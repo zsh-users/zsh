@@ -1,5 +1,7 @@
 2003-04-22  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_imagemagick: correct return codes
+
 	* 18458: Completion/Unix/Command/_renice: new completion for renice
 
 	* 18458: Completion/Base/Utility/_describe: handle the prefix-needed style

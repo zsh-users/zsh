@@ -1,4 +1,4 @@
-#compdef display animate import montage convert combine mogrify xtp
+#compdef display animate import identify montage convert combine mogrify xtp
 
 local state line expl formats curcontext="$curcontext"
 typeset -A opt_args
@@ -73,7 +73,7 @@ display)
       '*-visual:visual to use for display:(StaticGray GrayScale StaticColor PseudoColor TrueColor DirectColor default)' \
       '*-window:window ID to display image in:_x_window' \
       '*-write:output filename:_files' \
-      '*:picture file:_imagemagick' \
+      '*:picture file:_imagemagick' && return
   ;;
 
 animate)
@@ -102,7 +102,7 @@ animate)
       '*-verbose[print image information]' \
       '*-visual:visual to use for display:(StaticGray GrayScale StaticColor PseudoColor TrueColor DirectColor default)' \
       '*-window:window ID to display image in:_x_window' \
-      '*:picture file:_imagemagick' \
+      '*:picture file:_imagemagick' && return
   ;;
 
 import)
@@ -137,7 +137,7 @@ import)
       '-treedepth:color reduction tree depth:' \
       '-verbose[print image information]' \
       '-window:window ID to get:_x_window' \
-      ':output file:_files' \
+      ':output file:_files' && return
   ;;
 
 montage)
@@ -183,7 +183,7 @@ montage)
       '*-transparency:transparent color:_x_color' \
       '*-treedepth:color reduction tree depth:' \
       '*-verbose[print image information]' \
-      '*:picture file:_imagemagick' \
+      '*:picture file:_imagemagick' && return
   ;;
 
 convert)
@@ -279,14 +279,15 @@ convert)
       '-view:FlashPix viewing parameters:' \
       '-wave:sine wave parameters (<amplitude>x<wavelength>):' \
       '*:picture file:_imagemagick' && return 0
-  if [[ "$state" = profile ]]; then
-    if compset -P '*:'; then
-      _files
-    else
-      _wanted prefixes expl 'profile type' compadd icc: iptc:
+
+    if [[ "$state" = profile ]]; then
+      if compset -P '*:'; then
+	_files
+      else
+	_wanted prefixes expl 'profile type' compadd icc: iptc:
+      fi
+      return
     fi
-    return
-  fi
   ;;
 
 combine)
@@ -323,7 +324,7 @@ combine)
       ':image file:_imagemagick' \
       ':composite file:_imagemagick' \
       ':mask or combined file:_imagemagick' \
-      ':combined file:_files' \
+      ':combined file:_files' && return
   ;;
 
 mogrify)
@@ -411,7 +412,7 @@ mogrify)
       '*-verbose[print image information]' \
       '*-view:FlashPix viewing parameters:' \
       '*-wave:sine wave parameters (<amplitude>x<wavelength>):' \
-      '*:picture file:_imagemagick' \
+      '*:picture file:_imagemagick' && return
   ;;
 
 xtp)
@@ -430,8 +431,18 @@ xtp)
       '-retrieve[retrieve matching files]' \
       '-timeout:maximum timeout:' \
       '-type:remote system type:(UNIX VMS other)' \
-      ':url: _urls' \
+      ':url: _urls' && return
   ;;
+
+identify)
+  _arguments \
+      '*-density:resolution in pixels of image (<width>x<height>):' \
+      '*-depth[specify image depth]:image depth:(8 16)' \
+      '*-size:image size (<width>x<height>+<offset>):' \
+      '*-verbose[print more detailed info about image]' \
+      '*-noop[disable effect of preceding options]' \
+      '*:picture file:_imagemagick' && return
+ ;;
 
 *)
   _message 'eh?'
