@@ -1,5 +1,10 @@
 2004-05-25  Peter Stephenson  <pws@csr.com>
 
+	* 19976: Src/exec.c, Src/jobs.c: `job table full' messages
+	spotted by many people were traced by Wayne to thisjob
+	being -1, which wasn't handled in a test no one understands
+	anyway.
+
 	* Compiled by Thorsten Kampe in zsh-users/7474:
 	Doc/Zsh/options.yo: reorder option descriptions into subheadings.
 

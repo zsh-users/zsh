@@ -219,7 +219,7 @@ zfork(void)
     /*
      * Is anybody willing to explain this test?
      */
-    if (thisjob >= jobtabsize - 1 && !expandjobtab()) {
+    if (thisjob != -1 && thisjob >= jobtabsize - 1 && !expandjobtab()) {
 	zerr("job table full", NULL, 0);
 	return -1;
     }

@@ -904,6 +904,7 @@ addproc(pid_t pid, char *text, int aux)
     Process pn, *pnlist;
     struct timezone dummy_tz;
 
+    DPUTS(thisjob == -1, "No valid job in addproc.");
     pn = (Process) zshcalloc(sizeof *pn);
     pn->pid = pid;
     if (text)
@@ -1035,6 +1036,7 @@ void
 waitjobs(void)
 {
     Job jn = jobtab + thisjob;
+    DPUTS(thisjob == -1, "No valid job in waitjobs.");
 
     if (jn->procs || jn->auxprocs)
 	zwaitjob(thisjob, 0);
@@ -1129,6 +1131,7 @@ spawnjob(void)
 {
     Process pn;
 
+    DPUTS(thisjob == -1, "No valid job in spawnjob.");
     /* if we are not in a subshell */
     if (!subsh) {
 	if (curjob == -1 || !(jobtab[curjob].stat & STAT_STOPPED)) {
