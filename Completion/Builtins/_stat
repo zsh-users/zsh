@@ -9,7 +9,7 @@ else
 
   while _tags; do
     _requested options expl 'inode element' &&
-        { ! _style elements prefix-needed || [[ "$PREFIX[1]" = + ]] } &&
+        { ! _style options prefix-needed || [[ "$PREFIX[1]" = + ]] } &&
         compadd "$expl[@]" - +device +inode +mode +nlink +uid +gid +rdev \
                              +size +atime +mtime +ctime +blksize +block +link
     fi

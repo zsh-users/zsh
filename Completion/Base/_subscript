@@ -3,7 +3,7 @@
 local expl
 
 if [[ "$PREFIX" = :* ]]; then
-  _wanted char-classes expl 'character class' &&
+  _wanted characters expl 'character class' &&
       compadd "$expl[@]" -p: -S ':]' alnum alpha blank cntrl digit graph \
                                      lower print punct space upper xdigit
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then

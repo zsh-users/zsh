@@ -7,7 +7,7 @@ if [[ CURRENT -eq 2 ]]; then
     _wanted -C - jobs expl 'scheduled jobs' || return 1
 
     lines=(${(f)"$(sched)"})
-    if _style entries description; then
+    if _style jobs description; then
       disp=( -ld lines )
     else
       disp=()
