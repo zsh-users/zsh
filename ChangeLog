@@ -1,3 +1,8 @@
+2002-01-09  Peter Stephenson  <pws@csr.com>
+
+	* 16422: Functions/Misc/zcalc: fix output in bases when
+	base is specified for a single line.
+
 2002-01-08  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16418: Src/lex.c, Src/Zle/zle_tricky.c: fix completion after

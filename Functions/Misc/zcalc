@@ -173,7 +173,7 @@ while vared -cehp "${(%)ZCALCPROMPT}" line; do
       line=
       continue
     else
-      base=
+      base=$match[1]
     fi
   else
     base=$defbase
