@@ -167,5 +167,18 @@ t aaaXbaabY     (#a1)(a##b)##Y
 f read.me       (#ia1)README~READ.ME
 t read.me       (#ia1)README~READ_ME
 f read.me       (#ia1)README~(#a1)READ_ME
+t test          *((#s)|/)test((#e)|/)*
+t test/path     *((#s)|/)test((#e)|/)*
+t path/test     *((#s)|/)test((#e)|/)*
+t path/test/ohyes *((#s)|/)test((#e)|/)*
+f atest         *((#s)|/)test((#e)|/)*
+f testy         *((#s)|/)test((#e)|/)*
+f testy/path    *((#s)|/)test((#e)|/)*
+f path/atest    *((#s)|/)test((#e)|/)*
+f atest/path    *((#s)|/)test((#e)|/)*
+f path/testy    *((#s)|/)test((#e)|/)*
+f path/testy/ohyes *((#s)|/)test((#e)|/)*
+f path/atest/ohyes *((#s)|/)test((#e)|/)*
+t björn		*[åäöÅÄÖ]*
 EOT
 print "$failed tests failed."

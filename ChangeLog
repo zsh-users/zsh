@@ -1,3 +1,9 @@
+2003-12-03  Peter Stephenson  <pws@csr.com>
+
+	* 19269: Src/pattern.c, Misc/globtests, Test/D02glob.ztst:
+	8-bit characters didn't work in character classes where
+	chars were signed.
+
 2003-11-19  Clint Adams  <clint@zsh.org>
 
 	* 19258: Doc/Zsh/mod_terminfo.yo, Src/Modules/terminfo.c:
