@@ -118,7 +118,7 @@ icw-list-helper() {
   # +1 for the status line we will add...
 
   if [[ compstate[list_lines]+BUFFERLINES+1 -gt LINES ]]; then
-    compstate[list]='list explanations'
+    compstate[list]='list explanations messages'
     [[ compstate[list_lines]+BUFFERLINES+1 -gt LINES ]] && compstate[list]=''
 
     toolong='...'

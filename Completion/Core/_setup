@@ -64,5 +64,5 @@ fi
   zstyle -s ":completion:${curcontext}:$1" force-list val &&
     [[ "$val" = always ||
        ( "$val" = [0-9]## &&
-         ( -z "$_comp_force_list" || _comp_force_list -lt val ) ) ]] &&
+         ( -z "$_comp_force_list" || _comp_force_list -gt val ) ) ]] &&
     _comp_force_list="$val"

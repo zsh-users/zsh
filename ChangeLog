@@ -1,5 +1,11 @@
 2000-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11688: Completion/Commands/_complete_debug,
+ 	Completion/Core/_main_complete, Completion/Core/_setup,
+ 	Doc/Zsh/compwid.yo, Functions/Zle/incremental-complete-word,
+ 	Src/Zle/compcore.c, Src/Zle/complist.c, Src/Zle/compresult.c:
+ 	allow display of only messages via $compstate[list]=messages
+	
 	* 11549: Completion/Base/_combination, Completion/Base/_command_names,
  	Completion/Base/_describe, Completion/Base/_equal,
  	Completion/Base/_subscript, Completion/Base/_tilde,

@@ -259,9 +259,12 @@ group, this group will show the tt(LIST_PACKED) behavior. The same is
 done for the tt(LIST_ROWS_FIRST) option with the substring tt(rows).
 
 Finally, if the value contains the string tt(explanations), only the
-explanation strings, if any, will be listed.  It will be set
-appropriately on entry to a completion widget and may be changed
-there.
+explanation strings, if any, will be listed and if it contains
+tt(messages), only the messages (added with the tt(-x) option of
+tt(compadd)) will be listed.  If it contains both tt(explanations) and 
+tt(messages) both kinds of explanation strings will be listed.  It
+will be set appropriately on entry to a completion widget and may be
+changed there.
 )
 vindex(list_max, compstate)
 item(tt(list_max))(

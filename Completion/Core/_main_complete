@@ -220,9 +220,9 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
       fi
     fi
   fi
-elif [[ nm -eq 0 && -n "$_comp_mesg" ]]; then
+elif [[ nm -le 1 && -n "$_comp_mesg" ]]; then
   compstate[insert]=''
-  compstate[list]='list force'
+  compstate[list]='list force messages'
 elif [[ nm -eq 0 &&
         $#_lastdescr -ne 0 && $compstate[old_list] != keep ]] &&
      zstyle -s ":completion:${curcontext}:warnings" format format; then
@@ -251,7 +251,7 @@ fi
 
 [[ "$_comp_force_list" = always ||
    ( "$_comp_force_list" = ?*  && nm -ge _comp_force_list ) ]] &&
-    compstate[list]="$compstate[list] force"
+    compstate[list]="${compstate[list]//messages} force"
 
 [[ "$compstate[old_list]" = keep ]] && ZLS_COLORS="$_saved_colors"
 

@@ -20,7 +20,8 @@ unsetopt xtrace
 [[ -t 3 ]] && {
     print -sR "${VISUAL:-${EDITOR:-${PAGER:-more}}} $tmp ;: $w"
     _message -r "Trace output left in $tmp (up-history to view)"
-    compstate[list]='list force'
+    [[ $compstate[nmatches] -le 1 && $compstate[list] != *force* ]] &&
+        compstate[list]='list force messages'
     exec 2>&3 3>&-
 }
 

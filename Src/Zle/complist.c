@@ -1026,7 +1026,9 @@ compprintlist(int showall)
 		lastused = 1;
 	    }
 	    while (*e) {
-		if ((*e)->count) {
+		if ((*e)->count &&
+		    (!listdat.onlyexpl ||
+		     (listdat.onlyexpl & ((*e)->count > 0 ? 1 : 2)))) {
 		    if (pnl) {
 			if (dolistnl(ml) && compprintnl(ml))
 			    goto end;

@@ -440,7 +440,7 @@ do_completion(Hookdef dummy, Compldat dat)
     if (!showinglist && validlist && usemenu != 2 && 
 	(nmatches != 1 || diffmatches) &&
 	useline >= 0 && useline != 2 && (!oldlist || !listshown)) {
-	onlyexpl = 1;
+	onlyexpl = 3;
 	showinglist = -2;
     }
  compend:
@@ -802,7 +802,8 @@ callcompfunc(char *s, char *fn)
 	else
 	    uselist = 0;
 	forcelist = (complist && strstr(complist, "force"));
-	onlyexpl = (complist && strstr(complist, "expl"));
+	onlyexpl = (complist ? ((strstr(complist, "expl") ? 1 : 0) |
+				(strstr(complist, "messages") ? 2 : 0)) : 0);
 
 	if (!compinsert)
 	    useline = 0;
@@ -2449,7 +2450,7 @@ addexpl(void)
 
     for (n = firstnode(expls); n; incnode(n)) {
 	e = (Cexpl) getdata(n);
-	if (!strcmp(curexpl->str, e->str)) {
+	if (e->count >= 0 && !strcmp(curexpl->str, e->str)) {
 	    e->count += curexpl->count;
 	    e->fcount += curexpl->fcount;
 
@@ -2471,11 +2472,11 @@ addmesg(char *mesg)
 
     for (n = firstnode(expls); n; incnode(n)) {
 	e = (Cexpl) getdata(n);
-	if (!strcmp(mesg, e->str))
+	if (e->count < 0 && !strcmp(mesg, e->str))
 	    return;
     }
     e = (Cexpl) zhalloc(sizeof(*e));
-    e->count = e->fcount = 1;
+    e->count = e->fcount = -1;
     e->str = dupstring(mesg);
     addlinknode(expls, e);
     newmatches = 1;

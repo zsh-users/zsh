@@ -1170,7 +1170,8 @@ comp_list(char *v)
     zsfree(complist);
     complist = ztrdup(v);
 
-    onlyexpl = (v && strstr(v, "expl"));
+    onlyexpl = (v ? ((strstr(v, "expl") ? 1 : 0) |
+		     (strstr(v, "messages") ? 2 : 0)) : 0);
 }
 
 /* This skips over matches that are not to be listed. */
@@ -1300,7 +1301,9 @@ calclist(int showall)
 	}
 	if ((e = g->expls)) {
 	    while (*e) {
-		if ((*e)->count)
+		if ((*e)->count &&
+		    (!onlyexpl ||
+		     (onlyexpl & ((*e)->count > 0 ? 1 : 2))))
 		    nlines += 1 + printfmt((*e)->str, (*e)->count, 0, 1);
 		e++;
 	    }
@@ -1690,7 +1693,9 @@ printlist(int over, CLPrintFunc printm, int showall)
 	    int l;
 
 	    while (*e) {
-		if ((*e)->count) {
+		if ((*e)->count &&
+		    (!listdat.onlyexpl ||
+		     (listdat.onlyexpl & ((*e)->count > 0 ? 1 : 2)))) {
 		    if (pnl) {
 			putc('\n', shout);
 			pnl = 0;
