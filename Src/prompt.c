@@ -161,7 +161,7 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     rstring = rs;
     Rstring = Rs;
     fm = s;
-    bp = bufline = buf = zalloc(bufspc = 256);
+    bp = bufline = buf = zcalloc(bufspc = 256);
     bp1 = NULL;
     trunclen = 0;
     putpromptchar(1, '\0');
