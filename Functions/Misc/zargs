@@ -15,12 +15,6 @@
 #   127 if the command is not found
 #   1 if some other error occurred.
 #
-# However, "killed by a signal" is determined by the usual shell rule
-# that $? is the signal number plus 128, so zargs can be fooled by a
-# command that explicitly exits with 129+.  Also, zsh prior to 4.1.x
-# returns 1 rather than 127 for "command not found" so this function
-# incorrectly returns 123 in that case if used with zsh 4.0.x.
-#
 # The full set of GNU xargs options is supported (see help text below);
 # although --eof and --max-lines therefore have odd names, they have
 # analogous meanings to their xargs counterparts.  Also zargs --help is
@@ -34,6 +28,19 @@
 #   zargs -p -i one -- print There is just {} input-arg
 # Obviously, if there is no command, the second "--" may be omitted:
 #   zargs -n2 These words will be echoed in five lines of two
+#
+# BUGS:
+#
+# "Killed by a signal" is determined by the usual shell rule that $? is
+# the signal number plus 128, so zargs can be fooled by a command that
+# explicitly exits with 129+.  Also, zsh prior to 4.1.x returns 1 rather
+# than 127 for "command not found" so this function incorrectly returns
+# 123 in that case if used with zsh 4.0.x.
+#
+# With the --max-procs option, zargs may not correctly capture the exit
+# status of the backgrounded jobs, because of limitations of the "wait"
+# builtin.  If the zsh/parameter module is not available, the status is
+# NEVER correctly returned.
 #
 
 emulate -L zsh || return 1
@@ -114,6 +121,16 @@ HELP
 	# but GNU xargs does behave as if -i implies -r.
 	opts[(r)-r]=-r
     fi
+    if (( $#P ))
+    then
+	P=${${P##-(P|-max-procs(=|))}:-1}
+	if [[ x${P} != x$[P] ]]
+	then
+	    print -u2 zargs: invalid number for -P option
+	    return 1
+	fi
+    else P=1
+    fi
 else
     return 1
 fi
@@ -135,13 +152,32 @@ then (( c = $#command - 1 ))
 else command=( print -r -- )
 fi
 
+local wait bg
+if (( P != 1 ))
+then
+    setopt nonotify nomonitor
+    bg='&'
+fi
+if (( P > 1 ))
+then
+    if zmodload -i zsh/parameter 2>/dev/null
+    then
+	integer j=$#jobtexts
+	wait='(( $#jobtexts - j < P )) || wait %${(k)^jobtexts} 2>/dev/null;'
+    else
+	wait='{ (( P )) && (( P-- )) } || wait;'
+    fi
+fi
+
 local last='return $ret' execute='
     if (( $opts[(I)-(-interactive|p)] ))
     then read -q "?$call?..." || eval "$last"
     elif (( $opts[(I)-(-verbose|t)] ))
     then print -u2 -r -- "$call"
     fi
-    $call
+    eval "{
+	\$call
+    } $bg $wait"
     case $? in
     (0) ;;
     (<1-125>|128)  ret=123;;
