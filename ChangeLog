@@ -1,3 +1,7 @@
+2000-04-27  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* Tanaka Akira: 10980: Completion for enscript.
+
 2000-04-27  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 10985: Completion/Core/compinstall: _oldlist, list-prompt and
