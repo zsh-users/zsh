@@ -1,3 +1,8 @@
+2005-02-09  Peter Stephenson  <pws@csr.com>
+
+	* 20793 (part): Src/signals.c, Test/C03traps.ztst: Port main
+	fix for autoloaded traps and tests.
+
 2005-02-04  Peter Stephenson  <pws@csr.com>
 
 	* Motoi Washida: 20785: configure.ac: libiconv test needed

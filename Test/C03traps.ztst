@@ -1,0 +1,251 @@
+# Tests for both trap builtin and TRAP* functions.
+
+%prep
+
+  setopt localtraps
+  mkdir traps.tmp && cd traps.tmp
+
+%test
+
+  fn1() {
+    trap 'print EXIT1' EXIT
+    fn2() { trap 'print EXIT2' EXIT; }
+    fn2
+  }
+  fn1
+0:Nested `trap ... EXIT'
+>EXIT2
+>EXIT1
+
+  fn1() {
+    TRAPEXIT() { print EXIT1; }
+    fn2() { TRAPEXIT() { print EXIT2; }; }
+    fn2
+  }
+  fn1
+0: Nested TRAPEXIT
+>EXIT2
+>EXIT1
+
+  fn1() {
+    trap 'print EXIT1' EXIT
+    fn2() { trap - EXIT; }
+    fn2
+  }
+  fn1
+0:Nested `trap - EXIT' on `trap ... EXIT'
+>EXIT1
+
+  fn1() {
+    TRAPEXIT() { print EXIT1; }
+    fn2() { trap - EXIT; }
+    fn2
+  }
+  fn1
+0:Nested `trap - EXIT' on `TRAPEXIT'
+>EXIT1
+
+# We can't test an EXIT trap for the shell as a whole, because
+# we're inside a function scope which we don't leave when the
+# subshell exits.  Not sure if that's the correct behaviour, but
+# it's sort of consistent.
+  ( fn1() { trap 'print Function 1 going' EXIT; exit; print Not reached; }
+    fn2() { trap 'print Function 2 going' EXIT; fn1; print Not reached; }
+    fn2
+  )
+0:EXIT traps on functions when exiting from function
+>Function 1 going
+>Function 2 going
+
+# $ZTST_exe is relative to the parent directory.
+# We ought to fix this in ztst.zsh...
+  cd ..
+  $ZTST_exe -fc 'TRAPEXIT() { print Exited.; }'
+0:EXIT traps on a script
+>Exited.
+
+  fn1() {
+    trap
+    trap 'print INT1' INT
+    fn2() { trap 'print INT2' INT; trap; }
+    trap
+    fn2
+    trap
+  }
+  fn1
+0: Nested `trap ... INT', not triggered
+>trap -- 'print INT1' INT
+>trap -- 'print INT2' INT
+>trap -- 'print INT1' INT
+
+   fn1() {
+    trap
+    TRAPINT() { print INT1; }
+    fn2() { TRAPINT() { print INT2; }; trap; }
+    trap
+    fn2
+    trap
+  }
+  fn1
+0: Nested `trap ... INT', not triggered
+>TRAPINT () {
+>	print INT1
+>}
+>TRAPINT () {
+>	print INT2
+>}
+>TRAPINT () {
+>	print INT1
+>}
+
+  fn1() {
+    trap 'print INT1' INT
+    fn2() { trap - INT; trap; }
+    trap
+    fn2
+    trap
+  }
+  fn1
+0: Nested `trap - INT' on untriggered `trap ... INT'
+>trap -- 'print INT1' INT
+>trap -- 'print INT1' INT
+
+# Testing the triggering of traps here is very unpleasant.
+# The delays are attempts to avoid race conditions, though there is
+# no guarantee that they will work.  Note the subtlety that the
+# `sleep' in the function which receives the trap does *not* get the
+# signal, only the parent shell, which is waiting for a SIGCHILD.
+# (At least, that's what I think is happening.) Thus we have to wait at
+# least the full two seconds to make sure we have got the output from the
+# execution of the trap.
+
+  print 'This test takes at least three seconds...' >&8
+  fn1() {
+    trap 'print TERM1' TERM
+    fn2() { trap 'print TERM2; return 1' TERM; sleep 2; }
+    fn2 &
+    sleep 1
+    kill -TERM $!
+    sleep 2
+  }
+  fn1
+0: Nested `trap ... TERM', triggered on inner loop
+>TERM2
+
+  print 'This test, too, takes at least three seconds...' >&8
+  fn1() {
+    trap 'print TERM1; return 1' TERM
+    fn2() { trap 'print TERM2; return 1' TERM; }
+    fn2
+    sleep 2
+  }
+  fn1 &
+  sleep 1
+  kill -TERM $!
+  sleep 2
+0: Nested `trap ... TERM', triggered on outer loop
+>TERM1
+
+  TRAPZERR() { print error activated; }
+  fn() { print start of fn; false; print end of fn; }
+  fn
+  fn() {
+    setopt localoptions localtraps
+    unfunction TRAPZERR
+    print start of fn
+    false
+    print end of fn
+  }
+  fn
+  unfunction TRAPZERR
+  print finish
+0: basic localtraps handling
+>start of fn
+>error activated
+>end of fn
+>start of fn
+>end of fn
+>finish
+
+  TRAPZERR() { print 'ERR-or!'; }
+  f() { print f; false; }
+  t() { print t; }
+  f
+  f && t
+  t && f && true
+  t && f
+  testunset() {
+    setopt localtraps
+    unset -f TRAPZERR
+    print testunset
+    false
+    true
+  }
+  testunset
+  f
+  print status $?
+  unfunction TRAPZERR
+0: more sophisticated error trapping
+>f
+>ERR-or!
+>f
+>t
+>f
+>t
+>f
+>ERR-or!
+>testunset
+>f
+>ERR-or!
+>status 1
+
+  f() {
+    setopt localtraps
+    TRAPWINCH() { print "Window changed.  That wrecked the test."; }
+  }
+  f
+  f
+  functions TRAPWINCH
+1:Unsetting ordinary traps with localtraps.
+
+#
+# Returns from within traps are a perennial problem.
+# The following two apply to returns in and around standard
+# ksh-style traps.  The intention is that a return value from
+# within the function is preserved (i.e. statuses set by the trap
+# are ignored) unless the trap explicitly executes `return', which makes
+# it return from the enclosing function.
+#
+  fn() { trap 'true' EXIT; return 1; }
+  fn
+1: ksh-style EXIT traps preserve return value
+
+  inner() { trap 'return 3' EXIT; return 2; }
+  outer() { inner; return 1; }
+  outer
+3: ksh-style EXIT traps can force return status of enclosing function
+
+# Autoloaded traps are horrid, but unfortunately people expect
+# them to work if we support them.
+  echo "print Running exit trap" >TRAPEXIT
+  $ZTST_testdir/../Src/zsh -fc '
+    fpath=(. $fpath)
+    autoload TRAPEXIT
+    print "Exiting, attempt 1"
+    exit
+    print "What?"
+  '
+  $ZTST_testdir/../Src/zsh -fc '
+    fpath=(. $fpath)
+    autoload TRAPEXIT;
+    fn() { print Some function }
+    fn
+    print "Exiting, attempt 2"
+    exit
+  '
+0: autoloaded TRAPEXIT (exit status > 128 indicates an old bug is back)
+>Exiting, attempt 1
+>Running exit trap
+>Some function
+>Exiting, attempt 2
+>Running exit trap
