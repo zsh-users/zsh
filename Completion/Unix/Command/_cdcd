@@ -1,66 +1,57 @@
 #compdef cdcd
 
-typeset -A opt_args
+local expl
 
 _cdcd_tracks ()
 {
-    print ${${${(f)"$(cdcd info)"}[3]}/Total tracks: #(#b)([0-9]##)*/$match[1]}
-}
-
-_cdcd_track_list ()
-{
-    print ${1..$(_cdcd_tracks)}
-}
-
-_cdcd_track_list_verbose ()
-{
-    print ${${(M)${(f)"$(cdcd tracks)"}:#(#s) #[0-9]##:*}/(#s) #(#b)([0-9]##):[ >]#? #[^ ]# #(*) ##/$match[1]:${(qqq)match[2]}}
+  local -a tracks
+  tracks=( ${${(M)${(f)"$(cdcd tracks)"}:#(#s) #[0-9]##:*}/(#s) #(#b)([0-9]##):[ >]#? #[^ ]# #(*) ##/$match[1]:${match[2]}} )
+  _describe tracks tracks -V tracks
 }
 
 _cdcd_commands ()
 {
-    _arguments \
-	':cdcd command:((
-	play\:"play a track"
-	stop\:"stop plating"
-	open\:"eject the CD-ROM tray"
-	eject\:"eject the CD-ROM tray"
-	close\:"close the CD-ROM tray"
-	pause\:"pause playing"
-	resume\:"resume playing"
-	ff\:"fast forward"
-	rew\:"rewind"
-	next\:"advance one track"
-	prev\:"return to previous track"
-	getvol\:"get current volume settings"
-	setvol\:"set volume settings"
-	status\:"get numerical data regarding the CD status"
-	info\:"short information about the CD"
-	tracks\:"list all tracks on the CD"
-	rndplay\:"play a random track"
-	list\:"list all CDs in a CD-ROM changer"
-	slot\:"changes the current CD in the CD-ROM changer"
-	edit\:"edit information about the disc"
-	ext\:"Extended information about the disc"
-	refresh\:"refresh the information about the CD from a CDDB server"
-	device\:"change the CD-ROM device cdcd will use"
-	verbose\:"toggle verbosity"
-	sites\:"edit the server list"
-	access\:"configure cddb access method"
-	help\:"display a help message"
-	))'
+  local -a commands
+  commands=(
+    'play:play a track'
+    'stop:stop playing'
+    {open,eject}':eject the CD-ROM tray'
+    'close:close the CD-ROM tray'
+    'pause:pause playing'
+    'resume:resume playing'
+    'ff:fast forward'
+    'rew:rewind'
+    'next:advance one track'
+    'prev:return to previous track'
+    'getvol:get current volume settings'
+    'setvol:set volume settings'
+    'status:get numerical data regarding the CD status'
+    'info:short information about the CD'
+    'tracks:list all tracks on the CD'
+    'rndplay:play a random track'
+    'list:list all CDs in a CD-ROM changer'
+    'slot:changes the current CD in the CD-ROM changer'
+    'edit:edit information about the disc'
+    'ext:Extended information about the disc'
+    'refresh:refresh the information about the CD from a CDDB server'
+    'device:change the CD-ROM device cdcd will use'
+    'verbose:toggle verbosity'
+    'sites:edit the server list'
+    'access:configure cddb access method'
+    'help:display a help message'
+  )
+  _describe 'cdcd command' commands
 }
 
 if (( CURRENT == 2 )); then
     _cdcd_commands
 else
-    shift words
-    (( --CURRENT ))
-    case "$words[1]" in
+    case "$words[2]" in
 	# sub-commands with no args
 	stop|open|eject|close|pause|resume|next|prev|getvol)
-	    ;;
+	    ;&
 	status|info|tracks|rndplay|list|slot|refresh)
+	    _message 'no more arguments'
 	    ;;
 	# sub-commands with args that cannot be completed
 	ff|rew|setvol)
@@ -70,30 +61,18 @@ else
 	    ;;
 	# completeable sub-commands
 	verbose)
-	    _arguments \
-		':verbose subcommand:((
-		on\:"turn verbosity on"
-		off\:"turn verbosity off"))'
+	    _wanted subcommand expl 'verbose subcommand' compadd on off
 	    ;;
 	ext)
-	    _arguments \
-		":ext subcommand:((
-		disc\:\"extra information about the disc\"
-		$(_cdcd_track_list)))"
+	    _values 'ext subcommand' \
+	      'disc[extra information about the disc]' \
+	      {1..${${(z)${${(f)"$(cdcd info)"}[3]}}[3]}}
 	    ;;
 	device)
-	    compadd "$expl[@]" /dev/cd* /dev/cd*/*
+	    _wanted device expl 'cdrom device' compadd /dev/cd* /dev/cd*/*
 	    ;;
 	play)
-	    if (( CURRENT == 2 )); then
-		_arguments ":play subcommand:((
-		$(_cdcd_track_list_verbose)))"
-	    else
-		shift words
-		(( --CURRENT ))
-		_arguments ":play subcommand2:((
-		$(_cdcd_track_list_verbose)))"
-	    fi
+            _cdcd_tracks
 	    ;;
 	help)
 	    _cdcd_commands;;

@@ -1,21 +1,12 @@
 #compdef apt-show-versions
 
 _arguments \
-   '(--status-file)-stf[status file]:status file:_files' \
-   '(-stf)--status-file=:status file:_files' \
-   '(--list-dir)-ld[aptlist dir]:aptlist dir:_files -/' \
-   '(-ld)--list-dir=:aptlist dir:_files -/' \
-   '(--package)-p[package]:package:_deb_packages avail' \
-   '(-p)--package=:package:_deb_packages avail' \
-   '(--regex)-r[regex]' \
-   '(-r)--regex' \
-   '(--upgradeable)-u[print only upgradeable packages]' \
-   '(-u)--upgradeable' \
-   '(--allversions)-a[print all available versions]' \
-   '(-a)--allversions' \
-   '(--brief)-b[brief output]' \
-   '(-b)--brief' \
-   '(--verbose)-v[verbose output]' \
-   '(-v)--verbose' \
-   '(--help)-h[help]' \
-   '(-h)--help'
+   '(--status-file -stf)'{--status-file=,-stf}'[specify dpkg status file]:status file:_files' \
+   '(--list-dir -ld)'{--list-dir=,-ld}"[specify dir for apt's list files]:apt list dir:_files -/" \
+   '(--package -p)'{--package=,-p}'[restrict to specified package]:package:_deb_packages avail' \
+   '(--regex -r)'{--regex,-r}'[interpret -p argument as regex]' \
+   '(--upgradeable -u)'{--upgradeable,-u}'[print only upgradeable packages]' \
+   '(--allversions -a)'{--allversions,-a}'[print all available versions]' \
+   '(--brief -b)'{--brief,-b}'[brief output]' \
+   '(--verbose -v)'{--verbose,-v}'[verbose output]' \
+   '(--help -h)'{--help,-h}'[display help information]'

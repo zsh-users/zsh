@@ -1,4 +1,4 @@
-#compdef curl
+#compdef curl -value-,http_proxy,-default-
 
 # Configuration styles used:
 #
@@ -82,7 +82,7 @@ case "$scheme" in
     fi
   ;;
   file)
-    [[ -prefix //localhost/ ]] && compset -P //localhost
+    [[ -prefix //(127.0.0.1|localhost)/ ]] && compset -P //(127.0.0.1|localhost)
     [[ -prefix /// ]] && compset -P //
     if ! compset -P //; then
       _tags -C file files

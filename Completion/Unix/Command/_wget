@@ -61,7 +61,7 @@ _arguments -C -s \
   '--exclude-domains=:rejected domains:' \
   '--follow-ftp' \
   '--follow-tags=:HTML tags:' \
-  '(--ignore-tags -G)'{--ignore-tags=,-G+}'[spcify ignored HTML tags]:HTML tags' \
+  '(--ignore-tags -G)'{--ignore-tags=,-G+}'[specify ignored HTML tags]:HTML tags' \
   '(--span-hosts -H)'{--span-hosts,-H}'[span hosts]' \
   '(--relative -L)'{--relative,-L}'[follow relative links only]' \
   '(--include-directories -I)'{--include-directories=,-I+}'[include directories]:allowed directories' \
