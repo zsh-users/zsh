@@ -1,3 +1,8 @@
+2003-05-28  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk, Completion/Unix/Command/.distfiles,
+	Completion/X/Command/.distfiles: zsh-4.1.1-test-3.
+
 2003-05-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 18578: Src/builtin.c: changet to OPT_ISSET() in 18559
