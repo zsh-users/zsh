@@ -780,7 +780,7 @@ complistmatches(Hookdef dummy, Chdata dat)
     if (inselect)
 	clearflag = 0;
 
-    if (asklist() || !clearflag) {
+    if (asklist()) {
 	amatches = oamatches;
 	return (noselect = 1);
     }
@@ -800,7 +800,8 @@ complistmatches(Hookdef dummy, Chdata dat)
     last_cap = (char *) zhalloc(max_caplen + 1);
     *last_cap = '\0';
 
-    if (!printlist(1, clprintm, (mselect >= 0)) || listdat.nlines >= lines)
+    if (!printlist(1, clprintm, (mselect >= 0)) || listdat.nlines >= lines ||
+	!clearflag)
 	noselect = 1;
 
     amatches = oamatches;
