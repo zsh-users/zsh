@@ -196,6 +196,8 @@ _cvsdirentries () {
   setopt localoptions nullglob unset
   if [[ -f ${pref}CVS/Entries ]]; then
     entries=( ${${${(M)${(f)"$(<${pref}CVS/Entries)"}:#D/*}#D/}%%/*} )
+  else
+    entries=()
   fi
 }
 
@@ -203,6 +205,8 @@ _cvsentries () {
   setopt localoptions nullglob unset
   if [[ -f ${pref}CVS/Entries ]]; then
     entries=( ${${${${(f)"$(<${pref}CVS/Entries)"}:#D}#(D|)/}%%/*} )
+  else
+    entries=()
   fi
 }
 
@@ -213,6 +217,7 @@ _cvsentries_modified () {
     return
   fi
 
+  entries=()
   local line Entries
   typeset -A mtime
 
@@ -242,52 +247,59 @@ _cvsentries_modified () {
 _cvsdirs () {
   if [[ -d ${pref}CVS ]]; then
     _cvsdirentries
-    compadd -fW "$pref" - $entries
+    if (( $#entries )); then
+      compgen "$@" -g '('${(j:|:)entries:q}')'
+    fi
   else
-    _files -W "$pref"
+    _files
   fi
 }
 
 _cvstargets () {
   local qpref pref entries
-  _cvsprefix; compset -P '*/'
+  _cvsprefix
   if [[ -d ${pref}CVS ]]; then
     _cvsentries
-    compgen -W "$pref" -g "(${(j:|:)entries})"
+    if (( $#entries )); then
+      compgen -g '('${(j:|:)entries:q}')'
+    fi
   else
-    _files -W "$pref"
+    _files
   fi
 }
 
 _cvstargets_modified () {
   local qpref pref entries
-  _cvsprefix; compset -P '*/'
+  _cvsprefix
   if [[ -d ${pref}CVS ]]; then
     _cvsentries_modified
-    compgen -W "$pref" -g "(${(j:|:)entries})"
+    if (( $#entries )); then
+      compgen -g '('${(j:|:)entries:q}')'
+    fi
   else
-    _files -W "$pref"
+    _files 
   fi
 }
 
 _cvsremovep () {
   local qpref pref entries
-  _cvsprefix; compset -P '*/'
+  _cvsprefix
   if [[ -d ${pref}CVS ]]; then
     _cvsentries
     setopt localoptions unset
     local omit
     omit=( ${pref}*(D:t) )
-    eval 'compadd -fW "$pref" - ${entries:#('${(j:|:)omit}')}' ||
+    eval 'entries=( ${entries:#('${(j:|:)omit:q}')} )'
+    compadd -P "$qpref" - ${entries:q} ||
     _cvsdirs
   else
-    _files -W "$pref"
+    _files
   fi
 }
 
 _cvsaddp () {
   local qpref pref entries
-  _cvsprefix; compset -P '*/'
+  _cvsprefix
   if [[ -d ${pref}CVS ]]; then
     _cvsentries
     setopt localoptions unset
@@ -296,10 +308,10 @@ _cvsaddp () {
     omit=( CVS $entries ${=cvsignore} )
     [[ -r ~/.cvsignore ]] && omit=( $omit $(<~/.cvsignore) )
     [[ -r ${pref}.cvsignore ]] && omit=( $omit $(<${pref}.cvsignore) )
-    compgen -W "$pref" -g "*~*/(${(j:|:)omit})" ||
-    _cvsdirs
+    compgen -g '*~(*/|)('${(j:|:)omit:q}')' ||
+    { _cvsdirentries; compgen -g '('${(j:|:)entries:q}')' }
   else
-    _files -W "$pref"
+    _files
   fi
 }
 
