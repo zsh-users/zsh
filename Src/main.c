@@ -35,22 +35,44 @@ int
 main(int argc, char **argv)
 {
     char **t;
-#ifdef LC_ALL
+    int t0;
+#ifdef USE_LOCALE
     setlocale(LC_ALL, "");
 #endif
 
-    global_permalloc();
-
     init_hackzero(argv, environ);
+
+    /*
+     * Provisionally set up the type table to allow metafication.
+     * This will be done properly when we have decided if we are
+     * interactive
+     */
+    typtab['\0'] |= IMETA;
+    typtab[STOUC(Meta)  ] |= IMETA;
+    typtab[STOUC(Marker)] |= IMETA;
+    for (t0 = (int)STOUC(Pound); t0 <= (int)STOUC(Nularg); t0++)
+	typtab[t0] |= ITOK | IMETA;
 
     for (t = argv; *t; *t = metafy(*t, -1, META_ALLOC), t++);
 
-    if (!(zsh_name = strrchr(argv[0], '/')))
-	zsh_name = argv[0];
-    else
-	zsh_name++;
-    if (*zsh_name == '-')
-	zsh_name++;
+    zsh_name = argv[0];
+    do {
+      char *arg0 = zsh_name;
+      if (!(zsh_name = strrchr(arg0, '/')))
+	  zsh_name = arg0;
+      else
+	  zsh_name++;
+      if (*zsh_name == '-')
+	  zsh_name++;
+      if (strcmp(zsh_name, "su") == 0) {
+	  char *sh = zgetenv("SHELL");
+	  if (sh && *sh && arg0 != sh)
+	      zsh_name = sh;
+	  else
+	      break;
+      } else
+	  break;
+    } while (zsh_name);
 
     fdtable_size = OPEN_MAX;
     fdtable = zcalloc(fdtable_size);
@@ -67,7 +89,6 @@ main(int argc, char **argv)
     init_io();
     setupvals();
     init_signals();
-    global_heapalloc();
     init_bltinmods();
     run_init_scripts();
     init_misc();

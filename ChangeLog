@@ -1,3 +1,8 @@
+2000-06-08  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* pws: 11820: Src/main.c: metafication of command line arguments
+	didn't work because type table wasn't set up.
+
 2000-06-08  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11817: Src/Zle/compmatch.c: more anchor matching fixes
