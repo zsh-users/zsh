@@ -320,13 +320,13 @@ Both the tt(/dev/fd) and the named pipe implementation have drawbacks.  In
 the former case, some programmes may automatically close the file
 descriptor in question before examining the file on the command line,
 particularly if this is necessary for security reasons such as when the
-programme is running setuid.  In the second case, the file passed as an
-argument to the command is a system pipe, so programs that expect to lseek
-(see manref(lseek)(2)) on the file will not work; furthermore, if the
+programme is running setuid.  In the second case,  if the
 programme does not actually open the file the subshell attempting to read
 from or write to the pipe will (in a typical implementation, different
 operating systems may have different behaviour) block for ever and have to
-be killed explicitly.
+be killed explicitly.  In both cases, the shell actually supplies the
+information using a pipe, so that programmes that expect to lseek
+(see manref(lseek)(2)) on the file will not work.
 
 Also note that the previous example can be more compactly and
 efficiently written (provided the tt(MULTIOS) option is set) as:
