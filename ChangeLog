@@ -1,3 +1,7 @@
+2004-06-18  Clint Adams  <clint@zsh.org>
+
+	* 20081: Doc/Zsh/mod_pcre.yo: document -pcre-match condition.
+
 2004-06-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 20077: Completion/Zsh/Command/_disable,

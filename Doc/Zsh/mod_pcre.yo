@@ -32,3 +32,15 @@ substrings, unless the tt(-a) option is given, in which
 case it will set the array var(arr).
 )
 enditem()
+
+The tt(zsh/pcre) module makes available the following test condition:
+startitem()
+findex(pcre-match)
+item(expr tt(-pcre-match) pcre)(
+Matches a string against a perl-compatible regular expression.
+
+For example,
+
+[[ "$text" -pcre-match ^d+$ ]] && print text variable contains only "d's".
+)
+enditem()
