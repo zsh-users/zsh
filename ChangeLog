@@ -5,6 +5,8 @@
 
 2000-05-08  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11255: Src/Modules/zpty.c: close fd for pty-master in sub-shell
+	
 	* 11253: Completion/Base/_arguments, Src/Zle/computil.c: more
  	problems with optional arguments in _arguments
 	

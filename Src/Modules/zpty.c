@@ -352,6 +352,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
 	dup2(slave, 2);
 
 	close(slave);
+	close(master);
 
 	if (SHTTY != -1)
 	    close(SHTTY);
