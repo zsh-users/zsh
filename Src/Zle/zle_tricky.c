@@ -5255,7 +5255,7 @@ makecomplist(char *s, int incmd, int lst)
 	endcmgroup(NULL);
 
 	if (amatches && !oldlist)
-	    amatches->ccs = (Compctl *) makearray(ccused, 0,
+	    amatches->ccs = (Compctl *) makearray(ccused, 0, 0,
 						  &(amatches->ccount), NULL, NULL);
 	else {
 	    LinkNode n;
@@ -7221,7 +7221,7 @@ matcheq(Cmatch a, Cmatch b)
 
 /**/
 static Cmatch *
-makearray(LinkList l, int s, int *np, int *nlp, int *llp)
+makearray(LinkList l, int s, int u, int *np, int *nlp, int *llp)
 {
     Cmatch *ap, *bp, *cp, *rp;
     LinkNode nod;
@@ -7272,7 +7272,7 @@ makearray(LinkList l, int s, int *np, int *nlp, int *llp)
 		nl++;
 	}
 	*cp = NULL;
-    } else {
+    } else if (u) {
 	for (ap = rp; *ap; ap++) {
 	    for (bp = cp = ap + 1; *bp; bp++) {
 		if (!matcheq(*ap, *bp))
@@ -7430,7 +7430,7 @@ permmatches(void)
 		g->lmatches = g->lfmatches;
 
 	    g->matches = makearray(g->lmatches,
-				   ((g->flags & CGF_NOSORT) ? 0 : 2),
+				   ((g->flags & CGF_NOSORT) ? 0 : 2), 1,
 				   &nn, &nl, &ll);
 	    g->mcount = nn;
 	    if ((g->lcount = nn - nl) < 0)
@@ -7440,7 +7440,7 @@ permmatches(void)
 		g->lcount = arrlen(g->ylist);
 		smatches = 2;
 	    }
-	    g->expls = (Cexpl *) makearray(g->lexpls, 0, &(g->ecount),
+	    g->expls = (Cexpl *) makearray(g->lexpls, 0, 0, &(g->ecount),
 					   NULL, NULL);
 
 	    g->ccount = 0;
@@ -8822,7 +8822,7 @@ listlist(LinkList l)
     smatches = 1;
     validlist = 1;
     memset(&dg, 0, sizeof(struct cmgroup));
-    dg.ylist = (char **) makearray(l, 1, &(dg.lcount), NULL, NULL);
+    dg.ylist = (char **) makearray(l, 1, 0, &(dg.lcount), NULL, NULL);
     amatches = &dg;
     ilistmatches(NULL, NULL);
     amatches = am;
