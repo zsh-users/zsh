@@ -1,3 +1,8 @@
+2001-08-08  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15615: Completion/Unix/Type/_path_files: -[12n] options don't
+	get arguments
+
 2001-08-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* Peter Breitenlohner: 14956: Makefile.in, Doc/Makefile.in,
