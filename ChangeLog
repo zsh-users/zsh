@@ -1,3 +1,9 @@
+2000-07-27  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12394: Completion/Core/_main_complete: don't hide possible
+ 	completions if there is only one and at the same time messages are
+ 	shown
+	
 2000-07-26  Adam Spiers  <adam@spiers.net>
 
 	* unposted: Completion/User/_perl: -e, -I, -m and -M parameters

@@ -266,7 +266,7 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
   fi
 elif [[ nm -le 1 && -n "$_comp_mesg" ]]; then
   compstate[insert]=''
-  compstate[list]='list force messages'
+  compstate[list]='list force'
 elif [[ nm -eq 0 && -z "$_comp_mesg" &&
         $#_lastdescr -ne 0 && $compstate[old_list] != keep ]] &&
      zstyle -s ":completion:${curcontext}:warnings" format format; then
