@@ -1,3 +1,8 @@
+2002-07-05  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17429: Src/Zle/complist.c: improve interactive mode when
+	there are no matches left (alow to go back with undo)
+
 2002-07-04  Clint Adams  <clint@zsh.org>
 
 	* 17417: Src/Modules/datetime.c: remove unused fluff.

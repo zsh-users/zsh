@@ -1724,7 +1724,7 @@ struct menustack {
     Brinfo brbeg;
     Brinfo brend;
     int nbrbeg, nbrend;
-    int cs, acc, nmatches, mline, mlbeg;
+    int cs, acc, nmatches, mline, mlbeg, nolist;
     struct menuinfo info;
     Cmgroup amatches, pmatches, lastmatches, lastlmatches;
     char *origline;
@@ -1768,10 +1768,13 @@ setmstatus(char *status, char *sline, int sll, int scs,
         p = (char *) zhalloc(cs - wb + 1);
         strncpy(p, (char *) line + wb, cs - wb);
         p[cs - wb] = '\0';
-        s = (char *) zhalloc(lastend - cs + 1);
-        strncpy(s, (char *) line + cs, lastend - cs);
-        s[lastend - cs] = '\0';
-
+        if (lastend < cs)
+            s = "";
+        else {
+            s = (char *) zhalloc(lastend - cs + 1);
+            strncpy(s, (char *) line + cs, lastend - cs);
+            s[lastend - cs] = '\0';
+        }
         cs = 0;
         foredel(ll);
         spaceinline(sll);
@@ -2117,7 +2120,9 @@ domenuselect(Hookdef dummy, Chdata dat)
             molbeg = -1;
 	    break;
 	} else if (nolist && cmd != Th(z_undo) &&
-                   (!mode || cmd != Th(z_backwarddeletechar))) {
+                   (!mode || (cmd != Th(z_backwarddeletechar) &&
+                              cmd != Th(z_selfinsert) &&
+                              cmd != Th(z_selfinsertunmeta)))) {
 	    ungetkeycmd();
 	    break;
 	} else if (cmd == Th(z_acceptline)) {
@@ -2162,6 +2167,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->pmatches = pmatches;
 	    s->lastmatches = lastmatches;
 	    s->lastlmatches = lastlmatches;
+            s->nolist = nolist;
 	    s->acc = menuacc;
 	    s->brbeg = dupbrinfo(brbeg, NULL, 1);
 	    s->brend = dupbrinfo(brend, NULL, 1);
@@ -2258,6 +2264,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
 	    s->amatches = s->pmatches =
 		s->lastmatches = s->lastlmatches = NULL;
+            s->nolist = nolist;
 	    s->acc = menuacc;
 	    s->brbeg = dupbrinfo(brbeg, NULL, 1);
 	    s->brend = dupbrinfo(brend, NULL, 1);
@@ -2305,7 +2312,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		break;
 
 	    handleundo();
-	    cs = nolist = 0;
+	    cs = 0;
 	    foredel(ll);
 	    spaceinline(l = strlen(u->line));
 	    strncpy((char *) line, u->line, l);
@@ -2336,6 +2343,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    origll = u->origll;
             strcpy(status, u->status);
             mode = u->mode;
+            nolist = u->nolist;
 
 	    u = u->prev;
 	    clearlist = 1;
@@ -2343,6 +2351,16 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    listdat.valid = 0;
             molbeg = -42;
 
+            if (nolist) {
+                if (mode == MM_INTER) {
+                    statusline = status;
+                    statusll = strlen(status);
+                }
+                zrefresh();
+                statusline = NULL;
+                statusll = 0;
+                goto getk;
+            }
             if (mode)
                 continue;
 	} else if (cmd == Th(z_redisplay)) {
@@ -2781,13 +2799,15 @@ domenuselect(Hookdef dummy, Chdata dat)
     mselect = mlastcols = mlastlines = -1;
     mstatus = NULL;
     inselect = mhasstat = 0;
+    if (nolist)
+        clearlist = listshown = 1;
     if (acc && validlist && minfo.cur) {
 	menucmp = lastambig = hasoldlist = 0;
 	do_single(*(minfo.cur));
     }
     if (wasnext || broken) {
 	menucmp = 2;
-	showinglist = (validlist ? -2 : 0);
+	showinglist = ((validlist && !nolist) ? -2 : 0);
 	minfo.asked = 0;
 	if (!noselect) {
 	    int nos = noselect;
@@ -2797,10 +2817,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 	}
     }
     if (!noselect && (!dat || acc)) {
-	showinglist = (validlist ? -2 : 0);
+	showinglist = ((validlist && !nolist) ? -2 : 0);
 	onlyexpl = oe;
 	if (!smatches)
-	    clearlist = 1;
+	    clearlist = listshown = 1;
 	zrefresh();
     }
     mlbeg = -1;
