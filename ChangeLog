@@ -1,5 +1,8 @@
 2005-03-07  Clint Adams  <clint@zsh.org>
 
+	* 20943: Completion/Linux/Command/_tune2fs: completion for
+	tune2fs command.
+
 	* 20942: Completion/Unix/Command/_showmount: completion for
 	showmount command.
 
