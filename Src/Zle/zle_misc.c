@@ -775,10 +775,13 @@ executenamedcommand(char *prmt)
     char *okeymap = ztrdup(curkeymapname);
 
     clearlist = 1;
+    /* prmt may be constant */
+    prmt = ztrdup(prmt);
     zprmt = stringaszleline((unsigned char *)prmt, &l, NULL);
     cmdbuf = zhalloc((l + NAMLEN + 2) * ZLE_CHAR_SIZE);
     ZS_memcpy(cmdbuf, zprmt, l);
     free(zprmt);
+    zsfree(prmt);
     statusline = cmdbuf;
     selectkeymap("main", 1);
     ptr = cmdbuf += l;
@@ -919,7 +922,7 @@ executenamedcommand(char *prmt)
 		    int ltmp;
 		    ZLE_STRING_T ztmp = stringaszleline(peekfirst(cmdll),
 							&ltmp, NULL);
-		    ZS_mempcy(cmdbuf, ztmp, ltmp);
+		    ZS_memcpy(cmdbuf, ztmp, ltmp);
 		    free(ztmp);
 		    ptr = cmdbuf + cmdambig;
 		    *ptr = ZWC('_');

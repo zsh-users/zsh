@@ -1,3 +1,7 @@
+2005-02-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 20866: Src/Zle/zle_misc.c: two mistakes in 20861.
+
 2005-02-24  Oliver Kiddle  <opk@zsh.org>
 
 	* Konstantin Sobolev: 20832 (modified):
