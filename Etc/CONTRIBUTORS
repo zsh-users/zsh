@@ -15,6 +15,52 @@ to be currently accurate.  If you feel that you or someone else have
 been unfairly omitted from this list please mail the current maintainer
 at <coordinator@zsh.org>.
 
+Version 4.1.1
+-------------
+
+Clint Adams <clint@zsh.org>: termcap/terminfo, completion, configuration,
+various modules, networking, prompts
+
+Andrej Borsenkow <bor@zsh.org>: configuration, completion functions, cygwin
+support
+
+Chmouel Bodjnah <chmouel@mandrakesoft.com>: Linux completion support
+
+Wayne Davison <wayned@users.sourceforge.net>: shell history mechanism,
+arithmetic
+
+Zvi Har'El <rl@math.technion.ac.il>: completion functions
+
+Doug Kearns  <djkea2@mugca.its.monash.edu.au>: completion functions
+
+Oliver Kiddle <opk@zsh.org>: builtins, completion, parameters, prompts,
+standards support, tests
+
+Andrew Main <zefram@zsh.org>: zle keymaps, games
+
+Akinori Musha: BSD completion support
+
+Felix Rosencrantz <f_rosenkrantz@yahoo.com>: completion, zle
+
+Bart Schaefer <schaefer@zsh.org>: configuration, parameters, prompts,
+signals, syntax, tests, functions, sanity checking
+
+Adam Spiers <adam@spiers.net>: completion and other functions
+
+Peter Stephenson <pws@zsh.org>: configuration, zle, networking, syntax,
+completion
+
+Tanaka Akira <akr@zsh.org>: completion functions
+
+Philippe Troin <phil@fifi.org>: signals, process groups.
+
+Geoff Wing <gcw@zsh.org>: archiving and distribution network, line editor
+display, configuration
+
+Sven Wischnowsky <wischnow@zsh.org>: internal completion mechanism and
+low-level functions, line editor internals, syntax, wordcode mechanism,
+
+
 Version 4.0.1
 -------------
 

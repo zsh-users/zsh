@@ -1,3 +1,8 @@
+2003-04-04  Peter Stephenson  <pws@csr.com>
+
+	* 18433: INSTALL, README, Etc/CONTRIBUTORS, Etc/NEWS: information
+	for 4.1.1.
+
 2003-04-03  Peter Stephenson  <pws@csr.com>
 
 	* 18432: Completion/Unix/Command/_mh,

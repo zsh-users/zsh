@@ -5,7 +5,9 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is zsh version 4.0.  This is a stable release.
+This is zsh version 4.1.  This is a development release.  However, it has
+been in use over a long period by many people and it is believed to be
+fairly stable.
 
 Installing Zsh
 --------------
@@ -24,38 +26,14 @@ details, see the documentation.
 Possible incompatibilities
 ---------------------------
 
-Some particular differences you may notice between version 3.0 and 4.0
-(mostly based on 3.0.8; there are other differences from earlier versions):
+Some particular differences you may notice since version 4.0:
 
-  o  The options ALWAYS_LAST_PROMPT (return to the line you were
-     editing after displaying completion lists) and LIST_AMBIGUOUS
-     (don't do AUTO_LIST if there was an unambiguous prefix that could be
-     inserted, i.e. only list if it is ambiguous what to insert next) are
-     now set by default.  This is in response to complaints that too many
-     zsh features are never noticed by many users.  To turn them off,
-     just put `unsetopt alwayslastprompt listambiguous' in your
-     .zshrc file.
-  o  The editor commands history-search-{forward,backward} are implemented
-     slightly differently, as are {up,down}-line-or-search.  You may
-     well not notice this, however.
-  o  Cursor keys are now usually bound in both vi command and insert
-     mode.  In the latter case, this may result in a slight delay after
-     hitting ESCAPE to exit insert mode.  Purists who object to this can
-     unbind the appropriate key sequences (see zshzle(1)).  Most beginning
-     users of zsh apparently find the current behaviour preferable.
-  o  History file format is incompatible with versions older than 3.0.6,
-     but this should only affect people who try to share history files
-     between the two versions -- 4.0 can read the old format, 3.0.6 and
-     later can read the new format.  Just beware of INC_APPEND_HISTORY,
-     which could conceivably mix the two.
-  o  Default compctl completions have been removed for some builtin
-     commands.  Either use the new compinit-derived system, use the
-     improved compctls from Misc/compctl-examples, or restore these
-     equivalents yourself:
-	 compctl -b bindkey
-	 compctl -v export typeset vared
-	 compctl -o setopt unsetopt
-         compctl -c which
+The bash-compatibility zle functions described in the zshcontrib manual
+page have been removed as a more configurable set of editing widgets for
+dealing with words have been added.  The following code in .zshrc will set
+up for bash-style word handling:
+  autoload -U select-word-style
+  select-word-style bash
 
 Documentation
 -------------

@@ -1,7 +1,75 @@
 -------------------------------------
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
-				     
+
+New features between zsh versions 4.0 and 4.1
+---------------------------------------------
+
+Configuration:
+- upgraded to use autoconf post-2.50
+- improved compatibility with other shells through shell options,
+  builtin arguments and improved builtin option parsing
+
+Syntax and builtins:
+- new printf builtin
+- `+=' to append to parameters which works for scalars, arrays and (with
+  pairs) associative arrays.
+- enhanced multiple parameter `for' loops:
+    for key value in key1 value1 key2 value2 ...
+  maintaining full compatibility with POSIX syntax
+
+Add-on modules and functions:
+- zsh/net/tcp module provides builtin interface to TCP through ztcp
+  builtin.  Function suite for interactive and script use with expect-style
+  pattern matching.
+- zsh/net/socket module provides zsocket builtin.
+- zcalc calculator function with full line editing.
+- builtin interface to pcre library
+- zsh/zselect module provides zselect builtin as interface to select
+  system call
+
+Completion system:
+- general improvements to command and context support, low-level functions,
+  display code.
+- in verbose mode, matches with the same description are grouped
+- highly configurable completions for values of specific parameters,
+  specific redirections for specific commands
+- support for bash completion functions (typically zsh native functions are
+  more powerful where available)
+- New completions provided for (some of these may be in later 4.0
+  releases):  valgrind, tidy, texinfo, infocmp, Java classes, larch, limit,
+  locale parameters, netcat, mysqldiff, mt, lsof, elinks, ant, debchange
+  (dch), email addresses, file system types, Perforce, xsltproc.
+
+Line editor:
+- special parameters $PREDISPLAY, $POSTDISPLAY available in function
+  widgets to configure uneditable text (for narrowing)
+- recursive editing
+- supplied widgets read-from-minibuffer, replace-string use these features
+  (more intuitive prompting and argument reading than 4.0)
+- access to killed text vai $CUTBUFFER and $killring
+- supplied highly configurable word widgets forward-word-match etc., can
+  set what constitutes a word interactively or in startup script
+  (implement bash-style behaviour, replacing previous bash-* word widgets)
+- interface to increment search via $LASTSEARCH
+- better handling of keymaps in zle and widgets
+- better support for output from user-defined widgets while zle is active
+- tetris game which runs entirely in zle
+
+Local internal improvements:
+- disowned jobs are automatically restarted
+- line numbers in error messages and $PS4 output are more consistent
+- `=prog' expands only paths, no longer aliases for consistency
+- job display in prompts; `jobs' command output can be piped
+- prompts: new $RPROMPT2, %^, %y, enhanced %{, %}, %_.
+- rand48() function for better randomness in arithmetic
+  (if the corresponding math library function is present)
+- $SECONDS parameter can be made floating point via `typeset -F SECONDS'
+  for better accuracy
+- improvements to command line history mechanism
+- many bugfixes
+
+
 New features in zsh version 4.0.1
 ---------------------------------
 

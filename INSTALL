@@ -181,7 +181,7 @@ Alternatively, you can install the various parts in separate stages.  To
 install the zsh binary, execute the command:
     make install.bin
 Any previous copy of zsh will be renamed "zsh.old"
-                   
+
 To install the dynamically-loadable modules, execute the command:
     make install.modules
 Note that this is required for the shell to operate properly if dynamic
