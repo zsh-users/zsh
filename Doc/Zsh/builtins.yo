@@ -448,6 +448,7 @@ Checks the var(arg)s for legal options.  If the var(arg)s are omitted,
 use the positional parameters.  A valid option argument
 begins with a `tt(PLUS())' or a `tt(-)'.  An argument not beginning with
 a `tt(PLUS())' or a `tt(-)', or the argument `tt(--)', ends the options.
+Note that a single `tt(-)' is not considered a valid option argument.
 var(optstring) contains the letters that tt(getopts)
 recognizes.  If a letter is followed by a `tt(:)', that option
 is expected to have an argument.  The options can be

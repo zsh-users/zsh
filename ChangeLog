@@ -1,3 +1,9 @@
+2002-08-06  Peter Stephenson  <pws@csr.com>
+
+	* 17504: Doc/Zsh/builtins.yo: note that `getopts' doesn't
+	recognise a single `-' as a valid option argument.  The
+	behaviour is consistent with bash and Solaris sh.
+
 2002-08-05  Peter Stephenson  <pws@csr.com>
 
 	* 17502 (with some additional comments): Test/B01cd.ztst,
