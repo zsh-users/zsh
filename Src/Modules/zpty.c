@@ -183,7 +183,12 @@ get_pty(int master, int *retfd)
 
 	return 0;
     }
-    if ((sfd = open(name, O_RDWR|O_NOCTTY)) < 0) {
+    if ((sfd = open(name, O_RDWR
+#ifndef __CYGWIN__
+		    /* It is not clear whether this flag is actually needed. */
+		    |O_NOCTTY
+#endif
+	)) < 0) {
 	close(mfd);
 	return 1;
     }
