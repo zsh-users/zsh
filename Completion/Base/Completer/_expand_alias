@@ -2,7 +2,7 @@
 
 local word expl tmp pre sel what
 
-setopt localoptions ${_comp_options[@]}
+eval "$_comp_setup"
 
 if [[ -n $funcstack[2] ]]; then
   if [[ "$funcstack[2]" = _prefix ]]; then

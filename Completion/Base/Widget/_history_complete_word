@@ -15,7 +15,7 @@
 #   range -- range of history words to complete
 
 _history_complete_word () {
-  setopt localoptions ${_comp_options[@]}
+  eval "$_comp_setup"
 
   local expl direction stop curcontext="$curcontext"
 

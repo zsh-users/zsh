@@ -2,7 +2,7 @@
 
 # Simple completion front-end implementing expansion.
 
-setopt localoptions ${_comp_options[@]}
+eval "$_comp_setup"
 
 local curcontext="$curcontext"
 

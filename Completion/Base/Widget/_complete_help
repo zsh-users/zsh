@@ -1,9 +1,7 @@
 #compdef -k complete-word \C-xh
 
 _complete_help() {
-  setopt localoptions ${_comp_options[@]}
-
-  exec </dev/null	# ZLE closes stdin, which can cause errors
+  eval "$_comp_setup"
 
   local _sort_tags=_help_sort_tags text i j k tmp
   typeset -A help_funcs help_tags help_sfuncs help_styles

@@ -139,7 +139,18 @@ _comp_options=(
     NO_cshnullglob
     NO_allexport
     NO_aliases
+    NO_errexit
 )
+
+# And this one should be `eval'ed at the beginning of every entry point
+# to the completion system.  It sets up what we currently consider a
+# sane environment.  That means we set the options above, make sure we
+# have a valid stdin descriptor (zle closes it before calling widgets)
+# and don't get confused by user's ZERR trap handlers.
+
+_comp_setup='setopt localoptions localtraps ${_comp_options[@]};
+             exec </dev/null;
+             trap - ZERR'
 
 # These can hold names of functions that are to be called before/after all
 # matches have been generated.

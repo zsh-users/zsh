@@ -1,8 +1,6 @@
 #compdef -k complete-word \C-x?
 
-setopt localoptions ${_comp_options[@]}
-
-setopt localtraps noerrexit ; trap - ZERR
+eval "$_comp_setup"
 
 (( $+_debug_count )) || integer -g _debug_count
 local tmp=${TMPPREFIX}${$}${words[1]:t}$[++_debug_count]
