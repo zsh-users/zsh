@@ -1,9 +1,0 @@
-#autoload
-
-local expl
-
-if [[ CURRENT -eq 2 ]]; then
-  _wanted commands expl command compadd "$@"
-else
-  _message 'no more arguments'
-fi
