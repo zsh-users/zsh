@@ -1,3 +1,9 @@
+2003-09-15  Oliver Kiddle  <opk@zsh.org>
+
+	* Vin Shelton: 19073: Src/exec.c (execcmd): Replace C++-style comment.
+
+	* Vin Shelton: 19038: zshconfig.ac: Make sed grok icc's cpp output.
+
 2003-09-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 19053 modified c.f. 19056: Functions/MIME, Doc/Zsh/contrib.yo:

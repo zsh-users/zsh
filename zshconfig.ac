@@ -1081,7 +1081,8 @@ dnl The backslash substitution is to persuade cygwin to cough up
 dnl slashes rather than doubled backslashes in the path.
 echo "#include <signal.h>" > nametmp.c
 sigfile_list="`$CPP nametmp.c |
-sed -n 's/^#[ 	].*\"\(.*\)\"/\1/p' |
+sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
+       -e 's/^#[ 	].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
 $AWK '{ if (\$1 ~ \"sig\") files[[\$1]] = \$1 }
   END { for (var in files) print var }'`"
@@ -1128,7 +1129,8 @@ dnl The backslash substitution is to persuade cygwin to cough up
 dnl slashes rather than doubled backslashes in the path.
 echo "#include <errno.h>" > nametmp.c
 errfile_list="`$CPP nametmp.c |
-sed -n 's/^#[ 	].*\"\(.*\)\"/\1/p' |
+sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
+       -e 's/^#[ 	].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
 $AWK '{ if (\$1 ~ \"err\") files[[\$1]] = \$1 }
   END { for (var in files) print var }'`"

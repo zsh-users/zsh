@@ -1824,7 +1824,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    cflags |= hn->flags;
 	    checked = 0;
 	    if (cflags & BINF_COMMAND && nextnode(firstnode(args))) {
-		// check for options to command builtin
+		/* check for options to command builtin */
 		char *next = (char *) getdata(nextnode(firstnode(args)));
 		char *cmdopt;
 		if (next && *next == '-' && strlen(next) == 2 &&
