@@ -3429,12 +3429,16 @@ bin_break(char *name, char **argv, char *ops, int func)
 	}
 	/*FALLTHROUGH*/
     case BIN_EXIT:
-	if (locallevel) {
+	if (locallevel > forklevel) {
 	    /*
 	     * We don't exit directly from functions to allow tidying
 	     * up, in particular EXIT traps.  We still need to perform
 	     * the usual interactive tests to see if we can exit at
 	     * all, however.
+	     *
+	     * The forklevel test means we *do* exit from a subshell
+	     * inside a function when we reach the level of the
+	     * function itself.
 	     */
 	    if (stopmsg || (zexit(0,2), !stopmsg)) {
 		retflag = 1;

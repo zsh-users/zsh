@@ -233,7 +233,7 @@ globlist(LinkList list, int nountok)
     badcshglob = 0;
     for (node = firstnode(list); !errflag && node; node = next) {
 	next = nextnode(node);
-	glob(list, node, nountok);
+	zglob(list, node, nountok);
     }
     if (badcshglob == 1)
 	zerr("no match", NULL, 0);

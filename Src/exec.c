@@ -1757,7 +1757,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (!(cflags & BINF_NOGLOB))
 		while (!checked && !errflag && args && nonempty(args) &&
 		       has_token((char *) peekfirst(args)))
-		    glob(args, firstnode(args), 0);
+		    zglob(args, firstnode(args), 0);
 	    else if (!unglobbed) {
 		for (node = firstnode(args); node; incnode(node))
 		    untokenize((char *) getdata(node));
@@ -2490,6 +2490,10 @@ fixfds(int *save)
 }
 
 /**/
+int
+forklevel;
+
+/**/
 static void
 entersubsh(int how, int cl, int fake)
 {
@@ -2557,6 +2561,7 @@ entersubsh(int how, int cl, int fake)
     if (cl)
 	clearjobtab();
     times(&shtms);
+    forklevel = locallevel;
 }
 
 /* close internal shell fds */
