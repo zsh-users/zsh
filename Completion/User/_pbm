@@ -116,7 +116,7 @@ if (( $#opts )); then
     # colon-separated list of words. We just execute this list of words
     # as a command with its arguments.
 
-    if [[ "$after" = *:* ]]; then
+    if [[ "$opts[$after]" = *:* ]]; then
       after="${${opts[after]#*:}//:/ }"
       [[ -z "$after" ]] || $=after 
     fi

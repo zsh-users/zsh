@@ -5,11 +5,13 @@ if (( ! $+_color_cache )); then
 
   # Cache of color names doesn't exist yet, create it.
 
-  if [[ -f /usr/lib/X11/rgb.txt ]]; then
-    file=/usr/lib/X11/rgb.txt
-  elif [[ -f /usr/local/lib/X11/rgb.txt ]]; then
-    file=/usr/local/lib/X11/rgb.txt
-  fi
+  for f in /usr/{,local/,X11R6/,openwin/}lib/X11/rgb.txt
+  do
+    if [[ -f $f ]]; then
+      file=$f
+      break;
+    fi
+  done
 
   if [[ -n "$file" ]]; then
     _color_cache=( "${(@)${(@f)$(< $file)}[2,-1]##*		}" )
