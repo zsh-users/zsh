@@ -7,6 +7,10 @@
 
 	* 12326: Completion/User/_cvs: Discard stderr of a command subst.
 
+2000-07-20  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 12323: Src/hist.c: support "builtin" in HIST_NO_STORE check.
+
 2000-07-19  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 12319: Completion/User/_perl_builtin_funcs: Get also /usr/share/man.
@@ -46,10 +50,6 @@
 	the history command to output correctly when the current command was
 	already removed from the history.  Fixed remhist() to not remove
 	the wrong line in the above scenario.  Got rid of "spaceflag".
-
-2000-07-17  Wayne Davison  <wayned@users.sourceforge.net>
-
-	* 12323: Src/hist.c: support "builtin" in HIST_NO_STORE check.
 
 2000-07-17  Tanaka Akira  <akr@zsh.org>
 
