@@ -1,0 +1,9 @@
+#compdef set
+
+local prev="$words[CURRENT-1]"
+
+if [[ "$prev" = [-+]o ]]; then
+  _options
+elif [[ "$prev" = -A ]]; then
+  _arrays
+fi
