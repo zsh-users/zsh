@@ -1,5 +1,11 @@
 2000-05-02  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11049: Completion/Base/_arguments, Completion/Base/_first,
+ 	Completion/Builtins/_hash, Completion/Core/_expand,
+ 	Completion/User/_gprof, Completion/User/_mount,
+ 	Completion/User/_socket, Completion/User/_urls: completion
+ 	cleanup, mostly _wanted and $expl
+	
 	* 11048: Completion/Base/_first, Completion/Core/_complete,
  	Completion/Core/_path_files: make completion-in-vared complete
  	parameter values as default; cleanup for _path_files

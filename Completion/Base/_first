@@ -33,7 +33,7 @@
 #           opt=-V
 #         fi
 #         if _wanted "$opt" history-words expl "history ($n)" \
-#                compadd "$expl[@]" -Q - \
+#                compadd -Q - \
 #                    "${(@)${(@)historywords:#[\$'\"]*}[1,i*10]}"; then
 #           # We have found at least one matching word, so we switch
 #           # on menu-completion and make sure that no other

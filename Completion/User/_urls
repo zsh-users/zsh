@@ -104,7 +104,7 @@ case "$scheme" in
         while _next_label files expl 'bookmark'; do
           _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && 
               ret=0
-          _path_files -W "$urls_path/$scheme" -S/ -r '/' -/ && ret=0
+          _path_files -W "$urls_path/$scheme" "$expl[@]" -S/ -r '/' -/ && ret=0
         done
 	(( ret )) || return 0
       done

@@ -540,7 +540,7 @@ fstype)
   compset -P '*,'
 
   _wanted types expl 'file system type' \
-      compadd "$expl[@]" -qS, -M 'L:|no=' - "$fss[@]" && ret=0
+      compadd -qS, -M 'L:|no=' - "$fss[@]" && ret=0
   ;;
 fsopt)
   _tags options || return 1

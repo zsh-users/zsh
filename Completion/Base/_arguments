@@ -298,14 +298,15 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 	
         if comparguments -s single; then
 
-          _description options expl option
-
           if [[ "$single" = direct ]]; then
-	    compadd "$expl[@]" -QS '' - "${PREFIX}${SUFFIX}"
+            _all_labels options expl option \
+	        compadd -QS '' - "${PREFIX}${SUFFIX}"
           elif [[ "$single" = next ]]; then
-	    compadd "$expl[@]" -Q - "${PREFIX}${SUFFIX}"
+            _all_labels options expl option \
+	        compadd -Q - "${PREFIX}${SUFFIX}"
           elif [[ "$single" = equal ]]; then
-	    compadd "$expl[@]" -QqS= - "${PREFIX}${SUFFIX}"
+            _all_labels options expl option \
+	        compadd -QqS= - "${PREFIX}${SUFFIX}"
           else
 	    tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
 	    tmp3=( "${(M@)tmp1:#[-+]?[^:]*}" )

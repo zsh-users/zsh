@@ -94,10 +94,8 @@ if [[ -z "$compstate[insert]" ]] ;then
 else
   _tags all-expansions expansions original
 
-  if _requested all-expansions; then
-    _description all-expansions expl 'all expansions'
-    compadd "$expl[@]" -UQ -qS "$suf" - "$exp"
-  fi
+  _requested all-expansions expl 'all expansions' &&
+      compadd "$expl[@]" -UQ -qS "$suf" - "$exp"
 
   if [[ $#exp -gt 1 ]] && _requested expansions; then
     local i normal dir

@@ -10,7 +10,7 @@ if [[ "$words[2]" = -*d* ]]; then
         compadd -q -S '=' - "${(@k)nameddirs}"
   fi
 elif compset -P 1 '*='; then
-  _wanted -C value values expl 'executable file' _files "$expl[@]" -g '*(-*)'
+  _wanted -C value values expl 'executable file' _files -g '*(-*)'
 else
   _wanted -C name commands expl command compadd -q -S '=' - "${(@k)commands}"
 fi

@@ -11,8 +11,7 @@ typeset -A opt_args
 [[ $CURRENT -eq 2 ]] &&
     { ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
       [[ "$PREFIX" = -* ]] } &&
-    _wanted options expl option \
-        compadd -M 'r:|[_-]=* r:|=*' "$expl[@]" - -version
+    _wanted options expl option compadd - -version
 
 _arguments -C -s \
   '-b[background]' \
