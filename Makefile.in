@@ -98,6 +98,7 @@ install.html uninstall.html:
 distclean-here:
 	@cd Completion && $(MAKE) $(MAKEDEFS) $@
 	@cd Functions && $(MAKE) $(MAKEDEFS) $@
+	@cd Test && $(MAKE) $(MAKEDEFS) $@
 	rm -f Makefile config.h config.status config.log config.cache stamp-h Config/defs.mk
 
 realclean-here:
@@ -123,7 +124,7 @@ stamp-h: config.h.in config.status
 config.h.in: stamp-h.in
 stamp-h.in: configure.in acconfig.h aclocal.m4 aczsh.m4
 	cd $(sdir) && autoheader
-	echo > $@
+	echo > $(sdir)/stamp-h.in
 
 # ========== DEPENDENCIES FOR DISTRIBUTION ==========
 
