@@ -43,19 +43,14 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2000/05/24)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2000/06/05)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2000/05/24
+mydit(Last-Modified:) 2000/06/05
 mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--2000 (see end of document)
-)
-
-bf(Changes since issue posted April 2000:)
-description(
-mydit(2.5)  Mention that tt(${var/old/new}) is a little different from bash.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -303,7 +298,7 @@ sect(What's the latest version?)
   incompatibilities at the end of link(5.1)(51).  This is longer than usual
   due to enhanced sh, ksh and POSIX compatibility.
 
-  The beta version 3.1.6 is also available.  Development of zsh is usually
+  The beta version 3.1.9 is also available.  Development of zsh is usually
   patch by patch, with each intermediate version publicly available.  Note
   that this `open' development system does mean bugs are sometimes
   introduced into the most recent archived version.  These are usually
@@ -1132,7 +1127,10 @@ label(35)
   )
   (disable parity detection, don't strip high bit, use 8-bit characters).
   Make sure this comes myem(before) any bindkey entries in your .zshrc which
-  redefine keys normally defined in the emacs/vi keymap.
+  redefine keys normally defined in the emacs/vi keymap.  You may also
+  need to set the tt(eightBitOutput) resource in your tt(~/.Xdefaults)
+  file, although this is on by default and it's unlikely anybody will
+  have tinkered with it.
 
   You don't need the mytt(bindkey) to be able to define your own sequences
   with the meta key, though you still need the mytt(stty).
