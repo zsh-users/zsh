@@ -48,6 +48,15 @@ dnl -----------------------------
 dnl Handle --program-prefix, --program-suffix, etc.
 AC_ARG_PROGRAM
 
+u_ptn=`make -s -f - <<EOF
+all:
+	@echo ${program_transform_name}
+EOF
+`
+tzsh=`echo zsh | sed -e "${u_ptn}"`
+
+AC_SUBST(tzsh)dnl
+
 dnl Do you want to debug zsh?
 undefine([zsh-debug])dnl
 AC_ARG_ENABLE(zsh-debug,
@@ -214,10 +223,10 @@ undefine([fndir])dnl
 AC_ARG_ENABLE(fndir,
 [  --enable-fndir=DIR         where functions go (default DATADIR/zsh/functions)],
 [if test $enableval = yes; then
-  fndir=${datadir}/zsh/functions
+  fndir=${datadir}/${tzsh}/functions
 else
   fndir="$enableval"
-fi], [fndir=${datadir}/zsh/functions])
+fi], [fndir=${datadir}/${tzsh}/functions])
 
 undefine([function_subdirs])
 AC_ARG_ENABLE(function-subdirs,
