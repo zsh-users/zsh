@@ -43,14 +43,21 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2000/06/05)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2001/03/04)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2000/06/05
+mydit(Last-Modified:) 2001/03/04
 mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
-mydit(Copyright:) (C) P.W. Stephenson, 1995--2000 (see end of document)
+mydit(Copyright:) (C) P.W. Stephenson, 1995--2001 (see end of document)
+)
+
+bf(Changes since issue posted January 2001:)
+description(
+  mydit(3.26) New item: effect of multios on pipes.
+  mydit(5.3)  Add parameter code changes to wishlist.
+  mydit(5.4)  Rewrite for historical reasons.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -115,6 +122,7 @@ Chapter 3:  How to get various things to work
 3.23. How do I prevent the prompt overwriting output when there is no newline?
 3.24. What's wrong with cut and paste on my xterm?
 3.25. How do I get coloured prompts on my colour xterm?
+3.26. Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -128,7 +136,7 @@ Chapter 5:  The future of zsh
 5.1. What bugs are currently known and unfixed? (Plus recent important changes)
 5.2. Where do I report bugs, get more info / who's working on zsh?
 5.3. What's on the wish-list?
-5.4. Will zsh have problems in the year 2000?
+5.4. Did zsh have problems in the year 2000?
 
 Acknowledgments
 
@@ -142,21 +150,21 @@ sect(Sources of information)
 label(11)
 
   Information on zsh is available via the World Wide Web.  The URL
-  is url(http://sunsite.auc.dk/zsh/)(http://sunsite.auc.dk/zsh/) .
+  is url(http://sunsite.dk/zsh/)(http://sunsite.dk/zsh/) .
   The server provides this FAQ and much else and is
   now maintained by Karsten Thygesen and others (mail \
-  email(zsh@sunsite.auc.dk)
+  email(zsh@sunsite.dk)
   with any related messages).  The FAQ is at \
-url(http://sunsite.auc.dk/zsh/FAQ/)(http://sunsite.auc.dk/zsh/FAQ/) .
+url(http://sunsite.dk/zsh/FAQ/)(http://sunsite.dk/zsh/FAQ/) .
   The site also contains some contributed zsh scripts and functions;
   we are delighted to add more, or simply links to your own collection.
 
   This document was originally written in YODL, allowing it to be converted
   easily into various other formats.  The master source file lives at
-  url(http://sunsite.auc.dk/zsh/FAQ/zshfaq.yo)
-(http://sunsite.auc.dk/zsh/FAQ/zshfaq.yo) and the plain text version
-  can be found at url(http://sunsite.auc.dk/zsh/FAQ/zshfaq.txt)
-(http://sunsite.auc.dk/zsh/FAQ/zshfaq.txt) .
+  url(http://sunsite.dk/zsh/FAQ/zshfaq.yo)
+(http://sunsite.dk/zsh/FAQ/zshfaq.yo) and the plain text version
+  can be found at url(http://sunsite.dk/zsh/FAQ/zshfaq.txt)
+(http://sunsite.dk/zsh/FAQ/zshfaq.txt) .
 
   Another useful source of information is the collection of FAQ articles
   posted frequently to the Usenet news groups comp.unix.questions,
@@ -291,12 +299,19 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 3.0.7 is the latest production version. The new major number 3.0
+  Zsh 3.0.8 is the latest production version. The new major number 3.0
   largely reflects the considerable internal changes in zsh to make it more
   reliable, consistent and (where possible) compatible.  Those planning on
   upgrading their zsh installation should take a look at the list of
   incompatibilities at the end of link(5.1)(51).  This is longer than usual
   due to enhanced sh, ksh and POSIX compatibility.
+
+  It is unlikely that there will be more 3.0 releases before 4.0 becomes
+  the stable version.  However, a few patches to 3.0.8 are available from
+  the patch manager at Sourceforge, \
+url(http://sourceforge.net/patch/?group_id=4068)\
+(http://www.sourceforge.net/patch/?group_id=4068)
+  Official patches are posted by Bart Schaefer (user name tt(barts)).
 
   The beta version 3.1.9 is also available.  Development of zsh is usually
   patch by patch, with each intermediate version publicly available.  Note
@@ -334,12 +349,12 @@ label(16)
 (http://www.zsh.org/pub/zsh/)
     mydit(Australia) url(ftp://ftp.ips.gov.au/mirror/zsh/)
 (ftp://ftp.ips.gov.au/mirror/zsh/)
-    mydit(Denmark)   url(ftp://sunsite.auc.dk/pub/unix/shells/zsh)
-(ftp://sunsite.auc.dk/pub/unix/shells/zsh)
+    mydit(Denmark)   url(ftp://sunsite.dk/pub/unix/shells/zsh)
+(ftp://sunsite.dk/pub/unix/shells/zsh)
     mydit(Finland)   url(ftp://ftp.funet.fi/pub/unix/shells/zsh/)
 (ftp://ftp.funet.fi/pub/unix/shells/zsh/)
-    mydit(France)    url(ftp://ftp.cenatls.cena.dgac.fr/pub/shells/zsh/)
-(ftp://ftp.cenatls.cena.dgac.fr/pub/shells/zsh/)
+    mydit(France)    url(ftp://ftp.cenatls.cena.dgac.fr/shells/zsh/)
+(ftp://ftp.cenatls.cena.dgac.fr/shells/zsh/)
     mydit(Germany)   url(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
 (ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
     mydit()          url(ftp://ftp.uni-trier.de/pub/unix/shell/zsh/)
@@ -399,6 +414,12 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 (ftp://ftp.blarg.net/users/amol/zsh)  
   )
 
+  There is no port of 3.1 for Windows, but newer releases compile under
+  Cygwin, a freely available UNIX-style environment for the Win32 API.  You
+  can find information about this at 
+  url(http://sourceware.cygnus.com/cygwin)\
+(http://sourceware.cygnus.com/cygwin).
+
   Likewise the OS/2 port is available from email(TAMURA Kent
   <kent@tril.ibm.co.jp>) at
 
@@ -416,8 +437,8 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
   link(1.1)(11)) at:
 
   description(
-    mydit()        url(http://sunsite.auc.dk/zsh/Patches/)
-(http://sunsite.auc.dk/zsh/Patches/)
+    mydit()        url(http://sunsite.dk/zsh/Patches/)
+(http://sunsite.dk/zsh/Patches/)
   )
      
 sect(I don't have root access: how do I make zsh my login shell?)
@@ -883,7 +904,7 @@ sect(Similarities with bash)
 
   In recent years there has been a certain amount of crossover in the
   extensions, however.  Zsh now (3.1.6) has bash's `tt(${var/old/new})'
-  feature for replacing the text tt(old) with the text(new) in the
+  feature for replacing the text tt(old) with the text tt(new) in the
   parameter tt($var).  Note one difference here:  while both shells
   implement the syntax `tt(${var/#old/new})' and `tt(${var/%old/new})' for
   anchoring the match of tt(old) to the start or end of the parameter text,
@@ -1294,7 +1315,7 @@ sect(Why does zsh not work in an Emacs shell mode any more?)
   into a file ~/bin/eshell, then mytt(chmod +x ~/bin/eshell), and
   tell emacs to use that as the shell by adding
   verb(
-    (setenv "ESHELL" "~/bin/eshell")
+    (setenv "ESHELL" (expand-file-name "~/bin/eshell"))
   )
   to ~/.emacs.
 
@@ -1382,7 +1403,11 @@ sect(How does base arithmetic work?)
   )
   which requests base 10 for output.  You can change the output base of an
   existing variable in this fashion.  Using the mytt($(( ... ))) method will
-  always display in decimal.
+  always display in decimal, except that in 3.1.9 there is a new feature
+  for selecting a base for displaying here:
+  verb(
+    print $(( [#16] 255 ))
+  )
 
 
 sect(How do I get a newline in my prompt?)
@@ -1566,8 +1591,8 @@ sect(How do I get a variable's value to be evaluated as another variable?)
   Ignore the mytt((e)) for now.  The mytt(:+) means: if the variable
   tt($E) is set, substitute the following, i.e. mytt(\$$E).  This is
   expanded to mytt($EDITOR) by the normal rules.  Finally, the mytt((e)) \
-  means:
-  evaluate the expression you just made.  This gives mytt(emacs).
+  means
+  `evaluate the expression you just made'.  This gives mytt(emacs).
 
   For a standard shell way of doing this, you are stuck with mytt(eval):
   verb(
@@ -1663,6 +1688,42 @@ sect(How do I get coloured prompts on my colour xterm?)
   resulting `mytt(<ESC>[1;31m)' makes the prompt red, and the
   `mytt(<ESC>[0m)' puts printing back to normal so that the rest of the line
   is unchanged.
+
+sect(Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?)
+
+This is a slightly unexpected effect of the option tt(MULTIOS), which is
+set by default.  Let's look more closely:
+verb(
+  foo 2>&1 >foo.out | bar
+)
+What you're probably expecting is that the command mytt(foo) sends its
+standadrd output to the pipe and so to the input of the command mytt(bar),
+while it sends its standard error to the file mytt(foo.out).  What you
+actually see is that the output is going both to the pipe and into the file.
+To be more explicit, here's the same example with real commands:
+verb(
+  % { print output; print error >&2 } 2>&1 >foo.out | sed 's/error/erratic'
+  erratic
+  output
+  % cat foo.out
+  output
+)
+and you can see `tt(output)' appears twice.
+
+It becomes clearer what's going on if we write:
+verb(
+  % print output >foo1.out >foo2.out
+  % cat foo1.out
+  output
+  % cat foo2.out
+  output
+)
+You might recognise this as a standard feature of zsh, called `tt(multios)'
+and controlled by the option of the same name, whereby output is copied to
+both files when the redirector appears twice.  What's going on in the first
+example is exactly the same, however the second redirector is disguised as
+a pipe.  So if you want to turn this effect off, you need to unset the
+option mytt(MULTIOS).
 
 
 chapter(The mysteries of completion)
@@ -1978,7 +2039,9 @@ sect(And if programmable completion isn't good enough?)
   completions via the mytt(reply) array, and this becomes the set of
   possible completions.  The best way to understand this is to look at
   mytt(multicomp) and other functions supplied with the zsh
-  distribution.
+  distribution.  Almost certainly, however, you are better off using
+  the new completion system for anything complicated.  No further
+  upgrades are planned for the old system.
 
 
 chapter(The future of zsh)
@@ -2121,7 +2184,7 @@ label(52)
   The shell is being maintained by various (entirely self-appointed)
   subscribers to the mailing list,
   verb(
-    zsh-workers@sunsite.auc.dk
+    zsh-workers@sunsite.dk
   )
   so mail on any issues (bug reports, suggestions, complaints...)
   related to the development of the shell should be sent there.  If
@@ -2141,12 +2204,12 @@ label(52)
   Two progressively lower volume lists exist, one with messages
   concerning the use of zsh,
   verb(
-    zsh-users@sunsite.auc.dk
+    zsh-users@sunsite.dk
   )
   and one just containing announcements:  about releases, about major
   changes in the shell, or this FAQ, for example,
   verb(
-    zsh-announce@sunsite.auc.dk
+    zsh-announce@sunsite.dk
   )
   (posting to the last one is currently restricted).
 
@@ -2160,14 +2223,14 @@ label(52)
 
   To join zsh-workers, send email to
   verb(
-    zsh-workers-subscribe@sunsite.auc.dk
+    zsh-workers-subscribe@sunsite.dk
   )
   (the actual content is unimportant).  Replace tt(subscribe) with
   tt(unsubscribe) to unsubscribe.  The mailing software (tt(ezlm)) has
   various bells and whistles: you can retrieve archived messages.
-  Mail email(zsh-workers-help@sunsite.auc.dk) for detailed information.
+  Mail email(zsh-workers-help@sunsite.dk) for detailed information.
   Adminstrative matters are best sent to
-  email(zsh-workers-owner@sunsite.auc.dk).  The list maintainer's
+  email(zsh-workers-owner@sunsite.dk).  The list maintainer's
   real name is email(Karsten Thygesen <karthy@kom.auc.dk>).
   
   An archive of mailings for the last few years can be found at
@@ -2223,6 +2286,10 @@ sect(What's on the wish-list?)
 
   Other future possibilities which have been suggested:
   itemize(
+  it() The parameter code could do with tidying up, maybe with more of the
+     features made available in ksh93.
+  it() Configuration files to enable zsh startup files to be created
+     with the Dotfile Generator.
   it() Further improvements in integrating the line editor with shell
      functions.
   it() Ksh compatibility could be improved.
@@ -2230,33 +2297,12 @@ sect(What's on the wish-list?)
   )
 
 
-sect(Will zsh have problems in the year 2000?)
+sect(Did zsh have problems in the year 2000?)
 
-  (This information was written by Bart Schaefer.  Note it is a
-  description of the state of affairs as seen by the developers, it is
-  not a guarantee!)
-
-  You can confirm the following by looking at the source code yourself
-  if necessary; there's no other definitive reference:
-
-  Zsh uses UNIX/POSIX time_t, timeval, and tm data types for internal
-  date manipulations.  These types either do not store year values at
-  all (for example, time_t is measured in seconds since midnight, Jan
-  1, 1970) or store them as integer types and NOT as pairs of digits.
-  Thus there can be no overflows at year 2000.  On some unix systems,
-  time_t is a 32-bit value and will overflow during the year 2038, but
-  more modern systems use a 64-bit time_t.
-
-  The only input and output of dates that zsh performs for its own use
-  is optional history time-stamping.  This is performed using time_t
-  values converted to long integers, which are either 32 or 64 bits,
-  see above.
-
-  Note, however, that zsh does provide facilities for formatted date
-  output, in particular in prompt escapes such as mytt(%W) and
-  mytt(%D) using mytt(print -P), so it's possible that scripts written
-  for zsh might employ 2-digit years.  Shell scripts should always be
-  considered separate programs and therefore evaluated individually.
+  Not that I heard of; it's up to you to be careful with two-digit dates,
+  though, which are produced by the prompt escapes mytt(%W) and mytt(%D),
+  and also by the command `tt(print -P)'.  Earlier versions of zsh may
+  show problems here.
 
 
 nsect(Acknowledgments:)
@@ -2284,4 +2330,4 @@ notice appears in all copies of this documentation.  Remember,
 however, that this document changes monthly and it may be more useful
 to provide a pointer to it rather than the entire text.  A suitable
 pointer is "information on the Z-shell can be obtained on the World
-Wide Web at URL http://sunsite.auc.dk/zsh/".
+Wide Web at URL http://sunsite.dk/zsh/".
