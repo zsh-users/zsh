@@ -1,5 +1,8 @@
 2001-03-25  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 13745: Test/ztst.zsh: set LC_COLLATE to C if already set to
+	something.
+
 	* 13743: Completion/User/_mailboxes: handle @folder in MH.
 
 2001-03-24  Bart Schaefer  <schaefer@zsh.org>

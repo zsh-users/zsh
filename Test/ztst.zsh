@@ -25,6 +25,7 @@ emulate -R zsh
 # Ensure the locale does not screw up sorting.  Don't supply a locale
 # unless there's one set, to minimise problems.
 [[ -n $LC_ALL ]] && LC_ALL=C
+[[ -n $LC_COLLATE ]] && LC_COLLATE=C
 [[ -n $LANG ]] && LANG=C
 
 # Set the module load path to correspond to this build of zsh.
