@@ -1,3 +1,9 @@
+2001-03-07 Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 13590: Test/54compmatch.ztst: Added another test case
+        that covers the bug mentioned in workers/13563.  The case
+        is based on a bug mentioned in workers/13320.
+
 2001-03-07  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13589: Src/mem.c, Src/parse.c, Src/zsh.h: two optimisations; use

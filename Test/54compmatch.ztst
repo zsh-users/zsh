@@ -621,6 +621,13 @@
 >COMPADD:{}
 >INSERT_POSITIONS:{9:27}
 
+ test_code $workers_13320_matcher workers_13320_list
+ comptest $'tst g-2\t'
+0:Test from workers 13320
+>line: {tst glibc}{-2.1.94-3.i386.rpm}
+>COMPADD:{}
+>INSERT_POSITIONS:{9:27}
+
  workers_13345a_matcher='r:|[.,_-]=**'
  workers_13345a_list=(A.B.C A.B.C.D A.C)
  test_code $workers_13345a_matcher workers_13345a_list
