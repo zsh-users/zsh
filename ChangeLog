@@ -1,6 +1,6 @@
 2001-09-10  Clint Adams  <clint@zsh.org>
 
-	* 15771: Src/Modules/tcp.c:
+	* 15772: Src/Modules/tcp.c:
 	add -t (test) for ztcp.
 
 2001-09-09  Clint Adams  <clint@zsh.org>
