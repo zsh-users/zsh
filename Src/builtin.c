@@ -4155,6 +4155,7 @@ bin_eval(char *nam, char **argv, Options ops, int func)
 	errflag = 0;
 	return 1;
     }
+    lastval = 0;
     execode(prog, 1, 0);
     if (errflag) {
 	lastval = errflag;
