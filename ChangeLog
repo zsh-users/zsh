@@ -1,3 +1,8 @@
+2001-10-22  Adam Spiers  <adam@spiers.net>
+
+	* 16092: Completion/Unix/Command/_mysql_utils: don't override
+	settings in ~/.my.cnf
+
 2001-10-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* Adapted from Stefan Dalibor, 16043: Src/utils.c: checkrmall()

@@ -14,9 +14,9 @@ _mysql_get_identity () {
   _mysql_host=${opt_args[-h]-$opt_args[--host]}
 
   _mysql_params=(
-                 ${_mysql_user+"--user=$_mysql_user"}
-                 ${_mysql_host+"--host=$_mysql_host"}
-                 ${_mysql_port+"--port=$_mysql_port"}
+                 ${_mysql_user:+"--user=$_mysql_user"}
+                 ${_mysql_host:+"--host=$_mysql_host"}
+                 ${_mysql_port:+"--port=$_mysql_port"}
                 )
 }
 
