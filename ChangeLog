@@ -1,3 +1,8 @@
+2003-06-05  Peter Stephenson  <pws@csr.com>
+
+	* users/6154: Src/subst.c: anchors didn't work with //
+	parameter substitution.
+
 2003-06-03  Peter Stephenson  <pws@csr.com>
 
 	* 18600: Src/pattern.c: bug matching against [[:xdigit:]].

@@ -1349,7 +1349,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if ((c = *s) == '/') {
 		/* doubled, so replace all occurrences */
 		flags |= SUB_GLOBAL;
-		s++;
+		c = *++s;
 	    }
 	    /* Check for anchored substitution */
 	    if (c == '%') {
