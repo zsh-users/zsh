@@ -1,3 +1,12 @@
+2004-03-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 19669, 19670: Danek Duvall: Completion/compaudit: Use of
+	getent to check groups was slow; typo caused duplicate fpath
+	entries.
+
+	* 19671: Src/Zle/zle_main.c: error in zle-line-init caused
+	infinite loop.
+
 2004-03-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* 19666 (tweaked): Completion/Unix/Command/_ssh: fixes for remote

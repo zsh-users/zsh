@@ -64,7 +64,7 @@ if [[ -n $_compdir ]]; then
       # Likewise (installation-layout)
       _i_addfiles=(${_compdir}/*(/))
     fi
-    for _i_line in {1..$#i_addfiles}; do
+    for _i_line in {1..$#_i_addfiles}; do
       _i_file=${_i_addfiles[$_i_line]}
       [[ -d $_i_file && -z ${fpath[(r)$_i_file]} ]] ||
         _i_addfiles[$_i_line]=
@@ -83,13 +83,11 @@ fi
 # that this has not happened, and pick the best group.
 
 local GROUP GROUPMEM _i_pw _i_gid _i_ulwdirs
-while IFS=: read GROUP _i_pw _i_gid GROUPMEM; do
-  if (( UID == EUID )); then
-    [[ $GROUP == $LOGNAME ]] && break
-  else
-    (( _i_gid == EGID )) && break       # Somewhat arbitrary
-  fi
-done <<(getent group)
+if ((UID == EUID )); then
+  getent group $LOGNAME | IFS=: read GROUP _i_pw _i_gid GROUPMEM
+else
+  getent group $EGID | IFS=: read GROUP _i_pw _i_gid GROUPMEM
+fi
 
 # We search for:
 # - world/group-writable directories in fpath not owned by root and the user
