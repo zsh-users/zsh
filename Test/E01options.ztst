@@ -1,0 +1,616 @@
+# Test various shell options.
+# Interactive options not tested here:
+#    ALWAYS_LAST_PROMPT
+#    ALWAYS_TO_END
+#    APPEND_HISTORY (history not maintained)
+#    AUTO_LIST
+#    AUTO_MENU
+#    AUTO_NAME_DIRS  (named directory table not maintained)
+#    AUTO_PARAM_KEYS
+#    AUTO_PARAM_SLASH
+#    AUTO_REMOVE_SLASH
+#    AUTO_RESUME
+#    BANG_HIST
+#    BASH_AUTO_LIST
+#    BEEP (!)
+#    BG_NICE
+#    CHECK_JOBS
+#    COMPLETE_ALIASES
+#    COMPLETE_IN_WORD
+#    CORRECT
+#    CORRECT_ALL
+#    CSH_JUNKIE_HISTORY
+#    DVORAK
+#    EXTENDED_HISTORY
+#    FLOW_CONTROL
+#    GLOB_COMPLETE
+#    HIST_ALLOW_CLOBBER
+#    HIST_BEEP
+#    HIST_EXPIRE_DUPS_FIRST
+#    HIST_FIND_NO_DUPS
+#    HIST_IGNORE_ALL_DUPS
+#    HIST_IGNORE_DUPS (-h)
+#    HIST_IGNORE_SPACE (-g)
+#    HIST_NO_FUNCTIONS
+#    HIST_NO_STORE
+#    HIST_REDUCE_BLANKS
+#    HIST_SAVE_NO_DUPS
+#    HIST_VERIFY
+#    HUP
+#    IGNORE_EOF
+#    INC_APPEND_HISTORY
+#    INTERACTIVE
+#    INTERACTIVE_COMMENTS
+#    LIST_AMBIGUOUS
+#    LIST_BEEP
+#    LIST_PACKED
+#    LIST_ROWS_FIRST
+#    LIST_TYPES
+#    LOGIN
+#    LONG_LIST_JOBS
+#    MAIL_WARNING
+#    MENU_COMPLETE
+#    MONITOR
+#    NOTIFY
+# The following require SHINSTDIN and are not (yet) tested:
+#    AUTO_CD
+#
+# Other difficult things I haven't done:
+#    GLOBAL_RCS (uses fixed files outside build area)
+#    HASH_CMDS     )
+#    HASH_DIRS     )  fairly seriously internal, hard to test at all
+#    HASH_LIST_ALL )
+
+%prep
+  mkdir options.tmp && cd options.tmp
+  mkdir tmpcd
+  touch tmpfile1 tmpfile2
+  mydir=$PWD
+  catpath=$(which cat)
+
+%test
+
+  alias echo='print foo'
+  unsetopt aliases
+  # use eval else aliases are all parsed at start
+  eval echo bar
+  setopt aliases
+  eval echo bar
+  unalias echo
+0:ALIASES option
+>bar
+>foo bar
+
+  setopt allexport
+  testpm1=exported
+  unsetopt allexport
+  testpm2=unexported
+  print ${(t)testpm1}
+  print ${(t)testpm2}
+0:ALL_EXPORT option
+>scalar-export
+>scalar
+  
+  # Count the number of directories on the stack.  Don't care what they are.
+  dircount() { dirs -v | tail -1 | awk '{ print $1 + 1}'; }
+  unsetopt autopushd
+  cd tmpcd
+  dircount
+  cd ..
+  setopt autopushd
+  cd tmpcd
+  dircount
+  cd ..
+  unsetopt autopushd
+0:AUTO_PUSHD option
+>1
+>2
+
+  unsetopt badpattern
+  print [a
+  setopt badpattern
+  print [b
+1:BAD_PATTERN option
+>[a
+?ZTST_execchunk:2: bad pattern: [b
+
+  unsetopt bareglobqual nomatch
+  print *(.)
+  setopt bareglobqual nomatch
+  print *(.)
+0:BARE_GLOB_QUAL option
+>*(.)
+>tmpfile1 tmpfile2
+
+  setopt braceccl
+  print {abcd}
+  unsetopt braceccl
+  print {abcd}
+0:BRACE_CCL option
+>a b c d
+>{abcd}
+
+  setopt bsdecho
+  echo "histon\nimpington"
+  echo -e "girton\ncottenham"
+  unsetopt bsdecho
+  echo "newnham\ncomberton"
+0:BSD_ECHO option
+>histon\nimpington
+>girton
+>cottenham
+>newnham
+>comberton
+
+  unsetopt c_bases
+  print $(( [#16]15 ))
+  print $(( [#8]9 ))
+  setopt c_bases
+  print $(( [#16]31 ))
+  print $(( [#8]17 ))
+  setopt octal_zeroes
+  print $(( [#8]19 ))
+  unsetopt c_bases octal_zeroes
+0:C_BASES option
+>16#F
+>8#11
+>0x1F
+>8#21
+>023
+
+  setopt cdablevars
+  # only absolute paths are eligible for ~-expansion
+  cdablevar1=tmpcd
+  (cd cdablevar1)
+  cdablevar2=$PWD/tmpcd
+  cd cdablevar2
+  cd ..
+  print back in ${PWD:t}
+  unsetopt cdablevars
+  cd cdablevar2
+1q:CDABLE_VARS option
+>`print -P '%~'`/tmpcd
+>back in options.tmp
+?ZTST_execchunk:cd:2: no such file or directory: cdablevar1
+?ZTST_execchunk:cd:2: no such file or directory: cdablevar2
+
+# CHASE_DOTS should go with CHASE_LINKS in B01cd.ztst
+# which saves me having to write it here.
+
+  setopt noclobber
+  rm -f foo1 bar1 rod1
+  echo waterbeach >foo1
+  (echo landbeach >foo1)
+  cat foo1
+  (echo lode >>bar1)
+  [[ -f bar1 ]] && print That shouldn\'t be there.
+  echo denny >rod1
+  echo wicken >>rod1
+  cat rod1
+  unsetopt noclobber
+  rm -f foo2 bar2 rod2
+  echo ely >foo2
+  echo march >foo2
+  cat foo2
+  echo wimpole >>bar2
+  cat bar2
+  echo royston >rod2
+  echo foxton >>rod2
+  cat rod2
+  rm -f foo* bar* rod*
+0:CLOBBER option
+>waterbeach
+>denny
+>wicken
+>march
+>wimpole
+>royston
+>foxton
+?ZTST_execchunk:2: file exists: foo1
+?ZTST_execchunk:2: no such file or directory: bar1
+
+   setopt cshjunkieloops
+   eval 'for f in swaffham bulbeck; print $f; end'
+   print next one should fail >&2
+   unsetopt cshjunkieloops
+   eval 'for f in chesterton arbury; print $f; end'
+1:CSH_JUNKIE_LOOPS option (for loop)
+>swaffham
+>bulbeck
+?next one should fail
+?ZTST_execchunk:-1: parse error near `end'
+
+  setopt cshjunkiequotes
+  print this should cause an error >&2
+  eval "print 'line one
+  line two'"
+  print this should not >&2
+  eval "print 'line three\\
+  line four'"
+  unsetopt cshjunkiequotes
+0:CSH_JUNKIE_QUOTES option
+>line three
+>  line four
+?this should cause an error
+?ZTST_execchunk:-1: unmatched '
+?this should not
+
+  nullcmd() { print '$NULLCMD run'; }
+  readnullcmd() { print 'Running $READNULLCMD'; cat; }
+  NULLCMD=nullcmd
+  READNULLCMD=readnullcmd
+  setopt cshnullcmd
+  rm -f foo
+  print "This should fail" >&2
+  (>foo)
+  print "This should succeed" >&2
+  print "These are the contents of foo" >foo
+  cat foo
+  print "This should also fail" >&2
+  (<foo)
+  unsetopt cshnullcmd
+  rm -f foo
+  >foo
+  <foo
+  rm -f foo
+0:CSH_NULL_CMD option
+>These are the contents of foo
+>Running $READNULLCMD
+>$NULLCMD run
+?This should fail
+?ZTST_execchunk:2: redirection with no command
+?This should succeed
+?This should also fail
+?ZTST_execchunk:2: redirection with no command
+
+# nomatch should be overridden by cshnullglob
+  setopt nomatch cshnullglob
+  print tmp* nothing* blah
+  print -n 'hoping for no match: ' >&2
+  (print nothing* blah)
+  print >&2
+  unsetopt cshnullglob nomatch
+  print tmp* nothing* blah
+  print nothing* blah
+0:CSH_NULL_GLOB option
+>tmpcd tmpfile1 tmpfile2 blah
+>tmpcd tmpfile1 tmpfile2 nothing* blah
+>nothing* blah
+?hoping for no match: ZTST_execchunk:2: no match
+?
+
+# The trick is to avoid =cat being expanded in the output while $catpath is.
+  setopt NO_equals
+  print -n trick; print =cat
+  setopt equals
+  print -n trick; print =cat
+0q:EQUALS option
+>trick=cat
+>trick$catpath
+
+# explanation of expected TRAPZERR output:  from false and from
+# testfn() with ERR_EXIT on (hmm, should we really get a second one from
+# the function exiting?), then from the false only with ERR_EXIT off.
+  TRAPZERR() { print ZERR trapped; }
+  testfn() { setopt localoptions $2; print $1 before; false; print $1 after; }
+  (testfn on errexit)
+  testfn off
+  unfunction TRAPZERR testfn
+0:ERR_EXIT option
+>on before
+>ZERR trapped
+>ZERR trapped
+>off before
+>ZERR trapped
+>off after
+
+  (print before; setopt noexec; print after)
+0:NO_EXEC option
+>before
+
+  # The EXTENDED_GLOB test doesn't test globbing fully --- it just tests
+  # that certain patterns are treated literally with the option off
+  # and as patterns with the option on.
+  testfn() { print -n "$1 $2 $3 "; if [[ $1 = ${~2} ]];
+             then print yes; else print no; fi; }
+  tests=('a#' '?~b' '^aa')
+  strings=('a' 'aa' 'b' 'a#' '?~b' '^aa')
+  for opt in noextendedglob extendedglob; do
+    setopt $opt
+    for test in $tests; do
+      for string in $strings; do
+         testfn $string $test $opt
+      done
+    done
+  done
+0:EXTENDED_GLOB option
+>a a# noextendedglob no
+>aa a# noextendedglob no
+>b a# noextendedglob no
+>a# a# noextendedglob yes
+>?~b a# noextendedglob no
+>^aa a# noextendedglob no
+>a ?~b noextendedglob no
+>aa ?~b noextendedglob no
+>b ?~b noextendedglob no
+>a# ?~b noextendedglob no
+>?~b ?~b noextendedglob yes
+>^aa ?~b noextendedglob no
+>a ^aa noextendedglob no
+>aa ^aa noextendedglob no
+>b ^aa noextendedglob no
+>a# ^aa noextendedglob no
+>?~b ^aa noextendedglob no
+>^aa ^aa noextendedglob yes
+>a a# extendedglob yes
+>aa a# extendedglob yes
+>b a# extendedglob no
+>a# a# extendedglob no
+>?~b a# extendedglob no
+>^aa a# extendedglob no
+>a ?~b extendedglob yes
+>aa ?~b extendedglob no
+>b ?~b extendedglob no
+>a# ?~b extendedglob no
+>?~b ?~b extendedglob no
+>^aa ?~b extendedglob no
+>a ^aa extendedglob yes
+>aa ^aa extendedglob no
+>b ^aa extendedglob yes
+>a# ^aa extendedglob yes
+>?~b ^aa extendedglob yes
+>^aa ^aa extendedglob yes
+
+  foo() { print My name is $0; }
+  unsetopt functionargzero
+  foo
+  setopt functionargzero
+  foo
+  unfunction foo
+0:FUNCTION_ARGZERO option
+>My name is ZTST_execchunk
+>My name is foo
+
+  setopt _NO_glob_
+  print tmp*
+  set -o glob
+  print tmp*
+0:GLOB option
+>tmp*
+>tmpcd tmpfile1 tmpfile2
+
+  showit() { local v;
+             for v in first second third; do
+               eval print \$$v \$\{\(t\)$v\}
+	     done;
+           }      
+  setit() { typeset -x first=inside1;
+            typeset +g -x second=inside2;
+            typeset -g -x third=inside3;
+            showit;
+          }
+  first=outside1 second=outside2 third=outside3
+  unsetopt globalexport
+  setit
+  showit
+  setopt globalexport
+  setit
+  showit
+  unfunction setit showit
+0:GLOBAL_EXPORT option
+>inside1 scalar-local-export
+>inside2 scalar-local-export
+>inside3 scalar-export
+>outside1 scalar
+>outside2 scalar
+>inside3 scalar-export
+>inside1 scalar-export
+>inside2 scalar-local-export
+>inside3 scalar-export
+>inside1 scalar-export
+>outside2 scalar
+>inside3 scalar-export
+
+  setopt globassign
+  foo=tmp*
+  print $foo
+  unsetopt globassign
+  foo=tmp*
+  print $foo
+0:GLOB_ASSIGN option
+>tmpcd tmpfile1 tmpfile2
+>tmp*
+
+  mkdir onlysomefiles
+  touch onlysomefiles/.thisfile onlysomefiles/thatfile
+  setopt globdots
+  print onlysomefiles/*
+  unsetopt globdots
+  print onlysomefiles/*
+  rm -rf onlysomefiles
+0:GLOB_DOTS option
+>onlysomefiles/.thisfile onlysomefiles/thatfile
+>onlysomefiles/thatfile
+
+  # we've tested this enough times already...
+  # could add some stuff for other sorts of expansion
+  foo='tmp*'
+  setopt globsubst
+  print ${foo}
+  unsetopt globsubst
+  print ${foo}
+0:GLOB_SUBST option
+>tmpcd tmpfile1 tmpfile2
+>tmp*
+
+  setopt ignorebraces
+  echo X{a,b}Y
+  unsetopt ignorebraces
+  echo X{a,b}Y
+0:IGNORE_BRACES option
+>X{a,b}Y
+>XaY XbY
+
+  setopt ksh_arrays
+  array=(one two three)
+  print $array $array[2]
+  print ${array[0]} ${array[1]} ${array[2]} ${array[3]}
+  unsetopt ksh_arrays
+  print $array $array[2]
+  print ${array[0]} ${array[1]} ${array[2]} ${array[3]}
+  unset array
+0:KSH_ARRAYS option
+>one one[2]
+>one two three
+>one two three two
+>one one two three
+
+  fpath=(.)
+  echo >foo 'echo foo loaded; foo() { echo foo run; }'
+  echo >bar 'bar() { echo bar run; }'
+  setopt kshautoload
+  autoload foo bar
+  foo
+  bar
+  unfunction foo bar
+  unsetopt kshautoload
+  autoload foo bar
+  foo
+  bar
+0:KSH_AUTOLOAD option
+>foo loaded
+>foo run
+>bar run
+>foo loaded
+>bar run
+
+# ksh_glob is tested by the glob tests.
+
+  setopt kshoptionprint globassign
+  print set
+  setopt | grep kshoptionprint
+  setopt | grep globassign
+  unsetopt kshoptionprint
+  print unset
+  setopt | grep kshoptionprint
+  setopt | grep globassign
+  unsetopt globassign
+0:KSH_OPTION_PRINT option
+>set
+>kshoptionprint        on
+>globassign            on
+>unset
+>globassign
+
+  setopt kshtypeset
+  ktvars=(ktv1 ktv2)
+  typeset ktfoo=`echo arg1 arg2` $ktvars
+  print $+ktv1 $+ktv2 $+ktv3
+  print $ktfoo
+  unsetopt kshtypeset
+  typeset noktfoo=`echo noktarg1 noktarg2`
+  print $noktfoo
+  print $+noktarg1 $+noktarg2
+  unset ktfoo ktv1 ktv2 noktfoo noktarg2
+0:KSH_TYPESET option
+>1 1 0
+>arg1 arg2
+>noktarg1
+>0 1
+
+  showopt() { setopt | egrep 'localoptions|ksharrays'; }
+  f1() { setopt localoptions ksharrays; showopt }
+  f2() { setopt ksharrays; showopt }
+  setopt kshoptionprint
+  showopt
+  f1
+  showopt
+  f2
+  showopt
+  unsetopt ksh_arrays
+0:LOCAL_OPTIONS option
+>ksharrays             off
+>localoptions          off
+>ksharrays             on
+>localoptions          on
+>ksharrays             off
+>localoptions          off
+>ksharrays             on
+>localoptions          off
+>ksharrays             on
+>localoptions          off
+
+# LOCAL_TRAPS was tested in C03traps (phew).
+
+  fn() {
+    local HOME=/any/old/name
+    print -l var=~ 'anything goes/here'=~ split=`echo maybe not`;
+  }
+  setopt magicequalsubst
+  fn
+  setopt kshtypeset
+  fn
+  unsetopt magicequalsubst kshtypeset
+  fn
+0:MAGIC_EQUAL_SUBST option
+>var=/any/old/name
+>anything goes/here=/any/old/name
+>split=maybe
+>not
+>var=/any/old/name
+>anything goes/here=/any/old/name
+>split=maybe not
+>var=~
+>anything goes/here=~
+>split=maybe
+>not
+
+  setopt MARK_DIRS
+  print tmp*
+  unsetopt MARK_DIRS
+  print tmp*
+0:MARK_DIRS option
+>tmpcd/ tmpfile1 tmpfile2
+>tmpcd tmpfile1 tmpfile2
+
+# maybe should be in A04redirect
+  print "This is in1" >in1
+  print "This is in2" >in2
+  unsetopt multios
+  print Test message >foo1 >foo2
+  print foo1: $(<foo1)
+  print foo2: $(<foo2)
+  cat <in1 <in2
+  setopt multios
+  print Test message >foo1 >foo2
+  sleep 1   # damn, race in multios
+  print foo1: $(<foo1)
+  print foo2: $(<foo2)
+  cat <in1 <in2
+  rm -f foo1 foo2 in1 in2
+0:MULTIOS option
+>foo1:
+>foo2: Test message
+>This is in2
+>foo1: Test message
+>foo2: Test message
+>This is in1
+>This is in2
+
+# tried this with other things, but not on its own, so much.
+  unsetopt nomatch
+  print with nonomatch: flooble*
+  setopt nomatch
+  print with nomatch flooble*
+1:NOMATCH option
+>with nonomatch: flooble*
+?ZTST_execchunk:2: no matches found: flooble*
+
+# NULL_GLOB should override NONOMATCH...
+  setopt nullglob nomatch
+  print frooble* tmp*
+  unsetopt nullglob nomatch
+  print frooble* tmp*
+0:NULL_GLOB option
+>tmpcd tmpfile1 tmpfile2
+>frooble* tmpcd tmpfile1 tmpfile2

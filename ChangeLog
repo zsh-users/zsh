@@ -5,7 +5,7 @@
 
 001-06-22  Andrej Borsenkow  <bor@zsh.org>
 
-        * 15021: Src/prompt.c, Doc/Zsh/prompt.yo: revert to old %l
+	* 15021: Src/prompt.c, Doc/Zsh/prompt.yo: revert to old %l
 	semantic; add new %y character instead as suggested by Wayne
 
 2001-06-21  Bart Schaefer  <schaefer@zsh.org>
@@ -16,6 +16,10 @@
 	in command position.
 
 	* 15018: Completion/compinit: Fix exit status of compdef.
+
+	* 15002: Completion/Base/Widget/_complete_debug,
+	Completion/Base/Widget/_complete_help: Use `trap' to restore state
+	properly in case of keyboard interrupt.
 
 2001-06-20  Bart Schaefer  <schaefer@zsh.org>
 
@@ -99,6 +103,12 @@
 
 	* 14883 (Jos Backus): Completion/Unix/Command/_mount: add code for
 	BSDish systems
+
+2001-06-12  Peter Stephenson  <pws@csr.com>
+
+	* 14858: Doc/Zsh/options.yo, Src/options.c, Src/subst.c,
+	Src/zsh.h, Test/E01options.ztst: KSH_TYPESET option allows
+	assignments after typeset not to be split.
 
 2001-06-12  Bart Schaefer  <schaefer@zsh.org>
 

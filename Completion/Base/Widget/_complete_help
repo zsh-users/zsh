@@ -1,0 +1,92 @@
+#compdef -k complete-word \C-xh
+
+_complete_help() {
+  eval "$_comp_setup"
+
+  local _sort_tags=_help_sort_tags text i j k tmp
+  typeset -A help_funcs help_tags help_sfuncs help_styles
+
+  compadd() { return 1 }
+  zstyle() {
+    local _f="${${(@)${(@)funcstack[2,(i)_(main_complete|complete|approximate|normal)]}:#_(wanted|requested|all_labels|next_label)}% *}"
+
+    [[ -z "$_f" ]] && _f="${${(@)funcstack[2,(i)_(main_complete|complete|approximate|normal)]}:#_(wanted|requested|all_labels|next_label)}"
+
+    if [[ "$help_sfuncs[$2]" != *${_f}* ||
+          "$help_styles[${2}${_f}]" != *${3}* ]]; then
+      [[ "$help_sfuncs[$2]" != *${_f}* ]] &&
+          help_sfuncs[$2]="${help_sfuncs[$2]}:${_f}"
+      local _t
+
+      case "$1" in
+      -s) _t='[string] ';;
+      -a) _t='[array]  ';;
+      -h) _t='[assoc]  ';;
+      *)  _t='[boolean]';;
+      esac
+      help_styles[${2}${_f}]="${help_styles[${2}${_f}]},${_t} ${3}:${_f}"
+    fi
+
+    # No need to call the completers more than once with different match specs.
+
+    if [[ "$3" = matcher-list ]]; then
+      set -A "$4" ''
+    else
+      builtin zstyle "$@"
+    fi
+  }
+  trap 'unfunction compadd zstyle' EXIT INT
+
+  _main_complete
+
+  unfunction compadd zstyle
+  trap - EXIT INT
+
+  for i in "${(@ok)help_funcs}"; do
+    text="${text}
+tags in context :completion:${i}:"
+    tmp=()
+    for j in "${(@s.:.)help_funcs[$i][2,-1]}"; do
+      tmp=( "$tmp[@]" "${(@s.,.)help_tags[${i}${j}][2,-1]}" )
+    done
+    zformat -a tmp '  (' "$tmp[@]"
+    tmp=( '
+    '${^tmp}')' )
+    text="${text}${tmp}"
+  done
+
+  if [[ ${NUMERIC:-1} -ne 1 ]]; then
+    text="$text
+"
+    for i in "${(@ok)help_sfuncs}"; do
+      text="${text}
+styles in context ${i}"
+      tmp=()
+      for j in "${(@s.:.)help_sfuncs[$i][2,-1]}"; do
+        tmp=( "$tmp[@]" "${(@s.,.)help_styles[${i}${j}][2,-1]}" )
+      done
+      zformat -a tmp '  (' "$tmp[@]"
+      tmp=( '
+    '${^tmp}')' )
+      text="${text}${tmp}"
+    done
+  fi
+  compstate[list]='list force'
+  compstate[insert]=''
+
+  compadd -UX "$text[2,-1]" -n ''
+}
+
+_help_sort_tags() {
+  local f="${${(@)${(@)funcstack[3,(i)_(main_complete|complete|approximate|normal)]}:#_(wanted|requested|all_labels|next_label)}% *}"
+
+  if [[ "$help_funcs[$curcontext]" != *${f}* ||
+        "$help_tags[${curcontext}${f}]" != *(${(j:|:)~argv})* ]]; then
+    [[ "$help_funcs[$curcontext]" != *${f}* ]] &&
+        help_funcs[$curcontext]="${help_funcs[$curcontext]}:${f}"
+    help_tags[${curcontext}${f}]="${help_tags[${curcontext}${f}]},${argv}:${f}"
+    comptry "$@"
+  fi
+}
+
+_complete_help "$@"

@@ -30,7 +30,6 @@
 #define trashzle()      trashzleptr()
 #define zleread(X,Y,H)  zlereadptr(X,Y,H)
 #define spaceinline(X)  spaceinlineptr(X)
-#define gotword()       gotwordptr()
 #define zrefresh()      refreshptr()
 
 #define compctlread(N,A,O,R) compctlreadptr(N,A,O,R)
@@ -234,31 +233,31 @@ enum {
  * below.                                                              */
 
 enum {
-    WRITE,		/* > */
-    WRITENOW,		/* >| */
-    APP,		/* >> */
-    APPNOW,		/* >>| */
-    ERRWRITE,		/* &>, >& */
-    ERRWRITENOW,	/* >&| */
-    ERRAPP,		/* >>& */
-    ERRAPPNOW,		/* >>&| */
-    READWRITE,		/* <> */
-    READ,		/* < */
-    HEREDOC,		/* << */
-    HEREDOCDASH,	/* <<- */
-    HERESTR,		/* <<< */
-    MERGEIN,		/* <&n */
-    MERGEOUT,		/* >&n */
-    CLOSE,		/* >&-, <&- */
-    INPIPE,		/* < <(...) */
-    OUTPIPE		/* > >(...) */
+    REDIR_WRITE,		/* > */
+    REDIR_WRITENOW,		/* >| */
+    REDIR_APP,		/* >> */
+    REDIR_APPNOW,		/* >>| */
+    REDIR_ERRWRITE,		/* &>, >& */
+    REDIR_ERRWRITENOW,	/* >&| */
+    REDIR_ERRAPP,		/* >>& */
+    REDIR_ERRAPPNOW,		/* >>&| */
+    REDIR_READWRITE,		/* <> */
+    REDIR_READ,		/* < */
+    REDIR_HEREDOC,		/* << */
+    REDIR_HEREDOCDASH,	/* <<- */
+    REDIR_HERESTR,		/* <<< */
+    REDIR_MERGEIN,		/* <&n */
+    REDIR_MERGEOUT,		/* >&n */
+    REDIR_CLOSE,		/* >&-, <&- */
+    REDIR_INPIPE,		/* < <(...) */
+    REDIR_OUTPIPE		/* > >(...) */
 };
 
-#define IS_WRITE_FILE(X)      ((X)>=WRITE && (X)<=READWRITE)
+#define IS_WRITE_FILE(X)      ((X)>=REDIR_WRITE && (X)<=REDIR_READWRITE)
 #define IS_APPEND_REDIR(X)    (IS_WRITE_FILE(X) && ((X) & 2))
 #define IS_CLOBBER_REDIR(X)   (IS_WRITE_FILE(X) && ((X) & 1))
-#define IS_ERROR_REDIR(X)     ((X)>=ERRWRITE && (X)<=ERRAPPNOW)
-#define IS_READFD(X)          (((X)>=READWRITE && (X)<=MERGEIN) || (X)==INPIPE)
+#define IS_ERROR_REDIR(X)     ((X)>=REDIR_ERRWRITE && (X)<=REDIR_ERRAPPNOW)
+#define IS_READFD(X)          (((X)>=REDIR_READWRITE && (X)<=REDIR_MERGEIN) || (X)==REDIR_INPIPE)
 #define IS_REDIROP(X)         ((X)>=OUTANG && (X)<=TRINANG)
 
 /* Flags for input stack */
@@ -468,8 +467,8 @@ struct value {
     int isarr;
     Param pm;		/* parameter node                      */
     int inv;		/* should we return the index ?        */
-    int a;		/* first element of array slice, or -1 */
-    int b;		/* last element of array slice, or -1  */
+    int start;		/* first element of array slice, or -1 */
+    int end;		/* 1-rel last element of array slice, or -1 */
     char **arr;		/* cache for hash turned into array */
 };
 
@@ -487,7 +486,8 @@ typedef struct eprog *Eprog;
 
 struct funcdump {
     FuncDump next;		/* next in list */
-    char *name;			/* path name */
+    dev_t dev;			/* device */
+    ino_t ino;			/* indoe number */
     int fd;			/* file descriptor */
     Wordcode map;		/* pointer to header */
     Wordcode addr;		/* mapped region */
@@ -496,7 +496,7 @@ struct funcdump {
 };
 
 struct eprog {
-    int alloc;			/* EA_* below */
+    int flags;			/* EF_* below */
     int len;			/* total block length */
     int npats;			/* Patprog cache size */
     Patprog *pats;		/* the memory block, the patterns */
@@ -506,9 +506,10 @@ struct eprog {
     FuncDump dump;		/* dump file this is in */
 };
 
-#define EA_REAL 0
-#define EA_HEAP 1
-#define EA_MAP  2
+#define EF_REAL 1
+#define EF_HEAP 2
+#define EF_MAP  4
+#define EF_RUN  8
 
 typedef struct estate *Estate;
 
@@ -521,9 +522,9 @@ struct estate {
 typedef struct eccstr *Eccstr;
 
 struct eccstr {
-    Eccstr next;
+    Eccstr left, right;
     char *str;
-    wordcode offs;
+    wordcode offs, aoffs;
     int nfunc;
 };
 
@@ -659,8 +660,9 @@ struct eccstr {
 /* Defintions for job table and job control */
 /********************************************/
 
-/* size of job table */
-#define MAXJOB 50
+#ifdef NEED_LINUX_TASKS_H
+#include <linux/tasks.h>
+#endif
 
 /* entry in the job table */
 
@@ -750,6 +752,8 @@ struct dirsav {
     dev_t dev;
     ino_t ino;
 };
+
+#define MAX_PIPESTATS 256
 
 /*******************************/
 /* Definitions for Hash Tables */
@@ -953,6 +957,7 @@ struct module {
     union {
 	void *handle;
 	Linkedmod linked;
+	char *alias;
     } u;
     LinkList deps;
     int wrapper;
@@ -964,6 +969,7 @@ struct module {
 #define MOD_LINKED  (1<<3)
 #define MOD_INIT_S  (1<<4)
 #define MOD_INIT_B  (1<<5)
+#define MOD_ALIAS   (1<<6)
 
 typedef int (*Module_func) _((Module));
 
@@ -1019,6 +1025,8 @@ struct patprog {
 #define PAT_STATIC	0x0040	/* Don't copy pattern to heap as per default */
 #define PAT_SCAN	0x0080	/* Scanning, so don't try must-match test */
 #define PAT_ZDUP        0x0100  /* Copy pattern in real memory */
+#define PAT_NOTSTART	0x0200	/* Start of string is not real start */
+#define PAT_NOTEND	0x0400	/* End of string is not real end */
 
 /* Globbing flags: lower 8 bits gives approx count */
 #define GF_LCMATCHUC	0x0100
@@ -1111,20 +1119,22 @@ struct param {
 #define PM_UNALIASED	(1<<13)	/* do not expand aliases when autoloading   */
 
 #define PM_HIDE		(1<<14)	/* Special behaviour hidden by local        */
-#define PM_TIED 	(1<<15)	/* array tied to colon-path or v.v.         */
+#define PM_HIDEVAL	(1<<15)	/* Value not shown in `typeset' commands    */
+#define PM_TIED 	(1<<16)	/* array tied to colon-path or v.v.         */
 
 /* Remaining flags do not correspond directly to command line arguments */
-#define PM_LOCAL	(1<<16) /* this parameter will be made local        */
-#define PM_SPECIAL	(1<<17) /* special builtin parameter                */
-#define PM_DONTIMPORT	(1<<18)	/* do not import this variable              */
-#define PM_RESTRICTED	(1<<19) /* cannot be changed in restricted mode     */
-#define PM_UNSET	(1<<20)	/* has null value                           */
-#define PM_REMOVABLE	(1<<21)	/* special can be removed from paramtab     */
-#define PM_AUTOLOAD	(1<<22) /* autoloaded from module                   */
-#define PM_NORESTORE	(1<<23)	/* do not restore value of local special    */
+#define PM_LOCAL	(1<<17) /* this parameter will be made local        */
+#define PM_SPECIAL	(1<<18) /* special builtin parameter                */
+#define PM_DONTIMPORT	(1<<19)	/* do not import this variable              */
+#define PM_RESTRICTED	(1<<20) /* cannot be changed in restricted mode     */
+#define PM_UNSET	(1<<21)	/* has null value                           */
+#define PM_REMOVABLE	(1<<22)	/* special can be removed from paramtab     */
+#define PM_AUTOLOAD	(1<<23) /* autoloaded from module                   */
+#define PM_NORESTORE	(1<<24)	/* do not restore value of local special    */
+#define PM_HASHELEM     (1<<25) /* is a hash-element */
 
 /* The option string corresponds to the first of the variables above */
-#define TYPESET_OPTSTR "aiEFALRZlurtxUhT"
+#define TYPESET_OPTSTR "aiEFALRZlurtxUhHT"
 
 /* These typeset options take an optional numeric argument */
 #define TYPESET_OPTNUM "LRZiEF"
@@ -1138,6 +1148,7 @@ struct param {
 #define SCANPM_MATCHMANY  (1<<5)
 #define SCANPM_ASSIGNING  (1<<6)
 #define SCANPM_KEYMATCH   (1<<7)
+#define SCANPM_DQUOTED    (1<<8)
 #define SCANPM_ISVAR_AT   ((-1)<<15)	/* Only sign bit is significant */
 
 /*
@@ -1205,13 +1216,14 @@ struct nameddir {
 #define PRINT_TYPE		(1<<1)
 #define PRINT_LIST		(1<<2)
 #define PRINT_KV_PAIR		(1<<3)
+#define PRINT_INCLUDEVALUE	(1<<4)
 
 /* flags for printing for the whence builtin */
-#define PRINT_WHENCE_CSH	(1<<4)
-#define PRINT_WHENCE_VERBOSE	(1<<5)
-#define PRINT_WHENCE_SIMPLE	(1<<6)
-#define PRINT_WHENCE_FUNCDEF	(1<<7)
-#define PRINT_WHENCE_WORD	(1<<8)
+#define PRINT_WHENCE_CSH	(1<<5)
+#define PRINT_WHENCE_VERBOSE	(1<<6)
+#define PRINT_WHENCE_SIMPLE	(1<<7)
+#define PRINT_WHENCE_FUNCDEF	(1<<9)
+#define PRINT_WHENCE_WORD	(1<<10)
 
 /***********************************/
 /* Definitions for history control */
@@ -1240,6 +1252,7 @@ struct histent {
 #define HIST_READ	0x00000004	/* Command was read back from disk*/
 #define HIST_DUP	0x00000008	/* Command duplicates a later line */
 #define HIST_FOREIGN	0x00000010	/* Command came from another shell */
+#define HIST_TMPSTORE	0x00000020	/* Kill when user enters another cmd */
 
 #define GETHIST_UPWARD  (-1)
 #define GETHIST_DOWNWARD  1
@@ -1294,6 +1307,7 @@ struct histent {
 
 enum {
     OPT_INVALID,
+    ALIASESOPT,
     ALLEXPORT,
     ALWAYSLASTPROMPT,
     ALWAYSTOEND,
@@ -1315,6 +1329,7 @@ enum {
     BGNICE,
     BRACECCL,
     BSDECHO,
+    CBASES,
     CDABLEVARS,
     CHASEDOTS,
     CHASELINKS,
@@ -1336,8 +1351,9 @@ enum {
     EXTENDEDHISTORY,
     FLOWCONTROL,
     FUNCTIONARGZERO,
-    GLOBALRCS,
     GLOBOPT,
+    GLOBALEXPORT,
+    GLOBALRCS,
     GLOBASSIGN,
     GLOBCOMPLETE,
     GLOBDOTS,
@@ -1367,6 +1383,7 @@ enum {
     KSHAUTOLOAD,
     KSHGLOB,
     KSHOPTIONPRINT,
+    KSHTYPESET,
     LISTAMBIGUOUS,
     LISTBEEP,
     LISTPACKED,
@@ -1386,6 +1403,7 @@ enum {
     NOTIFY,
     NULLGLOB,
     NUMERICGLOBSORT,
+    OCTALZEROES,
     OVERSTRIKE,
     PATHDIRS,
     POSIXBUILTINS,
@@ -1422,6 +1440,7 @@ enum {
     VERBOSE,
     XTRACE,
     USEZLE,
+    DVORAK,
     OPT_SIZE
 };
 
@@ -1508,7 +1527,11 @@ struct ttyinfo {
 #define TCSTANDOUTEND  22
 #define TCUNDERLINEEND 23
 #define TCHORIZPOS     24
-#define TC_COUNT       25
+#define TCUPCURSOR     25
+#define TCDOWNCURSOR   26
+#define TCLEFTCURSOR   27
+#define TCRIGHTCURSOR  28
+#define TC_COUNT       29
 
 #define tccan(X) (tclen[X])
 
@@ -1612,13 +1635,11 @@ struct heap {
 #endif
 ;
 
-# define LASTALLOC_RETURN return
-
 # define NEWHEAPS(h)    do { Heap _switch_oldheaps = h = new_heaps(); do
 # define OLDHEAPS       while (0); old_heaps(_switch_oldheaps); } while (0);
 
-# define SWITCHHEAPS(h)  do { Heap _switch_oldheaps = switch_heaps(h); do
-# define SWITCHBACKHEAPS while (0); switch_heaps(_switch_oldheaps); } while (0);
+# define SWITCHHEAPS(o, h)  do { o = switch_heaps(h); do
+# define SWITCHBACKHEAPS(o) while (0); switch_heaps(o); } while (0);
 
 /****************/
 /* Debug macros */
@@ -1664,12 +1685,6 @@ typedef int (*CompctlReadFn) _((char *, char **, char *, char *));
 typedef void (*ZleVoidFn) _((void));
 typedef void (*ZleVoidIntFn) _((int));
 typedef unsigned char * (*ZleReadFn) _((char *, char *, int));
-
-/***************************************/
-/* Pseudo-keyword to mark exportedness */
-/***************************************/
-
-#define mod_export
 
 /***************************************/
 /* Hooks in core.                      */
