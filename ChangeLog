@@ -1,3 +1,9 @@
+2003-09-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 19053 modified c.f. 19056: Functions/MIME, Doc/Zsh/contrib.yo:
+	Functions using suffix aliases for handling suffixes mailcap
+	style.
+
 2003-09-14  Clint Adams  <clint@zsh.org>
 
 	* 19076: Src/Modules/terminfo.c: don't call setupterm

@@ -1,0 +1,112 @@
+# Function to find a web browser to run on a URL or file.
+# Can also be run as a script.  It is suitable for use as
+# a suffix alias:
+#   alias -s html=pick-web-browser
+#
+# The single argument is the URL or file name which may be of any type.
+# The only processing which occurs is that if the argument is a file,
+# it is converted into a URL.  As the function takes account of
+# any necessary conversions to the file name (for example, if it
+# contains spaces), it is generally preferable to pass in raw file
+# names rather than convert them to URLs elsewhere.
+#
+# The function takes account of the fact that many X Windows browsers
+# which are already running on the current display can take a command
+# to pass the URL to that process for handling.  A typical sign
+# that this has happened is that apparently nothing happens --- you
+# need to check the browser window.
+#
+# If no $DISPLAY is set, the function tries to start a terminal-based
+# browser instead.
+
+emulate -L zsh
+setopt extendedglob cbases nonomatch
+
+local -a xbrowsers ttybrowsers
+
+# X Windows browsers which might be running and can accept
+# a remote URL.  You can change the order of preference.
+# If none is already running, starts the first in the array.
+zstyle -a :mime: x-browsers xbrowsers ||
+  xbrowsers=(mozilla netscape opera konqueror)
+# Preferred command line browser.  Used if there is on $DISPLAY set.
+zstyle -a :mime: tty-browsers ttybrowsers ||
+  ttybrowsers=(links lynx)
+# Characters in addition to alphanumerics which can appear literally
+# in a URL.  `-' should be the first if it appears, so append others
+# to the end.
+litc="-_./"
+
+local -a windows remoteargs match mbegin mend
+local url browser
+
+url=$1
+if [[ -f $url ]]; then
+  if [[ $url = *[^-_[:alnum:]]* ]]; then
+    # Convert special characters into hex escapes.
+    local sofar
+    while [[ $url = (#b)([${litc}[:alnum:]]#)([^${litc}[:alnum:]])(*) ]]
+      do
+      sofar+="$match[1]%${$(( [#16] ##$match[2] ))##0x}"
+      url=$match[3]
+    done
+    url="$sofar$url"
+  fi
+
+  # Turn this into a local URL
+  if [[ $url = /* ]]; then
+      url=file://$url
+  else
+      url=file://$PWD/$url
+  fi
+fi
+
+
+if [[ -n $DISPLAY ]]; then
+  # X Windows running
+
+  # Get the name of all windows running; use the internal name, not
+  # the friendly name, which is less useful.
+  #
+  # The nasty but portable version.
+  # The nice but non-portable version uses Perl, even though perl
+  # is more portable.
+#    windows=(${(f)"$(xwininfo -root -all | 
+#	sed -ne 's/.*".*": ("\(.*\)" ".*").*/\1/p' |sort | uniq)"})
+
+  windows=(${(f)"$(xwininfo -root -all | 
+         perl -ne '/.*"(.*)": \("(.*)" "(.*)"\).*/ and $w{$2} = 1;
+                   END { print join("\n", keys %w), "\n" }')"})
+
+  # Is any browser we've heard of running?
+  for browser in $xbrowsers; do
+    if [[ $windows[(I)(#i)$browser] -ne 0 ]]; then
+      if [[ $browser = konqueror ]]; then
+	# I'm sure there's documentation for this somewhere...
+	dcop $(dcop|grep konqueror) default openBrowserWindow $url
+      else
+	# Mozilla bells and whistles are described at:
+	# http://www.mozilla.org/unix/remote.html
+	$browser -remote "openURL($url)"
+      fi
+      return
+    fi
+  done
+
+  # Start our preferred X Windows browser in the background.
+  for browser in $xbrowsers; do
+      if eval "[[ =$browser != \\=$browser ]]"; then
+	# The following is to make the job text more readable.
+	eval ${(q)browser} ${(q)url} "&"
+	break
+      fi
+  done
+else
+  # Start up dumb terminal browser.
+  for browser in $ttybrowsers; do
+    if eval "[[ =$browser != \\=$browser ]]"; then
+      $browser $url
+      break
+    fi
+  done
+fi

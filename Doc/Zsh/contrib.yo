@@ -13,6 +13,7 @@ startmenu()
 menu(Utilities)
 menu(Prompt Themes)
 menu(ZLE Functions)
+menu(MIME functions)
 menu(Other Functions)
 endmenu()
 
@@ -344,7 +345,7 @@ normally call a theme's setup function directly.
 )
 enditem()
 
-texinode(ZLE Functions)(Other Functions)(Prompt Themes)(User Contributions)
+texinode(ZLE Functions)(MIME Functions)(Prompt Themes)(User Contributions)
 sect(ZLE Functions)
 
 subsect(Widgets)
@@ -955,7 +956,159 @@ whether the tt(widget) style is used.
 )
 enditem()
 
-texinode(Other Functions)()(ZLE Functions)(User Contributions)
+texinode(MIME Functions)(Other Functions)(ZLE Functions)(User Contributions)
+sect(MIME Functions)
+
+Three functions are available to provide handling of files recognised by
+extension, for example to dispatch a file tt(text.ps) when executed as a
+command to an appropriate viewer.
+
+startitem()
+xitem(tt(zsh-mime-setup [-flv]))
+item(tt(zsh-mime-handler))(
+These two functions use the files tt(~/.mime.types) and tt(/etc/mime.types),
+which associate types and extensions, as well as tt(~/.mailcap) and
+tt(/etc/mailcap) files, which associate types and the programs that
+handle them.  These are provided on many systems with the Multimedia
+Internet Mail Extensions.
+
+To enable the system, the function tt(zsh-mime-setup) should be
+autoloaded and run.  This allows files with extensions to be treated
+as executable; such files be completed by the function completion system.
+The function tt(zsh-mime-handler) should not need to be called by the
+user.
+
+The system works by setting up suffix aliases with `tt(alias -s)'.
+Suffix aliases already installed by the user will not be overwritten.
+
+Repeated calls to tt(zsh-mime-setup) do not override the existing
+mapping between suffixes and executable files unless the option tt(-f)
+is given.  Note, however, that this does not override existing suffix
+aliases assigned to handlers other than tt(zsh-mime-handler).
+Calling tt(zsh-mime-setup) with the option tt(-l) lists the existing
+mapping without altering it.  Calling tt(zsh-mime-setup) with the option
+tt(-v) causes verbose output to be shown during the setup operation.
+
+The system respects the tt(mailcap) flags tt(needsterminal) and
+tt(copiousoutput), see manref(mailcap)(4).
+
+The functions use the following styles, which are defined with the
+tt(zstyle) builtin command (\
+ifzman(see zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module))).  They should be defined
+before tt(zsh-mime-setup) is run.  The contexts used all
+start with tt(:mime:), with additional components in some cases.
+It is recommended that a trailing tt(*) (suitably quoted) be appended
+to style patterns in case the system is extended in future.  Some
+examples are given below.
+startitem()
+item(mime-types)(
+A list of files in the format of tt(~/.mime.types) and
+tt(/etc/mime.types) to be read during setup, replacing the default list
+which consists of those two files.  The context is tt(:mime:).
+)
+item(mailcap)(
+A list of files in the format of tt(~/.mailcap) and
+tt(/etc/mailcap) to be read during setup, replacing the default list
+which consists of those two files.  The context is tt(:mime:).
+)
+item(handler)(
+Specifies a handler for a suffix; the suffix is given by the context as
+tt(:mime:.)var(suffix)tt(:), and the format of the handler is exactly
+that in tt(mailcap).  Note in particular the `tt(.)' and trailing colon
+to distinguish this use of the context.  This overrides any handler
+specified by the tt(mailcap) files.  If the handler requires a terminal,
+the tt(flags) style should be set to include the word tt(needsterminal),
+or if the output is to be displayed through a pager (but not if the
+handler is itself a pager), it should include tt(copiousoutput).
+)
+item(flags)(
+Defines flags to go with a handler; the context is as for the
+tt(handler) style, and the format is as for the flags in tt(mailcap).
+)
+item(pager)(
+If set, will be used instead of tt($PAGER) or tt(more) to handle
+suffixes where the tt(copiousoutput) flag is set.  The context is
+as for tt(handler), i.e. tt(:mime:.)var(suffix)tt(:) for handling
+a file with the given var(suffix).
+)
+enditem()
+
+Examples:
+
+example(zstyle ':mime:*' mailcap ~/.mailcap /usr/local/etc/mailcap
+zstyle ':mime:.txt' handler less %s
+zstyle ':mime:.txt' flags needsterminal)
+
+When tt(zsh-mime-setup) is subsequently run, it will look for
+tt(mailcap) entries in the two files given.  Files of suffix tt(.txt)
+will be handled by running `tt(less) var(file.txt)'.  The flag
+tt(needsterminal) is set to show that this program must run attached to a
+terminal.
+
+As there are several steps to dispatching a command, the following
+should be checked if attempting to execute a file by extension
+tt(.)var(ext) does not have the expected effect.
+starteit()
+eit()(
+The command `tt(alias -s) var(ext)' should show
+`tt(ps=zsh-mime-handler)'.  If it shows something else, another suffix
+alias was already installed and was not overwritten.  If it shows
+nothing, no handler was installed:  this is most likely because no
+handler was found in the tt(.mime.types) and tt(mailcap) combination for
+tt(.ext) files.  In that case, appropriate handling should be added to
+tt(~/.mime.types) and tt(mailcap).
+)
+eit()(
+If the extension is handled by tt(zsh-mime-handler) but the file is
+not opened correctly, either the handler defined for the type is
+incorrect, or the flags associated with it are in appropriate.  Running
+tt(zsh-mime-setup -l) will show the handler and, if there are any, the
+flags.  A tt(%s) in the handler is replaced by the file (suitably quoted
+if necessary).  Check that the handler program listed lists and can
+be run in the way shown.  Also check that the flags tt(needsterminal) or
+tt(copiousoutput) are set if the handler needs to be run under a
+terminal; the second flag is used if the output should be sent to a pager.
+An example of a suitable tt(mailcap) entry for such a program is:
+
+example(text/html; /usr/bin/lynx '%s'; needsterminal)
+)
+endeit()
+)
+item(tt(pick-web-browser))(
+This function is separate from the two MIME functions described above
+and can be assigned directly to a suffix:
+
+example(autoload -U pick-web-browser
+alias -s html=pick-web-browser)
+
+It is provided as an intelligent front end to dispatch a web browser.
+It will check if an X Windows display is available, and if so
+if there is already a browser running which can accept a remote
+connection.  In that case, the file will be displayed in that browser;
+you should check explicitly if it has appeared in the running browser's
+window.  Otherwise, it will start a new browser according to a builtin
+set of preferences.
+
+Alternatively, tt(pick-web-browser) can be run as a zsh script.
+
+Two styles are available to customize the choice of browsers:
+tt(x-browsers) when running under the X Windows System, and
+tt(tty-browsers) otherwise.  These are arrays in decreasing order
+of preference consiting of the command name under which to start the
+browser.  They are looked up in the context tt(:mime:) (which may
+be extended in future, so appending `tt(*)' is recommended).  For
+example,
+
+example(zstyle ':mime:*' x-browsers opera konqueror netscape)
+
+specifies that tt(pick-web-browser) should first look for a runing
+instance of Opera, Konqueror or Netscape, in that order, and if it
+fails to find any should attempt to start Opera.
+)
+enditem()
+
+texinode(Other Functions)()(MIME Functions)(User Contributions)
 sect(Other Functions)
 
 There are a large number of helpful functions in the tt(Functions/Misc)

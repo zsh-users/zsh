@@ -1,0 +1,259 @@
+emulate -L zsh
+setopt extendedglob cbases
+
+local opt o_verbose o_list
+
+autoload -U zsh-mime-handler
+
+while getopts "flv" opt; do
+  case $opt in
+    # List: show existing suffixes and their handlers then exit.
+    (l)
+    o_list=1
+    ;;
+
+    # Verbose; print diagnostics to stdout.
+    (v)
+    o_verbose=1
+    ;;
+
+    # Force; discard any existing settings before reading.
+    (f)
+    unset -m zsh_mime_\*
+    ;;
+
+    (*)
+    [[ $opt = \? ]] || print -r "Option $opt not handled, complain" >&2
+    return 1
+    ;;
+  esac
+done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
+
+
+if [[ -n $o_list ]]; then
+  # List and return.
+  for suffix in ${(ko)zsh_mime_handlers}; do
+      print ${(r.10.)suffix}${zsh_mime_handlers[$suffix]}
+      if [[ -n ${zsh_mime_flags[$suffix]} ]]; then
+	print "  flags: ${zsh_mime_flags[$suffix]}"
+      fi
+  done
+  return 0
+fi
+
+
+# Handler for each suffix.
+(( ${+zsh_mime_handlers} )) || typeset -gA zsh_mime_handlers
+# Corresponding flags, if any, for handler
+(( ${+zsh_mime_flags} )) || typeset -gA zsh_mime_flags
+
+# Internal maps read from MIME configuration files.
+# Note we don't remember the types, just the mappings from suffixes
+# to handlers and their flags.
+typeset -A suffix_type_map type_handler_map type_flags_map
+
+local -a type_files cap_files array match mbegin mend
+local file line type suffix exts elt flags line2
+
+# Customizable list of files to examine.
+zstyle -a :mime: mime-types type_files ||
+  type_files=(~/.mime.types /etc/mime.types)
+zstyle -a :mime: mailcap cap_files ||
+  cap_files=(~/.mailcap /etc/mailcap)
+
+TRAPEXIT() { unfunction mime-setup-add-type >&/dev/null; return 0; }
+
+mime-setup-add-type() {
+    local type suffix
+    local -a array
+
+    type=$1
+    shift
+
+    while (( $# )); do
+	# `.ps' instead of `ps' has been noted
+	suffix=${1##.}
+	shift
+
+	if [[ -z $suffix_type_map[$suffix] ]]; then
+	    [[ -n $o_verbose ]] && 
+	    print -r "Adding type $type for $suffix" >&2
+	    suffix_type_map[$suffix]=$type
+	else
+	    # Skip duplicates.
+	    array=(${=suffix_type_map[$suffix]})
+	    if [[ ${array[(I)$type]} -eq 0 ]]; then
+		[[ -n $o_verbose ]] &&
+		print -r "Appending type $type for already defined $suffix" >&2
+		suffix_type_map[$suffix]+=" $type"
+	    fi
+	fi
+    done
+}
+
+# Loop through files to find suffixes for MIME types.
+# Earlier entries take precedence, so the files need to be listed
+# with the user's own first.  This also means pre-existing
+# values in suffix_type_map are respected.
+for file in $type_files; do
+    [[ -r $file ]] || continue
+
+    # For once we rely on the fact that read handles continuation
+    # lines ending in backslashes, i.e. there's no -r.
+    while read line; do
+	# Skip blank or comment lines.
+	[[ $line = [[:space:]]#(\#*|) ]] && continue
+
+	# There are two types of line you find in MIME type files.
+	# The original simple sort contains the type name then suffixes
+	# separated by whitespace.  However, Netscape insists
+	# on adding lines with backslash continuation with
+	# key="value" pairs.  So we'd better handle both.
+	if [[ $line = *=* ]]; then
+	    # Gory.
+	    # This relies on the fact that a typical entry:
+	    #   type=video/x-mpeg2 desc="MPEG2 Video" exts="mpv2,mp2v"
+	    # looks like a parameter assignment.  However, we really
+	    # don't want to be screwed up by future extensions,
+	    # so we split the elements to an array and pick out the
+	    # ones we're interested in.
+	    type= exts=
+
+	    # Syntactically split line to preserve quoted words.
+	    array=(${(z)line})
+	    for elt in $array; do
+		if [[ $elt = (type|exts)=* ]]; then
+		    eval $elt
+		fi
+	    done
+
+	    # Get extensions by splitting on comma
+	    array=(${(s.,.)exts})
+
+	    [[ -n $type ]] && mime-setup-add-type $type $array
+	else
+	    # Simple.
+	    mime-setup-add-type ${=line}
+	fi
+    done <$file
+done
+
+
+# Loop through files to find handlers for types.
+for file in $cap_files; do
+    [[ -r $file ]] || continue
+
+    # Oh, great.  We need to preserve backslashes inside the line,
+    # but need to manage continuation lines.
+    while read -r line; do
+	# Skip blank or comment lines.
+	[[ $line = [[:space:]]#(\#*|) ]] && continue
+
+	while [[ $line = (#b)(*)\\ ]]; do
+	    line=$match[1]
+	    read -r line2 || break
+	    line+=$line2
+	done
+
+	# Guess what, this file has a completely different format.
+	# See mailcap(4).
+	# The biggest unpleasantness here is that the fields are
+	# delimited by semicolons, but the command field, which
+	# is the one we want to extract, may itself contain backslashed
+	# semicolons.
+	if [[ $line = (#b)[[:space:]]#([^[:space:]\;]##)[[:space:]]#\;(*) ]]
+	then
+	    # this is the only form we can handle, but there's no point
+	    # issuing a warning for other forms.
+	    type=$match[1]
+            line=$match[2]
+	    # See if it has flags after the command.
+	    if [[ $line = (#b)(([^\;\\]|\\\;|\\[^\;])#)\;(*) ]]; then
+		line=$match[1]
+		flags=$match[3]
+	    else
+		flags=
+	    fi
+	    # Remove quotes from semicolons
+	    line=${line//\\\;/\;}
+	    # and remove any surrounding white space --- this might
+	    # make the handler empty.
+	    line=${${line##[[:space:]]#}%%[[:space:]]}
+	    if [[ -z $type_handler_map[$type] ]]; then
+		if [[ -n $o_verbose ]]; then
+		    print -r "Adding handler for type $type:
+  $line" >&2
+		fi
+		type_handler_map[$type]=$line
+		type_flags_map[$type]=$flags
+		if [[ -n $flags && -n $o_verbose ]]; then
+		    print -r "  with flags $flags" >&2
+		fi
+	    elif [[ -n $o_verbose ]]; then
+		print -r "Skipping handler for already defined type $type:
+  $line" >&2
+		if [[ -n $flags ]]; then
+		    print -r " with flags $flags" >&2
+		fi
+	    fi
+	fi
+    done <$file
+done
+
+
+# Check for styles which override whatever is in the file.
+# We need to make sure there is a handler set up; for some
+# uses we may need to defer checking styles until zsh-mime-handler.
+# How much we need to do here is a moot point.
+zstyle -L | while read line; do
+  array=(${(Q)${(z)line}})
+  if [[ $array[3] = (handler|flags) && \
+        $array[2] = (#b):mime:.([^:]##):(*) ]]; then
+    suffix=$match[1]
+    # Make sure there is a suffix alias set up for this.
+    alias -s $suffix >&/dev/null || alias -s $suffix=zsh-mime-handler
+  fi
+done
+
+# Now associate the suffixes directly with handlers.
+# We just look for the first one with a handler.
+# If there is no handler, we don't bother registering an alias
+# for the suffix.
+
+for suffix line in ${(kv)suffix_type_map}; do
+  # Skip if we already have a handler.
+  [[ -n $zsh_mime_handlers[$suffix] ]] && continue
+
+  # Split the space-separated list of types.
+  array=(${=line})
+
+  # Find the first type with a handler.
+  line2=
+  for type in $array; do
+    line2=${type_handler_map[$type]}
+    [[ -n $line2 ]] && break
+  done
+
+  # See if there is a generic type/* handler.
+  # TODO: do we need to consider other forms of wildcard?
+  if [[ -z $line2 ]]; then
+    for type in $array; do
+      type="${type%%/*}/*"
+      line2=${type_handler_map[$type]}
+      [[ -n $line2 ]] && break
+    done
+  fi
+
+  if [[ -n $line2 ]]; then
+    # Found a type with a handler.
+    # Install the zsh handler as an alias, but never override
+    # existing suffix handling.
+    alias -s $suffix >&/dev/null || alias -s $suffix=zsh-mime-handler
+
+    zsh_mime_handlers[$suffix]=$line2
+    zsh_mime_flags[$suffix]=$type_flags_map[$type]
+  fi
+done
+
+true
