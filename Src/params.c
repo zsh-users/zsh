@@ -376,6 +376,7 @@ scanparamvals(HashNode hn, int flags)
 	char *tmp = dupstring(v.pm->nam);
 
 	tokenize(tmp);
+	remnulargs(tmp);
 
 	if (!(prog = patcompile(tmp, 0, NULL)) || !pattry(prog, scanstr))
 	    return;
@@ -966,9 +967,10 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		if (ishash) {
 		    scanprog = pprog;
 		    scanstr = s;
-		    if (keymatch)
+		    if (keymatch) {
+			untokenize(s);
 			v->isarr |= SCANPM_KEYMATCH;
-		    else if (ind)
+		    } else if (ind)
 			v->isarr |= SCANPM_MATCHKEY;
 		    else
 			v->isarr |= SCANPM_MATCHVAL;
