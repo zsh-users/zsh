@@ -13,10 +13,10 @@ if comptags -A "$1" curtag spec; then
     zformat -f descr "${curtag#*:}" "d:$3"
     _description "$gopt" "${curtag%:*}" "$2" "$descr"
     curtag="${curtag%:*}"
-    set -A $2 "${(P@)2}" "${argv[4,-1][@]}"
+    set -A $2 "${(P@)2}" "${(@)argv[4,-1]}"
   else
     _description "$gopt" "$curtag" "$2" "$3"
-    set -A $2 "${argv[4,-1][@]}" "${(P@)2}"
+    set -A $2 "${(@)argv[4,-1]}" "${(P@)2}"
   fi
 
   return 0

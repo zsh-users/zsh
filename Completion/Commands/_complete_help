@@ -32,7 +32,7 @@ _complete_help() {
     # No need to call the completers more than once with different match specs.
 
     if [[ "$3" = matcher-list ]]; then
-      eval "${4}=( '' )"
+      set -A "$4" ''
     else
       builtin zstyle "$@"
     fi

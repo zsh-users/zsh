@@ -149,7 +149,7 @@ if (( long )); then
 	cache=( "$cache[@]" "$tmp[@]" )
       fi
     done
-    eval "${name}=( \"\${(@)cache:# #}\" )"
+    set -A "$name" "${(@)cache:# #}"
   fi
   set -- "$tmpargv[@]" "${(@P)name}"
 fi

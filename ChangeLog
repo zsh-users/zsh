@@ -1,5 +1,10 @@
 2000-05-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11525: Completion/Base/_arguments, Completion/Commands/_complete_help,
+ 	Completion/Commands/_next_tags, Completion/Core/_description,
+ 	Completion/Core/_next_label: use `set -A' instead of `eval' in
+ 	more places
+	
 	* 11524: Src/builtin.c: fix for read -q without a shout
 	
 	* 11523: Src/hist.c, Src/init.c, Src/lex.c, Src/zsh.h, Src/Zle/zle.h,
