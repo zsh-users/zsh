@@ -469,7 +469,8 @@ Like tt(-J) but naming a unsorted group.
 )
 item(tt(-1))(
 If given together with the tt(-V) option, makes
-only consecutive duplicates in the group be removed. Note that groups
+only consecutive duplicates in the group be removed. If combined with
+the tt(-J) option, this has no visible effect. Note that groups
 with and without this flag are in different name spaces.
 )
 item(tt(-2))(
