@@ -1662,8 +1662,26 @@ addmatches(Cadata dat, char **argv)
 	    } else
 		lsl = 0;
 	    if (dat->aflags & CAF_MATCH) {
-		int ml;
+		int ml, gfl = 0;
+		char *globflag = NULL;
 
+		if (comppatmatch && *comppatmatch &&
+		    dat->ppre && lpre[0] == '(' && lpre[1] == '#') {
+		    char *p;
+
+		    for (p = lpre + 2; *p && *p != ')'; p++);
+
+		    if (*p == ')') {
+			char sav = p[1];
+
+			p[1] = '\0';
+			globflag = dupstring(lpre);
+			gfl = p - lpre + 1;
+			p[1] = sav;
+
+			lpre = p + 1;
+		    }
+		}
 		s = dat->ppre ? dat->ppre : "";
 		if ((ml = match_str(lpre, s, &bpl, 0, NULL, 0, 0, 1)) >= 0) {
 		    if (matchsubs) {
@@ -1688,11 +1706,11 @@ addmatches(Cadata dat, char **argv)
 			*argv = NULL;
 		    bcp = lpl;
 		}
-
 		s = dat->psuf ? dat->psuf : "";
 		if ((ml = match_str(lsuf, s, &bsl, 0, NULL, 1, 0, 1)) >= 0) {
 		    if (matchsubs) {
-			Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0, CLF_SUF);
+			Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0,
+					      CLF_SUF);
 
 			tmp->suffix = matchsubs;
 			if (matchlastpart)
@@ -1715,17 +1733,21 @@ addmatches(Cadata dat, char **argv)
 		}
 		if (comppatmatch && *comppatmatch) {
 		    int is = (*comppatmatch == '*');
-		    char *tmp = (char *) zhalloc(2 + llpl + llsl);
+		    char *tmp = (char *) zhalloc(2 + llpl + llsl + gfl);
 
-		    strcpy(tmp, lpre);
-		    tmp[llpl] = 'x';
-		    strcpy(tmp + llpl + is, lsuf);
+		    if (gfl) {
+			strcpy(tmp, globflag);
+			strcat(tmp, lpre);
+		    } else
+			strcpy(tmp, lpre);
+		    tmp[llpl + gfl] = 'x';
+		    strcpy(tmp + llpl + gfl + is, lsuf);
 
 		    tokenize(tmp);
 		    remnulargs(tmp);
 		    if (haswilds(tmp)) {
 			if (is)
-			    tmp[llpl] = Star;
+			    tmp[llpl + gfl] = Star;
 			if ((cp = patcompile(tmp, 0, NULL)))
 			    haspattern = 1;
 		    }
