@@ -164,18 +164,21 @@ alias zfuget='noglob zfuget'
 setopt completealiases
 
 #
-# zftp completions
+# zftp completions: only use these if new-style completion is not
+# active.
 #
-compctl -f -x 'p[1]' \
-  -k '(open params user login type ascii binary mode put putat
-  get getat append appendat ls dir local remote mkdir rmdir delete
-  close quit)'  - \
-  'w[1,cd][1,ls][1,dir][1,rmdir]' -K zfcd_match -S/ -q - \
-  'W[1,get*]' -K zfget_match - 'w[1,delete][1,remote]' -K zfget_match - \
-  'w[1,open][1,params]' -k hosts -- zftp
-compctl -K zfcd_match -S/ -q zfcd zfdir zfls
-compctl -K zfget_match zfget zfgcp zfuget zfcget
-compctl -k hosts zfopen zfparams
+if [[ ${#patcomps} -eq 0 || ${patcomps[(i)zf*]} -gt ${#patcomps} ]]; then
+  compctl -f -x 'p[1]' \
+    -k '(open params user login type ascii binary mode put putat
+    get getat append appendat ls dir local remote mkdir rmdir delete
+    close quit)'  - \
+    'w[1,cd][1,ls][1,dir][1,rmdir]' -K zfcd_match -S/ -q - \
+    'W[1,get*]' -K zfget_match - 'w[1,delete][1,remote]' -K zfget_match - \
+    'w[1,open][1,params]' -k hosts -- zftp
+  compctl -K zfcd_match -S/ -q zfcd zfdir zfls
+  compctl -K zfget_match zfget zfgcp zfuget zfcget
+  compctl -k hosts zfanon zfopen zfparams
+fi
 
 function zfanon {
   local opt optlist once
@@ -245,6 +248,40 @@ function zfanon {
   fi
 }
 
+function zfautocheck {
+  # This function is used to implement auto-open behaviour.
+  #
+  # With first argument including n, don't change to the old directory; else do.
+  #
+  # Set do_close to 1 if the connection was not previously open, 0 otherwise
+  # With first arguemnt including d, don't set do_close to 1.  Broadly
+  # speaking, we use this mechanism to shut the connection after use
+  # if the connection had been explicitly closed (i.e. didn't time out,
+  # which zftp test investigates) and we are not using a directory
+  # command, which implies we are looking for something so should stay open
+  # for it.
+  
+  # Remember the old session:  zflastsession will be overwritten by
+  # a successful open.
+  local lastsession=$zflastsession
+  
+  if [[ -z $ZFTP_HOST ]]; then
+    zfopen || return 1
+    [[ $1 = *d* ]] || do_close=1
+  elif zftp test 2>/dev/null; then
+    return 0
+  else
+    zfopen || return 1
+  fi
+  
+  if [[ $1 = *n* ]]; then
+    return 0
+  else
+    zfcd ${lastsession#*:}
+  fi
+  
+}
+
 function zfcd {
   # zfcd:  change directory on the remote server.
   #
@@ -266,9 +303,11 @@ function zfcd {
   #   second, we can no do 'zfcd $PWD' and the like, and that will
   #     work just as long as the directory structures under the home match.
   
-  # Autoopen:  if not already open, hope there are parameters set up to
-  # do so.  If not, we get the right error message, so no harm done.
-  [[ -z $ZFTP_HOST ]] && { zfopen  || return 1; }
+  if [[ $1 = /* ]]; then
+    zfautocheck -dn
+  else
+    zfautocheck -d
+  fi
   
   if [[ $1 = $HOME || $1 = $HOME/* ]]; then
     1="~${1#$HOME}"
@@ -291,6 +330,7 @@ function zfcd {
   local lastdir=$ZFTP_PWD
   
   zftp cd "$@"  &&  zflastdir=$lastdir
+  print $zflastsession
 }
 
 function zfcd_match {
@@ -302,6 +342,8 @@ function zfcd_match {
   # error messages only
   local ZFTP_VERBOSE=45
   # should we redirect 2>/dev/null or let the user see it?
+  
+  local tmpf=${TMPPREFIX}zfcm$$
   
   if [[ $ZFTP_SYSTEM = UNIX* ]]; then
     # hoo, aren't we lucky: this makes things so much easier
@@ -315,8 +357,9 @@ function zfcd_match {
     # If we're using -F, we get away with using a directory
     # to list, but not a glob.  Don't ask me why.
     # I hate having to rely on awk here.
-    reply=($(zftp ls -F $dir | 
-    awk '/\/$/ { print substr($1, 0, length($1)-1) }'))
+    zftp ls -F $dir >$tmpf
+    reply=($(awk '/\/$/ { print substr($1, 0, length($1)-1) }' $tmpf))
+    rm -f $tmpf
     if [[ $dir = / ]]; then
       reply=(${dir}$reply)
     elif [[ -n $dir ]]; then
@@ -423,6 +466,84 @@ function zfclose {
   zftp close
 }
 
+function zfcput {
+  # Continuation put of files from remote server.
+  # For each file, if it's shorter over there, put the remainder from
+  # over here.  This uses append, which is standard, so unlike zfcget it's
+  # expected to work on any reasonable server... err, as long as it
+  # supports SIZE and MDTM.  (It could be enhanced so you can enter the
+  # size so far by hand.)  You should probably be in binary transfer
+  # mode, thought it's not enforced.
+  #
+  # To read from midway through a local file, `tail +<n>c' is used.
+  # It would be nice to find a way of doing this which works on all OS's.
+  
+  setopt localoptions
+  unsetopt ksharrays shwordsplit
+  
+  local loc rem stat=0 locst remst offs tailtype
+  local tmpfile=${TMPPREFIX}zfcget$$ rstat
+  
+  # find how tail works.  this is intensely annoying, since it's completely
+  # standard in C.  od's no use, since we can only skip whole blocks.
+  if [[ $(echo abcd | tail +2c) = bcd ]]; then
+    tailtype=c
+  elif [[ $(echo abcd | tail --bytes=+2) = bcd ]]; then
+    tailtype=b
+  else
+    print "I can't get your \`tail' to start from from arbitrary characters.\n" \
+    "If you know how to do this, let me know." 2>&1
+    return 1
+  fi
+  
+  for loc in $*; do
+    # zfcd directory hack to put the front back to ~
+    rem=$loc
+    if [[ $rem = $HOME || $rem = $HOME/* ]]; then
+      rem="~${rem#$HOME}"
+    fi
+    if [[ ! -r $loc ]]; then
+      print "Can't read file $loc"
+      stat=1
+    else
+      # Compare the sizes.
+      locst=($(zftp local $loc))
+      zftp remote $rem >$tmpfile
+      rstat=$?
+      remst=($(<$tmpfile))
+      rm -f $tmpfile
+      if [[ $rstat = 2 ]]; then
+        print "Server does not support remote status commands.\n" \
+        "You will have to find out the size by hand and use zftp append." 2>&1
+        stat=1
+        continue
+      elif [[ $rstat = 1 ]]; then
+        # Not found, so just do a standard put.
+        zftp put $rem <$loc
+      elif [[ $remst[1] -gt $locst[1] ]]; then
+        print "Remote file is larger!" 2>&1
+        continue;
+      elif [[ $locst[1] == $remst[1] ]]; then
+        print "Files are already the same size." 2>&1
+        continue
+      else
+        # tail +<N>c takes the count of the character
+        # to start from, not the offset from zero. if we did
+        # this with years, then 2000 would be 1999.  no y2k bug!
+        # brilliant.
+        (( offs = $remst[1] + 1 ))
+        if [[ $tailtype = c ]]; then
+  	tail +${offs}c $loc | zftp append $rem || stat=1
+        else
+  	tail --bytes=+$offs $loc | zftp append $rem || stat=1
+        fi
+      fi
+    fi
+  done
+  
+  return $stat
+}
+
 function zfdir {
   # Long directory of remote server.
   # The remote directory is cached.  In fact, two caches are kept:
@@ -440,9 +561,11 @@ function zfdir {
   # zfdir -f will force the existing cache to be ignored, e.g. if you know
   #          or suspect the directory has changed.
   # zfdir -d will remove both caches without listing anything.
-  # If you need to pass -r, -f or -d to the dir itself, use zfdir -- -d etc.
+  # If you need to pass -r, -f or -d to the dir itself, use zfdir -- -d etc.;
+  # unrecognised options are passed through to dir, but zfdir options must
+  # appear first and unmixed with the others.
   
-  setopt localoptions unset
+  setopt localoptions unset extendedglob
   unsetopt shwordsplit ksharrays
   
   local file opt optlist redir i newargs force
@@ -450,6 +573,9 @@ function zfdir {
   while [[ $1 = -* ]]; do
     if [[ $1 = - || $1 = -- ]]; then
       shift;
+      break;
+    elif [[ $1 != -[rfd]## ]]; then
+      # pass options through to ls
       break;
     fi
     optlist=${1#-}
@@ -465,12 +591,12 @@ function zfdir {
   	 zftp_fcache=()
   	 return 0
   	 ;;
-        *) print option $opt not recognised >&2
-  	 ;;
       esac
     done
     shift
   done
+  
+  zfautocheck -d
   
   # directory hack, see zfcd
   for (( i = 1; i <= $#argv; i++ )); do
@@ -507,27 +633,38 @@ function zfdir {
   if [[ -n $file && -f $file ]]; then
     eval ${PAGER:-more} \$file
   else
-    zftp dir $* | tee $file | eval ${PAGER-:more}
+    if (zftp test); then
+      # Works OK in subshells
+      zftp dir $* | tee $file | eval ${PAGER-:more}
+    else
+      # Doesn't work in subshells (IRIX 6.2 --- why?)
+      zftp dir $* >$file
+      eval ${PAGER-:more} >$file
+    fi
   fi
 }
 
 function zfgcp {
   # ZFTP get as copy:  i.e. first arguments are remote, last is local.
   # Supposed to work exactly like a normal copy otherwise, i.e.
-  #  zfcp rfile lfile
+  #  zfgcp rfile lfile
   # or
-  #  zfcp rfile1 rfile2 rfile3 ... ldir
+  #  zfgcp rfile1 rfile2 rfile3 ... ldir
   # Options:
   #   -G   don't to remote globbing, else do
   #   -t   update the local file times to the same time as the remote.
   #        Currently this only works if you have the `perl' command,
   #        and that perl is version 5 with the standard library.
   #        See the function zfrtime for more gory details.
+  #
+  # If there is no current connection, try to use the existing set of open
+  # parameters to establish one and close it immediately afterwards.
   
   setopt localoptions
   unsetopt shwordsplit
   
-  local opt optlist nglob remlist rem loc stat=0 time
+  local opt optlist nglob remlist rem loc time
+  integer stat do_close
   
   while [[ $1 == -* ]]; do
     if [[ $1 == - || $1 == -- ]]; then
@@ -548,6 +685,8 @@ function zfgcp {
     done
     shift
   done
+  
+  zfautocheck
   
   # hmm, we should really check this after expanding the glob,
   # but we shouldn't expand the last argument remotely anyway.
@@ -584,6 +723,9 @@ function zfgcp {
   else
     zftp get $1 >$2 || stat=$?
   fi
+  
+  (( $do_close )) && zfclose
+  
   return $stat
 }
 
@@ -594,8 +736,14 @@ function zfget {
   #        Currently this only works if you have the `perl' command,
   #        and that perl is version 5 with the standard library.
   #        See the function zfrtime for more gory details.
+  #
+  # If the connection is not currently open, try to open it with the current
+  # parameters (set by a previous zfopen or zfparams), then close it after
+  # use.  The file is put in the current directory (i.e. using the basename
+  # of the remote file only); for more control, use zfgcp.
   
-  local loc rem stat=0 optlist opt nglob remlist time
+  local loc rem optlist opt nglob remlist time
+  integer stat do_close
   
   while [[ $1 == -* ]]; do
     if [[ $1 == - || $1 == -- ]]; then
@@ -617,6 +765,8 @@ function zfget {
     shift
   done
   
+  zfautocheck
+  
   for remlist in $*; do
     # zfcd directory hack to put the front back to ~
     if [[ $remlist == $HOME || $remlist == $HOME/* ]]; then
@@ -637,6 +787,8 @@ function zfget {
     fi
   done
   
+  (( $do_close )) && zfclose
+  
   return $stat
 }
 
@@ -646,15 +798,20 @@ function zfget_match {
     1="~${1#$HOME}"
   fi
   
+  local tmpf=${TMPPREFIX}zfgm$$
   
   if [[ $ZFTP_SYSTEM == UNIX* && $1 == */* ]]; then
     # On the first argument to ls, we usually get away with a glob.
-    reply=($(zftp ls "$1*$2"))
+    zftp ls "$1*$2" >$tmpf
+    reply=($(<$tmpf))
+    rm -f $tmpf
   else
     if (( $#zftp_fcache == 0 )); then
       # Always cache the current directory and use it
       # even if the system is UNIX.
-      zftp_fcache=($(zftp ls))
+      zftp ls >$tmpf
+      zftp_fcache=($(<$tmpf))
+      rm -f $tmpf
     fi
     reply=($zftp_fcache);
   fi
@@ -671,6 +828,9 @@ function zfls {
   if [[ $1 = $HOME || $1 = $HOME/* ]]; then
     1="~${1#$HOME}"
   fi
+  
+  zfautocheck -d
+  
   zftp ls $*
 }
 
@@ -725,15 +885,62 @@ function zfparams {
     zftp params $*
 }
 
+function zfpcp {
+  # ZFTP put as copy:  i.e. first arguments are remote, last is local.
+  # Currently only supports
+  #  zfcp lfile rfile
+  # if and only if there are two arguments
+  # or
+  #  zfcp lfile1 lfile2 lfile3 ... rdir
+  # if and only if there are more than two (because otherwise it doesn't
+  # know if the last argument is a directory on the remote machine).
+  # argument.
+  
+  setopt localoptions
+  unsetopt shwordsplit
+  
+  local rem loc
+  integer stat do_close
+  
+  zfautocheck
+  
+  if (( $# > 2 )); then
+    local dir=$argv[-1]
+    argv[-1]=
+    # zfcd directory hack to put the front back to ~
+    if [[ $dir = $HOME || $dir = $HOME/* ]]; then
+      dir="~${dir#$HOME}"
+    fi
+    for loc in $*; do
+      rem=$dir/${loc:t}
+      zftp put $rem <$loc || stat=1
+    done
+  else
+    zftp put $2 <$1 || stat=$?
+  fi
+  
+  (( $do_close )) && zfclose
+  
+  return $stat
+}
+
 function zfput {
   # Simple put:  dump every file under the same name, but stripping
   # off any directory parts.
-  local loc rem stat=0
+  
+  local loc rem
+  integer stat do_close
+  
+  zfautocheck
+  
   for loc in $*; do
     rem=${loc:t}
     zftp put $rem <$loc
     [[ $? == 0 ]] || stat=$?
   done
+  
+  (( $do_close )) && zfclose
+  
   return $stat
 }
 
@@ -764,13 +971,16 @@ function zfrglob {
   # globbing characters, and if extendedglob is set and we are
   # using zsh for the actual pattern matching also look for
   # extendedglob characters.
-  if [[ $remlist != *[][*?]* &&
-    ( -n $zfrglob || ! -o extendedglob || $remlist != *[(|)~#^]* ) ]]; then
+  if [[ $pat != *[][*?]* &&
+    ( -n $zfrglob || ! -o extendedglob || $pat != *[(|)#^]* ) ]]; then
     return 0
   fi
+  local tmpf={$TMPPREFIX}zfrglob$$
   
   if [[ $zfrglob != '' ]]; then
-    eval "$1=(\$(zftp ls \"$pat\" 2>/dev/null))"
+    zftp ls "$pat" >$tmpf 2>/dev/null
+    eval "$1=(\$(<\$tmpf))"
+    rm -f $tmpf
   else
     if [[ $ZFTP_SYSTEM = UNIX* && $pat = */* ]]; then
       # not the current directory and we know how to handle paths
@@ -781,12 +991,18 @@ function zfrglob {
         dir=/
       fi
       nondir=${pat##*/}
-      files=($(zftp ls "$dir" 2>/dev/null))
+      zftp ls "$dir" 2>/dev/null >$tmpf
+      files=($(<$tmpf))
+      files=(${files:t})
+      rm -f $tmpf
     else
       # we just have to do an ls and hope that's right
       nondir=$pat
       if (( $#zftp_fcache == 0 )); then
-        zftp_fcache=($(zftp ls))
+        # Why does `zftp_fcache=($(zftp ls))' sometimes not work?
+        zftp ls >$tmpf
+        zftp_fcache=($(<$tmpf))
+        rm -f $tmpf
       fi
       files=($zftp_fcache)
     fi
@@ -848,7 +1064,7 @@ function zfrtime {
 
 function zfstat {
   # Give a zftp status report using local variables.
-  # With option -v, connect the remote host and ask it what it
+  # With option -v, connect to the remote host and ask it what it
   # thinks the status is.  
   
   setopt localoptions unset
@@ -873,10 +1089,6 @@ function zfstat {
     done
     shift
   done
-  
-  # hack:  in case the status from a subshell process hasn't been
-  # fixed yet
-  zftp type >&/dev/null
   
   if [[ -n $ZFTP_HOST ]]; then
     print "Host:\t\t$ZFTP_HOST"
@@ -907,12 +1119,14 @@ function zfstat {
     fi
   else
     print "Not connected."
+    [[ -n $zflastsession ]] && print "Last session:\t$zflastsession"
     stat=1
   fi
   
   # things which may be set even if not connected:
   [[ -n $ZFTP_REPLY ]] && print "Last reply:\t$ZFTP_REPLY"
   print "Verbosity:\t$ZFTP_VERBOSE"
+  print "Timeout:\t$ZFTP_TMOUT"
   print -n "Preferences:\t"
   for (( i = 1; i <= ${#ZFTP_PREFS}; i++ )); do
     case $ZFTP_PREFS[$i] in
@@ -928,6 +1142,7 @@ function zfstat {
   print
   
   if [[ -n $ZFTP_HOST && $verbose = 1 ]]; then
+    zfautocheck -d
     print "Status of remote server:"
     # make sure we print the reply
     local ZFTP_VERBOSE=045
@@ -939,8 +1154,6 @@ function zfstat {
 
 function zftp_chpwd {
   # You may want to alter chpwd to call this when $ZFTP_USER is set.
-  # If so, call it with a non-zero first argument so it doesn't
-  # print the new FTP directory.
   
   # Cancel the filename cache for the current directory.
   zftp_fcache=()
@@ -948,26 +1161,26 @@ function zftp_chpwd {
   # As this function is called when we close the connection, this
   # is the only place we need to do these two things.
   [[ -n $zfcurdir && -f $zfcurdir ]] && rm -f $zfcurdir
+  zfotherargs=
   
   if [[ -z $ZFTP_USER ]]; then
     # last call, after an FTP logout
   
     # delete the non-current cached directory
     [[ -n $zfotherdir && -f $zfotherdir ]] && rm -f $zfotherdir
-    zfotherargs=
   
-    # don't keep zflastdir between opens
+    # don't keep zflastdir between opens (do keep zflastsession)
     zflastdir=
   
     # return the display to standard
     # uncomment the following line if you have a chpwd which shows directories
-    # chpwd
+    chpwd
   else
-    [[ -z $zflastdir ]] && zflastdir=$ZFTP_PWD
+    [[ -n $ZFTP_PWD ]] && zflastdir=$ZFTP_PWD
+    zflastsession="$ZFTP_HOST:$ZFTP_PWD"
     local args
     if [[ -t 1 && -t 2 ]]; then
-      local str="$ZFTP_HOST:$ZFTP_PWD"
-      [[ -z $1 ]] && print $str
+      local str=$zflastsession
       [[ ${#str} -lt 70 ]] && str="%m: %~  $str"
       case $TERM in
         sun-cmd) print -n -P "\033]l$str\033\\"
@@ -999,10 +1212,14 @@ function zftp_progress {
 }
 
 function zftype {
-  local type
+  local type zftmp=${TMPPREFIX}zftype$$
+  
+  zfautocheck -d
   
   if (( $# == 0 )); then
-    type=$(zftp type)
+    zftp type >$zftmp
+    type=$(<$zftmp)
+    rm -f $zftmp
     if [[ $type = I ]]; then
       print "Current type is image (binary)"
       return 0
@@ -1054,8 +1271,9 @@ function zfuget {
   setopt localoptions
   unsetopt ksharrays shwordsplit
   
-  local loc rem stat=0 locstats remstats doit tmpfile=${TMPPREFIX}zfuget$$
+  local loc rem locstats remstats doit tmpfile=${TMPPREFIX}zfuget$$
   local rstat remlist verbose optlist opt bad i silent nglob time
+  integer stat do_close
   
   zfuget_print_time() {
     local tim=$1
@@ -1096,6 +1314,8 @@ function zfuget {
   done
   
   [[ -n $bad ]] && return 1
+  
+  zfautocheck
   
   for remlist in $*; do
     # zfcd directory hack to put the front back to ~
@@ -1166,6 +1386,9 @@ function zfuget {
       done
     fi
   done
+  
+  (( do_close )) && zfclose
+  
   return $stat
 }
 
@@ -1183,8 +1406,9 @@ function zfuput {
   setopt localoptions
   unsetopt ksharrays shwordsplit
   
-  local loc rem stat=0 locstats remstats doit tmpfile=${TMPPREFIX}zfuput$$
+  local loc rem locstats remstats doit tmpfile=${TMPPREFIX}zfuput$$
   local rstat verbose optlist opt bad i silent
+  integer stat do_close
   
   zfuput_print_time() {
     local tim=$1
@@ -1221,6 +1445,8 @@ function zfuput {
   done
   
   [[ -n $bad ]] && return 1
+  
+  zfautocheck
   
   if [[ $ZFTP_VERBOSE = *5* ]]; then
     # should we turn it off locally?
@@ -1277,5 +1503,8 @@ function zfuput {
       zftp put $rem <$loc || stat=$?
     fi
   done
+  
+  (( do_close )) && zfclose
+  
   return $stat
 }

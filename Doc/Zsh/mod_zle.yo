@@ -165,7 +165,7 @@ xitem(tt(zle) tt(-l) [ tt(-L) ])
 xitem(tt(zle) tt(-D) var(widget) ...)
 xitem(tt(zle) tt(-A) var(old-widget) var(new-widget))
 xitem(tt(zle) tt(-N) var(widget) [ var(function) ])
-xitem(tt(zle) tt(-C) [ tt(-mMgG) ] var(widget) [ var(compctl-options) ])
+xitem(tt(zle) tt(-C) var(widget) var(completion-widget) var(function))
 item(tt(zle) var(widget))(
 The tt(zle) builtin performs a number of different actions concerning
 ZLE.  Which operation it performs depends on its options:
@@ -193,22 +193,15 @@ widget is invoked from within the editor, the specified shell var(function)
 is called.  If no function name is specified, it defaults to
 the same name as the widget.
 )
-item(tt(-C) [ tt(-mMgG) ] var(widget) [ var(compctl-options) ])(
-Create a user-defined widget which will perform completion according
-to var(compctl-options).  These are passed directly to the
-tt(compctl) command, see
-ifzman(zmanref(zshcompctl))\
-ifnzman(noderef(Programmable Completion))\
-; no command names or special options (tt(-LDCT)) may be used.  If the
-var(compctl-options) are missing the widget will have normal
-completion behaviour as modified by the tt(zle) options.
-
-There are four additional tt(zle) options, which must precede the
-widget name: tt(-m) and tt(-M) force the widget to use or not to use
-menu completion, respectively, while tt(-g) and tt(-G) likewise force
-the widget to use or not to use glob completion.  The defaults are to
-use the current settings of tt(MENU_COMPLETE) and tt(GLOB_COMPLETE)
-as with normal completion.
+item(tt(-C) var(widget) var(completion-widget) var(function))(
+Create a user-defined completion widget names var(widget). The 
+completion widget will behave like the built-in completion-widget
+whose name is given as var(completion-widget). To generate the
+completions, the shell function var(function) will be called.
+For further information, see
+ifzman(zmanref(zshcompwid))\
+ifnzman(noderef(Completion Widgets))\
+.
 )
 item(var(widget))(
 Invoke the specified widget.  This can only be done when ZLE is

@@ -1810,7 +1810,7 @@ xpandredir(struct redir *fn, LinkList tab)
     fake = newlinklist();
     addlinknode(fake, fn->name);
     /* ...which undergoes all the usual shell expansions */
-    prefork(fake, isset(MULTIOS) ? 0 : 4);
+    prefork(fake, isset(MULTIOS) ? 0 : PF_SINGLE);
     /* Globbing is only done for multios. */
     if (!errflag && isset(MULTIOS))
 	globlist(fake);

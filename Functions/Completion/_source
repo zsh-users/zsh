@@ -1,0 +1,7 @@
+#defcomp source
+
+if [[ -position 2 -1 ]]; then
+  compsub
+else
+  _files
+fi

@@ -64,6 +64,7 @@ ifnzman(includefile(Zsh/options.yo))
 ifnzman(includefile(Zsh/builtins.yo))
 ifnzman(includefile(Zsh/zle.yo))
 ifnzman(includefile(Zsh/compctl.yo))
+ifnzman(includefile(Zsh/compwid.yo))
 ifnzman(includefile(Zsh/modules.yo))
 ifzshall(\
 def(source)(1)(NOTRANS(.so )man1/ARG1NOTRANS(.)1)\
@@ -75,6 +76,7 @@ source(zshoptions)
 source(zshbuiltins)
 source(zshzle)
 source(zshcompctl)
+source(zshcompwid)
 source(zshmodules)
 manpage(ZSHALL)(1)(date())(zsh version())
 )\

@@ -439,4 +439,8 @@ until the next call to tt(zftp).  Other status changes in subshells
 will not be reflected by changes to the variables (but should
 be otherwise harmless).
 
+On some operatings systems, the control connection is not valid after a
+fork(), so that operations in subshells or on the left hand side of a
+pipeline are not possible.
+
 enditem()

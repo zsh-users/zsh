@@ -1685,6 +1685,10 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	return 1;
     }
     for (; *argv && **argv ==  '-'; argv++) {
+	if (!(*argv)[1]) {
+	    argv++;
+	    break;
+	}
 	for (p = *argv + 1; *p; p++) {
 	    sp = NULL;
 	    dm = 0;
@@ -1945,9 +1949,9 @@ restrict_range(int b, int e)
     pparams = p;
     zsfree(compcontext);
     if ((compcurrent -= b + 1))
-	compcontext = ztrdup("arg");
+	compcontext = ztrdup("argument");
     else
-	compcontext = ztrdup("cmd");
+	compcontext = ztrdup("command");
 }
 
 /**/

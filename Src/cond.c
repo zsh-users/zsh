@@ -30,6 +30,13 @@
 #include "zsh.mdh"
 #include "cond.pro"
 
+int tracingcond;
+
+static char *condstr[COND_MOD] = {
+    "!", "&&", "||", "==", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
+    "-ne", "-lt", "-gt", "-le", "-ge"
+};
+
 /**/
 int
 evalcond(Cond c)
@@ -38,11 +45,23 @@ evalcond(Cond c)
 
     switch (c->type) {
     case COND_NOT:
+	if (tracingcond)
+	    fprintf(stderr, " %s", condstr[c->type]);
 	return !evalcond(c->left);
     case COND_AND:
-	return evalcond(c->left) && evalcond(c->right);
+	if (evalcond(c->left)) {
+	    if (tracingcond)
+		fprintf(stderr, " %s", condstr[c->type]);
+	    return evalcond(c->right);
+	} else
+	    return 0;
     case COND_OR:
-	return evalcond(c->left) || evalcond(c->right);
+	if (!evalcond(c->left)) {
+	    if (tracingcond)
+		fprintf(stderr, " %s", condstr[c->type]);
+	    return evalcond(c->right);
+	} else
+	    return 1;
     case COND_MOD:
     case COND_MODI:
 	{
@@ -58,6 +77,9 @@ evalcond(Cond c)
 			return 0;
 		    }
 		}
+		if (tracingcond)
+		    tracemodcond((char *)c->left, (char **)c->right,
+				 c->type == COND_MODI);
 		return cd->handler((char **) c->right, cd->condid);
 	    }
 	    else {
@@ -71,6 +93,8 @@ evalcond(Cond c)
 			zerr("unrecognized condition: `%s'", (char *) c->left, 0);
 			return 0;
 		    }
+		    if (tracingcond)
+			tracemodcond((char *)c->left, a, c->type == COND_MODI);
 		    a[0] = (char *) c->left;
 		    return cd->handler(a, cd->condid);
 		} else
@@ -86,6 +110,20 @@ evalcond(Cond c)
 	if (c->type != COND_STREQ && c->type != COND_STRNEQ)
 	    untokenize(c->right);
     }
+
+    if (tracingcond) {
+	if (c->type < COND_MOD) {
+	    char *rt = (char *)c->right;
+	    if (c->type == COND_STREQ || c->type == COND_STRNEQ) {
+		rt = dupstring(rt);
+		untokenize(rt);
+	    }
+	    fprintf(stderr, " %s %s %s", (char *)c->left, condstr[c->type],
+		    rt);
+	} else
+	    fprintf(stderr, " -%c %s", c->type, (char *)c->left);
+    }
+
     switch (c->type) {
     case COND_STREQ:
 	return matchpat(c->left, c->right);
@@ -293,4 +331,22 @@ cond_match(char **args, int num, char *str)
     singsub(&s);
 
     return matchpat(str, s);
+}
+
+/**/
+static void
+tracemodcond(char *name, char **args, int inf)
+{
+    char **aptr;
+    MUSTUSEHEAP("tracemodcond");
+    args = duparray(args, (VFunc) dupstring);
+    for (aptr = args; *aptr; aptr++)
+	untokenize(*aptr);
+    if (inf) {
+	fprintf(stderr, " %s %s %s", args[0], name, args[1]);
+    } else {
+	fprintf(stderr, " %s", name);
+	while (*args)
+	    fprintf(stderr, " %s", *args++);
+    }
 }

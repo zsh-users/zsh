@@ -10,6 +10,7 @@ ifzshone(\
 ,
 zmanref(zshbuiltins),
 zmanref(zshcompctl),
+zmanref(zshcompwid),
 zmanref(zshexpn),
 zmanref(zshmisc),
 zmanref(zshmodules),

@@ -544,12 +544,14 @@ List jobs in the long format by default.
 )
 pindex(MAGIC_EQUAL_SUBST)
 item(tt(MAGIC_EQUAL_SUBST))(
-All unquoted arguments of the form `var(identifier)tt(=)var(expression)'
+All unquoted arguments of the form `var(anything)tt(=)var(expression)'
 appearing after the command name have filename expansion (that is,
 where var(expression) has a leading `tt(~)' or `tt(=)') performed on
 var(expression) as if it were a parameter assignment.  The argument is
 not otherwise treated specially; it is passed to the command as a single
-argument, and not used as an actual parameter assignment.
+argument, and not used as an actual parameter assignment.  For example, in
+tt(echo foo=~/bar:~/rod), both occurrences of tt(~) would be replaced.
+Note that this happens anyway with tt(typeset) and similar statements.
 )
 pindex(MAIL_WARNING)
 cindex(mail, warning of reading)

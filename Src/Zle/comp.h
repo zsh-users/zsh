@@ -261,15 +261,19 @@ struct cline {
     int llen;			/* length of line */
     char *word;			/* prefered string to insert */
     int wlen;			/* length of word */
-    Cmatcher matcher;		/* which matcher was used */
     int flags;			/* see CLF_* below */
+    Cline prefix;		/* prefix we've build for new parts */
+    Cline suffix;		/* suffix we've build for new parts */
 };
 
-#define CLF_END   1
-#define CLF_MID   2
-#define CLF_MISS  4
-#define CLF_DIFF  8
-#define CLF_SUF  16
+#define CLF_END    1
+#define CLF_MID    2
+#define CLF_MISS   4
+#define CLF_DIFF   8
+#define CLF_SUF   16
+#define CLF_NEW   32
+#define CLF_VAR   64
+#define CLF_JOIN 128
 
 /* Flags for makecomplist*(). Things not to do. */
 

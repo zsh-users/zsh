@@ -76,8 +76,11 @@ Reliant: SINIX
 	linking; configure now detects this and will disable dynamic
 	linking even if you requested it.
 
-SGI: IRIX 5.1.1.1, 5.2, 5.3, 6.2, 6.3
+SGI: IRIX 5.1.1.1, 5.2, 5.3, 6.2, 6.3, 6.5
 	Should build `out-of-the-box'.
+
+        On 6.5.2, zsh malloc routines are reported not to work; also
+        full optimization (cc -O3 -OPT:Olimit=0) causes problems.
 
 Sun: SunOS 4.1.*
 	Under 4.1.3 if yellow pages is used, username completion may cause

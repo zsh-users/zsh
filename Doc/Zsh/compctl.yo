@@ -1,4 +1,4 @@
-texinode(Programmable Completion)(Zsh Modules)(Zsh Line Editor)(Top)
+texinode(Programmable Completion)(Completion Widgets)(Zsh Line Editor)(Top)
 chapter(Programmable Completion)
 cindex(completion, programmable)
 cindex(completion, controlling)
@@ -89,7 +89,7 @@ to the user database is too slow and/or it contains too many users (so
 that completion after `tt(~)' is too slow to be usable), you can use
 
 indent(
-tt(compctl -T -x 'C[0,*/*]' -f - 's[~]' -k friends -S/ -tn)
+tt(compctl -T -x 's[~] C[0,[^/]#]' -k friends -S/ -tn)
 )
 
 to complete the strings in the array tt(friends) after a `tt(~)'.

@@ -29,6 +29,7 @@ menu(Options)
 menu(Shell Builtin Commands)
 menu(Zsh Line Editor)
 menu(Programmable Completion)
+menu(Completion Widgets)
 menu(Zsh Modules)
 
  --- Indices ---
@@ -102,6 +103,13 @@ menu(Option Flags)
 menu(Alternative Completion)
 menu(Extended Completion)
 menu(Example)
+
+Completion Widgets
+
+menu(Special Parameters)
+menu(Builtin Commands)
+menu(Condition Codes)
+menu(Examples)
 
 Zsh Modules
 

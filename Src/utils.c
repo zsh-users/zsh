@@ -2261,7 +2261,7 @@ duplist(LinkList l, VFunc func)
 }
 
 /**/
-static char **
+char **
 duparray(char **arr, VFunc func)
 {
     char **ret, **rr;

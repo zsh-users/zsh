@@ -11,7 +11,7 @@ sect(Author)
 cindex(author)
 Zsh was originally written by Paul Falstad tt(<pf@zsh.org>).
 Zsh is now maintained by the members of the zsh-workers mailing
-list tt(<zsh-workers@math.gatech.edu>).  The development is currently
+list tt(<zsh-workers@sunsite.auc.dk>).  The development is currently
 coordinated by Andrew Main (Zefram) tt(<zefram@zsh.org>).  The coordinator
 can be contacted at tt(<coordinator@zsh.org>), but matters relating to
 the code should generally go to the mailing list.

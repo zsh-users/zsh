@@ -554,7 +554,7 @@ zfgetline(char *ln, int lnsize, int tmout)
     if (setjmp(zfalrmbuf)) {
 	alarm(0);
 	zwarnnam("zftp", "timeout getting response", NULL, 0);
-	return 5;
+	return 6;
     }
     zfalarm(tmout);
 
@@ -676,7 +676,7 @@ zfgetmsg()
     int stopit, printing = 0, tmout;
 
     if (zcfd == -1)
-	return 5;
+	return 6;
     if (!(verbose = getsparam("ZFTP_VERBOSE")))
 	verbose = "";
     zsfree(lastmsg);
@@ -763,7 +763,7 @@ zfgetmsg()
 	zfclose();
 	/* unexpected, so tell user */
 	zwarnnam("zftp", "remote server has closed connection", NULL, 0);
-	return 6;		/* pretend it failed, because it did */
+	return 6;
     }
     if (lastcode == 530) {
 	/* user not logged in */
@@ -802,20 +802,21 @@ zfsendcmd(char *cmd)
     int ret, tmout;
 
     if (zcfd == -1)
-	return 5;
+	return 6;
     tmout = getiparam("ZFTP_TMOUT");
     if (setjmp(zfalrmbuf)) {
 	alarm(0);
 	zwarnnam("zftp", "timeout sending message", NULL, 0);
-	return 5;
+	return 6;
     }
     zfalarm(tmout);
     ret = write(zcfd, cmd, strlen(cmd));
     alarm(0);
 
     if (ret <= 0) {
-	zwarnnam("zftp send", "failed sending control message", NULL, 0);
-	return 5;		/* FTP status code */
+	zwarnnam("zftp send", "failure sending control message: %e",
+		 NULL, errno);
+	return 6;
     }
 
     return zfgetmsg();
@@ -1023,11 +1024,11 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
 	/* accept the connection */
 	len = sizeof(zdsock);
 	newfd = zfmovefd(accept(zdfd, (struct sockaddr *)&zdsock, &len));
+	if (newfd < 0)
+	    zwarnnam(name, "unable to accept data: %e", NULL, errno);
 	zfclosedata();
-	if (newfd < 0) {
-	    zwarnnam(name, "unable to accept data.", NULL, 0);
+	if (newfd < 0)
 	    return 1;
-	}
 	zdfd = newfd;		/* this is now the actual data fd */
     } else {
 	/*
@@ -1270,7 +1271,7 @@ zfread_block(int fd, char *bf, size_t sz, int tmout)
 	    n = zfread(fd, (char *)&hdr, sizeof(hdr), tmout);
 	} while (n < 0 && errno == EINTR);
 	if (n != 3 && !zfdrrrring) {
-	    zwarnnam("zftp", "failed to read FTP block header", NULL, 0);
+	    zwarnnam("zftp", "failure reading FTP block header", NULL, 0);
 	    return n;
 	}
 	/* size is stored in network byte order */
@@ -1324,7 +1325,7 @@ zfwrite_block(int fd, char *bf, size_t sz, int tmout)
 	n = zfwrite(fd, (char *)&hdr, sizeof(hdr), tmout);
     } while (n < 0 && errno == EINTR);
     if (n != 3 && !zfdrrrring) {
-	zwarnnam("zftp", "failed to write FTP block header", NULL, 0);
+	zwarnnam("zftp", "failure writing FTP block header", NULL, 0);
 	return n;
     }
     bfptr = bf;

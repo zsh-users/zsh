@@ -445,3 +445,61 @@ new-style completions: not posted
 Me: 5281 now works, 5364
 
 Me: make dependencies for main.o, Makemod, zshpaths.h, 5365
+
+  pws-9
+
+Bart: CVS should ignore version.h, 5367
+
+Oliver Kiddle: another change of mailing list host, 5372
+
+Oliver: compctl -T documentation for ~dirs, 5374
+
+Andrej: Reliant UNIX configuration, 5377
+
+Sven: Manual for new completion (so far), 5384, 5397
+
+Me: dump new completion status for fast initialisation, 5393
+
+Me: bug fixlet for __path_files, 5398
+
+Sven: overhaul of do_ambiguous with some bug-fixage, 5399, 5407
+
+Sven: print needs - in Functions/Completion/dump, 5400; auto-dump and use
+$COMPDUMP file, 5402
+
+Sven: files -> __files, 5401
+
+Me: magicequalsubst now affects all arguments ...=~...:~..., 5403
+
+Me: set -x output for [[ ... ]], 5408
+
+Me: IRIX 6.5 problems in Etc/MACHINES (see 5410 from Helmut Jarausch).
+
+Sven: 5412: better matcher control.
+
+Sven: 5415: anchors in matchers shouldn't match variable part of completion
+
+Sven: 5417: multiple subscripts with undefined array
+
+Sven: 5418: small addmatches fixes
+
+Me: 5421: setting same element of assoc array in full array assignment crashed
+
+Sven: 5422: braces in completions were not tokenized; array parameters were
+used uncopied
+
+Sven: 5423: compadd accepts either - or -- to end options
+
+Sven: 5424: addmatches fix when not doing matching
+
+Me: 5425: fix pattern matching for new completion
+
+Sven: 5429: $CONTEXT strings
+
+Sven: 5430: rewrite Functions/Completions with simplified syntax (no #array
+type completions).
+
+Me: 5436: set -x for function calls and ((...)).
+
+Me: unposted (but see 5440): zftp changes: more return 6's, functions now
+do auto-open and avoid subshells.

@@ -950,6 +950,11 @@ struct param {
 #define SUB_ALL		0x0100	/* match complete string */
 #define SUB_GLOBAL	0x0200	/* global substitution ${..//all/these} */
 
+/* Flags as the second argument to prefork */
+#define PF_TYPESET	0x01	/* argument handled like typeset foo=bar */
+#define PF_ASSIGN	0x02	/* argument handled like the RHS of foo=bar */
+#define PF_SINGLE	0x04	/* single word substitution */
+
 /* node for named directory hash table (nameddirtab) */
 
 struct nameddir {

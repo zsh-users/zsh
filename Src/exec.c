@@ -1208,7 +1208,7 @@ addvars(LinkList l, int export)
 	    addlinknode(vl, v->str);
 	} else
 	    vl = v->arr;
-	prefork(vl, v->type == PM_SCALAR ? 7 : 3);
+	prefork(vl, v->type == PM_SCALAR ? (PF_SINGLE|PF_ASSIGN) : PF_ASSIGN);
 	if (errflag)
 	    return;
 	if (isset(GLOBASSIGN) || v->type != PM_SCALAR)
@@ -1356,7 +1356,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
     }
 
     /* Do prefork substitutions */
-    prefork(args, assign ? 2 : isset(MAGICEQUALSUBST));
+    prefork(args, (assign || isset(MAGICEQUALSUBST)) ? PF_TYPESET : 0);
 
     if (type == SIMPLE) {
 	int unglobbed = 0;
@@ -2519,13 +2519,26 @@ spawnpipes(LinkList l)
     }
 }
 
+extern int tracingcond;
+
 /* evaluate a [[ ... ]] */
 
 /**/
 static int
 execcond(Cmd cmd)
 {
-    return !evalcond(cmd->u.cond);
+    int stat;
+    if (isset(XTRACE)) {
+	fprintf(stderr, "%s[[", prompt4 ? prompt4 : "");
+	tracingcond++;
+    }
+    stat = !evalcond(cmd->u.cond);
+    if (isset(XTRACE)) {
+	fprintf(stderr, " ]]\n");
+	fflush(stderr);
+	tracingcond--;
+    }
+    return stat;
 }
 
 /* evaluate a ((...)) arithmetic command */
@@ -2537,8 +2550,17 @@ execarith(Cmd cmd)
     char *e;
     long val = 0;
 
-    while ((e = (char *) ugetnode(cmd->args)))
+    if (isset(XTRACE))
+	fprintf(stderr, "%s((", prompt4 ? prompt4 : "");
+    while ((e = (char *) ugetnode(cmd->args))) {
+	if (isset(XTRACE))
+	    fprintf(stderr, " %s", e);
 	val = matheval(e);
+    }
+    if (isset(XTRACE)) {
+	fprintf(stderr, " ))\n", stderr);
+	fflush(stderr);
+    }
     errflag = 0;
     return !val;
 }
@@ -2611,6 +2633,18 @@ execshfunc(Cmd cmd, Shfunc shf)
 	last_file_list = jobtab[thisjob].filelist;
 	jobtab[thisjob].filelist = NULL;
 	deletejob(jobtab + thisjob);
+    }
+
+    if (isset(XTRACE)) {
+	LinkNode lptr;
+	fprintf(stderr, "%s", prompt4 ? prompt4 : prompt4);
+	for (lptr = firstnode(cmd->args); lptr; incnode(lptr)) {
+	    if (lptr != firstnode(cmd->args))
+		fputc(' ', stderr);
+	    fprintf(stderr, "%s", (char *)getdata(lptr));
+	}
+	fputc('\n', stderr);
+	fflush(stderr);
     }
 
     doshfunc(shf->nam, shf->funcdef, cmd->args, shf->flags, 0);

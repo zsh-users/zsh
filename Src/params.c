@@ -568,8 +568,10 @@ createparam(char *name, int flags)
 
 	if (isset(ALLEXPORT) && !oldpm)
 	    flags |= PM_EXPORTED;
-    } else
+    } else {
 	pm = (Param) alloc(sizeof *pm);
+	pm->nam = nulstring;
+    }
     pm->flags = flags;
 
     if(!(pm->flags & PM_SPECIAL))
@@ -1835,6 +1837,12 @@ arrhashsetfn(Param pm, char **val)
     while (*aptr) {
 	/* The parameter name is ztrdup'd... */
 	v->pm = createparam(*aptr, PM_SCALAR|PM_UNSET);
+	/*
+	 * createparam() doesn't return anything if the parameter
+	 * already existed.
+	 */
+	if (!v->pm)
+	    v->pm = (Param) paramtab->getnode(paramtab, *aptr);
 	zsfree(*aptr++);
 	/* ...but we can use the value without copying. */
 	setstrvalue(v, *aptr++);

@@ -1,4 +1,4 @@
-texinode(Zsh Modules)()(Programmable Completion)(Top)
+texinode(Zsh Modules)()(Completion Widgets)(Top)
 chapter(Zsh Modules)
 cindex(modules)
 sect(Description)
@@ -19,7 +19,8 @@ item(tt(comp1))(
 Base of the completion system.  Used by the tt(compctl) and tt(zle) modules.
 )
 item(tt(compctl))(
-The tt(compctl) builtin for controlling completion.
+The tt(compctl) builtin for controlling completion and the builtins for
+completion widgets.
 )
 item(tt(deltochar))(
 A ZLE function duplicating EMACS' tt(zap-to-char).

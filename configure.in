@@ -1036,7 +1036,7 @@ char *argv[];
       #
       sni_cc_version=`$CC -V 2>&1 | head -1`
       case "$sni_cc_version" in
-        CDS* )
+        *CDS* )
          EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-Blargedynsym}"
        ;;
        * )

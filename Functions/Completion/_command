@@ -1,0 +1,7 @@
+#defcomp command
+
+if [[ -position 2 -1 ]]; then
+  _normal "$@"
+else
+  complist -em
+fi

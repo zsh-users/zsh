@@ -1,0 +1,3 @@
+#defcomp -math- getopts read unset vared
+
+complist -v

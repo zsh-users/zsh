@@ -42,11 +42,7 @@ char nulstring[] = {Nularg, '\0'};
  *  - Brace expansion
  *  - Tilde and equals substitution
  *
- * Bits 0 and 1 of flags are used in filesub.
- * bit 0 is set when we are doing MAGIC_EQUALSUBST or normal
- *	 assignment but not a typeset.
- * bit 1 is set on a real assignment (both typeset and normal).
- * bit 2 is a flag to paramsubst (single word sub)
+ * PF_* flags are defined in zsh.h
  */
 
 /**/
@@ -70,20 +66,22 @@ prefork(LinkList list, int flags)
 		return;
 	} else {
 	    if (isset(SHFILEEXPANSION))
-		filesub((char **)getaddrdata(node), flags & 3);
-	    if (!(node = stringsubst(list, node, flags & 4)))
+		filesub((char **)getaddrdata(node),
+			flags & (PF_TYPESET|PF_ASSIGN));
+	    if (!(node = stringsubst(list, node, flags & PF_SINGLE)))
 		return;
 	}
     }
     for (node = firstnode(list); node; incnode(node)) {
 	if (*(char *)getdata(node)) {
 	    remnulargs(getdata(node));
-	    if (unset(IGNOREBRACES) && !(flags & 4))
+	    if (unset(IGNOREBRACES) && !(flags & PF_SINGLE))
 		while (hasbraces(getdata(node)))
 		    xpandbraces(list, &node);
 	    if (unset(SHFILEEXPANSION))
-		filesub((char **)getaddrdata(node), flags & 3);
-	} else if (!(flags & 4))
+		filesub((char **)getaddrdata(node),
+			flags & (PF_TYPESET|PF_ASSIGN));
+	} else if (!(flags & PF_SINGLE))
 	    uremnode(list, node);
 	if (errflag)
 	    return;
@@ -234,7 +232,7 @@ singsub(char **s)
 
     foo = newlinklist();
     addlinknode(foo, *s);
-    prefork(foo, 4);
+    prefork(foo, PF_SINGLE);
     if (errflag)
 	return;
     *s = (char *) ugetnode(foo);
@@ -287,8 +285,10 @@ multsub(char **s, char ***a, int *isarr, char *sep)
     return !l;
 }
 
-/* ~, = subs: assign = 2 => typeset; assign = 1 => something that looks
-	like an assignment but may not be; assign = 3 => normal assignment */
+/*
+ * ~, = subs: assign & PF_TYPESET => typeset or magic equals
+ *            assign & PF_ASSIGN => normal assignment
+ */
 
 /**/
 void
@@ -302,12 +302,8 @@ filesub(char **namptr, int assign)
     if (!assign)
 	return;
 
-    if (assign < 3) {
+    if (assign & PF_TYPESET) {
 	if ((*namptr)[1] && (sub = strchr(*namptr + 1, Equals))) {
-	    if (assign == 1)
-		for (ptr = *namptr; ptr != sub; ptr++)
-		    if (!iident(*ptr) && !INULL(*ptr))
-			return;
 	    str = sub + 1;
 	    if ((sub[1] == Tilde || sub[1] == Equals) && filesubstr(&str, assign)) {
 		sub[1] = '\0';

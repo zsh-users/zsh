@@ -1,0 +1,3 @@
+#defkeycomp expand-or-complete \C-xm
+
+complist -g '*(om[1])'
