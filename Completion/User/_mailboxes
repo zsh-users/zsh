@@ -65,7 +65,8 @@ _mailbox_cache () {
 
 
   [[ -f ${~muttrc:-.} ]] &&
-    _mutt_cache=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
+    _mutt_cache=( ${${(M)${(f)"$(<${~muttrc})"}:#mailboxes *}#mailboxes *} )
+
 
   _mbox_cache=( ${~maildirectory}/*(^/) )
   _pine_cache=( ${~pinedirectory}/**/*(.) )

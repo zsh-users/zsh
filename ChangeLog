@@ -1,3 +1,8 @@
+2000-06-22  Clint Adams  <schizo@debian.org>
+
+	* 12024: Completion/User/_mailboxes: handle multiple mailboxes
+	lines in muttrc.
+
 2000-06-21  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 12019: Completion/User/_ssh: upgrade to the last openssh
