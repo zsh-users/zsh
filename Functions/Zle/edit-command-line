@@ -1,0 +1,18 @@
+# Edit the command line using your usual editor.
+# Binding this to 'v' in the vi command mode map,
+#   autoload edit-command-line
+#   zle -N edit-command-line
+#   bindkey -M vicmd v edit-command-line
+# will give ksh-like behaviour for that key.
+
+local tmpfile=${TMPPREFIX:-/tmp/zsh}ecl$$
+
+print $BUFFER >$tmpfile
+exec </dev/tty
+${VISUAL:-${EDITOR:-vi}} $tmpfile
+LBUFFER=
+RBUFFER=
+BUFFER=$(<$tmpfile)
+
+rm -f $tmpfile
+zle redisplay

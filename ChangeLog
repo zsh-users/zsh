@@ -1,3 +1,8 @@
+2000-05-10  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11299: Bart/pws: Functions/Zle/edit-command-line: edit command
+	line with external editor.
+
 2000-05-10  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11298: Doc/Zsh/compsys.yo, Src/Zle/computil.c: more fixes for
