@@ -83,9 +83,8 @@ struct heredocs *hdocs;
 /* 
  * Word code.
  *
- * For now we simply post-process the syntax tree produced by the
- * parser. We compile it into a struct eprog. Some day the parser
- * above should be changed to emit the word code directly.
+ * The parser now produces word code, reducing memory consumption compared
+ * to the nested structs we had before.
  *
  * Word code layout:
  *
@@ -157,7 +156,7 @@ struct heredocs *hdocs;
  *     - followed by body
  *
  *   WC_WHILE
- *     - data contains type (while, until) and ofsset to after body
+ *     - data contains type (while, until) and offset to after body
  *     - followed by condition
  *     - followed by body
  *

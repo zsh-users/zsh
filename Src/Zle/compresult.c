@@ -165,7 +165,7 @@ static char *
 cline_str(Cline l, int ins, int *csp, LinkList posl)
 {
     Cline s;
-    int ocs = cs, ncs, pcs, scs, opos, npos;
+    int ocs = cs, ncs, pcs, scs, opos = -1, npos;
     int pm, pmax, pmm, pma, sm, smax, smm, sma, d, dm, mid;
     int i, j, li = 0, cbr, padd = (ins ? wb - ocs : -ocs);
     Brinfo brp, brs;
