@@ -1,3 +1,10 @@
+2001-04-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 13958: Completion/Zsh/Type/_directory_stack: a hopefully correct
+	fix to avoid appending a / when called from _cd
+
+	* unposted: Completion/Zsh/Command/.distfiles: missed change for 13947
+
 2001-04-12  Clint Adams  <schizo@debian.org>
 
 	* 13955: acconfig.h, configure.in, Src/Modules/terminfo.c:
