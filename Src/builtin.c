@@ -3077,7 +3077,15 @@ err:
 	    p = ztrdup(args[zoptind++]);
 	} else
 	    p = metafy(str+optcind, lenstr-optcind, META_DUP);
-	optcind = ztrlen(args[zoptind - 1]);
+	/*
+	 * Careful:  I've just changed the following two lines from
+	 *   optcind = ztrlen(args[zoptind - 1]);
+	 * and it's a rigorous theorem that every change in getopts breaks
+	 * something.  See zsh-workers/9095 for the bug fixed here.
+	 *   PWS 2000/05/02
+	 */
+	optcind = 0;
+	zoptind++;
 	zsfree(zoptarg);
 	zoptarg = p;
     } else {

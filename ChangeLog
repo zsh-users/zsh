@@ -1,3 +1,8 @@
+2000-05-02  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11057: Src/builtin.c:  getopts for options with arguments
+	miscounted $OPTIND and index into subsequent options (see 9095).
+
 2000-05-02  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 11053: Completion/Commands/_complete_help: always use empty
