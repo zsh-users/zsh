@@ -1,0 +1,3 @@
+moddeps="comp1 zle"
+
+objects="complist.o"

@@ -1,0 +1,6 @@
+#compdef newgrp
+
+: ${(A)groups:=${${(s: :)$(</etc/group)}%%:*}}
+# : ${(A)groups:=${${(s: :)$(ypcat group.byname)}%%:*}} # If you use NIS
+
+compadd $groups
