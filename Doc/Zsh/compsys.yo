@@ -779,6 +779,12 @@ This is tested for the default tag and the tags used when generating
 matches.  If it is set to `true' for at least one match which is the
 same as the string on the line, this match will immediately be
 accepted.
+
+Note that this is also used by the tt(_expand) completer to decide if
+words beginning with a tilde or parameter expansion should be
+expanded. This means that if, for example, there are parameters
+tt(foo) and tt(foobar), the string `tt($foo)' will only be expanded if 
+tt(accept-exact) is set to `true'.
 )
 kindex(add-space, completion style)
 item(tt(add-space))(
@@ -1785,6 +1791,14 @@ example(zstyle ':completion:*:expand:::' substitute '${NUMERIC:-1} != 1')
 
 substitution will be performed only if given an explicit numeric
 argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
+)
+kindex(suffix, completion style)
+item(tt(suffix))(
+This is used by the tt(_expand) completer if the word starts with a
+tilde or parameter expansion. If it is set to `true', the word will
+only be expanded if it doesn't have a suffix, i.e. if it is something
+like `tt(~foo)' or `tt($foo)', but not if it is `tt(~foo/)' or
+`tt($foo/bar)'. The default for this style is `false'.
 )
 kindex(tag-order, completion style)
 item(tt(tag-order))(

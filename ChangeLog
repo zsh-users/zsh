@@ -1,5 +1,8 @@
 2000-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* ?????: Completion/Core/_expand, Doc/Zsh/compsys.yo: new style
+	`suffix', use accept-exact style in _expand
+	
 	* ?????: Src/Zle/complist.c: fix for longer capability strings;
 	very bad
 
