@@ -684,7 +684,8 @@ putstr(int d)
 
 /* Count height etc. of a prompt string returned by promptexpand(). *
  * This depends on the current terminal width, and tabs and         *
- * newlines require nontrivial processing.                          */
+ * newlines require nontrivial processing.                          *
+ * Passing `overf' as -1 means to ignore columns (absolute width).  */
 
 /**/
 mod_export void
@@ -693,7 +694,7 @@ countprompt(char *str, int *wp, int *hp, int overf)
     int w = 0, h = 1;
     int s = 1;
     for(; *str; str++) {
-	if(w >= columns) {
+	if(w >= columns && overf >= 0) {
 	    w = 0;
 	    h++;
 	}
@@ -715,7 +716,7 @@ countprompt(char *str, int *wp, int *hp, int overf)
 		w++;
 	}
     }
-    if(w >= columns) {
+    if(w >= columns && overf >= 0) {
 	if (!overf || w > columns) {
 	    w = 0;
 	    h++;
@@ -734,6 +735,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
     if (arg) {
 	char ch = *fm, *ptr = bp, *truncstr;
 	int truncatleft = ch == '<';
+	int w;
 
 	/*
 	 * If there is already a truncation active, return so that
@@ -768,7 +770,8 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	fm++;
 	putpromptchar(doprint, endchar);
 	*bp = '\0';
-	if (bp - ptr > trunclen) {
+	countprompt(ptr, &w, 0, -1);
+	if (w > trunclen) {
 	    /*
 	     * We need to truncate.  t points to the truncation string -- *
 	     * which is inserted literally, without nice representation.  *
@@ -780,23 +783,82 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	    char *t = truncstr;
 	    int fullen = bp - ptr;
 	    int tlen = ztrlen(t), maxlen;
-	    if (tlen > fullen) {
-		addbufspc(tlen - fullen);
-		bp += tlen - fullen;
-	    } else
-		bp -= fullen - trunclen;
 	    maxlen = tlen < trunclen ? trunclen - tlen : 0;
-	    if (truncatleft) {
-		if (maxlen)
-		    memmove(ptr + strlen(t), ptr + fullen - maxlen,
-			    maxlen);
-		while (*t)
-		    *ptr++ = *t++;
+	    if (w < fullen) {
+		/* Invisible substrings, lots of shuffling. */
+		int n = strlen(t);
+		addbufspc(n);
+
+		if (truncatleft) {
+		    char *p = ptr + n, *q = p;
+
+		    n = fullen - w;
+
+		    /* Shift the whole string right, then *
+		     * selectively copy to the left.      */
+		    memmove(p, ptr, fullen);
+		    while (w > 0 || n > 0) {
+			if (*p == Inpar)
+			    do {
+				*q++ = *p;
+				--n;
+			    } while (*p++ != Outpar && *p && n);
+			else if (w) {
+			    if (--w < maxlen)
+				*q++ = *p;
+			    ++p;
+			}
+		    }
+		    bp = q;
+		} else {
+		    /* Truncate on the right, selectively */
+		    char *q = ptr + fullen;
+
+		    /* First skip over as much as will "fit". */
+		    while (w > 0 && maxlen > 0) {
+			if (*ptr == Inpar)
+			    while (*ptr++ != Outpar && *ptr) {;}
+			else
+			    ++ptr, --w, --maxlen;
+		    }
+		    if (ptr < q) {
+			/* We didn't reach the end of the string. *
+			 * In case there are more invisible bits, *
+			 * insert the truncstr and keep looking.  */
+			memmove(ptr + n, ptr, q - ptr);
+			q = ptr + n;
+			while (*t)
+			    *ptr++ = *t++;
+			while (*q) {
+			    if (*q == Inpar)
+				do {
+				    *ptr++ = *q;
+				} while (*q++ != Outpar && *q);
+			    else
+				++q;
+			}
+			bp = ptr;
+			*bp = 0;
+		    } else
+			bp = ptr + n;
+		}
 	    } else {
-		ptr += maxlen;
-		while (*t)
-		    *ptr++ = *t++;
+		/* No invisible substrings. */
+		if (tlen > fullen) {
+		    addbufspc(tlen - fullen);
+		    bp += tlen - fullen;
+		} else
+		    bp -= fullen - trunclen;
+		if (truncatleft) {
+		    if (maxlen)
+			memmove(ptr + strlen(t), ptr + fullen - maxlen,
+				maxlen);
+		} else
+		    ptr += maxlen;
 	    }
+	    /* Finally, copy the truncstr into place. */
+	    while (*t)
+		*ptr++ = *t++;
 	}
 	zsfree(truncstr);
 	trunclen = 0;
