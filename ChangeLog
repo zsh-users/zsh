@@ -1,3 +1,8 @@
+2004-04-14  Clint Adams  <clint@zsh.org>
+
+	* Jay Berkenbilt: 19769: Completion/Unix/Command/_rsync:
+	fix quoting for remote file completion, add -L to ls command.
+
 2004-04-14  Oliver Kiddle  <opk@zsh.org>
 
 	* Ingo Rohlfs: 19747: Completion/Unix/Command/_subversion:

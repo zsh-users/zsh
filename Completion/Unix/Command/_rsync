@@ -37,8 +37,8 @@ elif [[ -prefix 1 *: ]]; then
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
     slash=/
-    remfiles=(${(f)"$(_call_program files ssh -a -x ${words[CURRENT]%:*} ls -d1F ${${${words[CURRENT
-]#*:}:h}/${slash}(#e)/}/\* 2>/dev/null)"})
+    remfiles=(${(f)"$(_call_program files ssh -a -x ${words[CURRENT]%:*} ls -d1FL "${${${words[CURRENT
+]#*:}:h}/${slash}(#e)/}/\* 2>/dev/null")"})
 
     remdispf=(${remfiles:#*/})
     remdispd=(${(M)remfiles:#*/})
