@@ -1,3 +1,8 @@
+2000-04-06  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+
+	* 10531: Src/init.c: use `zsh' as command name in error messages
+	even with -c
+
 2000-04-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 10524: Util/mkdisttree.sh: always copy files to tarred tree;
