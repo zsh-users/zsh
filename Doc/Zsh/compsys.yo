@@ -1566,7 +1566,6 @@ substitution will be performed only if given an explicit numeric
 argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
 )
 kindex(tag-order, completion style)
-kindex(tag-order, completion style)
 item(tt(tag-order))(
 This provides a mechanism for sorting how the tags available in a
 particular context will be used.
