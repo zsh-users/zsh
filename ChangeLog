@@ -1,3 +1,8 @@
+2001-08-24  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15705: Src/Zle/complete.c: test if hash table pointer is NULL
+	to avoid SEGV with compstate=()
+
 2001-08-22  Clint Adams  <clint@zsh.org>
 
         * 15683: Completion/Unix/Command/.distfiles,

@@ -1054,6 +1054,9 @@ set_compstate(Param pm, HashTable ht)
     struct value v;
     char *str;
 
+    if (!ht)
+        return;
+
     for (i = 0; i < ht->hsize; i++)
 	for (hn = ht->nodes[i]; hn; hn = hn->next)
 	    for (cp = compkparams,
