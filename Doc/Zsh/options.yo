@@ -557,7 +557,10 @@ pindex(LIST_BEEP)
 cindex(beep, ambiguous completion)
 cindex(completion, beep on ambiguous)
 item(tt(LIST_BEEP))(
-Beep on an ambiguous completion.
+Beep on an ambiguous completion.  More accurately, this forces the
+completion widgets to return status 1 on an ambiguous completion, which
+causes the shell to beep if the option tt(BEEP) is also set; this may
+be modified if completion is called from a user-defined widget.
 )
 pindex(LIST_TYPES)
 cindex(marking file types)

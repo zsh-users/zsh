@@ -1,11 +1,63 @@
-#compdef -subscript-
+#compdef -first-
 
-if [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
-  if [[ "$RBUFFER" = \]* ]]; then
-    compadd -S '' - "${(@kP)${compstate[parameter]}}"
-  else
-    compadd -S ']' - "${(@kP)${compstate[parameter]}}"
-  fi
-else
-  _compalso -math-
-fi
+# This function is called at the very beginning before any other
+# function for a specific context.
+#
+# This just gives some examples of things you might want to do here.
+#
+#
+# If you use the vared builtin and want completion in there to act the 
+# way completion on the right hand side of assignments is done, add
+# (or un-comment) this code:
+#
+#     if [[ -n $compstate[vared] ]]; then
+#       if [[ $compstate[vared] = *\[* ]]; then
+#         # vared on an array-element
+#         compstate[parameter]=${compstate[vared]%%\[*}
+#         compstate[context]=value
+#       else
+#         # vared on a parameter, let's see if it is an array
+#         compstate[parameter]=$compstate[vared]
+#         if [[ ${(tP)compstate[vared]} = *(array|assoc)* ]]; then
+#           compstate[context]=array_value
+#         else
+#           compstate[context]=value
+#         fi
+#       fi
+#       return
+#     fi
+#
+#
+#
+# Other things you can do here is to complete different things if the
+# word on the line matches a certain pattern. This example allows
+# completion of words from the history by adding two commas at the end 
+# and hitting TAB.
+#
+#     if [[ "$PREFIX" = *,, ]]; then
+#       local max i=1
+#     
+#       PREFIX="$PREFIX[1,-2]"
+#       # If a numeric prefix is given, we use it as the number of
+#       # lines (multiplied by ten below) in the history to search.
+#       if [[ ${NUMERIC:-1} -gt 1 ]]; then
+#         max=$NUMERIC
+#         unset NUMERIC
+#       else
+#         # The default is to search the last 100 lines.
+#         max=10
+#       fi
+#       # We first search in the last ten lines, then in the last
+#       # twenty lines, and so on...
+#       while [[ i -le max ]]; do
+#         if compgen -X "%Bhistory ($n):%b" -Q -H $(( i*10 )) ''; then
+#           # We have found at least one matching word, so we switch
+#           # on menu-completion and make sure that no other
+#           # completion function is called by setting _comp_skip.
+#           compstate[insert]=menu
+#           _comp_skip=1
+#           return
+#         fi
+#         (( i++ ))
+#       done
+#     fi

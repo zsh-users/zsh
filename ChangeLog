@@ -1,3 +1,248 @@
+1999-07-03  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: 6955, 6956: Completion/Core/compinit,
+	  Completion/Core/compinstall, Doc/Zsh/compsys.yo: better handling
+	  of subdirectory structure for completion functions; -d is default
+	  for compinit, -D turns it off; documentation updated for installed
+	  files; bugfix for compinstall re-using compconf arguments.
+
+1999-07-02  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Tanaka Akira: 6953: Completion/Builtins/_cd: use pushd code for cd
+
+	* Sven: 6945: Completion/Core/_expand: error expanding :]
+
+	* Sven: 6941: Src/exec.c, Src/jobs.c: neater fix for time builtin.
+
+	* Oliver: 6939: Completion/User/_hosts,
+	  Completion/Base/_subscript, Misc/compctl-examples: better way of
+	  using /etc/hosts; complete POSIX character classes.
+	
+	* Sven: 6937: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: use
+	  send-break to exit menu selection and return to normal menu
+	  completion.
+
+1999-07-01  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Sven: 6936: Src/jobs.c: time builtin was broken.
+
+	* Sven: 6933: Src/exec.c, Src/jobs.c, Src/Signals.c:  More job
+	  control fixes:  running external command after loop in function;
+	  function on left hand side of pipeline with loop on right.
+
+1999-06-29  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Sven: 6908, 6926: Src/exec.c, Src/jobs.c, Src/zsh.h: more job
+	  control fixes:  functions with programs that send strange
+	  signals to parents should work.
+
+	* Sven: 6904: Src/Makefile.in: bugs with cleaning up modules
+	  in Src.
+
+	* Sven: 6903: Src/Zle/zle_tricky.c, Doc/Zsh/compwid.yo:
+	  compstate[insert] can have a space at the end to force inserting
+	  a space after completion.
+
+	* Sven: 6902: Src/Zle/complist.c, Doc/Zsh/mod_complist.yo:
+	  menu-select will use %S/%s if ZLS_COLO[U]RS is not defined.
+
+	* Sven: 6901: Src/exec.c, Src/init.c, Src/jobs.c:  back off
+	  some (but not all) recent job handling patches to avoid more
+	  serious problems with recalcitrant programs.
+
+1999-06-28  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: 6899: Doc/Zsh/params.yo, Doc/Zsh/prompt.yo, Src/init.c:
+	  default PS4 is now "+%N:%i> ", except in [k]sh emulation.
+
+	* Andrej: 6893: aczsh.m4: use existing environment value when
+	  testing for large file support.
+
+	* pws: 6890: Doc/Zsh/params.yo, Doc/Zsh/prompt.yo, Src/prompt.c:
+	  %N and %i prompt escapes provide script or function name and
+	  line number.
+
+	* Sven: 6887: Src/exec.c, Src/jobs.c: another loop killing problem.
+
+	* Geoff: 6884: Src/Zle/zle_refresh.c: bug when redisplaying line
+	  one shorter than terminal width
+
+1999-06-27  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+        * pws: 6881: Doc/Zsh/mod_zle.yo: explain keymap linking
+
+	* pws: 6879: Src/exec.c: update command hash pointer if builtin
+	  is autoloaded after a prefork().
+
+	* Bart: 6873: Src/Zle/zle_tricky.c: magic-space doesn't feep
+	  quite so much.
+
+	* Geoff: 6871: Src/Zle/complist.c: optimi[sz]ations for outputing
+	  coloured/colorized output.
+
+	* pws: 6866: Src/exec.c, Src/init.c: signed/unsigned character
+	  problems; one was causing SunOS 4.1.3_U1 with gcc 2.7.0 to hang.
+
+1999-06-26  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* 3.1.5-pws-24 made available
+
+1999-06-25  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: 6857: Completion/Core/compinit,
+	  Completion/Core/compinstall, Doc/Zsh/compsys.yo: compinit and
+	  compinstall are now functions which unfunction and autoload
+	  themselves.  _compdir is used by compinstall to record where
+	  it found the completion directories.  compinit is now otherwise
+	  stuck with fpath.
+
+	* pws: 6851, 6853: typeset -g doesn't locallize parameters; bug
+	  that unset parameters were recreated global instead of at
+	  some higher local level; handle PM_AUTOLOAD consistent with other
+	  flags.
+
+	* Sven: 6850: Src/init.c: always generate a new pgrp for the
+	  shell, since the parent (e.g. xterm) may not have done that
+	  and zsh now runs programs in its own pgrp.
+
+	* Sven: 6848: Src/exec.c: don't suspend if the shell is the
+	  only thing to suspend (or something like that).
+
+	* Sven: 6841: Src/loop.c: %_ in else branches for PS4
+
+1999-06-24  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: 6834: Src/glob.c, Src/hashtable.c: dyncat() changed always
+	  to use heap memory (as it erroneously claimed); hashtable element
+	  tablename (used for debugging) freed.
+
+	* Bart: 6830: Src/params.c: don't create the hashtable for an
+	  assoc array on assignment unless there is something to put in it.
+
+	* Sven: 6825: Src/Zle_tricky.c: make sure path prefix and suffix
+	  are quoted in filename completion; recalculate length of match
+	  string.
+
+	* Sven: 6824: Src/exec.c, Src/signals.c: functions got deleted
+	  from the process table too early for job control.
+
+	* pws: 6823: Src/exec.c, Src/utils.c:  names and line numbers
+	  of functions printed for errors during execution.
+
+	* Sven: 6822: Src/Zle/complist.c, Src/Zle/zle_tricky.c: assorted
+	  completion fixes: crash with old completion; too many spaces
+	  with menu inserting; too many beeps with LISTBEEP.
+
+	* Sven: 6819: Src/exec.c, Src/jobs.c, Src/signals.c:  Run
+	  jobs inside shell constructs in the same process group as the
+	  shell itself.
+
+	* Sven: 6817: Src/Zle/comp.h, Src/Zle/complist.c,
+	  Src/Zle/zle_tricky.c: Change ZLS_SELECT to SELECTMIN;
+	  don't automatically switch on select widget until there are
+	  $SELECTMIN choices.
+
+1999-06-23  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: 6816: Doc/Zsh/params.yo, Src/utils.c:  ZBEEP parameter
+	  gives string to output instead of beeping.
+
+	* Sven: 6815: Src/Zle/complist.c: switch off menu-select for
+	  hidden matches.
+
+	* pws: 6814: Doc/Zsh/mod_zle.yo, Doc/Zsh/options.yo,
+	  Doc/Zsh/zle.yo, Src/Zle/deltochar.c, Src/Zle/iwidgets.list,
+	  Src/Zle/zle_hist.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/Zle/zle_move.c, Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c,
+	  Src/Zle/zle_utils.c, Src/Zle/zle_vi.c, Src/Zle/zle_word.c:
+	  Zle determines whether to feep by the return status (except
+	  for some inner code loops); completion widgets return 1 if
+	  something failed in the hierarchy outside the widget function;
+	  the -n and -N options work properly.
+
+	* pws: 6812: Src/subst.c: ${(AA)foo=}, or anything that gives
+	  a null string after the =, creates an empty assoc array.
+
+	* pws: 6806: Completion/Core/compdump, Completion/Core/compinit,
+	  Completion/Core/compinstall, Doc/Zsh/compsys.yo: compdump is now
+	  a function which unfunctions itself; default dumpfile location
+	  is now ${ZDOTDIR:-$HOME}/.zcompdump
+
+	* Sven: 6807: Src/Zle/complist.c: accept-and-menu-complete
+	  advances the menu-select selection too.
+
+	* Sven: 6802: Src/Zle/complist.c: change some default colours
+
+	* pws: 6801: Doc/Zsh/builtins.yo, Src/builtin.c: Make emulate -L
+	  turn on LOCAL_TRAPS, too.
+
+	* Sven: 6796: Src/Zle/zle_main.c, Src/Zle/zle_thingy.c,
+	  Doc/Zsh/mod_zle.yo, Completion/Core/compinit: zle -la lists
+	  all widgets, just the name; zle -la <NAME> tests if <NAME> is
+	  defined.
+
+	* Sven: 6793: Src/Zle/complist.c, Src/Zle/zle_keymap.c,
+	  Src/Zle/zle_main.c, Doc/Zsh/mod_complist.yo: Local keymaps can be
+	  defined, currently only used with menu-select.
+
+1999-06-22  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Sven: 6786: Src/Zle/zle_tricky.c, Doc/Zsh/compctl.yo: only use
+	  a range when you are after the first pattern in it.
+
+	* Sven: 6780: Src/Zle/complist.c: wasn't showinglist when it
+	  thought it was.
+
+	* Sven: 6778: don't delete function from job tables
+	  
+	 * pws: 6776: Doc/Makefile.in, Doc/Zsh/compsys.yo,
+	  Doc/Zsh/mod_complist.yo:  Tweakchen for menu-select patch;
+	  also (unposted) changed name collist to complist wherever it
+	  occurs.
+
+	* Sven: 6774, 6775: Src/Zle/collist.c, Src/Zle/comp.h,
+	  Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_tricky.c,
+	  Doc/Zsh/compsys.yo, Doc/Zsh/mod_collist.yo,
+	  Doc/Zsh/mod_compctl.yo, Doc/Zsh/mod_deltochar.yo,
+	  Doc/Zsh/modules.yo, Completion/Core/_path_files:  Improvements
+	  for menu-select widget; ZLS_SELECT turns menu-completion
+	  into menu-selection; key bindings more natural; highlighting
+	  more useful
+
+	* Oliver: 6772: Src/Zle/zle_tricky.c: use the whole
+	  command text for job completion.
+
+1999-06-21  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Sven: 6760: Src/Zle/zle_tricky.c: menucompletion displaying new
+	  list of matches sometimes got confused.
+
+	* Sven: 6755: Src/jobs.c: status of restarted job including
+	  current shell processes was wrong.
+
+	* Sven: 6753: Src/Zle/collist.c, Src/xmods.conf: 
+	  load collist
+
+	* Sven: 6747: Src/Zle/collist.c, Src/Zle/zle_main.c,
+	  Src/Zle/zle_tricky.c: menu-select allows you to move
+	  cursor to select completions; uses ma list colouring
+	  capability.
+
+	* Sven: 6742: Src/Zle/collist.c, Src/Zle/collist.mdd,
+	  Src/Zle/zle_main.c, Src/Zle/zle_tricky.c, Src/module.c,
+	  Src/zsh.h, Doc/Zsh/mod_collist.yo, Doc/Zsh/mod_compctly.yo,
+	  Doc/Zsh/mod_deltochar.yo, Doc/Zsh/modules.yo,
+	  Util/zsh-development-guide:  collist module: colour completion
+	  lists by setting ZLS_COLOURS (or even ZLS_COLORS) variables.
+
+	* pws: 6737: Doc/Zsh/builtins.yo, Doc/Zsh/zle.yo: simplifications
+	  suggested by Bart.
+
+	* Bart: 6732: Doc/Zsh/compsys.yo: restore missing bits of Sven's
+	  patches (not the zle_tricky.c hunk).
+
+	* Bart: 6731: Doc/Zsh/compctl.yo: spelling correction
+
 1999-06-20  Peter Stephenson  <pws@ibmth.difi.unipi.it>
 
 	* zsh-3.1.5-pws-23 made available

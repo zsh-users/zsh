@@ -62,9 +62,10 @@ zerr(const char *fmt, const char *str, int num)
     /*
      * scriptname is set when sourcing scripts, so that we get the
      * correct name instead of the generic name of whatever
-     * program/script is running.
+     * program/script is running.  It's also set in shell functions,
+     * so test locallevel, too.
      */
-    nicezputs(isset(SHINSTDIN) ? "zsh" :
+    nicezputs((isset(SHINSTDIN) && !locallevel) ? "zsh" :
 	      scriptname ? scriptname : argzero, stderr);
     fputs(": ", stderr);
     zerrnam(NULL, fmt, str, num);
@@ -79,7 +80,7 @@ zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 	    return;
 	errflag = 1;
 	trashzle();
-	if(unset(SHINSTDIN)) {
+	if (unset(SHINSTDIN) || locallevel) {
 	    nicezputs(scriptname ? scriptname : argzero, stderr);
 	    fputs(": ", stderr);
 	}
@@ -133,7 +134,7 @@ zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 	    putc(*fmt == Meta ? *++fmt ^ 32 : *fmt, stderr);
 	    fmt++;
 	}
-    if (unset(SHINSTDIN) && lineno)
+    if ((unset(SHINSTDIN) || locallevel) && lineno)
 	fprintf(stderr, " [%ld]\n", (long)lineno);
     else
 	putc('\n', stderr);
@@ -2133,7 +2134,12 @@ mkarray(char *s)
 void
 zbeep(void)
 {
-    if (isset(BEEP))
+    char *vb;
+    if ((vb = getsparam("ZBEEP"))) {
+	int len;
+	vb = getkeystring(vb, &len, 2, NULL);
+	write(SHTTY, vb, len);
+    } else if (isset(BEEP))
 	write(SHTTY, "\07", 1);
 }
 

@@ -531,6 +531,14 @@ putpromptchar(int doprint, int endchar)
 		if(Rstring)
 		    stradd(Rstring);
 		break;
+	    case 'i':
+		addbufspc(DIGBUFSIZE);
+		sprintf(bp, "%ld", (long)lineno);
+		bp += strlen(bp);
+		break;
+	    case 'N':
+		stradd(scriptname ? scriptname : argzero);
+		break;
 	    case '\0':
 		return 0;
 	    case Meta:

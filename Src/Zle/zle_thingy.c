@@ -318,9 +318,10 @@ deletezlefunction(Widget w)
 /*
  * The available operations are:
  *
- *   -l   list user-defined widgets (no arguments)
+ *   -l   list widgets/test for existence
  *   -D   delete widget names
  *   -A   link the two named widgets (2 arguments)
+ *   -C   create completion widget (3 arguments)
  *   -N   create new user-defined widget (1 or 2 arguments)
  *        invoke a widget (1 argument)
  */
@@ -334,7 +335,7 @@ bin_zle(char *name, char **args, char *ops, int func)
 	int (*func) _((char *, char **, char *, char));
 	int min, max;
     } const opns[] = {
-	{ 'l', bin_zle_list, 0,  0 },
+	{ 'l', bin_zle_list, 0, -1 },
 	{ 'D', bin_zle_del,  1, -1 },
 	{ 'A', bin_zle_link, 2,  2 },
 	{ 'N', bin_zle_new,  1,  2 },
@@ -373,8 +374,21 @@ bin_zle(char *name, char **args, char *ops, int func)
 static int
 bin_zle_list(char *name, char **args, char *ops, char func)
 {
-    scanhashtable(thingytab, 1, 0, DISABLED, scanlistwidgets, ops['L']);
-    return 0;
+    if (!*args) {
+	scanhashtable(thingytab, 1, 0, DISABLED, scanlistwidgets,
+		      (ops['a'] ? -1 : ops['L']));
+	return 0;
+    } else {
+	int ret = 0;
+	Thingy t;
+
+	for (; *args && !ret; args++) {
+	    if (!(t = (Thingy) thingytab->getnode2(thingytab, *args)) ||
+		(!ops['a'] && (t->widget->flags & WIDGET_INT)))
+		ret = 1;
+	}
+	return ret;
+    }
 }
 
 /**/
@@ -405,6 +419,10 @@ scanlistwidgets(HashNode hn, int list)
     Thingy t = (Thingy) hn;
     Widget w = t->widget;
 
+    if(list < 0) {
+	printf("%s\n", hn->nam);
+	return;
+    }
     if(w->flags & WIDGET_INT)
 	return;
     if(list) {
@@ -536,6 +554,7 @@ bin_zle_call(char *name, char **args, char *ops, char func)
     Thingy t;
     struct modifier modsave;
     int ret, saveflag = 0;
+    char *wname = *args++;
 
     if(!zleactive || incompctlfunc || incompfunc) {
 	zerrnam(name, "widgets can only be called when ZLE is active",
@@ -543,6 +562,12 @@ bin_zle_call(char *name, char **args, char *ops, char func)
 	return 1;
     }
 
+    if (!wname) {
+	zwarnnam(name, "wrong number of arguments", NULL, 0);
+	if (saveflag)
+	    zmod = modsave;
+	return 1;
+    }
     while (*args && **args == '-') {
 	char *num;
 	if (!args[0][1] || args[0][1] == '-') {
@@ -577,14 +602,8 @@ bin_zle_call(char *name, char **args, char *ops, char func)
 	}
 	args++;
     }
-    if (!args[0]) {
-	zwarnnam(name, "wrong number of arguments", NULL, 0);
-	if (saveflag)
-	    zmod = modsave;
-	return 1;
-    }
 
-    t = rthingy(*args++);
+    t = rthingy(wname);
     PERMALLOC {
         ret = execzlefunc(t, args);
     } LASTALLOC;

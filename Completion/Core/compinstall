@@ -1,11 +1,12 @@
 # This script is to be run by a user to set up the new function based
 # completion system.  The functions themselves are assumed to be already
 # available in some directory; they should have been installed with the
-# the shell (except we haven't written that yet).
+# the shell.  If they have been, the commands `autoload -U compinit; compinit'
+# in the shell startup file should be enough, although you can run
+# compinstall for more configuration choices.
 #
-# Source this script (e.g. `. /path/compinstall') and answer the questions.
-#
-# Normally, this will alter ~/.zshrc (or wherever ZDOTDIR puts it), but you
+# Simply run this script as a function and answer the questions.
+# Normally it will alter ~/.zshrc (or wherever ZDOTDIR puts it), but you
 # can make that unwritable and it will leave the lines in a temporary file
 # instead.  It doesn't matter if .zshrc didn't exist before.  If your
 # .zshrc usually exits before the end, then you should take the code added
@@ -23,33 +24,13 @@
 #  - Could add code for setting other completers and options.
 #  - Could add keys for context-sensitive help.
 
-# Save the options.  We will need to trap ^C to make sure they get
-# restored properly.
-typeset -A _ci_options
-_ci_options=($(setopt kshoptionprint;setopt))
-[[ -o kshoptionprint ]] || _ci_options[kshoptionprint]=off
-[[ -o monitor ]] && _ci_options[monitor]=on
-[[ -o zle ]] && _ci_options[zle]=on
 
-emulate zsh
+emulate -L zsh
 
-TRAPINT() { 
-  unsetopt ${(k)_ci_options[(R)off]}
-  setopt ${(k)_ci_options[(R)on]}
-
-  unset _ci_options _ci_f _ci_fdir _ci_files _ci_dumpfile _ci_lines
-  unset _ci_type _ci_completer _ci_accept _ci_cprompt _ci_startline
-  unset _ci_endline _ci_ifile _ci_tmpf _ci_defaults _ci_compconf _ci_warn
-  unset _ci_dtype _ci_existing _ci_line
-
-  if (( $1 )); then
-    print Aborted.
-    unfunction TRAPINT
-    return 1
-  fi
-  return 0
-}
-
+typeset _ci_options _ci_f _ci_fdir _ci_files _ci_dumpfile _ci_lines
+typeset _ci_type _ci_completer _ci_accept _ci_cprompt _ci_startline
+typeset _ci_endline _ci_ifile _ci_tmpf _ci_compconf _ci_warn
+typeset _ci_dtype _ci_existing _ci_line _ci_end
 
 # Look for the defaults.
 _ci_startline='# The following lines were added by compinstall'
@@ -60,6 +41,7 @@ _ci_lines=''
 _ci_existing=''
 
 typeset -A _ci_defaults
+
 if [[ -f $_ci_ifile ]]; then
   # This assumes the lines haven't been altered by the user too much
   # after they were added.
@@ -68,13 +50,14 @@ if [[ -f $_ci_ifile ]]; then
   while read -rA _ci_line; do
     if (( $_ci_compconf )); then
       # parse a compconf component as first argument
-      if [[ $_ci_line[-1] == \\ ]]; then
-	_ci_line=(${_ci_line[1,-2]})
-      else
+      if [[ $_ci_line[-1] != \\ ]]; then
+	_ci_end=-1
 	_ci_compconf=0
+      else
+	_ci_end=-2
       fi
       if [[ $_ci_line[1] = *=* ]]; then
-	_ci_f="${${_ci_line[*]}#*=}"
+	_ci_f="${${_ci_line[1,$_ci_end]}#*=}"
 	if [[ $_ci_f = \'*\' ]]; then
 	  # strip quotes
 	  _ci_f=${_ci_f[2,-2]//\'\\\'\'/\'}
@@ -83,10 +66,12 @@ if [[ -f $_ci_ifile ]]; then
       fi
       _ci_existing="${_ci_existing}  $_ci_line
 "
-    elif [[ $_ci_line[1] = . && $_ci_line[2] = */compinit ]]; then
-      # parse the line sourcing compinit
-      [[ $_ci_line[3] = -f ]]  && _ci_fdir=$_ci_line[4]
+    elif [[ $_ci_line[1] = compinit ]]; then
+      # parse the line running compinit
+      [[ $_ci_line[2] = -f ]]  && _ci_fdir=$_ci_line[3]
       [[ $_ci_line[-2] = -d ]] && _ci_dumpfile=$_ci_line[-1]
+    elif [[ $_ci_line[1] = _compdir=* ]]; then
+      _ci_fdir=${_ci_line[1]##_compdir=}
     elif [[ $_ci_line[1] = compconf ]]; then
       # parse a compconf component as second argument (should be completer)
       [[ $_ci_line[2] = completer=* ]] &&
@@ -94,7 +79,7 @@ if [[ -f $_ci_ifile ]]; then
       [[ $_ci_line[-1] == \\ ]] && _ci_compconf=1
       _ci_existing="${_ci_existing}$_ci_line
 "
-    elif [[ $_ci_line[1] != \#* ]]; then
+    elif [[ $_ci_line[1] != \#* && $_ci_line[1] != (autoload|\[\[) ]]; then
       if [[ -z $_ci_warn ]]; then
 	_ci_warn=1
 	print "Warning:  existing lines in compinstall setup not understood:"
@@ -109,38 +94,42 @@ fi
 
 # Find out where the completion functions are kept.
 
-if [[ -z $_ci_fdir || ! -f $_ci_f/compinit || ! -f $_ci_f/compdump ]]; then
+if [[ -z $_ci_fdir || ! -f ${~_ci_fdir}/compinit ||
+  ! -f ${~_ci_fdir}/compdump ]]; then
   for _ci_f in $fpath; do
     if [[ $_ci_f != . && -f $_ci_f/compinit && -f $_ci_f/compdump ]]; then
       _ci_fdir=$_ci_f
+      break
+    elif [[ $_ci_f != . && -f $_ci_f/Core/compinit &&
+      -f $_ci_f/Core/compdump ]]
+    then
+      _ci_fdir=$_ci_f/Core
       break
     fi
   done
 fi
 
 if [[ -z $_ci_fdir || ! -d ${~_ci_fdir} ]]; then
-  print "Trying to find where the completion functions are..."
-  if [[ $0 = */* && -o functionargzero &&
-        -f $0:h/compinit && -f $0:h/compdump ]]; then
-    _ci_fdir=$0:h
-    print "Using my directory, $_ci_fdir"
-  else
-    # more guesses?
-    print \
+  print \
 "Please edit the name of the directory where the completion functions are
 installed.  If they are not installed, you will need to find them in the
 Completion/* directories of the zsh distribution and install them yourself,
 or insult your system manager for incompetence."
-    vared -c _ci_fdir
-    while [[ ! -d ${~_ci_fdir} || ! -f ${~_ci_fdir}/compinit || 
-      ! -f ${~_ci_fdir}/compdump ]]; do
-      print "I can't find them in that directory.  Try again or abort."
-      vared _ci_fdir
-    done
+  vared -c _ci_fdir
+  while [[ ! -d ${~_ci_fdir} || 
+    ((! -f ${~_ci_fdir}/compinit || ! -f ${~_ci_fdir}/compdump) &&
+    (! -f ${~_ci_fdir}/Core/compinit || ! -f ${~_ci_fdir}/Core/compdump)) ]]
+  do
+    print "I can't find them in that directory.  Try again or abort."
+    vared _ci_fdir
+  done
+  if [[ -f ${~_ci_fdir}/Core/compinit && ! -f ${~_ci_fdir}/compinit ]]; then
+    _ci_fdir=$_ci_fdir/Core
   fi
 else
   print "Keeping existing completion directiory $_ci_fdir"
 fi
+
 if [[ ${~_ci_fdir} != /* ]]; then
   _ci_fdir=$(cd $_ci_fdir;builtin pwd)
 fi
@@ -148,6 +137,7 @@ fi
 # Check if this is in fpath already, else put it there (with ~'s expanded).
 _ci_f=${~_ci_fdir}
 [[ -z ${fpath[(r)$_ci_f]} ]] && fpath=($_ci_f $fpath)
+
 # Contract $HOME to ~ in the parameter to be used for writing.
 _ci_fdir=${_ci_fdir/#$HOME/\~}
 
@@ -166,7 +156,7 @@ fi
 # Set up the dumpfile
 _ci_dtype=existing
 if [[ -z $_ci_dumpfile ]]; then
-  _ci_dumpfile="${_ci_fdir}/compinit.dump"
+  _ci_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
   _ci_dtype=standard
 fi
 
@@ -184,7 +174,6 @@ else
 I will force completion to dump its status, which will speed up the shell's
 start-up considerably.  However, I can't write the file I'd like to, namely
 ${_ci_dumpfile}.  Please edit a replacement."
-  _ci_dumpfile='~/.compinit.dump'
   vared _ci_dumpfile
   while ! touch ${~_ci_dumpfile} >& /dev/null; do
     print "Sorry, I can't write that either.  Try again."
@@ -193,7 +182,10 @@ ${_ci_dumpfile}.  Please edit a replacement."
   [[ -s $_ci_dumpfile ]] || rm -f $_ci_dumpfile
 fi
 
-_ci_lines="${_ci_lines}. $_ci_fdir/compinit -f $_ci_fdir -d"
+_ci_lines="${_ci_lines}_compdir=$_ci_fdir
+[[ -z \$fpath[(r)\$_compdir] ]] && fpath=(\$_compdir \$fpath)
+autoload -U compinit
+compinit"
 [[ $_ci_dtype != standard ]] && _ci_lines="${_ci_lines} $_ci_dumpfile"
 _ci_lines="${_ci_lines}
 "
@@ -363,6 +355,7 @@ $_ci_lines$_ci_endline" >>$_ci_ifile &&
   print "\nSuccessfully appended lines to $_ci_ifile."
 fi
 
-TRAPINT 0
+unfunction compinstall
+autoload -U compinstall
 
 return 0

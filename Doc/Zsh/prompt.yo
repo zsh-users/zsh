@@ -95,6 +95,16 @@ Current time of day in 24-hour format, with seconds.
 item(tt(%n))(
 tt($USERNAME).
 )
+item(tt(%N))(
+The name of the script, sourced file, or shell function that zsh is
+currently executing, whichever was started most recently.  If there is
+none, this is equivalent to the parameter tt($0).
+)
+item(tt(%i))(
+The line number currently being executed in the script, sourced file, or
+shell function given by tt(%N).  This is most useful for debugging as part
+of tt($PS4).
+)
 item(tt(%w))(
 The date in var(day)tt(-)var(dd) format.
 )
@@ -122,7 +132,9 @@ item(tt(%_))(
 The status of the parser, i.e. the shell constructs (like `tt(if)' and
 `tt(for)') that have been started on the command line. If given an integer
 number that many strings will be printed; zero or no integer means
-print as many as there are.
+print as many as there are.  This is most useful in prompts tt(PS2) for
+continuation lines and tt(PS4) for debugging with the tt(XTRACE) option; in
+the latter case it will also work non-interactively.
 )
 item(tt(%E))(
 Clears to end of line.

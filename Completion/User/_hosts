@@ -1,3 +1,5 @@
-#compdef ftp ncftp ping rwho rup xping traceroute nslookup
+#compdef ftp ncftp ping rwho rup xping traceroute nslookup telnet
 
-compgen -k hosts
+: ${(A)hosts:=${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+
+compgen -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' -k hosts

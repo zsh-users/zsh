@@ -299,8 +299,11 @@ The current hostname.
 )
 vindex(LINENO)
 item(tt(LINENO) <S>)(
-The line number of the current line within the current script
-being executed.
+The line number of the current line within the current script, sourced
+file, or shell function being executed, whichever was started most
+recently.  Note that in the case of shell functions the line
+number refers to the function as it appeared in the original definition,
+not necesarily as displayed by the tt(functions) builtin.
 )
 vindex(LOGNAME)
 item(tt(LOGNAME))(
@@ -647,7 +650,9 @@ The default is `tt(?# )'.
 )
 vindex(PS4)
 item(tt(PS4) <S>)(
-The execution trace prompt.  Default is `tt(PLUS() )'.
+The execution trace prompt.  Default is `tt(PLUS()%N:%i> )', which displays
+the name of the current shell structure and the line number within it.
+In sh or ksh emulation, the default is `tt(PLUS() )'.
 )
 vindex(PROMPT)
 xitem(tt(PROMPT) <S> <Z>)
@@ -857,6 +862,19 @@ vindex(WORDCHARS)
 item(tt(WORDCHARS) <S>)(
 A list of non-alphanumeric characters considered part of a word
 by the line editor.
+)
+vindex(ZBEEP)
+item(tt(ZBEEP))(
+If set, this gives a string of characters, which can use all the same codes
+as the tt(bindkey) command as described in
+ifzman(zmanref(zshzle))\
+ifnzman(noderef(Zsh Line Editor))\
+, that will be output to the terminal
+instead of beeping.  This may have a visible instead of an audible effect;
+for example, the string `tt(\e[?5h\e[?5l)' on a vt100 or xterm will have
+the effect of flashing reverse video on and off (if you usually use reverse
+video, you should use the string `tt(\e[?5l\e[?5h)' instead).  This takes
+precedence over the tt(NOBEEP) option.
 )
 vindex(ZDOTDIR)
 item(tt(ZDOTDIR))(

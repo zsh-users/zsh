@@ -36,6 +36,7 @@ typedef struct patcomp   *Patcomp;
 typedef struct cmatcher  *Cmatcher;
 typedef struct cmlist    *Cmlist;
 typedef struct cpattern  *Cpattern;
+typedef struct menuinfo  *Menuinfo;
 
 /* node for compctl hash table (compctltab) */
 
@@ -266,6 +267,19 @@ struct cpattern {
 #define CFN_FIRST   1
 #define CFN_DEFAULT 2
 
+/* Information about menucompletion stuff. */
+
+struct menuinfo {
+    Cmgroup group;		/* position in the group list */
+    Cmatch *cur;		/* match currently inserted */
+    int pos;			/* begin on line */
+    int len;			/* length of inserted string */
+    int end;			/* end on the line */
+    int we;			/* non-zero if the cursor was at the end */
+    int insc;			/* length of suffix inserted */
+    int asked;			/* we asked if the list should be shown */
+};
+
 /* Flags for compadd and addmatches(). */
 
 #define CAF_QUOTE    1
@@ -297,6 +311,16 @@ struct cadata {
     char *apar;			/* array to store matches in (-A) */
     char *opar;			/* array to store originals in (-O) */
     char *dpar;			/* array to delete non-matches in (-D) */
+};
+
+/* Data given to hooks. */
+
+typedef struct chdata *Chdata;
+
+struct chdata {
+    Cmgroup matches;		/* the matches generated */
+    int num;			/* the number of matches */
+    Cmatch cur;			/* current match or NULL */
 };
 
 /* Flags for special parameters. */

@@ -586,7 +586,10 @@ killjb(Job jn, int sig)
  
                 for (pn = jn->procs; pn->next; pn = pn->next)
                     err = kill(pn->pid, sig);
- 
+
+		if (!jobtab[jn->other].procs && pn)
+		    err = kill(pn->pid, sig);
+
                 return err;
             }
  

@@ -5,7 +5,7 @@
 #    and the string doesn't begin with ~, /, ./ or ../.
 #  - In the second argument to cd for the form `cd old new', completes
 #    possible `new' strings by examining `old' and $PWD.
-#  - After pushd - or pushd +, completes numbers, but the listing
+#  - After - or +, completes numbers, but the listing
 #    gives you the list of directories to complete.  This turns on
 #    menu-completion and lists the possibilities automatically, otherwise
 #    it's not a lot of use.  If you don't type the + or - it will
@@ -25,7 +25,7 @@ if [[ CURRENT -eq 3 ]]; then
   # Now remove all the common parts of $PWD and the completions from this
   rep=(${${rep#${PWD%%$words[2]*}}%${PWD#*$words[2]}})
   (( ! $#rep )) || compadd $rep
-elif [[ $words[1] = pu* && $PREFIX = [-+]* ]]; then
+elif [[ $PREFIX = [-+]* ]]; then
   # pushd: just complete the numbers, but show the full directory list with
   # numbers.
   # For - we do the same thing, but reverse the numbering (other

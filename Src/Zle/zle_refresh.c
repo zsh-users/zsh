@@ -495,7 +495,7 @@ zrefresh(void)
     /* if old line and new line are different,
        see if we can insert/delete a line to speed up update */
 
-	if (ln < olnct - 1 && !(hasam && vcs == winw) &&
+	if (ln > 0 && ln < olnct - 1 && !(hasam && vcs == winw) &&
 	    nbuf[ln] && obuf[ln] &&
 	    strncmp(nbuf[ln], obuf[ln], 16)) {
 	    if (tccan(TCDELLINE) && obuf[ln + 1] && obuf[ln + 1][0] &&

@@ -409,19 +409,11 @@ showmsg(char const *msg)
 /* handle the error flag */
 
 /**/
-void
-feep(void)
+int
+handlefeep(char **args)
 {
-    feepflag = 1;
-}
-
-/**/
-void
-handlefeep(void)
-{
-    if(feepflag)
-	zbeep();
-    feepflag = 0;
+    zbeep();
+    return 0;
 }
 
 /***************/
@@ -559,10 +551,8 @@ undo(char **args)
 {
     handleundo();
     do {
-	if(!curchange->prev) {
-	    feep();
+	if(!curchange->prev)
 	    return 1;
-	}
 	unapplychange(curchange = curchange->prev);
     } while(curchange->flags & CH_PREV);
     setlastline();
@@ -598,10 +588,8 @@ redo(char **args)
 {
     handleundo();
     do {
-	if(!curchange->next) {
-	    feep();
+	if(!curchange->next)
 	    return 1;
-	}
 	applychange(curchange);
 	curchange = curchange->next;
     } while(curchange->prev->flags & CH_NEXT);

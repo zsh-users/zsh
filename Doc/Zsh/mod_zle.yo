@@ -72,6 +72,17 @@ be empty.
 )
 enditem()
 
+To use a newly created keymamp, it should be linked to tt(main).  Hence
+the sequence of commands to create and use a new keymap `tt(mymap)'
+initialized from the tt(emacs) keymap (which remains unchanged) is:
+
+example(bindkey -N mymap emacs
+bindkey -A mymap main)
+
+Note that while `tt(bindkey -A) var(newmap) tt(main)' will work when
+var(newmap) is tt(emacs) or tt(viins), it will not work for tt(vicmd), as
+switching from vi insert to command mode becomes impossible.
+
 The following operations require a keymap to be selected:
 
 startitem()
@@ -161,7 +172,7 @@ cindex(widgets, calling)
 cindex(calling widgets)
 cindex(widgets, defining)
 cindex(defining widgets)
-xitem(tt(zle) tt(-l) [ tt(-L) ])
+xitem(tt(zle) tt(-l) [ tt(-L) ] [ tt(-a) ] [ var(string) ... ])
 xitem(tt(zle) tt(-D) var(widget) ...)
 xitem(tt(zle) tt(-A) var(old-widget) var(new-widget))
 xitem(tt(zle) tt(-N) var(widget) [ var(function) ])
@@ -176,7 +187,15 @@ item(tt(-l) [ tt(-L) ])(
 List all existing user-defined widgets.  If the tt(-L)
 option is used, list in the form of tt(zle)
 commands to create the widgets.
-Built-in widgets are not listed.
+
+When combined with the tt(-a) option, all widget names are listed,
+including the builtin ones. In this case the tt(-L) option is ignored.
+
+If at least one var(string) is given, nothing will be printed but the
+return status will be zero if all var(string)s are names of existing
+widgets (or of user-defined widgets if the tt(-a) flag is not given)
+and non-zero if at least one var(string) is not a name of an defined
+widget.
 )
 item(tt(-D) var(widget) ...)(
 Delete the named var(widget)s.
@@ -234,7 +253,12 @@ them.
 
 The return status reflects the success or failure of the operation carried
 out by the widget, or if it is a user-defined widget the return status of
-the shell function.
+the shell function.  
+
+A non-zero return status causes the shell to beep when the widget exits,
+unless the tt(BEEP) options was unset or the widget was called via the
+tt(zle) command.  Thus if a user defined widget requires an immediate beep,
+it should call the tt(beep) widget directly.
 )
 enditem()
 )

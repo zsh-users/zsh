@@ -50,7 +50,7 @@ static struct builtin builtins[] =
     BUILTIN("cd", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("chdir", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
-    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafilrtux", NULL),
+    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafgilrtux", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "v", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
@@ -60,7 +60,7 @@ static struct builtin builtins[] =
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "LRTUZafilrtu", "x"),
+    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "LRTUZafilrtu", "xg"),
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
     BUILTIN("fc", BINF_FCOPTS, bin_fc, 0, -1, BIN_FC, "nlreIRWAdDfEim", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
@@ -74,7 +74,7 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "nrdDfEim", "l"),
-    BUILTIN("integer", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "lrtux", "i"),
+    BUILTIN("integer", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "glrtux", "i"),
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", 0, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
@@ -93,7 +93,7 @@ static struct builtin builtins[] =
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", BINF_R, bin_fc, 0, -1, BIN_FC, "nrl", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "rzu0123456789pkqecnAlE", NULL),
-    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafiltux", "r"),
+    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafgiltux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "dfv", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL, bin_set, 0, -1, 0, NULL, NULL),
@@ -107,7 +107,7 @@ static struct builtin builtins[] =
     BUILTIN("trap", BINF_PSPECIAL, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsw", "v"),
-    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafilrtuxm", NULL),
+    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafgilrtuxm", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "m", "a"),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, 0, "m", "f"),
@@ -120,7 +120,9 @@ static struct builtin builtins[] =
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
 
 #ifdef DYNAMIC
-    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcdipu", NULL),
+    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcdipue", NULL),
+#else
+    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "e", NULL),
 #endif
 };
 
@@ -1492,8 +1494,14 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 {
     int usepm, tc, keeplocal = 0;
 
-    /* use the existing pm? */
-    usepm = pm && !(pm->flags & (PM_UNSET | PM_AUTOLOAD));
+    /*
+     * Do we use the existing pm?  Note that this isn't the end of the
+     * story, because if we try and create a new pm at the same
+     * locallevel as an unset one we use the pm struct anyway: that's
+     * handled in createparam().  Here we just avoid using it for the
+     * present tests if it's unset.
+     */
+    usepm = pm && !(pm->flags & PM_UNSET);
 
     /* Always use an existing pm if special at current locallevel */
     if (pm && (pm->flags & PM_SPECIAL) && pm->level == locallevel)
@@ -1502,15 +1510,15 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     /*
      * Don't use a non-special existing param if
      *   - the local level has changed, and
-     *   - the function is not `export'.
+     *   - we are really locallizing the parameter
      */
     if (usepm && !(pm->flags & PM_SPECIAL) &&
-	locallevel != pm->level && func != BIN_EXPORT)
+	locallevel != pm->level && (on & PM_LOCAL))
 	usepm = 0;
 
     /* attempting a type conversion, or making a tied colonarray? */
     if ((tc = usepm && (((off & pm->flags) | (on & ~pm->flags)) &
-			(PM_INTEGER|PM_HASHED|PM_ARRAY|PM_TIED))))
+			(PM_INTEGER|PM_HASHED|PM_ARRAY|PM_TIED|PM_AUTOLOAD))))
 	usepm = 0;
     if (tc && (pm->flags & PM_SPECIAL)) {
 	zerrnam(cname, "%s: can't change type of a special parameter",
@@ -1519,6 +1527,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     }
 
     if (usepm) {
+	on &= ~PM_LOCAL;
 	if (!on && !roff && !value) {
 	    paramtab->printnode((HashNode)pm, 0);
 	    return pm;
@@ -1605,7 +1614,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 
     if (keeplocal)
 	pm->level = keeplocal;
-    else if (func != BIN_EXPORT)
+    else if (on & PM_LOCAL)
 	pm->level = locallevel;
     if (value && !(pm->flags & (PM_ARRAY|PM_HASHED)))
 	setsparam(pname, ztrdup(value));
@@ -1677,6 +1686,9 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	scanhashtable(paramtab, 1, on|roff, 0, paramtab->printnode, printflags);
 	return 0;
     }
+
+    if (!ops['g'])
+	on |= PM_LOCAL;
 
     if (on & PM_TIED) {
 	Param apm;
@@ -3074,7 +3086,7 @@ bin_emulate(char *nam, char **argv, char *ops, int func)
 {
     emulate(*argv, ops['R']);
     if (ops['L'])
-	dosetopt(LOCALOPTIONS, 1, 0);
+	opts[LOCALOPTIONS] = opts[LOCALTRAPS] = 1;
     return 0;
 }
 

@@ -106,13 +106,7 @@ struct modifier zmod;
 /**/
 int prefixflag;
 
-/* != 0 if there is a pending beep (usually indicating an error) */
-
-/**/
-int feepflag;
- 
 /* Number of characters waiting to be read by the ungetkeys mechanism */
-
 /**/
 int kungetct;
 
@@ -507,6 +501,7 @@ zleread(char *lp, char *rp, int flags)
 	viinsbegin = 0;
 	statusline = NULL;
 	selectkeymap("main", 1);
+	selectlocalmap(NULL);
 	fixsuffix();
 	if ((s = (unsigned char *)getlinknode(bufstack))) {
 	    setline((char *)s);
@@ -535,20 +530,21 @@ zleread(char *lp, char *rp, int flags)
 	lastcol = -1;
 	initmodifier(&zmod);
 	prefixflag = 0;
-	feepflag = 0;
 	zrefresh();
 	while (!done && !errflag) {
 
 	    statusline = NULL;
 	    vilinerange = 0;
 	    reselectkeymap();
+	    selectlocalmap(NULL);
 	    bindk = getkeycmd();
 	    if (!ll && isfirstln && c == eofchar) {
 		eofsent = 1;
 		break;
 	    }
 	    if (bindk) {
-		execzlefunc(bindk, zlenoargs);
+		if (execzlefunc(bindk, zlenoargs))
+		    handlefeep(zlenoargs);
 		handleprefixes();
 		/* for vi mode, make sure the cursor isn't somewhere illegal */
 		if (invicmdmode() && cs > findbol() &&
@@ -573,7 +569,6 @@ zleread(char *lp, char *rp, int flags)
 #endif
 		if (!kungetct)
 		    zrefresh();
-	    handlefeep();
 	}
 	statusline = NULL;
 	invalidatelist();
@@ -613,7 +608,7 @@ execzlefunc(Thingy func, char **args)
 	zsfree(nm);
 	showmsg(msg);
 	zsfree(msg);
-	feep();
+	ret = 1;
     } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_NCOMP)) {
 	int wflags = w->flags;
 
@@ -646,7 +641,7 @@ execzlefunc(Thingy func, char **args)
 	    zsfree(nm);
 	    showmsg(msg);
 	    zsfree(msg);
-	    feep();
+	    ret = 1;
 	} else {
 	    int osc = sfcontext, osi = movefd(0), olv = lastval;
 	    LinkList largs = NULL;
@@ -953,7 +948,17 @@ trashzle(void)
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLR", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcR",  NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRa",  NULL),
+};
+
+/* The order of the entries in this table has to match the *HOOK
+ * macros in zle.h */
+
+/**/
+struct hookdef zlehooks[] = {
+    HOOKDEF("list_matches", ilistmatches, 0),
+    HOOKDEF("insert_match", NULL, HOOKF_ALL),
+    HOOKDEF("menu_start", NULL, HOOKF_ALL),
 };
 
 /**/
@@ -999,6 +1004,7 @@ int
 boot_zle(Module m)
 {
     addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    addhookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return 0;
 }
 
@@ -1014,6 +1020,7 @@ cleanup_zle(Module m)
 	return 1;
     }
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    deletehookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return 0;
 }
 

@@ -92,12 +92,17 @@ matches to insert into the command line can be selected from this
 list. In the list one match is highlighted using the value for tt(ma)
 from the tt(ZLS_COLORS) or tt(ZLS_COLOURS) parameter. The default
 value for this it `tt(7)' which forces the selected match to be
-highlighted using standout mode on a vt100 compatible terminal.
+highlighted using standout mode on a vt100 compatible terminal. If
+neither tt(ZLS_COLORS) nor tt(ZLS_COLOURS) is set, the same terminal
+control sequence is used as for the `tt(%S)' escape in prompts.
 
 Selecting matches is done by moving the mark around using the zle movement
 functions. The zle functions tt(send-break) and tt(accept-line) can be used
 to leave menu-selection, leaving the match currently inserted into the line
-in place. The functions tt(accept-and-hold) and
+in place. In the case of tt(accept-line), the match currently inserted
+will be accepted and the immediatly trying completion again will
+complete after it. Using tt(send-break) leaves menu-selection and
+continues with normal menu-completion. The functions tt(accept-and-hold) and
 tt(accept-and-menu-complete) can be used to accept the match currently
 inserted and continue inserting matches after that. Matches inserted this
 way can be removed by invoking the tt(undo) function. Keys bound to one of
@@ -116,4 +121,9 @@ keys in the the tt(menuselect) keymap can be modified directly using the
 tt(bindkey) builtin command (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The zle Module))\
-).
+). For example, to make the return key leave menu-selection and
+continue with normal menu-completion one can call
+
+indent(tt(bindkey -M menuselect '^J' send-break))
+
+after loading the tt(complist) module.

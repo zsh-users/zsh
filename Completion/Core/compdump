@@ -1,4 +1,4 @@
-# This is a file to be sourced to dump the definitions for new-style
+# This is a function to dump the definitions for new-style
 # completion defined by 'compinit' in the same directory.  The output
 # should be directed into the "compinit.dump" in the same directory as
 # compinit. If you rename init, just stick .dump onto the end of whatever
@@ -9,11 +9,13 @@
 # To do this, simply remove the .dump file, start a new shell, and
 # create the .dump file as before.  Again, compinit -d handles this
 # automatically.
-#
-# It relies on KSH_ARRAYS not being set.
 
 # Print the number of files used for completion. This is used in compinit
 # to see if auto-dump should re-dump the dump-file.
+
+emulate -L zsh
+
+typeset _d_file _d_f _d_bks _d_line _d_als
 
 _d_file=${compconfig[dumpfile]-${0:h}/compinit.dump}
 
@@ -21,8 +23,6 @@ typeset -U _d_files
 _d_files=( ${^~fpath}/_(|*[^~])(N:t) )
 
 print "#files: $#_d_files" > $_d_file
-
-unset _d_files
 
 # First dump the arrays _comps and _patcomps.  The quoting hieroglyphyics
 # ensure that a single quote inside a variable is itself correctly quoted.
@@ -88,4 +88,5 @@ done >> $_d_file
 
 print >> $_d_file
 
-unset _d_line _d_zle _d_bks _d_als _d_f _f_file
+unfunction compdump
+autoload -U compdump

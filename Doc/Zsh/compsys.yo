@@ -6,51 +6,29 @@ cindex(completion, controlling)
 sect(Description)
 
 This describes the shell code for the new completion system.  It consists
-of two scripts and a few other files that define shell functions.
-The shell functions which implement completion behaviour and which may
-be bound to keystrokes, are referred to as `widgets'.  All are contained
-in the following subdirectories of the tt(Completion) directory of the main
-distribution directory.
-
-startitem()
-item(tt(Core))(
-The core scripts and functions.  You will certainly need these, though will
-probably not need to alter them.  The contents of this directory is
-described in more detail below.
-)
-item(tt(Base))(
-Other functions you will almost certainly want if you are going to use
-any of the standard completion functions.  You may want to edit some of
-these files.
-)
-item(tt(Builtins))(
-Functions for completing arguments of shell builtin commands.
-)
-item(tt(User))(
-Functions for completing arguments of external commands and suites of
-commands.  They may need modifying for your system.
-)
-item(tt(Commands))(
-Functions which implement special types of completion to be bound to
-keystrokes rather than called by context.
-)
-enditem()
-
-You should decide which files you will be using and copy them to a
-directory (or multiple directories) of your own which should appear in your
-tt($fpath) variable so that the functions can be autoloaded.
+of varsious shell functions; those beginning `tt(comp)' are to be called
+directly by the user, while those beginning `tt(_)' are called by the
+completion code.  The shell functions of the second set which implement
+completion behaviour and which may be bound to keystrokes, are referred to
+as `widgets'.
 
 startmenu()
 menu(Initialization)
 menu(Control Functions)
 menu(Completion Functions)
+menu(Completion Directories)
 endmenu()
 
 texinode(Initialization)(Control Functions)()(Completion System)
 sect(Initialization)
 
-The script tt(compinstall) can be run by a user to set up the completion
-system for use.  It will usually insert code into tt(.zshrc), although if
+The function tt(compinstall) can be run by a user to set up the completion
+system for use, which also provides options for more advanced usage.
+However, if the system was installed completely, it should be enough to
+call the shell function tt(compinit) from your initialization file; see the
+next section.
+
+Usually, tt(compinstall) will insert code into tt(.zshrc), although if
 that is not writable it will save it in another file and tell you that
 file's locations.  Note that it is up to you to make sure that the lines
 added to tt(.zshrc) are actually run; you may, for example, need to move
@@ -62,10 +40,10 @@ this section by hand is likely to be lost if you rerun tt(compinstall).
 The new code will take effect next time you start the shell, or run
 tt(.zshrc) by hand.
 
-You can run it as `tt(source )var(<path>)tt(/compinstall)' or
-`tt(. )var(<path>)tt(/compinstall)', where var(<path>) is where the
-completion functions are stored.  It will ask you various questions about
-how you would like completion set up.  It is in two parts; the basic part
+To run it, you will need to make sure it is in a directory mentioned in your
+tt($fpath) parameter, and that it is autoloaded (`tt(autoload -U
+compinstall)' is recommended).  It will ask you various questions about how
+you would like completion set up.  It is in two parts; the basic part
 locates the completion files and decides where to put your personal
 dumpfile, used to speed up initialization after the first time.  After
 that, you will be asked if you wish to go on to the advanced set-up; if you
@@ -86,30 +64,21 @@ This section describes the use of tt(compinit) to initialize completion for
 the current session when run directly by the user; if you have run
 tt(compinstall) it will be called automatically from your tt(.zshrc).
 
-To initialize the system, the script tt(compinit) should be sourced with
-`tt(source )var(<path>)tt(/compinit)' or
-`tt(. )var(<path>)tt(/compinit)'. This will define a few utility functions,
-arrange for all the necessary shell functions to be autoloaded, and will
-then re-bind all keys that do completion to use the new system.
+To initialize the system, the function tt(compinit) should be in a
+directory mentioned in the tt($fpath) variable, and should be autoloaded
+(`tt(autoload -U compinit)' is recommended).  When run, it will define a
+few utility functions, arrange for all the necessary shell functions to be
+autoloaded, and will then re-bind all keys that do completion to use the
+new system.
 
 To speed up the running of tt(compinit), it can be made to produce a dumped
-configuration which will be read in on future invocations.  The easiest way
-to do this is by adding the option tt(-d) whenever tt(compinit) is sourced.
-In this case the dumped file will have the same name as the sourced file,
-but with tt(.dump) appended to the end, or, if that is not writable by the
-user, the file tt(.zcompdump) in the same directory as the startup files
-(i.e. tt($ZDOTDIR) or tt($HOME)); alternatively, an explicit file name can
-be given following the tt(-d).  On the next call to tt(compinit -d), the
-dumped file will be read instead.
-
-The other option accepted by tt(compinit) is tt(-f )var(dir), which gives
-the directory in which tt(compinit) resides.  If you source tt(compinit) by
-its full pathname, and the option tt(FUNCTION_ARGZERO) is set, as it is by
-default unless tt(zsh) is emulating tt(sh) or tt(ksh), this is unnecessary
-as tt(compinit) can deduce the directory for itself.  It is used in two
-ways: to find the program tt(compdump) used by the tt(-d) option, and to
-check if the directory should be added to the function search path to find
-the completion functions (see below).
+configuration which will be read in on future invocations; this is the
+default, although it can be turned off by calling tt(compinit) with the
+option tt(-D).  The dumped file is tt(.zcompdump) in the same
+directory as the startup files (i.e. tt($ZDOTDIR) or tt($HOME));
+alternatively, an explicit file name can be given following the option
+tt(-d).  On the next call to tt(compinit -d), the dumped file will be read
+instead.
 
 If the number of completion files changes, tt(compinit) will recognise this
 and produce a new dump file.  However, if the name of a function or the
@@ -117,27 +86,34 @@ arguments in the first line of a tt(#compdef) function (as described below)
 change, it is easiest to delete the dump file by hand so that the next time
 tt(compinit) will re-create it.
 
-The dumping is actually done by another script, tt(compdump), but you will
-only need to source this yourself if you change the configuration
+The dumping is actually done by another function, tt(compdump), but you
+will only need to run this yourself if you change the configuration
 (e.g. using tt(compdef)) and then want to dump the new one.  The name of
-the old dumped file will be remembered for this.
+the old dumped file will be remembered for this purpose.
+
+If the parameter tt(_compdir) is set, tt(compinit) uses it has a directory
+where completion functions can be found; this is only necessary if they are
+not already in the function search path.
 
 subsect(Autoloaded files)
 
 The convention for autoloaded functions used in completion is that they
 start with an underscore; as already mentioned, the tt(fpath/FPATH)
-parameter must contain the directory in which they are stored.  If
-tt(compinit) does not find enough files beginning with an underscore (fewer
-than twenty) in the search path, it will try to find more by adding its own
-directory to the search path.  If you keep all the completion files in this
-directory, this means you never have to alter tt(fpath/FPATH) yourself.
+parameter must contain the directory in which they are stored.  If tt(zsh)
+was properly installed on your system, then tt(fpath/FPATH) automatically
+contains the required directories.
+
+For incomplete installations, if tt(compinit) does not find enough files
+beginning with an underscore (fewer than twenty) in the search path, it
+will try to find more by adding the directory tt(_compdir) to the search
+path; if you have run tt(compinstall), this will be set automatically.
 Furthermore, if the directory in question ends in the path segment
 tt(Core), or has a subdirectory named tt(Core), tt(compinit) will add all
 subdirectories of the directory where tt(Core) is to the path: this allows
 the functions to be in the same format as in the tt(zsh) source
 distribution.
 
-When tt(compinit) is sourced, it searches all such files accessible via
+When tt(compinit) is run, it searches all such files accessible via
 tt(fpath/FPATH) and reads the first line of each of them.  This line should
 contain one of the tags described below. Files whose first line does not
 start with one of these tags are not considered to be part of the
@@ -165,7 +141,11 @@ var(key-sequences).  It creates a widget behaving like the builtin widget
 var(style), which must be one of those that perform completion, namely
 tt(complete-word), tt(delete-char-or-list), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(list-choices), tt(menu-complete),
-tt(menu-expand-or-complete), or tt(reverse-menu-complete).
+tt(menu-expand-or-complete), or tt(reverse-menu-complete). If the
+tt(complist) module is loaded (see
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The complist Module))\
+), the tt(menu-select) widget can be used, too.
 
 The widget is then bound to all the var(key-sequences) given, if any: when
 one of the var(key-sequences) is typed, the function in the file will
@@ -248,8 +228,8 @@ enditem()
 texinode(Control Functions)(Completion Functions)(Initialization)(Completion System)
 sect(Control Functions)
 
-The initialization script tt(compinit) re-binds all the keys which perform
-completion to newly created widgets that all call the supplied widget
+The initialization script tt(compinit) redefines all the widgets
+which perform completion to call the supplied widget
 function tt(_main_complete). This function acts as a wrapper calling
 the so-called `completer' functions that generate matches. If
 tt(_main_complete) is
@@ -474,6 +454,12 @@ configuration key tt(match_original) has a value of `tt(only)', no
 `tt(*)' will be inserted. If tt(match_original) has any other non-empty
 string as its value, this completer will first try to generate matches
 without, then with a `tt(*)' inserted at the cursor position.
+
+The generated matches will be offered in a menucompletion unless the
+tt(match_insert) configuration key is set to a string starting with
+`tt(unambig)'. In this case menucompletion will only be started if no
+unambiguous string could be generated that is at least as long as the
+original string.
 )
 item(tt(_expand))(
 This completer function does not really do completion, but instead
@@ -620,7 +606,7 @@ enditem()
 )
 enditem()
 
-texinode(Completion Functions)()(Control Functions)(Completion System)
+texinode(Completion Functions)(Completion Directories)(Control Functions)(Completion System)
 sect(Utility Functions)
 
 Descriptions follow for utility functions that may be
@@ -707,10 +693,13 @@ These functions also accept the `tt(-J)', `tt(-V)', `tt(-X)', `tt(-P)',
 `tt(-S)', `tt(-q)', `tt(-r)', and `tt(-R)' options from the
 tt(compadd) builtin.
 
-Finally, the tt(_path_files) function supports one configuration key:
-tt(path_expand). If this is set to any non-empty string, the partially
+Finally, the tt(_path_files) function supports two configuration keys.
+If tt(path_expand) is set to any non-empty string, the partially
 typed path from the line will be expanded as far as possible even if
-trailing pathname components can not be completed.
+trailing pathname components can not be completed. And if
+tt(path_cursor) is set to a non-empty string, the cursor will be left
+after the first ambiguous pathname component even when menucompletion
+is used.
 )
 item(tt(_parameters))(
 This should be used to complete parameter names if you need some of the
@@ -777,5 +766,39 @@ This function also accepts the `tt(-X)', `tt(-J)', and `tt(-V)'
 options which are passed unchanged to `tt(compadd)'. Finally, it
 accepts the option `tt(-t)'; if this is given, completion is only done
 on words starting with two hyphens.
+)
+enditem()
+
+texinode(Completion Directories)()(Completion Functions)(Completion System)
+sect(Completion Directories)
+
+In the source distribution, the files are contained in various
+subdirectories of the tt(Completion) directory.  They may have been
+installed in the same structure, or into one single function directory.
+The following is a description of the files found in the original directory
+structure.  If you wish to alter an installed file, you will need to copy
+it to some directory which appears earlier in your tt(fpath) than the
+standard directory where it appears.
+
+startitem()
+item(tt(Core))(
+The core scripts and functions.  You will certainly need these, though will
+probably not need to alter them.  Many of these are docmented above.
+)
+item(tt(Base))(
+Other functions you will almost certainly want if you are going to use
+any of the standard completion functions.  You may want to edit some of
+these files.
+)
+item(tt(Builtins))(
+Functions for completing arguments of shell builtin commands.
+)
+item(tt(User))(
+Functions for completing arguments of external commands and suites of
+commands.  They may need modifying for your system.
+)
+item(tt(Commands))(
+Functions which implement special types of completion to be bound to
+keystrokes rather than called by context.
 )
 enditem()

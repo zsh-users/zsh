@@ -92,8 +92,12 @@ makerunning(Job jn)
 
     jn->stat &= ~STAT_STOPPED;
     for (pn = jn->procs; pn; pn = pn->next)
+#if 0
 	if (WIFSTOPPED(pn->status) && 
 	    (!(jn->stat & STAT_SUPERJOB) || pn->next))
+	    pn->status = SP_RUNNING;
+#endif
+        if (WIFSTOPPED(pn->status))
 	    pn->status = SP_RUNNING;
 
     if (jn->stat & STAT_SUPERJOB)
@@ -176,13 +180,14 @@ update_job(Job jn)
 		/* If we have `cat foo|while read a; grep $a bar;done'
 		 * and have hit ^Z, the sub-job is stopped, but the
 		 * super-job may still be running, waiting to be stopped
-		 * or to exit. So we have to send it a SIGSTOP. */
+		 * or to exit. So we have to send it a SIGTSTP. */
 		int i;
 
 		for (i = 1; i < MAXJOB; i++)
 		    if ((jobtab[i].stat & STAT_SUPERJOB) &&
-			jobtab[i].other == job) {
-			killpg(jobtab[i].gleader, SIGSTOP);
+			jobtab[i].other == job &&
+			jobtab[i].gleader) {
+			killpg(jobtab[i].gleader, SIGTSTP);
 			break;
 		    }
 	    }
@@ -667,6 +672,8 @@ deletejob(Job jn)
     if (jn->ty)
 	zfree(jn->ty, sizeof(struct ttyinfo));
 
+    if (jn->stat & STAT_WASSUPER)
+	deletejob(jobtab + jn->other);
     jn->gleader = jn->other = 0;
     jn->stat = jn->stty_in_env = 0;
     jn->procs = NULL;
@@ -780,22 +787,38 @@ waitjob(int job, int sig)
 	       what this might be.  --oberon
 
 	    errflag = 0; */
+	    if (subsh) {
+		killjb(jn, SIGCONT);
+		jn->stat &= ~STAT_STOPPED;
+	    }
 	    if (jn->stat & STAT_SUPERJOB) {
 		Job sj = jobtab + jn->other;
-		if (sj->stat & STAT_DONE) {
+		if ((sj->stat & STAT_DONE) || !sj->procs) {
 		    struct process *p;
 		    
 		    for (p = sj->procs; p; p = p->next)
 			if (WIFSIGNALED(p->status)) {
-			    killpg(jn->gleader, WTERMSIG(p->status));
+			    if (jn->gleader != mypgrp && jn->procs->next)
+				killpg(jn->gleader, WTERMSIG(p->status));
+			    else
+				kill(jn->procs->pid, WTERMSIG(p->status));
 			    kill(sj->other, SIGCONT);
 			    kill(sj->other, WTERMSIG(p->status));
 			    break;
 			}
 		    if (!p) {
+			int cp;
+
 			jn->stat &= ~STAT_SUPERJOB;
-			if (WIFEXITED(jn->procs->status))
-			    jn->gleader = mypgrp;
+			jn->stat |= STAT_WASSUPER;
+
+			if ((cp = ((WIFEXITED(jn->procs->status) ||
+				    WIFSIGNALED(jn->procs->status)) &&
+				   killpg(jn->gleader, 0) == -1))) {
+			    Process p;
+			    for (p = jn->procs; p->next; p = p->next);
+			    jn->gleader = p->pid;
+			}
 			/* This deleted the job too early if the parent
 			   shell waited for a command in a list that will
 			   be executed by the sub-shell (e.g.: if we have
@@ -804,6 +827,11 @@ waitjob(int job, int sig)
 			   but the parent shell gets notified for the
 			   sleep.
 			   deletejob(sj); */
+			/* If this super-job contains only the sub-shell,
+			   we have to attach the tty to our process group
+			   (which is shared by the sub-shell) now. */
+			if (!jn->procs->next || cp || jn->procs->pid != jn->gleader)
+			    attachtty(jn->gleader);
 			kill(sj->other, SIGCONT);
 		    }
 		    curjob = jn - jobtab;
@@ -813,7 +841,9 @@ waitjob(int job, int sig)
 
 		    jn->stat |= STAT_STOPPED;
 		    for (p = jn->procs; p; p = p->next)
-			p->status = sj->procs->status;
+			if (p->status == SP_RUNNING ||
+			    (!WIFEXITED(p->status) && !WIFSIGNALED(p->status)))
+			    p->status = sj->procs->status;
 		    curjob = jn - jobtab;
 		    printjob(jn, !!isset(LONGLISTJOBS), 1);
 		    break;
@@ -1232,7 +1262,14 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		fflush(shout);
 		if (func != BIN_WAIT) {		/* fg */
 		    thisjob = job;
-		    attachtty(jobtab[job].gleader);
+		    if ((jobtab[job].stat & STAT_SUPERJOB) &&
+			((!jobtab[job].procs->next ||
+			  WIFEXITED(jobtab[job].procs->status) ||
+			  WIFSIGNALED(jobtab[job].procs->status))) &&
+			jobtab[jobtab[job].other].gleader)
+			attachtty(jobtab[jobtab[job].other].gleader);
+		    else
+			attachtty(jobtab[job].gleader);
 		}
 	    }
 	    if (stopped) {

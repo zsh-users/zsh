@@ -235,10 +235,10 @@ parseargs(char **argv)
 		else
 		    dosetopt(optno, action, 1);
               break;
-	    } else if (isspace(**argv)) {
+	    } else if (isspace(STOUC(**argv))) {
 		/* zsh's typtab not yet set, have to use ctype */
 		while (*++*argv)
-		    if (!isspace(**argv)) {
+		    if (!isspace(STOUC(**argv))) {
 			zerr("bad option string: `%s'", args, 0);
 			exit(1);
 		    }
@@ -615,7 +615,8 @@ setupvals(void)
 	prompt2 = ztrdup("%_> ");
     }
     prompt3 = ztrdup("?# ");
-    prompt4 = ztrdup("+ ");
+    prompt4 = (emulation == EMULATE_KSH || emulation == EMULATE_SH)
+	? ztrdup("+ ") : ztrdup("+%N:%i> ");
     sprompt = ztrdup("zsh: correct '%R' to '%r' [nyae]? ");
 
     ifs         = ztrdup(DEFAULT_IFS);

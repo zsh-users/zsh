@@ -143,3 +143,9 @@ typedef struct cutbuffer *Cutbuffer;
 #define CUTBUFFER_LINE 1   /* for vi: buffer contains whole lines of data */
 
 #define KRINGCT 8   /* number of buffers in the kill ring */
+
+/* Convenience macros for the hooks */
+
+#define LISTMATCHESHOOK (zlehooks + 0)
+#define INSERTMATCHHOOK (zlehooks + 1)
+#define MENUSTARTHOOK   (zlehooks + 2)

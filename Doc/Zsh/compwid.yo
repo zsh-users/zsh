@@ -238,7 +238,9 @@ upwards (e.g. `tt(2:4)' specifies the fourth match of the second group).
 Negative numbers count backward from the last match or group (with `tt(-1)'
 selecting the last match or group) and out-of-range values are wrapped
 around, so that a value of zero selects the last match or group and a value
-one more than the maximum selects the first.
+one more than the maximum selects the first. Unless the value of this
+key ends in a space, the match is inserted as in a menu-completion,
+i.e. without automatically appending a space.
 )
 item(tt(to_end))(
 Specifies the occasions on which the cursor is moved to the end of a string

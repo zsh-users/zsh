@@ -198,7 +198,7 @@ getcoldef(Listcols c, char *s)
 
 /* This initializes the given terminal color structure. */
 
-static int
+static void
 getcols(Listcols c)
 {
     char *s;
@@ -206,16 +206,17 @@ getcols(Listcols c)
 
     if (!(s = getsparam("ZLS_COLORS")) &&
 	!(s = getsparam("ZLS_COLOURS"))) {
-	if (!c)
-	    return 1;
 	for (i = 0; i < NUM_COLS; i++)
 	    c->cols[i] = "";
-	
 	c->exts = NULL;
-	return 1;
+	
+	if (!(c->cols[COL_MA] = tcstr[TCSTANDOUTBEG]) ||
+	    !c->cols[COL_MA][0])
+	    c->cols[COL_MA] = "";
+	else
+	    c->cols[COL_EC] = tcstr[TCSTANDOUTEND];
+	return;
     }
-    if (!c)
-	return 0;
     /* We have one of the parameters, use it. */
     memset(c, 0, sizeof(*c));
     s = dupstring(s);
@@ -230,48 +231,65 @@ getcols(Listcols c)
     if (!c->cols[COL_MI])
 	c->cols[COL_MI] = c->cols[COL_FI];
 
-    if (!c->cols[COL_EC]) {
-	char *e = (char *) zhalloc(strlen(c->cols[COL_LC]) +
-				   strlen(c->cols[COL_NO]) +
-				   strlen(c->cols[COL_RC]) + 1);
+    return;
+}
 
-	/* If no `ec' was given, we is `<lc><no><rc>' as the default. */
-	strcpy(e, c->cols[COL_LC]);
-	strcat(e, c->cols[COL_NO]);
-	strcat(e, c->cols[COL_RC]);
-	c->cols[COL_EC] = e;
+static int last_col = COL_NO;
+
+static void
+zcputs(Listcols c, int colour)
+{
+    if (colour != last_col
+	&& (last_col < COL_NO
+	    || strcmp(c->cols[last_col], c->cols[colour]))) {
+	fputs(c->cols[COL_LC], shout);
+	fputs(c->cols[colour], shout);
+	fputs(c->cols[COL_RC], shout);
+	last_col = colour;
     }
-    return 0;
+    return;
 }
 
 /* Get the terminal color string for the file with the given name and
  * file modes. */
 
-static char *
-getcolstr(Listcols c, char *n, mode_t m)
+static void
+putcolstr(Listcols c, char *n, mode_t m)
 {
+    int colour;
     Extcol e;
 
     for (e = c->exts; e; e = e->next)
-	if (strsfx(e->ext, n))
-	    return e->col;
+	if (strsfx(e->ext, n)) {	/* XXX: unoptimised if used */
+	    if (last_col < COL_NO
+		|| strcmp(c->cols[last_col], e->col)) {
+		fputs(c->cols[COL_LC], shout);
+		fputs(e->col, shout);
+		fputs(c->cols[COL_RC], shout);
+	    }
+	    last_col = COL_NO - 1;
+	    return;
+	}
 
     if (S_ISDIR(m))
-	return c->cols[COL_DI];
+	colour = COL_DI;
     else if (S_ISLNK(m))
-	return c->cols[COL_LN];
+	colour = COL_LN;
     else if (S_ISFIFO(m))
-	return c->cols[COL_PI];
+	colour = COL_PI;
     else if (S_ISSOCK(m))
-	return c->cols[COL_SO];
+	colour = COL_SO;
     else if (S_ISBLK(m))
-	return c->cols[COL_BD];
+	colour = COL_BD;
     else if (S_ISCHR(m))
-	return c->cols[COL_CD];
+	colour = COL_CD;
     else if (S_ISREG(m) && (m & S_IXUGO))
-	return c->cols[COL_EX];
+	colour = COL_EX;
+    else
+	colour = COL_FI;
 
-    return c->cols[COL_FI];
+    zcputs(c, colour);
+    return;
 }
 
 /* Information about the list shown. */
@@ -505,14 +523,15 @@ complistmatches(Hookdef dummy, Chdata dat)
 		mc = 0;
 		q = p;
 		while (n && i--) {
-		    fputs(col.cols[COL_LC], shout);
 		    if (!(m = *q)) {
-			fputs(col.cols[COL_MI], shout);
-			fputs(col.cols[COL_RC], shout);
+			zcputs(&col, COL_MI);
 			a = longest - 2;
 			while (a--)
 			    putc(' ', shout);
-			fputs(col.cols[COL_EC], shout);
+			if (col.cols[COL_EC])
+			    fputs(col.cols[COL_EC], shout);
+			else
+			    zcputs(&col, COL_NO);
 			break;
 		    }
 		    hasm = 1;
@@ -539,20 +558,18 @@ complistmatches(Hookdef dummy, Chdata dat)
 
 			zt = ztat(pb, &buf, 1);
 			if (cc >= 0)
-			    fputs(col.cols[cc], shout);
+			    zcputs(&col, cc);
 			else if (zt)
-			    fputs(col.cols[COL_NO], shout);
+			    zcputs(&col, COL_NO);
 			else
-			    fputs(getcolstr(&col, pb, buf.st_mode), shout);
-			fputs(col.cols[COL_RC], shout);
+			    putcolstr(&col, pb, buf.st_mode);
 			nicezputs(m->str, shout);
 			if (zt)
 			    putc(' ', shout);
 			else
 			    putc(file_type(buf.st_mode), shout);
 		    } else {
-			fputs(col.cols[cc >= 0 ? cc : COL_NO], shout);
-			fputs(col.cols[COL_RC], shout);
+			zcputs(&col, cc >= 0 ? cc : COL_NO);
 			nicezputs(m->str, shout);
 			if (of)
 			    putc(' ', shout);
@@ -560,13 +577,17 @@ complistmatches(Hookdef dummy, Chdata dat)
 		    a = longest - niceztrlen(m->str) - 2 - of;
 		    while (a--)
 			putc(' ', shout);
-		    fputs(col.cols[COL_EC], shout);
-		    if (i) {
-			fputs(col.cols[COL_LC], shout);
-			fputs(col.cols[COL_NO], shout);
-			fputs(col.cols[COL_RC], shout);
-			fputs("  ", shout);
+		    if (col.cols[COL_EC])
 			fputs(col.cols[COL_EC], shout);
+		    else
+			zcputs(&col, COL_NO);
+		    if (i) {
+			zcputs(&col, COL_NO);
+			fputs("  ", shout);
+			if (col.cols[COL_EC])
+			    fputs(col.cols[COL_EC], shout);
+			else
+			    zcputs(&col, COL_NO);
 		    }
 		    if (--n)
 			for (j = nc; j && *q; j--)
@@ -574,13 +595,14 @@ complistmatches(Hookdef dummy, Chdata dat)
 		    mc++;
 		}
 		if (i > 0) {
-		    fputs(col.cols[COL_LC], shout);
-		    fputs(col.cols[COL_MI], shout);
-		    fputs(col.cols[COL_RC], shout);
+		    zcputs(&col, COL_MI);
 		    a = longest - 2;
 		    while (a--)
 			putc(' ', shout);
-		    fputs(col.cols[COL_EC], shout);
+		    if (col.cols[COL_EC])
+			fputs(col.cols[COL_EC], shout);
+		    else
+			zcputs(&col, COL_NO);
 		}
 		if (n) {
 		    putc('\n', shout);
@@ -627,12 +649,12 @@ domenuselect(Hookdef dummy, Chdata dat)
     Cmgroup *pg;
     Thingy cmd;
     Menustack u = NULL;
-    int i = 0;
+    int i = 0, acc = 0;
     char *s;
 
-    if (getcols(NULL) || (dummy && (!(s = getsparam("SELECTMIN")) ||
-				    (dat && dat->num < atoi(s)))))
-	return 1;
+    if (dummy && (!(s = getsparam("SELECTMIN")) ||
+		  (dat && dat->num < atoi(s))))
+	return 0;
 
     selectlocalmap(mskeymap);
     noselect = 0;
@@ -659,10 +681,12 @@ domenuselect(Hookdef dummy, Chdata dat)
 
     getk:
 
-	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak) ||
-	    cmd == Th(z_acceptline))
+	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak))
 	    break;
-	else if (cmd == Th(z_acceptandhold) ||
+	else if (cmd == Th(z_acceptline)) {
+	    acc = 1;
+	    break;
+	} else if (cmd == Th(z_acceptandhold) ||
 		 cmd == Th(z_acceptandmenucomplete)) {
 	    Menustack s = (Menustack) zhalloc(sizeof(*s));
 
@@ -825,11 +849,16 @@ domenuselect(Hookdef dummy, Chdata dat)
     selectlocalmap(NULL);
     mselect = -1;
     inselect = 0;
+    if (acc) {
+	menucmp = 0;
+	lastambig = 0;
+	do_single(*(minfo.cur));
+    }
     if (!noselect) {
 	showinglist = -2;
 	zrefresh();
     }
-    return noselect;
+    return (!noselect ^ acc);
 }
 
 /* The widget function. */

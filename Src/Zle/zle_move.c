@@ -228,7 +228,6 @@ vimatchbracket(char **args)
 
   otog:
     if (cs == ll || line[cs] == '\n') {
-	feep();
 	cs = ocs;
 	return 1;
     }
@@ -273,7 +272,6 @@ vimatchbracket(char **args)
 	    ct++;
     }
     if (cs < 0 || cs >= ll) {
-	feep();
 	cs = ocs;
 	return 1;
     } else if(dir > 0 && virangeflag)
@@ -295,10 +293,8 @@ viforwardchar(char **args)
 	zmult = n;
 	return ret;
     }
-    if (cs >= lim) {
-	feep();
+    if (cs >= lim)
 	return 1;
-    }
     while (n-- && cs < lim)
 	cs++;
     return 0;
@@ -317,10 +313,8 @@ vibackwardchar(char **args)
 	zmult = n;
 	return ret;
     }
-    if (cs == findbol()) {
-	feep();
+    if (cs == findbol())
 	return 1;
-    }
     while (n--) {
 	cs--;
 	if (cs < 0 || line[cs] == '\n') {
@@ -337,14 +331,11 @@ viendofline(char **args)
 {
     int oldcs = cs, n = zmult;
 
-    if (n < 1) {
-	feep();
+    if (n < 1)
 	return 1;
-    }
     while(n--) {
 	if (cs > ll) {
 	    cs = oldcs;
-	    feep();
 	    return 1;
 	}
 	cs = findeol() + 1;
@@ -385,7 +376,7 @@ vifindprevchar(char **args)
 	tailadd = 0;
 	return virepeatfind(args);
     }
-    return 0;
+    return 1;
 }
 
 /**/
@@ -418,10 +409,8 @@ virepeatfind(char **args)
 {
     int ocs = cs, n = zmult;
 
-    if (!vfinddir) {
-	feep();
+    if (!vfinddir)
 	return 1;
-    }
     if (n < 0) {
 	int ret;
 	zmult = -n;
@@ -434,7 +423,6 @@ virepeatfind(char **args)
 	    cs += vfinddir;
 	while (cs >= 0 && cs < ll && line[cs] != vfindchar && line[cs] != '\n');
 	if (cs < 0 || cs >= ll || line[cs] == '\n') {
-	    feep();
 	    cs = ocs;
 	    return 1;
 	}
@@ -480,10 +468,8 @@ visetmark(char **args)
     int ch;
 
     ch = getkey(0);
-    if (ch < 'a' || ch > 'z') {
-	feep();
+    if (ch < 'a' || ch > 'z')
 	return 1;
-    }
     ch -= 'a';
     vimarkcs[ch] = cs;
     vimarkline[ch] = histline;
@@ -500,19 +486,14 @@ vigotomark(char **args)
     if (ch == c)
 	ch = 26;
     else {
-	if (ch < 'a' || ch > 'z') {
-	    feep();
+	if (ch < 'a' || ch > 'z')
 	    return 1;
-	}
 	ch -= 'a';
     }
-    if (!vimarkline[ch]) {
-	feep();
+    if (!vimarkline[ch])
 	return 1;
-    }
     if (curhist != vimarkline[ch] && !zle_goto_hist(vimarkline[ch], 0, 0)) {
 	vimarkline[ch] = 0;
-	feep();
 	return 1;
     }
     cs = vimarkcs[ch];

@@ -57,7 +57,6 @@
 #    `%o' in this string will be replaced by the original string.
 
 local exp word="$PREFIX$SUFFIX" group=-V
-
 # Do this only for the first global matcher.
 
 [[ "$compstate[matcher]" -le 1 ]] || return 1
@@ -88,7 +87,7 @@ exp=("$word")
 # as the original string, we let other completers run.
 
 [[ $#exp -eq 0 ||
-   ( $#exp -eq 1 && "$exp[1]" = "$word" ) ]] && return 1
+   ( $#exp -eq 1 && "$exp[1]" = "$word"(|\(N\)) ) ]] && return 1
 
 # We have expansions, should we menucomplete them?
 

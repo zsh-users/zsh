@@ -47,6 +47,8 @@ for ac_shellvar in $ac_shellvars; do
     eval test '"${'$ac_shellvar'+set}"' = set && ac_set=$ac_shellvar
     ac_getconfs=$ac_getconfs$ac_getconf
     eval ac_test_$ac_shellvar="\$ac_getconf"
+  else
+    eval ac_test_$ac_shellvar="\$$ac_shellvar"
   fi
 done
 case "$ac_result$ac_getconfs" in
