@@ -1,6 +1,10 @@
 2000-05-16  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 11403(?): Completion/Core/_expand, Src/Zle/compcore.c,
+	* 11406: Completion/Base/_arguments: make _arguments take the
+ 	attempt to add matches as an indication not to do default
+ 	option-completion
+	
+	* 11403: Completion/Core/_expand, Src/Zle/compcore.c,
 	Src/Zle/complist.c: fix scrolling in menu-selection with matches
 	spanning multiple lines
 	

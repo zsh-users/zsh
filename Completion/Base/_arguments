@@ -163,7 +163,7 @@ done
 zstyle -s ":completion:${curcontext}:options" auto-description autod
 
 if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
-  local action noargs aret expl local
+  local action noargs aret expl local tried
   local next direct odirect equal single match matched ws tmp1 tmp2 tmp3
   local opts subc tc prefix suffix descrs actions subcs
   local origpre="$PREFIX" origipre="$IPREFIX"
@@ -244,6 +244,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 
 	      _message "$descr"
 	      mesg=yes
+	      tried=yes
 
             elif [[ "$action" = \(\(*\)\) ]]; then
 
@@ -252,6 +253,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
               eval ws\=\( "${action[3,-3]}" \)
 
               _describe -t "$subc" "$descr" ws -M "$match" "$subopts[@]"
+	      tried=yes
 
             elif [[ "$action" = \(*\) ]]; then
 
@@ -259,6 +261,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 
               _all_labels "$subc" expl "$descr" \
                   compadd "$subopts[@]" - ${=action[2,-2]}
+	      tried=yes
             elif [[ "$action" = \{*\} ]]; then
 
               # A string in braces is evaluated.
@@ -266,6 +269,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
               while _next_label "$subc" expl "$descr"; do
                 eval "$action[2,-2]"
               done
+	      tried=yes
             elif [[ "$action" = \ * ]]; then
 
               # If the action starts with a space, we just call it.
@@ -274,6 +278,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
               while _next_label "$subc" expl "$descr"; do
                 "$action[@]"
               done
+	      tried=yes
             else
 
               # Otherwise we call it with the description-arguments.
@@ -282,6 +287,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
               while _next_label "$subc" expl "$descr"; do
                 "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}"
 	      done
+	      tried=yes
             fi
           fi
         fi
@@ -293,8 +299,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
       if [[ -z "$matched$hasopts" ]] && _requested options &&
           { [[ -n "$ismulti" ]] ||
             ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
-            [[ "$origpre" = [-+]* ||
-               ( -z "$aret$mesg" && nm -eq compstate[nmatches] ) ]] } ; then
+            [[ "$origpre" = [-+]* || -z "$aret$mesg$tried" ]] } ; then
 	local prevpre="$PREFIX" previpre="$IPREFIX"
 
 	hasopts=yes
@@ -351,6 +356,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 	PREFIX="$prevpre"
 	IPREFIX="$previpre"
       fi
+      [[ -n "$tried" ]] && break
     done
     if [[ -n "$opts" && -z "$aret$matched$mesg" &&
           nm -eq compstate[nmatches] ]]; then
