@@ -1,5 +1,7 @@
 2000-05-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 11284: Completion/Base/_math: use _math to complete the let builtin
+
 	* 11282: Completion/Builtins/_vars_eq: complete using _arguments
 	for typeset and its variants
 
