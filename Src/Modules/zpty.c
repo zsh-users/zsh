@@ -213,16 +213,18 @@ static int
 get_pty(int master, int *retfd)
 {
 
-#if defined(__linux)
+#ifdef __linux
     static char char1[] = "abcdefghijklmnopqrstuvwxyz";
     static char char2[] = "0123456789abcdef";
-#elif defined(__FreeBSD__)
+#else /* __linux */
+# ifdef __FreeBSD__
     static char char1[] = "pqrsPQRS";
     static char char2[] = "0123456789abcdefghijklmnopqrstuv";
-#else
+# else /* __FreeBSD__ */
     static char char1[] = "pqrstuvwxyzPQRST";
     static char char2[] = "0123456789abcdef";
-#endif
+# endif /* __FreeBSD__ */
+#endif /* __linux */
 
     static char name[11];
     static int mfd, sfd;
