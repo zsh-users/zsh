@@ -171,13 +171,8 @@ install.man: $(MAN)
 	tzsh=`echo zsh | sed '$(transform); s/,/\\\\,/g'`; \
 	for file in $(MAN); do \
 	  tfile=`echo $$file | sed "s,zsh,$$tzsh,"`; \
-	  if test -f $$file; then \
-	    cp -f $$file $$tfile; \
-	  elif test -f $(sdir)/$$file; then \
-	    cp -f $(sdir)/$$file $$tfile; \
-	  else :; \
-	  fi || exit 1; \
-	  $(INSTALL_DATA) $$tfile $(DESTDIR)$(mandir)/man1 || exit 1; \
+	sed "s/zshall/$${tzsh}all/; s/zshmisc/$${tzsh}misc/; s/zshexpn/$${tzsh}expn/; s/zshparam/$${tzsh}param/; s/zshoptions/$${tzsh}options/; s/zshbuiltins/$${tzsh}builtins/; s/zshzle/$${tzsh}zle/; s/zshcompwid/$${tzsh}compwid/; s/zshcompctl/$${tzsh}compctl/; s/zshmodules/$${tzsh}modules/; s/zshcompsys/$${tzsh}compsys/;" \
+	$(sdir)/$$file >$(DESTDIR)$(mandir)/man1/$$tfile || exit 1; \
 	done
 
 # install info pages, creating install directory if necessary
