@@ -1,5 +1,8 @@
 2000-11-05  Bart Schaefer  <schaefer@zsh.org>
 
+	* 13124: Functions/Misc/nslookup: Use "command nslookup" as it's
+	now possible to call the nslookup function recursively from zpty.
+	
 	* unposted: Src/Modules/zpty.c: Cloned shell is non-interactive
 	for purposes of calling zexit(), so it doesn't print job status,
 	save history, etc.

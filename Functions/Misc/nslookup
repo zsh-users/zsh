@@ -24,7 +24,7 @@ zstyle -s ':nslookup' pager tmp &&
     [[ -z "$pager" ]] && pager="${opager:-more}"
 (( $#pmpt )) || pmpt=(-p '> ')
 
-zpty nslookup nslookup "$@"
+zpty nslookup command nslookup "${(q)@}"
 
 zpty -r nslookup line '*
 > '
