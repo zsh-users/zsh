@@ -1,3 +1,10 @@
+2001-08-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 15606: Completion/Unix/Command/_dd: add exclusion lists
+
+	* 15599: Completion/Unix/Command/_user_admin: detect redhat or
+	mandrake before completing redhat's extensions
+
 2001-08-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 15596: Src/Zle/compmatch.c, Src/Zle/compresult.c,
