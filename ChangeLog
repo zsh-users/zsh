@@ -1,3 +1,11 @@
+2001-04-04  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13902: Completion/Base/Utility/_arguments,
+	Completion/X/Utility/_x_arguments,
+	Completion/X/Utility/_xt_arguments, Doc/Zsh/compsys.yo: add -W
+	option to _arguments, which allows to complete options after
+	options that take an argument in the next word
+
 2000-04-03  Clint Adams  <schizo@debian.org>
 
 	* 13899: Completion/Unix/Command/_apm: add $OSTYPE checking.

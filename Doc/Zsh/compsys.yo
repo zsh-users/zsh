@@ -2930,6 +2930,13 @@ two hyphens (like `tt(-)tt(-prefix)') are still considered to contain only
 one option name.  This allows the use of the `tt(-s)' option to describe
 single-letter options together with such long option names.
 
+The tt(-s) option may be combined with the option tt(-W) to say that more
+option characters are to be expected even after an option that takes an
+argument.  For example, if a command takes the options `tt(a)' and `tt(b)',
+where `tt(a)' takes an argument in the next word, tt(_arguments) would
+normally not complete the other option directly after `tt(-a)', but it would
+allow that if given the tt(-W) option.
+
 The forms of var(optspec) are:
 
 startitem()
@@ -3202,6 +3209,13 @@ example(_arguments \
   - '(uncompress)' \ 
     {-d,--decompress}'[decompress]')
 
+Note that using multiple sets will be slower than using only one set
+because the completion code has to parse the command line once for
+every set. So more than one set should only be used if the command
+syntax is too complicated. Note also that an option specification with
+rest-arguments (as in `tt(-foo:*:...)') often allows the use of
+multiple sets to be avoided.
+
 To simplify the specifications for commands with standard option
 parsing, the options tt(-S) and tt(-A) may be given.  With tt(-S), no
 option will be completed after a `tt(-)tt(-)' on the line and this
@@ -3212,13 +3226,6 @@ be taken as arguments. For example, to make tt(_arguments) stop
 completing options after the first normal argument, but ignoring all
 strings starting with a hyphen even if they are not described by one
 of the var(optspec)s, one would use: `tt(-A "-*")'.
-
-Note that using multiple sets will be slower than using only one set
-because the completion code has to parse the command line once for
-every set. So more than one set should only be used if the command
-syntax is too complicated. Note also that an option specification with
-rest-arguments (as in `tt(-foo:*:...)') often allows the use of
-multiple sets to be avoided.
 
 Another option supported is `tt(-O) var(name)'. The var(name) will be
 taken as the name of an array and its elements will be given to

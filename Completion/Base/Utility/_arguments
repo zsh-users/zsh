@@ -4,7 +4,7 @@
 # descriptions given as arguments to this function.
 
 local long cmd="$words[1]" descr mesg subopts opt usecc autod
-local oldcontext="$curcontext" hasopts rawret
+local oldcontext="$curcontext" hasopts rawret optarg singopt
 
 long=$argv[(I)--]
 if (( long )); then
@@ -173,18 +173,21 @@ if (( long )); then
 fi
 
 subopts=()
-while [[ "$1" = -(O*|[CR]) ]]; do
+singopt=()
+while [[ "$1" = -(O*|[CRWs]) ]]; do
   case "$1" in
   -C)  usecc=yes; shift ;;
   -O)  subopts=( "${(@P)2}" ); shift 2 ;;
   -O*) subopts=( "${(@P)1[3,-1]}" ); shift ;;
   -R)  rawret=yes; shift;;
+  -W)  optarg=yes; shift;;
+  -s)  singopt=(-s); shift;;
   esac
 done
 
 zstyle -s ":completion:${curcontext}:options" auto-description autod
 
-if (( $# )) && comparguments -i "$autod" "$@"; then
+if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
   local action noargs aret expl local tried
   local next direct odirect equal single matcher matched ws tmp1 tmp2 tmp3
   local opts subc tc prefix suffix descrs actions subcs anum
@@ -335,14 +338,19 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
           if [[ "$single" = direct ]]; then
             _all_labels options expl option \
 	        compadd -QS '' - "${PREFIX}${SUFFIX}"
-          elif [[ "$single" = next ]]; then
+          elif [[ -z "$optarg" && "$single" = next ]]; then
             _all_labels options expl option \
 	        compadd -Q - "${PREFIX}${SUFFIX}"
           elif [[ "$single" = equal ]]; then
             _all_labels options expl option \
 	        compadd -QqS= - "${PREFIX}${SUFFIX}"
           else
+
 	    tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
+
+            [[ "$single" = next ]] &&
+                tmp1=( "${(@)tmp1:#[-+]${PREFIX[-1]}((#e)|:*)}" )
+
 	    [[ "$PREFIX" != --* ]] && tmp1=( "${(@)tmp1:#--*}" )
 	    tmp3=( "${(M@)tmp1:#[-+]?[^:]*}" )
 	    tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
@@ -351,6 +359,11 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
             _describe -o option \
                       tmp1 tmp2 -Q -S '' -- \
 		      tmp3 -Q
+
+            [[ -n "$optarg" && "$single" = next && nm -eq $compstate[nmatches] ]] &&
+                _all_labels options expl option \
+	            compadd -Q - "${PREFIX}${SUFFIX}"
+
           fi
           single=yes
         else

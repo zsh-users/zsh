@@ -17,7 +17,7 @@ else
 fi
 
 opts=()
-while [[ $1 = -(O*|[CR]) ]]; do
+while [[ $1 = -(O*|[CRWs]) ]]; do
   opts=($opts $1)
   [[ $1 = -R ]] && rawret=yes
   shift
