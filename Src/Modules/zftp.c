@@ -1971,8 +1971,7 @@ zftp_open(char *name, char **args, int flags)
      * However, it is closed whenever there are no connections open.
      */
     if (zfstatfd == -1) {
-	fname = gettempname(NULL, 1);
-	zfstatfd = open(fname, O_RDWR|O_CREAT|O_EXCL, 0600);
+	zfstatfd = gettempfile(NULL, 1, &fname);
 	DPUTS(zfstatfd == -1, "zfstatfd not created");
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
 	/* If the shell execs a program, we don't want this fd left open. */

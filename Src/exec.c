@@ -2801,8 +2801,7 @@ getherestr(struct redir *fn)
     untokenize(t);
     unmetafy(t, &len);
     t[len++] = '\n';
-    s = gettempname(NULL, 1);
-    if (!s || (fd = open(s, O_CREAT|O_WRONLY|O_EXCL|O_NOCTTY, 0600)) == -1)
+    if ((fd = gettempfile(NULL, 1, &s)) < 0)
 	return -1;
     write(fd, t, len);
     close(fd);
@@ -2975,10 +2974,8 @@ getoutputfile(char *cmd)
 	return NULL;
     if (!(prog = parsecmd(cmd)))
 	return NULL;
-    if (!(nam = gettempname(NULL, 1)))
+    if (!(nam = gettempname(NULL, 0)))
 	return NULL;
-
-    nam = ztrdup(nam);
 
     if (!jobtab[thisjob].filelist)
 	jobtab[thisjob].filelist = znewlinklist();

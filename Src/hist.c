@@ -2137,8 +2137,7 @@ lockhistfile(char *fn, int keep_trying)
 
 	lockfile = bicat(unmeta(fn), ".LOCK");
 #ifdef HAVE_LINK
-	tmpfile = gettempname(fn, 0);
-	if ((fd = open(tmpfile, O_WRONLY|O_CREAT|O_EXCL, 0644)) >= 0) {
+	if ((fd = gettempfile(fn, 0, &tmpfile)) >= 0) {
 	    FILE *out = fdopen(fd, "w");
 	    if (out) {
 		fprintf(out, "%ld %s\n", (long)getpid(), getsparam("HOST"));
@@ -2163,8 +2162,8 @@ lockhistfile(char *fn, int keep_trying)
 		break;
 	    }
 	    unlink(tmpfile);
+	    free(tmpfile);
 	}
-	free(tmpfile);
 #else /* not HAVE_LINK */
 	while ((fd = open(lockfile, O_WRONLY|O_CREAT|O_EXCL, 0644)) < 0) {
 	    if (errno != EEXIST || !keep_trying)
