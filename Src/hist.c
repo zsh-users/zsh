@@ -913,11 +913,34 @@ gethistent(int ev, int nearmatch)
     return he;
 }
 
+static void
+putoldhistentryontop(void)
+{
+    Histent he = hist_ring->down;
+    if (isset(HISTEXPIREDUPSFIRST) && !(he->flags & HIST_DUP)) {
+	int max_unique_ct = getiparam("SAVEHIST");
+	do {
+	    if (max_unique_ct-- <= 0) {
+		he = hist_ring->down;
+		break;
+	    }
+	    he = he->down;
+	} while (he != hist_ring->down && !(he->flags & HIST_DUP));
+	if (he != hist_ring->down) {
+	    he->up->down = he->down;
+	    he->down->up = he->up;
+	    he->up = hist_ring;
+	    he->down = hist_ring->down;
+	    hist_ring->down = he->down->up = he;
+	}
+    }
+    hist_ring = he;
+}
+
 /**/
 Histent
 prepnexthistent(void)
 {
-    Histent he;
     int curline_in_ring = hist_ring == &curline;
 
     if (curline_in_ring)
@@ -928,7 +951,7 @@ prepnexthistent(void)
     }
 
     if (histlinect < histsiz) {
-	he = (Histent)zcalloc(sizeof *he);
+	Histent he = (Histent)zcalloc(sizeof *he);
 	if (!hist_ring)
 	    hist_ring = he->up = he->down = he;
 	else {
@@ -940,30 +963,13 @@ prepnexthistent(void)
 	histlinect++;
     }
     else {
-	he = hist_ring->down;
-	if (isset(HISTEXPIREDUPSFIRST) && !(he->flags & HIST_DUP)) {
-	    int max_unique_ct = getiparam("SAVEHIST");
-	    do {
-		if (max_unique_ct-- <= 0) {
-		    he = hist_ring->down;
-		    break;
-		}
-		he = he->down;
-	    } while (he != hist_ring->down && !(he->flags & HIST_DUP));
-	    if (he != hist_ring->down) {
-		he->up->down = he->down;
-		he->down->up = he->up;
-		he->up = hist_ring;
-		he->down = hist_ring->down;
-		hist_ring->down = he->down->up = he;
-	    }
-	}
-	freehistdata(hist_ring = he, 0);
+	putoldhistentryontop();
+	freehistdata(hist_ring, 0);
     }
-    he->histnum = ++curhist;
+    hist_ring->histnum = ++curhist;
     if (curline_in_ring)
 	linkcurline();
-    return he;
+    return hist_ring;
 }
 
 /* A helper function for hend() */
@@ -1756,8 +1762,10 @@ inithist(void)
 void
 resizehistents(void)
 {
-    while (histlinect > histsiz)
-	freehistnode((HashNode)hist_ring->down);
+    while (histlinect > histsiz) {
+	putoldhistentryontop();
+	freehistnode((HashNode)hist_ring);
+    }
 }
 
 /* Remember the last line in the history file so we can find it again. */
