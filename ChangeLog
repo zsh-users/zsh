@@ -1,7 +1,7 @@
 2000-10-09  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12930: Src/Zle/compmatch.c: prefer exact character matches over
- 	match specs (so that `nom' can match `nomatch')
+ 	match specs (so that `nom' can match `nomatch' in _options)
 	
 2000-10-06  Sven Wischnowsky  <wischnow@zsh.org>
 
