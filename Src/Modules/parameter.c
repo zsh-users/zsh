@@ -1397,9 +1397,8 @@ scanpmjobdirs(HashTable ht, ScanFunc func, int flags)
 static void
 setpmnameddir(Param pm, char *value)
 {
-    errno = 0;
-    if (!value || *value != '/' || zpathmax(value) < 0)
-	zwarn((errno ? "%s: %e" : "invalid value: %s"), value, errno);
+    if (!value || *value != '/')
+	zwarn("invalid value: %s", value, 0);
     else
 	adduserdir(pm->nam, value, 0, 1);
     zsfree(value);
@@ -1443,9 +1442,8 @@ setpmnameddirs(Param pm, HashTable ht)
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
-	    errno = 0;
-	    if (!(val = getstrvalue(&v)) || *val != '/' || zpathmax(val) < 0)
-		zwarn((errno ? "%s: %e" : "invalid value: %s"), val, errno);
+	    if (!(val = getstrvalue(&v)) || *val != '/')
+		zwarn("invalid value: %s", val, 0);
 	    else
 		adduserdir(hn->nam, val, 0, 1);
 	}

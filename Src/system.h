@@ -200,18 +200,15 @@ struct timezone {
 # ifdef MAXPATHLEN
 #  define PATH_MAX MAXPATHLEN
 # else
-   /* so we will just pick something */
-#  define PATH_MAX 1024
+#  ifdef _POSIX_PATH_MAX
+#   define PATH_MAX _POSIX_PATH_MAX
+#  else
+    /* so we will just pick something */
+#   define PATH_MAX 1024
+#  endif
 # endif
 #endif
-#ifndef HAVE_PATHCONF
-# define zpathmax(X) ((long)((strlen(X) >= PATH_MAX) ? \
-			     ((errno = ENAMETOOLONG), -1) : \
-			     ((errno = 0), PATH_MAX)))
-#endif
 
-/* we should be getting this value from sysconf(_SC_OPEN_MAX) */
-/* but this is too much trouble                               */
 #ifndef OPEN_MAX
 # ifdef NOFILE
 #  define OPEN_MAX NOFILE
@@ -221,7 +218,7 @@ struct timezone {
 # endif
 #endif
 #ifndef HAVE_SYSCONF
-# define zopenmax() (long) OPEN_MAX
+# define zopenmax() ((long) OPEN_MAX)
 #endif
 
 #ifdef HAVE_FCNTL_H

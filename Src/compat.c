@@ -105,7 +105,23 @@ strerror(int errnum)
 #endif
 
 
-#ifdef HAVE_PATHCONF
+#if 0
+/* pathconf(_PC_PATH_MAX) is not currently useful to zsh.  The value *
+ * returned varies depending on a number of factors, e.g. the amount *
+ * of memory available to the operating system at a given time; thus *
+ * it can't be used for buffer allocation, or even as an indication  *
+ * of whether an attempt to use or create a given pathname may fail  *
+ * at any future time.                                               *
+ *                                                                   *
+ * The call is also permitted to fail if the argument path is not an *
+ * existing directory, so even to make sense of that one must search *
+ * for a valid directory somewhere in the path and adjust.  Even if  *
+ * it succeeds, the return value is relative to the input directory, *
+ * and therefore potentially relative to the length of the shortest  *
+ * path either to that directory or to our working directory.        *
+ *                                                                   *
+ * Finally, see the note below for glibc; detection of pathconf() is *
+ * not by itself an indication that it works reliably.               */
 
 /* The documentation for pathconf() says something like:             *
  *     The limit is returned, if one exists.  If the system  does    *
@@ -114,34 +130,24 @@ strerror(int errnum)
  *     -1  is returned, and errno is set to reflect the nature of    *
  *     the error.                                                    *
  *                                                                   *
- * This is less useful than may be, as one must reset errno to 0 (or *
+ * System calls are not permitted to set errno to 0; but we must (or *
  * some other flag value) in order to determine that the resource is *
  * unlimited.  What use is leaving errno unchanged?  Instead, define *
  * a wrapper that resets errno to 0 and returns 0 for "the system    *
- * does not have a limit," so that -1 always means a real error.     *
- *                                                                   *
- * This is replaced by a macro from system.h if not HAVE_PATHCONF.   *
- *
- * Note that the length of a relative path is compared without first *
- * prepending the current directory, if pathconf() does not return   *
- * an error.  This is for consistency with the macro and with older  *
- * zsh behavior; it may be problematic in the ENOENT/ENOTDIR cases.  */
+ * does not have a limit," so that -1 always means a real error.     */
 
 /**/
 mod_export long
 zpathmax(char *dir)
 {
+#ifdef HAVE_PATHCONF
     long pathmax;
 
     errno = 0;
     if ((pathmax = pathconf(dir, _PC_PATH_MAX)) >= 0) {
-	/* This code is redundant if pathconf works correctly, but   *
-	 * some versions of glibc pathconf return a hardwired value. */
-	if (strlen(dir) < pathmax)
-	    return pathmax;
-	else
-	    errno = ENAMETOOLONG;
-    } else if (errno == ENOENT || errno == ENOTDIR) {
+	/* Some versions of glibc pathconf return a hardwired value! */
+	return pathmax;
+    } else if (errno == EINVAL || errno == ENOENT || errno == ENOTDIR) {
 	/* Work backward to find a directory, until we run out of path. */
 	char *tail = strrchr(dir, '/');
 	while (tail > dir && tail[-1] == '/')
@@ -158,8 +164,9 @@ zpathmax(char *dir)
 		pathmax = pathconf(".", _PC_PATH_MAX);
 	}
 	if (pathmax > 0) {
-	    if (strlen(dir) < pathmax)
-		return pathmax;
+	    long taillen = (tail ? strlen(tail) : (strlen(dir) + 1));
+	    if (taillen < pathmax)
+		return pathmax - taillen;
 	    else
 		errno = ENAMETOOLONG;
 	}
@@ -168,12 +175,20 @@ zpathmax(char *dir)
 	return -1;
     else
 	return 0; /* pathmax should be considered unlimited */
-}
+#else
+    long dirlen = strlen(dir);
+
+    /* The following is wrong if dir is not an absolute path. */
+    return ((long) ((dirlen >= PATH_MAX) ?
+		    ((errno = ENAMETOOLONG), -1) :
+		    ((errno = 0), PATH_MAX - dirlen)));
 #endif
+}
+#endif // 0
 
 #ifdef HAVE_SYSCONF
-/* This is replaced by a macro from system.h if not HAVE_PATHCONF.   *
- * 0 is returned if _SC_OPEN_MAX is unavailable                      *
+/* This is replaced by a macro from system.h if not HAVE_SYSCONF.    *
+ * 0 is returned by sysconf if _SC_OPEN_MAX is unavailable;          *
  * -1 is returned on error                                           *
  *                                                                   *
  * Neither of these should happen, but resort to OPEN_MAX rather     *
@@ -183,10 +198,9 @@ zpathmax(char *dir)
 mod_export long
 zopenmax(void)
 {
-    long openmax;
-    
-    openmax = sysconf(_SC_OPEN_MAX);
-    if(openmax < 1)
+    long openmax = sysconf(_SC_OPEN_MAX);
+
+    if (openmax < 1)
 	return OPEN_MAX;
     else
 	return openmax;

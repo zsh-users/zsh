@@ -91,11 +91,6 @@ bin_mkdir(char *nam, char **args, char *ops, int func)
 
 	while(ptr > *args + (**args == '/') && *--ptr == '/')
 	    *ptr = 0;
-	if(zpathmax(unmeta(*args)) < 0) {
-	    zwarnnam(nam, "%s: %e", *args, errno);
-	    err = 1;
-	    continue;
-	}
 	if(ops['p']) {
 	    char *ptr = *args;
 
