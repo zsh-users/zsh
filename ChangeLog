@@ -1,3 +1,9 @@
+2001-05-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 14389: Src/hashtable.c, Src/hist.c: Don't call addhistnode()
+	or removehashnode() on a HIST_TMPSTORE entry.  Don't merge a
+	HIST_TMPSTORE entry with a previous "duplicate" line.
+
 2001-05-18  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14388: Src/params.c, Src/subst.c: Correctly handle re-set of
