@@ -18,6 +18,10 @@ The format of entries is thus:
 Machines
 --------
 
+Apple/NeXT OpenStep 4.2 for i386.
+	Reported to work at least with gcc 2.8.1 and gawk 2.15 patchlevel
+	6, but not with the bundled cc 2.7.2.1 and awk.
+
 Cray: Unicos (C90 and T90)
 	Should build `out-of-the-box'.
 
@@ -66,7 +70,7 @@ IBM: AIX 3.2, 4.1
 	4.1, though native cc works. More information about this problem
 	would be appreciated.
 
-Linux: Linux (i386) [3.1.4]
+Linux: Linux (i[345]86,various Pentia,AMD K6/2)
 	Should build `out-of-the-box'.
 
 	If you are using an early minor version of libc 5, then a bug
@@ -79,6 +83,13 @@ Linux: Linux (i386) [3.1.4]
 	with the experimental GNU compiler, egcs.  In particular,
 	on Linux Alpha with egcs 1.0.3a and 1.1.1 using -O1 or greater,
 	the completion code is not correctly compiled.
+
+	Some versions of glibc2 have a conflict with <asm/resource.h>
+	which causes a redefinition warning on RLIM_INFINITY.  This
+	causes configure to decide that <sys/resource.h> is not present,
+	which can cause compilation errors in zsh's rlimit code.  The
+	best solution is to edit config.h after running configure and
+	#define HAS_SYS_RESOURCE_H.
 
 NetBSD: NetBSD 1.*
 	Should build `out-of-the-box'.

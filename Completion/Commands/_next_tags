@@ -46,7 +46,7 @@ _next_tags_pre() {
 # Helper function for sorting tags. Most of this is copied from _tags.
 
 _next_tags_sort() {
-  local order tags tag nodef tmp tmp2
+  local order tags tag nodef
 
   if ! zstyle -a ":completion:${curcontext}:" tag-order order; then
     if (( $+_comp_default_tags )); then
@@ -69,49 +69,12 @@ _next_tags_sort() {
     case $tag in
     -)     nodef=yes;;
     *\(\)) "${${tag%%[ 	]#\(\)}##[ 	]#}" "$@";;
-    \!*)   comptry "${(@)argv:#(${(j:|:)~${=~tag[2,-1]}})}";;
-    ?*)    tmp=( ${${(s: :)${tag//\\\\ /$'\0'}}//$'\0'/ } ) tmp2=() tmp3=()
-           for tag in "$tmp[@]"; do
-	     if [[ "$tag" = *:* ]]; then
-	       tmp2=( "$tmp2[@]" "${(@M)^argv:#${~tag%%:*}}:${tag#*:}" )
-	     else
-	       for atag in "${(@M)argv:#${~tag}}"; do
-	         if zstyle -a ":completion:${curcontext}:${atag}" tag-aliases als; then
-		   tmp3=( "$tmp3[@]" "$als[@]" )
-		   tmp=( "${(@)tmp:#${atag}}" )
-                 else
-	           tmp2=( "$tmp2[@]" "$atag" )
-		 fi
-	       done
-	     fi
-	   done
-
-	   comptry "${(@)tmp2:#(${(j:|:)~${(q)tmp%%:*}})}" "$tmp3[@]" "$tmp[@]"
-	   ;;
+    \!*)   comptry "${(@)argv:#(${(j:|:)~${=tag[2,-1]}})}";;
+    ?*)    comptry ${=tag};;
     esac
   done
 
-  if [[ -z "$nodef" ]]; then
-    if (( $+_comp_default_tags )); then
-      for tag in "$_comp_default_tags[@]"; do
-        if zstyle -a ":completion:${curcontext}:${tag}" tag-aliases als; then
-          comptry "$als[@]"
-        else
-          comptry "$tag"
-	fi
-      done
-    else
-      tmp2=()
-      for tag; do
-	if zstyle -a ":completion:${curcontext}:${tag}" tag-aliases als; then
-	  tmp2=( "$tmp2[@]" "$als[@]" )
-        else
-	  tmp2=( "$tmp2[@]" "$tag" )
-	fi
-      done
-      comptry "$tmp2[@]"
-    fi
-  fi
+  [[ -z "$nodef" ]] && comptry "$@"
 }
 
 [[ -o kshautoload ]] || _next_tags "$@"

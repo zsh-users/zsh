@@ -197,12 +197,15 @@ level.
 )
 item(tt(nmatches))(
 The number of matches generated and accepted by the completion code so
-far.
-)
-item(tt(ignored))(
-The number of words that were ignored because they matched one of the
-patterns given with the tt(-F) option to the tt(compadd) builtin
+far, excluding those matches that are only accepted by ignoring the
+tt(fignore) parameter and the tt(-a) option of the tt(compadd) builtin 
 command.
+)
+item(tt(alternate_nmatches))(
+Like tt(nmatches), but counts only matches in the alternate set. I.e. file
+names with one of the suffixes from the tt(fignore) array and matches
+put into the alternate set using the tt(-a) option of the tt(compadd)
+builtin command (see below) are not counted.
 )
 item(tt(restore))(
 This is set to tt(auto) before a function is entered, which forces the
@@ -515,9 +518,23 @@ with any prefix specified by the tt(-p) option to form a complete filename
 for testing.  Hence it is only useful if combined with the tt(-f) flag, as
 the tests will not otherwise be performed.
 )
+item(tt(-a))(
+The completion code may build two sets of matches: the normal and the
+alternate set. Normally only the matches in the first set are used,
+but if this set is empty, the words from the alternate set are
+used. The completion code uses this mechanism, for example, to make
+filenames without one of the suffixes defined with the tt(fignore)
+shell parameter be preferred over filenames with one of these
+suffixes.
+
+With the tt(-a)-flag given, the var(words) are stored in the alternate
+set unless this flag is overridden by the tt(-F) option.
+)
 item(tt(-F) var(array))(
-Specifies an array containing patterns. Words matching one of these
-patterns are ignored, i.e. not considered to be possible matches.
+Specifies an array containing patterns.
+Words matching one of these patterns are stored in
+the alternate set of matches and words that match none of the patterns
+are stored in the normal set.
 
 The var(array) may be the name of an array parameter or a list of
 literal patterns enclosed in parentheses and quoted, as in `tt(-F "(*?.o

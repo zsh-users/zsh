@@ -16,7 +16,7 @@ if (( $# )); then
 
   # We have arguments: the tags supported in this context.
 
-  local curcontext="$curcontext" order tag nodef tmp tmp2 tmp3 als atag
+  local curcontext="$curcontext" order tag nodef
 
   if [[ "$1" = -C?* ]]; then
     curcontext="${curcontext%:*}:${1[3,-1]}"
@@ -51,13 +51,7 @@ if (( $# )); then
 
   if [[ -n "$_sort_tags" ]]; then
     "$_sort_tags" "$@"
-  else
-    zstyle -a ":completion:${curcontext}:" tag-order order ||
-      if [[ "$*" = *(arguments|values)* || "$*" = *options* ]] ;then
-        order=( 'arguments values' options )
-      else
-        order=()
-      fi
+  elif zstyle -a ":completion:${curcontext}:" tag-order order; then
 
     for tag in $order; do
       case $tag in
@@ -67,49 +61,33 @@ if (( $# )); then
                break
              fi
              ;;
-      \!*)   comptry "${(@)argv:#(${(j:|:)~${=~tag[2,-1]}})}";;
-      ?*)    tmp=( ${${(s: :)${tag//\\\\ /$'\0'}}//$'\0'/ } ) tmp2=() tmp3=()
-             for tag in "$tmp[@]"; do
-	       if [[ "$tag" = *:* ]]; then
-	         tmp2=( "$tmp2[@]" "${(@M)^argv:#${~tag%%:*}}:${tag#*:}" )
-	       else
-	         for atag in "${(@M)argv:#${~tag}}"; do
-	           if zstyle -a ":completion:${curcontext}:${atag}" tag-aliases als; then
-		     tmp3=( "$tmp3[@]" "$als[@]" )
-		     tmp=( "${(@)tmp:#${atag}}" )
-                   else
-	             tmp2=( "$tmp2[@]" "$atag" )
-		   fi
-		 done
-	       fi
-	     done
-
-	     comptry "${(@)tmp2:#(${(j:|:)~${(q)tmp%%:*}})}" "$tmp3[@]" "$tmp[@]"
-	     ;;
+      \!*)   comptry "${(@)argv:#(${(j:|:)~${=tag[2,-1]}})}";;
+      ?*)    comptry ${${(ps: :)${tag//\\\\ /$'\0'}}//$'\0'/ };;
       esac
     done
 
     if [[ -z "$nodef" ]]; then
       if (( $+_comp_default_tags )); then
         for tag in "$_comp_default_tags[@]"; do
-	  if zstyle -a ":completion:${curcontext}:${tag}" tag-aliases als; then
-            comptry "$als[@]"
-          else
-            comptry "$tag"
-	  fi
+          comptry "$tag"
         done
       else
-        tmp2=()
-	for tag; do
-	  if zstyle -a ":completion:${curcontext}:${tag}" tag-aliases als; then
-	    tmp2=( "$tmp2[@]" "$als[@]" )
-          else
-	    tmp2=( "$tmp2[@]" "$tag" )
-	  fi
-	done
-        comptry "$tmp2[@]"
+        comptry "$@"
       fi
     fi
+  else
+
+    # Use default tags...
+
+    if (( $+_comp_default_tags )); then
+      for tag in "$_comp_default_tags[@]"; do
+        comptry "$tag"
+      done
+    else
+      comptry arguments values
+      comptry options
+    fi
+    comptry "$@"
   fi
 
   # Return non-zero if at least one set of tags should be used.

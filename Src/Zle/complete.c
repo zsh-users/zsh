@@ -36,8 +36,7 @@
 mod_export zlong compcurrent;
 /**/
 zlong complistmax,
-      complistlines,
-      compignored;
+      complistlines;
 
 /**/
 mod_export
@@ -477,6 +476,9 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		sp = &(dat.prpre);
 		e = "string expected after -%c";
 		break;
+	    case 'a':
+		dat.aflags |= CAF_ALT;
+		break;
 	    case 'M':
 		sp = &m;
 		e = "matching specification expected after -%c";
@@ -910,9 +912,9 @@ static struct compparam compkparams[] = {
     { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
     { "old_insert", PM_SCALAR, VAL(compoldins), NULL, NULL },
     { "vared", PM_SCALAR, VAL(compvared), NULL, NULL },
+    { "alternate_nmatches", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_anmatches) },
     { "list_lines", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_listlines) },
     { "all_quotes", PM_SCALAR | PM_READONLY, VAL(compqstack), NULL, NULL },
-    { "ignored", PM_INTEGER | PM_READONLY, VAL(compignored), NULL, NULL },
     { NULL, 0, NULL, NULL, NULL }
 };
 
@@ -1023,7 +1025,14 @@ set_compstate(Param pm, HashTable ht)
 static zlong
 get_nmatches(Param pm)
 {
-    return (permmatches(0) ? 0 : nmatches);
+    return num_matches(1);
+}
+
+/**/
+static zlong
+get_anmatches(Param pm)
+{
+    return num_matches(0);
 }
 
 /**/

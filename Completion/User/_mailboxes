@@ -63,6 +63,7 @@ _mailbox_cache () {
 
   setopt localoptions nullglob
 
+
   [[ -f ${~muttrc:-.} ]] &&
     _mutt_cache=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
 
@@ -76,11 +77,11 @@ _mailbox_cache () {
     shift dirboxes
     if [[ -d "$i/cur" ]]; then
       _maildir_cache=( "${_maildir_cache[@]}" "$i" )
-    elif j=( $i/<1-> ) && [[ -n "$j" ]]; then
+    elif j=( "$i"/<1-> ) && [[ -n "$j" ]]; then
       _mh_cache=( "${_mh_cache[@]}" "$i" )
     else
       _mbox_cache=( "${_mbox_cache[@]}" "$i"/*(.) )
-      dirboxes=( $dirboxes $i/*(/) )
+      dirboxes=( $dirboxes "$i"/*(/) )
     fi
   done
 

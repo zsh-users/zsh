@@ -2363,7 +2363,7 @@ bin_comptags(char *nam, char **args, char *ops, int func)
 		    return 1;
 		}
 		s->ptr = q + 1;
-		setsparam(args[2], ztrdup(*v == '-' ? dyncat(args[1], v) : v));
+		setsparam(args[2], ztrdup(v));
 		return 0;
 	    }
 	    return 1;

@@ -1102,6 +1102,22 @@ do_ambig_menu(void)
     minfo.cur = mc;
 }
 
+/* Return the real number of matches. */
+
+/**/
+zlong
+num_matches(int normal)
+{
+    int alt;
+
+    alt = permmatches(0);
+
+    if (normal)
+	return (alt ? 0 : nmatches);
+    else
+	return (alt ? nmatches : 0);
+}
+
 /* Return the number of screen lines needed for the list. */
 
 /**/

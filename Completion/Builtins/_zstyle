@@ -49,13 +49,13 @@ styles=(
   packageset		 c:packageset
   path			 'c:_wanted directories expl directory _path_files -/'
   ports			 c:_ports
+  prefer-ignored         c:bool
   prefix-hidden		 c:bool
   prefix-needed		 c:bool
   prompt		 c:
   remove-all-dups	 c:bool
   single-ignored         c:single-ignored
   sort			 c:bool
-  tag-aliases            c:tag
   tag-order		 c:tag
   special-dirs		 c:sdirs
   squeeze-slashes	 c:bool
@@ -215,7 +215,7 @@ while [[ -n $state ]]; do
       ;;
 
     single-ignored)
-      _wanted values expl 'how to handle a single ignored match' \
+      _wanted values expl 'how to handle single alternate match' \
           compadd - show menu
       ;;
 

@@ -29,9 +29,8 @@ zstyle -s ":completion:${curcontext}:$1" matcher match &&
     opts=($opts -M "${(q)match}")
 [[ -n "$_matcher" ]] && opts=($opts -M "${(q)_matcher}")
 
-if [[ -z "$_comp_no_ignore" ]] &&
-   zstyle -a ":completion:${curcontext}:$1" ignored-patterns _comp_ignore; then
-  opts=( $opts -F _comp_ignore )
+if zstyle -a ":completion:${curcontext}:$1" ignored-patterns _comp_ignore; then
+  opts=( $opts -F _comp_ignore)
 else
   _comp_ignore=()
 fi

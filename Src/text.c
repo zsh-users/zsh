@@ -122,7 +122,8 @@ getpermtext(Eprog prog, Wordcode c)
     tlim = tbuf + tsiz;
     tindent = 1;
     tjob = 0;
-    gettext2(&s);
+    if (prog->len)
+	gettext2(&s);
     *tptr = '\0';
     untokenize(tbuf);
     return tbuf;
@@ -194,9 +195,6 @@ struct tstack {
 	struct {
 	    int par;
 	} _cond;
-	struct {
-	    Wordcode end;
-	} _subsh;
     } u;
 };
 
@@ -332,10 +330,8 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("( ");
 		tindent++;
-		n = tpush(code, 1);
-		n->u._subsh.end = state->pc + WC_SUBSH_SKIP(code);
+		tpush(code, 1);
 	    } else {
-		state->pc = s->u._subsh.end;
 		tindent--;
 		taddstr(" )");
 		stack = 1;
@@ -345,10 +341,8 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("{ ");
 		tindent++;
-		n = tpush(code, 1);
-		n->u._subsh.end = state->pc + WC_CURSH_SKIP(code);
+		tpush(code, 1);
 	    } else {
-		state->pc = s->u._subsh.end;
 		tindent--;
 		taddstr(" }");
 		stack = 1;

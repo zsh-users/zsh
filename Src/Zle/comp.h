@@ -229,9 +229,10 @@ struct menuinfo {
 
 #define CAF_QUOTE    1
 #define CAF_NOSORT   2
-#define CAF_MATCH    4
-#define CAF_UNIQCON  8
-#define CAF_UNIQALL 16
+#define CAF_ALT      4
+#define CAF_MATCH    8
+#define CAF_UNIQCON 16
+#define CAF_UNIQALL 32
 
 /* Data for compadd and addmatches() */
 
@@ -350,12 +351,12 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
 #define CP_OLDINS      (1 << CPN_OLDINS)
 #define CPN_VARED      20
 #define CP_VARED       (1 << CPN_VARED)
-#define CPN_LISTLINES  21
+#define CPN_ANMATCHES  21
+#define CP_ANMATCHES   (1 << CPN_ANMATCHES)
+#define CPN_LISTLINES  22
 #define CP_LISTLINES   (1 << CPN_LISTLINES)
-#define CPN_QUOTES     22
+#define CPN_QUOTES     23
 #define CP_QUOTES      (1 << CPN_QUOTES)
-#define CPN_IGNORED    23
-#define CP_IGNORED     (1 << CPN_IGNORED)
 
 #define CP_KEYPARAMS   24
 #define CP_ALLKEYS     ((unsigned int) 0xffffff)

@@ -1,3 +1,547 @@
+2000-03-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Tanaka Akira: 10234, 10236: Completion/X/_xwit: _message passing.
+
+	* Tanaka Akira; 10232: Test/comptest, Test/ztst.zsh, ChangeLog(!):
+	minor test fixes and typo.
+
+	* Sven: 10226: Completion/Core/_path_files: quoting problem.
+
+	* Sven: 10225: Completion/Core/_path_files: dot problems with
+	files.
+
+	* Tanaka Akira: 10223: Completion/Base/_regex_arguments,
+	Completion/X/_x_colormapid, Completion/X/_xwit:
+	new X completions.
+
+	* Bart: 10218: Src/prompt.c: possible realloc() in
+	putpromptchar().
+
+2000-03-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 10215: Completion/User/_nedit: and this one.
+
+	* Sven: 10214: Completion/Builtins/_cd,
+	Completion/Builtins/_zstyle, Completion/User/_pbm,
+	Completion/User/_pspdf, Completion/User/_tiff,
+	Completion/User/_zdump: some _path_files calls now need loop for
+	tags.
+
+	* Sven: 10210: Completion/Commands/_next_tags,
+	Completion/Core/_main_complete, Completion/Core/compinit,
+	Doc/Zsh/compsys.yo: _next_tags doesn't need to be in completer
+	list any more; $compprefuncs array does pre-completion functions.
+	
+	* Sven: 10209: Completion/Core/_loop, Completion/Core/_try:
+	missing functions form 10195.
+
+	* 10204: Completion/Base/_arguments, Completion/Base/_values,
+	Completion/Core/_alternative, Completion/Core/_tags,
+	Completion/Core/_wanted, Src/Zle/computil.c: additions to 10195.
+
+	* Sven: 10195: Completion/Base/_arguments,
+	Completion/Base/_brace_parameter, Completion/Base/_condition,
+	Completion/Base/_default, Completion/Base/_describe,
+	Completion/Base/_first, Completion/Base/_jobs,
+	Completion/Base/_math, Completion/Base/_parameter,
+	Completion/Base/_subscript, Completion/Base/_tilde,
+	Completion/Base/_values, Completion/Builtins/_arrays,
+	Completion/Builtins/_autoload, Completion/Builtins/_bindkey,
+	Completion/Builtins/_builtin, Completion/Builtins/_cd,
+	Completion/Builtins/_command, Completion/Builtins/_compdef,
+	Completion/Builtins/_echotc, Completion/Builtins/_functions,
+	Completion/Builtins/_hash, Completion/Builtins/_limits,
+	Completion/Builtins/_pids, Completion/Builtins/_popd,
+	Completion/Builtins/_sched, Completion/Builtins/_signals,
+	Completion/Builtins/_stat, Completion/Builtins/_vars,
+	Completion/Builtins/_zftp, Completion/Builtins/_zle,
+	Completion/Builtins/_zmodload, Completion/Builtins/_zpty,
+	Completion/Builtins/_zstyle, Completion/Commands/_next_tags,
+	Completion/Core/_alternative, Completion/Core/_files,
+	Completion/Core/_main_complete, Completion/Core/_multi_parts,
+	Completion/Core/_options, Completion/Core/_parameters,
+	Completion/Core/_path_files, Completion/Core/_requested,
+	Completion/Core/_sep_parts, Completion/Core/_set_options,
+	Completion/Core/_setup, Completion/Core/_tags,
+	Completion/Core/_unset_options, Completion/Core/_wanted,
+	Completion/Debian/_apt, Completion/Debian/_deb_packages,
+	Completion/Linux/_rpm, Completion/User/_archie,
+	Completion/User/_cvs, Completion/User/_dd,
+	Completion/User/_domains, Completion/User/_gcc,
+	Completion/User/_gdb, Completion/User/_getconf,
+	Completion/User/_gprof, Completion/User/_groups,
+	Completion/User/_gs, Completion/User/_hosts, Completion/User/_lp,
+	Completion/User/_mailboxes, Completion/User/_make,
+	Completion/User/_man, Completion/User/_mh, Completion/User/_mount,
+	Completion/User/_mutt, Completion/User/_mysql_utils,
+	Completion/User/_netscape, Completion/User/_nslookup,
+	Completion/User/_pbm, Completion/User/_perl_basepods,
+	Completion/User/_perl_builtin_funcs,
+	Completion/User/_perl_modules, Completion/User/_ports,
+	Completion/User/_rcs, Completion/User/_rlogin,
+	Completion/User/_socket, Completion/User/_ssh,
+	Completion/User/_stty, Completion/User/_tar,
+	Completion/User/_telnet, Completion/User/_tiff,
+	Completion/User/_urls, Completion/User/_user_at_host,
+	Completion/User/_users, Completion/User/_users_on,
+	Completion/User/_whois, Completion/User/_yp,
+	Completion/X/_x_color, Completion/X/_x_cursor,
+	Completion/X/_x_display, Completion/X/_x_extension,
+	Completion/X/_x_font, Completion/X/_x_keysym,
+	Completion/X/_x_modifier, Completion/X/_x_window,
+	Completion/X/_xmodmap, Completion/X/_xutils, Doc/Zsh/compsys.yo,
+	Doc/Zsh/mod_zutil.yo, Etc/completion-style-guide,
+	Functions/Zftp/zfcd_match, Functions/Zftp/zfget_match,
+	Src/Modules/zutil.c, Src/Zle/computil.c: implement tag aliases,
+	which allows neat tricks with styles.
+
+	* Sven: 10197: Src/exec.c, Src/init.c: %_ sometimes got cmdstack
+	wrong in source(); $(...) didn't show up at all.
+
+	* Bart: 10193: Src/prompt.c: prompttrunc() didn't track realloc()'s.
+
+	* Bart: 10181: Functions/Prompts/prompt_bart_setup: Bart's Theme
+	and Variations.
+
+	* Sven: 10178: Completion/Commands/_next_tags, Doc/Zsh/compsys.yo:
+	don't bind _next_tags by default and add some more docs.
+
+	* Sven: 10176: Src/Zle/compresult.c, Src/init.c, Src/parse.c:
+	optimize list-packed.
+
+	* Sven: 10174: Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo: tweaks on
+	completer and -V.
+
+	* Bart: 10173: Functions/Prompts/prompt_bart_setup,
+	Functions/Prompts/promptinit: Bart's Theme.
+
+	* Sven: 10172: Completion/Core/_main_complete: typo.
+
+	* Bart: 10168: Src/init.c: move hbegin() to get it right in
+	precmd.
+
+	* Oliver: 10166: Completion/X/_xt_arguments,
+	Completion/User/_nedit: new and improved.
+
+	* Bart: 10165: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo: move doc
+	for using a completer twice; zcompile doc tweak.
+
+	* Oliver: 10162: Completion/Core/_expand: use nullglob option
+	instead of (N) so that user's qualifiers work.
+
+	* Sven: 10159: Src/Zle/compresult.c: wrong calculation of display
+	length when not using zsh/complist.
+
+	* Sven: 10156: Src/exec.c: possible invalid field in function
+	definition when loading.
+
+	* Zefram: 10152: Src/mem.c: fix ordering ambiguity ANSI wouldn't
+	have liked.
+
+	* Bart: 10150: Src/exec.c, Test/51xtrace.ztst: `one last' xtrace
+	redirection fix.
+
+	* Sven: 10149: Doc/Zsh/builtins.yo, Src/builtin.c, Src/exec.c,
+	Src/parse.c: allows native and ksh-like wordcode function styles.
+
+	* Sven: 10148: Src/Zle/comp.h, Src/Zle/compcore.c, Src/mem.c:
+	optimization for added matches where things didn't change.
+
+	* Sven: 10146: Completion/Core/_sort_tags, Completion/Core/_tags,
+	Doc/Zsh/compsys.yo: return value of function called by _tags used
+	to decide dispositions.
+
+	* Sven: 10145: Doc/Zsh/mod_zle.yo: confess to users that zle input
+	is on a stack.
+
+	* Sven: 10144: Doc/Zsh/builtins.yo, Src/Modules/parameter.c,
+	Src/builtin.c, Src/exec.c, Src/linklist.c, Src/parse.c: dump
+	functions from current shell.
+
+	* Sven: 10143: Src/init.c, Src/math.c: better ignoring of bits
+	that shouldn't get evaluated in math expressions.
+
+	* Sven: 10135: Doc/Zsh/compsys.yo, Src/Zle/computil.c: complex
+	argument handling expressions.
+
+	* Sven: 10131: Src/Modules/stat.c, Src/Modules/zpty.c,
+	Src/Modules/zutil.c, Src/Zle/compctl.c, Src/Zle/complete.c,
+	Src/Zle/computil.c, Src/Zle/zle_main.c, Src/Zle/zle_thingy.c,
+	Src/parse.c: more consistent zerrnam/zwarnnam usage.
+
+	* Sven: 10129: Doc/Zsh/builtins.yo, Src/builtin.c, Src/parse.c:
+	autoload -w can mark all functions in .zwc files for autoloading.
+
+	* Sven: 10128: Doc/Zsh/zle.yo, Src/Zle/zle_main.c, Src/init.c,
+	Src/signals.c, Src/zsh.h: zle parameters available readonly in
+	traps.
+
+	* Sven: 10127: Doc/Zsh/zle.yo, Src/Zle/compresult.c,
+	Src/Zle/iwidgets.list, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	Src/Zle/zle_refresh.c, Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c:
+	end-of-list widget to display prompt under command line, plus
+	$MARK documentation.
+
+	* Sven: 10126: Src/Zle/compcore.c: quotes in $PREFIX and $SUFFIX.
+
+	* Sven: 10125: Src/math.c, Src/params.c: restore old cruddy
+	behaviour removed in 10104, but using recursion counter.
+
+	* Sven: 10120: Src/exec.c, Src/loop.c, Src/parse.c: state not
+	tested properly in some constructs.
+
+	* Sven: 10117: Doc/Zsh/mod_zle.yo, Src/Zle/zle_params.c,
+	Src/Zle/zle_thingy.c: zle on its own returns zle status;
+	MARK parameter; disallow widgets in traps.
+
+	* Oliver: 10116: Completion/Builtins/_source: wasn't looking
+	through the path.
+
+	* Sven: 10112: Completion/Base/_condition, Src/Zle/zle_tricky.c:
+	fix up altmodische _condition; `[[ ... && ' thought it was in
+	command position for completion.
+
+	* Sven: 10108: Completion/Commands/.distfiles,
+	Completion/Commands/_next_tags, Completion/Core/_files,
+	Completion/Core/_main_complete, Completion/Core/_requested,
+	Completion/Core/_wanted, Doc/Zsh/compsys.yo,
+	Functions/Misc/.distfiles: _next_tags allows you to cycle through
+	sets of completions according to the tags.
+
+	* Sven: 10107: Doc/Zsh/compwid.yo, Src/Zle/complete.c,
+	Src/Zle/compmatch.c: ** in match spec allows matching including
+	the anchor as well.
+
+	* Sven: 10106: Functions/Misc/zrecompile, Src/exec.c, Src/parse.c,
+	Src/zsh.h: recompilation of wordcode files and related bugs.
+
+	* Sven: 10105: Src/lex.c: single exclamation marks in conditions.
+
+	* Sven: 10104: Src/math.c, Src/params.c: retrieve parameters in
+	math evaluations more directly rather than recursively calling
+	matheval(), which was kind of stupid, so stupid I could	quite
+	possible have put it in myself, but I don't think I did this time.
+
+	* Sven: 10103: Src/glob.c: bad handling of ./ and ../ in
+	closures.
+
+	* Bart: 10098: configure.in, Src/cond.c: check for AIX's
+	faccessx() and neaten configure library function tests.
+
+	* Oliver: 10088: Completion/User/_groups,
+	Completion/Base/_condition: better handling of files after
+	conditions, checking of use of NIS.
+
+	* Adam: 10087: Completion/User/_perl_modules,
+	Completion/User/_perl: new and enhanced perl completions.
+
+	* Oliver: 10073: Src/cond.c: /dev/fd emulation for access tests.
+
+	* Adam: 10072: Completion/User/_mysql_utils: new completion
+	function for something with suspcicious `SQL' bit in its name.
+
+	* Bart: 10071: Src/exec.c: xtrace output redirection problem.
+
+	* Sven: 10059: Src/builtin.c, Src/lex.c, Src/parse.c, Src/text.c,
+	Src/zsh.h: bugs found by ksh tests: typeset -Ai didn't create
+	assocs (still doesn't create ints), some heredoc difficulties, |&
+	difficulties.
+
+	* Alexandre: 10058: Completion/User/_prcs, Completion/User/_diff,
+	Completion/User/_diff_options: another solution for the GNU diff
+	completion problem.
+
+	* Bart: 10056: Etc/MACHINES: RLIM_INFINITY incompatibility with
+	some Linux/GNU libraries.
+
+	* Sven: 10044: Completion/User/_diff, Completion/User/_use_lo:
+	gdiff should use diff completion, pretty obviously.
+
+	* Sven: 10041: Doc/Zsh/builtins.yo, Doc/Zsh/files.yo,
+	Doc/Zsh/func.yo, Src/init.c, Src/parse.c: enhancements for digest
+	files including digests of sourced files.  Or maybe digestion of
+	sauce.
+
+	* Sven: 10040: Completion/User/_diff_options: can test for GNU
+	diff.
+
+	* Oliver: 10029: Src/utils.c: bad handling of '^^' in keystring
+	parsing.
+
+	* Andrej: 10028: Completion/Builtins/_cd: remove local directory
+	from cdpath.
+
+	* Sven: 10025: Functions/Misc/nslookup, Src/Modules/zpty.c:
+	optimizations for pty reads.
+
+	* Sven: 10017: Doc/Zsh/builtins.yo, Src/lex.c, Src/parse.c:
+	fix buffer problem for autoloading and unportable macro.
+
+	* Oliver: 10013: Completion/Builtins/_compdef,
+	Completion/Builtins/_zpty, Completion/User/_getconf: two new
+	functions and one updated.
+
+	* Andrej: 10011: Completion/User/_sudo: options for recent sudo.
+
+	* Bart: 10009: Completion/Base/_subscript: didn't get arrays the
+	right length.
+
+	* Bart: 10006: configure.in, Src/utils.c: use mktemp() if
+	available.
+
+	* Bart: 9992: Functions/Zle/predict-on: tweaks.
+
+	* Bart: 9990: Test/07cond.ztst: compatibility fix for chmod g+s.
+
+	* Bart: 9982: Test/53completion.ztst, Test/Makefile.in,
+	Test/comptest, Test/ztst.zsh: better handling of uninstalled
+	modules.
+
+	* Andrej: 9981: Src/Modules/zpty.c: SYSV-related pty stuff.
+
+	* Bart: 9980: Src/Makefile.in: separate mymods.conf and xmods.conf
+	dependencies.
+
+	* Sven: 9966: Doc/Zsh/builtins.yo, Doc/Zsh/func.yo, Src/parse.c:
+	require .zwc ending for digest files.
+
+	* Bart: 9963: Test/11glob.ztst: existing globbing tests run under
+	new test harness.
+
+	* Bart: 9961: INSTALL, Src/Makefile.in, Test/53completion.ztst,
+	Test/comptest: errors trying to load zpty for static shell in
+	tests; INSTALL didn't describe mymods.conf properly.
+
+	* Tanaka Akira: 9960: Test/comptest, Test/53completion.ztst: avoid
+	zpty timing problem.
+
+	* Sven: 9958: Src/parse.c: sharing strings made test fail with
+	new wordcode.
+
+	* Tanaka Akira: 9957: Test/comptest: clear to end.
+
+	* Sven: 9953: Src/Zle/complist.c: was incorrectly omitting some
+	display sequences.
+
+	* Tanaka Akira: 9952: Test/comptest: compatibility, quoting and
+	debugging fixes.
+
+	* Sven: 9951: Completion/Core/_multi_parts: was producing
+	mysterious blank entries.
+
+	* Sven: 9948: Src/exec.c, Src/parse.c: stripkshdef() was broken.
+
+	* Sven: 9947: Completion/Core/compdump, Completion/Core/compinit,
+	Doc/Zsh/builtins.yo, Doc/Zsh/func.yo, Src/builtin.c, Src/cond.c,
+	Src/exec.c, Src/glob.c, Src/lex.c, Src/loop.c, Src/math.c,
+	Src/mem.c, Src/parse.c, Src/text.c, Src/utils.c, Src/zsh.h:
+	Wordcode compilation for functions using .zwc or `digest
+	functions' in $fpath.
+
+	* Bart: 9946: Src/subst.c: return type in 9937.
+
+	* Bart: 9945: Src/prompt.c: truncation messed up non-literal
+	parts of the prompt.
+
+	* Bart: 9942: Src/prompt.c: truncation in true part of ternary
+	expression incorrectly showed false part and closing parenthesis.
+
+	* Sven: 9937: Src/subst.c: parsing problem with parameter
+	substitution which showed up in file completion.
+
+	* Sven: 9938: Src/Modules/parameter.c: problem assigning to
+	dirstack.
+
+	* Tanaka Akira: 9936: Src/Zle/complist.c, Test/comptest,
+	Test/53completion.ztst: tests for completion using zpty.
+
+	* Tanaka Akira: 9935: Test/52zregexparse.ztst: tests for
+	zregexparse.
+
+2000-03-21  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9920: Completion/Core/.distfiles, Completion/Core/_call:
+	the function needed for 9897.
+
+	* Bart: 9912: Completion/User/_mailboxes: further improvements.
+
+	* Sven: 9904: Src/utils.c: getquery() and rmstarsilent.
+
+	* Sven: 9902: Completion/Core/_path_files: _files -g problem.
+
+	* Sven: 9900, 9903: Src/exec.c: parsing oddity in here documents.
+
+	* 9897: Completion/Base/_arguments, Completion/Builtins/_pids,
+	Completion/Linux/_rpm, Completion/User/_a2ps,
+	Completion/User/_archie, Completion/User/_diff_options,
+	Completion/User/_finger, Completion/User/_groups,
+	Completion/User/_gs, Completion/User/_killall,
+	Completion/User/_lp, Completion/User/_telnet,
+	Completion/User/_users_on, Completion/User/_yp,
+	Completion/X/_x_font, Completion/X/_x_window, Doc/Zsh/compsys.yo:
+	use _call function and `command' style to override command
+	used in various completions.
+
+	* Sven: 9895: Completion/Base/_combination,
+	Completion/Builtins/_zstyle, Completion/User/_telnet,
+	Doc/Zsh/compsys.yo: usage of combination styles.
+
+	* Sven: 9893: Completion/Core/_multi_parts: return values.
+
+	* Sven: 9892: Completion/Core/_main_complete,
+	Completion/Core/_path_files, Completion/Core/compdump,
+	Completion/Core/compinit: improved fix for 9886; typo in
+	_main_complete; compdump uses (q) flag; remove compstyle; update
+	compconf.
+
+	* Bart: 9891: Completion/User/_cvs: kshautoload problem.
+
+	* Bart: 9889: acconfig.h, configure.in, Src/exec.c,
+	Src/prototypes.h: from 3.0.8: detect mknod(), minor redirection
+	tweaks.
+
+	* Bart: 9886: Completion/Core/_path_files: matcher problem.
+
+	* Tanaka Akira: 9885: Completion/User/_dvi, Completion/User/_lynx,
+	Completion/X/_xutils: extra arguments for completion functions.
+
+	* Alexandre: 9882: Completion/User/_prcs: error messages.
+
+	* Sven: 9880: Completion/Core/_path_files: error message with
+	~unknown.
+
+	* Sven: 9879: Completion/User/_tilde_files: use of magicequalsubst
+	with completion.
+
+	* Sven: 9877: Src/parse.c: wordcode bug in functions with failed
+	builtins.
+
+	* Sven: 9876: Completion/Base/_combination,
+	Completion/User/_rlogin, Completion/User/_ssh,
+	Completion/User/_user_at_host, Doc/Zsh/compsys.yo: more flexible
+	handling of separators in combinations.
+
+	* Sven: 9870: Completion/Core/_path_files,
+	Completion/User/.distfiles, Completion/User/_dd,
+	Completion/User/_tilde_files, Src/Zle/compresult.c: better
+	handling of paths beginning ~ in various places.
+
+	* Sven: 9865: Completion/Builtins/_zstyle,
+	Completion/Core/_main_complete, Completion/Core/_setup,
+	Doc/Zsh/compsys.yo, Src/Zle/compcore.c, Src/Zle/compresult.c:
+	implement prefer-ignored style to prefer alternative matches
+	to going on to another completer.
+
+	* Sven: 9863: Src/parse.c, Src/text.c: wordcode problems, using
+	old code.
+
+	* Sven: 9861: Completion/Core/_main_complete: interaction of
+	_main_complete and _oldlist.
+
+	* Sven: 9860: Src/Zle/compctl.c: storing of match and display list.
+
+	* Sven: 9855: Completion/Core/_multi_parts, Doc/Zsh/compsys.yo:
+	_multi_parts accepts -f.
+
+2000-02-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9845: Functions/Zle/incremental-complete-word: another
+	context change.
+
+	* Sven: 9844: Functions/Zle/predict-on: rationalize 9837.
+
+	* Sven: 9840: config.sub: test for alphaev6 systems.
+
+	* Sven: 9839: Src/Builtins/sched.c, Src/Modules/example.c,
+	Src/Modules/mapfile.c, Src/Modules/parameter.c,
+	Src/Modules/zftp.c, Src/Modules/zprof.c, Src/Modules/zpty.c,
+	Src/Modules/zutil.c, Src/Zle/compcore.c, Src/Zle/compctl.c,
+	Src/Zle/complete.c, Src/Zle/complist.c, Src/Zle/compresult.c,
+	Src/Zle/computil.c, Src/Zle/zle_hist.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c, Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c,
+	Src/Zle/zleparameter.c, Src/builtin.c, Src/cond.c, Src/exec.c,
+	Src/glob.c, Src/hist.c, Src/init.c, Src/jobs.c, Src/lex.c,
+	Src/linklist.c, Src/loop.c, Src/main.c, Src/math.c, Src/mem.c,
+	Src/module.c, Src/params.c, Src/parse.c, Src/pattern.c,
+	Src/prompt.c, Src/signals.c, Src/subst.c, Src/utils.c, Src/zsh.h:
+	Eliminate `useheap' variable and consequent HEAPALLOC/PERMALLOC
+	usage throughout the shell (hooray!)  All memory allocation is
+	either explicitly on the heap or permanent.
+
+	* Sven: 9838: Src/Modules/parameter.c, Src/Zle/computil.c,
+	Src/Zle/zle_main.c, Src/builtin.c, Src/cond.c, Src/exec.c,
+	Src/glob.c, Src/hashtable.c, Src/init.c, Src/jobs.c, Src/lex.c,
+	Src/linklist.c, Src/loop.c, Src/params.c, Src/parse.c,
+	Src/signals.c, Src/signals.h, Src/subst.c, Src/text.c,
+	Src/version.h, Src/zsh.h: parser now emits wordcode directly; a
+	whole heap of optimisations of the execution tree.
+
+	* Sven: 9837: Completion/User/_gunzip, Functions/Zle/predict-on:
+	no. of colons in predict-on, typo in _gunzip.
+
+	* Sven: 9835: Completion/Builtins/_zstyle,
+	Completion/Core/_main_complete, Doc/Zsh/compsys.yo: document
+	single-ignored style, better handling of descriptions with
+	warnings about no matches.
+
+	* Bart: 2930: Completion/User/_ssh: basic completion for remote
+	files.
+
+2000-02-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9831: Completion/Core/_multi_parts: better separator
+	removal.
+
+	* Sven: 9830: Completion/X/_x_arguments: reverse 9824, but use
+	_default instead of _files if no special arguments.
+
+	* Bart: 9828: Completion/User/_mailboxes: $i -> "$i" missed out.
+
+2000-02-21  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Clint: 9824: Completion/X/_x_arguments: `*/X11/*' was too broad
+	a definition for X commands taking standard arguments to be
+	useful.
+
+	* Clint: 9823: configure.in: open fifo read/write in test to avoid
+	possible (unconfirmed) hang.
+
+	* Bart: 9822: Completion/User/_mailboxes: add completions for mush
+	and tkrat; allow pine to complete mh folders.
+
+	* Sven: 9816: Completion/Core/_multi_parts,
+	Completion/User/_mailboxes: improved version of 9812/9815.
+
+	* Bart: 9812, 9815: Completion/User/_mailboxes,
+	Completion/User/_mutt: improved mailbox completion for all sorts
+	of types, currently only used for mutt.
+
+	* Sven: 9810: Completion/Core/_multi_parts: difficulties with
+	separator as initial character.
+
+	* Sven: 9809: Completion/Builtins/_popd,
+	Completion/Core/_approximate, Doc/Zsh/compsys.yo: documentation
+	improvements and typo fixes.
+
+	* Tanaka Akira/Sven: 9807: Completion/Core/_main_complete:
+	single-ignored style, as yet undocumented, for handling of
+	alternate match set.
+
+	* Sven: 9806: Completion/Core/_multi_parts: problems with literal
+	(parenthesised) arrays.
+
+	* Sven: 9805: Completion/Core/_path_files: difficulties with
+	suffixes when expanding paths.
+
+	* Sven: 9802: Src/utils.c: no need to quote !'s in ${(qq)...}
+	because they're not active in single quotes.
+
+	* Bart: 9799: Src/utils.c: better interpretation of typeahead when
+	querying user e.g. for spell checking.
+
+	* Adam: 9798: Doc/Makefile.in: use `texi' and `html' for targets
+	to avoid duplicated name complaint by gmake.
+
 2000-02-20  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws: Config/version.mk: 3.1.6-dev-19.
