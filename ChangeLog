@@ -1,3 +1,13 @@
+2003-04-18  Oliver Kiddle  <opk@zsh.org>
+
+	* users/6013: GoTaR <gotar@poczta.onet.pl>: Completion/Unix/Type/_ps,
+	Completion/Unix/Type/_pdf, Completion/X/Command/_gqview:
+	new gqview completion and complete .ps/.pdf files for more commands
+
+2003-04-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 18443: Completion/X/Command/_dcop: new completion for dcop
+
 2003-03-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 18402: Src/builtin.c: Prevent "print -m" from crashing (it now
