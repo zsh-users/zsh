@@ -4,7 +4,7 @@ local dict dictresult dictwords j expl
 
 [[ -z $words[CURRENT] ]] && return 1
 
-dictresults=(${${(f)${"$(dict -m $words[CURRENT])":gs/    
+dictresults=(${${(f)${"$(dict -m -s prefix $words[CURRENT])":gs/    
   / /}}:#[0-9]*matches found})
 
 for j in ${dictresults}

@@ -1,3 +1,8 @@
+2002-02-08  Clint Adams  <clint@zsh.org>
+
+	* Matt Zimmerman: 16590: Completion/Unix/Type/_dict_words:
+	use a prefix match instead of a "fuzzy-exact" match.
+
 2002-02-07  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16582: Src/Zle/computil.c: fix for displaying matches in
