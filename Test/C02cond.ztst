@@ -27,9 +27,13 @@
 0:-a cond
 
   # Find a block special file system.  This is a little tricky.
-  block=$(find /dev /devices -type b -print 2>/dev/null|head -1) &&
-  [[ -b $block && ! -b zerolength ]]
-0:-b cond
+  if block=$(find /dev(|ices)/ -type b -print); then
+    [[ -b $block[(f)1] && ! -b zerolength ]]
+  else
+    print -u8 'Warning: Not testing [[ -b blockdevice ]] (no devices found)'
+    [[ ! -b zerolength ]]
+  fi
+0D:-b cond
 
   char=(/dev/tty*([1]))
   [[ -c $char && ! -c $block ]]
