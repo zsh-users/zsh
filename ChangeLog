@@ -1,7 +1,7 @@
 2005-01-23  Clint Adams  <clint@zsh.org>
 
-	* 20737: Completion/Unix/Command/_subversion: run svn commands with
-	  LANG=C.
+	* 20737, 20739: Completion/Unix/Command/_subversion: run svn
+	  commands with LC_MESSAGES=C.
 
 2005-01-22  Clint Adams  <clint@zsh.org>
 
