@@ -30,6 +30,17 @@
 #include "zsh.mdh"
 #include "utils.pro"
 
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined (__STDC_ISO_10646__)
+# include <wchar.h>
+#else
+# ifdef HAVE_LANGINFO_H
+#   include <langinfo.h>
+#   if defined(HAVE_ICONV_H) || defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+#     include <iconv.h>
+#   endif
+# endif
+#endif
+
 /* name of script being sourced */
 
 /**/
@@ -67,7 +78,8 @@ zwarn(const char *fmt, const char *str, int num)
 {
     if (errflag || noerrs)
 	return;
-    trashzle();
+    if (isatty(2))
+	trashzle();
     /*
      * scriptname is set when sourcing scripts, so that we get the
      * correct name instead of the generic name of whatever
@@ -84,6 +96,10 @@ zwarn(const char *fmt, const char *str, int num)
 mod_export void
 zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
 {
+    if (!cmd) {
+	zwarn(fmt, str, num);
+	return;
+    }
     if (errflag || noerrs)
 	return;
     trashzle();
@@ -91,12 +107,23 @@ zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
 	nicezputs(scriptname ? scriptname : argzero, stderr);
 	fputc((unsigned char)':', stderr);
     }
-    if (cmd) {
-	nicezputs(cmd, stderr);
-	fputc((unsigned char)':', stderr);
-    }
+    nicezputs(cmd, stderr);
+    fputc((unsigned char)':', stderr);
     zerrmsg(fmt, str, num);
 }
+
+#ifdef __CYGWIN__
+/*
+ * This works around an occasional problem with dllwrap on Cygwin, seen
+ * on at least two installations.  It fails to find the last symbol
+ * exported in alphabetical order (in our case zwarnnam).  Until this is
+ * properly categorised and fixed we add a dummy symbol at the end.
+ */
+mod_export void
+zz_plural_z_alpha(void)
+{
+}
+#endif
 
 /**/
 void
@@ -162,7 +189,7 @@ zerrmsg(const char *fmt, const char *str, int num)
  * This is used instead of putchar since it can be a macro. */
 
 /**/
-int
+mod_export int
 putraw(int c)
 {
     putc(c, stdout);
@@ -292,7 +319,7 @@ slashsplit(char *s)
     int t0;
 
     if (!*s)
-	return (char **) zcalloc(sizeof(char **));
+	return (char **) zshcalloc(sizeof(char **));
 
     for (t = s, t0 = 0; *t; t++)
 	if (*t == '/')
@@ -451,7 +478,7 @@ static int finddir_best;
 
 /**/
 static void
-finddir_scan(HashNode hn, int flags)
+finddir_scan(HashNode hn, UNUSED(int flags))
 {
     Nameddir nd = (Nameddir) hn;
 
@@ -490,7 +517,7 @@ finddir(char *s)
     if(!strcmp(s, finddir_full) && *finddir_full)
 	return finddir_last;
 
-    if(strlen(s) >= ffsz) {
+    if ((int)strlen(s) >= ffsz) {
 	free(finddir_full);
 	finddir_full = zalloc(ffsz = strlen(s) * 2);
     }
@@ -540,7 +567,7 @@ adduserdir(char *s, char *t, int flags, int always)
     }
 
     /* add the name */
-    nd = (Nameddir) zcalloc(sizeof *nd);
+    nd = (Nameddir) zshcalloc(sizeof *nd);
     nd->flags = flags;
     nd->dir = ztrdup(t);
     /* The variables PWD and OLDPWD are not to be displayed as ~PWD etc. */
@@ -570,6 +597,7 @@ getnameddir(char *name)
     if ((pm = (Param) paramtab->getnode(paramtab, name)) &&
 	    (PM_TYPE(pm->flags) == PM_SCALAR) &&
 	    (str = getsparam(name)) && *str == '/') {
+	pm->flags |= PM_NAMEDDIR;
 	adduserdir(name, str, 0, 1);
 	return str;
     }
@@ -622,6 +650,30 @@ time_t lastmailcheck;
 /**/
 time_t lastwatch;
 
+/**/
+mod_export int
+callhookfunc(char *name, LinkList lnklst)
+{
+    Eprog prog;
+
+    if ((prog = getshfunc(name)) != &dummy_eprog) {
+	/*
+	 * Save stopmsg, since user doesn't get a chance to respond
+	 * to a list of jobs generated in a hook.
+	 */
+	int osc = sfcontext, osm = stopmsg;
+
+	sfcontext = SFC_HOOK;
+	doshfunc(name, prog, lnklst, 0, 1);
+	sfcontext = osc;
+	stopmsg = osm;
+
+	return 0;
+    }
+
+    return 1;
+}
+
 /* do pre-prompt stuff */
 
 /**/
@@ -630,7 +682,6 @@ preprompt(void)
 {
     static time_t lastperiodic;
     LinkNode ln;
-    Eprog prog;
     int period = getiparam("PERIOD");
     int mailcheck = getiparam("MAILCHECK");
 
@@ -643,13 +694,7 @@ preprompt(void)
 
     /* If a shell function named "precmd" exists, *
      * then execute it.                           */
-    if ((prog = getshfunc("precmd")) != &dummy_eprog) {
-	int osc = sfcontext;
-
-	sfcontext = SFC_HOOK;
-	doshfunc("precmd", prog, NULL, 0, 1);
-	sfcontext = osc;
-    }
+    callhookfunc("precmd", NULL);
     if (errflag)
 	return;
 
@@ -657,14 +702,8 @@ preprompt(void)
      * "periodic" exists, 3) it's been greater than PERIOD since we *
      * executed "periodic", then execute it now.                    */
     if (period && (time(NULL) > lastperiodic + period) &&
-	(prog = getshfunc("periodic")) != &dummy_eprog) {
-	int osc = sfcontext;
-
-	sfcontext = SFC_HOOK;
-	doshfunc("periodic", prog, NULL, 0, 1);
-	sfcontext = osc;
+	!callhookfunc("periodic", NULL))
 	lastperiodic = time(NULL);
-    }
     if (errflag)
 	return;
 
@@ -685,12 +724,16 @@ preprompt(void)
 
 	if (mailpath && *mailpath && **mailpath)
 	    checkmailpath(mailpath);
-	else if ((mailfile = getsparam("MAIL")) && *mailfile) {
-	    char *x[2];
+	else {
+	    queue_signals();
+	    if ((mailfile = getsparam("MAIL")) && *mailfile) {
+		char *x[2];
 
-	    x[0] = mailfile;
-	    x[1] = NULL;
-	    checkmailpath(x);
+		x[0] = mailfile;
+		x[1] = NULL;
+		checkmailpath(x);
+	    }
+	    unqueue_signals();
 	}
 	lastmailcheck = time(NULL);
     }
@@ -719,11 +762,7 @@ checkmailpath(char **s)
 	if (**s == 0) {
 	    *v = c;
 	    zerr("empty MAILPATH component: %s", *s, 0);
-#ifndef MAILDIR_SUPPORT
-	} else if (stat(unmeta(*s), &st) == -1) {
-#else
 	} else if (mailstat(unmeta(*s), &st) == -1) {
-#endif
 	    if (errno != ENOENT)
 		zerr("%e: %s", *s, errno);
 	} else if (S_ISDIR(st.st_mode)) {
@@ -798,13 +837,16 @@ printprompt4(void)
     if (!xtrerr)
 	xtrerr = stderr;
     if (prompt4) {
-	int l;
+	int l, t = opts[XTRACE];
 	char *s = dupstring(prompt4);
 
+	opts[XTRACE] = 0;
 	unmetafy(s, &l);
 	s = unmetafy(promptexpand(metafy(s, l, META_NOALLOC), 0, NULL, NULL), &l);
+	opts[XTRACE] = t;
 
 	fprintf(xtrerr, "%s", s);
+	free(s);
     }
 }
 
@@ -963,10 +1005,10 @@ adjustwinsize(int from)
 	    ttyrows = shttyinfo.winsize.ws_row;
 	    ttycols = shttyinfo.winsize.ws_col;
 	} else {
-	    /* Set to unknown on failure */
-	    shttyinfo.winsize.ws_row = 0;
-	    shttyinfo.winsize.ws_col = 0;
-	    resetzle = 1;
+	    /* Set to value from environment on failure */
+	    shttyinfo.winsize.ws_row = lines;
+	    shttyinfo.winsize.ws_col = columns;
+	    resetzle = (from == 1);
 	}
 #else
 	resetzle = from == 1;
@@ -1075,30 +1117,86 @@ zclose(int fd)
 	    coprocin = -1;
 	if (fd == coprocout)
 	    coprocout = -1;
+	return close(fd);
     }
-    return close(fd);
+    return -1;
 }
 
-/* Get a file name relative to $TMPPREFIX which *
- * is unique, for use as a temporary file.      */
+#ifdef HAVE__MKTEMP
+extern char *_mktemp(char *);
+#endif
+
+/* Get a unique filename for use as a temporary file.  If "prefix" is
+ * NULL, the name is relative to $TMPPREFIX; If it is non-NULL, the
+ * unique suffix includes a prefixed '.' for improved readability.  If
+ * "use_heap" is true, we allocate the returned name on the heap. */
  
 /**/
 mod_export char *
-gettempname(void)
+gettempname(const char *prefix, int use_heap)
 {
-    char *s;
+    char *ret, *suffix = prefix ? ".XXXXXX" : "XXXXXX";
  
-    if (!(s = getsparam("TMPPREFIX")))
-	s = DEFAULT_TMPPREFIX;
+    queue_signals();
+    if (!prefix && !(prefix = getsparam("TMPPREFIX")))
+	prefix = DEFAULT_TMPPREFIX;
+    if (use_heap)
+	ret = dyncat(unmeta(prefix), suffix);
+    else
+	ret = bicat(unmeta(prefix), suffix);
  
 #ifdef HAVE__MKTEMP
     /* Zsh uses mktemp() safely, so silence the warnings */
-    return ((char *) _mktemp(dyncat(unmeta(s), "XXXXXX")));
+    ret = (char *) _mktemp(ret);
 #else
-    return ((char *) mktemp(dyncat(unmeta(s), "XXXXXX")));
+    ret = (char *) mktemp(ret);
 #endif
+    unqueue_signals();
+
+    return ret;
 }
 
+/**/
+mod_export int
+gettempfile(const char *prefix, int use_heap, char **tempname)
+{
+    char *fn;
+    int fd;
+#if HAVE_MKSTEMP
+    char *suffix = prefix ? ".XXXXXX" : "XXXXXX";
+
+    if (!prefix && !(prefix = getsparam("TMPPREFIX")))
+	prefix = DEFAULT_TMPPREFIX;
+    if (use_heap)
+	fn = dyncat(unmeta(prefix), suffix);
+    else
+	fn = bicat(unmeta(prefix), suffix);
+
+    fd = mkstemp(fn);
+    if (fd < 0) {
+	if (!use_heap)
+	    free(fn);
+	fn = NULL;
+    }
+#else
+    int failures = 0;
+
+    do {
+	if (!(fn = gettempname(prefix, use_heap))) {
+	    fd = -1;
+	    break;
+	}
+	if ((fd = open(fn, O_RDWR | O_CREAT | O_EXCL, 0600)) >= 0)
+	    break;
+	if (!use_heap)
+	    free(fn);
+	fn = NULL;
+    } while (errno == EEXIST && ++failures < 16);
+#endif
+    *tempname = fn;
+    return fd;
+}
+ 
 /* Check if a string contains a token */
 
 /**/
@@ -1213,7 +1311,8 @@ skipparens(char inpar, char outpar, char **s)
 mod_export zlong
 zstrtol(const char *s, char **t, int base)
 {
-    zlong ret = 0;
+    const char *inp, *trunc = NULL;
+    zulong calc = 0, newcalc = 0;
     int neg;
 
     while (inblank(*s))
@@ -1232,21 +1331,59 @@ zstrtol(const char *s, char **t, int base)
 	else
 	    base = 8;
     }
+    inp = s;
     if (base <= 10)
-	for (; *s >= '0' && *s < ('0' + base); s++)
-	    ret = ret * base + *s - '0';
+	for (; *s >= '0' && *s < ('0' + base); s++) {
+	    if (trunc)
+		continue;
+	    newcalc = calc * base + *s - '0';
+	    if (newcalc < calc)
+	    {
+	      trunc = s;
+	      continue;
+	    }
+	    calc = newcalc;
+	}
     else
 	for (; idigit(*s) || (*s >= 'a' && *s < ('a' + base - 10))
-	     || (*s >= 'A' && *s < ('A' + base - 10)); s++)
-	    ret = ret * base + (idigit(*s) ? (*s - '0') : (*s & 0x1f) + 9);
+	     || (*s >= 'A' && *s < ('A' + base - 10)); s++) {
+	    if (trunc)
+		continue;
+	    newcalc = calc*base + (idigit(*s) ? (*s - '0') : (*s & 0x1f) + 9);
+	    if (newcalc < calc)
+	    {
+		trunc = s;
+		continue;
+	    }
+	    calc = newcalc;
+	}
+
+    /*
+     * Special case: check for a number that was just too long for
+     * signed notation.
+     * Extra special case: the lowest negative number would trigger
+     * the first test, but is actually representable correctly.
+     * This is a 1 in the top bit, all others zero, so test for
+     * that explicitly.
+     */
+    if (!trunc && (zlong)calc < 0 &&
+	(!neg || calc & ~((zulong)1 << (8*sizeof(zulong)-1))))
+    {
+	trunc = s - 1;
+	calc /= base;
+    }
+
+    if (trunc)
+	zwarn("number truncated after %d digits: %s", inp, trunc - inp);
+
     if (t)
 	*t = (char *)s;
-    return neg ? -ret : ret;
+    return neg ? -(zlong)calc : (zlong)calc;
 }
 
 /**/
 int
-setblock_stdin(void)
+setblock_fd(int turnonblocking, int fd, long *modep)
 {
 #ifdef O_NDELAY
 # ifdef O_NONBLOCK
@@ -1264,15 +1401,24 @@ setblock_stdin(void)
 
 #if NONBLOCK
     struct stat st;
-    long mode;
 
-    if (!fstat(0, &st) && !S_ISREG(st.st_mode)) {
-	mode = fcntl(0, F_GETFL, 0);
-	if (mode != -1 && (mode & NONBLOCK) &&
-	    !fcntl(0, F_SETFL, mode & ~NONBLOCK))
-	    return 1;
-    }
+    if (!fstat(fd, &st) && !S_ISREG(st.st_mode)) {
+	*modep = fcntl(fd, F_GETFL, 0);
+	if (*modep != -1) {
+	    if (!turnonblocking) {
+		/* We want to know if blocking was off */
+		if ((*modep & NONBLOCK) ||
+		    !fcntl(fd, F_SETFL, *modep | NONBLOCK))
+		    return 1;
+	    } else if ((*modep & NONBLOCK) &&
+		       !fcntl(fd, F_SETFL, *modep & ~NONBLOCK)) {
+		/* Here we want to know if the state changed */
+		return 1;
+	    }
+	}
+    } else
 #endif /* NONBLOCK */
+	*modep = -1;
     return 0;
 
 #undef NONBLOCK
@@ -1280,8 +1426,116 @@ setblock_stdin(void)
 
 /**/
 int
+setblock_stdin(void)
+{
+    long mode;
+    return setblock_fd(1, 0, &mode);
+}
+
+/*
+ * Check for pending input on fd.  If polltty is set, we may need to
+ * use termio to look for input.  As a final resort, go to non-blocking
+ * input and try to read a character, which in this case will be
+ * returned in *readchar.
+ *
+ * Note that apart from setting (and restoring) non-blocking input,
+ * this function does not change the input mode.  The calling function
+ * should have set cbreak mode if necessary.
+ */
+
+/**/
+mod_export int
+read_poll(int fd, int *readchar, int polltty, zlong microseconds)
+{
+    int ret = -1;
+    long mode = -1;
+    char c;
+#ifdef HAVE_SELECT
+    fd_set foofd;
+    struct timeval expire_tv;
+#else
+#ifdef FIONREAD
+    int val;
+#endif
+#endif
+#ifdef HAS_TIO
+    struct ttyinfo ti;
+#endif
+
+
+#if defined(HAS_TIO) && !defined(__CYGWIN__)
+    /*
+     * Under Solaris, at least, reading from the terminal in non-canonical
+     * mode requires that we use the VMIN mechanism to poll.  Any attempt
+     * to check any other way, or to set the terminal to non-blocking mode
+     * and poll that way, fails; it will just for canonical mode input.
+     * We should probably use this mechanism if the user has set non-canonical
+     * mode, in which case testing here for isatty() and ~ICANON would be
+     * better than testing whether bin_read() set it, but for now we've got
+     * enough problems.
+     *
+     * Under Cygwin, you won't be surprised to here, this mechanism,
+     * although present, doesn't work, and we *have* to use ordinary
+     * non-blocking reads to find out if there is a character present
+     * in non-canonical mode.
+     *
+     * I am assuming Solaris is nearer the UNIX norm.  This is not necessarily
+     * as plausible as it sounds, but it seems the right way to guess.
+     *		pws 2000/06/26
+     */
+    if (polltty) {
+	gettyinfo(&ti);
+	if ((polltty = ti.tio.c_cc[VMIN])) {
+	    ti.tio.c_cc[VMIN] = 0;
+	    /* termios timeout is 10ths of a second */
+	    ti.tio.c_cc[VTIME] = (int) (microseconds / (zlong)100000);
+	    settyinfo(&ti);
+	}
+    }
+#else
+    polltty = 0;
+#endif
+#ifdef HAVE_SELECT
+    expire_tv.tv_sec = (int) (microseconds / (zlong)1000000);
+    expire_tv.tv_usec = microseconds % (zlong)1000000;
+    FD_ZERO(&foofd);
+    FD_SET(fd, &foofd);
+    ret = select(fd+1, (SELECT_ARG_2_T) &foofd, NULL, NULL, &expire_tv);
+#else
+#ifdef FIONREAD
+    if (ioctl(fd, FIONREAD, (char *) &val) == 0)
+	ret = (val > 0);
+#endif
+#endif
+
+    if (ret < 0) {
+	/*
+	 * Final attempt: set non-blocking read and try to read a character.
+	 * Praise Bill, this works under Cygwin (nothing else seems to).
+	 */
+	if ((polltty || setblock_fd(0, fd, &mode)) && read(fd, &c, 1) > 0) {
+	    *readchar = STOUC(c);
+	    ret = 1;
+	}
+	if (mode != -1)
+	    fcntl(fd, F_SETFL, mode);
+    }
+#ifdef HAS_TIO
+    if (polltty) {
+	ti.tio.c_cc[VMIN] = 1;
+	ti.tio.c_cc[VTIME] = 0;
+	settyinfo(&ti);
+    }
+#endif
+    return (ret > 0);
+}
+
+/**/
+int
 checkrmall(char *s)
 {
+    if (!shout)
+	return 1;
     fprintf(shout, "zsh: sure you want to delete all the files in ");
     if (*s != '/') {
 	nicezputs(pwd[1] ? unmeta(pwd) : "", shout);
@@ -1315,10 +1569,11 @@ read1char(void)
 }
 
 /**/
-int
+mod_export int
 noquery(int purge)
 {
-    int c, val = 0;
+    int val = 0;
+    char c;
 
 #ifdef FIONREAD
     ioctl(SHTTY, FIONREAD, (char *)&val);
@@ -1350,7 +1605,7 @@ getquery(char *valid_chars, int purge)
     }
 
     while ((c = read1char()) >= 0) {
-	if (c == 'Y' || c == '\t')
+	if (c == 'Y')
 	    c = 'y';
 	else if (c == 'N')
 	    c = 'n';
@@ -1385,7 +1640,7 @@ static char *guess, *best;
 
 /**/
 static void
-spscan(HashNode hn, int scanflags)
+spscan(HashNode hn, UNUSED(int scanflags))
 {
     int nd;
 
@@ -1514,11 +1769,11 @@ spckword(char **s, int hist, int cmd, int ask)
 		free(pptbuf);
 		fflush(shout);
 		zbeep();
-		x = getquery("nyae ", 0);
+		x = getquery("nyae \t", 0);
 	    }
 	} else
 	    x = 'y';
-	if (x == 'y' || x == ' ') {
+	if (x == 'y' || x == ' ' || x == '\t') {
 	    *s = dupstring(best);
 	    if (hist)
 		hwrep(best);
@@ -1532,20 +1787,47 @@ spckword(char **s, int hist, int cmd, int ask)
     }
 }
 
+/*
+ * Helper for ztrftime.  Called with a pointer to the length left
+ * in the buffer, and a new string length to decrement from that.
+ * Returns 0 if the new length fits, 1 otherwise.  We assume a terminating
+ * NUL and return 1 if that doesn't fit.
+ */
+
+/**/
+static int
+ztrftimebuf(int *bufsizeptr, int decr)
+{
+    if (*bufsizeptr <= decr)
+	return 1;
+    *bufsizeptr -= decr;
+    return 0;
+}
+
+/*
+ * Like the system function, this returns the number of characters
+ * copied, not including the terminating NUL.  This may be zero
+ * if the string didn't fit.
+ *
+ * As an extension, try to detect an error in strftime --- typically
+ * not enough memory --- and return -1.  Not guaranteed to be portable,
+ * since the strftime() interface doesn't make any guarantees about
+ * the state of the buffer if it returns zero.
+ */
+
 /**/
 mod_export int
 ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 {
-    int hr12;
+    int hr12, decr;
 #ifndef HAVE_STRFTIME
     static char *astr[] =
     {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     static char *estr[] =
     {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
      "Aug", "Sep", "Oct", "Nov", "Dec"};
-#else
-    char *origbuf = buf;
 #endif
+    char *origbuf = buf;
     char tmp[3];
 
 
@@ -1554,6 +1836,14 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
     while (*fmt)
 	if (*fmt == '%') {
 	    fmt++;
+	    /*
+	     * Assume this format will take up at least two
+	     * characters.  Not always true, but if that matters
+	     * we are so close to the edge it's not a big deal.
+	     * Fix up some longer cases specially when we get to them.
+	     */
+	    if (ztrftimebuf(&bufsize, 2))
+		return 0;
 	    switch (*fmt++) {
 	    case 'd':
 		*buf++ = '0' + tm->tm_mday / 10;
@@ -1581,9 +1871,10 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		if (hr12 == 0)
 		    hr12 = 12;
 	        if (hr12 > 9)
-		  *buf++ = '1';
+		    *buf++ = '1';
 		else if (fmt[-1] == 'l')
-		  *buf++ = ' ';
+		    *buf++ = ' ';
+
 		*buf++ = '0' + (hr12 % 10);
 		break;
 	    case 'm':
@@ -1602,11 +1893,20 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		*buf++ = '0' + (tm->tm_year / 10) % 10;
 		*buf++ = '0' + tm->tm_year % 10;
 		break;
+	    case '\0':
+		/* Guard against premature end of string */
+		*buf++ = '%';
+		fmt--;
+		break;
 #ifndef HAVE_STRFTIME
 	    case 'a':
+		if (ztrftimebuf(&bufsize, strlen(astr[tm->tm_wday]) - 2))
+		    return 0;
 		strucpy(&buf, astr[tm->tm_wday]);
 		break;
 	    case 'b':
+		if (ztrftimebuf(&bufsize, strlen(estr[tm->tm_mon]) - 2))
+		    return 0;
 		strucpy(&buf, estr[tm->tm_mon]);
 		break;
 	    case 'p':
@@ -1619,17 +1919,33 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		    *buf++ = fmt[-1];
 #else
 	    default:
-		*buf = '\0';
+		/*
+		 * Remember we've already allowed for two characters
+		 * in the accounting in bufsize (but nowhere else).
+		 */
+		*buf = '\1';
 		tmp[1] = fmt[-1];
-		strftime(buf, bufsize - strlen(origbuf), tmp, tm);
-		buf += strlen(buf);
+		if (!strftime(buf, bufsize + 2, tmp, tm))
+		{
+		    if (*buf) {
+			buf[0] = '\0';
+			return -1;
+		    }
+		    return 0;
+		}
+		decr = strlen(buf);
+		buf += decr;
+		bufsize -= decr - 2;
 #endif
 		break;
 	    }
-	} else
+	} else {
+	    if (ztrftimebuf(&bufsize, 1))
+		return 0;
 	    *buf++ = *fmt++;
+	}
     *buf = '\0';
-    return 0;
+    return buf - origbuf;
 }
 
 /**/
@@ -1640,16 +1956,20 @@ zjoin(char **arr, int delim, int heap)
     char **s, *ret, *ptr;
 
     for (s = arr; *s; s++)
-	len += strlen(*s) + 1;
+	len += strlen(*s) + 1 + (imeta(delim) ? 1 : 0);
     if (!len)
-	return "";
-    ptr = ret = (heap ? (char *) hcalloc(len) : (char *) zcalloc(len));
+	return heap? "" : ztrdup("");
+    ptr = ret = (heap ? (char *) hcalloc(len) : (char *) zshcalloc(len));
     for (s = arr; *s; s++) {
 	strucpy(&ptr, *s);
-	if (delim)
-	    *ptr++ = delim;
+	    if (imeta(delim)) {
+		*ptr++ = Meta;
+		*ptr++ = delim ^ 32;
+	    }
+	    else
+		*ptr++ = delim;
     }
-    ptr[-1] = '\0';
+    ptr[-1 - (imeta(delim) ? 1 : 0)] = '\0';
     return ret;
 }
 
@@ -1675,7 +1995,7 @@ colonsplit(char *s, int uniq)
 	for (; *t && *t != ':'; t++);
 	if (uniq)
 	    for (p = ret; p < ptr; p++)
-		if (strlen(*p) == t - s && ! strncmp(*p, s, t - s))
+		if ((int)strlen(*p) == t - s && ! strncmp(*p, s, t - s))
 		    goto cont;
 	*ptr = (char *) zalloc((t - s) + 1);
 	ztrncpy(*ptr++, s, t - s);
@@ -1703,15 +2023,33 @@ skipwsep(char **s)
     return i;
 }
 
+/*
+ * haven't worked out what allownull does; it's passed down from
+ *   sepsplit but all the cases it's used are either 0 or 1 without
+ *   a comment.  it seems to be something to do with the `nulstring'
+ *   which i think is some kind of a metafication thing, so probably
+ *   allownull's value is associated with whether we are using
+ *   metafied strings.
+ * see findsep() below for handling of `quote' argument
+ */
+
 /**/
 mod_export char **
-spacesplit(char *s, int allownull, int heap)
+spacesplit(char *s, int allownull, int heap, int quote)
 {
     char *t, **ret, **ptr;
     int l = sizeof(*ret) * (wordcount(s, NULL, -!allownull) + 1);
     char *(*dup)(const char *) = (heap ? dupstring : ztrdup);
 
-    ptr = ret = (heap ? (char **) hcalloc(l) : (char **) zcalloc(l));
+    ptr = ret = (heap ? (char **) hcalloc(l) : (char **) zshcalloc(l));
+
+    if (quote) {
+	/*
+	 * we will be stripping quoted separators by hacking string,
+	 * so make sure it's hackable.
+	 */
+	s = dupstring(s);
+    }
 
     t = s;
     skipwsep(&s);
@@ -1720,17 +2058,17 @@ spacesplit(char *s, int allownull, int heap)
     else if (!allownull && t != s)
 	*ptr++ = dup("");
     while (*s) {
-	if (isep(*s == Meta ? s[1] ^ 32 : *s)) {
+	if (isep(*s == Meta ? s[1] ^ 32 : *s) || (quote && *s == '\\')) {
 	    if (*s == Meta)
 		s++;
 	    s++;
 	    skipwsep(&s);
 	}
 	t = s;
-	findsep(&s, NULL);
+	findsep(&s, NULL, quote);
 	if (s > t || allownull) {
 	    *ptr = (heap ? (char *) hcalloc((s - t) + 1) :
-		    (char *) zcalloc((s - t) + 1));
+		    (char *) zshcalloc((s - t) + 1));
 	    ztrncpy(*ptr++, t, s - t);
 	} else
 	    *ptr++ = dup(nulstring);
@@ -1745,13 +2083,33 @@ spacesplit(char *s, int allownull, int heap)
 
 /**/
 static int
-findsep(char **s, char *sep)
+findsep(char **s, char *sep, int quote)
 {
+    /*
+     * *s is the string we are looking along, which will be updated
+     * to the point we have got to.
+     *
+     * sep is a possibly multicharacter separator to look for.  If NULL,
+     * use normal separator characters.
+     *
+     * quote is a flag that '\<sep>' should not be treated as a separator.
+     * in this case we need to be able to strip the backslash directly
+     * in the string, so the calling function must have sent us something
+     * modifiable.  currently this only works for sep == NULL.  also in
+     * in this case only, we need to turn \\ into \.
+     */
     int i;
     char *t, *tt;
 
     if (!sep) {
 	for (t = *s; *t; t++) {
+	    if (quote && *t == '\\' &&
+		(isep(t[1] == Meta ? (t[2] ^ 32) : t[1]) || t[1] == '\\')) {
+		chuck(t);
+		if (*t == Meta)
+		    t++;
+		continue;
+	    }
 	    if (*t == Meta) {
 		if (isep(t[1] ^ 32))
 		    break;
@@ -1764,7 +2122,14 @@ findsep(char **s, char *sep)
 	return i;
     }
     if (!sep[0]) {
-	return **s ? ++*s, 1 : -1;
+	if (**s) {
+	    if (**s == Meta)
+		*s += 2;
+	    else
+		++*s;
+	    return 1;
+	}
+	return -1;
     }
     for (i = 0; **s; i++) {
 	for (t = sep, tt = *s; *t && *tt && *t == *tt; t++, tt++);
@@ -1795,7 +2160,7 @@ findword(char **s, char *sep)
     if (sep) {
 	sl = strlen(sep);
 	r = *s;
-	while (! findsep(s, sep)) {
+	while (! findsep(s, sep, 0)) {
 	    r = *s += sl;
 	}
 	return r;
@@ -1809,7 +2174,7 @@ findword(char **s, char *sep)
 	    break;
     }
     *s = t;
-    findsep(s, sep);
+    findsep(s, sep, 0);
     return t;
 }
 
@@ -1822,7 +2187,7 @@ wordcount(char *s, char *sep, int mul)
     if (sep) {
 	r = 1;
 	sl = strlen(sep);
-	for (; (c = findsep(&s, sep)) >= 0; s += sl)
+	for (; (c = findsep(&s, sep, 0)) >= 0; s += sl)
 	    if ((c && *(s + sl)) || mul)
 		r++;
     } else {
@@ -1842,7 +2207,7 @@ wordcount(char *s, char *sep, int mul)
 		if (mul <= 0)
 		    skipwsep(&s);
 	    }
-	    findsep(&s, NULL);
+	    findsep(&s, NULL, 0);
 	    t = s;
 	    if (mul <= 0)
 		skipwsep(&s);
@@ -1862,16 +2227,20 @@ sepjoin(char **s, char *sep, int heap)
     char sepbuf[3];
 
     if (!*s)
-	return "";
+	return heap ? "" : ztrdup("");
     if (!sep) {
-	sep = sepbuf;
-	sepbuf[0] = *ifs;
-	sepbuf[1] = *ifs == Meta ? ifs[1] ^ 32 : '\0';
-	sepbuf[2] = '\0';
+	p = sep = sepbuf;
+	if (ifs) {
+	    *p++ = *ifs;
+	    *p++ = *ifs == Meta ? ifs[1] ^ 32 : '\0';
+	} else {
+	    *p++ = ' ';
+	}
+	*p = '\0';
     }
     sl = strlen(sep);
     for (t = s, l = 1 - sl; *t; l += strlen(*t) + sl, t++);
-    r = p = (heap ? (char *) hcalloc(l) : (char *) zcalloc(l));
+    r = p = (heap ? (char *) hcalloc(l) : (char *) zshcalloc(l));
     t = s;
     while (*t) {
 	strucpy(&p, *t);
@@ -1890,18 +2259,18 @@ sepsplit(char *s, char *sep, int allownull, int heap)
     char *t, *tt, **r, **p;
 
     if (!sep)
-	return spacesplit(s, allownull, heap);
+	return spacesplit(s, allownull, heap, 0);
 
     sl = strlen(sep);
     n = wordcount(s, sep, 1);
     r = p = (heap ? (char **) hcalloc((n + 1) * sizeof(char *)) :
-	     (char **) zcalloc((n + 1) * sizeof(char *)));
+	     (char **) zshcalloc((n + 1) * sizeof(char *)));
 
     for (t = s; n--;) {
 	tt = t;
-	findsep(&t, sep);
+	findsep(&t, sep, 0);
 	*p = (heap ? (char *) hcalloc(t - tt + 1) :
-	      (char *) zcalloc(t - tt + 1));
+	      (char *) zshcalloc(t - tt + 1));
 	strncpy(*p, tt, t - tt);
 	(*p)[t - tt] = '\0';
 	p++;
@@ -1942,12 +2311,14 @@ mod_export void
 zbeep(void)
 {
     char *vb;
+    queue_signals();
     if ((vb = getsparam("ZBEEP"))) {
 	int len;
 	vb = getkeystring(vb, &len, 2, NULL);
 	write(SHTTY, vb, len);
     } else if (isset(BEEP))
 	write(SHTTY, "\07", 1);
+    unqueue_signals();
 }
 
 /**/
@@ -2127,7 +2498,7 @@ static int
 spdist(char *s, char *t, int thresh)
 {
     char *p, *q;
-    char *keymap =
+    const char qwertykeymap[] =
     "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 \t1234567890-=\t\
 \tqwertyuiop[]\t\
@@ -2139,6 +2510,23 @@ spdist(char *s, char *t, int thresh)
 \tASDFGHJKL:\"\n\t\
 \tZXCVBNM<>?\n\n\t\
 \n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    const char dvorakkeymap[] =
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
+\t1234567890[]\t\
+\t',.pyfgcrl/=\t\
+\taoeuidhtns-\n\t\
+\t;qjkxbmwvz\t\t\t\
+\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
+\t!@#$%^&*(){}\t\
+\t\"<>PYFGCRL?+\t\
+\tAOEUIDHTNS_\n\t\
+\t:QJKXBMWVZ\n\n\t\
+\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    const char *keymap;
+    if ( isset( DVORAK ) )
+      keymap = dvorakkeymap;
+    else
+      keymap = qwertykeymap;
 
     if (!strcmp(s, t))
 	return 0;
@@ -2228,12 +2616,11 @@ attachtty(pid_t pgrp)
 	    else {
 		if (errno != ENOTTY)
 		{
-		    zerr("can't set tty pgrp: %e", NULL, errno);
+		    zwarn("can't set tty pgrp: %e", NULL, errno);
 		    fflush(stderr);
 		}
 		opts[MONITOR] = 0;
 		ep = 1;
-		errflag = 0;
 	    }
 	}
     }
@@ -2364,7 +2751,7 @@ getbaudrate(struct ttyinfo *shttyinfo)
 
 /* Escape tokens and null characters.  Buf is the string which should be     *
  * escaped.  len is the length of the string.  If len is -1, buf should be   *
- * null terminated.  If len is non-negative and the third paramerer is not   *
+ * null terminated.  If len is non-negative and the third parameter is not   *
  * META_DUP, buf should point to an at least len+1 long memory area.  The    *
  * return value points to the quoted string.  If the given string does not   *
  * contain any special character which should be quoted and the third        *
@@ -2378,7 +2765,7 @@ getbaudrate(struct ttyinfo *shttyinfo)
  *   META_NOALLOC:  buf points to a memory area which is long enough to hold *
  *                  the quoted form, just quote it and return buf.           *
  *   META_STATIC:   store the quoted string in a static area.  The original  *
- *                  sting should be at most PATH_MAX long.                   *
+ *                  string should be at most PATH_MAX long.                   *
  *   META_ALLOC:    allocate memory for the new string with zalloc().        *
  *   META_DUP:      leave buf unchanged and allocate space for the return    *
  *                  value even if buf does not contains special characters   *
@@ -2430,7 +2817,7 @@ metafy(char *buf, int len, int heap)
 	case META_NOALLOC:
 	    break;
 	default:
-	    fprintf(stderr, "BUG: metafy called with invaild heap value\n");
+	    fprintf(stderr, "BUG: metafy called with invalid heap value\n");
 	    fflush(stderr);
 	    break;
 #endif
@@ -2681,7 +3068,7 @@ niceztrdup(char const *s)
 }
 
 /**/
-char *
+mod_export char *
 nicedupstring(char const *s)
 {
     return nicedup(s, 1);
@@ -2749,8 +3136,9 @@ hasspecial(char const *s)
  * pointer it points to may point to a position in s and in e the position  *
  * of the corresponding character in the quoted string is returned.         *
  * The last argument should be zero if this is to be used outside a string, *
- * one if it is to be quoted for the inside of a single quoted string, and  *
- * two if it is for the inside of  double quoted string.                    *
+ * one if it is to be quoted for the inside of a single quoted string,      *
+ * two if it is for the inside of a double quoted string, and               *
+ * three if it is for the inside of a posix quoted string.                  *
  * The string may be metafied and contain tokens.                           */
 
 /**/
@@ -3064,6 +3452,42 @@ dquotedzputs(char const *s, FILE *stream)
 }
 #endif
 
+# if defined(HAVE_NL_LANGINFO) && defined(CODESET) && !defined(__STDC_ISO_10646__)
+/* Convert a character from UCS4 encoding to UTF-8 */
+
+size_t
+ucs4toutf8(char *dest, unsigned int wval)
+{
+    size_t len;
+
+    if (wval < 0x80)
+      len = 1;
+    else if (wval < 0x800)
+      len = 2;
+    else if (wval < 0x10000)
+      len = 3;
+    else if (wval < 0x200000)
+      len = 4;
+    else if (wval < 0x4000000)
+      len = 5;
+    else
+      len = 6;
+
+    switch (len) { /* falls through except to the last case */
+    case 6: dest[5] = (wval & 0x3f) | 0x80; wval >>= 6;
+    case 5: dest[4] = (wval & 0x3f) | 0x80; wval >>= 6;
+    case 4: dest[3] = (wval & 0x3f) | 0x80; wval >>= 6;
+    case 3: dest[2] = (wval & 0x3f) | 0x80; wval >>= 6;
+    case 2: dest[1] = (wval & 0x3f) | 0x80; wval >>= 6;
+	*dest = wval | (0xfc << (6 - len)) & 0xfc;
+	break;
+    case 1: *dest = wval;
+    }
+
+    return len;
+}
+#endif
+
 /*
  * Decode a key string, turning it into the literal characters.
  * The length is returned in len.
@@ -3076,7 +3500,8 @@ dquotedzputs(char const *s, FILE *stream)
  *       for no newlines.
  *   3:  As 1, but don't handle \c.
  *   4:  Do $'...' quoting.  Overwrites the existing string instead of
- *       zhalloc'ing 
+ *       zhalloc'ing. If \uNNNN ever generates multi-byte chars longer
+ *       than 6 bytes, will need to adjust this to re-allocate memory.
  *   5:  As 2, but \- is special.  Expects misc to be defined.
  *   6:  As 2, but parses only one character and returns end-pointer
  *       and parsed character in *misc
@@ -3090,6 +3515,20 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     char *t, *u = NULL;
     char svchar = '\0';
     int meta = 0, control = 0;
+    int i;
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
+    wint_t wval;
+    size_t count;
+#else
+    unsigned int wval;
+# if defined(HAVE_NL_LANGINFO) && defined(CODESET) && (defined(HAVE_ICONV_H) || defined(HAVE_ICONV) || defined(HAVE_LIBICONV))
+    iconv_t cd;
+    char inbuf[4];
+    size_t inbytes, outbytes;
+    char *inptr;
+    size_t count;
+# endif
+#endif
 
     if (fromwhere == 6)
 	t = buf = tmp;
@@ -3165,6 +3604,88 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    *misc = 1;
 		    break;
 		}
+	    case 'u':
+	    case 'U':
+	    	wval = 0;
+		for (i=(*s == 'u' ? 4 : 8); i>0; i--) {
+		    if (*++s && idigit(*s))
+		        wval = wval * 16 + (*s - '0');
+		    else if (*s && ((*s >= 'a' && *s <= 'f') ||
+				    (*s >= 'A' && *s <= 'F')))
+		        wval = wval * 16 + (*s & 0x1f) + 9;
+		    else {
+		    	s--;
+		        break;
+		    }
+		}
+    	    	if (fromwhere == 6) {
+		    *misc = wval;
+		    return s+1;
+		}
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
+		count = wctomb(t, (wchar_t)wval);
+		if (count == (size_t)-1) {
+		    zerr("character not in range", NULL, 0);
+		    if (fromwhere == 4) {
+			for (u = t; (*u++ = *++s););
+			return t;
+		    }
+		    *t = '\0';
+		    *len = t - buf;
+		    return buf;
+		}
+		t += count;  
+		continue;
+# else
+#  if defined(HAVE_NL_LANGINFO) && defined(CODESET)
+		if (!strcmp(nl_langinfo(CODESET), "UTF-8")) {
+		    t += ucs4toutf8(t, wval);
+		    continue;
+		} else {
+#   if defined(HAVE_ICONV_H) || defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+    	    	    inbytes = 4;
+		    outbytes = 6;
+    	    	    inptr = inbuf;
+		    /* assume big endian convention for UCS-4 */
+		    for (i=3;i>=0;i--) {
+			inbuf[i] = wval & 0xff;
+			wval >>= 8;
+		    }
+
+    	    	    cd = iconv_open(nl_langinfo(CODESET), "ISO-10646");
+		    if (cd == (iconv_t)-1) {
+			zerr("cannot do charset conversion", NULL, 0);
+			if (fromwhere == 4) {
+			    for (u = t; (*u++ = *++s););
+			    return t;
+			}
+			*t = '\0';
+			*len = t - buf;
+			return buf;
+		    }
+                    count = iconv(cd, (char **)&inptr, &inbytes, &t, &outbytes);
+		    iconv_close(cd);
+		    if (count == (size_t)-1) {
+                        zerr("cannot do charset conversion", NULL, 0);
+		        *t = '\0';
+			*len = t - buf;
+			return buf;
+		    }
+		    continue;
+#   else
+                    zerr("cannot do charset conversion", NULL, 0);
+		    *t = '\0';
+		    *len = t - buf;
+		    return buf;
+#   endif
+		}
+#  else
+                zerr("cannot do charset conversion", NULL, 0);
+		*t = '\0';
+		*len = t - buf;
+		return buf;
+#  endif
+# endif
 	    default:
 	    def:
 		if ((idigit(*s) && *s < '8') || *s == 'x') {
@@ -3233,7 +3754,10 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     }
     DPUTS(fromwhere == 4, "BUG: unterminated $' substitution");
     *t = '\0';
-    *len = t - buf;
+    if (fromwhere == 6)
+      *misc = 0;
+    else
+      *len = t - buf;
     return buf;
 }
 
@@ -3259,37 +3783,6 @@ strsfx(char *s, char *t)
     if (ls <= lt)
 	return !strcmp(t + lt - ls, s);
     return 0;
-}
-
-/**/
-mod_export char *
-dupstrpfx(const char *s, int len)
-{
-    char *r = zhalloc(len + 1);
-
-    memcpy(r, s, len);
-    r[len] = '\0';
-    return r;
-}
-
-/**/
-mod_export char *
-ztrduppfx(const char *s, int len)
-{
-    char *r = zalloc(len + 1);
-
-    memcpy(r, s, len);
-    r[len] = '\0';
-    return r;
-}
-
-/* Append a string to an allocated string, reallocating to make room. */
-
-/**/
-mod_export char *
-appstr(char *base, char const *append)
-{
-    return strcat(realloc(base, strlen(base) + strlen(append) + 1), append);
 }
 
 /**/
@@ -3476,27 +3969,6 @@ restoredir(struct dirsav *d)
     return err;
 }
 
-/* Get a signal number from a string */
-
-/**/
-mod_export int
-getsignum(char *s)
-{
-    int x, i;
-
-    /* check for a signal specified by number */
-    x = atoi(s);
-    if (idigit(*s) && x >= 0 && x < VSIGCOUNT)
-	return x;
-
-    /* search for signal by name */
-    for (i = 0; i < VSIGCOUNT; i++)
-	if (!strcmp(s, sigs[i]))
-	    return i;
-
-    /* no matching signal */
-    return -1;
-}
 
 /* Check whether the shell is running with privileges in effect.  *
  * This is the case if EITHER the euid is zero, OR (if the system *
@@ -3518,8 +3990,7 @@ privasserted(void)
 	    cap_flag_value_t val;
 	    cap_value_t n;
 	    for(n = 0; !cap_get_flag(caps, n, CAP_EFFECTIVE, &val); n++)
-		if(val ||
-		   (!cap_get_flag(caps, n, CAP_INHERITABLE, &val) && val)) {
+		if(val) {
 		    cap_free(caps);
 		    return 1;
 		}
@@ -3591,25 +4062,23 @@ mode_to_octal(mode_t mode)
  *
  *     This is good enough for most mail-checking applications.
  */
+
+/**/
 int
 mailstat(char *path, struct stat *st)
 {
        DIR                     *dd;
        struct                  dirent *fn;
        struct stat             st_ret, st_tmp;
-       static struct stat      st_new_last, st_ret_last;
-       char                    dir[PATH_MAX * 2];
-       char                    file[PATH_MAX * 2];
-       int                     i, l;
+       static struct stat      st_ret_last;
+       char                    *dir, *file = 0;
+       int                     i;
        time_t                  atime = 0, mtime = 0;
+       size_t                  plen = strlen(path), dlen;
 
        /* First see if it's a directory. */
        if ((i = stat(path, st)) != 0 || !S_ISDIR(st->st_mode))
                return i;
-       if (strlen(path) > sizeof(dir) - 5) {
-               errno = ENAMETOOLONG;
-               return -1;
-       }
 
        st_ret = *st;
        st_ret.st_nlink = 1;
@@ -3619,54 +4088,70 @@ mailstat(char *path, struct stat *st)
        st_ret.st_mode  |= S_IFREG;
 
        /* See if cur/ is present */
-       sprintf(dir, "%s/cur", path);
+       dir = appstr(ztrdup(path), "/cur");
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_atime = st_tmp.st_atime;
 
        /* See if tmp/ is present */
-       sprintf(dir, "%s/tmp", path);
+       dir[plen] = 0;
+       dir = appstr(dir, "/tmp");
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_mtime = st_tmp.st_mtime;
 
        /* And new/ */
-       sprintf(dir, "%s/new", path);
+       dir[plen] = 0;
+       dir = appstr(dir, "/new");
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_mtime = st_tmp.st_mtime;
 
+#if THERE_IS_EXACTLY_ONE_MAILDIR_IN_MAILPATH
+       {
+       static struct stat      st_new_last;
        /* Optimization - if new/ didn't change, nothing else did. */
        if (st_tmp.st_dev == st_new_last.st_dev &&
            st_tmp.st_ino == st_new_last.st_ino &&
            st_tmp.st_atime == st_new_last.st_atime &&
            st_tmp.st_mtime == st_new_last.st_mtime) {
-               *st = st_ret_last;
-               return 0;
+	   *st = st_ret_last;
+	   return 0;
        }
        st_new_last = st_tmp;
+       }
+#endif
 
        /* Loop over new/ and cur/ */
        for (i = 0; i < 2; i++) {
-               sprintf(dir, "%s/%s", path, i ? "cur" : "new");
-               sprintf(file, "%s/", dir);
-               l = strlen(file);
-               if ((dd = opendir(dir)) == NULL)
-                       return 0;
-               while ((fn = readdir(dd)) != NULL) {
-                       if (fn->d_name[0] == '.' ||
-                           strlen(fn->d_name) + l >= sizeof(file))
-                               continue;
-                       strcpy(file + l, fn->d_name);
-                       if (stat(file, &st_tmp) != 0)
-                               continue;
-                       st_ret.st_size += st_tmp.st_size;
-                       st_ret.st_blocks++;
-                       if (st_tmp.st_atime != st_tmp.st_mtime &&
-                           st_tmp.st_atime > atime)
-                               atime = st_tmp.st_atime;
-                       if (st_tmp.st_mtime > mtime)
-                               mtime = st_tmp.st_mtime;
-               }
-               closedir(dd);
+	   dir[plen] = 0;
+	   dir = appstr(dir, i ? "/cur" : "/new");
+	   if ((dd = opendir(dir)) == NULL) {
+	       zsfree(file);
+	       zsfree(dir);
+	       return 0;
+	   }
+	   dlen = strlen(dir) + 1; /* include the "/" */
+	   while ((fn = readdir(dd)) != NULL) {
+	       if (fn->d_name[0] == '.')
+		   continue;
+	       if (file) {
+		   file[dlen] = 0;
+		   file = appstr(file, fn->d_name);
+	       } else {
+		   file = tricat(dir, "/", fn->d_name);
+	       }
+	       if (stat(file, &st_tmp) != 0)
+		   continue;
+	       st_ret.st_size += st_tmp.st_size;
+	       st_ret.st_blocks++;
+	       if (st_tmp.st_atime != st_tmp.st_mtime &&
+		   st_tmp.st_atime > atime)
+		   atime = st_tmp.st_atime;
+	       if (st_tmp.st_mtime > mtime)
+		   mtime = st_tmp.st_mtime;
+	   }
+	   closedir(dd);
        }
+       zsfree(file);
+       zsfree(dir);
 
        if (atime) st_ret.st_atime = atime;
        if (mtime) st_ret.st_mtime = mtime;

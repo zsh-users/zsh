@@ -1,3 +1,8 @@
+2005-02-01  Peter Stephenson  <pws@csr.com>
+
+	* Peter A. Castro: 20759 updated as 20760 and 20765: configure.ac,
+	Src/utils.c: Improve configuration of libiconv and pcre on Cygwin.
+
 2005-01-27  Peter Stephenson  <pws@csr.com>
 
 	* users/8433: configure.ac: Latest Cygwin hangs on FIFO test,
