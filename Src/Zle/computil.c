@@ -976,13 +976,13 @@ ca_parse_line(Cadef d)
 	    else
 		state.curopt = NULL;
 	} else {
-	    state.opt = (line[0] && line[1]);
+	    state.opt = (line[0] ? (line[1] ? 2 : 1) : 0);
 	    state.arg = 1;
 	    state.curopt = NULL;
 	}
 	pe = NULL;
 
-	if (state.opt && (state.curopt = ca_get_opt(d, line, 0, &pe))) {
+	if (state.opt == 2 && (state.curopt = ca_get_opt(d, line, 0, &pe))) {
 	    ddef = state.def = state.curopt->args;
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;
@@ -1009,7 +1009,7 @@ ca_parse_line(Cadef d)
 	    }
 	    if (!state.def)
 		state.curopt = NULL;
-	} else if (state.opt && d->single &&
+	} else if (state.opt == 2 && d->single &&
 		   (state.curopt = ca_get_sopt(d, line, 0, &pe))) {
 	    char *p;
 	    Caopt tmpopt;

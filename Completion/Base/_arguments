@@ -190,7 +190,6 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
 
           [[ -n "$matched" ]] && compadd -n -Q -S '' -s "$SUFFIX" - "$PREFIX"
           _message "$descr"
-          break
 
         elif [[ "$action" = \(\(*\)\) ]]; then
 
