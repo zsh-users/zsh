@@ -1,5 +1,8 @@
 2005-03-07  Clint Adams  <clint@zsh.org>
 
+	* 20941: Completion/Unix/Command/_mii-tool: completion for mii-tool
+	command.
+
 	* 20940: Completion/Unix/Command/_knock: completion for knock
 	command.
 
