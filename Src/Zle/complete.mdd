@@ -8,4 +8,6 @@ autoprefixconds="prefix suffix between after"
 
 autoparams="compmatchers"
 
-objects="complete.o"
+headers="comp.h"
+
+objects="complete.o compcore.o compmatch.o compresult.o"

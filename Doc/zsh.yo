@@ -61,8 +61,8 @@ ifnzman(includefile(Zsh/params.yo))
 ifnzman(includefile(Zsh/options.yo))
 ifnzman(includefile(Zsh/builtins.yo))
 ifnzman(includefile(Zsh/zle.yo))
-ifnzman(includefile(Zsh/compctl.yo))
 ifnzman(includefile(Zsh/compwid.yo))
+ifnzman(includefile(Zsh/compctl.yo))
 ifnzman(includefile(Zsh/modules.yo))
 ifnzman(includefile(Zsh/compsys.yo))
 ifnzman(includefile(Zsh/zftpsys.yo))
@@ -75,8 +75,8 @@ source(zshparam)
 source(zshoptions)
 source(zshbuiltins)
 source(zshzle)
-source(zshcompctl)
 source(zshcompwid)
+source(zshcompctl)
 source(zshmodules)
 source(zshcompsys)
 source(zshzftpsys)

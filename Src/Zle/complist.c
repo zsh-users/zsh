@@ -622,7 +622,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		fixsuffix();
 		validlist = 0;
 		amatches = pmatches = lastmatches = NULL;
-		invalidatelist();
+		invalidate_list();
 		PERMALLOC {
 		    menucomplete(zlenoargs);
 		} LASTALLOC;
@@ -653,7 +653,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		s->nbrbeg = nbrbeg;
 		s->nbrend = nbrend;
 		s->nmatches = nmatches;
-		acceptlast();
+		accept_last();
 		do_menucmp(0);
 		mselect = (*(minfo.cur))->gnum;
 		setwish = 1;
@@ -913,7 +913,7 @@ boot_complist(Module m)
 		 NULL, 0);
 	return -1;
     }
-    addhookfunc("list_matches", (Hookfn) complistmatches);
+    addhookfunc("comp_list_matches", (Hookfn) complistmatches);
     addhookfunc("menu_start", (Hookfn) domenuselect);
     mskeymap = newkeymap(NULL, "menuselect");
     linkkeymap(mskeymap, "menuselect", 1);
@@ -941,7 +941,7 @@ cleanup_complist(Module m)
     free(mgtab);
 
     deletezlefunction(w_menuselect);
-    deletehookfunc("list_matches", (Hookfn) complistmatches);
+    deletehookfunc("comp_list_matches", (Hookfn) complistmatches);
     deletehookfunc("menu_start", (Hookfn) domenuselect);
     unlinkkeymap("menuselect", 1);
     return 0;

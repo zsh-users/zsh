@@ -19,7 +19,7 @@ global matching control, such as case-insensitivity (`tt(abc)' will complete
 to a string beginning `tt(ABC)'), or wildcard behaviour on
 certain anchors (`tt(a-d)' will complete to abc-def as if there were a
 `tt(*)' after the `a').  See
-ifzman(the section `Matching Control' in zmanref(zshcompctl))\
+ifzman(the section `Matching Control' in zmanref(zshcompwid))\
 ifnzman(noderef(Matching Control))
 for further details.
 
@@ -383,7 +383,7 @@ for completing the name of a parameter expansion within braces
 )
 item(tt(-first-))(
 for adding completions before any other other completion functions are
-tried (similar to the `tt(-T)' flag of tt(compctl)); if this
+tried; if this
 function sets the tt(_compskip) parameter to `tt(all)', no other
 completion functions will be called, if it is set to a string
 containing `tt(patterns)', no pattern completion functions will be
@@ -392,12 +392,10 @@ function for the `tt(-default-)' context will not be called, but
 functions defined for commands will.
 )
 item(tt(-default-))(
-for generating completions when no special completion function is used 
-(similar to the `tt(-D)' option of tt(compctl)).
+for generating completions when no special completion function is used.
 )
 item(tt(-command-))(
-for completing in a command position (as with the `tt(-C)' option of
-tt(compctl)).
+for completing in a command position.
 )
 enditem()
 
@@ -696,15 +694,21 @@ to the tt(compadd) builtin used to add the matches.
 )
 item(tt(_path_files) and tt(_files))(
 The function tt(_path_files) is used throughout the shell code
-to complete filenames. The advantage over the builtin
-completion functions is that it allows completion of partial paths. For
+to complete filenames. It allows completion of partial paths. For
 example, the string `tt(/u/i/s/sig)' may be completed to
-`tt(/usr/include/sys/signal.h)'.  The options `tt(-/)', `tt(-f)', `tt(-g)',
-and `tt(-W)' are available as for the tt(compctl)
-and builtin command; tt(-f) is the default. Additionally, the `tt(-F)'
+`tt(/usr/include/sys/signal.h)'.  The option `tt(-/)' specifies that
+only directories should be completed. The option `tt(-g) var(pattern)' 
+says that only files matching the var(pattern) should be completed,
+and the `tt(-f)' option, which is the default, completes all
+filenames. The option `tt(-W) var(paths)' may be used to specify path
+prefixes that are to be prepended to the string from the line to
+generate the filenames but that should not be inserted in the line or
+shown in a completion listing. The var(paths) may be the name of an
+array parameter or a literal list of paths enclosed in parentheses.
+Additionally, the `tt(-F)'
 option from the tt(compadd) builtin is supported, giving direct control
-over which filenames should be ignored as done by the tt(fignore)
-parameter in normal completion.
+over which filenames should be ignored. If no such option is given,
+the tt(fignore) parameter is used.
 
 The function tt(_files) calls tt(_path_files) with all the arguments
 it was passed and, if that generated no matches, calls tt(_path_files) again
@@ -1488,7 +1492,7 @@ item(tt(approximate_prompt))(
 This can be set to a string to be displayed on top of the
 corrected strings generated when cycling through them. This string
 may contain the control sequences `tt(%n)', `tt(%B)', etc. known from
-the `tt(-X)' option of tt(compctl). Also, the sequence `tt(%e)' will
+the `tt(-X)' option of tt(compadd). Also, the sequence `tt(%e)' will
 be replaced by the number of errors accepted to generate the corrected 
 strings.
 )

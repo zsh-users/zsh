@@ -238,7 +238,6 @@ struct cadata {
     char *pre;			/* prefix to insert (-P) */
     char *suf;			/* suffix to insert (-S) */
     char *group;		/* name of the group (-[JV]) */
-    char *ylist;		/* display list (-y) */
     char *rems;			/* remove suffix on chars... (-r) */
     char *remf;			/* function to remove suffix (-R) */
     char *ign;			/* ignored suffixes (-F) */
@@ -270,28 +269,10 @@ struct cldata {
 typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
 			    char *, struct stat *);
 
-/* Information about one brace run. */
+/* Flags for fromcomp. */
 
-typedef struct brinfo *Brinfo;
-
-struct brinfo {
-    Brinfo next;		/* next in list */
-    Brinfo prev;		/* previous (only for closing braces) */
-    char *str;			/* the string to insert */
-    int pos;			/* original position */
-    int qpos;			/* original position, with quoting */
-    int curpos;			/* position for current match */
-};
-
-/* Data given to hooks. */
-
-typedef struct chdata *Chdata;
-
-struct chdata {
-    Cmgroup matches;		/* the matches generated */
-    int num;			/* the number of matches */
-    Cmatch cur;			/* current match or NULL */
-};
+#define FC_LINE   1
+#define FC_INWORD 2
 
 /* Flags for special parameters. */
 
@@ -376,12 +357,30 @@ struct chdata {
 #define CP_KEYPARAMS   27
 #define CP_ALLKEYS     ((unsigned int) 0x7ffffff)
 
-/* Types of completion. */
+/* Hooks. */
 
-#define COMP_COMPLETE        0
-#define COMP_LIST_COMPLETE   1
-#define COMP_SPELL           2
-#define COMP_EXPAND          3
-#define COMP_EXPAND_COMPLETE 4
-#define COMP_LIST_EXPAND     5
-#define COMP_ISEXPAND(X) ((X) >= COMP_EXPAND)
+#define INSERTMATCHHOOK     (comphooks + 0)
+#define MENUSTARTHOOK       (comphooks + 1)
+#define COMPCTLMAKEHOOK     (comphooks + 2)
+#define COMPCTLBEFOREHOOK   (comphooks + 3)
+#define COMPCTLAFTERHOOK    (comphooks + 4)
+#define COMPLISTMATCHESHOOK (comphooks + 5)
+
+/* compctl hook data struct */
+
+struct ccmakedat {
+    char *str;
+    int incmd;
+    int lst;
+};
+
+/* Data given to offered hooks. */
+
+typedef struct chdata *Chdata;
+
+struct chdata {
+    Cmgroup matches;		/* the matches generated */
+    int num;			/* the number of matches */
+    Cmatch cur;			/* current match or NULL */
+};
+

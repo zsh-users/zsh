@@ -1,4 +1,4 @@
-texinode(Completion Widgets)(Zsh Modules)(Programmable Completion Using compctl)(Top)
+texinode(Completion Widgets)(Programmable Completion Using compctl)(Zsh Line Editor)(Top)
 chapter(Completion Widgets)
 cindex(completion, widgets)
 cindex(completion, programmable)
@@ -33,6 +33,7 @@ startmenu()
 menu(Special Parameters)
 menu(Builtin Commands)
 menu(Condition Codes)
+menu(Matching Control)
 menu(Examples)
 endmenu()
 
@@ -364,7 +365,7 @@ xitem(tt(compadd) [ tt(-qQfenUaml12) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
-xitem([ tt(-W) var(file-prefix) ] [ tt(-y) var(array) ] [ tt(-d) var(array) ])
+xitem([ tt(-W) var(file-prefix) ] [ tt(-d) var(array) ])
 xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ])
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 xitem([ tt(-M) var(match-spec) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
@@ -541,7 +542,8 @@ code not to quote any metacharacters in the words when inserting them
 into the command line.
 )
 item(tt(-M) var(match-spec))(
-This gives local match specifications.
+This gives local match specifications as described below in
+noderef(Matching Control).
 Note that they will only be used if the tt(-U) option is not given.
 )
 item(tt(-n))(
@@ -552,10 +554,6 @@ item(tt(-U))(
 If this flag is given, all words given will be accepted and no matching
 will be done by the completion code. Normally this is used in
 functions that do the matching themselves.
-
-Note that with tt(compadd) this option does not automatically turn on
-menu completion if tt(AUTO_LIST) is set, unlike the corresponding option of
-tt(compctl).
 )
 item(tt(-O) var(array))(
 If this option is given, the var(words) are em(not) added to the set of
@@ -693,7 +691,7 @@ Note that this builtin is defined by the tt(compctl) module.
 )
 enditem()
 
-texinode(Condition Codes)(Examples)(Builtin Commands)(Completion Widgets)
+texinode(Condition Codes)(Matching Control)(Builtin Commands)(Completion Widgets)
 sect(Condition Codes)
 cindex(completion widgets, condition codes)
 
@@ -719,26 +717,209 @@ true if the test for the tt(-N) option with both patterns would succeed.
 )
 enditem()
 
-texinode(Examples)()(Condition Codes)(Completion Widgets)
+texinode(Matching Control)(Examples)(Condition Codes)(Completion Widgets)
+sect(Matching Control)
+
+It is possible by use of the tt(compmatchers) special array and the
+tt(-M) option of the tt(compadd) builtin command to specify how the
+characters in the string to be completed (referred to here as the
+command line) map onto the characters in the list of matches produced by
+the completion code (referred to here as the trial completions). Note
+that this is not used if the command line contains a glob pattern and
+the tt(GLOB_COMPLETE) option is set.
+
+The var(spec) consists of one or more matching descriptions separated by
+whitespace. Each description consists of a letter followed by a colon,
+then the patterns describing which character sequences on the line match
+which character sequences in the trial completion.  Any sequence of characters not
+handled in this fashion must match exactly, as usual.
+
+The forms of var(spec) understood are as follows. In each case, the
+form with an uppercase initial character retains the string already
+typed on the command line as the final result of completion, while with
+a lowercase initial character the string on the command line is changed
+into the corresponding part of the trial completion.
+
+startitem()
+xitem(tt(m:)var(lpat)tt(=)var(tpat))
+item(tt(M:)var(lpat)tt(=)var(tpat))(
+Here, var(lpat) is a pattern that matches on the command line,
+corresponding to var(tpat) which matches in the trial completion.
+)
+xitem(tt(l:)var(anchor)tt(|)var(lpat)tt(=)var(tpat))
+item(tt(L:)var(anchor)tt(|)var(lpat)tt(=)var(tpat))(
+These letters are for patterns that are anchored by another pattern on
+the left side. Matching for var(lpat) and var(tpat) is as for tt(m) and
+tt(M), but the pattern var(lpat) matched on the command line must be
+preceeded by the pattern var(anchor).  The var(anchor) can be blank to
+anchor the match to the start of the command line string; otherwise the
+anchor can occur anywhere, but must match in both the command line and
+trial completion strings.
+)
+xitem(tt(r:)var(lpat)tt(|)var(anchor)tt(=)var(tpat))
+item(tt(R:)var(lpat)tt(|)var(anchor)tt(=)var(tpat))(
+As tt(l) and tt(L) with the difference that the command line and trial
+completion patterns are anchored on the right side.  Here an empty
+var(anchor) forces the match to the end of the command line string.
+)
+enditem()
+
+Each var(lpat), var(tpat) or var(anchor) is either an empty string or
+consists of a sequence of literal characters (which may be quoted with a
+backslash), question marks, character classes, and correspondence
+classes; ordinary shell patterns are not used.  Literal characters match
+only themselves, question marks match any character, and character
+classes are formed as for globbing and match any character in the given
+set.
+
+Correspondence classes are defined like character classes, but with two
+differences: they are delimited by a pair of braces, and negated classes
+are not allowed, so the characters tt(!) and tt(^) have no special
+meaning directly after the opening brace.  They indicate that a range of
+characters on the line match a range of characters in the trial
+completion, but (unlike ordinary character classes) paired according to
+the corresponding position in the sequence. For example, to make any
+lowercase letter on the line match the corresponding uppercase letter in
+the trial completion, you can use `tt(m:{a-z}={A-Z})'.  More than one
+pair of classes can occur, in which case the first class before the
+tt(=) corresponds to the first after it, and so on.  If one side has
+more such classes than the other side, the superfluous classes behave
+like normal character classes. In anchor patterns correspondence classes
+also behave like normal character classes.
+
+The pattern var(tpat) may also be a single star, `tt(*)'. This means
+that the pattern on the command line can match any number of characters
+in the trial completion. In this case the pattern must be anchored (on
+either side); the var(anchor) then determines how much of the trial
+completion is to be included --- only the characters up to the next
+appearance of the anchor will be matched.
+
+Examples:
+
+The keys of the tt(options) association defined by the tt(parameter)
+module are the option names in all-lowercase form, without
+underscores, and without the optional tt(no) at the beginning even
+though the builtins tt(setopt) and tt(unsetopt) understand option names
+with uppercase letters, underscores, and the optional tt(no).  The
+following alters the matching rules so that the prefix tt(no) and any
+underscore are ignored when trying to match the trial completions
+generated and uppercase letters on the line match the corresponding
+lowercase letters in the words:
+
+example(compadd -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' - \ 
+  ${(k)options} )
+
+The first part says that the pattern `tt([nN][oO])' at the beginning
+(the empty anchor before the pipe symbol) of the string on the
+line matches the empty string in the list of words generated by
+completion, so it will be ignored if present. The second part does the
+same for an underscore anywhere in the command line string, and the
+third part uses correspondence classes so that any
+uppercase letter on the line matches the corresponding lowercase
+letter in the word. The use of the uppercase forms of the
+specification characters (tt(L) and tt(M)) guarantees that what has
+already been typed on the command line (in particular the prefix
+tt(no)) will not be deleted.
+
+The second example makes completion case insensitive.  By setting the
+tt(compmatchers) array this applies to every
+completion.  This is just the same as in the option example, except
+here we wish to retain the characters in the list of completions:
+
+example(compmatchers=( 'm:{a-z}={A-Z}' ) )
+
+This makes lowercase letters match their uppercase counterparts.
+To make uppercase letters match the lowercase forms as well:
+
+example(compmatchers=( 'm:{a-zA-Z}={A-Za-z}' ) )
+
+A nice example for the use of tt(*) patterns is partial word
+completion. Sometimes you would like to make strings like tt(c.s.u)
+complete to strings like tt(comp.source.unix), i.e. the word on the
+command line consists of multiple parts, separated by a dot in this
+example, where each part should be completed separately --- note,
+however, that the case where each part of the word, i.e. tt(comp),
+tt(source) and tt(unix) in this example, is to be completed separately
+is a different problem to be solved by extended completion.  The
+example can be handled by:
+
+example(compadd -M 'r:|.=* r:|=*' \ 
+  - comp.sources.unix comp.sources.misc ...)
+
+The first specification says that tt(lpat) is the empty string, while
+tt(anchor) is a dot; tt(tpat) is tt(*), so this can match anything
+except for the `tt(.)' from the anchor in
+the trial completion word.  So in tt(c.s.u), the matcher sees tt(c),
+followed by the empty string, followed by the anchor `tt(.)', and
+likewise for the second dot, and replaces the empty strings before the
+anchors, giving tt(c)[tt(omp)]tt(.s)[tt(ources)]tt(.u)[tt(nix)], where
+the last part of the completion is just as normal.
+
+The second specification is needed to make this work when the cursor is
+in the middle of the string on the command line and the option
+tt(COMPLETE_IN_WORD) is set. In this case the completion code would
+normally try to match trial completions that end with the string as
+typed so far, i.e. it will only insert new characters at the cursor
+position rather then at the end.  However in our example we would like
+the code to recognise matches which contain extra characters after the
+string on the line (the tt(nix) in the example).  Hence we say that the
+empty string at the end of the string on the line matches any characters
+at the end of the trial completion.
+
+More generally, the specification
+
+example(compmatchers=( 'r:|[.,_-]=* r:|=*' ) )
+
+allows one to complete words with abbreviations before any of the
+characters in the square brackets in any completion.  For example, to
+complete tt(veryverylongfile.c) rather than tt(veryverylongheader.h)
+with the above in effect, you can just type tt(very.c) before attempting
+completion.
+
+The tt(compmatchers) array that defines global matching can actually 
+contain any number of specification strings, unlike the case where the
+tt(-M) option is used with the tt(compadd) builtin command.  In this case, when
+completion is attempted for any command, the code will try the
+specifications in order until one matches.  This allows one to define
+simple and fast matches to be used first, more powerful matchers as a
+second choice, and so on.
+
+For example, one can make the code match trial completions that contain
+the string on the command line as a substring, not just at the
+beginning.  Since this might produce more matches than we want,
+we arrange for it to be tried only if the matchers described above don't
+produce any matches:
+
+example(compmatchers=( 'r:|[.,_-]=* r:|=*' 'l:|=* r:|=*' ) )
+
+Here, if the string on the command line is tt(foo.bar), the completion 
+code first tries matching tt(foo)var(anything)tt(.bar)var(anything), as
+with the previous example.  If that fails, the two descriptions in the
+second string say that the blanks at the beginning
+and end of the string on the command line can match any set of
+characters at the beginning or end of the trial completion, so it will
+look for var(anything)tt(foo.bar)var(anything).
+
+texinode(Examples)()(Matching Control)(Completion Widgets)
 sect(Examples)
 cindex(completion widgets, examples)
 
 The first step is to define the widget:
 
-example(zle -C complete complete-word complete-history)
+example(zle -C complete complete-word complete-files)
 
 Then the widget can be bound to a key using the tt(bindkey) builtin
 command:
 
 example(bindkey '^X\t' complete)
 
-After that the shell function tt(complete-history) will be invoked
+After that the shell function tt(complete-files) will be invoked
 after typing control-X and TAB. The function should then generate the
 matches, e.g.:
 
-example(complete-history LPAR()RPAR() { compadd - $historywords })
+example(complete-filles LPAR()RPAR() { compadd - * })
 
-This function will complete words from the history matching the 
+This function will complete files in the current directory matching the 
 current word.
 
 For a description of the widget-based completion system provided with the

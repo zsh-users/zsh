@@ -424,7 +424,7 @@ bin_zle_refresh(char *name, char **args, char *ops, char func)
 	} else if (ops['c'])
 	    clearlist = 1;
     } else if (ops['c'])
-	clearlist = 1;
+	clearlist = listshown = 1;
     zrefresh();
 
     clearlist = ocl;

@@ -640,7 +640,7 @@ Thingy
 executenamedcommand(char *prmt)
 {
     Thingy cmd;
-    int len, l = strlen(prmt), ols = listshown, feep = 0;
+    int len, l = strlen(prmt), ols = listshown, feep = 0, listed = 0, curlist = 0;
     char *ptr;
     char *okeymap = curkeymapname;
 
@@ -660,14 +660,31 @@ executenamedcommand(char *prmt)
 	    selectkeymap(okeymap, 1);
 	    if ((listshown = ols))
 		showinglist = -2;
-	    else
-		clearlist = 1;
+	    else if (listed)
+		clearlist = listshown = 1;
+
 	    return NULL;
 	}
 	if(cmd == Th(z_clearscreen)) {
 	    clearscreen(zlenoargs);
+	    if (curlist) {
+		int zmultsav = zmult;
+
+		zmult = 1;
+		listlist(cmdll);
+		showinglist = 0;
+		zmult = zmultsav;
+	    }
 	} else if(cmd == Th(z_redisplay)) {
 	    redisplay(zlenoargs);
+	    if (curlist) {
+		int zmultsav = zmult;
+
+		zmult = 1;
+		listlist(cmdll);
+		showinglist = 0;
+		zmult = zmultsav;
+	    }
 	} else if(cmd == Th(z_viquotedinsert)) {
 	    *ptr = '^';
 	    zrefresh();
@@ -675,23 +692,28 @@ executenamedcommand(char *prmt)
 	    if(c == EOF || !c || len == NAMLEN)
 		feep = 1;
 	    else
-		*ptr++ = c, len++;
+		*ptr++ = c, len++, curlist = 0;
 	} else if(cmd == Th(z_quotedinsert)) {
 	    if((c = getkey(0)) == EOF || !c || len == NAMLEN)
 		feep = 1;
 	    else
-		*ptr++ = c, len++;
+		*ptr++ = c, len++, curlist = 0;
 	} else if(cmd == Th(z_backwarddeletechar) ||
 	    	cmd == Th(z_vibackwarddeletechar)) {
 	    if (len)
-		len--, ptr--;
+		len--, ptr--, curlist = 0;
 	} else if(cmd == Th(z_killregion) || cmd == Th(z_backwardkillword) ||
-	    	cmd == Th(z_vibackwardkillword)) {
+		  cmd == Th(z_vibackwardkillword)) {
+	    if (len)
+		curlist = 0;
 	    while (len && (len--, *--ptr != '-'));
 	} else if(cmd == Th(z_killwholeline) || cmd == Th(z_vikillline) ||
 	    	cmd == Th(z_backwardkillline)) {
 	    len = 0;
 	    ptr = cmdbuf;
+	    if (listed)
+		clearlist = listshown = 1;
+	    curlist = 0;
 	} else {
 	    if(cmd == Th(z_acceptline) || cmd == Th(z_vicmdmode)) {
 		Thingy r;
@@ -704,8 +726,8 @@ executenamedcommand(char *prmt)
 		    selectkeymap(okeymap, 1);
 		    if ((listshown = ols))
 			showinglist = -2;
-		    else
-			clearlist = 1;
+		    else if (listed)
+			clearlist = listshown = 1;
 		    return r;
 		}
 		unrefthingy(r);
@@ -728,15 +750,19 @@ executenamedcommand(char *prmt)
 
 		    scanhashtable(thingytab, 1, 0, DISABLED, scancompcmd, 0);
 		} LASTALLOC;
-		if (empty(cmdll))
+		if (empty(cmdll)) {
 		    feep = 1;
-		else if (cmd == Th(z_listchoices) ||
+		    if (listed)
+			clearlist = listshown = 1;
+		    curlist = 0;
+		} else if (cmd == Th(z_listchoices) ||
 		    cmd == Th(z_deletecharorlist)) {
 		    int zmultsav = zmult;
 		    *ptr = '_';
 		    statusll = l + len + 1;
 		    zmult = 1;
 		    listlist(cmdll);
+		    listed = curlist = 1;
 		    showinglist = 0;
 		    zmult = zmultsav;
 		} else if (!nextnode(firstnode(cmdll))) {
@@ -756,6 +782,7 @@ executenamedcommand(char *prmt)
 			statusll = l + cmdambig + 1;
 			zmult = 1;
 			listlist(cmdll);
+			listed = curlist = 1;
 			showinglist = 0;
 			zmult = zmultsav;
 		    }
@@ -765,7 +792,7 @@ executenamedcommand(char *prmt)
 		if (len == NAMLEN || icntrl(c) || cmd != Th(z_selfinsert))
 		    feep = 1;
 		else
-		    *ptr++ = c, len++;
+		    *ptr++ = c, len++, curlist = 0;
 	    }
 	}
 	if (feep)

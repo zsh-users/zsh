@@ -30,14 +30,6 @@
 #include "zle.mdh"
 #include "zle_main.pro"
 
-/* Defined by the complete module, called in zle_tricky.c. */
-
-/**/
-void (*makecompparamsptr) _((void));
-
-/**/
-void (*comp_setunsetptr) _((int, int, int, int));
-
 /* != 0 if in a shell function called from completion, such that read -[cl]  *
  * will work (i.e., the line is metafied, and the above word arrays are OK). */
 
@@ -49,50 +41,10 @@ int incompctlfunc;
 /**/
 int incompfunc;
 
-/* Global matcher. */
+/* != 0 if completion module is loaded */
 
 /**/
-Cmlist cmatcher;
-
-/* global variables for shell parameters in new style completion */
-
-/**/
-zlong compcurrent,
-      compmatcher,
-      compmatchertot,
-      complistmax,
-      complistlines;
-
-/**/
-char **compwords,
-     *compprefix,
-     *compsuffix,
-     *compiprefix,
-     *compisuffix,
-     *compqiprefix,
-     *compqisuffix,
-     *compmatcherstr,
-     *compcontext,
-     *compparameter,
-     *compredirect,
-     *compquote,
-     *compquoting,
-     *comprestore,
-     *complist,
-     *compforcelist,
-     *compinsert,
-     *compexact,
-     *compexactstr,
-     *comppatmatch,
-     *comppatinsert,
-     *complastprompt,
-     *comptoend,
-     *compoldlist,
-     *compoldins,
-     *compvared;
-
-/**/
-Param *comprpms, *compkpms;
+int hascompmod;
 
 /* != 0 if we're done editing */
 
@@ -1022,12 +974,13 @@ static struct builtin bintab[] = {
 
 /**/
 struct hookdef zlehooks[] = {
-    HOOKDEF("list_matches", ilistmatches, 0),
-    HOOKDEF("insert_match", NULL, HOOKF_ALL),
-    HOOKDEF("menu_start", NULL, HOOKF_ALL),
-    HOOKDEF("compctl_make", NULL, 0),
-    HOOKDEF("compctl_before", NULL, 0),
-    HOOKDEF("compctl_after", NULL, 0),
+    HOOKDEF("list_matches", NULL, 0),
+    HOOKDEF("complete", NULL, 0),
+    HOOKDEF("before_complete", NULL, 0),
+    HOOKDEF("after_complete", NULL, 0),
+    HOOKDEF("accept_completion", NULL, 0),
+    HOOKDEF("reverse_menu", NULL, 0),
+    HOOKDEF("invalidate_list", NULL, 0),
 };
 
 /**/
@@ -1050,29 +1003,15 @@ setup_zle(Module m)
     /* miscellaneous initialisations */
     stackhist = stackcs = -1;
     kungetbuf = (char *) zalloc(kungetsz = 32);
-    hasperm = 0;
 
     /* initialise the keymap system */
     init_keymaps();
 
     varedarg = NULL;
 
-    incompfunc = incompctlfunc = 0;
-
-    comprpms = compkpms = NULL;
-    compwords = NULL;
-    compprefix = compsuffix = compiprefix = compisuffix = 
-	compqiprefix = compqisuffix = compmatcherstr = 
-	compcontext = compparameter = compredirect = compquote =
-	compquoting = comprestore = complist = compinsert =
-	compexact = compexactstr = comppatmatch = comppatinsert =
-	compforcelist = complastprompt = comptoend = 
-	compoldlist = compoldins = compvared = NULL;
+    incompfunc = incompctlfunc = hascompmod = 0;
 
     clwords = (char **) zcalloc((clwsize = 16) * sizeof(char *));
-
-    makecompparamsptr = NULL;
-    comp_setunsetptr = NULL;
 
     return 0;
 }
@@ -1131,33 +1070,6 @@ finish_zle(Module m)
     zlereadptr = fallback_zleread;
 
     getkeyptr = NULL;
-
-    freearray(compwords);
-    zsfree(compprefix);
-    zsfree(compsuffix);
-    zsfree(compiprefix);
-    zsfree(compisuffix);
-    zsfree(compqiprefix);
-    zsfree(compqisuffix);
-    zsfree(compmatcherstr);
-    zsfree(compcontext);
-    zsfree(compparameter);
-    zsfree(compredirect);
-    zsfree(compquote);
-    zsfree(compquoting);
-    zsfree(comprestore);
-    zsfree(complist);
-    zsfree(compforcelist);
-    zsfree(compinsert);
-    zsfree(compexact);
-    zsfree(compexactstr);
-    zsfree(comppatmatch);
-    zsfree(comppatinsert);
-    zsfree(complastprompt);
-    zsfree(comptoend);
-    zsfree(compoldlist);
-    zsfree(compoldins);
-    zsfree(compvared);
 
     zfree(clwords, clwsize * sizeof(char *));
 

@@ -144,19 +144,53 @@ typedef struct cutbuffer *Cutbuffer;
 
 #define KRINGCT 8   /* number of buffers in the kill ring */
 
+/* Types of completion. */
+
+#define COMP_COMPLETE        0
+#define COMP_LIST_COMPLETE   1
+#define COMP_SPELL           2
+#define COMP_EXPAND          3
+#define COMP_EXPAND_COMPLETE 4
+#define COMP_LIST_EXPAND     5
+#define COMP_ISEXPAND(X) ((X) >= COMP_EXPAND)
+
+/* Information about one brace run. */
+
+typedef struct brinfo *Brinfo;
+
+struct brinfo {
+    Brinfo next;		/* next in list */
+    Brinfo prev;		/* previous (only for closing braces) */
+    char *str;			/* the string to insert */
+    int pos;			/* original position */
+    int qpos;			/* original position, with quoting */
+    int curpos;			/* position for current match */
+};
+
 /* Convenience macros for the hooks */
 
-#define LISTMATCHESHOOK   (zlehooks + 0)
-#define INSERTMATCHHOOK   (zlehooks + 1)
-#define MENUSTARTHOOK     (zlehooks + 2)
-#define COMPCTLMAKEHOOK   (zlehooks + 3)
-#define COMPCTLBEFOREHOOK (zlehooks + 4)
-#define COMPCTLAFTERHOOK  (zlehooks + 5)
+#define LISTMATCHESHOOK    (zlehooks + 0)
+#define COMPLETEHOOK       (zlehooks + 1)
+#define BEFORECOMPLETEHOOK (zlehooks + 2)
+#define AFTERCOMPLETEHOOK  (zlehooks + 3)
+#define ACCEPTCOMPHOOK     (zlehooks + 4)
+#define REVERSEMENUHOOK    (zlehooks + 5)
+#define INVALIDATELISTHOOK (zlehooks + 6)
 
-/* compctl hook data structs */
+/* complete hook data struct */
 
-struct ccmakedat {
-    char *str;
-    int incmd;
+typedef struct compldat *Compldat;
+
+struct compldat {
+    char *s;
     int lst;
+    int incmd;
 };
+
+/* List completion matches. */
+
+#define listmatches() runhookdef(LISTMATCHESHOOK, NULL)
+
+/* Invalidate the completion list. */
+
+#define invalidatelist() runhookdef(INVALIDATELISTHOOK, NULL)

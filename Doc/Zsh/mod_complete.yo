@@ -1,6 +1,6 @@
 texinode(The complete Module)(The compctl Module)(The clone Module)(Zsh Modules)
 sect(The complete Module)
-The tt(compctl) module makes available several builtin commands which
+The tt(complete) module makes available several builtin commands which
 can be used in user-defined completion widgets, see
 ifzman(zmanref(zshcompwid))\
 ifnzman(noderef(Completion Widgets))\

@@ -1,5 +1,5 @@
 /*
- * complete.c - the complete module
+ * complete.c - the complete module, interface part
  *
  * This file is part of zsh, the Z shell.
  *
@@ -28,10 +28,55 @@
  */
 
 #include "complete.mdh"
-#include "complete.pro"
 #define GLOBAL_PROTOTYPES
 #include "zle_tricky.pro"
 #undef GLOBAL_PROTOTYPES
+#include "complete.pro"
+
+/* Global matcher. */
+
+/**/
+Cmlist cmatcher;
+
+/* global variables for shell parameters in new style completion */
+
+/**/
+zlong compcurrent,
+      compmatcher,
+      compmatchertot,
+      complistmax,
+      complistlines;
+
+/**/
+char **compwords,
+     *compprefix,
+     *compsuffix,
+     *compiprefix,
+     *compisuffix,
+     *compqiprefix,
+     *compqisuffix,
+     *compmatcherstr,
+     *compcontext,
+     *compparameter,
+     *compredirect,
+     *compquote,
+     *compquoting,
+     *comprestore,
+     *complist,
+     *compforcelist,
+     *compinsert,
+     *compexact,
+     *compexactstr,
+     *comppatmatch,
+     *comppatinsert,
+     *complastprompt,
+     *comptoend,
+     *compoldlist,
+     *compoldins,
+     *compvared;
+
+/**/
+Param *comprpms, *compkpms;
 
 /**/
 void
@@ -88,6 +133,7 @@ freecpattern(Cpattern p)
 
 /* Copy a list of completion matchers. */
 
+/**/
 static Cmlist
 cpcmlist(Cmlist l)
 {
@@ -399,7 +445,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre =
 	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp = 
-	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = dat.ylist = NULL;
+	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
     dat.match = NULL;
     dat.flags = 0;
     dat.aflags = CAF_MATCH;
@@ -461,10 +507,6 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	    case '2':
 		if (!(dat.aflags & CAF_UNIQALL))
 		    dat.aflags |= CAF_UNIQCON;
-		break;
-	    case 'y':
-		sp = &(dat.ylist);
-		e = "string expected after -%c";
 		break;
 	    case 'i':
 		sp = &(dat.ipre);
@@ -644,6 +686,7 @@ restrict_range(int b, int e)
     }
 }
 
+/**/
 static int
 do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 {
@@ -1284,12 +1327,36 @@ static struct paramdef patab[] = {
     PARAMDEF("compmatchers", PM_ARRAY|PM_SPECIAL, NULL, cmsetfn, cmgetfn, cmunsetfn)
 };
 
+/* The order of the entries in this table has to match the *HOOK
+ * macros in comp.h */
+
+/**/
+struct hookdef comphooks[] = {
+    HOOKDEF("insert_match", NULL, HOOKF_ALL),
+    HOOKDEF("menu_start", NULL, HOOKF_ALL),
+    HOOKDEF("compctl_make", NULL, 0),
+    HOOKDEF("compctl_before", NULL, 0),
+    HOOKDEF("compctl_after", NULL, 0),
+    HOOKDEF("comp_list_matches", ilistmatches, 0),
+};
+
 /**/
 int
 setup_complete(Module m)
 {
-    makecompparamsptr = makecompparams;
-    comp_setunsetptr = comp_setunset;
+    hasperm = 0;
+
+    comprpms = compkpms = NULL;
+    compwords = NULL;
+    compprefix = compsuffix = compiprefix = compisuffix = 
+	compqiprefix = compqisuffix = compmatcherstr = 
+	compcontext = compparameter = compredirect = compquote =
+	compquoting = comprestore = complist = compinsert =
+	compexact = compexactstr = comppatmatch = comppatinsert =
+	compforcelist = complastprompt = comptoend = 
+	compoldlist = compoldins = compvared = NULL;
+
+    hascompmod = 1;
 
     return 0;
 }
@@ -1298,6 +1365,14 @@ setup_complete(Module m)
 int
 boot_complete(Module m)
 {
+    addhookfunc("complete", (Hookfn) do_completion);
+    addhookfunc("before_complete", (Hookfn) before_complete);
+    addhookfunc("after_complete", (Hookfn) after_complete);
+    addhookfunc("accept_completion", (Hookfn) accept_last);
+    addhookfunc("reverse_menu", (Hookfn) reverse_menu);
+    addhookfunc("list_matches", (Hookfn) list_matches);
+    addhookfunc("invalidate_list", (Hookfn) invalidate_list);
+    addhookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
     if (!(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
 	  addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab)) |
 	  addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab)) |
@@ -1312,6 +1387,14 @@ boot_complete(Module m)
 int
 cleanup_complete(Module m)
 {
+    deletehookfunc("complete", (Hookfn) do_completion);
+    deletehookfunc("before_complete", (Hookfn) before_complete);
+    deletehookfunc("after_complete", (Hookfn) after_complete);
+    deletehookfunc("accept_completion", (Hookfn) accept_last);
+    deletehookfunc("reverse_menu", (Hookfn) reverse_menu);
+    deletehookfunc("list_matches", (Hookfn) list_matches);
+    deletehookfunc("invalidate_list", (Hookfn) invalidate_list);
+    deletehookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
     deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
@@ -1323,8 +1406,34 @@ cleanup_complete(Module m)
 int
 finish_complete(Module m)
 {
-    makecompparamsptr = NULL;
-    comp_setunsetptr = NULL;
+    freearray(compwords);
+    zsfree(compprefix);
+    zsfree(compsuffix);
+    zsfree(compiprefix);
+    zsfree(compisuffix);
+    zsfree(compqiprefix);
+    zsfree(compqisuffix);
+    zsfree(compmatcherstr);
+    zsfree(compcontext);
+    zsfree(compparameter);
+    zsfree(compredirect);
+    zsfree(compquote);
+    zsfree(compquoting);
+    zsfree(comprestore);
+    zsfree(complist);
+    zsfree(compforcelist);
+    zsfree(compinsert);
+    zsfree(compexact);
+    zsfree(compexactstr);
+    zsfree(comppatmatch);
+    zsfree(comppatinsert);
+    zsfree(complastprompt);
+    zsfree(comptoend);
+    zsfree(compoldlist);
+    zsfree(compoldins);
+    zsfree(compvared);
+
+    hascompmod = 0;
 
     return 0;
 }

@@ -1,4 +1,4 @@
-texinode(Zsh Modules)(Completion System)(Completion Widgets)(Top)
+texinode(Zsh Modules)(Completion System)(Programmable Completion Using compctl)(Top)
 chapter(Zsh Modules)
 cindex(modules)
 sect(Description)
@@ -14,6 +14,9 @@ Builtins for manipulating POSIX.1e (POSIX.6) capability (privilege) sets.
 )
 item(tt(clone))(
 A builtin that can clone a running shell onto another terminal.
+)
+item(tt(complete))(
+The basic completion code.
 )
 item(tt(compctl))(
 The tt(compctl) builtin for controlling completion and the builtins for
