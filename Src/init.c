@@ -90,6 +90,8 @@ mod_export sigset_t sigchld_mask;
 /**/
 mod_export struct hookdef zshhooks[] = {
     HOOKDEF("exit", NULL, HOOKF_ALL),
+    HOOKDEF("before_trap", NULL, HOOKF_ALL),
+    HOOKDEF("after_trap", NULL, HOOKF_ALL),
 };
 
 /* keep executing lists until EOF found */

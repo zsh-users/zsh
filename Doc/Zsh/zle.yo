@@ -115,6 +115,9 @@ outside ZLE, that value is temporarily inaccessible, but will return
 when the widget function exits.  These special parameters in fact have
 local scope, like parameters created in a function using tt(local).
 
+Inside completion widgets and traps called while ZLE is active, these
+parameters are available read-only.
+
 startitem()
 vindex(BUFFER)
 item(tt(BUFFER) (scalar))(

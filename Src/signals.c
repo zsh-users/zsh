@@ -894,6 +894,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     lexsave();
     execsave();
     breaks = 0;
+    runhookdef(BEFORETRAPHOOK, NULL);
     if (*sigtr & ZSIG_FUNC) {
 	int osc = sfcontext;
 
@@ -912,6 +913,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	zsfree(name);
     } else
 	execode(sigfn, 1, 0);
+    runhookdef(AFTERTRAPHOOK, NULL);
 
     if (trapreturn > 0)
 	trapret = trapreturn;

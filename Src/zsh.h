@@ -1675,4 +1675,6 @@ typedef unsigned char * (*ZleReadFn) _((char *, char *, int));
 /* Hooks in core.                      */
 /***************************************/
 
-#define EXITHOOK (zshhooks + 0)
+#define EXITHOOK       (zshhooks + 0)
+#define BEFORETRAPHOOK (zshhooks + 1)
+#define AFTERTRAPHOOK  (zshhooks + 2)

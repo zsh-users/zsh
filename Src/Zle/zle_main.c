@@ -992,6 +992,28 @@ trashzle(void)
 	kungetct = 0;
 }
 
+/* Hook functions. Used to allow access to zle parameters if zle is
+ * active. */
+
+static int
+zlebeforetrap(Hookdef dummy, void *dat)
+{
+    if (zleactive) {
+	startparamscope();
+	makezleparams(1);
+    }
+    return 0;
+}
+
+static int
+zleaftertrap(Hookdef dummy, void *dat)
+{
+    if (zleactive)
+	endparamscope();
+
+    return 0;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLR", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
@@ -1049,6 +1071,8 @@ setup_(Module m)
 int
 boot_(Module m)
 {
+    addhookfunc("before_trap", (Hookfn) zlebeforetrap);
+    addhookfunc("after_trap", (Hookfn) zleaftertrap);
     addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     addhookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return 0;
@@ -1063,6 +1087,8 @@ cleanup_(Module m)
 	    NULL, 0);
 	return 1;
     }
+    deletehookfunc("before_trap", (Hookfn) zlebeforetrap);
+    deletehookfunc("after_trap", (Hookfn) zleaftertrap);
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deletehookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return 0;
