@@ -1,5 +1,8 @@
 2001-12-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 16364: Src/params.c: further to 16351, except specials
+	from having their value set to null
+
 	* unposted: Src/params.c: small fix to += code from 16353
 
 2001-12-18  Clint Adams  <clint@zsh.org>
