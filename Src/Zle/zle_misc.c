@@ -372,8 +372,10 @@ yankpop(char **args)
     int cc, kctstart = kct;
     Cutbuffer buf;
 
-    if (!(lastcmd & ZLE_YANK) || !kring)
+    if (!(lastcmd & ZLE_YANK) || !kring || !kctbuf) {
+	kctbuf = NULL;
 	return 1;
+    }
     do {
 	/*
 	 * This is supposed to make the yankpop loop
