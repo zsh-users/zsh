@@ -247,12 +247,15 @@ Shell functions
 By default, the shell functions which are installed with `make install' or
 `make install.fns' go into the directory ${datadir}/zsh/functions, which
 unless you have specified --datadir is the same as
-${prefix}/share/zsh/functions ($prefix itself defaults to /usr/local, as
-described below).  This directory will also be compiled into the shell as
-the default directory for the variable $fpath/$FPATH. You can override it
-with --enable-fndir=directory; --disable-fndir or --enable-fndir=no will
-turn off both installation of functions and the setting of a default value
-for $fpath/$FPATH.
+${prefix}/share/zsh/functions/$ZSH_VERSION ($prefix itself defaults to
+/usr/local, as described below).  This directory will also be compiled into
+the shell as the default directory for the variable $fpath/$FPATH. You can
+override it with --enable-fndir=directory; --disable-fndir or
+--enable-fndir=no will turn off both installation of functions and the
+setting of a default value for $fpath/$FPATH.  Note the presence of
+$ZSH_VERSION (e.g. `3.1.7') to avoid clashes between versions of zsh.
+If you only run one version of zsh at once, installing into a common
+directory such as /usr/local/share/zsh/functions is fine.
 
 You can control the functions which get installed by setting
 FUNCTIONS_INSTALL, either when running configure (e.g.
