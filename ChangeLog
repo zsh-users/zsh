@@ -1,3 +1,8 @@
+2001-06-05  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
+
+	* 14550: Completion/Redhat/Command/_rpm: Add --nobuild and --nogpg to rpm
+	completion
+
 2001-06-04  Peter Stephenson  <pws@csr.com>
 
 	* Relabelled this version 4.1.0-dev-0.

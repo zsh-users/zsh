@@ -177,7 +177,7 @@ _rpm () {
   
       _arguments -s \
         "${commonopts[@]}" "${pathopts[@]}" \
-        --{short-circuit,clean,rmsource,sign,test} \
+        --{short-circuit,clean,nobuild,rmsource,sign,test} \
         '--target:specify a build target:->target'\
         '--buildroot:build root directory:_files -/' \
         '--buildarch:architecture for which to build:->target' \
@@ -188,7 +188,7 @@ _rpm () {
       _arguments -s \
         '(-K)--checksig' '(--checksig)-K' \
         "${commonopts[@]}" \
-        --no{pgp,md5} \
+        --no{gpg,pgp,md5} \
         '*:RPM package file:->package_file' && ret=0
       ;;
     rebuild)
