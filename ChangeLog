@@ -5,6 +5,11 @@
 
 2003-12-04  Oliver Kiddle  <opk@zsh.org>
 
+	* Baptiste Daroussin: 19272: Completion/Unix/Command/_chown,
+	Completion/Unix/Command/_links, Completion/X/Command/_mplayer:
+	use colon separator on Linux for chown, complete links graphics
+	drivers and more file types for mplayer
+
 	* unposted: Completion/Unix/Command/_subversion: small addition to
 	output from `svn help diff' broke substitution for getting options
 

@@ -8,7 +8,7 @@ _arguments -C \
   '(-help)-assume-codepage[use the given codepage when the webpage did not specify its]:codepage:' \
   '(-help)-async-dns[asynchronous DNS resolver]:bool:((0\:on 1\:off))' \
   '(-help)-download-dir[default download directory]:_files -/' \
-  '(-help)-driver[graphics driver to use]:driver:(x svgalib fb pmshell atheos)' \
+  '(-help)-driver[graphics driver to use]:graphics driver:->graphics_drivers' \
   '(-help)-dump[dump the page as pure text]' \
   '(-help)-format-cache-size[number of formatted document pages cached]:pages:' \
   '(-help)-ftp-proxy[host and port number of the FTP proxy, or blank]:hostport:_hosts' \
@@ -27,10 +27,14 @@ _arguments -C \
   '(-help)-version[prints the links version number and exit]' \
   ':url:->html' && ret=0
 
-case "$state" in
-html)
-  _files -g '*.html' || _urls
-  return
+case $state in
+  html)
+    _files -g '*.html' || _urls
+    return
+  ;;
+  graphics_drivers)
+    vals=(${=${${${(f)"$(_call_program links-graphics-drivers links -driver help 2>&1)"}[-1]}//','/''}} )
+    _describe -t links-graphics-drivers 'graphics driver' vals && ret=0
   ;;
 esac
 

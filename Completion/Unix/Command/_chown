@@ -39,7 +39,7 @@ case $state in
     else
       if compset -S '[.:]*'; then
         suf=()
-      elif [[ $OSTYPE = (solaris*|hpux*|*bsd*) ]]; then
+      elif [[ $OSTYPE = (solaris*|hpux*|*bsd*|linux*) ]]; then
 	suf=( -qS ':' )
       else
 	suf=( -qS '.' )
