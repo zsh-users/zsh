@@ -288,6 +288,7 @@ for prepath in "$prepaths[@]"; do
       # See which of them match what's on the line.
 
       if [[ -n "$_comp_correct" ]]; then
+        tmp2=( "$tmp1[@]" )
         builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
 
         if [[ $#tmp1 -eq 0 ]]; then
