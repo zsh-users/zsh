@@ -567,7 +567,7 @@ execcase(Estate state, int do_exec)
 		state->pc = next;
 		code = *state->pc;
 		state->pc += 3;
-		next = state->pc + WC_CASE_SKIP(code) - 1;
+		next = state->pc + WC_CASE_SKIP(code) - 2;
 		execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
 				    do_exec));
 	    }
