@@ -1,3 +1,7 @@
+2001-05-14  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14327: Src/exec.c: set list_pipe_job only for real pipelines
+
 2001-05-11  Peter Stephenson  <pws@csr.com>
 
 	* 14314: Src/Modules/stat.c: writing const variable under cygwin.

@@ -973,10 +973,10 @@ execpline(Estate state, wordcode slcode, int how, int last1)
      * stopped, the top-level execpline() didn't get the pid for the
      * sub-shell because it was overwritten. */
     if (!pline_level++) {
-	list_pipe_job = newjob;
         list_pipe_pid = 0;
 	nowait = 0;
 	simple_pline = (WC_PIPE_TYPE(code) == WC_PIPE_END);
+	list_pipe_job = (simple_pline ? 0 : newjob);
     }
     lastwj = lpforked = 0;
     execpline2(state, code, how, opipe[0], ipipe[1], last1);
