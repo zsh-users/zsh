@@ -1433,7 +1433,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	    }
 	} else if (state.opt == 2 && d->single &&
 		   ((state.curopt = ca_get_sopt(d, line, &pe, &sopts)) ||
-		    (sopts && nonempty(sopts)))) {
+		    (cur != compcurrent && sopts && nonempty(sopts)))) {
 	    /* Or maybe it's a single-letter option? */
 
 	    char *p;
@@ -1782,6 +1782,9 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
     }
     switch (args[0][1]) {
     case 'i':
+        /* This initialises the internal data structures. Arguments are the
+         * auto-description string, the optional -s, -S, -A and -M options
+         * given to _arguments and the specs. */
 	if (compcurrent > 1 && compwords[0]) {
 	    Cadef def;
 	    int cap = ca_parsed, multi, first = 1, use, ret = 0;
@@ -1843,6 +1846,11 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	return 1;
 
     case 'D':
+        /* This returns the descriptions, actions and sub-contexts for the
+         * things _arguments has to execute at this place on the line (the
+         * sub-contexts are used as tags).
+         * The return value is particularly important here, it says if 
+         * there are arguments to completely at all. */
 	{
 	    LinkList descr, act, subc;
 	    Caarg arg;
@@ -1874,6 +1882,10 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    return ret;
 	}
     case 'O':
+        /* This returns the descriptions for the options in the arrays whose
+         * names are given as arguments.  The descriptions are strings in a
+         * form usable by _describe.  The return value says if there are any
+         * options to be completed. */
 	{
 	    LinkList next = newlinklist();
 	    LinkList direct = newlinklist();
@@ -1929,6 +1941,12 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    return (ca_laststate.singles ? 2 : 1);
 	}
     case 'L':
+        /* This tests if the beginning of the current word matches an option.
+         * It is for cases like `./configure --pre=/<TAB>' which should
+         * complete to `--prefix=/...'.  The options name isn't fully typed
+         * and _arguments finds out that there is no option `--pre' and that
+         * it should complete some argument to an option.  It then uses -L
+         * to find the option the argument is for. */
 	{
 	    LinkList descr, act, subc;
 	    Caopt opt;
@@ -1955,6 +1973,11 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    return ret;
 	}
     case 's':
+        /* This returns zero if we are completing single letter options.
+         * It also uses its argument as the name of a parameter and sets
+         * that to a string describing the argument behaviour of the last
+         * option in the current word so that we can get the auto-suffix
+         * right. */
 	for (; lstate; lstate = lstate->snext)
 	    if (lstate->d->single && lstate->singles &&
 		lstate->actopts
@@ -1974,14 +1997,25 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    }
 	return 1;
     case 'M':
+        /* This returns the match specs defined for the set of specs we are
+         * using.  Returned, as usual in a parameter whose name is given as
+         * the argument. */
 	setsparam(args[1], ztrdup(ca_laststate.d->match));
 	return 0;
     case 'a':
+        /* This just sets the return value.  To zero if there would be or
+         * were any normal arguments to be completed.  Used to decide if
+         * _arguments should say `no arguments' or `no more arguments'. */
 	for (; lstate; lstate = lstate->snext)
 	    if (lstate->d->args || lstate->d->rest)
 		return 0;
 	return 1;
     case 'W':
+        /* This gets two parameter names as arguments.  The first is set to
+         * the current word sans any option prefixes handled by comparguments.
+         * The second parameter is set to an array containing the options on
+         * the line and their arguments.  I.e. the stuff _arguments returns
+         * to its caller in the `line' and `opt_args' parameters. */
 	{
 	    Castate s;
 	    char **ret, **p;
@@ -2563,6 +2597,8 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
     }
     switch (args[0][1]) {
     case 'i':
+        /* This initialises the internal data structures.  The arguments are
+         * just the arguments that were given to _values itself. */
 	{
 	    Cvdef def = get_cvdef(nam, args + 1);
 	    int cvp = cv_parsed;
@@ -2581,6 +2617,9 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	return 1;
 
     case 'D':
+        /* This returns the description and action to use if we are at
+         * a place where some action has to be used at all.  In that case
+         * zero is returned and non-zero otherwise. */
 	{
 	    Caarg arg = cv_laststate.def;
 
@@ -2593,6 +2632,8 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
     case 'C':
+        /* This returns the sub-context (i.e.: the tag) to use when executing
+         * an action. */
 	{
 	    Caarg arg = cv_laststate.def;
 
@@ -2604,6 +2645,10 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
     case 'V':
+        /* This is what -O is for comparguments: it returns (in three arrays)
+         * the values for values without arguments, with arguments and with
+         * optional arguments (so that we can get the auto-suffixes right).
+         * As for comparguments, the strings returned are usable for _describe. */
 	{
 	    LinkList noarg = newlinklist();
 	    LinkList arg = newlinklist();
@@ -2637,6 +2682,8 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	    return 0;
 	}
     case 's':
+        /* This returns the value separator, if any, and sets the return
+         * value to say if there is such a separator. */
 	if (cv_laststate.d->hassep) {
 	    char tmp[2];
 
@@ -2648,6 +2695,7 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	}
 	return 1;
     case 'S':
+        /* Like -s, but for the separator between values and their arguments. */
 	{
 	    char tmp[2];
 
@@ -2657,9 +2705,15 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	}
 	return 0;
     case 'd':
+        /* This returns the description string (first argument to _values)
+         * which is passed down to _describe. */
 	setsparam(args[1], ztrdup(cv_laststate.d->descr));
 	return 0;
     case 'L':
+        /* Almost the same as for comparguments.  This gets a value name
+         * and returns the description and action of its first argument, if
+         * any.  The rest (prefix matching) is in _values.  Return non-zero
+         * if there is no such option. */
 	{
 	    Cvval val = cv_get_val(cv_laststate.d, args[1]);
 
@@ -2675,6 +2729,8 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
     case 'v':
+        /* Again, as for comparguments.  This returns the values and their
+         * arguments as an array which will be stored in val_args in _values. */
 	if (cv_laststate.vals) {
 	    char **ret, **p;
 	    LinkNode n;

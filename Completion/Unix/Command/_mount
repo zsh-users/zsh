@@ -444,7 +444,7 @@ if [[ "$service" = mount ]]; then
   irix*)
     args=( -s
       '-a[mount all filesystems in /etc/fstab]'
-      '-b[mount all filesystems in /etc/fstab except those listed]:list of directories:_files -/ -S,'
+      '-b[mount all filesystems in /etc/fstab except those listed]:list of directories:_dir_list -s,'
       '-c[check any dirty filesystems before mounting]'
       '-f[fake a new /etc/mtab entry, but don'\''t mount any filesystems]'
       '-h[mount all filesystems associated with host]:hostnames:_hosts'
@@ -575,7 +575,7 @@ else
     irix*)
       args=(
 	'-a[unmount all mounted file systems]'
-	'-b[unmount all filesystems in /etc/fstab except those listed]:list of directories:_files -/ -S,'
+	'-b[unmount all filesystems in /etc/fstab except those listed]:list of directories:_dir_list -s,'
 	'-h[unmount all filesystems associated with host]:hostnames:_hosts'
 	'-k[kill all processes with files open on filesystems before unmounting]'
 	'-t[unmount all filesystems of specified type]:file system type:->fstype'

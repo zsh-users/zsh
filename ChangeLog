@@ -1,3 +1,14 @@
+2001-06-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14897 (and Oliver Kiddle: 14862): Completion/Base/Utility/_values,
+	Completion/Unix/Command/_mount, Completion/Unix/Type/_dir_list,
+	Src/Zle/computil.c: fix for comparguments (completing after
+	single letter options that get their argument in the next
+	word); make _values ignore some of the standard option it may
+	get; make _mount use _dir_list in some places and improve that;
+	`document' comparguments and compvalues with some comments in
+	computil.c
+
 2001-06-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 14896: Completion/Zsh/Type/_command_names: don't complete read-only
