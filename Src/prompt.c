@@ -815,9 +815,9 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	     */
 	    if (!putpromptchar(doprint, endchar))
 		return 0;
-	    /* Now we have to trick it into matching endchar again */
-	    fm--;
 	}
+	/* Now we have to trick it into matching endchar again */
+	fm--;
     } else {
 	if (*fm != ']')
 	    fm++;
