@@ -1,12 +1,16 @@
 #compdef defaults
 
 _defaults_domains(){
-  local str="$(_call_program domains defaults domains 2>/dev/null)"
-  local expl
-  local -a list
-  list=( ${(s/, /)str} -g -globalDomain )
-  _wanted domains expl 'defaults database domain' \
-      compadd -M 'r:|.=* r:|=*' -a list
+  if [[ "`eval echo $PREFIX`" != [/~]* ]]; then
+    local str="$(_call_program domains defaults domains 2>/dev/null)"
+    local expl
+    local -a list
+    list=( ${(s/, /)str} -g -globalDomain )
+    _wanted domains expl 'defaults database domain' \
+	compadd -M 'r:|.=* r:|=*' -a list
+  else
+    _files -g '*.plist(e:"reply=\${REPLY%.plist}":)'
+  fi
 }
 
 _defaults_keys(){

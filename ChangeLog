@@ -1,3 +1,8 @@
+2005-01-17  Oliver Kiddle  <opk@zsh.org>
+
+	* Motoi Washida: users/8380: Completion/Darwin/Command/_defaults:
+	complete plist files
+
 2005-01-16  Clint Adams  <clint@zsh.org>
 
 	* 20718: Src/Zle/zle_utils.c: minor cleanup for proto-Unicode
