@@ -31,11 +31,11 @@ _arguments -C -s \
   "($opts $idx -url)-attach_and_delete[go to composer, attach file, delete when finished]:file:_files" \
   "($opts $idx $send)-url[open the given URL]:url:->url" \
   "($opts $send)-f+[specify mailbox to load]:mailbox: _mailboxes" \
-  "($opts $send)-c+[specify context to apply to -f arg]:number" \
+  "($opts $send)-c+[specify context to apply to -f arg]:number:_guard '[0-9]#'" \
   "($opts $send)-sort[specify sort order of folder]:sort order:(${(j: :)sortorder})" \
   "($opts $send)-i[go directly to index, bypassing main menu]" \
   "($opts $send)-I+[specify initial keystrokes to be executed]:keystrokes" \
-  "($opts $send)-n+[entry in index to begin on]:number" \
+  "($opts $send)-n+[entry in index to begin on]:number:_guard '[0-9]#'" \
   "($opts $send)-o[open first folder read-only]" \
   "(-F -h)-r[restricted - can only send mail to oneself]" \
   "(${opts#-F})-k[force use of function keys]" \

@@ -1,3 +1,9 @@
+2001-04-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 14112: Completion/Base/Utility/.distfiles,
+	Completion/Unix/Command/_pine, Completion/X/Command/.distfiles,
+	Completion/X/Command/_vnc: new _vnc and use of new _guard in _pine
+
 2001-04-26  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14107: Completion/compaudit, Completion/compinstall,

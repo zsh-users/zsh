@@ -2,7 +2,7 @@ DISTFILES_SRC='
 .distfiles
 _alternative      _call_program     _nothing          _sub_commands
 _arg_compile      _combination      _regex_arguments  _values
-_arguments        _contexts         _retrieve_cache
+_arguments        _contexts         _retrieve_cache   _guard
 _cache_invalid    _describe         _sep_parts
 _call_function    _multi_parts      _store_cache
 '
