@@ -1,5 +1,8 @@
 2000-06-28  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12109: Completion/Core/_complete: make _complete return the
+ 	right value
+	
 	* 12107: Completion/Core/_setup, Src/Zle/complist.c: fix for
  	list-colors handling
 	

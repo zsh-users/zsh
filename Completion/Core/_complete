@@ -4,7 +4,7 @@
 # a normal completion function, but as one possible value for the
 # completer style.
 
-local comp name oldcontext
+local comp name oldcontext ret=1
 typeset -T curcontext="$curcontext" ccarray
 
 oldcontext="$curcontext"
@@ -25,11 +25,10 @@ fi
 comp="$_comps[-first-]"
 if [[ ! -z "$comp" ]]; then
   ccarray[3]=-first-
-  "$comp"
+  "$comp" && ret=0
   if [[ "$_compskip" = all ]]; then
-    _compskip=''
-    (( compstate[nmatches] ))
-    return
+    _compskip=
+    return ret
   fi
 fi
 
@@ -42,7 +41,7 @@ fi
 
 if [[ "$compstate[context]" = command ]]; then
   curcontext="$oldcontext"
-  _normal -s
+  _normal -s && ret=0
 else
   # Let's see if we have a special completion definition for the other
   # possible contexts.
@@ -57,14 +56,14 @@ else
 
   if [[ -z "$comp" ]]; then
     if [[ "$_compskip" = *default* ]]; then
-      _compskip=''
+      _compskip=
       return 1
     fi
     comp="$_comps[-default-]"
   fi
-  [[ -z "$comp" ]] || "$comp"
+  [[ -z "$comp" ]] || "$comp" && ret=0
 fi
 
-_compskip=''
+_compskip=
 
-(( compstate[nmatches] ))
+return ret
