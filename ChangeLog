@@ -1,5 +1,8 @@
 2001-03-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13725: Completion/Core/_all_labels,
+	Completion/Core/_next_label: test if the colon is quoted
+
 	* 13724: Completion/Core/_path_files: fixlet, complicated
 	match specs could result in incorrect words being used as
 	possible path expansions

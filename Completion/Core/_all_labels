@@ -27,7 +27,7 @@ fi
 
 while comptags "-A$__prev" "$1" curtag __spec; do
   _comp_tags="$_comp_tags $__spec "
-  if [[ "$curtag" = *:* ]]; then
+  if [[ "$curtag" = *[^\\]:* ]]; then
     zformat -f __descr "${curtag#*:}" "d:$3"
     _description "$__gopt" "${curtag%:*}" "$2" "$__descr"
     curtag="${curtag%:*}"
