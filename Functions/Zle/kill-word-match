@@ -26,7 +26,7 @@ while (( count-- )); do
 	    killring=("$CUTBUFFER" "${(@)killring[1,-2]}")
 	    CUTBUFFER=$word
 	fi
-	RBUFFER=$matched_words[6]
+	RBUFFER=${(j..)matched_words[6,7]}
     else
 	return 1
     fi
