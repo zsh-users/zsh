@@ -118,6 +118,7 @@ predict-limit-list() {
     compstate[list]=''
     compstate[force_list]=yes
   elif [[ $compconfig[predict_list] = always ]]
+  then
     compstate[force_list]=yes
   fi
 }
