@@ -28,9 +28,6 @@ emulate -R zsh
 [[ -n $LC_COLLATE ]] && LC_COLLATE=C
 [[ -n $LANG ]] && LANG=C
 
-# POSIXLY_CORRECT can cause spurious error messages with "tail -<num>".
-unset POSIXLY_CORRECT
-
 # Set the module load path to correspond to this build of zsh.
 # This Modules directory should have been created by "make check".
 [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
@@ -59,6 +56,33 @@ ZTST_testdir=$PWD
 ZTST_testname=$1
 
 integer ZTST_testfailed
+
+# This is POSIX nonsense.  Because of the vague feeling someone, somewhere
+# may one day need to examine the arguments of "tail" using a standard
+# option parser, every Unix user in the world is expected to switch
+# to using "tail -n NUM" instead of "tail -NUM".  Older versions of
+# tail don't support this.
+tail() {
+  emulate -L zsh
+
+  if [[ -z $TAIL_SUPPORTS_MINUS_N ]]; then
+    local test
+    test=$(echo "foo\nbar" | command tail -n 1 2>/dev/null)
+    if [[ $test = bar ]]; then
+      TAIL_SUPPORTS_MINUS_N=1
+    else
+      TAIL_SUPPORTS_MINUS_N=0
+    fi
+  fi
+
+  integer argi=${argv[(i)-<->]}
+
+  if [[ $argi -le $# && $TAIL_SUPPORTS_MINUS_N = 1 ]]; then
+    argv[$argi]=(-n ${argv[$argi][2,-1]})
+  fi
+
+  command tail "$argv[@]"
+}
 
 # The source directory is not necessarily the current directory,
 # but if $0 doesn't contain a `/' assume it is.

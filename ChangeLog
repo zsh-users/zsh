@@ -1,3 +1,8 @@
+2005-01-13  Peter Stephenson  <pws@csr.com>
+
+	* 20698: Test/ztst.zsh: improve 20692 by using tail function
+	to overcome POSIX problems.
+
 2005-01-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 20701: Src/system.h: fix compilation on Mac OS X
