@@ -67,13 +67,13 @@ char *argzero,		/* $0           */
      *readnullcmd,	/* $READNULLCMD */
      *rprompt,		/* $RPROMPT     */
      *sprompt,		/* $SPROMPT     */
-     *term,		/* $TERM        */
      *wordchars,	/* $WORDCHARS   */
      *zsh_name;		/* $ZSH_NAME    */
 /**/
 mod_export
 char *ifs,		/* $IFS         */
      *postedit,		/* $POSTEDIT    */
+     *term,		/* $TERM        */
      *ttystrname,	/* $TTY         */
      *pwd;		/* $PWD         */
 

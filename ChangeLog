@@ -1,3 +1,7 @@
+2000-06-05  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Src/params.c: AIX dependency fix
+
 2000-06-05  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: Config/version.mk: 3.1.8 released.
