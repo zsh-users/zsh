@@ -572,6 +572,13 @@ item(tt(LC_MESSAGES) <S>)(
 This variable determines the language in which messages should be
 written.  Note that zsh does not use message catalogs.
 )
+vindex(LC_NUMERIC)
+item(tt(LC_NUMERIC) <S>)(
+This variable affects the decimal point character and thousands
+separator character for the formatted input/output functions
+and string conversion functions.  Note that zsh ignores this
+setting when parsing floating point mathematical expressions.
+)
 vindex(LC_TIME)
 item(tt(LC_TIME) <S>)(
 This variable determines the locale category for date and time

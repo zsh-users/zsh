@@ -159,6 +159,9 @@ LCIPDEF("LC_CTYPE"),
 # ifdef LC_MESSAGES
 LCIPDEF("LC_MESSAGES"),
 # endif
+# ifdef LC_NUMERIC
+LCIPDEF("LC_NUMERIC"),
+# endif
 # ifdef LC_TIME
 LCIPDEF("LC_TIME"),
 # endif
@@ -2457,6 +2460,9 @@ static struct localename {
 #endif
 #ifdef LC_MESSAGES
     {"LC_MESSAGES", LC_MESSAGES},
+#endif
+#ifdef LC_NUMERIC
+    {"LC_NUMERIC", LC_NUMERIC},
 #endif
 #ifdef LC_TIME
     {"LC_TIME", LC_TIME},
