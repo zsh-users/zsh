@@ -753,7 +753,8 @@ setupvals(void)
      * initialize `PWD' from `HOME'      */
     if (ispwd(home))
 	pwd = ztrdup(home);
-    else if ((ptr = zgetenv("PWD")) && ispwd(ptr))
+    else if ((ptr = zgetenv("PWD")) && (strlen(ptr) < PATH_MAX) &&
+	     (ptr = metafy(ptr, -1, META_STATIC), ispwd(ptr)))
 	pwd = ztrdup(ptr);
     else
 	pwd = metafy(zgetcwd(), -1, META_DUP);
