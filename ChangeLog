@@ -1,3 +1,9 @@
+2002-10-10  Oliver Kiddle  <opk@zsh.org>
+
+	* 17794: Src/builtin.c, Src/params.c: fix bugs with tied parameters
+	(prevent tying array elements and find correct parameter under
+	alternate name for unsetting)
+
 2002-10-09  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
 	* 17793: Completion/Base/Utility/_store_cache: Allow / in cache

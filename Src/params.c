@@ -2234,8 +2234,21 @@ unsetparam_pm(Param pm, int altflag, int exp)
     /* remove it under its alternate name if necessary */
     if (pm->ename && !altflag) {
 	altpm = (Param) paramtab->getnode(paramtab, pm->ename);
-	if (altpm)
+	/* tied parameters are at the same local level as each other */
+	oldpm = NULL;
+	while (altpm && altpm->level > pm->level) {
+	    /* param under alternate name hidden by a local */
+	    oldpm = altpm;
+	    altpm = altpm->old;
+	}
+	if (altpm) {
+	    if (oldpm && !altpm->level) {
+		oldpm->old = NULL;
+		/* fudge things so removenode isn't called */
+		altpm->level = 1;
+	    }
 	    unsetparam_pm(altpm, 1, exp);
+	}
     }
 
     /*
