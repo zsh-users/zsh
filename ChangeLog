@@ -1,5 +1,8 @@
 2000-05-29  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11634: Src/Zle/compcore.c, Src/Zle/compmatch.c, Src/Zle/compresult.c:
+ 	matching bugs with patterns with two anchors
+	
 	* 11631: Completion/Base/_arguments: keep information about things
  	to complete in _arguments
 	

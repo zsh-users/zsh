@@ -473,7 +473,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	bp = bp->next;
     }
     /*** This once was: `while (ll && lw)', but then ignored characters at
-     *   the end or not, well, ignored. */
+     *   the end were not, well, ignored. */
     while (ll) {
 
 	/* Hm, we unconditionally first tried the matchers for the cases
@@ -1859,8 +1859,10 @@ join_clines(Cline o, Cline n)
 	    if (!(o->flags & CLF_NEW) && (n->flags & CLF_NEW)) {
 		Cline t, tn;
 
-		for (t = n; (tn = t->next) && (tn->flags & CLF_NEW); t = tn);
-		if (tn && cmp_anchors(o, tn, 0)) {
+		for (t = n; (tn = t->next) &&
+			 ((tn->flags & CLF_NEW) || !cmp_anchors(o, tn, 0));
+		     t = tn);
+		if (tn) {
 		    diff = sub_join(o, n, tn, 0);
 
 #if 0

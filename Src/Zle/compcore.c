@@ -49,6 +49,11 @@ mod_export int dolastprompt;
 /**/
 mod_export int oldlist, oldins;
 
+/* Original prefix/suffix lengths. Flag saying if they changed. */
+
+/**/
+int origlpre, origlsuf, lenchanged;
+
 /* This is used to decide when the cursor should be moved to the end of    *
  * the inserted word: 0 - never, 1 - only when a single match is inserted, *
  * 2 - when a full match is inserted (single or menu), 3 - always.         */
@@ -691,6 +696,11 @@ callcompfunc(char *s, char *fn)
 	compqiprefix = ztrdup(qipre ? qipre : "");
 	zsfree(compqisuffix);
 	compqisuffix = ztrdup(qisuf ? qisuf : "");
+	origlpre = (strlen(compqiprefix) + strlen(compiprefix) +
+		    strlen(compprefix));
+	origlsuf = (strlen(compqisuffix) + strlen(compisuffix) +
+		    strlen(compsuffix));
+	lenchanged = 0;
 	compcurrent = (usea ? (clwpos + 1 - aadd) : 0);
 
 	zsfree(complist);
@@ -1700,6 +1710,11 @@ addmatches(Cadata dat, char **argv)
 	    lsuf = dupstring(compsuffix);
 	    llpl = strlen(lpre);
 	    llsl = strlen(lsuf);
+
+	    if (llpl + strlen(compqiprefix) + strlen(lipre) != origlpre ||
+		llsl + strlen(compqisuffix) + strlen(lisuf) != origlsuf)
+		lenchanged = 1;
+
 	    /* Test if there is an existing -P prefix. */
 	    if (dat->pre && *dat->pre) {
 		pl = pfxlen(dat->pre, lpre);
