@@ -59,7 +59,7 @@ Doc/Zsh/*.yo	The master source for the zsh documentation is written in
 		It is not required by zsh but but it is a nice program so
 		you might want to get it anyway, especially if you are a
 		zsh developer.  It can be downloaded from
-		ftp://ftp.icce.rug.nl/pub/unix/yodl*
+		ftp://ftp.lilypond.org/pub/yodl/
 
 Doc/zsh*.1	Man pages in nroff format.  These will be installed
 		by "make install.man" or "make install".  By default,
