@@ -1,3 +1,7 @@
+2001-03-12  Chmouel Boudjnah <chmouel@mandrakesoft.com>
+
+	* 13601: Completion/User/_lftp: Add completion for lftp
+
 2001-03-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 13600: Completion/Base/_subscript, Completion/Core/_files,
