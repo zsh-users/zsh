@@ -1,7 +1,8 @@
 2004-08-18  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* 20269: Completion/Unix/Command/_make: Don't output the make
-	targets all clumped into a single string when useperl is enabled.
+	* 20269, 20270: Completion/Unix/Command/_make: Don't output the
+	make targets all clumped into a single string when useperl is
+	enabled.  Don't output a bogus target for a "VAR := VAL" line.
 
 2004-08-16  Peter Stephenson  <pws@csr.com>
 
