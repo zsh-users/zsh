@@ -44,7 +44,7 @@ local ret=1 tmp expl
 # Used by `_arguments', made local here.
 
 local state lstate line
-tyeset -A options
+typeset -A options
 
 state=''
 
@@ -139,7 +139,7 @@ while [[ -n "$state" ]]; do
       '*:RPM package:->package' && ret=0
     ;;
   build_b)
-    tmp=( '*:RPM package:->package' )
+    tmp=( '*:spec file:_files -g \*.spec' )
     ;&
   build_t)
     (( $#tmp )) || tmp=( '*:tar file:_files -g \*.\(\#i\)tar\(.\*\|\)' )
