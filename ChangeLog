@@ -1,3 +1,8 @@
+2001-01-28 Felix Rosencrantz <f_rosencrantz@yahoo.com>
+	* 13395: Test/54compmatch.ztst, Test/comptest: Added code to
+	test compstate[insert_positions], value of insert_positions are
+	now reported
+
 2001-01-26  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 13389: Src/builtin.c: on Cygwin convert path to posix form in
