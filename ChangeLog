@@ -1,3 +1,7 @@
+2001-05-29  Bart Schaefer  <schaefer@zsh.org>
+
+	* 1454?: INSTALL: Mention "make check" and its usage.
+
 2001-05-29  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 14539: Completion/Debian/Command/_update-alternatives:

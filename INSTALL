@@ -152,6 +152,18 @@ Compiling Zsh
 After configuring, to build zsh, do the command:
     make
 
+It's then a good idea to check that your build is working properly:
+    make check
+
+If you have trouble with a particular test, you can run it separately:
+    make TESTNUM=C02 check
+
+The TESTNUM value can be a single test number, as above, or a letter to
+run an entire category of tests:
+    make TESTNUM=Y check
+
+See Test/README for a list of test categories.
+
 Installing Zsh
 --------------
 
