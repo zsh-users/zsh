@@ -1949,8 +1949,12 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    continue;
 	    } while (!*p || *p == mtexpl);
 
-	    if (wrap == 1)
-		goto left;
+	    if (wrap == 1) {
+		if (mcol == wishcol)
+		    goto left;
+
+		wishcol = mcol;
+	    }
 	} else if (cmd == Th(z_emacsforwardword) ||
 		   cmd == Th(z_viforwardword) ||
 		   cmd == Th(z_viforwardwordend) ||
@@ -2104,8 +2108,12 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    } while (!*p || *p == mtexpl || (mcol != omcol && *p == *op));
 	    wishcol = mcol;
 
-	    if (wrap == 2)
+	    if (wrap == 2) {
+		p += mcols - 1 - mcol;
+		wishcol = mcol = mcols - 1;
+		adjust_mcol(wishcol, &p, NULL);
 		goto up;
+	    }
 	} else if (cmd == Th(z_beginningofbufferorhistory) ||
 		   cmd == Th(z_beginningofline) ||
 		   cmd == Th(z_beginningoflinehist) ||

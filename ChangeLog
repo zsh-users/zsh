@@ -1,3 +1,8 @@
+2000-05-25  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11569: Src/Zle/complist.c: better cursor-movement in
+ 	menu-selection
+	
 2000-05-25  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11567: Src/Modules/zftp.c: fix fcntl() argument for FD_CLOEXEC.
