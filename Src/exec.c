@@ -2913,6 +2913,7 @@ execautofn(Cmd cmd, LinkList args, int flags)
 
     if (l == &dummy_list) {
 	zerr("%s: function definition file not found", shf->nam, 0);
+	popheap();
 	return 1;
     }
     if (isset(KSHAUTOLOAD)) {
@@ -2922,6 +2923,7 @@ execautofn(Cmd cmd, LinkList args, int flags)
 	shf = (Shfunc) shfunctab->getnode(shfunctab, n);
 	if(!shf || (shf->flags & PM_UNDEFINED)) {
 	    zerr("%s: function not defined by file", n, 0);
+	    popheap();
 	    return 1;
 	}
     } else {
