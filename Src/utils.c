@@ -2875,7 +2875,7 @@ bslashquote(const char *s, char **e, int instring)
 		  (isset(MAGICEQUALSUBST) && (u[-1] == '=' || u[-1] == ':')) ||
 		  (*u == '~' && isset(EXTENDEDGLOB))) &&
 	    (!instring ||
-	     (isset(BANGHIST) && *u == (char)bangchar) ||
+	     (isset(BANGHIST) && *u == (char)bangchar && instring != 1) ||
 	     (instring == 2 &&
 	      (*u == '$' || *u == '`' || *u == '\"' || *u == '\\')) ||
 	     (instring == 1 && *u == '\''))) {
