@@ -2726,8 +2726,12 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	pm = (Param) (paramtab == realparamtab ?
 		      gethashnode2(paramtab, s) :
 		      paramtab->getnode(paramtab, s));
+	/*
+	 * Unsetting an unset variable is not an error.
+	 * This appears to be reasonably standard behaviour.
+	 */
 	if (!pm)
-	    returnval = 1;
+	    continue;
 	else if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
 	    zerrnam(name, "%s: restricted", pm->nam, 0);
 	    returnval = 1;
