@@ -1,3 +1,8 @@
+2005-03-27  Andrey Borzenkov  <bor@zsh.org>
+
+	* 21066: Completion/Unix/Command/_rsync: rsync:// URL support,
+	fix modules completion, strip remote banners
+
 2005-03-24  Andrey Borzenkov  <bor@zsh.org>
 
 	* 21053: Completion/X/Command/_kfmclient: use kde search path
