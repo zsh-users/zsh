@@ -202,7 +202,7 @@ static int
 putpromptchar(int doprint, int endchar)
 {
     char *ss, *tmbuf = NULL, *hostnam;
-    int t0, arg, test, sep;
+    int t0, arg, test, sep, j, numjobs;
     struct tm *tm;
     time_t timet;
     Nameddir nd;
@@ -285,6 +285,13 @@ putpromptchar(int doprint, int endchar)
 		case 'g':
 		    if (getegid() == arg)
 			test = 1;
+		    break;
+		case 'j':
+		    for (numjobs = 0, j = 1; j < MAXJOB; j++)
+			if (jobtab[j].stat && jobtab[j].procs &&
+		    	    !(jobtab[j].stat & STAT_NOPRINT)) numjobs++;
+		    if (numjobs >= arg)
+		    	test = 1;
 		    break;
 		case 'l':
 		    *bp = '\0';
@@ -369,6 +376,14 @@ putpromptchar(int doprint, int endchar)
 	    case '!':
 		addbufspc(DIGBUFSIZE);
 		sprintf(bp, "%d", curhist);
+		bp += strlen(bp);
+		break;
+	    case 'j':
+		for (numjobs = 0, j = 1; j < MAXJOB; j++)
+		    if (jobtab[j].stat && jobtab[j].procs &&
+		    	!(jobtab[j].stat & STAT_NOPRINT)) numjobs++;
+		addbufspc(DIGBUFSIZE);
+		sprintf(bp, "%d", numjobs);
 		bp += strlen(bp);
 		break;
 	    case 'M':

@@ -111,6 +111,9 @@ The line number currently being executed in the script, sourced file, or
 shell function given by tt(%N).  This is most useful for debugging as part
 of tt($PS4).
 )
+item(tt(%j))(
+The number of jobs.
+)
 item(tt(%L))(
 The current value of tt($SHLVL).
 )
@@ -222,6 +225,7 @@ least var(n) elements.)
 sitem(tt(D))(True if the month is equal to var(n) (January = 0).)
 sitem(tt(d))(True if the day of the month is equal to var(n).)
 sitem(tt(g))(True if the effective gid of the current process is var(n).)
+sitem(tt(j))(True if the number of jobs is at least var(n).)
 sitem(tt(L))(True if the tt(SHLVL) parameter is at least var(n).)
 sitem(tt(l))(True if at least var(n) characters have already been
 printed on the current line.)

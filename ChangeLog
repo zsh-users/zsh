@@ -1,5 +1,11 @@
 2001-11-02  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Functions/Prompts/prompt_oliver_setup,
+	Doc/Zsh/prompt.yo: documentation and example for 16198
+
+	* 16198: Src/prompt.c: add %j prompt expansion and j test
+	character for putting the number of jobs in the prompt
+
 	* 16177: Completion/Unix/Type/_time_zone: also look in
 	/usr/lib/locale/TZ for time zones
 
