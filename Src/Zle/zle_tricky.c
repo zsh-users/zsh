@@ -146,6 +146,11 @@ mod_export int cfret;
 /**/
 mod_export int comprecursive;
 
+/* != 0 if there are any defined completion widgets. */
+
+/**/
+int hascompwidgets;
+
 /* Find out if we have to insert a tab (instead of trying to complete). */
 
 /**/
@@ -557,7 +562,11 @@ docomplete(int lst)
     if (undoing)
 	setlastline();
 
-    if (!module_loaded("zsh/complete"))
+    /* We the C-code's point of view, we can only use compctl as a default
+     * type of completion. Load it if it hasn't been loaded already and
+     * no completion widgets are defined. */
+
+    if (!module_loaded("zsh/compctl") && !hascompwidgets)
 	load_module("zsh/compctl");
 
     if (runhookdef(BEFORECOMPLETEHOOK, (void *) &lst)) {
