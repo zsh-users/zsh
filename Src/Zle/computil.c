@@ -2119,6 +2119,7 @@ parse_cvdef(char *nam, char **args)
     ret->lastt = time(0);
 
     for (valp = &(ret->vals); *args; args++) {
+	int bs = 0;
 	p = dupstring(*args);
 	xnum = 0;
 
@@ -2166,9 +2167,9 @@ parse_cvdef(char *nam, char **args)
 
 	for (name = p; *p && *p != ':' && *p != '['; p++)
 	    if (*p == '\\' && p[1])
-		p++;
+		p++, bs = 1;
 
-	if (hassep && !sep && name + 1 != p) {
+	if (hassep && !sep && name + bs + 1 < p) {
 	    freecvdef(ret);
 	    zwarnnam(nam, "no multi-letter values with empty separator allowed", NULL, 0);
 	    return NULL;
