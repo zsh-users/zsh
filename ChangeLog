@@ -1,3 +1,8 @@
+2001-10-06  Clint Adams  <clint@zsh.org>
+
+	* Norbert Koch: 15954: Doc/Zsh/arith.yo:
+	fix inconsistency of variable name in example.
+
 2001-10-05  Peter Stephenson  <pws@csr.com>
 
 	* 15949: Completion/compinstall: add handling for expand style.
