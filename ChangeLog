@@ -1,3 +1,8 @@
+2001-06-22  Andrej Borsenkow  <bor@zsh.org>
+
+	* 15038: Test/A01grammar.ztst: test case for 15023.
+	(unposted) fix a couple of typos in test decriptions
+
 2001-06-21  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15029: Completion/Unix/Command/_man: improve pattern matching

@@ -118,6 +118,15 @@
 >to
 >term
 
+  for name
+  in word to term; do
+    print $name
+  done
+0:`for' loop with newline before in keyword
+>word
+>to
+>term
+
   for (( name = 0; name < 3; name++ )); do
     print $name
   done
@@ -165,7 +174,7 @@
     *) print 3
        ;;
   esac
-0:`case' loop, old syntax
+0:`case', old syntax
 >2
 
   word=Trinity
@@ -179,7 +188,7 @@
     (*) print 3
        ;;
   esac
-0:`case' loop, new syntax
+0:`case', new syntax
 >2
 
   word=Hilary
@@ -193,7 +202,7 @@
     (*) print 3
        ;;
   esac
-0:`case' loop, new syntax, cascaded
+0:`case', new syntax, cascaded
 >1
 >2
 >3
