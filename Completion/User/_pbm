@@ -430,7 +430,7 @@ pnmscale)
     scale=( ':scale factor:' )
   fi
   
-  _arguments
+  _arguments \
     '(-width)-xsize:width:' \
     '(-xsize)-width:width:' \
     '(-height)-ysize:height:' \
