@@ -1,5 +1,8 @@
 2002-05-21  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 17193: Completion/Unix/Command/_init_d: let _init_d use a
+	pre-pattern
+
 	* 17192: Src/Zle/compcore.c: fix for completion in nested
 	quotes where the sub-word ends in a backslash
 

@@ -1,6 +1,8 @@
-#compdef -P */(init|rc[0-9S]#).d/*
+#compdef -p */(init|rc[0-9S]#).d/*
 
 local magic cmds what script
+
+_compskip=all
 
 # This should probably be system specific...
 
