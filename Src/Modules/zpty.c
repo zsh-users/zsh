@@ -356,6 +356,8 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
 	if (SHTTY != -1)
 	    close(SHTTY);
 
+	closedumps();
+
 	execve(cmd, args, environ);
 	exit(0);
     }

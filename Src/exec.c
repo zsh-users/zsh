@@ -356,6 +356,7 @@ zexecve(char *pth, char **argv)
     if (!*eep)
 	eep[1] = NULL;
     *eep = buf;
+    closedumps();
     execve(pth, argv, environ);
 
     /* If the execve returns (which in general shouldn't happen),   *

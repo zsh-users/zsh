@@ -5,6 +5,9 @@
 
 2000-05-04  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11151: Src/exec.c, Src/parse.c, Src/Modules/zpty.c: close dump
+ 	file descriptors in children
+	
 	* 11145: Src/lex.c: parse_subst_string() should use modified
  	version of `len'
 	

@@ -3030,6 +3030,16 @@ decrdumpcount(FuncDump f)
     }
 }
 
+/**/
+mod_export void
+closedumps(void)
+{
+    FuncDump p;
+
+    for (p = dumps; p; p = p->next)
+	zclose(p->fd);
+}
+
 #else
 
 void
@@ -3039,6 +3049,11 @@ incrdumpcount(FuncDump f)
 
 void
 decrdumpcount(FuncDump f)
+{
+}
+
+void
+closedumps(void)
 {
 }
 
@@ -3070,3 +3085,4 @@ dump_autoload(char *nam, char *file, int on, char *ops, int func)
     }
     return ret;
 }
+
