@@ -1,3 +1,9 @@
+2005-01-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: Added new options
+	for impending 2.6.4 release and improved the descriptions of
+	several others.  Also dropped "-- ..." options to _arguments.
+
 2005-01-27  Peter Stephenson  <pws@csr.com>
 
 	* users/8433: configure.ac: Latest Cygwin hangs on FIFO test,
