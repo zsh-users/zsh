@@ -1,3 +1,7 @@
+2005-02-28  Philippe Troin  <phil@fifi.org>
+
+       * 20886: configure.ac: Use TTOU with trap rather than SIGTTOU.
+
 2005-03-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_bart_setup: Update to some
