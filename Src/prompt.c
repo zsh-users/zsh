@@ -93,6 +93,10 @@ static int trunclen;
 
 static int dontcount;
 
+/* Level of %{ / %} surrounding a truncation segment. */
+
+static int trunccount;
+
 /* Strings to use for %r and %R (for the spelling prompt). */
 
 static char *rstring, *Rstring;
@@ -465,6 +469,8 @@ putpromptchar(int doprint, int endchar)
 		}
 		break;
 	    case /*{*/ '}':
+		if (trunccount && trunccount >= dontcount)
+		    return *fm;
 		if (dontcount && !--dontcount) {
 		    addbufspc(1);
 		    *bp++ = Outpar;
@@ -868,7 +874,9 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	bp = ptr;
 	w = bp - buf;
 	fm++;
+	trunccount = dontcount;
 	putpromptchar(doprint, endchar);
+	trunccount = 0;
 	ptr = buf + w;		/* putpromptchar() may have realloc()'d */
 	*bp = '\0';
 
