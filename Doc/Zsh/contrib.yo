@@ -961,8 +961,8 @@ not exist; it is created on write, if necessary.
 )
 findex(zcp)
 findex(zln)
-xitem(tt(zcp) [ tt(-finqQvw) ] var(srcpat) var(dest))
-item(tt(zln) [ tt(-finqQsvw) ] var(srcpat) var(dest))(
+xitem(tt(zcp) [ tt(-finqQvwW) ] var(srcpat) var(dest))
+item(tt(zln) [ tt(-finqQsvwW) ] var(srcpat) var(dest))(
 Same as tt(zmv -C) and tt(zmv -L), respectively.  These functions do not
 appear in the zsh distribution, but can be created by linking tt(zmv) to
 the names tt(zcp) and tt(zln) in some directory in your tt(fpath).
@@ -973,7 +973,7 @@ ifzman(above)\
 ifnzman((noderef(Utilities))).
 )
 findex(zmv)
-item(tt(zmv) [ tt(-finqQsvw) ] [ -C | -L | -M | -p var(program) ] [ -o var(optstring) ] var(srcpat) var(dest) )(
+item(tt(zmv) [ tt(-finqQsvwW) ] [ -C | -L | -M | -p var(program) ] [ -o var(optstring) ] var(srcpat) var(dest) )(
 Move (usually, rename) files matching the pattern var(srcpat) to
 corresponding files having names of the form given by var(dest), where
 var(srcpat) contains parentheses surrounding patterns which will be
@@ -1008,6 +1008,8 @@ sitem(tt(-s))(Symbolic, passed down to tt(ln); only works with tt(-L).)
 sitem(tt(-v))(Verbose: print each command as it's being executed.)
 sitem(tt(-w))(Pick out wildcard parts of the pattern, as described above,
 and implicitly add parentheses for referring to them.)
+sitem(tt(-W))(Just like tt(-w), with the addition of turning wildcards in
+the replacement pattern into sequential ${1} .. ${N} references.)
 sxitem(tt(-C))
 sxitem(tt(-L))
 sitem(tt(-M))(Force tt(cp), tt(ln) or tt(mv), respectively, regardless of

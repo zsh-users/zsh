@@ -1,5 +1,9 @@
 2003-01-07  Oliver Kiddle  <opk@zsh.org>
 
+	* 18060: Completion/Zsh/Command/_zmv, Doc/Zsh/contrib.yo,
+	Completion/Zsh/Command/.distfiles: document zmv's -W option and
+	add a completion for zmv
+
 	* 18058: Completion/Unix/Command/_lsof, Completion/Unix/Command/_mt,
 	Completion/Unix/Command/_xsltproc, Completion/Unix/Command/_rlogin,
 	Completion/Unix/Command/_ssh, Completion/Unix/Command/_ant,
