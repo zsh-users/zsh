@@ -446,6 +446,32 @@ getvaluearr(Value v)
 	return NULL;
 }
 
+/*
+ * Split environment string into (name, vlaue) pair.
+ * this is used to avoid in-place editing of environment table
+ * that results in core dump on some systems
+ */
+
+static int
+split_env_string(char *env, char **name, char **value)
+{
+    char *str, *tenv;
+
+    if (!env || !name || !value)
+	return 0;
+
+    tenv = strcpy(zhalloc(strlen(env) + 1), env);
+    for (str = tenv; *str && *str != '='; str++)
+	;
+    if (str != tenv && *str == '=') {
+	*str = '\0';
+	*name = tenv;
+	*value = str + 1;
+	return 1;
+    } else
+	return 0;
+}
+    
 /* Set up parameter hash table.  This will add predefined  *
  * parameter entries as well as setting up parameter table *
  * entries for environment variables we inherit.           */
@@ -460,7 +486,7 @@ createparamtable(void)
     int  envsize;
 #endif
     char **envp, **envp2, **sigptr, **t;
-    char buf[50], *str, *iname, *hostnam;
+    char buf[50], *str, *iname, *ivalue, *hostnam;
     int  oae = opts[ALLEXPORT];
 #ifdef HAVE_UNAME
     struct utsname unamebuf;
@@ -513,20 +539,18 @@ createparamtable(void)
     environ = new_environ;
 #endif
 
+    /* Use heap allocation to avoid many small alloc/free calls */
+    pushheap();
+
     /* Now incorporate environment variables we are inheriting *
      * into the parameter hash table. Copy them into dynamic   *
      * memory so that we can free them if needed               */
     for (envp = envp2 = environ; *envp2; envp2++) {
-	for (str = *envp2; *str && *str != '='; str++);
-	if (*str == '=') {
-	    iname = NULL;
-	    *str = '\0';
-	    if (!idigit(**envp2) && isident(*envp2) && !strchr(*envp2, '[')) {
-		iname = *envp2;
+	if (split_env_string(*envp2, &iname, &ivalue)) {
+	    if (!idigit(*iname) && isident(iname) && !strchr(iname, '[')) {
 		if ((!(pm = (Param) paramtab->getnode(paramtab, iname)) ||
 		     !(pm->flags & PM_DONTIMPORT || pm->flags & PM_EXPORTED)) &&
-		    (pm = setsparam(iname, metafy(str + 1, -1, META_DUP)))) {
-		    *str = '=';
+		    (pm = setsparam(iname, metafy(ivalue, -1, META_DUP)))) {
 		    pm->flags |= PM_EXPORTED;
 		    if (pm->flags & PM_SPECIAL)
 			pm->env = mkenvstr (pm->nam,
@@ -536,9 +560,9 @@ createparamtable(void)
 		    *envp++ = pm->env;
 		}
 	    }
-	    *str = '=';
 	}
     }
+    popheap();
     *envp = '\0';
     opts[ALLEXPORT] = oae;
 
@@ -1503,12 +1527,9 @@ export_param(Param pm)
 			pm->flags, NULL);
     else
 	val = pm->gets.cfn(pm);
-    if (pm->env)
-	pm->env = replenv(pm->nam, val, pm->flags);
-    else {
-	pm->flags |= PM_EXPORTED;
-	pm->env = addenv(pm->nam, val, pm->flags);
-    }
+
+    pm->flags |= PM_EXPORTED;
+    pm->env = addenv(pm->nam, val, pm->flags);
 }
 
 /**/
@@ -2857,9 +2878,6 @@ pipestatsetfn(Param pm, char **x)
     numpipestats = i;
 }
 
-/* We could probably replace the replenv with the actual code to *
- * do the replacing, since we've already scanned for the string. */
-
 /**/
 void
 arrfixenv(char *s, char **t)
@@ -2867,24 +2885,28 @@ arrfixenv(char *s, char **t)
     char *u;
     Param pm;
 
+    if (t == path)
+	cmdnamtab->emptytable(cmdnamtab);
+
     pm = (Param) paramtab->getnode(paramtab, s);
+    
     /*
      * Only one level of a parameter can be exported.  Unless
      * ALLEXPORT is set, this must be global.
      */
-    if (t == path)
-	cmdnamtab->emptytable(cmdnamtab);
+
     if (pm->flags & PM_HASHELEM)
 	return;
-    u = t ? zjoin(t, ':', 1) : "";
-    if (findenv(s, 0)) {
-	pm->env = replenv(s, u, pm->flags);
-	return;
-    }
+
     if (isset(ALLEXPORT))
 	pm->flags |= PM_EXPORTED;
+
+    /*
+     * Do not "fix" parameters that were not exported
+     */
+
     if (pm->flags & PM_EXPORTED)
-	pm->env = addenv(s, u, pm->flags);
+	pm->env = addenv(s, t ? zjoin(t, ':', 1) : "", pm->flags);
 }
 
 
@@ -2971,8 +2993,9 @@ copyenvstr(char *s, char *value, int flags)
     }
 }
 
-static char *
-addenv_internal(char *name, char *value, int flags, int add)
+/**/
+char *
+addenv(char *name, char *value, int flags)
 {
     char *oldenv = 0, *newenv = 0, *env = 0;
     int pos;
@@ -2982,8 +3005,6 @@ addenv_internal(char *name, char *value, int flags, int add)
      * we are not requested to add new, return        */
     if (findenv(name, &pos))
 	oldenv = environ[pos];
-    else if (!add)
-	return NULL;
 
      newenv = mkenvstr(name, value, flags);
      if (zputenv(newenv)) {
@@ -3008,15 +3029,6 @@ addenv_internal(char *name, char *value, int flags, int add)
     return NULL; /* Cannot happen */
 }
 
-/* Change the value of an existing environment variable */
-
-/**/
-char *
-replenv(char *name, char *value, int flags)
-{
-
-    return addenv_internal(name, value, flags, 0);
-}
 
 /* Given strings *name = "foo", *value = "bar", *
  * return a new string *str = "foo=bar".        */
@@ -3044,12 +3056,6 @@ mkenvstr(char *name, char *value, int flags)
  * pointer to the location of this new environment *
  * string.                                         */
 
-/**/
-char *
-addenv(char *name, char *value, int flags)
-{
-    return addenv_internal(name, value, flags, 1);
-}
 
 /* Delete a pointer from the list of pointers to environment *
  * variables by shifting all the other pointers up one slot. */

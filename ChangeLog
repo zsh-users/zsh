@@ -1,5 +1,10 @@
 2001-01-19  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
+	* 13370 (modified): Src/params.c: do not modify environment when
+	importing it - some library functions may access it. When importing
+	colon arrays, replenv() tried to free unallocated memory. Remove
+	replenv() as it is now redundant.
+
 	* 13380: configure.in: replace AC_CHECK_LIB(...,tgetent) with
 	AC_SEARCH_LIBS(tgetent,...) to allow user to override default
 	library selection
