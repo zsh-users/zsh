@@ -2103,10 +2103,7 @@ parse_cvdef(char *nam, char **args)
 
     while (args[0][0] == '-' && (args[0][1] == 's' || args[0][1] == 'S') &&
            !args[0][2]) {
-	if (!args[1][0] || (args[1][0] && args[1][1])) {
-	    zwarnnam(nam, "invalid separator: %s", args[1], 0);
-	    return NULL;
-	}
+
         if (args[0][1] == 's') {
             hassep = 1;
             sep = args[1][0];
@@ -2314,20 +2311,122 @@ struct cvstate {
 static struct cvstate cv_laststate;
 static int cv_parsed = 0, cv_alloced = 0;
 
+/* Get the next value in the string.  Return it's definition and update the
+ * sp pointer to point to the end of the value (plus argument, if any).
+ * If there is no next value, the string pointer is set to null.  In any
+ * case ap will point to the beginning of the argument or will be a null
+ * pointer if there is no argument.
+ */
+
+static Cvval
+cv_next(Cvdef d, char **sp, char **ap)
+{
+    Cvval r = NULL;
+    char *s = *sp;
+
+    if (!*s) {
+        *sp = *ap = NULL;
+
+        return NULL;
+    }
+    if ((d->hassep && !d->sep) || !d->argsep) {
+        char sav, ec, *v = s, *os;
+
+        ec = ((d->hassep && d->sep) ? d->sep : d->argsep);
+
+        do {
+            sav = *++s;
+            *s = '\0';
+            if ((r = cv_get_val(d, v))) {
+                *s = sav;
+
+                break;
+            }
+            *s = sav;
+        } while (*s && *s != ec);
+
+        os = s;
+
+        if (d->hassep && d->sep) {
+            if ((s = strchr(s, d->sep)))
+                *sp = s + 1;
+            else
+                *sp = NULL;
+        } else
+            *sp = s;
+        if (d->argsep && *os == d->argsep) {
+            *ap = os + 1;
+            *sp = NULL;
+        } else if (r && r->type != CVV_NOARG)
+            *ap = os;
+        else
+            *ap = NULL;
+
+        return r;
+
+    } else if (d->hassep) {
+        char *ns = strchr(s, d->sep), *as, *sap, sav;
+        int skip = 0;
+
+        if (d->argsep && (as = strchr(s, d->argsep)) && (!ns || as <= ns)) {
+            *ap = as + 1;
+            ns = strchr(as + 1, d->sep);
+            skip = 1;
+            sap = as;
+        } else {
+            *ap = NULL;
+            sap = ns;
+        }
+        if (sap) {
+            sav = *sap;
+            *sap = '\0';
+        }
+        if ((!(r = cv_get_val(d, s)) || r->type == CVV_NOARG) && skip)
+            ns = as;
+
+        if (sap)
+            *sap = sav;
+
+        *sp = ((!ns || (ns == as && r && r->type != CVV_NOARG)) ? NULL : ns + 1);
+
+        return r;
+    } else {
+        char *as = strchr(s, d->argsep), *sap, sav;
+
+        *sp = NULL;
+
+        if (as) {
+            *ap = as + 1;
+            sap = as;
+            sav = *as;
+            *sap = '\0';
+        } else
+            *ap = sap = NULL;
+
+        r = cv_get_val(d, s);
+
+        if (sap)
+            *sap = sav;
+
+        return r;
+    }
+}
+
 /* Parse the current word. */
 
 static void
 cv_parse_word(Cvdef d)
 {
-    Cvval ptr;
+    Cvval val;
     struct cvstate state;
-    char *str, *eq;
+    char *str, *arg = NULL, *pign = compprefix;
+    int nosfx = 0;
 
     if (cv_alloced)
 	freelinklist(cv_laststate.vals, freestr);
 
-    for (ptr = d->vals; ptr; ptr = ptr->next)
-	ptr->active = 1;
+    for (val = d->vals; val; val = val->next)
+	val->active = 1;
 
     state.d = d;
     state.def = NULL;
@@ -2336,103 +2435,90 @@ cv_parse_word(Cvdef d)
 
     cv_alloced = 1;
 
-    if (d->hassep) {
-	if (d->sep) {
-	    char *end;
-	    int heq;
+    for (str = compprefix; str && *str; ) {
+        if ((val = cv_next(d, &str, &arg))) {
+            zaddlinknode(state.vals, ztrdup(val->name));
+            if (arg) {
+                if (str) {
+                    char sav = str[-1];
 
-	    for (str = compprefix, end = strchr(str, d->sep); end;) {
-		*end = '\0';
+                    str[-1] = '\0';
+                    zaddlinknode(state.vals, ztrdup(arg));
+                    str[-1] = sav;
+                } else {
+                    zaddlinknode(state.vals, tricat(arg, compsuffix, ""));
+                    nosfx = 1;
+                }
+            } else
+                zaddlinknode(state.vals, ztrdup(""));
 
-		if ((heq = !!(eq = strchr(str, d->argsep))))
-		    *eq++ = '\0';
-		else
-		    eq = "";
+            cv_inactive(d, val->xor);
 
-		if ((ptr = cv_get_val(d, str))) {
-		    zaddlinknode(state.vals, ztrdup(str));
-		    zaddlinknode(state.vals, ztrdup(eq));
-
-		    cv_inactive(d, ptr->xor);
-		}
-		if (heq)
-		    eq[-1] = d->argsep;
-
-		*end = d->sep;
-		str = end + 1;
-		end = strchr(str, d->sep);
-	    }
-	    ignore_prefix(str - compprefix);
-
-	    if ((str = strchr(compsuffix, d->sep))) {
-		char *beg = str;
-
-		for (str++; str; str = end) {
-		    if ((end = strchr(str, d->sep)))
-			*end = '\0';
-
-		    if ((heq = !!(eq = strchr(str, d->argsep))))
-			*eq++ = '\0';
-		    else
-			eq = "";
-
-		    if ((ptr = cv_get_val(d, str))) {
-			zaddlinknode(state.vals, ztrdup(str));
-			zaddlinknode(state.vals, ztrdup(eq));
-
-			cv_inactive(d, ptr->xor);
-		    }
-		    if (heq)
-			eq[-1] = d->argsep;
-		    if (end)
-			*end++ = d->sep;
-		}
-		ignore_suffix(strlen(beg));
-	    }
-	} else {
-	    char tmp[2];
-
-	    tmp[1] = '\0';
-
-	    for (str = compprefix; *str; str++) {
-		tmp[0] = *str;
-		if ((ptr = cv_get_val(d, tmp))) {
-		    zaddlinknode(state.vals, ztrdup(tmp));
-		    zaddlinknode(state.vals, ztrdup(""));
-
-		    cv_inactive(d, ptr->xor);
-		}
-	    }
-	    for (str = compsuffix; *str; str++) {
-		tmp[0] = *str;
-		if ((ptr = cv_get_val(d, tmp))) {
-		    zaddlinknode(state.vals, ztrdup(tmp));
-		    zaddlinknode(state.vals, ztrdup(""));
-
-		    cv_inactive(d, ptr->xor);
-		}
-	    }
-	    ignore_prefix(strlen(compprefix));
-	    ignore_suffix(strlen(compsuffix));
-	}
+            if (str)
+                pign = str;
+            else
+                val->active = 1;
+        }
     }
-    str = tricat(compprefix, compsuffix, "");
-    zsfree(compprefix);
-    zsfree(compsuffix);
-    compprefix = str;
-    compsuffix = ztrdup("");
+    state.val = val;
+    if (val && arg && !str)
+        state.def = val->arg;
 
-    if ((eq = strchr(str, d->argsep))) {
-	*eq++ = '\0';
+    if (!nosfx && d->hassep) {
+        int ign = 0;
+        char *more = NULL;
 
-	if ((ptr = cv_get_val(d, str)) && ptr->type != CVV_NOARG) {
-	    eq[-1] = d->argsep;
-	    ignore_prefix(eq - str);
-	    state.def = ptr->arg;
-	    state.val = ptr;
-	} else
-	    eq[-1] = d->argsep;
-    }
+        ignore_prefix(pign - compprefix);
+
+        if (!d->sep && (!val || val->type == CVV_NOARG)) {
+            ign = strlen(compsuffix);
+            more = compsuffix;
+        } else {
+            if (d->sep) {
+                char *ns = strchr(compsuffix, d->sep), *as;
+
+                if (d->argsep && (as = strchr(compsuffix, d->argsep)) &&
+                    (!ns || as <= ns)) {
+                    ign = strlen(as);
+                } else
+                    ign = (ns ? strlen(ns) : 0);
+
+                more = (ns ? ns + 1 : NULL);
+            } else if (d->argsep) {
+                char *as;
+
+                if ((as = strchr(compsuffix, d->argsep)))
+                    ign = strlen(as);
+            }
+        }
+        if (ign)
+            ignore_suffix(ign);
+
+        while (more && *more) {
+            if ((val = cv_next(d, &str, &arg))) {
+                zaddlinknode(state.vals, ztrdup(val->name));
+                if (arg) {
+                    if (str) {
+                        char sav = str[-1];
+
+                        str[-1] = '\0';
+                        zaddlinknode(state.vals, ztrdup(arg));
+                        str[-1] = sav;
+                    } else {
+                        zaddlinknode(state.vals, tricat(arg, compsuffix, ""));
+                        nosfx = 1;
+                    }
+                } else
+                    zaddlinknode(state.vals, ztrdup(""));
+
+                cv_inactive(d, val->xor);
+            }
+        }
+    } else if (arg)
+        ignore_prefix(arg - compprefix);
+    else
+        ignore_prefix(pign - compprefix);
+
     memcpy(&cv_laststate, &state, sizeof(state));
 }
 

@@ -27,7 +27,7 @@ if compvalues -i "$@"; then
 
     compvalues -V noargs args opts
 
-    if [[ "$PREFIX" = *${argsep}${~test} ]]; then
+    if [[ -n "$argsep" && "$PREFIX" = *${argsep}${~test} ]]; then
       local name
 
       name="${PREFIX%%${argsep}*}"
