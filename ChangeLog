@@ -1,3 +1,9 @@
+2004-12-10  Andrey Borzenkov  <bor@zsh.org>
+
+	* 20617: Completion/Linux/Command/_modutils: fix
+	completion of compressed modules on kernel 2.6; add
+	trivial insmod completion.
+
 2004-12-09  Peter Stephenson  <pws@csr.com>
 
 	* 20613, 20614: Functions/Zle/match-words-by-style: fix
