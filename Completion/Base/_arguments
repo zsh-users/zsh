@@ -71,6 +71,7 @@ if (( long )); then
     lopts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$(${~words[1]} --help 2>&1)//\[--/
 --}:#[ 	]#-*}//,/
 }}:#[ 	]#--*}#*--}%%[], ]*}:#}")
+    lopts=( "${(@)lopts:#--}" )
 
     # Now remove all ignored options ...
 
@@ -163,7 +164,7 @@ done
 
 _style -s options auto-description autod
 
-if comparguments -i "$autod" "$@"; then
+if (( $# )) && comparguments -i "$autod" "$@"; then
   local nm="$compstate[nmatches]" action noargs aret expl local
   local next direct odirect equal single match matched ws tmp1 tmp2 tmp3
   local opts subc prefix suffix
