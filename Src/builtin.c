@@ -3151,7 +3151,7 @@ bin_print(char *name, char **args, Options ops, int func)
     int flen, width, prec, type, argc, n, narg;
     int nnl = 0, ret = 0, maxarg = 0;
     int flags[5], *len;
-    char *start, *endptr, *c, *d, *flag, *buf, spec[11], *fmt = NULL;
+    char *start, *endptr, *c, *d, *flag, *buf, spec[13], *fmt = NULL;
     char **first, *curarg, *flagch = "0+- #", save = '\0', nullstr = '\0';
     size_t rcount, count = 0;
 #ifdef HAVE_OPEN_MEMSTREAM

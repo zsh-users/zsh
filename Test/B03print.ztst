@@ -149,7 +149,7 @@
 0:%n count zeroed on format reuse
 >1
 
-# this should fill spec string with '%0+- #*.*d\0' - 11 characters
+# this may fill spec string with '%0+- #*.*lld\0' - 13 characters
  printf '%1$0+- #-08.5dx\n' 123
 0:maximal length format specification
 >+00123  x

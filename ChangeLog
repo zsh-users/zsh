@@ -1,3 +1,8 @@
+2004-03-07  Oliver Kiddle  <opk@zsh.org>
+
+	* 19549: Src/builtin.c, Test/B03print.ztst: allow for size
+	modifiers in printf format spec's buffer
+
 2004-03-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* zsh-users/7121: Doc/Zsh/options.yo, Src/options.c,
