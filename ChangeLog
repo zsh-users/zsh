@@ -1,5 +1,9 @@
 2000-05-02  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11052: Src/Zle/computil.c: fix for _arguments, use
+ 	on-line-argument-numbers only for normal arguments, not for
+ 	arguments of options
+	
 	* 11049: Completion/Base/_arguments, Completion/Base/_first,
  	Completion/Builtins/_hash, Completion/Core/_expand,
  	Completion/User/_gprof, Completion/User/_mount,

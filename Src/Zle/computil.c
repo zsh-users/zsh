@@ -1396,9 +1396,9 @@ ca_set_data(char *opt, Caarg arg, char **args, int single)
 
     addopt = (opt ? 0 : ca_laststate.oopt);
 
-    for (; arg && (arg->num < 0 ||
-		   (arg->min <= ca_laststate.nth + addopt &&
-		    arg->num >= ca_laststate.nth));) {
+    for (; arg && (opt || (arg->num < 0 ||
+			   (arg->min <= ca_laststate.nth + addopt &&
+			    arg->num >= ca_laststate.nth)));) {
 	lopt = (arg->type == CAA_OPT);
 	if (!opt && !lopt && oopt > 0)
 	    oopt = 0;
