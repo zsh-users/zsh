@@ -1,5 +1,10 @@
 2002-05-08  Peter Stephenson  <pws@csr.com>
 
+	* Unposted: Src/Modules/zselect.c: remove an unused counter.
+
+	* 17095: Src/Modules/zselect.c: wrong index when appending to a
+	value with zselect -A assoc.
+
 	* 17081: Src/Modules/zselect.c, Src/Modules/zselect.mdd,
 	Doc/Zsh/mod_zselect.yo:  zsh/zselect module provides zselect
 	builtin as front-end to select system call.

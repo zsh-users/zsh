@@ -37,8 +37,7 @@
  * Return 1 for error (after printing a message), 0 for OK.
  */
 static int
-handle_digits(char *nam, char *argptr, fd_set *fdset, int *fdcount,
-	      int *fdmax)
+handle_digits(char *nam, char *argptr, fd_set *fdset, int *fdmax)
 {
     int fd;
     char *endptr;
@@ -54,7 +53,6 @@ handle_digits(char *nam, char *argptr, fd_set *fdset, int *fdcount,
     }
 
     FD_SET(fd, fdset);
-    (*fdcount)++;
     if (fd+1 > *fdmax)
 	*fdmax = fd+1;
     return 0;
@@ -67,7 +65,7 @@ static int
 bin_zselect(char *nam, char **args, char *ops, int func)
 {
 #ifdef HAVE_SELECT
-    int i, fd, fdsetind = 0, fdcount = 0, fdmax = 0;
+    int i, fd, fdsetind = 0, fdmax = 0, fdcount;
     fd_set fdset[3];
     const char fdchar[3] = "rwe";
     struct timeval tv, *tvptr = NULL;
@@ -166,12 +164,11 @@ bin_zselect(char *nam, char **args, char *ops, int func)
 		    /* Digits following option without arguments are fd's. */
 		default:
 		    if (handle_digits(nam, argptr, fdset+fdsetind,
-				      &fdcount, &fdmax))
+				      &fdmax))
 			return 1;
 		}
 	    }
-	} else if (handle_digits(nam, argptr, fdset+fdsetind, &fdcount,
-				 &fdmax))
+	} else if (handle_digits(nam, argptr, fdset+fdsetind, &fdmax))
 	    return 1;
     }
 
@@ -220,7 +217,7 @@ bin_zselect(char *nam, char **args, char *ops, int func)
 				strcpy(buf, data);
 				for (ptr = buf; *ptr; ptr++)
 				    ;
-				*ptr++ = fdchar[1];
+				*ptr++ = fdchar[i];
 				*ptr = '\0';
 				zsfree(data);
 				*dataptr = ztrdup(buf);
