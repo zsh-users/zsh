@@ -15,7 +15,7 @@
 # This function will also do the matching required to find out
 # which strings will be included in the list. All elements that
 # don't match will be removed from the array. This means that the
-# special parameters `PREFI' and `SUFFIX' have to be set up 
+# special parameters `PREFIX' and `SUFFIX' have to be set up 
 # correctly before this function is called.
 
 local _param="$1" _arr _len _i _tmp _simple

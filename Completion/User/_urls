@@ -24,6 +24,10 @@
 #      ... drwxr-xr-x ... 512 Sep  3 02:48 ./bookmark/zsh
 #      ... -rw-r--r-- ...  27 Sep  3 02:47 ./bookmark/zsh/home
 #      ... -rw-r--r-- ...  20 Sep  3 02:48 ./bookmark/zsh/meta
+#      % cat bookmark/zsh/home 
+#      http://sunsite.auc.dk/zsh/
+#      % cat bookmark/zsh/meta
+#      http://www.zsh.org/
 
 local ipre scheme dirs files
 
@@ -42,7 +46,7 @@ if [[ -prefix [-+.a-z0-9]#: ]]; then
   scheme="${PREFIX%%:*}"
   compset -P "[-+.a-z0-9]#:"
 else
-  compadd -S '' http:// ftp:// bookmark:
+  compadd "$@" -S '' http:// ftp:// bookmark:
   return
 fi
 
