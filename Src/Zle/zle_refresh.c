@@ -698,7 +698,7 @@ refreshline(int ln)
       which need to be written. do this now to allow some pre-processing */
 
     if (cleareol 		/* request to clear to end of line */
-	|| !nllen 		/* no line buffer given */
+	|| (!nllen && (ln != 0 || !put_rpmpt))	/* no line buffer given */
 	|| (ln == 0 && (put_rpmpt != oput_rpmpt))) {	/* prompt changed */
 	p1 = zhalloc(winw + 2);
 	if (nllen)
