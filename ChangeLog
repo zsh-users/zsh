@@ -1,3 +1,8 @@
+2004-06-09  Peter Stephenson  <pws@csr.com>
+
+	* c.f. 20034: Test/V03mathfunc.ztst: tests for the zsh/mathfunc
+	module.
+
 2004-06-08  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 20029: Src/Modules/mathfunc.c: rand48(seed) stopped being
