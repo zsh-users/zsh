@@ -615,16 +615,12 @@ iscom(char *s)
 int
 isreallycom(Cmdnam cn)
 {
-    if (cn->flags & HASHED)
-	return 1;
-    else {
-	char fullnam[MAXCMDLEN];
+    char fullnam[MAXCMDLEN];
 
-	strcpy(fullnam, cn->u.name ? *(cn->u.name) : "");
-	strcat(fullnam, "/");
-	strcat(fullnam, cn->nam);
-	return iscom(fullnam);
-    }
+    strcpy(fullnam, cn->u.name ? *(cn->u.name) : "");
+    strcat(fullnam, "/");
+    strcat(fullnam, cn->nam);
+    return iscom(fullnam);
 }
 
 /**/
@@ -1689,7 +1685,8 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    char *cmdarg = (char *) peekfirst(args);
 
 	    hn = cmdnamtab->getnode(cmdnamtab, cmdarg);
-	    if (hn && trycd && !isreallycom((Cmdnam)hn)) {
+	    if (hn && trycd && !(((Cmdnam)hn)->flags & HASHED) &&
+		!isreallycom((Cmdnam)hn)) {
 		cmdnamtab->removenode(cmdnamtab, cmdarg);
 		cmdnamtab->freenode(hn);
 		hn = NULL;
