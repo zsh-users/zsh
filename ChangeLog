@@ -1,3 +1,15 @@
+2001-07-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15308: Src/builtin.c: Fix infinite loop on `r OLD=NEW' when OLD
+	is the empty string, by rejecting replacements with an empty OLD.
+
+	* 15305: Src/Zle/zle_main.c: Suppress XTRACE during execution of
+	user-defined ZLE widgets unless the widget function has been
+	tagged for tracing with `typeset -ft'.
+
+	* 15304: Src/math.c: Unset parameters should not always become
+	typed as float upon assignment (fix for 15292).
+
 2001-07-06  Peter Stephenson  <pws@csr.com>
 
 	* 15291, 15292: Src/math.c, Src/zsh.h, Test/C01arith.yo:
