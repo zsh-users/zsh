@@ -39,4 +39,4 @@ else
   disp=()
 fi
 
-compadd "$expl[@]" "$@" -qS/ "$disp[@]" -Q - "$list[@]"
+compadd "$expl[@]" "$@" -q "$disp[@]" -Q - "$list[@]"
