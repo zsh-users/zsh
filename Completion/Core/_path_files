@@ -210,10 +210,15 @@ for prepath in "$prepaths[@]"; do
     # Get the matching files by globbing.
 
     if [[ "$tpre$tsuf" = */* ]]; then
-      tmp1=( ${^tmp1}*(-/) )
+      tmp2=( ${^tmp1}*(-/) )
+      [[ ! -o globdots && "$PREFIX" = .* ]] &&
+          tmp2=( "$tmp1[@]" ${^tmp1}.*(-/) )
     else
-      tmp1=( ${^tmp1}${^~pats} )
+      tmp2=( ${^tmp1}${^~pats} )
+      [[ ! -o globdots && "$PREFIX" = .* ]] &&
+          tmp2=( "$tmp1[@]" ${^tmp1}.${^~pats} )
     fi
+    tmp1=( "$tmp2[@]" )
 
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.
