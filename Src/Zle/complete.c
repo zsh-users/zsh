@@ -413,7 +413,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	zwarnnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
-    dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre =
+    dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre = dat.mesg =
 	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp = 
 	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
     dat.match = NULL;
@@ -507,6 +507,10 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		sp = &(dat.exp);
 		e = "string expected after -%c";
 		break;
+	    case 'x':
+		sp = &(dat.mesg);
+		e = "string expected after -%c";
+		break;
 	    case 'r':
 		dat.flags |= CMF_REMOVE;
 		sp = &(dat.rems);
@@ -575,7 +579,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 
  ca_args:
 
-    if (!*argv && !dat.group &&
+    if (!*argv && !dat.group && !dat.mesg &&
 	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON)))
 	return 1;
 

@@ -1538,6 +1538,8 @@ addmatches(Cadata dat, char **argv)
 		endcmgroup(NULL);
 		begcmgroup("default", 0);
 	    }
+	    if (dat->mesg)
+		addmesg(dat->mesg);
 	} SWITCHBACKHEAPS;
 
 	return 1;
@@ -1785,6 +1787,8 @@ addmatches(Cadata dat, char **argv)
 	    endcmgroup(NULL);
 	    begcmgroup("default", 0);
 	}
+	if (dat->mesg)
+	    addmesg(dat->mesg);
 	if (*argv) {
 	    if (dat->pre)
 		dat->pre = dupstring(dat->pre);
@@ -2364,6 +2368,28 @@ addexpl(void)
     }
     addlinknode(expls, curexpl);
     newmatches = 1;
+}
+
+/* Add a message to the current group. Make sure it is shown. */
+
+/**/
+mod_export void
+addmesg(char *mesg)
+{
+    LinkNode n;
+    Cexpl e;
+
+    for (n = firstnode(expls); n; incnode(n)) {
+	e = (Cexpl) getdata(n);
+	if (!strcmp(mesg, e->str))
+	    return;
+    }
+    e = (Cexpl) zhalloc(sizeof(*e));
+    e->count = e->fcount = 1;
+    e->str = dupstring(mesg);
+    addlinknode(expls, e);
+    newmatches = 1;
+    mgroup->new = 1;
 }
 
 /* The comparison function for matches (used for sorting). */

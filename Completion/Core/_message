@@ -1,19 +1,23 @@
 #autoload
 
-local format
+local format raw
 
-format="$compconfig[message_format]"
-[[ -z "$format" ]] && "$compconfig[description_format]"
+_tags messages || return 1
 
-if [[ -n "$format" ]]; then
-  if [[ $compstate[nmatches] -eq 0 ]]; then
-    compstate[list]=list
-    compstate[insert]=''
-    compadd -UX "${format//\\%d/$1}" -n ''
-  else
-    compadd -X "${format//\\%d/$1}" -n ''
-  fi
-  compstate[force_list]=yes
+if [[ "$1" = -r ]]; then
+  raw=yes
+  shift
+  format="$1"
 else
-  compadd -n ''
+  zstyle -s ":completion:${curcontext}:messages" format format ||
+      zstyle -s ":completion:${curcontext}:descriptions" format format
+fi
+
+if [[ -n "$format$raw" ]]; then
+  [[ -z "$raw" ]] && zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
+  compadd -x "$format"
+  if [[ $compstate[nmatches] -eq 0 ]]; then
+    compstate[list]='list force'
+    compstate[insert]=''
+  fi
 fi

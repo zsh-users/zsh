@@ -395,7 +395,7 @@ xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
 xitem([ tt(-W) var(file-prefix) ] [ tt(-d) var(array) ])
-xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ])
+xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ] [ tt(-x) var(message) ])
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 xitem([ tt(-D) var(array) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
 item([ tt(-M) var(match-spec) ] [ tt(--) ] [ var(words) ... ])(
@@ -490,7 +490,12 @@ duplicates be kept. Again, groups with and without this flag are in
 different name spaces.
 )
 item(tt(-X) var(explanation))(
-The var(explanation) string will be printed with the list of matches.
+The var(explanation) string will be printed with the list of matches,
+above the group currently selected.
+)
+item(tt(-x) var(message))(
+Like tt(-X), but the var(message) will be printed even if there are no 
+matches in the group.
 )
 item(tt(-q))(
 The suffix given with tt(-S) will be automatically removed if 

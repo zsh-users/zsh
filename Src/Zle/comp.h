@@ -257,6 +257,7 @@ struct cadata {
     char *opar;			/* array to store originals in (-O) */
     char *dpar;			/* array to delete non-matches in (-D) */
     char *disp;			/* array with display lists (-d) */
+    char *mesg;			/* message to show unconditionally (-x) */
 };
 
 /* List data. */
