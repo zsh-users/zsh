@@ -6,10 +6,13 @@ local arguments
 arguments=(
   '(--all -a -A --almost-all)'{--all,-a}'[list entries starting with .]'
   '(--almost-all -A -a --all)'{--almost-all,-A}'[list all except . and ..]'
+  '--author[print the author of each file]'
   '(--ignore-backups -B)'{--ignore-backups,-B}"[don't list entries ending with ~]"
   '(--directory -d)'{--directory,-d}'[list directory entries instead of contents]'
+  '(--dired -D)'{--dired,-D}"[generate output designed for Emacs' dired mode]"
   '(--ignore,-I)'{--ignore,-I}"[don't list entire matching pattern]:pattern:"
-  '(--dereference -L)'{--dereference,-L}'[list referenced file for sym link]'
+  '(--dereference -L --dereference-command-line --dereference-command-line-symlink-to-dir)'{--dereference,-L}'[list referenced file for sym link]'
+  '(--dereference -L --dereference-command-line --dereference-command-line-symlink-to-dir)'{--dereference-command-line,--dereference-command-line-symlink-to-dir}
   '(--recursive -R)'{--recursive,-R}'[list subdirectories recursively]'
  
   '(--no-group -G)'{--no-group,-G}'[inhibit display of group information]'
@@ -17,19 +20,21 @@ arguments=(
   '(--si -H -h --human-readable)'{--si,-H}'[sizes in human readable form; powers of 1000]'
   '(--inode -i)'{--inode,-i}'[print file inode numbers]'
  
-  '(--format -o -1 -C -m -x)-l[long listing]'
+  '(--format -l -g -o -1 -C -m -x)-l[long listing]'
+  '(--format -l -1 -C -m -x)-g[long listing but without owner information]' 
   '(--format -l --no-group -G -1 -C -m -x)-o[no group, long]'
-  '(--format -l -o -C -m -x)-1[single column output]'
-  '(--format -l -o -1 -m -x)-C[sort vertically]'
-  '(--format -l -o -1 -C -x)-m[comma separated]'
-  '(--format -l -o -1 -C -m)-x[sort horizontally]'
-  '(-l -o -1 -C -m -x)--format=:format:(verbose long commas horizontal across vertical single-column)'
+  '(--format -l -g -o -C -m -x)-1[single column output]'
+  '(--format -l -g -o -1 -m -x)-C[list entries in columns sorted vertically]'
+  '(--format -l -g -o -1 -C -x)-m[comma separated]'
+  '(--format -l -g -o -1 -C -m)-x[sort horizontally]'
+  '(-l -g -o -1 -C -m -x)--format=:format:(verbose long commas horizontal across vertical single-column)'
  
   '(--size -s -f)'{--size,-s}'[display size of each file in blocks]'
  
   '(--time -u)-c[status change time]'
   '(--time -c)-u[access time]'
   '(-c -u)--time=[specify time to show]:time:(ctime status use atime access)'
+  '--time-style=[show times using specified style]:time style:(full-iso long-iso iso locale)'
  
   '(-a --all -U -l --format -s --size -t --sort --full-time)-f[unsorted, all, short list]'
   '(--reverse)'{--reverse,-r}'[reverse sort order]'
@@ -63,7 +68,8 @@ arguments=(
  
   '(--hide-control-chars -q --show-control-chars)'{--hide-control-chars,-q}'[hide control chars]'
   '(-q --hide-control-chars)--show-control-chars'
-  '--version[display version information]'
+  '(- :)--help[display help information]'
+  '(- :)--version[display version information]'
   '*:files:_files'
 )
 
