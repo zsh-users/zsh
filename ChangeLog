@@ -1,5 +1,8 @@
 2002-01-07  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 16408: Src/Zle/compcore.c: make sure auto menu isn't started
+	accidentially when bashautolist is set
+
 	* 16407: Completion/X/Command/_netscape: fix nested _tags-loops
 	by re-initialising the outer one when leaving the inner one
 
