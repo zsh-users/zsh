@@ -113,7 +113,7 @@ delete-no-predict() {
 
 predict-limit-list() {
   if (( compstate[list_lines]+BUFFERLINES > LINES ||
-	compstate[nmatches] > compstate[list_max] ))
+	( compstate[list_max] != 0 && compstate[nmatches] > compstate[list_max] ) ))
   then
     compstate[list]=''
     compstate[force_list]=yes
