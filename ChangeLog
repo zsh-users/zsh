@@ -1,5 +1,8 @@
 2001-10-05  Clint Adams  <clint@zsh.org>
 
+	* 15941: Completion/Unix/Command/_mount:
+	complete reiserfs mount options.
+
 	* 15940: Completion/Unix/Command/_mount:
 	complete -o utf8 for mount -t vfat.
 
