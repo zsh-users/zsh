@@ -39,7 +39,7 @@ sdir_top        = @top_srcdir@
 INSTALL         = @INSTALL@
 
 @DEFS_MK@
-	
+
 sdir_src      = $(sdir_top)/Src
 dir_src       = $(dir_top)/Src
 

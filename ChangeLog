@@ -1,5 +1,7 @@
 2000-07-28  Peter Stephenson  <pws@csr.com>
 
+	* 12421: Src/Makemod.in.in: extra tab
+
 	* Andrej: 12419: Src/builtin.c, Src/params.c: use putenv() and
 	getenv() if available and try to make minimal assumptions about
 	environment handling.
