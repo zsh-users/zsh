@@ -72,7 +72,7 @@ few utility functions, arrange for all the necessary shell functions to be
 autoloaded, and will then re-define all widgets that do completion to use the
 new system.  If you use the tt(menu-select) widget, which is part of the
 tt(zsh/complist) module, you should make sure that that module is loaded
-before the call to tt(compinit) to make sure that that widget is also
+before the call to tt(compinit) so that that widget is also
 re-defined.  If completion styles (see below) are set up to perform
 expansion as well as completion by default, and the TAB key is bound to
 tt(expand-or-complete), tt(compinit) will rebind it to tt(complete-word);
@@ -414,22 +414,6 @@ ifnzman(noderef(The zsh/zutil Module))).
 When looking up styles the completion system uses full context names,
 including the tag.
 
-To have more control over when certain values for styles are used one
-can use the special parameters available in completion widgets (see
-ifzman(see zmanref(zshcompwid))\
-ifnzman(noderef(Completion Widgets)))\
-) and the tt(-e) option to tt(zstyle) that makes the value be
-evaluated when looked up.  For example, to make the tt(completer)
-style have a different value when completion for the tt(cvs) command,
-one could use the tt(words) special array:
-
-example(zstyle -e ':completion:*' completer '
-    if [[ $words[1] = cvs ]]; then
-      reply=(_complete)
-    else
-      reply=(_complete _approximate)
-    fi')
-
 Styles determine such things as how the matches are generated; some of them
 correspond to shell options (for example, the use of menu completion), but
 styles provide more specific control.  They can have any number of strings as
@@ -466,6 +450,22 @@ when styles are looked up.  As the function for the tt(kill)
 builtin command uses the tags tt(jobs) and tt(processes), we can use:
 
 example(zstyle ':completion:*:*:kill:*:jobs' verbose no)
+
+To have more control over when certain values for styles are used one
+can use the special parameters available in completion widgets (see
+ifzman(see zmanref(zshcompwid))\
+ifnzman(noderef(Completion Widgets)))\
+) and the tt(-e) option to tt(zstyle) that makes the value be
+evaluated when looked up.  For example, to make the tt(completer)
+style have a different value when completing for the tt(cvs) command,
+one could use the tt(words) special array:
+
+example(zstyle -e ':completion:*' completer '
+    if [[ $words[1] = cvs ]]; then
+      reply=(_complete)
+    else
+      reply=(_complete _approximate)
+    fi')
 
 Note that the order in which styles are em(defined) does not matter; the
 style mechanism uses the most specific possible match for a particular
@@ -1141,7 +1141,7 @@ descriptions separated by newlines.
 The `tt(%)' for the sequences that are replaced by strings provided by 
 the completion functions like the `tt(%d)' may be followed by field
 width specifications as  described for the tt(zformat) builtin command
-from the tt(zutil) module, see
+from the tt(zsh/zutil) module, see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The zsh/zutil Module))\
 .
@@ -1245,7 +1245,7 @@ except the current one will not be considered to be a possible
 completion.
 
 The values `tt(current)' and `tt(current-shown)' are a bit like the
-opposite of the tt(accept-exact). It means that only strings with
+opposite of tt(accept-exact). They mean that only strings with
 missing characters will be completed.
 
 Note that you almost certainly don't want to set this to `true' or
@@ -1334,7 +1334,7 @@ pending which has not yet been processed by the shell. If a var(val)
 is given, completion will not be done if there are at least that many
 characters of unprocessed input. This is often useful to have set when 
 pasting characters into a terminal. Note however, that it relies on
-the tt($PENDING) special parameter from the tt(zle) module being set
+the tt($PENDING) special parameter from the tt(zsh/zle) module being set
 properly which is not guaranteed on all platforms.
 
 The default value of this style is `true' unless when completing
@@ -1444,9 +1444,6 @@ width, padded to the  right with spaces.  As in other prompt strings, the
 escape sequences `tt(%S)', `tt(%s)', `tt(%B)', `tt(%b)', `tt(%U)',
 `tt(%u)', and `tt(%{)...tt(%})' for entering and leaving the display modes
 standout, bold and underline are also available.
-
-Note that this style has a default value.  If you don't want to use
-scrolling, set this style to an empty string.
 )
 kindex(list-rows-first, completion style)
 item(tt(list-rows-first))(
@@ -1585,18 +1582,18 @@ even then, the value `tt(yes=long-list)' can be used.
 
 In addition to (or instead of) the above possibilities, the value may
 contain the string `tt(select)', optionally followed by an equals sign and a
-number.  In this case menu-selection (as defined by the tt(zsh/complist)
+number.  In this case menu selection (as defined by the tt(zsh/complist)
 module) will be started.  Without the optional number, it will be started
 unconditionally and with a number it will be started only if at least that
 many matches are generated; if the values for more than one tag provide a
 number, the smallest number is taken.  Menu selection can be turned off
 explicitly by defining a value containing the string `tt(no-select)'.
 
-It is also possible to start menu-selection only if the list of
+It is also possible to start menu selection only if the list of
 matches does not fit on the screen by using the value
-`tt(select=long)'.  This will only start menu-selection if the widget
+`tt(select=long)'.  This will only start menu selection if the widget
 invoked does completion, not simply listing as done by
-tt(delete-char-or-list); to start menu-selection even here, use the value
+tt(delete-char-or-list); to start menu selection even here, use the value
 `tt(select=long-list)'.
 
 To turn on menu completion or menu selection when a certain number of
@@ -1746,7 +1743,7 @@ removed, rather than just consecutive duplicates.
 kindex(select-prompt, completion style)
 item(tt(select-prompt))(
 If this is set for the tt(default) tag, its
-value will be displayed during menu-selection (see the tt(menu) style
+value will be displayed during menu selection (see the tt(menu) style
 above) when the completion list does not fit on the screen as a
 whole.  The same escapes as for the tt(list-prompt) style are
 understood, but give the number of the match or line the mark is
@@ -1755,7 +1752,7 @@ on.  A default prompt is used when the value is the empty string.
 kindex(select-scroll, completion style)
 item(tt(select-scroll))(
 This style is tested for the tt(default) tag and determines how a
-completion list is scrolled during a menu-selection (see the tt(menu)
+completion list is scrolled during a menu selection (see the tt(menu)
 style above) when the completion list does not fit on the screen as a
 whole.  Its value should be `tt(0)' (zero) to scroll by
 half-screenfuls, a positive integer to scroll by that many lines and a
@@ -2093,7 +2090,7 @@ function returns.
 If the first argument to tt(_main_complete) is a single hyphen, the
 arguments will not be taken as names of completers. Instead, the
 second argument gives a name to use in the var(completer) field of the 
-context and the other arguments give a command anme and arguments to
+context and the other arguments give a command name and arguments to
 call to generate the matches.
 
 The following completer functions are contained in the distribution (users
@@ -2502,7 +2499,7 @@ store the name of the widget in the var(function) field of the context
 and call the completion system. This allows to easily define custom
 completion widgets with their own sets of style settings. For example, 
 to define a widget that does normal completion and starts
-menu-selection, one could do:
+menu selection, one could do:
 
 example(zle -C foo complete-word _generic
 bindkey '...' foo

@@ -6,7 +6,7 @@ cindex(completion, coloured listings)
 cindex(completion, scroll listings)
 The tt(zsh/complist) module offers three extensions to completion listings:
 the ability to highlight matches in such a list, the ability to
-scroll through long lists and a different style of menu-completion.
+scroll through long lists and a different style of menu completion.
 
 subsect(Colored completion listings)
 Whenever one of the parameters tt(ZLS_COLORS) or tt(ZLS_COLOURS) is set 
@@ -63,11 +63,11 @@ for the left code (see below)
 item(tt(rc m))(
 for the right code
 )
-item(tt(tc) var(0))(
+item(tt(tc 0))(
 for the character indicating the file type  printed after filenames if
 the tt(LIST_TYPES) option is set
 )
-item(tt(sp) var(0))(
+item(tt(sp 0))(
 for the spaces printed after matches to align the next column
 )
 item(tt(ec) var(none))(
@@ -94,7 +94,7 @@ equal signs.  The first code will be used for all parts for which no
 explicit code is specified and the following codes will be used for
 the parts matched by the sub-patterns in parentheses.  For example,
 the specification `tt(=(#b)(?)*(?)=0=3=7)' will be used for all
-matches which are at least two characters long and will make the use
+matches which are at least two characters long and will use
 the code `tt(3)' for the first character, `tt(7)' for the last
 character and `tt(0)' for the rest.
 
@@ -187,14 +187,14 @@ cindex(completion, selecting by cursor)
 vindex(MENUSELECT)
 tindex(menu-select)
 The tt(zsh/complist) module also offers an alternative style of selecting
-matches from a list, called menu-selection, which can be used if the
+matches from a list, called menu selection, which can be used if the
 shell is set up to return to the last prompt after showing a
 completion list (see the tt(ALWAYS_LAST_PROMPT) option in
 ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Options))\
 ).  It can be invoked directly by
 the widget tt(menu-select) defined by the module.  Alternatively,
-the parameter tt(MENUSELECT) can be set to an integer, which give the
+the parameter tt(MENUSELECT) can be set to an integer, which gives the
 minimum number of matches that must be present before menu selection is
 automatically turned on.  This second method requires that menu completion
 be started, either directly from a widget such as tt(menu-complete), or due
@@ -207,7 +207,7 @@ tt(MENUSELECT) parameter should not be used (like the tt(ZLS_COLORS)
 and tt(ZLS_COLOURS) parameters described above).  Instead, the tt(menu) 
 style should be used with the tt(select=)var(...) keyword.
 
-After menu-selection is started, the matches will be listed. If there
+After menu selection is started, the matches will be listed. If there
 are more matches than fit on the screen, only the first screenful is
 shown.  The
 matches to insert into the command line can be selected from this
@@ -227,7 +227,7 @@ used.
 
 The tt(MENUSCROLL) parameter can be used to specify how the list is
 scrolled.  If the parameter is unset, this is done line by line, if it
-is set to `tt(0)' (zero), the list will scrolled half the number of
+is set to `tt(0)' (zero), the list will scroll half the number of
 lines of the screen.  If the value is positive, it gives the number of
 lines to scroll and if it is negative, the list will be scrolled
 the number of lines of the screen minus the (absolute) value.
@@ -244,7 +244,7 @@ completion function which added them explicitly requested that they
 not appear in the list (using the tt(-n) option of the tt(compadd)
 builtin command) or they are matches which duplicate a string already
 in the list (because they differ only in things like prefixes or
-suffixes that are not displayed).  In the list used for menu-selection,
+suffixes that are not displayed).  In the list used for menu selection,
 however, even these matches are shown so that it is possible to select
 them.  To highlight such matches the tt(hi) and tt(du) capabilities in
 the tt(ZLS_COLORS) and tt(ZLS_COLOURS) parameters are supported for
@@ -273,7 +273,7 @@ select the next match to insert into the line
 )
 item(tt(accept-and-infer-next-history))(
 accepts the current match and then tries completion with
-menu-selection again;  in the case of files this allows one to select
+menu selection again;  in the case of files this allows one to select
 a directory and immediately attempt to complete files in it;  if there 
 are no matches, a message is shown and one can use tt(undo) to go back 
 to completion on the previous level, every other key leaves menu
@@ -335,7 +335,7 @@ moves the mark to the previous match
 enditem()
 
 All movement functions wrap around at the edges; any other zle function not
-listed leaves menu-selection and executes that function.  It is possible to
+listed leaves menu selection and executes that function.  It is possible to
 make widgets in the above list do the same by using the form of the widget
 with a `tt(.)' in front.  For example, the widget `tt(.accept-line)' has
 the effect of leaving menu selection and accepting the entire command line.
@@ -345,12 +345,12 @@ key that is not defined in this keymap or that is bound to
 tt(undefined-key) is looked up in the keymap currently selected.  This
 is used to ensure that the most important keys used during selection
 (namely the cursor keys, return, and TAB) have sensible defaults.  However,
-keys in the the tt(menuselect) keymap can be modified directly using the
+keys in the tt(menuselect) keymap can be modified directly using the
 tt(bindkey) builtin command (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The zsh/zle Module))\
-). For example, to make the return key leave menu-selection and
-continue with normal menu-completion one can call
+). For example, to make the return key leave menu selection without
+accepting the match currently selected one could call
 
 indent(tt(bindkey -M menuselect '^M' send-break))
 

@@ -116,9 +116,9 @@ the tt(zmodload) builtin to provide standard floating point mathematical
 functions.
 
 An expression of the form `tt(##)var(x)' where var(x) is any character
-sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the ascii
+sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the ASCII
 value of this character and an expression of the form `tt(#)var(foo)'
-gives the ascii value of the first character of the value of the
+gives the ASCII value of the first character of the value of the
 parameter var(foo).  Note that this is different from the expression
 `tt($#)var(foo)', a standard parameter substitution which gives the
 length of the parameter var(foo).  `tt(#\)' is accepted instead of
@@ -168,7 +168,7 @@ retain that type either until the type is explicitly changed or until the
 end of the scope.  This can have unforeseen consequences.  For example, in
 the loop
 
-example(for (( f = 0; f < 1; f += 0.1 )); do;
+example(for (( f = 0; f < 1; f += 0.1 )); do
 # use $f
 done)
 

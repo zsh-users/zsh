@@ -74,7 +74,7 @@ vindex(CURRENT)
 item(tt(CURRENT))(
 This is the number of the current word, i.e. the word the cursor is
 currently on in the tt(words) array.  Note that this value is only
-correct if the tt(ksharrays) options is not set.
+correct if the tt(ksharrays) option is not set.
 )
 vindex(IPREFIX)
 item(tt(IPREFIX))(
@@ -212,8 +212,8 @@ line.  On entry to the widget function, if it is unset the command line is
 not to be changed; if set to tt(unambiguous), any prefix common to all
 matches is to be inserted; if set to tt(automenu-unambiguous), the
 common prefix is to be inserted and the next invocation of the
-completion code may start menucompletion (due to the tt(AUTO_MENU)
-option being set); if set to tt(menu) or tt(automenu) menucompletion
+completion code may start menu completion (due to the tt(AUTO_MENU)
+option being set); if set to tt(menu) or tt(automenu) menu completion
 will be started for the matches currently generated (in the
 latter case this will happen because the tt(AUTO_MENU) is set). The
 value may also contain the string `tt(tab)' when the completion code
@@ -227,12 +227,12 @@ Negative numbers count backward from the last match (with `tt(-1)'
 selecting the last match) and out-of-range values are wrapped
 around, so that a value of zero selects the last match and a value
 one more than the maximum selects the first. Unless the value of this
-key ends in a space, the match is inserted as in a menucompletion,
+key ends in a space, the match is inserted as in a menu completion,
 i.e. without automatically appending a space.
 
 Both tt(menu) and tt(automenu) may also specify the the number of the
 match to insert, given after a colon.  For example, `tt(menu:2)' says
-to start menucompletion, beginning with the second match.
+to start menu completion, beginning with the second match.
 
 Note that a value containing the substring `tt(tab)' makes the
 matches generated be ignored and only the TAB be inserted.
@@ -261,7 +261,7 @@ list be shown even if there is only one match. Normally, the list
 would be shown only if there are at least two matches.
 
 The value contains the substring tt(packed) if the tt(LIST_PACKED)
-option is set. If this substring is given for all matches added of a
+option is set. If this substring is given for all matches added to a
 group, this group will show the tt(LIST_PACKED) behavior. The same is
 done for the tt(LIST_ROWS_FIRST) option with the substring tt(rows).
 
@@ -325,9 +325,9 @@ value of a parameter assignment.
 )
 vindex(pattern_insert, compstate)
 item(tt(pattern_insert))(
-Normally this is set to tt(menu), which specifies that menucompletion will
+Normally this is set to tt(menu), which specifies that menu completion will
 be used whenever a set of matches was generated using pattern matching.  If
-it is set to any other non-empty string by the user and menucompletion is
+it is set to any other non-empty string by the user and menu completion is
 not selected by other option settings, the code will instead insert any
 common prefix for the generated matches as with normal completion.
 )
@@ -377,7 +377,7 @@ Specifies the occasions on which the cursor is moved to the end of a string
 when a match is inserted.  On entry to a widget function, it may be
 tt(single) if this will happen when a single unambiguous match was inserted
 or tt(match) if it will happen any time a match is inserted (for example,
-by menucompletion; this is likely to be the effect of the tt(ALWAYS_TO_END)
+by menu completion; this is likely to be the effect of the tt(ALWAYS_TO_END)
 option).
 
 On exit, it may be set to tt(single) as above.  It may also be set to
@@ -785,7 +785,7 @@ true if the test for the tt(-N) option with both patterns would succeed.
 )
 enditem()
 
-texinode(Matching Control)(Examples)(Condition Codes)(Completion Widgets)
+texinode(Matching Control)(Completion Widget Example)(Condition Codes)(Completion Widgets)
 sect(Matching Control)
 
 It is possible by use of the
@@ -942,7 +942,8 @@ complete to strings like `tt(comp.source.unix)', i.e. the word on the
 command line consists of multiple parts, separated by a dot in this
 example, where each part should be completed separately --- note,
 however, that the case where each part of the word, i.e. `tt(comp)',
-`tt(source)' and `tt(unix)' in this example, is to be completed separately
+`tt(source)' and `tt(unix)' in this example, is to be completed from
+separate sets of matches
 is a different problem to be solved by the implementation of the
 completion widget.  The example can be handled by:
 
@@ -1021,9 +1022,9 @@ ifnzman(noderef(Completion System))\
 specific contexts by using the tt(matcher) and tt(matcher-list)
 styles. The values for the latter will be used everywhere.
 
-texinode(Examples)()(Matching Control)(Completion Widgets)
-sect(Examples)
-cindex(completion widgets, examples)
+texinode(Completion Widget Example)()(Matching Control)(Completion Widgets)
+sect(Completion Widget Example)
+cindex(completion widgets, example)
 
 The first step is to define the widget:
 

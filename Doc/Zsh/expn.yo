@@ -630,7 +630,7 @@ item(tt(q))(
 Quote the resulting words with backslashes. If this flag is given
 twice, the resulting words are quoted in single quotes and if it is
 given three times, the words are quoted in double quotes. If it is
-given four times, the words are quoted in single quotes preceded a tt($).
+given four times, the words are quoted in single quotes preceded by a tt($).
 )
 item(tt(Q))(
 Remove one level of quotes from the resulting words.
@@ -884,7 +884,7 @@ item(tt(9.) em(Shell Word Splitting))(
 If no `tt((s))', `tt((f))' or `tt(=)' was given, but the word is not
 quoted and the option tt(SH_WORD_SPLIT) is set, the word is split on
 occurrences of any of the characters in tt($IFS).  Note this step, too,
-take place at all levels of a nested substitution.
+takes place at all levels of a nested substitution.
 )
 item(tt(10.) em(Re-Evaluation))(
 Any `tt((e))' flag is applied to the value, forcing it to be re-examined
@@ -1642,7 +1642,7 @@ files on the device var(dev)
 )
 item(tt(l)[tt(-)|tt(PLUS())]var(ct))(
 files having a link count less than var(ct) (tt(-)), greater than
-var(ct) (tt(PLUS())), or is equal to var(ct)
+var(ct) (tt(PLUS())), or equal to var(ct)
 )
 item(tt(U))(
 files owned by the effective user ID
@@ -1726,7 +1726,7 @@ those in the current directory at each level of the search --- this is best
 combined with other criteria, for example `tt(odon)' to sort on names for
 files within the same directory.  Note that tt(a), tt(m), and tt(c) compare
 the age against the current time, hence the first name in the list is the
-the youngest file. Also note that the modifiers tt(^) and tt(-) are used,
+youngest file. Also note that the modifiers tt(^) and tt(-) are used,
 so `tt(*(^-oL))' gives a list of all files sorted by file size in descending
 order, following any symbolic links.
 )

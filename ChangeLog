@@ -1,5 +1,9 @@
 2000-10-05  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12896: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo, Doc/Zsh/compctl.yo,
+ 	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/expn.yo,
+ 	Doc/Zsh/func.yo, Doc/Zsh/mod_complist.yo: cleanup
+	
 	* 12892: Completion/Core/_files, Completion/Core/_path_files,
  	Doc/Zsh/compsys.yo, Doc/Zsh/expn.yo: complete after autoloaded
  	directories (a rather ugly hack); remove old code in _files (comma

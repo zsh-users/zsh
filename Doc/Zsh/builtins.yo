@@ -1162,7 +1162,7 @@ special tt(PATH) parameter is not altered in any way.  It is also possible
 to create a local parameter using `tt(typeset +h )var(special)', where the
 local copy of var(special) will retain its special properties regardless of
 having the tt(-h) attribute.  Global special parameters loaded from shell
-modules (currently those in tt(mapfile) and tt(parameter)) are
+modules (currently those in tt(zsh/mapfile) and tt(zsh/parameter)) are
 automatically given the tt(-h) attribute to avoid name clashes.
 )
 item(tt(-H))(
@@ -1440,7 +1440,7 @@ files compiled into it are listed.  The first line of output shows
 the version of the shell which compiled the file and how the file
 will be used (i.e. by reading it directly or by mapping it into memory).
 With arguments, nothing is output and the return value is set to zero if
-definitions for em(all) var(name)s name files were found in the compiled
+definitions for em(all) var(name)s were found in the compiled
 file, and non-zero if the definition for at least one var(name) was not
 found.
 

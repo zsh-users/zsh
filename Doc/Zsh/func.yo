@@ -58,7 +58,7 @@ contain the definitions for all functions in the directory named
 var(element).  The file is treated in the same manner as a directory
 containing files for functions and is searched for the definition of the
 function.   If the definition is not found, the search for a definition
-proceeds with the the other two possibilities described below.
+proceeds with the other two possibilities described below.
 
 If var(element) already includes a tt(.zwc) extension (i.e. the extension
 was explicitly given by the user), var(element) is searched for the
