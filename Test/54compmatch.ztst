@@ -509,6 +509,22 @@
 >line: {tst c00.abc }{}
 >COMPADD:{}
 
+ workers_12995a_matcher='r:|/=* r:|=*'
+ workers_12995a_list=(u1 u1/q1 u1/q1/e1 u2 u2/q1 u2/q1/e2 u2/q1/e2/a1 u2/q1/e2/a2 u3 u3/q1 u4 u4/q u4/q/a1 u4/q/a2)
+ test_code $workers_12995a_matcher workers_12995a_list
+ comptest $'tst u/q/a\t'
+0:First test from workers 12995
+>line: {tst u4/q/a}{}
+>COMPADD:{}
+
+ workers_12995b_matcher='m:{a-z}={A-Z} r:|/=* r:|=*'
+ workers_12995b_list=(../Completion/Core ../Completion/Commands)
+ test_code $workers_12995b_matcher workers_12995b_list
+ comptest $'tst ../com/cor\002\002\002\002\002\002\002\t'
+0:Second test from workers 12995
+>line: {tst ../Completion/Core }{}
+>COMPADD:{}
+
 %clean
 
   zmodload -ui zsh/zpty

@@ -1,3 +1,7 @@
+2000-10-16  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* ?????: Test/54compmatch.ztst: add tests for the stuff in 12995
+	
 2000-10-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13000: Doc/Zsh/jobs.yo: Document tty restoration when a stopped
