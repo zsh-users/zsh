@@ -1935,8 +1935,10 @@ if test "x$aixdynamic" = xyes; then
   zsh_cv_shared_environ="${zsh_cv_shared_environ=yes}"
 elif test "$host_os" = cygwin; then
   DL_EXT="${DL_EXT=dll}"
-  DLLD="${DLLD=dllwrap}"
-  DLLDFLAGS="${DLLDFLAGS=--export-all-symbols}"
+##DLLD="${DLLD=dllwrap}"
+  DLLD="${DLLD=$CC}"
+##DLLDFLAGS="${DLLDFLAGS=--export-all-symbols}"
+  DLLDFLAGS=${DLLDFLAGS=-shared -Wl,--export-all-symbols}
   zsh_cv_func_dlsym_needs_underscore=no
   DLLDFLAGS=${DLLDFLAGS=}
   EXTRA_LDFLAGS=${EXTRA_LDFLAGS=}

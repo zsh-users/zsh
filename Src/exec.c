@@ -3662,6 +3662,7 @@ getfpfunc(char *s, int *ksh)
 {
     char **pp, buf[PATH_MAX];
     off_t len;
+    off_t rlen;
     char *d;
     Eprog r;
     int fd;
@@ -3681,12 +3682,12 @@ getfpfunc(char *s, int *ksh)
 	    if ((len = lseek(fd, 0, 2)) != -1) {
 		d = (char *) zalloc(len + 1);
 		lseek(fd, 0, 0);
-		if (read(fd, d, len) == len) {
+		if ((rlen = read(fd, d, len)) >= 0) {
 		    char *oldscriptname = scriptname;
 
 		    close(fd);
-		    d[len] = '\0';
-		    d = metafy(d, len, META_REALLOC);
+		    d[rlen] = '\0';
+		    d = metafy(d, rlen, META_REALLOC);
 
 		    scriptname = dupstring(s);
 		    r = parse_string(d);

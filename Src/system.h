@@ -675,6 +675,7 @@ extern short ospeed;
 #endif
 
 #ifdef __CYGWIN__
+# include <sys/cygwin.h>
 # define IS_DIRSEP(c) ((c) == '/' || (c) == '\\')
 #else
 # define IS_DIRSEP(c) ((c) == '/')

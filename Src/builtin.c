@@ -927,7 +927,9 @@ cd_do_chdir(char *cnam, char *dest, int hard)
      * DOS style names with drives in them
      */
     static char buf[PATH_MAX];
+#ifndef _SYS_CYGWIN_H
     void cygwin_conv_to_posix_path(const char *, char *);
+#endif
 
     cygwin_conv_to_posix_path(dest, buf);
     dest = buf;
@@ -1031,7 +1033,15 @@ cd_try_chdir(char *pfix, char *dest, int hard)
     /* handle directory prefix */
     if (pfix && *pfix) {
 	if (*pfix == '/')
+#ifdef __CYGWIN__
+/* NB: Don't turn "/"+"bin" into "//"+"bin" by mistake!  "//bin" may *
+ * not be what user really wants (probably wants "/bin"), but        *
+ * "//bin" could be valid too (see fixdir())!  This is primarily for *
+ * handling CDPATH correctly.                                        */
+	    buf = tricat(pfix, ( pfix[1] == '\0' ? "" : "/" ), dest);
+#else
 	    buf = tricat(pfix, "/", dest);
+#endif
 	else {
 	    int pfl = strlen(pfix);
 	    dlen = strlen(pwd);

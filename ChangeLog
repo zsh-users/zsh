@@ -1,5 +1,10 @@
 2004-04-06  Peter Stephenson  <pws@csr.com>
 
+	* Peter Castro <doctor@fruitbat.org>: 19735 (minus texinfo hunk):
+	Doc/Makefile.in, Src/builtin.c, Src/exec.c, Src/main.c,
+	Src/system.h, configure.ac: improved use of paths, text/binary
+	and dynamic library usage for Cygwin.
+
 	* 19733 (with improved documentation): Doc/Zsh/contrib.yo,
 	Doc/Zsh/zle.yo, Functions/Misc/zed, Src/Zle/zle_keymap.c,
 	Src/Zle/zle_main.c: vared -M and -m allow you to provide
