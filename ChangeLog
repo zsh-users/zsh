@@ -1,3 +1,9 @@
+2002-03-07  Adam Spiers  <adam@spiers.net>
+
+	* 16779: Completion/Unix/Command/_mysqldiff,
+	Completion/Unix/Command/.distfiles: new completion for
+	my mysqldiff utility.
+
 2002-03-07  Clint Adams  <clint@zsh.org>
 
 	* 16778: Completion/Unix/Command/.distfiles,
