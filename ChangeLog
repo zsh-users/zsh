@@ -1,3 +1,7 @@
+2000-05-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* Felix Rosencrantz: 11450: Replace `tr` with paramsubst.
+
 2000-05-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws; 11448: Doc/Zsh/compsys.yo, Doc/Zsh/metafaq.yo: more

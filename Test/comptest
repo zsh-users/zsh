@@ -107,8 +107,7 @@ comptest () {
       elif (( 0 <= $mbegin[5] )); then
 	print -lr "MESSAGE:{$match[5]}"
       elif (( 0 <= $mbegin[6] )); then
-        result=`echo $match[6] | tr -d '\012\015'`
-        print -lr "COMPADD:{$result}"
+        print -lr "COMPADD:{${${match[6]}//[$'\r\n']/}}"
       fi
     done
   done
