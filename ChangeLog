@@ -1,3 +1,8 @@
+2001-05-29  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14524: Src/jobs.c: print at least a warning when disowning a
+	stopped job
+
 2001-05-28  Clint Adams  <schizo@debian.org>
 
 	* 14517: Src/Builtins/rlimits.awk: fix glibc2.2.3

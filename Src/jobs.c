@@ -1392,6 +1392,14 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    printjob(job + jobtab, lng, 2);
 	    break;
 	case BIN_DISOWN:
+	    if (jobtab[job].stat & STAT_STOPPED)
+                zwarnnam(name,
+#ifdef USE_SUSPENDED
+                         "warning: job is suspended",
+#else
+                         "warning: job is stopped",
+#endif
+                         NULL, 0);
 	    deletejob(jobtab + job);
 	    break;
 	}
