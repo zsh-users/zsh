@@ -1,3 +1,7 @@
+2004-03-05  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: 4.2.0-pre-3
+
 2004-03-05  Geoff Wing  <gcw@zsh.org>
 
 	* 19474: Src/Zle/compresult.c: fix a calculation when displaying
