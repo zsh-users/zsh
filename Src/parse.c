@@ -1335,6 +1335,7 @@ par_funcdef(void)
     lineno += oldlineno;
     ecnpats = onp;
     ecssub = oecssub;
+    ecnfunc++;
 
     ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
 }
@@ -1504,6 +1505,7 @@ par_simple(int *complex, int nr)
 	    lineno += oldlineno;
 	    ecnpats = onp;
 	    ecssub = oecssub;
+	    ecnfunc++;
 
 	    ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
 
