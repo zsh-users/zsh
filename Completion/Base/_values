@@ -2,328 +2,71 @@
 
 setopt localoptions extendedglob
 
-local name arg def descr xor str tmp ret=1 expl nm="$compstate[nmatches]"
-local snames odescr gdescr sep esep spat tmp1 tmp2 tmp3 opts
-typeset -A names onames xors _values
+if compvalues -i "$@"; then
 
-# Probably fill our cache.
+  local noargs args opts descr action expl sep
 
-if [[ "$*" != "$_vals_cache_args" ]]; then
-  _vals_cache_args="$*"
-
-  unset _vals_cache_{sep,esep,descr,names,onames,snames,xors,odescr}
-
-  typeset -gA _vals_cache_{names,onames,xors}
-  _vals_cache_snames=()
-  _vals_cache_odescr=()
-
-  # Get the separator, if any.
-
-  if [[ "$1" = -s ]]; then
-    _vals_cache_sep="$2"
-    [[ -z "$2" ]] && _vals_cache_esep=yes
-    shift 2
-  fi
-
-  # This is the description string for the values.
-
-  _vals_cache_descr="$1"
-  shift
-
-  # Now parse the descriptions.
-
-  while (( $# )); do
-
-    # Get the `name', anything before an unquoted colon.
-
-    if [[ "$1" = *[^\\]:* ]]; then
-      name="${${${(M)1#*[^\\]:}[1,-2]}//\\\\:/:}"
-    else
-      name="$1"
-    fi
-
-    descr=''
-    xor=''
-
-    # Get a description, if any.
-
-    if [[ "$name" = *\[*\] ]]; then
-      descr="${${name#*\[}[1,-2]}"
-      name="${name%%\[*}"
-    fi
-
-    # Get the names of other values that are mutually exclusive with
-    # this one.
-
-    if [[ "$name" = \(*\)* ]]; then
-      xor="${${name[2,-1]}%%\)*}"
-      name="${name#*\)}"
-    fi
-
-    # Finally see if this value may appear more than once.
-
-    if [[ "$name" = \** ]]; then
-      name="$name[2,-1]"
-    else
-      xor="$xor $name"
-    fi
-
-    # Store the information in the cache.
-
-    _vals_cache_odescr=( "$_vals_cache_odescr[@]" "${name}:$descr" )
-    [[ -n "$xor" ]] && _vals_cache_xors[$name]="${${xor##[ 	]#}%%[ 	]#}"
-
-    # Get the description and store that.
-
-    if [[ "$1" = *[^\\]:* ]]; then
-      descr=":${1#*[^\\]:}"
-    else
-      descr=''
-    fi
-
-    if [[ "$descr" = ::* ]]; then
-
-       # Optional argument.
-
-      _vals_cache_onames[$name]="$descr[3,-1]"
-    elif [[ "$descr" = :* ]]; then
-
-      # Mandatory argument.
-
-      _vals_cache_names[$name]="$descr[2,-1]"
-    else
-
-      # No argument.
-
-      _vals_cache_snames=( "$_vals_cache_snames[@]" "$name" )
-    fi
-    shift
-  done
-fi
-
-snames=( "$_vals_cache_snames[@]" )
-names=( "${(@kv)_vals_cache_names}" )
-onames=( "${(@kv)_vals_cache_onames}" )
-xors=( "${(@kv)_vals_cache_xors}" )
-odescr=( "$_vals_cache_odescr[@]" )
-gdescr="$_vals_cache_descr"
-sep="$_vals_cache_sep"
-esep="$_vals_cache_esep"
-
-if [[ -n "$sep$esep" ]]; then
-
-  # We have a separator character. We parse the PREFIX and SUFFIX to
-  # see if any of the values that must not appear more than once are
-  # already on the line.
-
-  if [[ -n "$esep" ]]; then
-    spat='?*'
-  else
-    spat="*${sep}*"
-  fi
-
-  while [[ "$PREFIX" = $~spat ]]; do
-
-    # Get one part, remove it from PREFIX and put it into IPREFIX.
-
-    if [[ -n "$esep" ]]; then
-      tmp="$PREFIX[1]"
-      IPREFIX="${IPREFIX}${tmp}"
-      PREFIX="${PREFIX[2,-1]}"
-    else
-      tmp="${PREFIX%%${sep}*}"
-      PREFIX="${PREFIX#*${sep}}"
-      IPREFIX="${IPREFIX}${tmp}${sep}"
-    fi
-
-    # Get the value `name'.
-
-    name="${tmp%%\=*}"
-
-    if [[ "$tmp" = *\=* ]]; then
-      _values[$name]="${tmp#*\=}"
-    else
-      _values[$name]=''
-    fi
-
-    # And remove the descriptions for the values this one makes
-    # superfluous.
-
-    if [[ -n "$xors[$name]" ]]; then
-      snames=( "${(@)snames:#(${(j:|:)~${=xors[$name]}})}" )
-      odescr=( "${(@)odescr:#(${(j:|:)~${=xors[$name]}}):*}" )
-      unset {names,onames,xors}\[$name\]
-    fi
-  done
-  if [[ "$SUFFIX" = $~spat ]]; then
-
-    # The same for the suffix.
-
-    if [[ -n "$esep" ]]; then
-      str=''
-    else
-      str="${SUFFIX%%${sep}*}"
-      SUFFIX="${SUFFIX#*${sep}}"
-    fi
-
-    while [[ -n "$SUFFIX" ]]; do
-      if [[ -n "$esep" ]]; then
-        tmp="$SUFFIX[-1]"
-        ISUFFIX="${SUFFIX[-1]}$ISUFFIX"
-	SUFFIX="$SUFFIX[1,-2]"
-      else
-        tmp="${SUFFIX##*${sep}}"
-        if [[ "$SUFFIX" = *${sep}* ]]; then
-          SUFFIX="${SUFFIX%${sep}*}"
-        else
-          SUFFIX=''
-        fi
-	ISUFFIX="${sep}${tmp}${ISUFFIX}"
-      fi
-
-      name="${tmp%%\=*}"
-
-      if [[ "$tmp" = *\=* ]]; then
-        _values[$name]="${tmp#*\=}"
-      else
-        _values[$name]=''
-      fi
-
-      if [[ -n "$xors[$name]" ]]; then
-        snames=( "${(@)snames:#(${(j:|:)~${=xors[$name]}})}" )
-        odescr=( "${(@)odescr:#(${(j:|:)~${=xors[$name]}}):*}" )
-        unset {names,onames,xors}\[$name\]
-      fi
-    done
-    SUFFIX="$str"
-  fi
-fi
-
-descr=''
-str="$PREFIX$SUFFIX"
-
-if [[ "$str" = *\=* ]]; then
-
-  # The string from the line contains a `=', so we get the stuff before
-  # it and after it and see what we can do here...
-
-  name="${str%%\=*}"
-  arg="${str#*\=}"
-
-  if (( $snames[(I)${name}] )); then
-
-    # According to our information, the value doesn't get an argument,
-    # so give up.
-
-    _message "\`${name}' gets no value"
-    return 1
-  elif (( $+names[$name] )); then
-
-    # It has to get an argument, we skip over the name and complete
-    # the argument (below).
-
-    def="$names[$name]"
-    if ! compset -P '*\='; then
-      IPREFIX="${IPREFIX}${name}="
-      PREFIX="$arg"
-      SUFFIX=''
-    fi
-  elif (( $+onames[$name] )); then
-
-    # Gets an optional argument, same as previous case.
-
-    def="$onames[$name]"
-    if ! compset -P '*\='; then
-      IPREFIX="${IPREFIX}${name}="
-      PREFIX="$arg"
-      SUFFIX=''
-    fi
-  else
-    local pre="$PREFIX" suf="$SUFFIX"
-
-    # The part before the `=' isn't a known value name, so we see if
-    # it matches only one of the known names.
+  if ! compvalues -D descr action; then
+    compvalues -V noargs args opts
 
     if [[ "$PREFIX" = *\=* ]]; then
-      PREFIX="${PREFIX%%\=*}"
-      pre="${pre#*\=}"
-      SUFFIX=''
+      local name
+
+      name="${PREFIX%%\=*}"
+      if compvalues -L "$name" descr action; then
+        IPREFIX="${IPREFIX}${name}="
+        PREFIX="${PREFIX#*\=}"
+      else
+        local prefix suffix
+
+	prefix="${PREFIX#*\=}"
+	suffix="$SUFFIX"
+	PREFIX="$name"
+	SUFFIX=''
+	args=( "$args[@]" "$opts[@]" )
+	compadd -M 'r:|[_-]=* r:|=*' -D args - "${(@)args[@]%%:*}"
+
+	[[ $#args -ne 1 ]] && return 1
+
+        PREFIX="$prefix"
+	SUFFIX="$suffix"
+        IPREFIX="${IPREFIX}${args[1]%%:*}="
+	compvalues -L "${args[1]%%:*}" descr action
+      fi
     else
-      SUFFIX="${SUFFIX%%\=*}"
-      pre="${suf#*\=}"
-      suf=''
-    fi
+      compvalues -d descr
+      if [[ ${#noargs}+${#args}+${#opts} -ne 1 ]] && compvalues -s sep; then
+        sep=( "-qQS$sep" )
+      else
+        sep=()
+      fi
 
-    tmp=( "${(@k)names}" "${(@k)onames}" )
-    compadd -M 'r:|[-_]=* r:|=*' -D tmp - "$tmp[@]"
+      _describe "$descr" \
+        noargs "$sep[@]" -M 'r:|[_-]=* r:|=*' -- \
+        args -S= -M 'r:|[_-]=* r:|=*' -- \
+        opts -qS= -M 'r:|[_-]=* r:|=*'
 
-    if [[ $#tmp -eq 1 ]]; then
-
-      # It does, so we use that name and immediatly start completing
-      # the argument for it.
-
-      IPREFIX="${IPREFIX}${tmp[1]}="
-      PREFIX="$pre"
-      SUFFIX="$suf"
-
-      def="$names[$tmp[1]]"
-      [[ -z "$def" ]] && def="$onames[$tmp[1]]"
-    elif (( $#tmp )); then
-      _message "ambiguous option \`${PREFIX}${SUFFIX}'"
-      return 1
-    else
-      _message "unknown option \`${PREFIX}${SUFFIX}'"
-      return 1
+      return
     fi
   fi
-else
-
-  # No `=', just complete value names.
-
-  if [[ -n "$sep" && ${#snames}+${#names}+${#onames} -ne 1 ]]; then
-    opts=( "-qS$sep" )
-  else
-    opts=()
-  fi
-
-  tmp1=( "${(@M)odescr:#(${(j:|:)~snames}):*}" )
-  tmp2=( "${(@M)odescr:#(${(kj:|:)~names}):*}" )
-  tmp3=( "${(@M)odescr:#(${(kj:|:)~onames}):*}" )
-
-  _describe "$gdescr" \
-  tmp1 "$opts[@]" -M 'r:|[_-]=* r:|=*' -- \
-  tmp2 -S= "$opts[@]" -M 'r:|[_-]=* r:|=*' -- \
-  tmp3 -qS= "$opts[@]" -M 'r:|[_-]=* r:|=*'
-
-  return ret
-fi
-
-if [[ -z "$def" ]]; then
-  _message 'no value'
-  return 1
-else
-  local action
-
-  descr="${${${(M)def#*[^\\]:}[1,-2]}//\\\\:/:}"
-  action="${${def#*[^\\]:}//\\\\:/:}"
 
   _description expl "$descr"
 
   # We add the separator character as a autoremovable suffix unless
   # we have only one possible value left.
 
-  [[ -n "$sep" && ${#snames}+${#names}+${#onames} -ne 1 ]] &&
+  [[ ${#snames}+${#names}+${#onames} -ne 1 ]] && compvalues -s sep &&
       expl=( "-qS$sep" "$expl[@]" )
 
   if [[ "$action" = -\>* ]]; then
-    values=( "${(@kv)_values}" )
+    compvalues -v values
     state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
     compstate[restore]=''
     return 1
   else
     typeset -A values
 
-    values=( "${(@kv)_values}" )
+    compvalues -v values
 
     if [[ "$action" = \ # ]]; then
 
@@ -341,7 +84,7 @@ else
 
       if [[ -n "$compconfig[describe_values]" &&
             "$compconfig[describe_values]" != *\!${cmd}* ]] &&
-         _display tmp "$ws[@]"; then
+         compdisplay tmp ' -- ' "$ws[@]"; then
 	compadd "$expl[@]" -M 'r:|[_-]=* r:|=*' -ld tmp - "${(@)ws%%:*}"
       else
 	compadd "$expl[@]" - "${(@)ws%%:*}"
@@ -370,6 +113,10 @@ else
       ${(e)action[1]} "$expl[@]" ${(e)~action[2,-1]}
     fi
   fi
-fi
 
-[[ nm -ne "$compstate[nmatches]" ]]
+  [[ nm -ne "$compstate[nmatches]" ]]
+  return
+
+else
+  return 1;
+fi

@@ -4,8 +4,7 @@
 
 setopt localoptions extendedglob
 
-local gdescr isopt cmd opt nsets tmp descr match descrs matches adescr i
-local disps disp expl tmps tmpd tmpmd tmpms name ret=1 showd _nm
+local isopt cmd opt expl tmps tmpd tmpmd tmpms ret=1 showd _nm hide
 
 cmd="$words[1]"
 
@@ -45,101 +44,22 @@ else
      "$compconfig[describe_values]" != *\!${cmd}* ]] && showd=yes
 fi
 
-gdescr="$1"
+_description expl "$1"
 shift
 
-# Now interpret the arguments.
+if [[ -n "$showd" ]]; then
+  compdescribe -I ' -- ' "$@"
+else
+  compdescribe -i ' -- ' "$@"
+fi
 
-nsets=0
-adescr=()
-descrs=()
-matches=()
-while (( $# )); do
-  (( nsets++ ))
-  descr="$1"
-  [[ -n "$showd" ]] && adescr=( "$adescr[@]" "${(@PM)^descr:#*:?*},$nsets" )
-  if [[ $# = 1 || "$2" = -* ]]; then
-    match=''
-    shift
-  else
-    match="$2"
-    shift 2
-  fi
-  tmp=$argv[(i)--]
-  if [[ tmp -eq 1 ]]; then
-    opt=()
-  else
-    opt=( "${(@)argv[1,tmp-1]}" )
-  fi
-  if [[ tmp -gt $# ]]; then
-    argv=()
-  else
-    shift tmp
-  fi
+[[ -n "$isopt" && "$compconfig[option_prefix]" = hide* ]] && hide=yes
 
-  # `descr' and `matches' collect the names of the arrays containing the
-  # possible matches with descriptions and the matches to add.
-  # The options to give to `compadd' are stored in local arrays.
-
-  descrs[nsets]="$descr"
-  matches[nsets]="$match"
-  typeset -a _descr_opts_$nsets
-  eval "_descr_opts_${nsets}=( \"\$opt[@]\" )"
-done
-
-(( nsets )) || return 1
-
-# Build the display strings if needed.
-
-[[ -n "$showd" ]] && _display disps "$adescr[@]"
-_description expl "$gdescr"
-
-# Loop through the array/option sets we have.
-
-i=0
-while [[ ++i -le nsets ]]; do
-  name=_descr_opts_$i
-  [[ -n "$showd" ]] && disp=( "${(@)${(@M)disps:#*,${i}}%,*}" )
-  descr=( "${(@P)descrs[i]}" )
-
-  # We collect the strings to display in `tmpd' (one string per line)
-  # and `tmps' (in columns) and the matches to add in `tmpmd' and `tmpms'.
-
-  tmpd=()
-  tmps=()
-  tmpmd=()
-  tmpms=()
-  if [[ -n "$matches[i]" ]]; then
-    match=( "${(@P)matches[i]}" )
-    while (( $#match )); do
-      if [[ -n "$showd" && "$descr[1]" = *:?* ]]; then
-	tmpd=( "$tmpd[@]" "$disp[1]" )
-        tmpmd=( "$tmpmd[@]" "$match[1]" )
-        shift 1 disp
-      else
-        tmps=( "$tmps[@]" "${descr[1]%%:*}" )
-        tmpms=( "$tmpms[@]" "$match[1]" )
-      fi
-      shift 1 match
-      shift 1 descr
-    done
-  else
-    while (( $#descr )); do
-      if [[ -n "$showd" && "$descr[1]" = *:?* ]]; then
-	tmpd=( "$tmpd[@]" "$disp[1]" )
-        tmpmd=( "$tmpmd[@]" "${descr[1]%%:*}" )
-        shift 1 disp
-      else
-        tmps=( "$tmps[@]" "${descr[1]%%:*}" )
-        tmpms=( "$tmpms[@]" "${descr[1]%%:*}" )
-      fi
-      shift 1 descr
-    done
-  fi
+while compdescribe -g args tmpd tmpmd tmps tmpms; do
 
   # See if we should remove the option prefix characters.
 
-  if [[ -n "$isopt" && "$compconfig[option_prefix]" = hide* ]]; then
+  if [[ -n "$hide" ]]; then
     if [[ "$PREFIX" = --* ]]; then
       tmpd=( "${(@)tmpd#--}" )
       tmps=( "${(@)tmps#--}" )
@@ -148,8 +68,8 @@ while [[ ++i -le nsets ]]; do
       tmps=( "${(@)tmps#[-+]}" )
     fi
   fi
-  compadd "${(@P)name}" "$expl[@]" -ld tmpd - "$tmpmd[@]" && ret=0
-  compadd "${(@P)name}" "$expl[@]" -d tmps - "$tmpms[@]" && ret=0
+  compadd "$args[@]" "$expl[@]" -ld tmpd - "$tmpmd[@]" && ret=0
+  compadd "$args[@]" "$expl[@]" -d tmps - "$tmpms[@]" && ret=0
 done
 
 return ret

@@ -1919,50 +1919,75 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 #define CVT_SUFNUM   4
 #define CVT_SUFPAT   5
 
-static void
+/**/
+void
 ignore_prefix(int l)
 {
-    char *tmp, sav = compprefix[l];
+    if (l) {
+	char *tmp, sav;
+	int pl = strlen(compprefix);
 
-    compprefix[l] = '\0';
-    tmp = tricat(compiprefix, compprefix, "");
-    zsfree(compiprefix);
-    compiprefix = tmp;
-    compprefix[l] = sav;
-    tmp = ztrdup(compprefix + l);
-    zsfree(compprefix);
-    compprefix = tmp;
-}
+	if (l > pl)
+	    l = pl;
 
-static void
-ignore_suffix(int l)
-{
-    char *tmp, sav;
+	sav = compprefix[l];
 
-    l = strlen(compsuffix) - l;
-    tmp = tricat(compsuffix + l, compisuffix, "");
-    zsfree(compisuffix);
-    compisuffix = tmp;
-    sav = compsuffix[l];
-    compsuffix[l] = '\0';
-    tmp = ztrdup(compsuffix);
-    compsuffix[l] = sav;
-    zsfree(compsuffix);
-    compsuffix = tmp;
+	compprefix[l] = '\0';
+	tmp = tricat(compiprefix, compprefix, "");
+	zsfree(compiprefix);
+	compiprefix = tmp;
+	compprefix[l] = sav;
+	tmp = ztrdup(compprefix + l);
+	zsfree(compprefix);
+	compprefix = tmp;
+    }
 }
 
 /**/
-static void
+void
+ignore_suffix(int l)
+{
+    if (l) {
+	char *tmp, sav;
+	int sl = strlen(compsuffix);
+
+	if ((l = sl - l) < 0)
+	    l = 0;
+
+	tmp = tricat(compsuffix + l, compisuffix, "");
+	zsfree(compisuffix);
+	compisuffix = tmp;
+	sav = compsuffix[l];
+	compsuffix[l] = '\0';
+	tmp = ztrdup(compsuffix);
+	compsuffix[l] = sav;
+	zsfree(compsuffix);
+	compsuffix = tmp;
+    }
+}
+
+/**/
+void
 restrict_range(int b, int e)
 {
-    int i = e - b + 1;
-    char **p = (char **) zcalloc((i + 1) * sizeof(char *)), **q, **pp;
+    int wl = arrlen(compwords) - 1;
 
-    for (q = p, pp = compwords + b; i; i--, q++, pp++)
-	*q = ztrdup(*pp);
-    freearray(compwords);
-    compwords = p;
-    compcurrent -= b;
+    if (wl && b >= 0 && e >= 0 && (b > 0 || e < wl)) {
+	int i;
+	char **p, **q, **pp;
+
+	if (e > wl)
+	    e = wl;
+
+	i = e - b + 1;
+	p = (char **) zcalloc((i + 1) * sizeof(char *));
+
+	for (q = p, pp = compwords + b; i; i--, q++, pp++)
+	    *q = ztrdup(*pp);
+	freearray(compwords);
+	compwords = p;
+	compcurrent -= b;
+    }
 }
 
 static int

@@ -3966,8 +3966,9 @@ add_match_data(int alt, char *str, Cline line,
 
 /* This stores the strings from the list in an array. */
 
-static void
-set_param(char *name, LinkList l)
+/**/
+void
+set_list_array(char *name, LinkList l)
 {
     char **a, **p;
     LinkNode n;
@@ -4267,11 +4268,11 @@ addmatches(Cadata dat, char **argv)
 	    compnmatches = mnum;
 	    compnnmatches = nmnum;
 	    if (dat->apar)
-		set_param(dat->apar, aparl);
+		set_list_array(dat->apar, aparl);
 	    if (dat->opar)
-		set_param(dat->opar, oparl);
+		set_list_array(dat->opar, oparl);
 	    if (dat->dpar)
-		set_param(dat->dpar, dparl);
+		set_list_array(dat->dpar, dparl);
 	    if (dat->ylist) {
 		if (dat->group) {
 		    endcmgroup(get_user_var(dat->ylist));
@@ -7143,7 +7144,7 @@ invalidatelist(void)
 /* Get the words from a variable or a compctl -k list. */
 
 /**/
-static char **
+char **
 get_user_var(char *nam)
 {
     if (!nam)
@@ -8804,12 +8805,13 @@ calclist(void)
 		g->width = 0;
 
 		for (p = g->matches; (m = *p); p++)
-		    if (!(m->flags & CMF_HIDE))
+		    if (!(m->flags & CMF_HIDE)) {
 			if (m->disp) {
 			    if (!(m->flags & CMF_DISPLINE))
 				glines += 1 + (mlens[m->gnum] / columns);
 			} else if (!(m->flags & CMF_NOLIST))
 			    glines += 1 + ((1 + mlens[m->gnum]) / columns);
+		    }
 	    }
 	}
 	g->lins = glines;

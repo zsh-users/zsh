@@ -753,7 +753,8 @@ startitem()
 item(var(n)tt(:)var(message)tt(:)var(action))(
 This describes the var(n)'th normal argument. The var(message) will be 
 printed above the matches generated and the var(action) says what can
-be completed in this position (see below).
+be completed in this position (see below). If there are two colons
+before the var(message), this describes an optional argument.
 )
 item(tt(:)var(message)tt(:)var(action))(
 Like the previous one, but describing the em(next) argument. I.e. if
@@ -766,10 +767,12 @@ This describes how arguments are to be completed for which no
 description with one of the first two forms was given. This also means 
 that any number of arguments can be completed.
 
-If there are two colons before the message (as in
+If there are two colons before the var(message) (as in
 `tt(*::)var(message)tt(:)var(action)') the tt(words) special array and 
 the tt(CURRENT) special parameter will be restricted to only the
-normal arguments when the var(action) is executed or evaluated.
+normal arguments when the var(action) is executed or evaluated. With
+three colons before the var(message) they will be restructed to only
+the normal arguments covered by this description.
 )
 item(var(opt-spec)[var(description) ...])(
 This describes an option and (if at least one var(description) is
