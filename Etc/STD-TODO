@@ -1,7 +1,7 @@
 Last updated: Tue Aug  7 08:44:03 PDT 2001			-*- text -*-
 
 In this file we maintain a list of "standard shell features" (many of them
-proposed as POSIX extensions by David Korn and the shell@research.acc.com
+proposed as POSIX extensions by David Korn and the shell@research.att.com
 mailing list) that will require changes to zsh behavior for compatibility.
 
 This file is not part of the packaged zsh distribution.
@@ -10,7 +10,7 @@ Syntax and Parsing
 ------------------
 
 Redirections following a function body definition should be considered
-part of the function defininition, and positional parameter references in
+part of the function definition, and positional parameter references in
 those redirections refer to the function's positionals.
 
 Subscript brackets do not imply double-quoting and in fact other quotings
@@ -38,7 +38,7 @@ done by any other shell.
   special rules zsh uses for these commands.
 
 POSIX requires that shell functions behave like macros, but does not have
-the "function name() ..." syntax.  Ksh uses the latter as an indicator
+the "function name { ..." syntax.  Ksh uses the latter as an indicator
 that extended function semantics are allowed.
 - The value of $0 behaves as if FUNCTION_ARGZERO in "function name()", but
   never does so in bare "name()" syntax functions.
