@@ -1,5 +1,10 @@
 .nr PI 0
 .nr LL 6.5i
+.if \n(.g \{\
+.if "\*(.T"ascii" .ftr C R
+.if "\*(.T"latin1" .ftr C R
+.nr De \n[.ss]
+.\}
 .de Ds
 .DS I .5i
 .ft C
@@ -12,7 +17,8 @@
 .ft R
 .ps
 .vs
-.ss
+.ie \n(.g .ss \n(De
+.el .ss
 ..
 .de Sh
 .SH
