@@ -1,3 +1,8 @@
+2001-09-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15837: Src/Zle/zle_hist.c: Fixed incremental search in vared
+	(without -h) so that it doesn't access the history.
+
 2001-09-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* Akinori MUSHA: 15815: Completion/BSD/Command/_bsd_pkg: More
