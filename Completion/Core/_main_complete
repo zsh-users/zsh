@@ -22,7 +22,7 @@
 # state than the global one for which you are completing.
 
 
-local comp ret=1 _compskip
+local comp post ret=1 _compskip
 
 typeset -U _lastdescr
 
