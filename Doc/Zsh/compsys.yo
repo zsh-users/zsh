@@ -2457,7 +2457,7 @@ giving the option `tt(-V)', `tt(-1V)', or `tt(-2V)'.
 In most cases, this function will be used like this:
 
 example(local expl
-_description expl files file
+_description files expl file
 compadd "$expl[@]" - "$files[@]")
 )
 findex(_message)
