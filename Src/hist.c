@@ -845,7 +845,7 @@ addhistnum(int hl, int n, int xflags)
     if (n)
 	he = movehistent(he, n, xflags);
     if (!he)
-	return dir < 0? firsthist() : curhist;
+	return dir < 0? firsthist() - 1 : curhist + 1;
     return he->histnum;
 }
 
@@ -993,6 +993,8 @@ should_ignore_line(Eprog prog)
 	    b += 8;
 	if (*b == 'h' && strncmp(b, "history", 7) == 0
 	 && (!b[7] || b[7] == ' '))
+	    return 1;
+	if (*b == 'r' && (!b[1] || b[1] == ' '))
 	    return 1;
 	if (*b == 'f' && b[1] == 'c' && b[2] == ' ' && b[3] == '-') {
 	    b += 3;
