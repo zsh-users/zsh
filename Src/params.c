@@ -2882,7 +2882,6 @@ pipestatsetfn(Param pm, char **x)
 void
 arrfixenv(char *s, char **t)
 {
-    char *u;
     Param pm;
 
     if (t == path)

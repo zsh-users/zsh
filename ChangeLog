@@ -1,5 +1,7 @@
 2001-02-14  Clint Adams  <schizo@debian.org>
 
+	* unposted: Src/params.c: remove unused variable declaration.
+
 	* 13478: Src/builtins.c: don't call dyncat with a NULL argument.
 
 2001-02-14  Peter Stephenson  <pws@csr.com>
