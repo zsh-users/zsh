@@ -721,7 +721,7 @@ bin_zformat(char *nam, char **args, char *ops, int func)
     return 1;
 }
 
-/* Regexparse stuff. */
+/* Zregexparse stuff. */
 
 typedef struct {
     int cutoff;
@@ -1105,7 +1105,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 }
 
 /*
-  usage: regexparse string regex...
+  usage: zregexparse string regex...
   status:
     0: matched
     1: unmatched (all next state candidates are failed)
@@ -1114,7 +1114,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 */
 
 static int
-bin_regexparse(char *nam, char **args, char *ops, int func)
+bin_zregexparse(char *nam, char **args, char *ops, int func)
 {
     int oldextendedglob = opts[EXTENDEDGLOB];
     char *var1 = args[0];
@@ -1152,7 +1152,7 @@ bin_regexparse(char *nam, char **args, char *ops, int func)
 static struct builtin bintab[] = {
     BUILTIN("zstyle", 0, bin_zstyle, 0, -1, 0, NULL, NULL),
     BUILTIN("zformat", 0, bin_zformat, 3, -1, 0, NULL, NULL),
-    BUILTIN("regexparse", 0, bin_regexparse, 3, -1, 0, "c", NULL),
+    BUILTIN("zregexparse", 0, bin_zregexparse, 3, -1, 0, "c", NULL),
 };
 
 
