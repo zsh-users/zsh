@@ -333,7 +333,7 @@ zrefresh(void)
 	tsetcap(TCUNDERLINEEND, 0);
 
         if (!clearflag) {
-            if (tccan(TCCLEAREOD))
+            if (tccan(TCCLEAREOD) && isset(ALWAYSLASTPROMPT))
                 tcout(TCCLEAREOD);
             else
                 cleareol = 1;   /* request: clear to end of line */
