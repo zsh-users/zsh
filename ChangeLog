@@ -1,3 +1,9 @@
+2002-04-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/4851: Functions/Misc/relative: new function inspired by
+	discussion with Vin Shelton which converts a full file path into
+	its location relative to another path (default $PWD).
+
 2002-04-18  Peter Stephenson  <pws@csr.com>
 
 	* 17011: Src/Modules/tcp.c, Src/Modules/zftp.c: restore
