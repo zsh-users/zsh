@@ -1,3 +1,8 @@
+2004-03-16  Clint Adams  <clint@zsh.org>
+
+	* 19641: Src/Modules/pcre.c: implement -pcre-match conditional
+        suggested by Oliver.
+
 2004-03-16  Peter Stephenson  <pws@csr.com>
 
 	* 19629: Src/Modules/zpty.c: implement Oliver's research into

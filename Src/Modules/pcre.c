@@ -31,6 +31,8 @@
 #include "pcre.mdh"
 #include "pcre.pro"
 
+#define CPCRE_PLAIN 0
+
 /**/
 #if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
 #include <pcre.h>
@@ -99,10 +101,30 @@ bin_pcre_study(char *nam, char **args, Options ops, int func)
 
 /**/
 static int
+zpcre_get_substrings(char *arg, int *ovec, int ret, char *receptacle)
+{
+    char **captures, **matches;
+
+	if(!pcre_get_substring_list(arg, ovec, ret, (const char ***)&captures)) {
+	    
+	    matches = zarrdup(&captures[1]); /* first one would be entire string */
+	    if (receptacle == NULL)
+		setaparam("match", matches);
+	    else
+		setaparam(receptacle, matches);
+	    
+	    pcre_free_substring_list((const char **)captures);
+	}
+
+	return 0;
+}
+
+/**/
+static int
 bin_pcre_match(char *nam, char **args, Options ops, int func)
 {
     int ret, capcount, *ovec, ovecsize;
-    char **captures, **matches, *receptacle = NULL;
+    char *receptacle = NULL;
     
     if(OPT_ISSET(ops,'a')) {
 	receptacle = *args++;
@@ -112,7 +134,7 @@ bin_pcre_match(char *nam, char **args, Options ops, int func)
 	}
     }
     
-    if (ret = pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount))
+    if ((ret = pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount)))
     {
 	zwarnnam(nam, "error %d in fullinfo", NULL, ret);
 	return 1;
@@ -126,17 +148,8 @@ bin_pcre_match(char *nam, char **args, Options ops, int func)
     if (ret==0) return 0;
     else if (ret==PCRE_ERROR_NOMATCH) return 1; /* no match */
     else if (ret>0) {
-	if(!pcre_get_substring_list(*args, ovec, ret, (const char ***)&captures)) {
-	    
-	    matches = zarrdup(&captures[1]); /* first one would be entire string */
-	    if (receptacle == NULL)
-		setaparam("match", matches);
-	    else
-		setaparam(receptacle, matches);
-	    
-	    pcre_free_substring_list((const char **)captures);
-	    return 0;
-      	}
+	zpcre_get_substrings(*args, ovec, ret, receptacle);
+	return 0;
     }
     else {
 	zwarnnam(nam, "error in pcre_exec", NULL, 0);
@@ -147,11 +160,43 @@ bin_pcre_match(char *nam, char **args, Options ops, int func)
 }
 
 /**/
+static int
+cond_pcre_match(char **a, int id)
+{
+    pcre *pcre_pat;
+    const char *pcre_err;
+    char *lhstr, *rhre;
+    int r = 0, pcre_opts = 0, pcre_errptr, capcnt, *ov, ovsize;
+
+    lhstr = cond_str(a,0,0);
+    rhre = cond_str(a,1,0);
+
+    switch(id) {
+	 case CPCRE_PLAIN:
+		 pcre_pat = pcre_compile(rhre, pcre_opts, &pcre_err, &pcre_errptr, NULL);
+                 pcre_fullinfo(pcre_pat, NULL, PCRE_INFO_CAPTURECOUNT, &capcnt);
+    		 ovsize = (capcnt+1)*3;
+		 ov = zalloc(ovsize*sizeof(int));
+    		 r = pcre_exec(pcre_pat, NULL, lhstr, strlen(lhstr), 0, 0, ov, ovsize);
+    		if (r==0) return 1;
+	        else if (r==PCRE_ERROR_NOMATCH) return 0; /* no match */
+                else if (r>0) {
+		    zpcre_get_substrings(lhstr, ov, r, NULL);
+		    return 1;
+		}
+		break;
+    }
+
+    return 0;
+}
+
+/**/
 #else /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
 
 # define bin_pcre_compile bin_notavail
 # define bin_pcre_study bin_notavail
 # define bin_pcre_match bin_notavail
+# define cond_pcre_match cond_match
 
 /**/
 #endif /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
@@ -161,6 +206,11 @@ static struct builtin bintab[] = {
     BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL),
     BUILTIN("pcre_match",   0, bin_pcre_match,   1, 2, 0, "a",    NULL)
 };
+
+static struct conddef cotab[] = {
+    CONDDEF("pcre-match", CONDF_INFIX, cond_pcre_match, 0, 0, CPCRE_PLAIN)
+};
+
 
 /**/
 int
@@ -173,7 +223,8 @@ setup_(Module m)
 int
 boot_(Module m)
 {
-    return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) ||
+	   !addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
 }
 
 /**/
@@ -181,6 +232,7 @@ int
 cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
     return 0;
 }
 
