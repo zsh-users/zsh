@@ -129,7 +129,7 @@ struct execstack *exstack;
 /**/
 mod_export Funcstack funcstack;
 
-#define execerr() if (!forked) { lastval = 1; return; } else _exit(1)
+#define execerr() if (!forked) { lastval = 1; goto done; } else _exit(1)
 
 static LinkList args;
 static int doneps4;
@@ -473,6 +473,7 @@ execute(Cmdnam not_used_yet, int dash)
     }
 
     argv = makecline(args);
+    closem(3);
     child_unblock();
     if ((int) strlen(arg0) >= PATH_MAX) {
 	zerr("command too long: %s", arg0, 0);
@@ -1937,9 +1938,12 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     /* Make a copy of stderr for xtrace output before redirecting */
     fflush(xtrerr);
-    if (xtrerr == stderr &&
-	!(xtrerr = fdopen(movefd(dup(fileno(stderr))), "w")))
-	xtrerr = stderr;
+    if (xtrerr == stderr && (type < WC_SUBSH || type == WC_TIMED)) {
+	if (!(xtrerr = fdopen(movefd(dup(fileno(stderr))), "w")))
+	    xtrerr = stderr;
+	else
+	    fdtable[fileno(xtrerr)] = 3;
+    }
 
     /* Add pipeline input/output to mnodes */
     if (input)

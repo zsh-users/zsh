@@ -1,0 +1,60 @@
+# Test that xtrace output is correctly generated
+
+%prep
+  mkdir xtrace.tmp && cd xtrace.tmp
+
+%test
+
+  set -x
+  print 'Tracing: builtin'
+  print 'Tracing: builtin 2>file' 2>xtrace.err
+  cat <<<'Tracing: external'
+  cat <<<'Tracing: external 2>file' 2>>xtrace.err
+  ( print 'Tracing: ( builtin )' )
+  ( print 'Tracing: ( builtin ) 2>file' ) 2>>xtrace.err
+  ( cat <<<'Tracing: ( external )' )
+  ( cat <<<'Tracing: ( external ) 2>file' ) 2>>xtrace.err
+  { print 'Tracing: { builtin }' }
+  { print 'Tracing: { builtin } 2>file' } 2>>xtrace.err
+  { cat <<<'Tracing: { external }' }
+  { cat <<<'Tracing: { external } 2>file' } 2>>xtrace.err
+  repeat 1 do print 'Tracing: do builtin done'; done
+  repeat 1 do print 'Tracing: do builtin done 2>file'; done 2>>xtrace.err
+  repeat 1 do cat <<<'Tracing: do external done'; done
+  repeat 1 do cat <<<'Tracing: do external done'; done 2>>xtrace.err
+  set +x
+  cat xtrace.err
+0:xtrace with and without redirection
+>Tracing: builtin
+>Tracing: builtin 2>file
+>Tracing: external
+>Tracing: external 2>file
+>Tracing: ( builtin )
+>Tracing: ( builtin ) 2>file
+>Tracing: ( external )
+>Tracing: ( external ) 2>file
+>Tracing: { builtin }
+>Tracing: { builtin } 2>file
+>Tracing: { external }
+>Tracing: { external } 2>file
+>Tracing: do builtin done
+>Tracing: do builtin done 2>file
+>Tracing: do external done
+>Tracing: do external done
+>+ZTST_execchunk:2> print Tracing: ( builtin ) 2>file
+>+ZTST_execchunk:2> cat
+>+ZTST_execchunk:2> print Tracing: { builtin } 2>file
+>+ZTST_execchunk:2> cat
+>+ZTST_execchunk:2> print Tracing: do builtin done 2>file
+>+ZTST_execchunk:2> cat
+?+ZTST_execchunk:2> print Tracing: builtin
+?+ZTST_execchunk:2> print Tracing: builtin 2>file
+?+ZTST_execchunk:2> cat
+?+ZTST_execchunk:2> cat
+?+ZTST_execchunk:2> print Tracing: ( builtin )
+?+ZTST_execchunk:2> cat
+?+ZTST_execchunk:2> print Tracing: { builtin }
+?+ZTST_execchunk:2> cat
+?+ZTST_execchunk:2> print Tracing: do builtin done
+?+ZTST_execchunk:2> cat
+?+ZTST_execchunk:2> set +x
