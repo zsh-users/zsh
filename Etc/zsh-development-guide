@@ -7,10 +7,31 @@ This development takes place by mailing list.  Check the META-FAQ for the
 various zsh mailing lists and how to subscribe to them.  The development
 is very open and anyone is welcomed and encouraged to join and contribute.
 Because zsh is a very large package whose development can sometimes
-be very rapid, I kindly ask that people observe a few guidelines when
+be very rapid, we kindly ask that people observe a few guidelines when
 contributing patches and feedback to the mailing list.  These guidelines
 are very simple and hopefully should make for a more orderly development
 of zsh.
+
+Tools
+-----
+
+To develop (as opposed to just build) zsh, you'll need a few specialised
+tools:
+
+* GNU autoconf, version 2.12 or later.  (Earlier versions mostly work,
+  but part of the configuration system now relies on part of the format
+  of the config.status files that get generated.  See the comments in
+  configure.in and at the end of Src/mkmakemod.sh for an explanation.)
+
+  Note that configure.in has not yet been modified to work with autoconf
+  2.50.  Use version 2.13 until configure.in and associated files have
+  been updated.
+
+* GNU m4.  (Required by autoconf.)
+
+* yodl.
+
+* texi2html.
 
 Patches
 -------
@@ -47,7 +68,7 @@ Testing
   a wide range of human and artificial life, it is very difficult to
   test the shell thoroughly.  For this purpose, the Test subdirectory
   exists.  It consists of a driver script (ztst.zsh) and various test
-  files (*.ztst) in a format which is described in 50cd.ztst, which acts
+  files (*.ztst) in a format which is described in B01cd.ztst, which acts
   as a template.  It is designed to make it easy to provide input to
   chunks of shell code and to test the corresponding standard output,
   error output and exit status.
@@ -56,8 +77,7 @@ Testing
   tests for basic syntactic features, builtins, options etc. which you
   know to be flakey or to have had difficulties in the past.  Better
   support for testing job control and interactive features is expected
-  to follow eventually (this may require additional external software
-  e.g. `expect').
+  to follow eventually.
 
 * The directory is not part of the usual process of building and
   installation.  To run the tests, go to Test and `make check'.  Please
@@ -129,7 +149,7 @@ C coding style
   The declaration itself should be all on one line (except for multi-line
   initialisers).
 
-* Preprocessor directives thst affect the function/variable declarations must
+* Preprocessor directives that affect the function/variable declarations must
   also be preceded by a "/**/" line, so that they get copied into the
   prototype lists.
 
@@ -161,12 +181,27 @@ used; the naming hierarchy is strictly for organisational convenience.
 
 Each module is described by a file with a name ending in `.mdd' somewhere
 under the Src directory.  This file is actually a shell script that will
-sourced when zsh is build. To describe the module it can/should set the
+sourced when zsh is built. To describe the module it can/should set the
 following shell variables:
 
   - name            name of the module
+  - link            `static', `dynamic' or `no', as described in INSTALL.
+		    In addition, the value `either' is allowed in the .mdd
+		    file, which will be converted by configure to `dynamic'
+		    if that is available, else `static'.
+		    May also be a command string, which will be run within
+		    configure and whose output is used to set the value
+		    of `link' in config.modules.  This allows a
+		    system-specific choice of modules.  For example,
+		    link='case $host in *-hpux*) echo dynamic; ;;
+		                        *) echo no; ;; esac'
+  - load            `yes' or `no': whether the shell should include hooks
+		    for loading the module automatically as necessary.
+		    (This corresponds to an `L' in xmods.conf in the
+		    old mechanism.)
   - moddeps         modules on which this module depends (default none)
-  - nozshdep        non-empty indicates no dependence on the `zsh/main' pseudo-module
+  - nozshdep        non-empty indicates no dependence on the `zsh/main'
+                    pseudo-module
   - alwayslink      if non-empty, always link the module into the executable
   - autobins        builtins defined by the module, for autoloading
   - autoinfixconds  infix condition codes defined by the module, for
@@ -344,7 +379,7 @@ tokenized. There are three helper functions available:
     function is non-zero if the the num'th string from the array taken 
     as a glob pattern matches the given string.
 
-Registering and de-resgitering condition codes with the shell is
+Registering and de-registering condition codes with the shell is
 almost exactly the same as for builtins, using the functions
 `addconddefs()' and `deleteconddefs()' instead:
 
@@ -487,7 +522,7 @@ last argument from the macro-call. Functions defined with
 `STRMATHFUNC' get the name of the function, the string between the
 parentheses at the call, and the last argument from the macro-call.
 
-Both types of functions return an mnumber which is a descriminated
+Both types of functions return an mnumber which is a discriminated
 union looking like:
 
   typedef struct {
@@ -599,80 +634,6 @@ that are changed or called very often. These functions,
 structure defining the hook instead of the name and otherwise behave
 like their counterparts.
 
-Modules can also define function hooks. Other modules can then add
-functions to these hooks to make the first module call these functions
-instead of the default.
-
-Again, an array is used to define hooks:
-
-  static struct hookdef foohooks[] = {
-    HOOKDEF("foo", foofunc, 0),
-  };
-
-The first argument of the macro is the name of the hook. This name
-is used whenever the hook is used. The second argument is the default
-function for the hook or NULL if no default function exists. The
-last argument is used to define flags for the hook. Currently only one
-such flag is defined: `HOOKF_ALL'. If this flag is given and more than
-one function was added to the hook, all functions will be called
-(including the default function). Otherwise only the last function
-added will be called.
-
-The functions that can be used as default functions or that can be
-added to a hook have to be defined like:
-
-  /**/
-  static int
-  foofunc(Hookdef h, void *data)
-  {
-    ...
-  }
-
-The first argument is a pointer to the struct defining the hook. The
-second argument is an arbitrary pointer that is given to the function
-used to invoke hooks (see below).
-
-The functions to register and de-register hooks look like those for
-the other things that can be defined by modules:
-
-  /**/
-  int
-  boot_foo(Module m)
-  {
-    int ret;
-
-    ret = addhookdefs(m->nam, foohooks, sizeof(foohooks)/sizeof(*foohooks))
-    ...
-  }
-  ...
-  /**/
-  int
-  cleanup_foo(Module m)
-  {
-    deletehookdefs(m->nam, foohooks, sizeof(foohooks)/sizeof(*foohooks));
-    ...
-  }
-
-Modules that define hooks can invoke the function(s) registered for
-them by calling the function `runhook(name, data)'. The first argument 
-is the name of the hook and the second one is the pointer given to the 
-hook functions as their second argument. Hooks that have the `HOOKF_ALL' 
-flag call all function defined for them until one returns non-zero.
-The return value of `runhook()' is the return value of the last hook
-function called or zero if none was called.
-
-To add a function to a hook, the function `addhookfunc(name, func)' is 
-called with the name of the hook and a hook function as arguments.
-Deleting them is done by calling `deletehookfunc(name, func)' with the 
-same arguments as for the corresponding call to `addhookfunc()'.
-
-Alternative forms of the last three function are provided for hooks
-that are changed or called very often. These functions,
-`runhookdef(def, data)', `addhookdeffunc(def, func)', and
-`deletehookdeffunc(def, func)' get a pointer to the `hookdef'
-structure defining the hook instead of the name and otherwise behave
-like their counterparts.
-
 Finally, modules can define wrapper functions. These functions are
 called whenever a shell function is to be executed.
 
@@ -700,6 +661,7 @@ The first two arguments should only be used to pass them to
 is the name of the function to be executed. The arguments passed to
 the function can be accessed vie the global variable `pparams' (a
 NULL-terminated array of strings).
+
 The return value of the wrapper function should be zero if it calls
 `runshfunc()' itself and non-zero otherwise. This can be used for
 wrapper functions that only need to run under certain conditions or
@@ -720,7 +682,7 @@ finished:
   }
 
 Inside these wrapper functions the global variable `sfcontext' will be 
-set to a vlue indicating the circumstances under which the shell
+set to a clue indicating the circumstances under which the shell
 function was called. It can have any of the following values:
 
   - SFC_DIRECT:   the function was invoked directly by the user
@@ -741,13 +703,14 @@ defined wrappers from a shell function. In this case the module can't
 be unloaded immediately since the wrapper function is still on the
 call stack. The zsh code delays unloading modules until all wrappers
 from them have finished. To hide this from the user, the module's
-cleanup function is run immediatly so that all builtins, condition
+cleanup function is run immediately so that all builtins, condition
 codes, and wrapper function defined by the module are
 de-registered. But if there is some module-global state that has to be 
 finalized (e.g. some memory that has to be freed) and that is used by
 the wrapper functions finalizing this data in the cleanup function
 won't work.
-This is why ther are two functions each for the initialization and
+
+This is why there are two functions each for the initialization and
 finalization of modules. The `boot'- and `cleanup'-functions are run
 whenever the user calls `zmodload' or `zmodload -u' and should only
 register or de-register the module's interface that is visible to the
@@ -793,7 +756,7 @@ Documentation
     `item()' list structure, then the instruction `nofill(...)', which
     simply turns off filling should be used; as with `indent(...)',
     explicit font changing commands are required.  This can be used
-    without `indent()' when no identation is required, e.g. if the
+    without `indent()' when no indentation is required, e.g. if the
     accumulated indentation would otherwise be too long.
   All the above should appear on their own, separated by newlines from the
   surrounding text.  No extra newlines after the opening or before the
