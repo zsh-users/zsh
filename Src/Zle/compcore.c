@@ -1428,8 +1428,8 @@ set_comp_sep(void)
     for (p = ns, i = swb; *p; p++, i++) {
 	if (INULL(*p)) {
 	    if (i < scs) {
-		if (*p == Bnull && p[1]) {
-                    if (remq)
+		if (*p == Bnull) {
+                    if (p[1] && remq)
                         swb -= 2;
                     if (odq) {
                         swb--;
@@ -1526,6 +1526,10 @@ set_comp_sep(void)
 	    untokenize(ss);
 	    compsuffix = ztrdup(ss);
 	}
+        if ((i = strlen(compprefix)) &&
+            compprefix[i - 1] == '\\' && compprefix[i - 2] != '\\')
+            compprefix[i - 1] = '\0';
+        
 	tmp = tricat(compqiprefix, compiprefix, multiquote(qp, 1));
 	zsfree(compqiprefix);
 	compqiprefix = tmp;
