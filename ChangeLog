@@ -1,3 +1,14 @@
+2002-01-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16400, 16401: Src/subst.c: preserve empty words that result from
+	brace expansion.
+
+	* 16215: Src/subst.c: save and restore mult_isarr in singsub().
+
+	* 16201: Src/params.c, Src/utils.c, Src/zsh.h: introduce the
+	PM_NAMEDDIR flag to mark parameters for which a value change
+	should be reflected in the named directory table.
+
 2002-01-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16435: Src/builtin.c: Fix core dump in `hash'.
