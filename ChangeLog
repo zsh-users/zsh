@@ -1,5 +1,7 @@
 2001-06-01  Peter Stephenson  <pws@csr.com>
 
+	* Andrej: can't find the number: improved 14644.
+
 	* 14660: Etc/zsh-development-guide: can't use autoconf 2.50 yet.
 
 2001-06-01  Oliver Kiddle  <opk@zsh.org>
