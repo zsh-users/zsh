@@ -2061,7 +2061,8 @@ savehistfile(char *fn, int err, int writeflags)
 	    hist_ignore_all_dups |= isset(HISTSAVENODUPS);
 	    readhistfile(fn, err, 0);
 	    hist_ignore_all_dups = isset(HISTIGNOREALLDUPS);
-	    savehistfile(fn, err, 0);
+	    if (histlinect)
+		savehistfile(fn, err, 0);
 	    deletehashtable(histtab);
 
 	    curhist = remember_curhist;
