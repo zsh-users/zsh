@@ -1,3 +1,11 @@
+2004-10-12  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_make: got rid of an unused
+	local vaiable (cmdargs).
+
+	* unposted: Completion/Unix/Command/_rsync: added 7 more options
+	that were not described.
+
 2004-10-08  Peter Stephenson  <pws@csr.com>
 
 	* 20467: configure.ac, Doc/Zsh/params.yo, Src/exec.c, Src/jobs.c,
