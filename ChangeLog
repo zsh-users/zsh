@@ -1,5 +1,9 @@
 2001-03-28  Peter Stephenson  <pws@csr.com>
 
+	* 13818: Doc/Zsh/zle.yo, Src/Zle/zle_keymap,c. Src/Zle/zle_main.c
+	[zle_main hunk got omitted from posted patch, oops]: Add
+	`bindkey -p' to list bindings with a given prefix.
+
 	* unposted: Doc/Zsh/zle.yo, Doc/Zsh/mod_zle.yo: move ZLE builtin
 	documentation from mod_zle.yo to zle.yo.
 

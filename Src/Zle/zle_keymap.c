@@ -86,6 +86,8 @@ struct bindstate {
     char *lastseq;
     Thingy bind;
     char *str;
+    char *prefix;
+    int prefixlen;
 };
 
 #define BS_LIST (1<<0)
@@ -890,7 +892,7 @@ bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
 
     bs.flags = ops['L'] ? BS_LIST : 0;
     bs.kmname = kmname;
-    if(argv[0]) {
+    if(argv[0] && !ops['p']) {
 	int len;
 	char *seq;
 
@@ -899,8 +901,22 @@ bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
 	bs.flags |= BS_ALL;
 	bs.firstseq = bs.lastseq = seq;
 	bs.bind = keybind(km, seq, &bs.str);
+	bs.prefix = NULL;
+	bs.prefixlen = 0;
 	bindlistout(&bs);
     } else {
+	/* empty prefix is equivalent to no prefix */
+	if (ops['p'] && (!argv[0] || argv[0][0])) {
+	    if (!argv[0]) {
+		zwarnnam(name, "option -p requires a prefix string", NULL, 0);
+		return 1;
+	    }
+	    bs.prefix = getkeystring(argv[0], &bs.prefixlen, 2, NULL);
+	    bs.prefix = metafy(bs.prefix, bs.prefixlen, META_HREALLOC);
+	} else {
+	    bs.prefix = NULL;
+	    bs.prefixlen = 0;
+	}
 	bs.firstseq = ztrdup("");
 	bs.lastseq = ztrdup("");
 	bs.bind = t_undefinedkey;
@@ -918,6 +934,10 @@ static void
 scanbindlist(char *seq, Thingy bind, char *str, void *magic)
 {
     struct bindstate *bs = magic;
+
+    if (bs->prefixlen &&
+	(strncmp(seq, bs->prefix, bs->prefixlen) || !seq[bs->prefixlen]))
+	return;
 
     if(bind == bs->bind && (bind || !strcmp(str, bs->str)) &&
        ztrlen(seq) == 1 && ztrlen(bs->lastseq) == 1) {

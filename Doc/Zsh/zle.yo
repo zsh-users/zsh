@@ -195,6 +195,10 @@ if the tt(-e) or tt(-v) option is used alone, the keymap is em(not)
 displayed - the implicit linking of keymaps is the only thing that
 happens.)
 
+When the option tt(-p) is used, the var(in-string) must be present.
+The listing shows all bindings which have the given key sequence as a
+prefix, not including any bindings for the key sequence itself.
+
 When the tt(-L) option is used, the list is in the form of tt(bindkey)
 commands to create the key bindings.
 )
