@@ -247,7 +247,7 @@ there.
 vindex(list_max, compstate)
 item(tt(list_max))(
 Initially this is set to the value of the tt(LISTMAX) parameter.
-It may be set to any other numeric value; when the widget exits this value
+It may be set to any other value; when the widget exits this value
 will be used in the same way as the value of tt(LISTMAX).
 )
 vindex(list_lines, compstate)

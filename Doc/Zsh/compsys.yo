@@ -1267,6 +1267,19 @@ for a tag, the matches added for it will be listed as if the
 tt(LIST_PACKED) option were set for them. If it is set to `false',
 they are listed normally.
 )
+kindex(list-prompt, completion style)
+item(tt(list-prompt))(
+If this style is set to a non-empty value for the tt(default) tag,
+completion lists that don't fit on the screen can be scrolled (see
+ifzman(the description of the tt(zsh/complist) module in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/complist Module))\
+). The value will be displayed after every screenful, prompting for a
+key and may contain the escape `tt(%l)' which will be replaced by the
+number of the last line displayed and the total number of lines. As
+usual, the `tt(%S)', `tt(%s)', `tt(%B)', `tt(%b)', `tt(%U)', `tt(%u)',
+and `tt(%{)...tt(%})' escapes for the terminal display modes are
+understood, too.
+)
 kindex(list-rows-first, completion style)
 item(tt(list-rows-first))(
 This style is tested like the tt(list-packed) style and determines if
@@ -1558,6 +1571,28 @@ item(tt(remove-all-dups))(
 The tt(_history_complete_word) bindable command uses this to decide if 
 all duplicate matches should be removed, rather than just consecutive
 duplicates.
+)
+kindex(select-prompt, completion style)
+item(tt(select-prompt))(
+If this is set to a non-empty string for the tt(default) tag, its
+value will be displayed during menu-selection (see the tt(menu) style
+above) when the completion list does not fit on the screen as a
+whole. The same escapes as for the tt(list-prompt) style are
+understood, plus `tt(%m)' which is replaced by the number of the
+currently selected match and the total number of matches and `tt(%p)'
+which is replaced by `tt(Top)' when the mark is on the first line,
+`tt(Bottom)' when it is on the last line and the relative position of
+the mark in the list given as a percentage.
+)
+kindex(select-scroll, completion style)
+item(tt(select-scroll))(
+This style is tested for the tt(default) tag and determines how a
+completion list is scrolled during a menu-selection (see the tt(menu)
+style above) when the completion list does not fit on the screen as a
+whole. Its value should be `tt(0)' (zero) to scroll by
+half-screenfuls, a positive integer to scroll by that many lines and a
+negative number to scroll by the number of lines of the screen minus
+that number (or plus the number, since it is negative).
 )
 kindex(single-ignored, completion style)
 item(tt(single-ignored))(

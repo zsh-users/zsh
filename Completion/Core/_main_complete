@@ -56,6 +56,16 @@ _def_menu_style=( "$_last_menu_style[@]"
                 )
 _last_menu_style=()
 
+if zstyle -s ":completion:${curcontext}:default" list-prompt LISTPROMPT &&
+   [[ -n "$LISTPROMPT" ]]; then
+  zmodload -i zsh/complist
+  compstate[list_max]=scroll
+fi
+zstyle -s ":completion:${curcontext}:default" select-prompt SELECTPROMPT ||
+    SELECTPROMPT='%SScrolling active: current selection at %p'
+zstyle -s ":completion:${curcontext}:default" select-scroll SELECTSCROLL ||
+    SELECTSCROLL=1
+
 # Get the names of the completers to use in the positional parameters.
 
 if (( $# )); then

@@ -37,7 +37,7 @@
 
 
 static Widget w_menuselect;
-static Keymap mskeymap;
+static Keymap mskeymap, lskeymap;
 
 /* Indixes into the terminal string arrays. */
 
@@ -59,9 +59,8 @@ static Keymap mskeymap;
 #define COL_MA 15
 #define COL_HI 16
 #define COL_DU 17
-#define COL_ST 18
 
-#define NUM_COLS 19
+#define NUM_COLS 18
 
 /* Maximum number of in-string colours supported. */
 
@@ -71,14 +70,14 @@ static Keymap mskeymap;
 
 static char *colnames[] = {
     "no", "fi", "di", "ln", "pi", "so", "bd", "cd", "ex", "mi",
-    "lc", "rc", "ec", "tc", "sp", "ma", "hi", "du", "st", NULL
+    "lc", "rc", "ec", "tc", "sp", "ma", "hi", "du", NULL
 };
 
 /* Default values. */
 
 static char *defcols[] = {
     "0", "0", "1;34", "1;36", "33", "1;35", "1;33", "1;33", "1;32", NULL,
-    "\033[", "m", NULL, "0", "0", "7", "0", "0", "7"
+    "\033[", "m", NULL, "0", "0", "7", "0", "0"
 };
 
 /* This describes a terminal string for a file type. */
@@ -347,12 +346,9 @@ getcols(Listcols c)
 	
 	if ((s = tcstr[TCSTANDOUTBEG]) && s[0]) {
 	    c->files[COL_MA] = filecol(s);
-	    c->files[COL_ST] = filecol(s);
 	    c->files[COL_EC] = filecol(tcstr[TCSTANDOUTEND]);
-	} else {
+	} else
 	    c->files[COL_MA] = filecol(defcols[COL_MA]);
-	    c->files[COL_ST] = filecol(defcols[COL_ST]);
-	}
 	lr_caplen = 0;
 	if ((max_caplen = strlen(c->files[COL_MA]->col)) <
 	    (l = strlen(c->files[COL_EC]->col)))
@@ -657,32 +653,46 @@ static Cmgroup last_group;
 static int
 asklistscroll(int ml)
 {
-    int v, i;
+    Thingy cmd;
+    int i, ret = 0;
 
     compprintfmt(NULL, -1, 1, 1, ml, NULL);
 
     fflush(shout);
     zsetterm();
-    v = getzlequery(0);
+    selectlocalmap(lskeymap);
+    if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak))
+	ret = 1;
+    else if (cmd == Th(z_acceptline) ||
+	     cmd == Th(z_downhistory) ||
+	     cmd == Th(z_downlineorhistory) ||
+	     cmd == Th(z_downlineorsearch) ||
+	     cmd == Th(z_vidownlineorhistory))
+	mrestlines = 1;
+    else if (cmd == Th(z_completeword) ||
+		   cmd == Th(z_expandorcomplete) ||
+		   cmd == Th(z_expandorcompleteprefix) ||
+		   cmd == Th(z_menucomplete) ||
+		   cmd == Th(z_menuexpandorcomplete) ||
+		   !strcmp(cmd->nam, "menu-select") ||
+		   !strcmp(cmd->nam, "complete-word") ||
+		   !strcmp(cmd->nam, "expand-or-complete") ||
+		   !strcmp(cmd->nam, "expand-or-complete-prefix") ||
+		   !strcmp(cmd->nam, "menu-complete") ||
+	     !strcmp(cmd->nam, "menu-expand-or-complete"))
+	mrestlines = lines - 1;
+    else {
+	ungetkeycmd();
+	ret = 1;
+    }
+    selectlocalmap(NULL);
     settyinfo(&shttyinfo);
     putc('\r', shout);
     for (i = columns - 1; i--; )
 	putc(' ', shout);
-
     putc('\r', shout);
 
-    if (v == '\n' || v == '\r') {
-	mrestlines = 1;
-	return 0;
-    }
-    mrestlines = lines - 1;
-
-    if (v == ' ' || v == '\t')
-	return 0;
-    if (v != 'q')
-	ungetkey(v);
-
-    return 1;
+    return ret;
 }
 
 #define dolist(X)   ((X) >= mlbeg && (X) < mlend)
@@ -720,8 +730,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    if (!(fmt = mstatus))
 		return 0;
 	    cc = -1;
-	} else if (!(fmt = getsparam("LISTSTATUS")))
-	    fmt = "continue? ";
+	} else if (!(fmt = getsparam("LISTPROMPT")))
+	    fmt = "Continue? ";
     }
     for (p = fmt; *p; p++) {
 	if (doesc && *p == '%') {
@@ -1417,7 +1427,7 @@ complistmatches(Hookdef dummy, Chdata dat)
     mscroll = 0;
 
     if (mselect >= 0 || mlbeg >= 0 ||
-	((p = getsparam("LISTMAX")) && !strcmp(p, "scroll"))) {
+	((p = complistmax) && !strcmp(p, "scroll"))) {
 	trashzle();
 	showinglist = listshown = 0;
 
@@ -1536,8 +1546,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if ((step += lines - nlnct) < 0)
 		step = 1;
     }
-    mstatus = getsparam("SELECTSTATUS");
-    mhasstat = !!mstatus;
+    mstatus = getsparam("SELECTPROMPT");
+    mhasstat = (mstatus && *mstatus);
     fdat = dat;
     selectlocalmap(mskeymap);
     noselect = 0;
@@ -2054,6 +2064,14 @@ boot_(Module m)
     bindkey(mskeymap, "\33OB",  refthingy(t_downlineorhistory), NULL);
     bindkey(mskeymap, "\33OC",  refthingy(t_forwardchar), NULL);
     bindkey(mskeymap, "\33OD",  refthingy(t_backwardchar), NULL);
+    lskeymap = newkeymap(NULL, "listscroll");
+    linkkeymap(lskeymap, "listscroll", 1);
+    bindkey(lskeymap, "\t", refthingy(t_completeword), NULL);
+    bindkey(lskeymap, " ", refthingy(t_completeword), NULL);
+    bindkey(lskeymap, "\n", refthingy(t_acceptline), NULL);
+    bindkey(lskeymap, "\r", refthingy(t_acceptline), NULL);
+    bindkey(lskeymap, "\33[B",  refthingy(t_downlineorhistory), NULL);
+    bindkey(lskeymap, "\33OB",  refthingy(t_downlineorhistory), NULL);
     return 0;
 }
 
@@ -2068,6 +2086,7 @@ cleanup_(Module m)
     deletehookfunc("comp_list_matches", (Hookfn) complistmatches);
     deletehookfunc("menu_start", (Hookfn) domenuselect);
     unlinkkeymap("menuselect", 1);
+    unlinkkeymap("listscroll", 1);
     return 0;
 }
 

@@ -41,6 +41,7 @@ styles=(
   list			 c:listwhen
   list-colors		 c:
   list-packed		 c:bool
+  list-prompt            c:
   list-rows-first	 c:bool
   local			 c:
   matcher-list		 c:
@@ -55,6 +56,8 @@ styles=(
   prefix-needed		 c:bool
   prompt		 c:
   remove-all-dups	 c:bool
+  select-prompt          c:
+  select-scroll          c:
   single-ignored         c:single-ignored
   sort			 c:bool
   special-dirs		 c:sdirs

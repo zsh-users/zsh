@@ -1,5 +1,11 @@
 2000-04-18  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10801: Completion/Builtins/_zstyle, Completion/Core/_main_complete,
+ 	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/mod_complist.yo,
+ 	Src/Zle/complist.c: completion list scrolling cleanup; *STATUS
+ 	renamed to *PROMPT, styles for new used parameters, use local
+ 	keymap when waiting at list-prompt
+	
 	* 10799: Src/text.c: fix to get newlines in non-job-texts (I'm
  	sooo stupid)
 	
