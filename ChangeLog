@@ -1,3 +1,14 @@
+2004-06-21  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/zle.yo: copy-prev-shell-word has no default
+	bindings, so it shouldn't claim those of copy-prev-word.
+
+	* 19785 (cont'd): Doc/zsh/builtins.yo, Doc/zsh/compsys.yo:
+	Previously uncommitted documentation changes (Oliver).
+
+	* users/7267: Functions/Zle/predict-on: Minor update to cooperate
+	with zle-line-init.
+
 2004-06-18  Clint Adams  <clint@zsh.org>
 
 	* 20081: Doc/Zsh/mod_pcre.yo: document -pcre-match condition.
