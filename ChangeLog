@@ -1,3 +1,8 @@
+2004-10-07  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: added options that
+	are new in rsync 2.6.3.
+
 2004-10-05  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Update README to indicate 20412.
