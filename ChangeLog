@@ -73,6 +73,11 @@
 	* 15023, 15027: Src/parse.c: Accept newlines before the "in"
 	keyword in "for" and "select", per POSIX.
 
+2001-10-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16059: Src/hist.c: Fix HIST_NO_SPACE when
+	INTERACTIVE_COMMENTS is set and we get a comment.
+
 2001-10-15  Clint Adams  <clint@zsh.org>
 
         * 15094: Functions/Prompts/prompt_clint_setup:
