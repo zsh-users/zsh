@@ -3073,7 +3073,10 @@ bslashquote(const char *s, char **e, int instring)
 	  }
 	  continue;
 	}
-	else if (ispecial(*u) && (*u != '=' || u == s) &&
+	else if (ispecial(*u) &&
+		 ((*u != '=' && *u != '~') ||
+		  (u == s || (isset(MAGICEQUALSUBST) &&
+			      (u[-1] == '=' || u[-1] == ':')))) &&
 	    (!instring ||
 	     (isset(BANGHIST) && *u == (char)bangchar) ||
 	     (instring == 2 &&
