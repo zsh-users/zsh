@@ -1419,7 +1419,7 @@ addvars(Estate state, Wordcode pc, int export)
 		return;
 	    }
 	    if (isset(GLOBASSIGN) || !isstr)
-		globlist(vl);
+		globlist(vl, 0);
 	    if (errflag) {
 		state->pc = opc;
 		return;
@@ -1520,7 +1520,7 @@ execsubst(LinkList strs)
 	prefork(strs, esprefork);
 	if (esglob) {
 	    LinkList ostrs = strs;
-	    globlist(strs);
+	    globlist(strs, 0);
 	    strs = ostrs;
 	}
     }
@@ -1644,7 +1644,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (!(cflags & BINF_NOGLOB))
 		while (!checked && !errflag && args && nonempty(args) &&
 		       has_token((char *) peekfirst(args)))
-		    glob(args, firstnode(args));
+		    glob(args, firstnode(args), 0);
 	    else if (!unglobbed) {
 		for (node = firstnode(args); node; incnode(node))
 		    untokenize((char *) getdata(node));
@@ -1927,7 +1927,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     if ((esglob = !(cflags & BINF_NOGLOB)) && args) {
 	LinkList oargs = args;
-	globlist(args);
+	globlist(args, 0);
 	args = oargs;
     }
     if (errflag) {

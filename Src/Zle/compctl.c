@@ -2219,7 +2219,7 @@ gen_matches_files(int dirs, int execs, int all)
 			    /* Do the globbing... */
 			    remnulargs(p);
 			    addlinknode(l, p);
-			    globlist(l);
+			    globlist(l, 0);
 			    /* And see if that produced a filename. */
 			    tt = nonempty(l);
 			    while (ugetnode(l));
@@ -3334,7 +3334,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		tokenize(p);
 		remnulargs(p);
 		addlinknode(l, p);
-		globlist(l);
+		globlist(l, 0);
 
 		if (nonempty(l)) {
 		    /* And add the resulting words. */
@@ -3483,7 +3483,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 				/* Do the globbing. */
 				ng = opts[NULLGLOB];
 				opts[NULLGLOB] = 1;
-				globlist(l);
+				globlist(l, 0);
 				opts[NULLGLOB] = ng;
 				/* Get the results. */
 				if (nonempty(l) && peekfirst(l)) {
@@ -3679,7 +3679,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	/* Fine, now do full expansion. */
 	prefork(foo, 0);
 	if (!errflag) {
-	    globlist(foo);
+	    globlist(foo, 0);
 	    if (!errflag)
 		/* And add the resulting words as matches. */
 		for (n = firstnode(foo); n; incnode(n))

@@ -872,7 +872,7 @@ gmatchcmp(Gmatch a, Gmatch b)
 
 /**/
 void
-glob(LinkList list, LinkNode np)
+glob(LinkList list, LinkNode np, int nountok)
 {
     struct qual *qo, *qn, *ql;
     LinkNode node = prevnode(np);
@@ -887,7 +887,8 @@ glob(LinkList list, LinkNode np)
 
     MUSTUSEHEAP("glob");
     if (unset(GLOBOPT) || !haswilds(ostr)) {
-	untokenize(ostr);
+	if (!nountok)
+	    untokenize(ostr);
 	return;
     }
     save_globstate(saved);
@@ -1339,7 +1340,8 @@ glob(LinkList list, LinkNode np)
     if (!q || errflag) {	/* if parsing failed */
 	restore_globstate(saved);
 	if (unset(BADPATTERN)) {
-	    untokenize(ostr);
+	    if (!nountok)
+		untokenize(ostr);
 	    insertlinknode(list, node, ostr);
 	    return;
 	}
@@ -1578,7 +1580,7 @@ xpandredir(struct redir *fn, LinkList tab)
     prefork(fake, isset(MULTIOS) ? 0 : PF_SINGLE);
     /* Globbing is only done for multios. */
     if (!errflag && isset(MULTIOS))
-	globlist(fake);
+	globlist(fake, 0);
     if (errflag)
 	return 0;
     if (nonempty(fake) && !nextnode(firstnode(fake))) {

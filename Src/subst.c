@@ -212,14 +212,14 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 
 /**/
 mod_export void
-globlist(LinkList list)
+globlist(LinkList list, int nountok)
 {
     LinkNode node, next;
 
     badcshglob = 0;
     for (node = firstnode(list); !errflag && node; node = next) {
 	next = nextnode(node);
-	glob(list, node);
+	glob(list, node, nountok);
     }
     if (badcshglob == 1)
 	zerr("no match", NULL, 0);

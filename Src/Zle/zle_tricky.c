@@ -1612,11 +1612,11 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	prefork(vl, 0);
 	if (errflag)
 	    goto end;
-	if ((lst == COMP_LIST_EXPAND) || (lst == COMP_EXPAND)) {
+	if (lst == COMP_LIST_EXPAND || lst == COMP_EXPAND) {
 	    int ng = opts[NULLGLOB];
 
 	    opts[NULLGLOB] = 1;
-	    globlist(vl);
+	    globlist(vl, 1);
 	    opts[NULLGLOB] = ng;
 	}
 	if (errflag)
@@ -1645,11 +1645,14 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	foredel(we - wb);
 	while ((ss = (char *)ugetnode(vl))) {
 	    ret = 0;
-	    untokenize(ss);
 	    ss = quotename(ss, NULL);
+	    untokenize(ss);
 	    inststr(ss);
+#if 0
 	    if (olst != COMP_EXPAND_COMPLETE || nonempty(vl) ||
 		(cs && line[cs-1] != '/')) {
+#endif
+	    if (nonempty(vl)) {
 		spaceinline(1);
 		line[cs++] = ' ';
 	    }
