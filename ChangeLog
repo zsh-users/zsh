@@ -1,5 +1,8 @@
 2001-09-11  Oliver Kiddle  <opk@zsh.org>
 
+	* 15781: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_samba: new completion for samba tools
+
 	* unposted: Completion/Zsh/Context/_subscript: complete ascii
 	character class added in 15765
 
