@@ -356,6 +356,10 @@ zhalloc(size_t size)
 	    n = (n + pgsz) & ~pgsz;
 	    h = (Heap) mmap(NULL, n, PROT_READ | PROT_WRITE,
 			    MMAP_FLAGS, -1, 0);
+	    if (h == ((Heap) -1)) {
+		zerr("fatal error: out of heap memory", NULL, 0);
+		exit(1);
+	    }
 	    h->size = n;
 	}
 #else
