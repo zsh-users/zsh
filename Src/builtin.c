@@ -1628,10 +1628,16 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	if ((tc = chflags && chflags != (PM_EFLOAT|PM_FFLOAT)))
 	    usepm = 0;
     }
-    if (tc && (pm->flags & PM_SPECIAL)) {
-	zerrnam(cname, "%s: can't change type of a special parameter",
-		pname, 0);
-	return NULL;
+    if (tc){
+	if (pm->flags & PM_SPECIAL) {
+	    zerrnam(cname, "%s: can't change type of a special parameter",
+		    pname, 0);
+	    return NULL;
+	} else if (pm->flags & PM_AUTOLOAD) {
+	    zerrnam(cname, "%s: can't change type of autoloaded parameter",
+		    pname, 0);
+	    return NULL;
+	}
     }
 
     /*

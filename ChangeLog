@@ -1,3 +1,8 @@
+2001-03-29  Peter Stephenson  <pws@csr.com>
+
+	* 13837: Src/builtin.c: disallows changing of parameter type
+	for autoloadable parameter (bug 219459 on Sourceforge).
+
 2001-03-29  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13833: Completion/Core/_expand: fix comparison of expansions
