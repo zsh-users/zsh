@@ -1,3 +1,9 @@
+2000-09-16  Clint Adams  <schizo@debian.org>
+
+	* 12814: configure.in, Src/compat.c, Src/init.c, Src/system.h:
+	implement zasprintf and use it in lieu of sprintf with a
+	static buffer in sourcehome().
+
 2000-09-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/contrib.yo: Missing hunk from 12765 (replace

@@ -1020,18 +1020,22 @@ source(char *s)
 void
 sourcehome(char *s)
 {
-    char buf[PATH_MAX];
+    char *buf;
     char *h;
 
     if (emulation == EMULATE_SH || emulation == EMULATE_KSH ||
 	!(h = getsparam("ZDOTDIR")))
 	h = home;
+/* Let source() complain if it's too long */
+#if 0
     if (strlen(h) + strlen(s) + 1 >= PATH_MAX) {
 	zerr("path too long: %s", s, 0);
 	return;
     }
-    sprintf(buf, "%s/%s", h, s);
+#endif
+    zasprintf(&buf, "%s/%s", h, s);
     source(buf);
+    zsfree(buf);
 }
 
 /**/

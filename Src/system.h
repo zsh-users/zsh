@@ -227,6 +227,26 @@ struct timezone {
 # define zopenmax() ((long) OPEN_MAX)
 #endif
 
+#if defined (__STDC__) && defined (HAVE_STDARG_H)
+# define PREFER_STDARG
+# define USE_VARARGS
+# include <stdarg.h>
+#else
+# ifdef HAVE_VARARGS_H
+#  define PREFER_VARARGS
+#  define USE_VARARGS
+#  include <varargs.h>
+# endif
+#endif
+
+#ifdef HAVE_ASPRINTF
+# ifdef __GNUC__
+# define zasprintf(X,F,A...) asprintf(X,F, ## A)
+# else
+# define zasprintf asprintf
+# endif
+#endif
+
 #ifdef HAVE_FCNTL_H
 # include <fcntl.h>
 #else
