@@ -1,0 +1,32 @@
+#! /bin/sh
+
+for zshmod in \
+    cap \
+    clone \
+    compctl \
+    complete \
+    complist \
+    computil \
+    deltochar \
+    example \
+    files \
+    mapfile \
+    mathfunc \
+    parameter \
+    rlimits \
+    sched \
+    stat \
+    zftp \
+    zle \
+    zleparameter \
+    zutil \
+; do
+    localname=$zshmod
+    aliasname=$zshmod
+    depname=zsh/$zshmod
+    sed '
+	s,@LOCALNAME@,'$localname',g
+	s,@ALIASNAME@,'$aliasname',g
+	s,@DEPNAME@,'$depname',g
+    ' < alias.mdd.in > ${localname}.mdd
+done

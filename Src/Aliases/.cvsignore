@@ -1,0 +1,16 @@
+Makefile
+Makefile.in
+*.export
+so_locations
+*.pro
+*.epro
+*.syms
+*.o
+*.o.c
+*.so
+*.mdh
+*.mdhi
+*.mdhs
+*.mdh.tmp
+*.c
+*.mdd
