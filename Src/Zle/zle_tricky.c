@@ -7049,7 +7049,6 @@ do_single(Cmatch m)
 	/* If we didn't add a suffix, add a space, unless we are *
 	 * doing menu completion or we are completing files and  *
 	 * the string doesn't name an existing file.             */
-	cs = scs;
 	inststrlen(" ", 1, 1);
 	menuinsc++;
 	if (menuwe)
