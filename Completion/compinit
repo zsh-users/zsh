@@ -140,6 +140,7 @@ _comp_options=(
     NO_shglob
     NO_kshglob
     NO_ksharrays
+    NO_kshtypeset
     NO_cshnullglob
     NO_allexport
     NO_aliases

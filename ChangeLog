@@ -1,3 +1,8 @@
+2004-10-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (based on 20514): Completion/compinit: _comp_options
+	needs to include NO_kshtypeset.
+
 2004-10-22  Peter Stephenson  <pws@csr.com>
 
 	* 20513: Src/pattern.c, Test/D02glob.ztst: tests of zero length
