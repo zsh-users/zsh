@@ -1,5 +1,9 @@
 2001-01-15  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* Ulrik Haugen: 13344, 13347: Completion/User/_grep,
+	Completion/User/_ls, Completion/User/_use_lo: add completion for
+	ls and ([ef]|)grep
+	
 	* 13346: Completion/Bsd/_bsd_pkg, Completion/Bsd/_kld,
  	Completion/Core/_compalso, Completion/Core/_complete,
  	Completion/Core/_normal, Completion/Core/compdump,
