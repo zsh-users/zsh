@@ -202,7 +202,7 @@ while [[ -n "$state" ]]; do
   tags)
     if compset -P '*\{'; then
       _wanted tags expl 'RPM tag' &&
-          compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '}' - \
+          compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '\}' - \
                   "${(@)${(@f)$(rpm --querytags)}#RPMTAG_}" && ret=0
     else
       _message 'RPM format'
@@ -212,7 +212,7 @@ while [[ -n "$state" ]]; do
     _message 'RPM capability'
     ;;
   relocate)
-    if compset -P '*\='; then
+    if compset -P '*='; then
       _description directories expl 'new path'
     else
       _description directories expl 'old path'

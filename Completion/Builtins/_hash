@@ -3,13 +3,13 @@
 local expl
 
 if [[ "$words[2]" = -*d* ]]; then
-  if compset -P 1 '*\='; then
+  if compset -P 1 '*='; then
     _wanted -C -d-value files && _path_files -g '*(-/)'
   else
     _wanted -C -d named-directories expl 'named directory' &&
         compadd "$expl[@]" -q -S '=' - "${(@k)nameddirs}"
   fi
-elif compset -P 1 '*\='; then
+elif compset -P 1 '*='; then
   _wanted -C value values expl 'executable file' &&
       _files "$expl[@]" -g '*(*)'
 else
