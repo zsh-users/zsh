@@ -7,17 +7,17 @@ if [[ "$words[1]" != "$_a2ps_cache_cmd" ]]; then
 
   _a2ps_cache_cmd="$words[1]"
 
-  descr=( "${(@)${(f@)$($words[1] --list=features)//
+  descr=( "${(@)${(f@)$(LC_ALL=C $words[1] --list=features)//
  /	}:#}" )
 
   _a2ps_cache_values=(
-      "${descr[(r)Known style sheets*]#*	}"
-      "${descr[(r)Known encodings*]#*	}"
-      "${descr[(r)Known media*]#*	}"
-      "${descr[(r)Known prologues*]#*	}"
+      "${descr[(r)Known [Ss]tyle [Ss]heets*]#*	}"
+      "${descr[(r)Known [Ee]ncodings*]#*	}"
+      "${descr[(r)Known [Mm]edia*]#*	}"
+      "${descr[(r)Known [Pp]rologues*]#*	}"
       "${descr[(r)Known PostScript Printer Descriptions*]#*	}"
-      "${descr[(r)Known output destination*]#*	}"
-      "${descr[(r)Known user options*]#*	}"
+      "${descr[(r)Known [Oo]utput [Dd]estination*]#*	}"
+      "${descr[(r)Known [Uu]ser [Oo]ptions*]#*	}"
       "${descr[(r)Known Variables*]#*	}"
   )
 fi
