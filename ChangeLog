@@ -1,3 +1,8 @@
+2004-02-04  Oliver Kiddle  <opk@zsh.org>
+
+	* Mikael Magnusson: 19405: Completion/Unix/Command/_gphoto2:
+	new completion for gphoto2
+
 2004-01-22  Peter Stephenson  <pws@csr.com>
 
 	* 19389 plus added stdunsetfn to EPOCHSECONDS:

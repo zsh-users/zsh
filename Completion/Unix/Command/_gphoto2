@@ -1,0 +1,47 @@
+#compdef gphoto2
+
+_arguments -s \
+  '--debug[turn on debugging]' \
+  '(-q --quiet)'{-q,--quiet}'[quiet output]' \
+  '(-v --version)'{-v,--version}'[display version and exit]' \
+  '(-h --help)'{-h,--help}'[display a short usage message]' \
+  '--list-cameras[list supported camera models]' \
+  '--list-ports[list supported port devices]' \
+  '--stdout[send file to stdout]' \
+  '--stdout-size[print filesize before data]' \
+  '--auto-detect[list auto-detected cameras]' \
+  '--port[specify port device]:port' \
+  '--speed[specify serial transfer speed]:speed' \
+  '--camera[specify camera model]:camera model' \
+  '--filename[specify pattern to save file as]:pattern' \
+  '--usbid[override USB IDs (expert only)]:usbid' \
+  '(-a --abilities)'{-a,--abilities}'[display camera abilities]' \
+  '(-f --folder)'{-f,--folder}'[specify camera folder]:folder' \
+  '(-R --recurse --no-recurse)'{-R,--recurse}'[recursion (default for download)]' \
+  '(-R --recurse)--no-recurse[no recursion (default for deletion)]' \
+  '(-l --list-folders)'{-l,--list-folders}'[list folders in folder]' \
+  '(-L --list-files)'{-L,--list-files}'[list files in folder]' \
+  '(-m --mkdir)'{-m,--mkdir}'[create a directory]:directory' \
+  '(-r --rmdir)'{-r,--rmdir}'[remove a directory]:directory' \
+  '(-n --num-files)'{-n,--num-files}'[sisplay number of files]' \
+  '(-p --get-file)'{-p,--get-file}'[get files given in range]:range' \
+  '(-P --get-all-files)'{-P,--get-all-files}'[get all files from folder]' \
+  '(-t --get-thumbnail)'{-t,--get-thumbnail}'[get thumbnails given in range]:range' \
+  '(-T --get-all-thumbnails)'{-T,--get-all-thumbnails}'[get all thumbnails from folder]' \
+  '(-r --get-raw-data)'{-r,--get-raw-data}'[get raw data given in range]:range' \
+  '--get-all-raw-data[get all raw data from folder]' \
+  '--get-audio-data[get audio data given in range]:range' \
+  '--get-all-audio-data[get all audio data from folder]' \
+  '--delete-files[delete files given in range]:range' \
+  '--delete-all-files[delete all files in folder]' \
+  '(-u --upload-file)'{-u,--upload-file}'[upload a file to camera]:file:_files' \
+  '--capture-preview[capture a quick preview]' \
+  '--capture-image[capture an image]' \
+  '--capture-movie[capture a movie]' \
+  '--capture-sound[capture an audio clip]' \
+  '--show-info[show info about given range]:range' \
+  '--summary[summary of camera status]' \
+  '--manual[camera driver manual]' \
+  '--about[show information about the camera driver]' \
+  '--shell[start the gphoto2 shell]'
+
