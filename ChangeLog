@@ -64,12 +64,6 @@
 	Test/C02cond.ztst: allow dynamic loading to work on MacOS X
 	if the dlcompat library is installed.
 
-2001-10-11  Bart Schaefer  <schaefer@zsh.org>
-
-	* 16013: Src/exec.c: Properly save/restore state around the
-	DEBUG trap, so that its return value does not alter the return
-	value of current command (among other things).
-
 2001-10-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 15983: Completion/Unix/Command/_user_admin,
