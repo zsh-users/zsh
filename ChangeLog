@@ -1,3 +1,8 @@
+2000-05-15  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11362: Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo, Doc/Zsh/seealso.yo:
+	pointers and menu entries for userguide wrong.
+
 2000-05-15  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11360: Src/Modules/zutil.c: zparseopts should detect if it is
@@ -10,11 +15,11 @@
 
 2000-05-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
-	* Src/builtin.c: make integer builtin understand `-i base'.
+	* 11352: Src/builtin.c: make integer builtin understand `-i base'.
 
-	* Completion/Base/_jobs: typo in suspended jobs.
+	* 11352: Completion/Base/_jobs: typo in suspended jobs.
 
-	* Doc/Zsh/*: various changes of phrasing.
+	* 11352: Doc/Zsh/*: various changes of phrasing.
 
 2000-05-12  Sven Wischnowsky  <wischnow@zsh.org>
 
