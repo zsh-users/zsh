@@ -1253,7 +1253,7 @@ ca_parse_line(Cadef d, int multi, int first)
     Caopt ptr, wasopt = NULL, dopt;
     struct castate state;
     char *line, *pe, **argxor = NULL;
-    int cur, doff, argend, arglast;
+    int cur, doff, argend, arglast, ne;
     Patprog endpat = NULL, napat = NULL;
     LinkList sopts = NULL;
 
@@ -1319,7 +1319,10 @@ ca_parse_line(Cadef d, int multi, int first)
 
         /* remove quotes */
         line = dupstring(line);
+        ne = noerrs;
+        noerrs = 2;
         parse_subst_string(line);
+        noerrs = ne;
         remnulargs(line);
         untokenize(line);
 

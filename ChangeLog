@@ -1,3 +1,7 @@
+2001-05-03  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14214: Src/Zle/computil.c: ignore errors when removing quotes
+
 2001-05-02  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14206: configure.in: Fix bug introduced by 14177; also, only
