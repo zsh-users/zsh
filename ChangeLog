@@ -1,3 +1,8 @@
+2003-03-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 18347: Completion/Base/Utility/_alternative: fix problems
+	with having more than one ((val\:desc ...)) style action
+
 2003-03-07  Peter Stephenson  <pws@csr.com>
 
 	* 18325: Src/Modules/parameter.c: options on by default weren't
