@@ -64,6 +64,8 @@ _arguments -C -s \
   '--install:*:install:->install' \
   '-U+[upgrade mode]:*:upgrade:->upgrade' \
   '--upgrade:*:upgrade:->upgrade' \
+  '-F+[freshen mode]:*:upgrade:->upgrade' \
+  '--freshen:*:upgrade:->upgrade' \
   '-e+[uninstall mode]:*:uninstall:->uninstall' \
   '--erase:*:uninstall:->uninstall' \
   -'b+[build mode (spec file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
