@@ -1,3 +1,8 @@
+2002-02-09  Clint Adams  <clint@zsh.org>
+
+	* unposted: Functions/Prompts/prompt_clint_setup: improve APM and
+	screen handling.
+
 2002-02-08  Clint Adams  <clint@zsh.org>
 
 	* 16566, 16568, Oliver: 16461: Completion/Unix/Command/_ssh:
