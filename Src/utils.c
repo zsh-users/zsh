@@ -717,7 +717,11 @@ checkmailpath(char **s)
 	if (**s == 0) {
 	    *v = c;
 	    zerr("empty MAILPATH component: %s", *s, 0);
+#ifndef MAILDIR_SUPPORT
 	} else if (stat(unmeta(*s), &st) == -1) {
+#else
+	} else if (mailstat(unmeta(*s), &st) == -1) {
+#endif
 	    if (errno != ENOENT)
 		zerr("%e: %s", *s, errno);
 	} else if (S_ISDIR(st.st_mode)) {
@@ -3782,3 +3786,104 @@ mode_to_octal(mode_t mode)
 	m |= 00001;
     return m;
 }
+
+#ifdef MAILDIR_SUPPORT
+/*
+ *     Stat a file. If it's a maildir, check all messages
+ *     in the maildir and present the grand total as a file.
+ *     The fields in the 'struct stat' are from the mail directory.
+ *     The following fields are emulated:
+ *
+ *     st_nlink        always 1
+ *     st_size         total number of bytes in all files
+ *     st_blocks       total number of messages
+ *     st_atime        access time of newest file in maildir
+ *     st_mtime        modify time of newest file in maildir
+ *     st_mode         S_IFDIR changed to S_IFREG
+ *
+ *     This is good enough for most mail-checking applications.
+ */
+int
+mailstat(char *path, struct stat *st)
+{
+       DIR                     *dd;
+       struct                  dirent *fn;
+       struct stat             st_ret, st_tmp;
+       static struct stat      st_new_last, st_ret_last;
+       char                    dir[PATH_MAX * 2];
+       char                    file[PATH_MAX * 2];
+       int                     i, l;
+       time_t                  atime = 0, mtime = 0;
+
+       /* First see if it's a directory. */
+       if ((i = stat(path, st)) != 0 || !S_ISDIR(st->st_mode))
+               return i;
+       if (strlen(path) > sizeof(dir) - 5) {
+               errno = ENAMETOOLONG;
+               return -1;
+       }
+
+       st_ret = *st;
+       st_ret.st_nlink = 1;
+       st_ret.st_size  = 0;
+       st_ret.st_blocks  = 0;
+       st_ret.st_mode  &= ~S_IFDIR;
+       st_ret.st_mode  |= S_IFREG;
+
+       /* See if cur/ is present */
+       sprintf(dir, "%s/cur", path);
+       if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
+       st_ret.st_atime = st_tmp.st_atime;
+
+       /* See if tmp/ is present */
+       sprintf(dir, "%s/tmp", path);
+       if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
+       st_ret.st_mtime = st_tmp.st_mtime;
+
+       /* And new/ */
+       sprintf(dir, "%s/new", path);
+       if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
+       st_ret.st_mtime = st_tmp.st_mtime;
+
+       /* Optimization - if new/ didn't change, nothing else did. */
+       if (st_tmp.st_dev == st_new_last.st_dev &&
+           st_tmp.st_ino == st_new_last.st_ino &&
+           st_tmp.st_atime == st_new_last.st_atime &&
+           st_tmp.st_mtime == st_new_last.st_mtime) {
+               *st = st_ret_last;
+               return 0;
+       }
+       st_new_last = st_tmp;
+
+       /* Loop over new/ and cur/ */
+       for (i = 0; i < 2; i++) {
+               sprintf(dir, "%s/%s", path, i ? "cur" : "new");
+               sprintf(file, "%s/", dir);
+               l = strlen(file);
+               if ((dd = opendir(dir)) == NULL)
+                       return 0;
+               while ((fn = readdir(dd)) != NULL) {
+                       if (fn->d_name[0] == '.' ||
+                           strlen(fn->d_name) + l >= sizeof(file))
+                               continue;
+                       strcpy(file + l, fn->d_name);
+                       if (stat(file, &st_tmp) != 0)
+                               continue;
+                       st_ret.st_size += st_tmp.st_size;
+                       st_ret.st_blocks++;
+                       if (st_tmp.st_atime != st_tmp.st_mtime &&
+                           st_tmp.st_atime > atime)
+                               atime = st_tmp.st_atime;
+                       if (st_tmp.st_mtime > mtime)
+                               mtime = st_tmp.st_mtime;
+               }
+               closedir(dd);
+       }
+
+       if (atime) st_ret.st_atime = atime;
+       if (mtime) st_ret.st_mtime = mtime;
+
+       *st = st_ret_last = st_ret;
+       return 0;
+}
+#endif
