@@ -1,3 +1,8 @@
+2003-07-29  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* users/6421: Src/Zle/zle_misc.c: Don't crash if alt-y is
+	typed twice in a row without a prior ctrl-y.
+
 2003-07-25  Peter Stephenson  <pws@csr.com>
 
 	* 18908: Doc/Zsh/builtins.yo, Functions/TCP/tcp_fd_handler,
