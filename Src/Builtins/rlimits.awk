@@ -33,6 +33,7 @@ BEGIN {limidx = 0}
 	    if (limnam == "NOFILE")  { msg[limnum] = "Ndescriptors" }
 	    if (limnam == "NPROC")   { msg[limnum] = "Nmaxproc" }
 	    if (limnam == "OFILE")   { msg[limnum] = "Ndescriptors" }
+	    if (limnam == "PTHREAD") { msg[limnum] = "Nmaxpthreads" }
 	    if (limnam == "RSS")     { msg[limnum] = "Mresident" }
 	    if (limnam == "SBSIZE")  { msg[limnum] = "Msockbufsize" }
 	    if (limnam == "STACK")   { msg[limnum] = "Mstacksize" }
