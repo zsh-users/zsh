@@ -76,6 +76,11 @@ mod_export int clearflag;
 /**/
 mod_export int clearlist;
 
+/* Zle in trashed state - updates may be subtly altered */
+
+/**/
+int trashedzle;
+
 #ifdef HAVE_SELECT
 /* cost of last update */
 /**/
@@ -167,6 +172,7 @@ resetvideo(void)
     olnct = nlnct = 0;
     if (showinglist > 0)
 	showinglist = -2;
+    trashedzle = 0;
 }
 
 /*
@@ -357,6 +363,20 @@ zrefresh(void)
             zputs(lpromptbuf, shout);
 	    if (lpromptwof == winw)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
+	} else {
+	    txtchange = pmpt_attr;
+	    if (txtchangeisset(TXTNOBOLDFACE))
+		tsetcap(TCALLATTRSOFF, 0);
+	    if (txtchangeisset(TXTNOSTANDOUT))
+		tsetcap(TCSTANDOUTEND, 0);
+	    if (txtchangeisset(TXTNOUNDERLINE))
+		tsetcap(TCUNDERLINEEND, 0);
+	    if (txtchangeisset(TXTBOLDFACE))
+		tsetcap(TCBOLDFACEBEG, 0);
+	    if (txtchangeisset(TXTSTANDOUT))
+		tsetcap(TCSTANDOUTBEG, 0);
+	    if (txtchangeisset(TXTUNDERLINE))
+		tsetcap(TCUNDERLINEBEG, 0);
 	}
 	if (clearflag) {
 	    zputc('\r', shout);
@@ -504,11 +524,14 @@ zrefresh(void)
 	zfree(nbuf[ln], winw + 2), nbuf[ln] = NULL;
 
 /* determine whether the right-prompt exists and can fit on the screen */
-    if (!more_start)
-	put_rpmpt = rprompth == 1 && rpromptbuf[0] &&
-	    !strchr(rpromptbuf, '\t') &&
-	    (int)strlen(nbuf[0]) + rpromptw < winw - 1;
-    else {
+    if (!more_start) {
+	if (trashedzle && opts[TRANSIENTRPROMPT])
+	    put_rpmpt = 0;
+	else
+	    put_rpmpt = rprompth == 1 && rpromptbuf[0] &&
+		!strchr(rpromptbuf, '\t') &&
+		(int)strlen(nbuf[0]) + rpromptw < winw - 1;
+    } else {
 /* insert >.... on first line if there is more text before start of screen */
 	memset(nbuf[0], ' ', lpromptw);
 	t0 = winw - lpromptw;
@@ -518,7 +541,7 @@ zrefresh(void)
 	nbuf[0][winw] = nbuf[0][winw + 1] = '\0';
     }
 
-    for (ln = 0; !clearf && (ln < nlnct); ln++) {
+    for (ln = 0; ln < nlnct; ln++) {
 	/* if we have more lines than last time, clear the newly-used lines */
 	if (ln >= olnct)
 	    cleareol = 1;
@@ -526,7 +549,7 @@ zrefresh(void)
     /* if old line and new line are different,
        see if we can insert/delete a line to speed up update */
 
-	if (ln > 0 && ln < olnct - 1 && !(hasam && vcs == winw) &&
+	if (!clearf && ln > 0 && ln < olnct - 1 && !(hasam && vcs == winw) &&
 	    nbuf[ln] && obuf[ln] &&
 	    strncmp(nbuf[ln], obuf[ln], 16)) {
 	    if (tccan(TCDELLINE) && obuf[ln + 1] && obuf[ln + 1][0] &&
@@ -558,6 +581,7 @@ zrefresh(void)
 
     /* output the right-prompt if appropriate */
 	if (put_rpmpt && !ln && !oput_rpmpt) {
+	    oput_rpmpt = put_rpmpt;
 	    moveto(0, winw - 1 - rpromptw);
 	    zputs(rpromptbuf, shout);
 	    vcs = winw - 1;
@@ -616,7 +640,6 @@ individually */
 /* store current values so we can use them next time */
     ovln = nvln;
     olnct = nlnct;
-    oput_rpmpt = put_rpmpt;
     onumscrolls = numscrolls;
     if (nlnct > vmaxln)
 	vmaxln = nlnct;

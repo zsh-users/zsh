@@ -199,6 +199,7 @@ static struct optname optns[] = {
 {NULL, "singlecommand",	      OPT_SPECIAL,		 SINGLECOMMAND},
 {NULL, "singlelinezle",	      OPT_KSH,			 SINGLELINEZLE},
 {NULL, "sunkeyboardhack",     0,			 SUNKEYBOARDHACK},
+{NULL, "transientrprompt",    0,			 TRANSIENTRPROMPT},
 {NULL, "unset",		      OPT_EMULATE|OPT_BSHELL,	 UNSET},
 {NULL, "verbose",	      0,			 VERBOSE},
 {NULL, "xtrace",	      0,			 XTRACE},

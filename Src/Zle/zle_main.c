@@ -1057,6 +1057,7 @@ trashzle(void)
 	 * extra `inlist' check]).                                          */
 	int sl = showinglist;
 	showinglist = 0;
+	trashedzle = 1;
 	zrefresh();
 	showinglist = sl;
 	moveto(nlnct, 0);

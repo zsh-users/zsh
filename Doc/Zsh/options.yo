@@ -1153,6 +1153,11 @@ of backquotes on the line, ignore the trailing backquote.
 This is useful on some keyboards where the return key is
 too small, and the backquote key lies annoyingly close to it.
 )
+pindex(TRANSIENT_RPROMPT)
+item(tt(TRANSIENT_RPROMPT))(
+Remove any right prompt from display when accepting a command
+line.  This may be useful with terminals with other cut/paste methods.
+)
 pindex(UNSET)
 cindex(parameters, substituting unset)
 cindex(unset parameters, substituting)
