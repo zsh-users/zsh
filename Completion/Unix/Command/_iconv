@@ -1,0 +1,54 @@
+#compdef iconv
+
+local expl curcontext="$curcontext" state line codeset LOCPATH
+
+(( $+_is_gnu )) || typeset -gA _is_gnu
+if (( ! $+_is_gnu[$words[1]] )); then
+  if [[ $(_call_program version $words[1] --version </dev/null 2>/dev/null) = *GNU* ]]; 
+  then
+    _is_gnu[$words[1]]=yes
+  else
+    _is_gnu[$words[1]]=
+  fi
+fi
+
+if [[ -n "$_is_gnu[$words[1]]" ]]; then
+
+  _arguments -C \
+    {'(--from-code --list)-f','(-f --list)--from-code='}'[specify code set of input file]:code set:->codeset' \
+    {'(--to-code --list)-t','(-t --list)--to-code='}'[specify code set for output]:code set:->codeset' \
+    '--list[list all character code sets]' \
+    '--verbose[print progress information]' \
+    {'(--help)-\?','(-\?)--help'}'[display help information]' \
+    '--usage[display a short usage message]' \
+    {'(--version)-V','(-V)--version'}'[print program version]' \
+    '1:file:_files' && return 0
+    
+    if [[ $state = codeset ]]; then
+      _wanted codesets expl 'code set' \
+          compadd "$@" ${${(s:,:)$(iconv --list|sed -n '/^$/,$ p')}## #}
+    fi
+    
+else
+
+  _arguments -C \
+    '-f[specify code set of input file]:code set:->codeset' \
+    '-t[specify code set for output]:code set:->codeset' \
+    '1:file:_files' && return 0
+
+    if [[ $state = codeset ]]; then
+      if [[ -f /usr/lib/iconv/iconv_data ]]; then  # IRIX & Solaris
+	codeset=( ${${(f)"$(</usr/lib/iconv/iconv_data)"}%%[[:blank:]]*} )
+      elif [[ -d ${LOCPATH:=/usr/lib/nls/loc}/iconv ]]; then  # OSF
+	codeset=( $LOCPATH/iconv/*(N:t) )
+	codeset=( ${(j:_:s:_:)codeset} )
+      else
+	return 1
+      fi
+	
+      _wanted codesets expl 'code set' compadd "$@" -a codeset
+    fi
+
+fi    
+    
+    
