@@ -1,5 +1,9 @@
 2001-03-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13730: Completion/Core/_approximate: probably no reason to
+	put the (#a?) flag after an initial tilde in _approximate
+	anymore
+
 	* 13727: Completion/User/_init_d, Completion/User/_make,
 	Doc/Zsh/compsys.yo: add commands and call-command styles;
 	mention some of the more expensive things about completion

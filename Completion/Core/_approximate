@@ -53,11 +53,12 @@ if (( ! $+functions[compadd] )); then
     [[ ${argv[(I)-[a-zA-Z]#U[a-zA-Z]#]} -eq 0 &&
        "${#:-$PREFIX$SUFFIX}" -le _comp_correct ]] && return
 
-    if [[ "$PREFIX" = \~*/* ]]; then
-      PREFIX="${PREFIX%%/*}/(#a${_comp_correct})${PREFIX#*/}"
-    else
+    ### This distinction doesn't seem to be needed anymore
+    # if [[ "$PREFIX" = \~*/* ]]; then
+    #   PREFIX="${PREFIX%%/*}/(#a${_comp_correct})${PREFIX#*/}"
+    # else
       PREFIX="(#a${_comp_correct})$PREFIX"
-    fi
+    # fi
     builtin compadd "$_correct_expl[@]" "$@"
   }
 fi
