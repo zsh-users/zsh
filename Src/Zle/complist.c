@@ -1556,7 +1556,7 @@ singledraw()
     mcc2 = singlecalc(&mc2, ml2, &lc2);
 
     if (md1)
-        tcmultout(TCDOWN, TCMULTDOWN, md1);
+        tc_downcurs(md1);
     if (mc1)
         tcmultout(TCRIGHT, TCMULTRIGHT, mc1);
     g = mgtab[ml1 * columns + mc1];
@@ -1565,7 +1565,7 @@ singledraw()
     putc('\r', shout);
 
     if (md2 != md1)
-        tcmultout(TCDOWN, TCMULTDOWN, md2 - md1);
+        tc_downcurs(md2 - md1);
     if (mc2)
         tcmultout(TCRIGHT, TCMULTRIGHT, mc2);
     g = mgtab[ml2 * columns + mc2];
@@ -1576,7 +1576,7 @@ singledraw()
     if (mstatprinted) {
         int i = lines - md2 - nlnct;
 
-        tcmultout(TCDOWN, TCMULTDOWN, i - 1);
+        tc_downcurs(i - 1);
         compprintfmt(NULL, 0, 1, 1, mline, NULL);
         tcmultout(TCUP, TCMULTUP, lines - 1);
     } else

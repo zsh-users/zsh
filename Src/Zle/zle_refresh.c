@@ -1062,7 +1062,7 @@ tc_rightcurs(int ct)
 }
 
 /**/
-static int
+mod_export int
 tc_downcurs(int ct)
 {
     int ret = 0;
