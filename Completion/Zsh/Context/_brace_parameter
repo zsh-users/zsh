@@ -1,0 +1,3 @@
+#compdef -brace-parameter-
+
+_parameters -e
