@@ -191,6 +191,11 @@ struct lexstack {
     void (*hwend) _((void));
     void (*addtoline) _((int));
 
+    int eclen, ecused, ecfree, ecnpats;
+    Wordcode ecbuf;
+    Eccstr ecstrs;
+    int ecsoffs;
+
     unsigned char *cstack;
     int csp;
 };
@@ -243,6 +248,13 @@ lexsave(void)
     ls->hwbegin = hwbegin;
     ls->hwend = hwend;
     ls->addtoline = addtoline;
+    ls->eclen = eclen;
+    ls->ecused = ecused;
+    ls->ecfree = ecfree;
+    ls->ecnpats = ecnpats;
+    ls->ecbuf = ecbuf;
+    ls->ecstrs = ecstrs;
+    ls->ecsoffs = ecsoffs;
     cmdsp = 0;
     inredir = 0;
     hdocs = NULL;
@@ -295,6 +307,13 @@ lexrestore(void)
     hwbegin = lstack->hwbegin;
     hwend = lstack->hwend;
     addtoline = lstack->addtoline;
+    eclen = lstack->eclen;
+    ecused = lstack->ecused;
+    ecfree = lstack->ecfree;
+    ecnpats = lstack->ecnpats;
+    ecbuf = lstack->ecbuf;
+    ecstrs = lstack->ecstrs;
+    ecsoffs = lstack->ecsoffs;
     hlinesz = lstack->hlinesz;
     errflag = 0;
 
@@ -315,15 +334,17 @@ yylex(void)
     if (tok == NEWLIN || tok == ENDINPUT) {
 	while (hdocs) {
 	    struct heredocs *next = hdocs->next;
+	    char *name;
 
 	    hwbegin(0);
-	    cmdpush(hdocs->rd->type == HEREDOC ? CS_HEREDOC : CS_HEREDOCD);
+	    cmdpush(WC_REDIR_TYPE(*(hdocs->pc)) == HEREDOC ?
+		    CS_HEREDOC : CS_HEREDOCD);
 	    STOPHIST
-	    hdocs->rd->name = gethere(hdocs->rd->name, hdocs->rd->type);
+	    name = gethere(hdocs->str, WC_REDIR_TYPE(*hdocs->pc));
 	    ALLOWHIST
 	    cmdpop();
 	    hwend();
-	    hdocs->rd->type = HERESTR;
+	    setheredoc(hdocs->pc, HERESTR, name);
 	    zfree(hdocs, sizeof(struct heredocs));
 	    hdocs = next;
 	}
@@ -1458,52 +1479,62 @@ exalias(void)
 	yytext = tokstrings[tok];
 
 	return 0;
-    }
+    } else {
+	VARARR(char, copy, (strlen(tokstr) + 1));
 
-    if (has_token(tokstr)) {
-	char *p, *t;
+	if (has_token(tokstr)) {
+	    char *p, *t;
 
-	yytext = p = ncalloc(strlen(tokstr) + 1);
-	for (t = tokstr; (*p++ = itok(*t) ? ztokens[*t++ - Pound] : *t++););
-    } else
-	yytext = tokstr;
+	    yytext = p = copy;
+	    for (t = tokstr;
+		 (*p++ = itok(*t) ? ztokens[*t++ - Pound] : *t++););
+	} else
+	    yytext = tokstr;
 
-    if (zleparse && !(inbufflags & INP_ALIAS)) {
-	int zp = zleparse;
+	if (zleparse && !(inbufflags & INP_ALIAS)) {
+	    int zp = zleparse;
 
-	gotword();
-	if (zp == 1 && !zleparse) {
-	    return 0;
-	}
-    }
-
-    if (tok == STRING) {
-	/* Check for an alias */
-	an = noaliases ? NULL : (Alias) aliastab->getnode(aliastab, yytext);
-	if (an && !an->inuse && ((an->flags & ALIAS_GLOBAL) || incmdpos ||
-	     inalmore)) {
-	    inpush(an->text, INP_ALIAS, an);
-	    /* remove from history if it begins with space */
-	    if (isset(HISTIGNORESPACE) && an->text[0] == ' ')
-		remhist();
-	    lexstop = 0;
-	    return 1;
+	    gotword();
+	    if (zp == 1 && !zleparse) {
+		if (yytext == copy)
+		    yytext = tokstr;
+		return 0;
+	    }
 	}
 
-	/* Then check for a reserved word */
-	if ((incmdpos ||
-	     (unset(IGNOREBRACES) && yytext[0] == '}' && !yytext[1])) &&
-	    (rw = (Reswd) reswdtab->getnode(reswdtab, yytext))) {
-	    tok = rw->token;
-	    if (tok == DINBRACK)
-		incond = 1;
-	} else if (incond && !strcmp(yytext, "]]")) {
-	    tok = DOUTBRACK;
-	    incond = 0;
-	} else if (incond && yytext[0] == '!' && !yytext[1])
-	    tok = BANG;
+	if (tok == STRING) {
+	    /* Check for an alias */
+	    an = noaliases ? NULL :
+		(Alias) aliastab->getnode(aliastab, yytext);
+	    if (an && !an->inuse && ((an->flags & ALIAS_GLOBAL) || incmdpos ||
+				     inalmore)) {
+		inpush(an->text, INP_ALIAS, an);
+		/* remove from history if it begins with space */
+		if (isset(HISTIGNORESPACE) && an->text[0] == ' ')
+		    remhist();
+		lexstop = 0;
+		if (yytext == copy)
+		    yytext = tokstr;
+		return 1;
+	    }
+
+	    /* Then check for a reserved word */
+	    if ((incmdpos ||
+		 (unset(IGNOREBRACES) && yytext[0] == '}' && !yytext[1])) &&
+		(rw = (Reswd) reswdtab->getnode(reswdtab, yytext))) {
+		tok = rw->token;
+		if (tok == DINBRACK)
+		    incond = 1;
+	    } else if (incond && !strcmp(yytext, "]]")) {
+		tok = DOUTBRACK;
+		incond = 0;
+	    } else if (incond && yytext[0] == '!' && !yytext[1])
+		tok = BANG;
+	}
+	inalmore = 0;
+	if (yytext == copy)
+	    yytext = tokstr;
     }
-    inalmore = 0;
     return 0;
 }
 

@@ -209,7 +209,7 @@ int
 execbuiltin(LinkList args, Builtin bn)
 {
     LinkNode n;
-    char ops[MAX_OPS], *arg, *pp, *name, **argv, **oargv, *optstr;
+    char ops[MAX_OPS], *arg, *pp, *name, *optstr;
     char *oxarg, *xarg = NULL;
     char typenumstr[] = TYPESET_OPTNUM;
     int flags, sense, argc = 0, execop, xtr = isset(XTRACE), lxarg = 0;
@@ -330,37 +330,42 @@ execbuiltin(LinkList args, Builtin bn)
 	while (n)
 	    argc++, incnode(n);
     }
-    /* Get the actual arguments, into argv.  Oargv saves the *
-     * beginning of the array for later reference.           */
-    oargv = argv = (char **)ncalloc(sizeof(char **) * (argc + 1));
-    if ((*argv++ = arg))
-	while ((*argv++ = (char *)ugetnode(args)));
-    argv = oargv;
-    if (errflag) {
-	errflag = 0;
-	return 1;
-    }
+    {
+	VARARR(char *, argarr, (argc + 1));
+	char **argv, **oargv;
 
-    /* check that the argument count lies within the specified bounds */
-    if (argc < bn->minargs || (argc > bn->maxargs && bn->maxargs != -1)) {
-	zwarnnam(name, (argc < bn->minargs)
-		? "not enough arguments" : "too many arguments", NULL, 0);
-	return 1;
-    }
+	/* Get the actual arguments, into argv.  Oargv saves the *
+	 * beginning of the array for later reference.           */
+	oargv = argv = argarr;
+	if ((*argv++ = arg))
+	    while ((*argv++ = (char *)ugetnode(args)));
+	argv = oargv;
+	if (errflag) {
+	    errflag = 0;
+	    return 1;
+	}
 
-    /* display execution trace information, if required */
-    if (xtr) {
-	printprompt4();
-	fprintf(xtrerr, "%s", name);
-	if (xarg)
-	    fprintf(xtrerr, " %s", xarg);
-	while (*oargv)
-	    fprintf(xtrerr, " %s", *oargv++);
-	fputc('\n', xtrerr);
-	fflush(xtrerr);
+	/* check that the argument count lies within the specified bounds */
+	if (argc < bn->minargs || (argc > bn->maxargs && bn->maxargs != -1)) {
+	    zwarnnam(name, (argc < bn->minargs)
+		     ? "not enough arguments" : "too many arguments", NULL, 0);
+	    return 1;
+	}
+
+	/* display execution trace information, if required */
+	if (xtr) {
+	    printprompt4();
+	    fprintf(xtrerr, "%s", name);
+	    if (xarg)
+		fprintf(xtrerr, " %s", xarg);
+	    while (*oargv)
+		fprintf(xtrerr, " %s", *oargv++);
+	    fputc('\n', xtrerr);
+	    fflush(xtrerr);
+	}
+	/* call the handler function, and return its return value */
+	return (*(bn->handlerfunc)) (name, argv, ops, bn->funcid);
     }
-    /* call the handler function, and return its return value */
-    return (*(bn->handlerfunc)) (name, argv, ops, bn->funcid);
 }
 
 /* Enable/disable an element in one of the internal hash tables.  *
@@ -704,12 +709,14 @@ bin_cd(char *nam, char **argv, char *ops, int func)
     cd_new_pwd(func, dir);
 
     if (stat(unmeta(pwd), &st1) < 0) {
+	setjobpwd();
 	zsfree(pwd);
 	pwd = metafy(zgetcwd(), -1, META_DUP);
     } else if (stat(".", &st2) < 0)
 	chdir(unmeta(pwd));
     else if (st1.st_ino != st2.st_ino || st1.st_dev != st2.st_dev) {
 	if (chasinglinks) {
+	    setjobpwd();
 	    zsfree(pwd);
 	    pwd = metafy(zgetcwd(), -1, META_DUP);
 	} else {
@@ -1004,6 +1011,7 @@ cd_new_pwd(int func, LinkNode dir)
     current (i.e. new) pwd */
     zsfree(oldpwd);
     oldpwd = pwd;
+    setjobpwd();
     pwd = new_pwd;
     set_pwd_env();
 
@@ -2154,7 +2162,7 @@ mkautofn(Shfunc shf)
     p->pats = NULL;
     p->heap = 0;
 
-    p->prog[0] = WCB_LIST(Z_SYNC | Z_END);
+    p->prog[0] = WCB_LIST((Z_SYNC | Z_END), 0);
     p->prog[1] = WCB_SUBLIST(WC_SUBLIST_END, 0, 3);
     p->prog[2] = WCB_PIPE(WC_PIPE_END, 0);
     p->prog[3] = WCB_AUTOFN();

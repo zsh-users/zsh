@@ -134,6 +134,14 @@ mod_export Funcstack funcstack;
 static LinkList args;
 static int doneps4;
 
+/* Execution functions. */
+
+static int (*execfuncs[]) _((Estate, int)) = {
+    execcursh, exectime, execfuncdef, execfor, execselect,
+    execwhile, execrepeat, execcase, execif, execcond,
+    execarith, execautofn
+};
+
 /* parse string into a list */
 
 /**/
@@ -713,6 +721,33 @@ execode(Eprog p, int dont_change_job, int exiting)
     execlist(&s, dont_change_job, exiting);
 }
 
+/* Execute a simplified command. This is used to execute things that
+ * will run completely in the shell, so that we can by-pass all that
+ * nasty job-handling and redirection stuff in execpline and execcmd. */
+
+/**/
+static int
+execsimple(Estate state)
+{
+    wordcode code = *state->pc++;
+
+    if (code)
+	lineno = code - 1;
+
+    code = wc_code(*state->pc++);
+
+    if (code == WC_ASSIGN) {
+	cmdoutval = 0;
+	addvars(state, state->pc - 1, 0);
+	if (isset(XTRACE)) {
+	    fputc('\n', xtrerr);
+	    fflush(xtrerr);
+	}
+	return (lastval = (errflag ? errflag : cmdoutval));
+    } else
+	return (lastval = (execfuncs[code - WC_CURSH])(state, 0));
+}
+
 /* Main routine for executing a list.                                *
  * exiting means that the (sub)shell we are in is a definite goner   *
  * after the current list is finished, so we may be able to exec the *
@@ -749,11 +784,18 @@ execlist(Estate state, int dont_change_job, int exiting)
      * semi-colon or ampersand (`sublists').               */
     code = *state->pc++;
     while (wc_code(code) == WC_LIST && !breaks && !retflag) {
+	ltype = WC_LIST_TYPE(code);
+	csp = cmdsp;
+
+	if (ltype & Z_SIMPLE) {
+	    next = state->pc + WC_LIST_SKIP(code);
+	    execsimple(state);
+	    state->pc = next;
+	    goto sublist_done;
+	}
 	/* Reset donetrap:  this ensures that a trap is only *
 	 * called once for each sublist that fails.          */
 	donetrap = 0;
-	csp = cmdsp;
-	ltype = WC_LIST_TYPE(code);
 
 	/* Loop through code followed by &&, ||, or end of sublist. */
 	code = *state->pc++;
@@ -764,14 +806,19 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    switch (WC_SUBLIST_TYPE(code)) {
 	    case WC_SUBLIST_END:
 		/* End of sublist; just execute, ignoring status. */
-		execpline(state, code, ltype, (ltype & Z_END) && exiting);
+		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE)
+		    execsimple(state);
+		else
+		    execpline(state, code, ltype, (ltype & Z_END) && exiting);
 		state->pc = next;
 		goto sublist_done;
 		break;
 	    case WC_SUBLIST_AND:
 		/* If the return code is non-zero, we skip pipelines until *
 		 * we find a sublist followed by ORNEXT.                   */
-		if ((ret = execpline(state, code, Z_SYNC, 0))) {
+		if ((ret = ((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) ?
+			    execsimple(state) :
+			    execpline(state, code, Z_SYNC, 0)))) {
 		    state->pc = next;
 		    code = *state->pc++;
 		    next = state->pc + WC_SUBLIST_SKIP(code);
@@ -794,7 +841,9 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    case WC_SUBLIST_OR:
 		/* If the return code is zero, we skip pipelines until *
 		 * we find a sublist followed by ANDNEXT.              */
-		if (!(ret = execpline(state, code, Z_SYNC, 0))) {
+		if (!(ret = ((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) ?
+			     execsimple(state) :
+			     execpline(state, code, Z_SYNC, 0)))) {
 		    state->pc = next;
 		    code = *state->pc++;
 		    next = state->pc + WC_SUBLIST_SKIP(code);
@@ -1190,6 +1239,7 @@ makecline(LinkList list)
     /* A bigger argv is necessary for executing scripts */
     ptr = argv = 2 + (char **) ncalloc((countlinknodes(list) + 4) *
 				       sizeof(char *));
+
     if (isset(XTRACE)) {
 	if (!doneps4)
 	    printprompt4();
@@ -1390,10 +1440,11 @@ static void
 addvars(Estate state, Wordcode pc, int export)
 {
     LinkList vl;
-    int xtr, isstr;
+    int xtr, isstr, htok = 0;
     char **arr, **ptr, *name;
     Wordcode opc = state->pc;
     wordcode ac;
+    local_list1(svl);
 
     xtr = isset(XTRACE);
     if (xtr) {
@@ -1402,17 +1453,18 @@ addvars(Estate state, Wordcode pc, int export)
     }
     state->pc = pc;
     while (wc_code(ac = *state->pc++) == WC_ASSIGN) {
-	name = ecgetstr(state, 1);
-	untokenize(name);
+	name = ecgetstr(state, EC_DUPTOK, &htok);
+	if (htok)
+	    untokenize(name);
 	if (xtr)
 	    fprintf(xtrerr, "%s=", name);
 	if ((isstr = (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR))) {
-	    vl = newlinklist();
-	    addlinknode(vl, ecgetstr(state, 1));
+	    init_list1(svl, ecgetstr(state, EC_DUPTOK, &htok));
+	    vl = &svl;
 	} else
-	    vl = ecgetlist(state, WC_ASSIGN_NUM(ac), 1);
+	    vl = ecgetlist(state, WC_ASSIGN_NUM(ac), EC_DUPTOK, &htok);
 
-	if (vl) {
+	if (vl && htok) {
 	    prefork(vl, (isstr ? (PF_SINGLE|PF_ASSIGN) :
 			 PF_ASSIGN));
 	    if (errflag) {
@@ -1490,17 +1542,19 @@ void
 setunderscore(char *str)
 {
     if (str && *str) {
-	int l = strlen(str) + 1;
+	int l = strlen(str) + 1, nl = (l + 31) & ~31;
 
-	if (l > underscorelen || l < (underscorelen >> 2)) {
+	if (nl > underscorelen || (underscorelen - nl) > 64) {
 	    zfree(underscore, underscorelen);
-	    underscore = (char *) zalloc(underscorelen = l);
+	    underscore = (char *) zalloc(underscorelen = nl);
 	}
 	strcpy(underscore, str);
 	underscoreused = l;
     } else {
-	zfree(underscore, underscorelen);
-	underscore = (char *) zalloc(underscorelen = 32);
+	if (underscorelen > 128) {
+	    zfree(underscore, underscorelen);
+	    underscore = (char *) zalloc(underscorelen = 32);
+	}
 	*underscore = '\0';
 	underscoreused = 1;
     }
@@ -1537,7 +1591,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     struct multio *mfds[10];
     char *text;
     int save[10];
-    int fil, dfil, is_cursh, type, do_exec = 0, i;
+    int fil, dfil, is_cursh, type, do_exec = 0, i, htok = 0;
     int nullexec = 0, assign = 0, forked = 0;
     int is_shfunc = 0, is_builtin = 0, is_exec = 0;
     /* Various flags to the command. */
@@ -1560,8 +1614,11 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     type = wc_code(code);
 
+    /* It would be nice if we could use EC_DUPTOK instead of EC_DUP here.
+     * But for that we would need to check/change all builtins so that
+     * they don't modify their argument strings. */
     args = (type == WC_SIMPLE ?
-	    ecgetlist(state, WC_SIMPLE_ARGC(code), 1) : NULL);
+	    ecgetlist(state, WC_SIMPLE_ARGC(code), EC_DUP, &htok) : NULL);
 
     for (i = 0; i < 10; i++) {
 	save[i] = -2;
@@ -1633,7 +1690,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     /* Do prefork substitutions */
     esprefork = (assign || isset(MAGICEQUALSUBST)) ? PF_TYPESET : 0;
-    if (args)
+    if (args && htok)
 	prefork(args, esprefork);
 
     if (type == WC_SIMPLE) {
@@ -1890,7 +1947,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		wordcode ac;
 
 		while (wc_code(ac = *p) == WC_ASSIGN) {
-		    if (!strcmp(ecrawstr(state->prog, p + 1), "STTY")) {
+		    if (!strcmp(ecrawstr(state->prog, p + 1, NULL), "STTY")) {
 			jobtab[thisjob].stty_in_env = 1;
 			break;
 		    }
@@ -1926,7 +1983,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	is_exec = 1;
     }
 
-    if ((esglob = !(cflags & BINF_NOGLOB)) && args) {
+    if ((esglob = !(cflags & BINF_NOGLOB)) && args && htok) {
 	LinkList oargs = args;
 	globlist(args, 0);
 	args = oargs;
@@ -2087,7 +2144,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
     /* We are done with redirection.  close the mnodes, *
      * spawning tee/cat processes as necessary.         */
     for (i = 0; i < 10; i++)
-	closemn(mfds, i);
+	if (mfds[i] && mfds[i]->ct >= 2)
+	    closemn(mfds, i);
 
     if (nullexec) {
 	if (nullexec == 1) {
@@ -2120,15 +2178,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	if (is_exec)
 	    entersubsh(how, (type != WC_SUBSH) ? 2 : 1, 1);
 	if (type >= WC_CURSH) {
-	    static int (*func[]) _((Estate, int)) = {
-		execcursh, exectime, execfuncdef, execfor, execselect,
-		execwhile, execrepeat, execcase, execif, execcond,
-		execarith, execautofn
-	    };
-
 	    if (last1 == 1)
 		do_exec = 1;
-	    lastval = (func[type - WC_CURSH])(state, do_exec);
+	    lastval = (execfuncs[type - WC_CURSH])(state, do_exec);
 	} else if (is_builtin || is_shfunc) {
 	    LinkList restorelist = 0, removelist = 0;
 	    /* builtin or shell function */
@@ -2136,16 +2188,20 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (!forked && ((cflags & BINF_COMMAND) ||
 			    (unset(POSIXBUILTINS) && !assign) ||
 			    (isset(POSIXBUILTINS) && !is_shfunc &&
-			     !(hn->flags & BINF_PSPECIAL))))
-		save_params(state, varspc, &restorelist, &removelist);
-
+			     !(hn->flags & BINF_PSPECIAL)))) {
+		if (varspc)
+		    save_params(state, varspc, &restorelist, &removelist);
+		else
+		    restorelist = removelist = NULL;
+	    }
 	    if (varspc) {
 		/* Export this if the command is a shell function,
 		 * but not if it's a builtin.
 		 */
 		addvars(state, varspc, is_shfunc);
 		if (errflag) {
-		    restore_params(restorelist, removelist);
+		    if (restorelist)
+			restore_params(restorelist, removelist);
 		    lastval = 1;
 		    fixfds(save);
 		    goto done;
@@ -2204,7 +2260,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
 		exit(lastval);
 	    }
-	    restore_params(restorelist, removelist);
+	    if (restorelist)
+		restore_params(restorelist, removelist);
 
 	} else {
 	    if (!forked)
@@ -2271,15 +2328,11 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 
     MUSTUSEHEAP("save_params()");
     
-    if (!pc) {
-	*restore_p = *remove_p = NULL;
-	return;
-    }
     *restore_p = newlinklist();
     *remove_p = newlinklist();
 
     while (wc_code(ac = *pc) == WC_ASSIGN) {
-	s = ecrawstr(state->prog, pc + 1);
+	s = ecrawstr(state->prog, pc + 1, NULL);
 	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
 	    if (!(pm->flags & PM_SPECIAL)) {
 		paramtab->removenode(paramtab, s);
@@ -2309,14 +2362,12 @@ restore_params(LinkList restorelist, LinkList removelist)
     Param pm;
     char *s;
 
-    if (removelist) {
-	/* remove temporary parameters */
-	while ((s = (char *) ugetnode(removelist))) {
-	    if ((pm = (Param) paramtab->getnode(paramtab, s)) &&
-		!(pm->flags & PM_SPECIAL)) {
-		pm->flags &= ~PM_READONLY;
-		unsetparam_pm(pm, 0, 0);
-	    }
+    /* remove temporary parameters */
+    while ((s = (char *) ugetnode(removelist))) {
+	if ((pm = (Param) paramtab->getnode(paramtab, s)) &&
+	    !(pm->flags & PM_SPECIAL)) {
+	    pm->flags &= ~PM_READONLY;
+	    unsetparam_pm(pm, 0, 0);
 	}
     }
 
@@ -2560,7 +2611,7 @@ getoutput(char *cmd, int qt)
 	wc_code(pc[6]) == WC_SIMPLE && !WC_SIMPLE_ARGC(pc[6])) {
 	/* $(< word) */
 	int stream;
-	char *s = dupstring(ecrawstr(prog, pc + 5));
+	char *s = dupstring(ecrawstr(prog, pc + 5, NULL));
 
 	singsub(&s);
 	if (errflag)
@@ -2908,13 +2959,15 @@ execarith(Estate state, int do_exec)
 {
     char *e;
     zlong val = 0;
+    int htok = 0;
 
     if (isset(XTRACE)) {
 	printprompt4();
 	fprintf(xtrerr, "((");
     }
-    e = ecgetstr(state, 1);
-    singsub(&e);
+    e = ecgetstr(state, EC_DUPTOK, &htok);
+    if (htok)
+	singsub(&e);
     if (isset(XTRACE))
 	fprintf(xtrerr, " %s", e);
 
@@ -2954,21 +3007,22 @@ execfuncdef(Estate state, int do_exec)
 {
     Shfunc shf;
     char *s;
-    int signum, nprg, npats, len, plen, i;
+    int signum, nprg, npats, len, plen, i, htok = 0;
     Wordcode beg = state->pc, end;
     Eprog prog;
     Patprog *pp;
     LinkList names;
 
     end = beg + WC_FUNCDEF_SKIP(state->pc[-1]);
-    names = ecgetlist(state, *state->pc++, 1);
+    names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
     nprg = *state->pc++ - 4;
     npats = *state->pc++;
 
     plen = (end - state->pc) * sizeof(wordcode);
     len = plen + (npats * sizeof(Patprog));
 
-    execsubst(names);
+    if (htok)
+	execsubst(names);
 
     PERMALLOC {
 	while ((s = (char *) ugetnode(names))) {
@@ -3346,7 +3400,7 @@ stripkshdef(Eprog prog, char *name)
 	return prog;
     code = *pc++;
     if (wc_code(code) != WC_FUNCDEF ||
-	*pc != 1 || strcmp(name, ecrawstr(prog, pc + 1)))
+	*pc != 1 || strcmp(name, ecrawstr(prog, pc + 1, NULL)))
 	return prog;
 
     {

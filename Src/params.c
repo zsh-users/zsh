@@ -747,8 +747,8 @@ static zlong
 getarg(char **str, int *inv, Value v, int a2, zlong *w)
 {
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
-    int keymatch = 0;
-    char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt;
+    int keymatch = 0, needtok = 0;
+    char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt, c;
     zlong num = 1, beg = 0, r = 0;
     Patprog pprog = NULL;
 
@@ -870,21 +870,25 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	*inv = ind;
     }
 
-    for (t=s, i=0;
-	 *t && ((*t != ']' && *t != Outbrack && (ishash || *t != ',')) || i); t++)
-	if (*t == '[' || *t == Inbrack)
+    for (t = s, i = 0;
+	 (c = *t) && ((c != ']' && c != Outbrack &&
+		       (ishash || c != ',')) || i); t++) {
+	if (c == '[' || c == Inbrack)
 	    i++;
-	else if (*t == ']' || *t == Outbrack)
+	else if (c == ']' || c == Outbrack)
 	    i--;
-
-    if (!*t)
+	if (ispecial(c))
+	    needtok = 1;
+    }
+    if (!c)
 	return 0;
     s = dupstrpfx(s, t - s);
     *str = tt = t;
-    if (parsestr(s))
-	return 0;
-    singsub(&s);
-
+    if (needtok) {
+	if (parsestr(s))
+	    return 0;
+	singsub(&s);
+    }
     if (!rev) {
 	if (ishash) {
 	    HashTable ht = v->pm->gets.hfn(v->pm);
@@ -1177,43 +1181,42 @@ getindex(char **pptr, Value v)
 
 /**/
 mod_export Value
-getvalue(char **pptr, int bracks)
+getvalue(Value v, char **pptr, int bracks)
 {
-  return fetchvalue(pptr, bracks, 0);
+  return fetchvalue(v, pptr, bracks, 0);
 }
 
 /**/
 mod_export Value
-fetchvalue(char **pptr, int bracks, int flags)
+fetchvalue(Value v, char **pptr, int bracks, int flags)
 {
     char *s, *t;
-    char sav;
-    Value v;
+    char sav, c;
     int ppar = 0;
 
     s = t = *pptr;
 
-    if (idigit(*s)) {
+    if (idigit(c = *s)) {
 	if (bracks >= 0)
 	    ppar = zstrtol(s, &s, 10);
 	else
 	    ppar = *s++ - '0';
     }
-    else if (iident(*s))
+    else if (iident(c))
 	while (iident(*s))
 	    s++;
-    else if (*s == Quest)
+    else if (c == Quest)
 	*s++ = '?';
-    else if (*s == Pound)
+    else if (c == Pound)
 	*s++ = '#';
-    else if (*s == String)
+    else if (c == String)
 	*s++ = '$';
-    else if (*s == Qstring)
+    else if (c == Qstring)
 	*s++ = '$';
-    else if (*s == Star)
+    else if (c == Star)
 	*s++ = '*';
-    else if (*s == '#' || *s == '-' || *s == '?' || *s == '$' ||
-	     *s == '_' || *s == '!' || *s == '@' || *s == '*')
+    else if (c == '#' || c == '-' || c == '?' || c == '$' ||
+	     c == '!' || c == '@' || c == '*')
 	s++;
     else
 	return NULL;
@@ -1221,7 +1224,10 @@ fetchvalue(char **pptr, int bracks, int flags)
     if ((sav = *s))
 	*s = '\0';
     if (ppar) {
-	v = (Value) hcalloc(sizeof *v);
+	if (v)
+	    memset(v, 0, sizeof(*v));
+	else
+	    v = (Value) hcalloc(sizeof *v);
 	v->pm = argvparam;
 	v->inv = 0;
 	v->a = v->b = ppar - 1;
@@ -1231,14 +1237,17 @@ fetchvalue(char **pptr, int bracks, int flags)
 	Param pm;
 	int isvarat;
 
-        isvarat = !strcmp(t, "@");
+        isvarat = (t[0] == '@' && !t[1]);
 	pm = (Param) paramtab->getnode(paramtab, *t == '0' ? "0" : t);
 	if (sav)
 	    *s = sav;
 	*pptr = s;
 	if (!pm || (pm->flags & PM_UNSET))
 	    return NULL;
-	v = (Value) hcalloc(sizeof *v);
+	if (v)
+	    memset(v, 0, sizeof(*v));
+	else
+	    v = (Value) hcalloc(sizeof *v);
 	if (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED)) {
 	    /* Overload v->isarr as the flag bits for hashed arrays. */
 	    v->isarr = flags | (isvarat ? SCANPM_ISVAR_AT : 0);
@@ -1628,9 +1637,10 @@ setarrvalue(Value v, char **val)
 mod_export zlong
 getiparam(char *s)
 {
+    struct value vbuf;
     Value v;
 
-    if (!(v = getvalue(&s, 1)))
+    if (!(v = getvalue(&vbuf, &s, 1)))
 	return 0;
     return getintvalue(v);
 }
@@ -1641,8 +1651,10 @@ getiparam(char *s)
 mnumber
 getnparam(char *s)
 {
+    struct value vbuf;
     Value v;
-    if (!(v = getvalue(&s, 1))) {
+
+    if (!(v = getvalue(&vbuf, &s, 1))) {
 	mnumber mn;
 	mn.type = MN_INTEGER;
 	mn.u.l = 0;
@@ -1657,9 +1669,10 @@ getnparam(char *s)
 mod_export char *
 getsparam(char *s)
 {
+    struct value vbuf;
     Value v;
 
-    if (!(v = getvalue(&s, 0)))
+    if (!(v = getvalue(&vbuf, &s, 0)))
 	return NULL;
     return getstrvalue(v);
 }
@@ -1670,9 +1683,10 @@ getsparam(char *s)
 mod_export char **
 getaparam(char *s)
 {
+    struct value vbuf;
     Value v;
 
-    if (!idigit(*s) && (v = getvalue(&s, 0)) &&
+    if (!idigit(*s) && (v = getvalue(&vbuf, &s, 0)) &&
 	PM_TYPE(v->pm->flags) == PM_ARRAY)
 	return v->pm->gets.afn(v->pm);
     return NULL;
@@ -1684,9 +1698,10 @@ getaparam(char *s)
 mod_export char **
 gethparam(char *s)
 {
+    struct value vbuf;
     Value v;
 
-    if (!idigit(*s) && (v = getvalue(&s, 0)) &&
+    if (!idigit(*s) && (v = getvalue(&vbuf, &s, 0)) &&
 	PM_TYPE(v->pm->flags) == PM_HASHED)
 	return paramvalarr(v->pm->gets.hfn(v->pm), SCANPM_WANTVALS);
     return NULL;
@@ -1696,6 +1711,7 @@ gethparam(char *s)
 mod_export Param
 setsparam(char *s, char *val)
 {
+    struct value vbuf;
     Value v;
     char *t = s;
     char *ss;
@@ -1708,12 +1724,12 @@ setsparam(char *s, char *val)
     }
     if ((ss = strchr(s, '['))) {
 	*ss = '\0';
-	if (!(v = getvalue(&s, 1)))
+	if (!(v = getvalue(&vbuf, &s, 1)))
 	    createparam(t, PM_ARRAY);
 	*ss = '[';
 	v = NULL;
     } else {
-	if (!(v = getvalue(&s, 1)))
+	if (!(v = getvalue(&vbuf, &s, 1)))
 	    createparam(t, PM_SCALAR);
 	else if ((PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
 		 !(v->pm->flags & (PM_SPECIAL|PM_TIED)) && unset(KSHARRAYS)) {
@@ -1722,7 +1738,7 @@ setsparam(char *s, char *val)
 	    v = NULL;
 	}
     }
-    if (!v && !(v = getvalue(&t, 1))) {
+    if (!v && !(v = getvalue(&vbuf, &t, 1))) {
 	zsfree(val);
 	return NULL;
     }
@@ -1734,6 +1750,7 @@ setsparam(char *s, char *val)
 mod_export Param
 setaparam(char *s, char **val)
 {
+    struct value vbuf;
     Value v;
     char *t = s;
     char *ss;
@@ -1746,7 +1763,7 @@ setaparam(char *s, char **val)
     }
     if ((ss = strchr(s, '['))) {
 	*ss = '\0';
-	if (!(v = getvalue(&s, 1)))
+	if (!(v = getvalue(&vbuf, &s, 1)))
 	    createparam(t, PM_ARRAY);
 	*ss = '[';
 	if (v && PM_TYPE(v->pm->flags) == PM_HASHED) {
@@ -1757,7 +1774,7 @@ setaparam(char *s, char **val)
 	}
 	v = NULL;
     } else {
-	if (!(v = fetchvalue(&s, 1, SCANPM_ASSIGNING)))
+	if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING)))
 	    createparam(t, PM_ARRAY);
 	else if (!(PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
 		 !(v->pm->flags & (PM_SPECIAL|PM_TIED))) {
@@ -1768,7 +1785,7 @@ setaparam(char *s, char **val)
 	}
     }
     if (!v)
-	if (!(v = fetchvalue(&t, 1, SCANPM_ASSIGNING)))
+	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING)))
 	    return NULL;
     setarrvalue(v, val);
     return v->pm;
@@ -1778,6 +1795,7 @@ setaparam(char *s, char **val)
 mod_export Param
 sethparam(char *s, char **val)
 {
+    struct value vbuf;
     Value v;
     char *t = s;
 
@@ -1793,7 +1811,7 @@ sethparam(char *s, char **val)
 	errflag = 1;
 	return NULL;
     } else {
-	if (!(v = fetchvalue(&s, 1, SCANPM_ASSIGNING)))
+	if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING)))
 	    createparam(t, PM_HASHED);
 	else if (!(PM_TYPE(v->pm->flags) & PM_HASHED) &&
 		 !(v->pm->flags & PM_SPECIAL)) {
@@ -1803,7 +1821,7 @@ sethparam(char *s, char **val)
 	}
     }
     if (!v)
-	if (!(v = fetchvalue(&t, 1, SCANPM_ASSIGNING)))
+	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING)))
 	    return NULL;
     setarrvalue(v, val);
     return v->pm;
@@ -1813,6 +1831,7 @@ sethparam(char *s, char **val)
 mod_export Param
 setiparam(char *s, zlong val)
 {
+    struct value vbuf;
     Value v;
     char *t = s;
     Param pm;
@@ -1823,7 +1842,7 @@ setiparam(char *s, zlong val)
 	errflag = 1;
 	return NULL;
     }
-    if (!(v = getvalue(&s, 1))) {
+    if (!(v = getvalue(&vbuf, &s, 1))) {
 	pm = createparam(t, PM_INTEGER);
 	DPUTS(!pm, "BUG: parameter not created");
 	pm->u.val = val;
@@ -1844,6 +1863,7 @@ setiparam(char *s, zlong val)
 Param
 setnparam(char *s, mnumber val)
 {
+    struct value vbuf;
     Value v;
     char *t = s;
     Param pm;
@@ -1853,7 +1873,7 @@ setnparam(char *s, mnumber val)
 	errflag = 1;
 	return NULL;
     }
-    if (!(v = getvalue(&s, 1))) {
+    if (!(v = getvalue(&vbuf, &s, 1))) {
 	pm = createparam(t, (val.type & MN_INTEGER) ? PM_INTEGER
 			 : PM_FFLOAT);
 	DPUTS(!pm, "BUG: parameter not created");

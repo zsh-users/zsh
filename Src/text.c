@@ -78,7 +78,7 @@ taddlist(Estate state, int num)
 {
     if (num) {
 	while (num--) {
-	    taddstr(ecgetstr(state, 0));
+	    taddstr(ecgetstr(state, EC_NODUP, NULL));
 	    taddchr(' ');
 	}
 	tptr--;
@@ -243,7 +243,7 @@ gettext2(Estate state)
 	switch (wc_code(code)) {
 	case WC_LIST:
 	    if (!s) {
-		tpush(code, (WC_LIST_TYPE(code) & Z_END));
+		s = tpush(code, (WC_LIST_TYPE(code) & Z_END));
 		stack = 0;
 	    } else {
 		if (WC_LIST_TYPE(code) & Z_ASYNC) {
@@ -260,6 +260,8 @@ gettext2(Estate state)
 		    s->pop = (WC_LIST_TYPE(s->code) & Z_END);
 		}
 	    }
+	    if (!stack && (WC_LIST_TYPE(s->code) & Z_SIMPLE))
+		state->pc++;
 	    break;
 	case WC_SUBLIST:
 	    if (!s) {
@@ -306,14 +308,14 @@ gettext2(Estate state)
 	    }
 	    break;
 	case WC_ASSIGN:
-	    taddstr(ecgetstr(state, 0));
+	    taddstr(ecgetstr(state, EC_NODUP, NULL));
 	    taddchr('=');
 	    if (WC_ASSIGN_TYPE(code) == WC_ASSIGN_ARRAY) {
 		taddchr('(');
 		taddlist(state, WC_ASSIGN_NUM(code));
 		taddstr(") ");
 	    } else {
-		taddstr(ecgetstr(state, 0));
+		taddstr(ecgetstr(state, EC_NODUP, NULL));
 		taddchr(' ');
 	    }
 	    break;
@@ -391,14 +393,14 @@ gettext2(Estate state)
 		taddstr("for ");
 		if (WC_FOR_TYPE(code) == WC_FOR_COND) {
 		    taddstr("((");
-		    taddstr(ecgetstr(state, 0));
+		    taddstr(ecgetstr(state, EC_NODUP, NULL));
 		    taddstr("; ");
-		    taddstr(ecgetstr(state, 0));
+		    taddstr(ecgetstr(state, EC_NODUP, NULL));
 		    taddstr("; ");
-		    taddstr(ecgetstr(state, 0));
+		    taddstr(ecgetstr(state, EC_NODUP, NULL));
 		    taddstr(")) do");
 		} else {
-		    taddstr(ecgetstr(state, 0));
+		    taddstr(ecgetstr(state, EC_NODUP, NULL));
 		    if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
 			taddstr(" in ");
 			taddlist(state, *state->pc++);
@@ -419,7 +421,7 @@ gettext2(Estate state)
 	case WC_SELECT:
 	    if (!s) {
 		taddstr("select ");
-		taddstr(ecgetstr(state, 0));
+		taddstr(ecgetstr(state, EC_NODUP, NULL));
 		if (WC_SELECT_TYPE(code) == WC_SELECT_LIST) {
 		    taddstr(" in ");
 		    taddlist(state, *state->pc++);
@@ -457,7 +459,7 @@ gettext2(Estate state)
 	case WC_REPEAT:
 	    if (!s) {
 		taddstr("repeat ");
-		taddstr(ecgetstr(state, 0));
+		taddstr(ecgetstr(state, EC_NODUP, NULL));
 		taddnl();
 		taddstr("do");
 		tindent++;
@@ -475,7 +477,7 @@ gettext2(Estate state)
 		Wordcode end = state->pc + WC_CASE_SKIP(code);
 
 		taddstr("case ");
-		taddstr(ecgetstr(state, 0));
+		taddstr(ecgetstr(state, EC_NODUP, NULL));
 		taddstr(" in");
 
 		if (state->pc >= end) {
@@ -492,7 +494,7 @@ gettext2(Estate state)
 		    else
 			taddchr(' ');
 		    code = *state->pc++;
-		    taddstr(ecgetstr(state, 0));
+		    taddstr(ecgetstr(state, EC_NODUP, NULL));
 		    state->pc++;
 		    taddstr(") ");
 		    tindent++;
@@ -508,7 +510,7 @@ gettext2(Estate state)
 		else
 		    taddchr(' ');
 		code = *state->pc++;
-		taddstr(ecgetstr(state, 0));
+		taddstr(ecgetstr(state, EC_NODUP, NULL));
 		state->pc++;
 		taddstr(") ");
 		tindent++;
@@ -638,31 +640,31 @@ gettext2(Estate state)
 			}
 			break;
 		    case COND_MOD:
-			taddstr(ecgetstr(state, 0));
+			taddstr(ecgetstr(state, EC_NODUP, NULL));
 			taddchr(' ');
 			taddlist(state, WC_COND_SKIP(code));
 			stack = 1;
 			break;
 		    case COND_MODI:
 			{
-			    char *name = ecgetstr(state, 0);
+			    char *name = ecgetstr(state, EC_NODUP, NULL);
 
-			    taddstr(ecgetstr(state, 0));
+			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			    taddchr(' ');
 			    taddstr(name);
 			    taddchr(' ');
-			    taddstr(ecgetstr(state, 0));
+			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			    stack = 1;
 			}
 			break;
 		    default:
 			if (ctype <= COND_GE) {
 			    /* Binary test: `a = b' etc. */
-			    taddstr(ecgetstr(state, 0));
+			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			    taddstr(" ");
 			    taddstr(c1[ctype - COND_STREQ]);
 			    taddstr(" ");
-			    taddstr(ecgetstr(state, 0));
+			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			    if (ctype == COND_STREQ ||
 				ctype == COND_STRNEQ)
 				state->pc++;
@@ -675,7 +677,7 @@ gettext2(Estate state)
 			    c2[2] = ' ';
 			    c2[3] = '\0';
 			    taddstr(c2);
-			    taddstr(ecgetstr(state, 0));
+			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			}
 			stack = 1;
 			break;
@@ -685,7 +687,7 @@ gettext2(Estate state)
 	    break;
 	case WC_ARITH:
 	    taddstr("((");
-	    taddstr(ecgetstr(state, 0));
+	    taddstr(ecgetstr(state, EC_NODUP, NULL));
 	    taddstr("))");
 	    stack = 1;
 	    break;

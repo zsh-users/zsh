@@ -1318,7 +1318,7 @@ pmjobdir(int job)
 {
     char *ret;
 
-    ret = dupstring(jobtab[job].pwd);
+    ret = dupstring(jobtab[job].pwd ? jobtab[job].pwd : pwd);
     return ret;
 }
 

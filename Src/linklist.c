@@ -220,3 +220,26 @@ rolllist(LinkList l, LinkNode nd)
     l->last->next = 0;
 }
 
+/**/
+LinkList
+newsizedlist(int size)
+{
+    LinkList list;
+    LinkNode node;
+
+    MUSTUSEHEAP("newsizedlist()");
+
+    list = (LinkList) zhalloc(sizeof(struct linklist) +
+			      (size * sizeof(struct linknode)));
+
+    list->first = (LinkNode) (list + 1);
+    for (node = list->first; size; size--, node++) {
+	node->last = node - 1;
+	node->next = node + 1;
+    }
+    list->last = node - 1;
+    list->first->last = (LinkNode) list;
+    node[-1].next = NULL;
+
+    return list;
+}

@@ -82,6 +82,11 @@ mod_export int hasam;
 /**/
 mod_export int (*getkeyptr) _((int));
 
+/* SIGCHLD mask */
+
+/**/
+mod_export sigset_t sigchld_mask;
+
 #ifdef DEBUG
 /* depth of allocation type stack */
 
@@ -761,6 +766,8 @@ setupvals(void)
 void
 init_signals(void)
 {
+    sigchld_mask = signal_mask(SIGCHLD);
+
     intr();
 
 #ifndef QDEBUG

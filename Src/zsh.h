@@ -352,7 +352,25 @@ struct linklist {
 #define pushnode(X,Y) insertlinknode(X,(LinkNode) X,Y)
 #define incnode(X) (X = nextnode(X))
 #define firsthist() (hist_ring? hist_ring->down->histnum : curhist)
+#define setsizednode(X,Y,Z) ((X)->first[(Y)].dat = (void *) (Z))
 
+/* stack allocated linked lists */
+
+#define local_list0(N) struct linklist N
+#define init_list0(N) \
+    do { \
+        (N).first = NULL; \
+        (N).last = (LinkNode) &(N); \
+    } while (0)
+#define local_list1(N) struct linklist N; struct linknode __n0
+#define init_list1(N,V0) \
+    do { \
+        (N).first = &__n0; \
+        (N).last = &__n0; \
+        __n0.next = NULL; \
+        __n0.last = (LinkNode) &(N); \
+        __n0.dat = (void *) (V0); \
+    } while (0)
 
 /********************************/
 /* Definitions for syntax trees */
@@ -364,9 +382,10 @@ struct linklist {
 #define Z_SYNC	 (1<<1)	/* run this sublist synchronously       (;)  */
 #define Z_ASYNC  (1<<2)	/* run this sublist asynchronously      (&)  */
 #define Z_DISOWN (1<<3)	/* run this sublist without job control (&|) */
+/* (1<<4) is used for Z_END, see the wordcode definitions */
+/* (1<<5) is used for Z_SIMPLE, see the wordcode definitions */
 
-/* flags for command modifiers */
-#define CFLAG_EXEC	(1<<0)	/* exec ...    */
+/* Condition types. */
 
 #define COND_NOT    0
 #define COND_AND    1
@@ -481,11 +500,24 @@ struct estate {
     char *strs;			/* strings from prog */
 };
 
+typedef struct eccstr *Eccstr;
+
+struct eccstr {
+    Eccstr next;
+    char *str;
+    wordcode offs;
+};
+
+#define EC_NODUP  0
+#define EC_DUP    1
+#define EC_DUPTOK 2
+
 #define WC_CODEBITS 5
 
 #define wc_code(C)   ((C) & ((wordcode) ((1 << WC_CODEBITS) - 1)))
 #define wc_data(C)   ((C) >> WC_CODEBITS)
-#define wc_bld(C, D) (((wordcode) (C)) | (((wordcode) (D)) << WC_CODEBITS))
+#define wc_bdata(D)  ((D) << WC_CODEBITS)
+#define wc_bld(C,D)  (((wordcode) (C)) | (((wordcode) (D)) << WC_CODEBITS))
 
 #define WC_END      0
 #define WC_LIST     1
@@ -512,17 +544,20 @@ struct estate {
 
 #define WC_LIST_TYPE(C)     wc_data(C)
 #define Z_END               (1<<4) 
-#define WCB_LIST(T)         wc_bld(WC_LIST, (T))
+#define Z_SIMPLE            (1<<5)
+#define WC_LIST_SKIP(C)     (wc_data(C) >> 6)
+#define WCB_LIST(T,O)       wc_bld(WC_LIST, ((T) | ((O) << 6)))
 
 #define WC_SUBLIST_TYPE(C)  (wc_data(C) & ((wordcode) 3))
 #define WC_SUBLIST_END      0
 #define WC_SUBLIST_AND      1
 #define WC_SUBLIST_OR       2
-#define WC_SUBLIST_FLAGS(C) (wc_data(C) & ((wordcode) 12))
+#define WC_SUBLIST_FLAGS(C) (wc_data(C) & ((wordcode) 0x1c))
 #define WC_SUBLIST_COPROC   4
 #define WC_SUBLIST_NOT      8
-#define WC_SUBLIST_SKIP(C)  (wc_data(C) >> 4)
-#define WCB_SUBLIST(T,F,O)  wc_bld(WC_SUBLIST, ((T) | (F) | ((O) << 4)))
+#define WC_SUBLIST_SIMPLE  16
+#define WC_SUBLIST_SKIP(C)  (wc_data(C) >> 5)
+#define WCB_SUBLIST(T,F,O)  wc_bld(WC_SUBLIST, ((T) | (F) | ((O) << 5)))
 
 #define WC_PIPE_TYPE(C)     (wc_data(C) & ((wordcode) 1))
 #define WC_PIPE_END         0
@@ -612,7 +647,7 @@ struct job {
     pid_t gleader;		/* process group leader of this job  */
     pid_t other;		/* subjob id or subshell pid         */
     int stat;                   /* see STATs below                   */
-    char pwd[PATH_MAX + 1];	/* current working dir of shell when *
+    char *pwd;			/* current working dir of shell when *
 				 * this job was spawned              */
     struct process *procs;	/* list of processes                 */
     LinkList filelist;		/* list of files to delete when done */
@@ -683,7 +718,8 @@ struct execstack {
 
 struct heredocs {
     struct heredocs *next;
-    Redir rd;
+    Wordcode pc;
+    char *str;
 };
 
 struct dirsav {
@@ -968,7 +1004,7 @@ struct patprog {
 #define GF_BACKREF	0x0400
 #define GF_MATCHREF	0x0800
 
-/* Dummy Patprog pointers. Used mainly in executions trees, but the
+/* Dummy Patprog pointers. Used mainly in executable code, but the
  * pattern code needs to know about it, too. */
 
 #define dummy_patprog1 ((Patprog) 1)
@@ -1475,14 +1511,19 @@ struct ttyinfo {
 /****************************************/
 
 #define CMDSTACKSZ 256
-#define cmdpush(X) if (!(cmdsp >= 0 && cmdsp < CMDSTACKSZ)) {;} else cmdstack[cmdsp++]=(X)
+#define cmdpush(X) do { \
+                       if (cmdsp >= 0 && cmdsp < CMDSTACKSZ) \
+                           cmdstack[cmdsp++]=(X); \
+                   } while (0)
 #ifdef DEBUG
-# define cmdpop()  if (cmdsp <= 0) { \
-			fputs("BUG: cmdstack empty\n", stderr); \
-			fflush(stderr); \
-		   } else cmdsp--
+# define cmdpop()  do { \
+                       if (cmdsp <= 0) { \
+			   fputs("BUG: cmdstack empty\n", stderr); \
+			   fflush(stderr); \
+		       } else cmdsp--; \
+                   } while (0)
 #else
-# define cmdpop()   if (cmdsp <= 0) {;} else cmdsp--
+# define cmdpop()   do { if (cmdsp > 0) cmdsp--; } while (0)
 #endif
 
 #define CS_FOR          0

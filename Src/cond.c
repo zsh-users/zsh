@@ -42,10 +42,17 @@ int
 evalcond(Estate state)
 {
     struct stat *st;
-    char *left, *right = NULL;
-    Wordcode pcode = state->pc++;
-    wordcode code = *pcode;
-    int ctype = WC_COND_TYPE(code);
+    char *left, *right;
+    Wordcode pcode;
+    wordcode code;
+    int ctype, htok = 0;
+
+ rec:
+
+    left = right = NULL;
+    pcode = state->pc++;
+    code = *pcode;
+    ctype = WC_COND_TYPE(code);
 
     switch (ctype) {
     case COND_NOT:
@@ -56,7 +63,7 @@ evalcond(Estate state)
 	if (evalcond(state)) {
 	    if (tracingcond)
 		fprintf(xtrerr, " %s", condstr[ctype]);
-	    return evalcond(state);
+	    goto rec;
 	} else {
 	    state->pc = pcode + (WC_COND_SKIP(code) + 1);
 	    return 0;
@@ -65,7 +72,7 @@ evalcond(Estate state)
 	if (!evalcond(state)) {
 	    if (tracingcond)
 		fprintf(xtrerr, " %s", condstr[ctype]);
-	    return evalcond(state);
+	    goto rec;
 	} else {
 	    state->pc = pcode + (WC_COND_SKIP(code) + 1);
 	    return 1;
@@ -74,16 +81,16 @@ evalcond(Estate state)
     case COND_MODI:
 	{
 	    Conddef cd;
-	    char *name = ecgetstr(state, 0), **strs;
+	    char *name = ecgetstr(state, EC_NODUP, NULL), **strs;
 	    int l = WC_COND_SKIP(code);
 
 	    if (ctype == COND_MOD)
-		strs = ecgetarr(state, l, 1);
+		strs = ecgetarr(state, l, EC_DUP, NULL);
 	    else {
 		char *sbuf[3];
 
-		sbuf[0] = ecgetstr(state, 0);
-		sbuf[1] = ecgetstr(state, 0);
+		sbuf[0] = ecgetstr(state, EC_NODUP, NULL);
+		sbuf[1] = ecgetstr(state, EC_NODUP, NULL);
 		sbuf[2] = NULL;
 
 		strs = arrdup(sbuf);
@@ -120,19 +127,23 @@ evalcond(Estate state)
 	    return 0;
 	}
     }
-    left = ecgetstr(state, 1);
-    singsub(&left);
-    untokenize(left);
+    left = ecgetstr(state, EC_DUPTOK, &htok);
+    if (htok) {
+	singsub(&left);
+	untokenize(left);
+    }
     if (ctype <= COND_GE && ctype != COND_STREQ && ctype != COND_STRNEQ) {
-	right = ecgetstr(state, 1);
-	singsub(&right);
-	untokenize(right);
+	right = ecgetstr(state, EC_DUPTOK, &htok);
+	if (htok) {
+	    singsub(&right);
+	    untokenize(right);
+	}
     }
     if (tracingcond) {
 	if (ctype < COND_MOD) {
 	    char *rt = (char *) right;
 	    if (ctype == COND_STREQ || ctype == COND_STRNEQ) {
-		rt = dupstring(ecrawstr(state->prog, state->pc));
+		rt = dupstring(ecrawstr(state->prog, state->pc, NULL));
 		singsub(&rt);
 		untokenize(rt);
 	    }
@@ -191,8 +202,10 @@ evalcond(Estate state)
 		char *opat;
 		int save;
 
-		right = opat = dupstring(ecrawstr(state->prog, state->pc));
-		singsub(&right);
+		right = opat = dupstring(ecrawstr(state->prog, state->pc,
+						  &htok));
+		if (htok)
+		    singsub(&right);
 		save = (!state->prog->heap &&
 			!strcmp(opat, right) && pprog != dummy_patprog2);
 
@@ -370,10 +383,11 @@ cond_str(char **args, int num, int raw)
 {
     char *s = args[num];
 
-    singsub(&s);
-    if (!raw)
-	untokenize(s);
-
+    if (has_token(s)) {
+	singsub(&s);
+	if (!raw)
+	    untokenize(s);
+    }
     return s;
 }
 
@@ -383,9 +397,10 @@ cond_val(char **args, int num)
 {
     char *s = args[num];
 
-    singsub(&s);
-    untokenize(s);
-
+    if (has_token(s)) {
+	singsub(&s);
+	untokenize(s);
+    }
     return mathevali(s);
 }
 

@@ -2117,6 +2117,7 @@ static int
 bin_compquote(char *nam, char **args, char *ops, int func)
 {
     char *name;
+    struct value vbuf;
     Value v;
 
     /* Anything to do? */
@@ -2128,7 +2129,7 @@ bin_compquote(char *nam, char **args, char *ops, int func)
 
     while ((name = *args++)) {
 	name = dupstring(name);
-	if ((v = getvalue(&name, 0))) {
+	if ((v = getvalue(&vbuf, &name, 0))) {
 	    switch (PM_TYPE(v->pm->flags)) {
 	    case PM_SCALAR:
 		{

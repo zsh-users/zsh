@@ -732,6 +732,7 @@ static int
 bin_vared(char *name, char **args, char *ops, int func)
 {
     char *s, *t, *ova = varedarg;
+    struct value vbuf;
     Value v;
     Param pm = 0;
     int create = 0, ifl;
@@ -809,7 +810,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     }
     /* handle non-existent parameter */
     s = args[0];
-    v = fetchvalue(&s, (!create || type == PM_SCALAR),
+    v = fetchvalue(&vbuf, &s, (!create || type == PM_SCALAR),
 		   SCANPM_WANTKEYS|SCANPM_WANTVALS|SCANPM_MATCHMANY);
     if (!v && !create) {
 	zwarnnam(name, "no such variable: %s", args[0], 0);

@@ -80,10 +80,10 @@ static HashTable firstht, lastht;
 mod_export unsigned
 hasher(char *str)
 {
-    unsigned hashval = 0;
+    unsigned hashval = 0, c;
 
-    while (*str)
-	hashval += (hashval << 5) + *(unsigned char *)str++;
+    while ((c = *((unsigned char *) str++)))
+	hashval += (hashval << 5) + c;
 
     return hashval;
 }

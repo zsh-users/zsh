@@ -54,7 +54,7 @@ int prevjob;
  
 /**/
 mod_export struct job jobtab[MAXJOB];
- 
+
 /* shell timings */
  
 /**/
@@ -556,6 +556,7 @@ dumptime(Job jn)
 static int
 should_report_time(Job j)
 {
+    struct value vbuf;
     Value v;
     char *s = "REPORTTIME";
     int reporttime;
@@ -565,7 +566,8 @@ should_report_time(Job j)
 	return 1;
 
     HEAPALLOC {
-	if (!(v = getvalue(&s, 0)) || (reporttime = getintvalue(v)) < 0) {
+	if (!(v = getvalue(&vbuf, &s, 0)) ||
+	    (reporttime = getintvalue(v)) < 0) {
 	    LASTALLOC_RETURN 0;
 	}
     } LASTALLOC;
@@ -717,7 +719,8 @@ printjob(Job jn, int lng, int synch)
  * the directory where the job is running, otherwise the current directory
  */
 
-    if ((lng & 4) || (interact && job == thisjob && strcmp(jn->pwd, pwd))) {
+    if ((lng & 4) || (interact && job == thisjob &&
+		      jn->pwd && strcmp(jn->pwd, pwd))) {
 	fprintf(shout, "(pwd %s: ", (lng & 4) ? "" : "now");
 	fprintdir((lng & 4) ? jn->pwd : pwd, shout);
 	fprintf(shout, ")\n");
@@ -774,7 +777,9 @@ deletejob(Job jn)
 
     if (jn->ty)
 	zfree(jn->ty, sizeof(struct ttyinfo));
-
+    if (jn->pwd)
+	zsfree(jn->pwd);
+    jn->pwd = NULL;
     if (jn->stat & STAT_WASSUPER)
 	deletejob(jobtab + jn->other);
     jn->gleader = jn->other = 0;
@@ -945,17 +950,29 @@ initjob(void)
     for (i = 1; i < MAXJOB; i++)
 	if (!jobtab[i].stat) {
 	    jobtab[i].stat = STAT_INUSE;
-	    if (strlen(pwd) >= PATH_MAX) {
-		memcpy(jobtab[i].pwd, pwd, PATH_MAX);
-		jobtab[i].pwd[PATH_MAX] = '\0';
-	    } else
-		strcpy(jobtab[i].pwd, pwd);
+	    if (jobtab[i].pwd)
+		zsfree(jobtab[i].pwd);
 	    jobtab[i].gleader = 0;
 	    return i;
 	}
 
     zerr("job table full or recursion limit exceeded", NULL, 0);
     return -1;
+}
+
+/**/
+void
+setjobpwd(void)
+{
+    int i, l;
+
+    for (i = 1; i < MAXJOB; i++)
+	if (jobtab[i].stat && !jobtab[i].pwd) {
+	    if ((l = strlen(pwd)) >= PATH_MAX)
+		jobtab[i].pwd = ztrdup(pwd + l - PATH_MAX);
+	    else
+		jobtab[i].pwd = ztrdup(pwd);
+	}
 }
 
 /* print pids for & */
@@ -1302,7 +1319,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		/* for bg and fg -- show the job we are operating on */
 		printjob(jobtab + job, (stopped) ? -1 : 0, 1);
 	    if (func != BIN_BG) {		/* fg or wait */
-		if (strcmp(jobtab[job].pwd, pwd)) {
+		if (jobtab[job].pwd && strcmp(jobtab[job].pwd, pwd)) {
 		    fprintf(shout, "(pwd : ");
 		    fprintdir(jobtab[job].pwd, shout);
 		    fprintf(shout, ")\n");

@@ -177,20 +177,25 @@ signal_mask(int sig)
 
 /* Block the signals in the given signal *
  * set. Return the old signal set.       */
- 
+
 /**/
+#ifdef POSIX_SIGNALS
+
+/**/
+mod_export sigset_t dummy_sigset1, dummy_sigset2;
+
+/**/
+#else
+
+/**/
+#ifndef BSD_SIGNALS
+
 sigset_t
 signal_block(sigset_t set)
 {
     sigset_t oset;
  
-#ifdef POSIX_SIGNALS
-    sigprocmask(SIG_BLOCK, &set, &oset);
-#else
-# ifdef BSD_SIGNALS
-    oset = sigblock(set);
-# else
-#  ifdef SYSV_SIGNALS
+#ifdef SYSV_SIGNALS
     int i;
  
     oset = blocked_set;
@@ -200,7 +205,7 @@ signal_block(sigset_t set)
             sighold(i);
         }
     }
-#  else  /* NO_SIGNAL_BLOCKING */
+#else  /* NO_SIGNAL_BLOCKING */
 /* We will just ignore signals if the system doesn't have *
  * the ability to block them.                             */
     int i;
@@ -212,25 +217,27 @@ signal_block(sigset_t set)
             signal_ignore(i);
         }
    }
-#  endif /* SYSV_SIGNALS  */
-# endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
+#endif /* SYSV_SIGNALS  */
  
     return oset;
 }
 
+/**/
+#endif /* BSD_SIGNALS */
+
+/**/
+#endif /* POSIX_SIGNALS */
+
 /* Unblock the signals in the given signal *
  * set. Return the old signal set.         */
 
-/**/
+#ifndef POSIX_SIGNALS
+
 sigset_t
 signal_unblock(sigset_t set)
 {
     sigset_t oset;
  
-#ifdef POSIX_SIGNALS
-    sigprocmask(SIG_UNBLOCK, &set, &oset);
-#else
 # ifdef BSD_SIGNALS
     sigfillset(&oset);
     oset = sigsetmask(oset);
@@ -260,10 +267,11 @@ signal_unblock(sigset_t set)
    }
 #  endif /* SYSV_SIGNALS  */
 # endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
  
     return oset;
 }
+
+#endif   /* POSIX_SIGNALS */
 
 /* set the process signal mask to *
  * be the given signal mask       */

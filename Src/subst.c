@@ -53,12 +53,12 @@ prefork(LinkList list, int flags)
 
     MUSTUSEHEAP("prefork");
     for (node = firstnode(list); node; incnode(node)) {
-	char *str;
+	char *str, c;
 
 	str = (char *)getdata(node);
-	if ((*str == Inang || *str == Outang || *str == Equals) &&
+	if (((c = *str) == Inang || c == Outang || c == Equals) &&
 	    str[1] == Inpar) {
-	    if (*str == Inang || *str == Outang)
+	    if (c == Inang || c == Outang)
 		setdata(node, (void *) getproc(str));	/* <(...) or >(...) */
 	    else
 		setdata(node, (void *) getoutputfile(str));	/* =(...) */
@@ -94,16 +94,16 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 {
     int qt;
     char *str3 = (char *)getdata(node);
-    char *str  = str3;
+    char *str  = str3, c;
 
-    while (!errflag && *str) {
-	if ((qt = *str == Qstring) || *str == String) {
-	    if (str[1] == Inpar) {
+    while (!errflag && (c = *str)) {
+	if ((qt = c == Qstring) || c == String) {
+	    if ((c = str[1]) == Inpar) {
 		if (!qt)
 		    mult_isarr = 1;
 		str++;
 		goto comsub;
-	    } else if (str[1] == Inbrack) {
+	    } else if (c == Inbrack) {
 		/* $[...] */
 		char *str2 = str;
 		str2++;
@@ -115,7 +115,7 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 		str = arithsubst(str + 2, &str3, str2);
 		setdata(node, (void *) str3);
 		continue;
-	    } else if (str[1] == Snull) {
+	    } else if (c == Snull) {
 		str = getkeystring(str, NULL, 4, NULL);
 		continue;
 	    } else {
@@ -125,14 +125,14 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 		str3 = (char *)getdata(node);
 		continue;
 	    }
-	} else if ((qt = *str == Qtick) || *str == Tick)
+	} else if ((qt = c == Qtick) || c == Tick)
 	  comsub: {
 	    LinkList pl;
 	    char *s, *str2 = str;
 	    char endchar;
 	    int l1, l2;
 
-	    if (*str == Inpar) {
+	    if (c == Inpar) {
 		endchar = Outpar;
 		str[-1] = '\0';
 #ifdef DEBUG
@@ -143,7 +143,7 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 #endif
 		str--;
 	    } else {
-		endchar = *str;
+		endchar = c;
 		*str = '\0';
 
 		while (*++str != endchar)
@@ -164,12 +164,12 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 	     * be left unchanged.  Note that the lexer doesn't tokenize   *
 	     * the body of a command substitution so if there are some    *
 	     * tokens here they are from a ${(e)~...} substitution.       */
-	    for (str = str2; *++str; )
-		if (itok(*str) && *str != Nularg &&
-		    !(endchar != Outpar && *str == Bnull &&
+	    for (str = str2; (c = *++str); )
+		if (itok(c) && c != Nularg &&
+		    !(endchar != Outpar && c == Bnull &&
 		      (str[1] == '$' || str[1] == '\\' || str[1] == '`' ||
 		       (qt && str[1] == '"'))))
-		    *str = ztokens[*str - Pound];
+		    *str = ztokens[c - Pound];
 	    str++;
 	    if (!(pl = getoutput(str2 + 1, qt || ssub))) {
 		zerr("parse error in command substitution", NULL, 0);
@@ -231,15 +231,15 @@ globlist(LinkList list, int nountok)
 mod_export void
 singsub(char **s)
 {
-    LinkList foo;
+    local_list1(foo);
 
-    foo = newlinklist();
-    addlinknode(foo, *s);
-    prefork(foo, PF_SINGLE);
+    init_list1(foo, *s);
+
+    prefork(&foo, PF_SINGLE);
     if (errflag)
 	return;
-    *s = (char *) ugetnode(foo);
-    DPUTS(nonempty(foo), "BUG: singsub() produced more than one word!");
+    *s = (char *) ugetnode(&foo);
+    DPUTS(nonempty(&foo), "BUG: singsub() produced more than one word!");
 }
 
 /* Perform substitution on a single word. Unlike with singsub, the      *
@@ -259,24 +259,23 @@ static int mult_isarr;
 static int
 multsub(char **s, char ***a, int *isarr, char *sep)
 {
-    LinkList foo;
     int l, omi = mult_isarr;
     char **r, **p;
+    local_list1(foo);
 
     mult_isarr = 0;
-    foo = newlinklist();
-    addlinknode(foo, *s);
-    prefork(foo, 0);
+    init_list1(foo, *s);
+    prefork(&foo, 0);
     if (errflag) {
 	if (isarr)
 	    *isarr = 0;
 	mult_isarr = omi;
 	return 0;
     }
-    if ((l = countlinknodes(foo))) {
+    if ((l = countlinknodes(&foo))) {
 	p = r = ncalloc((l + 1) * sizeof(char*));
-	while (nonempty(foo))
-	    *p++ = (char *)ugetnode(foo);
+	while (nonempty(&foo))
+	    *p++ = (char *)ugetnode(&foo);
 	*p = NULL;
 	if (a && mult_isarr) {
 	    *a = r;
@@ -291,7 +290,7 @@ multsub(char **s, char ***a, int *isarr, char *sep)
 	return 0;
     }
     if (l)
-	*s = (char *) ugetnode(foo);
+	*s = (char *) ugetnode(&foo);
     else
 	*s = dupstring("");
     if (isarr)
@@ -423,20 +422,27 @@ filesubstr(char **namptr, int assign)
 
 /**/
 static char *
-strcatsub(char **d, char *pb, char *pe, char *src, int l, char *s, int glbsub)
+strcatsub(char **d, char *pb, char *pe, char *src, int l, char *s, int glbsub,
+	  int copied)
 {
+    char *dest;
     int pl = pe - pb;
-    char *dest = ncalloc(pl + l + (s ? strlen(s) : 0) + 1);
 
-    *d = dest;
-    strncpy(dest, pb, pl);
-    dest += pl;
-    strcpy(dest, src);
-    if (glbsub)
-	tokenize(dest);
-    dest += l;
-    if (s)
-	strcpy(dest, s);
+    if (!pl && (!s || !*s)) {
+	dest = (*d = (copied ? src : dupstring(src)));
+	if (glbsub)
+	    tokenize(dest);
+    } else {
+	*d = dest = ncalloc(pl + l + (s ? strlen(s) : 0) + 1);
+	strncpy(dest, pb, pl);
+	dest += pl;
+	strcpy(dest, src);
+	if (glbsub)
+	    tokenize(dest);
+	dest += l;
+	if (s)
+	    strcpy(dest, s);
+    }
     return dest;
 }
 
@@ -719,7 +725,7 @@ subst_parse_str(char *s, int single)
 LinkNode
 paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 {
-    char *aptr = *str;
+    char *aptr = *str, c, cc;
     char *s = aptr, *fstr, *idbeg, *idend, *ostr = (char *) getdata(n);
     int colf;			/* != 0 means we found a colon after the name */
     int isarr = 0;
@@ -733,6 +739,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int spbreak = isset(SHWORDSPLIT) && !ssub && !qt;
     char *val = NULL, **aval = NULL;
     unsigned int fwidth = 0;
+    struct value vbuf;
     Value v = NULL;
     int flags = 0;
     int flnum = 0;
@@ -756,24 +763,24 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int subexp;
 
     *s++ = '\0';
-    if (!ialnum(*s) && *s != '#' && *s != Pound && *s != '-' &&
-	*s != '!' && *s != '$' && *s != String && *s != Qstring &&
-	*s != '?' && *s != Quest && *s != '_' &&
-	*s != '*' && *s != Star && *s != '@' && *s != '{' &&
-	*s != Inbrace && *s != '=' && *s != Equals && *s != Hat &&
-	*s != '^' && *s != '~' && *s != Tilde && *s != '+') {
+    if (!ialnum(c = *s) && c != '#' && c != Pound && c != '-' &&
+	c != '!' && c != '$' && c != String && c != Qstring &&
+	c != '?' && c != Quest && c != '_' &&
+	c != '*' && c != Star && c != '@' && c != '{' &&
+	c != Inbrace && c != '=' && c != Equals && c != Hat &&
+	c != '^' && c != '~' && c != Tilde && c != '+') {
 	s[-1] = '$';
 	*str = s;
 	return n;
     }
-    DPUTS(*s == '{', "BUG: inbrace == '{' in paramsubst()");
-    if (*s == Inbrace) {
+    DPUTS(c == '{', "BUG: inbrace == '{' in paramsubst()");
+    if (c == Inbrace) {
 	inbrace = 1;
 	s++;
-	if (*s == '!' && s[1] != Outbrace && emulation == EMULATE_KSH) {
+	if ((c = *s) == '!' && s[1] != Outbrace && emulation == EMULATE_KSH) {
 	    hkeys = SCANPM_WANTKEYS;
 	    s++;
-	} else if (*s == '(' || *s == Inpar) {
+	} else if (c == '(' || c == Inpar) {
 	    char *t, sav;
 	    int tt = 0;
 	    zlong num;
@@ -788,8 +795,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		}\
 	    }
 
-	    for (s++; *s != ')' && *s != Outpar; s++, tt = 0) {
-		switch (*s) {
+	    for (s++; (c = *s) != ')' && c != Outpar; s++, tt = 0) {
+		switch (c) {
 		case ')':
 		case Outpar:
 		    break;
@@ -979,31 +986,31 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	postmul = " ";
 
     for (;;) {
-	if (*s == '^' || *s == Hat) {
-	    if (*++s == '^' || *s == Hat) {
+	if ((c = *s) == '^' || c == Hat) {
+	    if ((c = *++s) == '^' || c == Hat) {
 		plan9 = 0;
 		s++;
 	    } else
 		plan9 = 1;
-	} else if (*s == '=' || *s == Equals) {
-	    if (*++s == '=' || *s == Equals) {
+	} else if ((c = *s) == '=' || c == Equals) {
+	    if ((c = *++s) == '=' || c == Equals) {
 		spbreak = 0;
 		s++;
 	    } else
 		spbreak = 1;
-	} else if ((*s == '#' || *s == Pound) &&
-		   (iident(s[1])
-		    || s[1] == '*' || s[1] == Star || s[1] == '@'
-		    || s[1] == '-' || (s[1] == ':' && s[2] == '-')
-		    || (isstring(s[1]) && (s[2] == Inbrace || s[2] == Inpar))))
+	} else if ((c == '#' || c == Pound) &&
+		   (iident(cc = s[1])
+		    || cc == '*' || cc == Star || cc == '@'
+		    || cc == '-' || (cc == ':' && s[2] == '-')
+		    || (isstring(cc) && (s[2] == Inbrace || s[2] == Inpar))))
 	    getlen = 1 + whichlen, s++;
-	else if (*s == '~' || *s == Tilde) {
-	    if (*++s == '~' || *s == Tilde) {
+	else if (c == '~' || c == Tilde) {
+	    if ((c = *++s) == '~' || c == Tilde) {
 		globsubst = 0;
 		s++;
 	    } else
 		globsubst = 1;
-	} else if (*s == '+') {
+	} else if (c == '+') {
 	    if (iident(s[1]) || (aspar && isstring(s[1]) &&
 				 (s[2] == Inbrace || s[2] == Inpar)))
 		chkset = 1, s++;
@@ -1043,7 +1050,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    s++;
 	v = (Value) NULL;
     } else if (aspar) {
-	if ((v = getvalue(&s, 1))) {
+	if ((v = getvalue(&vbuf, &s, 1))) {
 	    val = idbeg = getstrvalue(v);
 	    subexp = 1;
 	} else
@@ -1052,8 +1059,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     if (!subexp || aspar) {
 	char *ov = val;
 
-	if (!(v = fetchvalue((subexp ? &ov : &s), (wantt ? -1 :
-				  ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
+	if (!(v = fetchvalue(&vbuf, (subexp ? &ov : &s),
+			     (wantt ? -1 :
+			      ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
 			     hkeys|hvals|(arrasg ? SCANPM_ASSIGNING : 0))) ||
 	    (v->pm && (v->pm->flags & PM_UNSET)))
 	    vunset = 1;
@@ -1199,13 +1207,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case PM_LOWER:
 		    t = val;
-		    for (; *t; t++)
-			*t = tulower(*t);
+		    for (; (c = *t); t++)
+			*t = tulower(c);
 		    break;
 		case PM_UPPER:
 		    t = val;
-		    for (; *t; t++)
-			*t = tuupper(*t);
+		    for (; (c = *t); t++)
+			*t = tuupper(c);
 		    break;
 		}
 	    }
@@ -1236,12 +1244,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     fstr = s;
     if (inbrace) {
 	int bct;
-	for (bct = 1;; fstr++) {
-	    if (!*fstr)
-		break;
-	    else if (*fstr == Inbrace)
+	for (bct = 1; (c = *fstr); fstr++) {
+	    if (c == Inbrace)
 		bct++;
-	    else if (*fstr == Outbrace && !--bct)
+	    else if (c == Outbrace && !--bct)
 		break;
 	}
 
@@ -1250,29 +1256,29 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    zerr("closing brace expected", NULL, 0);
 	    return NULL;
 	}
-	if (*fstr)
+	if (c)
 	    *fstr++ = '\0';
     }
 
     /* Check for ${..?..} or ${..=..} or one of those. *
      * Only works if the name is in braces.            */
 
-    if (inbrace && (*s == '-' ||
-		    *s == '+' ||
-		    *s == ':' ||
-		    *s == '=' || *s == Equals ||
-		    *s == '%' ||
-		    *s == '#' || *s == Pound ||
-		    *s == '?' || *s == Quest ||
-		    *s == '/')) {
+    if (inbrace && ((c = *s) == '-' ||
+		    c == '+' ||
+		    c == ':' ||
+		    c == '=' || c == Equals ||
+		    c == '%' ||
+		    c == '#' || c == Pound ||
+		    c == '?' || c == Quest ||
+		    c == '/')) {
 
 	if (!flnum)
 	    flnum++;
-	if (*s == '%')
+	if (c == '%')
 	    flags |= SUB_END;
 
 	/* Check for ${..%%..} or ${..##..} */
-	if ((*s == '%' || *s == '#' || *s == Pound) && *s == s[1]) {
+	if ((c == '%' || c == '#' || c == Pound) && c == s[1]) {
 	    s++;
 	    /* we have %%, not %, or ##, not # */
 	    flags |= SUB_LONG;
@@ -1285,17 +1291,17 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	     * indicates shortest substring; else look for longest.
 	     */
 	    flags = (flags & SUB_SUBSTR) ? 0 : SUB_LONG;
-	    if (*s == '/') {
+	    if ((c = *s) == '/') {
 		/* doubled, so replace all occurrences */
 		flags |= SUB_GLOBAL;
 		s++;
 	    }
 	    /* Check for anchored substitution */
-	    if (*s == '%') {
+	    if (c == '%') {
 		/* anchor at tail */
 		flags |= SUB_END;
 		s++;
-	    } else if (*s == '#' || *s == Pound) {
+	    } else if (c == '#' || c == Pound) {
 		/* anchor at head: this is the `normal' case in getmatch */
 		s++;
 	    } else
@@ -1311,8 +1317,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	     * double quotes the Bnull isn't there, so it's not
 	     * consistent.
 	     */
-	    for (ptr = s; *ptr && *ptr != '/'; ptr++)
-		if (*ptr == '\\' && ptr[1] == '/')
+	    for (ptr = s; (c = *ptr) && c != '/'; ptr++)
+		if (c == '\\' && ptr[1] == '/')
 		    chuck(ptr);
 	    replstr = (*ptr && ptr[1]) ? ptr+1 : "";
 	    *ptr = '\0';
@@ -1453,12 +1459,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		singsub(&s);
 		if (t == '/' && (flags & SUB_SUBSTR)) {
-		    if (*s == '#' || *s == '%') {
+		    if ((c = *s) == '#' || c == '%') {
 			flags &= ~SUB_SUBSTR;
-			if (*s == '%')
+			if (c == '%')
 			    flags |= SUB_END;
 			s++;
-		    } else if (*s == '\\') {
+		    } else if (c == '\\') {
 			s++;
 		    }
 		}
@@ -1508,6 +1514,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    }
 		    s = ss;
 		}
+		copied = 1;
 		if (inbrace && *s) {
 		    if (*s == ':' && !imeta(s[1]))
 			zerr("unrecognized modifier `%c'", NULL, s[1]);
@@ -1696,7 +1703,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    int pre = quotetype != 3 ? 1 : 2;
 		    int sl;
 		    char *tmp;
-
 		    tmp = bslashquote(val, NULL, quotetype);
 		    sl = strlen(tmp);
 		    val = (char *) zhalloc(pre + sl + 2);
@@ -1769,15 +1775,15 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		qsort(aval, i, sizeof(char *), sortfn[sortit-1]);
 	}
 	if (plan9) {
-	    LinkList tl = newlinklist();
 	    LinkNode tn;
+	    local_list1(tl);
 
 	    *--fstr = Marker;
-	    addlinknode(tl, fstr);
-	    if (!eval && !stringsubst(tl, firstnode(tl), ssub))
+	    init_list1(tl, fstr);
+	    if (!eval && !stringsubst(&tl, firstnode(&tl), ssub))
 		return NULL;
 	    *str = aptr;
-	    tn = firstnode(tl);
+	    tn = firstnode(&tl);
 	    while ((x = *aval++)) {
 		if (prenum || postnum)
 		    x = dopadding(x, prenum, postnum, preone, postone,
@@ -1785,10 +1791,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (eval && subst_parse_str(x, (qt && !nojoin)))
 		    return NULL;
 		xlen = strlen(x);
-		for (tn = firstnode(tl);
+		for (tn = firstnode(&tl);
 		     tn && *(y = (char *) getdata(tn)) == Marker;
 		     incnode(tn)) {
-		    strcatsub(&y, ostr, aptr, x, xlen, y + 1, globsubst);
+		    strcatsub(&y, ostr, aptr, x, xlen, y + 1, globsubst,
+			      copied);
 		    if (qt && !*y && isarr != 2)
 			y = dupstring(nulstring);
 		    if (plan9)
@@ -1820,7 +1827,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (eval && subst_parse_str(x, (qt && !nojoin)))
 		return NULL;
 	    xlen = strlen(x);
-	    strcatsub(&y, ostr, aptr, x, xlen, NULL, globsubst);
+	    strcatsub(&y, ostr, aptr, x, xlen, NULL, globsubst, copied);
 	    if (qt && !*y && isarr != 2)
 		y = dupstring(nulstring);
 	    setdata(n, (void *) y);
@@ -1851,7 +1858,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (eval && subst_parse_str(x, (qt && !nojoin)))
 		return NULL;
 	    xlen = strlen(x);
-	    *str = strcatsub(&y, aptr, aptr, x, xlen, fstr, globsubst);
+	    *str = strcatsub(&y, aptr, aptr, x, xlen, fstr, globsubst, copied);
 	    if (qt && !*y && isarr != 2)
 		y = dupstring(nulstring);
 	    insertlinknode(l, n, (void *) y), incnode(n);
@@ -1870,7 +1877,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if (eval && subst_parse_str(x, (qt && !nojoin)))
 	    return NULL;
 	xlen = strlen(x);
-	*str = strcatsub(&y, ostr, aptr, x, xlen, fstr, globsubst);
+	*str = strcatsub(&y, ostr, aptr, x, xlen, fstr, globsubst, copied);
 	if (qt && !*y)
 	    y = dupstring(nulstring);
 	setdata(n, (void *) y);

@@ -51,12 +51,12 @@ execfor(Estate state, int do_exec)
 {
     Wordcode end, loop;
     wordcode code = state->pc[-1];
-    int iscond = (WC_FOR_TYPE(code) == WC_FOR_COND);
+    int iscond = (WC_FOR_TYPE(code) == WC_FOR_COND), ctok = 0, atok = 0;
     char *name, *str, *cond = NULL, *advance = NULL;
     zlong val = 0;
     LinkList args = NULL;
 
-    name = ecgetstr(state, 0);
+    name = ecgetstr(state, EC_NODUP, NULL);
     end = state->pc + WC_FOR_SKIP(code);
 
     if (iscond) {
@@ -75,14 +75,17 @@ execfor(Estate state, int do_exec)
 	    state->pc = end;
 	    return lastval = errflag;
 	}
-	cond = ecgetstr(state, 0);
-	advance = ecgetstr(state, 0);
+	cond = ecgetstr(state, EC_NODUP, &ctok);
+	advance = ecgetstr(state, EC_NODUP, &atok);
     } else if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
-	if (!(args = ecgetlist(state, *state->pc++, 1))) {
+	int htok = 0;
+
+	if (!(args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
 	    state->pc = end;
 	    return 0;
 	}
-	execsubst(args);
+	if (htok)
+	    execsubst(args);
     } else {
 	char **x;
 
@@ -97,8 +100,11 @@ execfor(Estate state, int do_exec)
     loop = state->pc;
     for (;;) {
 	if (iscond) {
-	    str = dupstring(cond);
-	    singsub(&str);
+	    if (ctok) {
+		str = dupstring(cond);
+		singsub(&str);
+	    } else
+		str = cond;
 	    if (!errflag) {
 		while (iblank(*str))
 		    str++;
@@ -141,13 +147,16 @@ execfor(Estate state, int do_exec)
 	if (retflag)
 	    break;
 	if (iscond && !errflag) {
-	    str = dupstring(advance);
+	    if (atok) {
+		str = dupstring(advance);
+		singsub(&str);
+	    } else
+		str = advance;
 	    if (isset(XTRACE)) {
 		printprompt4();
 		fprintf(xtrerr, "%s\n", str);
 		fflush(xtrerr);
 	    }
-	    singsub(&str);
 	    if (!errflag)
 		matheval(str);
 	}
@@ -179,7 +188,7 @@ execselect(Estate state, int do_exec)
     LinkList args;
 
     end = state->pc + WC_FOR_SKIP(code);
-    name = ecgetstr(state, 0);
+    name = ecgetstr(state, EC_NODUP, NULL);
 
     if (WC_SELECT_TYPE(code) == WC_SELECT_PPARAM) {
 	char **x;
@@ -188,11 +197,14 @@ execselect(Estate state, int do_exec)
 	for (x = pparams; *x; x++)
 	    addlinknode(args, dupstring(*x));
     } else {
-	if (!(args = ecgetlist(state, *state->pc++, 1))) {
+	int htok = 0;
+
+	if (!(args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
 	    state->pc = end;
 	    return 0;
 	}
-	execsubst(args);
+	if (htok)
+	    execsubst(args);
     }
     if (!args || empty(args)) {
 	state->pc = end;
@@ -391,14 +403,15 @@ execrepeat(Estate state, int do_exec)
 {
     Wordcode end, loop;
     wordcode code = state->pc[-1];
-    int count;
+    int count, htok = 0;
     char *tmp;
 
     end = state->pc + WC_REPEAT_SKIP(code);
 
     lastval = 0;
-    tmp = ecgetstr(state, 1);
-    singsub(&tmp);
+    tmp = ecgetstr(state, EC_DUPTOK, &htok);
+    if (htok)
+	singsub(&tmp);
     count = atoi(tmp);
     pushheap();
     cmdpush(CS_REPEAT);
@@ -487,7 +500,7 @@ execcase(Estate state, int do_exec)
 
     end = state->pc + WC_CASE_SKIP(code);
 
-    word = ecgetstr(state, 1);
+    word = ecgetstr(state, EC_DUP, NULL);
     singsub(&word);
     untokenize(word);
     lastval = 0;
@@ -509,7 +522,7 @@ execcase(Estate state, int do_exec)
 	if (isset(XTRACE)) {
 	    char *pat2, *opat;
 
-	    opat = pat = ecgetstr(state, 1);
+	    opat = pat = ecgetstr(state, EC_DUP, NULL);
 	    singsub(&pat);
 	    save = (!state->prog->heap &&
 		    !strcmp(pat, opat) && *spprog != dummy_patprog2);
@@ -529,9 +542,12 @@ execcase(Estate state, int do_exec)
 	if (!pprog) {
 	    if (!pat) {
 		char *opat;
+		int htok = 0;
 
-		opat = pat = dupstring(ecrawstr(state->prog, state->pc - 2));
-		singsub(&pat);
+		opat = pat = dupstring(ecrawstr(state->prog,
+						state->pc - 2, &htok));
+		if (htok)
+		    singsub(&pat);
 		save = (!state->prog->heap &&
 			!strcmp(pat, opat) && *spprog != dummy_patprog2);
 	    }

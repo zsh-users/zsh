@@ -1482,15 +1482,15 @@ hasbraces(char *str)
     if (isset(BRACECCL)) {
 	/* In this case, any properly formed brace expression  *
 	 * will match and expand to the characters in between. */
-	int bc;
+	int bc, c;
 
-	for (bc = 0; *str; ++str)
-	    if (*str == Inbrace) {
+	for (bc = 0; (c = *str); ++str)
+	    if (c == Inbrace) {
 		if (!bc && str[1] == Outbrace)
 		    *str++ = '{', *str = '}';
 		else
 		    bc++;
-	    } else if (*str == Outbrace) {
+	    } else if (c == Outbrace) {
 		if (!bc)
 		    *str = '}';
 		else if (!--bc)
@@ -1568,24 +1568,23 @@ hasbraces(char *str)
 int
 xpandredir(struct redir *fn, LinkList tab)
 {
-    LinkList fake;
     char *nam;
     struct redir *ff;
     int ret = 0;
+    local_list1(fake);
 
     /* Stick the name in a list... */
-    fake = newlinklist();
-    addlinknode(fake, fn->name);
+    init_list1(fake, fn->name);
     /* ...which undergoes all the usual shell expansions */
-    prefork(fake, isset(MULTIOS) ? 0 : PF_SINGLE);
+    prefork(&fake, isset(MULTIOS) ? 0 : PF_SINGLE);
     /* Globbing is only done for multios. */
     if (!errflag && isset(MULTIOS))
-	globlist(fake, 0);
+	globlist(&fake, 0);
     if (errflag)
 	return 0;
-    if (nonempty(fake) && !nextnode(firstnode(fake))) {
+    if (nonempty(&fake) && !nextnode(firstnode(&fake))) {
 	/* Just one match, the usual case. */
-	char *s = peekfirst(fake);
+	char *s = peekfirst(&fake);
 	fn->name = s;
 	untokenize(s);
 	if (fn->type == MERGEIN || fn->type == MERGEOUT) {
@@ -1609,7 +1608,7 @@ xpandredir(struct redir *fn, LinkList tab)
     else {
 	if (fn->type == MERGEOUT)
 	    fn->type = ERRWRITE;
-	while ((nam = (char *)ugetnode(fake))) {
+	while ((nam = (char *)ugetnode(&fake))) {
 	    /* Loop over matches, duplicating the *
 	     * redirection for each file found.   */
 	    ff = (struct redir *)alloc(sizeof *ff);
