@@ -1,3 +1,9 @@
+2000-11-25  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13192: Completion/Core/compinit, Src/params.c: Turn off
+	ALL_EXPORT during completion; don't export arrays or hashes, even
+	with ALL_EXPORT.
+
 2000-11-22  Tanaka Akira  <akr@zsh.org>
 
 	* 13181: Completion/Debian/_apt: add an action for _alternative.

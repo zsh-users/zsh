@@ -1484,7 +1484,19 @@ export_param(Param pm)
 {
     char buf[(sizeof(zlong) * 8) + 4], *val;
 
-    if (PM_TYPE(pm->flags) == PM_INTEGER)
+    if (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED)) {
+#if 0	/* Requires changes elsewhere in params.c and builtin.c */
+	if (emulation == EMULATE_KSH /* isset(KSHARRAYS) */) {
+	    struct value v;
+	    v.isarr = 1;
+	    v.inv = 0;
+	    v.start = 0;
+	    v.end = -1;
+	    val = getstrvalue(&v);
+	} else
+#endif
+	    return;
+    } else if (PM_TYPE(pm->flags) == PM_INTEGER)
 	convbase(val = buf, pm->gets.ifn(pm), pm->ct);
     else if (pm->flags & (PM_EFLOAT|PM_FFLOAT))
 	val = convfloat(pm->gets.ffn(pm), pm->ct,
