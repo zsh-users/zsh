@@ -1039,7 +1039,6 @@ setup_(Module m)
 {
     /* Set up editor entry points */
     trashzleptr = trashzle;
-    gotwordptr = gotword;
     refreshptr = zrefresh;
     spaceinlineptr = spaceinline;
     zlereadptr = zleread;
@@ -1116,7 +1115,6 @@ finish_(Module m)
 
     /* editor entry points */
     trashzleptr = noop_function;
-    gotwordptr = noop_function;
     refreshptr = noop_function;
     spaceinlineptr = noop_function_int;
     zlereadptr = fallback_zleread;

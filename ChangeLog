@@ -1,3 +1,9 @@
+2000-05-23  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11523: Src/hist.c, Src/init.c, Src/lex.c, Src/zsh.h, Src/Zle/zle.h,
+ 	Src/Zle/zle_main.c, Src/Zle/zle_tricky.c: save and restore more
+ 	variables in bufferwords(); move gotword() into core
+	
 2000-05-22  Oliver Kiddle  <opk@zsh.org>
 
 	* 11517: Completion/Core/_next_label: don't lose empty arguments

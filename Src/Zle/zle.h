@@ -30,15 +30,14 @@
 #undef trashzle
 #undef zleread
 #undef spaceinline
-#undef gotword
-#undef refresh
+#undef zrefresh
 
 typedef struct widget *Widget;
 typedef struct thingy *Thingy;
 
 /* widgets (ZLE functions) */
 
-typedef void (*ZleIntFunc) _((void));
+typedef int (*ZleIntFunc) _((char **));
 
 struct widget {
     int flags;		/* flags (see below) */
@@ -46,16 +45,24 @@ struct widget {
     union {
 	ZleIntFunc fn;	/* pointer to internally implemented widget */
 	char *fnnam;	/* name of the shell function for user-defined widget */
+	struct {
+	    ZleIntFunc fn; /* internal widget function to call */
+	    char *wid;     /* name of widget to call */
+	    char *func;    /* name of shell function to call */
+	} comp;
     } u;
 };
 
-#define WIDGET_INT	(1<<0)    /* widget is internally implemented */
-#define ZLE_MENUCMP	(1<<1)    /* DON'T invalidate completion list */
+#define WIDGET_INT	(1<<0)	/* widget is internally implemented */
+#define WIDGET_NCOMP    (1<<1)	/* new style completion widget */
+#define ZLE_MENUCMP	(1<<2)	/* DON'T invalidate completion list */
 #define ZLE_YANK	(1<<3)
-#define ZLE_LINEMOVE	(1<<4)    /* command is a line-oriented movement */
-#define ZLE_LASTCOL     (1<<5)    /* command maintains lastcol correctly */
+#define ZLE_LINEMOVE	(1<<4)	/* command is a line-oriented movement */
+#define ZLE_LASTCOL     (1<<5)	/* command maintains lastcol correctly */
 #define ZLE_KILL	(1<<6)
-#define ZLE_KEEPSUFFIX	(1<<9)    /* DON'T remove added suffix */
+#define ZLE_KEEPSUFFIX	(1<<7)	/* DON'T remove added suffix */
+#define ZLE_NOTCOMMAND  (1<<8)	/* widget should not alter lastcmd */
+#define ZLE_ISCOMP      (1<<9)	/* usable for new style completion */
 
 /* thingies */
 
@@ -99,6 +106,7 @@ struct change {
     int off;			/* offset of the text changes */
     char *del;			/* characters to delete (metafied) */
     char *ins;			/* characters to insert (metafied) */
+    int old_cs, new_cs;		/* old and new cursor positions */
 };
 
 #define CH_NEXT (1<<0)   /* next structure is also part of this change */
@@ -118,7 +126,7 @@ typedef void (*KeyScanFunc) _((char *, Thingy, char *, void *));
 
 /* Standard type of suffix removal. */
 
-#define removesuffix() iremovesuffix(256)
+#define removesuffix() iremovesuffix(256, 0)
 
 /* Cut/kill buffer type.  The buffer itself is purely binary data, *
  * not NUL-terminated.  len is a length count.  flags uses the     *
@@ -135,3 +143,54 @@ typedef struct cutbuffer *Cutbuffer;
 #define CUTBUFFER_LINE 1   /* for vi: buffer contains whole lines of data */
 
 #define KRINGCT 8   /* number of buffers in the kill ring */
+
+/* Types of completion. */
+
+#define COMP_COMPLETE        0
+#define COMP_LIST_COMPLETE   1
+#define COMP_SPELL           2
+#define COMP_EXPAND          3
+#define COMP_EXPAND_COMPLETE 4
+#define COMP_LIST_EXPAND     5
+#define COMP_ISEXPAND(X) ((X) >= COMP_EXPAND)
+
+/* Information about one brace run. */
+
+typedef struct brinfo *Brinfo;
+
+struct brinfo {
+    Brinfo next;		/* next in list */
+    Brinfo prev;		/* previous (only for closing braces) */
+    char *str;			/* the string to insert */
+    int pos;			/* original position */
+    int qpos;			/* original position, with quoting */
+    int curpos;			/* position for current match */
+};
+
+/* Convenience macros for the hooks */
+
+#define LISTMATCHESHOOK    (zlehooks + 0)
+#define COMPLETEHOOK       (zlehooks + 1)
+#define BEFORECOMPLETEHOOK (zlehooks + 2)
+#define AFTERCOMPLETEHOOK  (zlehooks + 3)
+#define ACCEPTCOMPHOOK     (zlehooks + 4)
+#define REVERSEMENUHOOK    (zlehooks + 5)
+#define INVALIDATELISTHOOK (zlehooks + 6)
+
+/* complete hook data struct */
+
+typedef struct compldat *Compldat;
+
+struct compldat {
+    char *s;
+    int lst;
+    int incmd;
+};
+
+/* List completion matches. */
+
+#define listmatches() runhookdef(LISTMATCHESHOOK, NULL)
+
+/* Invalidate the completion list. */
+
+#define invalidatelist() runhookdef(INVALIDATELISTHOOK, NULL)

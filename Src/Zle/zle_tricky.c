@@ -58,11 +58,6 @@ mod_export int clwsize, clwnum, clwpos;
 /**/
 mod_export char **clwords;
 
-/* wb and we hold the beginning/end position of the word we are completing. */
-
-/**/
-mod_export int wb, we;
-
 /* offs is the cursor position within the tokenized *
  * current word after removing nulargs.             */
 
@@ -1690,19 +1685,6 @@ doexpansion(char *s, int lst, int olst, int explincmd)
     popheap();
 
     return ret;
-}
-
-/* This is called from the lexer to give us word positions. */
-
-/**/
-void
-gotword(void)
-{
-    we = ll + 1 - inbufct + (addedx == 2 ? 1 : 0);
-    if (cs <= we) {
-	wb = ll - wordbeg + addedx;
-	zleparse = 0;
-    }
 }
 
 /**/

@@ -93,6 +93,11 @@ mod_export int inwhat;
 /**/
 mod_export int addedx;
 
+/* wb and we hold the beginning/end position of the word we are completing. */
+
+/**/
+mod_export int wb, we;
+
 /* 1 if aliases should not be expanded */
  
 /**/
@@ -1481,6 +1486,19 @@ parse_subst_string(char *s)
     }
 #endif
     return 0;
+}
+
+/* Called below to report word positions. */
+
+/**/
+mod_export void
+gotword(void)
+{
+    we = ll + 1 - inbufct + (addedx == 2 ? 1 : 0);
+    if (cs <= we) {
+	wb = ll - wordbeg + addedx;
+	zleparse = 0;
+    }
 }
 
 /* expand aliases and reserved words */
