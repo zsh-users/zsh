@@ -1,0 +1,23 @@
+#compdef xsltproc
+
+_arguments \
+  '(-)'{--version,-V}'[show libxml and libxslt versions]' \
+  '(--verbose -v)'{--verbose,-v}"[show logs of what's happening]" \
+  '(--output -o)'{--output,-o}'[specify output file]:output file:_files' \
+  '--timing[display the time used]' \
+  '--repeat[run the transformation 20 times]' \
+  '--debug[dump the tree of the result instead]' \
+  '--dumpextensions[dump registered extension elements and functions]' \
+  '--novalid[skip the DTD loading phase]' \
+  '--noout[do not dump the result]' \
+  '--maxdepth[increase the maximum depth]:depth' \
+  '(--docbook)--html[input document is an HTML file]' \
+  '(--html)--docbook[input document is SGML docbook]' \
+  '--param[pass a parameter,value pair]:name::value (xpath expression)' \
+  '--stringparam[pass a parameter]:name::value' \
+  '--nonet[refuse to fetch DTDs or entities over network]' \
+  '--catalogs[use SGML catalogs]' \
+  '--xinclude[do XInclude processing on document input]' \
+  {--profile,--norman}'[dump profiling information]' \
+  '1:stylesheet:_files -g \*.xsl' \
+  ':file:_files -g \*.xml'
