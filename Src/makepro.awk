@@ -146,7 +146,7 @@ END {
 	printf "\n"
 	printf "#ifndef GLOBAL_PROTOTYPES\n"
 	printf "\n"
-	printf locals
+	print locals
 	printf "\n"
 	printf "#endif /* !GLOBAL_PROTOTYPES */\n"
     }
