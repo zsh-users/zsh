@@ -1,29 +1,30 @@
 #compdef elinks
 
-# ELinks 0.4.1 - Text WWW browser
+# ELinks 0.4.2 - Text WWW browser
 
 local curcontext="$curcontext" state line
 typeset -A opt_args
 
 _arguments -C -A '-*' \
-  '*-anonymous[Restrict to anonymous mode]:boolean:(0 1)' \
-  '*-auto-submit[Autosubmit first form]:boolean:(0 1)' \
-  '*-base-session[Clone session with given ID]:ID number:' \
-  '*-dump[Write formatted version of given URL to stdout]:boolean:(0 1)' \
-  '*-dump-charset[Codepage to use with -dump]:codepage:' \
-  '*-dump-width[Width of document formatted with -dump]:width:' \
-  '*-eval[Evaluate given configuration option]:configuration option:' \
-  '(- 1)-'{\?,h,help}'[Print usage help and exit]' \
-  '(- 1)-long-help[Print detailed usage help and exit]' \
-  '(- 1)-config-help[Print help for configuration options]' \
-  '(- 1)-lookup[Look up specified host]:host:_hosts' \
-  '*-no-connect[Run as separate instance]:boolean:(0 1)' \
-  '*-no-home[Don'"'"'t use files in ~/.elinks]:boolean:(0 1)' \
-  '*-session-ring[Connect to session ring with given ID]:ID number:' \
-  '*-source[Write the source of given URL to stdout]:boolean:(0 1)' \
-  '(1)*-stdin[Read document from stdin]:boolean:(0 1)' \
-  '*-touch-files[Touch files in ~/.elinks when running with -no-connect/-session-ring]:boolean:(0 1)' \
-  '(- 1)-version[Print version information and exit]' \
+  '*-anonymous[restrict to anonymous mode]::boolean:(0 1)' \
+  '*-auto-submit[autosubmit first form]::boolean:(0 1)' \
+  '*-base-session[clone session with given ID]:ID number:' \
+  '*-default-mime-type[MIME type to assume for documents]:MIME type:' \
+  '*-dump[write formatted version of given URL to stdout]::boolean:(0 1)' \
+  '*-dump-charset[codepage to use with -dump]:codepage:' \
+  '*-dump-width[width of document formatted with -dump]:width:' \
+  '*-eval[evaluate given configuration option]:configuration option:' \
+  '(- 1)-'{\?,h,help}'[print usage help and exit]' \
+  '(- 1)-long-help[print detailed usage help and exit]' \
+  '(- 1)-config-help[print help for configuration options]' \
+  '(- 1)-lookup[look up specified host]:host:_hosts' \
+  '*-no-connect[run as separate instance]::boolean:(0 1)' \
+  "*-no-home[don't use files in ~/.elinks]::boolean:(0 1)" \
+  '*-session-ring[connect to session ring with given ID]:ID number:' \
+  '*-source[write the source of given URL to stdout]::boolean:(0 1)' \
+  '(1)*-stdin[read document from stdin]::boolean:(0 1)' \
+  '*-touch-files[touch files in ~/.elinks when running with -no-connect/-session-ring]::boolean:(0 1)' \
+  '(- 1)-version[print version information and exit]' \
   '1:url:->url' && return
 
 if [[ "$state" = url ]]; then

@@ -1,3 +1,9 @@
+2003-02-17  Oliver Kiddle  <opk@zsh.org>
+
+	* Doug Kearns: 18246: Completion/Unix/Command/_elinks,
+	Completion/Unix/Command/_ant, Completion/Unix/Command/_java:
+	minor update to _elinks and a couple of trivial fixes for java/ant
+
 2003-02-08  Clint Adams  <clint@zsh.org>
 
         * 18207: Src/Builtins/rlimits.c: add maxfilelocks to ulimit output.

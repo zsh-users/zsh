@@ -6,7 +6,7 @@ local target='*:target:->target'
 
 _arguments -C \
   '-help[display usage information]' \
-  '-projecthelp[print project hjelp information]' \
+  '-projecthelp[print project help information]' \
   '-version[display version information]' \
   '-diagnostics[display info useful to problem diagnosis]' \
   '(-q -quiet)'{-q,-quiet}'[be extra quiet]' \
