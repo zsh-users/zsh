@@ -1,6 +1,6 @@
 name=zsh/zutil
 
-moddeps="complete"
+moddeps="zsh/complete"
 
 objects="zutil.o"
 
