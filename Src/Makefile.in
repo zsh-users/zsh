@@ -101,7 +101,8 @@ rm-modobjs-tmp:
 @CONFIG_MK@
 
 Makemod modules.index prep: modules-bltin $(CONFIG_INCS)
-	( cd $(sdir_top) && $(SHELL) $(subdir)/mkmodindex.sh $(subdir) ) \
+	( cd $(sdir_top) && OMIT_MODULES="$(OMIT_MODULES)" \
+	$(SHELL) $(subdir)/mkmodindex.sh $(subdir) ) \
 	    > modules.index.tmp
 	@if cmp -s modules.index.tmp modules.index; then \
 	    rm -f modules.index.tmp; \

@@ -186,6 +186,16 @@ AC_ARG_ENABLE(dynamic,
 [  --disable-dynamic          turn off dynamically loaded binary modules],
 [dynamic="$enableval"], [dynamic=yes])
 
+dnl Do you want to disable a list of modules?
+dnl Unfortunately we can't give --disable-* a value, so we'll have
+dnl to do it as an `--enable-*', rather unnaturally.
+undefine([OMIT_MODULES])dnl
+AC_ARG_ENABLE(omit-modules,
+[  --enable-omit-modules      give comma-separated list of modules to ignore],
+[OMIT_MODULES="$enableval"], [OMIT_MODULES=])
+
+AC_SUBST(OMIT_MODULES)dnl
+
 dnl Do you want to compile as K&R C.
 AC_ARG_ENABLE(ansi2knr,
 [  --enable-ansi2knr          translate source to K&R C before compiling],

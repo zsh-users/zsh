@@ -59,8 +59,8 @@ is EPREFIX/lib/zsh/<zsh-version-number>, where EPREFIX defaults to PREFIX
 unless given explicitly, and PREFIX defaults to /usr/local.  See the end of
 this file for options to configure to change these.
 
-Adding more modules
--------------------
+Adding and removing modules
+---------------------------
 
 The zsh distribution contains several modules, in the Src/Builtins,
 Src/Modules and Src/Zle directories.  If you have any additional zsh
@@ -72,6 +72,18 @@ must be actual directories; symbolic links will not work.
 If you wish to add or remove modules or module directories after you
 have already run make, then after adding or removing the modules run:
     make prep
+
+You can also instruct the configuration process that a certain module
+should neither be compiled nor installed without modifying any files.  To
+do this, give the argument `--enable-omit-modules=mod1,mod2,...' to
+configure.  The module arguments are the full names of the modules,
+probably including the prefix `zsh/'.  For example,
+`configure --enable-omit-modules=zsh/zpty,zsh/example' says that the
+modules zsh/zpty and zsh/example are not to be compiled nor installed.
+Note that it is up to you to make sure the modules in question are not going
+to be compiled into the main zsh binary, as described in the next section.
+It is unlikely you would want to omit any of the modules liable to be
+compiled in by default.
 
 Controlling what is compiled into the main zsh binary
 -----------------------------------------------------
@@ -365,6 +377,7 @@ Features:
      fndir=directory     # the directory where shell functions will go
      site-fndir=directory# the directory where site-specific functions can go
      function-subdirs    # if functions will be installed into subdirectories
+     omit-modules=mod1,..# don't compile nor install the modules named mod1,...
      dynamic             # allow dynamically loaded binary modules
      lfs                 # allow configure check for large files
      locale              # allow use of locale library
