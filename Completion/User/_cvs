@@ -225,21 +225,18 @@ _cvs_history () {
 
 builtin functions _cvs_history_x >&- ||
 _cvs_history_x () {
-  compset -P '*'
-
-  compadd "$@" -S '' -d '(
-  F\ --\ release
-  O\ --\ checkout
-  E\ --\ export
-  T\ --\ rtag
-  C\ --\ merge\ collision-detected
-  G\ --\ merge\ succeed
-  U\ --\ working\ file\ was\ copied
-  W\ --\ working\ file\ was\ deleted
-  A\ --\ A\ file\ was\ added
-  M\ --\ A\ file\ was\ modified
-  R\ --\ A\ file\ was\ removed
-  )' F O E T C G U W A M R
+  _values -s '' 'type' \
+    'F[release]' \
+    'O[checkout]' \
+    'E[export]' \
+    'T[rtag]' \
+    'C[merge collision-detected]' \
+    'G[merge succeed]' \
+    'U[working file was copied]' \
+    'W[working file was deleted]' \
+    'A[A file was added]' \
+    'M[A file was modified]' \
+    'R[A file was removed]'
 }
 
 builtin functions _cvs_import >&- ||

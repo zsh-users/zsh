@@ -78,16 +78,13 @@ _arguments -s \
 
 case "$state" in
 noflags)
-  tmp1=(
-    'v:non verbose'
-    'h:no host lookup'
-    'H:no host directories'
-    'd:no directories'
-    'c:no clobber'
-    'r:don'\''t remove listing'
-    'p:no parent'
-  )
-  tmp2=(${PREFIX}${^tmp1%%:*})
-  _describe -o option tmp1 tmp2
+  _values -s '' 'option' \
+    'v[non verbose]' \
+    'h[no host lookup]' \
+    'H[no host directories]' \
+    'd[no directories]' \
+    'c[no clobber]' \
+    'r[don'\''t remove listing]' \
+    'p[no parent]'
   ;;
 esac
