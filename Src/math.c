@@ -168,8 +168,8 @@ static int prec[TOKCOUNT] =
      0,  16, 0
 };
 
-#define TOPPREC 17
-#define ARGPREC (TOPPREC-1)
+#define TOPPREC 18
+#define ARGPREC 16
 
 static int type[TOKCOUNT] =
 {

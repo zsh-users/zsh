@@ -110,3 +110,23 @@
   print $(( ))
 0:empty math parse e.g. $(( )) acts like a zero
 >0
+
+  print $(( a = ))
+1:empty assignment
+?(eval):1: bad math expression: operand expected at `'
+
+  print $(( 3, ))
+1:empty right hand of comma
+?(eval):1: bad math expression: operand expected at `'
+
+  print $(( 3,,4 ))
+1:empty middle of comma
+?(eval):1: bad math expression: operand expected at `,4 '
+
+  print $(( (3 + 7, 4), 5 ))
+0:commas and parentheses, part 1
+>5
+
+  print $(( 5, (3 + 7, 4) ))
+0:commas and parentheses, part 1
+>4
