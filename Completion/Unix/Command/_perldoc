@@ -1,0 +1,23 @@
+#compdef perldoc
+#
+# _perldoc - zsh completion function for perldoc
+#
+# Adam Spiers <adam@spiers.net>
+#
+
+_perldoc () {
+  _arguments -s \
+    '-h:help:' \
+    '(-q)-f:Perl built-in function:_perl_builtin_funcs:*:' \
+    '(-f)-q:Perl FAQ keyword:' \
+    '*:Perl pod pages:_perl_pods'
+}
+
+_perl_pods () {
+  _alternative \
+    'modules:: _perl_modules' \
+    'pods:: _perl_basepods' \
+    'files:Perl modules and .pods:_files -g \*.\(pod\|pm\)'
+}
+
+_perldoc "$@"
