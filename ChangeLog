@@ -1,3 +1,9 @@
+2002-09-03  Peter Stephenson  <pws@csr.com>
+
+	* 17602, 17603: Doc/Zsh/builtins.yo, Src/builtin.c, Src/zsh.h:
+	Rationalise option handling further, make cd, pushd, popd options
+	behave as documented and more like other builtins.
+
 2002-09-02  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (based on users/5283): Functions/Misc/zargs: Implement

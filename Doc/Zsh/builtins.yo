@@ -772,9 +772,9 @@ pindex(PUSHD_TO_HOME, use of)
 pindex(PUSHD_MINUS, use of)
 pindex(CDABLE_VARS, use of)
 pindex(PUSHD_SILENT, use of)
-xitem(tt(pushd) [ var(arg) ])
-xitem(tt(pushd) var(old) var(new))
-item(tt(pushd) {tt(PLUS())|tt(-)}var(n))(
+xitem(tt(pushd) [ tt(-sLP) ] [ var(arg) ])
+xitem(tt(pushd) [ tt(-sLP) ] var(old) var(new))
+item(tt(pushd) [ tt(-sLP) ] {tt(PLUS())|tt(-)}var(n))(
 Change the current directory, and push the old current directory
 onto the directory stack.  In the first form, change the
 current directory to var(arg).
@@ -795,6 +795,9 @@ of `tt(PLUS())' and `tt(-)' in this context are swapped.
 
 If the option tt(PUSHD_SILENT) is not set, the directory
 stack will be printed after a tt(pushd) is performed.
+
+The options tt(-s), tt(-L) and tt(-P) have the same meanings as for the
+tt(cd) builtin.
 )
 findex(pushln)
 item(tt(pushln) [ var(arg) ... ])(

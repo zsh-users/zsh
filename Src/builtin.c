@@ -50,14 +50,14 @@ static struct builtin builtins[] =
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
     BUILTIN("bye", 0, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("cd", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
-    BUILTIN("chdir", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
+    BUILTIN("cd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "sPL", NULL),
+    BUILTIN("chdir", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "sPL", NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
     BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lprtux", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
-    BUILTIN("echo", BINF_PRINTOPTS | BINF_ECHOPTS, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
+    BUILTIN("echo", BINF_PRINTOPTS | BINF_SKIPINVALID, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
     BUILTIN("emulate", 0, bin_emulate, 1, 1, 0, "LR", NULL),
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
@@ -99,10 +99,10 @@ static struct builtin builtins[] =
     BUILTIN("patdebug", 0, bin_patdebug, 1, -1, 0, "p", NULL),
 #endif
 
-    BUILTIN("popd", 0, bin_cd, 0, 2, BIN_POPD, NULL, NULL),
+    BUILTIN("popd", 0, bin_cd, 0, 1, BIN_POPD, NULL, NULL),
     BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPbnrsf:lzNu:pioOcm-", NULL),
     BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, NULL, NULL),
-    BUILTIN("pushd", 0, bin_cd, 0, 2, BIN_PUSHD, NULL, NULL),
+    BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "sPL", NULL),
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "nrl", NULL),
@@ -238,10 +238,8 @@ new_optarg(Options ops)
 int
 execbuiltin(LinkList args, Builtin bn)
 {
-    LinkNode n;
-    char *arg, *pp, *name, *optstr;
-    char *oxarg, *xarg = NULL;
-    int flags, sense, argc = 0, execop, xtr = isset(XTRACE), lxarg = 0;
+    char *pp, *name, *optstr;
+    int flags, sense, argc, execop, xtr = isset(XTRACE);
     struct options ops;
 
     /* initialise options structure */
@@ -252,8 +250,6 @@ execbuiltin(LinkList args, Builtin bn)
     /* initialize some local variables */
     name = (char *) ugetnode(args);
 
-    arg = (char *) ugetnode(args);
-
     if (!bn->handlerfunc) {
 	zwarnnam(name, "autoload failed", NULL, 0);
 	deletebuiltin(bn->nam);
@@ -263,141 +259,150 @@ execbuiltin(LinkList args, Builtin bn)
     flags = bn->flags;
     optstr = bn->optstr;
 
-    /* Sort out the options. */
-    if ((flags & BINF_ECHOPTS) && isset(BSDECHO))
-	ops.ind['E'] = 1;
-    if (optstr)
-	/* while arguments look like options ... */
-	while (arg &&
-	       ((sense = (*arg == '-')) ||
-		((flags & BINF_PLUSOPTS) && *arg == '+')) &&
-	       ((flags & BINF_PLUSOPTS) || !atoi(arg))) {
-	    /* unrecognised options to echo etc. are not really options */
-	    if (flags & BINF_ECHOPTS) {
-		char *p = arg;
-		while (*++p && strchr(optstr, (int) *p));
-		if (*p)
-		    break;
-	    }
-	    /* save the options in xarg, for execution tracing */
-	    if (xtr) {
-		if (xarg) {
-		    int l = strlen(arg) + lxarg + 1;
-
-		    oxarg = zhalloc(l + 1);
-		    strcpy(oxarg, xarg);
-		    oxarg[lxarg] = ' ';
-		    strcpy(oxarg + lxarg + 1, arg);
-		    xarg = oxarg;
-		    lxarg = l + 1;
-		} else {
-		    xarg = dupstring(arg);
-		    lxarg = strlen(xarg);
-		}
-	    }
-	    /* handle -- or - (ops.ind['-']), and +
-	     * (ops.ind['-'] and ops.ind['+']) */
-	    if (arg[1] == '-')
-		arg++;
-	    if (!arg[1]) {
-		ops.ind['-'] = 1;
-		if (!sense)
-		    ops.ind['+'] = 1;
-	    }
-	    /* save options in ops, as long as they are in bn->optstr */
-	    execop = -1;
-	    while (*++arg) {
-		char *optptr;
-		if ((optptr = strchr(optstr, execop = (int)*arg))) {
-		    ops.ind[(int)*arg] = (sense) ? 1 : 2;
-		    if (optptr[1] == ':') {
-			char *argptr = NULL;
-			if (optptr[2] == ':') {
-			    if (arg[1])
-				argptr = arg+1;
-			    /* Optional argument in same word*/
-			} else if (optptr[2] == '%') {
-			    /* Optional numeric argument in same
-			     * or next word. */
-			    if (arg[1] && idigit(arg[1]))
-				argptr = arg+1;
-			    else if (firstnode(args) &&
-				     idigit(*(char *)peekfirst(args)))
-				argptr = arg = (char *)ugetnode(args);
-			} else {
-			    /* Mandatory argument */
-			    if (arg[1])
-				argptr = arg+1;
-			    else if ((arg = (char *)ugetnode(args)))
-				argptr = arg;
-			    else {
-				zwarnnam(name, "argument expected: -%c", NULL,
-					 execop);
-				return 1;
-			    }
-			}
-			if (argptr) {
-			    if (new_optarg(&ops)) {
-				zwarnnam(name, 
-					 "too many option arguments", NULL, 0);
-				return 1;
-			    }
-			    ops.ind[execop] |= ops.argscount << 2;
-			    ops.args[ops.argscount-1] = argptr;
-			    while (arg[1])
-				arg++;
-			}
-		    }
-		} else
-		    break;
-	    }
-	    /* The above loop may have exited on an invalid option.  (We  *
-	     * assume that any option requiring metafication is invalid.) */
-	    if (*arg) {
-		if(*arg == Meta)
-		    *++arg ^= 32;
-		zwarn("bad option: -%c", NULL, *arg);
-		return 1;
-	    }
-	    arg = (char *) ugetnode(args);
-	    /* for the "print" builtin, the options after -R are treated as
-	       options to "echo" */
-	    if ((flags & BINF_PRINTOPTS) && ops.ind['R'] && !ops.ind['f']) {
-		optstr = "ne";
-		flags |= BINF_ECHOPTS;
-	    }
-	    /* the option -- indicates the end of the options */
-	    if (ops.ind['-'])
-		break;
-	}
-    /* handle built-in options, for overloaded handler functions */
-    if ((pp = bn->defopts)) {
-	while (*pp) {
-	    /* only if not already set */
-	    if (!ops.ind[(int)*pp])
-		ops.ind[(int)*pp] = 1;
-	    pp++;
-	}
-    }
-
     /* Set up the argument list. */
-    if (arg) {
-	/* count the arguments */
-	argc = 1;
-	n = firstnode(args);
-	while (n)
-	    argc++, incnode(n);
-    }
-    {
-	VARARR(char *, argarr, (argc + 1));
-	char **argv, **oargv;
+    /* count the arguments */
+    argc = countlinknodes(args);
 
-	/* Get the actual arguments, into argv.  Oargv saves the *
-	 * beginning of the array for later reference.           */
-	oargv = argv = argarr;
-	if ((*argv++ = arg))
-	    while ((*argv++ = (char *)ugetnode(args)));
-	argv = oargv;
+    {
+	/*
+	 * Keep all arguments, including options, in an array.
+	 * We don't actually need the option part of the argument
+	 * after option processing, but it makes XTRACE output
+	 * much simpler.
+	 */
+	VARARR(char *, argarr, argc + 1);
+	char **argv;
+
+	/*
+	 * Get the actual arguments, into argv.  Remember argarr
+	 * may be an array declaration, depending on the compiler.
+	 */
+	argv = argarr;
+	while ((*argv++ = (char *)ugetnode(args)));
+	argv = argarr;
+
+	/* Sort out the options. */
+	if (optstr) {
+	    char *arg = *argv;
+	    /* while arguments look like options ... */
+	    while (arg &&
+		   /* Must begin with - or maybe + */
+		   ((sense = (*arg == '-')) ||
+		    ((flags & BINF_PLUSOPTS) && *arg == '+'))) {
+		/* Digits aren't arguments unless the command says they are. */
+		if (!(flags & BINF_KEEPNUM) && idigit(arg[1]))
+		    break;
+		/* For cd and friends, a single dash is not an option. */
+		if ((flags & BINF_SKIPDASH) && !arg[1])
+		    break;
+		if ((flags & BINF_DASHDASHVALID) && !strcmp(arg, "--")) {
+		    /*
+		     * Need to skip this before checking whether this is
+		     * really an option.
+		     */
+		    argv++;
+		    break;
+		}
+		/* unrecognised options to echo etc. are not really options */
+		if (flags & BINF_SKIPINVALID) {
+		    char *p = arg;
+		    if (optstr)
+			while (*++p && strchr(optstr, (int) *p));
+		    else
+			p++;
+		    if (*p)
+			break;
+		}
+		/* handle -- or - (ops.ind['-']), and +
+		 * (ops.ind['-'] and ops.ind['+']) */
+		if (arg[1] == '-')
+		    arg++;
+		if (!arg[1]) {
+		    ops.ind['-'] = 1;
+		    if (!sense)
+			ops.ind['+'] = 1;
+		}
+		/* save options in ops, as long as they are in bn->optstr */
+		while (*++arg) {
+		    char *optptr;
+		    if ((optptr = strchr(optstr, execop = (int)*arg))) {
+			ops.ind[(int)*arg] = (sense) ? 1 : 2;
+			if (optptr[1] == ':') {
+			    char *argptr = NULL;
+			    if (optptr[2] == ':') {
+				if (arg[1])
+				    argptr = arg+1;
+				/* Optional argument in same word*/
+			    } else if (optptr[2] == '%') {
+				/* Optional numeric argument in same
+				 * or next word. */
+				if (arg[1] && idigit(arg[1]))
+				    argptr = arg+1;
+				else if (argv[1] && idigit(*argv[1]))
+				    argptr = arg = *++argv;
+			    } else {
+				/* Mandatory argument */
+				if (arg[1])
+				    argptr = arg+1;
+				else if ((arg = *++argv))
+				    argptr = arg;
+				else {
+				    zwarnnam(name, "argument expected: -%c",
+					     NULL, execop);
+				    return 1;
+				}
+			    }
+			    if (argptr) {
+				if (new_optarg(&ops)) {
+				    zwarnnam(name, 
+					     "too many option arguments",
+					     NULL, 0);
+				    return 1;
+				}
+				ops.ind[execop] |= ops.argscount << 2;
+				ops.args[ops.argscount-1] = argptr;
+				while (arg[1])
+				    arg++;
+			    }
+			}
+		    } else
+			break;
+		}
+		/* The above loop may have exited on an invalid option.  (We  *
+		 * assume that any option requiring metafication is invalid.) */
+		if (*arg) {
+		    if(*arg == Meta)
+			*++arg ^= 32;
+		    zwarn("bad option: -%c", NULL, *arg);
+		    return 1;
+		}
+		arg = *++argv;
+		/* for the "print" builtin, the options after -R are treated as
+		   options to "echo" */
+		if ((flags & BINF_PRINTOPTS) && ops.ind['R'] &&
+		    !ops.ind['f']) {
+		    optstr = "ne";
+		    flags |= BINF_SKIPINVALID;
+		}
+		/* the option -- indicates the end of the options */
+		if (ops.ind['-'])
+		    break;
+	    }
+	}
+
+	/* handle built-in options, for overloaded handler functions */
+	if ((pp = bn->defopts)) {
+	    while (*pp) {
+		/* only if not already set */
+		if (!ops.ind[(int)*pp])
+		    ops.ind[(int)*pp] = 1;
+		pp++;
+	    }
+	}
+
+	/* Fix the argument count by subtracting option arguments */
+	argc -= argv - argarr;
+
 	if (errflag) {
 	    errflag = 0;
 	    return 1;
@@ -412,15 +417,13 @@ execbuiltin(LinkList args, Builtin bn)
 
 	/* display execution trace information, if required */
 	if (xtr) {
+	    /* Use full argument list including options for trace output */
+	    char **fullargv = argarr;
 	    printprompt4();
 	    fprintf(xtrerr, "%s", name);
-	    if (xarg) {
+	    while (*fullargv) {
 	        fputc(' ', xtrerr);
-	        quotedzputs(xarg, xtrerr);
-	    }
-	    while (*oargv) {
-	        fputc(' ', xtrerr);
-	        quotedzputs(*oargv++, xtrerr);
+	        quotedzputs(*fullargv++, xtrerr);
 	    }
 	    fputc('\n', xtrerr);
 	    fflush(xtrerr);
@@ -762,27 +765,11 @@ bin_cd(char *nam, char **argv, Options ops, int func)
     }
     doprintdir = (doprintdir == -1);
 
-    for (; *argv && **argv == '-'; argv++) {
-	char *s = *argv + 1;
-
-	do {
-	    switch (*s) {
-	    case 's':
-	    case 'P':
-	    case 'L':
-		break;
-	    default:
-		goto brk;
-	    }
-	} while (*++s);
-	for (s = *argv; *++s; ops->ind[STOUC(*s)] = 1);
-    }
- brk:
     chasinglinks = OPT_ISSET(ops,'P') || 
 	(isset(CHASELINKS) && !OPT_ISSET(ops,'L'));
     queue_signals();
     zpushnode(dirstack, ztrdup(pwd));
-    if (!(dir = cd_get_dest(nam, argv, ops, func))) {
+    if (!(dir = cd_get_dest(nam, argv, OPT_ISSET(ops,'s'), func))) {
 	zsfree(getlinknode(dirstack));
 	unqueue_signals();
 	return 1;
@@ -812,7 +799,7 @@ bin_cd(char *nam, char **argv, Options ops, int func)
 
 /**/
 static LinkNode
-cd_get_dest(char *nam, char **argv, Options ops, int func)
+cd_get_dest(char *nam, char **argv, int hard, int func)
 {
     LinkNode dir = NULL;
     LinkNode target;
@@ -882,7 +869,7 @@ cd_get_dest(char *nam, char **argv, Options ops, int func)
     if (!dir) {
 	dir = firstnode(dirstack);
     }
-    if (!(dest = cd_do_chdir(nam, getdata(dir), OPT_ISSET(ops,'s')))) {
+    if (!(dest = cd_do_chdir(nam, getdata(dir), hard))) {
 	if (!target)
 	    zsfree(getlinknode(dirstack));
 	if (func == BIN_POPD)
@@ -3026,6 +3013,8 @@ bin_print(char *name, char **args, Options ops, int func)
     
     if (func == BIN_PRINTF)
 	fmt = *args++;
+    else if (func == BIN_ECHO && isset(BSDECHO))
+	ops->ind['E'] = 1;
     else if (OPT_HASARG(ops,'f'))
 	fmt = OPT_ARG(ops,'f');
     if (fmt)

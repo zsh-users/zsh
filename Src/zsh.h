@@ -1002,15 +1002,19 @@ struct builtin {
 #define BINF_PLUSOPTS		(1<<1)	/* +xyz legal */
 #define BINF_PRINTOPTS		(1<<2)
 #define BINF_ADDED		(1<<3)	/* is in the builtins hash table */
-#define BINF_ECHOPTS		(1<<4)
-#define BINF_MAGICEQUALS	(1<<5)  /* needs automatic MAGIC_EQUAL_SUBST substitution */
-#define BINF_PREFIX		(1<<6)
-#define BINF_DASH		(1<<7)
-#define BINF_BUILTIN		(1<<8)
-#define BINF_COMMAND		(1<<9)
-#define BINF_EXEC		(1<<10)
-#define BINF_NOGLOB		(1<<11)
-#define BINF_PSPECIAL		(1<<12)
+#define BINF_MAGICEQUALS	(1<<4)  /* needs automatic MAGIC_EQUAL_SUBST substitution */
+#define BINF_PREFIX		(1<<5)
+#define BINF_DASH		(1<<6)
+#define BINF_BUILTIN		(1<<7)
+#define BINF_COMMAND		(1<<8)
+#define BINF_EXEC		(1<<9)
+#define BINF_NOGLOB		(1<<10)
+#define BINF_PSPECIAL		(1<<11)
+/* Builtin option handling */
+#define BINF_SKIPINVALID	(1<<12)	/* Treat invalid option as argument */
+#define BINF_KEEPNUM		(1<<13) /* `[-+]NUM' can be an option */
+#define BINF_SKIPDASH		(1<<14) /* Treat `-' as argument (maybe `+') */
+#define BINF_DASHDASHVALID	(1<<15) /* Handle `--' evenf if SKIPINVALD */
 
 struct module {
     char *nam;
