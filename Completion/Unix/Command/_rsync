@@ -13,7 +13,7 @@ _rsync_user_or_host() {
       _wanted users expl "user" \
 	  _combination -s '[:@]' "${tag}" users-hosts users -q "$@" -
   else
-    [[ $words[CURRENT] = rsync://* ]] || rsync='rsync:rsync: compadd -S/ rsync:/'
+    [[ $words[CURRENT] = rsync://* ]] || rsync='rsync:rsync: compadd -S "" rsync://'
     _alternative \
       'users:user:_users -S @' \
       "hosts:host:_hosts -S '$suf'" \
@@ -26,7 +26,7 @@ local expl remfiles remdispf remdispd remmodules suf ret=1 tag=accounts
 
 if compset -P '*::*/' || compset -P 'rsync://*/*/'; then
 
-  remfiles=(${${(f)"$(_call_program files rsync ${words[CURRENT]%/*}/)"}:#[ 	]*})
+  remfiles=(${${(f)"$(_call_program files rsync ${words[CURRENT]%/*}/ 2>/dev/null)"}:#([ 	]|MOTD:)*})
 
   remdispf=(${remfiles:#d*})
   remdispd=(${(M)remfiles:#d*})
@@ -41,11 +41,13 @@ elif compset -P 1 '*::' || compset -P 1 'rsync://*/'; then
 
   local pat=${words[CURRENT]}
 
-  if [[ $pat = *:: ]]; then
+  if [[ $pat = *::* ]]; then
     pat=${pat%::*}::
+  else
+    pat=${pat%/*}/
   fi
 
-  remfiles=(${${(f)"$(_call_program files rsync $pat)"}:#[ 	]*})
+  remfiles=(${${(f)"$(_call_program files rsync $pat 2>/dev/null)"}:#([ 	]|MOTD:)*})
 
   remmodules=(${remfiles/[ 	]##/:})
 

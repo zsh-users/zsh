@@ -1,5 +1,9 @@
 2005-04-03  Andrey Borzenkov  <bor@zsh.org>
 
+	* 21086: Completion/Unix/Command/_rsync: fix module completion,
+	redirect rsync errors to /dev/null, use -S "" as suggested
+	by Oliver.
+	
 	* 21085: Completion/Mandrake/Command/_urpmi: update for 10.2,
 	add parsehdlist, use urpmq --list options to get media and
 	package list
