@@ -1,3 +1,7 @@
+2001-07-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: zshconfig.ac: Remove references to FUNCINST_MK.
+
 2001-07-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 15204: zshconfig.ac, Src/compat.c, Src/params.c: fix compilation
