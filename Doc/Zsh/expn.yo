@@ -452,7 +452,7 @@ item(tt(${)var(name)tt(^^)var(pattern)tt(^)var(then)tt(^)var(else)tt(}))(
 If the expansion of var(name) matches the var(pattern), the var(then)
 string is substituted, otherwise the var(else) string is
 substituted. In the second form the var(pattern) is taken to be
-negated (even if the tt(EXTENDED_GLOB) option is not set. The
+negated (even if the tt(EXTENDED_GLOB) option is not set). The
 var(else) string with the preceding `tt(^)' may be omitted in which
 case the expansion behaves as if var(name) were unset (or, if
 var(name) is an array, as if the element compared did not exist). In
