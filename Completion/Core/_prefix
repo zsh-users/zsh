@@ -1,0 +1,23 @@
+#autoload
+
+# Try to ignore the suffix. A bit like e-o-c-prefix.
+
+[[ -n "$SUFFIX" ]] || return 1
+
+local curcontext="${curcontext/:[^:]#:/:prefix:}" comp i
+
+zstyle -a ":completion:${curcontext}:" completer comp ||
+  comp=( "${(@)_completers[1,-${#_completers_left}-1][(R)_prefix,-1]}" )
+
+if zstyle -t ":completion:${curcontext}:" add-space; then
+  ISUFFIX=" $SUFFIX"
+else
+  ISUFFIX="$SUFFIX"
+fi
+SUFFIX=''
+
+for i in "$comp[@]"; do
+  [[ "$i" != _prefix ]] && "$i" && return 0
+done
+
+return 1
