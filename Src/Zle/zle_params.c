@@ -482,8 +482,10 @@ set_prepost(unsigned char **textvar, int *lenvar, char *x)
     }
     if (x) {
 	unmetafy(x, lenvar);
-	*textvar = (unsigned char *)zalloc(*lenvar);
-	memcpy((char *)*textvar, x, *lenvar);
+	if (*lenvar) {
+	    *textvar = (unsigned char *)zalloc(*lenvar);
+	    memcpy((char *)*textvar, x, *lenvar);
+	}
 	free(x);
     }
 }

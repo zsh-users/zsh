@@ -1,3 +1,8 @@
+2003-03-05  Peter Stephenson  <pws@csr.com>
+
+	* 18318: Src/Zle/zle_params.c: memory leak in PREDISPLAY and
+	POSTDISPLAY when setting zero length values.
+
 2003-02-27  Peter Stephenson  <pws@csr.com>
 
 	* 18313: Src/Zle/zle_misc.c: After a single yank (hence
