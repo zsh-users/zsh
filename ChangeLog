@@ -1,3 +1,8 @@
+2002-05-23  Clint Adams  <clint@zsh.org>
+
+	* Matt Zimmerman: 17211: Completion/Unix/Command/_cvs:
+	respect $CVSIGNORE.
+
 2002-05-21  Peter Stephenson  <pws@csr.com>
 
 	* 17201: Doc/Zsh/mod_tcp.yo: add example use of ztcp.
