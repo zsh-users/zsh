@@ -401,6 +401,13 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	nicezputs((m->disp ? m->disp : m->str), shout);
 	len = niceztrlen(m->disp ? m->disp : m->str);
 
+	if (m->gnum != mselect) {
+	    if (mcolors.cols[COL_EC])
+		tputs(mcolors.cols[COL_EC], 1, putshout);
+	    else
+		zcputs(&mcolors, COL_NO);
+	}
+
 	if (isset(LISTTYPES)) {
 	    if (buf)
 		putc(file_type(buf->st_mode), shout);
@@ -413,10 +420,13 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	while (len-- > 0)
 	    putc(' ', shout);
 
-	if (mcolors.cols[COL_EC])
-	    tputs(mcolors.cols[COL_EC], 1, putshout);
-	else
-	    zcputs(&mcolors, COL_NO);
+	if (m->gnum == mselect) {
+	    if (mcolors.cols[COL_EC])
+		tputs(mcolors.cols[COL_EC], 1, putshout);
+	    else
+		zcputs(&mcolors, COL_NO);
+	}
+
 	if (!lastc) {
 	    zcputs(&mcolors, COL_NO);
 	    fputs("  ", shout);
