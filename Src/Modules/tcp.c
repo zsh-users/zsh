@@ -226,19 +226,7 @@ freehostent(struct hostent *ptr)
 /**/
 #endif /* !HAVE_GETIPNODEBYNAME */
 
-Tcp_session ztcp_head = NULL, ztcp_tail = NULL;
-
-static Tcp_session
-zts_head(void)
-{
-    return ztcp_head;
-}
-
-static Tcp_session
-zts_next(Tcp_session cur)
-{
-    return cur ? cur->next : NULL;
-}
+LinkList ztcp_sessions;
 
 /* "allocate" a tcp_session */
 static Tcp_session
@@ -249,16 +237,10 @@ zts_alloc(int ztflags)
     sess = (Tcp_session)zcalloc(sizeof(struct tcp_session));
     if (!sess) return NULL;
     sess->fd=-1;
-    sess->next=NULL;
     sess->flags=ztflags;
 
-    if (!zts_head()) {
-	ztcp_head = ztcp_tail = sess;
-    }
-    else {
-	ztcp_tail->next = sess;
-	ztcp_tail = sess;
-    }
+    zinsertlinknode(ztcp_sessions, lastnode(ztcp_sessions), (void *)sess);
+
     return sess;
 }
 
@@ -276,62 +258,50 @@ tcp_socket(int domain, int type, int protocol, int ztflags)
 }
 
 static int
+ztcp_free_session(Tcp_session sess)
+{
+    zfree(sess, sizeof(struct tcp_session));
+
+    return 0;
+}
+
+static int
 zts_delete(Tcp_session sess)
 {
-    Tcp_session tsess;
+    LinkNode node;
 
-    tsess = zts_head();
+    node = linknodebydatum(ztcp_sessions, (void *)sess);
 
-    if(!sess) return 1;
-
-    if (tsess == sess)
+    if (!node)
     {
-	ztcp_head = sess->next;
-	free(sess);
-	return 0;
+	return 1;
     }
 
-    while((tsess->next != sess) && (tsess->next)) {
-	tsess = zts_next(tsess);
-    }
+    ztcp_free_session(getdata(node));
+    remnode(ztcp_sessions, node);
 
-    if (!tsess->next) return 1;
-
-    if (ztcp_tail == sess)
-	ztcp_tail = tsess;
-    tsess->next = sess->next;
-    free(sess);
     return 0;
-
 }
 
 static Tcp_session
 zts_byfd(int fd)
 {
-    Tcp_session tsess;
-
-    tsess = zts_head();
-
-    while(tsess != NULL) {
-	if (tsess->fd == fd)
-	    return tsess;
-
-	tsess = zts_next(tsess);
-    }
-
+    LinkNode node;
+    
+    for (node = firstnode(ztcp_sessions); node; incnode(node))
+	if (((Tcp_session)getdata(node))->fd == fd)
+	    return (Tcp_session)node;
+    
     return NULL;
 }
 
 static void
 tcp_cleanup(void)
 {
-    Tcp_session sess, prev;
-    
-    for(sess = zts_head(); sess != NULL; sess = zts_next(prev))
-    {
-	prev = sess;
-	tcp_close(sess);
-    }
+    LinkNode node;
+
+    for (node = firstnode(ztcp_sessions); node; incnode(node))
+	tcp_close((Tcp_session)getdata(node));
 }
 
 /**/
@@ -601,8 +571,11 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
     {
 	
 	if (!dargs[0]) {
-	    for(sess = zts_head(); sess != NULL; sess = zts_next(sess))
+	    LinkNode node;
+	    for(node = firstnode(ztcp_sessions); node; incnode(node))
 	    {
+		sess = (Tcp_session)getdata(node);
+
 		if (sess->fd != -1)
 		{
 		    zthost = gethostbyaddr(&(sess->sock.in.sin_addr), sizeof(struct sockaddr_in), AF_INET);
@@ -708,6 +681,7 @@ setup_(Module m)
 int
 boot_(Module m)
 {
+    ztcp_sessions = znewlinklist();
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
@@ -717,6 +691,7 @@ int
 cleanup_(Module m)
 {
     tcp_cleanup();
+    freelinklist(ztcp_sessions, (FreeFunc) ztcp_free_session);
     return 0;
 }
 

@@ -1,3 +1,8 @@
+2001-10-02  Clint Adams  <clint@zsh.org>
+
+	* 15919: Src/linklist.c, Src/Modules/tcp.c, Src/Modules/tcp.h:
+	use LinkLists in tcp module rather than somewhat equivalent code.
+
 2001-10-01  Peter Stephenson  <pws@csr.com>
 
 	* 15917: Test/C03traps.ztst: test for EXIT trap fix in 15844.

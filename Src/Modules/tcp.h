@@ -80,7 +80,6 @@ struct tcp_session {
     int fd;				/* file descriptor */
     union tcp_sockaddr sock;  	/* local address   */
     union tcp_sockaddr peer;  	/* remote address  */
-    Tcp_session next;
     int flags;
 };
 

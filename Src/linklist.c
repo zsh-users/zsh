@@ -33,12 +33,24 @@
 /* Get an empty linked list header */
 
 /**/
-LinkList
+mod_export LinkList
 newlinklist(void)
 {
     LinkList list;
 
-    list = (LinkList) alloc(sizeof *list);
+    list = (LinkList) zhalloc(sizeof *list);
+    list->first = NULL;
+    list->last = (LinkNode) list;
+    return list;
+}
+
+/**/
+mod_export LinkList
+znewlinklist(void)
+{
+    LinkList list;
+
+    list = (LinkList) zalloc(sizeof *list);
     list->first = NULL;
     list->last = (LinkNode) list;
     return list;
@@ -47,13 +59,31 @@ newlinklist(void)
 /* Insert a node in a linked list after a given node */
 
 /**/
-LinkNode
+mod_export LinkNode
 insertlinknode(LinkList list, LinkNode node, void *dat)
 {
     LinkNode tmp, new;
 
     tmp = node->next;
-    node->next = new = (LinkNode) alloc(sizeof *tmp);
+    node->next = new = (LinkNode) zhalloc(sizeof *tmp);
+    new->last = node;
+    new->dat = dat;
+    new->next = tmp;
+    if (tmp)
+	tmp->last = new;
+    else
+	list->last = new;
+    return new;
+}
+
+/**/
+mod_export LinkNode
+zinsertlinknode(LinkList list, LinkNode node, void *dat)
+{
+    LinkNode tmp, new;
+
+    tmp = node->next;
+    node->next = new = (LinkNode) zalloc(sizeof *tmp);
     new->last = node;
     new->dat = dat;
     new->next = tmp;
@@ -67,7 +97,7 @@ insertlinknode(LinkList list, LinkNode node, void *dat)
 /* Insert an already-existing node into a linked list after a given node */
 
 /**/
-LinkNode
+mod_export LinkNode
 uinsertlinknode(LinkList list, LinkNode node, LinkNode new)
 {
     LinkNode tmp = node->next;
@@ -84,7 +114,7 @@ uinsertlinknode(LinkList list, LinkNode node, LinkNode new)
 /* Insert a list in another list */
 
 /**/
-void
+mod_export void
 insertlinklist(LinkList l, LinkNode where, LinkList x)
 {
     LinkNode nx;
@@ -104,7 +134,7 @@ insertlinklist(LinkList l, LinkNode where, LinkList x)
 /* Get top node in a linked list */
 
 /**/
-void *
+mod_export void *
 getlinknode(LinkList list)
 {
     void *dat;
@@ -125,7 +155,7 @@ getlinknode(LinkList list)
 /* Get top node in a linked list without freeing */
 
 /**/
-void *
+mod_export void *
 ugetnode(LinkList list)
 {
     void *dat;
@@ -145,7 +175,7 @@ ugetnode(LinkList list)
 /* Remove a node from a linked list */
 
 /**/
-void *
+mod_export void *
 remnode(LinkList list, LinkNode nd)
 {
     void *dat;
@@ -164,7 +194,7 @@ remnode(LinkList list, LinkNode nd)
 /* Remove a node from a linked list without freeing */
 
 /**/
-void *
+mod_export void *
 uremnode(LinkList list, LinkNode nd)
 {
     void *dat;
@@ -181,7 +211,7 @@ uremnode(LinkList list, LinkNode nd)
 /* Free a linked list */
 
 /**/
-void
+mod_export void
 freelinklist(LinkList list, FreeFunc freefunc)
 {
     LinkNode node, next;
@@ -198,7 +228,7 @@ freelinklist(LinkList list, FreeFunc freefunc)
 /* Count the number of nodes in a linked list */
 
 /**/
-int
+mod_export int
 countlinknodes(LinkList list)
 {
     LinkNode nd;
@@ -209,7 +239,7 @@ countlinknodes(LinkList list)
 }
 
 /**/
-void
+mod_export void
 rolllist(LinkList l, LinkNode nd)
 {
     l->last->next = l->first;
@@ -220,3 +250,50 @@ rolllist(LinkList l, LinkNode nd)
     l->last->next = 0;
 }
 
+/**/
+mod_export LinkList
+newsizedlist(int size)
+{
+    LinkList list;
+    LinkNode node;
+
+    list = (LinkList) zhalloc(sizeof(struct linklist) +
+			      (size * sizeof(struct linknode)));
+
+    list->first = (LinkNode) (list + 1);
+    for (node = list->first; size; size--, node++) {
+	node->last = node - 1;
+	node->next = node + 1;
+    }
+    list->last = node - 1;
+    list->first->last = (LinkNode) list;
+    node[-1].next = NULL;
+
+    return list;
+}
+
+/**/
+mod_export int
+listcontains(LinkList list, void *dat)
+{
+    LinkNode node;
+
+    for (node = firstnode(list); node; incnode(node))
+	if (getdata(node) == dat)
+	    return 1;
+
+    return 0;
+}
+
+/**/
+mod_export LinkNode
+linknodebydatum(LinkList list, void *dat)
+{
+    LinkNode node;
+
+    for (node = firstnode(list); node; incnode(node))
+	if (getdata(node) == dat)
+	    return node;
+
+    return NULL;
+}
