@@ -1,3 +1,9 @@
+2005-02-01  Peter Stephenson  <pws@csr.com>
+
+	* Peter A. Castro: 20759 updated as 20760 and 20765: configure.ac,
+	Src/system.h, Src/utils.c: Improve configuration of libiconv and
+	pcre on Cygwin.
+
 2005-01-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync: Added new options
