@@ -1435,7 +1435,7 @@ glob(LinkList list, LinkNode np, int nountok)
 	end += matchct + 1;
     else if (end > matchct)
 	end = matchct;
-    if (end -= first > 0) {
+    if ((end -= first) > 0) {
 	matchptr = matchbuf + matchct - first - end;
 	while (end-- > 0) {		/* insert matches in the arg list */
 	    insertlinknode(list, node, matchptr->name);
