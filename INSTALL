@@ -330,6 +330,19 @@ $fpath array on shell startup.  This directory will not be affected by
 `make uninstall' or `make uninstall.fns', although the version-specific
 directory and its contents will be deleted.
 
+Function depth
+--------------
+
+Shell functions may be called recursively.  In order to detect infinite
+recursion the shell has a limit on the depth to which functions may be
+called:  note that this is a single limit for all functions, not a limit
+for each function called recursively.  The default for the limit is 4096.
+The limit may be altered to the value MAX by passing the option
+--enable-max-function-depth=MAX to configure.  Alternatively, the limit may
+be disabled with --disable-max-function-depth.  However, this is not
+recommended as it is likely to cause the shell to crash on an infinite
+recursion.
+
 Support for large files and integers
 ------------------------------------
 

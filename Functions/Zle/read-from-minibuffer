@@ -5,15 +5,17 @@ local opt keys
 integer stat
 
 while getopts "k:" opt; do
-    case $opt in
-	(k)
-	keys=$OPTARG
-	;;
+  case $opt in
+    # Read the given number of keys.  This is a bit
+    # ropey for more than a single key.
+    (k)
+    keys=$OPTARG
+    ;;
 
-	(*)
-	return 1
-	;;
-    esac
+    (*)
+    return 1
+    ;;
+  esac
 done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
@@ -27,13 +29,13 @@ ${1:-? }"
 POSTDISPLAY=
 
 if [[ -n $keys ]]; then
-    zle -R
-    read -k $keys
-    stat=$?
+  zle -R
+  read -k $keys
+  stat=$?
 else
-    zle recursive-edit
-    stat=$?
-    (( stat )) || REPLY=$BUFFER
+  zle recursive-edit
+  stat=$?
+  (( stat )) || REPLY=$BUFFER
 fi
 
 LBUFFER=$savelbuffer

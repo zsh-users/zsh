@@ -25,14 +25,23 @@ Possible incompatibilities
 ---------------------------
 
 Currently the only known incompatibilities between 4.2.0 and later
-versions are minor: IPv6 addresses must be specified in
-square brackets in the zftp module and function system; special
-traps for pseudosignals ZERR, DEBUG and EXIT are no longer executed
-inside other traps (users may well have assumed this was the case anyway
-since the behaviour was not explicity documented).  See the NEWS file for
+versions are minor:
+
+IPv6 addresses must be specified in square brackets in the zftp module and
+the function system built on top of the zftp module.
+
+Special traps for pseudosignals ZERR, DEBUG and EXIT are no longer executed
+inside other traps.  Users may well have assumed this was the case anyway
+since the behaviour was not explicity documented.  See the NEWS file for
 more detail.
 
-Some particular differences you may notice since version 4.0:
+By default, a maximum function depth of 4096 is now compiled into the
+shell.  This may be altered during configuration; see `Function depth' in
+INSTALL.
+
+
+Some particular differences you may notice between the 4.0 and 4.2 series
+of releases:
 
 The bash-compatibility zle functions described in the zshcontrib manual
 page have been removed as a more configurable set of editing widgets for

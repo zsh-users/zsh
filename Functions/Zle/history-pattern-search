@@ -28,7 +28,9 @@ else
 fi
 
 # Read pattern.  Prompt could be made customisable.
-read-from-minibuffer "pat ($dir): "
+read-from-minibuffer "pat ($dir): " $_last_history_pattern_search
+
+_last_history_pattern_search=$REPLY
 
 # Abort if bad status or nothing entered
 [[ $? -ne 0 || -z $REPLY ]] && return 0

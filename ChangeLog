@@ -1,3 +1,13 @@
+2004-07-30  Peter Stephenson  <pws@csr.com>
+
+	* unposted: minor tidy up for 20219: neaten read-from-minibuffer
+	and make history-pattern-search use last pattern as default.
+
+	* unposted: README: mention max function depth is on by default
+
+	* 20222: INSTALL, configure.ac: turn on max function depth by
+	default to avoid crash.
+
 2004-07-29  Peter Stephenson  <pws@csr.com>
 
 	* 20221: Src/exec.c, Src/signals.c, Test/A05execution.ztst:

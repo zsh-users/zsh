@@ -301,12 +301,14 @@ ifdef([max_function_depth],[undefine([max_function_depth])])dnl
 AH_TEMPLATE([MAX_FUNCTION_DEPTH],
 [Define for function depth limits])
 AC_ARG_ENABLE(max-function-depth,
-[  --enable-max-function-depth=MAX   limit function depth to MAX],
+[  --enable-max-function-depth=MAX   limit function depth to MAX, default 4096],
 [if test x$enableval = xyes; then
   AC_DEFINE(MAX_FUNCTION_DEPTH, 4096)
-else
+elif test x$enableval != xno; then
   AC_DEFINE_UNQUOTED(MAX_FUNCTION_DEPTH, $enableval)
-fi])
+fi],
+[AC_DEFINE(MAX_FUNCTION_DEPTH, 4096)]
+)
 
 dnl Do you want to look for pcre support?
 AC_ARG_ENABLE(pcre,
