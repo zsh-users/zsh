@@ -56,7 +56,7 @@
  comptest $'tst -\C-d'
 0:-+
 >DESCRIPTION:{option}
->NO:{-+ -- opt}
+>NO:{-+  -- opt}
 
  tst_arguments -+o
  comptest $'tst -\t\t\t\C-w\C-w+\t\t\t'

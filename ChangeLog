@@ -1,3 +1,7 @@
+2001-07-31  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15549: Test/Y03arguments.ztst: fix for changed listing layout
+
 2001-07-30  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15526: Completion/Base/Utility/_arguments, Src/Zle/computil.c:
