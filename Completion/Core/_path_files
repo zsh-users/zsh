@@ -5,7 +5,7 @@
 
 local linepath realpath donepath prepath testpath exppath skips skipped
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
-local pats haspats ignore pfxsfx remt sopt gopt opt sdirs ignpar
+local pats haspats ignore pfxsfx sopt gopt opt sdirs ignpar
 local nm=$compstate[nmatches] menu matcher mopts sort match mid
 
 typeset -U prepaths exppaths
@@ -312,35 +312,14 @@ for prepath in "$prepaths[@]"; do
 
     # Get the matching files by globbing.
 
-    tmp2=( "$tmp1[@]" )
     if [[ "$tpre$tsuf" = */* ]]; then
-      if [[ ! -o globdots && "$PREFIX" = .* ]]; then
-        tmp1=( ${^tmp1}${skipped}*(-/) ${^tmp1}${skipped}.*(-/) )
-      else
-        tmp1=( ${^tmp1}${skipped}*(-/) )
-      fi
-      if [[ -n "$sdirs" && ( -o globdots || "$PREFIX" = .* ) ]]; then
-	if [[ "$sdirs" = yes ]]; then
-	  tmp1=( "$tmp1[@]" $^tmp2${skipped}{.,..} )
-	elif [[ "$sdirs" = .. ]]; then
-	  tmp1=( "$tmp1[@]" $^tmp2${skipped}.. )
-        fi
-      fi
+      compfiles -P tmp1 "$skipped" "$_matcher" "$sdirs"
+    elif [[ "$sopt" = *[/f]* ]]; then
+      compfiles -p tmp1 "$skipped" "$_matcher" "$sdirs" "$pats"
     else
-      if [[ ! -o globdots && "$PREFIX" = .* ]]; then
-        tmp1=( ${^tmp1}${skipped}${^~pats} ${^tmp1}${skipped}.${^~pats:#.*} )
-      else
-        tmp1=( ${^tmp1}${skipped}${^~pats} )
-      fi
-      if [[ -n "$sdirs" && "$sopt" = *[/f]* &&
-            ( -o globdots || "$PREFIX" = .* ) ]]; then
-	if [[ "$sdirs" = yes ]]; then
-	  tmp1=( "$tmp1[@]" $^tmp2${skipped}{.,..} )
-	elif [[ "$sdirs" = .. ]]; then
-	  tmp1=( "$tmp1[@]" $^tmp2${skipped}.. )
-        fi
-      fi
+      compfiles -p tmp1 "$skipped" "$_matcher" '' "$pats"
     fi
+    tmp1=( $~tmp1 )
 
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.
@@ -354,9 +333,13 @@ for prepath in "$prepaths[@]"; do
 	  compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp2:t}"
         fi
       else
-        [[ "$tmp1[1]" = */* ]] && tmp2=( "$tmp1[@]" )
+        if [[ "$tmp1[1]" = */* ]]; then
+          tmp2=( "$tmp1[@]" )
+        else
+          tmp2=( '' )
+        fi
 
-        builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
+        compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
       fi
 
       # If no file matches, save the expanded path and continue with
@@ -411,24 +394,12 @@ for prepath in "$prepaths[@]"; do
     if [[ -n "$ignpar" && -z "$_comp_no_ignore" &&
           "$tpre$tsuf" != */* && $#tmp1 -ne 0 &&
           ( "$ignpar" != *dir* || "$pats" = '*(-/)' ) &&
-	  ( "$ignpar" != *..* || "$tmp1" = *../* ) ]]; then
-      if [[ "$ignpar" = *parent* ]]; then
-	for i in ${(M)^tmp1:#*/*}(-/); do
-	  remt="${${i#$prepath$realpath$donepath}%/*}"
-	  while [[ "$remt" = */* &&
-	           ! "$prepath$realpath$donepath$remt" -ef "$i" ]]; do
-	    remt="${remt%/*}"
-	  done
-	  [[ "$remt" = */* || "$remt" -ef "$i" ]] &&
-	      _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
-	done
-      fi
-      if [[ "$ignpar" = *pwd* ]]; then
-        for i in ${^tmp1}(-/); do
-	  [[ "$i" -ef "$PWD" ]] && _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
-	done
-      fi
-      (( $#_comp_ignore && $mopts[(I)-F] )) || mopts=( "$mopts[@]" -F _comp_ignore )
+          ( "$ignpar" != *..* || "$tmp1[1]" = *../* ) ]]; then
+
+      compfiles -i tmp1 _comp_ignore "$ignpar" "$prepath$realpath$donepath"
+
+      (( $#_comp_ignore && $mopts[(I)-F] )) ||
+          mopts=( "$mopts[@]" -F _comp_ignore )
     fi
 
     # Step over to the next component, if any.

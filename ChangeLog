@@ -1,3 +1,9 @@
+2000-06-09  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11833: Completion/Core/_path_files, Src/Zle/computil.c: improve
+ 	_path_files, move some code into C, try to optimise glob patterns
+ 	and immediately accept exact directory matches
+	
 2000-06-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 11823: Doc/Makefile.in, Completion/User/_urls: avoid bug in
