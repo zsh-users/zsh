@@ -1508,7 +1508,7 @@ parse_subst_string(char *s)
 {
     int c, l = strlen(s), err, olen;
 
-    if (! *s)
+    if (! *s || !strcmp(s, nulstring))
 	return 0;
     lexsave();
     untokenize(s);
