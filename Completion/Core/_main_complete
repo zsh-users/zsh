@@ -16,14 +16,16 @@
 # which makes the output of setopt and unsetopt reflect a different
 # state than the global one for which you are completing.
 
+setopt localoptions nullglob rcexpandparam extendedglob
+unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 local comp post ret=1 _compskip _prio_num=1 format \
       context state line opt_args val_args curcontext="$curcontext" \
       _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
-      _saved_exact="$compstate[exact]" \
-      _saved_lastprompt="$compstate[last_prompt]" \
-      _saved_list="$compstate[list]" \
-      _saved_insert="$compstate[insert]"
+      _saved_exact="${compstate[exact]}" \
+      _saved_lastprompt="${compstate[last_prompt]}" \
+      _saved_list="${compstate[list]}" \
+      _saved_insert="${compstate[insert]}"
 
 typeset -U _offered_tags _tried_tags _failed_tags _used_tags _unused_tags
 
@@ -32,9 +34,6 @@ _tried_tags=()
 _failed_tags=()
 
 typeset -U _lastdescr
-
-setopt localoptions nullglob rcexpandparam extendedglob
-unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 # Special completion contexts after `~' and `='.
 
