@@ -329,14 +329,14 @@ scanpmmapfile(HashTable ht, ScanFunc func, int flags)
 
 /**/
 int
-setup_mapfile(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_mapfile(Module m)
+boot_(Module m)
 {
     /* Create the special associative array. */
 
@@ -348,7 +348,7 @@ boot_mapfile(Module m)
 
 /**/
 int
-cleanup_mapfile(Module m)
+cleanup_(Module m)
 {
     Param pm;
 
@@ -364,7 +364,7 @@ cleanup_mapfile(Module m)
 
 /**/
 int
-finish_mapfile(Module m)
+finish_(Module m)
 {
     return 0;
 }

@@ -1,3 +1,5 @@
+name=zsh/mathfunc
+
 autobins="mathfunc"
 
 objects="mathfunc.o"

@@ -1,3 +1,5 @@
+name=zsh/zftp
+
 autobins="zftp"
 
 objects="zftp.o"

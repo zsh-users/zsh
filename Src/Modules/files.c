@@ -714,21 +714,21 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_files(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_files(Module m)
+boot_(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
 /**/
 int
-cleanup_files(Module m)
+cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
@@ -736,7 +736,7 @@ cleanup_files(Module m)
 
 /**/
 int
-finish_files(Module m)
+finish_(Module m)
 {
     return 0;
 }

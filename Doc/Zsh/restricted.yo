@@ -29,8 +29,6 @@ itemiz(using the tt(ARGV0) parameter to override tt(argv[0]) for external
 commands)
 itemiz(turning off restricted mode with tt(set +r) or tt(unsetopt
 RESTRICTED))
-itemiz(specifying modules to be loaded with an explicitly given
-pathname containing slashes)
 enditemize()
 
 These restrictions are enforced after processing the startup files.  The

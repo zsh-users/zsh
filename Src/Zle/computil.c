@@ -2444,7 +2444,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_computil(Module m)
+setup_(Module m)
 {
     memset(cadef_cache, 0, sizeof(cadef_cache));
     memset(cvdef_cache, 0, sizeof(cvdef_cache));
@@ -2458,14 +2458,14 @@ setup_computil(Module m)
 
 /**/
 int
-boot_computil(Module m)
+boot_(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
 /**/
 int
-cleanup_computil(Module m)
+cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
@@ -2473,7 +2473,7 @@ cleanup_computil(Module m)
 
 /**/
 int
-finish_computil(Module m)
+finish_(Module m)
 {
     int i;
 

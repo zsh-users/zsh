@@ -1525,6 +1525,13 @@ else
   E=N
 fi
 
+if test "x$zsh_cv_sys_dynamic_clash_ok" = xyes; then
+  SHORTBOOTNAMES=yes
+else
+  SHORTBOOTNAMES=no
+fi
+AC_SUBST(SHORTBOOTNAMES)
+
 AC_DEFINE_UNQUOTED(DL_EXT, "$DL_EXT")dnl
 AC_SUBST(D)dnl
 AC_SUBST(DL_EXT)dnl

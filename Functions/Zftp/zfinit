@@ -1,6 +1,6 @@
 emulate -L zsh
 
-[[ $1 = -n ]] || zmodload -e zftp || zmodload -ia zftp
+[[ $1 = -n ]] || zmodload -e zsh/zftp || zmodload -ia zsh/zftp
 
 if [[ ${+zfconfig} = 0 ]]; then
   typeset -gA zfconfig

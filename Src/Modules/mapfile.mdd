@@ -1,3 +1,5 @@
+name=zsh/mapfile
+
 autoparams="mapfile"
 
 objects="mapfile.o"

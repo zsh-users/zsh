@@ -98,21 +98,21 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_clone(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_clone(Module m)
+boot_(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
 /**/
 int
-cleanup_clone(Module m)
+cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
@@ -120,7 +120,7 @@ cleanup_clone(Module m)
 
 /**/
 int
-finish_clone(Module m)
+finish_(Module m)
 {
     return 0;
 }

@@ -1,3 +1,5 @@
+name=zsh/zle
+
 autobins="bindkey vared zle"
 
 objects="zle_bindings.o zle_hist.o zle_keymap.o zle_main.o \

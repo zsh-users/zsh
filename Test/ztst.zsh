@@ -24,7 +24,7 @@ emulate -R zsh
 
 # We need to be able to save and restore the options used in the test.
 # We use the $options variable of the parameter module for this.
-zmodload -i parameter
+zmodload -i zsh/parameter
 
 # Note that both the following are regular arrays, since we only use them
 # in whole array assignments to/from $options.

@@ -3732,7 +3732,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_compctl(Module m)
+setup_(Module m)
 {
     compctlreadptr = compctlread;
     createcompctltable();
@@ -3752,7 +3752,7 @@ setup_compctl(Module m)
 
 /**/
 int
-boot_compctl(Module m)
+boot_(Module m)
 {
     addhookfunc("compctl_make", (Hookfn) ccmakehookfn);
     addhookfunc("compctl_before", (Hookfn) ccbeforehookfn);
@@ -3762,7 +3762,7 @@ boot_compctl(Module m)
 
 /**/
 int
-cleanup_compctl(Module m)
+cleanup_(Module m)
 {
     deletehookfunc("compctl_make", (Hookfn) ccmakehookfn);
     deletehookfunc("compctl_before", (Hookfn) ccbeforehookfn);
@@ -3773,7 +3773,7 @@ cleanup_compctl(Module m)
 
 /**/
 int
-finish_compctl(Module m)
+finish_(Module m)
 {
     deletehashtable(compctltab);
 

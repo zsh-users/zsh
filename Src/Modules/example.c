@@ -159,7 +159,7 @@ ex_wrapper(List list, FuncWrap w, char *name)
 }
 
 /*
- * boot_example is executed when the module is loaded.
+ * boot_ is executed when the module is loaded.
  */
 
 static struct builtin bintab[] = {
@@ -188,7 +188,7 @@ static struct funcwrap wrapper[] = {
 
 /**/
 int
-setup_example(Module m)
+setup_(Module m)
 {
     printf("The example module has now been set up.\n");
     fflush(stdout);
@@ -197,7 +197,7 @@ setup_example(Module m)
 
 /**/
 int
-boot_example(Module m)
+boot_(Module m)
 {
     intparam = 42;
     strparam = ztrdup("example");
@@ -214,7 +214,7 @@ boot_example(Module m)
 
 /**/
 int
-cleanup_example(Module m)
+cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
@@ -226,7 +226,7 @@ cleanup_example(Module m)
 
 /**/
 int
-finish_example(Module m)
+finish_(Module m)
 {
     printf("Thank you for using the example module.  Have a nice day.\n");
     fflush(stdout);

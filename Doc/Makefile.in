@@ -172,7 +172,7 @@ Zsh/modlist.yo: $(MODDOCSRC)
 	    modules=`echo '' $(MODDOCSRC) '' | sed 's| Zsh/mod_| |g;s|\.yo | |g'`; \
 	    echo "startitem()"; \
 	    for mod in $$modules; do \
-		echo "item(tt($$mod))("; \
+		echo "item(tt(zsh/$$mod))("; \
 		sed -n '1d;/^!MOD!)$$/q;p' < $(sdir)/Zsh/mod_$${mod}.yo; \
 		echo ")"; \
 	    done; \
@@ -182,8 +182,8 @@ Zsh/modlist.yo: $(MODDOCSRC)
 	    echo "endmenu()"; \
 	    set '' $$modules; \
 	    while test ".$$2" != .; do \
-		echo "texinode(The $$2 Module)($${3+The $$3 Module})($${1:+The $$1 Module})(Zsh Modules)"; \
-		echo "sect(The $$2 Module)"; \
+		echo "texinode(The zsh/$$2 Module)($${3+The $$3 Module})($${1:+The $$1 Module})(Zsh Modules)"; \
+		echo "sect(The zsh/$$2 Module)"; \
 		echo "includefile(Zsh/mod_$${2}.yo)"; \
 		shift; \
 	    done \
@@ -193,7 +193,7 @@ Zsh/modmenu.yo: $(MODDOCSRC)
 	( \
 	    modules=`echo '' $(MODDOCSRC) '' | sed 's| Zsh/mod_| |g;s|\.yo | |g'`; \
 	    for mod in $$modules; do \
-		echo "menu(The $$mod Module)"; \
+		echo "menu(The zsh/$$mod Module)"; \
 	    done \
 	) > $(sdir)/Zsh/modmenu.yo
 
