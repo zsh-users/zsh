@@ -38,7 +38,7 @@ unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 # Special completion contexts after `~' and `='.
 
-if compset -P 1 '\='; then
+if compset -P 1 '='; then
   compstate[context]=equal
 elif [[ "$PREFIX" != */* && "$PREFIX[1]" = '~' ]]; then
   compset -p 1
