@@ -1,3 +1,11 @@
+2002-02-18  Clint Adams  <clint@zsh.org>
+
+	* 16662: Completion/Unix/Command/_cdcd: use parameter expansion
+	instead of grep, sed, and seq.
+
+	* Gergely Nagy, 16644: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_cdcd: completion for cdcd.
+
 2002-02-10  Clint Adams  <clint@zsh.org>
 
         * Sven: 16408: Src/Zle/compcore.c: make sure auto menu
