@@ -615,7 +615,8 @@ gettext2(Estate state)
 			}
 			break;
 		    case COND_AND:
-			tpush(code, 1);
+			n = tpush(code, 1);
+			n->u._cond.par = 0;
 			code = *state->pc++;
 			if (WC_COND_TYPE(code) == COND_OR) {
 			    taddstr("( ");
@@ -624,7 +625,8 @@ gettext2(Estate state)
 			}
 			break;
 		    case COND_OR:
-			tpush(code, 1);
+			n = tpush(code, 1);
+			n->u._cond.par = 0;
 			code = *state->pc++;
 			if (WC_COND_TYPE(code) == COND_AND) {
 			    taddstr("( ");
