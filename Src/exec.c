@@ -2363,6 +2363,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	xtrerr = oxtrerr;
 	zclose(fil);
     }
+
+    zsfree(STTYval);
+    STTYval = 0;
 }
 
 /* Arrange to have variables restored. */

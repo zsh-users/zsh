@@ -1,6 +1,7 @@
 2000-09-25  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12862: Src/exec.c: Fix STTY parameter to match documentation.
+	(Plus unposted addition at the end of execcmd() to clear STTYval.)
 
 2000-09-22  Clint Adams  <schizo@debian.org>
 
