@@ -211,9 +211,9 @@ void
 cline_setlens(Cline l, int both)
 {
     while (l) {
-	l->max = cline_sublen(l);
+	l->min = cline_sublen(l);
 	if (both)
-	    l->min = l->max;
+	    l->max = l->min;
 	l = l->next;
     }
 }
