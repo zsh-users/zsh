@@ -1,3 +1,9 @@
+2004-01-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 19377 based on 19375 (Laurent Rineau):
+	Completion/Unix/Type/_email_addresses: handle better
+	situation where MH is not installed
+
 2004-01-15  Peter Stephenson  <pws@csr.com>
 
 	* 19374: Src/params.c: typo in 19361 caused crashes when

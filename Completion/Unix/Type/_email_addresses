@@ -22,7 +22,7 @@ _email-mail() {
 
 (( $+functions[_email-MH] )) ||
 _email-MH() {
-  reply=( ${${(f)"$(_call_program aliases ali)"}/: /:} )
+  reply=( ${${(f)"$(_call_program aliases ali 2>/dev/null)"}/: /:} )
   return 300
 }
 
@@ -119,7 +119,7 @@ _email_addresses() {
   fi
 
   # get list of all plugins except any with missing config files
-  files=( mutt ~/.muttrc mush ~/.mushrc mail ${MAILRC:-~/.mailrc} pine ~/.addressbook )
+  files=( MH ${MH:-~/.mh_profile} mutt ~/.muttrc mush ~/.mushrc mail ${MAILRC:-~/.mailrc} pine ~/.addressbook )
   plugins=( 
     ${${(k)functions[(I)_email-*]#*-}:#(${(kj.|.)~files})}
     $files(Ne:'REPLY=( ${(k)files[(r)$REPLY]} ):')
