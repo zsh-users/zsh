@@ -959,7 +959,7 @@ strings consisting of the string to complete followed by a colon
 (which needs to be preceded by a backslash) and a description. The
 matches will be listed together with their descriptions.
 
-A var(action) of the form `tt(->)var(string)' is used by functions
+An var(action) of the form `tt(->)var(string)' is used by functions
 that implement a state machine. In this case, the `var(string)' (with
 all leading and trailing spaces and tabs removed) will be stored in
 the global parameter tt(state) and the function returns with a return
