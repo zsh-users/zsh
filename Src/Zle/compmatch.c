@@ -1129,7 +1129,7 @@ pattern_match(Cpattern p, char *s, unsigned char *in, unsigned char *out)
 Cline
 bld_parts(char *str, int len, int plen, Cline *lp)
 {
-    Cline ret = NULL, *q = &ret, n;
+    Cline ret = NULL, *q = &ret, n = NULL;
     Cmlist ms;
     Cmatcher mp;
     int t, op = plen;
