@@ -66,13 +66,15 @@ if [[ -n $pats ]]; then
       argv=()
     fi
 
-    files=( ${files:#*(.zwc|~)} )
     if [[ $files[1] = -[RM] ]]; then
       map=( $files[1] )
       shift 1 files
     else
       map=()
     fi
+    (( $#files )) || continue
+
+    files=( $files[1] ${files[2,-1]:#*(.zwc|~)} )
 
     (( $#files )) || continue
 
