@@ -215,7 +215,7 @@ AC_ARG_ENABLE(function-subdirs,
 [  --enable-function-subdirs  install functions in subdirectories])
 
 if test "x${FUNCTIONS_INSTALL+set}" != xset; then
-  FUNCTIONS_INSTALL="Core/* Base/* Builtins/* User/* Commands/* Zle/*"
+  FUNCTIONS_INSTALL="Core/* Base/* Builtins/* User/* Commands/* Cvs/* Pbmplus/* X/* Rpm/* Zle/*"
   if test $dynamic != no; then
     FUNCTIONS_INSTALL="${FUNCTIONS_INSTALL} Zftp/*"
   fi

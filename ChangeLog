@@ -1,3 +1,226 @@
+1999-08-30  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Tanaka Akira: 7551: Doc/Zsh/expn.yo: mismatched parenthesis.
+
+	* Sven: 7549: Src/hist.c: shell wouldn't exit if writing history
+	  file failed.
+
+	* Sven: 7548: Completion/User/_xargs: new.
+
+	* Sven: 7541: Completion/Base/_arguments: fix.
+
+	* Sven: 7540: Src/subst.c, Doc/Zsh/expn.yo: ${name^pat^then^else}
+	  tests string and substitutes appropriately.
+
+	* Sven: 7539: Src/subst.c, Doc/Zsh/expn.yo: % parameter flag does
+	  prompt escapes.
+
+	* Sven: 7538: Completion/Base/_arguments: completion of trailing
+	  non-option arguments.
+
+	* Sven: 7535: Src/glob.c: don't restore badcshglob.
+
+	* Sven: 7533: Completion/Rpm/*, Completion/Base/_arguments,
+	  Completion/User/_a2ps, Completion/User/_configure,
+	  Completion/User/_dvi, Completion/User/_gdb, Completion/User/_gs,
+	  Completion/User/_gs_name, Completion/User/_patch,
+	  Completion/User/_pspdf, Completion/User/_tar,
+	  Completion/User/_use_lo, Completion/User/_xfig,
+	  Completion/User/_xsetroot, Completion/User/_xterm,
+	  Completion/X/_gv, Completion/X/_xdvi,
+	  Completion/X/_xt_arguments, Completion/X/_xv,
+	  Doc/Zsh/compsys.yo: argument handling; new rpm functions.
+
+	* Sven: 7532: Src/Zle/zle_tricky.c: completion bug.
+
+	* Bart, Sven: 7529, 7530: process groups not continued properly.
+
+	* Bart: 7527: KSH_ARRAYS messed up assignment to a
+	  hash, plus 7521 typo.
+
+	* Bart: 7521: Src/init.c: replace 7472 and 7490 with thing that
+	  tests if hashed command is really there.
+
+	* Sven: 7517: Completion/Base/_arguments,
+	  Completion/Pbmplus/_pbmtext, Completion/Pbmplus/_pbmtopk,
+	  Completion/Pbmplus/_pktopbm, Completion/Pbmplus/_pnmcomp,
+	  Completion/Pbmplus/_pnmtoddif, Completion/Pbmplus/_psidtopgm,
+	  Completion/Pbmplus/_pstopnm, Completion/User/_gdb,
+	  Completion/User/_gprof, Completion/User/_x_options,
+	  Completion/User/_xfig, Completion/User/_xsetroot,
+	  Completion/X/_x_borderwidth, Completion/X/_x_geometry,
+	  Completion/X/_x_locale, Completion/X/_x_name,
+	  Completion/X/_x_resource, Completion/X/_x_selection_timeout,
+	  Completion/X/_x_title, Completion/X/_xv: use _arguments more.
+
+	* Tanaka Akira: 7516: Completion/Base/_arguments,
+	  Completion/Cvs/_cvs, Completion/Cvs/_cvs_command: fixes.
+
+	* Sven: 7515: Doc/Zsh/compsys.yo, Completion/Base/_arguments,
+	  Completion/Pbmplus/_pnmtotiff, Completion/Pbmplus/_ppmtomitsu,
+	  Completion/User/_find: _arguments allows descriptions in list of
+	  possibilities.
+
+	* Sven: 7514: Src/glob.c, Doc/Zsh/expn.yo: use REPLY to set
+	  filename.
+
+	* Bart: 7510: Src/init.c: zsh -ce interprets e as option, not
+	  command.
+
+	* Sven: 7512: Completion/Base/_arguments: complete function.
+
+	* Sven: 7500: Completion/Base/_arguments,
+	  Completion/Cvs/_cvs_command, Completion/User/_find:
+	  word-splitting in _arguments.
+
+	* Tanaka Akira: 7495: Completion/Cvs/_cvs*: new cvs functions.
+
+	* Sven: 7496: Src/glob.c, Src/zsh.h, Doc/Zsh/expn.yo: glob
+	  qualifier e:string: with $_ set to filename.
+
+	* Sven: 7492: Completion/Base/_arguments, Completion/User/_find,
+	  Completion/X/_x_font: speed up _arguments.
+
+	* Sven: 7490: Src/exec.c: change 7472 not to try test on hashed
+	  command.
+
+	* Sven: zsh-users/2511: Src/Zle/zle_tricky.c: bad (old) completion
+	  after `$(<'.
+
+	* Sven: 7482: Src/exec.c, Src/glob.c, Src/zsh.h, Doc/Zsh/expn.yo:
+	  F:func: glob qualifier calls func to determine whether to
+	  include file.
+
+	* Sven: 7480: Src/Zle/zle_tricky.c, Completion/Core/_multi_parts,
+	  Completion/User/_xterm, Completion/X/_x_font,
+	  Completion/X/_xt_arguments: matching bug.
+
+	* Sven: 7478: Doc/Zsh/compsys.yo, Completion/Base/_arguments,
+	  Completion/Builtins/_vars_eq: handling of :: in _arguments.
+
+	* Tanaka Akira: 7477: Completion/User/_xterm,
+	  Completion/X/_x_borderwidth, Completion/X/_x_font,
+	  Completion/X/_x_geometry, Completion/X/_x_locale,
+	  Completion/X/_x_name, Completion/X/_x_resource,
+	  Completion/X/_x_selection_timeout, Completion/X/_x_title,
+	  Completion/X/_xt_arguments, Completion/X/_xt_session_id:
+	  use standard XToolkit arguments.
+
+	* Sven: 7472: Src/exec.c: crash in isreallycom().
+
+	* Sven: 7469: Completion/Base/_arguments,
+	  Completion/Base/_command_names, Completion/Builtins/_zftp,
+	  Completion/Core/_complete, Completion/Core/_main_complete,
+	  Completion/Core/_normal, Completion/User/_x_display,
+	  Completion/User/_x_options, Completion/User/_xterm: fix
+	  word-splitting for _arguments.
+
+	* Sven: zsh-users/2505: parameter with non-empty prefix.
+
+	* Tanaka Akira: 7468: Completion/User/_xterm: xterm argument
+	  completion.
+
+	* Sven: zsh-users/2502: completing '=$' erased word.
+
+	* Sven: 7467: Doc/Zsh/compsys.yo, Completion/Base/_arguments,
+	  Completion/Base/_long_options: allow an _arguments option to
+	  swallow everything to end of line.
+
+	* Sven: 7465: Src/params.c: reverse indexing of associative
+	  arrays.
+
+	* Sven: 7463: Src/Zle/compctl.c, Doc/Zsh/compsys.yo,
+	  Completion/Base/_arguments, Completion/Base/_brace_parameter,
+	  Completion/Base/_condition, Completion/Base/_long_options,
+	  Completion/Base/_math, Completion/Base/_parameter,
+	  Completion/Base/_tilde, Completion/Base/_vars,
+	  Completion/Builtins/_vars_eq, Completion/Builtins/_zftp,
+	  Completion/Commands/_correct_filename,
+	  Completion/Commands/_correct_word,
+	  Completion/Commands/_expand_word,
+	  Completion/Commands/_history_complete_word,
+	  Completion/Commands/_most_recent_file,
+	  Completion/Commands/_read_comp, Completion/Core/_parameters,
+	  Completion/Core/compinit, Completion/User/_chown,
+	  Completion/User/_dir_list, Completion/User/_exec_funcs,
+	  Completion/User/_find, Completion/User/_gprof,
+	  Completion/User/_rlogin, Completion/User/_su,
+	  Completion/User/_tar, Completion/User/_users,
+	  Util/completion-style-guide: miscellaneous completion fixes.
+
+	* Tanaka Akira: 7460. 7461: Completion/Base/_arguments,
+	  Completion/User/_patch: _arguments -s handling with --.
+
+	* Clint Adams: 7459: Config/funcinst.mk, Config/installfns.sh,
+	  Doc/Makefile.in, Src/Makefile.in, Src/Makemod.in.in: can set
+	  DESTDIR to specify install prefix.
+
+	* Tanaka Akira: 7458: Completion/Base/_arguments,
+	  Completion/Base/_long_options, Completion/User/_patch:
+	  _patch function and required fixes.
+
+	* Sven: 7457: Doc/Zsh/compsys.yo, Completion/Base/_arguments:
+	  handle short options.
+
+	* Sven: 7455: Src/Zle/complist.c: handle lengths of capabilities.
+
+	* Sven: 7454: Doc/Zsh/compsys.yo, Completion/Base/_arguments,
+	  Completion/Core/_message: option prefix configuration.
+
+	* Sven: 7429: _pbm: more stuff
+
+	* Tanaka Akira: 7451: Completion/Core/_message,
+	  Completion/Pbmplus/_pbmtoepsi, Completion/Pbmplus/_pktopbm,
+	  Completion/Pbmplus/_yuvtoppm, Doc/Zsh/compsys.yo: some small
+	  mistakes.
+
+	* Sven: 7441: Src/Zle/zle_tricky.c: matching control bug.
+
+	* Sven: 7450: Completion/Base/_arguments,
+	  Completion/Base/_long_options, Completion/Base/_subscript,
+	  Completion/Builtins/_zmodload, Completion/User/_colors,
+	  Completion/User/_cvs, Completion/User/_gdb: explanations and
+	  arguments.
+
+	* Tanaka Akira: 7431: Completion/User/_colors: null glob.
+
+	* Tanaka Akira: 7432: Completion/User/_cvs: update.
+
+	* Sven: 7449: Src/module.c, Src/params.c: better errors for failed
+	  autoloading; 
+
+	* Sven: 7448: too many files under Completion to list, including
+	  new Pbmplus directory: revised pbm completion; pattern completion
+	  only if no specific completion; descriptions for completions;
+	  better handling for command line arguments.
+
+	* Tanaka Akira: 7417: Completion/User/_pdf, Completion/User/_ps,
+	  Completion/User/_pspdf: more programs that take ps or pdf files.
+
+	* Sven: 7430: matching control bug: Src/Zle/zle_tricky.c,
+	  Completion/User/_colors, Completion/User/_cursors,
+	  Completion/User/_x_options, Completion/User/_xsetroot:
+	  bug in matching control.
+
+	* Tanaka Akira: 7428: Completion/User/_pbm,
+	  Completion/User/_colors: fix some problems.
+
+	* Sven: 7420: Src/Zle/zle_tricky.c, Doc/Zsh/compsys.yo,
+	  Completion/Base/_first, Completion/Builtins/_zftp,
+	  Completion/Core/_complete, Completion/Core/_main_complete,
+	  Completion/Core/_normal, Completion/User/_colors,
+	  Completion/User/_pbm, Completion/User/_x_options: _compskip
+	  extended to allow choice of what to skip.
+
+	* Sven: 7418: Completion/User/_pbm: new
+
+	* Sven: 7446: print -P %s didn't work.
+
+	* Bart: 7410: parameter flags doc for M.
+
+	* Sven: 7404: Src/glob.c: repeatedly matching empty string
+	  (somehow).
+
 1999-08-06  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: Config/version.mk: 3.1.6-pws-1 made available.

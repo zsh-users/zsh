@@ -1,0 +1,15 @@
+DISTFILES_SRC='
+    .distfiles
+    _cvs _cvs_D _cvs_add _cvs_admin _cvs_admin_t _cvs_annotate _cvs_bindir
+    _cvs_checkout _cvs_command _cvs_commit _cvs_diff _cvs_diff_arg
+    _cvs_directories _cvs_edit _cvs_editor _cvs_editors _cvs_export
+    _cvs_extract_directory_entries _cvs_extract_file_entries
+    _cvs_extract_modifiedfile_entries _cvs_files _cvs_files_modified
+    _cvs_files_removed _cvs_files_unmaintained _cvs_gzip_level _cvs_history
+    _cvs_history_x _cvs_import _cvs_init _cvs_k _cvs_login _cvs_logout
+    _cvs_m _cvs_modules _cvs_rdiff _cvs_release _cvs_remove _cvs_revisions
+    _cvs_root _cvs_setup_allentries _cvs_setup_direntries
+    _cvs_setup_modentries _cvs_setup_prefix _cvs_status _cvs_tag
+    _cvs_tempdir _cvs_unedit _cvs_update _cvs_user_variable _cvs_watch
+    _cvs_watchers
+'
