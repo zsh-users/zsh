@@ -1,3 +1,14 @@
+2002-01-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16400, 16401: Src/subst.c: preserve empty words that result from
+	brace expansion.
+	
+	* users/4483: Completion/Unix/Command/_cvs: with "cvs add" et al.,
+	complete names of locally removed (but not committed) files.
+
+	* 15746: Src/utils.c: remove (with #if) an incorrect optimization
+	in the maildir version of mailstat().
+	
 2002-01-04  Oliver Kiddle  <opk@zsh.org>
 
 	* 16398: Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo,
