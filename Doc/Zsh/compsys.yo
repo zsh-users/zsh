@@ -2147,6 +2147,13 @@ completing words for the dict command. It allows words from different
 dictionary databases to be added separately.
 The default for this style is `false'.
 )
+kindex(show-completer, completion style)
+item(tt(show-completer))(
+Tested whenever a new completer is tried.  If it is true, the completion
+system outputs a progress message in the listing area showing what
+completer is being tried.  The message will be overwritten by any output
+when completions are found and is removed after completion is finished.
+)
 kindex(single-ignored, completion style)
 item(tt(single-ignored))(
 This is used by the tt(_ignored) completer when there is only one match.

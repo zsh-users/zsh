@@ -135,7 +135,10 @@ for tmp in "$_completers[@]"; do
   else
     _completer="${tmp[2,-1]//_/-}"
   fi
+
   curcontext="${curcontext/:[^:]#:/:${_completer}:}"
+  zstyle -t ":completion:${curcontext}:" show-completer &&
+    zle -R "Trying completion for :completion:${curcontext}"
 
   zstyle -a ":completion:${curcontext}:" matcher-list _matchers ||
       _matchers=( '' )
@@ -167,7 +170,14 @@ for tmp in "$_completers[@]"; do
 done
 
 curcontext="${curcontext/:[^:]#:/::}"
-nm=$compstate[nmatches]
+if [[ $compstate[old_list] = keep ]]; then
+  # We are keeping the old list of matches, so keep the
+  # number of matches we found last time rather than the
+  # number just generated.
+  nm=$_lastcomp[nmatches]
+else
+  nm=$compstate[nmatches]
+fi
 
 if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
   [[ _last_nmatches -ge 0 && _last_nmatches -ne nm ]] &&

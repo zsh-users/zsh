@@ -1,3 +1,9 @@
+2004-10-01  Peter Stephenson  <pws@csr.com>
+
+	* 20427, 20339 (modified): Completion/Base/Core/_main_complete,
+	Doc/Zsh/compsys.yo:  Fix for problem with _oldlist and custom
+	completion.  Also snuck in show-completer style with documentation.
+
 2004-09-30  Clint Adams  <clint@zsh.org>
 
 	* 20358: Completion/Unix/Command/_make: avoid potential gawk
