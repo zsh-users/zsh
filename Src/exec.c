@@ -352,18 +352,13 @@ zexecve(char *pth, char **argv)
     for (eep = argv; *eep; eep++)
 	if (*eep != pth)
 	    unmetafy(*eep, NULL);
-    for (eep = environ; *eep; eep++)
-	if (**eep == '_' && (*eep)[1] == '=')
-	    break;
     buf[0] = '_';
     buf[1] = '=';
     if (*pth == '/')
 	strcpy(buf + 2, pth);
     else
 	sprintf(buf + 2, "%s/%s", pwd, pth);
-    if (!*eep)
-	eep[1] = NULL;
-    *eep = buf;
+    zputenv(buf);
     closedumps();
     execve(pth, argv, environ);
 

@@ -3297,7 +3297,8 @@ arrfixenv(char *s, char **t)
 }
 
 
-static int
+/**/
+int
 zputenv(char *str)
 {
 #ifdef HAVE_PUTENV
