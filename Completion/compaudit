@@ -65,10 +65,10 @@ if [[ -n $_compdir ]]; then
     _i_addfiles=()
     if [[ -d $_compdir/Base/Core ]]; then
       # Add all the Completion subdirectories (CVS-layout)
-      _i_addfiles=(${_compdir}/*/*(/))
+      _i_addfiles=(${_compdir}/*/*(/^M))
     elif [[ -d $_compdir/Base ]]; then
       # Likewise (installation-layout)
-      _i_addfiles=(${_compdir}/*(/))
+      _i_addfiles=(${_compdir}/*(/^M))
     fi
     for _i_line in {1..$#_i_addfiles}; do
       _i_file=${_i_addfiles[$_i_line]}

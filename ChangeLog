@@ -1,3 +1,8 @@
+2005-02-23  Clint Adams  <clint@zsh.org>
+
+	* 20847: Completion/compaudit: stop adding gratuitous
+	elements to fpath when MARK_DIRS is set.
+
 2005-02-23  Andrey Borzenkov  <bor@zsh.org>
 
 	* 20845: Src/Zle/zle_main.c, Src/Zle/zle_utils.c: fix
