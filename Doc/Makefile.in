@@ -39,14 +39,14 @@ INSTALL         = @INSTALL@
 
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
-DVIPS = dvips -D 300
+DVIPS = dvips
 TEXI2HTML = texi2html -expandinfo -split_chapter
 
 .SUFFIXES: .yo .1
 
 # man pages to install
 MAN = zsh.1 zshbuiltins.1 zshcompctl.1 zshcompwid.1 zshcompsys.1 \
-zshexpn.1 zshmisc.1 zshmodules.1 \
+zshcontrib.1 zshexpn.1 zshmisc.1 zshmodules.1 \
 zshoptions.1 zshparam.1 zshzftpsys.1 zshzle.1 zshall.1
 
 # yodl documentation
@@ -59,12 +59,13 @@ Zsh/mod_compctl.yo Zsh/mod_complete.yo Zsh/mod_complist.yo \
 Zsh/mod_computil.yo \
 Zsh/mod_deltochar.yo Zsh/mod_example.yo Zsh/mod_files.yo \
 Zsh/mod_mapfile.yo Zsh/mod_mathfunc.yo Zsh/mod_parameter.yo Zsh/mod_sched.yo \
-Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo Zsh/mod_zleparameter.yo \
-Zsh/mod_zutil.yo Zsh/mod_zprof.yo Zsh/mod_zpty.yo
+Zsh/mod_stat.yo Zsh/mod_termcap.yo Zsh/mod_terminfo.yo \
+Zsh/mod_zftp.yo Zsh/mod_zle.yo Zsh/mod_zleparameter.yo \
+Zsh/mod_zprof.yo Zsh/mod_zpty.yo Zsh/mod_zutil.yo
 
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
-Zsh/exec.yo Zsh/expn.yo \
+Zsh/contrib.yo Zsh/exec.yo Zsh/expn.yo \
 Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/manual.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
 Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo $(MODDOCSRC) \
@@ -165,6 +166,8 @@ zshcompwid.1: Zsh/compwid.yo
 
 zshcompsys.1: Zsh/compsys.yo
 
+zshcontrib.1: Zsh/contrib.yo
+
 zshexpn.1: Zsh/expn.yo
 
 zshmisc.1: Zsh/grammar.yo Zsh/redirect.yo Zsh/exec.yo Zsh/func.yo \
@@ -193,7 +196,8 @@ Zsh/modlist.yo: $(MODDOCSRC)
 	( \
 	    echo "startitem()"; \
 	    for modfile in $(MODDOCSRC); do \
-		sed -n '1{s|^COMMENT(!MOD!\(.*\)$$|item(tt(\1))(|;p;d;};/^!MOD!)$$/q;p' \
+		sed -n -e '1{s|^COMMENT(!MOD!\(.*\)$$|item(tt(\1))(|;p;d;}' \
+		    -e '/^!MOD!)$$/q;p' \
 		    < $(sdir)/$$modfile; \
 		echo ")"; \
 	    done; \
@@ -246,7 +250,7 @@ uninstall: uninstall.man
 
 # install man pages, creating install directory if necessary
 install.man: man
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
+	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
 	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
 	done
@@ -254,7 +258,7 @@ install.man: man
 
 # install info pages, creating install directory if necessary
 install.info: texi
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(infodir)
+	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(infodir)
 	rm -rf infodir
 	mkdir infodir
 	if ( \
@@ -265,6 +269,10 @@ install.info: texi
 		$(INSTALL_DATA) $$file $(DESTDIR)$(infodir) || exit 1; \
 	    done \
 	); then \
+	    if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
+	      install-info --dir-file=$(DESTDIR)$(infodir)/dir \
+	        $(infodir)/$(tzsh).info; \
+	    else true; fi; \
 	    rm -rf infodir; \
 	    exit 0; \
 	else \
@@ -288,15 +296,15 @@ uninstall.info:
 
 # install HTML manual
 install.html: html
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
-	for file in zsh_*.html; do \
+	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
+	for file in zsh*.html; do \
 	    $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir) || exit 1; \
 	done
 .PHONY: install.html
 
 # uninstall HTML manual
 uninstall.html:
-	rm -f $(DESTDIR)$(htmldir)/zsh_*.html
+	rm -f $(DESTDIR)$(htmldir)/zsh*.html
 .PHONY: uninstall.html
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
