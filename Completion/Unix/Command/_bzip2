@@ -49,10 +49,10 @@ if [[ "$state" = files ]]; then
       $+opt_args[--test] )) && unset decompress
   if [[ -z "$decompress" ]]; then
     _description files expl 'compressed file'
-    _files "$expl[@]" -g '*.bz2' && return 0
+    _files "$expl[@]" -g '*.(bz2|tbz|tbz2)' && return 0
   else
     _description files expl 'file to compress'
-    _files "$expl[@]" -g '*~*.bz2' && return 0
+    _files "$expl[@]" -g '*~*.(bz2|tbz|tbz2)' && return 0
   fi
 fi
 
