@@ -2404,6 +2404,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 	    close(dfd);
 	    zerrnam(nam, "can't open file: %s", *files, 0);
 	    noaliases = ona;
+	    unlink(dump);
 	    return 1;
 	}
 	file = (char *) zalloc(flen + 1);
@@ -2415,17 +2416,19 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 	    zfree(file, flen);
 	    zerrnam(nam, "can't read file: %s", *files, 0);
 	    noaliases = ona;
+	    unlink(dump);
 	    return 1;
 	}
 	close(fd);
 	file = metafy(file, flen, META_REALLOC);
 
 	if (!(prog = parse_string(file, 1)) || errflag) {
+	    errflag = 0;
 	    close(dfd);
 	    zfree(file, flen);
-	    zerrnam(nam, "can't read file: %s", *files, 0);
+	    zwarnnam(nam, "can't read file: %s", *files, 0);
 	    noaliases = ona;
-	    errflag  = 0;
+	    unlink(dump);
 	    return 1;
 	}
 	zfree(file, flen);

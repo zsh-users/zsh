@@ -171,6 +171,7 @@ execfor(Estate state, int do_exec)
     popheap();
     cmdpop();
     loops--;
+    state->pc = end;
     return lastval;
 }
 
@@ -394,6 +395,7 @@ execwhile(Estate state, int do_exec)
     cmdpop();
     popheap();
     loops--;
+    state->pc = end;
     return lastval;
 }
 

@@ -735,6 +735,9 @@ execsimple(Estate state)
 {
     wordcode code = *state->pc++;
 
+    if (errflag)
+	return (lastval = 1);
+
     if (code)
 	lineno = code - 1;
 
