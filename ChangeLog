@@ -1,3 +1,7 @@
+2000-06-05  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* pws: Config/version.mk: 3.1.8 released.
+
 2000-06-05  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11745: Src/builtin.c, Src/Modules/parameter.c, Src/Zle/compresult.c:
