@@ -1,3 +1,10 @@
+2003-06-05  Peter Stephenson  <pws@csr.com>
+
+	* 18526 tweaked (c.f. 18527): Completion/Base/Utility/_arguments,
+	Completion/Base/Utility/_describe, Doc/Zsh/compsys.yo:
+	fix use of style prefix-needed in _arguments by adding an
+	option -O to _describe.
+
 2003-06-03  Peter Stephenson  <pws@csr.com>
 
 	* 18600: Src/pattern.c: bug matching against [[:xdigit:]].

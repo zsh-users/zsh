@@ -387,7 +387,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 	    tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
 	    tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
 
-            _describe -o option \
+            _describe -O option \
                       tmp1 tmp2 -Q -S '' -- \
 		      tmp3 -Q
 
@@ -399,7 +399,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
           single=yes
         else
           next=( "$next[@]" "$odirect[@]" )
-          _describe -o option \
+          _describe -O option \
                     next -Q -M "$matcher" -- \
                     direct -QS '' -M "$matcher" -- \
                     equal -QqS= -M "$matcher"
