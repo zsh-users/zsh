@@ -1077,7 +1077,7 @@ int hwgetword = -1;
 void
 ihwbegin(int offset)
 {
-    if (stophist == 2 || strin)
+    if (stophist == 2)
 	return;
     if (chwordpos%2)
 	chwordpos--;	/* make sure we're on a word start, not end */
@@ -1097,7 +1097,7 @@ ihwbegin(int offset)
 void
 ihwend(void)
 {
-    if (stophist == 2 || strin)
+    if (stophist == 2)
 	return;
     if (chwordpos%2 && chline) {
 	/* end of word reached and we've already begun a word */
