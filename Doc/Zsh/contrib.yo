@@ -820,6 +820,12 @@ indication of the base, or `tt([##16])' just to display the raw number in
 the given base.  Bases themselves are always specified in decimal.
 `tt([#])' restores the normal output format.
 
+The prompt is configurable via the parameter tt(ZCALCPROMPT), which
+undergoes standard prompt expansion.  The index of the current entry is
+stored locally in the first element of the array tt(psvar), which can be
+referred to in tt(ZCALCPROMPT) as `tt(%1v)'.  The default prompt is
+`tt(%1v> )'.
+
 See the comments in the function for a few extra tips.
 )
 findex(zed)

@@ -1,3 +1,8 @@
+2001-07-28  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 15511: Functions/Misc/zcalc, Doc/Zsh/contrib.yo: make
+	zcalc prompt configurable and allow ^D to exit.
+
 2001-07-27  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15509: Completion/Base/Utility/_describe, Src/Zle/compresult.c,
