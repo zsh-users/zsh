@@ -1,3 +1,8 @@
+2005-01-27  Peter Stephenson  <pws@csr.com>
+
+	* users/8433: configure.ac: Latest Cygwin hangs on FIFO test,
+	so tell it explicitly that FIFOs don't work.
+
 2005-01-26  Clint Adams  <clint@zsh.org>
 
 	* 20753: Src/system.h, Src/Zle/zle_params.c: use ZS_memmove

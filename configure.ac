@@ -1635,7 +1635,10 @@ dnl named FIFOs
 dnl -----------
 AC_CACHE_CHECK(if named FIFOs work,
 zsh_cv_sys_fifo,
-[AC_TRY_RUN([
+[if test "$host_os" = cygwin; then
+zsh_cv_sys_fifo=no
+else
+AC_TRY_RUN([
 #include <fcntl.h>
 #include <signal.h>
 main()
@@ -1665,7 +1668,8 @@ main()
 ],
   zsh_cv_sys_fifo=yes,
   zsh_cv_sys_fifo=no,
-  zsh_cv_sys_fifo=yes)])
+  zsh_cv_sys_fifo=yes)
+fi])
 AH_TEMPLATE([HAVE_FIFOS],
 [Define to 1 if system has working FIFOs.])
 if test $zsh_cv_sys_fifo = yes; then
