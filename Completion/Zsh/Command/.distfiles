@@ -6,5 +6,5 @@ _builtin     _emulate     _precommand  _setopt      _unsetopt    _zle
 _cd          _enable      _print       _source      _wait        _zmodload
 _command     _fc          _prompt      _stat        _which       _zpty
 _compdef     _hash        _read        _trap        _zcompile    _zstyle
-_ttyctl      _ulimit      _vared
+_ttyctl      _ulimit      _vared       _alias       _jobs_builtin
 '
