@@ -1,3 +1,8 @@
+2004-01-05  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* zsh-users/6969: Src/builtin.c: made an eval of an empty string
+	return a zero errorcode.
+
 2003-12-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 19308: Src/utils.c, Test/C01arith.ztst: zsh crashes with $((##))
