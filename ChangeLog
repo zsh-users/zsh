@@ -1,3 +1,10 @@
+2004-03-08  Clint Adams  <clint@zsh.org>
+
+	* 19566: Doc/Zsh/params.yo: change associative array
+	documentation to refer to Parameter Expansion Flags
+	rather than Subscript Flags.  Wording by Frederik
+	Eaton and Peter.
+
 2004-03-08  Peter Stephenson  <pws@csr.com>
 
 	* 19554: Src/pattern.c: improve users/7121 by allowing

@@ -107,8 +107,12 @@ of an array; there is no difference between the two except when they
 appear within double quotes.
 `tt("$foo[*]")' evaluates to `tt("$foo[1] $foo[2] )...tt(")', whereas
 `tt("$foo[@]")' evaluates to `tt("$foo[1]" "$foo[2]" )...'.  For
-associative arrays, `tt([*])' or `tt([@])' evaluate to all the values (not
-the keys, but see em(Subscript Flags) below), in no particular order.
+associative arrays, `tt([*])' or `tt([@])' evaluate to all the values,
+in no particular order.  Note that this does not substitute
+the keys; see the documentation for the `tt(k)' flag under
+ifzman(em(Parameter Expansion Flags) in zmanref(zshexpn))\
+ifnzman(noderef(Parameter Expansion))
+for complete details.
 When an array parameter is referenced as `tt($)var(name)' (with no
 subscript) it evaluates to `tt($)var(name)tt([*])', unless the tt(KSH_ARRAYS)
 option is set in which case it evaluates to `tt(${)var(name)tt([0]})' (for
