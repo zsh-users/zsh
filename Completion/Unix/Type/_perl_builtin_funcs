@@ -1,33 +1,9 @@
 #autoload
-#
-# Parses perlfunc(1) to get a list of perl functions. The result is cached
-# for future use.
-
-if (( ! $+_perl_builtin_funcs )); then
-  typeset -agU _perl_builtin_funcs
-  local perlfunc
-
-  if [[ -n "${perlfunc:=$(man -w perlfunc 2>/dev/null; print -l ${^manpath:-${(s.:.)$(manpath)}}/man1/perlfunc.1(|[zZ]|gz|bz2)(N) {/usr/man,/usr/share/man,/usr/local/man}/man1/perlfunc.1(|[zZ]|gz|bz2)(N))}" ]]; then
-    case $perlfunc in
-      *.bz2) perlfunc="bzip2 -cd $perlfunc" ;;
-      *[zZ]) perlfunc="gzip -cd $perlfunc" ;;
-      *) perlfunc="cat $perlfunc" ;;
-    esac
-    _perl_builtin_funcs=(
-      $($=perlfunc | perl -lne '
-      $in_funcs++, next if /Alphabetical/;
-      next unless $in_funcs;
-      if (/^\.I[pP] "(\w+)/) {
-        print $1 unless $func{$1}; $func{$1}++
-      }')
-    )
-  else
-    _message "can't find perlfunc man page; giving up"
-    return 1
-  fi
-fi
 
 local expl
+
+: ${(A)_perl_builtin_funcs:=${(u)${${(M)${(f)"$(_call_program functions \
+    perldoc -u perlfunc 2>/dev/null)"}:#\=item [a-z]*}#* }%%[^a-z]*}}
 
 _wanted functions expl 'perl built-in function' compadd "$@" -a - \
     _perl_builtin_funcs

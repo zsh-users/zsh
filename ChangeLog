@@ -1,3 +1,8 @@
+2003-04-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 18468: Completion/Unix/Type/_perl_builtin_funcs: follow Bart's
+	suggestion of using perldoc itself to retrieve the documentation
+
 2003-04-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 18467: Src/Zle/computil.c: null pointer dereferenced with
