@@ -565,6 +565,9 @@ for communication ports
 item(tt(prefixes))(
 for prefixes (like those of an URL)
 )
+item(tt(printers))(
+for printer names
+)
 item(tt(processes))(
 for process identifiers
 )

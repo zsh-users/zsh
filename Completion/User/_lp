@@ -1,6 +1,6 @@
 #compdef lp lpr lpq lprm
 
-local file expl ret=1 list disp strs shown
+local file expl ret=1 printer list disp strs shown
 
 if (( ! $+_lp_cache )); then
    file=( /etc/(printcap|printers.conf)(N) )
@@ -18,7 +18,12 @@ if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
   _wanted printers expl printer && compadd "$expl" - "$_lp_cache[@]"
 else
   if [[ "$words[1]" = (lpq|lprm) ]]; then
-    list=( "${(@M)${(f@)$(lpq)}:#[0-9]*}" )
+    if [[ "$words" = *-P* ]]; then
+      printer=(-P "${${words##*-P( |)}%% *}")
+    else
+      printer=()
+    fi
+    list=( ${(M)"${(f@)$(lpq $printer 2> /dev/null)}":#[0-9]*} )
 
     if (( $#list )); then
       _tags users jobs
