@@ -1,0 +1,73 @@
+# clint prompt theme
+
+prompt_clint_help () {
+  cat <<'EOF'
+
+  prompt clint [<color1> [<color2> [<color3> [<color4> [<color5>]]]]]
+
+  defaults are red, cyan, green, yellow, and white, respectively.
+
+EOF
+}
+
+prompt_clint_setup () {
+  local -a pcc
+  local -A pc
+  local p_date p_tty p_plat p_ver p_userpwd p_apm p_shlvlhist p_rc p_end
+
+  pcc[1]=${1:-'red'}
+  pcc[2]=${2:-'cyan'}
+  pcc[3]=${3:-'green'}
+  pcc[4]=${4:-'yellow'}
+  pcc[5]=${5:-'white'}
+
+  pc['\[']="%{$fg_no_bold[$pcc[1]]%}["
+  pc['\]']="%{$fg_no_bold[$pcc[1]]%}]"
+  pc['<']="%{$fg_no_bold[$pcc[1]]%}<"
+  pc['>']="%{$fg_no_bold[$pcc[1]]%}>"
+
+  p_date="$pc['\[']%{$fg_no_bold[$pcc[2]]%}%D{%a %y/%m/%d %R %Z}$pc['\]']"
+  p_tty="$pc['\[']%{$fg_no_bold[$pcc[3]]%}%l$pc['\]']"
+  p_plat="$pc['\[']%{$fg_no_bold[$pcc[2]]%}${MACHTYPE}/${OSTYPE}/$(uname -r)$pc['\]']"
+  p_ver="$pc['\[']%{$fg_no_bold[$pcc[2]]%}${ZSH_VERSION}$pc['\]']"
+
+  p_userpwd="$pc['<']%{$fg_no_bold[$pcc[3]]%}%n@%m%{$fg_bold[$pcc[5]]%}:%{$fg_no_bold[$pcc[4]]%}%~$pc['>']"
+  [[ -f /proc/apm ]] && p_apm="%(2v.-%2v-.)"
+
+  p_shlvlhist="%{$reset_color%}zsh%(2L./$SHLVL.) %B%h%b "
+  p_rc="%(?..[%?%v1] )"
+  p_end="%{$reset_color%}%B%#%b %{$fg_no_bold[$pcc[2]]%}"
+
+  POSTEDIT="$reset_color"
+
+  prompt="$p_date$p_tty$p_plat$p_ver
+$p_userpwd
+$p_shlvlhist$p_rc$p_apm$p_end"
+  PS2='%(4_.\.)%3_> %E'
+
+  [[ -f /proc/apm ]] &&
+     precmd () { prompt_clint_precmd ; prompt_clint_apm_precmd } ||
+     precmd () { prompt_clint_precmd }
+  preexec () { }
+}
+
+prompt_clint_precmd () {
+  setopt noxtrace localoptions
+  local exitstatus=$?
+
+  [[ $exitstatus -ge 128 ]] && psvar[1]=" $signals[$exitstatus-127]" ||
+	psvar[1]=""
+
+  [[ -o interactive ]] && jobs -l
+
+}
+
+prompt_clint_apm_precmd () {
+  setopt noxtrace localoptions
+  local bat
+
+  bat=${${="$(</proc/apm)"}[7]/%/%%}
+  [[ $bat == ("100%"|"-1%") ]] && psvar[3]=() || psvar[2]=$bat
+}
+
+prompt_clint_setup "$@"

@@ -1,5 +1,8 @@
 2001-10-15  Clint Adams  <clint@zsh.org>
 
+        * 15094: Functions/Prompts/prompt_clint_setup:
+	don't display battery level if it's -1%.
+
         * 15740: Completion/compaudit: don't whine about
 	/usr/local/**/*(/) in $fpath being root:staff 2755
 	if we think we're on Debian.
