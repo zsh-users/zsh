@@ -1,36 +1,44 @@
 texinode(Expansion)(Parameters)(Prompt Expansion)(Top)
 chapter(Expansion)
 cindex(expansion)
-sect(Description)
-The types of expansions performed are
+ifnztexi(sect(Description))
+The following types of expansions are performed in the indicated order in
+five steps:
 
-startlist()
-list(em(History Expansion))
-list(em(Alias Expansion))
-list(em(Process Substitution))
-list(em(Parameter Expansion))
-list(em(Command Substitution))
-list(em(Arithmetic Expansion))
-list(em(Brace Expansion))
-list(em(Filename Expansion))
-list(em(Filename Generation))
-endlist()
-
-Expansion is done in the above specified order in five steps.  The
-first is em(history expansion), which is only performed in
-interactive shells.  The next step is em(alias expansion), which is
-done right before the command line is parsed.  They are followed by
-em(process substitution), em(parameter expansion), em(command
-substitution), em(arithmetic expansion) and em(brace expansion)
-which are performed in one step in left-to-right fashion.  After
+startitem()
+item(em(History Expansion))(
+This is performed only in interactive shells.
+)
+item(em(Alias Expansion))(
+Aliases are expanded immediately before the command line is parsed as
+explained
+ifzman(under Aliasing in zmanref(zshmisc))\
+ifnzman(in noderef(Aliasing))\
+.
+)
+xitem(em(Process Substitution))
+xitem(em(Parameter Expansion))
+xitem(em(Command Substitution))
+xitem(em(Arithmetic Expansion))
+item(em(Brace Expansion))(
+These five are performed in one step in left-to-right fashion.  After
 these expansions, all unquoted occurrences of the characters `tt(\)',
-`tt(')' and `tt(")' are removed, and the result is subjected to
-em(filename expansion) followed by em(filename generation).
-
-If the tt(SH_FILE_EXPANSION) option is set, the order of expansion is modified
-for compatibility with bf(sh) and bf(ksh).  em(Filename expansion)
-is performed immediately after em(alias expansion),
+`tt(')' and `tt(")' are removed.
+)
+item(em(Filename Expansion))(
+If the tt(SH_FILE_EXPANSION) option is set, the order of expansion is
+modified for compatibility with bf(sh) and bf(ksh).  In that case
+em(filename expansion) is performed immediately after em(alias expansion),
 preceding the set of five expansions mentioned above.
+)
+cindex(globbing)
+item(em(Filename Generation))(
+This expansion, commonly referred to as bf(globbing), is always done last.
+)
+enditem()
+
+The following sections explain the types of expansion in detail.
+
 startmenu()
 menu(History Expansion)
 menu(Process Substitution)
@@ -192,8 +200,11 @@ tt(!?) expansion (possibly in an earlier command).  Anything else results
 in an error, although the error may not be the most obvious one.
 texinode(Modifiers)()(Word Designators)(History Expansion)
 subsect(Modifiers)
-cindex(modifiers, history)
+cindex(modifiers)
+cindex(colon modifiers)
 cindex(history modifiers)
+cindex(globbing modifiers)
+cindex(parameter modifiers)
 After the optional word designator, you can add
 a sequence of one or more of the following modifiers,
 each preceded by a `tt(:)'.  These modifiers also work on the result
@@ -312,7 +323,7 @@ tt(>) is selected then writing on this special file will provide input for
 var(list).  If tt(<) is used, then the file passed as an argument will
 be connected to the output of the var(list) process.  For example,
 
-nofill(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR() |
+example(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR() |
 tee >LPAR())var(process1)tt(RPAR() >LPAR())var(process2)tt(RPAR() >/dev/null))
 
 cuts fields 1 and 3 from the files var(file1) and var(file2) respectively,
@@ -334,7 +345,8 @@ information using a pipe, so that programmes that expect to lseek
 Also note that the previous example can be more compactly and
 efficiently written (provided the tt(MULTIOS) option is set) as:
 
-nofill(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR() > >LPAR())var(process1)tt(RPAR() > >LPAR())var(process2)tt(RPAR()))
+example(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR()) ifzman(\ 
+)tt(> >LPAR())var(process1)tt(RPAR() > >LPAR())var(process2)tt(RPAR()))
 
 The shell uses pipes instead of FIFOs to implement the latter
 two process substitutions in the above example.
@@ -365,7 +377,7 @@ the pattern is the same as that used for filename generation;
 see noderef(Filename Generation).  Note that these patterns, along with
 the replacement text of any substitutions, are themselves subject to
 parameter expansion, command substitution, and arithmetic expansion.
-In addition to the following operations, the file modifiers described in
+In addition to the following operations, the colon modifiers described in
 noderef(Modifiers) in noderef(History Expansion) can be
 applied:  for example, tt(${i:s/foo/bar/}) performs string
 substitution on the expansion of parameter tt($i).
@@ -501,7 +513,7 @@ Note that `tt(^)', `tt(=)', and `tt(~)', below, must appear
 to the left of `tt(#)' when these forms are combined.
 )
 item(tt(${^)var(spec)tt(}))(
-pindex(RC_EXPAND_PARAM, use of)
+pindex(RC_EXPAND_PARAM, toggle)
 cindex(array expansion style, rc)
 cindex(rc, array expansion style)
 Turn on the tt(RC_EXPAND_PARAM) option for the
@@ -522,9 +534,9 @@ tt($var[)var(N)tt(]) may themselves be split into different list
 elements.
 )
 item(tt(${=)var(spec)tt(}))(
-pindex(SH_WORD_SPLIT, use of)
-cindex(field splitting, sh style)
-cindex(sh, field splitting style)
+pindex(SH_WORD_SPLIT, toggle)
+cindex(field splitting, sh style, parameter)
+cindex(sh, field splitting style, parameter)
 Perform word splitting using the rules for tt(SH_WORD_SPLIT) during the
 evaluation of var(spec), but regardless of whether the parameter appears in
 double quotes; if the `tt(=)' is doubled, turn it off.
@@ -538,7 +550,7 @@ of var(spec) em(before) the assignment to var(name) is performed.
 This affects the result of array assignments with the tt(A) flag.
 )
 item(tt(${~)var(spec)tt(}))(
-pindex(GLOB_SUBST)
+pindex(GLOB_SUBST, toggle)
 Turn on the tt(GLOB_SUBST) option for the evaluation of
 var(spec); if the `tt(~)' is doubled, turn it off.  When this option is
 set, the string resulting from the expansion will be interpreted as a
@@ -1102,7 +1114,6 @@ first `tt(=)' also inhibits this.
 texinode(Filename Generation)()(Filename Expansion)(Expansion)
 sect(Filename Generation)
 cindex(filename generation)
-cindex(globbing)
 If a word contains an unquoted instance of one of the characters
 `tt(*)', `tt(LPAR())', `tt(|)', `tt(<)', `tt([)', or `tt(?)', it is regarded
 as a pattern for filename generation, unless the tt(GLOB) option is unset.
