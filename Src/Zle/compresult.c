@@ -1661,7 +1661,9 @@ asklist(void)
 	    putc('\n', shout);
 	settyinfo(&shttyinfo);
 	minfo.asked = 1;
-    }
+    } else if (minfo.asked == 2)
+	tcmultout(TCUP, TCMULTUP, nlnct);
+
     return (minfo.asked ? minfo.asked - 1 : 0);
 }
 

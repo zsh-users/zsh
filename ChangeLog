@@ -1,5 +1,8 @@
 2000-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11682: Src/Zle/compresult.c: move to last cursor after not
+ 	asking a second time if list should be shown
+	
 	* 11679: Src/Zle/compcore.c: fix for ignore-line style
 	
 	* 11678: Completion/Base/_arguments: avoid reporting the same
