@@ -965,7 +965,7 @@ _cvs_nonentried_files () {
     )
     [[ -r ~/.cvsignore ]] && omitpats=($omitpats $(<~/.cvsignore))
     [[ -r ${realdir}.cvsignore ]] && omitpats=($omitpats $(<${realdir}.cvsignore))
-    omitpats=($omitpats $CVSIGNORE)
+    omitpats=($omitpats $=CVSIGNORE)
 
     _path_files -g "*~(*/|)(${(j:|:)~omitpats})(D.)"
   }
