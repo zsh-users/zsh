@@ -368,6 +368,7 @@ debug)
 
 classpath|sourcepath|bootstrapclasspath|docletpath)
   compset -P '*:'
+  compset -S ':*'
   _alternative \
     "classpath:$state:_path_files -qS: -g '*.(jar|zip)'" \
     "classpath:$state:_path_files -r': ' -/"

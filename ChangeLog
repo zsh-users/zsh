@@ -1,3 +1,8 @@
+2001-03-15  Peter Stephenson  <pws@csr.com>
+
+	* users/3671: Completion/User/_java: complete in middle of
+	-classpath etc., not just at end.
+	
 2001-03-15  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* user/3674: Src/Zle/complist.c: fix default colour for directories
