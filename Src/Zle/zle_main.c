@@ -413,7 +413,6 @@ zleread(char *lp, char *rp, int flags)
 
     baud = getiparam("BAUD");
     costmult = (baud) ? 3840000L / baud : 0;
-    tv.tv_sec = 0;
 #endif
 
     /* ZLE doesn't currently work recursively.  This is needed in case a *
@@ -523,6 +522,7 @@ zleread(char *lp, char *rp, int flags)
 #ifdef HAVE_SELECT
 	    if (baud && !(lastcmd & ZLE_MENUCMP)) {
 		FD_SET(SHTTY, &foofd);
+		tv.tv_sec = 0;
 		if ((tv.tv_usec = cost * costmult) > 500000)
 		    tv.tv_usec = 500000;
 		if (!kungetct && select(SHTTY+1, (SELECT_ARG_2_T) & foofd,
