@@ -115,6 +115,7 @@ cd_init(char *nam, char *sep, char **args, int disp)
     if (cd_parsed) {
 	zsfree(cd_state.sep);
 	freecdsets(cd_state.sets);
+	cd_parsed = 0;
     }
     setp = &(cd_state.sets);
     cd_state.sep = ztrdup(sep);
@@ -153,6 +154,7 @@ cd_init(char *nam, char *sep, char **args, int disp)
 	if ((*args = tmp))
 	    args++;
     }
+    cd_parsed = 1;
     return 0;
 }
 
@@ -259,10 +261,8 @@ bin_compdescribe(char *nam, char **args, char *ops, int func)
     }
     switch (args[0][1]) {
     case 'i':
-	cd_parsed = 1;
 	return cd_init(nam, "", args + 1, 0);
     case 'I':
-	cd_parsed = 1;
 	return cd_init(nam, args[1], args + 2, 1);
     case 'g':
 	if (cd_parsed) {

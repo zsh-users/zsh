@@ -5,6 +5,9 @@
 
 2000-07-27  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12400: Src/Zle/computil.c: compdescribe shouldn't use the sets
+ 	after failed initialisation
+	
 	* 12394: Completion/Core/_main_complete: don't hide possible
  	completions if there is only one and at the same time messages are
  	shown
