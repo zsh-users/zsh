@@ -523,6 +523,8 @@ sitem(tt(cputime))(Maximum CPU seconds per process.)
 sitem(tt(maxproc))(Maximum number of processes.)
 sitem(tt(addressspace))(Maximum amount of address space used.)
 sitem(tt(cachedthreads))(Maximum number of cached threads.)
+sitem(tt(aiooperations))(Maximum number of AIO operations.)
+sitem(tt(aiomemorylocked))(Maximum amount of memory locked in RAM for AIO operations.)
 endsitem()
 
 Which of these resource limits are available depends on the system.

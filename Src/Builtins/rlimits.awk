@@ -6,7 +6,7 @@
 #
 BEGIN {limidx = 0}
 
-/^[\t ]*(#[\t ]*define[\t _]*RLIMIT_[A-Z]*[\t ]*[0-9][0-9]*|RLIMIT_[A-Z]*,[\t ]*)/ {
+/^[\t ]*(#[\t ]*define[\t _]*RLIMIT_[A-Z_]*[\t ]*[0-9][0-9]*|RLIMIT_[A-Z]*,[\t ]*)/ {
     limindex = index($0, "RLIMIT_")
     limtail = substr($0, limindex, 80)
     split(limtail, tmp)
@@ -35,6 +35,8 @@ BEGIN {limidx = 0}
 	    if (limnam == "NPROC")   { msg[limnum] = "maxproc" }
 	    if (limnam == "AS")      { msg[limnum] = "addressspace" }
 	    if (limnam == "TCACHE")  { msg[limnum] = "cachedthreads" }
+	    if (limnam == "AIO_OPS") { msg[limnum] = "aiooperations" }
+	    if (limnam == "AIO_MEM") { msg[limnum] = "aiomemorylocked" }
         }
     }
 }

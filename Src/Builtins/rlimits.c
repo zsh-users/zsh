@@ -218,6 +218,20 @@ printulimit(int lim, int hard, int head)
 	    printf("cached threads             ");
 	break;
 # endif /* RLIMIT_TCACHE */
+# ifdef RLIMIT_AIO_OPS
+    case RLIMIT_AIO_OPS:
+	if (head)
+	    printf("AIO operations             ");
+	break;
+# endif /* RLIMIT_AIO_OPS */
+# ifdef RLIMIT_AIO_MEM
+    case RLIMIT_AIO_MEM:
+	if (head)
+	    printf("AIO locked-in-memory (kb)  ");
+	if (limit != RLIM_INFINITY)
+	    limit /= 1024;
+	break;
+# endif /* RLIMIT_AIO_MEM */
     }
     /* display the limit */
     if (limit == RLIM_INFINITY)
@@ -538,6 +552,9 @@ bin_ulimit(char *name, char **argv, char *ops, int func)
 # ifdef RLIMIT_VMEM
 	    case RLIMIT_VMEM:
 # endif /* RLIMIT_VMEM */
+# ifdef RLIMIT_AIO_MEM
+	    case RLIMIT_AIO_MEM:
+# endif /* RLIMIT_AIO_MEM */
 		limit *= 1024;
 		break;
 	    }
