@@ -35,7 +35,7 @@ _cvs_command () {
   if (( CURRENT == 1 )); then
     compadd "$@" ${(k)cmds} || compadd "$@" ${(kv)=cmds}
   else
-    _cvs_"${${(k)cmds[(R)* $words[1] *]}:-${words[1]:#*~(${(@kj:|:)~cmds})}}"
+    _cvs_"${${(k)cmds[(R)* $words[1] *]}:-${(k)cmds[(i)$words[1]]}}"
   fi
 }
 
