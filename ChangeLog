@@ -1,3 +1,8 @@
+2001-05-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 14219: Completion/Zsh/Command/_bindkey: update for bindkey
+	changes in 14046
+
 2001-05-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14217: Completion/Unix/Type/_files: Fix processing of the -F
