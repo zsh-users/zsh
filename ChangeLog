@@ -1,3 +1,8 @@
+2001-06-16  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 14939: zshconfig.ac, Src/utils.c: Some systems with GNU-based
+	utilities scream at you for using mktemp() instead of mkstemp().
+
 2001-06-15  Peter Stephenson  <pws@csr.com>
 
 	* 14929: Src/params.c: after 14915, assigning to individual

@@ -1101,11 +1101,14 @@ gettempname(void)
     if (!(s = getsparam("TMPPREFIX")))
 	s = DEFAULT_TMPPREFIX;
  
+#ifdef HAVE_MKSTEMP
+    ret = ((char *) mkstemp(dyncat(unmeta(s), "XXXXXX")));
 #ifdef HAVE__MKTEMP
     /* Zsh uses mktemp() safely, so silence the warnings */
     ret = ((char *) _mktemp(dyncat(unmeta(s), "XXXXXX")));
 #else
     ret = ((char *) mktemp(dyncat(unmeta(s), "XXXXXX")));
+#endif
 #endif
     unqueue_signals();
 
