@@ -1,5 +1,8 @@
 2001-06-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* user/3946: Src/Zle/computil.c: fix for finding the first
+	ambiguous path component in compfiles
+
 	* 15087: Src/jobs.c: make warning message for disowning stopped
 	jobs more verbose (saying how to make the job running again)
 
