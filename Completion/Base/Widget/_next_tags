@@ -1,4 +1,4 @@
-#compdef -k complete-word \C-xn
+#compdef -k list-choices \C-xn
 
 # Main widget.
 
@@ -96,11 +96,7 @@ _next_tags() {
   _next_tags_pfx="$PREFIX"
   _next_tags_sfx="$SUFFIX"
 
-  if [[ -n "$compstate[old_insert]" ]]; then
-    ins=1
-  else
-    ins=unambiguous
-  fi
+  ins="${compstate[old_insert]:+1}"
 
   _main_complete _complete _next_tags_completer
 
