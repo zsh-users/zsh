@@ -1,3 +1,8 @@
+2004-10-22  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20510: Borzenkov Andrey: Src/jobs.c: Fixed the arg to a call
+	to times().
+
 2004-10-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (based on 20514): Completion/compinit: _comp_options
