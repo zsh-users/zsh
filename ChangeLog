@@ -1,3 +1,8 @@
+2001-06-25  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* user/3940: Src/Zle/zle_tricky.c: make expand-word not always
+	restore the command line
+
 001-06-22  Andrej Borsenkow  <bor@zsh.org>
 
         * 15021: Src/prompt.c, Doc/Zsh/prompt.yo: revert to old %l

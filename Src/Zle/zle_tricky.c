@@ -752,7 +752,8 @@ docomplete(int lst)
 	    inststr(x);
 	} else if (COMP_ISEXPAND(lst)) {
 	    /* Do expansion. */
-	    char *ol = (olst == COMP_EXPAND_COMPLETE) ?
+	    char *ol = (olst == COMP_EXPAND ||
+                        olst == COMP_EXPAND_COMPLETE) ?
 		dupstring((char *)line) : (char *)line;
 	    int ocs = cs, ne = noerrs;
 
