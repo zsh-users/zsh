@@ -8,7 +8,7 @@ _cache_ident="$1"
 if zstyle -t ":completion:${curcontext}:" use-cache; then
   # Decide which directory to retrieve cache from, and ensure it exists
   zstyle -s ":completion:${curcontext}:" cache-path _cache_dir
-  : ${_cache_dir:=${ZDOTDIR:-HOME}/.zcompcache}
+  : ${_cache_dir:=${ZDOTDIR:-$HOME}/.zcompcache}
   if [[ ! -d "$_cache_dir" ]]; then
     [[ -e "$_cache_dir" ]] &&
       _message "cache-dir ($_cache_dir) isn't a directory\!"
