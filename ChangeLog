@@ -1,3 +1,11 @@
+2001-08-07  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15588: Completion/Base/Completer/_approximate,
+	Completion/Base/Utility/_describe, Completion/Unix/Command/_dd:
+	make _dd not use already used specs; fix for selecting stuff to
+	complete in _describe; fix for correction and _describe with
+	grouped lists
+
 2001-08-07  Peter Stephenson  <pws@csr.com>
 
 	* 15586: Src/subst.c, Doc/Zsh/expn.yo: remove =alias expansion,
