@@ -1,3 +1,8 @@
+2004-02-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Zle/complist.c: Silenced some compiler warnings
+	about uninitialized variables.
+
 2004-02-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 19437: configure.ac: don't rely on path search to find
