@@ -1,3 +1,8 @@
+2001-09-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* Akinori MUSHA: 15815: Completion/BSD/Command/_bsd_pkg: More
+	detailed completion of package options on different BSD flavors.
+
 2001-09-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15812: Doc/Makefile.in, Doc/Zsh/zle.yo: Include mod_tcp.yo in
