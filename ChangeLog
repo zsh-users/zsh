@@ -1,3 +1,8 @@
+2002-05-06  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17078: Completion/Base/Utility/_describe: fix _arguments' -s
+	option
+
 2002-05-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 17072; based on 17066 (Danek Duvall):
