@@ -579,8 +579,8 @@ cd_get(char **params)
                     memset(buf, ' ', cd_state.pre);
                     memcpy(buf, str->str, str->len);
                     strcpy(sufp, str->desc);
-                    if (strlen(buf) >= columns)
-                        buf[columns] = '\0';
+                    if (strlen(buf) >= columns - 1)
+                        buf[columns - 1] = '\0';
                     *dp++ = ztrdup(buf);
                 }
                 *mp = *dp = NULL;
