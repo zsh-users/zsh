@@ -1,3 +1,8 @@
+2000-05-05  Tanaka Akira  <akr@zsh.org>
+
+	* 11219: Completion/User/_cvs, Completion/User/_diff_options: add
+	option description to `_cvs' and fix typo in _diff_options.
+
 2000-05-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 11216: Doc/Zsh/builtins.yo, Src/loop.c: small doc fix and AIX
