@@ -388,6 +388,15 @@ _cvs_watchers () {
       '*:file:_cvs_files'
 }
 
+(( $+functions[_cvs_loadstat] )) ||
+_cvs_loadstat () {
+  zstyle -t ":completion${curcontext}:cvs" disable-stat && return
+  (( $+_cvs_loadstat_tried )) && return
+  _cvs_loadstat_tried=yes
+
+  zmodload -i zsh/stat 2>/dev/null
+}
+
 (( $+functions[_cvs_root] )) ||
 _cvs_root () {
   local cvspassfile id
@@ -395,7 +404,8 @@ _cvs_root () {
   typeset -gU _cvs_roots
 
   if [[ -f "${cvspassfile::=${CVS_PASSFILE:-$HOME/.cvspass}}" ]]; then
-    if zmodload -e stat; then
+    _cvs_loadstat
+    if (( $+builtins[stat] )); then
       id="$(LANG=C builtin stat -g +mtime -F '%Y/%m/%d-%T' "$cvspassfile")"
     else
       id="$(LANG=C ls -l "$cvspassfile")"
@@ -508,8 +518,8 @@ _cvs_extract_file_entries () {
 
 (( $+functions[_cvs_extract_modifiedfile_entries] )) ||
 _cvs_extract_modifiedfile_entries () {
-  if zstyle -t ":completion${curcontext}:cvs" disable-stat ||
-     ! { zmodload -e zsh/stat || zmodload zsh/stat }; then
+  _cvs_loadstat
+  if (( ! $+builtins[stat] )); then
     _cvs_extract_file_entries
     return
   fi
