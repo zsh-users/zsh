@@ -2,7 +2,7 @@
 
 emulate -L zsh
 
-local opt optlist once
+local opt optlist once dir
 
 while [[ $1 = -* ]]; do
   if [[ $1 = - || $1 = -- ]]; then
@@ -61,10 +61,20 @@ if [[ -z $EMAIL_ADDR ]]; then
   print "Using $EMAIL_ADDR as anonymous FTP password."
 fi
 
+if [[ $1 = */* ]]; then
+  1=${1##ftp://}
+  dir=${1#*/}
+  1=${1%%/*}
+fi
+
 if [[ $once = 1 ]]; then
-  zftp open $1 anonymous $EMAIL_ADDR
+  zftp open $1 anonymous $EMAIL_ADDR || return 1
 else
   zftp params $1 anonymous $EMAIL_ADDR
-  zftp open
+  zftp open || return 1
+fi
+
+if [[ -n $dir ]]; then
+  zfcd $dir
 fi
 # }

@@ -1,10 +1,16 @@
 # function zfget {
 # Get files from remote server.  Options:
+#   -c   cat: dump files to stdout.
+#          alias zfcat="zfget -c"
+#          zfpage() { zfget -c "$@" | eval $PAGER }
+#        are sensible things to do, but aren't done for you.  Note the
+#        second doesn't work on all OS's.
 #   -G   don't to remote globbing, else do
 #   -t   update the local file times to the same time as the remote.
 #        Currently this only works if you have the `perl' command,
 #        and that perl is version 5 with the standard library.
-#        See the function zfrtime for more gory details.
+#        See the function zfrtime for more gory details.  This has
+#        no effect with the -c option.
 #
 # If the connection is not currently open, try to open it with the current
 # parameters (set by a previous zfopen or zfparams), then close it after
@@ -13,7 +19,7 @@
 
 emulate -L zsh
 
-local loc rem optlist opt nglob remlist time
+local loc rem optlist opt nglob remlist time cat
 integer stat do_close
 
 while [[ $1 == -* ]]; do
@@ -28,6 +34,8 @@ while [[ $1 == -* ]]; do
       G) nglob=1
 	 ;;
       t) time=1
+	 ;;
+      c) cat=1
 	 ;;
       *) print option $opt not recognised >&2
 	 ;;
@@ -48,11 +56,16 @@ for remlist in $*; do
   fi
   if (( $#remlist )); then
     for rem in $remlist; do
-      loc=${rem:t}
-      if zftp get $rem >$loc; then
-	[[ $time = 1 ]] && zfrtime $rem $loc
+      if [[ -n $cat ]]; then
+	zftp get $rem
+	stat=$?
       else
-	stat=1
+	loc=${rem:t}
+	if zftp get $rem >$loc; then
+	  [[ $time = 1 ]] && zfrtime $rem $loc
+	else
+	  stat=1
+	fi
       fi
     done
   fi
