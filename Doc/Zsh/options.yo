@@ -219,6 +219,16 @@ Make the tt(echo) builtin compatible with the BSD manref(echo)(1) command.
 This disables backslashed escape sequences in echo strings unless the
 tt(-e) option is specified.
 )
+pindex(CASE_GLOB)
+cindex(case-insensitive globbing, option)
+item(tt(CASE_GLOB) <D>)(
+Make globbing (filename generation) sensitive to case.  Note that other
+uses of patterns are always sensitive to case.  If the option is unset,
+the presence of any character which is special to filename generation
+will cause case-insensitive matching.  For example, tt(cvs(/)) can
+match the directory tt(CVS) owing to the presence of the globbing flag
+(unless the option tt(BARE_GLOB_QUAL) is unset).
+)
 pindex(C_BASES)
 cindex(bases, output in C format)
 cindex(hexadecimal, output in C format)

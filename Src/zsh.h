@@ -1412,6 +1412,7 @@ enum {
     BGNICE,
     BRACECCL,
     BSDECHO,
+    CASEGLOB,
     CBASES,
     CDABLEVARS,
     CHASEDOTS,

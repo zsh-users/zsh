@@ -1,3 +1,9 @@
+2004-03-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* zsh-users/7121: Doc/Zsh/options.yo, Src/options.c,
+	Src/pattern.c, Src/zsh.h: NO_CASE_GLOB option for
+	case-insensitive globbing.
+
 2004-03-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: config.guess, config.sub: update to versions from

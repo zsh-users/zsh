@@ -289,7 +289,10 @@ static long rn_offs;
 void
 patcompstart(void)
 {
-    patglobflags = 0;
+    if (isset(CASEGLOB))
+	patglobflags = 0;
+    else
+	patglobflags = GF_IGNCASE;
 }
 
 /* Top level pattern compilation subroutine */
