@@ -1,5 +1,8 @@
 2000-08-14  Bart Schaefer  <schaefer@zsh.org>
 
+	* 12621: Src/Zle/zle_main.c: Use ztrdup() on a string that will
+	later be freed; this appears to have been a bug ever since 9839.
+
 	* Andrej: 12620: configure.in, Src/system.h: Fix cache variable
 	test for mmap, remove cygwin special-case.
 

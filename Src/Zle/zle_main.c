@@ -877,6 +877,8 @@ bin_vared(char *name, char **args, char *ops, int func)
     } else if (*s) {
 	zwarnnam(name, "invalid parameter name: %s", args[0], 0);
 	return 1;
+    } else {
+	s = ztrdup(s);
     }
 
     if (SHTTY == -1) {
