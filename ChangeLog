@@ -1,3 +1,8 @@
+2005-02-02  Peter Stephenson  <pws@csr.com>
+
+	* unposted: README, Config/version.mk, Etc/FAQ.yo: update version
+	number to 4.2.4.
+
 2005-02-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* 20774: Src/exec.c: fix e.g. "FOO=BAR BAR=FOO echo" failure to
