@@ -114,7 +114,7 @@ check test:
 @CLEAN_MK@
 
 distclean-here:
-	rm -f Makefile config.h config.status config.log config.cache stamp-h Config/defs.mk
+	rm -f Makefile config.h config.status config.log config.cache config.modules stamp-h Config/defs.mk
 
 realclean-here:
 	cd $(sdir) && rm -f config.h.in stamp-h.in configure

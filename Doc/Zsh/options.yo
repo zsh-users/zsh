@@ -343,7 +343,7 @@ If a pattern for filename generation has no matches,
 delete the pattern from the argument list;
 do not report an error unless all the patterns
 in a command have no matches.
-Overrides tt(NULL_GLOB).
+Overrides tt(NOMATCH).
 )
 pindex(DVORAK)
 item(tt(DVORAK))(
