@@ -414,7 +414,9 @@ _apt-get () {
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
-    /$'install\0'/ /$'[^\0]#\0'/ ':packages::{ _deb_packages "$expl_packages[@]" uninstalled || _deb_packages "$expl_packages[@]" installed }' \# \| \
+    \( \
+    /$'install\0'/ /$'[^\0]#\0'/ ':packages::{ _deb_packages "$expl_packages[@]" uninstalled || _deb_packages "$expl_packages[@]" installed }' \# \
+    /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \) \| \
     /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'dist-upgrade\0'/ \| \
     /$'dselect-upgrade\0'/ \| \
@@ -535,7 +537,7 @@ ${${${${(M)${(f)"$(apt-cache dump)"}:# #Archive:*}# #Archive: #}:#*\(null\)*}/ /
 }
 
 _apt_releases () {
-  local command="$argv[$#]" update_policy
+  local update_policy
 
   zstyle -s ":completion:*:*:$service:*" cache-policy update_policy
   if [[ -z "$update_policy" ]]; then

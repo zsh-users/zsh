@@ -1,5 +1,8 @@
 2001-04-02  Clint Adams  <schizo@debian.org>
 
+ 	* 13866: Completion/Debian/_apt: complete a release
+	name after apt-get install <pkgname>/.
+
 	* 13864: Completion/Debian/_apt: complete a
 	"release" name after apt-get -t.
 
