@@ -1,3 +1,7 @@
+2003-12-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk, README: zsh-4.0.9.
+
 2003-12-18  Peter Stephenson  <pws@csr.com>
 
 	* 19315: Src/lex.c, Src/math.c, Src/params.c, Src/Zle/compcore.c,
