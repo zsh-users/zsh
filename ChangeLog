@@ -1,5 +1,7 @@
 2004-03-03  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: zsh 4.2.0-pre-2.
+
 	* 19523: Src/signames2.awk: attempt to work around awk
 	problem on AIX 5.
 
