@@ -1392,14 +1392,36 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    printjob(job + jobtab, lng, 2);
 	    break;
 	case BIN_DISOWN:
-	    if (jobtab[job].stat & STAT_STOPPED)
+	    if (jobtab[job].stat & STAT_STOPPED) {
+		char buf[20], *pids = "";
+
+		if (jobtab[job].stat & STAT_SUPERJOB) {
+		    Process pn;
+
+		    for (pn = jobtab[jobtab[job].other].procs; pn; pn = pn->next) {
+			sprintf(buf, " -%d", pn->pid);
+			pids = dyncat(pids, buf);
+		    }
+		    for (pn = jobtab[job].procs; pn->next; pn = pn->next) {
+			sprintf(buf, " %d", pn->pid);
+			pids = dyncat(pids, buf);
+		    }
+		    if (!jobtab[jobtab[job].other].procs && pn) {
+			sprintf(buf, " %d", pn->pid);
+			pids = dyncat(pids, buf);
+		    }
+		} else {
+		    sprintf(buf, " -%d", jobtab[job].gleader);
+		    pids = buf;
+		}
                 zwarnnam(name,
 #ifdef USE_SUSPENDED
-                         "warning: job is suspended",
+                         "warning: job is suspended, use `kill -CONT%s' to resume",
 #else
-                         "warning: job is stopped",
+                         "warning: job is stopped, use `kill -CONT%s' to resume",
 #endif
-                         NULL, 0);
+                         pids, 0);
+	    }
 	    deletejob(jobtab + job);
 	    break;
 	}
