@@ -1,5 +1,8 @@
 2001-09-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 15864: Doc/Zsh/params.yo: Document that assignment to TERM
+	is necessary to re-initialize the terminal.
+
 	* users/4269: Src/hist.c: Detect and reject corrupted history
 	files ('\0' bytes) rather than consuming all available memory.
 

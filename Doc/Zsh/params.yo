@@ -993,7 +993,12 @@ window size specifications; these will not be local to the command.
 )
 vindex(TERM)
 item(tt(TERM) <S>)(
-The type of terminal in use.  This is used when looking up termcap sequences.
+The type of terminal in use.  This is used when looking up termcap
+sequences.  An assignment to tt(TERM) causes zsh to re-initialize the
+terminal, even if the value does not change (e.g., `tt(TERM=$TERM)').  It
+is necessary to make such an assignment upon any change to the terminal
+definition database or terminal type in order for the new settings to
+take effect.
 )
 vindex(TIMEFMT)
 item(tt(TIMEFMT))(
