@@ -1,5 +1,10 @@
 #defcomp -subscript-
 
-_compalso -math-
+local ret=1
+
+_compalso -math- && ret=0
+
 [[ ${(Pt)${compstate[parameter]}} = assoc* ]] &&
-    compgen -k "( ${(kP)${compstate[parameter]}} )"
+  compgen -k "( ${(kP)${compstate[parameter]}} )" && ret=0
+
+return ret

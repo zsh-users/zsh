@@ -15,6 +15,7 @@ compctltab
 compcurrent
 compexact
 compexactstr
+compforcelist
 compinsert
 compiprefix
 complist

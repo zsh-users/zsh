@@ -263,7 +263,7 @@ multsub(char **s, char ***a, int *isarr, char *sep)
 	    *isarr = 0;
 	return 0;
     }
-    if ((l = countlinknodes(foo)) > 1) {
+    if ((l = countlinknodes(foo)) > 1 || a) {
 	p = r = ncalloc((l + 1) * sizeof(char*));
 	while (nonempty(foo))
 	    *p++ = (char *)ugetnode(foo);
@@ -976,7 +976,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	skipparens(*s, *s == Inpar ? Outpar : Outbrace, &s);
 	sav = *s;
 	*s = 0;
-	if (multsub(&val, (aspar ? NULL : &aval), &isarr, NULL) && quoted) {
+	if (multsub(&val, (((quoted || aspar) && !nojoin) ? NULL : &aval),
+		    &isarr, NULL) &&
+	    quoted) {
 	    isarr = -1;
 	    aval = alloc(sizeof(char *));
 	    aspar = 0;

@@ -249,8 +249,21 @@ inputline(void)
 	    free(pptbuf);
 	}
 	ingetcline = shingetline();
-    } else
-	ingetcline = (char *)zleread(ingetcpmptl, ingetcpmptr, 1);
+    } else {
+	/*
+	 * Since we may have to read multiple lines before getting
+	 * a complete piece of input, we tell zle not to restore the
+	 * original tty settings after reading each chunk.  Instead,
+	 * this is done when the history mechanism for the current input
+	 * terminates, which is not until we have the whole input.
+	 * This is supposed to minimise problems on systems that clobber
+	 * typeahead when the terminal settings are altered.
+	 *                     pws 1998/03/12
+	 */
+	ingetcline = (char *)zleread(ingetcpmptl, ingetcpmptr,
+				     ZLRF_HISTORY|ZLRF_NOSETTY);
+	histdone |= HISTFLAG_SETTY;
+    }
     if (!ingetcline) {
 	return lexstop = 1;
     }

@@ -1,8 +1,10 @@
 #defcomp disable
 
-local prev="$words[CURRENT-1]"
+local prev="$words[CURRENT-1]" ret=1
 
-[[ "$prev" = -*a* ]] && compgen -ea
-[[ "$prev" = -*f* ]] && compgen -eF
-[[ "$prev" = -*r* ]] && compgen -ew
-[[ "$prev" != -* ]] && compgen -eB
+[[ "$prev" = -*a* ]] && compgen -ea && ret=0
+[[ "$prev" = -*f* ]] && compgen -eF && ret=0
+[[ "$prev" = -*r* ]] && compgen -ew && ret=0
+[[ "$prev" != -* ]]  && compgen -eB && ret=0
+
+return ret

@@ -1,0 +1,5 @@
+DISTFILES_SRC='
+    .distfiles
+    _compalso _files _main_complete _multi_parts _normal _path_files
+    _sep_parts compdump compinit
+'

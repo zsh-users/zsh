@@ -1,2 +1,3 @@
 #defcomp strip
+
 _files -g '*(*)'

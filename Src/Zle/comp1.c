@@ -115,6 +115,7 @@ char **compwords,
      *compquoting,
      *comprestore,
      *complist,
+     *compforcelist,
      *compinsert,
      *compexact,
      *compexactstr,
@@ -432,7 +433,7 @@ setup_comp1(Module m)
     compprefix = compsuffix = compiprefix = compmatcherstr = 
 	compcontext = compparameter = compredirect = compquote =
 	compquoting = comprestore = complist = compinsert =
-	compexact = compexactstr = comppatmatch = NULL;
+	compexact = compexactstr = comppatmatch = compforcelist = NULL;
     makecompparamsptr = NULL;
     comp_setunsetptr = NULL;
     return 0;
@@ -473,6 +474,7 @@ finish_comp1(Module m)
     zsfree(compquoting);
     zsfree(comprestore);
     zsfree(complist);
+    zsfree(compforcelist);
     zsfree(compinsert);
     zsfree(compexact);
     zsfree(compexactstr);

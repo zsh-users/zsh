@@ -1,7 +1,9 @@
 #defcomp man
+
 setopt localoptions rcexpandparam
 
 local rep
+
 if [[ $words[2] = (<->*|ln) ]]; then
   rep=( $manpath/(man|cat)${words[2]}/$PREFIX*$SUFFIX.<->*(N:t:r) )
 else

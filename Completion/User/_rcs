@@ -6,6 +6,7 @@ local nm=$compstate[nmatches]
 
 if [[ $compstate[nmatches] -eq nm && -d RCS && $words[1] != ci ]]; then
   local rep
+
   rep=(RCS/$PREFIX*$SUFFIX,v(:t:s/\,v//))
   (( $#rep )) && compadd - $rep
 fi

@@ -735,6 +735,8 @@ hend(void)
     int flag, save = 1;
 
     DPUTS(!chline, "BUG: chline is NULL in hend()");
+    if (histdone & HISTFLAG_SETTY)
+	settyinfo(&shttyinfo);
     if (histactive & (HA_NOSTORE|HA_NOINC)) {
 	zfree(chline, hlinesz);
 	zfree(chwords, chwordlen*sizeof(short));

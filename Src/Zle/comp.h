@@ -311,11 +311,12 @@ struct cline {
 #define CP_QUOTING    (1 << 14)
 #define CP_RESTORE    (1 << 15)
 #define CP_LIST       (1 << 16)
-#define CP_INSERT     (1 << 17)
-#define CP_EXACT      (1 << 18)
-#define CP_EXACTSTR   (1 << 19)
-#define CP_PATMATCH   (1 << 20)
+#define CP_FORCELIST  (1 << 17)
+#define CP_INSERT     (1 << 18)
+#define CP_EXACT      (1 << 19)
+#define CP_EXACTSTR   (1 << 20)
+#define CP_PATMATCH   (1 << 21)
 
-#define CP_NUM              21
+#define CP_NUM              22
 
 #define CP_ALLMASK    ((1 << CP_NUM) - 1)

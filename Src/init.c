@@ -792,7 +792,11 @@ run_init_scripts(void)
 void
 init_misc(void)
 {
+#ifndef RESTRICTED_R
+    if ( restricted )
+#else
     if (*zsh_name == 'r' || restricted)
+#endif
 	dosetopt(RESTRICTED, 1, 0);
     if (cmd) {
 	if (SHIN >= 10)

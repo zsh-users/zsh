@@ -394,11 +394,13 @@ getkey(int keytmout)
     return ret;
 }
 
+static int no_restore_tty;
+
 /* Read a line.  It is returned metafied. */
 
 /**/
 unsigned char *
-zleread(char *lp, char *rp, int ha)
+zleread(char *lp, char *rp, int flags)
 {
     unsigned char *s;
     int old_errno = errno;
@@ -451,7 +453,7 @@ zleread(char *lp, char *rp, int ha)
     pmpt_attr = txtchange;
     rpromptbuf = promptexpand(rp, 1, NULL, NULL);
     rpmpt_attr = txtchange;
-    histallowed = ha;
+    histallowed = (flags & ZLRF_HISTORY);
     PERMALLOC {
 	histline = curhist;
 #ifdef HAVE_SELECT
@@ -486,6 +488,8 @@ zleread(char *lp, char *rp, int ha)
 	if (tmout)
 	    alarm(tmout);
 	zleactive = 1;
+	if (flags & ZLRF_NOSETTY)
+	  no_restore_tty = 1;
 	resetneeded = 1;
 	errflag = retflag = 0;
 	lastcol = -1;
@@ -535,7 +539,7 @@ zleread(char *lp, char *rp, int ha)
 	trashzle();
 	free(lpromptbuf);
 	free(rpromptbuf);
-	zleactive = 0;
+	zleactive = no_restore_tty = 0;
 	alarm(0);
     } LASTALLOC;
     zsfree(curhistline);
@@ -754,7 +758,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     PERMALLOC {
 	pushnode(bufstack, ztrdup(s));
     } LASTALLOC;
-    t = (char *) zleread(p1, p2, ops['h']);
+    t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
     if (!t || errflag) {
 	/* error in editing */
 	errflag = 0;
@@ -885,7 +889,8 @@ trashzle(void)
 	    fprintf(shout, "%s", postedit);
 	fflush(shout);
 	resetneeded = 1;
-	settyinfo(&shttyinfo);
+	if (!no_restore_tty)
+	  settyinfo(&shttyinfo);
     }
     if (errflag)
 	kungetct = 0;

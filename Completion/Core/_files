@@ -3,10 +3,9 @@
 # Utility function for completing files of a given type or any file.
 # In many cases you will want to call this one instead of _path_files().
 
-local nm=$compstate[nmatches] ret
+local nm=$compstate[nmatches] ret=1
 
-_path_files "$@"
-ret=$?
+_path_files "$@" && ret=0
 
 if [[ $# -ne 0 && compstate[nmatches] -eq nm ]]; then
   local opt opts
@@ -23,7 +22,7 @@ if [[ $# -ne 0 && compstate[nmatches] -eq nm ]]; then
     [[ "$opt" = [PSWFJVX] ]] && opts=("$opts[@]" "-$opt" "$OPTARG")
   done
 
-  _path_files "$opts[@]"
-else
-  return $ret
+  _path_files "$opts[@]" && ret=0
 fi
+
+return ret

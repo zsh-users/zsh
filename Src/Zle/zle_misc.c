@@ -42,7 +42,7 @@ doinsert(char *str)
     int neg = zmult < 0;             /* insert *after* the cursor? */
     int m = neg ? -zmult : zmult;    /* number of copies to insert */
 
-    iremovesuffix(c1);
+    iremovesuffix(c1, 0);
     invalidatelist();
 
     if(insmode)
@@ -849,7 +849,7 @@ makesuffixstr(char *f, char *s, int n)
 
 /**/
 void
-iremovesuffix(int c)
+iremovesuffix(int c, int keep)
 {
     if (suffixfunc) {
 	List l = getshfunc(suffixfunc);
@@ -876,7 +876,8 @@ iremovesuffix(int c)
 	int sl = suffixlen[c];
 	if(sl) {
 	    backdel(sl);
-	    invalidatelist();
+	    if (!keep)
+		invalidatelist();
 	}
     }
     fixsuffix();

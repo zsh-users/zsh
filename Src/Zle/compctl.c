@@ -183,7 +183,7 @@ print_gmatcher(int ac)
 static Cmatcher
 parse_cmatcher(char *name, char *s)
 {
-    Cmatcher ret = NULL, r, n;
+    Cmatcher ret = NULL, r = NULL, n;
     Cpattern line, word, left, right;
     int fl, ll, wl, lal, ral, err;
 
@@ -276,8 +276,10 @@ parse_cmatcher(char *name, char *s)
 	n->right = right;
 	n->ralen = ral;
 
-	if (ret) r->next = n;
-	else ret = n;
+	if (ret)
+	    r->next = n;
+	else
+	    ret = n;
 
 	r = n;
     }
@@ -290,7 +292,7 @@ parse_cmatcher(char *name, char *s)
 static Cpattern
 parse_pattern(char *name, char **sp, int *lp, char e, int *err)
 {
-    Cpattern ret = NULL, r, n;
+    Cpattern ret = NULL, r = NULL, n;
     unsigned char *s = (unsigned char *) *sp;
     int l = 0;
 
@@ -1707,6 +1709,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	}
 	for (p = *argv + 1; *p; p++) {
 	    sp = NULL;
+	    e = NULL;
 	    dm = 0;
 	    switch (*p) {
 	    case 'q':
@@ -1864,6 +1867,7 @@ static struct compparam {
     { "quoting", PM_SCALAR, VAR(compquoting) },
     { "restore", PM_SCALAR, VAR(comprestore) },
     { "list", PM_SCALAR, VAR(complist) },
+    { "force_list", PM_SCALAR, VAR(compforcelist) },
     { "insert", PM_SCALAR, VAR(compinsert) },
     { "exact", PM_SCALAR, VAR(compexact) },
     { "exact_string", PM_SCALAR, VAR(compexactstr) },
@@ -2228,7 +2232,7 @@ cond_range(char **a, int id)
     if (comp_check()) {
 	char *s, **p;
 	int i, l = arrlen(compwords), t = 0, b = 0, e = l - 1;
-	Comp c;
+	Comp c = NULL;
 
 	i = compcurrent - 1;
 	if (i < 0 || i >= l)

@@ -125,7 +125,7 @@ typedef void (*KeyScanFunc) _((char *, Thingy, char *, void *));
 
 /* Standard type of suffix removal. */
 
-#define removesuffix() iremovesuffix(256)
+#define removesuffix() iremovesuffix(256, 0)
 
 /* Cut/kill buffer type.  The buffer itself is purely binary data, *
  * not NUL-terminated.  len is a length count.  flags uses the     *

@@ -28,4 +28,10 @@
 # like the `r:|[.-]=* r:|=*'. To make this work, the function `_match_test'
 # would have to be changed to `(( compstate[matcher] <= 2 ))'
 #
+# When automatic correction is used (see the file `_main_complete'), you
+# probably don't want to set matching flags here as that may make the
+# results slightly unpredictable. For this, change the line above to:
+#
+#   [[ compstate[matcher] -lt 0 ]] && eval "${3}='(#l)'"
+#
 # The default implementation of this function is empty.

@@ -6,7 +6,7 @@
 # NB: On SunOS 4.1.3 - user-functions don't work properly, also \" problems
 # Without 0 + hacks some nawks compare numbers as strings
 #
-/^XXNAMES XXSIG[A-Z][A-Z0-9]* [1-9][0-9]*/ {
+/^XXNAMES XXSIG[A-Z][A-Z0-9]*[\t ][\t ]*[1-9][0-9]*/ {
     sigindex = index($0, "SIG")
     sigtail = substr($0, sigindex, 80)
     split(sigtail, tmp)

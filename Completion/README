@@ -9,9 +9,12 @@ Core/compinit.  It is recommnded that you use the -d option, which outputs
 a file containing the necessary variables, bindkeys etc., making later
 loading much faster.  For example,
   [[ -f ~/completion/compinit ]] && . ~/completion/compinit -d
+The name of the file to use may be given as an extra argument.
+
 This will rebind any keys which do completion to use the new system.
 For more detailed instructions, including how to add new completions, see
-the top of Core/compinit.
+the top of Core/compinit. For information about how to configure the code,
+see the comment at the top of Core/_main_complete.
 
 The subdirectories contain:
 
@@ -27,7 +30,7 @@ Core:
     This dumps the completions status for faster initialisation.  The
     easiest way of doing this is to use the -d option to compinit rather
     than calling compdump directly.
-  _comp_parts
+  _sep_parts
     Utility used for completing words with multiple separate parts, such as
     `<user>@<host>'
   _multi_parts
@@ -67,10 +70,15 @@ Base:
     This handles completion of command arguments when no special function
     exists.  Usually this means completing files, but you can modify this
     as you wish.
+  _long_options
+    This handles options beginning with `--', as in many GNU commands.
+    The command must accept the --help option to list the possible options.
+    __long_options can also take arguments to help it decide what to
+    complete as the value of the option.
   _match_pattern
   _match_test
     These are used by Base/_path_files (and hence also Base/_files)
-    and Base/_comp_parts for file completion with control over
+    and Base/_sep_parts for file completion with control over
     matching (whether to complete case-insensitively, or to allow
     insertion before `.', etc.)  See _match_test for instructions.
     Note _path_files expects these files to be present.

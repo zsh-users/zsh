@@ -4,6 +4,7 @@
 # Alter the following two to your own mh directory and the directory
 # where standard mh library files live.  (It works anyway, but this
 # will save a little time.)
+
 local mymhdir=~/Mail
 local mhlib=/usr/lib/mh
 
@@ -25,6 +26,7 @@ if [[ -iprefix - ]]; then
 elif [[ -iprefix '+' || -iprefix '@' || "$prev" = -draftfolder ]]; then
   # Complete folder names.
   local mhpath
+
   if [[ $IPREFIX != '@' ]]; then
     [[ $IPREFIX = '+' ]] || IPREFIX=+
     mhpath=$mymhdir
@@ -53,7 +55,8 @@ elif [[ "$prev" = -[rw]cache ]]; then
   compadd public private never ask
 else
   # Generate sequences.
-  local foldnam folddir f
+  local foldnam folddir f ret
+
   for f in $argv; do
     [[ $f = [@+]* ]] && foldnam=$f
   done
@@ -66,7 +69,10 @@ else
     # leaving foldnam empty works here
   fi
 
-  compgen -s '$(mark $foldnam 2>/dev/null | awk -F: '\''{ print $1 }'\'')'
-  compadd reply next cur prev first last all unseen
-  compgen -W folddir -g '<->'
+  compgen -s '$(mark $foldnam 2>/dev/null | awk -F: '\''{ print $1 }'\'')' &&
+      ret=0
+  compadd reply next cur prev first last all unseen && ret=0
+  compgen -W folddir -g '<->' && ret=0
+
+  return ret
 fi

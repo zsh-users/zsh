@@ -43,22 +43,25 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(1998/10/26)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(1999/02/25)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 1998/10/26
-mydit(Submitted-By:) email(pws@amtp.liv.ac.uk (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.1 1999/04/15 18:05:37 akr Exp $
-mydit(Frequency:) Monthly
-mydit(Copyright:) (C) P.W. Stephenson, 1995, 1996, 1997, 1998 \
-(see end of document)
+mydit(Last-Modified:) 1999/02/05
+mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.2 1999/04/15 18:20:31 akr Exp $
+mydit(Posting-Frequency:) Monthly
+mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
 )
 
-bf(Changes since issue posted September 1998:)
+bf(Changes since issue posted January 1999:)
 description(
-mydit(2.1)  Another mytt(typeset) difference turned up.
-mydit(5.4)  Slight addition to Y2K item (prompt formatting)
+mydit(1.1)  deleted the bit saying startup files are not mentioned.
+mydit(3.2)  New: about startup files.
+mydit(3.7)  we just found the PRINT_EIGHT_BIT option again...
+mydit(3.22) New: about ${(e)...} and ${${...}}.
+mydit(5.2)  (In wishlist): patch exists for 3.1 to handle tying
+     texinputs/TEXINPUTS etc.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -99,25 +102,27 @@ Chapter 2:  How does zsh differ from...?
 
 Chapter 3:  How to get various things to work
 3.1. Why does `$var' where `var="foo bar"' not do what I expect?
-3.2. What is the difference between `export' and the ALL_EXPORT option?
-3.3. How do I turn off spelling correction/globbing for a single command?
-3.4. How do I get the meta key to work on my xterm?
-3.5. How do I automatically display the directory in my xterm title bar?
-3.6. How do I make the completion list use eight bit characters?
-3.7. Why do the cursor (arrow) keys not work?
-3.8. Why does my terminal act funny in some way?
-3.9. Why does zsh not work in an Emacs shell mode any more?
-3.10. Why do my autoloaded functions not autoload [the first time]?
-3.11. How does base arithmetic work?
-3.12. How do I get a newline in my prompt?
-3.13. Why does `bindkey ^a command-name' or 'stty intr ^-' do something funny?
-3.14. Why can't I bind \C-s and \C-q any more?
-3.15. How do I execute command `foo' within function `foo'?
-3.16. Why do history substitutions with single bangs do something funny?
-3.17. Why does zsh kill off all my background jobs when I logout?
-3.18. How do I list all my history entries?
-3.19. How does the alternative loop syntax, e.g. mytt(while {...} {...}) work?
-3.20. Why is my history not being saved?
+3.2. In which startup file do I put...?
+3.3. What is the difference between `export' and the ALL_EXPORT option?
+3.4. How do I turn off spelling correction/globbing for a single command?
+3.5. How do I get the meta key to work on my xterm?
+3.6. How do I automatically display the directory in my xterm title bar?
+3.7. How do I make the completion list use eight bit characters?
+3.8. Why do the cursor (arrow) keys not work?
+3.9. Why does my terminal act funny in some way?
+3.10. Why does zsh not work in an Emacs shell mode any more?
+3.11. Why do my autoloaded functions not autoload [the first time]?
+3.12. How does base arithmetic work?
+3.13. How do I get a newline in my prompt?
+3.14. Why does `bindkey ^a command-name' or 'stty intr ^-' do something funny?
+3.15. Why can't I bind \C-s and \C-q any more?
+3.16. How do I execute command `foo' within function `foo'?
+3.17. Why do history substitutions with single bangs do something funny?
+3.18. Why does zsh kill off all my background jobs when I logout?
+3.19. How do I list all my history entries?
+3.20. How does the alternative loop syntax, e.g. mytt(while {...} {...}) work?
+3.21. Why is my history not being saved?
+3.22. How do I get a variable's value to be evaluated as another variable?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -164,19 +169,22 @@ url(http://sunsite.auc.dk/zsh/FAQ/)(http://sunsite.auc.dk/zsh/FAQ/) .
   posted frequently to the Usenet news groups comp.unix.questions,
   comp.unix.shells and comp.answers with answers to general questions
   about UNIX.  The fifth of the seven articles deals with shells,
-  including zsh, with a brief description of differences.  (This article
-  also talks about shell startup files which would otherwise rate a
-  mention here.)  There is also a separate FAQ on shell differences
-  and how to change your shell.  Usenet FAQs are available via FTP
-  from rtfm.mit.edu and mirrors and also on the World Wide Web; see
+  including zsh, with a brief description of differences.  There is
+  also a separate FAQ on shell differences and how to change your
+  shell.  Usenet FAQs are available via FTP from rtfm.mit.edu and
+  mirrors and also on the World Wide Web; see
   description(
     mydit(USA)         url(http://www.cis.ohio-state.edu/hypertext/faq/usenet/top.html)
     (http://www.cis.ohio-state.edu/hypertext/faq/usenet/top.html)
     mydit(UK)          url(http://www.lib.ox.ac.uk/internet/news/faq/comp.unix.shell.html)
     (http://www.lib.ox.ac.uk/internet/news/faq/comp.unix.shell.html)
-    mydit(Netherlands) url(http://www.cs.ruu.nl/wais/html/na-dir/unix-faq/shell/.html)
-    (http://www.cs.ruu.nl/wais/html/na-dir/unix-faq/shell/.html)
+    mydit(Netherlands) url(http://www.cs.uu.nl/wais/html/na-dir/unix-faq/shell/.html)
+    (http://www.cs.uu.nl/wais/html/na-dir/unix-faq/shell/.html)
   )
+
+  You can also get it via email by emailing \
+email(mail-server@rtfm.mit.edu)
+  with, in the body of the message, mytt(send faqs/unix-faq/shell/zsh).
 
   The latest version of this FAQ is also available directly from any
   of the zsh archive sites listed in question link(1.6)(16).
@@ -296,7 +304,7 @@ sect(What's the latest version?)
   the list of incompatibilities at the end of link(5.1)(51).  This is
   longer than usual due to enhanced sh, ksh and POSIX compatibility.
 
-  The beta version 3.1.4 is also available.  Development of zsh is
+  The beta version 3.1.5 is also available.  Development of zsh is
   usually patch by patch, with each intermediate version publicly
   available.  Note that this `open' development system does mean bugs
   are sometimes introduced into the most recent archived version.
@@ -352,6 +360,8 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 (ftp://ftp.tohoku.ac.jp/mirror/zsh/)
     mydit()          url(ftp://ftp.nis.co.jp/pub/shells/zsh/)
 (ftp://ftp.nis.co.jp/pub/shells/zsh/)
+    mydit()          url(ftp://ftp.win.ne.jp/pub/shell/zsh/)
+(ftp://ftp.win.ne.jp/pub/shell/zsh/)
     mydit(Norway)    url(ftp://ftp.uit.no/pub/unix/shells/zsh/)
 (ftp://ftp.uit.no/pub/unix/shells/zsh/)
     mydit(Romania)   url(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/)
@@ -623,6 +633,7 @@ link(2.3)(23).
     it()* Options are not local to functions (use LOCAL_OPTIONS; note this
         may always be unset locally to propagate options settings from a
         function to the calling level).
+    it()  Function definitions themselves are not local to functions.
   )
     it() Traps and signals:
   itemize(
@@ -720,12 +731,12 @@ label(23)
   )
   can be replaced by the zsh function,
   verb(
-    cd() { builtin cd $*; echo $PWD; }
+    cd() { builtin cd "$@"; echo $PWD; }
   )
   (the `builtin' tells zsh to use its own `cd', avoiding an infinite loop)
   or, perhaps better,
   verb(
-    cd() { builtin cd $*; print -D $PWD; }
+    cd() { builtin cd "$@"; print -D $PWD; }
   )
   (which converts your home directory to a tt(~)).  In fact, this problem is
   better solved by defining the special function chpwd() (see the manual).
@@ -746,7 +757,7 @@ label(23)
 
   myeit() If the csh alias references its own name (tt(alias rm "rm -i")),
      then in a zsh function you need the "command" keyword
-     (function tt(rm() { command rm -i $* })), but in a zsh alias
+     (function tt(rm() { command rm -i "$@" })), but in a zsh alias
      you don't (tt(alias rm="rm -i")).
 
   myeit() If you have aliases that refer to each other (tt(alias ls "ls -C";
@@ -799,7 +810,7 @@ label(23)
   There is one other serious problem with aliases: consider
   verb(
     alias l='/bin/ls -F'
-    l() { /bin/ls -la $* | more }
+    l() { /bin/ls -la "$@" | more }
   )
   mytt(l) in the function definition is in command position and is expanded
   as an alias, defining mytt(/bin/ls) and mytt(-F) as functions which call
@@ -959,11 +970,66 @@ label(31)
 
   Note also the tt("$@") method of word splitting is always available in zsh
   functions and scripts (though strictly this does array splitting, not
-  word splitting).
+  word splitting).  This is more portable than the tt($*), since it
+  will work regardless of the SHWORDSPLIT setting; the other
+  difference is that tt($*) removes empty arguments from the array.
+  You can fix the first half of that objection by using tt(${==*}),
+  which turns off SHWORDSPLIT for the duration of the expansion.
 
   SHWORDSPLIT is set when zsh is invoked with the names `ksh' or `sh',
   or (entirely equivalent) when mytt(emulate ksh) or mytt(emulate sh) is in
   effect.
+
+
+sect(In which startup file do I put...?)
+
+  When zsh starts up, there are four files you can change which it will
+  run under various circumstances: tt(.zshenv), tt(.zprofile), tt(.zshrc)
+  and tt(.zlogin).  They are usually in your home directory, but the
+  variable tt($ZDOTDIR) may be set to alter that.  Here are a few simple
+  hints about how to use them.  There are also files which the system
+  administrator can set for all shells; you can avoid running all except
+  tt(/etc/zshenv) by starting zsh with the tt(-f) option --- for this
+  reason it is important for administrators to make sure tt(/etc/zshenv)
+  is as brief as possible.
+
+  The order in which the four files are searched (none of them myem(need)
+  to exist) is the one just given.  However, tt(.zprofile) and tt(.zlogin)
+  are only run when the shell is a login shell --- when you first login,
+  of course, and whenever you start zsh with the tt(-l) option.  All
+  login shells are interactive.  The order is the only difference
+  between those; you should decide whether you need things set before or
+  after tt(.zshrc).  These files are a good place to set environment
+  variables (i.e. mytt(export) commands), since they are passed on to
+  all shells without you having to set them again, and also to check
+  that your terminal is set up properly (except that if you want to
+  change settings for terminal emulator windows like tt(xterm) you will
+  need to put those in tt(.zshrc), since usually you do not get a login
+  shell here).  
+
+  The only file you can alter which is started with every zsh (unless
+  you use the tt(-f) option) is tt(.zshenv), so this is a good place to \
+  put
+  things you want even if the shell is non-interactive: options for
+  changing the the syntax, like EXTENDED_GLOB, any changes to set with
+  mytt(limit), any more variables you want to make sure are set as for
+  example tt($fpath) to find functions.  You almost certainly do not
+  want tt(.zshenv) to produce any output.  Some people prefer not to
+  use tt(.zshenv) for setting options, as this affects scripts; but
+  making zsh scripts portable usually requires special handling anyway.
+
+  Finally, tt(.zshrc) is run for every interactive shell; that includes
+  login shells, but also any other time you start up a shell, such as
+  simply by typing mytt(zsh) or opening a new terminal emulator window.
+  This file is the place to change the editing behaviour via options or
+  mytt(bindkey), control how your history is saved, set aliases unless
+  you want to use them in scripts too, and for any other clutter which
+  can't be exported but you only use when interacting directly with the
+  shell.  You probably don't want tt(.zshrc) to produce output, either,
+  since there are occasions when this can be a problem, such as when
+  using mytt(rsh) from another host.  See link(3.21)(321) for what to \
+  put in tt(.zshrc)
+  to save your history.
 
 
 sect(What is the difference between `export' and the ALL_EXPORT option?)
@@ -1019,7 +1085,7 @@ sect(How do I turn off spelling correction/globbing for a single command?)
 
 
 sect(How do I get the meta key to work on my xterm?)
-label(34)
+label(35)
 
   As stated in the manual, zsh needs to be told about the meta key by
   using mytt(bindkey -me) or mytt(bindkey -mv) in your .zshrc or on the
@@ -1071,36 +1137,12 @@ sect(How do I automatically display the directory in my xterm title bar?)
 
 sect(How do I make the completion list use eight bit characters?)
 
-  A traditional UNIX environment (character terminal and ASCII
-  character sets) is not sufficient to be able to handle non-ASCII
-  characters, and there are so many possible enhancements that in
-  general this is hard.  However, if you have something like an xterm
-  using a standard character set like ISO-8859-1 (which is often the
-  default for xterm), read on.  You should also note question
-  link(3.4)(34) on the subject of eight bit characters.
-
-  You are probably creating files with names including non-ASCII
-  accented characters, and find they show up in the completion list as
-  verb(\M-i) or something such.  This is because the library routines
-  (not zsh itself) which test whether a character is printable have
-  replied that it is not; zsh has simply found a way to show them
-  anyway.
-
-  The answer, under a modern POSIXy operating system, is to find a
-  locale where these are treated as printable characters.  Zsh has
-  handling for locales built in and will recognise when you set a
-  relevant variable. You need to look in /usr/lib/locale to find one
-  which suits you; the subdirectories correspond to the locale names.
-  The simplest possibility is likely to be en_US, so that the simplest
-  answer to your problem is to set
-
-  verb(
-    LC_CTYPE=en_US
-  )
-
-  when your terminal is capable of showing eight bit characters.  If
-  you only have a default domain (called C), you may need to have some
-  additional files installed on your system.
+  If you are sure your terminal handles this, the easiest way is to
+  set the option PRINT_EIGHT_BIT.  In principle, this will work
+  automatically if your computer uses the `locale' system and your
+  locale variables are set properly, as zsh understands this.
+  However, it is quite complicated, so if it isn't already set up,
+  trying the option is a lot easier.
 
 
 sect(Why do the cursor (arrow) keys not work?)
@@ -1433,6 +1475,7 @@ work?)
 
 
 sect(Why is my history not being saved?)
+label(321)
 
   In zsh, you need to set three variables to make sure your history is
   written out when the shell exits.  For example,
@@ -1447,6 +1490,43 @@ sect(Why is my history not being saved?)
   simplest possibility is to set it to the same as tt($HISTSIZE) as
   above.  There are also various options affecting history; see the
   manual.
+
+
+sect(How do I get a variable's value to be evaluated as another variable?)
+
+  The problem is that you have a variable tt($E) containing the string
+  mytt(EDITOR), and a variable tt($EDITOR) containing the string mytt(emacs),
+  or something such.  How do you get from tt($E) to emacs in one easy
+  stage?
+
+  There is no standard single-stage way of doing this.  However, there
+  is a zsh idiom (available in all versions of zsh since 3.0) for this:
+  verb(
+    print ${(e)E:+\$$E}
+  )
+  Ignore the mytt((e)) for now.  The mytt(:+) means: if the variable
+  tt($E) is set, substitute the following, i.e. mytt(\$$E).  This is
+  expanded to mytt($EDITOR) by the normal rules.  Finally, the mytt((e)) \
+  means:
+  evaluate the expression you just made.  This gives mytt(emacs).
+
+  For a standard shell way of doing this, you are stuck with mytt(eval):
+  verb(
+    eval echo \$$E
+  )
+  produces the same result.
+
+  Future versions of zsh will probably allow you to do this directly,
+  with a new flag; mytt(${(P)E}).
+
+  As a slight aside, sometimes people note that the syntax mytt(${${E}})
+  is valid and expect it to have this effect.  It probably ought to, but
+  in the early days of zsh it was found convenient to have this way of
+  producing different substitutions on the same parameter; for example,
+  mytt(${${file##**/}%.*}) removes everything up to the last slash in
+  mytt($file), then everything from the last dot on, inclusive (try
+  it, this works).  So in mytt(${${E}}), the internal mytt(${...})
+  actually does nothing.
 
 
 chapter(The mysteries of completion)
@@ -1879,12 +1959,17 @@ label(52)
   The shell is being maintained by various (entirely self-appointed)
   subscribers to the mailing list,
   verb(
-    zsh-workers@math.gatech.edu
+    zsh-workers@sunsite.auc.dk
   )
   so mail on any issues (bug reports, suggestions, complaints...)
   related to the development of the shell should be sent there.  If
   you want someone to mail you directly, say so.  Most patches to zsh
   appear there first.
+
+  Note that this location has just changed (January 1999), and the
+  instructions to go with it are slightly different --- in particular,
+  if you are already subscribed, the instructions about how to
+  unsubscribe are different.
 
   Please note when reporting bugs that many exist only on certain
   architectures, which the developers may not have access to.  In
@@ -1894,12 +1979,12 @@ label(52)
   Two progressively lower volume lists exist, one with messages
   concerning the use of zsh,
   verb(
-    zsh-users@math.gatech.edu
+    zsh-users@sunsite.auc.dk
   )
   and one just containing announcements:  about releases, about major
   changes in the shell, or this FAQ, for example,
   verb(
-    zsh-announce@math.gatech.edu
+    zsh-announce@sunsite.auc.dk
   )
   (posting to the last one is currently restricted).
 
@@ -1913,20 +1998,16 @@ label(52)
 
   To join zsh-workers, send email to
   verb(
-    zsh-workers-request@math.gatech.edu
+    zsh-workers-subscribe@sunsite.auc.dk
   )
-  with the mybf(subject) line (this is a change from the old list)
-  verb(
-    subscribe <your-email-address>
-  )
-  e.g.
-  verb(
-    Subject:  subscribe P.Stephenson@swansea.ac.uk
-  )
-  and you can unsubscribe in the same way.
-  The list maintainer, Richard Coleman, can be reached at
-  email(coleman@math.gatech.edu).
-
+  (the actual content is unimportant).  Replace tt(subscribe) with
+  tt(unsubscribe) to unsubscribe.  The mailing software (tt(ezlm)) has
+  various bells and whistles: you can retrieve archived messages.
+  Mail email(zsh-workers-help@sunsite.auc.dk) for detailed information.
+  Adminstrative matters are best sent to
+  email(zsh-workers-owner@sunsite.auc.dk).  The list maintainer's
+  real name is email(Karsten Thygesen <karthy@kom.auc.dk>).
+  
   The list from May 1992 to May 1995 is archived in
     url(ftp://ftp.sterling.com/zsh/zsh-list/YY-MM)
 (ftp://ftp.sterling.com/zsh/zsh-list/YY-MM)
@@ -1951,14 +2032,15 @@ sect(What's on the wish-list?)
   of multiple functions to keystrokes, is being developed.
 
   itemize(
-  it() Loadable module support (will be in 3.1 but much work still needs doing).
+  it() Loadable module support (will be in 3.1 but much work still needs
+     doing).
   it() Ksh compatibility could be improved.
   it() Option for glob qualifiers to follow perl syntax (a traditional item).
   it() Binding of shell functions to key strokes, accessing editing
      buffer from functions, executing zle functions as a command:  now
      under development for 3.1. 
   it() Users should be able to create their own foopath/FOOPATH array/path
-     combinations.
+     combinations (now exists as a patch for 3.1).
   )
 
 
@@ -1996,17 +2078,18 @@ nsect(Acknowledgments:)
 Thanks to zsh-list, in particular Bart Schaefer, for suggestions
 regarding this document.  Zsh has been in the hands of archivists Jim
 Mattson, Bas de Bakker, Richard Coleman, Zoltan Hidvegi and Andrew
-Main, and the mailing list has been run by Peter Gray, Rick Ohnemus
-and Richard Coleman, all of whom deserve thanks.  The world is
-eternally in the debt of Paul Falstad for inventing zsh in the first
-place (though the wizzo extended completion is by Sven Wischnowsky).
+Main, and the mailing list has been run by Peter Gray, Rick Ohnemus,
+Richard Coleman and Karsten Thygesen, all of whom deserve thanks.  The
+world is eternally in the debt of Paul Falstad for inventing zsh in
+the first place (though the wizzo extended completion is by Sven
+Wischnowsky).
 
 
 nsect(Copyright Information:)
 
 This document is copyright (C) P.W. Stephenson, 1995, 1996, 1997,
-1998. This text originates in the U.K. and the author asserts his
-moral rights under the Copyrights, Designs and Patents Act, 1988.
+1998, 1999. This text originates in the U.K. and the author asserts
+his moral rights under the Copyrights, Designs and Patents Act, 1988.
 
 Permission is hereby granted, without written agreement and without
 license or royalty fees, to use, copy, modify, and distribute this

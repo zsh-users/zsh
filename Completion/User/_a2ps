@@ -1,22 +1,39 @@
 #defcomp a2ps
 
-if [[ "$PREFIX[1,2]" = -- ]]; then
-  _comp_parts '(--borders --compact --truncate-lines --interpret
-                --print-anyway --delegate)' '=' '(yes no)'
-  _comp_parts '(--major)' '=' '(rows columns)'
-  _comp_parts '(--end-of-line)' '=' '(r n nr rn any)'
+# This is for the GNU version of a2ps.
 
-  compgen -S= -k '(--medium --columns --rows --line-numbers
-                    --font-size --lines-per-page --chars-per-line
- 		    --tabsize --non-printable-format --encoding
-		    --title --stdin --prologue --highlight-level
-		    --strip-level --output --version-control --suffix
-		    --printer --copies --sides --page-prefeed
-		    --no-page-prefeed)'
-  compgen -qS= -k '(--margin --header --underlay --left-title
-                     --right-title --left-footer --footer --right-footer
-		     --pages --pretty-print)'
-  compgen -k '(--landscape --portrait --catman --no-header)'
-else
-  _files -F fignore -g "*~*.ps"
+if [[ "$words[1]" != "$_a2ps_cache_cmd" ]]; then
+  local descr
+
+  _a2ps_cache_cmd="$words[1]"
+
+  descr=( "${(@)${(f@)$($words[1] --list=features)//
+ /	}:#}" )
+
+  _a2ps_cache_values=(
+      "${descr[(r)Known style sheets*]#*	}"
+      "${descr[(r)Known encodings*]#*	}"
+      "${descr[(r)Known media*]#*	}"
+      "${descr[(r)Known prologues*]#*	}"
+      "${descr[(r)Known PostScript Printer Descriptions*]#*	}"
+      "${descr[(r)Known output destination*]#*	}"
+      "${descr[(r)Known user options*]#*	}"
+      "${descr[(r)Known Variables*]#*	}"
+  )
 fi
+
+_long_options -t '*\*'                '(yes no)' \
+                 '*=DIRECTION'        '(rows columns)' \
+                 '*=TYPE'             '(r n nr rn any)' \
+		 '--highlight-level*' '(none normal heavy)' \
+		 '--version-control*' '(none off t numbered nil 
+		                        existing never simple)' \
+	         '--pretty-print*'    "[${_a2ps_cache_values[1]}]" \
+	         '--encoding*'        "(${_a2ps_cache_values[2]})" \
+	         '--medium*'          "[${_a2ps_cache_values[3]}]" \
+	         '--prologue*'        "[${_a2ps_cache_values[4]}]" \
+	         '--ppd*'             "[${_a2ps_cache_values[5]}]" \
+	         '--printer*'         "[${_a2ps_cache_values[6]}]" \
+	         '--user-option*'     "[${_a2ps_cache_values[7]}]" \
+	         '--variable*'        "[${_a2ps_cache_values[8]}]" ||
+    _files -F fignore -g '*~*.(ps|PS|eps|EPS)'

@@ -24,7 +24,7 @@ if [[ -position 3 ]]; then
   rep=(${~PWD/$words[2]/*}~$PWD(-/N))
   # Now remove all the common parts of $PWD and the completions from this
   rep=(${${rep#${PWD%%$words[2]*}}%${PWD#*$words[2]}})
-  (( $#rep )) && compadd $rep
+  (( ! $#rep )) || compadd $rep
 elif [[ $words[1] = pu* && $PREFIX = [-+]* ]]; then
   # pushd: just complete the numbers, but show the full directory list with
   # numbers.
@@ -34,7 +34,8 @@ elif [[ $words[1] = pu* && $PREFIX = [-+]* ]]; then
   # lazy to type pushd.
   IPREFIX=$PREFIX[1]
   PREFIX=$PREFIX[2,-1]
-  local list lines
+  local list lines ret=1
+
   # get the list of directories with their canonical number
   lines="$(dirs -v)"
   # turn the lines into an array, removing the current directory
@@ -52,9 +53,11 @@ elif [[ $words[1] = pu* && $PREFIX = [-+]* ]]; then
   lines="${(F)list}"
   # get the array of numbers only
   list=(${list%%[ 	]*})
-  compgen -y '$lines' -Q -k list
-  [[ -z $compstate[list] ]] && compstate[list]=list
-  [[ -n $compstate[insert] ]] && compstat[insert]=menu
+  compgen -y '$lines' -Q -k list && ret=0
+  [[ -z $compstate[list] ]] && compstate[list]=list && ret=0
+  [[ -n $compstate[insert] ]] && compstat[insert]=menu && ret=0
+
+  return ret
 elif [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
   _path_files -W cdpath -/
 else

@@ -185,6 +185,16 @@ AC_ARG_ENABLE(ansi2knr,
 [  --enable-ansi2knr          translate source to K&R C before compiling],
 [ansi2knr="$enableval"], [ansi2knr=default])
 
+dnl Do you want to disable restricted on r* commands
+undefine([resticted-r])dnl
+AC_ARG_ENABLE(resticted-r,
+[  --disable-resticted-r      turn off restricted shell if the invoked command is r*],
+[if test x$enableval = xyes; then
+  AC_DEFINE(RESTRICTED_R)
+fi],
+AC_DEFINE(RESTRICTED_R)
+)
+
 dnl ------------------
 dnl CHECK THE COMPILER
 dnl ------------------
@@ -766,7 +776,7 @@ if test $zsh_cv_rlim_t_is_longer = yes; then
 #include <sys/resource.h>
 main() { 
   struct rlimit r;
-  char buf[[20]];
+  char buf[20];
   r.rlim_cur = 0;
   sprintf(buf, "%qd", r.rlim_cur);
   exit(strcmp(buf, "0"));
@@ -774,7 +784,7 @@ main() {
   zsh_cv_rlim_t_is_quad_t=yes,
   zsh_cv_rlim_t_is_quad_t=no,
   zsh_cv_rlim_t_is_quad_t=no)])
-  if test $zsh_cv_tlim_t_is_quad_t = yes; then
+  if test $zsh_cv_rlim_t_is_quad_t = yes; then
     AC_DEFINE(RLIM_T_IS_QUAD_T)
     DEFAULT_RLIM_T=quad_t
   else

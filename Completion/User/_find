@@ -10,8 +10,12 @@ elif [[ -iprefix - ]]; then
     {i,}{l,}name {no,}{user,group} path perm regex size true uid used \
     exec {f,}print{f,0,} ok prune ls'
 elif [[ -position 2 ]]; then
-  compgen -g '. ..'
-  _files -g '(-/)'
+  local ret=1
+
+  compgen -g '. ..' && ret=0
+  _files -g '(-/)' && ret=0
+
+  return ret
 elif [[ "$prev" = -((a|c|)newer|fprint(|0|f)) ]]; then
   _files
 elif [[ "$prev" = -fstype ]]; then

@@ -1,7 +1,11 @@
 #defcomp -command-
 
-local nm=$compstate[nmatches]
+local nm=$compstate[nmatches] ret=1
 
-compgen -c
+compgen -c && ret=0
 
-[[ nm -eq compstate[nmatches] ]] && _path_files -/g "*(*)"
+if [[ nm -eq compstate[nmatches] ]]; then
+  _path_files -/g "*(*)"
+else
+  return ret
+fi

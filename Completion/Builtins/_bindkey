@@ -1,7 +1,14 @@
 #defcomp bindkey
 
-if [[ "$words[2]" = -*[DAN]* || "$words[CURRENT-1] = -*M ]]; then
+# Normally, this completes names of zle widgets, whether the builtin ones
+# or ones defined by the user.  Note that a - allows a wildcard before it,
+# so h-b-s-b will complete to history-beginning-search-backward.  You
+# can alter this by removing the -M ... from the second compgen.
+#
+# Where appropriate, will complete keymaps instead of widgets.
+
+if [[ "$words[2]" = -*[DAN]* || "$words[CURRENT-1]" = -*M ]]; then
   compgen -s '$(bindkey -l)'
 else
-  compgen -b
+  compgen -b -M 'r:|-=* r:|=*'
 fi

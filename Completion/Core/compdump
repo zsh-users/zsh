@@ -15,7 +15,7 @@
 # Print the number of files used for completion. This is used in compinit
 # to see if auto-dump should re-dump the dump-file.
 
-_d_file=${COMPDUMP-${0:h}/compinit.dump}
+_d_file=${compconfig[dump_file]-${0:h}/compinit.dump}
 
 typeset -U _d_files
 _d_files=( ${^~fpath}/_*~*~(N:t) )

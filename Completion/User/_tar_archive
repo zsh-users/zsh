@@ -1,0 +1,20 @@
+#autoload
+
+# This is used to generate filenames usable as a tar archive. This may
+# get one argument, a collection of tar option characters that may be
+# used to find out what kind of filename is needed. If no argument is
+# given but the parameter `_tar_cmd' is set, that is used.
+# If your version of `tar' supports this you may want to complete
+# things like `host:file' or `user@host:file' here.
+
+[[ $# -eq 0 && $+_tar_cmd -ne 0 ]] && set "$_tar_cmd"
+
+if [[ "$1" = *[tx]* ]]; then
+  if [[ "$1" = *[zZ]* ]]; then
+    _files -g '*.((tar|TAR).(gz|GZ|Z)|.tgz)'
+  else
+    _files -g '*.(tar|TAR)'
+  fi
+else
+  _files
+fi

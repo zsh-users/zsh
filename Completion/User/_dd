@@ -5,7 +5,7 @@ if [[ -iprefix conv= ]]; then
   # test alone will have that effect.
   [[ -string , ]]
   compgen -S, -q \
-  -k '(ascii ebcdic ibm block unblock lcase ucase swab noerror sync)'
+      -k '(ascii ebcdic ibm block unblock lcase ucase swab noerror sync)'
 elif [[ -iprefix 'if=' || -iprefix 'of=' ]]; then
   _files
 else

@@ -2304,26 +2304,25 @@ getmatch(char **sp, char *pat, int fl, int n, char *replstr)
     case SUB_LONG:
 	/*
 	 * Largest/smallest possible match at head of string.
-	 * First get the longest match.
+	 * First get the longest match...
 	 */
 	if (dolongestmatch(s, c, 0)) {
 	    char *mpos = pptr;
-	    while (!(fl & SUB_LONG) && pptr > s) {
-		/*
-		 * If we want the shortest, keep backing up to the
-		 * previous character and find the longest up to there.
-		 * That way we can usually reach the shortest in only
-		 * a few attempts.
-		 */
-		t = (pptr > s + 1 && pptr[-2] == Meta) ? pptr - 2 : pptr -1;
+	    if (!(fl & SUB_LONG)) {
+	      /*
+	       * ... now we know whether it's worth looking for the
+	       * shortest, which we do by brute force.
+	       */
+	      for (t = s; t < mpos; METAINC(t)) {
 		sav = *t;
 		*t = '\0';
-		if (!dolongestmatch(s, c, 0)) {
-		    *t = sav;
-		    break;
+		if (dolongestmatch(s, c, 0)) {
+		  mpos = pptr;
+		  *t = sav;
+		  break;
 		}
-		mpos = pptr;
 		*t = sav;
+	      }
 	    }
 	    *sp = get_match_ret(*sp, 0, mpos-s, fl, replstr);
 	    return 1;

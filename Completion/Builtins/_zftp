@@ -45,6 +45,7 @@ case $subcom in
 
   *)
   # dunno... try ordinary completion after all.
-  unset _compskip   
+  unset _compskip
+  return 1
   ;;
 esac

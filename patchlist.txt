@@ -556,6 +556,8 @@ Sven: 5544: another completion cleanup
 
 pws: 5545: silly set -x mistake
 
+Sven: 5547: group handling -J/-V in compadd
+
 Sven: 5548: _path_files, _comp_parts
 
 Matt: 5553: under _WIN32, .exe suffix is optional for commands
@@ -570,6 +572,8 @@ file found.  This was in pws-10, but the patch didn't appear on the list
 for four days.
 
 Larry P. Schrof: 5550: last -> previous in history documentation
+
+pws: 5559: cd /.. doesn't show .. (except if RFS was detected).
 
 Sven: 5560: subscripting fixes in params.c: flags for scalars and
 converting integer AA element to string
@@ -644,9 +648,13 @@ Sven: 5629: approximate correction patches
 
 Sven: 5631: compilation warnings
 
+Sven: 5634: return values for compgen and compadd
+
 Sven: 5637: mustuseheap check in complistflags
 
 Sven: 5640: _multi_parts, _path_files, _tar
+
+Sven: 5647: _multi_parts doesn't replace so many *'s
 
 Andrej: 5650: more tricks with _configure
 
@@ -663,3 +671,98 @@ Sven: 5665: return values from completion functions
 Sven: 5666: calling inststrlen() with a null string
 
 pws: from autoconf 2.13: new config.sub
+
+  pws-12
+
+Sven: 5670: parameter completion fix
+
+Sven: 5671: another small parameter fix for multiple braces
+
+Sven: 5675: tidying up for zle_tricky.c
+
+pws: from autoconf 2.13: new config.guess, too.
+
+Sven: 5676: all Completion example functions return a status
+
+Sven: 5677, 5679: Completion/User/_long_options and consequent upgrades for
+Completion/User files which use long GNU-style options.
+
+Sven: 5682: bindkey fix
+
+Sven: 5692: remove compstate[matcher] test from _long_options
+
+Sven: 5696, 5697: "${${path}[1]}" indexes on characters again
+
+Sven: 5698: array indexing in _long_options and _multi_parts
+
+Sven: 5699: matching prefixes of various sorts
+
+Sven: 5701: _main_complete, _multi_parts, _path_files, a few cosmetic
+changes.
+
+Sven: 5704: _long_options
+
+Sven: 5707: tokenization changes
+
+Sven: 5708: completion manual, -M anchors must be matched explicitly
+
+Sven: 5710: zle_tricky.c, completion inside words
+
+Sven: 5712: _path_files, noglobcomplete fix
+
+Sven: 5713: zle_tricky.c, interesting code specimen made extinct
+
+Sven: 5714: _path_files: failed completions get left alone more often
+
+Sven: 5716: zle.h, zle_misc.c, zle_tricky.c: iremovesuffix() can be told
+whether to keep a list of matches
+
+Andrej: 5719: _bindkey can use - as anchor for wildcard matching
+
+Will Day: 5724 (+postprocessing, 5741): signames2.awk: match extra spaces
+if produced by CPP.
+
+Sven: 5726: zle_tricky.c: ctokenize() fix and parameter completion
+
+pws: 5729: _bindkey doc
+
+Sven: 5732: _a2ps, _long_options
+
+Sven: 5736: completion before = in assignment
+
+pws: 5737: ${foo#* } is more efficient in ordinary cases
+
+Sven: zsh-users/2211 (+ p -> s): setopt -m handles underscores and case
+sensitivity
+
+Lehti Rami: 5754: --disable-restricted-r stops the shell becoming
+restricted when its name starts with r
+
+Sven: 5756: compstate[force_list]
+
+Sven: 5757: compconfig
+
+Sven: 5758: _path_files accepts -q, -r and -R options
+
+pws: www archive: updated Etc/FAQ finally, keep forgetting
+
+Sven: 5759: math environment fixes
+
+Sven: 5761: remove unnecessary compiler warnings in compctl.c
+
+Sven: 5766: _path_files closer to compctl/compgen behaviour
+
+Sven: 5770: _path_files again
+
+Sven: 5775: correcting completion will not ignore everything the user has
+typed; prefix quote fix
+
+pws: 5776: untested patch for typeahead problems when reading multiple
+lines of input
+
+pws: unposted archive changes: .distfiles in Completion hierarchy, dunno
+what these do but it looks better; _comp_parts is now _sep_parts; moved
+_long_options into Base and mentioned it in Completion/README.
+
+Geoff: 5779: correct mistakes some bozo (guess who) made testing rlim_t for
+long long.

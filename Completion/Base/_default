@@ -9,6 +9,6 @@
 # and insert the line `[[ compstate[nmatches] -eq 0 ]] || return' after
 # `compcall'.
 
-compcall || return
+compcall || return 0
 
 _files

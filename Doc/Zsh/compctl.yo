@@ -703,7 +703,8 @@ The pattern var(tpat) may also be a single star, `tt(*)'. This means
 that the pattern on the command line can match any number of characters
 in the trial completion. In this case the pattern must be anchored (on
 either side); the var(anchor) then determines how much of the trial
-completion is to be included.
+completion is to be included --- only the characters up to the next
+appearance of the anchor will be matched.
 
 Examples:
 
@@ -758,7 +759,8 @@ nofill(tt(compctl -M 'r:|.=* r:|=*' \
   -k '(comp.sources.unix comp.sources.misc ...)' ngroups))
 )
 The first specification says that tt(lpat) is the empty string, while
-tt(anchor) is a dot; tt(tpat) is tt(*), so this can match anything in
+tt(anchor) is a dot; tt(tpat) is tt(*), so this can match anything
+except for the `tt(.)' from the anchor in
 the trial completion word.  So in tt(c.s.u), the matcher sees tt(c),
 followed by the empty string, followed by the anchor `tt(.)', and
 likewise for the second dot, and replaces the empty strings before the

@@ -1,8 +1,10 @@
 #defcomp unhash
 
-local fl="$words[2]"
+local fl="$words[2]" ret=1
 
-[[ "$fl" = -*d* ]] && compgen -n
-[[ "$fl" = -*a* ]] && compgen -a
-[[ "$fl" = -*f* ]] && compgen -F
-[[ "$fl" != -* ]] && compgen -m
+[[ "$fl" = -*d* ]] && compgen -n && ret=0
+[[ "$fl" = -*a* ]] && compgen -a && ret=0
+[[ "$fl" = -*f* ]] && compgen -F && ret=0
+[[ "$fl" != -* ]]  && compgen -m && ret=0
+
+return ret

@@ -7,6 +7,10 @@ if [[ "$prev" = -o ]]; then
 elif [[ "$prev" = -([no]t|ef) ]]; then
   _files
 else
-  _files
-  compgen -v
+  local ret=1
+
+  _files && ret=0
+  compgen -v && ret=0
+
+  return ret
 fi

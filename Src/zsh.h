@@ -1013,7 +1013,7 @@ struct histent {
 #define HISTFLAG_DONE   1
 #define HISTFLAG_NOEXEC 2
 #define HISTFLAG_RECALL 4
-
+#define HISTFLAG_SETTY  8
 
 /******************************************/
 /* Definitions for programable completion */
@@ -1402,6 +1402,13 @@ struct heap {
 #define ZSIG_TRAPPED	(1<<0)
 #define ZSIG_IGNORED	(1<<1)
 #define ZSIG_FUNC	(1<<2)
+
+/**********************************/
+/* Flags to third argument of zle */
+/**********************************/
+
+#define ZLRF_HISTORY	0x01
+#define ZLRF_NOSETTY	0x02
 
 /****************/
 /* Entry points */

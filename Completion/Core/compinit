@@ -37,18 +37,24 @@
 # Note that no white space is allowed between the `#' and the rest of
 # the string.
 #
-# See the file `compdump' for how to speed up initialiation.
+# Functions that are used to generate matches should return zero if they
+# were able to add matches and non-zero otherwise.
+#
+# See the file `compdump' for how to speed up initialisation.
 #
 # If you are using global matching specifications with `compctl -M ...'
 # have a look at the files `_match_test' and `_match_pattern'. To make
 # all the example functions use matching as specified with `-M' these
 # need some editing.
-#
+
 # If we got the `-d'-flag, we will automatically dump the new state (at
 # the end).
+# If we were given an argument, this will be taken as the name of the
+# file in which to store the dump.
 
 if [[ "$1" = -d ]]; then
   _i_autodump=1
+  shift
 else
   _i_autodump=0
 fi
@@ -58,6 +64,18 @@ fi
 
 typeset -A _comps
 _patcomps=()
+
+# This is the associative array used for configuration.
+
+typeset -A compconfig
+
+# Standard initialisation for `compconfig'.
+
+(( $# )) && compconfig[dump_file]="$1"
+[[ -z "$compconfig[dump_file]" ]] && compconfig[dump_file]="$0.dump"
+
+compconfig[correct_prompt]='correct to:'
+
 
 # This function is used to register or delete completion functions. For
 # registering completion functions, it is invoked with the name of the
@@ -197,11 +215,25 @@ compdef() {
   fi
 }
 
+# Functional interface to configuration. This takes its arguments
+# and sets the according values in `compconfig'.
+# Arguments may be `foo=bar' to set key `foo' to `bar' or `baz' to
+# set key `baz' to the empty string.
+
+compconf() {
+  local i name
+
+  for i; do
+    if [[ "$i" = *\=* ]]; then
+      name="${i%%\=*}"
+      compconfig[$name]="${i#*\=}"
+    else
+      compconfig[$i]=''
+    fi
+  done
+}
+
 # Now we automatically make the definition files autoloaded.
-
-# First we get the name of a dump file if this will be used.
-
-: ${COMPDUMP:=$0.dump}
 
 if [[ ! -o extendedglob ]]; then
   _i_noextglob=yes
@@ -215,10 +247,10 @@ _i_done=''
 
 # If we have a dump file, load it.
 
-if [[ -f "$COMPDUMP" ]]; then
-  read -rA _i_line < "$COMPDUMP"
+if [[ -f "$compconfig[dump_file]" ]]; then
+  read -rA _i_line < "$compconfig[dump_file]"
   if [[ _i_autodump -eq 1 && $_i_line[2] -eq $#_i_files ]]; then
-    builtin . "$COMPDUMP"
+    builtin . "$compconfig[dump_file]"
     _i_done=yes
   fi
   unset _i_line

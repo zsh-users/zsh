@@ -5,7 +5,11 @@ local list
 if [[ -iprefix '-' ]]; then
   compgen -k "($signals[1,-3])"
 else
-  compgen -P '%' -j
+  local ret=1
+
+  compgen -P '%' -j && ret=0
   list=("$(ps 2>/dev/null)")
-  compgen -y '$list' -s '`ps 2>/dev/null | tail +2 | cut -c1-5`'
+  compgen -y '$list' -s '`ps 2>/dev/null | tail +2 | cut -c1-5`' && ret=0
+
+  return ret
 fi

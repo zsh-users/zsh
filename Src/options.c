@@ -522,11 +522,20 @@ bin_setopt(char *nam, char **args, char *ops, int isun)
 	/* Globbing option (-m) set. */
 	while (*args) {
 	    Comp com;
+	    char *s, *t;
+
+	    t = s = dupstring(*args);
+	    while (*t)
+		if (*t == '_')
+		    chuck(t);
+		else {
+		    *t = tulower(*t);
+		    t++;
+		}
 
 	    /* Expand the current arg. */
-	    tokenize(*args);
-	    if (!(com = parsereg(*args))) {
-		untokenize(*args);
+	    tokenize(s);
+	    if (!(com = parsereg(s))) {
 		zwarnnam(nam, "bad pattern: %s", *args, 0);
 		continue;
 	    }
