@@ -30,6 +30,12 @@
 #include "zsh.mdh"
 #include "jobs.pro"
 
+/* the process group of the shell at startup (equal to mypgprp, except
+   when we started without being process group leader */
+
+/**/
+mod_export pid_t origpgrp;
+
 /* the process group of the shell */
 
 /**/
@@ -1663,16 +1669,16 @@ bin_suspend(char *name, char **argv, Options ops, int func)
 	signal_default(SIGTTIN);
 	signal_default(SIGTSTP);
 	signal_default(SIGTTOU);
+
+	/* Move ourselves back to the process group we came from */
+	release_pgrp();
     }
+
     /* suspend ourselves with a SIGTSTP */
-    kill(0, SIGTSTP);
+    killpg(origpgrp, SIGTSTP);
+
     if (jobbing) {
-	/* stay suspended */
-	while (gettygrp() != mypgrp) {
-	    sleep(1);
-	    if (gettygrp() != mypgrp)
-		kill(0, SIGTTIN);
-	}
+	acquire_pgrp();
 	/* restore signal handling */
 	signal_ignore(SIGTTOU);
 	signal_ignore(SIGTSTP);
@@ -1695,4 +1701,60 @@ findjobnam(char *s)
 	    jobtab[jobnum].procs->text && strpfx(s, jobtab[jobnum].procs->text))
 	    return jobnum;
     return -1;
+}
+
+
+/* make sure we are a process group leader by creating a new process
+   group if necessary */
+
+/**/
+void
+acquire_pgrp(void)
+{
+    long ttpgrp;
+    sigset_t blockset, oldset;
+
+    if ((mypgrp = GETPGRP()) > 0) {
+	sigemptyset(&blockset);
+	sigaddset(&blockset, SIGTTIN);
+	sigaddset(&blockset, SIGTTOU);
+	sigaddset(&blockset, SIGTSTP);
+	oldset = signal_block(blockset);
+	while ((ttpgrp = gettygrp()) != -1 && ttpgrp != mypgrp) {
+	    mypgrp = GETPGRP();
+	    if (mypgrp == mypid) {
+		signal_setmask(oldset);
+		attachtty(mypgrp); /* Might generate SIGT* */
+		signal_block(blockset);
+	    }
+	    if (mypgrp == gettygrp())
+		break;
+	    signal_setmask(oldset);
+	    read(0, NULL, 0); /* Might generate SIGT* */
+	    signal_block(blockset);
+	    mypgrp = GETPGRP();
+	}
+	if (mypgrp != mypid) {
+	    if (setpgrp(0, 0) == 0) {
+		mypgrp = mypid;
+		attachtty(mypgrp);
+	    } else
+		opts[MONITOR] = 0;
+	}
+	signal_setmask(oldset);
+    } else
+	opts[MONITOR] = 0;
+}
+
+/* revert back to the process group we came from (before acquire_pgrp) */
+
+/**/
+void
+release_pgrp(void)
+{
+    if (origpgrp != mypgrp) {
+	attachtty(origpgrp);
+	setpgrp(0, origpgrp);
+	mypgrp = origpgrp;
+    }
 }

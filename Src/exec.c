@@ -1149,7 +1149,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    }
 		    else {
 			close(synch[0]);
-			entersubsh(Z_ASYNC, 0, 0);
+			entersubsh(Z_ASYNC, 0, 0, 0);
 			if (jobtab[list_pipe_job].procs) {
 			    if (setpgrp(0L, mypgrp = jobtab[list_pipe_job].gleader)
 				== -1) {
@@ -1258,7 +1258,7 @@ execpline2(Estate state, wordcode pcode,
 	    } else {
 		zclose(pipes[0]);
 		close(synch[0]);
-		entersubsh(how, 2, 0);
+		entersubsh(how, 2, 0, 0);
 		close(synch[1]);
 		execcmd(state, input, pipes[1], how, 0);
 		_exit(lastval);
@@ -2060,7 +2060,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	}
 	/* pid == 0 */
 	close(synch[0]);
-	entersubsh(how, (type != WC_SUBSH) && !(how & Z_ASYNC) ? 2 : 1, 0);
+	entersubsh(how, (type != WC_SUBSH) && !(how & Z_ASYNC) ? 2 : 1, 0, 0);
 	close(synch[1]);
 	forked = 1;
 	if (sigtrapped[SIGINT] & ZSIG_IGNORED)
@@ -2277,7 +2277,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	 * exit) in case there is an error return.
 	 */
 	if (is_exec)
-	    entersubsh(how, (type != WC_SUBSH) ? 2 : 1, 1);
+	    entersubsh(how, (type != WC_SUBSH) ? 2 : 1, 1,
+		       (do_exec || (type >= WC_CURSH && last1 == 1)) 
+		       && !forked);
 	if (type >= WC_CURSH) {
 	    if (last1 == 1)
 		do_exec = 1;
@@ -2536,7 +2538,7 @@ forklevel;
 
 /**/
 static void
-entersubsh(int how, int cl, int fake)
+entersubsh(int how, int cl, int fake, int revertpgrp)
 {
     int sig, monitor;
 
@@ -2580,6 +2582,8 @@ entersubsh(int how, int cl, int fake)
     }
     if (!fake)
 	subsh = 1;
+    if (revertpgrp && getpid() == mypgrp)
+	release_pgrp();
     if (SHTTY != -1) {
 	shout = NULL;
 	zclose(SHTTY);
@@ -2769,7 +2773,7 @@ getoutput(char *cmd, int qt)
     zclose(pipes[0]);
     redup(pipes[1], 1);
     opts[MONITOR] = 0;
-    entersubsh(Z_SYNC, 1, 0);
+    entersubsh(Z_SYNC, 1, 0, 0);
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
     cmdpop();
@@ -2900,7 +2904,7 @@ getoutputfile(char *cmd)
     /* pid == 0 */
     redup(fd, 1);
     opts[MONITOR] = 0;
-    entersubsh(Z_SYNC, 1, 0);
+    entersubsh(Z_SYNC, 1, 0, 0);
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
     cmdpop();
@@ -2980,10 +2984,10 @@ getproc(char *cmd)
 	zerr("can't open %s: %e", pnam, errno);
 	_exit(1);
     }
-    entersubsh(Z_ASYNC, 1, 0);
+    entersubsh(Z_ASYNC, 1, 0, 0);
     redup(fd, out);
 #else
-    entersubsh(Z_ASYNC, 1, 0);
+    entersubsh(Z_ASYNC, 1, 0, 0);
     redup(pipes[out], out);
     closem(0);   /* this closes pipes[!out] as well */
 #endif
@@ -3012,7 +3016,7 @@ getpipe(char *cmd)
 	zclose(pipes[out]);
 	return pipes[!out];
     }
-    entersubsh(Z_ASYNC, 1, 0);
+    entersubsh(Z_ASYNC, 1, 0, 0);
     redup(pipes[out], out);
     closem(0);	/* this closes pipes[!out] as well */
     cmdpush(CS_CMDSUBST);

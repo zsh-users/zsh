@@ -1,3 +1,10 @@
+2003-03-07  Peter Stephenson  <pws@csr.com>
+
+	* 18319: Philippe Troin: Src/exec.c, Src/init.c, Src/jobs.c:
+	Fix various process group problems associated with certain
+	versions of `su'.  In particular, this improves `suspend'
+	behaviour.
+
 2003-03-06  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 18314: Completion/Unix/Command/_ruby: allow -I, -r, -e and script

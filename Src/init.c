@@ -354,7 +354,6 @@ printhelp(void)
 mod_export void
 init_io(void)
 {
-    long ttpgrp;
     static char outbuf[BUFSIZ], errbuf[BUFSIZ];
 
 #ifdef RSH_BUG_WORKAROUND
@@ -462,37 +461,8 @@ init_io(void)
      */
     mypid = (zlong)getpid();
     if (opts[MONITOR] && interact && (SHTTY != -1)) {
-	if ((mypgrp = GETPGRP()) > 0) {
-	    sigset_t blockset, oldset;
-	    sigemptyset(&blockset);
-	    sigaddset(&blockset, SIGTTIN);
-	    sigaddset(&blockset, SIGTTOU);
-	    sigaddset(&blockset, SIGTSTP);
-	    oldset = signal_block(blockset);
-	    while ((ttpgrp = gettygrp()) != -1 && ttpgrp != mypgrp) {
-		mypgrp = GETPGRP();
-		if (mypgrp == mypid) {
-		    signal_setmask(oldset);
-		    attachtty(mypgrp); /* Might generate SIGT* */
-		    signal_block(blockset);
-		}
-		if (mypgrp == gettygrp())
-		    break;
-		signal_setmask(oldset);
-		read(0, NULL, 0); /* Might generate SIGT* */
-		signal_block(blockset);
-		mypgrp = GETPGRP();
-	    }
-	    if (mypgrp != mypid) {
-	        if (setpgrp(0, 0) == 0) {
-		    mypgrp = mypid;
-		    attachtty(mypgrp);
-                } else
-		    opts[MONITOR] = 0;
-	    }
-	    signal_setmask(oldset);
-	} else
-	    opts[MONITOR] = 0;
+	origpgrp = GETPGRP();
+        acquire_pgrp(); /* might also clear opts[MONITOR] */
     } else
 	opts[MONITOR] = 0;
 #else
