@@ -258,7 +258,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
         fi
       fi
 
-      if [[ -z "$matched" ]] && _requested options &&
+      if [[ -z "$matched$mesg" ]] && _requested options &&
           { ! zstyle -t ":completion${curcontext}:options" prefix-needed ||
             [[ "$origpre" = [-+]* ||
                ( -z "$aret$mesg" && nm -eq compstate[nmatches] ) ]] } ; then
@@ -301,7 +301,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 	IPREFIX="$previpre"
       fi
     done
-    if [[ -n "$opts" && -z "$aret$matched" &&
+    if [[ -n "$opts" && -z "$aret$matched$mesg" &&
           nm -eq compstate[nmatches] ]]; then
 
       PREFIX="$origpre"
