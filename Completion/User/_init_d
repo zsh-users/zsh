@@ -1,4 +1,4 @@
-#compdef -P */(init|rc[0-9]#).d/*
+#compdef -P */(init|rc[0-9S]#).d/*
 
 local magic cmds what
 
@@ -7,7 +7,7 @@ local magic cmds what
 # If the file starts with `#!' we hope that this is a shell script
 # and get lines looking like <space>foo|bar) with the words in $what.
 
-what='(st(art|op|atus)|re(start|load)|debug_(up|down)|dump(|_stats)|add|delete|clean|list)'
+what='(st(art|op|atus)|(force-|)re(start|load)|debug_(up|down)|dump(|_stats)|add|delete|clean|list)'
 
 read -u0k 2 magic < $words[1] && [[ $magic = '#!' ]] &&
     cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $words[1])"}:#[[:blank:]]#(\'|)${~what}(|${~what})#(\'|)\)}}//[^a-z_]} )
