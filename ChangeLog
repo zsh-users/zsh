@@ -1,3 +1,8 @@
+2004-03-11  Clint Adams  <clint@zsh.org>
+
+	* 19600: Completion/Unix/Command/_tla: rudimentary completion
+	for tla.
+
 2004-03-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 19596: Src/module.c: include dlfcn.h instead of dl.h on HP/UX 11
