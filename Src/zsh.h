@@ -1125,6 +1125,7 @@ struct param {
 #define PM_REMOVABLE	(1<<21)	/* special can be removed from paramtab     */
 #define PM_AUTOLOAD	(1<<22) /* autoloaded from module                   */
 #define PM_NORESTORE	(1<<23)	/* do not restore value of local special    */
+#define PM_HASHELEM     (1<<24) /* is a hash-element */
 
 /* The option string corresponds to the first of the variables above */
 #define TYPESET_OPTSTR "aiEFALRZlurtxUhT"

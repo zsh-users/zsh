@@ -1630,7 +1630,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		if (!(pm->flags & PM_UNSET) && !pm->env && !value)
 		    pm->env = addenv(pname, getsparam(pname), pm->flags);
 	    } else if (pm->env &&
-		       (!pm->level || (isset(ALLEXPORT) && !pm->old))) {
+		       (!pm->level || (isset(ALLEXPORT) && !pm->old &&
+				       !(pm->flags & PM_HASHELEM)))) {
 		delenv(pm->env);
 		zsfree(pm->env);
 		pm->env = NULL;

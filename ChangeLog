@@ -1,5 +1,9 @@
 2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10463: Src/builtin.c, Src/params.c, Src/zsh.h: PM_HASHELEM
+	flag to keep association elements from being exported with
+	ALL_EXPORT set
+
 	* 10459: Completion/Commands/_next_tags, Doc/Zsh/compwid.yo,
 	Src/Zle/compcore.c: _next_tags should be usable with menu-
 	completion

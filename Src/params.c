@@ -617,6 +617,9 @@ createparam(char *name, int flags)
 {
     Param pm, oldpm;
 
+    if (paramtab != realparamtab)
+	flags = (flags & ~PM_EXPORTED) | PM_HASHELEM;
+
     if (name != nulstring) {
 	oldpm = (Param) (paramtab == realparamtab ?
 			 gethashnode2(paramtab, name) :
@@ -646,7 +649,7 @@ createparam(char *name, int flags)
 	    paramtab->addnode(paramtab, ztrdup(name), pm);
 	}
 
-	if (isset(ALLEXPORT) && !oldpm)
+	if (isset(ALLEXPORT) && !oldpm && !(flags & PM_HASHELEM))
 	    flags |= PM_EXPORTED;
     } else {
 	pm = (Param) zhalloc(sizeof *pm);
@@ -1520,7 +1523,7 @@ setstrvalue(Value v, char *val)
 	break;
     }
     if ((!v->pm->env && !(v->pm->flags & PM_EXPORTED) &&
-	 !(isset(ALLEXPORT) && !v->pm->old)) ||
+	 !(isset(ALLEXPORT) && !v->pm->old && !(v->pm->flags & PM_HASHELEM))) ||
 	(v->pm->flags & PM_ARRAY) || v->pm->ename)
 	return;
     if (PM_TYPE(v->pm->flags) == PM_INTEGER)
@@ -2742,7 +2745,7 @@ arrfixenv(char *s, char **t)
      */
     if (t == path)
 	cmdnamtab->emptytable(cmdnamtab);
-    if (isset(ALLEXPORT) ? !!pm->old : pm->level)
+    if ((pm->flags & PM_HASHELEM) || (isset(ALLEXPORT) ? !!pm->old : pm->level))
 	return;
     u = t ? zjoin(t, ':', 1) : "";
     len_s = strlen(s);
