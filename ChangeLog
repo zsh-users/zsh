@@ -1,5 +1,8 @@
 2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10961: Src/Zle/complist.c: make menu-selection handle
+ 	undefined-key
+	
 	* 10959: Completion/Core/_main_complete, Doc/Zsh/compsys.yo,
  	Doc/Zsh/mod_complist.yo, Src/params.c, Src/Zle/compcore.c,
  	Src/Zle/complete.c, Src/Zle/complist.c, Src/Zle/compresult.c:

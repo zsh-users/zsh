@@ -2034,6 +2034,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    setwish = 1;
 	    mline = -1;
 	    continue;
+	} else if (cmd == Th(z_undefinedkey)) {
+	    continue;
 	} else {
 	    ungetkeycmd();
 	    break;
