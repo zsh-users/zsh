@@ -42,7 +42,7 @@ INSTALL         = @INSTALL@
 
 # default target
 all: config.h
-	@for subdir in Src Doc; do \
+	@for subdir in Src Doc Etc; do \
 	  (cd $$subdir && $(MAKE) $(MAKEDEFS) $@) || exit 1; \
 	done
 
