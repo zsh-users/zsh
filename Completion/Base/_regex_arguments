@@ -6,6 +6,13 @@
 
 ## usage: _regex_arguments funcname regex
 
+## configuration key used:
+
+# regex_arguments_path
+#  The path to a directory for caching. (default: ~/.zsh/regex_arguments)
+
+##
+
 # _regex_arguments compiles `regex' and emit the result of the state
 # machine into the function `funcname'. `funcname' parses a command line
 # according to `regex' and evaluate appropriate actions in `regex'. Before
@@ -396,31 +403,47 @@ _regex_arguments () {
   local regex index first last nullable
   local i state next
 
-  funcname="$1"
-  shift
+  local cache_dir="${compconfig[regex_arguments_path]:-$HOME/.zsh/regex_arguments}"
+  local cache_file="$cache_dir/$1"
+  local cache_test
 
-  regex=("$@")
-  index=1
-  tbl=()
-  pattern=()
-  lookahead=()
-  parse_action=()
-  complete_action=()
-  _ra_parse_alt
+  if ! [[ -f "$cache_file" ]] || ! source "$cache_file" "$@"; then
+    cache_test='[[ $# -eq '$#' && "$*" = '"${*:q}"' ]]'
 
-  if (( $? == 2 || index != $#regex + 1 )); then
-    if (( index != $#regex + 1 )); then
-      print "regex parse error at $index: $regex[index]" >&2
-    else
-      print "regex parse error at $index (end)" >&2
+    funcname="$1"
+    shift
+
+    regex=("$@")
+    index=1
+    tbl=()
+    pattern=()
+    lookahead=()
+    parse_action=()
+    complete_action=()
+    _ra_parse_alt
+
+    if (( $? == 2 || index != $#regex + 1 )); then
+      if (( index != $#regex + 1 )); then
+	print "regex parse error at $index: $regex[index]" >&2
+      else
+	print "regex parse error at $index (end)" >&2
+      fi
+      return 1
     fi
-    return 1
+
+    funcdef="$(_ra_gen_func)"
+
+    unfunction "$funcname" 2>/dev/null
+    eval "${(F)funcdef}"
+
+    [[ -d "$cache_dir" && -w "$cache_dir" ]] && {
+      print -lr - \
+	"if $cache_test; then" \
+	"$funcdef" \
+	'true; else false; fi' > "${cache_file}.$HOST.$$"
+      mv "${cache_file}.$HOST.$$" "${cache_file}"
+    }
   fi
-
-  funcdef="$(_ra_gen_func)"
-
-  unfunction "$funcname" 2>/dev/null
-  eval "${(F)funcdef}"
 }
 
 _regex_arguments "$@"
