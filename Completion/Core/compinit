@@ -479,6 +479,7 @@ zstyle ':completion:correct'  max-errors    '2' numeric
 zstyle ':completion:correct'  prompt        'correct to:'
 zstyle ':completion:*'        completer     '_complete'
 zstyle ':completion*:default' list-colors   "${(s.:.)ZLS_COLORS:-${ZLS_COLOURS:-no=0:fi=0:di=0:ln=0:pi=0:so=0:bd=0:cd=0:ex=0}}"
+(( $+SELECTMIN )) && zstyle ':completion*:default' menu "select=$SELECTMIN"
 zstyle ':completion:*' tag-order 'arguments values' options \
                                  globbed-files directories all-files
 
