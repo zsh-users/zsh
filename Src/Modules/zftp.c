@@ -126,12 +126,12 @@ int h_errno;
 # define INET6_ADDRSTRLEN 46
 #endif
 
-/**/  
+/**/
 #ifndef HAVE_INET_NTOP
 
-/**/    
+/**/
 static char const *
-inet_ntop(int af, void const *cp, char *buf, size_t len)
+zsh_inet_ntop(int af, void const *cp, char *buf, size_t len)
 {       
         if(af != AF_INET) {
                 errno = EAFNOSUPPORT;
@@ -145,7 +145,11 @@ inet_ntop(int af, void const *cp, char *buf, size_t len)
         return buf;
 }
 
-/**/  
+#else /* !HAVE_INET_NTOP */
+
+# define zsh_inet_ntop inet_ntop
+
+/**/
 #endif /* !HAVE_INET_NTOP */
 
 /**/
@@ -159,24 +163,32 @@ inet_ntop(int af, void const *cp, char *buf, size_t len)
 #  endif
 
 /**/
-static int inet_aton(char const *src, struct in_addr *dst)
+static int zsh_inet_aton(char const *src, struct in_addr *dst)
 {
     return (dst->s_addr = inet_addr(src)) != INADDR_NONE;
 }
+
+#else /* !HAVE_INET_ATON */
+
+# define zsh_inet_aton inet_aton
 
 /**/
 # endif /* !HAVE_INET_ATON */
 
 /**/
 static int
-inet_pton(int af, char const *src, void *dst)
+zsh_inet_pton(int af, char const *src, void *dst)
 {
         if(af != AF_INET) {
                 errno = EAFNOSUPPORT;
                 return -1;
         }
-        return !!inet_aton(src, dst);
+        return !!zsh_inet_aton(src, dst);
 }
+
+#else /* !HAVE_INET_PTON */
+
+# define zsh_inet_pton inet_pton
 
 /**/
 #endif /* !HAVE_INET_PTON */
@@ -184,13 +196,35 @@ inet_pton(int af, char const *src, void *dst)
 /**/
 #ifndef HAVE_GETIPNODEBYNAME
 
+/**/
+# ifndef HAVE_GETHOSTBYNAME2
+
+/**/
+static struct hostent *
+zsh_gethostbyname2(char const *name, int af)
+{
+	if(af != AF_INET) {
+		h_errno = NO_RECOVERY;
+		return NULL;
+	}
+	return gethostbyname(name);
+}
+
+#else /* !HAVE_GETHOSTBYNAME2 */
+
+# define zsh_gethostbyname2 gethostbyname2
+
+/**/
+# endif /* !HAVE_GETHOSTBYNAME2 */
+
+
 /* note: this is not a complete implementation.  If ignores the flags,
    and does not provide the memory allocation of the standard interface.
    Each returned structure will overwrite the previous one. */
 
 /**/
 static struct hostent *
-getipnodebyname(char const *name, int af, int flags, int *errorp)
+zsh_getipnodebyname(char const *name, int af, int flags, int *errorp)
 {
 	static struct hostent ahe;
 	static char nbuf[16];
@@ -201,8 +235,8 @@ getipnodebyname(char const *name, int af, int flags, int *errorp)
 	static char pbuf[INET_ADDRSTRLEN];
 # endif
 	struct hostent *he;
-	if(inet_pton(af, name, nbuf) == 1) {
-		inet_ntop(af, nbuf, pbuf, sizeof(pbuf));
+	if(zsh_inet_pton(af, name, nbuf) == 1) {
+		zsh_inet_ntop(af, nbuf, pbuf, sizeof(pbuf));
 		ahe.h_name = pbuf;
 		ahe.h_aliases = addrlist+1;
 		ahe.h_addrtype = af;
@@ -210,34 +244,20 @@ getipnodebyname(char const *name, int af, int flags, int *errorp)
 		ahe.h_addr_list = addrlist;
 		return &ahe;
 	}
-	he = gethostbyname2(name, af);
+	he = zsh_gethostbyname2(name, af);
 	if(!he)
 		*errorp = h_errno;
 	return he;
 }
-
-/**/
-# ifndef HAVE_GETHOSTBYNAME2
-
-/**/
-struct hostent *
-gethostbyname2(char const *name, int af)
-{
-	if(af != AF_INET) {
-		h_errno = NO_RECOVERY;
-		return NULL;
-	}
-	return gethostbyname(name);
-}
-
-/**/
-# endif /* !HAVE_GETHOSTBYNAME2 */
-
 /**/
 static void
 freehostent(struct hostent *ptr)
 {
 }
+
+#else /* !HAVE_GETIPNODEBYNAME */
+
+# define zsh_getipnodebyname getipnodebyname
 
 /**/
 #endif /* !HAVE_GETIPNODEBYNAME */
@@ -1171,7 +1191,7 @@ zfopendata(char *name, union zftp_sockaddr *zdsockp, int *is_passivep)
 	if(zdsockp->a.sa_family == AF_INET6) {
 	    /* see RFC 2428 for explanation */
 	    strcpy(portcmd, "EPRT |2|");
-	    inet_ntop(AF_INET6, &zdsockp->in6.sin6_addr,
+	    zsh_inet_ntop(AF_INET6, &zdsockp->in6.sin6_addr,
 		portcmd+8, INET6_ADDRSTRLEN);
 	    sprintf(strchr(portcmd, 0), "|%u|\r\n",
 		(unsigned)ntohs(zdsockp->in6.sin6_port));
@@ -1917,7 +1937,7 @@ zftp_open(char *name, char **args, int flags)
 # define FAILED() do { } while(0)
 #endif
     {
-    	zhostp = getipnodebyname(args[0], af, 0, &herrno);
+    	zhostp = zsh_getipnodebyname(args[0], af, 0, &herrno);
 	if (!zhostp || errflag) {
 	    /* should use herror() here if available, but maybe
 	     * needs configure test. on AIX it's present but not
@@ -1999,7 +2019,7 @@ zftp_open(char *name, char **args, int flags)
 	char pbuf[INET_ADDRSTRLEN];
 #endif
 	addrp--;
-	inet_ntop(af, *addrp, pbuf, sizeof(pbuf));
+	zsh_inet_ntop(af, *addrp, pbuf, sizeof(pbuf));
 	zfsetparam("ZFTP_IP", ztrdup(pbuf), ZFPM_READONLY);
     }
     freehostent(zhostp);
