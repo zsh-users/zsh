@@ -1515,12 +1515,46 @@ get_comp_string(void)
 	     */
 	    for (i = 0, p = s; *p; p++, i++) {
 		/* careful, ${... is not a brace expansion...
-		 * in fact, if it's got a substitution in it's too
-		 * hard for us anyway.  sorry.
+		 * we try to get braces after a parameter expansion right,
+		 * but this may fail sometimes. sorry.
 		 */
 		if (*p == String || *p == Qstring) {
-		    tt = NULL;
-		    break;
+		    if (p[1] == Inbrace) {
+			char *tp = p + 1;
+			if (skipparens(Inbrace, Outbrace, &tp)) {
+			    tt = NULL;
+			    break;
+			}
+			i += tp - p;
+			p = tp;
+		    } else {
+			char *tp = p + 1;
+
+			if (*tp == Quest || *tp == Star || *tp == String ||
+			    *tp == Qstring || *tp == '?' || *tp == '*' ||
+			    *tp == '$' || *tp == '-' || *tp == '!' ||
+			    *tp == '@')
+			    p++, i++;
+			else {
+			    if (idigit(*tp))
+				while (idigit(*tp))
+				    tp++;
+			    else if (iident(*tp))
+				while (iident(*tp))
+				    tp++;
+			    else {
+				tt = NULL;
+				break;
+			    }
+			    if (*tp == Inbrace) {
+				tt = NULL;
+				break;
+			    }
+			    tp--;
+			    i += tp - p;
+			    p = tp;
+			}
+		    }
 		} else if (*p == Inbrace) {
 		    if (tt) {
 			/* too many inbraces */
