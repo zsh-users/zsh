@@ -55,11 +55,10 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
          ;;
   F)     tmp1="$OPTARG"
          if [[ "$tmp1[1]" = '(' ]]; then
-           ignore=( ${^=tmp1[2,-2]}/ )
+           ignore=( ${=tmp1[2,-2]} )
          else
-           ignore=( ${(P)${tmp1}} )
+           ignore=( ${(P)tmp1} )
          fi
-	 (( $#ignore )) && ignore=(-F "( $ignore )")
          ;;
   [JV])  group=("-$opt" "$OPTARG")
          ;;
@@ -158,18 +157,13 @@ eorig="$orig"
    ( $#compstate[pattern_match] -ne 0 &&
      "${orig#\~}" != "${${orig#\~}:q}" ) ]] && menu=yes
 
-# If given no `-F' option, we want to use the `ignored-suffixes'-style.
+# If given no `-F' option, we may want to use $fignore, turned into patterns.
 
-if [[ $#ignore -eq 0 && -z $gopt ]]; then
-  if zstyle -a ":completion${curcontext}:files" ignored-suffixes ignore; then
-    ignore=(-F "( $ignore )")
-  else
+[[ $#ignore -eq 0 && -z $gopt ]] && ignore=( "?*${^fignore[@]}" )
 
-    # For now we still use the fignore parameter.
-    # This may be removed some day.
-
-    ignore=(-F fignore)
-  fi
+if (( $#ignore )); then
+  _comp_ignore=( "$_comp_ignore[@]" "$ignore[@]" )
+  (( $expl[(I)-F] )) || expl=( "$expl[@]" -F _comp_ignore )
 fi
 
 # Now let's have a closer look at the string to complete.
@@ -298,11 +292,11 @@ for prepath in "$prepaths[@]"; do
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.
 
-      builtin compadd -D tmp1 "$ignore[@]" "$matcher[@]" - "${(@)tmp1:t}"
+      builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
 
       if [[ $#tmp1 -eq 0 && -n "$_comp_correct" ]]; then
         tmp1=( "$tmp2[@]" )
-	compadd -D tmp1 "$ignore[@]" "$matcher[@]" - "${(@)tmp2:t}"
+	compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp2:t}"
       fi
 
       # If no file matches, save the expanded path and continue with
@@ -423,13 +417,13 @@ for prepath in "$prepaths[@]"; do
             compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -s "/${tmp3#*/}" \
-	          -W "$prepath$realpath$testpath" "$ignore[@]" \
+	          -W "$prepath$realpath$testpath" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                   -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
 		  - "${(@)tmp1%%/*}"
 	else
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
-	          -W "$prepath$realpath$testpath" "$ignore[@]" \
+	          -W "$prepath$realpath$testpath" \
 		   "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                    -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
 		   - "$tmp1[@]"
@@ -437,7 +431,7 @@ for prepath in "$prepaths[@]"; do
       else
         if [[ "$tmp3" = */* ]]; then
 	  atmp=( -Qf "$mopts[@]" -p "$linepath$tmp4"
-	         -W "$prepath$realpath$testpath" "$ignore[@]"
+	         -W "$prepath$realpath$testpath"
 	         "$addpfx[@]" "$addsfx[@]" "$remsfx[@]"
                  -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" )
           for i in "$tmp1[@]"; do
@@ -445,7 +439,7 @@ for prepath in "$prepaths[@]"; do
 	  done
         else
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
-		  -W "$prepath$realpath$testpath" "$ignore[@]" \
+		  -W "$prepath$realpath$testpath" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                   -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
 		  - "$tmp1[@]"
@@ -495,7 +489,7 @@ for prepath in "$prepaths[@]"; do
     tmp4="$testpath"
     compquote tmp4 tmp1
     compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
-	    -W "$prepath$realpath$testpath" "$ignore[@]" \
+	    -W "$prepath$realpath$testpath" \
 	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
             -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
 	    - "$tmp1[@]"

@@ -1510,15 +1510,16 @@ addmatches(Cadata dat, char **argv)
 {
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
     char **aign = NULL, **dparr = NULL, *oaq = autoq, *oppre = dat->ppre;
-    char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL;
+    char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL, *ibuf = NULL;
     int lpl, lsl, pl, sl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
+    int ppl = 0, psl = 0;
     int llpl = 0, llsl = 0, nm = mnum, gflags = 0, ohp = haspattern;
     int oisalt = 0, isalt, isexact, doadd, ois = instring, oib = inbackt;
     Cline lc = NULL, pline = NULL, sline = NULL;
     Cmatch cm;
     struct cmlist mst;
     Cmlist oms = mstack;
-    Patprog cp = NULL;
+    Patprog cp = NULL, *pign = NULL;
     LinkList aparl = NULL, oparl = NULL, dparl = NULL;
     Brinfo bp, bpl = brbeg, obpl, bsl = brend, obsl;
 
@@ -1612,8 +1613,29 @@ addmatches(Cadata dat, char **argv)
 		update_bmatchers();
 
 	    /* Get the suffixes to ignore. */
-	    if (dat->ign)
-		aign = get_user_var(dat->ign);
+	    if (dat->ign && (aign = get_user_var(dat->ign))) {
+		char **ap, **sp, *tmp;
+		Patprog *pp, prog;
+
+		pign = (Patprog *) zhalloc((arrlen(aign) + 1) * sizeof(Patprog));
+
+		for (ap = sp = aign, pp = pign; (tmp = *ap); ap++) {
+		    tokenize(tmp);
+		    remnulargs(tmp);
+		    if (((tmp[0] == Quest && tmp[1] == Star) ||
+			 (tmp[1] == Quest && tmp[0] == Star)) &&
+			tmp[2] && !haswilds(tmp + 2))
+			untokenize(*sp++ = tmp + 2);
+		    else if ((prog = patcompile(tmp, 0, NULL)))
+			*pp++ = prog;
+		}
+		*sp = NULL;
+		*pp = NULL;
+		if (!*aign)
+		    aign = NULL;
+		if (!*pign)
+		    pign = NULL;
+	    }
 	    /* Get the display strings. */
 	    if (dat->disp)
 		if ((disp = get_user_var(dat->disp)))
@@ -1794,6 +1816,17 @@ addmatches(Cadata dat, char **argv)
 	    /* Walk through the matches given. */
 	    obpl = bpl;
 	    obsl = bsl;
+	    if (!oisalt && (aign || pign)) {
+		int max = 0;
+		char **ap = argv;
+
+		ppl = (dat->ppre ? strlen(dat->ppre) : 0);
+		while ((s = *ap++))
+		    if ((sl = strlen(s)) > max)
+			max = sl;
+		psl = (dat->psuf ? strlen(dat->psuf) : 0);
+		ibuf = (char *) zhalloc(1 + ppl + max + psl);
+	    }
 	    for (; (s = *argv); argv++) {
 		bpl = obpl;
 		bsl = obsl;
@@ -1803,16 +1836,31 @@ addmatches(Cadata dat, char **argv)
 		}
 		sl = strlen(s);
 		isalt = oisalt;
-		if (doadd && (!dat->psuf || !*(dat->psuf)) && aign) {
-		    /* Do the suffix-test. If the match has one of the
-		     * suffixes from ign, we put it in the alternate set. */
-		    char **pt = aign;
-		    int filell;
+		if (!isalt && (aign || pign)) {
+		    int il = ppl + sl + psl;
 
-		    for (isalt = 0; !isalt && *pt; pt++)
-			if ((filell = strlen(*pt)) < sl
-			    && !strcmp(*pt, s + sl - filell))
-			    isalt = 1;
+		    if (ppl)
+			memcpy(ibuf, dat->ppre, ppl);
+		    strcpy(ibuf + ppl, s);
+		    if (psl)
+			strcpy(ibuf + ppl + sl, dat->psuf);
+
+		    if (aign) {
+			/* Do the suffix-test. If the match has one of the
+			 * suffixes from aign, we put it in the alternate set. */
+			char **pt = aign;
+			int filell;
+
+			for (isalt = 0; !isalt && *pt; pt++)
+			    isalt = ((filell = strlen(*pt)) < il &&
+				     !strcmp(*pt, ibuf + il - filell));
+		    }
+		    if (!isalt && pign) {
+			Patprog *pt = pign;
+
+			for (isalt = 0; !isalt && *pt; pt++)
+			    isalt = pattry(*pt, ibuf);
+		    }
 		}
 		if (!(dat->aflags & CAF_MATCH)) {
 		    if (dat->aflags & CAF_QUOTE)

@@ -532,29 +532,27 @@ for testing.  Hence it is only useful if combined with the tt(-f) flag, as
 the tests will not otherwise be performed.
 )
 item(tt(-a))(
-The completion code may
-build two sets of matches: the normal one where words with one of the 
-suffixes in the array parameter tt(fignore) are not considered
-possible matches, and the alternate set where the words excluded
-from the first set are stored. Normally only the matches in the first
-set are used, but if this set is empty, the words from the alternate
-set are used.
+The completion code may build two sets of matches: the normal and the
+alternate set. Normally only the matches in the first set are used,
+but if this set is empty, the words from the alternate set are
+used. The completion code uses this mechanism, for example, to make
+filenames without one of the suffixes defined with the tt(fignore)
+shell parameter be preferred over filenames with one of these
+suffixes.
 
-The tt(compadd) builtin does not use the tt(fignore) parameter and
-normally stores all words in the first set.  With the tt(-a)-flag
-given, however, the given var(words) are stored in the alternate set unless
-this flag is overridden by the tt(-F) option.
+With the tt(-a)-flag given, the var(words) are stored in the alternate
+set unless this flag is overridden by the tt(-F) option.
 )
 item(tt(-F) var(array))(
-Specifies an array containing suffixes in the same form as the
-tt(fignore) parameter. Words with one of these suffixes are stored in
-the alternate set of matches and words without one of these suffixes
+Specifies an array containing patterns.
+Words matching one of these patterns are stored in
+the alternate set of matches and words that match none of the patterns
 are stored in the normal set.
 
 The var(array) may be the name of an array parameter or a list of
-literal suffixes enclosed in parentheses and quoted, as in `tt(-F "(.o
-.h)")'. If the name of an array is given, the elements of the array are
-taken as the suffixes.
+literal patterns enclosed in parentheses and quoted, as in `tt(-F "(*?.o
+*?.h)")'. If the name of an array is given, the elements of the array are
+taken as the patterns.
 )
 item(tt(-Q))(
 This flag instructs the completion 

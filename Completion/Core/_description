@@ -1,10 +1,11 @@
 #autoload
 
-local name gropt format gname hidden hide match
+local name gropt format gname hidden hide match ign
 
 gropt=(-J)
 hide=()
 match=()
+ign=()
 
 if [[ "$1" = -([12]|)[VJ] ]]; then
   gropt=("$1")
@@ -29,21 +30,26 @@ zstyle -s ":completion${curcontext}:$1" group-name gname &&
     [[ -z "$gname" ]] && gname="$1"
 zstyle -s ":completion${curcontext}:$1" matcher match &&
     match=(-M "${(q)match}")
+if zstyle -a ":completion${curcontext}:$1" ignored-patterns _comp_ignore; then
+  ign=(-F _comp_ignore)
+else
+  _comp_ignore=()
+fi
 
 shift 2
 [[ -n "$format" ]] && zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
 
 if [[ -n "$gname" ]]; then
   if [[ -n "$format" ]]; then
-    eval "${name}=($hide $match $gropt ${(q)gname} -X \"${format}\")"
+    eval "${name}=($hide $match $ign $gropt ${(q)gname} -X \"${format}\")"
   else
-    eval "${name}=($hide $match $gropt ${(q)gname})"
+    eval "${name}=($hide $match $ign $gropt ${(q)gname})"
   fi
 else
   if [[ -n "$format" ]]; then
-    eval "${name}=($hide $match $gropt -default- -X \"${format}\")"
+    eval "${name}=($hide $match $ign $gropt -default- -X \"${format}\")"
   else
-    eval "${name}=($hide $match $gropt -default-)"
+    eval "${name}=($hide $match $ign $gropt -default-)"
   fi
 fi
 

@@ -835,10 +835,11 @@ item(tt(hosts-ports-users))(
 Like tt(hosts-ports) but used for commands like tt(telnet) and
 containing strings of the form `var(host)tt(:)var(port)tt(:)var(user)'.
 )
-item(tt(ignored-suffixes))(
-This style is used with the tt(files) tag and gives suffixes of
-filenames to ignore. The matches ignored will only be completed when
-there are no other matches.  It it is a more configurable version
+item(tt(ignored-patterns))(
+This style is used with the tags used when adding matches and gives a
+number of patterns. All matches that are matched by any of these
+patterns will be ignored as long as there are other matches not
+matched by any of the patterns.  It is a more configurable version
 of the shell parameter tt($fignore).
 )
 item(tt(insert-unambiguous))(
