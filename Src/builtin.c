@@ -126,7 +126,7 @@ static struct builtin builtins[] =
     BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "m", "a"),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, 0, "m", "f"),
     BUILTIN("unhash", 0, bin_unhash, 1, -1, 0, "adfm", NULL),
-    BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, 0, "fm", NULL),
+    BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, 0, "fmv", NULL),
     BUILTIN("unsetopt", 0, bin_setopt, 0, -1, BIN_UNSETOPT, NULL, NULL),
     BUILTIN("wait", 0, bin_fg, 0, -1, BIN_WAIT, NULL, NULL),
     BUILTIN("whence", 0, bin_whence, 0, -1, 0, "acmpvfsw", NULL),

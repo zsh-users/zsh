@@ -1,3 +1,8 @@
+2003-02-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 18223: Src/builtin.c, Doc/Zsh/builtins.yo: satisfy POSIX
+	requirement for a -v flag to unset
+
 2003-02-13  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: same again,
