@@ -35,8 +35,10 @@ typeset -U _lastdescr _comp_ignore
 
 [[ -z "$curcontext" ]] && curcontext=:::
 
-if [[ "$compstate[insert]" = tab* ]]; then
-  zstyle -T ":completion:${curcontext}:" insert-tab && return 1
+if [[ "$compstate[insert]" = tab* && "$WIDGET" != *list* ]]; then
+  { zstyle -T ":completion:${curcontext}:" insert-tab &&
+    { [[ "$curcontext" != :* || -z "$compstate[vared]" ]] ||
+        zstyle -t ":completion:vared${curcontext}:" insert-tab } } && return 1
 
   compstate[insert]="${compstate[insert]//tab /}"
 fi

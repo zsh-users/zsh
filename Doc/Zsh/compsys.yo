@@ -1258,7 +1258,8 @@ insert the TAB character if the completion code would normally do that
 (i.e. when there is no non-blank character to the left of the cursor
 yet). If set to `false', completion will be done even there.
 
-The default value of this style is `true'.
+The default value of this style is `true' unless when completing
+inside the tt(vared) builtin command, where it defaults to `false'.
 )
 kindex(insert-unambiguous, completion style)
 item(tt(insert-unambiguous))(
