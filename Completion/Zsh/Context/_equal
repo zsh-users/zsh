@@ -1,0 +1,9 @@
+#compdef -equal-
+
+local args
+
+args=( "$@" )
+
+_alternative -O args \
+    'commands:command:compadd -k commands' \
+    'aliases:alias:compadd -k aliases'
