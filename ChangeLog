@@ -1,3 +1,8 @@
+2002-05-24  Peter Stephenson  <pws@csr.com>
+
+	* 17220: Src/Modules/tcp.c: bugs displaying host names and remote
+	host address when using `ztcp' to list connections.
+
 2002-05-24  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17219: Src/Zle/complist.c: make re-display in menu selection
