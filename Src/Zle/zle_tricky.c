@@ -6283,8 +6283,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 			    gen_matches_files(1, 0, 0);
 			/* The compctl has a glob pattern (compctl -g). */
 			if (cc->glob) {
-			    int ns, pl = strlen(prpre), o;
-			    char *g = dupstring(cc->glob), pa[PATH_MAX];
+			    int ns, pl = strlen(prpre), o, paalloc;
+			    char *g = dupstring(cc->glob), *pa;
 			    char *p2, *p3;
 			    int ne = noerrs, md = opts[MARKDIRS];
 
@@ -6298,8 +6298,9 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 			    }
 			    noerrs = 1;
 			    addwhat = -6;
+			    o = strlen(prpre);
+			    pa = (char *)zalloc(paalloc = o + PATH_MAX);
 			    strcpy(pa, prpre);
-			    o = strlen(pa);
 			    opts[MARKDIRS] = 0;
 
 			    /* The compctl -g string may contain more than *
@@ -6338,6 +6339,10 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 				else {
 				/* It's a simple pattern, so append it to *
 				 * the path we have on the command line.  */
+				    int minlen = o + strlen(g);
+				    if (minlen > paalloc)
+					pa = (char *)
+					    zrealloc(pa, paalloc = minlen+1);
 				    strcpy(pa + o, g);
 				    addlinknode(l, dupstring(pa));
 				}
@@ -6383,6 +6388,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 			    glob_pre = glob_suf = NULL;
 			    noerrs = ne;
 			    opts[MARKDIRS] = md;
+
+			    zfree(pa, paalloc);
 			}
 		    }
 		    dirs++;
