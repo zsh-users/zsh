@@ -59,6 +59,10 @@ while true; do
 done
 
 [[ -n "$_ms_opt" ]] &&
+   { ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
+     [[ "$PREFIX" = [-+]* ||
+     ( -z "$has_args" && ret -ne 300 && nm -eq compstate[nmatches] ) ]] } &&
+  has_args=yes &&
   _describe -o option \
             _ms_soptmid _ms_soptmidadd -Q -S '' -- \
 	    _ms_soptend -Q -- \

@@ -1,5 +1,9 @@
 2000-05-11  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11324: Completion/Base/_argument_sets, Completion/Base/_arguments,
+ 	Src/Zle/computil.c: make _argument_sets add the options as
+ 	defaults when there is nothing else to complete
+	
 	* 11321: Completion/Core/_files: _files used alternative tag-order
  	values even if not needed
 	
