@@ -10,12 +10,7 @@ link='if test "x$ac_cv_func_tgetent" = xyes; then
           echo either;
       fi
 '
-load='if test "x$ac_cv_func_tgetent" = xyes; then
-          echo yes;
-      else
-          echo no;
-      fi
-'
+load=yes
 
 autobins="echotc"
 

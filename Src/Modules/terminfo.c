@@ -215,6 +215,8 @@ boot_(Module m)
 
     if (!createtihash())
     	return 1;
+#else
+    unsetparam(terminfo_nam);
 #endif
     return  !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
