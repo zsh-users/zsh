@@ -17,7 +17,8 @@ elif compset -P '-(exec|se)='; then
 elif compset -P '-(symbols|core|command)='; then
   _files
 elif [[ "$PREFIX" = -* ]]; then
-  if _wanted options; then
+  _tags options
+  while _tags; do
     while _next_label options expl option; do
       compadd "$expl[@]" -QS '' - -symbols\= -exec\= -se\= -core\= -command\= \
                                   -directory\= -cd\= -tty\= && ret=0
@@ -25,7 +26,7 @@ elif [[ "$PREFIX" = -* ]]; then
 	    		          -batch -fullname -f -b && ret=0
     done
     (( ret )) || return 0
-  fi
+  done
 else
   prev="$words[CURRENT-1]"
 

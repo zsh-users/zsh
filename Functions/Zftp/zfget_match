@@ -17,7 +17,7 @@ if [[ $ZFTP_SYSTEM == UNIX* && $1 == */* ]]; then
     local reply
     reply=(${${${(f)"$(<$tmpf)"}##$dir}%\*})
     rm -f $tmpf
-    _all_labels files expl 'remote file' compadd -P $dir - $reply
+    _wanted files expl 'remote file' compadd -P $dir - $reply
   else
     # On the first argument to ls, we usually get away with a glob.
     zftp ls "$1*$2" >$tmpf
@@ -28,7 +28,7 @@ else
   local fcache_name
   zffcache
   if [[ -n $WIDGET ]]; then
-    _all_labels files expl 'remote file' compadd -F fignore - ${(P)fcache_name}
+    _wanted files expl 'remote file' compadd -F fignore - ${(P)fcache_name}
   else
     reply=(${(P)fcache_name});
   fi

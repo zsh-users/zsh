@@ -36,28 +36,27 @@ if (( ! $+_lp_cache )); then
 fi
 
 if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
-  if _wanted printers; then
-    if zstyle -T ":completion:${curcontext}:printers" verbose; then
-      zformat -a list ' -- ' "$_lp_cache[@]"
-      disp=(-ld list)
-    else
-      disp=()
-    fi
-    _all_labels printers expl printer \
-        compadd "$disp[@]" - "${(@)_lp_cache%%:*}" && return 0
-
-    (( $+_lp_alias_cache )) || return 1
-
-    if zstyle -T ":completion:${curcontext}:printers" verbose; then
-      zformat -a list ' -- ' "$_lp_alias_cache[@]"
-      disp=(-ld list)
-    else
-      disp=()
-    fi
-    compadd "$expl[@]" "$disp[@]" - "${(@)_lp_alias_cache%%:*}"
+  if zstyle -T ":completion:${curcontext}:printers" verbose; then
+    zformat -a list ' -- ' "$_lp_cache[@]"
+    disp=(-ld list)
   else
-    return 1
+    disp=()
   fi
+  _wanted printers expl printer \
+      compadd "$disp[@]" - "${(@)_lp_cache%%:*}" && return 0
+
+  (( $+_lp_alias_cache )) || return 1
+
+  if zstyle -T ":completion:${curcontext}:printers" verbose; then
+    zformat -a list ' -- ' "$_lp_alias_cache[@]"
+    disp=(-ld list)
+  else
+    disp=()
+  fi
+  _wanted printers expl printer \
+      compadd "$disp[@]" - "${(@)_lp_alias_cache%%:*}" && return 0
+
+  return 1
 else
   if [[ "${words[1]:t}" = (lpq|lprm) ]]; then
     if [[ "$words" = *-P* ]]; then

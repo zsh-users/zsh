@@ -2,7 +2,7 @@
 
 local expl
 
-_wanted fonts || return 1
+_tags fonts || return 1
 
 # This *has* to be improved some day...
 
@@ -12,5 +12,5 @@ if (( ! $+_font_cache )); then
  _font_cache=( "${(@)^${(@f)$(_call fonts xlsfonts)}%%--*}--" )
 fi
 
-_all_labels fonts expl font \
+_wanted fonts expl font \
     compadd -M 'r:|-=* r:|=*' "$@" -S '' - "$_font_cache[@]"

@@ -1,3 +1,36 @@
+2000-04-11  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+
+	* 10632: Completion/Base/_brace_parameter, Completion/Base/_condition,
+ 	Completion/Base/_default, Completion/Base/_describe,
+ 	Completion/Base/_first, Completion/Base/_jobs,
+ 	Completion/Base/_values, Completion/Builtins/_compdef,
+ 	Completion/Builtins/_hash, Completion/Builtins/_pids,
+ 	Completion/Builtins/_popd, Completion/Builtins/_sched,
+ 	Completion/Builtins/_signals, Completion/Builtins/_vars,
+ 	Completion/Builtins/_zcompile, Completion/Builtins/_zftp,
+ 	Completion/Builtins/_zpty, Completion/Builtins/_zstyle,
+ 	Completion/Commands/_next_tags, Completion/Core/_all_labels,
+ 	Completion/Core/_files, Completion/Core/_next_label,
+ 	Completion/Core/_requested, Completion/Core/_wanted,
+ 	Completion/Debian/_apt, Completion/Debian/_deb_packages,
+ 	Completion/User/_cvs, Completion/User/_gdb,
+ 	Completion/User/_gprof, Completion/User/_groups,
+ 	Completion/User/_lp, Completion/User/_mh, Completion/User/_mount,
+ 	Completion/User/_netscape, Completion/User/_nslookup,
+ 	Completion/User/_rlogin, Completion/User/_socket,
+ 	Completion/User/_tiff, Completion/User/_urls,
+ 	Completion/User/_users, Completion/User/_users_on,
+ 	Completion/User/_whois, Completion/X/_x_colormapid,
+ 	Completion/X/_x_display, Completion/X/_x_extension,
+ 	Completion/X/_x_font, Completion/X/_x_keysym,
+ 	Completion/X/_x_window, Completion/X/_xmodmap,
+ 	Completion/X/_xutils, Completion/X/_xwit, Doc/Zsh/compsys.yo,
+ 	Etc/completion-style-guide, Functions/Zftp/zfcd_match,
+ 	Functions/Zftp/zfget_match, Src/Zle/computil.c: _wanted now tests
+ 	both tags and labels; change places where _wanted was called
+ 	without a command; allow multiple patterns per string in
+ 	file-patterns; update _next_tags to work with labels
+	
 2000-04-10  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* 10628: Doc/Zsh/compsys.yo, Completion/User/_make: Check for

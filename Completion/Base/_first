@@ -35,28 +35,35 @@
 # and hitting TAB.
 #
 #     if [[ "$PREFIX" = *,, ]]; then
-#       local max i=1
+#       local max i=1 expl opt
 #     
 #       PREFIX="$PREFIX[1,-2]"
 #       # If a numeric prefix is given, we use it as the number of
 #       # lines (multiplied by ten below) in the history to search.
-#       if [[ NUMERIC -gt 1 ]]; then
+#       if [[ ${NUMERIC:-1} -gt 1 ]]; then
 #         max=$NUMERIC
-#         NUMERIC=1
+#         unset NUMERIC
 #       else
 #         # The default is to search the last 100 lines.
 #         max=10
 #       fi
-#       # We first search in the last ten lines, then in the last
-#       # twenty lines, and so on...
+#       # We first search in the last ten words, then in the last
+#       # twenty words, and so on...
 #       while [[ i -le max ]]; do
-#         if compgen -X "%Bhistory ($n):%b" -Q -H $(( i*10 )) ''; then
+#         if zstyle -t ":completion:${curcontext}:history-words" sort; then
+#           opt=-J
+#         else
+#           opt=-V
+#         fi
+#         if _wanted "$opt" history-words expl "history ($n)" \
+#                compadd "$expl[@]" -Q - \
+#                    "${(@)${(@)historywords:#[\$'\"]*}[1,i*10]}"; then
 #           # We have found at least one matching word, so we switch
 #           # on menu-completion and make sure that no other
-#           # completion function is called by setting _comp_skip.
+#           # completion function is called by setting _compskip.
 #           compstate[insert]=menu
-#           _comp_skip=1
-#           return
+#           _compskip=all
+#           return 0
 #         fi
 #         (( i++ ))
 #       done

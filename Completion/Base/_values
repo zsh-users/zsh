@@ -18,7 +18,7 @@ if compvalues -i "$@"; then
 
   if ! compvalues -D descr action; then
 
-    _wanted values || return 1
+    _tags values || return 1
 
     curcontext="${oldcontext%:*}:values"
 

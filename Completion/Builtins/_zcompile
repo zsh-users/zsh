@@ -18,5 +18,6 @@ _arguments -s \
 if (( $+opt_args[-c] )); then
   _wanted functions expl 'function to write' compadd - ${(k)functions}
 else
-  _wanted file expl 'zsh source file' _files
+  _description files expl 'zsh source file'
+  _files "$expl[@]"
 fi

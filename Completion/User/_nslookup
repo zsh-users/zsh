@@ -19,9 +19,7 @@
 # other characters than lower case letters, we try to call the function
 # `_nslookup_host'.
 
-setopt localoptions extendedglob
-
-local state expl ret=1 setopts
+local context curstate="$curcontext" expl ret=1 setopts
 
 setopts=(
   'all[print current values]' \
@@ -40,7 +38,7 @@ setopts=(
   '(noignoretc)ignoretc[ignore packet truncation errors]' \
   '(ignoretc)noignoretc[don'"'"'t ignore packet truncation errors]' \
   'class[change query class]:query class:((in\:Internet\ class chaos\:CHAOS\ class hesiod\:MIT\ Athena\ Hesiod\ class any\:wildcard\ \(any\ of\ the\ above\)))'
-  'domain[change default domain]:default domain:_hosts'
+  "domain[change default domain]:default domain:_domains"
   'srchlist[change default domain and search list]: :->srchlist'
   'port[change name server port]:name server port:'
   {query,}type'[change type of information query]:query information type:((a\:internet\ address cname\:canonical\ name\ for\ alias hinfo\:CPU\ and\ operating\ system\ type minfo\:mailbox\ or\ mail\ list\ information mx\:mail\ exchanger ns\:name\ server\ for\ zone ptr\:host\ name\ or\ other\ information soa\:domain\'"'"'s\ \`start-of-authority\'"'"'\ information txt\:text\ information uinfo\:user\ information wks\:supported\ well-known\ services))'
@@ -52,23 +50,25 @@ setopts=(
 if [[ -n "$compcontext" ]]; then
   if [[ CURRENT -eq 1 ]]; then
 
-    funcall ret _nslookup_command && return ret
+    _funcall ret _nslookup_command && return ret
 
-    _description expl 'command'
-    compadd "$expl[@]" - server lserver root finger ls view help set && ret=0
-    _hosts && ret=0
+    _alternative \
+        'commands:command:(server lserver root finger ls view help set exit)' \
+	'hosts:: _hosts' && ret=0
     return ret
   elif [[ "$compstate[context]" = redirect ]]; then
 
-    funcall ret _nslookup_redirect && return ret
+    _funcall ret _nslookup_redirect && return ret
+
+    _tags -C redirection files || return 1
 
     if [[ "$words[1]" != (finger|ls) ]]; then
       _message "redirection not allowed for command \`$words[1]'"
       return 1
     elif [[ "$compstate[redirect]" = '>' ]]; then
-      _description expl 'write to file'
+      _description files expl 'write to file'
     elif [[ "$compstate[redirect]" = '>>' ]]; then
-      _description expl 'append to file'
+      _description files expl 'append to file'
     else
       _message "unknown redirection operator \`$compstate[redirect]'"
       return 1
@@ -79,15 +79,14 @@ if [[ -n "$compcontext" ]]; then
   fi
 
   if [[ "$words[1]" = [a-z]## ]]; then
-    funcall ret _nslookup_$words[1] && return ret
+    _funcall ret _nslookup_$words[1] && return ret
   else
-    funcall ret _nslookup_host && return ret
+    _funcall ret _nslookup_host && return ret
   fi
 
   case "$words[1]" in
   (|l)server)
-    _description expl 'new default server'
-    _hosts "$expl[@]"
+    _wanted hosts expl 'new default server' _hosts
     return
     ;;
   root|exit|help|\?)
@@ -104,24 +103,23 @@ if [[ -n "$compcontext" ]]; then
      '-d[all records]' \
      '-h[CPU and operating system information]' \
      '-s[well-known services]' \
-     ':domain:_hosts'
+     ":domain:_domains"
     return
     ;;
   view)
-    _description expl 'view file'
+    _description files expl 'view file'
     _files "$expl[@]"
     return
     ;;
   set)
-    typeset -A values
+    typeset -A val_args
 
     _values 'state information' "$setopts[@]" && ret=0
 
     [[ -z "$state" ]] && return ret
     ;;
   *)
-    _description expl 'server'
-    _hosts "$expl[@]"
+    _wanted hosts expl 'server' _hosts
     return
   esac
 fi
@@ -130,9 +128,9 @@ fi
 
 if [[ -z "$state" ]]; then
   local line
-  typeset -A options
+  typeset -A opt_args
 
-  _arguments \
+  _arguments -C \
     "-${(@)^${(@M)setopts:#*\]:*}/\[/=[}" \
     "-${(@)^setopts:#(\(|*\]:)*}" \
     "${(@)^${(@)${(@M)setopts:#\(*}/\)/)-}/\(/(-}" \
@@ -143,15 +141,17 @@ fi
 # This is completion after `srchlist' for both types.
 
 if [[ -n "$state" ]]; then
+  _tags domains || return 1
+
   if compset -P '*/'; then
-    _description expl 'search list entry'
+    _description domains expl 'search list entry'
   else
-    _description expl 'default domain name and first search list entry'
+    _description domains expl 'default domain name and first search list entry'
   fi
   if [[ -n "$_vals_cache_multi" ]]; then
-    _hosts "$expl[@]" -qS/ -r "/\\- \\t\\n$_vals_cache_multi"
+    _domains "$expl[@]" -qS/ -r "/\\- \\t\\n$_vals_cache_multi"
   else
-    _hosts "$expl[@]" -qS/
+    _domains "$expl[@]" -qS/
   fi
   return
 fi

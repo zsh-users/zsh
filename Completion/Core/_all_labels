@@ -1,11 +1,7 @@
 #autoload
 
-local gopt=-J len tmp pre suf tloop ret=1 descr
+local gopt=-J len tmp pre suf ret=1 descr spec
 
-if [[ "$1" = -t ]]; then
-  tloop=yes
-  shift
-fi
 if [[ "$1" = -([12]|)[VJ] ]]; then
   gopt="$1"
   shift
@@ -24,21 +20,19 @@ else
   suf=5
 fi
 
-while [[ -z "$tloop" ]] || comptags -N; do
-  while comptags -A "$1" curtag; do
-    if [[ "$curtag" = *:* ]]; then
-      zformat -f descr "${curtag#*:}" "d:$3"
-      _description "$gopt" "${curtag%:*}" "$2" "$descr"
-      curtag="${curtag%:*}"
+while comptags -A "$1" curtag spec; do
+  _comp_tags="$_comp_tags $spec "
+  if [[ "$curtag" = *:* ]]; then
+    zformat -f descr "${curtag#*:}" "d:$3"
+    _description "$gopt" "${curtag%:*}" "$2" "$descr"
+    curtag="${curtag%:*}"
 
-      "$4" "${(P@)2}" "${(@)argv[5,-1]}"
-    else
-      _description "$gopt" "$curtag" "$2" "$3"
+    "$4" "${(P@)2}" "${(@)argv[5,-1]}"
+  else
+    _description "$gopt" "$curtag" "$2" "$3"
 
-      "${(@)argv[4,pre]}" "${(P@)2}" "${(@)argv[suf,-1]}" && ret=0
-    fi
-  done
-  [[ -z "$tloop" || ret -eq 0 ]] && break
+    "${(@)argv[4,pre]}" "${(P@)2}" "${(@)argv[suf,-1]}" && ret=0
+  fi
 done
 
 return ret

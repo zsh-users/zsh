@@ -543,7 +543,7 @@ fstype)
       compadd "$expl[@]" -qS, -M 'L:|no=' - "$fss[@]" && ret=0
   ;;
 fsopt)
-  _wanted options || return 1
+  _tags options || return 1
 
   eval 'tmp=(' '"$_fs_'${(s:,:)^${opt_args[$typeops]:-${deffs}}}'[@]"' ')'
   tmp=( "$_fs_any[@]" "${(@)tmp:#}" )

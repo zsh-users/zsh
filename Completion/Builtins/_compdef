@@ -19,15 +19,13 @@ case $state in
     _wanted commands expl 'completed command' compadd - ${(k)_comps}
   ;;
   cfun)
-    if _wanted functions; then
-      list=( ${^fpath:/.}/_(|*[^~])(N:t) )
-      if zstyle -T ":completion:${curcontext}:functions" prefix-hidden; then
-        disp=( ${list[@]#_} )
-        _all_labels functions expl 'completion function' \
-            compadd -d disp - "$list[@]"
-      else
-        _all_labels functions expl 'completion function' compadd - "$list[@]"
-      fi
+    list=( ${^fpath:/.}/_(|*[^~])(N:t) )
+    if zstyle -T ":completion:${curcontext}:functions" prefix-hidden; then
+      disp=( ${list[@]#_} )
+      _wanted functions expl 'completion function' \
+          compadd -d disp - "$list[@]"
+    else
+      _wanted functions expl 'completion function' compadd - "$list[@]"
     fi
   ;;
   style)

@@ -5,7 +5,7 @@
 
 local out list expl match desc listargs args
 
-_wanted processes || return 1
+_tags processes || return 1
 
 if [[ "$1" = -m ]]; then
   match="${2}*"
@@ -29,6 +29,6 @@ else
   desc=()
 fi
 
-_all_labels processes expl 'process ID' \
+_wanted processes expl 'process ID' \
     compadd "$@" "$desc[@]" - \
         ${${${(M)${(f)"${out}"}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]#*${~match}}## #}%% *}

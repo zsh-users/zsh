@@ -945,15 +945,19 @@ expected by the caller of tt(_files).
 
 If the tt(file-patterns) style is set, the default tags are not
 used. Instead, the value of the style says which tags and which
-patterns are to be offered. The strings in the value are of the form
-`var(patterns)tt(:)var(tag)'. The var(patterns) gives one or more glob 
-patterns separated by spaces that are to be used to generate
+patterns are to be offered. The strings in the value contain
+specifications of the form
+`var(patterns)tt(:)var(tag)'; each string may contain any number of
+such specifications. The var(patterns) give one or more glob 
+patterns separated by commas that are to be used to generate
 filenames. If it contains the sequence `tt(%p)', that is replaced by
 the pattern(s) given by the calling function.
 Colons in the pattern have to be preceded by a backslash to
 make them distinguishable from the colon before the var(tag). The
 var(tag)s of all strings in the value will be offered by tt(_files)
-(again, one after another) and used when looking up other styles. If
+(again, one after another) and used when looking up other styles. For
+strings containing more than one specification, the filenames for all
+specifications will be generated at the same try. If
 no `tt(:)var(tag)' is given the `tt(files)' tag will be used. The
 var(tag) may also be
 followed by an optional second colon and a description. If that is
@@ -978,7 +982,7 @@ directories in the first try and all files as the second try. To
 achieve this, one could do:
 
 example(zstyle ':completion:*' file-patterns \ 
-    '%p *(-/):globbed-files' '*:all-files')
+    '%p:globbed-files *(-/):directories' '*:all-files')
 
 Note also that during the execution of completion functions, the
 tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
@@ -2216,22 +2220,12 @@ var(N), complete the var(N)th most recently modified file.  Note the
 completion, if any, is always unique.
 )
 findex(_next_tags)
-item(tt(_next_tags))(
+item(tt(_next_tags) (^Xn))(
 This allows to complete types of matches that are not immediately
 offered because of the setting of the tt(tag-order) style. After a
 normal completion was tried, invoking this command makes the matches
 for the next tag (or set of tags) be used. Repeatedly invoking this
-command makes the following tags be used. To be able to complete the
-matches selected by tt(_next_tags), the tt(completer) style should
-contain tt(_next_tags) as its first string. With that, the normal key
-binding (normally tt(TAB)) can be used to complete the matches shown
-after the call to tt(_next_tags).
-
-Normally, this command is not bound to a key. To invoke it with, say
-`tt(^Xn)', one would use:
-
-example(zle -C _next_tags complete-word _next_tags
-bindkey '^Xn' _next_tags)
+command makes the following tags be used.
 )
 findex(_read_comp (^X^R))
 item(tt(_read_comp (^X^R)))(
@@ -2442,7 +2436,7 @@ user to the tt(tag-order) style is prefered over the one given to
 tt(_next_label).
 
 Note that this function must not be called without a previous call to
-tt(_tags), tt(_wanted) or tt(_requested) because it uses the tag label
+tt(_tags) or tt(_requested) because it uses the tag label
 for the current tag found by these functions.
 
 A normal use of this function for the tag labels for the tag tt(foo)
@@ -2450,12 +2444,13 @@ looks like this:
 
 example(local expl ret=1
 ...
-_wanted foo || return 1
-...
-while _next_label foo expl '...'; do
-  compadd "$expl[@]" ... && ret=0
-done
-...
+if _requested foo; then
+  ...
+  while _next_label foo expl '...'; do
+    compadd "$expl[@]" ... && ret=0
+  done
+  ...
+fi
 return ret
 )
 )
@@ -2477,9 +2472,10 @@ For example:
 
 example(local expl
 ...
-_wanted foo || return 1
-...
-_all_labels foo expl '...' compadd ... - $matches)
+if _requested foo; then
+  ...
+  _all_labels foo expl '...' compadd ... - $matches
+fi)
 
 Will complete the strings from the tt(matches) parameter, using
 tt(compadd) with additional options which will take precedence over
@@ -2525,7 +2521,7 @@ while _tags; do
 done)
 )
 findex(_wanted)
-item(tt(_wanted) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(specs) ... ])(
+item(tt(_wanted) [ tt(-12VJ) ] var(tag) var(name) var(descr) var(command) var(args) ...)(
 In many contexts only one type of matches can be generated but even
 then it should be tested if the tag representing those matches is
 requested by the user. This function makes that easier.
@@ -2538,6 +2534,10 @@ description built, you can just do:
 
 example(_wanted tag expl 'description' \ 
     compadd matches...)
+
+Unlike tt(_requested), however, tt(_wanted) can not be called without
+the var(command). That's because tt(_wanted) also implements the loop
+over the tags, not only the one for the labels.
 )
 findex(_alternative)
 item(tt(_alternative) [ tt(-C) var(name) ] var(specs) ...)(

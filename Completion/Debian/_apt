@@ -75,7 +75,7 @@ _apt_arguments () {
   nul=$'\0'
   qnul="\$'\\0'"
 
-  comp_bool='_wanted values && compadd "$expl_bool[@]" '"$bool"
+  comp_bool='_wanted values expl_bool "boolean value" compadd "$expl_bool[@]" '"$bool"
   comp_intlevel= #"_message 'intlevel'"
   comp_configfile='_files "$expl_configfile[@]"'
   comp_arbitem= #"_message 'Foo::Bar=bar'"

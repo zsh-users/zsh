@@ -11,13 +11,13 @@ _arguments -C -s \
   '(-e -b -d -w -r)-L[list defined commands as calls]' \
   '(-r)*::args:_normal'
 
-if [[ $state = name ]] && _wanted names; then
+if [[ $state = name ]]; then
   list=( ${${(f)"$(zpty)"}#*\) } )
   names=( ${list%%:*} )
   if zstyle -T ":completion:${curcontext}" verbose; then
     zformat -a list ' --' ${${(f)"$(zpty)"}#*\) }
-    _all_labels names expl 'zpty command names' compadd -d list - "$names[@]"
+    _wanted names expl 'zpty command names' compadd -d list - "$names[@]"
   else
-    _all_labels names expl 'zpty command names' compadd - "$names[@]"
+    _wanted names expl 'zpty command names' compadd - "$names[@]"
   fi
 fi

@@ -1,3 +1,3 @@
 #autoload
 
-_wanted displays && _hosts -S ':0 ' -r :
+_tags displays && _hosts -S ':0 ' -r :

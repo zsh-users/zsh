@@ -1,13 +1,14 @@
 #autoload
 
-local gopt=-J descr
+local gopt=-J descr spec
 
 if [[ "$1" = -([12]|)[VJ] ]]; then
   gopt="$1"
   shift
 fi
 
-if comptags -A "$1" curtag; then
+if comptags -A "$1" curtag spec; then
+  _comp_tags="$_comp_tags $spec "
   if [[ "$curtag" = *:* ]]; then
     zformat -f descr "${curtag#*:}" "d:$3"
     _description "$gopt" "${curtag%:*}" "$2" "$descr"

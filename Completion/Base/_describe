@@ -14,8 +14,6 @@ fi
 
 # Do the tests. `showd' is set if the descriptions should be shown.
 
-_wanted "$_type" || return 1
-
 zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes
 
 _descr="$1"
@@ -24,30 +22,35 @@ shift
 [[ "$_type" = options ]] &&
     zstyle -t ":completion:${curcontext}:options" prefix-hidden && _hide=yes
 
-while _next_label "$_type" _expl "$_descr"; do
+_tags "$_type"
+while _tags; do
+  while _next_label "$_type" _expl "$_descr"; do
 
-  if [[ -n "$_showd" ]]; then
-    compdescribe -I ' -- ' "$@"
-  else
-    compdescribe -i "$@"
-  fi
-
-  while compdescribe -g _args _tmpd _tmpmd _tmps _tmpms; do
-
-    # See if we should remove the option prefix characters.
-
-    if [[ -n "$_hide" ]]; then
-      if [[ "$PREFIX" = --* ]]; then
-        _tmpd=( "${(@)_tmpd#--}" )
-        _tmps=( "${(@)_tmps#--}" )
-      elif [[ "$PREFIX" = [-+]* ]]; then
-        _tmpd=( "${(@)_tmpd#[-+]}" )
-        _tmps=( "${(@)_tmps#[-+]}" )
-      fi
+    if [[ -n "$_showd" ]]; then
+      compdescribe -I ' -- ' "$@"
+    else
+      compdescribe -i "$@"
     fi
 
-    compadd "$_args[@]" "$_expl[@]" -ld _tmpd - "$_tmpmd[@]" && _ret=0
-    compadd "$_args[@]" "$_expl[@]" -d _tmps  - "$_tmpms[@]" && _ret=0
+    while compdescribe -g _args _tmpd _tmpmd _tmps _tmpms; do
+
+      # See if we should remove the option prefix characters.
+
+      if [[ -n "$_hide" ]]; then
+        if [[ "$PREFIX" = --* ]]; then
+          _tmpd=( "${(@)_tmpd#--}" )
+          _tmps=( "${(@)_tmps#--}" )
+        elif [[ "$PREFIX" = [-+]* ]]; then
+          _tmpd=( "${(@)_tmpd#[-+]}" )
+          _tmps=( "${(@)_tmps#[-+]}" )
+        fi
+      fi
+
+      compadd "$_args[@]" "$_expl[@]" -ld _tmpd - "$_tmpmd[@]" && _ret=0
+      compadd "$_args[@]" "$_expl[@]" -d _tmps  - "$_tmpms[@]" && _ret=0
+    done
   done
+  (( _ret )) || return 0
 done
-return _ret
+
+return 1

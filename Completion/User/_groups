@@ -2,7 +2,7 @@
 
 local expl groups tmp
 
-_wanted groups || return 1
+_tags groups || return 1
 
 if ! zstyle -a ":completion:${curcontext}:" groups groups; then
   (( $+_cache_groups )) ||
@@ -16,4 +16,4 @@ if ! zstyle -a ":completion:${curcontext}:" groups groups; then
   groups=( "$_cache_groups[@]" )
 fi
 
-_all_labels groups expl group compadd "$@" - "$groups[@]"
+_wanted groups expl group compadd "$@" - "$groups[@]"

@@ -63,12 +63,12 @@ example).
 Then, before adding the matches, see if matches of that type are
 requested by the user in the current context. If you will add only one 
 type of matches, this is very simple. You can use the function
-`_wanted' for this. Its return value is zero only if the type of
-matches is requested by the user, so you can just do:
+`_wanted' for this. Well, you can often use it, that is. Use it as in:
 
-  _wanted names || return 1
+  _wanted names expl 'name' compadd - alice bob
 
-  _all_labels names expl 'name' compadd - alice bob
+This is like testing if the tag `names' is requested by the user and
+then calling `_all_labels' with the same arguments.
 
 The `_all_labels' function implements the loop over the tag aliases and
 handles the user-defined description, using (in the example) the
@@ -87,13 +87,6 @@ the last argument. A good example for such a function is
 
 And the `-' will be replaced by the options that are to be given to
 `compadd'.
-
-Since the above sequence of command is used so often, the `_wanted'
-function can also accept the same arguments as `_all_labels'. In this
-case it will do the test for the requested tag and then just call
-`_all_labels', so:
-
-  _wanted names expl 'name' compadd - alice bob
 
 Note that you can also give the `-J' and `-V' options with the
 optional `1' or `2' preceding them supported by `_description':
@@ -332,11 +325,11 @@ often be using the tags function that allows you to give the
 explanation to the same function that is used to test if the tags are
 requested (again: see above). Just as a reminder:
 
-  _wanted [ -[1,2]V | -[1,2]J ] <tag> expl <descr>
+  _wanted [ -[1,2]V | -[1,2]J ] <tag> expl <descr> <cmd> ...
 
 and
 
-  _requested [ -[1,2]V | -[1,2]J ] <tag> expl <descr>
+  _requested [ -[1,2]V | -[1,2]J ] <tag> expl <descr> [ <cmd> ... ]
 
 is all you need to make your function work correctly with both tags
 and description at the same time.

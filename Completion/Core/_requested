@@ -8,7 +8,6 @@ if [[ "$1" = -([12]|)[VJ] ]]; then
 fi
 
 if comptags -R "$1"; then
-  _comp_tags="$_comp_tags $1"
   if [[ $# -gt 3 ]]; then
     _all_labels "$gopt" "$@"
   elif [[ $# -gt 1 ]]; then

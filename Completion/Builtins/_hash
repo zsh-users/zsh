@@ -1,13 +1,16 @@
-#defcomp hash
+#compdef hash
 
-if [[ -mword 1 -*d* ]]; then
-  if [[ -string 1 '=' ]]; then
-    _path_files -g '*(-/)'
+local expl
+
+if [[ "$words[2]" = -*d* ]]; then
+  if compset -P 1 '*='; then
+    _wanted -C -d-value files expl directories _path_files -/
   else
-    complist -n -q -S '='
+    _wanted -C -d named-directories expl 'named directory' \
+        compadd -q -S '=' - "${(@k)nameddirs}"
   fi
-elif [[ -string 1 '=' ]]; then
-  _files -/g '*(*)'
+elif compset -P 1 '*='; then
+  _wanted -C value values expl 'executable file' _files "$expl[@]" -g '*(-*)'
 else
-  complist -m -q -S '='
+  _wanted -C name commands expl command compadd -q -S '=' - "${(@k)commands}"
 fi

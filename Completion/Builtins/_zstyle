@@ -96,20 +96,18 @@ while [[ -n $state ]]; do
 
   case "$ostate" in
     contexts)
-      if _wanted contexts; then
-        if [[ $PREFIX != :*: ]]; then
-	  _all_labels contexts expl context compadd -P : -S : completion zftp
-        elif [[ $PREFIX = :completion:* ]]; then
-          mesg=''
-          case "$PREFIX" in
-          :completion:[^:]#) mesg=function ;;
-          :completion:[^:]#:[^:]#) mesg=completer ;;
-          :completion:[^:]#:[^:]#:[^:]#) mesg='command or context' ;;
-          :completion:[^:]#:[^:]#:[^:]#:[^:]#) mesg=argument ;;
-          :completion:[^:]#:[^:]#:[^:]#:[^:]#:[^:]#) mesg=tag ;;
-	  esac
-	  [[ -n "$mesg" ]] && _message "$mesg"
-        fi
+      if [[ $PREFIX != :*: ]]; then
+	_wanted contexts expl context compadd -P : -S : completion zftp
+      elif [[ $PREFIX = :completion:* ]] && _tags contexts; then
+        mesg=''
+        case "$PREFIX" in
+        :completion:[^:]#) mesg=function ;;
+        :completion:[^:]#:[^:]#) mesg=completer ;;
+        :completion:[^:]#:[^:]#:[^:]#) mesg='command or context' ;;
+        :completion:[^:]#:[^:]#:[^:]#:[^:]#) mesg=argument ;;
+        :completion:[^:]#:[^:]#:[^:]#:[^:]#:[^:]#) mesg=tag ;;
+	esac
+	[[ -n "$mesg" ]] && _message "$mesg"
       fi
       ;;
 

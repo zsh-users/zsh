@@ -1,5 +1,3 @@
-#defcomp -brace-parameter-
+#compdef -brace-parameter-
 
-# Simple but without spiffy suffix handling: compgen -v -S '} '
-
-compadd -S '} ' -r '-:?#%+=[/'  - "${(@)${${${(f)$(typeset)}%%\=*}##* }:gs/'//}"
+_parameters -e

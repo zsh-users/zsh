@@ -2291,7 +2291,7 @@ bin_comptags(char *nam, char **args, char *ops, int func)
     case 'N': min = 0; max =  0; break;
     case 'R': min = 1; max =  1; break;
     case 'S': min = 1; max =  1; break;
-    case 'A': min = 2; max =  2; break;
+    case 'A': min = 2; max =  3; break;
     default:
 	zwarnnam(nam, "invalid option: %s", args[0], 0);
 	return 1;
@@ -2365,6 +2365,14 @@ bin_comptags(char *nam, char **args, char *ops, int func)
 		}
 		s->ptr = q + 1;
 		setsparam(args[2], ztrdup(*v == '-' ? dyncat(args[1], v) : v));
+		if (args[3]) {
+		    char *r = dupstring(*q), *p;
+
+		    for (p = r + (v - *q); *p && *p != ':'; p++);
+		    *p = '\0';
+
+		    setsparam(args[3], ztrdup(r));
+		}
 		return 0;
 	    }
 	    return 1;

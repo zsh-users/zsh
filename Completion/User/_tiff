@@ -195,12 +195,14 @@ if [[ -n "$state" ]]; then
       ;;
     esac
   else
-    if _wanted values; then
+    _tags values
+    while _tags; do
       while _next_label values expl 'compression scheme'; do
         compadd "$expl[@]" - none g4 packbits && ret=0
         compadd "$expl[@]" -qS: - lzw zip jpeg g3 && ret=0
       done
-    fi
+      (( ret )) || return 0
+    done
   fi
 fi
 

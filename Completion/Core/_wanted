@@ -17,17 +17,10 @@ if [[ "$1" = -([12]|)[VJ] ]]; then
   shift
 fi
 
-if [[ $# -gt 3 ]]; then
-  if _tags "$targs[@]" "$1"; then
-    _comp_tags="$_comp_tags $1"
+_tags "$targs[@]" "$1"
 
-    _all_labels -t "$gopt" "$@"
-  else
-    return 1
-  fi
-elif [[ $# -gt 1 ]]; then
-  _tags -- "$targs[@]" "$1" && _comp_tags="$_comp_tags $1" &&
-    _description "$gopt" "$@"
-else
-  _tags -- "$targs[@]" "$1" && _comp_tags="$_comp_tags $1"
-fi
+while _tags; do
+  _all_labels "$gopt" "$@" && return 0
+done
+
+return 1
