@@ -786,6 +786,42 @@ See `Accessing On-Line Help'
 ifzman(above)\
 ifnzman((noderef(Utilities))).
 )
+findex(zcalc)
+item(tt(zcalc) [ var(expression) ... ])(
+A reasonably powerful calculator based on zsh's arithmetic evaluation
+facility.  The syntax is similar to that of formulae in most programming
+languages; see
+ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
+ifnzman(noderef(Arithmetic Evaluation)) for details.  The mathematical
+library tt(zsh/mathfunc) will be loaded if it is available; see
+ifzman(the section `The zsh/mathfunc Module' in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/mathfunc Module)).  The mathematical functions
+correspond to the raw system libraries, so trigonometric functions are
+evaluated using radians, and so on.
+
+Each line typed is evaluated as an expression.  The prompt shows a number,
+which corresponds to a positional parameter where the result of that
+calculation is stored.  For example, the result of the calculation on the
+line preceeded by `tt(4> )' is available as tt($4).  Full command line
+editing, including the history of previous calculations, is available.
+To exit, enter a blank line or type `tt(q)' on its own.
+
+If arguments are given to tt(zcalc) on start up, they are used to prime the
+first few positional parameters.  A visual indication of this is given when
+the calculator starts.
+
+The constants tt(PI) (3.14159...) and tt(E) (2.71828...) are provided.
+Parameter assignment is possible, but note that all parameters will be put
+into the global namespace.
+
+An extra facility is provided for changing the default output base.  Use,
+for example, `tt([#16])' to display hexadecimal output preceeded by an
+indication of the base, or `tt([##16])' just to display the raw number in
+the given base.  Bases themselves are always specified in decimal.
+`tt([#])' restores the normal output format.
+
+See the comments in the function for a few extra tips.
+)
 findex(zed)
 item(tt(zed) [ tt(-f) ] var(name))(
 This function uses the ZLE editor to edit a file or function.  It rebinds

@@ -1,3 +1,11 @@
+2001-07-27  Peter Stephenson  <pws@csr.com>
+
+	* 15508: Completion/Unix/Command/_cvs: cvs tag told you it was
+	going to complete a tag, but then didn't.
+
+	* 15507: Functions/Misc/zcalc, Doc/Zsh/contrib.yo: new zcalc
+	shell function.
+
 2001-07-26  Oliver Kiddle  <opk@zsh.org>
 
 	* 15503: Test/E01options.ztst: fix posixbuiltins test so that it

@@ -525,7 +525,7 @@ _cvs_tag () {
     '(-d)-f[force a head revision]' \
     '-r+[specify revision]:tag:_cvs_revisions' \
     '-D+[specify date]:date:_cvs_D' \
-    ':tag:' \
+    ':tag:_cvs_revisions' \
     '*:file:_cvs_files'
 }
 
