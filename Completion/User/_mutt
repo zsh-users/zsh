@@ -8,7 +8,7 @@ local curcontext="$curcontext" state line ret=1
  '-b:BCC recipient:->userhost' \
  '-c:CC recipient:->userhost' \
  '-e:post-init configuration:' \
- '-f+:mailbox:_mailboxes' \
+ '-f+:mailbox: _mailboxes' \
  '-F+:init file:_files' \
  '-h+:help:' \
  '-H+:draft file:_files' \

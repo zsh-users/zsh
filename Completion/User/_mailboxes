@@ -5,42 +5,89 @@ setopt localoptions nullglob
 
 # This is still needlessly mutt-biased and should be fixed.
 
-local -U muttboxes mboxes dirboxes MHboxes maildirboxes
+local -U dirboxes
 local i j expl muttrc="${muttrc:-~/.muttrc}"
 local pinedirectory="${pinedirectory:-~/mail}"
 local maildirectory="${maildirectory:-~/Mail}"
 
 if (( ! $+_mailbox_cache )) then
 
-  [[ -f ${~muttrc:-.} ]] && muttboxes=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
+  typeset -U -g _mailbox_cache
+  typeset -U -g _maildir_cache _mbox_cache _mh_cache _mutt_cache _pine_cache
 
-  mboxes=( ${~maildirectory}/*(^/) ${~pinedirectory}/**/*(.) )
+  [[ -f ${~muttrc:-.} ]] &&
+    _mutt_cache=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
+
+  _mbox_cache=( ${~maildirectory}/*(^/) )
+  _pine_cache=( ${~pinedirectory}/**/*(.) )
+
   dirboxes=( ${~maildirectory}/*(/) )
 
   while (( $#dirboxes )); do
-    i=$dirboxes[1]
+    i=${dirboxes[1]}
     shift dirboxes
     if [[ -d "$i/cur" ]]; then
-      maildirboxes=( $maildirboxes $i )
+      _maildir_cache=( "${_maildir_cache[@]}" "$i" )
     elif j=( $i/<1-> ) && [[ -n "$j" ]]; then
-      MHboxes=( $MHboxes $i )
+      _mh_cache=( "${_mh_cache[@]}" "$i" )
     else
-      mboxes=( $mboxes $i/*(.) )
+      _mbox_cache=( "${_mbox_cache[@]}" "$i"/*(.) )
       dirboxes=( $dirboxes $i/*(/) )
     fi
   done
 
-  [[ -n "$muttboxes" || -d ~/.elm || -d ~/.mutt ]] &&
-      _mailbox_cache=(\! \< \> $muttboxes)
+  [[ -n "$_mutt_cache" || -d ~/.elm || -d ~/.mutt ]] &&
+      _mailbox_cache=( \! \< \> )
   [[ -n "$mailpath" ]] &&
-      _mailbox_cache=($_mailbox_cache ${mailpath//\?*/})
+      _mailbox_cache=( "${_mailbox_cache[@]}" "${(@)mailpath%%\?*}" )
 
-  _mailbox_cache=($_mailbox_cache $mboxes $maildirboxes $MHboxes)
+  _mailbox_cache=( "${_mailbox_cache[@]}" $MAIL )
 fi
 
 if _wanted files expl 'mailbox specification'; then
-    local opre=$PREFIX
-    [[ $PREFIX = +* ]] && PREFIX="$~maildirectory/${PREFIX#+}"
-    compadd "$@" "$expl[@]" - "$_mailbox_cache[@]"
-    PREFIX=$opre
+  local -U mbox_names
+  case "${curcontext}" in
+  (*:elm:*) # I've probably got this wrong, or at least incomplete
+    compadd "${expl[@]}" - \! \< \>
+    mbox_names=( "${_mbox_cache[@]}" "${_mailbox_cache[@]}" )
+    _multi_parts "${expl[@]}" / mbox_names;;
+  (*:mail:*)
+    if compset -P '+|-f+'; then
+      mbox_names=( "${(@)_mbox_cache#$~maildirectory/}" )
+      _multi_parts "${expl[@]}" / mbox_names
+    else
+      mbox_names=( +"${(@)^_mbox_cache#$~maildirectory/}" "${_mailbox_cache[@]}" )
+      _multi_parts "${expl[@]}" / mbox_names
+      _path_files -J all-files
+    fi;;
+  (*:mh:*) # I've probably got this wrong, or at least incomplete
+    (( $#_mh_cache )) && _multi_parts "${expl[@]}" / _mh_cache;;
+  (*:mutt:*)
+    mbox_names=( "${_mutt_cache[@]}" "${_mailbox_cache[@]}" "${_maildir_cache[@]}" )
+    compadd "${expl[@]}" - \! \< \>
+    _multi_parts "${expl[@]}" / mbox_names;;
+  (*:pine:*)
+    # Pine is like mail but with no leading `+' to disambiguate;
+    # any files not in $pinedirectory must be absolute paths.
+    mbox_names=( "${(@)_pine_cache#$~pinedirectory/}" "${_mbox_cache[@]}" )
+    _multi_parts "${expl[@]}" / mbox_names
+    # _path_files -J all-files -g '/*'
+    ;;
+  (*:(zmail|zmlite):*)
+    if compset -P '+|-f+'; then
+      mbox_names=( "${(@)_mbox_cache#$~maildirectory/}" )
+      _multi_parts "${expl[@]}" / mbox_names
+    else
+      compadd "${expl[@]}" - % \&
+      mbox_names=( +"${(@)^_mbox_cache#$~maildirectory/}"
+		   "${_mailbox_cache[@]}" "${_mh_cache[@]}" )
+      _multi_parts "${expl[@]}" / mbox_names
+      _path_files -J all-files
+    fi
+    ;;
+  (*) # Some other program wants mailbox names?  Use them all?
+    mbox_names=( "${_mailbox_cache[@]}" "${_mbox_cache[@]}"
+		 "${_mh_cache[@]}" "${_mutt_cache[@]}" "${_pine_cache[@]}" )
+    _multi_parts "${expl[@]}" / mbox_names;;
+  esac
 fi
