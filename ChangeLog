@@ -1,3 +1,7 @@
+2003-02-06  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/compinit: conjugate "need" properly.
+
 2003-01-29  Oliver Kiddle  <opk@zsh.org>
 
 	* 18149, 18153, 18156: Completion/bashcompinit, Doc/Zsh/compsys.yo:

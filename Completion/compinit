@@ -219,7 +219,7 @@ compdef() {
   # Get the options.
 
   if [[ $#* -eq 0 ]]; then
-    echo "$0: I needs arguments"
+    echo "$0: I need arguments"
     return 1
   fi
 
@@ -249,7 +249,7 @@ compdef() {
   shift OPTIND-1
 
   if [[ $#* -eq 0 ]]; then
-    echo "$0: I needs arguments"
+    echo "$0: I need arguments"
     return 1
   fi
 
