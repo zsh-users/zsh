@@ -1733,7 +1733,9 @@ unsetparam(char *s)
 {
     Param pm;
 
-    if ((pm = (Param) paramtab->getnode(paramtab, s)))
+    if ((pm = (Param) (paramtab == realparamtab ?
+		       gethashnode2(paramtab, s) :
+		       paramtab->getnode(paramtab, s))))
 	unsetparam_pm(pm, 0, 1);
 }
 
