@@ -1,5 +1,7 @@
 2000-05-04  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11142: Src/lex.c: save and restore `len' in lexsave/restore
+	
 	* 11140: Completion/Builtins/_zstyle, Completion/Core/_main_complete,
  	Doc/Zsh/compsys.yo, Src/Zle/compcore.c, Src/Zle/compctl.c: don't
  	list when all matches look the same; force-list style to give

@@ -178,6 +178,7 @@ struct lexstack {
     char *yytext;
     char *bptr;
     int bsiz;
+    int len;
     short *chwords;
     int chwordlen;
     int chwordpos;
@@ -236,6 +237,7 @@ lexsave(void)
     ls->yytext = yytext;
     ls->bptr = bptr;
     ls->bsiz = bsiz;
+    ls->len = len;
     ls->chwords = chwords;
     ls->chwordlen = chwordlen;
     ls->chwordpos = chwordpos;
@@ -296,6 +298,7 @@ lexrestore(void)
     yytext = lstack->yytext;
     bptr = lstack->bptr;
     bsiz = lstack->bsiz;
+    len = lstack->len;
     chwords = lstack->chwords;
     chwordlen = lstack->chwordlen;
     chwordpos = lstack->chwordpos;
