@@ -1,3 +1,9 @@
+2003-03-15  Bart Schaefer  <schaefer@zsh.org>
+
+	* 17659, 17661: zshconfig.ac: insert config.modules processing
+	into config.status, so that a full configure is not necessary
+	when changing the module configuration.
+
 2003-03-15  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/X/Command/_xrdb: remove _xrdb as superior

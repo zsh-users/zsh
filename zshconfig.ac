@@ -1909,9 +1909,15 @@ AC_SUBST(EXTRAZSHOBJS)dnl
 # level subdirectories.  Any existing line not containing 'auto=y' will be
 # retained, provided the .mdd file itself was found.
 CONFIG_MODULES=./config.modules
+cat <<EOM > ${CONFIG_MODULES}.sh
+srcdir="$srcdir"
+dynamic="$dynamic"
+CONFIG_MODULES="${CONFIG_MODULES}"
+EOM
+cat <<\EOM >> ${CONFIG_MODULES}.sh
 echo "creating ${CONFIG_MODULES}"
 userlist=" "
-if test -f config.modules; then
+if test -f ${CONFIG_MODULES}; then
   userlist="`sed -e '/^#/d' -e '/auto=y/d' -e 's/ .*/ /' -e 's/^name=/ /' \
         ${CONFIG_MODULES}`"
   mv ${CONFIG_MODULES} ${CONFIG_MODULES}.old
@@ -1997,6 +2003,11 @@ for modfile in `cd ${srcdir}; echo */*.mdd */*/*.mdd`; do
   fi
 done) >${CONFIG_MODULES}
 rm -f ${CONFIG_MODULES}.old
+EOM
+AC_OUTPUT_COMMANDS(,[if test -z "\$CONFIG_FILES\$CONFIG_HEADERS"; then
+`cat ./${CONFIG_MODULES}.sh && rm -f ./${CONFIG_MODULES}.sh`
+fi])
+. ./${CONFIG_MODULES}.sh
 
 CLEAN_MK="${srcdir}/Config/clean.mk"
 CONFIG_MK="${srcdir}/Config/config.mk"
