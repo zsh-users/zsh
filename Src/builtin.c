@@ -4097,13 +4097,14 @@ bin_ttyctl(char *name, char **argv, char *ops, int func)
 int
 bin_let(char *name, char **argv, char *ops, int func)
 {
-    zlong val = 0;
+    mnumber val = zero_mnumber;
 
     while (*argv)
-	val = mathevali(*argv++);
+	val = matheval(*argv++);
     /* Errors in math evaluation in let are non-fatal. */
     errflag = 0;
-    return !val;
+    /* should test for fabs(val.u.d) < epsilon? */
+    return (val.type == MN_INTEGER) ? val.u.l == 0 : val.u.d == 0.0;
 }
 
 /* umask command.  umask may be specified as octal digits, or in the  *
