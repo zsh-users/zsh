@@ -1,3 +1,7 @@
+2000-07-20  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: tweaked a function name in hist.c for Sven.
+
 2000-07-20  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 12239: Fr. Br. George (George V Kouryachy), adapted:
