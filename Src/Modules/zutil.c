@@ -320,6 +320,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 				    else
 					s->pats = p->next;
 				    freestypat(p);
+				    break;
 				}
 			    }
 			}
@@ -335,6 +336,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 				else
 				    s->pats = p->next;
 				freestypat(p);
+				break;
 			    }
 			}
 		    }
