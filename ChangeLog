@@ -1,5 +1,8 @@
 2003-07-09  Peter Stephenson  <pws@csr.com>
 
+	* 18839, modified c.f. 18840: Completion/Unix/Command/_nice,
+	Completion/Zsh/Command/_precommand: Completion for nice.
+
 	* unposted: Config/version.mk: rebrand as 4.1.1-dev-1 to
 	avoid confusion with release version.
 
