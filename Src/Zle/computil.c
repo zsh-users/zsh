@@ -1145,7 +1145,7 @@ ca_get_arg(Cadef d, int n)
 static LinkList ca_xor;
 
 static int
-ca_inactive(Cadef d, char **xor, int cur, int opts)
+ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 {
     if ((xor || opts) && cur <= compcurrent) {
 	Caopt opt;
@@ -1153,6 +1153,8 @@ ca_inactive(Cadef d, char **xor, int cur, int opts)
 	int sl = (d->set ? strlen(d->set) : -1), set = 0;
 
 	for (; (x = (opts ? "-" : *xor)); xor++) {
+            if (optname && strcmp(optname, x))
+                continue;
 	    if (ca_xor)
 		addlinknode(ca_xor, x);
 	    set = 0;
@@ -1315,9 +1317,9 @@ ca_parse_line(Cadef d, int multi, int first)
 	dopt = NULL;
 	doff = state.singles = arglast = 0;
 
-	if (ca_inactive(d, argxor, cur, 0) ||
+	if (ca_inactive(d, argxor, cur, 0, NULL) ||
 	    ((d->flags & CDF_SEP) && cur != compcurrent && !strcmp(line, "--"))) {
-	    if (ca_inactive(d, NULL, cur, 1))
+	    if (ca_inactive(d, NULL, cur, 1, NULL))
 		return 1;
 	    continue;
 	}
@@ -1391,7 +1393,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	    if (!state.oargs[state.curopt->num])
 		state.oargs[state.curopt->num] = znewlinklist();
 
-	    if (ca_inactive(d, state.curopt->xor, cur, 0))
+	    if (ca_inactive(d, state.curopt->xor, cur, 0, state.curopt->name))
 		return 1;
 
 	    /* Collect the argument strings. Maybe. */
@@ -1444,7 +1446,7 @@ ca_parse_line(Cadef d, int multi, int first)
 		    if (!state.oargs[tmpopt->num])
 			state.oargs[tmpopt->num] = znewlinklist();
 
-		    if (ca_inactive(d, tmpopt->xor, cur, 0))
+		    if (ca_inactive(d, tmpopt->xor, cur, 0, tmpopt->name))
 			return 1;
 		}
 	    }
@@ -1476,7 +1478,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	    return 1;
 	else if (state.arg && (!napat || !pattry(napat, line))) {
 	    /* Otherwise it's a normal argument. */
-	    if (napat && ca_inactive(d, NULL, cur + 1, 1))
+	    if (napat && ca_inactive(d, NULL, cur + 1, 1, NULL))
 		return 1;
 
 	    arglast = 1;
@@ -1791,7 +1793,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 			for (node = firstnode(nx); node; incnode(node)) {
 			    xor[0] = (char *) getdata(node);
 			    if (!strcmp(xor[0], def->sname) ||
-				ca_inactive(def, xor, compcurrent, 0))
+				ca_inactive(def, xor, compcurrent, 0, NULL))
 				break;
 			}
 			if (!node)
