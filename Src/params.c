@@ -270,6 +270,7 @@ newparamtable(int size, char const *name)
     ht->hash        = hasher;
     ht->emptytable  = emptyhashtable;
     ht->filltable   = NULL;
+    ht->cmpnodes    = strcmp;
     ht->addnode     = addhashnode;
     ht->getnode     = getparamnode;
     ht->getnode2    = getparamnode;
@@ -282,6 +283,7 @@ newparamtable(int size, char const *name)
     return ht;
 }
 
+/**/
 #ifdef DYNAMIC
 /**/
 static HashNode
@@ -299,6 +301,7 @@ getparamnode(HashTable ht, char *nam)
     }
     return hn;
 }
+/**/
 #endif /* DYNAMIC */
 
 /* Copy a parameter hash table */
@@ -1753,7 +1756,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
      * Some specials, such as those used in zle, still need removing
      * from the parameter table; they have the PM_REMOVABLE flag.
      */
-    if ((locallevel && locallevel >= pm->level) ||
+    if ((pm->level && locallevel >= pm->level) ||
 	(pm->flags & (PM_SPECIAL|PM_REMOVABLE)) == PM_SPECIAL)
 	return;
 
@@ -1963,23 +1966,11 @@ intvarsetfn(Param pm, long x)
 void
 zlevarsetfn(Param pm, long x)
 {
-    if ((long *)pm->u.data == & columns) {
-	if(x <= 0)
-	    x = tccolumns > 0 ? tccolumns : 80;
-	if (x > 2)
-	    termflags &= ~TERM_NARROW;
-	else
-	    termflags |= TERM_NARROW;
-    } else if ((long *)pm->u.data == & lines) {
-	if(x <= 0)
-	    x = tclines > 0 ? tclines : 24;
-	if (x > 2)
-	    termflags &= ~TERM_SHORT;
-	else
-	    termflags |= TERM_SHORT;
-    }
+    long *p = (long *)pm->u.data;
 
-    *((long *)pm->u.data) = x;
+    *p = x;
+    if (p == &lines || p == &columns)
+	adjustwinsize(2 + (p == &columns));
 }
 
 /* Function to set value of generic special scalar    *

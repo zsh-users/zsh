@@ -302,7 +302,11 @@ then
 		echo
 		zmodload -d -L
 		echo
-		zmodload -a -L
+		zmodload -ab -L
+		echo
+		zmodload -ac -L
+		echo
+		zmodload -ap -L
 		echo
 		zmodload -L
 	else

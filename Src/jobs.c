@@ -180,11 +180,14 @@ update_job(Job jn)
     } else {                   /* job is done, so remember return value */
 	lastval2 = val;
 	/* If last process was run in the current shell, keep old status
-	 * and let it handle its own traps
+	 * and let it handle its own traps, but always allow the test
+	 * for the pgrp.
 	 */
-	if (job == thisjob && !(jn->stat & STAT_CURSH)) {
-	  lastval = val;
-	  inforeground = 1;
+	if (jn->stat & STAT_CURSH)
+	    inforeground = 1;
+	else if (job == thisjob) {
+	    lastval = val;
+	    inforeground = 2;
 	}
     }
 
@@ -198,8 +201,20 @@ update_job(Job jn)
 	/* is this job in the foreground of an interactive shell? */
 	if (mypgrp != pgrp && inforeground &&
 	    (jn->gleader == pgrp || (pgrp > 1 && kill(-pgrp, 0) == -1))) {
-	    attachtty(mypgrp);
-	    adjustwinsize();   /* check window size and adjust if necessary */
+	    if (list_pipe) {
+		/*
+		 * Oh, dear, we're right in the middle of some confusion
+		 * of shell jobs on the righthand side of a pipeline, so
+		 * it's death to call attachtty() just yet.  Mark the
+		 * fact in the job, so that the attachtty() will be called
+		 * when the job is finally deleted.
+		 */
+		jn->stat |= STAT_ATTACH;
+	    } else {
+		attachtty(mypgrp);
+		/* check window size and adjust if necessary */
+		adjustwinsize(0);
+	    }
 	}
     }
 
@@ -223,7 +238,7 @@ update_job(Job jn)
      * process group from the shell, so the shell will not receive     *
      * terminal signals, therefore we we pretend that the shell got    *
      * the signal too.                                                 */
-    if (inforeground && isset(MONITOR) && WIFSIGNALED(status)) {
+    if (inforeground == 2 && isset(MONITOR) && WIFSIGNALED(status)) {
 	int sig = WTERMSIG(status);
 
 	if (sig == SIGINT || sig == SIGQUIT) {
@@ -608,6 +623,11 @@ void
 deletejob(Job jn)
 {
     struct process *pn, *nx;
+
+    if (jn->stat & STAT_ATTACH) {
+	attachtty(mypgrp);
+	adjustwinsize(0);
+    }
 
     pn = jn->procs;
     jn->procs = NULL;

@@ -294,7 +294,7 @@ struct linklist {
 #define peekfirst(X) ((X)->first->dat)
 #define pushnode(X,Y) insertlinknode(X,(LinkNode) X,Y)
 #define incnode(X) (X = nextnode(X))
-#define gethistent(X) (histentarr+((X)%histentct))
+#define firsthist() (hist_ring? hist_ring->down->histnum : curhist)
 
 
 /********************************/
@@ -611,6 +611,7 @@ struct job {
 #define STAT_CURSH	(1<<9)	/* last command is in current shell     */
 #define STAT_NOSTTY	(1<<10)	/* the tty settings are not inherited   */
 				/* from this job when it exits.         */
+#define STAT_ATTACH	(1<<11)	/* delay reattaching shell to tty       */
 
 #define SP_RUNNING -1		/* fake status for jobs currently running */
 
@@ -679,6 +680,7 @@ typedef void     (*AddNodeFunc)    _((HashTable, char *, void *));
 typedef HashNode (*GetNodeFunc)    _((HashTable, char *));
 typedef HashNode (*RemoveNodeFunc) _((HashTable, char *));
 typedef void     (*FreeNodeFunc)   _((HashNode));
+typedef int      (*CompareFunc)    _((const char *, const char *));
 
 /* type of function that is passed to *
  * scanhashtable or scanmatchtable    */
@@ -698,6 +700,7 @@ struct hashtable {
     HashFunc hash;		/* pointer to hash function for this table    */
     TableFunc emptytable;	/* pointer to function to empty table         */
     TableFunc filltable;	/* pointer to function to fill table          */
+    CompareFunc cmpnodes;	/* pointer to function to compare two nodes     */
     AddNodeFunc addnode;	/* pointer to function to add new node        */
     GetNodeFunc getnode;	/* pointer to function to get an enabled node */
     GetNodeFunc getnode2;	/* pointer to function to get node            */
@@ -1015,18 +1018,30 @@ struct nameddir {
 /* history entry */
 
 struct histent {
+    HashNode hash_next;		/* next in hash chain               */
     char *text;			/* the history line itself          */
+    int flags;			/* Misc flags                       */
+
+    Histent up;			/* previous line (moving upward)    */
+    Histent down;		/* next line (moving downward)      */
     char *zle_text;		/* the edited history line          */
     time_t stim;		/* command started time (datestamp) */
     time_t ftim;		/* command finished time            */
     short *words;		/* Position of words in history     */
 				/*   line:  as pairs of start, end  */
     int nwords;			/* Number of words in history line  */
-    int flags;			/* Misc flags                       */
+    int histnum;		/* A sequential history number      */
 };
 
-#define HIST_OLD	0x00000001	/* Command is already written to disk*/
-#define HIST_READ	0x00000002	/* Command was read back from disk*/
+#define HIST_MAKEUNIQUE	0x00000001	/* Kill this new entry if not unique */
+#define HIST_OLD	0x00000002	/* Command is already written to disk*/
+#define HIST_READ	0x00000004	/* Command was read back from disk*/
+#define HIST_DUP	0x00000008	/* Command duplicates a later line */
+#define HIST_FOREIGN	0x00000010	/* Command came from another shell */
+
+#define GETHIST_UPWARD  (-1)
+#define GETHIST_DOWNWARD  1
+#define GETHIST_EXACT     0
 
 /* Parts of the code where history expansion is disabled *
  * should be within a pair of STOPHIST ... ALLOWHIST     */
@@ -1038,6 +1053,13 @@ struct histent {
 #define HISTFLAG_NOEXEC 2
 #define HISTFLAG_RECALL 4
 #define HISTFLAG_SETTY  8
+
+#define HFILE_APPEND		0x0001
+#define HFILE_SKIPOLD		0x0002
+#define HFILE_SKIPDUPS		0x0004
+#define HFILE_SKIPFOREIGN	0x0008
+#define HFILE_FAST		0x0010
+#define HFILE_USE_OPTIONS	0x8000
 
 /******************************************/
 /* Definitions for programable completion */
@@ -1120,15 +1142,20 @@ enum {
     HASHLISTALL,
     HISTALLOWCLOBBER,
     HISTBEEP,
+    HISTEXPIREDUPSFIRST,
+    HISTFINDNODUPS,
+    HISTIGNOREALLDUPS,
     HISTIGNOREDUPS,
     HISTIGNORESPACE,
     HISTNOFUNCTIONS,
     HISTNOSTORE,
     HISTREDUCEBLANKS,
+    HISTSAVENODUPS,
     HISTVERIFY,
     HUP,
     IGNOREBRACES,
     IGNOREEOF,
+    INCREMENTALAPPENDHISTORY,
     INTERACTIVE,
     INTERACTIVECOMMENTS,
     KSHARRAYS,
@@ -1172,6 +1199,7 @@ enum {
     RESTRICTED,
     RMSTARSILENT,
     RMSTARWAIT,
+    SHAREHISTORY,
     SHFILEEXPANSION,
     SHGLOB,
     SHINSTDIN,

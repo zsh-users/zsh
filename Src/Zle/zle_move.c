@@ -476,17 +476,10 @@ vigotomark(void)
 	feep();
 	return;
     }
-    if (curhist != vimarkline[ch]) {
-	char *s;
-
-	remember_edits();
-	if (!(s = qgetevent(vimarkline[ch]))) {
-	    vimarkline[ch] = 0;
-	    feep();
-	    return;
-	}
-	histline = vimarkline[ch];
-	setline(s);
+    if (curhist != vimarkline[ch] && !zle_goto_hist(vimarkline[ch], 0)) {
+	vimarkline[ch] = 0;
+	feep();
+	return;
     }
     cs = vimarkcs[ch];
     if (cs > ll)

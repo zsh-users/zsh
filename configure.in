@@ -204,6 +204,10 @@ test -z "${LDFLAGS+set}" && LDFLAGS= auto_ldflags=1
 
 AC_PROG_CC
 
+dnl Check for large file support (Solaris).
+dnl This needs to be done early to get the stuff into the flags.
+zsh_LARGE_FILE_SUPPORT
+
 dnl if the user hasn't specified CFLAGS, then
 dnl   if compiler is gcc, then use -O2 and some warning flags
 dnl   else use -O
@@ -882,25 +886,6 @@ zsh_PATH_UTMP(utmp)
 zsh_PATH_UTMP(wtmp)
 zsh_PATH_UTMP(utmpx)
 zsh_PATH_UTMP(wtmpx)
-
-dnl ----------------
-dnl TYPEAHEAD KLUDGE
-dnl ----------------
-dnl Some systems clobber typeahead when you go from canonical input
-dnl processing to non-canonical, so we need a FIONREAD ioctl.
-dnl I don't know how to check this with configure, so I am using the
-dnl system names directly.
-dnl The doubled square brackets are necessary because autoconf uses m4.
-AC_CACHE_CHECK(if typeahead needs FIONREAD, zsh_cv_sys_clobbers_typeahead,
-[case x-$host_vendor-$host_os in
-    x-*-ultrix* | x-*-dgux* | x-sni-sysv4* | x-*-irix*)
-	zsh_cv_sys_clobbers_typeahead=yes;;
-    *)
-	zsh_cv_sys_clobbers_typeahead=no;;
-esac])
-if test $zsh_cv_sys_clobbers_typeahead = yes; then
-  AC_DEFINE(CLOBBERS_TYPEAHEAD)
-fi
 
 dnl -------------------
 dnl brk/sbrk PROTOTYPES

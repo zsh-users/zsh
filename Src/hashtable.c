@@ -83,7 +83,7 @@ hasher(char *str)
     unsigned hashval = 0;
 
     while (*str)
-	hashval += (hashval << 5) + ((unsigned) *str++);
+	hashval += (hashval << 5) + *(unsigned char *)str++;
 
     return hashval;
 }
@@ -138,7 +138,7 @@ deletehashtable(HashTable ht)
 }
 
 /* Add a node to a hash table.                          *
- * nam is the key to use in hashing.  dat is a pointer  *
+ * nam is the key to use in hashing.  nodeptr points    *
  * to the node to add.  If there is already a node in   *
  * the table with the same key, it is first freed, and  *
  * then the new node is added.  If the number of nodes  *
@@ -148,6 +148,17 @@ deletehashtable(HashTable ht)
 /**/
 void
 addhashnode(HashTable ht, char *nam, void *nodeptr)
+{
+    HashNode oldnode = addhashnode2(ht, nam, nodeptr);
+    if (oldnode)
+	ht->freenode(oldnode);
+}
+
+/* Add a node to a hash table, returning the old node on replacment. */
+
+/**/
+HashNode
+addhashnode2(HashTable ht, char *nam, void *nodeptr)
 {
     unsigned hashval;
     HashNode hn, hp, hq;
@@ -164,11 +175,11 @@ addhashnode(HashTable ht, char *nam, void *nodeptr)
 	ht->nodes[hashval] = hn;
 	if (++ht->ct >= ht->hsize * 2 && !ht->scan)
 	    expandhashtable(ht);
-	return;
+	return NULL;
     }
 
     /* else check if the first node contains the same key */
-    if (!strcmp(hp->nam, hn->nam)) {
+    if (ht->cmpnodes(hp->nam, hn->nam) == 0) {
 	ht->nodes[hashval] = hn;
 	replacing:
 	hn->next = hp->next;
@@ -182,15 +193,14 @@ addhashnode(HashTable ht, char *nam, void *nodeptr)
 	    } else if(ht->scan->u.u == hp)
 		ht->scan->u.u = hn;
 	}
-	ht->freenode(hp);
-	return;
+	return hp;
     }
 
     /* else run through the list and check all the keys */
     hq = hp;
     hp = hp->next;
     for (; hp; hq = hp, hp = hp->next) {
-	if (!strcmp(hp->nam, hn->nam)) {
+	if (ht->cmpnodes(hp->nam, hn->nam) == 0) {
 	    hq->next = hn;
 	    goto replacing;
 	}
@@ -201,6 +211,7 @@ addhashnode(HashTable ht, char *nam, void *nodeptr)
     ht->nodes[hashval] = hn;
     if (++ht->ct >= ht->hsize * 2 && !ht->scan)
         expandhashtable(ht);
+    return NULL;
 }
 
 /* Get an enabled entry in a hash table.  *
@@ -217,7 +228,7 @@ gethashnode(HashTable ht, char *nam)
 
     hashval = ht->hash(nam) % ht->hsize;
     for (hp = ht->nodes[hashval]; hp; hp = hp->next) {
-	if (!strcmp(hp->nam, nam)) {
+	if (ht->cmpnodes(hp->nam, nam) == 0) {
 	    if (hp->flags & DISABLED)
 		return NULL;
 	    else
@@ -241,7 +252,7 @@ gethashnode2(HashTable ht, char *nam)
 
     hashval = ht->hash(nam) % ht->hsize;
     for (hp = ht->nodes[hashval]; hp; hp = hp->next) {
-	if (!strcmp(hp->nam, nam))
+	if (ht->cmpnodes(hp->nam, nam) == 0)
 	    return hp;
     }
     return NULL;
@@ -267,7 +278,7 @@ removehashnode(HashTable ht, char *nam)
 	return NULL;
 
     /* else check if the key in the first one matches */
-    if (!strcmp(hp->nam, nam)) {
+    if (ht->cmpnodes(hp->nam, nam) == 0) {
 	ht->nodes[hashval] = hp->next;
 	gotit:
 	ht->ct--;
@@ -288,7 +299,7 @@ removehashnode(HashTable ht, char *nam)
     hq = hp;
     hp = hp->next;
     for (; hp; hq = hp, hp = hp->next) {
-	if (!strcmp(hp->nam, nam)) {
+	if (ht->cmpnodes(hp->nam, nam) == 0) {
 	    hq->next = hp->next;
 	    goto gotit;
 	}
@@ -316,7 +327,7 @@ enablehashnode(HashNode hn, int flags)
     hn->flags &= ~DISABLED;
 }
 
-/* Compare two hash table entries */
+/* Compare two hash table entries by name */
 
 /**/
 static int
@@ -498,6 +509,7 @@ emptyhashtable(HashTable ht)
     resizehashtable(ht, ht->hsize);
 }
 
+/**/
 #ifdef ZSH_HASH_DEBUG
 
 /* Print info about hash table */
@@ -550,6 +562,7 @@ bin_hashinfo(char *nam, char **args, char *ops, int func)
     return 0;
 }
 
+/**/
 #endif /* ZSH_HASH_DEBUG */
 
 /********************************/
@@ -577,6 +590,7 @@ createcmdnamtable(void)
     cmdnamtab->hash        = hasher;
     cmdnamtab->emptytable  = emptycmdnamtable;
     cmdnamtab->filltable   = fillcmdnamtable;
+    cmdnamtab->cmpnodes    = strcmp;
     cmdnamtab->addnode     = addhashnode;
     cmdnamtab->getnode     = gethashnode2;
     cmdnamtab->getnode2    = gethashnode2;
@@ -747,6 +761,7 @@ createshfunctable(void)
     shfunctab->hash        = hasher;
     shfunctab->emptytable  = NULL;
     shfunctab->filltable   = NULL;
+    shfunctab->cmpnodes    = strcmp;
     shfunctab->addnode     = addhashnode;
     shfunctab->getnode     = gethashnode;
     shfunctab->getnode2    = gethashnode2;
@@ -920,6 +935,7 @@ createreswdtable(void)
     reswdtab->hash        = hasher;
     reswdtab->emptytable  = NULL;
     reswdtab->filltable   = NULL;
+    reswdtab->cmpnodes    = strcmp;
     reswdtab->addnode     = addhashnode;
     reswdtab->getnode     = gethashnode;
     reswdtab->getnode2    = gethashnode2;
@@ -980,6 +996,7 @@ createaliastable(void)
     aliastab->hash        = hasher;
     aliastab->emptytable  = NULL;
     aliastab->filltable   = NULL;
+    aliastab->cmpnodes    = strcmp;
     aliastab->addnode     = addhashnode;
     aliastab->getnode     = gethashnode;
     aliastab->getnode2    = gethashnode2;
@@ -1109,6 +1126,7 @@ createnameddirtable(void)
     nameddirtab->hash        = hasher;
     nameddirtab->emptytable  = emptynameddirtable;
     nameddirtab->filltable   = fillnameddirtable;
+    nameddirtab->cmpnodes    = strcmp;
     nameddirtab->addnode     = addnameddirnode;
     nameddirtab->getnode     = gethashnode;
     nameddirtab->getnode2    = gethashnode2;
@@ -1218,4 +1236,138 @@ printnameddirnode(HashNode hn, int printflags)
     putchar('=');
     quotedzputs(nd->dir, stdout);
     putchar('\n');
+}
+
+/*************************************/
+/* History Line Hash Table Functions */
+/*************************************/
+
+/**/
+void
+createhisttable(void)
+{
+    histtab = newhashtable(599, "histtab", NULL);
+
+    histtab->hash        = histhasher;
+    histtab->emptytable  = emptyhisttable;
+    histtab->filltable   = NULL;
+    histtab->cmpnodes    = histstrcmp;
+    histtab->addnode     = addhistnode;
+    histtab->getnode     = gethashnode2;
+    histtab->getnode2    = gethashnode2;
+    histtab->removenode  = removehashnode;
+    histtab->disablenode = NULL;
+    histtab->enablenode  = NULL;
+    histtab->freenode    = freehistnode;
+    histtab->printnode   = NULL;
+}
+
+/**/
+unsigned
+histhasher(char *str)
+{
+    unsigned hashval = 0;
+
+    while (inblank(*str)) str++;
+
+    while (*str) {
+	if (inblank(*str)) {
+	    do str++; while (inblank(*str));
+	    if (*str)
+		hashval += (hashval << 5) + ' ';
+	}
+	else
+	    hashval += (hashval << 5) + *(unsigned char *)str++;
+    }
+    return hashval;
+}
+
+/**/
+void
+emptyhisttable(HashTable ht)
+{
+    emptyhashtable(ht);
+    if (hist_ring)
+	histremovedups();
+}
+
+/* Compare two strings with normalized white-space */
+
+/**/
+int
+histstrcmp(const char *str1, const char *str2)
+{
+    while (inblank(*str1)) str1++;
+    while (inblank(*str2)) str2++;
+    while (*str1 && *str2) {
+	if (inblank(*str1)) {
+	    if (!inblank(*str2))
+		break;
+	    do str1++; while (inblank(*str1));
+	    do str2++; while (inblank(*str2));
+	}
+	else {
+	    if (*str1 != *str2)
+		break;
+	    str1++;
+	    str2++;
+	}
+    }
+    return *str1 - *str2;
+}
+
+/**/
+void
+addhistnode(HashTable ht, char *nam, void *nodeptr)
+{
+    HashNode oldnode = addhashnode2(ht, nam, nodeptr);
+    Histent he = (Histent)nodeptr;
+    if (oldnode && oldnode != nodeptr) {
+	if (he->flags & HIST_MAKEUNIQUE
+	 || (he->flags & HIST_FOREIGN && (Histent)oldnode == he->up)) {
+	    he->flags |= HIST_DUP;
+	    addhashnode(ht, oldnode->nam, oldnode); /* Remove the new dup */
+	}
+	else {
+	    oldnode->flags |= HIST_DUP;
+	    if (hist_ignore_all_dups)
+		freehistnode(oldnode); /* Remove the old dup */
+	}
+    }
+    else
+	he->flags &= ~HIST_MAKEUNIQUE;
+}
+
+/**/
+void
+freehistnode(HashNode nodeptr)
+{
+    freehistdata((Histent)nodeptr, 1);
+    zfree(nodeptr, sizeof (struct histent));
+}
+
+/**/
+void
+freehistdata(Histent he, int unlink)
+{
+    if (!he)
+	return;
+
+    if (!(he->flags & HIST_DUP))
+	removehashnode(histtab, he->text);
+
+    zsfree(he->text);
+    if (he->nwords)
+	zfree(he->words, he->nwords*2*sizeof(short));
+
+    if (unlink) {
+	if (!--histlinect)
+	    hist_ring = NULL;
+	else {
+	    if (he == hist_ring)
+		hist_ring = hist_ring->up;
+	    he->up->down = he->down;
+	    he->down->up = he->up;
+	}
+    }
 }

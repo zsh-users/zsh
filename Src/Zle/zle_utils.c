@@ -572,10 +572,8 @@ undo(void)
 static void
 unapplychange(struct change *ch)
 {
-    if(ch->hist != histline) {
-	remember_edits();
-	setline(zle_get_event(histline = ch->hist));
-    }
+    if(ch->hist != histline)
+	zle_setline(quietgethist(ch->hist));
     cs = ch->off;
     if(ch->ins)
 	foredel(ztrlen(ch->ins));
@@ -613,10 +611,8 @@ redo(void)
 static void
 applychange(struct change *ch)
 {
-    if(ch->hist != histline) {
-	remember_edits();
-	setline(zle_get_event(histline = ch->hist));
-    }
+    if(ch->hist != histline)
+	zle_setline(quietgethist(ch->hist));
     cs = ch->off;
     if(ch->del)
 	foredel(ztrlen(ch->del));

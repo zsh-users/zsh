@@ -130,6 +130,7 @@ createkeymapnamtab(void)
     keymapnamtab->hash        = hasher;
     keymapnamtab->emptytable  = emptyhashtable;
     keymapnamtab->filltable   = NULL;
+    keymapnamtab->cmpnodes    = strcmp;
     keymapnamtab->addnode     = addhashnode;
     keymapnamtab->getnode     = gethashnode2;
     keymapnamtab->getnode2    = gethashnode2;
@@ -172,6 +173,7 @@ newkeytab(char *kmname)
     ht->hash        = hasher;
     ht->emptytable  = emptyhashtable;
     ht->filltable   = NULL;
+    ht->cmpnodes    = strcmp;
     ht->addnode     = addhashnode;
     ht->getnode     = gethashnode2;
     ht->getnode2    = gethashnode2;

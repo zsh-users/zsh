@@ -1862,7 +1862,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 		/* If we are exec'ing a command, and we are not in a subshell, *
 		 * then check if we should save the history file.              */
 		if (isset(RCS) && interact && !nohistsave)
-		    savehistfile(getsparam("HISTFILE"), 1, isset(APPENDHISTORY) ? 3 : 0);
+		    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
 		exit(lastval);
 	    }
 
@@ -1874,7 +1874,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 		/* If we are exec'ing a command, and we are not *
 		 * in a subshell, then save the history file.   */
 		if (!subsh && isset(RCS) && interact && !nohistsave)
-		    savehistfile(getsparam("HISTFILE"), 1, isset(APPENDHISTORY) ? 3 : 0);
+		    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
 	    }
 	    if (type == SIMPLE) {
 		if (cmd->vars) {
@@ -2232,7 +2232,7 @@ getoutput(char *cmd, int qt)
 	zclose(pipes[1]);
 	retval = readoutput(pipes[0], qt);
 	fdtable[pipes[0]] = 0;
-	child_suspend(0);		/* unblocks */
+	waitforpid(pid);		/* unblocks */
 	lastval = cmdoutval;
 	return retval;
     }

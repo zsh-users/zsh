@@ -4,6 +4,7 @@ addbuiltins
 addconddefs
 addedx
 addhashnode
+addhistnum
 addparamdefs
 addwrapper
 arrvargetfn
@@ -45,6 +46,7 @@ deleteparamdefs
 deletewrapper
 domatch
 doshfunc
+down_histent
 dputs
 dquotedztrdup
 dummy_list
@@ -97,6 +99,8 @@ hgetc
 hgetline
 histentarr
 histentct
+hist_ring
+hist_skip_flags
 holdintr
 hptr
 hrealloc
@@ -132,6 +136,7 @@ metadiffer
 metafy
 metalen
 mode_to_octal
+movehistent
 mypgrp
 mypid
 nameddirtab
@@ -240,6 +245,7 @@ unmetafy
 unsetparam
 unsetparam_pm
 untokenize
+up_histent
 uremnode
 useheap
 winchanged

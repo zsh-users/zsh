@@ -124,15 +124,20 @@ static struct optname optns[] = {
 {NULL, "hashlistall",	      OPT_ALL,			 HASHLISTALL},
 {NULL, "histallowclobber",    0,			 HISTALLOWCLOBBER},
 {NULL, "histbeep",	      OPT_ALL,			 HISTBEEP},
+{NULL, "histexpiredupsfirst", 0,			 HISTEXPIREDUPSFIRST},
+{NULL, "histfindnodups",      0,			 HISTFINDNODUPS},
+{NULL, "histignorealldups",   0,			 HISTIGNOREALLDUPS},
 {NULL, "histignoredups",      0,			 HISTIGNOREDUPS},
 {NULL, "histignorespace",     0,			 HISTIGNORESPACE},
 {NULL, "histnofunctions",     0,			 HISTNOFUNCTIONS},
 {NULL, "histnostore",	      0,			 HISTNOSTORE},
 {NULL, "histreduceblanks",    0,			 HISTREDUCEBLANKS},
+{NULL, "histsavenodups",      0,			 HISTSAVENODUPS},
 {NULL, "histverify",	      0,			 HISTVERIFY},
 {NULL, "hup",		      OPT_EMULATE|OPT_ZSH,	 HUP},
 {NULL, "ignorebraces",	      OPT_EMULATE|OPT_SH,	 IGNOREBRACES},
 {NULL, "ignoreeof",	      0,			 IGNOREEOF},
+{NULL, "incrementalappendhistory",0,			 INCREMENTALAPPENDHISTORY},
 {NULL, "interactive",	      OPT_SPECIAL,		 INTERACTIVE},
 {NULL, "interactivecomments", OPT_EMULATE|OPT_BOURNE,	 INTERACTIVECOMMENTS},
 {NULL, "ksharrays",	      OPT_EMULATE|OPT_BOURNE,	 KSHARRAYS},
@@ -176,6 +181,7 @@ static struct optname optns[] = {
 {NULL, "restricted",	      OPT_SPECIAL,		 RESTRICTED},
 {NULL, "rmstarsilent",	      OPT_BOURNE,		 RMSTARSILENT},
 {NULL, "rmstarwait",	      0,			 RMSTARWAIT},
+{NULL, "sharehistory",	      OPT_KSH,			 SHAREHISTORY},
 {NULL, "shfileexpansion",     OPT_EMULATE|OPT_BOURNE,	 SHFILEEXPANSION},
 {NULL, "shglob",	      OPT_EMULATE|OPT_BOURNE,	 SHGLOB},
 {NULL, "shinstdin",	      OPT_SPECIAL,		 SHINSTDIN},
@@ -378,9 +384,9 @@ printoptionnode(HashNode hn, int set)
 	optno = -optno;
     if (isset(KSHOPTIONPRINT)) {
 	if (defset(on))
-	    printf("no%-20s%s\n", on->nam, isset(optno) ? "off" : "on");
+	    printf("no%-19s %s\n", on->nam, isset(optno) ? "off" : "on");
 	else
-	    printf("%-22s%s\n", on->nam, isset(optno) ? "on" : "off");
+	    printf("%-21s %s\n", on->nam, isset(optno) ? "on" : "off");
     } else if (set == (isset(optno) ^ defset(on))) {
 	if (set ^ isset(optno))
 	    fputs("no", stdout);
@@ -399,6 +405,7 @@ createoptiontable(void)
     optiontab->hash        = hasher;
     optiontab->emptytable  = NULL;
     optiontab->filltable   = NULL;
+    optiontab->cmpnodes    = strcmp;
     optiontab->addnode     = addhashnode;
     optiontab->getnode     = gethashnode;
     optiontab->getnode2    = gethashnode2;
@@ -635,6 +642,8 @@ dosetopt(int optno, int value, int force)
 	}
     } else if(!force && (optno == INTERACTIVE || optno == SHINSTDIN ||
 	    optno == SINGLECOMMAND)) {
+	if (opts[optno] == value)
+	    return 0;
 	/* it is not permitted to change the value of these options */
 	return -1;
     } else if(!force && optno == USEZLE && value) {

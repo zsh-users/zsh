@@ -49,13 +49,41 @@ endmenu()
 texinode(Initialisation)(Control Functions)()(Completion System)
 sect(Initialisation)
 
+The script tt(compinstall) can be run by a user to set up the completion
+system for use.  It will usually insert code into tt(.zshrc), although if
+that is not writeable it will save it in another file and tell you that
+file's locations.  Note that it is up to you to make sure that the lines
+added to tt(.zshrc) are actually run; you may, for example, need to move
+them to an earlier place in the file if tt(.zshrc) usually returns early.
+So long as you keep them all together (including the comment lines at the
+start and finish), you can rerun tt(compinstall) and it will correctly
+locate and modify these lines.  Note, however, that any code you add to
+this section by hand is likely to be lost if you rerun tt(compinstall).
+
+You can run it as `tt(source )var(<path>)tt(/compinstall)' or
+`tt(. )var(<path>)tt(/compinstall)', where var(<path>) is where the
+completion functions are stored.  It will ask you various questions about
+how you would like completion set up.  It is in two parts; the basic part
+locates the completion files and decides where to put your personal
+dumpfile, used to speed up initialisation after the first time.  After
+that, you will be asked if you wish to go on to the advanced set-up; if you
+answer tt(n), you can rerun tt(compinstall) later without having to
+re-enter any of the basic settings.
+
+You can abort the installation any time you are being prompted for
+information, and your tt(.zshrc) will not be altered at all.
+
+subsect(Use of compinit)
+
+This section describes the use of tt(compinit) to initialize completion for
+the current session when run directly by the user; if you have run
+tt(compinstall) it will be called automatically from your tt(.zshrc).
+
 To initialise the system, the script tt(compinit) should be sourced with
 `tt(source )var(<path>)tt(/compinit)' or
 `tt(. )var(<path>)tt(/compinit)'. This will define a few utility functions,
 arrange for all the necessary shell functions to be autoloaded, and will
 then re-bind all keys that do completion to use the new system.
-
-subsect(Arguments)
 
 To speed up the running of tt(compinit), it can be made to produce a dumped
 configuration which will be read in on future invocations.  The easiest way
@@ -64,6 +92,15 @@ In this case the dumped file will have the same name as the sourced file,
 but with tt(.dump) appended to the end; alternatively, an explicit file
 name can be given following the tt(-d).  On the next call to tt(compinit
 -d), the dumped file will be read instead.
+
+The other option accepted by tt(compinit) is tt(-f var(dir)), which gives
+the directory in which tt(compinit) resides.  If you source tt(compinit) by
+its full pathname, and the option tt(FUNCTION_ARGZERO) is set, as it is by
+default unless tt(zsh) is emulating tt(sh) or tt(ksh), this is unnecessary
+as tt(compinit) can deduce the directory for itself.  It is used in two
+ways: to find the program tt(compdump) used by the tt(-d) option, and to
+check if the directory should be added to the function search path to find
+the completion functions (see below).
 
 If the number of completion files changes, tt(compinit) will recognise this
 and produce a new dump file.  However, if the name of a function or the
@@ -80,8 +117,18 @@ subsect(Autoloaded files)
 
 The convention for autoloaded functions used in completion is that they
 start with an underscore; as already mentioned, the tt(fpath/FPATH)
-parameter must contain the directory in which they are stored.  When
-tt(compinit) is sourced, it searches all such files accessible via
+parameter must contain the directory in which they are stored.  If
+tt(compinit) does not find enough files beginning with an underscore (fewer
+than twenty) in the search path, it will try to find more by adding its own
+directory to the search path.  If you keep all the completion files in this
+directory, this means you never have to alter tt(fpath/FPATH) yourself.
+Furthermore, if the directory in question ends in the path segment
+tt(Core), or has a subdirectory named tt(Core), tt(compinit) will add all
+subdirectories of the directory where tt(Core) is to the path: this allows
+the functions to be in the same format as in the tt(zsh) source
+distribution.
+
+When tt(compinit) is sourced, it searches all such files accessible via
 tt(fpath/FPATH) and reads the first line of each of them.  This line should
 contain one of the tags described below. Files whose first line does not
 start with one of these tags are not considered to be part of the

@@ -120,7 +120,7 @@ static struct builtin builtins[] =
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
 
 #ifdef DYNAMIC
-    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "LaudicIp", NULL),
+    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcdipu", NULL),
 #endif
 };
 
@@ -142,6 +142,7 @@ createbuiltintable(void)
     builtintab->hash        = hasher;
     builtintab->emptytable  = NULL;
     builtintab->filltable   = NULL;
+    builtintab->cmpnodes    = strcmp;
     builtintab->addnode     = addhashnode;
     builtintab->getnode     = gethashnode;
     builtintab->getnode2    = gethashnode2;
@@ -1146,19 +1147,17 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     }
     if (ops['R']) {
 	/* read history from a file */
-	readhistfile(*argv ? *argv : getsparam("HISTFILE"), 1);
+	readhistfile(*argv, 1, ops['I'] ? HFILE_SKIPOLD : 0);
 	return 0;
     }
     if (ops['W']) {
 	/* write history to a file */
-	savehistfile(*argv ? *argv : getsparam("HISTFILE"), 1,
-		     (ops['I'] ? 2 : 0));
+	savehistfile(*argv, 1, ops['I'] ? HFILE_SKIPOLD : 0);
 	return 0;
     }
     if (ops['A']) {
 	/* append history to a file */
-	savehistfile(*argv ? *argv : getsparam("HISTFILE"), 1,
-		     (ops['I'] ? 3 : 1));
+	savehistfile(*argv, 1, HFILE_APPEND | (ops['I'] ? HFILE_SKIPOLD : 0));
 	return 0;
     }
     if (!(ops['l'] && unset(HISTNOSTORE)))
@@ -1200,9 +1199,9 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     }
     /* default values of first and last, and range checking */
     if (first == -1)
-	first = (ops['l']) ? curhist - 16 : curhist - 1;
+	first = ops['l']? addhistnum(curhist,-16,0) : addhistnum(curhist,-1,0);
     if (last == -1)
-	last = (ops['l']) ? curhist - 1 : first;
+	last = ops['l']? addhistnum(curhist,-1,0) : first;
     if (first < firsthist())
 	first = firsthist();
     if (last == -1)
@@ -1267,7 +1266,7 @@ fcgetcomm(char *s)
      * numbers indicate reversed numbering.           */
     if ((cmd = atoi(s))) {
 	if (cmd < 0)
-	    cmd = curhist + cmd;
+	    cmd = addhistnum(curhist,cmd,HIST_FOREIGN);
 	if (cmd >= curhist) {
 	    zwarnnam("fc", "bad history number: %d", 0, cmd);
 	    return -1;
@@ -1331,7 +1330,7 @@ static int
 fclist(FILE *f, int n, int r, int D, int d, int first, int last, struct asgment *subs, Comp com)
 {
     int fclistdone = 0;
-    char *s, *hs;
+    char *s;
     Histent ent;
 
     /* reverse range if required */
@@ -1344,28 +1343,31 @@ fclist(FILE *f, int n, int r, int D, int d, int first, int last, struct asgment 
     if (!subs)
 	fclistdone = 1;
 
-    for (;;) {
-	hs = quietgetevent(first);
-	if (!hs) {
+    ent = gethistent(first, first < last? GETHIST_DOWNWARD : GETHIST_UPWARD);
+    if (!ent || ent->histnum < first || ent->histnum > last) {
+	if (first == last)
 	    zwarnnam("fc", "no such event: %d", NULL, first);
-	    return 1;
-	}
-	s = dupstring(hs);
+	else
+	    zwarnnam("fc", "no events in that range", NULL, 0);
+	return 1;
+    }
+
+    for (;;) {
+	s = dupstring(ent->text);
 	/* this if does the pattern matching, if required */
 	if (!com || domatch(s, com, 0)) {
 	    /* perform substitution */
 	    fclistdone |= fcsubs(&s, subs);
 
 	    /* do numbering */
-	    if (n)
-		fprintf(f, "%5d  ", first);
-	    ent = NULL;
+	    if (n) {
+		fprintf(f, "%5d%c ", ent->histnum,
+			ent->flags & HIST_FOREIGN? '*' : ' ');
+	    }
 	    /* output actual time (and possibly date) of execution of the
 	    command, if required */
 	    if (d) {
 		struct tm *ltm;
-		if (!ent)
-		    ent = gethistent(first);
 		ltm = localtime(&ent->stim);
 		if (d >= 2) {
 		    if (d >= 8) {
@@ -1387,8 +1389,6 @@ fclist(FILE *f, int n, int r, int D, int d, int first, int last, struct asgment 
 	    /* display the time taken by the command, if required */
 	    if (D) {
 		long diff;
-		if (!ent)
-		    ent = gethistent(first);
 		diff = (ent->ftim) ? ent->ftim - ent->stim : 0;
 		fprintf(f, "%ld:%02ld  ", diff / 60, diff % 60);
 	    }
@@ -1401,12 +1401,14 @@ fclist(FILE *f, int n, int r, int D, int d, int first, int last, struct asgment 
 		fprintf(f, "%s\n", s);
 	}
 	/* move on to the next history line, or quit the loop */
-	if (first == last)
-	    break;
-	else if (first > last)
-	    first--;
-	else
-	    first++;
+	if (first < last) {
+	    if (!(ent = down_histent(ent)) || ent->histnum > last)
+		break;
+	}
+	else {
+	    if (!(ent = up_histent(ent)) || ent->histnum < last)
+		break;
+	}
     }
 
     /* final processing */
@@ -1768,7 +1770,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    for (i = 0; i < paramtab->hsize; i++) {
 		for (pm = (Param) paramtab->nodes[i]; pm;
 		     pm = (Param) pm->next) {
-		    if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED))
+		    if (((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) ||
+			(pm->flags & PM_UNSET))
 			continue;
 		    if (domatch(pm->nam, com, 0))
 			addlinknode(pmlist, pm);
@@ -2523,10 +2526,7 @@ bin_print(char *name, char **args, char *ops, int func)
 	char **pargs = args;
 
 	PERMALLOC {
-	    ent = gethistent(++curhist);
-	    zsfree(ent->text);
-	    if (ent->nwords)
-		zfree(ent->words, ent->nwords*2*sizeof(short));
+	    ent = prepnexthistent(++curhist);
 	    while (*pargs++)
 		nwords++;
 	    if ((ent->nwords = nwords)) {
@@ -2543,6 +2543,7 @@ bin_print(char *name, char **args, char *ops, int func)
 	    ent->text = zjoin(args, ' ');
 	    ent->stim = ent->ftim = time(NULL);
 	    ent->flags = 0;
+	    addhistnode(histtab, ent->text, ent);
 	} LASTALLOC;
 	return 0;
     }
@@ -2952,7 +2953,7 @@ zexit(int val, int from_signal)
 	    killrunjobs(from_signal);
 	if (isset(RCS) && interact) {
 	    if (!nohistsave)
-		savehistfile(getsparam("HISTFILE"), 1, isset(APPENDHISTORY) ? 3 : 0);
+		savehistfile(NULL, 1, HFILE_USE_OPTIONS);
 	    if (islogin && !subsh) {
 		sourcehome(".zlogout");
 #ifdef GLOBAL_ZLOGOUT

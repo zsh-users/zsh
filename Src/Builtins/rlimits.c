@@ -43,14 +43,14 @@ zstrtorlimt(const char *s, char **t, int base)
 {
     rlim_t ret = 0;
  
-    if (!base)
+    if (!base) {
 	if (*s != '0')
 	    base = 10;
 	else if (*++s == 'x' || *s == 'X')
 	    base = 16, s++;
 	else
 	    base = 8;
- 
+    } 
     if (base <= 10)
 	for (; *s >= '0' && *s < ('0' + base); s++)
 	    ret = ret * base + *s - '0';

@@ -72,10 +72,9 @@ taddstr(char *s)
     tptr += sl;
 }
 
-#if 0
 /* add an integer to the text buffer */
 
-/**/
+#if 0 /**/
 void
 taddint(int x)
 {

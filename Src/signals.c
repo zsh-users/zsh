@@ -129,10 +129,9 @@ intr(void)
         install_handler(SIGINT);
 }
 
-#if 0
 /* disable ^C interrupts */
  
-/**/
+#if 0 /**/
 void
 nointr(void)
 {
@@ -505,7 +504,7 @@ handler(int sig)
 
 #ifdef SIGWINCH
     case SIGWINCH:
-        adjustwinsize();  /* check window size and adjust */
+        adjustwinsize(1);  /* check window size and adjust */
 	if (sigtrapped[SIGWINCH])
 	    dotrap(SIGWINCH);
         break;

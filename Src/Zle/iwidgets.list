@@ -91,6 +91,7 @@
 "send-break", sendbreak, 0
 "set-mark-command", setmarkcommand, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "spell-word", spellword, 0
+"set-local-history", setlocalhistory, 0
 "transpose-chars", transposechars, 0
 "transpose-words", transposewords, 0
 "undefined-key", undefinedkey, 0

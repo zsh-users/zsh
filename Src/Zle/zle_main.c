@@ -111,6 +111,10 @@ int prefixflag;
 /**/
 int feepflag;
 
+#ifdef FIONREAD
+static int delayzsetterm;
+#endif
+
 /* set up terminal */
 
 /**/
@@ -119,12 +123,30 @@ zsetterm(void)
 {
     struct ttyinfo ti;
 
-#if defined(CLOBBERS_TYPEAHEAD) && defined(FIONREAD)
+#if defined(FIONREAD)
     int val;
 
     ioctl(SHTTY, FIONREAD, (char *)&val);
-    if (val)
+    if (val) {
+	/*
+	 * Problems can occur on some systems when switching from
+	 * canonical to non-canonical input.  The former is usually
+	 * set while running programmes, but the latter is necessary
+	 * for zle.  If there is input in canonical mode, then we
+	 * need to read it without setting up the terminal.  Furthermore,
+	 * while that input gets processed there may be more input
+	 * being typed (i.e. further typeahead).  This means that
+	 * we can't set up the terminal for zle *at all* until
+	 * we are sure there is no more typeahead to come.  So
+	 * if there is typeahead, we set the flag delayzsetterm.
+	 * Then getkey() performs another FIONREAD call; if that is
+	 * 0, we have finally used up all the typeahead, and it is
+	 * safe to alter the terminal, which we do at that point.
+	 */
+	delayzsetterm = 1;
 	return;
+    } else
+	delayzsetterm = 0;
 #endif
 
 /* sanitize the tty */
@@ -298,7 +320,19 @@ getkey(int keytmout)
     if (kungetct)
 	ret = STOUC(kungetbuf[--kungetct]);
     else {
-	if (keytmout) {
+#ifdef FIONREAD
+	if (delayzsetterm) {
+	    int val;
+	    ioctl(SHTTY, FIONREAD, (char *)&val);
+	    if (!val)
+		zsetterm();
+	}
+#endif
+	if (keytmout
+#ifdef FIONREAD
+	    && ! delayzsetterm
+#endif
+	    ) {
 	    if (keytimeout > 500)
 		exp100ths = 500;
 	    else if (keytimeout > 0)
@@ -461,7 +495,6 @@ zleread(char *lp, char *rp, int flags)
 	undoing = 1;
 	line = (unsigned char *)zalloc((linesz = 256) + 2);
 	virangeflag = lastcmd = done = cs = ll = mark = 0;
-	curhistline = NULL;
 	vichgflag = 0;
 	viinsbegin = 0;
 	statusline = NULL;
@@ -542,7 +575,6 @@ zleread(char *lp, char *rp, int flags)
 	zleactive = no_restore_tty = 0;
 	alarm(0);
     } LASTALLOC;
-    zsfree(curhistline);
     freeundo();
     if (eofsent) {
 	free(line);

@@ -302,9 +302,10 @@ always produces named directory expansion.)
 pindex(EXTENDED_HISTORY)
 cindex(history, timestamping)
 item(tt(EXTENDED_HISTORY))(
-Save beginning and ending timestamps to the history file.
-The format of these timestamps is
-`tt(:)var(<beginning time>)tt(:)var(<ending time>)tt(:)var(<command>)'.
+Save each command's beginning timestamp (in seconds since the epoch)
+and the duration (in seconds) to the history file.  The format of
+this prefixed data is
+`tt(:)var(<beginning time>)tt(:)var(<elapsed seconds>)tt(:)var(<command>)'.
 )
 pindex(FLOW_CONTROL)
 cindex(flow control)
@@ -405,6 +406,20 @@ item(tt(HIST_BEEP))(
 Beep when an attempt is made to access a history entry which
 isn't there.
 )
+pindex(HIST_EXPIRE_DUPS_FIRST)
+cindex(history, expiring duplicates)
+item(tt(HIST_EXPIRE_DUPS_FIRST))(
+If the history needs to be trimmed to add a new line, setting this
+option will cause the oldest duplicate history line to be lost before
+losing a unique line from the internal history list.
+)
+pindex(HIST_IGNORE_ALL_DUPS)
+cindex(history, ignoring all duplicates)
+item(tt(HIST_IGNORE_ALL_DUPS) (tt(-h)))(
+If a new command line being added to the history list duplicates an
+older one, the older command is removed from the list (even if it is
+not the previous event).
+)
 pindex(HIST_IGNORE_DUPS)
 cindex(history, ignoring duplicates)
 item(tt(HIST_IGNORE_DUPS) (tt(-h)))(
@@ -425,6 +440,11 @@ pindex(HIST_NO_STORE)
 item(tt(HIST_NO_STORE))(
 Remove the tt(history) (tt(fc -l)) command from
 the history when invoked.
+)
+pindex(HIST_SAVE_NO_DUPS)
+item(tt(HIST_SAVE_NO_DUPS))(
+When writing out the history file, older commands that duplicate
+newer ones are omitted.
 )
 pindex(HIST_REDUCE_BLANKS)
 item(tt(HIST_REDUCE_BLANKS))(
@@ -458,6 +478,15 @@ Do not exit on end-of-file.  Require the use
 of tt(exit) or tt(logout) instead.
 However, ten consecutive EOFs will cause the shell to exit anyway,
 to avoid the shell hanging if its tty goes away.
+)
+pindex(INCREMENTAL_APPEND_HISTORY)
+cindex(history, incremental appending to a file)
+item(tt(INCREMENTAL_APPEND_HISTORY))(
+This options works like APPEND_HISTORY except that new history lines
+are added to the tt($HISTFILE) when they finish running, rather than
+waiting until the shell is killed. The file is periodically trimmed
+to the number of lines specified by tt($SAVEHIST), but can exceed this
+value between trimmings.
 )
 pindex(INTERACTIVE)
 item(tt(INTERACTIVE) (tt(-i), ksh: tt(-i)))(
@@ -797,6 +826,28 @@ first wait ten seconds and ignore anything typed in that time.
 This avoids the problem of reflexively answering `yes' to the query
 when one didn't really mean it.  The wait and query can always be
 avoided by expanding the `tt(*)' in ZLE (with tab).
+)
+pindex(SHARE_HISTORY)
+cindex(share history)
+cindex(history, sharing)
+item(tt(SHARE_HISTORY))(
+
+This option both imports new commands from the history file, and also
+causes your typed commands to be appended to the history file (like
+specifiying tt(INCREMENTAL_APPEND_HISTORY)).  The history lines are also
+output with timestamps ala tt(EXTENDED_HISTORY) (which makes it easier to
+find the spot where we left off reading the file after it gets re-written).
+
+By default, history movement commands visit the imported lines as well as
+the local lines, but you can toggle this on and off with the
+set-local-history zle binding.  It is also possible to create a zle
+widget that will make some commands ignore imported commands, and some
+include them.
+
+If you find that you want more control over when commands
+get imported, you may wish to turn tt(SHARE_HISTORY) off,
+tt(INCREMENTAL_APPEND_HISTORY) on, and then manually import
+commands whenever you need them using `fc -RI'.
 )
 pindex(SH_FILE_EXPANSION)
 cindex(sh, expansion style)

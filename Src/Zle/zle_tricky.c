@@ -578,6 +578,10 @@ static char *varname;
 
 static int insubscr;
 
+/* Parameter pointer for completing keys of an assoc array. */
+
+static Param keypm;
+
 /* 1 if we are completing in a quoted string (or inside `...`) */
 
 /**/
@@ -1364,9 +1368,15 @@ get_comp_string(void)
 	    zsfree(varname);
 	    varname = ztrdup(tt);
 	    *s = sav;
-	    if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt + cs - wb)
-		s = NULL, inwhat = IN_MATH, insubscr = 1;
-	    else if (*s == '=' && cs > wb + (s - tt)) {
+	    if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt + cs - wb) {
+		s = NULL;
+		inwhat = IN_MATH;
+		if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
+		    (keypm->flags & PM_HASHED))
+		    insubscr = 2;
+		else
+		    insubscr = 1;
+	    } else if (*s == '=' && cs > wb + (s - tt)) {
 		s++;
 		wb += s - tt;
 		t0 = STRING;
@@ -1424,11 +1434,15 @@ get_comp_string(void)
 		    zsfree(varname);
 		    varname = ztrdup(nb);
 		    *ne = sav;
+		    if ((keypm = (Param) paramtab->getnode(paramtab,
+							   varname)) &&
+			(keypm->flags & PM_HASHED))
+			insubscr = 2;
 		}
 	    }
 	}
 	if (inwhat == IN_MATH) {
-	    if (compfunc) {
+	    if (compfunc || insubscr == 2) {
 		int lev;
 		char *p;
 
@@ -1472,7 +1486,11 @@ get_comp_string(void)
 		zsfree(varname);
 		varname = ztrdup((char *) line + i + 1);
 		line[wb - 1] = sav;
-		insubscr = 1;
+		if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
+		    (keypm->flags & PM_HASHED))
+		    insubscr = 2;
+		else
+		    insubscr = 1;
 	    }
 	}
 	/* This variable will hold the current word in quoted form. */
@@ -3524,7 +3542,7 @@ int
 addmatches(Cadata dat, char **argv)
 {
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
-    char **aign = NULL, **dparr;
+    char **aign = NULL, **dparr = NULL;
     int lpl, lsl, pl, sl, bpl, bsl, llpl = 0, llsl = 0, nm = mnum;
     int oisalt = 0, isalt, isexact, doadd;
     Cline lc = NULL;
@@ -4360,7 +4378,7 @@ callcompfunc(char *s, char *fn)
 
 	    PERMALLOC {
 		q = compwords = (char **)
-		    zalloc((clwnum - aadd + 1) * sizeof(char *));
+		    zalloc((clwnum + 1) * sizeof(char *));
 		for (p = clwords + aadd; *p; p++, q++) {
 		    tmp = dupstring(*p);
 		    untokenize(tmp);
@@ -4829,13 +4847,22 @@ makecomplistglobal(char *os, int incmd, int lst, int flags)
     char *s;
 
     ccont = CC_CCCONT;
+    cc_dummy.suffix = NULL;
 
     if (linwhat == IN_ENV) {
         /* Default completion for parameter values. */
         cc = &cc_default;
+	keypm = NULL;
     } else if (linwhat == IN_MATH) {
-        /* Parameter names inside mathematical expression. */
-        cc_dummy.mask = CC_PARAMS;
+	if (insubscr == 2) {
+	    /* Inside subscript of assoc array, complete keys. */
+	    cc_dummy.mask = 0;
+	    cc_dummy.suffix = "]";
+	} else {
+	    /* Other math environment, complete paramete names. */
+	    keypm = NULL;
+	    cc_dummy.mask = CC_PARAMS;
+	}
 	cc = &cc_dummy;
 	cc_dummy.refc = 10000;
     } else if (linwhat == IN_COND) {
@@ -4851,13 +4878,16 @@ makecomplistglobal(char *os, int incmd, int lst, int flags)
 	    (CC_FILES | CC_PARAMS);
 	cc = &cc_dummy;
 	cc_dummy.refc = 10000;
-    } else if (linredir)
+	keypm = NULL;
+    } else if (linredir) {
 	/* In redirections use default completion. */
 	cc = &cc_default;
-    else
+	keypm = NULL;
+    } else {
 	/* Otherwise get the matches for the command. */
+	keypm = NULL;
 	return makecomplistcmd(os, incmd, flags);
-
+    }
     if (cc) {
 	/* First, use the -T compctl. */
 	if (!(flags & CFN_FIRST)) {
@@ -5917,7 +5947,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	Comp compc = NULL;
 	char *e, *h, hpatsav;
 	Histent he;
-	int i = curhist - 1, n = cc->hnum;
+	int i = addhistnum(curhist,-1,HIST_FOREIGN), n = cc->hnum;
 
 	/* Parse the pattern, if it isn't the null string. */
 	if (*(cc->hpat)) {
@@ -5971,7 +6001,12 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     if ((t = cc->mask & (CC_ALREG | CC_ALGLOB)))
 	/* Add the two types of aliases. */
 	dumphashtable(aliastab, t | (cc->mask & (CC_DISCMDS|CC_EXCMDS)));
-
+    if (keypm && cc == &cc_dummy) {
+	/* Add the keys of the parameter in keypm. */
+	scanhashtable(keypm->gets.hfn(keypm), 0, 0, PM_UNSET, addhnmatch, 0);
+	keypm = NULL;
+	cc_dummy.suffix = NULL;
+    }
     if (!errflag && cc->ylist) {
 	/* generate the user-defined display list: if anything fails, *
 	 * we silently allow the normal completion list to be used.   */

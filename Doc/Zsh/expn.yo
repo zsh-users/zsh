@@ -717,18 +717,24 @@ If multiple nested tt(${...}) forms are present, substitution is
 performed from the inside outwards.  At each level, the substitution takes
 account of whether the current value is a scalar or an array, whether the
 whole substitution is in double quotes, and what flags are supplied to the
-current level of substitution; the flags are not propagated up to enclosing
-substitutions.  The value passed back to an enclosing substitution is
-always an array, which however will consist of one word if the value was
-not itself an array.  All the following steps take place where applicable
-at all levels of substitution.
+current level of substitution, just as if the nested substitution were the
+outermost.  The flags are not propagated up to enclosing
+substitutions; the nested subsitution will return either a scalar or an
+array as determined by the flags, possibly adjusted for quoting.  All the
+following steps take place where applicable at all levels of substitution.
+Note that, unless the tt((P)) flag is present, the flags and any subscripts
+apply directly to the value of the nested substitution; for example, the
+expansion tt(${${foo}}) behaves exactly the same as tt(${foo}).
 )
 item(tt(2.) em(Parameter Subscripting))(
 If the value is a raw parameter reference with a subscript, such as
 tt(${)var(var)tt([3]}), the effect of subscripting is applied directly to
-the parameter.  If the parameter is an array, any second subscript,
-indexing on the character in the word, may appear,
-e.g. tt(${)var(var)tt([1][2]}).
+the parameter.  Subscripts are evaluated left to right; subsequent
+subscripts apply to the scalar or array value yielded by the previous
+subscript.  Thus if tt(var) is an array, tt(${var[1][2]}) is the second
+character of the first word, but tt(${var[2,4][2]}) is the entire third
+word (the second word of the range of words two through four of the
+original array).  Any number of subscripts may appear.
 )
 item(tt(3.) em(Parameter Name Replacement))(
 The effect of any tt((P)) flag, which treats the value so far as a
@@ -746,6 +752,10 @@ item(tt(5.) em(Nested Subscripting))(
 Any remaining subscript (i.e. of a nested substitution) is evaluated at
 this point, based on whether the value is an array or a scalar; if it was
 an array, a second subscript for the character in the word may also appear.
+Note that tt(${foo[2,4][2]}) is thus equivalent to tt(${${foo[2,4]}[2]})
+and also to tt("${${(@)foo[2,4]}[2]}") (the nested substitution returns an
+array in both cases), but not to tt("${${foo[2,4]}[2]}") (the nested
+substitution returns a scalar because of the quotes).
 )
 item(tt(6.) em(Modifiers))(
 Any modifiers, as specified by a trailing tt(#), tt(%), tt(/)
@@ -798,20 +808,17 @@ Suppose that tt($foo) contains the array tt(LPAR()bar baz)tt(RPAR()):
 
 startitem()
 item(tt("${(@)${foo}[1]}"))(
-This produces the result tt(bar baz).  First, the inner substitution
+This produces the result tt(b).  First, the inner substitution
 tt("${foo}"), which has no array (tt(@)) flag, produces a single word
-result.  The outer substitution tt("${(@)...[1]}") acts on this result as
-if it were a one word array, because of the array flag, so the result is
-just that single word.
+result tt("bar baz").  The outer substitution tt("${(@)...[1]}") detects
+that this is a scalar, so that (despite the tt((@)) flag) the subscript
+picks the first character. 
 )
 item(tt("${${(@)foo}[1]}"))(
-The produces the result tt(b).  In this case, the inner substitution
+The produces the result tt(bar).  In this case, the inner substitution
 tt("${(@)foo}") produces the array tt(LPAR()bar baz)tt(RPAR()).  The outer
-substitution tt("${...[1]}"), however, has no array flag, so that it joins
-the array it has to a single word and indexes as if it were a string.  Note
-that this is not identical to the case tt("${foo[1]}"), since here the
-expression tt(foo[1]) is recognised immediately as an index into an array,
-so that the result in that case is tt(bar).
+substitution tt("${...[1]}") detects that this is an array and picks the
+first word.  This is similar to the simple case tt("${foo[1]}").
 )
 enditem()
 

@@ -209,10 +209,9 @@ nicechar(int c)
     return buf;
 }
 
-#if 0
 /* Output a string's visible representation. */
 
-/**/
+#if 0 /**/
 void
 nicefputs(char *s, FILE *f)
 {
@@ -853,27 +852,64 @@ int resetneeded;
 /**/
 int winchanged;
 #endif
- 
-/* check the size of the window and adjust if necessary */
+
+/* check the size of the window and adjust if necessary. *
+ * The value of from:					 *
+ *   0: called from update_job or setupvals		 *
+ *   1: called from the SIGWINCH handler		 *
+ *   2: the user have just changed LINES manually	 *
+ *   3: the user have just changed COLUMNS manually      */
 
 /**/
 void
-adjustwinsize(void)
+adjustwinsize(int from)
 {
-#ifdef TIOCGWINSZ
     int oldcols = columns, oldrows = lines;
+
+#ifdef TIOCGWINSZ
+    static int userlines, usercols;
 
     if (SHTTY == -1)
 	return;
 
-    ioctl(SHTTY, TIOCGWINSZ, (char *)&shttyinfo.winsize);
-    setiparam("COLUMNS", shttyinfo.winsize.ws_col);
-    setiparam("LINES", shttyinfo.winsize.ws_row);
-    if (zleactive && (oldcols != columns || oldrows != lines)) {
+    if (from == 2)
+	userlines = lines > 0;
+    if (from == 3)
+	usercols = columns > 0;
+
+    if (!ioctl(SHTTY, TIOCGWINSZ, (char *)&shttyinfo.winsize)) {
+	if (!userlines || from == 1)
+	    lines = shttyinfo.winsize.ws_row;
+	if (!usercols || from == 1)
+	    columns = shttyinfo.winsize.ws_col;
+    }
+#endif   /* TIOCGWINSZ */
+
+    if (lines <= 0)
+	lines = tclines > 0 ? tclines : 24;
+    if (columns <= 0)
+	columns = tccolumns > 0 ? tccolumns : 80;
+    if (lines > 2)
+	termflags &= ~TERM_SHORT;
+    else
+	termflags |= TERM_SHORT;
+    if (columns > 2)
+	termflags &= ~TERM_NARROW;
+    else
+	termflags |= TERM_NARROW;
+
+#ifdef TIOCGWINSZ
+    if (interact && from >= 2) {
+	shttyinfo.winsize.ws_row = lines;
+	shttyinfo.winsize.ws_col = columns;
+	ioctl(SHTTY, TIOCSWINSZ, (char *)&shttyinfo.winsize);
+    }
+#endif
+
+    if (zleactive && (from >= 2 || oldcols != columns || oldrows != lines)) {
 	resetneeded = winchanged = 1;
 	zrefresh();
     }
-#endif   /* TIOCGWINSZ */
 }
 
 /* Move a fd to a place >= 10 and mark the new fd in fdtable.  If the fd *
@@ -3343,10 +3379,9 @@ dquotedztrdup(char const *s)
     return ret;
 }
 
-#if 0
 /* Unmetafy and output a string, double quoting it in its entirety. */
 
-/**/
+#if 0 /**/
 int
 dquotedzputs(char const *s, FILE *stream)
 {

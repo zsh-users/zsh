@@ -64,6 +64,7 @@ createthingytab(void)
     thingytab->hash        = hasher;
     thingytab->emptytable  = emptythingytab;
     thingytab->filltable   = NULL;
+    thingytab->cmpnodes    = strcmp;
     thingytab->addnode     = addhashnode;
     thingytab->getnode     = gethashnode;
     thingytab->getnode2    = gethashnode2;
@@ -356,7 +357,7 @@ bin_zle(char *name, char **args, char *ops, int func)
 
     /* check number of arguments */
     for(n = 0; args[n]; n++) ;
-    if(!op->o && n != 1) {
+    if(!op->o && n != 1 && n != 2) {
 	zerrnam(name, "wrong number of arguments", NULL, 0);
 	return 1;
     }
@@ -515,17 +516,31 @@ static int
 bin_zle_call(char *name, char **args, char *ops, char func)
 {
     Thingy t;
+    struct modifier modsave;
 
     if(!zleactive || incompctlfunc || incompfunc) {
 	zerrnam(name, "widgets can only be called when ZLE is active",
 	    NULL, 0);
 	return 1;
     }
+    if (args[1]) {
+	modsave = zmod;
+	if (isdigit(*args[1])) {
+	    zmod.mult = atoi(args[1]);
+	    zmod.flags |= MOD_MULT;
+	}
+	else {
+	    zmod.mult = 1;
+	    zmod.flags &= ~MOD_MULT;
+	}
+    }
     t = rthingy(args[0]);
     PERMALLOC {
       execzlefunc(t);
     } LASTALLOC;
     unrefthingy(t);
+    if (args[1])
+	zmod = modsave;
     return 0;
 }
 

@@ -318,10 +318,13 @@ cindex(file, history)
 tt(fc -R) reads the history from the given file,
 tt(fc -W) writes the history out to the given file,
 and tt(fc -A) appends the history out to the given file.
-If the tt(-I) option is added, only those
-events that are new since last incremental append (write) to
-the history file are appended (written).
-In any case the file will have no more than tt($SAVEHIST)
+If no filename is specified, the tt($HISTFILE) is assumed.
+If the tt(-I) option is added to tt(-R), only those events that are
+not already contained within the internal history list are added.
+If the tt(-I) option is added to tt(-A) or tt(-W), only those
+events that are new since last incremental append/write to
+the history file are appended/written.
+In any case, the created file will have no more than tt($SAVEHIST)
 entries.
 )
 findex(fg)
@@ -1169,30 +1172,26 @@ Equivalent to tt(whence -c).
 findex(zmodload)
 cindex(modules, loading)
 cindex(loading modules)
-xitem(tt(zmodload) [ tt(-iL) ] [ var(name) ... ])
-xitem(tt(zmodload) tt(-u) [ tt(-i) ] var(name) ...)
-xitem(tt(zmodload) tt(-d) [ tt(-L) ] [ var(name) [ var(dep) ... ] ])
-xitem(tt(zmodload) tt(-du) var(name) [ var(dep) ... ])
-xitem(tt(zmodload) tt(-a) [ tt(-iL) ] [ var(name) [ var(builtin) ... ] ])
-xitem(tt(zmodload) tt(-au) [ tt(-i) ] var(builtin) ...)
-xitem(tt(zmodload) tt(-c) [ tt(-iI) ] var(name) [ var(cond) ... ])
-xitem(tt(zmodload) tt(-cu) [ tt(-iI) ] var(cond) ...)
-xitem(tt(zmodload) tt(-c) [ tt(-IL) ])
-xitem(tt(zmodload) tt(-p) [ tt(-i) ] var(name) [ var(parameter) ... ])
-xitem(tt(zmodload) tt(-pu) [ tt(-i) ] var(parameter) ... ])
-item(tt(zmodload) tt(-p) [ tt(-L) ])(
+xitem(tt(zmodload) [ tt(-dL) ] [ ... ])
+xitem(tt(zmodload) [ tt(-a) [ tt(-bcp) [ tt(-I) ] ] ] [ tt(-iL) ] ...)
+item(tt(zmodload) tt(-u) [ tt(-abcdp) [ tt(-I) ] ] [ tt(-iL) ] ...)(
 tt(zmodload) performs operations relating to zsh's loadable modules.
 This feature is not available on all operating systems,
 or on all installations on a particular operating system.
 
-In the simplest case,
-tt(zmodload) loads a binary module.  The module must be in a file with a
-name consisting of the specified var(name) followed by a standard suffix,
-usually `tt(.so)'.  If this can't be found, the var(name) is tried without
-the suffix.
-If the module to be loaded is already loaded and the tt(-i)
-option is given, the duplicate module is ignored.  Otherwise
-tt(zmodload) prints an error message.
+Without arguments all currently loaded binary modules are printed.
+The tt(-L) option causes this list to be in the form of a series of
+tt(zmodload) commands.  Forms with arguments are:
+
+startitem()
+xitem(tt(zmodload) [ tt(-i) ] var(name) ... )
+item(tt(zmodload) tt(-u) [ tt(-i) ] var(name) ...)(
+In the simplest case, tt(zmodload) loads a binary module.  The module must
+be in a file with a name consisting of the specified var(name) followed by
+a standard suffix, usually `tt(.so)'.  If this can't be found, the
+var(name) is tried without the suffix.  If the module to be loaded is
+already loaded and the tt(-i) option is given, the duplicate module is
+ignored.  Otherwise tt(zmodload) prints an error message.
 
 The var(name)d module is searched for in the same way a command is, using
 tt($module_path) instead of tt($path).  If var(name) contains a `tt(/)',
@@ -1209,55 +1208,66 @@ unloaded (or was never loaded).
 Each module has a boot and a cleanup function.  The module
 will not be loaded if its boot function fails.  Similarly a module
 can only be unloaded if its cleanup function runs successfully.
+)
+xitem(tt(zmodload) tt(-d) [ tt(-L) ] [ var(name) ])
+xitem(tt(zmodload) tt(-d) var(name) var(dep) ...)
+item(tt(zmodload) tt(-ud) var(name) [ var(dep) ... ])(
+The tt(-d) option can be used to specify module dependencies.  The modules
+named in the second and subsequent arguments will be loaded before the
+module named in the first argument.
 
-Without arguments all currently loaded binary modules are printed.
-The tt(-L) option causes this list to be in the form of a series of
-tt(zmodload) commands.
+With tt(-d) and one argument, all dependencies for that module are listed.
+With tt(-d) and no arguments, all module dependencies are listed.  This
+listing is by default in a Makefile-like format.  The tt(-L) option
+changes this format to a list of tt(zmodload -d) commands.
 
-The tt(-d) option can be used to specify module dependencies.
-This operation is idempotent regardless of the tt(-i) option.
-The modules named in the second and subsequent arguments will be
-loaded before the module named in the first argument.
+If tt(-d) and tt(-u) are both used, dependencies are removed.  If only one
+argument is given, all dependencies for that module are removed.
+)
+xitem(tt(zmodload) tt(-ab) [ tt(-L) ])
+xitem(tt(zmodload) tt(-ab) [ tt(-i) ] var(name) [ var(builtin) ... ])
+item(tt(zmodload) tt(-ub) [ tt(-i) ] var(builtin) ...)(
+The tt(-ab) option defines autoloaded builtins.  It defines the specified
+var(builtin)s.  When any of those builtins is called, the module specified
+in the first argument is loaded.  If only the var(name) is given, one
+builtin is defined, with the same name as the module.  tt(-i) suppresses
+the error if the builtin is already defined or autoloaded, regardless of
+which module it came from.
 
-With tt(-d) and one
-argument, all dependencies for that module are listed.  With tt(-d) and no
-arguments, all module dependencies are listed.
-This listing is by default in a Makefile-like format.
-The tt(-L) option changes this format to a list of
-tt(zmodload -d) commands.
+With tt(-ab) and no arguments, all autoloaded builtins are listed, with the
+module name (if different) shown in parentheses after the builtin name.
+The tt(-L) option changes this format to a list of tt(zmodload -a)
+commands.
 
-If tt(-d) and tt(-u) are both used, dependencies are removed.
-This operation is idempotent regardless of the tt(-i) option.
-If only one argument is given, all dependencies for that module are removed.
-
-The tt(-a) option defines autoloaded builtins.  It defines the
-specified var(builtin)s.  When any of those builtins is called, the module
-specified in the first argument is loaded.  If only one argument is given,
-one builtin is defined, with the same name as the module.
-tt(-i) suppresses the error if the builtin is already defined or
-autoloaded, regardless of which module it came from.
-
-With tt(-a) and no arguments, all
-autoloaded builtins are listed, with the module name (if different)
-shown in parentheses after the builtin name.  The tt(-L) option changes
-this format to a list of tt(zmodload -a) commands.
-
-If tt(-a) is used
-together with the tt(-u) option it removes builtins defined with
-tt(zmodload -a).  This is only possible if the builtin is not yet
-loaded.  tt(-i) suppresses the error if the builtin is already
+If tt(-b) is used together with the tt(-u) option, it removes builtins
+previously defined with tt(-ab).  This is only possible if the builtin is
+not yet loaded.  tt(-i) suppresses the error if the builtin is already
 removed (or never existed).
-
-The tt(-c) option is used to define autoloaded condition codes. The
+)
+xitem(tt(zmodload) tt(-ac) [ tt(-IL) ])
+xitem(tt(zmodload) tt(-ac) [ tt(-iI) ] var(name) [ var(cond) ... ])
+item(tt(zmodload) tt(-uc) [ tt(-iI) ] var(cond) ...)(
+The tt(-ac) option is used to define autoloaded condition codes. The
 var(cond) strings give the names of the conditions defined by the
 module. The optional tt(-I) option is used to define infix condition
 names. Without this option prefix condition names are defined.
 
-Together with the tt(-u) option definitions for autoloaded conditions
-are removed. If given no condition names all defined names are listed
-(as a series of tt(zmodload) commands if the tt(-L) option is given).
+If given no condition names, all defined names are listed (as a series of
+tt(zmodload) commands if the tt(-L) option is given).
 
-The tt(-p) option is like the tt(-c) option, but makes tt(zmodload)
-work on autoloaded parameters instead of condition codes.
+The tt(-uc) option removes definitions for autoloaded conditions.
+)
+xitem(tt(zmodload) tt(-ap) [ tt(-L) ])
+xitem(tt(zmodload) tt(-ap) [ tt(-i) ] var(name) [ var(parameter) ... ])
+item(tt(zmodload) tt(-up) [ tt(-i) ] var(parameter) ...)(
+The tt(-p) option is like the tt(-b) and tt(-c) options, but makes
+tt(zmodload) work on autoloaded parameters instead.
+)
+xitem(tt(zmodload) tt(-a) [ tt(-L) ])
+xitem(tt(zmodload) tt(-a) [ tt(-i) ] var(name) [ var(builtin) ... ])
+item(tt(zmodload) tt(-ua) [ tt(-i) ] var(builtin) ...)(
+Equivalent to tt(-ab) and tt(-ub).
+)
+enditem()
 )
 enditem()

@@ -245,35 +245,43 @@ singsub(char **s)
  * the result is stored in *a. If `a' is zero a multiple word result is *
  * joined using sep or the IFS parameter if sep is zero and the result  *
  * is returned in *s.  The return value is true iff the expansion       *
- * resulted in an empty list                                            */
+ * resulted in an empty list.                                           *
+ * The mult_isarr variable is used by paramsubst() to tell if it yields *
+ * an array.                                                            */
+
+static int mult_isarr;
 
 /**/
 static int
 multsub(char **s, char ***a, int *isarr, char *sep)
 {
     LinkList foo;
-    int l;
+    int l, omi = mult_isarr;
     char **r, **p;
 
+    mult_isarr = 0;
     foo = newlinklist();
     addlinknode(foo, *s);
     prefork(foo, 0);
     if (errflag) {
 	if (isarr)
 	    *isarr = 0;
+	mult_isarr = omi;
 	return 0;
     }
-    if ((l = countlinknodes(foo)) > 1 || a) {
+    if ((l = countlinknodes(foo))) {
 	p = r = ncalloc((l + 1) * sizeof(char*));
 	while (nonempty(foo))
 	    *p++ = (char *)ugetnode(foo);
 	*p = NULL;
-	if (a) {
+	if (a && mult_isarr) {
 	    *a = r;
 	    *isarr = 1;
+	    mult_isarr = omi;
 	    return 0;
 	}
 	*s = sepjoin(r, NULL);
+	mult_isarr = omi;
 	return 0;
     }
     if (l)
@@ -282,6 +290,7 @@ multsub(char **s, char ***a, int *isarr, char *sep)
 	*s = dupstring("");
     if (isarr)
 	*isarr = 0;
+    mult_isarr = omi;
     return !l;
 }
 
@@ -977,16 +986,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	skipparens(*s, *s == Inpar ? Outpar : Outbrace, &s);
 	sav = *s;
 	*s = 0;
-	if (multsub(&val, ((!aspar && (!quoted || nojoin)) ? &aval : NULL),
-		    &isarr, NULL) &&
-	    quoted) {
+	if (multsub(&val, (aspar ? NULL : &aval), &isarr, NULL) && quoted) {
 	    isarr = -1;
 	    aval = alloc(sizeof(char *));
 	    aspar = 0;
 	} else if (aspar)
 	    idbeg = val;
-	if (isarr)
-	    isarr = -1;
 	copied = 1;
 	*s = sav;
 	v = (Value) NULL;
@@ -1465,6 +1470,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	val = dupstring(buf);
 	isarr = 0;
     }
+    mult_isarr = isarr;
     if (isarr > 0 && !plan9 && (!aval || !aval[0])) {
 	val = dupstring("");
 	isarr = 0;
@@ -1485,6 +1491,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		val = aval[0];
 	    else
 		isarr = 2;
+	    mult_isarr = isarr;
 	}
     }
     if (casmod) {

@@ -42,14 +42,32 @@
 
 # If we got the `-d'-flag, we will automatically dump the new state (at
 # the end).
+# `-f dir' is used to pass down the directory where this file was
+#   found.  This is necessary if functionargzero is not set.
 # If we were given an argument, this will be taken as the name of the
 # file in which to store the dump.
 
-if [[ "$1" = -d ]]; then
-  _i_autodump=1
-  shift
-else
-  _i_autodump=0
+_i_fdir=''
+_i_dumpfile=''
+_i_autodump=0
+while [[ $1 = -[df] ]]; do
+  if [[ "$1" = -d ]]; then
+    _i_autodump=1
+    shift
+    if [[ -n "$1" && "$1" != -[df] ]]; then
+      _i_dumpfile="$1"
+      shift
+    fi
+  elif [[ "$1" = -f ]]; then
+    # Used by compinstall to pass down directory where compinit was found
+    shift
+    _i_fdir="$1"
+    shift
+  fi
+done
+# Get the directory if we don't have it already and we can
+if [[ -z "$_i_fdir" && -o functionargzero && $0 = */* ]]; then
+  _i_fdir=${0:h}
 fi
 
 # The associative array containing the definitions for the commands.
@@ -63,9 +81,19 @@ _patcomps=()
 typeset -A compconfig
 
 # Standard initialisation for `compconfig'.
-
-(( $# )) && compconfig[dumpfile]="$1"
-[[ -z "$compconfig[dumpfile]" ]] && compconfig[dumpfile]="$0.dump"
+if [[ -n $_i_dumpfile ]]; then
+  # Explicitly supplied dumpfile.
+  compconfig[dumpfile]="$_i_dumpfile"
+elif [[ -o functionargzero ]]; then
+  # We can deduce it from the name of this script
+  compconfig[dumpfile]="$0.dump"
+elif [[ -n $_i_fdir ]]; then
+  # We were told what directory to use.
+  compconfig[dumpfile]="$_i_fdir/compinit.dump"
+else
+  # Now we're stuck, but we'd better do something.
+  compconfig[dumpfile]="$HOME/.compinit.dump"
+fi
 
 compconfig[correct_accept]=2n
 compconfig[correct_prompt]='correct to:'
@@ -180,9 +208,15 @@ compdef() {
     *)
       # For commands store the function name in the `_comps'
       # associative array, command names as keys.
-      for i; do
-        [[ -z "$new" || "${+_comps[$i]}" -eq 0 ]] && _comps[$i]="$func"
-      done
+      if [[ -z "$new" ]]; then
+	for i; do
+	  _comps[$i]="$func"
+	done
+      else
+        for i; do
+          [[ "${+_comps[$i]}" -eq 0 ]] && _comps[$i]="$func"
+        done
+      fi
       ;;
     esac
   else
@@ -265,8 +299,24 @@ compconf() {
 # Now we automatically make the definition files autoloaded.
 
 typeset -U _i_files
-_i_files=( ${^~fpath}/_(|*[^~])(N:t) )
-_i_initname=$0
+_i_files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
+if [[ $#_i_files -lt 20 ]]; then
+  # Too few files:  we need some more directories
+  # Assume that we need to add the compinit directory to fpath.
+  if [[ -n $_i_fdir ]]; then
+    if [[ $_i_fdir = */Core ]]; then
+      # Add all the Completion subdirectories
+      fpath=(${_i_fdir:h}/*(/) $fpath)
+    elif [[ -d $_i_fdir/Core ]]; then
+      # Likewise
+      fpath=(${_i_fdir}/*(/) $fpath)
+    else
+      fpath=($_i_fdir $fpath)
+    fi
+    _i_files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
+  fi
+fi
+
 _i_done=''
 
 # If we have a dump file, load it.
@@ -286,38 +336,45 @@ if [[ -z "$_i_done" ]]; then
       read -rA _i_line < $_i_file
       _i_tag=$_i_line[1]
       shift _i_line
-      if [[ $_i_tag = '#compdef' ]]; then
+      case $_i_tag in
+      (\#compdef)
 	if [[ $_i_line[1] = -[pk] ]]; then
 	  compdef ${_i_line[1]}a "${_i_file:t}" "${(@)_i_line[2,-1]}"
 	else
 	  compdef -na "${_i_file:t}" "${_i_line[@]}"
 	fi
-      elif [[ $_i_tag = '#autoload' ]]; then
+	;;
+      (\#autoload)
 	autoload ${_i_file:t}
-      fi
+	;;
+      esac
     done
   done
 
   bindkey |
     while read -rA _i_line; do
-      if [[ "$_i_line[2]" = complete-word ||
-	"$_i_line[2]" = delete-char-or-list ||
-	"$_i_line[2]" = expand-or-complete ||
-	"$_i_line[2]" = expand-or-complete-prefix ||
-	"$_i_line[2]" = list-choices ||
-	"$_i_line[2]" = menu-complete ||
-	"$_i_line[2]" = menu-expand-or-complete ||
-	"$_i_line[2]" = reverse-menu-complete ]]; then
+      case "$_i_line[2]" in
+      (complete-word) ;&
+      (delete-char-or-list) ;&
+      (expand-or-complete) ;&
+      (expand-or-complete-prefix) ;&
+      (list-choices) ;&
+      (menu-complete) ;&
+      (menu-expand-or-complete) ;&
+      (reverse-menu-complete)
 	zle -C _complete_$_i_line[2] $_i_line[2] _main_complete
 	bindkey "${_i_line[1][2,-2]}" _complete_$_i_line[2]
-      fi
+	;;
+      esac
     done
 
   unset _i_dir _i_line _i_file _i_tag
 
   # If autodumping was requested, do it now.
 
-  (( _i_autodump )) && builtin . ${_i_initname:h}/compdump
+  if [[ -n ${_i_fdir} && $_i_autodump = 1 ]]; then
+    builtin . ${_i_fdir}/compdump
+  fi
 fi
 
-unset _i_files _i_initname _i_done _i_autodump
+unset _i_files _i_initname _i_done _i_autodump _i_fdir _i_dumpfile

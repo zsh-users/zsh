@@ -110,15 +110,14 @@ loop(int toplevel, int justonce)
 	    List prelist;
 
 	    if (toplevel && (prelist = getshfunc("preexec")) != &dummy_list) {
-		Histent he = gethistent(curhist);
 		LinkList args;
 		int osc = sfcontext;
 
 		PERMALLOC {
 		    args = newlinklist();
 		    addlinknode(args, "preexec");
-		    if (he && he->text)
-			addlinknode(args, he->text);
+		    if (hist_ring)
+			addlinknode(args, hist_ring->text);
 		} LASTALLOC;
 		sfcontext = SFC_HOOK;
 		doshfunc("preexec", prelist, args, 0, 1);
@@ -642,11 +641,13 @@ setupvals(void)
     wrappers = NULL;
 
 #ifdef TIOCGWINSZ
-    adjustwinsize();
+    adjustwinsize(0);
 #else
-    /* Using zero below sets the defaults from termcap */
-    setiparam("COLUMNS", 0);
-    setiparam("LINES", 0);
+    /* columns and lines are normally zero, unless something different *
+     * was inhereted from the environment.  If either of them are zero *
+     * the setiparam calls below set them to the defaults from termcap */
+    setiparam("COLUMNS", columns);
+    setiparam("LINES", lines);
 #endif
 
 #ifdef HAVE_GETRLIMIT
@@ -828,7 +829,7 @@ init_misc(void)
     }
 
     if (interact && isset(RCS))
-	readhistfile(getsparam("HISTFILE"), 0);
+	readhistfile(NULL, 0, HFILE_USE_OPTIONS);
 }
 
 /* source a file */

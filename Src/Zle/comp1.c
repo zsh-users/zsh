@@ -47,7 +47,7 @@ Cmlist cmatcher;
 void (*makecompparamsptr) _((void));
 
 /**/
-void (*comp_setunsetptr) _((int, int));
+void (*comp_setunsetptr) _((unsigned int, unsigned int));
 
 /* pointers to functions required by compctl and defined by zle */
 
@@ -147,6 +147,7 @@ createcompctltable(void)
     compctltab->hash        = hasher;
     compctltab->emptytable  = emptyhashtable;
     compctltab->filltable   = NULL;
+    compctltab->cmpnodes    = strcmp;
     compctltab->addnode     = addhashnode;
     compctltab->getnode     = gethashnode2;
     compctltab->getnode2    = gethashnode2;
