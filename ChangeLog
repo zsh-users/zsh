@@ -1,3 +1,8 @@
+2001-05-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 14304: Src/hist.c: Fixed an obscure local-history bug that could
+	make the "history" command output something that was slightly wrong.
+
 2001-05-10  Andrej Borsenkow <bor@zsh.org>
 
 	* users/3872: Src/Modules/zftp.c: rename inet_* to avoid clash
