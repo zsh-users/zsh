@@ -1,3 +1,8 @@
+2002-07-08  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17438: Completion/Base/Widget/_complete_help: don't display
+	_dispatch as one of the called functions
+
 2002-07-05  Peter Stephenson  <pws@csr.com>
 
 	* 17432: Test/B02typeset.ztst:  change consequent on 17334
