@@ -1,5 +1,7 @@
 #compdef bug reportbug
 
+local _bug_commonargs _rb_commonargs
+
 _bug_commonargs=('-d[debug: send mail to postmaster@localhost]' \
            '-m[maintainer-only]' \
            '-p[print to stdout instead of mail]' \
@@ -7,6 +9,15 @@ _bug_commonargs=('-d[debug: send mail to postmaster@localhost]' \
            '-h[help]' \
            '-v[version]' \
            '*:package:_deb_packages installed')
+
+
+_rb_commonargs=('(--bts)-B[use alternate BTS]:system:(debian gnome kde tdyc kde-debian)' \
+           '(-B)--bts=:system:(debian gnome kde tdyc kde-debian)' \
+           '(--ldap)-l[enable LDAP support]' \
+           '(-l)--ldap' \
+           '--no-ldap[disable LDAP support]' \
+	   '(--http_proxy)--proxy=:proxyhost:_hosts' \
+	   '(--proxy)--http_proxy=:proxyhost:_hosts')
 
 case "${words[1]:t}" in
 bug)
@@ -39,13 +50,9 @@ _arguments '(--no-config-files)-c[exclude configs from report]' \
            '(-a)--af[use af instead of editor]' \
            '(--no-bts-query)-b[do not check bts]' \
            '(-b)--no-bts-query' \
-           '(--bts)-B[use alternate BTS]:system:(debian gnome kde tdyc)' \
-           '(-B)--bts=:system:(debian gnome kde tdyc)' \
            '-g[sign report with GnuPG]' \
-           '(--include)-i[include text]:' \
-           '(-i)--include=:' \
-           '(--no-ldap)-l[disable LDAP support]' \
-           '(-l)--no-ldap' \
+           '(--include)-i[include text]:_files' \
+           '(-i)--include=:_files' \
            '(--mutt)-M[use mutt instead of editor]' \
            '(-M)--mutt' \
            '--mua=[use specified mua instead of editor]' \
@@ -56,7 +63,14 @@ _arguments '(--no-config-files)-c[exclude configs from report]' \
            '(-o)--output=' \
            '(--pgp)-P[sign report with PGP]' \
            '(-P)--pgp' \
-           '--ldap[enable LDAP support]' \
-           "$_bug_commonargs[@]"
+           "$_bug_commonargs[@]" \
+	   "$_rb_commonargs[@]"
 ;;
+
+querybts)
+_arguments '(--web)-w[launch external web browser]' \
+           '(-w)--web' \
+           "$_rb_commonargs[@]" \
+           '*:package:_deb_packages avail'
+
 esac
