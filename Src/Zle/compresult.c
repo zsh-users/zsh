@@ -165,7 +165,7 @@ static char *
 cline_str(Cline l, int ins, int *csp, LinkList posl)
 {
     Cline s;
-    int ocs = cs, ncs, pcs, scs;
+    int ocs = cs, ncs, pcs, scs, opos, npos;
     int pm, pmax, pmm, pma, sm, smax, smm, sma, d, dm, mid;
     int i, j, li = 0, cbr, padd = (ins ? wb - ocs : -ocs);
     Brinfo brp, brs;
@@ -224,8 +224,10 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 
 		if ((s->flags & CLF_DIFF) && (!dm || (s->flags & CLF_MATCHED))) {
 		    d = cs; dm = s->flags & CLF_MATCHED;
-		    if (posl)
-			addlinknode(posl, (void *) ((long) (cs + padd)));
+		    if (posl && (npos = cs + padd) != opos) {
+			opos = npos;
+			addlinknode(posl, (void *) ((long) npos));
+		    }
 		}
 		li += s->llen;
 	    }
@@ -247,8 +249,10 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	/* Remember the position if this is the first prefix with
 	 * missing characters. */
 	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF)) {
-	    if (posl && l->min != l->max)
-		addlinknode(posl, (void *) ((long) (cs + padd)));
+	    if (posl && l->min != l->max && (npos = cs + padd) != opos) {
+		opos = npos;
+		addlinknode(posl, (void *) ((long) npos));
+	    }
 	    if (((pmax < (l->max - l->min) || (pma && l->max != l->min)) &&
 		 (!pmm || (l->flags & CLF_MATCHED))) ||
 		((l->flags & CLF_MATCHED) && !pmm)) {
@@ -299,8 +303,10 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	    if (l->flags & CLF_MID)
 		mid = cs;
 	    else if (l->flags & CLF_SUF) {
-		if (posl && l->min != l->max)
-		    addlinknode(posl, (void *) ((long) (cs + padd)));
+		if (posl && l->min != l->max && (npos = cs + padd) != opos) {
+		    opos = npos;
+		    addlinknode(posl, (void *) ((long) npos));
+		}
 		if (((smax < (l->min - l->max) || (sma && l->max != l->min)) &&
 		     (!smm || (l->flags & CLF_MATCHED))) ||
 		    ((l->flags & CLF_MATCHED) && !smm)) {
@@ -399,14 +405,16 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	    cs += i;
 	    if (j >= 0 && (!dm || (js->flags & CLF_MATCHED))) {
 		d = cs - j; dm = js->flags & CLF_MATCHED;
-		if (posl)
-		    addlinknode(posl, (void *) ((long) (cs - j + padd)));
+		if (posl && (npos = cs - j + padd) != opos) {
+		    opos = npos;
+		    addlinknode(posl, (void *) ((long) npos));
+		}
 	    }
 	}
 	l = l->next;
     }
-    if (posl)
-	addlinknode(posl, (void *) ((long) (cs + padd)));
+    if (posl && (npos = cs + padd) != opos)
+	addlinknode(posl, (void *) ((long) npos));
     if (ins) {
 	int ocs = cs;
 

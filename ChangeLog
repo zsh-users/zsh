@@ -1,3 +1,9 @@
+2001-01-12  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13343: Src/Zle/compmatch.c, Src/Zle/compresult.c: fix for 13339
+ 	(report each position only once) and fixlet for matching: a case
+ 	where missing characters weren't remembered
+	
 2001-01-11  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13339: Doc/Zsh/compwid.yo, Doc/Zsh/contrib.yo,
