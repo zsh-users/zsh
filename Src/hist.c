@@ -2266,7 +2266,16 @@ bufferwords(LinkList list, char *buf, int *index)
 	}
     } while (tok != ENDINPUT && tok != LEXERR);
     if (buf && tok == LEXERR && tokstr && *tokstr) {
+	int plen;
 	untokenize((p = dupstring(tokstr)));
+	plen = strlen(p);
+	/*
+	 * Strip the space we added for lexing but which won't have
+	 * been swallowed by the lexer because we aborted early.
+	 * The test is paranoia.
+	 */
+	if (plen && p[plen-1] == ' ' && (plen == 1 || p[plen-2] != Meta))
+	    p[plen - 1] = '\0';
 	addlinknode(list, p);
 	num++;
     }
