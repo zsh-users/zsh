@@ -1727,8 +1727,13 @@ setarrvalue(Value v, char **val)
 		 v->pm->nam, 0);
 	    return;
 	}
-	if (v->inv && unset(KSHARRAYS))
-	    v->start--, v->end--;
+	if (v->inv && unset(KSHARRAYS)) {
+	    if (v->start > 0)
+		v->start--;
+	    v->end--;
+	}
+	if (v->end < v->start)
+	    v->end = v->start;
 	q = old = v->pm->gets.afn(v->pm);
 	n = arrlen(old);
 	if (v->start < 0) {
