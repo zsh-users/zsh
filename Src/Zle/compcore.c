@@ -282,7 +282,7 @@ int lastend;
 int
 do_completion(Hookdef dummy, Compldat dat)
 {
-    int ret = 0, lst = dat->lst, incmd = dat->incmd;
+    int ret = 0, lst = dat->lst, incmd = dat->incmd, osl = showinglist;
     char *s = dat->s;
     char *opm;
     LinkNode n;
@@ -412,6 +412,9 @@ do_completion(Hookdef dummy, Compldat dat)
 	if (nmatches > 1 && diffmatches) {
 	    /* There is more than one match. */
 	    ret = do_ambiguous();
+
+	    if (!showinglist && uselist && listshown && (usemenu == 2 || oldlist))
+		showinglist = osl;
 	} else if (nmatches == 1 || (nmatches > 1 && !diffmatches)) {
 	    /* Only one match. */
 	    Cmgroup m = amatches;

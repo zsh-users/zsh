@@ -1,3 +1,8 @@
+2000-10-04  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12884: Src/Zle/compcore.c: don't forget a displayed list when
+ 	starting menu completion
+	
 2000-10-04  Tanaka Akira  <akr@zsh.org>
 
 	* 12872: Completion/User/_cvs: Fix modules completion when a cvsroot
