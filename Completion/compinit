@@ -223,7 +223,7 @@ compdef() {
   # Get the options.
 
   if (( ! $# )); then
-    echo "$0: I need arguments"
+    print -u2 "$0: I need arguments"
     return 1
   fi
 
@@ -234,7 +234,7 @@ compdef() {
     [pPkK]) if [[ -n "$type" ]]; then
             # Error if both `-p' and `-k' are given (or one of them
 	    # twice).
-            echo "$0: type already set to $type"
+            print -u2 "$0: type already set to $type"
 	    return 1
 	  fi
 	  if [[ "$opt" = p ]]; then
@@ -253,7 +253,7 @@ compdef() {
   shift OPTIND-1
 
   if (( ! $# )); then
-    echo "$0: I need arguments"
+    print -u2 "$0: I need arguments"
     return 1
   fi
 
@@ -275,11 +275,11 @@ compdef() {
 	    _comps[$cmd]="$func"
 	    _services[$cmd]="$svc"
 	  else
-	    echo "$0: unknown command or service: $svc"
+	    print -u2 "$0: unknown command or service: $svc"
 	    ret=1
 	  fi
 	else
-	  echo "$0: invalid argument: $1"
+	  print -u2 "$0: invalid argument: $1"
 	  ret=1
 	fi
         shift
@@ -299,7 +299,7 @@ compdef() {
     widgetkey)
       while [[ -n $1 ]]; do
 	if [[ $# -lt 3 ]]; then
-	  echo "$0: compdef -K requires <widget> <comp-widget> <key>"
+	  print -u2 "$0: compdef -K requires <widget> <comp-widget> <key>"
 	  return 1
 	fi
 	[[ $1 = _* ]] || 1="_$1"
@@ -317,7 +317,7 @@ compdef() {
       ;;
     key)
       if [[ $# -lt 2 ]]; then
-        echo "$0: missing keys"
+        print -u2 "$0: missing keys"
 	return 1
       fi
 
@@ -390,7 +390,7 @@ compdef() {
     key)
       # Oops, cannot do that yet.
 
-      echo "$0: cannot restore key bindings"
+      print -u2 "$0: cannot restore key bindings"
       return 1
       ;;
     *)
@@ -413,7 +413,8 @@ if [[ -n "$_i_check" ]]; then
     if [[ -n "$_i_q" ]]; then
       if [[ "$_i_fail" = ask ]]; then
         if ! read -q "?Ignore insecure $_i_q and continue [ny]? "; then
-	  echo "$0: initialization aborted"
+	  print -u2 "run compaudit to see list of insecure $_i_q"
+	  print -u2 "$0: initialization aborted"
           unfunction compinit compdef
           unset _comp_dumpfile _comp_secure compprefuncs comppostfuncs \
                 _comps _patcomps _postpatcomps _compautos _lastcomp
