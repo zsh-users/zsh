@@ -292,7 +292,7 @@ getparamnode(HashTable ht, char *nam)
 	if (!load_module(mn))
 	    return NULL;
 	hn = gethashnode2(ht, nam);
-	if (((Param) hn) == pm) {
+	if (((Param) hn) == pm && (pm->flags & PM_AUTOLOAD)) {
 	    pm->flags &= ~PM_AUTOLOAD;
 	    zwarnnam(nam, "autoload failed", NULL, 0);
 	}

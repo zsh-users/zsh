@@ -173,6 +173,22 @@ if [[ "$pre[1]" = \~ ]]; then
   orig="${orig#*/}"
   donepath=''
   prepaths=( '' )
+elif [[ "$pre" = *\$*/* ]]; then
+
+  # If there is a parameter expansion in the word from the line, we try
+  # to complete the beast by expanding the prefix and completing anything
+  # after the first slash after the parameter expansion.
+  # This fails for things like `f/$foo/b/<TAB>' where the first `f' is
+  # meant as a partial path.
+
+  linepath="${(M)pre##*\$[^/]##/}"
+  realpath=${(e)~linepath}
+  [[ "$realpath" = "$linepath" ]] && return 1
+  pre="${pre#${linepath}}"
+  i="${#linepath//[^\\/]}"
+  orig="${orig[1,(in:i:)/][1,-2]}"
+  donepath=''
+  prepaths=( '' )
 else
   # If the string does not start with a `~' we don't remove a prefix from the
   # string.

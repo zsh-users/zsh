@@ -27,18 +27,21 @@ fi
 
 _description expl parameter
 
-if zmodload -e parameter; then
-  setopt localoptions extendedglob
-  pars=( ${(k)parameters[(R)^*local*]} )
-else
-  pars=( ${${${(f)"$(typeset +)"}:#*local *}##* } )
-fi
-
 if [[ -n "$slash" && -o autoparamslash ]]; then
   local i dirs nodirs ret=1
 
   dirs=()
   nodirs=()
+
+  if zmodload -e parameter; then
+    setopt localoptions extendedglob
+    nodirs=( ${(k)parameters[(R)undefined]} )
+    pars=( ${(k)parameters[(R)^*(local|undefined)*]} )
+  else
+    nodirs=( ${${(M)${(f)"$(typeset +)"}:#undefined *}##* } )
+    pars=( ${${${(f)"$(typeset +)"}:#*(local|undefined) *}##* } )
+  fi
+
   for i in $pars; do
     if [[ -d "${(P)i}" ]]; then
       dirs=( $dirs $i )
@@ -57,6 +60,13 @@ if [[ -n "$slash" && -o autoparamslash ]]; then
 
   return ret
 else
+  if zmodload -e parameter; then
+    setopt localoptions extendedglob
+    pars=( ${(k)parameters[(R)^*local*]} )
+  else
+    pars=( ${${${(f)"$(typeset +)"}:#*local *}##* } )
+  fi
+
   if [[ "$slash" = normal ]]; then
     compadd -S "$suf" -r ' [:' "$expl[@]" "$@" - $pars
   elif [[ "$slash" = brace ]]; then

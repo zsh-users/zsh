@@ -83,6 +83,9 @@ paramtypestr(Param pm)
     int f = pm->flags;
 
     if (!(f & PM_UNSET)) {
+	if (pm->flags & PM_AUTOLOAD)
+	    return dupstring("undefined");
+
 	switch (PM_TYPE(f)) {
 	case PM_SCALAR:  val = "scalar"; break;
 	case PM_ARRAY:   val = "array"; break;
