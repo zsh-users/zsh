@@ -1,3 +1,8 @@
+2002-03-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 16803: Completion/Debian/Command/_make-kpkg,
+	Completion/Debian/Command/_dpkg: option descriptions
+
 2002-03-10  Clint Adams  <clint@zsh.org>
 
 	* 16789: Completion/Unix/Command/_netcat: completion for netcat,
