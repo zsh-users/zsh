@@ -424,7 +424,10 @@ do_load_module(char const *name)
 static void *
 do_load_module(char const *name)
 {
+    int waserr = errflag;
+
     zerr("failed to load module: %s", name, 0);
+    errflag = waserr;
 
     return NULL;
 }
