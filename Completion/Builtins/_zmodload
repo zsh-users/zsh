@@ -10,5 +10,5 @@ elif [[ "$fl" = -*u* ]]; then
   compadd "$expl[@]" - $(zmodload)
 else
   _description expl 'module file'
-  compadd "$expl[@]" - ${^module_path}/*(N:t:r)
+  compadd "$expl[@]" - ${^module_path}/*.s[ol](N:t:r)
 fi
