@@ -37,81 +37,62 @@ typedef struct style *Style;
 
 /* A pattern and the styles for it. */
 
+struct style {
+    Style next;			/* next in stypat list */
+    Stypat pats;		/* patterns */
+    char *name;
+};
+
 struct stypat {
     Stypat next;
     char *pat;			/* pattern string */
     Patprog prog;		/* compiled pattern */
     int weight;			/* how specific is the pattern? */
-    Style styles, lstyles;	/* first/last style */
-};
-    
-struct style {
-    Style next;
-    char *name;
     char **vals;
 };
-
+    
 /* List of styles. */
 
-static Stypat zstyles, lzstyles;
+static Style zstyles, zlstyles;
 
 /* Memory stuff. */
 
 static void
-freestyle(Style s)
+freestypat(Stypat p)
 {
-    Style n;
-
-    while (s) {
-	n = s->next;
-
-	zsfree(s->name);
-	if (s->vals)
-	    freearray(s->vals);
-	zfree(s, sizeof(*s));
-
-	s = n;
-    }
+    zsfree(p->pat);
+    freepatprog(p->prog);
+    if (p->vals)
+	freearray(p->vals);
+    zfree(p, sizeof(*p));
 }
 
 static void
-freestypat(Stypat p)
+freeallstyles(void)
 {
-    Stypat n;
+    Style s, sn;
+    Stypat p, pn;
 
-    while (p) {
-	n = p->next;
-
-	zsfree(p->pat);
-	freepatprog(p->prog);
-	zfree(p, sizeof(*p));
-
-	p = n;
+    for (s = zstyles; s; s = sn) {
+	sn = s->next;
+	for (p = s->pats; p; p = pn) {
+	    pn = p->next;
+	    freestypat(p);
+	}
+	zsfree(s->name);
+	zfree(s, sizeof(*s));
     }
+    zstyles = zlstyles = NULL;
 }
 
-/* Get the struct for a pattern, if any. */
-
-static Stypat
-getstypat(char *pat)
-{
-    Stypat p;
-
-    for (p = zstyles; p; p = p->next)
-	if (!strcmp(pat, p->pat))
-	    return p;
-
-    return NULL;
-}
-
-/* Get the style stuff for a name. */
+/* Get the style struct for a name. */
 
 static Style
-getstyle(Stypat p, char *name)
+getstyle(char *name)
 {
     Style s;
 
-    for (s = p->styles; s; s=  s->next)
+    for (s = zstyles; s; s = s->next)
 	if (!strcmp(name, s->name))
 	    return s;
 
@@ -121,66 +102,52 @@ getstyle(Stypat p, char *name)
 /* Store a value for a style. */
 
 static void
-setstyle(Stypat p, char *name, char **vals)
+setstypat(Style s, char *pat, Patprog prog, char **vals)
 {
-    Style s;
+    int weight, tmp, first;
+    char *str;
+    Stypat p, q, qq;
 
-    for (s = p->styles; s; s = s->next)
-	if (!strcmp(name, s->name)) {
+    for (p = s->pats; p; p = p->next)
+	if (!strcmp(pat, p->pat)) {
 
 	    /* Exists -> replace. */
 
-	    if (s->vals)
-		freearray(s->vals);
+	    if (p->vals)
+		freearray(p->vals);
 	    PERMALLOC {
-		s->vals = arrdup(vals);
+		p->vals = arrdup(vals);
 	    } LASTALLOC;
 
 	    return;
 	}
 
-    /* New style. */
+    /* New pattern. */
 
-    s = (Style) zalloc(sizeof(*s));
-
-    s->name = ztrdup(name);
+    p = (Stypat) zalloc(sizeof(*p));
+    p->pat = ztrdup(pat);
+    p->prog = prog;
     PERMALLOC {
-	s->vals = arrdup(vals);
+	p->vals = arrdup(vals);
     } LASTALLOC;
-    s->next = NULL;
-
-    if (p->lstyles)
-	p->lstyles->next = s;
-    else
-	p->styles = s;
-    p->lstyles = s;
-}
-
-/* Add a new pattern. */
-
-static Stypat
-addstypat(char *pat, Patprog prog)
-{
-    Stypat p, q, qq;
-    int weight, tmp, first;
-    char *s;
+    p->next = NULL;
 
     /* Calculate the weight. */
 
-    for (weight = 0, tmp = 2, first = 1, s = pat; *s; s++) {
-	if (first && *s == '*' && (!s[1] || s[1] == ':')) {
+    for (weight = 0, tmp = 2, first = 1, str = pat; *str; str++) {
+	if (first && *str == '*' && (!str[1] || str[1] == ':')) {
 	    /* Only `*' in this component. */
 	    tmp = 0;
 	    continue;
 	}
 	first = 0;
 
-	if (*s == '(' || *s == '|' || *s == '*' || *s == '[' || *s == '<' ||
-	    *s == '?' || *s == '#' || *s == '^')
+	if (*str == '(' || *str == '|' || *str == '*' || *str == '[' ||
+	    *str == '<' ||  *str == '?' || *str == '#' || *str == '^')
 	    /* Is pattern. */
 	    tmp = 1;
 
-	if (*s == ':') {
+	if (*str == ':') {
 	    /* Yet another component. */
 
 	    first = 1;
@@ -188,91 +155,52 @@ addstypat(char *pat, Patprog prog)
 	    tmp = 2;
 	}
     }
-    weight += tmp;
+    p->weight = weight + tmp;
 
-    p = (Stypat) zalloc(sizeof(*p));
-
-    p->pat = ztrdup(pat);
-    p->weight = weight;
-    p->prog = prog;
-    p->styles = p->lstyles = NULL;
-
-    for (qq = NULL, q = zstyles; q && q->weight >= weight;
+    for (qq = NULL, q = s->pats; q && q->weight >= weight;
 	 qq = q, q = q->next);
 
     p->next = q;
     if (qq)
 	qq->next = p;
     else
-	zstyles = p;
-    if (!q)
-	lzstyles = p;
-
-    return p;
+	s->pats = p;
 }
 
-/* Delete a style. */
+/* Add a new style. */
 
-static void
-deletestyle(Stypat p, char *name)
+static Style
+addstyle(char *name)
 {
-    Style ps, s;
+    Style s;
 
-    for (ps = NULL, s = p->styles; s; ps = s, s = s->next)
-	if (!strcmp(name, s->name)) {
-	    if (ps)
-		ps->next = s->next;
-	    else
-		p->styles = s->next;
-	    if (s == p->lstyles)
-		p->lstyles = ps;
+    s = (Style) zalloc(sizeof(*s));
+    s->next = NULL;
+    s->pats = NULL;
+    s->name = ztrdup(name);
 
-	    s->next = NULL;
-	    freestyle(s);
+    if (zlstyles)
+	zlstyles->next = s;
+    else
+	zstyles = s;
+    zlstyles = s;
 
-	    return;
-	}
-}
-
-/* Delete a whole pattern with all its styles. */
-
-static void
-deletestypat(Stypat pat)
-{
-    Stypat pp, p;
-
-    for (pp = NULL, p = zstyles; p; pp = p, p = p->next)
-	if (p == pat) {
-	    if (pp)
-		pp->next = p->next;
-	    else
-		zstyles = p->next;
-	    if (p == lzstyles)
-		lzstyles = pp;
-
-	    p->next = NULL;
-	    zsfree(p->pat);
-	    freepatprog(p->prog);
-	    freestyle(p->styles);
-	    zfree(p, sizeof(*p));
-
-	    return;
-	}
+    return s;
 }
 
 /* Look up a style for a context pattern. This does the matching. */
 
-static Style
+static Stypat
 lookupstyle(char *ctxt, char *style)
 {
-    Stypat p;
     Style s;
+    Stypat p;
 
-    for (p = zstyles; p; p = p->next)
-	if (pattry(p->prog, ctxt))
-	    for (s = p->styles; s; s = s->next)
-		if (!strcmp(style, s->name))
-		    return s;
+    for (s = zstyles; s; s = s->next)
+	if (!strcmp(s->name, style))
+	    for (p = s->pats; p; p = p->next)
+		if (pattry(p->prog, ctxt))
+		    return p;
 
     return NULL;
 }
@@ -302,47 +230,46 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	add = 1;
 
     if (add) {
-	Stypat p;
+	Style s;
+	Patprog prog;
+	char *pat;
 
 	if (arrlen(args) < 2) {
 	    zerrnam(nam, "not enough arguments", NULL, 0);
 	    return 1;
 	}
-	if (!(p = getstypat(args[0]))) {
-	    Patprog prog;
-	    char *pat = dupstring(args[0]);
+	pat = dupstring(args[0]);
+	tokenize(pat);
 
-	    tokenize(pat);
-
-	    if (!(prog = patcompile(pat, PAT_ZDUP, NULL))) {
-		zerrnam(nam, "invalid pattern: %s", args[0], 0);
-		return 1;
-	    }
-	    p = addstypat(args[0], prog);
+	if (!(prog = patcompile(pat, PAT_ZDUP, NULL))) {
+	    zerrnam(nam, "invalid pattern: %s", args[0], 0);
+	    return 1;
 	}
-	setstyle(p, args[1], args + 2);
+	if (!(s = getstyle(args[1])))
+	    s = addstyle(args[1]);
+	setstypat(s, args[0], prog, args + 2);
 
 	return 0;
     }
     if (list) {
-	Stypat p;
 	Style s;
+	Stypat p;
 	char **v;
 
-	for (p = zstyles; p; p = p->next) {
+	for (s = zstyles; s; s = s->next) {
 	    if (list == 1) {
-		quotedzputs(p->pat, stdout);
+		quotedzputs(s->name, stdout);
 		putchar('\n');
 	    }
-	    for (s = p->styles; s; s = s->next) {
+	    for (p = s->pats; p; p = p->next) {
 		if (list == 1)
-		    printf("    %s", s->name);
+		    printf("    %s", p->pat);
 		else {
 		    printf("zstyle ");
 		    quotedzputs(p->pat, stdout);
 		    printf(" %s", s->name);
 		}
-		for (v = s->vals; *v; v++) {
+		for (v = p->vals; *v; v++) {
 		    putchar(' ');
 		    quotedzputs(*v, stdout);
 		}
@@ -375,30 +302,50 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
     switch (args[0][1]) {
     case 'd':
 	{
-	    Stypat p;
+	    Style s;
 
 	    if (args[1]) {
-		if ((p = getstypat(args[1]))) {
-		    if (args[2]) {
-			char **ap = args + 2;
+		if (args[2]) {
+		    char *pat = args[1];
 
-			while (*ap)
-			    deletestyle(p, *ap++);
+		    for (args += 2; *args; args++) {
+			if ((s = getstyle(*args))) {
+			    Stypat p, q;
 
-			if (!p->styles)
-			    deletestypat(p);
-		    } else
-			deletestypat(p);
+			    for (q = NULL, p = s->pats; p;
+				 q = p, p = p->next) {
+				if (!strcmp(p->pat, pat)) {
+				    if (q)
+					q->next = p->next;
+				    else
+					s->pats = p->next;
+				    freestypat(p);
+				}
+			    }
+			}
+		    }
+		} else {
+		    Stypat p, q;
+
+		    for (s = zstyles; s; s = s->next) {
+			for (q = NULL, p = s->pats; p; q = p, p = p->next) {
+			    if (!strcmp(p->pat, args[1])) {
+				if (q)
+				    q->next = p->next;
+				else
+				    s->pats = p->next;
+				freestypat(p);
+			    }
+			}
+		    }
 		}
-	    } else {
-		freestypat(zstyles);
-		zstyles = lzstyles = NULL;
-	    }
+	    } else
+		freeallstyles();
 	}
 	break;
     case 's':
 	{
-	    Style s;
+	    Stypat s;
 	    char *ret;
 	    int val;
 
@@ -418,7 +365,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	break;
     case 'b':
 	{
-	    Style s;
+	    Stypat s;
 	    char *ret;
 	    int val;
 
@@ -442,7 +389,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
     case 'a':
     case 'h':
 	{
-	    Style s;
+	    Stypat s;
 	    char **ret;
 	    int val;
 
@@ -469,7 +416,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	break;
     case 't':
 	{
-	    Style s;
+	    Stypat s;
 
 	    if ((s = lookupstyle(args[1], args[2])) && s->vals[0]) {
 		if (args[3]) {
@@ -494,7 +441,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	break;
     case 'm':
 	{
-	    Style s;
+	    Stypat s;
 	    Patprog prog;
 
 	    tokenize(args[3]);
@@ -514,32 +461,44 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	{
 	    LinkList l = newlinklist();
 	    int ret = 1;
+	    Style s;
 	    Stypat p;
 
 	    if (args[2]) {
-		if ((p = getstypat(args[2]))) {
-		    Style s;
+		if (args[3]) {
+		    if ((s = getstyle(args[3]))) {
+			for (p = s->pats; p; p = p->next) {
+			    if (!strcmp(args[2], p->pat)) {
+				char **v = p->vals;
 
-		    if (args[3]) {
-			if ((s = getstyle(p, args[3]))) {
-			    char **v = s->vals;
+				while (*v)
+				    addlinknode(l, *v++);
 
-			    while (*v)
-				addlinknode(l, *v++);
-
-			    ret = 0;
+				ret = 0;
+				break;
+			    }
 			}
-		    } else {
-			for (s = p->styles; s; s = s->next)
-			    addlinknode(l, s->name);
-
-			ret = 0;
 		    }
+		} else {
+		    for (s = zstyles; s; s = s->next)
+			for (p = s->pats; p; p = p->next)
+			    if (!strcmp(args[2], p->pat)) {
+				addlinknode(l, s->name);
+				break;
+			    }
+		    ret = 0;
 		}
 	    } else {
-		for (p = zstyles; p; p = p->next)
-		    addlinknode(l, p->pat);
+		LinkNode n;
 
+		for (s = zstyles; s; s = s->next)
+		    for (p = s->pats; p; p = p->next) {
+			for (n = firstnode(l); n; incnode(n))
+			    if (!strcmp(p->pat, (char *) getdata(n)))
+				break;
+			if (!n)
+			    addlinknode(l, p->pat);
+		    }
 		ret = 0;
 	    }
 	    set_list_array(args[1], l);
@@ -1182,7 +1141,7 @@ static struct builtin bintab[] = {
 int
 setup_(Module m)
 {
-    zstyles = NULL;
+    zstyles = zlstyles = NULL;
 
     return 0;
 }
@@ -1206,7 +1165,7 @@ cleanup_(Module m)
 int
 finish_(Module m)
 {
-    freestypat(zstyles);
+    freeallstyles();
 
     return 0;
 }
