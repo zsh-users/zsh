@@ -642,6 +642,7 @@ struct savetrap {
 };
 
 static LinkList savetraps;
+static int dontsavetrap;
 
 /*
  * Save the current trap by copying it.  This does nothing to
@@ -670,6 +671,10 @@ dosavetrap(int sig, int level)
 	    newshf->flags = shf->flags;
 	    newshf->funcdef = dupeprog(shf->funcdef, 0);
 	}
+#ifdef DEBUG
+	else dputs("BUG: no function present with function trap flag set.");
+#endif
+	    
 	st->list = newshf;
     } else if (sigtrapped[sig]) {
 	st->list = sigfuncs[sig] ? dupeprog(sigfuncs[sig], 0) : NULL;
@@ -754,7 +759,8 @@ removetrap(int sig)
      * one, to aid in removing this one.  However, if there's
      * already one at the current locallevel we just overwrite it.
      */
-    if ((isset(LOCALTRAPS) || sig == SIGEXIT) && locallevel &&
+    if (!dontsavetrap && (isset(LOCALTRAPS) || sig == SIGEXIT) &&
+	locallevel &&
 	(!trapped || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)))
 	dosavetrap(sig, locallevel);
 
@@ -854,21 +860,19 @@ endtrapscope(void)
 
 	    remnode(savetraps, ln);
 
-	    if (sigtrapped[sig])
-		unsettrap(sig);
-	    sigtrapped[sig] = st->flags;
 	    if (st->flags && (st->list != NULL)) {
 		Eprog prog = (st->flags & ZSIG_FUNC) ?
 		    ((Shfunc) st->list)->funcdef : (Eprog) st->list;
 		/* prevent settrap from saving this */
-		int oldlt = opts[LOCALTRAPS];
-		opts[LOCALTRAPS] = 0;
+		dontsavetrap++;
 		settrap(sig, prog);
-		opts[LOCALTRAPS] = oldlt;
+		dontsavetrap--;
 		if ((sigtrapped[sig] = st->flags) & ZSIG_FUNC)
 		    shfunctab->addnode(shfunctab, ((Shfunc)st->list)->nam,
 				       (Shfunc) st->list);
-	    }
+	    } else if (sigtrapped[sig])
+		unsettrap(sig);
+
 	    zfree(st, sizeof(*st));
 	}
     }
@@ -881,6 +885,8 @@ endtrapscope(void)
 	else
 	    freeeprog(exitfn);
     }
+    DPUTS(!locallevel && savetraps && firstnode(savetraps),
+	  "BUG: still saved traps outside all function scope");
 }
 
 /* Execute a trap function for a given signal, possibly

@@ -1,3 +1,9 @@
+2000-06-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 11906: Src/signals.c: yet another two bugs with saving traps:
+	flags were prematurely restored when resetting and TRAPEXIT
+	was sometimes saved incorrectly when exitting the scope.
+
 2000-06-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 11903: Completion/Core/_expand: handle suffix style for arrays
