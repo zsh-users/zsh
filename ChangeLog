@@ -26,10 +26,10 @@
 
 2001-05-02  Clint Adams  <clint@zsh.org>
 
-	* 14208: Completion/User/Command/_loadkeys: support Solaris
+	* 14208: Completion/Unix/Command/_loadkeys: support Solaris
 	loadkeys.
 
-	* 14201: Completion/User/Command/_loadkeys: completion for
+	* 14201: Completion/Unix/Command/_loadkeys: completion for
 	loadkeys.
 
 2001-05-02  Peter Stephenson  <pws@csr.com>
