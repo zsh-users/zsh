@@ -1,3 +1,8 @@
+2001-04-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Etc/zsh-development-guide: The entire section on hook
+	functions was repeated twice; delete one copy.
+
 2001-04-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 13982: Completion/Base/Utility/_multi_parts,
