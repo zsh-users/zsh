@@ -708,7 +708,7 @@ setupvals(void)
     breaks = loops = 0;
     lastmailcheck = time(NULL);
     locallevel = sourcelevel = 0;
-    sfcontext = SFC_DIRECT;
+    sfcontext = SFC_NONE;
     trapreturn = 0;
     noerrexit = -1;
     nohistsave = 1;

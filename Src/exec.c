@@ -1053,7 +1053,7 @@ execpline2(Pline pline, int how, int input, int output, int last1)
 	lineno = pline->left->lineno;
 
     if (pline_level == 1) {
-	if (!sfcontext)
+	if ((how & Z_ASYNC) || (!sfcontext && !sourcelevel))
 	    strcpy(list_pipe_text, getjobtext((void *) pline->left));
 	else
 	    list_pipe_text[0] = '\0';
@@ -1639,7 +1639,8 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
     }
 
     /* Get the text associated with this command. */
-    if (!sfcontext && (jobbing || (how & Z_TIMED)))
+    if ((how & Z_ASYNC) ||
+	(!sfcontext && !sourcelevel && (jobbing || (how & Z_TIMED))))
 	text = getjobtext((void *) cmd);
     else
 	text = NULL;
@@ -2854,7 +2855,7 @@ execshfunc(Cmd cmd, Shfunc shf, LinkList args)
 {
     LinkList last_file_list = NULL;
     unsigned char *ocs;
-    int ocsp;
+    int ocsp, osfc;
 
     if (errflag)
 	return;
@@ -2882,7 +2883,10 @@ execshfunc(Cmd cmd, Shfunc shf, LinkList args)
     ocsp = cmdsp;
     cmdstack = (unsigned char *) zalloc(CMDSTACKSZ);
     cmdsp = 0;
+    if ((osfc = sfcontext) == SFC_NONE)
+	sfcontext = SFC_DIRECT;
     doshfunc(shf->nam, shf->funcdef, args, shf->flags, 0);
+    sfcontext = osfc;
     free(cmdstack);
     cmdstack = ocs;
     cmdsp = ocsp;

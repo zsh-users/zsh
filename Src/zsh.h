@@ -850,12 +850,13 @@ struct shfunc {
 
 /* Shell function context types. */
 
-#define SFC_DIRECT   0		/* called directly from the user */
-#define SFC_SIGNAL   1		/* signal handler */
-#define SFC_HOOK     2		/* one of the special functions */
-#define SFC_WIDGET   3		/* user defined widget */
-#define SFC_COMPLETE 4		/* called from completion code */
-#define SFC_CWIDGET  5		/* new style completion widget */
+#define SFC_NONE     0		/* no function running */
+#define SFC_DIRECT   1		/* called directly from the user */
+#define SFC_SIGNAL   2		/* signal handler */
+#define SFC_HOOK     3		/* one of the special functions */
+#define SFC_WIDGET   4		/* user defined widget */
+#define SFC_COMPLETE 5		/* called from completion code */
+#define SFC_CWIDGET  6		/* new style completion widget */
 
 /* node in list of function call wrappers */
 
