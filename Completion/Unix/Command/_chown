@@ -28,6 +28,7 @@ else
   [[ -n $grp ]] && grp="${${(M)grp:#[0-9]#}:-.$grp.}"
   req=( ${usr:+\^u$usr} ${grp:+\^g$grp} )
   (( EUID )) && req=( u$EUID$^req )
+  req=( -$^req )
 
   _files -g "*(${(j:,:)req})" && return 0
 fi
