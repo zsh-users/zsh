@@ -1696,6 +1696,7 @@ addmatches(Cadata dat, char **argv)
 		    }
 		    pline = matchparts;
 		    lpre += ml;
+		    llpl -= ml;
 		    bcp = ml;
 		    bpadd = strlen(s) - ml;
 		} else {
@@ -1721,6 +1722,7 @@ addmatches(Cadata dat, char **argv)
 		    }
 		    sline = revert_cline(matchparts);
 		    lsuf[llsl - ml] = '\0';
+		    llsl -= ml;
 		    bcs = ml;
 		    bsadd = strlen(s) - ml;
 		} else {
