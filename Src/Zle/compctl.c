@@ -1692,7 +1692,7 @@ static int
 bin_compadd(char *name, char **argv, char *ops, int func)
 {
     struct cadata dat;
-    char *p, **sp, *e, *m;
+    char *p, **sp, *e, *m = NULL;
     int dm;
     Cmatcher match = NULL;
 
@@ -1839,7 +1839,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     if (!*argv)
 	return 1;
 
-    match = cpcmatcher(match);
+    dat.match = match = cpcmatcher(match);
     dm = addmatchesptr(&dat, argv);
     freecmatcher(match);
 

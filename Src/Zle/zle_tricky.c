@@ -6730,11 +6730,13 @@ unambig_data(int *cp)
     return scache;
 }
 
-/* Insert the given match. This returns the number of characters inserted.*/
+/* Insert the given match. This returns the number of characters inserted.
+ * scs is used to return the position where a automatically created suffix
+ * has to be inserted. */
 
 /**/
 static int
-instmatch(Cmatch m)
+instmatch(Cmatch m, int *scs)
 {
     int l, r = 0, ocs, a = cs;
 
@@ -6784,6 +6786,7 @@ instmatch(Cmatch m)
     } else
 	brscs = -1;
     /* -S suffix */
+    *scs = cs;
     if (m->suf) {
 	inststrlen(m->suf, 1, (l = strlen(m->suf)));
 	r += l;
@@ -6855,13 +6858,13 @@ do_ambiguous(void)
 
 	/* If REC_EXACT and AUTO_MENU are set and what we inserted is an  *
 	 * exact match, we want menu completion the next time round       *
-	 * so we set fromcomp,to ensure that the word on the line is not  *
+	 * so we set fromcomp, to ensure that the word on the line is not *
 	 * taken as an exact match. Also we remember if we just moved the *
 	 * cursor into the word.                                          */
 	fromcomp = ((isset(AUTOMENU) ? FC_LINE : 0) |
 		    ((atend && cs != lastend) ? FC_INWORD : 0));
 
-	/* Probably move the cursor to then end. */
+	/* Probably move the cursor to the end. */
 	if (movetoend == 3)
 	    cs = lastend;
 
@@ -6920,7 +6923,7 @@ ztat(char *nam, struct stat *buf, int ls)
 static void
 do_single(Cmatch m)
 {
-    int l, sr = 0;
+    int l, sr = 0, scs;
     int havesuff = 0;
     char *str = m->str, *ppre = m->ppre, *psuf = m->psuf, *prpre = m->prpre;
 
@@ -6950,7 +6953,7 @@ do_single(Cmatch m)
     foredel(l);
 
     /* And then we insert the new string. */
-    menulen = instmatch(m);
+    menulen = instmatch(m, &scs);
     menuend = cs;
     cs = menupos + menulen;
 
@@ -6969,6 +6972,7 @@ do_single(Cmatch m)
     } else {
 	/* There is no user-specified suffix, *
 	 * so generate one automagically.     */
+	cs = scs;
 	if (m->ripre && (m->flags & CMF_PARBR)) {
 	    /*{{*/
 	    /* Completing a parameter in braces.  Add a removable `}' suffix. */
@@ -7019,6 +7023,8 @@ do_single(Cmatch m)
 		}
 	    }
 	}
+	if (!menuinsc)
+	    cs = menupos + menulen;
     }
     /* If completing in a brace expansion... */
     if (brbeg) {
@@ -7031,7 +7037,7 @@ do_single(Cmatch m)
 	} else if (!menucmp) {
 	    /*{{*/
 	    /* Otherwise, add a `,' suffix, and let `}' remove it. */
-	    cs = menuend;
+	    cs = scs;
 	    havesuff = 1;
 	    inststrlen(",", 1, 1);
 	    menuinsc++;
@@ -7043,6 +7049,7 @@ do_single(Cmatch m)
 	/* If we didn't add a suffix, add a space, unless we are *
 	 * doing menu completion or we are completing files and  *
 	 * the string doesn't name an existing file.             */
+	cs = scs;
 	inststrlen(" ", 1, 1);
 	menuinsc++;
 	if (menuwe)
