@@ -165,7 +165,7 @@ while [[ -n "$state" ]]; do
       --{short-circuit,clean,rmsource,sign,test} \
       '--target:specify a build target:->target'\
       '--buildroot:build root directory:_files -/' \
-      '--buildarch:architecture for which to build:' \
+      '--buildarch:architecture for which to build:->target' \
       '--buildos:ositecture for which to build:' \
       '--timecheck:time check (seconds):' "$tmp[1]" && ret=0
     ;;

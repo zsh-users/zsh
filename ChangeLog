@@ -1,3 +1,7 @@
+2000-05-22  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
+
+	* 11501: Completion/Linux/_rpm: --buildarch is like --target.
+
 2000-05-22  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11500: Completion/Core/_main_complete: another fix for
