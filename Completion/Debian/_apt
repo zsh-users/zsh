@@ -419,7 +419,7 @@ _apt-cache () {
     /$'dumpavail\0'/ \| \
     /$'unmet\0'/ \| \
     /$'check\0'/ \| \
-    /$'search\0'/ \| \
+    /$'search\0'/ /$'[^\0]#\0'/ :'_message "pattern"' \| \
     /$'show\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'depends\0'/ \| \
     /"[]"/ :'_tags actions && compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'

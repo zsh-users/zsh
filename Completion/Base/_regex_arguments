@@ -77,7 +77,6 @@ _regex_arguments () {
       if [[ "$_ra_line[_ra_p1 + 1, -1]" = *$'\''\0'\''* ]]; then
 	_message "parse failed before current word"
       else
-	: $#PREFIX - $#_ra_line + $_ra_p1 : $_ra_p2
 	_ra_left="$_ra_line[_ra_p1 + 1, _ra_p2]"
 	_ra_right="$_ra_line[_ra_p2 + 1, -1]"
 	compset -p $(( $#PREFIX - $#_ra_line + $_ra_p1 ))
