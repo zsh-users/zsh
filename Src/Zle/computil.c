@@ -1224,7 +1224,7 @@ static int
 ca_parse_line(Cadef d, int multi, int first)
 {
     Caarg adef, ddef;
-    Caopt ptr, wasopt, dopt;
+    Caopt ptr, wasopt = NULL, dopt;
     struct castate state;
     char *line, *pe, **argxor = NULL;
     int cur, doff, argend, arglast;
