@@ -1,0 +1,6 @@
+#compdef fakeroot
+
+_arguments \
+       '--lib[alternate wrapper library]:wrapper library:_files' \
+       '--faked[alternate faked binary]:fake binary:_command_names' \
+       '*::arguments: _normal'
