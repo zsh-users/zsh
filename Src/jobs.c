@@ -1500,21 +1500,32 @@ bin_kill(char *nam, char **argv, char *ops, int func)
 		putchar('\n');
 		return 0;
 	    }
-	    if ((*argv)[1] == 's' && (*argv)[2] == '\0')
-		signame = *++argv;
-	    else
-		signame = *argv + 1;
 
-	    /* check for signal matching specified name */
-	    for (sig = 1; sig <= SIGCOUNT; sig++)
-		if (!cstrpcmp(sigs + sig, &signame))
-		    break;
-	    if (*signame == '0' && !signame[1])
-		sig = 0;
-	    if (sig > SIGCOUNT) {
-		zwarnnam(nam, "unknown signal: SIG%s", signame, 0);
-		zwarnnam(nam, "type kill -l for a List of signals", NULL, 0);
-		return 1;
+    	    if ((*argv)[1] == 'n' && (*argv)[2] == '\0') {
+	    	char *endp;
+
+	    	sig = zstrtol(*++argv, &endp, 10);
+		if (*endp) {
+		    zwarnnam(nam, "invalid signal number", signame, 0);
+		    return 1;
+		}
+	    } else {
+		if ((*argv)[1] == 's' && (*argv)[2] == '\0')
+		    signame = *++argv;
+		else
+		    signame = *argv + 1;
+
+		/* check for signal matching specified name */
+		for (sig = 1; sig <= SIGCOUNT; sig++)
+		    if (!cstrpcmp(sigs + sig, &signame))
+			break;
+		if (*signame == '0' && !signame[1])
+		    sig = 0;
+		if (sig > SIGCOUNT) {
+		    zwarnnam(nam, "unknown signal: SIG%s", signame, 0);
+		    zwarnnam(nam, "type kill -l for a List of signals", NULL, 0);
+		    return 1;
+		}
 	    }
 	}
 	argv++;

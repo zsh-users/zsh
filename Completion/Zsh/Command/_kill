@@ -1,6 +1,18 @@
 #compdef kill
 
-_alternative \
-    'signals:: _signals -p' \
+local curcontext="$curcontext" line state ret=1
+
+_arguments -C \
+  '(-s -l 1)-n[specify signal number]:signal number' \
+  '(-n -l 1)-s[specify signal name]:signal:_signals' \
+  '(-n -s)-l[list signal names or numbers of specified signals]:*:signal:_signals' \
+  '(-n -s -l)1::signal:_signals -p' \
+  '*:processes:->processes' && ret=0
+  
+if [[ -n "$state" && -prefix [%0-9]# ]]; then
+  _alternative \
     'processes:: _pids' \
-    'jobs:: _jobs -t'
+    'jobs:: _jobs -t' && ret=0
+fi
+
+return ret

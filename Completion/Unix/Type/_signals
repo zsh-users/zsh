@@ -7,16 +7,15 @@
 #
 # A `-' or `--' as the first argument is ignored.
 
-local expl last=-3 minus
+local expl last minus
 
-while [[ "$1" = -[ap] ]]; do
-  if [[ "$1" = -a ]]; then
-    last=-1
-  else
-    minus=-
-  fi
-  shift
-done
+zparseopts -D -K -E 'p=minus' 'a=last'
+if [[ -z "$last" ]]; then
+  last=-1
+else
+  last=-3
+fi
+[[ -n "$minus" ]] && minus='-'
 
 [[ "$1" = -(|-) ]] && shift
 

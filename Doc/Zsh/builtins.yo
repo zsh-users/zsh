@@ -534,8 +534,8 @@ used by daemons, to indicate their state.
 findex(kill)
 cindex(killing jobs)
 cindex(jobs, killing)
-xitem(tt(kill) [ tt(-s) var(signal_name) ] var(job) ...)
-xitem(tt(kill) [ tt(-)var(sig) ] var(job) ...)
+xitem(tt(kill) [ tt(-s) var(signal_name) | tt(-n) var(signal_number) | \
+tt(-)var(sig) ] var(job) ...)
 item(tt(kill) tt(-l) [ var(sig) ... ])(
 Sends either tt(SIGTERM) or the specified signal to the given
 jobs or processes.
@@ -544,7 +544,7 @@ If the signal being sent is not `tt(KILL)' or `tt(CONT)', then the job
 will be sent a `tt(CONT)' signal if it is stopped.
 The argument var(job) can be the process ID of a job
 not in the job list.
-In the third form, tt(kill -l), if var(sig) is not
+In the second form, tt(kill -l), if var(sig) is not
 specified the signal names are listed.  Otherwise, for each
 var(sig) that is a name, the corresponding signal number is
 listed.  For each var(sig) that is a signal number or a number

@@ -2,7 +2,7 @@
 
 _arguments -C -s \
   "(-d -l -p -r -s *)-Z[specify string to replace shell's argument and environment with]:string" \
-  '(-Z)-d[show directory from which to job was started]' \
+  '(-Z)-d[show directory from which each job was started]' \
   '(-Z)-l[list process IDs]' \
   '(-Z)-p[list process groups]' \
   '(-Z -s)-r[list only running jobs]' \
