@@ -1,5 +1,8 @@
 2000-04-13  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10727: Src/builtin.c: make read -[kq] always print the prompt,
+ 	if any; after all they make sure they have a terminal anyway
+	
 	* 10726: Src/hashtable.c: fix field name for HAVE_NIS_PLUS
 	
 	* 10725: Src/Zle/compcore.c, Src/Zle/compctl.c,

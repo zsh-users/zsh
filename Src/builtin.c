@@ -3356,11 +3356,12 @@ int
 bin_read(char *name, char **args, char *ops, int func)
 {
     char *reply, *readpmpt;
-    int bsiz, c = 0, gotnl = 0, al = 0, first, nchars = 1, bslash;
+    int bsiz, c = 0, gotnl = 0, al = 0, first, nchars = 1, bslash, keys = 0;
     int haso = 0;	/* true if /dev/tty has been opened specially */
     int isem = !strcmp(term, "emacs"), izle = zleactive && getkeyptr;
     char *buf, *bptr, *firstarg, *zbuforig;
     LinkList readll = newlinklist();
+    FILE *oshout = NULL;
 
     if ((ops['k'] || ops['b']) && *args && idigit(**args)) {
 	if (!(nchars = atoi(*args)))
@@ -3385,8 +3386,11 @@ bin_read(char *name, char **args, char *ops, int func)
 	if (!zleactive) {
 	    if (SHTTY == -1) {
 		/* need to open /dev/tty specially */
-		SHTTY = open("/dev/tty", O_RDWR|O_NOCTTY);
-		haso = 1;
+		if ((SHTTY = open("/dev/tty", O_RDWR|O_NOCTTY)) != -1) {
+		    haso = 1;
+		    oshout = shout;
+		    init_shout();
+		}
 	    }
 	    /* We should have a SHTTY opened by now. */
 	    if (SHTTY == -1) {
@@ -3403,6 +3407,7 @@ bin_read(char *name, char **args, char *ops, int func)
 		setcbreak();
 	    readfd = SHTTY;
 	}
+	keys = 1;
     } else if (ops['u'] && !ops['p']) {
 	/* -u means take input from the specified file descriptor. *
 	 * -up means take input from the coprocess.                */
@@ -3419,9 +3424,9 @@ bin_read(char *name, char **args, char *ops, int func)
 	for (readpmpt = firstarg;
 	     *readpmpt && *readpmpt != '?'; readpmpt++);
 	if (*readpmpt++) {
-	    if (isatty(0)) {
-		zputs(readpmpt, stderr);
-		fflush(stderr);
+	    if (keys || isatty(0)) {
+		zputs(readpmpt, (haso ? shout : stderr));
+		fflush(haso ? shout : stderr);
 	    }
 	    readpmpt[-1] = '\0';
 	}
@@ -3462,6 +3467,8 @@ bin_read(char *name, char **args, char *ops, int func)
 		settyinfo(&shttyinfo);
 	    if (haso) {
 		close(SHTTY);
+		fclose(shout);
+		shout = oshout;
 		SHTTY = -1;
 	    }
 	}
@@ -3493,6 +3500,8 @@ bin_read(char *name, char **args, char *ops, int func)
 	    /* dispose of result appropriately, etc. */
 	    if (haso) {
 		close(SHTTY);
+		fclose(shout);
+		shout = oshout;
 		SHTTY = -1;
 	    }
 	}
