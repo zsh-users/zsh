@@ -3,6 +3,11 @@
 	* 18947: Completion/Unix/Command/_chown: also complete options using
 	_arguments
 
+2003-08-16  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 18944: Completion/Unix/Command/_ruby: update ruby completion for
+	version 1.8.0 and add descriptions for -T matches
+
 2003-08-05  Peter Stephenson  <pws@csr.com>
 
 	* 18926: Src/Zle/complist.c: fix (without knowing how) insertion
