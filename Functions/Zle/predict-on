@@ -64,7 +64,7 @@ insert-and-predict () {
 	  # get out of that `case'.
 	  repeat 1
 	  do
-	    zstyle -s ":completion:${curcontext}" cursor crs
+	    zstyle -s ":completion:${curcontext}:" cursor crs
 	    case $crs in
 	    (complete)
 	      # At the place where the completion left it, if it is after
