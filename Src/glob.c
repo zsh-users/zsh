@@ -139,6 +139,7 @@ struct globdata {
     int gd_qualct, gd_qualorct;
     int gd_range, gd_amc, gd_units;
     int gd_gf_nullglob, gd_gf_markdirs, gd_gf_noglobdots, gd_gf_listtypes;
+    int gd_gf_numsort;
     int gd_gf_follow, gd_gf_sorts, gd_gf_nsorts, gd_gf_sortlist[11];
 
     char *gd_glob_pre, *gd_glob_suf;
@@ -165,6 +166,7 @@ static struct globdata curglobdata;
 #define gf_markdirs   (curglobdata.gd_gf_markdirs)
 #define gf_noglobdots (curglobdata.gd_gf_noglobdots)
 #define gf_listtypes  (curglobdata.gd_gf_listtypes)
+#define gf_numsort    (curglobdata.gd_gf_numsort)
 #define gf_follow     (curglobdata.gd_gf_follow)
 #define gf_sorts      (curglobdata.gd_gf_sorts)
 #define gf_nsorts     (curglobdata.gd_gf_nsorts)
@@ -899,6 +901,7 @@ glob(LinkList list, LinkNode np)
     gf_markdirs = isset(MARKDIRS);
     gf_listtypes = gf_follow = 0;
     gf_noglobdots = unset(GLOBDOTS);
+    gf_numsort = isset(NUMERICGLOBSORT);
     gf_sorts = gf_nsorts = 0;
 
     /* Check for qualifiers */
@@ -1176,6 +1179,10 @@ glob(LinkList list, LinkNode np)
 			/* Glob dots: match leading dots implicitly */
 			gf_noglobdots = sense & 1;
 			break;
+		    case 'n':
+			/* Numeric glob sort */
+			gf_numsort = !(sense & 1);
+			break;
 		    case 'a':
 			/* Access time in given range */
 			g_amc = 0;
@@ -1413,7 +1420,7 @@ notstrcmp(char **a, char **b)
 #ifndef HAVE_STRCOLL
     cmp = (int)STOUC(*c) - (int)STOUC(*d);
 #endif
-    if (isset(NUMERICGLOBSORT) && (idigit(*c) || idigit(*d))) {
+    if (gf_numsort && (idigit(*c) || idigit(*d))) {
 	for (; c > *b && idigit(c[-1]); c--, d--);
 	if (idigit(*c) && idigit(*d)) {
 	    while (*c == '0')
