@@ -41,9 +41,7 @@
 0:Basic subshell list with error
 >false
 
-# Can someone convince me the following is really supposed to fail
-# without the semicolon present?
-  { cd /NonExistentDirectory >&/dev/null; } || print false
+  { cd /NonExistentDirectory >&/dev/null } || print false
 0:Basic current shell list with error
 >false
 
@@ -235,17 +233,13 @@
 # Tests for `Alternate Forms For Complex Commands'
 #
 
-## I simply can't get these to work.
-## I suspect that the lists which are allowed here are only syntactically
-## special tests.
-#  if true; { print true-1; } elif true; { print true-2; } else { false; }
-#  if false; { print true-1; } elif true; { print true-2; } else { false; }
-#  if false; { print true-1; } elif false; { print true-2; } else { false; }
-#0:Alternate `if' with braces
-## Are all those semicolons necessary?  If not, what are the rules?
-#>true-1
-#>true-2
-#>false
+  if (true) { print true-1 } elif (true) { print true-2 } else { print false }
+  if (false) { print true-1 } elif (true) { print true-2 } else { print false }
+  if (false) { print true-1 } elif (false) { print true-2 } else { print false }
+0:Alternate `if' with braces
+>true-1
+>true-2
+>false
 
   if true; print true
 0:Short form of `if'
@@ -295,15 +289,25 @@
 >Hip hip hooray
 >Hip hip hooray
 
-## Why doesn't this one work here?  It works from the command line
-## or with zsh -fc.
-#  case bravo {
-#    (alpha) print schmalpha
-#	    ;;
-#    (bravo) print schmavo
-#	    ;;
-#    (charlie) print schmarlie
-#	    ;;
-#  }
-#0:`case' with braces
-#>schmavo
+# Why doesn't this one work here?  It works from the command line
+# or with zsh -fc.
+  case bravo {
+    (alpha) print schmalpha
+	    ;;
+    (bravo) print schmavo
+	    ;;
+    (charlie) print schmarlie
+	    ;;
+  }
+0:`case' with braces
+>schmavo
+
+  print 'This test hangs the shell when it fails...' >&8
+  name=0
+# The number 4375 here is chosen to produce more than 16384 bytes of output
+  while (( name < 4375 )); do
+    print -n $name
+    (( name++ ))
+  done < /dev/null | { read name; print done }
+0:Bug regression: `while' loop with redirection and pipeline
+>done

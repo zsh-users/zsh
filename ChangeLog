@@ -1,3 +1,8 @@
+2001-03-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13736: Test/01grammar.ztst: Enable more tests as they seem to
+	work now; add regression test for the fix from 13706.
+
 2001-03-23  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13733: Completion/Builtins/_pids: don't auto-start menu
