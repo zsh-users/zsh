@@ -32,25 +32,32 @@
 
 #if defined(HAVE_GETRLIMIT) && defined(RLIM_INFINITY)
 
+enum {
+    ZLIMTYPE_MEMORY,
+    ZLIMTYPE_NUMBER,
+    ZLIMTYPE_TIME,
+    ZLIMTYPE_UNKNOWN
+};
+
 /* Generated rec array containing limits required for the limit builtin.     *
  * They must appear in this array in numerical order of the RLIMIT_* macros. */
 
 # include "rlimits.h"
 
-# if defined(RLIM_T_IS_QUAD_T) || defined(RLIM_T_IS_UNSIGNED)
+# if defined(RLIM_T_IS_QUAD_T) || defined(RLIM_T_IS_LONG_LONG) || defined(RLIM_T_IS_UNSIGNED)
 static rlim_t
 zstrtorlimt(const char *s, char **t, int base)
 {
     rlim_t ret = 0;
  
-    if (!base)
+    if (!base) {
 	if (*s != '0')
 	    base = 10;
 	else if (*++s == 'x' || *s == 'X')
 	    base = 16, s++;
 	else
 	    base = 8;
- 
+    } 
     if (base <= 10)
 	for (; *s >= '0' && *s < ('0' + base); s++)
 	    ret = ret * base + *s - '0';
@@ -62,9 +69,9 @@ zstrtorlimt(const char *s, char **t, int base)
 	*t = (char *)s;
     return ret;
 }
-# else /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_UNSIGNED */
+# else /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_LONG_LONG && !RLIM_T_IS_UNSIGNED */
 #  define zstrtorlimt(a, b, c)	zstrtol((a), (b), (c))
-# endif /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_UNSIGNED */
+# endif /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_LONG_LONG && !RLIM_T_IS_UNSIGNED */
 
 /* Display resource limits.  hard indicates whether `hard' or `soft'  *
  * limits should be displayed.  lim specifies the limit, or may be -1 *
@@ -85,31 +92,36 @@ showlimits(int hard, int lim)
 	    val = (hard) ? limits[rt].rlim_max : limits[rt].rlim_cur;
 	    if (val == RLIM_INFINITY)
 		printf("unlimited\n");
-	    else if (rt==RLIMIT_CPU)
+	    else if (limtype[rt] == ZLIMTYPE_TIME) {
 		/* time-type resource -- display as hours, minutes and
 		seconds. */
 		printf("%d:%02d:%02d\n", (int)(val / 3600),
 		       (int)(val / 60) % 60, (int)(val % 60));
-# ifdef RLIMIT_NPROC
-	    else if (rt == RLIMIT_NPROC)
+	    } else if (limtype[rt] == ZLIMTYPE_NUMBER || limtype[rt] == ZLIMTYPE_UNKNOWN) {
 		/* pure numeric resource */
 		printf("%d\n", (int)val);
-# endif /* RLIMIT_NPROC */
-# ifdef RLIMIT_NOFILE
-	    else if (rt == RLIMIT_NOFILE)
-		/* pure numeric resource */
-		printf("%d\n", (int)val);
-# endif /* RLIMIT_NOFILE */
-	    else if (val >= 1024L * 1024L)
+	    } else if (val >= 1024L * 1024L)
 		/* memory resource -- display with `K' or `M' modifier */
 # ifdef RLIM_T_IS_QUAD_T
 		printf("%qdMB\n", val / (1024L * 1024L));
 	    else
 		printf("%qdkB\n", val / 1024L);
 # else
+#  ifdef RLIM_T_IS_LONG_LONG
+		printf("%lldMB\n", val / (1024L * 1024L));
+            else
+		printf("%lldkB\n", val / 1024L);
+#  else
+#   ifdef RLIM_T_IS_UNSIGNED
+		printf("%luMB\n", val / (1024L * 1024L));
+            else
+		printf("%lukB\n", val / 1024L);
+#   else
 		printf("%ldMB\n", val / (1024L * 1024L));
             else
 		printf("%ldkB\n", val / 1024L);
+#   endif /* RLIM_T_IS_UNSIGNED */
+#  endif /* RLIM_T_IS_LONG_LONG */
 # endif /* RLIM_T_IS_QUAD_T */
 	}
 }
@@ -206,12 +218,53 @@ printulimit(int lim, int hard, int head)
 	    printf("cached threads             ");
 	break;
 # endif /* RLIMIT_TCACHE */
+# ifdef RLIMIT_AIO_OPS
+    case RLIMIT_AIO_OPS:
+	if (head)
+	    printf("AIO operations             ");
+	break;
+# endif /* RLIMIT_AIO_OPS */
+# ifdef RLIMIT_AIO_MEM
+    case RLIMIT_AIO_MEM:
+	if (head)
+	    printf("AIO locked-in-memory (kb)  ");
+	if (limit != RLIM_INFINITY)
+	    limit /= 1024;
+	break;
+# endif /* RLIMIT_AIO_MEM */
+# ifdef RLIMIT_SBSIZE
+    case RLIMIT_SBSIZE:
+	if (head)
+	    printf("socket buffer size (kb)    ");
+	if (limit != RLIM_INFINITY)
+	    limit /= 1024;
+	break;
+# endif /* RLIMIT_SBSIZE */
+# ifdef RLIMIT_PTHREAD
+    case RLIMIT_PTHREAD:
+	if (head)
+	    printf("threads per process        ");
+	break;
+# endif /* RLIMIT_PTHREAD */
     }
     /* display the limit */
     if (limit == RLIM_INFINITY)
 	printf("unlimited\n");
-    else
-	printf("%ld\n", (long)limit);
+    else {
+# ifdef RLIM_T_IS_QUAD_T
+	printf("%qd\n", limit);
+# else
+#  ifdef RLIM_T_IS_LONG_LONG
+	printf("%lld\n", limit);
+#  else
+#   ifdef RLIM_T_IS_UNSIGNED
+	printf("%lu\n", limit);
+#   else
+	printf("%ld\n", limit);
+#   endif /* RLIM_T_IS_UNSIGNED */
+#  endif /* RLIM_T_IS_LONG_LONG */
+# endif /* RLIM_T_IS_QUAD_T */
+    }
 }
 
 /* limit: set or show resource limits.  The variable hard indicates *
@@ -258,13 +311,13 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 	    showlimits(hard, lim);
 	    return 0;
 	}
-	if (lim==RLIMIT_CPU) {
+	if (limtype[lim] == ZLIMTYPE_TIME) {
 	    /* time-type resource -- may be specified as seconds, or minutes or *
 	     * hours with the `m' and `h' modifiers, and `:' may be used to add *
 	     * together more than one of these.  It's easier to understand from *
 	     * the code:                                                        */
 	    val = zstrtorlimt(s, &s, 10);
-	    if (*s)
+	    if (*s) {
 		if ((*s == 'h' || *s == 'H') && !s[1])
 		    val *= 3600L;
 		else if ((*s == 'm' || *s == 'M') && !s[1])
@@ -275,20 +328,17 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 		    zwarnnam("limit", "unknown scaling factor: %s", s, 0);
 		    return 1;
 		}
-	}
-# ifdef RLIMIT_NPROC
-	else if (lim == RLIMIT_NPROC)
+	    }
+	} else if (limtype[lim] == ZLIMTYPE_NUMBER || limtype[lim] == ZLIMTYPE_UNKNOWN) {
 	    /* pure numeric resource -- only a straight decimal number is
 	    permitted. */
-	    val = zstrtorlimt(s, &s, 10);
-# endif /* RLIMIT_NPROC */
-# ifdef RLIMIT_NOFILE
-	else if (lim == RLIMIT_NOFILE)
-	    /* pure numeric resource -- only a straight decimal number is
-	    permitted. */
-	    val = zstrtorlimt(s, &s, 10);
-# endif /* RLIMIT_NOFILE */
-	else {
+	    char *t = s;
+	    val = zstrtorlimt(t, &s, 10);
+	    if (s == t) {
+		zwarnnam("limit", "limit must be a number", NULL, 0);
+		return 1;
+	    }
+	} else {
 	    /* memory-type resource -- `k' and `M' modifiers are permitted,
 	    meaning (respectively) 2^10 and 2^20. */
 	    val = zstrtorlimt(s, &s, 10);
@@ -339,12 +389,12 @@ bin_unlimit(char *nam, char **argv, char *ops, int func)
     /* Without arguments, remove all limits. */
     if (!*argv) {
 	for (limnum = 0; limnum != RLIM_NLIMITS; limnum++) {
-	    if (hard)
+	    if (hard) {
 		if (euid && current_limits[limnum].rlim_max != RLIM_INFINITY)
 		    ret++;
 		else
 		    limits[limnum].rlim_max = RLIM_INFINITY;
-	    else
+	    } else
 		limits[limnum].rlim_cur = limits[limnum].rlim_max;
 	}
 	if (ops['s'])
@@ -373,13 +423,13 @@ bin_unlimit(char *nam, char **argv, char *ops, int func)
 		return 1;
 	    }
 	    /* remove specified limit */
-	    if (hard)
+	    if (hard) {
 		if (euid && current_limits[lim].rlim_max != RLIM_INFINITY) {
 		    zwarnnam(nam, "can't remove hard limits", NULL, 0);
 		    ret++;
 		} else
 		    limits[lim].rlim_max = RLIM_INFINITY;
-	    else
+	    } else
 		limits[lim].rlim_cur = limits[lim].rlim_max;
 	    if (ops['s'] && zsetlimit(lim, nam))
 		ret++;
@@ -478,11 +528,12 @@ bin_ulimit(char *name, char **argv, char *ops, int func)
 	    }
 	}
 	if (!*argv || **argv == '-') {
-	    if (res < 0)
+	    if (res < 0) {
 		if (*argv || nres)
 		    continue;
 		else
 		    res = RLIMIT_FSIZE;
+	    }
 	    resmask |= 1 << res;
 	    nres++;
 	    continue;
@@ -511,6 +562,9 @@ bin_ulimit(char *name, char **argv, char *ops, int func)
 # ifdef RLIMIT_VMEM
 	    case RLIMIT_VMEM:
 # endif /* RLIMIT_VMEM */
+# ifdef RLIMIT_AIO_MEM
+	    case RLIMIT_AIO_MEM:
+# endif /* RLIMIT_AIO_MEM */
 		limit *= 1024;
 		break;
 	    }
@@ -576,18 +630,29 @@ static struct builtin bintab[] = {
 
 /**/
 int
-boot_rlimits(Module m)
+setup_(Module m)
+{
+    return 0;
+}
+
+/**/
+int
+boot_(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
-#ifdef MODULE
-
 /**/
 int
-cleanup_rlimits(Module m)
+cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }
-#endif
+
+/**/
+int
+finish_(Module m)
+{
+    return 0;
+}
