@@ -1,3 +1,9 @@
+2002-07-25  Peter Stephenson  <pws@csr.com>
+
+	* 17481: Etc/MACHINES: from Karl Tomlinson
+	<k.tomlinson@auckland.ac.nz>: the SGI compiler needs to be told
+	to turn off variable length arrays.
+
 2002-07-24  Clint Adams  <clint@zsh.org>
 
 	* 17479: Doc/Zsh/arith.yo: fix typo noticed by Martin Pool.

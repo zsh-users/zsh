@@ -147,6 +147,11 @@ SGI: IRIX 6.2, 6.3, 6.5
 	On 6.5.2, zsh malloc routines are reported not to work; also
 	full optimization (cc -O3 -OPT:Olimit=0) causes problems.
 
+	If using the SGI compiler, variable length arrays need to
+	be turned off.  configure can work this out for itself if it
+	is passed the option --enable-cflags='-LANG:vla=off -O' (combined
+	with other flags if necessary).
+
 	The zpty module is not currently supported.
 
 Sun: SunOS 4.1.*
