@@ -1,7 +1,36 @@
-#defcomp bindkey
+#compdef bindkey
 
-if [[ -mword 1 -*[DAN]* || -mcurrent -1 -*M ]]; then
-  complist -s '$(bindkey -l)'
-else
-  complist -b
-fi
+# Normally, this completes names of zle widgets, whether the builtin ones
+# or ones defined by the user.  Note that a - allows a wildcard before it,
+# so h-b-s-b will complete to history-beginning-search-backward.  You
+# can alter this by removing the -M ... from the second compadd.
+#
+# Where appropriate, will complete keymaps instead of widgets.
+
+local state expl line
+
+_arguments -C -s \
+  '(-v -a -M -l -D -A -N)-e[select emacs keymap and bind it to main]' \
+  '(-e -a -M -l -D -A -N)-v[select viins keymap and bind it to main]' \
+  '(-e -v -M -l -D -A -N)-a[select vicmd keymap]' \
+  '(-e -v -a -l -D -A -N)-M[specify keymap to select]:keymap:->keymap' \
+  '(-e -v -a -M -D -A -N -m -r -s -R *)-l[list existing keymap names]' \
+  '(-e -v -a -d -A -N -m -r -s -R *)-L[output in form of bindkey commands]' \
+  '(-e -v -a -l -D -A -N -m -r -s -R *)-d[delete existing keymaps and reset to default state]' \
+  '(-e -v -a -M -l -d -A -N -m -r -s -R *)-D[delete named keymaps]:*:keymap:->keymap' \
+  '(-e -v -a -M -l -L -d -D -N -m -r -s -R *)-A[create alias to keymap]:old-keymap:->keymap:new-keymap:->keymap' \
+  '(-e -v -a -M -l -L -d -D -A -m -r -s -R *)-N[create new keymap]:new-keymap:->keymap:old-keymap to copy:->keymap' \
+  '(-l -L -d -D -A -N -r -s -r -R *)-m[add builtin meta-key bindings to selected keymape]' \
+  '(-l -L -d -D -A -N -m -s *)-r[unbind specified in-strings]:*:in-string' \
+  '(-l -L -d -D -A -N -m -r *)-s[bind each in-string to each out-string]:*:key string' \
+  '(-e -v -a -M -l -L -d -D -A -N -m)-R[interpret in-strings as ranges]' \
+  '(-l -L -d -A -N -m -r -s)*::widgets:->widget'
+
+case $state in
+  keymap)
+    _wanted -C -M keymaps expl keymap compadd - "$keymaps[@]"
+  ;;
+  widget)
+    _wanted widgets expl widget compadd -M 'r:|-=* r:|=*' - "${(@k)widgets}"
+  ;;
+esac

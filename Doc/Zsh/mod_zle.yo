@@ -72,7 +72,7 @@ be empty.
 )
 enditem()
 
-To use a newly created keymamp, it should be linked to tt(main).  Hence
+To use a newly created keymap, it should be linked to tt(main).  Hence
 the sequence of commands to create and use a new keymap `tt(mymap)'
 initialized from the tt(emacs) keymap (which remains unchanged) is:
 
