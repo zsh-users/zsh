@@ -1,3 +1,12 @@
+2002-03-24  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16890: Src/hist.c, Src/params.c: Made SAVEHIST a special parameter,
+	and used "savehistsiz" in place of getiparam("SAVEHIST").  This fixes
+	an annoying history-truncation bug after getting a parser error!
+
+	* unposted: Src/builtin.c: got rid of unused-variable compiler
+	warning.
+
 2002-03-21  Peter Stephenson  <pws@csr.com>
 
 	* 16879: Functions/Zle/up-line-or-beginning-search,
