@@ -1,6 +1,0 @@
-#autoload
-
-# This is for GNU-like commands which understand the --help option,
-# but which do not otherwise require special completion handling.
-
-_arguments '*:arg: _default' --
