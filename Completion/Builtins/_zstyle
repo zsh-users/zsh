@@ -10,6 +10,7 @@ typeset -A styles
 # followed by a colon, followed by a state to enter, empty if none.
 styles=(
   accept-exact		 c:bool
+  add-space		 c:bool
   arguments		 c:
   auto-description	 c:
   completer		 c:completer
@@ -39,6 +40,7 @@ styles=(
   list-packed		 c:bool
   list-rows-first	 c:bool
   local			 c:
+  matcher		 c:
   max-errors		 c:
   menu			 c:boolauto
   numbers		 c:bool
