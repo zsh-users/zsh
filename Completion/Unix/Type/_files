@@ -52,7 +52,7 @@ fi
 
 tried=()
 for def in "$pats[@]"; do
-  eval "def=( ${${def:s/\\:/\\\\\\\\\\\\:}//(#b)([][()|*?^#~<>])/\\${match[1]}} )"
+  eval "def=( ${${def:gs/\\:/\\\\\\\\\\\\:}//(#b)([][()|*?^#~<>])/\\${match[1]}} )"
   for sdef in "$def[@]"; do
 
     tag="${${sdef#*[^\\]:}%%:*}"
