@@ -1,5 +1,8 @@
 2001-05-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 14266, 14283: Etc/FEATURES, StartupFiles/zshrc: update; in
+	particular to use new style completion in example startup file.
+
 	* 14282: Completion/Unix/Command/_chown: complete only files
 	that can be chowned.
 

@@ -5,13 +5,13 @@ ZSH FEATURES
 very close to ksh/sh grammar, with csh additions
 most features of ksh, bash, and tcsh
 can emulate ksh or POSIX sh
-81 builtins, 102 options, 162 key bindings
+100 builtins, 145 options, 166 key bindings
 short for loops, ex: for i (*.c) echo $i
 select
 shell functions
 conditional expressions (test builtin, [ ... ], and ksh-style [[ ... ]])
 global aliases (may be expanded anywhere on the line)
-directory stack access with =num
+directory stack access with ~num
 process substitution (vi =(cmd) edits the output of cmd)
 generalized pipes (ls foo >>(cmd1) 2>>(cmd2) pipes stdout to cmd1
   and stderr to cmd2)
