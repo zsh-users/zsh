@@ -1,3 +1,8 @@
+2003-01-27  Oliver Kiddle  <opk@zsh.org>
+
+	* Doug Kearns: 18141: Completion/Unix/Command/_elinks:
+	new completion for elinks web browser
+
 2003-01-20  Peter Stephenson  <pws@csr.com>
 
 	* zsh-users/5780: Doc/Zsh/mod_complist.yo: viinsert widget
