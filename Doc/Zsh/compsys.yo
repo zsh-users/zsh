@@ -2300,7 +2300,7 @@ to accept may be given with the tt(-a) option.  Its argument should be
 the same as the value of the tt(max-errors) style, all in one string.
 
 Note that this completer (and the tt(_correct) completer mentioned
-below) can be quite expansive to call, especially when a large number
+below) can be quite expensive to call, especially when a large number
 of errors is allowed.  One way to avoid this is to set up the
 tt(completer) style using the tt(-e) option to zstyle so that some
 completers are only used when completion is attempted a second time on 
