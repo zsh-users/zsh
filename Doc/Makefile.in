@@ -60,7 +60,7 @@ Zsh/mod_computil.yo \
 Zsh/mod_deltochar.yo Zsh/mod_example.yo Zsh/mod_files.yo \
 Zsh/mod_mapfile.yo Zsh/mod_mathfunc.yo Zsh/mod_parameter.yo Zsh/mod_sched.yo \
 Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo Zsh/mod_zleparameter.yo \
-Zsh/mod_zutil.yo
+Zsh/mod_zutil.yo Zsh/mod_zprof.yo
 
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
