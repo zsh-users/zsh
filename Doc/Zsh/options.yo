@@ -544,18 +544,28 @@ if they are duplicates of the previous event.
 pindex(HIST_IGNORE_SPACE)
 cindex(history, ignoring spaces)
 item(tt(HIST_IGNORE_SPACE) (tt(-g)))(
-Do not enter command lines into the history list
-if the first character on the line is a space, or if one of
-the expanded aliases contained a leading space.
+Remove command lines from the history list when the first character on
+the line is a space, or when one of the expanded aliases contains a
+leading space.
+Note that the command lingers in the internal history until the next
+command is entered before it vanishes, allowing you to briefly reuse
+or edit the line.  If you want to make it vanish right away without
+entering another command, type a space and press return.
 )
 pindex(HIST_NO_FUNCTIONS)
 item(tt(HIST_NO_FUNCTIONS))(
-Do not store function definitions in the history list.
+Remove function definitions from the history list.
+Note that the function lingers in the internal history until the next
+command is entered before it vanishes, allowing you to briefly reuse
+or edit the definition.
 )
 pindex(HIST_NO_STORE)
 item(tt(HIST_NO_STORE))(
-Remove the tt(history) (tt(fc -l)) command from
-the history when invoked.
+Remove the tt(history) (tt(fc -l)) command from the history list
+when invoked.
+Note that the command lingers in the internal history until the next
+command is entered before it vanishes, allowing you to briefly reuse
+or edit the line.
 )
 pindex(HIST_REDUCE_BLANKS)
 item(tt(HIST_REDUCE_BLANKS))(
