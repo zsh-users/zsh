@@ -1112,6 +1112,8 @@ mod_export ZleVoidFn refreshptr = noop_function;
 mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
 /**/
 mod_export ZleReadFn zlereadptr = autoload_zleread;
+/**/
+mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 
 #else /* !LINKED_XMOD_zshQszle */
 
@@ -1124,6 +1126,7 @@ mod_export ZleReadFn zlereadptr = autoload_zleread;
 mod_export ZleReadFn zlereadptr = fallback_zleread;
 # endif /* !UNLINKED_XMOD_zshQszle */
 
+mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 #endif /* !LINKED_XMOD_zshQszle */
 
 /**/

@@ -1370,3 +1370,13 @@ getkeycmd(void)
 	func = lastnamed;
     return func;
 }
+
+/**/
+mod_export void
+zlesetkeymap(int mode)
+{
+    Keymap km = openkeymap((mode == VIMODE) ? "viins" : "emacs");
+    if (!km)
+	return;
+    linkkeymap(km, "main", 0);
+}

@@ -367,6 +367,14 @@ Use the Dvorak keyboard instead of the standard qwerty keyboard as a basis
 for examining spelling mistakes for the tt(CORRECT) and tt(CORRECT_ALL)
 options and the tt(spell-word) editor command.
 )
+pindex(EMACS)
+item(tt(EMACS))(
+If ZLE is loaded, turning on this option has the equivalent effect
+of `tt(bindkey -e)'.  In addition, the VI option is unset.
+Turning it off has no effect.  The option setting is
+not guaranteed to reflect the current keymap.  This option is
+provided for compatibility; tt(bindkey) is the recommended interface.
+)
 pindex(EQUALS)
 cindex(filename expansion, =)
 item(tt(EQUALS) <Z>)(
@@ -1192,6 +1200,14 @@ cindex(tracing, of input lines)
 cindex(input, tracing)
 item(tt(VERBOSE) (tt(-v), ksh: tt(-v)))(
 Print shell input lines as they are read.
+)
+pindex(VI)
+item(tt(VI))(
+If ZLE is loaded, turning on this option has the equivalent effect
+of `tt(bindkey -v)'.  In addition, the EMACS option is unset.
+Turning it off has no effect.  The option setting is
+not guaranteed to reflect the current keymap.  This option is
+provided for compatibility; tt(bindkey) is the recommended interface.
 )
 pindex(XTRACE)
 cindex(tracing, of commands)

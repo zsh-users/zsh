@@ -1363,6 +1363,7 @@ setup_(Module m)
     refreshptr = zrefresh;
     spaceinlineptr = spaceinline;
     zlereadptr = zleread;
+    zlesetkeymapptr = zlesetkeymap;
 
     getkeyptr = getkey;
 
@@ -1446,6 +1447,7 @@ finish_(Module m)
     refreshptr = noop_function;
     spaceinlineptr = noop_function_int;
     zlereadptr = fallback_zleread;
+    zlesetkeymapptr= noop_function_int;
 
     getkeyptr = NULL;
 
