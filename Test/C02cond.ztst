@@ -15,6 +15,7 @@
   print 'Garbuglio' >nonzerolength
 
   mkdir modish
+  chgrp $EGID modish
   chmod g+xs modish
   chmod u+s modish
   chmod +t modish
