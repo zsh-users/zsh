@@ -191,6 +191,11 @@
 1:null redir with NULLCMD unset
 ?ZTST_execchunk:2: redirection with no command
 
+  echo this should still work >out1
+  print "$(<out1)"
+0:null redir in $(...) with NULLCMD unset
+>this should still work
+
   READNULLCMD=cat
   print cat input >out1
   <out1

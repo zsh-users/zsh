@@ -140,3 +140,12 @@
 
   [[ -e /dev/fd/0 ]]
 0:/dev/fd support in conds
+
+  [[ ( -z foo && -z foo ) || -z foo ]]
+1:complex conds with skipping
+
+  [ '' != bar -a '' = '' ]
+0:strings with `[' builtin
+
+  [ `echo 0` -lt `echo 1` ]
+0:substituion in `[' builtin

@@ -43,7 +43,8 @@ evalcond(Estate state)
 {
     struct stat *st;
     char *left, *right = NULL;
-    wordcode code = *state->pc++;
+    Wordcode pcode = state->pc++;
+    wordcode code = *pcode;
     int ctype = WC_COND_TYPE(code);
 
     switch (ctype) {
@@ -57,7 +58,7 @@ evalcond(Estate state)
 		fprintf(stderr, " %s", condstr[ctype]);
 	    return evalcond(state);
 	} else {
-	    state->pc += WC_COND_SKIP(code) - 1;
+	    state->pc = pcode + (WC_COND_SKIP(code) + 1);
 	    return 0;
 	}
     case COND_OR:
@@ -66,7 +67,7 @@ evalcond(Estate state)
 		fprintf(stderr, " %s", condstr[ctype]);
 	    return evalcond(state);
 	} else {
-	    state->pc += WC_COND_SKIP(code) - 1;
+	    state->pc = pcode + (WC_COND_SKIP(code) + 1);
 	    return 1;
 	}
     case COND_MOD:

@@ -1727,7 +1727,7 @@ yyerror(int noerr)
  * Word code layout:
  *
  *   WC_END
- *     - only used for empty functions
+ *     - end of program code
  *
  *   WC_LIST
  *     - data contains type (sync, ...)
@@ -2217,6 +2217,14 @@ ecomp(struct node *n)
 	    }
 	}
 	break;
+    case N_COND:
+	eccond((Cond) n);
+	break;
+#ifdef DEBUG
+    default:
+	dputs("BUG: node type not handled in ecomp().");
+	break;
+#endif
     }
 }
 
@@ -2335,8 +2343,7 @@ execompile(List list)
     ecsoffs = ecnpats = 0;
 
     ec(list);
-    if (!ecused)
-	ecadd(WCB_END());
+    ecadd(WCB_END());
 
     ret = (Eprog) zhalloc(sizeof(*ret));
     ret->len = ((ecnpats * sizeof(Patprog)) +
