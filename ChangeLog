@@ -1,3 +1,8 @@
+2002-05-24  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17219: Src/Zle/complist.c: make re-display in menu selection
+	faster; redraw only the previously and newly selected matches
+
 2002-05-23 Andrej Borsenkow  <bor@zsh.org>
 
 	* unposted: Completion/Redhat/Command/_service: uncomment

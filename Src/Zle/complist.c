@@ -392,7 +392,7 @@ getcols(Listcols c)
 static int noselect, mselect, inselect, mcol, mline, mcols, mlines, mmlen;
 static int selected, mlbeg = -1, mlend = 9999999, mscroll, mrestlines;
 static int mnew, mlastcols, mlastlines, mhasstat, mfirstl, mlastm;
-static int mlprinted;
+static int mlprinted, molbeg = -2, mocol = 0, moline = 0, mstatprinted;
 static char *mstatus, *mlistp;
 static Cmatch **mtab, **mmtabp;
 static Cmgroup *mgtab, *mgtabp;
@@ -1304,6 +1304,7 @@ compprintlist(int showall)
     }
     asked = 0;
  end:
+    mstatprinted = 0;
     lastlistlen = 0;
     if (nlnct <= 1)
 	mscroll = 0;
@@ -1317,6 +1318,7 @@ compprintlist(int showall)
 		if (mhasstat) {
 		    putc('\n', shout);
 		    compprintfmt(NULL, 0, 1, 1, mline, NULL);
+                    mstatprinted = 1;
 		}
 		nl = lines - 1;
 	    } else
@@ -1494,6 +1496,79 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 }
 
 static int
+singlecalc(int *cp, int l, int *lcp)
+{
+    int c = *cp, n, j, first = 1;
+    Cmatch **p, *op, *mp = mtab[l * columns + c];
+
+    for (n = 0, j = c, p = mtab + l * columns + c, op = NULL; j >= 0; j--, p--) {
+        if (*p == mp)
+            c = j;
+        if (!first && *p != op)
+            n++;
+        op = *p;
+        first = 0;
+    }
+    *cp = c;
+    *lcp = 1;
+    for (p = mtab + l * columns + c; c < columns; c++, p++)
+        if (*p && mp != *p)
+            *lcp = 0;
+
+    return n;
+}
+
+static void
+singledraw()
+{
+    Cmgroup g;
+    int mc1, mc2, ml1, ml2, md1, md2, mcc1, mcc2, lc1, lc2, t1, t2;
+
+    t1 = mline - mlbeg;
+    t2 = moline - molbeg;
+
+    if (t2 < t1) {
+        mc1 = mocol; ml1 = moline; md1 = t2;
+        mc2 = mcol; ml2 = mline; md2 = t1;
+    } else {
+        mc1 = mcol; ml1 = mline; md1 = t1;
+        mc2 = mocol; ml2 = moline; md2 = t2;
+    }
+    mcc1 = singlecalc(&mc1, ml1, &lc1);
+    mcc2 = singlecalc(&mc2, ml2, &lc2);
+
+    if (md1)
+        tcmultout(TCDOWN, TCMULTDOWN, md1);
+    if (mc1)
+        tcmultout(TCRIGHT, TCMULTRIGHT, mc1);
+    g = mgtab[ml1 * columns + mc1];
+    clprintm(g, mtab[ml1 * columns + mc1], mcc1, ml1, lc1,
+             (g->widths ? g->widths[mcc1] : g->width));
+    putc('\r', shout);
+
+    if (md2 != md1)
+        tcmultout(TCDOWN, TCMULTDOWN, md2 - md1);
+    if (mc2)
+        tcmultout(TCRIGHT, TCMULTRIGHT, mc2);
+    g = mgtab[ml2 * columns + mc2];
+    clprintm(g, mtab[ml2 * columns + mc2], mcc2, ml2, lc2,
+             (g->widths ? g->widths[mcc2] : g->width));
+    putc('\r', shout);
+
+    if (mstatprinted) {
+        int i = lines - md2 - nlnct;
+
+        tcmultout(TCDOWN, TCMULTDOWN, i - 1);
+        compprintfmt(NULL, 0, 1, 1, mline, NULL);
+        tcmultout(TCUP, TCMULTUP, lines - 1);
+    } else
+        tcmultout(TCUP, TCMULTUP, md2 + nlnct);
+
+    showinglist = -1;
+    listshown = 1;
+}
+
+static int
 complistmatches(Hookdef dummy, Chdata dat)
 {
     Cmgroup oamatches = amatches;
@@ -1575,8 +1650,14 @@ complistmatches(Hookdef dummy, Chdata dat)
     last_cap = (char *) zhalloc(max_caplen + 1);
     *last_cap = '\0';
 
-    if (!compprintlist(mselect >= 0) || !clearflag)
+    if (mlbeg >= 0 && mlbeg == molbeg)
+        singledraw();
+    else if (!compprintlist(mselect >= 0) || !clearflag)
 	noselect = 1;
+
+    molbeg = mlbeg;
+    mocol = mcol;
+    moline = mline;
 
     amatches = oamatches;
 
@@ -1678,6 +1759,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     mline = 0;
     mlines = 999999;
     mlbeg = 0;
+    molbeg = -42;
     for (;;) {
 	if (mline < 0) {
 	    int x, y;
@@ -1730,17 +1812,17 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    }
 	}
 	lbeg = mlbeg;
-	onlyexpl = 0;
-	showinglist = -2;
-	if (first && !listshown && isset(LISTBEEP))
-	    zbeep();
-	first = 0;
-	zrefresh();
-	inselect = 1;
-	if (noselect) {
-	    broken = 1;
-	    break;
-	}
+        onlyexpl = 0;
+        showinglist = -2;
+        if (first && !listshown && isset(LISTBEEP))
+            zbeep();
+        first = 0;
+        zrefresh();
+        inselect = 1;
+        if (noselect) {
+            broken = 1;
+            break;
+        }
 	selected = 1;
 	if (!i) {
 	    i = mcols * mlines;
@@ -1770,6 +1852,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    zbeep();
+            molbeg = -1;
 	    break;
 	} else if (nolist && cmd != Th(z_undo)) {
 	    ungetkeycmd();
