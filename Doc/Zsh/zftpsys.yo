@@ -425,22 +425,56 @@ fits in well.
 )
 findex(zftp_progress, supplied version)
 item(tt(zftp_progress))(
-This function shows the status of the transfer as the percentage of the
-total so far transferred.  It will not write anything unless the output is
-going to a terminal; however, if you transfer files in the background, you
-should tt(unfunction) this first.  (Background file transfers don't work on
-all OSes.)  Note also that if you alter it, any output em(must) be to
-standard error, as standard output may be a file being received.
+This function shows the status of the transfer.  It will not write anything
+unless the output is going to a terminal; however, if you transfer files in
+the background, you should turn off progress reports by hand using
+`tt(zfconfig[progress]=none)'.  (Background file transfers don't work on all
+OSes.) Note also that if you alter it, any output em(must) be to standard
+error, as standard output may be a file being received.  The form of the
+progess meter, or whether it is used at all, can be configured without
+altering the function, as described in the next section.
 )
 enditem()
 
 texinode(Miscellaneous Features)()(Zftp Functions)(Zftp Function System)
 sect(Miscellaneous Features)
 
+subsect(Configuration)
+cindex(zftp function system, configuration)
+pindex(zfconfig)
+
+The tt(zfinit) function defines an associative array tt(zfconfig).
+Elements of this may subsequently be set to change the behaviour of the
+tt(zftp) functions using standard syntax (for example,
+`tt(zfconfig[progress]=percent)'.  The following keys are understood.
+
+startitem()
+item(tt(progress))(
+Controls the way that tt(zftp_progress) reports on the progress of a
+transfer.  If empty, unset, or `tt(none)', no progress report is made; if
+`tt(bar)' (the default), a growing bar of inverse video is shown; if
+`tt(percent)' (or any other string, though this may change in future), the
+percentage of the file transferred is shown.  The bar meter requires that
+the width of the terminal be available via the tt($COLUMNS) parameter
+(normally this is set automatically).  If the size of the file being
+transferred is not available, tt(bar) and tt(percent) meters will simply
+show the number of bytes transferred so far.
+)
+item(tt(update))(
+Specifies the minimum time interval between updates of the progress meter
+in seconds.  No update is made unless new data has been received, so the
+actual time interval is limited only by tt($ZFTP_TIMEOUT).
+)
+item(tt(remote_glob))(
+If set to a non-zero length, filename generation (globbing) is
+performed on the remote machine instead of by zsh itself; see below.
+)
+enditem()
+
 subsect(Remote globbing)
 cindex(zftp function system, remote globbing)
 
-The commands for retrieving files usually perform filename expansion
+The commands for retrieving files usually perform filename generation
 (globbing) on their arguments; this can be turned off by passing the option
 tt(-G) to each of the commands.  Normally this operates by retrieving a
 complete list of files for the directory in question, then matching these
@@ -452,14 +486,15 @@ remote server does not support the UNIX directory semantics, directory
 handling is problematic and it is recommended that globbing only be used
 within the current directory.  The list of files in the current directory,
 if retrieved, will be cached, so that subsequent globs in the same
-directory without an intervening tt(zfcd) are fast.
+directory without an intervening tt(zfcd) are much faster.
 
-If the variable tt($zfrglob) is set to a non-zero length, globbing is
-instead performed on the remote host:  the server is asked for a list of
-matching files.  This is highly dependent on how the server is implemented,
-though typically UNIX servers will provide support for basic glob
-patterns.  This may in some cases be faster, as it avoids retrieving the
-entire list of directory contents.
+If the key tt(remote_glob) of the tt(zfconfig) associative array (see
+above) is set to a non-zero length, globbing is instead performed on the
+remote host: the server is asked for a list of matching files.  This is
+highly dependent on how the server is implemented, though typically UNIX
+servers will provide support for basic glob patterns.  This may in some
+cases be faster, as it avoids retrieving the entire list of directory
+contents.
 
 subsect(Automatic and temporary reopening)
 cindex(zftp function system, automatic reopening)
@@ -500,9 +535,9 @@ will open the connection in the directory tt(/pub) and leave it open.
 
 subsect(Completion)
 
-Completion of remote files, directories and bookmarks is supported.  The
-older, tt(compctl)-style completion is defined when tt(zfinit) is called;
-support for the new widget-based completion system is provided in the
-function tt(Completion/Builtins/_zftp), which should be installed with the
-other functions of the completion system and hence should automatically be
-available.
+Completion of local and remote files, directories and bookmarks is
+supported.  The older, tt(compctl)-style completion is defined when
+tt(zfinit) is called; support for the new widget-based completion system is
+provided in the function tt(Completion/Builtins/_zftp), which should be
+installed with the other functions of the completion system and hence
+should automatically be available.

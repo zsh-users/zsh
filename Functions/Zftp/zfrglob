@@ -9,7 +9,8 @@
 #      stick with a single directory.  This is the default.
 #  (2) Use remote globbing, i.e. pass it to ls at the site.
 #      Faster, but only works with UNIX, and only basic globbing.
-#      We do this if $zfrglob is non-null.
+#      We do this if zfconfig[remote_glob] (or $zfrglob for
+#      backward compatibility) is non-null.
 
 # There is only one argument, the variable containing the
 # pattern to be globbed.  We set this back to an array containing
@@ -19,6 +20,10 @@ emulate -L zsh
 setopt extendedglob
 
 local pat dir nondir files i
+
+if [[ -n ${zfconfig[remote_glob]} ]]; then
+  local zfrglob=1
+fi
 
 eval pat=\$$1
 

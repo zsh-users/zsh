@@ -15,6 +15,10 @@
 # a successful open.
 local lastsession=$zflastsession
 
+# Unset the delay counter from the progress meter in case there was an
+# abnormal exit.
+(( ${+zftpseconds} )) && unset zftpseconds
+
 if [[ -z $ZFTP_HOST ]]; then
   zfopen || return 1
   [[ $1 = *d* ]] || do_close=1

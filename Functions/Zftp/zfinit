@@ -2,6 +2,11 @@ emulate -L zsh
 
 [[ $1 = -n ]] || zmodload -e zftp || zmodload -ia zftp
 
+if [[ ${+zfconfig} = 0 ]]; then
+  typeset -gA zfconfig
+  zfconfig=(progress bar update 1)
+fi
+
 alias zfcd='noglob zfcd'
 alias zfget='noglob zfget'
 alias zfls='noglob zfls'
@@ -13,15 +18,15 @@ autoload -U zfdir zfgcp zfget zfget_match zfgoto zfhere zfinit zfls
 autoload -U zfmark zfopen zfparams zfpcp zfput zfrglob zfrtime zfstat
 autoload -U zftp_chpwd zftp_progress zftype zfuget zfuput
 
-# only way of getting that noglob out of the way: this is unnecessary with
-# widget-based completion and can be commented out.
-setopt completealiases
-
 #
 # zftp completions: only use these if new-style completion is not
 # active.
 #
 if [[ ${#_patcomps} -eq 0 || ${_patcomps[(i)zf*]} -gt ${#_patcomps} ]]; then
+  # only way of getting that noglob out of the way: this is unnecessary with
+  # widget-based completion
+  setopt completealiases
+
   compctl -f -x 'p[1]' \
     -k '(open params user login type ascii binary mode put putat
     get getat append appendat ls dir local remote mkdir rmdir delete
