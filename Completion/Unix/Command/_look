@@ -1,0 +1,21 @@
+#compdef look
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+_arguments -C -s \
+  '-t+[termination character]:termination character:' \
+  '-f[case insensitive]' \
+  '-d[dictionary order]' \
+  ':string:->string' \
+  ':dictionary file:_files' && return 0
+
+case "$state" in
+string)
+  if [[ -n "$PREFIX" ]]; then
+    _wanted values expl 'word prefix' compadd - $(_call_program values $words[1] $PREFIX)
+  else
+    _message 'word prefix'
+  fi
+  ;;
+esac
