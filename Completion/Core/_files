@@ -73,6 +73,7 @@ for def in "$pats[@]"; do
           _path_files "$expl[@]" -g "$pat" "$opts[@]" && ret=0
         fi
       done
+      (( ret )) || break
     done
   done
   (( ret )) || return 0

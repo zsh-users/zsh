@@ -1,5 +1,8 @@
 2000-05-11  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11321: Completion/Core/_files: _files used alternative tag-order
+ 	values even if not needed
+	
 	* 11320: Completion/Base/_argument_sets, Completion/Base/_arguments,
  	Doc/Zsh/compsys.yo, Src/Zle/computil.c: allow internally-mutually
  	exclusive sets in _argument_sets; fixes for _argument_sets and the
