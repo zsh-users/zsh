@@ -1,0 +1,52 @@
+#compdef compdef
+
+local state line expl list disp curcontext="$curcontext"
+typeset -A opt_args
+
+_arguments -C -s -A "-*" -S \
+  '(-d)-a[make function autoloadable]' \
+  '(-d -p -P)-n[leave existing definitions intact]' \
+  ':completion function:->cfun' \
+  '*:commands: _command_names' \
+ - d \
+  '(-a -n)-d[delete]:*:completed command:->ccom' \
+ - p \
+  '(-n)-p[completion for command matching pattern]:completion function:->cfun:pattern' \
+ - P \
+  '(-n)-P[as -p for commands without own completion]:completion function:->cfun:pattern' \
+ - k \
+  '-k[define widget and key binding]:completion function:->cfun:style:->style:*:key' \
+ - K \
+  '-K[define multiple widgets based on function]:*::: :->multi' && return 0
+
+if [[ $state = multi ]]; then
+  case $(( CURRENT % 3 )) in
+  0) _message key
+     return 1;;
+  1) state=cfun;;
+  2) state=style;;
+  esac
+fi
+
+case $state in
+  ccom)
+    _wanted commands expl 'completed command' compadd -k _comps
+  ;;
+  cfun)
+    list=( ${^fpath:/.}/_(|*[^~])(:t) )
+    if zstyle -T ":completion:${curcontext}:functions" prefix-hidden; then
+      disp=( ${list[@]#_} )
+      _wanted functions expl 'completion function' \
+          compadd -d disp -a list
+    else
+      _wanted functions expl 'completion function' compadd -a list
+    fi
+  ;;
+  style)
+    _wanted widgetstyle expl 'widget style' \
+        compadd -M 'r:|-=* r:|=*' \
+            complete-word delete-char-or-list expand-or-complete \
+            expand-or-complete-prefix list-choices menu-complete \
+            menu-expand-or-complete reverse-menu-complete
+  ;;
+esac
