@@ -44,22 +44,26 @@ int contflag;
  
 /**/
 int breaks;
- 
+
 /**/
 int
-execfor(Cmd cmd)
+execfor(Cmd cmd, LinkList args, int flags)
 {
-    List list;
     Forcmd node;
     char *str;
-    int val = 0;
-    LinkList args;
+    zlong val = 0;
 
     node = cmd->u.forcmd;
-    args = cmd->args;
     if (node->condition) {
-	str = node->name;
+	str = dupstring(node->name);
 	singsub(&str);
+	if (isset(XTRACE)) {
+	    char *str2 = dupstring(str);
+	    untokenize(str2);
+	    printprompt4();
+	    fprintf(stderr, "%s\n", str2);
+	    fflush(stderr);
+	}
 	if (!errflag)
 	    matheval(str);
 	if (errflag)
@@ -69,11 +73,12 @@ execfor(Cmd cmd)
 
 	args = newlinklist();
 	for (x = pparams; *x; x++)
-	    addlinknode(args, ztrdup(*x));
+	    addlinknode(args, dupstring(*x));
     }
     lastval = 0;
     loops++;
     pushheap();
+    cmdpush(CS_FOR);
     for (;;) {
 	if (node->condition) {
 	    str = dupstring(node->condition);
@@ -81,9 +86,14 @@ execfor(Cmd cmd)
 	    if (!errflag) {
 		while (iblank(*str))
 		    str++;
-		if (*str)
+		if (*str) {
+		    if (isset(XTRACE)) {
+			printprompt4();
+			fprintf(stderr, "%s\n", str);
+			fflush(stderr);
+		    }
 		    val = matheval(str);
-		else
+		} else
 		    val = 1;
 	    }
 	    if (errflag) {
@@ -95,13 +105,17 @@ execfor(Cmd cmd)
 	    if (!val)
 		break;
 	} else {
-	    str = (char *) ugetnode(args);
-	    if (!str)
+	    if (!args || !(str = (char *) ugetnode(args)))
 		break;
+	    if (isset(XTRACE)) {
+		printprompt4();
+		fprintf(stderr, "%s=%s\n", node->name, str);
+		fflush(stderr);
+	    }
 	    setsparam(node->name, ztrdup(str));
 	}
-	list = (List) dupstruct(node->list);
-	execlist(list, 1, (cmd->flags & CFLAG_EXEC) && empty(args));
+	execlist(node->list, 1,
+		 (flags & CFLAG_EXEC) && args && empty(args));
 	if (breaks) {
 	    breaks--;
 	    if (breaks || !contflag)
@@ -110,6 +124,11 @@ execfor(Cmd cmd)
 	}
 	if (node->condition && !errflag) {
 	    str = dupstring(node->advance);
+	    if (isset(XTRACE)) {
+		printprompt4();
+		fprintf(stderr, "%s\n", str);
+		fflush(stderr);
+	    }
 	    singsub(&str);
 	    if (!errflag)
 		matheval(str);
@@ -123,44 +142,49 @@ execfor(Cmd cmd)
 	freeheap();
     }
     popheap();
+    cmdpop();
     loops--;
     return lastval;
 }
 
 /**/
 int
-execselect(Cmd cmd)
+execselect(Cmd cmd, LinkList args, int flags)
 {
-    List list;
     Forcmd node;
     char *str, *s;
-    LinkList args;
     LinkNode n;
     int i;
     FILE *inp;
+    size_t more;
 
     node = cmd->u.forcmd;
-    args = cmd->args;
     if (!node->inflag) {
 	char **x;
 
 	args = newlinklist();
 	for (x = pparams; *x; x++)
-	    addlinknode(args, ztrdup(*x));
+	    addlinknode(args, dupstring(*x));
     }
-    if (empty(args))
+    if (!args || empty(args))
 	return 1;
     loops++;
     lastval = 0;
     pushheap();
+    cmdpush(CS_SELECT);
     inp = fdopen(dup((SHTTY == -1) ? 0 : SHTTY), "r");
-    selectlist(args);
+    more = selectlist(args, 0);
     for (;;) {
 	for (;;) {
 	    if (empty(bufstack)) {
 	    	if (interact && SHTTY != -1 && isset(USEZLE)) {
+		    int oef = errflag;
+
 		    isfirstln = 1;
 		    str = (char *)zleread(prompt3, NULL, 0);
+		    if (errflag)
+			str = NULL;
+		    errflag = oef;
 	    	} else {
 		    str = promptexpand(prompt3, 0, NULL, NULL);
 		    zputs(str, stderr);
@@ -181,7 +205,7 @@ execselect(Cmd cmd)
 		*s = '\0';
 	    if (*str)
 	      break;
-	    selectlist(args);
+	    more = selectlist(args, more);
 	}
 	setsparam("REPLY", ztrdup(str));
 	i = atoi(str);
@@ -195,8 +219,7 @@ execselect(Cmd cmd)
 		str = "";
 	}
 	setsparam(node->name, ztrdup(str));
-	list = (List) dupstruct(node->list);
-	execlist(list, 1, 0);
+	execlist(node->list, 1, 0);
 	freeheap();
 	if (breaks) {
 	    breaks--;
@@ -208,6 +231,7 @@ execselect(Cmd cmd)
 	    break;
     }
   done:
+    cmdpop();
     popheap();
     fclose(inp);
     loops--;
@@ -217,8 +241,8 @@ execselect(Cmd cmd)
 /* And this is used to print select lists. */
 
 /**/
-static void
-selectlist(LinkList l)
+size_t
+selectlist(LinkList l, size_t start)
 {
     size_t longest = 1, fct, fw = 0, colsz, t0, t1, ct;
     LinkNode n;
@@ -245,7 +269,7 @@ selectlist(LinkList l)
     else
 	fw = (columns - 1) / fct;
     colsz = (ct + fct - 1) / fct;
-    for (t1 = 0; t1 != colsz; t1++) {
+    for (t1 = start; t1 != colsz && t1 - start < lines - 2; t1++) {
 	ap = arr + t1;
 	do {
 	    int t2 = strlen(*ap) + 2, t3;
@@ -271,13 +295,14 @@ selectlist(LinkList l)
        }
        while (*ap);*/
     fflush(stderr);
+
+    return t1 < colsz ? t1 : 0;
 }
 
 /**/
 int
-execwhile(Cmd cmd)
+execwhile(Cmd cmd, LinkList args, int flags)
 {
-    List list;
     struct whilecmd *node;
     int olderrexit, oldval;
 
@@ -285,11 +310,11 @@ execwhile(Cmd cmd)
     node = cmd->u.whilecmd;
     oldval = 0;
     pushheap();
+    cmdpush(node->cond ? CS_UNTIL : CS_WHILE);
     loops++;
     for (;;) {
-	list = (List) dupstruct(node->cont);
 	noerrexit = 1;
-	execlist(list, 1, 0);
+	execlist(node->cont, 1, 0);
 	noerrexit = olderrexit;
 	if (!((lastval == 0) ^ node->cond)) {
 	    if (breaks)
@@ -297,8 +322,7 @@ execwhile(Cmd cmd)
 	    lastval = oldval;
 	    break;
 	}
-	list = (List) dupstruct(node->loop);
-	execlist(list, 1, 0);
+	execlist(node->loop, 1, 0);
 	if (breaks) {
 	    breaks--;
 	    if (breaks || !contflag)
@@ -312,6 +336,7 @@ execwhile(Cmd cmd)
 	}
 	oldval = lastval;
     }
+    cmdpop();
     popheap();
     loops--;
     return lastval;
@@ -319,22 +344,21 @@ execwhile(Cmd cmd)
 
 /**/
 int
-execrepeat(Cmd cmd)
+execrepeat(Cmd cmd, LinkList args, int flags)
 {
-    List list;
     int count;
 
     lastval = 0;
-    if (empty(cmd->args) || nextnode(firstnode(cmd->args))) {
+    if (!args || empty(args) || nextnode(firstnode(args))) {
 	zerr("bad argument for repeat", NULL, 0);
 	return 1;
     }
-    count = atoi(peekfirst(cmd->args));
+    count = atoi(peekfirst(args));
     pushheap();
+    cmdpush(CS_REPEAT);
     loops++;
     while (count--) {
-	list = (List) dupstruct(cmd->u.list);
-	execlist(list, 1, 0);
+	execlist(cmd->u.list, 1, 0);
 	freeheap();
 	if (breaks) {
 	    breaks--;
@@ -347,6 +371,7 @@ execrepeat(Cmd cmd)
 	    break;
 	}
     }
+    cmdpop();
     popheap();
     loops--;
     return lastval;
@@ -354,10 +379,10 @@ execrepeat(Cmd cmd)
 
 /**/
 int
-execif(Cmd cmd)
+execif(Cmd cmd, LinkList args, int flags)
 {
     struct ifcmd *node;
-    int olderrexit;
+    int olderrexit, s = 0;
     List *i, *t;
 
     olderrexit = noerrexit;
@@ -368,17 +393,22 @@ execif(Cmd cmd)
     if (!noerrexit)
 	noerrexit = 1;
     while (*i) {
+	cmdpush(s ? CS_ELIF : CS_IF);
 	execlist(*i, 1, 0);
+	cmdpop();
 	if (!lastval)
 	    break;
+	s = 1;
 	i++;
 	t++;
     }
     noerrexit = olderrexit;
 
-    if (*t)
-	execlist(*t, 1, cmd->flags & CFLAG_EXEC);
-    else
+    if (*t) {
+	cmdpush(*i ? (s ? CS_ELIFTHEN : CS_IFTHEN) : CS_ELSE);
+	execlist(*t, 1, flags & CFLAG_EXEC);
+	cmdpop();
+    } else
 	lastval = 0;
 
     return lastval;
@@ -386,7 +416,7 @@ execif(Cmd cmd)
 
 /**/
 int
-execcase(Cmd cmd)
+execcase(Cmd cmd, LinkList args, int flags)
 {
     struct casecmd *node;
     char *word;
@@ -397,25 +427,33 @@ execcase(Cmd cmd)
     l = node->lists;
     p = node->pats;
 
-    word = *p++;
+    word = dupstring(*p++);
     singsub(&word);
     untokenize(word);
     lastval = 0;
 
     if (node) {
+	cmdpush(CS_CASE);
 	while (*p) {
-	    char *pat = *p + 1;
+	    char *pat = dupstring(*p + 1);
 	    singsub(&pat);
+	    if (isset(XTRACE)) {
+		char *pat2 = dupstring(pat);
+		untokenize(pat2);
+		printprompt4();
+		fprintf(stderr, "case %s (%s)\n", word, pat2);
+		fflush(stderr);
+	    }
 	    if (matchpat(word, pat)) {
 		do {
-		    execlist(*l++, 1, **p == ';' && (cmd->flags & CFLAG_EXEC));
+		    execlist(*l++, 1, **p == ';' && (flags & CFLAG_EXEC));
 		} while(**p++ == '&' && *p);
 		break;
 	    }
 	    p++;
 	    l++;
 	}
+	cmdpop();
     }
     return lastval;
 }
-
