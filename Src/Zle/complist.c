@@ -1862,7 +1862,8 @@ static Cmatch **
 msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
 {
 #ifdef ZLE_UNICODE_SUPPORT
-    char s[MB_CUR_MAX+1];
+    /* MB_CUR_MAX may not be constant */
+    VARARR(char *, s, MB_CUR_MAX+1);
 #else
     char s[2];
 #endif
