@@ -198,7 +198,7 @@ when tt(MULTIOS) is unset will truncate bar, and write `tt(foo)' into baz.
 sect(Redirections with no command)
 vindex(NULLCMD, use of)
 vindex(READNULLCMD, use of)
-pindex(IGNORE_NULLCMD, use of)
+pindex(CSH_NULLCMD, use of)
 pindex(SH_NULLCMD, use of)
 When a simple command consists of one or more redirection operators
 and zero or more parameter assignments, but no command name, zsh can

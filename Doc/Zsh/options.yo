@@ -310,7 +310,7 @@ vindex(NULLCMD, ignoring)
 vindex(READNULLCMD, ignoring)
 cindex(redirections with no command, csh)
 cindex(csh, redirections with no command)
-item(tt(IGNORE_NULLCMD) <C>)(
+item(tt(CSH_NULLCMD) <C>)(
 Do not use the values of tt(NULLCMD) and tt(READNULLCMD) 
 when running redirections with no command.  This make 
 such redirections fail (see noderef(Redirection)).
