@@ -1724,9 +1724,12 @@ setarrvalue(Value v, char **val)
     }
     if (v->start == 0 && v->end == -1) {
 	if (PM_TYPE(v->pm->flags) == PM_HASHED)
-	    arrhashsetfn(v->pm, val);
+	    arrhashsetfn(v->pm, val, 0);
 	else
 	    (v->pm->sets.afn) (v->pm, val);
+    } else if (v->start == -1 && v->end == 0 &&
+    	    PM_TYPE(v->pm->flags) == PM_HASHED) {
+    	arrhashsetfn(v->pm, val, 1);
     } else {
 	char **old, **new, **p, **q, **r;
 	int n, ll, i;
@@ -1870,12 +1873,15 @@ gethkparam(char *s)
 
 /**/
 mod_export Param
-setsparam(char *s, char *val)
+assignsparam(char *s, char *val, int augment)
 {
     struct value vbuf;
     Value v;
     char *t = s;
-    char *ss;
+    char *ss, *copy, *var;
+    size_t lv;
+    mnumber lhs, rhs;
+    int sstart;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s, 0);
@@ -1893,8 +1899,10 @@ setsparam(char *s, char *val)
     } else {
 	if (!(v = getvalue(&vbuf, &s, 1)))
 	    createparam(t, PM_SCALAR);
-	else if ((PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
-		 !(v->pm->flags & (PM_SPECIAL|PM_TIED)) && unset(KSHARRAYS)) {
+	else if ((((v->pm->flags & PM_ARRAY) && !augment) ||
+	    	 (v->pm->flags & PM_HASHED)) &&
+		 !(v->pm->flags & (PM_SPECIAL|PM_TIED)) && 
+		 unset(KSHARRAYS)) {
 	    unsetparam(t);
 	    createparam(t, PM_SCALAR);
 	    v = NULL;
@@ -1905,6 +1913,78 @@ setsparam(char *s, char *val)
 	zsfree(val);
 	return NULL;
     }
+    if (augment) {
+	if (v->start == 0 && v->end == -1) {
+	    switch (PM_TYPE(v->pm->flags)) {
+	    case PM_SCALAR:
+		v->start = INT_MAX;  /* just append to scalar value */
+		break;
+	    case PM_INTEGER:
+	    case PM_EFLOAT:
+	    case PM_FFLOAT:
+		rhs = matheval(val);
+		lhs = getnumvalue(v);
+		if (lhs.type == MN_FLOAT) {
+		    if ((rhs.type) == MN_FLOAT)
+        		lhs.u.d = lhs.u.d + rhs.u.d;
+		    else
+			lhs.u.d = lhs.u.d + (double)rhs.u.l;
+		} else {
+        	    if ((rhs.type) == MN_INTEGER)
+			lhs.u.l = lhs.u.l + rhs.u.l;
+		    else
+			lhs.u.l = lhs.u.l + (zlong)rhs.u.d;
+		}
+		setnumvalue(v, lhs);
+    	    	unqueue_signals();
+		zsfree(val);
+		return v->pm; /* avoid later setstrvalue() call */
+	    case PM_ARRAY:
+	    	if (unset(KSHARRAYS)) {
+		    v->start = arrlen(v->pm->gets.afn(v->pm));
+		    v->end = v->start + 1;
+		} else {
+		    /* ksh appends scalar to first element */
+		    v->end = 1;
+		    goto kshappend;
+		}
+		break;
+	    }
+	} else {
+	    switch (PM_TYPE(v->pm->flags)) {
+	    case PM_SCALAR:
+    		if (v->end > 0)
+		    v->start = v->end;
+		else
+		    v->start = v->end = strlen(v->pm->gets.cfn(v->pm)) +
+			v->end + 1;
+	    	break;
+	    case PM_INTEGER:
+	    case PM_EFLOAT:
+	    case PM_FFLOAT:
+		unqueue_signals();
+		zerr("attempt to add to slice of a numeric variable",
+		    NULL, 0);
+		zsfree(val);
+		return NULL;
+	    case PM_ARRAY:
+	      kshappend:
+		/* treat slice as the end element */
+		v->start = sstart = v->end > 0 ? v->end - 1 : v->end;
+		v->isarr = 0;
+		var = getstrvalue(v);
+		v->start = sstart;
+		copy = val;
+		lv = strlen(var);
+		val = (char *)zalloc(lv + strlen(var));
+		strcpy(val, var);
+		strcpy(val + lv, copy);
+		zsfree(copy);
+		break;
+	    }
+	}
+    }
+    
     setstrvalue(v, val);
     unqueue_signals();
     return v->pm;
@@ -1912,7 +1992,7 @@ setsparam(char *s, char *val)
 
 /**/
 mod_export Param
-setaparam(char *s, char **val)
+assignaparam(char *s, char **val, int augment)
 {
     struct value vbuf;
     Value v;
@@ -1946,6 +2026,18 @@ setaparam(char *s, char **val)
 	else if (!(PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
 		 !(v->pm->flags & (PM_SPECIAL|PM_TIED))) {
 	    int uniq = v->pm->flags & PM_UNIQUE;
+	    if (augment) {
+	    	/* insert old value at the beginning of the val array */
+		char **new;
+		int lv = arrlen(val);
+
+		new = (char **) zalloc(sizeof(char *) * (lv + 2));
+		*new = ztrdup(getstrvalue(v));
+		memcpy(new+1, val, sizeof(char *) * (lv + 1));
+		free(val);
+		val = new;
+		
+	    }
 	    unsetparam(t);
 	    createparam(t, PM_ARRAY | uniq);
 	    v = NULL;
@@ -1954,8 +2046,27 @@ setaparam(char *s, char **val)
     if (!v)
 	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING))) {
 	    unqueue_signals();
+	    freearray(val);
 	    return NULL;
 	}
+
+    if (augment) {
+    	if (v->start == 0 && v->end == -1) {
+	    if (PM_TYPE(v->pm->flags) & PM_ARRAY) {
+	    	v->start = arrlen(v->pm->gets.afn(v->pm));
+	    	v->end = v->start + 1;
+	    } else if (PM_TYPE(v->pm->flags) & PM_HASHED)
+	    	v->start = -1, v->end = 0;
+	} else {
+	    if (v->end > 0)
+		v->start = v->end--;
+	    else if (PM_TYPE(v->pm->flags) & PM_ARRAY) {
+		v->end = arrlen(v->pm->gets.afn(v->pm)) + v->end;
+		v->start = v->end + 1;
+	    }
+	}
+    }
+
     setarrvalue(v, val);
     unqueue_signals();
     return v->pm;
@@ -2291,7 +2402,7 @@ hashsetfn(Param pm, HashTable x)
 
 /**/
 static void
-arrhashsetfn(Param pm, char **val)
+arrhashsetfn(Param pm, char **val, int augment)
 {
     /* Best not to shortcut this by using the existing hash table,   *
      * since that could cause trouble for special hashes.  This way, *
@@ -2309,7 +2420,8 @@ arrhashsetfn(Param pm, char **val)
 	return;
     }
     if (alen)
-	ht = paramtab = newparamtable(17, pm->nam);
+    	if (!(augment && (ht = paramtab = pm->gets.hfn(pm))))
+	    ht = paramtab = newparamtable(17, pm->nam);
     while (*aptr) {
 	/* The parameter name is ztrdup'd... */
 	v->pm = createparam(*aptr, PM_SCALAR|PM_UNSET);

@@ -1,3 +1,9 @@
+2001-12-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 16353: Src/exec.c, Src/lex.c, Src/params.c, Src/parse.c,
+	Src/text.c, Src/zsh.h, Doc/Zsh/params.yo, Test/.distfiles,
+	Test/A06assign.ztst: add += parameter assignments
+
 2001-12-17  Clint Adams  <clint@zsh.org>
 
 	* 16357: Doc/Zsh/expn.yo, Src/subst.c:

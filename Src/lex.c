@@ -1140,6 +1140,7 @@ gettokstr(int c, int sub)
 			skipparens(Inbrack, Outbrack, &t);
 		    }
 		}
+		if (*t == '+') t++;
 		if (t == bptr) {
 		    e = hgetc();
 		    if (e == '(' && incmdpos) {

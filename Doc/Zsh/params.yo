@@ -20,8 +20,9 @@ cindex(assignment)
 indent(var(name)tt(=)var(value))
 
 If the integer attribute, tt(-i), is set for var(name), the var(value)
-is subject to arithmetic evaluation.  See noderef(Array Parameters)
-for additional forms of assignment.
+is subject to arithmetic evaluation.  Furthermore, by replacing `tt(=)'
+with `tt(+=)', a parameter can be added or appended to.  See
+noderef(Array Parameters) for additional forms of assignment.
 
 To refer to the value of a parameter, write `tt($)var(name)' or
 `tt(${)var(name)tt(})'.  See

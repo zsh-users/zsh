@@ -323,6 +323,7 @@ gettext2(Estate state)
 	    break;
 	case WC_ASSIGN:
 	    taddstr(ecgetstr(state, EC_NODUP, NULL));
+	    if (WC_ASSIGN_TYPE2(code) == WC_ASSIGN_INC) taddchr('+');
 	    taddchr('=');
 	    if (WC_ASSIGN_TYPE(code) == WC_ASSIGN_ARRAY) {
 		taddchr('(');

@@ -1488,11 +1488,17 @@ par_simple(int *complex, int nr)
 	} else if (tok == ENVSTRING) {
 	    char *p, *name, *str;
 
-	    ecadd(WCB_ASSIGN(WC_ASSIGN_SCALAR, 0));
 	    name = tokstr;
-	    for (p = tokstr; *p && *p != Inbrack && *p != '='; p++);
-	    if (*p == Inbrack && !skipparens(Inbrack, Outbrack, &p) &&
-		*p == '=') {
+	    for (p = tokstr; *p && *p != Inbrack && *p != '=' && *p != '+';
+	         p++);
+	    if (*p == Inbrack) skipparens(Inbrack, Outbrack, &p);
+	    if (*p == '+') {
+	    	*p++ = '\0';
+	    	ecadd(WCB_ASSIGN(WC_ASSIGN_SCALAR, WC_ASSIGN_INC, 0));
+	    } else
+		ecadd(WCB_ASSIGN(WC_ASSIGN_SCALAR, WC_ASSIGN_NEW, 0));
+    	
+	    if (*p == '=') {
 		*p = '\0';
 		str = p + 1;
 	    } else
@@ -1501,15 +1507,20 @@ par_simple(int *complex, int nr)
 	    ecstr(str);
 	    isnull = 0;
 	} else if (tok == ENVARRAY) {
-	    int oldcmdpos = incmdpos, n;
+	    int oldcmdpos = incmdpos, n, type2;
 
 	    p = ecadd(0);
 	    incmdpos = 0;
+	    if ((type2 = strlen(tokstr) - 1) && tokstr[type2] == '+') {
+	    	tokstr[type2] = '\0';
+		type2 = WC_ASSIGN_INC;
+    	    } else
+		type2 = WC_ASSIGN_NEW;
 	    ecstr(tokstr);
 	    cmdpush(CS_ARRAY);
 	    yylex();
 	    n = par_nl_wordlist();
-	    ecbuf[p] = WCB_ASSIGN(WC_ASSIGN_ARRAY, n);
+	    ecbuf[p] = WCB_ASSIGN(WC_ASSIGN_ARRAY, type2, n);
 	    cmdpop();
 	    if (tok != OUTPAR)
 		YYERROR(oecused);
@@ -2288,8 +2299,8 @@ init_eprog(void)
 #define FD_MINMAP 4096
 
 #define FD_PRELEN 12
-#define FD_MAGIC  0x03040506
-#define FD_OMAGIC 0x06050403
+#define FD_MAGIC  0x04050607
+#define FD_OMAGIC 0x07060504
 
 #define FDF_MAP   1
 #define FDF_OTHER 2

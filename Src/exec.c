@@ -1512,7 +1512,8 @@ addvars(Estate state, Wordcode pc, int export)
 	if (htok)
 	    untokenize(name);
 	if (xtr)
-	    fprintf(xtrerr, "%s=", name);
+	    fprintf(xtrerr,
+	    	WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC ? "%s+=" : "%s=", name);
 	if ((isstr = (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR))) {
 	    init_list1(svl, ecgetstr(state, EC_DUPTOK, &htok));
 	    vl = &svl;
@@ -1561,10 +1562,12 @@ addvars(Estate state, Wordcode pc, int export)
 		}
 		allexp = opts[ALLEXPORT];
 		opts[ALLEXPORT] = 1;
-		pm = setsparam(name, val);
+	    	pm = assignsparam(name, val,
+		    WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
 		opts[ALLEXPORT] = allexp;
 	    } else
-		pm = setsparam(name, val);
+	    	pm = assignsparam(name, val,
+		    WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
 	    if (errflag) {
 		state->pc = opc;
 		return;
@@ -1587,7 +1590,7 @@ addvars(Estate state, Wordcode pc, int export)
 		fprintf(xtrerr, "%s ", *ptr);
 	    fprintf(xtrerr, ") ");
 	}
-	setaparam(name, arr);
+	assignaparam(name, arr, WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
 	if (errflag) {
 	    state->pc = opc;
 	    return;

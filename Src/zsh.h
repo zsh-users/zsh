@@ -591,10 +591,13 @@ struct eccstr {
 #define WCB_REDIR(T)        wc_bld(WC_REDIR, (T))
 
 #define WC_ASSIGN_TYPE(C)   (wc_data(C) & ((wordcode) 1))
+#define WC_ASSIGN_TYPE2(C)  ((wc_data(C) & ((wordcode) 2)) >> 1)
 #define WC_ASSIGN_SCALAR    0
 #define WC_ASSIGN_ARRAY     1
-#define WC_ASSIGN_NUM(C)    (wc_data(C) >> 1)
-#define WCB_ASSIGN(T,N)     wc_bld(WC_ASSIGN, ((T) | ((N) << 1)))
+#define WC_ASSIGN_NEW       0
+#define WC_ASSIGN_INC       1
+#define WC_ASSIGN_NUM(C)    (wc_data(C) >> 2)
+#define WCB_ASSIGN(T,A,N)   wc_bld(WC_ASSIGN, ((T) | ((A) << 1) | ((N) << 2)))
 
 #define WC_SIMPLE_ARGC(C)   wc_data(C)
 #define WCB_SIMPLE(N)       wc_bld(WC_SIMPLE, (N))
@@ -1197,6 +1200,9 @@ struct paramdef {
 #define ARRPARAMDEF(name, var) \
     { name, PM_ARRAY, (void *) var, (void *) arrvarsetfn, \
       (void *) arrvargetfn, (void *) stdunsetfn }
+
+#define setsparam(S,V) assignsparam(S,V,0)
+#define setaparam(S,V) assignaparam(S,V,0)
 
 /* node for named directory hash table (nameddirtab) */
 
