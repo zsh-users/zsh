@@ -1,5 +1,7 @@
 2003-05-05  Andrey Borzenkov  <bor@zsh.org>
 
+	* unposted: Etc/CONTRIBUTORS: my name spelling changed ...
+
 	* 18476: Src/Zle/complist.c, Src/Zle/zle_refresh.c: fix
 	menu selection on terminals without cursor_down or with
 	cursor_down set to ^J (Linux console)

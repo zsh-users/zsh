@@ -21,7 +21,7 @@ Version 4.1.1
 Clint Adams <clint@zsh.org>: termcap/terminfo, completion, configuration,
 various modules, networking, prompts
 
-Andrej Borsenkow <bor@zsh.org>: configuration, completion functions, cygwin
+Andrey Borzenkov <bor@zsh.org>: configuration, completion functions, cygwin
 support
 
 Chmouel Boudjnah <chmouel@mandrakesoft.com>: Linux completion support
