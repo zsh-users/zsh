@@ -374,9 +374,10 @@ if (( ! $+_fs_any )); then
     _fs_msdos=( "$_fs_fat[@]" )
     _fs_umsdos=( "$_fs_fat[@]" )
     _fs_vfat=( "$_fs_fat[@]"
-      'uni_xlate[translate unicode to escaped sequences]'
+      '(utf8)uni_xlate[translate unicode to escaped sequences]'
       'posix[allow file names only differing in case]'
       'nonumtail[try short name before number extension]'
+      '(uni_xlate)utf8[mount the filesystem in UTF8 mode]'
     )
     _fs_hpfs=(
       'uid[specify user ID of all files]:user ID:'
