@@ -1413,6 +1413,27 @@ addvars(LinkList l, int export)
 }
 
 /**/
+void
+setunderscore(char *str)
+{
+    if (str && *str) {
+	int l = strlen(str) + 1;
+
+	if (l > underscorelen || l < (underscorelen >> 2)) {
+	    zfree(underscore, underscorelen);
+	    underscore = (char *) zalloc(underscorelen = l);
+	}
+	strcpy(underscore, str);
+	underscoreused = l;
+    } else {
+	zfree(underscore, underscorelen);
+	underscore = (char *) zalloc(underscorelen = 32);
+	*underscore = '\0';
+	underscoreused = 1;
+    }
+}
+
+/**/
 static void
 execcmd(Cmd cmd, int input, int output, int how, int last1)
 {
@@ -1629,21 +1650,8 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	text = NULL;
 
     /* Set up special parameter $_ */
-    if (args && nonempty(args)) {
-	char *u = (char *) getdata(lastnode(args));
 
-	if (u) {
-	    int ul = strlen(u);
-
-	    if (ul >= underscorelen) {
-		zfree(underscore, underscorelen);
-		underscore = (char *) zalloc(underscorelen = ul + 32);
-	    }
-	    strcpy(underscore, u);
-	} else
-	    *underscore = '\0';
-    } else
-	*underscore = '\0';
+    setunderscore((args && nonempty(args)) ? ((char *) getdata(lastnode(args))) : "");
 
     /* Warn about "rm *" */
     if (type == SIMPLE && interact && unset(RMSTARSILENT)
@@ -3016,7 +3024,9 @@ void
 runshfunc(List list, FuncWrap wrap, char *name)
 {
     int cont;
-    VARARR(char, ou, underscorelen);
+    VARARR(char, ou, underscoreused);
+
+    memcpy(ou, underscore, underscoreused);
 
     while (wrap) {
 	wrap->module->wrapper++;
@@ -3032,9 +3042,8 @@ runshfunc(List list, FuncWrap wrap, char *name)
 	wrap = wrap->next;
     }
     startparamscope();
-    strcpy(ou, underscore);
     execlist(list, 1, 0);
-    strcpy(underscore, ou);
+    setunderscore(ou);
     endparamscope();
 }
 
@@ -3233,7 +3242,7 @@ execrestore(void)
     trapreturn = exstack->trapreturn;
     noerrs = exstack->noerrs;
     subsh_close = exstack->subsh_close;
-    strcpy(underscore, exstack->underscore);
+    setunderscore(exstack->underscore);
     zsfree(exstack->underscore);
     en = exstack->next;
     free(exstack);

@@ -43,7 +43,7 @@ int noexitct = 0;
 char *underscore;
 
 /**/
-int underscorelen;
+int underscorelen, underscoreused;
 
 /* what level of sourcing we are at */
  
@@ -625,6 +625,7 @@ setupvals(void)
     wordchars   = ztrdup(DEFAULT_WORDCHARS);
     postedit    = ztrdup("");
     underscore  = (char *) zalloc(underscorelen = 32);
+    underscoreused = 1;
     *underscore = '\0';
 
     zoptarg = ztrdup("");
