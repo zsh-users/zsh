@@ -2174,6 +2174,7 @@ add_match_data(int alt, char *str, Cline line,
     addlinknode((alt ? fmatches : matches), cm);
 
     newmatches = 1;
+    mgroup->new = 1;
 
     if (!complastprompt || !*complastprompt)
 	dolastprompt = 0;
@@ -2262,6 +2263,8 @@ begcmgroup(char *n, int flags)
     mgroup->matches = NULL;
     mgroup->ylist = NULL;
     mgroup->expls = NULL;
+    mgroup->perm = NULL;
+    mgroup->new = 0;
 
     mgroup->lexpls = expls = newlinklist();
     mgroup->lmatches = matches = newlinklist();
@@ -2519,12 +2522,12 @@ dupmatch(Cmatch m, int nbeg, int nend)
 mod_export int
 permmatches(int last)
 {
-    Cmgroup g = amatches, n;
+    Cmgroup g = amatches, n, opm;
     Cmatch *p, *q;
     Cexpl *ep, *eq, e, o;
     LinkList mlist;
     static int fi = 0;
-    int nn, nl, ll, gn = 1, mn = 1, rn;
+    int nn, nl, ll, gn = 1, mn = 1, rn, ofi = fi;
 
     if (pmatches && !newmatches) {
 	if (last && fi)
@@ -2533,9 +2536,7 @@ permmatches(int last)
     }
     newmatches = fi = 0;
 
-    if (pmatches)
-	freematches(pmatches);
-
+    opm = pmatches;
     pmatches = lmatches = NULL;
     nmatches = smatches = 0;
 
@@ -2545,68 +2546,87 @@ permmatches(int last)
 	fi = 1;
     }
     while (g) {
-	if (fi)
-	    /* We have no matches, try ignoring fignore. */
-	    mlist = g->lfmatches;
-	else
-	    mlist = g->lmatches;
+	if (fi != ofi || !g->perm || g->new) {
+	    if (fi)
+		/* We have no matches, try ignoring fignore. */
+		mlist = g->lfmatches;
+	    else
+		mlist = g->lmatches;
 
-	g->matches = makearray(mlist, 1, g->flags, &nn, &nl, &ll);
-	g->mcount = nn;
-	if ((g->lcount = nn - nl) < 0)
-	    g->lcount = 0;
-	g->llcount = ll;
-	if (g->ylist) {
-	    g->lcount = arrlen(g->ylist);
-	    smatches = 2;
-	}
-	g->expls = (Cexpl *) makearray(g->lexpls, 0, 0, &(g->ecount),
-				       NULL, NULL);
-
-	g->ccount = 0;
-
-	nmatches += g->mcount;
-	smatches += g->lcount;
-
-	n = (Cmgroup) zcalloc(sizeof(struct cmgroup));
-
-	if (!lmatches)
-	    lmatches = n;
-	if (pmatches)
-	    pmatches->prev = n;
-	n->next = pmatches;
-	pmatches = n;
-	n->prev = 0;
-	n->num = gn++;
-
-	n->flags = g->flags;
-	n->mcount = g->mcount;
-	n->matches = p = (Cmatch *) zcalloc((n->mcount + 1) * sizeof(Cmatch));
-	n->name = ztrdup(g->name);
-	for (q = g->matches; *q; q++, p++)
-	    *p = dupmatch(*q, nbrbeg, nbrend);
-	*p = NULL;
-
-	n->lcount = g->lcount;
-	n->llcount = g->llcount;
-	if (g->ylist)
-	    n->ylist = zarrdup(g->ylist);
-	else
-	    n->ylist = NULL;
-
-	if ((n->ecount = g->ecount)) {
-	    n->expls = ep = (Cexpl *) zcalloc((n->ecount + 1) * sizeof(Cexpl));
-	    for (eq = g->expls; (o = *eq); eq++, ep++) {
-		*ep = e = (Cexpl) zcalloc(sizeof(struct cexpl));
-		e->count = (fi ? o->fcount : o->count);
-		e->str = ztrdup(o->str);
+	    g->matches = makearray(mlist, 1, g->flags, &nn, &nl, &ll);
+	    g->mcount = nn;
+	    if ((g->lcount = nn - nl) < 0)
+		g->lcount = 0;
+	    g->llcount = ll;
+	    if (g->ylist) {
+		g->lcount = arrlen(g->ylist);
+		smatches = 2;
 	    }
-	    *ep = NULL;
-	} else
-	    n->expls = NULL;
+	    g->expls = (Cexpl *) makearray(g->lexpls, 0, 0, &(g->ecount),
+					   NULL, NULL);
 
-	n->widths = NULL;
+	    g->ccount = 0;
 
+	    nmatches += g->mcount;
+	    smatches += g->lcount;
+
+	    n = (Cmgroup) zcalloc(sizeof(struct cmgroup));
+
+	    if (g->perm) {
+		g->perm->next = NULL;
+		freematches(g->perm);
+	    }
+	    g->perm = n;
+
+	    if (!lmatches)
+		lmatches = n;
+	    if (pmatches)
+		pmatches->prev = n;
+	    n->next = pmatches;
+	    pmatches = n;
+	    n->prev = NULL;
+	    n->num = gn++;
+	    n->flags = g->flags;
+	    n->mcount = g->mcount;
+	    n->matches = p = (Cmatch *) zcalloc((n->mcount + 1) * sizeof(Cmatch));
+	    n->name = ztrdup(g->name);
+	    for (q = g->matches; *q; q++, p++)
+		*p = dupmatch(*q, nbrbeg, nbrend);
+	    *p = NULL;
+
+	    n->lcount = g->lcount;
+	    n->llcount = g->llcount;
+	    if (g->ylist)
+		n->ylist = zarrdup(g->ylist);
+	    else
+		n->ylist = NULL;
+
+	    if ((n->ecount = g->ecount)) {
+		n->expls = ep = (Cexpl *) zcalloc((n->ecount + 1) * sizeof(Cexpl));
+		for (eq = g->expls; (o = *eq); eq++, ep++) {
+		    *ep = e = (Cexpl) zcalloc(sizeof(struct cexpl));
+		    e->count = (fi ? o->fcount : o->count);
+		    e->str = ztrdup(o->str);
+		}
+		*ep = NULL;
+	    } else
+		n->expls = NULL;
+
+	    n->widths = NULL;
+	} else {
+	    if (!lmatches)
+		lmatches = g->perm;
+	    if (pmatches)
+		pmatches->prev = g->perm;
+	    g->perm->next = pmatches;
+	    pmatches = g->perm;
+	    g->perm->prev = NULL;
+
+	    nmatches += g->mcount;
+	    smatches += g->lcount;
+	    g->num = gn++;
+	}
+	g->new = 0;
 	g = g->next;
     }
     for (g = pmatches; g; g = g->next) {
@@ -2664,7 +2684,7 @@ freematches(Cmgroup g)
 
     while (g) {
 	n = g->next;
-	
+
 	for (m = g->matches; *m; m++)
 	    freematch(*m, g->nbrbeg, g->nbrend);
 

@@ -1219,7 +1219,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
     int i, ii, fi, ui, j;
     struct m_hdr *m, *mf, *ms;
     char *b, *c, buf[40];
-    long u = 0, f = 0;
+    long u = 0, f = 0, to, cu;
 
     if (ops['v']) {
 	printf("The lower and the upper addresses of the heap. Diff gives\n");
@@ -1242,13 +1242,15 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	printf("values, i.e. the number of blocks of that size that is\n");
 	printf("currently allocated. Total is the product of size and diff,\n");
 	printf("i.e. the number of bytes that are allocated for blocks of\n");
-	printf("this size.\n");
+	printf("this size. The last field gives the accumulated number of\n");
+	printf("bytes for all sizes.\n");
     }
-    printf("\nsize\tmalloc\tfree\tdiff\ttotal\n");
-    for (i = 0; i < 1024; i++)
+    printf("\nsize\tmalloc\tfree\tdiff\ttotal\tcum\n");
+    for (i = 0, cu = 0; i < 1024; i++)
 	if (m_m[i] || m_f[i])
-	    printf("%ld\t%d\t%d\t%d\t%ld\n", (long)i * M_ISIZE, m_m[i], m_f[i],
-		   m_m[i] - m_f[i], (long)i * M_ISIZE * (m_m[i] - m_f[i]));
+	    printf("%ld\t%d\t%d\t%d\t%ld\t%ld\n",
+		   (long)i * M_ISIZE, m_m[i], m_f[i], m_m[i] - m_f[i],
+		   (to = (long) i * M_ISIZE * (m_m[i] - m_f[i])), (cu += to));
 
     if (m_m[i] || m_f[i])
 	printf("big\t%d\t%d\t%d\n", m_m[i], m_f[i], m_m[i] - m_f[i]);

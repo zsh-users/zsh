@@ -73,6 +73,8 @@ struct cmgroup {
     int *widths;		/* column widths for listpacked */
     int totl;			/* total length */
     int shortest;		/* length of shortest match */
+    Cmgroup perm;		/* perm. alloced version of this group */
+    int new;			/* new matches since last permalloc() */
 };
 
 
