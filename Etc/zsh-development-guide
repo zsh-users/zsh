@@ -182,6 +182,9 @@ following shell variables:
 
   - name            name of the module
   - link            `static', `dynamic' or `no', as described in INSTALL.
+		    In addition, the value `either' is allowed in the .mdd
+		    file, which will be converted by configure to `dynamic'
+		    if that is available, else `static'.
 		    May also be a command string, which will be run within
 		    configure and whose output is used to set the value
 		    of `link' in config.modules.  This allows a
