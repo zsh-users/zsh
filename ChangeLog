@@ -1,3 +1,7 @@
+2001-10-05  Geoff Wing  <gcw@zsh.org>
+
+	* unposted: Doc/Zsh/options.yo: typo
+
 2001-10-05  Clint Adams  <clint@zsh.org>
 
 	* 15941: Completion/Unix/Command/_mount:
