@@ -420,13 +420,13 @@ for prepath in "$prepaths[@]"; do
     fi
 
     if [[ "$tpre" = */* ]]; then
-      PREFIX="${donepath}${linepath}${cpre}${tpre%%/*}"
-      SUFFIX="/${tsuf#*/}"
       tmp2="${cpre}${tpre%%/*}"
+      PREFIX="${donepath}${linepath}${tmp2}"
+      SUFFIX="/${tpre#*/}${tsuf#*/}"
     else
-      PREFIX="${donepath}${linepath}${cpre}${tpre}"
-      SUFFIX="${tsuf}"
       tmp2="${cpre}${tpre}"
+      PREFIX="${donepath}${linepath}${tmp2}"
+      SUFFIX="${tsuf}"
     fi
 
     if (( tmp4 )) ||
