@@ -3219,7 +3219,6 @@ zexit(int val, int from_signal)
 	}
 	if (sigtrapped[SIGEXIT])
 	    dotrap(SIGEXIT);
-	runhookdef(EXITHOOK, NULL);
 	if (mypid != getpid())
 	    _exit(val);
 	else

@@ -41,13 +41,13 @@
 typedef struct gmatch *Gmatch; 
 
 struct gmatch {
-    off_t size ALIGN64;
-    off_t _size ALIGN64;
     char *name;
+    off_t size ALIGN64;
     long atime;
     long mtime;
     long ctime;
     long links;
+    off_t _size ALIGN64;
     long _atime;
     long _mtime;
     long _ctime;
@@ -102,10 +102,10 @@ typedef struct stat *Statptr;	 /* This makes the Ultrix compiler happy.  Go figu
 typedef int (*TestMatchFunc) _((char *, struct stat *, off_t, char *));
 
 struct qual {
-    off_t data ALIGN64;		/* Argument passed to function               */
     struct qual *next;		/* Next qualifier, must match                */
     struct qual *or;		/* Alternative set of qualifiers to match    */
     TestMatchFunc func;		/* Function to call to test match            */
+    off_t data ALIGN64;		/* Argument passed to function               */
     int sense;			/* Whether asserting or negating             */
     int amc;			/* Flag for which time to test (a, m, c)     */
     int range;			/* Whether to test <, > or = (as per signum) */

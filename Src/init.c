@@ -89,11 +89,6 @@ mod_export int (*getkeyptr) _((int));
 mod_export int alloc_stackp;
 #endif
 
-/**/
-mod_export struct hookdef zshhooks[] = {
-    HOOKDEF("exit", NULL, HOOKF_ALL),
-};
-
 /* keep executing lists until EOF found */
 
 /**/
@@ -564,8 +559,6 @@ setupvals(void)
     int fpathlen = 0;
 # endif
 #endif
-
-    addhookdefs(argzero, zshhooks, sizeof(zshhooks)/sizeof(*zshhooks));
 
     init_eprog();
 

@@ -1,10 +1,197 @@
+2000-01-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Config/version.mk, Src/Modules/.distfiles: 3.1.6-dev-16;
+	zprof.mdd, zfprof.c finally added to distribution.
+
+2000-01-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9408: Src/pattern.c, Doc/Zsh/expn.yo: failed
+	backreferences, such as (...)# matching zero times or (|(...))
+	matching first part of branch now set match to null string and
+	indices to -1 instead of crashing the shell.
+
+	* Clint: 9405: Makefile.in: $(DESTDIR) missing in front of
+	$(sitefndir).
+
+	* Tanaka Akira: 9404: Completion/Core/_path_files: `%' missing in
+	parameter expansion.
+
+2000-01-21  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9403: Completion/Core/_path_files, Doc/Zsh/compsys.yo:
+	brace problems with squeeze-slashes.
+
+	* Sven: 9402: Completion/Builtins/_zstyle,
+	Completion/Core/_path_files, Doc/Zsh/compsys.yo: ignore-parents
+	style for more tunable path completion.
+
+	* Sven: 9401: Src/Modules/parameter.c, Src/exec.c, Src/zsh.h: use
+	list-based instead of function-based system for shell function
+	wrappers.
+
+	* Sven: 9399: Functions/Zftp/zfinit: bad reverse index.
+
+	* Sven: 9398: Functions/Zftp/zfcd_match,
+	Functions/Zftp/zfget_match: fix _description calls
+
+	* Sven: 9397: Functions/Zftp/zfinit: incorrect zmodload for
+	autoloaded builtin
+
+	* Sven: 9396: Doc/Zsh/mod_zle.yo, Src/Zle/zle_main.c: better
+	retrieval of history in vared.
+
+	* Sven: 9395: Src/exec.c, Src/parse.c, Src/text.c: problems with
+	ksh-format autoload and core dump due to bad termination in
+	function execution.
+	
+	* Sven: 9388, 9389: Completion/User/_domains: try to completion
+	host domains better.
+
+2000-01-20  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Alexandre: 9387: Doc/Zsh/compsys.yo: document brace problems
+	with 9383.
+
+	* Sven: 9386: Completion/Core/_multi_parts,
+	Completion/Core/_sep_parts: both functions support -F option.
+
+	* Alexandre: 9385: Completion/User/_prcs: tilde expansion in prcs
+	repository path.
+
+	* Alexandre: 9383: Doc/Zsh/compsys.yo, Completion/Core/_path_files,
+	Completion/Builtins/_zstyle: add squeeze-slashes style not to take
+	multiple slashes as multiple completable directories; add
+	file-patterns to zstyle completion.
+
+	* Sven: 9382: Src/Modules/parameter.c, Src/exec.c, Src/mem.c,
+	Src/parse.c, Src/text.c: fix problems with empty lists in wordcode
+	programmes and some comments.
+
+	* Sven: 9381: Src/Zle/compresult.c: don't expand parameters quite
+	so often for tests.
+
+2000-01-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9373: Src/Modules/parameter.c: missing keys with special
+	parameters.
+
+	* Sven: 9371: Completion/Core/_files, Completion/Core/_path_files,
+	Doc/Zsh/compsys.yo: file-patterns style for overriding choices for
+	file completion built into completion functions.
+
+	* Sven: 9370: Src/text.c: missing tstack initialisation.
+
+	* pws: 9367: Src/cond.c, Src/parse.c, Test/04redirect.ztst,
+	Test/07cond.ztst: fixes for 9332: `[' tests didn't work, skipping
+	conditions with `&&' and `||' didn't work, always use WC_END
+	marker to terminate code.
+
+	* Tanaka Akira: 9360: Completion/User/_cvs: new -C option to cvs
+	update, better descriptions.
+
+	* Tanaka Akira: 9359: Completion/Debian/_apt,
+	Completion/Base/_regex_arguments: argument handling for apt-cache.
+
+2000-01-18  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9336: Src/signals.c: addition to 9332.
+
+	* Sven: 9332: Src/Modules/example.c, Src/Modules/parameter.c,
+	Src/Modules/zftp.c, Src/Modules/zprof.c, Src/Zle/compcore.c,
+	Src/Zle/compctl.c, Src/Zle/complete.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c, Src/builtin.c, Src/cond.c, Src/exec.c,
+	Src/glob.c, Src/hashtable.c, Src/init.c, Src/loop.c, Src/parse.c,
+	Src/signals.c, Src/text.c, Src/utils.c, Src/zsh.h: Use word code
+	instead of structs for passing executable chunks around.
+
+	* pws: 9357: Src/glob.c: speculative but harmless attempt to avoid
+	alignment problems on sparc/Linux.
+
+	* Sven: 9353: Completion/Base/_jobs: bad prefix test
+
+	* Sven: 9348: Src/Modules/zutil.c: various minor regex fixes
+
+	* Sven: 9345: Src/exec.c, Src/jobs.c, Src/zsh.h:
+	bug with job control when group leader exits; other problems
+	with subshells.
+
+	* Alexandre: 9340: Src/Zle/computil.c: bug with adding `=' after
+	options.
+
+	* Sven: 9335: Completion/Core/_path_files: fix special-dirs style.
+
+2000-01-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Clint: 9333: Completion/User/_a2ps: a2ps can take PostScript
+	input files.
+
+	* Johan Sundström: 9331: Doc/Zsh/compwid.yo: typo.
+
+	* Sven: 9330: Src/mem.c: debugging message not needed when using
+	mmap().
+
+	* Sven: 9329: Src/Modules/parameter.c, Src/Zle/complete.c,
+	Src/Zle/zleparameter.c, Src/glob.c, Src/mem.c: memory management
+	fixes for hashtables and heaps.
+
+2000-01-16  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Tanaka Akira: 9328: Completion/User/_finger,
+	Completion/User/_other_accounts: new finger completion.
+	.distfiles also updated.
+
+2000-01-15  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Tanaka Akira: 9325: Src/init.c: misspelled SITEFPATH_DIR
+
+	* Alexandre: 9324: Completion/User/_tar_archive: .tgz completion
+	didn't work.
+
+2000-01-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9322: INSTALL, Makefile.in, configure.in,
+	Config/defs.mk.in, Config/funcinst.mk, Config/installfns.sh,
+	Config/uninstallfns.sh, Src/init.c, Src/zsh.mdd: install.fns
+	creates site-functions, parallel to /usr/share/zsh/3.1.6-dev-15
+	or wherever; no functions.old directory saved or used; functions
+	directory is version-specific anyway, so just delete old one.
+
+	* Sven: 9318: Src/exec.c, Src/init.c, Src/zsh.h: cases where we
+	don't need to make up the job text.
+
+	* Tanaka Akira: 9317: Completion/User/_urls: don't quote bookmarks
+	when inserted.
+
+	* Tanaka Akira: 9316: Completion/User/_cvs: detects zsh/stat
+	module more carefully.
+
+	* Sven: 9315: Src/module.c: bad error status when using zmodload
+	in static shell.
+
+	* Tanaka Akira: 9311: Completion/Builtins/_zmodload,
+	Doc/Makefile.in, Test/.distfiles: missing stuff in 3.1.6-dev-15:
+	unused parameter in _zmodload, deleting too many files with clean
+	in Doc, 08traps.ztst wasn't in distribution list.
+	
+2000-01-13  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9309: Completion/Core/_path_files,
+	Completion/Builtins/_zstyle: fixes for 9298: test for non-zero
+	$FIGNORE, zstyle completion for ignored-patterns.
+
+	* Sven: 9306: Doc/Zsh/mod_zle.yo, Src/Zle/zle_thingy.c: allow
+	permanent (until next return) message with zle -M.
+
+	* Sven: 9305: Src/Zle/compcore.c: sometimes failed to switch to
+	alternate match set.
+
 2000-01-12  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws: Config/version.mk: 3.1.6-dev-15.
 
-	* pws: configure.in: use quoted '${VERSION}' in function directory
-	to be determined at compile time, avoids having to re-make
-	config.status.
+	* pws: 9301: configure.in: use quoted '${VERSION}' in function
+	directory to be determined at compile time, avoids having to
+	re-make config.status.
 
 	* Sven: 9298: Completion/Core/_description,
 	Completion/Core/_main_complete, Completion/Core/_path_files,

@@ -2519,7 +2519,8 @@ getoutput(char *cmd, int qt)
 	wc_code(pc[2]) == WC_PIPE && WC_PIPE_TYPE(pc[2]) == WC_PIPE_END &&
 	wc_code(pc[3]) == WC_REDIR && WC_REDIR_TYPE(pc[3]) == READ && 
 	!pc[4] &&
-	wc_code(pc[6]) == WC_SIMPLE && !WC_SIMPLE_ARGC(pc[6])) {
+	wc_code(pc[6]) == WC_SIMPLE && !WC_SIMPLE_ARGC(pc[6]) &&
+	wc_code(pc[7]) == WC_END) {
 	/* $(< word) */
 	int stream;
 	char *s = dupstring(ecrawstr(prog, pc + 5));
