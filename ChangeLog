@@ -1,3 +1,8 @@
+2005-03-01  Peter Stephenson  <pws@csr.com>
+
+	* 20897: Completion/Unix/Command/_a2ps: complete system printers
+	as well as those configured into a2ps.
+
 2005-02-28  Peter Stephenson  <pws@csr.com>
 
 	* 20888: Doc/Zsh/builtins.yo, Src/jobs.c: allow the prefix

@@ -22,10 +22,14 @@ if [[ "$words[1]" != "$_cache_a2ps_cmd" ]]; then
   )
 fi
 
+integer ret=1
+local context state line expl
+typeset -A opt_args
+
 _arguments \
   '(-E --pretty-print=)'{-E-,--pretty-print=}"[enable pretty-printing]::language:(${_cache_a2ps_values[1]})" \
   \*{-D+,--define=}"[set or unset variable]:variable:(${_cache_a2ps_values[8]})" \
-  '(-d -P --printer)'{-P,--printer=}"[send output to printer]:printer:(${_cache_a2ps_values[6]})" \
+  '(-d -P --printer)'{-P,--printer=}"[send output to printer]:printer:->printers" \
   '(-A --file-align)'{-A,--file-align=}'[specify alignment of separate files]:mode:(virtual rank page sheet)' \
   '(-a --pages)'{-a-,--pages=}'[select pages to print]:page range' \
   '(-q --quiet --silent -v --verbose)'{-q,--quiet,--silent}'[quiet output]' \
@@ -50,4 +54,11 @@ _arguments \
   '--sides=*:mode:(simplex duplex tumble)' \
   '--non-printable-format*:format:(caret space question-mark octal hexa emacs)' \
   "--encoding*:encoding:(${_cache_a2ps_values[2]})" \
-  "--prologue*::prologue:(${_cache_a2ps_values[4]})"
+  "--prologue*::prologue:(${_cache_a2ps_values[4]})" && ret=0
+
+if [[ $state = printers ]]; then
+  _wanted printers expl printer compadd -- ${=_cache_a2ps_values[6]} && ret=0
+  _printers && ret=0
+fi
+
+return ret
