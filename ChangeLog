@@ -1,3 +1,8 @@
+2000-05-02  Andrew Main  <zefram@zsh.org>
+
+	* zefram103: Src/Makemod.in.in: make sure .{e,}pro files are
+	non-empty, to keep the AIX compiler quiet.
+
 2000-05-02  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11066: Src/exec.c: suppress doing in and/or when at the end

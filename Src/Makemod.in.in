@@ -30,9 +30,16 @@
 # dir_top is done by mkmakemod.sh
 # SUBDIRS is done by mkmakemod.sh
 
-@@version.mk@@
-@@defs.mk@@
+@VERSION_MK@
 
+# source/build directories
+VPATH           = @srcdir@
+sdir            = @srcdir@
+sdir_top        = @top_srcdir@
+INSTALL         = @INSTALL@
+
+@DEFS_MK@
+	
 sdir_src      = $(sdir_top)/Src
 dir_src       = $(dir_top)/Src
 
@@ -51,7 +58,7 @@ KNROBJ=._foo_
 ANSIOBJ=.o
 ANSI_OBJ=._foo_
 
-.SUFFIXES: .c .$(DL_EXT) ..o .._foo_ .o ._foo_ .pro
+.SUFFIXES: .c .$(DL_EXT) ..o .._foo_ .o ._foo_ .syms .pro .epro
 
 .c$(ANSI@U@OBJ):
 	$(COMPILE) -o $@ $<
@@ -71,19 +78,27 @@ ANSI_OBJ=._foo_
 	$(DLCOMPILE) -o $@ $@.c
 	rm -f $@.c
 
-.c.pro:
+.c.syms:
 	$(AWK) -f $(sdir_src)/makepro.awk $< $(subdir) > $@
+
+.syms.epro:
+	(echo '/* Generated automatically */'; sed -n '/^E/{s/^E//;p;}' < $<) \
+		> $@
+	(echo '/* Generated automatically */'; sed -n '/^L/{s/^L//;p;}' < $<) \
+		> `echo $@ | sed 's/\.epro$$/.pro/'`
 
 PROTODEPS = $(sdir_src)/makepro.awk
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
 all: modobjs modules
+.PHONY: all
 
 modobjs: $(MODOBJS)
 modules: $(MODULES)
 headers: $(MDHS)
 proto: $(PROTOS)
+.PHONY: modobjs modules headers proto
 
 prep:
 	@case $(sdir_top) in \
@@ -99,50 +114,47 @@ prep:
 	    $(SHELL) $$top_srcdir/Src/mkmakemod.sh $$dir Makefile || exit 1; \
 	    ( cd $$dir && $(MAKE) $(MAKEDEFS) $@ ) || exit 1; \
 	done
+.PHONY: prep
 
 headers prep: $(dir_src)/modules.stamp
 $(dir_src)/modules.stamp: $(MDDS)
 	echo 'timestamp for *.mdd files' > $@
+.PHONY: headers
 
 FORCE:
+.PHONY: FORCE
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
 install: install.bin install.modules
 uninstall: uninstall.bin uninstall.modules
+.PHONY: install uninstall
 
 install.bin: install.bin-here
 uninstall.bin: uninstall.bin-here
 install.modules: install.modules-here
 uninstall.modules: uninstall.modules-here
+.PHONY: install.bin uninstall.bin install.modules uninstall.modules
 
 install.bin-here uninstall.bin-here:
-
-install.modules-here:
-	$(sdir_top)/mkinstalldirs $(MODDIR)
-	modules='$(MODULES)'; for mod in $$modules; do \
-	    $(INSTALL_PROGRAM) $$mod $(MODDIR)/$$mod; \
-	done
-
-uninstall.modules-here:
-	modules='$(MODULES)'; for mod in $$modules; do \
-	    if test -f $(MODDIR)/$$mod; then \
-		rm -f $(MODDIR)/$$mod; \
-	    else :; fi; \
-	done
+install.modules-here uninstall.modules-here:
+.PHONY: install.bin-here install.modules-here
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
-@@clean.mk@@
+@CLEAN_MK@
 
 mostlyclean-here:
-	rm -f *.o *.$(DL_EXT)
+	rm -f *.o *.export *.$(DL_EXT)
+.PHONY: mostlyclean-here
 
 clean-here:
-	rm -f *.o.c *.pro *.mdh *.mdhi *.mdhs *.mdh.tmp
+	rm -f *.o.c *.syms *.pro *.epro *.mdh *.mdhi *.mdhs *.mdh.tmp
+.PHONY: clean-here
 
 distclean-here:
 	rm -f $(makefile) $(makefile).in
+.PHONY: distclean-here
 
 # ========== RECURSIVE MAKES ==========
 
