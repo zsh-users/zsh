@@ -540,7 +540,7 @@ instmatch(Cmatch m, int *scs)
  * braces. */
 
 /**/
-int
+mod_export int
 hasbrpsfx(Cmatch m, char *pre, char *suf)
 {
     char *op = lastprebr, *os = lastpostbr;
@@ -1148,7 +1148,7 @@ comp_list(char *v)
 /* This skips over matches that are not to be listed. */
 
 /**/
-Cmatch *
+mod_export Cmatch *
 skipnolist(Cmatch *p, int showall)
 {
     int mask = (showall ? 0 : (CMF_NOLIST | CMF_MULT)) | CMF_HIDE;

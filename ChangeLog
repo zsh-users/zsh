@@ -1,3 +1,8 @@
+2000-04-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 11031: Src/math.c, Src/glob.c, Src/module.c, Src/Zle/compcore.c
+	Src/Zle/compresult.c: AIX dependency fixes.
+
 2000-04-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11029: Src/hashtable.c, Src/signals.c: Back out more bits of

@@ -666,7 +666,7 @@ modname_ok(char const *p)
 }
 
 /**/
-int
+mod_export int
 load_module(char const *name)
 {
     Module m;

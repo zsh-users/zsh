@@ -42,13 +42,12 @@ int useexact, useline, uselist, forcelist, startauto;
 /* Non-zero if we should go back to the last prompt. */
 
 /**/
-int dolastprompt;
+mod_export int dolastprompt;
 
 /* Non-zero if we should keep an old list. */
 
 /**/
-mod_export
-int oldlist, oldins;
+mod_export int oldlist, oldins;
 
 /* This is used to decide when the cursor should be moved to the end of    *
  * the inserted word: 0 - never, 1 - only when a single match is inserted, *

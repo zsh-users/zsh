@@ -1514,7 +1514,7 @@ file_type(mode_t filemode)
 /* check to see if str is eligible for brace expansion */
 
 /**/
-int
+mod_export int
 hasbraces(char *str)
 {
     char *lbr, *mbr, *comma;
@@ -1696,7 +1696,7 @@ tricat(char const *s1, char const *s2, char const *s3)
 /* brace expansion */
 
 /**/
-void
+mod_export void
 xpandbraces(LinkList list, LinkNode *np)
 {
     LinkNode node = (*np), last = prevnode(node);
