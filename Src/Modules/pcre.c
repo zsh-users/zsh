@@ -74,8 +74,8 @@ bin_pcre_study(char *nam, char **args, Options ops, int func)
 
     if (pcre_pattern == NULL)
     {
-	zwarnnam(nam, "no pattern has been compiled for study: %s",
-		 pcre_error, 0);
+	zwarnnam(nam, "no pattern has been compiled for study",
+		 NULL, 0);
 	return 1;
     }
     
@@ -112,9 +112,9 @@ bin_pcre_match(char *nam, char **args, Options ops, int func)
 	}
     }
     
-    if (pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount))
+    if (ret = pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount))
     {
-	zwarnnam(nam, "error in fullinfo", NULL, 0);
+	zwarnnam(nam, "error %d in fullinfo", NULL, ret);
 	return 1;
     }
     

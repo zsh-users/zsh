@@ -1,5 +1,7 @@
 2004-03-16  Clint Adams  <clint@zsh.org>
 
+	* 19640: Src/Modules/pcre.c: improve error reporting a bit.
+
 	* 19631: Doc/Zsh/mod_pcre.yo, Src/Modules/pcre.c: avoid segfault
 	when pcre_study is called before pcre_compile; documentation on
 	pcre_compile options.
