@@ -348,13 +348,13 @@ if [[ -n "$_i_check" ]]; then
     typeset _i_q
 
     # We search for:
-    # - world/group-writable directories in fpath not owned by root or the user
+    # - world/group-writable directories in fpath not owned by root and the user
     # - parent-directories of directories in fpath that are world/group-writable
-    #   and not owned by root or the user (that would allow someone to put a
+    #   and not owned by root and the user (that would allow someone to put a
     #   digest file for one of the directories into the parent directory)
-    # - digest files for one of the directories in fpath not owned by root or
+    # - digest files for one of the directories in fpath not owned by root and
     #   the user
-    # - and for files in directories from fpath not owned by root or the user
+    # - and for files in directories from fpath not owned by root and the user
     #   (including zwc files)
 
     _i_wdirs=( ${^fpath}(Nf:g+w:,f:o+w:,^u0u${EUID})

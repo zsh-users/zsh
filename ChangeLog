@@ -1,6 +1,6 @@
 2000-06-23  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 12041: Completion/Core/compinit: even more compiinit stuff,
+	* 12041,12043 : Completion/Core/compinit: even more compinit stuff,
  	change prompt, search for insecure parent dirs
 	
 2000-06-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
