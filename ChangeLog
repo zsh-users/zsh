@@ -1,3 +1,7 @@
+2000-04-17  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* Chmouel: 10772: Completion/Linux/_rpm:  --target support.
+
 2000-04-17  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
 	* 10780: Completion/Base/_default, Completion/Base/_value,

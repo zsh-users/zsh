@@ -162,6 +162,7 @@ while [[ -n "$state" ]]; do
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
       --{short-circuit,clean,rmsource,sign,test} \
+      '--target:specify a build target:->target'\
       '--buildroot:build root directory:_files -/' \
       '--buildarch:architecture for which to build:' \
       '--buildos:ositecture for which to build:' \
@@ -189,6 +190,10 @@ while [[ -n "$state" ]]; do
   package_or_file)
     state=package_file
     ;&
+  target)
+    _wanted target expl 'Target platforms' \
+        compadd $(_call target rpm --showrc |grep 'compatible archs'|sed 's/.*: //') && ret=0
+    ;;
   package)
     _wanted packages expl 'RPM package' \
         compadd -M 'r:|-=* r:|=*' - $(_call packages rpm -qa) && ret=0
