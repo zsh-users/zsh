@@ -408,7 +408,6 @@ fndir=directory      # the directory where shell functions will go
 site-fndir=directory # the directory where site-specific functions can go
                      # [DATADIR/zsh/site-functions]
 function-subdirs     # if functions will be installed into subdirectories [no]
-omit-modules=mod1,.. # don't compile or install the modules named mod1,...
 dynamic              # allow dynamically loaded binary modules [yes]
 lfs                  # allow configure check for large files [yes]
 locale               # allow use of locale library [yes]

@@ -1,3 +1,8 @@
+2001-05-31  Peter Stephenson  <pws@csr.com>
+
+	* as per 14577 from Bart: README, INSTALL: we don't support
+	--enable-omit-modules any more; a few more changes since 3.0.
+
 2001-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14605: Src/params.c, Src/Modules/parameter.c,
