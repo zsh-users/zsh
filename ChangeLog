@@ -1,3 +1,8 @@
+2003-03-25  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 18383: Src/utils.c: Fixed zjoin() when it returns an empty
+	string that should be allocated.
+
 2003-03-25  Clint Adams  <clint@zsh.org>
 
 	* users/5986, 18380: Src/Modules/terminfo.c,
