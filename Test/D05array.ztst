@@ -3,6 +3,7 @@
 %prep
 
   foo=(a b c d e f g)
+  arr=(foo bar baz)
   mkdir array.tmp
   touch array.tmp/{1..9}
 
@@ -59,6 +60,20 @@
   echo .$foo[-6,-2].
 0:A slice with a negative start and end
 >.b c d e f.
+
+  echo .${${arr[2]}[1]}.
+  echo .${${arr[-2]}[1]}.
+  echo .${${arr[2,2]}[1]}.
+  echo .${${arr[-2,-2]}[1]}.
+  echo .${${arr[2,-2]}[1]}. 
+  echo .${${arr[-2,2]}[1]}. 
+0:Slices should return an array, elements a scalar
+>.b.
+>.b.
+>.bar.
+>.bar.
+>.bar.
+>.bar.
 
   setopt ksh_arrays
   echo .${foo[1,2]}.

@@ -1272,13 +1272,14 @@ getindex(char **pptr, Value v, int dq)
 	    } else {
 		end = we ? we : start;
 	    }
+	    if (start != end) com = 1;
 	    if (start > 0)
 		start--;
 	    else if (start == 0 && end == 0)
 		end++;
 	    if (s == tbrack) {
 		s++;
-		if (v->isarr && start == end-1 && !com &&
+		if (v->isarr && !com &&
 		    (!(v->isarr & SCANPM_MATCHMANY) ||
 		     !(v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
 				   SCANPM_KEYMATCH))))

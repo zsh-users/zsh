@@ -1,3 +1,9 @@
+2004-03-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 19707: Src/params.c, Test/D05array.ztst: fix bug where a
+	nagative index into an array returned a one element array
+	instead of a scalar
+
 2004-03-25  Clint Adams  <clint@zsh.org>
 
 	* 19691: Completion/Unix/Type/_diff_options: Allow more than
@@ -65,7 +71,7 @@
 	the parameter was previously exported.
 
 	* 19655: Src/params.c: the reverse pointer from a tied array
-	to a tied scalar wasn't delete if the array was unset by unsetting
+	to a tied scalar wasn't deleted if the array was unset by unsetting
 	the scalar (or probably vice versa).
 
 2004-03-17  Peter Stephenson  <pws@csr.com>
