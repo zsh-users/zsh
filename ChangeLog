@@ -1,3 +1,11 @@
+2000-09-08  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+
+	* 12779: Src/system.h: Comment out #define _XPG_IV for sinix.
+	It was not correct to set it here, and is not needed with
+	currently supported versions. If anybody happens to run really
+	outdated SINIX, we should add check for gettimeofday prototype
+	instead.
+
 2000-09-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12773: Doc/Zsh/contrib.yo, Functions/Zle/smart-insert-last-word:

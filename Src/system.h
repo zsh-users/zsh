@@ -27,8 +27,14 @@
  *
  */
 
+#if 0
+/*
+ * Setting _XPG_IV here is actually wrong and is not needed
+ * with currently supported versions (5.43C20 and above)
+ */
 #ifdef sinix
 # define _XPG_IV 1
+#endif
 #endif
 
 /* NeXT has half-implemented POSIX support *
