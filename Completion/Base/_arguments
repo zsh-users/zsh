@@ -236,14 +236,17 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 
             # A string in braces is evaluated.
 
-            _loop arguments expl "$descr" eval "$action[2,-2]"
-
+            while _try arguments expl "$descr"; do
+              eval "$action[2,-2]"
+            done
           elif [[ "$action" = \ * ]]; then
 
             # If the action starts with a space, we just call it.
 
 	    eval "action=( $action )"
-            _loop arguments expl "$descr" "$action[@]"
+            while _try arguments expl "$descr"; do
+              "$action[@]"
+            done
           else
 
             # Otherwise we call it with the description-arguments.

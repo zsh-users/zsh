@@ -2225,14 +2225,14 @@ freectags(Ctags t)
 /* Set the tags for the current local level. */
 
 static void
-settags(char **tags)
+settags(int level, char **tags)
 {
     Ctags t;
 
-    if (comptags[locallevel])
-	freectags(comptags[locallevel]);
+    if (comptags[level])
+	freectags(comptags[level]);
 
-    comptags[locallevel] = t = (Ctags) zalloc(sizeof(*t));
+    comptags[level] = t = (Ctags) zalloc(sizeof(*t));
 
     t->all = zarrdup(tags + 1);
     t->context = ztrdup(*tags);
@@ -2263,22 +2263,23 @@ arrcontains(char **a, char *s, int colon)
 static int
 bin_comptags(char *nam, char **args, char *ops, int func)
 {
-    int min, max, n;
+    int min, max, n, level;
 
     if (incompfunc != 1) {
 	zwarnnam(nam, "can only be called from completion function", NULL, 0);
 	return 1;
     }
-    if (args[0][0] != '-' || !args[0][1] || args[0][2]) {
+    if (args[0][0] != '-' || !args[0][1] ||
+	(args[0][2] && (args[0][2] != '-' || args[0][3]))) {
 	zwarnnam(nam, "invalid argument: %s", args[0], 0);
 	return 1;
     }
-    if (locallevel >= MAX_TAGS) {
+    level = locallevel - (args[0][2] ? 1 : 0);
+    if (level >= MAX_TAGS) {
 	zwarnnam(nam, "nesting level too deep", NULL, 0);
 	return 1;
     }
-    if ((args[0][1] != 'i' && args[0][1] != 'A' && !comptags[locallevel]) ||
-	(args[0][1] == 'A' && !comptags[lasttaglevel])) {
+    if (args[0][1] != 'i' && args[0][1] != 'I' && !comptags[level]) {
 	zwarnnam(nam, "no tags registered", NULL, 0);
 	return 1;
     }
@@ -2304,39 +2305,39 @@ bin_comptags(char *nam, char **args, char *ops, int func)
     }
     switch (args[0][1]) {
     case 'i':
-	settags(args + 1);
-	lasttaglevel = locallevel;
+	settags(level, args + 1);
+	lasttaglevel = level;
 	break;
     case 'C':
-	setsparam(args[1], ztrdup(comptags[locallevel]->context));
+	setsparam(args[1], ztrdup(comptags[level]->context));
 	break;
     case 'T':
-	return !comptags[locallevel]->sets;
+	return !comptags[level]->sets;
     case 'N':
 	{
 	    Ctset s;
 
-	    if (comptags[locallevel]->init)
-		comptags[locallevel]->init = 0;
-	    else if ((s = comptags[locallevel]->sets)) {
-		comptags[locallevel]->sets = s->next;
+	    if (comptags[level]->init)
+		comptags[level]->init = 0;
+	    else if ((s = comptags[level]->sets)) {
+		comptags[level]->sets = s->next;
 		s->next = NULL;
 		freectset(s);
 	    }
-	    return !comptags[locallevel]->sets;
+	    return !comptags[level]->sets;
 	}
     case 'R':
 	{
 	    Ctset s;
 
-	    return !((s = comptags[locallevel]->sets) &&
+	    return !((s = comptags[level]->sets) &&
 		     arrcontains(s->tags, args[1], 1));
 	}
     case 'A':
 	{
 	    Ctset s;
 
-	    if (comptags[lasttaglevel] && (s = comptags[lasttaglevel]->sets)) {
+	    if (comptags[level] && (s = comptags[level]->sets)) {
 		char **q, *v = NULL;
 		int l = strlen(args[1]);
 
@@ -2368,10 +2369,10 @@ bin_comptags(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
     case 'S':
-	if (comptags[locallevel]->sets) {
+	if (comptags[level]->sets) {
 	    char **ret;
 
-	    ret = zarrdup(comptags[locallevel]->sets->tags);
+	    ret = zarrdup(comptags[level]->sets->tags);
 	    setaparam(args[1], ret);
 	} else
 	    return 1;

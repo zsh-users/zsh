@@ -26,8 +26,8 @@ if [[ $# -gt 3 ]]; then
     return 1
   fi
 elif [[ $# -gt 1 ]]; then
-  _tags "$targs[@]" "$1" && _comp_tags="$_comp_tags $1" &&
+  _tags -- "$targs[@]" "$1" && _comp_tags="$_comp_tags $1" &&
     _description "$gopt" "$@"
 else
-  _tags "$targs[@]" "$1" && _comp_tags="$_comp_tags $1"
+  _tags -- "$targs[@]" "$1" && _comp_tags="$_comp_tags $1"
 fi
