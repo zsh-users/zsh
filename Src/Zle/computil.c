@@ -3058,17 +3058,37 @@ bin_compfmt(char *nam, char **args, char *ops, int func)
 #define PATH_MAX2 (PATH_MAX * 2)
 
 static LinkList
-cfp_test_exact(LinkList names, char *skipped)
+cfp_test_exact(LinkList names, char **accept, char *skipped)
 {
     char buf[PATH_MAX2 + 1], *suf, *p;
     int l, sl, found = 0;
     struct stat st;
     LinkNode node;
-    LinkList ret = newlinklist();
+    LinkList ret = newlinklist(), alist = NULL;
 
-    if (!(compprefix && *compprefix) && !(compsuffix && *compsuffix))
+    if ((!(compprefix && *compprefix) && !(compsuffix && *compsuffix)) ||
+	(!accept || !*accept ||
+	 ((!strcmp(*accept, "false") || !strcmp(*accept, "no") ||
+	   !strcmp(*accept, "off") || !strcmp(*accept, "0")) && !accept[1])))
 	return NULL;
 
+    if (accept[1] ||
+	(strcmp(*accept, "true") && strcmp(*accept, "yes") &&
+	 strcmp(*accept, "on") && strcmp(*accept, "1"))) {
+	Patprog prog;
+
+	alist = newlinklist();
+
+	for (; (p = *accept); accept++) {
+	    if (*p == '*' && !p[1]) {
+		alist = NULL;
+		break;
+	    }
+	    tokenize(p = dupstring(p));
+	    if ((prog = patcompile(p, 0, NULL)))
+		addlinknode(alist, prog);
+	}
+    }
     sl = strlen(skipped) + (compprefix ? strlen(compprefix) : 0) +
 	(compsuffix ? strlen(compsuffix) : 0);
 
@@ -3078,11 +3098,22 @@ cfp_test_exact(LinkList names, char *skipped)
     suf = dyncat(skipped, rembslash(dyncat(compprefix, compsuffix)));
 
     for (node = firstnode(names); node; incnode(node)) {
-	if ((l = strlen(p = (char *) getdata(node))) && l + sl < PATH_MAX2) {
+	l = strlen(p = (char *) getdata(node));
+	if (l + sl < PATH_MAX2) {
 	    strcpy(buf, p);
 	    strcpy(buf + l, suf);
 
-	    if (!ztat(buf, &st, 0) && S_ISDIR(st.st_mode)) {
+	    if (!ztat(buf, &st, 0)) {
+		if (alist) {
+		    LinkNode anode;
+
+		    for (anode = firstnode(alist); anode; incnode(anode))
+			if (pattry((Patprog) getdata(anode), buf))
+			    break;
+
+		    if (!anode)
+			continue;
+		}
 		found = 1;
 		addlinknode(ret, dupstring(buf));
 	    }
@@ -3334,12 +3365,14 @@ cfp_bld_pats(int dirs, LinkList names, char *skipped, char **pats)
 }
 
 static LinkList
-cfp_add_sdirs(LinkList final, LinkList orig, char *skipped, char *sdirs)
+cfp_add_sdirs(LinkList final, LinkList orig, char *skipped,
+	      char *sdirs, char **fake)
 {
     int add = 0;
 
-    if (*sdirs) {
-	if (!strcmp(sdirs, "yes"))
+    if (*sdirs && (isset(GLOBDOTS) || (compprefix && *compprefix == '.'))) {
+	if (!strcmp(sdirs, "yes") || !strcmp(sdirs, "true") ||
+	    !strcmp(sdirs, "on") || !strcmp(sdirs, "1"))
 	    add = 2;
 	else if (!strcmp(sdirs, ".."))
 	    add = 1;
@@ -3350,10 +3383,62 @@ cfp_add_sdirs(LinkList final, LinkList orig, char *skipped, char *sdirs)
 	char *s2 = (add == 2 ? dyncat(skipped, ".") : NULL), *m;
 
 	for (node = firstnode(orig); node; incnode(node)) {
-	    if (*(m = (char *) getdata(node))) {
-		addlinknode(final, dyncat((char *) getdata(node), s1));
+	    if ((m = (char *) getdata(node))) {
+		addlinknode(final, dyncat(m, s1));
 		if (s2)
-		    addlinknode(final, dyncat((char *) getdata(node), s2));
+		    addlinknode(final, dyncat(m, s2));
+	    }
+	}
+    }
+    if (fake && *fake) {
+	LinkNode node;
+	char *m, *f, *p, *t, *a, c;
+	int sl = strlen(skipped) + 1;
+	struct stat st1, st2;
+
+	for (; (f = *fake); fake++) {
+	    f = dupstring(f);
+	    for (p = t = f; *p; p++) {
+		if (*p == ':')
+		    break;
+		else if (*p == '\\' && p[1])
+		    p++;
+		*t++ = *p;
+	    }
+	    if (*p) {
+		*t = *p++ = '\0';
+		if (!*p)
+		    continue;
+
+		for (node = firstnode(orig); node; incnode(node)) {
+		    if ((m = (char *) getdata(node)) &&
+			(!strcmp(f, m) ||
+			 (!stat(f, &st1) && !stat((*m ? m : "."), &st2) &&
+			  st1.st_dev == st2.st_dev &&
+			  st1.st_ino == st2.st_ino))) {
+			while (*p) {
+			    while (*p && inblank(*p))
+				p++;
+			    if (!*p)
+				break;
+			    for (f = t = p; *p; p++) {
+				if (inblank(*p))
+				    break;
+				else if (*p == '\\' && p[1])
+				    p++;
+				*t++ = *p;
+			    }
+			    c = *t;
+			    *t = '\0';
+			    a = (char *) zhalloc(strlen(m) + sl + strlen(f));
+			    strcpy(a, m);
+			    strcat(a, skipped);
+			    strcat(a, f);
+			    addlinknode(final, a);
+			    *t = c;
+			}
+		    }
+		}
 	    }
 	}
     }
@@ -3361,14 +3446,14 @@ cfp_add_sdirs(LinkList final, LinkList orig, char *skipped, char *sdirs)
 }
 
 static LinkList
-cf_pats(int dirs, int noopt, LinkList names, char *skipped, char *matcher,
-	char *sdirs, char **pats)
+cf_pats(int dirs, int noopt, LinkList names, char **accept, char *skipped,
+	char *matcher, char *sdirs, char **fake, char **pats)
 {
     LinkList ret;
     char *dpats[2];
 
-    if (dirs && (ret = cfp_test_exact(names, skipped)))
-	return cfp_add_sdirs(ret, names, skipped, sdirs);
+    if ((ret = cfp_test_exact(names, accept, skipped)))
+	return cfp_add_sdirs(ret, names, skipped, sdirs, fake);
 
     if (dirs) {
 	dpats[0] = "*(-/)";
@@ -3379,7 +3464,7 @@ cf_pats(int dirs, int noopt, LinkList names, char *skipped, char *matcher,
 	cfp_opt_pats(pats, matcher);
 
     return cfp_add_sdirs(cfp_bld_pats(dirs, names, skipped, pats),
-			 names, skipped, sdirs);
+			 names, skipped, sdirs, fake);
 }
 
 static void
@@ -3421,6 +3506,61 @@ cf_ignore(char **names, LinkList ign, char *style, char *path)
     }
 }
 
+static LinkList
+cf_remove_other(char **names, char *pre, int *amb)
+{
+    char *p;
+
+    if ((p = strchr(pre, '/'))) {
+	char **n;
+
+	*p = '\0';
+	pre = dyncat(pre, "/");
+	*p = '/';
+
+	for (n = names; *n; n++)
+	    if (strpfx(pre, *n))
+		break;
+
+	if (*n) {
+	    LinkList ret = newlinklist();
+
+	    for (; *names; names++)
+		if (strpfx(pre, *names))
+		    addlinknode(ret, dupstring(*names));
+
+	    *amb = 0;
+
+	    return ret;
+	} else {
+	    if (!(p = *names++))
+		*amb = 0;
+	    else {
+		char *q;
+
+		if ((q = strchr((p = dupstring(p)), '/')))
+		    *q = '\0';
+
+		for (; *names; names++)
+		    if (!strpfx(p, *names)) {
+			*amb = 1;
+			return NULL;
+		    }
+	    }
+	}
+    } else {
+	if (!(p = *names++))
+	    *amb = 0;
+	else
+	    for (; *names; names++)
+		if (strcmp(p, *names)) {
+		    *amb = 1;
+		    return NULL;
+		}
+    }
+    return NULL;
+}
+
 static int
 bin_compfiles(char *nam, char **args, char *ops, int func)
 {
@@ -3438,8 +3578,8 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 	    char **tmp;
 	    LinkList l;
 
-	    if (!args[1] || !args[2] || !args[3] || !args[4] ||
-		(args[0][1] == 'p' && !args[5])) {
+	    if (!args[1] || !args[2] || !args[3] || !args[4] || !args[5] ||
+		!args[6] || (args[0][1] == 'p' && !args[7])) {
 		zwarnnam(nam, "too few arguments", NULL, 0);
 		return 1;
 	    }
@@ -3450,8 +3590,9 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 	    for (l = newlinklist(); *tmp; tmp++)
 		addlinknode(l, *tmp);
 	    set_list_array(args[1], cf_pats((args[0][1] == 'P'), !!args[0][2],
-					    l, args[2], args[3], args[4],
-					    args + 5));
+					    l, getaparam(args[2]), args[3],
+					    args[4], args[5],
+					    getaparam(args[6]), args + 7));
 	    return 0;
 	}
     case 'i':
@@ -3482,6 +3623,28 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 	    cf_ignore(tmp, l, args[3], args[4]);
 	    set_list_array(args[2], l);
 	    return 0;
+	}
+    case 'r':
+	{
+	    char **tmp;
+	    LinkList l;
+	    int ret = 0;
+
+	    if (!args[1] || !args[2]) {
+		zwarnnam(nam, "too few arguments", NULL, 0);
+		return 1;
+	    }
+	    if (args[3]) {
+		zwarnnam(nam, "too many arguments", NULL, 0);
+		return 1;
+	    }
+	    if (!(tmp = getaparam(args[1]))) {
+		zwarnnam(nam, "unknown parameter: %s", args[1], 0);
+		return 0;
+	    }
+	    if ((l = cf_remove_other(tmp, args[2], &ret)))
+		set_list_array(args[1], l);
+	    return ret;
 	}
     }
     zwarnnam(nam, "invalid option: %s", *args, 0);

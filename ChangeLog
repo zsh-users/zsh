@@ -8,6 +8,10 @@
 
 2000-06-19  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11971: Completion/Core/_path_files, Doc/Zsh/compsys.yo,
+ 	Src/Zle/compcore.c, Src/Zle/computil.c: improve filename
+ 	completion; use accept-exact for in-path completion; new fake style
+	
 	* users/3188: Completion/Core/_description, Completion/Core/_setup,
  	Doc/Zsh/compsys.yo: restore ZLS_COLORS when possible; better
  	group-name handling in ZLS_COLORS

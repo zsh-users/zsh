@@ -780,6 +780,13 @@ matches.  If it is set to `true' for at least one match which is the
 same as the string on the line, this match will immediately be
 accepted.
 
+When completing filenames (where it is looked up for the tt(files)
+tag), this style also accepts any number of patterns as the value. If
+this is used, pathnames matching one of these patterns will be
+accepted immediately even if the command line contains some more
+partially typed pathname components and these match no file under the
+directory accepted.
+
 Note that this is also used by the tt(_expand) completer to decide if
 words beginning with a tilde or parameter expansion should be
 expanded. This means that if, for example, there are parameters
@@ -967,6 +974,17 @@ possible, but if menu completion is started on the list of matches
 generated this way (e.g. due to the option tt(AUTO_MENU) being set),
 this will also cycle through the names of the files in pathname
 components after the first ambiguous one.
+)
+kindex(fake, completion style)
+item(tt(fake))(
+Currently, this style is only used when completing files and lookup up 
+with the tag tt(files).  Its values are of the form
+`var(dir)tt(:)var(names...)'.  This will add the var(names) as
+possible matches when completing in the directory var(dir), even if no 
+such files really exist.
+
+This can be useful on systems that support special filesystems whose
+top-level pathnames can not be listed or generated with glob patterns.
 )
 kindex(file-patterns, completion style)
 item(tt(file-patterns))(

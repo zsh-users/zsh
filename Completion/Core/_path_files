@@ -6,7 +6,7 @@
 local linepath realpath donepath prepath testpath exppath skips skipped
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
 local pats haspats ignore pfxsfx sopt gopt opt sdirs ignpar cfopt
-local nm=$compstate[nmatches] menu matcher mopts sort match mid
+local nm=$compstate[nmatches] menu matcher mopts sort match mid accex fake
 
 typeset -U prepaths exppaths
 
@@ -139,11 +139,13 @@ else
   skips='((.|..)/)##'
 fi
 
-zstyle -s ":completion:${curcontext}:paths" special-dirs sdirs &&
-    [[ "$sdirs" = (yes|true|on|1) ]] && sdirs=yes
+zstyle -s ":completion:${curcontext}:paths" special-dirs sdirs
 
 [[ "$pats" = ((|*[[:blank:]])\*(|[[:blank:]]*)|*\([^[:blank:]]#/[^[:blank:]]#\)*) ]] &&
     sopt=$sopt/
+
+zstyle -a ":completion:${curcontext}:files" accept-exact accex
+zstyle -a ":completion:${curcontext}:files" fake fake
 
 zstyle -s ":completion:${curcontext}:files" ignore-parents ignpar
 
@@ -314,33 +316,33 @@ for prepath in "$prepaths[@]"; do
     # Get the matching files by globbing.
 
     if [[ "$tpre$tsuf" = */* ]]; then
-      compfiles -P$cfopt tmp1 "$skipped" "$_matcher" "$sdirs"
+      compfiles -P$cfopt tmp1 accex "$skipped" "$_matcher" "$sdirs" fake
     elif [[ "$sopt" = *[/f]* ]]; then
-      compfiles -p$cfopt tmp1 "$skipped" "$_matcher" "$sdirs" "$pats[@]"
+      compfiles -p$cfopt tmp1 accex "$skipped" "$_matcher" "$sdirs" fake "$pats[@]"
     else
-      compfiles -p$cfopt tmp1 "$skipped" "$_matcher" '' "$pats[@]"
+      compfiles -p$cfopt tmp1 accex "$skipped" "$_matcher" '' fake "$pats[@]"
     fi
     tmp1=( $~tmp1 )
 
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.
 
-      if [[ -n "$_comp_correct" ]]; then
-        tmp2=( "$tmp1[@]" )
-        builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
+      if [[ "$tmp1[1]" = */* ]]; then
+        if [[ -n "$_comp_correct" ]]; then
+          tmp2=( "$tmp1[@]" )
+          builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
 
-        if [[ $#tmp1 -eq 0 ]]; then
-          tmp1=( "$tmp2[@]" )
-	  compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp2:t}"
+          if [[ $#tmp1 -eq 0 ]]; then
+            tmp1=( "$tmp2[@]" )
+	    compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp2:t}"
+          fi
+        else
+          tmp2=( "$tmp1[@]" )
+          compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
         fi
       else
-        if [[ "$tmp1[1]" = */* ]]; then
-          tmp2=( "$tmp1[@]" )
-        else
-          tmp2=( '' )
-        fi
-
-        compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
+        tmp2=( '' )
+        compadd -D tmp1 -F _comp_ignore "$matcher[@]" -a tmp1
       fi
 
       # If no file matches, save the expanded path and continue with
@@ -431,26 +433,18 @@ for prepath in "$prepaths[@]"; do
   tmp3="$pre$suf"
   tpre="$pre"
   tsuf="$suf"
-  tmp1=( "${(@)tmp1#${prepath}${realpath}${testpath}}" )
+  [[ -n "${prepath}${realpath}${testpath}" ]] &&
+      tmp1=( "${(@)tmp1#${prepath}${realpath}${testpath}}" )
 
   while true; do
 
     # First we check if some of the files match the original string
     # for this component. If there are some we remove all other
     # names. This avoids having `foo' complete to `foo' and `foobar'.
+    # The return value is non-zero if the component is ambiguous.
 
-    if [[ "$tmp3" = */* ]]; then
-      tmp4=( "${(@M)tmp1:#${tmp3%%/*}/*}" )
-      (( $#tmp4 )) && tmp1=( "$tmp4[@]" )
-    fi
-
-    # Next we see if this component is ambiguous.
-
-    if [[ "$tmp3" = */* ]]; then
-       tmp4=$tmp1[(I)^${${tmp1[1]%%/*}//(#b)([][\\<>(|)^#~*?])/\\$match[1]}/*]
-    else
-       tmp4=$tmp1[(I)^${tmp1[1]//(#b)([][\\<>(|)^#~*?])/\\$match[1]}]
-    fi
+    compfiles -r tmp1 "$tmp3"
+    tmp4=$?
 
     if [[ "$tpre" = */* ]]; then
       tmp2="${cpre}${tpre%%/*}"

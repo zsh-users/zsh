@@ -1914,8 +1914,8 @@ addmatches(Cadata dat, char **argv)
 	    if (aign || pign) {
 		int il = ppl + sl + psl, addit = 1;
 
-		if (il > ilen)
-		    ibuf = (char *) zhalloc((ilen = il) + 1);
+		if (il + 1> ilen)
+		    ibuf = (char *) zhalloc((ilen = il) + 2);
 
 		if (ppl)
 		    memcpy(ibuf, dat->ppre, ppl);
