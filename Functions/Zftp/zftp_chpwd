@@ -35,7 +35,7 @@ else
     case $TERM in
       sun-cmd) print -n -P "\033]l$str\033\\"
 	       ;;
-      xterm|aixterm) print -n -P "\033]2;$str\a"
+      *xterm*) print -n -P "\033]2;$str\a"
 	     ;;
     esac
   fi
