@@ -1,3 +1,8 @@
+2000-05-24  Clint Adams  <schizo@debian.org>
+
+	* 11548: Completion/User/_ispell: add -h switch to
+	designate input file as HTML.
+
 2000-05-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 11542: Doc/Zsh/compsys.yo: more wording `improvements'.

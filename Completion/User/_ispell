@@ -3,8 +3,9 @@
 case "${words[1]:t}" in
 ispell)
   _arguments -s \
-    '(-n)-t[input file is in TeX/LaTeX format]' \
-    '(-t)-n[input file is in nroff/troff format]' \
+    '(-n -h)-t[input file is in TeX/LaTeX format]' \
+    '(-t -h)-n[input file is in nroff/troff format]' \
+    '(-n -t)-h[input file is in HTML format]' \
     '(-x)-b[create backup file]' \
     '(-b)-x[don'"'"'t create backup file]' \
     '(-C)-B[report run-together words as errors]' \
