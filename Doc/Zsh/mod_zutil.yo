@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/zutil
 Some utility builtins, e.g. the one for supporting configuration via 
 styles.
 !MOD!)

@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/compctl
 The tt(compctl) builtin for controlling completion.
 !MOD!)
 The tt(zsh/compctl) module makes available two builtin commands. tt(compctl),

@@ -1,8 +1,8 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/zprof
 A module allowing profiling for shell functions.
 !MOD!)
 cindex(functions, profiling)
-When loaded, the tt(zprof) module makes shell functions be
+When loaded, the tt(zsh/zprof) module makes shell functions be
 profiled. The profiling results can be obtained with the tt(zprof)
 builtin command made available by this module. There is no way to turn 
 profiling off other than unloading this module.
@@ -53,7 +53,7 @@ For the calling and the called functions, the column showing the
 number of calls to a function also show the total number of
 invocations made to the called function after a slash.
 
-As long as the tt(zprof) module is loaded, profiling will be done and
+As long as the tt(zsh/zprof) module is loaded, profiling will be done and
 multiple invocations of the tt(zprof) builtin command will show the
 times and numbers of calls since the module was loaded. With the
 tt(-c) option, the tt(zprof) builtin command will reset its internal

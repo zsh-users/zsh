@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/complist
 Completion listing extensions.
 !MOD!)
 cindex(completion, listing)
@@ -205,7 +205,7 @@ have sensible default (namely the cursor keys, return, and TAB). However,
 keys in the the tt(menuselect) keymap can be modified directly using the
 tt(bindkey) builtin command (see
 ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zle Module))\
+ifnzman(noderef(The zsh/zle Module))\
 ). For example, to make the return key leave menu-selection and
 continue with normal menu-completion one can call
 

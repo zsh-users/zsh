@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/files
 Some basic file manipulation commands as builtins.
 !MOD!)
 cindex(files, manipulating)

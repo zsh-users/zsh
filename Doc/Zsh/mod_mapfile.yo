@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/mapfile
 Access to external files via a special associative array.
 !MOD!)
 cindex(parameter, file access via)

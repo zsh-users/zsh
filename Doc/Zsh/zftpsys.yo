@@ -18,7 +18,7 @@ ifzman(\
 zmanref(zshmodules)
 )\
 ifnzman(\
-noderef(The zftp Module)
+noderef(The zsh/zftp Module)
 ), must be available in the
 version of tt(zsh) installed at your site.  If the shell is configured to
 load new commands at run time, it probably is: typing `tt(zmodload zsh/zftp)'
@@ -515,7 +515,7 @@ cindex(styles in zftp functions)
 Various styles are available using the standard shell style mechanism,
 described in
 ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zutil Module)). Briefly, the
+ifnzman(noderef(The zsh/zutil Module)). Briefly, the
 command `tt(zstyle ':zftp:*') var(style) var(value) ...'.
 defines the var(style) to have value var(value) (more than one may be
 given, although that is not useful in the cases described here).  These

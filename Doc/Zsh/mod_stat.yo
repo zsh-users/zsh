@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/stat
 A builtin command interface to the tt(stat) system call.
 !MOD!)
 The tt(zsh/stat) module makes available one builtin command:

@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/cap
 Builtins for manipulating POSIX.1e (POSIX.6) capability (privilege) sets.
 !MOD!)
 The tt(zsh/cap) module is used for manipulating POSIX.1e (POSIX.6) capability

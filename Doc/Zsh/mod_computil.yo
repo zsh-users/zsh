@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/computil
 A module with utility builtins needed for the shell function based
 completion system.
 !MOD!)

@@ -169,31 +169,38 @@ version.yo: $(sdir_top)/Config/version.mk
 
 Zsh/modlist.yo: $(MODDOCSRC)
 	( \
-	    modules=`echo '' $(MODDOCSRC) '' | sed 's| Zsh/mod_| |g;s|\.yo | |g'`; \
 	    echo "startitem()"; \
-	    for mod in $$modules; do \
-		echo "item(tt(zsh/$$mod))("; \
-		sed -n '1d;/^!MOD!)$$/q;p' < $(sdir)/Zsh/mod_$${mod}.yo; \
+	    for modfile in $(MODDOCSRC); do \
+		sed -n '1{s|^COMMENT(!MOD!\(.*\)$$|item(tt(\1))(|;p;d;};/^!MOD!)$$/q;p' \
+		    < $(sdir)/$$modfile; \
 		echo ")"; \
 	    done; \
 	    echo "enditem()"; \
 	    echo "startmenu()"; \
 	    echo "includefile(Zsh/modmenu.yo)"; \
 	    echo "endmenu()"; \
-	    set '' $$modules; \
+	    set '' $(MODDOCSRC); \
+	    unset mod1 mod2 mod3; \
+	    test ".$$2" != . && \
+		mod2=`sed -n '1{s|^COMMENT(!MOD!||;p;q;}' < $(sdir)/$$2`; \
 	    while test ".$$2" != .; do \
-		echo "texinode(The zsh/$$2 Module)($${3+The $$3 Module})($${1:+The $$1 Module})(Zsh Modules)"; \
-		echo "sect(The zsh/$$2 Module)"; \
-		echo "includefile(Zsh/mod_$${2}.yo)"; \
+		unset mod3; \
+		test ".$$3" != . && \
+		    mod3=`sed -n '1{s|^COMMENT(!MOD!||;p;q;}' < $(sdir)/$$3`; \
+		echo "texinode(The $$mod2 Module)($${mod3+The $$mod3 Module})($${mod1:+The $$mod1 Module})(Zsh Modules)"; \
+		echo "sect(The $$mod2 Module)"; \
+		echo "includefile($${2})"; \
 		shift; \
+		mod1=$$mod2; \
+		mod2=$$mod3; \
 	    done \
 	) > $(sdir)/Zsh/modlist.yo
 
 Zsh/modmenu.yo: $(MODDOCSRC)
 	( \
-	    modules=`echo '' $(MODDOCSRC) '' | sed 's| Zsh/mod_| |g;s|\.yo | |g'`; \
-	    for mod in $$modules; do \
-		echo "menu(The zsh/$$mod Module)"; \
+	    for modfile in $(MODDOCSRC); do \
+		sed -n '1{s|^COMMENT(!MOD!\(.*\)$$|menu(The \1 Module)|;p;q;}' \
+		    < $(sdir)/$$modfile; \
 	    done \
 	) > $(sdir)/Zsh/modmenu.yo
 

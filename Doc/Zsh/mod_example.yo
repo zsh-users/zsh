@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/example
 An example of how to write a module.
 !MOD!)
 The tt(zsh/example) module makes available one builtin command:

@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/mathfunc
 Standard scientific functions for use in mathematical evaluations.
 !MOD!)
 cindex(functions, mathematical)

@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/clone
 A builtin that can clone a running shell onto another terminal.
 !MOD!)
 The tt(zsh/clone) module makes available one builtin command:

@@ -87,7 +87,7 @@ or built in.
 The standard widgets built in to ZLE are listed in Standard Widgets below.
 Other built-in widgets can be defined by other modules (see
 ifzman(zmanref(zshmodules))\
-ifnzman(noderef(Zsh Modules))\
+ifnzman(noderef(Zsh zsh/Modules))\
 ).  Each built-in widget has two names: its normal canonical name, and the
 same name preceded by a `tt(.)'.  The `tt(.)' name is special: it can't be
 rebound to a different widget.  This makes the widget available even when

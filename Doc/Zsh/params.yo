@@ -910,8 +910,8 @@ vindex(ZBEEP)
 item(tt(ZBEEP))(
 If set, this gives a string of characters, which can use all the same codes
 as the tt(bindkey) command as described in
-ifzman(the zle module entry in zmanref(zshmodules))\
-ifnzman(noderef(The zle Module))\
+ifzman(the zsh/zle module entry in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zle Module))\
 , that will be output to the terminal
 instead of beeping.  This may have a visible instead of an audible effect;
 for example, the string `tt(\e[?5h\e[?5l)' on a vt100 or xterm will have

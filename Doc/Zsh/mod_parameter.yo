@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/parameter
 Access to internal hash tables via special associative arrays.
 !MOD!)
 cindex(parameters, special)

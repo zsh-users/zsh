@@ -1,4 +1,4 @@
-COMMENT(!MOD!
+COMMENT(!MOD!zsh/zleparameter
 Access to internals of the Zsh Line Editor via parameters.
 !MOD!)
 cindex(parameters, special)

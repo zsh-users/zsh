@@ -166,7 +166,7 @@ tt(expand-or-complete-prefix), tt(list-choices), tt(menu-complete),
 tt(menu-expand-or-complete), or tt(reverse-menu-complete). If the
 tt(complist) module is loaded (see
 ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The complist Module))\
+ifnzman(noderef(The zsh/complist Module))\
 ), the tt(menu-select) widget can be used, too.  Note that the
 bindings will not be used if the key is already bound (that
 is, is bound to something other than tt(undefined-key)).
@@ -244,7 +244,7 @@ the var(style) argument. The widgets usable for this are:
 tt(complete-word), tt(delete-char-or-list), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(list-choices), tt(menu-complete),
 tt(menu-expand-or-complete), and tt(reverse-menu-complete), as well as
-tt(menu-select) if the tt(complist) module is loaded.  The option tt(-n)
+tt(menu-select) if the tt(zsh/complist) module is loaded.  The option tt(-n)
 prevents the key being bound if it is already to bound to something other
 than tt(undefined-key).
 
@@ -324,7 +324,7 @@ Completion behaviour can be modified by various other
 `styles' defined with the tt(zstyle) builtin command
 (see
 ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zutil Module))).
+ifnzman(noderef(The zsh/zutil Module))).
 The full context used in looking up styles is the prefix `tt(:completion)'
 followed by the context as described above, followed by another colon and
 the name of the tag currently being tried for completion.
@@ -711,7 +711,7 @@ is used.
 )
 item(tt(disable-stat))(
 This is used with the tt(cvs) tag by the function completing for the
-tt(cvs) command to decide if the tt(stat) module should be used to
+tt(cvs) command to decide if the tt(zsh/stat) module should be used to
 generate only names of modified files in the appropriate places.
 )
 item(tt(expand))(
@@ -756,7 +756,7 @@ sequences, the `tt(%)' may be followed by field with specifications as
 described for the tt(zformat) builtin command from the tt(zutil)
 module, see
 ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zutil Module))\
+ifnzman(noderef(The zsh/zutil Module))\
 .
 )
 item(tt(glob))(
@@ -909,11 +909,11 @@ Like the tt(arguments) style, but used when calling the tt(ps) command
 to generate the list to display.
 )
 item(tt(list-colors))(
-If the tt(complist) module is used, this style can be used to set
+If the tt(zsh/complist) module is used, this style can be used to set
 color specifications as with the tt(ZLS_COLORS) and tt(ZLS_COLOURS)
 parameters (see
-ifzman(the section `The complist Module' in zmanref(zshmodules))\
-ifnzman(noderef(The complist Module))\
+ifzman(the section `The zsh/complist Module' in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/complist Module))\
 ).
 
 If this style is set for the tt(default) tag, the strings in the value 
@@ -992,7 +992,7 @@ override the value set for the tt(default) tag.
 Either instead of or in addition to one of the values above, the value
 for this style may also contain the string tt(select), optionally
 followed by an equal sign and a number. In this case menuselection
-(as defined by the tt(computil) module) will be started. Without the
+(as defined by the tt(zsh/computil) module) will be started. Without the
 optional number, it will be started unconditionally and with a number
 it will be started only if at least that many matches are generated
 (if the values for more than one tag defines such a number, the
@@ -2355,7 +2355,7 @@ example(_sort_tags() {
 })
 
 Every call to the tt(comptry) function (actually a builtin
-command defined by the tt(computil) module) gives a
+command defined by the tt(zsh/computil) module) gives a
 set of tags to use; as soon as tt(comptry) produces some matches,
 subsequent calls have no effect.  Hence in the example
 this means that for the tt(dvips) command on the first attempt the

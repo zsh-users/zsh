@@ -5,15 +5,15 @@ cindex(completion, programmable)
 cindex(completion, controlling)
 sect(Description)
 Completion widgets are defined by the tt(-C) option to the tt(zle)
-builtin command provided by the tt(zle) module (see
+builtin command provided by the tt(zsh/zle) module (see
 ifzman(zmanref(zshzle))\
-ifnzman(noderef(The zle Module))\
+ifnzman(noderef(The zsh/zle Module))\
 ). For example,
 
 example(zle -C complete expand-or-complete completer)
 
 defines a widget named tt(complete). When this widget is bound to a key
-using the tt(bindkey) builtin command defined in the tt(zle) module
+using the tt(bindkey) builtin command defined in the tt(zsh/zle) module
 (see 
 ifzman(zmanref(zshzle))\
 ifnzman(noderef(Zsh Line Editor))\
@@ -706,7 +706,7 @@ The return value can be used to test if a matching tt(compctl)
 definition was found. It is non-zero if a tt(compctl) was found and
 zero otherwise.
 
-Note that this builtin is defined by the tt(compctl) module.
+Note that this builtin is defined by the tt(zsh/compctl) module.
 )
 enditem()
 

@@ -613,7 +613,7 @@ item(tt(-b))(
 Recognize all the escape sequences defined for the tt(bindkey) command,
 see 
 ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zle Module))\
+ifnzman(noderef(The zsh/zle Module))\
 .
 )
 item(tt(-m))(
