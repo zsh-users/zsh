@@ -1919,6 +1919,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = wasnext = 1;
 	    mline = 0;
+            molbeg = -42;
 	    continue;
 	} else if (cmd == Th(z_acceptandhold) ||
 		   cmd == Th(z_acceptandmenucomplete)) {
@@ -1970,6 +1971,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		break;
 	    }
 	    setwish = 1;
+            molbeg = -42;
 	    continue;
 	} else if (cmd == Th(z_undo)) {
 	    int l;
@@ -2012,11 +2014,14 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    clearlist = 1;
 	    setwish = 1;
 	    listdat.valid = 0;
+            molbeg = -42;
 	} else if (cmd == Th(z_redisplay)) {
 	    redisplay(zlenoargs);
+            molbeg = -42;
 	    continue;
 	} else if (cmd == Th(z_clearscreen)) {
 	    clearscreen(zlenoargs);
+            molbeg = -42;
 	    continue;
 	} else if (cmd == Th(z_downhistory) ||
 		   cmd == Th(z_downlineorhistory) ||
@@ -2322,6 +2327,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = 1;
 	    mline = -1;
+            molbeg = -42;
 	    continue;
 	} else if (cmd == Th(z_reversemenucomplete) ||
 		   !strcmp(cmd->nam, "reverse-menu-complete")) {
@@ -2330,6 +2336,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = 1;
 	    mline = -1;
+            molbeg = -42;
 	    continue;
 	} else if (cmd == Th(z_undefinedkey)) {
 	    continue;

@@ -1,3 +1,8 @@
+2002-05-24  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17222: Src/Zle/complist.c: we have to disable 17219 for some
+	keys because their code doesn't set up the variables we need
+
 2002-05-24  Peter Stephenson  <pws@csr.com>
 
 	* 17220: Src/Modules/tcp.c: bugs displaying host names and remote
