@@ -1,3 +1,7 @@
+2000-07-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 12165: Completion/User/_arp: new completion for arp
+
 2000-07-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12160: Completion/Core/compdump: Return failure early if the
