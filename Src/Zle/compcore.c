@@ -753,8 +753,9 @@ callcompfunc(char *s, char *fn)
 	else if (!strcmp(compinsert, "all"))
 	    useline = 2, usemenu = 0;
 	else if (idigit(*compinsert)) {
+#if 0
 	    char *m;
-
+#endif
 	    useline = 1; usemenu = 3;
 	    insmnum = atoi(compinsert);
 #if 0
