@@ -1,3 +1,10 @@
+2002-03-14  Peter Stephenson  <pws@csr.com>
+
+	* 16821 (adapted, c.f. 16831): Completion/Unix/Command/_bzip2,
+	Completion/Unix/Command/_compress,
+	Completion/Unix/Command/_gzip: add completions for the redirection
+	code in 16819.
+
 2002-03-13  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16819: Completion/compdump, Completion/compinit,

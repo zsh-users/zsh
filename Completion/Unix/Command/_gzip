@@ -1,4 +1,4 @@
-#compdef gzip gunzip gzcat=gunzip
+#compdef gzip gunzip gzcat=gunzip -redirect-,<,gunzip=gunzip -redirect-,>,gzip=gunzip -redirect-,<,gzip=gzip
 
 local decompress expl curcontext="$curcontext" state line
 typeset -A opt_args

@@ -1,4 +1,4 @@
-#compdef compress uncompress
+#compdef compress uncompress -redirect-,<,uncompress=uncompress -redirect-,>,compress=uncompress -redirect-,<,compress=compress
 
 local expl state line bits common_args1 common_args2 decompress
 local curcontext="$curcontext"

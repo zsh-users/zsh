@@ -1,4 +1,4 @@
-#compdef bzip2 bunzip2 bzcat=bunzip2 bzip2recover
+#compdef bzip2 bunzip2 bzcat=bunzip2 bzip2recover -redirect-,<,bunzip2=bunzip2 -redirect-,>,bzip2=bunzip2 -redirect-,<,bzip2=bzip2
 
 local decompress expl state line curcontext="$curcontext"
 typeset -A opt_args
