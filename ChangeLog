@@ -1,3 +1,9 @@
+2004-10-20  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20505: Src/utils.c, Src/builtin.c, Src/exec.c, Src/hist.c,
+	Src/Modules/zftp.c:  Added gettempfile(), which works like a
+	specialized mkstemp().
+
 2004-10-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20503: Alexey Tourbin: Doc/Zsh/compsys.yo: corrected the
