@@ -1,3 +1,7 @@
+2001-05-21  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Test/.distfiles: add Test/E01options.ztst.
+
 2001-05-20  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 14396: Src/params.c, Test/D04paramater.ztst, Doc/Zsh/params.yo:
@@ -40,6 +44,10 @@
 	value.
 
 2001-05-18  Peter Stephenson  <pws@csr.com>
+
+	* not posted: Test/ztst.zsh, Test/E01options.ztst: added some more
+	options; made ztst.zsh more robust about ksharrays being set by
+	a test.
 
 	* 14382: Src/module.c: zmodload -uf wouldn't work even if the
 	math function hadn't been loaded yet.
