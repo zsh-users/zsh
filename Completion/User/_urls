@@ -1,4 +1,4 @@
-#autoload
+#compdef curl
 
 # Usage: _urls [-f]
 # Options:
@@ -37,7 +37,9 @@
 #    name used by a user placing web pages within their home area.
 #    e.g. compconf urls_localhttp=www:/usr/local/apache/htdocs:public_html
 
-local ipre scheme host user dirs files ret=1 expl
+setopt localoptions extendedglob
+
+local ipre scheme host user hosts ret=1 expl
 local urls_path="${compconfig[urls_path]:-${ZDOTDIR:-$HOME}/.zsh/urls}"
 local localhttp_servername="${${(@s.:.)compconfig[urls_localhttp]}[1]}"
 local localhttp_documentroot="${${(@s.:.)compconfig[urls_localhttp]}[2]}"
@@ -50,16 +52,14 @@ fi
 
 ipre="$IPREFIX"
 
-if ! [[ -prefix [-+.a-z0-9]#: ]]; then
+if ! compset -P '(#b)([-+.a-z0-9]#):'; then
   _description expl 'URL prefix'
   [[ -d $urls_path/bookmark ]] &&
     compadd "$@" "$expl[@]" -S '' bookmark: && ret=0
   compadd "$@" "$expl[@]" -S '' file: ftp:// gopher:// http:// && ret=0
   return $ret
 fi
-
-scheme="${PREFIX%%:*}"
-compset -P "[-+.a-z0-9]#:"
+scheme="$match[1]"
 
 case "$scheme" in
   http|ftp|gopher)
@@ -70,10 +70,10 @@ case "$scheme" in
   ;;
   file)
     if ! compset -P //; then
-      if [ -prefix / ]; then
+      if [[ -prefix / ]]; then
 	_path_files "$@" -S '' -g '*(^/)' && ret=0
 	_path_files "$@" -S/ -r '/' -/ && ret=0
-      elif [ ! "$PREFIX" ]; then
+      elif [[ -z "$PREFIX" ]]; then
 	compadd -S '/' -r '/' - "${PWD%/}"
 	ret=0
       fi
@@ -94,34 +94,31 @@ case "$scheme" in
 esac
 
 # Complete hosts
-if ! [[ -prefix */* ]]; then
-  dirs=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
-  (( $#dirs )) || _hosts -S/ && ret=0
-  [ "$scheme" = "http" ] && dirs=($dirs $localhttp_servername)
-  compadd "$@" -QS/ - $dirs && ret=0
+if ! compset -P '(#b)([^/]#)/'; then
+  hosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
+  (( $#hosts )) || _hosts -S/ && ret=0
+  [[ "$scheme" = http ]] && hosts=($hosts $localhttp_servername)
+  compadd "$@" -QS/ - $hosts && ret=0
   return $ret
 fi
+host="$match[1]"
 
 # Complete part after hostname
-host=${PREFIX%%/*}
-compset -P "$host/"
-if [[ "$localhttp_servername" = $host ]]; then
-  if [[ -prefix \~ ]]; then
-    compset -P \~
-    if [[ -prefix */* ]]; then
-      user=${PREFIX%%/*}
-      compset -P $user/
-      _path_files -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
-      _path_files -W ~$user/$localhttp_userdir -S/ -r '/' -/ && ret=0
-    else
-      _users -S/ && ret=0
+if [[ "$localhttp_servername" = "$host" ]]; then
+  if compset -P \~; then
+    if ! compset -P '(#b)([^/]#)/'; then
+      _users -S/
+      return
     fi
+    user="$match[1]"
+    _path_files -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
+    _path_files -W ~$user/$localhttp_userdir -S/ -r '/' -/ && ret=0
   else
     _path_files -W $localhttp_documentroot -g '*(^/)' && ret=0
     _path_files -W $localhttp_documentroot -S/ -r '/' -/ && ret=0
   fi
 else
-  _path_files -W $urls_path/$scheme/$host/ -g '*(^/)' && ret=0
-  _path_files -W $urls_path/$scheme/$host/ -S/ -r '/' -/ && ret=0
+  _path_files -W $urls_path/$scheme/$host -g '*(^/)' && ret=0
+  _path_files -W $urls_path/$scheme/$host -S/ -r '/' -/ && ret=0
 fi
 return $ret
