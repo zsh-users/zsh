@@ -595,3 +595,28 @@ if test $zsh_cv_struct_member_[]translit($2, [ ], [_])_$3 = yes; then
   AC_DEFINE(HAVE_[]translit($2_$3, [ a-z], [_A-Z]))
 fi
 ])
+
+dnl
+dnl zsh_ARG_PROGRAM
+dnl   Handle AC_ARG_PROGRAM substitutions into other zsh configure macros.
+dnl   After processing this macro, the configure script may refer to
+dnl   and $tzsh_name, and @tzsh@ is defined for make substitutions.
+dnl
+
+AC_DEFUN(zsh_ARG_PROGRAM,
+[AC_ARG_PROGRAM
+# Un-double any \ or $ (doubled by AC_ARG_PROGRAM).
+cat <<\EOF_SED > conftestsed
+s,\\\\,\\,g; s,\$\$,$,g
+EOF_SED
+zsh_transform_name=`echo "${program_transform_name}" | sed -f conftestsed`
+rm -f conftestsed
+tzsh_name=`echo zsh | sed -e "${zsh_transform_name}"`
+# Double any \ or $ in the transformed name that results.
+cat <<\EOF_SED >> conftestsed
+s,\\,\\\\,g; s,\$,$$,g
+EOF_SED
+tzsh=`echo ${tzsh_name} | sed -f conftestsed`
+rm -f conftestsed
+AC_SUBST(tzsh)dnl
+])
