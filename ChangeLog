@@ -43,6 +43,11 @@
 	* 20254: Completion/Base/Core/_tags: restrict the scope of the
 	default tag-order to fix a problem with cdrecord completion
 
+2004-08-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 20244: Functions/Misc/zed: fix bug with editing of autoloaded
+	functions (introduced by 20089).
+
 2004-08-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 20237: Completion/Unix/Command/_screen: rewrite completion of
