@@ -1,7 +1,5 @@
 name=@ALIASNAME@
 
-nozshdep=1
-
 moddeps="@DEPNAME@"
 
 objects="@LOCALNAME@.o"
