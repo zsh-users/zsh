@@ -211,12 +211,14 @@ while [[ -n "$state" ]]; do
         _files -g \*.spec && ret=0
     ;;
   package_file)
-    if compset -P '(f|ht)tp://'; then
-      _hosts -S/ && ret=0
+    _wanted files expl 'RPM package file' \
+        _files -g '*.(#i)rpm' && ret=0
+    if [[ -prefix 1 (f|ht)tp:// ]]; then
+      _wanted urls expl 'URL of RPM package file' \
+          _urls -f -g '*.(#i)rpm' "${expl[@]}" && ret=0
     else
-      _alternative \
-          'files:RPM package file:_files -g \*.\(\#i\)rpm' \
-          'prefixes:URL prefix:compadd ftp:// http://' && ret=0
+      _wanted urls expl 'URL of RPM package file' \
+          compadd -S '' "${expl[@]}" ftp:// http:// && ret=0
     fi
     ;;
   package_src)

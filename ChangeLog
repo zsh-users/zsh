@@ -1,5 +1,8 @@
 2000-06-05  Oliver Kiddle  <opk@zsh.org>
 
+	* 11756: Completion/User/_urls, Completion/Linux/_rpm: accept -g
+	option in _urls and use _urls in _rpm
+
 	* 11755: test/comptest: fix wording in error messages
 
 2000-06-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>

@@ -38,7 +38,7 @@
 #    E.g.:
 #      zstyle ':completion:*:urls' local www /usr/local/apache/htdocs public_html
 
-local ipre scheme host user uhosts ret=1 expl match
+local ipre scheme host user uhosts ret=1 expl match glob
 local urls_path localhttp
 zstyle -s ":completion:${curcontext}:urls" path urls_path ||
     urls_path="${ZDOTDIR:-$HOME}/.zsh/urls"
@@ -51,6 +51,9 @@ if [[ "$1" = -f ]]; then
   shift
   _wanted -C -f files expl file _files "$@" && return 0
 fi
+
+zparseopts -D -E 'g:=glob'
+(( $#glob )) || glob=( -g '*(^/)' )
 
 ipre="$IPREFIX"
 
@@ -82,7 +85,7 @@ case "$scheme" in
       while _tags; do
         while _next_label files expl 'local file'; do
           if [[ -prefix / ]]; then
-	    _path_files "$expl[@]" -S '' -g '*(^/)' && ret=0
+	    _path_files "$expl[@]" -S '' "${glob[@]}" && ret=0
 	    _path_files "$expl[@]" -S/ -r '/' -/ && ret=0
           elif [[ -z "$PREFIX" ]]; then
 	    compadd -S '/' -r '/' "$expl[@]" "$@" - "${PWD%/}" && ret=0
@@ -103,7 +106,7 @@ case "$scheme" in
       _tags -C bookmark files
       while _tags; do
         while _next_label files expl 'bookmark'; do
-          _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && 
+          _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' "${glob[@]}" && 
               ret=0
           _path_files -W "$urls_path/$scheme" -S/ -r '/' "$expl[@]" -/ && ret=0
         done
@@ -145,7 +148,7 @@ if [[ "$localhttp_servername" = "$host" ]]; then
     user="$match[1]"
     while _tags; do
       while _next_label files expl 'local file'; do
-        _path_files "$expl[@]" "$@" -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
+        _path_files "$expl[@]" "$@" -W ~$user/$localhttp_userdir "${glob[@]}" && ret=0
         _path_files -S/ -r '/'  "$expl[@]" -W ~$user/$localhttp_userdir-/ && ret=0
       done
       (( ret )) || return 0
@@ -153,7 +156,7 @@ if [[ "$localhttp_servername" = "$host" ]]; then
   else
     while _tags; do
       while _next_label files expl 'local file'; do
-        _path_files "$expl[@]" "$@" -W $localhttp_documentroot -g '*(^/)' && ret=0
+        _path_files "$expl[@]" "$@" -W $localhttp_documentroot "${glob[@]}" && ret=0
         _path_files -S/ -r '/' "$expl[@]" -W $localhttp_documentroot -/ && ret=0
       done
       (( ret )) || return 0
@@ -162,7 +165,7 @@ if [[ "$localhttp_servername" = "$host" ]]; then
 else
   while _tags; do
     while _next_label files expl 'local file'; do
-      _path_files "$expl[@]" "$@" -W $urls_path/$scheme/$host -g '*(^/)' && ret=0
+      _path_files "$expl[@]" "$@" -W $urls_path/$scheme/$host "${glob[@]}" && ret=0
       _path_files -S/ -r '/' "$expl[@]" -W $urls_path/$scheme/$host -/ && ret=0
     done
     (( ret )) || return 0
