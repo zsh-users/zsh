@@ -1,3 +1,10 @@
+2000-07-06  Oliver Kiddle  <opk@zsh.org>
+
+	* 12181: Completion/AIX/_lscfg, Completion/AIX/_object_classes,
+	Completion/AIX/_physical_volumes, Completion/AIX/_smit,
+	Completion/AIX/_volume_groups, Completion/User/_printers: updates
+	and additions to completions for AIX commands
+
 2000-07-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 12177: Doc/Zsh/compsys.yo, Completion/Builtins/_unhash,

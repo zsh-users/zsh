@@ -1,5 +1,7 @@
 #compdef smit smitty
 
+local state line expl curcontext="$curcontext"
+
 _arguments -C \
   '-s[specify smit.script file]:smit.script file:_files' \
   '-l[specify smit.log file]:smit.log file:_files' \
@@ -15,5 +17,11 @@ _arguments -C \
   '-t[generate trace information]' \
   '-v[verbose]' \
   '-x[do not run any execute commands]' \
-  '-X[do not run any commands]'
+  '-X[do not run any commands]' \
+  '1:fastpath:->fastpath' && return 0
+
+[[ "$state" = fastpath ]] &&
+  _wanted fastpaths expl 'fast path' compadd \
+      $(odmget sm_cmd_hdr sm_name_hdr|sed -n 's/^	id = \"\(.*\)\"/\1/p')
+
   

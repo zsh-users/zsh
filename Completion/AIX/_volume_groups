@@ -2,4 +2,4 @@
 
 local expl
 
-_wanted physicalvolumes expl 'physical volumes' compadd - $(lsvg)
+_wanted physicalvolumes expl 'physical volume' compadd - $(lsvg)

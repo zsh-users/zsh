@@ -2,10 +2,16 @@
 
 local expl ret=1 list disp
 
+if (( $+commands[lsallq] )); then
+  # Use AIX's command to list print queues
+  _wanted printers expl printer compadd $(lsallq)
+  return
+fi
+
 if (( ! $+_lp_cache )); then
   local file entry names i
 
-   file=( /etc/(printcap|printers.conf)(N) )
+  file=( /etc/(printcap|printers.conf)(N) )
 
   _lp_cache=()
   _lp_alias_cache=()

@@ -1,0 +1,21 @@
+#compdef lscfg
+
+local state line expl curcontext="$curcontext" disp list devs
+
+_arguments -C -s \
+  '-l[display device information for named device]:device:->device' \
+  '-v[display vital product data for physical devices]' && return 0
+
+if [[ "$state" = device ]]; then
+  devs=( ${${${${(f)"$(lscfg)"}[6,-1]:# *}##??}/ ##[^ ]# #/:} )
+  if zstyle -T ":completion:${curcontext}:devices" verbose; then
+    zformat -a list ' -- ' "$devs[@]"
+    disp=(-ld list)
+  else
+    disp=()
+  fi
+  _wanted devices expl 'device' compadd "$disp[@]" - "${devs[@]%%:*}"
+  return
+fi
+
+return 1
