@@ -1,3 +1,19 @@
+2001-06-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14792: Test/comptest: Don't import the current terminal type for
+	the zpty terminal, because the current terminal might not be able
+	to run ZLE (e.g., emacs shell mode).
+
+	* 14792: Src/Modules/tcp.h, Src/Modules/zftp.c: Shuffle around
+	several #include directives to get the sockaddr_in definition in
+	all the places it's needed.
+
+	* 14712: Doc/Zsh/builtins.yo: Improve appearance of long hanging
+	paragraph tag for the "read" builtin.
+
+	* 14578: Src/Modules/termcap.c: Handle vagaries of tgetflag()
+	return value in new function ztgetflag().
+
 2001-06-07  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 14793: Src/hist.c: Don't mark a HIST_TMPSTORE entry with HIST_OLD
