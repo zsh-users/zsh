@@ -1,3 +1,10 @@
+2002-02-19  Clint Adams  <clint@zsh.org>
+
+	* 16673: zshconfig.ac, Doc/Zsh/.distfiles, Doc/Zsh/mod_langinfo.yo,
+	Src/Modules/.distfiles, Src/Modules/langinfo.c,
+	Src/Modules/langinfo.mdd: add langinfo module as an interface
+	to locale information.
+
 2002-02-19  Geoff Wing  <gcw@zsh.org>
 
 	* 16635: Src/Zle/zle_refresh.c: make sure we display lists in

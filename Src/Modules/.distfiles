@@ -4,6 +4,7 @@ DISTFILES_SRC='
     clone.mdd clone.c
     example.mdd example.c
     files.mdd files.c
+    langinfo.mdd langinfo.c
     mapfile.mdd mapfile.c
     mathfunc.mdd mathfunc.c
     parameter.mdd parameter.c

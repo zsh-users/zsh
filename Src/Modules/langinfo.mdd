@@ -1,0 +1,8 @@
+name=zsh/langinfo
+
+link=either
+load=no
+
+autoparams="langinfo"
+
+objects="langinfo.o"
