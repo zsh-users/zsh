@@ -10,7 +10,7 @@ else
   _tags files aliases
   while _tags; do
     _requested files expl 'module file' \
-      _files -W module_path -/g '*.s[ol](:r)' && ret=0
+      _files -W module_path -/g '*.(dll|s[ol])(:r)' && ret=0
     _requested aliases expl 'module alias' \
       compadd -- ${${(f)"$(zmodload -A)"}%% *} && ret=0
     (( ret )) || break
