@@ -4,7 +4,9 @@
 # a normal completion function, but as one possible value for the
 # completer style.
 
-local comp name curcontext="${curcontext}:complete" oldcontext
+local comp name curcontext="$curcontext" oldcontext
+
+[[ "$funcstack[2]" = _main_complete ]] && curcontext="${curcontext}:complete"
 
 oldcontext="$curcontext"
 
