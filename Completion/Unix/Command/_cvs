@@ -611,7 +611,7 @@ _cvs_loadstat () {
 
 (( $+functions[_cvs_root] )) ||
 _cvs_root () {
-  local cvspassfile id
+  local cvspassfile id slash
 
   typeset -gU _cvs_roots
 
@@ -622,7 +622,8 @@ _cvs_root () {
       id="$(LC_ALL=C ls -l "$cvspassfile")"
     fi
     if [[ "$id" != "$_cvs_pass_id" ]]; then
-      _cvs_roots=($_cvs_roots ${${${${(f)"$(<$cvspassfile)"}#/1 }%% *}/:2401\\//:/})
+      slash=/
+      _cvs_roots=($_cvs_roots ${${${${(f)"$(<$cvspassfile)"}#/1 }%% *}/:2401${slash}/:/})
       _cvs_pass_id="$id"
     fi
   fi
@@ -918,13 +919,13 @@ _cvs_existing_entries () {
 (( $+functions[_cvs_modified_entries] )) ||
 _cvs_modified_entries () {
   if _cvs_loadstat; then
-    local expl match linedir realdir pat
+    local expl match linedir realdir pat slash=/
     match=()
     : ${PREFIX:#(#b)(*/)(*)}
     linedir="$match[1]"
     realdir=${(e)~linedir}
     [[ -f "$realdir"CVS/Entries ]] &&
-    [[ -n ${pat::="${(@j:|:)${(@)${(@)${(@)${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}/\\/[^\\/]#\\///}%/[^/]#/[^/]#}:#${(j:|:)~${${${${(f)"$(LC_ALL=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${realdir}*(D) 2>/dev/null)"}##*/}/ //}//(#m)[][*?()<|^~#\\]/\\$MATCH}}}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}"} ]] &&
+    [[ -n ${pat::="${(@j:|:)${(@)${(@)${(@)${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}/${slash}[^${slash}]#${slash}//}%/[^/]#/[^/]#}:#${(j:|:)~${${${${(f)"$(LC_ALL=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${realdir}*(D) 2>/dev/null)"}##*/}/ //}//(#m)[][*?()<|^~#\\]/\\$MATCH}}}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}"} ]] &&
     _wanted files expl 'modified file' _path_files -g "$pat"
   else
     _cvs_existing_entries

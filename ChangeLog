@@ -1,3 +1,12 @@
+2003-05-08  Peter Stephenson  <pws@csr.com>
+
+	* 18512 (modified for 4.0): README, Completion/Unix/Command/_cvs,
+	Completion/Unix/Command/_rsync,  Completion/Unix/Type/_path_files,
+	Doc/Zsh/expn.yo: 18508 wasn't enough; the \\/ hack was documented
+	and in use in the completion system.  Change the documentation,
+	mention the inconsistency in README and alter the completion
+	system to hide the `/' a parameter so that it doesn't care.
+
 2003-05-07  Peter Stephenson  <pws@csr.com>
 
 	* 18508: Src/subst.c, Test/D04parameter.ztst: quoting of the `/'

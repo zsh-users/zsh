@@ -483,8 +483,8 @@ The var(pattern) may begin with a `tt(#)', in which case the
 var(pattern) must match at the start of the string, or `tt(%)', in
 which case it must match at the end of the string.  The var(repl) may
 be an empty string, in which case the final `tt(/)' may also be omitted.
-To quote the final `tt(/)' in other cases it should be preceded by two
-backslashes (i.e., a quoted backslash); this is not necessary if the
+To quote the final `tt(/)' in other cases it should be preceded by a
+single backslash; this is not necessary if the
 `tt(/)' occurs inside a substituted parameter.  Note also that the `tt(#)'
 and `tt(%)' are not active if they occur inside a substituted parameter,
 even at the start.

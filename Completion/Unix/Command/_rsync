@@ -31,13 +31,14 @@ elif [[ -prefix 1 *:: ]]; then
   _describe "remote modules" remmodules -S/
 
 elif [[ -prefix 1 *: ]]; then
-  local remfiles remdispf remdispd
+  local remfiles remdispf remdispd slash
 
   compset -P 1 '*:'
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
+    slash=/
     remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${${${words[CURRENT
-]#*:}:h}/\\/(#e)/}/\* 2>/dev/null)"})
+]#*:}:h}/${slash}(#e)/}/\* 2>/dev/null)"})
 
     remdispf=(${remfiles:#*/})
     remdispd=(${(M)remfiles:#*/})
@@ -46,7 +47,7 @@ elif [[ -prefix 1 *: ]]; then
       compadd -d remdispf ${${remfiles:#*/}/[*=@|](#e)/}
       
     _wanted files expl 'remote files and directories' \
-      compadd -S/ -d remdispd ${${(M)remfiles:#*/}/\\/(#e)/}
+      compadd -S/ -d remdispd ${${(M)remfiles:#*/}/${slash}(#e)/}
   else
     _message 'remote files'
   fi

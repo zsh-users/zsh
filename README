@@ -24,6 +24,21 @@ details, see the documentation.
 Possible incompatibilities
 ---------------------------
 
+A change between 4.0.6 and 4.0.7 affects substitutions of the form
+${foo/src/rep} and ${foo//src/rep}.  In 4.0.6, a literal `/' was quoted in
+the `src' text with two backslashes.  This was documented, but inconsistent
+with normal quoting conventions and poorly implemented.  The `/' now
+requires only one backslash to quote it whether or not the expresion occurs
+in double quotes.  For example:
+  % foo=word/bird
+  % print ${foo/\//-} "${foo/\//+}"
+  word-bird word+bird
+Note also the following workaround which is valid in all versions of the
+shell that support this syntax:
+  % slash=/
+  % foo=word/bird
+  % print ${foo/$slash/-} "${foo/$slash/+}"
+
 Some particular differences you may notice between version 3.0 and 4.0
 (mostly based on 3.0.8; there are other differences from earlier versions):
 

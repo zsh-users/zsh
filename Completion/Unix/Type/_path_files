@@ -204,7 +204,8 @@ if [[ "$pre" = [^][*?#^\|\<\>]#(\`[^\`]#\`|\$)*/* && "$compstate[quote]" != \' ]
   eval 'realpath=${(e)~linepath}' 2>/dev/null
   [[ -z "$realpath" || "$realpath" = "$linepath" ]] && return 1
   pre="${pre#${linepath}}"
-  i="${#linepath//[^\\/]}"
+  i='[^/]'
+  i="${#linepath//$i}"
   orig="${orig[1,(in:i:)/][1,-2]}"
   donepath=
   prepaths=( '' )
