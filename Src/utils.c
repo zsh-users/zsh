@@ -1901,6 +1901,8 @@ findsep(char **s, char *sep, int quote)
 	    if (quote && *t == '\\' &&
 		isep(t[1] == Meta ? (t[2] ^ 32) : t[1])) {
 		chuck(t);
+		if (*t == Meta)
+		    t++;
 		continue;
 	    }
 	    if (*t == Meta) {
