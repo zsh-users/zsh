@@ -1305,7 +1305,7 @@ main()
     if(pid < 0)
 	exit(1);
     if(pid) {
-	fd = open("/tmp/fifo$$", O_RDWR);
+	fd = open("/tmp/fifo$$", O_RDONLY);
 	exit(fd < 0 || read(fd, &c, 1) != 1 || c != 'x');
     }
     fd = open("/tmp/fifo$$", O_WRONLY);

@@ -1390,15 +1390,15 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	return NULL;
     }
     if (v->start < -MAX_ARRLEN) {
-	zerr("%s: subscript too %s: %d", "small", v->start);
+	zerr("subscript too %s: %d", "small", v->start);
 	return NULL;
     }
     if (v->end > MAX_ARRLEN+1) {
-	zerr("%s: subscript too %s: %d", "big", v->end - !!isset(KSHARRAYS));
+	zerr("subscript too %s: %d", "big", v->end - !!isset(KSHARRAYS));
 	return NULL;
     }
     if (v->end < -MAX_ARRLEN) {
-	zerr("%s: subscript too %s: %d", "small", v->end);
+	zerr("subscript too %s: %d", "small", v->end);
 	return NULL;
     }
     return v;

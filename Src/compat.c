@@ -184,7 +184,7 @@ zpathmax(char *dir)
 		    ((errno = 0), PATH_MAX - dirlen)));
 #endif
 }
-#endif // 0
+#endif /* 0 */
 
 #ifdef HAVE_SYSCONF
 /* This is replaced by a macro from system.h if not HAVE_SYSCONF.    *
