@@ -1,9 +1,13 @@
+2001-07-03  Clint Adams  <clint@zsh.org>
+
+	* unposted: Doc/Makefile.in: add mod_pcre.yo to makefile.
+
 2001-07-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 15223, Akinori Musha: 15215: Completion/Unix/Command/.distfiles,
 	Completion/Unix/Command/_sysctl: Add completion for sysctl(8)
 
-2001-07-02  Clint Adams  <clint@zsh.org>
+2001-07-03  Clint Adams  <clint@zsh.org>
 
 	* unposted: Doc/Zsh/.distfiles,
 	Functions/Example/.distfiles, Src/Modules/.distfiles:
