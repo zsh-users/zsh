@@ -1,5 +1,8 @@
 2002-02-18  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 16668: Src/Zle/compcore.c: fix group handling nothing should
+	now possibly be added to the wrong group again
+
 	* 16667: Completion/Base/Utility/_arguments: fix test for
 	prefix-needed
 

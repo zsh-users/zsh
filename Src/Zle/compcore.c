@@ -1619,6 +1619,21 @@ addmatches(Cadata dat, char **argv)
     Heap oldheap;
 
     SWITCHHEAPS(oldheap, compheap) {
+        if (dat->dummies)
+            dat->aflags = ((dat->aflags | CAF_NOSORT | CAF_UNIQCON) &
+                           ~CAF_UNIQALL);
+
+        /* Select the group in which to store the matches. */
+        gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
+                  ((dat->aflags & CAF_UNIQALL) ? CGF_UNIQALL : 0) |
+                  ((dat->aflags & CAF_UNIQCON) ? CGF_UNIQCON : 0));
+        if (dat->group) {
+            endcmgroup(NULL);
+            begcmgroup(dat->group, gflags);
+        } else {
+            endcmgroup(NULL);
+            begcmgroup("default", 0);
+        }
         if (dat->mesg || dat->exp) {
             curexpl = (Cexpl) zhalloc(sizeof(struct cexpl));
             curexpl->always = !!dat->mesg;
@@ -1630,25 +1645,13 @@ addmatches(Cadata dat, char **argv)
             curexpl = NULL;
     } SWITCHBACKHEAPS(oldheap);
 
-    if (!*argv && !dat->dummies && !(dat->aflags & CAF_ALL)) {
-	SWITCHHEAPS(oldheap, compheap) {
-	    /* Select the group in which to store the matches. */
-	    gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
-		      ((dat->aflags & CAF_UNIQALL) ? CGF_UNIQALL : 0) |
-		      ((dat->aflags & CAF_UNIQCON) ? CGF_UNIQCON : 0));
-	    if (dat->group) {
-		endcmgroup(NULL);
-		begcmgroup(dat->group, gflags);
-	    } else {
-		endcmgroup(NULL);
-		begcmgroup("default", 0);
-	    }
-	} SWITCHBACKHEAPS(oldheap);
-
+    if (!*argv && !dat->dummies && !(dat->aflags & CAF_ALL))
 	return 1;
-    }
+
+#if 0
     if (dat->dummies)
         dat->aflags = (dat->aflags | CAF_NOSORT | CAF_UNIQCON) & ~CAF_UNIQALL;
+#endif
     for (bp = brbeg; bp; bp = bp->next)
 	bp->curpos = ((dat->aflags & CAF_QUOTE) ? bp->pos : bp->qpos);
     for (bp = brend; bp; bp = bp->next)
@@ -1880,17 +1883,6 @@ addmatches(Cadata dat, char **argv)
 			haspattern = 1;
 		}
 	    }
-	}
-	/* Select the group in which to store the matches. */
-	gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
-		  ((dat->aflags & CAF_UNIQALL) ? CGF_UNIQALL : 0) |
-		  ((dat->aflags & CAF_UNIQCON) ? CGF_UNIQCON : 0));
-	if (dat->group) {
-	    endcmgroup(NULL);
-	    begcmgroup(dat->group, gflags);
-	} else {
-	    endcmgroup(NULL);
-	    begcmgroup("default", 0);
 	}
 	if (*argv) {
 	    if (dat->pre)
