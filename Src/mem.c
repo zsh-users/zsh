@@ -507,32 +507,6 @@ zrealloc(void *ptr, size_t size)
 }
 
 /**/
-mod_export char *
-dupstring(const char *s)
-{
-    char *t;
-
-    if (!s)
-	return NULL;
-    t = (char *) zhalloc(strlen((char *)s) + 1);
-    strcpy(t, s);
-    return t;
-}
-
-/**/
-mod_export char *
-ztrdup(const char *s)
-{
-    char *t;
-
-    if (!s)
-	return NULL;
-    t = (char *)zalloc(strlen((char *)s) + 1);
-    strcpy(t, s);
-    return t;
-}
-
-/**/
 #ifdef ZSH_MEM
 
 /*

@@ -1,5 +1,9 @@
 2000-09-19  Clint Adams  <schizo@debian.org>
 
+	* 12846: Src/.distfiles, Src/mem.c, Src/string.c, Src/utils.c,
+	Src/zsh.mdd: Move dupstring(), ztrdup(), tricat(), zhtricat(),
+	dyncat(), dupstrpfx(), ztrduppfx(), and appstr() to string.c.
+
 	* 12845: Src/Modules/files.c: dynamically allocate pbuf in domove().
 
 2000-09-18  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
