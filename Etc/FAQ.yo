@@ -43,20 +43,21 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2000/1/25)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2000/04/30)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2000/11/25
-mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.2 2000/04/01 20:43:44 pws Exp $
+mydit(Last-Modified:) 2000/04/30
+mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--2000 (see end of document)
 )
 
-bf(Changes since issue posted December 1999:)
+bf(Changes since issue posted March 2000:)
 description(
-mydit(   )  None.  Suggestions on a postcard.
+mydit(3.8)  Mention the `keypad mode' horror and fixes (from Bart).
+mydit(3.25) Rephrased, example for older versions added.
+mydit(5.1)  Mention :x and :q modifiers again
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -120,6 +121,7 @@ Chapter 3:  How to get various things to work
 3.22. How do I get a variable's value to be evaluated as another variable?
 3.23. How do I prevent the prompt overwriting output when there is no newline?
 3.24. What's wrong with cut and paste on my xterm?
+3.25. How do I get coloured prompts on my colour xterm?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -147,9 +149,8 @@ sect(Sources of information)
 label(11)
 
   Information on zsh is available via the World Wide Web.  The URL
-  is url(http://sunsite.auc.dk/zsh/)(http://sunsite.auc.dk/zsh/) (note the \
-  change of address from the
-  end of April 1998).  The server provides this FAQ and much else and is
+  is url(http://sunsite.auc.dk/zsh/)(http://sunsite.auc.dk/zsh/) .
+  The server provides this FAQ and much else and is
   now maintained by Karsten Thygesen and others (mail \
   email(zsh@sunsite.auc.dk)
   with any related messages).  The FAQ is at \
@@ -188,13 +189,15 @@ email(mail-server@rtfm.mit.edu)
   The latest version of this FAQ is also available directly from any
   of the zsh archive sites listed in question link(1.6)(16).
 
-  There is now a preliminary version of a reference card for
-  zsh 3.0, which you can find (while it's being developed) at
-    url(http://www.ifh.de/~pws/computing/refcard.ps)
-    (http://www.ifh.de/~pws/computing/refcard.ps)
-  This is optimised for A4 paper. The tt(LaTeX) source is in the
-  same place with the extension tt(.tex).  It is not a good place
-  from which to learn zsh for the first time.
+  I have been putting together a user guide to complement the manual by
+  explaining the most useful features of zsh in a more easy to read way.
+  This will be a long project, but a partial version describing how to
+  write startup files and how to use the new, more powerful, form for
+  completion which first appeared in 3.1.6 (and is not described in this
+  FAQ) can be seen by looking at
+    url(http://www.pwstephenson.fsnet.co.uk/computing/)
+(http://www.pwstephenson.fsnet.co.uk/computing/)
+  where it exists in various formats.
 
   (As a method of reading the following in Emacs, you can type tt(\M-2
   \C-x $) to make all the indented text vanish, then tt(\M-0 \C-x $)
@@ -1188,6 +1191,29 @@ sect(Why do the cursor (arrow) keys not work?)
   tt(B), tt(C) or tt(D), as well as the corresponding set beginning
   mytt(<ESC>[), so this may be redundant.
 
+  A particular problem which sometimes occurs is that there are two
+  different modes for arrow keys, normal mode and keypad mode, which
+  send different sequences.  Although this is largely a historical
+  artifact, it sometimes happens that your terminal can be switched from
+  one mode to the other, for example by a rogue programme that sends the
+  sequence to switch one way, but not the sequence to switch back.  Thus
+  you are stuck with the effects.  Luckily in this case the arrow key
+  sequences are likely to be standard, and you can simply bind both sets.
+  The following code does this.
+  verb(
+    bindkey '\e[A'  up-line-or-history
+    bindkey '\e[B'  down-line-or-history
+    bindkey '\e[C'  forward-char
+    bindkey '\e[D'  backward-char
+    bindkey '\eOA'  up-line-or-history
+    bindkey '\eOB'  down-line-or-history
+    bindkey '\eOC'  forward-char
+    bindkey '\eOD'  backward-char
+  )
+  For most even vaguely VT100-compatible terminals, the above eight
+  instructions are a fairly safe bet for your tt(.zshrc).  Of course
+  you can substitute variant functions for the second argument here too.
+
 
 sect(Why does my terminal act funny in some way?)
 
@@ -1370,6 +1396,7 @@ label(313)
   )
   is a neat way of doing what you want.  Note that it is the quotes, not
   the prompt expansion, which turns the `tt(\n)' into a newline.
+
 
 sect(Why does mytt(bindkey ^a command-name) or mytt(stty intr ^-) do something funny?)
 
@@ -1601,6 +1628,32 @@ sect(What's wrong with cut and paste on my xterm?)
      fixes referred to above in order to be reliable).
   )
 
+sect(How do I get coloured prompts on my colour xterm?)
+
+  (Or `color xterm', if you're reading this in black and white.)  You need
+  to find the sequences which generate the various colours from the manual
+  for your terminal emulator; these are ANSI standard on those I know about
+  which support colour.  With a recent (post 3.1.6) distribution of zsh,
+  there is a theme system to handle this for you; even if you don't see that,
+  the installed function `mytt(colors)' (meaning `colours', if you're not
+  reading this in black and white) gives the escape sequences.  You will end
+  up with code looking like this (borrowed from Oliver Kiddle):
+  verb(
+    PS1=$'%{\e[1;31m%}<the rest of your prompt here>%{\e[0m%}'
+  )
+  The mytt($') form of quoting turns the `mytt(\e)' into a real escape
+  character; this only works from about version 3.1.4, so if you're using
+  3.0.x, you need to do something like
+  verb(
+    PS1="$(print '%{\e[1;31m%}<the rest goes here>%{\e[0m%}')"
+  )
+  The `mytt(%{...%})' is used in prompts for strings which will
+  not appear as characters, so that the prompt code doesn't miscalculate the
+  length of the prompt which would have a bad effect on editing.  The
+  resulting `mytt(<ESC>[1;31m)' makes the prompt red, and the
+  `mytt(<ESC>[0m)' puts printing back to normal so that the rest of the line
+  is unchanged.
+
 
 chapter(The mysteries of completion)
 
@@ -1619,6 +1672,7 @@ you need to do, in principal, is to arrange for this to be loaded.  Putting
 `tt(autoload -U compinit; compinit)' in your tt(.zshrc) should be enough if
 the system is installed properly.  The rest of this section talks about the
 old completion system.
+
 
 sect(What is completion?)
 
@@ -1955,6 +2009,9 @@ this applies
      complicated exclusions using mytt(^) or mytt(~).  These
      are fixed in version 3.1.3.
   )
+  it() Handling of the mytt(:q) and mytt(:x) with parameter subsitutions is
+  erratic: neither work in any 3.0 release, and tt(:x) doesn't work in
+  any release so far.
 
   Note that a few recent changes introduce incompatibilities (these
   are not bugs):
