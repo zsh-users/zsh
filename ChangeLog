@@ -1,3 +1,9 @@
+2002-06-07  Peter Stephenson  <pws@csr.com>
+
+	* 17301 (doc slightly tweaked): Src/Zle/zle_thingy.c,
+	Doc/Zsh/zle.yo: make `zle -I' only invalidate the display on the
+	first call to prevent spurious extra command lines appearing.
+
 2002-06-06  Peter Stephenson  <pws@csr.com>
 
 	* 17293: Src/Zle/zle_main.c, Doc/Zsh/zle.yo: support poll()

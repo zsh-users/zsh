@@ -672,7 +672,7 @@ bin_zle_call(char *name, char **args, char *ops, char func)
 static int
 bin_zle_invalidate(char *name, char **args, char *ops, char func)
 {
-    if (zleactive) {
+    if (zleactive && !trashedzle) {
 	trashzle();
 	return 0;
     } else

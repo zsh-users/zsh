@@ -472,8 +472,9 @@ example(if ztcp pwspc 2811; then
 fi)
 )
 item(tt(-I))(
-Unusually, this option is only useful em(outside) ordinary widget functions.
-It invalidates the current zle display in preparation for output; usually
+Unusually, this option is most useful outside ordinary widget functions,
+though it may be used within if normal output to the terminal is required.
+It invalidates the current zle display in preparation for output; typically
 this will be from a trap function.  It has no effect if zle is not
 active.  When a trap exits, the shell checks to see if the display needs
 restoring, hence the following will print output in such a way as not to
@@ -481,17 +482,23 @@ disturb the line being edited:
 
 example(TRAPUSR1() {
     # Invalidate zle display
-  zle -I
+  [[ -o zle ]] && zle -I
     # Show output
   print Hello
 })
 
-Note that there are better ways of manipulating the display from within zle
-widgets.  In general, the trap function may need to test whether zle is
-loaded before using this method; if it is not, there is no point in loading
-it specially since the line editor will not be active.
+In general, the trap function may need to test whether zle is active before
+using this method (as shown in the example), since the tt(zsh/zle) module
+may not even be loaded; if it is not, the command can be skipped.
 
-The status is zero if zle was active, else one.
+It is possible to call `tt(zle -I)' several times before control is
+returned to the editor; the display will only be invalidated the first time
+to minimise disruption.
+
+Note that there are normally better ways of manipulating the display from
+within zle widgets; see, for example, `tt(zle -R)' above.
+
+The status is zero if the current zle display was invalidated, else one.
 )
 item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
 Invoke the specified widget.  This can only be done when ZLE is
