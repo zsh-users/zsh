@@ -1867,12 +1867,13 @@ xpandbraces(LinkList list, LinkNode *np)
 	 * set of flags saying whether each character is present; *
 	 * the final list is in lexical order.                    */
 	char ccl[256], *p;
-	unsigned char c1, c2, lastch;
+	unsigned char c1, c2;
 	unsigned int len, pl;
+	int lastch = -1;
 
 	uremnode(list, node);
 	memset(ccl, 0, sizeof(ccl) / sizeof(ccl[0]));
-	for (p = str + 1, lastch = 0; p < str2;) {
+	for (p = str + 1; p < str2;) {
 	    if (itok(c1 = *p++))
 		c1 = ztokens[c1 - STOUC(Pound)];
 	    if ((char) c1 == Meta)
@@ -1881,10 +1882,10 @@ xpandbraces(LinkList list, LinkNode *np)
 		c2 = ztokens[c2 - STOUC(Pound)];
 	    if ((char) c2 == Meta)
 		c2 = 32 ^ p[1];
-	    if (c1 == '-' && lastch && p < str2 && (int)lastch <= (int)c2) {
-		while ((int)lastch < (int)c2)
+	    if (c1 == '-' && lastch >= 0 && p < str2 && lastch <= (int)c2) {
+		while (lastch < (int)c2)
 		    ccl[lastch++] = 1;
-		lastch = 0;
+		lastch = -1;
 	    } else
 		ccl[lastch = c1] = 1;
 	}
