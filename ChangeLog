@@ -1,3 +1,9 @@
+2002-04-09  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 16955: Completion/Unix/Type/.distfiles,
+	Completion/Unix/Type/_java_class: new function to handle
+	finding java classes.
+ 
 2002-04-08  Peter Stephenson  <pws@csr.com>
 
 	* 16942: Src/glob.c: Allow zero-length matches in parameter
