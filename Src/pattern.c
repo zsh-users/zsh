@@ -601,8 +601,8 @@ patcompbranch(int *flagp)
     *flagp = P_PURESTR;
 
     starter = chain = 0;
-    while (!memchr(patendseg, *patparse, patendseglen) &&
-	   (*patparse != Tilde ||
+    while (!memchr(patendseg, *patparse, patendseglen) ||
+	   (*patparse == Tilde &&
 	    memchr(patendseg, patparse[1], patendseglen))) {
 	if (isset(EXTENDEDGLOB) &&
 	    ((!isset(SHGLOB) &&
