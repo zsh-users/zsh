@@ -1,3 +1,8 @@
+2002-10-18  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Debian/Command/_apt: add showsrc part missing
+	from 16463.
+
 2002-10-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 17832: Completion/X/Command/_xloadimage: add default list of

@@ -477,7 +477,7 @@ _apt-cache () {
     /$'pkgnames\0'/ \| \
     /$'dotty\0'/ \| \
     /$'policy\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
-    /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends pkgnames dotty policy'
+    /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg showsrc stats dump dumpavail unmet check search show depends pkgnames dotty policy'
 
   _apt-cache () {
     local expl_action expl_packages expl_pkg_cache expl_src_cache
