@@ -56,9 +56,9 @@ BEGIN {limidx = 0}
 }
 # in case of GNU libc
 /^[\t ]*RLIM_NLIMITS[\t ]*=[\t ]*RLIMIT_NLIMITS/ {
-    nlimits = limidx
+    if(!nlimits) { nlimits = limidx }
 }
-/^[\t ]*RLIM_NLIMITS[\t ]*=[\t ]*[0-9][0-9]*/ {
+/^[\t ]*RLIMIT_NLIMITS[\t ]*=[\t ]*[0-9][0-9]*/ {
     limindex = index($0, "=")
     limtail = substr($0, limindex, 80)
     split(limtail, tmp)

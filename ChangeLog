@@ -1,5 +1,8 @@
 2001-05-28  Clint Adams  <schizo@debian.org>
 
+	* 14517: Src/Builtins/rlimits.awk: fix glibc2.2.3
+	handling.
+
 	* 14513: Completion/Debian/Command/.distfiles,
 	Completion/Debian/Command/_update_alternatives:
 	completion for update-alternatives
