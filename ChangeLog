@@ -1,5 +1,8 @@
 2000-06-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12067: Completion/Core/_history, Src/Zle/zle_tricky.c: typo in
+ 	_history; missing free()s in zle_tricky.c
+	
 	* 12066: Src/Zle/computil.c: missing allocation of list for option
  	arguments
 	

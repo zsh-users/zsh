@@ -604,6 +604,8 @@ docomplete(int lst)
 	    ll = strlen((char *) line);
 	    cs = ocs;
 	    unmetafy_line();
+	    zsfree(s);
+	    zsfree(qword);
 	    return 1;
 	}
 	ocs = cs;

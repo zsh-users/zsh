@@ -57,4 +57,4 @@ while [[ $compstate[nmatches] -eq 0 && beg -lt max ]]; do
   (( beg+=slice ))
 done
 
-(( $compstate[namtches] ))
+(( $compstate[nmatches] ))
