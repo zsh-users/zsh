@@ -581,7 +581,8 @@ docomplete(int lst)
     qisuf = ztrdup("");
     zsfree(autoq);
     autoq = NULL;
-    /* Get the word to complete. */
+    /* Get the word to complete.
+     * NOTE: get_comp_string() calls pushheap(), but not popheap(). */
     noerrs = 1;
     s = get_comp_string();
     DPUTS(wb < 0 || cs < wb || cs > we,
@@ -603,6 +604,7 @@ docomplete(int lst)
 	    strcpy((char *) line, ol);
 	    ll = strlen((char *) line);
 	    cs = ocs;
+	    popheap();
 	    unmetafy_line();
 	    zsfree(s);
 	    zsfree(qword);

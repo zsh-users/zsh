@@ -1,3 +1,8 @@
+2000-08-29  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12717: Src/Zle/zle_tricky.c: fix for unbalanced calls to
+ 	{push,pop}heap in docomplete()/get_comp_string()
+	
 2000-08-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12716: Doc/Zsh/builtins.yo, Doc/Zsh/compctl.yo,
