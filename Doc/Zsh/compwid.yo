@@ -240,6 +240,14 @@ matches generated be ignored and only the TAB be inserted.
 Finally, it may also be set to tt(all), which makes all matches
 generated be inserted into the line.
 )
+vindex(insert_positions, compstate)
+item(tt(insert_positions))(
+When the completion system inserts an unambiguous string into the
+line, there may be multiple places where characters are missing or
+where the character inserted differs from at least one match.  The
+value of this key contains a colon separated list of all these
+positions, as indexes into the command line.
+)
 vindex(last_prompt, compstate)
 item(tt(last_prompt))(
 If this is set to an non-empty string for every match added, the
@@ -396,6 +404,13 @@ This gives the position the cursor would be placed at if the
 common prefix in the tt(unambiguous) key were inserted, relative to
 the value of that key. The cursor would be placed before the character
 whose index is given by this key.
+)
+vindex(unambiguous_positions, compstate)
+item(tt(unambiguous_positions))(
+This contains all positions where characters in the unambiguous string
+are missing or where the character inserted differs from at least one
+of the matches.  The positions are given as indexes into the string
+given by the value of the tt(uanmbiguous) key.
 )
 vindex(vared, compstate)
 item(tt(vared))(

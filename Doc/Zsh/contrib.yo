@@ -316,6 +316,20 @@ followed by an appropriate tt(bindkey) command to associate the function
 with a key sequence.  Suggested bindings are described below.
 
 startitem()
+tindex(cycle-completion-positions)
+item(tt(cycle-completion-positions))(
+After inserting an unambiguous string into the command line, the new
+function based completion system may know about multiple places in
+this string where characters are missing or differ from at least one
+of the possible matches.  It will then place the cursor on the
+position it considers to be the most interesting one, i.e. the one
+where one can disambiguate between as many matches as possible with as 
+little typing as possible.
+
+This widget allows to easily move the cursor to the other interesting
+spots.  It can be invoked repeatedly to cycle between all positions
+reported by the completion system.
+)
 tindex(edit-command-line)
 item(tt(edit-command-line))(
 Edit the command line using your visual editor, as in tt(ksh).

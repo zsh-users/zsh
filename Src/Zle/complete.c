@@ -956,6 +956,10 @@ static struct compparam compkparams[] = {
     { "unambiguous", PM_SCALAR | PM_READONLY, NULL, NULL, VAL(get_unambig) },
     { "unambiguous_cursor", PM_INTEGER | PM_READONLY, NULL, NULL,
       VAL(get_unambig_curs) },
+    { "unambiguous_positions", PM_SCALAR | PM_READONLY, NULL, NULL,
+      VAL(get_unambig_pos) },
+    { "insert_positions", PM_SCALAR | PM_READONLY, NULL, NULL,
+      VAL(get_insert_pos) },
     { "list_max", PM_INTEGER, VAL(complistmax), NULL, NULL },
     { "last_prompt", PM_SCALAR, VAL(complastprompt), NULL, NULL },
     { "to_end", PM_SCALAR, VAL(comptoend), NULL, NULL },
@@ -1103,7 +1107,7 @@ get_complist(Param pm)
 static char *
 get_unambig(Param pm)
 {
-    return unambig_data(NULL);
+    return unambig_data(NULL, NULL, NULL);
 }
 
 /**/
@@ -1112,9 +1116,31 @@ get_unambig_curs(Param pm)
 {
     int c;
 
-    unambig_data(&c);
+    unambig_data(&c, NULL, NULL);
 
     return c;
+}
+
+/**/
+static char *
+get_unambig_pos(Param pm)
+{
+    char *p;
+
+    unambig_data(NULL, &p, NULL);
+
+    return p;
+}
+
+/**/
+static char *
+get_insert_pos(Param pm)
+{
+    char *p;
+
+    unambig_data(NULL, NULL, &p);
+
+    return p;
 }
 
 /**/

@@ -1,3 +1,11 @@
+2001-01-11  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13339: Doc/Zsh/compwid.yo, Doc/Zsh/contrib.yo,
+ 	Functions/Zle/cycle-completion-positions, Src/Zle/comp.h,
+ 	Src/Zle/complete.c, Src/Zle/compresult.c: add
+ 	unambiguous_positions and insert_positions keys to $compstate; use
+ 	them in the new cycle-completion-positions shell function widget
+
 2001-01-10  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: Etc/MACHINES: format leading spaces to tabs

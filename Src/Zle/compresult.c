@@ -154,18 +154,20 @@ cut_cline(Cline l)
     return l;
 }
 
-/* This builds the unambiguous string. If ins is non-zero, it is
- * immediatly inserted in the line. Otherwise csp is used to return
- * the relative cursor position in the string returned. */
+/* This builds the unambiguous string. If ins is one, it is immediately
+ * inserted into the line. Otherwise csp is used to return the relative
+ * cursor position in the string returned and posl contains all 
+ * positions with missing or ambiguous characters. If ins is two, csp
+ * and posl contain real command line positions (including braces). */
 
 /**/
 static char *
-cline_str(Cline l, int ins, int *csp)
+cline_str(Cline l, int ins, int *csp, LinkList posl)
 {
     Cline s;
     int ocs = cs, ncs, pcs, scs;
     int pm, pmax, pmm, pma, sm, smax, smm, sma, d, dm, mid;
-    int i, j, li = 0, cbr;
+    int i, j, li = 0, cbr, padd = (ins ? wb - ocs : -ocs);
     Brinfo brp, brs;
 
     l = cut_cline(l);
@@ -222,6 +224,8 @@ cline_str(Cline l, int ins, int *csp)
 
 		if ((s->flags & CLF_DIFF) && (!dm || (s->flags & CLF_MATCHED))) {
 		    d = cs; dm = s->flags & CLF_MATCHED;
+		    if (posl)
+			addlinknode(posl, (void *) ((long) (cs + padd)));
 		}
 		li += s->llen;
 	    }
@@ -242,12 +246,15 @@ cline_str(Cline l, int ins, int *csp)
 	}
 	/* Remember the position if this is the first prefix with
 	 * missing characters. */
-	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF) &&
-	    (((pmax < (l->max - l->min) || (pma && l->max != l->min)) &&
-	      (!pmm || (l->flags & CLF_MATCHED))) ||
-	     ((l->flags & CLF_MATCHED) && !pmm))) {
-	    pm = cs; pmax = l->max - l->min; pmm = l->flags & CLF_MATCHED;
-	    pma = ((l->prefix || l->suffix) && l->min == cline_sublen(l));
+	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF)) {
+	    if (posl && l->min != l->max)
+		addlinknode(posl, (void *) ((long) (cs + padd)));
+	    if (((pmax < (l->max - l->min) || (pma && l->max != l->min)) &&
+		 (!pmm || (l->flags & CLF_MATCHED))) ||
+		((l->flags & CLF_MATCHED) && !pmm)) {
+		pm = cs; pmax = l->max - l->min; pmm = l->flags & CLF_MATCHED;
+		pma = ((l->prefix || l->suffix) && l->min == cline_sublen(l));
+	    }
 	}
 	if (ins) {
 	    int ocs, bl;
@@ -291,12 +298,15 @@ cline_str(Cline l, int ins, int *csp)
 	if (l->flags & CLF_MISS) {
 	    if (l->flags & CLF_MID)
 		mid = cs;
-	    else if ((l->flags & CLF_SUF) && 
-		     (((smax < (l->min - l->max) || (sma && l->max != l->min)) &&
-		       (!smm || (l->flags & CLF_MATCHED))) ||
-		      ((l->flags & CLF_MATCHED) && !smm))) {
-		sm = cs; smax = l->min - l->max; smm = l->flags & CLF_MATCHED;
-		sma = ((l->prefix || l->suffix) && l->min == cline_sublen(l));
+	    else if (l->flags & CLF_SUF) {
+		if (posl && l->min != l->max)
+		    addlinknode(posl, (void *) ((long) (cs + padd)));
+		if (((smax < (l->min - l->max) || (sma && l->max != l->min)) &&
+		     (!smm || (l->flags & CLF_MATCHED))) ||
+		    ((l->flags & CLF_MATCHED) && !smm)) {
+		    sm = cs; smax = l->min - l->max; smm = l->flags & CLF_MATCHED;
+		    sma = ((l->prefix || l->suffix) && l->min == cline_sublen(l));
+		}
 	    }
 	}
 	if (ins) {
@@ -389,10 +399,14 @@ cline_str(Cline l, int ins, int *csp)
 	    cs += i;
 	    if (j >= 0 && (!dm || (js->flags & CLF_MATCHED))) {
 		d = cs - j; dm = js->flags & CLF_MATCHED;
+		if (posl)
+		    addlinknode(posl, (void *) ((long) (cs - j + padd)));
 	    }
 	}
 	l = l->next;
     }
+    if (posl)
+	addlinknode(posl, (void *) ((long) (cs + padd)));
     if (ins) {
 	int ocs = cs;
 
@@ -411,6 +425,17 @@ cline_str(Cline l, int ins, int *csp)
 	    sm += cs - ocs;
 	if (d >= ocs)
 	    d += cs - ocs;
+
+	if (posl) {
+	    LinkNode node;
+	    long p;
+
+	    for (node = firstnode(posl); node; incnode(node)) {
+		p = (long) getdata(node);
+		if (p >= ocs)
+		    setdata(node, (void *) (p + cs - ocs));
+	    }
+	}
     }
     /* This calculates the new cursor position. If we had a mid cline
      * with missing characters, we take this, otherwise if we have a
@@ -420,7 +445,7 @@ cline_str(Cline l, int ins, int *csp)
 	   (cbr >= 0 ? cbr :
 	    (pm >= 0 ? pm : (sm >= 0 ? sm : (d >= 0 ? d : cs)))));
 
-    if (!ins) {
+    if (ins != 1) {
 	/* We always inserted the string in the line. If that was not
 	 * requested, we copy it and remove from the line. */
 	char *r = zalloc((i = cs - ocs) + 1);
@@ -430,7 +455,8 @@ cline_str(Cline l, int ins, int *csp)
 	cs = ocs;
 	foredel(i);
 
-	*csp = ncs - ocs;
+	if (csp)
+	    *csp = ncs - ocs;
 
 	return r;
     }
@@ -440,31 +466,81 @@ cline_str(Cline l, int ins, int *csp)
     return NULL;
 }
 
+/* Small utility function turning a list of positions into a colon
+ * separated string. */
+
+static char *
+build_pos_string(LinkList list)
+{
+    LinkNode node;
+    int l;
+    char buf[40], *s;
+
+    for (node = firstnode(list), l = 0; node; incnode(node)) {
+	sprintf(buf, "%ld", (long) getdata(node));
+	setdata(node, dupstring(buf));
+	l += 1 + strlen(buf);
+    }
+    s = (char *) zalloc(l * sizeof(char));
+    *s = 0;
+    for (node = firstnode(list); node;) {
+	strcat(s, (char *) getdata(node));
+	incnode(node);
+	if (node)
+	    strcat(s, ":");
+    }
+    return s;
+}
+
 /* This is a utility function using the function above to allow access
  * to the unambiguous string and cursor position via compstate. */
 
 /**/
 char *
-unambig_data(int *cp)
+unambig_data(int *cp, char **pp, char **ip)
 {
-    static char *scache = NULL;
+    static char *scache = NULL, *pcache = NULL, *icache = NULL;
     static int ccache;
 
     if (mnum && ainfo) {
 	if (mnum != unambig_mnum) {
+	    LinkList list = newlinklist();
+
 	    zsfree(scache);
 	    scache = cline_str((ainfo->count ? ainfo->line : fainfo->line),
-			       0, &ccache);
+			       0, &ccache, list);
+	    zsfree(pcache);
+	    if (empty(list))
+		pcache = ztrdup("");
+	    else
+		pcache = build_pos_string(list);
+
+	    zsfree(icache);
+
+	    list = newlinklist();
+	    zsfree(cline_str((ainfo->count ? ainfo->line : fainfo->line),
+			     2, NULL, list));
+	    if (empty(list))
+		icache = ztrdup("");
+	    else
+		icache = build_pos_string(list);
 	}
     } else if (mnum != unambig_mnum || !ainfo || !scache) {
 	zsfree(scache);
 	scache = ztrdup("");
+	zsfree(pcache);
+	pcache = ztrdup("");
+	zsfree(icache);
+	icache = ztrdup("");
 	ccache = 0;
     }
     unambig_mnum = mnum;
     if (cp)
 	*cp = ccache + 1;
-
+    if (pp)
+	*pp = pcache;
+    if (ip)
+	*ip = icache;
     return scache;
 }
 
@@ -665,7 +741,7 @@ do_ambiguous(void)
 	foredel(we - wb);
 
 	/* Now get the unambiguous string and insert it into the line. */
-	cline_str(ainfo->line, 1, NULL);
+	cline_str(ainfo->line, 1, NULL, NULL);
 
 	/* Sometimes the different match specs used may result in a cline
 	 * that gives an empty string. If that happened, we re-insert the

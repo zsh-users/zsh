@@ -345,27 +345,31 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
 #define CP_UNAMBIG     (1 << CPN_UNAMBIG)
 #define CPN_UNAMBIGC   14
 #define CP_UNAMBIGC    (1 << CPN_UNAMBIGC)
-#define CPN_LISTMAX    15
+#define CPN_UNAMBIGP   15
+#define CP_UNAMBIGP    (1 << CPN_UNAMBIGP)
+#define CPN_INSERTP    16
+#define CP_INSERTP     (1 << CPN_INSERTP)
+#define CPN_LISTMAX    17
 #define CP_LISTMAX     (1 << CPN_LISTMAX)
-#define CPN_LASTPROMPT 16
+#define CPN_LASTPROMPT 18
 #define CP_LASTPROMPT  (1 << CPN_LASTPROMPT)
-#define CPN_TOEND      17
+#define CPN_TOEND      19
 #define CP_TOEND       (1 << CPN_TOEND)
-#define CPN_OLDLIST    18
+#define CPN_OLDLIST    20
 #define CP_OLDLIST     (1 << CPN_OLDLIST)
-#define CPN_OLDINS     19
+#define CPN_OLDINS     21
 #define CP_OLDINS      (1 << CPN_OLDINS)
-#define CPN_VARED      20
+#define CPN_VARED      22
 #define CP_VARED       (1 << CPN_VARED)
-#define CPN_LISTLINES  21
+#define CPN_LISTLINES  23
 #define CP_LISTLINES   (1 << CPN_LISTLINES)
-#define CPN_QUOTES     22
+#define CPN_QUOTES     24
 #define CP_QUOTES      (1 << CPN_QUOTES)
-#define CPN_IGNORED    23
+#define CPN_IGNORED    25
 #define CP_IGNORED     (1 << CPN_IGNORED)
 
-#define CP_KEYPARAMS   24
-#define CP_ALLKEYS     ((unsigned int) 0xffffff)
+#define CP_KEYPARAMS   26
+#define CP_ALLKEYS     ((unsigned int) 0x3ffffff)
 
 /* Hooks. */
 
