@@ -3,7 +3,7 @@
 local format
 
 format="$compconfig[message_format]"
-[[ -z "$format" ]] && "$compconfig[description_format]"
+[[ -z "$format" ]] && format="$compconfig[description_format]"
 
 if [[ -n "$format" ]]; then
   if [[ $compstate[nmatches] -eq 0 ]]; then

@@ -924,6 +924,7 @@ in one string with the option name, but may also be given as a
 separate argument after the option, a plus sign should be used
 instead. Finally, if the option may be given more than once, a star
 (`tt(*)') should be added in front of the var(opt-spec).
+)
 enditem()
 
 In each of the cases above, the var(action) says how the possible
