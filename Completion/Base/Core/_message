@@ -2,6 +2,19 @@
 
 local format raw
 
+if [[ "$1" = -e ]]; then
+  local expl ret=1
+
+  _comp_mesg=yes
+
+  _tags "$2" && while _next_label "$2" expl "$3"; do
+    compadd ${expl:/-X/-x}
+    ret=0
+  done
+
+  return ret
+fi
+
 _tags messages || return 1
 
 if [[ "$1" = -r ]]; then

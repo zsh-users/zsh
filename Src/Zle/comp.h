@@ -38,6 +38,7 @@ typedef struct cmatch *Cmatch;
 /* This is for explantion strings. */
 
 struct cexpl {
+    int always;                 /* display even without matches */
     char *str;			/* the string */
     int count;			/* the number of matches */
     int fcount;			/* number of matches with fignore ignored */

@@ -103,7 +103,7 @@ if compvalues -i "$@"; then
 
       # An empty action means that we should just display a message.
 
-      _message "$descr"
+      _message -e arguments "$descr"
       return 1
 
     elif [[ "$action" = \(\(*\)\) ]]; then

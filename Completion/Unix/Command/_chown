@@ -5,7 +5,7 @@ local suf usr grp req expl line
 line=( "${(@)words[2,CURRENT-1]:#-*}" )
 
 if [[ -prefix - ]]; then
-  _message option
+  _message -e options option
 elif [[ $#line -eq 0 ]]; then
   if [[ $service = chgrp ]] || compset -P '*[:.]'; then
     if (( EGID && $+commands[groups] )); then  # except for root

@@ -274,7 +274,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 
                 # An empty action means that we should just display a message.
 
-	        _message "$descr"
+	        _message -e "$subc" "$descr"
 	        mesg=yes
 	        tried=yes
                 alwopt=${alwopt:-yes}

@@ -268,7 +268,7 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
       fi
     fi
   fi
-elif [[ nm -le 1 && -n "$_comp_mesg" ]]; then
+elif [[ nm -lt 1 && -n "$_comp_mesg" ]]; then
   compstate[insert]=''
   compstate[list]='list force'
 elif [[ nm -eq 0 && -z "$_comp_mesg" &&

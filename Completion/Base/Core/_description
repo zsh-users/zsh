@@ -1,6 +1,6 @@
 #autoload
 
-local name gropt=-J format gname hidden hide match opts
+local name gropt=-J format gname hidden hide match opts tag
 
 opts=()
 
@@ -51,6 +51,8 @@ else
   _comp_ignore=()
 fi
 
+tag="$1"
+
 shift 2
 if [[ -z "$1" && $# -eq 1 ]]; then
   format=
@@ -70,6 +72,17 @@ else
   else
     set -A "$name" "$opts[@]" "$gropt" -default-
   fi
+fi
+
+if ! (( ${funcstack[2,-1][(I)_description]} )) &&
+   zstyle -a ":completion:${curcontext}:$tag" fake match; then
+
+  local descr
+
+  descr=( "${(@M)match:#*[^\\]:*}" )
+
+  compadd "${(@P)name}" - "${(@)${(@)match:#*[^\\]:*}:s/\\:/:/}"
+  (( $#descr )) && _describe -t "$tag" '' descr "${(@P)name}"
 fi
 
 return 0

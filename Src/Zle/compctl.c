@@ -3808,9 +3808,9 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    if (cc->gname) {
 		endcmgroup(yaptr);
 		begcmgroup(cc->gname, gflags);
-		addexpl();
+		addexpl(0);
 	    } else {
-		addexpl();
+		addexpl(0);
 		endcmgroup(yaptr);
 		begcmgroup("default", 0);
 	    }
@@ -3825,7 +3825,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    untokenize(tt);
 	}
 	curexpl->str = tt;
-	addexpl();
+	addexpl(0);
     }
     if (cc->subcmd) {
 	/* Handle -l sub-completion. */

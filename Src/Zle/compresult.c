@@ -1494,10 +1494,12 @@ calclist(int showall)
 	}
 	if ((e = g->expls)) {
 	    while (*e) {
-		if ((*e)->count &&
+		if (((*e)->count || (*e)->always) &&
 		    (!onlyexpl ||
-		     (onlyexpl & ((*e)->count > 0 ? 1 : 2))))
-		    nlines += 1 + printfmt((*e)->str, (*e)->count, 0, 1);
+		     (onlyexpl & ((*e)->always > 0 ? 2 : 1))))
+		    nlines += 1 + printfmt((*e)->str,
+                                           ((*e)->always ? -1 : (*e)->count),
+                                           0, 1);
 		e++;
 	    }
 	}
@@ -1840,9 +1842,9 @@ printlist(int over, CLPrintFunc printm, int showall)
 	    int l;
 
 	    while (*e) {
-		if ((*e)->count &&
+		if (((*e)->count || (*e)->always) &&
 		    (!listdat.onlyexpl ||
-		     (listdat.onlyexpl & ((*e)->count > 0 ? 1 : 2)))) {
+		     (listdat.onlyexpl & ((*e)->always > 0 ? 2 : 1)))) {
 		    if (pnl) {
 			putc('\n', shout);
 			pnl = 0;
@@ -1853,7 +1855,8 @@ printlist(int over, CLPrintFunc printm, int showall)
 				tcout(TCCLEAREOD);
 			}
 		    }
-		    l = printfmt((*e)->str, (*e)->count, 1, 1);
+		    l = printfmt((*e)->str,
+                                 ((*e)->always ? -1 : (*e)->count), 1, 1);
 		    ml += l;
 		    if (cl >= 0 && (cl -= l) <= 1) {
 			cl = -1;

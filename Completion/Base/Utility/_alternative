@@ -31,7 +31,7 @@ while _tags; do
 
         # An empty action means that we should just display a message.
 
-        mesgs=( "$mesgs[@]" "$descr")
+        mesgs=( "$mesgs[@]" "${def%%:*}:$descr")
       elif [[ "$action" = \(\(*\)\) ]]; then
         local ws
 
@@ -76,7 +76,7 @@ while _tags; do
 done
 
 for descr in "$mesgs[@]"; do
-  _message "$descr"
+  _message -e "${descr%%:*}" "${desc#*:}"
 done
 
 return 1

@@ -36,7 +36,7 @@ if [[ -n "$compcontext" ]]; then
 
     case "$action" in
     \ #)
-      _message "$descr";;
+      _message -e "$tag" "$descr";;
 
     \(\(*\)\))
       eval ws\=\( "${action[3,-3]}" \)

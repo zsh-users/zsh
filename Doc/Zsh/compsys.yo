@@ -1120,6 +1120,22 @@ generated this way,
 this will also cycle through the names of the files in pathname
 components after the first ambiguous one.
 )
+kindex(fake, completion style)
+item(tt(fake))(
+This style may be set for every completion context and is used to
+specify additional strings to complete in that context.  It's values
+are either the strings to complete with every colon quoted by a
+preceding backslash or strings of the form
+`var(string)tt(:)var(description)'.  In the latter case the var(string)s
+will be shown together with the var(description)s in completion
+listings.
+
+Note that you only really want to use this style for a narrow
+enough context, so that the additional string won't show up in other
+contexts.  Also note the styles tt(fake-files) and tt(fake-parameters)
+which give more control over additional strings to add when completing
+files or parameters.
+)
 kindex(fake-files, completion style)
 item(tt(fake-files))(
 This style is used when completing files and looked up 
@@ -3676,7 +3692,8 @@ tt(_guard)), only the message will be displayed and if the `tt(-n)' is
 followed by another character, only options are completed.
 )
 findex(_message)
-item(tt(_message) [ -r ] var(descr))(
+xitem(tt(_message) [ tt(-r) ] var(descr))
+item(tt(_message -e) var(tag descr))(
 The var(descr) is used like the third
 argument to the tt(_description) function. However, the resulting
 string will always be shown whether or not matches were
@@ -3691,6 +3708,10 @@ If the tt(-r) option is given, no style is used and the var(descr) is
 used literally as the string to display. This is only used in cases
 where that string is taken from some pre-processed argument list
 containing an expanded description.
+
+In the second form, the var(descr) is added like a description added
+by tt(_description) under the given var(tag), but the var(descr) will
+always be shown even if no matches are added for the var(tag).
 )
 findex(_multi_parts)
 item(tt(_multi_parts) var(sep) var(array))(

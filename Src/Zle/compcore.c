@@ -1618,6 +1618,18 @@ addmatches(Cadata dat, char **argv)
     Brinfo bp, bpl = brbeg, obpl, bsl = brend, obsl;
     Heap oldheap;
 
+    SWITCHHEAPS(oldheap, compheap) {
+        if (dat->mesg || dat->exp) {
+            curexpl = (Cexpl) zhalloc(sizeof(struct cexpl));
+            curexpl->always = !!dat->mesg;
+            curexpl->count = curexpl->fcount = 0;
+            curexpl->str = dupstring(dat->mesg ? dat->mesg : dat->exp);
+            if (dat->mesg)
+                addexpl(1);
+        } else
+            curexpl = NULL;
+    } SWITCHBACKHEAPS(oldheap);
+
     if (!*argv && !dat->dummies && !(dat->aflags & CAF_ALL)) {
 	SWITCHHEAPS(oldheap, compheap) {
 	    /* Select the group in which to store the matches. */
@@ -1631,8 +1643,6 @@ addmatches(Cadata dat, char **argv)
 		endcmgroup(NULL);
 		begcmgroup("default", 0);
 	    }
-	    if (dat->mesg)
-		addmesg(dat->mesg);
 	} SWITCHBACKHEAPS(oldheap);
 
 	return 1;
@@ -1689,13 +1699,6 @@ addmatches(Cadata dat, char **argv)
 		dparr = NULL;
 	    dparl = newlinklist();
 	}
-	if (dat->exp) {
-	    curexpl = (Cexpl) zhalloc(sizeof(struct cexpl));
-	    curexpl->count = curexpl->fcount = 0;
-	    curexpl->str = dupstring(dat->exp);
-	} else
-	    curexpl = NULL;
-
 	/* Store the matcher in our stack of matchers. */
 	if (dat->match) {
 	    mst.next = mstack;
@@ -1889,8 +1892,6 @@ addmatches(Cadata dat, char **argv)
 	    endcmgroup(NULL);
 	    begcmgroup("default", 0);
 	}
-	if (dat->mesg)
-	    addmesg(dat->mesg);
 	if (*argv) {
 	    if (dat->pre)
 		dat->pre = dupstring(dat->pre);
@@ -2057,7 +2058,7 @@ addmatches(Cadata dat, char **argv)
 	if (dat->dpar)
 	    set_list_array(dat->dpar, dparl);
 	if (dat->exp)
-	    addexpl();
+	    addexpl(0);
 	if (!hasallmatch && (dat->aflags & CAF_ALL)) {
             addmatch("<all>", dat->flags | CMF_ALL, &disp, 1);
 	    hasallmatch = 1;
@@ -2496,45 +2497,31 @@ endcmgroup(char **ylist)
 
 /**/
 mod_export void
-addexpl(void)
+addexpl(int always)
 {
     LinkNode n;
     Cexpl e;
 
     for (n = firstnode(expls); n; incnode(n)) {
 	e = (Cexpl) getdata(n);
-	if (e->count >= 0 && !strcmp(curexpl->str, e->str)) {
+	if (!strcmp(curexpl->str, e->str)) {
 	    e->count += curexpl->count;
 	    e->fcount += curexpl->fcount;
-
+            if (always) {
+                e->always = 1;
+                nmessages++;
+                newmatches = 1;
+                mgroup->new = 1;
+            }
 	    return;
 	}
     }
     addlinknode(expls, curexpl);
     newmatches = 1;
-}
-
-/* Add a message to the current group. Make sure it is shown. */
-
-/**/
-mod_export void
-addmesg(char *mesg)
-{
-    LinkNode n;
-    Cexpl e;
-
-    for (n = firstnode(expls); n; incnode(n)) {
-	e = (Cexpl) getdata(n);
-	if (e->count < 0 && !strcmp(mesg, e->str))
-	    return;
+    if (always) {
+        mgroup->new = 1;
+        nmessages++;
     }
-    e = (Cexpl) zhalloc(sizeof(*e));
-    e->count = e->fcount = -1;
-    e->str = dupstring(mesg);
-    addlinknode(expls, e);
-    newmatches = 1;
-    mgroup->new = 1;
-    nmessages++;
 }
 
 /* The comparison function for matches (used for sorting). */
@@ -2852,6 +2839,7 @@ permmatches(int last)
 		for (eq = g->expls; (o = *eq); eq++, ep++) {
 		    *ep = e = (Cexpl) zcalloc(sizeof(struct cexpl));
 		    e->count = (fi ? o->fcount : o->count);
+                    e->always = o->always;
 		    e->fcount = 0;
 		    e->str = ztrdup(o->str);
 		}

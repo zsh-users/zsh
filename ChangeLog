@@ -1,3 +1,17 @@
+2002-01-22  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16483: Completion/Base/Completer/_complete,
+	Completion/Base/Core/_description,
+	Completion/Base/Core/_main_complete,
+	Completion/Base/Core/_message,
+	Completion/Base/Utility/_alternative,
+	Completion/Base/Utility/_arguments,
+	Completion/Base/Utility/_values, Completion/Unix/Command/_chown,
+	Doc/Zsh/compsys.yo, Src/Zle/comp.h, Src/Zle/compcore.c,
+	Src/Zle/compctl.c, Src/Zle/complist.c, Src/Zle/compresult.c:
+	add new generic fake style and changes to the C-code for that
+	(different implementation of compadd -x)
+
 2002-01-21  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16472: Completion/Base/Completer/_complete,

@@ -1042,9 +1042,9 @@ compprintlist(int showall)
 		lastused = 1;
 	    }
 	    while (*e) {
-		if ((*e)->count &&
+		if (((*e)->count || (*e)->always) &&
 		    (!listdat.onlyexpl ||
-		     (listdat.onlyexpl & ((*e)->count > 0 ? 1 : 2)))) {
+		     (listdat.onlyexpl & ((*e)->always > 0 ? 2 : 1)))) {
 		    if (pnl) {
 			if (dolistnl(ml) && compprintnl(ml))
 			    goto end;
@@ -1058,8 +1058,9 @@ compprintlist(int showall)
 		    }
 		    if (mlbeg < 0 && mfirstl < 0)
 			mfirstl = ml;
-		    l = compprintfmt((*e)->str, (*e)->count, dolist(ml), 1,
-				     ml, &stop);
+		    l = compprintfmt((*e)->str,
+                                     ((*e)->always ? -1 : (*e)->count),
+                                     dolist(ml), 1, ml, &stop);
 		    if (mselect >= 0) {
 			int mm = (mcols * ml), i;
 
