@@ -90,7 +90,7 @@ case $line[1] in
   fi
   ;;
 
-  (move|download|openProperties)
+  (move|download|copy|openProperties)
   if [[ $state = firstarg ]]; then
       _webbrowser
       return

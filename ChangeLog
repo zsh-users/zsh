@@ -1,3 +1,8 @@
+2005-03-05  Andrey Borzenkov  <bor@zsh.org>
+
+	* Tobias Gruetzmacher: 20932: Completion/X/Command/_kfmclient:
+	Add copy command
+
 2005-03-04  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* unposted: Src/Zle/zle_refresh.c: correct deliberate mistake.
