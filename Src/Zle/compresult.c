@@ -1287,7 +1287,7 @@ calclist(void)
 				if (!(m->flags & CMF_DISPLINE))
 				    glines += 1 + (mlens[m->gnum] / columns);
 			    } else if (!(m->flags & CMF_NOLIST))
-				glines += 1 + ((1 + mlens[m->gnum]) / columns);
+				glines += 1 + ((mlens[m->gnum]) / columns);
 			}
 		}
 	    }
