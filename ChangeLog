@@ -1,5 +1,8 @@
 2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10465: Src/Zle/computil.c: fix for completion of options
+	after option with rest-arguments
+
 	* 10463: Src/builtin.c, Src/params.c, Src/zsh.h: PM_HASHELEM
 	flag to keep association elements from being exported with
 	ALL_EXPORT set

@@ -1427,7 +1427,8 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	if ((ca_laststate.opt || (ca_laststate.doff && ca_laststate.def) ||
 	     (ca_laststate.def &&
 	      (ca_laststate.def->type == CAA_OPT ||
-	       ca_laststate.def->type >= CAA_RARGS))) &&
+	       (ca_laststate.def->type >= CAA_RARGS &&
+		ca_laststate.def->num < 0)))) &&
 	    (!ca_laststate.def || ca_laststate.def->type < CAA_RARGS ||
 	     (ca_laststate.def->type == CAA_RARGS ?
 	      (ca_laststate.curpos == ca_laststate.argbeg + 1) :
