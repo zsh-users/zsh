@@ -704,7 +704,7 @@ createparam(char *name, int flags)
 	if (isset(ALLEXPORT) && !(flags & PM_HASHELEM))
 	    flags |= PM_EXPORTED;
     } else {
-	pm = (Param) zhalloc(sizeof *pm);
+	pm = (Param) hcalloc(sizeof *pm);
 	pm->nam = nulstring;
     }
     pm->flags = flags & ~PM_LOCAL;
@@ -727,6 +727,7 @@ copyparam(Param tpm, Param pm, int toplevel)
      * with sets.?fn() usage).
      */
     tpm->flags = pm->flags;
+    tpm->ct = pm->ct;
     if (!toplevel)
 	tpm->flags &= ~PM_SPECIAL;
     switch (PM_TYPE(pm->flags)) {
@@ -2551,6 +2552,7 @@ usernamesetfn(Param pm, char *x)
 	}
     }
 #endif /* HAVE_SETUID && HAVE_GETPWNAM */
+    zsfree(x);
 }
 
 /* Function to get value for special parameter `UID' */

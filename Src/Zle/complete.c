@@ -403,7 +403,7 @@ parse_class(Cpattern p, unsigned char *s, unsigned char e)
 
     n = !n;
     while (*s && (k || *s != e)) {
-	if (s[1] == '-' && s[2] != e) {
+	if (s[1] == '-' && s[2] && s[2] != e) {
 	    /* a run of characters */
 	    for (j = (int) *s; j <= (int) s[2]; j++)
 		p->tab[j] = (eq ? i++ : n);

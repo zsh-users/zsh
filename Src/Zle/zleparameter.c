@@ -54,7 +54,8 @@ createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan)
     pm->gets.hfn = hashgetfn;
     pm->sets.hfn = hashsetfn;
     pm->unsetfn = stdunsetfn;
-    pm->u.hash = ht = newhashtable(7, name, NULL);
+    pm->u.hash = ht = newhashtable(0, name, NULL);
+    pm->ct = 0;
 
     ht->hash        = hasher;
     ht->emptytable  = (TableFunc) shempty;
@@ -100,27 +101,24 @@ getpmwidgets(HashTable ht, char *name)
     Param pm = NULL;
     Thingy th;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if ((th = (Thingy) thingytab->getnode(thingytab, name)) &&
-	    !(th->flags & DISABLED))
-	    pm->u.str = widgetstr(th->widget);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
+    if ((th = (Thingy) thingytab->getnode(thingytab, name)) &&
+	!(th->flags & DISABLED))
+	pm->u.str = widgetstr(th->widget);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -145,7 +143,9 @@ scanpmwidgets(HashTable ht, ScanFunc func, int flags)
     for (i = 0; i < thingytab->hsize; i++)
 	for (hn = thingytab->nodes[i]; hn; hn = hn->next) {
 	    pm.nam = hn->nam;
-	    if (func != scancountparams)
+	    if (func != scancountparams &&
+		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		 !(flags & SCANPM_WANTKEYS)))
 		pm.u.str = widgetstr(((Thingy) hn)->widget);
 	    func((HashNode) &pm, flags);
 	}
@@ -185,10 +185,10 @@ struct pardef {
 };
 
 static struct pardef partab[] = {
-    { "zlewidgets", PM_READONLY,
+    { "widgets", PM_READONLY,
       getpmwidgets, scanpmwidgets, hashsetfn,
       NULL, NULL, stdunsetfn, NULL },
-    { "zlekeymaps", PM_ARRAY|PM_HIDE|PM_SPECIAL|PM_READONLY,
+    { "keymaps", PM_ARRAY|PM_SPECIAL|PM_READONLY,
       NULL, NULL, NULL,
       arrsetfn, keymapsgetfn, stdunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
@@ -196,14 +196,14 @@ static struct pardef partab[] = {
 
 /**/
 int
-setup_zleparameter(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_zleparameter(Module m)
+boot_(Module m)
 {
     struct pardef *def;
 
@@ -218,7 +218,7 @@ boot_zleparameter(Module m)
 	    if (def->hsetfn)
 		def->pm->sets.hfn = def->hsetfn;
 	} else {
-	    if (!(def->pm = createparam(def->name, def->flags)))
+	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE)))
 		return 1;
 	    def->pm->sets.afn = def->setfn;
 	    def->pm->gets.afn = def->getfn;
@@ -228,11 +228,9 @@ boot_zleparameter(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
-cleanup_zleparameter(Module m)
+cleanup_(Module m)
 {
     Param pm;
     struct pardef *def;
@@ -249,9 +247,7 @@ cleanup_zleparameter(Module m)
 
 /**/
 int
-finish_zleparameter(Module m)
+finish_(Module m)
 {
     return 0;
 }
-
-#endif

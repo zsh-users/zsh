@@ -1,5 +1,11 @@
 2001-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 14605: Src/params.c, Src/Modules/parameter.c,
+	Src/Zle/complete.c, Src/Zle/computil.c, Src/Zle/zleparameter.c:
+	fix two memory leaks (at least I hope they are fixed) and some
+	out-of-bound array accesses, plus some defensive programming
+	for heap allocated param structs
+
 	* 14602: Completion/Base/Utility/_values,
 	Functions/Misc/nslookup: better prompt matching in nslookup;
 	fix separator handling in _multi_parts

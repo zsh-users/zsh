@@ -819,8 +819,9 @@ parse_cadef(char *nam, char **args)
 	    if (!multi) {
 		if (!xor) {
 		    xor = (char **) zalloc(2 * sizeof(char *));
-		    xor[1] = NULL;
+		    xor[0] = xor[1] = NULL;
 		}
+                zsfree(xor[xnum]);
 		xor[xnum] = ztrdup(rembslashcolon(name));
 	    }
 	    if (c == ':') {
@@ -1029,7 +1030,7 @@ get_cadef(char *nam, char **args)
     Cadef *p, *min, new;
     int i, na = arrlen(args);
 
-    for (i = MAX_CACACHE, p = cadef_cache, min = NULL; *p && i; p++, i--)
+    for (i = MAX_CACACHE, p = cadef_cache, min = NULL; i && *p; p++, i--)
 	if (*p && na == (*p)->ndefs && arrcmp(args, (*p)->defs)) {
 	    (*p)->lastt = time(0);
 
