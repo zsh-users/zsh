@@ -11,7 +11,7 @@ _urpmi_cache_policy() {
 case "$service" in
     urpmi.addmedia )
 	_arguments -A '-*' \
-	    "-update[mark as update media]" \
+	    "--update[mark as update media]" \
 	    ":name of media: " \
 	    ":media URL:->media_url" \
 	    ": :(with)" \

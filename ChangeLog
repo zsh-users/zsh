@@ -1,3 +1,8 @@
+2001-11-16  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
+
+	* 16258: Completion/Mandrake/Command/_urpmi:
+	Fix typo in _urpmi for urpmi.addmedia.
+
 2001-11-15  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_clint_setup:
