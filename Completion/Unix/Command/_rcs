@@ -1,4 +1,4 @@
-#compdef co ci rcs
+#compdef co ci rcs rcsdiff
 
 local ret=1
 

@@ -1,5 +1,7 @@
 2002-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* Zvi Har'El: Completion/Unix/Command/_rcs: complete also for rcsdiff
+
 	* 17928: Zvi Har'El <rl@math.technion.ac.il>:
 	Functions/Zle/edit-command-line: don't interpret escapes when
 	setting the command buffer
