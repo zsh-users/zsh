@@ -784,7 +784,7 @@ zsh_STRUCT_MEMBER([
 dnl need to integrate this function
 dnl AC_FUNC_STRFTIME
 
-AC_CHECK_FUNCS(memcpy memmove \
+AC_CHECK_FUNCS(lchown memcpy memmove \
               strftime waitpid select poll tcsetpgrp tcgetattr strstr lstat \
               getlogin setpgid gettimeofday gethostname mkfifo wait3 difftime \
               sigblock sigsetmask sigrelse sighold killpg sigaction getrlimit \

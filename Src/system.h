@@ -583,6 +583,10 @@ struct timezone {
 # define R_OK 4
 #endif
 
+#ifndef HAVE_LCHOWN
+# define lchown chown
+#endif
+
 #ifndef HAVE_MEMCPY
 # define memcpy memmove
 #endif
