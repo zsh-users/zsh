@@ -30,12 +30,13 @@
 #include "terminfo.mdh"
 #include "terminfo.pro"
 
+/**/
+#ifdef HAVE_TIGETSTR
+
 static char terminfo_nam[] = "terminfo";
 static Param terminfo_pm;
 
 /* echoti: output a terminfo capability */
-
-#ifdef HAVE_TIGETSTR
 
 /**/
 static int
@@ -79,11 +80,13 @@ bin_echoti(char *name, char **argv, char *ops, int func)
     return 0;
 }
 
-#else
+/**/
+#else /* !HAVE_TIGETSTR */
 
 #define bin_echoti bin_notavail
 
-#endif
+/**/
+#endif /* !HAVE_TIGETSTR */
 
 static struct builtin bintab[] = {
     BUILTIN("echoti", 0, bin_echoti, 1, -1, 0, NULL, NULL),
@@ -93,6 +96,7 @@ static struct builtin bintab[] = {
 
 static int incleanup;
 
+/**/
 #ifdef HAVE_TIGETSTR
 
 /* Empty dummy function for special hash parameters. */
@@ -195,6 +199,7 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 {
 }
 
+/**/
 #endif /* HAVE_TIGETSTR */
 
 /**/
@@ -225,7 +230,9 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
+#ifdef HAVE_TIGETSTR
     Param pm;
+#endif
 
     incleanup = 1;
 
