@@ -150,6 +150,8 @@ zstyle -s ":completion:${curcontext}:files" ignore-parents ignpar
 if [[ -n "$compstate[pattern_match]" &&
       ( ( -z "$SUFFIX" && "$PREFIX" = *\([^\|\~]##\) ) ||
         "$SUFFIX" =  *\([^\|\~]##\) ) ]]; then
+  # Copy all glob qualifiers from the line to
+  # the patterns used when generating matches
   if [[ "$SUFFIX" = *\([^\|\~]##\) ]]; then
     tmp3="${${(M)SUFFIX%\([^\|\~]##\)}[2,-2]}"
     SUFFIX="${SUFFIX%\($tmp3\)}"

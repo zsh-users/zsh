@@ -1,3 +1,8 @@
+2000-05-29  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Completion/Core/_path_files: Add a comment to explain
+	the change made in 11635.
+
 2000-05-29  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11638: Doc/Zsh/compsys.yo: doc fix, missing `)'
