@@ -3,6 +3,19 @@
 	* 17078: Completion/Base/Utility/_describe: fix _arguments' -s
 	option
 
+2002-05-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16613 (modified): acconfig.h, zshconfig.ac, Src/init.c: detect
+	variant tgetent() return value and test for it correctly.
+
+	* unposted; based on 16032: Src/exec.c, Src/glob.c, Src/subst.c:
+	split tokenize() into a second function shtokenize() and a static
+	function zshtokenize() which implements both of them; tokenize()
+	ignores SH_GLOB, shtokenize() respects it.
+	
+	* unposted: Doc/Zsh/options.yo: explain the effect of unreadable
+	directories in PATH, etc., on the CORRECT option.
+
 2002-05-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 17072; based on 17066 (Danek Duvall):
