@@ -1,5 +1,8 @@
 2005-01-12  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk, README, Etc/FAQ.yo: release
+	zsh version 4.2.2.
+
 	* unposted: Completion/Unix/Command/_perforce: minor comment
 	change.
 
