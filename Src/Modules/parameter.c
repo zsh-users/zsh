@@ -1325,6 +1325,83 @@ scanpmjobstates(HashTable ht, ScanFunc func, int flags)
     }
 }
 
+/* Functions for the jobdirs special parameter. */
+
+/**/
+static char *
+pmjobdir(int job)
+{
+    char *ret;
+
+    ret = dupstring(jobtab[job].pwd);
+    return ret;
+}
+
+/**/
+static HashNode
+getpmjobdir(HashTable ht, char *name)
+{
+    Param pm = NULL;
+    int job;
+
+    HEAPALLOC {
+       pm = (Param) zhalloc(sizeof(struct param));
+       pm->nam = dupstring(name);
+       pm->flags = PM_SCALAR | PM_READONLY;
+       pm->sets.cfn = NULL;
+       pm->gets.cfn = strgetfn;
+       pm->unsetfn = NULL;
+       pm->ct = 0;
+       pm->env = NULL;
+       pm->ename = NULL;
+       pm->old = NULL;
+       pm->level = 0;
+
+       if ((job = atoi(name)) >= 1 && job < MAXJOB &&
+           jobtab[job].stat && jobtab[job].procs &&
+           !(jobtab[job].stat & STAT_NOPRINT))
+           pm->u.str = pmjobdir(job);
+       else {
+           pm->u.str = dupstring("");
+           pm->flags |= PM_UNSET;
+       }
+    } LASTALLOC;
+
+    return (HashNode) pm;
+}
+
+/**/
+static void
+scanpmjobdirs(HashTable ht, ScanFunc func, int flags)
+{
+    struct param pm;
+    int job;
+    char buf[40];
+
+    pm.flags = PM_SCALAR | PM_READONLY;
+    pm.sets.cfn = NULL;
+    pm.gets.cfn = strgetfn;
+    pm.unsetfn = NULL;
+    pm.ct = 0;
+    pm.env = NULL;
+    pm.ename = NULL;
+    pm.old = NULL;
+    pm.level = 0;
+
+    for (job = 1; job < MAXJOB; job++) {
+       if (jobtab[job].stat && jobtab[job].procs &&
+           !(jobtab[job].stat & STAT_NOPRINT)) {
+           sprintf(buf, "%d", job);
+           pm.nam = dupstring(buf);
+           if (func != scancountparams &&
+               ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+                !(flags & SCANPM_WANTKEYS)))
+               pm.u.str = pmjobdir(job);
+           func((HashNode) &pm, flags);
+       }
+    }
+}
+
 /* Functions for the nameddirs special parameter. */
 
 /**/
@@ -1833,6 +1910,9 @@ static struct pardef partab[] = {
     { "jobstates", PM_READONLY,
       getpmjobstate, scanpmjobstates, hashsetfn,
       NULL, NULL, stdunsetfn, NULL },
+    { "jobdirs", PM_READONLY,
+      getpmjobdir, scanpmjobdirs, hashsetfn,
+      NULL, NULL, stdunsetfn, NULL },
     { "nameddirs", 0,
       getpmnameddir, scanpmnameddirs, setpmnameddirs,
       NULL, NULL, stdunsetfn, NULL },
@@ -1889,8 +1969,7 @@ boot_parameter(Module m)
 	    if (def->hsetfn)
 		def->pm->sets.hfn = def->hsetfn;
 	} else {
-	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE |
-					PM_REMOVABLE)))
+	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE)))
 		return 1;
 	    def->pm->sets.afn = def->setfn;
 	    def->pm->gets.afn = def->getfn;
