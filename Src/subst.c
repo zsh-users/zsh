@@ -1022,7 +1022,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    aspar = 0;
 	} else if (aspar)
 	    idbeg = val;
-	copied = 1;
 	*s = sav;
 	while (INULL(*s))
 	    s++;
