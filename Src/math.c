@@ -383,9 +383,10 @@ zzlex(void)
 		return NUM;
 	    }
 	    else if (isset(OCTALZEROES) &&
-		    (memchr(ptr, '.', strlen(ptr)) == NULL)) {
+		    (memchr(ptr, '.', strlen(ptr)) == NULL) &&
+		     idigit(*ptr)) {
 	        yyval.u.l = zstrtol(ptr, &ptr, lastbase = 8);
-	        return NUM;
+		return NUM;
 	    }
 	/* Fall through! */
 	default:

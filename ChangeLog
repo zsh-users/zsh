@@ -1,3 +1,8 @@
+2002-04-25  Peter Stephenson  <pws@csr.com>
+
+	* 17046: Src/math.c: OCTAL_ZEROES with a `0' on its own was
+	swallowing up too many characters.
+
 2002-04-25  Clint Adams  <clint@zsh.org>
 
 	* 17044: Completion/Unix/Command/_w3m: complete all files, not
