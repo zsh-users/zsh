@@ -1,3 +1,8 @@
+2004-07-19  Oliver Kiddle  <opk@zsh.org>
+
+	* Jean-Baptiste Quenot: 20167: Completion/Unix/Command/_ant:
+	find targets enclosed in single instead of double quotes
+
 2004-07-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 20173: Src/mem.c: crash when globbing lots of files; need to

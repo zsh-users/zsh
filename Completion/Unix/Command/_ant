@@ -86,7 +86,7 @@ case $state in
 	buildfile=${(v)opt_args[(I)(-f|-file|-buildfile)]:-build.xml}
       fi
       if [[ -f $buildfile ]]; then
-	targets=( $(sed -n 's/ *<target name="\([^"]*\)".*/\1/p' < $buildfile) )
+        targets=( $(sed -n "s/ *<target name=[\"']\([^\"']*\)[\"'].*/\1/p" < $buildfile) )
 	_wanted targets expl target compadd -a targets && ret=0
       else
 	_message -e targets target
