@@ -1,5 +1,8 @@
 2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10977: and Andrej: 10976: Completion/User/_make: use $words[1]
+ 	to call make in _make and throw away stderr and use _call
+	
 	* 10974: Completion/Base/_arguments: ensure $PWD is prepended to
  	cache-names for long options in _arguments
 	
