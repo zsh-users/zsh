@@ -1420,7 +1420,7 @@ getnumvalue(Value v)
 	mn.type = MN_FLOAT;
 	mn.u.d = v->pm->gets.ffn(v->pm);
     } else
-	return mathnumber(getstrvalue(v));
+	return matheval(getstrvalue(v));
     return mn;
 }
 
