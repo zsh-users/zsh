@@ -1,5 +1,9 @@
 2000-08-08  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/xmods.conf, Src/Aliases/*: Remove Src/Aliases
+	files and delete alias modules from xmods.conf (should now
+	use `zmodload -A' to generate module aliases).
+
 	* 12561: Completion/Builtins/_zmodload, Doc/Zsh/builtins.yo,
 	Src/builtin.c, Src/module.c, Src/zsh.h: aliases for modules
 	done internally via `zmodload -[AR]'.

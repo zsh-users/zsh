@@ -1,8 +1,0 @@
-DISTFILES_SRC='
-    .cvsignore .distfiles .exrc .preconfig
-    alias.mdd.in alias.c.in
-    cap.mdd clone.mdd compctl.mdd complete.mdd complist.mdd
-    computil.mdd deltochar.mdd example.mdd files.mdd mapfile.mdd
-    mathfunc.mdd parameter.mdd rlimits.mdd sched.mdd stat.mdd
-    zftp.mdd zle.mdd zleparameter.mdd zutil.mdd
-'
