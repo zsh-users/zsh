@@ -136,7 +136,7 @@
   rm fn
 0:trap DEBUG
 >Line 1
->Line 1
+>Line 2
 
   TRAPZERR() { print Command failed; }
   true

@@ -943,6 +943,11 @@ endtrapscope(void)
 /**/
 int intrap;
 
+/* Is the current trap a function? */
+
+/**/
+int trapisfunc;
+
 /**/
 void
 dotrapargs(int sig, int *sigtr, void *sigfn)
@@ -1001,19 +1006,19 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	zaddlinknode(args, num);
 
 	trapreturn = -1;	/* incremented by doshfunc */
+	trapisfunc = isfunc = 1;
+
 	sfcontext = SFC_SIGNAL;
 	doshfunc(name, sigfn, args, 0, 1);
 	sfcontext = osc;
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
 
-	isfunc = 1;
     } else {
 	trapreturn = -2;	/* not incremented, used at current level */
+	trapisfunc = isfunc = 0;
 
 	execode(sigfn, 1, 0);
-
-	isfunc = 0;
     }
     runhookdef(AFTERTRAPHOOK, NULL);
 
