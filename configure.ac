@@ -2007,18 +2007,21 @@ char *argv[];
   fi
   if test -n "$GCC"; then
     case "$host_os" in
+      hpux*)   DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
       darwin*) DLCFLAGS="${DLCFLAGS=-fno-common}" ;;
       *)       DLCFLAGS="${DLCFLAGS=-fPIC}" ;;
     esac
   else
     case "$host_os" in
-      hpux*)                 DLCFLAGS="${DLCFLAGS=+z}" ;;
+      hpux*)
+        DLCFLAGS="${DLCFLAGS=+z}"
+        DLLDFLAGS="${DLLDFLAGS=-b}"
+      ;;
       sunos*)                DLCFLAGS="${DLCFLAGS=-pic}" ;;
       solaris*|sysv4*|esix*) DLCFLAGS="${DLCFLAGS=-KPIC}" ;;
     esac
   fi
   case "$host_os" in
-    hpux*)        DLLDFLAGS="${DLLDFLAGS=-b}" ;;
     freebsd*|linux*|irix*|osf*|gnu*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
     sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
