@@ -743,7 +743,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     char *p1 = NULL, *p2 = NULL;
     FILE *oshout = NULL;
 
-    if (unset(USEZLE)) {
+    if ((interact && unset(USEZLE)) || !strcmp(term, "emacs")) {
 	zwarnnam(name, "ZLE not enabled", NULL, 0);
 	return 1;
     }
