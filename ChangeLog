@@ -1,5 +1,8 @@
 2001-05-29  Clint Adams  <clint@zsh.org>
 
+	* 14541: %# with capabilities should prompt-expand to #
+	iff (euid=0 or the Effective set is non-empty).
+
 	* 14538: cleaner _perl_config_vars from Matt Zimmerman.
 
 	* 14536: Completion/Debian/Command/_update-alternatives:
