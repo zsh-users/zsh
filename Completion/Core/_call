@@ -11,5 +11,3 @@ if zstyle -s ":completion:${curcontext}:${1}" command tmp; then
 else
   eval "$argv[2,-1]"
 fi
-
-return $?

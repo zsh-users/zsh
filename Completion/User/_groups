@@ -7,7 +7,7 @@ _tags groups || return 1
 if ! zstyle -a ":completion:${curcontext}:" groups groups; then
   (( $+_cache_groups )) ||
       if (( ${+commands[ypcat]} )) &&
-	  tmp=$(_call groups ypcat group.byname); then
+	  tmp=$(_call groups ypcat group.byname 2>/dev/null); then
         : ${(A)_cache_groups:=${${(f)tmp}%%:*}} # If you use YP
       else
         : ${(A)_cache_groups:=${${(s: :)$(</etc/group)}%%:*}}
