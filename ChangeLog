@@ -1,3 +1,8 @@
+001-06-22  Andrej Borsenkow  <bor@zsh.org>
+
+        * 15021: Src/prompt.c, Doc/Zsh/prompt.yo: revert to old %l
+	semantic; add new %y character instead as suggested by Wayne
+
 2001-06-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15020: Completion/Zsh/Command/_cd, Completion/Zsh/Context/_autocd,

@@ -1,4 +1,4 @@
-texinode(Prompt Expansion)(Restricted Shell)(Compatibility)(Top)
+texinode(Prompt Expansion)(Expansion)(Conditional Expressions)(Top)
 chapter(Prompt Expansion)
 ifzman(\
 sect(Prompt Expansion)
@@ -44,7 +44,8 @@ xitem(tt(%d))
 item(tt(%/))(
 Present working directory (tt($PWD)).  If an integer follows the `tt(%)',
 it specifies a number of trailing components of tt($PWD) to show; zero
-means the whole path.
+means the whole path.  A negative integer specifies leading components,
+i.e. tt(%-1d) specifies the first component.
 )
 item(tt(%~))(
 As tt(%d) and tt(%/), but if tt($PWD) has a named directory as its prefix,
@@ -64,7 +65,8 @@ The full machine hostname.
 item(tt(%m))(
 The hostname up to the first `tt(.)'.
 An integer may follow the `tt(%)' to specify
-how many components of the hostname are desired.
+how many components of the hostname are desired.  With a negative integer,
+trailing components of the hostname are shown.
 )
 item(tt(%S) LPAR()tt(%s)RPAR())(
 Start (stop) standout mode.
@@ -93,7 +95,7 @@ The name of the script, sourced file, or shell function that zsh is
 currently executing, whichever was started most recently.  If there is
 none, this is equivalent to the parameter tt($0).  An integer may follow
 the `tt(%)' to specify a number of trailing path components to show; zero
-means the full path.
+means the full path.  A negative integer specifies leading components.
 )
 item(tt(%i))(
 The line number currently being executed in the script, sourced file, or
@@ -118,7 +120,12 @@ tt(%K)/tt(%L) correspond to tt(%k)/tt(%l) for the hour of the day
 (24/12 hour clock) in the same way.
 )
 item(tt(%l))(
-The line (tty) the user is logged in on.
+The line (tty) the user is logged in on without tt(/dev/) prefix.
+If name starts with tt(/dev/tty) this is stripped.
+)
+item(tt(%y))(
+The line (tty) the user is logged in on without tt(/dev/) prefix.
+It does not treat tt(/dev/tty*) specially.
 )
 item(tt(%?))(
 The return code of the last command executed just before the prompt.
@@ -126,7 +133,7 @@ The return code of the last command executed just before the prompt.
 item(tt(%_))(
 The status of the parser, i.e. the shell constructs (like `tt(if)' and
 `tt(for)') that have been started on the command line. If given an integer
-number that many strings will be printed; zero or no integer means
+number that many strings will be printed; zero or negative or no integer means
 print as many as there are.  This is most useful in prompts tt(PS2) for
 continuation lines and tt(PS4) for debugging with the tt(XTRACE) option; in
 the latter case it will also work non-interactively.
@@ -145,7 +152,8 @@ capability vectors.
 item(tt(%v))(
 vindex(psvar, use of)
 The value of the first element of the tt(psvar) array parameter.  Following
-the `tt(%)' with an integer gives that element of the array.
+the `tt(%)' with an integer gives that element of the array.  Negative
+integers count from the end of the array.
 )
 item(tt(%{)...tt(%}))(
 Include a string as a literal escape sequence.
@@ -163,10 +171,9 @@ var(true-text)
 and var(false-text) may both contain arbitrarily-nested escape
 sequences, including further ternary expressions.
 
-The left
-parenthesis may be preceded or followed by a positive integer var(n),
-which defaults to zero.  The test character var(x) may be any of the
-following:
+The left parenthesis may be preceded or followed by a positive integer var(n),
+which defaults to zero.  A negative integer will be multiplied by -1.
+The test character var(x) may be any of the following:
 
 startsitem()
 sxitem(tt(c))
