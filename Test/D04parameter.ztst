@@ -212,10 +212,17 @@
 >split me
 >I'm yours
 
-  foo='$(print Howzat)'
-  print ${(e)foo}
+  foo='$(print Howzat usay)'
+  print -l ${(e)foo}
 0:${(e)...}
 >Howzat
+>usay
+
+  foo='`print Howzat usay`'
+  print -l ${(e)foo}
+0:Regress ${(e)...} with backticks (see zsh-workers/15871)
+>Howzat
+>usay
 
   foo='I'\''m nearly out of my mind with tedium'
   bar=foo

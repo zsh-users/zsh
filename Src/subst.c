@@ -133,7 +133,7 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		str3 = (char *)getdata(node);
 		continue;
 	    }
-	} else if ((qt = c == Qtick) || c == Tick)
+	} else if ((qt = c == Qtick) || (c == Tick ? (mult_isarr = 1) : 0))
 	  comsub: {
 	    LinkList pl;
 	    char *s, *str2 = str;
@@ -724,9 +724,12 @@ subst_parse_str(char **sp, int single, int err)
             int qt = 0;
 
 	    for (; *s; s++)
-		if (!qt && *s == Qstring)
-		    *s = String;
-                else if (*s == Dnull)
+		if (!qt) {
+		    if (*s == Qstring)
+			*s = String;
+		    else if (*s == Qtick)
+			*s = Tick;
+                } else if (*s == Dnull)
                     qt = !qt;
 	}
 	return 0;
@@ -1492,7 +1495,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
             /* This once was executed only `if (qt) ...'. But with that
              * patterns in a expansion resulting from a ${(e)...} aren't
              * tokenized even though this function thinks they are (it thinks
-             * they are because subst_parse_string() turns Qstring tokens
+             * they are because subst_parse_str() turns Qstring tokens
              * into String tokens and for unquoted parameter expansions the
              * lexer normally does tokenize patterns inside parameter
              * expansions). */

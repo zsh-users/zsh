@@ -1,3 +1,8 @@
+2001-09-25  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15871, 15872: Src/subst.c, Test/D04parameter.ztst: Equivalence
+	of `...` and $(...) in parameter substitutions, e.g. ${(e)...}.
+
 2001-09-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15868, 15869: Src/text.c: job text building code couldn't handle
