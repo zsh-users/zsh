@@ -68,7 +68,7 @@ getposint(char *instr, char *nam)
 
 /**/
 static int
-bin_sysread(char *nam, char **args, Options ops, int func)
+bin_sysread(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int infd = 0, outfd = -1, bufsize = SYSREAD_BUFSIZE, count;
     char *outvar = NULL, *countvar = NULL, *inbuf;
@@ -236,7 +236,7 @@ bin_sysread(char *nam, char **args, Options ops, int func)
 
 /**/
 static int
-bin_syswrite(char *nam, char **args, Options ops, int func)
+bin_syswrite(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int outfd = 1, len, count, totcount;
     char *countvar = NULL;
@@ -290,7 +290,7 @@ bin_syswrite(char *nam, char **args, Options ops, int func)
 
 /**/
 static int
-bin_syserror(char *nam, char **args, Options ops, int func)
+bin_syserror(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int num = 0;
     char *errvar = NULL, *msg, *pfx = "", *str;
@@ -345,7 +345,7 @@ bin_syserror(char *nam, char **args, Options ops, int func)
 
 /**/
 static char **
-errnosgetfn(Param pm)
+errnosgetfn(UNUSED(Param pm))
 {
     /* arrdup etc. should really take const pointers as arguments */
     return arrdup((char **)sys_errnames);
@@ -363,7 +363,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -414,7 +414,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

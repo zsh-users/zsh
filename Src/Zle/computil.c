@@ -717,7 +717,7 @@ cd_get(char **params)
 
 /**/
 static int
-bin_compdescribe(char *nam, char **args, Options ops, int func)
+bin_compdescribe(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int n = arrlen(args);
 
@@ -2259,7 +2259,7 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
 }
 
 static int
-bin_comparguments(char *nam, char **args, Options ops, int func)
+bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int min, max, n;
     Castate lstate = &ca_laststate;
@@ -3136,7 +3136,7 @@ cv_parse_word(Cvdef d)
 }
 
 static int
-bin_compvalues(char *nam, char **args, Options ops, int func)
+bin_compvalues(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int min, max, n;
 
@@ -3349,7 +3349,7 @@ comp_quote(char *str, int prefix)
 }
 
 static int
-bin_compquote(char *nam, char **args, Options ops, int func)
+bin_compquote(char *nam, char **args, Options ops, UNUSED(int func))
 {
     char *name;
     struct value vbuf;
@@ -3500,7 +3500,7 @@ arrcontains(char **a, char *s, int colon)
 }
 
 static int
-bin_comptags(char *nam, char **args, Options ops, int func)
+bin_comptags(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int min, max, n, level;
 
@@ -3630,7 +3630,7 @@ bin_comptags(char *nam, char **args, Options ops, int func)
 }
 
 static int
-bin_comptry(char *nam, char **args, Options ops, int func)
+bin_comptry(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     if (incompfunc != 1) {
 	zwarnnam(nam, "can only be called from completion function", NULL, 0);
@@ -4092,7 +4092,7 @@ cfp_opt_pats(char **pats, char *matcher)
 }
 
 static LinkList
-cfp_bld_pats(int dirs, LinkList names, char *skipped, char **pats)
+cfp_bld_pats(UNUSED(int dirs), LinkList names, char *skipped, char **pats)
 {
     LinkList ret = newlinklist();
     LinkNode node;
@@ -4322,7 +4322,7 @@ cf_remove_other(char **names, char *pre, int *amb)
 }
 
 static int
-bin_compfiles(char *nam, char **args, Options ops, int func)
+bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     if (incompfunc != 1) {
 	zwarnnam(nam, "can only be called from completion function", NULL, 0);
@@ -4424,7 +4424,7 @@ bin_compfiles(char *nam, char **args, Options ops, int func)
 }
 
 static int
-bin_compgroups(char *nam, char **args, Options ops, int func)
+bin_compgroups(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     Heap oldheap;
     char *n;
@@ -4467,7 +4467,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     memset(cadef_cache, 0, sizeof(cadef_cache));
     memset(cvdef_cache, 0, sizeof(cvdef_cache));
@@ -4496,7 +4496,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     int i;
 

@@ -58,7 +58,7 @@ doinsert(char *str)
 
 /**/
 mod_export int
-selfinsert(char **args)
+selfinsert(UNUSED(char **args))
 {
     char s[3], *p = s;
 
@@ -118,7 +118,7 @@ backwarddeletechar(char **args)
 
 /**/
 int
-killwholeline(char **args)
+killwholeline(UNUSED(char **args))
 {
     int i, fg, n = zmult;
 
@@ -138,7 +138,7 @@ killwholeline(char **args)
 
 /**/
 int
-killbuffer(char **args)
+killbuffer(UNUSED(char **args))
 {
     cs = 0;
     forekill(ll, 0);
@@ -173,7 +173,7 @@ backwardkillline(char **args)
 
 /**/
 int
-gosmacstransposechars(char **args)
+gosmacstransposechars(UNUSED(char **args))
 {
     int cc;
 
@@ -193,7 +193,7 @@ gosmacstransposechars(char **args)
 
 /**/
 int
-transposechars(char **args)
+transposechars(UNUSED(char **args))
 {
     int cc, ct;
     int n = zmult;
@@ -232,7 +232,7 @@ transposechars(char **args)
 
 /**/
 int
-poundinsert(char **args)
+poundinsert(UNUSED(char **args))
 {
     cs = 0;
     vifirstnonblank(zlenoargs);
@@ -264,7 +264,7 @@ poundinsert(char **args)
 
 /**/
 int
-acceptline(char **args)
+acceptline(UNUSED(char **args))
 {
     done = 1;
     return 0;
@@ -272,7 +272,7 @@ acceptline(char **args)
 
 /**/
 int
-acceptandhold(char **args)
+acceptandhold(UNUSED(char **args))
 {
     zpushnode(bufstack, metafy((char *)line, ll, META_DUP));
     stackcs = cs;
@@ -307,7 +307,7 @@ killline(char **args)
 
 /**/
 int
-killregion(char **args)
+killregion(UNUSED(char **args))
 {
     if (mark > ll)
 	mark = ll;
@@ -320,7 +320,7 @@ killregion(char **args)
 
 /**/
 int
-copyregionaskill(char **args)
+copyregionaskill(UNUSED(char **args))
 {
     if (mark > ll)
 	mark = ll;
@@ -341,7 +341,7 @@ static Cutbuffer kctbuf;
 
 /**/
 int
-yank(char **args)
+yank(UNUSED(char **args))
 {
     int n = zmult;
 
@@ -367,7 +367,7 @@ yank(char **args)
 
 /**/
 int
-yankpop(char **args)
+yankpop(UNUSED(char **args))
 {
     int cc, kctstart = kct;
     Cutbuffer buf;
@@ -426,7 +426,7 @@ yankpop(char **args)
 
 /**/
 int
-overwritemode(char **args)
+overwritemode(UNUSED(char **args))
 {
     insmode ^= 1;
     return 0;
@@ -434,7 +434,7 @@ overwritemode(char **args)
 
 /**/
 int
-whatcursorposition(char **args)
+whatcursorposition(UNUSED(char **args))
 {
     char msg[100];
     char *s = msg;
@@ -473,7 +473,7 @@ whatcursorposition(char **args)
 
 /**/
 int
-undefinedkey(char **args)
+undefinedkey(UNUSED(char **args))
 {
     return 1;
 }
@@ -501,7 +501,7 @@ quotedinsert(char **args)
 
 /**/
 int
-digitargument(char **args)
+digitargument(UNUSED(char **args))
 {
     int sign = (zmult < 0) ? -1 : 1;
 
@@ -525,7 +525,7 @@ digitargument(char **args)
 
 /**/
 int
-negargument(char **args)
+negargument(UNUSED(char **args))
 {
     if (zmod.flags & MOD_TMULT)
 	return 1;
@@ -568,7 +568,7 @@ universalargument(char **args)
 
 /**/
 int
-copyprevword(char **args)
+copyprevword(UNUSED(char **args))
 {
     int len, t0;
 
@@ -589,7 +589,7 @@ copyprevword(char **args)
 
 /**/
 int
-copyprevshellword(char **args)
+copyprevshellword(UNUSED(char **args))
 {
     LinkList l;
     LinkNode n;
@@ -615,7 +615,7 @@ copyprevshellword(char **args)
 
 /**/
 int
-sendbreak(char **args)
+sendbreak(UNUSED(char **args))
 {
     errflag = 1;
     return 1;
@@ -623,7 +623,7 @@ sendbreak(char **args)
 
 /**/
 int
-quoteregion(char **args)
+quoteregion(UNUSED(char **args))
 {
     char *str;
     size_t len;
@@ -648,7 +648,7 @@ quoteregion(char **args)
 
 /**/
 int
-quoteline(char **args)
+quoteline(UNUSED(char **args))
 {
     char *str;
     size_t len = ll;
@@ -692,7 +692,7 @@ static int cmdambig;
 
 /**/
 static void
-scancompcmd(HashNode hn, int flags)
+scancompcmd(HashNode hn, UNUSED(int flags))
 {
     int l;
     Thingy t = (Thingy) hn;

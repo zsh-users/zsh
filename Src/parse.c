@@ -2400,7 +2400,7 @@ dump_find_func(Wordcode h, char *name)
 
 /**/
 int
-bin_zcompile(char *nam, char **args, Options ops, int func)
+bin_zcompile(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int map, flags, ret;
     char *dump;

@@ -171,7 +171,7 @@ setpmmapfile(Param pm, char *value)
 
 /**/
 static void
-unsetpmmapfile(Param pm, int exp)
+unsetpmmapfile(Param pm, UNUSED(int exp))
 {
     /* Unlink the file given by pm->nam */
     char *fname = ztrdup(pm->nam);
@@ -259,7 +259,7 @@ get_contents(char *fname)
 
 /**/
 static HashNode
-getpmmapfile(HashTable ht, char *name)
+getpmmapfile(UNUSED(HashTable ht), char *name)
 {
     char *contents;
     Param pm = NULL;
@@ -290,7 +290,7 @@ getpmmapfile(HashTable ht, char *name)
 
 /**/
 static void
-scanpmmapfile(HashTable ht, ScanFunc func, int flags)
+scanpmmapfile(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     DIR *dir;
@@ -327,14 +327,14 @@ scanpmmapfile(HashTable ht, ScanFunc func, int flags)
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     /* Create the special associative array. */
 
@@ -346,7 +346,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_(UNUSED(Module m))
 {
     Param pm;
 
@@ -362,7 +362,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

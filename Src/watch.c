@@ -559,7 +559,7 @@ dowatch(void)
 
 /**/
 int
-bin_log(char *nam, char **argv, Options ops, int func)
+bin_log(UNUSED(char *nam), UNUSED(char **argv), UNUSED(Options ops), UNUSED(int func))
 {
     if (!watch)
 	return 1;

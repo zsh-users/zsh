@@ -528,7 +528,7 @@ bin_enable(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_set(char *nam, char **args, Options ops, int func)
+bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int action, optno, array = 0, hadopt = 0,
 	hadplus = 0, hadend = 0, sort = 0;
@@ -656,7 +656,7 @@ int doprintdir = 0;		/* set in exec.c (for autocd) */
 
 /**/
 int
-bin_pwd(char *name, char **argv, Options ops, int func)
+bin_pwd(UNUSED(char *name), UNUSED(char **argv), Options ops, UNUSED(int func))
 {
     if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'P') ||
 	(isset(CHASELINKS) && !OPT_ISSET(ops,'L')))
@@ -677,7 +677,7 @@ mod_export LinkList dirstack;
 
 /**/
 int
-bin_dirs(char *name, char **argv, Options ops, int func)
+bin_dirs(UNUSED(char *name), char **argv, Options ops, UNUSED(int func))
 {
     LinkList l;
 
@@ -1722,7 +1722,7 @@ enum {
 
 /**/
 static Param
-typeset_single(char *cname, char *pname, Param pm, int func,
+typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	       int on, int off, int roff, char *value, Param altpm,
 	       Options ops, int auxlen, int joinchar)
 {
@@ -2914,7 +2914,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 
 /**/
 int
-bin_hash(char *name, char **argv, Options ops, int func)
+bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 {
     HashTable ht;
     Patprog pprog;
@@ -3017,7 +3017,7 @@ bin_hash(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_unhash(char *name, char **argv, Options ops, int func)
+bin_unhash(char *name, char **argv, Options ops, UNUSED(int func))
 {
     HashTable ht;
     HashNode hn, nhn;
@@ -3089,7 +3089,7 @@ bin_unhash(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_alias(char *name, char **argv, Options ops, int func)
+bin_alias(char *name, char **argv, Options ops, UNUSED(int func))
 {
     Alias a;
     Patprog pprog;
@@ -3189,7 +3189,7 @@ bin_alias(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_true(char *name, char **argv, Options ops, int func)
+bin_true(UNUSED(char *name), UNUSED(char **argv), UNUSED(Options ops), UNUSED(int func))
 {
     return 0;
 }
@@ -3198,7 +3198,7 @@ bin_true(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_false(char *name, char **argv, Options ops, int func)
+bin_false(UNUSED(char *name), UNUSED(char **argv), UNUSED(Options ops), UNUSED(int func))
 {
     return 1;
 }
@@ -3829,7 +3829,7 @@ bin_print(char *name, char **args, Options ops, int func)
 
 /**/
 int
-bin_shift(char *name, char **argv, Options ops, int func)
+bin_shift(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     int num = 1, l, ret = 0;
     char **s;
@@ -3880,7 +3880,7 @@ int optcind;
 
 /**/
 int
-bin_getopts(char *name, char **argv, Options ops, int func)
+bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     int lenstr, lenoptstr, quiet, lenoptbuf;
     char *optstr = unmetafy(*argv++, &lenoptstr), *var = *argv++;
@@ -3987,7 +3987,7 @@ exit_pending;
 
 /**/
 int
-bin_break(char *name, char **argv, Options ops, int func)
+bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 {
     int num = lastval, nump = 0;
 
@@ -4138,7 +4138,7 @@ zexit(int val, int from_where)
 
 /**/
 int
-bin_dot(char *name, char **argv, Options ops, int func)
+bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     char **old, *old0 = NULL;
     int ret, diddot = 0, dotdot = 0;
@@ -4216,7 +4216,7 @@ bin_dot(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_emulate(char *nam, char **argv, Options ops, int func)
+bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 {
     emulate(*argv, OPT_ISSET(ops,'R'));
     if (OPT_ISSET(ops,'L'))
@@ -4228,7 +4228,7 @@ bin_emulate(char *nam, char **argv, Options ops, int func)
 
 /**/
 int
-bin_eval(char *nam, char **argv, Options ops, int func)
+bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     Eprog prog;
     char *oscriptname = scriptname;
@@ -4266,7 +4266,7 @@ file/buffer. */
 
 /**/
 int
-bin_read(char *name, char **args, Options ops, int func)
+bin_read(char *name, char **args, Options ops, UNUSED(int func))
 {
     char *reply, *readpmpt;
     int bsiz, c = 0, gotnl = 0, al = 0, first, nchars = 1, bslash, keys = 0;
@@ -4791,7 +4791,7 @@ testlex(void)
 
 /**/
 int
-bin_test(char *name, char **argv, Options ops, int func)
+bin_test(char *name, char **argv, UNUSED(Options ops), int func)
 {
     char **s;
     Eprog prog;
@@ -4846,7 +4846,7 @@ bin_test(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_times(char *name, char **argv, Options ops, int func)
+bin_times(UNUSED(char *name), UNUSED(char **argv), UNUSED(Options ops), UNUSED(int func))
 {
     struct tms buf;
 
@@ -4868,7 +4868,7 @@ bin_times(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_trap(char *name, char **argv, Options ops, int func)
+bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     Eprog prog;
     char *arg, *s;
@@ -4944,7 +4944,7 @@ bin_trap(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_ttyctl(char *name, char **argv, Options ops, int func)
+bin_ttyctl(UNUSED(char *name), UNUSED(char **argv), Options ops, UNUSED(int func))
 {
     if (OPT_ISSET(ops,'f'))
 	ttyfrozen = 1;
@@ -4959,7 +4959,7 @@ bin_ttyctl(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_let(char *name, char **argv, Options ops, int func)
+bin_let(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     mnumber val = zero_mnumber;
 
@@ -4978,7 +4978,7 @@ bin_let(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_umask(char *nam, char **args, Options ops, int func)
+bin_umask(char *nam, char **args, Options ops, UNUSED(int func))
 {
     mode_t um;
     char *s = *args;
@@ -5089,7 +5089,7 @@ bin_umask(char *nam, char **args, Options ops, int func)
 
 /**/
 mod_export int
-bin_notavail(char *nam, char **argv, Options ops, int func)
+bin_notavail(char *nam, UNUSED(char **argv), UNUSED(Options ops), UNUSED(int func))
 {
     zwarnnam(nam, "not available on this system", NULL, 0);
     return 1;

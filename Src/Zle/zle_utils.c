@@ -424,7 +424,7 @@ showmsg(char const *msg)
 
 /**/
 int
-handlefeep(char **args)
+handlefeep(UNUSED(char **args))
 {
     zbeep();
     return 0;
@@ -565,7 +565,7 @@ setlastline(void)
 
 /**/
 int
-undo(char **args)
+undo(UNUSED(char **args))
 {
     handleundo();
     do {
@@ -610,7 +610,7 @@ unapplychange(struct change *ch)
 
 /**/
 int
-redo(char **args)
+redo(UNUSED(char **args))
 {
     handleundo();
     do {

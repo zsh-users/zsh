@@ -2068,7 +2068,7 @@ zfgetinfo(char *prompt, int noecho)
 
 /**/
 static int
-zftp_params(char *name, char **args, int flags)
+zftp_params(UNUSED(char *name), char **args, UNUSED(int flags))
 {
     char *prompts[] = { "Host: ", "User: ", "Password: ", "Account: " };
     char **aptr, **newarr;
@@ -2122,7 +2122,7 @@ zftp_params(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_login(char *name, char **args, int flags)
+zftp_login(char *name, char **args, UNUSED(int flags))
 {
     char *ucmd, *passwd = NULL, *acct = NULL;
     char *user, tbuf[2] = "X";
@@ -2255,7 +2255,7 @@ zftp_login(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_test(char *name, char **args, int flags)
+zftp_test(UNUSED(char *name), UNUSED(char **args), UNUSED(int flags))
 {
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
     int ret;
@@ -2336,7 +2336,7 @@ zftp_dir(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_cd(char *name, char **args, int flags)
+zftp_cd(UNUSED(char *name), char **args, int flags)
 {
     /* change directory --- enhance to allow 'zftp cdup' */
     int ret;
@@ -2468,7 +2468,7 @@ zftp_type(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_mode(char *name, char **args, int flags)
+zftp_mode(char *name, char **args, UNUSED(int flags))
 {
     char *str, cmd[] = "MODE X\r\n";
     int nt;
@@ -2495,7 +2495,7 @@ zftp_mode(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_local(char *name, char **args, int flags)
+zftp_local(UNUSED(char *name), char **args, int flags)
 {
     int more = !!args[1], ret = 0, dofd = !*args;
     while (*args || dofd) {
@@ -2638,7 +2638,7 @@ zftp_getput(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_delete(char *name, char **args, int flags)
+zftp_delete(UNUSED(char *name), char **args, UNUSED(int flags))
 {
     int ret = 0;
     char *cmd, **aptr;
@@ -2655,7 +2655,7 @@ zftp_delete(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_mkdir(char *name, char **args, int flags)
+zftp_mkdir(UNUSED(char *name), char **args, int flags)
 {
     int ret;
     char *cmd = tricat((flags & ZFTP_DELE) ? "RMD " : "MKD ",
@@ -2669,7 +2669,7 @@ zftp_mkdir(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_rename(char *name, char **args, int flags)
+zftp_rename(UNUSED(char *name), char **args, UNUSED(int flags))
 {
     int ret;
     char *cmd;
@@ -2693,7 +2693,7 @@ zftp_rename(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_quote(char *name, char **args, int flags)
+zftp_quote(UNUSED(char *name), char **args, int flags)
 {
     int ret = 0;
     char *cmd;
@@ -2785,7 +2785,7 @@ zfclose(int leaveparams)
 
 /**/
 static int
-zftp_close(char *name, char **args, int flags)
+zftp_close(UNUSED(char *name), UNUSED(char **args), UNUSED(int flags))
 {
     zfclose(0);
     return 0;
@@ -2892,7 +2892,7 @@ freesession(Zftp_session sptr)
 
 /**/
 static int
-zftp_session(char *name, char **args, int flags)
+zftp_session(UNUSED(char *name), char **args, UNUSED(int flags))
 {
     if (!*args) {
 	LinkNode nptr;
@@ -2918,7 +2918,7 @@ zftp_session(char *name, char **args, int flags)
 
 /**/
 static int
-zftp_rmsession(char *name, char **args, int flags)
+zftp_rmsession(UNUSED(char *name), char **args, UNUSED(int flags))
 {
     int no;
     LinkNode nptr;
@@ -3005,7 +3005,7 @@ zftp_rmsession(char *name, char **args, int flags)
 
 /**/
 static int
-bin_zftp(char *name, char **args, Options ops, int func)
+bin_zftp(char *name, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char fullname[20] = "zftp ";
     char *cnam = *args++, *prefs, *ptr;
@@ -3157,7 +3157,7 @@ zftp_cleanup(void)
 }
 
 static int
-zftpexithook(Hookdef d, void *dummy)
+zftpexithook(UNUSED(Hookdef d), UNUSED(void *dummy))
 {
     zftp_cleanup();
     return 0;
@@ -3167,7 +3167,7 @@ zftpexithook(Hookdef d, void *dummy)
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     /* setup_ returns 0 for success. require_module returns 1 for success. */
     return !require_module("", "zsh/net/tcp", 0, 0);
@@ -3175,7 +3175,7 @@ setup_(Module m)
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     int ret;
     if ((ret = addbuiltins("zftp", bintab,
@@ -3199,7 +3199,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_(UNUSED(Module m))
 {
     deletehookfunc("exit", zftpexithook);
     zftp_cleanup();
@@ -3208,7 +3208,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

@@ -870,7 +870,7 @@ ztat(char *nam, struct stat *buf, int ls)
 
 /**/
 void
-do_allmatches(int end)
+do_allmatches(UNUSED(int end))
 {
     int first = 1, nm = nmatches - 1, omc = menucmp, oma = menuacc, e;
     Cmatch *mc;
@@ -1176,7 +1176,7 @@ do_menucmp(int lst)
 
 /**/
 int
-reverse_menu(Hookdef dummy, void *dummy2)
+reverse_menu(UNUSED(Hookdef dummy), UNUSED(void *dummy2))
 {
     do {
 	if (minfo.cur == (minfo.group)->matches) {
@@ -2091,7 +2091,7 @@ bld_all_str(Cmatch all)
 
 /**/
 static void
-iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
+iprintm(Cmgroup g, Cmatch *mp, UNUSED(int mc), UNUSED(int ml), int lastc, int width)
 {
     Cmatch m;
     int len = 0;
@@ -2128,7 +2128,7 @@ iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 
 /**/
 int
-ilistmatches(Hookdef dummy, Chdata dat)
+ilistmatches(UNUSED(Hookdef dummy), UNUSED(Chdata dat))
 {
     calclist(0);
 
@@ -2148,7 +2148,7 @@ ilistmatches(Hookdef dummy, Chdata dat)
 
 /**/
 int
-list_matches(Hookdef dummy, void *dummy2)
+list_matches(UNUSED(Hookdef dummy), UNUSED(void *dummy2))
 {
     struct chdata dat;
     int ret;

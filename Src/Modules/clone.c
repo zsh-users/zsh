@@ -41,7 +41,7 @@
 
 /**/
 static int
-bin_clone(char *nam, char **args, Options ops, int func)
+bin_clone(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int ttyfd, pid, cttyfd;
 
@@ -111,7 +111,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -133,7 +133,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

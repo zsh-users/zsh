@@ -341,7 +341,7 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
  */
 /**/
 static int
-bin_stat(char *name, char **args, Options ops, int func)
+bin_stat(char *name, char **args, Options ops, UNUSED(int func))
 {
     char **aptr, *arrnam = NULL, **array = NULL, **arrptr = NULL;
     char *hashnam = NULL, **hash = NULL, **hashptr = NULL;
@@ -615,7 +615,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -637,7 +637,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

@@ -1588,7 +1588,7 @@ singledraw()
 }
 
 static int
-complistmatches(Hookdef dummy, Chdata dat)
+complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 {
     static int onlnct = -1;
 
@@ -2870,7 +2870,7 @@ menuselect(char **args)
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -2919,7 +2919,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_(UNUSED(Module m))
 {
     free(mtab);
     free(mgtab);
@@ -2934,7 +2934,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

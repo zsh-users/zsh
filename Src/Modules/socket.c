@@ -58,7 +58,7 @@
 #endif
 
 static int
-bin_zsocket(char *nam, char **args, Options ops, int func)
+bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int err=1, verbose=0, test=0, targetfd=0;
     SOCKLEN_T len;
@@ -254,7 +254,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -277,7 +277,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

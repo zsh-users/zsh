@@ -421,7 +421,7 @@ parse_class(Cpattern p, unsigned char *s, unsigned char e)
 
 /**/
 static int
-bin_compadd(char *name, char **argv, Options ops, int func)
+bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     struct cadata dat;
     char *p, **sp, *e, *m = NULL, *mstr = NULL;
@@ -866,7 +866,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 
 /**/
 static int
-bin_compset(char *name, char **argv, Options ops, int func)
+bin_compset(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     int test = 0, na = 0, nb = 0;
     char *sa = NULL, *sb = NULL;
@@ -1067,7 +1067,7 @@ get_compstate(Param pm)
 
 /**/
 static void
-set_compstate(Param pm, HashTable ht)
+set_compstate(UNUSED(Param pm), HashTable ht)
 {
     struct compparam *cp;
     Param *pp;
@@ -1103,42 +1103,42 @@ set_compstate(Param pm, HashTable ht)
 
 /**/
 static zlong
-get_nmatches(Param pm)
+get_nmatches(UNUSED(Param pm))
 {
     return (permmatches(0) ? 0 : nmatches);
 }
 
 /**/
 static zlong
-get_listlines(Param pm)
+get_listlines(UNUSED(Param pm))
 {
     return list_lines();
 }
 
 /**/
 static void
-set_complist(Param pm, char *v)
+set_complist(UNUSED(Param pm), char *v)
 {
     comp_list(v);
 }
 
 /**/
 static char *
-get_complist(Param pm)
+get_complist(UNUSED(Param pm))
 {
     return complist;
 }
 
 /**/
 static char *
-get_unambig(Param pm)
+get_unambig(UNUSED(Param pm))
 {
     return unambig_data(NULL, NULL, NULL);
 }
 
 /**/
 static zlong
-get_unambig_curs(Param pm)
+get_unambig_curs(UNUSED(Param pm))
 {
     int c;
 
@@ -1149,7 +1149,7 @@ get_unambig_curs(Param pm)
 
 /**/
 static char *
-get_unambig_pos(Param pm)
+get_unambig_pos(UNUSED(Param pm))
 {
     char *p;
 
@@ -1160,7 +1160,7 @@ get_unambig_pos(Param pm)
 
 /**/
 static char *
-get_insert_pos(Param pm)
+get_insert_pos(UNUSED(Param pm))
 {
     char *p;
 
@@ -1394,7 +1394,7 @@ struct hookdef comphooks[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     hasperm = 0;
 
@@ -1454,7 +1454,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     if (compwords)
 	freearray(compwords);

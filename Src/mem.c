@@ -1462,7 +1462,7 @@ bin_mem(char *name, char **argv, Options ops, int func)
 
 /**/
 mod_export void
-zfree(void *p, int sz)
+zfree(void *p, UNUSED(int sz))
 {
     if (p)
 	free(p);

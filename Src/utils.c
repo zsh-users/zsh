@@ -476,7 +476,7 @@ static int finddir_best;
 
 /**/
 static void
-finddir_scan(HashNode hn, int flags)
+finddir_scan(HashNode hn, UNUSED(int flags))
 {
     Nameddir nd = (Nameddir) hn;
 
@@ -1551,7 +1551,7 @@ static char *guess, *best;
 
 /**/
 static void
-spscan(HashNode hn, int scanflags)
+spscan(HashNode hn, UNUSED(int scanflags))
 {
     int nd;
 

@@ -157,7 +157,7 @@ endoflinehist(char **args)
 
 /**/
 int
-forwardchar(char **args)
+forwardchar(UNUSED(char **args))
 {
     cs += zmult;
     if (cs > ll)
@@ -169,7 +169,7 @@ forwardchar(char **args)
 
 /**/
 int
-backwardchar(char **args)
+backwardchar(UNUSED(char **args))
 {
     cs -= zmult;
     if (cs > ll)
@@ -181,7 +181,7 @@ backwardchar(char **args)
 
 /**/
 int
-setmarkcommand(char **args)
+setmarkcommand(UNUSED(char **args))
 {
     mark = cs;
     return 0;
@@ -189,7 +189,7 @@ setmarkcommand(char **args)
 
 /**/
 int
-exchangepointandmark(char **args)
+exchangepointandmark(UNUSED(char **args))
 {
     int x;
 
@@ -203,7 +203,7 @@ exchangepointandmark(char **args)
 
 /**/
 int
-vigotocolumn(char **args)
+vigotocolumn(UNUSED(char **args))
 {
     int x, y;
 
@@ -221,7 +221,7 @@ vigotocolumn(char **args)
 
 /**/
 int
-vimatchbracket(char **args)
+vimatchbracket(UNUSED(char **args))
 {
     int ocs = cs, dir, ct;
     unsigned char oth, me;
@@ -327,7 +327,7 @@ vibackwardchar(char **args)
 
 /**/
 int
-viendofline(char **args)
+viendofline(UNUSED(char **args))
 {
     int oldcs = cs, n = zmult;
 
@@ -347,7 +347,7 @@ viendofline(char **args)
 
 /**/
 int
-vibeginningofline(char **args)
+vibeginningofline(UNUSED(char **args))
 {
     cs = findbol();
     return 0;
@@ -453,7 +453,7 @@ virevrepeatfind(char **args)
 
 /**/
 int
-vifirstnonblank(char **args)
+vifirstnonblank(UNUSED(char **args))
 {
     cs = findbol();
     while (cs != ll && iblank(line[cs]))
@@ -463,7 +463,7 @@ vifirstnonblank(char **args)
 
 /**/
 int
-visetmark(char **args)
+visetmark(UNUSED(char **args))
 {
     int ch;
 
@@ -478,7 +478,7 @@ visetmark(char **args)
 
 /**/
 int
-vigotomark(char **args)
+vigotomark(UNUSED(char **args))
 {
     int ch;
 

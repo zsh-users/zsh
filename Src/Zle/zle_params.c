@@ -146,7 +146,7 @@ zleunsetfn(Param pm, int exp)
 
 /**/
 static void
-set_buffer(Param pm, char *x)
+set_buffer(UNUSED(Param pm), char *x)
 {
     if(x) {
 	unmetafy(x, &ll);
@@ -163,14 +163,14 @@ set_buffer(Param pm, char *x)
 
 /**/
 static char *
-get_buffer(Param pm)
+get_buffer(UNUSED(Param pm))
 {
     return metafy((char *)line, ll, META_HEAPDUP);
 }
 
 /**/
 static void
-set_cursor(Param pm, zlong x)
+set_cursor(UNUSED(Param pm), zlong x)
 {
     if(x < 0)
 	cs = 0;
@@ -184,14 +184,14 @@ set_cursor(Param pm, zlong x)
 
 /**/
 static zlong
-get_cursor(Param pm)
+get_cursor(UNUSED(Param pm))
 {
     return cs;
 }
 
 /**/
 static void
-set_mark(Param pm, zlong x)
+set_mark(UNUSED(Param pm), zlong x)
 {
     if (x < 0)
 	mark = 0;
@@ -203,14 +203,14 @@ set_mark(Param pm, zlong x)
 
 /**/
 static zlong
-get_mark(Param pm)
+get_mark(UNUSED(Param pm))
 {
     return mark;
 }
 
 /**/
 static void
-set_lbuffer(Param pm, char *x)
+set_lbuffer(UNUSED(Param pm), char *x)
 {
     char *y;
     int len;
@@ -231,14 +231,14 @@ set_lbuffer(Param pm, char *x)
 
 /**/
 static char *
-get_lbuffer(Param pm)
+get_lbuffer(UNUSED(Param pm))
 {
     return metafy((char *)line, cs, META_HEAPDUP);
 }
 
 /**/
 static void
-set_rbuffer(Param pm, char *x)
+set_rbuffer(UNUSED(Param pm), char *x)
 {
     char *y;
     int len;
@@ -256,14 +256,14 @@ set_rbuffer(Param pm, char *x)
 
 /**/
 static char *
-get_rbuffer(Param pm)
+get_rbuffer(UNUSED(Param pm))
 {
     return metafy((char *)line + cs, ll - cs, META_HEAPDUP);
 }
 
 /**/
 static char *
-get_prebuffer(Param pm)
+get_prebuffer(UNUSED(Param pm))
 {
     if (chline)
 	return dupstrpfx(chline, hptr - chline);
@@ -273,35 +273,35 @@ get_prebuffer(Param pm)
 
 /**/
 static char *
-get_widget(Param pm)
+get_widget(UNUSED(Param pm))
 {
     return bindk->nam;
 }
 
 /**/
 static char *
-get_lwidget(Param pm)
+get_lwidget(UNUSED(Param pm))
 {
     return (lbindk ? lbindk->nam : "");
 }
 
 /**/
 static char *
-get_keymap(Param pm)
+get_keymap(UNUSED(Param pm))
 {
     return dupstring(curkeymapname);
 }
 
 /**/
 static char *
-get_keys(Param pm)
+get_keys(UNUSED(Param pm))
 {
     return keybuf;
 }
 
 /**/
 static void
-set_numeric(Param pm, zlong x)
+set_numeric(UNUSED(Param pm), zlong x)
 {
     zmult = x;
     zmod.flags = MOD_MULT;
@@ -309,7 +309,7 @@ set_numeric(Param pm, zlong x)
 
 /**/
 static zlong
-get_numeric(Param pm)
+get_numeric(UNUSED(Param pm))
 {
     return zmult;
 }
@@ -327,28 +327,28 @@ unset_numeric(Param pm, int exp)
 
 /**/
 static zlong
-get_histno(Param pm)
+get_histno(UNUSED(Param pm))
 {
     return histline;
 }
 
 /**/
 static zlong
-get_bufferlines(Param pm)
+get_bufferlines(UNUSED(Param pm))
 {
     return nlnct;
 }
 
 /**/
 static zlong
-get_pending(Param pm)
+get_pending(UNUSED(Param pm))
 {
     return noquery(0);
 }
 
 /**/
 static char *
-get_cutbuffer(Param pm)
+get_cutbuffer(UNUSED(Param pm))
 {
     if (cutbuf.buf)
 	return metafy(cutbuf.buf, cutbuf.len, META_HEAPDUP);
@@ -359,7 +359,7 @@ get_cutbuffer(Param pm)
 
 /**/
 static void
-set_cutbuffer(Param pm, char *x)
+set_cutbuffer(UNUSED(Param pm), char *x)
 {
     if (cutbuf.buf)
 	free(cutbuf.buf);
@@ -393,7 +393,7 @@ unset_cutbuffer(Param pm, int exp)
 
 /**/
 static void
-set_killring(Param pm, char **x)
+set_killring(UNUSED(Param pm), char **x)
 {
     int kcnt;
     Cutbuffer kptr;
@@ -435,7 +435,7 @@ set_killring(Param pm, char **x)
 
 /**/
 static char **
-get_killring(Param pm)
+get_killring(UNUSED(Param pm))
 {
     /*
      * Return the kill ring with the most recently killed first.
@@ -508,28 +508,28 @@ get_prepost(unsigned char *text, int len)
 
 /**/
 static void
-set_predisplay(Param pm, char *x)
+set_predisplay(UNUSED(Param pm), char *x)
 {
     set_prepost(&predisplay, &predisplaylen, x);
 }
 
 /**/
 static char *
-get_predisplay(Param pm)
+get_predisplay(UNUSED(Param pm))
 {
     return get_prepost(predisplay, predisplaylen);
 }
 
 /**/
 static void
-set_postdisplay(Param pm, char *x)
+set_postdisplay(UNUSED(Param pm), char *x)
 {
     set_prepost(&postdisplay, &postdisplaylen, x);
 }
 
 /**/
 static char *
-get_postdisplay(Param pm)
+get_postdisplay(UNUSED(Param pm))
 {
     return get_prepost(postdisplay, postdisplaylen);
 }
@@ -546,7 +546,7 @@ free_prepostdisplay(void)
 
 /**/
 static char *
-get_lsearch(Param pm)
+get_lsearch(UNUSED(Param pm))
 {
     if (previous_search_len)
 	return metafy(previous_search, previous_search_len, META_HEAPDUP);
@@ -556,7 +556,7 @@ get_lsearch(Param pm)
 
 /**/
 static char *
-get_context(Param pm)
+get_context(UNUSED(Param pm))
 {
     switch (zlecontext) {
     case ZLCON_LINE_CONT:

@@ -62,7 +62,7 @@ handle_digits(char *nam, char *argptr, fd_set *fdset, int *fdmax)
 
 /**/
 static int
-bin_zselect(char *nam, char **args, Options ops, int func)
+bin_zselect(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
 #ifdef HAVE_SELECT
     int i, fd, fdsetind = 0, fdmax = 0, fdcount;
@@ -278,7 +278,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -293,7 +293,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_(UNUSED(Module m))
 {
     deletebuiltins("zselect", bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
@@ -301,7 +301,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

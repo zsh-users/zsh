@@ -280,7 +280,7 @@ static int mult_isarr;
 
 /**/
 static int
-multsub(char **s, char ***a, int *isarr, char *sep)
+multsub(char **s, char ***a, int *isarr, UNUSED(char *sep))
 {
     int l, omi = mult_isarr;
     char **r, **p;

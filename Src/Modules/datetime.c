@@ -32,7 +32,7 @@
 #include <time.h>
 
 static int
-bin_strftime(char *nam, char **argv, Options ops, int func)
+bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int bufsize, x;
     char *endptr = NULL, *scalar = NULL, *buffer;
@@ -93,7 +93,7 @@ static struct paramdef patab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -124,7 +124,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

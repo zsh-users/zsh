@@ -39,7 +39,7 @@ static char **arrparam;
 
 /**/
 static int
-bin_example(char *nam, char **args, Options ops, int func)
+bin_example(char *nam, char **args, Options ops, UNUSED(int func))
 {
     unsigned char c;
     char **oargs = args, **p = arrparam;
@@ -76,7 +76,7 @@ bin_example(char *nam, char **args, Options ops, int func)
 
 /**/
 static int
-cond_p_len(char **a, int id)
+cond_p_len(char **a, UNUSED(int id))
 {
     char *s1 = cond_str(a, 0, 0);
 
@@ -91,7 +91,7 @@ cond_p_len(char **a, int id)
 
 /**/
 static int
-cond_i_ex(char **a, int id)
+cond_i_ex(char **a, UNUSED(int id))
 {
     char *s1 = cond_str(a, 0, 0), *s2 = cond_str(a, 1, 0);
 
@@ -100,7 +100,7 @@ cond_i_ex(char **a, int id)
 
 /**/
 static mnumber
-math_sum(char *name, int argc, mnumber *argv, int id)
+math_sum(UNUSED(char *name), int argc, mnumber *argv, UNUSED(int id))
 {
     mnumber ret;
     int f = 0;
@@ -129,7 +129,7 @@ math_sum(char *name, int argc, mnumber *argv, int id)
 
 /**/
 static mnumber
-math_length(char *name, char *arg, int id)
+math_length(UNUSED(char *name), char *arg, UNUSED(int id))
 {
     mnumber ret;
 
@@ -186,7 +186,7 @@ static struct funcwrap wrapper[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     printf("The example module has now been set up.\n");
     fflush(stdout);
@@ -224,7 +224,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     printf("Thank you for using the example module.  Have a nice day.\n");
     fflush(stdout);

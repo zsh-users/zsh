@@ -1096,7 +1096,7 @@ tcoutarg(int cap, int arg)
 
 /**/
 mod_export int
-clearscreen(char **args)
+clearscreen(UNUSED(char **args))
 {
     tcout(TCCLEARSCREEN);
     resetneeded = 1;
@@ -1106,7 +1106,7 @@ clearscreen(char **args)
 
 /**/
 mod_export int
-redisplay(char **args)
+redisplay(UNUSED(char **args))
 {
     moveto(0, 0);
     zputc('\r', shout);		/* extra care */

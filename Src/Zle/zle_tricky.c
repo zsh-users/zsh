@@ -223,7 +223,7 @@ menucomplete(char **args)
 
 /**/
 int
-listchoices(char **args)
+listchoices(UNUSED(char **args))
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
@@ -233,7 +233,7 @@ listchoices(char **args)
 
 /**/
 int
-spellword(char **args)
+spellword(UNUSED(char **args))
 {
     usemenu = useglob = 0;
     wouldinstab = 0;
@@ -305,7 +305,7 @@ menuexpandorcomplete(char **args)
 
 /**/
 int
-listexpand(char **args)
+listexpand(UNUSED(char **args))
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
@@ -2305,7 +2305,7 @@ magicspace(char **args)
 
 /**/
 int
-expandhistory(char **args)
+expandhistory(UNUSED(char **args))
 {
     if (!doexpandhist())
 	return 1;
@@ -2352,7 +2352,7 @@ getcurcmd(void)
 
 /**/
 int
-processcmd(char **args)
+processcmd(UNUSED(char **args))
 {
     char *s;
     int m = zmult;
@@ -2376,7 +2376,7 @@ processcmd(char **args)
 
 /**/
 int
-expandcmdpath(char **args)
+expandcmdpath(UNUSED(char **args))
 {
     int oldcs = cs, na = noaliases;
     char *s, *str;
@@ -2421,7 +2421,7 @@ expandorcompleteprefix(char **args)
 
 /**/
 int
-endoflist(char **args)
+endoflist(UNUSED(char **args))
 {
     if (lastlistlen > 0) {
 	int i;

@@ -1035,7 +1035,7 @@ mod_export char *varedarg;
 
 /**/
 static int
-bin_vared(char *name, char **args, Options ops, int func)
+bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 {
     char *s, *t, *ova = varedarg;
     struct value vbuf;
@@ -1217,7 +1217,7 @@ bin_vared(char *name, char **args, Options ops, int func)
 
 /**/
 int
-describekeybriefly(char **args)
+describekeybriefly(UNUSED(char **args))
 {
     char *seq, *str, *msg, *is;
     Thingy func;
@@ -1255,7 +1255,7 @@ struct findfunc {
 
 /**/
 static void
-scanfindfunc(char *seq, Thingy func, char *str, void *magic)
+scanfindfunc(char *seq, Thingy func, UNUSED(char *str), void *magic)
 {
     struct findfunc *ff = magic;
 
@@ -1274,7 +1274,7 @@ scanfindfunc(char *seq, Thingy func, char *str, void *magic)
 
 /**/
 int
-whereis(char **args)
+whereis(UNUSED(char **args))
 {
     struct findfunc ff;
 
@@ -1294,7 +1294,7 @@ whereis(char **args)
 
 /**/
 int
-recursiveedit(char **args)
+recursiveedit(UNUSED(char **args))
 {
     int locerror;
 
@@ -1341,7 +1341,7 @@ trashzle(void)
  * active. */
 
 static int
-zlebeforetrap(Hookdef dummy, void *dat)
+zlebeforetrap(UNUSED(Hookdef dummy), UNUSED(void *dat))
 {
     if (zleactive) {
 	startparamscope();
@@ -1351,7 +1351,7 @@ zlebeforetrap(Hookdef dummy, void *dat)
 }
 
 static int
-zleaftertrap(Hookdef dummy, void *dat)
+zleaftertrap(UNUSED(Hookdef dummy), UNUSED(void *dat))
 {
     if (zleactive)
 	endparamscope();
@@ -1381,7 +1381,7 @@ mod_export struct hookdef zlehooks[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     /* Set up editor entry points */
     trashzleptr = trashzle;
@@ -1444,7 +1444,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     int i;
 

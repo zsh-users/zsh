@@ -1572,7 +1572,7 @@ printcompctlp(HashNode hn, int printflags)
 
 /**/
 static int
-bin_compctl(char *name, char **argv, Options ops, int func)
+bin_compctl(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     Compctl cc = NULL;
     int ret = 0;
@@ -1678,7 +1678,7 @@ bin_compctl(char *name, char **argv, Options ops, int func)
 #define CFN_DEFAULT 2
 
 static int
-bin_compcall(char *name, char **argv, Options ops, int func)
+bin_compcall(char *name, UNUSED(char **argv), Options ops, UNUSED(int func))
 {
     if (incompfunc != 1) {
 	zwarnnam(name, "can only be called from completion function", NULL, 0);
@@ -1755,7 +1755,7 @@ static int addwhat;
 /* Hook functions */
 
 static int
-ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
+ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
 {
     char *s = dat->str;
     int incmd = dat->incmd, lst = dat->lst;
@@ -1891,7 +1891,7 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
 }
 
 static int
-cccleanuphookfn(Hookdef dummy, void *dat)
+cccleanuphookfn(UNUSED(Hookdef dummy), UNUSED(void *dat))
 {
     ccused = ccstack = NULL;
     return 0;
@@ -2103,7 +2103,7 @@ dumphashtable(HashTable ht, int what)
 
 /**/
 static void
-addhnmatch(HashNode hn, int flags)
+addhnmatch(HashNode hn, UNUSED(int flags))
 {
     addmatch(hn->nam, NULL);
 }
@@ -2345,7 +2345,7 @@ makecomplistctl(int flags)
 
 /**/
 static int
-makecomplistglobal(char *os, int incmd, int lst, int flags)
+makecomplistglobal(char *os, int incmd, UNUSED(int lst), int flags)
 {
     Compctl cc = NULL;
     char *s;
@@ -3896,7 +3896,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     compctlreadptr = compctlread;
     createcompctltable();
@@ -3935,7 +3935,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     deletehashtable(compctltab);
 

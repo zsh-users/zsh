@@ -76,7 +76,7 @@ forget_edits(void)
 
 /**/
 int
-uphistory(char **args)
+uphistory(UNUSED(char **args))
 {
     int nodups = isset(HISTIGNOREDUPS);
     if (!zle_goto_hist(histline, -zmult, nodups) && isset(HISTBEEP))
@@ -254,7 +254,7 @@ downlineorsearch(char **args)
 
 /**/
 int
-acceptlineanddownhistory(char **args)
+acceptlineanddownhistory(UNUSED(char **args))
 {
     Histent he = quietgethist(histline);
 
@@ -268,7 +268,7 @@ acceptlineanddownhistory(char **args)
 
 /**/
 int
-downhistory(char **args)
+downhistory(UNUSED(char **args))
 {
     int nodups = isset(HISTIGNOREDUPS);
     if (!zle_goto_hist(histline, zmult, nodups) && isset(HISTBEEP))
@@ -390,7 +390,7 @@ beginningofbufferorhistory(char **args)
 
 /**/
 int
-beginningofhistory(char **args)
+beginningofhistory(UNUSED(char **args))
 {
     if (!zle_goto_hist(firsthist(), 0, 0) && isset(HISTBEEP))
 	return 1;
@@ -410,7 +410,7 @@ endofbufferorhistory(char **args)
 
 /**/
 int
-endofhistory(char **args)
+endofhistory(UNUSED(char **args))
 {
     zle_goto_hist(curhist, 0, 0);
     return 0;
@@ -574,7 +574,7 @@ zle_setline(Histent he)
 
 /**/
 int
-setlocalhistory(char **args)
+setlocalhistory(UNUSED(char **args))
 {
     if (zmod.flags & MOD_MULT) {
 	hist_skip_flags = zmult? HIST_FOREIGN : 0;
@@ -604,7 +604,7 @@ zle_goto_hist(int ev, int n, int skipdups)
 
 /**/
 int
-pushline(char **args)
+pushline(UNUSED(char **args))
 {
     int n = zmult;
 
@@ -663,7 +663,7 @@ pushinput(char **args)
 /* Renamed to avoid clash with library function */
 /**/
 int
-zgetline(char **args)
+zgetline(UNUSED(char **args))
 {
     char *s = (char *)getlinknode(bufstack);
 
@@ -1000,7 +1000,7 @@ doisearch(char **args, int dir)
 }
 
 static Histent
-infernexthist(Histent he, char **args)
+infernexthist(Histent he, UNUSED(char **args))
 {
     for (he = movehistent(he, -2, HIST_FOREIGN);
 	 he; he = movehistent(he, -1, HIST_FOREIGN)) {
@@ -1038,7 +1038,7 @@ infernexthistory(char **args)
 
 /**/
 int
-vifetchhistory(char **args)
+vifetchhistory(UNUSED(char **args))
 {
     if (zmult < 0)
 	return 1;
@@ -1200,7 +1200,7 @@ vihistorysearchbackward(char **args)
 
 /**/
 int
-virepeatsearch(char **args)
+virepeatsearch(UNUSED(char **args))
 {
     Histent he;
     int t0;

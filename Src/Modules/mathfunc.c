@@ -462,7 +462,7 @@ math_func(char *name, int argc, mnumber *argv, int id)
 
 /**/
 static mnumber
-math_string(char *name, char *arg, int id)
+math_string(UNUSED(char *name), char *arg, int id)
 {
     mnumber ret = zero_mnumber;
     char *send;
@@ -556,7 +556,7 @@ math_string(char *name, char *arg, int id)
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -578,7 +578,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

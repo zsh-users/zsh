@@ -486,7 +486,7 @@ setoption(HashNode hn, int value)
 
 /**/
 int
-bin_setopt(char *nam, char **args, Options ops, int isun)
+bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 {
     int action, optno, match = 0;
 
@@ -697,7 +697,7 @@ dosetopt(int optno, int value, int force)
 
 /**/
 char *
-dashgetfn(Param pm)
+dashgetfn(UNUSED(Param pm))
 {
     static char buf[LAST_OPT - FIRST_OPT + 2];
     char *val = buf;
@@ -763,7 +763,7 @@ printoptionlist(void)
 
 /**/
 static void
-printoptionlist_printoption(HashNode hn, int ignored)
+printoptionlist_printoption(HashNode hn, UNUSED(int ignored))
 {
     Optname on = (Optname) hn;
 

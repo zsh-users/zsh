@@ -1672,7 +1672,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 
 /**/
 int
-bin_kill(char *nam, char **argv, Options ops, int func)
+bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     int sig = SIGTERM;
     int returnval = 0;
@@ -1816,7 +1816,7 @@ bin_kill(char *nam, char **argv, Options ops, int func)
 
 /**/
 int
-bin_suspend(char *name, char **argv, Options ops, int func)
+bin_suspend(char *name, UNUSED(char **argv), Options ops, UNUSED(int func))
 {
     /* won't suspend a login shell, unless forced */
     if (islogin && !OPT_ISSET(ops,'f')) {

@@ -42,28 +42,28 @@ LinkList linkedmodules;
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     return 0;
 }
 
 /**/
 int
-cleanup_(Module m)
+cleanup_(UNUSED(Module m))
 {
     return 0;
 }
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }
@@ -869,7 +869,7 @@ load_module(char const *name)
 
 /**/
 mod_export int
-require_module(char *nam, const char *module, int res, int test)
+require_module(char *nam, const char *module, UNUSED(int res), int test)
 {
     Module m = NULL;
     LinkNode node;
@@ -956,7 +956,7 @@ autoloadscan(HashNode hn, int printflags)
 
 /**/
 int
-bin_zmodload(char *nam, char **args, Options ops, int func)
+bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int ops_bcpf = OPT_ISSET(ops,'b') || OPT_ISSET(ops,'c') || 
 	OPT_ISSET(ops,'p') || OPT_ISSET(ops,'f');
@@ -1128,7 +1128,7 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
 
 /**/
 static int
-bin_zmodload_exist(char *nam, char **args, Options ops)
+bin_zmodload_exist(UNUSED(char *nam), char **args, Options ops)
 {
     LinkNode node;
     Module m;
@@ -1167,7 +1167,7 @@ bin_zmodload_exist(char *nam, char **args, Options ops)
 
 /**/
 static int
-bin_zmodload_dep(char *nam, char **args, Options ops)
+bin_zmodload_dep(UNUSED(char *nam), char **args, Options ops)
 {
     LinkNode node;
     Module m;
@@ -1783,7 +1783,7 @@ deletehookdef(Hookdef h)
 
 /**/
 mod_export int
-deletehookdefs(char const *nam, Hookdef h, int size)
+deletehookdefs(UNUSED(char const *nam), Hookdef h, int size)
 {
     while (size--) {
 	deletehookdef(h);
@@ -1932,7 +1932,7 @@ deleteparamdef(Paramdef d)
 
 /**/
 mod_export int
-deleteparamdefs(char const *nam, Paramdef d, int size)
+deleteparamdefs(UNUSED(char const *nam), Paramdef d, int size)
 {
     while (size--) {
 	deleteparamdef(d);

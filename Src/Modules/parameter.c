@@ -136,7 +136,7 @@ paramtypestr(Param pm)
 
 /**/
 static HashNode
-getpmparameter(HashTable ht, char *name)
+getpmparameter(UNUSED(HashTable ht), char *name)
 {
     Param rpm, pm = NULL;
 
@@ -163,7 +163,7 @@ getpmparameter(HashTable ht, char *name)
 
 /**/
 static void
-scanpmparameters(HashTable ht, ScanFunc func, int flags)
+scanpmparameters(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int i;
@@ -213,7 +213,7 @@ setpmcommand(Param pm, char *value)
 
 /**/
 static void
-unsetpmcommand(Param pm, int exp)
+unsetpmcommand(Param pm, UNUSED(int exp))
 {
     HashNode hn = cmdnamtab->removenode(cmdnamtab, pm->nam);
 
@@ -223,7 +223,7 @@ unsetpmcommand(Param pm, int exp)
 
 /**/
 static void
-setpmcommands(Param pm, HashTable ht)
+setpmcommands(UNUSED(Param pm), HashTable ht)
 {
     int i;
     HashNode hn;
@@ -251,7 +251,7 @@ setpmcommands(Param pm, HashTable ht)
 
 /**/
 static HashNode
-getpmcommand(HashTable ht, char *name)
+getpmcommand(UNUSED(HashTable ht), char *name)
 {
     Cmdnam cmd;
     Param pm = NULL;
@@ -290,7 +290,7 @@ getpmcommand(HashTable ht, char *name)
 
 /**/
 static void
-scanpmcommands(HashTable ht, ScanFunc func, int flags)
+scanpmcommands(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int i;
@@ -385,7 +385,7 @@ setpmdisfunction(Param pm, char *value)
 
 /**/
 static void
-unsetpmfunction(Param pm, int exp)
+unsetpmfunction(Param pm, UNUSED(int exp))
 {
     HashNode hn = shfunctab->removenode(shfunctab, pm->nam);
 
@@ -395,7 +395,7 @@ unsetpmfunction(Param pm, int exp)
 
 /**/
 static void
-setfunctions(Param pm, HashTable ht, int dis)
+setfunctions(UNUSED(Param pm), HashTable ht, int dis)
 {
     int i;
     HashNode hn;
@@ -433,7 +433,7 @@ setpmdisfunctions(Param pm, HashTable ht)
 
 /**/
 static HashNode
-getfunction(HashTable ht, char *name, int dis)
+getfunction(UNUSED(HashTable ht), char *name, int dis)
 {
     Shfunc shf;
     Param pm = NULL;
@@ -498,7 +498,7 @@ getpmdisfunction(HashTable ht, char *name)
 
 /**/
 static void
-scanfunctions(HashTable ht, ScanFunc func, int flags, int dis)
+scanfunctions(UNUSED(HashTable ht), ScanFunc func, int flags, int dis)
 {
     struct param pm;
     int i;
@@ -568,7 +568,7 @@ scanpmdisfunctions(HashTable ht, ScanFunc func, int flags)
 
 /**/
 static char **
-funcstackgetfn(Param pm)
+funcstackgetfn(UNUSED(Param pm))
 {
     Funcstack f;
     int num;
@@ -589,7 +589,7 @@ funcstackgetfn(Param pm)
 
 /**/
 static HashNode
-getbuiltin(HashTable ht, char *name, int dis)
+getbuiltin(UNUSED(HashTable ht), char *name, int dis)
 {
     Param pm = NULL;
     Builtin bn;
@@ -634,7 +634,7 @@ getpmdisbuiltin(HashTable ht, char *name)
 
 /**/
 static void
-scanbuiltins(HashTable ht, ScanFunc func, int flags, int dis)
+scanbuiltins(UNUSED(HashTable ht), ScanFunc func, int flags, int dis)
 {
     struct param pm;
     int i;
@@ -705,14 +705,14 @@ getreswords(int dis)
 
 /**/
 static char **
-reswordsgetfn(Param pm)
+reswordsgetfn(UNUSED(Param pm))
 {
     return getreswords(0);
 }
 
 /**/
 static char **
-disreswordsgetfn(Param pm)
+disreswordsgetfn(UNUSED(Param pm))
 {
     return getreswords(DISABLED);
 }
@@ -736,7 +736,7 @@ setpmoption(Param pm, char *value)
 
 /**/
 static void
-unsetpmoption(Param pm, int exp)
+unsetpmoption(Param pm, UNUSED(int exp))
 {
     int n;
 
@@ -748,7 +748,7 @@ unsetpmoption(Param pm, int exp)
 
 /**/
 static void
-setpmoptions(Param pm, HashTable ht)
+setpmoptions(UNUSED(Param pm), HashTable ht)
 {
     int i;
     HashNode hn;
@@ -778,7 +778,7 @@ setpmoptions(Param pm, HashTable ht)
 
 /**/
 static HashNode
-getpmoption(HashTable ht, char *name)
+getpmoption(UNUSED(HashTable ht), char *name)
 {
     Param pm = NULL;
     int n;
@@ -813,7 +813,7 @@ getpmoption(HashTable ht, char *name)
 
 /**/
 static void
-scanpmoptions(HashTable ht, ScanFunc func, int flags)
+scanpmoptions(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int i;
@@ -846,7 +846,7 @@ static int modpmfound;
 
 /**/
 static void
-modpmbuiltinscan(HashNode hn, int dummy)
+modpmbuiltinscan(HashNode hn, UNUSED(int dummy))
 {
     if (!(((Builtin) hn)->flags & BINF_ADDED) &&
 	!strcmp(((Builtin) hn)->optstr, modpmname))
@@ -855,7 +855,7 @@ modpmbuiltinscan(HashNode hn, int dummy)
 
 /**/
 static void
-modpmparamscan(HashNode hn, int dummy)
+modpmparamscan(HashNode hn, UNUSED(int dummy))
 {
     if ((((Param) hn)->flags & PM_AUTOLOAD) &&
 	!strcmp(((Param) hn)->u.str, modpmname))
@@ -877,7 +877,7 @@ findmodnode(LinkList l, char *nam)
 
 /**/
 static HashNode
-getpmmodule(HashTable ht, char *name)
+getpmmodule(UNUSED(HashTable ht), char *name)
 {
     Param pm = NULL;
     char *type = NULL;
@@ -937,7 +937,7 @@ getpmmodule(HashTable ht, char *name)
 
 /**/
 static void
-scanpmmodules(HashTable ht, ScanFunc func, int flags)
+scanpmmodules(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int i;
@@ -999,7 +999,7 @@ scanpmmodules(HashTable ht, ScanFunc func, int flags)
 
 /**/
 static void
-dirssetfn(Param pm, char **x)
+dirssetfn(UNUSED(Param pm), char **x)
 {
     char **ox = x;
 
@@ -1015,7 +1015,7 @@ dirssetfn(Param pm, char **x)
 
 /**/
 static char **
-dirsgetfn(Param pm)
+dirsgetfn(UNUSED(Param pm))
 {
     int l = countlinknodes(dirstack);
     char **ret = (char **) zhalloc((l + 1) * sizeof(char *)), **p;
@@ -1032,7 +1032,7 @@ dirsgetfn(Param pm)
 
 /**/
 static HashNode
-getpmhistory(HashTable ht, char *name)
+getpmhistory(UNUSED(HashTable ht), char *name)
 {
     Param pm = NULL;
     Histent he;
@@ -1071,7 +1071,7 @@ getpmhistory(HashTable ht, char *name)
 
 /**/
 static void
-scanpmhistory(HashTable ht, ScanFunc func, int flags)
+scanpmhistory(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int i = addhistnum(curhist, -1, HIST_FOREIGN);
@@ -1106,7 +1106,7 @@ scanpmhistory(HashTable ht, ScanFunc func, int flags)
 
 /**/
 static char **
-histwgetfn(Param pm)
+histwgetfn(UNUSED(Param pm))
 {
     char **ret, **p, *h, *e, sav;
     LinkList l = newlinklist(), ll;
@@ -1164,7 +1164,7 @@ pmjobtext(int job)
 
 /**/
 static HashNode
-getpmjobtext(HashTable ht, char *name)
+getpmjobtext(UNUSED(HashTable ht), char *name)
 {
     Param pm = NULL;
     int job;
@@ -1194,7 +1194,7 @@ getpmjobtext(HashTable ht, char *name)
 
 /**/
 static void
-scanpmjobtexts(HashTable ht, ScanFunc func, int flags)
+scanpmjobtexts(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int job;
@@ -1274,7 +1274,7 @@ pmjobstate(int job)
 
 /**/
 static HashNode
-getpmjobstate(HashTable ht, char *name)
+getpmjobstate(UNUSED(HashTable ht), char *name)
 {
     Param pm = NULL;
     int job;
@@ -1304,7 +1304,7 @@ getpmjobstate(HashTable ht, char *name)
 
 /**/
 static void
-scanpmjobstates(HashTable ht, ScanFunc func, int flags)
+scanpmjobstates(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int job;
@@ -1349,7 +1349,7 @@ pmjobdir(int job)
 
 /**/
 static HashNode
-getpmjobdir(HashTable ht, char *name)
+getpmjobdir(UNUSED(HashTable ht), char *name)
 {
     Param pm = NULL;
     int job;
@@ -1379,7 +1379,7 @@ getpmjobdir(HashTable ht, char *name)
 
 /**/
 static void
-scanpmjobdirs(HashTable ht, ScanFunc func, int flags)
+scanpmjobdirs(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int job;
@@ -1429,7 +1429,7 @@ setpmnameddir(Param pm, char *value)
 
 /**/
 static void
-unsetpmnameddir(Param pm, int exp)
+unsetpmnameddir(Param pm, UNUSED(int exp))
 {
     HashNode hd = nameddirtab->removenode(nameddirtab, pm->nam);
 
@@ -1439,7 +1439,7 @@ unsetpmnameddir(Param pm, int exp)
 
 /**/
 static void
-setpmnameddirs(Param pm, HashTable ht)
+setpmnameddirs(UNUSED(Param pm), HashTable ht)
 {
     int i;
     HashNode hn, next, hd;
@@ -1487,7 +1487,7 @@ setpmnameddirs(Param pm, HashTable ht)
 
 /**/
 static HashNode
-getpmnameddir(HashTable ht, char *name)
+getpmnameddir(UNUSED(HashTable ht), char *name)
 {
     Param pm = NULL;
     Nameddir nd;
@@ -1515,7 +1515,7 @@ getpmnameddir(HashTable ht, char *name)
 
 /**/
 static void
-scanpmnameddirs(HashTable ht, ScanFunc func, int flags)
+scanpmnameddirs(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int i;
@@ -1549,7 +1549,7 @@ scanpmnameddirs(HashTable ht, ScanFunc func, int flags)
 
 /**/
 static HashNode
-getpmuserdir(HashTable ht, char *name)
+getpmuserdir(UNUSED(HashTable ht), char *name)
 {
     Param pm = NULL;
     Nameddir nd;
@@ -1579,7 +1579,7 @@ getpmuserdir(HashTable ht, char *name)
 
 /**/
 static void
-scanpmuserdirs(HashTable ht, ScanFunc func, int flags)
+scanpmuserdirs(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int i;
@@ -1665,7 +1665,7 @@ setpmdissalias(Param pm, char *value)
 
 /**/
 static void
-unsetpmalias(Param pm, int exp)
+unsetpmalias(Param pm, UNUSED(int exp))
 {
     HashNode hd = aliastab->removenode(aliastab, pm->nam);
 
@@ -1675,7 +1675,7 @@ unsetpmalias(Param pm, int exp)
 
 /**/
 static void
-unsetpmsalias(Param pm, int exp)
+unsetpmsalias(Param pm, UNUSED(int exp))
 {
     HashNode hd = sufaliastab->removenode(sufaliastab, pm->nam);
 
@@ -1685,7 +1685,7 @@ unsetpmsalias(Param pm, int exp)
 
 /**/
 static void
-setaliases(HashTable alht, Param pm, HashTable ht, int flags)
+setaliases(HashTable alht, UNUSED(Param pm), HashTable ht, int flags)
 {
     int i;
     HashNode hn, next, hd;
@@ -1813,7 +1813,7 @@ assignaliasdefs(Param pm, int flags)
 
 /**/
 static HashNode
-getalias(HashTable alht, HashTable ht, char *name, int flags)
+getalias(HashTable alht, UNUSED(HashTable ht), char *name, int flags)
 {
     Param pm = NULL;
     Alias al;
@@ -1877,7 +1877,7 @@ getpmdissalias(HashTable ht, char *name)
 
 /**/
 static void
-scanaliases(HashTable alht, HashTable ht, ScanFunc func,
+scanaliases(HashTable alht, UNUSED(HashTable ht), ScanFunc func,
 	    int pmflags, int alflags)
 {
     struct param pm;
@@ -2036,7 +2036,7 @@ static struct pardef partab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     incleanup = 0;
 
@@ -2045,7 +2045,7 @@ setup_(Module m)
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     /* Create the special associative arrays.
      * As an example for autoloaded parameters, this is probably a bad
@@ -2078,7 +2078,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_(UNUSED(Module m))
 {
     Param pm;
     struct pardef *def;
@@ -2097,7 +2097,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

@@ -254,7 +254,7 @@ lookupstyle(char *ctxt, char *style)
 }
 
 static int
-bin_zstyle(char *nam, char **args, Options ops, int func)
+bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int min, max, n, add = 0, list = 0, eval = 0;
 
@@ -692,7 +692,7 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 }
 
 static int
-bin_zformat(char *nam, char **args, Options ops, int func)
+bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char opt;
 
@@ -1232,7 +1232,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 */
 
 static int
-bin_zregexparse(char *nam, char **args, Options ops, int func)
+bin_zregexparse(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int oldextendedglob = opts[EXTENDEDGLOB];
     char *var1 = args[0];
@@ -1386,7 +1386,7 @@ add_opt_val(Zoptdesc d, char *arg)
 }
 
 static int
-bin_zparseopts(char *nam, char **args, Options ops, int func)
+bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL, **cp, **np;
     int del = 0, f, extract = 0, keep = 0;
@@ -1687,7 +1687,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     zstyles = zlstyles = NULL;
 
@@ -1711,7 +1711,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     freeallstyles();
 

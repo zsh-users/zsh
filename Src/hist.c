@@ -708,7 +708,7 @@ strinend(void)
  * they aren't needed */
 
 static void
-nohw(int c)
+nohw(UNUSED(int c))
 {
 }
 

@@ -285,7 +285,7 @@ mod_export int lastend;
 
 /**/
 int
-do_completion(Hookdef dummy, Compldat dat)
+do_completion(UNUSED(Hookdef dummy), Compldat dat)
 {
     int ret = 0, lst = dat->lst, incmd = dat->incmd, osl = showinglist;
     char *s = dat->s;
@@ -444,7 +444,7 @@ static int oldmenucmp;
 
 /**/
 int
-before_complete(Hookdef dummy, int *lst)
+before_complete(UNUSED(Hookdef dummy), int *lst)
 {
     oldmenucmp = menucmp;
 
@@ -483,7 +483,7 @@ before_complete(Hookdef dummy, int *lst)
 
 /**/
 int
-after_complete(Hookdef dummy, int *dat)
+after_complete(UNUSED(Hookdef dummy), int *dat)
 {
     if (menucmp && !oldmenucmp) {
 	struct chdata cdat;

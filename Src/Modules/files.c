@@ -56,7 +56,7 @@ ask(void)
 
 /**/
 static int
-bin_sync(char *nam, char **args, Options ops, int func)
+bin_sync(UNUSED(char *nam), UNUSED(char **args), UNUSED(Options ops), UNUSED(int func))
 {
     sync();
     return 0;
@@ -66,7 +66,7 @@ bin_sync(char *nam, char **args, Options ops, int func)
 
 /**/
 static int
-bin_mkdir(char *nam, char **args, Options ops, int func)
+bin_mkdir(char *nam, char **args, Options ops, UNUSED(int func))
 {
     mode_t oumask = umask(0);
     mode_t mode = 0777 & ~oumask;
@@ -143,7 +143,7 @@ domkdir(char *nam, char *path, mode_t mode, int p)
 
 /**/
 static int
-bin_rmdir(char *nam, char **args, Options ops, int func)
+bin_rmdir(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int err = 0;
 
@@ -477,7 +477,7 @@ recursivecmd_dorec(struct recursivecmd const *reccmd,
 
 /**/
 static int
-recurse_donothing(char *arg, char *rp, struct stat const *sp, void *magic)
+recurse_donothing(UNUSED(char *arg), UNUSED(char *rp), UNUSED(struct stat const *sp), UNUSED(void *magic))
 {
     return 0;
 }
@@ -541,7 +541,7 @@ rm_leaf(char *arg, char *rp, struct stat const *sp, void *magic)
 
 /**/
 static int
-rm_dirpost(char *arg, char *rp, struct stat const *sp, void *magic)
+rm_dirpost(char *arg, char *rp, UNUSED(struct stat const *sp), void *magic)
 {
     struct rmmagic *rmm = magic;
 
@@ -563,7 +563,7 @@ rm_dirpost(char *arg, char *rp, struct stat const *sp, void *magic)
 
 /**/
 static int
-bin_rm(char *nam, char **args, Options ops, int func)
+bin_rm(char *nam, char **args, Options ops, UNUSED(int func))
 {
     struct rmmagic rmm;
     int err;
@@ -589,7 +589,7 @@ struct chownmagic {
 
 /**/
 static int
-chown_dochown(char *arg, char *rp, struct stat const *sp, void *magic)
+chown_dochown(char *arg, char *rp, UNUSED(struct stat const *sp), void *magic)
 {
     struct chownmagic *chm = magic;
 
@@ -708,7 +708,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -730,7 +730,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

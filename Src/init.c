@@ -1108,7 +1108,7 @@ noop_function(void)
 
 /**/
 mod_export void
-noop_function_int(int nothing)
+noop_function_int(UNUSED(int nothing))
 {
     /* do nothing */
 }
@@ -1158,7 +1158,7 @@ autoload_zleread(char *lp, char *rp, int ha, int con)
 
 /**/
 mod_export unsigned char *
-fallback_zleread(char *lp, char *rp, int ha, int con)
+fallback_zleread(char *lp, UNUSED(char *rp), UNUSED(int ha), UNUSED(int con))
 {
     char *pptbuf;
     int pptlen;
@@ -1187,7 +1187,7 @@ mod_export CompctlReadFn compctlreadptr = fallback_compctlread;
 
 /**/
 mod_export int
-fallback_compctlread(char *name, char **args, Options ops, char *reply)
+fallback_compctlread(char *name, UNUSED(char **args), UNUSED(Options ops), UNUSED(char *reply))
 {
     zwarnnam(name, "option valid only in functions called from completion",
 	    NULL, 0);
@@ -1201,7 +1201,7 @@ fallback_compctlread(char *name, char **args, Options ops, char *reply)
 
 /**/
 mod_export int
-zsh_main(int argc, char **argv)
+zsh_main(UNUSED(int argc), char **argv)
 {
     char **t;
     int t0;

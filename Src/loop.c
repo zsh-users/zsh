@@ -196,7 +196,7 @@ execfor(Estate state, int do_exec)
 
 /**/
 int
-execselect(Estate state, int do_exec)
+execselect(Estate state, UNUSED(int do_exec))
 {
     Wordcode end, loop;
     wordcode code = state->pc[-1];
@@ -368,7 +368,7 @@ selectlist(LinkList l, size_t start)
 
 /**/
 int
-execwhile(Estate state, int do_exec)
+execwhile(Estate state, UNUSED(int do_exec))
 {
     Wordcode end, loop;
     wordcode code = state->pc[-1];
@@ -437,7 +437,7 @@ execwhile(Estate state, int do_exec)
 
 /**/
 int
-execrepeat(Estate state, int do_exec)
+execrepeat(Estate state, UNUSED(int do_exec))
 {
     Wordcode end, loop;
     wordcode code = state->pc[-1];

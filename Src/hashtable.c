@@ -92,7 +92,7 @@ hasher(char *str)
 
 /**/
 mod_export HashTable
-newhashtable(int size, char const *name, PrintTableStats printinfo)
+newhashtable(int size, UNUSED(char const *name), UNUSED(PrintTableStats printinfo))
 {
     HashTable ht;
 
@@ -315,7 +315,7 @@ removehashnode(HashTable ht, char *nam)
 
 /**/
 void
-disablehashnode(HashNode hn, int flags)
+disablehashnode(HashNode hn, UNUSED(int flags))
 {
     hn->flags |= DISABLED;
 }
@@ -324,7 +324,7 @@ disablehashnode(HashNode hn, int flags)
 
 /**/
 void
-enablehashnode(HashNode hn, int flags)
+enablehashnode(HashNode hn, UNUSED(int flags))
 {
     hn->flags &= ~DISABLED;
 }
@@ -670,7 +670,7 @@ hashdir(char **dirp)
 
 /**/
 static void
-fillcmdnamtable(HashTable ht)
+fillcmdnamtable(UNUSED(HashTable ht))
 {
     char **pq;
  
@@ -794,7 +794,7 @@ createshfunctable(void)
 
 /**/
 static HashNode
-removeshfuncnode(HashTable ht, char *nam)
+removeshfuncnode(UNUSED(HashTable ht), char *nam)
 {
     HashNode hn;
     int signum;
@@ -813,7 +813,7 @@ removeshfuncnode(HashTable ht, char *nam)
 
 /**/
 static void
-disableshfuncnode(HashNode hn, int flags)
+disableshfuncnode(HashNode hn, UNUSED(int flags))
 {
     hn->flags |= DISABLED;
     if (!strncmp(hn->nam, "TRAP", 4)) {
@@ -830,7 +830,7 @@ disableshfuncnode(HashNode hn, int flags)
 
 /**/
 static void
-enableshfuncnode(HashNode hn, int flags)
+enableshfuncnode(HashNode hn, UNUSED(int flags))
 {
     Shfunc shf = (Shfunc) hn;
 
@@ -1274,7 +1274,7 @@ add_userdir(int status, char *key, int keylen, char *val, int vallen, char *dumm
 
 /**/
 static void
-fillnameddirtable(HashTable ht)
+fillnameddirtable(UNUSED(HashTable ht))
 {
     if (!allusersadded) {
 #if defined(HAVE_NIS) || defined(HAVE_NIS_PLUS)

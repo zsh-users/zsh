@@ -136,7 +136,7 @@ cmpparcs(Parc *a, Parc *b)
 }
 
 static int
-bin_zprof(char *nam, char **args, Options ops, int func)
+bin_zprof(UNUSED(char *nam), UNUSED(char **args), Options ops, UNUSED(int func))
 {
     if (OPT_ISSET(ops,'c')) {
 	freepfuncs(calls);
@@ -329,7 +329,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

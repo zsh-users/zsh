@@ -96,7 +96,7 @@ widgetstr(Widget w)
 
 /**/
 static HashNode
-getpmwidgets(HashTable ht, char *name)
+getpmwidgets(UNUSED(HashTable ht), char *name)
 {
     Param pm = NULL;
     Thingy th;
@@ -124,7 +124,7 @@ getpmwidgets(HashTable ht, char *name)
 
 /**/
 static void
-scanpmwidgets(HashTable ht, ScanFunc func, int flags)
+scanpmwidgets(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
     int i;
@@ -154,7 +154,7 @@ scanpmwidgets(HashTable ht, ScanFunc func, int flags)
 /* Functions for the zlekeymaps special parameter. */
 
 static char **
-keymapsgetfn(Param pm)
+keymapsgetfn(UNUSED(Param pm))
 {
     int i;
     HashNode hn;
@@ -196,14 +196,14 @@ static struct pardef partab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     struct pardef *def;
 
@@ -230,7 +230,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_(UNUSED(Module m))
 {
     Param pm;
     struct pardef *def;
@@ -247,7 +247,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

@@ -61,7 +61,7 @@ static Param terminfo_pm;
 
 /**/
 static int
-bin_echoti(char *name, char **argv, Options ops, int func)
+bin_echoti(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     char *s, *t, **u;
     int arg, num, strarg = 0;
@@ -187,7 +187,7 @@ createtihash()
 
 /**/
 static HashNode
-getterminfo(HashTable ht, char *name)
+getterminfo(UNUSED(HashTable ht), char *name)
 {
     int len, num;
     char *tistr;
@@ -243,7 +243,7 @@ getterminfo(HashTable ht, char *name)
 
 /**/
 static void
-scanterminfo(HashTable ht, ScanFunc func, int flags)
+scanterminfo(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     Param pm = NULL;
     int num;
@@ -369,7 +369,7 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -413,7 +413,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

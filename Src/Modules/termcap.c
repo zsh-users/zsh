@@ -103,7 +103,7 @@ ztgetflag(char *s)
 
 /**/
 static int
-bin_echotc(char *name, char **argv, Options ops, int func)
+bin_echotc(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     char *s, buf[2048], *t, *u;
     int num, argct;
@@ -219,7 +219,7 @@ createtchash()
 
 /**/
 static HashNode
-gettermcap(HashTable ht, char *name)
+gettermcap(UNUSED(HashTable ht), char *name)
 {
     int len, num;
     char *tcstr, buf[2048], *u;
@@ -284,7 +284,7 @@ gettermcap(HashTable ht, char *name)
 
 /**/
 static void
-scantermcap(HashTable ht, ScanFunc func, int flags)
+scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     Param pm = NULL;
     int num;
@@ -389,7 +389,7 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -430,7 +430,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

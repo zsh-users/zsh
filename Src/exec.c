@@ -444,7 +444,7 @@ isgooderr(int e, char *dir)
 
 /**/
 void
-execute(Cmdnam not_used_yet, int dash, int defpath)
+execute(UNUSED(Cmdnam cmdname), int dash, int defpath)
 {
     Cmdnam cn;
     char buf[MAXCMDLEN], buf2[MAXCMDLEN];
@@ -3157,7 +3157,7 @@ extern int tracingcond;
 
 /**/
 static int
-execcond(Estate state, int do_exec)
+execcond(Estate state, UNUSED(int do_exec))
 {
     int stat;
 
@@ -3182,7 +3182,7 @@ execcond(Estate state, int do_exec)
 
 /**/
 static int
-execarith(Estate state, int do_exec)
+execarith(Estate state, UNUSED(int do_exec))
 {
     char *e;
     mnumber val = zero_mnumber;
@@ -3216,7 +3216,7 @@ execarith(Estate state, int do_exec)
 
 /**/
 static int
-exectime(Estate state, int do_exec)
+exectime(Estate state, UNUSED(int do_exec))
 {
     int jb;
 
@@ -3234,7 +3234,7 @@ exectime(Estate state, int do_exec)
 
 /**/
 static int
-execfuncdef(Estate state, int do_exec)
+execfuncdef(Estate state, UNUSED(int do_exec))
 {
     Shfunc shf;
     char *s;
@@ -3364,7 +3364,7 @@ execshfunc(Shfunc shf, LinkList args)
 
 /**/
 static int
-execautofn(Estate state, int do_exec)
+execautofn(Estate state, UNUSED(int do_exec))
 {
     Shfunc shf;
     char *oldscriptname;

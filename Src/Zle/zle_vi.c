@@ -259,7 +259,7 @@ dovilinerange(void)
 
 /**/
 int
-viaddnext(char **args)
+viaddnext(UNUSED(char **args))
 {
     if (cs != findeol())
 	cs++;
@@ -269,7 +269,7 @@ viaddnext(char **args)
 
 /**/
 int
-viaddeol(char **args)
+viaddeol(UNUSED(char **args))
 {
     cs = findeol();
     startvitext(1);
@@ -278,7 +278,7 @@ viaddeol(char **args)
 
 /**/
 int
-viinsert(char **args)
+viinsert(UNUSED(char **args))
 {
     startvitext(1);
     return 0;
@@ -286,7 +286,7 @@ viinsert(char **args)
 
 /**/
 int
-viinsertbol(char **args)
+viinsertbol(UNUSED(char **args))
 {
     vifirstnonblank(zlenoargs);
     startvitext(1);
@@ -295,7 +295,7 @@ viinsertbol(char **args)
 
 /**/
 int
-videlete(char **args)
+videlete(UNUSED(char **args))
 {
     int c2, ret = 1;
 
@@ -343,7 +343,7 @@ videletechar(char **args)
 
 /**/
 int
-vichange(char **args)
+vichange(UNUSED(char **args))
 {
     int c2, ret = 1;
 
@@ -360,7 +360,7 @@ vichange(char **args)
 
 /**/
 int
-visubstitute(char **args)
+visubstitute(UNUSED(char **args))
 {
     int n = zmult;
 
@@ -382,7 +382,7 @@ visubstitute(char **args)
 
 /**/
 int
-vichangeeol(char **args)
+vichangeeol(UNUSED(char **args))
 {
     forekill(findeol() - cs, 0);
     startvitext(1);
@@ -399,7 +399,7 @@ vichangewholeline(char **args)
 
 /**/
 int
-viyank(char **args)
+viyank(UNUSED(char **args))
 {
     int oldcs = cs, c2, ret = 1;
 
@@ -415,7 +415,7 @@ viyank(char **args)
 
 /**/
 int
-viyankeol(char **args)
+viyankeol(UNUSED(char **args))
 {
     int x = findeol();
 
@@ -428,7 +428,7 @@ viyankeol(char **args)
 
 /**/
 int
-viyankwholeline(char **args)
+viyankwholeline(UNUSED(char **args))
 {
     int bol = findbol(), oldcs = cs;
     int n = zmult;
@@ -451,7 +451,7 @@ viyankwholeline(char **args)
 
 /**/
 int
-vireplace(char **args)
+vireplace(UNUSED(char **args))
 {
     startvitext(0);
     return 0;
@@ -472,7 +472,7 @@ vireplace(char **args)
 
 /**/
 int
-vireplacechars(char **args)
+vireplacechars(UNUSED(char **args))
 {
     int ch, n = zmult;
 
@@ -510,7 +510,7 @@ vireplacechars(char **args)
 
 /**/
 int
-vicmdmode(char **args)
+vicmdmode(UNUSED(char **args))
 {
     if (invicmdmode() || selectkeymap("vicmd", 0))
 	return 1;
@@ -523,7 +523,7 @@ vicmdmode(char **args)
 
 /**/
 int
-viopenlinebelow(char **args)
+viopenlinebelow(UNUSED(char **args))
 {
     cs = findeol();
     spaceinline(1);
@@ -535,7 +535,7 @@ viopenlinebelow(char **args)
 
 /**/
 int
-viopenlineabove(char **args)
+viopenlineabove(UNUSED(char **args))
 {
     cs = findbol();
     spaceinline(1);
@@ -547,7 +547,7 @@ viopenlineabove(char **args)
 
 /**/
 int
-vioperswapcase(char **args)
+vioperswapcase(UNUSED(char **args))
 {
     int oldcs, c2, ret = 1;
 
@@ -576,7 +576,7 @@ vioperswapcase(char **args)
 
 /**/
 int
-virepeatchange(char **args)
+virepeatchange(UNUSED(char **args))
 {
     /* make sure we have a change to repeat */
     if (!vichgbuf || vichgflag)
@@ -599,7 +599,7 @@ virepeatchange(char **args)
 
 /**/
 int
-viindent(char **args)
+viindent(UNUSED(char **args))
 {
     int oldcs = cs, c2;
 
@@ -630,7 +630,7 @@ viindent(char **args)
 
 /**/
 int
-viunindent(char **args)
+viunindent(UNUSED(char **args))
 {
     int oldcs = cs, c2;
 
@@ -691,7 +691,7 @@ vibackwarddeletechar(char **args)
 
 /**/
 int
-vikillline(char **args)
+vikillline(UNUSED(char **args))
 {
     if (viinsbegin > cs)
 	return 1;
@@ -701,7 +701,7 @@ vikillline(char **args)
 
 /**/
 int
-viputbefore(char **args)
+viputbefore(UNUSED(char **args))
 {
     Cutbuffer buf = &cutbuf;
     int n = zmult;
@@ -733,7 +733,7 @@ viputbefore(char **args)
 
 /**/
 int
-viputafter(char **args)
+viputafter(UNUSED(char **args))
 {
     Cutbuffer buf = &cutbuf;
     int n = zmult;
@@ -767,7 +767,7 @@ viputafter(char **args)
 
 /**/
 int
-vijoin(char **args)
+vijoin(UNUSED(char **args))
 {
     int x;
 
@@ -788,7 +788,7 @@ vijoin(char **args)
 
 /**/
 int
-viswapcase(char **args)
+viswapcase(UNUSED(char **args))
 {
     int eol, n = zmult;
 
@@ -810,7 +810,7 @@ viswapcase(char **args)
 
 /**/
 int
-vicapslockpanic(char **args)
+vicapslockpanic(UNUSED(char **args))
 {
     clearlist = 1;
     zbeep();
@@ -824,7 +824,7 @@ vicapslockpanic(char **args)
 
 /**/
 int
-visetbuffer(char **args)
+visetbuffer(UNUSED(char **args))
 {
     int ch;
 
@@ -844,7 +844,7 @@ visetbuffer(char **args)
 
 /**/
 int
-vikilleol(char **args)
+vikilleol(UNUSED(char **args))
 {
     int n = findeol() - cs;
 
@@ -860,7 +860,7 @@ vikilleol(char **args)
 
 /**/
 int
-vipoundinsert(char **args)
+vipoundinsert(UNUSED(char **args))
 {
     int oldcs = cs;
 

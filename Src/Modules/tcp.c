@@ -167,7 +167,7 @@ zsh_gethostbyname2(char const *name, int af)
 
 /**/
 mod_export struct hostent *
-zsh_getipnodebyname(char const *name, int af, int flags, int *errorp)
+zsh_getipnodebyname(char const *name, int af, UNUSED(int flags), int *errorp)
 {
     static struct hostent ahe;
     static char nbuf[16];
@@ -195,7 +195,7 @@ zsh_getipnodebyname(char const *name, int af, int flags, int *errorp)
 
 /**/
 mod_export void
-freehostent(struct hostent *ptr)
+freehostent(UNUSED(struct hostent *ptr))
 {
 }
 
@@ -337,7 +337,7 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 }
 
 static int
-bin_ztcp(char *nam, char **args, Options ops, int func)
+bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int herrno, err=1, destport, force=0, verbose=0, test=0, targetfd=0;
     SOCKLEN_T  len;
@@ -680,7 +680,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -706,7 +706,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

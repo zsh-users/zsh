@@ -439,7 +439,7 @@ createlihash()
 
 /**/
 static HashNode
-getlanginfo(HashTable ht, char *name)
+getlanginfo(UNUSED(HashTable ht), char *name)
 {
     int len, *elem;
     char *listr;
@@ -480,7 +480,7 @@ getlanginfo(HashTable ht, char *name)
 
 /**/
 static void
-scanlanginfo(HashTable ht, ScanFunc func, int flags)
+scanlanginfo(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     Param pm = NULL;
     char **element, *langstr;
@@ -515,14 +515,14 @@ scanlanginfo(HashTable ht, ScanFunc func, int flags)
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
 #ifdef HAVE_NL_LANGINFO
     if (!createlihash())
@@ -535,7 +535,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_(UNUSED(Module m))
 {
 #ifdef HAVE_NL_LANGINFO
     Param pm;
@@ -551,7 +551,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

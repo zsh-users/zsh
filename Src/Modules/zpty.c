@@ -622,7 +622,7 @@ ptywrite(Ptycmd cmd, char **args, int nonl)
 
 /**/
 static int
-bin_zpty(char *nam, char **args, Options ops, int func)
+bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 {
     if ((OPT_ISSET(ops,'r') && OPT_ISSET(ops,'w')) ||
 	((OPT_ISSET(ops,'r') || OPT_ISSET(ops,'w')) && 
@@ -721,7 +721,7 @@ bin_zpty(char *nam, char **args, Options ops, int func)
 }
 
 static int
-ptyhook(Hookdef d, void *dummy)
+ptyhook(UNUSED(Hookdef d), UNUSED(void *dummy))
 {
     deleteallptycmds();
     return 0;
@@ -733,7 +733,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -760,7 +760,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

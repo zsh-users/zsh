@@ -248,7 +248,7 @@ newkeymap(Keymap tocopy, char *kmname)
 
 /**/
 static void
-scancopykeys(HashNode hn, int flags)
+scancopykeys(HashNode hn, UNUSED(int flags))
 {
     Key k = (Key) hn;
     Key kn = zalloc(sizeof(*k));
@@ -301,7 +301,7 @@ scankeymap(Keymap km, int sort, KeyScanFunc func, void *magic)
 
 /**/
 static void
-scankeys(HashNode hn, int flags)
+scankeys(HashNode hn, UNUSED(int flags))
 {
     Key k = (Key) hn;
     int f = k->nam[0] == Meta ? STOUC(k->nam[1])^32 : STOUC(k->nam[0]);
@@ -615,7 +615,7 @@ keyisprefix(Keymap km, char *seq)
 
 /**/
 int
-bin_bindkey(char *name, char **argv, Options ops, int func)
+bin_bindkey(char *name, char **argv, Options ops, UNUSED(int func))
 {
     static struct opn {
 	char o;
@@ -707,7 +707,7 @@ bin_bindkey(char *name, char **argv, Options ops, int func)
 
 /**/
 static int
-bin_bindkey_lsmaps(char *name, char *kmname, Keymap km, char **argv, Options ops, char func)
+bin_bindkey_lsmaps(UNUSED(char *name), UNUSED(char *kmname), UNUSED(Keymap km), UNUSED(char **argv), Options ops, UNUSED(char func))
 {
     scanhashtable(keymapnamtab, 1, 0, 0, scanlistmaps, OPT_ISSET(ops,'L'));
     return 0;
@@ -733,7 +733,7 @@ scanlistmaps(HashNode hn, int list)
 
 /**/
 static int
-bin_bindkey_delall(char *name, char *kmname, Keymap km, char **argv, Options ops, char func)
+bin_bindkey_delall(UNUSED(char *name), UNUSED(char *kmname), UNUSED(Keymap km), UNUSED(char **argv), UNUSED(Options ops), UNUSED(char func))
 {
     keymapnamtab->emptytable(keymapnamtab);
     default_bindings();
@@ -744,7 +744,7 @@ bin_bindkey_delall(char *name, char *kmname, Keymap km, char **argv, Options ops
 
 /**/
 static int
-bin_bindkey_del(char *name, char *kmname, Keymap km, char **argv, Options ops, char func)
+bin_bindkey_del(char *name, UNUSED(char *kmname), UNUSED(Keymap km), char **argv, UNUSED(Options ops), UNUSED(char func))
 {
     int ret = 0;
 
@@ -763,7 +763,7 @@ bin_bindkey_del(char *name, char *kmname, Keymap km, char **argv, Options ops, c
 
 /**/
 static int
-bin_bindkey_link(char *name, char *kmname, Keymap km, char **argv, Options ops, char func)
+bin_bindkey_link(char *name, UNUSED(char *kmname), Keymap km, char **argv, UNUSED(Options ops), UNUSED(char func))
 {
     km = openkeymap(argv[0]);
     if(!km) {
@@ -780,7 +780,7 @@ bin_bindkey_link(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 
 /**/
 static int
-bin_bindkey_new(char *name, char *kmname, Keymap km, char **argv, Options ops, char func)
+bin_bindkey_new(char *name, UNUSED(char *kmname), Keymap km, char **argv, UNUSED(Options ops), UNUSED(char func))
 {
     KeymapName kmn = (KeymapName) keymapnamtab->getnode(keymapnamtab, argv[0]);
 
@@ -808,7 +808,7 @@ bin_bindkey_new(char *name, char *kmname, Keymap km, char **argv, Options ops, c
 
 /**/
 static int
-bin_bindkey_meta(char *name, char *kmname, Keymap km, char **argv, Options ops, char func)
+bin_bindkey_meta(char *name, char *kmname, Keymap km, UNUSED(char **argv), UNUSED(Options ops), UNUSED(char func))
 {
     char m[3], *str;
     int i;
@@ -916,7 +916,7 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 
 /**/
 static void
-scanremoveprefix(char *seq, Thingy bind, char *str, void *magic)
+scanremoveprefix(char *seq, UNUSED(Thingy bind), UNUSED(char *str), void *magic)
 {
     struct remprefstate *rps = magic;
 
@@ -932,7 +932,7 @@ scanremoveprefix(char *seq, Thingy bind, char *str, void *magic)
 
 /**/
 static int
-bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, Options ops, char func)
+bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, Options ops, UNUSED(char func))
 {
     struct bindstate bs;
 

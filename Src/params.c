@@ -329,7 +329,7 @@ static HashTable outtable;
 
 /**/
 static void
-scancopyparams(HashNode hn, int flags)
+scancopyparams(HashNode hn, UNUSED(int flags))
 {
     /* Going into a real parameter, so always use permanent storage */
     Param pm = (Param)hn;
@@ -372,7 +372,7 @@ static unsigned numparamvals;
 
 /**/
 mod_export void
-scancountparams(HashNode hn, int flags)
+scancountparams(UNUSED(HashNode hn), int flags)
 {
     ++numparamvals;
     if ((flags & SCANPM_WANTKEYS) && (flags & SCANPM_WANTVALS))
@@ -2311,7 +2311,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
 
 /**/
 mod_export void
-stdunsetfn(Param pm, int exp)
+stdunsetfn(Param pm, UNUSED(int exp))
 {
     switch (PM_TYPE(pm->flags)) {
 	case PM_SCALAR: pm->sets.cfn(pm, NULL); break;
@@ -2482,14 +2482,14 @@ arrhashsetfn(Param pm, char **val, int augment)
 
 /**/
 void
-nullstrsetfn(Param pm, char *x)
+nullstrsetfn(UNUSED(Param pm), char *x)
 {
     zsfree(x);
 }
 
 /**/
 void
-nullintsetfn(Param pm, zlong x)
+nullintsetfn(UNUSED(Param pm), UNUSED(zlong x))
 {}
 
 
@@ -2671,7 +2671,7 @@ tiedarrsetfn(Param pm, char *x)
 
 /**/
 void
-tiedarrunsetfn(Param pm, int exp)
+tiedarrunsetfn(Param pm, UNUSED(int exp))
 {
     /*
      * Special unset function because we allocated a struct tieddata
@@ -2724,7 +2724,7 @@ zhuniqarray(char **x)
 
 /**/
 zlong
-poundgetfn(Param pm)
+poundgetfn(UNUSED(Param pm))
 {
     return arrlen(pparams);
 }
@@ -2733,7 +2733,7 @@ poundgetfn(Param pm)
 
 /**/
 zlong
-randomgetfn(Param pm)
+randomgetfn(UNUSED(Param pm))
 {
     return rand() & 0x7fff;
 }
@@ -2742,7 +2742,7 @@ randomgetfn(Param pm)
 
 /**/
 void
-randomsetfn(Param pm, zlong v)
+randomsetfn(UNUSED(Param pm), zlong v)
 {
     srand((unsigned int)v);
 }
@@ -2767,7 +2767,7 @@ intsecondssetfn(Param pm, zlong x)
 
 /**/
 double
-floatsecondsgetfn(Param pm)
+floatsecondsgetfn(UNUSED(Param pm))
 {
     struct timeval now;
     struct timezone dummy_tz;
@@ -2780,7 +2780,7 @@ floatsecondsgetfn(Param pm)
 
 /**/
 void
-floatsecondssetfn(Param pm, double x)
+floatsecondssetfn(UNUSED(Param pm), double x)
 {
     struct timeval now;
     struct timezone dummy_tz;
@@ -2832,7 +2832,7 @@ setsecondstype(Param pm, int on, int off)
 
 /**/
 char *
-usernamegetfn(Param pm)
+usernamegetfn(UNUSED(Param pm))
 {
     return get_username();
 }
@@ -2841,7 +2841,7 @@ usernamegetfn(Param pm)
 
 /**/
 void
-usernamesetfn(Param pm, char *x)
+usernamesetfn(UNUSED(Param pm), char *x)
 {
 #if defined(HAVE_SETUID) && defined(HAVE_GETPWNAM)
     struct passwd *pswd;
@@ -2864,7 +2864,7 @@ usernamesetfn(Param pm, char *x)
 
 /**/
 zlong
-uidgetfn(Param pm)
+uidgetfn(UNUSED(Param pm))
 {
     return getuid();
 }
@@ -2873,7 +2873,7 @@ uidgetfn(Param pm)
 
 /**/
 void
-uidsetfn(Param pm, uid_t x)
+uidsetfn(UNUSED(Param pm), uid_t x)
 {
 #ifdef HAVE_SETUID
     setuid(x);
@@ -2884,7 +2884,7 @@ uidsetfn(Param pm, uid_t x)
 
 /**/
 zlong
-euidgetfn(Param pm)
+euidgetfn(UNUSED(Param pm))
 {
     return geteuid();
 }
@@ -2893,7 +2893,7 @@ euidgetfn(Param pm)
 
 /**/
 void
-euidsetfn(Param pm, uid_t x)
+euidsetfn(UNUSED(Param pm), uid_t x)
 {
 #ifdef HAVE_SETEUID
     seteuid(x);
@@ -2904,7 +2904,7 @@ euidsetfn(Param pm, uid_t x)
 
 /**/
 zlong
-gidgetfn(Param pm)
+gidgetfn(UNUSED(Param pm))
 {
     return getgid();
 }
@@ -2913,7 +2913,7 @@ gidgetfn(Param pm)
 
 /**/
 void
-gidsetfn(Param pm, gid_t x)
+gidsetfn(UNUSED(Param pm), gid_t x)
 {
 #ifdef HAVE_SETUID
     setgid(x);
@@ -2924,7 +2924,7 @@ gidsetfn(Param pm, gid_t x)
 
 /**/
 zlong
-egidgetfn(Param pm)
+egidgetfn(UNUSED(Param pm))
 {
     return getegid();
 }
@@ -2933,7 +2933,7 @@ egidgetfn(Param pm)
 
 /**/
 void
-egidsetfn(Param pm, gid_t x)
+egidsetfn(UNUSED(Param pm), gid_t x)
 {
 #ifdef HAVE_SETEUID
     setegid(x);
@@ -2942,7 +2942,7 @@ egidsetfn(Param pm, gid_t x)
 
 /**/
 zlong
-ttyidlegetfn(Param pm)
+ttyidlegetfn(UNUSED(Param pm))
 {
     struct stat ttystat;
 
@@ -2955,7 +2955,7 @@ ttyidlegetfn(Param pm)
 
 /**/
 char *
-ifsgetfn(Param pm)
+ifsgetfn(UNUSED(Param pm))
 {
     return ifs;
 }
@@ -2964,7 +2964,7 @@ ifsgetfn(Param pm)
 
 /**/
 void
-ifssetfn(Param pm, char *x)
+ifssetfn(UNUSED(Param pm), char *x)
 {
     zsfree(ifs);
     ifs = x;
@@ -3056,7 +3056,7 @@ lcsetfn(Param pm, char *x)
 
 /**/
 zlong
-histsizegetfn(Param pm)
+histsizegetfn(UNUSED(Param pm))
 {
     return histsiz;
 }
@@ -3065,7 +3065,7 @@ histsizegetfn(Param pm)
 
 /**/
 void
-histsizesetfn(Param pm, zlong v)
+histsizesetfn(UNUSED(Param pm), zlong v)
 {
     if ((histsiz = v) < 1)
 	histsiz = 1;
@@ -3076,7 +3076,7 @@ histsizesetfn(Param pm, zlong v)
 
 /**/
 zlong
-savehistsizegetfn(Param pm)
+savehistsizegetfn(UNUSED(Param pm))
 {
     return savehistsiz;
 }
@@ -3085,7 +3085,7 @@ savehistsizegetfn(Param pm)
 
 /**/
 void
-savehistsizesetfn(Param pm, zlong v)
+savehistsizesetfn(UNUSED(Param pm), zlong v)
 {
     if ((savehistsiz = v) < 0)
 	savehistsiz = 0;
@@ -3095,7 +3095,7 @@ savehistsizesetfn(Param pm, zlong v)
 
 /**/
 void
-errnosetfn(Param pm, zlong x)
+errnosetfn(UNUSED(Param pm), zlong x)
 {
     errno = (int)x;
 }
@@ -3104,7 +3104,7 @@ errnosetfn(Param pm, zlong x)
 
 /**/
 zlong
-errnogetfn(Param pm)
+errnogetfn(UNUSED(Param pm))
 {
     return errno;
 }
@@ -3113,7 +3113,7 @@ errnogetfn(Param pm)
 
 /**/
 char *
-histcharsgetfn(Param pm)
+histcharsgetfn(UNUSED(Param pm))
 {
     static char buf[4];
 
@@ -3128,7 +3128,7 @@ histcharsgetfn(Param pm)
 
 /**/
 void
-histcharssetfn(Param pm, char *x)
+histcharssetfn(UNUSED(Param pm), char *x)
 {
     if (x) {
 	bangchar = x[0];
@@ -3147,7 +3147,7 @@ histcharssetfn(Param pm, char *x)
 
 /**/
 char *
-homegetfn(Param pm)
+homegetfn(UNUSED(Param pm))
 {
     return home;
 }
@@ -3156,7 +3156,7 @@ homegetfn(Param pm)
 
 /**/
 void
-homesetfn(Param pm, char *x)
+homesetfn(UNUSED(Param pm), char *x)
 {
     zsfree(home);
     if (x && isset(CHASELINKS) && (home = xsymlink(x)))
@@ -3170,7 +3170,7 @@ homesetfn(Param pm, char *x)
 
 /**/
 char *
-wordcharsgetfn(Param pm)
+wordcharsgetfn(UNUSED(Param pm))
 {
     return wordchars;
 }
@@ -3179,7 +3179,7 @@ wordcharsgetfn(Param pm)
 
 /**/
 void
-wordcharssetfn(Param pm, char *x)
+wordcharssetfn(UNUSED(Param pm), char *x)
 {
     zsfree(wordchars);
     wordchars = x;
@@ -3190,7 +3190,7 @@ wordcharssetfn(Param pm, char *x)
 
 /**/
 char *
-underscoregetfn(Param pm)
+underscoregetfn(UNUSED(Param pm))
 {
     char *u = dupstring(underscore);
 
@@ -3202,7 +3202,7 @@ underscoregetfn(Param pm)
 
 /**/
 char *
-termgetfn(Param pm)
+termgetfn(UNUSED(Param pm))
 {
     return term;
 }
@@ -3211,7 +3211,7 @@ termgetfn(Param pm)
 
 /**/
 void
-termsetfn(Param pm, char *x)
+termsetfn(UNUSED(Param pm), char *x)
 {
     zsfree(term);
     term = x ? x : ztrdup("");
@@ -3227,7 +3227,7 @@ termsetfn(Param pm, char *x)
 
 /**/
 static char **
-pipestatgetfn(Param pm)
+pipestatgetfn(UNUSED(Param pm))
 {
     char **x = (char **) zhalloc((numpipestats + 1) * sizeof(char *));
     char buf[20], **p;
@@ -3246,7 +3246,7 @@ pipestatgetfn(Param pm)
 
 /**/
 static void
-pipestatsetfn(Param pm, char **x)
+pipestatsetfn(UNUSED(Param pm), char **x)
 {
     if (x) {
         int i;
@@ -3591,7 +3591,7 @@ endparamscope(void)
 
 /**/
 static void
-scanendscope(HashNode hn, int flags)
+scanendscope(HashNode hn, UNUSED(int flags))
 {
     Param pm = (Param)hn;
     if (pm->level > locallevel) {
