@@ -19,7 +19,7 @@ To develop (as opposed to just build) zsh, you'll need a few specialised
 tools:
 
 * GNU autoconf, version 2.50 or later.  This version contained
-  significant enhancements and arlier versions will no
+  significant enhancements and earlier versions will no
   longer work.
 
 * GNU m4.  (Required by autoconf.)
