@@ -1,3 +1,9 @@
-#defcomp declare export integer local readonly typeset
+#compdef declare export integer local readonly typeset
 
-complist -v -q -S '='
+if compset -P '*=*:'; then
+  _default
+elif compset -P '*='; then
+  _default
+else
+  _parameters -q -S '='
+fi
