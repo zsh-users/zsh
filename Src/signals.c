@@ -671,8 +671,11 @@ dosavetrap(int sig, int level)
 	    newshf->funcdef = dupeprog(shf->funcdef, 0);
 	}
 	st->list = newshf;
-    } else {
+    } else if (sigtrapped[sig]) {
 	st->list = sigfuncs[sig] ? dupeprog(sigfuncs[sig], 0) : NULL;
+    } else {
+	DPUTS(sigfuncs[sig], "BUG: sigfuncs not null for untrapped signal");
+	st->list = NULL;
     }
     if (!savetraps)
 	savetraps = znewlinklist();
@@ -789,6 +792,7 @@ removetrap(int sig)
 	 * As in dosavetrap(), don't call removeshfuncnode() because
 	 * that calls back into unsettrap();
 	 */
+	sigfuncs[sig] = NULL;
 	return removehashnode(shfunctab, func);
     } else if (sigfuncs[sig]) {
 	freeeprog(sigfuncs[sig]);
