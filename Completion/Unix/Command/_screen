@@ -76,18 +76,18 @@ if [[ -n $state ]]; then
   case $state in
     attached-sessions)
       sessions=(
-	${${${${(f)"$(_call_program screen-sessions $words[1] \
-            -ls)"}[2,-3]##[[:blank:]]}:#*Detached*}%[[:blank:]]*}
+        ${${${(M)${(f)"$(_call_program screen-sessions $words[1] \
+            -ls)"}:#*[Aa]ttached*}##[[:blank:]]}%%[[:blank:]]*}
       )
     ;;
     detached-sessions)
       sessions=(
-	${${${${(f)"$(_call_program screen-sessions $words[1] \
-            -ls)"}[2,-3]##[[:blank:]]}:#*Attached*}%[[:blank:]]*}
+        ${${${(M)${(f)"$(_call_program screen-sessions $words[1] \
+            -ls)"}:#*[Dd]etached*}##[[:blank:]]}%%[[:blank:]]*}
       )
     ;;
   esac
-  
+
   # check if initial PID is necessary to make sessions unambiguous
   if [[ ${#${(u)sessions#*.}} -lt $#sessions ]]; then
     _wanted screen-sessions expl "${state%-*} screen process" \

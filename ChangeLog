@@ -1,3 +1,8 @@
+2004-11-27  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 20584: Completion/Unix/Command/_screen: offer multiuser screen
+	sessions for attaching/detaching
+
 2004-11-24  Clint Adams  <clint@zsh.org>
 
 	* 20578: Functions/Prompts/prompt_elite2_setup:
