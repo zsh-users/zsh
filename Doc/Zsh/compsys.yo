@@ -587,6 +587,13 @@ item(tt(paths))(
 used to look up the values of the tt(expand), tt(cursor) and
 tt(special-dirs) styles
 )
+item(tt(pids))(
+for process identifiers
+)
+item(tt(pids-list))(
+used to look up the tt(command) style when generating the list to
+display for process identifiers
+)
 item(tt(pods))(
 for perl pods
 )
@@ -601,9 +608,6 @@ for printer names
 )
 item(tt(processes))(
 for process identifiers
-)
-item(tt(ps))(
-used to look up the tt(arguments) and tt(list-arguments) styles
 )
 item(tt(sequences))(
 for sequences (e.g. tt(mh) sequences)
@@ -674,10 +678,6 @@ item(tt(add-space))(
 This style is used by the tt(_prefix) completer to decide if a space
 should be inserted before the suffix.
 )
-item(tt(arguments))(
-The value of this style is given to the tt(ps) command by functions
-that call it when generating process identifiers as matches.
-)
 item(tt(auto-description))(
 If set, this style's value will be used as the description for options which
 are not described by the completion functions, but that have exactly
@@ -692,6 +692,25 @@ in the tt(Functions/Zle) directory of the distribution). Its value
 should be a pattern and all keys matching this pattern will cause the
 widget to stop incremental completion without the key having any
 further effect.
+)
+item(tt(command))(
+This style can be used to override the defaults in several completion
+functions for how commands are called to generate information about
+possible matches. The strings in the value are joined with spaces
+between them to build the command line to execute. If the value starts 
+with a hyphen the string built will be prepended to the default
+supplied by the completion function. This allows one to easily stick a 
+tt(builtin) or tt(command) in front of the default in case one has,
+for example, a shell function with the same name as the command
+called, but for completion purposes one needs to ensure that the real
+command is called.
+
+For example, the function generating process IDs as matches uses this
+style with the tt(pids) tag to generate the IDs to complete and iwhen
+the tt(verbose) style is `true', it uses this style with the
+tt(pids-list) tag to generate the strings to display. When using
+different values for these two tags one should ensure that the process
+IDs appear in the same order in both lists.
 )
 item(tt(completer))(
 The strings given as the value of this style give the names of the
@@ -1004,10 +1023,6 @@ screen).
 The tt(predict-on) widget uses this style to decide if the completion
 should be shown even if there is only one possible completion. This is 
 done if the value of this style is the string tt(always).
-)
-item(tt(list-arguments))(
-Like the tt(arguments) style, but used when calling the tt(ps) command 
-to generate the list to display.
 )
 item(tt(list-colors))(
 If the tt(zsh/complist) module is used, this style can be used to set
@@ -1469,6 +1484,10 @@ item(tt(users-hosts-ports))(
 Like tt(users-hosts) but used for commands like tt(telnet) and
 containing strings of the form `var(user)tt(@)var(host)tt(:)var(port)'.
 )
+item(tt(users-hosts-ports))(
+Like tt(users-hosts) but used for commands like tt(telnet) and
+containing strings of the form `var(user)tt(@)var(host)tt(:)var(port)'.
+)
 item(tt(verbose))(
 This is used in several contexts to decide if only a simple or a
 verbose list of matches should be generated. For example some commands 
@@ -1908,6 +1927,19 @@ there is a definition (given with the tt(compdef) function). For
 example, the function completing inside subscripts might use
 `tt(_compalso -math-)' to include the completions generated for
 mathematical environments.
+)
+findex(_call)
+item(tt(_call) var(tag) var(string) ...)(
+This function is used in places where a command is called and the user 
+should have the possibility to override the default for calling this
+command. It looks up the tt(command) style with the supplied
+var(tag). If the style is set, its value is used as the command to
+execute.
+
+In any case, the var(strings) from the call to tt(_call) or from the
+style are concatenated with spaces between them and the resulting
+string is evaluated. The return value is the return value of the
+command called.
 )
 findex(_normal)
 item(tt(_normal))(

@@ -6,7 +6,7 @@ _tags users || return 1
 
 if which users >/dev/null; then
   _description users expl 'users logged on'
-  compadd "$@" "$expl[@]" - $(users) && return 0
+  compadd "$@" "$expl[@]" - $(_call users users) && return 0
 else
   # Other methods of finding out users logged on should be added here
   return 1

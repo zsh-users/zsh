@@ -36,7 +36,7 @@ else
       case "$IPREFIX" in
       *DEVICE\=)
         _wanted devices expl 'ghostscript device' &&
-            compadd "$expl[@]" - "${(@)${=${$(gs -h)##* devices:}%%Search path:*}:#}" && ret=0
+            compadd "$expl[@]" - "${(@)${=${$(_call devices gs -h)##* devices:}%%Search path:*}:#}" && ret=0
         ;;
       *OutputFile\=)
         _description files expl 'output file'

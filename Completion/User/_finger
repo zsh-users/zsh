@@ -4,7 +4,7 @@ local curcontext="$curcontext" state line
 typeset -A opt_args
 
 if (( ! $+_finger_args )); then
-  local help="$(finger -\? 2>&1)"
+  local help="$(_call options finger -\? 2>&1)"
   local -A optionmap
 
 ## `finger -\?':

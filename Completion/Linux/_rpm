@@ -190,7 +190,7 @@ while [[ -n "$state" ]]; do
     ;&
   package)
     _wanted packages expl 'RPM package' &&
-        compadd "$expl[@]" -M 'r:|-=* r:|=*' - $(rpm -qa) && ret=0
+        compadd "$expl[@]" -M 'r:|-=* r:|=*' - $(_call packages rpm -qa) && ret=0
     ;;
   package_file)
     if compset -P ftp://; then
@@ -205,7 +205,7 @@ while [[ -n "$state" ]]; do
     if compset -P '*\{'; then
       _wanted tags expl 'RPM tag' &&
           compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '\}' - \
-                  "${(@)${(@f)$(rpm --querytags)}#RPMTAG_}" && ret=0
+                  "${(@)${(@f)$(_call tags rpm --querytags)}#RPMTAG_}" && ret=0
     else
       _message 'RPM format'
     fi

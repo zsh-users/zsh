@@ -9,7 +9,7 @@ _wanted fonts expl font || return 1
 if (( ! $+_font_cache )); then
   typeset -gU _font_cache
 
- _font_cache=( "${(@)^${(@f)$(xlsfonts)}%%--*}--" )
+ _font_cache=( "${(@)^${(@f)$(_call fonts xlsfonts)}%%--*}--" )
 fi
 
 compadd -M 'r:|-=* r:|=*' "$expl[@]" "$@" -S '' - "$_font_cache[@]"

@@ -4,8 +4,8 @@ local curcontext="$curcontext" line state ret=1
 typeset -A opt_args
 
 if (( ! $+_yp_cache_maps )); then
-  _yp_cache_maps=( "${(@)${(@f)$(ypwhich -m)}%% *}" )
-  _yp_cache_nicks=( "${(@)${(@)${(@f)$(ypwhich -x)}#*\"}%%\"*}" )
+  _yp_cache_maps=( "${(@)${(@f)$(_call maps ypwhich -m)}%% *}" )
+  _yp_cache_nicks=( "${(@)${(@)${(@f)$(_call names ypwhich -x)}#*\"}%%\"*}" )
   _yp_args=(
     '(-x)-d[specify domain]:domain name:' \
     '(-x)-k[display keys]' \
