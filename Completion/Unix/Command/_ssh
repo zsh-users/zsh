@@ -3,11 +3,16 @@
 _remote_files () {
   # This is extremely simple-minded; could parse "ls -F" output to do
   # colorings and LIST_TYPES and so on, but I'm just not that ambitious.
-  local expl
+  local expl remfiles
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
+    remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${words[CURRENT]#*:}\*)"})
+
     _wanted files expl 'remote files' \
-        compadd $(ssh -a -x ${words[CURRENT]%:*} echo ${words[CURRENT]#*:}\*)
+      compadd ${${remfiles:#*/}/[*=@](#e)/}
+
+    _wanted dirs expl 'remote directories' \
+      compadd -S/ ${${(M)remfiles:#*/}/\\/(#e)/}
   else
     _message 'remote files'
   fi
