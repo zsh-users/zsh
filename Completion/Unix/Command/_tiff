@@ -1,0 +1,209 @@
+#compdef -P (tiff*|*2tiff|pal2rgb)
+
+local pat expl ret=1
+
+if [[ "$service" = *2tiff ]]; then
+  pat="*.(#i)${service}"
+else
+  pat="*.(#i)tiff"
+fi
+
+if [[ $# -ne 0 || $+_in_tiff -ne 0 ]]; then
+  if (( ! $# )); then
+    _description files expl 'picture file'
+    set -- "$expl[@]"
+  fi
+  _wanted files expl 'picture file' _path_files "$@" -g "$pat" - ||
+      _files "$@" "$expl[@]" -g '*.(#i)tiff'
+  return
+fi
+
+local _in_tiff=yes
+
+local curcontext="$curcontext" state line ret=1
+typeset -A opt_args
+
+case "$service" in
+tiff2bw)
+  _arguments -C \
+    '-c[specify compression scheme]:compression scheme:->compress' \
+    '-r[specify rows per strip]:rows per strip:' \
+    '-R[specify percentage of red channel]:percentage of red channel:' \
+    '-G[specify percentage of green channel]:percentage of green channel:' \
+    '-B[specify percentage of blue channel]:percentage of blue channel:' \
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+tiff2ps)
+  _arguments \
+    '-1[generate PostScript Level I output]' \
+    '-2[generate PostScript Level II output]' \
+    '-a[generate output for all IFDs]' \
+    '-d[set initial TIFF directory]:initial TIFF directory:' \
+    '(-p)-e[generate Encapsulated PostScript]' \
+    '-o[set initial TIFF directory (file offset)]:file offset:' \
+    '(-e)-p[generate non-Encapsulated PostScript]' \
+    '-h[set page height]:page height:' \
+    '-w[set page width]:page width:' \
+    '-8[disable use of ASCII85 encoding]' \
+    '-D[print two pages per sheet]' \
+    '-O[specify output file]:output file:_files -g \*.\(\#i\)ps' \
+    '-s[generate output for a single image]' \
+    '-T[print pages for top edge binding]' \
+    '*:input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+tiffcmp)
+  _arguments \
+    '-l[list all differing bytes]' \
+    '-t[ignore differences in directories]' \
+    ':first input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':second input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+tiffcp)
+  _arguments -C \
+    '-B[write output in bin-endian byte order]' \
+    '-c[specify compression scheme]:compression scheme:->compress' \
+    '-o[set initial TIFF directory (file offset)]:file offset:' \
+    '-p[set sample packing]:sample packing:(contig separate)' \
+    '(-t)-s[write output in strips]' \
+    '(-s)-t[write output in tiles]' \
+    '-i[ignore read errors]' \
+    '-r[specify rows per strip]:rows per strip:' \
+    '-w[specify output tile width]:output tile width:' \
+    '-l[specify output tile length]:output tile length:' \
+    '-f[specify fill order]:fill order:(lsb2msb msb2lsb)' \
+    '*:input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+tiffdither)
+  _arguments -C \
+    '-c[specify compression scheme]:compression scheme:->compress' \
+    '-f[specify fill order]:fill order:(lsb2msb msb2lsb)' \
+    '-r[specify rows per strip]:rows per strip:' \
+    '-t[set threshold for dithering]:dither threshold value:' \
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+tiffdump)
+  _arguments \
+    '-o[set initial TIFF directory (file offset)]:file offset:' \
+    '-h[print numbers in hexadecimal]' \
+    '*:input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+tiffinfo)
+  _arguments \
+    '-c[display colormap and color/gray response curves]' \
+    '-D[read and decompress data]' \
+    '-d[print decompressed data]' \
+    '-j[display JPEG-related tags]' \
+    '-o[set initial TIFF directory (file offset)]:file offset:' \
+    '-s[display offsets and byte counts for all data strips]' \
+    '-i[ignore read errors]' \
+    '-f[force fill order]:fill order:(lsb2msb msb2lsb)' \
+    '-w[display raw data in words]' \
+    '*:input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+tiffmedian)
+  _arguments -C \
+    '-r[specify rows per strip]:rows per strip:' \
+    '-C[specify number of colormap entries]:number of colormap entries:' \
+    '-c[specify compression scheme]:compression scheme:->compress' \
+    '-f[use Floyd-Steinberg dithering]' \
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+tiffsplit)
+  _arguments \
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':output file prefix:' && ret=0
+  ;;
+fax2tiff)
+  _arguments \
+    '(-1 -4)-2[input is Group 3, 2d encoded]' \
+    '(-2 -4)-1[input is Group 3, 1d encoded]' \
+    '(-1 -2)-4[input is Group 4 encoded]' \
+    '(-W)-B[0 in input is black]' \
+    '(-B)-W[0 in input is white]' \
+    '(-M)-L[input is lsb-to-msb]' \
+    '(-L)-M[input is msb-to-lsb]' \
+    '-R[specify resolution]:resolution (lines per inch):' \
+    '-o[specify output file]:output file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    '(-f)-c[generate `classic'"'"' TIFF format]' \
+    '(-c)-f[generate TIFF Class F format]' \
+    '-m[output in msb-to-lsb order]' \
+    '-p[don'"'"'t align EOL codes]' \
+    '-s[duplicate all rows]' \
+    '-v[verbose mode]' \
+    ':FAX input file:_files -g \*.\(\#i\)\(g\[34\]\|fax\)' && ret=0
+  ;;
+gif2tiff)
+  _arguments -C \
+    '-r[specify rows per strip]:rows per strip:' \
+    '-c[specify compression scheme]:compression scheme:->compress' \
+    ':input GIF file:_files -g \*.\(\#i\)gif' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+ppm2tiff)
+  _arguments -C \
+    '-r[specify rows per strip]:rows per strip:' \
+    '-c[specify compression scheme]:compression scheme:->compress' \
+    '-R[specify resolution]:resolution:' \
+    ':input GIF file:_files -g \*.\(\#i\)ppm' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+ras2tiff)
+  _arguments -C \
+    '-r[specify rows per strip]:rows per strip:' \
+    '-c[specify compression scheme]:compression scheme:->compress' \
+    ':input raster image file:_files -g \*.\(\#i\)ras\(\|t\)' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+pal2rgb)
+  _arguments -C \
+    '-C[specify number of bits for colormap entries]:bits for colormap entries:(8 16)' \
+    '-p[set sample packing]:sample packing:(contig separate)' \
+    '-c[specify compression scheme]:compression scheme:->compress' \
+    '-r[specify rows per strip]:rows per strip:' \
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
+  ;;
+*)
+  _description files expl 'picture file'
+  _files "$expl[@]" -g "$pat" && ret=0
+esac
+
+if [[ -n "$state" ]]; then
+  if [[ "$PREFIX" = *:* ]]; then
+    local scheme="${PREFIX%%:*}"
+
+    compset -P 1 '*:'
+
+    case "$scheme" in
+    g3)
+      _values -s : 'FAX Group 3 options' \
+        '(2d)1d[use 1D-encoding]' \
+        '(1d)2d[use 2D-encoding]' \
+	'fill[byte-align EOL codes]' && ret=0
+      ;;
+    jpeg)
+      _message 'compression quality (0-100), or `r'"'"' (output RGB)'
+      ret=0
+      ;;
+    lzw|zip)
+      _values 'LZW and deflate options' \
+        '1[without differencing]' \
+        '2[with differencing]' && ret=0
+      ;;
+    esac
+  else
+    _tags values
+    while _tags; do
+      while _next_label values expl 'compression scheme'; do
+        compadd "$expl[@]" - none g4 packbits && ret=0
+        compadd "$expl[@]" -qS: - lzw zip jpeg g3 && ret=0
+      done
+      (( ret )) || return 0
+    done
+  fi
+fi
+
+return ret
