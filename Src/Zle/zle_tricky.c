@@ -2871,7 +2871,8 @@ join_strs(int la, char *sa, int lb, char *sb)
 			    *ap += mp->wlen; *alp -= mp->wlen;
 			    *bp += bl; *blp -= bl;
 			    t = 1;
-			}
+			} else
+			    t = 0;
 		    }
 		}
 	    }
@@ -3422,6 +3423,11 @@ join_clines(Cline o, Cline n)
 	    }
 	    /* Now see if they have matching anchors. If not, cut the list. */
 	    if (!(o->flags & CLF_MID) && !cmp_anchors(o, n, 1)) {
+#if 0
+		/* This used to search forward for matching anchors.
+		 * Unfortunately this does the wrong thing if the prefixes
+		 * before the differing anchors match nicely. */
+
 		Cline t, tn;
 
 		for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
@@ -3430,6 +3436,7 @@ join_clines(Cline o, Cline n)
 		    n = tn;
 		    continue;
 		} else {
+#endif
 		    if (o->flags & CLF_SUF)
 			break;
 
@@ -3438,7 +3445,9 @@ join_clines(Cline o, Cline n)
 		    free_cline(o->next);
 		    o->next = NULL;
 		    o->flags |= CLF_MISS;
+#if 0
 		}
+#endif
 	    }
 	    /* Ok, they are equal, now join the sub-lists. */
 	    if (o->flags & CLF_MID)
