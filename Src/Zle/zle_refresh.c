@@ -191,9 +191,15 @@ resetvideo(void)
     }
     for (ln = 0; ln != winh + 1; ln++) {
 	if (nbuf[ln])
-	    *nbuf[ln] = ZWC('\n');
+	{
+	    nbuf[ln][0] = ZWC('\n');
+	    nbuf[ln][1] = ZWC('\0');
+	}
 	if (obuf[ln])
-	    *obuf[ln] = ZWC('\n');
+	{
+	    obuf[ln][0] = ZWC('\n');
+	    obuf[ln][0] = ZWC('\0');
+	}
     }
 
     /* TODO currently zsh core is not using widechars */
