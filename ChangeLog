@@ -1,3 +1,8 @@
+2001-05-09  Peter Stephenson  <pws@csr.com>
+
+	* unposted: back off 14140, since logically it implies tokenizing
+	braces from parameters, which opens a whole new kettle of worms.
+
 2001-05-09  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14279: Doc/Zsh/compsys.yo: add description of how to add a
