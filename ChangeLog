@@ -1,3 +1,11 @@
+2001-09-09  Geoff Wing  <gcw@zsh.org>
+	
+	* 15621: Src/Zle/zle_refresh.c: display of status line was being
+	mucked up; also fix continuation markers "<...." and "<....>"
+
+	* unposted: Src/Zle/zle_refresh.c: fix possible seg fault on a
+	screen height shrink
+
 2001-08-28  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15717: Src/subst.c, Src/Modules/parameter.c,
