@@ -42,6 +42,7 @@ styles=(
   list-rows-first	 c:bool
   local			 c:
   matcher		 c:
+  matcher-list		 c:
   max-errors		 c:
   menu			 c:boolauto
   numbers		 c:bool

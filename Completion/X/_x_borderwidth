@@ -1,7 +1,9 @@
 #autoload
 
-if (( $# )); then
-  _message "$2"
+local x="$argv[(I)-X]"
+
+if (( x )); then
+  _message -r "$argv[x + 1]"
 else
   _message 'border width'
 fi

@@ -1,14 +1,20 @@
 #autoload
 
-local format
+local format raw
 
 _tags messages || return 1
 
-zstyle -s ":completion:${curcontext}:messages" format format ||
-    zstyle -s ":completion:${curcontext}:descriptions" format format
+if [[ "$1" = -r ]]; then
+  raw=yes
+  shift
+  format="$1"
+else
+  zstyle -s ":completion:${curcontext}:messages" format format ||
+      zstyle -s ":completion:${curcontext}:descriptions" format format
+fi
 
-if [[ -n "$format" ]]; then
-  zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
+if [[ -n "$format$raw" ]]; then
+  [[ -z "$raw" ]] && zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
   if [[ $compstate[nmatches] -eq 0 ]]; then
     compstate[list]='list force'
     compstate[insert]=''

@@ -1922,7 +1922,7 @@ _description expl files file
 compadd "$expl[@]" - "$files[@]")
 )
 findex(_message)
-item(tt(_message) var(descr))(
+item(tt(_message) [ -r ] var(descr))(
 The var(descr) is used like the third
 argument to the tt(_description) function. However, the resulting
 string will always be shown whether or not matches were
@@ -1932,6 +1932,11 @@ completions can be generated automatically.
 This function also uses the tt(format) style for the tt(messages) tag in
 preference to the tt(format) style for the tt(descriptions) tag. The
 latter is used only if the former is unset.
+
+If the tt(-r) option is given, no style is used and the var(descr) is
+used literally as the string to display. This is only used in cases
+where that string is taken from some pre-processed argument list
+containing an expanded description.
 )
 findex(_setup)
 item(tt(_setup) var(tag))(
