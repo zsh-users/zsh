@@ -1,3 +1,8 @@
+2003-08-21  Peter Stephenson  <pws@csr.com>
+
+	* 18958: Completion/Unix/Command/_perforce: improved option
+	handling for p4 change.
+
 2003-08-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 18956: Completion/Unix/Command/_a2ps: update for a2ps 4.13

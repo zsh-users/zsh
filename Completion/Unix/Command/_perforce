@@ -1173,13 +1173,17 @@ _perforce_cmd_branches() {
 
 (( $+functions[_perforce_cmd_change] )) ||
 _perforce_cmd_change() {
+    local ctype
+    # Unless forcing or outputting, we don't
+    # complete committed changes since they can't be altered.
+    [[ ${words[(I)-*(f|o)*]} -eq 0 ]] && ctype=" -tp"
     _arguments -s : \
 	'(-o)-f[allow force by superuser]' \
 	'-s[joblist includes the fix status]' \
-	'(-o -i)-d[describe newly created pending change]' \
+	'(-o -i)-d[discard newly created pending change]' \
 	'(-d -i -f)-o[output specification to standard output]' \
 	'(-d -o)-i[read specification from standard input]' \
-	'(-i)1::change:_perforce_changes -tp'
+	"(-i)1::change:_perforce_changes$ctype"
 }
 
 
