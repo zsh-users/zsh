@@ -425,7 +425,6 @@ AC_ARG_ENABLE(max-jobtable-size,
 
 [if test x$enableval = xyes; then
 
-  if test $ac_cv_header_linux_tasks_h = yes; then
    AC_EGREP_CPP(yes,
    [#include <linux/tasks.h>
     #ifdef MAX_TASKS_PER_USER
@@ -433,7 +432,6 @@ AC_ARG_ENABLE(max-jobtable-size,
     #endif
    ],
    maxj=max)
-  fi
 
    if test x$maxj = xmax; then
     AC_DEFINE(MAXJOB, MAX_TASKS_PER_USER)
@@ -478,7 +476,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdlib.h unistd.h sys/capability.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
-		 linux/tasks.h netinet/in_systm.h curses.h term.h)
+		 netinet/in_systm.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -562,6 +560,11 @@ fi],
 esac])dnl
 
 AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
+case "$LIBS" in
+*curses*)
+AC_CHECK_HEADERS(curses.h term.h)
+if test x$ac_cv_header_term_h = xyes; then
+
 AC_MSG_CHECKING(if term.h needs curses.h)
 AC_TRY_COMPILE([#include <term.h>], [char **test = boolcodes;], boolcodes_with_only_term_h=yes,
 boolcodes_with_only_term_h=no)
@@ -612,6 +615,9 @@ AC_TRY_LINK([#include <curses.h>
 #include <term.h>], [char **test = strnames; printf(*test);],
 AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
 AC_MSG_RESULT($strnames)
+
+fi;;
+esac
 
 dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
 dnl libnsl (Network Services Library) to find yp_all
