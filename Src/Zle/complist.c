@@ -986,7 +986,7 @@ compnicezputs(char *s, int ml)
 static int
 compprintlist(int showall)
 {
-    static int lasttype = 0, lastbeg = 0, lastml = 0;
+    static int lasttype = 0, lastbeg = 0, lastml = 0, lastinvcount = -1;
     static int lastn = 0, lastnl = 0, lastnlnct = -1;
     static Cmgroup lastg = NULL;
     static Cmatch *lastp = NULL;
@@ -999,7 +999,7 @@ compprintlist(int showall)
     int lastused = 0;
 
     mfirstl = -1;
-    if (mnew || lastbeg != mlbeg || mlbeg < 0) {
+    if (mnew || lastinvcount != invcount || lastbeg != mlbeg || mlbeg < 0) {
 	lasttype = 0;
 	lastg = NULL;
 	lastexpl = NULL;
@@ -1010,6 +1010,7 @@ compprintlist(int showall)
 	  lines - nlnct - mhasstat : listdat.nlines) - (lastnlnct > nlnct);
     lastnlnct = nlnct;
     mrestlines = lines - 1;
+    lastinvcount = invcount;
 
     if (cl < 2) {
 	cl = -1;

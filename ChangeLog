@@ -1,3 +1,8 @@
+2000-10-25  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13082: Src/Zle/complist.c, Src/Zle/compresult.c: add a counter
+ 	for invalidatelist() to allow finding out if there is a new list
+	
 2000-10-24  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13071: Src/Zle/complist.c, Src/Zle/compresult.c: avoid printing

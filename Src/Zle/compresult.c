@@ -30,6 +30,12 @@
 #include "complete.mdh"
 #include "compresult.pro"
 
+/* This counts how often the list of completions was invalidated.
+ * Can be used to detect if we have a new list.  */
+
+/**/
+mod_export int invcount;
+
 #define inststr(X) inststrlen((X),1,-1)
 
 /* This cuts the cline list before the stuff that isn't worth
@@ -1264,6 +1270,8 @@ skipnolist(Cmatch *p, int showall)
 mod_export int
 calclist(int showall)
 {
+    static int lastinvcount = -1;
+
     Cmgroup g;
     Cmatch *p, m;
     Cexpl *e;
@@ -1271,10 +1279,12 @@ calclist(int showall)
     int max = 0, i;
     VARARR(int, mlens, nmatches + 1);
 
-    if (listdat.valid && onlyexpl == listdat.onlyexpl &&
+    if (lastinvcount == invcount &&
+	listdat.valid && onlyexpl == listdat.onlyexpl &&
 	menuacc == listdat.menuacc && showall == listdat.showall &&
 	lines == listdat.lines && columns == listdat.columns)
 	return 0;
+    lastinvcount = invcount;
 
     for (g = amatches; g; g = g->next) {
 	char **pp = g->ylist;
@@ -2089,6 +2099,7 @@ list_matches(Hookdef dummy, void *dummy2)
 mod_export int
 invalidate_list(void)
 {
+    invcount++;
     if (validlist) {
 	if (showinglist == -2)
 	    zrefresh();
