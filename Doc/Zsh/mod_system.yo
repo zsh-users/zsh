@@ -8,7 +8,7 @@ sect(Builtins)
 
 startitem()
 findex(syserror)
-item(tt(syserror) tt([ -e) var(errvar) tt(] [ -p) var(prefix) tt(] [) var(errno) tt(|) var(errname ]))(
+item(tt(syserror) tt([ -e) var(errvar) tt(] [ -p) var(prefix) tt(] [) var(errno) tt(|) var(errname) tt(]))(
 This command prints out the error message associated with var(errno), a
 system error number, followed by a newline to standard error.
 

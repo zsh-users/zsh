@@ -1,3 +1,7 @@
+2003-09-17  Vin Shelton  <acs@alumni.princeton.edu>
+
+	* 19087: Doc/Zsh/mod_system.yo: Fix up makeinfo warning.
+
 2003-09-17  Peter Stephenson  <pws@csr.com>
 
 	* 19096: Src/Modules/system.c: Unloading zsh/system could crash
@@ -6,7 +10,8 @@
 
 2003-09-15  Vin Shelton  <acs@alumni.princeton.edu>
 
-	* Doc/Zsh/contrib.yo: Fix capitalization to make makeinfo happy.
+	* 19087: Doc/Zsh/contrib.yo: Fix capitalization to make makeinfo
+	happy.
 
 2003-09-15  Oliver Kiddle  <opk@zsh.org>
 
