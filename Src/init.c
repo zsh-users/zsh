@@ -1012,7 +1012,8 @@ unsigned char *
 autoload_zleread(char *lp, char *rp, int ha)
 {
     zlereadptr = fallback_zleread;
-    load_module("zsh/zle") && load_module("zsh/compctl");
+    if (load_module("zsh/zle"))
+	load_module("zsh/compctl");
     return zleread(lp, rp, ha);
 }
 
