@@ -69,9 +69,19 @@ If you have some already defined by compinstall, edit the name of the
 file where these can be found.  Note that this will only work if they
 are exactly the form in which compinstall inserted them.  If you leave
 the line as it is, or empty, I won't search."
-  vared -ch -p 'file> ' newifile
-  [[ -z $newifile || $ifile = $newifile ]] && foundold=false
+  while true;  do
+    vared -ch -p 'file> ' newifile
+    if [[ -n $newifile && $ifile != $newifile ]]; then
+      if __ci_test_ifile $newifile; then
+        foundold=true
+	break
+      fi
+      print "I couldn't find any definitions there.  Edit a new filename, or
+leave the line blank to ignore it."
+    fi
+  done
 fi
+ifile=$newifile
 
 if [[ $foundold = true ]]; then
   sed -n "/^[   ]*$startline/,/^[       ]*$endline/p" $ifile |

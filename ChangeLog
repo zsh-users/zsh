@@ -1,3 +1,8 @@
+2000-04-28  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* pws: 10999: Completion/Core/compinstall: some idiot didn't
+	get searching of alternative files for definitions to work properly.
+
 2000-04-28  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 10992: Src/Zle/complist.c: avoid wrapping around both
