@@ -1,3 +1,21 @@
+2001-06-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14897 (and Oliver Kiddle: 14862): Completion/Base/Utility/_values,
+	Completion/Unix/Command/_mount, Completion/Unix/Type/_dir_list,
+	Src/Zle/computil.c: fix for comparguments (completing after
+	single letter options that get their argument in the next
+	word); make _values ignore some of the standard option it may
+	get; make _mount use _dir_list in some places and improve that;
+	`document' comparguments and compvalues with some comments in
+	computil.c
+
+	* 14883 (Jos Backus): Completion/Unix/Command/_mount: add code for
+	BSDish systems
+
+	* 14841: Completion/Base/Utility/_values, Src/Zle/computil.c:
+	new word parsing for compvalues; this should now handle empty
+	separators correctly, as far as it is possible
+
 2001-06-13  Wayne Davison  <wayned@users.sourceforge.net>
 
         * 14793: Src/hist.c: Don't mark a HIST_TMPSTORE entry with HIST_OLD
