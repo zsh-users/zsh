@@ -1,5 +1,8 @@
 2000-04-18  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10799: Src/text.c: fix to get newlines in non-job-texts (I'm
+ 	sooo stupid)
+	
 	* 10798: Src/Zle/compmatch.c: join_clines() tested the wrong
  	variable
 	
