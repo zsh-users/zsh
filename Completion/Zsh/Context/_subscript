@@ -1,6 +1,6 @@
 #compdef -subscript-
 
-local expl ind osuf=']'
+local expl ind osuf=']' flags
 
 if [[ "$1" = -q ]]; then
   osuf='] '
@@ -8,10 +8,39 @@ if [[ "$1" = -q ]]; then
   shift
 fi
 
+compset -P '\([^\)]##\)' # remove subscript flags
+
 if [[ "$PREFIX" = :* ]]; then
   _wanted characters expl 'character class' \
       compadd -p: -S ':]' alnum alpha blank cntrl digit graph \
                           lower print punct space upper xdigit
+elif compset -P '\('; then
+  compset -S '\)*'
+
+  case ${(Pt)${compstate[parameter]}} in
+    assoc*) flags=(
+      '(R k K i I)r[return first matching value]'
+      '(r k K i I)R[return value of first matching key]'
+      '(r R K i I)k[return all values with matching keys]'
+      '(r R k i I)K[return value of first matching key]'
+      '(r R k K I)i[return first matching key]'
+      '(r R k K i)I[return all matching keys]'
+    );;
+    (|scalar*)) flags=(
+      'w[make subscripting work on words of scalar]'
+      's[specify word separator]'
+      'p[recognise escape sequences in subsequent s flag]'
+    );&
+    array*) flags=($flags
+      'n[specify match to return]'
+      'b[begin with specified element]'
+      '(r R k K i)I[reverse subscript giving index of last match]'
+      '(r k K i I)R[reverse subscripting giving last match]'
+      '(R k K i I)r[reverse subscripting giving first match]'
+    );;
+  esac
+
+  _values -s '' 'subscript flags' $flags
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
   local suf
 
