@@ -3,28 +3,31 @@
 local state line list names expl curcontext="$curcontext"
 typeset -A opt_args
 
-
 _arguments -C -s -S \
-  '(-r -w -L -d)-e[echo input characters]' \
-  '(-r -w -L -d)-b[io to pseudo-terminal blocking]' \
-  '(-r -w -L -e -b)-d[delete command]:*:name:->name' \
-  '(-r -L -e -b -d)-w[send string to command]:name:->name:*:strings to write' \
-  '(: -r -w -e -b -d)-L[list defined commands as calls]' \
-  '(: -w -L -e -b -d)-r[read string from command]:name:->name:param: _vars:pattern:' \
-  '(-r -w -L -d):zpty command name:' \
-  '(-r -w -L -d):cmd: _command_names -e' \
-  '(-r -w -L -d)*::args:_precommand' && return 0
+  '(-r -w -t -n -L -d)-e[echo input characters]' \
+  '(-r -w -t -n -L -d)-b[io to pseudo-terminal blocking]' \
+  '(-r -w -t -n -L -e -b)-d[delete command]:*:name:->name' \
+  '(-r -L -t -e -b -d)-w[send string to command]:name:->name:*:strings to write' \
+  '(-r -L -t -e -b -d)-n[do not add a newline to the result]' \
+  '(: -r -w -t -n -e -b -d)-L[list defined commands as calls]' \
+  '(: -w -n -L -e -b -d)-r[read string from command]:name:->name:param: _vars:pattern:' \
+  '(: -w -n -L -e -b -d)-t[test if output is available before reading]' \
+  '(-r -w -t -n -L -d):zpty command name:' \
+  '(-r -w -t -n -L -d):cmd: _command_names -e' \
+  '(-r -w -t -n -L -d)*::args:_precommand' && return 0
 
 # One could use sets, but that's more expensive and zpty is simple enough.
 #
 # _arguments -C -s -S \
 #   - read \
 #     '-r[read string from command]' \
+#     '-t[test if output is available first]' \
 #     ':name:->name' \
 #     ':param: _vars' \
 #     ':pattern:' \
 #   - write \
 #     '-w[send string to command]' \
+#     '-n[do not add a newline to the result]' \
 #     ':name:->name' \
 #     '*:strings to write' \
 #   - list \
