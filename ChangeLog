@@ -1,5 +1,7 @@
 2000-04-09  Bart Schaefer  <schaefer@brasslantern.com>
 
+	* 10602: Completion/Core/compinstall: Fix typo.
+
 	* 10598: Completion/Builtins/_zstyle, Doc/Zsh/compsys.yo:
 	Fix typo; reformat styles documentation for readability.
 

@@ -553,7 +553,7 @@ Current context: $curcontext
 
 To have different values for approximation and correction, you should
 change the context appropriately.  For approximation, use
-\`:completion:*:approxima2te:*' and for correction use
+\`:completion:*:approximate:*' and for correction use
 \`:completion:*:correct:*'.
 
 Enter maximum number of errors allowed:
