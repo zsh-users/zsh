@@ -77,10 +77,10 @@ if [[ "$state" = "urls" ]]; then
   else
     _tags prefixes
     while _tags; do
-      while _next_label prefixes expl 'URL prefix'; do
-        _urls "$@" && ret=0
+      while _next_label prefixes expl 'URL prefix' "$@"; do
+        _urls "$expl[@]" && ret=0
 	compset -S '[^:]*'
-        compadd "$expl[@]" -S '' about: mocha: javascript: && ret=0
+        compadd -S '' "$expl[@]" about: mocha: javascript: && ret=0
       done
       (( ret )) || return 0
     done
