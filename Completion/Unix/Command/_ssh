@@ -1,12 +1,23 @@
 #compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen
 
 _remote_files () {
-  # This is extremely simple-minded; could parse "ls -F" output to do
-  # colorings and LIST_TYPES and so on, but I'm just not that ambitious.
-  local expl
+  # There should be coloring based on all the different ls -F classifiers.
+  local expl remfiles remdispf remdispd
 
-  _wanted files expl 'remote files' \
-      compadd $(ssh -a -x ${words[CURRENT]%:*} echo ${words[CURRENT]#*:}\*)
+  if zstyle -T ":completion:${curcontext}:" remote-access; then
+    remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${${${words[CURRENT]#*:}:h}/\\/(#e)/}/\* 2>/dev/null)"})
+
+    remdispf=(${remfiles:#*/})
+    remdispd=(${(M)remfiles:#*/})
+
+    _wanted files expl 'remote files and directories' \
+      compadd -d remdispf ${${remfiles:#*/}/[*=@|](#e)/}
+      
+    _wanted files expl 'remote files and directories' \
+      compadd -S/ -d remdispd ${${(M)remfiles:#*/}/\\/(#e)/}
+  else
+    _message 'remote files'
+  fi
 }
 
 _ssh () {

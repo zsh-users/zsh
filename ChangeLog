@@ -1,7 +1,10 @@
 2002-02-08  Clint Adams  <clint@zsh.org>
 
-       * Matt Zimmerman: 16590: Completion/Unix/Type/_dict_words:
-       use a prefix match instead of a "fuzzy-exact" match.
+	* 16566, 16568, Oliver: 16461: Completion/Unix/Command/_ssh:
+	improvements for scp completion.
+
+	* Matt Zimmerman: 16590: Completion/Unix/Type/_dict_words:
+	use a prefix match instead of a "fuzzy-exact" match.
 
 2002-02-07  Clint Adams  <clint@zsh.org>
 
