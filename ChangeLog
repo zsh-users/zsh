@@ -1,3 +1,8 @@
+2001-10-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* Adapted from Stefan Dalibor, 16043: Src/utils.c: checkrmall()
+	must not print to shout when shout's not valid.
+
 2001-10-19  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16085: Completion/Base/Utility/_describe,

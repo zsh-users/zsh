@@ -1406,6 +1406,8 @@ read_poll(int fd, int *readchar, int polltty)
 int
 checkrmall(char *s)
 {
+    if (!shout)
+	return 1;
     fprintf(shout, "zsh: sure you want to delete all the files in ");
     if (*s != '/') {
 	nicezputs(pwd[1] ? unmeta(pwd) : "", shout);
