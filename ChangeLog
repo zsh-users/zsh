@@ -1,3 +1,10 @@
+2002-11-08  Peter Stephenson  <pws@csr.com>
+
+	* 17861: Philippe Troin <phil@fifi.org>: Src/init.c: Improve
+	initialisation of signals.  Allow shell to get SIGTERM; remove
+	duplicate attachtty() code; initialise signal mask consistently
+	in interactive shells, resetting ignored signals, too.
+
 2002-11-06  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17910: Bart (17906): de-quote prefix when calling compfiles to

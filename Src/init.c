@@ -883,6 +883,12 @@ setupvals(void)
 void
 init_signals(void)
 {
+    if (interact) {
+	int i;
+	signal_setmask(signal_mask(0));
+	for (i=0; i<NSIG; ++i)
+	    signal_default(i);
+    }
     sigchld_mask = signal_mask(SIGCHLD);
 
     intr();
@@ -898,31 +904,11 @@ init_signals(void)
 #endif
     if (interact) {
 	install_handler(SIGALRM);
-	signal_ignore(SIGTERM);
     }
     if (jobbing) {
-	long ttypgrp;
-
-	while ((ttypgrp = gettygrp()) != -1 && ttypgrp != mypgrp)
-	    kill(0, SIGTTIN);
-	if (ttypgrp == -1) {
-	    opts[MONITOR] = 0;
-	} else {
-	    signal_ignore(SIGTTOU);
-	    signal_ignore(SIGTSTP);
-	    signal_ignore(SIGTTIN);
-	    attachtty(mypgrp);
-	}
-    }
-    if (islogin) {
-	signal_setmask(signal_mask(0));
-    } else if (interact) {
-	sigset_t set;
-
-	sigemptyset(&set);
-	sigaddset(&set, SIGINT);
-	sigaddset(&set, SIGQUIT);
-	signal_unblock(set);
+	signal_ignore(SIGTTOU);
+	signal_ignore(SIGTSTP);
+	signal_ignore(SIGTTIN);
     }
 }
 
