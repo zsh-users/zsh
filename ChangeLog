@@ -1,3 +1,7 @@
+2000-10-01  Clint Adams  <schizo@debian.org>
+
+	* unposted: Src/Zle/compresult.c: remove unused variable declaration.
+
 2000-09-27  Clint Adams  <schizo@debian.org>
 
 	* 12863: Src/string.c, Src/Zle/compresult.c: remove ztrdupstring(),

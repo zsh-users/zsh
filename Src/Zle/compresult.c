@@ -731,8 +731,6 @@ do_ambiguous(void)
 mod_export int
 ztat(char *nam, struct stat *buf, int ls)
 {
-    int e;
-
     if (!(ls ? lstat(nam, buf) : stat(nam, buf)))
 	return 0;
     else {
