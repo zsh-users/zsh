@@ -88,7 +88,7 @@ Chapter 2:  How does zsh differ from...?
 2.4. tcsh?
 2.5. bash?
 2.6. Shouldn't zsh be more/less like ksh/(t)csh?
-2.7. What is zsh's support Unicode/UTF-8?
+2.7. What is zsh's support for Unicode/UTF-8?
 
 Chapter 3:  How to get various things to work
 3.1. Why does `$var' where `var="foo bar"' not do what I expect?

@@ -1,5 +1,8 @@
 2004-01-11  Clint Adams  <clint@zsh.org>
 
+	* 20657: Src/Zle/zle_tricky.c: sort completions partially based on
+	LC_COLLATE setting.
+
 	* unposted: Completion/X/Command/_gnome-gv: move gnome-gv
 	completion from C/U/C to C/X/C.
 

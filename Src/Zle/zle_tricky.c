@@ -1907,7 +1907,11 @@ strbpcmp(char **aa, char **bb)
 	    }
 	}
     }
+#ifndef HAVE_STRCOLL
     return (int)(*a - *b);
+#else
+    return strcoll(a,b);
+#endif
 }
 
 /* This is used to print the strings (e.g. explanations). *
