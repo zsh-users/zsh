@@ -791,6 +791,26 @@ See `Accessing On-Line Help'
 ifzman(above)\
 ifnzman((noderef(Utilities))).
 )
+item(tt(tetris))(
+Zsh was once accused of not being as complete as Emacs,
+because it lacked a Tetris game.  This function was written to
+refute this vicious slander.
+
+This function must be used as a ZLE widget:
+
+example(autoload -U tetris
+zle -N tetris
+bindkey var(keys) tetris)
+
+To start a game, execute the widget by typing the var(keys).  Whatever command
+line you were editing disappears temporarily, and your keymap is also
+temporarily replaced by the Tetris control keys.  The previous editor state
+is restored when you quit the game (by pressing `tt(q)') or when you lose.
+
+If you quit in the middle of a game, the next invocation of the tt(tetris)
+widget will continue where you left off.  If you lost, it will start a new
+game.
+)
 findex(zcalc)
 item(tt(zcalc) [ var(expression) ... ])(
 A reasonably powerful calculator based on zsh's arithmetic evaluation
