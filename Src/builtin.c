@@ -1857,7 +1857,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	return 0;
     }
 
-    if (!ops['g'])
+    if (!ops['g'] && !ops['x'])
 	on |= PM_LOCAL;
 
     if (on & PM_TIED) {
@@ -1895,7 +1895,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	 */
 	if ((pm = (Param) paramtab->getnode(paramtab, asg0.name))
 	    && !(pm->flags & PM_UNSET)
-	    && (locallevel == pm->level || func == BIN_EXPORT)) {
+	    && (locallevel == pm->level || !(on & PM_LOCAL))) {
 	    if (!asg0.value && !(PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED)))
 		oldval = ztrdup(getsparam(asg0.name));
 	    on |= (pm->flags & PM_EXPORTED);
