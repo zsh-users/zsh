@@ -1247,10 +1247,12 @@ bin_mem(char *name, char **argv, char *ops, int func)
     }
     printf("\nsize\tmalloc\tfree\tdiff\ttotal\tcum\n");
     for (i = 0, cu = 0; i < 1024; i++)
-	if (m_m[i] || m_f[i])
+	if (m_m[i] || m_f[i]) {
+	    to = (long) i * M_ISIZE * (m_m[i] - m_f[i]);
 	    printf("%ld\t%d\t%d\t%d\t%ld\t%ld\n",
 		   (long)i * M_ISIZE, m_m[i], m_f[i], m_m[i] - m_f[i],
-		   (to = (long) i * M_ISIZE * (m_m[i] - m_f[i])), (cu += to));
+		   to, (cu += to));
+	}
 
     if (m_m[i] || m_f[i])
 	printf("big\t%d\t%d\t%d\n", m_m[i], m_f[i], m_m[i] - m_f[i]);
