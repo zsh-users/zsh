@@ -37,6 +37,7 @@ if (( ! $+_telnet_args )); then
     '*\[-noasynctty\]*' '-noasynctty'
   )
   _telnet_args=($optionmap[(K)"$help"])
+  (( $#_telnet_args )) || _telnet_args=( '-l+[specify user]:user:->users' )
 fi
 
 _arguments -C -s \

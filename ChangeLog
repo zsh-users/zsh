@@ -1,5 +1,8 @@
 2001-03-20  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13674: Completion/User/_telnet: use -l as default for telnet's
+ 	without -\? option
+	
 	* 13673: Src/Modules/zprof.c: fix misaligned percent output of
  	zprof
 	
