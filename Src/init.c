@@ -904,6 +904,7 @@ init_signals(void)
 #endif
     if (interact) {
 	install_handler(SIGALRM);
+	signal_ignore(SIGTERM);
     }
     if (jobbing) {
 	signal_ignore(SIGTTOU);

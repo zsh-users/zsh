@@ -1,3 +1,8 @@
+2002-11-13  Peter Stephenson  <pws@csr.com>
+
+	* 17931: Philippe Troin <phil@fifi.org>: Src/init.c: restore
+	ignoring of SIGTERM in interactive shells.
+
 2002-11-12  Oliver Kiddle  <opk@zsh.org>
 
 	* Zvi Har'El: Completion/Unix/Command/_rcs: complete also for rcsdiff
