@@ -1,4 +1,4 @@
-#compdef gls gdiff
+#compdef gls
 
 # This is for GNU-like commands which understand the --help option,
 # but which do not otherwise require special completion handling.
