@@ -16,6 +16,8 @@ while read res str pat; do
 done <<EOT
 # a few simple things certain nameless idiots have been known to mess up
 t foo~                foo~
+t foo~                (foo~)
+t foo~                (foo~|)
 t foo.c               *.c~boo*
 f foo.c               *.c~boo*~foo*
 # closures

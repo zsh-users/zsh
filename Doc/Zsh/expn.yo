@@ -1089,13 +1089,16 @@ not in the given set.
 item(tt(<)[var(x)]tt(-)[var(y)]tt(>))(
 Matches any number in the range var(x) to var(y), inclusive.
 Either of the numbers may be omitted to make the range open-ended;
-hence `tt(<->)' matches any number.
+hence `tt(<->)' matches any number.  To match individual digits, the
+tt([)...tt(]) form is more efficient.
 )
 item(tt(LPAR())...tt(RPAR()))(
 Matches the enclosed pattern.  This is used for grouping.
 If the tt(KSH_GLOB) option is set, then a
 `tt(@)', `tt(*)', `tt(+)', `tt(?)' or `tt(!)' immediately preceding
-the `tt(LPAR())' is treated specially, as detailed below.
+the `tt(LPAR())' is treated specially, as detailed below. The option
+tt(SH_GLOB) prevents bare parentheses from being used in this way, though
+the tt(KSH_GLOB) option is still available.
 Note that grouping cannot currently extend over multiple directories:
 a `tt(/)' separating a directory terminates processing of the current
 group; processing resumes after the end of the group.
@@ -1120,7 +1123,7 @@ This has lower precedence than any operator except `tt(|)', so
 `tt(*/*~foo/bar)' will search for all files in all directories in `tt(.)'
 and then exclude `tt(foo/bar)' if there was such a match.
 Multiple patterns can be excluded by
-`var(foo)tt(~LPAR())var(bar)tt(|)var(baz)tt(RPAR())'.
+`var(foo)tt(~)var(bar)tt(~)var(baz)'.
 In the exclusion pattern (var(y)), `tt(/)' and `tt(.)' are not treated
 specially the way they usually are in globbing.
 )
@@ -1128,13 +1131,19 @@ item(var(x)tt(#))(
 (Requires tt(EXTENDED_GLOB) to be set.)
 Matches zero or more occurrences of the pattern var(x).
 This operator has high precedence; `tt(12#)' is equivalent to `tt(1(2#))',
-rather than `tt((12)#)'.
+rather than `tt((12)#)'.  It is an error for an unquoted `tt(#)' to follow
+something which cannot be repeated; this includes an empty string, a
+pattern already followed by `tt(##)', or parentheses when part of a
+tt(KSH_GLOB) pattern (for example, `tt(!LPAR())var(foo)tt(RPAR()#)' is
+invalid and must be replaced by
+`tt(*LPAR()!LPAR())var(foo)tt(RPAR()RPAR())').
 )
 item(var(x)tt(##))(
 (Requires tt(EXTENDED_GLOB) to be set.)
 Matches one or more occurrences of the pattern var(x).
 This operator has high precedence; `tt(12##)' is equivalent to `tt(1(2##))',
-rather than `tt((12)##)'.
+rather than `tt((12)##)'.  No more than two active `tt(#)' characters may
+appear together.
 )
 enditem()
 subsect(ksh-like Glob Operators)
@@ -1162,6 +1171,20 @@ Match anything but the expression in parentheses.
 (Like `tt(LPAR()^LPAR())...tt(RPAR()RPAR())'.)
 )
 enditem()
+subsect(Precedence)
+cindex(precedence of glob operators)
+The precedence of the operators given above is (highest) `tt(^)', `tt(/)',
+`tt(~)', `tt(|)' (lowest); the
+remaining operators are simply treated from left to right as part of a
+string, with `tt(#)' and `tt(##)' applying to the shortest possible
+preceeding unit (i.e. a character, `tt(?)', `tt([)...tt(])',
+`tt(<)...tt(>)', or a parenthesised expression).  As mentioned
+above, a `tt(/)' used as a directory separator may not appear inside
+parentheses, while a `tt(|)' must do so; in patterns used in other contexts
+than filename generation (for example, in tt(case) statements and tests
+within `tt([[)...tt(]])'), a `tt(/)' is not special; and `tt(/)' is also
+not special after a `tt(~)' appearing outside parentheses in a filename
+pattern.
 subsect(Globbing Flags)
 There are various flags which affect any text to their right up to the
 end of the enclosing group or to the end of the pattern; they require
@@ -1258,7 +1281,10 @@ tt(LPAR()#a1)tt(RPAR()cat)tt(LPAR()LPAR()#a0)tt(RPAR()dog)tt(RPAR()fox)
 allows one error in total, which may not occur in the tt(dog) section, and
 the pattern
 tt(LPAR()#a1)tt(RPAR()cat)tt(LPAR()#a0)tt(RPAR()dog)tt(LPAR()#a1)tt(RPAR()fox)
-is equivalent.
+is equivalent.  Note that the point at which an error is first found is the
+crucial one for establishing whether to use approximation; for example,
+tt((#a1)abc(#a0)xyz) will not match tt(abcdxyz), because the error occurs
+at the `tt(x)', where approximation is turned off.
 
 subsect(Recursive Globbing)
 A pathname component of the form `tt(LPAR())var(foo)tt(/RPAR()#)'

@@ -623,6 +623,12 @@ par_case(Cmd c)
 		    }
 		    if (*s || pct || s == str + 1)
 			YYERRORV;
+		    /* Simplify pattern by removing surrounding (...) */
+		    sl = strlen(str);
+		    DPUTS(str[1] != Inpar || str[sl-1] != Outpar,
+			  "BUG: strange case pattern");
+		    str[sl-1] = '\0';
+		    chuck(str+1);
 		    break;
 		} else {
 		    char *str2;
