@@ -2896,7 +2896,7 @@ bin_print(char *name, char **args, char *ops, int func)
     int nnl = 0, ret = 0, maxarg = 0;
     int flags[5], *len;
     char *start, *endptr, *c, *d, *flag, spec[11], *fmt = NULL;
-    char **first, *curarg, *flagch = "0+- #", save, nullstr = '\0';
+    char **first, *curarg, *flagch = "0+- #", save = NULL, nullstr = '\0';
     zlong count;
     FILE *fout = stdout;
 
