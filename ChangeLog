@@ -1,3 +1,8 @@
+2000-06-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12074: Doc/Zsh/builtins.yo, Doc/Zsh/manual.yo: Remove one more
+	reference to compfmt; add missing menu items to node listing.
+
 2000-06-26  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 12073: Src/builtin.c, Src/utils.c, Doc/Zsh/builtins.yo: first

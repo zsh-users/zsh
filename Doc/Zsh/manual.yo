@@ -53,6 +53,11 @@ menu(The Zsh Web Page)
 menu(The Zsh Userguide)
 menu(See Also)
 
+Invocation
+
+menu(Compatibility)
+menu(Restricted Shell)
+
 Shell Grammar
 
 menu(Simple Commands & Pipelines)
@@ -85,7 +90,9 @@ menu(Parameters Used By The Shell)
 
 Options
 
+menu(Specifying Options)
 menu(Description of Options)
+menu(Option Aliases)
 menu(Single Letter Options)
 
 Zsh Line Editor
@@ -102,6 +109,7 @@ Completion Widgets
 menu(Special Parameters)
 menu(Builtin Commands)
 menu(Condition Codes)
+menu(Matching Control)
 menu(Examples)
 
 Completion System
@@ -124,6 +132,12 @@ menu(Example)
 Zsh Modules
 
 includefile(Zsh/manmodmenu.yo)
+
+Zftp Function System
+
+menu(Installation)
+menu(Zftp Functions)
+menu(Miscellaneous Features)
 endmenu()
 texinode(The Z Shell Manual)(Introduction)(Top)(Top)
 chapter(The Z Shell Manual)
