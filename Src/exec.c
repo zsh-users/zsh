@@ -2012,7 +2012,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     /* Make a copy of stderr for xtrace output before redirecting */
     fflush(xtrerr);
-    if (xtrerr == stderr && (type < WC_SUBSH || type == WC_TIMED)) {
+    if (isset(XTRACE) && xtrerr == stderr &&
+	(type < WC_SUBSH || type == WC_TIMED)) {
 	if (!(xtrerr = fdopen(movefd(dup(fileno(stderr))), "w")))
 	    xtrerr = stderr;
 	else
