@@ -548,9 +548,7 @@ bin_set(char *nam, char **args, char *ops, int func)
     } else {
 	/* set shell arguments */
 	freearray(pparams);
-	PERMALLOC {
-	    pparams = arrdup(args);
-	} LASTALLOC;
+	pparams = zarrdup(args);
     }
     return 0;
 }
@@ -609,15 +607,13 @@ bin_dirs(char *name, char **argv, char *ops, int func)
 	return 0;
     }
     /* replace the stack with the specified directories */
-    PERMALLOC {
-	l = newlinklist();
-	if (*argv) {
-	    while (*argv)
-		addlinknode(l, ztrdup(*argv++));
-	    freelinklist(dirstack, freestr);
-	    dirstack = l;
-	}
-    } LASTALLOC;
+    l = znewlinklist();
+    if (*argv) {
+	while (*argv)
+	    zaddlinknode(l, ztrdup(*argv++));
+	freelinklist(dirstack, freestr);
+	dirstack = l;
+    }
     return 0;
 }
 
@@ -699,13 +695,11 @@ bin_cd(char *nam, char **argv, char *ops, int func)
     }
   brk:
     chasinglinks = ops['P'] || (isset(CHASELINKS) && !ops['L']);
-    PERMALLOC {
-	pushnode(dirstack, ztrdup(pwd));
-	if (!(dir = cd_get_dest(nam, argv, ops, func))) {
-	    zsfree(getlinknode(dirstack));
-	    LASTALLOC_RETURN 1;
-	}
-    } LASTALLOC;
+    zpushnode(dirstack, ztrdup(pwd));
+    if (!(dir = cd_get_dest(nam, argv, ops, func))) {
+	zsfree(getlinknode(dirstack));
+	return 1;
+    }
     cd_new_pwd(func, dir);
 
     if (stat(unmeta(pwd), &st1) < 0) {
@@ -744,9 +738,9 @@ cd_get_dest(char *nam, char **argv, char *ops, int func)
 	if (func == BIN_PUSHD && unset(PUSHDTOHOME))
 	    dir = nextnode(firstnode(dirstack));
 	if (dir)
-	    insertlinknode(dirstack, dir, getlinknode(dirstack));
+	    zinsertlinknode(dirstack, dir, getlinknode(dirstack));
 	else if (func != BIN_POPD)
-	    pushnode(dirstack, ztrdup(home));
+	    zpushnode(dirstack, ztrdup(home));
     } else if (!argv[1]) {
 	int dd;
 	char *end;
@@ -767,8 +761,8 @@ cd_get_dest(char *nam, char **argv, char *ops, int func)
 	    }
 	}
 	if (!dir)
-	    pushnode(dirstack, ztrdup(strcmp(argv[0], "-")
-				      ? (doprintdir--, argv[0]) : oldpwd));
+	    zpushnode(dirstack, ztrdup(strcmp(argv[0], "-")
+				       ? (doprintdir--, argv[0]) : oldpwd));
     } else {
 	char *u, *d;
 	int len1, len2, len3;
@@ -784,7 +778,7 @@ cd_get_dest(char *nam, char **argv, char *ops, int func)
 	strncpy(d, pwd, len3);
 	strcpy(d + len3, argv[1]);
 	strcat(d, u + len1);
-	pushnode(dirstack, d);
+	zpushnode(dirstack, d);
 	doprintdir++;
     }
 
@@ -1219,7 +1213,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	remhist();
     /* put foo=bar type arguments into the substitution list */
     while (*argv && equalsplit(*argv, &s)) {
-	Asgment a = (Asgment) alloc(sizeof *a);
+	Asgment a = (Asgment) zhalloc(sizeof *a);
 
 	if (!asgf)
 	    asgf = asgl = a;
@@ -1353,7 +1347,7 @@ fcsubs(char **sp, struct asgment *sub)
 	oldpos = s;
 	/* loop over occurences of oldstr in s, replacing them with newstr */
 	while ((newpos = (char *)strstr(oldpos, oldstr))) {
-	    newmem = (char *) alloc(1 + (newpos - s)
+	    newmem = (char *) zhalloc(1 + (newpos - s)
 			+ strlen(newstr) + strlen(newpos + strlen(oldstr)));
 	    ztrncpy(newmem, s, newpos - s);
 	    strcat(newmem, newstr);
@@ -1761,26 +1755,24 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	 * We need to use the special setting function to re-initialise
 	 * the special parameter to empty.
 	 */
-	HEAPALLOC {
-	    switch (PM_TYPE(pm->flags)) {
-	    case PM_SCALAR:
-		pm->sets.cfn(pm, ztrdup(""));
-		break;
-	    case PM_INTEGER:
-		pm->sets.ifn(pm, 0);
-		break;
-	    case PM_EFLOAT:
-	    case PM_FFLOAT:
-		pm->sets.ffn(pm, 0.0);
-		break;
-	    case PM_ARRAY:
-		pm->sets.afn(pm, mkarray(NULL));
-		break;
-	    case PM_HASHED:
-		pm->sets.hfn(pm, newparamtable(17, pm->nam));
-		break;
-	    }
-	} LASTALLOC;
+	switch (PM_TYPE(pm->flags)) {
+	case PM_SCALAR:
+	    pm->sets.cfn(pm, ztrdup(""));
+	    break;
+	case PM_INTEGER:
+	    pm->sets.ifn(pm, 0);
+	    break;
+	case PM_EFLOAT:
+	case PM_FFLOAT:
+	    pm->sets.ffn(pm, 0.0);
+	    break;
+	case PM_ARRAY:
+	    pm->sets.afn(pm, mkarray(NULL));
+	    break;
+	case PM_HASHED:
+	    pm->sets.hfn(pm, newparamtable(17, pm->nam));
+	    break;
+	}
     }
     pm->flags |= (on & PM_READONLY);
     if (value && (pm->flags & (PM_ARRAY|PM_HASHED))) {
@@ -1944,7 +1936,6 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
     /* With the -m option, treat arguments as glob patterns */
     if (ops['m']) {
-	MUSTUSEHEAP("typeset -m");
 	while ((asg = getasg(*argv++))) {
 	    LinkList pmlist = newlinklist();
 	    LinkNode pmnode;
@@ -2739,7 +2730,7 @@ bin_print(char *name, char **args, char *ops, int func)
     }
     /* compute lengths, and interpret according to -P, -D, -e, etc. */
     argc = arrlen(args);
-    len = (int *)ncalloc(argc * sizeof(int));
+    len = (int *) hcalloc(argc * sizeof(int));
     for(n = 0; n < argc; n++) {
 	/* first \ sequences */
 	if (!ops['e'] && (ops['R'] || ops['r'] || ops['E']))
@@ -2763,7 +2754,7 @@ bin_print(char *name, char **args, char *ops, int func)
 	if(ops['D']) {
 	    Nameddir d = finddir(args[n]);
 	    if(d) {
-		char *arg = alloc(strlen(args[n]) + 1);
+		char *arg = zhalloc(strlen(args[n]) + 1);
 		sprintf(arg, "~%s%s", d->nam,
 			args[n] + strlen(d->dir));
 		args[n] = arg;
@@ -2774,9 +2765,7 @@ bin_print(char *name, char **args, char *ops, int func)
 
     /* -z option -- push the arguments onto the editing buffer stack */
     if (ops['z']) {
-	PERMALLOC {
-	    pushnode(bufstack, sepjoin(args, NULL));
-	} LASTALLOC;
+	zpushnode(bufstack, sepjoin(args, NULL, 0));
 	return 0;
     }
     /* -s option -- add the arguments to the history list */
@@ -2784,26 +2773,24 @@ bin_print(char *name, char **args, char *ops, int func)
 	int nwords = 0, nlen, iwords;
 	char **pargs = args;
 
-	PERMALLOC {
-	    ent = prepnexthistent(++curhist);
-	    while (*pargs++)
-		nwords++;
-	    if ((ent->nwords = nwords)) {
-		ent->words = (short *)zalloc(nwords*2*sizeof(short));
-		nlen = iwords = 0;
-		for (pargs = args; *pargs; pargs++) {
-		    ent->words[iwords++] = nlen;
-		    nlen += strlen(*pargs);
-		    ent->words[iwords++] = nlen;
-		    nlen++;
-		}
-	    } else
-		ent->words = (short *)NULL;
-	    ent->text = zjoin(args, ' ');
-	    ent->stim = ent->ftim = time(NULL);
-	    ent->flags = 0;
-	    addhistnode(histtab, ent->text, ent);
-	} LASTALLOC;
+	ent = prepnexthistent(++curhist);
+	while (*pargs++)
+	    nwords++;
+	if ((ent->nwords = nwords)) {
+	    ent->words = (short *)zalloc(nwords*2*sizeof(short));
+	    nlen = iwords = 0;
+	    for (pargs = args; *pargs; pargs++) {
+		ent->words[iwords++] = nlen;
+		nlen += strlen(*pargs);
+		ent->words[iwords++] = nlen;
+		nlen++;
+	    }
+	} else
+	    ent->words = (short *)NULL;
+	ent->text = zjoin(args, ' ', 0);
+	ent->stim = ent->ftim = time(NULL);
+	ent->flags = 0;
+	addhistnode(histtab, ent->text, ent);
 	return 0;
     }
     /* -u and -p -- output to other than standard output */
@@ -2985,9 +2972,7 @@ bin_shift(char *name, char **argv, char *ops, int func)
 		    ret++;
 		    continue;
 		}
-                PERMALLOC {
-		    s = arrdup(s + num);
-                } LASTALLOC;
+		s = zarrdup(s + num);
                 setaparam(*argv, s);
             }
     } else {
@@ -3197,42 +3182,40 @@ zexit(int val, int from_signal)
 {
     static int in_exit;
 
-    HEAPALLOC {
-	if (isset(MONITOR) && !stopmsg && !from_signal) {
-	    scanjobs();    /* check if jobs need printing           */
-	    if (isset(CHECKJOBS))
-	        checkjobs();   /* check if any jobs are running/stopped */
-	    if (stopmsg) {
-		stopmsg = 2;
-		LASTALLOC_RETURN;
-	    }
-	}
-	if (in_exit++ && from_signal) {
+    if (isset(MONITOR) && !stopmsg && !from_signal) {
+	scanjobs();    /* check if jobs need printing           */
+	if (isset(CHECKJOBS))
+	    checkjobs();   /* check if any jobs are running/stopped */
+	if (stopmsg) {
+	    stopmsg = 2;
 	    LASTALLOC_RETURN;
 	}
-	if (isset(MONITOR)) {
-	    /* send SIGHUP to any jobs left running  */
-	    killrunjobs(from_signal);
-	}
-	if (isset(RCS) && interact) {
-	    if (!nohistsave)
-		savehistfile(NULL, 1, HFILE_USE_OPTIONS);
-	    if (islogin && !subsh) {
-		sourcehome(".zlogout");
+    }
+    if (in_exit++ && from_signal)
+	    return;
+
+    if (isset(MONITOR)) {
+	/* send SIGHUP to any jobs left running  */
+	killrunjobs(from_signal);
+    }
+    if (isset(RCS) && interact) {
+	if (!nohistsave)
+	    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
+	if (islogin && !subsh) {
+	    sourcehome(".zlogout");
 #ifdef GLOBAL_ZLOGOUT
-		if (isset(RCS) && isset(GLOBALRCS))
-		    source(GLOBAL_ZLOGOUT);
+	    if (isset(RCS) && isset(GLOBALRCS))
+		source(GLOBAL_ZLOGOUT);
 #endif
-	    }
 	}
-	if (sigtrapped[SIGEXIT])
-	    dotrap(SIGEXIT);
-	runhookdef(EXITHOOK, NULL);
-	if (mypid != getpid())
-	    _exit(val);
-	else
-	    exit(val);
-    } LASTALLOC;
+    }
+    if (sigtrapped[SIGEXIT])
+	dotrap(SIGEXIT);
+    runhookdef(EXITHOOK, NULL);
+    if (mypid != getpid())
+	_exit(val);
+    else
+	exit(val);
 }
 
 /* . (dot), source */
@@ -3251,11 +3234,9 @@ bin_dot(char *name, char **argv, char *ops, int func)
 	return 0;
     old = pparams;
     /* get arguments for the script */
-    if (argv[1]) {
-	PERMALLOC {
-	    pparams = arrdup(argv + 1);
-	} LASTALLOC;
-    }
+    if (argv[1])
+	pparams = zarrdup(argv + 1);
+
     enam = arg0 = ztrdup(*argv);
     if (isset(FUNCTIONARGZERO)) {
 	old0 = argzero;
@@ -3336,7 +3317,7 @@ bin_eval(char *nam, char **argv, char *ops, int func)
 {
     Eprog prog;
 
-    prog = parse_string(zjoin(argv, ' '), 0);
+    prog = parse_string(zjoin(argv, ' ', 1), 0);
     if (!prog) {
 	errflag = 0;
 	return 1;
@@ -3906,9 +3887,7 @@ bin_trap(char *name, char **argv, char *ops, int func)
 	    zwarnnam(name, "undefined signal: %s", *argv, 0);
 	    break;
 	}
-	PERMALLOC {
-	    t = dupeprog(prog);
-	} LASTALLOC;
+	t = zdupeprog(prog);
 	if (settrap(sig, t))
 	    freeeprog(t);
     }

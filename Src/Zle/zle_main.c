@@ -508,94 +508,94 @@ zleread(char *lp, char *rp, int flags)
     pmpt_attr = txtchange;
     rpromptbuf = promptexpand(rp, 1, NULL, NULL);
     rpmpt_attr = txtchange;
-    PERMALLOC {
-	zlereadflags = flags;
-	histline = curhist;
-#ifdef HAVE_SELECT
-	FD_ZERO(&foofd);
-#endif
-	undoing = 1;
-	line = (unsigned char *)zalloc((linesz = 256) + 2);
-	virangeflag = lastcmd = done = cs = ll = mark = 0;
-	vichgflag = 0;
-	viinsbegin = 0;
-	statusline = NULL;
-	selectkeymap("main", 1);
-	selectlocalmap(NULL);
-	fixsuffix();
-	if ((s = (unsigned char *)getlinknode(bufstack))) {
-	    setline((char *)s);
-	    zsfree((char *)s);
-	    if (stackcs != -1) {
-		cs = stackcs;
-		stackcs = -1;
-		if (cs > ll)
-		    cs = ll;
-	    }
-	    if (stackhist != -1) {
-		histline = stackhist;
-		stackhist = -1;
-	    }
-	}
-	initundo();
-	if (isset(PROMPTCR))
-	    putc('\r', shout);
-	if (tmout)
-	    alarm(tmout);
-	zleactive = 1;
-	resetneeded = 1;
-	errflag = retflag = 0;
-	lastcol = -1;
-	initmodifier(&zmod);
-	prefixflag = 0;
-	zrefresh();
-	while (!done && !errflag) {
 
-	    statusline = NULL;
-	    vilinerange = 0;
-	    reselectkeymap();
-	    selectlocalmap(NULL);
-	    bindk = getkeycmd();
-	    if (!ll && isfirstln && c == eofchar) {
-		eofsent = 1;
-		break;
-	    }
-	    if (bindk) {
-		if (execzlefunc(bindk, zlenoargs))
-		    handlefeep(zlenoargs);
-		handleprefixes();
-		/* for vi mode, make sure the cursor isn't somewhere illegal */
-		if (invicmdmode() && cs > findbol() &&
-		    (cs == ll || line[cs] == '\n'))
-		    cs--;
-		if (undoing)
-		    handleundo();
-	    } else {
-		errflag = 1;
-		break;
-	    }
+    zlereadflags = flags;
+    histline = curhist;
 #ifdef HAVE_SELECT
-	    if (baud && !(lastcmd & ZLE_MENUCMP)) {
-		FD_SET(SHTTY, &foofd);
-		tv.tv_sec = 0;
-		if ((tv.tv_usec = cost * costmult) > 500000)
-		    tv.tv_usec = 500000;
-		if (!kungetct && select(SHTTY+1, (SELECT_ARG_2_T) & foofd,
-					NULL, NULL, &tv) <= 0)
-		    zrefresh();
-	    } else
+    FD_ZERO(&foofd);
 #endif
-		if (!kungetct)
-		    zrefresh();
+    undoing = 1;
+    line = (unsigned char *)zalloc((linesz = 256) + 2);
+    virangeflag = lastcmd = done = cs = ll = mark = 0;
+    vichgflag = 0;
+    viinsbegin = 0;
+    statusline = NULL;
+    selectkeymap("main", 1);
+    selectlocalmap(NULL);
+    fixsuffix();
+    if ((s = (unsigned char *)getlinknode(bufstack))) {
+	setline((char *)s);
+	zsfree((char *)s);
+	if (stackcs != -1) {
+	    cs = stackcs;
+	    stackcs = -1;
+	    if (cs > ll)
+		cs = ll;
 	}
+	if (stackhist != -1) {
+	    histline = stackhist;
+	    stackhist = -1;
+	}
+    }
+    initundo();
+    if (isset(PROMPTCR))
+	putc('\r', shout);
+    if (tmout)
+	alarm(tmout);
+    zleactive = 1;
+    resetneeded = 1;
+    errflag = retflag = 0;
+    lastcol = -1;
+    initmodifier(&zmod);
+    prefixflag = 0;
+    zrefresh();
+    while (!done && !errflag) {
+
 	statusline = NULL;
-	invalidatelist();
-	trashzle();
-	free(lpromptbuf);
-	free(rpromptbuf);
-	zleactive = zlereadflags = 0;
-	alarm(0);
-    } LASTALLOC;
+	vilinerange = 0;
+	reselectkeymap();
+	selectlocalmap(NULL);
+	bindk = getkeycmd();
+	if (!ll && isfirstln && c == eofchar) {
+	    eofsent = 1;
+	    break;
+	}
+	if (bindk) {
+	    if (execzlefunc(bindk, zlenoargs))
+		handlefeep(zlenoargs);
+	    handleprefixes();
+	    /* for vi mode, make sure the cursor isn't somewhere illegal */
+	    if (invicmdmode() && cs > findbol() &&
+		(cs == ll || line[cs] == '\n'))
+		cs--;
+	    if (undoing)
+		handleundo();
+	} else {
+	    errflag = 1;
+	    break;
+	}
+#ifdef HAVE_SELECT
+	if (baud && !(lastcmd & ZLE_MENUCMP)) {
+	    FD_SET(SHTTY, &foofd);
+	    tv.tv_sec = 0;
+	    if ((tv.tv_usec = cost * costmult) > 500000)
+		tv.tv_usec = 500000;
+	    if (!kungetct && select(SHTTY+1, (SELECT_ARG_2_T) & foofd,
+				    NULL, NULL, &tv) <= 0)
+		zrefresh();
+	} else
+#endif
+	    if (!kungetct)
+		zrefresh();
+    }
+    statusline = NULL;
+    invalidatelist();
+    trashzle();
+    free(lpromptbuf);
+    free(rpromptbuf);
+    zleactive = zlereadflags = 0;
+    alarm(0);
+
     freeundo();
     if (eofsent) {
 	free(line);
@@ -835,9 +835,8 @@ bin_vared(char *name, char **args, char *ops, int func)
 	haso = 1;
     }
     /* edit the parameter value */
-    PERMALLOC {
-	pushnode(bufstack, ztrdup(s));
-    } LASTALLOC;
+    zpushnode(bufstack, ztrdup(s));
+
     varedarg = *args;
     ifl = isfirstln;
     if (ops['e'])
@@ -876,9 +875,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     if (pm && (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED))) {
 	char **a;
 
-	PERMALLOC {
-	    a = spacesplit(t, 1);
-	} LASTALLOC;
+	a = spacesplit(t, 1, 0);
 	if (PM_TYPE(pm->flags) == PM_ARRAY)
 	    setaparam(args[0], a);
 	else

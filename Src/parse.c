@@ -998,7 +998,7 @@ par_case(int *complex)
 
 		incasepat = 1;
 		incmdpos = 0;
-		str2 = ncalloc(sl + 2);
+		str2 = hcalloc(sl + 2);
 		strcpy(str2, str);
 		str2[sl] = Bar;
 		str2[sl+1] = '\0';
@@ -1042,7 +1042,7 @@ par_case(int *complex)
 
 		    if (tok != STRING)
 			YYERRORV(oecused);
-		    str2 = ncalloc(sl + strlen(tokstr) + 1);
+		    str2 = hcalloc(sl + strlen(tokstr) + 1);
 		    strcpy(str2, str);
 		    strcpy(str2 + sl, tokstr);
 		    str = str2;
@@ -2008,7 +2008,7 @@ yyerror(int noerr)
 
 /**/
 mod_export Eprog
-dupeprog(Eprog p)
+zdupeprog(Eprog p)
 {
     Eprog r;
     int i;
@@ -2017,14 +2017,15 @@ dupeprog(Eprog p)
     if (p == &dummy_eprog)
 	return p;
 
-    r = (Eprog) ncalloc(sizeof(*r));
-    r->heap = useheap;
+    r = (Eprog) zalloc(sizeof(*r));
+    r->heap = 0;
     r->len = p->len;
     r->npats = p->npats;
-    pp = r->pats = (Patprog *) ncalloc(r->len);
+    pp = r->pats = (Patprog *) zcalloc(r->len);
     r->prog = (Wordcode) (r->pats + r->npats);
     r->strs = ((char *) r->prog) + (p->strs - ((char *) p->prog));
     memcpy(r->prog, p->prog, r->len - (p->npats * sizeof(Patprog)));
+    r->shf = NULL;
 
     for (i = r->npats; i--; pp++)
 	*pp = dummy_patprog1;
@@ -2038,11 +2039,8 @@ static LinkList eprog_free;
 mod_export void
 freeeprog(Eprog p)
 {
-    if (p && p != &dummy_eprog) {
-	PERMALLOC {
-	    addlinknode(eprog_free, p);
-	} LASTALLOC;
-    }
+    if (p && p != &dummy_eprog)
+	zaddlinknode(eprog_free, p);
 }
 
 /**/
@@ -2191,7 +2189,5 @@ init_eprog(void)
     dummy_eprog.prog = &dummy_eprog_code;
     dummy_eprog.strs = NULL;
 
-    PERMALLOC {
-	eprog_free = newlinklist();
-    } LASTALLOC;
+    eprog_free = znewlinklist();
 }

@@ -1237,7 +1237,7 @@ makecline(LinkList list)
     char **argv, **ptr;
 
     /* A bigger argv is necessary for executing scripts */
-    ptr = argv = 2 + (char **) ncalloc((countlinknodes(list) + 4) *
+    ptr = argv = 2 + (char **) hcalloc((countlinknodes(list) + 4) *
 				       sizeof(char *));
 
     if (isset(XTRACE)) {
@@ -1402,7 +1402,7 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag)
 
     if (!mfds[fd1] || unset(MULTIOS)) {
 	if(!mfds[fd1]) {		/* starting a new multio */
-	    mfds[fd1] = (struct multio *) alloc(sizeof(struct multio));
+	    mfds[fd1] = (struct multio *) zhalloc(sizeof(struct multio));
 	    if (!forked && save[fd1] == -2)
 		save[fd1] = (fd1 == fd2) ? -1 : movefd(fd1);
 	}
@@ -2326,8 +2326,6 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
     char *s;
     wordcode ac;
 
-    MUSTUSEHEAP("save_params()");
-    
     *restore_p = newlinklist();
     *remove_p = newlinklist();
 
@@ -2338,7 +2336,7 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 		paramtab->removenode(paramtab, s);
 	    } else if (!(pm->flags & PM_READONLY) &&
 		       (unset(RESTRICTED) || !(pm->flags & PM_RESTRICTED))) {
-		Param tpm = (Param) alloc(sizeof *tpm);
+		Param tpm = (Param) zhalloc(sizeof *tpm);
 		tpm->nam = s;
 		copyparam(tpm, pm, 1);
 		pm = tpm;
@@ -2671,7 +2669,7 @@ readoutput(int in, int qt)
 
     fin = fdopen(in, "r");
     ret = newlinklist();
-    ptr = buf = (char *) ncalloc(bsiz = 64);
+    ptr = buf = (char *) hcalloc(bsiz = 64);
     while ((c = fgetc(fin)) != EOF || errno == EINTR) {
 	if (c == EOF) {
 	    errno = 0;
@@ -2684,7 +2682,7 @@ readoutput(int in, int qt)
 	    cnt++;
 	}
 	if (++cnt >= bsiz) {
-	    char *pp = (char *) ncalloc(bsiz *= 2);
+	    char *pp = (char *) hcalloc(bsiz *= 2);
 
 	    memcpy(pp, buf, cnt - 1);
 	    ptr = (buf = pp) + cnt - 1;
@@ -2702,7 +2700,7 @@ readoutput(int in, int qt)
 	}
 	addlinknode(ret, buf);
     } else {
-	char **words = spacesplit(buf, 0);
+	char **words = spacesplit(buf, 0, 1);
 
 	while (*words) {
 	    if (isset(GLOBSUBST))
@@ -2752,11 +2750,11 @@ getoutputfile(char *cmd)
 	return NULL;
 
     nam = ztrdup(nam);
-    PERMALLOC {
-	if (!jobtab[thisjob].filelist)
-	    jobtab[thisjob].filelist = newlinklist();
-	addlinknode(jobtab[thisjob].filelist, nam);
-    } LASTALLOC;
+
+    if (!jobtab[thisjob].filelist)
+	jobtab[thisjob].filelist = znewlinklist();
+    zaddlinknode(jobtab[thisjob].filelist, nam);
+
     child_block();
     fd = open(nam, O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0600);
 
@@ -2830,16 +2828,15 @@ getproc(char *cmd)
     if (!(pnam = namedpipe()))
 	return NULL;
 #else
-    pnam = ncalloc(strlen(PATH_DEV_FD) + 6);
+    pnam = hcalloc(strlen(PATH_DEV_FD) + 6);
 #endif
     if (!(prog = parsecmd(cmd)))
 	return NULL;
 #ifndef PATH_DEV_FD
-    PERMALLOC {
-	if (!jobtab[thisjob].filelist)
-	    jobtab[thisjob].filelist = newlinklist();
-	addlinknode(jobtab[thisjob].filelist, ztrdup(pnam));
-    } LASTALLOC;
+    if (!jobtab[thisjob].filelist)
+	jobtab[thisjob].filelist = znewlinklist();
+    zaddlinknode(jobtab[thisjob].filelist, ztrdup(pnam));
+
     if (zfork()) {
 #else
     mpipe(pipes);
@@ -3024,40 +3021,37 @@ execfuncdef(Estate state, int do_exec)
     if (htok)
 	execsubst(names);
 
-    PERMALLOC {
-	while ((s = (char *) ugetnode(names))) {
-	    prog = (Eprog) zalloc(sizeof(*prog));
-	    prog->heap = 0;
-	    prog->len = len;
-	    prog->npats = npats;
-	    prog->pats = pp = (Patprog *) zalloc(len);
-	    prog->prog = (Wordcode) (prog->pats + npats);
-	    for (i = npats; i--; pp++)
-		*pp = dummy_patprog1;
-	    memcpy(prog->prog, state->pc, plen);
-	    prog->strs = (char *) (prog->prog + nprg);
-	    prog->shf = NULL;
+    while ((s = (char *) ugetnode(names))) {
+	prog = (Eprog) zalloc(sizeof(*prog));
+	prog->heap = 0;
+	prog->len = len;
+	prog->npats = npats;
+	prog->pats = pp = (Patprog *) zalloc(len);
+	prog->prog = (Wordcode) (prog->pats + npats);
+	for (i = npats; i--; pp++)
+	    *pp = dummy_patprog1;
+	memcpy(prog->prog, state->pc, plen);
+	prog->strs = (char *) (prog->prog + nprg);
+	prog->shf = NULL;
 
-	    shf = (Shfunc) zalloc(sizeof(*shf));
-	    shf->funcdef = prog;
-	    shf->flags = 0;
+	shf = (Shfunc) zalloc(sizeof(*shf));
+	shf->funcdef = prog;
+	shf->flags = 0;
 
-	    /* is this shell function a signal trap? */
-	    if (!strncmp(s, "TRAP", 4) &&
-		(signum = getsignum(s + 4)) != -1) {
-		if (settrap(signum, shf->funcdef)) {
-		    freeeprog(shf->funcdef);
-		    zfree(shf, sizeof(*shf));
-		    state->pc = end;
-		    LASTALLOC_RETURN 1;
-		}
-		sigtrapped[signum] |= ZSIG_FUNC;
+	/* is this shell function a signal trap? */
+	if (!strncmp(s, "TRAP", 4) &&
+	    (signum = getsignum(s + 4)) != -1) {
+	    if (settrap(signum, shf->funcdef)) {
+		freeeprog(shf->funcdef);
+		zfree(shf, sizeof(*shf));
+		state->pc = end;
+		return 1;
 	    }
-	    shfunctab->addnode(shfunctab, ztrdup(s), shf);
+	    sigtrapped[signum] |= ZSIG_FUNC;
 	}
-    } LASTALLOC;
-
-    if(isset(HISTNOFUNCTIONS))
+	shfunctab->addnode(shfunctab, ztrdup(s), shf);
+    }
+    if (isset(HISTNOFUNCTIONS))
 	remhist();
     state->pc = end;
     return 0;
@@ -3150,9 +3144,7 @@ execautofn(Estate state, int do_exec)
 	}
     } else {
 	freeeprog(shf->funcdef);
-	PERMALLOC {
-	    shf->funcdef = dupeprog(stripkshdef(prog, shf->nam));
-	} LASTALLOC;
+	shf->funcdef = zdupeprog(stripkshdef(prog, shf->nam));
 	shf->flags &= ~PM_UNDEFINED;
     }
     popheap();
@@ -3182,9 +3174,7 @@ loadautofn(Shfunc shf)
     }
     if (!prog)
 	prog = &dummy_eprog;
-    PERMALLOC {
-	shf->funcdef = dupeprog(stripkshdef(prog, shf->nam));
-    } LASTALLOC;
+    shf->funcdef = zdupeprog(stripkshdef(prog, shf->nam));
     shf->flags &= ~PM_UNDEFINED;
 
     popheap();
@@ -3207,89 +3197,87 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     int obreaks = breaks;
     struct funcstack fstack;
 
-    HEAPALLOC {
-	pushheap();
-	if (trapreturn < 0)
-	    trapreturn--;
-	oldlastval = lastval;
+    pushheap();
+    if (trapreturn < 0)
+	trapreturn--;
+    oldlastval = lastval;
 
-	starttrapscope();
+    starttrapscope();
 
-	tab = pparams;
-	oldscriptname = scriptname;
-	scriptname = dupstring(name);
-	oldzoptind = zoptind;
-	zoptind = 1;
-	oldoptcind = optcind;
-	optcind = 0;
+    tab = pparams;
+    oldscriptname = scriptname;
+    scriptname = dupstring(name);
+    oldzoptind = zoptind;
+    zoptind = 1;
+    oldoptcind = optcind;
+    optcind = 0;
 
-	/* We need to save the current options even if LOCALOPTIONS is *
-	 * not currently set.  That's because if it gets set in the    *
-	 * function we need to restore the original options on exit.   */
-	memcpy(saveopts, opts, sizeof(opts));
+    /* We need to save the current options even if LOCALOPTIONS is *
+     * not currently set.  That's because if it gets set in the    *
+     * function we need to restore the original options on exit.   */
+    memcpy(saveopts, opts, sizeof(opts));
 
-	if (flags & PM_TAGGED)
-	    opts[XTRACE] = 1;
-	opts[PRINTEXITVALUE] = 0;
-	if (doshargs) {
-	    LinkNode node;
+    if (flags & PM_TAGGED)
+	opts[XTRACE] = 1;
+    opts[PRINTEXITVALUE] = 0;
+    if (doshargs) {
+	LinkNode node;
 
-	    node = doshargs->first;
-	    pparams = x = (char **) zcalloc(((sizeof *x) *
-					     (1 + countlinknodes(doshargs))));
-	    if (isset(FUNCTIONARGZERO)) {
-		oargv0 = argzero;
-		argzero = ztrdup((char *) node->dat);
-	    }
-	    node = node->next;
-	    for (; node; node = node->next, x++)
-		*x = ztrdup((char *) node->dat);
-	} else {
-	    pparams = (char **) zcalloc(sizeof *pparams);
-	    if (isset(FUNCTIONARGZERO)) {
-		oargv0 = argzero;
-		argzero = ztrdup(argzero);
-	    }
+	node = doshargs->first;
+	pparams = x = (char **) zcalloc(((sizeof *x) *
+					 (1 + countlinknodes(doshargs))));
+	if (isset(FUNCTIONARGZERO)) {
+	    oargv0 = argzero;
+	    argzero = ztrdup((char *) node->dat);
 	}
-	fstack.name = dupstring(name);
-	fstack.prev = funcstack;
-	funcstack = &fstack;
-	runshfunc(prog, wrappers, fstack.name);
-	funcstack = fstack.prev;
-	if (retflag) {
-	    retflag = 0;
-	    breaks = obreaks;
+	node = node->next;
+	for (; node; node = node->next, x++)
+	    *x = ztrdup((char *) node->dat);
+    } else {
+	pparams = (char **) zcalloc(sizeof *pparams);
+	if (isset(FUNCTIONARGZERO)) {
+	    oargv0 = argzero;
+	    argzero = ztrdup(argzero);
 	}
-	freearray(pparams);
-	if (oargv0) {
-	    zsfree(argzero);
-	    argzero = oargv0;
-	}
-	optcind = oldoptcind;
-	zoptind = oldzoptind;
-	scriptname = oldscriptname;
-	pparams = tab;
+    }
+    fstack.name = dupstring(name);
+    fstack.prev = funcstack;
+    funcstack = &fstack;
+    runshfunc(prog, wrappers, fstack.name);
+    funcstack = fstack.prev;
+    if (retflag) {
+	retflag = 0;
+	breaks = obreaks;
+    }
+    freearray(pparams);
+    if (oargv0) {
+	zsfree(argzero);
+	argzero = oargv0;
+    }
+    optcind = oldoptcind;
+    zoptind = oldzoptind;
+    scriptname = oldscriptname;
+    pparams = tab;
 
-	if (isset(LOCALOPTIONS)) {
-	    /* restore all shell options except PRIVILEGED and RESTRICTED */
-	    saveopts[PRIVILEGED] = opts[PRIVILEGED];
-	    saveopts[RESTRICTED] = opts[RESTRICTED];
-	    memcpy(opts, saveopts, sizeof(opts));
-	} else {
-	    /* just restore a couple. */
-	    opts[XTRACE] = saveopts[XTRACE];
-	    opts[PRINTEXITVALUE] = saveopts[PRINTEXITVALUE];
-	    opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
-	}
+    if (isset(LOCALOPTIONS)) {
+	/* restore all shell options except PRIVILEGED and RESTRICTED */
+	saveopts[PRIVILEGED] = opts[PRIVILEGED];
+	saveopts[RESTRICTED] = opts[RESTRICTED];
+	memcpy(opts, saveopts, sizeof(opts));
+    } else {
+	/* just restore a couple. */
+	opts[XTRACE] = saveopts[XTRACE];
+	opts[PRINTEXITVALUE] = saveopts[PRINTEXITVALUE];
+	opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
+    }
 
-	endtrapscope();
+    endtrapscope();
 
-	if (trapreturn < -1)
-	    trapreturn++;
-	if (noreturnval)
-	    lastval = oldlastval;
-	popheap();
-    } LASTALLOC;
+    if (trapreturn < -1)
+	trapreturn++;
+    if (noreturnval)
+	lastval = oldlastval;
+    popheap();
 }
 
 /* This finally executes a shell function and any function wrappers     *
@@ -3354,9 +3342,8 @@ getfpfunc(char *s)
 		    close(fd);
 		    d[len] = '\0';
 		    d = metafy(d, len, META_REALLOC);
-		    HEAPALLOC {
-			r = parse_string(d, 1);
-		    } LASTALLOC;
+
+		    r = parse_string(d, 1);
 
 		    zfree(d, len + 1);
 

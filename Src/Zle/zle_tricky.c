@@ -696,13 +696,13 @@ docomplete(int lst)
 		    *q = Nularg;
 	    cs = wb;
 	    foredel(we - wb);
-	    HEAPALLOC {
-		untokenize(x = ox = dupstring(w));
-		if (*w == Tilde || *w == Equals || *w == String)
-		    *x = *w;
-		spckword(&x, 0, lincmd, 0);
-		ret = !strcmp(x, ox);
-	    } LASTALLOC;
+
+	    untokenize(x = ox = dupstring(w));
+	    if (*w == Tilde || *w == Equals || *w == String)
+		*x = *w;
+	    spckword(&x, 0, lincmd, 0);
+	    ret = !strcmp(x, ox);
+
 	    untokenize(x);
 	    inststr(x);
 	} else if (COMP_ISEXPAND(lst)) {
@@ -810,7 +810,7 @@ mod_export char *
 dupstrspace(const char *str)
 {
     int len = strlen((char *)str);
-    char *t = (char *) ncalloc(len + 2);
+    char *t = (char *) hcalloc(len + 2);
     strcpy(t, str);
     strcpy(t+len, " ");
     return t;
@@ -868,16 +868,17 @@ freebrinfo(Brinfo p)
 
 /**/
 mod_export Brinfo
-dupbrinfo(Brinfo p, Brinfo *last)
+dupbrinfo(Brinfo p, Brinfo *last, int heap)
 {
     Brinfo ret = NULL, *q = &ret, n = NULL;
 
     while (p) {
-	n = *q = (Brinfo) alloc(sizeof(*n));
+	n = *q = (heap ? (Brinfo) zhalloc(sizeof(*n)) :
+		  (Brinfo) zalloc(sizeof(*n)));
 	q = &(n->next);
 
 	n->next = NULL;
-	n->str = dupstring(p->str);
+	n->str = (heap ? dupstring(p->str) : ztrdup(p->str));
 	n->pos = p->pos;
 	n->qpos = p->qpos;
 	n->curpos = p->curpos;
@@ -946,628 +947,618 @@ get_comp_string(void)
     addx(&tmp);
     linptr = (char *)line;
     pushheap();
-    HEAPALLOC {
-      start:
-	inwhat = IN_NOTHING;
-	/* Now set up the lexer and start it. */
-	parbegin = parend = -1;
-	lincmd = incmdpos;
-	linredir = inredir;
-	zsfree(cmdstr);
-	cmdstr = NULL;
-	zsfree(varname);
-	varname = NULL;
-	insubscr = 0;
-	zleparse = 1;
-	clwpos = -1;
-	lexsave();
-	inpush(dupstrspace((char *) linptr), 0, NULL);
-	strinbeg(0);
-	i = tt0 = cp = rd = ins = oins = linarr = parct = ia = 0;
 
-	/* This loop is possibly the wrong way to do this.  It goes through *
-	 * the previously massaged command line using the lexer.  It stores *
-	 * each token in each command (commands being regarded, roughly, as *
-	 * being separated by tokens | & &! |& || &&).  The loop stops when *
-	 * the end of the command containing the cursor is reached.  It's a *
-	 * simple way to do things, but suffers from an inability to        *
-	 * distinguish actual command arguments from, for example,          *
-	 * filenames in redirections.  (But note that code elsewhere checks *
-	 * if we are completing *in* a redirection.)  The only way to fix   *
-	 * this would be to pass the command line through the parser too,   *
-	 * and get the arguments that way.  Maybe in 3.1...                 */
-	do {
-	    lincmd = ((incmdpos && !ins) || (oins == 2 && i == 2) ||
-		      (ins == 3 && i == 1));
-	    linredir = (inredir && !ins);
-	    oins = ins;
-	    /* Get the next token. */
-	    if (linarr)
-		incmdpos = 0;
-	    ctxtlex();
+ start:
+    inwhat = IN_NOTHING;
+    /* Now set up the lexer and start it. */
+    parbegin = parend = -1;
+    lincmd = incmdpos;
+    linredir = inredir;
+    zsfree(cmdstr);
+    cmdstr = NULL;
+    zsfree(varname);
+    varname = NULL;
+    insubscr = 0;
+    zleparse = 1;
+    clwpos = -1;
+    lexsave();
+    inpush(dupstrspace((char *) linptr), 0, NULL);
+    strinbeg(0);
+    i = tt0 = cp = rd = ins = oins = linarr = parct = ia = 0;
 
-	    if (tok == LEXERR) {
-		if (!tokstr)
-		    break;
-		for (j = 0, p = tokstr; *p; p++)
-		    if (*p == Snull || *p == Dnull)
-			j++;
-		if (j & 1) {
-		    if (lincmd && strchr(tokstr, '=')) {
-			varq = 1;
-			tok = ENVSTRING;
-		    } else
-			tok = STRING;
-		}
-	    } else if (tok == ENVSTRING)
-		varq = 0;
-	    if (tok == ENVARRAY) {
-		linarr = 1;
-		zsfree(varname);
-		varname = ztrdup(tokstr);
-	    } else if (tok == INPAR)
-		parct++;
-	    else if (tok == OUTPAR) {
-		if (parct)
-		    parct--;
-		else
-		    linarr = 0;
-	    }
-	    if (inredir)
-		rdstr = tokstrings[tok];
-	    if (tok == DINPAR)
-		tokstr = NULL;
+    /* This loop is possibly the wrong way to do this.  It goes through *
+     * the previously massaged command line using the lexer.  It stores *
+     * each token in each command (commands being regarded, roughly, as *
+     * being separated by tokens | & &! |& || &&).  The loop stops when *
+     * the end of the command containing the cursor is reached.  It's a *
+     * simple way to do things, but suffers from an inability to        *
+     * distinguish actual command arguments from, for example,          *
+     * filenames in redirections.  (But note that code elsewhere checks *
+     * if we are completing *in* a redirection.)  The only way to fix   *
+     * this would be to pass the command line through the parser too,   *
+     * and get the arguments that way.  Maybe in 3.1...                 */
+    do {
+	lincmd = ((incmdpos && !ins) || (oins == 2 && i == 2) ||
+		  (ins == 3 && i == 1));
+	linredir = (inredir && !ins);
+	oins = ins;
+	/* Get the next token. */
+	if (linarr)
+	    incmdpos = 0;
+	ctxtlex();
 
-	    /* We reached the end. */
-	    if (tok == ENDINPUT)
-		break;
-	    if ((ins && (tok == DO || tok == SEPER)) ||
-		(ins == 2 && i == 2) ||	(ins == 3 && i == 3) ||
-		tok == BAR    || tok == AMPER     ||
-		tok == BARAMP || tok == AMPERBANG ||
-		((tok == DBAR || tok == DAMPER) && !incond)) {
-		/* This is one of the things that separate commands.  If we  *
-		 * already have the things we need (e.g. the token strings), *
-		 * leave the loop.                                           */
-		if (tt)
-		    break;
-		/* Otherwise reset the variables we are collecting data in. */
-		i = tt0 = cp = rd = ins = 0;
-	    }
-	    if (lincmd && (tok == STRING || tok == FOR || tok == FOREACH ||
-			   tok == SELECT || tok == REPEAT || tok == CASE)) {
-		/* The lexer says, this token is in command position, so *
-		 * store the token string (to find the right compctl).   */
-		ins = (tok == REPEAT ? 2 : (tok != STRING));
-		zsfree(cmdstr);
-		cmdstr = ztrdup(tokstr);
-		i = 0;
-	    }
-	    if (!zleparse && !tt0) {
-		/* This is done when the lexer reached the word the cursor is on. */
-		tt = tokstr ? dupstring(tokstr) : NULL;
-		/* If we added a `x', remove it. */
-		if (addedx && tt)
-		    chuck(tt + cs - wb);
-		tt0 = tok;
-		/* Store the number of this word. */
-		clwpos = i;
-		cp = lincmd;
-		rd = linredir;
-		ia = linarr;
-		if (inwhat == IN_NOTHING && incond)
-		    inwhat = IN_COND;
-	    } else if (linredir)
-		continue;
+	if (tok == LEXERR) {
 	    if (!tokstr)
-		continue;
-	    /* Hack to allow completion after `repeat n do'. */
-	    if (oins == 2 && !i && !strcmp(tokstr, "do"))
-		ins = 3;
-	    /* We need to store the token strings of all words (for some of *
-	     * the more complicated compctl -x things).  They are stored in *
-	     * the clwords array.  Make this array big enough.              */
-	    if (i + 1 == clwsize) {
-		int n;
-		clwords = (char **)realloc(clwords,
-					   (clwsize *= 2) * sizeof(char *));
-		for(n = clwsize; --n > i; )
-		    clwords[n] = NULL;
+		break;
+	    for (j = 0, p = tokstr; *p; p++)
+		if (*p == Snull || *p == Dnull)
+		    j++;
+	    if (j & 1) {
+		if (lincmd && strchr(tokstr, '=')) {
+		    varq = 1;
+		    tok = ENVSTRING;
+		} else
+		    tok = STRING;
 	    }
-	    zsfree(clwords[i]);
-	    /* And store the current token string. */
-	    clwords[i] = ztrdup(tokstr);
-	    sl = strlen(tokstr);
-	    /* Sometimes the lexer gives us token strings ending with *
-	     * spaces we delete the spaces.                           */
-	    while (sl && clwords[i][sl - 1] == ' ' &&
-		   (sl < 2 || (clwords[i][sl - 2] != Bnull &&
-			       clwords[i][sl - 2] != Meta)))
-		clwords[i][--sl] = '\0';
-	    /* If this is the word the cursor is in and we added a `x', *
-	     * remove it.                                               */
-	    if (clwpos == i++ && addedx)
-		chuck(&clwords[i - 1][((cs - wb) >= sl) ?
-				     (sl - 1) : (cs - wb)]);
-	} while (tok != LEXERR && tok != ENDINPUT &&
-		 (tok != SEPER || (zleparse && !tt0)));
-	/* Calculate the number of words stored in the clwords array. */
-	clwnum = (tt || !i) ? i : i - 1;
-	zsfree(clwords[clwnum]);
-	clwords[clwnum] = NULL;
-	t0 = tt0;
-	if (ia) {
-	    lincmd = linredir = 0;
-	    inwhat = IN_ENV;
-	} else {
-	    lincmd = cp;
-	    linredir = rd;
-	}
-	strinend();
-	inpop();
-	errflag = zleparse = 0;
-	if (parbegin != -1) {
-	    /* We are in command or process substitution if we are not in
-	     * a $((...)). */
-	    if (parend >= 0 && !tmp)
-		line = (unsigned char *) dupstring(tmp = (char *)line);
-	    linptr = (char *) line + ll + addedx - parbegin + 1;
-	    if ((linptr - (char *) line) < 3 || *linptr != '(' ||
-		linptr[-1] != '(' || linptr[-2] != '$') {
-		if (parend >= 0) {
-		    ll -= parend;
-		    line[ll + addedx] = '\0';
-		}
-		lexrestore();
-		goto start;
-	    }
-	}
-
-	if (inwhat == IN_MATH)
-	    s = NULL;
-	else if (!t0 || t0 == ENDINPUT) {
-	    /* There was no word (empty line). */
-	    s = ztrdup("");
-	    we = wb = cs;
-	    clwpos = clwnum;
-	    t0 = STRING;
-	} else if (t0 == STRING) {
-	    /* We found a simple string. */
-	    s = ztrdup(clwords[clwpos]);
-	} else if (t0 == ENVSTRING) {
-	    char sav;
-	    /* The cursor was inside a parameter assignment. */
-
-	    if (varq)
-		tt = clwords[clwpos];
-
-	    for (s = tt; iident(*s); s++);
-	    sav = *s;
-	    *s = '\0';
+	} else if (tok == ENVSTRING)
+	    varq = 0;
+	if (tok == ENVARRAY) {
+	    linarr = 1;
 	    zsfree(varname);
-	    varname = ztrdup(tt);
-	    *s = sav;
-	    if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt + cs - wb) {
-		s = NULL;
-		inwhat = IN_MATH;
+	    varname = ztrdup(tokstr);
+	} else if (tok == INPAR)
+	    parct++;
+	else if (tok == OUTPAR) {
+	    if (parct)
+		parct--;
+	    else
+		linarr = 0;
+	}
+	if (inredir)
+	    rdstr = tokstrings[tok];
+	if (tok == DINPAR)
+	    tokstr = NULL;
+
+	/* We reached the end. */
+	if (tok == ENDINPUT)
+	    break;
+	if ((ins && (tok == DO || tok == SEPER)) ||
+	    (ins == 2 && i == 2) ||	(ins == 3 && i == 3) ||
+	    tok == BAR    || tok == AMPER     ||
+	    tok == BARAMP || tok == AMPERBANG ||
+	    ((tok == DBAR || tok == DAMPER) && !incond)) {
+	    /* This is one of the things that separate commands.  If we  *
+	     * already have the things we need (e.g. the token strings), *
+	     * leave the loop.                                           */
+	    if (tt)
+		break;
+	    /* Otherwise reset the variables we are collecting data in. */
+	    i = tt0 = cp = rd = ins = 0;
+	}
+	if (lincmd && (tok == STRING || tok == FOR || tok == FOREACH ||
+		       tok == SELECT || tok == REPEAT || tok == CASE)) {
+	    /* The lexer says, this token is in command position, so *
+	     * store the token string (to find the right compctl).   */
+	    ins = (tok == REPEAT ? 2 : (tok != STRING));
+	    zsfree(cmdstr);
+	    cmdstr = ztrdup(tokstr);
+	    i = 0;
+	}
+	if (!zleparse && !tt0) {
+	    /* This is done when the lexer reached the word the cursor is on. */
+	    tt = tokstr ? dupstring(tokstr) : NULL;
+	    /* If we added a `x', remove it. */
+	    if (addedx && tt)
+		chuck(tt + cs - wb);
+	    tt0 = tok;
+	    /* Store the number of this word. */
+	    clwpos = i;
+	    cp = lincmd;
+	    rd = linredir;
+	    ia = linarr;
+	    if (inwhat == IN_NOTHING && incond)
+		inwhat = IN_COND;
+	} else if (linredir)
+	    continue;
+	if (!tokstr)
+	    continue;
+	/* Hack to allow completion after `repeat n do'. */
+	if (oins == 2 && !i && !strcmp(tokstr, "do"))
+	    ins = 3;
+	/* We need to store the token strings of all words (for some of *
+	 * the more complicated compctl -x things).  They are stored in *
+	 * the clwords array.  Make this array big enough.              */
+	if (i + 1 == clwsize) {
+	    int n;
+	    clwords = (char **)realloc(clwords,
+				       (clwsize *= 2) * sizeof(char *));
+	    for(n = clwsize; --n > i; )
+		clwords[n] = NULL;
+	}
+	zsfree(clwords[i]);
+	/* And store the current token string. */
+	clwords[i] = ztrdup(tokstr);
+	sl = strlen(tokstr);
+	/* Sometimes the lexer gives us token strings ending with *
+	 * spaces we delete the spaces.                           */
+	while (sl && clwords[i][sl - 1] == ' ' &&
+	       (sl < 2 || (clwords[i][sl - 2] != Bnull &&
+			   clwords[i][sl - 2] != Meta)))
+	    clwords[i][--sl] = '\0';
+	/* If this is the word the cursor is in and we added a `x', *
+	 * remove it.                                               */
+	if (clwpos == i++ && addedx)
+	    chuck(&clwords[i - 1][((cs - wb) >= sl) ?
+				 (sl - 1) : (cs - wb)]);
+    } while (tok != LEXERR && tok != ENDINPUT &&
+	     (tok != SEPER || (zleparse && !tt0)));
+    /* Calculate the number of words stored in the clwords array. */
+    clwnum = (tt || !i) ? i : i - 1;
+    zsfree(clwords[clwnum]);
+    clwords[clwnum] = NULL;
+    t0 = tt0;
+    if (ia) {
+	lincmd = linredir = 0;
+	inwhat = IN_ENV;
+    } else {
+	lincmd = cp;
+	linredir = rd;
+    }
+    strinend();
+    inpop();
+    errflag = zleparse = 0;
+    if (parbegin != -1) {
+	/* We are in command or process substitution if we are not in
+	 * a $((...)). */
+	if (parend >= 0 && !tmp)
+	    line = (unsigned char *) dupstring(tmp = (char *)line);
+	linptr = (char *) line + ll + addedx - parbegin + 1;
+	if ((linptr - (char *) line) < 3 || *linptr != '(' ||
+	    linptr[-1] != '(' || linptr[-2] != '$') {
+	    if (parend >= 0) {
+		ll -= parend;
+		line[ll + addedx] = '\0';
+	    }
+	    lexrestore();
+	    goto start;
+	}
+    }
+
+    if (inwhat == IN_MATH)
+	s = NULL;
+    else if (!t0 || t0 == ENDINPUT) {
+	/* There was no word (empty line). */
+	s = ztrdup("");
+	we = wb = cs;
+	clwpos = clwnum;
+	t0 = STRING;
+    } else if (t0 == STRING) {
+	/* We found a simple string. */
+	s = ztrdup(clwords[clwpos]);
+    } else if (t0 == ENVSTRING) {
+	char sav;
+	/* The cursor was inside a parameter assignment. */
+
+	if (varq)
+	    tt = clwords[clwpos];
+
+	for (s = tt; iident(*s); s++);
+	sav = *s;
+	*s = '\0';
+	zsfree(varname);
+	varname = ztrdup(tt);
+	*s = sav;
+	if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt + cs - wb) {
+	    s = NULL;
+	    inwhat = IN_MATH;
+	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
+		(keypm->flags & PM_HASHED))
+		insubscr = 2;
+	    else
+		insubscr = 1;
+	} else if (*s == '=' && cs > wb + (s - tt)) {
+	    s++;
+	    wb += s - tt;
+	    t0 = STRING;
+	    s = ztrdup(s);
+	    inwhat = IN_ENV;
+	}
+	lincmd = 1;
+    }
+    if (we > ll)
+	we = ll;
+    tt = (char *)line;
+    if (tmp) {
+	line = (unsigned char *)tmp;
+	ll = strlen((char *)line);
+    }
+    if (t0 != STRING && inwhat != IN_MATH) {
+	if (tmp) {
+	    tmp = NULL;
+	    linptr = (char *)line;
+	    lexrestore();
+	    addedx = 0;
+	    goto start;
+	}
+	noaliases = 0;
+	lexrestore();
+	return NULL;
+    }
+
+    noaliases = 0;
+
+    /* Check if we are in an array subscript.  We simply assume that  *
+     * we are in a subscript if we are in brackets.  Correct solution *
+     * is very difficult.  This is quite close, but gets things like  *
+     * foo[_ wrong (note no $).  If we are in a subscript, treat it   *
+     * as being in math.                                              */
+    if (inwhat != IN_MATH) {
+	int i = 0;
+	char *nnb = (iident(*s) ? s : s + 1), *nb = NULL, *ne = NULL;
+	
+	for (tt = s; ++tt < s + cs - wb;)
+	    if (*tt == Inbrack) {
+		i++;
+		nb = nnb;
+		ne = tt;
+	    } else if (i && *tt == Outbrack)
+		i--;
+	    else if (!iident(*tt))
+		nnb = tt + 1;
+	if (i) {
+	    inwhat = IN_MATH;
+	    insubscr = 1;
+	    if (nb < ne) {
+		char sav = *ne;
+		*ne = '\0';
+		zsfree(varname);
+		varname = ztrdup(nb);
+		*ne = sav;
 		if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
 		    (keypm->flags & PM_HASHED))
 		    insubscr = 2;
-		else
-		    insubscr = 1;
-	    } else if (*s == '=' && cs > wb + (s - tt)) {
-		s++;
-		wb += s - tt;
-		t0 = STRING;
-		s = ztrdup(s);
-		inwhat = IN_ENV;
 	    }
-	    lincmd = 1;
 	}
-	if (we > ll)
-	    we = ll;
-	tt = (char *)line;
-	if (tmp) {
-	    line = (unsigned char *)tmp;
-	    ll = strlen((char *)line);
-	}
-	if (t0 != STRING && inwhat != IN_MATH) {
-	    if (tmp) {
-		tmp = NULL;
-		linptr = (char *)line;
-		lexrestore();
-		addedx = 0;
-		goto start;
+    }
+    if (inwhat == IN_MATH) {
+	if (compfunc || insubscr == 2) {
+	    int lev;
+	    char *p;
+
+	    for (wb = cs - 1, lev = 0; wb > 0; wb--)
+		if (line[wb] == ']' || line[wb] == ')')
+		    lev++;
+		else if (line[wb] == '[') {
+		    if (!lev--)
+			break;
+		} else if (line[wb] == '(') {
+		    if (!lev && line[wb - 1] == '(')
+			break;
+		    if (lev)
+			lev--;
+		}
+	    p = (char *) line + wb;
+	    wb++;
+	    if (wb && (*p == '[' || *p == '(') &&
+		!skipparens(*p, (*p == '[' ? ']' : ')'), &p)) {
+		we = (p - (char *) line) - 1;
+		if (insubscr == 2)
+		    insubscr = 3;
 	    }
-	    noaliases = 0;
-	    lexrestore();
-	    LASTALLOC_RETURN NULL;
+	} else {
+	    /* In mathematical expression, we complete parameter names  *
+	     * (even if they don't have a `$' in front of them).  So we *
+	     * have to find that name.                                  */
+	    for (we = cs; iident(line[we]); we++);
+	    for (wb = cs; --wb >= 0 && iident(line[wb]););
+	    wb++;
 	}
+	zsfree(s);
+	s = zalloc(we - wb + 1);
+	strncpy(s, (char *) line + wb, we - wb);
+	s[we - wb] = '\0';
+	if (wb > 2 && line[wb - 1] == '[' && iident(line[wb - 2])) {
+	    int i = wb - 3;
+	    unsigned char sav = line[wb - 1];
 
-	noaliases = 0;
+	    while (i >= 0 && iident(line[i]))
+		i--;
 
-	/* Check if we are in an array subscript.  We simply assume that  *
-	 * we are in a subscript if we are in brackets.  Correct solution *
-	 * is very difficult.  This is quite close, but gets things like  *
-	 * foo[_ wrong (note no $).  If we are in a subscript, treat it   *
-	 * as being in math.                                              */
-	if (inwhat != IN_MATH) {
-	    int i = 0;
-	    char *nnb = (iident(*s) ? s : s + 1), *nb = NULL, *ne = NULL;
-
-	    for (tt = s; ++tt < s + cs - wb;)
-		if (*tt == Inbrack) {
-		    i++;
-		    nb = nnb;
-		    ne = tt;
-		} else if (i && *tt == Outbrack)
-		    i--;
-		else if (!iident(*tt))
-		    nnb = tt + 1;
-	    if (i) {
-		inwhat = IN_MATH;
+	    line[wb - 1] = '\0';
+	    zsfree(varname);
+	    varname = ztrdup((char *) line + i + 1);
+	    line[wb - 1] = sav;
+	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
+		(keypm->flags & PM_HASHED)) {
+		if (insubscr != 3)
+		    insubscr = 2;
+	    } else
 		insubscr = 1;
-		if (nb < ne) {
-		    char sav = *ne;
-		    *ne = '\0';
-		    zsfree(varname);
-		    varname = ztrdup(nb);
-		    *ne = sav;
-		    if ((keypm = (Param) paramtab->getnode(paramtab,
-							   varname)) &&
-			(keypm->flags & PM_HASHED))
-			insubscr = 2;
-		}
-	    }
 	}
-	if (inwhat == IN_MATH) {
-	    if (compfunc || insubscr == 2) {
-		int lev;
-		char *p;
+    }
+    /* This variable will hold the current word in quoted form. */
+    qword = ztrdup(s);
+    offs = cs - wb;
+    if ((p = parambeg(s))) {
+	for (p = s; *p; p++)
+	    if (*p == Dnull)
+		*p = '"';
+	    else if (*p == Snull)
+		*p = '\'';
+    }
+    if ((*s == Snull || *s == Dnull) && !has_real_token(s + 1)) {
+	char *q = (*s == Snull ? "'" : "\""), *n = tricat(qipre, q, "");
+	int sl = strlen(s);
 
-		for (wb = cs - 1, lev = 0; wb > 0; wb--)
-		    if (line[wb] == ']' || line[wb] == ')')
-			lev++;
-		    else if (line[wb] == '[') {
-			if (!lev--)
-			    break;
-		    } else if (line[wb] == '(') {
-			if (!lev && line[wb - 1] == '(')
-			    break;
-			if (lev)
-			    lev--;
-		    }
-		p = (char *) line + wb;
-		wb++;
-		if (wb && (*p == '[' || *p == '(') &&
-		    !skipparens(*p, (*p == '[' ? ']' : ')'), &p)) {
-			we = (p - (char *) line) - 1;
-			if (insubscr == 2)
-			    insubscr = 3;
-		}
-	    } else {
-		/* In mathematical expression, we complete parameter names  *
-		 * (even if they don't have a `$' in front of them).  So we *
-		 * have to find that name.                                  */
-		for (we = cs; iident(line[we]); we++);
-		for (wb = cs; --wb >= 0 && iident(line[wb]););
-		wb++;
-	    }
-	    zsfree(s);
-	    s = zalloc(we - wb + 1);
-	    strncpy(s, (char *) line + wb, we - wb);
-	    s[we - wb] = '\0';
-	    if (wb > 2 && line[wb - 1] == '[' && iident(line[wb - 2])) {
-		int i = wb - 3;
-		unsigned char sav = line[wb - 1];
-
-		while (i >= 0 && iident(line[i]))
-		    i--;
-
-		line[wb - 1] = '\0';
-		zsfree(varname);
-		varname = ztrdup((char *) line + i + 1);
-		line[wb - 1] = sav;
-		if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
-		    (keypm->flags & PM_HASHED)) {
-		    if (insubscr != 3)
-			insubscr = 2;
-		} else
-		    insubscr = 1;
-	    }
+	instring = (*s == Snull ? 1 : 2);
+	zsfree(qipre);
+	qipre = n;
+	if (sl > 1 && s[sl - 1] == *s) {
+	    n = tricat(q, qisuf, "");
+	    zsfree(qisuf);
+	    qisuf = n;
 	}
-	/* This variable will hold the current word in quoted form. */
-	qword = ztrdup(s);
-	offs = cs - wb;
-	if ((p = parambeg(s))) {
-	    for (p = s; *p; p++)
-		if (*p == Dnull)
-		    *p = '"';
-		else if (*p == Snull)
-		    *p = '\'';
-	}
-	if ((*s == Snull || *s == Dnull) && !has_real_token(s + 1)) {
-	    char *q = (*s == Snull ? "'" : "\""), *n = tricat(qipre, q, "");
-	    int sl = strlen(s);
-
-	    instring = (*s == Snull ? 1 : 2);
-	    zsfree(qipre);
-	    qipre = n;
-	    if (sl > 1 && s[sl - 1] == *s) {
-		n = tricat(q, qisuf, "");
-		zsfree(qisuf);
-		qisuf = n;
-	    }
-	    autoq = ztrdup(q);
-	}
-	/* While building the quoted form, we also clean up the command line. */
-	for (p = s, tt = qword, i = wb; *p; p++, tt++, i++)
-	    if (INULL(*p)) {
-		if (i < cs)
-		    offs--;
-		if (p[1] || *p != Bnull) {
-		    if (*p == Bnull) {
-			*tt = '\\';
-			if (cs == i + 1)
-			    cs++, offs++;
-		    } else {
-			ocs = cs;
-			cs = i;
-			foredel(1);
-			chuck(tt--);
-			if ((cs = ocs) > i--)
-			    cs--;
-			we--;
-		    }
+	autoq = ztrdup(q);
+    }
+    /* While building the quoted form, we also clean up the command line. */
+    for (p = s, tt = qword, i = wb; *p; p++, tt++, i++)
+	if (INULL(*p)) {
+	    if (i < cs)
+		offs--;
+	    if (p[1] || *p != Bnull) {
+		if (*p == Bnull) {
+		    *tt = '\\';
+		    if (cs == i + 1)
+			cs++, offs++;
 		} else {
 		    ocs = cs;
-		    *tt = '\0';
-		    cs = we;
-		    backdel(1);
-		    if (ocs == we)
-			cs = we - 1;
-		    else
-			cs = ocs;
+		    cs = i;
+		    foredel(1);
+		    chuck(tt--);
+		    if ((cs = ocs) > i--)
+			cs--;
 		    we--;
 		}
-		chuck(p--);
+	    } else {
+		ocs = cs;
+		*tt = '\0';
+		cs = we;
+		backdel(1);
+		if (ocs == we)
+		    cs = we - 1;
+		else
+		    cs = ocs;
+		we--;
 	    }
+	    chuck(p--);
+	}
 
-	zsfree(origword);
-	origword = ztrdup(s);
+    zsfree(origword);
+    origword = ztrdup(s);
 
-	if (!isset(IGNOREBRACES)) {
-	    /* Try and deal with foo{xxx etc. */
-	    char *curs = s + (isset(COMPLETEINWORD) ? offs : strlen(s));
-	    char *predup = dupstring(s), *dp = predup;
-	    char *bbeg = NULL, *bend = NULL, *dbeg = NULL;
-	    char *lastp = NULL, *firsts = NULL;
-	    int cant = 0, begi = 0, boffs = offs, hascom = 0;
+    if (!isset(IGNOREBRACES)) {
+	/* Try and deal with foo{xxx etc. */
+	char *curs = s + (isset(COMPLETEINWORD) ? offs : strlen(s));
+	char *predup = dupstring(s), *dp = predup;
+	char *bbeg = NULL, *bend = NULL, *dbeg = NULL;
+	char *lastp = NULL, *firsts = NULL;
+	int cant = 0, begi = 0, boffs = offs, hascom = 0;
 
-	    for (i = 0, p = s; *p; p++, dp++, i++) {
-		/* careful, ${... is not a brace expansion...
-		 * we try to get braces after a parameter expansion right,
-		 * but this may fail sometimes. sorry.
-		 */
-		if (*p == String || *p == Qstring) {
-		    if (p[1] == Inbrace || p[1] == Inpar || p[1] == Inbrack) {
-			char *tp = p + 1;
+	for (i = 0, p = s; *p; p++, dp++, i++) {
+	    /* careful, ${... is not a brace expansion...
+	     * we try to get braces after a parameter expansion right,
+	     * but this may fail sometimes. sorry.
+	     */
+	    if (*p == String || *p == Qstring) {
+		if (p[1] == Inbrace || p[1] == Inpar || p[1] == Inbrack) {
+		    char *tp = p + 1;
 
-			if (skipparens(*tp, (*tp == Inbrace ? Outbrace :
-					     (*tp == Inpar ? Outpar : Outbrack)),
-				       &tp)) {
+		    if (skipparens(*tp, (*tp == Inbrace ? Outbrace :
+					 (*tp == Inpar ? Outpar : Outbrack)),
+				   &tp)) {
+			tt = NULL;
+			break;
+		    }
+		    i += tp - p;
+		    dp += tp - p;
+		    p = tp;
+		} else {
+		    char *tp = p + 1;
+
+		    for (; *tp == '^' || *tp == Hat ||
+			     *tp == '=' || *tp == Equals ||
+			     *tp == '~' || *tp == Tilde ||
+			     *tp == '#' || *tp == Pound || *tp == '+';
+			 tp++);
+		    if (*tp == Quest || *tp == Star || *tp == String ||
+			*tp == Qstring || *tp == '?' || *tp == '*' ||
+			*tp == '$' || *tp == '-' || *tp == '!' ||
+			*tp == '@')
+			p++, i++;
+		    else {
+			if (idigit(*tp))
+			    while (idigit(*tp))
+				tp++;
+			else if (iident(*tp))
+			    while (iident(*tp))
+				tp++;
+			else {
 			    tt = NULL;
 			    break;
 			}
+			if (*tp == Inbrace) {
+			    cant = 1;
+			    break;
+			}
+			tp--;
 			i += tp - p;
 			dp += tp - p;
 			p = tp;
-		    } else {
-			char *tp = p + 1;
-
-			for (; *tp == '^' || *tp == Hat ||
-				 *tp == '=' || *tp == Equals ||
-				 *tp == '~' || *tp == Tilde ||
-				 *tp == '#' || *tp == Pound || *tp == '+';
-			     tp++);
-			if (*tp == Quest || *tp == Star || *tp == String ||
-			    *tp == Qstring || *tp == '?' || *tp == '*' ||
-			    *tp == '$' || *tp == '-' || *tp == '!' ||
-			    *tp == '@')
-			    p++, i++;
-			else {
-			    if (idigit(*tp))
-				while (idigit(*tp))
-				    tp++;
-			    else if (iident(*tp))
-				while (iident(*tp))
-				    tp++;
-			    else {
-				tt = NULL;
-				break;
-			    }
-			    if (*tp == Inbrace) {
-				cant = 1;
-				break;
-			    }
-			    tp--;
-			    i += tp - p;
-			    dp += tp - p;
-			    p = tp;
-			}
-		    }
-		} else if (p < curs) {
-		    if (*p == Outbrace) {
-			cant = 1;
-			break;
-		    }
-		    if (*p == Inbrace) {
-			if (bbeg) {
-			    Brinfo new;
-			    int len = bend - bbeg;
-
-			    new = (Brinfo) zalloc(sizeof(*new));
-			    nbrbeg++;
-
-			    new->next = NULL;
-			    if (lastbrbeg)
-				lastbrbeg->next = new;
-			    else
-				brbeg = new;
-			    lastbrbeg = new;
-
-			    new->next = NULL;
-			    PERMALLOC {
-				new->str = dupstrpfx(bbeg, len);
-				untokenize(new->str);
-			    } LASTALLOC;
-			    new->pos = begi;
-			    *dbeg = '\0';
-			    new->qpos = strlen(quotename(predup, NULL));
-			    *dbeg = '{';
-			    i -= len;
-			    boffs -= len;
-			    strcpy(dbeg, dbeg + len);
-			    dp -= len;
-			}
-			bbeg = lastp = p;
-			dbeg = dp;
-			bend = p + 1;
-			begi = i;
-		    } else if (*p == Comma && bbeg) {
-			bend = p + 1;
-			hascom = 1;
-		    }
-		} else {
-		    if (*p == Inbrace) {
-			cant = 1;
-			break;
-		    }
-		    if (p == curs) {
-			if (bbeg) {
-			    Brinfo new;
-			    int len = bend - bbeg;
-
-			    new = (Brinfo) zalloc(sizeof(*new));
-			    nbrbeg++;
-
-			    new->next = NULL;
-			    if (lastbrbeg)
-				lastbrbeg->next = new;
-			    else
-				brbeg = new;
-			    lastbrbeg = new;
-
-			    PERMALLOC {
-				new->str = dupstrpfx(bbeg, len);
-				untokenize(new->str);
-			    } LASTALLOC;
-			    new->pos = begi;
-			    *dbeg = '\0';
-			    new->qpos = strlen(quotename(predup, NULL));
-			    *dbeg = '{';
-			    i -= len;
-			    boffs -= len;
-			    strcpy(dbeg, dbeg + len);
-			    dp -= len;
-			}
-			bbeg = NULL;
-		    }
-		    if (*p == Comma) {
-			if (!bbeg)
-			    bbeg = p;
-			hascom = 1;
-		    } else if (*p == Outbrace) {
-			Brinfo new;
-			int len;
-
-			if (!bbeg)
-			    bbeg = p;
-			len = p + 1 - bbeg;
-			if (!firsts)
-			    firsts = p + 1;
-			
-			new = (Brinfo) zalloc(sizeof(*new));
-			nbrend++;
-
-			if (!lastbrend)
-			    lastbrend = new;
-
-			new->next = brend;
-			brend = new;
-
-			PERMALLOC {
-			    new->str = dupstrpfx(bbeg, len);
-			    untokenize(new->str);
-			} LASTALLOC;
-			new->pos = dp - predup - len + 1;
-			new->qpos = len;
-			bbeg = NULL;
 		    }
 		}
-	    }
-	    if (cant) {
-		freebrinfo(brbeg);
-		freebrinfo(brend);
-		brbeg = lastbrbeg = brend = lastbrend = NULL;
-		nbrbeg = nbrend = 0;
+	    } else if (p < curs) {
+		if (*p == Outbrace) {
+		    cant = 1;
+		    break;
+		}
+		if (*p == Inbrace) {
+		    if (bbeg) {
+			Brinfo new;
+			int len = bend - bbeg;
+
+			new = (Brinfo) zalloc(sizeof(*new));
+			nbrbeg++;
+
+			new->next = NULL;
+			if (lastbrbeg)
+			    lastbrbeg->next = new;
+			else
+			    brbeg = new;
+			lastbrbeg = new;
+
+			new->next = NULL;
+			new->str = ztrduppfx(bbeg, len);
+			untokenize(new->str);
+			new->pos = begi;
+			*dbeg = '\0';
+			new->qpos = strlen(quotename(predup, NULL));
+			*dbeg = '{';
+			i -= len;
+			boffs -= len;
+			strcpy(dbeg, dbeg + len);
+			dp -= len;
+		    }
+		    bbeg = lastp = p;
+		    dbeg = dp;
+		    bend = p + 1;
+		    begi = i;
+		} else if (*p == Comma && bbeg) {
+		    bend = p + 1;
+		    hascom = 1;
+		}
 	    } else {
-		if (p == curs && bbeg) {
+		if (*p == Inbrace) {
+		    cant = 1;
+		    break;
+		}
+		if (p == curs) {
+		    if (bbeg) {
+			Brinfo new;
+			int len = bend - bbeg;
+
+			new = (Brinfo) zalloc(sizeof(*new));
+			nbrbeg++;
+
+			new->next = NULL;
+			if (lastbrbeg)
+			    lastbrbeg->next = new;
+			else
+			    brbeg = new;
+			lastbrbeg = new;
+
+			new->str = ztrduppfx(bbeg, len);
+			untokenize(new->str);
+			new->pos = begi;
+			*dbeg = '\0';
+			new->qpos = strlen(quotename(predup, NULL));
+			*dbeg = '{';
+			i -= len;
+			boffs -= len;
+			strcpy(dbeg, dbeg + len);
+			dp -= len;
+		    }
+		    bbeg = NULL;
+		}
+		if (*p == Comma) {
+		    if (!bbeg)
+			bbeg = p;
+		    hascom = 1;
+		} else if (*p == Outbrace) {
 		    Brinfo new;
-		    int len = bend - bbeg;
+		    int len;
+
+		    if (!bbeg)
+			bbeg = p;
+		    len = p + 1 - bbeg;
+		    if (!firsts)
+			firsts = p + 1;
 
 		    new = (Brinfo) zalloc(sizeof(*new));
-		    nbrbeg++;
+		    nbrend++;
 
-		    new->next = NULL;
-		    if (lastbrbeg)
-			lastbrbeg->next = new;
-		    else
-			brbeg = new;
-		    lastbrbeg = new;
+		    if (!lastbrend)
+			lastbrend = new;
 
-		    PERMALLOC {
-			new->str = dupstrpfx(bbeg, len);
-			untokenize(new->str);
-		    } LASTALLOC;
-		    new->pos = begi;
-		    *dbeg = '\0';
-		    new->qpos = strlen(quotename(predup, NULL));
-		    *dbeg = '{';
-		    boffs -= len;
-		    strcpy(dbeg, dbeg + len);
+		    new->next = brend;
+		    brend = new;
+
+		    new->str = ztrduppfx(bbeg, len);
+		    untokenize(new->str);
+		    new->pos = dp - predup - len + 1;
+		    new->qpos = len;
+		    bbeg = NULL;
 		}
-		if (brend) {
-		    Brinfo bp, prev = NULL;
-		    int p, l;
-
-		    for (bp = brend; bp; bp = bp->next) {
-			bp->prev = prev;
-			prev = bp;
-			p = bp->pos;
-			l = bp->qpos;
-			bp->pos = strlen(predup + p + l);
-			bp->qpos = strlen(quotename(predup + p + l, NULL));
-			strcpy(predup + p, predup + p + l);
-		    }
-		}
-		if (hascom) {
-		    if (lastp) {
-			char sav = *lastp;
-
-			*lastp = '\0';
-			untokenize(lastprebr = ztrdup(s));
-			*lastp = sav;
-		    }
-		    if ((lastpostbr = ztrdup(firsts)))
-			untokenize(lastpostbr);
-		}
-		zsfree(s);
-		s = ztrdup(predup);
-		offs = boffs;
 	    }
 	}
-    } LASTALLOC;
+	if (cant) {
+	    freebrinfo(brbeg);
+	    freebrinfo(brend);
+	    brbeg = lastbrbeg = brend = lastbrend = NULL;
+	    nbrbeg = nbrend = 0;
+	} else {
+	    if (p == curs && bbeg) {
+		Brinfo new;
+		int len = bend - bbeg;
+
+		new = (Brinfo) zalloc(sizeof(*new));
+		nbrbeg++;
+
+		new->next = NULL;
+		if (lastbrbeg)
+		    lastbrbeg->next = new;
+		else
+		    brbeg = new;
+		lastbrbeg = new;
+
+		new->str = ztrduppfx(bbeg, len);
+		untokenize(new->str);
+		new->pos = begi;
+		*dbeg = '\0';
+		new->qpos = strlen(quotename(predup, NULL));
+		*dbeg = '{';
+		boffs -= len;
+		strcpy(dbeg, dbeg + len);
+	    }
+	    if (brend) {
+		Brinfo bp, prev = NULL;
+		int p, l;
+
+		for (bp = brend; bp; bp = bp->next) {
+		    bp->prev = prev;
+		    prev = bp;
+		    p = bp->pos;
+		    l = bp->qpos;
+		    bp->pos = strlen(predup + p + l);
+		    bp->qpos = strlen(quotename(predup + p + l, NULL));
+		    strcpy(predup + p, predup + p + l);
+		}
+	    }
+	    if (hascom) {
+		if (lastp) {
+		    char sav = *lastp;
+
+		    *lastp = '\0';
+		    untokenize(lastprebr = ztrdup(s));
+		    *lastp = sav;
+		}
+		if ((lastpostbr = ztrdup(firsts)))
+		    untokenize(lastpostbr);
+	    }
+	    zsfree(s);
+	    s = ztrdup(predup);
+	    offs = boffs;
+	}
+    }
     lexrestore();
 
     return (char *)s;
@@ -1603,63 +1594,60 @@ doexpansion(char *s, int lst, int olst, int explincmd)
     LinkList vl;
     char *ss;
 
-    DPUTS(useheap, "BUG: useheap in doexpansion()");
-    HEAPALLOC {
-	pushheap();
-	vl = newlinklist();
-	ss = dupstring(s);
-	addlinknode(vl, ss);
-	prefork(vl, 0);
-	if (errflag)
-	    goto end;
-	if (lst == COMP_LIST_EXPAND || lst == COMP_EXPAND) {
-	    int ng = opts[NULLGLOB];
+    pushheap();
+    vl = newlinklist();
+    ss = dupstring(s);
+    addlinknode(vl, ss);
+    prefork(vl, 0);
+    if (errflag)
+	goto end;
+    if (lst == COMP_LIST_EXPAND || lst == COMP_EXPAND) {
+	int ng = opts[NULLGLOB];
 
-	    opts[NULLGLOB] = 1;
-	    globlist(vl, 1);
-	    opts[NULLGLOB] = ng;
-	}
-	if (errflag)
-	    goto end;
-	if (empty(vl) || !*(char *)peekfirst(vl))
-	    goto end;
-	if (peekfirst(vl) == (void *) ss ||
-		(olst == COMP_EXPAND_COMPLETE &&
-		 !nextnode(firstnode(vl)) && *s == Tilde &&
-		 (ss = dupstring(s), filesubstr(&ss, 0)) &&
-		 !strcmp(ss, (char *)peekfirst(vl)))) {
-	    /* If expansion didn't change the word, try completion if *
-	     * expandorcomplete was called, otherwise, just beep.     */
-	    if (lst == COMP_EXPAND_COMPLETE)
-		docompletion(s, COMP_COMPLETE, explincmd);
-	    goto end;
-	}
-	if (lst == COMP_LIST_EXPAND) {
-	    /* Only the list of expansions was requested. */
-	    ret = listlist(vl);
-	    showinglist = 0;
-	    goto end;
-	}
-	/* Remove the current word and put the expansions there. */
-	cs = wb;
-	foredel(we - wb);
-	while ((ss = (char *)ugetnode(vl))) {
-	    ret = 0;
-	    ss = quotename(ss, NULL);
-	    untokenize(ss);
-	    inststr(ss);
+	opts[NULLGLOB] = 1;
+	globlist(vl, 1);
+	opts[NULLGLOB] = ng;
+    }
+    if (errflag)
+	goto end;
+    if (empty(vl) || !*(char *)peekfirst(vl))
+	goto end;
+    if (peekfirst(vl) == (void *) ss ||
+	(olst == COMP_EXPAND_COMPLETE &&
+	 !nextnode(firstnode(vl)) && *s == Tilde &&
+	 (ss = dupstring(s), filesubstr(&ss, 0)) &&
+	 !strcmp(ss, (char *)peekfirst(vl)))) {
+	/* If expansion didn't change the word, try completion if *
+	 * expandorcomplete was called, otherwise, just beep.     */
+	if (lst == COMP_EXPAND_COMPLETE)
+	    docompletion(s, COMP_COMPLETE, explincmd);
+	goto end;
+    }
+    if (lst == COMP_LIST_EXPAND) {
+	/* Only the list of expansions was requested. */
+	ret = listlist(vl);
+	showinglist = 0;
+	goto end;
+    }
+    /* Remove the current word and put the expansions there. */
+    cs = wb;
+    foredel(we - wb);
+    while ((ss = (char *)ugetnode(vl))) {
+	ret = 0;
+	ss = quotename(ss, NULL);
+	untokenize(ss);
+	inststr(ss);
 #if 0
-	    if (olst != COMP_EXPAND_COMPLETE || nonempty(vl) ||
-		(cs && line[cs-1] != '/')) {
+	if (olst != COMP_EXPAND_COMPLETE || nonempty(vl) ||
+	    (cs && line[cs-1] != '/')) {
 #endif
-	    if (nonempty(vl)) {
-		spaceinline(1);
-		line[cs++] = ' ';
-	    }
+	if (nonempty(vl)) {
+	    spaceinline(1);
+	    line[cs++] = ' ';
 	}
-      end:
-	popheap();
-    } LASTALLOC;
+    }
+    end:
+    popheap();
 
     return ret;
 }
@@ -2079,61 +2067,59 @@ doexpandhist(void)
     unsigned char *ol;
     int oll, ocs, ne = noerrs, err;
 
-    DPUTS(useheap, "BUG: useheap in doexpandhist()");
-    HEAPALLOC {
-	pushheap();
-	metafy_line();
-	oll = ll;
-	ocs = cs;
-	ol = (unsigned char *)dupstring((char *)line);
-	expanding = 1;
-	excs = cs;
-	ll = cs = 0;
-	lexsave();
-	/* We push ol as it will remain unchanged */
-	inpush((char *) ol, 0, NULL);
-	strinbeg(1);
-	noaliases = 1;
-	noerrs = 1;
-	exlast = inbufct;
-	do {
-	    ctxtlex();
-	} while (tok != ENDINPUT && tok != LEXERR);
-	while (!lexstop)
-	    hgetc();
-	/* We have to save errflags because it's reset in lexrestore. Since  *
-	 * noerrs was set to 1 errflag is true if there was a habort() which *
-	 * means that the expanded string is unusable.                       */
-	err = errflag;
-	noerrs = ne;
-	noaliases = 0;
-	strinend();
-	inpop();
-	zleparse = 0;
-	lexrestore();
-	expanding = 0;
+    pushheap();
+    metafy_line();
+    oll = ll;
+    ocs = cs;
+    ol = (unsigned char *)dupstring((char *)line);
+    expanding = 1;
+    excs = cs;
+    ll = cs = 0;
+    lexsave();
+    /* We push ol as it will remain unchanged */
+    inpush((char *) ol, 0, NULL);
+    strinbeg(1);
+    noaliases = 1;
+    noerrs = 1;
+    exlast = inbufct;
+    do {
+	ctxtlex();
+    } while (tok != ENDINPUT && tok != LEXERR);
+    while (!lexstop)
+	hgetc();
+    /* We have to save errflags because it's reset in lexrestore. Since  *
+     * noerrs was set to 1 errflag is true if there was a habort() which *
+     * means that the expanded string is unusable.                       */
+    err = errflag;
+    noerrs = ne;
+    noaliases = 0;
+    strinend();
+    inpop();
+    zleparse = 0;
+    lexrestore();
+    expanding = 0;
 
-	if (!err) {
-	    cs = excs;
-	    if (strcmp((char *)line, (char *)ol)) {
-		unmetafy_line();
-		/* For vi mode -- reset the beginning-of-insertion pointer   *
-		 * to the beginning of the line.  This seems a little silly, *
-		 * if we are, for example, expanding "exec !!".              */
-		if (viinsbegin > findbol())
-		    viinsbegin = findbol();
-		popheap();
-		LASTALLOC_RETURN 1;
-	    }
+    if (!err) {
+	cs = excs;
+	if (strcmp((char *)line, (char *)ol)) {
+	    unmetafy_line();
+	    /* For vi mode -- reset the beginning-of-insertion pointer   *
+	     * to the beginning of the line.  This seems a little silly, *
+	     * if we are, for example, expanding "exec !!".              */
+	    if (viinsbegin > findbol())
+		viinsbegin = findbol();
+	    popheap();
+	    return 1;
 	}
+    }
 
-	strcpy((char *)line, (char *)ol);
-	ll = oll;
-	cs = ocs;
-	unmetafy_line();
+    strcpy((char *)line, (char *)ol);
+    ll = oll;
+    cs = ocs;
+    unmetafy_line();
 
-	popheap();
-    } LASTALLOC;
+    popheap();
+
     return 0;
 }
 
@@ -2166,34 +2152,32 @@ getcurcmd(void)
     int curlincmd;
     char *s = NULL;
 
-    DPUTS(useheap, "BUG: useheap in getcurcmd()");
-    HEAPALLOC {
-	zleparse = 2;
-	lexsave();
-	metafy_line();
-	inpush(dupstrspace((char *) line), 0, NULL);
-	unmetafy_line();
-	strinbeg(1);
-	pushheap();
-	do {
-	    curlincmd = incmdpos;
-	    ctxtlex();
-	    if (tok == ENDINPUT || tok == LEXERR)
-		break;
-	    if (tok == STRING && curlincmd) {
-		zsfree(s);
-		s = ztrdup(tokstr);
-		cmdwb = ll - wordbeg;
-		cmdwe = ll + 1 - inbufct;
-	    }
+    zleparse = 2;
+    lexsave();
+    metafy_line();
+    inpush(dupstrspace((char *) line), 0, NULL);
+    unmetafy_line();
+    strinbeg(1);
+    pushheap();
+    do {
+	curlincmd = incmdpos;
+	ctxtlex();
+	if (tok == ENDINPUT || tok == LEXERR)
+	    break;
+	if (tok == STRING && curlincmd) {
+	    zsfree(s);
+	    s = ztrdup(tokstr);
+	    cmdwb = ll - wordbeg;
+	    cmdwe = ll + 1 - inbufct;
 	}
-	while (tok != ENDINPUT && tok != LEXERR && zleparse);
-	popheap();
-	strinend();
-	inpop();
-	errflag = zleparse = 0;
-	lexrestore();
-    } LASTALLOC;
+    }
+    while (tok != ENDINPUT && tok != LEXERR && zleparse);
+    popheap();
+    strinend();
+    inpop();
+    errflag = zleparse = 0;
+    lexrestore();
+
     return s;
 }
 
@@ -2213,9 +2197,9 @@ processcmd(char **args)
     inststr(bindk->nam);
     inststr(" ");
     untokenize(s);
-    HEAPALLOC {
-	inststr(quotename(s, NULL));
-    } LASTALLOC;
+
+    inststr(quotename(s, NULL));
+
     zsfree(s);
     done = 1;
     return 0;

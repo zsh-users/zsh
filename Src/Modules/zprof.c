@@ -224,28 +224,24 @@ zprof_wrapper(Eprog prog, FuncWrap w, char *name)
     double prev, now;
 
     if (!(f = findpfunc(name))) {
-	PERMALLOC {
-	    f = (Pfunc) zalloc(sizeof(*f));
-	    f->name = ztrdup(name);
-	    f->calls = 0;
-	    f->time = f->self = 0.0;
-	    f->next = calls;
-	    calls = f;
-	    ncalls++;
-	} LASTALLOC;
+	f = (Pfunc) zalloc(sizeof(*f));
+	f->name = ztrdup(name);
+	f->calls = 0;
+	f->time = f->self = 0.0;
+	f->next = calls;
+	calls = f;
+	ncalls++;
     }
     if (stack) {
 	if (!(a = findparc(stack->p, f))) {
-	    PERMALLOC {
-		a = (Parc) zalloc(sizeof(*a));
-		a->from = stack->p;
-		a->to = f;
-		a->calls = 0;
-		a->time = a->self = 0.0;
-		a->next = arcs;
-		arcs = a;
-		narcs++;
-	    } LASTALLOC;
+	    a = (Parc) zalloc(sizeof(*a));
+	    a->from = stack->p;
+	    a->to = f;
+	    a->calls = 0;
+	    a->time = a->self = 0.0;
+	    a->next = arcs;
+	    arcs = a;
+	    narcs++;
 	}
     }
     sf.prev = stack;

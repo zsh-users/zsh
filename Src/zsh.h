@@ -337,21 +337,23 @@ struct linklist {
 
 /* Macros for manipulating link lists */
 
-#define addlinknode(X,Y) insertlinknode(X,(X)->last,Y)
-#define uaddlinknode(X,Y) uinsertlinknode(X,(X)->last,Y)
-#define empty(X)     ((X)->first == NULL)
-#define nonempty(X)  ((X)->first != NULL)
-#define firstnode(X) ((X)->first)
-#define getaddrdata(X) (&((X)->dat))
-#define getdata(X)   ((X)->dat)
-#define setdata(X,Y) ((X)->dat = (Y))
-#define lastnode(X)  ((X)->last)
-#define nextnode(X)  ((X)->next)
-#define prevnode(X)  ((X)->last)
-#define peekfirst(X) ((X)->first->dat)
-#define pushnode(X,Y) insertlinknode(X,(LinkNode) X,Y)
-#define incnode(X) (X = nextnode(X))
-#define firsthist() (hist_ring? hist_ring->down->histnum : curhist)
+#define addlinknode(X,Y)    insertlinknode(X,(X)->last,Y)
+#define zaddlinknode(X,Y)   zinsertlinknode(X,(X)->last,Y)
+#define uaddlinknode(X,Y)   uinsertlinknode(X,(X)->last,Y)
+#define empty(X)            ((X)->first == NULL)
+#define nonempty(X)         ((X)->first != NULL)
+#define firstnode(X)        ((X)->first)
+#define getaddrdata(X)      (&((X)->dat))
+#define getdata(X)          ((X)->dat)
+#define setdata(X,Y)        ((X)->dat = (Y))
+#define lastnode(X)         ((X)->last)
+#define nextnode(X)         ((X)->next)
+#define prevnode(X)         ((X)->last)
+#define peekfirst(X)        ((X)->first->dat)
+#define pushnode(X,Y)       insertlinknode(X,(LinkNode) X,Y)
+#define zpushnode(X,Y)      zinsertlinknode(X,(LinkNode) X,Y)
+#define incnode(X)          (X = nextnode(X))
+#define firsthist()         (hist_ring? hist_ring->down->histnum : curhist)
 #define setsizednode(X,Y,Z) ((X)->first[(Y)].dat = (void *) (Z))
 
 /* stack allocated linked lists */
@@ -483,7 +485,7 @@ typedef wordcode *Wordcode;
 typedef struct eprog *Eprog;
 
 struct eprog {
-    int heap;			/* != 0 if this is in heap memory */
+    int heap;			/* != 0 if in heap memory */
     int len;			/* total block length */
     int npats;			/* Patprog cache size */
     Patprog *pats;		/* the memory block, the patterns */
@@ -1590,53 +1592,13 @@ struct heap {
 #endif
 ;
 
-#ifndef DEBUG
-# define HEAPALLOC	do { int nonlocal_useheap = global_heapalloc(); do
+# define LASTALLOC_RETURN return
 
-# define PERMALLOC	do { int nonlocal_useheap = global_permalloc(); do
+# define NEWHEAPS(h)    do { Heap _switch_oldheaps = h = new_heaps(); do
+# define OLDHEAPS       while (0); old_heaps(_switch_oldheaps); } while (0);
 
-# define LASTALLOC	while (0); \
-			if (nonlocal_useheap) global_heapalloc(); \
-			else global_permalloc(); \
-		} while(0)
-
-# define LASTALLOC_RETURN \
-			if ((nonlocal_useheap ? global_heapalloc() : \
-			     global_permalloc()), 0) {;} else return
-
-# define NEWHEAPS(h)    do { Heap oldheaps = h = new_heaps(); do
-# define OLDHEAPS       while (0); old_heaps(oldheaps); } while (0);
-
-# define SWITCHHEAPS(h)  do { Heap oldheaps = switch_heaps(h); do
-# define SWITCHBACKHEAPS while (0); switch_heaps(oldheaps); } while (0);
-
-#else
-# define HEAPALLOC	do { int nonlocal_useheap = global_heapalloc(); \
-			alloc_stackp++; do
-
-# define PERMALLOC	do { int nonlocal_useheap = global_permalloc(); \
-			alloc_stackp++; do
-
-# define LASTALLOC	while (0); alloc_stackp--; \
-			if (nonlocal_useheap) global_heapalloc(); \
-			else global_permalloc(); \
-		} while(0)
-
-# define LASTALLOC_RETURN \
-			if ((nonlocal_useheap ? global_heapalloc() : \
-			    global_permalloc()),alloc_stackp--,0){;}else return
-
-# define NEWHEAPS(h)    do { Heap oldheaps = h = new_heaps(); \
-                        alloc_stackp++; do
-# define OLDHEAPS       while (0); alloc_stackp--; \
-                        old_heaps(oldheaps); } while (0);
-
-# define SWITCHHEAPS(h)  do { Heap oldheaps = switch_heaps(h); \
-                         alloc_stackp++; do
-# define SWITCHBACKHEAPS while (0); alloc_stackp--; \
-                         switch_heaps(oldheaps); } while (0);
-
-#endif
+# define SWITCHHEAPS(h)  do { Heap _switch_oldheaps = switch_heaps(h); do
+# define SWITCHBACKHEAPS while (0); switch_heaps(_switch_oldheaps); } while (0);
 
 /****************/
 /* Debug macros */
@@ -1644,12 +1606,8 @@ struct heap {
 
 #ifdef DEBUG
 # define DPUTS(X,Y) if (!(X)) {;} else dputs(Y)
-# define MUSTUSEHEAP(X) if (useheap) {;} else \
-		fprintf(stderr, "BUG: permanent allocation in %s\n", X), \
-		fflush(stderr)
 #else
 # define DPUTS(X,Y)
-# define MUSTUSEHEAP(X)
 #endif
 
 /**************************/

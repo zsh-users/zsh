@@ -924,44 +924,40 @@ do_menucmp(int lst)
 	return;
     }
     /* Otherwise go to the next match in the array... */
-    HEAPALLOC {
-	do {
-	    if (!*++(minfo.cur)) {
-		do {
-		    if (!(minfo.group = (minfo.group)->next))
-			minfo.group = amatches;
-		} while (!(minfo.group)->mcount);
-		minfo.cur = minfo.group->matches;
-	    }
-	} while (menuacc &&
-		 !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr));
-	/* ... and insert it into the command line. */
-	metafy_line();
-	do_single(*(minfo.cur));
-	unmetafy_line();
-    } LASTALLOC;
+    do {
+	if (!*++(minfo.cur)) {
+	    do {
+		if (!(minfo.group = (minfo.group)->next))
+		    minfo.group = amatches;
+	    } while (!(minfo.group)->mcount);
+	    minfo.cur = minfo.group->matches;
+	}
+    } while (menuacc &&
+	     !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr));
+    /* ... and insert it into the command line. */
+    metafy_line();
+    do_single(*(minfo.cur));
+    unmetafy_line();
 }
 
 /**/
 int
 reverse_menu(Hookdef dummy, void *dummy2)
 {
-    HEAPALLOC {
-	do {
-	    if (minfo.cur == (minfo.group)->matches) {
-		do {
-		    if (!(minfo.group = (minfo.group)->prev))
-			minfo.group = lmatches;
-		} while (!(minfo.group)->mcount);
-		minfo.cur = (minfo.group)->matches + (minfo.group)->mcount - 1;
-	    } else
-		minfo.cur--;
-	} while (menuacc &&
-		 !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr));
-	metafy_line();
-	do_single(*(minfo.cur));
-	unmetafy_line();
-    } LASTALLOC;
+    do {
+	if (minfo.cur == (minfo.group)->matches) {
+	    do {
+		if (!(minfo.group = (minfo.group)->prev))
+		    minfo.group = lmatches;
+	    } while (!(minfo.group)->mcount);
+	    minfo.cur = (minfo.group)->matches + (minfo.group)->mcount - 1;
+	} else
+	    minfo.cur--;
+    } while (menuacc &&
+	     !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr));
+    metafy_line();
+    do_single(*(minfo.cur));
+    unmetafy_line();
 
     return 0;
 }
@@ -1100,9 +1096,7 @@ num_matches(int normal)
 {
     int alt;
 
-    PERMALLOC {
-	alt = permmatches(0);
-    } LASTALLOC;
+    alt = permmatches(0);
 
     if (normal)
 	return (alt ? 0 : nmatches);
@@ -1118,9 +1112,7 @@ list_lines(void)
 {
     Cmgroup oam;
 
-    PERMALLOC {
-	permmatches(0);
-    } LASTALLOC;
+    permmatches(0);
 
     oam = amatches;
     amatches = pmatches;
@@ -1829,20 +1821,18 @@ list_matches(Hookdef dummy, void *dummy2)
     struct chdata dat;
     int ret;
 
-    HEAPALLOC {
 #ifdef DEBUG
-	/* Sanity check */
-	if (!validlist) {
-	    showmsg("BUG: listmatches called with bogus list");
-	    return 1;
-	}
+    /* Sanity check */
+    if (!validlist) {
+	showmsg("BUG: listmatches called with bogus list");
+	return 1;
+    }
 #endif
 
-	dat.matches = amatches;
-	dat.num = nmatches;
-	dat.cur = NULL;
-	ret = runhookdef(COMPLISTMATCHESHOOK, (void *) &dat);
-    } LASTALLOC;
+    dat.matches = amatches;
+    dat.num = nmatches;
+    dat.cur = NULL;
+    ret = runhookdef(COMPLISTMATCHESHOOK, (void *) &dat);
 
     return ret;
 }

@@ -100,27 +100,24 @@ getpmwidgets(HashTable ht, char *name)
     Param pm = NULL;
     Thingy th;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if ((th = (Thingy) thingytab->getnode(thingytab, name)) &&
-	    !(th->flags & DISABLED))
-	    pm->u.str = widgetstr(th->widget);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
+    if ((th = (Thingy) thingytab->getnode(thingytab, name)) &&
+	!(th->flags & DISABLED))
+	pm->u.str = widgetstr(th->widget);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 

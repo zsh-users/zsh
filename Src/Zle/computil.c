@@ -130,9 +130,7 @@ cd_init(char *nam, char *sep, char **args, int disp)
 	    zerrnam(nam, "invalid argument: %s", *args, 0);
 	    return 1;
 	}
-	PERMALLOC {
-	    set->strs = arrdup(ap);
-	} LASTALLOC;
+	set->strs = zarrdup(ap);
 
 	if (disp)
 	    cdisp_calc(&(cd_state.disp), set->strs);
@@ -142,9 +140,7 @@ cd_init(char *nam, char *sep, char **args, int disp)
 		zerrnam(nam, "invalid argument: %s", *args, 0);
 		return 1;
 	    }
-	    PERMALLOC {
-		set->matches = arrdup(ap);
-	    } LASTALLOC;
+	    set->matches = zarrdup(ap);
 	    args++;
 	}
 	for (ap = args; *args &&
@@ -153,9 +149,7 @@ cd_init(char *nam, char *sep, char **args, int disp)
 
 	tmp = *args;
 	*args = NULL;
-	PERMALLOC {
-	    set->opts = arrdup(ap);
-	} LASTALLOC;
+	set->opts = zarrdup(ap);
 	if ((*args = tmp))
 	    args++;
     }
@@ -234,9 +228,7 @@ cd_get(char **params)
 	}
 	*sdp = *ssp = *mdp = *msp = NULL;
 
-	PERMALLOC {
-	    p = arrdup(set->opts);
-	} LASTALLOC;
+	p = zarrdup(set->opts);
 
 	setaparam(params[0], p);
 	setaparam(params[1], sd);
@@ -547,21 +539,19 @@ parse_cadef(char *nam, char **args)
 
     /* Looks good. Optimistically allocate the cadef structure. */
 
-    PERMALLOC {
-	ret = (Cadef) zalloc(sizeof(*ret));
-	ret->next = NULL;
-	ret->opts = NULL;
-	ret->args = ret->rest = NULL;
-	ret->defs = arrdup(oargs);
-	ret->ndefs = arrlen(oargs);
-	ret->lastt = time(0);
-	if (single) {
-	    ret->single = (Caopt *) zalloc(256 * sizeof(Caopt));
-	    memset(ret->single, 0, 256 * sizeof(Caopt));
-	} else
-	    ret->single = NULL;
-	ret->match = ztrdup(match);
-    } LASTALLOC;
+    ret = (Cadef) zalloc(sizeof(*ret));
+    ret->next = NULL;
+    ret->opts = NULL;
+    ret->args = ret->rest = NULL;
+    ret->defs = zarrdup(oargs);
+    ret->ndefs = arrlen(oargs);
+    ret->lastt = time(0);
+    if (single) {
+	ret->single = (Caopt *) zalloc(256 * sizeof(Caopt));
+	memset(ret->single, 0, 256 * sizeof(Caopt));
+    } else
+	ret->single = NULL;
+    ret->match = ztrdup(match);
 
     /* Get the definitions. */
 
@@ -752,32 +742,30 @@ parse_cadef(char *nam, char **args)
 	    }
 	    /* Store the option definition. */
 
-	    PERMALLOC {
-		*optp = opt = (Caopt) zalloc(sizeof(*opt));
-		optp = &((*optp)->next);
+	    *optp = opt = (Caopt) zalloc(sizeof(*opt));
+	    optp = &((*optp)->next);
 
-		opt->next = NULL;
-		opt->name = ztrdup(rembslashcolon(name));
-		if (descr)
-		    opt->descr = ztrdup(descr);
-		else if (adpre && oargs && !oargs->next) {
-		    char *d;
+	    opt->next = NULL;
+	    opt->name = ztrdup(rembslashcolon(name));
+	    if (descr)
+		opt->descr = ztrdup(descr);
+	    else if (adpre && oargs && !oargs->next) {
+		char *d;
 
-		    for (d = oargs->descr; *d; d++)
-			if (!iblank(*d))
-			    break;
+		for (d = oargs->descr; *d; d++)
+		    if (!iblank(*d))
+			break;
 
-		    if (*d)
-			opt->descr = tricat(adpre, oargs->descr, adsuf);
-		    else
-			opt->descr = NULL;
-		} else
+		if (*d)
+		    opt->descr = tricat(adpre, oargs->descr, adsuf);
+		else
 		    opt->descr = NULL;
-		opt->xor = xor;
-		opt->type = otype;
-		opt->args = oargs;
-		opt->num = nopts++;
-	    } LASTALLOC;
+	    } else
+		opt->descr = NULL;
+	    opt->xor = xor;
+	    opt->type = otype;
+	    opt->args = oargs;
+	    opt->num = nopts++;
 
 	    if (otype == CAO_DIRECT)
 		ndopts++;
@@ -1064,11 +1052,10 @@ ca_parse_line(Cadef d)
 	state.nth = state.inopt = state.inarg = state.opt = state.arg = 1;
     state.inrest = state.doff = state.singles = state.doff = 0;
     state.curpos = compcurrent;
-    PERMALLOC {
-	state.args = newlinklist();
-	state.oargs = (LinkList *) zalloc(d->nopts * sizeof(LinkList));
-	memset(state.oargs, 0, d->nopts * sizeof(LinkList));
-    } LASTALLOC;
+    state.args = znewlinklist();
+    state.oargs = (LinkList *) zalloc(d->nopts * sizeof(LinkList));
+    memset(state.oargs, 0, d->nopts * sizeof(LinkList));
+
     ca_alloced = 1;
 
     memcpy(&ca_laststate, &state, sizeof(state));
@@ -1089,11 +1076,9 @@ ca_parse_line(Cadef d)
 
 	if (state.def) {
 	    state.arg = 0;
-	    if (state.curopt) {
-		PERMALLOC {
-		    addlinknode(state.oargs[state.curopt->num], ztrdup(line));
-		} LASTALLOC;
-	    }
+	    if (state.curopt)
+		zaddlinknode(state.oargs[state.curopt->num], ztrdup(line));
+
 	    state.opt = (state.def->type == CAA_OPT);
 
 	    if (state.def->type == CAA_REST || state.def->type == CAA_RARGS ||
@@ -1133,9 +1118,8 @@ ca_parse_line(Cadef d)
 	    state.singles = (d->single && (!pe || !*pe) &&
 			     state.curopt->name[1] && !state.curopt->name[2]);
 
-	    PERMALLOC {
-		state.oargs[state.curopt->num] = newlinklist();
-	    } LASTALLOC;
+	    state.oargs[state.curopt->num] = znewlinklist();
+
 	    ca_inactive(d, state.curopt->xor);
 
 	    /* Collect the argument strings. Maybe. */
@@ -1149,9 +1133,8 @@ ca_parse_line(Cadef d)
 		    state.def->type != CAA_RARGS &&
 		    state.def->type != CAA_RREST)
 		    state.def = state.def->next;
-		PERMALLOC {
-		    addlinknode(state.oargs[state.curopt->num], ztrdup(pe));
-		} LASTALLOC;
+
+		zaddlinknode(state.oargs[state.curopt->num], ztrdup(pe));
 	    }
 	    if (state.def)
 		state.opt = 0;
@@ -1174,9 +1157,8 @@ ca_parse_line(Cadef d)
 
 	    for (p = line + 1; p < pe; p++) {
 		if ((tmpopt = d->single[STOUC(*p)])) {
-		    PERMALLOC {
-			state.oargs[tmpopt->num] = newlinklist();
-		    } LASTALLOC;
+		    state.oargs[tmpopt->num] = znewlinklist();
+
 		    ca_inactive(d, tmpopt->xor);
 		}
 	    }
@@ -1189,9 +1171,8 @@ ca_parse_line(Cadef d)
 		    state.def->type != CAA_RARGS &&
 		    state.def->type != CAA_RREST)
 		    state.def = state.def->next;
-		PERMALLOC {
-		    addlinknode(state.oargs[state.curopt->num], ztrdup(pe));
-		} LASTALLOC;
+
+		zaddlinknode(state.oargs[state.curopt->num], ztrdup(pe));
 	    }
 	    if (state.def)
 		state.opt = 0;
@@ -1211,19 +1192,16 @@ ca_parse_line(Cadef d)
 		state.optbeg = state.nargbeg;
 		state.argbeg = cur - 1;
 
-		for (; line; line = compwords[cur++]) {
-		    PERMALLOC {
-			addlinknode(state.args, ztrdup(line));
-		    } LASTALLOC;
-		}
+		for (; line; line = compwords[cur++])
+		    zaddlinknode(state.args, ztrdup(line));
+
 		memcpy(&ca_laststate, &state, sizeof(state));
 		ca_laststate.ddef = NULL;
 		ca_laststate.doff = 0;
 		break;
 	    }
-	    PERMALLOC {
-		addlinknode(state.args, ztrdup(line));
-	    } LASTALLOC;
+	    zaddlinknode(state.args, ztrdup(line));
+
 	    if (state.def && state.def->type != CAA_NORMAL &&
 		state.def->type != CAA_OPT && state.inarg) {
 		state.restbeg = cur;
@@ -1245,10 +1223,10 @@ ca_parse_line(Cadef d)
 
 		if (cur < compcurrent)
 		    memcpy(&ca_laststate, &state, sizeof(state));
-		PERMALLOC {
-		    for (; line; line = compwords[cur++])
-			addlinknode(l, ztrdup(line));
-		} LASTALLOC;
+
+		for (; line; line = compwords[cur++])
+		    zaddlinknode(l, ztrdup(line));
+
 		ca_laststate.ddef = NULL;
 		ca_laststate.doff = 0;
 		break;
@@ -1624,17 +1602,15 @@ parse_cvdef(char *nam, char **args)
     }
     descr = *args++;
 
-    PERMALLOC {
-	ret = (Cvdef) zalloc(sizeof(*ret));
-	ret->descr = ztrdup(descr);
-	ret->hassep = hassep;
-	ret->sep = sep;
-	ret->next = NULL;
-	ret->vals = NULL;
-	ret->defs = arrdup(oargs);
-	ret->ndefs = arrlen(oargs);
-	ret->lastt = time(0);
-    } LASTALLOC;
+    ret = (Cvdef) zalloc(sizeof(*ret));
+    ret->descr = ztrdup(descr);
+    ret->hassep = hassep;
+    ret->sep = sep;
+    ret->next = NULL;
+    ret->vals = NULL;
+    ret->defs = zarrdup(oargs);
+    ret->ndefs = arrlen(oargs);
+    ret->lastt = time(0);
 
     for (valp = &(ret->vals); *args; args++) {
 	p = dupstring(*args);
@@ -1740,17 +1716,15 @@ parse_cvdef(char *nam, char **args)
 	    vtype = CVV_NOARG;
 	    arg = NULL;
 	}
-	PERMALLOC {
-	    *valp = val = (Cvval) zalloc(sizeof(*val));
-	    valp = &((*valp)->next);
+	*valp = val = (Cvval) zalloc(sizeof(*val));
+	valp = &((*valp)->next);
 
-	    val->next = NULL;
-	    val->name = ztrdup(name);
-	    val->descr = ztrdup(descr);
-	    val->xor = xor;
-	    val->type = vtype;
-	    val->arg = arg;
-	} LASTALLOC;
+	val->next = NULL;
+	val->name = ztrdup(name);
+	val->descr = ztrdup(descr);
+	val->xor = xor;
+	val->type = vtype;
+	val->arg = arg;
     }
     return ret;
 }
@@ -1837,9 +1811,8 @@ cv_parse_word(Cvdef d)
     state.d = d;
     state.def = NULL;
     state.val = NULL;
-    PERMALLOC {
-	state.vals = (LinkList) newlinklist();
-    } LASTALLOC;
+    state.vals = (LinkList) znewlinklist();
+
     cv_alloced = 1;
 
     if (d->hassep) {
@@ -1856,10 +1829,8 @@ cv_parse_word(Cvdef d)
 		    eq = "";
 
 		if ((ptr = cv_get_val(d, str))) {
-		    PERMALLOC {
-			addlinknode(state.vals, ztrdup(str));
-			addlinknode(state.vals, ztrdup(eq));
-		    } LASTALLOC;
+		    zaddlinknode(state.vals, ztrdup(str));
+		    zaddlinknode(state.vals, ztrdup(eq));
 
 		    cv_inactive(d, ptr->xor);
 		}
@@ -1885,10 +1856,8 @@ cv_parse_word(Cvdef d)
 			eq = "";
 
 		    if ((ptr = cv_get_val(d, str))) {
-			PERMALLOC {
-			    addlinknode(state.vals, ztrdup(str));
-			    addlinknode(state.vals, ztrdup(eq));
-			} LASTALLOC;
+			zaddlinknode(state.vals, ztrdup(str));
+			zaddlinknode(state.vals, ztrdup(eq));
 
 			cv_inactive(d, ptr->xor);
 		    }
@@ -1907,10 +1876,8 @@ cv_parse_word(Cvdef d)
 	    for (str = compprefix; *str; str++) {
 		tmp[0] = *str;
 		if ((ptr = cv_get_val(d, tmp))) {
-		    PERMALLOC {
-			addlinknode(state.vals, ztrdup(tmp));
-			addlinknode(state.vals, ztrdup(""));
-		    } LASTALLOC;
+		    zaddlinknode(state.vals, ztrdup(tmp));
+		    zaddlinknode(state.vals, ztrdup(""));
 
 		    cv_inactive(d, ptr->xor);
 		}
@@ -1918,10 +1885,8 @@ cv_parse_word(Cvdef d)
 	    for (str = compsuffix; *str; str++) {
 		tmp[0] = *str;
 		if ((ptr = cv_get_val(d, tmp))) {
-		    PERMALLOC {
-			addlinknode(state.vals, ztrdup(tmp));
-			addlinknode(state.vals, ztrdup(""));
-		    } LASTALLOC;
+		    zaddlinknode(state.vals, ztrdup(tmp));
+		    zaddlinknode(state.vals, ztrdup(""));
 
 		    cv_inactive(d, ptr->xor);
 		}
@@ -2238,9 +2203,7 @@ settags(char **tags)
 
     comptags[locallevel] = t = (Ctags) zalloc(sizeof(*t));
 
-    PERMALLOC {
-	t->all = arrdup(tags + 1);
-    } LASTALLOC;
+    t->all = zarrdup(tags + 1);
     t->context = ztrdup(*tags);
     t->sets = NULL;
     t->init = 1;
@@ -2332,10 +2295,7 @@ bin_comptags(char *nam, char **args, char *ops, int func)
 	if (comptags[locallevel]->sets) {
 	    char **ret;
 
-	    PERMALLOC {
-		ret = arrdup(comptags[locallevel]->sets->tags);
-	    } LASTALLOC;
-
+	    ret = zarrdup(comptags[locallevel]->sets->tags);
 	    setaparam(args[1], ret);
 	} else
 	    return 1;
@@ -2377,9 +2337,7 @@ bin_comptry(char *nam, char **args, char *ops, int func)
 	if (*args) {
 	    Ctset s = (Ctset) zalloc(sizeof(*s)), l;
 
-	    PERMALLOC {
-		s->tags = arrdup(args);
-	    } LASTALLOC;
+	    s->tags = zarrdup(args);
 	    s->next = NULL;
 
 	    if ((l = comptags[lasttaglevel]->sets)) {

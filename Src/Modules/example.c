@@ -70,9 +70,7 @@ bin_example(char *nam, char **args, char *ops, int func)
     zsfree(strparam);
     strparam = ztrdup(*oargs ? *oargs : "");
     freearray(arrparam);
-    PERMALLOC {
-	arrparam = arrdup(oargs);
-    } LASTALLOC;
+    arrparam = zarrdup(oargs);
     return 0;
 }
 

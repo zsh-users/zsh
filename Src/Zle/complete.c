@@ -1172,10 +1172,7 @@ comp_wrapper(Eprog prog, FuncWrap w, char *name)
 	oqi = ztrdup(compquoting);
 	oqs = ztrdup(compqstack);
 	oaq = ztrdup(autoq);
-
-	PERMALLOC {
-	    owords = arrdup(compwords);
-	} LASTALLOC;
+	owords = zarrdup(compwords);
 
 	runshfunc(prog, w, name);
 

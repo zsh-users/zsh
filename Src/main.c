@@ -39,8 +39,6 @@ main(int argc, char **argv)
     setlocale(LC_ALL, "");
 #endif
 
-    global_permalloc();
-
     init_hackzero(argv, environ);
 
     for (t = argv; *t; *t = metafy(*t, -1, META_ALLOC), t++);
@@ -79,7 +77,6 @@ main(int argc, char **argv)
     init_io();
     setupvals();
     init_signals();
-    global_heapalloc();
     init_bltinmods();
     run_init_scripts();
     init_misc();

@@ -296,7 +296,7 @@ selectlist(LinkList l, size_t start)
 
     trashzle();
     ct = countlinknodes(l);
-    ap = arr = (char **)alloc((countlinknodes(l) + 1) * sizeof(char **));
+    ap = arr = (char **) zhalloc((countlinknodes(l) + 1) * sizeof(char **));
 
     for (n = (LinkNode) firstnode(l); n; incnode(n))
 	*ap++ = (char *)getdata(n);

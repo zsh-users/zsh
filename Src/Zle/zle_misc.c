@@ -274,7 +274,7 @@ acceptline(char **args)
 int
 acceptandhold(char **args)
 {
-    pushnode(bufstack, metafy((char *)line, ll, META_DUP));
+    zpushnode(bufstack, metafy((char *)line, ll, META_DUP));
     stackcs = cs;
     done = 1;
     return 0;
@@ -745,12 +745,11 @@ executenamedcommand(char *prmt)
 		cmd == Th(z_acceptline) || c == ' ' || c == '\t') {
 		cmdambig = 100;
 
-		HEAPALLOC {
-		    cmdll = newlinklist();
-		    *ptr = 0;
+		cmdll = newlinklist();
+		*ptr = 0;
 
-		    scanhashtable(thingytab, 1, 0, DISABLED, scancompcmd, 0);
-		} LASTALLOC;
+		scanhashtable(thingytab, 1, 0, DISABLED, scancompcmd, 0);
+
 		if (empty(cmdll)) {
 		    feep = 1;
 		    if (listed)

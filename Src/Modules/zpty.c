@@ -307,9 +307,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
     p = (Ptycmd) zalloc(sizeof(*p));
 
     p->name = ztrdup(pname);
-    PERMALLOC {
-	p->args = arrdup(args);
-    } LASTALLOC;
+    p->args = zarrdup(args);
     p->fd = master;
     p->pid = pid;
     p->echo = echo;

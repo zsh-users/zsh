@@ -87,13 +87,6 @@ mod_export int (*getkeyptr) _((int));
 /**/
 mod_export sigset_t sigchld_mask;
 
-#ifdef DEBUG
-/* depth of allocation type stack */
-
-/**/
-mod_export int alloc_stackp;
-#endif
-
 /**/
 mod_export struct hookdef zshhooks[] = {
     HOOKDEF("exit", NULL, HOOKF_ALL),
@@ -106,9 +99,6 @@ void
 loop(int toplevel, int justonce)
 {
     Eprog prog;
-#ifdef DEBUG
-    int oasp = toplevel ? 0 : alloc_stackp;
-#endif
 
     pushheap();
     for (;;) {
@@ -138,12 +128,11 @@ loop(int toplevel, int justonce)
 		LinkList args;
 		int osc = sfcontext;
 
-		PERMALLOC {
-		    args = newlinklist();
-		    addlinknode(args, "preexec");
-		    if (hist_ring)
-			addlinknode(args, hist_ring->text);
-		} LASTALLOC;
+		args = znewlinklist();
+		zaddlinknode(args, "preexec");
+		if (hist_ring)
+		    zaddlinknode(args, hist_ring->text);
+
 		sfcontext = SFC_HOOK;
 		doshfunc("preexec", preprog, args, 0, 1);
 		sfcontext = osc;
@@ -159,7 +148,6 @@ loop(int toplevel, int justonce)
 	    if (toplevel)
 		noexitct = 0;
 	}
-	DPUTS(alloc_stackp != oasp, "BUG: alloc_stackp changed in loop()");
 	if (ferror(stderr)) {
 	    zerr("write error", NULL, 0);
 	    clearerr(stderr);
@@ -263,7 +251,7 @@ parseargs(char **argv)
 	argv++;
     }
     doneoptions:
-    paramlist = newlinklist();
+    paramlist = znewlinklist();
     if (cmd) {
 	if (!*argv) {
 	    zerr("string expected after -%s", cmd, 0);
@@ -284,7 +272,7 @@ parseargs(char **argv)
 	    argv++;
 	}
 	while (*argv)
-	    addlinknode(paramlist, ztrdup(*argv++));
+	    zaddlinknode(paramlist, ztrdup(*argv++));
     } else
 	opts[SHINSTDIN] = 1;
     if(isset(SINGLECOMMAND))
@@ -642,8 +630,8 @@ setupvals(void)
     watch    = mkarray(NULL);
     psvar    = mkarray(NULL);
     module_path = mkarray(ztrdup(MODULE_DIR));
-    modules = newlinklist();
-    linkedmodules = newlinklist();
+    modules = znewlinklist();
+    linkedmodules = znewlinklist();
 
     /* Set default prompts */
     if(unset(INTERACTIVE)) {
@@ -743,9 +731,9 @@ setupvals(void)
     trapreturn = 0;
     noerrexit = -1;
     nohistsave = 1;
-    dirstack = newlinklist();
-    bufstack = newlinklist();
-    prepromptfns = newlinklist();
+    dirstack = znewlinklist();
+    bufstack = znewlinklist();
+    prepromptfns = znewlinklist();
     hsubl = hsubr = NULL;
     lastpid = 0;
     bshin = SHIN ? fdopen(SHIN, "r") : stdin;

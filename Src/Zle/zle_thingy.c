@@ -637,9 +637,7 @@ bin_zle_call(char *name, char **args, char *ops, char func)
     }
 
     t = rthingy(wname);
-    PERMALLOC {
-        ret = execzlefunc(t, args);
-    } LASTALLOC;
+    ret = execzlefunc(t, args);
     unrefthingy(t);
     if (saveflag)
 	zmod = modsave;

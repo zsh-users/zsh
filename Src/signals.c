@@ -531,10 +531,9 @@ handler(int sig)
         if (sigtrapped[SIGALRM]) {
 	    int tmout;
             dotrap(SIGALRM);
-	    HEAPALLOC {
-		if ((tmout = getiparam("TMOUT")))
-		    alarm(tmout);           /* reset the alarm */
-	    } LASTALLOC;
+
+	    if ((tmout = getiparam("TMOUT")))
+		alarm(tmout);           /* reset the alarm */
         } else {
 	    int idle = ttyidlegetfn(NULL);
 	    int tmout = getiparam("TMOUT");
@@ -671,14 +670,12 @@ dosavetrap(int sig, int level)
 	st->list = sigfuncs[sig];
 	sigfuncs[sig] = NULL;
     }
-    PERMALLOC {
-	if (!savetraps)
-	    savetraps = newlinklist();
-	/*
-	 * Put this at the front of the list
-	 */
-	insertlinknode(savetraps, (LinkNode)savetraps, st);
-    } LASTALLOC;
+    if (!savetraps)
+	savetraps = znewlinklist();
+    /*
+     * Put this at the front of the list
+     */
+    zinsertlinknode(savetraps, (LinkNode)savetraps, st);
 }
 
 /**/
@@ -900,23 +897,22 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     if (*sigtr & ZSIG_FUNC) {
 	int osc = sfcontext;
 
-	PERMALLOC {
-	    args = newlinklist();
-	    name = (char *) zalloc(5 + strlen(sigs[sig]));
-	    sprintf(name, "TRAP%s", sigs[sig]);
-	    addlinknode(args, name);
-	    sprintf(num, "%d", sig);
-	    addlinknode(args, num);
-	} LASTALLOC;
+	args = znewlinklist();
+	name = (char *) zalloc(5 + strlen(sigs[sig]));
+	sprintf(name, "TRAP%s", sigs[sig]);
+	zaddlinknode(args, name);
+	sprintf(num, "%d", sig);
+	zaddlinknode(args, num);
+
 	trapreturn = -1;
 	sfcontext = SFC_SIGNAL;
 	doshfunc(name, sigfn, args, 0, 1);
 	sfcontext = osc;
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
-    } else HEAPALLOC {
+    } else
 	execode(sigfn, 1, 0);
-    } LASTALLOC;
+
     if (trapreturn > 0)
 	trapret = trapreturn;
     else if (errflag)

@@ -320,9 +320,7 @@ set_gmatcher(char *name, char **argv)
 	q = &(n->next);
     }
     freecmlist(cmatcher);
-    PERMALLOC {
-	cmatcher = cpcmlist(l);
-    } LASTALLOC;
+    cmatcher = cpcmlist(l);
 
     return 1;
 }
@@ -1254,9 +1252,7 @@ cc_assign(char *name, Compctl *ccptr, Compctl cct, int reass)
     cc->gname = ztrdup(cct->gname);
     cc->hpat = ztrdup(cct->hpat);
     cc->hnum = cct->hnum;
-    PERMALLOC {
-	cc->matcher = cpcmatcher(cct->matcher);
-    } LASTALLOC;
+    cc->matcher = cpcmatcher(cct->matcher);
     cc->mstr = ztrdup(cct->mstr);
 
     /* careful with extended completion:  it's already allocated */
@@ -1832,11 +1828,9 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
 	    if (lastccused)
 		freelinklist(lastccused, (FreeFunc) freecompctl);
 
-	    PERMALLOC {
-		lastccused = newlinklist();
-		for (n = firstnode(ccused); n; incnode(n))
-		    addlinknode(lastccused, getdata(n));
-	    } LASTALLOC;
+	    lastccused = znewlinklist();
+	    for (n = firstnode(ccused); n; incnode(n))
+		zaddlinknode(lastccused, getdata(n));
 	} else if (ccused)
 	    for (n = firstnode(ccused); n; incnode(n))
 		if (((Compctl) getdata(n)) != &cc_dummy)
@@ -1857,16 +1851,14 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
 	    dat->lst = 0;
 	    return 0;
 	}
-	PERMALLOC {
-	    if (lastmatches) {
-		freematches(lastmatches);
-		lastmatches = NULL;
-	    }
-	    permmatches(1);
-	    amatches = pmatches;
-	    lastpermmnum = permmnum;
-	    lastpermgnum = permgnum;
-	} LASTALLOC;
+	if (lastmatches) {
+	    freematches(lastmatches);
+	    lastmatches = NULL;
+	}
+	permmatches(1);
+	amatches = pmatches;
+	lastpermmnum = permmnum;
+	lastpermgnum = permgnum;
 
 	lastmatches = pmatches;
 	lastlmatches = lmatches;
@@ -2277,66 +2269,64 @@ makecomplistctl(int flags)
 
     cdepth++;
     SWITCHHEAPS(compheap) {
-	HEAPALLOC {
-	    int ooffs = offs, lip, lp;
-	    char *str = comp_str(&lip, &lp, 0), *t;
-	    char *os = cmdstr, **ow = clwords, **p, **q, qc;
-	    int on = clwnum, op = clwpos, ois =  instring, oib = inbackt;
-	    char *oisuf = isuf, *oqp = qipre, *oqs = qisuf, *oaq = autoq;
-	    char buf[2];
+	int ooffs = offs, lip, lp;
+	char *str = comp_str(&lip, &lp, 0), *t;
+	char *os = cmdstr, **ow = clwords, **p, **q, qc;
+	int on = clwnum, op = clwpos, ois =  instring, oib = inbackt;
+	char *oisuf = isuf, *oqp = qipre, *oqs = qisuf, *oaq = autoq;
+	char buf[2];
 
-	    if (compquote && (qc = *compquote)) {
-		if (qc == '`') {
-		    instring = 0;
-		    inbackt = 0;
-		    autoq = "";
-		} else {
-		    buf[0] = qc;
-		    buf[1] = '\0';
-		    instring = (qc == '\'' ? 1 : 2);
-		    inbackt = 0;
-		    autoq = buf;
-		}
-	    } else {
-		instring = inbackt = 0;
+	if (compquote && (qc = *compquote)) {
+	    if (qc == '`') {
+		instring = 0;
+		inbackt = 0;
 		autoq = "";
+	    } else {
+		buf[0] = qc;
+		buf[1] = '\0';
+		instring = (qc == '\'' ? 1 : 2);
+		inbackt = 0;
+		autoq = buf;
 	    }
-	    qipre = ztrdup(compqiprefix ? compqiprefix : "");
-	    qisuf = ztrdup(compqisuffix ? compqisuffix : "");
-	    isuf = dupstring(compisuffix);
-	    ctokenize(isuf);
-	    remnulargs(isuf);
-	    clwnum = arrlen(compwords);
-	    clwpos = compcurrent - 1;
-	    cmdstr = ztrdup(compwords[0]);
-	    clwords = (char **) zalloc((clwnum + 1) * sizeof(char *));
-	    for (p = compwords, q = clwords; *p; p++, q++) {
-		t = dupstring(*p);
-		tokenize(t);
-		remnulargs(t);
-		*q = ztrdup(t);
-	    }
-	    *q = NULL;
-	    offs = lip + lp;
-	    incompfunc = 2;
-	    ret = makecomplistglobal(str, !clwpos, COMP_COMPLETE, flags);
-	    incompfunc = 1;
-	    isuf = oisuf;
-	    zsfree(qipre);
-	    zsfree(qisuf);
-	    qipre = oqp;
-	    qisuf = oqs;
-	    instring = ois;
-	    inbackt = oib;
-	    autoq = oaq;
-	    offs = ooffs;
-	    zsfree(cmdstr);
-	    freearray(clwords);
-	    cmdstr = os;
-	    clwords = ow;
-	    clwnum = on;
-	    clwpos = op;
-	} LASTALLOC;
+	} else {
+	    instring = inbackt = 0;
+	    autoq = "";
+	}
+	qipre = ztrdup(compqiprefix ? compqiprefix : "");
+	qisuf = ztrdup(compqisuffix ? compqisuffix : "");
+	isuf = dupstring(compisuffix);
+	ctokenize(isuf);
+	remnulargs(isuf);
+	clwnum = arrlen(compwords);
+	clwpos = compcurrent - 1;
+	cmdstr = ztrdup(compwords[0]);
+	clwords = (char **) zalloc((clwnum + 1) * sizeof(char *));
+	for (p = compwords, q = clwords; *p; p++, q++) {
+	    t = dupstring(*p);
+	    tokenize(t);
+	    remnulargs(t);
+	    *q = ztrdup(t);
+	}
+	*q = NULL;
+	offs = lip + lp;
+	incompfunc = 2;
+	ret = makecomplistglobal(str, !clwpos, COMP_COMPLETE, flags);
+	incompfunc = 1;
+	isuf = oisuf;
+	zsfree(qipre);
+	zsfree(qisuf);
+	qipre = oqp;
+	qisuf = oqs;
+	instring = ois;
+	inbackt = oib;
+	autoq = oaq;
+	offs = ooffs;
+	zsfree(cmdstr);
+	freearray(clwords);
+	cmdstr = os;
+	clwords = ow;
+	clwnum = on;
+	clwpos = op;
     } SWITCHBACKHEAPS;
     cdepth--;
 
@@ -2966,8 +2956,6 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
     if (incompfunc != 1 && ccstack && findnode(ccstack, cc))
 	return;
-
-    MUSTUSEHEAP("complistflags");
 
     if (!ccstack)
 	ccstack = newlinklist();

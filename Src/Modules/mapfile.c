@@ -248,7 +248,7 @@ get_contents(char *fname)
     val = NULL;
     if ((fd = open(fname, O_RDONLY | O_NOCTTY)) >= 0) {
 	LinkList ll;
-	MUSTUSEHEAP("mapfile:get_contents");
+
 	if ((ll = readoutput(fd, 1)))
 	    val = peekfirst(ll);
     }
@@ -264,30 +264,27 @@ getpmmapfile(HashTable ht, char *name)
     char *contents;
     Param pm = NULL;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR;
-	pm->sets.cfn = setpmmapfile;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = unsetpmmapfile;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR;
+    pm->sets.cfn = setpmmapfile;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = unsetpmmapfile;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
 
-	pm->flags |= (mapfile_pm->flags & PM_READONLY);
+    pm->flags |= (mapfile_pm->flags & PM_READONLY);
 
-	/* Set u.str to contents of file given by name */
-	if ((contents = get_contents(pm->nam)))
-	    pm->u.str = contents;
-	else {
-	    pm->u.str = "";
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    /* Set u.str to contents of file given by name */
+    if ((contents = get_contents(pm->nam)))
+	pm->u.str = contents;
+    else {
+	pm->u.str = "";
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 

@@ -54,9 +54,6 @@
 	Memory allocated in this way does not have to be freed explicitly;
 	it will all be freed when the pool is destroyed.  In fact,
 	attempting to free this memory may result in a core dump.
-	The pair of pointers ncalloc and alloc may point to either
-	zalloc & zcalloc or zhalloc & hcalloc; permalloc() sets them to the
-	former, and heapalloc() sets them to the latter.
 
 	If possible, the heaps are allocated using mmap() so that the
 	(*real*) heap isn't filled up with empty zsh heaps. If mmap()
@@ -81,17 +78,6 @@
 #endif
 #endif
 
-/* != 0 if we are allocating in the heaplist */
- 
-/**/
-mod_export int useheap;
-
-/* Current allocation pointers.  ncalloc() is either zalloc() or zhalloc(); *
- * alloc() is either zcalloc() or hcalloc().                               */
-
-/**/
-mod_export void *(*ncalloc) _((size_t)), *(*alloc) _((size_t));
-
 #ifdef ZSH_MEM_WARNING
 # ifndef DEBUG
 #  define DEBUG 1
@@ -115,35 +101,7 @@ union mem_align {
 #define HEAP_ARENA_SIZE (HEAPSIZE - sizeof(struct heap))
 #define HEAPFREE (16384 - H_ISIZE)
 
-/* set default allocation to heap stack */
-
-/**/
-mod_export int
-global_heapalloc(void)
-{
-    int luh = useheap;
-
-    alloc = hcalloc;
-    ncalloc = zhalloc;
-    useheap = 1;
-    return luh;
-}
-
-/* set default allocation to malloc() */
-
-/**/
-mod_export int
-global_permalloc(void)
-{
-    int luh = useheap;
-
-    alloc = zcalloc;
-    ncalloc = zalloc;
-    useheap = 0;
-    return luh;
-}
-
-/* list of zsh heap */
+/* list of zsh heaps */
 
 static Heap heaps;
 
@@ -556,7 +514,7 @@ dupstring(const char *s)
 
     if (!s)
 	return NULL;
-    t = (char *)ncalloc(strlen((char *)s) + 1);
+    t = (char *) zhalloc(strlen((char *)s) + 1);
     strcpy(t, s);
     return t;
 }

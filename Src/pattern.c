@@ -1357,9 +1357,7 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 		char *str;
 		int mlen = ztrsub(patinput, patinstart);
 
-		PERMALLOC {
-		    str = dupstrpfx(patinstart, patinput - patinstart);
-		} LASTALLOC;
+		str = ztrduppfx(patinstart, patinput - patinstart);
 		setsparam("MATCH", str);
 		setiparam("MBEGIN", (zlong)(patoffset + !isset(KSHARRAYS)));
 		setiparam("MEND",
@@ -1406,42 +1404,40 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 		sp = patbeginp;
 		ep = patendp;
 
-		PERMALLOC {
-		    for (i = 0; i < prog->patnpar; i++) {
-			if (parsfound & (1 << i)) {
-			    matcharr[i] = dupstrpfx(*sp, *ep - *sp);
-			    /*
-			     * mbegin and mend give indexes into the string
-			     * in the standard notation, i.e. respecting
-			     * KSHARRAYS, and with the end index giving
-			     * the last character, not one beyond.
-			     * For example, foo=foo; [[ $foo = (f)oo ]] gives
-			     * (without KSHARRAYS) indexes 1 and 1, which
-			     * corresponds to indexing as ${foo[1,1]}.
-			     */
-			    sprintf(numbuf, "%ld",
-				    (long)(ztrsub(*sp, patinstart) + 
-					   patoffset +
-					   !isset(KSHARRAYS)));
-			    mbeginarr[i] = ztrdup(numbuf);
-			    sprintf(numbuf, "%ld",
-				    (long)(ztrsub(*ep, patinstart) + 
-					   patoffset +
-					   !isset(KSHARRAYS) - 1));
-			    mendarr[i] = ztrdup(numbuf);
-			} else {
-			    /* Pattern wasn't set: either it was in an
-			     * unmatched branch, or a hashed parenthesis
-			     * that didn't match at all.
-			     */
-			    matcharr[i] = ztrdup("");
-			    mbeginarr[i] = ztrdup("-1");
-			    mendarr[i] = ztrdup("-1");
-			}
-			sp++;
-			ep++;
+		for (i = 0; i < prog->patnpar; i++) {
+		    if (parsfound & (1 << i)) {
+			matcharr[i] = ztrduppfx(*sp, *ep - *sp);
+			/*
+			 * mbegin and mend give indexes into the string
+			 * in the standard notation, i.e. respecting
+			 * KSHARRAYS, and with the end index giving
+			 * the last character, not one beyond.
+			 * For example, foo=foo; [[ $foo = (f)oo ]] gives
+			 * (without KSHARRAYS) indexes 1 and 1, which
+			 * corresponds to indexing as ${foo[1,1]}.
+			 */
+			sprintf(numbuf, "%ld",
+				(long)(ztrsub(*sp, patinstart) + 
+				       patoffset +
+				       !isset(KSHARRAYS)));
+			mbeginarr[i] = ztrdup(numbuf);
+			sprintf(numbuf, "%ld",
+				(long)(ztrsub(*ep, patinstart) + 
+				       patoffset +
+				       !isset(KSHARRAYS) - 1));
+			mendarr[i] = ztrdup(numbuf);
+		    } else {
+			/* Pattern wasn't set: either it was in an
+			 * unmatched branch, or a hashed parenthesis
+			 * that didn't match at all.
+			 */
+			matcharr[i] = ztrdup("");
+			mbeginarr[i] = ztrdup("-1");
+			mendarr[i] = ztrdup("-1");
 		    }
-		} LASTALLOC;
+		    sp++;
+		    ep++;
+		}
 		setaparam("match", matcharr);
 		setaparam("mbegin", mbeginarr);
 		setaparam("mend", mendarr);
@@ -2243,22 +2239,6 @@ static int patrepeat(Upat p)
 
     patinput = scan;
     return count;
-}
-
-/* Duplicate a patprog. */
-
-/**/
-Patprog
-duppatprog(Patprog prog)
-{
-    if (prog && prog != dummy_patprog1 && prog != dummy_patprog2) {
-	Patprog ret = (Patprog) alloc(prog->size);
-
-	memcpy(ret, prog, prog->size);
-
-	return ret;
-    }
-    return prog;
 }
 
 /* Free a patprog. */

@@ -143,9 +143,7 @@ bin_sched(char *nam, char **argv, char *ops, int func)
     of scheduled commands. */
     sch = (struct schedcmd *) zcalloc(sizeof *sch);
     sch->time = t;
-    PERMALLOC {
-	sch->cmd = zjoin(argv, ' ');
-    } LASTALLOC;
+    sch->cmd = zjoin(argv, ' ', 0);
     sch->next = NULL;
     for (sch2 = (struct schedcmd *)&schedcmds; sch2->next; sch2 = sch2->next);
     sch2->next = sch;

@@ -2887,17 +2887,15 @@ newsession(char *nm)
     }
 
     if (!nptr) {
-	PERMALLOC {
-	    zfsess = (Zftp_session) zcalloc(sizeof(struct zftp_session));
-	    zfsess->name = ztrdup(nm);
-	    zfsess->cfd = zfsess->dfd = -1;
-	    zfsess->params = (char **) zcalloc(sizeof(zfparams));
-	    addlinknode(zfsessions, zfsess);
+	zfsess = (Zftp_session) zcalloc(sizeof(struct zftp_session));
+	zfsess->name = ztrdup(nm);
+	zfsess->cfd = zfsess->dfd = -1;
+	zfsess->params = (char **) zcalloc(sizeof(zfparams));
+	zaddlinknode(zfsessions, zfsess);
 
-	    zfsesscnt++;
-	    zfstatusp = (int *)zrealloc(zfstatusp, sizeof(int)*zfsesscnt);
-	    zfstatusp[zfsessno] = 0;
-	} LASTALLOC;
+	zfsesscnt++;
+	zfstatusp = (int *)zrealloc(zfstatusp, sizeof(int)*zfsesscnt);
+	zfstatusp[zfsessno] = 0;
     }
 
     zfsetparam("ZFTP_SESSION", ztrdup(zfsess->name), ZFPM_READONLY);
@@ -3221,9 +3219,7 @@ boot_(Module m)
 	/* default preferences if user deletes variable */
 	zfprefs = ZFPF_SNDP|ZFPF_PASV;
     
-	PERMALLOC {
-	    zfsessions = newlinklist();
-	} LASTALLOC;
+	zfsessions = znewlinklist();
 	newsession("default");
     }
 

@@ -420,7 +420,7 @@ static void
 tracemodcond(char *name, char **args, int inf)
 {
     char **aptr;
-    MUSTUSEHEAP("tracemodcond");
+
     args = arrdup(args);
     for (aptr = args; *aptr; aptr++)
 	untokenize(*aptr);

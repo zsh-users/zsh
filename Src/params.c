@@ -408,11 +408,10 @@ scanparamvals(HashNode hn, int flags)
 char **
 paramvalarr(HashTable ht, int flags)
 {
-    MUSTUSEHEAP("paramvalarr");
     numparamvals = 0;
     if (ht)
 	scanhashtable(ht, 0, 0, PM_UNSET, scancountparams, flags);
-    paramvals = (char **) alloc((numparamvals + 1) * sizeof(char *));
+    paramvals = (char **) zhalloc((numparamvals + 1) * sizeof(char *));
     if (ht) {
 	numparamvals = 0;
 	scanhashtable(ht, 0, 0, PM_UNSET, scanparamvals, flags);
@@ -468,87 +467,85 @@ createparamtable(void)
 
     noerrs = 2;
 
-    HEAPALLOC {
-	/* Add the standard non-special parameters which have to    *
-	 * be initialized before we copy the environment variables. *
-	 * We don't want to override whatever values the users has  *
-	 * given them in the environment.                           */
-	opts[ALLEXPORT] = 0;
-	setiparam("MAILCHECK", 60);
-	setiparam("LOGCHECK", 60);
-	setiparam("KEYTIMEOUT", 40);
-	setiparam("LISTMAX", 100);
+    /* Add the standard non-special parameters which have to    *
+     * be initialized before we copy the environment variables. *
+     * We don't want to override whatever values the users has  *
+     * given them in the environment.                           */
+    opts[ALLEXPORT] = 0;
+    setiparam("MAILCHECK", 60);
+    setiparam("LOGCHECK", 60);
+    setiparam("KEYTIMEOUT", 40);
+    setiparam("LISTMAX", 100);
 #ifdef HAVE_SELECT
-	setiparam("BAUD", getbaudrate(&shttyinfo));  /* get the output baudrate */
+    setiparam("BAUD", getbaudrate(&shttyinfo));  /* get the output baudrate */
 #endif
-	setsparam("FCEDIT", ztrdup(DEFAULT_FCEDIT));
-	setsparam("TMPPREFIX", ztrdup(DEFAULT_TMPPREFIX));
-	setsparam("TIMEFMT", ztrdup(DEFAULT_TIMEFMT));
-	setsparam("WATCHFMT", ztrdup(default_watchfmt));
-	setsparam("HOST", ztrdup(hostnam));
-	setsparam("LOGNAME", ztrdup((str = getlogin()) && *str ? str : cached_username));
+    setsparam("FCEDIT", ztrdup(DEFAULT_FCEDIT));
+    setsparam("TMPPREFIX", ztrdup(DEFAULT_TMPPREFIX));
+    setsparam("TIMEFMT", ztrdup(DEFAULT_TIMEFMT));
+    setsparam("WATCHFMT", ztrdup(default_watchfmt));
+    setsparam("HOST", ztrdup(hostnam));
+    setsparam("LOGNAME", ztrdup((str = getlogin()) && *str ? str : cached_username));
 
-	/* Copy the environment variables we are inheriting to dynamic *
-	 * memory, so we can do mallocs and frees on it.               */
-	num_env = arrlen(environ);
-	new_environ = (char **) zalloc(sizeof(char *) * (num_env + 1));
-	*new_environ = NULL;
+    /* Copy the environment variables we are inheriting to dynamic *
+     * memory, so we can do mallocs and frees on it.               */
+    num_env = arrlen(environ);
+    new_environ = (char **) zalloc(sizeof(char *) * (num_env + 1));
+    *new_environ = NULL;
 
-	/* Now incorporate environment variables we are inheriting *
-	 * into the parameter hash table.                          */
-	for (envp = new_environ, envp2 = environ; *envp2; envp2++) {
-	    for (str = *envp2; *str && *str != '='; str++);
-	    if (*str == '=') {
-		iname = NULL;
-		*str = '\0';
-		if (!idigit(**envp2) && isident(*envp2) && !strchr(*envp2, '[')) {
-		    iname = *envp2;
-		    if ((!(pm = (Param) paramtab->getnode(paramtab, iname)) ||
-			 !(pm->flags & PM_DONTIMPORT)) &&
-			(pm = setsparam(iname, metafy(str + 1, -1, META_DUP))) &&
-			!(pm->flags & PM_EXPORTED)) {
-			*str = '=';
-			pm->flags |= PM_EXPORTED;
-			pm->env = *envp++ = ztrdup(*envp2);
-			*envp = NULL;
-			if (pm->flags & PM_SPECIAL)
-			    pm->env = replenv(pm->env, getsparam(pm->nam),
-					      pm->flags);
-		    }
+    /* Now incorporate environment variables we are inheriting *
+     * into the parameter hash table.                          */
+    for (envp = new_environ, envp2 = environ; *envp2; envp2++) {
+	for (str = *envp2; *str && *str != '='; str++);
+	if (*str == '=') {
+	    iname = NULL;
+	    *str = '\0';
+	    if (!idigit(**envp2) && isident(*envp2) && !strchr(*envp2, '[')) {
+		iname = *envp2;
+		if ((!(pm = (Param) paramtab->getnode(paramtab, iname)) ||
+		     !(pm->flags & PM_DONTIMPORT)) &&
+		    (pm = setsparam(iname, metafy(str + 1, -1, META_DUP))) &&
+		    !(pm->flags & PM_EXPORTED)) {
+		    *str = '=';
+		    pm->flags |= PM_EXPORTED;
+		    pm->env = *envp++ = ztrdup(*envp2);
+		    *envp = NULL;
+		    if (pm->flags & PM_SPECIAL)
+			pm->env = replenv(pm->env, getsparam(pm->nam),
+					  pm->flags);
 		}
-		*str = '=';
 	    }
+	    *str = '=';
 	}
-	environ = new_environ;
-	opts[ALLEXPORT] = oae;
+    }
+    environ = new_environ;
+    opts[ALLEXPORT] = oae;
 
-	pm = (Param) paramtab->getnode(paramtab, "HOME");
-	if (!(pm->flags & PM_EXPORTED)) {
-	    pm->flags |= PM_EXPORTED;
-	    pm->env = addenv("HOME", home, pm->flags);
-	}
-	pm = (Param) paramtab->getnode(paramtab, "LOGNAME");
-	if (!(pm->flags & PM_EXPORTED)) {
-	    pm->flags |= PM_EXPORTED;
-	    pm->env = addenv("LOGNAME", pm->u.str, pm->flags);
-	}
-	pm = (Param) paramtab->getnode(paramtab, "SHLVL");
-	if (!(pm->flags & PM_EXPORTED))
-	    pm->flags |= PM_EXPORTED;
-	sprintf(buf, "%d", (int)++shlvl);
-	pm->env = addenv("SHLVL", buf, pm->flags);
+    pm = (Param) paramtab->getnode(paramtab, "HOME");
+    if (!(pm->flags & PM_EXPORTED)) {
+	pm->flags |= PM_EXPORTED;
+	pm->env = addenv("HOME", home, pm->flags);
+    }
+    pm = (Param) paramtab->getnode(paramtab, "LOGNAME");
+    if (!(pm->flags & PM_EXPORTED)) {
+	pm->flags |= PM_EXPORTED;
+	pm->env = addenv("LOGNAME", pm->u.str, pm->flags);
+    }
+    pm = (Param) paramtab->getnode(paramtab, "SHLVL");
+    if (!(pm->flags & PM_EXPORTED))
+	pm->flags |= PM_EXPORTED;
+    sprintf(buf, "%d", (int)++shlvl);
+    pm->env = addenv("SHLVL", buf, pm->flags);
 
-	/* Add the standard non-special parameters */
-	set_pwd_env();
-	setsparam("MACHTYPE", ztrdup(MACHTYPE));
-	setsparam("OSTYPE", ztrdup(OSTYPE));
-	setsparam("TTY", ztrdup(ttystrname));
-	setsparam("VENDOR", ztrdup(VENDOR));
-	setsparam("ZSH_NAME", ztrdup(zsh_name));
-	setsparam("ZSH_VERSION", ztrdup(ZSH_VERSION));
-	setaparam("signals", sigptr = zalloc((SIGCOUNT+4) * sizeof(char *)));
-	for (t = sigs; (*sigptr++ = ztrdup(*t++)); );
-    } LASTALLOC;
+    /* Add the standard non-special parameters */
+    set_pwd_env();
+    setsparam("MACHTYPE", ztrdup(MACHTYPE));
+    setsparam("OSTYPE", ztrdup(OSTYPE));
+    setsparam("TTY", ztrdup(ttystrname));
+    setsparam("VENDOR", ztrdup(VENDOR));
+    setsparam("ZSH_NAME", ztrdup(zsh_name));
+    setsparam("ZSH_VERSION", ztrdup(ZSH_VERSION));
+    setaparam("signals", sigptr = zalloc((SIGCOUNT+4) * sizeof(char *)));
+    for (t = sigs; (*sigptr++ = ztrdup(*t++)); );
 
     noerrs = 0;
 }
@@ -634,7 +631,7 @@ createparam(char *name, int flags)
 	if (isset(ALLEXPORT) && !oldpm)
 	    flags |= PM_EXPORTED;
     } else {
-	pm = (Param) alloc(sizeof *pm);
+	pm = (Param) zhalloc(sizeof *pm);
 	pm->nam = nulstring;
     }
     pm->flags = flags & ~PM_LOCAL;
@@ -656,29 +653,27 @@ copyparam(Param tpm, Param pm, int toplevel)
      * to set the parameter, so must be permanently allocated (in accordance
      * with sets.?fn() usage).
      */
-    PERMALLOC {
-	tpm->flags = pm->flags;
-	if (!toplevel)
-	    tpm->flags &= ~PM_SPECIAL;
-	switch (PM_TYPE(pm->flags)) {
-	case PM_SCALAR:
-	    tpm->u.str = ztrdup(pm->gets.cfn(pm));
-	    break;
-	case PM_INTEGER:
-	    tpm->u.val = pm->gets.ifn(pm);
-	    break;
-	case PM_EFLOAT:
-	case PM_FFLOAT:
-	    tpm->u.dval = pm->gets.ffn(pm);
-	    break;
-	case PM_ARRAY:
-	    tpm->u.arr = arrdup(pm->gets.afn(pm));
-	    break;
-	case PM_HASHED:
-	    tpm->u.hash = copyparamtable(pm->gets.hfn(pm), pm->nam);
-	    break;
-	}
-    } LASTALLOC;
+    tpm->flags = pm->flags;
+    if (!toplevel)
+	tpm->flags &= ~PM_SPECIAL;
+    switch (PM_TYPE(pm->flags)) {
+    case PM_SCALAR:
+	tpm->u.str = ztrdup(pm->gets.cfn(pm));
+	break;
+    case PM_INTEGER:
+	tpm->u.val = pm->gets.ifn(pm);
+	break;
+    case PM_EFLOAT:
+    case PM_FFLOAT:
+	tpm->u.dval = pm->gets.ffn(pm);
+	break;
+    case PM_ARRAY:
+	tpm->u.arr = zarrdup(pm->gets.afn(pm));
+	break;
+    case PM_HASHED:
+	tpm->u.hash = copyparamtable(pm->gets.hfn(pm), pm->nam);
+	break;
+    }
     /*
      * If called from inside an associative array, that array is later going
      * to be passed as a real parameter, so we need the gets and sets
@@ -949,14 +944,14 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	    l = strlen(s);
 	    if (a2) {
 		if (!l || *s != '*') {
-		    d = (char *) ncalloc(l + 2);
+		    d = (char *) hcalloc(l + 2);
 		    *d = '*';
 		    strcpy(d + 1, s);
 		    s = d;
 		}
 	    } else {
 		if (!l || s[l - 1] != '*') {
-		    d = (char *) ncalloc(l + 2);
+		    d = (char *) hcalloc(l + 2);
 		    strcpy(d, s);
 		    strcat(d, "*");
 		    s = d;
@@ -1010,7 +1005,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 				return r;
 		}
 	    } else if (word) {
-		ta = sepsplit(d = s = getstrvalue(v), sep, 1);
+		ta = sepsplit(d = s = getstrvalue(v), sep, 1, 1);
 		len = arrlen(ta);
 		if (beg < 0)
 		    beg += len;
@@ -1296,63 +1291,62 @@ getstrvalue(Value v)
 
     if (!v)
 	return hcalloc(1);
-    HEAPALLOC {
-	if (v->inv && !(v->pm->flags & PM_HASHED)) {
-	    sprintf(buf, "%d", v->a);
-	    s = dupstring(buf);
-	    LASTALLOC_RETURN s;
-	}
 
-	switch(PM_TYPE(v->pm->flags)) {
-	case PM_HASHED:
-	    /* (!v->isarr) should be impossible unless emulating ksh */
-	    if (!v->isarr && emulation == EMULATE_KSH) {
-		s = dupstring("[0]");
-		if (getindex(&s, v) == 0)
-		    s = getstrvalue(v);
-		LASTALLOC_RETURN s;
-	    } /* else fall through */
-	case PM_ARRAY:
-	    ss = getvaluearr(v);
-	    if (v->isarr)
-		s = sepjoin(ss, NULL);
-	    else {
-		if (v->a < 0)
-		    v->a += arrlen(ss);
-		s = (v->a >= arrlen(ss) || v->a < 0) ? (char *) hcalloc(1) : ss[v->a];
-	    }
-	    LASTALLOC_RETURN s;
-	case PM_INTEGER:
-	    convbase(buf, v->pm->gets.ifn(v->pm), v->pm->ct);
-	    s = dupstring(buf);
-	    break;
-	case PM_EFLOAT:
-	case PM_FFLOAT:
-	    s = convfloat(v->pm->gets.ffn(v->pm), v->pm->ct,
-			  v->pm->flags, NULL);
-	    break;
-	case PM_SCALAR:
-	    s = v->pm->gets.cfn(v->pm);
-	    break;
-	default:
-	    s = NULL;
-	    DPUTS(1, "BUG: param node without valid type");
-	    break;
-	}
+    if (v->inv && !(v->pm->flags & PM_HASHED)) {
+	sprintf(buf, "%d", v->a);
+	s = dupstring(buf);
+	return s;
+    }
 
-	if (v->a == 0 && v->b == -1) {
-	    LASTALLOC_RETURN s;
+    switch(PM_TYPE(v->pm->flags)) {
+    case PM_HASHED:
+	/* (!v->isarr) should be impossible unless emulating ksh */
+	if (!v->isarr && emulation == EMULATE_KSH) {
+	    s = dupstring("[0]");
+	    if (getindex(&s, v) == 0)
+		s = getstrvalue(v);
+	    return s;
+	} /* else fall through */
+    case PM_ARRAY:
+	ss = getvaluearr(v);
+	if (v->isarr)
+	    s = sepjoin(ss, NULL, 1);
+	else {
+	    if (v->a < 0)
+		v->a += arrlen(ss);
+	    s = (v->a >= arrlen(ss) || v->a < 0) ? (char *) hcalloc(1) : ss[v->a];
 	}
-	if (v->a < 0)
-	    v->a += strlen(s);
-	if (v->b < 0)
-	    v->b += strlen(s);
-	s = (v->a > (int)strlen(s)) ? dupstring("") : dupstring(s + v->a);
-	if (v->b < v->a)
-	    s[0] = '\0';
-	else if (v->b - v->a < (int)strlen(s))
-	    s[v->b - v->a + 1 + (s[v->b - v->a] == Meta)] = '\0';
-    } LASTALLOC;
+	return s;
+    case PM_INTEGER:
+	convbase(buf, v->pm->gets.ifn(v->pm), v->pm->ct);
+	s = dupstring(buf);
+	break;
+    case PM_EFLOAT:
+    case PM_FFLOAT:
+	s = convfloat(v->pm->gets.ffn(v->pm), v->pm->ct, v->pm->flags, NULL);
+	break;
+    case PM_SCALAR:
+	s = v->pm->gets.cfn(v->pm);
+	break;
+    default:
+	s = NULL;
+	DPUTS(1, "BUG: param node without valid type");
+	break;
+    }
+
+    if (v->a == 0 && v->b == -1)
+	return s;
+
+    if (v->a < 0)
+	v->a += strlen(s);
+    if (v->b < 0)
+	v->b += strlen(s);
+    s = (v->a > (int)strlen(s)) ? dupstring("") : dupstring(s + v->a);
+    if (v->b < v->a)
+	s[0] = '\0';
+    else if (v->b - v->a < (int)strlen(s))
+	s[v->b - v->a + 1 + (s[v->b - v->a] == Meta)] = '\0';
+
     return s;
 }
 
@@ -1386,7 +1380,7 @@ getarrvalue(Value v)
     if (v->a > arrlen(s) || v->a < 0)
 	s = arrdup(nular);
     else
-	s = arrdup(s) + v->a;
+	s = arrdup(s + v->a);
     if (v->b < v->a)
 	s[0] = NULL;
     else if (v->b - v->a < arrlen(s))
@@ -1449,7 +1443,6 @@ setstrvalue(Value v, char *val)
     v->pm->flags &= ~PM_UNSET;
     switch (PM_TYPE(v->pm->flags)) {
     case PM_SCALAR:
-	MUSTUSEHEAP("setstrvalue");
 	if (v->a == 0 && v->b == -1) {
 	    (v->pm->sets.cfn) (v->pm, val);
 	    if (v->pm->flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z) && !v->pm->ct)
@@ -1499,7 +1492,6 @@ setstrvalue(Value v, char *val)
 	}
 	break;
     case PM_ARRAY:
-	MUSTUSEHEAP("setstrvalue");
 	{
 	    char **ss = (char **) zalloc(2 * sizeof(char *));
 
@@ -2234,7 +2226,7 @@ char *
 colonarrgetfn(Param pm)
 {
     char ***dptr = (char ***)pm->u.data;
-    return *dptr ? zjoin(*dptr, ':') : "";
+    return *dptr ? zjoin(*dptr, ':', 1) : "";
 }
 
 /**/
@@ -2693,7 +2685,6 @@ arrfixenv(char *s, char **t)
     int len_s;
     Param pm;
 
-    MUSTUSEHEAP("arrfixenv");
     pm = (Param) paramtab->getnode(paramtab, s);
     /*
      * Only one level of a parameter can be exported.  Unless
@@ -2703,7 +2694,7 @@ arrfixenv(char *s, char **t)
 	cmdnamtab->emptytable(cmdnamtab);
     if (isset(ALLEXPORT) ? !!pm->old : pm->level)
 	return;
-    u = t ? zjoin(t, ':') : "";
+    u = t ? zjoin(t, ':', 1) : "";
     len_s = strlen(s);
     for (ep = environ; *ep; ep++)
 	if (!strncmp(*ep, s, len_s) && (*ep)[len_s] == '=') {
@@ -2883,7 +2874,6 @@ convfloat(double dval, int digits, int flags, FILE *fout)
 {
     char fmt[] = "%.*e";
 
-    MUSTUSEHEAP("convfloat");
     /*
      * The difficulty with the buffer size is that a %f conversion
      * prints all digits before the decimal point: with 64 bit doubles,

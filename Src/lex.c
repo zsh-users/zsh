@@ -575,7 +575,6 @@ gettok(void)
     int c, d;
     int peekfd = -1, peek;
 
-    MUSTUSEHEAP("gettok");
   beginning:
     tokstr = NULL;
     while (iblank(c = hgetc()) && !lexstop);
@@ -587,7 +586,7 @@ gettok(void)
     /* word includes the last character read and possibly \ before ! */
     if (dbparens) {
 	len = 0;
-	bptr = tokstr = (char *)ncalloc(bsiz = 32);
+	bptr = tokstr = (char *) hcalloc(bsiz = 32);
 	hungetc(c);
 	cmdpush(CS_MATH);
 	c = dquote_parse(infor ? ';' : ')', 0);
@@ -702,7 +701,7 @@ gettok(void)
 	    }
 	    if (incmdpos) {
 		len = 0;
-		bptr = tokstr = (char *)ncalloc(bsiz = 32);
+		bptr = tokstr = (char *) hcalloc(bsiz = 32);
 		return cmd_or_math(CS_MATH) ? DINPAR : INPAR;
 	    }
 	} else if (d == ')')
@@ -849,7 +848,7 @@ gettokstr(int c, int sub)
     peek = STRING;
     if (!sub) {
 	len = 0;
-	bptr = tokstr = (char *)ncalloc(bsiz = 32);
+	bptr = tokstr = (char *) hcalloc(bsiz = 32);
     }
     for (;;) {
 	int act;
@@ -1392,28 +1391,26 @@ parsestr(char *s)
 {
     int l = strlen(s), err;
 
-    HEAPALLOC {
-	lexsave();
+    lexsave();
+    untokenize(s);
+    inpush(dupstring(s), 0, NULL);
+    strinbeg(0);
+    len = 0;
+    bptr = tokstr = s;
+    bsiz = l + 1;
+    err = dquote_parse('\0', 1);
+    *bptr = '\0';
+    strinend();
+    inpop();
+    DPUTS(cmdsp, "BUG: parsestr: cmdstack not empty.");
+    lexrestore();
+    if (err) {
 	untokenize(s);
-	inpush(dupstring(s), 0, NULL);
-	strinbeg(0);
-	len = 0;
-	bptr = tokstr = s;
-	bsiz = l + 1;
-	err = dquote_parse('\0', 1);
-	*bptr = '\0';
-	strinend();
-	inpop();
-	DPUTS(cmdsp, "BUG: parsestr: cmdstack not empty.");
-	lexrestore();
-	if (err) {
-	    untokenize(s);
-	    if (err > 32 && err < 127)
-		zerr("parse error near `%c'", NULL, err);
-	    else
-		zerr("parse error", NULL, 0);
-	}
-    } LASTALLOC;
+	if (err > 32 && err < 127)
+	    zerr("parse error near `%c'", NULL, err);
+	else
+	    zerr("parse error", NULL, 0);
+    }
     return err;
 }
 

@@ -136,27 +136,24 @@ getpmparameter(HashTable ht, char *name)
 {
     Param rpm, pm = NULL;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if ((rpm = (Param) realparamtab->getnode(realparamtab, name)) &&
-	    !(rpm->flags & PM_UNSET))
-	    pm->u.str = paramtypestr(rpm);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
+    if ((rpm = (Param) realparamtab->getnode(realparamtab, name)) &&
+	!(rpm->flags & PM_UNSET))
+	pm->u.str = paramtypestr(rpm);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -257,34 +254,30 @@ getpmcommand(HashTable ht, char *name)
 	cmdnamtab->filltable(cmdnamtab);
 	cmd = (Cmdnam) cmdnamtab->getnode(cmdnamtab, name);
     }
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR;
-	pm->sets.cfn = setpmcommand;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = unsetpmcommand;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if (cmd) {
-	    if (cmd->flags & HASHED)
-		pm->u.str = cmd->u.cmd;
-	    else {
-		pm->u.str = zhalloc(strlen(*(cmd->u.name)) +
-				    strlen(name) + 2);
-		strcpy(pm->u.str, *(cmd->u.name));
-		strcat(pm->u.str, "/");
-		strcat(pm->u.str, name);
-	    }
-	} else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR;
+    pm->sets.cfn = setpmcommand;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = unsetpmcommand;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
+    if (cmd) {
+	if (cmd->flags & HASHED)
+	    pm->u.str = cmd->u.cmd;
+	else {
+	    pm->u.str = zhalloc(strlen(*(cmd->u.name)) + strlen(name) + 2);
+	    strcpy(pm->u.str, *(cmd->u.name));
+	    strcat(pm->u.str, "/");
+	    strcat(pm->u.str, name);
 	}
-    } LASTALLOC;
-
+    } else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -344,32 +337,28 @@ setfunction(char *name, char *val, int dis)
 
     val = metafy(val, strlen(val), META_REALLOC);
 
-    HEAPALLOC {
-	prog = parse_string(val, 1);
-    } LASTALLOC;
+    prog = parse_string(val, 1);
 
     if (!prog || prog == &dummy_eprog) {
 	zwarn("invalid function definition", value, 0);
 	zsfree(val);
 	return;
     }
-    PERMALLOC {
-	shf = (Shfunc) zalloc(sizeof(*shf));
-	shf->funcdef = dupeprog(prog);
-	shf->flags = dis;
+    shf = (Shfunc) zalloc(sizeof(*shf));
+    shf->funcdef = zdupeprog(prog);
+    shf->flags = dis;
 
-	if (!strncmp(name, "TRAP", 4) &&
-	    (sn = getsignum(name + 4)) != -1) {
-	    if (settrap(sn, shf->funcdef)) {
-		freeeprog(shf->funcdef);
-		zfree(shf, sizeof(*shf));
-		zsfree(val);
-		LASTALLOC_RETURN;
-	    }
-	    sigtrapped[sn] |= ZSIG_FUNC;
+    if (!strncmp(name, "TRAP", 4) &&
+	(sn = getsignum(name + 4)) != -1) {
+	if (settrap(sn, shf->funcdef)) {
+	    freeeprog(shf->funcdef);
+	    zfree(shf, sizeof(*shf));
+	    zsfree(val);
+	    return;
 	}
-	shfunctab->addnode(shfunctab, ztrdup(name), shf);
-    } LASTALLOC;
+	sigtrapped[sn] |= ZSIG_FUNC;
+    }
+    shfunctab->addnode(shfunctab, ztrdup(name), shf);
     zsfree(val);
 }
 
@@ -442,41 +431,38 @@ getfunction(HashTable ht, char *name, int dis)
     Shfunc shf;
     Param pm = NULL;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR;
-	pm->sets.cfn = (dis ? setpmdisfunction : setpmfunction);
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = unsetpmfunction;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR;
+    pm->sets.cfn = (dis ? setpmdisfunction : setpmfunction);
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = unsetpmfunction;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
 
-	if ((shf = (Shfunc) shfunctab->getnode2(shfunctab, name)) &&
-	    (dis ? (shf->flags & DISABLED) : !(shf->flags & DISABLED))) {
-	    if (shf->flags & PM_UNDEFINED) {
-		pm->u.str = dyncat("builtin autoload -X",
-				   ((shf->flags & PM_UNALIASED) ?
-				    ((shf->flags & PM_TAGGED) ? "Ut" : "U") :
-				    ((shf->flags & PM_TAGGED) ? "t" : "")));
-	    } else {
-		char *t = getpermtext(shf->funcdef, NULL), *h;
-
-		h = dupstring(t);
-		zsfree(t);
-		unmetafy(h, NULL);
-
-		pm->u.str = h;
-	    }
+    if ((shf = (Shfunc) shfunctab->getnode2(shfunctab, name)) &&
+	(dis ? (shf->flags & DISABLED) : !(shf->flags & DISABLED))) {
+	if (shf->flags & PM_UNDEFINED) {
+	    pm->u.str = dyncat("builtin autoload -X",
+			       ((shf->flags & PM_UNALIASED) ?
+				((shf->flags & PM_TAGGED) ? "Ut" : "U") :
+				((shf->flags & PM_TAGGED) ? "t" : "")));
 	} else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
+	    char *t = getpermtext(shf->funcdef, NULL), *h;
 
+	    h = dupstring(t);
+	    zsfree(t);
+	    unmetafy(h, NULL);
+
+	    pm->u.str = h;
+	}
+    } else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -583,30 +569,27 @@ getbuiltin(HashTable ht, char *name, int dis)
     Param pm = NULL;
     Builtin bn;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if ((bn = (Builtin) builtintab->getnode2(builtintab, name)) &&
-	    (dis ? (bn->flags & DISABLED) : !(bn->flags & DISABLED))) {
-	    char *t = ((bn->handlerfunc || (bn->flags & BINF_PREFIX)) ?
-		       "defined" : "undefined");
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
+    if ((bn = (Builtin) builtintab->getnode2(builtintab, name)) &&
+	(dis ? (bn->flags & DISABLED) : !(bn->flags & DISABLED))) {
+	char *t = ((bn->handlerfunc || (bn->flags & BINF_PREFIX)) ?
+		   "defined" : "undefined");
 
-	    pm->u.str = dupstring(t);
-	} else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+	pm->u.str = dupstring(t);
+    } else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -775,27 +758,24 @@ getpmoption(HashTable ht, char *name)
     Param pm = NULL;
     int n;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR;
-	pm->sets.cfn = setpmoption;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = unsetpmoption;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR;
+    pm->sets.cfn = setpmoption;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = unsetpmoption;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
 
-	if ((n = optlookup(name)))
-	    pm->u.str = dupstring(opts[n] ? "on" : "off");
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    if ((n = optlookup(name)))
+	pm->u.str = dupstring(opts[n] ? "on" : "off");
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -871,57 +851,54 @@ getpmmodule(HashTable ht, char *name)
     char *type = NULL;
     LinkNode node;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
 
-	if (!type) {
-	    Module m;
+    if (!type) {
+	Module m;
 
-	    for (node = firstnode(modules); node; incnode(node)) {
-		m = (Module) getdata(node);
-		if (m->u.handle && !(m->flags & MOD_UNLOAD) &&
-		    !strcmp(name, m->nam)) {
-		    type = "loaded";
+	for (node = firstnode(modules); node; incnode(node)) {
+	    m = (Module) getdata(node);
+	    if (m->u.handle && !(m->flags & MOD_UNLOAD) &&
+		!strcmp(name, m->nam)) {
+		type = "loaded";
+		break;
+	    }
+	}
+    }
+    modpmname = name;
+    modpmfound = 0;
+    if (!type) {
+	scanhashtable(builtintab, 0, 0, 0, modpmbuiltinscan, 0);
+	if (!modpmfound) {
+	    Conddef p;
+
+	    for (p = condtab; p; p = p->next)
+		if (p->module && !strcmp(name, p->module)) {
+		    modpmfound = 1;
 		    break;
 		}
-	    }
+	    if (!modpmfound)
+		scanhashtable(realparamtab, 0, 0, 0, modpmparamscan, 0);
 	}
-	modpmname = name;
-	modpmfound = 0;
-	if (!type) {
-	    scanhashtable(builtintab, 0, 0, 0, modpmbuiltinscan, 0);
-	    if (!modpmfound) {
-		Conddef p;
-
-		for (p = condtab; p; p = p->next)
-		    if (p->module && !strcmp(name, p->module)) {
-			modpmfound = 1;
-			break;
-		    }
-		if (!modpmfound)
-		    scanhashtable(realparamtab, 0, 0, 0, modpmparamscan, 0);
-	    }
-	    if (modpmfound)
-		type = "autoloaded";
-	}
-	if (type)
-	    pm->u.str = dupstring(type);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+	if (modpmfound)
+	    type = "autoloaded";
+    }
+    if (type)
+	pm->u.str = dupstring(type);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -991,12 +968,10 @@ static void
 dirssetfn(Param pm, char **x)
 {
     if (!incleanup) {
-	PERMALLOC {
-	    freelinklist(dirstack, freestr);
-	    dirstack = newlinklist();
-	    while (x && *x)
-		addlinknode(dirstack, ztrdup(*x++));
-	} LASTALLOC;
+	freelinklist(dirstack, freestr);
+	dirstack = znewlinklist();
+	while (x && *x)
+	    zaddlinknode(dirstack, ztrdup(*x++));
     }
     if (x)
 	freearray(x);
@@ -1026,26 +1001,23 @@ getpmhistory(HashTable ht, char *name)
     Param pm = NULL;
     Histent he;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if ((he = quietgethist(atoi(name))))
-	    pm->u.str = dupstring(he->text);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
+    if ((he = quietgethist(atoi(name))))
+	pm->u.str = dupstring(he->text);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -1145,29 +1117,26 @@ getpmjobtext(HashTable ht, char *name)
     Param pm = NULL;
     int job;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
 
-	if ((job = atoi(name)) >= 1 && job < MAXJOB &&
-	    jobtab[job].stat && jobtab[job].procs &&
-	    !(jobtab[job].stat & STAT_NOPRINT))
-	    pm->u.str = pmjobtext(job);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    if ((job = atoi(name)) >= 1 && job < MAXJOB &&
+	jobtab[job].stat && jobtab[job].procs &&
+	!(jobtab[job].stat & STAT_NOPRINT))
+	pm->u.str = pmjobtext(job);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -1251,29 +1220,26 @@ getpmjobstate(HashTable ht, char *name)
     Param pm = NULL;
     int job;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
 
-	if ((job = atoi(name)) >= 1 && job < MAXJOB &&
-	    jobtab[job].stat && jobtab[job].procs &&
-	    !(jobtab[job].stat & STAT_NOPRINT))
-	    pm->u.str = pmjobstate(job);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    if ((job = atoi(name)) >= 1 && job < MAXJOB &&
+	jobtab[job].stat && jobtab[job].procs &&
+	!(jobtab[job].stat & STAT_NOPRINT))
+	pm->u.str = pmjobstate(job);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -1329,29 +1295,26 @@ getpmjobdir(HashTable ht, char *name)
     Param pm = NULL;
     int job;
 
-    HEAPALLOC {
-       pm = (Param) zhalloc(sizeof(struct param));
-       pm->nam = dupstring(name);
-       pm->flags = PM_SCALAR | PM_READONLY;
-       pm->sets.cfn = NULL;
-       pm->gets.cfn = strgetfn;
-       pm->unsetfn = NULL;
-       pm->ct = 0;
-       pm->env = NULL;
-       pm->ename = NULL;
-       pm->old = NULL;
-       pm->level = 0;
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
 
-       if ((job = atoi(name)) >= 1 && job < MAXJOB &&
-           jobtab[job].stat && jobtab[job].procs &&
-           !(jobtab[job].stat & STAT_NOPRINT))
-           pm->u.str = pmjobdir(job);
-       else {
-           pm->u.str = dupstring("");
-           pm->flags |= PM_UNSET;
-       }
-    } LASTALLOC;
-
+    if ((job = atoi(name)) >= 1 && job < MAXJOB &&
+	jobtab[job].stat && jobtab[job].procs &&
+	!(jobtab[job].stat & STAT_NOPRINT))
+	pm->u.str = pmjobdir(job);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -1462,27 +1425,24 @@ getpmnameddir(HashTable ht, char *name)
     Param pm = NULL;
     Nameddir nd;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR;
-	pm->sets.cfn = setpmnameddir;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = unsetpmnameddir;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if ((nd = (Nameddir) nameddirtab->getnode(nameddirtab, name)) &&
-	    !(nd->flags & ND_USERNAME))
-	    pm->u.str = dupstring(nd->dir);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR;
+    pm->sets.cfn = setpmnameddir;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = unsetpmnameddir;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
+    if ((nd = (Nameddir) nameddirtab->getnode(nameddirtab, name)) &&
+	!(nd->flags & ND_USERNAME))
+	pm->u.str = dupstring(nd->dir);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -1529,27 +1489,24 @@ getpmuserdir(HashTable ht, char *name)
 
     nameddirtab->filltable(nameddirtab);
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if ((nd = (Nameddir) nameddirtab->getnode(nameddirtab, name)) &&
-	    (nd->flags & ND_USERNAME))
-	    pm->u.str = dupstring(nd->dir);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = NULL;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
+    if ((nd = (Nameddir) nameddirtab->getnode(nameddirtab, name)) &&
+	(nd->flags & ND_USERNAME))
+	pm->u.str = dupstring(nd->dir);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -1715,30 +1672,27 @@ getalias(HashTable ht, char *name, int global, int dis)
     Param pm = NULL;
     Alias al;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR;
-	pm->sets.cfn = (global ? (dis ? setpmdisgalias : setpmgalias) :
-			(dis ? setpmdisralias : setpmralias));
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = unsetpmalias;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if ((al = (Alias) aliastab->getnode2(aliastab, name)) &&
-	    ((global && (al->flags & ALIAS_GLOBAL)) ||
-	     (!global && !(al->flags & ALIAS_GLOBAL))) &&
-	    (dis ? (al->flags & DISABLED) : !(al->flags & DISABLED)))
-	    pm->u.str = dupstring(al->text);
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR;
+    pm->sets.cfn = (global ? (dis ? setpmdisgalias : setpmgalias) :
+		    (dis ? setpmdisralias : setpmralias));
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = unsetpmalias;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
+    if ((al = (Alias) aliastab->getnode2(aliastab, name)) &&
+	((global && (al->flags & ALIAS_GLOBAL)) ||
+	 (!global && !(al->flags & ALIAS_GLOBAL))) &&
+	(dis ? (al->flags & DISABLED) : !(al->flags & DISABLED)))
+	pm->u.str = dupstring(al->text);
+    else {
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 

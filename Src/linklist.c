@@ -38,7 +38,19 @@ newlinklist(void)
 {
     LinkList list;
 
-    list = (LinkList) ncalloc(sizeof *list);
+    list = (LinkList) zhalloc(sizeof *list);
+    list->first = NULL;
+    list->last = (LinkNode) list;
+    return list;
+}
+
+/**/
+mod_export LinkList
+znewlinklist(void)
+{
+    LinkList list;
+
+    list = (LinkList) zalloc(sizeof *list);
     list->first = NULL;
     list->last = (LinkNode) list;
     return list;
@@ -53,7 +65,25 @@ insertlinknode(LinkList list, LinkNode node, void *dat)
     LinkNode tmp, new;
 
     tmp = node->next;
-    node->next = new = (LinkNode) ncalloc(sizeof *tmp);
+    node->next = new = (LinkNode) zhalloc(sizeof *tmp);
+    new->last = node;
+    new->dat = dat;
+    new->next = tmp;
+    if (tmp)
+	tmp->last = new;
+    else
+	list->last = new;
+    return new;
+}
+
+/**/
+mod_export LinkNode
+zinsertlinknode(LinkList list, LinkNode node, void *dat)
+{
+    LinkNode tmp, new;
+
+    tmp = node->next;
+    node->next = new = (LinkNode) zalloc(sizeof *tmp);
     new->last = node;
     new->dat = dat;
     new->next = tmp;
@@ -226,8 +256,6 @@ newsizedlist(int size)
 {
     LinkList list;
     LinkNode node;
-
-    MUSTUSEHEAP("newsizedlist()");
 
     list = (LinkList) zhalloc(sizeof(struct linklist) +
 			      (size * sizeof(struct linknode)));

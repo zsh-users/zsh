@@ -149,11 +149,10 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     if (isset(PROMPTSUBST)) {
 	int olderr = errflag;
 
-	HEAPALLOC {
-	    s = dupstring(s);
-	    if (!parsestr(s))
-		singsub(&s);
-	} LASTALLOC;
+	s = dupstring(s);
+	if (!parsestr(s))
+	    singsub(&s);
+
 	/* Ignore errors in prompt substitution */
 	errflag = olderr;
     }

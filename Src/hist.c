@@ -987,9 +987,8 @@ hend(void)
 	    fflush(shout);
 	}
 	if (flag & HISTFLAG_RECALL) {
-	    PERMALLOC {
-		pushnode(bufstack, ptr);
-	    } LASTALLOC;
+	    zpushnode(bufstack, ptr);
+
 	    save = 0;
 	} else
 	    zsfree(ptr);
@@ -1420,7 +1419,7 @@ convamps(char *out, char *in, int inlen)
 	    slen += inlen - 1, sdup = 1;
     if (!sdup)
 	return out;
-    ret = pp = (char *)alloc(slen + 1);
+    ret = pp = (char *) zhalloc(slen + 1);
     for (ptr = out; *ptr; ptr++)
 	if (*ptr == '\\')
 	    *pp++ = *++ptr;
@@ -1522,7 +1521,7 @@ quote(char **tr)
 	} else if (inblank(*ptr) && !inquotes && ptr[-1] != '\\')
 	    len += 2;
     ptr = *str;
-    *str = rptr = (char *)alloc(len);
+    *str = rptr = (char *) zhalloc(len);
     *rptr++ = '\'';
     for (; *ptr; ptr++)
 	if (*ptr == '\'') {
@@ -1559,7 +1558,7 @@ quotebreak(char **tr)
 	else if (inblank(*ptr))
 	    len += 2;
     ptr = *str;
-    *str = rptr = (char *)alloc(len);
+    *str = rptr = (char *) zhalloc(len);
     *rptr++ = '\'';
     for (; *ptr;)
 	if (*ptr == '\'') {

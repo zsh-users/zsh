@@ -77,17 +77,15 @@ register_module(char *n, Module_func setup, Module_func boot,
 {
     Linkedmod m;
 
-    PERMALLOC {
-	m = (Linkedmod) zalloc(sizeof(*m));
+    m = (Linkedmod) zalloc(sizeof(*m));
 
-	m->name = ztrdup(n);
-	m->setup = setup;
-	m->boot = boot;
-	m->cleanup = cleanup;
-	m->finish = finish;
+    m->name = ztrdup(n);
+    m->setup = setup;
+    m->boot = boot;
+    m->cleanup = cleanup;
+    m->finish = finish;
 
-	addlinknode(linkedmodules, m);
-    } LASTALLOC;
+    zaddlinknode(linkedmodules, m);
 }
 
 /* Check if a module is linked in. */
@@ -119,9 +117,7 @@ addbuiltin(Builtin b)
 	return 1;
     if (bn)
 	builtintab->freenode(builtintab->removenode(builtintab, b->nam));
-    PERMALLOC {
-	builtintab->addnode(builtintab, b->nam, b);
-    } LASTALLOC;
+    builtintab->addnode(builtintab, b->nam, b);
     return 0;
 }
 
@@ -684,9 +680,8 @@ load_module(char const *name)
 	    m->u.linked = linked;
 	    m->flags |= MOD_SETUP | MOD_LINKED;
 	}
-	PERMALLOC {
-	    node = addlinknode(modules, m);
-	} LASTALLOC;
+	node = zaddlinknode(modules, m);
+
 	if ((set = setup_module(m)) || boot_module(m)) {
 	    if (!set)
 		finish_module(m);
@@ -796,21 +791,19 @@ add_dep(char *name, char *from)
     LinkNode node;
     Module m;
 
-    PERMALLOC {
-	if (!(node = find_module(name))) {
-	    m = zcalloc(sizeof(*m));
-	    m->nam = ztrdup(name);
-	    addlinknode(modules, m);
-	} else
-	    m = (Module) getdata(node);
-	if (!m->deps)
-	    m->deps = newlinklist();
-	for (node = firstnode(m->deps);
-	     node && strcmp((char *) getdata(node), from);
-	     incnode(node));
-	if (!node)
-	    addlinknode(m->deps, ztrdup(from));
-    } LASTALLOC;
+    if (!(node = find_module(name))) {
+	m = zcalloc(sizeof(*m));
+	m->nam = ztrdup(name);
+	zaddlinknode(modules, m);
+    } else
+	m = (Module) getdata(node);
+    if (!m->deps)
+	m->deps = znewlinklist();
+    for (node = firstnode(m->deps);
+	 node && strcmp((char *) getdata(node), from);
+	 incnode(node));
+    if (!node)
+	zaddlinknode(m->deps, ztrdup(from));
 }
 
 /**/
@@ -1481,9 +1474,7 @@ addhookdef(Hookdef h)
 
     h->next = hooktab;
     hooktab = h;
-    PERMALLOC {
-	h->funcs = newlinklist();
-    } LASTALLOC;
+    h->funcs = znewlinklist();
 
     return 0;
 }
@@ -1545,9 +1536,8 @@ deletehookdefs(char const *nam, Hookdef h, int size)
 int
 addhookdeffunc(Hookdef h, Hookfn f)
 {
-    PERMALLOC {
-	addlinknode(h->funcs, (void *) f);
-    } LASTALLOC;
+    zaddlinknode(h->funcs, (void *) f);
+
     return 0;
 }
 

@@ -515,7 +515,7 @@ callmathfunc(char *o)
 	    while (*a) {
 		if (*a) {
 		    argc++;
- 		    q = (mnumber *)zhalloc(sizeof(mnumber));
+ 		    q = (mnumber *) zhalloc(sizeof(mnumber));
 		    *q = mathevall(a, ARGPREC, &a);
 		    addlinknode(l, q);
 		    if (errflag || mtok != COMMA)
@@ -864,7 +864,6 @@ mathevall(char *s, int prek, char **ep)
     struct mathvalue *xstack = 0, nstack[STACKSZ];
     mnumber ret;
 
-    MUSTUSEHEAP("mathevall");
     if (mlevel++) {
 	xlastbase = lastbase;
 	xnoeval = noeval;

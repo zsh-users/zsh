@@ -734,24 +734,23 @@ checkmailpath(char **s)
 
 	    if (lock) {
 		char *fn;
-		HEAPALLOC {
-		    pushheap();
-		    l = newlinklist();
-		    while ((fn = zreaddir(lock, 1)) && !errflag) {
-			if (u)
-			    sprintf(buf, "%s/%s?%s", *s, fn, u);
-			else
-			    sprintf(buf, "%s/%s", *s, fn);
-			addlinknode(l, dupstring(buf));
-			ct++;
-		    }
-		    closedir(lock);
-		    ap = arr = (char **) alloc(ct * sizeof(char *));
 
-		    while ((*ap++ = (char *)ugetnode(l)));
-		    checkmailpath(arr);
-		    popheap();
-		} LASTALLOC;
+		pushheap();
+		l = newlinklist();
+		while ((fn = zreaddir(lock, 1)) && !errflag) {
+		    if (u)
+			sprintf(buf, "%s/%s?%s", *s, fn, u);
+		    else
+			sprintf(buf, "%s/%s", *s, fn);
+		    addlinknode(l, dupstring(buf));
+		    ct++;
+		}
+		closedir(lock);
+		ap = arr = (char **) zhalloc(ct * sizeof(char *));
+
+		while ((*ap++ = (char *)ugetnode(l)));
+		checkmailpath(arr);
+		popheap();
 	    }
 	} else {
 	    if (st.st_size && st.st_atime <= st.st_mtime &&
@@ -765,15 +764,14 @@ checkmailpath(char **s)
 		    memcpy(usav, underscore, underscoreused);
 
 		    setunderscore(*s);
-		    HEAPALLOC {
-			u = dupstring(u);
-			if (! parsestr(u)) {
-			    singsub(&u);
-			    zputs(u, shout);
-			    fputc('\n', shout);
-			    fflush(shout);
-			}
-		    } LASTALLOC;
+
+		    u = dupstring(u);
+		    if (! parsestr(u)) {
+			singsub(&u);
+			zputs(u, shout);
+			fputc('\n', shout);
+			fflush(shout);
+		    }
 		    setunderscore(usav);
 		}
 	    }
@@ -1490,11 +1488,11 @@ spckword(char **s, int hist, int cmd, int ask)
 		if (strncmp(guess, best, preflen))
 		    return;
 		/* replace the temporarily expanded prefix with the original */
-		u = (char *) ncalloc(t - *s + strlen(best + preflen) + 1);
+		u = (char *) hcalloc(t - *s + strlen(best + preflen) + 1);
 		strncpy(u, *s, t - *s);
 		strcpy(u + (t - *s), best + preflen);
 	    } else {
-		u = (char *) ncalloc(strlen(best) + 2);
+		u = (char *) hcalloc(strlen(best) + 2);
 		strcpy(u + 1, best);
 	    }
 	    best = u;
@@ -1631,7 +1629,7 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 
 /**/
 mod_export char *
-zjoin(char **arr, int delim)
+zjoin(char **arr, int delim, int heap)
 {
     int len = 0;
     char **s, *ret, *ptr;
@@ -1640,7 +1638,7 @@ zjoin(char **arr, int delim)
 	len += strlen(*s) + 1;
     if (!len)
 	return "";
-    ptr = ret = (char *) ncalloc(len);
+    ptr = ret = (heap ? (char *) hcalloc(len) : (char *) zcalloc(len));
     for (s = arr; *s; s++) {
 	strucpy(&ptr, *s);
 	if (delim)
@@ -1702,18 +1700,20 @@ skipwsep(char **s)
 
 /**/
 mod_export char **
-spacesplit(char *s, int allownull)
+spacesplit(char *s, int allownull, int heap)
 {
     char *t, **ret, **ptr;
+    int l = sizeof(*ret) * (wordcount(s, NULL, -!allownull) + 1);
+    char *(*dup)(char *) = (heap ? dupstring : ztrdup);
 
-    ptr = ret = (char **) ncalloc(sizeof(*ret) * (wordcount(s, NULL, -!allownull) + 1));
+    ptr = ret = (heap ? (char **) hcalloc(l) : (char **) zcalloc(l));
 
     t = s;
     skipwsep(&s);
     if (*s && isep(*s == Meta ? s[1] ^ 32 : *s))
-	*ptr++ = dupstring(allownull ? "" : nulstring);
+	*ptr++ = dup(allownull ? "" : nulstring);
     else if (!allownull && t != s)
-	*ptr++ = dupstring("");
+	*ptr++ = dup("");
     while (*s) {
 	if (isep(*s == Meta ? s[1] ^ 32 : *s)) {
 	    if (*s == Meta)
@@ -1724,15 +1724,16 @@ spacesplit(char *s, int allownull)
 	t = s;
 	findsep(&s, NULL);
 	if (s > t || allownull) {
-	    *ptr = (char *) ncalloc((s - t) + 1);
+	    *ptr = (heap ? (char *) hcalloc((s - t) + 1) :
+		    (char *) zcalloc((s - t) + 1));
 	    ztrncpy(*ptr++, t, s - t);
 	} else
-	    *ptr++ = dupstring(nulstring);
+	    *ptr++ = dup(nulstring);
 	t = s;
 	skipwsep(&s);
     }
     if (!allownull && t != s)
-	*ptr++ = dupstring("");
+	*ptr++ = dup("");
     *ptr = NULL;
     return ret;
 }
@@ -1849,7 +1850,7 @@ wordcount(char *s, char *sep, int mul)
 
 /**/
 mod_export char *
-sepjoin(char **s, char *sep)
+sepjoin(char **s, char *sep, int heap)
 {
     char *r, *p, **t;
     int l, sl;
@@ -1865,7 +1866,7 @@ sepjoin(char **s, char *sep)
     }
     sl = strlen(sep);
     for (t = s, l = 1 - sl; *t; l += strlen(*t) + sl, t++);
-    r = p = (char *) ncalloc(l);
+    r = p = (heap ? (char *) hcalloc(l) : (char *) zcalloc(l));
     t = s;
     while (*t) {
 	strucpy(&p, *t);
@@ -1878,22 +1879,24 @@ sepjoin(char **s, char *sep)
 
 /**/
 char **
-sepsplit(char *s, char *sep, int allownull)
+sepsplit(char *s, char *sep, int allownull, int heap)
 {
     int n, sl;
     char *t, *tt, **r, **p;
 
     if (!sep)
-	return spacesplit(s, allownull);
+	return spacesplit(s, allownull, heap);
 
     sl = strlen(sep);
     n = wordcount(s, sep, 1);
-    r = p = (char **) ncalloc((n + 1) * sizeof(char *));
+    r = p = (heap ? (char **) hcalloc((n + 1) * sizeof(char *)) :
+	     (char **) zcalloc((n + 1) * sizeof(char *)));
 
     for (t = s; n--;) {
 	tt = t;
 	findsep(&t, sep);
-	*p = (char *) ncalloc(t - tt + 1);
+	*p = (heap ? (char *) hcalloc(t - tt + 1) :
+	      (char *) zcalloc(t - tt + 1));
 	strncpy(*p, tt, t - tt);
 	(*p)[t - tt] = '\0';
 	p++;
@@ -2026,43 +2029,23 @@ arrdup(char **s)
 {
     char **x, **y;
 
-    y = x = (char **) ncalloc(sizeof(char *) * (arrlen(s) + 1));
+    y = x = (char **) zhalloc(sizeof(char *) * (arrlen(s) + 1));
 
     while ((*x++ = dupstring(*s++)));
+
     return y;
 }
 
-/* Duplicate a list of strings. */
-
 /**/
-LinkList
-listdup(LinkList l)
-{
-    if (!l)
-	return NULL;
-    else {
-	LinkList r = newlinklist();
-	LinkNode n;
-
-	for (n = firstnode(l); n; incnode(n))
-	    addlinknode(r, dupstring((char *) getdata(n)));
-
-	return r;
-    }
-}
-
-/**/
-char **
-listarr(LinkList l)
+mod_export char **
+zarrdup(char **s)
 {
     char **x, **y;
-    LinkNode n;
 
-    x = y = (char **) ncalloc((countlinknodes(l) + 1) * sizeof(char *));
+    y = x = (char **) zalloc(sizeof(char *) * (arrlen(s) + 1));
 
-    for (n = firstnode(l); n; incnode(n))
-	*x++ = dupstring((char *) getdata(n));
-    *x = NULL;
+    while ((*x++ = ztrdup(*s++)));
+
     return y;
 }
 
@@ -2771,7 +2754,7 @@ bslashquote(const char *s, char **e, int instring)
 {
     const char *u, *tt;
     char *v;
-    char *buf = ncalloc(4 * strlen(s) + 1);
+    char *buf = hcalloc(4 * strlen(s) + 1);
     int sf = 0;
 
     tt = v = buf;
@@ -3277,7 +3260,7 @@ strsfx(char *s, char *t)
 mod_export char *
 dupstrpfx(const char *s, int len)
 {
-    char *r = ncalloc(len + 1);
+    char *r = zhalloc(len + 1);
 
     memcpy(r, s, len);
     r[len] = '\0';

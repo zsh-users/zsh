@@ -51,7 +51,6 @@ prefork(LinkList list, int flags)
 {
     LinkNode node;
 
-    MUSTUSEHEAP("prefork");
     for (node = firstnode(list); node; incnode(node)) {
 	char *str, c;
 
@@ -187,7 +186,7 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 	    l2 = strlen(s);
 	    if (nonempty(pl)) {
 		LinkNode n = lastnode(pl);
-		str2 = (char *) ncalloc(l1 + l2 + 1);
+		str2 = (char *) hcalloc(l1 + l2 + 1);
 		strcpy(str2, str3);
 		strcpy(str2 + l1, s);
 		setdata(node, str2);
@@ -196,7 +195,7 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 		l1 = 0;
 		l2 = strlen(s);
 	    }
-	    str2 = (char *) ncalloc(l1 + l2 + strlen(str) + 1);
+	    str2 = (char *) hcalloc(l1 + l2 + strlen(str) + 1);
 	    if (l1)
 		strcpy(str2, str3);
 	    strcpy(str2 + l1, s);
@@ -273,7 +272,7 @@ multsub(char **s, char ***a, int *isarr, char *sep)
 	return 0;
     }
     if ((l = countlinknodes(&foo))) {
-	p = r = ncalloc((l + 1) * sizeof(char*));
+	p = r = hcalloc((l + 1) * sizeof(char*));
 	while (nonempty(&foo))
 	    *p++ = (char *)ugetnode(&foo);
 	*p = NULL;
@@ -283,7 +282,7 @@ multsub(char **s, char ***a, int *isarr, char *sep)
 	    mult_isarr = omi;
 	    return 0;
 	}
-	*s = sepjoin(r, NULL);
+	*s = sepjoin(r, NULL, 1);
 	mult_isarr = omi;
 	if (isarr)
 	    *isarr = 0;
@@ -433,7 +432,7 @@ strcatsub(char **d, char *pb, char *pe, char *src, int l, char *s, int glbsub,
 	if (glbsub)
 	    tokenize(dest);
     } else {
-	*d = dest = ncalloc(pl + l + (s ? strlen(s) : 0) + 1);
+	*d = dest = hcalloc(pl + l + (s ? strlen(s) : 0) + 1);
 	strncpy(dest, pb, pl);
 	dest += pl;
 	strcpy(dest, src);
@@ -1041,7 +1040,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	*s = 0;
 	if (multsub(&val, (aspar ? NULL : &aval), &isarr, NULL) && quoted) {
 	    isarr = -1;
-	    aval = alloc(sizeof(char *));
+	    aval = (char **) hcalloc(sizeof(char *));
 	    aspar = 0;
 	} else if (aspar)
 	    idbeg = val;
@@ -1167,7 +1166,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    else
 			while (iblank(*t))
 			    t++;
-		    val = (char *)ncalloc(fwidth + 1);
+		    val = (char *) hcalloc(fwidth + 1);
 		    val[fwidth] = '\0';
 		    if ((t0 = strlen(t)) > fwidth)
 			t0 = fwidth;
@@ -1186,7 +1185,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 				if (!*t || !idigit(*t))
 				    zero = 0;
 			    }
-			    t = (char *)ncalloc(fwidth + 1);
+			    t = (char *) hcalloc(fwidth + 1);
 			    memset(t, (((v->pm->flags & PM_RIGHT_B) || !zero) ?
 				       ' ' : '0'), fwidth);
 			    if ((t0 = strlen(val)) > fwidth)
@@ -1194,7 +1193,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			    strcpy(t + (fwidth - t0), val);
 			    val = t;
 			} else {
-			    t = (char *)ncalloc(fwidth + 1);
+			    t = (char *) hcalloc(fwidth + 1);
 			    t[fwidth] = '\0';
 			    strncpy(t, val + strlen(val) - fwidth, fwidth);
 			    val = t;
@@ -1226,7 +1225,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if (nojoin)
 	    isarr = -1;
 	if (qt && !getlen && isarr > 0) {
-	    val = sepjoin(aval, sep);
+	    val = sepjoin(aval, sep, 1);
 	    isarr = 0;
 	}
     }
@@ -1376,7 +1375,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (arrasg) {
 		    char *arr[2], **t, **a, **p;
 		    if (spsep || spbreak) {
-			aval = sepsplit(val, spsep, 0);
+			aval = sepsplit(val, spsep, 0, 1);
 			isarr = 2;
 			sep = spsep = NULL;
 			spbreak = 0;
@@ -1501,7 +1500,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		else {
 		    char *ss;
 		    char **ap = aval;
-		    char **pp = aval = (char **)ncalloc(sizeof(char *) * (arrlen(aval) + 1));
+		    char **pp = aval = (char **) hcalloc(sizeof(char *) *
+							 (arrlen(aval) + 1));
 
 		    while ((*pp = *ap++)) {
 			ss = s;
@@ -1575,9 +1575,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * It means that we must join arrays and should not split words. */
     if (ssub || spbreak || spsep || sep) {
 	if (isarr)
-	    val = sepjoin(aval, sep), isarr = 0;
+	    val = sepjoin(aval, sep, 1), isarr = 0;
 	if (!ssub && (spbreak || spsep)) {
-	    aval = sepsplit(val, spsep, 0);
+	    aval = sepsplit(val, spsep, 0, 1);
 	    if (!aval || !aval[0])
 		val = dupstring("");
 	    else if (!aval[1])
@@ -1755,7 +1755,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (aptr > (char *) getdata(n) &&
 		aptr[-1] == Dnull && *fstr == Dnull)
 		*--aptr = '\0', fstr++;
-	    y = (char *)ncalloc((aptr - ostr) + strlen(fstr) + 1);
+	    y = (char *) hcalloc((aptr - ostr) + strlen(fstr) + 1);
 	    strcpy(y, ostr);
 	    *str = y + (aptr - ostr);
 	    strcpy(*str, fstr);
@@ -1910,8 +1910,8 @@ arithsubst(char *a, char **bptr, char *rest)
 	b = convfloat(v.u.d, 0, 0, NULL);
     else
 	convbase(buf, v.u.l, 0);
-    t = *bptr = (char *)ncalloc(strlen(*bptr) + strlen(b) + 
-				strlen(rest) + 1);
+    t = *bptr = (char *) hcalloc(strlen(*bptr) + strlen(b) + 
+				 strlen(rest) + 1);
     t--;
     while ((*++t = *s++));
     t--;

@@ -296,7 +296,7 @@ insert(char *s, int checked)
 	if (gf_listtypes || S_ISDIR(mode)) {
 	    int ll = strlen(s);
 
-	    news = (char *)ncalloc(ll + 2);
+	    news = (char *) hcalloc(ll + 2);
 	    strcpy(news, s);
 	    news[ll] = file_type(mode);
 	    news[ll + 1] = '\0';
@@ -625,7 +625,7 @@ parsecomplist(char *instr)
 	instr += (3 + follow);
 
 	/* Now get the next path component if there is one. */
-	l1 = (Complist) alloc(sizeof *l1);
+	l1 = (Complist) zhalloc(sizeof *l1);
 	if ((l1->next = parsecomplist(instr)) == NULL) {
 	    errflag = 1;
 	    return NULL;
@@ -650,7 +650,7 @@ parsecomplist(char *instr)
 		pdflag = 1;
 		instr++;
 	    }
-	    l1 = (Complist) alloc(sizeof *l1);
+	    l1 = (Complist) zhalloc(sizeof *l1);
 	    l1->pat = p1;
 	    l1->closure = 1 + pdflag;
 	    l1->follow = 0;
@@ -665,7 +665,7 @@ parsecomplist(char *instr)
 	if (*instr == '/' || !*instr) {
 	    int ef = *instr == '/';
 
-	    l1 = (Complist) alloc(sizeof *l1);
+	    l1 = (Complist) zhalloc(sizeof *l1);
 	    l1->pat = p1;
 	    l1->closure = 0;
 	    l1->next = ef ? parsecomplist(instr+1) : NULL;
@@ -885,7 +885,6 @@ glob(LinkList list, LinkNode np, int nountok)
 				        /* return */
     struct globdata saved;		/* saved glob state              */
 
-    MUSTUSEHEAP("glob");
     if (unset(GLOBOPT) || !haswilds(ostr)) {
 	if (!nountok)
 	    untokenize(ostr);
@@ -1611,7 +1610,7 @@ xpandredir(struct redir *fn, LinkList tab)
 	while ((nam = (char *)ugetnode(&fake))) {
 	    /* Loop over matches, duplicating the *
 	     * redirection for each file found.   */
-	    ff = (struct redir *)alloc(sizeof *ff);
+	    ff = (struct redir *) zhalloc(sizeof *ff);
 	    *ff = *fn;
 	    ff->name = nam;
 	    addlinknode(tab, ff);
@@ -1755,12 +1754,12 @@ xpandbraces(LinkList list, LinkNode *np)
 	    if (*p) {
 		c1 = p - ccl;
 		if (imeta(c1)) {
-		    str = ncalloc(len + 1);
+		    str = hcalloc(len + 1);
 		    str[pl] = Meta;
 		    str[pl+1] = c1 ^ 32;
 		    strcpy(str + pl + 2, str2);
 		} else {
-		    str = ncalloc(len);
+		    str = hcalloc(len);
 		    str[pl] = c1;
 		    strcpy(str + pl + 1, str2);
 		}
@@ -1791,7 +1790,7 @@ xpandbraces(LinkList list, LinkNode *np)
 	}
 	/* Concatenate the string before the braces (str3), the section *
 	 * just found (str4) and the text after the braces (str2)       */
-	zz = (char *)ncalloc(prev + (str - str4) + strlen(str2) + 1);
+	zz = (char *) hcalloc(prev + (str - str4) + strlen(str2) + 1);
 	ztrncpy(zz, str3, prev);
 	strncat(zz, str4, str - str4);
 	strcat(zz, str2);
@@ -1894,7 +1893,7 @@ get_match_ret(char *s, int b, int e, int fl, char *replstr)
     if (bl)
 	buf[bl - 1] = '\0';
 
-    rr = r = (char *)ncalloc(ll);
+    rr = r = (char *) hcalloc(ll);
 
     if (fl & SUB_MATCH) {
 	/* copy matched portion to new buffer */
@@ -1978,7 +1977,7 @@ compgetmatch(char *pat, int *flp, char **replstrp)
  * This is called from paramsubst to get the match for ${foo#bar} etc.
  * fl is a set of the SUB_* flags defined in zsh.h
  * *sp points to the string we have to modify. The n'th match will be
- * returned in *sp. ncalloc is used to get memory for the result string.
+ * returned in *sp. The heap is used to get memory for the result string.
  * replstr is the replacement string from a ${.../orig/repl}, in
  * which case pat is the original.
  *
@@ -2009,7 +2008,7 @@ getmatcharr(char ***ap, char *pat, int fl, int n, char *replstr)
     if (!(p = compgetmatch(pat, &fl, &replstr)))
 	return;
 
-    *ap = pp = ncalloc(sizeof(char *) * (arrlen(arr) + 1));
+    *ap = pp = hcalloc(sizeof(char *) * (arrlen(arr) + 1));
     while ((*pp = *arr++))
 	if (igetmatch(pp, p, fl, n, replstr))
 	    pp++;
@@ -2022,7 +2021,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
     char *s = *sp, *t, sav;
     int i, l = strlen(*sp), ml = ztrlen(*sp), matched = 1;
 
-    MUSTUSEHEAP("igetmatch");	/* presumably covered by prefork() test */
     repllist = NULL;
 
     /* perform must-match test for complex closures */

@@ -115,9 +115,7 @@ setstypat(Style s, char *pat, Patprog prog, char **vals)
 
 	    if (p->vals)
 		freearray(p->vals);
-	    PERMALLOC {
-		p->vals = arrdup(vals);
-	    } LASTALLOC;
+	    p->vals = zarrdup(vals);
 
 	    return;
 	}
@@ -127,9 +125,7 @@ setstypat(Style s, char *pat, Patprog prog, char **vals)
     p = (Stypat) zalloc(sizeof(*p));
     p->pat = ztrdup(pat);
     p->prog = prog;
-    PERMALLOC {
-	p->vals = arrdup(vals);
-    } LASTALLOC;
+    p->vals = zarrdup(vals);
     p->next = NULL;
 
     /* Calculate the weight. */
@@ -353,9 +349,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	    int val;
 
 	    if ((s = lookupstyle(args[1], args[2])) && s->vals[0]) {
-		PERMALLOC {
-		    ret = sepjoin(s->vals, (args[4] ? args[4] : " "));
-		} LASTALLOC;
+		ret = sepjoin(s->vals, (args[4] ? args[4] : " "), 0);
 		val = 0;
 	    } else {
 		ret = ztrdup("");
@@ -397,16 +391,12 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	    int val;
 
 	    if ((s = lookupstyle(args[1], args[2]))) {
-		PERMALLOC {
-		    ret = arrdup(s->vals);
-		} LASTALLOC;
+		ret = zarrdup(s->vals);
 		val = 0;
 	    } else {
 		char *dummy = NULL;
 
-		PERMALLOC {
-		    ret = arrdup(&dummy);
-		} LASTALLOC;
+		ret = zarrdup(&dummy);
 		val = 1;
 	    }
 	    if (args[0][1] == 'a')
@@ -697,14 +687,12 @@ savematch(MatchData *m)
 {
     char **a;
 
-    PERMALLOC {
-	a = getaparam("match");
-	m->match = a ? arrdup(a) : NULL;
-	a = getaparam("mbegin");
-	m->mbegin = a ? arrdup(a) : NULL;
-	a = getaparam("mend");
-	m->mend = a ? arrdup(a) : NULL;
-    } LASTALLOC;
+    a = getaparam("match");
+    m->match = a ? zarrdup(a) : NULL;
+    a = getaparam("mbegin");
+    m->mbegin = a ? zarrdup(a) : NULL;
+    a = getaparam("mend");
+    m->mend = a ? zarrdup(a) : NULL;
 }
 
 static void
@@ -770,7 +758,7 @@ connectstates(LinkList out, LinkList in)
 
 	for (innode = firstnode(in); innode; innode = nextnode(innode)) {
 	    RParseBranch *inbranch = getdata(innode);
-	    RParseBranch *br = ncalloc(sizeof(*br));
+	    RParseBranch *br = hcalloc(sizeof(*br));
 
 	    br->state = inbranch->state;
 	    br->actions = newlinklist();
@@ -804,7 +792,7 @@ rparseelt(RParseResult *result, jmp_buf *perr)
 	      (3 <= l && s[l - 2] == '/' && (s[l - 1] == '+' ||
 					     s[l - 1] == '-'))))
 	    return 1;
-	st = ncalloc(sizeof(*st));
+	st = hcalloc(sizeof(*st));
 	st->branches = newlinklist();
 	st->cutoff = s[l - 1];
 	if (s[l - 1] == '/') {
@@ -830,7 +818,7 @@ rparseelt(RParseResult *result, jmp_buf *perr)
 	    int l = patternlen + 12; /* (#b)((#B)...)...* */
 	    if(lookahead)
 	        l += lookaheadlen + 4; /* (#B)... */
-	    cp = st->pattern = ncalloc(l);
+	    cp = st->pattern = hcalloc(l);
 	    strcpy(cp, "(#b)((#B)");
 	    cp += 9;
 	    strcpy(cp, pattern);
@@ -849,7 +837,7 @@ rparseelt(RParseResult *result, jmp_buf *perr)
 	if ((s = *rparseargs) && *s == '-') {
 	    rparseargs++;
 	    l = strlen(s);
-	    st->guard = ncalloc(l);
+	    st->guard = hcalloc(l);
 	    memcpy(st->guard, s + 1, l - 1);
 	    st->guard[l - 1] = '\0';
 	} else
@@ -857,19 +845,19 @@ rparseelt(RParseResult *result, jmp_buf *perr)
 	if ((s = *rparseargs) && *s == ':') {
 	    rparseargs++;
 	    l = strlen(s);
-	    st->action = ncalloc(l);
+	    st->action = hcalloc(l);
 	    memcpy(st->action, s + 1, l - 1);
 	    st->action[l - 1] = '\0';
 	} else
 	    st->action = NULL;
 	result->nullacts = NULL;
 	result->in = newlinklist();
-	br = ncalloc(sizeof(*br));
+	br = hcalloc(sizeof(*br));
 	br->state = st;
 	br->actions = newlinklist();
 	addlinknode(result->in, br);
 	result->out = newlinklist();
-	br = ncalloc(sizeof(*br));
+	br = hcalloc(sizeof(*br));
 	br->state = st;
 	br->actions = newlinklist();
 	addlinknode(result->out, br);
@@ -948,7 +936,7 @@ rparseseq(RParseResult *result, jmp_buf *perr)
 
     while (1) {
 	if ((s = *rparseargs) && s[0] == '{' && s[(l = strlen(s)) - 1] == '}') {
-	    char *action = ncalloc(l - 1);
+	    char *action = hcalloc(l - 1);
 	    LinkNode ln;
 
 	    rparseargs++;
@@ -1136,22 +1124,21 @@ bin_zregexparse(char *nam, char **args, char *ops, int func)
     opts[EXTENDEDGLOB] = 1;
 
     rparseargs = args + 3;
-    HEAPALLOC {
-	pushheap();
-        rparsestates = newlinklist();
-	if (setjmp(rparseerr) || rparsealt(&result, &rparseerr) || *rparseargs) {
-	    if (*rparseargs)
-		zwarnnam(nam, "invalid regex : %s", *rparseargs, 0);
-	    else
-		zwarnnam(nam, "not enough regex arguments", NULL, 0);
-	    ret = 3;
-	} else
-	    ret = 0;
 
-	if (!ret)
-	    ret = rmatch(&result, subj, var1, var2, ops['c']);
-        popheap();
-    } LASTALLOC;
+    pushheap();
+    rparsestates = newlinklist();
+    if (setjmp(rparseerr) || rparsealt(&result, &rparseerr) || *rparseargs) {
+	if (*rparseargs)
+	    zwarnnam(nam, "invalid regex : %s", *rparseargs, 0);
+	else
+	    zwarnnam(nam, "not enough regex arguments", NULL, 0);
+	ret = 3;
+    } else
+	ret = 0;
+
+    if (!ret)
+	ret = rmatch(&result, subj, var1, var2, ops['c']);
+    popheap();
 
     opts[EXTENDEDGLOB] = oldextendedglob;
     return ret;
@@ -1511,10 +1498,7 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 	sethparam(assoc, aval);
     }
     if (del) {
-	PERMALLOC {
-	    pp = arrdup(pp);
-	} LASTALLOC;
-
+	pp = zarrdup(pp);
 	freearray(pparams);
 	pparams = pp;
     }

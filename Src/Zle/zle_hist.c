@@ -252,7 +252,7 @@ acceptlineanddownhistory(char **args)
 
     if (!(he = movehistent(quietgethist(histline), 1, HIST_FOREIGN)))
 	return 1;
-    pushnode(bufstack, ztrdup(ZLETEXT(he)));
+    zpushnode(bufstack, ztrdup(ZLETEXT(he)));
     done = 1;
     stackhist = he->histnum;
     return 0;
@@ -506,9 +506,9 @@ pushline(char **args)
 
     if (n < 0)
 	return 1;
-    pushnode(bufstack, metafy((char *) line, ll, META_DUP));
+    zpushnode(bufstack, metafy((char *) line, ll, META_DUP));
     while (--n)
-	pushnode(bufstack, ztrdup(""));
+	zpushnode(bufstack, ztrdup(""));
     stackcs = cs;
     *line = '\0';
     ll = cs = 0;
@@ -902,7 +902,7 @@ acceptandinfernexthistory(char **args)
 	 he; he = movehistent(he, -1, HIST_FOREIGN)) {
 	if (!metadiffer(ZLETEXT(he), (char *) line, ll)) {
 	    he = movehistent(he, 1, HIST_FOREIGN);
-	    pushnode(bufstack, ztrdup(ZLETEXT(he)));
+	    zpushnode(bufstack, ztrdup(ZLETEXT(he)));
 	    stackhist = he->histnum;
 	    return 0;
 	}
