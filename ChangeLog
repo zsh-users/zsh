@@ -1,3 +1,11 @@
+2002-08-19  Oliver Kiddle  <opk@zsh.org>
+
+	* users/5260 (Bill Burton), users/5266: Completion/Unix/Command/_ant:
+	with the call-command style parse ant -projecthelp to get targets
+
+	* unposted: Completion/X/Command/_nedit, Completion/Unix/Command/_mail:
+	nedit 5.3 adds a -version option and complete for nail with _mail
+
 2002-08-18  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
 	* 17562: Completion/Unix/Command/_valgrind: Function for
