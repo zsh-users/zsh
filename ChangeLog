@@ -1,3 +1,9 @@
+2002-07-30  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17489: Src/Zle/compresult.c: make sure invalidatelist() isn't
+	called hwen we are inside menu selection and there's only one
+	match left
+
 2002-07-29  Peter Stephenson  <pws@csr.com>
 
 	* 17488: Src/builtin.c: TYPESET_SILENT part of 17334 used

@@ -813,7 +813,7 @@ do_ambiguous(void)
 	 * want to enter an AUTO_MENU imediately.                          */
 	if ((uselist == 3 ||
 	     (!uselist && isset(BASHAUTOLIST) && isset(LISTAMBIGUOUS))) &&
-	    la) {
+	    la && iforcemenu != -1) {
 	    int fc = fromcomp;
 
 	    invalidatelist();
