@@ -68,14 +68,14 @@ Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
 
 transform = @program_transform_name@
 
-all: $(MAN) zsh.texi zsh.info ../META-FAQ
+all: $(MAN) zsh.texi ../META-FAQ
 
 everything: all zsh.dvi zsh_us.ps zsh_a4.ps zsh_toc.html
 
 zsh.dvi: zsh.texi
 	$(TEXI2DVI) zsh.texi
 
-zsh.texi.in: $(sdir)/zsh.yo
+$(sdir)/zsh.texi.in: $(sdir)/zsh.yo
 	$(YODL) -o $(sdir)/zsh.texi.in -I$(sdir) -w ztexi.yo version.yo zsh.yo
 
 zsh.texi: zsh.texi.in
