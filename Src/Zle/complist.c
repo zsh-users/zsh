@@ -745,7 +745,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	}
 	zcoff();
 	if (!lastc) {
-	    zcputs(&mcolors, g->name, COL_NO);
+	    zcputs(&mcolors, g->name, COL_SP);
 	    fputs("  ", shout);
 	    zcoff();
 	}
