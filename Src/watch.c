@@ -103,6 +103,9 @@
 # ifdef HAVE_STRUCT_UTMPX_UT_HOST
 #  define WATCH_UTMP_UT_HOST 1
 # endif
+# ifdef __APPLE__
+#  define ut_name ut_user
+# endif
 #endif
 
 #if !defined(WATCH_STRUCT_UTMP) && defined(HAVE_STRUCT_UTMP) && defined(REAL_UTMP_FILE)
@@ -491,8 +494,6 @@ dowatch(void)
     int uct, wct;
 
     s = watch;
-    if (!(fmt = getsparam("WATCHFMT")))
-	fmt = DEFAULT_WATCHFMT;
 
     holdintr();
     if (!wtab) {
@@ -542,6 +543,9 @@ dowatch(void)
 	free(utab);
 	return;
     }
+    queue_signals();
+    if (!(fmt = getsparam("WATCHFMT")))
+	fmt = DEFAULT_WATCHFMT;
     while ((uct || wct) && !errflag)
 	if (!uct || (wct && ucmp(uptr, wptr) > 0))
 	    wct--, watchlog(0, wptr++, s, fmt);
@@ -549,6 +553,7 @@ dowatch(void)
 	    uct--, watchlog(1, uptr++, s, fmt);
 	else
 	    uptr++, wptr++, wct--, uct--;
+    unqueue_signals();
     free(wtab);
     wtab = utab;
     wtabsz = utabsz;
@@ -557,7 +562,7 @@ dowatch(void)
 
 /**/
 int
-bin_log(char *nam, char **argv, char *ops, int func)
+bin_log(UNUSED(char *nam), UNUSED(char **argv), UNUSED(Options ops), UNUSED(int func))
 {
     if (!watch)
 	return 1;
@@ -579,7 +584,7 @@ void dowatch(void)
 
 /**/
 int
-bin_log(char *nam, char **argv, char *ops, int func)
+bin_log(char *nam, char **argv, Options ops, int func)
 {
     return bin_notavail(nam, argv, ops, func);
 }

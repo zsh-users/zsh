@@ -242,7 +242,7 @@ printulimit(char *nam, int lim, int hard, int head)
 # endif /* HAVE_RLIMIT_MEMLOCK */
 /* If RLIMIT_VMEM and RLIMIT_RSS are defined and equal, avoid *
  * duplicate case statement.  Observed on QNX Neutrino 6.1.0. */
-# if defined(HAVE_RLIMIT_RSS) && !defined(RLIMIT_VMEM_IS_RSS)
+# if defined(HAVE_RLIMIT_RSS) && !defined(RLIMIT_VMEM_IS_RSS) && !defined(RLIMIT_RSS_IS_AS)
     case RLIMIT_RSS:
 	if (head)
 	    printf("-m: resident set size (kbytes) ");
@@ -834,7 +834,7 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    case RLIMIT_VMEM:
 # endif /* HAVE_RLIMIT_VMEM */
 /* ditto RLIMIT_VMEM and RLIMIT_AS */
-# if defined(HAVE_RLIMIT_AS) && !defined(RLIMIT_VMEM_IS_AS)
+# if defined(HAVE_RLIMIT_AS) && !defined(RLIMIT_VMEM_IS_AS) && !defined(RLIMIT_RSS_IS_AS)
 	    case RLIMIT_AS:
 # endif /* HAVE_RLIMIT_AS */
 # ifdef HAVE_RLIMIT_AIO_MEM
