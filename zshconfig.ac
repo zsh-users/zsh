@@ -289,7 +289,7 @@ fi
 dnl if the user hasn't specified CFLAGS, then
 dnl   if compiler is gcc, then use -O2 and some warning flags
 dnl   else use -O
-if test -n "$auto_cflags"; then
+if test -n "$auto_cflags" && test ."$ansi2knr" != .yes; then
   if test "${enable_zsh_debug}" = yes; then
     if test -n "$GCC"; then
       CFLAGS="$CFLAGS -Wall -Wno-implicit -Wmissing-prototypes -ggdb"
@@ -462,6 +462,17 @@ AC_PROG_INSTALL             dnl Check for BSD compatible `install'
 AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
 AC_PROG_LN                  dnl Check for working ln, for "make install"
 AC_CHECK_PROGS([YODL], [yodl], [: yodl])
+AC_CHECK_PROGS([ANSI2KNR], [ansi2knr], [: ansi2knr])
+
+if test x"$ansi2knr" = xyes && test x"$ANSI2KNR" = x": ansi2knr"; then
+    echo "----------"
+    echo "configure fatal error:"
+    echo "ansi2knr was specified (--enable-ansi2knr) but the program could not be found."
+    echo "Either remove the configure option if it is not required or build the ansi2knr"
+    echo "program before reconfiguring Zsh.  The source code for ansi2knr is also"
+    echo "available in the GPL directory on Zsh distribution sites."
+    exit 1
+fi
 
 dnl ------------------
 dnl CHECK HEADER FILES

@@ -39,7 +39,7 @@ sdir_top        = @top_srcdir@
 INSTALL         = @INSTALL@
 
 @DEFS_MK@
-	
+
 sdir_src      = $(sdir_top)/Src
 dir_src       = $(dir_top)/Src
 
@@ -65,7 +65,7 @@ ANSI_OBJ=._foo_
 	@rm -f $(dir_src)/stamp-modobjs
 
 .c$(KNR@U@OBJ):
-	$(dir_src)/ansi2knr $< > $@.c
+	@ANSI2KNR@ $< > $@.c
 	$(COMPILE) -o $@ $@.c
 	rm -f $@.c
 	@rm -f $(dir_src)/stamp-modobjs
@@ -74,7 +74,7 @@ ANSI_OBJ=._foo_
 	$(DLCOMPILE) -o $@ $<
 
 .c.$(KNR@U@OBJ):
-	$(dir_src)/ansi2knr $< > $@.c
+	@ANSI2KNR@ $< > $@.c
 	$(DLCOMPILE) -o $@ $@.c
 	rm -f $@.c
 
@@ -82,8 +82,10 @@ ANSI_OBJ=._foo_
 	$(AWK) -f $(sdir_src)/makepro.awk $< $(subdir) > $@
 
 .syms.epro:
-	sed -n '/^E/{s/^E//;p;}' < $< > $@
-	sed -n '/^L/{s/^L//;p;}' < $< > `echo $@ | sed 's/\.epro$$/.pro/'`
+	(echo '/* Generated automatically */'; sed -n '/^E/{s/^E//;p;}' < $<) \
+		> $@
+	(echo '/* Generated automatically */'; sed -n '/^L/{s/^L//;p;}' < $<) \
+		> `echo $@ | sed 's/\.epro$$/.pro/'`
 
 PROTODEPS = $(sdir_src)/makepro.awk
 
@@ -175,7 +177,8 @@ $(makefile): $(makefile).in $(dir_top)/config.status
 	cd $(dir_top) && \
 	    $(SHELL) $$top_srcdir/Src/mkmakemod.sh -m $(subdir) $(makefile)
 
-$(makefile).in: $(sdir_src)/mkmakemod.sh $(sdir_src)/Makemod.in.in $(MDDS) $(dir_src)/modules-bltin
+$(makefile).in: $(sdir_src)/mkmakemod.sh $(sdir_src)/Makemod.in.in $(MDDS) \
+	$(dir_top)/config.modules
 	@case $(sdir_top) in \
 	    /*) top_srcdir=$(sdir_top) ;; \
 	    *) top_srcdir=$(subdir)/$(sdir_top) ;; \
@@ -186,5 +189,3 @@ $(makefile).in: $(sdir_src)/mkmakemod.sh $(sdir_src)/Makemod.in.in $(MDDS) $(dir
 	cd $(dir_top) && \
 	    $(SHELL) $$top_srcdir/Src/mkmakemod.sh -i $(subdir) $(makefile)
 
-$(dir_src)/modules-bltin:
-	@cd $(dir_src) && $(MAKE) $(MAKEDEFS) modules-bltin
