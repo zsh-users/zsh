@@ -1,5 +1,15 @@
 2002-08-05  Oliver Kiddle  <opk@zsh.org>
 
+	* 17503: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo,
+	Doc/Zsh/expn.yo, Doc/Zsh/files.yo, Doc/Zsh/params.yo, Doc/Zsh/zle.yo:
+	fix various typos, spelling mistakes and poor wordings in docs
+
+	* 17503: Src/builtin.c, Src/compat.c, Src/exec.c, Src/glob.c,
+	Src/hashtable.c, Src/init.c, Src/lex.c, Src/math.c, Src/mem.c,
+	Src/module.c, Src/params.c, Src/parse.c, Src/pattern.c,
+	Src/prompt.c, Src/utils.c, Src/zsh.h: fix various typos
+	and spelling mistakes in source code comments
+
 	* Akinori Musha: 17499: Completion/BSD/Command/_bsd_pkg: BSD pkg_*
 	tools now support bzip2'd packages
 
