@@ -121,7 +121,7 @@ while true; do
 	  tmp2=( "${(@M)matches:#${tmp1[1]}${sep}*}" )
 
 	  if (( $#tmp2 )); then
-	    compadd "$group[@]" "$expl[@]" -p "$pref" -qS "$sep" "$opts[@]" \
+	    compadd "$group[@]" "$expl[@]" -p "$pref" -r "$sep" -S "$sep" "$opts[@]" \
                     -M "r:|${sep}=* r:|=* $match" - "$tmp1[1]"
           else
 	    compadd "$group[@]" "$expl[@]" -p "$pref" "$sopts[@]" \
@@ -162,9 +162,9 @@ while true; do
         fi
         for i in "${(@M)matches:#(${(j:|:)~tmp1})*}"; do
 	  if [[ "$i" = *${sep}* ]]; then
-            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+            compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
 	            -p "$pref" \
-                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}${sep}"
+                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}"
           else
             compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
                     -M "r:|${sep}=* r:|=* $match" - "$i"
@@ -177,9 +177,9 @@ while true; do
 
         for i in "${(@M)matches:#(${(j:|:)~tmp1})*}"; do
 	  if [[ "$i" = *${sep}* ]]; then
-            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+            compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
 	            -p "$pref" -s "${i#*${sep}}" \
-                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}${sep}"
+                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}"
           else
             compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
                     -M "r:|${sep}=* r:|=* $match" - "$i"
