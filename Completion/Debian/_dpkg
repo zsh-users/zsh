@@ -1,0 +1,42 @@
+#compdef dpkg
+
+_arguments -s '(--install)-i[install packages]:Debian package:_files -g \*.deb' \
+           '--unpack[unpack package]:Debian package:_files -g \*.deb' \
+           '(--record-avail)-A[record available]:package file:_files' \
+           '--configure:package:_deb_packages installed' \
+           '(--remove)-r[remove package]:package:_deb_packages installed' \
+           '(--purge)-P[purge package]:package:_deb_packages installed' \
+           '--get-selections[get selections]:pattern:' \
+           '--set-selections[set selections]' \
+           '--update-avail[update available]:package file:_files' \
+           '--merge-avail[merge available]:package file:_files' \
+           '--clear-avail[clear available]' \
+           '--forget-old-avail[forget uninstalled unavailable]' \
+           '(--status)-s[display package status]:packages:_deb_packages avail' \
+           '(--print-avail)-p[display available details]:packages:_deb_packages avail' \
+           '(--listfiles)-L[list owned files]:packages:_deb_packages installed' \
+           '(--list)-l[list packages]:packages:_deb_packages avail' \
+           '(--search)-S[search for file owner]:pattern:' \
+           '(--audit)-C[check for broken pkgs]' \
+           '--abort-after[abort after errors]:number of errors:' \
+           '--print-architecture[print target architecture]' \
+           '--print-gnu-build-architecture[print GNU version of target architecture]' \
+           '--print-installation-architecture[print host architecture]' \
+           '--compare-versions[compare version numbers]:expression:' \
+           '--help[show help]' \
+           '--version[show version]' \
+           '--licence[show licensing]' \
+           '--admindir=[data directory]:directory:_files -/' \
+           '--root=[alternative root]:root:_files -/' \
+           '--instdir=[change inst root but not data dir]:_files -/' \
+           '(--selected-only)-O[skip unselected packages]' \
+           '(--skip-same-version)-E[skip packages with same version as installed]' \
+           '(--refuse-downgrade)-G[skip packages with earlier version than installed]' \
+           '(--auto-deconfigure)-B[install can break other packages]' \
+           '--largemem[optimize for >4Mb RAM]' \
+           '--smallmem[optimize for <4Mb RAM]' \
+           '--no-act[show potential actions but do not follow through]' \
+           '-D+[debug options]:debug options:(h 1 2 3)' \
+           '--debug=[debug options]:debug options:(help 1 2 3)' \
+           '--ignore-depends=[ignore depends involving package]:package:_deb_packages avail' \
+           --{force,refuse,no-force}'--[forcing options]:what:(auto-select downgrade configure-any hold bad-path not-root overwrite overwrite-diverted depends-version depends confnew confold confdef confmiss conflicts architecture overwrite-dir remove-reinstreq remove-essential)'
