@@ -556,11 +556,15 @@ possible to perform nested operations:  tt(${${foo#head}%tail})
 substitutes the value of tt($foo) with both `tt(head)' and `tt(tail)'
 deleted.  The form with tt($LPAR())...tt(RPAR()) is often useful in
 combination with the flags described next; see the examples below.
+Each var(name) or nested tt(${)...tt(}) in a parameter expansion may
+also be followed by a subscript expression as described in
+ifzman(em(Array Parameters) in zmanref(zshparam))\
+ifnzman(noderef(Array Parameters)).
 
-Note that double quotes may appear around nested substitutions, in which
+Note that double quotes may appear around nested expressions, in which
 case only the part inside is treated as quoted; for example,
 tt(${(f)"$(foo)"}) quotes the result of tt($(foo)), but the flag `tt((f))'
-(see below) is applied using the rules for unquoted substitutions.  Note
+(see below) is applied using the rules for unquoted expansions.  Note
 further that quotes are themselves nested in this context; for example, in
 tt("${(@f)"$(foo)"}"), there are two sets of quotes, one surrounding the
 whole expression, the other (redundant) surrounding the tt($(foo)) as
@@ -579,19 +583,19 @@ in place of the colon as delimiters.  The following flags are supported:
 
 startitem()
 item(tt(A))(
-Create an array parameter with tt(${)...tt(=)...tt(}),
-tt(${)...tt(:=)...tt(}) or tt(${)...tt(::=)...tt(}).
-If this flag is repeated (as in tt(AA)), create an associative
+Create an array parameter with `tt(${)...tt(=)...tt(})',
+`tt(${)...tt(:=)...tt(})' or `tt(${)...tt(::=)...tt(})'.
+If this flag is repeated (as in `tt(AA)'), create an associative
 array parameter.  Assignment is made before sorting or padding.
 The var(name) part may be a subscripted range for ordinary
 arrays; the var(word) part em(must) be converted to an array, for
-example by using tt(${(AA)=)var(name)tt(=)...tt(}) to activate word
+example by using `tt(${(AA)=)var(name)tt(=)...tt(})' to activate word
 splitting, when creating an associative array.
 )
 item(tt(@))(
 In double quotes, array elements are put into separate words.
-E.g., tt("${(@)foo}") is equivalent to tt("${foo[@]}") and
-tt("${(@)foo[1,2]}") is the same as tt("$foo[1]" "$foo[2]").
+E.g., `tt("${(@)foo}")' is equivalent to `tt("${foo[@]}")' and
+`tt("${(@)foo[1,2]}")' is the same as `tt("$foo[1]" "$foo[2]")'.
 )
 item(tt(e))(
 Perform em(parameter expansion), em(command substitution) and

@@ -1,3 +1,9 @@
+2001-04-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14066: Doc/Zsh/expn.yo, Doc/Zsh/params.yo, Src/params.c,
+	Test/D06subscript.ztst: Document subscript usage; fix minor bug in
+	(kK) subscript flags, and add a test for it.
+
 2001-04-22  Clint Adams  <schizo@debian.org>
 
 	* 14065: Src/params.c, Src/Modules/termcap.c,

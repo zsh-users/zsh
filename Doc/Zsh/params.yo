@@ -8,19 +8,26 @@ characters and underscores, or the single characters
 `tt(*)', `tt(@)', `tt(#)', `tt(?)', `tt(-)', `tt($)', or `tt(!)'.
 The value may be a em(scalar) (a string),
 an integer, an array (indexed numerically), or an em(associative)
-array (an unordered set of name-value pairs, indexed by name).
-To assign a scalar or integer value to a parameter,
-use the tt(typeset) builtin.
+array (an unordered set of name-value pairs, indexed by name).  To declare
+the type of a parameter, or to assign a scalar or integer value to a
+parameter, use the tt(typeset) builtin.
 findex(typeset, use of)
-To assign an array value, use `tt(set -A) var(name) var(value) ...'.
-findex(set, use of)
-The value of a parameter may also be assigned by writing:
+
+The value of a scalar or integer parameter may also be assigned by
+writing:
+cindex(assignment)
 
 indent(var(name)tt(=)var(value))
 
 If the integer attribute, tt(-i), is set for var(name), the var(value)
 is subject to arithmetic evaluation.  See noderef(Array Parameters)
 for additional forms of assignment.
+
+To refer to the value of a parameter, write `tt($)var(name)' or
+`tt(${)var(name)tt(})'.  See
+ifzman(em(Parameter Expansion) in zmanref(zshexpn))\
+ifnzman(noderef(Parameter Expansion))
+for complete details.
 
 In the parameter lists that follow, the mark `<S>' indicates that the
 parameter is special.
@@ -36,40 +43,74 @@ menu(Parameters Used By The Shell)
 endmenu()
 texinode(Array Parameters)(Positional Parameters)()(Parameters)
 sect(Array Parameters)
-The value of an array parameter may be assigned by writing:
+To assign an array value, write one of:
+findex(set, use of)
+cindex(array assignment)
 
+indent(tt(set -A) var(name) var(value) ...)
 indent(var(name)tt(=LPAR())var(value) ...tt(RPAR()))
 
 If no parameter var(name) exists, an ordinary array parameter is created.
-Associative arrays must be declared first, by `tt(typeset -A) var(name)'.
-When var(name) refers to an associative array, the parenthesized list is
-interpreted as alternating keys and values:
+If the parameter var(name) exists and is a scalar, it is replaced by a new
+array.  Ordinary array parameters may also be explicitly declared with:
+findex(typeset, use of)
 
+indent(tt(typeset -a) var(name))
+
+Associative arrays em(must) be declared before assignment, by using:
+
+indent(tt(typeset -A) var(name))
+
+When var(name) refers to an associative array, the list in an assignment
+is interpreted as alternating keys and values:
+
+indent(set -A var(name) var(key) var(value) ...)
 indent(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
 
-Every var(key) must have a var(value) in this case.  To create an empty
-array or associative array, use:
+Every var(key) must have a var(value) in this case.  Note that this
+assigns to the entire array, deleting any elements that do not appear
+in the list.
 
+To create an empty array (including associative arrays), use one of:
+
+indent(tt(set -A) var(name))
 indent(var(name)tt(=LPAR()RPAR()))
 
-Individual elements of an array may be selected using a
-subscript.  A subscript of the form `tt([)var(exp)tt(])'
-selects the single element var(exp), where var(exp) is
-an arithmetic expression which will be subject to arithmetic
-expansion as if it were surrounded by `tt($LPAR()LPAR())...tt(RPAR()RPAR())'.
-The elements are numbered beginning with 1 unless the
-tt(KSH_ARRAYS) option is set when they are numbered from zero.
+subsect(Array Subscripts)
 cindex(subscripts)
+
+Individual elements of an array may be selected using a subscript.  A
+subscript of the form `tt([)var(exp)tt(])' selects the single element
+var(exp), where var(exp) is an arithmetic expression which will be subject
+to arithmetic expansion as if it were surrounded by
+`tt($LPAR()LPAR())...tt(RPAR()RPAR())'.  The elements are numbered
+beginning with 1, unless the tt(KSH_ARRAYS) option is set in which case
+they are numbered from zero.
 pindex(KSH_ARRAYS, use of)
 
-The same subscripting syntax is used for associative arrays,
-except that no arithmetic expansion is applied to var(exp).
+Subscripts may be used inside braces used to delimit a parameter name, thus
+`tt(${foo[2]})' is equivalent to `tt($foo[2])'.  If the tt(KSH_ARRAYS)
+option is set, the braced form is the only one that works, as bracketed
+expressions otherwise are not treated as subscripts.
 
-A subscript of the form `tt([*])' or `tt([@])' evaluates to all
-elements of an array; there is no difference between the two
-except when they appear within double quotes.
-`tt("$foo[*]")' evaluates to `tt("$foo[1] $foo[2] )...tt(")', while
-`tt("$foo[@]")' evaluates to `tt("$foo[1]" "$foo[2]")', etc.
+The same subscripting syntax is used for associative arrays, except that
+no arithmetic expansion is applied to var(exp).  However, the parsing
+rules for arithmetic expressions still apply, which affects the way that
+certain special characters must be protected from interpretation.  See
+em(Subscript Parsing) below for details.
+
+A subscript of the form `tt([*])' or `tt([@])' evaluates to all elements
+of an array; there is no difference between the two except when they
+appear within double quotes.
+`tt("$foo[*]")' evaluates to `tt("$foo[1] $foo[2] )...tt(")', whereas
+`tt("$foo[@]")' evaluates to `tt("$foo[1]" "$foo[2]" )...'.  For
+associative arrays, `tt([*])' or `tt([@])' evaluate to all the values (not
+the keys, but see em(Subscript Flags) below), in no particular order.
+When an array parameter is referenced as `tt($)var(name)' (with no
+subscript) it evaluates to `tt($)var(name)tt([*])', unless the tt(KSH_ARRAYS)
+option is set in which case it evaluates to `tt(${)var(name)tt([0]})' (for
+an associative array, this means the value of the key `tt(0)', which may
+not exist even if there are values for other keys).
 
 A subscript of the form `tt([)var(exp1)tt(,)var(exp2)tt(])'
 selects all elements in the range var(exp1) to var(exp2),
@@ -85,26 +126,44 @@ case the subscripts specify a substring to be extracted.
 For example, if tt(FOO) is set to `tt(foobar)', then
 `tt(echo $FOO[2,5])' prints `tt(ooba)'.
 
-Subscripts may be used inside braces used to delimit a parameter name, thus
-`tt(${foo[2]})' is equivalent to `tt($foo[2])'.  If the tt(KSH_ARRAYS)
-option is set, the braced form is the only one that will
-work, the subscript otherwise not being treated specially.
+subsect(Array Element Assignment)
 
-If a subscript is used on the left side of an assignment the selected
-element or range is replaced by the expression on the right side.  An
-array (but not an associative array) may be created by assignment to a
-range or element.  Arrays do not nest, so assigning a parenthesized list
-of values to an element or range changes the number of elements in the
-array, shifting the other elements to accommodate the new values.  (This
-is not supported for associative arrays.)
+A subscript may be used on the left side of an assignment like so:
+
+indent(var(name)tt([)var(exp)tt(]=)var(value))
+
+In this form of assignment the element or range specified by var(exp)
+is replaced by the expression on the right side.  An array (but not an
+associative array) may be created by assignment to a range or element.
+Arrays do not nest, so assigning a parenthesized list of values to an
+element or range changes the number of elements in the array, shifting the
+other elements to accommodate the new values.  (This is not supported for
+associative arrays.)
+
+This syntax also works as an argument to the tt(typeset) command:
+
+indent(tt(typeset) tt(")var(name)tt([)var(exp)tt(]"=)var(value))
+
+The var(value) may em(not) be a parenthesized list in this case; only
+single-element assignments may be made with tt(typeset).  Note that quotes
+are necessary in this case to prevent the brackets from being interpreted
+as filename generation operators.  The tt(noglob) precommand modifier
+could be used instead.
 
 To delete an element of an ordinary array, assign `tt(LPAR()RPAR())' to
-that element.
-To delete an element of an associative array, use the tt(unset) command.
+that element.  To delete an element of an associative array, use the
+tt(unset) command:
 
-If the opening bracket or the comma is directly followed by an opening
-parentheses the string up to the matching closing one is considered to
-be a list of flags. The flags currently understood are:
+indent(tt(unset) tt(")var(name)tt([)var(exp)tt(]"))
+
+subsect(Subscript Flags)
+cindex(subscript flags)
+
+If the opening bracket, or the comma in a range, in any subscript
+expression is directly followed by an opening parenthesis, the string up
+to the matching closing one is considered to be a list of flags, as in
+`var(name)tt([LPAR())var(flags)tt(RPAR())var(exp)tt(])'.  The flags
+currently understood are:
 
 startitem()
 item(tt(w))(
@@ -126,54 +185,176 @@ subscripting work on lines instead of characters, i.e. with elements
 separated by newlines.  This is a shorthand for `tt(pws:\n:)'.
 )
 item(tt(r))(
-Reverse subscripting:  if this flag is given, the var(exp) is taken as a
-pattern and the  result is the first matching array element, substring or
-word (if the parameter is an array, if it is a scalar, or if it is a scalar
-and the `tt(w)' flag is given, respectively).  The subscript used is the
-number of the matching element, so that pairs of subscripts such as
-`tt($foo[(r))var(??)tt(,3])' and `tt($foo[(r))var(??)tt(,(r)f*])'
-are possible.  If the parameter is an associative array, only the value part
-of each pair is compared to the pattern.
+Reverse subscripting: if this flag is given, the var(exp) is taken as a
+pattern and the result is the first matching array element, substring or
+word (if the parameter is an array, if it is a scalar, or if it is a
+scalar and the `tt(w)' flag is given, respectively).  The subscript used
+is the number of the matching element, so that pairs of subscripts such as
+`tt($foo[(r))var(??)tt(,3])' and `tt($foo[(r))var(??)tt(,(r)f*])' are
+possible.  If the parameter is an associative array, only the value part
+of each pair is compared to the pattern, and the result is that value.
+Reverse subscripts may be used for assigning to ordinary array elements,
+but not for assigning to associative arrays.
 )
 item(tt(R))(
 Like `tt(r)', but gives the last match.  For associative arrays, gives
 all possible matches.
 )
-item(tt(k))(
-If used in a subscript on a parameter that is not an associative
-array, this behaves like `tt(r)', but if used on an association, it
-makes the keys be interpreted as patterns and returns the first value
-whose key matches the var(exp).
-)
-item(tt(K))(
-On an association this is like `tt(k)' but returns all values whose
-keys match the var(exp). On other types of parameters this has the
-same effect as `tt(R)'.
-)
 item(tt(i))(
-like `tt(r)', but gives the index of the match instead; this may not
-be combined with a second argument.  For associative arrays, the key
-part of each pair is compared to the pattern, and the first matching
-key found is used.
+Like `tt(r)', but gives the index of the match instead; this may not be
+combined with a second argument.  On the left side of an assignment,
+behaves like `tt(r)'.  For associative arrays, the key part of each pair
+is compared to the pattern, and the first matching key found is the
+result.
 )
 item(tt(I))(
-like `tt(i)', but gives the index of the last match, or all possible
+Like `tt(i)', but gives the index of the last match, or all possible
 matching keys in an associative array.
 )
+item(tt(k))(
+If used in a subscript on an associative array, this flag causes the keys
+to be interpreted as patterns, and returns the value for the first key
+found where var(exp) is matched by the key.  This flag does not work on
+the left side of an assignment to an associative array element.  If used
+on another type of parameter, this behaves like `tt(r)'.
+)
+item(tt(K))(
+On an associative array this is like `tt(k)' but returns all values where
+var(exp) is matched by the keys.  On other types of parameters this has
+the same effect as `tt(R)'.
+)
 item(tt(n:)var(expr)tt(:))(
-if combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them give
+If combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them give
 the var(n)th or var(n)th last match (if var(expr) evaluates to
 var(n)).  This flag is ignored when the array is associative.
 )
 item(tt(b:)var(expr)tt(:))(
-if combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them begin
+If combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them begin
 at the var(n)th or var(n)th last element, word, or character (if var(expr)
 evaluates to var(n)).  This flag is ignored when the array is associative.
 )
 item(tt(e))(
-This option has no effect and retained for backward compatibility only.
+This flag has no effect and for ordinary arrays is retained for backward
+compatibility only.  For associative arrays, this flag can be used to
+force tt(*) or tt(@) to be interpreted as a single key rather than as a
+reference to all values.  This flag may be used on the left side of an
+assignment.
 )
 enditem()
+
+See em(Parameter Expansion Flags) (\
+ifzman(zmanref(zshexpn))\
+ifnzman(noderef(Parameter Expansion))\
+) for additional ways to manipulate the results of array subscripting.
+
+subsect(Subscript Parsing)
+
+This discussion applies mainly to associative array key strings and to
+patterns used for reverse subscripting (the `tt(r)', `tt(R)', `tt(i)',
+etc. flags), but it may also affect parameter substitutions that appear
+as part of an arithmetic expression in an ordinary subscript.
+
+The basic rule to remember when writing a subscript expression is that all
+text between the opening `tt([)' and the closing `tt(])' is interpreted
+em(as if) it were in double quotes (\
+ifzman(see zmanref(zshmisc))\
+ifnzman(noderef(Quoting))\
+).  However, unlike double quotes which normally cannot nest, subscript
+expressions may appear inside double-quoted strings or inside other
+subscript expressions (or both!), so the rules have two important
+differences.
+
+The first difference is that brackets (`tt([)' and `tt(])') must appear as
+balanced pairs in a subscript expression unless they are preceded by a
+backslash (`tt(\)').  Therefore, within a subscript expression (and unlike
+true double-quoting) the sequence `tt(\[)' becomes `tt([)', and similarly
+`tt(\])' becomes `tt(])'.  This applies even in cases where a backslash is
+not normally required; for example, the pattern `tt([^[])' (to match any
+character other than an open bracket) should be written `tt([^\[])' in a
+reverse-subscript pattern.  However, note that `tt(\[^\[\])' and even
+`tt(\[^[])' mean the em(same) thing, because backslashes are always
+stripped when they appear before brackets!
+
+The same rule applies to parentheses (`tt(LPAR())' and `tt(RPAR())') and
+braces (`tt({)' and `tt(})'): they must appear either in balanced pairs or
+preceded by a backslash, and backslashes that protect parentheses or
+braces are removed during parsing.  This is because parameter expansions
+may be surrounded balanced braces, and subscript flags are introduced by
+balanced parens.
+
+The second difference is that a double-quote (`tt(")') may appear as part
+of a subscript expression without being preceded by a backslash, and
+therefore that the two characters `tt(\")' remain as two characters in the
+subscript (in true double-quoting, `tt(\")' becomes `tt(")').  However,
+because of the standard shell quoting rules, any double-quotes that appear
+must occur in balanced pairs unless preceded by a backslash.  This makes
+it more difficult to write a subscript expression that contains an odd
+number of double-quote characters, but the reason for this difference is
+so that when a subscript expression appears inside true double-quotes, one
+can still write `tt(\")' (rather than `tt(\\\")') for `tt(")'.
+
+To use an odd number of double quotes as a key in an assignment, use the
+tt(typeset) builtin and an enclosing pair of double quotes; to refer to
+the value of that key, again use double quotes:
+
+example(typeset -A aa
+typeset "aa[one\"two\"three\"quotes]"=QQQ
+print "$aa[one\"two\"three\"quotes]")
+
+It is important to note that the quoting rules do not change when a
+parameter expansion with a subscript is nested inside another subscript
+expression.  That is, it is not necessary to use additional backslashes
+within the inner subscript expression; they are removed only once, from
+the innermost subscript outwards.  Parameters are also expanded from the
+innermost subscript first, as each expansion is encountered left to right
+in the outer expression.
+
+A further complication arises from a way in which subscript parsing is
+em(not) different from double quote parsing.  As in true double-quoting,
+the sequences `tt(\*)', and `tt(\@)' remain as two characters when they
+appear in a subscript expression.  To use a literal `tt(*)' or `tt(@)' as
+an associative array key, the `tt(e)' flag must be used:
+
+example(typeset -A aa
+aa[(e)*]=star
+print $aa[(e)*])
+
+A last detail must be considered when reverse subscripting is performed.
+Parameters appearing in the subscript expression are first expanded and
+then the complete expression is interpreted as a pattern.  This has two
+effects: first, parameters behave as if tt(GLOB_SUBST) were on (and it
+cannot be turned off); second, backslashes are interpreted twice, once
+when parsing the array subscript and again when parsing the pattern.  In a
+reverse subscript, it's necessary to use em(four) backslashes to cause a
+single backslash to match literally in the pattern.  For complex patterns,
+it is often easiest to assign the desired pattern to a parameter and then
+refer to that parameter in the subscript, because then the backslashes,
+brackets, parentheses, etc., are seen only when the complete expression is
+converted to a pattern.  To match the value of a parameter literally in a
+reverse subscript, rather than as a pattern,
+use `tt(${LPAR()q)tt(RPAR())var(name)tt(})' (\
+ifzman(see zmanref(zshexpn))\
+ifnzman(noderef(Parameter Expansion))\
+) to quote the expanded value.
+
+Note that the `tt(k)' and `tt(K)' flags are reverse subscripting for an
+ordinary array, but are em(not) reverse subscripting for an associative
+array!  (For an associative array, the keys in the array itself are
+interpreted as patterns by those flags; the subscript is a plain string
+in that case.)
+
+One final note, not directly related to subscripting: the numeric names
+of positional parameters (\
+ifzman(described below)\
+ifnzman(noderef(Positional Parameters))\
+) are parsed specially, so for example `tt($2foo)' is equivalent to
+`tt(${2}foo)'.  Therefore, to use subscript syntax to extract a substring
+from a positional parameter, the expansion must be surrounded by braces;
+for example, `tt(${2[3,5]})' evaluates to the third through fifth
+characters of the second positional parameter, but `tt($2[3,5])' is the
+entire second parameter concatenated with the filename generation pattern
+`tt([3,5])'.
+
 texinode(Positional Parameters)(Local Parameters)(Array Parameters)(Parameters)
 sect(Positional Parameters)
 The positional parameters provide access to the command-line arguments
