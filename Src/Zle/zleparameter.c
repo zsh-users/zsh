@@ -145,7 +145,8 @@ scanpmwidgets(HashTable ht, ScanFunc func, int flags)
     for (i = 0; i < thingytab->hsize; i++)
 	for (hn = thingytab->nodes[i]; hn; hn = hn->next) {
 	    pm.nam = hn->nam;
-	    if (func != scancountparams)
+	    if (func != scancountparams &&
+		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
 		pm.u.str = widgetstr(((Thingy) hn)->widget);
 	    func((HashNode) &pm, flags);
 	}

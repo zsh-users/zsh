@@ -181,7 +181,8 @@ scanpmparameters(HashTable ht, ScanFunc func, int flags)
     for (i = 0; i < realparamtab->hsize; i++)
 	for (hn = realparamtab->nodes[i]; hn; hn = hn->next) {
 	    pm.nam = hn->nam;
-	    if (func != scancountparams)
+	    if (func != scancountparams &&
+		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
 		pm.u.str = paramtypestr((Param) hn);
 	    func((HashNode) &pm, flags);
 	}
@@ -312,7 +313,8 @@ scanpmcommands(HashTable ht, ScanFunc func, int flags)
 	for (hn = cmdnamtab->nodes[i]; hn; hn = hn->next) {
 	    pm.nam = hn->nam;
 	    cmd = (Cmdnam) hn;
-	    if (func != scancountparams) {
+	    if (func != scancountparams &&
+		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
 		if (cmd->flags & HASHED)
 		    pm.u.str = cmd->u.cmd;
 		else {
@@ -513,7 +515,8 @@ scanfunctions(HashTable ht, ScanFunc func, int flags, int dis)
 	for (hn = shfunctab->nodes[i]; hn; hn = hn->next) {
 	    if (dis ? (hn->flags & DISABLED) : !(hn->flags & DISABLED)) {
 		pm.nam = hn->nam;
-		if (func != scancountparams) {
+		if (func != scancountparams &&
+		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
 		    if (((Shfunc) hn)->flags & PM_UNDEFINED) {
 			Shfunc shf = (Shfunc) hn;
 			pm.u.str =
@@ -621,7 +624,8 @@ scanbuiltins(HashTable ht, ScanFunc func, int flags, int dis)
 	for (hn = builtintab->nodes[i]; hn; hn = hn->next) {
 	    if (dis ? (hn->flags & DISABLED) : !(hn->flags & DISABLED)) {
 		pm.nam = hn->nam;
-		if (func != scancountparams) {
+		if (func != scancountparams &&
+		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
 		    char *t = ((((Builtin) hn)->handlerfunc ||
 				(hn->flags & BINF_PREFIX)) ?
 			       "defined" : "undefined");
@@ -1054,7 +1058,8 @@ scanpmhistory(HashTable ht, ScanFunc func, int flags)
     pm.level = 0;
 
     while (he) {
-	if (func != scancountparams) {
+	if (func != scancountparams &&
+	    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
 	    sprintf(buf, "%d", he->histnum);
 	    pm.nam = dupstring(buf);
 	    pm.u.str = dupstring(he->text);
@@ -1175,7 +1180,8 @@ scanpmjobtexts(HashTable ht, ScanFunc func, int flags)
     for (job = 1; job < MAXJOB; job++) {
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
-	    if (func != scancountparams) {
+	    if (func != scancountparams &&
+		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
 		sprintf(buf, "%d", job);
 		pm.nam = dupstring(buf);
 		pm.u.str = pmjobtext(job);
@@ -1279,7 +1285,8 @@ scanpmjobstates(HashTable ht, ScanFunc func, int flags)
     for (job = 1; job < MAXJOB; job++) {
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
-	    if (func != scancountparams) {
+	    if (func != scancountparams &&
+		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
 		sprintf(buf, "%d", job);
 		pm.nam = dupstring(buf);
 		pm.u.str = pmjobstate(job);
@@ -1410,7 +1417,8 @@ scanpmnameddirs(HashTable ht, ScanFunc func, int flags)
 	for (hn = nameddirtab->nodes[i]; hn; hn = hn->next) {
 	    if (!((nd = (Nameddir) hn)->flags & ND_USERNAME)) {
 		pm.nam = hn->nam;
-		if (func != scancountparams)
+		if (func != scancountparams &&
+		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
 		    pm.u.str = dupstring(nd->dir);
 		func((HashNode) &pm, flags);
 	    }
@@ -1477,7 +1485,8 @@ scanpmuserdirs(HashTable ht, ScanFunc func, int flags)
 	for (hn = nameddirtab->nodes[i]; hn; hn = hn->next) {
 	    if ((nd = (Nameddir) hn)->flags & ND_USERNAME) {
 		pm.nam = hn->nam;
-		if (func != scancountparams)
+		if (func != scancountparams &&
+		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
 		    pm.u.str = dupstring(nd->dir);
 		func((HashNode) &pm, flags);
 	    }
@@ -1693,7 +1702,8 @@ scanaliases(HashTable ht, ScanFunc func, int flags, int global, int dis)
 		 (!global && !((al = (Alias) hn)->flags & ALIAS_GLOBAL))) &&
 		(dis ? (al->flags & DISABLED) : !(al->flags & DISABLED))) {
 		pm.nam = hn->nam;
-		if (func != scancountparams)
+		if (func != scancountparams &&
+		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
 		    pm.u.str = dupstring(al->text);
 		func((HashNode) &pm, flags);
 	    }
