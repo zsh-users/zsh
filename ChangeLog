@@ -1,9 +1,9 @@
 2003-05-06  Peter Stephenson  <pws@csr.com>
 
-	* zsh-users/6049: Src/utils.c: actually in 4.1.1-test-2 but not
-	documented: don't make terminal window size invalid on failed
-	ioctl TIOCGIWNSZ (typically following SIGWINCH) since it doesn't
-	do anyone any good.
+	* Koen van Hoo: zsh-users/6049: Src/utils.c: actually in
+	4.1.1-test-2 but not documented: don't make terminal window size
+	invalid on failed ioctl TIOCGIWNSZ (typically following SIGWINCH)
+	since it doesn't do anyone any good.
 
 	* unposted: Config/version.mk: version 4.1.1-test-2.
 
