@@ -736,7 +736,12 @@ hbegin(int dohist)
 {
     isfirstln = isfirstch = 1;
     errflag = histdone = 0;
-    stophist = (!dohist || !interact || unset(SHINSTDIN)) ? 2 : 0;
+    if (!dohist)
+	stophist = 2;
+    else if (dohist != 2)
+	stophist = (!interact || unset(SHINSTDIN)) ? 2 : 0;
+    else
+	stophist = 0;
     if (stophist == 2 || (inbufflags & INP_ALIAS)) {
 	chline = hptr = NULL;
 	hlinesz = 0;
@@ -764,7 +769,7 @@ hbegin(int dohist)
 
     if (hist_ring && !hist_ring->ftim)
 	hist_ring->ftim = time(NULL);
-    if (interact && isset(SHINSTDIN) && !strin) {
+    if ((dohist == 2 || (interact && isset(SHINSTDIN))) && !strin) {
 	histactive = HA_ACTIVE;
 	attachtty(mypgrp);
 	linkcurline();

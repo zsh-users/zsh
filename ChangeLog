@@ -1,3 +1,8 @@
+2000-10-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13055: Src/hist.c, Src/Zle/zle_main.c: Fix `vared -h' for non-
+	interactive shells (scripts).
+
 2000-10-19  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13036: Completion/Commands/_bash_completions,

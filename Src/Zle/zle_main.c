@@ -903,7 +903,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     if (ops['e'])
 	isfirstln = 1;
     if (ops['h'])
-	hbegin(1);
+	hbegin(2);
     t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
     if (ops['h'])
 	hend(NULL);
