@@ -1,0 +1,35 @@
+# oliver prompt theme
+
+prompt_oliver_help() {
+  cat - <<ENDHELP
+With this prompt theme, the prompt contains the current directory,
+history number and the previous command\'s exit code (if non-zero)
+and a final character which depends on priviledges.
+
+The colour of the prompt depends on two associative arrays -
+\$pcolour and $\tcolour. Each array is indexed by the name of the
+local host. Alternatively, the colour can be set with parameters
+to prompt.
+
+The hostname and username are also included unless they are in the
+\$normal_hosts or \$normal_users array.
+ENDHELP
+}
+
+prompt_oliver_setup() {
+  prompt_opts=( percent set )
+  
+  local pcol=$'\e['${1:-${pcolour[${HOST:=`hostname`}]:-33}}m
+  local tcol=$'\e['${2:-${tcolour[$HOST]:-37}}m
+  local a host="%M:" user="%n "
+  for a in $normal_hosts; do
+    [[ $HOST == $a ]] && host=""
+  done
+  for a in root $normal_users; do
+    [[ ${USER:-`whoami`} == $a ]] && user=""
+  done
+
+  PS1="%{$pcol%}$user$host%~ [%h%0(?..:%?)]%# %{$tcol%}"
+}
+
+prompt_oliver_setup "$@"
