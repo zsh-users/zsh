@@ -1,0 +1,14 @@
+#compdef debsign
+
+_arguments '-r[copy .changes file from remote host]:[username@]remotehost' \
+           '-p[program with which to sign]:program name' \
+           '-m[maintainer]:maintainer name and email address' \
+           '-e[maintainer]:maintainer name and email address' \
+           '-k[key ID to use for signing]:keyid' \
+           '-s[argument style for signing program]:gpg or pgp' \
+           '-S[Look for source-only .changes file]' \
+           '-a[architecture]:Debian architecture' \
+           '-t[GNU system type]:GNU system type' \
+           '--help[help]' \
+           '--version[version]' \
+           '*:changes or dsc file:_files -g "*.(changes|dsc)"'

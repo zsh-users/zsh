@@ -1,3 +1,10 @@
+2003-07-07  Clint Adams  <clint@zsh.org>
+
+	* 18xxx: Completion/Unix/Command/_subversion: completion for
+	svn and svnadmin.
+	* 18xxx: Completion/Debian/Command/_debsign: completion for
+	debsign, by Matt Zimmerman.
+
 2003-07-04  Oliver Kiddle  <opk@zsh.org>
 
 	* 18811: Completion/Unix/Type/_files: needed to quote % in
