@@ -631,7 +631,7 @@ patcompswitch(int paren, int *flagp)
 static long
 patcompbranch(int *flagp)
 {
-    long chain, latest, starter;
+    long chain, latest = 0, starter;
     int flags = 0;
 
     *flagp = P_PURESTR;
@@ -647,44 +647,46 @@ patcompbranch(int *flagp)
 	      patparse[2] == Pound))) {
 	    /* Globbing flags. */
 	    char *pp1 = patparse;
-	    int oldglobflags = patglobflags;
+	    int oldglobflags = patglobflags, ignore;
 	    long assert;
 	    patparse += (*patparse == '@') ? 3 : 2;
-	    if (!patgetglobflags(&patparse, &assert))
+	    if (!patgetglobflags(&patparse, &assert, &ignore))
 		return 0;
-	    if (assert) {
-		/*
-		 * Start/end assertion looking like flags, but
-		 * actually handled as a normal node
-		 */
-		latest = patnode(assert);
-		flags = 0;
-	    } else {
-		if (pp1 == patstart) {
-		    /* Right at start of pattern, the simplest case.
-		     * Put them into the flags and don't emit anything.
+	    if (!ignore) {
+		if (assert) {
+		    /*
+		     * Start/end assertion looking like flags, but
+		     * actually handled as a normal node
 		     */
-		    ((Patprog)patout)->globflags = patglobflags;
-		    continue;
-		} else if (!*patparse) {
-		    /* Right at the end, so just leave the flags for
-		     * the next Patprog in the chain to pick up.
-		     */
-		    break;
-		}
-		/*
-		 * Otherwise, we have to stick them in as a pattern
-		 * matching nothing.
-		 */
-		if (oldglobflags != patglobflags) {
-		    /* Flags changed */
-		    union upat up;
-		    latest = patnode(P_GFLAGS);
-		    up.l = patglobflags;
-		    patadd((char *)&up, 0, sizeof(union upat), 0);
+		    latest = patnode(assert);
+		    flags = 0;
 		} else {
-		    /* No effect. */
-		    continue;
+		    if (pp1 == patstart) {
+			/* Right at start of pattern, the simplest case.
+			 * Put them into the flags and don't emit anything.
+			 */
+			((Patprog)patout)->globflags = patglobflags;
+			continue;
+		    } else if (!*patparse) {
+			/* Right at the end, so just leave the flags for
+			 * the next Patprog in the chain to pick up.
+			 */
+			break;
+		    }
+		    /*
+		     * Otherwise, we have to stick them in as a pattern
+		     * matching nothing.
+		     */
+		    if (oldglobflags != patglobflags) {
+			/* Flags changed */
+			union upat up;
+			latest = patnode(P_GFLAGS);
+			up.l = patglobflags;
+			patadd((char *)&up, 0, sizeof(union upat), 0);
+		    } else {
+			/* No effect. */
+			continue;
+		    }
 		}
 	    }
 	} else if (isset(EXTENDEDGLOB) && *patparse == Hat) {
@@ -720,74 +722,83 @@ patcompbranch(int *flagp)
 
 /**/
 int
-patgetglobflags(char **strp, long *assertp)
+patgetglobflags(char **strp, long *assertp, int *ignore)
 {
     char *nptr, *ptr = *strp;
     zlong ret;
 
     *assertp = 0;
+    *ignore = 1;
     /* (#X): assumes we are still positioned on the first X */
     for (; *ptr && *ptr != Outpar; ptr++) {
-	switch (*ptr) {
-	case 'a':
-	    /* Approximate matching, max no. of errors follows */
-	    ret = zstrtol(++ptr, &nptr, 10);
-	    /*
-	     * We can't have more than 254, because we need 255 to
-	     * mark 254 errors in wbranch and exclude sync strings
-	     * (hypothetically --- hope no-one tries it).
-	     */
-	    if (ret < 0 || ret > 254 || ptr == nptr)
+	if (*ptr == 'q') { 
+	    /* Glob qualifiers, ignored in pattern code */
+	    while (*ptr && *ptr != Outpar)
+		ptr++;
+	    break;
+	} else {
+	    *ignore = 0;
+	    switch (*ptr) {
+	    case 'a':
+		/* Approximate matching, max no. of errors follows */
+		ret = zstrtol(++ptr, &nptr, 10);
+		/*
+		 * We can't have more than 254, because we need 255 to
+		 * mark 254 errors in wbranch and exclude sync strings
+		 * (hypothetically --- hope no-one tries it).
+		 */
+		if (ret < 0 || ret > 254 || ptr == nptr)
+		    return 0;
+		patglobflags = (patglobflags & ~0xff) | (ret & 0xff);
+		ptr = nptr-1;
+		break;
+
+	    case 'l':
+		/* Lowercase in pattern matches lower or upper in target */
+		patglobflags = (patglobflags & ~GF_IGNCASE) | GF_LCMATCHUC;
+		break;
+
+	    case 'i':
+		/* Fully case insensitive */
+		patglobflags = (patglobflags & ~GF_LCMATCHUC) | GF_IGNCASE;
+		break;
+
+	    case 'I':
+		/* Restore case sensitivity */
+		patglobflags &= ~(GF_LCMATCHUC|GF_IGNCASE);
+		break;
+
+	    case 'b':
+		/* Make backreferences */
+		patglobflags |= GF_BACKREF;
+		break;
+
+	    case 'B':
+		/* Don't make backreferences */
+		patglobflags &= ~GF_BACKREF;
+		break;
+
+	    case 'm':
+		/* Make references to complete match */
+		patglobflags |= GF_MATCHREF;
+		break;
+
+	    case 'M':
+		/* Don't */
+		patglobflags &= ~GF_MATCHREF;
+		break;
+
+	    case 's':
+		*assertp = P_ISSTART;
+		break;
+
+	    case 'e':
+		*assertp = P_ISEND;
+		break;
+
+	    default:
 		return 0;
-	    patglobflags = (patglobflags & ~0xff) | (ret & 0xff);
-	    ptr = nptr-1;
-	    break;
-
-	case 'l':
-	    /* Lowercase in pattern matches lower or upper in target */
-	    patglobflags = (patglobflags & ~GF_IGNCASE) | GF_LCMATCHUC;
-	    break;
-
-	case 'i':
-	    /* Fully case insensitive */
-	    patglobflags = (patglobflags & ~GF_LCMATCHUC) | GF_IGNCASE;
-	    break;
-
-	case 'I':
-	    /* Restore case sensitivity */
-	    patglobflags &= ~(GF_LCMATCHUC|GF_IGNCASE);
-	    break;
-
-	case 'b':
-	    /* Make backreferences */
-	    patglobflags |= GF_BACKREF;
-	    break;
-
-	case 'B':
-	    /* Don't make backreferences */
-	    patglobflags &= ~GF_BACKREF;
-	    break;
-
-	case 'm':
-	    /* Make references to complete match */
-	    patglobflags |= GF_MATCHREF;
-	    break;
-
-	case 'M':
-	    /* Don't */
-	    patglobflags &= ~GF_MATCHREF;
-	    break;
-
-	case 's':
-	    *assertp = P_ISSTART;
-	    break;
-
-	case 'e':
-	    *assertp = P_ISEND;
-	    break;
-
-	default:
-	    return 0;
+	    }
 	}
     }
     if (*ptr != Outpar)

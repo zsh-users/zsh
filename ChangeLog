@@ -1,3 +1,9 @@
+2002-01-22  Peter Stephenson  <pws@csr.com>
+
+	* 16486: Doc/Zsh/expn.yo, Src/glob.c, Src/pattern.c:  support
+	(#q...) EXTENDED_GLOB syntax for qualifiers.  May be chained,
+	ignored by pattern matching code.
+
 2002-01-22  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16483: Completion/Base/Completer/_complete,

@@ -1442,6 +1442,17 @@ anywhere except at the start of the string, although this actually means
 need to use `tt((""~(#s)))' to match a zero-length portion of the string
 not at the start.
 )
+item(tt(q))(
+A `tt(q)' and everything up to the closing parenthesis of the globbing
+flags are ignored by the pattern matching code.  This is intended to
+support the use of glob qualifiers, see below.  The result is that
+the pattern `tt((#b)(*).c(#q.))' can be used both for globbing and for
+matching against a string.  In the former case, the `tt((#q.))' will be
+treated as a glob qualifier and the `tt((#b))' will not be useful, while in
+the latter case the `tt((#b))' is useful for backreferences and the
+`tt((#q.))' will be ignored.  Note that colon modifiers in the glob
+qualifiers are also not applied in ordinary pattern matching.
+)
 enditem()
 
 For example, the test string tt(fooxx) can be matched by the pattern
@@ -1563,6 +1574,20 @@ glob qualifiers.  A glob subexpression that would normally be taken as glob
 qualifiers, for example `tt((^x))', can be forced to be treated as part of
 the glob pattern by doubling the parentheses, in this case producing
 `tt(((^x)))'.
+
+If the option tt(EXTENDED_GLOB) is set, a different syntax for glob
+qualifiers is available, namely `tt((#qx))' where tt(x) is any of the same
+glob qualifiers used in the other format.  The qualifiers must still appear
+at the end of the pattern.  However, with this syntax multiple glob
+qualifiers may be chained together.  They are treated as a logical AND of
+the individual sets of flags.  Also, as the syntax is unambiguous, the
+expression will be treated as glob qualifiers just as long any parentheses
+contained within it are balanced; appearance of `tt(|)', `tt(LPAR())' or
+`tt(~)' does not negate the effect.  Note that qualifiers will be
+recognised in this form even if a bare glob qualifier exists at the end of
+the pattern, for example `tt(*(#q*)(.))' will recognise executable regular
+files if both options are set; however, mixed syntax should probably be
+avoided for the sake of clarity.
 
 A qualifier may be any one of the following:
 
@@ -1847,3 +1872,11 @@ example(ls *.*~(lex|parse).[ch](^D^l1))
 lists all files having a link count of one whose names contain a dot
 (but not those starting with a dot, since tt(GLOB_DOTS) is explicitly
 switched off) except for tt(lex.c), tt(lex.h), tt(parse.c) and tt(parse.h).
+
+example(print b*.pro(#q:s/pro/shmo/)(#q.:s/builtin/shmiltin/))
+
+demonstrates how colon modifiers and other qualifiers may be chained
+together.  The ordinary qualifier `tt(.)' is applied first, then the colon
+modifiers in order from left to right.  So if tt(EXTENDED_GLOB) is set and
+the base battern matches the regular file tt(builtin.pro), the shell will
+print `tt(shmiltin.shmo)'.
