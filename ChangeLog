@@ -1,5 +1,8 @@
 2002-10-29  Peter Stephenson  <pws@csr.com>
 
+	* 17872: Src/builtin.c: Make sure `typeset SECONDS' uses a
+	suitable type when creating a new local parameter.
+
 	* 17868: Src/builtin.c, Src/params.c, Doc/Zsh/params.yo:
 	Can `typeset -F SECONDS' to get better accuracy.  Try to
 	catch all cases when converting or creating local copy

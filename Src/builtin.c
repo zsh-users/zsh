@@ -1732,11 +1732,30 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    int err = 1;
 	    if (!readonly && !strcmp(pname, "SECONDS"))
 	    {
+		/*
+		 * We allow SECONDS to change type between integer
+		 * and floating point.  If we are creating a new
+		 * local copy we check the type here and allow
+		 * a new special to be created with that type.
+		 * We then need to make sure the correct type
+		 * for the special is restored at the end of the scope.
+		 * If we are changing the type of an existing
+		 * parameter, we do the whole thing here.
+		 */
 		if (newspecial != NS_NONE)
 		{
-		    newspecial = NS_SECONDS;
-		    err = 0;	/* and continue */
-		    tc = 0;	/* but don't do a normal conversion */
+		    /*
+		     * The first test allows `typeset' to copy the
+		     * existing type.  This is the usual behaviour
+		     * for making special parameters local.
+		     */
+		    if (PM_TYPE(on) == 0 || PM_TYPE(on) == PM_INTEGER ||
+			PM_TYPE(on) == PM_FFLOAT || PM_TYPE(on) == PM_EFLOAT)
+		    {
+			newspecial = NS_SECONDS;
+			err = 0;	/* and continue */
+			tc = 0;	/* but don't do a normal conversion */
+		    }
 		} else if (!setsecondstype(pm, on, off)) {
 		    if (value && !setsparam(pname, ztrdup(value)))
 			return NULL;
