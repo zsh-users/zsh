@@ -359,6 +359,20 @@ correct handling of these types.
 None of this is relevant for 64-bit systems; zsh should compile and run
 without problems if (sizeof(long) == 8).
 
+Searching for `pcre'
+--------------------
+
+Zsh has a module which allows the pcre regular expression library to be
+used via shell builtins.  Compiling this library into the shell with
+dynamic loading (the default where available) produces a dependency on the
+library libpcre.so.  This is a problem on systems where zsh needs to be
+available at boot before the directory containing libpcre.so (for
+example /usr/lib or /usr/local/lib) is mounted.  For this reason,
+pcre support will only be searched for if the option --enable-pcre
+is passed to configure.
+
+(Future versions of the shell may have a better fix for this problem.)
+
 Options For Configure
 ---------------------
 

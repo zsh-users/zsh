@@ -308,6 +308,11 @@ else
   AC_DEFINE_UNQUOTED(MAX_FUNCTION_DEPTH, $enableval)
 fi])
 
+dnl Do you want to look for pcre support?
+AC_ARG_ENABLE(pcre,
+AC_HELP_STRING([--enable-pcre],
+[enable the search for the pcre library (may create run-time library dependencies)]))
+
 dnl ------------------
 dnl CHECK THE COMPILER
 dnl ------------------
@@ -495,6 +500,7 @@ AC_HEADER_STAT
 AC_HEADER_SYS_WAIT
 
 oldcflags="$CFLAGS"
+if test x$enable_pcre = xyes; then
 AC_CHECK_PROG([PCRECONF], pcre-config, pcre-config)
 dnl Typically (meaning on this single RedHat 9 box in front of me)
 dnl pcre-config --cflags produces a -I output which needs to go into
@@ -502,6 +508,7 @@ dnl CPPFLAGS else configure's preprocessor tests don't pick it up,
 dnl producing a warning.
 if test "x$ac_cv_prog_PCRECONF" = xpcre-config; then
   CPPFLAGS="$CPPFLAGS `pcre-config --cflags`"
+fi
 fi
 
 AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
@@ -708,8 +715,10 @@ AC_CHECK_LIB(socket, socket)
 
 AC_CHECK_LIB(iconv, iconv)
 
+if test x$enable_pcre = xyes; then
 dnl pcre-config should probably be employed here
 AC_SEARCH_LIBS(pcre_compile, pcre)
+fi
 
 dnl ---------------------
 dnl CHECK TERMCAP LIBRARY

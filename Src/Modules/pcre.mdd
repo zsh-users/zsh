@@ -1,5 +1,5 @@
 name=zsh/pcre
-link=dynamic
+link=`if test x$enable_pcre = xyes; then echo dynamic; else echo no; fi`
 load=no
 
 autobins="pcre_compile pcre_study pcre_match"
