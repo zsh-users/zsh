@@ -1936,7 +1936,14 @@ compgetmatch(char *pat, int *flp, char **replstrp)
      * have one pattern at a time; we will try the must-match test ourselves,
      * so tell the pattern compiler we are scanning.
      */
-    int patflags = PAT_STATIC|PAT_SCAN|PAT_NOANCH;
+
+    /* int patflags = PAT_STATIC|PAT_SCAN|PAT_NOANCH;*/
+
+    /* Unfortunately, PAT_STATIC doesn't work if we have a replstr with
+     * something like ${x#...} in it which will be singsub()ed below because
+     * that would overwrite the pattern buffer. */
+
+    int patflags = PAT_SCAN|PAT_NOANCH | (*replstrp ? 0 : PAT_STATIC);
 
     /*
      * Search is anchored to the end of the string if we want to match

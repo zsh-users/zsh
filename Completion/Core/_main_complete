@@ -66,8 +66,7 @@ _completers=( "$@" )
 _completer_num=1
 
 for _completer; do
-  _matcher="${_completer[2,-1]}-${(M)#_completers[1,_completer_num]:#$_completer}"
-  zstyle -a ":completion:${curcontext/::/:${_matcher}:}:" matcher-list _matchers ||
+  zstyle -a ":completion:${curcontext/::/:${_completer[2,-1]}-${(M)#_completers[1,_completer_num]:#$_completer}:}:" matcher-list _matchers ||
       _matchers=( '' )
 
   _matcher_num=1

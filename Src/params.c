@@ -1145,9 +1145,11 @@ getindex(char **pptr, Value v)
 	    if (*s == ']' || *s == Outbrack)
 		s++;
 	} else {
+	    int com;
+
 	    if (a > 0)
 		a--;
-	    if (*s == ',') {
+	    if ((com = (*s == ','))) {
 		s++;
 		b = getarg(&s, &inv, v, 1, &dummy);
 		if (b > 0)
@@ -1157,7 +1159,7 @@ getindex(char **pptr, Value v)
 	    }
 	    if (*s == ']' || *s == Outbrack) {
 		s++;
-		if (v->isarr && a == b && 
+		if (v->isarr && a == b && !com &&
 		    (!(v->isarr & SCANPM_MATCHMANY) ||
 		     !(v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
 				   SCANPM_KEYMATCH))))
