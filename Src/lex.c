@@ -1305,7 +1305,8 @@ dquote_parse(char endchar, int sub)
 		    c == endchar || c == '`' ||
 		    (endchar == ']' && (c == '[' || c == ']' ||
 					c == '(' || c == ')' ||
-					c == '{' || c == '}')))
+					c == '{' || c == '}' ||
+					(c == '"' && sub))))
 		    add(Bnull);
 		else {
 		    /* lexstop is implicitly handled here */
@@ -1390,7 +1391,7 @@ dquote_parse(char endchar, int sub)
 		err = (!brct-- && math);
 	    break;
 	case '"':
-	    if (intick || endchar == ']' || (!endchar && !bct))
+	    if (intick || ((endchar == ']' || !endchar) && !bct))
 		break;
 	    if (bct) {
 		add(Dnull);
@@ -1463,7 +1464,7 @@ parsestrnoerr(char *s)
 
 /**/
 mod_export char *
-parse_subscript(char *s)
+parse_subscript(char *s, int sub)
 {
     int l = strlen(s), err;
     char *t;
@@ -1477,7 +1478,7 @@ parse_subscript(char *s)
     len = 0;
     bptr = tokstr = s;
     bsiz = l + 1;
-    err = dquote_parse(']', 1);
+    err = dquote_parse(']', sub);
     if (err) {
 	err = *bptr;
 	*bptr = 0;

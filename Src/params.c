@@ -785,7 +785,7 @@ isident(char *s)
 	return 0;
 
     /* Require balanced [ ] pairs with something between */
-    if (!(ss = parse_subscript(++ss)))
+    if (!(ss = parse_subscript(++ss, 1)))
 	return 0;
     untokenize(s);
     return !ss[1];
@@ -922,7 +922,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
     for (t = s, i = 0;
 	 (c = *t) && ((c != Outbrack &&
 		       (ishash || c != ',')) || i); t++) {
-	/* Untokenize INULL() except before brackets, for parsestr() */
+	/* Untokenize INULL() except before brackets and double-quotes */
 	if (INULL(c)) {
 	    c = t[1];
 	    if (c == '[' || c == ']' ||
@@ -933,7 +933,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		    *t = ztokens[*t - Pound];
 		needtok = 1;
 		++t;
-	    } else
+	    } else if (c != '"')
 		*t = ztokens[*t - Pound];
 	    continue;
 	}
@@ -1181,16 +1181,17 @@ getindex(char **pptr, Value v)
 {
     int start, end, inv = 0;
     char *s = *pptr, *tbrack;
+    int dq = !!strchr(s, Dnull);
 
     *s++ = '[';
-    s = parse_subscript(s);	/* Error handled after untokenizing */
+    s = parse_subscript(s, dq);	/* Error handled after untokenizing */
     /* Now we untokenize everthing except INULL() markers so we can check *
      * for the '*' and '@' special subscripts.  The INULL()s are removed  *
      * in getarg() after we know whether we're doing reverse indexing.    */
     for (tbrack = *pptr + 1; *tbrack && tbrack != s; tbrack++) {
 	if (INULL(*tbrack) && !*++tbrack)
 	    break;
-	if (itok(*tbrack))
+	if (itok(*tbrack))	/* Need to check for Nularg here? */
 	    *tbrack = ztokens[*tbrack - Pound];
     }
     /* If we reached the end of the string (s == NULL) we have an error */

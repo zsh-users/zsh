@@ -145,3 +145,18 @@
 0:Associative array keys interpreted as patterns
 >\2 backcbrack cbrack star
 >\\\4 \\\? star zounds
+
+  typeset "A[one\"two\"three\"quotes]"=QQQ
+  typeset 'A[one\"two\"three\"quotes]'=qqq
+  print -R "$A[one\"two\"three\"quotes]"
+  print -R $A[one\"two\"three\"quotes]
+  A[one"two"three"four"quotes]=QqQq
+  print -R $A[one"two"three"four"quotes]
+  print -R $A[$A[(i)one\"two\"three\"quotes]]
+  print -R "$A[$A[(i)one\"two\"three\"quotes]]"
+0:Associative array keys with double quotes
+>QQQ
+>qqq
+>QqQq
+>qqq
+>QQQ

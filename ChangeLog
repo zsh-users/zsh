@@ -1,3 +1,9 @@
+2001-04-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14070: Src/lex.c, Src/params.c, Test/D06subscript.ztst: Fix
+	problem with parsing \" in subscripts during parameter expansion
+	in double-quotes.
+
 2001-04-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14066: Doc/Zsh/expn.yo, Doc/Zsh/params.yo, Src/params.c,
