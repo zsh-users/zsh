@@ -1,3 +1,8 @@
+2004-03-04  Peter Stephenson  <pws@csr.com>
+
+	* 19535: configure.ac, INSTALL: Add --enable-cap flag
+	to turn on search for POSIX capabilities; fails on AIX otherwise.
+
 2004-03-03  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/7105: configure.ac, Makefile.in: Added back the stamp-h

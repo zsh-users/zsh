@@ -313,6 +313,11 @@ AC_ARG_ENABLE(pcre,
 AC_HELP_STRING([--enable-pcre],
 [enable the search for the pcre library (may create run-time library dependencies)]))
 
+dnl Do you want to look for capability support?
+AC_ARG_ENABLE(cap,
+AC_HELP_STRING([--enable-cap],
+[enable the search for POSIX capabilities (may require additional headers to be added by hand)]))
+
 dnl ------------------
 dnl CHECK THE COMPILER
 dnl ------------------
@@ -709,7 +714,9 @@ if test "x$dynamic" = xyes; then
   AC_CHECK_LIB(dl, dlopen)
 fi
 
-AC_CHECK_LIB(cap, cap_get_proc)
+if test x$enable_cap = xyes; then
+  AC_CHECK_LIB(cap, cap_get_proc)
+fi
 
 AC_CHECK_LIB(socket, socket)
 
@@ -1029,7 +1036,6 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       initgroups nis_list \
 	       setuid seteuid setreuid setresuid setsid \
 	       memcpy memmove strstr strerror \
-	       cap_get_proc \
 	       getrlimit \
 	       setlocale \
 	       uname \
@@ -1044,6 +1050,10 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       wctomb iconv \
 	       grantpt unlockpt ptsname)
 AC_FUNC_STRCOLL
+
+if test x$enable_cap = xyes; then
+  AC_CHECK_FUNCS(cap_get_proc)
+fi
 
 dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)
 dnl  Some termcaps reportedly accept a zero buffer, but then dump core
