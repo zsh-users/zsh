@@ -992,7 +992,7 @@ rparsealt(RParseResult *result, jmp_buf *perr)
 }
 
 static int
-rmatch(RParseResult *sm, char *subj, char *var1, char *var2)
+rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 {
     LinkNode ln, lnn;
     LinkList nexts;
@@ -1080,8 +1080,8 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2)
 	}
     } while(ln);
 
-    if(!*subj)
-        for(ln = firstnode(sm->out); ln; ln = nextnode(ln)) {
+    if(!comp && !*subj)
+	for(ln = firstnode(sm->out); ln; ln = nextnode(ln)) {
 	    br = getdata(ln);
 	    if(br->state == st) {
 		for(ln = firstnode(br->actions); ln; ln = nextnode(ln)) {
@@ -1141,7 +1141,7 @@ bin_regexparse(char *nam, char **args, char *ops, int func)
 	    ret = 0;
 
 	if(!ret)
-	    ret = rmatch(&result, subj, var1, var2);
+	    ret = rmatch(&result, subj, var1, var2, ops['c']);
         popheap();
     } LASTALLOC;
 
@@ -1152,7 +1152,7 @@ bin_regexparse(char *nam, char **args, char *ops, int func)
 static struct builtin bintab[] = {
     BUILTIN("zstyle", 0, bin_zstyle, 0, -1, 0, NULL, NULL),
     BUILTIN("zformat", 0, bin_zformat, 3, -1, 0, NULL, NULL),
-    BUILTIN("regexparse", 0, bin_regexparse, 3, -1, 0, NULL, NULL),
+    BUILTIN("regexparse", 0, bin_regexparse, 3, -1, 0, "c", NULL),
 };
 
 

@@ -70,7 +70,7 @@ _regex_arguments () {
   "$funcname"' () {
     local _ra_p1 _ra_p2 _ra_left _ra_right _ra_com
     local _ra_actions _ra_line="${(pj:\0:)${(@)words[1,CURRENT - 1]:Q}}"$'\''\0'\''"$PREFIX"
-    regexparse _ra_p1 _ra_p2 "$_ra_line" '"${(j: :)${(qqqq)regex[@]}}"'
+    regexparse -c _ra_p1 _ra_p2 "$_ra_line" '"${(j: :)${(qqqq)regex[@]}}"'
     case "$?" in
     0|2) _message "no more arguments";;
     1) 
