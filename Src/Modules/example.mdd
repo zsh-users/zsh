@@ -1,3 +1,6 @@
 autobins="example"
 
+autoinfixconds="ex"
+autoprefixconds="len"
+
 objects="example.o"

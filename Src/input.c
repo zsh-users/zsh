@@ -219,7 +219,7 @@ inputline(void)
     char *ingetcline, *ingetcpmptl = NULL, *ingetcpmptr = NULL;
 
     /* If reading code interactively, work out the prompts. */
-    if (interact && isset(SHINSTDIN))
+    if (interact && isset(SHINSTDIN)) {
 	if (!isfirstln)
 	    ingetcpmptl = prompt2;
 	else {
@@ -227,6 +227,7 @@ inputline(void)
 	    if (rprompt)
 		ingetcpmptr = rprompt;
 	}
+    }
     if (!(interact && isset(SHINSTDIN) && SHTTY != -1 && isset(USEZLE))) {
 	/*
 	 * If not using zle, read the line straight from the input file.

@@ -172,7 +172,7 @@ addhashnode(HashTable ht, char *nam, void *nodeptr)
 	ht->nodes[hashval] = hn;
 	replacing:
 	hn->next = hp->next;
-	if(ht->scan)
+	if(ht->scan) {
 	    if(ht->scan->sorted) {
 		HashNode *tab = ht->scan->u.s.tab;
 		int i;
@@ -181,6 +181,7 @@ addhashnode(HashTable ht, char *nam, void *nodeptr)
 			tab[i] = hn;
 	    } else if(ht->scan->u.u == hp)
 		ht->scan->u.u = hn;
+	}
 	ht->freenode(hp);
 	return;
     }
@@ -270,7 +271,7 @@ removehashnode(HashTable ht, char *nam)
 	ht->nodes[hashval] = hp->next;
 	gotit:
 	ht->ct--;
-	if(ht->scan)
+	if(ht->scan) {
 	    if(ht->scan->sorted) {
 		HashNode *tab = ht->scan->u.s.tab;
 		int i;
@@ -279,6 +280,7 @@ removehashnode(HashTable ht, char *nam)
 			tab[i] = NULL;
 	    } else if(ht->scan->u.u == hp)
 		ht->scan->u.u = hp->next;
+	}
 	return hp;
     }
 

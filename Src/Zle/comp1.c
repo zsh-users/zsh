@@ -41,13 +41,31 @@ struct compctl cc_compos, cc_default, cc_first, cc_dummy;
 /**/
 Cmlist cmatcher;
 
-/* pointers to functions required by zle */
+/* pointers to functions required by zle and defined by compctl */
 
 /**/
 void (*printcompctlptr) _((char *, Compctl, int, int));
 
 /**/
 Compctl (*compctl_widgetptr) _((char *, char **));
+
+/**/
+void (*makecompparamsptr) _((void));
+
+/* pointers to functions required by compctl and defined by zle */
+
+/**/
+void (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, int, int, int, int, int, char **));
+
+/**/
+char *(*comp_strptr) _((int*,int*));
+
+/**/
+int (*getcpatptr) _((char *, int, char *, int));
+
+/**/
+void (*makecomplistcallptr) _((Compctl));
+
 
 /* Hash table for completion info for commands */
  
@@ -72,6 +90,23 @@ char **clwords;
 /**/
 int incompctlfunc;
 
+/* != 0 if we are in a new style completion function */
+
+/**/
+int incompfunc;
+
+/* global variables for shell parameters in new style completion */
+
+/**/
+long compcurrent,
+     compnmatches;
+
+/**/
+char *compcontext,
+     *compcommand,
+     *compprefix,
+     *compsuffix,
+     *compiprefix;
 
 /* This variable and the functions rembslash() and quotename() came from     *
  * zle_tricky.c, but are now used in compctl.c, too.                         */
@@ -443,6 +478,8 @@ setup_comp1(Module m)
     cc_first.refc = 10000;
     cc_first.mask = 0;
     cc_first.mask2 = CC_CCCONT;
+    compcontext = compcommand = compprefix = compsuffix =
+	compiprefix = NULL;
     return 0;
 }
 
@@ -469,6 +506,11 @@ finish_comp1(Module m)
     deletehashtable(compctltab);
     zfree(clwords, clwsize * sizeof(char *));
     compctlreadptr = fallback_compctlread;
+    zsfree(compcontext);
+    zsfree(compcommand);
+    zsfree(compprefix);
+    zsfree(compiprefix);
+    zsfree(compsuffix);
     return 0;
 }
 

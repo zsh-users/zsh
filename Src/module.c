@@ -227,7 +227,6 @@ deletewrapper(Module m, FuncWrap w)
 
 static char *dlerrstr[256];
 
-/**/
 static void *
 load_and_bind(const char *fn)
 {
@@ -277,7 +276,6 @@ load_and_bind(const char *fn)
 # define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
 # define dlclose(handle) shl_unload((shl_t)(handle))
 
-/**/
 static
 void *
 hpux_dlsym(void *handle, char *name)

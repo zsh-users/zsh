@@ -235,7 +235,7 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 # endif /* WATCH_UTMP_UT_HOST */
 
     while (*fmt)
-	if (*fmt == '\\')
+	if (*fmt == '\\') {
 	    if (*++fmt) {
 		if (prnt)
 		    putchar(*fmt);
@@ -244,6 +244,7 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		return fmt;
 	    else
 		break;
+	}
 	else if (*fmt == fini)
 	    return ++fmt;
 	else if (*fmt != '%') {

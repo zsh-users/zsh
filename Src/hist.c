@@ -392,7 +392,7 @@ histsubchar(int c)
 		c = ingetc();
 	    }
 	    *ptr = 0;
-	    if (!*buf)
+	    if (!*buf) {
 		if (c != '%') {
 		    if (isset(CSHJUNKIEHISTORY))
 			ev = curhist - 1;
@@ -408,6 +408,7 @@ histsubchar(int c)
 		    else
 			ev = defev;
 		    evset = 0;
+		}
 	    } else if ((t0 = atoi(buf))) {
 		ev = (t0 < 0) ? curhist + t0 : t0;
 		evset = 1;
@@ -749,11 +750,12 @@ hend(void)
 	save = 0;
     else {
 	*hptr = '\0';
-	if (hptr[-1] == '\n')
+	if (hptr[-1] == '\n') {
 	    if (chline[1]) {
 		*--hptr = '\0';
 	    } else
 		save = 0;
+	}
 	if (!*chline || !strcmp(chline, "\n") ||
 	    (isset(HISTIGNORESPACE) && spaceflag))
 	    save = 0;

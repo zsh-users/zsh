@@ -195,18 +195,18 @@ bin_ln(char *nam, char **args, char *ops, int func)
 
 
     if(func == BIN_MV) {
-	move = rename;
+	move = (MoveFunc) rename;
 	flags = ops['f'] ? 0 : MV_ASKNW;
 	flags |= MV_ATOMIC;
     } else {
 	flags = ops['f'] ? MV_FORCE : 0;
 #ifdef HAVE_LSTAT
 	if(ops['s'])
-	    move = symlink;
+	    move = (MoveFunc) symlink;
 	else
 #endif
 	     {
-	    move = link;
+	    move = (MoveFunc) link;
 	    if(!ops['d'])
 		flags |= MV_NODIRS;
 	}

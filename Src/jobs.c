@@ -462,7 +462,7 @@ printjob(Job jn, int lng, int synch)
 	if (jn->stat & STAT_SUPERJOB &&
 	    jn->procs->status == SP_RUNNING && !pn->next)
 	    pn->status = SP_RUNNING;
-	if (pn->status != SP_RUNNING)
+	if (pn->status != SP_RUNNING) {
 	    if (WIFSIGNALED(pn->status)) {
 		sig = WTERMSIG(pn->status);
 		llen = strlen(sigmsg[sig]);
@@ -483,6 +483,7 @@ printjob(Job jn, int lng, int synch)
 	    } else if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
 		       WEXITSTATUS(pn->status))
 		sflag = 1;
+	}
     }
 
 /* print if necessary */
@@ -508,7 +509,7 @@ printjob(Job jn, int lng, int synch)
 			break;
 		    len2 += strlen(qn->text) + 2;
 		}
-	    if (job != thisjob)
+	    if (job != thisjob) {
 		if (fline)
 		    fprintf(fout, "[%ld]  %c ",
 			    (long)(jn - jobtab),
@@ -516,7 +517,7 @@ printjob(Job jn, int lng, int synch)
 			    : (job == prevjob) ? '-' : ' ');
 		else
 		    fprintf(fout, (job > 9) ? "        " : "       ");
-	    else
+	    } else
 		fprintf(fout, "zsh: ");
 	    if (lng & 1)
 		fprintf(fout, "%ld ", (long) pn->pid);
@@ -531,18 +532,19 @@ printjob(Job jn, int lng, int synch)
 		lng &= ~3;
 	    } else
 		fprintf(fout, "%*s", skip, "");
-	    if (pn->status == SP_RUNNING)
+	    if (pn->status == SP_RUNNING) {
 		if (!conted)
 		    fprintf(fout, "running%*s", len - 7 + 2, "");
 		else
 		    fprintf(fout, "continued%*s", len - 9 + 2, "");
-	    else if (WIFEXITED(pn->status))
+	    }
+	    else if (WIFEXITED(pn->status)) {
 		if (WEXITSTATUS(pn->status))
 		    fprintf(fout, "exit %-4d%*s", WEXITSTATUS(pn->status),
 			    len - 9 + 2, "");
 		else
 		    fprintf(fout, "done%*s", len - 4 + 2, "");
-	    else if (WIFSTOPPED(pn->status))
+	    } else if (WIFSTOPPED(pn->status))
 		fprintf(fout, "%-*s", len + 2, sigmsg[WSTOPSIG(pn->status)]);
 	    else if (WCOREDUMP(pn->status))
 		fprintf(fout, "%s (core dumped)%*s",
@@ -1071,7 +1073,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
         /* If you immediately type "exit" after "jobs", this      *
          * will prevent zexit from complaining about stopped jobs */
 	stopmsg = 2;
-    if (!*argv)
+    if (!*argv) {
 	/* This block handles all of the default cases (no arguments).  bg,
 	fg and disown act on the current job, and jobs and wait act on all the
 	jobs. */
@@ -1100,6 +1102,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		    waitjob(job, SIGINT);
 	    return 0;
 	}
+    }
 
     /* Defaults have been handled.  We now have an argument or two, or three...
     In the default case for bg, fg and disown, the argument will be provided by

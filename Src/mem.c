@@ -129,25 +129,51 @@ global_permalloc(void)
     return luh;
 }
 
-/* heappush saves the current heap state using this structure */
-
-struct heapstack {
-    struct heapstack *next;	/* next one in list for this heap */
-    size_t used;
-};
-
-/* A zsh heap. */
-
-struct heap {
-    struct heap *next;		/* next one                                  */
-    size_t used;		/* bytes used from the heap                  */
-    struct heapstack *sp;	/* used by pushheap() to save the value used */
-#define arena(X)	((char *) (X) + sizeof(struct heap))
-};
-
 /* list of zsh heap */
 
 static Heap heaps;
+
+/* Use new heaps from now on. This returns the old heap-list. */
+
+/**/
+Heap
+new_heaps(void)
+{
+    Heap h = heaps;
+
+    heaps = NULL;
+
+    return h;
+}
+
+/* Re-install the old heaps again, freeing the new ones. */
+
+/**/
+void
+old_heaps(Heap old)
+{
+    Heap h, n;
+
+    for (h = heaps; h; h = n) {
+	n = h->next;
+	DPUTS(h->sp, "BUG: old_heaps() with pushed heaps");
+	zfree(h, sizeof(*h));
+    }
+    heaps = old;
+}
+
+/* Temporarily switch to other heaps (or back again). */
+
+/**/
+Heap
+switch_heaps(Heap new)
+{
+    Heap h = heaps;
+
+    heaps = new;
+
+    return h;
+}
 
 /* save states of zsh heaps */
 

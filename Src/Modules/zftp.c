@@ -62,9 +62,19 @@
 /* it's a TELNET based protocol, but don't think I like doing this */
 #include <arpa/telnet.h>
 
+/*
+ * We use poll() in preference to select because some subset of manuals says
+ * that's the thing to do, plus it's a bit less fiddly.  I don't actually
+ * have access to a system with poll but not select, however, though
+ * both bits of the code have been tested on a machine with both.
+ */
+#ifdef HAVE_POLL_H
+# include <poll.h>
+#endif
+
 /* pinch the definition from <netinet/in.h> for deficient headers */
 #ifndef INADDR_NONE
-#define INADDR_NONE 0xffffffff
+# define INADDR_NONE 0xffffffff
 #endif
 
 /*
@@ -124,7 +134,8 @@ enum {
     ZFTP_HERE  = 0x0100,	/* here rather than over there */
     ZFTP_CDUP  = 0x0200,	/* CDUP rather than CWD */
     ZFTP_REST  = 0x0400,	/* restart: set point in remote file */
-    ZFTP_RECV  = 0x0800		/* receive rather than send */
+    ZFTP_RECV  = 0x0800,	/* receive rather than send */
+    ZFTP_TEST  = 0x1000		/* test command, don't test */
 };
 
 typedef struct zftpcmd *Zftpcmd;
@@ -134,6 +145,7 @@ static struct zftpcmd zftpcmdtab[] = {
     { "params", zftp_params, 0, 4, 0 },
     { "login", zftp_login, 0, 3, ZFTP_CONN },
     { "user", zftp_login, 0, 3, ZFTP_CONN },
+    { "test", zftp_test, 0, 0, ZFTP_TEST },
     { "cd", zftp_cd, 1, 1, ZFTP_CONN|ZFTP_LOGI },
     { "cdup", zftp_cd, 0, 0, ZFTP_CONN|ZFTP_LOGI|ZFTP_CDUP },
     { "dir", zftp_dir, 0, -1, ZFTP_CONN|ZFTP_LOGI },
@@ -674,8 +686,8 @@ zfgetmsg()
 
     zfgetline(line, 256, tmout);
     ptr = line;
-    if (zfdrrrring || !isdigit((int)*ptr) || !isdigit((int)ptr[1]) || 
-	!isdigit((int)ptr[2])) {
+    if (zfdrrrring || !isdigit(STOUC(*ptr)) || !isdigit(STOUC(ptr[1])) || 
+	!isdigit(STOUC(ptr[2]))) {
 	/* timeout, or not talking FTP.  not really interested. */
 	zcfinish = 2;
 	if (!zfclosing)
@@ -820,7 +832,7 @@ zfopendata(char *name)
 	zwarnnam(name, "Must set preference S or P to transfer data", NULL, 0);
 	return 1;
     }
-    zdfd = zfmovefd(socket(AF_INET, SOCK_STREAM, 0));
+    zdfd = socket(AF_INET, SOCK_STREAM, 0);
     if (zdfd < 0) {
 	zwarnnam(name, "can't get data socket: %e", NULL, errno);
 	return 1;
@@ -851,7 +863,7 @@ zfopendata(char *name)
 	 * lastmsg already has the reply code expunged.
 	 */
 	for (ptr = lastmsg; *ptr; ptr++)
-	    if (isdigit(*ptr))
+	    if (isdigit(STOUC(*ptr)))
 		break;
 	if (sscanf(ptr, "%d,%d,%d,%d,%d,%d",
 		   nums, nums+1, nums+2, nums+3, nums+4, nums+5) != 6) {
@@ -986,11 +998,11 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
 	char *ptr = strstr(lastmsg, "bytes");
 	zfstatus |= ZFST_NOSZ|ZFST_TRSZ;
 	if (ptr) {
-	    while (ptr > lastmsg && !isdigit(*ptr))
+	    while (ptr > lastmsg && !isdigit(STOUC(*ptr)))
 		ptr--;
-	    while (ptr > lastmsg && isdigit(ptr[-1]))
+	    while (ptr > lastmsg && isdigit(STOUC(ptr[-1])))
 		ptr--;
-	    if (isdigit(*ptr)) {
+	    if (isdigit(STOUC(*ptr))) {
 		zfstatus &= ~ZFST_NOSZ;
 		if (getsize) {
 		    long sz = zstrtol(ptr, NULL, 10);
@@ -1017,6 +1029,13 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
 	    return 1;
 	}
 	zdfd = newfd;		/* this is now the actual data fd */
+    } else {
+	/*
+	 * We avoided dup'ing zdfd up to this point, to try to keep
+	 * things simple, so we now need to move it out of the way
+	 * of the user-visible fd's.
+	 */
+	zdfd = zfmovefd(zdfd);
     }
 
 
@@ -1659,19 +1678,13 @@ zftp_open(char *name, char **args, int flags)
     }
 
     zsock.sin_port = zservp->s_port;
-    zcfd = zfmovefd(socket(zsock.sin_family, SOCK_STREAM, 0));
+    zcfd = socket(zsock.sin_family, SOCK_STREAM, 0);
     if (zcfd < 0) {
 	zwarnnam(name, "socket failed: %e", NULL, errno);
 	zfunsetparam("ZFTP_HOST");
 	alarm(0);
 	return 1;
     }
-
-#if defined(F_SETFD) && defined(FD_CLOEXEC)
-    /* If the shell execs a program, we don't want this fd left open. */
-    len = FD_CLOEXEC;
-    fcntl(zcfd, F_SETFD, &len);
-#endif
 
     /*
      * now connect the socket.  manual pages all say things like `this is all
@@ -1707,6 +1720,19 @@ zftp_open(char *name, char **args, int flags)
     zfsetparam("ZFTP_IP", ztrdup(inet_ntoa(zsock.sin_addr)), ZFPM_READONLY);
     /* now we can talk to the control connection */
     zcfinish = 0;
+
+
+    /*
+     * Move the fd out of the user-visible range.  We need to do
+     * this after the connect() on some systems.
+     */
+    zcfd = zfmovefd(zcfd);
+
+#if defined(F_SETFD) && defined(FD_CLOEXEC)
+    /* If the shell execs a program, we don't want this fd left open. */
+    len = FD_CLOEXEC;
+    fcntl(zcfd, F_SETFD, &len);
+#endif
 
     len = sizeof(zsock);
     if (getsockname(zcfd, (struct sockaddr *)&zsock, &len) < 0) {
@@ -2021,6 +2047,69 @@ zftp_login(char *name, char **args, int flags)
      */
     return zfgetcwd();
 }
+
+/*
+ * See if the server wants to tell us something.  On a timeout, we usually
+ * have a `421 Timeout' or something such waiting for us, so we read
+ * it here.  As well as being called explicitly by the user
+ * (precmd is a very good place for this, it's cheap since it has
+ * no network overhead), we call it in the bin_zftp front end if we
+ * have a connection and weren't going to call it anyway.
+ *
+ * Poll-free and select-free systems are few and far between these days,
+ * but I'm willing to consider suggestions.
+ */
+
+/**/
+static int
+zftp_test(char *name, char **args, int flags)
+{
+#if defined(HAVE_POLL) || defined(HAVE_SELECT)
+    int ret;
+# ifdef HAVE_POLL
+    struct pollfd pfd;
+# else
+    fd_set f;
+    struct timeval tv;
+# endif /* HAVE_POLL */
+
+    if (zcfd == -1)
+	return 1;
+
+# ifdef HAVE_POLL
+#  ifndef POLLIN
+    /* safety first, though I think POLLIN is more common */
+#   define POLLIN POLLNORM
+#  endif /* HAVE_POLL */
+    pfd.fd = zcfd;
+    pfd.events = POLLIN;
+    if ((ret = poll(&pfd, 1, 0)) < 0 && errno != EINTR && errno != EAGAIN)
+	zfclose();
+    else if (ret > 0 && pfd.revents) {
+	/* handles 421 (maybe a bit noisily?) */
+	zfgetmsg();
+    }
+# else
+    FD_ZERO(&f);
+    FD_SET(zcfd, &f);
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    if ((ret = select(zcfd +1, (SELECT_ARG_2_T) &f, NULL, NULL, &tv)) < 0
+	&& errno != EINTR)
+	zfclose();
+    else if (ret > 0) {
+	/* handles 421 */
+	zfgetmsg();
+    }
+# endif /* HAVE_POLL */
+    /* if we now have zcfd == -1, then we've just been dumped out. */
+    return (zcfd == -1) ? 2 : 0;
+#else
+    zfwarnnam(name, "not supported on this system.", NULL, 0);
+    return 3;
+#endif /* defined(HAVE_POLL) || defined(HAVE_SELECT) */
+}
+
 
 /* do ls or dir on the remote directory */
 
@@ -2476,7 +2565,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
     char fullname[11] = "zftp ";
     char *cnam = *args++, *prefs, *ptr;
     Zftpcmd zptr;
-    int n, ret;
+    int n, ret = 0;
 
     for (zptr = zftpcmdtab; zptr->nam; zptr++)
 	if (!strcmp(zptr->nam, cnam))
@@ -2521,8 +2610,25 @@ bin_zftp(char *name, char **args, char *ops, int func)
 				  "B" : "S"), ZFPM_READONLY);
 	}
     }
+#if defined(HAVE_SELECT) || defined (HAVE_POLL)
+    if (zcfd != -1 && !(zptr->flags & ZFTP_TEST)) {
+	/*
+	 * Test the connection for a bad fd or incoming message, but
+	 * only if the connection was last heard of open, and
+	 * if we are not about to call the test command anyway.
+	 * Not worth it unless we have select() or poll().
+	 */
+	ret = zftp_test("zftp test", NULL, 0);
+    }
+#endif
     if ((zptr->flags & ZFTP_CONN) && zcfd == -1) {
-	zwarnnam(fullname, "not connected.", NULL, 0);
+	if (ret != 2) {
+	    /*
+	     * with ret == 2, we just got dumped out in the test,
+	     * so enough messages already.
+	     */	       
+	    zwarnnam(fullname, "not connected.", NULL, 0);
+	}
 	return 1;
     }
 

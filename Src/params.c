@@ -765,7 +765,7 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 	} else if (rev) {
 	    v->isarr |= SCANPM_WANTVALS;
 	}
-	if (!down)
+	if (!down && PM_TYPE(v->pm->flags) == PM_HASHED)
 	    v->isarr &= ~SCANPM_MATCHMANY;
 	*inv = ind;
     }
@@ -1534,6 +1534,12 @@ setaparam(char *s, char **val)
 	if (!(v = getvalue(&s, 1)))
 	    createparam(t, PM_ARRAY);
 	*ss = '[';
+	if (PM_TYPE(v->pm->flags) == PM_HASHED) {
+	    zerr("attempt to set slice of associative array", NULL, 0);
+	    freearray(val);
+	    errflag = 1;
+	    return NULL;
+	}
 	v = NULL;
     } else {
 	if (!(v = getvalue(&s, 1)))
@@ -1571,13 +1577,13 @@ sethparam(char *s, char **val)
     }
     if (strchr(s, '[')) {
 	freearray(val);
-	zerr("attempt to set slice of associative array", NULL, 0);
+	zerr("nested associative arrays not yet supported", NULL, 0);
 	errflag = 1;
 	return NULL;
     } else {
 	if (!(v = getvalue(&s, 1)))
 	    createparam(t, PM_HASHED);
-	else if (!(PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
+	else if (!(PM_TYPE(v->pm->flags) & PM_HASHED) &&
 		 !(v->pm->flags & PM_SPECIAL)) {
 	    unsetparam(t);
 	    createparam(t, PM_HASHED);

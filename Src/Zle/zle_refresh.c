@@ -33,7 +33,7 @@
 /* Expanded prompts */
 
 /**/
-char *lpptbuf, *rpptbuf;
+char *lpromptbuf, *rpromptbuf;
 
 /* Text attributes after displaying prompts */
 
@@ -77,17 +77,17 @@ int cost;
 /* Oct/Nov 94: <mason> some code savagely redesigned to fix several bugs -
    refreshline() & tc_rightcurs() majorly rewritten; zrefresh() fixed -
    I've put my fingers into just about every routine in here -
-   any queries about updates to mason@werple.net.au */
+   any queries about updates to mason@primenet.com.au */
 
 static char **nbuf = NULL,	/* new video buffer line-by-line char array */
     **obuf = NULL;		/* old video buffer line-by-line char array */
 static int more_start,		/* more text before start of screen?	    */
     more_end,			/* more stuff after end of screen?	    */
-    lppth,			/* lines taken up by the prompt		    */
     olnct,			/* previous number of lines		    */
     ovln,			/* previous video cursor position line	    */
-    pptw, rpw,                  /* prompt widths on screen                  */
-    rppth,			/* right prompt height                      */
+    lpromptw, rpromptw,		/* prompt widths on screen                  */
+    lprompth,			/* lines taken up by the prompt		    */
+    rprompth,			/* right prompt height                      */
     vcs, vln,			/* video cursor position column & line	    */
     vmaxln,			/* video maximum number of lines	    */
     winw, winh, rwinh,		/* window width & height		    */
@@ -100,7 +100,6 @@ resetvideo(void)
     int ln;
     static int lwinw = -1, lwinh = -1;	/* last window width & height */
  
-    genprompts();
     winw = columns;  /* terminal width */
     if (termflags & TERM_SHORT)
 	winh = 1;
@@ -132,13 +131,16 @@ resetvideo(void)
 	    *obuf[ln] = '\0';
     }
 
-    if (pptw) {
-    	memset(nbuf[0], ' ', pptw);
-	memset(obuf[0], ' ', pptw);
-	nbuf[0][pptw] = obuf[0][pptw] = '\0';
+    countprompt(lpromptbuf, &lpromptw, &lprompth);
+    countprompt(rpromptbuf, &rpromptw, &rprompth);
+
+    if (lpromptw) {
+    	memset(nbuf[0], ' ', lpromptw);
+	memset(obuf[0], ' ', lpromptw);
+	nbuf[0][lpromptw] = obuf[0][lpromptw] = '\0';
     }
 
-    vcs = pptw;
+    vcs = lpromptw;
     olnct = nlnct = 0;
     if (showinglist > 0)
 	showinglist = -2;
@@ -280,21 +282,25 @@ zrefresh(void)
 	tsetcap(TCSTANDOUTEND, 0);
 	tsetcap(TCUNDERLINEEND, 0);
 
-        if (!clearflag)
+        if (!clearflag) {
             if (tccan(TCCLEAREOD))
                 tcout(TCCLEAREOD);
             else
                 cleareol = 1;   /* request: clear to end of line */
+	}
         if (t0 > -1)
             olnct = t0;
         if (termflags & TERM_SHORT)
             vcs = 0;
-        else if (!clearflag && lpptbuf[0])
-            zputs(lpptbuf, shout);
+        else if (!clearflag && lpromptbuf[0]) {
+            zputs(lpromptbuf, shout);
+	    if (lpromptw == 0)
+		zputs("\n", shout);	/* works with both hasam and !hasam */
+	}
 	if (clearflag) {
 	    zputc('\r', shout);
 	    vcs = 0;
-	    moveto(0, pptw);
+	    moveto(0, lpromptw);
 	}
 	fflush(shout);
 	clearf = clearflag;
@@ -326,7 +332,7 @@ zrefresh(void)
     if (!*nbuf)
 	*nbuf = (char *)zalloc(winw + 2);
 
-    s = (unsigned char *)(nbuf[ln = 0] + pptw);
+    s = (unsigned char *)(nbuf[ln = 0] + lpromptw);
     t = line;
     sen = (unsigned char *)(*nbuf + winw);
     for (; t < line+ll; t++) {
@@ -425,15 +431,16 @@ zrefresh(void)
 
 /* determine whether the right-prompt exists and can fit on the screen */
     if (!more_start)
-	put_rpmpt = rppth == 1 && rpptbuf[0] && !strchr(rpptbuf, '\t') &&
-	    (int)strlen(nbuf[0]) + rpw < winw - 1;
+	put_rpmpt = rprompth == 1 && rpromptbuf[0] &&
+	    !strchr(rpromptbuf, '\t') &&
+	    (int)strlen(nbuf[0]) + rpromptw < winw - 1;
     else {
 /* insert >.... on first line if there is more text before start of screen */
-	memset(nbuf[0], ' ', pptw);
-	t0 = winw - pptw;
+	memset(nbuf[0], ' ', lpromptw);
+	t0 = winw - lpromptw;
 	t0 = t0 > 5 ? 5 : t0;
-	strncpy(nbuf[0] + pptw, ">....", t0);
-	memset(nbuf[0] + pptw + t0, ' ', winw - t0 - pptw);
+	strncpy(nbuf[0] + lpromptw, ">....", t0);
+	memset(nbuf[0] + lpromptw + t0, ' ', winw - t0 - lpromptw);
 	nbuf[0][winw] = nbuf[0][winw + 1] = '\0';
     }
 
@@ -477,8 +484,8 @@ zrefresh(void)
 
     /* output the right-prompt if appropriate */
 	if (put_rpmpt && !ln && !oput_rpmpt) {
-	    moveto(0, winw - 1 - rpw);
-	    zputs(rpptbuf, shout);
+	    moveto(0, winw - 1 - rpromptw);
+	    zputs(rpromptbuf, shout);
 	    vcs = winw - 1;
 	/* reset character attributes to that set by the main prompt */
 	    txtchange = pmpt_attr;
@@ -659,12 +666,12 @@ refreshline(int ln)
 /* 2c: if we're on the first line, start checking at the end of the prompt;
    we shouldn't be doing anything within the prompt */
 
-    if (ln == 0 && pptw) {
-	i = pptw - ccs;
+    if (ln == 0 && lpromptw) {
+	i = lpromptw - ccs;
 	j = strlen(ol);
 	nl += i;
 	ol += (i > j ? j : i);	/* if ol is too short, point it to '\0' */
-	ccs = pptw;
+	ccs = lpromptw;
     }
 
 /* 3: main display loop - write out the buffer using whatever tricks we can */
@@ -815,7 +822,7 @@ moveto(int ln, int cl)
    instead of TCDOWN */
 
     while (ln > vln) {
-	if (vln < vmaxln - 1)
+	if (vln < vmaxln - 1) {
 	    if (ln > vmaxln - 1) {
 		if (tc_downcurs(vmaxln - 1 - vln))
 		    vcs = 0;
@@ -826,6 +833,7 @@ moveto(int ln, int cl)
 		vln = ln;
 		continue;
 	    }
+	}
 	zputc('\r', shout), vcs = 0; /* safety precaution */
 	while (ln > vln) {
 	    zputc('\n', shout);
@@ -893,21 +901,23 @@ tc_rightcurs(int cl)
 
 /* otherwise _carefully_ write the contents of the video buffer.
    if we're anywhere in the prompt, goto the left column and write the whole
-   prompt out unless ztrlen(lpptbuf) == pptw : we can cheat then */
-    if (vln == 0 && i < pptw) {
-	if (strlen(lpptbuf) == pptw)
-	    fputs(lpptbuf + i, shout);
-	else if (tccan(TCRIGHT) && (tclen[TCRIGHT] * ct <= ztrlen(lpptbuf)))
+   prompt out unless ztrlen(lpromptbuf) == lpromptw : we can cheat then */
+    if (vln == 0 && i < lpromptw) {
+	if (strlen(lpromptbuf) == lpromptw)
+	    fputs(lpromptbuf + i, shout);
+	else if (tccan(TCRIGHT) && (tclen[TCRIGHT] * ct <= ztrlen(lpromptbuf)))
 	    /* it is cheaper to send TCRIGHT than reprint the whole prompt */
-	    for (ct = pptw - i; ct--; )
+	    for (ct = lpromptw - i; ct--; )
 		tcout(TCRIGHT);
         else {
 	    if (i != 0)
 		zputc('\r', shout);
-	    tc_upcurs(lppth - 1);
-	    zputs(lpptbuf, shout);
+	    tc_upcurs(lprompth - 1);
+	    zputs(lpromptbuf, shout);
+	    if (lpromptw == 0)
+		zputs("\n", shout);	/* works with both hasam and !hasam */
 	}
-	i = pptw;
+	i = lpromptw;
 	ct = cl - i;
     }
 
@@ -969,7 +979,7 @@ redisplay(void)
 {
     moveto(0, 0);
     zputc('\r', shout);		/* extra care */
-    tc_upcurs(lppth - 1);
+    tc_upcurs(lprompth - 1);
     resetneeded = 1;
     clearflag = 0;
 }
@@ -987,7 +997,7 @@ singlerefresh(void)
 
     nlnct = 1;
 /* generate the new line buffer completely */
-    for (vsiz = 1 + pptw, t0 = 0; t0 != ll; t0++, vsiz++)
+    for (vsiz = 1 + lpromptw, t0 = 0; t0 != ll; t0++, vsiz++)
 	if (line[t0] == '\t')
 	    vsiz = (vsiz | 7) + 1;
 	else if (icntrl(line[t0]))
@@ -1002,9 +1012,10 @@ singlerefresh(void)
 	cs = 0;
     }
 
-    memcpy(vbuf, strchr(lpptbuf, 0) - pptw, pptw); /* only use last part of prompt */
-    vbuf[pptw] = '\0';
-    vp = vbuf + pptw;
+    /* only use last part of prompt */
+    memcpy(vbuf, strchr(lpromptbuf, 0) - lpromptw, lpromptw);
+    vbuf[lpromptw] = '\0';
+    vp = vbuf + lpromptw;
 
     for (t0 = 0; t0 != ll; t0++) {
 	if (line[t0] == '\t')
@@ -1103,14 +1114,4 @@ singmoveto(int pos)
 		vcs++;
 	    }
     }
-}
-
-/* recheck size of prompts */
-
-/**/
-static void
-genprompts(void)
-{
-    countprompt(lpptbuf, &pptw, &lppth);
-    countprompt(rpptbuf, &rpw, &rppth);
 }

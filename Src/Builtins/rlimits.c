@@ -264,7 +264,7 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 	     * together more than one of these.  It's easier to understand from *
 	     * the code:                                                        */
 	    val = zstrtorlimt(s, &s, 10);
-	    if (*s)
+	    if (*s) {
 		if ((*s == 'h' || *s == 'H') && !s[1])
 		    val *= 3600L;
 		else if ((*s == 'm' || *s == 'M') && !s[1])
@@ -275,6 +275,7 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 		    zwarnnam("limit", "unknown scaling factor: %s", s, 0);
 		    return 1;
 		}
+	    }
 	}
 # ifdef RLIMIT_NPROC
 	else if (lim == RLIMIT_NPROC)
@@ -339,12 +340,12 @@ bin_unlimit(char *nam, char **argv, char *ops, int func)
     /* Without arguments, remove all limits. */
     if (!*argv) {
 	for (limnum = 0; limnum != RLIM_NLIMITS; limnum++) {
-	    if (hard)
+	    if (hard) {
 		if (euid && current_limits[limnum].rlim_max != RLIM_INFINITY)
 		    ret++;
 		else
 		    limits[limnum].rlim_max = RLIM_INFINITY;
-	    else
+	    } else
 		limits[limnum].rlim_cur = limits[limnum].rlim_max;
 	}
 	if (ops['s'])
@@ -373,13 +374,13 @@ bin_unlimit(char *nam, char **argv, char *ops, int func)
 		return 1;
 	    }
 	    /* remove specified limit */
-	    if (hard)
+	    if (hard) {
 		if (euid && current_limits[lim].rlim_max != RLIM_INFINITY) {
 		    zwarnnam(nam, "can't remove hard limits", NULL, 0);
 		    ret++;
 		} else
 		    limits[lim].rlim_max = RLIM_INFINITY;
-	    else
+	    } else
 		limits[lim].rlim_cur = limits[lim].rlim_max;
 	    if (ops['s'] && zsetlimit(lim, nam))
 		ret++;
@@ -478,11 +479,12 @@ bin_ulimit(char *name, char **argv, char *ops, int func)
 	    }
 	}
 	if (!*argv || **argv == '-') {
-	    if (res < 0)
+	    if (res < 0) {
 		if (*argv || nres)
 		    continue;
 		else
 		    res = RLIMIT_FSIZE;
+	    }
 	    resmask |= 1 << res;
 	    nres++;
 	    continue;

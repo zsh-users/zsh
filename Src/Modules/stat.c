@@ -346,7 +346,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 	} else {
 	    for (; *arg; arg++) {
 		if (strchr("glLnNrstT", *arg))
-		    ops[*arg] = 1;
+		    ops[STOUC(*arg)] = 1;
 		else if (*arg == 'A') {
 		    if (arg[1]) {
 			arrnam = arg+1;
@@ -505,7 +505,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 		continue;
 	}
 
-	if (flags & STF_FILE)
+	if (flags & STF_FILE) {
 	    if (arrnam)
 		*arrptr++ = ztrdup(*args);
 	    else if (hashnam) {
@@ -513,6 +513,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 		*hashptr++ = ztrdup(*args);
 	    } else
 		printf("%s%s", *args, (flags & STF_PICK) ? " " : ":\n");
+	}
 	if (iwhich > -1) {
 	    statprint(&statbuf, outbuf, *args, iwhich, flags);
 	    if (arrnam)
@@ -544,7 +545,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 	    putchar('\n');
     }
 
-    if (arrnam)
+    if (arrnam) {
 	if (ret)
 	    freearray(array);
 	else {
@@ -552,8 +553,9 @@ bin_stat(char *name, char **args, char *ops, int func)
 	    if (errflag)
 		return 1;
 	}
+    }
 
-    if (hashnam)
+    if (hashnam) {
     	if (ret)
 	    freearray(hash);
 	else {
@@ -561,6 +563,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 	    if (errflag)
 		return 1;
 	}
+    }
 
     return ret;
 }

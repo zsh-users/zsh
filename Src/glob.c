@@ -2318,7 +2318,7 @@ doesmatch(Comp c)
 		    for (; *pptr; pptr++) {
 			if (*pptr == Meta)
 			    pptr++;
-			else if (CHARMATCH(*pptr, looka))
+			else if (CHARMATCH(STOUC(*pptr), STOUC(looka)))
 			    break;
 		    }
 		    if (!*(saves = pptr))
@@ -2688,7 +2688,7 @@ matchonce(Comp c)
 	    }
 	    continue;
 	}
-	if (CHARMATCH(*pptr, *pat)) {
+	if (CHARMATCH(STOUC(*pptr), STOUC(*pat))) {
 	    /* just plain old characters */
 	    pptr++;
 	    pat++;

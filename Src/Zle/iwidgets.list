@@ -25,11 +25,11 @@
 "beginning-of-line-hist", beginningoflinehist, 0
 "capitalize-word", capitalizeword, 0
 "clear-screen", clearscreen, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
-"complete-word", completeword, ZLE_MENUCMP | ZLE_KEEPSUFFIX
+"complete-word", completeword, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "copy-prev-word", copyprevword, 0
 "copy-region-as-kill", copyregionaskill, ZLE_KEEPSUFFIX
 "delete-char", deletechar, ZLE_KEEPSUFFIX
-"delete-char-or-list", deletecharorlist, ZLE_MENUCMP | ZLE_KEEPSUFFIX
+"delete-char-or-list", deletecharorlist, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "delete-word", deleteword, ZLE_KEEPSUFFIX
 "describe-key-briefly", describekeybriefly, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "digit-argument", digitargument, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
@@ -48,8 +48,8 @@
 "execute-named-cmd", NULL, 0
 "expand-cmd-path", expandcmdpath, 0
 "expand-history", expandhistory, 0
-"expand-or-complete", expandorcomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX
-"expand-or-complete-prefix", expandorcompleteprefix, ZLE_MENUCMP | ZLE_KEEPSUFFIX
+"expand-or-complete", expandorcomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
+"expand-or-complete-prefix", expandorcompleteprefix, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "expand-word", expandword, 0
 "forward-char", forwardchar, 0
 "forward-word", forwardword, 0
@@ -68,11 +68,11 @@
 "kill-region", killregion, ZLE_KILL | ZLE_KEEPSUFFIX
 "kill-whole-line", killwholeline, ZLE_KILL | ZLE_KEEPSUFFIX
 "kill-word", killword, ZLE_KILL | ZLE_KEEPSUFFIX
-"list-choices", listchoices, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
+"list-choices", listchoices, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_ISCOMP
 "list-expand", listexpand, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "magic-space", magicspace, 0
-"menu-complete", menucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX
-"menu-expand-or-complete", menuexpandorcomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX
+"menu-complete", menucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
+"menu-expand-or-complete", menuexpandorcomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "neg-argument", negargument, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "overwrite-mode", overwritemode, 0
 "pound-insert", poundinsert, 0
@@ -84,7 +84,7 @@
 "quote-region", quoteregion, 0
 "redisplay", redisplay, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "redo", redo, 0
-"reverse-menu-complete", reversemenucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX
+"reverse-menu-complete", reversemenucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "run-help", processcmd, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "self-insert", selfinsert, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "self-insert-unmeta", selfinsertunmeta, ZLE_MENUCMP | ZLE_KEEPSUFFIX

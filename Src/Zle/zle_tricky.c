@@ -237,6 +237,15 @@ struct aminfo {
 
 static Aminfo ainfo, fainfo;
 
+/* This contains the name of the function to call if this is for a new  *
+ * style completion. */
+
+static char *compfunc = NULL;
+
+/* The memory heap to use for new style completion generation. */
+
+static Heap compheap;
+
 /* Find out if we have to insert a tab (instead of trying to complete). */
 
 /**/
@@ -270,6 +279,15 @@ completespecial(void)
     useglob = (flags & ZLE_USEGLOB) ? 1 : (flags & ZLE_NOGLOB) ? 0
 	: isset(GLOBCOMPLETE);
     docomplete(compwidget->u.cc ? COMP_WIDGET : COMP_COMPLETE);
+}
+
+/**/
+void
+completecall(void)
+{
+    compfunc = compwidget->u.comp.func;
+    compwidget->u.comp.fn();
+    compfunc = NULL;
 }
 
 /**/
@@ -408,11 +426,15 @@ reversemenucomplete(void)
 void
 acceptandmenucomplete(void)
 {
+    int sl = suffixlen[' '];
+
     if (!menucmp) {
 	feep();
 	return;
     }
-    cs = menuend + menuinsc;
+    cs = menupos + menulen + menuinsc;
+    if (sl)
+	backdel(sl);
     inststrlen(" ", 1, 1);
     menuinsc = menulen = 0;
     menupos = cs;
@@ -439,6 +461,13 @@ static int lastambig;
 
 static char *cmdstr;
 
+/* This hold the name of the variable we are working on. */
+
+static char *varname;
+
+/* != 0 if we are in a subscript */
+
+static int insubscr;
 
 /* Check if the given string is the name of a parameter and if this *
  * parameter is one worth expanding.                                */
@@ -614,16 +643,13 @@ docomplete(int lst)
 			lst = COMP_EXPAND;
 		    else {
 			int t0, n = 0;
-			char *fc;
 			struct hashnode *hn;
 
 			for (t0 = cmdnamtab->hsize - 1; t0 >= 0; t0--)
 			    for (hn = cmdnamtab->nodes[t0]; hn;
 				 hn = hn->next) {
-				if (strpfx(q, hn->nam) && (fc = findcmd(hn->nam))) {
-				    zsfree(fc);
+				if (strpfx(q, hn->nam) && findcmd(hn->nam, 0))
 				    n++;
-				}
 				if (n == 2)
 				    break;
 			    }
@@ -889,7 +915,7 @@ unmetafy_line(void)
 static char *
 get_comp_string(void)
 {
-    int t0, tt0, i, j, k, cp, rd, sl, ocs;
+    int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins;
     char *s = NULL, *linptr, *tmp, *p, *tt = NULL;
 
     zsfree(brbeg);
@@ -943,13 +969,16 @@ get_comp_string(void)
 	linredir = inredir;
 	zsfree(cmdstr);
 	cmdstr = NULL;
+	zsfree(varname);
+	varname = NULL;
+	insubscr = 0;
 	zleparse = 1;
 	clwpos = -1;
 	lexsave();
 	inpush(dupstrspace((char *) linptr), 0, NULL);
 	strinbeg();
 	stophist = 2;
-	i = tt0 = cp = rd = 0;
+	i = tt0 = cp = rd = ins = oins = 0;
 
 	/* This loop is possibly the wrong way to do this.  It goes through *
 	 * the previously massaged command line using the lexer.  It stores *
@@ -963,8 +992,10 @@ get_comp_string(void)
 	 * this would be to pass the command line through the parser too,   *
 	 * and get the arguments that way.  Maybe in 3.1...                 */
 	do {
-	    lincmd = incmdpos;
-	    linredir = inredir;
+	    lincmd = ((incmdpos && !ins) || (oins == 2 && i == 2) ||
+		      (ins == 3 && i == 1));
+	    linredir = (inredir && !ins);
+	    oins = ins;
 	    /* Get the next token. */
 	    ctxtlex();
 	    if (tok == DINPAR)
@@ -973,7 +1004,9 @@ get_comp_string(void)
 	    /* We reached the end. */
 	    if (tok == ENDINPUT)
 		break;
-	    if (tok == BAR    || tok == AMPER     ||
+	    if ((ins && (tok == DO || tok == SEPER)) ||
+		(ins == 2 && i == 2) ||	(ins == 3 && i == 3) ||
+		tok == BAR    || tok == AMPER     ||
 		tok == BARAMP || tok == AMPERBANG ||
 		((tok == DBAR || tok == DAMPER) && !incond)) {
 		/* This is one of the things that separate commands.  If we  *
@@ -982,11 +1015,13 @@ get_comp_string(void)
 		if (tt)
 		    break;
 		/* Otherwise reset the variables we are collecting data in. */
-		i = tt0 = cp = rd = 0;
+		i = tt0 = cp = rd = ins = 0;
 	    }
-	    if (lincmd && tok == STRING) {
+	    if (lincmd && (tok == STRING || tok == FOR || tok == FOREACH ||
+			   tok == SELECT || tok == REPEAT || tok == CASE)) {
 		/* The lexer says, this token is in command position, so *
 		 * store the token string (to find the right compctl).   */
+		ins = (tok == REPEAT ? 2 : (tok != STRING));
 		zsfree(cmdstr);
 		cmdstr = ztrdup(tokstr);
 		i = 0;
@@ -1004,9 +1039,13 @@ get_comp_string(void)
 		rd = linredir;
 		if (inwhat == IN_NOTHING && incond)
 		    inwhat = IN_COND;
-	    }
+	    } else if (linredir)
+		continue;
 	    if (!tokstr)
 		continue;
+	    /* Hack to allow completion after `repeat n do'. */
+	    if (oins == 2 && !i && !strcmp(tokstr, "do"))
+		ins = 3;
 	    /* We need to store the token strings of all words (for some of *
 	     * the more complicated compctl -x things).  They are stored in *
 	     * the clwords array.  Make this array big enough.              */
@@ -1069,10 +1108,16 @@ get_comp_string(void)
 	    /* We found a simple string. */
 	    s = ztrdup(clwords[clwpos]);
 	} else if (t0 == ENVSTRING) {
+	    char sav;
 	    /* The cursor was inside a parameter assignment. */
 	    for (s = tt; iident(*s); s++);
+	    sav = *s;
+	    *s = '\0';
+	    zsfree(varname);
+	    varname = ztrdup(tt);
+	    *s = sav;
 	    if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt + cs - wb)
-		s = NULL, inwhat = IN_MATH;
+		s = NULL, inwhat = IN_MATH, insubscr = 1;
 	    else if (*s == '=') {
 		s++;
 		wb += s - tt;
@@ -1110,14 +1155,32 @@ get_comp_string(void)
 	 * foo[_ wrong (note no $).  If we are in a subscript, treat it   *
 	 * as being in math.                                              */
 	if (inwhat != IN_MATH) {
-	    int i = 0;
+	    int i = 0, hn = 0;
+	    char *nb = (*s == String ? s + 1 : NULL), *ne = NULL;
+
 	    for (tt = s; ++tt < s + cs - wb;)
-		if (*tt == Inbrack)
+		if (*tt == String) {
+		    hn = 0;
+		    nb = tt + 1;
+		} else if (*tt == Inbrack) {
 		    i++;
-		else if (i && *tt == Outbrack)
+		    if (nb && !hn) {
+			hn = 1;
+			ne = tt;
+		    }
+		} else if (i && *tt == Outbrack)
 		    i--;
-	    if (i)
+	    if (i) {
 		inwhat = IN_MATH;
+		insubscr = 1;
+		if (hn && nb && ne) {
+		    char sav = *ne;
+		    *ne = '\0';
+		    zsfree(varname);
+		    varname = ztrdup(nb);
+		    *ne = sav;
+		}
+	    }
 	}
 	if (inwhat == IN_MATH) {
 	    /* In mathematical expression, we complete parameter names (even *
@@ -2336,6 +2399,119 @@ instmatch(Cmatch m)
     return r;
 }
 
+/**/
+void
+addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
+	   char *suf, char *group,
+	   int flags, int quote, int menu, int nosort, int alt, char **argv)
+{
+    char *s, *t;
+    int lpl, lsl, i;
+    Aminfo ai = (alt ? fainfo : ainfo);
+    Cmatch cm;
+
+    if (menu && isset(AUTOMENU))
+	usemenu = 1;
+    SWITCHHEAPS(compheap) {
+	HEAPALLOC {
+	    if (ipre)
+		ipre = dupstring(ipre);
+	    if (ppre) {
+		ppre = dupstring(ppre);
+		lpl = strlen(ppre);
+	    } else
+		lpl = 0;
+	    if (psuf) {
+		psuf = dupstring(psuf);
+		lsl = strlen(psuf);
+	    } else
+		lsl = 0;
+	    if (pre)
+		pre = dupstring(pre);
+	    if (suf)
+		suf = dupstring(suf);
+	    if (!prpre && (prpre = ppre)) {
+		singsub(&prpre);
+		untokenize(prpre);
+	    } else
+		prpre = dupstring(prpre);
+	    if (group) {
+		endcmgroup(NULL);
+		begcmgroup(group, nosort);
+		if (nosort)
+		    mgroup->flags |= CGF_NOSORT;
+	    }
+    	    if (ai->pprefix) {
+		if (pre)
+		    ai->pprefix[pfxlen(ai->pprefix, pre)] = '\0';
+		else
+		    ai->pprefix[0] = '\0';
+	    } else
+		ai->pprefix = dupstring(pre ? pre : "");
+
+	    for (; (s = *argv); argv++) {
+		if (ai->firstm) {
+		    if ((i = pfxlen(ai->firstm->str, s)) < ai->prerest)
+			ai->prerest = i;
+		    if ((i = sfxlen(ai->firstm->str, s)) < ai->suflen)
+			ai->suflen = i;
+		}
+		t = s;
+		if (ppre)
+		    t = dyncat(ppre, t);
+		if (ipre && *ipre) {
+		    ai->noipre = 0;
+		    if (ai->icpl > lpl)
+			ai->icpl = lpl;
+		    if (ai->icsl > lsl)
+			ai->icsl = lsl;
+		    if (ai->iaprefix)
+			ai->iaprefix[pfxlen(ai->iaprefix, t)] = '\0';
+		    else
+			ai->iaprefix = dupstring(t);
+		    if (ai->iprefix) {
+			if (strcmp(ipre, ai->iprefix))
+			    ai->iprefix = "";
+		    } else
+			ai->iprefix = dupstring(ipre);
+
+		    t = dyncat(ipre, t);
+		} else
+		    ai->iprefix = "";
+		if (ai->cpl > lpl)
+		    ai->cpl = lpl;
+		if (ai->csl > lsl)
+		    ai->csl = lsl;
+		if (ai->aprefix)
+		    ai->aprefix[pfxlen(ai->aprefix, t)] = '\0';
+		else
+		    ai->aprefix = dupstring(t);
+		mnum++;
+		ai->count++;
+
+		cm = (Cmatch) halloc(sizeof(struct cmatch));
+		cm->ppre = ppre;
+		cm->psuf = psuf;
+		cm->prpre = prpre;
+		if (!quote)
+		    s = quotename(s, NULL, NULL, NULL);
+		cm->str = dupstring(s);
+		cm->ipre = cm->ripre = ipre;
+		cm->pre = pre;
+		cm->suf = suf;
+		cm->flags = flags;
+		cm->brpl = brpl;
+		cm->brsl = brsl;
+		addlinknode((alt ? fmatches : matches), cm);
+
+		if (expl)
+		    expl->fcount++;
+		if (!ai->firstm)
+		    ai->firstm = cm;
+	    }
+	} LASTALLOC;
+    } SWITCHBACKHEAPS;
+}
 
 /* This adds a match to the list of matches.  The string to add is given   *
  * in s, the type of match is given in the global variable addwhat and     *
@@ -2351,7 +2527,7 @@ addmatch(char *s, char *t)
 {
     int test = 0, sl = strlen(s), pl = rpl, cc = 0, isf = 0;
     int mpl = 0, msl = 0, bpl = brpl, bsl = brsl;
-    char *e = NULL, *tt, *te, *fc, *ms = NULL;
+    char *e = NULL, *tt, *te, *ms = NULL;
     Comp cp = patcomp;
     HashNode hn;
     Param pm;
@@ -2377,6 +2553,8 @@ addmatch(char *s, char *t)
     hn = (HashNode) t;
     pm = (Param) t;
 
+    if (incompfunc)
+	s = dupstring(s);
     if (!addwhat) {
 	test = 1;
     } else if (addwhat == -1 || addwhat == -5 || addwhat == -6 ||
@@ -2427,11 +2605,8 @@ addmatch(char *s, char *t)
 	    }
 	}
 	if (test) {
-	    fc = NULL;
-	    if (addwhat == -7 && !(fc = findcmd(s)))
+	    if (addwhat == -7 && !findcmd(s, 0))
 		return;
-	    if (fc)
-		zsfree(fc);
 	    isf = CMF_FILE;
 
 	    if (addwhat == CC_FILES || addwhat == -6 ||
@@ -2515,7 +2690,6 @@ addmatch(char *s, char *t)
     }
     if (!test)
 	return;
-
     if (!ms && !ispattern && ai->firstm) {
 	if ((test = sl - pfxlen(ai->firstm->str, s)) < ai->prerest)
 	    ai->prerest = test;
@@ -2602,8 +2776,13 @@ addmatch(char *s, char *t)
     cm->str = (ms ? ms : s);
     cm->ipre = (ipre && *ipre ? ipre : NULL);
     cm->ripre = (ripre && *ripre ? ripre : NULL);
-    cm->pre = curcc->prefix;
-    cm->suf = curcc->suffix;
+    if (incompfunc) {
+	cm->pre = dupstring(curcc->prefix);
+	cm->suf = dupstring(curcc->suffix);
+    } else {
+	cm->pre = curcc->prefix;
+	cm->suf = curcc->suffix;
+    }
     cm->flags = mflags | isf;
     cm->brpl = bpl;
     cm->brsl = bsl;
@@ -2729,7 +2908,7 @@ maketildelist(void)
 /* This does the check for compctl -x `n' and `N' patterns. */
 
 /**/
-static int
+int
 getcpat(char *str, int cpatindex, char *cpat, int class)
 {
     char *s, *t, *p;
@@ -2951,6 +3130,8 @@ docompletion(char *s, int lst, int incmd)
 
 	    else if (nmatches == 1) {
 		/* Only one match. */
+		while (!amatches->mcount)
+		    amatches = amatches->next;
 		do_single(amatches->matches[0]);
 		invalidatelist();
 	    }
@@ -3051,7 +3232,98 @@ makecomplist(char *s, int incmd, int lst)
 	ccused = newlinklist();
 	ccstack = newlinklist();
 
-	makecomplistglobal(s, incmd, lst);
+	if (compfunc) {
+	    List list;
+	    int lv = lastval;
+
+	    if ((list = getshfunc(compfunc)) != &dummy_list) {
+		LinkList args = newlinklist();
+		char **p, *tmp;
+		int aadd = 0, usea = 1;
+
+		addlinknode(args, compfunc);
+
+		zsfree(compcontext);
+		zsfree(compcommand);
+		compcommand = "";
+		if (inwhat == IN_MATH) {
+		    if (insubscr) {
+			compcontext = "subscript";
+			compcommand = varname ? varname : "";
+		    } else
+			compcontext = "math";
+		    usea = 0;
+		} else if (lincmd)
+		    compcontext = (insubscr ? "subscript" : "command");
+		else if (linredir)
+		    compcontext = "redirect";
+		else
+		    switch (inwhat) {
+		    case IN_ENV:
+			compcontext = "value";
+			compcommand = varname;
+			usea = 0;
+			break;
+		    case IN_COND:
+			compcontext = "condition";
+			break;
+		    default:
+			if (cmdstr) {
+			    compcontext = "argument";
+			    compcommand = cmdstr;
+			} else {
+			    compcontext = "value";
+			    if (clwords[0])
+				compcommand = clwords[0];
+			}
+			aadd = 1;
+		    }
+		compcontext = ztrdup(compcontext);
+		tmp = quotename(compcommand, NULL, NULL, NULL);
+		untokenize(tmp);
+		compcommand = ztrdup(tmp);
+		if (usea && (!aadd || clwords[0]))
+		    for (p = clwords + aadd; *p; p++) {
+			tmp = dupstring(*p);
+			untokenize(tmp);
+			addlinknode(args, tmp);
+		    }
+		zsfree(compprefix);
+		zsfree(compsuffix);
+		if (unset(COMPLETEINWORD)) {
+		    tmp = quotename(s, NULL, NULL, NULL);
+		    untokenize(tmp);
+		    compprefix = ztrdup(tmp);
+		    compsuffix = ztrdup("");
+		} else {
+		    char *ss = s + offs, sav;
+
+		    tmp = quotename(s, &ss, NULL, NULL);
+		    sav = *ss;
+		    *ss = '\0';
+		    untokenize(tmp);
+		    compprefix = ztrdup(tmp);
+		    *ss = sav;
+		    untokenize(ss);
+		    compsuffix = ztrdup(ss);
+		}
+		zsfree(compiprefix);
+		compiprefix = ztrdup("");
+		compcurrent = (usea ? (clwpos + 1 - aadd) : 1);
+		compnmatches = mnum;
+		incompfunc = 1;
+		startparamscope();
+		makecompparamsptr();
+		NEWHEAPS(compheap) {
+		    doshfunc(compfunc, list, args, 0, 1);
+		} OLDHEAPS;
+		endparamscope();
+		lastcmd = 9;
+		incompfunc = 0;
+	    }
+	    lastval = lv;
+	} else
+	    makecomplistglobal(s, incmd, lst);
 
 	endcmgroup(NULL);
 
@@ -3080,6 +3352,83 @@ makecomplist(char *s, int incmd, int lst)
 	errflag = 0;
     }
     return 1;
+}
+
+/* This should probably be moved into tokenize(). */
+
+static char *
+ctokenize(char *p)
+{
+    char *r = p;
+    int bslash = 0;
+
+    tokenize(p);
+
+    for (p = r; *p; p++) {
+	if (*p == '\\')
+	    bslash = 1;
+	else {
+	    if (*p == '$') {
+		if (bslash)
+		    p[-1] = Bnull;
+		else
+		    *p = String;
+	    }
+	    bslash = 0;
+	}
+    }
+    return r;
+}
+
+/**/
+char *
+comp_str(int *ipl, int *pl)
+{
+    char *p = dupstring(compprefix);
+    char *s = dupstring(compsuffix);
+    char *ip = dupstring(compiprefix);
+    char *str;
+    int lp, ls, lip;
+
+    ctokenize(p);
+    remnulargs(p);
+    ctokenize(s);
+    remnulargs(s);
+    ctokenize(ip);
+    remnulargs(ip);
+    ls = strlen(s);
+    lip = strlen(ip);
+    lp = strlen(p);
+    str = halloc(lip + lp + ls + 1);
+    strcpy(str, ip);
+    strcat(str, p);
+    strcat(str, s);
+
+    if (ipl)
+	*ipl = lip;
+    if (pl)
+	*pl = lp;
+
+    return str;
+}
+
+/**/
+void
+makecomplistcall(Compctl cc)
+{
+    SWITCHHEAPS(compheap) {
+	HEAPALLOC {
+	    int ooffs = offs, lip, lp;
+	    char *str = comp_str(&lip, &lp);
+
+	    offs = lip + lp;
+	    cc->refc++;
+	    ccont = 0;
+	    makecomplistor(cc, str, lincmd, lip, 0);
+	    offs = ooffs;
+	    compnmatches = mnum;
+	} LASTALLOC;
+    } SWITCHBACKHEAPS;
 }
 
 /* This function gets the compctls for the given command line and *
@@ -3159,7 +3508,7 @@ makecomplistcmd(char *os, int incmd)
     /* If the command string starts with `=', try the path name of the *
      * command. */
     if (cmdstr && cmdstr[0] == Equals) {
-	char *c = findcmd(cmdstr + 1);
+	char *c = findcmd(cmdstr + 1, 1);
 
 	if (c) {
 	    zsfree(cmdstr);
@@ -3191,7 +3540,7 @@ makecomplistpc(char *os, int incmd)
 {
     Patcomp pc;
     Comp pat;
-    char *s = findcmd(cmdstr);
+    char *s = findcmd(cmdstr, 1);
 
     for (pc = patcomps; pc; pc = pc->next) {
 	if ((pat = parsereg(pc->pat)) &&
@@ -3468,12 +3817,12 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
     ccont |= (cc->mask2 & (CC_CCCONT | CC_DEFCONT | CC_PATCONT));
 
-    if (findnode(ccstack, cc))
+    if (!incompfunc && findnode(ccstack, cc))
 	return;
 
     addlinknode(ccstack, cc);
 
-    if (allccs) {
+    if (!incompfunc && allccs) {
 	if (findnode(allccs, cc)) {
 	    uremnode(ccstack, firstnode(ccstack));
 	    return;
@@ -4107,7 +4456,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    }
 
 	    /* This flag allows us to use read -l and -c. */
-	    incompctlfunc = 1;
+	    if (!incompfunc)
+		incompctlfunc = 1;
 	    sfcontext = SFC_COMPLETE;
 	    /* Call the function. */
 	    doshfunc(cc->func, list, args, 0, 1);
@@ -4126,7 +4476,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	char *j, *jj;
 
 	for (i = 0; i < MAXJOB; i++)
-	    if (jobtab[i].stat & STAT_INUSE) {
+	    if ((jobtab[i].stat & STAT_INUSE) &&
+		jobtab[i].procs && jobtab[i].procs->text) {
 		int stopped = jobtab[i].stat & STAT_STOPPED;
 
 		j = jj = dupstring(jobtab[i].procs->text);
@@ -4274,7 +4625,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    }
 
 	    /* No harm in allowing read -l and -c here, too */
-	    incompctlfunc = 1;
+	    if (!incompfunc)
+		incompctlfunc = 1;
 	    sfcontext = SFC_COMPLETE;
 	    doshfunc(cc->ylist, list, args, 0, 1);
 	    sfcontext = osc;
@@ -4528,10 +4880,12 @@ makearray(LinkList l, int s, int *np, int *nlp)
 	    for (bp = ap; bp[1] && matcheq(*ap, bp[1]); bp++, n--);
 	    ap = bp;
 	    /* Mark those, that would show the same string in the list. */
-	    for (; bp[1] && !strcmp((*ap)->str, (bp[1])->str); bp++) {
-		(bp[1])->flags |= CMF_NOLIST; nl++;
-	    }
+	    for (; bp[1] && !strcmp((*ap)->str, (bp[1])->str); bp++)
+		(bp[1])->flags |= CMF_NOLIST;
 	}
+	for (ap = rp; *ap; ap++)
+	    if ((*ap)->flags & CMF_NOLIST)
+		nl++;
 	*cp = NULL;
     }
     if (np)
@@ -4991,10 +5345,14 @@ do_single(Cmatch m)
     if (m->suf) {
 	havesuff = 1;
 	menuinsc = ztrlen(m->suf);
-	if (menuwe && (m->flags & CMF_REMOVE)) {
-	    makesuffix(menuinsc);
-	    if (menuinsc == 1)
-		suffixlen[m->suf[0]] = 1;
+	menulen -= menuinsc;
+	if (menuwe) {
+	    menuend += menuinsc;
+	    if (m->flags & CMF_REMOVE) {
+		makesuffix(menuinsc);
+		if (menuinsc == 1)
+		    suffixlen[STOUC(m->suf[0])] = 1;
+	    }
 	}
     } else {
 	/* There is no user-specified suffix, *
@@ -5463,7 +5821,8 @@ listmatches(void)
 		}
 		if (n) {
 		    putc('\n', shout);
-		    p = skipnolist(p + 1);
+		    if (n && nl)
+			p = skipnolist(p + 1);
 		}
 	    }
 	}
@@ -5671,7 +6030,7 @@ expandcmdpath(void)
 	feep();
 	return;
     }
-    str = findcmd(s);
+    str = findcmd(s, 1);
     zsfree(s);
     if (!str) {
 	feep();
@@ -5686,7 +6045,6 @@ expandcmdpath(void)
 	cs += cmdwe - cmdwb + strlen(str);
     if (cs > ll)
 	cs = ll;
-    zsfree(str);
 }
 
 /* Extra function added by AR Iano-Fletcher. */

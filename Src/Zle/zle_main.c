@@ -443,9 +443,9 @@ zleread(char *lp, char *rp, int ha)
     insmode = unset(OVERSTRIKE);
     eofsent = 0;
     resetneeded = 0;
-    lpptbuf = promptexpand(lp, 1, NULL, NULL);
+    lpromptbuf = promptexpand(lp, 1, NULL, NULL);
     pmpt_attr = txtchange;
-    rpptbuf = promptexpand(rp, 1, NULL, NULL);
+    rpromptbuf = promptexpand(rp, 1, NULL, NULL);
     rpmpt_attr = txtchange;
     histallowed = ha;
     PERMALLOC {
@@ -529,8 +529,8 @@ zleread(char *lp, char *rp, int ha)
 	statusline = NULL;
 	invalidatelist();
 	trashzle();
-	free(lpptbuf);
-	free(rpptbuf);
+	free(lpromptbuf);
+	free(rpromptbuf);
 	zleactive = 0;
 	alarm(0);
     } LASTALLOC;
@@ -565,13 +565,14 @@ execzlefunc(Thingy func)
 	showmsg(msg);
 	zsfree(msg);
 	feep();
-    } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_COMP)) {
+    } else if((w = func->widget)->flags &
+	      (WIDGET_INT|WIDGET_COMP | WIDGET_NCOMP)) {
 	int wflags = w->flags;
 
 	if(!(wflags & ZLE_KEEPSUFFIX))
 	    removesuffix();
 	if(!(wflags & ZLE_MENUCMP) ||
-	   ((wflags & WIDGET_COMP) && compwidget != w)) {
+	   ((wflags & (WIDGET_COMP|WIDGET_NCOMP)) && compwidget != w)) {
 	    /* If we are doing a special completion, and the widget
 	     * is not the one currently in use for special completion,
 	     * we are starting a new completion.
@@ -586,6 +587,9 @@ execzlefunc(Thingy func)
 	if (wflags & WIDGET_COMP) {
 	    compwidget = w;
 	    completespecial();
+	} else if (wflags & WIDGET_NCOMP) {
+	    compwidget = w;
+	    completecall();
 	} else
 	    w->u.fn();
 	if (!(wflags & ZLE_NOTCOMMAND))
@@ -855,7 +859,7 @@ trashzle(void)
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLR", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgG",     NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGc",    NULL),
 };
 
 /**/
@@ -868,6 +872,11 @@ setup_zle(Module m)
     refreshptr = zrefresh;
     spaceinlineptr = spaceinline;
     zlereadptr = zleread;
+
+    addmatchesptr = addmatches;
+    comp_strptr = comp_str;
+    getcpatptr = getcpat;
+    makecomplistcallptr = makecomplistcall;
 
     /* initialise the thingies */
     init_thingies();
@@ -930,6 +939,11 @@ finish_zle(Module m)
     refreshptr = noop_function;
     spaceinlineptr = noop_function_int;
     zlereadptr = fallback_zleread;
+
+    addmatchesptr = NULL;
+    comp_strptr = NULL;
+    getcpatptr = NULL;
+    makecomplistcallptr = NULL;
 
     return 0;
 }

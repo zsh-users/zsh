@@ -54,7 +54,7 @@ evalcond(Cond c)
 		    int l = arrlen((char **) c->right);
 
 		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
-			zerr("unrecognized condition: `-%s'", (char *) c->left, 0);
+			zerr("unrecognized condition: `%s'", (char *) c->left, 0);
 			return 0;
 		    }
 		}
@@ -68,13 +68,13 @@ evalcond(Cond c)
 		    int l = arrlen(a);
 
 		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
-			zerr("unrecognized condition: `-%s'", (char *) c->left, 0);
+			zerr("unrecognized condition: `%s'", (char *) c->left, 0);
 			return 0;
 		    }
 		    a[0] = (char *) c->left;
 		    return cd->handler(a, cd->condid);
 		} else
-		    zerr("unrecognized condition: `-%s'", (char *) c->left, 0);
+		    zerr("unrecognized condition: `%s'", (char *) c->left, 0);
 	    }
 	    return 0;
 	}

@@ -92,6 +92,27 @@ nofill(tt(LPAR()zftp open; zftp get foo >bar; zftp close)tt(RPAR() &))
 --- here, the connection is restricted to a background subshell and
 you are free to open a simultaneous connection in the foreground.
 )
+item(tt(test))(
+Test the connection; if the server has reported
+that it has closed the connection (maybe due to a timeout), return
+status 2; if no connection was open anyway, return status 1; else
+return status 0.  The tt(test) subcommand is
+silent, apart from messages printed by the tt($ZFTP_VERBOSE)
+mechanism, or error messages if the connection closes.  There is no
+network overhead for this test.
+
+The test is only supported on systems with either the tt(select(2)) or
+tt(poll(2)) system calls; otherwise the message tt(not
+supported on this system) is printed instead.
+
+It is useful to put the code
+
+nofill(tt([[ -n $ZFTP_HOST ]] && zftp test))
+
+into the shell function tt(precmd) for testing the connection before
+every prompt.  However, tt(zftp) will call tt(test) at the start of any
+other subcommand when a connection is open.
+)
 item(tt(cd) var(directory))(
 Change the remote directory to var(directory).  Also alters the shell
 variable tt(ZFTP_PWD).

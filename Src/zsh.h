@@ -1305,6 +1305,22 @@ struct ttyinfo {
  * Memory management *
  *********************/
 
+/* heappush saves the current heap state using this structure */
+
+struct heapstack {
+    struct heapstack *next;	/* next one in list for this heap */
+    size_t used;
+};
+
+/* A zsh heap. */
+
+struct heap {
+    struct heap *next;		/* next one                                  */
+    size_t used;		/* bytes used from the heap                  */
+    struct heapstack *sp;	/* used by pushheap() to save the value used */
+#define arena(X)	((char *) (X) + sizeof(struct heap))
+};
+
 #ifndef DEBUG
 # define HEAPALLOC	do { int nonlocal_useheap = global_heapalloc(); do
 
@@ -1318,6 +1334,13 @@ struct ttyinfo {
 # define LASTALLOC_RETURN \
 			if ((nonlocal_useheap ? global_heapalloc() : \
 			     global_permalloc()), 0) {;} else return
+
+# define NEWHEAPS(h)    do { Heap oldheaps = h = new_heaps(); do
+# define OLDHEAPS       while (0); old_heaps(oldheaps); } while (0);
+
+# define SWITCHHEAPS(h)  do { Heap oldheaps = switch_heaps(h); do
+# define SWITCHBACKHEAPS while (0); switch_heaps(oldheaps); } while (0);
+
 #else
 # define HEAPALLOC	do { int nonlocal_useheap = global_heapalloc(); \
 			alloc_stackp++; do
@@ -1333,6 +1356,17 @@ struct ttyinfo {
 # define LASTALLOC_RETURN \
 			if ((nonlocal_useheap ? global_heapalloc() : \
 			    global_permalloc()),alloc_stackp--,0){;}else return
+
+# define NEWHEAPS(h)    do { Heap oldheaps = h = new_heaps(); \
+                        alloc_stackp++; do
+# define OLDHEAPS       while (0); alloc_stackp--; \
+                        old_heaps(oldheaps); } while (0);
+
+# define SWITCHHEAPS(h)  do { Heap oldheaps = switch_heaps(h); \
+                         alloc_stackp++; do
+# define SWITCHBACKHEAPS while (0); alloc_stackp--; \
+                         switch_heaps(oldheaps); } while (0);
+
 #endif
 
 /****************/

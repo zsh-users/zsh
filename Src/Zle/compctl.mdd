@@ -1,5 +1,7 @@
 moddeps="comp1"
 
-autobins="compctl"
+autobins="compctl complist compadd"
+
+autoprefixconds="prefix iprefix position word mword current mcurrent string class words between mbetween after mafter nmatches"
 
 objects="compctl.o"

@@ -85,7 +85,7 @@ the standard behavior for all commands.  For example, if your access
 to the user database is too slow and/or it contains too many users (so
 that completion after `tt(~)' is too slow to be usable), you can use
 
-nofill(tt(compctl -Tx  'C[0,*/*]' -f - 's[~]' -k friends -S/))
+nofill(tt(compctl -Tx  'C[0,*/*]' -f - 's[~]' -k friends -S/ -tn))
 
 to complete the strings in the array tt(friends) after a `tt(~)'.
 The first argument is necessary so that this form of ~-completion is
@@ -432,16 +432,18 @@ the sorted ones. I.e. it is possible to have a sorted and a unsorted group
 with the same name and the matches in those groups will not be mixed.
 )
 item(tt(-t) var(continue))(
-The var(continue)-string contains a set of characters that specify if 
-and when completion should continue to produce matches where it normally
-would not do that. The character tt(c) means that completion continues
-with the next suitable compctl (i.e. if you don't specify this in a
-tt(compctl -T), compctls for commands are never used). The character
-tt(PLUS()) is used to continue with the matches for the next alternative
-completion (see below). The characters tt(-) and tt(x) may be used in
-sub-lists for extended completion (see below). They will make the completion
-code use the flag list after the next tt(-) (if the corresponding pattern
-matches) and the default flag list (those before the tt(-x)), respectively.
+The var(continue)-string contains a character that specifies which set 
+of completion flags should be used next. Normally those of the next
+matching compctl are used, i.e. pattern compctls and normal compctls
+after tt(-T) and after a pattern compctl. If var(continue) is the
+character tt(PLUS()) the flags for the next alternative completion
+(see below) are used. The characters tt(-) and tt(x) can be used in
+sub-lists for extended completion (see below). They will make the
+completion code use the flag list after the next tt(-) (if the
+corresponding pattern matches) and the default flag list (those before
+the tt(-x)), respectively. if var(continue) is the character tt(n) no
+other flag lists are used, i.e. the generation of matches stops
+immediately.
 )
 item(tt(-M) var(match-spec))(
 This defines additional matching control specifications that should be used

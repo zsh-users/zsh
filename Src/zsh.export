@@ -23,6 +23,7 @@ closem
 cmdnamtab
 columns
 compctlreadptr
+cond_match
 cond_str
 cond_val
 coprocin
@@ -104,6 +105,8 @@ inredir
 insertlinknode
 install_handler
 intr
+intvargetfn
+intvarsetfn
 inwhat
 isfirstln
 jobtab
@@ -126,6 +129,7 @@ mypgrp
 mypid
 nameddirtab
 ncalloc
+new_heaps
 newhashtable
 newlinklist
 nicechar
@@ -137,6 +141,7 @@ noerrs
 noholdintr
 noop_function
 noop_function_int
+old_heaps
 optiontab
 opts
 paramtab
@@ -148,6 +153,7 @@ path
 pathchecked
 popheap
 postedit
+pparams
 ppid
 prefork
 prepromptfns
@@ -197,6 +203,9 @@ strpfx
 strsfx
 strucpy
 struncpy
+strvargetfn
+strvarsetfn
+switch_heaps
 tclen
 tcstr
 termflags

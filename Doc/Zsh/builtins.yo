@@ -947,9 +947,10 @@ otherwise it is determined by the width of the value of the
 first assignment.
 )
 item(tt(-a))(
-The names refer to array parameters.  For historical reasons, scalar
-parameters are created even when this flag is specified, but the
-output is restricted to arrays (including associative arrays).
+The names refer to array parameters.  An array parameter may be
+created this way, but it may not be assigned to in the tt(typeset)
+statement.  When displaying, both normal and associative arrays are
+shown.
 )
 item(tt(-f))(
 The names refer to functions rather than parameters.  No assignments

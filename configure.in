@@ -340,7 +340,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 termios.h sys/param.h sys/filio.h string.h memory.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdlib.h unistd.h sys/capability.h \
-		 utmp.h utmpx.h sys/types.h pwd.h grp.h)
+		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -467,9 +467,22 @@ elif test $zsh_cv_decl_ospeed_must_define = yes; then
 fi
 
 dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)
+dnl  Some termcaps reportedly accept a zero buffer, but then dump core
+dnl  in tgetstr().
 AC_CACHE_CHECK(if tgetent accepts NULL,
 zsh_cv_func_tgetent_accepts_null,
-[AC_TRY_RUN([main(){int i = tgetent((char*)0,"vt100");exit(!i || i == -1);}],
+[AC_TRY_RUN([
+main()
+{
+    int i = tgetent((char*)0,"vt100");
+    if (i > 0) {
+	char tbuf[1024], *u;
+    	u = tbuf;
+    	tgetstr("cl", &u);
+    }
+    exit(!i || i == -1);
+}
+],
   zsh_cv_func_tgetent_accepts_null=yes,
   zsh_cv_func_tgetent_accepts_null=no,
   zsh_cv_func_tgetent_accepts_null=no)])
@@ -615,7 +628,7 @@ dnl need to integrate this function
 dnl AC_FUNC_STRFTIME
 
 AC_CHECK_FUNCS(memcpy memmove \
-              strftime waitpid select tcsetpgrp tcgetattr strstr lstat \
+              strftime waitpid select poll tcsetpgrp tcgetattr strstr lstat \
               getlogin setpgid gettimeofday gethostname mkfifo wait3 difftime \
               sigblock sigsetmask sigrelse sighold killpg sigaction getrlimit \
               sigprocmask setuid seteuid setreuid setresuid setsid strerror \

@@ -387,11 +387,11 @@ filesubstr(char **namptr, int assign)
 	for (pp = str + 1; !isend2(*pp); pp++);
 	sav = *pp;
 	*pp = 0;
-	if (!(cnam = findcmd(str + 1))) {
+	if (!(cnam = findcmd(str + 1, 1))) {
 	    Alias a = (Alias) aliastab->getnode(aliastab, str + 1);
 	    
 	    if (a)
-		cnam = ztrdup(a->text);
+		cnam = a->text;
 	    else {
 		if (isset(NOMATCH))
 		    zerr("%s not found", str + 1, 0);
@@ -399,7 +399,6 @@ filesubstr(char **namptr, int assign)
 	    }
 	}
 	*namptr = dupstring(cnam);
-	zsfree(cnam);
 	if (sav) {
 	    *pp = sav;
 	    *namptr = dyncat(*namptr, pp);

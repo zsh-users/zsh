@@ -45,7 +45,7 @@ else
 fi
 echo '
 	extern char **environ;
-	void *symlist1[] = {
+	void *symlist1[[]] = {
 		(void *)&environ,
 		(void *)0
 	};

@@ -457,13 +457,17 @@ execute(Cmdnam not_used_yet, int dash)
     _exit(1);
 }
 
-#define try(X) { if (iscom(X)) return ztrdup(X); }
+#define RET_IF_COM(X) { if (iscom(X)) return docopy ? dupstring(X) : arg0; }
 
-/* get the full pathname of an external command */
+/*
+ * Get the full pathname of an external command.
+ * If the second argument is zero, return the first argument if found;
+ * if non-zero, return the path using heap memory.  (RET_IF_COM(X), above).
+ */
 
 /**/
 char *
-findcmd(char *arg0)
+findcmd(char *arg0, int docopy)
 {
     char **pp;
     char *z, *s, buf[MAXCMDLEN];
@@ -476,7 +480,7 @@ findcmd(char *arg0)
 	return NULL;
     for (s = arg0; *s; s++)
 	if (*s == '/') {
-	    try(arg0);
+	    RET_IF_COM(arg0);
 	    if (arg0 == s || unset(PATHDIRS)) {
 		return NULL;
 	    }
@@ -496,13 +500,13 @@ findcmd(char *arg0)
 			*z++ = '/';
 		    }
 		    strcpy(z, arg0);
-		    try(buf);
+		    RET_IF_COM(buf);
 		}
 	    strcpy(nn, cn->u.name ? *(cn->u.name) : "");
 	    strcat(nn, "/");
 	    strcat(nn, cn->nam);
 	}
-	try(nn);
+	RET_IF_COM(nn);
     }
     for (pp = path; *pp; pp++) {
 	z = buf;
@@ -511,7 +515,7 @@ findcmd(char *arg0)
 	    *z++ = '/';
 	}
 	strcpy(z, arg0);
-	try(buf);
+	RET_IF_COM(buf);
     }
     return NULL;
 }

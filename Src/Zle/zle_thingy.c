@@ -246,7 +246,10 @@ freewidget(Widget w)
 {
     if ((w->flags & WIDGET_COMP) && w->u.cc)
 	freecompctl(w->u.cc);
-    else if(!(w->flags & WIDGET_INT))
+    else if (w->flags & WIDGET_NCOMP) {
+	zsfree(w->u.comp.wid);
+	zsfree(w->u.comp.func);
+    } else if(!(w->flags & WIDGET_INT))
 	zsfree(w->u.fnnam);
     zfree(w, sizeof(*w));
 }
@@ -337,16 +340,17 @@ bin_zle(char *name, char **args, char *ops, int func)
 	{ 'A', bin_zle_link, 2,  2 },
 	{ 'N', bin_zle_new,  1,  2 },
 	{ 'C', bin_zle_compctl, 1, -1},
+	{ 'c', bin_zle_complete, 3, 3 },
 	{ 0,   bin_zle_call, 0, -1 },
     };
     struct opn const *op, *opp;
     int n;
 
     /* select operation and ensure no clashing arguments */
-    for(op = opns; op->o && !ops[op->o]; op++) ;
+    for(op = opns; op->o && !ops[STOUC(op->o)]; op++) ;
     if(op->o)
 	for(opp = op; (++opp)->o; )
-	    if(ops[opp->o]) {
+	    if(ops[STOUC(opp->o)]) {
 		zerrnam(name, "incompatible operation selection options",
 		    NULL, 0);
 		return 1;
@@ -395,6 +399,11 @@ scanlistwidgets(HashNode hn, int list)
 	if (w->flags & WIDGET_COMP) {
 	    if (printcompctlptr && w->u.cc)
 		printcompctlptr(NULL, w->u.cc, PRINT_LIST, 0);
+	} else if (w->flags & WIDGET_NCOMP) {
+	    fputc(' ', stdout);
+	    quotedzputs(w->u.comp.wid, stdout);
+	    fputc(' ', stdout);
+	    quotedzputs(w->u.comp.func, stdout);
 	} else if(strcmp(t->nam, w->u.fnnam)) {
 	    fputc(' ', stdout);
 	    quotedzputs(w->u.fnnam, stdout);
@@ -405,6 +414,11 @@ scanlistwidgets(HashNode hn, int list)
 	    fputs(" -C", stdout);
 	    if (printcompctlptr && w->u.cc)
 		printcompctlptr(NULL, w->u.cc, PRINT_TYPE, 0);
+	} else if (w->flags & WIDGET_NCOMP) {
+	    fputs(" -c ", stdout);
+	    nicezputs(w->u.comp.wid, stdout);
+	    fputc(' ', stdout);
+	    nicezputs(w->u.comp.func, stdout);
 	} else if(strcmp(t->nam, w->u.fnnam)) {
 	    fputs(" (", stdout);
 	    nicezputs(w->u.fnnam, stdout);
@@ -506,11 +520,39 @@ bin_zle_compctl(char *name, char **args, char *ops, char func)
 
 /**/
 static int
+bin_zle_complete(char *name, char **args, char *ops, char func)
+{
+    Thingy t;
+    Widget w, cw;
+
+    t = rthingy(args[1]);
+    cw = t->widget;
+    unrefthingy(t);
+    if (!(cw->flags & ZLE_ISCOMP)) {
+	zerrnam(name, "invalid widget `%s'", args[1], 0);
+	return 1;
+    }
+    w = zalloc(sizeof(*w));
+    w->flags = WIDGET_NCOMP|ZLE_MENUCMP|ZLE_KEEPSUFFIX;
+    w->first = NULL;
+    w->u.comp.fn = cw->u.fn;
+    w->u.comp.wid = ztrdup(args[1]);
+    w->u.comp.func = ztrdup(args[2]);
+    if (bindwidget(w, rthingy(args[0]))) {
+	freewidget(w);
+	zerrnam(name, "widget name `%s' is protected", args[0], 0);
+	return 1;
+    }
+    return 0;
+}
+
+/**/
+static int
 bin_zle_call(char *name, char **args, char *ops, char func)
 {
     Thingy t;
 
-    if(!zleactive || incompctlfunc) {
+    if(!zleactive || incompctlfunc || incompfunc) {
 	zerrnam(name, "widgets can only be called when ZLE is active",
 	    NULL, 0);
 	return 1;

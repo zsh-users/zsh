@@ -598,10 +598,10 @@ bin_bindkey(char *name, char **argv, char *ops, int func)
     int n;
 
     /* select operation and ensure no clashing arguments */
-    for(op = opns; op->o && !ops[op->o]; op++) ;
+    for(op = opns; op->o && !ops[STOUC(op->o)]; op++) ;
     if(op->o)
 	for(opp = op; (++opp)->o; )
-	    if(ops[opp->o]) {
+	    if(ops[STOUC(opp->o)]) {
 		zwarnnam(name, "incompatible operation selection options",
 		    NULL, 0);
 		return 1;

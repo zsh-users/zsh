@@ -52,7 +52,7 @@ execfor(Cmd cmd)
     List list;
     Forcmd node;
     char *str;
-    int val;
+    int val = 0;
     LinkList args;
 
     node = cmd->u.forcmd;

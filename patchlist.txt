@@ -213,3 +213,56 @@ Sven's ignored character fix, 4828
 More Sven condition patches, 4837, 4842
 
 Final (???) isident() fix from Sven, 4845
+
+  pws-5
+
+Name of top level directory is now zsh-3.1.5-pws-5
+
+Missing part of Bart's sethparam() changes, 4851
+
+zftp test subcommand, 4852
+
+Geoff's refresh fix for a line the same length as the terminal width,
+4855
+
+Bart's fix for array slices, 4874
+
+Sven's accept-and-menu-complete-fix, 4878
+
+Sven's group completion fix, 4879
+
+Sven's module condition fixes, 4880
+
+Oliver Kiddle's autoconf fix, 4887
+
+My zftp fix (actually due to Andrej Borsenkow) for systems which only
+allow dup'ing sockets after they are connected, 4888.
+
+Bart's fix to making setting associative array elements inside
+substitutions consistent, 4893
+
+My typeset neatness and -a and -m fix, 4902
+
+My brief Etc/MACHINES addition, 4912
+
+My modification to findcmd() for memory leaks, 4923, plus comment
+alteration by Bart, 4924
+
+Sven's patch for completion after various reserved words, 4930
+
+My patch for compiler warnings, 4931
+
+My configuration fix for when tgetent() accepts a null argument but
+then tgetstr() dumps core, 4939
+
+Sven's alteration of `-t' behaviour, 4940.  This is slightly
+incompatible with previous patched versions of 3.1.5 since now you don't
+need '-tc' with -T.  However, you now do need '-tn' in cases where you
+don't want normal completion tried after a -T matches.
+
+Sven's new completion functions, 4850, 4881, 4941, 4942, 4943, 4944,
+4946, 4949, plus my addition of function pointers, 4945.  The example
+file is now in Misc/new-completion-examples.
+
+(Effect of) fix from Helmut Jarausch in 4947 partly due to change
+missed in patch.

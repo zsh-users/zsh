@@ -17,15 +17,18 @@
 # defines one module.  The .mdd file is actually a shell script, which will
 # be sourced.  It may define the following shell variables:
 #
-#   moddeps       modules on which this module depends (default none)
-#   nozshdep      non-empty indicates no dependence on the `zsh' pseudo-module
-#   alwayslink    if non-empty, always link the module into the executable
-#   autobins      builtins defined by the module, for autoloading
-#   objects       .o files making up this module (*must* be defined)
-#   proto         .pro files for this module (default generated from $objects)
-#   headers       extra headers for this module (default none)
-#   hdrdeps       extra headers on which the .mdh depends (default none)
-#   otherincs     extra headers that are included indirectly (default none)
+#   moddeps         modules on which this module depends (default none)
+#   nozshdep        non-empty indicates no dependence on the `zsh' pseudo-module
+#   alwayslink      if non-empty, always link the module into the executable
+#   autobins        builtins defined by the module, for autoloading
+#   autoinfixconds  infix condition codes defined by the module, for
+#                   autoloading (without the leading `-')
+#   autoprefixconds like autoinfixconds, but for prefix condition codes
+#   objects         .o files making up this module (*must* be defined)
+#   proto           .pro files for this module (default generated from $objects)
+#   headers         extra headers for this module (default none)
+#   hdrdeps         extra headers on which the .mdh depends (default none)
+#   otherincs       extra headers that are included indirectly (default none)
 #
 # The .mdd file may also include a Makefile.in fragment between lines
 # `:<<\Make' and `Make' -- this will be copied into Makemod.in.
@@ -167,7 +170,7 @@ if $first_stage; then
     for module in $here_modules; do
 
 	unset moddeps nozshdep alwayslink hasexport
-	unset autobins
+	unset autobins autoinfixconds autoprefixconds
 	unset objects proto headers hdrdeps otherincs
 	. $top_srcdir/$the_subdir/${module}.mdd
 	test -n "${moddeps+set}" || moddeps=

@@ -373,7 +373,7 @@ parse_class(Cpattern p, unsigned char *s, unsigned char e)
 
 /**/
 static int
-get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
+get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 {
     /* Parse the basic flags for completion:
      * first is a flag that we are not in extended completion,
@@ -394,12 +394,17 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 	if(argv[0] && argv[0][0] == '-')
 	    argv++;
 	*av = argv;
-	freecompctl(cc);
- 	cclist = COMP_REMOVE;
-	return 0;
+	if (cl)
+	    return 1;
+	else {
+	    freecompctl(cc);
+	    cclist = COMP_REMOVE;
+	    return 0;
+	}
     }
 
     memset((void *)&cct, 0, sizeof(cct));
+    cct.mask2 = CC_CCCONT;
 
     /* Loop through the flags until we have no more:        *
      * those with arguments are not properly allocated yet, *
@@ -505,6 +510,10 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 		{
 		    char *p;
 
+		    if (cl) {
+			zerrnam(name, "illegal option -%c", NULL, **argv);
+			return 1;
+		    }
 		    if ((*argv)[1]) {
 			p = (*argv) + 1;
 			*argv = "" - 1;
@@ -516,26 +525,28 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 			p = *++argv;
 			*argv = "" - 1;
 		    }
-		    while (*p) {
-			switch (*p) {
-			case '+':
-			    cct.mask2 |= CC_XORCONT;
-			    break;
-			case 'c':
-			    cct.mask2 |= CC_CCCONT;
-			    break;
-			case '-':
-			    cct.mask2 |= CC_PATCONT;
-			    break;
-			case 'x':
-			    cct.mask2 |= CC_DEFCONT;
-			    break;
-			default:
-			    zwarnnam(name, "invalid retry specification character `%c'",
-				     NULL, *p);
-			    return 1;
-			}
-			p++;
+		    switch (*p) {
+		    case '+':
+			cct.mask2 = CC_XORCONT;
+			break;
+		    case 'n':
+			cct.mask2 = 0;
+			break;
+		    case '-':
+			cct.mask2 = CC_PATCONT;
+			break;
+		    case 'x':
+			cct.mask2 = CC_DEFCONT;
+			break;
+		    default:
+			zwarnnam(name, "invalid retry specification character `%c'",
+				 NULL, *p);
+			return 1;
+		    }
+		    if (p[1]) {
+			zwarnnam(name, "too many retry specification characters: `%s'",
+				 p + 1, 0);
+			return 1;
 		    }
 		}
 		break;
@@ -645,7 +656,10 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 		}
 		break;
 	    case 'l':
-		if ((*argv)[1]) {
+		if (cl) {
+		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    return 1;
+		} else if ((*argv)[1]) {
 		    cct.subcmd = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
@@ -745,6 +759,10 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 		*argv = "" - 1;
 		break;
 	    case 'C':
+		if (cl) {
+		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    return 1;
+		}
 		if (first && !hx) {
 		    cclist |= COMP_COMMAND;
 		} else {
@@ -754,6 +772,10 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 		}
 		break;
 	    case 'D':
+		if (cl) {
+		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    return 1;
+		}
 		if (first && !hx) {
 		    isdef = 1;
 		    cclist |= COMP_DEFAULT;
@@ -764,7 +786,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 		}
 		break;
  	    case 'T':
-              if (first && !hx) {
+		if (cl) {
+		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    return 1;
+		}
+		if (first && !hx) {
  		    cclist |= COMP_FIRST;
  		} else {
  		    zwarnnam(name, "misplaced first completion (-T) flag",
@@ -773,6 +799,10 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
  		}
  		break;
 	    case 'L':
+		if (cl) {
+		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    return 1;
+		}
 		if (!first || hx) {
 		    zwarnnam(name, "illegal use of -L flag", NULL, 0);
 		    return 1;
@@ -780,6 +810,10 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 		cclist |= COMP_LIST;
 		break;
 	    case 'x':
+		if (cl) {
+		    zerrnam(name, "extended completion not allowed", NULL, 0);
+		    return 1;
+		}
 		if (!argv[1]) {
 		    zwarnnam(name, "condition expected after -%c", NULL,
 			    **argv);
@@ -811,6 +845,10 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 
 	if (*++argv && (!ready || ready == 2) &&
 	    **argv == '+' && !argv[0][1]) {
+	    if (cl) {
+		zerrnam(name, "xor'ed completion illegal", NULL, 0);
+		return 1;
+	    }
 	    /* There's an alternative (+) completion:  assign
 	     * what we have so far before moving on to that.
 	     */
@@ -835,6 +873,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef)
 		cc->xor = (Compctl) zcalloc(sizeof(*cc));
 		cc = cc->xor;
 		memset((void *)&cct, 0, sizeof(cct));
+		cct.mask2 = CC_CCCONT;
 	    }
 	}
     }
@@ -1084,7 +1123,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 	(*next)->cond = m;
 	argv++;
 	/* End of the condition; get the flags that go with it. */
-	if (get_compctl(name, &argv, *next, 0, isdef))
+	if (get_compctl(name, &argv, *next, 0, isdef, 0))
 	    return 1;
  	if ((!argv || !*argv) && (cclist & COMP_SPECIAL))
  	    /* default, first, or command completion finished */
@@ -1362,17 +1401,16 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 	    t >>= 1;
 	}
     }
-    if (flags2 & (CC_XORCONT | CC_CCCONT | CC_PATCONT | CC_DEFCONT)) {
+    if (flags2 & (CC_XORCONT | CC_PATCONT | CC_DEFCONT)) {
 	printf(" -t");
 	if (flags2 & CC_XORCONT)
 	    putchar('+');
-	if (flags2 & CC_CCCONT)
-	    putchar('c');
 	if (flags2 & CC_PATCONT)
 	    putchar('-');
 	if (flags2 & CC_DEFCONT)
 	    putchar('x');
-    }
+    } else if (!(flags2 & CC_CCCONT))
+	printf(" -tn");
     /* now flags with arguments */
     printif(cc->mstr, 'M');
     if (flags2 & CC_NOSORT)
@@ -1518,7 +1556,7 @@ bin_compctl(char *name, char **argv, char *ops, int func)
 	    return ret - 1;
 
 	cc = (Compctl) zcalloc(sizeof(*cc));
-	if (get_compctl(name, &argv, cc, 1, 0)) {
+	if (get_compctl(name, &argv, cc, 1, 0, 0)) {
 	    freecompctl(cc);
 	    return 1;
 	}
@@ -1610,7 +1648,7 @@ compctl_widget(char *name, char **argv)
   cclist = 0;
   showmask = 0;
 
-  if (get_compctl(name, &argv, cc, 1, 0)) {
+  if (get_compctl(name, &argv, cc, 1, 0, 0)) {
       freecompctl(cc);
       return NULL;
   }
@@ -1632,8 +1670,478 @@ compctl_widget(char *name, char **argv)
   return cc;
 }
 
+/**/
+static int
+bin_complist(char *name, char **argv, char *ops, int func)
+{
+    Compctl cc;
+    int ret = 0;
+
+    if (!incompfunc) {
+	zerrnam(name, "can only be called from completion function", NULL, 0);
+	return 1;
+    }
+    cc = (Compctl) zcalloc(sizeof(*cc));
+    cclist = 0;
+    showmask = 0;
+
+    if (get_compctl(name, &argv, cc, 1, 0, 1))
+	ret = 1;
+    else if (*argv) {
+	zerrnam(name, "command names illegal", NULL, 0);
+	ret = 1;
+    } else
+	makecomplistcallptr(cc);
+
+    freecompctl(cc);
+    return ret;
+}
+
+/**/
+static int
+bin_compadd(char *name, char **argv, char *ops, int func)
+{
+    char *p, **sp, *e;
+    char *ipre = NULL, *ppre = NULL, *psuf = NULL, *prpre = NULL;
+    char *pre = NULL, *suf = NULL, *group = NULL;
+    int f = 0, q = 0, m = 0, ns = 0, a = 0;
+
+    if (!incompfunc) {
+	zerrnam(name, "can only be called from completion function", NULL, 0);
+	return 1;
+    }
+    for (; *argv && **argv ==  '-'; argv++) {
+	for (p = *argv + 1; *p; p++) {
+	    sp = NULL;
+	    switch (*p) {
+	    case 'q':
+		f |= CMF_REMOVE;
+		break;
+	    case 'Q':
+		q = 1;
+		break;
+	    case 'f':
+		f |= CMF_FILE;
+		break;
+	    case 'n':
+		f |= CMF_NOLIST;
+		break;
+	    case 'U':
+		m = 1;
+		break;
+	    case 'P':
+		sp = &pre;
+		e = "string expected after -%c";
+		break;
+	    case 'S':
+		sp = &suf;
+		e = "string expected after -%c";
+		break;
+	    case 'J':
+		sp = &group;
+		e = "group name expected after -%c";
+		break;
+	    case 'V':
+		if (!group)
+		    ns = 1;
+		sp = &group;
+		e = "group name expected after -%c";
+		break;
+	    case 'i':
+		sp = &ipre;
+		e = "string expected after -%c";
+		break;
+	    case 'p':
+		sp = &ppre;
+		e = "string expected after -%c";
+		break;
+	    case 's':
+		sp = &psuf;
+		e = "string expected after -%c";
+		break;
+	    case 'W':
+		sp = &prpre;
+		e = "string expected after -%c";
+		break;
+	    case 'a':
+		a = 1;
+		break;
+	    case '-':
+		argv++;
+		goto ca_args;
+	    default:
+		zerrnam(name, "bad option: -%c", NULL, *p);
+		return 1;
+	    }
+	    if (sp) {
+		if (*sp) {
+		    zerrnam(name, "doubled option: -%c", NULL, *p);
+		    return 1;
+		}
+		if (p[1]) {
+		    *sp = p + 1;
+		    p = "" - 1;
+		} else if (argv[1]) {
+		    *sp = *++argv;
+		    p = "" - 1;
+		} else {
+		    zerrnam(name, e, NULL, *p);
+		    return 1;
+		}
+	    }
+	}
+    }
+ ca_args:
+    if (!*argv) {
+	zerrnam(name, "missing completions", NULL, 0);
+	return 1;
+    }
+    addmatchesptr(ipre, ppre, psuf, prpre, pre, suf, group,
+		  f, q, m, ns, a, argv);
+    return 0;
+}
+
+#define VAR(X) ((void *) (&(X)))
+static struct compparam {
+    char *name;
+    int type;
+    void *var;
+} compparams[] = {
+    { "CURRENT", PM_INTEGER, VAR(compcurrent) },
+    { "CONTEXT", PM_SCALAR, VAR(compcontext) },
+    { "COMMAND", PM_SCALAR, VAR(compcommand) },
+    { "PREFIX", PM_SCALAR, VAR(compprefix) },
+    { "SUFFIX", PM_SCALAR, VAR(compsuffix) },
+    { "IPREFIX", PM_SCALAR, VAR(compiprefix) },
+    { "NMATCHES", PM_INTEGER, VAR(compnmatches) },
+    { NULL, 0, NULL }
+};
+
+/**/
+void makecompparams(void)
+{
+    struct compparam *cp;
+
+    for (cp = compparams; cp->name; cp++) {
+	Param pm = createparam(cp->name, cp->type | PM_SPECIAL);
+	if (!pm)
+	    pm = (Param) paramtab->getnode(paramtab, cp->name);
+	DPUTS(!pm, "param not set in makecompparams");
+
+	pm->level = locallevel;
+	pm->u.data = cp->var;
+	switch(PM_TYPE(cp->type)) {
+	case PM_SCALAR:
+	    pm->sets.cfn = strvarsetfn;
+	    pm->gets.cfn = strvargetfn;
+	    break;
+	case PM_INTEGER:
+	    pm->sets.ifn = intvarsetfn;
+	    pm->gets.ifn = intvargetfn;
+	    break;
+	}
+	pm->unsetfn = compunsetfn;
+    }
+}
+
+/**/
+static void
+compunsetfn(Param pm, int exp)
+{
+    if (exp)
+	stdunsetfn(pm, exp);
+}
+
+/**/
+static int
+comp_wrapper(List list, FuncWrap w, char *name)
+{
+    if (!incompfunc)
+	return 1;
+    else {
+	char *octxt, *ocmd, *opre, *osuf, *oipre;
+	long ocur;
+
+	ocur = compcurrent;
+	octxt = dupstring(compcontext);
+	ocmd = dupstring(compcommand);
+	opre = dupstring(compprefix);
+	osuf = dupstring(compsuffix);
+	oipre = dupstring(compiprefix);
+
+	runshfunc(list, w, name);
+
+	compcurrent = ocur;
+	zsfree(compcontext);
+	compcontext = ztrdup(octxt);
+	zsfree(compcommand);
+	compcommand = ztrdup(ocmd);
+	zsfree(compprefix);
+	compprefix = ztrdup(opre);
+	zsfree(compsuffix);
+	compsuffix = ztrdup(osuf);
+	zsfree(compiprefix);
+	compiprefix = ztrdup(oipre);
+
+	return 0;
+    }
+}
+
+/**/
+static void
+ignore_prefix(int l)
+{
+    char *o, sav = compprefix[l];
+
+    compprefix[l] = '\0';
+    o = compiprefix;
+    compiprefix = tricat(o, compprefix, "");
+    zsfree(o);
+    compprefix[l] = sav;
+    o = compprefix;
+    compprefix = ztrdup(o + l);
+    zsfree(o);
+}
+
+/**/
+static int
+comp_check(void)
+{
+    if (!incompfunc) {
+	zerr("condition can only be used in completion function", NULL, 0);
+	return 0;
+    }
+    return 1;
+}
+
+/**/
+static void
+restrict_range(int b, int e)
+{
+    int i = e - b;
+    char **p = (char **) zcalloc((i + 1) * sizeof(char *)), **q, **pp;
+
+    for (q = p, pp = pparams + b + 1; i; i--, q++, pp++)
+	*q = ztrdup(*pp);
+    zsfree(compcommand);
+    compcommand = ztrdup(pparams[b]);
+    freearray(pparams);
+    pparams = p;
+    zsfree(compcontext);
+    if ((compcurrent -= b + 1))
+	compcontext = ztrdup("arg");
+    else
+	compcontext = ztrdup("cmd");
+}
+
+/**/
+static int
+cond_prefix(char **a, int id)
+{
+    if (comp_check())
+	return strpfx(cond_str(a, 0), compprefix);
+    return 0;
+}
+
+/**/
+static int
+cond_iprefix(char **a, int id)
+{
+    if (comp_check()) {
+	char *s = cond_str(a, 0);
+
+	if (strpfx(s, compprefix)) {
+	    ignore_prefix(strlen(s));
+	    return 1;
+	}
+    }
+    return 0;
+}
+
+/**/
+static int
+cond_position(char **a, int id)
+{
+    if (comp_check()) {
+	int b = cond_val(a, 0), e = (a[1] ? cond_val(a, 1) : b);
+	int l = arrlen(pparams), t, i = compcurrent - 1;
+
+	if (b > 0)
+	    b--;
+	if (e > 0)
+	    e--;
+	if (b < 0)
+	    b += l;
+	if (e < 0)
+	    e += l;
+	t = (b >= 0 && e >= 0 && i >= b && i <= e && b <= e);
+
+	if (t && a[1]) {
+	    if (b > l)
+		b = l;
+	    if (e > l)
+		e = l;
+	    restrict_range(b, e);
+	}
+	return t;
+    }
+    return 0;
+}
+
+/**/
+static int
+cond_word(char **a, int id)
+{
+    if (comp_check()) {
+	int o = ((id & 2) ? compcurrent : 0) + cond_val(a, 0);
+	int l = arrlen(pparams);
+	char *s;
+
+	if (o < 0)
+	    o += l;
+
+	o--;
+	if (o < 0 || o >= l)
+	    return 0;
+
+	s = pparams[o];
+	return ((id & 1) ? cond_match(a, 1, s) : !strcmp(s, cond_str(a, 1)));
+    }
+    return 0;
+}
+
+/**/
+static int
+cond_strcl(char **a, int id)
+{
+    if (comp_check()) {
+	char *s;
+	int i;
+
+	if (a[1]) {
+	    s = cond_str(a, 1);
+	    i = cond_val(a, 0);
+	} else {
+	    s = cond_str(a, 0);
+	    i = -1;
+	}
+	if (!getcpatptr) {
+	    zerr("zle not loaded, zle condition not available", NULL, 0);
+	    return 1;
+	}
+	i = getcpatptr(comp_strptr(NULL, NULL), i, s, id);
+	if (i != -1) {
+	    ignore_prefix(i);
+	    return 1;
+	}
+    }
+    return 0;
+}
+
+/**/
+static int
+cond_words(char **a, int id)
+{
+    if (comp_check()) {
+	int b = cond_val(a, 0), e = (a[1] ? cond_val(a, 1) : -1);
+	int l = arrlen(pparams);
+
+	return (l >= b && l <= e);
+    }
+    return 0;
+}
+
+/**/
+static int
+cond_range(char **a, int id)
+{
+    if (comp_check()) {
+	char *s, **p;
+	int i, l = arrlen(pparams), t = 0, b = 0, e = l - 1;
+	Comp c;
+
+	i = compcurrent - 1;
+	if (i < 0 || i >= l)
+	    return 0;
+
+	if (id & 1) {
+	    s = a[0];
+	    singsub(&s);
+	    c = parsereg(s);
+	} else
+	    s = cond_str(a, 0);
+
+	for (i--, p = pparams + i; i >= 0; p--, i--) {
+	    if (((id & 1) ? domatch(*p, c, 0) : !strcmp(*p, s))) {
+		b = i + 1;
+		t = 1;
+		break;
+	    }
+	}
+	if (t && (id & 2)) {
+	    int tt = 0;
+
+	    if (id & 1) {
+		s = a[1];
+		singsub(&s);
+		c = parsereg(s);
+	    } else
+		s = cond_str(a, 1);
+
+	    for (i++, p = pparams + i; i < l; p++, i++) {
+		if (((id & 1) ? domatch(*p, c, 0) : !strcmp(*p, s))) {
+		    e = i - 1;
+		    tt = 1;
+		    break;
+		}
+	    }
+	    if (tt && i < compcurrent)
+		t = 0;
+	}
+	if (e < b)
+	    t = 0;
+	if (t)
+	    restrict_range(b, e);
+	return t;
+    }
+    return 0;
+}
+
+/**/
+static int
+cond_nmatches(char **a, int id)
+{
+    if (comp_check())
+	return compnmatches == cond_val(a, 0);
+    return 0;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("compctl", 0, bin_compctl, 0, -1, 0, NULL, NULL),
+    BUILTIN("complist", 0, bin_complist, 1, -1, 0, NULL, NULL),
+    BUILTIN("compadd", 0, bin_compadd, 1, -1, 0, NULL, NULL),
+};
+
+static struct conddef cotab[] = {
+    CONDDEF("prefix", 0, cond_prefix, 1, 1, 0),
+    CONDDEF("iprefix", 0, cond_iprefix, 1, 1, 0),
+    CONDDEF("position", 0, cond_position, 1, 2, 0),
+    CONDDEF("word", 0, cond_word, 2, 2, 0),
+    CONDDEF("mword", 0, cond_word, 2, 2, 1),
+    CONDDEF("current", 0, cond_word, 2, 2, 2),
+    CONDDEF("mcurrent", 0, cond_word, 2, 2, 3),
+    CONDDEF("string", 0, cond_strcl, 1, 2, 0),
+    CONDDEF("class", 0, cond_strcl, 1, 2, 1),
+    CONDDEF("words", 0, cond_words, 1, 2, 0),
+    CONDDEF("between", 0, cond_range, 2, 2, 2),
+    CONDDEF("mbetween", 0, cond_range, 2, 2, 3),
+    CONDDEF("after", 0, cond_range, 1, 1, 0),
+    CONDDEF("mafter", 0, cond_range, 1, 1, 1),
+    CONDDEF("nmatches", 0, cond_nmatches, 1, 1, 0),
+};
+
+static struct funcwrap wrapper[] = {
+    WRAPDEF(comp_wrapper),
 };
 
 /**/
@@ -1643,6 +2151,7 @@ setup_compctl(Module m)
     compctltab->printnode = printcompctlp;
     printcompctlptr = printcompctl;
     compctl_widgetptr = compctl_widget;
+    makecompparamsptr = makecompparams;
     return 0;
 }
 
@@ -1650,7 +2159,9 @@ setup_compctl(Module m)
 int
 boot_compctl(Module m)
 {
-    if(!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)))
+    if(!(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
+	 addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab)) |
+	 !addwrapper(m, wrapper)))
 	return 1;
     return 0;
 }
@@ -1662,6 +2173,8 @@ int
 cleanup_compctl(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
+    deletewrapper(m, wrapper);
     return 0;
 }
 
@@ -1672,6 +2185,7 @@ finish_compctl(Module m)
     compctltab->printnode = NULL;
     printcompctlptr = NULL;
     compctl_widgetptr = NULL;
+    makecompparamsptr = NULL;
     return 0;
 }
 

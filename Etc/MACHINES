@@ -45,7 +45,8 @@ HP: HP-UX 9, 10.20
 	Should build `out-of-the-box'.
 
 IBM: AIX
-	Should build `out-of-the-box'.
+	Should build `out-of-the-box'.  On AIX 3.x (at least),
+	--enable-zsh-mem will not work.
 
 Linux: Linux (i386) [3.1.4]
 	If you are using an early minor version of libc 5, then a bug
@@ -92,3 +93,6 @@ Sun: Solaris 2.*
 	To avoid this, make sure you compile zsh without any reference
 	to /usr/ucblib in your LD_LIBRARY_PATH.  You can easily do this
 	by just unsetting LD_LIBRARY_PATH before building zsh.
+
+	Under Solaris 2.7, dynamically loaded library support with
+	--enable-dynamic currently does not work.

@@ -457,11 +457,11 @@ add(int c)
 
 #define SETPARBEGIN {if (zleparse && !(inbufflags & INP_ALIAS) && cs >= ll+1-inbufct) parbegin = inbufct;}
 #define SETPAREND {\
-	    if (zleparse && !(inbufflags & INP_ALIAS) && parbegin != -1 && parend == -1)\
+	    if (zleparse && !(inbufflags & INP_ALIAS) && parbegin != -1 && parend == -1) {\
 		if (cs >= ll + 1 - inbufct)\
 		    parbegin = -1;\
 		else\
-		    parend = inbufct;}
+		    parend = inbufct;} }
 
 static int
 cmd_or_math(int cs_type)
@@ -823,20 +823,22 @@ gettokstr(int c, int sub)
 	case LX2_OUTPAR:
 	    if ((sub || in_brace_param) && isset(SHGLOB))
 		break;
-	    if (!in_brace_param && !pct--)
+	    if (!in_brace_param && !pct--) {
 		if (sub) {
 		    pct = 0;
 		    break;
 		} else
 		    goto brk;
+	    }
 	    c = Outpar;
 	    break;
 	case LX2_BAR:
-	    if (!pct && !in_brace_param)
+	    if (!pct && !in_brace_param) {
 		if (sub)
 		    break;
 		else
 		    goto brk;
+	    }
 	    if (unset(SHGLOB) || (!sub && !in_brace_param))
 		c = Bar;
 	    break;
@@ -912,8 +914,9 @@ gettokstr(int c, int sub)
 		    *bptr = '\0';
 		    return STRING;
 		}
-		if (in_brace_param)
+		if (in_brace_param) {
 		    cmdpush(CS_BRACE);
+		}
 		bct++;
 	    }
 	    break;
@@ -922,8 +925,9 @@ gettokstr(int c, int sub)
 		break;
 	    if (!bct)
 		break;
-	    if (in_brace_param)
+	    if (in_brace_param) {
 		cmdpop();
+	    }
 	    if (bct-- == in_brace_param)
 		in_brace_param = 0;
 	    c = Outbrace;
@@ -933,11 +937,12 @@ gettokstr(int c, int sub)
 		c = Comma;
 	    break;
 	case LX2_OUTANG:
-	    if (!intpos)
+	    if (!intpos) {
 		if (in_brace_param || sub)
 		    break;
 		else
 		    goto brk;
+	    }
 	    e = hgetc();
 	    if (e != '(') {
 		hungetc(e);
@@ -1101,11 +1106,12 @@ gettokstr(int c, int sub)
 			break;
 		    }
 		    add(c);
-		    if (c == '\'')
+		    if (c == '\'') {
 			if ((inquote = !inquote))
 			    STOPHIST
 			else
 			    ALLOWHIST
+		    }
 		}
 	    if (inquote)
 		ALLOWHIST
@@ -1260,8 +1266,9 @@ dquote_parse(char endchar, int sub)
     }
     if (intick == 2)
 	ALLOWHIST
-    if (intick)
+    if (intick) {
 	cmdpop();
+    }
     while (bct--)
 	cmdpop();
     if (lexstop)
