@@ -1,3 +1,8 @@
+2002-09-06  Oliver Kiddle  <opk@zsh.org>
+
+	* 17632: Completion/Unix/Command/_cvs: add descriptions for keyword
+	substitutions
+
 2002-09-06  Clint Adams  <clint@zsh.org>
 
 	* 17629: Completion/Unix/Command/_ssh: patch from Juergen Erhard
@@ -18,7 +23,7 @@
 	* unposted: Completion/Unix/Command/_lynx,
 	Completion/Unix/Command/_links: minor bug fix (missing -g)
 
-	* Thomas Köhler: 176xx: Completion/Unix/Command/_ssh: also pass
+	* Thomas Köhler: 17610: Completion/Unix/Command/_ssh: also pass
 	through -F option
 
 	* 17607: Completion/Unix/Command/_ssh: pass through options such as
