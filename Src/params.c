@@ -1933,9 +1933,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	    adduserdir(oldpm->nam, oldpm->u.str, 0, 0);
     }
 
-    /* Even removable specials shouldn't be deleted. */
-    if (!(pm->flags & PM_SPECIAL))
-	paramtab->freenode((HashNode) pm); /* free parameter node */
+    paramtab->freenode((HashNode) pm); /* free parameter node */
 }
 
 /* Standard function to unset a parameter.  This is mostly delegated to *
