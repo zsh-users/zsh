@@ -137,16 +137,10 @@
 >errout:
 >Output
 
-# Following two tests have to be separated since in
-#   print bar >foo >bar && print "$(<foo) $(<bar)"
-# the multios aren't flushed until after the substitutions take
-# place.  This can't be right.
   rm -f errout
   print doo be doo be doo >foo >bar 
-0:setup 2-file multio
-
   print "foo: $(<foo)\nbar: $(<bar)"
-0:read 2-file multio
+0:2-file multio
 >foo: doo be doo be doo
 >bar: doo be doo be doo
 
@@ -162,11 +156,9 @@
   rm -f *
   touch out1 out2
   print All files >*
-0:setup multio with globbing
-
   print *
   print "out1: $(<out1)\nout2: $(<out2)"
-0:read multio with globbing
+0:multio with globbing
 >out1 out2
 >out1: All files
 >out2: All files

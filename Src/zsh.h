@@ -697,6 +697,7 @@ struct job {
     char *pwd;			/* current working dir of shell when *
 				 * this job was spawned              */
     struct process *procs;	/* list of processes                 */
+    struct process *auxprocs;	/* auxiliary processes e.g multios   */
     LinkList filelist;		/* list of files to delete when done */
     int stty_in_env;		/* if STTY=... is present            */
     struct ttyinfo *ty;		/* the modes specified by STTY       */

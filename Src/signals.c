@@ -487,8 +487,11 @@ zhandler(int sig)
             }
 
 	    /* Find the process and job containing this pid and update it. */
-	    if (findproc(pid, &jn, &pn)) {
+	    if (findproc(pid, &jn, &pn, 0)) {
 		update_process(pn, status);
+		update_job(jn);
+	    } else if (findproc(pid, &jn, &pn, 1)) {
+		pn->status = status;
 		update_job(jn);
 	    } else {
 		/* If not found, update the shell record of time spent by

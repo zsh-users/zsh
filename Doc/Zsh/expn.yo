@@ -332,7 +332,16 @@ cuts fields 1 and 3 from the files var(file1) and var(file2) respectively,
 pastes the results together, and sends it to the processes
 var(process1) and var(process2).
 
-Both the tt(/dev/fd) and the named pipe implementation have drawbacks.  In
+If tt(=LPAR())var(...)tt(RPAR()) is used instead of
+tt(<LPAR())var(...)tt(RPAR()),
+then the file passed as an argument will be the name
+of a temporary file containing the output of the var(list)
+process.  This may be used instead of the tt(<)
+form for a program that expects to lseek (see manref(lseek)(2))
+on the input file.
+
+The tt(=) form is useful as both the tt(/dev/fd) and the named pipe
+implementation of tt(<LPAR())var(...)tt(RPAR()) have drawbacks.  In 
 the former case, some programmes may automatically close the file
 descriptor in question before examining the file on the command line,
 particularly if this is necessary for security reasons such as when the
@@ -353,12 +362,25 @@ example(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)t
 The shell uses pipes instead of FIFOs to implement the latter
 two process substitutions in the above example.
 
-If tt(=) is used,
-then the file passed as an argument will be the name
-of a temporary file containing the output of the var(list)
-process.  This may be used instead of the tt(<)
-form for a program that expects to lseek (see manref(lseek)(2))
-on the input file.
+There is an additional problem with tt(>LPAR())var(process)tt(RPAR()); when
+this is attached to an external command, the parent shell does not wait
+for var(process) to finish and hence an immediately following command
+cannot rely on the results being complete.  The problem and solution are
+the same as described in the section em(MULTIOS) in
+ifzman(zmanref(zshmisc))\
+ifnzman(noderef(Redirection)).  Hence in a simplified
+version of the example above:
+
+example(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR()) tt(> >LPAR())var(process)tt(RPAR()))
+
+(note that no tt(MULTIOS) are involved), var(process) will be run
+asynchronously.  The workaround is:
+
+example(tt({ paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR() }) tt(> >LPAR())var(process)tt(RPAR()))
+
+The extra processes here are
+spawned from the parent shell which will wait for their completion.
+
 texinode(Parameter Expansion)(Command Substitution)(Process Substitution)(Expansion)
 sect(Parameter Expansion)
 cindex(parameter expansion)

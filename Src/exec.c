@@ -318,7 +318,7 @@ execcursh(Estate state, int do_exec)
 {
     Wordcode end = state->pc + WC_CURSH_SKIP(state->pc[-1]);
 
-    if (!list_pipe && thisjob != list_pipe_job)
+    if (!list_pipe && thisjob != list_pipe_job && !hasprocs(thisjob))
 	deletejob(jobtab + thisjob);
     cmdpush(CS_CURSH);
     execlist(state, 1, do_exec);
@@ -1054,7 +1054,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 
 		    curjob = newjob;
 		    DPUTS(!list_pipe_pid, "invalid list_pipe_pid");
-		    addproc(list_pipe_pid, list_pipe_text);
+		    addproc(list_pipe_pid, list_pipe_text, 0);
 
 		    /* If the super-job contains only the sub-shell, the
 		       sub-shell is the group leader. */
@@ -1088,13 +1088,13 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    makerunning(jn);
 		}
 		if (!(jn->stat & STAT_LOCKED)) {
-		    updated = !!jobtab[thisjob].procs;
+		    updated = hasprocs(thisjob);
 		    waitjobs();
 		    child_block();
 		} else
 		    updated = 0;
 		if (!updated &&
-		    list_pipe_job && jobtab[list_pipe_job].procs &&
+		    list_pipe_job && hasprocs(list_pipe_job) &&
 		    !(jobtab[list_pipe_job].stat & STAT_STOPPED)) {
 		    child_unblock();
 		    child_block();
@@ -1143,7 +1143,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			    jn->stat |= STAT_SUBJOB | STAT_NOPRINT;
 			    jn->other = pid;
 			}
-			if ((list_pipe || last1) && jobtab[list_pipe_job].procs)
+			if ((list_pipe || last1) && hasprocs(list_pipe_job))
 			    killpg(jobtab[list_pipe_job].gleader, SIGSTOP);
 			break;
 		    }
@@ -1251,7 +1251,7 @@ execpline2(Estate state, wordcode pcode,
 		char dummy, *text;
 
 		text = getjobtext(state->prog, state->pc);
-		addproc(pid, text);
+		addproc(pid, text, 0);
 		close(synch[1]);
 		read(synch[0], &dummy, 1);
 		close(synch[0]);
@@ -1388,13 +1388,19 @@ closemn(struct multio **mfds, int fd)
 	struct multio *mn = mfds[fd];
 	char buf[TCBUFSIZE];
 	int len, i;
+	pid_t pid;
 
-	if (zfork()) {
+	if ((pid = zfork())) {
 	    for (i = 0; i < mn->ct; i++)
 		zclose(mn->fds[i]);
 	    zclose(mn->pipe);
+	    if (pid == -1) { 
+		mfds[fd] = NULL;
+		return;
+	    }
 	    mn->ct = 1;
 	    mn->fds[0] = fd;
+	    addproc(pid, NULL, 1);
 	    return;
 	}
 	/* pid == 0 */
@@ -2054,7 +2060,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			  3 : WC_ASSIGN_NUM(ac) + 2);
 		}
 	    }
-	    addproc(pid, text);
+	    addproc(pid, text, 0);
             opts[AUTOCONTINUE] = oautocont;
 	    return;
 	}
@@ -2946,38 +2952,28 @@ getproc(char *cmd)
     Eprog prog;
     int out = *cmd == Inang;
     char *pnam;
+    pid_t pid;
+
 #ifndef PATH_DEV_FD
     int fd;
-#else
-    int pipes[2];
-#endif
 
     if (thisjob == -1)
 	return NULL;
-#ifndef PATH_DEV_FD
     if (!(pnam = namedpipe()))
 	return NULL;
-#else
-    pnam = hcalloc(strlen(PATH_DEV_FD) + 6);
-#endif
     if (!(prog = parsecmd(cmd)))
 	return NULL;
-#ifndef PATH_DEV_FD
     if (!jobtab[thisjob].filelist)
 	jobtab[thisjob].filelist = znewlinklist();
     zaddlinknode(jobtab[thisjob].filelist, ztrdup(pnam));
 
-    if (zfork()) {
-#else
-    mpipe(pipes);
-    if (zfork()) {
-	sprintf(pnam, "%s/%d", PATH_DEV_FD, pipes[!out]);
-	zclose(pipes[out]);
-	fdtable[pipes[!out]] = 2;
-#endif
+    if ((pid = zfork())) {
+	if (pid == -1)
+	    return NULL;
+	if (!out)
+	    addproc(pid, NULL, 1);
 	return pnam;
     }
-#ifndef PATH_DEV_FD
     closem(0);
     fd = open(pnam, out ? O_WRONLY | O_NOCTTY : O_RDONLY | O_NOCTTY);
     if (fd == -1) {
@@ -2986,11 +2982,37 @@ getproc(char *cmd)
     }
     entersubsh(Z_ASYNC, 1, 0, 0);
     redup(fd, out);
-#else
+#else /* PATH_DEV_FD */
+    int pipes[2];
+
+    if (thisjob == -1)
+	return NULL;
+    pnam = hcalloc(strlen(PATH_DEV_FD) + 6);
+    if (!(prog = parsecmd(cmd)))
+	return NULL;
+    mpipe(pipes);
+    if ((pid = zfork())) {
+	sprintf(pnam, "%s/%d", PATH_DEV_FD, pipes[!out]);
+	zclose(pipes[out]);
+	if (pid == -1)
+	{
+	    zclose(pipes[!out]);
+	    return NULL;
+	}
+	fdtable[pipes[!out]] = 2;
+	if (!out)
+	{
+	    addproc(pid, NULL, 1);
+	    fprintf(stderr, "Proc %d added\n", pid);
+	    fflush(stderr);
+	}
+	return pnam;
+    }
     entersubsh(Z_ASYNC, 1, 0, 0);
     redup(pipes[out], out);
     closem(0);   /* this closes pipes[!out] as well */
-#endif
+#endif /* PATH_DEV_FD */
+
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
     cmdpop();
@@ -3008,12 +3030,18 @@ getpipe(char *cmd)
 {
     Eprog prog;
     int pipes[2], out = *cmd == Inang;
+    pid_t pid;
 
     if (!(prog = parsecmd(cmd)))
 	return -1;
     mpipe(pipes);
-    if (zfork()) {
+    if ((pid = zfork())) {
 	zclose(pipes[out]);
+	if (pid == -1) {
+	    zclose(pipes[!out]);
+	    return -1;
+	}
+	addproc(pid, NULL, 1);
 	return pipes[!out];
     }
     entersubsh(Z_ASYNC, 1, 0, 0);
@@ -3226,13 +3254,14 @@ execshfunc(Shfunc shf, LinkList args)
     if (errflag)
 	return;
 
-    if (!list_pipe && thisjob != list_pipe_job) {
+    if (!list_pipe && thisjob != list_pipe_job && !hasprocs(thisjob)) {
 	/* Without this deletejob the process table *
 	 * would be filled by a recursive function. */
 	last_file_list = jobtab[thisjob].filelist;
 	jobtab[thisjob].filelist = NULL;
 	deletejob(jobtab + thisjob);
     }
+
     if (isset(XTRACE)) {
 	LinkNode lptr;
 	printprompt4();

@@ -130,20 +130,34 @@ makerunning(Job jn)
 
 /**/
 int
-findproc(pid_t pid, Job *jptr, Process *pptr)
+findproc(pid_t pid, Job *jptr, Process *pptr, int aux)
 {
     Process pn;
     int i;
 
     for (i = 1; i < MAXJOB; i++)
-	for (pn = jobtab[i].procs; pn; pn = pn->next)
+    {
+	for (pn = aux ? jobtab[i].auxprocs : jobtab[i].procs;
+	     pn; pn = pn->next)
 	    if (pn->pid == pid) {
 		*pptr = pn;
 		*jptr = jobtab + i;
 		return 1;
 	    }
+    }
 
     return 0;
+}
+
+/* Does the given job number have any processes? */
+
+/**/
+int
+hasprocs(int job)
+{
+    Job jn = jobtab + job;
+
+    return jn->procs || jn->auxprocs;
 }
 
 /* Find the super-job of a sub-job. */
@@ -168,7 +182,7 @@ handle_sub(int job, int fg)
 {
     Job jn = jobtab + job, sj = jobtab + jn->other;
 
-    if ((sj->stat & STAT_DONE) || !sj->procs) {
+    if ((sj->stat & STAT_DONE) || (!sj->procs && !sj->auxprocs)) {
 	struct process *p;
 		    
 	for (p = sj->procs; p; p = p->next)
@@ -256,6 +270,10 @@ update_job(Job jn)
     int job;
     int val = 0, status = 0;
     int somestopped = 0, inforeground = 0;
+
+    for (pn = jn->auxprocs; pn; pn = pn->next)
+	if (pn->status == SP_RUNNING)
+	    return;
 
     for (pn = jn->procs; pn; pn = pn->next) {
 	if (pn->status == SP_RUNNING)      /* some processes in this job are running       */
@@ -806,6 +824,13 @@ freejob(Job jn, int deleting)
 	zfree(pn, sizeof(struct process));
     }
 
+    pn = jn->auxprocs;
+    jn->auxprocs = NULL;
+    for (; pn; pn = nx) {
+	nx = pn->next;
+	zfree(pn, sizeof(struct process));
+    }
+
     if (jn->ty)
 	zfree(jn->ty, sizeof(struct ttyinfo));
     if (jn->pwd)
@@ -819,7 +844,6 @@ freejob(Job jn, int deleting)
     }
     jn->gleader = jn->other = 0;
     jn->stat = jn->stty_in_env = 0;
-    jn->procs = NULL;
     jn->filelist = NULL;
     jn->ty = NULL;
 }
@@ -842,13 +866,19 @@ deletejob(Job jn)
     freejob(jn, 1);
 }
 
-/* add a process to the current job */
+/*
+ * Add a process to the current job.
+ * The third argument is 1 if we are adding a process which is not
+ * part of the main pipeline but an auxiliary process used for
+ * handling MULTIOS or process substitution.  We will wait for it
+ * but not display job information about it.
+ */
 
 /**/
 void
-addproc(pid_t pid, char *text)
+addproc(pid_t pid, char *text, int aux)
 {
-    Process pn;
+    Process pn, *pnlist;
     struct timezone dummy_tz;
 
     pn = (Process) zcalloc(sizeof *pn);
@@ -857,25 +887,30 @@ addproc(pid_t pid, char *text)
 	strcpy(pn->text, text);
     else
 	*pn->text = '\0';
-    gettimeofday(&pn->bgtime, &dummy_tz);
     pn->status = SP_RUNNING;
     pn->next = NULL;
 
-    /* if this is the first process we are adding to *
-     * the job, then it's the group leader.          */
-    if (!jobtab[thisjob].gleader)
-	jobtab[thisjob].gleader = pid;
+    if (!aux)
+    {
+	gettimeofday(&pn->bgtime, &dummy_tz);
+	/* if this is the first process we are adding to *
+	 * the job, then it's the group leader.          */
+	if (!jobtab[thisjob].gleader)
+	    jobtab[thisjob].gleader = pid;
+	/* attach this process to end of process list of current job */
+	pnlist = &jobtab[thisjob].procs;
+    }
+    else
+	pnlist = &jobtab[thisjob].auxprocs;
 
-    /* attach this process to end of process list of current job */
-    if (jobtab[thisjob].procs) {
+    if (*pnlist) {
 	Process n;
 
-	for (n = jobtab[thisjob].procs; n->next; n = n->next);
-	pn->next = NULL;
+	for (n = *pnlist; n->next; n = n->next);
 	n->next = pn;
     } else {
 	/* first process for this job */
-	jobtab[thisjob].procs = pn;
+	*pnlist = pn;
     }
     /* If the first process in the job finished before any others were *
      * added, maybe STAT_DONE got set incorrectly.  This can happen if *
@@ -938,7 +973,7 @@ zwaitjob(int job, int sig)
 
     dont_queue_signals();
     child_block();		 /* unblocked during child_suspend() */
-    if (jn->procs) {		 /* if any forks were done         */
+    if (jn->procs || jn->auxprocs) { /* if any forks were done         */
 	jn->stat |= STAT_LOCKED;
 	if (jn->stat & STAT_CHANGED)
 	    printjob(jn, !!isset(LONGLISTJOBS), 1);
@@ -978,7 +1013,7 @@ waitjobs(void)
 {
     Job jn = jobtab + thisjob;
 
-    if (jn->procs)
+    if (jn->procs || jn->auxprocs)
 	zwaitjob(thisjob, 0);
     else {
 	deletejob(jn);
@@ -1075,7 +1110,7 @@ spawnjob(void)
 	    fflush(stderr);
 	}
     }
-    if (!jobtab[thisjob].procs)
+    if (!hasprocs(thisjob))
 	deletejob(jobtab + thisjob);
     else
 	jobtab[thisjob].stat |= STAT_LOCKED;
@@ -1373,7 +1408,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    Job j;
 	    Process p;
 
-	    if (findproc(pid, &j, &p))
+	    if (findproc(pid, &j, &p, 0))
 		waitforpid(pid);
 	    else
 		zwarnnam(name, "pid %d is not a child of this shell", 0, pid);

@@ -209,6 +209,28 @@ example(echo foo > bar > baz)
 
 when tt(MULTIOS) is unset will truncate bar, and write `tt(foo)' into baz.
 
+There is a problem when an output multio is attached to an external
+program.  A simple example shows this:
+
+example(cat file >file1 >file2
+cat file1 file2)
+
+Here, it is possible that the second `tt(cat)' will not display the full
+contents of tt(file1) and tt(file2) (i.e. the original contents of
+tt(file) repeated twice).
+
+The reason for this is that the multios are spawned after the tt(cat)
+process is forked from the parent shell, so the parent shell does not
+wait for the multios to finish writing data.  This means the command as
+shown can exit before tt(file1) and tt(file2) are completely written.
+As a workaround, it is possible to run the tt(cat) process as part of a
+job in the current shell:
+
+example({ cat file } >file >file2)
+
+Here, the tt({)var(...)tt(}) job will pause to wait for both files to be
+written.
+
 sect(Redirections with no command)
 When a simple command consists of one or more redirection operators
 and zero or more parameter assignments, but no command name, zsh can

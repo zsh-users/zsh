@@ -1,5 +1,14 @@
 2003-05-02  Peter Stephenson  <pws@csr.com>
 
+	* 18492: Doc/Zsh/expn.yo, Doc/Zsh/redirect.yo, Src/exec.c,
+	Src/jobs.c, Src/signals.c, Src/utils.c, Src/zsh.h,
+	Test/A04redirect.ztst, Test/D03procsubst.ztst:  Work around long
+	standing problem that multios and output process substitutions
+	run asynchronously.  Remember processes and wait for them.
+	Unfortunately this only works when run from a builtin as otherwise
+	the processes are forked in a subshell which execs the main
+	command.  Document use of { ... } as workaround.
+
 	* 18496: Etc/MACHINES: Paul Ackersviller reports the curses
 	problem has gone on HP-UX 11 but --disable-dynamic is needed
 	for use with Softbench.

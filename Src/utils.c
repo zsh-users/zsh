@@ -988,10 +988,10 @@ adjustwinsize(int from)
 	    ttyrows = shttyinfo.winsize.ws_row;
 	    ttycols = shttyinfo.winsize.ws_col;
 	} else {
-	    /* Set to unknown on failure */
-	    shttyinfo.winsize.ws_row = 0;
-	    shttyinfo.winsize.ws_col = 0;
-	    resetzle = 1;
+	    /* Set to value from environment on failure */
+	    shttyinfo.winsize.ws_row = lines;
+	    shttyinfo.winsize.ws_col = columns;
+	    resetzle = (from == 1);
 	}
 #else
 	resetzle = from == 1;
