@@ -1,10 +1,13 @@
 #compdef chown chgrp
 
-local suf
+local suf usr grp req expl
 
 if [[ CURRENT -eq 2 || CURRENT -eq 3 && $words[CURRENT-1] = -* ]]; then
   if [[ $service = chgrp ]] || compset -P '*[:.]'; then
-    _groups
+    if (( EGID && $+commands[groups] )); then  # except for root
+      _wanted groups expl 'group' compadd $(groups) && return 0
+    fi
+    _groups && return 0
   else
     if [[ $OSTYPE = (solaris*|hpux*) ]]; then
       suf=':'
@@ -12,8 +15,19 @@ if [[ CURRENT -eq 2 || CURRENT -eq 3 && $words[CURRENT-1] = -* ]]; then
       suf='.'
     fi
     compset -S '.*' && unset suf
-    _users -S "$suf" -q
+    _users -S "$suf" -q && return 0
   fi
 else
-  _files
+  if [[ $service = chgrp ]]; then
+    grp=${words[CURRENT-1]}
+  else
+    usr=${words[CURRENT-1]%%[.:]*}
+    usr=${${(M)usr:#[0-9]#}:-${userdirs[$usr]:+.$usr.}}
+    grp=${${(M)words[CURRENT-1]%%[.:]*}#?}
+  fi
+  [[ -n $grp ]] && grp="${${(M)grp:#[0-9]#}:-.$grp.}"
+  req=( ${usr:+\^u$usr} ${grp:+\^g$grp} )
+  (( EUID )) && req=( u$EUID$^req )
+
+  _files -g "*(${(j:,:)req})" && return 0
 fi

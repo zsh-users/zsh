@@ -1,5 +1,8 @@
 2001-05-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 14282: Completion/Unix/Command/_chown: complete only files
+	that can be chowned.
+
 	* 14281: Completion/Base/Completer/_expand: insert redirection
 	operators when expanding after a redirection operator.
 
