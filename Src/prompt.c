@@ -526,11 +526,16 @@ putpromptchar(int doprint, int endchar)
 		    }
 		    timet = time(NULL);
 		    tm = localtime(&timet);
-		    for(t0=80; ; t0*=2) {
+		    /*
+		     * Hack because strftime won't say how
+		     * much space it actually needs.  Try to add it
+		     * a few times until it works.  Some formats don't
+		     * actually have a length, so we could go on for
+		     * ever.
+		     */
+		    for(j = 0, t0 = strlen(tmfmt)*8; j < 3; j++, t0*=2) {
 			addbufspc(t0);
-			if (ztrftime(bp, t0, tmfmt, tm) ||
-			    !strcmp("%P", tmfmt) ||
-			    !strcmp("%p", tmfmt))
+			if (ztrftime(bp, t0, tmfmt, tm) >= 0)
 			    break;
 		    }
 		    bp += strlen(bp);

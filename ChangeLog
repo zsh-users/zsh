@@ -1,3 +1,9 @@
+2004-05-04  Peter Stephenson  <pws@csr.com>
+
+	* 19877: Src/prompt.c, Src/utils.c, Src/Modules/datetime.c:
+	Improve 19869: remove infinite loop and attempt to test
+	for whether strftime() encountered an error.
+
 2004-05-04  Clint Adams  <clint@zsh.org>
 
 	* 19869: Src/prompt.c, Src/utils.c: avoid segfault when

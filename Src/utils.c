@@ -1719,6 +1719,11 @@ ztrftimebuf(int *bufsizeptr, int decr)
  * Like the system function, this returns the number of characters
  * copied, not including the terminating NUL.  This may be zero
  * if the string didn't fit.
+ *
+ * As an extension, try to detect an error in strftime --- typically
+ * not enough memory --- and return -1.  Not guaranteed to be portable,
+ * since the strftime() interface doesn't make any guarantees about
+ * the state of the buffer if it returns zero.
  */
 
 /**/
@@ -1831,9 +1836,14 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		 */
 		*buf = '\0';
 		tmp[1] = fmt[-1];
-		if (!strftime(buf, bufsize + 2, tmp, tm) &&
-		    tmp[1]!='p' && tmp[1]!='P')
+		if (!strftime(buf, bufsize + 2, tmp, tm))
+		{
+		    if (*buf) {
+			buf[0] = '\0';
+			return -1;
+		    }
 		    return 0;
+		}
 		decr = strlen(buf);
 		buf += decr;
 		bufsize -= decr - 2;
