@@ -16,7 +16,7 @@ _description files expl 'archive file'
 if [[ "$1" = *[tx]* ]]; then
   if [[ "$1" = *[zZ]* ]]; then
     _files "$expl[@]" -g '*.((tar|TAR).(gz|GZ|Z)|tgz)'
-  elif [[ "$1" = *I* ]]; then
+  elif [[ "$1" = *[Iy]* ]]; then
     _files "$expl[@]" -g '*.(tar|TAR).bz2'
   else
     _files "$expl[@]" -g '*.(tar|TAR)'
