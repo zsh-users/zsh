@@ -1,5 +1,7 @@
 2001-05-09  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: 4.0.1-pre-4.
+
 	* 14280: Doc/Zsh/options.yo: make clearer that GLOB_SUBST doesn't
 	affect braces and commas.
 
