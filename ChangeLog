@@ -1,3 +1,8 @@
+2000-11-27  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13199: .cvsignore, Completion/User/_gprof: pattern-fix in
+ 	_gprof; add config.modules to .cvsignore
+	
 2000-11-27  Peter Stephenson  <pws@csr.com>
 
 	* 13197: configure.in: fix problems with use of link parameter,

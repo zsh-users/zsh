@@ -10,7 +10,7 @@ _arguments -C -s -{a,b,c,D,h,i,l,L,s,T,v,w,x,y,z} \
 	   '-m:minimum execution count:' \
 	   ':executable:_files -g \*\(\*\)' \
 	   ':profile file:_files -g gmon.\*' \
-	   -- -s '(#--[no-] --)' \
+	   -- -s '((#s)--[no-] --)' \
            '*=name*:function name:->funcs' \
 	   '*=dirs*:directory:_dir_list' && ret=0
 
