@@ -9,7 +9,7 @@
 	some items there from existing chapters; fix a few typos.
 	Minor improvements to promptinit and history-search-end.
 	Larger improvements to predict-on, including removing the
-	`:comletion' prefix from most of its style contexts.
+	`:completion' prefix from most of its style contexts.
 
 2000-09-04  Peter Stephenson  <pws@csr.com>
 
