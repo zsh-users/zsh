@@ -365,6 +365,52 @@ if (( ! $+_fs_any )); then
       'onerror[set behaviour on error]:behaviour on error:(panic lock umount repair)'
     )
     ;;
+  freebsd*)
+    _fs_any=(
+      '(sync)async[do all I/O asynchronously]'
+      'current[use current options on already mounted file system]'
+      'force[force R/W mount of unclean filesystem]'
+      'fstab[use options listed in /etc/fstab]'
+      'noasync[do I/O synchronously]'
+      'noatime[don'"'"'t update access time]'
+      'noauto[can only be mounted explicitly]'
+      'noclusterr[disable read clustering]'
+      'noclusterw[disable write clustering]'
+      'nodev[don'"'"'t interpret devices]'
+      'noexec[don'"'"'t allow execution of binaries]'
+      'nosuid[ignore suid and sgid bits]'
+      'nosymfollow[don'"'"'t follow symlinks]'
+      'rdonly[mount file system read-only]'
+      '(async)sync[do all I/O synchronously]'
+      'suiddir[allow suid bits on directories]'
+      'update[change status of already mounted filesystem]'
+      'union[cause the namespace at the mount point to appear as the union of the mounted filesystem and the existing directory]'
+    )
+    _fs_iso9660=(
+      'extatt[enable use of extended attributes]'
+      'gens[don'"'"'t strip version number on files]'
+      'joliet[don'"'"'t use any Joliet extensions]'
+      'rrip[don'"'"'t use any Rockridge extensions]'
+      'strictjoliet[relax checking for Supplementary Volume Descriptor Flags field which is set to a wrong value on some Joliet formatted disks]'
+    )
+    _fs_std=(
+      'nodev[don'"'"'t interpret devices]'
+      'noexec[don'"'"'t allow execution of binaries]'
+      'nosuid[ignore suid and sgid bits]'
+      'rdonly[mount file system read-only]'
+      'union[cause the namespace at the mount point to appear as the union of the mounted filesystem and the existing directory]'
+    )
+    _fs_devfs=( "$_fs_std[@]" )
+    _fs_fdesc=( "$_fs_std[@]" )
+    _fs_kernfs=( "$_fs_std[@]" )
+    _fs_linprocfs=( "$_fs_std[@]" )
+    _fs_procfs=( "$_fs_std[@]" )
+    _fs_msdos=(
+      'shortnames[]'
+      'longnames[]'
+      'nowin95[]'
+    )
+    ;;
   esac
 fi
 
@@ -475,6 +521,25 @@ if [[ "$service" = mount ]]; then
     deffs=hsfs
     typeops=-F
     ;;
+  freebsd*)
+    args=( -s
+      '-a[mount all filesystems in fstab]'
+      '-d[cause everything to be done except for the actual system call]'      
+      '-f[forced mount]'
+      '-o[specify file system options]:file system option:->fsopt'
+      '-p[print mounted file systems]'
+      '-r[mount readonly]'
+      '-t[specify file system type]:file system type:->fstype'
+      '-u[change status of already mounted filesystem]'
+      '-v[verbose mode]'
+      '-w[mount read/write]'
+      ':dev or dir:->devordir'
+      ':mount point:_files -/'
+    )
+    fss=( cd9660 devfs ext2fs fdesc kernfs linprocfs mfs msdos nfs 
+          ntfs null nwfs portal procfs std ufs umap union )
+    deffs=ufs
+    ;;
   *)
     # Default for all other systems. Dunno.
 
@@ -517,6 +582,17 @@ else
 	'-v[verbose]'
       )
     ;;  
+    freebsd*)
+      args=(
+        '-a[unmount all mounted file systems]'
+        '-A[unmount all mounted file systems except the root]'
+        '-f[force unmount]'
+        '-h[unmount all filesystems associated with host]:hostnames:_hosts'
+	'-t[unmount all filesystems of specified type]:file system type:->fstype'
+	'-v[verbose mode]'
+	'*:dev or dir:->udevordir'
+      )
+    ;;
     *)
       args=( \
 	'-h[show help]'
@@ -553,20 +629,55 @@ devordir)
   if (( $+opt_args[-a] )); then
     _message "no device or directory with option \`-a'"
   else
-    _alternative \
-        'devices:device:{compadd "$expl[@]" /dev/*}' \
-	'directories:mount point:_files -/' && ret=0
+    local dev_tmp mp_tmp mline
+
+    case "$OSTYPE" in
+    freebsd*)
+      while read mline; do 
+        case $mline[(w)1] in
+          \#* )
+            ;;
+          proc)
+            ;;
+          *)
+            [[ $mline[(w)3] == swap ]] || \
+              dev_tmp=( $dev_tmp $mline[(w)1] ) \
+              mp_tmp=( $mp_tmp $mline[(w)2] )
+            ;;
+        esac
+      done < /etc/fstab
+      
+      _alternative \
+          'devices:device:compadd -a dev_tmp' \
+          'directories:mount point:compadd -a mp_tmp' && ret=0
+      ;;
+    *)
+      _alternative \
+          'devices:device:{compadd "$expl[@]" /dev/*}' \
+	  'directories:mount point:_files -/' && ret=0
+    ;;
+    esac
   fi
   ;;
 udevordir)
   if (( $+opt_args[-a] )); then
     _message "no device or directory with option \`-a'"
   else
-    local dev_tmp mp_tmp
+    local dev_tmp mp_tmp mline
 
-    tmp=( "${(@f)$(< /etc/mtab)}" )
-    dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
-    mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
+    case "$OSTYPE" in
+    freebsd*)
+      /sbin/mount | while read mline; do
+        dev_tmp=( $dev_tmp $mline[(w)1] )
+        mp_tmp=( $mp_tmp $mline[(w)3] )
+      done
+      ;;
+    *)
+      tmp=( "${(@f)$(< /etc/mtab)}" )
+      dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
+      mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
+      ;;
+    esac
 
     _alternative \
         'devices:device:compadd -a dev_tmp' \

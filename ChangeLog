@@ -1,3 +1,8 @@
+2001-06-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14883 (Jos Backus): Completion/Unix/Command/_mount: add code for
+	BSDish systems
+
 2001-06-12  Clint Adams  <clint@zsh.org>
 
 	* 14863: Src/Modules/tcp.c, Src/Modules/zftp.c:
