@@ -10,9 +10,13 @@ _arguments -C \
   '(-P --prompt)'{-P,--prompt}'[always display a prompt]' \
   '(-y --assume-yes)'{-y,--assume-yes}'[assume yes answer to questions]' \
   '(-F --display-format)'{-F,--display-format}'[specify output format for search command]:format' \
-  '(-U --sort)'{-U,--sort}'[specify sort order]:sort order:()' \
+  '(-O --sort)'{-O,--sort}'[specify sort order]:sort order:()' \
   '(-w --width)'{-w,--width}'[specify output width]:width' \
   '-f[aggressivley try to fix dependencies of broken packages]' \
+  '(-V --show-versions)'{-V,--show-versions}'[show which versions of packages will be installed]' \
+  '(-D --show-deps)'{-D,--show-deps}'[show brief explanations of automatic installations and removals]' \
+  '-Z[show disk space changes for each package]' \
+  '(-v --verbose)'{-v,--verbose}'[causes some commands to display extra information]' \
   '(--without-recommends)--with-recommends[install recommended packages when installing new packages]' \
   '(--without-suggests)--with-suggests[install suggested packages when installing new packages]' \
   '(--with-recommends)--without-recommends[ignore recommended packages when installing new packages]' \
