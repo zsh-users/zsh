@@ -1,5 +1,11 @@
 2000-12-05  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: 3.1.9-dev-8.
+
+	* 13233, 13234: Src/Modules/terminfo.mdd, Src/Modules/terminfo.c:
+	fix name for configure variable; don't crash on Solaris if
+	capability not found.
+
 	* Joel Smith <jsmith@caldera.com>: 13230: Src/exec.c, Src/glob.c,
 	Src/lex.c, Src/parse.c, Src/text.c, Src/zsh.h: avoid name clashes
 	with Linux kernel.
