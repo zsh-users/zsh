@@ -1,3 +1,8 @@
+2001-07-06  Clint Adams  <clint@zsh.org>
+
+	* 15250: zsh/pcre module will load gracefully even
+	when pcre functions are unavailable.
+
 2001-07-06  Peter Stephenson  <pws@csr.com>
 
 	* 15288: Doc/Zsh/contrib.yo,

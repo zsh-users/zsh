@@ -83,7 +83,12 @@ bin_pcre_study(char *nam, char **args, char *ops, int func)
 }
 
 /**/
-#endif /* HAVE_PCRE_STUDY */
+#else /* !HAVE_PCRE_STUDY */
+
+# define bin_pcre_study bin_notavail
+
+/**/
+#endif /* !HAVE_PCRE_STUDY */
 
 /**/
 static int
@@ -134,11 +139,19 @@ bin_pcre_match(char *nam, char **args, char *ops, int func)
     return 1;
 }
 
+/**/
+#else /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
+
+# define bin_pcre_compile bin_notavail
+# define bin_pcre_study bin_notavail
+# define bin_pcre_match bin_notavail
+
+/**/
+#endif /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
+
 static struct builtin bintab[] = {
     BUILTIN("pcre_compile", 0, bin_pcre_compile, 1, 1, 0, "aimx",  NULL),
-#ifdef HAVE_PCRE_STUDY
     BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL),
-#endif
     BUILTIN("pcre_match",   0, bin_pcre_match,   1, 2, 0, "a",    NULL)
 };
 
@@ -170,6 +183,3 @@ finish_(Module m)
 {
     return 0;
 }
-
-/**/
-#endif /* HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC */
