@@ -1,5 +1,12 @@
 2003-08-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 18980: zshconfig.ac, Doc/.cvsignore, Doc/Makefile.in,
+	Doc/Zsh/mod_system.yo, Doc/Zsh/params.yo, Src/params.c,
+	Src/Modules/.cvsignore, Src/Modules/errnames1.awk,
+	Src/Modules/errnames2.awk, Src/Modules/system.c,
+	Src/Modules/system.mdd: zsh/system module provides interface
+	to read, write and system errors.
+
 	* 18982: Src/subst.c:  Comments/rant for paramsubst().
 
 	* 18981: Doc/Zsh/tcpsys.yo: General tidy up.

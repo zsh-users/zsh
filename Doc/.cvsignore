@@ -15,3 +15,4 @@ zsh.tp zsh.tps
 zsh_*.ps
 infodir
 *.swp
+zsh.pdf zsh_a4.pdf zsh_us.pdf

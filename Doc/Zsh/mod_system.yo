@@ -1,0 +1,128 @@
+COMMENT(!MOD!zsh/system
+A builtin interface to various low-level system features.
+!MOD!)
+The tt(zsh/system) module makes available three builtin commands and
+a parameter.
+
+sect(Builtins)
+
+startitem()
+findex(syserror)
+item(tt(syserror) tt([ -e) var(errvar) tt(] [ -p) var(prefix) tt(] [) var(errno) tt(|) var(errname ]))(
+This command prints out the error message associated with var(errno), a
+system error number, followed by a newline to standard error.
+
+Instead of the error number, a name var(errname), for example
+tt(ENOENT), may be used.  The set of names is the same as the contents
+of the array tt(errnos), see below.
+
+If the string var(prefix) is given, it is printed in front of the error
+message, with no intervening space.
+
+If var(errvar) is supplied, the entire message, without a newline, is
+assigned to the parameter names var(errvar) and nothing is output.
+
+A return value of 0 indicates the message was successfully printed
+(although it may not be useful if the error number was out of the
+system's range), a return value of 1 indicates an error in the
+parameters, and a return value of 2 indicates the error name was
+not recognised (no message is printed for this).
+)
+findex(sysread)
+xitem(tt(sysread [ -c) var(countvar) tt(] [ -i) var(infd) tt(] [ -o) var(outfd) tt(]))
+item(  tt([ -s) var(bufsize) tt(] [ -t) var(timeout) tt(] [) var(param) tt(]))(
+Perform a single system read from file descriptor var(infd), or zero if
+that is not given.  The result of the read is stored in var(param) or
+var(REPLY) if that is not given.  If var(countvar) is given, the number
+of bytes read is assigned to the parameter named by var(countvar).
+
+The maximum number of bytes read is var(bufsize) or 8192 if that is not
+given, however the command returns as soon as any number of bytes was
+successfully read.
+
+If var(timeout) is given, it specifies a timeout in seconds, which may
+be zero to poll the file descriptor.  This is handled by the tt(poll)
+system call if available, otherwise the tt(select) system call if
+available.
+
+If var(outfd) is given, an attempt is made to write all the bytes just
+read to the file descriptor var(outfd).  If this fails, because of a
+system error other than tt(EINTR) or because of an internal zsh error
+during an interrupt, the bytes read but not written are stored in the
+parameter named by var(param) if supplied (no default is used in this
+case), and the number of bytes read but not written is stored in the
+parameter named by var(countvar) if that is supplied.  If it was
+successful, var(countvar) contains the full number of bytes transferred,
+as usual, and var(param) is not set.
+
+The error tt(EINTR) (interrupted system call) is handled internally so
+that shell interrupts are transparent to the caller.  Any other error
+causes a return.
+
+The possible return values are
+startitem()
+item(0)(
+At least one byte of data was successfully read and, if appropriate,
+written.
+)
+item(1)(
+There was an error in the parameters to the command.  This is the only
+error for which a message is printed to standard error.
+)
+item(2)(
+There was an error on the read, or on polling the input file descriptor
+for a timeout.  The parameter tt(ERRNO) gives the error.
+)
+item(3)(
+Data were successfully read, but there was an error writing them
+to var(outfd).  The parameter tt(ERRNO) gives the error.
+)
+item(4)(
+The attempt to read timed out.  Note this does not set tt(ERRNO) as this
+is not a system error.
+)
+item(5)(
+No system error occurred, but zero bytes were read.  This usually
+indicates end of file.  The parameters are set according to the
+usual rules; no write to var(outfd) is attempted.
+)
+enditem()
+)
+item(tt(syswrite [ -c) var(countvar) tt(] [ -o) var(outfd) tt(]) var(data))(
+The data (a single string of bytes) are written to the file descriptor
+var(outfd), or 1 if that is not given, using the tt(write) system call.
+Multiple write operations may be used if the first does not write all
+the data.
+
+If var(countvar) is given, the number of byte written is stored in the
+parameter named by var(countvar); this may not be the full length of
+var(data) if an error occurred.
+
+The error tt(EINTR) (interrupted system call) is handled internally by
+retrying; otherwise an error causes the command to return.  For example,
+if the file descriptor is set to non-blocking output, an error
+tt(EAGAIN) (on some systems, tt(EWOULDBLOCK)) may result in the command
+returning early.
+
+The return status may be 0 for success, 1 for an error in the parameters
+to the command, or 2 for an error on the write; no error message is
+printed in the last case, but the parameter tt(ERRNO) will reflect
+the error that occurred.
+)
+enditem()
+
+sect(Parameters)
+
+startitem()
+item(tt(errnos))(
+A readonly array of the names of errors defined on the system.  These
+are typically macros defined in C by including the system header file
+tt(errno.h).  The index of each name (assuming the option tt(KSH_ARRAYS)
+is unset) corresponds to the error number.  Error numbers var(num)
+before the last known error which have no name are given the name
+tt(E)var(num) in the array.
+
+Note that aliases for errors are not handled; only the canonical name is
+used.
+)
+enditem()

@@ -1117,6 +1117,39 @@ zsh_cv_path_signal_h=$SIGNAL_H
 SIGNAL_H=$zsh_cv_path_signal_h
 AC_SUBST(SIGNAL_H)dnl
 
+dnl Where are error names located?  Needed as input for errnames1.awk
+AC_CACHE_CHECK(where error names are located, zsh_cv_path_errno_h,
+[dnl Look at the output from the preprocessor.
+dnl We should get lines of the form `# 1 "/usr/include/errno.h"'
+dnl The following assumes the real definitions are in a file which
+dnl contains the name `err'; we could relax this if necessary,
+dnl but then you can get a rather long list of files to test.
+dnl The backslash substitution is to persuade cygwin to cough up
+dnl slashes rather than doubled backslashes in the path.
+echo "#include <errno.h>" > nametmp.c
+errfile_list="`$CPP nametmp.c |
+sed -n 's/^#[ 	].*\"\(.*\)\"/\1/p' |
+sed 's/\\\\\\\\/\//g' |
+$AWK '{ if (\$1 ~ \"err\") files[[\$1]] = \$1 }
+  END { for (var in files) print var }'`"
+rm -f nametmp.c
+for ERRNO_H in $errfile_list /dev/null
+do
+  dnl Try to make sure it doesn't get confused by files that don't
+  dnl have real error definitions in.  Count definitions to make sure.
+  nerrs=`test -f $ERRNO_H && \
+  grep '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*[0-9][0-9]*' $ERRNO_H | \
+  wc -l | sed 's/[ 	]//g'`
+  test "x$nerrs" != x && test "$nerrs" -ge 7 && break
+done
+if test $ERRNO_H = "/dev/null"; then
+  AC_MSG_ERROR(ERROR MACROS NOT FOUND:  please report to developers)
+fi
+zsh_cv_path_errno_h=$ERRNO_H
+])
+ERRNO_H=$zsh_cv_path_errno_h
+AC_SUBST(ERRNO_H)dnl
+
 dnl -----------------------------------------------------
 dnl Look for the file containing the RLIMIT_* definitions
 dnl -----------------------------------------------------

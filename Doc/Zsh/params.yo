@@ -520,7 +520,8 @@ item(tt(ERRNO) <S>)(
 The value of errno (see manref(errno)(3))
 as set by the most recently failed system call.
 This value is system dependent and is intended for debugging
-purposes.
+purposes.  It is also useful with the tt(zsh/system) module which
+allows the number to be turned into a name or message.
 )
 vindex(GID)
 item(tt(GID) <S>)(
