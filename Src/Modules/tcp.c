@@ -298,7 +298,7 @@ zts_delete(Tcp_session sess)
     if (!tsess->next) return 1;
 
     if (ztcp_tail == sess)
-	    ztcp_tail = tsess;
+	ztcp_tail = tsess;
     tsess->next = sess->next;
     free(sess);
     return 0;
@@ -385,8 +385,8 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 static int
 bin_ztcp(char *nam, char **args, char *ops, int func)
 {
-    int herrno, err=1, destport, force=0, verbose=0, test=0, len;
-    char **addrp, *desthost, *localname, *remotename;
+    int herrno, err=1, destport, force=0, verbose=0, test=0, targetfd=0, len;
+    char **addrp, *desthost, *localname, *remotename, **arg = args;
     struct hostent *zthost = NULL, *ztpeer = NULL;
     struct servent *srv;
     Tcp_session sess = NULL;
@@ -399,14 +399,29 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 
     if (ops['t'])
         test = 1;
+
+    if (ops['d']) {
+	targetfd = atoi(arg[0]);
+	arg++;
+	if (!targetfd) {
+	    zwarnnam(nam, "%s is an invalid argument to -d", args[0], 0);
+	    return 1;
+	}
+    }
+
+
     
     if (ops['c']) {
-	if (!args[0]) {
+	if (!arg[0]) {
 	    tcp_cleanup();
 	}
 	else {
-	    int targetfd = atoi(args[0]);
+	    targetfd = atoi(arg[0]);
 	    sess = zts_byfd(targetfd);
+	    if(!targetfd) {
+		zwarnnam(nam, "%s is an invalid argument to -c", arg[0], 0);
+		return 1;
+	    }
 
 	    if (sess)
 	    {
@@ -420,7 +435,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    }
 	    else
 	    {
-		zwarnnam(nam, "fd %s not found in tcp table", args[0], 0);
+		zwarnnam(nam, "fd %s not found in tcp table", arg[0], 0);
 		return 1;
 	    }
 	}
@@ -428,16 +443,16 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
     else if (ops['l']) {
 	int lport = 0;
 
-	if (!args[0]) {
+	if (!arg[0]) {
 	    zwarnnam(nam, "-l requires an argument", NULL, 0);
 	    return 1;
 	}
 
-	srv = getservbyname(args[0], "tcp");
+	srv = getservbyname(arg[0], "tcp");
 	if (srv)
 	    lport = srv->s_port;
 	else
-	    lport = htons(atoi(args[0]));
+	    lport = htons(atoi(arg[0]));
 	if (!lport) { zwarnnam(nam, "bad service name or port number", NULL, 0);
 	return 1;
 	}
@@ -475,8 +490,14 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
 
-	/* move the fd since no one will want to read from it */
-	sess->fd = movefd(sess->fd);
+	if (targetfd) {
+	    redup(sess->fd,targetfd);
+	    sess->fd = targetfd;
+	}
+	else {
+	    /* move the fd since no one will want to read from it */
+	    sess->fd = movefd(sess->fd);
+	}
 
 	setiparam("REPLY", sess->fd);
 
@@ -490,12 +511,12 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
     {
 	int lfd, rfd;
 
-	if (!args[0]) {
+	if (!arg[0]) {
 	    zwarnnam(nam, "-a requires an argument", NULL, 0);
 	    return 1;
 	}
 
-	lfd = atoi(args[0]);
+	lfd = atoi(arg[0]);
 
 	if (!lfd) {
 	    zwarnnam(nam, "invalid numerical argument", NULL, 0);
@@ -504,7 +525,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 
 	sess = zts_byfd(lfd);
 	if (!sess) {
-	    zwarnnam(nam, "fd %s is not registered as a tcp connection", args[0], 0);
+	    zwarnnam(nam, "fd %s is not registered as a tcp connection", arg[0], 0);
 	    return 1;
 	}
 
@@ -536,7 +557,14 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    tcp_close(sess);
 	    return 1;
 	}
-	sess->fd = rfd;
+
+	if (targetfd) {
+	    redup(rfd, targetfd);
+	    sess->fd = targetfd;
+	}
+	else {
+	    sess->fd = rfd;
+	}
 
 	setiparam("REPLY", sess->fd);
 
@@ -547,7 +575,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
     else
     {
 	
-	if (!args[0]) {
+	if (!arg[0]) {
 	    for(sess = zts_head(); sess != NULL; sess = zts_next(sess))
 	    {
 		if (sess->fd != -1)
@@ -567,19 +595,19 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    }
 	    return 0;
 	}
-	else if (!args[1]) {
+	else if (!arg[1]) {
 	    destport = htons(23);
 	}
 	else {
 
-	    srv = getservbyname(args[1],"tcp");
+	    srv = getservbyname(arg[1],"tcp");
 	    if (srv)
 		destport = srv->s_port;
 	    else
-		destport = htons(atoi(args[1]));
+		destport = htons(atoi(arg[1]));
 	}
 	
-	desthost = ztrdup(args[0]);
+	desthost = ztrdup(arg[0]);
 	
 	zthost = zsh_getipnodebyname(desthost, AF_INET, 0, &herrno);
 	if (!zthost || errflag) {
@@ -614,10 +642,17 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    } while (err && errno == EINTR && !errflag);
 	}
 	
-	if (err)
+	if (err) {
 	    zwarnnam(nam, "connection failed: %e", NULL, errno);
+	    tcp_close(sess);
+	}
 	else
 	{
+	    if (targetfd) {
+		redup(sess->fd, targetfd);
+		sess->fd = targetfd;
+	    }
+
 	    setiparam("REPLY", sess->fd);
 
 	    if (verbose)
@@ -632,7 +667,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("ztcp", 0, bin_ztcp, 0, 2, 0, "acfltv", NULL),
+    BUILTIN("ztcp", 0, bin_ztcp, 0, 3, 0, "acdfltv", NULL),
 };
 
 /* The load/unload routines required by the zsh library interface */
