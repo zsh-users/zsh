@@ -39,6 +39,15 @@ The `=prog' facility for expanding command paths (provided the EQUALS
 option is enabled, as it is by default) no longer expands aliases.  It was
 felt this feature was underused and confusing.
 
+In 4.0, a literal `/' was quoted in the `src' text of a substitution of the
+form `${foo/src/rep}' or ${foo//src/rep} with two backslashes.  This was
+documented, but inconsistent with normal quoting conventions and poorly
+implemented.  The `/' now requires only one backslash to quote it whether
+or not the expression occurs in double quotes.  For example:
+  % foo=word/bird
+  % print ${foo/\//-} "${foo/\//+}"
+  word-bird word+bird
+
 Documentation
 -------------
 

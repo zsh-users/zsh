@@ -906,7 +906,7 @@ _perforce_jobviews() {
     # by various logical operators.  The `=' could be a comparison,
     # but we don't currently bother with that here; it's a bit cumbersome
     # to complete.
-    local line type oldifs=$IFS IFS= key value
+    local line type oldifs=$IFS IFS= key value slash=/
     local match mbegin mend
     # This is simply to split out two space-delimited words a backreferences.
     local m2words
@@ -962,7 +962,7 @@ _perforce_jobviews() {
 
     for key in ${(k)p4fields}; do
 	if [[ -n ${p4values[$key]} ]]; then
-	    valuespec+=("${key}:${p4fields[$key]}:(${p4values[$key]//\\// })")
+	    valuespec+=("${key}:${p4fields[$key]}:(${p4values[$key]//$slash/ })")
 	elif [[ $key = job ]]; then
 	    # Nothing special for jobs; add our own completion.
 	    valuespec+=("${key}:Perforce job:_perforce_jobs")

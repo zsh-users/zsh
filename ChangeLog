@@ -1,3 +1,13 @@
+2003-05-08  Peter Stephenson  <pws@csr.com>
+
+	* 18512: README, Completion/Unix/Command/_cvs,
+	Completion/Unix/Command/_perforce, Completion/Unix/Command/_rsync,
+	Completion/Unix/Type/_path_files, Doc/Zsh/expn.yo: 18508 wasn't
+	enough; the \\/ hack was documented and in use in the completion
+	system.  Change the documentation, mention the inconsistency in
+	README and alter the completion system to hide the `/' a parameter
+	so that it doesn't care.
+
 2003-05-07  Oliver Kiddle  <opk@zsh.org>
 
 	* users/6083: Completion/Unix/Command/_rlogin,
