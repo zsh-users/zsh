@@ -277,7 +277,14 @@ AC_PROG_CC
 dnl Check for large file support.
 dnl This needs to be done early to get the stuff into the flags.
 if test $lfs != no; then
-zsh_LARGE_FILE_SUPPORT
+dnl Gross hack for ReliantUNIX - GCC does not understand getconf options
+dnl For now just disable LFS in this case
+dnl Any takers?
+  if test "$host" = mips-sni-sysv4 -a -n "$GCC"; then
+    : 
+  else
+    zsh_LARGE_FILE_SUPPORT
+  fi
 fi
 
 dnl if the user hasn't specified CFLAGS, then
@@ -1505,8 +1512,17 @@ char *argv[];
   zsh_cv_sys_elf=yes)])
   DL_EXT="${DL_EXT=so}"
   if test $zsh_cv_sys_elf = yes; then
-    DLLD="${DLLD=$CC}"
-    DLLDARG="${LDARG}"
+    case "$host" in
+      mips-sni-sysv4*)
+        # Forcibly set ld to native compiler to avoid obscure GCC problems
+	DLLD="${DLLD=/usr/ccs/bin/cc}"
+	DLLDARG="${LDARG}"
+      ;;
+      * )
+	DLLD="${DLLD=$CC}"
+	DLLDARG="${LDARG}"
+      ;;
+    esac
   else
     DLLD="${DLLD=ld}"
     DLLDARG=""
@@ -1538,9 +1554,13 @@ char *argv[];
       # unfortunately, we have different compilers
       # that need different flags
       #
-      sni_cc_version=`$CC -V 2>&1 | head -1`
+      if test -n "$GCC"; then
+        sni_cc_version=GCC
+      else
+        sni_cc_version=`$CC -V 2>&1 | head -1`
+      fi
       case "$sni_cc_version" in
-        *CDS* )
+        *CDS*|GCC )
          EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-Blargedynsym}"
        ;;
        * )
@@ -1554,8 +1574,8 @@ char *argv[];
    [echo failed >conftestval && cat >conftest.c <<EOM
 fred () { }
 EOM
-    $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest.c 1>&5 2>&5 &&
-    $DLLD -o conftest.$DL_EXT $LDFLAGS $DLLDFLAGS conftest.o 1>&5 2>&5 &&
+    AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest.c 1>&AC_FD_CC) &&
+    AC_TRY_COMMAND($DLLD $LDFLAGS $DLLDFLAGS -o conftest.$DL_EXT conftest.o 1>&AC_FD_CC) &&
     AC_TRY_RUN([
 #include <stdio.h>
 #ifdef HPUXDYNAMIC

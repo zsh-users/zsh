@@ -1,3 +1,9 @@
+2001-03-07  Andrej Borsenkow <bor@zsh.org>
+
+	* unposted: configure.in, aczsh.m4: support building with
+	GCC on ReliantUNIX; use AC_TRY_COMMAND for better diagnostic
+
+
 2001-03-06  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/User/.distfiles, Completion/User/_webbrowser:

@@ -164,10 +164,10 @@ void *zsh_getaddr1()
 };
 ' > conftest1.c
 sed 's/zsh_getaddr1/zsh_getaddr2/' < conftest1.c > conftest2.c
-if $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&5 2>&5 &&
-$DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
-$CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
-$DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
+if AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&AC_FD_CC); then
     AC_TRY_RUN([
 #ifdef HPUXDYNAMIC
 #include <dl.h>
@@ -245,10 +245,10 @@ else
 fi
 echo 'int fred () { return 42; }' > conftest1.c
 echo 'int fred () { return 69; }' > conftest2.c
-if $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&5 2>&5 &&
-$DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
-$CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
-$DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
+if AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&AC_FD_CC); then
     AC_TRY_RUN([
 #ifdef HPUXDYNAMIC
 #include <dl.h>
@@ -320,10 +320,10 @@ else
 fi
 echo 'int fred () { return 42; }' > conftest1.c
 echo 'extern int fred(); int barney () { return fred() + 27; }' > conftest2.c
-if $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&5 2>&5 &&
-$DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
-$CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
-$DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
+if AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&AC_FD_CC); then
     AC_TRY_RUN([
 #ifdef HPUXDYNAMIC
 #include <dl.h>
@@ -390,8 +390,8 @@ else
     us=
 fi
 echo 'extern int fred(); int barney () { return fred() + 27; }' > conftest1.c
-if $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&5 2>&5 &&
-$DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5; then
+if AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&AC_FD_CC); then
     save_ldflags=$LDFLAGS
     LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS"
     AC_TRY_RUN([
@@ -463,8 +463,8 @@ elif
 	us=
     fi
     echo 'extern int fred(); int barney() { return fred() + 27; }' > conftest1.c
-    $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&5 2>&5 &&
-    $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5; then
+    AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&AC_FD_CC) &&
+    AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&AC_FD_CC); then
     save_ldflags=$LDFLAGS
     LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS -s"
     AC_TRY_RUN([
@@ -532,8 +532,8 @@ else
     us=
 fi
 echo 'int fred () { return 42; }' > conftest1.c
-if $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&5 2>&5 &&
-$DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS -s conftest1.o $LIBS 1>&5 2>&5; then
+if AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&AC_FD_CC) &&
+AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS -s conftest1.o $LIBS 1>&AC_FD_CC); then
     AC_TRY_RUN([
 #ifdef HPUXDYNAMIC
 #include <dl.h>
