@@ -362,6 +362,23 @@ followed by an appropriate tt(bindkey) command to associate the function
 with a key sequence.  Suggested bindings are described below.
 
 startitem()
+tindex(bash-forward-word)
+tindex(bash-backward-word)
+tindex(bash-kill-word)
+tindex(bash-backward-kill-word)
+xitem(tt(bash-forward-word), tt(bash-backward-word))
+item(tt(bash-kill-word), tt(bash-backward-kill-word))(
+These work similarly to the corresponding builtin zle functions without the
+`tt(bash-)' prefix, but a word is considered to consist of alphanumeric
+characters only.  If you wish to replace your existing bindings with these
+four widgets, the following is sufficient:
+
+example(for widget in kill-word backward-kill-word \ 
+forward-word backward-word; do 
+  autoload bash-$widget 
+  zle -N $widget bash-$widget
+done)
+)
 tindex(cycle-completion-positions)
 item(tt(cycle-completion-positions))(
 After inserting an unambiguous string into the command line, the new

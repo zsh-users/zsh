@@ -1,0 +1,9 @@
+# This implements a bash-style forward-word.
+# To use,
+#   zle -N bash-forward-word
+#   bindkey '...' bash-forward-word
+# or if you wish to replace existing forward-word bindings,
+#   zle -N forward-word bash-forward-word
+
+local WORDCHARS=''
+zle .forward-word

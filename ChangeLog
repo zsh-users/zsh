@@ -1,3 +1,13 @@
+2001-07-06  Peter Stephenson  <pws@csr.com>
+
+	* 15288: Doc/Zsh/contrib.yo,
+	Functions/Zle/bash-forward-word, Functions/Zle/bash-bacward-word,
+	Functions/Zle/bash-kill-word, Functions/Zle/bash-backward-kill-word:
+	complete set of bash-compatible word functions with documentation.
+
+	* 15279: Doc/Zsh/expn.yo: describe those ${(S)...%%...} things
+	so that even I understand what the code does.
+
 2001-07-06  Oliver Kiddle  <opk@zsh.org>
 
 	* 15252 (and Akinori Musha: 15245): Completion/BSD/Command/_kld,

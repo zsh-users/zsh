@@ -791,10 +791,26 @@ Search the var(expr)th match (where var(expr) evaluates to a number).
 This only applies when searching for substrings, either with the tt(S)
 flag, or with tt(${)...tt(/)...tt(}) (only the var(expr)th match is
 substituted) or tt(${)...tt(//)...tt(}) (all matches from the
-var(expr)th on are substituted).  The var(expr)th match is counted
-such that there is either one or zero matches from each starting
-position in the string, although for global substitution matches
-overlapping previous replacements are ignored.
+var(expr)th on are substituted).  The default is to take the first match.
+
+The var(expr)th match is counted such that there is either one or zero
+matches from each starting position in the string, although for global
+substitution matches overlapping previous replacements are ignored.  With
+the tt(${)...tt(%)...tt(}) and tt(${)...tt(%%)...tt(}) forms, the starting
+position for the match moves backwards from the end as the index increases,
+while with the other forms it moves forward from the start.
+
+Hence with the string
+example(which switch is the right switch for Ipswich?)
+substitutions of the form
+tt(${)LPAR()tt(SI:)var(N)tt(:)RPAR()tt(string#w*ch}) as var(N) increases
+from 1 will match and remove `tt(which)', `tt(witch)', `tt(witch)' and
+`tt(wich)'; the form using `tt(##)' will match and remove `tt(which switch
+is the right switch for Ipswich)', `tt(witch is the right switch for
+Ipswich)', `tt(witch for Ipswich)' and `tt(wich)'. The form using `tt(%)'
+will remove the same matches as for `tt(#)', but in reverse order, and the
+form using `tt(%%)' will remove the same matches as for `tt(##)' in reverse
+order.
 )
 item(tt(M))(
 Include the matched portion in the result.

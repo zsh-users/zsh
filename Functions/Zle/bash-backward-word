@@ -1,0 +1,9 @@
+# This implements a bash-style backward-word.
+# To use,
+#   zle -N bash-backward-word
+#   bindkey '...' bash-backward-word
+# or if you wish to replace existing backward-word bindings,
+#   zle -N backward-word bash-backward-word
+
+local WORDCHARS=''
+zle .backward-word
