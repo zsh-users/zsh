@@ -1,0 +1,8 @@
+#compdef ncftp
+
+if [[ -f ~/.ncftp/bookmarks ]]; then
+  _wanted bookmarks expl bookmark \
+      compadd - $(awk -F, 'NR > 2 { print $1 }' ~/.ncftp/bookmarks) && return 0
+fi
+
+_hosts

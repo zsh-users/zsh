@@ -18,6 +18,8 @@ _arguments -C -s \
   '*-n+[no]:flags:->noflags' \
   {'(--input-file)-i+[input file]','(-i)--input-file='}':file containing URLs:_files' \
   '(--force-html)-F[force html]' '(-F)--force-html' \
+  {'(--base)-B+[prepend URL to relative links]','(-B)--base='}':base URL:_urls' \
+  '--bind-address=:address to bind to (hostname or IP):_hosts' \
   {'(--tries)-t+[tries]','(-t)--tries='}':number of retries:(0)' \
   {'(--output-document)-O+[output document]','(-O)--output-document='}':output file:_files' \
   '(--continue)-c[continue]' '(-c)--continue' \
@@ -27,6 +29,7 @@ _arguments -C -s \
   '--spider' \
   {'(--timeout)-T+[timeout]','(-T)--timeout='}':read timeout(seconds):' \
   {'(--wait)-w+[wait]','(-w)--wait='}':wait between retrievals(seconds):' \
+  '--waitretry=:seconds to wait between retries of a retieval:' \
   {'(--proxy --use-proxy)-Y+[proxy]','(-Y --use-proxy)--proxy=','(-Y --proxy)--use-proxy='}':proxy:(on off)' \
   {'(--quota)-Q+[quota]','(-Q)--quota='}':number:' \
   '(--force-directories)-x[force directories]' '(-x)--force-directories' \
@@ -34,10 +37,13 @@ _arguments -C -s \
   '--cut-dirs=:number:' \
   '--http-user=:user:' \
   '--http-passwd=:password:' \
+  '(--html-extension)-E[save all text/html files with a .html extension]' \
+  '(-E)--html-extension' \
   '--ignore-length' \
   '--header=:string:' \
   '--proxy-user=:user:' \
   '--proxy-passwd=:password:' \
+  '--referer=:url:_urls' \
   '(--save-headers)-s[save headers]' '(-s)--save-headers' \
   {'(--user-agent)-U+[user agent]','(-U)--user-agent='}':user-agent:' \
   '--retr-symlinks' \
@@ -47,17 +53,22 @@ _arguments -C -s \
   {'(--level)-l+[level]','(-l)--level='}':level:(0)' \
   '--delete-after' \
   '(--convert-links)-k[convert links]' '(-k)--convert-links' \
+  '(--backup-converted)-K[backup files before conversion]' \
+  '(-K)--backup-converted' \
   '(--mirror)-m[mirror]' '(-m)--mirror' \
-  {'(--accept)-A+[accept]','(-A)--accept='}':accepted etensions:' \
-  {'(--reject)-R+[reject]','(-R)--reject='}':rejected etensions:' \
+  '(--page-requisites)-p[get all images needed to display page]' \
+  '(-p)--page-requisites' \
+  {'(--accept)-A+[accept]','(-A)--accept='}':accepted extensions:' \
+  {'(--reject)-R+[reject]','(-R)--reject='}':rejected extensions:' \
   {'(--domains)-D+[domains]','(-D)--domains='}':accepted domains:' \
   '--exclude-domains=:rejected domains:' \
-  '(--relative)-L[relative]' '(-L)--relative' \
   '--follow-ftp' \
+  '--follow-tags=:HTML tags:' \
+  {'(--ignore-tags)-G+[ignored HTML tags]','(-G)--ignore-tags='}':HTML tags:' \
   '(--span-hosts)-H[span hosts]' '(-H)--span-hosts' \
+  '(--relative)-L[follow relative links only]' '(-L)--relative' \
   {'(--include-directories)-I+[include directories]','(-I)--include-directories='}':allowed directories:' \
   {'(--exclude-directories)-X+[exclude directories]','(-X)--exclude-directories='}':excluded directories:' \
-  {'(--base)-B+[base]','(-B)--base='}':base:' \
   '--no-host-lookup' \
   '--no-parent' \
   '--non-verbose' \

@@ -1,6 +1,6 @@
 #compdef -subscript-
 
-local expl osuf=']'
+local expl ind osuf=']'
 
 if [[ "$1" = -q ]]; then
   osuf='] '

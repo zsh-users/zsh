@@ -80,4 +80,4 @@ fi | (
   fi |
   nroff -T$terminal -man | $col -x
 ) |
-${MANPAGER:-${PAGER:-more}} -s
+${=MANPAGER:-${PAGER:-more}} -s

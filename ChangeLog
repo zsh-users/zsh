@@ -1,3 +1,14 @@
+2001-03-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 13600: Completion/Base/_subscript, Completion/Core/_files,
+	Completion/Core/_tags,  Completion/User/.distfiles,
+	Completion/User/_dir_list, Completion/User/_fetchmail,
+	Completion/User/_hosts, Completion/User/_iconv, Completion/User/_mutt,
+	Completion/User/_ncftp, Completion/User/_tar, Completion/User/_urls,
+	Completion/User/_webbrowser, Completion/User/_wget,
+	Completion/User/_xargs, Completion/User/_zip, Functions/Misc/mere:
+	various new, improved, fixed or updated functions
+
 2001-03-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13599: Completion/User/_sh: Use _normal completion following
@@ -40,7 +51,6 @@
 	* unposted: configure.in, aczsh.m4: support building with
 	GCC on ReliantUNIX; use AC_TRY_COMMAND for better diagnostic
 
-
 2001-03-06  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/User/.distfiles, Completion/User/_webbrowser:
@@ -72,7 +82,6 @@
 
 	* unposted: Etc/CONTRIBUTORS: use zsh.org mail address (courtesy
 	of Geoff) for me :-)
-
 
 2001-03-05  Sven Wischnowsky  <wischnow@zsh.org>
 

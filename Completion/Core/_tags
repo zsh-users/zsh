@@ -24,8 +24,6 @@ if (( $# )); then
   elif [[ "$1" = -C ]]; then
     curcontext="${curcontext%:*}:${2}"
     shift 2
-  else
-    targs=()
   fi
 
   [[ "$1" = -(|-) ]] && shift

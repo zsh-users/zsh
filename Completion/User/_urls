@@ -1,4 +1,4 @@
-#compdef curl
+#compdef curl galeon
 
 # Usage: _urls [-f]
 # Options:
@@ -38,7 +38,7 @@
 #    E.g.:
 #      zstyle ':completion:*:urls' local www /usr/local/apache/htdocs public_html
 
-local ipre scheme host user uhosts ret=1 expl match glob
+local ipre scheme host user uhosts ret=1 expl match glob suf
 local urls_path localhttp
 zstyle -s ":completion:${curcontext}:urls" path urls_path ||
     urls_path="${ZDOTDIR:-$HOME}/.zsh/urls"
@@ -118,22 +118,24 @@ case "$scheme" in
 esac
 
 # Complete hosts
-if ! compset -P '(#b)([^/]#)/'; then
+if ! compset -P '(#b)([^:/]#)([:/])'; then
   uhosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
 
   _tags hosts
   while _tags; do
     while _next_label hosts expl host "$@"; do
-      compset -S '/*' || suf="/"
-      (( $#uhosts )) || _hosts -S "$suf" "$expl[@]" && ret=0
+      compset -S '[:/]*' || suf="/"
+      (( $#uhosts )) || _hosts -S "$suf" -r '/:' "$expl[@]" && ret=0
       [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
-      compadd -S "$suf" "$expl[@]" -a uhosts && ret=0
+      compadd -S "$suf" -r '/:' "$expl[@]" -a uhosts && ret=0
     done
     (( ret )) || return 0
   done
   return 1
 fi
 host="$match[1]"
+
+[[ $match[2] = ':' ]] && ! compset -P '<->/' && _message 'port number' && return 0
 
 # Complete part after hostname
 
