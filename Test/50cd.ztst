@@ -38,6 +38,9 @@
 
  ln -s ../real cdtst.tmp/sub/fake
 
+ setopt chaselinks
+ cd .
+ unsetopt chaselinks
  mydir=$PWD
 
 %test
