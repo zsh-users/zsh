@@ -1,3 +1,8 @@
+2000-12-26  Clint Adams  <schizo@debian.org>
+
+	* 13312: Completion/User/_killall: get longer command names
+	from procps.
+
 2000-12-23  Clint Adams  <schizo@debian.org>
 
 	* unposted: configure.in: thinko in jobtable size determination.
