@@ -1,3 +1,12 @@
+2001-10-19  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16085: Completion/Base/Utility/_describe,
+	Completion/Zsh/Context/_condition,
+	Completion/Zsh/Type/_file_descriptors: fix: make _describe
+	handle (...) arguments correctly; use _file_descriptors after
+	-t in conditions; don't display empty descriptions in
+	_file_descriptors
+
 2001-10-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 16080: Src/builtin.c, Doc/Zsh/builtins.yo, Test/B03print.ztst:

@@ -54,7 +54,11 @@ while _tags; do
       while (( $# )); do
     
         _strs="_a_$_try$_i"
-        eval local "_a_$_try$_i;_a_$_try$_i"'=( "${'$1'[@]}" )'
+        if [[ "$1" = \(*\) ]]; then
+          eval local "_a_$_try$_i;_a_$_try$_i"'='$1
+        else
+          eval local "_a_$_try$_i;_a_$_try$_i"'=( "${'$1'[@]}" )'
+        fi
         _argv[_i]="_a_$_try$_i"
         shift
         (( _i++ ))
@@ -63,7 +67,11 @@ while _tags; do
           _mats=
         else
           _matss="_a_$_try$_i"
-          eval local "_a_$_try$_i;_a_$_try$_i"'=( "${'$1'[@]}" )'
+          if [[ "$1" = \(*\) ]]; then
+            eval local "_a_$_try$_i;_a_$_try$_i"'='$1
+          else
+            eval local "_a_$_try$_i;_a_$_try$_i"'=( "${'$1'[@]}" )'
+          fi
           _argv[_i]="_a_$_try$_i"
           shift
           (( _i++ ))

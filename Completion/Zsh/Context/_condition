@@ -6,6 +6,8 @@ if [[ "$prev" = -o ]]; then
   _tags -C -o options && _options
 elif [[ "$prev" = -([a-hkprsuwxLOGSN]|[no]t|ef) ]]; then
   _tags -C "$prev" files && _files
+elif [[ "$prev" = -t ]]; then
+  _file_descriptors
 else
   if [[ "$PREFIX" = -* ]] ||
      ! zstyle -T ":completion:${curcontext}:options" prefix-needed; then
