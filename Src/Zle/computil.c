@@ -623,7 +623,7 @@ parse_cadef(char *nam, char **args)
 		 * stuff twice for such things. */
 		name = ++p;
 		*p = (again ? '-' : '+');
-		again = 1 - again;
+		again++;
 	    } else {
 		name = p;
 		/* If it's a long option skip over the first `-'. */
@@ -767,7 +767,7 @@ parse_cadef(char *nam, char **args)
 		    opt->descr = NULL;
 	    } else
 		opt->descr = NULL;
-	    opt->xor = xor;
+	    opt->xor = (again == 1 ? zarrdup(xor) : xor);
 	    opt->type = otype;
 	    opt->args = oargs;
 	    opt->num = nopts++;
@@ -783,7 +783,7 @@ parse_cadef(char *nam, char **args)
 	    if (single && name[1] && !name[2])
 		ret->single[STOUC(name[1])] = opt;
 
-	    if (again) {
+	    if (again == 1) {
 		/* Do it all again for `*-...'. */
 		p = dupstring(*args);
 		goto rec;

@@ -4,6 +4,9 @@
 
 2000-04-17  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10782: Src/Zle/computil.c: fix for exclusion lists for -+o
+ 	specifications
+	
 	* 10780: Completion/Base/_default, Completion/Base/_value,
  	Completion/Builtins/_vars_eq, Completion/Builtins/_zstyle,
  	Doc/Zsh/compsys.yo: better completion after `=', everywhere
