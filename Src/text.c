@@ -410,6 +410,27 @@ getcond(Cond nm, int addpar)
 	taddstr(" || ");
 	getcond(nm->right, _Cond(nm->right)->type == COND_AND);
 	break;
+    case COND_MOD:
+	{
+	    /* Module defined prefix condition. */
+	    char **p = (char **) nm->right;
+
+	    taddstr("-");
+	    taddstr(nm->left);
+	    for (; *p; p++) {
+		taddstr(" ");
+		taddstr(*p);
+	    }
+	}
+	break;
+    case COND_MODI:
+	/* Module defined infix condition. */
+	taddstr(((char **) nm->right)[0]);
+	taddstr(" -");
+	taddstr(nm->left);
+	taddstr(" ");
+	taddstr(((char **) nm->right)[1]);
+	break;
     default:
 	if (nm->type <= COND_GE) {
 	    /* Binary test: `a = b' etc. */

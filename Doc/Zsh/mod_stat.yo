@@ -1,4 +1,4 @@
-texinode(The stat Module)(The zle Module)(The sched Module)(Zsh Modules)
+texinode(The stat Module)(The zftp Module)(The sched Module)(Zsh Modules)
 sect(The stat Module)
 The tt(stat) module makes available one builtin command:
 
@@ -6,7 +6,8 @@ startitem()
 findex(stat)
 cindex(files, listing)
 cindex(files, examining)
-item(tt(stat) [ tt(-gnNlLtTrs) ] [ tt(-f) var(fd) ] [ tt(-A) var(array) ] \
+item(tt(stat) [ tt(-gnNlLtTrs) ] [ tt(-f) var(fd) ] \
+    [ tt(-H) var(hash) ] [ tt(-A) var(array) ] \
     [ tt(-F) var(fmt) ] [ tt(PLUS())var(element) ] [ var(file) ... ])(
 The command acts as a front end to the tt(stat) system call (see
 manref(stat)(2)).
@@ -90,6 +91,11 @@ former case the element name appears as a prefix to the
 appropriate array element and in the latter case the file name
 appears as a separate array element preceding all the others.
 Other formatting options are respected.
+)
+item(tt(-H) var(hash))(
+Similar to tt(-A), but instead assign the values to var(hash).  The keys
+are the elements listed above.  If the tt(-n) option is provided then the
+name of the file is included in the hash with key tt(name).
 )
 item(tt(-f) var(fd))(
 Use the file on file descriptor var(fd) instead of

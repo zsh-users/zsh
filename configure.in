@@ -428,6 +428,8 @@ fi
 
 AC_CHECK_LIB(cap, cap_get_proc)
 
+AC_CHECK_LIB(socket, socket)
+
 dnl ---------------------
 dnl CHECK TERMCAP LIBRARY
 dnl ---------------------

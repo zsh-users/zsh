@@ -34,11 +34,13 @@ enum statnum { ST_DEV, ST_INO, ST_MODE, ST_NLINK, ST_UID, ST_GID,
 		   ST_RDEV, ST_SIZE, ST_ATIM, ST_MTIM, ST_CTIM,
 		   ST_BLKSIZE, ST_BLOCKS, ST_READLINK, ST_COUNT };
 enum statflags { STF_NAME = 1,  STF_FILE = 2, STF_STRING = 4, STF_RAW = 8,
-		     STF_PICK = 16, STF_ARRAY = 32, STF_GMT = 64 };
+		     STF_PICK = 16, STF_ARRAY = 32, STF_GMT = 64,
+		     STF_HASH = 128 };
 static char *statelts[] = { "device", "inode", "mode", "nlink",
 				"uid", "gid", "rdev", "size", "atime",
 				"mtime", "ctime", "blksize", "blocks",
 				"link", NULL };
+#define HNAMEKEY "name"
 
 /**/
 static void
@@ -287,6 +289,8 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
  *        file names are returned as a separate array element, type names as
  *        prefix to element.  Note the formatting deliberately contains
  *        fewer frills when -A is used.
+ *  -H hash:  as for -A array, but returns a hash with the keys being those
+ *        from stat -l
  *  -F fmt: specify a $TIME-like format for printing times; the default
  *        is the (CTIME-like) "%a %b %e %k:%M:%S".  This option implies
  *        -s as it is not useful for numerical times.
@@ -305,6 +309,7 @@ static int
 bin_stat(char *name, char **args, char *ops, int func)
 {
     char **aptr, *arrnam = NULL, **array = NULL, **arrptr = NULL;
+    char *hashnam = NULL, **hash = NULL, **hashptr = NULL;
     int len, iwhich = -1, ret = 0, flags = 0, arrsize = 0, fd = 0;
     struct stat statbuf;
     int found = 0, nargs;
@@ -352,6 +357,16 @@ bin_stat(char *name, char **args, char *ops, int func)
 		    }
 		    flags |= STF_ARRAY;
 		    break;
+		} else if (*arg == 'H') {
+		    if (arg[1]) {
+			hashnam = arg+1;
+		    } else if (!(hashnam = *++args)) {
+			zerrnam(name, "missing parameter name\n",
+				NULL, 0);
+			return 1;
+		    }
+		    flags |= STF_HASH;
+		    break;
 		} else if (*arg == 'f') {
 		    char *sfd;
 		    ops['f'] = 1;
@@ -383,6 +398,15 @@ bin_stat(char *name, char **args, char *ops, int func)
 		}
 	    }
 	}
+    }
+
+    if ((flags & STF_ARRAY) && (flags & STF_HASH)) {
+    	/* We don't implement setting multiple variables at once */
+	zwarnnam(name, "both array and hash requested", NULL, 0);
+	return 1;
+	/* Alternate method would be to make -H blank arrnam etc etc *
+	 * and so get 'silent loss' of earlier choice, which would   *
+	 * be similar to stat -A foo -A bar filename                 */
     }
 
     if (ops['l']) {
@@ -435,7 +459,7 @@ bin_stat(char *name, char **args, char *ops, int func)
     if (ops['g'])
 	flags |= STF_GMT;
 
-    if (!arrnam) {
+    if (!(arrnam || hashnam)) {
 	if (nargs > 1)
 	    flags |= STF_FILE;
 	if (!(flags & STF_PICK))
@@ -444,8 +468,19 @@ bin_stat(char *name, char **args, char *ops, int func)
 
     if (ops['N'] || ops['f'])
 	flags &= ~STF_FILE;
-    if (ops['T'])
+    if (ops['T'] || ops['H'])
 	flags &= ~STF_NAME;
+
+    if (hashnam) {
+    	if (nargs > 1) {
+	    zwarnnam(name, "only one file allowed with -H", NULL, 0);
+	    return 1;
+	}
+	arrsize = (flags & STF_PICK) ? 1 : ST_COUNT;
+	if (flags & STF_FILE)
+	    arrsize++;
+	hashptr = hash = (char **)zcalloc((arrsize+1)*2*sizeof(char *));
+    }
 
     if (arrnam) {
 	arrsize = (flags & STF_PICK) ? 1 : ST_COUNT;
@@ -473,13 +508,20 @@ bin_stat(char *name, char **args, char *ops, int func)
 	if (flags & STF_FILE)
 	    if (arrnam)
 		*arrptr++ = ztrdup(*args);
-	    else
+	    else if (hashnam) {
+	    	*hashptr++ = ztrdup(HNAMEKEY);
+		*hashptr++ = ztrdup(*args);
+	    } else
 		printf("%s%s", *args, (flags & STF_PICK) ? " " : ":\n");
 	if (iwhich > -1) {
 	    statprint(&statbuf, outbuf, *args, iwhich, flags);
 	    if (arrnam)
 		*arrptr++ = ztrdup(outbuf);
-	    else
+	    else if (hashnam) {
+		/* STF_NAME explicitly turned off for ops['H'] above */
+	    	*hashptr++ = ztrdup(statelts[iwhich]);
+		*hashptr++ = ztrdup(outbuf);
+	    } else
 		printf("%s\n", outbuf);
 	} else {
 	    int i;
@@ -487,24 +529,35 @@ bin_stat(char *name, char **args, char *ops, int func)
 		statprint(&statbuf, outbuf, *args, i, flags);
 		if (arrnam)
 		    *arrptr++= ztrdup(outbuf);
-		else
+		else if (hashnam) {
+		    /* STF_NAME explicitly turned off for ops['H'] above */
+		    *hashptr++ = ztrdup(statelts[i]);
+		    *hashptr++ = ztrdup(outbuf);
+		} else
 		    printf("%s\n", outbuf);
 	    }
 	}
 	if (ops['f'])
 	    break;
 
-	if (!arrnam && args[1] && !(flags & STF_PICK))
+	if (!arrnam && !hashnam && args[1] && !(flags & STF_PICK))
 	    putchar('\n');
     }
 
     if (arrnam)
-	if (ret) {
-	    for (aptr = array; *aptr; aptr++)
-		zsfree(*aptr);
-	    zfree(array, arrsize+1);
-	} else {
+	if (ret)
+	    freearray(array);
+	else {
 	    setaparam(arrnam, array);
+	    if (errflag)
+		return 1;
+	}
+
+    if (hashnam)
+    	if (ret)
+	    freearray(hash);
+	else {
+	    sethparam(hashnam, hash);
 	    if (errflag)
 		return 1;
 	}

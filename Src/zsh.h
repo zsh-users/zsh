@@ -233,6 +233,7 @@ typedef struct alias     *Alias;
 typedef struct param     *Param;
 typedef struct cmdnam    *Cmdnam;
 typedef struct shfunc    *Shfunc;
+typedef struct funcwrap  *FuncWrap;
 typedef struct builtin   *Builtin;
 typedef struct nameddir  *Nameddir;
 typedef struct module    *Module;
@@ -242,6 +243,7 @@ typedef struct job       *Job;
 typedef struct value     *Value;
 typedef struct varasg    *Varasg;
 typedef struct cond      *Cond;
+typedef struct conddef   *Conddef;
 typedef struct cmd       *Cmd;
 typedef struct pline     *Pline;
 typedef struct sublist   *Sublist;
@@ -455,6 +457,26 @@ struct cond {
 #define COND_GT    13
 #define COND_LE    14
 #define COND_GE    15
+#define COND_MOD   16
+#define COND_MODI  17
+
+typedef int (*CondHandler) _((Conddef, char **));
+
+struct conddef {
+    Conddef next;		/* next in list                       */
+    char *name;			/* the condition name                 */
+    int flags;			/* see CONDF_* below                  */
+    int min;			/* minimum number of strings          */
+    int max;			/* maximum number of strings          */
+    CondHandler handler;	/* handler function                   */
+    char *module;		/* module to autoload                 */
+};
+
+#define CONDF_INFIX  1
+#define CONDF_ADDED  2
+
+#define CONDDEF(name, flags, min, max, handler) \
+    { NULL, name, flags, min, max, handler, NULL }
 
 struct forcmd {			/* for/select */
 /* Cmd->args contains list of words to loop thru */
@@ -750,6 +772,23 @@ struct shfunc {
     List funcdef;		/* function definition    */
 };
 
+/* node in list of function call wrappers */
+
+typedef int (*WrapFunc) _((List, FuncWrap, char *));
+
+struct funcwrap {
+    FuncWrap next;
+    int flags;
+    WrapFunc handler;
+    Module module;
+    int count;
+};
+
+#define WRAPF_ADDED 1
+
+#define WRAPDEF(func) \
+    { NULL, 0, func, NULL, 0 }
+
 /* node in builtin command hash table (builtintab) */
 
 typedef int (*HandlerFunc) _((char *, char **, char *, int));
@@ -800,6 +839,8 @@ struct module {
 };
 
 #define MOD_BUSY    (1<<0)
+#define MOD_WRAPPER (1<<1)
+#define MOD_UNLOAD  (1<<2)
 
 /* node used in parameter hash table (paramtab) */
 
@@ -872,6 +913,23 @@ struct param {
 #define PM_RESTRICTED	(1<<13) /* cannot be changed in restricted mode       */
 #define PM_UNSET	(1<<14)	/* has null value                             */
 
+/*
+ * Flags for doing matches inside parameter substitutions, i.e.
+ * ${...#...} and friends.  This could be an enum, but so
+ * could a lot of other things.
+ */
+
+#define SUB_END		0x0001	/* match end instead of begining, % or %%  */
+#define SUB_LONG	0x0002	/* % or # doubled, get longest match */
+#define SUB_SUBSTR	0x0004	/* match a substring */
+#define SUB_MATCH	0x0008	/* include the matched portion */
+#define SUB_REST	0x0010	/* include the unmatched portion */
+#define SUB_BIND	0x0020	/* index of beginning of string */
+#define SUB_EIND	0x0040	/* index of end of string */
+#define SUB_LEN		0x0080	/* length of match */
+#define SUB_ALL		0x0100	/* match complete string */
+#define SUB_GLOBAL	0x0200	/* global substitution ${..//all/these} */
+
 /* node for named directory hash table (nameddirtab) */
 
 struct nameddir {
@@ -891,13 +949,14 @@ struct nameddir {
 #define PRINT_NAMEONLY		(1<<0)
 #define PRINT_TYPE		(1<<1)
 #define PRINT_LIST		(1<<2)
+#define PRINT_KV_PAIR		(1<<3)
 
 /* flags for printing for the whence builtin */
-#define PRINT_WHENCE_CSH	(1<<3)
-#define PRINT_WHENCE_VERBOSE	(1<<4)
-#define PRINT_WHENCE_SIMPLE	(1<<5)
-#define PRINT_WHENCE_FUNCDEF	(1<<6)
-#define PRINT_WHENCE_WORD	(1<<7)
+#define PRINT_WHENCE_CSH	(1<<4)
+#define PRINT_WHENCE_VERBOSE	(1<<5)
+#define PRINT_WHENCE_SIMPLE	(1<<6)
+#define PRINT_WHENCE_FUNCDEF	(1<<7)
+#define PRINT_WHENCE_WORD	(1<<8)
 
 /***********************************/
 /* Definitions for history control */

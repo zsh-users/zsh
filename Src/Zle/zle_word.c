@@ -73,7 +73,7 @@ viforwardword(void)
 		cs++;
 	if (wordflag && !n)
 	    return;
-	while (cs != ll && iblank(line[cs]))
+	while (cs != ll && (iblank(line[cs]) || line[cs] == '\n'))
 	    cs++;
     }
 }

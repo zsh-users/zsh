@@ -605,7 +605,7 @@ execzlefunc(Thingy func)
 	} else {
 	  startparamscope();
 	  makezleparams();
-	  doshfunc(l, NULL, 0, 1);
+	  doshfunc(w->u.fnnam, l, NULL, 0, 1);
 	  endparamscope();
 	  lastcmd = 0;
 	}

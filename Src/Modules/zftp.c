@@ -1,0 +1,2596 @@
+/*
+ * zftp.c - builtin FTP client
+ *
+ * This file is part of zsh, the Z shell.
+ *
+ * Copyright (c) 1998 Peter Stephenson
+ * All rights reserved.
+ *
+ * Permission is hereby granted, without written agreement and without
+ * license or royalty fees, to use, copy, modify, and distribute this
+ * software and to distribute modified versions of this software for any
+ * purpose, provided that the above copyright notice and the following
+ * two paragraphs appear in all copies of this software.
+ *
+ * In no event shall Peter Stephenson or the Zsh Development Group be liable
+ * to any party for direct, indirect, special, incidental, or consequential
+ * damages arising out of the use of this software and its documentation,
+ * even if Peter Stephenson and the Zsh Development Group have been advised of
+ * the possibility of such damage.
+ *
+ * Peter Stephenson and the Zsh Development Group specifically disclaim any
+ * warranties, including, but not limited to, the implied warranties of
+ * merchantability and fitness for a particular purpose.  The software
+ * provided hereunder is on an "as is" basis, and Peter Stephenson and the
+ * Zsh Development Group have no obligation to provide maintenance,
+ * support, updates, enhancements, or modifications.
+ *
+ */
+
+/*
+ * TODO:
+ *   can signal handling be improved?
+ *   error messages may need tidying up.
+ *   maybe we should block CTRL-c on some more operations,
+ *     otherwise you can get the connection closed prematurely.
+ *   some way of turning off progress reports when backgrounded
+ *     would be nice, but the shell doesn't make it easy to find that out.
+ *   the progress reports 100% a bit prematurely:  the data may still
+ *     be in transit, and we are stuck waiting for a message from the
+ *     server.  but there's really nothing else to do.  it's worst
+ *     with small files.
+ *   proxy/gateway connections if i knew what to do
+ *   options to specify e.g. a non-standard port
+ *   optimizing things out is hard in general when you don't know what
+ *     the shell's going to want, but they may be places to second guess
+ *     the user.  Some of the variables could be made special and so
+ *     only retrieve things like the current directory when necessary.
+ *     But it's much neater to have ordinary variables, which the shell
+ *     can manage without our interference, and getting the directory
+ *     just every time it changes isn't so bad.  The user can always
+ *     toggle the `Dumb' preference if it's feeling clever.
+ */
+#include "zftp.mdh"
+#include "zftp.pro"
+
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in_systm.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <arpa/inet.h>
+/* it's a TELNET based protocol, but don't think I like doing this */
+#include <arpa/telnet.h>
+
+/* bet there are machines which have neither INADDR_NONE nor in_addr_t. */
+#ifndef INADDR_NONE
+#define INADDR_NONE (in_addr_t)-1
+#endif
+
+/*
+ * For FTP block mode
+ *
+ * The server on our AIX machine here happily accepts block mode, takes the
+ * first connection, then at the second complains that it's got nowhere
+ * to send data.  The same problem happens with ncftp, it's not just
+ * me.  And a lot of servers don't even support block mode. So I'm not sure
+ * how widespread the supposed ability to leave open the data fd between
+ * transfers.  Therefore, I've closed all connections after the transfer.
+ * But then what's the point in block mode?  I only implemented it because
+ * it says in RFC959 that you need it to be able to restart transfers
+ * later in the file.  However, it turns out that's not true for
+ * most servers --- but our AIX machine happily accepts the REST
+ * command and then dumps the whole file onto you.  Sigh.
+ *
+ * Note on block sizes:
+ * Not quite sure how to optimize this:  in principle
+ * we should handle blocks up to 65535 bytes, which
+ * is pretty big, and should presumably send blocks
+ * which are smaller to be on the safe side.
+ * Currently we send 32768 and use that also as
+ * the maximum to receive.  No-one's complained yet.  Of course,
+ * no-one's *used* it yet apart from me, but even so.
+ */
+
+struct zfheader {
+    char flags;
+    unsigned char bytes[2];
+};
+
+enum {
+    ZFHD_MARK = 16,		/* restart marker */
+    ZFHD_ERRS = 32,		/* suspected errors in block */
+    ZFHD_EOFB = 64,		/* block is end of record */
+    ZFHD_EORB = 128		/* block is end of file */
+};
+
+typedef int (*readwrite_t)(int, char *, size_t, int);
+
+struct zftpcmd {
+    const char *nam;
+    int (*fun) _((char *, char **, int));
+    int min, max, flags;
+};
+
+enum {
+    ZFTP_CONN  = 0x0001,	/* must be connected */
+    ZFTP_LOGI  = 0x0002,	/* must be logged in */
+    ZFTP_TBIN  = 0x0004,	/* set transfer type image */
+    ZFTP_TASC  = 0x0008,	/* set transfer type ASCII */
+    ZFTP_NLST  = 0x0010,	/* use NLST rather than LIST */
+    ZFTP_DELE  = 0x0020,	/* a delete rather than a make */
+    ZFTP_SITE  = 0x0040,	/* a site rather than a quote */
+    ZFTP_APPE  = 0x0080,	/* append rather than overwrite */
+    ZFTP_HERE  = 0x0100,	/* here rather than over there */
+    ZFTP_CDUP  = 0x0200,	/* CDUP rather than CWD */
+    ZFTP_REST  = 0x0400,	/* restart: set point in remote file */
+    ZFTP_RECV  = 0x0800		/* receive rather than send */
+};
+
+typedef struct zftpcmd *Zftpcmd;
+
+static struct zftpcmd zftpcmdtab[] = {
+    { "open", zftp_open, 0, 4, 0 },
+    { "params", zftp_params, 0, 4, 0 },
+    { "login", zftp_login, 0, 3, ZFTP_CONN },
+    { "user", zftp_login, 0, 3, ZFTP_CONN },
+    { "cd", zftp_cd, 1, 1, ZFTP_CONN|ZFTP_LOGI },
+    { "cdup", zftp_cd, 0, 0, ZFTP_CONN|ZFTP_LOGI|ZFTP_CDUP },
+    { "dir", zftp_dir, 0, -1, ZFTP_CONN|ZFTP_LOGI },
+    { "ls", zftp_dir, 0, -1, ZFTP_CONN|ZFTP_LOGI|ZFTP_NLST },
+    { "type", zftp_type, 0, 1, ZFTP_CONN|ZFTP_LOGI },
+    { "ascii", zftp_type, 0, 0, ZFTP_CONN|ZFTP_LOGI|ZFTP_TASC },
+    { "binary", zftp_type, 0, 0, ZFTP_CONN|ZFTP_LOGI|ZFTP_TBIN },
+    { "mode", zftp_mode, 0, 1, ZFTP_CONN|ZFTP_LOGI },
+    { "local", zftp_local, 0, -1, ZFTP_HERE },
+    { "remote", zftp_local, 1, -1, ZFTP_CONN|ZFTP_LOGI },
+    { "get", zftp_getput, 1, -1, ZFTP_CONN|ZFTP_LOGI|ZFTP_RECV },
+    { "getat", zftp_getput, 2, 2, ZFTP_CONN|ZFTP_LOGI|ZFTP_RECV|ZFTP_REST },
+    { "put", zftp_getput, 1, -1, ZFTP_CONN|ZFTP_LOGI },
+    { "putat", zftp_getput, 2, 2, ZFTP_CONN|ZFTP_LOGI|ZFTP_REST },
+    { "append", zftp_getput, 1, -1, ZFTP_CONN|ZFTP_LOGI|ZFTP_APPE },
+    { "appendat", zftp_getput, 2, 2, ZFTP_CONN|ZFTP_LOGI|ZFTP_APPE|ZFTP_REST },
+    { "delete", zftp_delete, 1, -1, ZFTP_CONN|ZFTP_LOGI },
+    { "mkdir", zftp_mkdir, 1, 1, ZFTP_CONN|ZFTP_LOGI },
+    { "rmdir", zftp_mkdir, 1, 1, ZFTP_CONN|ZFTP_LOGI|ZFTP_DELE },
+    { "rename", zftp_rename, 2, 2, ZFTP_CONN|ZFTP_LOGI },
+    { "quote", zftp_quote, 1, -1, ZFTP_CONN },
+    { "site", zftp_quote, 1, -1, ZFTP_CONN|ZFTP_SITE },
+    { "close", zftp_close, 0, 0, ZFTP_CONN },
+    { "quit", zftp_close, 0, 0, ZFTP_CONN },
+    { 0, 0, 0, 0}
+};
+
+static struct builtin bintab[] = {
+    BUILTIN("zftp", 0, bin_zftp, 1, -1, 0, NULL, NULL),
+};
+
+/*
+ * these are the non-special params to unset when a connection
+ * closes.  any special params are handled, well, specially.
+ * currently there aren't any, which is the way I like it.
+ */
+static char *zfparams[] = {
+    "ZFTP_HOST", "ZFTP_IP", "ZFTP_SYSTEM", "ZFTP_USER",
+    "ZFTP_ACCOUNT", "ZFTP_PWD", "ZFTP_TYPE", "ZFTP_MODE", NULL
+};
+
+/* flags for zfsetparam */
+
+enum {
+    ZFPM_READONLY = 0x01,	/* make parameter readonly */
+    ZFPM_IFUNSET  = 0x02,	/* only set if not already set */
+    ZFPM_INTEGER  = 0x04	/* passed pointer to long */
+};
+
+/*
+ * Basic I/O variables for control connection:
+ * zcfd != -1 is a flag that there is a connection open.
+ */
+static int zcfd = -1;
+static FILE *zcin;
+static struct sockaddr_in zsock;
+
+/*
+ * zcfinish = 0 keep going
+ *            1 line finished, alles klar
+ *            2 EOF
+ */
+static int zcfinish;
+/* zfclosing is set if zftp_close() is active */
+static int zfclosing;
+
+/*
+ * Now stuff for data connection
+ */
+static int zdfd = -1;
+static struct sockaddr_in zdsock;
+
+/*
+ * Stuff about last message:  last line of message and status code.
+ * The reply is also stored in $ZFTP_REPLY; we keep these separate
+ * for convenience.
+ */
+static char *lastmsg, lastcodestr[4];
+static int lastcode;
+
+/* flag for remote system is UNIX --- useful to know as things are simpler */
+static int zfis_unix, zfpassive_conn;
+
+/* remote system has size, mdtm commands */
+enum {
+    ZFCP_UNKN = 0,		/* dunno if it works on this server */
+    ZFCP_YUPP = 1,		/* it does */
+    ZFCP_NOPE = 2		/* it doesn't */
+};
+
+static int zfhas_size, zfhas_mdtm;
+
+/*
+ * We keep an fd open for communication between the main shell
+ * and forked off bits and pieces.  This allows us to know
+ * if something happend in a subshell:  mode changed, type changed,
+ * connection was closed.  If something too substantial happened
+ * in a subshell --- connection opened, ZFTP_USER and ZFTP_PWD changed
+ * --- we don't try to track it because it's too complicated.
+ */
+enum {
+    ZFST_ASCI = 0x00,		/* type for next transfer is ASCII */
+    ZFST_IMAG = 0x01,		/* type for next transfer is image */
+
+    ZFST_TMSK = 0x01,		/* mask for type flags */
+    ZFST_TBIT = 0x01,		/* number of bits in type flags */
+
+    ZFST_CASC = 0x00,		/* current type is ASCII - default */
+    ZFST_CIMA = 0x02,		/* current type is image */
+
+    ZFST_STRE = 0x00,		/* stream mode - default */
+    ZFST_BLOC = 0x04,		/* block mode */
+
+    ZFST_MMSK = 0x04,		/* mask for mode flags */
+
+    ZFST_LOGI = 0x08,		/* user logged in */
+    ZFST_NOPS = 0x10,		/* server doesn't understand PASV */
+    ZFST_NOSZ = 0x20,		/* server doesn't send `(XXXX bytes)' reply */
+    ZFST_TRSZ = 0x40,		/* tried getting 'size' from reply */
+    ZFST_CLOS = 0x80		/* connection closed */
+};
+#define ZFST_TYPE(x) (x & ZFST_TMSK)
+/*
+ * shift current type flags to match type flags: should be by
+ * the number of bits in the type flags
+ */
+#define ZFST_CTYP(x) ((x >> ZFST_TBIT) & ZFST_TMSK)
+#define ZFST_MODE(x) (x & ZFST_MMSK)
+
+static int zfstatfd = -1, zfstatus;
+
+/* Preferences, read in from the `zftp_prefs' array variable */
+enum {
+    ZFPF_SNDP = 0x01,		/* Use send port mode */
+    ZFPF_PASV = 0x02,		/* Try using passive mode */
+    ZFPF_DUMB = 0x04		/* Don't do clever things with variables */
+};
+
+/* The flags as stored internally. */
+int zfprefs;
+
+
+/* zfuserparams is the storage area for zftp_params() */
+char **zfuserparams;
+
+/*
+ * Bits and pieces for dealing with SIGALRM (and SIGPIPE, but that's
+ * easier).  The complication is that SIGALRM may already be handled
+ * by the user setting TMOUT and possibly setting their own trap --- in
+ * fact, it's always handled by the shell when it's interactive.  It's
+ * too difficult to use zsh's own signal handler --- either it would
+ * need rewriting to use a C function as a trap, or we would need a
+ * hack to make it callback via a hidden builtin from a function --- so
+ * just install our own, and use settrap() to restore the behaviour
+ * afterwards if necessary.  However, the more that could be done by
+ * the main shell code, the better I would like it.
+ *
+ * Since we don't want to go through the palaver of changing between
+ * the main zsh signal handler and ours every time we start or stop the
+ * alarm, we keep the flag zfalarmed set to 1 while zftp is rigged to
+ * handle alarms.  This is tested at the end of bin_zftp(), which is
+ * the entry point for all functions, and that restores the original
+ * handler for SIGALRM.  To turn off the alarm temporarily in the zftp
+ * code we then just call alarm(0).
+ *
+ * If we could rely on having select() or some replacement, we would
+ * only need the alarm during zftp_open().
+ */
+
+/* flags for alarm set, alarm gone off */
+int zfalarmed, zfdrrrring;
+/* remember old alarm status */
+time_t oaltime;
+unsigned int oalremain;
+
+/*
+ * Where to jump to when the alarm goes off.  This is much
+ * easier than fiddling with error flags at every turn.
+ * Since we don't expect too many alarm's, the simple setjmp()
+ * mechanism should be good enough.
+ *
+ * gcc -O gives apparently spurious `may be clobbered by longjmp' warnings.
+ */
+jmp_buf zfalrmbuf;
+
+/* The signal handler itself */
+
+/**/
+static RETSIGTYPE
+zfhandler(int sig)
+{
+    if (sig == SIGALRM) {
+	zfdrrrring = 1;
+#ifdef ETIMEDOUT		/* just in case */
+	errno = ETIMEDOUT;
+#else
+	errno = EIO;
+#endif
+	longjmp(zfalrmbuf, 1);
+    }
+    DPUTS(1, "zfhandler caught incorrect signal");
+}
+
+/* Set up for an alarm call */
+
+/**/
+static void
+zfalarm(int tmout)
+{
+    zfdrrrring = 0;
+    /*
+     * We need to do this even if tmout is zero, since there may
+     * be a non-zero timeout set in the main shell which we don't
+     * want to go off.  This could be argued the other way, since
+     * if we don't get that it's probably harmless.  But this looks safer.
+     */
+    if (zfalarmed) {
+	alarm(tmout);
+	return;
+    }
+    signal(SIGALRM, zfhandler);
+    oalremain = alarm(tmout);
+    if (oalremain)
+	oaltime = time(NULL);
+    /*
+     * We'll leave sigtrapped, sigfuncs and TRAPXXX as they are; since the
+     * shell's handler doesn't get the signal, they don't matter.
+     */
+    zfalarmed = 1;
+}
+
+/* Set up for a broken pipe */
+
+/**/
+static void
+zfpipe()
+{
+    /* Just ignore SIGPIPE and rely on getting EPIPE from the write. */
+    signal(SIGPIPE, SIG_IGN);
+}
+
+/* Unset the alarm, see above */
+
+/**/
+static void
+zfunalarm()
+{
+    if (oalremain) {
+	/*
+	 * The alarm was previously set, so set it back, adjusting
+	 * for the time used.  Mostly the alarm was set to zero
+	 * beforehand, so it would probably be best to reinstall
+	 * the proper signal handler before resetting the alarm.
+	 *
+	 * I love the way alarm() uses unsigned int while time_t
+	 * is probably something completely different.
+	 */
+	time_t tdiff = time(NULL) - oaltime;
+	alarm(oalremain < tdiff ? 1 : oalremain - tdiff);
+    } else
+	alarm(0);
+    if (sigtrapped[SIGALRM] || interact) {
+	if (sigfuncs[SIGALRM] || !sigtrapped[SIGALRM])
+	    install_handler(SIGALRM);
+	else
+	    signal_ignore(SIGALRM);
+    } else
+	signal_default(SIGALRM);
+    zfalarmed = 0;
+}
+
+/* Restore SIGPIPE handling to its usual status */
+
+/**/
+static void
+zfunpipe()
+{
+    if (sigtrapped[SIGPIPE]) {
+	if (sigfuncs[SIGPIPE])
+	    install_handler(SIGPIPE);
+	else
+	    signal_ignore(SIGPIPE);
+    } else
+	signal_default(SIGPIPE);
+}
+
+/*
+ * Same as movefd(), but don't mark the fd in the zsh tables,
+ * because we only want it closed by zftp.  However, we still
+ * need to shift the fd's out of the way of the user-visible 0-9.
+ */
+
+/**/
+static int
+zfmovefd(int fd)
+{
+    if (fd != -1 && fd < 10) {
+#ifdef F_DUPFD
+	int fe = fcntl(fd, F_DUPFD, 10);
+#else
+	int fe = zfmovefd(dup(fd));
+#endif
+	close(fd);
+	fd = fe;
+    }
+    return fd;
+}
+
+/*
+ * set a non-special parameter.
+ * if ZFPM_IFUNSET, don't set if it already exists.
+ * if ZFPM_READONLY, make it readonly, but only when creating it.
+ * if ZFPM_INTEGER, val pointer is to long (NB not int), don't free.
+ */
+/**/
+static void
+zfsetparam(char *name, void *val, int flags)
+{
+    Param pm = NULL;
+    int type = (flags & ZFPM_INTEGER) ? PM_INTEGER : PM_SCALAR;
+
+    if (!(pm = (Param) paramtab->getnode(paramtab, name))
+	|| (pm->flags & PM_UNSET)) {
+	/*
+	 * just make it readonly when creating, in case user
+	 * *really* knows what they're doing
+	 */
+	if ((pm = createparam(name, type)) && (flags & ZFPM_READONLY))
+	    pm->flags |= PM_READONLY;
+    } else if (flags & ZFPM_IFUNSET) {
+	pm = NULL;
+    }
+    if (!pm || PM_TYPE(pm->flags) != type) {
+	/* parameters are funny, you just never know */
+	if (type == PM_SCALAR)
+	    zsfree((char *)val);
+	return;
+    }
+    if (type == PM_INTEGER)
+	pm->sets.ifn(pm, *(long *)val);
+    else
+	pm->sets.cfn(pm, (char *)val);
+}
+
+/*
+ * Unset a ZFTP parameter when the connection is closed.
+ * We only do this with connection-specific parameters.
+ */
+
+/**/
+static void
+zfunsetparam(char *name)
+{
+    Param pm;
+
+    if ((pm = (Param) paramtab->getnode(paramtab, name))) {
+	pm->flags &= ~PM_READONLY;
+	unsetparam_pm(pm, 0, 1);
+    }
+}
+
+/*
+ * Join command and arguments to make a proper TELNET command line.
+ * New line is in permanent storage.
+ */
+
+/**/
+static char *
+zfargstring(char *cmd, char **args)
+{
+    int clen = strlen(cmd) + 3;
+    char *line, **aptr;
+
+    for (aptr = args; *aptr; aptr++)
+	clen += strlen(*aptr) + 1;
+    line = zalloc(clen);
+    strcpy(line, cmd);
+    for (aptr = args; *aptr; aptr++) {
+	strcat(line, " ");
+	strcat(line, *aptr);
+    }
+    strcat(line, "\r\n");
+
+    return line;
+}
+
+/*
+ * get a line on the control connection according to TELNET rules
+ * Return status is first digit of FTP reply code
+ */
+
+/**/
+static int
+zfgetline(char *ln, int lnsize, int tmout)
+{
+    int ch, added = 0;
+    /* current line point */
+    char *pcur = ln, cmdbuf[3];
+
+    zcfinish = 0;
+    /* leave room for null byte */
+    lnsize--;
+    /* in case we return unexpectedly before getting anything */
+    ln[0] = '\0';
+
+    if (setjmp(zfalrmbuf)) {
+	alarm(0);
+	zwarnnam("zftp", "timeout getting response", NULL, 0);
+	return 5;
+    }
+    zfalarm(tmout);
+
+    /*
+     * We need to be more careful about errors here; we
+     * should do the stuff with errflag and so forth.
+     * We should probably holdintr() here, since if we don't
+     * get the message, the connection is going to be messed up.
+     * But then we get `frustrated user syndrome'.
+     */
+    for (;;) {
+	ch = fgetc(zcin);
+
+	switch(ch) {
+	case EOF:
+	    if (ferror(zcin) && errno == EINTR) {
+		clearerr(zcin);
+		continue;
+	    }
+	    zcfinish = 2;
+	    break;
+
+	case '\r':
+	    /* always precedes something else */
+	    ch = fgetc(zcin);
+	    if (ch == EOF) {
+		zcfinish = 2;
+		break;
+	    }
+	    if (ch == '\n') {
+		zcfinish = 1;
+		break;
+	    }
+	    if (ch == '\0') {
+		ch = '\r';
+		break;
+	    }
+	    /* not supposed to get here */
+	    ch = '\r';
+	    break;
+
+	case '\n':
+	    /* not supposed to get here */
+	    zcfinish = 1;
+	    break;
+
+	case IAC:
+	    /*
+	     * oh great, now it's sending TELNET commands.  try
+	     * to persuade it not to.
+	     */
+	    ch = fgetc(zcin);
+	    switch (ch) {
+	    case WILL:
+	    case WONT:
+		ch = fgetc(zcin);
+		/* whatever it wants to do, stop it. */
+		cmdbuf[0] = (char)IAC;
+		cmdbuf[1] = (char)DONT;
+		cmdbuf[2] = ch;
+		write(zcfd, cmdbuf, 3);
+		continue;
+
+	    case DO:
+	    case DONT:
+		ch = fgetc(zcin);
+		/* well, tough, we're not going to. */
+		cmdbuf[0] = (char)IAC;
+		cmdbuf[1] = (char)WONT;
+		cmdbuf[2] = ch;
+		write(zcfd, cmdbuf, 3);
+		continue;
+
+	    case EOF:
+		/* strange machine. */
+		zcfinish = 2;
+		break;
+
+	    default:
+		break;
+	    }
+	    break;
+	}
+	
+	if (zcfinish)
+	    break;
+	if (added < lnsize) {
+	    *pcur++ = ch;
+	    added++;
+	}
+	/* junk it if we don't have room, but go on reading */
+    }
+
+    alarm(0);
+
+    *pcur = '\0';
+    /* if zcfinish == 2, at EOF, return that, else 0 */
+    return (zcfinish & 2);
+}
+
+/*
+ * Get a whole message from the server.  A dash after
+ * the first line code means keep reading until we get
+ * a line with the same code followed by a space.
+ *
+ * Note that this returns an FTP status code, the first
+ * digit of the reply.  There is also a pseudocode, 6, which
+ * means `there's no point trying anything, just yet'.
+ * We return it either if the connection is closed, or if
+ * we got a 530 (user not logged in), in which case whatever
+ * you're trying to do isn't going to work.
+ */
+
+/**/
+static int 
+zfgetmsg()
+{
+    char line[256], *ptr, *verbose;
+    int stopit, printing = 0, tmout;
+
+    if (zcfd == -1)
+	return 5;
+    if (!(verbose = getsparam("ZFTP_VERBOSE")))
+	verbose = "";
+    zsfree(lastmsg);
+    lastmsg = NULL;
+
+    tmout = getiparam("ZFTP_TMOUT");
+
+    zfgetline(line, 256, tmout);
+    ptr = line;
+    if (zfdrrrring || !isdigit((int)*ptr) || !isdigit((int)ptr[1]) || 
+	!isdigit((int)ptr[2])) {
+	/* timeout, or not talking FTP.  not really interested. */
+	zcfinish = 2;
+	if (!zfclosing)
+	    zfclose();
+	lastmsg = ztrdup("");
+	strcpy(lastcodestr, "000");
+	zfsetparam("ZFTP_REPLY", ztrdup(lastmsg), ZFPM_READONLY);
+	return 6;
+    }
+    strncpy(lastcodestr, ptr, 3);
+    ptr += 3;
+    lastcodestr[3] = '\0';
+    lastcode = atoi(lastcodestr);
+    zfsetparam("ZFTP_CODE", ztrdup(lastcodestr), ZFPM_READONLY);
+    stopit = (*ptr++ != '-');
+
+    if (strchr(verbose, lastcodestr[0])) {
+	/* print the whole thing verbatim */
+	printing = 1;
+	fputs(line, stderr);
+    }  else if (strchr(verbose, '0') && !stopit) {
+	/* print multiline parts with the code stripped */
+	printing = 2;
+	fputs(ptr, stderr);
+    }
+    if (printing)
+	fputc('\n', stderr);
+
+    while (zcfinish != 2 && !stopit) {
+	zfgetline(line, 256, tmout);
+	ptr = line;
+	if (zfdrrrring) {
+	    line[0] = '\0';
+	    break;
+	}
+
+	if (!strncmp(lastcodestr, line, 3)) {
+	    if (line[3] == ' ') {
+		stopit = 1;
+		ptr += 4;
+	    } else if (line[3] == '-')
+		ptr += 4;
+	} else if (!strncmp("    ", line, 4))
+	    ptr += 4;
+
+	if (printing == 2) {
+	    if (!stopit) {
+		fputs(ptr, stderr);
+		fputc('\n', stderr);
+	    }
+	} else if (printing) {
+	    fputs(line, stderr);
+	    fputc('\n', stderr);
+	}
+    }
+
+    if (printing)
+	fflush(stderr);
+
+    /* The internal message is just the text. */
+    lastmsg = ztrdup(ptr);
+    /*
+     * The parameter is the whole thing, including the code.
+     */
+    zfsetparam("ZFTP_REPLY", ztrdup(line), ZFPM_READONLY);
+    /*
+     * close the connection here if zcfinish == 2, i.e. EOF,
+     * or if we get a 421 (service not available, closing connection),
+     * but don't do it if it's expected (zfclosing set).
+     */
+    if ((zcfinish == 2 || lastcode == 421) && !zfclosing) {
+	zcfinish = 2;		/* don't need to tell server */
+	zfclose();
+	/* unexpected, so tell user */
+	zwarnnam("zftp", "remote server has closed connection", NULL, 0);
+	return 6;		/* pretend it failed, because it did */
+    }
+    if (lastcode == 530) {
+	/* user not logged in */
+	return 6;
+    }
+    /*
+     * May as well handle this here, though it's pretty uncommon.
+     * A 120 is something like "service ready in nnn minutes".
+     * It means we just hang around waiting for another reply.
+     */
+    if (lastcode == 120) {
+	zwarnnam("zftp", "delay expected, waiting: %s", lastmsg, 0);
+	return zfgetmsg();
+    }
+
+    /* first digit of code determines success, failure, not in the mood... */
+    return lastcodestr[0] - '0';
+}
+
+
+/*
+ * Send a command and get the reply.
+ * The command is expected to have the \r\n already tacked on.
+ * Returns the status code for the reply.
+ */
+
+/**/
+static int
+zfsendcmd(char *cmd)
+{
+    /*
+     * We use the fd directly; there's no point even using
+     * stdio with line buffering, since we always send the
+     * complete line in one string anyway.
+     */
+    int ret, tmout;
+
+    if (zcfd == -1)
+	return 5;
+    tmout = getiparam("ZFTP_TMOUT");
+    if (setjmp(zfalrmbuf)) {
+	alarm(0);
+	zwarnnam("zftp", "timeout sending message", NULL, 0);
+	return 5;
+    }
+    zfalarm(tmout);
+    ret = write(zcfd, cmd, strlen(cmd));
+    alarm(0);
+
+    if (ret <= 0) {
+	zwarnnam("zftp send", "failed sending control message", NULL, 0);
+	return 5;		/* FTP status code */
+    }
+
+    return zfgetmsg();
+}
+
+
+/* Set up a data connection, return 1 for failure, 0 for success */
+
+/**/
+static int
+zfopendata(char *name)
+{
+    if (!(zfprefs & (ZFPF_SNDP|ZFPF_PASV))) {
+	zwarnnam(name, "Must set preference S or P to transfer data", NULL, 0);
+	return 1;
+    }
+    zdfd = zfmovefd(socket(AF_INET, SOCK_STREAM, 0));
+    if (zdfd < 0) {
+	zwarnnam(name, "can't get data socket: %e", NULL, errno);
+	return 1;
+    }
+
+    zdsock = zsock;
+    zdsock.sin_family = AF_INET;
+
+    if (!(zfstatus & ZFST_NOPS) && (zfprefs & ZFPF_PASV)) {
+	char *ptr;
+	int i, nums[6], err;
+	unsigned char iaddr[4], iport[2];
+
+	if (zfsendcmd("PASV\r\n") == 6)
+	    return 1;
+	else if (lastcode >= 500 && lastcode <= 504) {
+	    /*
+	     * Fall back to send port mode.  That will
+	     * test the preferences for whether that's OK.
+	     */
+	    zfstatus |= ZFST_NOPS;
+	    zfclosedata();
+	    return zfopendata(name);
+	}
+	/*
+	 * OK, now we need to know what port we're looking at,
+	 * which is cunningly concealed in the reply.
+	 * lastmsg already has the reply code expunged.
+	 */
+	for (ptr = lastmsg; *ptr; ptr++)
+	    if (isdigit(*ptr))
+		break;
+	if (sscanf(ptr, "%d,%d,%d,%d,%d,%d",
+		   nums, nums+1, nums+2, nums+3, nums+4, nums+5) != 6) {
+	    zwarnnam(name, "bad response to PASV: %s", lastmsg, 0);
+	    zfclosedata();
+	    return 1;
+	}
+	for (i = 0; i < 4; i++)
+	    iaddr[i] = STOUC(nums[i]);
+	iport[0] = STOUC(nums[4]);
+	iport[1] = STOUC(nums[5]);
+
+	memcpy(&zdsock.sin_addr, iaddr, sizeof(iaddr));
+	memcpy(&zdsock.sin_port, iport, sizeof(iport));
+
+	/* we should timeout this connect */
+	do {
+	    err = connect(zdfd, (struct sockaddr *)&zdsock, sizeof(zdsock));
+	} while (err && errno == EINTR && !errflag);
+
+	if (err) {
+	    zwarnnam(name, "connect failed: %e", NULL, errno);
+	    zfclosedata();
+	    return 1;
+	}
+
+	zfpassive_conn = 1;
+    } else {
+	char portcmd[40];
+	unsigned char *addr, *port;
+	int ret, len;
+
+	if (!(zfprefs & ZFPF_SNDP)) {
+	    zwarnnam(name, "only sendport mode available for data", NULL, 0);
+	    return 1;
+	}
+
+	zdsock.sin_port = 0;	/* to be set by bind() */
+	len = sizeof(zdsock);
+	/* need to do timeout stuff and probably handle EINTR here */
+	if (bind(zdfd, (struct sockaddr *)&zdsock, sizeof(zdsock)) < 0)
+	    ret = 1;
+	else if (getsockname(zdfd, (struct sockaddr *)&zdsock, &len) < 0)
+	    ret = 2;
+	else if (listen(zdfd, 1) < 0)
+	    ret = 3;
+	else
+	    ret = 0;
+
+	if (ret) {
+	    zwarnnam(name, "failure on data socket: %s: %e",
+		     ret == 3 ? "listen" : ret == 2 ? "getsockname" : "bind",
+		     errno);
+	    zfclosedata();
+	    return 1;
+	}
+
+	addr = (unsigned char *) &zdsock.sin_addr;
+	port = (unsigned char *) &zdsock.sin_port;
+	sprintf(portcmd, "PORT %d,%d,%d,%d,%d,%d\r\n",
+		addr[0],addr[1],addr[2],addr[3],port[0],port[1]);
+	if (zfsendcmd(portcmd) >= 5) {
+	    zwarnnam(name, "port command failed", NULL, 0);
+	    zfclosedata();
+	    return 1;
+	}
+	zfpassive_conn = 0;
+    }
+
+    return 0;
+}
+
+/* Close the data connection. */
+
+/**/
+static void
+zfclosedata(void)
+{
+    if (zdfd == -1)
+	return;
+    close(zdfd);
+    zdfd = -1;
+}
+
+/*
+ * Set up a data connection and use cmd to initiate a transfer.
+ * The actual data fd will be zdfd; the calling routine
+ * must handle the data itself.
+ * rest is a REST command to specify starting somewhere other
+ * then the start of the remote file.
+ * getsize is non-zero if we want to try to find the number
+ * of bytes in the reply to a RETR command.
+ *
+ * Return 0 on success, 1 on failure.
+ */
+
+/**/
+static int
+zfgetdata(char *name, char *rest, char *cmd, int getsize)
+{
+    int len, newfd;
+
+    if (zfopendata(name))
+	return 1;
+
+    /*
+     * Set position in remote file for get/put.
+     * According to RFC959, the restart command needs something
+     * called a marker which has previously been put into the data.
+     * Luckily for the real world, UNIX machines just interpret this
+     * as an offset into the byte stream.
+     *
+     * This has to be sent immediately before the data transfer, i.e.
+     * after all mucking around with types and sizes and so on.
+     */
+    if (rest && zfsendcmd(rest) > 3) {
+	zfclosedata();
+	return 1;
+    }
+
+    if (zfsendcmd(cmd) > 2) {
+	zfclosedata();
+	return 1;
+    }
+    if (getsize || (!(zfstatus & ZFST_TRSZ) && !strncmp(cmd, "RETR", 4))) {
+	/*
+	 * See if we got something like:
+	 *   Opening data connection for nortypix.gif (1234567 bytes).
+	 * On the first RETR, always see if this works,  Then we
+	 * can avoid sending a special SIZE command beforehand.
+	 */
+	char *ptr = strstr(lastmsg, "bytes");
+	zfstatus |= ZFST_NOSZ|ZFST_TRSZ;
+	if (ptr) {
+	    while (ptr > lastmsg && !isdigit(*ptr))
+		ptr--;
+	    while (ptr > lastmsg && isdigit(ptr[-1]))
+		ptr--;
+	    if (isdigit(*ptr)) {
+		zfstatus &= ~ZFST_NOSZ;
+		if (getsize) {
+		    long sz = zstrtol(ptr, NULL, 10);
+		    zfsetparam("ZFTP_SIZE", &sz, ZFPM_READONLY|ZFPM_INTEGER);
+		}
+	    }
+	}
+    }
+
+    if (!zfpassive_conn) {
+	/*
+	 * the current zdfd is the socket we opened, but we need
+	 * to let the server set up a different fd for reading/writing.
+	 * then we can close the fd we were listening for a connection on.
+	 * don't expect me to understand this, i'm only the programmer.
+	 */
+
+	/* accept the connection */
+	len = sizeof(zdsock);
+	newfd = zfmovefd(accept(zdfd, (struct sockaddr *)&zdsock, &len));
+	zfclosedata();
+	if (newfd < 0) {
+	    zwarnnam(name, "unable to accept data.", NULL, 0);
+	    return 1;
+	}
+	zdfd = newfd;		/* this is now the actual data fd */
+    }
+
+
+    /* more options, just to look professional */
+#ifdef SO_LINGER
+    /*
+     * Since data can take arbitrary amounts of time to arrive,
+     * the socket can be made to hang around until it doesn't think
+     * anything is arriving.
+     *
+     * In BSD 4.3, you could only linger for infinity.  Don't
+     * know if this has changed.
+     */
+    {
+	struct linger li;
+
+	li.l_onoff = 1;
+	li.l_linger = 120;
+	setsockopt(zdfd, SOL_SOCKET, SO_LINGER, (char *)&li, sizeof(li));
+    }
+#endif
+#if defined(IP_TOS) && defined(IPTOS_THROUGHPUT)
+    /* try to get high throughput, snigger */
+    {
+	int arg = IPTOS_THROUGHPUT;
+	setsockopt(zdfd, IPPROTO_IP, IP_TOS, (char *)&arg, sizeof(arg));
+    }
+#endif
+#if defined(F_SETFD) && defined(FD_CLOEXEC)
+	/* If the shell execs a program, we don't want this fd left open. */
+	len = FD_CLOEXEC;
+	fcntl(zdfd, F_SETFD, &len);
+#endif
+
+    return 0;
+}
+
+/*
+ * Find out about a local or remote file and pass back the information.
+ *
+ * We could jigger this to use ls like ncftp does as a backup.
+ * But if the server is non-standard enough not to have SIZE and MDTM,
+ * there's a very good chance ls -l isn't going to do great things.
+ *
+ * if fd is >= 0, it is used for an fstat when remote is zero:
+ * this is because on a put we are taking input from fd 0.
+ */
+
+/**/
+static int
+zfstats(char *fnam, int remote, long *retsize, char **retmdtm, int fd)
+{
+    long sz = -1;
+    char *mt = NULL;
+    int ret;
+
+    if (retsize)
+	*retsize = -1;
+    if (retmdtm)
+	*retmdtm = NULL;
+    if (remote) {
+	char *cmd;
+	if ((zfhas_size == ZFCP_NOPE && retsize) ||
+	    (zfhas_mdtm == ZFCP_NOPE && retmdtm))
+	    return 2;
+
+	/*
+	 * File is coming from over there.
+	 * Make sure we get the type right.
+	 */
+	zfsettype(ZFST_TYPE(zfstatus));
+	if (retsize) {
+	    cmd = tricat("SIZE ", fnam, "\r\n");
+	    ret = zfsendcmd(cmd);
+	    zsfree(cmd);
+	    if (ret == 6)
+		return 1;
+	    else if (lastcode < 300) {
+		sz = zstrtol(lastmsg, 0, 10);
+		zfhas_size = ZFCP_YUPP;
+	    } else if (lastcode >= 500 && lastcode <= 504) {
+		zfhas_size = ZFCP_NOPE;
+		return 2;
+	    } else if (lastcode == 550)
+		return 1;
+	    /* if we got a 550 from SIZE, the file doesn't exist */
+	}
+
+	if (retmdtm) {
+	    cmd = tricat("MDTM ", fnam, "\r\n");
+	    ret = zfsendcmd(cmd);
+	    zsfree(cmd);
+	    if (ret == 6)
+		return 1;
+	    else if (lastcode < 300) {
+		mt = ztrdup(lastmsg);
+		zfhas_mdtm = ZFCP_YUPP;
+	    } else if (lastcode >= 500 && lastcode <= 504) {
+		zfhas_mdtm = ZFCP_NOPE;
+		return 2;
+	    } else if (lastcode == 550)
+		return 1;
+	}
+    } else {
+	/* File is over here */
+	struct stat statbuf;
+	struct tm *tm;
+	char tmbuf[20];
+
+	if ((fd == -1 ? stat(fnam, &statbuf) : fstat(fd, &statbuf)) < 0)
+	    return 1;
+	/* make sure it's long, since this has to be a pointer */
+	sz = statbuf.st_size;
+
+	if (retmdtm) {
+	    /* use gmtime() rather than localtime() for consistency */
+	    tm = gmtime(&statbuf.st_mtime);
+	    /*
+	     * FTP format for data is YYYYMMDDHHMMSS
+	     * Using tm directly is easier than worrying about
+	     * incompatible strftime()'s.
+	     */
+	    sprintf(tmbuf, "%04d%02d%02d%02d%02d%02d",
+		    tm->tm_year + 1900, tm->tm_mon+1, tm->tm_mday,
+		    tm->tm_hour, tm->tm_min, tm->tm_sec);
+	    mt = ztrdup(tmbuf);
+	}
+    }
+    if (retsize)
+	*retsize = sz;
+    if (retmdtm)
+	*retmdtm = mt;
+    return 0;
+}
+
+/* Set parameters to say what's coming */
+
+/**/
+static void
+zfstarttrans(char *nam, int recv, long sz)
+{
+    long cnt = 0;
+    /*
+     * sz = -1 signifies error getting size.  don't set ZFTP_SIZE if sz is
+     * zero, either: it probably came from an fstat() on a pipe, so it
+     * means we don't know and shouldn't tell the user porkies.
+     */
+    if (sz > 0)
+	zfsetparam("ZFTP_SIZE", &sz, ZFPM_READONLY|ZFPM_INTEGER);
+    zfsetparam("ZFTP_FILE", ztrdup(nam), ZFPM_READONLY);
+    zfsetparam("ZFTP_TRANSFER", ztrdup(recv ? "G" : "P"), ZFPM_READONLY);
+    zfsetparam("ZFTP_COUNT", &cnt, ZFPM_READONLY|ZFPM_INTEGER);
+}
+
+/* Tidy up afterwards */
+
+/**/
+static void
+zfendtrans()
+{
+    zfunsetparam("ZFTP_SIZE");
+    zfunsetparam("ZFTP_FILE");
+    zfunsetparam("ZFTP_TRANSFER");
+    zfunsetparam("ZFTP_COUNT");
+}
+
+/* Read with timeout if recv is set. */
+
+/**/
+static int
+zfread(int fd, char *bf, size_t sz, int tmout)
+{
+    int ret;
+
+    if (!tmout)
+	return read(fd, bf, sz);
+
+    if (setjmp(zfalrmbuf)) {
+	alarm(0);
+	zwarnnam("zftp", "timeout on network read", NULL, 0);
+	return -1;
+    }
+    zfalarm(tmout);
+
+    ret = read(fd, bf, sz);
+
+    /* we don't bother turning off the whole alarm mechanism here */
+    alarm(0);
+    return ret;
+}
+
+/* Write with timeout if recv is not set. */
+
+/**/
+static int
+zfwrite(int fd, char *bf, size_t sz, int tmout)
+{
+    int ret;
+
+    if (!tmout)
+	return write(fd, bf, sz);
+
+    if (setjmp(zfalrmbuf)) {
+	alarm(0);
+	zwarnnam("zftp", "timeout on network write", NULL, 0);
+	return -1;
+    }
+    zfalarm(tmout);
+
+    ret = write(fd, bf, sz);
+
+    /* we don't bother turning off the whole alarm mechanism here */
+    alarm(0);
+    return ret;
+}
+
+static int zfread_eof;
+
+/* Version of zfread when we need to read in block mode. */
+
+/**/
+static int
+zfread_block(int fd, char *bf, size_t sz, int tmout)
+{
+    int n;
+    struct zfheader hdr;
+    size_t blksz, cnt;
+    char *bfptr;
+    do {
+	/* we need the header */
+	do {
+	    n = zfread(fd, (char *)&hdr, sizeof(hdr), tmout);
+	} while (n < 0 && errno == EINTR);
+	if (n != 3 && !zfdrrrring) {
+	    zwarnnam("zftp", "failed to read FTP block header", NULL, 0);
+	    return n;
+	}
+	/* size is stored in network byte order */
+	if (hdr.flags & ZFHD_EOFB)
+	    zfread_eof = 1;
+	blksz = (hdr.bytes[0] << 8) | hdr.bytes[1];
+	if (blksz > sz) {
+	    /*
+	     * See comments in file headers
+	     */
+	    zwarnnam("zftp", "block too large to handle", NULL, 0);
+	    errno = EIO;
+	    return -1;
+	}
+	bfptr = bf;
+	cnt = blksz;
+	while (cnt) {
+	    n = zfread(fd, bfptr, cnt, tmout);
+	    if (n > 0) {
+		bfptr += n;
+		cnt -= n;
+	    } else if (n < 0 && (errflag || zfdrrrring || errno != EINTR))
+		return n;
+	    else
+		break;
+	}
+	if (cnt) {
+	    zwarnnam("zftp", "short data block", NULL, 0);
+	    errno = EIO;
+	    return -1;
+	}
+    } while ((hdr.flags & ZFHD_MARK) && !zfread_eof);
+    return (hdr.flags & ZFHD_MARK) ? 0 : blksz;
+}
+
+/* Version of zfwrite when we need to write in block mode. */
+
+/**/
+static int
+zfwrite_block(int fd, char *bf, size_t sz, int tmout)
+{
+    int n;
+    struct zfheader hdr;
+    size_t cnt;
+    char *bfptr;
+    /* we need the header */
+    do {
+	hdr.bytes[0] = (sz & 0xff00) >> 8;
+	hdr.bytes[1] = sz & 0xff;
+	hdr.flags = sz ? 0 : ZFHD_EOFB;
+	n = zfwrite(fd, (char *)&hdr, sizeof(hdr), tmout);
+    } while (n < 0 && errno == EINTR);
+    if (n != 3 && !zfdrrrring) {
+	zwarnnam("zftp", "failed to write FTP block header", NULL, 0);
+	return n;
+    }
+    bfptr = bf;
+    cnt = sz;
+    while (cnt) {
+	n = zfwrite(fd, bfptr, cnt, tmout);
+	if (n > 0) {
+	    bfptr += n;
+	    cnt -= n;
+	} else if (n < 0 && (errflag || zfdrrrring || errno != EINTR))
+	    return n;
+    }
+
+    return sz;
+}
+
+/*
+ * Move stuff from fdin to fdout, tidying up the data connection
+ * when finished.  The data connection could be either input or output:
+ * recv is 1 for receiving a file, 0 for sending.
+ *
+ * progress is 1 to use a progress meter.
+ * startat says how far in we're starting with a REST command.
+ *
+ * Since we're doing some buffering here anyway, we don't bother
+ * with a stdio layer.
+ */
+
+/**/
+static int
+zfsenddata(char *name, int recv, int progress, long startat)
+{
+#define ZF_BUFSIZE 32768
+#define ZF_ASCSIZE (ZF_BUFSIZE/2)
+    /* ret = 2 signals the local read/write failed, so send abort */
+    int n, ret = 0, gotack = 0, fdin, fdout, fromasc = 0, toasc = 0;
+    int rtmout = 0, wtmout = 0;
+    char lsbuf[ZF_BUFSIZE], *ascbuf = NULL, *optr;
+    long sofar = 0, last_sofar = 0;
+    readwrite_t read_ptr = zfread, write_ptr = zfwrite;
+    List l;
+
+    if (progress && (l = getshfunc("zftp_progress")) != &dummy_list) {
+	/*
+	 * progress to set up:  ZFTP_COUNT is zero.
+	 * We do this here in case we needed to wait for a RETR
+	 * command to tell us how many bytes are coming.
+	 */
+	doshfunc("zftp_progress", l, NULL, 0, 1);
+	/* Now add in the bit of the file we've got/sent already */
+	sofar = last_sofar = startat;
+    }
+    if (recv) {
+	fdin = zdfd;
+	fdout = 1;
+	rtmout = getiparam("ZFTP_TMOUT");
+	if (ZFST_CTYP(zfstatus) == ZFST_ASCI)
+	    fromasc = 1;
+	if (ZFST_MODE(zfstatus) == ZFST_BLOC)
+	    read_ptr = zfread_block;
+    } else {
+	fdin = 0;
+	fdout = zdfd;
+	wtmout = getiparam("ZFTP_TMOUT");
+	if (ZFST_CTYP(zfstatus) == ZFST_ASCI)
+	    toasc = 1;
+	if (ZFST_MODE(zfstatus) == ZFST_BLOC)
+	    write_ptr = zfwrite_block;
+    }
+
+    if (toasc)
+	ascbuf = zalloc(ZF_ASCSIZE);
+    zfpipe();
+    zfread_eof = 0;
+    while (!ret && !zfread_eof) {
+	n = (toasc) ? read_ptr(fdin, ascbuf, ZF_ASCSIZE, rtmout)
+	    : read_ptr(fdin, lsbuf, ZF_BUFSIZE, rtmout);
+	if (n > 0) {
+	    char *iptr;
+	    if (toasc) {
+		/* \n -> \r\n it shouldn't happen to a dog. */
+		char *iptr = ascbuf, *optr = lsbuf;
+		int cnt = n;
+		while (cnt--) {
+		    if (*iptr == '\n') {
+			*optr++ = '\r';
+			n++;
+		    }
+		    *optr++ = *iptr++;
+		}
+	    }
+	    if (fromasc && (iptr = memchr(lsbuf, '\r', n))) {
+		/* \r\n -> \n */
+		char *optr = iptr;
+		int cnt = n - (iptr - lsbuf);
+		while (cnt--) {
+		    if (*iptr != '\r' || iptr[1] != '\n') {
+			*optr++ = *iptr;
+		    } else
+			n--;
+		    iptr++;
+		}
+	    }
+	    optr = lsbuf;
+
+	    sofar += n;
+
+	    for (;;) {
+		/*
+		 * in principle, write can be interrupted after
+		 * safely writing some bytes, and will return the
+		 * number already written, which may not be the
+		 * complete buffer.  so make this robust.  they call me
+		 * `robustness stephenson'.  in my dreams.
+		 */
+		int newn = write_ptr(fdout, optr, n, wtmout);
+		if (newn == n)
+		    break;
+		if (newn < 0) {
+		    /*
+		     * The somewhat contorted test here (for write)
+		     * and below (for read) means:
+		     * real error if
+		     *  - errno is set and it's not just an interrupt, or
+		     *  - errflag is set, probably due to CTRL-c, or
+		     *  - zfdrrrring is set, due to the alarm going off.
+		     * print an error message if
+		     *  - not a timeout, since that was reported, and
+		     *    either
+		     *    - a non-interactive shell, where we don't
+		     *      know what happened otherwise
+		     *    - or both of
+		     *      - not errflag, i.e. CTRL-c or what have you,
+		     *        since the user probably knows about that, and
+		     *      - not a SIGPIPE, since usually people are
+		     *        silent about those when going to pagers
+		     *        (if you quit less or more in the middle
+		     *        and see an error message you think `I
+		     *        shouldn't have done that').
+		     *
+		     * If we didn't print an error message here,
+		     * and were going to do an abort (ret == 2)
+		     * because the error happened on the local end
+		     * of the connection, set ret to 3 and don't print
+		     * the 'aborting...' either.
+		     *
+		     * There must be a better way of doing this.
+		     */
+		    if (errno != EINTR || errflag || zfdrrrring) {
+			if (!zfdrrrring &&
+			    (!interact || (!errflag && errno != EPIPE))) {
+			    ret = recv ? 2 : 1;
+			    zwarnnam(name, "write failed: %e", NULL, errno);
+			} else
+			    ret = recv ? 3 : 1;
+			break;
+		    }
+		    continue;
+		}
+		optr += newn;
+		n -= newn;
+	    }
+	} else if (n < 0) {
+	    if (errno != EINTR || errflag || zfdrrrring) {
+		if (!zfdrrrring &&
+		    (!interact || (!errflag && errno != EPIPE))) {
+		    ret = recv ? 1 : 2;
+		    zwarnnam(name, "read failed: %e", NULL, errno);
+		} else
+		    ret = recv ? 1 : 3;
+		break;
+	    }
+	} else
+	    break;
+	if (!ret && sofar != last_sofar && progress &&
+	    (l = getshfunc("zftp_progress")) != &dummy_list) {
+	    zfsetparam("ZFTP_COUNT", &sofar, ZFPM_READONLY|ZFPM_INTEGER);
+	    doshfunc("zftp_progress", l, NULL, 0, 1);
+	    last_sofar = sofar;
+	}
+    }
+    zfunpipe();
+    /*
+     * At this point any timeout was on the data connection,
+     * so we don't need to force the control connection to close.
+     */
+    zfdrrrring = 0;
+    if (!errflag && !ret && !recv && ZFST_MODE(zfstatus) == ZFST_BLOC) {
+	/* send an end-of-file marker block */
+	ret = (zfwrite_block(fdout, lsbuf, 0, wtmout) < 0);
+    }
+    if (errflag || ret > 1) {
+	/*
+	 * some error occurred, maybe a keyboard interrupt, or
+	 * a local file/pipe handling problem.
+	 * send an abort.
+	 *
+	 * safest to block all signals here?  can get frustrating if
+	 * we're waiting for an abort.  don't I know.  let's start
+	 * off just by blocking SIGINT's.
+	 *
+	 * maybe the timeout for the abort should be shorter than
+	 * for normal commands.  and what about aborting after
+	 * we had a timeout on the data connection, is that
+	 * really a good idea?
+	 */
+	/* RFC 959 says this is what to send */
+	unsigned char msg[4] = { IAC, IP, IAC, SYNCH };
+
+	if (ret == 2)
+	    zwarnnam(name, "aborting data transfer...", NULL, 0);
+
+	holdintr();
+
+	/* the following is black magic, as far as I'm concerned. */
+	/* what are we going to do if it fails?  not a lot, actually. */
+	send(zcfd, (char *)msg, 3, 0);
+	send(zcfd, (char *)msg+3, 1, MSG_OOB);
+
+	zfsendcmd("ABOR\r\n");
+	if (lastcode == 226) {
+	    /*
+	     * 226 is supposed to mean the transfer got sent OK after
+	     * all, and the abort got ignored, at least that's what
+	     * rfc959 seems to be saying.  but in fact what can happen
+	     * is the transfer finishes (at least as far as the
+	     * server's concerned) and it's response is waiting, then
+	     * the abort gets sent, and we need to mop up a response to
+	     * that.  so actually in most cases we get two replies
+	     * anyway.  we could test if we had select() on all hosts.
+	     */
+	    /* gotack = 1; */
+	    /*
+	     * we'd better leave errflag, since we don't know
+	     * where it came from.  maybe the user wants to abort
+	     * a whole script or function.
+	     */
+	} else
+	    ret = 1;
+
+	noholdintr();
+    }
+	
+    if (toasc)
+	zfree(ascbuf, ZF_ASCSIZE);
+    zfclosedata();
+    if (!gotack && zfgetmsg() > 2)
+	ret = 1;
+    return ret != 0;
+}
+
+/* Open a new control connection, i.e. start a new FTP session */
+
+/**/
+static int
+zftp_open(char *name, char **args, int flags)
+{
+    struct in_addr ipaddr;
+    struct protoent *zprotop;
+    struct servent *zservp;
+    struct hostent *zhostp = NULL;
+    char **addrp, tbuf[2] = "X", *fname;
+    int err, len, tmout;
+
+    if (!*args) {
+	if (zfuserparams)
+	    args = zfuserparams;
+	else {
+	    zwarnnam(name, "no host specified", NULL, 0);
+	    return 1;
+	}
+    }
+
+    /*
+     * Close the existing connection if any.
+     * Probably this is the safest thing to do.  It's possible
+     * a `QUIT' will hang, though.
+     */
+    if (zcfd != -1)
+	zfclose();
+
+    /* this is going to give 0.  why bother? */
+    zprotop = getprotobyname("tcp");
+    zservp = getservbyname("ftp", "tcp");
+
+    if (!zprotop || !zservp) {
+	zwarnnam(name, "Somebody stole FTP!", NULL, 0);
+	return 1;
+    }
+
+    /* don't try talking to server yet */
+    zcfinish = 2;
+
+    /*
+     * This sets an alarm for the whole process, getting the host name
+     * as well as connecting.  Arguably you could time them out separately. 
+     */
+    tmout = getiparam("ZFTP_TMOUT");
+    if (setjmp(zfalrmbuf)) {
+	char *hname;
+	alarm(0);
+	if ((hname = getsparam("ZFTP_HOST")) && *hname) 
+	    zwarnnam(name, "timeout connecting to %s", hname, 0);
+	else
+	    zwarnnam(name, "timeout on host name lookup", NULL, 0);
+	zfclose();
+	return 1;
+    }
+    zfalarm(tmout);
+
+    /*
+     * Now this is what I like.  A library which provides decent higher
+     * level functions to do things like converting address types.  It saves
+     * so much trouble.  Pity about the rest of the network interface, though.
+     */
+    ipaddr.s_addr = inet_addr(args[0]);
+    if (ipaddr.s_addr != INADDR_NONE) {
+	/*
+	 * hmmm, we don't necessarily want to do this... maybe the
+	 * user is actively trying to avoid a bad nameserver.
+	 * perhaps better just to set ZFTP_HOST to the dot address, too.
+	 * that way shell functions know how it was opened.
+	 *
+	 * 	zhostp = gethostbyaddr(&ipaddr, sizeof(ipaddr), AF_INET);
+	 *
+	 * or, we could have a `no_lookup' flag.
+	 */
+	zfsetparam("ZFTP_HOST", ztrdup(args[0]), ZFPM_READONLY);
+	zsock.sin_family = AF_INET;
+    } else {
+	zhostp = gethostbyname(args[0]);
+	if (!zhostp || errflag) {
+	    /* should use herror() here if available, but maybe
+	     * needs configure test. on AIX it's present but not
+	     * in headers.
+	     */
+	    zwarnnam(name, "host not found: %s", args[0], 0);
+	    alarm(0);
+	    return 1;
+	}
+	zsock.sin_family = zhostp->h_addrtype;
+	zfsetparam("ZFTP_HOST", ztrdup(zhostp->h_name), ZFPM_READONLY);
+    }
+
+    zsock.sin_port = ntohs(zservp->s_port);
+    zcfd = zfmovefd(socket(zsock.sin_family, SOCK_STREAM, 0));
+    if (zcfd < 0) {
+	zwarnnam(name, "socket failed: %e", NULL, errno);
+	zfunsetparam("ZFTP_HOST");
+	alarm(0);
+	return 1;
+    }
+
+#if defined(F_SETFD) && defined(FD_CLOEXEC)
+    /* If the shell execs a program, we don't want this fd left open. */
+    len = FD_CLOEXEC;
+    fcntl(zcfd, F_SETFD, &len);
+#endif
+
+    /*
+     * now connect the socket.  manual pages all say things like `this is all
+     * explained oh-so-wonderfully in some other manual page'.  not.
+     */
+
+    err = 1;
+
+    if (ipaddr.s_addr != INADDR_NONE) {
+	/* dot address */
+	memcpy(&zsock.sin_addr, &ipaddr, sizeof(ipaddr));
+	do {
+	    err = connect(zcfd, (struct sockaddr *)&zsock, sizeof(zsock));
+	} while (err && errno == EINTR && !errflag);
+    } else {
+	/* host name: try all possible IP's */
+	for (addrp = zhostp->h_addr_list; *addrp; addrp++) {
+	    memcpy(&zsock.sin_addr, *addrp, zhostp->h_length);
+	    do {
+		err = connect(zcfd, (struct sockaddr *)&zsock, sizeof(zsock));
+	    } while (err && errno == EINTR && !errflag);
+	    /* you can check whether it's worth retrying here */
+	}
+    }
+
+    alarm(0);
+
+    if (err < 0) {
+	zwarnnam(name, "connect failed: %e", NULL, errno);
+	zfclose();
+	return 1;
+    }
+    zfsetparam("ZFTP_IP", ztrdup(inet_ntoa(zsock.sin_addr)), ZFPM_READONLY);
+    /* now we can talk to the control connection */
+    zcfinish = 0;
+
+    len = sizeof(zsock);
+    if (getsockname(zcfd, (struct sockaddr *)&zsock, &len) < 0) {
+	zwarnnam(name, "getsockname failed: %e", NULL, errno);
+	zfclose();
+	return 1;
+    }
+    /* nice to get some options right, ignore if they don't work */
+#ifdef SO_OOBINLINE
+    /*
+     * this says we want messages in line.  maybe sophisticated people
+     * do clever things with SIGURG.
+     */
+    len = 1;
+    setsockopt(zcfd, SOL_SOCKET, SO_OOBINLINE, (char *)&len, sizeof(len));
+#endif
+#if defined(IP_TOS) && defined(IPTOS_LOWDELAY)
+    /* for control connection we want low delay.  please don't laugh. */
+    len = IPTOS_LOWDELAY;
+    setsockopt(zcfd, IPPROTO_IP, IP_TOS, (char *)&len, sizeof(len));
+#endif
+
+    /*
+     * We use stdio with line buffering for convenience on input.
+     * On output, we can just dump a complete message to the fd via write().
+     */
+    zcin = fdopen(zcfd, "r");
+
+    if (!zcin) {
+	zwarnnam(name, "file handling error", NULL, 0);
+	zfclose();
+	return 1;
+    }
+
+#ifdef _IONBF
+    setvbuf(zcin, NULL, _IONBF, 0);
+#else
+    setlinebuf(zcin);
+#endif
+
+    /*
+     * now see what the remote server has to say about that.
+     */
+    if (zfgetmsg() >= 4) {
+	zfclose();
+	return 1;
+    }
+
+    zfis_unix = 0;
+    zfhas_size = zfhas_mdtm = ZFCP_UNKN;
+    zdfd = -1;
+    /* initial status: open, ASCII data, stream mode 'n' stuff */
+    zfstatus = 0;
+
+    /* open file for saving the current status */
+    fname = gettempname();
+    zfstatfd = open(fname, O_RDWR|O_CREAT, 0600);
+    DPUTS(zfstatfd == -1, "zfstatfd not created");
+#if defined(F_SETFD) && defined(FD_CLOEXEC)
+    /* If the shell execs a program, we don't want this fd left open. */
+    len = FD_CLOEXEC;
+    fcntl(zfstatfd, F_SETFD, &len);
+#endif
+    unlink(fname);
+
+    /* now find out what system we're connected to */
+    if (!(zfprefs & ZFPF_DUMB) && zfsendcmd("SYST\r\n") == 2) {
+	char *ptr = lastmsg, *eptr, *systype;
+	for (eptr = ptr; *eptr; eptr++)
+	    ;
+	systype = ztrduppfx(ptr, eptr-ptr);
+	if (!strncmp(systype, "UNIX Type: L8", 13)) {
+	    /*
+	     * Use binary for transfers.  This simple test saves much
+	     * hassle for all concerned, particularly me.
+	     */
+	    zfstatus |= ZFST_IMAG;
+	    zfis_unix = 1;
+	}
+	/*
+	 * we could set zfis_unix based just on the UNIX part,
+	 * but I don't really know the consequences of that.
+	 */
+	zfsetparam("ZFTP_SYSTEM", systype, ZFPM_READONLY);
+    } else if (zcfd == -1) {
+	/* final paranoid check */
+	return 1;
+    }
+	
+    tbuf[0] = (ZFST_TYPE(zfstatus) == ZFST_ASCI) ? 'A' : 'I';
+    zfsetparam("ZFTP_TYPE", ztrdup(tbuf), ZFPM_READONLY);
+    zfsetparam("ZFTP_MODE", ztrdup("S"), ZFPM_READONLY);
+    /* if remaining arguments, use them to log in. */
+    if (zcfd > -1 && *++args)
+	return zftp_login(name, args, flags);
+    /* if something wayward happened, connection was already closed */
+    return zcfd == -1;
+}
+
+/*
+ * Read a parameter string, with a prompt if reading from stdin.
+ * The returned string is on the heap.
+ * If noecho, turn off ECHO mode while reading.
+ */
+
+/**/
+static char *
+zfgetinfo(char *prompt, int noecho)
+{
+    int resettty = 0;
+    /* 256 characters should be enough, hardly worth allocating
+     * a password string byte by byte
+     */
+    char instr[256], *strret;
+    int len;
+
+    /*
+     * Only print the prompt if getting info from a tty.  Of
+     * course, we don't know if stderr has been redirected, but
+     * that seems a minor point.
+     */
+    if (isatty(0)) {
+	if (noecho) {
+	    /* hmmm... all this great big shell and we have to read
+	     * something with no echo by ourselves.
+	     * bin_read() is far to complicated for our needs.
+	     * we could use zread(), but that relies on static
+	     * variables, so someone doesn't want that to happen.
+	     *
+	     * this is modified from setcbreak() in utils.c,
+	     * except I don't see any point in using cbreak mode
+	     */
+	    struct ttyinfo ti;
+
+	    ti = shttyinfo;
+#ifdef HAS_TIO
+	    ti.tio.c_lflag &= ~ECHO;
+#else
+	    ti.sgttyb.sg_flags &= ~ECHO;
+#endif
+	    settyinfo(&ti);
+	    resettty = 1;
+	}
+	fflush(stdin);
+	fputs(prompt, stderr);
+	fflush(stderr);
+    }
+
+    fgets(instr, 256, stdin);
+    if (instr[len = strlen(instr)-1] == '\n')
+	instr[len] = '\0';
+
+    strret = dupstring(instr);
+
+    if (resettty) {
+	/* '\n' didn't get echoed */
+	fputc('\n', stdout);
+	fflush(stdout);
+    	settyinfo(&shttyinfo);
+    }
+
+    return strret;
+}
+
+/*
+ * set params for an open with no arguments.
+ * this allows easy re-opens.
+ */
+
+/**/
+static int
+zftp_params(char *name, char **args, int flags)
+{
+    char *prompts[] = { "Host: ", "User: ", "Password: ", "Account: " };
+    char **aptr, **newarr;
+    int i, j, len;
+
+    if (!*args) {
+	if (zfuserparams) {
+	    for (aptr = zfuserparams, i = 0; *aptr; aptr++, i++) {
+		if (i == 2) {
+		    len = strlen(*aptr);
+		    for (j = 0; j < len; j++)
+			fputc('*', stdout);
+		    fputc('\n', stdout);
+		} else
+		    fprintf(stdout, "%s\n", *aptr);
+	    }
+	}
+	return 0;
+    }
+    if (!strcmp(*args, "-")) {
+	if (zfuserparams)
+	    freearray(zfuserparams);
+	zfuserparams = 0;
+	return 0;
+    }
+    len = arrlen(args);
+    newarr = (char **)zcalloc((len+1)*sizeof(char *));
+    for (aptr = args, i = 0; *aptr && !errflag; aptr++, i++) {
+	char *str;
+	if (!strcmp(*aptr, "?"))
+	    str = zfgetinfo(prompts[i], i == 2);
+	else
+	    str = *aptr;
+	newarr[i] = ztrdup(str);
+    }
+    if (errflag) {
+	/* maybe user CTRL-c'd in the middle somewhere */
+	for (aptr = newarr; *aptr; aptr++)
+	    zsfree(*aptr);
+	zfree(newarr, len+1);
+	return 1;
+    }
+    if (zfuserparams)
+	freearray(zfuserparams);
+    zfuserparams = newarr;
+    return 0;
+}
+
+/* login a user:  often called as part of the open sequence */
+
+/**/
+static int
+zftp_login(char *name, char **args, int flags)
+{
+    char *ucmd, *passwd = NULL, *acct = NULL;
+    char *user;
+    int stopit;
+
+    if ((zfstatus & ZFST_LOGI) && zfsendcmd("REIN\r\n") >= 4)
+	return 1;
+
+    zfstatus &= ~ZFST_LOGI;
+    if (*args) {
+	user = *args++;
+    } else {
+	user = zfgetinfo("User: ", 0);
+    }
+
+    ucmd = tricat("USER ", user, "\r\n");
+    stopit = 0;
+
+    if (zfsendcmd(ucmd) == 6)
+	stopit = 2;
+
+    while (!stopit && !errflag) {
+	switch (lastcode) {
+	case 230: /* user logged in */
+	case 202: /* command not implemented, don't care */
+	    stopit = 1;
+	    break;
+
+	case 331: /* need password */
+	    if (*args)
+		passwd = *args++;
+	    else
+		passwd = zfgetinfo("Password: ", 1);
+	    zsfree(ucmd);
+	    ucmd = tricat("PASS ", passwd, "\r\n");
+	    if (zfsendcmd(ucmd) == 6)
+		stopit = 2;
+	    break;
+
+	case 332: /* need account */
+	case 532:
+	    if (*args)
+		acct = *args++;
+	    else
+		acct = zfgetinfo("Account: ", 0);
+	    zsfree(ucmd);
+	    ucmd = tricat("ACCT ", passwd, "\r\n");
+	    if (zfsendcmd(ucmd) == 6)
+		stopit = 2;
+	    break;
+
+	case 421: /* service not available, so closed anyway */
+	case 501: /* syntax error */
+	case 503: /* bad commands */
+	case 530: /* not logged in */
+	case 550: /* random can't-do-that */
+	default:  /* whatever, should flag this as bad karma */
+	    /* need more diagnostics here */
+	    stopit = 2;
+	    break;
+	}
+    }
+
+    zsfree(ucmd);
+    if (zcfd == -1)
+	return 1;
+    if (stopit == 2 || (lastcode != 230 && lastcode != 202)) {
+	zwarnnam(name, "login failed", NULL, 0);
+	return 1;
+    }
+
+    if (*args) {
+	int cnt;
+	for (cnt = 0; *args; args++)
+	    cnt++;
+	zwarnnam(name, "warning: %d comand arguments not used\n", NULL, cnt);
+    }
+    zfstatus |= ZFST_LOGI;
+    zfsetparam("ZFTP_USER", ztrdup(user), ZFPM_READONLY);
+    if (acct)
+	zfsetparam("ZFTP_ACCOUNT", ztrdup(acct), ZFPM_READONLY);
+
+    /*
+     * Get the directory.  This is possibly an unnecessary overhead, of
+     * course, but when you're being driven by shell functions there's
+     * just no way of telling.
+     */
+    return zfgetcwd();
+}
+
+/* do ls or dir on the remote directory */
+
+/**/
+static int
+zftp_dir(char *name, char **args, int flags)
+{
+    /* maybe should be cleverer about handling arguments */
+    char *cmd;
+    int ret;
+
+    /*
+     * RFC959 says this must be ASCII or EBCDIC, not image format.
+     * I rather suspect on a UNIX server we get away handsomely
+     * with doing everything, including this, as image.
+     */
+    zfsettype(ZFST_ASCI);
+
+    cmd = zfargstring((flags & ZFTP_NLST) ? "NLST" : "LIST", args);
+    ret = zfgetdata(name, NULL, cmd, 0);
+    zsfree(cmd);
+    if (ret)
+	return 1;
+
+    fflush(stdout);		/* since we're now using fd 1 */
+    return zfsenddata(name, 1, 0, 0);
+}
+
+/* change the remote directory */
+
+/**/
+static int
+zftp_cd(char *name, char **args, int flags)
+{
+    /* change directory --- enhance to allow 'zftp cdup' */
+    int ret;
+
+    if ((flags & ZFTP_CDUP) || !strcmp(*args, "..") ||
+	!strcmp(*args, "../")) {
+	ret = zfsendcmd("CDUP\r\n");
+    } else {
+	char *cmd = tricat("CWD ", *args, "\r\n");
+	ret = zfsendcmd(cmd);
+	zsfree(cmd);
+    }
+    if (ret > 2)
+	return 1;
+    /* sometimes the directory may be in the response. usually not. */
+    if (zfgetcwd())
+	return 1;
+
+    return 0;
+}
+
+/* get the remote directory */
+
+/**/
+static int
+zfgetcwd(void)
+{
+    char *ptr, *eptr;
+    int endc;
+    List l;
+
+    if (zfprefs & ZFPF_DUMB)
+	return 1;
+    if (zfsendcmd("PWD\r\n") > 2) {
+	zfunsetparam("ZFTP_PWD");
+	return 1;
+    }
+    ptr = lastmsg;
+    while (*ptr == ' ')
+	ptr++;
+    if (!*ptr)			/* ultra safe */
+	return 1;
+    if (*ptr == '"') {
+	ptr++;
+	endc = '"';
+    } else 
+	endc = ' ';
+    for (eptr = ptr; *eptr && *eptr != endc; eptr++)
+	;
+    zfsetparam("ZFTP_PWD", ztrduppfx(ptr, eptr-ptr), ZFPM_READONLY);
+
+    /*
+     * This isn't so necessary if we're going to have a shell function
+     * front end.  By putting it here, and in close when ZFTP_PWD is unset,
+     * we at least cover the bases.
+     */
+    if ((l = getshfunc("zftp_chpwd")) != &dummy_list)
+	doshfunc("zftp_chpwd", l, NULL, 0, 1);
+
+    return 0;
+}
+
+/*
+ * Set the type for the next transfer, usually image (binary) or ASCII.
+ */
+
+/**/
+static int
+zfsettype(int type)
+{
+    char buf[] = "TYPE X\r\n";
+    if (ZFST_TYPE(type) == ZFST_CTYP(zfstatus))
+	return 0;
+    buf[5] = (ZFST_TYPE(type) == ZFST_ASCI) ? 'A' : 'I';
+    if (zfsendcmd(buf) > 2)
+	return 1;
+    zfstatus &= ~(ZFST_TMSK << ZFST_TBIT);
+    /* shift the type left to set the current type bits */;
+    zfstatus |= type << ZFST_TBIT;
+    return 0;
+}
+
+/*
+ * Print or get a new type for the transfer.
+ * We don't actually set the type at this point.
+ */
+
+/**/
+static int
+zftp_type(char *name, char **args, int flags)
+{
+    char *str, nt, tbuf[2] = "A";
+    if (flags & (ZFTP_TBIN|ZFTP_TASC)) {
+	nt = (flags & ZFTP_TBIN) ? 'I' : 'A';
+    } else if (!(str = *args)) {
+	/*
+	 * Since this is supposed to be a low-level basis for
+	 * an FTP system, just print the single code letter.
+	 */
+	printf("%c\n", (ZFST_TYPE(zfstatus) == ZFST_ASCI) ? 'A' : 'I');
+	fflush(stdout);
+	return 0;
+    } else {
+	nt = toupper(*str);
+	/*
+	 * RFC959 specifies other types, but these are the only
+	 * ones we know what to do with.
+	 */
+	if (str[1] || (nt != 'A' && nt != 'B' && nt != 'I')) {
+	    zwarnnam(name, "transfer type %s not recognised", str, 0);
+	    return 1;
+	}
+	
+	if (nt == 'B')		/* binary = image */
+	    nt = 'I';
+    }
+
+    zfstatus &= ~ZFST_TMSK;
+    zfstatus |= (nt == 'I') ? ZFST_IMAG : ZFST_ASCI;
+    tbuf[0] = nt;
+    zfsetparam("ZFTP_TYPE", ztrdup(tbuf), ZFPM_READONLY);
+    return 0;
+}
+
+/**/
+static int
+zftp_mode(char *name, char **args, int flags)
+{
+    char *str, cmd[] = "MODE X\r\n";
+    int nt;
+
+    if (!(str = *args)) {
+	printf("%c\n", (ZFST_MODE(zfstatus) == ZFST_STRE) ? 'S' : 'B');
+	fflush(stdout);
+	return 0;
+    }
+    nt = str[0] = toupper(*str);
+    if (str[1] || (nt != 'S' && nt != 'B')) {
+	zwarnnam(name, "transfer mode %s not recognised", str, 0);
+	return 1;
+    }
+    cmd[5] = (char) nt;
+    if (zfsendcmd(cmd) > 2)
+	return 1;
+    zfstatus &= ZFST_MMSK;
+    zfstatus |= (nt == 'S') ? ZFST_STRE : ZFST_BLOC;
+    zfsetparam("ZFTP_MODE", ztrdup(str), ZFPM_READONLY);
+    return 0;
+}
+
+/**/
+static int
+zftp_local(char *name, char **args, int flags)
+{
+    int more = !!args[1], ret = 0, dofd = !*args;
+    while (*args || dofd) {
+	long sz;
+	char *mt;
+	int newret = zfstats(*args, !(flags & ZFTP_HERE), &sz, &mt,
+			     dofd ? 0 : -1);
+	if (newret == 2)	/* at least one is not implemented */
+	    return 2;
+	else if (newret) {
+	    ret = 1;
+	    if (mt)
+		zsfree(mt);
+	    args++;
+	    continue;
+	}
+	if (more) {
+	    fputs(*args, stdout);
+	    fputc(' ', stdout);
+	}
+	printf("%ld %s\n", sz, mt);
+	zsfree(mt);
+	if (dofd)
+	    break;
+	args++;
+    }
+    fflush(stdout);
+
+    return ret;
+}
+
+/*
+ * Generic transfer for get, put and append.
+ *
+ * Get sends all files to stdout, i.e. this is basically cat. It's up to a
+ * shell function driver to turn this into standard FTP-like commands.
+ *
+ * Put/append sends everything from stdin down the drai^H^H^Hata connection. 
+ * Slightly weird with multiple files in that it tries to read
+ * a separate complete file from stdin each time, which is
+ * only even potentially useful interactively.  But the only
+ * real alternative is just to allow one file at a time.
+ */
+
+/**/
+static int
+zftp_getput(char *name, char **args, int flags)
+{
+    int ret = 0, recv = (flags & ZFTP_RECV), getsize = 0, progress = 1;
+    char *cmd = recv ? "RETR " : (flags & ZFTP_APPE) ? "APPE " : "STOR ";
+    List l;
+
+    /*
+     * At this point I'd like to set progress to 0 if we're
+     * backgrounded, since it's hard for the user to find out.
+     * It turns out it's hard enough for us to find out.
+     * The problem is that zsh clears it's job table, so we
+     * just don't know if we're some forked shell in a pipeline
+     * somewhere or in the background.  This seems to me a problem.
+     */
+
+    zfsettype(ZFST_TYPE(zfstatus));
+
+    if (recv)
+	fflush(stdout);		/* since we may be using fd 1 */
+    for (; *args; args++) {
+	char *ln, *rest = NULL;
+	long startat = 0;
+	if (progress && (l = getshfunc("zftp_progress")) != &dummy_list) {
+	    long sz;
+	    /*
+	     * This calls the SIZE command to get the size for remote
+	     * files.  Some servers send the size with the reply to
+	     * the transfer command (i.e. RETR), in which
+	     * case we note the fact and don't call this
+	     * next time.  For that reason, the first call
+	     * of zftp_progress is delayed until zfsenddata().
+	     */
+	    if ((!(zfprefs & ZFPF_DUMB) &&
+		 (zfstatus & (ZFST_NOSZ|ZFST_TRSZ)) != ZFST_TRSZ)
+		|| !recv) {
+		/* the final 0 is a local fd to fstat if recv is zero */
+		zfstats(*args, recv, &sz, NULL, 0);
+		/* even if it doesn't support SIZE, it may tell us */
+		if (recv && sz == -1)
+		    getsize = 1;
+	    } else
+		getsize = 1;
+	    zfstarttrans(*args, recv, sz);
+	}
+
+	if (flags & ZFTP_REST) {
+	    startat = zstrtol(args[1], NULL, 10);
+	    rest = tricat("REST ", args[1], "\r\n");
+	}
+
+	ln = tricat(cmd, *args, "\r\n");
+	/* note zdfd doesn't exist till zfgetdata() creates it */
+	if (zfgetdata(name, rest, ln, getsize) ||
+	    zfsenddata(name, recv, progress, startat))
+	    ret = 1;
+	zsfree(ln);
+	if (progress && (l = getshfunc("zftp_progress")) != &dummy_list) {
+	    /* progress to finish: ZFTP_TRANSFER set to GF or PF */
+	    zfsetparam("ZFTP_TRANSFER", ztrdup(recv ? "GF" : "PF"),
+		       ZFPM_READONLY);
+	    doshfunc("zftp_progress", l, NULL, 0, 1);
+	}
+	if (rest) {
+	    zsfree(rest);
+	    args++;
+	}
+	if (errflag)
+	    break;
+    }
+    zfendtrans();
+    return ret;
+}
+
+/*
+ * Delete a list of files on the server.  We allow a list by analogy with
+ * `rm'.
+ */
+
+/**/
+static int
+zftp_delete(char *name, char **args, int flags)
+{
+    int ret = 0;
+    char *cmd, **aptr;
+    for (aptr = args; *aptr; aptr++) {
+	cmd = tricat("DELE ", *aptr, "\r\n");
+	if (zfsendcmd(cmd) > 2)
+	    ret = 1;
+	zsfree(cmd);
+    }
+    return ret;
+}
+
+/* Create or remove a directory on the server */
+
+/**/
+static int
+zftp_mkdir(char *name, char **args, int flags)
+{
+    int ret;
+    char *cmd = tricat((flags & ZFTP_DELE) ? "RMD " : "MKD ",
+		       *args, "\r\n");
+    ret = (zfsendcmd(cmd) > 2);
+    zsfree(cmd);
+    return ret;
+}
+
+/* Rename a file on the server */
+
+/**/
+static int
+zftp_rename(char *name, char **args, int flags)
+{
+    int ret;
+    char *cmd;
+
+    cmd = tricat("RNFR ", args[0], "\r\n");
+    ret = 1;
+    if (zfsendcmd(cmd) == 3) {
+	zsfree(cmd);
+	cmd = tricat("RNTO ", args[1], "\r\n");
+	if (zfsendcmd(cmd) == 2)
+	    ret = 0;
+    }
+    zsfree(cmd);
+    return ret;
+}
+
+/*
+ * Send random commands, either with SITE or literal.
+ * In the second case, the user better know what they're doing.
+ */
+
+/**/
+static int
+zftp_quote(char *name, char **args, int flags)
+{
+    int ret = 0;
+    char *cmd;
+
+    cmd = (flags & ZFTP_SITE) ? zfargstring("SITE", args)
+	: zfargstring(args[0], args+1);
+    ret = (zfsendcmd(cmd) > 2);
+    zsfree(cmd);
+
+    return ret;
+}
+
+/* Close the connection, ending the session */
+
+/**/
+static int
+zftp_close(char *name, char **args, int flags)
+{
+    char **aptr;
+    List l;
+    zfclosing = 1;
+    if (zcfinish != 2) {
+	/*
+	 * haven't had EOF from server, so send a QUIT and get the response.
+	 * maybe we should set a shorter timeout for this to avoid
+	 * CTRL-c rage.
+	 */
+	zfsendcmd("QUIT\r\n");
+    }
+    if (zcin)
+	fclose(zcin);
+    zcin = NULL;
+    close(zcfd);
+    zcfd = -1;
+
+    /* Write the final status in case this is a subshell */
+    zfstatus |= ZFST_CLOS;
+    lseek(zfstatfd, 0, 0);
+    write(zfstatfd, &zfstatus, sizeof(zfstatus));
+    close(zfstatfd);
+    zfstatfd = -1;
+
+    /* Unset the non-special parameters */
+    for (aptr = zfparams; *aptr; aptr++)
+	zfunsetparam(*aptr);
+
+    /* Now ZFTP_PWD is unset.  It's up to zftp_chpwd to notice. */
+    if ((l = getshfunc("zftp_chpwd")) != &dummy_list)
+	doshfunc("zftp_chpwd", l, NULL, 0, 1);
+
+    /* tidy up status variables, because mess is bad */
+    zfclosing = zfdrrrring = 0;
+
+    return 0;
+}
+
+/* Safe front end to zftp_close() from within the package */
+
+/**/
+static void
+zfclose(void)
+{
+    if (zcfd != -1)
+	zftp_close("zftp close", NULL, 0);
+}
+
+/* The builtin command frontend to the rest of the package */
+
+/**/
+static int
+bin_zftp(char *name, char **args, char *ops, int func)
+{
+    char fullname[11] = "zftp ";
+    char *cnam = *args++, *prefs, *ptr;
+    Zftpcmd zptr;
+    int n, ret;
+
+    for (zptr = zftpcmdtab; zptr->nam; zptr++)
+	if (!strcmp(zptr->nam, cnam))
+	    break;
+
+    if (!zptr->nam) {
+	zwarnnam(name, "no such subcommand: %s", cnam, 0);
+	return 1;
+    }
+
+    /* check number of arguments */
+    for (n = 0; args[n]; n++)
+	;
+    if (n < zptr->min || (zptr->max != -1 && n > zptr->max)) {
+	zwarnnam(name, "wrong no. of arguments for %s", cnam, 0);
+	return 1;
+    }
+
+    strcat(fullname, cnam);
+    if (zfstatfd != -1) {
+	/* Get the status in case it was set by a forked process */
+	int oldstatus = zfstatus;
+	lseek(zfstatfd, 0, 0);
+	read(zfstatfd, &zfstatus, sizeof(zfstatus));
+	if (zcfd != -1 && (zfstatus & ZFST_CLOS)) {
+	    /* got closed in subshell without us knowing */
+	    zcfinish = 2;
+	    zfclose();
+	} else {
+	    /*
+	     * fix up status types: unfortunately they may already
+	     * have been looked at between being changed in the subshell
+	     * and now, but we can't help that.
+	     */
+	    if (ZFST_TYPE(oldstatus) != ZFST_TYPE(zfstatus))
+		zfsetparam("ZFTP_TYPE",
+			   ztrdup(ZFST_TYPE(zfstatus) == ZFST_ASCI ?
+				  "A" : "I"), ZFPM_READONLY);
+	    if (ZFST_MODE(oldstatus) != ZFST_MODE(zfstatus))
+		zfsetparam("ZFTP_MODE",
+			   ztrdup(ZFST_MODE(zfstatus) == ZFST_BLOC ?
+				  "B" : "S"), ZFPM_READONLY);
+	}
+    }
+    if ((zptr->flags & ZFTP_CONN) && zcfd == -1) {
+	zwarnnam(fullname, "not connected.", NULL, 0);
+	return 1;
+    }
+
+    if ((prefs = getsparam("ZFTP_PREFS"))) {
+	zfprefs = 0;
+	for (ptr = prefs; *ptr; ptr++) {
+	    switch (toupper(*ptr)) {
+	    case 'S':
+		/* sendport */
+		zfprefs |= ZFPF_SNDP;
+		break;
+
+	    case 'P':
+		/*
+		 * passive
+		 * If we have already been told to use sendport mode,
+		 * we're never going to use passive mode.
+		 */
+		if (!(zfprefs & ZFPF_SNDP))
+		    zfprefs |= ZFPF_PASV;
+		break;
+
+	    case 'D':
+		/* dumb */
+		zfprefs |= ZFPF_DUMB;
+		break;
+
+	    default:
+		zwarnnam(name, "preference %c not recognized", NULL, *ptr);
+		break;
+	    }
+	}
+    }
+
+    ret = (*zptr->fun)(fullname, args, zptr->flags);
+
+    if (zfalarmed)
+	zfunalarm();
+    if (zfdrrrring) {
+	/* had a timeout, close the connection */
+	zcfinish = 2;		/* don't try sending QUIT */
+	zfclose();
+    }
+    if (zfstatfd != -1) {
+	/* Set the status in case another process needs to know */
+	lseek(zfstatfd, 0, 0);
+	write(zfstatfd, &zfstatus, sizeof(zfstatus));
+    }
+    return ret;
+}
+
+/* The load/unload routines required by the zsh library interface */
+
+/**/
+int
+boot_zftp(Module m)
+{
+    int ret;
+    if ((ret = addbuiltins(m->nam, bintab,
+			   sizeof(bintab)/sizeof(*bintab))) == 1) {
+	/* if successful, set some default parameters */
+	long tmout_def = 60;
+	zfsetparam("ZFTP_VERBOSE", ztrdup("450"), ZFPM_IFUNSET);
+	zfsetparam("ZFTP_TMOUT", &tmout_def, ZFPM_IFUNSET|ZFPM_INTEGER);
+	zfsetparam("ZFTP_PREFS", ztrdup("PS"), ZFPM_IFUNSET);
+	/* default preferences if user deletes variable */
+	zfprefs = ZFPF_SNDP|ZFPF_PASV;
+    }
+    return !ret;
+}
+
+#ifdef MODULE
+
+/**/
+int
+cleanup_zftp(Module m)
+{
+    /*
+     * There are various parameters hanging around, but they're
+     * all non-special so are entirely non-life-threatening.
+     */
+    zfclosedata();
+    zfclose();
+    zsfree(lastmsg);
+    if (zfuserparams)
+	freearray(zfuserparams);
+    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return 0;
+}
+
+#endif

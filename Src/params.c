@@ -303,7 +303,11 @@ copyparamtable(HashTable ht, char *name)
 
 #define SCANPM_WANTVALS   (1<<0)
 #define SCANPM_WANTKEYS   (1<<1)
-#define SCANPM_WANTINDEX  (1<<2)
+#define SCANPM_WANTINDEX  (1<<2)	/* Useful only if nested arrays */
+#define SCANPM_MATCHKEY   (1<<3)
+#define SCANPM_MATCHVAL   (1<<4)
+#define SCANPM_MATCHMANY  (1<<5)
+#define SCANPM_ISVAR_AT   ((-1)<<15)	/* Only sign bit is significant */
 
 static unsigned numparamvals;
 
@@ -311,13 +315,12 @@ static unsigned numparamvals;
 static void
 scancountparams(HashNode hn, int flags)
 {
-    if (!(((Param)hn)->flags & PM_UNSET)) {
+    ++numparamvals;
+    if ((flags & SCANPM_WANTKEYS) && (flags & SCANPM_WANTVALS))
 	++numparamvals;
-	if ((flags & SCANPM_WANTKEYS) && (flags & SCANPM_WANTVALS))
-	    ++numparamvals;
-    }
 }
 
+static Comp scancomp;
 static char **paramvals;
 
 /**/
@@ -325,33 +328,45 @@ static void
 scanparamvals(HashNode hn, int flags)
 {
     struct value v;
+    if (numparamvals && (flags & (SCANPM_MATCHVAL|SCANPM_MATCHKEY)) &&
+	!(flags & SCANPM_MATCHMANY))
+	return;
     v.pm = (Param)hn;
-    if (!(v.pm->flags & PM_UNSET)) {
-	if (flags & SCANPM_WANTKEYS) {
-	    paramvals[numparamvals++] = v.pm->nam;
-	    if (!(flags & SCANPM_WANTVALS))
-		return;
-	}
-	v.isarr = (PM_TYPE(v.pm->flags) & (PM_ARRAY|PM_HASHED));
-	v.inv = (flags & SCANPM_WANTINDEX);
-	v.a = 0;
-	v.b = -1;
-	paramvals[numparamvals++] = getstrvalue(&v);
+    if ((flags & SCANPM_MATCHKEY) && !domatch(v.pm->nam, scancomp, 0)) {
+	return;
     }
+    if (flags & SCANPM_WANTKEYS) {
+	paramvals[numparamvals++] = v.pm->nam;
+	if (!(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
+	    return;
+    }
+    v.isarr = (PM_TYPE(v.pm->flags) & (PM_ARRAY|PM_HASHED));
+    v.inv = 0;
+    v.a = 0;
+    v.b = -1;
+    paramvals[numparamvals] = getstrvalue(&v);
+    if (flags & SCANPM_MATCHVAL) {
+	if (domatch(paramvals[numparamvals], scancomp, 0)) {
+	    numparamvals += ((flags & SCANPM_WANTVALS) ? 1 :
+			     !(flags & SCANPM_WANTKEYS));
+	} else if (flags & SCANPM_WANTKEYS)
+	    --numparamvals;	/* Value didn't match, discard key */
+    } else
+	++numparamvals;
 }
 
 /**/
 char **
-paramvalarr(HashTable ht, unsigned flags)
+paramvalarr(HashTable ht, int flags)
 {
     MUSTUSEHEAP("paramvalarr");
     numparamvals = 0;
     if (ht)
-	scanhashtable(ht, 0, 0, 0, scancountparams, flags);
+	scanhashtable(ht, 0, 0, PM_UNSET, scancountparams, flags);
     paramvals = (char **) alloc((numparamvals + 1) * sizeof(char *));
     if (ht) {
 	numparamvals = 0;
-	scanhashtable(ht, 0, 0, 0, scanparamvals, flags);
+	scanhashtable(ht, 0, 0, PM_UNSET, scanparamvals, flags);
     }
     paramvals[numparamvals] = 0;
     return paramvals;
@@ -369,15 +384,10 @@ getvaluearr(Value v)
     else if (PM_TYPE(v->pm->flags) == PM_ARRAY)
 	return v->arr = v->pm->gets.afn(v->pm);
     else if (PM_TYPE(v->pm->flags) == PM_HASHED) {
-	unsigned flags = 0;
-	if (v->a)
-	    flags |= SCANPM_WANTKEYS;
-	if (v->b > v->a)
-	    flags |= SCANPM_WANTVALS;
-	v->arr = paramvalarr(v->pm->gets.hfn(v->pm), flags);
+	v->arr = paramvalarr(v->pm->gets.hfn(v->pm), v->isarr);
 	/* Can't take numeric slices of associative arrays */
 	v->a = 0;
-	v->b = -1;
+	v->b = numparamvals;
 	return v->arr;
     } else
 	return NULL;
@@ -737,7 +747,19 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 	down = !down;
 	num = -num;
     }
-    *inv = ind;
+    if (v->isarr & SCANPM_WANTKEYS)
+	*inv = (ind || !(v->isarr & SCANPM_WANTVALS));
+    else if (v->isarr & SCANPM_WANTVALS)
+	*inv = 0;
+    else {
+	if (ind) {
+	    v->isarr |= SCANPM_WANTKEYS;
+	    v->isarr &= ~SCANPM_WANTVALS;
+	}
+	if (!down)
+	    v->isarr &= ~SCANPM_MATCHMANY;
+	*inv = ind;
+    }
 
     for (t=s, i=0; *t && ((*t != ']' && *t != Outbrack && *t != ',') || i); t++)
 	if (*t == '[' || *t == Inbrack)
@@ -829,7 +851,21 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 
 	if ((c = parsereg(s))) {
 	    if (v->isarr) {
-		ta = getarrvalue(v);
+		if (PM_TYPE(v->pm->flags) == PM_HASHED) {
+		    scancomp = c;
+		    if (ind)
+			v->isarr |= SCANPM_MATCHKEY;
+		    else
+			v->isarr |= SCANPM_MATCHVAL;
+		    if (down)
+			v->isarr |= SCANPM_MATCHMANY;
+		    if ((ta = getvaluearr(v)) && *ta) {
+			*inv = v->inv;
+			*w = v->b;
+			return 1;
+		    }
+		} else
+		    ta = getarrvalue(v);
 		if (!ta || !*ta)
 		    return 0;
 		if (down)
@@ -920,8 +956,8 @@ getindex(char **pptr, Value v)
     if (*tbrack == Outbrack)
 	*tbrack = ']';
     if ((s[0] == '*' || s[0] == '@') && s[1] == ']') {
-	if (v->isarr)
-	    v->isarr = (s[0] == '*') ? 1 : -1;
+	if (v->isarr && s[0] == '@')
+	    v->isarr |= SCANPM_ISVAR_AT;
 	v->a = 0;
 	v->b = -1;
 	s += 2;
@@ -941,7 +977,7 @@ getindex(char **pptr, Value v)
 		} else
 		    a = -ztrlen(t + a + strlen(t));
 	    }
-	    if (a > 0 && isset(KSHARRAYS))
+	    if (a > 0 && (isset(KSHARRAYS) || (v->pm->flags & PM_HASHED)))
 		a--;
 	    v->inv = 1;
 	    v->isarr = 0;
@@ -984,6 +1020,13 @@ getindex(char **pptr, Value v)
 /**/
 Value
 getvalue(char **pptr, int bracks)
+{
+  return fetchvalue(pptr, bracks, 0);
+}
+
+/**/
+Value
+fetchvalue(char **pptr, int bracks, int flags)
 {
     char *s, *t;
     char sav;
@@ -1039,8 +1082,16 @@ getvalue(char **pptr, int bracks)
 	if (!pm || (pm->flags & PM_UNSET))
 	    return NULL;
 	v = (Value) hcalloc(sizeof *v);
-	if (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED))
-	    v->isarr = isvarat ? -1 : 1;
+	if (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED)) {
+	    /* Overload v->isarr as the flag bits for hashed arrays. */
+	    v->isarr = flags | (isvarat ? SCANPM_ISVAR_AT : 0);
+	    /* If no flags were passed, we need something to represent *
+	     * `true' yet differ from an explicit WANTVALS.  This is a *
+	     * bit of a hack, but makes some sense:  When no subscript *
+	     * is provided, all values are substituted.                */
+	    if (!v->isarr)
+		v->isarr = SCANPM_MATCHMANY;
+	}
 	v->pm = pm;
 	v->inv = 0;
 	v->a = 0;
@@ -1079,7 +1130,7 @@ getstrvalue(Value v)
     if (!v)
 	return hcalloc(1);
     HEAPALLOC {
-	if (v->inv) {
+	if (v->inv && !(v->pm->flags & PM_HASHED)) {
 	    sprintf(buf, "%d", v->a);
 	    s = dupstring(buf);
 	    LASTALLOC_RETURN s;
@@ -1087,6 +1138,13 @@ getstrvalue(Value v)
 
 	switch(PM_TYPE(v->pm->flags)) {
 	case PM_HASHED:
+	    /* (!v->isarr) should be impossible unless emulating ksh */
+	    if (!v->isarr && emulation == EMULATE_KSH) {
+		s = dupstring("[0]");
+		if (getindex(&s, v) == 0)
+		    s = getstrvalue(v);
+		LASTALLOC_RETURN s;
+	    } /* else fall through */
 	case PM_ARRAY:
 	    ss = getvaluearr(v);
 	    if (v->isarr)
@@ -1484,6 +1542,39 @@ setaparam(char *s, char **val)
 	v->b = -1;
     setarrvalue(v, val);
     return v->pm;
+}
+
+/**/
+Param
+sethparam(char *s, char **kvarr)
+{
+    Value v;
+    Param pm;
+    char *t;
+
+    if (!isident(s)) {
+	zerr("not an identifier: %s", s, 0);
+	freearray(kvarr);
+	errflag = 1;
+	return NULL;
+    }
+    t=ztrdup(s); /* Is this a memory leak? */
+    /* Why does getvalue(s, 1) set s to empty string? */
+    if ((v = getvalue(&t, 1)))
+	if (v->pm->flags & PM_SPECIAL) {
+	    zerr("not overriding a special: %s", s, 0);
+	    freearray(kvarr);
+	    errflag = 1;
+	    return NULL;
+	} else
+	    unsetparam(s);
+
+    pm = createparam(s, PM_HASHED);
+    DPUTS(!pm, "BUG: parameter not created");
+
+    arrhashsetfn(pm, kvarr);
+
+    return pm;
 }
 
 /**/
@@ -2538,24 +2629,28 @@ printparamnode(HashNode hn, int printflags)
 	return;
     }
 
+    quotedzputs(p->nam, stdout);
+    if (printflags & PRINT_KV_PAIR)
+	putchar(' ');
+    else
+	putchar('=');
+
     /* How the value is displayed depends *
      * on the type of the parameter       */
-    quotedzputs(p->nam, stdout);
-    putchar('=');
     switch (PM_TYPE(p->flags)) {
     case PM_SCALAR:
 	/* string: simple output */
 	if (p->gets.cfn && (t = p->gets.cfn(p)))
 	    quotedzputs(t, stdout);
-	putchar('\n');
 	break;
     case PM_INTEGER:
 	/* integer */
-	printf("%ld\n", p->gets.ifn(p));
+	printf("%ld", p->gets.ifn(p));
 	break;
     case PM_ARRAY:
 	/* array */
-	putchar('(');
+	if (!(printflags & PRINT_KV_PAIR))
+	    putchar('(');
 	u = p->gets.afn(p);
 	if(*u) {
 	    quotedzputs(*u++, stdout);
@@ -2564,17 +2659,25 @@ printparamnode(HashNode hn, int printflags)
 		quotedzputs(*u++, stdout);
 	    }
 	}
-	printf(")\n");
+	if (!(printflags & PRINT_KV_PAIR))
+	    putchar(')');
 	break;
     case PM_HASHED:
 	/* association */
-	putchar('(');
+	if (!(printflags & PRINT_KV_PAIR))
+	    putchar('(');
 	{
             HashTable ht = p->gets.hfn(p);
             if (ht)
-		scanhashtable(ht, 0, 0, 0, ht->printnode, 0);
+		scanhashtable(ht, 0, 0, PM_UNSET,
+			      ht->printnode, PRINT_KV_PAIR);
 	}
-	printf(")\n");
+	if (!(printflags & PRINT_KV_PAIR))
+	    putchar(')');
 	break;
     }
+    if (printflags & PRINT_KV_PAIR)
+	putchar(' ');
+    else
+	putchar('\n');
 }

@@ -47,7 +47,8 @@ Bart's chpwd() fix 4589
   Second edition
 
 Added line in zle_tricky.c missed when patching by hand, spotted by
-Bart.  (Whitespace is still non-canonical.)
+Bart.  (Whitespace is still non-canonical in the completion code where
+I have merged patches by hand.)
 
 Fixed up my compctl widgets patch for use with Sven's rewrite, which I
 hadn't done properly before.
@@ -58,7 +59,9 @@ Bart's doc fixes, 4472
 
 Bart's PWD and OLDPWD reshuffle, 4589
 
-My test-line-length patch for prompts, 4591
+My test-line-length patch for prompts, 4591 (`%(40l.yes.no)' outputs
+`yes' if at least 40 characters have already appeared on the line,
+`no' otherwise.)
 
 Configure patch from Wilfredo Sanchez in 4594, with some extra
 tabbification and without the setterm() hunk, since I've already renamed
@@ -84,12 +87,16 @@ one two
 % print ${(kv)hash}                  # flag to get keys and values (**)
 one eins two zwei
 Comparison of (*) and (**) will reveal how to copy an associative
-array, but you always need to declare it with typeset -A or an
-ordinary array will appear.  There is a predefined special associative
-array $testhash, for testing purposes only, which will eventually
-disappear.
+array, `hash2=(${(kv}hash})', but you always need to `typeset -A
+hash2' first or an ordinary array will appear.  There is a predefined
+special associative array $testhash, for testing purposes only, which
+will eventually disappear.
 
-My rewrite of prompt truncation, 4601
+My rewrite of prompt truncation, 4601 --- note this introduces a
+slight incompatibility in that the string to be truncated now runs by
+default to the end of the string, instead of only covering individual
+%-substitutions.  If necessary, stick in an extra '%>>' to turn
+truncation off at the point you want.
 
 Bart's params error message fix, 4606
 
@@ -100,3 +107,65 @@ Bart's version of the *** fix, 4624
 Bart's parameter substitution flag delimiter fix, 4644
 
 My special parameter unset fix, 4662
+
+  Third edition
+
+I've taken the plunge and changed $ZSH_VERSION, the current one is now
+3.1.5.pws-1 .  It seemed rational to have something incremental at the
+end for testing, so I abandoned using the date.
+
+4482 (cdmatch2)and 4641 (${assoc[0]}) now applied; 4641 was supposed
+to be there before.
+
+nroff manual pages deleted, you now need yodl.
+
+deleted modules-bltin by hand, which `make distclean' somehow missed.
+Caused problems when building a statically linked shell.
+
+Bart's scanmatchtable fix, 4674
+
+Commented out vifirstnonblank() in vioperswapcase(), pending any
+better patch for it.
+
+Bart's viforwardword fix, 4678
+
+My case-independent globbing fix, 4693
+
+Sven's zle_tricky.c, 4697
+
+Sven's patch to ignore completions if the cursor is not in a part to
+be completed, 4698, plus addition, 4707
+
+I have not added Sven's zerr() patch, 4699, in case it has side
+effects, but I haven't heard anything on the subject and I haven't
+looked at it.
+
+Sven's pennockite heap memory patch, 4700
+
+Sven's condition module patch, 4716, and addition, 4732, and the
+function wrapper patch, 4734, and additions, 4742, 4769: the module.c
+bits of these have been moved around a little to avoid clashes with
+the AIXDYNAMIC stuff.  The wrapper stuff is still not finished, but
+doesn't currently impinge on use of the shell.
+
+Phil Pennock's patch to use associative arrays in stat, 4727
+
+Unposted fix for use of printcompctlptr in completion widgets:
+printcompctl() had acquired another argument.
+
+My bash-like ${foo/orig/new} patch, 4736, and the version to do
+shortest matching together with optimizations of all pattern matching
+in variable strings, 4754.
+
+Phil's patch for typeset -a docs, 4737
+
+Nobody wanted my fix for `FOO=x eval external', so it's not there.
+
+zftp, 4761
+
+Bart's fix for conddef without dynamical modules, 4762
+
+Bart's associative array patches for implentation of subscripting flags,
+4763, plus fix 4766; typeset output 4764
+
+Sven's completion listing fix, 4767

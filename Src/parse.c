@@ -114,7 +114,7 @@ par_event(void)
     }
     if (tok == ENDINPUT)
 	return NULL;
-    if ((sl = par_sublist()))
+    if ((sl = par_sublist())) {
 	if (tok == ENDINPUT) {
 	    l = (List) make_list();
 	    l->type = Z_SYNC;
@@ -137,6 +137,7 @@ par_event(void)
 	    yylex();
 	} else
 	    l = NULL;
+    }
     if (!l) {
 	if (errflag) {
 	    yyerror();
@@ -181,7 +182,7 @@ par_list(void)
 
     while (tok == SEPER)
 	yylex();
-    if ((sl = par_sublist()))
+    if ((sl = par_sublist())) {
 	if (tok == SEPER || tok == AMPER || tok == AMPERBANG) {
 	    l = (List) make_list();
 	    l->left = sl;
@@ -197,6 +198,7 @@ par_list(void)
 	    l->left = sl;
 	    l->type = Z_SYNC;
 	}
+    }
     return l;
 }
 
@@ -1139,13 +1141,14 @@ par_cond_2(void)
 	condlex();
 	return c;
     }
-    if (tok != STRING)
+    if (tok != STRING) {
 	if (tok && tok != LEXERR && condlex == testlex) {
 	    s1 = tokstr;
 	    condlex();
 	    return par_cond_double("-n", s1);
 	} else
 	    YYERROR;
+    }
     s1 = tokstr;
     if (condlex == testlex)
 	dble = (*s1 == '-' && strspn(s1+1, "abcdefghknoprstuwxzLONGS") == 1
@@ -1165,7 +1168,7 @@ par_cond_2(void)
 	c->ntype = NT_SET(N_COND, NT_STR, NT_STR, 0, 0);
 	return c;
     }
-    if (tok != STRING)
+    if (tok != STRING) {
 	if (tok != LEXERR && condlex == testlex) {
 	    if (!dble)
 		return par_cond_double("-n", s1);
@@ -1173,6 +1176,7 @@ par_cond_2(void)
 		return par_cond_double(s1, "1");
 	} else
 	    YYERROR;
+    }
     s2 = tokstr;
     incond++;			/* parentheses do globbing */
     condlex();
@@ -1180,7 +1184,19 @@ par_cond_2(void)
     if (tok == STRING && !dble) {
 	s3 = tokstr;
 	condlex();
-	return par_cond_triple(s1, s2, s3);
+	if (tok == STRING) {
+	    LinkList l = newlinklist();
+
+	    addlinknode(l, s2);
+	    addlinknode(l, s3);
+
+	    while (tok == STRING) {
+		addlinknode(l, tokstr);
+		condlex();
+	    }
+	    return par_cond_multi(s1, l);
+	} else
+	    return par_cond_triple(s1, s2, s3);
     } else
 	return par_cond_double(s1, s2);
 }
@@ -1312,11 +1328,22 @@ par_cond_double(char *a, char *b)
 {
     Cond n = (Cond) make_cond();
 
-    if (a[0] != '-' || !a[1] || a[2])
-	COND_ERROR("parse error: condition expected: %s", a);
-    n->left = (void *) b;
-    n->type = a[1];
     n->ntype = NT_SET(N_COND, NT_STR, NT_STR, 0, 0);
+    n->left = (void *) b;
+    if (a[0] != '-' || !a[1])
+	COND_ERROR("parse error: condition expected: %s", a);
+    else if (!a[2] && strspn(a+1, "abcdefgknoprstuwxzhLONGS") == 1)
+	n->type = a[1];
+    else {
+	char *d[2];
+
+	n->ntype = NT_SET(N_COND, NT_STR, NT_STR | NT_ARR, 0, 0);
+	n->type = COND_MOD;
+	n->left = (void *) (a + 1);
+	d[0] = b;
+	d[1] = NULL;
+	n->right = (void *) arrdup(d);
+    }
     return n;
 }
 
@@ -1343,6 +1370,9 @@ par_cond_triple(char *a, char *b, char *c)
     Cond n = (Cond) make_cond();
     int t0;
 
+    n->ntype = NT_SET(N_COND, NT_STR, NT_STR, 0, 0);
+    n->left = (void *) a;
+    n->right = (void *) c;
     if ((b[0] == Equals || b[0] == '=') &&
 	(!b[1] || ((b[1] == Equals || b[1] == '=') && !b[2])))
 	n->type = COND_STREQ;
@@ -1351,13 +1381,46 @@ par_cond_triple(char *a, char *b, char *c)
     else if (b[0] == '-') {
 	if ((t0 = get_cond_num(b + 1)) > -1)
 	    n->type = t0 + COND_NT;
-	else
-	    COND_ERROR("unrecognized condition: %s", b);
+	else {
+	    char *d[3];
+
+	    n->ntype = NT_SET(N_COND, NT_STR, NT_STR | NT_ARR, 0, 0);
+	    n->type = COND_MODI;
+	    n->left = (void *) (b + 1);
+	    d[0] = a;
+	    d[1] = c;
+	    d[2] = NULL;
+	    n->right = (void *) arrdup(d);
+	}
+    } else if (a[0] == '-' && a[1]) {
+	char *d[3];
+
+	n->ntype = NT_SET(N_COND, NT_STR, NT_STR | NT_ARR, 0, 0);
+	n->type = COND_MOD;
+	n->left = (void *) (a + 1);
+	d[0] = b;
+	d[1] = c;
+	d[2] = NULL;
+	n->right = (void *) arrdup(d);
     } else
 	COND_ERROR("condition expected: %s", b);
-    n->left = (void *) a;
-    n->right = (void *) c;
-    n->ntype = NT_SET(N_COND, NT_STR, NT_STR, 0, 0);
+    return n;
+}
+
+/**/
+static Cond
+par_cond_multi(char *a, LinkList l)
+{
+    Cond n = (Cond) make_cond();
+
+    n->ntype = NT_SET(N_COND, NT_STR, NT_STR | NT_ARR, 0, 0);
+    if (a[0] != '-' || !a[1])
+	COND_ERROR("condition expected: %s", a);
+    else {
+	n->type = COND_MOD;
+	n->left = (void *) a;
+	n->right = (void *) listarr(l);
+    }
     return n;
 }
 

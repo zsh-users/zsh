@@ -512,7 +512,7 @@ sitem([var(mm)tt(:)]var(ss))(minutes and seconds)
 endsitem()
 )
 findex(local)
-item(tt(local) [ {tt(PLUS())|tt(-)}tt(LRZilrtu) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
+item(tt(local) [ {tt(PLUS())|tt(-)}tt(ALRUZailrtu) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
 Same as tt(typeset), except that the options tt(-x) and
 tt(-f) are not permitted.
 )
@@ -878,7 +878,7 @@ Equivalent to tt(whence -v).
 findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
-item(tt(typeset) [ {tt(PLUS())|tt(-)}tt(LRUZfilrtuxm) [var(n)]] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(typeset) [ {tt(PLUS())|tt(-)}tt(ALRUZafilrtuxm) [var(n)]] [ var(name)[tt(=)var(value)] ... ])(
 Set attributes and values for shell parameters.
 When invoked inside a function a new parameter is created which will be
 unset when the function completes.  The new parameter will not be
@@ -887,6 +887,9 @@ exported provided no parameter of that name already exists.
 The following attributes are valid:
 
 startitem()
+item(tt(-A))(
+Declare var(name) to be an em(A)ssociation parameter (also known as a hash).
+)
 item(tt(-L))(
 Left justify and remove leading blanks from var(value).
 If var(n) is nonzero, it defines the width of the field;
@@ -915,6 +918,10 @@ character is a digit and the tt(-L) flag has not been set.
 If var(n) is nonzero it defines the width of the field;
 otherwise it is determined by the width of the value of the
 first assignment.
+)
+item(tt(-a))(
+On its own, this option produces a list of all array parameters.
+If any non-options are provided, the tt(typeset) command is silently ignored.
 )
 item(tt(-f))(
 The names refer to functions rather than parameters.  No assignments
@@ -1115,7 +1122,10 @@ xitem(tt(zmodload) tt(-u) [ tt(-i) ] var(name) ...)
 xitem(tt(zmodload) tt(-d) [ tt(-L) ] [ var(name) [ var(dep) ... ] ])
 xitem(tt(zmodload) tt(-du) var(name) [ var(dep) ... ])
 xitem(tt(zmodload) tt(-a) [ tt(-iL) ] [ var(name) [ var(builtin) ... ] ])
-item(tt(zmodload) tt(-au) [ tt(-i) ] var(builtin) ...)(
+xitem(tt(zmodload) tt(-au) [ tt(-i) ] var(builtin) ...)
+xitem(tt(zmodload) tt(-c) [ tt(-iI) ] [ var(name) [ var(cond) ... ] ])
+xitem(tt(zmodload) tt(-cu) [ tt(-iI) ] var(cond) ...)
+item(tt(zmodload) tt(-c) [ tt(-IL) ])(
 tt(zmodload) performs operations relating to zsh's loadable modules.
 This feature is not available on all operating systems,
 or on all installations on a particular operating system.
@@ -1182,5 +1192,14 @@ together with the tt(-u) option it removes builtins defined with
 tt(zmodload -a).  This is only possible if the builtin is not yet
 loaded.  tt(-i) suppresses the error if the builtin is already
 removed (or never existed).
+
+The tt(-c) option is used to define autoloaded condition codes. The
+var(cond) strings give the names of the conditions defined by the
+module. The optional tt(-I) option is used to define infix condition
+names. Without this option prefix condition names are defined.
+
+Together with the tt(-u) option definitions for autoloaded conditions
+are removed. If given no condition names all defined names are listed
+(as a series of tt(zmodload) commands if the tt(-L) option is given).
 )
 enditem()

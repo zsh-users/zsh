@@ -712,7 +712,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	    addlinknode(args, num);
 	} LASTALLOC;
 	trapreturn = -1;
-	doshfunc(sigfn, args, 0, 1);
+	doshfunc(name, sigfn, args, 0, 1);
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
     } else HEAPALLOC {

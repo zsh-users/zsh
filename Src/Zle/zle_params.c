@@ -72,6 +72,9 @@ makezleparams(void)
 
     for(zp = zleparams; zp->name; zp++) {
 	Param pm = createparam(zp->name, zp->type | PM_SPECIAL);
+	if (!pm)
+	    pm = (Param) paramtab->getnode(paramtab, zp->name);
+	DPUTS(!pm, "param not set in makezleparams");
 
 	pm->level = locallevel;
 	pm->u.data = zp->data;

@@ -43,6 +43,26 @@ evalcond(Cond c)
 	return evalcond(c->left) && evalcond(c->right);
     case COND_OR:
 	return evalcond(c->left) || evalcond(c->right);
+    case COND_MOD:
+    case COND_MODI:
+	{
+	    Conddef cd;
+
+	    if ((cd = getconddef((c->type == COND_MODI), (char *) c->left, 1))) {
+		if (c->type == COND_MOD) {
+		    int l = arrlen((char **) c->right);
+
+		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
+			zerr("unrecognized condition: `-%s'", (char *) c->left, 0);
+			return 0;
+		    }
+		}
+		return cd->handler(cd, (char **) c->right);
+	    }
+	    else
+		zerr("unrecognized condition: `-%s'", (char *) c->left, 0);
+	    return 0;
+	}
     }
     singsub((char **)&c->left);
     untokenize(c->left);

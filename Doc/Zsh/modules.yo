@@ -36,6 +36,9 @@ A builtin that provides a timed execution facility within the shell.
 item(tt(stat))(
 A builtin command interface to the tt(stat) system call.
 )
+item(tt(zftp))(
+A builtin FTP client.
+)
 item(tt(zle))(
 The Zsh Line Editor, including the tt(bindkey) and tt(vared) builtins.
 )
@@ -50,6 +53,7 @@ menu(The example Module)
 menu(The files Module)
 menu(The sched Module)
 menu(The stat Module)
+menu(The zftp Module)
 menu(The zle Module)
 endmenu()
 includefile(Zsh/mod_cap.yo)
@@ -61,4 +65,5 @@ includefile(Zsh/mod_example.yo)
 includefile(Zsh/mod_files.yo)
 includefile(Zsh/mod_sched.yo)
 includefile(Zsh/mod_stat.yo)
+includefile(Zsh/mod_zftp.yo)
 includefile(Zsh/mod_zle.yo)

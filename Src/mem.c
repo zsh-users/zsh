@@ -244,7 +244,7 @@ halloc(size_t size)
     size = (size + H_ISIZE - 1) & ~(H_ISIZE - 1);
 
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
-    h_m[size < 1024 ? (size / H_ISIZE) : 1024]++;
+    h_m[size < (1024 * H_ISIZE) ? (size / H_ISIZE) : 1024]++;
 #endif
 
     /* find a heap with enough free space */
@@ -319,6 +319,9 @@ hrealloc(char *p, size_t old, size_t new)
 	if (new > old) {
 	    char *ptr = (char *) halloc(new);
 	    memcpy(ptr, p, old);
+#ifdef ZSH_MEM_DEBUG
+	    memset(p, 0xff, old);
+#endif
 	    return ptr;
 	} else
 	    return new ? p : NULL;
@@ -1004,8 +1007,9 @@ zfree(void *p, int sz)
 	long n = (m_lfree->len - M_MIN) & ~(m_pgsz - 1);
 
 	m_lfree->len -= n;
-	if (brk(m_high -= n) == -1)
+	if (brk(m_high -= n) == -1) {
 	    DPUTS(1, "MEM: allocation error at brk.");
+	}
 
 #ifdef ZSH_MEM_DEBUG
 	m_b += n;

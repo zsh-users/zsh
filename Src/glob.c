@@ -129,6 +129,8 @@ struct comp {
 static char *pptr;		/* current place in string being matched */
 static Comp tail;
 static int first;		/* are leading dots special? */
+static int longest;		/* always match longest piece of path. */
+static int inclosure;		/* see comment in doesmatch() */
 
 /* Add a component to pathbuf: This keeps track of how    *
  * far we are into a file name, since each path component *
@@ -1806,41 +1808,62 @@ matchpat(char *a, char *b)
 /* do the ${foo%%bar}, ${foo#bar} stuff */
 /* please do not laugh at this code. */
 
+struct repldata {
+    int b, e;			/* beginning and end of chunk to replace */
+};
+typedef struct repldata *Repldata;
+
+/* 
+ * List of bits of matches to concatenate with replacement string.
+ * The data is a struct repldata.  It is not used in cases like
+ * ${...//#foo/bar} even though SUB_GLOBAL is set, since the match
+ * is anchored.  It goes on the heap.
+ */
+
+static LinkList repllist;
+
 /* Having found a match in getmatch, decide what part of string
  * to return.  The matched part starts b characters into string s
  * and finishes e characters in: 0 <= b <= e <= strlen(s)
  * (yes, empty matches should work).
- * Bits 3 and higher in fl are used: the flags are
- *   8:		Result is matched portion.
- *  16:		Result is unmatched portion.
- *		(N.B. this should be set for standard ${foo#bar} etc. matches.)
- *  32:		Result is numeric position of start of matched portion.
- *  64:		Result is numeric position of end of matched portion.
- * 128:		Result is length of matched portion.
+ * fl is a set of the SUB_* matches defined in zsh.h from SUB_MATCH onwards;
+ * the lower parts are ignored.
+ * replstr is the replacement string for a substitution
  */
 
 /**/
 static char *
-get_match_ret(char *s, int b, int e, int fl)
+get_match_ret(char *s, int b, int e, int fl, char *replstr)
 {
     char buf[80], *r, *p, *rr;
     int ll = 0, l = strlen(s), bl = 0, t = 0, i;
 
-    if (fl & 8)			/* matched portion */
+    if (replstr) {
+	if ((fl & SUB_GLOBAL) && repllist) {
+	    /* We are replacing the chunk, just add this to the list */
+	    Repldata rd = (Repldata) halloc(sizeof(*rd));
+	    rd->b = b;
+	    rd->e = e;
+	    addlinknode(repllist, rd);
+	    return s;
+	}
+	ll += strlen(replstr);
+    }
+    if (fl & SUB_MATCH)			/* matched portion */
 	ll += 1 + (e - b);
-    if (fl & 16)		/* unmatched portion */
+    if (fl & SUB_REST)		/* unmatched portion */
 	ll += 1 + (l - (e - b));
-    if (fl & 32) {
+    if (fl & SUB_BIND) {
 	/* position of start of matched portion */
 	sprintf(buf, "%d ", b + 1);
 	ll += (bl = strlen(buf));
     }
-    if (fl & 64) {
+    if (fl & SUB_EIND) {
 	/* position of end of matched portion */
 	sprintf(buf + bl, "%d ", e + 1);
 	ll += (bl = strlen(buf));
     }
-    if (fl & 128) {
+    if (fl & SUB_LEN) {
 	/* length of matched portion */
 	sprintf(buf + bl, "%d ", e - b);
 	ll += (bl = strlen(buf));
@@ -1850,13 +1873,13 @@ get_match_ret(char *s, int b, int e, int fl)
 
     rr = r = (char *)ncalloc(ll);
 
-    if (fl & 8) {
+    if (fl & SUB_MATCH) {
 	/* copy matched portion to new buffer */
 	for (i = b, p = s + b; i < e; i++)
 	    *rr++ = *p++;
 	t = 1;
     }
-    if (fl & 16) {
+    if (fl & SUB_REST) {
 	/* Copy unmatched portion to buffer.  If both portions *
 	 * requested, put a space in between (why?)            */
 	if (t)
@@ -1864,6 +1887,9 @@ get_match_ret(char *s, int b, int e, int fl)
 	/* there may be unmatched bits at both beginning and end of string */
 	for (i = 0, p = s; i < b; i++)
 	    *rr++ = *p++;
+	if (replstr)
+	    for (p = replstr; *p; )
+		*rr++ = *p++;
 	for (i = e, p = s + e; i < l; i++)
 	    *rr++ = *p++;
 	t = 1;
@@ -1879,64 +1905,102 @@ get_match_ret(char *s, int b, int e, int fl)
     return r;
 }
 
-/* It is called from paramsubst to get the match for ${foo#bar} etc.
- * Bits of fl determines the required action:
- *   bit 0: match the end instead of the beginning (% or %%)
- *   bit 1: % or # was doubled so get the longest match
- *   bit 2: substring match
- *   bit 3: include the matched portion
- *   bit 4: include the unmatched portion
- *   bit 5: the index of the beginning
- *   bit 6: the index of the end
- *   bit 7: the length of the match
- *   bit 8: match the complete string
+/*
+ * Run the pattern so that we always get the longest possible match.
+ * This eliminates a loop where we gradually shorten the target string
+ * to find same.  We also need to check pptr (the point successfully
+ * reached along the target string) explicitly.
+ *
+ * For this to work, we need the full hairy closure code, so
+ * set inclosure.
+ */
+
+/**/
+static int
+dolongestmatch(char *str, Comp c, int fist)
+{
+    int ret;
+    longest = 1;
+    inclosure++;
+    ret = domatch(str, c, fist);
+    inclosure--;
+    longest = 0;
+    return ret;
+}
+
+/*
+ * This is called from paramsubst to get the match for ${foo#bar} etc.
+ * fl is a set of the SUB_* flags defined in zsh.h
  * *sp points to the string we have to modify. The n'th match will be
  * returned in *sp. ncalloc is used to get memory for the result string.
+ * replstr is the replacement string from a ${.../orig/repl}, in
+ * which case pat is the original.
+ *
+ * n is now ignored unless we are looking for a substring, in
+ * which case the n'th match from the start is counted such that
+ * there is no more than one match from each position.
  */
 
 /**/
 int
-getmatch(char **sp, char *pat, int fl, int n)
+getmatch(char **sp, char *pat, int fl, int n, char *replstr)
 {
     Comp c;
-    char *s = *sp, *t, sav;
-    int i, j, l = strlen(*sp);
+    char *s = *sp, *t, *start, sav;
+    int i, j, l = strlen(*sp), matched;
 
+    MUSTUSEHEAP("getmatch");	/* presumably covered by prefork() test */
+    repllist = NULL;
     c = parsereg(pat);
     if (!c) {
 	zerr("bad pattern: %s", pat, 0);
 	return 1;
     }
-    if (fl & 256) {
+    if (fl & SUB_ALL) {
 	i = domatch(s, c, 0);
-	*sp = get_match_ret(*sp, 0, domatch(s, c, 0) ? l : 0, fl);
-	if (! **sp && (((fl & 8) && !i) || ((fl & 16) && i)))
+	*sp = get_match_ret(*sp, 0, i ? l : 0, fl, i ? replstr : 0);
+	if (! **sp && (((fl & SUB_MATCH) && !i) || ((fl & SUB_REST) && i)))
 	    return 0;
 	return 1;
     }
-    switch (fl & 7) {
+    switch (fl & (SUB_END|SUB_LONG|SUB_SUBSTR)) {
     case 0:
-	/* Smallest possible match at head of string:    *
-	 * start adding characters until we get a match. */
-	for (i = 0, t = s; i <= l; i++, t++) {
-	    sav = *t;
-	    *t = '\0';
-	    if (domatch(s, c, 0) && !--n) {
+    case SUB_LONG:
+	/*
+	 * Largest/smallest possible match at head of string.
+	 * First get the longest match.
+	 */
+	if (dolongestmatch(s, c, 0)) {
+	    char *mpos = pptr;
+	    while (!(fl & SUB_LONG) && pptr > s) {
+		/*
+		 * If we want the shortest, keep backing up to the
+		 * previous character and find the longest up to there.
+		 * That way we can usually reach the shortest in only
+		 * a few attempts.
+		 */
+		t = (pptr > s + 1 && pptr[-2] == Meta) ? pptr - 2 : pptr -1;
+		sav = *t;
+		*t = '\0';
+		if (!dolongestmatch(s, c, 0)) {
+		    *t = sav;
+		    break;
+		}
+		mpos = pptr;
 		*t = sav;
-		*sp = get_match_ret(*sp, 0, i, fl);
-		return 1;
 	    }
-	    if ((*t = sav) == Meta)
-		i++, t++;
+	    *sp = get_match_ret(*sp, 0, mpos-s, fl, replstr);
+	    return 1;
 	}
 	break;
 
-    case 1:
+    case SUB_END:
 	/* Smallest possible match at tail of string:  *
-	 * move back down string until we get a match. */
+	 * move back down string until we get a match. *
+	 * There's no optimization here.               */
 	for (t = s + l; t >= s; t--) {
-	    if (domatch(t, c, 0) && !--n) {
-		*sp = get_match_ret(*sp, t - s, l, fl);
+	    if (domatch(t, c, 0)) {
+		*sp = get_match_ret(*sp, t - s, l, fl, replstr);
 		return 1;
 	    }
 	    if (t > s+1 && t[-2] == Meta)
@@ -1944,29 +2008,13 @@ getmatch(char **sp, char *pat, int fl, int n)
 	}
 	break;
 
-    case 2:
-	/* Largest possible match at head of string:        *
-	 * delete characters from end until we get a match. */
-	for (t = s + l; t > s; t--) {
-	    sav = *t;
-	    *t = '\0';
-	    if (domatch(s, c, 0) && !--n) {
-		*t = sav;
-		*sp = get_match_ret(*sp, 0, t - s, fl);
-		return 1;
-	    }
-	    *t = sav;
-	    if (t >= s+2 && t[-2] == Meta)
-		t--;
-	}
-	break;
-
-    case 3:
+    case (SUB_END|SUB_LONG):
 	/* Largest possible match at tail of string:       *
-	 * move forward along string until we get a match. */
+	 * move forward along string until we get a match. *
+	 * Again there's no optimisation.                  */
 	for (i = 0, t = s; i < l; i++, t++) {
-	    if (domatch(t, c, 0) && !--n) {
-		*sp = get_match_ret(*sp, i, l, fl);
+	    if (domatch(t, c, 0)) {
+		*sp = get_match_ret(*sp, i, l, fl, replstr);
 		return 1;
 	    }
 	    if (*t == Meta)
@@ -1974,110 +2022,147 @@ getmatch(char **sp, char *pat, int fl, int n)
 	}
 	break;
 
-    case 4:
+    case SUB_SUBSTR:
 	/* Smallest at start, but matching substrings. */
-	if (domatch(s + l, c, 0) && !--n) {
-	    *sp = get_match_ret(*sp, 0, 0, fl);
+	if (!(fl & SUB_GLOBAL) && domatch(s + l, c, 0) && !--n) {
+	    *sp = get_match_ret(*sp, 0, 0, fl, replstr);
 	    return 1;
-	}
-	for (i = 1; i <= l; i++) {
-	    for (t = s, j = i; j <= l; j++, t++) {
-		sav = s[j];
-		s[j] = '\0';
-		if (domatch(t, c, 0) && !--n) {
-		    s[j] = sav;
-		    *sp = get_match_ret(*sp, t - s, j, fl);
-		    return 1;
+	} /* fall through */
+    case (SUB_SUBSTR|SUB_LONG):
+	/* longest or smallest at start with substrings */
+	start = s;
+	if (fl & SUB_GLOBAL)
+	    repllist = newlinklist();
+	do {
+	    /* loop over all matches for global substitution */
+	    matched = 0;
+	    for (t = start; t < s + l; t++) {
+		/* Find the longest match from this position. */
+		if (dolongestmatch(t, c, 0) && pptr > t) {
+		    char *mpos = pptr;
+		    while (!(fl & SUB_LONG) && pptr > t) {
+			/* Now reduce to find the smallest match */
+			char *p = (pptr > t + 1 && pptr[-2] == Meta) ?
+			    pptr - 2 : pptr - 1;
+			sav = *p;
+			*p = '\0';
+			if (!dolongestmatch(t, c, 0)) {
+			    *p = sav;
+			    break;
+			}
+			mpos = pptr;
+			*p = sav;
+		    }
+		    if (!--n || (n <= 0 && (fl & SUB_GLOBAL)))
+			*sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
+		    if (!(fl & SUB_GLOBAL)) {
+			if (n) {
+			    /*
+			     * Looking for a later match: in this case,
+			     * we can continue looking for matches from
+			     * the next character, even if it overlaps
+			     * with what we just found.
+			     */
+			    continue;
+			} else
+			    return 1;
+		    }
+		    /*
+		     * For a global match, we need to skip the stuff
+		     * which is already marked for replacement.
+		     */
+		    matched = 1;
+		    start = mpos;
+		    break;
 		}
-		if ((s[j] = sav) == Meta)
-		    j++;
 		if (*t == Meta)
 		    t++;
 	    }
-	    if (s[i] == Meta)
-		i++;
-	}
-	break;
-
-    case 5:
-	/* Smallest at end, matching substrings */
-	if (domatch(s + l, c, 0) && !--n) {
-	    *sp = get_match_ret(*sp, l, l, fl);
-	    return 1;
-	}
-	for (i = l; i--;) {
-	    if (i && s[i-1] == Meta)
-		i--;
-	    for (t = s + l, j = i; j >= 0; j--, t--) {
-		sav = *t;
-		*t = '\0';
-		if (domatch(s + j, c, 0) && !--n) {
-		    *t = sav;
-		    *sp = get_match_ret(*sp, j, t - s, fl);
-		    return 1;
-		}
-		*t = sav;
-		if (t >= s+2 && t[-2] == Meta)
-		    t--;
-		if (j >= 2 && s[j-2] == Meta)
-		    j--;
-	    }
-	}
-	break;
-
-    case 6:
-	/* Largest at start, matching substrings. */
-	for (i = l; i; i--) {
-	    for (t = s, j = i; j <= l; j++, t++) {
-		sav = s[j];
-		s[j] = '\0';
-		if (domatch(t, c, 0) && !--n) {
-		    s[j] = sav;
-		    *sp = get_match_ret(*sp, t - s, j, fl);
-		    return 1;
-		}
-		if ((s[j] = sav) == Meta)
-		    j++;
-		if (*t == Meta)
-		    t++;
-	    }
-	    if (i >= 2 && s[i-2] == Meta)
-		i--;
-	}
-	if (domatch(s + l, c, 0) && !--n) {
-	    *sp = get_match_ret(*sp, 0, 0, fl);
+	} while (matched);
+	/*
+	 * check if we can match a blank string, if so do it
+	 * at the start.  Goodness knows if this is a good idea
+	 * with global substitution, so it doesn't happen.
+	 */
+	if ((fl & (SUB_LONG|SUB_GLOBAL)) == SUB_LONG &&
+	    domatch(s + l, c, 0) && !--n) {
+	    *sp = get_match_ret(*sp, 0, 0, fl, replstr);
 	    return 1;
 	}
 	break;
 
-    case 7:
-	/* Largest at end, matching substrings. */
-	for (i = 0; i < l; i++) {
-	    for (t = s + l, j = i; j >= 0; j--, t--) {
-		sav = *t;
-		*t = '\0';
-		if (domatch(s + j, c, 0) && !--n) {
-		    *t = sav;
-		    *sp = get_match_ret(*sp, j, t - s, fl);
-		    return 1;
-		}
-		*t = sav;
-		if (t >= s+2 && t[-2] == Meta)
-		    t--;
-		if (j >= 2 && s[j-2] == Meta)
-		    j--;
-	    }
-	    if (s[i] == Meta)
-		i++;
-	}
+    case (SUB_END|SUB_SUBSTR):
+	/* Shortest at end with substrings */
 	if (domatch(s + l, c, 0) && !--n) {
-	    *sp = get_match_ret(*sp, l, l, fl);
+	    *sp = get_match_ret(*sp, l, l, fl, replstr);
+	    return 1;
+	} /* fall through */
+    case (SUB_END|SUB_LONG|SUB_SUBSTR):
+	/* Longest/shortest at end, matching substrings.       */
+	for (t = s + l - 1; t >= s; t--) {
+	    if (t > s && t[-1] == Meta)
+		t--;
+	    if (dolongestmatch(t, c, 0) && pptr > t && !--n) {
+		/* Found the longest match */
+		char *mpos = pptr;
+		while (!(fl & SUB_LONG) && pptr > t) {
+		    /* Look for the shortest match */
+		    char *p = (pptr > t+1 && pptr[-2] == Meta) ?
+			pptr-2 : pptr-1;
+		    sav = *p;
+		    *p = '\0';
+		    if (!dolongestmatch(t, c, 0) || pptr == t) {
+			*p = sav;
+			break;
+		    }
+		    *p = sav;
+		    mpos = pptr;
+		}
+		*sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
+		return 1;
+	    }
+	}
+	if ((fl & SUB_LONG) && domatch(s + l, c, 0) && !--n) {
+	    *sp = get_match_ret(*sp, l, l, fl, replstr);
 	    return 1;
 	}
 	break;
     }
-    /* munge the whole string */
-    *sp = get_match_ret(*sp, 0, 0, fl);
+
+    if (repllist && nonempty(repllist)) {
+	/* Put all the bits of a global search and replace together. */
+	LinkNode nd;
+	Repldata rd;
+	int rlen;
+	int lleft = 0;		/* size of returned string */
+
+	i = 0;			/* start of last chunk we got from *sp */
+	rlen = strlen(replstr);
+	for (nd = firstnode(repllist); nd; incnode(nd)) {
+	    rd = (Repldata) getdata(nd);
+	    lleft += rd->b - i; /* previous chunk of *sp */
+	    lleft += rlen;	/* the replaced bit */
+	    i = rd->e;		/* start of next chunk of *sp */
+	}
+	lleft += l - i;	/* final chunk from *sp */
+	start = t = halloc(lleft+1);
+	i = 0;
+	for (nd = firstnode(repllist); nd; incnode(nd)) {
+	    rd = (Repldata) getdata(nd);
+	    memcpy(t, s + i, rd->b - i);
+	    t += rd->b - i;
+	    memcpy(t, replstr, rlen);
+	    t += rlen;
+	    i = rd->e;
+	}
+	memcpy(t, s + i, l - i);
+	start[lleft] = '\0';
+	*sp = start;
+	return 1;
+    }
+
+    /* munge the whole string: no match, so no replstr */
+    *sp = get_match_ret(*sp, 0, 0, fl, 0);
     return 1;
 }
 
@@ -2109,9 +2194,15 @@ static int
 excluded(Comp c, char *eptr)
 {
     char *saves = pptr;
-    int savei = first, ret;
+    int savei = first, savel = longest, ret;
 
     first = 0;
+    /*
+     * Even if we've been told always to match the longest string,
+     * i.e. not anchored to the end, we want to match the full string
+     * we've already matched when we're trying to exclude it.
+     */
+    longest = 0;
     if (PATHADDP(c) && pathpos) {
 	VARARR(char, buf, pathpos + strlen(eptr) + 1);
 
@@ -2128,6 +2219,7 @@ excluded(Comp c, char *eptr)
 
     pptr = saves;
     first = savei;
+    longest = savel;
 
     return ret;
 }
@@ -2137,8 +2229,6 @@ struct gclose {
     char *end;
 };
 typedef struct gclose *Gclose;
-
-static int inclosure;		/* see comment in doesmatch() */
 
 /* Add a list of matches that fit the closure.  trystring is a string of
  * the same length as the target string; a non-zero in that string
@@ -2182,6 +2272,15 @@ addclosures(Comp c, LinkList closlist, int *pdone, char *trystring)
     }
 }
 
+/*
+ * Match characters with case-insensitivity.
+ * Note CHARMATCH(x,y) != CHARMATCH(y,x)
+ */
+#define CHARMATCH(x, y) \
+(x == y || (((c->stat & C_IGNCASE) ? (tulower(x) == tulower(y)) : \
+	     (c->stat & C_LCMATCHUC) ? (islower(y) && tuupper(y) == x) : 0)))
+
+
 /* see if current string in pptr matches c */
 
 /**/
@@ -2219,7 +2318,7 @@ doesmatch(Comp c)
 		    for (; *pptr; pptr++) {
 			if (*pptr == Meta)
 			    pptr++;
-			else if (*pptr == looka)
+			else if (CHARMATCH(*pptr, looka))
 			    break;
 		    }
 		    if (!*(saves = pptr))
@@ -2233,7 +2332,7 @@ doesmatch(Comp c)
 		for (done = 0; ; done++) {
 		    saves = pptr;
 		    if ((done || ONEHASHP(c) || OPTIONALP(c)) &&
-			((!c->next && (!LASTP(c) || !*pptr)) ||
+			((!c->next && (!LASTP(c) || !*pptr || longest)) ||
 			 (c->next && doesmatch(c->next))))
 			return 1;
 		    if (done && OPTIONALP(c))
@@ -2267,7 +2366,7 @@ doesmatch(Comp c)
 		break;
 	    saves = pptr;
 	    /* do we really want this LASTP here?? */
-	    if ((!c->next && (!LASTP(c) || !*pptr)) ||
+	    if ((!c->next && (!LASTP(c) || !*pptr || longest)) ||
 		(c->next && doesmatch(c->next))) {
 		retflag = 1;
 		break;
@@ -2453,7 +2552,7 @@ matchonce(Comp c)
 			if (!ret)
 			    break;
 			if ((ret = ret2 &&
-			     ((!c->next && (!LASTP(c) || !*pptr))
+			     ((!c->next && (!LASTP(c) || !*pptr || longest))
 			      || (c->next && doesmatch(c->next)))) ||
 			    (!c->next && LASTP(c)))
 			    break;
@@ -2485,7 +2584,7 @@ matchonce(Comp c)
 	    if (CLOSUREP(c))
 		return 1;
 	    if (!c->next)	/* no more patterns left */
-		return (!LASTP(c) || !*pptr);
+		return (!LASTP(c) || !*pptr || longest);
 	    /* optimisation when next pattern is not a closure */
 	    if (!CLOSUREP(c->next)) {
 		c = c->next;
@@ -2589,10 +2688,7 @@ matchonce(Comp c)
 	    }
 	    continue;
 	}
-	if (*pptr == *pat ||
-	    (((c->stat & C_IGNCASE) ? (tulower(*pat) == tulower(*pptr)) :
-	      (c->stat & C_LCMATCHUC) ?
-	      (islower(*pat) && tuupper(*pat) == *pptr) : 0))) {
+	if (CHARMATCH(*pptr, *pat)) {
 	    /* just plain old characters */
 	    pptr++;
 	    pat++;

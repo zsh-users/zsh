@@ -394,7 +394,7 @@ scanlistwidgets(HashNode hn, int list)
 	quotedzputs(t->nam, stdout);
 	if (w->flags & WIDGET_COMP) {
 	    if (printcompctlptr && w->u.cc)
-		printcompctlptr(NULL, w->u.cc, PRINT_LIST);
+		printcompctlptr(NULL, w->u.cc, PRINT_LIST, 0);
 	} else if(strcmp(t->nam, w->u.fnnam)) {
 	    fputc(' ', stdout);
 	    quotedzputs(w->u.fnnam, stdout);
@@ -404,7 +404,7 @@ scanlistwidgets(HashNode hn, int list)
 	if (w->flags & WIDGET_COMP) {
 	    fputs(" -C", stdout);
 	    if (printcompctlptr && w->u.cc)
-		printcompctlptr(NULL, w->u.cc, PRINT_TYPE);
+		printcompctlptr(NULL, w->u.cc, PRINT_TYPE, 0);
 	} else if(strcmp(t->nam, w->u.fnnam)) {
 	    fputs(" (", stdout);
 	    nicezputs(w->u.fnnam, stdout);

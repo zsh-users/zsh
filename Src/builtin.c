@@ -120,7 +120,7 @@ static struct builtin builtins[] =
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
 
 #ifdef DYNAMIC
-    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "Laudi", NULL),
+    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "LaudicI", NULL),
 #endif
 };
 
@@ -994,7 +994,7 @@ cd_new_pwd(int func, LinkNode dir, int chaselinks)
     if ((l = getshfunc("chpwd")) != &dummy_list) {
 	fflush(stdout);
 	fflush(stderr);
-	doshfunc(l, NULL, 0, 1);
+	doshfunc("chpwd", l, NULL, 0, 1);
     }
 
     dirstacksize = getiparam("DIRSTACKSIZE");

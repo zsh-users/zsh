@@ -1,4 +1,4 @@
-texinode(The zle Module)()(The stat Module)(Zsh Modules)
+texinode(The zle Module)()(The zftp Module)(Zsh Modules)
 sect(The zle Module)
 The tt(zle) module contains the Zsh Line Editor.  See
 ifzman(zmanref(zshzle))\

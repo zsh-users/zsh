@@ -567,7 +567,9 @@ vioperswapcase(void)
 	}
 	/* go back to the first line of the range */
 	cs = oldcs;
+#if 0
 	vifirstnonblank();
+#endif
     }
     vichgflag = 0;
 }

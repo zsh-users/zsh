@@ -312,8 +312,10 @@ noderef(Parameters)
 for a description of parameters.
 In the expansions discussed below that require a pattern, the form of
 the pattern is the same as that used for filename generation;
-see noderef(Filename Generation).  In addition to the following
-operations, the file modifiers described in
+see noderef(Filename Generation).  Note that this pattern, along with
+the replacement text of a substitution, is itself subject to
+parameter, command and arithmetic substitution.  In addition to the
+following operations, the file modifiers described in
 noderef(Modifiers) in noderef(History Expansion) can be
 applied:  for example, tt(${i:s/foo/bar/}) performs string
 substitution on the value of parameter tt($i).
@@ -397,6 +399,37 @@ is not quoted or the tt((@)) flag or the `var(name)tt([@])' syntax
 is used, matching is performed on each array elements separately, and
 the matched array elements are removed (use the tt((M)) flag to
 remove the non-matched elements).
+)
+xitem(tt(${)var(name)tt(/)var(pattern)tt(/)var(repl)tt(}))
+item(tt(${)var(name)tt(//)var(pattern)tt(/)var(repl)tt(}))(
+Substitute the longest possible match of var(pattern) in the value of
+variable var(name) with the string var(repl).  The first form
+substitutes just the first occurrence, the second all occurrences.
+The var(pattern) may begin with a var(#), in which case the
+var(pattern) must match at the start of the string, or var(%), in
+which case it must match at the end of the string.  The var(repl) may
+be an empty string, in which case the final tt(/) may also be omitted.
+To quote the final tt(/) in other cases it should be preceded by two
+backslashes (i.e., a quoted backslash); this is not necessary if the
+tt(/) occurs inside a substituted paramter.  Substitution of an array
+is as described for tt(#) and tt(%) above.
+
+The first tt(/) may be preceded by a tt(:), in which case the match
+will only succeed if it matches the entire word.  Note also the
+effect of the tt(I) and tt(S) parameter expansion flags below:  the
+flags tt(M), tt(R), tt(B), tt(E) and tt(N) are not useful, however.
+
+For example,
+
+nofill(tt(foo="twinkle twinkle little star" sub="t*e" rep="spy"))
+nofill(tt(print ${foo//${~sub}/$rep}))
+nofill(tt(print ${(S)foo//${~sub}/$rep}))
+
+Here, the tt(~) ensures that the text of tt($sub) is treated as a
+pattern rather than a plain string.  In the first case, the longest
+match for tt(t*e) is substituted and the result is `tt(spy star)',
+while in the second case, the shortest matches are taken and the
+result is `tt(spy spy lispy star)'.
 )
 item(tt(${#)var(spec)tt(}))(
 If var(spec) is one of the above substitutions, substitute
@@ -549,10 +582,21 @@ for `tt(ps:\n:)'.
 item(tt(S))(
 (This and all remaining flags are used with the tt(${)...tt(#)...tt(}) or
 tt(${)...tt(%)...tt(}) forms.)
-Search substrings as well as beginnings or ends.
+Search substrings as well as beginnings or ends; with tt(#) start
+from the beginning and with tt(%) start from the end of the string.
+With substitution via tt(${)...tt(/)...tt(}) or
+tt(${)...tt(//)...tt(}), specifies that the shortest instead of the
+longest match should be replaced.
 )
 item(tt(I:)var(expr)tt(:))(
 Search the var(expr)th match (where var(expr) evaluates to a number).
+This only applies when searching for substrings, either with the tt(S)
+flag, or with tt(${)...tt(/)...tt(}) (only the var(expr)th match is
+substituted) or tt(${)...tt(//)...tt(}) (all matches from the
+var(expr)th on are substituted).  The var(expr)th match is counted
+such that there is either one or zero matches from each starting
+position in the string, although for global subsitution matches
+overlapping previous replacements are ignored.
 )
 item(tt(M))(
 Include the matched portion in the result.

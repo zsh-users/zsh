@@ -117,7 +117,7 @@ loop(int toplevel, int justonce)
 		    if (he && he->text)
 			addlinknode(args, he->text);
 		} LASTALLOC;
-		doshfunc(prelist, args, 0, 1);
+		doshfunc("preexec", prelist, args, 0, 1);
 		freelinklist(args, (FreeFunc) NULL);
 		errflag = 0;
 	    }
@@ -591,6 +591,9 @@ setupvals(void)
     createbuiltintable();   /* create hash table for builtin commands  */
     createnameddirtable();  /* create hash table for named directories */
     createparamtable();     /* create paramater hash table             */
+
+    condtab = NULL;
+    wrappers = NULL;
 
 #ifdef TIOCGWINSZ
     adjustwinsize();

@@ -2730,18 +2730,16 @@ maketildelist(void)
 
 /**/
 static int
-getcpat(char *wrd, int cpatindex, char *cpat, int class)
+getcpat(char *str, int cpatindex, char *cpat, int class)
 {
-    char *str, *s, *t, *p;
+    char *s, *t, *p;
     int d = 0;
 
-    if (!wrd || !*wrd)
+    if (!str || !*str)
 	return -1;
 
     cpat = rembslash(cpat);
 
-    str = ztrdup(wrd);
-    untokenize(str);
     if (!cpatindex)
 	cpatindex++, d = 0;
     else if ((d = (cpatindex < 0)))
@@ -2752,23 +2750,14 @@ getcpat(char *wrd, int cpatindex, char *cpat, int class)
 	 d ? s-- : s++) {
 	for (t = s, p = cpat; *t && *p; p++) {
 	    if (class) {
-		if (*p == *s && !--cpatindex) {
-		    zsfree(str);
+		if (*p == *s && !--cpatindex)
 		    return (int)(s - str + 1);
-		}
 	    } else if (*t++ != *p)
 		break;
 	}
-	if (!class && !*p && !--cpatindex) {
-	    zsfree(str);
-	    t += wrd - str;
-	    for (d = 0; --t >= wrd;)
-		if (! INULL(*t))
-		    d++;
-	    return d;
-	}
+	if (!class && !*p && !--cpatindex)
+	    return t - str;
     }
-    zsfree(str);
     return -1;
 }
 
@@ -3336,8 +3325,9 @@ makecomplistext(Compctl occ, char *os, int incmd)
 			break;
 		    case CCT_CURSUF:
 		    case CCT_CURPRE:
-			s = ztrdup(clwpos < clwnum ? clwords[clwpos] : "");
+			s = ztrdup(clwpos < clwnum ? os : "");
 			untokenize(s);
+			if (isset(COMPLETEINWORD)) s[offs] = '\0';
 			sc = rembslash(cc->u.s.s[i]);
 			a = strlen(sc);
 			if (!strncmp(s, sc, a)) {
@@ -3347,10 +3337,13 @@ makecomplistext(Compctl occ, char *os, int incmd)
 			break;
 		    case CCT_CURSUB:
 		    case CCT_CURSUBC:
-			if (clwpos < 0 || clwpos > clwnum)
+			if (clwpos < 0 || clwpos >= clwnum)
 			    t = 0;
 			else {
-			    a = getcpat(clwords[clwpos],
+			    s = ztrdup(os);
+			    untokenize(s);
+			    if (isset(COMPLETEINWORD)) s[offs] = '\0';
+			    a = getcpat(s,
 					cc->u.s.p[i],
 					cc->u.s.s[i],
 					cc->type == CCT_CURSUBC);
@@ -4107,7 +4100,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    /* This flag allows us to use read -l and -c. */
 	    incompctlfunc = 1;
 	    /* Call the function. */
-	    doshfunc(list, args, 0, 1);
+	    doshfunc(cc->func, list, args, 0, 1);
 	    incompctlfunc = 0;
 	    /* And get the result from the reply parameter. */
 	    if ((r = get_user_var("reply")))
@@ -4270,7 +4263,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 	    /* No harm in allowing read -l and -c here, too */
 	    incompctlfunc = 1;
-	    doshfunc(list, args, 0, 1);
+	    doshfunc(cc->ylist, list, args, 0, 1);
 	    incompctlfunc = 0;
 	    uv = "reply";
 	}
@@ -4912,7 +4905,7 @@ do_ambiguous(void)
      * if it is needed.                                                     */
     if (isset(LISTBEEP))
 	feep();
-    if (isset(AUTOLIST) && !amenu && !showinglist)
+    if (isset(AUTOLIST) && !amenu && !showinglist && smatches >= 2)
 	showinglist = -2;
     if (am)
 	lastambig = 1;
@@ -5233,14 +5226,10 @@ listmatches(void)
     Cmgroup g;
     Cmatch *p, m;
     Cexpl *e;
-    int nlines = 0, ncols, colsz, ngr = 0, nlist = 0, longest = 1, pnl = 0;
+    int nlines = 0, ncols, nlist = 0, longest = 1, pnl = 0;
     int of = isset(LISTTYPES), opl = 0;
     int listmax = getiparam("LISTMAX");
 
-    if (smatches < 2) {
-	showinglist = 0;
-	return;
-    }
 #ifdef DEBUG
     /* Sanity check */
     if(!validlist) {
@@ -5310,16 +5299,13 @@ listmatches(void)
 		e++;
 	    }
 	}
-	if (g->lcount)
-	    ngr++;
     }
     longest += 2 + of;
     if ((ncols = (columns + 1) / longest)) {
-	colsz = (nlist + ncols - 1) / ncols;
-	nlines += ngr - 1 + colsz + (nlist == 0);
+	for (g = amatches; g; g = g->next)
+	    nlines += (g->lcount + ncols - 1) / ncols;
     } else {
 	ncols = 1;
-	colsz = 1;
 	opl = 1;
 	for (g = amatches; g; g = g->next) {
 	    char **pp = g->ylist;
@@ -5396,12 +5382,11 @@ listmatches(void)
 		}
 	    }
 	    else {
-		int n = g->lcount, nl = (n + ncols - 1) / ncols, i, a;
-		int nc = (opl ? 1 : (n + colsz - 1) / colsz);
+		int n = g->lcount, nl = (n + ncols - 1) / ncols, nc = nl, i, a;
 		char **pq;
 
 		while (n && nl--) {
-		    i = nc;
+		    i = ncols;
 		    pq = pp;
 		    while (n && i--) {
 			if (pq - g->ylist >= g->lcount)
@@ -5412,7 +5397,7 @@ listmatches(void)
 			    while (a--)
 				putc(' ', shout);
 			}
-			pq += colsz;
+			pq += nc;
 			n--;
 		    }
 		    if (n)
@@ -5422,8 +5407,7 @@ listmatches(void)
 	    }
 	}
 	else if (g->lcount) {
-	    int n = g->lcount, nl = (n + ncols - 1) / ncols, i, j, a;
-	    int nc = (opl ? 1 : (n + colsz - 1) / colsz);
+	    int n = g->lcount, nl = (n + ncols - 1) / ncols, nc = nl, i, j, a;
 	    Cmatch *q;
 
 	    if (n && pnl) {
@@ -5431,7 +5415,7 @@ listmatches(void)
 		pnl = 0;
 	    }
 	    for (p = skipnolist(g->matches); n && nl--;) {
-		i = nc;
+		i = ncols;
 		q = p;
 		while (n && i--) {
 		    if (!(m = *q))
@@ -5460,7 +5444,7 @@ listmatches(void)
 			while (a--)
 			    putc(' ', shout);
 		    if (--n)
-			for (j = colsz; j && *q; j--)
+			for (j = nc; j && *q; j--)
 			    q = skipnolist(q + 1);
 		}
 		if (n) {

@@ -99,7 +99,7 @@ stringsubst(LinkList list, LinkNode node, int ssub)
     char *str  = str3;
 
     while (!errflag && *str) {
-	if ((qt = *str == Qstring) || *str == String)
+	if ((qt = *str == Qstring) || *str == String) {
 	    if (str[1] == Inpar) {
 		str++;
 		goto comsub;
@@ -125,7 +125,7 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 		str3 = (char *)getdata(node);
 		continue;
 	    }
-	else if ((qt = *str == Qtick) || *str == Tick)
+	} else if ((qt = *str == Qtick) || *str == Tick)
 	  comsub: {
 	    LinkList pl;
 	    char *s, *str2 = str;
@@ -135,8 +135,12 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 	    if (*str == Inpar) {
 		endchar = Outpar;
 		str[-1] = '\0';
+#ifdef DEBUG
 		if (skipparens(Inpar, Outpar, &str))
-		    DPUTS(1, "BUG: parse error in command substitution");
+		    dputs("BUG: parse error in command substitution");
+#else
+		skipparens(Inpar, Outpar, &str);
+#endif
 		str--;
 	    } else {
 		endchar = *str;
@@ -298,7 +302,7 @@ filesub(char **namptr, int assign)
     if (!assign)
 	return;
 
-    if (assign < 3)
+    if (assign < 3) {
 	if ((*namptr)[1] && (sub = strchr(*namptr + 1, Equals))) {
 	    if (assign == 1)
 		for (ptr = *namptr; ptr != sub; ptr++)
@@ -311,6 +315,7 @@ filesub(char **namptr, int assign)
 	    }
 	} else
 	    return;
+    }
 
     ptr = *namptr;
     while ((sub = strchr(ptr, ':'))) {
@@ -691,7 +696,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     char *aptr = *str;
     char *s = aptr, *fstr, *idbeg, *idend, *ostr = (char *) getdata(n);
     int colf;			/* != 0 means we found a colon after the name */
-    int doub = 0;		/* != 0 means we have %%, not %, or ##, not # */
     int isarr = 0;
     int plan9 = isset(RCEXPANDPARAM);
     int globsubst = isset(GLOBSUBST);
@@ -705,11 +709,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     Value v;
     int flags = 0;
     int flnum = 0;
-    int substr = 0;
     int sortit = 0, casind = 0;
     int casmod = 0;
     char *sep = NULL, *spsep = NULL;
     char *premul = NULL, *postmul = NULL, *preone = NULL, *postone = NULL;
+    char *replstr = NULL;	/* replacement string for /orig/repl */
     long prenum = 0, postnum = 0;
     int copied = 0;
     int arrasg = 0;
@@ -717,7 +721,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int nojoin = 0;
     char inbrace = 0;		/* != 0 means ${...}, otherwise $... */
     char hkeys = 0;		/* 1 means get keys from associative array */
-    char hvals = 1;		/* > hkeys get values of associative array */
+    char hvals = 0;		/* > hkeys get values of associative array */
 
     *s++ = '\0';
     if (!ialnum(*s) && *s != '#' && *s != Pound && *s != '-' &&
@@ -764,22 +768,22 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    nojoin = 1;
 		    break;
 		case 'M':
-		    flags |= 8;
+		    flags |= SUB_MATCH;
 		    break;
 		case 'R':
-		    flags |= 16;
+		    flags |= SUB_REST;
 		    break;
 		case 'B':
-		    flags |= 32;
+		    flags |= SUB_BIND;
 		    break;
 		case 'E':
-		    flags |= 64;
+		    flags |= SUB_EIND;
 		    break;
 		case 'N':
-		    flags |= 128;
+		    flags |= SUB_LEN;
 		    break;
 		case 'S':
-		    substr = 1;
+		    flags |= SUB_SUBSTR;
 		    break;
 		case 'I':
 		    flnum = get_intarg(&s);
@@ -940,7 +944,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		s++;
 	    } else
 		globsubst = 1;
-	} else if (*s == '+')
+	} else if (*s == '+') {
 	    if (iident(s[1]))
 		chkset = 1, s++;
 	    else if (!inbrace) {
@@ -951,7 +955,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		zerr("bad substitution", NULL, 0);
 		return NULL;
 	    }
-	else
+	} else
 	    break;
     }
     globsubst = globsubst && !qt;
@@ -974,8 +978,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	copied = 1;
 	*s = sav;
 	v = (Value) NULL;
-    } else if (!(v = getvalue(&s, (unset(KSHARRAYS) || inbrace) ? 1 : -1)))
-	vunset = 1;
+    } else {
+	/* 2 == SCANPM_WANTKEYS, 1 == SCANPM_WANTVALS, see params.c */
+	if (!(v = fetchvalue(&s, (unset(KSHARRAYS) || inbrace) ? 1 : -1,
+			     (hkeys ? 2 : 0) + ((hvals > hkeys) ? 1 : 0))))
+	    vunset = 1;
+    }
     while (v || ((inbrace || (unset(KSHARRAYS) && vunset)) && isbrack(*s))) {
 	if (!v) {
 	    Param pm;
@@ -1000,13 +1008,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		break;
 	}
 	if ((isarr = v->isarr)) {
-	    /* No way to reach here with v->inv != 0, so getvaluearr() *
-	     * will definitely be called by getarrvalue().  Slicing of *
-	     * associations isn't done, so use v->a and v->b for flags */
-	    if (PM_TYPE(v->pm->flags) == PM_HASHED) {
-		v->a = hkeys;
-		v->b = hvals;
-	    }
+	    /* No way to get here with v->inv != 0, so getvaluearr() *
+	     * is called by getarrvalue(); needn't test PM_HASHED.   */
 	    aval = getarrvalue(v);
 	} else {
 	    if (v->pm->flags & PM_ARRAY) {
@@ -1124,23 +1127,72 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    *s == '=' || *s == Equals ||
 		    *s == '%' ||
 		    *s == '#' || *s == Pound ||
-		    *s == '?' || *s == Quest)) {
+		    *s == '?' || *s == Quest ||
+		    *s == '/')) {
 
 	if (!flnum)
 	    flnum++;
 	if (*s == '%')
-	    flags |= 1;
+	    flags |= SUB_END;
 
 	/* Check for ${..%%..} or ${..##..} */
 	if ((*s == '%' || *s == '#' || *s == Pound) && *s == s[1]) {
 	    s++;
-	    doub = 1;
+	    /* we have %%, not %, or ##, not # */
+	    flags |= SUB_LONG;
 	}
 	s++;
+	if (s[-1] == '/') {
+	    char *ptr;
+	    /*
+	     * previous flags are irrelevant, except for (S) which
+	     * indicates shortest substring; else look for longest.
+	     */
+	    flags = (flags & SUB_SUBSTR) ? 0 : SUB_LONG;
+	    if (*s == '/') {
+		/* doubled, so replace all occurrences */
+		flags |= SUB_GLOBAL;
+		s++;
+	    }
+	    /* Check for anchored substitution */
+	    if (*s == '%') {
+		/* anchor at tail */
+		flags |= SUB_END;
+		s++;
+	    } else if (*s == '#' || *s == Pound) {
+		/* anchor at head: this is the `normal' case in getmatch */
+		s++;
+	    } else
+		flags |= SUB_SUBSTR;
+	    /*
+	     * Find the / marking the end of the search pattern.
+	     * If there isn't one, we're just going to delete that,
+	     * i.e. replace it with an empty string.
+	     *
+	     * This allows quotation of the slash with '\\/'. Why
+	     * two?  Well, for a non-quoted string we can check for
+	     * Bnull+/, which is what you get from `\/', but inside
+	     * double quotes the Bnull isn't there, so it's not
+	     * consistent.
+	     */
+	    for (ptr = s; *ptr && *ptr != '/'; ptr++)
+		if (*ptr == '\\' && ptr[1] == '/')
+		    chuck(ptr);
+	    replstr = (*ptr && ptr[1]) ? ptr+1 : "";
+	    singsub(&replstr);
+	    untokenize(replstr);
+	    *ptr = '\0';
+	}
 
-	flags |= (doub << 1) | (substr << 2) | (colf << 8);
-	if (!(flags & 0xf8))
-	    flags |= 16;
+	if (colf)
+	    flags |= SUB_ALL;
+	/*
+	 * With no special flags, i.e. just a # or % or whatever,
+	 * the matched portion is removed and we keep the rest.
+	 * We also want the rest when we're doing a substitution.
+	 */
+	if (!(flags & (SUB_MATCH|SUB_REST|SUB_BIND|SUB_EIND|SUB_LEN)))
+	    flags |= SUB_REST;
 
 	if (colf && !vunset)
 	    vunset = (isarr) ? !*aval : !*val || (*val == Nularg && !val[1]);
@@ -1234,6 +1286,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '%':
 	case '#':
 	case Pound:
+	case '/':
 	    if (qt)
 		if (parse_subst_string(s)) {
 		    zerr("parse error in ${...%c...} substitution",
@@ -1247,14 +1300,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		char **pp = aval = (char **)ncalloc(sizeof(char *) * (arrlen(aval) + 1));
 
 		while ((*pp = *ap++)) {
-		    if (getmatch(pp, s, flags, flnum))
+		    if (getmatch(pp, s, flags, flnum, replstr))
 			pp++;
 		}
 		copied = 1;
 	    } else {
 		if (vunset)
 		    val = dupstring("");
-		getmatch(&val, s, flags, flnum);
+		getmatch(&val, s, flags, flnum, replstr);
 		copied = 1;
 	    }
 	    break;

@@ -2,7 +2,7 @@
 # second argument of cd and pushd.
 
 emulate -R zsh				# Requires zsh 3.0-pre4 or later
-setopt localoptions
+setopt localoptions extendedglob
 local from
 
 read -Ac from

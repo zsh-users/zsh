@@ -2602,7 +2602,7 @@ execshfunc(Cmd cmd, Shfunc shf)
 	deletejob(jobtab + thisjob);
     }
 
-    doshfunc(shf->funcdef, cmd->args, shf->flags, 0);
+    doshfunc(shf->nam, shf->funcdef, cmd->args, shf->flags, 0);
 
     if (!list_pipe)
 	deletefilelist(last_file_list);
@@ -2650,14 +2650,13 @@ execautofn(Cmd cmd)
 
 /**/
 void
-doshfunc(List list, LinkList doshargs, int flags, int noreturnval)
+doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 /* If noreturnval is nonzero, then reset the current return *
  * value (lastval) to its value before the shell function   *
  * was executed.                                            */
 {
     char **tab, **x, *oargv0 = NULL;
     int xexittr, newexittr, oldzoptind, oldlastval;
-    char *ou;
     void *xexitfn, *newexitfn;
     char saveopts[OPT_SIZE];
     int obreaks = breaks;
@@ -2705,14 +2704,7 @@ doshfunc(List list, LinkList doshargs, int flags, int noreturnval)
 		argzero = ztrdup(argzero);
 	    }
 	}
-	startparamscope();
-	ou = underscore;
-	underscore = ztrdup(underscore);
-	execlist(dupstruct(list), 1, 0);
-	zsfree(underscore);
-	underscore = ou;
-	endparamscope();
-
+	runshfunc(list, wrappers, name);
 	if (retflag) {
 	    retflag = 0;
 	    breaks = obreaks;
@@ -2765,6 +2757,44 @@ doshfunc(List list, LinkList doshargs, int flags, int noreturnval)
 	    lastval = oldlastval;
 	popheap();
     } LASTALLOC;
+}
+
+/* This finally executes a shell function and any function wrappers     *
+ * defined by modules. This works by calling the wrapper function which *
+ * in turn has to call back this function with the arguments it gets.   */
+
+/**/
+void
+runshfunc(List list, FuncWrap wrap, char *name)
+{
+    int cont;
+    char *ou;
+
+    while (wrap) {
+	wrap->module->flags |= MOD_WRAPPER;
+	wrap->count++;
+	cont = wrap->handler(list, wrap->next, name);
+	wrap->count--;
+	if (!wrap->count) {
+	    wrap->module->flags &= ~MOD_WRAPPER;
+#ifdef DYNAMIC
+	    if (wrap->module->flags & MOD_UNLOAD) {
+		wrap->module->flags &= ~MOD_UNLOAD;
+		unload_module(wrap->module, NULL);
+	    }
+#endif
+	}
+	if (!cont)
+	    return;
+	wrap = wrap->next;
+    }
+    startparamscope();
+    ou = underscore;
+    underscore = ztrdup(underscore);
+    execlist(dupstruct(list), 1, 0);
+    zsfree(underscore);
+    underscore = ou;
+    endparamscope();
 }
 
 /* Search fpath for an undefined function.  Finds the file, and returns the *

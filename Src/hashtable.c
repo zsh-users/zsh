@@ -414,9 +414,10 @@ scanmatchtable(HashTable ht, Comp com, int flags1, int flags2, ScanFunc scanfunc
 	    HashNode hn = st.u.u;
 	    st.u.u = st.u.u->next;
 	    if ((hn->flags & flags1) + !flags1 && !(hn->flags & flags2) &&
-		domatch(hn->nam, com, 0))
+		domatch(hn->nam, com, 0)) {
 		scanfunc(hn, scanflags);
 		match++;
+	    }
 	}
 
     ht->scan = NULL;

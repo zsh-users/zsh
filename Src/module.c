@@ -90,6 +90,35 @@ addbuiltins(char const *nam, Builtin binl, int size)
     return hadf ? hads : 1;
 }
 
+/* The list of function wrappers defined. */
+
+/**/
+FuncWrap wrappers;
+
+/* This adds a definition for a wrapper. Return value is one in case of *
+ * error and zero if all went fine. */
+
+/**/
+int
+addwrapper(Module m, FuncWrap w)
+{
+    FuncWrap p, q;
+
+    if (w->flags & WRAPF_ADDED)
+	return 1;
+    for (p = wrappers, q = NULL; p; q = p, p = p->next);
+    if (q)
+	q->next = w;
+    else
+	wrappers = w;
+    w->next = NULL;
+    w->flags |= WRAPF_ADDED;
+    w->module = m;
+    w->count = 0;
+
+    return 0;
+}
+
 #ifdef DYNAMIC
 
 /* $module_path ($MODULE_PATH) */
@@ -159,6 +188,31 @@ deletebuiltins(char const *nam, Builtin binl, int size)
 	b->flags &= ~BINF_ADDED;
     }
     return hadf ? hads : 1;
+}
+
+/* This removes the given wrapper definition from the list. Returned is *
+ * one in case of error and zero otherwise. */
+
+/**/
+int
+deletewrapper(Module m, FuncWrap w)
+{
+    FuncWrap p, q;
+
+    if (w->flags & WRAPF_ADDED) {
+	for (p = wrappers, q = NULL; p && p != w; q = p, p = p->next);
+
+	if (p) {
+	    if (q)
+		q->next = p->next;
+	    else
+		wrappers = p->next;
+	    p->flags &= ~WRAPF_ADDED;
+
+	    return 0;
+	}
+    }
+    return 1;
 }
 
 #ifdef AIXDYNAMIC
@@ -498,6 +552,8 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 	return bin_zmodload_dep(nam, args, ops);
     else if(ops['a'])
 	return bin_zmodload_auto(nam, args, ops);
+    else if (ops['c'] || ops['C'])
+	return bin_zmodload_cond(nam, args, ops);
     else
 	return bin_zmodload_load(nam, args, ops);
 }
@@ -632,6 +688,98 @@ bin_zmodload_auto(char *nam, char **args, char *ops)
 
 /**/
 static int
+bin_zmodload_cond(char *nam, char **args, char *ops)
+{
+    int ret = 0;
+
+    if (ops['u']) {
+	/* remove autoloaded conditions */
+	for (; *args; args++) {
+	    Conddef cd = getconddef(ops['I'], *args, 0);
+
+	    if (!cd) {
+		if (!ops['i']) {
+		    zwarnnam(nam, "%s: no such condition", *args, 0);
+		    ret = 1;
+		}
+	    } else if (cd->flags & CONDF_ADDED) {
+		zwarnnam(nam, "%s: condition is already defined", *args, 0);
+		ret = 1;
+	    } else
+		deleteconddef(cd);
+	}
+	return ret;
+    } else if (!*args) {
+	/* list autoloaded conditions */
+	Conddef p;
+
+	for (p = condtab; p; p = p->next) {
+	    if (p->module) {
+		if (ops['L']) {
+		    fputs("zmodload -c", stdout);
+		    if (p->flags & CONDF_INFIX)
+			putchar('I');
+		    printf(" %s %s\n", p->module, p->name);
+		} else {
+		    fputs("post ", stdout);
+		    if (p->flags & CONDF_INFIX)
+			fputs("infix ", stdout);
+		    printf("%s (%s)\n",p->name, p->module);
+		}
+	    }
+	}
+	return 0;
+    } else {
+	/* add autoloaded conditions */
+	char *modnam;
+
+	modnam = *args++;
+	if(isset(RESTRICTED) && strchr(modnam, '/')) {
+	    zwarnnam(nam, "%s: restricted", modnam, 0);
+	    return 1;
+	}
+	do {
+	    char *cnam = *args ? *args++ : modnam;
+	    if (strchr(cnam, '/')) {
+		zwarnnam(nam, "%s: `/' is illegal in a condition", cnam, 0);
+		ret = 1;
+	    } else if (add_autocond(cnam, ops['I'], modnam) && !ops['i']) {
+		zwarnnam(nam, "failed to add condition %s", cnam, 0);
+		ret = 1;
+	    }
+	} while(*args);
+	return ret;
+    }
+}
+
+/**/
+int
+unload_module(Module m, LinkNode node)
+{
+    if (m->handle && cleanup_module(m))
+	return 1;
+    else {
+	if (m->handle)
+	    dlclose(m->handle);
+	m->handle = NULL;
+	if(!m->deps) {
+	    if (!node) {
+		for (node = firstnode(modules); node; incnode(node))
+		    if (m == (Module) getdata(node))
+			break;
+		if (!node)
+		    return 1;
+	    }
+	    remnode(modules, node);
+	    zsfree(m->nam);
+	    zfree(m, sizeof(*m));
+	}
+    }
+    return 0;
+}
+
+/**/
+static int
 bin_zmodload_load(char *nam, char **args, char *ops)
 {
     LinkNode node;
@@ -654,20 +802,13 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 				goto cont;
 			    }
 		}
-
 		m = (Module) getdata(node);
-		if (m->handle && cleanup_module(m))
-		    ret = 1;
-		else {
-		    if (m->handle)
-			dlclose(m->handle);
-		    m->handle = NULL;
-		    if(!m->deps) {
-			remnode(modules, node);
-			zsfree(m->nam);
-			zfree(m, sizeof(*m));
-		    }
+		if (!(m->flags & MOD_WRAPPER)) {
+		    if (unload_module(m, node))
+			ret = 1;
 		}
+		else
+		    m->flags |= MOD_UNLOAD;
 	    } else if (!ops['i']) {
 		zwarnnam(nam, "no such module %s", *args, 0);
 		ret = 1;
@@ -708,6 +849,169 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 	}
 	return ret;
     }
+}
+
+#endif /* DYNAMIC */
+
+/* The list of module-defined conditions. */
+
+/**/
+Conddef condtab;
+
+/* This gets a condition definition with the given name. The first        *
+ * argument says if we have to look for an infix condition. The last      *
+ * argument is non-zero if we should autoload modules if needed. */
+
+/**/
+Conddef
+getconddef(int inf, char *name, int autol)
+{
+    Conddef p;
+#ifdef DYNAMIC
+    int f = 1;
+#endif
+
+    do {
+	for (p = condtab; p; p = p->next) {
+	    if ((!!inf == !!(p->flags & CONDF_INFIX)) &&
+		!strcmp(name, p->name))
+		break;
+	}
+#ifdef DYNAMIC
+	if (autol && p && p->module) {
+	    /* This is a definition for an autoloaded condition, load the *
+	     * module if we haven't tried that already. */
+	    if (f) {
+		load_module(p->module);
+		f = 0;
+		p = NULL;
+	    } else
+		break;
+	} else
+#endif
+	    break;
+    } while (!p);
+    return p;
+}
+
+#ifdef DYNAMIC
+
+/* This adds the given condition definition. The return value is zero on *
+ * success and 1 on failure. If there is a matching definition for an    *
+ * autoloaded condition, it is removed. */
+
+/**/
+int
+addconddef(Conddef c)
+{
+    Conddef p = getconddef((c->flags & CONDF_INFIX), c->name, 0);
+
+    if (p) {
+	if (!p->module || (p->flags & CONDF_ADDED))
+	    return 1;
+
+	/* There is an autoload definition. */
+
+	deleteconddef(p);
+    }
+    c->next = condtab;
+    condtab = c;
+    return 0;
+}
+
+/* This adds multiple condition definitions. This is like addbuiltins(). */
+
+/**/
+int
+addconddefs(char const *nam, Conddef c, int size)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (c->flags & CONDF_ADDED)
+	    continue;
+	if (addconddef(c)) {
+	    zwarnnam(nam, "name clash when adding condition `%s'", c->name, 0);
+	    hadf = 1;
+	} else {
+	    c->flags |= CONDF_ADDED;
+	    hads = 2;
+	}
+	c++;
+    }
+    return hadf ? hads : 1;
+}
+
+/* This adds a definition for autoloading a module for a condition. */
+
+/**/
+int
+add_autocond(char *nam, int inf, char *module)
+{
+    Conddef c = zalloc(sizeof(*c));
+
+    c->name = ztrdup(nam);
+    c->flags = (inf  ? CONDF_INFIX : 0);
+    c->module = ztrdup(module);
+
+    if (addconddef(c)) {
+	zsfree(c->name);
+	zsfree(c->module);
+	zfree(c, sizeof(*c));
+
+	return 1;
+    }
+    return 0;
+}
+
+/* This removes the given condition definition from the list(s). If this *
+ * is a definition for a autoloaded condition, the memory is freed. */
+
+/**/
+int
+deleteconddef(Conddef c)
+{
+    Conddef p, q;
+
+    for (p = condtab, q = NULL; p && p != c; q = p, p = p->next);
+
+    if (p) {
+	if (q)
+	    q->next = p->next;
+	else 
+	    condtab = p->next;
+		
+	if (p->module) {
+	    /* autoloaded, free it */
+	    zsfree(p->name);
+	    zsfree(p->module);
+	    zfree(p, sizeof(*p));
+	}
+	return 0;
+    }
+    return -1;
+}
+
+/* This removes multiple condition definitions (like deletebuiltins()). */
+
+/**/
+int
+deleteconddefs(char const *nam, Conddef c, int size)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (!(c->flags & CONDF_ADDED))
+	    continue;
+	if (deleteconddef(c)) {
+	    zwarnnam(nam, "condition `%s' already deleted", c->name, 0);
+	    hadf = 1;
+	} else
+	    hads = 2;
+	c->flags &= ~CONDF_ADDED;
+	c++;
+    }
+    return hadf ? hads : 1;
 }
 
 #endif /* DYNAMIC */

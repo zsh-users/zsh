@@ -634,7 +634,7 @@ preprompt(void)
     /* If a shell function named "precmd" exists, *
      * then execute it.                           */
     if ((list = getshfunc("precmd")) != &dummy_list)
-	doshfunc(list, NULL, 0, 1);
+	doshfunc("precmd", list, NULL, 0, 1);
     if (errflag)
 	return;
 
@@ -643,7 +643,7 @@ preprompt(void)
      * executed "periodic", then execute it now.                    */
     if (period && (time(NULL) > lastperiodic + period) &&
 	(list = getshfunc("periodic")) != &dummy_list) {
-	doshfunc(list, NULL, 0, 1);
+	doshfunc("periodic", list, NULL, 0, 1);
 	lastperiodic = time(NULL);
     }
     if (errflag)
@@ -732,7 +732,7 @@ checkmailpath(char **s)
 	    }
 	} else {
 	    if (st.st_size && st.st_atime <= st.st_mtime &&
-		st.st_mtime > lastmailcheck)
+		st.st_mtime > lastmailcheck) {
 		if (!u) {
 		    fprintf(shout, "You have new mail.\n");
 		    fflush(shout);
@@ -751,6 +751,7 @@ checkmailpath(char **s)
 			underscore = usav;
 		    } LASTALLOC;
 		}
+	    }
 	    if (isset(MAILWARNING) && st.st_atime > st.st_mtime &&
 		st.st_atime > lastmailcheck && st.st_size) {
 		fprintf(shout, "The mail in %s has been read.\n", unmeta(*s));
@@ -1066,14 +1067,14 @@ zstrtol(const char *s, char **t, int base)
     else if (*s == '+')
 	s++;
 
-    if (!base)
+    if (!base) {
 	if (*s != '0')
 	    base = 10;
 	else if (*++s == 'x' || *s == 'X')
 	    base = 16, s++;
 	else
 	    base = 8;
- 
+    }
     if (base <= 10)
 	for (; *s >= '0' && *s < ('0' + base); s++)
 	    ret = ret * base + *s - '0';
@@ -2137,22 +2138,24 @@ dupstruct2(void *a)
 		n = dupstring(on);
 		break;
 	    case NT_LIST | NT_NODE:
-		if (heap)
+		if (heap) {
 		    if (useheap)
 			n =  duplist(on, (VFunc) dupstruct2);
 		    else
 			n = list2arr(on, (VFunc) dupstruct2);
+		}
 		else if (useheap)
 		    n = arr2list(on, (VFunc) dupstruct2);
 		else
 		    n = duparray(on, (VFunc) dupstruct2);
 		break;
 	    case NT_LIST | NT_STR:
-		if (heap)
+		if (heap) {
 		    if (useheap)
 			n = duplist(on, (VFunc) dupstring);
 		    else
 			n = list2arr(on, (VFunc) ztrdup);
+		}
 		else if (useheap)
 		    n = arr2list(on, (VFunc) dupstring);
 		else
@@ -2378,11 +2381,12 @@ inittyptab(void)
     for (t0 = (int)STOUC(Pound); t0 <= (int)STOUC(Nularg); t0++)
 	typtab[t0] |= ITOK | IMETA;
     for (s = ifs ? ifs : DEFAULT_IFS; *s; s++) {
-	if (inblank(*s))
+	if (inblank(*s)) {
 	    if (s[1] == *s)
 		s++;
 	    else
 		typtab[STOUC(*s)] |= IWSEP;
+	}
 	typtab[STOUC(*s == Meta ? *++s ^ 32 : *s)] |= ISEP;
     }
     for (s = wordchars ? wordchars : DEFAULT_WORDCHARS; *s; s++)
@@ -2402,6 +2406,21 @@ arrdup(char **s)
     y = x = (char **) ncalloc(sizeof(char *) * (arrlen(s) + 1));
 
     while ((*x++ = dupstring(*s++)));
+    return y;
+}
+
+/**/
+char **
+listarr(LinkList l)
+{
+    char **x, **y;
+    LinkNode n;
+
+    x = y = (char **) ncalloc((countlinknodes(l) + 1) * sizeof(char *));
+
+    for (n = firstnode(l); n; incnode(n))
+	*x++ = dupstring((char *) getdata(n));
+    *x = NULL;
     return y;
 }
 
@@ -3009,11 +3028,12 @@ niceztrdup(char const *s)
     char *p = buf, *n, *ret;
 
     while ((c = *s++)) {
-	if (itok(c))
+	if (itok(c)) {
 	    if (c <= Comma)
 		c = ztokens[c - Pound];
 	    else 
 		continue;
+	}
 	if (c == Meta)
 	    c = *s++ ^ 32;
 	n = nicechar(c);
@@ -3034,11 +3054,12 @@ nicezputs(char const *s, FILE *stream)
     int c;
 
     while ((c = *s++)) {
-	if (itok(c))
+	if (itok(c)) {
 	    if (c <= Comma)
 		c = ztokens[c - Pound];
 	    else 
 		continue;
+	}
 	if (c == Meta)
 	    c = *s++ ^ 32;
 	if(fputs(nicechar(c), stream) < 0)
@@ -3057,11 +3078,12 @@ niceztrlen(char const *s)
     int c;
 
     while ((c = *s++)) {
-	if (itok(c))
+	if (itok(c)) {
 	    if (c <= Comma)
 		c = ztokens[c - Pound];
 	    else 
 		continue;
+	}
 	if (c == Meta)
 	    c = *s++ ^ 32;
 	l += strlen(nicechar(STOUC(c)));
@@ -3328,13 +3350,14 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		}
 	    default:
 		if ((idigit(*s) && *s < '8') || *s == 'x') {
-		    if (!fromwhere)
+		    if (!fromwhere) {
 			if (*s == '0')
 			    s++;
 			else if (*s != 'x') {
 			    *t++ = '\\', s--;
 			    continue;
 			}
+		    }
 		    if (s[1] && s[2] && s[3]) {
 			svchar = s[3];
 			s[3] = '\0';

@@ -44,7 +44,7 @@ Cmlist cmatcher;
 /* pointers to functions required by zle */
 
 /**/
-void (*printcompctlptr) _((char *, Compctl, int));
+void (*printcompctlptr) _((char *, Compctl, int, int));
 
 /**/
 Compctl (*compctl_widgetptr) _((char *, char **));

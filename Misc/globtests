@@ -112,5 +112,6 @@ t fooxx         ((#i)FOOX)x
 f fooxx         ((#i)FOOX)X
 f BAR           (bar|(#i)foo)
 t FOO           (bar|(#i)foo)
+t Modules       (#i)*m*
 EOT
 print "$failed tests failed."
