@@ -1,3 +1,15 @@
+2001-07-10  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15357: Completion/Base/Completer/_prefix, Src/Zle/compcore.c,
+	Src/Zle/zle_tricky.c: prefix completion: make e-o-c-p leave a
+	space before the cursor, make _prefix leave the cursor after
+	the inserted match even if only a single match; and make the
+	C-code not show explanation strings if the completion function
+	it doesn't want a list
+
+	* 15352: Completion/Unix/Command/_man: remove not only numeric
+	suffixes, but also `.n' and the like
+
 2001-07-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15321: Src/exec.c: Fix line numbers in an error message; unwind

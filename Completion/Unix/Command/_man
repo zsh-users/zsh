@@ -1,0 +1,61 @@
+#compdef man apropos whatis
+
+_man() {
+  local dirs expl mrd awk
+
+  if [[ $service == man ]] && (( $words[(I)-l] + $words[(I)--local-file] )); then
+    _files || return 0
+  fi
+
+  if (( ! $#manpath )); then
+    local mp
+    mp=($(manpath 2>/dev/null))
+    [[ "$mp" == *:* ]] && mp=( ${(s.:.)mp} )
+    manpath=( $mp )
+  fi
+
+  (( $#manpath )) || manpath=( ${(s.:.)$(manpath 2>/dev/null)} ) ||
+      manpath=( /usr/man(-/) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/) )
+
+  # `sman' is the SGML manual directory for Solaris 7.
+  # 1M is system administrator commands on SVR4
+
+  mrd=(${^manpath/\%L/${LANG:-En_US.ASCII}}/mandb(N))
+
+  if [[ $words[2] = (<->*|1M|l|n) ]]; then
+    dirs=( $^manpath/(sman|man|cat)${words[2]}/ )
+    awk="\$2 == \"$words[2]\" {print \$1}"
+  else
+    dirs=( $^manpath/(sman|man|cat)*/ )
+    awk='{print $1}'
+  fi
+
+  _wanted manuals expl 'manual page' _man_pages
+}
+
+_man_pages() {
+  local matcher pages dummy
+
+  zparseopts -E M+:=matcher
+
+  if (( $#matcher )); then
+    matcher=( ${matcher:#-M} )
+    matcher="$matcher"
+  else
+    matcher=
+  fi
+
+  pages=( $dirs )
+  compfiles -p pages '' '' "$matcher" '' dummy '*'
+  pages=( ${^~pages}(N:t:r) )
+
+  (($#mrd)) && pages[$#pages+1]=($(awk $awk $mrd))
+
+  # Remove any compression suffix, then remove the minimum possible string
+  # beginning with .<->: that handles problem cases like files called
+  # `POSIX.1.5'.
+
+  compadd "$@" - ${pages%.(?|<->*)}
+}
+
+_man "$@"
