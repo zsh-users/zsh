@@ -91,6 +91,8 @@ static struct zleparam {
 	zleunsetfn, NULL },
     { "LASTSEARCH", PM_SCALAR | PM_READONLY, NULL, FN(get_lsearch),
         zleunsetfn, NULL },
+    { "CONTEXT", PM_SCALAR | PM_READONLY, NULL, FN(get_context),
+	zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
 
@@ -547,4 +549,28 @@ get_lsearch(Param pm)
 	return metafy(previous_search, previous_search_len, META_HEAPDUP);
     else
 	return "";
+}
+
+/**/
+static char *
+get_context(Param pm)
+{
+    switch (zlecontext) {
+    case ZLCON_LINE_CONT:
+	return "cont";
+	break;
+
+    case ZLCON_SELECT:
+	return "select";
+	break;
+
+    case ZLCON_VARED:
+	return "vared";
+	break;
+
+    case ZLCON_LINE_START:
+    default:
+	return "start";
+	break;
+    }
 }

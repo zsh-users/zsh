@@ -28,7 +28,7 @@
  */
 
 #define trashzle()      trashzleptr()
-#define zleread(X,Y,H)  zlereadptr(X,Y,H)
+#define zleread(X,Y,H,C)  zlereadptr(X,Y,H,C)
 #define spaceinline(X)  spaceinlineptr(X)
 #define zrefresh()      refreshptr()
 
@@ -1761,6 +1761,17 @@ struct heap {
 #define ZLRF_NOSETTY	0x02	/* Don't set tty before return */
 #define ZLRF_IGNOREEOF  0x04	/* Ignore an EOF from the keyboard */
 
+/***************************/
+/* Context of zleread call */
+/***************************/
+
+enum {
+    ZLCON_LINE_START,		/* Command line at PS1 */
+    ZLCON_LINE_CONT,		/* Command line at PS2 */
+    ZLCON_SELECT,		/* Select loop */
+    ZLCON_VARED			/* Vared command */
+};
+
 /****************/
 /* Entry points */
 /****************/
@@ -1773,7 +1784,7 @@ typedef int (*CompctlReadFn) _((char *, char **, Options, char *));
 
 typedef void (*ZleVoidFn) _((void));
 typedef void (*ZleVoidIntFn) _((int));
-typedef unsigned char * (*ZleReadFn) _((char *, char *, int));
+typedef unsigned char * (*ZleReadFn) _((char *, char *, int, int));
 
 /***************************************/
 /* Hooks in core.                      */

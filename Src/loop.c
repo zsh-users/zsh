@@ -245,7 +245,7 @@ execselect(Estate state, int do_exec)
 		    int oef = errflag;
 
 		    isfirstln = 1;
-		    str = (char *)zleread(prompt3, NULL, 0);
+		    str = (char *)zleread(prompt3, NULL, 0, ZLCON_SELECT);
 		    if (errflag)
 			str = NULL;
 		    errflag = oef;

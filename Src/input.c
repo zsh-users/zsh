@@ -223,6 +223,7 @@ static int
 inputline(void)
 {
     char *ingetcline, *ingetcpmptl = NULL, *ingetcpmptr = NULL;
+    int context = ZLCON_LINE_START;
 
     /* If reading code interactively, work out the prompts. */
     if (interact && isset(SHINSTDIN)) {
@@ -230,6 +231,7 @@ inputline(void)
 	    ingetcpmptl = prompt2;
 	    if (rprompt2)
 		ingetcpmptr = rprompt2;
+	    context = ZLCON_LINE_CONT;
 	}
 	else {
 	    ingetcpmptl = prompt;
@@ -272,7 +274,8 @@ inputline(void)
 	int flags = ZLRF_HISTORY|ZLRF_NOSETTY;
 	if (isset(IGNOREEOF))
 	    flags |= ZLRF_IGNOREEOF;
-	ingetcline = (char *)zleread(ingetcpmptl, ingetcpmptr, flags);
+	ingetcline = (char *)zleread(ingetcpmptl, ingetcpmptr, flags,
+				     context);
 	histdone |= HISTFLAG_SETTY;
     }
     if (!ingetcline) {

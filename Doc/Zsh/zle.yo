@@ -593,6 +593,25 @@ The number of screen lines needed for the edit buffer currently
 displayed on screen (i.e. without any changes to the preceding
 parameters done after the last redisplay); read-only.
 )
+vindex(CONTEXT)
+item(tt(CONTEXT) (scalar))(
+The context in which zle was called to read a line; read-only.  One of
+the values:
+startitem()
+item(start)(
+The start of a command line (at prompt tt(PS1)).
+)
+item(cont)(
+A continuation to a command line (at prompt tt(PS2)).
+)
+item(select)(
+In a tt(select) loop.
+)
+item(vared)(
+Editing a variable in tt(vared).
+)
+enditem()
+)
 vindex(CURSOR)
 item(tt(CURSOR) (integer))(
 The offset of the cursor, within the edit buffer.  This is in the range

@@ -58,6 +58,11 @@ mod_export int hascompmod;
 /**/
 int zlereadflags;
 
+/* ZLCON_* flags passed to zleread() */
+
+/**/
+int zlecontext;
+
 /* != 0 if we're done editing */
 
 /**/
@@ -735,7 +740,7 @@ zlecore(void)
 
 /**/
 unsigned char *
-zleread(char *lp, char *rp, int flags)
+zleread(char *lp, char *rp, int flags, int context)
 {
     unsigned char *s;
     int old_errno = errno;
@@ -787,6 +792,7 @@ zleread(char *lp, char *rp, int flags)
     free_prepostdisplay();
 
     zlereadflags = flags;
+    zlecontext = context;
     histline = curhist;
     undoing = 1;
     line = (unsigned char *)zalloc((linesz = 256) + 2);
@@ -838,7 +844,7 @@ zleread(char *lp, char *rp, int flags)
     trashzle();
     free(lpromptbuf);
     free(rpromptbuf);
-    zleactive = zlereadflags = lastlistlen = 0;
+    zleactive = zlereadflags = lastlistlen = zlecontext = 0;
     alarm(0);
 
     freeundo();
@@ -1154,7 +1160,8 @@ bin_vared(char *name, char **args, Options ops, int func)
     if (OPT_ISSET(ops,'h'))
 	hbegin(2);
     isfirstln = OPT_ISSET(ops,'e');
-    t = (char *) zleread(p1, p2, OPT_ISSET(ops,'h') ? ZLRF_HISTORY : 0);
+    t = (char *) zleread(p1, p2, OPT_ISSET(ops,'h') ? ZLRF_HISTORY : 0,
+			 ZLCON_VARED);
     if (OPT_ISSET(ops,'h'))
 	hend(NULL);
     isfirstln = ifl;

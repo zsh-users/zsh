@@ -1146,17 +1146,17 @@ mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 
 /**/
 unsigned char *
-autoload_zleread(char *lp, char *rp, int ha)
+autoload_zleread(char *lp, char *rp, int ha, int con)
 {
     zlereadptr = fallback_zleread;
     if (load_module("zsh/zle"))
 	load_module("zsh/compctl");
-    return zleread(lp, rp, ha);
+    return zleread(lp, rp, ha, con);
 }
 
 /**/
 mod_export unsigned char *
-fallback_zleread(char *lp, char *rp, int ha)
+fallback_zleread(char *lp, char *rp, int ha, int con)
 {
     char *pptbuf;
     int pptlen;
