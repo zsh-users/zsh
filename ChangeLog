@@ -1,3 +1,8 @@
+2001-04-02  Clint Adams  <schizo@debian.org>
+
+	* 13864: Completion/Debian/_apt: complete a
+	"release" name after apt-get -t.
+
 2001-04-01  Oliver Kiddle  <opk@zsh.org>
 
 	* Completion/Builtins/_bindkey, Completion/Builtins/_compdef,

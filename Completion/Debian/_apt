@@ -20,6 +20,7 @@ _apt_arguments () {
   typeset -A canonicalize num_options
   local short_hasarg short_bool short_intlevel short_configfile short_arbitem
   local long_hasarg long_bool long_intlevel long_configfile long_arbitem
+  local short_release long_release
   local comp_hasarg=''
   local opt opts type
 
@@ -32,6 +33,7 @@ _apt_arguments () {
       intlevel) num_options[$opts]=-1;;
       configfile) num_options[$opts]=1;;
       arbitem) num_options[$opts]=-1;;
+      release) num_options[$opts]=1;;
       *) num_options[$opts]=1
 	 comp_hasarg="${comp_hasarg}$opts) $type;;"$'\n'
 	 type=hasarg;;
@@ -55,6 +57,7 @@ _apt_arguments () {
 
   local short_seq false true bool bool_prefix intlevel word word1 nul qnul match
   local comp_bool comp_intlevel comp_configfile comp_arbitem comp_long comp_opt
+  local comp_release
   local regex_short regex_long regex_all
 
   regex_all=( \( "$@" \) )
@@ -78,6 +81,7 @@ _apt_arguments () {
   comp_intlevel=
   comp_configfile='_files'
   comp_arbitem=
+  comp_release='_apt_releases'
 
   comp_short=\
 '{if [[ $PREFIX = -'"$short_seq"' ]]; then
@@ -93,16 +97,16 @@ fi}'
   comp_long=\
 'tmp1="${(j:|:)${(@)${(@M)${(@s:,:)${(@kj:,:)num_options[(R)*~0]}}:#--*}#--}}"
 tmp2=(--${(M)^long_bool:#$~tmp1} --${(M)^long_intlevel:#$~tmp1})
-tmp3=(--${(M)^long_hasarg:#$~tmp1} --${(M)^long_configfile:#$~tmp1} --${(M)^long_arbitem:#$~tmp1})
+tmp3=(--${(M)^long_hasarg:#$~tmp1} --${(M)^long_configfile:#$~tmp1} --${(M)^long_arbitem:#$~tmp1} --${(M)^long_release:#$~tmp1})
 _describe -o option tmp2 -- tmp3 -S= -- bool_prefix -S ""'
 
   comp_long_prefix=\
 '{tmp1="${(j:|:)${(@)${(@M)${(@s:,:)${(@kj:,:)num_options[(R)*~0]}}:#--*}#--}}"
 tmp2=($_ra_left${(M)^long_bool:#$~tmp1} $_ra_left${(M)^long_intlevel:#$~tmp1})
-tmp3=($_ra_left${(M)^long_hasarg:#$~tmp1} $_ra_left${(M)^long_configfile:#$~tmp1} $_ra_left${(M)^long_arbitem:#$~tmp1})
+tmp3=($_ra_left${(M)^long_hasarg:#$~tmp1} $_ra_left${(M)^long_configfile:#$~tmp1} $_ra_left${(M)^long_arbitem:#$~tmp1} $_ra_left${(M)^long_release:#$~tmp1})
 tmp1="${(j:|:)${(@)${(@M)${(@s:,:)${(@kj:,:)num_options[(R)*~0]}}:#-?}#-}}"
 tmp2=("$tmp2[@]" $_ra_left${(M)^short_bool:#$~tmp1} $_ra_left${(M)^short_intlevel:#$~tmp1})
-tmp3=("$tmp3[@]" $_ra_left${(M)^short_hasarg:#$~tmp1} $_ra_left${(M)^short_configfile:#$~tmp1} $_ra_left${(M)^short_arbitem:#$~tmp1})
+tmp3=("$tmp3[@]" $_ra_left${(M)^short_hasarg:#$~tmp1} $_ra_left${(M)^short_configfile:#$~tmp1} $_ra_left${(M)^short_arbitem:#$~tmp1} $_ra_left${(M)^short_release:#$~tmp1})
 _describe -o option tmp2 -- tmp3 -S=}'
 
   comp_opt='{{ ! zstyle -T ":completion:${curcontext}:options" prefix-needed || [[ "$PREFIX" = -* ]] }'" && { $comp_short; $comp_long }}"
@@ -194,6 +198,22 @@ _describe -o option tmp2 -- tmp3 -S=}'
       /"(${(j:|:)short_arbitem})="/
 	-'_apt_consume_short ${match[1][-2]}'
 	\( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
+    )
+  fi
+
+  if (( $#short_release )); then
+    regex_short=("$regex_short[@]"
+      /"$short_seq(${(j:|:)short_release})(=|)"/
+	-'_apt_consume_short ${match[1]%=}'
+	\( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":release name:release:$comp_release" \) \|
+    )
+    regex_long_prefix=("$regex_long_prefix[@]"
+      /"(${(j:|:)short_release})$nul"/
+	-'_apt_consume_short ${match[1][-2]}'
+	/"$word"/ ":releases:release name:$comp_release" \|
+      /"(${(j:|:)short_release})="/
+	-'_apt_consume_short ${match[1][-2]}'
+	\( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":releases:release name:$comp_release" \) \|
     )
   fi
 
@@ -292,6 +312,25 @@ _describe -o option tmp2 -- tmp3 -S=}'
     )
   fi
 
+  if (( $#long_release )); then
+    regex_long=("$regex_long[@]"
+      /"(${(j:|:)long_release})$nul"/
+	-'_apt_consume_long ${match[1]%'$qnul'}'
+	/"$word"/ ":releases:release name:$comp_release" \|
+      /"(${(j:|:)long_release})="/
+	-'_apt_consume_long ${match[1]%=}'
+	\( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":releases:release name:$comp_release" \) \|
+    )
+    regex_long_prefix=("$regex_long_prefix[@]"
+      /"(${(j:|:)long_release})$nul"/
+	-'_apt_consume_long ${match[1]%'$qnul'}'
+	/"$word"/ ":releases:release name:$comp_release" \|
+      /"(${(j:|:)long_release})="/
+	-'_apt_consume_long ${match[1]%=}'
+	\( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":releases:release name:$comp_release" \) \|
+    )
+  fi
+
   regex_all=(
     /"$word"/
     \( /--/+ \( "$regex_long[@]"
@@ -312,17 +351,20 @@ _describe -o option tmp2 -- tmp3 -S=}'
 
     local short_hasarg short_bool short_intlevel short_configfile short_arbitem
     local long_hasarg long_bool long_intlevel long_configfile long_arbitem
+    local short_release long_release
     local bool_prefix
     short_hasarg=($short_hasarg)
     short_bool=($short_bool)
     short_intlevel=($short_intlevel)
     short_configfile=($short_configfile)
     short_arbitem=($short_arbitem)
+    short_release=($short_release)
     long_hasarg=($long_hasarg)
     long_bool=($long_bool)
     long_intlevel=($long_intlevel)
     long_configfile=($long_configfile)
     long_arbitem=($long_arbitem)
+    long_release=($long_release)
     bool_prefix=($bool_prefix)
 
     local current_option tmp1 tmp2 tmp3
@@ -368,6 +410,7 @@ _apt-get () {
     --list-cleanup:bool \
     -c,--config-file:configfile \
     -o,--option:arbitem \
+    -t:release \
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
@@ -478,5 +521,40 @@ _apt-config () {
 
   _apt-config "$@"
 }
+
+_apt_releases_update () {
+  if ( [[ ${+_apt_releases} -eq 0 ]] ||
+      _cache_invalid APT_releases ) && ! _retrieve_cache APT_releases;
+  then
+    _apt_releases=(
+${${${${(M)${(f)"$(apt-cache dump)"}:# #Archive:*}# #Archive: #}:#*\(null\)*}/ /}
+    )
+    typeset -U _apt_releases
+    _store_cache APT_releases _apt_releases
+  fi
+}
+
+_apt_releases () {
+  local command="$argv[$#]" update_policy
+
+  zstyle -s ":completion:*:*:$service:*" cache-policy update_policy
+  if [[ -z "$update_policy" ]]; then
+    zstyle ":completion:*:*:$service:*" cache-policy _apt_caching_policy
+  fi
+
+  _apt_releases_update
+
+  _tags apt-releases && compadd -a _apt_releases
+}
+
+ _apt_caching_policy () {
+    # rebuild if cache is more than a week old
+      oldp=( "$1"(mw+1) )
+        (( $#oldp )) && return 0
+
+          [[ /var/cache/apt/pkgcache.bin -nt "$1" ||
+             /var/lib/dpkg/available -nt "$1" ]]
+          }
+
 
 _apt "$@"
