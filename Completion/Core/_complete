@@ -16,13 +16,11 @@ if [[ -n "$compcontext" ]]; then
 fi
 
 # An entry for `-first-' is the replacement for `compctl -T'
-# Completion functions may set `_compskip' to any value to make the 
-# main loops stop calling other completion functions.
 
 comp="$_comps[-first-]"
 if [[ ! -z "$comp" ]]; then
   "$comp"
-  if (( $+_compskip )); then
+  if [[ "$_compskip" = all ]]; then
     unset _compskip
     (( compstate[nmatches] ))
     return
@@ -55,8 +53,16 @@ else
 
   # If not, we use default completion, if any.
 
-  [[ -z "$comp" ]] && comp="$_comps[-default-]"
+  if [[ -z "$comp" ]]; then
+    if [[ "$_compskip" = *default* ]]; then
+      unset _compskip
+      return 1
+    fi
+    comp="$_comps[-default-]"
+  fi
   [[ -z "$comp" ]] || "$comp"
 fi
+
+unset _compskip
 
 (( compstate[nmatches] ))
