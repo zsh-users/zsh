@@ -51,7 +51,7 @@ case $service in
       '-x[exclude the following names]' \
       '-i[include only the following names]' \
       "(-f -d -R -q -c -b -@ -F -FF -A -T -y -e -h -u -m -g -j -l -ll -L -v -z -t -tt -o -D -J -X -n -0 -1 -2 -3 -4 -5 -6 -7 -8 -9):zip file:_files -g '(#i)*.(zip|[jw]ar)'" \
-      ':file:->files' && return 0
+      '*:file:->files' && return 0
   ;;
   unzip)
     _arguments -C -s \
