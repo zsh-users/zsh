@@ -1,3 +1,11 @@
+2002-05-20  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 16836: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_larch: Function for Tom Lord's arch
+	SCM tool.  This function was mentioned in the specified post.  
+	It still has many problems, but seems to be the fullest larch
+	completion function so far.  Added at Adam's request.
+
 2002-05-17  Peter Stephenson  <pws@csr.com>
 
 	* 17175: Src/math.c: didn't handle parameters before a ternary
