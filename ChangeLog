@@ -1,3 +1,8 @@
+2005-04-04  Peter Stephenson  <pws@csr.com>
+
+	* Dan Nelson: 21082: Src/exec.c, Test/A01grammar.ztst: fix zsh -c
+	exit status on parse error.
+
 2005-04-03  Andrey Borzenkov  <bor@zsh.org>
 
 	* 21086: Completion/Unix/Command/_rsync: fix module completion,

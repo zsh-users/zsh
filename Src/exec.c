@@ -162,6 +162,8 @@ parse_string(char *s)
     lineno = 1;
     p = parse_list();
     lineno = oldlineno;
+    if (tok == LEXERR && !lastval)
+	lastval = 1;
     strinend();
     inpop();
     lexrestore();

@@ -448,3 +448,7 @@
   $ZTST_testdir/../Src/zsh -f <unmatched_quote.txt
 1:Parse error on standard input causes non-zero exit status
 ?zsh: unmatched '
+
+  $ZTST_testdir/../Src/zsh -f -c "'"
+1:Parse error on inline command causes non-zero exit status
+?zsh: unmatched '
