@@ -1,0 +1,33 @@
+#compdef archie
+
+local curcontext="$curcontext" state line expl
+typeset -A opt_args
+
+_arguments -C -s \
+  '-D+[debug level]:debug level:' \
+  '-v[print version]' \
+  '-V[verbose mode]' \
+  '-O+[specifies offset]:offset:' \
+  '-a[list matches as Alex filenames]' \
+  '-c[case sensitive substring search]' \
+  '-e[exact string match (default)]' \
+  '-r[regular expression search]' \
+  '-s[case insensitive substring search]' \
+  '-l[list one match per line]' \
+  '-t[sort inverted by date]' \
+  '-m+[specifies maximum number of hits to return (default 95)]:hits to return:' \
+  '-o+[specifies file to store results in]:file to store:' \
+  '-h+[specifies server host]:server host:->serverhost' \
+  '-L[list known servers and current default]' \
+  '-N-[specifies query niceness level (0-35765)]:niceness level:' \
+  ':string:' && return 0
+
+case "$state" in
+serverhost)
+  : ${(A)archie_servers:=${(M)$(_call_program hosts archie -L):#archie.*}}
+
+  _wanted hosts expl 'archie servers' compadd -a archie_servers && return 0
+  ;;
+esac
+
+return 1
