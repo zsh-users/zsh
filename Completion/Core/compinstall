@@ -1727,17 +1727,19 @@ local tmpout=${TMPPREFIX:-/tmp/zsh}compinstall$$
 # insert.
 #
 { print -r "$startline
-autoload -U compinit
-compinit"
-
-  [[ -n $fpath_line ]] && print -r "$fpath_line"
-
-  print -r "$output"
+$output"
   if [[ -n $ifile ]]; then
     line="zstyle :compinstall filename ${(qq)ifile}"
     print -r "$line"
     eval "$line"
   fi
+
+  [[ -n $fpath_line ]] && print -r "$fpath_line"
+
+  print -r "
+autoload -U compinit
+compinit"
+
   print -r "$endline"
 } >$tmpout
 

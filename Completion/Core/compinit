@@ -452,6 +452,15 @@ for _i_line in complete-word delete-char-or-list expand-or-complete \
 done
 zle -la menu-select && zle -C menu-select .menu-select _main_complete
 
+# If the default completer set includes _expand, and tab is bound
+# to expand-or-complete, rebind it to complete-word instead.
+bindkey '^i' | read -A _i_line
+if [[ ${_i_line[2]} = expand-or-complete ]] &&
+  zstyle -a ':completion:' completer _i_line &&
+  (( ${_i_line[(i)_expand]} <= ${#_i_line} )); then
+  bindkey '^i' complete-word
+fi
+
 unfunction compinit
 autoload -U compinit
 

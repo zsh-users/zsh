@@ -73,7 +73,10 @@ autoloaded, and will then re-define all widgets that do completion to use the
 new system.  If you use the tt(menu-select) widget, which is part of the
 tt(zsh/complist) module, you should make sure that that module is loaded
 before the call to tt(compinit) to make sure that that widget is also
-re-defined.
+re-defined.  If completion styles (see below) are set up to perform
+expansion as well as completion by default, and the TAB key is bound to
+tt(expand-or-complete), tt(compinit) will rebind it to tt(complete-word);
+this is necessary to use the correct form of expansion.
 
 Should you need to use the original completion commands, you can still
 bind keys to the old widgets by putting a `tt(.)' in front of the

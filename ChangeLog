@@ -1,5 +1,10 @@
 2000-07-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 12140: Completion/Core/compinit, Completion/Core/compinstall,
+	Doc/Zsh/compsys.yo: compinstall calls compinit after styles
+	are defined; compinit checks for _expand completer and if
+	necessary rebinds ^i to complete-word.
+
 	* Config/version.mk: 3.1.9-dev-2.
 
 	* 12138: Src/params.c, Test/06arith.ztst: setting of array
