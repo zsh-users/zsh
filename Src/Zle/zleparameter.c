@@ -198,14 +198,14 @@ static struct pardef partab[] = {
 
 /**/
 int
-setup_zleparameter(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_zleparameter(Module m)
+boot_(Module m)
 {
     struct pardef *def;
 
@@ -232,7 +232,7 @@ boot_zleparameter(Module m)
 
 /**/
 int
-cleanup_zleparameter(Module m)
+cleanup_(Module m)
 {
     Param pm;
     struct pardef *def;
@@ -249,7 +249,7 @@ cleanup_zleparameter(Module m)
 
 /**/
 int
-finish_zleparameter(Module m)
+finish_(Module m)
 {
     return 0;
 }

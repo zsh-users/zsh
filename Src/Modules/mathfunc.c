@@ -450,21 +450,21 @@ math_func(char *name, int argc, mnumber *argv, int id)
 
 /**/
 int
-setup_mathfunc(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_mathfunc(Module m)
+boot_(Module m)
 {
     return !addmathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
 }
 
 /**/
 int
-cleanup_mathfunc(Module m)
+cleanup_(Module m)
 {
     deletemathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
     return 0;
@@ -472,7 +472,7 @@ cleanup_mathfunc(Module m)
 
 /**/
 int
-finish_mathfunc(Module m)
+finish_(Module m)
 {
     return 0;
 }

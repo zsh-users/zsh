@@ -2,7 +2,7 @@ COMMENT(!MOD!
 Some basic file manipulation commands as builtins.
 !MOD!)
 cindex(files, manipulating)
-The tt(files) module makes some standard commands available as builtins:
+The tt(zsh/files) module makes some standard commands available as builtins:
 
 startitem()
 findex(chgrp)

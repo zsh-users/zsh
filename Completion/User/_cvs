@@ -489,7 +489,7 @@ _cvs_extract_file_entries () {
 (( $+functions[_cvs_extract_modifiedfile_entries] )) ||
 _cvs_extract_modifiedfile_entries () {
   if zstyle -t ":completion${curcontext}:cvs" disable-stat ||
-     ! { zmodload -e stat || zmodload stat }; then
+     ! { zmodload -e zsh/stat || zmodload zsh/stat }; then
     _cvs_extract_file_entries
     return
   fi

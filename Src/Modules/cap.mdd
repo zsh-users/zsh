@@ -1,3 +1,5 @@
+name=zsh/cap
+
 autobins="cap getcap setcap"
 
 objects="cap.o"

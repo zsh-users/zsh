@@ -1,3 +1,5 @@
+name=zsh/rlimits
+
 autobins="limit ulimit unlimit"
 
 objects="rlimits.o"

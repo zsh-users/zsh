@@ -1350,7 +1350,7 @@ struct hookdef comphooks[] = {
 
 /**/
 int
-setup_complete(Module m)
+setup_(Module m)
 {
     hasperm = 0;
 
@@ -1371,7 +1371,7 @@ setup_complete(Module m)
 
 /**/
 int
-boot_complete(Module m)
+boot_(Module m)
 {
     addhookfunc("complete", (Hookfn) do_completion);
     addhookfunc("before_complete", (Hookfn) before_complete);
@@ -1391,7 +1391,7 @@ boot_complete(Module m)
 
 /**/
 int
-cleanup_complete(Module m)
+cleanup_(Module m)
 {
     deletehookfunc("complete", (Hookfn) do_completion);
     deletehookfunc("before_complete", (Hookfn) before_complete);
@@ -1410,7 +1410,7 @@ cleanup_complete(Module m)
 
 /**/
 int
-finish_complete(Module m)
+finish_(Module m)
 {
     if (compwords)
 	freearray(compwords);

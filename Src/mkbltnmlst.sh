@@ -11,7 +11,7 @@ test "x$srcdir" = "x"   && srcdir=.
 MODBINS=${MODBINS-modules-bltin}
 XMODCF=${XMODCF-$srcdir/xmods.conf}
 
-bin_mods=" zsh "`sed 's/^/ /;s/$/ /' $MODBINS`
+bin_mods=" zsh/main "`sed 's/^/ /;s/$/ /' $MODBINS`
 x_mods=`cat $XMODCF`
 . ./modules.index
 
@@ -20,6 +20,7 @@ trap "rm -f $1; exit 1" 1 2 15
 exec > $1
 
 for x_mod in $x_mods; do
+    q_x_mod=`echo $x_mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
     case "$bin_mods" in
     *" $x_mod "*)
         echo "/* linked-in known module \`$x_mod' */"
@@ -30,10 +31,10 @@ for x_mod in $x_mods; do
         echo "/* non-linked-in known module \`$x_mod' */"
 	linked=no
     esac
-    eval "loc=\$loc_$x_mod"
+    eval "modfile=\$modfile_$q_x_mod"
     unset moddeps autobins autoinfixconds autoprefixconds autoparams
     unset automathfuncs
-    . $srcdir/../$loc/${x_mod}.mdd
+    . $srcdir/../$modfile
     for bin in $autobins; do
 	echo "    add_autobin(\"$bin\", \"$x_mod\");"
     done
@@ -58,10 +59,11 @@ done
 echo
 done_mods=" "
 for bin_mod in $bin_mods; do
+    q_bin_mod=`echo $bin_mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
     echo "/* linked-in module \`$bin_mod' */"
-    eval "loc=\$loc_$bin_mod"
+    eval "modfile=\$modfile_$q_bin_mod"
     unset moddeps
-    . $srcdir/../$loc/${bin_mod}.mdd
+    . $srcdir/../$modfile
     for dep in $moddeps; do
 	case $done_mods in
 	    *" $dep "*)
@@ -72,14 +74,14 @@ for bin_mod in $bin_mods; do
 	esac
     done
     echo "    {"
-    echo "        extern int setup_${bin_mod} _((Module));"
-    echo "        extern int boot_${bin_mod} _((Module));"
-    echo "        extern int cleanup_${bin_mod} _((Module));"
-    echo "        extern int finish_${bin_mod} _((Module));"
+    echo "        extern int setup_${q_bin_mod} _((Module));"
+    echo "        extern int boot_${q_bin_mod} _((Module));"
+    echo "        extern int cleanup_${q_bin_mod} _((Module));"
+    echo "        extern int finish_${q_bin_mod} _((Module));"
     echo
     echo "        register_module(\"$bin_mod\","
-    echo "                        setup_${bin_mod}, boot_${bin_mod},"
-    echo "                        cleanup_${bin_mod}, finish_${bin_mod});"
+    echo "                        setup_${q_bin_mod}, boot_${q_bin_mod},"
+    echo "                        cleanup_${q_bin_mod}, finish_${q_bin_mod});"
     echo "    }"
     done_mods="$done_mods$bin_mod "
 done

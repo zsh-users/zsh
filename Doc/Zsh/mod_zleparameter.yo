@@ -2,7 +2,7 @@ COMMENT(!MOD!
 Access to internals of the Zsh Line Editor via parameters.
 !MOD!)
 cindex(parameters, special)
-The tt(zleparameter) module defines two special parameters that can be 
+The tt(zsh/zleparameter) module defines two special parameters that can be 
 used to access internal information of the Zsh Line Editor (see
 ifzman(zmanref(zshzle))\
 ifnzman(noderef(Zsh Line Editor))\

@@ -1,3 +1,5 @@
+name=zsh/example
+
 autobins="example"
 
 autoinfixconds="ex"

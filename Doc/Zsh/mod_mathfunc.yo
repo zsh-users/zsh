@@ -3,7 +3,8 @@ Standard scientific functions for use in mathematical evaluations.
 !MOD!)
 cindex(functions, mathematical)
 cindex(mathematical functions)
-The tt(mathfunc) module provides standard mathematical functions for use when
+The tt(zsh/mathfunc) module provides standard
+mathematical functions for use when
 evaluating mathematical formulae.  The syntax agrees with normal C and
 FORTRAN conventions, for example,
 

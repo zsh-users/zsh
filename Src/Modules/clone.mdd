@@ -1,3 +1,5 @@
+name=zsh/clone
+
 autobins="clone"
 
 objects="clone.o"

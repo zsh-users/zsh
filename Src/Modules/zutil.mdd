@@ -1,3 +1,5 @@
+name=zsh/zutil
+
 objects="zutil.o"
 
 autobins="zformat zstyle"

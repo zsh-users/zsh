@@ -1,7 +1,7 @@
 COMMENT(!MOD!
 A builtin that provides a timed execution facility within the shell.
 !MOD!)
-The tt(sched) module makes available one builtin command:
+The tt(zsh/sched) module makes available one builtin command:
 
 startitem()
 findex(sched)

@@ -185,14 +185,14 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_sched(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_sched(Module m)
+boot_(Module m)
 {
     if(!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)))
 	return 1;
@@ -202,7 +202,7 @@ boot_sched(Module m)
 
 /**/
 int
-cleanup_sched(Module m)
+cleanup_(Module m)
 {
     struct schedcmd *sch, *schn;
 
@@ -218,7 +218,7 @@ cleanup_sched(Module m)
 
 /**/
 int
-finish_sched(Module m)
+finish_(Module m)
 {
     return 0;
 }

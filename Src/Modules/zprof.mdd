@@ -1,3 +1,5 @@
+name=zsh/zprof
+
 autobins="zprof"
 
 objects="zprof.o"

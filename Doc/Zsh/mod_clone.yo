@@ -1,7 +1,7 @@
 COMMENT(!MOD!
 A builtin that can clone a running shell onto another terminal.
 !MOD!)
-The tt(clone) module makes available one builtin command:
+The tt(zsh/clone) module makes available one builtin command:
 
 startitem()
 findex(clone)

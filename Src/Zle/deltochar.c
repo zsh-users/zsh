@@ -75,14 +75,14 @@ deltochar(char **args)
 
 /**/
 int
-setup_deltochar(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_deltochar(Module m)
+boot_(Module m)
 {
     w_deletetochar = addzlefunction("delete-to-char", deltochar,
                                     ZLE_KILL | ZLE_KEEPSUFFIX);
@@ -100,7 +100,7 @@ boot_deltochar(Module m)
 
 /**/
 int
-cleanup_deltochar(Module m)
+cleanup_(Module m)
 {
     deletezlefunction(w_deletetochar);
     deletezlefunction(w_zaptochar);
@@ -109,7 +109,7 @@ cleanup_deltochar(Module m)
 
 /**/
 int
-finish_deltochar(Module m)
+finish_(Module m)
 {
     return 0;
 }

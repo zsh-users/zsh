@@ -124,21 +124,21 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_cap(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_cap(Module m)
+boot_(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
 /**/
 int
-cleanup_cap(Module m)
+cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
@@ -146,7 +146,7 @@ cleanup_cap(Module m)
 
 /**/
 int
-finish_cap(Module m)
+finish_(Module m)
 {
     return 0;
 }
