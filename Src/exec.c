@@ -3184,7 +3184,7 @@ execautofn(Estate state, int do_exec)
 	if (prog->alloc == EA_MAP)
 	    shf->funcdef = stripkshdef(prog, shf->nam);
 	else
-	    shf->funcdef = zdupeprog(stripkshdef(prog, shf->nam));
+	    shf->funcdef = dupeprog(stripkshdef(prog, shf->nam), 0);
 	shf->flags &= ~PM_UNDEFINED;
     }
     popheap();
@@ -3217,7 +3217,7 @@ loadautofn(Shfunc shf)
     if (prog->alloc == EA_MAP)
 	shf->funcdef = stripkshdef(prog, shf->nam);
     else
-	shf->funcdef = zdupeprog(stripkshdef(prog, shf->nam));
+	shf->funcdef = dupeprog(stripkshdef(prog, shf->nam), 0);
     shf->flags &= ~PM_UNDEFINED;
 
     popheap();
@@ -3359,7 +3359,7 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
  * list of its contents.                                                    */
 
 /**/
-static Eprog
+Eprog
 getfpfunc(char *s)
 {
     char **pp, buf[PATH_MAX];

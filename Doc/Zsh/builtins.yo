@@ -1296,6 +1296,7 @@ findex(zcompile)
 cindex(wordcode, creation)
 cindex(compilation)
 xitem(tt(zcompile) [ tt(-U) ] [ tt(-r) | tt(-m) ] var(file) [ var(name) ... ])
+xitem(tt(zcompile) tt(-c) [ tt(-M) ] [ tt(-r) | tt(-m) ] var(file) [ var(name) ... ])
 item(tt(zcompile -t) var(file) [ var(name) ... ])(
 This builtin command can be used to create and display files
 containing the wordcode for functions or scripts. In the first form, a wordcode
@@ -1342,7 +1343,15 @@ upshot of this is that the wordcode file is machine independent and if
 it is read or mapped, only one half of the file will really be used
 (and mapped).
 
-In the second form, with the tt(-t) option, an existing wordcode file is
+If given the tt(-c) option, the names have to be names currently
+defined in the shell or marked as autoloaded. The definitions for all
+these functions will be written into the wordcode var(file). If the
+tt(-M) option is given, too, the var(name)s are used as patterns and
+all functions whose names match one of these patterns will be
+written. If no var(name) is given, the definitions of all functions
+currently defined or marked as autoloaded will be written. 
+
+In the third form, with the tt(-t) option, an existing wordcode file is
 tested. Without further arguments, the names of the original files
 used for it are listed. The first line tells the version of the shell
 the file was created with and how the file will be used (mapping or

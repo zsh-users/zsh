@@ -1980,7 +1980,7 @@ yyerror(int noerr)
 
 /**/
 mod_export Eprog
-zdupeprog(Eprog p)
+dupeprog(Eprog p, int heap)
 {
     Eprog r;
     int i;
@@ -1989,12 +1989,13 @@ zdupeprog(Eprog p)
     if (p == &dummy_eprog)
 	return p;
 
-    r = (Eprog) zalloc(sizeof(*r));
+    r = (heap ? (Eprog) zhalloc(sizeof(*r)) : (Eprog) zalloc(sizeof(*r)));
     r->alloc = EA_REAL;
     r->dump = NULL;
     r->len = p->len;
     r->npats = p->npats;
-    pp = r->pats = (Patprog *) zcalloc(r->len);
+    pp = r->pats = (heap ? (Patprog *) hcalloc(r->len) :
+		    (Patprog *) zcalloc(r->len));
     r->prog = (Wordcode) (r->pats + r->npats);
     r->strs = ((char *) r->prog) + (p->strs - ((char *) p->prog));
     memcpy(r->prog, p->prog, r->len - (p->npats * sizeof(Patprog)));
@@ -2263,6 +2264,7 @@ int
 bin_zcompile(char *nam, char **args, char *ops, int func)
 {
     int map;
+    char *dump;
 
     if (ops['t']) {
 	Wordcode f;
@@ -2295,14 +2297,19 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	zwarnnam(nam, "too few arguments", NULL, 0);
 	return 1;
     }
+    if ((ops['c'] && ops['U']) || (!ops['c'] && ops['M'])) {
+	zwarnnam(nam, "illegal combination of options", NULL, 0);
+	return 1;
+    }
     map = (ops['m'] ? 2 : (ops['r'] ? 0 : 1));
 
-    if (!args[1])
+    if (!args[1] && !ops['c'])
 	return build_dump(nam, dyncat(*args, FD_EXT), args, ops['U'], map);
 
-    return build_dump(nam,
-		      (strsfx(FD_EXT, *args) ? *args : dyncat(*args, FD_EXT)),
-		      args + 1, ops['U'], map);
+    dump = (strsfx(FD_EXT, *args) ? *args : dyncat(*args, FD_EXT));
+
+    return (ops['c'] ? build_cur_dump(nam, dump, args + 1, ops['M'], map) :
+	    build_dump(nam, dump, args + 1, ops['U'], map));
 }
 
 /* Load the header of a dump file. Returns NULL if the file isn't a
@@ -2374,16 +2381,73 @@ fdswap(Wordcode p, int n)
 
 /* Write a dump file. */
 
+static void
+write_dump(int dfd, LinkList names, LinkList progs, int map,
+	   int hlen, int tlen)
+{
+    LinkNode name, node;
+    int other = 0, ohlen, tmp;
+    wordcode pre[FD_PRELEN];
+    char *tail, *n;
+    struct fdhead head;
+    Eprog prog;
+
+    if (map == 1)
+	map = (tlen >= FD_MINMAP);
+
+    for (ohlen = hlen; ; hlen = ohlen) {
+	fdmagic(pre) = (other ? FD_OMAGIC : FD_MAGIC);
+	fdsetflags(pre, ((map ? FDF_MAP : 0) | other));
+	fdsetother(pre, tlen);
+	strcpy(fdversion(pre), ZSH_VERSION);
+	write(dfd, pre, FD_PRELEN * sizeof(wordcode));
+
+	for (node = firstnode(progs), name = firstnode(names); node;
+	     incnode(node), incnode(name)) {
+	    n = (char *) getdata(name);
+	    prog = (Eprog) getdata(node);
+	    head.start = hlen;
+	    hlen += (prog->len - (prog->npats * sizeof(Patprog)) +
+		     sizeof(wordcode) - 1) / sizeof(wordcode);
+	    head.len = prog->len - (prog->npats * sizeof(Patprog));
+	    head.npats = prog->npats;
+	    head.strs = prog->strs - ((char *) prog->prog);
+	    head.hlen = (sizeof(struct fdhead) / sizeof(wordcode)) +
+		(strlen(n) + sizeof(wordcode)) / sizeof(wordcode);
+	    if ((tail = strrchr(n, '/')))
+		tail++;
+	    else
+		tail= n;
+	    head.tail = tail - n;
+	    if (other)
+		fdswap((Wordcode) &head, sizeof(head) / sizeof(wordcode));
+	    write(dfd, &head, sizeof(head));
+	    tmp = strlen(n) + 1;
+	    write(dfd, n, tmp);
+	    if ((tmp &= (sizeof(wordcode) - 1)))
+		write(dfd, &head, sizeof(wordcode) - tmp);
+	}
+	for (node = firstnode(progs); node; incnode(node)) {
+	    prog = (Eprog) getdata(node);
+	    tmp = (prog->len - (prog->npats * sizeof(Patprog)) +
+		   sizeof(wordcode) - 1) / sizeof(wordcode);
+	    if (other)
+		fdswap(prog->prog, (((Wordcode) prog->strs) - prog->prog));
+	    write(dfd, prog->prog, tmp * sizeof(wordcode));
+	}
+	if (other)
+	    break;
+	other = FDF_OTHER;
+    }
+}
+
 /**/
 static int
 build_dump(char *nam, char *dump, char **files, int ali, int map)
 {
-    int dfd, fd, hlen, tlen, flen, tmp, ona = noaliases, other = 0, ohlen;
-    LinkList progs;
-    LinkNode node;
-    struct fdhead head;
-    wordcode pre[FD_PRELEN];
-    char *file, **ofiles = files, **oofiles = files, *tail;
+    int dfd, fd, hlen, tlen, flen, ona = noaliases;
+    LinkList progs, names;
+    char *file;
     Eprog prog;
 
     if (!strsfx(FD_EXT, dump))
@@ -2394,6 +2458,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 	return 1;
     }
     progs = newlinklist();
+    names = newlinklist();
     noaliases = ali;
 
     for (hlen = FD_PRELEN, tlen = 0; *files; files++) {
@@ -2434,9 +2499,10 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 	zfree(file, flen);
 
 	addlinknode(progs, prog);
+	addlinknode(names, *files);
 
 	flen = (strlen(*files) + sizeof(wordcode)) / sizeof(wordcode);
-	hlen += (sizeof(head) / sizeof(wordcode)) + flen;
+	hlen += (sizeof(struct fdhead) / sizeof(wordcode)) + flen;
 
 	tlen += (prog->len - (prog->npats * sizeof(Patprog)) +
 		 sizeof(wordcode) - 1) / sizeof(wordcode);
@@ -2444,53 +2510,138 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
     noaliases = ona;
 
     tlen = (tlen + hlen) * sizeof(wordcode);
-    if (map == 1)
-	map = (tlen >= FD_MINMAP);
 
-    for (ohlen = hlen; ; hlen = ohlen) {
-	fdmagic(pre) = (other ? FD_OMAGIC : FD_MAGIC);
-	fdsetflags(pre, ((map ? FDF_MAP : 0) | other));
-	fdsetother(pre, tlen);
-	strcpy(fdversion(pre), ZSH_VERSION);
-	write(dfd, pre, FD_PRELEN * sizeof(wordcode));
+    write_dump(dfd, names, progs, map, hlen, tlen);
 
-	for (node = firstnode(progs), ofiles = oofiles; node;
-	     ofiles++, incnode(node)) {
-	    prog = (Eprog) getdata(node);
-	    head.start = hlen;
-	    hlen += (prog->len - (prog->npats * sizeof(Patprog)) +
-		     sizeof(wordcode) - 1) / sizeof(wordcode);
-	    head.len = prog->len - (prog->npats * sizeof(Patprog));
-	    head.npats = prog->npats;
-	    head.strs = prog->strs - ((char *) prog->prog);
-	    head.hlen = (sizeof(struct fdhead) / sizeof(wordcode)) +
-		(strlen(*ofiles) + sizeof(wordcode)) / sizeof(wordcode);
-	    if ((tail = strrchr(*ofiles, '/')))
-		tail++;
-	    else
-		tail= *ofiles;
-	    head.tail = tail - *ofiles;
-	    if (other)
-		fdswap((Wordcode) &head, sizeof(head) / sizeof(wordcode));
-	    write(dfd, &head, sizeof(head));
-	    tmp = strlen(*ofiles) + 1;
-	    write(dfd, *ofiles, tmp);
-	    if ((tmp &= (sizeof(wordcode) - 1)))
-		write(dfd, &head, sizeof(wordcode) - tmp);
-	}
-	for (node = firstnode(progs); node; incnode(node)) {
-	    prog = (Eprog) getdata(node);
-	    tmp = (prog->len - (prog->npats * sizeof(Patprog)) +
-		   sizeof(wordcode) - 1) / sizeof(wordcode);
-	    if (other)
-		fdswap(prog->prog, (((Wordcode) prog->strs) - prog->prog));
-	    write(dfd, prog->prog, tmp * sizeof(wordcode));
-	}
-	if (other)
-	    break;
-	other = FDF_OTHER;
-    }
     close(dfd);
+
+    return 0;
+}
+
+static int
+cur_add_func(Shfunc shf, LinkList names, LinkList progs, int *hlen, int *tlen)
+{
+    Eprog prog;
+
+    if (shf->flags & PM_UNDEFINED) {
+	int ona = noaliases;
+
+	noaliases = (shf->flags & PM_UNALIASED);
+	if (!(prog = getfpfunc(shf->nam)) || prog == &dummy_eprog) {
+	    noaliases = ona;
+
+	    return 1;
+	}
+	if (prog->dump)
+	    prog = dupeprog(prog, 1);
+	noaliases = ona;
+    } else
+	prog = dupeprog(shf->funcdef, 1);
+
+    addlinknode(progs, prog);
+    addlinknode(names, shf->nam);
+
+    *hlen += ((sizeof(struct fdhead) / sizeof(wordcode)) +
+	      ((strlen(shf->nam) + sizeof(wordcode)) / sizeof(wordcode)));
+    *tlen += (prog->len - (prog->npats * sizeof(Patprog)) +
+	      sizeof(wordcode) - 1) / sizeof(wordcode);
+
+    return 0;
+}
+
+/**/
+static int
+build_cur_dump(char *nam, char *dump, char **names, int match, int map)
+{
+    int dfd, hlen, tlen;
+    LinkList progs, lnames;
+    Shfunc shf;
+
+    if (!strsfx(FD_EXT, dump))
+	dump = dyncat(dump, FD_EXT);
+
+    if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
+	zwarnnam(nam, "can't write dump file: %s", dump, 0);
+	return 1;
+    }
+    progs = newlinklist();
+    lnames = newlinklist();
+
+    hlen = FD_PRELEN;
+    tlen = 0;
+
+    if (!*names) {
+	int i;
+	HashNode hn;
+
+	for (i = 0; i < shfunctab->hsize; i++)
+	    for (hn = shfunctab->nodes[i]; hn; hn = hn->next)
+		if (cur_add_func((Shfunc) hn, lnames, progs, &hlen, &tlen)) {
+		    zwarnnam(nam, "can't load function: %s", shf->nam, 0);
+		    errflag = 0;
+		    close(dfd);
+		    unlink(dump);
+		    return 1;
+		}
+    } else if (match) {
+	char *pat;
+	Patprog pprog;
+	int i;
+	HashNode hn;
+
+	for (; *names; names++) {
+	    tokenize(pat = dupstring(*names));
+	    if (!(pprog = patcompile(pat, PAT_STATIC, NULL))) {
+		zwarnnam(nam, "bad pattern: %s", *names, 0);
+		close(dfd);
+		unlink(dump);
+		return 1;
+	    }
+	    for (i = 0; i < shfunctab->hsize; i++)
+		for (hn = shfunctab->nodes[i]; hn; hn = hn->next)
+		    if (!listcontains(lnames, hn->nam) &&
+			pattry(pprog, hn->nam) &&
+			cur_add_func((Shfunc) hn, lnames, progs,
+				     &hlen, &tlen)) {
+			zwarnnam(nam, "can't load function: %s", shf->nam, 0);
+			errflag = 0;
+			close(dfd);
+			unlink(dump);
+			return 1;
+		    }
+	}
+    } else {
+	for (; *names; names++) {
+	    if (errflag ||
+		!(shf = (Shfunc) shfunctab->getnode(shfunctab, *names))) {
+		zwarnnam(nam, "unknown function: %s", *names, 0);
+		errflag = 0;
+		close(dfd);
+		unlink(dump);
+		return 1;
+	    }
+	    if (cur_add_func(shf, lnames, progs, &hlen, &tlen)) {
+		zwarnnam(nam, "can't load function: %s", shf->nam, 0);
+		errflag = 0;
+		close(dfd);
+		unlink(dump);
+		return 1;
+	    }
+	}
+    }
+    if (empty(progs)) {
+	zwarnnam(nam, "no functions", NULL, 0);
+	errflag = 0;
+	close(dfd);
+	unlink(dump);
+	return 1;
+    }
+    tlen = (tlen + hlen) * sizeof(wordcode);
+
+    write_dump(dfd, lnames, progs, map, hlen, tlen);
+
+    close(dfd);
+
     return 0;
 }
 

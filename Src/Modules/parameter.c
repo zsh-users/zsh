@@ -345,7 +345,7 @@ setfunction(char *name, char *val, int dis)
 	return;
     }
     shf = (Shfunc) zalloc(sizeof(*shf));
-    shf->funcdef = zdupeprog(prog);
+    shf->funcdef = dupeprog(prog, 0);
     shf->flags = dis;
 
     if (!strncmp(name, "TRAP", 4) &&

@@ -124,7 +124,7 @@ static struct builtin builtins[] =
     BUILTIN("where", 0, bin_whence, 0, -1, 0, "pmsw", "ca"),
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
     BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcfdipue", NULL),
-    BUILTIN("zcompile", 0, bin_zcompile, 0, -1, 0, "tUmr", NULL),
+    BUILTIN("zcompile", 0, bin_zcompile, 0, -1, 0, "tUmrcM", NULL),
 };
 
 /****************************************/
@@ -3895,7 +3895,7 @@ bin_trap(char *name, char **argv, char *ops, int func)
 	    zwarnnam(name, "undefined signal: %s", *argv, 0);
 	    break;
 	}
-	t = zdupeprog(prog);
+	t = dupeprog(prog, 0);
 	if (settrap(sig, t))
 	    freeeprog(t);
     }

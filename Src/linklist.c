@@ -239,7 +239,7 @@ countlinknodes(LinkList list)
 }
 
 /**/
-void
+mod_export void
 rolllist(LinkList l, LinkNode nd)
 {
     l->last->next = l->first;
@@ -251,7 +251,7 @@ rolllist(LinkList l, LinkNode nd)
 }
 
 /**/
-LinkList
+mod_export LinkList
 newsizedlist(int size)
 {
     LinkList list;
@@ -270,4 +270,17 @@ newsizedlist(int size)
     node[-1].next = NULL;
 
     return list;
+}
+
+/**/
+mod_export int
+listcontains(LinkList list, void *dat)
+{
+    LinkNode node;
+
+    for (node = firstnode(list); node; incnode(node))
+	if (getdata(node) == dat)
+	    return 1;
+
+    return 0;
 }
