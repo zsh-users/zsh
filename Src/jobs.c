@@ -548,8 +548,11 @@ should_report_time(Job j)
     if (j->stat & STAT_TIMED)
 	return 1;
 
-    if (!(v = getvalue(&s, 0)) || (reporttime = getintvalue(v)) < 0)
-	return 0;
+    HEAPALLOC {
+	if (!(v = getvalue(&s, 0)) || (reporttime = getintvalue(v)) < 0) {
+	    LASTALLOC_RETURN 0;
+	}
+    } LASTALLOC;
 
     /* can this ever happen? */
     if (!j->procs)
