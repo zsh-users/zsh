@@ -1,3 +1,20 @@
+2001-11-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16215: Src/subst.c: save and restore mult_isarr in singsub()
+	in case of nested substitution via getoutput().
+
+	* 16201: Src/params.c, Src/utils.c, Src/zsh.h: introduce the
+	PM_NAMEDDIR flag to mark parameters for which a value change
+	should be reflected in the named directory table.
+
+	* 16158: Src/utils.c: interpret TAB as "yes" only in spckword(),
+	not in getquery() which is also used by other callers.
+
+	* 16094: Src/compat.c: zopenmax() shouldn't return the true limit
+	on the number of descriptors, as that might be a very large number
+	and we really only care about the highest-numbered descriptor that
+	is already open.
+
 2001-11-02  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_oliver_setup,
