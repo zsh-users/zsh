@@ -721,9 +721,438 @@ bin_zformat(char *nam, char **args, char *ops, int func)
     return 1;
 }
 
+/* Regexparse stuff. */
+
+typedef struct {
+    int cutoff;
+    char *pattern;
+    Patprog patprog;
+    char *guard;
+    char *action;
+    LinkList branches;
+} RParseState;
+
+typedef struct {
+  RParseState *state;
+  LinkList actions;
+} RParseBranch;
+
+typedef struct {
+    LinkList nullacts;
+    LinkList in;
+    LinkList out;
+} RParseResult;
+
+static char **rparseargs;
+static LinkList rparsestates;
+
+static int rparsealt(RParseResult *result, jmp_buf *perr);
+
+static void
+connectstates(LinkList out, LinkList in)
+{
+    LinkNode outnode, innode, ln;
+    for(outnode = firstnode(out); outnode; outnode = nextnode(outnode)) {
+	RParseBranch *outbranch = getdata(outnode);
+	for(innode = firstnode(in); innode; innode = nextnode(innode)) {
+	    RParseBranch *inbranch = getdata(innode);
+	    RParseBranch *br = ncalloc(sizeof(*br));
+	    br->state = inbranch->state;
+	    br->actions = newlinklist();
+	    for(ln = firstnode(outbranch->actions); ln; ln = nextnode(ln))
+	      addlinknode(br->actions, getdata(ln));
+	    for(ln = firstnode(inbranch->actions); ln; ln = nextnode(ln))
+	      addlinknode(br->actions, getdata(ln));
+	    addlinknode(outbranch->state->branches, br);
+	}
+    }
+}
+
+static int
+rparseelt(RParseResult *result, jmp_buf *perr)
+{
+    int l;
+    char *s = *rparseargs;
+
+    if(!s)
+        return 1;
+
+    switch(s[0]) {
+    case '/': {
+	RParseState *st;
+	RParseBranch *br;
+	char *pattern, *lookahead;
+	int patternlen, lookaheadlen;
+	l = strlen(s);
+	if(!((2 <= l && s[l - 1] == '/') ||
+	     (3 <= l && s[l - 2] == '/' && (s[l - 1] == '+' ||
+					    s[l - 1] == '-'))))
+	    return 1;
+	st = ncalloc(sizeof(*st));
+	st->branches = newlinklist();
+	st->cutoff = s[l - 1];
+	if(s[l - 1] == '/') {
+	    pattern = s + 1;
+	    patternlen = l - 2;
+	}
+	else {
+	    pattern = s + 1;
+	    patternlen = l - 3;
+	}
+	rparseargs++;
+	if((s = *rparseargs) && s[0] == '%' &&
+	   2 <= (l = strlen(s)) && s[l - 1] == '%') {
+	    rparseargs++;
+	    lookahead = s + 1;
+	    lookaheadlen = l - 2;
+	}
+	else {
+	    lookahead = NULL;
+	}
+	if(patternlen == 2 && !strncmp(pattern, "[]", 2))
+	    st->pattern = NULL;
+	else {
+	    char *cp;
+	    int l = patternlen + 12; /* (#b)((#B)...)...* */
+	    if(lookahead)
+	        l += lookaheadlen + 4; /* (#B)... */
+	    cp = st->pattern = ncalloc(l);
+	    strcpy(cp, "(#b)((#B)");
+	    cp += 9;
+	    strcpy(cp, pattern);
+	    cp += patternlen;
+	    strcpy(cp, ")");
+	    cp += 1;
+	    if(lookahead) {
+		strcpy(cp, "(#B)");
+		cp += 4;
+		strcpy(cp, lookahead);
+		cp += lookaheadlen;
+	    }
+	    strcpy(cp, "*");
+	}
+	st->patprog = NULL;
+	if((s = *rparseargs) && *s == '-') {
+	    rparseargs++;
+	    l = strlen(s);
+	    st->guard = ncalloc(l);
+	    memcpy(st->guard, s + 1, l - 1);
+	    st->guard[l - 1] = '\0';
+	}
+	else
+	    st->guard = NULL;
+	if((s = *rparseargs) && *s == ':') {
+	    rparseargs++;
+	    l = strlen(s);
+	    st->action = ncalloc(l);
+	    memcpy(st->action, s + 1, l - 1);
+	    st->action[l - 1] = '\0';
+	}
+	else
+	    st->action = NULL;
+	result->nullacts = NULL;
+	result->in = newlinklist();
+	br = ncalloc(sizeof(*br));
+	br->state = st;
+	br->actions = newlinklist();
+	addlinknode(result->in, br);
+	result->out = newlinklist();
+	br = ncalloc(sizeof(*br));
+	br->state = st;
+	br->actions = newlinklist();
+	addlinknode(result->out, br);
+	break;
+    }
+    case '(':
+	if(s[1])
+	    return 1;
+	rparseargs++;
+	if(rparsealt(result, perr))
+	    longjmp(*perr, 2);
+	s = *rparseargs;
+	if(!s || s[0] != ')' || s[1] != '\0')
+	    longjmp(*perr, 2);
+	rparseargs++;
+        break;
+    default:
+        return 1;
+    }
+
+    return 0;
+}
+
+static int
+rparseclo(RParseResult *result, jmp_buf *perr)
+{
+    if(rparseelt(result, perr))
+	return 1;
+
+    if(*rparseargs && !strcmp(*rparseargs, "#")) {
+	rparseargs++;
+	while(*rparseargs && !strcmp(*rparseargs, "#"))
+	    rparseargs++;
+
+	connectstates(result->out, result->in);
+	result->nullacts = newlinklist();
+    }
+    return 0;
+}
+
+static void
+prependactions(LinkList acts, LinkList branches)
+{
+    LinkNode aln, bln;
+    for(bln = firstnode(branches); bln; bln = nextnode(bln)) {
+	RParseBranch *br = getdata(bln);
+	for(aln = lastnode(acts); aln != (LinkNode)acts; aln = prevnode(aln))
+	    pushnode(br->actions, getdata(aln));
+    }
+}
+
+static void
+appendactions(LinkList acts, LinkList branches)
+{
+    LinkNode aln, bln;
+    for(bln = firstnode(branches); bln; bln = nextnode(bln)) {
+	RParseBranch *br = getdata(bln);
+	for(aln = firstnode(acts); aln; aln = nextnode(aln))
+	    addlinknode(br->actions, getdata(aln));
+    }
+}
+
+static int
+rparseseq(RParseResult *result, jmp_buf *perr)
+{
+    int l;
+    char *s;
+    RParseResult sub;
+
+    result->nullacts = newlinklist();
+    result->in = newlinklist();
+    result->out = newlinklist();
+
+    while(1) {
+	if((s = *rparseargs) && s[0] == '{' && s[(l = strlen(s)) - 1] == '}') {
+	    char *action = ncalloc(l - 1);
+	    LinkNode ln;
+	    rparseargs++;
+	    memcpy(action, s + 1, l - 2);
+	    action[l - 2] = '\0';
+	    if(result->nullacts)
+		addlinknode(result->nullacts, action);
+	    for(ln = firstnode(result->out); ln; ln = nextnode(ln)) {
+		RParseBranch *br = getdata(ln);
+		addlinknode(br->actions, action);
+	    }
+	}
+        else if(!rparseclo(&sub, perr)) {
+	    connectstates(result->out, sub.in);
+
+	    if(result->nullacts) {
+		prependactions(result->nullacts, sub.in);
+		insertlinklist(sub.in, lastnode(result->in), result->in);
+	    }
+	    if(sub.nullacts) {
+		appendactions(sub.nullacts, result->out);
+		insertlinklist(sub.out, lastnode(result->out), result->out);
+	    }
+	    else
+		result->out = sub.out;
+
+	    if(result->nullacts && sub.nullacts)
+		insertlinklist(sub.nullacts, lastnode(result->nullacts), result->nullacts);
+	    else
+		result->nullacts = NULL;
+	}
+	else
+	    break;
+    }
+    return 0;
+}
+
+static int
+rparsealt(RParseResult *result, jmp_buf *perr)
+{
+    RParseResult sub;
+
+    if(rparseseq(result, perr))
+	return 1;
+
+    while(*rparseargs && !strcmp(*rparseargs, "|")) {
+	rparseargs++;
+	if(rparseseq(&sub, perr))
+	    longjmp(*perr, 2);
+	if(!result->nullacts && sub.nullacts) {
+	    result->nullacts = sub.nullacts;
+	}
+	insertlinklist(sub.in, lastnode(result->in), result->in);
+	insertlinklist(sub.out, lastnode(result->out), result->out);
+    }
+    return 0;
+}
+
+static int
+rmatch(RParseResult *sm, char *subj, char *var1, char *var2)
+{
+    LinkNode ln, lnn;
+    LinkList nexts;
+    LinkList nextslist;
+    RParseBranch *br;
+    RParseState *st = NULL;
+    int point1 = 0, point2 = 0;
+
+    setiparam(var1, point1);
+    setiparam(var2, point2);
+
+    if(!*subj) {
+	if(sm->nullacts)
+	    for(ln = firstnode(sm->nullacts); ln; ln = nextnode(ln)) {
+	        char *action = getdata(ln);
+		if(action)
+		    execstring(action, 1, 0);
+	    }
+	return 0;
+    }
+
+    nextslist = newlinklist();
+    nexts = sm->in;
+    addlinknode(nextslist, nexts);
+    do {
+	char **savematch1, **savembegin1, **savemend1;
+	char **savematch2, **savembegin2, **savemend2;
+	PERMALLOC {
+	  savematch1 = duparray(getaparam("match"), (VFunc) dupstring);
+	  savembegin1 = duparray(getaparam("mbegin"), (VFunc) dupstring);
+	  savemend1 = duparray(getaparam("mend"), (VFunc) dupstring);
+	} LASTALLOC;
+	for(ln = firstnode(nexts); ln; ln = nextnode(ln)) {
+	    int i;
+	    RParseState *next;
+	    br = getdata(ln);
+	    next = br->state;
+	    if(next->pattern && !next->patprog) {
+	        tokenize(next->pattern);
+		if(!(next->patprog = patcompile(next->pattern, 0, NULL))) {
+		    return 2;
+		}
+	    }
+	    if(next->pattern && pattry(next->patprog, subj) &&
+	       (!next->guard || (execstring(next->guard, 1, 0), !lastval))) {
+		LinkNode aln;
+		char **mend = getaparam("mend");
+		int len = atoi(mend[0]);
+		for(i = len; i; i--)
+		  if(*subj++ == Meta)
+		    subj++;
+		PERMALLOC {
+		  savematch2 = duparray(getaparam("match"), (VFunc) dupstring);
+		  savembegin2 = duparray(getaparam("mbegin"), (VFunc) dupstring);
+		  savemend2 = duparray(getaparam("mend"), (VFunc) dupstring);
+		} LASTALLOC;
+		if(savematch1) setaparam("match", savematch1);
+		if(savembegin1) setaparam("mbegin", savembegin1);
+		if(savemend1) setaparam("mend", savemend1);
+		for(aln = firstnode(br->actions); aln; aln = nextnode(aln)) {
+		    char *action = getdata(aln);
+		    if(action)
+			execstring(action, 1, 0);
+		}
+		if(savematch2) setaparam("match", savematch2);
+		if(savembegin2) setaparam("mbegin", savembegin2);
+		if(savemend2) setaparam("mend", savemend2);
+		point2 += len;
+		setiparam(var2, point2);
+		st = br->state;
+		nexts = st->branches;
+		if(next->cutoff == '-' || (next->cutoff == '/' && len)) {
+		  nextslist = newlinklist();
+		  point1 = point2;
+		  setiparam(var1, point1);
+		}
+		addlinknode(nextslist, nexts);
+		break;
+	    }
+	}
+	if(!ln) {
+	    if(savematch1) freearray(savematch1);
+	    if(savembegin1) freearray(savembegin1);
+	    if(savemend1) freearray(savemend1);
+	}
+    } while(ln);
+
+    if(!*subj)
+        for(ln = firstnode(sm->out); ln; ln = nextnode(ln)) {
+	    br = getdata(ln);
+	    if(br->state == st) {
+		for(ln = firstnode(br->actions); ln; ln = nextnode(ln)) {
+		    char *action = getdata(ln);
+		    if(action)
+			execstring(action, 1, 0);
+		}
+		return 0;
+	    }
+	}
+
+    for(lnn = firstnode(nextslist); lnn; lnn = nextnode(lnn)) {
+	nexts = getdata(lnn);
+	for(ln = firstnode(nexts); ln; ln = nextnode(ln)) {
+	    br = getdata(ln);
+	    if(br->state->action)
+		execstring(br->state->action, 1, 0);
+	}
+    }
+    return empty(nexts) ? 2 : 1;
+}
+
+/*
+  usage: regexparse string regex...
+  status:
+    0: matched
+    1: unmatched (all next state candidates are failed)
+    2: unmatched (there is no next state candidates)
+    3: regex parse error
+*/
+
+static int
+bin_regexparse(char *nam, char **args, char *ops, int func)
+{
+    int oldextendedglob = opts[EXTENDEDGLOB];
+    char *var1 = args[0];
+    char *var2 = args[1];
+    char *subj = args[2];
+    int ret;
+    jmp_buf rparseerr;
+    RParseResult result;
+
+    opts[EXTENDEDGLOB] = 1;
+
+    rparseargs = args + 3;
+    HEAPALLOC {
+	pushheap();
+        rparsestates = newlinklist();
+	if(setjmp(rparseerr) || rparsealt(&result, &rparseerr) || *rparseargs) {
+	    if(*rparseargs)
+		zwarnnam(nam, "invalid regex : %s", *rparseargs, 0);
+	    else
+		zwarnnam(nam, "not enough regex arguments", NULL, 0);
+	    ret = 3;
+	}
+	else
+	    ret = 0;
+
+	if(!ret)
+	    ret = rmatch(&result, subj, var1, var2);
+        popheap();
+    } LASTALLOC;
+
+    opts[EXTENDEDGLOB] = oldextendedglob;
+    return ret;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("zstyle", 0, bin_zstyle, 0, -1, 0, NULL, NULL),
     BUILTIN("zformat", 0, bin_zformat, 3, -1, 0, NULL, NULL),
+    BUILTIN("regexparse", 0, bin_regexparse, 3, -1, 0, NULL, NULL),
 };
 
 
