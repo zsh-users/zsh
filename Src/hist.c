@@ -722,7 +722,7 @@ hbegin(int dohist)
 	hwend = ihwend;
 	addtoline = iaddtoline;
 	if (!isset(BANGHIST))
-	    stophist = 2;
+	    stophist = 4;
     }
     chwordpos = 0;
 
