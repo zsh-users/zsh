@@ -4,6 +4,9 @@
 
 2000-04-05  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10502: Src/parse.c: use magic number in zwc files as zwc-version,
+	report zsh-version in error message.
+
 	* 10500: Doc/Zsh/zle.yo, Functions/Zle/incremental-complete-word,
 	Src/utils.c, Src/Zle/zle_params.c: add zle special parameter
 	$PENDING, giving the number of un-read bytes.

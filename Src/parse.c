@@ -2197,7 +2197,10 @@ init_eprog(void)
  * the version string in a field of 40 characters and the descriptions
  * for the functions in the dump file.
  *
- * NOTE: this layout has to be kept; everything after it may be changed.
+ * NOTES:
+ *  - This layout has to be kept; everything after it may be changed.
+ *  - When incompatible changes are made, the FD_MAGIC and FD_OMAGIC
+ *    numbers have to be changed.
  *
  * Each description consists of a struct fdhead followed by the name,
  * aligned to sizeof(wordcode) (i.e. 4 bytes).
@@ -2358,11 +2361,17 @@ load_dump_header(char *nam, char *name, int err)
     }
     if (read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
 	((FD_PRELEN + 1) * sizeof(wordcode)) ||
-	(fdmagic(buf) != FD_MAGIC && fdmagic(buf) != FD_OMAGIC) ||
-	(v = strcmp(ZSH_VERSION, fdversion(buf)))) {
-	if (err)
-	    zwarnnam(nam, (v ? "invalid zwc file, wrong version: %s" :
-			   "invalid zwc file: %s") , name, 0);
+	(v = (fdmagic(buf) != FD_MAGIC && fdmagic(buf) != FD_OMAGIC))) {
+	if (err) {
+	    if (v) {
+		char msg[80];
+
+		sprintf(msg, "zwc file has wrong version (zsh-%s): %%s",
+			fdversion(buf));
+		zwarnnam(nam, msg , name, 0);
+	    } else
+		zwarnnam(nam, "invalid zwc file: %s" , name, 0);
+	}
 	close(fd);
 	return NULL;
     } else {
