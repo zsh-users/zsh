@@ -1,0 +1,23 @@
+texinode(Invocation)(Files)(Introduction)(Top)
+chapter(Invocation)
+cindex(invocation)
+sect(Invocation Options)
+cindex(flags, shell)
+cindex(shell flags)
+If the tt(-s) flag is not present and an argument is given,
+the first argument is taken to be the pathname of a script to
+execute.  The remaining arguments are assigned to the positional
+parameters.  The following flags are interpreted by the shell
+when invoked:
+
+startitem()
+item(tt(-c) var(string))(
+Read commands from var(string).
+)
+item(tt(-i))(
+Force shell to be interactive.
+)
+item(tt(-s))(
+Read command from the standard input.
+)
+enditem()

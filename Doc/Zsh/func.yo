@@ -1,0 +1,107 @@
+texinode(Functions)(Jobs & Signals)(Command Execution)(Top)
+chapter(Functions)
+ifzman(\
+sect(Functions)
+)\
+cindex(functions)
+findex(function)
+The tt(function) reserved word is used to define shell functions.
+Shell functions are read in and stored internally.
+Alias names are resolved when the function is read.
+Functions are executed like commands with the arguments
+passed as positional parameters.
+(See noderef(Command Execution).)
+
+Functions execute in the same process as the caller and
+share all files
+and present working directory with the
+caller.  A trap on tt(EXIT) set inside a function
+is executed after the function completes in the environment
+of the caller.
+
+findex(return, use of)
+The tt(return) builtin is used to return from function calls.
+
+findex(functions, use of)
+Function identifiers can be listed with the tt(functions) builtin.
+findex(unfunction, use of)
+Functions can be undefined with the tt(unfunction) builtin.
+sect(Autoloading Functions)
+findex(autoload, use of)
+cindex(autoloading functions)
+cindex(functions, autoloading)
+A function can be marked as em(undefined) using the tt(autoload) builtin
+(or `tt(functions -u)' or `tt(typeset -fu)').  Such a function has no
+body.  When the function is first executed, the tt(fpath)
+variable will be searched for a file with the same name as the
+function.
+
+pindex(KSH_AUTOLOAD, use of)
+If the tt(KSH_AUTOLOAD) option is set, or the file contains only a simple
+definition of the function, the file's contents will be
+executed.  It would normally define the function in question, but may
+also perform initialisation.
+It is executed in the context of the function
+execution, and may therefore define local parameters.
+
+Otherwise, the function is defined such that its body is the
+complete contents of the file.  This form allows the file to be
+used directly as an executable shell script.
+Initialisation code can be executed, but only as part of the first
+function execution, so the function would have to redefine itself to
+avoid reinitialising on the next execution.
+
+If this processing of the file results in the function being
+fully defined, the function itself is then executed.
+sect(Special Functions)
+The following functions, if defined, have special meaning to
+the shell:
+
+startitem()
+findex(chpwd)
+item(tt(chpwd))(
+Executed whenever the current working directory is changed.
+)
+findex(periodic)
+item(tt(periodic))(
+vindex(PERIOD)
+If the parameter tt(PERIOD)
+is set, this function is executed every tt($PERIOD)
+seconds, just before a prompt.
+)
+findex(precmd)
+item(tt(precmd))(
+Executed before each prompt.
+)
+findex(preexec)
+item(tt(preexec))(
+Executed just after a command has been read and is about to be
+executed.  If the history mechanism is active, the string to be
+executed is passed as an argument.
+)
+item(tt(TRAP)var(NAL))(
+cindex(signals, trapping)
+cindex(trapping signals)
+If defined and non-null,
+this function will be executed whenever the shell
+catches a signal tt(SIG)var(NAL), where var(NAL) is a signal
+name as specified for the tt(kill) builtin.
+The signal number will be passed as the first parameter to the function.
+
+If a function of this form is defined and null,
+the shell and processes spawned by it will ignore tt(SIG)var(NAL).
+)
+findex(TRAPDEBUG)
+item(tt(TRAPDEBUG))(
+Executed after each command.
+)
+findex(TRAPEXIT)
+item(tt(TRAPEXIT))(
+Executed when the shell exits,
+or when the current function exits if defined inside a function.
+)
+findex(TRAPZERR)
+item(tt(TRAPZERR))(
+Executed whenever a command has a non-zero exit status.
+)
+enditem()

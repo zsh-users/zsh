@@ -1,0 +1,41 @@
+-----------------
+KNOWN BUGS IN ZSH
+-----------------
+
+------------------------------------------------------------------------
+Completion has a habit of doing the wrong thing after a
+backslash/newline.
+------------------------------------------------------------------------
+If you suspend "man", zle seems to get into cooked mode.  It works ok
+for plain "less".
+It is not specific neither to man nor to zsh.
+E.g. call the following program foo:
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int status;
+
+    if (!fork())	/* child */
+	execvp(argv[1], argv + 1);
+    else		/* parent */
+	wait(&status);
+}
+Then if you suspend
+% foo less something
+from zsh/bash, zle/readline gets into cooked mode.
+------------------------------------------------------------------------
+% zsh -c 'cat a_long_file | less ; :'
+can be interrupted with ^C. The prompt comes back and less is orphaned.
+If you go to the end of the file with less and cat terminates, ^C
+will not terminate less. The `; :' after less forces zsh to fork before
+executing less.
+------------------------------------------------------------------------
+The pattern %?* matches names beginning with %? instead of names with at
+least two characters beginning with %. This is a hack to allow %?foo job
+substitution without quoting. This behaviour is incompatible with sh
+and ksh and may be removed in the future. A good fix would be to keep
+such patterns unchanged if they do not match regardless of the state of
+the nonomatch and nullglob options.
+------------------------------------------------------------------------

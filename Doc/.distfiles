@@ -1,0 +1,16 @@
+DISTFILES_SRC='
+    .cvsignore .distfiles Makefile.in
+    META-FAQ.yo intro.ms
+    version.yo zmacros.yo zman.yo ztexi.yo
+    zsh.yo zshbuiltins.yo zshcompctl.yo zshexpn.yo zshmisc.yo
+    zshmodules.yo zshoptions.yo zshparam.yo zshzle.yo
+    zsh.texi
+    zsh.1 zshbuiltins.1 zshcompctl.1 zshexpn.1 zshmisc.1 zshmodules.1
+    zshoptions.1 zshparam.1 zshzle.1 zshall.1
+'
+
+DISTFILES_DOC='
+    zsh.info zsh.info-[0-9]*
+    zsh_toc.html zsh_[0-9]*.html
+    zsh.dvi zsh_us.ps zsh_a4.ps
+'

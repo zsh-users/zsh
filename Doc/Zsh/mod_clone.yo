@@ -1,0 +1,19 @@
+texinode(The clone Module)(The comp1 Module)(The cap Module)(Zsh Modules)
+sect(The clone Module)
+The tt(clone) module makes available one builtin command:
+
+startitem()
+findex(clone)
+cindex(shell, cloning)
+cindex(cloning the shell)
+cindex(terminal)
+item(tt(clone) var(tty))(
+Creates a forked instance of the current shell, attached to the specified
+var(tty).  In the new shell, the tt(PID), tt(PPID) and tt(TTY) special
+parameters are changed appropriately.  tt($!) is set to zero in the new
+shell, and to the new shell's PID in the original shell.
+
+The return value of the builtin is zero in both shells if successful,
+and non-zero on error.
+)
+enditem()

@@ -1,0 +1,812 @@
+texinode(Parameters)(Options)(Expansion)(Top)
+chapter(Parameters)
+cindex(parameters)
+sect(Description)
+A parameter has a name, a value, and a number of attributes.
+A name may be any sequence of alphanumeric
+characters and underscores, or the single characters
+`tt(*)', `tt(@)', `tt(#)', `tt(?)', `tt(-)', `tt($)', or `tt(!)'.
+The value may be a em(scalar) (a string),
+an integer, or an array.
+To assign a scalar or integer value to a parameter,
+use the tt(typeset) builtin.
+findex(typeset, use of)
+To assign an array value, use `tt(set -A) var(name) var(value) ...'.
+findex(set, use of)
+The value of a parameter may also be assigned by writing:
+
+nofill(var(name)tt(=)var(value))
+
+If the integer attribute, tt(-i), is set for var(name),
+the var(value) is subject to arithmetic evaluation.
+
+In the parameter lists, the mark `<S>' indicates that the parameter is special.
+Special parameters cannot have their type changed, and they stay special even
+if unset.  `<Z>' indicates that the parameter does not exist when the shell
+initialises in tt(sh) or tt(ksh) emulation mode.
+startmenu()
+menu(Local Parameters)
+menu(Array Parameters)
+menu(Positional Parameters)
+menu(Parameters Set By The Shell)
+menu(Parameters Used By The Shell)
+endmenu()
+texinode(Local Parameters)(Array Parameters)()(Parameters)
+sect(Local Parameters)
+Shell function executions delimit scopes for shell parameters.
+(Parameters are dynamically scoped.)  The tt(typeset) builtin, and its
+alternative forms tt(declare), tt(integer), tt(local) and tt(readonly)
+(but not tt(export)), can be used to declare a parameter as being local
+to the innermost scope.
+
+When a parameter is read or assigned to, the
+innermost existing parameter of that name is used.  (That is, the
+local parameter hides any less-local parameter.)  However, assigning
+to a non-existent parameter, or declaring a new parameter with tt(export),
+causes it to be created in the em(outer)most scope.
+
+Local parameters disappear when their scope ends.
+tt(unset) can be used to delete a parameter while it is still in scope; this
+will reveal the next outer parameter of the same name.  However, em(special)
+parameters are still special when unset.
+texinode(Array Parameters)(Positional Parameters)(Local Parameters)(Parameters)
+sect(Array Parameters)
+The value of an array parameter may be assigned by writing:
+
+nofill(var(name)tt(=LPAR())var(value) ...tt(RPAR()))
+
+Individual elements of an array may be selected using a
+subscript.  A subscript of the form `tt([)var(exp)tt(])'
+selects the single element var(exp), where var(exp) is
+an arithmetic expression which will be subject to arithmetic
+expansion as if it were surrounded by `tt($LPAR()LPAR())...tt(RPAR()RPAR())'.
+The elements are numbered beginning with 1 unless the
+tt(KSH_ARRAYS) option is set when they are numbered from zero.
+pindex(KSH_ARRAYS, use of)
+
+A subscript of the form `tt([*])' or `tt([@])' evaluates to all
+elements of an array; there is no difference between the two
+except when they appear within double quotes.
+`tt("$foo[*]")' evaluates to `tt("$foo[1] $foo[2] )...tt(")', while
+`tt("$foo[@]")' evaluates to `tt("$foo[1]" "$foo[2]")', etc.
+
+A subscript of the form `tt([)var(exp1)tt(,)var(exp2)tt(])'
+selects all elements in the range var(exp1) to var(exp2),
+inclusive.
+If one of the subscripts evaluates to a negative number,
+say tt(-)var(n), then the var(n)th element from the end
+of the array is used.  Thus `tt($foo[-3])' is the third element
+from the end of the array tt(foo), and
+`tt($foo[1,-1])' is the same as `tt($foo[*])'.
+
+Subscripting may also be performed on non-array values, in which
+case the subscripts specify a substring to be extracted.
+For example, if tt(FOO) is set to `tt(foobar)', then
+`tt(echo $FOO[2,5])' prints `tt(ooba)'.
+
+Subscripts may be used inside braces used to delimit a parameter name, thus
+`tt(${foo[2]})' is equivalent to `tt($foo[2])'.  If the tt(KSH_ARRAYS)
+option is set, the braced form is the only one that will
+work, the subscript otherwise not being treated specially.
+
+If a subscript is used on the left side of an assignment the selected
+range is replaced by the expression on the right side.
+
+If the opening bracket or the comma is directly followed by an opening
+parentheses the string up to the matching closing one is considered to
+be a list of flags. The flags currently understood are:
+
+startitem()
+item(tt(e))(
+this option has no effect and retained for backward compatibility only.
+)
+item(tt(w))(
+if the parameter subscripted is a scalar than this flag makes
+subscription work on a per-word basis instead of characters.
+)
+item(tt(s:)var(string)tt(:))(
+this gives the var(string) that separates words (for use with the
+tt(w) flag).
+)
+item(tt(p))(
+Recognize the same escape sequences as the tt(print) builtin in
+the string argument of a subsequent `tt(s)' flag.
+)
+item(tt(f))(
+if the parameter subscripted is a scalar than this flag makes
+subscription work on a per-line basis instead of characters.
+This is a shorthand for `tt(pws:\n:)'.
+)
+item(tt(r))(
+if this flag is given the var(exp) is taken as a pattern and the
+result is the first matching array element, substring or word (if the
+parameter is an array, if it is a scalar, or if it is a scalar and the
+`tt(w)' flag is given, respectively); note that this is like giving a
+number: `tt($foo[(r))var(??)tt(,3])' and `tt($foo[(r))var(??)tt(,(r)f*])' work.
+)
+item(tt(R))(
+like `tt(r)', but gives the last match.
+)
+item(tt(i))(
+like `tt(r)', but gives the index of the match instead; this may not
+be combined with a second argument.
+)
+item(tt(I))(
+like `tt(i), but gives the index of the last match.
+)
+item(tt(n:)var(expr)tt(:))(
+if combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them give
+the var(n)th or var(n)th last match (if var(expr) evaluates to
+var(n)).
+)
+enditem()
+texinode(Positional Parameters)(Parameters Set By The Shell)(Array Parameters)(Parameters)
+sect(Positional Parameters)
+Positional parameters are set by the shell on invocation,
+by the tt(set) builtin, or by direct assignment.
+The parameter var(n), where var(n) is a number,
+is the var(n)th positional parameter.
+The parameters tt(*), tt(@) and tt(argv) are
+arrays containing all the positional parameters;
+thus `tt($argv[)var(n)tt(])', etc., is equivalent to simply `tt($)var(n)'.
+
+texinode(Parameters Set By The Shell)(Parameters Used By The Shell)(Positional Parameters)(Parameters)
+sect(Parameters Set By The Shell)
+The following parameters are automatically set by the shell:
+
+startitem()
+vindex(!)
+item(tt(!) <S>)(
+The process ID of the last background command invoked.
+)
+vindex(#)
+item(tt(#) <S>)(
+The number of positional parameters in decimal.
+)
+vindex(ARGC)
+item(tt(ARGC) <S> <Z>)(
+Same as tt(#).
+)
+vindex($)
+item(tt($) <S>)(
+The process ID of this shell.
+)
+vindex(-)
+item(tt(-) <S>)(
+Flags supplied to the shell on invocation or by the tt(set)
+or tt(setopt) commands.
+)
+vindex(*)
+item(tt(*) <S>)(
+An array containing the positional parameters.
+)
+vindex(argv)
+item(tt(argv) <S> <Z>)(
+Same as tt(*).
+)
+vindex(@)
+item(tt(@) <S>)(
+Same as tt(argv[@]).
+)
+vindex(?)
+item(tt(?) <S>)(
+The exit value returned by the last command.
+)
+vindex(0)
+item(tt(0) <S>)(
+The name used to invoke the current shell.  If the tt(FUNCTION_ARGZERO) option
+is set, this is set temporarily within a shell function to the name of the
+function, and within a sourced script to the name of the script.
+)
+vindex(status)
+item(tt(status) <S> <Z>)(
+Same as tt(?).
+)
+vindex(_)
+item(tt(_) <S>)(
+The last argument of the previous command.
+Also, this parameter is set in the environment of every command
+executed to the full pathname of the command.
+)
+vindex(EGID)
+item(tt(EGID) <S>)(
+The effective group ID of the shell process.  If you have sufficient
+privileges, you may change the effective group ID of the shell
+process by assigning to this parameter.  Also (assuming sufficient
+privileges), you may start a single command with a different
+effective group ID by `tt(LPAR()EGID=)var(gid)tt(; command+RPAR())'
+)
+vindex(EUID)
+item(tt(EUID) <S>)(
+The effective user ID of the shell process.  If you have sufficient
+privileges, you may change the effective user ID of the shell process
+by assigning to this parameter.  Also (assuming sufficient privileges),
+you may start a single command with a different
+effective user ID by `tt(LPAR()EUID=)var(uid)tt(; command+RPAR())'
+)
+vindex(ERRNO)
+item(tt(ERRNO) <S>)(
+The value of errno (see manref(errno)(3))
+as set by the most recently failed system call.
+This value is system dependent and is intended for debugging
+purposes.
+)
+vindex(GID)
+item(tt(GID) <S>)(
+The real group ID of the shell process.  If you have sufficient privileges,
+you may change the group ID of the shell process by assigning to this
+parameter.  Also (assuming sufficient privileges), you may start a single
+command under a different
+group ID by `tt(LPAR()GID=)var(gid)tt(; command+RPAR())'
+)
+vindex(HOST)
+item(tt(HOST))(
+The current hostname.
+)
+vindex(LINENO)
+item(tt(LINENO) <S>)(
+The line number of the current line within the current script
+being executed.
+)
+vindex(LOGNAME)
+item(tt(LOGNAME))(
+If the corresponding variable is not set in the environment of the
+shell, it is initialized to the login name corresponding to the
+current login session. This parameter is exported by default but
+this can be disabled using the tt(typeset) builtin.
+)
+vindex(MACHTYPE)
+item(tt(MACHTYPE))(
+The machine type (microprocessor class or machine model),
+as determined at compile time.
+)
+vindex(OLDPWD)
+item(tt(OLDPWD))(
+The previous working directory.  This is set when the shell initialises
+and whenever the directory changes.
+)
+vindex(OPTARG)
+item(tt(OPTARG) <S>)(
+The value of the last option argument processed by the tt(getopts)
+command.
+)
+vindex(OPTIND)
+item(tt(OPTIND) <S>)(
+The index of the last option argument processed by the tt(getopts)
+command.
+)
+vindex(OSTYPE)
+item(tt(OSTYPE))(
+The operating system, as determined at compile time.
+)
+vindex(PPID)
+item(tt(PPID) <S>)(
+The process ID of the parent of the shell.
+)
+vindex(PWD)
+item(tt(PWD))(
+The present working directory.  This is set when the shell initialises
+and whenever the directory changes.
+)
+vindex(RANDOM)
+item(tt(RANDOM) <S>)(
+A random integer from 0 to 32767, newly generated each time
+this parameter is referenced.  The random number generator
+can be seeded by assigning a numeric value to tt(RANDOM).
+)
+vindex(SECONDS)
+item(tt(SECONDS) <S>)(
+The number of seconds since shell invocation.  If this parameter
+is assigned a value, then the value returned upon reference
+will be the value that was assigned plus the number of seconds
+since the assignment.
+)
+vindex(SHLVL)
+item(tt(SHLVL) <S>)(
+Incremented by one each time a new shell is started.
+)
+vindex(signals)
+item(tt(signals))(
+An array containing the names of the signals.
+)
+vindex(TTY)
+item(tt(TTY))(
+The name of the tty associated with the shell, if any.
+)
+vindex(TTYIDLE)
+item(tt(TTYIDLE) <S>)(
+The idle time of the tty associated with the shell in seconds or -1 if there
+is no such tty.
+)
+vindex(UID)
+item(tt(UID) <S>)(
+The real user ID of the shell process.  If you have sufficient privileges,
+you may change the user ID of the shell by assigning to this parameter.
+Also (assuming sufficient privileges), you may start a single command
+under a different
+user ID by `tt(LPAR()UID=)var(uid)tt(; command+RPAR())'
+)
+vindex(USERNAME)
+item(tt(USERNAME) <S>)(
+The username corresponding to the real user ID of the shell process.  If you
+have sufficient privileges, you may change the username (and also the
+user ID and group ID) of the shell by assigning to this parameter.
+Also (assuming sufficient privileges), you may start a single command
+under a different username (and user ID and group ID)
+by `tt(LPAR()USERNAME=)var(username)tt(; command+RPAR())'
+)
+vindex(VENDOR)
+item(tt(VENDOR))(
+The vendor, as determined at compile time.
+)
+vindex(ZSH_NAME)
+item(tt(ZSH_NAME))(
+Expands to the basename of the command used to invoke this instance
+of zsh.
+)
+vindex(ZSH_VERSION)
+item(tt(ZSH_VERSION))(
+The version number of this zsh.
+)
+enditem()
+texinode(Parameters Used By The Shell)()(Parameters Set By The Shell)(Parameters)
+sect(Parameters Used By The Shell)
+The following parameters are used by the shell:
+
+startitem()
+vindex(ARGV0)
+item(tt(ARGV0))(
+If exported, its value is used as tt(argv[0]) of external commands.
+Usually used in constructs like `tt(ARGV0=emacs nethack)'.
+)
+vindex(BAUD)
+item(tt(BAUD))(
+The baud rate of the current connection.  Used by the line editor
+update mechanism to compensate for a slow terminal by delaying
+updates until necessary.  This may be profitably set to a lower value
+in some circumstances, e.g.
+for slow modems dialing into a communications server which is connected
+to a host via a fast link; in this case, this variable
+would be set by default to the speed of the fast link, and not
+the modem.
+This parameter should be set to the baud
+rate of the slowest part of the link for best performance. The compensation
+mechanism can be turned off by setting the variable to zero.
+)
+vindex(cdpath)
+vindex(CDPATH)
+item(tt(cdpath) <S> <Z> (tt(CDPATH) <S>))(
+An array (colon-separated list)
+of directories specifying the search path for the tt(cd) command.
+)
+vindex(COLUMNS)
+item(tt(COLUMNS) <S>)(
+The number of columns for this terminal session.
+Used for printing select lists and for the line editor.
+)
+vindex(DIRSTACKSIZE)
+item(tt(DIRSTACKSIZE))(
+The maximum size of the directory stack.  If the
+stack gets larger than this, it will be truncated automatically.
+This is useful with the tt(AUTO_PUSHD) option.
+pindex(AUTO_PUSHD, use of)
+)
+vindex(FCEDIT)
+item(tt(FCEDIT))(
+The default editor for the tt(fc) builtin.
+)
+vindex(fignore)
+vindex(FIGNORE)
+item(tt(fignore) <S> <Z> (tt(FIGNORE) <S>))(
+An array (colon separated list)
+containing the suffixes of files to be ignored
+during filename completion.  However, if the completion generates only files
+which would match if this variable would be ignored, than these files are
+completed anyway.
+)
+vindex(fpath)
+vindex(FPATH)
+item(tt(fpath) <S> <Z> (tt(FPATH) <S>))(
+An array (colon separated list)
+of directories specifying the search path for
+function definitions.  This path is searched when a function
+with the tt(-u) attribute is referenced.  If an executable
+file is found, then it is read and executed in the current environment.
+)
+vindex(histchars)
+item(tt(histchars) <S>)(
+Three characters used by the shell's history and lexical analysis
+mechanism.  The first character signals the start of a history
+substitution (default `tt(!)').  The second character signals the
+start of a quick history substitution (default `tt(^)').  The third
+character is the comment character (default `tt(#)').
+)
+vindex(HISTCHARS)
+item(tt(HISTCHARS) <S> <Z>)(
+Same as tt(histchars).  (Deprecated.)
+)
+vindex(HISTFILE)
+item(tt(HISTFILE))(
+The file to save the history in when an interactive shell exits.
+If unset, the history is not saved.
+)
+vindex(HISTSIZE)
+item(tt(HISTSIZE) <S>)(
+The maximum size of the history list.
+)
+vindex(HOME)
+item(tt(HOME) <S>)(
+The default argument for the tt(cd) command.
+)
+vindex(IFS)
+item(tt(IFS) <S>)(
+Internal field separators (by default space, tab, newline and NUL), that
+are used to separate words which result from
+command or parameter substitution and words read by
+the tt(read) builtin.  Any characters from the set space, tab and
+newline that appear in the IFS are called em(IFS white space).
+One or more IFS white space characters or one non-IFS white space
+character together with any adjacent IFS white space character delimit
+a field.  If an IFS white space character appears twice consecutively
+in the IFS, this character is treated as if it were not an IFS white
+space character.
+)
+vindex(KEYTIMEOUT)
+item(tt(KEYTIMEOUT))(
+The time the shell waits, in hundredths of seconds, for another key to
+be pressed when reading bound multi-character sequences.
+)
+vindex(LANG)
+item(tt(LANG) <S>)(
+This variable determines the locale category for any category not
+specifically selected via a variable starting with `tt(LC_)'.
+)
+vindex(LC_ALL)
+item(tt(LC_ALL) <S>)(
+This variable overrides the value of the `tt(LANG)' variable and the value
+of any of the other variables starting with `tt(LC_)'.
+)
+vindex(LC_COLLATE)
+item(tt(LC_COLLATE) <S>)(
+This variable determines the locale category for character collation
+information within ranges in glob brackets and for sorting.
+)
+vindex(LC_CTYPE)
+item(tt(LC_CTYPE) <S>)(
+This variable determines the locale category for character handling
+functions.
+)
+vindex(LC_MESSAGES)
+item(tt(LC_MESSAGES) <S>)(
+This variable determines the language in which messages should be
+written.  Note that zsh does not use message catalogs.
+)
+vindex(LC_TIME)
+item(tt(LC_TIME) <S>)(
+This variable determines the locale category for date and time
+formatting in prompt escape sequences.
+)
+vindex(LINES)
+item(tt(LINES) <S>)(
+The number of lines for this terminal session.
+Used for printing select lists and for the line editor.
+)
+vindex(LISTMAX)
+item(tt(LISTMAX))(
+In the line editor, the number of filenames to list without asking first.
+If set to zero, the shell asks only if the top of the listing would scroll
+off the screen.
+)
+vindex(LOGCHECK)
+item(tt(LOGCHECK))(
+The interval in seconds between checks for login/logout activity
+using the tt(watch) parameter.
+)
+vindex(MAIL)
+item(tt(MAIL))(
+If this parameter is set and tt(mailpath) is not set,
+the shell looks for mail in the specified file.
+)
+vindex(MAILCHECK)
+item(tt(MAILCHECK))(
+The interval in seconds between checks for new mail.
+)
+vindex(mailpath)
+vindex(MAILPATH)
+item(tt(mailpath) <S> <Z> (tt(MAILPATH) <S>))(
+An array (colon-separated list) of filenames to check for
+new mail.  Each filename can be followed by a `tt(?)' and a
+message that will be printed.  The message will undergo
+parameter expansion, command substitution and arithmetic
+substitution with the variable tt($_) defined as the name
+of the file that has changed.  The default message is
+`tt(You have new mail)'.  If an element is a directory
+instead of a file the shell will recursively check every
+file in every subdirectory of the element.
+)
+vindex(manpath)
+vindex(MANPATH)
+item(tt(manpath) <S> <Z> (tt(MANPATH) <S> <Z>))(
+An array (colon-separated list)
+whose value is not used by the shell.  The tt(manpath)
+array can be useful, however, since setting it also sets
+tt(MANPATH), and vice versa.
+)
+vindex(module_path)
+vindex(MODULE_PATH)
+item(tt(module_path) <S> <Z> (tt(MODULE_PATH) <S>))(
+An array (colon-separated list)
+of directories that tt(zmodload)
+searches for dynamically loadable modules.
+This is initialised to a standard pathname,
+usually `tt(/usr/local/lib/zsh/$ZSH_VERSION)'.
+(The `tt(/usr/local/lib)' part varies from installation to installation.)
+For security reasons, any value set in the environment when the shell
+is started will be ignored.
+
+These parameters only exist if the installation supports dynamic
+module loading.
+)
+vindex(NULLCMD)
+cindex(null command style)
+cindex(csh, null command style)
+cindex(ksh, null command style)
+item(tt(NULLCMD) <S>)(
+The command name to assume if a redirection is specified
+with no command.  Defaults to tt(cat).  For bf(sh)/bf(ksh)
+behavior, change this to tt(:).  For bf(csh)-like
+behavior, unset this parameter; the shell will print an
+error message if null commands are entered.
+)
+vindex(path)
+vindex(PATH)
+item(tt(path) <S> <Z> (tt(PATH) <S>))(
+An array (colon-separated list)
+of directories to search for commands.
+When this parameter is set, each directory is scanned
+and all files found are put in a hash table.
+)
+vindex(POSTEDIT)
+item(tt(POSTEDIT) <S>)(
+This string is output whenever the line editor exits.
+It usually contains termcap strings to reset the terminal.
+)
+vindex(PS1)
+item(tt(PS1) <S>)(
+The primary prompt string, printed before a command is read.
+the default is `tt(%m%# )'.  It undergoes a special form of expansion
+before being displayed; see noderef(Prompt Expansion).
+)
+vindex(PS2)
+item(tt(PS2) <S>)(
+The secondary prompt, printed when the shell needs more information
+to complete a command.
+It is expanded in the same way as tt(PS1).
+The default is `tt(%_> )', which displays any shell constructs or quotation
+marks which are currently being processed.
+)
+vindex(PS3)
+item(tt(PS3) <S>)(
+Selection prompt used within a tt(select) loop.
+It is expanded in the same way as tt(PS1).
+The default is `tt(?# )'.
+)
+vindex(PS4)
+item(tt(PS4) <S>)(
+The execution trace prompt.  Default is `tt(PLUS() )'.
+)
+vindex(PROMPT)
+xitem(tt(PROMPT) <S> <Z>)
+vindex(PROMPT2)
+xitem(tt(PROMPT2) <S> <Z>)
+vindex(PROMPT3)
+xitem(tt(PROMPT3) <S> <Z>)
+vindex(PROMPT4)
+item(tt(PROMPT4) <S> <Z>)(
+Same as tt(PS1), tt(PS2), tt(PS3) and tt(PS4),
+respectively.
+)
+vindex(psvar)
+vindex(PSVAR)
+item(tt(psvar) <S> <Z> (tt(PSVAR) <S>))(
+An array (colon-separated list) whose first nine values can be used in
+tt(PROMPT) strings.  Setting tt(psvar) also sets tt(PSVAR), and
+vice versa.
+)
+vindex(prompt)
+item(tt(prompt) <S> <Z>)(
+Same as tt(PS1).
+)
+vindex(READNULLCMD)
+item(tt(READNULLCMD) <S>)(
+The command name to assume if a single input redirection
+is specified with no command.  Defaults to tt(more).
+)
+vindex(REPORTTIME)
+item(tt(REPORTTIME))(
+If nonnegative, commands whose combined user and system execution times
+(measured in seconds) are greater than this value have timing
+statistics printed for them.
+)
+vindex(RPROMPT)
+xitem(tt(RPROMPT) <S>)
+vindex(RPS1)
+item(tt(RPS1) <S>)(
+This prompt is displayed on the right-hand side of the screen
+when the primary prompt is being displayed on the left.
+This does not work if the tt(SINGLELINEZLE) option is set.
+It is expanded in the same way as tt(PS1).
+)
+vindex(SAVEHIST)
+item(tt(SAVEHIST))(
+The maximum number of history events to save in the history file.
+)
+vindex(SPROMPT)
+item(tt(SPROMPT) <S>)(
+The prompt used for spelling correction.  The sequence
+`tt(%R)' expands to the string which presumably needs spelling
+correction, and `tt(%r)' expands to the proposed correction.
+All other prompt escapes are also allowed.
+)
+vindex(STTY)
+item(tt(STTY))(
+If this parameter is set in a command's environment, the shell runs the
+tt(stty) command with the value of this parameter as arguments in order to
+set up the terminal before executing the command. The modes apply only to the
+command, and are reset when it finishes or is suspended. If the command is
+suspended and continued later with the tt(fg) or tt(wait) builtins it will
+see the modes specified by tt(STTY), as if it were not suspended.  This
+(intentionally) does not apply if the command is continued via `tt(kill -CONT)'.
+tt(STTY) is ignored if the command is run in the background, or if it is in the
+environment of the shell but not explicitly assigned to in the input line. This
+avoids running stty at every external command by accidentally exporting it.
+Also note that tt(STTY) should not be used for window size specifications; these
+will not be local to the command.
+)
+vindex(TERM)
+item(tt(TERM) <S>)(
+The type of terminal in use.  This is used when looking up termcap sequences.
+)
+vindex(TIMEFMT)
+item(tt(TIMEFMT))(
+The format of process time reports with the tt(time) keyword.
+The default is `tt(%E real  %U user  %S system  %P %J)'.
+Recognizes the following escape sequences:
+
+startsitem()
+sitem(tt(%%))(A `tt(%)'.)
+sitem(tt(%U))(CPU seconds spent in user mode.)
+sitem(tt(%S))(CPU seconds spent in kernel mode.)
+sitem(tt(%E))(Elapsed time in seconds.)
+sitem(tt(%P))(The CPU percentage, computed as (tt(%U)PLUS()tt(%S))/tt(%E).)
+sitem(tt(%J))(The name of this job.)
+endsitem()
+
+A star may be inserted between the percent sign and flags printing time.
+This cause the time to be printed in
+`var(hh)tt(:)var(mm)tt(:)var(ss)tt(.)var(ttt)'
+format (hours and minutes are only printed if they are not zero).
+)
+vindex(TMOUT)
+item(tt(TMOUT))(
+If this parameter is nonzero, the shell will receive an tt(ALRM)
+signal if a command is not entered within the specified number of
+seconds after issuing a prompt. If there is a trap on tt(SIGALRM), it
+will be executed and a new alarm is scheduled using the value of the
+tt(TMOUT) parameter after executing the trap.  If no trap is set, and
+the idle time of the terminal is not less than the value of the
+tt(TMOUT) parameter, zsh terminates.  Otherwise a new alarm is
+scheduled to tt(TMOUT) seconds after the last keypress.
+)
+vindex(TMPPREFIX)
+item(tt(TMPPREFIX))(
+A pathname prefix which the shell will use for all temporary files.
+Note that this should include an initial part for the file name as
+well as any directory names.  The default is `tt(/tmp/zsh)'.
+)
+vindex(watch)
+vindex(WATCH)
+item(tt(watch) <S> <Z> (tt(WATCH) <S>))(
+An array (colon-separated list) of login/logout events to report.
+If it contains the single word `tt(all)', then all login/logout events
+are reported.  If it contains the single word `tt(notme)', then all
+events are reported as with `tt(all)' except tt($USERNAME).
+An entry in this list may consist of a username,
+an `tt(@)' followed by a remote hostname,
+and a `tt(%)' followed by a line (tty).
+Any or all of these components may be present in an entry;
+if a login/logout event matches all of them,
+it is reported.
+)
+vindex(WATCHFMT)
+item(tt(WATCHFMT))(
+The format of login/logout reports if the tt(watch) parameter is set.
+Default is `tt(%n has %a %l from %m)'.
+Recognizes the following escape sequences:
+
+startitem()
+item(tt(%n))(
+The name of the user that logged in/out.
+)
+item(tt(%a))(
+The observed action, i.e. "logged on" or "logged off".
+)
+item(tt(%l))(
+The line (tty) the user is logged in on.
+)
+item(tt(%M))(
+The full hostname of the remote host.
+)
+item(tt(%m))(
+The hostname up to the first `tt(.)'.  If only the
+IP address is available or the utmp field contains
+the name of an X-windows display, the whole name is printed.
+
+em(NOTE:)
+The `tt(%m)' and `tt(%M)' escapes will work only if there is a host name
+field in the utmp on your machine.  Otherwise they are
+treated as ordinary strings.
+)
+item(tt(%S) LPAR()tt(%s)RPAR())(
+Start (stop) standout mode.
+)
+item(tt(%U) LPAR()tt(%u)RPAR())(
+Start (stop) underline mode.
+)
+item(tt(%B) LPAR()tt(%b)RPAR())(
+Start (stop) boldface mode.
+)
+xitem(tt(%t))
+item(tt(%@))(
+The time, in 12-hour, am/pm format.
+)
+item(tt(%T))(
+The time, in 24-hour format.
+)
+item(tt(%w))(
+The date in `var(day)tt(-)var(dd)' format.
+)
+item(tt(%W))(
+The date in `var(mm)tt(/)var(dd)tt(/)var(yy)' format.
+)
+item(tt(%D))(
+The date in `var(yy)tt(-)var(mm)tt(-)var(dd)' format.
+)
+item(tt(%LPAR())var(x)tt(:)var(true-text)tt(:)var(false-text)tt(RPAR()))(
+Specifies a ternary expression.
+The character following the var(x) is
+arbitrary; the same character is used to separate the text
+for the "true" result from that for the "false" result.
+Both the separator and the right parenthesis may be escaped
+with a backslash.
+Ternary expressions may be nested.
+
+The test character var(x) may be any one of `tt(l)', `tt(n)', `tt(m)'
+or `tt(M)', which indicate a `true' result if the corresponding
+escape sequence would return a non-empty value; or it may be `tt(a)',
+which indicates a `true' result if the watched user has logged in,
+or `false' if he has logged out.
+Other characters evaluate to neither true nor false; the entire
+expression is omitted in this case.
+
+If the result is `true', then the var(true-text)
+is formatted according to the rules above and printed,
+and the var(false-text) is skipped.
+If `false', the var(true-text) is skipped and the var(false-text)
+is formatted and printed.
+Either or both of the branches may be empty, but
+both separators must be present in any case.
+)
+enditem()
+)
+vindex(WORDCHARS)
+item(tt(WORDCHARS) <S>)(
+A list of non-alphanumeric characters considered part of a word
+by the line editor.
+)
+vindex(ZDOTDIR)
+item(tt(ZDOTDIR))(
+The directory to search for shell startup files (.zshrc, etc),
+if not tt($HOME).
+)
+enditem()

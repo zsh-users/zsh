@@ -1,0 +1,193 @@
+texinode(The zle Module)()(The stat Module)(Zsh Modules)
+sect(The zle Module)
+The tt(zle) module contains the Zsh Line Editor.  See
+ifzman(zmanref(zshzle))\
+ifnzman(noderef(Zsh Line Editor))\
+.  It also contains three related builtin commands:
+
+startitem()
+findex(bindkey)
+cindex(keys, rebinding)
+cindex(rebinding keys)
+cindex(keys, binding)
+cindex(binding keys)
+cindex(keymaps)
+xitem(tt(bindkey) [ var(options) ] tt(-l))
+xitem(tt(bindkey) [ var(options) ] tt(-d))
+xitem(tt(bindkey) [ var(options) ] tt(-D) var(keymap) ...)
+xitem(tt(bindkey) [ var(options) ] tt(-A) var(old-keymap new-keymap))
+xitem(tt(bindkey) [ var(options) ] tt(-N) var(new-keymap) [ var(old-keymap) ])
+xitem(tt(bindkey) [ var(options) ] tt(-m))
+xitem(tt(bindkey) [ var(options) ] tt(-r) var(in-string) ...)
+xitem(tt(bindkey) [ var(options) ] tt(-s) var(in-string out-string) ...)
+xitem(tt(bindkey) [ var(options) ] var(in-string command) ...)
+item(tt(bindkey) [ var(options) ] [ var(in-string) ])(
+tt(bindkey)'s options can be divided into three categories: keymap selection,
+operation selection, and others.  The keymap selection options are:
+
+startitem()
+item(tt(-e))(
+Selects keymap `tt(emacs)', and also links it to `tt(main)'.
+)
+item(tt(-v))(
+Selects keymap `tt(viins)', and also links it to `tt(main)'.
+)
+item(tt(-a))(
+Selects keymap `tt(vicmd)'.
+)
+item(tt(-M))(
+The first non-option argument is used as a keymap name,
+and does not otherwise count as an argument.
+)
+enditem()
+
+Some operations do not permit a keymap to be selected.
+If a keymap selection is required and none of the options above are used, the
+`tt(main)' keymap is used.  These operations do not permit a keymap to be
+selected:
+
+startitem()
+item(tt(-l))(
+List all existing keymap names.  If the tt(-L)
+option is used, list in the form of tt(bindkey)
+commands to create the keymaps.
+)
+item(tt(-d))(
+Delete all existing keymaps and reset to the default state.
+)
+item(tt(-D) var(keymap) ...)(
+Delete the named var(keymap)s.
+)
+item(tt(-A) var(old-keymap new-keymap))(
+Make the var(new-keymap) name an alias for var(old-keymap), so that
+both names refer to the same keymap.  The names have equal standing;
+if either is deleted, the other remains.  If there is already a keymap
+with the var(new-keymap) name, it is deleted.
+)
+item(tt(-N) var(new-keymap) [ var(old-keymap) ])(
+Create a new keymap, named var(new-keymap).  If a keymap already has that
+name, it is deleted.  If an var(old-keymap) name is given, the new keymap
+is initialised to be a duplicate of it, otherwise the new keymap will
+be empty.
+)
+enditem()
+
+The following operations require a keymap to be selected:
+
+startitem()
+item(tt(-m))(
+Add the built-in set of meta-key bindings to the selected keymap.
+Only keys that are unbound or bound to tt(self-insert) are affected.
+)
+item(tt(-r) var(in-string) ...)(
+Unbind the specified var(in-string)s in the selected keymap.
+This is exactly equivalent to binding the strings to tt(undefined-key).
+)
+item(tt(-s) var(in-string out-string) ...)(
+Bind each var(in-string) to each var(out-string).
+When var(in-string) is typed, var(out-string) will be
+pushed back and treated as input to the line editor.
+)
+item(var(in-string command) ...)(
+Bind each var(in-string) to each var(command).
+)
+item([ var(in-string) ])(
+List key bindings.  If an var(in-string) is specified, the binding of
+that string in the selected keymap is displayed.  Otherwise, all key
+bindings in the selected keymap are displayed.  As an exception,
+if the tt(-e) or tt(-v) options are used alone, the keymap is em(not)
+displayed - the implicit linking of keymaps is the only thing that happens.
+)
+enditem()
+
+In the binding operations, if the tt(-R) option is used, the var(in-string)s
+are interpreted as ranges, instead of plain strings.  A valid range
+consists of two characters, with an optional `tt(-)'
+between them.  All characters between the two specified, inclusive,
+are bound as specified.
+
+For either var(in-string) or var(out-string), the following
+escape sequences are recognised:
+
+startsitem()
+sitem(tt(\a))(bell character)
+sitem(tt(\b))(backspace)
+sitem(tt(\e), tt(\E))(escape)
+sitem(tt(\f))(form feed)
+sitem(tt(\n))(linefeed (newline))
+sitem(tt(\r))(carriage return)
+sitem(tt(\t))(horizontal tab)
+sitem(tt(\v))(vertical tab)
+sitem(tt(\)var(NNN))(character code in octal)
+sitem(tt(\x)var(NN))(character code in hexadecimal)
+sitem(tt(\M)[tt(-)]var(X))(character with meta bit set)
+sitem(tt(\C)[tt(-)]var(X))(control character)
+sitem(tt(^)var(X))(control character)
+endsitem()
+
+In all other cases, `tt(\)' escapes the following character.  Delete is
+written as `tt(^?)'.  Note that `tt(\M^?)' and `tt(^\M?)' are not the same.
+)
+findex(vared)
+cindex(parameters, editing)
+cindex(editing parameters)
+item(tt(vared) [ tt(-ch) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ] var(name))(
+The value of the parameter var(name) is loaded into the edit
+buffer, and the line editor is invoked.  When the editor exits,
+var(name) is set to the string value returned by the editor.
+If the tt(-c) flag is given, the parameter is created if it doesn't
+already exist.
+If the tt(-p) flag is given, the following string will be taken as
+the prompt to display at the left.  If the tt(-r) flag is given,
+the following string gives the prompt to display at the right.  If the
+tt(-h) flag is specified, the history can be accessed from ZLE.
+)
+findex(zle)
+cindex(widgets, rebinding)
+cindex(rebinding widgets)
+cindex(widgets, binding)
+cindex(binding widgets)
+cindex(widgets, invoking)
+cindex(invoking widgets)
+cindex(widgets, calling)
+cindex(calling widgets)
+cindex(widgets, defining)
+cindex(defining widgets)
+xitem(tt(zle) tt(-l) [ tt(-L) ])
+xitem(tt(zle) tt(-D) var(widget) ...)
+xitem(tt(zle) tt(-A) var(old-widget) var(new-widget))
+xitem(tt(zle) tt(-N) var(widget) [ var(function) ])
+item(tt(zle) var(widget))(
+The tt(zle) builtin performs a number of different actions concerning
+ZLE.  Which operation it performs depends on its options:
+
+startitem()
+item(tt(-l) [ tt(-L) ])(
+List all existing user-defined widgets.  If the tt(-L)
+option is used, list in the form of tt(zle)
+commands to create the widgets.
+Built-in widgets are not listed.
+)
+item(tt(-D) var(widget) ...)(
+Delete the named var(widget)s.
+)
+item(tt(-A) var(old-widget) var(new-widget))(
+Make the var(new-widget) name an alias for var(old-widget), so that
+both names refer to the same widget.  The names have equal standing;
+if either is deleted, the other remains.  If there is already a widget
+with the var(new-widget) name, it is deleted.
+)
+item(tt(-N) var(widget) [ var(function) ])(
+Create a user-defined widget.  If there is already a widget with the
+specified name, it is overwritten.  When the new
+widget is invoked from within the editor, the specified shell var(function)
+is called.  If no function name is specified, it defaults to
+the same name as the widget.
+)
+item(var(widget))(
+Invoke the specified widget.  This can only be done when ZLE is
+active; normally this will be within a user-defined widget.
+)
+enditem()
+)
+enditem()

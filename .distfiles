@@ -1,0 +1,7 @@
+DISTFILES_SRC='
+    .cvsignore .distfiles Makefile.in
+    ChangeLog ChangeLog.3.0 INSTALL META-FAQ README
+    acconfig.h aclocal.m4 aczsh.m4 configure.in
+    configure config.h.in stamp-h.in
+    config.guess config.sub install-sh mkinstalldirs
+'

@@ -1,0 +1,100 @@
+texinode(The files Module)(The sched Module)(The example Module)(Zsh Modules)
+sect(The files Module)
+cindex(files, manipulating)
+The tt(files) module makes some standard commands available as builtins:
+
+startitem()
+findex(ln)
+xitem(tt(ln) [ tt(-dfis) ] var(filename) var(dest))
+item(tt(ln) [ tt(-dfis) ] var(filename) ... var(dir))(
+Creates hard (or, with tt(-s), symbolic) links.  In the first form, the
+specified var(dest)ination is created, as a link to the specified
+var(filename).  In the second form, each of the var(filename)s is
+taken in turn, and linked to a pathname in the specified var(dir)ectory
+that has the same last pathname component.
+
+Normally, tt(ln) will not attempt to create hard links to
+directories.  This check can be overridden using the tt(-d) option.
+Typically only the super-user can actually succeed in creating
+hard links to directories.
+This does not apply to symbolic links in any case.
+
+By default, existing files cannot be replaced by links.
+The tt(-i) option causes the user to be queried about replacing
+existing files.  The tt(-f) option causes existing files to be
+silently deleted, without querying.  tt(-f) takes precedence.
+)
+findex(mkdir)
+item(tt(mkdir) [ tt(-p) ] [ tt(-m) var(mode) ] var(dir) ...)(
+Creates directories.  With the tt(-p) option, non-existing parent
+directories are first created if necessary, and there will be
+no complaint if the directory already exists.
+The tt(-m) option can be used to specify (in octal) a set of file permissions
+for the created directories, otherwise mode 777 modified by the current
+tt(umask) (see manref(umask)(2)) is used.
+)
+findex(mv)
+xitem(tt(mv) [ tt(-fi) ] var(filename) var(dest))
+item(tt(mv) [ tt(-fi) ] var(filename) ... var(dir))(
+Moves files.  In the first form, the specified var(filename) is moved
+to the specified var(dest)ination.  In the second form, each of the
+var(filename)s is
+taken in turn, and moved to a pathname in the specified var(dir)ectory
+that has the same last pathname component.
+
+By default, the user will be queried before replacing any file
+that the user cannot write to, but writable files will be silently
+removed.
+The tt(-i) option causes the user to be queried about replacing
+any existing files.  The tt(-f) option causes any existing files to be
+silently deleted, without querying.  tt(-f) takes precedence.
+
+Note that this tt(mv) will not move files across devices.
+Historical versions of tt(mv), when actual renaming is impossible,
+fall back on copying and removing files; if this behaviour is desired,
+use tt(cp) and tt(rm) manually.  This may change in a future version.
+)
+findex(rm)
+item(tt(rm) [ tt(-dfirs) ] var(filename) ...)(
+Removes files and directories specified.
+
+Normally, tt(rm) will not remove directories (except with the tt(-r)
+option).  The tt(-d) option causes tt(rm) to try removing directories
+with tt(unlink) (see manref(unlink)(2)), the same method used for files.
+Typically only the super-user can actually succeed in unlinking
+directories in this way.
+tt(-d) takes precedence over tt(-r).
+
+By default, the user will be queried before removing any file
+that the user cannot write to, but writable files will be silently
+removed.
+The tt(-i) option causes the user to be queried about removing
+any files.  The tt(-f) option causes files to be
+silently deleted, without querying, and suppresses all error indications.
+tt(-f) takes precedence.
+
+The tt(-r) option causes tt(rm) to recursively descend into directories,
+deleting all files in the directory before removing the directory with
+the tt(rmdir) system call (see manref(rmdir)(2)).
+
+The tt(-s) option is a zsh extension to tt(rm) functionality.  It enables
+paranoid behaviour, intended to avoid common security problems involving
+a root-run tt(rm) being tricked into removing files other than the ones
+intended.  It will refuse to follow symbolic links, so that (for example)
+``tt(rm /tmp/foo/passwd)'' can't accidentally remove tt(/etc/passwd)
+if tt(/tmp/foo) happens to be a link to tt(/etc).  It will also check
+where it is after leaving directories, so that a recursive removal of
+a deep directory tree can't end up recursively removing tt(/usr) as
+a result of directories being moved up the tree.
+)
+findex(rmdir)
+item(tt(rmdir) var(dir) ...)(
+Removes empty directories specified.
+)
+findex(sync)
+item(tt(sync))(
+Calls the system call of the same name (see manref(sync)(2)), which
+flushes dirty buffers to disk.  It might return before the I/O has
+actually been completed.
+)
+enditem()

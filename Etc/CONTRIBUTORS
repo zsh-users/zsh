@@ -1,0 +1,127 @@
+----------------
+ZSH CONTRIBUTORS
+----------------
+
+Zsh was originally written by Paul Falstad <pf@zsh.org>.  Zsh is
+now maintained by the members of the zsh-workers mailing list
+<zsh-workers@math.gatech.edu>.  The development is currently coordinated
+by Andrew Main (Zefram) <zefram@zsh.org>.
+
+This file credits only the major contributors to the current release.
+See the ChangeLog files for a complete list of people who have submitted
+patches.  Note that email addresses below and in the ChangeLog file
+are included for disambiguation purposes only, and are not guaranteed
+to be currently accurate.  If you feel that you or someone else have
+been unfairly omitted from this list please mail the current maintainer
+at <coordinator@zsh.org>.
+
+Version 3.0
+-----------
+
+* Richard Coleman <coleman@math.gatech.edu> maintained the code till the
+  release of zsh-2.6-beta16.  Converted zsh to use autoconf thus greatly
+  improving the portability.  Rewrote signal handling code.  Reorganized
+  internal hash tables and rewrote the related builtins (enable, disable,
+  hash, unhash).  Made some cleanups in exec.c.
+
+* Zoltán Hidvégi <hzoli@cs.elte.hu> maintained zsh from version
+  2.6-beta16.  Rewrote most of the lexer and substitution and the related
+  completion code.  Improved sh/ksh/POSIX compatibility.  Fixed lots
+  of bugs in completion, parameter and history code.  Made zsh fully
+  8-bit clean.  Made some reorganizations in exec.c.  Fixed signal
+  handling bugs.  Fixed lots of bugs in various places.
+
+* Peter W. Stephenson <pws@ifh.de> the maintainer of the zsh FAQ.
+  Reorganizations in exec.c.  Rewrote and reorganized the history code.
+  Rewrote the zshcompctl manual page.  Fixed several bugs related to
+  programmable completion.  Fixed several signal handling bugs.  Rewrote
+  test and read builtins.  Lots of other bugfixes.
+
+* Andrew Main (Zefram) <zefram@fysh.org> reorganized builtin.c.
+  Rewrote large parts of the zle vi mode.  Redirection fixes.  Reorganized
+  parts of the completion code, added some enhancements and fixed lots of
+  bugs.  Made zle fully 8-bit clean.  Fixed several zle bugs.  Reorganized
+  zsh option handling.  Lots of other bugfixes.
+
+* Sven Wischnowsky <wischnow@informatik.hu-berlin.de> wrote most of the
+  programmable completion code in zsh-2.5.0.  Several bugfixes in exec.c
+  and jobs.c.  Lots of completion bugfixes and enhancements.
+
+* Geoff Wing <mason@werple.net.au> rewrote most of zle_refresh.c.  Some
+  other bugfixes.
+
+* Clive Messer <clive@epos.demon.co.uk> brought the texinfo documentation
+  up-to-date.
+
+* Mark Borges <mdb@cdc.noaa.gov> maintains the zsh web page
+  (http://www.mal.com/zsh/).  Several documentation fixes.  Maintains the
+  texinfo documentation together with Clive.
+
+* Wayne Davison <wayne@clari.net> improved the the zle search functions
+  and made them 8-bit clean.  Some other little bugfixes.
+
+* Bart Schaefer <schaefer@candle.brasslantern.com> submitted several
+  bugfixes, reported lots of bugs and gave many very useful suggestions.
+
+Version 2.5
+-----------
+
+Bas de Bakker maintained zsh till the release of zsh-2.5.0.  People who
+have contributed to zsh-2.5.0 are (in lexical order):
+
+Chris.Moore@src.bae.co.uk (Chris Moore)
+Harald.Eikrem@delab.sintef.no
+Irving_Wolfe@happy-man.com (Irving Wolfe)
+Jarkko.Hietaniemi@hut.fi (Jarkko Hietanimi)
+P.Stephenson@swansea.ac.uk (Peter Stephenson)
+Richard.Sharman@software.mitel.com (Richard Sharman)
+Tero_Kivinen@hut.FI (Tero Kivinen)
+arf@maths.nott.ac.uk (Anthony Iano-Fletcher)
+bas@phys.uva.nl (Bas de Bakker)
+benson@odi.com (Benson Margulies)
+billb@bedford.progress.com (Bill Burton)
+brown@wi.extrel.com (M. Brown)
+carlos@snfep1.if.usp.br (Carlos Carvalho)
+cedman@capitalist.princeton.edu (Carl Edman)
+chip%fin@myrddin.sybus.com (Chip Salzenberg)
+chs@apu.fi (Hannu Strang)
+coleman@math.gatech.edu (Richard Coleman)
+cross@eng.umd.edu (Chris Ross)
+dm@cs.brown.edu (Dimitris Michailidis)
+dmm0t@rincewind.mech.virginia.edu (David M. Meyer)
+esky@CS.UCLA.EDU (Eskandar Ensafi)
+franl@centerline.com (Fran Litterio)
+gansevle@cs.utwente.nl (Fred Gansevles)
+gnohmon@ssiny.com (Ralph Betza)
+guillaum@clipper.ens.fr (Florent Guillaume)
+guthrie@math.upenn.edu (John Guthrie)
+hegedus@celeste.eng.yale.edu (Peter Hegedus)
+henryg@tusc.com.au (Henry Guillaume)
+hoh@approve.se (Goran Larsson)
+hooft@chem.ruu.nl (Rob Hooft)
+hsw1@papa.attmail.com (Stephen Harris)
+irving@happy-man.com (Irving Wolfe)
+jch@cs.cmu.edu (Jonathan Hardwick)
+jos@oce.nl (Jos Backus)
+liblit@cs.psu.edu (Benjamin Liblit)
+marc@cam.org (Marc Boucher)
+mason@werple.apana.org.au (Geoff Wing)
+mycroft@gnu.ai.mit.edu (Charles Hannum)
+mystic@axposf.pa.dec.com (D. Hall)
+norbert@i3.informatik.rwth-aachen.de (Norbert Kiesel)
+oberon@cs.tu-berlin.de (Sven Wischnowsky)
+pclink@qld.tne.oz.au (Rick)
+pem@aaii.oz.au (Paul Maisano)
+per@efd.lth.se (Per Foreby)
+pf@z-code.com (Paul Falstad)
+roderick@ibcinc.com (Roderick Schertler)
+schaefer@z-code.com (Bart Schaefer)
+schlangm@informatik.uni-muenchen.de (Harald Schlangmann)
+seniorr@teleport.com (Russell Senior)
+sinclair@dcs.gla.ac.uk (Duncan Sinclair)
+sterling@oldcolo.com (Bruce Sterling Woodcock)
+suzuki@otsl.oki.co.jp (Hisao Suzuki)
+tsm@cs.brown.edu (Timothy Miller)
+vogelke@c17mis.wpafb.af.mil (Karl E. Vogel)
+wacker@physik.uni-dortmund.de (Klaus Wacker)
+wacren@cis10.ens-cachan.fr (Laurent Wacrenier)

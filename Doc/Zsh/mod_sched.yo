@@ -1,0 +1,17 @@
+texinode(The sched Module)(The stat Module)(The files Module)(Zsh Modules)
+sect(The sched Module)
+The tt(sched) module makes available one builtin command:
+
+startitem()
+findex(sched)
+cindex(timed execution)
+cindex(execution, timed)
+xitem(tt(sched) [tt(PLUS())]var(hh)tt(:)var(mm) var(command) ...)
+item(tt(sched) [ tt(-)var(item) ])(
+Make an entry in the scheduled list of commands to execute.
+The time may be specified in either absolute or relative time.
+With no arguments, prints the list of scheduled commands.
+With the argument `tt(-)var(item)', removes the given item
+from the list.
+)
+enditem()

@@ -1,0 +1,9 @@
+DISTFILES_SRC='
+    .distfiles
+    arith.yo builtins.yo compat.yo compctl.yo cond.yo exec.yo expn.yo
+    filelist.yo files.yo func.yo grammar.yo guide.yo index.yo intro.yo
+    invoke.yo jobs.yo metafaq.yo mod_cap.yo mod_clone.yo mod_comp1.yo
+    mod_compctl.yo mod_deltochar.yo mod_example.yo mod_files.yo mod_sched.yo
+    mod_stat.yo mod_zle.yo modules.yo options.yo params.yo prompt.yo
+    redirect.yo restricted.yo seealso.yo zle.yo
+'

@@ -1,0 +1,2328 @@
+Thu Oct 29 21:51:10 1998  Andrew Main  <zefram@zsh.org>
+
+	* Config/version.mk: Version 3.1.5.
+
+	* Doc/Makefile.in, Doc/META-FAQ.yo: Format the plain-ASCII
+	  META-FAQ in a manner consistent with the other plain-ASCII
+	  documents.
+
+	* Src/exec.c: Retry reading from a pipe on EINTR, to avoid
+	  getting truncated output.  (schaefer, u1880)
+
+	* acconfig.h, aczsh.m4, configure.in, Src/compat.c, Src/system.h,
+	  Src/watch.c: New zsh_STRUCT_MEMBER macro for structure member
+	  tests (changes names of some existing preprocessor defines).
+	  Test for d_ino and d_stat in struct dire[nc]t.  New code in
+	  zgetdir() to make use of d_stat if available.
+
+	* Src/params.c, Src/system.h, Src/watch.c: Move definition of
+	  DEFAULT_WATCHFMT into watch.c (where the decision about which
+	  utmp structure to use is made).
+
+	* Doc/Zsh/metafaq.yo: Another mirror (sunsite.doc.ic.ac.uk).
+
+Wed Oct 28 21:02:28 1998  Andrew Main  <zefram@zsh.org>
+
+	* Src/builtin.c: More accurate test for ncurses, for the benefit
+	  of systems where ncurses' termcap.h is used.
+
+	* Etc/BUGS, Etc/CONTRIBUTORS, Etc/FEATURES, Etc/MACHINES,
+	  Etc/NEWS, INSTALL, README, Util/zsh-development-guide:
+	  Consistent formatting.
+
+	* Etc/NEWS: List universal-argument and POSIX character classes.
+
+	* Doc/Zsh/metafaq.yo, Etc/CONTRIBUTORS: Use more zsh.org email
+	  addresses.
+
+Tue Oct 27 20:23:18 1998  Andrew Main  <zefram@zsh.org>
+
+	* Etc/FAQ.yo: New version, 1998-10-26.  (pws)
+
+Mon Oct 26 21:13:42 1998  Andrew Main  <zefram@zsh.org>
+
+	* Doc/Zsh/guide.yo, Doc/Zsh/metafaq.yo, Etc/CONTRIBUTORS,
+	  Functions/checkmail, Functions/run-help, Functions/zed,
+	  Misc/compctl-examples, Misc/lete2ctl, README,
+	  Src/Builtins/rlimits.awk, Src/Zle/zle_main.c, Src/makepro.awk,
+	  Src/signames.awk, Util/helpfiles, Util/reporter: Consistently
+	  use zsh.org email addresses where available.  Remove some
+	  stray individual credits from the source, in favour of the
+	  more usual credit in ChangeLog and CONTRIBUTORS files.
+
+	* acconfig.h, configure.in, Src/watch.c: Some systems have ut_tv
+	  in struct utmpx, rather than ut_xtime or ut_time.
+
+Sun Oct 25 21:04:01 1998  Andrew Main  <zefram@zsh.org>
+
+	* Src/exec.c: Save and restore simple_pline.  (pws, 4390)
+
+	* Src/loop.c: Set isfirstln to get the right behaviour on ^D
+	  in select.  (pws, 4389)
+
+	* Src/exec.c: Don't fail to AUTO_CD if there is an improperly
+	  hashed external command of the same name.  (pws, 4426;
+	  schaefer, 4434)
+
+	* Src/builtin.c: getopts wasn't resetting all its counters
+	  correctly.  (schaefer, 4416)
+
+	* Src/Zle/zle_tricky.c: Prevent removable suffixes remaining in
+	  effect when a new completion is attempted.
+
+	* Doc/Zsh/compctl.yo: Add an example of usage of n[...] to the
+	  compctl manual.  (pws, u1857)
+
+	* Src/Zle/zle_main.c, Src/Zle/zle_misc.c: Give ungetkey()
+	  external linkage.
+
+	* Doc/Zsh/zle.yo, Src/Zle/zle_misc.c: Make universal-argument
+	  accept a typed integer, EMACS-style.  (pws, 4425)
+
+	* Src/Zle/zle.h, Src/Zle/zle_misc.c: Fix neg-argument.  (pws,
+	  4420)
+
+Sat Oct 17 17:12:31 1998  Andrew Main  <zefram@zsh.org>
+
+	* Doc/Zsh/mod_files.yo: Note that mv won't move across devices.
+
+	* Doc/Zsh/expn.yo: Add some examples to the parameter expansion
+	  section.  (schaefer, 4402)
+
+	* Src/jobs.c: Unset STAT_DONE when adding a process to a job,
+	  in case $() processes finish before all the processes have
+	  been started.  (pws, 4397)
+
+	* Doc/Zsh/builtins.yo, Src/builtin.c, Src/hashtable.c, Src/zsh.h:
+	  type/whence/where/which -w gives machine-readable output.
+	  (pws, 4388)
+
+	* Doc/Zsh/builtins.yo: Document the effect of unset on a local
+	  parameter.
+
+	* Src/params.c: unset should not remove the localness of a
+	  local parameter.  (pws, 4317)
+
+	* Src/compat.c, Src/prototypes.h: Give gethostname() the right
+	  prototype (the length argument is a size_t), and implement it
+	  to spec.
+
+	* Doc/Zsh/metafaq.yo: New address for web-based mailing list
+	  archive (http://www.zsh.org/mla/).
+
+	* Doc/Zsh/metafaq.yo: New mirror (foad.org).
+
+Thu Oct 15 19:07:17 1998  Andrew Main  <zefram@zsh.org>
+
+	* configure.in, Src/Modules/cap.c, Src/utils.c: Check for the
+	  existence of cap_get_proc() rather than cap_init(), because
+	  some systems have a different cap_init().
+
+	* Etc/MACHINES: Format changes.  Removed some entries that didn't
+	  actually contain any intelligible information.
+
+	* Etc/MACHINES: Tested on FreeBSD 2.2.7.  (Roland Jesse
+	  <jesse@prinz-atm.cs.uni-magdeburg.de>, u1770)
+
+	* acconfig.h, configure.in, Src/watch.c: Handle systems where
+	  struct utmpx has a member named ut_time rather than ut_xtime.
+
+	* Src/parse.c: Do not require a separator after esac.  (hzoli,
+	  4376)
+
+	* Doc/Makefile.in: Ignore errors from makeinfo.
+
+	* Src/Zle/zle_thingy.c: Use permanent allocation when executing
+	  widgets.  (schaefer, 4350)
+
+	* Functions/multicomp: Fix for leading tildes; made
+	  case-insensitive.  (schaefer, 4342)
+
+	* Src/Zle/zle_utils.c: Fix an uninitialised pointer in
+	  mkundoent().  (pws, 4315)
+
+	* config.guess: Support Netwinder (arm-unknown-linux).
+	  (Jason Naughton <jnaughto@ee.ryerson.ca>, 4308)
+
+	* configure.in: Dynamic linking on OSF.  (<simond@informix.com>,
+	  4258)
+
+	* Misc/lete2ctl: Update for Perl5.004.  Use compctl -/ and -W.
+	  Some other fixes.  (pws, 4245)
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/compctl.yo: Minor typo fixes.
+	  (schaefer, 4232)
+
+	* Src/signals.h: A variable was being modified twice without an
+	  intervening sequence point.  (Gray Watson <gwatson@lycos.com>,
+	  4221)
+
+	* Makefile.in: Remove spurious ";\".  (Gray Watson
+	  <gwatson@lycos.com>, 4221)
+
+Tue Oct 13 21:42:47 1998  Andrew Main  <zefram@zsh.org>
+
+	* Doc/Zsh/expn.yo, Src/glob.c: Add the [:blank:] character class
+	  required by POSIX, which has no corresponding ctype macro.
+
+	* Doc/Zsh/expn.yo, Misc/globtests, Src/glob.c, Src/lex.c:
+	  Add POSIX globbing character classes ([:alnum:] etc.).
+	  (pws, 4209+4212)
+
+Sun Oct 11 20:39:06 1998  Andrew Main  <zefram@zsh.org>
+
+	* Src/Zle/zle_tricky.c: Make compctl -S '' work properly (i.e.,
+	  suppress the addition of the default suffix).  (schaefer, u1668)
+
+	* Src/loop.c: Fix the handling of empty user input to select.
+	  (schaefer, 4200)
+
+	* Src/utils.c: Y2K bugfix in %y sequence in ztrftime().
+	  (zefram, 4198)
+
+	* Src/init.c, Src/main.c: Abort on parse errors, except when
+	  reading input from stdin.  (pws, 4191; some semantic changes
+	  by zefram)
+
+	* Misc/compctl-examples: Fix the setopt completion in the case
+	  where KSH_OPTION_PRINT is set.  (schaefer, 4176)
+
+	* Doc/Zsh/compctl.yo: Mention the read builtin in the
+	  documentation of compctl -K.  (sven, 4150)
+
+	* Src/Zle/zle_tricky.c: Fixed a bug where completing in a word
+	  could duplicate part of the word due to it being in both the
+	  common prefix and the common suffix.  (sven, 4147)
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/compat.yo, Doc/Zsh/expn.yo,
+	  Doc/Zsh/grammar.yo, Doc/Zsh/intro.yo, Doc/Zsh/options.yo,
+	  Doc/Zsh/params.yo, Doc/Zsh/restricted.yo, Doc/Zsh/zle.yo:
+	  Spelling/typo fixes in documentation.  (schaefer, 4136)
+
+	* Misc/compctl-examples: Better implementations of the CVS
+	  compctl functions.  (schaefer, 4130)
+
+Sun Sep 27 18:31:55 1998  Andrew Main  <zefram@zsh.org>
+
+	* Doc/zsh.yo, Doc/Zsh/builtins.yo, Doc/Zsh/compctl.yo,
+	  Doc/Zsh/expn.yo, Doc/Zsh/grammar.yo, Doc/Zsh/guide.yo,
+	  Doc/Zsh/intro.yo, Doc/Zsh/params.yo, Doc/Zsh/redirect.yo,
+	  Doc/Zsh/zle.yo: Clarification of the expansion documentation.
+	  Several other documentation bugfixes.  (schaefer, 4116)
+
+	* Src/Modules/rlimits.awk: Cosmetic fix of the generated file.
+
+	* Src/Modules/rlimits.awk: Avoid using the sub() function,
+	  which some older awks lack.
+
+	* Doc/Zsh/grammar.yo: List "builtin" as a precommand modifier.
+
+	* Doc/Zsh/builtins.yo: Fuller details of the interaction between
+	  options of the read builtin.  (schaefer, 4109)
+
+	* Src/Modules/stat.c: The ls-style mode string was not being
+	  terminated.  (Goran Larsson <hoh@lorelei.approve.se>, 4105)
+
+	* Src/Zle/zle_hist.c: Make use of repeat count in history
+	  searches.  (wayne, 4104)
+
+	* Src/Zle/zle_hist.c: Some bugfixes and code simplifications
+	  for {vi-,}{up,down}-line-or-{history,search}.  (wayne, 4086)
+
+Sat Sep 26 16:08:53 1998  Andrew Main  <zefram@zsh.org>
+
+	* Etc/zsh-development-guide: Expanded the section on C coding
+	  style.  Added some notes about documentation.
+
+	* configure.in, Src/exec.c, Src/glob.c, Src/hashtable.c,
+	  Src/init.c, Src/params.c, Src/system.h, Src/utils.c,
+	  Src/Modules/stat.c, Src/Zle/zle_tricky.c: Cope with systems
+	  that lack <pwd.h>, <grp.h>, nice(), getpw{ent,nam,uid}(),
+	  getgr{gid,nam}().
+
+	* Doc/Zsh/metafaq.yo: uiarchive now mirrors ftp.zsh.org.
+
+	* Doc/ztexi.yo, Doc/Zsh/expn.yo, Doc/Zsh/options.yo,
+	  Doc/Zsh/redirect.yo, Doc/Zsh/zle.yo: Some minor documentation
+	  fixes.  (schaefer, 4045)
+
+	* Src/hist.c, Src/input.c, Src/parse.c: Simplification and
+	  bugfixes of the input flushing code on history and parse
+	  errors.  (pws, 4172)
+
+	* configure.in: Use "1,$s" instead of ",s" in the generated
+	  ed script, for compatibility with historical systems.
+
+Mon Sep 21 19:16:03 1998  Andrew Main  <zefram@zsh.org>
+
+	* Src/Makefile.in: Clean up conditionals in install/uninstall
+	  rules.
+
+	* Config/clean.mk, Config/config.mk, Src/Makemod.in.in: Avoid
+	  empty argument list in for loops, for /bin/sh.
+
+	* aczsh.m4, configure.in, Etc/MACHINES: Check for systems with
+	  broken static/shared library combinations, such as SINIX.
+
+	* Doc/Zsh/params.yo, Src/builtin.c, Src/params.c: Make PWD and
+	  OLDPWD parameters non-special.  (hzoli, 3990; doc by zefram)
+
+	* Src/builtin.c: Don't crash when exporting an unset special
+	  parameter.  (hzoli, 3983)
+
+	* Src/Zle/zle_utils.c: Mark sticks to preceding character instead
+	  of the following one.  (wayne, 3969)
+
+	* Src/builtin.c, Src/init.c, Src/utils.c: Set stdin to read
+	  blockingly where appropriate.  (hzoli, 3950; POSIXification
+	  by zefram)
+
+Mon Sep 14 14:44:32 1998  Andrew Main  <zefram@zsh.org>
+
+	* Makefile.in, configure.in, Config/.distfiles, Config/config.mk,
+	  Config/defs.mk, Config/version.mk, Doc/.cvsignore,
+	  Doc/.distfiles, Doc/Makefile.in, Doc/paths.yo.in,
+	  Doc/zman.yo, Doc/zsh.yo, Doc/ztexi.yo, Doc/Zsh/builtins.yo,
+	  Doc/Zsh/filelist.yo, Doc/Zsh/files.yo, Doc/Zsh/mod_comp1.yo,
+	  Doc/Zsh/modules.yo, Doc/Zsh/options.yo, Doc/Zsh/params.yo,
+	  Etc/Makefile.in, Src/.distfiles, Src/Makefile.in,
+	  Src/Makemod.in.in, Src/version.h, Src/zsh.mdd: Move version
+	  data into a single file, Config/version.mk.  Remove all site
+	  dependencies from the documentation.  Some related Makefile
+	  cleanups.
+
+Sun May 31 09:28:18 1998  Andrew Main  <zefram@zsh.org>
+
+	* Src/version.h: Version 3.1.4.
+
+	* Doc/paths.yo.in: New date.
+
+	* configure.in, aczsh.m4, acconfig.h, Src/system.h,
+	  Src/watch.c: Don't confuse utmp and utmpx files.  Don't rely
+	  on having a utmp structure at all.
+
+	* Src/system.h, Src/Modules/clone.c, Src/Modules/files.c,
+	  Src/builtin.c, Src/compat.c, Src/exec.c, Src/hist.c, Src/init.c,
+	  Src/utils.c: Use O_NOCTTY on all open() calls, to get consistent
+	  behaviour (no controlling tty) on all systems.
+
+	* Doc/Zsh/grammar.yo: Correct and clarify the "simple commands &
+	  pipelines" section.  (schaefer, u1548; markup and some additions
+	  by zefram)
+
+	* Src/params.c: When unsetting paired special parameters (e.g.,
+	  CDPATH/cdpath), don't try to remove names that don't exist.
+	  (hzoli, 3974)
+
+Sat May 30 16:16:13 1998  Andrew Main  <zefram@zsh.org>
+
+	* Src/system.h: #define _XPG_IV on SINIX (Reliant UNIX).  It is
+	  reported that this is necessary in order to get the right
+	  version of gettimeofday().
+
+	* Doc/Zsh/grammar.yo, Src/lex.c, Src/subst.c, Src/utils.c,
+	  Etc/NEWS: ksh93 $'' syntax.  (hzoli, 3952; documentation
+	  clarifications by zefram)
+
+Thu May 28 21:13:04 1998  Andrew Main  <zefram@zsh.org>
+
+	* Functions/checkmail: Zero-length folders don't count as
+	  containing new mail, regardless of when they've been examined.
+	  (hzoli, 3963)
+
+	* Src/glob.c: When globbing `foo/', stat `foo/.', so that only
+	  directories are matched (as POSIX requires).  With (-T)
+	  qualifier, dangling symlinks should be matched as normal.
+	  With (T-/), etc., stat the pathname *before* modification by
+	  (T).  (hzoli, 3960)
+
+	* Src/Modules/stat.c: Some old K&R compilers don't like automatic
+	  aggregate initialisation.  (hzoli, 3962)
+
+	* Src/glob.c: tail was assumed to be NULL when pattern parsing
+	  was called.  (hzoli, 3961)
+
+	* Src/builtin.c: Fix off-by-one allocation bug in read.
+	  (hzoli, 3951)
+
+	* Src/builtin.c: Cleanup of read builtin.  Also backslash should
+	  quote characters, as well as performing line continuation.
+	  (hzoli, 3949)
+
+	* Src/Zle/zle_tricky.c: Remove prototype cast for
+	  yp_callback.foreach, because on some systems the prototype
+	  is wrong.  (hzoli, 3948)
+
+	* Src/math.c: Avoid an unbalanced stack error on $((0x1+0x1)).
+	  (hzoli, 3947)
+
+	* Src/params.c: PM_UNIQUE should persist across changes of
+	  parameter type.  (hzoli, 3946)
+
+	* Etc/NEWS: List major changes from 3.0.
+
+Tue May 26 21:39:06 1998  Andrew Main  <zefram@zsh.org>
+
+	* Src/glob.c, Doc/Zsh/expn.yo: `~' alone should not trigger
+	  globbing.
+
+Mon May 25 21:13:41 1998  Andrew Main  <zefram@zsh.org>
+
+	* Src/mkmakemod.sh, configure.in, aczsh.m4: Link modules against
+	  $(LIBS), and include -lc in $(LIBS), in case a module requires
+	  a function that only exists in static libraries.
+
+	* Src/makepro.awk: Change `\{' to `[{]' in regexps, because some
+	  nawks dislike the former.
+
+	* configure.in: Use tr to avoid giving backslashes to echo
+	  (which may interpret them).
+
+Fri May  1 19:39:12 1998  Andrew Main  <zefram@zsh.org>
+
+	* Doc/Zsh/metafaq.yo: ftp.math.technion.ac.il now mirrors
+	  ftp.zsh.org.
+
+Thu Apr 30 20:19:47 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/version.h: Version 3.1.3.
+
+	* Doc/paths.yo.in: New date.
+
+	* Src/Modules/stat.c: Remove some unused variables.
+
+	* configure.in: Start of configuration for dynamic modules
+	  on netbsd.  (gcw)
+
+	* Doc/Zsh/metafaq.yo: New mirror (ftp.roedu.net).  ftp.cs.elte.hu
+	  and ftp.cenatls.cena.dgac.fr now mirror ftp.zsh.org.
+
+Wed Apr 29 20:24:16 1998  Andrew Main  <zefram@fysh.org>
+
+	* many files: Remove RCS Id lines.
+
+	* Etc/pubring.pgp: Change mason's DSS/DH key.
+
+	* Doc/Zsh/metafaq.yo: New mirror (sunsite.auc.dk).
+	  ftp.math.gatech.edu now mirrors ftp.zsh.org.
+
+Tue Apr 28 23:18:44 1998  Andrew Main  <zefram@fysh.org>
+
+	* Doc/Zsh/metafaq.yo: New primary archive, ftp.zsh.org.
+
+	* Etc/FAQ.yo: New version, 1998-04-24.  (pws)
+
+	* Etc/FTP-README, Etc/pubring.pgp, Etc/.distfiles: Include these
+	  files from the FTP site in the distribution.
+
+	* configure.in, Util/mkdisttree.sh, Config/, Config/clean.mk,
+	  Config/config.mk, Config/defs.mk Makefile.in,
+	  Doc/Makefile.in, Etc/Makefile.in, Functions/Makefile.in,
+	  Misc/Makefile.in, Src/Makefile.in, Src/Makemod.in.in,
+	  StartupFiles/Makefile.in, Util/Makefile.in, .distfiles,
+	  Config/.distfiles, Doc/.distfiles, Doc/Zsh/.distfiles,
+	  Etc/.distfiles, Functions/.distfiles, Misc/.distfiles,
+	  Src/.distfiles, Src/Builtins/.distfiles, Src/Modules/.distfiles,
+	  Src/Zle/.distfiles, StartupFiles/.distfiles, Util/.distfiles:
+	  Modify config.status to add a file inclusion facility;
+	  this is used to remove common code from many Makefiles.
+	  New distribution-building mechanism: `.distfiles' files list
+	  the files to go in the distribution, and Util/mkdisttree.sh
+	  processes these.  As a result, directories in which nothing
+	  is ever built no longer need Makefiles.
+
+Sun Apr 26 22:08:06 1998  Andrew Main  <zefram@fysh.org>
+
+	* configure.in, Src/mkmakemod.sh: Modify config.status to allow
+	  .in files in the build tree.
+
+Sun Apr 26 19:35:17 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/glob.c: Glob patterns with | alternation at the top level
+	  were not setting C_LAST flags correctly.  (zefram, 3876)
+
+Sun Apr 26 13:49:28 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/cond.c, Src/glob.c, Src/system.h, Src/utils.c,
+	  Src/Modules/files.c, Src/Modules/stat.c, Src/Zle/zle_tricky.c:
+	  Use POSIX S_I* macros instead of fixed octal values.  (zefram,
+	  3875)
+
+	* configure.in, Src/params.c, Src/system.h: Don't need configure
+	  test for sizeof(long).
+
+	* configure.in, Src/cond.c, Src/glob.c, Src/system.h,
+	  Src/Modules/files.c, Src/Modules/stat.c, Src/Zle/zle_tricky.c:
+	  Use S_IS* macros in all cases instead of S_IF*.  Define S_IS*
+	  macros for file types that don't exist, to avoid needing
+	  conditionals; support readlink() similarly.  Add more file
+	  type letters to the stat module.  (zefram, 3874)
+
+Sat Apr 25 22:58:34 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/Zle/zle_misc.c: Fix an array overrun in suffix removal,
+	  caused by a signed/unsigned char mixup.  (zefram, 3873)
+
+Sat Apr 25 17:15:32 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/utils.c: Make CHASE_LINKS take effect on cd, as documented.
+	  (zefram, 3872)
+
+	* Misc/globtest, Misc/globtest.ksh, Src/glob.c: Fix for exclusions
+	  nested inside more complex glob patterns.  (pws, 3870)
+
+Thu Apr 23 21:21:29 1998  Andrew Main  <zefram@fysh.org>
+
+	* META-FAQ, Doc/META-FAQ.yo, Doc/Makefile.in, Doc/Zsh/guide.yo,
+	  Doc/Zsh/intro.yo, Doc/Zsh/metafaq.yo, Doc/Zsh/seealso.yo:
+	  Generate the META-FAQ and the related parts of the documentation
+	  from a common source (Doc/Zsh/metafaq.yo).  Updated list of
+	  mirror sites.
+
+	* Src/exec.c: Back out patch 3859.  NO_CLOBBER should allow
+	  opening non-regular files (POSIX.2 clause 3.7.2).  Instead fix
+	  the errno handling.  (zefram, 3869)
+
+Wed Apr 22 21:11:30 1998  Andrew Main  <zefram@fysh.org>
+
+	* Etc/BUGS, Etc/MACHINES: sed is no longer used for generating
+	  prototypes.  We also now know about /proc/self/fd.
+
+	* Misc/compctl-examples: Remove some code to cope with very old
+	  zsh versions.
+
+	* Etc/CONTRIBUTORS, Util/zsh-development-guide, Doc/Zsh/intro.yo,
+	  META-FAQ, README: New coordinator.
+
+	* Src/exec.c: NO_CLOBBER should prevent opening FIFOs, not just
+	  overwriting regular files.  (zefram, 3859)
+
+Wed Apr  8 20:29:28 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/version.h: Version 3.1.2-zefram4.
+
+	* Src/Zle/zle_keymap.c: Bind "^[OA" etc. as well as "^[[A".
+	  Change vi arrow key bindings to match vi practice.  (zefram)
+
+	* Src/jobs.c: Don't read tty settings when ZLE is active.
+	  (pws, 3818)
+
+	* Src/Zle/zle_keymap.c: Don't set errflag in bindkey.  (pws, 3815)
+
+	* Etc/FAQ: New FAQ version, 1998-03-24.  (pws, a76)
+
+	* Misc/compctl-examples: tar completion that lists files in
+	  the archive.  (pws, u1409)
+
+	* Src/glob.c: Fix foo(:s/foo/bar).  (pws, 3808)
+
+	* Src/subst.c: Fix ${i:s/foo/bar}.  (pws, 3806)
+
+	* Doc/Zsh/expn.yo: Mention in the parameter expansion section
+	  that history modifiers can be used.  (pws, 3805)
+
+Mon Apr  6 21:45:30 1998  Andrew Main  <zefram@fysh.org>
+
+	* Doc/Zsh/expn.yo, Doc/Zsh/options.yo, Src/glob.c, Src/options.c,
+	  Src/parse.c: More glob changes:
+	  + remove `-(...)' glob qualifier syntax
+	  + allow normal qualifier syntax with KSH_GLOB
+	  + add option BARE_GLOB_QUAL (emulation-relevant, zsh-only)
+	    that enables glob qualifiers
+	  + remove the paren twiddling when using patterns in [[ ]]
+	    and case
+	  (zefram)
+
+	* Misc/globtests, Misc/globtests.ksh: More tests for exclusions,
+	  which currently don't work properly.  (zefram)
+
+Sun Apr  5 20:00:40 1998  Andrew Main  <zefram@fysh.org>
+
+	* Doc/Zsh/expn.yo, Doc/Zsh/options.yo, Src/glob.c: Glob changes:
+	  + KSH_GLOB doesn't affect parens that are not preceded by the
+	    special characters
+	  + correctly handle combinations like ?(foo)##
+	  + parens always trigger globbing
+	  + with EXTENDED_GLOB, embedded `~' triggers globbing,
+	    as the documentation already states
+	  + remove incorrect special handling of (^...)
+	  + general documentation cleanup
+	  (zefram)
+
+	* Doc/Zsh/expn.yo, Doc/Zsh/options.yo, Misc/globtests,
+	  Misc/globtests.ksh, Src/glob.c, Src/options.c, Src/parse.c,
+	  Src/zsh.h: KSH_GLOB.  (pws, 3764)
+
+Sat Apr  4 15:44:05 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/Zle/zle_tricky.c: expand-or-complete-prefix rewrite.
+	  (pws, 3770)
+
+Wed Mar 25 21:51:15 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/builtin.c: getopts bugfixes.  (bugs pointed out by Bernd
+	  Eggink <eggink@uni-hamburg.de>, 3797)
+
+	* Misc/compctl-examples: Completions for ssh, nslookup, telnet,
+	  ping, finger and gdb.  (<mirar@idonex.se>, u1274; some fiddling)
+
+	* Misc/compctl-examples: pine completion.  (pws, u1359)
+
+Tue Mar 24 21:36:47 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/compat.c, Src/prototypes.h: gettimeofday() returns int,
+	  not void.  (zefram)
+
+	* Misc/compctl-examples: cvs completion.  (<mirar@idonex.se>,
+	  u1243; much fiddling)
+
+	* Misc/compctl-examples: lynx completion.  (Oliver Kiddle
+	  <opk101@cs.york.ac.uk>, 3760; some fiddling for portability)
+
+Mon Mar 23 21:18:11 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/loop.c: Don't reprint the select list after non-empty input.
+	  (Bernd Eggink <eggink@uni-hamburg.de>, 3796)
+
+	* configure.in: Display module compiler flags.  (zefram)
+
+	* Src/signames.awk, Src/Builtins/rlimits.awk: Remove leading
+	  zeros from decimal constants to avoid interpretation as octal.
+
+	* configure.in: define CLOBBERS_TYPEAHEAD for SINIX.  (Andrej
+	  Borsenkow <borsenkow.msk@sni.de>, 3737)
+
+	* Misc/compctl-examples: mount completion.  (Stefan Monnier
+	  <monnier@tequila.systemsz.cs.yale.edu>, u1238)
+
+Sun Mar 22 19:02:04 1998  Andrew Main  <zefram@fysh.org>
+
+	* Doc/Zsh/prompt.yo, Src/utils.c: %L strftime sequence to do %l
+	  without fill.  (pws, 3731)
+
+	* Src/prompt.c, Doc/Zsh/prompt.yo: %L prompt escape for $SHLVL.
+	  (Phil Pennock <bear@dcs.warwick.ac.uk>)
+
+	* Src/Makefile.in: Use LD_RUN_PATH instead of -R.  (Andrej
+	  Borsenkow <borsenkow.msk@sni.de>, 3739)
+
+	* Etc/FAQ: New FAQ version, 1998-03-02.  (pws, a75)
+
+Thu Jan 15 23:28:02 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/makepro.awk, Src/mkmakemod.sh, Src/mkmodindex.sh:
+	  Portability fixes.  (zefram, 3713)
+
+	* configure.in: Test for yp_all(), not getdomainname(), to see
+	  if -lnsl is required.  (zefram, 3715)
+
+	* Makefile.in, Src/Makefile.in, Src/Makemod.in.in: Accept
+	  $(INSTALL) being a relative pathname, set by configure.
+	  (zefram, 3716)
+
+	* configure.in, Src/Makefile.in: More logical name for libzsh.
+	  Install/uninstall/clean libzsh.  Link with a -R option to
+	  indicate where libzsh will be installed.  (zefram, 3714)
+
+	* Src/glob.c: Don't use up more digits in a <-> glob pattern
+	  than the range can match.  There are still several cases that
+	  don't work; backtracking is required.  (pws, 3680)
+
+Sun Jan 11 19:22:13 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/version.h: Version 3.1.2-zefram3.
+
+	* Src/builtins.c: Rewrote getopts to remove its various bugs.
+
+Sun Jan 11 14:22:50 1998  Andrew Main  <zefram@fysh.org>
+
+	* Doc/Makefile.in, Etc/Makefile.in, Functions/Makefile.in,
+	  Makefile.in, Misc/Makefile.in, Src/Makefile.in,
+	  Src/Makemod.in.in, StartupFiles/Makefile.in, Util/Makefile.in:
+	  Pass on all configuration variables to all Makefiles.
+
+	* Src/mkmakemod.sh: Fix $sed_normalise script to allow for
+	  compilation in the source tree.
+
+Sat Jan 10 23:56:33 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/version.h: Version 3.1.2-zefram2.
+
+	* Doc/Zsh/compctl.yo, Src/Zle/comp.h, Src/Zle/comp1.c,
+	  Src/Zle/compctl.c, Src/Zle/zle_tricky.c: compctl -Y is like -X,
+	  but performs expansion on the string.  compctl -y allows the
+	  displayed completions to be user-generated.  (pws, 3636)
+
+Sat Jan 10 16:27:30 1998  Andrew Main  <zefram@fysh.org>
+
+	* Misc/compctl-examples: Use compctl -W where appropriate.
+
+	* Doc/Zsh/compctl.yo, Src/Zle/comp.h, Src/Zle/compctl.c,
+	  Src/Zle/zle_tricky.c: compctl -W applies an invisible prefix
+	  when matching pathnames.  (pws, 3498+3502)
+
+	* Misc/compctl-examples: Use compctl -/ where appropriate.
+
+	* Doc/Zsh/compctl.yo, Src/Zle/comp.h, Src/Zle/compctl.c,
+	  Src/Zle/zle_tricky.c: compctl -/ completes directories in the
+	  manner of -f.  (pws, 3492+3493+3495+3502)
+
+Sat Jan 10 00:36:04 1998  Andrew Main  <zefram@fysh.org>
+
+	* Makefile.in, Src/Makefile.in, Src/Makemod.in.in: make clean
+	  fixes.
+
+Fri Jan  9 21:04:38 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/system.h, Src/zsh.h, Src/utils.c, Src/parse.c: Don't
+	  depend on any relation between sizes of ints and pointers when
+	  duplicating/freeing structures.
+
+	* Src/Zle/zle_refresh.c: Refresh bugfix.  (schaefer, 3511)
+
+	* Util/helpfiles: Updated.  (pws, 3598)
+
+	* Doc/Zsh/intro.yo: Mention the list archives.
+
+	* configure.in: Prefer -lcurses to -ltermcap on HP-UX 10.*.
+	  (pws, 3360)
+
+Fri Jan  9 01:28:46 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/Makefile.in: ansi2knr was being built as a.out.
+
+Wed Jan  7 23:44:16 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/glob.c, Misc/globtests: Backtrack in globbing, to support
+	  nested closures.  (pws, 3513+3514+3515+3525)
+
+	* Doc/Zsh/expn.yo: Clarifications and corrections to the
+	  documentation for history expansion modifiers.  (pws, 3549)
+
+	* Src/subst.c: Fix for a typo that made RC_EXPAND_PARAM expansion
+	  of an empty array go horribly wrong.  (hzoli, 3548)
+
+	* Src/builtin.c, Src/hist.c: Neater method to remove fc commands
+	  from the history list.  (pws, 3531)
+
+	* Src/builtin.c, Src/init.c, Src/main.c: Make $(r) work.
+	  (pws, 3526)
+
+Wed Jan  7 22:17:31 1998  Andrew Main  <zefram@fysh.org>
+
+	* Doc/Zsh/options.yo, Src/Zle/zle_tricky.c: Completion in brace
+	  expansion, with magic suffix removal on `,' and `}' triggered by
+	  AUTO_PARAM_KEYS.  (pws, 3438; suffix code rewritten by zefram)
+
+	* Src/Zle/zle_tricky.c, Doc/Zsh/compctl.yo: Print -X explanation
+	  iff there was not a unique match, rather than iff there were
+	  no matches.  (code: hzoli, 3423.  doc: pws, 3424)
+
+Wed Jan  7 20:44:46 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/init.c, Doc/Zsh/func.yo: preexec shell function is run
+	  immediately before running each command.  (pws, u1068)
+
+	* Src/Zle/zle_main.c: Select keymap earlier; apparently
+	  this avoids a crash in some circumstances.  (Bernd Eggink
+	  <eggink@uni-hamburg.de>, 3625)
+
+	* Src/mem.c: zrealloc() should check for out-of-memory condition.
+	  (hzoli, 3522)
+
+	* Src/subst.c: A fix for `a="a "; print -l ${(o)=a}b'.  (hzoli,
+	  3522)
+
+	* Src/rlimits.awk: Some awks do not like || in the pattern.
+	  (hzoli, 3522)
+
+	* Misc/c2z: Many corrections.  (schaefer, 3484)
+
+	* Doc/Zsh/expn.yo: An extra paragraph explaining RC_EXPAND_PARAM
+	  behaviour.  (pws, 3417; markup brought into line with the rest
+	  of the documentation)
+
+	* Src/zsh.h, Src/subst.c, Src/utils.c: Make parameter expansion
+	  with RC_EXPAND_PARAM behave the same as brace expansion,
+	  and make it make sense.  (hzoli, 3403)
+
+	* Src/parse.c: Fix error recovery on inputs such as
+	  `( [[ $I bug 10 ]] )', which previously got mangled.
+	  (hzoli, 3383)
+
+	* configure.in, Src/Builtins/rlimits.awk: Find and correctly
+	  handle the GNU hurd <resourcebits.h>, which defines RLIMIT_*
+	  in an enum.  (Kunihiro Ishiguro <kunihiro@zebra.org>, 3369)
+
+	* Src/glob.c: restrict leaf optimisation of recursive globs to
+	  the case of nlink == 2.  Some systems don't keep proper link
+	  counts for directories, but will probably distinguish themselves
+	  by having a link count of 1 or 0 for directories.  (hzoli, 3368)
+
+Tue Jan  6 23:29:43 1998  Andrew Main  <zefram@fysh.org>
+
+	* Src/version.h: Version 3.1.2-zefram1.
+
+	* Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/Zle/zle_tricky.c, Src/Zle/zle_vi.c: Rewrite of the
+	  removable suffix mechanism.  In all cases, the longest possible
+	  meaningful suffix is added, and on following insertions the
+	  minimum trailing part of the suffix removed in order to put
+	  the character in a sensible place.  (zefram, 3353)
+
+	* Doc/Zsh/options.yo, Src/options.c, Src/utils.c, Src/zsh.h:
+	  Option PRINT_EIGHT_BIT, indicates that characters >= 0x80 are
+	  printable, even if isprint() says otherwise.  (pws, 3318)
+
+	* Src/Zle/zle_utils.c: Spaces were getting added to the end of
+	  the line when menu completing.  (pws, 3308)
+
+	* Src/jobs.c: Set STAT_NOSTTY in bg.  The result is that
+	  STAT_NOSTTY is set if a job is ever run backgrounded.
+	  (Suzuki Hisao <suzuki@otsl.oki.co.jp>, 3302)
+
+	* Src/Zle/zle_tricky.c, Src/params.c: A couple of memory leaks.
+	  (pws, 3301)
+
+	* Src/zsh.h, Src/exec.c, Src/jobs.c: New job flag STAT_NOSTTY
+	  means don't inherit the tty settings from this job when it
+	  exits.  Is set on jobs that are started in the background.
+	  (hzoli, 3297)
+
+	* Src/params.c: Keep actual inherited environment strings around
+	  while importing individual variables.  This is required because
+	  the special behaviour when setting $TERM (and potentially
+	  other variables) depends on the value of other variables.
+	  (hzoli, 3293)
+
+	* Src/glob.c: In `*(-M)', the (-) should affect the type of stat
+	  used for (M).  (pws, 3285)
+
+	* Src/Zle/zle_refresh.c: Buffer overrun bug fix.  (gcw, 3260)
+
+	* INSTALL, Makefile.in, configure.in, Src/Makefile.in,
+	  Src/**/*.c, Src/mkbltnmlst.sh, Src/prototypes.h,
+	  Src/signals.h, Src/signames.awk, Src/xmods.conf, Src/zsh.h,
+	  Src/Zle/comp.h, Src/Zle/zle.h, Src/Makemod.in.in,
+	  Src/mkmakemod.sh, Src/mkmodindex.sh, Src/zsh.mdd,
+	  Src/Builtins/rlimits.mdd, Src/Builtins/sched.mdd,
+	  Src/Modules/cap.mdd, Src/Modules/clone.mdd,
+	  Src/Modules/example.mdd, Src/Modules/files.mdd,
+	  Src/Modules/stat.mdd, Src/Zle/comp1.mdd, Src/Zle/compctl.mdd,
+	  Src/Zle/deltochar.mdd, Src/Zle/zle.mdd, Src/conf.sed,
+	  Src/mkstamp.sh, Src/mods.conf, Src/Builtins/Makefile.in,
+	  Src/Modules/Makefile.in, Src/Zle/Makefile.in: Rewrite of
+	  the module build system.  Knowledge specific to each module
+	  is localised in a .mdd file for that module.  Makefiles and
+	  headers are automatically generated.  (zefram, 3252)
+
+	* Src/jobs.c: `disown' was leaking memory.  (pws, 3251)
+
+	* Src/subst.c: `set "$@"' was freeing strings while still needed,
+	  due to paramsubst() not duplicating them.  (zefram, 3250)
+
+	* Src/glob.c: globbing of `foo*r~foob*' was failing, due to
+	  the character before the ~ not being marked as being the end
+	  of a pattern.  (pws, 3249)
+
+	* Src/Zle/zle_tricky.c: AUTO_PARAM_KEYS was adding suffix
+	  characters in the middle of a word if completing within a word.
+	  (hzoli, 3247)
+
+	* Src/params.c: filter out garbage when importing environment
+	  variables.  (hzoli, 3246)
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/mod_compctl.yo,
+	  Doc/Zsh/mod_sched.yo, Doc/Zsh/mod_zle.yo: Move documentation
+	  of the standard moduleified builtins into zshmodules(1).
+	  (zefram, 3244)
+
+	* Src/Makefile.in, Src/builtin.c, Src/exec.c, Src/glob.c,
+	  Src/globals.h, Src/hashtable.c, Src/hashtable.h, Src/hist.c,
+	  Src/init.c, Src/input.c, Src/jobs.c, Src/lex.c, Src/loop.c,
+	  Src/makepro.awk, Src/math.c, Src/mem.c, Src/module.c,
+	  Src/options.c, Src/params.c, Src/parse.c, Src/prompt.c,
+	  Src/prototypes.h, Src/signals.c, Src/signals.h,
+	  Src/signames.awk, Src/subst.c, Src/utils.c, Src/zsh.h,
+	  Src/Builtins/Makefile.in, Src/Modules/Makefile.in,
+	  Src/Zle/Makefile.in, Src/Zle/comp.h, Src/Zle/comp1.c,
+	  Src/Zle/zle.h, Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c,
+	  Src/Zle/zle_main.c, Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c,
+	  Src/Zle/zle_utils.c, Src/Zle/zle_vi.c: Move all object
+	  declarations into .c files, so that they are processed by
+	  makepro.awk.  (zefram, 3243)
+
+	* Src/Makefile.in, Src/builtin.c, Src/exec.c, Src/glob.c,
+	  Src/globals.h, Src/hist.c, Src/init.c, Src/jobs.c,
+	  Src/lex.c, Src/main.c, Src/math.c, Src/mem.c, Src/options.c,
+	  Src/params.c, Src/parse.c, Src/signals.c, Src/watch.c,
+	  Src/zsh.h, Src/Builtins/Makefile.in, Src/Modules/Makefile.in,
+	  Src/Zle/Makefile.in, Src/Zle/zle.h, Src/Zle/zle_bindings.c,
+	  Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c, Src/makepro.sh,
+	  Src/makepro.awk: Generate prototypes with an awk script, which
+	  handles data declarations as well as functions.  Make data
+	  objects static where appropriate.  (zefram, 3242)
+
+	* Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/hashtable.h,
+	  Src/module.c, Src/zsh.h, Src/Builtins/rlimits.c,
+	  Src/Builtins/sched.c, Src/Modules/cap.c, Src/Modules/clone.c,
+	  Src/Modules/example.c, Src/Modules/files.c, Src/Modules/stat.c,
+	  Src/Zle/compctl.c, Src/Zle/zle_main.c: Use struct builtin
+	  instead of struct binlist, avoiding some dynamic memory
+	  allocation.  (zefram, 3241)
+
+	* configure.in, Src/builtin.c, Src/Builtins/Makefile.in,
+	  Src/Builtins/rlimits.c, Src/Modules/cap.c: Always build the
+	  rlimits module.  (zefram, 3240)
+
+	* Src/builtin.c, Src/globals.h, Src/init.c, Src/input.c,
+	  Src/loop.c, Src/prompt.c, Src/utils.c, Src/Zle/zle.h,
+	  Src/Zle/zle_main.c, Src/Zle/zle_refresh.c: Format prompts once
+	  per editing session, so that they don't get changed improperly.
+	  (zefram, 3239)
+
+	* Doc/Zsh/compat.yo, Doc/Zsh/options.yo, Doc/Zsh/prompt.yo,
+	  Src/options.c, Src/prompt.c, Src/zsh.h: Options PROMPT_PERCENT
+	  and PROMPT_BANG, controlling which type of sequences get
+	  expanded in prompts.  Set appropriately for sh and ksh
+	  emulation.  (zefram, 3052)
+
+	* Doc/Zsh/options.yo, Src/exec.c, Src/options.c, Src/zsh.h:
+	  Option HIST_NO_FUNCTIONS, to exclude function definitions
+	  from the history list.  Option alias NO_LOG (from ksh).
+	  (zefram, 3050)
+
+	* Src/init.c: When emulating sh or ksh, make the default prompts
+	  "$ " (or "# ") and "> ".  (zefram, 3004)
+
+	* Doc/Zsh/options.yo, Src/builtin.c, Src/options.c, Src/utils.c,
+	  Src/zsh.h: Option RM_STAR_WAIT to wait ten seconds at the `rm
+	  *' prompt.  (zefram, 2999)
+
+Tue Jun  3 06:14:14 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/version.h: zsh-3.1.2 released
+
+	* Src/params.c: Some compilers do not like ? (void *) :
+
+	* Src/jobs.c: pg(){ less;};:|pg caused suspended (tty input)
+
+Mon Jun  2 07:52:31 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Doc/paths.yo.in: Updated date
+
+	* Doc/paths.yo, Doc/zsh.1, Doc/zsh.texi, Doc/zshall.1,
+ 	  Doc/zshbuiltins.1, Doc/zshcompctl.1, Doc/zshexpn.1,
+ 	  Doc/zshmisc.1, Doc/zshmodules.1, Doc/zshoptions.1,
+ 	  Doc/zshparam.1, Doc/zshzle.1: generated zsh-3.1.2 manuals
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/params.yo: Typo fixes from Tomasz
+ 	  Cholewo (3163)
+
+	* Src/Zle/zle_refresh.c: Xterm cut & paste fixes from Geoff (3135)
+
+	* Src/hist.c: Fix !# history expansion during completion.  From
+ 	  Peter (3132)
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/compat.yo, Doc/Zsh/expn.yo,
+ 	  Doc/Zsh/func.yo: Minor documentation fixes from Zefram (3125)
+
+	* Doc/Zsh/guide.yo, Doc/Zsh/intro.yo: The zsh web site moved
+
+	* Etc/FAQ, Etc/FAQ.yo: FAQ from Peter: Id: zshfaq.yo,v 1.6
+ 	  1997/05/29 09:15:00 pws Exp
+
+	* Etc/Makefile.in: Do not make FAQ.yodl by default
+
+	* INSTALL: Instructions about dynamic modules and builtin modules
+
+	* Functions/zls: Improved zll module renamed to zls supporting the
+ 	  ailLFd options
+
+	* Src/glob.c: The T glob flag did not work
+
+Sun Jun  1 08:02:19 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/system.h: Use _POSIX_VDISABLE is available.  Fixes ^@ in zle
+ 	  on some systems.
+
+	* Src/Zle/zle_tricky.c: expand-or-complete-prefix fixed
+
+	* Src/Builtins/rlimits.c, Src/Builtins/sched.c,
+ 	  Src/Modules/clone.c, Src/Modules/example.c, Src/Zle/comp1.c,
+ 	  Src/Zle/compctl.c, Src/Zle/deltochar.c, Src/Zle/zle_hist.c,
+ 	  Src/Zle/zle_keymap.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+ 	  Src/Zle/zle_move.c, Src/Zle/zle_params.c, Src/Zle/zle_refresh.c,
+ 	  Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c,
+ 	  Src/Zle/zle_vi.c, Src/Zle/zle_word.c, Src/builtin.c,
+ 	  Src/compat.c, Src/cond.c, Src/exec.c, Src/glob.c,
+ 	  Src/hashtable.c, Src/hist.c, Src/init.c, Src/input.c, Src/jobs.c,
+ 	  Src/lex.c, Src/linklist.c, Src/loop.c, Src/main.c, Src/math.c,
+ 	  Src/mem.c, Src/module.c, Src/options.c, Src/params.c,
+ 	  Src/parse.c, Src/prompt.c, Src/prototypes.h, Src/signals.c,
+ 	  Src/subst.c, Src/text.c, Src/utils.c, Src/watch.c: Declare
+ 	  functions used locally in one file static.
+
+Sat May 31 07:29:53 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/comp.h, Src/prototypes.h, Src/makepro.sh,
+ 	  Src/Builtins/Makefile.in, Src/Makefile.in,
+ 	  Src/Modules/Makefile.in, Src/Zle/Makefile.in, Src/Zle/zle.h,
+ 	  Src/module.c: Use fixed names for module make/cleanup funxtions.
+  	  Generate prototypes for static functions.  Ideas from articles
+ 	  3123 and 3124 from Zefram.
+
+Thu May 29 05:17:31 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/cond.c: directories are always executable by root
+
+	* META-FAQ: The zsh web page moved.
+
+	* aclocal.m4, configure, configure.in: --enable-ansi2knr configure
+ 	  option added.  From Zefram (3122)
+
+Tue May 20 05:22:16 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/utils.c: if abort or edit used on a correct prompt, do not
+ 	  attempt to correct further words on the line.
+
+Sun May 18 18:57:08 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/builtin.c, Src/exec.c, Src/init.c, Src/signals.c, Src/jobs.c:
+ 	  Do not handle SIGPIPE specially for shells with job control
+
+	* Src/init.c, Src/jobs.c, Src/utils.c: (:); while true; do; done
+ 	  was uninterruptible.  Sometimes LINES/COLUMNS was not set
+ 	  properly for non-interractive shells.
+
+	* Src/exec.c, Src/signals.c: `:`; while true; do; done was
+ 	  uninterruptible
+
+Mon May 12 09:01:55 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* configure, configure.in: on NetBSD <sys/time.h> is needed for
+ 	  rlimit type checks.  From Geoff.
+
+	* Src/hist.c: !:2-1 history expansion caused memory corruption
+
+Sun May 11 08:52:00 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/lex.c: $((foo);bar) syntax works
+
+	* Src/hist.c: A terminal hangup caused coredump while saving history
+
+	* Src/globals.h, Src/init.c, Src/params.c: if we cannot get the
+ 	  correct window size with ioctl, set LINES and COLUMNS from
+ 	  termcap.
+
+	* Src/builtin.c: make sure zexit is not reentered when its
+ 	  execution is interrupted by a signal.
+
+Fri May  9 07:59:00 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/utils.c: print_if_link (used by whence -s) did not work well.
+
+	* Doc/zsh.texi: @br{} removed
+
+	* Src/exec.c: Quick hack: do not open file redirections if noexec
+ 	  is set
+
+	* Src/jobs.c: printjobs() set errflag when the foreground process
+ 	  was interrupted.
+
+Thu May  8 09:18:56 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/cond.c: [[ -x file ]] does stat for privileged users
+
+	* Src/Zle/zle_utils.c: do no read line[ll] (which is undefined)
+
+	* Src/signals.c: flush the input queue on interrupt
+
+	* Src/lex.c, Src/parse.c: improve parsing of for ((...))
+
+	* Src/Zle/zle_tricky.c, Src/hist.c, Src/lex.c, Src/parse.c:
+	  ((foo);bar) now works
+
+Wed May  7 14:50:08 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Etc/Makefile.in: make clean should delete generated htmls
+
+Tue May  6 06:33:06 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Etc/Makefile.in: rules to create FAQ and FAQ.html from the yodl
+ 	  source
+
+	* Doc/Makefile.in, Doc/Zsh/guide.yo, Doc/Zsh/mod_cap.yo,
+ 	  Doc/Zsh/mod_clone.yo, Doc/Zsh/modules.yo, Doc/Zsh/prompt.yo,
+ 	  Src/Modules/Makefile.in, Src/Modules/cap.c, Src/mods.conf,
+ 	  Src/prompt.c, Src/system.h, Src/utils.c, config.h.in, configure,
+ 	  configure.in: Make the shell aware of POSIX.1e capabilities and
+ 	  add a cap builtin module.  From Zefram (3088)
+
+	* Src/Zle/zle_main.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c: vi
+ 	  line range bugfix from Zefram (3094)
+
+	* Src/signals.c: WINCH traps did not work.  From Peter (3093)
+
+	* Src/hashtable.h, Src/params.c: LC_* parameters stopped working
+ 	  after patch 3014.  From Zefram (3089)
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/restricted.yo, Src/builtin.c,
+ 	  Src/hashtable.h: hash builtin fixes from Zefram (3061)
+
+	* Src/Zle/zle_thingy.c, Src/hashtable.c, Src/params.c, Src/zsh.h:
+ 	  Allow adding/deleting nodes during scanhashtable.  From Zefram
+ 	  (3058)
+
+Mon May  5 09:29:22 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/hist.c: % word designator fix from Bruce Murphy
+ 	  <packrat@iinet.net.au> (3065)
+
+	* Doc/Zsh/builtins.yo, Src/builtin.c, Src/hashtable.h,
+ 	  Src/utils.c: whence -s prints expanded symlinks (idea from
+ 	  art. 3067 by Juergen A. Erhard <jae@laden.ilk.de>).  Use zputs
+ 	  in whence. xsymlinks return 1 iff it found some symlinks or ../
+ 	  (previously it always returned 0 although it had some
+ 	  never-reached return 1 statements).
+
+	* Src/params.c: zero LINES/COLUMNS should not set narrow/short
+ 	  term.  From Zefram (3063)
+
+	* Src/builtin.c: typeset -R UID caused a coredump
+
+	* Src/globals.h, Src/mem.c, Src/prototypes.h: alloc/ncalloc
+ 	  declarations moved to globals.h.  From Zefram (3057)
+
+	* Doc/Makefile.in, Doc/zsh.yo: doc install and zshall fixes.  From
+ 	  Zefram (3056)
+
+	* Src/prototypes.h, Src/system.h, config.h.in, configure,
+ 	  configure.in: checks for memcpy and memmove.  From Zefram (3055)
+
+	* Doc/Zsh/params.yo: parameter documentation improvements.  From
+ 	  Zefram (3051)
+
+	* Src/utils.c: simplify adjustwinsize().  Based on art. 3053 from
+ 	  Zefram.
+
+	* Src/Zle/zle_main.c, Src/Zle/zle_params.c, Src/builtin.c,
+ 	  Src/exec.c, Src/globals.h, Src/init.c, Src/params.c: remove
+ 	  locallist.  From Zefram (3049)
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/guide.yo, Doc/Zsh/params.yo,
+ 	  Src/builtin.c, Src/params.c: local parameters can hide special
+ 	  parameters.  From Zefram (3048)
+
+Sun May  4 06:16:44 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Builtins/Makefile.in, Src/Makefile.in,
+ 	  Src/Modules/Makefile.in, Src/Zle/Makefile.in, aczsh.m4,
+ 	  configure, configure.in: Strip shared modules and executables if
+ 	  possible.  From Zefram (3038)
+
+	* Doc/Zsh/mod_sched.yo, Doc/Zsh/guide.yo, Doc/Zsh/mod_files.yo,
+ 	  Doc/Zsh/mod_stat.yo, Doc/Zsh/modules.yo,
+ 	  Src/Builtins/Makefile.in, Src/Builtins/sched.c, Src/Makefile.in,
+ 	  Src/builtin.c, Src/globals.h, Src/hashtable.h, Src/init.c,
+ 	  Src/linklist.c, Src/mods.conf, Src/utils.c, Src/xmods.conf,
+ 	  Src/zsh.h: The sched builtin moved to a separate module.  From
+ 	  Zefram (3037)
+
+	* Src/Builtins/rlimits.c, Src/prototypes.h, Src/hashtable.h,
+ 	  Src/mods.conf, Src/xmods.conf, Src/Builtins/Makefile.in,
+ 	  Src/Makefile.in, configure, configure.in: Src/Builtins directory
+ 	  created.  rlimits.c moved to Src/Builtins and converted into a
+ 	  loadable module.
+
+Wed Apr 30 07:40:30 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Doc/Zsh/grammar.yo, Src/globals.h, Src/lex.c, Src/loop.c,
+ 	  Src/parse.c, Src/text.c, Src/zsh.h: ksh style ;& case
+ 	  fall-through feature from Zefram (3062)
+
+	* Src/text.c: printing case commands were broken.  From Zefram (3062)
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/func.yo, Doc/Zsh/options.yo,
+ 	  Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/options.c,
+ 	  Src/utils.c, Src/zsh.h: KSH_AUTOLOAD option from Zefram (3060)
+
+	* Src/module.c: Do not remove dependencies for a module when it is
+ 	  unloaded. From Zefram (3033)
+
+	* Src/Zle/zle_main.c, Src/Zle/zle_tricky.c, Src/builtin.c,
+ 	  Src/exec.c, Src/utils.c: get{sh,fp}func() return &dummy_list for
+ 	  non-existent functions.  This allows autoloading empty
+ 	  functions.  From Zefram (3036)
+
+	* Src/exec.c: Assume ksh-autoloading only if the autoloaded file
+ 	  is a single function definition.  From Zefram (3032)
+
+	* Src/Makefile.in, Src/mkbltnmlst.sh, Src/mkstamp.sh,
+ 	  Src/xmods.conf, aczsh.m4, configure, configure.in: Link comp1
+ 	  into the main zsh if the system lacks RTDL_GLOBAL functionality.
+  	  From Zefram (3030)
+
+	* config.h.in, configure, aczsh.m4, configure.in, Makefile.in,
+ 	  acconfig.h, aclocal.m4: The config part of the nameclash patch
+ 	  from Zefram (3028).  The code part does not work with ansi2knr.
+
+Mon Apr 28 07:28:34 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/comp.h, Src/Zle/comp1.c, Src/Zle/compctl.c,
+ 	  Src/Zle/deltochar.c, Src/Zle/zle.h, Src/Zle/zle_bindings.c,
+ 	  Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+ 	  Src/Zle/zle_misc.c, Src/Zle/zle_move.c, Src/Zle/zle_params.c,
+ 	  Src/Zle/zle_refresh.c, Src/Zle/zle_thingy.c,
+ 	  Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c,
+ 	  Src/Zle/zle_word.c, Src/builtin.c, Src/globals.h, Src/init.c,
+ 	  Src/zsh.h: move compctl related read stuff global variables from
+ 	  the main binary into the comp1 module.  From Zefram (3029)
+
+	* Src/Zle/zle_tricky.c: Yet an other suffix removal fix from
+ 	  Zefram (3024)
+
+	* Src/builtin.c, Src/system.h, acconfig.h, config.h.in, configure,
+ 	  configure.in, Src/Builtins/rlimits.c: Use rlim_t if available
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/restricted.yo, Src/globals.h,
+ 	  Src/init.c, Src/jobs.c, Src/main.c: jobs -Z documented, improved
+ 	  and disabled in restricted mode.  From Zefram (3027)
+
+	* Doc/Zsh/builtins.yo, Src/hashtable.h, Src/jobs.c: jobs -d prints
+ 	  the working current directory of jobs.  From Peter (2889)
+
+	* Doc/Zsh/restricted.yo, Src/module.c: disallow adding module
+ 	  dependencies with absolute pathnames in restricted mode.  From
+ 	  Zefram (3025)
+
+	* Doc/Zsh/options.yo, Src/options.c: New option aliases to please
+ 	  bash users: dotglob, hashall, histappend, histexpand, mailwarn,
+ 	  onecmd and promptvars.  From Zefram (3026)
+
+	* Etc/FAQ.yo: from Peter: Id: zshfaq.yo,v 1.5 1997/04/24 10:19:15
+ 	  pws Exp
+
+	* Etc/FAQ: April 24 1997 FAQ from Peter
+
+	* Src/Makefile.in, Src/Zle/zle_params.c, Doc/Zsh/zle.yo,
+ 	  Src/Zle/Makefile.in, Src/Zle/zle.h, Src/Zle/zle_main.c,
+ 	  Src/exec.c, Src/hashtable.h, Src/mods.conf, Src/params.c,
+ 	  Src/zsh.h: New special parameters {,L,R}BUFFER, CURSER added
+ 	  only present in zle widget functions.  Virtualised unset method
+ 	  in struct param.  pm->data modev to pm->u.data.  From Zefram
+ 	  (3014)
+
+	* Src/Zle/zle_thingy.c: Fix a memory leak when unloading zle with
+ 	  user-defined widgets.  From Zefram (3015)
+
+	* Src/Zle/zle.h, Src/Zle/zle_hist.c, Src/Zle/zle_main.c,
+ 	  Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c, Src/builtin.c,
+ 	  Src/globals.h, Src/init.c, Src/input.c, Src/loop.c, Src/utils.c,
+ 	  Src/zsh.h: Remove in_vared and use a third parameter to zleread
+ 	  to allow history recall.  histallowed is a new zle global
+ 	  variable for that.  Rename inzlefunc to incompctlfunc.  Add some
+ 	  checks to avoid dangerous recursive zle calls.  From Zefram
+ 	  (3013)
+
+	* Src/Zle/zle_main.c, Src/Zle/zle_tricky.c: menu completion did
+ 	  not work well with auto_param_keys.  From Zefram (3011)
+
+Sat Apr 26 06:26:11 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Functions/zed: Reenter zed if it fails to save the file
+
+	* Functions/zed: Use bindkey -L to temporarily save bindings.
+  	  From Zefram (3012)
+
+	* Src/builtin.c, Src/init.c: Do not retry failed autoloads.  From
+ 	  Zefram (3010)
+
+	* Src/Makefile.in, Src/mkbltnmlst.sh: non-dynamic zsh can be built
+ 	  without zle.  From Zefram (3008)
+
+	* Doc/Zsh/builtins.yo, Src/module.c: Rearrange modules.c.
+  	  zmodload -qu removes dependencies.  From Zefram (3009)
+
+	* Doc/Zsh/builtins.yo, Src/module.c: zmodload -i -a works as one
+ 	  would expect.  From Zefram (3007)
+
+	* Doc/Zsh/builtins.yo, Src/module.c: zmodload -a argument swap to
+ 	  allow autoloading multiple builtins from a single file in one
+ 	  command.  From Zefram (2997)
+
+Fri Apr 25 06:41:36 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Doc/zman.yo: use UPPERCASE yodl macro
+
+	* Functions/cdmatch, Misc/compctl-examples: compctl-examples
+ 	  improvements from Zefram (3006)
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in,
+ 	  Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+ 	  Src/Zle/zle_thingy.c: ZLE unload code from Zefram (3005)
+
+	* Src/options.c: NOTIFY is off in sh/ksh mode.  From Zefram (3003)
+
+	* Doc/Zsh/builtins.yo, Doc/Zsh/zle.yo, Misc/compctl-examples,
+ 	  Src/Zle/Makefile.in, Src/Zle/deltochar.c, Src/Zle/iwidgets.list,
+ 	  Src/Zle/zle.h, Src/Zle/zle_bindings.c, Src/Zle/zle_hist.c,
+ 	  Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_move.c,
+ 	  Src/Zle/zle_things.sed, Src/Zle/zle_thingy.c,
+ 	  Src/Zle/zle_tricky.c, Src/Zle/zle_vi.c, Src/Zle/zle_widget.sed,
+ 	  Src/Zle/zle_word.c, Src/xmods.conf: New ZLE widgets allow
+ 	  user-defind ZLE functions.  From Zefram (3002)
+
+	* Src/params.c: ${foo#bar} writes to the value of foo which can be
+	  a const causing SEGV.  From Zefram (2998)
+
+	* Src/Modules/files.c: files module fixes from Zefram (2996)
+
+	* Functions/zll, Src/Modules/Makefile.in, Src/Modules/stat.c,
+ 	  Src/mods.conf: stat module fixes from Zefram (2995)
+
+	* Functions/zll, Src/Modules/stat.c: stat module from Peter (2994)
+
+	* Doc/Makefile.in, Doc/Zsh/compctl.yo, Doc/Zsh/guide.yo,
+ 	  Doc/Zsh/intro.yo, Doc/Zsh/mod_clone.yo, Doc/Zsh/mod_comp1.yo,
+ 	  Doc/Zsh/mod_compctl.yo, Doc/Zsh/mod_deltochar.yo,
+ 	  Doc/Zsh/mod_example.yo, Doc/Zsh/mod_files.yo,
+ 	  Doc/Zsh/mod_stat.yo, Doc/Zsh/mod_zle.yo, Doc/Zsh/modules.yo,
+ 	  Doc/Zsh/seealso.yo, Doc/zsh.yo, Doc/zshmodules.yo: Module
+ 	  documentations from zefram (2994)
+
+Sun Apr 20 07:24:12 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/init.c, Src/params.c, Src/utils.c: Remove setintenv()
+
+Tue Apr 15 05:51:27 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_refresh.c: SGTABTYPE can contain more than one bit
+ 	  set.  From Geoff (2976)
+
+	* Doc/Zsh/prompt.yo, Src/prompt.c, Src/utils.c, Src/watch.c: New
+ 	  escapes %K and %f inside %D{...} promt sequences.  %k and %e are
+ 	  now compatible with strftime().  From Peter (2963)
+
+	* Src/Zle/zle_keymap.c: bindkey -s "^X^L" "^@" produced a pound
+ 	  sterling sign.  From Zefram (2951)
+
+	* Src/Zle/zle_main.c: vared 1 caused a coredump.  From Peter (2909)
+
+	* Src/exec.c, Src/signals.c: execute trap on EXIT in the caller's
+ 	  environment. From Peter (2896)
+
+	* Src/Zle/zle_tricky.c: Autoparamkeys broken by earlier patch
+ 	  fixed.  From Zefram and Peter (2894)
+
+	* Src/Zle/zle_tricky.c: Clear menucur in invalidatelist().  From
+ 	  Peter (2881)
+
+	* Src/Zle/zle_main.c: vared path caused permanent
+ 	  allocation in arrayfixenv
+
+Sat Apr 12 04:27:34 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_misc.c: Overwrite mode did not work
+
+Sat Mar  8 00:17:24 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/compctl.c: Sometimes an incorrect compctl caused a core
+ 	  dump.  From Peter (2942)
+
+Fri Mar  7 23:54:18 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Makefile.in: zle_binding.pro is not used
+
+	* Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_refresh.c,
+ 	  Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c, Src/builtin.c,
+ 	  Src/globals.h, Src/init.c, Src/params.c, Src/prompt.c,
+ 	  Src/zsh.h: termok changed to termflags.  Modified version of
+ 	  art. 2970 from Geoff
+
+Thu Mar  6 18:06:17 1997  Zoltan T. Hidvegi  <hzoli@vnet.ibm.com>
+
+	* Src/init.c, Src/params.c, Src/utils.c: handle narrow and short
+	  terminals centralized in zlevarsetfn().  From Bart and me
+	  (2956, 2957)
+
+Wed Mar  5 23:37:30 1997  Zoltan T. Hidvegi  <hzoli@vnet.ibm.com>
+
+	* Src/Zle/zle.h, Src/Zle/zle_refresh.c: act as if single_line_zle
+	  were set when LINES < 3.  From Geoff (2865)
+
+	* Doc/zmacros.yo: Use UPPERCASE() yodl macro instead of chartable
+ 	  hacks.  From Zefram (2873)
+
+	* Src/Zle/zle_tricky.c: menu completing parameters removed
+ 	  non-existent / suffix. From Zefram (2872)
+
+	* Src/Zle/zle_bindings.c: Some zle functions did not use
+ 	  ZLE_KEEPSUFFIX.  From Zefram (2871)
+
+	* Src/Zle/Makefile.in, Src/Zle/zle.h: zle_bindings doesn't define
+ 	  any functions so zle_bindings.pro is not needed
+
+	* Src/loop.c: $? was incorrectly reset before executing case,
+	  while, for
+
+Tue Feb 18 20:59:51 1997  Zoltan Hidvegi  <hzoli@vnet.ibm.com>
+
+	* Src/Zle/zle_bindings.c: M-p and M-n defaults to
+	  history-beginning-search-*
+
+	* Src/builtin.c: getopts handling of required argument fix from
+	  Andrew Robinson (2846)
+
+	* Src/builtin.c, Src/globals.h, Src/hist.c, Src/lex.c, Src/zsh.h:
+	  History fixes: fc -AI;fc -R now do not confuse hist_ignore_dups
+	  and some other cleanups from Peter (2845).  Contains changes
+	  from articles 2748 and 2755.
+
+	* Src/signals.c: An #ifdef SIGWINCH was missing.  From Hrvoje
+	  Niksic <hniksic@srce.hr> (2844)
+
+	* Src/Modules/files.c: fix problems on machines with unsigned long
+	  mode_t.  From Zefram (2843)
+
+	* Doc/Makefile.in, Doc/Zsh/builtins.yo, Doc/Zsh/compctl.yo,
+	  Doc/Zsh/expn.yo, Doc/Zsh/guide.yo, Doc/Zsh/prompt.yo,
+	  Doc/Zsh/restricted.yo, Doc/zman.yo, Doc/zsh.yo, Doc/ztexi.yo,
+	  configure.in: Various documentation fixes from Zefram (2842)
+
+	* Src/exec.c: return from a function called from a loop breaked
+	  the loop
+
+	* Src/lex.c: eval \$\{$#\} did not work
+
+Tue Feb 11 20:25:59 1997  Zoltan Hidvegi  <hzoli@cs.elte.hu>
+
+	* config.h.in, Src/compat.c, Src/utils.c, configure, configure.in:
+	  stupid AIX 3.2 does not have fchdir
+
+Tue Jan 28 00:57:37 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/version.h: zsh-3.1.1 released
+
+	* Doc/paths.yo, Doc/zsh.1, Doc/zsh.texi, Doc/zshall.1,
+ 	  Doc/zshbuiltins.1, Doc/zshcompctl.1, Doc/zshexpn.1,
+ 	  Doc/zshmisc.1, Doc/zshoptions.1, Doc/zshparam.1, Doc/zshzle.1:
+ 	  yodl generated generated documentation
+
+Mon Jan 27 22:04:29 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/signals.c: temprarily set breaks to zero when executing a trap
+
+	* Src/exec.c: do not reset breaks in doshfunc
+
+	* Src/parse.c: words following for ((...)) are in command position.
+
+Sun Jan 26 23:29:48 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/builtin.c, Src/hashtable.h: fix cd -, use unrecognized
+ 	  option arguments literally
+
+	* Src/exec.c: localoptions should not restore RESTRICTED
+
+	* Src/signals.c: terminate a restricted shell if an untrapped INT
+ 	  signal is received
+
+	* Src/init.c: set noerrexit to -1 in setupvals()
+
+Sat Jan 25 20:07:46 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/subst.c, Src/utils.c: some assignments were missing from my
+ 	  spacesplit fix
+
+	* Etc/FAQ: FAQ from Peter: Id: zsh.FAQ,v 2.23 1997/01/24 13:21:16
+ 	  pws Exp
+
+	* config.h.in, configure, configure.in: check for setsid()
+
+	* Src/Modules/Makefile.in, Src/Modules/clone.c: new builtin: start
+ 	  a forked instance of the current shell on a new terminal
+
+Thu Jan 23 15:45:27 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_refresh.c, Src/globals.h, Src/prompt.c:
+	  redisplay fix for multiline prompts from Geoff (2817)
+
+	* Src/subst.c, Src/utils.c: a${=:- }b expanded to `ab'
+
+	* Doc/Zsh/compctl.yo, Doc/Zsh/guide.yo, Doc/Zsh/options.yo,
+ 	  Doc/Zsh/restricted.yo, Doc/zsh.yo, Doc/zshmisc.yo: RESTRICTED
+ 	  option documentation
+
+	* Doc/Makefile.in: generate everything with yodl
+
+	* Doc/zman.yo, Doc/ztexi.yo: itemize environment added
+
+	* Src/module.c: disable zmodload -a and loading explicitely given
+ 	  modules when restricted
+
+	* Doc/Zsh/zle.yo: what-cursor-position zle function documented
+
+Wed Jan 22 00:54:02 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Doc/Zsh/builtins.yo: cd -sLP documentation
+
+	* Doc/Zsh/builtins.yo, Src/module.c: zmodload -au removes defined
+ 	  but not yet loaded builtins
+
+Tue Jan 21 20:38:24 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Doc/ztexi.yo: sitem() fix for TeX
+
+	* Misc/compctl-examples: limit/unlimit compctl improvemenmt
+
+	* Doc/Zsh/builtins.yo, Doc/ztexi.yo: TeX changes
+
+Mon Jan 20 21:11:22 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/hashtable.h, acconfig.h, config.h.in, configure,
+ 	  configure.in: some old compilers cannot initialise a union
+
+	* Src/Zle/zle.h, Src/Zle/zle_keymap.c, Src/options.c: changes for
+ 	  K&R compilers
+
+	* Src/Zle/deltochar.c: deltochar is IN_ZLE
+
+	* Src/Modules/files.c, Src/Zle/zle_misc.c, Src/mem.c: stupid SunOS
+ 	  4 has broken headers
+
+	* Src/system.h: cast alloca in VARARR
+
+	* Src/Zle/zle_bindings.c, Src/Zle/zle_keymap.c,
+ 	  Src/Zle/zle_misc.c: what-cursor-position zle function added
+
+	* Src/Zle/zle_utils.c: move the mark when characters are
+ 	  inserted/deleted.  From Peter (2807)
+
+	* Src/builtin.c, Src/hashtable.h: bash/ksh compatible cd -LP options
+
+	* Src/utils.c: lchdir fix
+
+	* Src/Modules/files.c: rm -r works with arbitrary deep
+ 	  hierarchies.  rm -r can be interrupted
+
+Sun Jan 19 13:30:36 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/glob.c: glob arbitrary deep directory structures
+
+	* Src/mem.c, Src/Zle/zle_keymap.c, Src/subst.c, Src/utils.c,
+	  Src/zsh.h: add real hrealloc()
+
+Sat Jan 18 22:34:17 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_keymap.c: in bindkey -s the string was not zrdupped.
+
+	* Src/utils.c: after Zefram's changes getkeystring should return
+	  the result on the heap
+
+	* Src/utils.c: fix file descriptor leak in lchdir
+
+	* acconfig.h, config.h.in, configure, configure.in: use the
+	  AC_FUNC_STRCOLL builtin autoconf test
+
+	* Src/subst.c, Src/system.h, config.h.in, configure, configure.in:
+	  alloca() and VARARR macro added which defines a variable sized
+	  automatic array
+
+Tue Jan 14 23:17:34 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/glob.c: debugging changes (the change is mostrly reindentation)
+
+	* Src/Zle/zle_move.c: vi-goto-column did not move to the last column
+
+	* Src/glob.c: some old C compilers cannot use typedefed type
+	  defined function prototypes
+
+	* Src/exec.c: PATH=foo somecommand gives error in restricted mode
+
+	* Src/options.c, Src/init.c: the -r command line option turns on
+	  restricted mode
+
+Mon Jan 13 21:28:35 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/builtin.c, Src/exec.c, Src/hashtable.h, Src/init.c,
+	  Src/options.c, Src/params.c, Src/text.c, Src/zsh.h: RESTRICTED
+	  option added
+
+Sun Jan 12 01:00:04 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_tricky.c: automenu starts iff lastambig is true.
+	  From Zefram (2781)
+
+	* Src/Zle/zle.h, Src/Zle/zle_bindings.c, Src/Zle/zle_hist.c,
+	  Src/Zle/zle_main.c, Src/Zle/zle_move.c: add ZLE_LASTCOL flag to
+	  zle-commands which set lastcol.  From Zefram (2780)
+
+	* Src/Zle/deltochar.c, Src/Zle/zle.h, Src/Zle/zle_bindings.c,
+	  Src/Zle/zle_hist.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/Zle/zle_tricky.c, Src/Zle/zle_vi.c: zle removable suffix
+	  cleanup.  ZLE_INSERT and ZLE_DELETE is gone and ZLE_KEEPSUFFIX
+	  added for commands which do not remove autoremovable suffixes.
+	  From Zefram (2779)
+
+	* Src/Zle/zle.h, Src/Zle/zle_hist.c, Src/Zle/zle_utils.c: remove
+	  some code duplications and undo fixes.  From Zefram (2769)
+
+Sat Jan 11 23:45:50 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/compat.c: lstat is defined to stat on systems without lstat
+
+	* Src/system.h: define lstat(X,Y) instead of lstst if HAVE_LSTAT
+	  is not defined
+
+	* Src/Zle/zle_tricky.c: ll was not restored for xorrec
+
+	* Src/builtin.c: read -l forgot to duplicate line before assignment
+
+	* Src/jobs.c: do not execute trap when only the child receives the
+	  signal.  Based on article 2480 from Zefram.
+
+	* Src/builtin.c, Src/jobs.c: move job control builtins to jobs.c
+
+	* Src/builtin.c: fix bugs when there was no current job after disown
+
+Thu Jan  9 16:07:31 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/rlimits.c: zstrtorlimit was defined instead of zstrtorlimt
+
+	* Src/Modules/Makefile.in, Src/Zle/Makefile.in: some buggy makes
+	  could not find out how to make .so from .c
+
+Wed Jan  8 22:02:51 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Doc/Zsh/zle.yo, Doc/zsh.texi, Doc/zshzle.man, Src/Zle/zle.h,
+	  Src/Zle/zle_bindings.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/Zle/zle_utils.c: zle undo rewrite from Zefram (2746)
+
+	* Src/Zle/zle.h, Src/Zle/zle_hist.c, Src/Zle/zle_main.c,
+	  Src/Zle/zle_misc.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c,
+	  Src/utils.c: feep() just sets a flag and the main zle loop calls
+	  beep() when this flag is set so multiple feeps cause only one
+	  beep.  From Zefram (2745)
+
+	* Src/hist.c, Src/main.c, Src/utils.c: use shout instead of stderr
+	  where appropriate.  From Zefram (2743)
+
+	* configure, configure.in: on NetBSD <sys/time.h> is needed for
+	  rlimit type checks.  Based on article 2742 from Geoff
+
+	* Src/builtin.c: empty cd caused a coredump
+
+	* Doc/Makefile.in: texi -> dvi suffix rule added
+
+	* Doc/Zsh/redirect.yo: fix a typo.  From Zefram (2685)
+
+	* Doc/Zsh/expn.yo, Doc/Zsh/grammar.yo: brace related bugfixes
+
+	* Doc/Makefile.in, Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo,
+	  Doc/Zsh/compat.yo, Doc/Zsh/compctl.yo, Doc/Zsh/cond.yo,
+	  Doc/Zsh/exec.yo, Doc/Zsh/expn.yo, Doc/Zsh/filelist.yo,
+	  Doc/Zsh/files.yo, Doc/Zsh/func.yo, Doc/Zsh/grammar.yo,
+	  Doc/Zsh/guide.yo, Doc/Zsh/index.yo, Doc/Zsh/intro.yo,
+	  Doc/Zsh/invoke.yo, Doc/Zsh/jobs.yo, Doc/Zsh/options.yo,
+	  Doc/Zsh/params.yo, Doc/Zsh/prompt.yo, Doc/Zsh/redirect.yo,
+	  Doc/Zsh/seealso.yo, Doc/Zsh/zle.yo, Doc/paths.yo.in,
+	  Doc/zmacros.yo, Doc/zman.yo, Doc/zsh.yo, Doc/zshbuiltins.yo,
+	  Doc/zshcompctl.yo, Doc/zshexpn.yo, Doc/zshmisc.yo,
+	  Doc/zshoptions.yo, Doc/zshparam.yo, Doc/zshzle.yo, Doc/ztexi.yo:
+	  documentation rewritten into yodl format by Zefram.
+
+Tue Jan  7 23:10:24 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/params.c, Src/builtin.c, Src/exec.c: print error when
+	  changing read-only variables, prevent core dump when assigning
+	  an array to read-only scalar and some other fixes
+
+	* Src/Zle/zle_tricky.c: compctl -S bugfix
+
+Mon Jan  6 20:43:36 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/exec.c, acconfig.h, config.h.in, configure, configure.in:
+	  better /dev/fd filesystem check
+
+	* Src/Zle/Makefile.in, Src/Zle/zle.h, Src/Zle/zle_tricky.c: make
+	  dependency cleanups
+
+	* Src/Zle/Makefile.in, Src/Zle/zle.h, Src/Zle/zle_keymap.c,
+	  Src/Zle/zle_things.sed: autogenerate the enum of z_* and t_*
+	  macros.  From Zefram (2731)
+
+	* Src/Zle/zle.h, Src/Zle/zle_bindings.c, Src/Zle/zle_hist.c,
+	  Src/Zle/zle_keymap.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/Zle/zle_move.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c: zle
+	  prefix commands rewrite from Zefram (2722)
+
+	* Src/Zle/zle.h, Src/Zle/zle_bindings.c, Src/Zle/zle_hist.c:
+	  history-search-*ward serch for complete words.  From Zefram
+	  (2721, 2730)
+
+	* Doc/zsh.texi, Doc/zshbuiltins.man, Src/Zle/zle_keymap.c,
+	  Src/Zle/zle_main.c: remove bindkey -u -U options.  From Zefram
+	  (2711)
+
+	* Src/Zle/Makefile.in, Src/Zle/deltochar.c, Src/Zle/zle.h,
+	  Src/Zle/zle_bindings.c, Src/Zle/zle_hist.c,
+	  Src/Zle/zle_keymap.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c, Src/Zle/zle_vi.c,
+	  Src/mods.conf: first zle extendability patch from Zefram (2710)
+
+Sun Jan  5 23:33:32 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/builtin.c, Src/exec.c: do builtin autoloading in execcmd and
+	  do not ignore BINF_PSPECIAL and BINF_MAGICEQUALS flags for the
+	  builtin being loaded
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in,
+	  Src/builtin.c, Src/prototypes.h, Src/rlimits.c, Src/utils.c:
+	  move limit/ulimit/unlimit builtins to rlimits.c
+
+	* Src/builtin.c, Src/system.h, Src/utils.c, acconfig.h,
+	  config.h.in, configure, configure.in: checks for quad_t and
+	  unsigned resource types
+
+	* Src/Modules/example.c, Src/Modules/files.c: the copyright notice
+	  was different from the rest of the code
+
+	* Src/jobs.c: set_clktck() function added
+
+	* Src/compat.c, Src/Modules/files.c, Src/builtin.c, Src/utils.c,
+	  Src/zsh.h: safe rm and cd which do not follow any symlinks
+
+	* Src/builtin.c, Src/rlimits.awk: safe fallback when RLIM_ macros
+	  are not found
+
+	* Src/Zle/zle_main.c: EOF ignored in interactive mode when not in
+	  the first line.  From Peter (2713)
+
+Fri Jan  3 02:26:03 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Misc/compctl-examples: setopt/unsetopt compctl fixes
+
+	* Src/Zle/comp.h, Src/Zle/comp1.c, Src/Zle/compctl.c,
+	  Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/mods.conf, Src/xmods.conf, Src/Zle/Makefile.in: compctl base
+	  module.  compctl no longer depends on zle instead both zle and
+	  compctl depends on this new comp1 module.  From Zefram (2700)
+
+	* Src/Zle/zle.h, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+	  Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c,
+	  Src/Zle/zle_utils.c, Src/utils.c: add showmsg() which displays
+	  an arbitrary message below the ZLE buffer and minibuffer.  From
+	  Zefram (2699)
+
+	* Src/Zle/zle_keymap.c, Src/hashtable.c: omit resize option from
+	  emptytable thus make is available as a generic emptytable
+	  method.  From Zefram (2698)
+
+	* Src/Zle/zle_utils.c: literal ^ characters were not escaped when
+	  printing key sequences.  From Zefram (2689)
+
+	* Src/utils.c: finddir() now can cope with arbitrary long
+	  directories.	From Zefram (2688)
+
+	* Src/prompt.c: my long directories in prompt fix broke prompt
+	  truncation.  From Zefram (2687)
+
+Thu Jan  2 20:57:33 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* configure, configure.in: alpha-linux defines signals in
+	  <asm/signum.h>.  From David Krinsky <krinsky@hcs.harvard.edu>
+	  (2706)
+
+	* Src/Makefile.in: . does not set positional parameters
+
+	* Src/builtin.c, Src/compat.c: zchdir returns -2 when it looses
+	  the current directory.
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in,
+	  Src/Zle/compctl.c, Src/Zle/zle.h, Src/params.c, Src/zsh.h:
+	  header dependencies and inclusions fixes from Zefram (2697)
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in,
+	  Src/conf.sed, Src/mkbltnmlst.sh, Src/mkstamp.sh, Src/mods.conf,
+	  Src/xmods.conf: more Makefile fixes from Zefram (2703)
+
+	* Src/Modules/files.c, Src/utils.c: files module rm -r fixes
+
+	* Src/Modules/files.c: make rm -r safe so that it never follows
+	  symlinks.
+
+	* Src/utils.c (lchdir): paranoid chdir which does not follow
+	  symlinks.  From Zefram (2690)
+
+	* Src/Modules/Makefile.in, Src/Modules/files.c: module with
+	  builtin ln, mkdir, mv, rm, rmdir, sync utilities.  From Zefram
+	  (2621)
+
+	* Src/compat.c: do not use lstat if HAVE_LSTAT is not defined
+
+	* Src/conf.sed, Src/mkbltnmlst.sh, Src/mkstamp.sh: move big shell
+	  scripts from the Makefile to separate files.
+
+Wed Jan  1 20:04:06 1997  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/options.c: remove union initialisation hacks and use optno
+	  for aliases
+
+	* Src/params.c, Src/hashtable.h: remove the struct iparam hack
+	  which assumed that sizeof(long) == sizeof(void*)
+
+	* Src/system.h, configure, configure.in: dgux CLOBBERS_TYPEAHEAD.
+	  From Roderick Schertler <roderick@gate.net> (2623)
+
+Tue Dec 31 02:28:09 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in:
+	  improve proto dependency rules
+
+	* Doc/zshbuiltins.man, Doc/zshzle.man, Src/Zle/Makefile.in,
+	  Src/Zle/zle.h, Src/Zle/zle_bindings.c, Src/Zle/zle_hist.c,
+	  Src/Zle/zle_keymap.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/Zle/zle_move.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c,
+	  Src/hashtable.c, Src/mods.conf, Src/utils.c, Util/reporter:
+	  keymap rewrite from Zefram (2648)
+
+	* Src/Makefile.in: avoid using -nt test operator
+
+	* Src/Zle/zle_tricky.c, Src/params.c, Src/utils.c: use
+	  dupstrpfx/ztrduppfx
+
+Mon Dec 30 23:24:46 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Makefile.in, Src/init.c, Src/mods.conf, Src/xmods.conf:
+	  automatic generation of linked-in module boot code and automatic
+	  autoload code.  From Zefram (2647)
+
+	* Src/utils.c: dupsctruct/freestruct now work even if sizeof(int)
+	  != sizeof(void*)
+
+	* Src/options.c: option initialisation did not work on Alpha
+
+	* Src/Makefile.in: some sh's do not like empty for lists
+
+	* Src/options.c: use short instead of enum
+
+	* Src/globals.h, Src/input.c, Src/lex.c, Src/zsh.h: after alias
+	  foo='echo ' ; alias bar=foo, foo bar should expand to foo echo.
+	  From Peter (2558)
+
+	* Src/compat.c: zgetcwd's result should not be freed
+
+	* Src/prompt.c (putpromptchar): handle long pwd
+
+	* Src/builtin.c, Src/compat.c, Src/init.c: zgetcwd's result should
+	  not be freed
+
+	* Src/glob.c: make functions only called from glob.c static.
+	  Rearrange functions so that they are already defined when first
+	  referenced.
+
+Sun Dec 29 22:34:21 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Doc/zsh.texi, Doc/zshexpn.man, Doc/zshmisc.man, Src/glob.c,
+	  Src/lex.c: brace related bugfixes
+
+	* Src/glob.c, Src/utils.c: fix a buffer overflow bug in parsecomp()
+
+	* Src/exec.c, Src/loop.c, Src/parse.c: case argument should not be
+	  globbed
+
+Sat Dec 28 19:55:04 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/options.c (optlookup): no prefix was ignored
+
+	* Src/Makefile.in, Src/Modules/example.c, Src/Zle/compctl.c,
+	  Src/Zle/zle_main.c, Src/init.c, Src/module.c, Src/zsh.h:
+	  addbuiltins() and deletebuiltins() functions to add/delete a
+	  group of builtins.  From Zefram (2646)
+
+Fri Dec 27 23:33:20 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Modules/example.c, Src/Zle/compctl.c, Src/Zle/zle_main.c,
+	  Src/init.c, Src/module.c: addbuiltin can now set all members of
+	  the builtin structure.  From Zefram (2643)
+
+	* Src/options.c: set ALWAYSLASTPROMPT, APPENDHISTORY, AUTOLIST,
+	  AUTOMENU, AUTOPARAMKEYS, AUTOPARAMSLASH, AUTOREMOVESLASH,
+	  LISTAMBIGUOUS, LISTTYPES options by default
+
+	* Src/main.c, Src/options.c, Src/zsh.h: use the hastable functions
+	  for optiontab instead of the optns array.
+
+	* Src/exec.c: minor noclobber changes
+
+Thu Dec 26 22:43:13 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/exec.c, Src/hist.c, Src/lex.c, Src/mem.c, Src/params.c,
+	  Src/subst.c, Src/text.c, Src/utils.c: all "can't happen"
+	  messages start with a BUG: From Zefram (2633)
+
+	* Src/Makefile.in: better rules for version changes
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in:
+	  some Makefile cleanups
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in,
+	  configure, configure.in: use ..o suffix for module objects.
+	  From Zefram (2632)
+
+	* Src/Makefile.in, Src/init.c, Src/zsh.h: only init.o depends on
+	  zshxmods.h.  From Zefram (2631)
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in:
+	  some hacks to get parallel make work.	 From Zefram (2630)
+
+	* Src/Zle/zle.h, Src/Zle/zle_bindings.c, Src/Zle/zle_hist.c,
+	  Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_move.c,
+	  Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c,
+	  Src/Zle/zle_utils.c, Src/Zle/zle_vi.c, Src/Zle/zle_word.c,
+	  Src/globals.h, Src/init.c, Src/module.c, Src/zsh.h: zle module
+	  autoloading interface cleanup from Zefram (2627)
+
+	* Src/Zle/compctl.c, Src/Zle/zle_main.c: remove unnecessary
+	  contitional code for printcompctlp.  From Zefram (2629)
+
+	* Src/module.c: print error message when module's boot/cleanup
+	  function not found.  From Zefram (2628)
+
+	* Src/module.c: zmodload -L did not handle module names starting
+	  with `-'. From Zefram (2626)
+
+	* Doc/zshbuiltins.man, Src/hashtable.h, Src/module.c,
+	  Util/reporter: zmodload -a lists builtins declared for
+	  autoloading. -L prints everything in sourcable format.  From
+	  Zefram (2620)
+
+	* Src/Zle/zle_main.c, Src/hashtable.c, Src/options.c,
+	  Src/params.c, Src/zsh.h: Make ZSH_HASH_DEBUG less visible.  From
+	  Zefram (2619)
+
+	* Src/builtin.c, Src/compat.c, Src/utils.c: handle arbitrary long
+	  pathnames in pwd
+
+Wed Dec 25 16:04:45 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Doc/zsh.texi, Doc/zshoptions.man, Src/Makefile.in,
+	  Src/Zle/zle_tricky.c, Src/builtin.c, Src/glob.c, Src/globals.h,
+	  Src/init.c, Src/main.c, Src/params.c, Src/prototypes.h,
+	  Src/utils.c, Src/zsh.h, Src/options.c: New hash table for
+	  options, option aliases.  From Zefram (2612)
+
+Tue Dec 24 02:25:20 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_tricky.c, Src/glob.c, Src/hashtable.c, Src/utils.c:
+	  move . and .. special case handling into zreaddir().	From
+	  Zefram (2617)
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in:
+	  parallel make support gone again as it always rebuilt everything
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Zle/Makefile.in:
+	  More Makefile cleanups.  Parallel make now runs fine
+
+	* Src/Zle/zle.h, Src/Zle/zle_main.c, Src/globals.h, Src/init.c,
+	  Src/main.c, Src/module.c, Src/zsh.h, Src/Makefile.in,
+	  Src/Modules/Makefile.in, Src/Zle/Makefile.in: module makefile
+	  improvements, better support for builtin modules.  From Zefram
+	  (2611)
+
+Sat Dec 21 02:00:12 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/version.h: zsh-3.1.0 released
+
+	* Makefile.in: modifications for the beta series
+
+	* Src/Zle/zle_main.c, Src/globals.h, Src/hist.c, Src/module.c,
+ 	  Src/zsh.h: changes to allow compilation on SunOS 4 with K&R
+ 	  compiler
+
+	* Doc/zsh.texi, Doc/zshbuiltins.man, Src/builtin.c, Src/hashtable.h:
+	  pwd now accepts -L and -P to be compatible with bash and ksh
+
+	* configure, configure.in: SunOS 4 shared libraries do not work
+ 	  when they are stripped
+
+Thu Dec 19 21:27:17 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/init.c: work around a bug in NeXTStep 3.2 which caused slow
+ 	  refresh
+
+	* Etc/FAQ: FAQ from Peter: Id: zsh.FAQ,v 2.22 1996/12/19 09:52:11
+ 	  pws Exp
+
+Wed Dec 18 23:51:24 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Doc/zsh.texi, Etc/FAQ, META-FAQ: ftp.prz.tu-berlin.de no longer
+ 	  mirrors zsh, uiarchive.uiuc.edu name correction
+
+Tue Dec 17 20:08:58 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/params.c: remove some compiler varnings
+
+	* Src/Makefile.in: rlimits.h depends on rlimits.awk.  Cosmetic
+ 	  changes.  From Zefram (2589)
+
+Mon Dec 16 03:33:12 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* README: unknown limits should no longer be a problem
+
+	* Src/glob.c: toggles were not reset after a comma in a glob
+ 	  qualifier list (e.g. *(@-.,/))
+
+	* Src/builtin.c: fg %% failed and disabled job control sometimes
+ 	  when there were no current job
+
+Sun Dec 15 01:07:40 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* README: beta warning
+
+	* Misc/compctl-examples: compctl for zmodload
+
+Sat Dec 14 22:50:00 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_main.c: Remove unnecessary prefix delay in zle.
+  	  From Zefram (2583)
+
+	* Src/exec.c (execcmd): builtin < / > / closed stdin
+
+	* configure, Src/Makefile.in, Src/builtin.c, Src/rlimits.awk,
+ 	  configure.in: awk generated rlimits from Peter (2573)
+
+	* config.guess, config.sub, configure, configure.in: upgrade to
+ 	  autoconf-2.12.  Linux machines are still recognized without the
+ 	  -gnu suffix
+
+	* configure, configure.in: working fifos should be tested in /tmp
+
+Wed Dec 11 02:30:39 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_tricky.c, Src/builtin.c, Src/exec.c, Src/globals.h,
+ 	  Src/hist.c, Src/init.c, Src/input.c, Src/lex.c, Src/zsh.h:
+ 	  remove the alias stack and fix several related bugs. From Peter
+ 	  (2548, 2551)
+
+	* Doc/zsh.texi, META-FAQ: ftp mirror site changes
+
+	* Src/params.c: use the heap in getstrvalue()
+
+Tue Dec 10 02:27:35 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_refresh.c: single line zle refresh bugfix from Geoff
+ 	  (2549)
+
+	* Src/subst.c: ${(l:4:)foo} stopped working between 3.0.0 and 3.0.1
+
+	* Src/math.c: $((#\c)) character code expansion did not work when
+ 	  c was a metafied
+
+	* Src/params.c: $foo[i] did not work when foo[i] was a metafied
+ 	  character
+
+	* Src/builtin.c: use the heap in zexit()
+
+Sun Dec  8 21:32:06 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/utils.c, Doc/zshbuiltins.man, Src/hashtable.h, Src/module.c:
+ 	  zmodload can be used to define atoloaded builtins and module
+ 	  dependencies
+
+	* Doc/zsh.texi, Doc/zshoptions.man: options documentation
+ 	  improvements from Zefram (2529)
+
+	* Src/globals.h, Src/hist.c, Src/zsh.h: HIST_REDUCE_BLANKS from
+ 	  Wayne (2446)
+
+	* Etc/FEATURES, Etc/NEWS: news in zsh-3.1
+
+	* Src/hashtable.h: security: do not import MODULE_PATH
+
+	* Src/input.c: no further input should be attempted when lexstop
+ 	  is true (e.g. after eof).
+
+	* Src/Makefile.in: make tags fix
+
+	* Misc/compctl-examples: MH compctl changes from Peter (2535)
+
+	* Src/Zle/zle_tricky.c, Src/glob.c, Src/hashtable.c, Src/utils.c:
+ 	  unmetafy did not put a null terminator to the end of the string.
+  	  zreaddir discarded the metafied filename.  readdir was used
+ 	  instead of zreaddir in zle_tricky.c.  From Zefram (2533)
+
+	* Src/Zle/zle_vi.c: vi-replace-chars now emulates better the real
+ 	  vi.  From Zefram (2496)
+
+	* Src/jobs.c: CLK_TCK is 60 on NeXT not 64 as defined in the
+ 	  system headers.  From Robert F Tobler
+ 	  <rft@raven.cg.tuwien.ac.at> (2522)
+
+	* Src/input.c, Src/zsh.h: alias foo='a=b foo' ; foo caused an
+ 	  infinite loop.  From Peter (2515)
+
+	* Src/builtin.c, Src/zsh.h: put hash tables to a linked list when
+ 	  hash-debug is enabled and move the simplified bin_hashinfo into
+ 	  hashtable.c.  From Zefram (2509)
+
+	* Src/builtin.c, Src/Zle/compctl.c: more bad option fixes. Make
+ 	  the getopts builtin 8-bit clean.  From Zefram (2508)
+
+	* Src/builtin.c: show metafied characters correctly in bad option
+ 	  errors.  From Zefram (2497)
+
+Thu Dec  5 03:59:45 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Makefile.in, Src/Modules/Makefile.in, Src/Modules/example.c,
+ 	  Src/Zle/Makefile.in, Src/Zle/deltochar.c, Src/Zle/zle.h,
+ 	  Src/Zle/zle_bindings.c, Src/Zle/zle_hist.c, Src/Zle/zle_main.c,
+ 	  Src/Zle/zle_misc.c, Src/Zle/zle_move.c, Src/Zle/zle_refresh.c,
+ 	  Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c,
+ 	  Src/Zle/zle_word.c, Src/builtin.c, Src/globals.h,
+ 	  Src/hashtable.c, Src/hashtable.h, Src/init.c, Src/input.c,
+ 	  Src/loop.c, Src/main.c, Src/module.c, Src/modules-bltin,
+ 	  Src/prompt.c, Src/prototypes.h, Src/utils.c, Src/zsh.h,
+ 	  configure, configure.in: Move zle into a separate directory and
+ 	  convert it to an optional auto-loadable module.  Create Modules
+ 	  subdirectory.  Many Makefile changes.  boot_modname and
+ 	  cleanup_modname is back since on elf all module use one common
+ 	  name space.  Lots of other changes.
+
+Wed Nov 27 03:20:53 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_main.c, Src/Zle/zle_vi.c: ANSI was broken and fixed
+ 	  again in zle_main.c ESC in vi command mode caused SEGV.  From
+ 	  Zefram (2479)
+
+	* configure, configure.in: -pedantic is used with
+ 	  --enable-zsh-debug.  Link non-debugged zsh with -s.  From Zefram
+ 	  (2479)
+
+Tue Nov 26 02:45:15 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/exec.c: the STTY parameter did not work well when pipes were
+ 	  used.  From Peter (2474)
+
+	* Src/Zle/zle_main.c: little fix for the bindkey patch from Peter
+ 	  (2470)
+
+	* Doc/zshbuiltins.man, Src/Zle/zle.h, Src/Zle/zle_bindings.c,
+ 	  Src/Zle/zle_hist.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+ 	  Src/Zle/zle_tricky.c, Src/Zle/zle_vi.c, Src/builtin.c,
+ 	  Src/globals.h, Src/hashtable.c, Src/init.c: big multi-character
+ 	  key bindings fix from Zefram (2464)
+
+	* Doc/zshbuiltins.man, Src/hashtable.h, Src/module.c, Src/zsh.h:
+ 	  The -f option of zmodload is removed.  Improved zmodload
+ 	  documentation.
+
+	* Src/hashtable.h, Doc/zshbuiltins.man, Src/module.c: zmodload
+ 	  with -i will not complain and will succeed without doing
+ 	  anything if an already loaded module is loaded or a non-loaded
+ 	  module is unloaded.  From Zefram (2463)
+
+	* Doc/Makefile.in, Doc/zshbuiltins.man, Doc/zshparam.man: zmodload
+ 	  documentation.  It only appears in the final manual if dynamic
+ 	  modules are enabled.  Note that the texinfo documentation is
+ 	  still missing.  From Zefram (2460)
+
+	* Etc/FAQ: FAQ from Peter: Id: zsh.FAQ,v 2.21 1996/11/25 09:13:28
+ 	  pws Exp
+
+Mon Nov 25 02:39:08 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/module.c: try to load the modules with .DL_EXT appended
+ 	  first.  Honor PATH_DIRS when loading a module.
+
+	* Src/Makefile.in: handle force ruleas as in the top-level Makefile
+
+	* Makefile.in, Src/Makefile.in, Src/init.c: module install added,
+ 	  default module_path is $(libdir)/zsh/$(VERSION).  From Zefram
+ 	  (2458 and 2465 with modifications)
+
+	* Src/Makefile.in: optimized and made more silent
+
+	* Src/Makefile.in, Src/Modules/example.c, Src/Zle/deltochar.c,
+ 	  Src/init.c, Src/main.c, Src/module.c: modules can now statically
+ 	  compiled into zsh.  From Zefram (2455)
+
+Sun Nov 24 22:44:12 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Zle/zle_move.c: vi-goto-mark fix from Thorsten
+
+	* Src/utils.c: dupnode mergerd into the simplified dupstruct2,
+ 	  freetreenode merged into the simplified freestruct
+
+	* Src/globals.h, Src/text.c, Doc/zsh.texi, Doc/zshmisc.man,
+ 	  Src/lex.c, Src/loop.c, Src/parse.c, Src/utils.c, Src/zsh.h: for
+ 	  ((expr; expr; expr)) command added
+
+Sat Nov 23 23:34:58 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/exec.c:
+	  ((...)) substituted the expression twice and coredumped on (())
+
+	* Doc/zsh.texi, Doc/zshcompctl.man: compctl -e clarification from
+ 	  Peter (2453)
+
+	* Src/hist.c (hend): minor cleanup from Wayne (2447)
+
+	* Doc/zsh.texi, Doc/zshzle.man, Src/Zle/zle_hist.c:
+ 	  insert-last-word with numeric arguments inserts the given word
+ 	  from the previous history event.  From Bart (2445),
+ 	  documentation by me.
+
+	* Src/subst.c, acconfig.h, config.h.in, configure, configure.in:
+ 	  added configure check for variable-length automatic arrays
+
+Wed Nov 20 00:58:06 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/utils.c: The spell checker always tries to fix as many
+ 	  leading directory compontents as possible.  From Bart (2429)
+
+	* Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+ 	  Src/Zle/zle_tricky.c, Src/Zle/zle_vi.c: the source was not ANSI
+ 	  C compatible.  From Thorsten Meinecke <kaefer@aglaia.aball.DE>
+
+	* Src/Zle/zle_tricky.c: my spell-word fix used an uninitialised
+ 	  pointer.  Fix from Bart (2428)
+
+Sun Nov 17 21:21:22 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Makefile.in: fix the .SUFFIXES list
+
+	* Src/module.c: do not call dlclose() if cleanup_module failed
+ 	  (returned nonzero)
+
+	* Src/Makefile.in, Src/init.c, Src/main.c, Src/prototypes.h,
+ 	  configure, configure.in: try to support dynamic loading on SVR4
+ 	  systems
+
+	* config.h.in: Makefile and configure fixes from Zefram (2416)
+
+	* Src/params.c: remove a few memory leaks when initialising the
+ 	  parameter table.
+
+	* Src/exec.c, Src/zsh.h: allow arbitrary number of multios.  From
+ 	  Zefram (2414)
+
+	* Src/exec.c, Src/parse.c, Src/text.c, Src/zsh.h: do not convert
+ 	  ((...)) to builtin let internally.
+
+Sat Nov 16 23:57:40 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/zle_tricky.c: spell-word zle function did not work for word
+ 	  beginning with a tilde
+
+	* Src/hist.c: histignoredups ignores insignificant whitespace
+ 	  changes.  From Peter (1949)
+
+	* Src/zle_main.c: execute-last-named-cmd may point to an already
+ 	  removed zle function after a zle module is deleted.  From Zefram
+ 	  (2418)
+
+	* Doc/Makefile.in: give some explanation if the user compiling zsh
+ 	  has no makeinfo
+
+	* configure.in: fix a problem introduced by patch 2338.  From
+ 	  Zefram (2416)
+
+	* Makefile.in, acconfig.h, configure.in: Makefile and configure
+ 	  fixes from Zefram (2416)
+
+	* Src/zle_tricky.c: the cursor moved back on TAB when it was on
+ 	  "".  From Zefram (2415)
+
+Thu Nov 14 12:59:25 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/zle_refresh.c: one more refresh fix from Geoff (2404)
+
+	* Src/Makefile.in, Src/Modules/deltochar.c, Src/Modules/example.c,
+ 	  configure, configure.in: move modules into Src/Modules
+
+Wed Nov 13 21:47:28 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Modules/deltochar.c, Src/Modules/example.c, Src/module.c:
+ 	  unload the module if the boot routine failed
+
+	* config.guess, config.sub: recognize i[6-9]86
+
+	* Src/globals.h, Src/init.c, Src/utils.c: make fdtable dynamic
+
+	* Src/zle_refresh.c: zle_refresh fix from Geoff (2387)
+
+	* Src/zle_refresh.c: some checks added.  From Geoff (2386)
+
+	* Src/zle_refresh.c: fix an off-by-one array bound bug.  From
+ 	  Geoff (2359)
+
+	* Doc/zsh.texi, Doc/zshbuiltins.man, Src/Modules/deltochar.c,
+ 	  Src/hashtable.h, Src/module.c, Src/zle_main.c: handle name
+ 	  clashes when adding zle modules and remove bindings when a zle
+ 	  module is removed.  From Peter (2370)
+
+	* Src/zle_refresh.c: zle_refresh scrolling change from Geoff (2351)
+
+	* Src/Modules/deltochar.c, Src/module.c, Src/zle.h,
+ 	  Src/zle_main.c, Src/zle_misc.c, Src/zle_tricky.c, Src/zle_vi.c:
+ 	  zle function modules from Peter (2339)
+
+Tue Nov 12 21:35:18 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/init.c, Src/zle_refresh.c: zle-refresh patch from Geoff (2336)
+
+	* Src/hashtable.h, Src/module.c: rename modload to zmodload.  From
+ 	  Peter (2333)
+
+	* Src/Makefile.in: added automatic ansi2knr rules
+
+Mon Nov 11 21:55:17 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Makefile.in, Src/Modules/example.c, Src/module.c, configure,
+ 	  configure.in: various module changes from Zefram (2338)
+
+	* configure, configure.in: a $ was missing.  IRIX gcc needs
+ 	  -shared for modules.  From Peter
+
+Wed Nov  6 20:54:33 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Makefile.in, Src/mod_example.c: moduule modifications for
+ 	  old compilers
+
+Sun Nov  3 23:00:05 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/system.h: set OPEN_MAX to 64 if NOFILE is not defined
+
+	* Src/hashtable.c: disable -f TRAPxxx permanently removed the
+	  function
+
+	* Functions/pushd: setopt localoptions must come after
+	  emulate -R zsh
+
+Sat Nov  2 22:47:53 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/compat.c, Src/hashtable.c, Src/utils.c: do not blindly
+ 	  assume that . and .. are always the first two enrties in a
+ 	  directory.  Problem discovered by Hideki ONO and fixed by Bart
+ 	  (2309)
+
+	* Src/utils.c: max_zsh_fd should not be decreased below zero
+
+Thu Oct 31 01:38:10 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/Makefile.in, Src/globals.h, Src/hashtable.c,
+ 	  Src/hashtable.h, Src/init.c, Src/mod_example.c, Src/module.c,
+ 	  Src/prototypes.h, Src/zsh.h, acconfig.h, config.h.in, configure,
+ 	  configure.in: support dynamically loaded binary modules
+
+	* Src/hist.c: zsh splitted lines longer than 1022 while reading
+ 	  the history file
+
+	* Src/glob.c (doesmatch): <-number> range glob did not work
+
+	* Src/builtin.c: read -c ignored its first parameter
+
+Fri Oct 25 20:50:38 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
+
+	* Src/version.h: zsh-3.0.1 released

@@ -1,0 +1,242 @@
+--------------
+INSTALLING ZSH
+--------------
+
+Check MACHINES File
+-------------------
+
+Check the file MACHINES in the subdirectory Etc to see the architectures
+that zsh is known to compile on, as well as any special instructions
+for your particular architecture.  Most architectures will not require any
+special instructions.
+
+Configuring Zsh
+---------------
+
+To configure zsh, from the top level directory, do the command:
+    ./configure
+
+Configure accepts several options (explained below).  To display
+currently available options, do the command:
+    ./configure --help
+
+Most of the interesting configuration options can be added after running
+configure by editing the user configuration section of config.h and the
+top level Makefile.
+
+Dynamic loading
+---------------
+
+Zsh-3.1 has support for dynamically loadable modules.  To enable this run
+configure with the --enable-dynamic option.  Note that dynamic loading
+does not work on all systems.  On these systems this option will have no
+effect, so it is always safe to use --enable-dynamic.  When dynamic
+loading is enabled, major parts of zsh (including the Zsh Line Editor) are
+compiled into modules and not included into the main zsh binary.  Zsh
+autoloads these modules when they are required.  This means that you have
+to execute make install.modules before you try the newly compiled zsh
+executable.
+
+Adding more modules
+-------------------
+
+The zsh distribution contains several modules, in the Src/Builtins,
+Src/Modules and Src/Zle directories.  If you have any additional zsh
+modules that you wish to compile for this version of zsh, create another
+subdirectory of the Src directory and put them there.  You can create
+as many extra subdirectory hierarchies as you need.  The subdirectories
+must be actual directories; symbolic links will not work.
+
+If you wish to add or remove modules or module directories after you
+have already run make, then after adding or removing the modules run:
+    make prep
+
+Controlling what is compiled into the main zsh binary
+-----------------------------------------------------
+
+By default the comp1, compctl, zle, sched and rlimits modules are compiled
+into non-dynamic zsh and no modules are compiled into the main binary if
+dynamic loading is available.  This can be overridden by creating the
+Src/modules-bltin file with the list of modules which are to be compiled
+into the main binary.  See the zshmodules manual page for the list of
+available modules.
+
+Compiler Options or Using a Different Compiler
+----------------------------------------------
+
+By default, configure will use the "gcc" compiler if found.  You can use a
+different compiler, or add unusual options for compiling or linking that
+the "configure" script does not know about, by either editing the user
+configuration section of the top level Makefile (after running configure)
+or giving "configure" initial values for these variables by setting them
+in the environment.  Using a Bourne-compatible shell (such as sh,ksh,zsh),
+
+you can do that on the command line like this:
+    CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure
+
+Or on systems that have the "env" program, you can do it like this:
+    env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
+
+Check Generated Files
+---------------------
+
+Configure will probe your system and create a "config.h" header file.
+You should  check the user configuration section at the beginning of
+this include file.  You should also examine the values (determined by
+configure) of HOSTTYPE, OSTYPE, MACHTYPE, and VENDOR to make sure they
+are correct.  The value of these #defines's is used only to initialize
+the corresponding default shell parameters.  Since these shell parameters
+are only for informational purposes, you can change them to whatever
+you feel is appropriate.
+
+Also configure will create a Makefile in the top level directory as well
+as in the various subdirectories.  You should check the user configuration
+section of the top level Makefile.
+
+Compiling Zsh
+-------------
+
+After configuring, to build zsh, do the command:
+    make
+
+Installing Zsh
+--------------
+
+If no make/compilation errors occur, then to install the zsh binary, do
+the command:
+    make install.bin
+
+Any previous copy of zsh will be renamed "zsh.old"
+                   
+To install the dynamically-loadable modules, do the command:
+    make install.modules
+
+To install the zsh man page, do the command:
+    make install.man
+
+To install the zsh info files, do the command:
+    make install.info
+
+Or alternatively, you can install all the above with the command:
+    make install
+
+"make install.info" will only move the info files into the info directory.
+You will have to edit the topmost node of the info tree "dir" manually
+in order to have the zsh info files available to your info reader.
+
+Building Zsh On Additional Architectures
+----------------------------------------
+
+To build zsh on additional architectures, you can do a "make distclean".
+This should restore the zsh source distribution back to its original
+state.  You can then configure zsh as above on other architectures in
+which you wish to build zsh.  Or alternatively, you can use a different
+build directory for each architecture.
+
+Using A Different Build Directory
+---------------------------------
+
+You can compile the zsh in a different directory from the one containing
+the source code.  Doing so allows you to compile it on more than one
+architecture at the same time.  To do this, you must use a version of
+"make" that supports the "VPATH" variable, such as GNU "make".  "cd" to
+the directory where you want the object files and executables to go and
+run the "configure" script.  "configure" automatically checks for the
+source code in the directory that "configure" is in.  For example,
+
+    cd /usr/local/SunOS/zsh
+    /usr/local/src/zsh-3.0/configure
+    make
+
+Memory Routines
+---------------
+
+Included in this release are alternate malloc and associated functions
+which reduce memory usage on some systems. To use these, add the option
+  --enable-zsh-mem
+when invoking "configure".
+
+You should check Etc/MACHINES to see if there are specific recommendations
+about using the zsh malloc routines on your particular architecture.
+
+Debugging Routines
+------------------
+
+You can turn on various debugging options when invoking "configure".
+
+To turn on some extra checking in the memory management routines, you
+can use the following options when invoking "configure".
+ --enable-zsh-mem-warning      # turn on warnings of memory allocation errors
+ --enable-zsh-secure-free      # turn on memory checking of free()
+
+If you are using zsh's memory allocation routines (--enable-zsh-mem), you
+can turn on debugging of this code.  This enables the builtin "mem".
+ --enable-zsh-mem-debug        # debug zsh's memory allocators
+
+You can turn on some debugging information of zsh's internal hash tables.
+This enables the builtin "hashinfo".
+ --enable-zsh-hash-debug       # turn on debugging of internal hash tables
+
+To add some sanity checks and generate debugging information for debuggers
+you can use the following option.  This also disables optimization.
+ --enable-zsh-debug            # use it if you want to debug zsh
+
+Startup/shutdown files
+----------------------
+
+Zsh has several startup/shutdown files which are in /etc by default.  This
+can be overriden using one of the options below when invoking "configure".
+
+ --enable-etcdir=directory    # default directory for global zsh scripts
+ --enable-zshenv=pathname     # the full pathname of the global zshenv script
+ --enable-zshrc=pathname      # the full pathname of the global zshrc script
+ --enable-zlogin=pathname     # the full pathname of the global zlogin script
+ --enable-zprofile=pathname   # the full pathname of the global zprofile script
+ --enable-zlogout=pathname    # the full pathname of the global zlogout script
+
+Any startup/shutdown script can be disabled by giving the
+--disable-scriptname option to "configure".  The --disable-etcdir option
+disables all startup/shutdown files which are not explicitely enabled.
+
+
+Options For Configure
+---------------------
+
+The `configure' program accepts many options, not all of which are useful
+or relevant to zsh.  To get the complete list of configure options, run
+"./configure --help".  The following list should contain most of the
+options of interest for configuring zsh.
+
+Configuration:
+  --cache-file=FILE      # cache test results in FILE
+  --help                 # print a help message
+  --version              # print the version of autoconf that create configure
+  --quiet, --silent      # do not print `checking...' messages
+  --no-create            # do not create output files
+
+Directories:
+  --prefix=PREFIX        # install host independent files in PREFIX [/usr/local]
+  --exec-prefix=EPREFIX  # install host dependent files in EPREFIX [same as prefix]
+  --bindir=DIR           # install user executables in DIR [EPREFIX/bin]
+  --infodir=DIR          # install info documentation in DIR [PREFIX/info]
+  --mandir=DIR           # install man documentation in DIR [PREFIX/man]
+  --srcdir=DIR           # find the sources in DIR [configure dir or ..]
+
+Features:
+  --enable-FEATURE       # enable use of this feature
+  --disable-FEATURE      # disable use of this feature
+
+     The FEATURES currently supported are:
+     zsh-debug           # use it if you want to debug zsh
+     zsh-mem             # use zsh's memory allocators
+     zsh-mem-debug       # debug zsh's memory allocators
+     zsh-mem-warning     # turn on warnings of memory allocation errors
+     zsh-secure-free     # turn on memory checking of free()
+     zsh-hash-debug      # turn on debugging of internal hash tables
+     etcdir=directory    # default directory for global zsh scripts
+     zshenv=pathname     # the full pathname of the global zshenv script
+     zshrc=pathname      # the full pathname of the global zshrc script
+     zlogin=pathname     # the full pathname of the global zlogin script
+     zprofile=pathname   # the full pathname of the global zprofile script
+     zlogout=pathname    # the full pathname of the global zlogout script
+     dynamic             # allow dynamically loaded binary modules

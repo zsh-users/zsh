@@ -1,0 +1,107 @@
+#!/usr/local/bin/zsh -f
+
+setopt extendedglob badpattern
+unsetopt kshglob
+
+failed=0
+while read res str pat; do
+  [[ $res = '#' ]] && continue
+  [[ $str = ${~pat} ]]
+  ts=$?
+  [[ $1 = -q ]] || print "$ts:  [[ $str = $pat ]]"
+  if [[ ( $ts -gt 0 && $res = t) || ($ts -eq 0 && $res = f) ]]; then
+    print "Test failed:  [[ $str = $pat ]]"
+    (( failed++ ))
+  fi
+done <<EOT
+t fofo                (fo#)#
+t ffo                 (fo#)#
+t foooofo             (fo#)#
+t foooofof            (fo#)#
+t fooofoofofooo       (fo#)#
+f foooofof            (fo##)#
+f xfoooofof           (fo#)#
+f foooofofx           (fo#)#
+t ofxoofxo            ((ofo#x)#o)#
+f ofooofoofofooo      (fo#)#
+t foooxfooxfoxfooox   (fo#x)#
+f foooxfooxofoxfooox  (fo#x)#
+t foooxfooxfxfooox    (fo#x)#
+t ofxoofxo            ((ofo#x)#o)#
+t ofoooxoofxo         ((ofo#x)#o)#
+t ofoooxoofxoofoooxoofxo            ((ofo#x)#o)#
+t ofoooxoofxoofoooxoofxoo           ((ofo#x)#o)#
+f ofoooxoofxoofoooxoofxofo          ((ofo#x)#o)#
+t ofoooxoofxoofoooxoofxooofxofxo    ((ofo#x)#o)#
+t aac    ((a))#a(c)
+t ac     ((a))#a(c)
+f c      ((a))#a(c)
+t aaac   ((a))#a(c)
+f baaac  ((a))#a(c)
+t abcd   ?(a|b)c#d
+t abcd   (ab|ab#)c#d
+t acd    (ab|ab#)c#d
+t abbcd  (ab|ab#)c#d
+t effgz  (bc##d|ef#g?|(h|)i(j|k))
+t efgz   (bc##d|ef#g?|(h|)i(j|k))
+t egz    (bc##d|ef#g?|(h|)i(j|k))
+t egzefffgzbcdij    (bc##d|ef#g?|(h|)i(j|k))#
+f egz    (bc##d|ef##g?|(h|)i(j|k))
+t ofoofo (ofo##)#
+t oxfoxoxfox    (oxf(ox)##)#
+f oxfoxfox      (oxf(ox)##)#
+t ofoofo        (ofo##|f)#
+# The following is supposed to match only as fo+ofo+ofo
+t foofoofo      (foo|f|fo)(f|ofo##)#
+t oofooofo      (of|oofo##)#
+t fffooofoooooffoofffooofff     (f#o#)#
+# If the following is really slow, that's a bug.
+f fffooofoooooffoofffooofffx     (f#o#)#
+# The following tests backtracking in alternation matches
+t fofoofoofofoo (fo|foo)#
+# Exclusion: test both types
+t foo           ((^x))
+t foo           ((^x)*)
+f foo           ((^foo))
+t foo           ((^foo)*)
+t foobar        ((^foo))
+t foobar        ((^foo)*)
+f foot          z*~*x
+t zoot          z*~*x
+f foox          z*~*x
+f zoox          z*~*x
+t moo.cow       (*~*.*).(*~*.*)
+f mad.moo.cow   (*~*.*).(*~*.*)
+t moo.cow       (^*.*).(^*.*)
+f sane.moo.cow  (^*.*).(^*.*)
+f mucca.pazza   mu(^c#)?.pa(^z#)?
+t fff           ((^f))
+t fff           ((^f)#)
+t fff           ((^f)##)
+t ooo           ((^f))
+t ooo           ((^f)#)
+t ooo           ((^f)##)
+t foo           ((^f))
+t foo           ((^f)#)
+t foo           ((^f)##)
+f f             ((^f))
+f f             ((^f)#)
+f f             ((^f)##)
+t foot          (^z*|*x)
+f zoot          (^z*|*x)
+t foox          (^z*|*x)
+t zoox          (^z*|*x)
+t foo           (^foo)#
+f foob          (^foo)b*
+t foobb         (^foo)b*
+f zsh           ^z*
+t a%1X          [[:alpha:][:punct:]]#[[:digit:]][^[:lower:]]
+f a%1           [[:alpha:][:punct:]]#[[:digit:]][^[:lower:]]
+t [:            [[:]#
+t :]            []:]#
+t :]            [:]]#
+t [             [[]
+t ]             []]
+t []            [^]]]
+EOT
+print "$failed tests failed."

@@ -1,0 +1,11 @@
+texinode(The comp1 Module)(The compctl Module)(The clone Module)(Zsh Modules)
+sect(The comp1 Module)
+The tt(comp1) module does nothing that is visible to the user.
+Its purpose is to provide the internal basis of the programmable
+completion mechanism.
+
+This module must be loaded before any module that
+provides a means of controlling completion (such as the tt(compctl)
+module), or that uses completions (such as the tt(zle) module).
+This is done automatically for modules distributed with zsh, and
+for other modules can be effected by the use of tt(zmodload -d).

@@ -1,0 +1,73 @@
+texinode(Arithmetic Evaluation)(Conditional Expressions)(Jobs & Signals)(Top)
+chapter(Arithmetic Evaluation)
+ifzman(\
+sect(Arithmetic Evaluation)
+)\
+cindex(arithmetic evaluation)
+cindex(evaluation, arithmetic)
+An ability to perform integer arithmetic is provided with the builtin tt(let).
+findex(let, use of)
+Evaluations are performed using em(long) arithmetic.
+A leading `tt(0x)' or `tt(0X)' denotes hexadecimal.
+Otherwise, numbers are of the form `[var(base)tt(#)]var(n)',
+where var(base) is a decimal number between two and thirty-six
+representing the arithmetic base and var(n)
+is a number in that base (for example, `tt(16#ff)' is 255 in hexadecimal).
+If var(base) is omitted
+then base 10 is used.  For backwards compatibility the form
+`tt([)var(base)tt(])var(n)' is also accepted.
+
+cindex(arithmetic operators)
+cindex(operators, arithmetic)
+An arithmetic expression uses nearly the same syntax, precedence, and
+associativity of expressions in C.
+The following operators are supported (listed in decreasing order
+of precedence):
+
+startsitem()
+sitem(tt(PLUS() - ! ~ PLUS()PLUS() --))(unary plus/minus, logical NOT, complement, {pre,post}{in,de}crement)
+sitem(tt(<< >>))(bitwise shift left, right)
+sitem(tt(&))(bitwise AND)
+sitem(tt(^))(bitwise XOR)
+sitem(tt(|))(bitwise OR)
+sitem(tt(**))(exponentiation)
+sitem(tt(* / %))(multiplication, division, modulus (remainder))
+sitem(tt(PLUS() -))(addition, subtraction)
+sitem(tt(< > <= >=))(comparison)
+sitem(tt(== !=))(equality and inequality)
+sitem(tt(&&))(logical AND)
+sitem(tt(|| ^^))(logical OR, XOR)
+sitem(tt(? :))(ternary operator)
+sitem(tt(= PLUS()= -= *= /= %= &= ^= |= <<= >>= &&= ||= ^^= **=))(assignment)
+sitem(tt(,))(comma operator)
+endsitem()
+
+The operators `tt(&&)', `tt(||)', `tt(&&=)', and `tt(||=)' are short-circuiting,
+and only one of the latter two expressions in a ternary operator
+is evaluated.  Note the precedence of the bitwise AND, OR,
+and XOR operators.
+
+An expression of the form `tt(#\)var(x)' where var(x) is any character
+gives the ascii value of this character and an expression of the form
+`tt(#)var(foo)' gives the ascii value of the first character of the value
+of the parameter var(foo).
+
+Named parameters and subscripted arrays can be referenced by name within an
+arithmetic expression without using the parameter substitution syntax.
+
+An internal integer representation of a named parameter
+can be specified with the tt(integer) builtin.
+cindex(parameters, integer)
+cindex(integer parameters)
+findex(integer, use of)
+Arithmetic evaluation is performed on the value of each
+assignment to a named parameter declared integer
+in this manner.
+
+Since many of the arithmetic operators require
+quoting, an alternative form of the tt(let) command is provided.
+For any command which begins with a tt(LPAR()LPAR()),
+all the characters until a matching tt(RPAR()RPAR())
+are treated as a quoted expression.
+More precisely, `tt(LPAR()LPAR()) ... tt(RPAR()RPAR())'
+is equivalent to `tt(let ")...tt(")'.

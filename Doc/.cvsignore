@@ -1,0 +1,15 @@
+Makefile
+version.yo
+zsh*.1
+zsh.texi
+zsh.info*
+zsh_*.html
+zsh.aux zsh.toc
+zsh.cp zsh.cps
+zsh.fn zsh.fns
+zsh.ky zsh.kys
+zsh.pg zsh.pgs
+zsh.vr zsh.vrs
+zsh.log zsh.dvi
+zsh.tp zsh.tps
+zsh_*.ps

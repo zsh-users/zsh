@@ -1,0 +1,12 @@
+texinode(The deltochar Module)(The example Module)(The compctl Module)(Zsh Modules)
+sect(The deltochar Module)
+The tt(deltochar) module makes available one ZLE function:
+
+startitem()
+tindex(delete-to-char)
+item(tt(delete-to-char))(
+Read a character from the keyboard, and
+delete from the cursor position up to and including the next
+(or, with repeat count var(n), the var(n)th) instance of that character.
+)
+enditem()

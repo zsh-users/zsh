@@ -1,0 +1,69 @@
+texinode(Compatibility)(Prompt Expansion)(Conditional Expressions)(Top)
+chapter(Compatibility)
+ifzman(\
+sect(Compatibility)
+)\
+cindex(compatibility)
+cindex(sh, compatibility)
+cindex(ksh, compatibility)
+Zsh tries to emulate bf(sh) or bf(ksh) when it is invoked as
+tt(sh) or tt(ksh) respectively.  In this mode the following
+parameters are not special and not initialized by the shell:
+tt(ARGC),
+tt(argv),
+tt(cdpath),
+tt(fignore),
+tt(fpath),
+tt(HISTCHARS),
+tt(mailpath),
+tt(MANPATH),
+tt(manpath),
+tt(path),
+tt(prompt),
+tt(PROMPT),
+tt(PROMPT2),
+tt(PROMPT3),
+tt(PROMPT4),
+tt(psvar),
+tt(status),
+tt(watch).
+
+The usual zsh startup/shutdown scripts are not executed.  Login shells
+source tt(/etc/profile) followed by tt($HOME/.profile).  If the
+tt(ENV) environment variable is set on invocation, tt($ENV) is sourced
+after the profile scripts.  The value of tt(ENV) is subjected to
+parameter expansion, command substitution, and arithmetic expansion before
+being interpreted as a pathname.  Note that the tt(PRIVILEGED) option
+also affects the execution of startup files.
+
+The following options are set if the shell is invoked as tt(sh) or
+tt(ksh):
+tt(NO_BAD_PATTERN),
+tt(NO_BANG_HIST),
+tt(NO_BG_NICE),
+tt(NO_EQUALS),
+tt(NO_FUNCTION_ARGZERO),
+tt(GLOB_SUBST),
+tt(NO_HUP),
+tt(INTERACTIVE_COMMENTS),
+tt(KSH_ARRAYS),
+tt(NO_MULTIOS),
+tt(NO_NOMATCH),
+tt(NO_NOTIFY),
+tt(POSIX_BUILTINS),
+tt(NO_PROMPT_PERCENT),
+tt(RM_STAR_SILENT),
+tt(SH_FILE_EXPANSION),
+tt(SH_GLOB),
+tt(SH_OPTION_LETTERS),
+tt(SH_WORD_SPLIT).
+Additionally the tt(BSD_ECHO) and tt(IGNORE_BRACES)
+options are set if zsh is invoked as tt(sh).
+Also, the
+tt(KSH_OPTION_PRINT),
+tt(LOCAL_OPTIONS),
+tt(PROMPT_BANG),
+tt(PROMPT_SUBST)
+and
+tt(SINGLE_LINE_ZLE)
+options are set if zsh is invoked as tt(ksh).

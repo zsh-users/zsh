@@ -1,0 +1,26 @@
+texinode(Files)(Shell Grammar)(Invocation)(Top)
+chapter(Files)
+sect(Startup/Shutdown Files)
+cindex(files, startup)
+cindex(startup files)
+cindex(files, shutdown)
+cindex(shutdown files)
+pindex(NO_RCS, use of)
+Commands are first read from tt(/etc/zshenv).
+If the tt(RCS) option is unset
+within tt(/etc/zshenv), all other
+initialization files are skipped.
+Otherwise, commands are read
+from tt($ZDOTDIR/.zshenv).
+pindex(LOGIN, use of)
+If the shell is a login shell, commands
+are read from tt(/etc/zprofile) and then tt($ZDOTDIR/.zprofile).
+Then, if the shell is interactive,
+commands are read from tt(/etc/zshrc) and then tt($ZDOTDIR/.zshrc).
+Finally, if the shell is a login shell, tt(/etc/zlogin) and
+tt($ZDOTDIR/.zlogin) are read.
+
+If tt(ZDOTDIR) is unset, tt(HOME) is used instead.
+Those files listed above as being in tt(/etc) may be in another
+directory, depending on the installation.
+ifnzman(includefile(Zsh/filelist.yo))

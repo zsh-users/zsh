@@ -1,0 +1,44 @@
+texinode(Restricted Shell)(Expansion)(Prompt Expansion)(Top)
+chapter(Restricted Shell)
+ifzman(\
+sect(Restricted Shell)
+)\
+cindex(restricted shell)
+pindex(RESTRICTED)
+When the basename of the command used to invoke zsh starts with the letter
+`tt(r)' or the `tt(-r)' command line option is supplied at invocation, the
+shell becomes restricted.  Emulation mode is determined after stripping the
+letter `tt(r)' from the invocation name.  The following are disabled in
+restricted mode:
+
+startitemize()
+itemiz(changing directories with the tt(cd) builtin)
+itemiz(changing or unsetting the tt(PATH), tt(path), tt(MODULE_PATH),
+tt(module_path), tt(SHELL), tt(HISTFILE), tt(HISTSIZE), tt(GID), tt(EGID),
+tt(UID), tt(EUID), tt(USERNAME), tt(LD_LIBRARY_PATH),
+tt(LD_AOUT_LIBRARY_PATH), tt(LD_PRELOAD) and  tt(LD_AOUT_PRELOAD)
+parameters)
+itemiz(specifying command names containing tt(/))
+itemiz(specifying command pathnames using tt(hash))
+itemiz(redirecting output to files)
+itemiz(using the tt(exec) builtin command to replace the shell with another
+command)
+itemiz(using tt(jobs -Z) to overwrite the shell process' argument and
+environment space)
+itemiz(using the tt(ARGV0) parameter to override tt(argv[0]) for external
+commands)
+itemiz(turning off restricted mode with tt(set +r) or tt(unsetopt
+RESTRICTED))
+itemiz(specifying modules to be loaded with an explicitly given
+pathname containing slashes)
+enditemize()
+
+These restrictions are enforced after processing the startup files.  The
+startup files should set up tt(PATH) to point to a directory of commands
+which can be safely invoked in the restricted environment.  They may also
+add further restrictions by disabling selected builtins.
+
+Restricted mode can also be activated any time by setting the
+tt(RESTRICTED) option.  This immediately enables all the restrictions
+described above even if the shell still have not processed all startup
+files.

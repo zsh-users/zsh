@@ -1,0 +1,55 @@
+# zls () {
+# simple internal ls using the stat module
+
+zmodload -i stat || return 1
+
+emulate -R zsh
+setopt localoptions
+
+local f stat opts='' L=L mod=: dirs list
+
+dirs=()
+list=()
+
+while getopts ailLFd f
+do
+    opts=$opts$f
+    if [[ $f == '?' ]] then
+	echo Usage: $0 [ -ailLFd ] [ filename ... ]
+	return 1
+    fi
+done
+shift OPTIND-1
+
+[[ $opts == *L* ]] && L=''
+[[ $opts == *F* ]] && mod=T$mod
+[[ $opts == *a* ]] && setopt globdots
+
+if ((! ARGC)) then
+    set *
+    opts=d$opts
+fi
+
+for f in $*
+do
+    stat -s$L -A stat -F "%b %e %H:%M" - $f || continue
+    if [[ $opts != *d* && $stat[3] == d* ]] then
+	dirs=( $dirs $f )
+    elif [[ $opts == *l* ]] then
+	[[ $opts == *i* ]] && print -n "${(l:7:)stat[2]} "
+	[[ -n $stat[14] ]] && f=( $f '->' $stat[14] ) || f=( $f($mod) )
+	print -r -- "$stat[3] ${(l:3:)stat[4]} ${(r:8:)stat[5]} " \
+		    "${(r:8:)stat[6]} ${(l:8:)stat[8]} $stat[10] $f"
+    else
+	f=( $f($mod) )
+	list=( "$list[@]" "${${(M)opts:%*i*}:+${(l:7:)stat[2]} }$f" )
+    fi
+done
+(($#list)) && print -cr -- "$list[@]"
+while (($#dirs)) do
+    ((ARGC > $#dirs)) && echo
+    ((ARGC > 1)) && echo $dirs[1]:
+    (cd $dirs[1] && $0 -d$opts)
+    shift dirs
+done
+# }

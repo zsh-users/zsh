@@ -1,0 +1,5 @@
+DISTFILES_SRC='
+    .cvsignore .distfiles Makefile.in
+    BUGS CONTRIBUTORS FAQ FAQ.yo FEATURES MACHINES NEWS
+    FTP-README pubring.pgp
+'

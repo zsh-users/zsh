@@ -1,0 +1,83 @@
+ifzman(\
+IFDEF(ZSHALL)(\
+def(ifzshone)(1)()\
+def(ifzshall)(1)(ARG1)\
+manpage(ZSHALL)(1)(date())(zsh version())
+manpagename(zshall)(the Z shell meta-man page)
+)(\
+def(ifzshone)(1)(ARG1)\
+def(ifzshall)(1)()\
+manpage(ZSH)(1)(date())(zsh version())
+manpagename(zsh)(the Z shell)
+)\
+)\
+ifnzman(\
+def(ifzshone)(1)()\
+def(ifzshall)(1)()\
+)\
+ifztexi(\
+texinfo(zsh.info)(zsh)
+NOTRANS(@setchapternewpage odd
+@iftex
+@finalout
+@afourpaper
+@end iftex)
+texititlepage()
+texititle(The Z Shell Guide)
+texisubtitle(Version version())
+texisubtitle(Updated date())
+texiauthor(Original documentation by Paul Falstad)
+texipage()
+This is a texinfo version of the documentation for the Z Shell, originally by 
+Paul Falstad.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+texiendtitlepage()
+)\
+ifnzman(includefile(Zsh/guide.yo))
+includefile(Zsh/intro.yo)
+includefile(Zsh/invoke.yo)
+includefile(Zsh/files.yo)
+ifnzman(includefile(Zsh/grammar.yo))
+ifnzman(includefile(Zsh/redirect.yo))
+ifnzman(includefile(Zsh/exec.yo))
+ifnzman(includefile(Zsh/func.yo))
+ifnzman(includefile(Zsh/jobs.yo))
+ifnzman(includefile(Zsh/arith.yo))
+ifnzman(includefile(Zsh/cond.yo))
+ifnzman(includefile(Zsh/compat.yo))
+ifnzman(includefile(Zsh/prompt.yo))
+ifnzman(includefile(Zsh/restricted.yo))
+ifnzman(includefile(Zsh/expn.yo))
+ifnzman(includefile(Zsh/params.yo))
+ifnzman(includefile(Zsh/options.yo))
+ifnzman(includefile(Zsh/builtins.yo))
+ifnzman(includefile(Zsh/zle.yo))
+ifnzman(includefile(Zsh/compctl.yo))
+ifnzman(includefile(Zsh/modules.yo))
+ifzshall(\
+def(source)(1)(NOTRANS(.so )man1/ARG1NOTRANS(.)1)\
+CMT()
+source(zshmisc)
+source(zshexpn)
+source(zshparam)
+source(zshoptions)
+source(zshbuiltins)
+source(zshzle)
+source(zshcompctl)
+source(zshmodules)
+manpage(ZSHALL)(1)(date())(zsh version())
+)\
+ifzman(includefile(Zsh/filelist.yo))
+ifzman(includefile(Zsh/seealso.yo))
+ifnzman(includefile(Zsh/index.yo))

@@ -1,0 +1,1076 @@
+texinode(Zsh Line Editor)(Programmable Completion)(Shell Builtin Commands)(Top)
+chapter(Zsh Line Editor)
+cindex(line editor)
+cindex(editor, line)
+sect(Description)
+pindex(ZLE, use of)
+If the tt(ZLE) option is set (it is by default)
+and the shell input is attached to the terminal, the user
+is allowed to edit command lines.
+
+There are two display modes.  The first, multiline mode, is the
+default.  It only works if the tt(TERM) parameter is set to a valid
+terminal type that can move the cursor up.  The second, single line
+mode, is used if tt(TERM) is invalid or incapable of moving the
+cursor up, or if the tt(SINGLE_LINE_ZLE) option is set.
+pindex(SINGLE_LINE_ZLE, use of)
+cindex(ksh, editor mode)
+cindex(editor ksh style)
+This mode
+is similar to bf(ksh), and uses no termcap sequences.  If tt(TERM) is
+"emacs", the tt(ZLE) option will be unset by default.
+sect(Keymaps)
+cindex(keymaps)
+cindex(key bindings)
+cindex(bindings, key)
+A keymap in ZLE contains a set of bindings between key sequences
+and ZLE commands.  The empty key sequence cannot be bound.
+
+There can be any number of keymaps at any time, and each keymap has one
+or more names.  If all of a keymap's names are deleted, it disappears.
+findex(bindkey, use of)
+tt(bindkey) can be used to manipulate keymap names.
+
+Initially, there are four keymaps:
+
+startsitem()
+sitem(tt(emacs))(EMACS emulation)
+sitem(tt(viins))(vi emulation - insert mode)
+sitem(tt(vicmd))(vi emulation - command mode)
+sitem(tt(.safe))(fallback keymap)
+endsitem()
+
+The `tt(.safe)' keymap is special.  It can never be altered, and the name
+can never be removed.  However, it can be linked to other names, which can
+be removed.  In the future other special keymaps may be added; users should
+avoid using names beginning with `tt(.)' for their own keymaps.
+
+vindex(VISUAL)
+vindex(EDITOR)
+In addition to these four names, either `tt(emacs)' or `tt(viins)' is
+also linked to the name `tt(main)'.  If one of the tt(VISUAL) or
+tt(EDITOR) environment variables contain the string `tt(vi)' when the shell
+starts up then it will be `tt(viins)', otherwise it will be `tt(emacs)'.
+tt(bindkey)'s tt(-e) and tt(-v)
+options provide a convenient way to override this default choice.
+
+When the editor starts up, it will select the `tt(main)' keymap.
+If that keymap doesn't exist, it will use `tt(.safe)' instead.
+
+In the `tt(.safe)' keymap, each single key is bound to tt(self-insert),
+except for ^J (line feed) and ^M (return) which are bound to tt(accept-line).
+This is deliberately not pleasant to use; if you are using it, it
+means you deleted the main keymap, and you should put it back.
+subsect(Reading Commands)
+When ZLE is reading a command from the terminal, it may read a sequence
+that is bound to some command and is also a prefix of a longer bound string.
+In this case ZLE will wait a certain time to see if more characters
+are typed, and if not (or they don't match any longer string) it will
+execute the binding.  This timeout is defined by the tt(KEYTIMEOUT) parameter;
+its default is 0.4 sec.  No timeout is done if the prefix string is not bound.
+
+As well as ZLE commands, key sequences can be bound to other strings, by using
+`tt(bindkey -s)'.
+When such a sequence is read, the replacement string is pushed back as input,
+and the command reading process starts again using these fake keystrokes.
+This input can itself invoke further replacement strings, but in order to
+detect loops the process will be stopped if there are twenty such replacements
+without a real command being read.
+sect(Widgets)
+cindex(widgets)
+All actions in the editor are performed by `widgets'.  A widget's job is
+simply to perform some small action.  The ZLE commands that key sequences
+in keymaps are bound to are in fact widgets.  Widgets can be user-defined
+or built in.
+
+There are 162 standard widgets built in to ZLE (see sectref(Standard Widgets)).
+Other built-in widgets can be defined by other modules (see
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(Zsh Modules))\
+).  Each built-in widget has two names: its normal canonical name, and the
+same name preceded by a `tt(.)'.  The `tt(.)' name is special: it can't be
+rebound to a different widget.  This makes the widget available even when
+its usual name has been redefined.
+
+User-defined widgets are defined using `tt(zle -N)', and implemented
+as shell functions.  When the widget is executed, the corresponding
+shell function is executed, and can perform editing (or other) actions.
+It is recommended that user-defined widgets should not have names
+starting with `tt(.)'.
+sect(User-Defined Widgets)
+cindex(widgets, user-defined)
+User-defined widgets, being implemented as shell functions,
+can execute any normal shell command.  They can also run other widgets
+(whether built-in or user-defined) using the tt(zle) builtin command.
+Finally, they can examine and edit the ZLE buffer being edited by
+reading and setting the special parameters described below.
+
+cindex(parameters, editor)
+cindex(parameters, zle)
+These special parameters are always available in widget functions, but
+are not in any way special outside ZLE.  If they have some normal value
+outside ZLE, that value is temporarily inaccessible, but will return
+when the widget function exits.  These special parameters in fact have
+local scope, like parameters created in a function using tt(local).
+
+startitem()
+vindex(BUFFER)
+item(tt(BUFFER) (scalar))(
+The entire contents of the edit buffer.  If it is written to, the
+cursor remains at the same offset, unless that would put it outside the
+buffer.
+)
+vindex(CURSOR)
+item(tt(CURSOR) (integer))(
+The offset of the cursor, within the edit buffer.  This is in the range
+0 to tt($#BUFFER), and is by definition equal to tt($#LBUFFER).
+Attempts to move the cursor outside the buffer will result in the
+cursor being moved to the appropriate end of the buffer.
+)
+vindex(LBUFFER)
+item(tt(LBUFFER) (scalar))(
+The part of the buffer that lies to the left of the cursor position.
+If it is assigned to, only that part of the buffer is replaced, and the
+cursor remains between the new tt($LBUFFER) and the old tt($RBUFFER).
+)
+vindex(RBUFFER)
+item(tt(RBUFFER) (scalar))(
+The part of the buffer that lies to the right of the cursor position.
+If it is assigned to, only that part of the buffer is replaced, and the
+cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
+)
+enditem()
+sect(Standard Widgets)
+cindex(widgets, standard)
+The following is a list of all the standard widgets,
+and their default bindings in emacs mode,
+vi command mode and vi insert mode
+(the `tt(emacs)', `tt(vicmd)' and `tt(viins)' keymaps, respectively).
+startmenu()
+menu(Movement)
+menu(History Control)
+menu(Modifying Text)
+menu(Arguments)
+menu(Completion)
+menu(Miscellaneous)
+endmenu()
+texinode(Movement)(History Control)()(Zsh Line Editor)
+subsect(Movement)
+startitem()
+tindex(vi-backward-blank-word)
+item(tt(vi-backward-blank-word) (unbound) (B) (unbound))(
+Move backward one word, where a word is defined as a series of
+non-blank characters.
+)
+tindex(backward-char)
+item(tt(backward-char) (^B ESC-[D) (unbound) (unbound))(
+Move backward one character.
+)
+tindex(vi-backward-char)
+item(tt(vi-backward-char) (unbound) (^H h ^?) (unbound))(
+Move backward one character, without changing lines.
+)
+tindex(backward-word)
+item(tt(backward-word) (ESC-B ESC-b) (unbound) (unbound))(
+Move to the beginning of the previous word.
+)
+tindex(emacs-backward-word)
+item(tt(emacs-backward-word))(
+Move to the beginning of the previous word.
+)
+tindex(vi-backward-word)
+item(tt(vi-backward-word) (unbound) (b) (unbound))(
+Move to the beginning of the previous word, vi-style.
+)
+tindex(beginning-of-line)
+item(tt(beginning-of-line) (^A) (unbound) (unbound))(
+Move to the beginning of the line.  If already at the beginning
+of the line, move to the beginning of the previous line, if any.
+)
+tindex(vi-beginning-of-line)
+item(tt(vi-beginning-of-line))(
+Move to the beginning of the line, without changing lines.
+)
+tindex(end-of-line)
+item(tt(end-of-line) (^E) (unbound) (unbound))(
+Move to the end of the line.  If already at the end
+of the line, move to the end of the next line, if any.
+)
+tindex(vi-end-of-line)
+item(tt(vi-end-of-line) (unbound) ($) (unbound))(
+Move to the end of the line.
+If an argument is given to this command, the cursor will be moved to
+the end of the line (argument - 1) lines down.
+)
+tindex(vi-forward-blank-word)
+item(tt(vi-forward-blank-word) (unbound) (W) (unbound))(
+Move forward one word, where a word is defined as a series of
+non-blank characters.
+)
+tindex(vi-forward-blank-word-end)
+item(tt(vi-forward-blank-word-end) (unbound) (E) (unbound))(
+Move to the end of the current word, or, if at the end of the current word,
+to the end of the next word,
+where a word is defined as a series of non-blank characters.
+)
+tindex(forward-char)
+item(tt(forward-char) (^F ESC-[C) (unbound) (unbound))(
+Move forward one character.
+)
+tindex(vi-forward-char)
+item(tt(vi-forward-char) (unbound) (space l) (unbound))(
+Move forward one character.
+)
+tindex(vi-find-next-char)
+item(tt(vi-find-next-char) (^X^F) (f) (unbound))(
+Read a character from the keyboard, and move to
+the next occurrence of it in the line.
+)
+tindex(vi-find-next-char-skip)
+item(tt(vi-find-next-char-skip) (unbound) (t) (unbound))(
+Read a character from the keyboard, and move to
+the position just before the next occurrence of it in the line.
+)
+tindex(vi-find-prev-char)
+item(tt(vi-find-prev-char) (unbound) (F) (unbound))(
+Read a character from the keyboard, and move to
+the previous occurrence of it in the line.
+)
+tindex(vi-find-prev-char-skip)
+item(tt(vi-find-prev-char-skip) (unbound) (T) (unbound))(
+Read a character from the keyboard, and move to
+the position just after the previous occurrence of it in the line.
+)
+tindex(vi-first-non-blank)
+item(tt(vi-first-non-blank) (unbound) (^) (unbound))(
+Move to the first non-blank character in the line.
+)
+tindex(vi-forward-word)
+item(tt(vi-forward-word) (unbound) (w) (unbound))(
+Move forward one word, vi-style.
+)
+tindex(forward-word)
+item(tt(forward-word) (ESC-F ESC-f) (unbound) (unbound))(
+Move to the beginning of the next word.
+The editor's idea of a word is specified with the tt(WORDCHARS)
+parameter.
+)
+tindex(emacs-forward-word)
+item(tt(emacs-forward-word))(
+Move to the end of the next word.
+)
+tindex(vi-forward-word-end)
+item(tt(vi-forward-word-end) (unbound) (e) (unbound))(
+Move to the end of the next word.
+)
+tindex(vi-goto-column)
+item(tt(vi-goto-column) (ESC-|) (|) (unbound))(
+Move to the column specified by the numeric argument.
+)
+tindex(vi-goto-mark)
+item(tt(vi-goto-mark) (unbound) (`) (unbound))(
+Move to the specified mark.
+)
+tindex(vi-goto-mark-line)
+item(tt(vi-goto-mark-line) (unbound) (') (unbound))(
+Move to beginning of the line containing the specified mark.
+)
+tindex(vi-repeat-find)
+item(tt(vi-repeat-find) (unbound) (;) (unbound))(
+Repeat the last tt(vi-find) command.
+)
+tindex(vi-rev-repeat-find)
+item(tt(vi-rev-repeat-find) (unbound) (,) (unbound))(
+Repeat the last tt(vi-find) command in the opposite direction.
+)
+enditem()
+texinode(History Control)(Modifying Text)(Movement)(Zsh Line Editor)
+subsect(History Control)
+startitem()
+tindex(beginning-of-buffer-or-history)
+item(tt(beginning-of-buffer-or-history) (ESC-<) (unbound) (unbound))(
+Move to the beginning of the buffer, or if already there,
+move to the first event in the history list.
+)
+tindex(beginning-of-line-hist)
+item(tt(beginning-of-line-hist))(
+Move to the beginning of the line.  If already at the
+beginning of the buffer, move to the previous history line.
+)
+tindex(beginning-of-history)
+item(tt(beginning-of-history))(
+Move to the first event in the history list.
+)
+tindex(down-line-or-history)
+item(tt(down-line-or-history) (^N ESC-[B) (j) (unbound))(
+Move down a line in the buffer, or if already at the bottom line,
+move to the next event in the history list.
+)
+tindex(vi-down-line-or-history)
+item(tt(vi-down-line-or-history) (unbound) (PLUS()) (unbound))(
+Move down a line in the buffer, or if already at the bottom line,
+move to the next event in the history list.
+Then move to the first non-blank character on the line.
+)
+tindex(down-line-or-search)
+item(tt(down-line-or-search))(
+Move down a line in the buffer, or if already at the bottom line,
+search forward in the history for a line beginning with the first
+word in the buffer.
+)
+tindex(down-history)
+item(tt(down-history) (unbound) (^N) (unbound))(
+Move to the next event in the history list.
+)
+tindex(history-beginning-search-backward)
+item(tt(history-beginning-search-backward))(
+Search backward in the history for a line beginning with the current
+line up to the cursor.
+This leaves the cursor in its original position.
+)
+tindex(end-of-buffer-or-history)
+item(tt(end-of-buffer-or-history) (ESC->) (unbound) (unbound))(
+Move to the end of the buffer, or if already there,
+move to the last event in the history list.
+)
+tindex(end-of-line-hist)
+item(tt(end-of-line-hist))(
+Move to the end of the line.  If already at the end of
+the buffer, move to the next history line.
+)
+tindex(end-of-history)
+item(tt(end-of-history))(
+Move to the last event in the history list.
+)
+tindex(vi-fetch-history)
+item(tt(vi-fetch-history) (unbound) (G) (unbound))(
+Fetch the history line specified by the numeric argument.
+This defaults to the current history line
+(i.e. the one that isn't history yet).
+)
+tindex(history-incremental-search-backward)
+item(tt(history-incremental-search-backward) (^R ^Xr) (unbound) (unbound))(
+Search backward incrementally for a specified string.  The search is
+case-insensitive if the search string does not have uppercase letters and no
+numeric argument was given.  The string may begin with `tt(^)' to anchor the
+search to the beginning of the line.
+
+A restricted set of editing functions
+is available in the mini-buffer.  An interrupt signal, as defined by the stty
+setting, will stop the search and go back to the original line.  An undefined
+key will have the same effect. The supported functions are:
+tt(backward-delete-char),
+tt(vi-backward-delete-char),
+tt(clear-screen),
+tt(redisplay),
+tt(quoted-insert),
+tt(vi-quoted-insert),
+tt(accept-and-hold),
+tt(accept-and-infer-next-history),
+tt(accept-line) and
+tt(accept-line-and-down-history).
+
+tt(magic-space) just inserts a space.
+tt(vi-cmd-mode) toggles between the `tt(main)' and `tt(vicmd)' keymaps;
+the `tt(main)' keymap (insert mode) will be selected initially.
+tt(history-incremental-search-backward) will get the
+next occurrence of the contents of the mini-buffer.
+tt(history-incremental-search-forward) inverts the sense of the search.
+tt(vi-repeat-search) and tt(vi-rev-repeat-search) are similarly supported.
+The direction of the search is indicated in the mini-buffer.
+
+Any multi-character string
+that is not bound to one of the above functions will beep and interrupt the
+search, leaving the last found line in the buffer. Any single character that
+is not bound to one of the above functions, or tt(self-insert) or
+tt(self-insert-unmeta), will have the same effect but the function will be
+executed.
+)
+tindex(history-incremental-search-forward)
+item(tt(history-incremental-search-forward) (^S ^Xs) (unbound) (unbound))(
+Search forward incrementally for a specified string.  The search is
+case-insensitive if the search string does not have uppercase letters and no
+numeric argument was given.  The string may begin with `tt(^)' to anchor the
+search to the beginning of the line.  The functions available in the
+mini-buffer are the same as for tt(history-incremental-search-backward).
+)
+tindex(history-search-backward)
+item(tt(history-search-backward) (ESC-P ESC-p) (unbound) (unbound))(
+Search backward in the history for a line beginning with the first
+word in the buffer.
+)
+tindex(vi-history-search-backward)
+item(tt(vi-history-search-backward) (unbound) (/) (unbound))(
+Search backward in the history for a specified string.
+The string may begin with `tt(^)' to anchor the search to the
+beginning of the line.
+
+A restricted set of editing functions is available in
+the mini-buffer.  An interrupt signal, as defined by the stty setting,  will
+stop the search.
+The functions available in the mini-buffer are:
+tt(accept-line),
+tt(backward-delete-char),
+tt(vi-backward-delete-char),
+tt(backward-kill-word),
+tt(vi-backward-kill-word),
+tt(clear-screen),
+tt(redisplay),
+tt(quoted-insert)
+and
+tt(vi-quoted-insert).
+
+tt(vi-cmd-mode) is treated the same as accept-line, and
+tt(magic-space) is treated as a space.
+Any other character that is not bound to self-insert or
+self-insert-unmeta will beep and be ignored. If the function is called from vi
+command mode, the bindings of the current insert mode will be used.
+)
+tindex(history-search-forward)
+item(tt(history-search-forward) (ESC-N ESC-n) (unbound) (unbound))(
+Search forward in the history for a line beginning with the first
+word in the buffer.
+)
+tindex(vi-history-search-forward)
+item(tt(vi-history-search-forward) (unbound) (?) (unbound))(
+Search forward in the history for a specified string.
+The string may begin with `tt(^)' to anchor the search to the
+beginning of the line. The functions available in the mini-buffer are the same
+as for tt(vi-history-search-backward).
+)
+tindex(infer-next-history)
+item(tt(infer-next-history) (^X^N) (unbound) (unbound))(
+Search in the history list for a line matching the current one and
+fetch the event following it.
+)
+tindex(insert-last-word)
+item(tt(insert-last-word) (ESC-_ ESC-.) (unbound) (unbound))(
+Insert the last word from the previous history event at the
+cursor position.  If a positive numeric argument is given,
+insert that word from the end of the previous history event.
+If the argument is zero or negative insert that word from the
+left (zero inserts the previous command word).
+)
+tindex(vi-repeat-search)
+item(tt(vi-repeat-search) (unbound) (n) (unbound))(
+Repeat the last vi history search.
+)
+tindex(vi-rev-repeat-search)
+item(tt(vi-rev-repeat-search) (unbound) (N) (unbound))(
+Repeat the last vi history search, but in reverse.
+)
+tindex(up-line-or-history)
+item(tt(up-line-or-history) (^P ESC-[A) (k) (unbound))(
+Move up a line in the buffer, or if already at the top line,
+move to the previous event in the history list.
+)
+tindex(vi-up-line-or-history)
+item(tt(vi-up-line-or-history) (unbound) (-) (unbound))(
+Move up a line in the buffer, or if already at the top line,
+move to the previous event in the history list.
+Then move to the first non-blank character on the line.
+)
+tindex(up-line-or-search)
+item(tt(up-line-or-search))(
+Move up a line in the buffer, or if already at the top line,
+search backward in the history for a line beginning with the
+first word in the buffer.
+)
+tindex(up-history)
+item(tt(up-history) (unbound) (^P) (unbound))(
+Move to the previous event in the history list.
+)
+tindex(history-beginning-search-forward)
+item(tt(history-beginning-search-forward))(
+Search forward in the history for a line beginning with the current
+line up to the cursor.
+This leaves the cursor in its original position.
+)
+enditem()
+texinode(Modifying Text)(Arguments)(History Control)(Zsh Line Editor)
+subsect(Modifying Text)
+startitem()
+tindex(vi-add-eol)
+item(tt(vi-add-eol) (unbound) (A) (unbound))(
+Move to the end of the line and enter insert mode.
+)
+tindex(vi-add-next)
+item(tt(vi-add-next) (unbound) (a) (unbound))(
+Enter insert mode after the current cursor position, without changing lines.
+)
+tindex(backward-delete-char)
+item(tt(backward-delete-char) (^H ^?) (unbound) (unbound))(
+Delete the character behind the cursor.
+)
+tindex(vi-backward-delete-char)
+item(tt(vi-backward-delete-char) (unbound) (X) (^H))(
+Delete the character behind the cursor, without changing lines.
+If in insert mode, this won't delete past the point where insert mode was
+last entered.
+)
+tindex(backward-delete-word)
+item(tt(backward-delete-word))(
+Delete the word behind the cursor.
+)
+tindex(backward-kill-line)
+item(tt(backward-kill-line))(
+Kill from the beginning of the line to the cursor position.
+)
+tindex(backward-kill-word)
+item(tt(backward-kill-word) (^W ESC-^H ESC-^?) (unbound) (unbound))(
+Kill the word behind the cursor.
+)
+tindex(vi-backward-kill-word)
+item(tt(vi-backward-kill-word) (unbound) (unbound) (^W))(
+Kill the word behind the cursor, without going past the point where insert
+mode was last entered.
+)
+tindex(capitalize-word)
+item(tt(capitalize-word) (ESC-C ESC-c) (unbound) (unbound))(
+Capitalize the current word and move past it.
+)
+tindex(vi-change)
+item(tt(vi-change) (unbound) (c) (unbound))(
+Read a movement command from the keyboard, and kill
+from the cursor position to the endpoint of the movement.
+Then enter insert mode.
+If the command is tt(vi-change), change the current line.
+)
+tindex(vi-change-eol)
+item(tt(vi-change-eol) (unbound) (C) (unbound))(
+Kill to the end of the line and enter insert mode.
+)
+tindex(vi-change-whole-line)
+item(tt(vi-change-whole-line) (unbound) (S) (unbound))(
+Kill the current line and enter insert mode.
+)
+tindex(copy-region-as-kill)
+item(tt(copy-region-as-kill) (ESC-W ESC-w) (unbound) (unbound))(
+Copy the area from the cursor to the mark to the kill buffer.
+)
+tindex(copy-prev-word)
+item(tt(copy-prev-word) (ESC-^_) (unbound) (unbound))(
+Duplicate the word behind the cursor.
+)
+tindex(vi-delete)
+item(tt(vi-delete) (unbound) (d) (unbound))(
+Read a movement command from the keyboard, and kill
+from the cursor position to the endpoint of the movement.
+If the command is tt(vi-delete), kill the current line.
+)
+tindex(delete-char)
+item(tt(delete-char))(
+Delete the character under the cursor.
+)
+tindex(vi-delete-char)
+item(tt(vi-delete-char) (unbound) (x) (unbound))(
+Delete the character under the cursor,
+without going past the end of the line.
+)
+tindex(delete-word)
+item(tt(delete-word))(
+Delete the current word.
+)
+tindex(down-case-word)
+item(tt(down-case-word) (ESC-L ESC-l) (unbound) (unbound))(
+Convert the current word to all lowercase and move past it.
+)
+tindex(kill-word)
+item(tt(kill-word) (ESC-D ESC-d) (unbound) (unbound))(
+Kill the current word.
+)
+tindex(gosmacs-transpose-chars)
+item(tt(gosmacs-transpose-chars))(
+Exchange the two characters behind the cursor.
+)
+tindex(vi-indent)
+item(tt(vi-indent) (unbound) (>) (unbound))(
+Indent a number of lines.
+)
+tindex(vi-insert)
+item(tt(vi-insert) (unbound) (i) (unbound))(
+Enter insert mode.
+)
+tindex(vi-insert-bol)
+item(tt(vi-insert-bol) (unbound) (I) (unbound))(
+Move to the first non-blank character on the line and enter insert mode.
+)
+tindex(vi-join)
+item(tt(vi-join) (^X^J) (J) (unbound))(
+Join the current line with the next one.
+)
+tindex(kill-line)
+item(tt(kill-line) (^K) (unbound) (unbound))(
+Kill from the cursor to the end of the line.
+If already on the end of the line, kill the newline character.
+)
+tindex(vi-kill-line)
+item(tt(vi-kill-line) (unbound) (unbound) (^U))(
+Kill from the cursor back to wherever insert mode was last entered.
+)
+tindex(vi-kill-eol)
+item(tt(vi-kill-eol) (unbound) (D) (unbound))(
+Kill from the cursor to the end of the line.
+)
+tindex(kill-region)
+item(tt(kill-region))(
+Kill from the cursor to the mark.
+)
+tindex(kill-buffer)
+item(tt(kill-buffer) (^X^K) (unbound) (unbound))(
+Kill the entire buffer.
+)
+tindex(kill-whole-line)
+item(tt(kill-whole-line) (^U) (unbound) (unbound))(
+Kill the current line.
+)
+tindex(vi-match-bracket)
+item(tt(vi-match-bracket) (^X^B) (%) (unbound))(
+Move to the bracket character (one of tt({}), tt(()) or tt([])) that
+matches the one under the cursor.
+If the cursor is not on a bracket character, move forward without going
+past the end of the line to find one, and then go to the matching bracket.
+)
+tindex(vi-open-line-above)
+item(tt(vi-open-line-above) (unbound) (O) (unbound))(
+Open a line above the cursor and enter insert mode.
+)
+tindex(vi-open-line-below)
+item(tt(vi-open-line-below) (unbound) (o) (unbound))(
+Open a line below the cursor and enter insert mode.
+)
+tindex(vi-oper-swap-case)
+item(tt(vi-oper-swap-case))(
+Read a movement command from the keyboard, and swap
+the case of all characters
+from the cursor position to the endpoint of the movement.
+If the movement command is tt(vi-oper-swap-case),
+swap the case of all characters on the current line.
+)
+tindex(overwrite-mode)
+item(tt(overwrite-mode) (^X^O) (unbound) (unbound))(
+Toggle between overwrite mode and insert mode.
+)
+tindex(vi-put-before)
+item(tt(vi-put-before) (unbound) (P) (unbound))(
+Insert the contents of the kill buffer before the cursor.
+If the kill buffer contains a sequence of lines (as opposed to characters),
+paste it above the current line.
+)
+tindex(vi-put-after)
+item(tt(vi-put-after) (unbound) (p) (unbound))(
+Insert the contents of the kill buffer after the cursor.
+If the kill buffer contains a sequence of lines (as opposed to characters),
+paste it below the current line.
+)
+tindex(quoted-insert)
+item(tt(quoted-insert) (^V) (unbound) (unbound))(
+Insert the next character typed into the buffer literally.
+An interrupt character will not be inserted.
+)
+tindex(vi-quoted-insert)
+item(tt(vi-quoted-insert) (unbound) (unbound) (^Q ^V))(
+Display a `tt(^)' at the cursor position, and
+insert the next character typed into the buffer literally.
+An interrupt character will not be inserted.
+)
+tindex(quote-line)
+item(tt(quote-line) (ESC-') (unbound) (unbound))(
+Quote the current line; that is, put a `tt(')' character at the
+beginning and the end, and convert all `tt(')' characters
+to `tt('\'')'.
+)
+tindex(quote-region)
+item(tt(quote-region) (ESC-") (unbound) (unbound))(
+Quote the region from the cursor to the mark.
+)
+tindex(vi-replace)
+item(tt(vi-replace) (unbound) (R) (unbound))(
+Enter overwrite mode.
+)
+tindex(vi-repeat-change)
+item(tt(vi-repeat-change) (unbound) (.) (unbound))(
+Repeat the last vi mode text modification.
+If a count was used with the modification, it is remembered.
+If a count is given to this command, it overrides the remembered count,
+and is remembered for future uses of this command.
+The cut buffer specification is similarly remembered.
+)
+tindex(vi-replace-chars)
+item(tt(vi-replace-chars) (unbound) (r) (unbound))(
+Replace the character under the cursor with a character
+read from the keyboard.
+)
+tindex(self-insert)
+item(tt(self-insert) (printable characters) (unbound) (printable characters and some control characters))(
+Insert a character into the buffer at the cursor position.
+)
+tindex(self-insert-unmeta)
+item(tt(self-insert-unmeta) (ESC-^I ESC-^J ESC-^M) (unbound) (unbound))(
+Insert a character into the buffer after stripping the meta bit
+and converting ^M to ^J.
+)
+tindex(vi-substitute)
+item(tt(vi-substitute) (unbound) (s) (unbound))(
+Substitute the next characte+CHAR(r)(s).
+)
+tindex(vi-swap-case)
+item(tt(vi-swap-case) (unbound) (~) (unbound))(
+Swap the case of the character under the cursor and move past it.
+)
+tindex(transpose-chars)
+item(tt(transpose-chars) (^T) (unbound) (unbound))(
+Exchange the two characters to the left of the
+cursor if at end of line, else exchange the
+character under the cursor with the character
+to the left.
+)
+tindex(transpose-words)
+item(tt(transpose-words) (ESC-T ESC-t) (unbound) (unbound))(
+Exchange the current word with the one before it.
+)
+tindex(vi-unindent)
+item(tt(vi-unindent) (unbound) (<) (unbound))(
+Unindent a number of lines.
+)
+tindex(up-case-word)
+item(tt(up-case-word) (ESC-U ESC-u) (unbound) (unbound))(
+Convert the current word to all caps and move past it.
+)
+tindex(yank)
+item(tt(yank) (^Y) (unbound) (unbound))(
+Insert the contents of the kill buffer at the cursor position.
+)
+tindex(yank-pop)
+item(tt(yank-pop) (ESC-y) (unbound) (unbound))(
+Remove the text just yanked, rotate the kill-ring,
+and yank the new top.  Only works following
+tt(yank) or tt(yank-pop).
+)
+tindex(vi-yank)
+item(tt(vi-yank) (unbound) (y) (unbound))(
+Read a movement command from the keyboard, and copy the region
+from the cursor position to the endpoint of the movement
+into the kill buffer.
+If the command is tt(vi-yank), copy the current line.
+)
+tindex(vi-yank-whole-line)
+item(tt(vi-yank-whole-line) (unbound) (Y) (unbound))(
+Copy the current line into the kill buffer.
+)
+tindex(vi-yank-eol)
+item(tt(vi-yank-eol))(
+Copy the region from the cursor position to the end of the line
+into the kill buffer.
+Arguably, this is what Y should do in vi, but it isn't what it actually does.
+)
+enditem()
+texinode(Arguments)(Completion)(Modifying Text)(Zsh Line Editor)
+subsect(Arguments)
+startitem()
+tindex(digit-argument)
+item(tt(digit-argument) (ESC-0..ESC-9) (1-9) (unbound))(
+Start a new numeric argument, or add to the current one.
+See also tt(vi-digit-or-beginning-of-line).
+)
+tindex(neg-argument)
+item(tt(neg-argument) (ESC--) (unbound) (unbound))(
+Changes the sign of the following argument.
+)
+tindex(universal-argument)
+item(tt(universal-argument))(
+Multiply the argument of the next command by 4.  Alternatively, if
+this command is followed by an integer (positive or negative), use
+that as the argument for the next command.  Thus digits cannot be
+repeated using this command.  For example, if this command occurs
+twice, followed immediately by tt(forward-char), move forward sixteen
+spaces; if instead it is followed by tt(-2), then tt(forward-char),
+move backward two spaces.
+)
+enditem()
+texinode(Completion)(Miscellaneous)(Arguments)(Zsh Line Editor)
+subsect(Completion)
+startitem()
+tindex(accept-and-menu-complete)
+item(tt(accept-and-menu-complete))(
+In a menu completion, insert the current completion into the buffer,
+and advance to the next possible completion.
+)
+tindex(complete-word)
+item(tt(complete-word))(
+Attempt completion on the current word.
+)
+tindex(delete-char-or-list)
+item(tt(delete-char-or-list) (^D) (unbound) (unbound))(
+Delete the character under the cursor.  If the cursor
+is at the end of the line, list possible completions for the
+current word.
+)
+tindex(expand-cmd-path)
+item(tt(expand-cmd-path))(
+Expand the current command to its full pathname.
+)
+tindex(expand-or-complete)
+item(tt(expand-or-complete) (TAB) (unbound) (TAB))(
+Attempt shell expansion on the current word.
+If that fails,
+attempt completion.
+)
+tindex(expand-or-complete-prefix)
+item(tt(expand-or-complete-prefix))(
+Attempt shell expansion on the current word up to cursor.
+)
+tindex(expand-history)
+item(tt(expand-history) (ESC-space ESC-!) (unbound) (unbound))(
+Perform history expansion on the edit buffer.
+)
+tindex(expand-word)
+item(tt(expand-word) (^X*) (unbound) (unbound))(
+Attempt shell expansion on the current word.
+)
+tindex(list-choices)
+item(tt(list-choices) (ESC-^D) (^D =) (^D))(
+List possible completions for the current word.
+)
+tindex(list-expand)
+item(tt(list-expand) (^Xg ^XG) (^G) (^G))(
+List the expansion of the current word.
+)
+tindex(magic-space)
+item(tt(magic-space))(
+Perform history expansion and insert a space into the
+buffer.  This is intended to be bound to space.
+)
+tindex(menu-complete)
+pindex(MENU_COMPLETE, use of)
+item(tt(menu-complete))(
+Like tt(complete-word), except that menu completion is used.
+See the tt(MENU_COMPLETE) option.
+)
+tindex(menu-expand-or-complete)
+item(tt(menu-expand-or-complete))(
+Like tt(expand-or-complete), except that menu completion is used.
+)
+tindex(reverse-menu-complete)
+item(tt(reverse-menu-complete))(
+Perform menu completion, like tt(menu-complete), except that if
+a menu completion is already in progress, move to the em(previous)
+completion rather than the next.
+)
+enditem()
+texinode(Miscellaneous)()(Completion)(Zsh Line Editor)
+subsect(Miscellaneous)
+startitem()
+tindex(accept-and-hold)
+item(tt(accept-and-hold) (ESC-A ESC-a) (unbound) (unbound))(
+Push the contents of the buffer on the buffer stack
+and execute it.
+)
+tindex(accept-and-infer-next-history)
+item(tt(accept-and-infer-next-history))(
+Execute the contents of the buffer.
+Then search the history list for a line matching the current one
+and push the event following onto the buffer stack.
+)
+tindex(accept-line)
+item(tt(accept-line) (^J ^M) (^J ^M) (^J ^M))(
+Finish editing the buffer.  Normally this causes the buffer to be
+executed as a shell command.
+)
+tindex(accept-line-and-down-history)
+item(tt(accept-line-and-down-history) (^O) (unbound) (unbound))(
+Execute the current line, and push the next history
+event on the the buffer stack.
+)
+tindex(vi-cmd-mode)
+item(tt(vi-cmd-mode) (^X^V) (unbound) (^[))(
+Enter command mode; that is, select the `tt(vicmd)' keymap.
+Yes, this is bound by default in emacs mode.
+)
+tindex(vi-caps-lock-panic)
+item(tt(vi-caps-lock-panic))(
+Hang until any lowercase key is pressed.
+This is for vi users without the mental capacity to keep
+track of their caps lock key (like the author).
+)
+tindex(clear-screen)
+item(tt(clear-screen) (^L ESC-^L) (^L) (^L))(
+Clear the screen and redraw the prompt.
+)
+tindex(describe-key-briefly)
+item(tt(describe-key-briefly))(
+Reads a key sequence, then prints the function bound to that sequence.
+)
+tindex(exchange-point-and-mark)
+item(tt(exchange-point-and-mark) (^X^X) (unbound) (unbound))(
+Exchange the cursor position with the position of the mark.
+)
+tindex(execute-named-cmd)
+item(tt(execute-named-cmd) (ESC-x) (unbound) (unbound))(
+Read the name of an editor command and
+execute it.  A restricted set of editing functions is available in the
+mini-buffer.  An interrupt signal, as defined by the stty setting, will
+abort the function. The allowed functions are:
+tt(backward-delete-char),
+tt(vi-backward-delete-char),
+tt(clear-screen),
+tt(redisplay),
+tt(quoted-insert),
+tt(vi-quoted-insert),
+tt(backward-kill-word),
+tt(vi-backward-kill-word),
+tt(kill-whole-line),
+tt(vi-kill-line),
+tt(backward-kill-line),
+tt(list-choices),
+tt(delete-char-or-list),
+tt(complete-word),
+tt(accept-line),
+tt(expand-or-complete) and
+tt(expand-or-complete-prefix).
+
+tt(kill-region) kills the last word,
+and vi-cmd-mode is treated the same as accept-line.
+The space and tab characters, if not bound to one of
+these functions, will complete the name and then list the
+possibilities if the tt(AUTO_LIST) option is set.
+Any other character that is not bound to tt(self-insert) or
+tt(self-insert-unmeta) will beep and be ignored.
+The bindings of the current insert mode will be used.
+)
+tindex(execute-last-named-cmd)
+item(tt(execute-last-named-cmd) (ESC-z) (unbound) (unbound))(
+Redo the last function executed with tt(execute-named-cmd).
+)
+tindex(get-line)
+item(tt(get-line) (ESC-G ESC-g) (unbound) (unbound))(
+Pop the top line off the buffer stack and insert it at the
+cursor position.
+)
+tindex(pound-insert)
+item(tt(pound-insert) (unbound) (#) (unbound))(
+If there is no # character at the beginning of the buffer,
+add one to the beginning of each line.
+If there is one, remove a # from each line that has one.
+In either case, accept the current line.
+The tt(INTERACTIVE_COMMENTS) option must be set
+for this to have any usefulness.
+)
+tindex(vi-pound-insert)
+item(tt(vi-pound-insert))(
+If there is no # character at the beginning of the current line,
+add one.  If there is one, remove it.
+The tt(INTERACTIVE_COMMENTS) option must be set
+for this to have any usefulness.
+)
+tindex(push-input)
+item(tt(push-input))(
+Push the entire current multiline construct onto the buffer stack and
+return to the top-level (tt(PS1)) prompt.
+If the current parser construct is only a single line, this is exactly
+like tt(push-line).
+Next time the editor starts up or is popped with tt(get-line), the
+construct will be popped off the top of the buffer stack and loaded
+into the editing buffer.
+)
+tindex(push-line)
+item(tt(push-line) (^Q ESC-Q ESC-q) (unbound) (unbound))(
+Push the current buffer onto the buffer stack and clear
+the buffer.
+Next time the editor starts up, the buffer will be popped
+off the top of the buffer stack and loaded into the editing
+buffer.
+)
+tindex(push-line-or-edit)
+item(tt(push-line-or-edit))(
+At the top-level (tt(PS1)) prompt, equivalent to tt(push-line).
+At a secondary (tt(PS2)) prompt, move the entire current multiline
+construct into the editor buffer.
+The latter is equivalent to tt(push-input) followed by tt(get-line).
+)
+tindex(redisplay)
+item(tt(redisplay) (unbound) (^R) (^R))(
+Redisplays the edit buffer.
+)
+tindex(send-break)
+item(tt(send-break) (^G ESC-^G) (unbound) (unbound))(
+Abort the current editor function, e.g. tt(execute-named-command), or the
+editor itself, e.g. if you are in tt(vared). Otherwise abort the parsing of
+the current line.
+)
+tindex(run-help)
+item(tt(run-help) (ESC-H ESC-h) (unbound) (unbound))(
+Push the buffer onto the buffer stack, and execute the
+command `tt(run-help) var(cmd)', where var(cmd) is the current
+command.  tt(run-help) is normally aliased to var(man).
+)
+tindex(vi-set-buffer)
+item(tt(vi-set-buffer) (unbound) (") (unbound))(
+Specify a buffer to be used in the following command.
+There are 35 buffers that can be specified:
+the 26 `named' buffers tt("a) to tt("z)
+and the nine `queued' buffers tt("1) to tt("9).  The named buffers can also
+be specified as tt("A) to tt("Z).
+
+When a buffer is specified for a cut command, the text being cut replaces
+the previous contents of the specified buffer.  If a named buffer
+is specified using a capital, the newly cut text is appended to the buffer
+instead of overwriting it.
+
+If no buffer is specified for a cut command, tt("1) is used, and the
+contents of tt("1) to tt("8) are each shifted along one buffer; the contents of
+tt("9) is lost.
+)
+tindex(vi-set-mark)
+item(tt(vi-set-mark) (unbound) (m) (unbound))(
+Set the specified mark at the cursor position.
+)
+tindex(set-mark-command)
+item(tt(set-mark-command) (^@) (unbound) (unbound))(
+Set the mark at the cursor position.
+)
+tindex(spell-word)
+item(tt(spell-word) (ESC-$ ESC-S ESC-s) (unbound) (unbound))(
+Attempt spelling correction on the current word.
+)
+tindex(undefined-key)
+item(tt(undefined-key))(
+This command is executed when a key sequence that is not bound to any
+command is typed.  By default it beeps.
+)
+tindex(undo)
+item(tt(undo) (^_ ^Xu ^X^U) (unbound) (unbound))(
+Incrementally undo the last text modification.
+)
+tindex(redo)
+item(tt(redo))(
+Incrementally redo undone text modifications.
+)
+tindex(vi-undo-change)
+item(tt(vi-undo-change) (unbound) (u) (unbound))(
+Undo the last text modification.
+If repeated, redo the modification.
+)
+tindex(what-cursor-position)
+item(tt(what-cursor-position) (^X=) (unbound) (unbound))(
+Print the character under the cursor, its code as an octal, decimal and
+hexadecimal number, the current cursor position within the buffer and the
+column of the cursor in the current line.
+)
+tindex(where-is)
+item(tt(where-is))(
+Read the name of an editor command and and print the listing of key
+sequences that invoke the specified command.
+)
+tindex(which-command)
+item(tt(which-command) (ESC-?) (unbound) (unbound))(
+Push the buffer onto the buffer stack, and execute the
+command `tt(which-command) var(cmd)'. where var(cmd) is the current
+command.  tt(which-command) is normally aliased to var(whence).
+)
+tindex(vi-digit-or-beginning-of-line)
+item(tt(vi-digit-or-beginning-of-line) (unbound) (0) (unbound))(
+If the last command executed was a digit as part of an argument,
+continue the argument.  Otherwise, execute vi-beginning-of-line.
+)
+enditem()

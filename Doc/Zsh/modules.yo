@@ -1,0 +1,64 @@
+texinode(Zsh Modules)()(Programmable Completion)(Top)
+chapter(Zsh Modules)
+cindex(modules)
+sect(Description)
+Some optional parts of zsh are in modules, separate from the core
+of the shell.  Each of these modules may be linked in to the
+shell at build time,
+or can be dynamically linked while the shell is running
+if the installation supports this feature.  The modules available are:
+
+startitem()
+item(tt(cap))(
+Builtins for manipulating POSIX.1e (POSIX.6) capability (privilege) sets.
+)
+item(tt(clone))(
+A builtin that can clone a running shell onto another terminal.
+)
+item(tt(comp1))(
+Base of the completion system.  Used by the tt(compctl) and tt(zle) modules.
+)
+item(tt(compctl))(
+The tt(compctl) builtin for controlling completion.
+)
+item(tt(deltochar))(
+A ZLE function duplicating EMACS' tt(zap-to-char).
+)
+item(tt(example))(
+An example of how to write a module.
+)
+item(tt(files))(
+Some basic file manipulation commands as builtins.
+)
+item(tt(sched))(
+A builtin that provides a timed execution facility within the shell.
+)
+item(tt(stat))(
+A builtin command interface to the tt(stat) system call.
+)
+item(tt(zle))(
+The Zsh Line Editor, including the tt(bindkey) and tt(vared) builtins.
+)
+enditem()
+startmenu()
+menu(The cap Module)
+menu(The clone Module)
+menu(The comp1 Module)
+menu(The compctl Module)
+menu(The deltochar Module)
+menu(The example Module)
+menu(The files Module)
+menu(The sched Module)
+menu(The stat Module)
+menu(The zle Module)
+endmenu()
+includefile(Zsh/mod_cap.yo)
+includefile(Zsh/mod_clone.yo)
+includefile(Zsh/mod_comp1.yo)
+includefile(Zsh/mod_compctl.yo)
+includefile(Zsh/mod_deltochar.yo)
+includefile(Zsh/mod_example.yo)
+includefile(Zsh/mod_files.yo)
+includefile(Zsh/mod_sched.yo)
+includefile(Zsh/mod_stat.yo)
+includefile(Zsh/mod_zle.yo)

@@ -1,0 +1,142 @@
+startmenu()
+menu(Author)
+menu(Availability)
+menu(Mailing Lists)
+menu(The Zsh FAQ)
+menu(The Zsh Web Page)
+menu(See Also)
+endmenu()
+texinode(Author)(Availability)()(Introduction)
+sect(Author)
+cindex(author)
+Zsh was originally written by Paul Falstad tt(<pf@zsh.org>).
+Zsh is now maintained by the members of the zsh-workers mailing
+list tt(<zsh-workers@math.gatech.edu>).  The development is currently
+coordinated by Andrew Main (Zefram) tt(<zefram@zsh.org>).  The coordinator
+can be contacted at tt(<coordinator@zsh.org>), but matters relating to
+the code should generally go to the mailing list.
+texinode(Availability)(Mailing Lists)(Author)(Introduction)
+sect(Availability)
+Zsh is available from the following anonymous FTP sites.  These mirror
+sites are kept frequently up to date.  The sites marked with em((G))
+may be mirroring tt(ftp.math.gatech.edu) instead of the primary site.
+The sites marked with em((H)) may be mirroring tt(ftp.cs.elte.hu)
+instead of the primary site.
+
+startitem()
+item(Primary site)(
+nofill(tt(ftp://ftp.zsh.org/pub/zsh/)
+tt(http://www.zsh.org/pub/zsh/))
+)
+item(Australia)(
+nofill(tt(ftp://ftp.zsh.org/pub/zsh/)
+tt(http://www.zsh.org/pub/zsh/)
+tt(ftp://ftp.ips.oz.au/pub/packages/zsh/)  em((G))  em((H)))
+)
+item(Denmark)(
+nofill(tt(ftp://sunsite.auc.dk/pub/unix/shells/zsh/))
+)
+item(Finland)(
+nofill(tt(ftp://ftp.funet.fi/pub/unix/shells/zsh/)  em((H)))
+)
+item(France)(
+nofill(tt(ftp://ftp.cenatls.cena.dgac.fr/pub/shells/zsh/))
+)
+item(Germany)(
+nofill(tt(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)  em((H))
+tt(ftp://ftp.gmd.de/packages/zsh/)  em((H))
+tt(ftp://ftp.uni-trier.de/pub/unix/shell/zsh/)  em((H)))
+)
+item(Hungary)(
+nofill(tt(ftp://ftp.cs.elte.hu/pub/zsh/)
+tt(http://www.cs.elte.hu/pub/zsh/)
+tt(ftp://ftp.kfki.hu/pub/packages/zsh/)  em((H)))
+)
+item(Israel)(
+nofill(tt(ftp://ftp.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
+tt(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/))
+)
+item(Japan)(
+nofill(tt(ftp://ftp.tohoku.ac.jp/mirror/zsh/)  em((H))
+tt(ftp://ftp.nis.co.jp/pub/shells/zsh/)  em((H)))
+)
+item(Norway)(
+nofill(tt(ftp://ftp.uit.no/pub/unix/shells/zsh/)  em((H)))
+)
+item(Romania)(
+nofill(tt(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/))
+)
+item(Slovenia)(
+nofill(tt(ftp://ftp.siol.net/pub/unix/shells/zsh/)  em((H)))
+)
+item(Sweden)(
+nofill(tt(ftp://ftp.lysator.liu.se/pub/unix/zsh/)  em((H)))
+)
+item(UK)(
+nofill(tt(ftp://ftp.net.lut.ac.uk/zsh/)  em((H))
+tt(ftp://sunsite.doc.ic.ac.uk/packages/unix/shells/zsh/)  em((G)))
+)
+item(USA)(
+nofill(tt(ftp://ftp.math.gatech.edu/pub/zsh/)
+tt(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
+tt(ftp://ftp.sterling.com/zsh/)  em((G))  em((H))
+tt(ftp://ftp.rge.com/pub/shells/zsh/)  em((G))  em((H))
+tt(ftp://foad.org/pub/zsh/)
+tt(http://foad.org/zsh/))
+)
+enditem()
+texinode(Mailing Lists)(The Zsh FAQ)(Availability)(Introduction)
+sect(Mailing Lists)
+cindex(mailing lists)
+Zsh has 3 mailing lists:
+
+startitem()
+item(tt(<zsh-announce@math.gatech.edu>))(
+Announcements about releases, major changes in the shell and the
+monthly posting of the Zsh FAQ.  (moderated)
+)
+item(tt(<zsh-users@math.gatech.edu>))(
+User discussions.
+)
+item(tt(<zsh-workers@math.gatech.edu>))(
+Hacking, development, bug reports and patches.
+)
+enditem()
+
+To subscribe, send mail with the SUBJECT `tt(subscribe) var(<e-mail-address>)'
+to the associated administrative address for the mailing list.
+
+startlist()
+list(tt(<zsh-announce-request@math.gatech.edu>))
+list(tt(<zsh-users-request@math.gatech.edu>))
+list(tt(<zsh-workers-request@math.gatech.edu>))
+endlist()
+
+Unsubscribing is done similarly.
+
+YOU ONLY NEED TO JOIN ONE OF THE MAILING LISTS AS THEY ARE NESTED.
+All submissions to bf(zsh-announce) are automatically forwarded to
+bf(zsh-users).  All submissions to bf(zsh-users) are automatically
+forwarded to bf(zsh-workers).
+
+If you have problems subscribing/unsubscribing to any of the mailing
+lists, send mail to tt(<listmaster@zsh.org>).  The mailing lists are
+maintained by Richard Coleman tt(<coleman@zsh.org>).
+
+The mailing lists are archived; the archives can be accessed via the
+administrative addresses listed above.  There is also a hypertext
+archive, maintained by Geoff Wing tt(<gcw@zsh.org>), available at
+tt(http://www.zsh.org/mla/).
+texinode(The Zsh FAQ)(The Zsh Web Page)(Mailing Lists)(Introduction)
+sect(The Zsh FAQ)
+Zsh has a list of Frequently Asked Questions (FAQ), maintained by
+Peter Stephenson tt(<pws@zsh.org>).  It is regularly posted to the
+newsgroup bf(comp.unix.shell) and the bf(zsh-announce) mailing list.
+The latest version can be found at any of the Zsh FTP sites, or at
+tt(http://www.zsh.org/FAQ/).  The contact address for FAQ-related matters
+is tt(<faqmaster@zsh.org>).
+texinode(The Zsh Web Page)(See Also)(The Zsh FAQ)(Introduction)
+sect(The Zsh Web Page)
+Zsh has a web page which is located at tt(http://www.zsh.org/).  This is
+maintained by Karsten Thygesen tt(<karthy@zsh.org>), of SunSITE Denmark.
+The contact address for web-related matters is tt(<webmaster@zsh.org>).

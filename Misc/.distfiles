@@ -1,0 +1,4 @@
+DISTFILES_SRC='
+    .distfiles
+    c2z compctl-examples globtests globtests.ksh lete2ctl
+'

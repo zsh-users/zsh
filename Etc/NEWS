@@ -1,0 +1,203 @@
+-------------------------------------
+CHANGES FROM PREVIOUS VERSIONS OF ZSH
+-------------------------------------
+
+New features in zsh version 3.1 (beta version)
+----------------------------------------------
+
+On most operating systems zsh can load binary modules dynamically at
+run-time.  ZLE and the compctl builtin are now reside in a separate
+module which is loaded automatically on demand.
+
+for ((expr; expr; expr)) do ... done loop syntax from AT&T ksh93 is
+now supported.
+
+POSIX globbing character classes ([:alnum:] etc.) are now supported.
+
+ksh's case fall-through feature (;&) is supported.
+
+ksh93's $'' quoting syntax is supported.
+
+Restricted mode is now supported.  This is controlled by the new option
+RESTRICTED (-r).
+
+New options BARE_GLOB_QUAL, HIST_NO_FUNCTIONS (alias NO_LOG), KSH_GLOB,
+PRINT_EIGHT_BIT, PROMPT_BANG, PROMPT_PERCENT, RM_STAR_WAIT.
+
+Options ALWAYS_LAST_PROMPT, APPEND_HISTORY, AUTO_LIST, AUTO_MENU,
+AUTO_PARAM_KEYS, AUTO_PARAM_SLASH, AUTO_REMOVE_SLASH, LIST_AMBIGUOUS
+and LIST_TYPES are now on by default.
+
+In ZLE, arbitrarily many keymaps can be defined.  Multi-character
+keybindings now work.
+
+Completion can be performed within a brace expansion.
+
+EMACS-like universal-argument function.
+
+
+New features in zsh version 3.0
+-------------------------------
+
+Trailing "/" in a glob pattern now works like in other shell thus it
+can no longer be used as a sorthand for "(/)".
+
+Much improved sh/ksh emulation.  When zsh is invoked as sh it mostly
+conforms to POSIX 1003.2.
+
+Enhanced parameter expansion features: new flags: A, @, e, W, p, f, F.
+Expansions can be nested.  For example,
+"${${(M)${(f@)$(<builtin.pro)}:#char*}[2][(w)3]}" expands to the third
+word of the second line of builtin.pro which begins with char.  See
+zshexpn(1) for the details.
+
+***/foo glob does recursive directory search following symbolic links.
+
+Traps defined by the trap builtin are now executed in the current shell
+environment and not as a shell function.  This means that $1 is not set
+to the signal number.  Of course the TRAPxxx functions continue working
+as before.
+
+Traps defined by the trap builtin are reset to their default values in
+subshells.
+
+Option names can be prefixed by `no' to unset an option.
+setopt no_option_name is the same as unsetopt option_name.
+This change affects the output of the setopt and unsetopt
+builtins when these are invoked without arguments.  See
+the zshoptions manual page for more explanation.
+
+!, {, } and [[ are now reserved words.  Things like [[-z $foo]] or {foo}
+should not be used.  {foo} still works if the IGNORE_BRACES option is not
+set but this feature may be removed in the future.  [[ -z $foo ]] and
+{ foo } should be used instead.
+
+HOSTTYPE special parameter is removed.  The new OSTYPE, MACHTYPE and
+VENDOR parameters should be used instead.
+
+VERSION parameter is renamed to ZSH_VERSION
+
+exec now saves the history in interactive shells.  If you do not like this
+behaviour you can alias exec to 'unset HISTFILE ; exec'.
+
+${~spec}, ${=spec} and ${^spec} used to toggle the effect of
+globsubst/shwordsplit/rcexpandparam.  Now these force the corresponding
+option on. ~, = or ^ can be doubled to force the relevant option off for
+the substitution.
+
+Explicitly requested word splitting like ${=spec} or ${(s:delim:)spec}
+will be executed even if the substitution is double quoted.
+
+The right-hand side of assignments are no longer globbed by default hence
+assignment foo=* will assign '*' as a value of foo.  Use the foo=( * )
+array assignment syntax to get the old behaviour.  Alternatively the
+GLOB_ASSIGN can be set to emulate the old behaviour but the usage of this
+option is strongly discouraged and this option may be completely removed in
+the future.
+
+foo=$bar no longer creates an array even if bar is an array.  Use
+foo=( $bar ) or even better, foo=( "$bar[@]" ) instead.
+
+When foo is an array parameter ${#foo} will always return the length of the
+array even if the substitution is double quoted.  ${(c)#foo} should be used
+to get back the old behaviour.
+
+When the prompt_subst option is set prompts are fully expanded using
+parameter expansion, command substitution and arithmetic expansion.
+In 2.5 backquote substitution was not performed in the prompts so this
+change might cause problems in some startup scripts if ` is used literally
+in prompts.
+
+History substitution is now not performed if the history escape character
+appears in a single-quoted string.  This may break some interactive shell
+functions which use \! in single-quoted strings.
+
+The UID, EUID, GID, EGID parameters can be assigned now. The assignment
+executes the setuid(), seteuid(), setgid(), setegid() respectively.  On
+systems where setuid and seteuid is not supported these functions are
+emulated using setreuid or setresuid which may result in a different
+behaviour.
+
+Assigning the USERNAME parameter will call setuid(uid) where uid is the
+user id of the specified user.
+
+The privileged (-p) option is automatically set on invocation if euid != uid
+or egid != gid.  If this option is set no user startup files are sourced.
+The shell will drop privileges when this option is unset by resetting its
+euid to uid and its egid to gid.
+
+The =number substitution for accessing the directory stack is changed to
+~number to allow =command substitution when a command name begins with a 
+digit.
+
+<> is a redirection operator which opens the standard input for both
+reading and writing.  To match a number use <->.
+
+Option letters -1 and -C for PRINT_EXIT_VALUE and NO_CLOBBER are swapped:
+`set -C' sets NO_CLOBBER and `set -1' sets PRINT_EXIT_VALUE.
+
+AUTO_PUSHD behaviour is changed.  Now cd without arguments will always go
+to the $HOME directory even if AUTO_PUSHD is set and PUSHD_TO_HOME is not
+set.  If you preferred the old behaviour you can alias cd to pushd.
+
+IFS word splitting with SH_WORD_SPLIT and the splitting of the input in the
+read builtin has changed in cases when IFS contains characters other than
+<space>, <tab>, <newline>.  See the description of IFS in the zshparam
+manual page for more details.
+
+
+New features in zsh version 2.5
+-------------------------------
+
+Greatly expanded completion possibilities.  Programmable completion
+allows detailed control over what arguments of what commands can be
+completed to what.  See dots/zcomp in the distribution for examples.
+
+Expand filenames with ~ and = on the right hand side of parameter
+assignments.  New option MAGIC_EQUAL_SUBST to do it in all
+identifier=expression arguments.
+
+${+name} becomes 1 or 0 if name is set or unset.  ${~spec} toggles
+GLOB_SUBST in substitution.  Parameter substitution takes lots
+of flags in the format ${(flags)name}.
+
+New glob qualifiers for block/character special files, times in glob
+qualifiers can be in months, weeks, days, hours, minutes.  Qualifiers can
+work on links or on what they point to.  Qualifiers separated by commas
+are or-ed.
+
+New parameter substitution modifiers (fFwW) to repeat actions.  New
+option CSH_JUNKIE_HISTORY.
+
+New line editor functions history-beginning-search-backward,
+history-beginning-search-forward, expand-or-complete-prefix, push-input,
+push-line-or-edit.
+
+Assign to part of a string, use qualifiers on string subscription with
+$foo[(qual)2,5]
+
+New parameters: EGID, EUID, KEYTIMEOUT
+
+New prompt escape sequence %_ to get constructs like for and while in
+the secondary prompt.  %E in prompt clears to end of screen.
+
+Conditional expressions in PROMPT and WATCHFMT.
+
+New options ALWAYS_LAST_PROMPT, ALWAYS_TO_END, AUTO_PARAM_KEYS,
+COMPLETE_ALIASES, COMPLETE_IN_WORD, CSH_JUNKIE_HISTORY, GLOB_SUBST,
+LIST_AMBIGUOUS, MAGIC_EQUAL_SUBST, NO_FLOW_CONTROL, PROMPT_SUBST
+
+New option -m to many builtins makes arguments subject to pattern
+matching.
+
+Bindkey can now bind both key sequences and prefixes of those.  You can
+for example bind ESC and function keys sending ESC sequences.
+
+Additional options to read builtin to use in functions called by
+completion.
+
+New options to print to sort arguments and print them in columns.
+
+Some additional resource limits can be specified.
+
+Some editor functions now work in the minibuffer.

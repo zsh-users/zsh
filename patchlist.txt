@@ -1,0 +1,41 @@
+This version of zsh is based on 3.1.5 and includes the following
+patches.  (The version number built into the shell has not been changed.)
+
+  Old stuff:
+
+Zoli's AIX dynamic loading patch from 3933, slightly updated, without
+some hunks which weren't needed on AIX 3.x so I don't know how to
+update properly.
+
+My completion widgets patch
+
+  Patches which have appeared since 3.1.5 (it's already a week, after
+  all...):
+
+Bart's addon collection 4473 (excluding the bit from 4105), 4475, 4476
+
+My patch in 4477 to rename three functions to avoid clashes when
+dynamic loading (particularly necessary on IRIX and AIX), including
+the effect of Sven's additional fix in 4488
+
+My patch 4513 for case-insensitive globbing via flags, plus fixlet 4552
+
+Sven's magna opera patch-or 4510 and patch-match 4509 to add control of
+alternative matches and arbitrary mapping between characters in the
+command line and the matched, plus all known fixes 4526, 4527, 4534,
+4555, 4557
+
+My ~PWD patch 4533
+
+My suggestion for fixing the suffix on a yank in 4564
+
+Bart's deltochar patch including new flags to allow commands not to
+interrupt cumulative effects in 4570
+
+Bart's doc fiz 4574
+
+Sven's latest word on the fixsuffix() horror in 4576, plus a
+fixsuffix() added by hand in delcharorlist() which I've somehow missed
+along the way
+
+My latest version of lete2ctl, not posted

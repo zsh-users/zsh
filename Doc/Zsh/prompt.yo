@@ -1,0 +1,209 @@
+texinode(Prompt Expansion)(Restricted Shell)(Compatibility)(Top)
+chapter(Prompt Expansion)
+ifzman(\
+sect(Prompt Expansion)
+)\
+Prompt sequences undergo a special form of expansion.  This type of expansion
+is also available using the tt(-P) option to the tt(print) builtin.
+
+pindex(PROMPT_SUBST, use of)
+If the tt(PROMPT_SUBST) option is set, the prompt string is first subjected to
+em(parameter expansion),
+em(command substitution) and
+em(arithmetic expansion).
+See
+ifzman(\
+zmanref(zshexpn).
+)\
+ifnzman(\
+noderef(Expansion).
+)\
+
+Certain escape sequences may be recognised in the prompt string.
+
+pindex(PROMPT_BANG, use of)
+If the tt(PROMPT_BANG) option is set, a `tt(!)' in the prompt is replaced
+by the current history event number.  A literal `tt(!)' may then be
+represented as `tt(!!)'.
+
+pindex(PROMPT_PERCENT, use of)
+If the tt(PROMPT_PERCENT) option is set, certain escape sequences that
+start with `tt(%)' are expanded.
+Some escapes take an optional integer argument, which
+should appear between the `tt(%)' and the next character of the
+sequence.  The following escape sequences are recognized:
+
+startitem()
+item(tt(%%))(
+A `tt(%)'.
+)
+item(tt(%RPAR()))(
+A `tt(RPAR())'.
+)
+xitem(tt(%d))
+item(tt(%/))(
+Present working directory (tt($PWD)).
+)
+item(tt(%~))(
+tt($PWD).
+If it has a named directory as its prefix, that part is replaced
+by a `tt(~)' followed by the name of the directory.
+If it starts with tt($HOME), that part is
+replaced by a `tt(~)'.
+)
+xitem(tt(%c))
+xitem(tt(%.))
+item(tt(%C))(
+Trailing component of tt($PWD).
+An integer may follow the `tt(%)' to get more than one component.
+Unless `tt(%C)' is used, tilde contraction is performed first.
+)
+xitem(tt(%h))
+item(tt(%!))(
+Current history event number.
+)
+item(tt(%L))(
+The current value of tt($SHLVL).
+)
+item(tt(%M))(
+The full machine hostname.
+)
+item(tt(%m))(
+The hostname up to the first `tt(.)'.
+An integer may follow the `tt(%)' to specify
+how many components of the hostname are desired.
+)
+item(tt(%S) LPAR()tt(%s)RPAR())(
+Start (stop) standout mode.
+)
+item(tt(%U) LPAR()tt(%u)RPAR())(
+Start (stop) underline mode.
+)
+item(tt(%B) LPAR()tt(%b)RPAR())(
+Start (stop) boldface mode.
+)
+xitem(tt(%t))
+item(tt(%@))(
+Current time of day, in 12-hour, am/pm format.
+)
+item(tt(%T))(
+Current time of day, in 24-hour format.
+)
+item(tt(%*))(
+Current time of day in 24-hour format, with seconds.
+)
+item(tt(%n))(
+tt($USERNAME).
+)
+item(tt(%w))(
+The date in var(day)tt(-)var(dd) format.
+)
+item(tt(%W))(
+The date in var(mm)tt(/)var(dd)tt(/)var(yy) format.
+)
+item(tt(%D))(
+The date in var(yy)tt(-)var(mm)tt(-)var(dd) format.
+)
+item(tt(%D{)var(string)tt(}))(
+var(string) is formatted using the tt(strftime) function.
+See manref(strftime)(3) for more details.  Three additional codes are
+available:  tt(%f) prints the day of the month, like tt(%e) but
+without any preceding space if the day is a single digit, and
+tt(%K)/tt(%L) correspond to tt(%k)/tt(%l) for the hour of the day
+(24/12 hour clock) in the same way.
+)
+item(tt(%l))(
+The line (tty) the user is logged in on.
+)
+item(tt(%?))(
+The return code of the last command executed just before the prompt.
+)
+item(tt(%_))(
+The status of the parser, i.e. the shell constructs (like `tt(if)' and
+`tt(for)') that have been started on the command line. If given an integer
+number that many strings will be printed; zero or no integer means
+print as many as there are.
+)
+item(tt(%E))(
+Clears to end of line.
+)
+item(tt(%#))(
+A `tt(#)' if the shell is running with privileges, a `tt(%)' if not.
+Equivalent to `tt(%(!.#.%%))'.
+The definition of `privileged', for these purposes, is that either the
+effective user ID is zero, or, if POSIX.1e capabilities are supported, that
+at least one capability is raised in either the Effective or Inheritable
+capability vectors.
+)
+item(tt(%v))(
+vindex(psvar, use of)
+The value of the first element of the tt(psvar) array parameter.  Following
+the `tt(%)' with an integer gives that element of the array.
+)
+item(tt(%{)...tt(%}))(
+Include a string as a literal escape sequence.
+The string within the braces should not change the cursor
+position.  Brace pairs can nest.
+)
+item(tt(%LPAR())var(x.true-text.false-text)tt(RPAR()))(
+Specifies a ternary expression.  The character following the var(x) is
+arbitrary; the same character is used to separate the text for the
+`true' result from that for the `false' result.
+This separator may not appear in the var(true-text), except as part of a
+%-escape
+sequence.  A `tt(RPAR())' may appear in the var(false-text) as `tt(%RPAR())'.
+var(true-text)
+and var(false-text) may both contain arbitrarily-nested escape
+sequences, including further ternary expressions.
+
+The left
+parenthesis may be preceded or followed by a positive integer var(n),
+which defaults to zero.  The test character var(x) may be any of the
+following:
+
+startsitem()
+sxitem(tt(c))
+sxitem(tt(.))
+sitem(tt(~))(True if the current path, with prefix replacement, has at least var(n) elements.)
+sxitem(tt(/))
+sitem(tt(C))(True if the current absolute path has at least var(n) elements.)
+sitem(tt(t))(True if the time in minutes is equal to var(n).)
+sitem(tt(T))(True if the time in hours is equal to var(n).)
+sitem(tt(d))(True if the day of the month is equal to var(n).)
+sitem(tt(D))(True if the month is equal to var(n) (January = 0).)
+sitem(tt(w))(True if the day of the week is equal to var(n) (Sunday = 0).)
+sitem(tt(?))(True if the exit status of the last command was var(n).)
+sitem(tt(#))(True if the effective uid of the current process is var(n).)
+sitem(tt(g))(True if the effective gid of the current process is var(n).)
+sitem(tt(L))(True if the tt(SHLVL) parameter is at least var(n).)
+sitem(tt(S))(True if the tt(SECONDS) parameter is at least var(n).)
+sitem(tt(v))(True if the array tt(psvar) has at least var(n) elements.)
+sitem(tt(_))(True if at least var(n) shell constructs were started.)
+sitem(tt(!))(True if the shell is running with privileges.)
+endsitem()
+)
+xitem(tt(%<)var(string)tt(<))
+xitem(tt(%>)var(string)tt(>))
+item(tt(%[)var(xstring)tt(]))(
+Specifies truncation behaviour.
+The third, deprecated, form is equivalent to `tt(%)var(xstringx)',
+i.e. var(x) may be `tt(<)' or `tt(>)'.
+The numeric argument, which in the third form may appear immediately
+after the `tt([)', specifies the maximum permitted length of
+the various strings that can be displayed in the prompt.  If this
+integer is zero, or missing, truncation is disabled.  Truncation is
+initially disabled.
+The var(string) will be displayed in
+place of the truncated portion of any string.
+
+The forms with `tt(<)' truncate at the left of the string,
+and the forms with `tt(>)' truncate at the right of the string.
+For example, if the current directory is `tt(/home/pike)',
+the prompt `tt(%8<..<%/)' will expand to `tt(..e/pike)'.
+In this string, the terminating character (`tt(<)', `tt(>)' or `tt(])'),
+or in fact any character, may be quoted by a preceding `tt(\)'.
+% escapes are em(not) recognised.
+If the var(string) is longer than the specified truncation length,
+it will appear in full, completely replacing the truncated string.
+)
+enditem()

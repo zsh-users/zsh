@@ -1,0 +1,183 @@
+texinode(Redirection)(Command Execution)(Shell Grammar)(Top)
+chapter(Redirection)
+cindex(redirection)
+ifzman(\
+sect(Redirection)
+)\
+cindex(file descriptors)
+cindex(descriptors, file)
+If a command is followed by tt(&)
+and job control is not active,
+then the default standard input
+for the command is the empty file tt(/dev/null).
+Otherwise, the environment for the execution of a command contains the
+file descriptors of the invoking shell as modified by
+input/output specifications.
+
+The following may appear anywhere in a simple command
+or may precede or follow a complex command.
+Substitution occurs before var(word) or var(digit)
+is used except as noted below.
+If the result of substitution on var(word)
+produces more than one filename,
+redirection occurs for each
+separate filename in turn.
+
+startitem()
+item(tt(<) var(word))(
+Open file var(word) for reading as standard input.
+)
+item(tt(<>) var(word))(
+Open file var(word) for reading and writing as standard input.
+If the file does not exist then it is created.
+)
+item(tt(>) var(word))(
+Open file var(word) for writing as standard output.
+If the file does not exist then it is created.
+If the file exists, and the tt(CLOBBER) option is unset,
+this causes an error;
+otherwise, it is truncated to zero length.
+)
+xitem(tt(>|) var(word))
+item(tt(>!) var(word))(
+Same as tt(>), except that the file is truncated to zero length
+if it exists, even if tt(CLOBBER) is unset.
+)
+item(tt(>>) var(word))(
+Open file var(word) for writing in append mode as standard output.
+If the file does not exist, and the tt(CLOBBER)
+option is unset, this causes an error;
+otherwise, the file is created.
+)
+xitem(tt(>>|) var(word))
+item(tt(>>!) var(word))(
+Same as tt(>>), except that the file is created if it does not
+exist, even if tt(CLOBBER) is unset.
+)
+item(tt(<<)[tt(-)] var(word))(
+The shell input is read up to a line that is the same as
+var(word), or to an end-of-file.
+No parameter substitution, command substitution or
+filename generation is performed on var(word).
+The resulting document, called a
+em(here-document), becomes the standard input.
+
+If any character of var(word) is quoted with
+single or double quotes or a `tt(\)',
+no interpretation is placed upon the characters of the document.
+Otherwise, parameter and command substitution
+occurs, `tt(\)' followed by a newline is removed,
+and `tt(\)' must be used to quote the characters
+`tt(\)', `tt($)', `tt(`)' and the first character of var(word).
+
+If tt(<<-) is used, then all leading
+tabs are stripped from var(word) and from the document.
+)
+item(tt(<<<) var(word))(
+Perform shell expansion on var(word) and pass the result
+to standard input.  This is known as a em(here-string).
+)
+xitem(tt(<&) var(digit))
+item(tt(>&) var(digit))(
+The standard input/output is duplicated from file descriptor
+var(digit) (see manref(dup)(2)).
+)
+xitem(tt(<& -))
+item(tt(>& -))(
+Close the standard input/output.
+)
+xitem(tt(<& p))
+item(tt(>& p))(
+The input/output from/to the coprocess is moved to the standard input/output.
+)
+item(tt(>&) var(word))(
+Same as `tt(>) var(word) tt(2>&1)'.
+)
+item(tt(>>&) var(word))(
+Same as `tt(>>) var(word) tt(2>&1)'.
+)
+enditem()
+
+If one of the above is preceded by a digit, then the file
+descriptor referred to is that specified by the digit
+instead of the default 0 or 1.
+The order in which redirections are specified is significant.
+The shell evaluates each redirection in terms of the
+(em(file descriptor), em(file))
+association at the time of evaluation.
+For example:
+
+nofill(... tt(1>)var(fname) tt(2>&1))
+
+first associates file descriptor 1 with file var(fname).
+It then associates file descriptor 2 with the file associated with file
+descriptor 1 (that is, var(fname)).
+If the order of redirections were reversed,
+file descriptor 2 would be associated
+with the terminal (assuming file descriptor 1 had been)
+and then file descriptor 1 would be associated with file var(fname).
+sect(Multios)
+pindex(MULTIOS, use of)
+If the user tries to open a file descriptor for writing more than once,
+the shell opens the file descriptor as a pipe to a process that copies
+its input to all the specified outputs, similar to bf(tee),
+provided the tt(MULTIOS) option is set.  Thus:
+
+nofill(tt(date >foo >bar))
+
+writes the date to two files, named `tt(foo)' and `tt(bar)'.
+Note that a pipe is an implicit redirection; thus
+
+nofill(tt(date >foo | cat))
+
+writes the date to the file `tt(foo)', and also pipes it to cat.
+
+If the tt(MULTIOS)
+option is set, the word after a redirection operator is also subjected
+to filename generation (globbing).  Thus
+
+nofill(tt(: > *))
+
+will truncate all files in the current directory,
+assuming there's at least one.  (Without the tt(MULTIOS)
+option, it would create an empty file called `tt(*)'.)
+Similarly, you can do
+
+nofill(tt(echo exit 0 >> *.sh))
+
+If the user tries to open a file descriptor for reading more than once,
+the shell opens the file descriptor as a pipe to a process that copies
+all the specified inputs to its output in the order
+specified, similar to bf(cat),
+provided the tt(MULTIOS) option is set.  Thus
+
+nofill(tt(sort <foo <fubar))
+
+or even
+
+nofill(tt(sort <f{oo,ubar}))
+
+is equivalent to `tt(cat foo fubar | sort)'.
+
+Note that a pipe is an implicit redirection; thus
+
+nofill(tt(cat bar | sort <foo))
+
+is equivalent to `tt(cat bar foo | sort)' (note the order of the inputs).
+
+If the tt(MULTIOS) option is em(un)set,
+each redirection replaces the previous redirection for that file descriptor.
+However, all files redirected to are actually opened, so
+
+nofill(tt(echo foo > bar > baz))
+
+when tt(MULTIOS) is unset will truncate bar, and write `tt(foo)' into baz.
+
+If a simple command consists of one or more redirection operators
+and zero or more parameter assignments, but no command name,
+the command named in the shell variable tt(READNULLCMD) is assumed.
+(If tt(READNULLCMD) is empty or not set, `tt(cat)' is used.)  Thus
+
+nofill(tt(< file))
+
+prints the contents of tt(file).
