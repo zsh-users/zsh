@@ -356,7 +356,7 @@ compconf() {
       done
     fi
   else
-    for i in ${(k)compconfig}; do
+    for i in ${(ok)compconfig}; do
       if [[ $list = long ]]; then
 	print "compconf $i='$compconfig[$i]'"
       else
