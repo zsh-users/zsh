@@ -1,5 +1,9 @@
 2004-04-23  Peter Stephenson  <pws@csr.com>
 
+	* 19825: Completion/Unix/Command/_perforce: suggested by Michael
+	Denio: add `changes' style to allow limitting list of changes
+	offered for completion.
+
 	* 19810: Src/exec.c: avoid setting flag on Eprog which may
 	no longer be valid.  Had no feedback, so don't know if
 	it helps, but at worst harmless.

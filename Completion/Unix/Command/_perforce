@@ -47,6 +47,12 @@
 #   p4 jobs -e 'user=pws'
 # i.e. those assigned to Perforce user `pws'.
 #
+# Completion of changes can be controlled by the `changes' style.
+# This takes additional arguments to be passed to `p4 changes'.
+# An obvious example is:
+#   zstyle ':completion:*:p4-*:changes' changes -u $USER
+# to limit changes to the present user.
+#
 # The style `all-files' is used to tell the completion system to
 # complete any file in a given context.  This is for use in places
 # where it would, for example, only complete files opened for editing.
@@ -495,9 +501,10 @@ _perforce_branches() {
 (( $+functions[_perforce_changes] )) ||
 _perforce_changes() {
   local cline match mbegin mend max ctype num comma file
-  local -a cl cstatus amax
+  local -a cl cstatus amax xargs
 
   zstyle -s ":completion:${curcontext}:changes" max max || max=20
+  zstyle -a ":completion:${curcontext}:changes" changes xargs
   if [[ ${NUMERIC:-0} -lt 0 && -z $compstate[insert] ]]; then
     # Not inserting (i.e. just listing) and given a negative
     # prefix argument.  Instead of listing possible completions,
@@ -548,7 +555,7 @@ _perforce_changes() {
   # Limit to the 20 most recent changes by default to avoid huge
   # output.
   cl=(
-${${${${(f)"$(_perforce_call_p4 changes changes $amax $cstatus \$file)"}##Change\ }//\ on\ /:}/\ by\ /\ }
+${${${${(f)"$(_perforce_call_p4 changes changes $amax $xargs $cstatus \$file)"}##Change\ }//\ on\ /:}/\ by\ /\ }
 "default:change not yet numbered")
   [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
   _describe -t changes "${ctype}change" cl -V changes-unsorted $comma
