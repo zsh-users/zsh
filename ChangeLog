@@ -1,5 +1,7 @@
 2002-12-18  Peter Stephenson  <pws@csr.com>
 
+	* 18015: Src/math.c: empty math parse e.g. $(( )) acts like a zero.
+
 	* 18013: Src/builtin.c, Src/exec.c: let and (( ... )) should
 	return zero status on floating point only if the value compares
 	equal to 0 as a floating point number.

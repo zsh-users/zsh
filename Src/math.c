@@ -961,7 +961,7 @@ mathevall(char *s, int prek, char **ep)
     stack[0].val.u.l = 0;
     mathparse(prek);
     *ep = ptr;
-    DPUTS(!errflag && sp,
+    DPUTS(!errflag && sp > 0,
 	  "BUG: math: wallabies roaming too freely in outback");
 
     if (errflag) {
@@ -1084,6 +1084,9 @@ mathparse(int pc)
     if (errflag)
 	return;
     mtok = zzlex();
+    /* Handle empty input */
+    if (pc == TOPPREC && mtok == EOI)
+	return;
     checkunary(mtok, optr);
     while (prec[mtok] <= pc) {
 	if (errflag)
