@@ -53,6 +53,9 @@ prep:
 META-FAQ: FORCE
 	@cd Doc && $(MAKE) $(MAKEDEFS) ../META-FAQ
 
+dvi ps html info:
+	@cd Doc && $(MAKE) $(MAKEDEFS) $@
+
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
 # install stripped

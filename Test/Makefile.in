@@ -42,20 +42,20 @@ INSTALL         = @INSTALL@
 
 check test:
 	if test -n "$(DLLD)"; then \
-	  cd $(dir_top) && \
+	  cd $(dir_top) && DESTDIR= \
 	  $(MAKE) MODDIR=`pwd`/$(subdir)/Modules install.modules > /dev/null; \
 	fi
-	for f in $(sdir)/*.ztst; do \
-	  $(dir_top)/Src/zsh -f $(sdir)/ztst.zsh $$f; \
+	-for f in $(sdir)/$(TESTNUM)*.ztst; do \
+	  $(dir_top)/Src/zsh +Z -f $(sdir)/ztst.zsh $$f; \
 	done
-	rm -rf Modules
+	rm -rf Modules .zcompdump
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
 @CLEAN_MK@
 
 mostlyclean-here:
-	rm -rf *.tmp
+	rm -rf Modules .zcompdump *.tmp
 
 distclean-here:
 	rm -f Makefile
