@@ -82,6 +82,7 @@ _arguments -s \
   '--backup-dir[make backups into specified directory]:backup directory:_directories' \
   '--suffix=[override backup suffix]:suffix' \
   '(-u --update)'{-u,--update}'[update only]' \
+  '(-K --keep-dirlinks)'{-K,--keep-dirlinks}'[symlinked dir on receiver matches sender dir]' \
   '(-l --links)'{-l,--links}'[copy symlinks as symlinks]' \
   '(-L --copy-links)'{-L,--copy-links}'[treat soft links like regular files]' \
   '--copy-unsafe-links[copy links outside the source tree]' \
@@ -103,12 +104,14 @@ _arguments -s \
   '(-C --cvs-exclude)'{-C,--cvs-exclude}'[autoignore files in the same way as CVS]' \
   '--existing[only update files that already exist]' \
   '--ignore-existing[ignore files that already exist on the receiving side]' \
+  '--inplace[update destination files inplace (SEE MAN PAGE)]' \
   '--delete[delete files that do not exist on the sending side]' \
   '--delete-excluded[also delete excluded files on the receiving side]' \
   '--delete-after[perform delete after transferring]' \
   '--ignore-errors[delete even if there are IO errors]' \
   '--max-delete=[do not delete more than NUM files]:number:' \
   '(-P)--partial[keep partially transferred files]' \
+  '--partial-dir=[put a partially transferred file in specified directory]:directory:_files -/' \
   '--force[force deletion of directories even if not empty]' \
   '--numeric-ids[do not map uid/gid values by user/group name]' \
   '--timeout=[set IO timeout in seconds]:seconds:' \
@@ -139,8 +142,8 @@ _arguments -s \
   '--read-batch=[read batch file]:ext:' \
   '--write-batch[write batch file]' \
   '(-)'{-h,--help}'[display help information]' \
-  '-4[prefer IPv4]' \
-  '-6[prefer IPv6]' \
+  '(-4 --ipv4)'{-4,--ipv4}'[prefer IPv4]' \
+  '(-6 --ipv6)'{-6,--ipv6}'[prefer IPv6]' \
      -- '*=COMMAND*:command:_command' \
 	'*=FILE*:file:_files' \
 	'*=DIR*:directory:_files -/'
