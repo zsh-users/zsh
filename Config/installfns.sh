@@ -18,13 +18,12 @@ for file in $allfuncs; do
     esac
     if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
       case "$file" in
-      Completion/comp*)
-        subdir="`echo $file | sed -e 's%/[^/]*/[^/]*$%%'`"
-        instdir="$fndir/Completion"
-        ;;
-      Completion/*)
+      Completion/*/*)
         subdir="`echo $file | sed -e 's%/[^/]*/[^/]*$%%'`"
         instdir="$fndir/$subdir"
+        ;;
+      Completion/*)
+        instdir="$fndir/Completion"
         ;;
       *)
         subdir="`echo $file | sed -e 's%/[^/]*$%%' -e 's%^Functions/%%'`"

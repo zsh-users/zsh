@@ -1,5 +1,8 @@
 2003-02-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 18238: Config/installfns.sh, Src/Zle/complete.mdd:
+	bashcompinit was not being installed with --enable-function-subdirs
+
 	* users/5915: Completion/Unix/Command/_ssh: two levels of quoting
 	are needed for remote files referenced with scp
 
