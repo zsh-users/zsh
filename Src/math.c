@@ -399,12 +399,12 @@ zzlex(void)
 		    /* it's a float */
 		    yyval.type = MN_FLOAT;
 #ifdef USE_LOCALE
-		    prev_locale = setlocale(LC_NUMERIC, NULL);
+		    prev_locale = dupstring(setlocale(LC_NUMERIC, NULL));
 		    setlocale(LC_NUMERIC, "POSIX");
 #endif
 		    yyval.u.d = strtod(ptr, &nptr);
 #ifdef USE_LOCALE
-		    setlocale(LC_NUMERIC, prev_locale);
+		    if (prev_locale) setlocale(LC_NUMERIC, prev_locale);
 #endif
 		    if (ptr == nptr || *nptr == '.') {
 			zerr("bad floating point constant", NULL, 0);

@@ -1,5 +1,8 @@
 2003-03-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 18330: Src/math.c: save output of setlocale as the pointer it
+	returns gets clobbered
+
 	* 18331: Completion/Unix/Command/_mh: use _call_program to avoid
 	command not found errors, handle prefix-hidden style, make use of
 	_email_addresses and complete for more mh commands
