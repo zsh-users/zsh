@@ -1,0 +1,36 @@
+#autoload
+
+# Hm, this *can* sensibly be used as a completer. But it could also be used
+# as a utility function, so maybe it should be moved into another directory.
+# Or maybe not. Hm.
+#
+#
+# Complete words from the history
+#
+# Code taken from _history_complete_words.
+#
+# Available styles:
+#
+#   :history-words:sort -- sort matches lexically (default is to sort by age)
+#   :history-words:remove-all-dups --
+#                          remove /all/ duplicate matches rather than just
+#                          consecutives
+
+local opt expl 
+
+if zstyle -t ":completion:${curcontext}:" remove-all-dups; then
+  opt=-
+else
+  opt=-1
+fi
+
+if zstyle -t ":completion:${curcontext}:" sort; then
+  opt="${opt}J"
+else
+  opt="${opt}V"
+fi
+
+# We skip the first element of historywords so the current word doesn't
+# interfere with the completion
+_wanted "$opt" history-words expl 'history word' \
+    compadd -Q - "${(@)historywords[2,-1]}"

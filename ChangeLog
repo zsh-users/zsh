@@ -1,5 +1,8 @@
 2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10979: originally from Felix: 10894: Completion/Core/.distfiles,
+	Completion/Core/_history, Doc/Zsh/compsys.yo: new _history completer
+	
 	* 10978: Src/Zle/complist.c: better wrap around for cursor
 	movement widgets; avoid flicker when leaving menu-selection
 	

@@ -2138,6 +2138,14 @@ at all.
 In a different mode selected by the tt(completions) style, all
 em(completions) generated for the string on the line are inserted.
 )
+findex(_history)
+item(tt(_history))(
+Complete words from the shell's command  history.  This completer 
+uses the tt(remove-all-dups), and tt(sort) styles also used by the
+tt(_history_complete_word) bindable command, see
+ifzman(the section `Completion System Configuration' above)\
+ifnzman(noderef(Completion System Configuration)).
+)
 findex(_list)
 item(tt(_list))(
 This completer allows one to delay the insertion of matches until

@@ -2,8 +2,8 @@ DISTFILES_SRC='
     .distfiles
     _all_labels _alternative _approximate
     _call _compalso _complete _correct _description _expand
-    _file_descriptors _files _funcall _ignored _list _main_complete _match
-    _menu _multi_parts _message _next_label _normal _oldlist _options
+    _file_descriptors _files _funcall _history _ignored _list _main_complete
+    _match _menu _multi_parts _message _next_label _normal _oldlist _options
     _parameters _path_files _prefix _requested _sep_parts
     _set_options _setup _sort_tags _tags
     _unset_options _wanted
