@@ -1,9 +1,9 @@
 DISTFILES_SRC='
 .distfiles
 .cvsignore           B01cd.ztst           D03procsubst.ztst    Y02compmatch.ztst
-54compmatch.ztst~    C01arith.ztst        D04parameter.ztst    Y03arguments.ztst
+C01arith.ztst        D04parameter.ztst    Y03arguments.ztst
 A01grammar.ztst      C02cond.ztst         D05array.ztst        comptest
-A02alias.ztst        C03traps.ztst        E02xtrace.ztst       comptest~
+A02alias.ztst        C03traps.ztst        E02xtrace.ztst
 A03quoting.ztst      C04funcdef.ztst      Makefile.in          ztst.zsh
 A04redirect.ztst     D01prompt.ztst       V02zregexparse.ztst
 A05execution.ztst    D02glob.ztst         Y01completion.ztst
