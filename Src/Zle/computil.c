@@ -1235,12 +1235,12 @@ ca_parse_line(Cadef d)
 	    else {
 		LinkList l = state.oargs[state.curopt->num];
 
+		if (cur < compcurrent)
+		    memcpy(&ca_laststate, &state, sizeof(state));
 		PERMALLOC {
 		    for (; line; line = compwords[cur++])
 			addlinknode(l, ztrdup(line));
 		} LASTALLOC;
-		if (cur < compcurrent)
-		    memcpy(&ca_laststate, &state, sizeof(state));
 		ca_laststate.ddef = NULL;
 		ca_laststate.doff = 0;
 		break;
