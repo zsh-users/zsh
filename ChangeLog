@@ -1,3 +1,7 @@
+2001-06-21  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15018: Completion/compinit: Fix exit status of compdef.
+
 2001-06-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14880: Completion/Base/Core/_main_complete: Fix insert-tab style

@@ -221,7 +221,7 @@ compdef() {
     echo "$0: I needs arguments"
     return 1
   fi
-  
+
   while getopts "anpPkKd" opt; do
     case "$opt" in
     a)    autol=yes;;
@@ -251,7 +251,7 @@ compdef() {
     echo "$0: I needs arguments"
     return 1
   fi
-  
+
   if [[ -z "$delete" ]]; then
     # If the first word contains an equal sign, all words must contain one
     # and we define which services to use for the commands.
@@ -360,7 +360,7 @@ compdef() {
         fi
         if [[ -z "$new" || "${+_comps[$i]}" -eq 0 ]]; then
           _comps[$cmd]="$func"
-	  [[ -n "$svc" ]] && _services[$cmd]="${i#*\=}"
+	  if [[ -n "$svc" ]]; then _services[$cmd]="${i#*\=}"; fi
 	fi
       done
       ;;
