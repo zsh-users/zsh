@@ -1,3 +1,8 @@
+2004-12-15  Clint Adams  <clint@zsh.org>
+
+	* 20626: Completion/Unix/Command/_baz: completion
+	derived from _tla by Matt Zimmerman.
+
 2004-12-10  Andrey Borzenkov  <bor@zsh.org>
 
 	* 20617: Completion/Linux/Command/_modutils: fix
