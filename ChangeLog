@@ -1,3 +1,8 @@
+2002-10-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 17832: Completion/X/Command/_xloadimage: add default list of
+	filename extensions as a fallback
+
 2002-10-10  Clint Adams  <clint@zsh.org>
 
         * 17810 (Martin Waitz): Src/utils.c: bung up memory leak with
