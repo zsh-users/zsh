@@ -1,5 +1,7 @@
 2004-03-18  Peter Stephenson  <pws@csr.com>
 
+	* unposted: make 19655 a bit safer.
+
 	* 19657: Src/modules.c: Leak when an autoloadable math function
 	was read in.  Also, it was impossible to autoload multiple math
 	functions from the same library.

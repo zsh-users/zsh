@@ -2674,6 +2674,7 @@ tiedarrunsetfn(Param pm, int exp)
     /* paranoia -- shouldn't need these, but in case we reuse the struct... */
     pm->u.data = NULL;
     zsfree(pm->ename);
+    pm->ename = NULL;
     pm->flags &= ~PM_TIED;
 }
 
