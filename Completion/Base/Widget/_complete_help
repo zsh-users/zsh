@@ -14,8 +14,8 @@ _complete_help() {
 
     if [[ "$help_sfuncs[$2]" != *${_f}* ||
           "$help_styles[${2}${_f}]" != *${3}* ]]; then
-      [[ "$help_sfuncs[$2]" != *${_f}* ]] &&
-          help_sfuncs[$2]="${help_sfuncs[$2]}:${_f}"
+
+      [[ "$help_sfuncs[$2]" != *${_f}* ]] && help_sfuncs[$2]+=$'\0'"${_f}"
       local _t
 
       case "$1" in
@@ -24,7 +24,7 @@ _complete_help() {
       -h) _t='[assoc]  ';;
       *)  _t='[boolean]';;
       esac
-      help_styles[${2}${_f}]="${help_styles[${2}${_f}]},${_t} ${3}:${_f}"
+      help_styles[${2}${_f}]+=",${_t} ${3}:${_f}"
     fi
 
     # No need to call the completers more than once with different match specs.
@@ -43,32 +43,27 @@ _complete_help() {
   trap - EXIT INT
 
   for i in "${(@ok)help_funcs}"; do
-    text="${text}
-tags in context :completion:${i}:"
+    text+=$'\n'"tags in context :completion:${i}:"
     tmp=()
-    for j in "${(@s.:.)help_funcs[$i][2,-1]}"; do
-      tmp=( "$tmp[@]" "${(@s.,.)help_tags[${i}${j}][2,-1]}" )
+    for j in "${(@ps.\0.)help_funcs[$i][2,-1]}"; do
+      tmp+=( "${(@s.,.)help_tags[${i}${j}][2,-1]}" )
     done
     zformat -a tmp '  (' "$tmp[@]"
-    tmp=( '
-    '${^tmp}')' )
-    text="${text}${tmp}"
+    tmp=( $'\n    '${^tmp}')' )
+    text+="${tmp}"
   done
 
   if [[ ${NUMERIC:-1} -ne 1 ]]; then
-    text="$text
-"
+    text+=$'\n'
     for i in "${(@ok)help_sfuncs}"; do
-      text="${text}
-styles in context ${i}"
+      text+=$'\n'"styles in context ${i}"
       tmp=()
-      for j in "${(@s.:.)help_sfuncs[$i][2,-1]}"; do
-        tmp=( "$tmp[@]" "${(@s.,.)help_styles[${i}${j}][2,-1]}" )
+      for j in "${(@ps.\0.)help_sfuncs[$i][2,-1]}"; do
+        tmp+=( "${(@s.,.)help_styles[${i}${j}][2,-1]}" )
       done
       zformat -a tmp '  (' "$tmp[@]"
-      tmp=( '
-    '${^tmp}')' )
-      text="${text}${tmp}"
+      tmp=( $'\n    '${^tmp}')' )
+      text+="${tmp}"
     done
   fi
   compstate[list]='list force'
@@ -83,8 +78,8 @@ _help_sort_tags() {
   if [[ "$help_funcs[$curcontext]" != *${f}* ||
         "$help_tags[${curcontext}${f}]" != *(${(j:|:)~argv})* ]]; then
     [[ "$help_funcs[$curcontext]" != *${f}* ]] &&
-        help_funcs[$curcontext]="${help_funcs[$curcontext]}:${f}"
-    help_tags[${curcontext}${f}]="${help_tags[${curcontext}${f}]},${argv}:${f}"
+        help_funcs[$curcontext]+=$'\0'"${f}"
+    help_tags[${curcontext}${f}]+=",${argv}:${f}"
     comptry "$@"
   fi
 }

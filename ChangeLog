@@ -1,5 +1,8 @@
 2002-01-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 16397: Completion/Base/Widget/_complete_help: use nul as separator
+	instead of colon to avoid problems with _value:<param> functions
+
 	* 16396: Completion/Unix/Command/_chown: fix argument handling bugs
 
 2002-01-03  Clint Adams  <clint@zsh.org>
