@@ -1,3 +1,8 @@
+2001-09-11  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Zsh/Context/_subscript: complete ascii
+	character class added in 15765
+
 2001-09-10  Clint Adams  <clint@zsh.org>
 
 	* 15783: Doc/Zsh/builtins.yo Doc/Zsh/mod_tcp.c,

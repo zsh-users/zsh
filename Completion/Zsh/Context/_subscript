@@ -12,7 +12,7 @@ compset -P '\(([^\(\)]|\(*\))##\)' # remove subscript flags
 
 if [[ "$PREFIX" = :* ]]; then
   _wanted characters expl 'character class' \
-      compadd -p: -S ':]' alnum alpha blank cntrl digit graph \
+      compadd -p: -S ':]' alnum alpha ascii blank cntrl digit graph \
                           lower print punct space upper xdigit
 elif compset -P '\('; then
   local match
