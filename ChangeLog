@@ -1,3 +1,9 @@
+2003-11-11  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: bug in
+	_perforce_groups; wrong tag for users; directory completion
+	when not completing all files.
+
 2003-11-03  Peter Stephenson  <pws@csr.com>
 
 	* 19218: Src/exec.c, Src/Zle/zle_main.c: extend 19216 to

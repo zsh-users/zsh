@@ -987,9 +987,12 @@ _perforce_files() {
       altfiles+=("$type-files:$type file:_perforce_${type}_files")
     done
 
-    altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs"
-      "subdirs:subdirectory search:_perforce_subdirs"
-      "directories:directory:_path_files -/")
+    altfiles+=("subdirs:subdirectory search:_perforce_subdirs")
+    if zstyle -t ":completion:${curcontext}:" depot-files; then
+      altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs")
+    else
+      altfiles+=("directories:directory:_path_files -/")
+    fi
     _alternative $altfiles
   elif zstyle -t ":completion:${curcontext}:" depot-files; then
     local -a altfiles
@@ -1044,7 +1047,9 @@ _perforce_filetypes() {
 
 (( $+functions[_perforce_groups] )) ||
 _perforce_groups() {
-  _describe -t groups 'Perforce group' $(_perforce_call_p4 groups groups)
+  local -a values
+  values=($(_perforce_call_p4 groups groups))
+  _describe -t groups 'Perforce group' values
 }
 
 
@@ -1275,7 +1280,7 @@ _perforce_users() {
 
   ul=(${${(f)"$(_perforce_call_p4 users users)"}/\ /:})
   [[ $#ul -eq 1 && $ul[1] = '' ]] && ul=()
-  _describe -t clients 'Perforce client' ul
+  _describe -t users 'Perforce user' ul
 }
 
 
