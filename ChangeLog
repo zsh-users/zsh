@@ -1,5 +1,8 @@
 2005-01-05  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/_perforce: limit many
+	uses of pending changes to pending changes on the current client.
+
 	* 20632: propagating signals incorrectly to current process
 	group could kill shell.
 

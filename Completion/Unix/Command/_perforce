@@ -559,6 +559,19 @@ _perforce_changes() {
       ctype="pending "
       ;;
 
+      # Changes still pending and on the current client.
+      # Many uses of pending changes must be on the current client
+      # to be meaningful, in particular submitting a change or
+      # associating a file or operation with a particular change.
+      (-tc)
+      # Don't like this way of extracting the client to use,
+      # but I don't see a simpler one.  We do at least make sure
+      # we call p4 with the same arguments as we will use with p4 changes.
+      cstatus=(-s pending -c "$(_perforce_call_p4 client client -o |
+awk '/^Client:/ { print $2 }')")
+      ctype="local pending "
+      ;;
+
       # Range allowed: append comma and supply rules for
       # removing and handling subsequent `#'.
       (-tR)
@@ -1331,7 +1344,7 @@ _perforce_variables() {
 (( $+functions[_perforce_cmd_add] )) ||
 _perforce_cmd_add() {
   _arguments -s : \
-    '-c+[select by change]:change:_perforce_changes -tp' \
+    '-c+[select by change]:change:_perforce_changes -tc' \
     '-t+[set file type]:file type:_perforce_filetypes' \
     '*:file:_perforce_files -tu'
 }
@@ -1454,7 +1467,7 @@ _perforce_cmd_counters() {
 (( $+functions[_perforce_cmd_delete] )) ||
 _perforce_cmd_delete() {
   _arguments -s : \
-    '-c[select change for deletion]:change:_perforce_changes -tp' \
+    '-c[select change for deletion]:change:_perforce_changes -tc' \
     '*::file:_perforce_files'
 }
 
@@ -1527,7 +1540,7 @@ _perforce_cmd_dirs() {
 (( $+functions[_perforce_cmd_edit] )) ||
 _perforce_cmd_edit() {
   _arguments -s : \
-    '-c[set change for edit]:change:_perforce_changes -tp' \
+    '-c[set change for edit]:change:_perforce_changes -tc' \
     '-t[set filetype]:filetype:_perforce_filetypes' \
     '*::file:_perforce_files'
 }
@@ -1654,7 +1667,7 @@ _perforce_cmd_integrate() {
   [[ ${words[(I)-s]} -eq 0 ]] && range=" -tR"
   _arguments -s : \
     '-b[select branch]:branch:_perforce_branches' \
-    '-c[select change for integration]:change:_perforce_changes -tp' \
+    '-c[select change for integration]:change:_perforce_changes -tc' \
     '-f[force reintegration]' \
     '-d[reintegrate deleted files]' \
     '-D-[specify allowed deletions]:deletion type:((
@@ -1750,7 +1763,7 @@ _perforce_cmd_labelsync() {
 (( $+functions[_perforce_cmd_lock] )) ||
 _perforce_cmd_lock() {
   _arguments -s : \
-    '-c[select by change]:change:_perforce_changes -tp' \
+    '-c[select by change]:change:_perforce_changes -tc' \
     '*::file:_perforce_files -to'
 }
 
@@ -1819,7 +1832,7 @@ _perforce_cmd_obliterate() {
 _perforce_cmd_opened() {
   _arguments -s : \
     '-a[list for all clients]' \
-    '-c+[select by change]:change:_perforce_changes -tp' \
+    '-c+[select by change]:change:_perforce_changes -tc' \
     '*::file:_perforce_files -to'
 }
 
@@ -1854,7 +1867,7 @@ _perforce_cmd_protect() {
 (( $+functions[_perforce_cmd_reopen] )) ||
 _perforce_cmd_reopen() {
   _arguments -s : \
-    '-c+[select change to reopen on]:change:_perforce_changes -tp' \
+    '-c+[select change to reopen on]:change:_perforce_changes -tc' \
     '-t+[set file type]:file type:_perforce_filetypes' \
     '*::file:_perforce_files -to'
 }
@@ -1886,7 +1899,7 @@ _perforce_cmd_resolved() {
 _perforce_cmd_revert() {
   _arguments -s : \
     '-a[revert unaltered files]' \
-    '-c[limit reversions to change]:change:_perforce_changes -tp' \
+    '-c[limit reversions to change]:change:_perforce_changes -tc' \
     '-n[no action, show effect only]' \
     '*::file:_perforce_files -to'
 }
@@ -1923,7 +1936,7 @@ _perforce_cmd_submit() {
   _arguments -s : \
     '-r[files open for add or edit remain open]' \
     '-s[include fix status in list]' \
-    '(-s -i)-c[submit specific change]:change:_perforce_changes -tp' \
+    '(-s -i)-c[submit specific change]:change:_perforce_changes -tc' \
     '(-c)-i[read change spec from stdin]' \
     '*::file:_perforce_files -to -tr'
 }
@@ -1974,7 +1987,7 @@ _perforce_cmd_typemap() {
 (( $+functions[_perforce_cmd_unlock] )) ||
 _perforce_cmd_unlock() {
   _arguments -s : \
-    '-c[non-default change to unlock]:change:_perforce_changes -tp' \
+    '-c[non-default change to unlock]:change:_perforce_changes -tc' \
     '-f[allow superuser to unlock any file]' \
     '*::file:_perforce_files'
 }
