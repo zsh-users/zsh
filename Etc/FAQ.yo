@@ -43,11 +43,11 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2001/05/25)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2001/06/25)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2001/05/24
+mydit(Last-Modified:) 2001/06/25
 mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--2001 (see end of document)
@@ -55,8 +55,8 @@ mydit(Copyright:) (C) P.W. Stephenson, 1995--2001 (see end of document)
 
 bf(Changes since last issue posted:)
 description(
-  mydit()     Nothing substantive, but many minor tweaks in preparation for
-       the release of 4.0.1.
+  mydit(1.6)  4.0.2 nearly released.
+  mydit(3.1)  typeset splitting incompatibility and tt(KSH_TYPESET) option
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -299,7 +299,7 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 4.0.1 is the latest production version.
+  Zsh 4.0.2 is the latest production version.
 
   Zsh 3.0.8 was the previous production version.  The major number 3.0
   largely reflected considerable internal changes in zsh to make it more
@@ -586,7 +586,7 @@ tt(SH_OPTION_LETTERS),
         subscripts start at 1, not 0; tt(array[0]) refers to tt(array[1]);
         mytt($array) refers to the whole array, not tt($array[0]);
         braces are unnecessary: tt($a[1] == ${a[1]}), etc.
-        The tt(KSH_ARRAYS) option is now available.
+        Set the tt(KSH_ARRAYS) option for compatibility.
     it()  Coprocesses are established by mytt(coproc); mytt(|&) behaves like
         csh.  Handling of coprocess file descriptors is also different.
     it()  In mytt(cmd1 && cmd2 &), only mytt(cmd2) instead of the whole
@@ -1036,6 +1036,22 @@ label(31)
   or (entirely equivalent) when mytt(emulate ksh) or mytt(emulate sh) is in
   effect.
 
+  There is one other effect of word splitting which differs between ksh
+  and zsh.  In ksh, the builtin commands that declare parameters such
+  as tt(typeset) and tt(export) force word-splitting not to take place
+  after on an assignment argument:
+  verb(
+    typeset param=`echo foo bar`
+  )
+  in ksh will create a parameter with value mytt(foo bar), but in zsh will
+  create a parameter tt(param) with value tt(foo) and a parameter tt(bar)
+  whose value is empty.  Contrast this with a normal assignment (no
+  tt(typeset) or other command in front), which never causes a word split
+  unless you have tt(GLOB_ASSIGN) set.  From zsh version 4.0.2 the option
+  tt(KSH_TYPESET), set automatically in compatibility mode, fixes this
+  problem.  Note that in bash this behaviour occurs with all arguments that
+  look like assignments, whatever the command name; to get this behaviour
+  in zsh you have to set the option tt(MAGIC_EQUAL_SUBST).
 
 sect(In which startup file do I put...?)
 

@@ -1,3 +1,7 @@
+2001-06-25  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* zsh-users/3942: source installed as Etc/FAQ.yo: latest FAQ.
+
 2001-06-25  Clint Adams  <clint@zsh.org>
 
 	* 15079: Completion/Unix/Command/_last,
