@@ -371,7 +371,7 @@ _apt-get () {
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
-    /$'install\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" uninstalled || _deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'install\0'/ /$'[^\0]#\0'/ ':packages::{ _deb_packages "$expl_packages[@]" uninstalled || _deb_packages "$expl_packages[@]" installed }' \# \| \
     /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'dist-upgrade\0'/ \| \
     /$'dselect-upgrade\0'/ \| \
@@ -410,12 +410,12 @@ _apt-cache () {
     /$'add\0'/ /$'[^\0]#\0'/ ':files:index files:_files "$expl[@]"' \# \| \
     /$'gencaches\0'/ \| \
     /$'showpkg\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
-    /$'stats\0'=$status[4]/ \| \
+    /$'stats\0'/ \| \
     /$'dump\0'/ \| \
     /$'dumpavail\0'/ \| \
     /$'unmet\0'/ \| \
     /$'check\0'/ \| \
-    /$'search\0'/ /$'[^\0]#\0'/ ':strings::_message "pattern"' \| \
+    /$'search\0'/ /$'[^\0]#\0'/ ':strings:pattern:' \| \
     /$'show\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'depends\0'/ \| \
     /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'
