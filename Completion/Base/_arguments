@@ -223,15 +223,18 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
           fi
 
           if [[ "$action" = -\>* ]]; then
-            comparguments -W line opt_args
-            state=( "$state[@]" "${${action[3,-1]##[ 	]#}%%[ 	]#}" )
-	    if [[ -n "$usecc" ]]; then
-	      curcontext="${oldcontext%:*}:$subc"
-	    else
-	      context=( "$context[@]" "$subc" )
-	    fi
-            compstate[restore]=''
-            aret=yes
+	    action="${${action[3,-1]##[ 	]#}%%[ 	]#}"
+	    if (( ! $state[(I)$action] )); then
+              comparguments -W line opt_args
+              state=( "$state[@]" "$action" )
+	      if [[ -n "$usecc" ]]; then
+	        curcontext="${oldcontext%:*}:$subc"
+	      else
+	        context=( "$context[@]" "$subc" )
+	      fi
+              compstate[restore]=''
+              aret=yes
+            fi
           else
             if [[ -z "$local" ]]; then
               local line

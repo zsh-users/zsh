@@ -1,3 +1,8 @@
+2000-05-31  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11678: Completion/Base/_arguments: avoid reporting the same
+ 	->state more than once
+	
 2000-05-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 11661: Src/hist.c: AIX dependency fix
