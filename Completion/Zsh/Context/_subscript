@@ -1,0 +1,62 @@
+#compdef -subscript-
+
+local expl ind osuf=']'
+
+if [[ "$1" = -q ]]; then
+  osuf='] '
+  compquote osuf
+  shift
+fi
+
+if [[ "$PREFIX" = :* ]]; then
+  _wanted characters expl 'character class' \
+      compadd -p: -S ':]' alnum alpha blank cntrl digit graph \
+                          lower print punct space upper xdigit
+elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
+  local suf
+
+  [[ "$RBUFFER" != (|\\)\]* ]] && suf="$osuf"
+
+  _wanted association-keys expl 'association key' \
+      compadd -S "$suf" -k "$compstate[parameter]"
+elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
+  local list i j ret=1 disp
+
+  _tags indexes parameters
+
+  while _tags; do
+    if _requested indexes; then
+      ind=( {1..${#${(P)${compstate[parameter]}}}} )
+      if zstyle -T ":completion:${curcontext}:indexes" verbose; then
+        list=()
+        for i in "$ind[@]"; do
+          if [[ "$i" = ${PREFIX}*${SUFFIX} ]]; then
+              list=( "$list[@]" 
+	             "${i}:$(print -D ${(P)${compstate[parameter]}[$i]})" )
+	  else
+	      list=( "$list[@]" '' )
+	  fi
+        done
+        zformat -a list ' -- ' "$list[@]"
+	disp=( -d list)
+      else
+        disp=()
+      fi
+
+      if [[ "$RBUFFER" = (|\\)\]* ]]; then
+        _all_labels -V indexes expl 'array index' \
+            compadd -S '' "$disp[@]" -a ind && ret=0
+      else
+        _all_labels -V indexes expl 'array index' \
+            compadd -S "$osuf" "$disp[@]" -a ind && ret=0
+      fi
+    fi
+    _requested parameters && _parameters && ret=0
+
+    (( ret )) || return 0
+  done
+
+  return 1
+else
+  _contexts -math-
+fi
