@@ -8,7 +8,7 @@ if chkconfig --list > /dev/null 2>&1; then
   inits=( ${${${alls[1,(r)xinetd based*]}[1,-2]}/%[[:space:]]*/} )
   xinetds=( ${${${${alls[(r)xinetd based*,-1]}[2,-1]}/#[[:space:]]#}/%:*} )
 else
-  inits=( /etc/init.d/*(:t) )
+  inits=( /etc/init.d/*(-*:t) )
 fi
 
 _tags init xinetd

@@ -1,5 +1,9 @@
 2004-01-15  Oliver Kiddle  <opk@zsh.org>
 
+	* 19378: Completion/Debian/Command/_update-rc.d,
+	Completion/Unix/Type/_services: complete for update-rc.d and avoid
+	picking up README files as services
+
 	* 19377 based on 19375 (Laurent Rineau):
 	Completion/Unix/Type/_email_addresses: handle better
 	situation where MH is not installed
