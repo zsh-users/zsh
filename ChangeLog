@@ -1,3 +1,12 @@
+2000-06-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11713: Test/53completion.ztst: Revert the change made in 11647
+	because of the completion fix in 11678.
+
+	* 11701: Src/Zle/zle_main.c: Adjust 11566 to disable vared only
+	for interactive shells where ZLE has been explicitly disabled,
+	but also for any shell running in an emacs buffer.
+
 2000-06-01  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* unposted: Etc/NEWS: notes for 3.1.8.
