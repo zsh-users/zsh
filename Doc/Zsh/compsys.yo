@@ -1278,6 +1278,16 @@ insert a TAB character (assuming it was used to start completion) instead
 of performing completion when there is no non-blank character to the left
 of the cursor.  If set to `false', completion will be done even there.
 
+The value may also contain the substrings `tt(pending)' or
+`tt(pending=)var(val)' to make the character typed to start completion 
+be inserted instead of completion being tried when there is input
+pending which has not yet been processed by the shell. If a var(val)
+is given, completion will not be done if there are at least that many
+characters of unprocessed input. This is often useful to have set when 
+pasting characters into a terminal. Note however, that it relies on
+the tt($PENDING) special parameter from the tt(zle) module being set
+properly which is not guaranteed on all platforms.
+
 The default value of this style is `true' unless when completing
 inside the tt(vared) builtin command, where it defaults to `false'.
 )
@@ -2442,7 +2452,7 @@ Unlike tt(_expand) this uses a `tt(1)' (one) as the default
 value for the tt(substitute) and tt(glob) styles, so both types of
 expansion will normally be performed.
 )
-findex(_history_complete_word) (\e/)
+findex(_history_complete_word) (\e/))
 item(tt(_history_complete_word) (\e/))(
 Complete words from the shell's command history. This uses the
 tt(list), tt(remove-all-dups), tt(sort), and tt(stop) styles.

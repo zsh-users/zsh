@@ -23,7 +23,7 @@ exec </dev/null	# ZLE closes stdin, which can cause errors
 # Failed returns from this code are not real errors
 setopt localtraps noerrexit ; trap - ZERR
 
-local func funcs ret=1 tmp _compskip format nm call \
+local func funcs ret=1 tmp _compskip format nm call match \
       _completers _completer _completer_num curtag _comp_force_list \
       _matchers _matcher _matcher_num _comp_tags _comp_mesg \
       context state line opt_args val_args curcontext="$curcontext" \
@@ -38,8 +38,18 @@ typeset -U _lastdescr _comp_ignore
 
 [[ -z "$curcontext" ]] && curcontext=:::
 
-if [[ "$compstate[insert]" = tab* && "$WIDGET" != *list* ]]; then
-  { zstyle -T ":completion:${curcontext}:" insert-tab &&
+zstyle -s ":completion:${curcontext}:" insert-tab tmp || tmp=no
+
+if [[ "$tmp" = *pending(|[[:blank:]]*) ||
+      ( "$tmp" = *pending=(#b)([0-9]##)(|[[:blank:]]*) && 
+        PENDING -ge $match[1] ) ]]; then
+  compstate[insert]=tab
+
+  return 0
+fi
+
+if [[ "$compstate[insert]" = tab* ]]; then
+  { "$tmp" = (|[[:blank:]]*)(yes|true|on|1)(|[[:blank:]]*) &&
     { [[ "$curcontext" != :* || -z "$compstate[vared]" ]] ||
         zstyle -t ":completion:vared${curcontext}:" insert-tab } } && return 0
 
