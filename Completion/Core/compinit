@@ -249,6 +249,7 @@ compdef() {
 	  cmd="${i%%\=*}"
 	  svc="${i#*\=}"
           func="$_comps[${(k)_services[(R)$svc]:-$svc}]"
+          (( $+_services[$svc] )) && svc=$_services[$svc]
 	  [[ -z "$func" ]] &&
 	    func="${_patcomps[(K)$svc][1]:-${_postpatcomps[(K)$svc][1]}}"
           if [[ -n "$func" ]]; then
