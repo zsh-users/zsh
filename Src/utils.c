@@ -2027,7 +2027,7 @@ sepjoin(char **s, char *sep, int heap)
     char sepbuf[3];
 
     if (!*s)
-	return "";
+	return heap ? "" : ztrdup("");
     if (!sep) {
 	sep = sepbuf;
 	sepbuf[0] = *ifs;

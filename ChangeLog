@@ -1,3 +1,8 @@
+2003-05-12  Peter Stephenson  <pws@csr.com>
+
+	* 18524: Src/utils.c: sepjoin didn't respect !heap for an empty
+	array.  Showed up when vared'ing a zero-length array.
+
 2003-05-08  Peter Stephenson  <pws@csr.com>
 
 	* 18512 (modified for 4.0): README, Completion/Unix/Command/_cvs,
