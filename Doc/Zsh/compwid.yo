@@ -548,7 +548,7 @@ into the command line.
 item(tt(-M) var(match-spec))(
 This gives local match specifications as described below in
 noderef(Matching Control). This option may be given more than once. In 
-this case all var(match-spec)s given are contaneted with speces
+this case all var(match-spec)s given are concatenated with spaces
 between them to form the specification string to use.
 Note that they will only be used if the tt(-U) option is not given.
 )
@@ -589,6 +589,9 @@ will be taken as the words to use as matches even if they begin with
 hyphens.
 )
 enditem()
+
+Except for the tt(-M) flag, if any of these flags is given more than
+once, the first one (and its argument) will be used.
 )
 findex(compset)
 cindex(completion widgets, modifying special parameters)
