@@ -11,16 +11,19 @@
 emulate -R zsh
 setopt localoptions
 
+[[ $1 == "." ]] && 1="dot"
+[[ $1 == ":" ]] && 1="colon"
+
 # Check whether Util/helpfiles has been used to generate zsh help
 if [[ $1 == "-l" ]]
 then
-    if [[ -n "${HELPDIR:-}" ]]
+    if [[ -n "${HELPDIR:-}" && -d $HELPDIR ]]
     then
-	echo 'Here is a list of topics for which help is available:'
+	echo "Here is a list of topics for which special help is available:"
 	echo ""
 	print -rc $HELPDIR/*(:t)
     else
-	echo 'There is no list of help topics available at this time'
+	echo "There is no list of special help topics available at this time."
     fi
     return 0
 elif [[ -n "${HELPDIR:-}" && -r $HELPDIR/$1 && $1 != compctl ]]
@@ -29,7 +32,7 @@ then
     return $?
 fi
 
-# No zsh help, use "whence" to figure out where else we might look
+# No zsh help; use "whence" to figure out where else we might look
 local what places newline='
 '
 integer i=0 didman=0
