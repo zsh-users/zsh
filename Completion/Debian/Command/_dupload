@@ -2,7 +2,7 @@
 
 if (( ! $+_dupload_sites )); then
   _dupload_sites=(
-$(grep "^\$cfg" /etc/dupload.conf | sed 's/^\$cfg{\(.*\)}.*$/\1/')
+$(grep -hs "^\$cfg" /etc/dupload.conf ~/.dupload.conf | sed 's/^\$cfg{\([^}]*\)}.*$/\1/')
 )
 fi
 
