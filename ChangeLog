@@ -1,5 +1,9 @@
 2003-02-18  Oliver Kiddle  <opk@zsh.org>
 
+	* Doug Kearns: 18259: Completion/Unix/Command/_webbrowser,
+	Completion/Unix/Type/_urls: added more browsers and correct
+	'urls' description to 'url'
+
 	* 18257: Completion/Unix/Command/_xmllint: make use of _webbrowser
 
 	* Doug Kearns: 18254: Completion/Unix/Command/_xmllint: new
