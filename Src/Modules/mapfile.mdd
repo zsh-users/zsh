@@ -1,0 +1,3 @@
+autoparams="mapfile"
+
+objects="mapfile.o"
