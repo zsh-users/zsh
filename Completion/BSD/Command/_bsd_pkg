@@ -1,0 +1,168 @@
+#compdef pkg_add pkg_delete pkg_info
+
+(( $+functions[_bsd_pkg_packages] )) ||
+_bsd_pkg_packages() {
+  local ret=1 paths portsdir
+
+  case $OSTYPE in
+  netbsd*)
+    portsdir=/usr/pkg
+    ;;
+  *)
+    portsdir=${PORTSDIR:-/usr/ports}
+    ;;
+  esac
+
+  paths=( "${(@)${(@s.:.)PKG_PATH}:#}" )
+  _files "$@" -g \*.tgz && ret=0
+  (( $#path )) && _files "$@" -W paths -g \*.tgz && ret=0
+  compadd "$@" - $portsdir/packages/All/*.tgz && ret=0
+
+  return ret
+}
+
+(( $+functions[_bsd_pkg_or_file] )) ||
+_bsd_pkg_or_file() {
+  local ret=1
+
+  if (( $words[(I)-*F*] )); then
+    _files "$@" && ret=0
+  else
+    compadd "$@" - ${PKGDBDIR:-/var/db/pkg}/*(/:t) && ret=0
+  fi
+
+  return ret
+}
+
+_bsd_pkg() {
+  local flags
+
+  case "$service" in
+  pkg_add)
+    flags=(
+      '-f[force installation]'
+      '-I[don'\''t execute installation scripts]'
+      '-M[run in master mode]'
+      '-n[don'\''t really install packages]'
+      '-p:prefix directory:_files -/'
+      '-R[don'\''t record]'
+      '-S[run in slave mode]'
+      '-t:mktemp template:_files -/'
+      '-v[be verbose]'
+    )
+
+    case "$OSTYPE" in
+    freebsd*)
+      flags=(
+        $flags[@]
+        '-r[use remote fetching]'
+      )
+      ;;
+    netbsd*)
+      flags=(
+	$flags[@]
+	'-u[update]'
+	'-V[show version and exit]'
+      )
+      ;;
+    esac
+
+    _arguments -s \
+      $flags[@] \
+      '*:package to install:_bsd_pkg_packages'
+    ;;
+
+  pkg_delete)
+    flags=(
+      '-D[don'\''t execute deinstallation scripts]'
+      '-d[remove empty directories]'
+      '-f[force deinstallation]'
+      '-n[don'\''t really deinstall packages]'
+      '-p:prefix directory:_files -/'
+      '-v[be verbose]'
+    )
+
+    case "$OSTYPE" in
+    freebsd*)
+      flags=(
+        $flags[@]
+	'(:)-a[show all installed packages]'
+        '-G[do not expand glob patterns]'
+	'-i[be interactive]'
+        '-x[use regular expression]'
+      )
+      ;;
+    netbsd*)
+      flags=(
+	$flags[@]
+	'(:)-a[show all installed packages]'
+	'-F[specify each package by an installed file]'
+	'-i[be interactive]'
+	'-O[only delete the package'\''s entries]'
+        '-R[delete upward recursively]'
+        '-r[delete recursively]'
+	'-V[show version and exit]'
+      )
+      ;;
+    esac
+
+    _arguments -s \
+      $flags[@] \
+      '(-a)*:package name:_bsd_pkg_or_file'
+    ;;
+
+  pkg_info)
+    flags=(
+      '(:)-a[show all installed packages]'
+      '-c[show comment fields]'
+      '-D[show install-message files]'
+      '-d[show long descriptions]'
+      '-e[test if package is installed]:package name:compadd - ${PKG_DBDIR:-/var/db/pkg}/*(\:t)'
+      '-f[show packing list instructions]'
+      '-I[show index lines]'
+      '-i[show install scripts]'
+      '-k[show deinstall scripts]'
+      '-L[show full pathnames of files]'
+      '-l:prefix directory:_files -/'
+      '-m[show mtree files]'
+      '-p[show installation prefixes]'
+      '-q[be quiet]'
+      '-R[show list list of installed requiring packages]'
+      '-r[show requirements scripts]'
+      '-v[be verbose]'
+    )
+
+    case "$OSTYPE" in
+    freebsd*)
+      flags=(
+        $flags[@]
+        '-G[do not expand glob patterns]'
+	'-g[show files that'\''s modified]'
+	'-o[show origin]'
+	'-s[show total size occupied by each package]'
+	'-t:mktemp template:_files -/'
+	'*-W:show which package the file belongs to:_files'
+	'-x[use regular expression]'
+      )
+      ;;
+    netbsd*)
+      flags=(
+	$flags[@]
+	'-B[show build information]'
+	'-b[show RCS Id strings]'
+	'-F[specify each package by an installed file]'
+	'-S[show total size occupied by each package and its dependents]'
+	'-s[show total size occupied by each package]'
+	'-V[show version and exit]'
+      )
+      ;;
+    esac
+
+    _arguments -s \
+      $flags[@] \
+      '(-a)*:package name:_bsd_pkg_or_file'
+    ;;
+  esac
+}
+
+_bsd_pkg "$@"

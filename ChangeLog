@@ -1,3 +1,8 @@
+2001-09-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* Akinori MUSHA: 15815: Completion/BSD/Command/_bsd_pkg: More
+	detailed completion of package options on different BSD flavors.
+
 2001-09-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 15792: Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo: update url
