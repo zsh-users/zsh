@@ -428,6 +428,14 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 
   if [[ -n "$aret" ]]; then
     [[ -n $rawret ]] && return 300
+
+### Returning non-zero would allow the calling function to add its own
+### completions if we generated only options and have to use a ->state
+### action.  But if that then doesn't generate matches, the calling
+### function's return value would be wrong unless it compares
+### $compstate[nmatches] to its previous value.  Ugly.
+###
+###    return 1
   else
     [[ -n "$noargs" && nm -eq "$compstate[nmatches]" ]] && _message "$noargs"
   fi

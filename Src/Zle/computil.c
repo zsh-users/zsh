@@ -4281,17 +4281,17 @@ bin_compgroups(char *nam, char **args, char *ops, int func)
     SWITCHHEAPS(oldheap, compheap) {
 	while ((n = *args++)) {
 	    endcmgroup(NULL);
-	    begcmgroup(n, 0);
+	    begcmgroup(n, CGF_NOSORT|CGF_UNIQCON);
+	    endcmgroup(NULL);
+	    begcmgroup(n, CGF_UNIQALL);
+	    endcmgroup(NULL);
+	    begcmgroup(n, CGF_NOSORT|CGF_UNIQCON);
+	    endcmgroup(NULL);
+	    begcmgroup(n, CGF_UNIQALL);
 	    endcmgroup(NULL);
 	    begcmgroup(n, CGF_NOSORT);
 	    endcmgroup(NULL);
-	    begcmgroup(n, CGF_UNIQALL);
-	    endcmgroup(NULL);
-	    begcmgroup(n, CGF_NOSORT|CGF_UNIQCON);
-	    endcmgroup(NULL);
-	    begcmgroup(n, CGF_UNIQALL);
-	    endcmgroup(NULL);
-	    begcmgroup(n, CGF_NOSORT|CGF_UNIQCON);
+	    begcmgroup(n, 0);
 	}
     } SWITCHBACKHEAPS(oldheap);
 

@@ -1,3 +1,10 @@
+2001-07-30  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15526: Completion/Base/Utility/_arguments, Src/Zle/computil.c:
+	change order in which compgroups adds groups; add comment to
+	_arguments trying to explain how and why the return value is
+	wrong
+
 2001-07-28  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 15511: Functions/Misc/zcalc, Doc/Zsh/contrib.yo: make
