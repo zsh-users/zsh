@@ -322,7 +322,7 @@ In many of the possible contexts the completion system can generate
 matches, and often it can generate multiple types of matches. Whenever 
 a completion function is about to generate such matches it first calls 
 a utility function, telling it what types of matches can be
-generated. These types are represented as simple names calld
+generated. These types are represented as simple names called
 `tags'. This utility function in turn calls another function
 (tt(_sort_tags)) and gives the list of tags to it as
 arguments. The function tt(_sort_tags) can then say in which order the 
