@@ -916,7 +916,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		s->nbrbeg = nbrbeg;
 		s->nbrend = nbrend;
 		s->nmatches = nmatches;
-		menucmp = menuacc = 0;
+		menucmp = menuacc = hasoldlist = 0;
 		fixsuffix();
 		validlist = 0;
 		amatches = pmatches = lastmatches = NULL;
