@@ -38,9 +38,6 @@ INSTALL         = @INSTALL@
 
 @DEFS_MK@
 
-transform = @program_transform_name@
-tzsh = @tzsh@
-
 # ========== DEPENDENCIES FOR BUILDING ==========
 
 # default target

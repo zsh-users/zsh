@@ -1,8 +1,7 @@
 Makefile
 version.yo
-zsh.yo
 zsh*.1
-zsh.texi
+zsh.texi*
 zsh.info*
 zsh_*.html
 zsh.aux zsh.toc

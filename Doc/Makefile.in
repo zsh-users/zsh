@@ -35,8 +35,6 @@ sdir            = @srcdir@
 sdir_top        = @top_srcdir@
 INSTALL         = @INSTALL@
 
-tzsh = @tzsh@
-
 @DEFS_MK@
 
 MAKEINFO = makeinfo
@@ -52,7 +50,7 @@ zshexpn.1 zshmisc.1 zshmodules.1 \
 zshoptions.1 zshparam.1 zshzftpsys.1 zshzle.1 zshall.1
 
 # yodl documentation
-YODLDOC = $(MAN) zsh.texi
+YODLDOC = $(MAN) zsh.texi.in
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
 Zsh/exec.yo Zsh/expn.yo \
@@ -68,22 +66,21 @@ Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
-all: $(MAN) zsh.texi $(tzsh).info ../META-FAQ
+transform = @program_transform_name@
+
+all: $(MAN) zsh.texi zsh.info ../META-FAQ
 
 everything: all zsh.dvi zsh_us.ps zsh_a4.ps zsh_toc.html
 
 zsh.dvi: zsh.texi
-	$(TEXI2DVI) $(sdir)/zsh.texi
+	$(TEXI2DVI) zsh.texi
 
-%.info: zsh.texi
-	$(MAKEINFO) $(sdir)/zsh.texi || exit 0
+zsh.texi.in: $(sdir)/zsh.yo
+	$(YODL) -o $(sdir)/zsh.texi.in -I$(sdir) -w ztexi.yo version.yo zsh.yo
 
-zsh.texi: $(sdir)/zsh.yo
-	$(YODL) -o $(sdir)/zsh.texi -I$(sdir) -w ztexi.yo version.yo zsh.yo
-	test -f $(sdir)/zsh.texi
-
-$(sdir)/zsh.yo: $(sdir)/zsh.yo.in
-	sed 's,@@TEXINFO@@,texinfo\($(tzsh).info\)\($(tzsh)\),' $(sdir)/zsh.yo.in > $(sdir)/zsh.yo
+zsh.texi: zsh.texi.in
+	@test -f $(sdir)/zsh.texi.in -a -s $(sdir)/zsh.texi.in
+	sed '/@setfilename/{; s/@setfilename //; $(transform) ; s/^/@setfilename /;}' < $(sdir)/zsh.texi > zsh.texi
 
 .yo.1:
 	case $@ in \
@@ -171,27 +168,31 @@ uninstall: uninstall.man
 install.man: $(MAN)
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
+	  tzsh=`echo $$file | sed '$(transform)'`; \
 	  if test -f $$file; then \
-	    $(INSTALL_DATA) $$file $(DESTDIR)$(mandir)/man1; \
+	    cp -f $$file $$tzsh; \
 	  elif test -f $(sdir)/$$file; then \
-	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1; \
+	    cp -f $(sdir)/$$file $$tzsh; \
 	  else :; \
 	  fi || exit 1; \
+	  $(INSTALL_DATA) $$tzsh $(DESTDIR)$(mandir)/man1 || exit 1; \
 	done
 
 # install info pages, creating install directory if necessary
-install.info: $(tzsh).info
+install.info: zsh.texi
+	$(MAKEINFO) zsh.texi
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(infodir)
-	for file in $(tzsh).info $(tzsh).info-[1-9]*; do \
+	tzsh=`echo zsh.info | sed '$(transform)'`; \
+	for file in $$tzsh $$tzsh-[1-9]*; do \
 	  if test -f $$file; then \
 	    $(INSTALL_DATA) $$file $(DESTDIR)$(infodir); \
 	  elif test -f $(sdir)/$$file; then \
 	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(infodir); \
 	  else :; \
 	   fi || exit 1; \
-	done
+	done; \
 	if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
-	  install-info --dir-file=$(DESTDIR)$(infodir)/dir $(DESTDIR)$(infodir)/$(tzsh).info; \
+	  install-info --dir-file=$(DESTDIR)$(infodir)/dir $(DESTDIR)$(infodir)/$$tzsh.info; \
 	else true; fi
 
 install.html: zsh_toc.html
@@ -201,12 +202,14 @@ install.html: zsh_toc.html
 # uninstall man pages
 uninstall.man:
 	for file in $(MAN); do \
-	  rm -f $(DESTDIR)$(mandir)/man1/$$file; \
+	  tzsh=`echo zsh | sed '$(transform)'`; \
+	  rm -f $(DESTDIR)$(mandir)/man1/$$tzsh; \
 	done
 
 # uninstall info pages
 uninstall.info:
-	rm -f $(DESTDIR)$(infodir)/$(tzsh).info $(DESTDIR)$(infodir)/$(tzsh).info-[1-9]*
+	tzsh=`echo zsh | sed '$(transform)'`; \
+	rm -f $(DESTDIR)$(infodir)/$$tzsh.info $(DESTDIR)$(infodir)/$$tzsh.info-[1-9]*
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
