@@ -3,7 +3,7 @@
 # Usage: _deb_packages expl... avail|installed|uninstalled
 
 _deb_packages_update_avail () {
-  if (( ! $+_deb_packages_cache_uninstalled )); then
+  if (( ! $+_deb_packages_cache_avail )); then
     _deb_packages_cache_avail=(
       ${(f)"$(apt-cache dumpavail | awk '/^Package:/ { print $2 }')"}
     )
