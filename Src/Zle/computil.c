@@ -213,7 +213,7 @@ cd_init(char *nam, char *sep, char **args, int disp)
             freecdsets(cd_state.sets);
 	    return 1;
 	}
-        for (strp = &(set->strs); *ap; ap++) {
+        for (str = NULL, strp = &(set->strs); *ap; ap++) {
             *strp = str = (Cdstr) zalloc(sizeof(*str));
             strp = &(str->next);
 
@@ -231,7 +231,8 @@ cd_init(char *nam, char *sep, char **args, int disp)
             *tmp = '\0';
             str->str = str->match = ztrdup(rembslash(*ap));
         }
-        str->next = NULL;
+        if (str)
+            str->next = NULL;
 
 	if (*++args && **args != '-') {
 	    if (!(ap = get_user_var(*args))) {

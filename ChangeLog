@@ -1,5 +1,8 @@
 2001-07-18  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15409: Src/Zle/computil.c: fix for 15407; there may be sets
+	without matches
+
 	* 15407: Completion/Base/Utility/_describe,
 	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo,
 	Src/Zle/complist.c, Src/Zle/compresult.c, Src/Zle/computil.c:
