@@ -1,3 +1,11 @@
+2001-04-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 13982: Completion/Base/Utility/_multi_parts,
+	Completion/Unix/Command/.distfiles, Completion/Unix/Command/_elm,
+	Completion/Unix/Command/_mail, Completion/Unix/Command/_mutt,
+	Completion/Unix/Command/_ncftp, Completion/Unix/Command/_pine:
+	add completion for common MUAs and a couple of minor fixes
+
 2001-04-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 13981: Src/Modules/zftp.c: Don't define gethostbyname2()

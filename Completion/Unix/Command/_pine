@@ -1,0 +1,68 @@
+#compdef pine pinef
+
+local curcontext="$curcontext" state line expl suf
+local optfile getopts='pine -conf' sortorder lusortorder opts send idx
+
+if [[ -n $+_cache_pine_options ]]; then
+  for optfile in ~/.pinerc /etc/pine.conf; do
+    if [[ -f $optfile ]]; then
+      getopts="cat $optfile"
+      break
+    fi
+  done
+  _cache_pine_options=( $($=getopts | sed -n 's/^\([^#]*=\).*/-\1/p') )
+fi
+
+sortorder=( {subject,arrival,date,from,size}{,/reverse} )
+lusortorder=( dont-sort {nickname,fullname}{,-with-lists-last} )
+
+opts=( -h -F -conf -create_lu -pinerc )  # exclusive options
+idx=( -f -c -i -I -n -o -sort )  # options used when viewing messages
+send=( -attach -attachlist -attach_and_delete -url )  # options when sending
+
+_arguments -C -s \
+  "($opts $idx $send -bail -k -z -r -p -P *)-h[display help]" \
+  "($opts $idx $send -r *)-F+[specify file to open and page through]:file:_files" \
+  "($opts $idx $send *)-conf[print out fresh global configuration]" \
+  "($opts $idx $send *)-pinerc[put fresh pinerc configuration in file]:file:_files" \
+  "($opts $idx $send *)-create_lu[create .lu from script]:addressbook file:_files:sort order:(${(j: :)lusortorder})" \
+  "($opts $idx -url)-attach[go directly into composer with given file]:file:_files" \
+  "($opts $idx -url)-attachlist[go to composer with given files]:file:_files" \
+  "($opts $idx -url)-attach_and_delete[go to composer, attach file, delete when finished]:file:_files" \
+  "($opts $idx $send)-url[open the given URL]:url:->url" \
+  "($opts $send)-f+[specify mailbox to load]:mailbox: _mailboxes" \
+  "($opts $send)-c+[specify context to apply to -f arg]:number" \
+  "($opts $send)-sort[specify sort order of folder]:sort order:(${(j: :)sortorder})" \
+  "($opts $send)-i[go directly to index, bypassing main menu]" \
+  "($opts $send)-I+[specify initial keystrokes to be executed]:keystrokes" \
+  "($opts $send)-n+[entry in index to begin on]:number" \
+  "($opts $send)-o[open first folder read-only]" \
+  "(-F -h)-r[restricted - can only send mail to oneself]" \
+  "(${opts#-F})-k[force use of function keys]" \
+  "(${opts#-F})-z[allow use of ^Z suspension]" \
+  "(${opts#-F})-p+[use alternate .pinerc file]:alternate pinerc:_files" \
+  "(${opts#-F})-P+[use alternate pine.conf file]:alternate pine.conf:_files" \
+  "(${opts#-F})-bail[exit if pinerc file doesn't already exist]" \
+  '*::recipient:->userhost' \
+  ${^_cache_pine_options}':option value' && return 0
+
+if [[ "$state" = url ]]; then
+  if compset -P 'mailto:'; then
+    state=userhost
+  else
+    compadd -S: mailto && return 0
+  fi
+fi
+
+if [[ "$state" = userhost ]]; then
+  if compset -P '*@'; then
+    _description hosts expl 'remote host name'
+    _hosts "$expl[@]" && return 0
+  else
+    compset -S '@*' || suf='@'
+    _description users expl 'login name'
+    _users "$expl[@]" -q -S "$suf" && return 0
+  fi
+fi
+
+return 1

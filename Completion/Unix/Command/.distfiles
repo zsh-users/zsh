@@ -11,7 +11,7 @@ _compress     _gcc          _killall      _pack         _stty         _yp
 _configure    _gdb          _look         _patch        _su           _zcat
 _cpio         _getconf      _lp           _pbm          _sudo         _zdump
 _cvs          _gnu_generic  _ls           _perl         _tar          _zip
-_dd           _gprof        _lynx         _perldoc      _telnet
-_dict         _grep         _lzop         _prcs         _tiff
-_diff         _gs           _make         _psutils      _tin	_apm
+_dd           _gprof        _lynx         _perldoc      _telnet       _pine
+_dict         _grep         _lzop         _prcs         _tiff         _elm
+_diff         _gs           _make         _psutils      _tin	_apm  _mail
 '

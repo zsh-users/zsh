@@ -7,7 +7,7 @@
 # The parts of words from the array that are separated by the
 # separator character are then completed independently.
 
-local sep pref npref i tmp2 group expl menu pre suf opre osuf cpre
+local sep pref npref i tmp2 group expl menu pre suf opre osuf orig cpre
 local opts sopts matcher imm
 typeset -U tmp1 matches
 

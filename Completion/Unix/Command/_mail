@@ -1,0 +1,24 @@
+#compdef mail mailx Mail mush zmail
+
+local curcontext="$curcontext" state line expl suf
+
+_arguments -C -s \
+  '(-f -u)*-b[specify a BCC recipient]:BCC recipient:->userhost' \
+  '(-f -u)*-c[specify a CC recipient]:CC recipient:->userhost' \
+  '(-b -c -u -s *)-f+[specify mail folder]:mailbox:_mailboxes' \
+  '(-f -u)-s+[specify a subject]:subject:' \
+  "(-b -c -f -s *)-u+[read specified user's mail]:user:_users" \
+  '(-f -u)*:recipient:->userhost' && return 0
+
+if [[ "$state" = userhost ]]; then
+  if compset -P '*@'; then
+    _description hosts expl 'remote host name'
+    _hosts "$expl[@]" && return 0
+  else
+    compset -S '@*' || suf='@'
+    _description users expl 'login name'
+    _users "$expl[@]" -q -S "$suf" && return 0
+  fi
+fi
+
+return 1

@@ -1,12 +1,12 @@
 #compdef mutt
 
-local curcontext="$curcontext" state line suf
+local curcontext="$curcontext" state line expl suf
 typeset -A opt_args
 
 _arguments -C -s \
     '::recipient:->userhost' \
     '*-a[attach file using MIME]:file attachment:_files' \
-    '*-b[specify a BCC recipient]:BCC recepient:->userhost' \
+    '*-b[specify a BCC recipient]:BCC recipient:->userhost' \
     '*-c[specify a CC recipient]:CC recipient:->userhost' \
     '-e+[specify a post-init configuration command]:post-init configuration:' \
     '-f+[specify mailbox to load]:mailbox: _mailboxes' \

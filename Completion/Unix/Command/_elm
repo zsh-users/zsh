@@ -1,0 +1,33 @@
+#compdef elm
+
+local curcontext="$curcontext" state line expl suf
+
+_arguments -C -s \
+  '::recipient:->userhost' \
+  '-a[use the arrow pointer regardless]' \
+  '-A+[attach file]:file attachment:_files' \
+  '-c[check the given aliases only]:*:alias' \
+  '-d+[set debug level]:debug level' \
+  '-f+[specify mailbox to load]:mailbox: _mailboxes' \
+  '-h[display help]' \
+  '-i+[specify file to include in message]:include file:_files' \
+  '-m[turn off menu, using more of the screen]' \
+  '-s+[specify a subject]:subject:' \
+  "-t[don't use termcap/terminfo ti/te entries]" \
+  '-V[enable sendmail voyeur mode]' \
+  '-v[display elm version]' \
+  '-w[write .elm/elmrc]' \
+  '-z[start only if new messages]' && return 0
+
+if [[ "$state" = userhost ]]; then
+  if compset -P '*@'; then
+    _description hosts expl 'remote host name'
+    _hosts "$expl[@]" && return 0
+  else
+    compset -S '@*' || suf='@'
+    _description users expl 'login name'
+    _users "$expl[@]" -q -S "$suf" && return 0
+  fi
+fi
+
+return 1

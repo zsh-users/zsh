@@ -1,6 +1,6 @@
 #compdef ncftp lftp
 
-local bookmarks=$HOME/.$service/bookmarks
+local expl bookmarks=$HOME/.$service/bookmarks
 
 if [[ -f $bookmarks ]]; then
   bookmarks=(${"${(f)$(<$bookmarks)}"%%[[:space:],]*})
