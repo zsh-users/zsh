@@ -332,7 +332,7 @@ moves the mark to the next match
 item(tt(reverse-menu-complete))(
 moves the mark to the previous match
 )
-item(tt(viinsert))(
+item(tt(vi-insert))(
 this toggles between normal and interactive mode; in interactive mode
 the keys bound to tt(self-insert) and tt(self-insert-unmeta) insert
 into the command line as in normal editing mode but without leaving
