@@ -19,7 +19,7 @@ prompt_bart_help () {
 	The "off" token temporarily disables the theme; "on" restores it.
 	EOF
     [[ $(read -Ek 1 "?${(%):-%S[press return]%s}") == [Qq] ]] &&
-	print -nP $'\r'%E && return
+	print -nP '\r%E' && return
     <<-\EOF
 
 	The "upper left prompt" looks like:
@@ -36,7 +36,7 @@ prompt_bart_help () {
 	changes only after each command, as does the rest of the prompt.
 	EOF
     [[ $(read -Ek 1 "?${(%):-%S[press return]%s}") == [Qq] ]] &&
-	print -nP $'\r'%E && return
+	print -nP '\r%E' && return
     <<-\EOF
 
 	When RPS1 (RPROMPT) is set before this prompt is selected and a

@@ -1,3 +1,9 @@
+2000-04-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 10657: One change missed in 10635.
+
+	* Functions/Prompts/prompt_bart_setup: No-op cleanup.
+
 2000-04-11  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
 	* 10650: Completion/Core/_files: make trailing blanks in
@@ -46,7 +52,7 @@
  	without a command; allow multiple patterns per string in
  	file-patterns; update _next_tags to work with labels
 	
-2000-04-10  Bart Schaefer  <schaefer@brasslantern.com>
+2000-04-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* 10628: Doc/Zsh/compsys.yo, Completion/User/_make: Check for
 	GNU make using "_call version ..." as was done for GNU diff.
