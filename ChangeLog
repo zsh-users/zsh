@@ -1,3 +1,7 @@
+2001-03-12  Chmouel Boudjnah <chmouel@mandrakesoft.com>
+
+	* 13605: New tar options -j.
+
 2001-03-12  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/User/_zip, Completion/User/_hosts: handle

@@ -7,14 +7,20 @@
 # If your version of `tar' supports this you may want to complete
 # things like `host:file' or `user@host:file' here.
 
+local expl
+
 [[ $# -eq 0 && $+_tar_cmd -ne 0 ]] && set "$_tar_cmd"
+
+_description files expl 'archive file'
 
 if [[ "$1" = *[tx]* ]]; then
   if [[ "$1" = *[zZ]* ]]; then
-    _files -g '*.((tar|TAR).(gz|GZ|Z)|.tgz)'
+    _files "$expl[@]" -g '*.((tar|TAR).(gz|GZ|Z)|tgz)'
+  elif [[ "$1" = *[Ijy]* ]]; then
+    _files "$expl[@]" -g '*.(tar|TAR).bz2'
   else
-    _files -g '*.(tar|TAR)'
+    _files "$expl[@]" -g '*.(tar|TAR)'
   fi
 else
-  _files
+  _files "$expl[@]"
 fi

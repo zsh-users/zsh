@@ -125,6 +125,8 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
 
   if [[ $_tar_cmd = *z* ]]; then
     largs=-tzf
+  elif [[ $_tar_cmd = *j* ]]; then
+    largs=-tjf
   elif [[ $_tar_cmd = *y* ]]; then
     largs=-tyf
   elif [[ $_tar_cmd = *Z* ]]; then
