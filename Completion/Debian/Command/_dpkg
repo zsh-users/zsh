@@ -91,10 +91,10 @@ esac
 
 case "$state" in
   install|record_avail)
-        _call_function ret _dpkg_$state && return ret
+	_call_function ret _dpkg_$state && return ret
 # not needed anymore?
 #            "${(@e):-\$_dpkg_actions_${state}}" \
-        _arguments -C -A '-*' -s \
+	_arguments -C -A '-*' -s \
              "$_dpkg_options[@]" \
              \!${^_dpkg_actions%%:*} \
 	   - recur \
@@ -104,28 +104,32 @@ case "$state" in
 	     '*:Debian package:_path_files -g \*.deb'
   ;;
   remove|purge|status|listfiles)
-        _call_function ret _dpkg_$state && return ret
-  	_arguments -C -A "-*" -s "$_dpkg_options[@]" \
+	_call_function ret _dpkg_$state && return ret
+	_arguments -C -A "-*" -s "$_dpkg_options[@]" \
 	   '*:package:_deb_packages installed'
   ;;
   list)
-        _call_function ret _dpkg_$state && return ret
-        _arguments -C -A "-*" -s "$_dpkg_options[@]" \
+	_call_function ret _dpkg_$state && return ret
+	_arguments -C -A "-*" -s "$_dpkg_options[@]" \
            '*:packages:_deb_packages avail'
   ;;
   compare_versions)
-        _call_function ret _dpkg_$state && return ret
-        _arguments -C -A "-*" -s \
+	_call_function ret _dpkg_$state && return ret
+	_arguments -C -A "-*" -s \
 	'1:version A:' \
 	'2:operator:(lt le eq ne ge gt lt-nl le-nl ge-nl gt-nl)' \
 	'3:version B:'
   ;;
   configure)
-        _call_function ret _dpkg_$state && return ret
-        _arguments -C -A "-*" -s '--configure' \
+	_call_function ret _dpkg_$state && return ret
+	_arguments -C -A "-*" -s '--configure' \
 	   "$_dpkg_options[@]" \
 	  '(* --pending)-a[pending packages]' \
 	  '(* -a)--pending' \
 	  '*:package:_deb_packages installed'
+  ;;
+  search)
+	_call_function ret _dpkg_$state && return ret
+	_files
   ;;
 esac
