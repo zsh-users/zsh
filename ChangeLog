@@ -9,6 +9,8 @@
 
 2001-06-06  Andrej Borsenkow  <bor@zsh.org>
 
+	* 14766: Src/prompt.c: unify %l substitution (tty0, pts/3 etc)
+
 	* 14760: zshconfig.ac: use old-style AC_INIT without version
 
 	* 14758: zshconfig.ac: no more ac_cv_cygwin in autoconf-2.50;
