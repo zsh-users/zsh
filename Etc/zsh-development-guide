@@ -64,7 +64,7 @@ Testing
   a wide range of human and artificial life, it is very difficult to
   test the shell thoroughly.  For this purpose, the Test subdirectory
   exists.  It consists of a driver script (ztst.zsh) and various test
-  files (*.ztst) in a format which is described in 50cd.ztst, which acts
+  files (*.ztst) in a format which is described in B01cd.ztst, which acts
   as a template.  It is designed to make it easy to provide input to
   chunks of shell code and to test the corresponding standard output,
   error output and exit status.

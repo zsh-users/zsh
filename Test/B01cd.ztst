@@ -1,5 +1,5 @@
 # This file serves as a model for how to write tests, so is more heavily
-# commented that the others.  All tests are run in the Test subdirectory
+# commented than the others.  All tests are run in the Test subdirectory
 # of the distribution, which must be writable.  They should end with
 # the suffix `.ztst': this is not required by the test harness itself,
 # but it is needed by the Makefile to run all the tests.
@@ -54,7 +54,7 @@
 #
 # The rules for '<', '>' and '?' lines are the same: only the first
 # character is stripped, with subsequent whitespace being significant;
-# lines are not subject to any substitution unless the `q' flags (see
+# lines are not subject to any substitution unless the `q' flag (see
 # below) is set.
 #
 # Each chunk of indented code is to be evaluated in one go and is to
@@ -63,7 +63,7 @@
 # irrelevant.  An optional set of single-letter flags follows the status
 # or -.  The following are understood:
 #   d   Don't diff stdout against the expected stdout.
-#   D   Don't diff stderr agsinst the expected stderr.
+#   D   Don't diff stderr against the expected stderr.
 #   q   All redirection lines given in the test script (not the lines
 #       actually produced by the test) are subject to ordinary quoted shell
 #       expansion (i.e. not globbing).

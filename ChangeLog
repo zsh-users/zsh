@@ -1,5 +1,7 @@
 2001-06-28  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Etc/zsh-development-guide, Test/B01cd.ztst: fix typos
+
 	* 15159: Completion/X/Command/_vnc: fix for two digit display numbers,
 	use _values for -encodings option and complete for xvncviewer
 
