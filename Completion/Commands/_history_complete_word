@@ -20,9 +20,9 @@ _history_complete_word () {
   local expl direction stop
 
   if [[ $WIDGET = *newer ]]; then
-    direction=older
-  else
     direction=newer
+  else
+    direction=older
   fi
 
   _style -s history-words stop stop
