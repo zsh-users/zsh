@@ -614,7 +614,6 @@ zrefresh(void)
 
     /* output the right-prompt if appropriate */
 	if (put_rpmpt && !ln && !oput_rpmpt) {
-	    oput_rpmpt = put_rpmpt;
 	    moveto(0, winw - 1 - rpromptw);
 	    zputs(rpromptbuf, shout);
 	    vcs = winw - 1;
@@ -662,6 +661,7 @@ individually */
 	}
     }
     clearf = 0;
+    oput_rpmpt = put_rpmpt;
 
 /* move to the new cursor position */
     moveto(nvln, nvcs);

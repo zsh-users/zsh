@@ -1,3 +1,8 @@
+2003-02-27  Geoff Wing  <gcw@zsh.org>
+
+	* 18306: Src/Zle/zle_refresh.c: fix redisplay of rprompt when line
+	shortens
+
 2003-02-26  Clint Adams  <clint@zsh.org>
 
 	* 18303: zshconfig.ac: fix some always-true test evaluations.
