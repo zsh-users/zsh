@@ -571,6 +571,7 @@ getnameddir(char *name)
     if ((pm = (Param) paramtab->getnode(paramtab, name)) &&
 	    (PM_TYPE(pm->flags) == PM_SCALAR) &&
 	    (str = getsparam(name)) && *str == '/') {
+	pm->flags |= PM_NAMEDDIR;
 	adduserdir(name, str, 0, 1);
 	return str;
     }
@@ -1477,7 +1478,7 @@ getquery(char *valid_chars, int purge)
     }
 
     while ((c = read1char()) >= 0) {
-	if (c == 'Y' || c == '\t')
+	if (c == 'Y')
 	    c = 'y';
 	else if (c == 'N')
 	    c = 'n';
@@ -1641,11 +1642,11 @@ spckword(char **s, int hist, int cmd, int ask)
 		free(pptbuf);
 		fflush(shout);
 		zbeep();
-		x = getquery("nyae ", 0);
+		x = getquery("nyae \t", 0);
 	    }
 	} else
 	    x = 'y';
-	if (x == 'y' || x == ' ') {
+	if (x == 'y' || x == ' ' || x == '\t') {
 	    *s = dupstring(best);
 	    if (hist)
 		hwrep(best);
