@@ -1,0 +1,65 @@
+#autoload
+
+# Usage: _urls [-f]
+# Options:
+#  -f : complete files.
+
+# To complete URLs, you must make a URL database locally such as:
+#
+# % cd ~/.zsh/urls
+# % find . -ls
+# ... drwxr-xr-x ... 512 Sep  3 02:46 .
+# ... drwxr-xr-x ... 512 Sep  3 02:48 ./http
+# ... drwxr-xr-x ... 512 Sep  3 02:52 ./http/www.zsh.org
+# ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla
+# ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers
+# ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999
+# ... -rw-r--r-- ...   0 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999/index.html
+# ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk
+# ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk/zsh
+# ... drwxr-xr-x ... 512 Sep  3 02:47 ./bookmark
+# ... drwxr-xr-x ... 512 Sep  3 02:48 ./bookmark/zsh
+# ... -rw-r--r-- ...  27 Sep  3 02:47 ./bookmark/zsh/home
+# ... -rw-r--r-- ...  20 Sep  3 02:48 ./bookmark/zsh/meta
+
+local ipre scheme dirs files
+
+if [[ "$1" = -f ]]; then
+  shift
+  _files "$@" && return
+fi
+
+if [[ -z "$compconfig[_urls_dir]" ]]; then
+  compconfig[_urls_dir]=${ZDOTDIR:-$HOME}/.zsh/urls
+fi
+
+ipre="$IPREFIX"
+
+if [[ -prefix [-+.a-z0-9]#: ]]; then
+  scheme="${PREFIX%%:*}"
+  compset -P "[-+.a-z0-9]#:"
+else
+  compadd -S '' http:// ftp:// bookmark:
+  return
+fi
+
+case "$scheme" in
+  http) compset -P // || { compadd "$@" -S '' //; return };;
+  ftp) compset -P // || { compadd "$@" -S '' //; return };;
+esac
+
+if [[ "$scheme" = bookmark &&
+      -f "$compconfig[_urls_dir]/$scheme/$PREFIX$SUFFIX" &&
+      -s "$compconfig[_urls_dir]/$scheme/$PREFIX$SUFFIX" ]]; then
+  compadd "$@" -QU -- "$ipre$(<"$compconfig[_urls_dir]/$scheme/$PREFIX$SUFFIX")"
+else
+  dirs=($compconfig[_urls_dir]/$scheme/$PREFIX*$SUFFIX(/:t))
+  files=($compconfig[_urls_dir]/$scheme/$PREFIX*$SUFFIX(.:t))
+  compset -P '*/'
+  compadd "$@" -Q -S '/' - $dirs
+  if [[ "$scheme" = bookmark ]]; then
+    compadd "$@" -QS '' - $files
+  else
+    compadd "$@" -Q - $files
+  fi
+fi
