@@ -23,9 +23,7 @@ shift OPTIND-1
 
 # Do the tests. `showd' is set if the descriptions should be shown.
 
-_tags -c "$cmd" -f "$func" "$type"
-
-_tags || return 1
+_tags -i -c "$cmd" -f "$func" "$type" || return 1
 
 [[ "$tags" = *:${type}\[*describe*\]* ]] && showd=yes
 

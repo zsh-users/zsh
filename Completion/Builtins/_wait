@@ -1,18 +1,12 @@
 #compdef wait
 
-local tags list ret=1 expl
+local tags ret=1
   
 _tags job process
   
 while _tags; do
-  [[ "$tags" = *:job:* ]] && _jobs && ret=0
-  if [[ "$tags" = *:process:* ]]; then
-    list=("${(@M)${(f@)$(ps ${=compconfig[ps_listargs]:-$=compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*}")
-    _description expl 'process ID'
-    compadd "$expl[@]" -ld list - \
-      ${${${(f)"$(ps $=compconfig[ps_args] 2>/dev/null)"}[2,-1]## #}%% *} &&
-        ret=0
-  fi
+  [[ "$tags" = *:job:*     ]] && _jobs && ret=0
+  [[ "$tags" = *:process:* ]] && _pids && ret=0
   (( ret )) || break
 done
 

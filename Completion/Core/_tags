@@ -2,13 +2,14 @@
 
 if (( $# )); then
   local cmd="$words[1]" func="$funcstack[2]" defs i tags tag pat style prio
+  local trynow
 
-  while getopts 'c:f:' i; do
-    if [[ "$i" = c ]]; then
-      cmd="$OPTARG"
-    else
-      func="$OPTARG"
-    fi
+  while getopts 'c:f:i' i; do
+    case "$i" in
+    c) cmd="$OPTARG"  ;;
+    f) func="$OPTARG" ;;
+    i) trynow=yes     ;;
+    esac
   done
 
   shift OPTIND-1
@@ -67,7 +68,7 @@ if (( $# )); then
   _prio_names[$funcstack]="$prio"
   eval "${prio}=( \"\${(@)tags:#}\" )"
 
-  return 0
+  [[ -z "$trynow" ]] && return 0
 fi
 
 local prios="$_prio_names[$funcstack]"

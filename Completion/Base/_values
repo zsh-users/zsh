@@ -6,8 +6,7 @@ if compvalues -i "$@"; then
 
   if ! compvalues -D descr action; then
 
-    _tags value
-    _tags || return 1
+    _tags -i value || return 1
 
     compvalues -V noargs args opts
 
@@ -52,8 +51,7 @@ if compvalues -i "$@"; then
     fi
   fi
 
-  _tags argument
-  _tags || return 1
+  _tags -i argument || return 1
 
   _description expl "$descr"
 
