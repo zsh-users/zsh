@@ -1,14 +1,24 @@
 #autoload
 
-local of ofwuc ouc oss ofwy ofwg ofwl
+local of ofwuc ouc oss ofwy ofwg ofwl cmd
 
-(( $+_diff_is_gnu )) || {
-	_diff_is_gnu=0;
-        [[ $(_call version diff -v </dev/null 2>/dev/null) == *GNU* ]] && _diff_is_gnu=1
-}
+(( $+_diff_is_gnu )) || typeset -gA _diff_is_gnu
 
-if (( _diff_is_gnu ))
-then
+if (( ! $+_diff_is_gnu[$words[1]] )); then
+  if [[ "$words[1]" = *diff ]]; then
+    cmd="$words[1]"
+  else
+    cmd=diff
+  fi
+
+  if [[ $(_call version $cmd -v </dev/null 2>/dev/null) = *GNU* ]]; then
+    _diff_is_gnu[$words[1]]=yes
+  else
+    _diff_is_gnu[$words[1]]=
+  fi
+fi
+
+if [[ -n "$_diff_is_gnu[$words[1]]" ]]; then
   # output formats 
   of="-y --side-by-side -n --rcs -e -f --ed -q --brief -c -C --context -u -U \
   --unified --old-group-format --new-group-format --changed-group-format \
