@@ -1,5 +1,7 @@
 2000-04-13  Clint Adams  <schizo@debian.org>
-        * 10748: configure.in: set MAXJOB to whatever you want.
+
+	* 10748: configure.in: set MAXJOB to whatever you want.
+
 	* 10745: acconfig.h, configure.in, Src/zsh.h: set MAXJOB
 	to MAX_TASKS_PER_USER if available under Linux.
 
@@ -31,7 +33,7 @@
  	number of matches again when asking if a completion list should be
  	shown (only when not zero)
 	
-2000-04-12  Bart Schaefer  <schaefer@brasslantern.com>
+2000-04-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* 10706: Andrej: Completion/User/_man: Fix quoting in awk args.
 
