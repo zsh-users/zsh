@@ -1,5 +1,9 @@
 2001-07-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15482: Doc/Zsh/compwid.yo, Src/Zle/compcore.c,
+	Src/Zle/computil.c: fixlet for 15477, don't let it remove
+	consecutive dummy matches
+
 	* 15477: Completion/Base/Utility/_describe, Doc/Zsh/compwid.yo,
 	Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/complete.c,
 	Src/Zle/complist.c, Src/Zle/compresult.c, Src/Zle/computil.c:

@@ -1637,7 +1637,7 @@ addmatches(Cadata dat, char **argv)
 	return 1;
     }
     if (dat->dummies)
-        dat->aflags = dat->aflags | CAF_NOSORT | CAF_UNIQALL;
+        dat->aflags = (dat->aflags | CAF_NOSORT | CAF_UNIQCON) & ~CAF_UNIQALL;
     for (bp = brbeg; bp; bp = bp->next)
 	bp->curpos = ((dat->aflags & CAF_QUOTE) ? bp->pos : bp->qpos);
     for (bp = brend; bp; bp = bp->next)

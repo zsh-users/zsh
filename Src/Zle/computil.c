@@ -208,6 +208,8 @@ cd_prep()
             for (str = set->strs; str; str = str->next) {
                 if (str->kind != 1) {
                     if (!str->kind && str->desc) {
+                        if (str->len > wids[0])
+                            wids[0] = str->len;
                         str->other = NULL;
                         *strp++ = str;
                     }
@@ -536,7 +538,7 @@ cd_get(char **params)
                 if (dp[0][0] == '-' && dp[0][1] == 'J')
                     break;
             if (*dp) {
-                char *s = tricat("-1V", "", dp[0] + 2);
+                char *s = tricat("-2V", "", dp[0] + 2);
 
                 zsfree(*dp);
                 *dp = s;
@@ -545,7 +547,7 @@ cd_get(char **params)
                         (arrlen(opts + 1) + 1) * sizeof(char *));
                 
             } else
-                opts[0] = ztrdup("-1V-default-");
+                opts[0] = ztrdup("-2V-default-");
             csl = "packed rows";
             break;
 

@@ -673,7 +673,7 @@ completion or menu selection.  This makes empty matches only useful to
 format completion lists and to make explanatory string be shown in
 completion lists (since empty matches can be given display strings
 with the tt(-d) option).  And because all but one empty string would
-otherwise be removed, this option implies the tt(-V) and tt(-1)
+otherwise be removed, this option implies the tt(-V) and tt(-2)
 options (even if an explicit tt(-J) option is given).
 )
 xitem(tt(-))
