@@ -614,6 +614,8 @@ putfilecol(Listcols c, char *group, char *n, mode_t m)
     return 0;
 }
 
+static Cmgroup last_group;
+
 static void
 clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	 char *path, struct stat *buf)
@@ -621,8 +623,13 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
     Cmatch m;
     int len, subcols = 0;
 
+    if (g != last_group)
+        *last_cap = '\0';
+
+    last_group = g;
+
     if (!mp) {
-	zcputs(&mcolors, g->name, COL_MI);
+	zcputs(&mcolors, g->name, COL_SP);
 	len = width - 2;
 	while (len-- > 0)
 	    putc(' ', shout);
