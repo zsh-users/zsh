@@ -1,3 +1,11 @@
+2004-03-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 19525: Completion/Unix/Type/_groups: complete groups using
+	lookupd on Mac OS X
+
+	* 19525: Src/Modules/socket.c, Src/Modules/tcp.c,
+	Src/Zle/zle_params.c: suppress a few compiler warnings
+
 2004-03-03  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: zsh 4.2.0-pre-2.
@@ -16,7 +24,7 @@
 2004-03-01  Peter Stephenson  <pws@csr.com>
 
 	* 19512: INSTALL, configure.ac, Src/Modules/pcre.mdd:
-	Reqire --enable-pcre in order to avoid problems with libpcre.so
+	Require --enable-pcre in order to avoid problems with libpcre.so
 	availability.
 
 2004-03-01  Oliver Kiddle  <opk@zsh.org>

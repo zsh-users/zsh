@@ -365,7 +365,7 @@ set_cutbuffer(Param pm, char *x)
 	free(cutbuf.buf);
     cutbuf.flags = 0;
     if (x) {
-	unmetafy(x, &cutbuf.len);
+	unmetafy(x, (int *)&cutbuf.len);
 	cutbuf.buf = zalloc(cutbuf.len);
 	memcpy((char *)cutbuf.buf, x, cutbuf.len);
 	free(x);
@@ -420,7 +420,7 @@ set_killring(Param pm, char **x)
 	for (p = x; *p; p++) {
 	    int len = strlen(*p);
 	    kptr = kring + kpos;
-	    unmetafy(*p, &kptr->len);
+	    unmetafy(*p, (int *)&kptr->len);
 	    kptr->buf = (char *)zalloc(kptr->len);
 	    memcpy(kptr->buf, *p, kptr->len);
 	    zfree(*p, len+1);
