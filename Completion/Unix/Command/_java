@@ -1,7 +1,7 @@
 #compdef javac java javadoc appletviewer jar jdb javah javap extcheck rmic rmiregistry rmid serialvar native2ascii keytool jarsigner policytool
 
 local expl tmp jdb_args jar_cmd match basedir
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line jf
 typeset -A opt_args tmpassoc
 
 jdb_args=()
@@ -45,7 +45,8 @@ java)
     '-help[print help message]' \
     '(- 1)-jar[specify a program capsulated as jar]:jar:_files -g \*.jar' \
     '(-):class:->class' \
-    '*:arguments:_default' && return 0
+    '*::args: _normal' \
+     && return 0
   ;;
 
 javadoc)
@@ -526,6 +527,14 @@ jararg)
     _wanted file expl 'input file' _files -W "($words[CURRENT - 1])"
   elif [[ "$words[CURRENT - 1]" == -C ]]; then
     _wanted directories expl 'chdir to' _files -/
+  elif [[ $words[2] = *x* ]]; then
+        jf="$words[3]"
+        if [[ $jf != $_jar_cache_name && -f $jf ]]; then
+            _jar_cache_list=("${(@f)$($words[1] tf $jf)}")
+            _jar_cache_name=$jf
+        fi
+
+        _wanted files expl 'file from archive' _multi_parts / _jar_cache_list
   else
     _wanted files expl 'input file' _files
   fi
