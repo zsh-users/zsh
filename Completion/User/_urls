@@ -46,13 +46,23 @@ if [[ -prefix [-+.a-z0-9]#: ]]; then
   scheme="${PREFIX%%:*}"
   compset -P "[-+.a-z0-9]#:"
 else
-  compadd "$@" -S '' http:// ftp:// bookmark:
+  compadd "$@" -S '' http:// ftp:// bookmark: file:
   return
 fi
 
 case "$scheme" in
-  http) compset -P // || { compadd "$@" -S '' //; return };;
-  ftp) compset -P // || { compadd "$@" -S '' //; return };;
+  http|ftp) compset -P // || { compadd "$@" -S '' //; return };;
+  file)
+    if [[ -prefix // ]]; then
+      compset -P //
+    elif [ -prefix / ]; then
+      _files "$@"
+      return
+    elif [ ! "$PREFIX" ]; then
+      compadd -S '/' ~+
+      return
+    fi
+  ;;
 esac
 
 if [[ "$scheme" = bookmark &&
