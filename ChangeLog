@@ -1,3 +1,10 @@
+2002-10-31  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 17881: Src/builtin.c, Src/params.c: made the elapsed time in the
+	integer version of $SECONDS slightly more accurate and made the
+	calling of a function with a local $SECONDS value restore the parent
+	value without any accumulated error.
+
 2002-10-30  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/math.c: Got rid of a gcc-3.2 compiler warning.
