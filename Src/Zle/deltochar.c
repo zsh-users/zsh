@@ -31,19 +31,21 @@
 #include "deltochar.pro"
 
 static Widget w_deletetochar;
+static Widget w_zaptochar;
 
 /**/
 static int
 deltochar(char **args)
 {
     int c = getkey(0), dest = cs, ok = 0, n = zmult;
+    int zap = (bindk->widget == w_zaptochar);
 
     if (n > 0) {
 	while (n-- && dest != ll) {
 	    while (dest != ll && line[dest] != c)
 		dest++;
 	    if (dest != ll) {
-		if (n > 0)
+		if (!zap || n > 0)
 		    dest++;
 		if (!n) {
 		    forekill(dest - cs, 0);
@@ -60,7 +62,7 @@ deltochar(char **args)
 		dest--;
 	    if (line[dest] == c) {
 		if (!n) {
-		    backkill(cs - dest - 1, 1);
+		    backkill(cs - dest - zap, 1);
 		    ok++;
 		}
 		if (dest)
@@ -84,9 +86,14 @@ boot_deltochar(Module m)
 {
     w_deletetochar = addzlefunction("delete-to-char", deltochar,
                                     ZLE_KILL | ZLE_KEEPSUFFIX);
-    if (w_deletetochar)
-	return 0;
-    zwarnnam(m->nam, "name clash when adding ZLE function `delete-to-char'",
+    if (w_deletetochar) {
+	w_zaptochar = addzlefunction("zap-to-char", deltochar,
+				     ZLE_KILL | ZLE_KEEPSUFFIX);
+	if (w_zaptochar)
+	    return 0;
+	deletezlefunction(w_deletetochar);
+    }
+    zwarnnam(m->nam, "deltochar: name clash when adding ZLE functions",
 	     NULL, 0);
     return -1;
 }
@@ -98,6 +105,7 @@ int
 cleanup_deltochar(Module m)
 {
     deletezlefunction(w_deletetochar);
+    deletezlefunction(w_zaptochar);
     return 0;
 }
 
