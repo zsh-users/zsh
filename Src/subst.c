@@ -49,8 +49,8 @@ char nulstring[] = {Nularg, '\0'};
 mod_export void
 prefork(LinkList list, int flags)
 {
-    LinkNode node;
-    int asssub = (flags & PF_TYPESET) && isset(KSHTYPESET);
+    LinkNode node, stop = 0;
+    int keep = 0, asssub = (flags & PF_TYPESET) && isset(KSHTYPESET);
 
     queue_signals();
     for (node = firstnode(list); node; incnode(node)) {
@@ -78,15 +78,22 @@ prefork(LinkList list, int flags)
 	}
     }
     for (node = firstnode(list); node; incnode(node)) {
+	if (node == stop)
+	    keep = 0;
 	if (*(char *)getdata(node)) {
 	    remnulargs(getdata(node));
-	    if (unset(IGNOREBRACES) && !(flags & PF_SINGLE))
-		while (hasbraces(getdata(node)))
+	    if (unset(IGNOREBRACES) && !(flags & PF_SINGLE)) {
+		if (!keep)
+		    stop = nextnode(node);
+		while (hasbraces(getdata(node))) {
+		    keep = 1;
 		    xpandbraces(list, &node);
+		}
+	    }
 	    if (unset(SHFILEEXPANSION))
 		filesub((char **)getaddrdata(node),
 			flags & (PF_TYPESET|PF_ASSIGN));
-	} else if (!(flags & PF_SINGLE))
+	} else if (!(flags & PF_SINGLE) && !keep)
 	    uremnode(list, node);
 	if (errflag) {
 	    unqueue_signals();
