@@ -103,10 +103,6 @@
 #   are now turned off by default.  To force the use of glob qualifiers,
 #   give the flag -Q.
 #
-#   The second argument is re-evaluated in order to expand the parameters,
-#   so quoting may be a bit haphazard.  In particular, a double quote
-#   will need an extra level of quoting.
-#
 #   The pattern is always treated as an extendedglob pattern.  This
 #   can also be interpreted as a feature.
 #
@@ -130,7 +126,7 @@ while getopts ":o:p:MCLfinqQsvw" opt; do
     print -P "%N: unrecognized option: -$OPTARG" >&2
     return 1
   fi
-  eval "opt_$opt=${OPTARG:--$opt}"
+  eval "opt_$opt=${(q)OPTARG:--$opt}"
 done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
@@ -153,6 +149,7 @@ fi
 
 pat=$1
 repl=$2
+shift 2
 
 if [[ -z $action ]]; then
   # We can't necessarily get the name of the function directly, because
@@ -229,9 +226,9 @@ for f in $files; do
   fi
   [[ -e $f && $f = (#b)${~pat} ]] || continue
   set -- "$match[@]"
-  eval g=\"$repl\"
+  g=${(e)repl}
   if [[ -z $g ]]; then
-    errs=($errs "$f expanded to empty string")
+    errs=($errs "\`$f' expanded to an empty string")
   elif [[ $f = $g ]]; then
     # don't cause error: more useful just to skip
     #   errs=($errs "$f not altered by substitution")
@@ -255,7 +252,7 @@ fi
 for f in $files; do
   [[ -z $to[$f] ]] && continue
   exec=($action ${=opt_o} $opt_s -- $f $to[$f])
-  [[ -n $opt_i$opt_n$opt_v ]] && print -- $exec
+  [[ -n $opt_i$opt_n$opt_v ]] && print -r -- ${(q)exec}
   if [[ -n $opt_i ]]; then
     read -q 'opt?Execute? ' || continue
   fi
