@@ -82,8 +82,6 @@
 # To do:
 # - separate zcalc history from shell history using arrays --- or allow
 #   zsh to switch internally to and from array-based history.
-# - allow setting number of decimal places for display, scientific notation, 
-#   etc.
 
 emulate -L zsh
 setopt extendedglob
@@ -107,8 +105,10 @@ zcalc_restore() {
 }
 trap zcalc_restore HUP INT QUIT EXIT
 
-local line latest base defbase match mbegin mend psvar optlist opt arg
-integer num
+local line ans base defbase forms match mbegin mend psvar optlist opt arg
+integer num outdigits outform=1
+
+forms=( '%2$g' '%.*g' '%.*f' '%.*E' )
 
 zmodload -i zsh/mathfunc 2>/dev/null
 
@@ -178,30 +178,53 @@ while vared -cehp "${(%)ZCALCPROMPT}" line; do
   else
     base=$defbase
   fi
-  # Exit if `q' on its own.
-  [[ $line = [[:blank:]]#q[[:blank:]]# ]] && return 0
 
   print -s -- $line
-  if [[ $line = [[:blank:]]#local([[:blank:]]##*|) ]]; then
-    eval $line
+
+  case ${${line##[[:blank:]]#}%%[[:blank:]]#} in
+    q) # Exit if `q' on its own.
+      return 0
+    ;;
+    norm) # restore output format to default
+      outform=1
+    ;;
+    sci[[:blank:]]#(#b)(<->)(#B))
+      outdigits=$match[1]
+      outform=2
+    ;;
+    fix[[:blank:]]#(#b)(<->)(#B))
+      outdigits=$match[1]
+      outform=3
+    ;;
+    eng[[:blank:]]#(#b)(<->)(#B))
+      outdigits=$match[1]
+      outform=4
+    ;;
+    local([[:blank:]]##*|))
+      eval $line
+      line=
+      continue
+    ;;
+    *)
+      # Latest value is stored as a string, because it might be floating
+      # point or integer --- we don't know till after the evaluation, and
+      # arrays always store scalars anyway.
+      # 
+      # Since it's a string, we'd better make sure we know which
+      # base it's in, so don't change that until we actually print it.
+      eval "ans=\$(( $line ))"
+      # on error $ans is not set; let user re-edit line
+      [[ -n $ans ]] || continue
+      argv[num++]=$ans
+      psvar[1]=$num
+    ;;
+  esac
+  if [[ -n $base ]]; then
+    print -- $(( $base $ans ))
+  elif [[ $ans = *.* ]] || (( outdigits )); then
+    printf "$forms[outform]\n" $outdigits $ans
   else
-    # Latest value is stored as a string, because it might be floating
-    # point or integer --- we don't know till after the evaluation, and
-    # arrays always store scalars anyway.
-    # 
-    # Since it's a string, we'd better make sure we know which
-    # base it's in, so don't change that until we actually print it.
-    latest=
-    eval "latest=\$(( $line ))"
-    # on error $latest is not set; let user re-edit line
-    [[ -n $latest ]] || continue
-    argv[num++]=$latest
-    psvar[1]=$num
-    if [[ -z $base ]]; then
-      print -- $latest
-    else
-      print -- $(( $base $latest ))
-    fi
+    printf "%d\n" $ans
   fi
   line=
 done
