@@ -17,11 +17,11 @@ _style -a ps arguments args
 (( $#listargs )) || listargs=( "$args[@]" )
 
 if _style processes verbose; then
-  list=("${(@Mr:COLUMNS-1:)${(f@)$(ps $listargs 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+  list=("${(@Mr:COLUMNS-1:)${(f@)$(command ps $listargs 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
   desc=(-ld list)
 else
   desc=()
 fi
 
 compadd "$expl[@]" "$@" "$desc[@]" - \
-    ${${${(M)${(f)"$(ps $args 2>/dev/null)"}[2,-1]:#*${~match}}## #}%% *}
+    ${${${(M)${(f)"$(command ps $args 2>/dev/null)"}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]#*${~match}}## #}%% *}
