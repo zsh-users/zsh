@@ -593,38 +593,23 @@ killjb(Job jn, int sig)
                 for (pn = jobtab[jn->other].procs; pn; pn = pn->next)
                     if (killpg(pn->pid, sig) == -1)
 			if (kill(pn->pid, sig) == -1 && errno != ESRCH)
-#ifdef BROKEN_KILL_ESRCH
-			    if(errno != EINVAL || sig != 0)
-#endif /* BROKEN_KILL_ESRCH */
-				err = -1;
+			    err |= -1;
  
                 for (pn = jn->procs; pn->next; pn = pn->next)
                     if (kill(pn->pid, sig) == -1 && errno != ESRCH)
-#ifdef BROKEN_KILL_ESRCH
-			if(errno != EINVAL || sig != 0)
-#endif /* BROKEN_KILL_ESRCH */
-			    err = -1;
+			err |= -1;
 
 		if (!jobtab[jn->other].procs && pn)
 		    if (kill(pn->pid, sig) == -1 && errno != ESRCH)
-#ifdef BROKEN_KILL_ESRCH
-			if(errno != EINVAL || sig != 0)
-#endif /* BROKEN_KILL_ESRCH */
-			    err = -1;
+			err |= -1;
 
                 return err;
             }
             if (killpg(jobtab[jn->other].gleader, sig) == -1 && errno != ESRCH)
-#ifdef BROKEN_KILL_ESRCH
-		if(errno != EINVAL || sig != 0)
-#endif /* BROKEN_KILL_ESRCH */
-		    err = -1;
+		err = -1;
 		
 	    if (killpg(jn->gleader, sig) == -1 && errno != ESRCH)
-#ifdef BROKEN_KILL_ESRCH
-		if(errno != EINVAL || sig != 0)
-#endif /* BROKEN_KILL_ESRCH */
-		    err = -1;
+		err |= -1;
 
 	    return err;
         }
@@ -632,10 +617,7 @@ killjb(Job jn, int sig)
 	    return killpg(jn->gleader, sig);
     }
     for (pn = jn->procs; pn; pn = pn->next)
-        if ((err = kill(pn->pid, sig)) == -1 && errno != ESRCH)
-#ifdef BROKEN_KILL_ESRCH
-          if(errno != EINVAL || sig != 0)
-#endif /* BROKEN_KILL_ESRCH */
+        if ((err = kill(pn->pid, sig)) == -1 && errno != ESRCH && sig != 0)
             return -1;
     return err;
 }

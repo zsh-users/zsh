@@ -620,3 +620,8 @@ extern short ospeed;
 #ifdef BROKEN_TCSETPGRP
 #undef JOB_CONTROL
 #endif /* BROKEN_TCSETPGRP */
+
+#ifdef BROKEN_KILL_ESRCH
+#undef ESRCH
+#define ESRCH EINVAL
+#endif /* BROKEN_KILL_ESRCH */

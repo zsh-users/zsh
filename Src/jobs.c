@@ -835,11 +835,7 @@ waitforpid(pid_t pid)
 
     /* child_block() around this loop in case #ifndef WNOHANG */
     child_block();		/* unblocked in child_suspend() */
-#ifdef BROKEN_KILL_ESRCH
-    while (!errflag && (kill(pid, 0) >= 0 || (errno != ESRCH && errno != EINVAL))) {
-#else /* not BROKEN_KILL_ESRCH */
     while (!errflag && (kill(pid, 0) >= 0 || errno != ESRCH)) {
-#endif /* BROKEN_KILL_ESRCH */
 	if (first)
 	    first = 0;
 	else
