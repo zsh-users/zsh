@@ -1,5 +1,8 @@
 2000-10-06  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12919: Completion/User/_tiff, Completion/X/_xv: search for *.tif
+ 	files, too
+	
 	* 12917: Completion/Bsd/_bsd_pkg, Completion/Bsd/_kld,
  	Completion/Builtins/_autoload, Completion/Builtins/_cd,
  	Completion/Builtins/_compdef, Completion/Builtins/_popd,

@@ -31,8 +31,8 @@ tiff2bw)
     '-R[specify percentage of red channel]:percentage of red channel:' \
     '-G[specify percentage of green channel]:percentage of green channel:' \
     '-B[specify percentage of blue channel]:percentage of blue channel:' \
-    ':input file:_files -g \*.\(\#i\)tiff' \
-    ':output file:_files -g \*.\(\#i\)tiff' && ret=0
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 tiff2ps)
   _arguments \
@@ -47,17 +47,17 @@ tiff2ps)
     '-w[set page width]:page width:' \
     '-8[disable use of ASCII85 encoding]' \
     '-D[print two pages per sheet]' \
-    '-O[specify output file]:output file:_files -g \*.\(\#i\)' \
+    '-O[specify output file]:output file:_files -g \*.\(\#i\)ps' \
     '-s[generate output for a single image]' \
     '-T[print pages for top edge binding]' \
-    '*:input TIFF file:_files -g \*.\(\#i\)' && ret=0
+    '*:input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 tiffcmp)
   _arguments \
     '-l[list all differing bytes]' \
     '-t[ignore differences in directories]' \
-    ':first input TIFF file:_files -g \*.\(\#i\)' \
-    ':second input TIFF file:_files -g \*.\(\#i\)' && ret=0
+    ':first input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':second input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 tiffcp)
   _arguments -C \
@@ -72,7 +72,7 @@ tiffcp)
     '-w[specify output tile width]:output tile width:' \
     '-l[specify output tile length]:output tile length:' \
     '-f[specify fill order]:fill order:(lsb2msb msb2lsb)' \
-    '*:input TIFF file:_files -g \*.\(\#i\)' && ret=0
+    '*:input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 tiffdither)
   _arguments -C \
@@ -80,14 +80,14 @@ tiffdither)
     '-f[specify fill order]:fill order:(lsb2msb msb2lsb)' \
     '-r[specify rows per strip]:rows per strip:' \
     '-t[set threshold for dithering]:dither threshold value:' \
-    ':input file:_files -g \*.\(\#i\)tiff' \
-    ':output file:_files -g \*.\(\#i\)tiff' && ret=0
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 tiffdump)
   _arguments \
     '-o[set initial TIFF directory (file offset)]:file offset:' \
     '-h[print numbers in hexadecimal]' \
-    '*:input TIFF file:_files -g \*.\(\#i\)' && ret=0
+    '*:input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 tiffinfo)
   _arguments \
@@ -100,7 +100,7 @@ tiffinfo)
     '-i[ignore read errors]' \
     '-f[force fill order]:fill order:(lsb2msb msb2lsb)' \
     '-w[display raw data in words]' \
-    '*:input TIFF file:_files -g \*.\(\#i\)' && ret=0
+    '*:input TIFF file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 tiffmedian)
   _arguments -C \
@@ -108,12 +108,12 @@ tiffmedian)
     '-C[specify number of colormap entries]:number of colormap entries:' \
     '-c[specify compression scheme]:compression scheme:->compress' \
     '-f[use Floyd-Steinberg dithering]' \
-    ':input file:_files -g \*.\(\#i\)tiff' \
-    ':output file:_files -g \*.\(\#i\)tiff' && ret=0
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 tiffsplit)
   _arguments \
-    ':input file:_files -g \*.\(\#i\)tiff' \
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
     ':output file prefix:' && ret=0
   ;;
 fax2tiff)
@@ -126,7 +126,7 @@ fax2tiff)
     '(-M)-L[input is lsb-to-msb]' \
     '(-L)-M[input is msb-to-lsb]' \
     '-R[specify resolution]:resolution (lines per inch):' \
-    '-o[specify output file]:output file:_files -g \*.\(\#i\)' \
+    '-o[specify output file]:output file:_files -g \*.\(\#i\)tif\(\|f\)' \
     '(-f)-c[generate `classic'"'"' TIFF format]' \
     '(-c)-f[generate TIFF Class F format]' \
     '-m[output in msb-to-lsb order]' \
@@ -140,7 +140,7 @@ gif2tiff)
     '-r[specify rows per strip]:rows per strip:' \
     '-c[specify compression scheme]:compression scheme:->compress' \
     ':input GIF file:_files -g \*.\(\#i\)gif' \
-    ':output file:_files -g \*.\(\#i\)tiff' && ret=0
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 ppm2tiff)
   _arguments -C \
@@ -148,14 +148,14 @@ ppm2tiff)
     '-c[specify compression scheme]:compression scheme:->compress' \
     '-R[specify resolution]:resolution:' \
     ':input GIF file:_files -g \*.\(\#i\)ppm' \
-    ':output file:_files -g \*.\(\#i\)tiff' && ret=0
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 ras2tiff)
   _arguments -C \
     '-r[specify rows per strip]:rows per strip:' \
     '-c[specify compression scheme]:compression scheme:->compress' \
     ':input raster image file:_files -g \*.\(\#i\)ras\(\|t\)' \
-    ':output file:_files -g \*.\(\#i\)tiff' && ret=0
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 pal2rgb)
   _arguments -C \
@@ -163,8 +163,8 @@ pal2rgb)
     '-p[set sample packing]:sample packing:(contig separate)' \
     '-c[specify compression scheme]:compression scheme:->compress' \
     '-r[specify rows per strip]:rows per strip:' \
-    ':input file:_files -g \*.\(\#i\)tiff' \
-    ':output file:_files -g \*.\(\#i\)tiff' && ret=0
+    ':input file:_files -g \*.\(\#i\)tif\(\|f\)' \
+    ':output file:_files -g \*.\(\#i\)tif\(\|f\)' && ret=0
   ;;
 *)
   _description files expl 'picture file'
