@@ -1,5 +1,7 @@
 2000-07-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* Config/version.mk: 3.1.9-dev-2.
+
 	* 12138: Src/params.c, Test/06arith.ztst: setting of array
 	elements in math context didn't work (ever). 
 
