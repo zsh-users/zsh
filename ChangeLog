@@ -1,3 +1,22 @@
+2001-10-17  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16002: Completion/Unix/Type/_path_files: use expanded paths
+	(expand style with value prefix) only when we are at the last
+	matcher spec
+
+	* 15991: Src/Zle/compcore.c: hide all but one match with the
+	same string in the list even for unsorted groups
+
+	* 15944: Completion/Unix/Type/_path_files, Doc/Zsh/compsys.yo:
+	make expand style (file completion) work again; no more special
+	behaviour with menu completion; try to make docs clearer
+
+	* 15653: Completion/Base/Core/_main_complete: make insert-tab
+	really default to `true'
+
+	* 15615: Completion/Unix/Type/_path_files: -[12n] options don't
+	get arguments
+
 2001-10-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15812: Doc/Zsh/zle.yo: Cross-reference parameters used by ZLE.

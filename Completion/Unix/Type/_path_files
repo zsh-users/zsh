@@ -17,7 +17,7 @@ exppaths=()
 zparseopts -a mopts \
     'P:=pfxsfx' 'S:=pfxsfx' 'q=pfxsfx' 'r:=pfxsfx' 'R:=pfxsfx' \
     'W:=prepaths' 'F:=ignore' 'M+:=matcher' \
-    J+: V+: X+: 1: 2: n: 'f=tmp1' '/=tmp1' 'g+:-=tmp1'
+    J+: V+: X+: 1 2 n 'f=tmp1' '/=tmp1' 'g+:-=tmp1'
 
 sopt="-${(@j::M)${(@)tmp1#-}#?}"
 (( $tmp1[(I)-[/g]*] )) && haspats=yes
@@ -328,6 +328,8 @@ for prepath in "$prepaths[@]"; do
 
     # Get the matching files by globbing.
 
+    tmp2=( "$tmp1[@]" )
+
     if [[ "$tpre$tsuf" = */* ]]; then
       compfiles -P$cfopt tmp1 accex "$skipped" "$_matcher" "$sdirs" fake
     elif [[ "$sopt" = *[/f]* ]]; then
@@ -340,7 +342,9 @@ for prepath in "$prepaths[@]"; do
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.
 
-      if [[ "$tmp1[1]" = */* ]]; then
+      if (( ! $#tmp1 )); then
+        tmp2=( ${^tmp2}/$PREFIX$SUFFIX )
+      elif [[ "$tmp1[1]" = */* ]]; then
         if [[ -n "$_comp_correct" ]]; then
           tmp2=( "$tmp1[@]" )
           builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
@@ -501,12 +505,15 @@ for prepath in "$prepaths[@]"; do
         SUFFIX="$osuf"
       fi
 
-      if [[ -n $menu || -z "$compstate[insert]" ]] ||
-         ! zstyle -t ":completion:${curcontext}:paths" expand suffix ||
+      # This once tested `-n $menu ||' but our menu-completion expert says
+      # that's not what we want.
+
+      if [[ -z "$compstate[insert]" ]] ||
+         { ! zstyle -t ":completion:${curcontext}:paths" expand suffix &&
            [[ -z "$listsfx" &&
               ( -n "$_comp_correct" ||
                 -z "$compstate[pattern_match]" || "$SUFFIX" != */* ||
-                "${SUFFIX#*/}" = (|*[^\\])[][*?#~^\|\<\>]* ) ]]; then
+                "${SUFFIX#*/}" = (|*[^\\])[][*?#~^\|\<\>]* ) ]] }; then
         (( tmp4 )) && zstyle -t ":completion:${curcontext}:paths" ambiguous &&
             compstate[to_end]=
         if [[ "$tmp3" = */* ]]; then
@@ -645,9 +652,13 @@ done
 
 # If we are configured to expand paths as far as possible and we collected
 # expanded paths that are different from the string on the line, we add
-# them as possible matches.
+# them as possible matches. Do that only if we are currently trying the
+# last entry in the matcher-list style, otherwise other match specs might
+# make the suffix that didn't match this time match in one of the following
+# attempts.
 
-if zstyle -t ":completion:${curcontext}:paths" expand prefix &&
+if [[ _matcher_num -eq ${#_matchers} ]] &&
+   zstyle -t ":completion:${curcontext}:paths" expand prefix &&
    [[ nm -eq compstate[nmatches] && $#exppaths -ne 0 &&
       "$exppaths" != "$eorig" ]]; then
   PREFIX="${opre}"

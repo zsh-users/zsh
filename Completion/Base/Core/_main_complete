@@ -33,7 +33,7 @@ typeset -U _lastdescr _comp_ignore _comp_colors
 
 [[ -z "$curcontext" ]] && curcontext=:::
 
-zstyle -s ":completion:${curcontext}:" insert-tab tmp || tmp=no
+zstyle -s ":completion:${curcontext}:" insert-tab tmp || tmp=yes
 
 if [[ ( "$tmp" = *pending(|[[:blank:]]*) && PENDING -gt 0 ) ||
       ( "$tmp" = *pending=(#b)([0-9]##)(|[[:blank:]]*) &&

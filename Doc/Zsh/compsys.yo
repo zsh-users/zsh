@@ -1064,15 +1064,15 @@ the file tt(/etc/resolv.conf).
 kindex(expand, completion style)
 item(tt(expand))(
 This style is used when completing strings consisting of multiple
-parts, such as path names.  If its
-value contains the string `tt(prefix)', the partially typed word from
+parts, such as path names.  If one of its values is
+the string `tt(prefix)', the partially typed word from
 the line will be expanded as far as possible even if trailing parts
-cannot be completed.  If it contains the string `tt(suffix)'
-and normal (non-menu-) completion is used, matching names for
+cannot be completed.  If one of its values is the string `tt(suffix)',
+matching names for
 components after the first ambiguous one will also be added.  This
 means that the resulting string is the longest unambiguous string
 possible, but if menu completion is started on the list of matches
-generated this way (e.g. due to the option tt(AUTO_MENU) being set),
+generated this way,
 this will also cycle through the names of the files in pathname
 components after the first ambiguous one.
 )
