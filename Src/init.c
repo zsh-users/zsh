@@ -106,12 +106,16 @@ loop(int toplevel, int justonce)
     for (;;) {
 	freeheap();
 	errflag = 0;
+	hbegin(1);		/* init history mech        */
 	if (isset(SHINSTDIN)) {
 	    setblock_stdin();
-	    if (interact)
+	    if (interact) {
+	        int hstop = stophist;
+		stophist = 3;
 		preprompt();
+		stophist = hstop;
+	    }
 	}
-	hbegin(1);		/* init history mech        */
 	intr();			/* interrupts on            */
 	lexinit();              /* initialize lexical state */
 	if (!(prog = parse_event())) {	/* if we couldn't parse a list */
