@@ -66,7 +66,9 @@ char *mktemp _((char *));
 # ifndef HAVE_IOCTL_PROTO
 int ioctl _((int d, unsigned long request, void *argp));
 # endif
+# ifndef HAVE_MKNOD_PROTO
 int mknod _((const char *pathname, int mode, dev_t device));
+# endif
 int nice _((int increment));
 int select _((int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval *timeout));
 #endif

@@ -1278,7 +1278,7 @@ untokenize(char *s)
     }
 }
 
-/* Open a file for writing redicection */
+/* Open a file for writing redirection */
 
 /**/
 static int
@@ -2311,8 +2311,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
     if (xtrerr != stderr) {
 	fil = fileno(xtrerr);
 	fclose(xtrerr);
-	zclose(fil);
 	xtrerr = stderr;
+	zclose(fil);
     }
 }
 

@@ -1086,9 +1086,9 @@ if test $zsh_cv_header_unistd_h_sbrk_proto = yes; then
   AC_DEFINE(HAVE_SBRK_PROTO)
 fi
 
-dnl ------------------------
-dnl ioctl prototypes for OSF
-dnl ------------------------
+dnl ----------------------------------
+dnl ioctl and mknod prototypes for OSF
+dnl ----------------------------------
 
 if test "$ac_cv_prog_cc_stdc" != no; then
   AC_CACHE_CHECK(for ioctl prototype in <sys/ioctl.h>,
@@ -1099,6 +1099,15 @@ if test "$ac_cv_prog_cc_stdc" != no; then
   zsh_cv_header_sys_ioctl_h_ioctl_proto=yes)])
   if test $zsh_cv_header_sys_ioctl_h_ioctl_proto = yes; then
     AC_DEFINE(HAVE_IOCTL_PROTO)
+  fi
+  AC_CACHE_CHECK(for mknod prototype in <sys/stat.h>,
+  zsh_cv_header_sys_stat_h_mknod_proto,
+  [AC_TRY_COMPILE([#include <sys/stat.h>
+   int mknod(double x);], [int i;],
+  zsh_cv_header_sys_stat_h_mknod_proto=no,
+  zsh_cv_header_sys_stat_h_mknod_proto=yes)])
+  if test $zsh_cv_header_sys_stat_h_mknod_proto = yes; then
+    AC_DEFINE(HAVE_MKNOD_PROTO)
   fi
 fi
 

@@ -207,6 +207,9 @@
 /* Define to 1 if there is a prototype defined for ioctl() on your system */
 #undef HAVE_IOCTL_PROTO
 
+/* Define to 1 if there is a prototype defined for mknod() on your system */
+#undef HAVE_MKNOD_PROTO
+
 /* Define to 1 if select() is defined in <sys/socket.h>, ie BeOS R4.51*/
 #undef SELECT_IN_SYS_SOCKET_H
 
