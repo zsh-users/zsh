@@ -1,0 +1,6 @@
+DISTFILES_SRC='
+.distfiles
+_gv        _netscape  _xauth     _xfig      _xrdb      _xterm     _xwit
+_nedit     _vnc       _x_utils   _xdvi      _xmodmap   _xset      _xv
+_mozilla
+'
