@@ -2112,6 +2112,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    continue;
 	} else {
 	    ungetkeycmd();
+	    acc = 1;
 	    break;
 	}
 	do_single(**p);

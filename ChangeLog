@@ -1,3 +1,8 @@
+2000-05-16  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11401: Src/Zle/complist.c: make menu-select accept the match
+ 	when typing a non-special character
+	
 2000-05-16  Tanaka Akira  <akr@zsh.org>
 
 	* 11396: Completion/User/_look: display a message when
