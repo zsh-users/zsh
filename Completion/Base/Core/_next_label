@@ -1,0 +1,25 @@
+#autoload
+
+local __gopt=-J __descr __spec
+
+if [[ "$1" = -([12]|)[VJ] ]]; then
+  __gopt="$1"
+  shift
+fi
+
+if comptags -A "$1" curtag __spec; then
+  _comp_tags="$_comp_tags $__spec "
+  if [[ "$curtag" = *[^\\]:* ]]; then
+    zformat -f __descr "${curtag#*:}" "d:$3"
+    _description "$__gopt" "${curtag%:*}" "$2" "$__descr"
+    curtag="${curtag%:*}"
+    set -A $2 "${(P@)2}" "${(@)argv[4,-1]}"
+  else
+    _description "$__gopt" "$curtag" "$2" "$3"
+    set -A $2 "${(@)argv[4,-1]}" "${(P@)2}"
+  fi
+
+  return 0
+fi
+
+return 1
