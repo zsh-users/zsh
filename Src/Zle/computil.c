@@ -41,6 +41,7 @@ struct cdstate {
     int showd;			/* != 0 if descriptions should be shown */
     char *sep;			/* the separator string */
     int slen;			/* its length */
+    int maxmlen;                /* maximum length to allow for the matches */
     Cdset sets;			/* the sets of matches */
     int pre;                    /* longest prefix (before description) */
     int suf;                    /* longest suffix (description) */
@@ -129,22 +130,26 @@ cd_group()
                 continue;
 
             num = 1;
-            len = str1->len;
+            len = str1->len + cd_state.slen;
             strp = &(str1->other);
 
-            for (set2 = set1; set2; set2 = set2->next)
+            for (set2 = set1; set2; set2 = set2->next) {
                 for (str2 = (set2 == set1 ? str1->next : set2->strs);
                      str2; str2 = str2->next)
                     if (str2->desc && !strcmp(str1->desc, str2->desc)) {
+                        len += 2 + str2->len;
+                        if (len > cd_state.maxmlen)
+                            break;
                         str1->kind = 1;
                         str2->kind = 2;
                         num++;
-                        len += str2->len;
                         *strp = str2;
                         strp = &(str2->other);
                     }
+                if (str2)
+                    break;
+            }
             *strp = NULL;
-            len += num * 2 + cd_state.slen;
 
             if (len >= columns) {
                 cd_state.groups = 0;
@@ -393,12 +398,13 @@ cd_arrcat(char **a, char **b)
 /* Initialisation. Store and calculate the string and matches and so on. */
 
 static int
-cd_init(char *nam, char *hide, char *sep, char **opts, char **args, int disp)
+cd_init(char *nam, char *hide, char *mlen, char *sep,
+        char **opts, char **args, int disp)
 {
     Cdset *setp, set;
     Cdstr *strp, str;
     char **ap, *tmp;
-    int grp = 0;
+    int grp = 0, itmp;
 
     if (cd_parsed) {
 	zsfree(cd_state.sep);
@@ -411,7 +417,12 @@ cd_init(char *nam, char *hide, char *sep, char **opts, char **args, int disp)
     cd_state.sets = NULL;
     cd_state.showd = disp;
     cd_state.maxg = cd_state.groups = cd_state.descs = 0;
-
+    cd_state.maxmlen = atoi(mlen);
+    itmp = columns - cd_state.slen - 4;
+    if (cd_state.maxmlen > itmp)
+        cd_state.maxmlen = itmp;
+    if (cd_state.maxmlen < 4)
+        cd_state.maxmlen = 4;
     if (*args && !strcmp(*args, "-g")) {
         args++;
         grp = 1;
@@ -537,7 +548,7 @@ cd_get(char **params)
                 /* We are building a columnised list with dummy matches
                  * but there are also matches without descriptions.
                  * Those end up in a different group, so make sure that
-                 * groupd doesn't have an explanation. */
+                 * group doesn't have an explanation. */
 
                 for (mp = dp = opts; *mp; mp++) {
                     if (dp[0][0] == '-' && dp[0][1] == 'X') {
@@ -679,25 +690,25 @@ bin_compdescribe(char *nam, char **args, char *ops, int func)
     }
     switch (args[0][1]) {
     case 'i':
-        if (n < 2) {
+        if (n < 3) {
             zwarnnam(nam, "not enough arguments", NULL, 0);
 
             return 1;
         }
-	return cd_init(nam, args[1], "", NULL, args + 2, 0);
+	return cd_init(nam, args[1], args[2], "", NULL, args + 3, 0);
     case 'I':
-        if (n < 5) {
+        if (n < 6) {
             zwarnnam(nam, "not enough arguments", NULL, 0);
 
             return 1;
         } else {
             char **opts;
 
-            if (!(opts = getaparam(args[3]))) {
-		zwarnnam(nam, "unknown parameter: %s", args[2], 0);
+            if (!(opts = getaparam(args[4]))) {
+		zwarnnam(nam, "unknown parameter: %s", args[4], 0);
 		return 1;
             }
-            return cd_init(nam, args[1], args[2], opts, args + 4, 1);
+            return cd_init(nam, args[1], args[2], args[3], opts, args + 5, 1);
         }
     case 'g':
 	if (cd_parsed) {

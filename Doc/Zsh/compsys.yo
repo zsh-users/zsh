@@ -1766,6 +1766,20 @@ performed.
 
 The default value for this style is `tt(2 numeric)'.
 )
+kindex(max-match-length, completion style)
+item(tt(max-match-length))(
+This is used to define the maximum length to use for the matches when
+listing matches with descriptions. In such lists, matches with the
+same description will be grouped together, but that means that in
+cases where many matches have the same description, the matches take
+up most of the display width, leaving only little room for the
+descriptions. By setting this style one can specify whether one
+prefers to make more matches be grouped together or whether the shell
+should try keep more of the descriptions visible. 
+
+The value should give the maximum number of display columns to give to
+the matches, the default is half the screen width.
+)
 kindex(menu, completion style)
 item(tt(menu))(
 If this is set to true in a given context, using any of the tags defined

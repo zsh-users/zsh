@@ -1,5 +1,11 @@
 2002-05-14  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 17147: Completion/Base/Utility/_describe,
+	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo,
+	Src/Zle/computil.c: allow users to give the maximum number of
+	display-columns the matches should take up via the style
+	currently named max-match-length
+
 	* 17146: Doc/Zsh/compsys.yo: fix doc for _describe, mention -t
 	option
 

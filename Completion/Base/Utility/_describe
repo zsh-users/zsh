@@ -2,7 +2,7 @@
 
 # This can be used to add options or values with descriptions as matches.
 
-local _opt _expl _tmpm _tmpd
+local _opt _expl _tmpm _tmpd _mlen
 local _type=values _descr _ret=1 _showd _nm _hide _args _grp _sep
 local csl="$compstate[list]" csl2
 local _oargv _argv _new _strs _mats _opts _i _try=0
@@ -25,6 +25,8 @@ fi
 zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes
 
 zstyle -s ":completion:${curcontext}:$_type" list-separator _sep || _sep=--
+zstyle -s ":completion:${curcontext}:$_type" max-match-length _mlen ||
+    _mlen=$((COLUMNS/2))
 
 _descr="$1"
 shift
@@ -97,9 +99,9 @@ while _tags; do
     fi
 
     if [[ -n "$_showd" ]]; then
-      compdescribe -I "$_hide" "$_sep " _expl "$_grp[@]" "$@"
+      compdescribe -I "$_hide" "$_mlen" "$_sep " _expl "$_grp[@]" "$@"
     else
-      compdescribe -i "$_hide" "$@"
+      compdescribe -i "$_hide" "$_mlen" "$@"
     fi
 
     compstate[list]="$csl"
