@@ -3,6 +3,9 @@
 	* 15868: Src/text.c: job text building code couldn't handle
 	empty sublists (as in `coproc || test')
 
+	* 15868: Src/text.c: job text building code couldn't handle
+	empty sublists (as in `coproc || test')
+
 2001-09-25  Clint Adams  <clint@zsh.org>
 
 	* 15866: Completion/Unix/Command/_ssh:
