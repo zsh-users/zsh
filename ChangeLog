@@ -1,5 +1,8 @@
 2000-04-12  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10692: Src/builtin.c: missing initialisation for next field in
+ 	assignments for substitutions for fc builtin
+
 	* 10691: Completion/Core/_main_complete, Completion/Core/_oldlist:
  	keep _oldlist from using the dummy match inserted for warnings
 	

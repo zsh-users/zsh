@@ -1224,6 +1224,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	}
 	a->name = *argv;
 	a->value = s;
+	a->next = NULL;
 	argv++;
     }
     /* interpret and check first history line specifier */
