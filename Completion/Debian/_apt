@@ -374,6 +374,8 @@ _apt-get () {
     --no-upgrade:bool \
     --force-yes:bool \
     --print-uris:bool \
+    --purge:bool \
+    --list-cleanup:bool \
     -c,--config-file:configfile \
     -o,--option:arbitem \
     -- \
@@ -425,7 +427,8 @@ _apt-cache () {
     /$'check\0' \| \
     /$'search\0' \| \
     /$'show\0' \| \
-    /"[]"	!'compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show'
+    /$'depends\0' \| \
+    /"[]"	!'compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'
 
   _apt-cache () {
     local expl_action expl_packages expl_pkg_cache expl_src_cache
