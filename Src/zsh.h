@@ -1132,6 +1132,7 @@ struct param {
 #define PM_AUTOLOAD	(1<<23) /* autoloaded from module                   */
 #define PM_NORESTORE	(1<<24)	/* do not restore value of local special    */
 #define PM_HASHELEM     (1<<25) /* is a hash-element */
+#define PM_NAMEDDIR     (1<<26) /* has a corresponding nameddirtab entry    */
 
 /* The option string corresponds to the first of the variables above */
 #define TYPESET_OPTSTR "aiEFALRZlurtxUhHT"
