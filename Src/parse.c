@@ -2524,9 +2524,8 @@ load_dump_header(char *nam, char *name, int err)
 	}
 	memcpy(head, buf, (FD_PRELEN + 1) * sizeof(wordcode));
 
-	if (read(fd, head + (FD_PRELEN + 1),
-		 len - ((FD_PRELEN + 1) * sizeof(wordcode))) !=
-	    len - ((FD_PRELEN + 1) * sizeof(wordcode))) {
+	len -= (FD_PRELEN + 1) * sizeof(wordcode);
+	if (read(fd, head + (FD_PRELEN + 1), len) != len) {
 	    close(fd);
 	    zwarnnam(nam, "invalid zwc file: %s" , name, 0);
 	    return NULL;
@@ -3125,7 +3124,7 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
 	    }
 	    d = (Wordcode) zalloc(h->len + po);
 
-	    if (read(fd, ((char *) d) + po, h->len) != h->len) {
+	    if (read(fd, ((char *) d) + po, h->len) != (int)h->len) {
 		close(fd);
 		zfree(d, h->len);
 
