@@ -424,7 +424,9 @@ getpmfunction(HashTable ht, char *name)
 
 	if ((shf = (Shfunc) shfunctab->getnode(shfunctab, name))) {
 	    if (shf->flags & PM_UNDEFINED)
-		pm->u.str = "undefined";
+		pm->u.str = tricat("builtin autoload -X",
+				   ((shf->flags & PM_UNALIASED)? "U" : ""),
+				   ((shf->flags & PM_TAGGED)? "t" : ""));
 	    else {
 		char *t = getpermtext((void *) dupstruct((void *)
 							 shf->funcdef)), *h;
@@ -467,9 +469,12 @@ scanpmfunctions(HashTable ht, ScanFunc func, int flags)
 	    if (!(hn->flags & DISABLED)) {
 		pm.nam = hn->nam;
 		if (func != scancountparams) {
-		    if (((Shfunc) hn)->flags & PM_UNDEFINED)
-			pm.u.str = "undefined";
-		    else {
+		    if (((Shfunc) hn)->flags & PM_UNDEFINED) {
+			Shfunc shf = (Shfunc) hn;
+			pm.u.str = tricat("builtin autoload -X",
+					  ((shf->flags & PM_UNALIASED)? "U" : ""),
+					  ((shf->flags & PM_TAGGED)? "t" : ""));
+		    } else {
 			char *t = getpermtext((void *)
 					      dupstruct((void *) ((Shfunc) hn)->funcdef));
 
@@ -779,7 +784,7 @@ dirssetfn(Param pm, char **x)
     PERMALLOC {
 	freelinklist(dirstack, freestr);
 	dirstack = newlinklist();
-	while (*x)
+	while (x && *x)
 	    addlinknode(dirstack, ztrdup(*x++));
     } LASTALLOC;
 }

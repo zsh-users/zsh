@@ -872,21 +872,29 @@ printshfuncnode(HashNode hn, int printflags)
     }
  
     if (f->flags & PM_UNDEFINED)
-	printf("undefined ");
-    if (f->flags & PM_TAGGED)
-	printf("traced ");
-    if ((f->flags & PM_UNDEFINED) || !f->funcdef) {
-	nicezputs(f->nam, stdout);
-	printf(" () { }\n");
-	return;
+	t = tricat("builtin autoload -X",
+		   ((f->flags & PM_UNALIASED)? "U" : ""),
+		   ((f->flags & PM_TAGGED)? "t" : ""));
+    else {
+	if (!f->funcdef)
+	    t = 0;
+	else
+	    t = getpermtext((void *) f->funcdef);
     }
- 
-    t = getpermtext((void *) f->funcdef);
+
     quotedzputs(f->nam, stdout);
-    printf(" () {\n\t");
-    zputs(t, stdout);
-    printf("\n}\n");
-    zsfree(t);
+    if (t) {
+	printf(" () {\n\t");
+	if (f->flags & PM_UNDEFINED)
+	    printf("%c undefined\n\t", hashchar);
+	if (f->flags & PM_TAGGED)
+	    printf("%c traced\n\t", hashchar);
+	zputs(t, stdout);
+	printf("\n}\n");
+	zsfree(t);
+    } else {
+	printf(" () { }\n");
+    }
 }
 
 /**************************************/

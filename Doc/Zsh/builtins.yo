@@ -71,7 +71,24 @@ which no alias has been defined.
 findex(autoload)
 cindex(functions, autoloading)
 cindex(autoloading functions)
-alias(autoload)(functions -u)
+item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(UXmt) ] [ var(name) ... ])(
+Equivalent to tt(functions -u), with the exception of tt(-X)/tt(+X).
+
+The flag tt(-X) may be used only inside a shell function, and may not be
+followed by a var(name).  It causes the calling function to be marked for
+autoloading and then immediately loaded and executed, with the current
+array of positional parameters as arguments.  This replaces the previous
+definition of the function.  If no function definition is found, an error
+is printed and the function remains undefined and marked for autoloading.
+
+The flag tt(+X) attempts to load each var(name) as an autoloaded function,
+but does em(not) execute it.  The exit status is zero (success) if the
+function was not previously defined em(and) a definition for it was found.
+This does em(not) replace any existing definition of the function.  The
+exit status is nonzero (failure) if the function was already defined or
+when no definition was found.  In the latter case the function remains
+undefined and marked for autoloading.
+)
 findex(bg)
 cindex(jobs, backgrounding)
 xitem(tt(bg) [ var(job) ... ])
@@ -353,7 +370,7 @@ Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
 findex(functions)
-item(tt(functions) [ {tt(PLUS())|tt(-)}tt(tum) ] [ var(name) ... ])(
+item(tt(functions) [ {tt(PLUS())|tt(-)}tt(UXmtu) ] [ var(name) ... ])(
 Equivalent to tt(typeset -f).
 )
 findex(getln)
@@ -1028,6 +1045,7 @@ item(tt(-U))(
 For arrays (but not for associative arrays), keep only the first
 occurrence of each duplicated value.  This may also be set for
 colon-separated special parameters like tt(PATH) or tt(FIGNORE), etc.
+This flag has a different meaning when used with tt(-f); see below.
 )
 item(tt(-Z))(
 Right justify and fill with leading zeros if the first non-blank
@@ -1044,8 +1062,8 @@ shown.
 )
 item(tt(-f))(
 The names refer to functions rather than parameters.  No assignments
-can be made, and the only other valid flags are tt(-t), tt(-u) and
-tt(-U).  The flag tt(-t) turns on execution tracing for this
+can be made, and the only other valid flags are tt(-t), tt(-u), tt(-U),
+tt(-X) and tt(+X).  The flag tt(-t) turns on execution tracing for this
 function.  The tt(-u) and tt(-U) flags cause the function to be
 marked for autoloading; tt(-U) also causes alias expansion to be
 suppressed when the function is loaded.  The tt(fpath) parameter
@@ -1096,10 +1114,12 @@ The given var(name)s are marked readonly.
 )
 item(tt(-t))(
 Tags the named parameters.  Tags have no special meaning to the shell.
+This flag has a different meaning when used with tt(-f); see above.
 )
 item(tt(-u))(
 Convert the result to upper case whenever the parameter is expanded.
 The value is em(not) converted when assigned.
+This flag has a different meaning when used with tt(-f); see above.
 )
 item(tt(-x))(
 Mark for automatic export to the environment of subsequently

@@ -2911,11 +2911,11 @@ execautofn(Cmd cmd, LinkList args, int flags)
     l = getfpfunc(shf->nam);
     noaliases = noalias;
 
-    if(l == &dummy_list) {
+    if (l == &dummy_list) {
 	zerr("%s: function definition file not found", shf->nam, 0);
 	return 1;
     }
-    if(isset(KSHAUTOLOAD)) {
+    if (isset(KSHAUTOLOAD)) {
 	VARARR(char, n, strlen(shf->nam) + 1);
 	strcpy(n, shf->nam);
 	execlist(l, 1, 0);
@@ -2933,6 +2933,31 @@ execautofn(Cmd cmd, LinkList args, int flags)
     }
     execlist(shf->funcdef, 1, 0);
     return lastval;
+}
+
+/**/
+int
+loadautofn(Shfunc shf)
+{
+    /* Copied from execautofn() -- should consolidate someday */
+
+    int noalias = noaliases;
+    List l;
+
+    noaliases = (shf->flags & PM_UNALIASED);
+    l = getfpfunc(shf->nam);
+    noaliases = noalias;
+
+    if (l == &dummy_list) {
+	zerr("%s: function definition file not found", shf->nam, 0);
+	return 1;
+    }
+    PERMALLOC {
+	shf->funcdef = dupstruct(stripkshdef(l, shf->nam));
+    } LASTALLOC;
+    shf->flags &= ~PM_UNDEFINED;
+
+    return 0;
 }
 
 /* execute a shell function */

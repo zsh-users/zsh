@@ -43,7 +43,7 @@ static struct builtin builtins[] =
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmr", NULL),
-    BUILTIN("autoload", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "tU", "u"),
+    BUILTIN("autoload", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "tUX", "u"),
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
     BUILTIN("bye", 0, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
@@ -1998,6 +1998,29 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     return returnval;
 }
 
+/* Helper for bin_functions() when run as "autoload -X" */
+
+static int
+eval_autoload(Shfunc shf, char *name, char *ops, int func)
+{
+    if (!(shf->flags & PM_UNDEFINED))
+	return 1;
+
+    if (shf->funcdef)
+	freestruct(shf->funcdef);
+
+    if (ops['X'] == 1) {
+	char *fargv[3];
+	fargv[0] = name;
+	fargv[1] = "\"$@\"";
+	fargv[2] = 0;
+	shf->funcdef = mkautofn(shf);
+	return bin_eval(name, fargv, ops, func);
+    }
+
+    return loadautofn(shf);
+}
+
 /* Display or change the attributes of shell functions.   *
  * If called as autoload, it will define a new autoloaded *
  * (undefined) shell function.                            */
@@ -2012,10 +2035,10 @@ bin_functions(char *name, char **argv, char *ops, int func)
     int on = 0, off = 0, pflags = 0;
 
     /* Do we have any flags defined? */
-    if (ops['u'] == 1)
-	on |= PM_UNDEFINED;
-    else if (ops['u'] == 2)
+    if (ops['u'] == 2)
 	off |= PM_UNDEFINED;
+    else if (ops['u'] == 1 || ops['X'])
+	on |= PM_UNDEFINED;
     if (ops['U'] == 1)
 	on |= PM_UNALIASED|PM_UNDEFINED;
     else if (ops['U'] == 2)
@@ -2025,7 +2048,8 @@ bin_functions(char *name, char **argv, char *ops, int func)
     else if (ops['t'] == 2)
 	off |= PM_TAGGED;
 
-    if (off & PM_UNDEFINED) {
+    if ((off & PM_UNDEFINED) ||
+	(ops['X'] == 1 && (ops['m'] || *argv || !scriptname))) {
 	zwarnnam(name, "invalid option(s)", NULL, 0);
 	return 1;
     }
@@ -2037,10 +2061,22 @@ bin_functions(char *name, char **argv, char *ops, int func)
      * are given, we will print only functions containing these  *
      * flags, else we'll print them all.                         */
     if (!*argv) {
-	if (ops['U'] && !ops['u'])
-	    on &= ~PM_UNDEFINED;
-	scanhashtable(shfunctab, 1, on|off, DISABLED, shfunctab->printnode,
-		      pflags);
+	if (ops['X'] == 1) {
+	    if ((shf = (Shfunc) shfunctab->getnode(shfunctab, scriptname))) {
+		DPUTS(!shf->funcdef,
+		      "BUG: Calling autoload from empty function");
+	    } else {
+		shf = (Shfunc) zcalloc(sizeof *shf);
+		shfunctab->addnode(shfunctab, ztrdup(scriptname), shf);
+	    }
+	    shf->flags = on;
+	    return eval_autoload(shf, scriptname, ops, func);
+	} else {
+	    if (ops['U'] && !ops['u'])
+		on &= ~PM_UNDEFINED;
+	    scanhashtable(shfunctab, 1, on|off, DISABLED, shfunctab->printnode,
+			  pflags);
+	}
 	return 0;
     }
 
@@ -2061,8 +2097,14 @@ bin_functions(char *name, char **argv, char *ops, int func)
 			for (shf = (Shfunc) shfunctab->nodes[i]; shf;
 			     shf = (Shfunc) shf->next)
 			    if (pattry(pprog, shf->nam) &&
-				!(shf->flags & DISABLED))
-				shf->flags = (shf->flags | on) & (~off);
+				!(shf->flags & DISABLED)) {
+				shf->flags = (shf->flags |
+					      (on & ~PM_UNDEFINED)) & ~off;
+				if (ops['X'] &&
+				    eval_autoload(shf, shf->nam, ops, func)) {
+				    returnval = 1;
+				}
+			    }
 		    }
 		}
 	    } else {
@@ -2078,10 +2120,12 @@ bin_functions(char *name, char **argv, char *ops, int func)
     for (; *argv; argv++) {
 	if ((shf = (Shfunc) shfunctab->getnode(shfunctab, *argv))) {
 	    /* if any flag was given */
-	    if (on|off)
+	    if (on|off) {
 		/* turn on/off the given flags */
 		shf->flags = (shf->flags | (on & ~PM_UNDEFINED)) & ~off;
-	    else
+		if (ops['X'] && eval_autoload(shf, shf->nam, ops, func))
+		    returnval = 1;
+	    } else
 		/* no flags, so just print */
 		shfunctab->printnode((HashNode) shf, pflags);
 	} else if (on & PM_UNDEFINED) {
@@ -2091,6 +2135,8 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	    shf->flags = on;
 	    shf->funcdef = mkautofn(shf);
 	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
+	    if (ops['X'] && eval_autoload(shf, shf->nam, ops, func))
+		returnval = 1;
 	} else
 	    returnval = 1;
     }

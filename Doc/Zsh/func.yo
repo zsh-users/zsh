@@ -74,6 +74,29 @@ and any subsequent calls.  Without tt(KSH_AUTOLOAD) set, it will produce
 the initialization message on the first call, and the other message on the
 second and subsequent calls.
 
+It is also possible to create a function that is not marked autoloaded,
+yet loads its own definition by searching tt(fpath): `tt(autoload -X)',
+when called from within a shell function tt(myfunc), is equivalent to:
+
+example(unfunction myfunc
+autoload myfunc
+myfunc "$@")
+
+In fact, the tt(functions) command outputs `tt(builtin autoload -X)' as
+the body of an autoloaded function.  A true autoloaded function can be
+identifed by the presence of the comment `tt(# undefined)' in the body,
+because all comments are discarded from defined functions.  This is done
+so that
+
+example(eval "$(functions)")
+
+produces a reasonable result.
+
+To load the definition of an autoloaded function tt(myfunc) without
+executing tt(myfunc), use:
+
+example(autoload +X myfunc)
+
 sect(Special Functions)
 The following functions, if defined, have special meaning to
 the shell:
