@@ -174,7 +174,7 @@ while [[ -n "$state" ]]; do
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
       --no{pgp,md5} \
-      '*:RPM package file:->package_or_file' && ret=0
+      '*:RPM package file:->package_file' && ret=0
     ;;
   rebuild)
     _arguments -s \

@@ -1,3 +1,14 @@
+2000-04-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 10594: Functions/Prompts/prompt_bart_setup: Fix index into
+	$history in prompt_bart_precmd.
+
+	* 10591: Chmouel Boudjnah: Completion/User/_fakeroot: Completion
+	for the fakeroot program.
+
+	* 10590: Chmouel Boudjnah: Completion/Linux/_rpm: Signature
+	checking completes only local package files.
+
 2000-04-07  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 10584: Doc/Zsh/mod_stat.yo, Src/Modules/stat.c: -o shows

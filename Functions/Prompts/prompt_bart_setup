@@ -57,22 +57,13 @@ prompt_bart_precmd () {
     setopt localoptions noxtrace extendedglob noksharrays
 
     # Using psvar here protects against unwanted promptsubst expansions.
-    psvar[8]="$history[$#history]"	# Use history text, not just number
-    psvar[9]=''				# Padding before upper right prompt
+    psvar[8]="$history[$[${(%):-%h}-1]]" # Use history text, not just number
+    psvar[9]=''				 # Padding before upper right prompt
 
-    if [[ -o promptsubst ]]
-    then
-	# This is a bug workaround; ${(%)...} mishandles promptsubst
-	repeat $[COLUMNS-${#${(%f)${${(e)PS1}//[%]\{[^%]#%\}/}}[1]}-1]
-	do
-	    psvar[9]="$psvar[9] "
-	done
-    else
-	repeat $[COLUMNS-${#${(%f)${PS1//[%]\{[^%]#%\}/}}[1]}-1]
-	do
-	    psvar[9]="$psvar[9] "
-	done
-    fi
+    repeat $[COLUMNS-${#${(%%f)${PS1//[%]\{[^%]#%\}/}}[1]}-1]
+    do
+	psvar[9]="$psvar[9] "
+    done
 }
 
 prompt_bart_ps1 () {
