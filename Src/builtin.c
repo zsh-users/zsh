@@ -291,7 +291,7 @@ execbuiltin(LinkList args, Builtin bn)
 	    if (*arg) {
 		if(*arg == Meta)
 		    *++arg ^= 32;
-		zerr("bad option: -%c", NULL, *arg);
+		zwarn("bad option: -%c", NULL, *arg);
 		return 1;
 	    }
 	    arg = (char *) ugetnode(args);
@@ -3078,10 +3078,9 @@ err:
 	if(quiet) {
 	    zoptarg = metafy(optbuf, lenoptbuf, META_DUP);
 	} else {
-	    zerr(*p == '?' ? "bad option: -%c" :
-		"argument expected after -%c option", NULL, opch);
+	    zwarn(*p == '?' ? "bad option: -%c" :
+		  "argument expected after -%c option", NULL, opch);
 	    zoptarg=ztrdup("");
-	    errflag = 0;
 	}
 	return 0;
     }

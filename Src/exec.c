@@ -1824,8 +1824,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    if (!(hn = builtintab->getnode(builtintab, cmdarg))) {
 		if (cflags & BINF_BUILTIN) {
-		    zerr("no such builtin: %s", cmdarg, 0);
-		    errflag = lastval = 1;
+		    zwarn("no such builtin: %s", cmdarg, 0);
+		    lastval = 1;
 		    return;
 		}
 		break;
@@ -2085,7 +2085,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		execerr();
 	    }
 	    if (isset(RESTRICTED) && IS_WRITE_FILE(fn->type)) {
-		zerr("writing redirection not allowed in restricted mode", NULL, 0);
+		zwarn("writing redirection not allowed in restricted mode", NULL, 0);
 		execerr();
 	    }
 	    if (unset(EXECOPT))
@@ -2097,7 +2097,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    closemnodes(mfds);
 		    fixfds(save);
 		    if (errno != EINTR)
-			zerr("%e", NULL, errno);
+			zwarn("%e", NULL, errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 0);
@@ -2113,7 +2113,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    closemnodes(mfds);
 		    fixfds(save);
 		    if (errno != EINTR)
-			zerr("%e: %s", fn->name, errno);
+			zwarn("%e: %s", fn->name, errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 0);
@@ -2152,7 +2152,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    fixfds(save);
 		    if (fn->fd2 != -2)
 		    	sprintf(fdstr, "%d", fn->fd2);
-		    zerr("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr, errno);
+		    zwarn("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr, errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, fn->type == MERGEOUT);
@@ -2175,7 +2175,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    closemnodes(mfds);
 		    fixfds(save);
 		    if (errno != EINTR)
-			zerr("%e: %s", fn->name, errno);
+			zwarn("%e: %s", fn->name, errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 1);
@@ -2287,9 +2287,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		fflush(stdout);
 		if (save[1] == -2) {
 		    if (ferror(stdout)) {
-			zerr("write error: %e", NULL, errno);
+			zwarn("write error: %e", NULL, errno);
 			clearerr(stdout);
-			errflag = 0;
 		    }
 		} else
 		    clearerr(stdout);
@@ -3235,7 +3234,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
     if (prog == &dummy_eprog) {
 	/* We're not actually in the function; decrement locallevel */
 	locallevel--;
-	zerr("%s: function definition file not found", shf->nam, 0);
+	zwarn("%s: function definition file not found", shf->nam, 0);
 	locallevel++;
 	popheap();
 	return NULL;
@@ -3258,7 +3257,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	    execode(prog, 1, 0);
 	    shf = (Shfunc) shfunctab->getnode(shfunctab, n);
 	    if (!shf || (shf->flags & PM_UNDEFINED)) {
-		zerr("%s: function not defined by file", n, 0);
+		zwarn("%s: function not defined by file", n, 0);
 		popheap();
 		return NULL;
 	    }
@@ -3362,8 +3361,10 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 
 	if (!(shf = (Shfunc) shfunctab->getnode(shfunctab,
 						(name = fname)))) {
-	    zerr("%s: function not defined by file", name, 0);
-	    if (!noreturnval)
+	    zwarn("%s: function not defined by file", name, 0);
+	    if (noreturnval)
+		errflag = 1;
+	    else
 		lastval = 1;
 	    popheap();
 	    scriptname = oldscriptname;

@@ -541,8 +541,7 @@ handler(int sig)
 		alarm(tmout - idle);
 	    else {
 		errflag = noerrs = 0;
-		zerr("timeout", NULL, 0);
-		errflag = 0;
+		zwarn("timeout", NULL, 0);
 		stopmsg = 1;
 		zexit(SIGALRM, 1);
 	    }

@@ -1,3 +1,11 @@
+2000-10-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12869: Src/builtin.c, Src/exec.c, Src/glob.c, Src/signals.c,
+	Src/utils.c: Change several zerr() to zwarn(), either because
+	errflag was immediately cleared after calling zerr(), or to make
+	builtin commands fail normally (with nonzero exit status) rather
+	than aborting all the way back to top level.
+
 2000-10-01  Clint Adams  <schizo@debian.org>
 
 	* unposted: Src/Zle/compresult.c: remove unused variable declaration.

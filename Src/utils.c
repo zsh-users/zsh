@@ -2404,12 +2404,11 @@ attachtty(pid_t pgrp)
 	    else {
 		if (errno != ENOTTY)
 		{
-		    zerr("can't set tty pgrp: %e", NULL, errno);
+		    zwarn("can't set tty pgrp: %e", NULL, errno);
 		    fflush(stderr);
 		}
 		opts[MONITOR] = 0;
 		ep = 1;
-		errflag = 0;
 	    }
 	}
     }

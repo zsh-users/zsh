@@ -573,8 +573,7 @@ scanner(Complist q)
 			if (statfullpath(fn, &buf, !q->follow)) {
 			    if (errno != ENOENT && errno != EINTR &&
 				errno != ENOTDIR && !errflag) {
-				zerr("%e: %s", fn, errno);
-				errflag = 0;
+				zwarn("%e: %s", fn, errno);
 			    }
 			    continue;
 			}
