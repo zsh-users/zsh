@@ -1,5 +1,8 @@
 2001-04-21  Bart Schaefer  <schaefer@zsh.org>
 
+	* 14062: Src/Modules/termcap.c: Avoid including both old-style
+	termcap.h and ncurses term.h at the same time (see 13965).
+
 	* 14060: Src/builtin.c, Src/lex.c, Src/params.c,
 	Test/D06subscript.ztst: Fix problem with ${array[ix]=value}
 	introduced by 14008; fix long-standing problems with

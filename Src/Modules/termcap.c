@@ -37,20 +37,22 @@ static char termcap_nam[] = "termcap";
 /* echotc: output a termcap */
 
 #ifdef HAVE_TGETENT
-# ifdef HAVE_TERMCAP_H
-#  include <termcap.h>
-#  ifdef HAVE_TERM_H
-#   include <term.h>
-#  endif
-# else
+# if defined(HAVE_CURSES_H) && defined(HAVE_TERM_H)
 #  ifdef HAVE_TERMIO_H
 #   include <termio.h>
 #  endif
-#  ifdef HAVE_CURSES_H
-#   include <curses.h>
-#  endif
-#  ifdef HAVE_TERM_H
-#   include <term.h>
+#  include <curses.h>
+#  include <term.h>
+# else
+#  ifdef HAVE_TERMCAP_H
+#   include <termcap.h>
+#  else
+#   ifdef HAVE_CURSES_H
+#    include <curses.h>
+#   endif
+#   ifdef HAVE_TERM_H
+#    include <term.h>
+#   endif
 #  endif
 # endif
 
@@ -356,7 +358,9 @@ int
 boot_(Module m)
 {
 #ifdef HAVE_TGETENT
+# if defined(HAVE_CURSES_H) && defined(HAVE_TERM_H)
     setupterm((char *)0, 1, (int *)0);
+# endif
 
     if (!createtchash())
     	return 1;
@@ -376,7 +380,7 @@ cleanup_(Module m)
 
     incleanup = 1;
 
-#ifdef HAVE_TGETENTR
+#ifdef HAVE_TGETENT
     if ((pm = (Param) paramtab->getnode(paramtab, termcap_nam)) &&
 	pm == termcap_pm) {
 	pm->flags &= ~PM_READONLY;
