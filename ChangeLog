@@ -1,5 +1,8 @@
 2005-01-22  Clint Adams  <clint@zsh.org>
 
+	* 20736: Src/Zle/zle_utils.c: change zlegetline() to return
+	a metafied string.
+
 	* unposted (cf. zsh-users/8412): Config/version.mk: fix
 	year typo.
 

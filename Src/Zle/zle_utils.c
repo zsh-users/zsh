@@ -72,14 +72,11 @@ sizeline(int sz)
 
 /*
  * Insert a character, called from main shell.
- *
- * WCHAR: type is wrong, should be a genuine wide character,
- * when available in the caller.
  */
 
 /**/
 mod_export void
-zleaddtoline(int chr)
+zleaddtoline(ZLE_CHAR_T chr)
 {
     spaceinline(1);
     zleline[zlecs++] = chr;
@@ -109,15 +106,13 @@ zlegetline(int *ll, int *cs)
     }
 
     *ll = mb_len;
-
-    return (unsigned char *)s;
 #else
     *ll = zlell;
     *cs = zlecs;
 
     s = ztrdup(zleline);
-    return (unsigned char *)s;
 #endif
+    return (unsigned char *) metafy((char *) s, zlell, META_REALLOC);
 }
 
 
