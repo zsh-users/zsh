@@ -808,7 +808,7 @@ doisearch(char **args, int dir)
 			else
 			    pos -= 1 + (pos != 1 && s[pos-2] == Meta);
 		    } else if (sbuf[0] != '^') {
-			if (pos >= strlen(s+1))
+			if (pos >= (int)strlen(s+1))
 			    skip_line = 1;
 			else
 			    pos += 1 + (s[pos] == Meta);

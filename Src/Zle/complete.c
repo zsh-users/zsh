@@ -788,7 +788,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 	if (!na)
 	    return 1;
 	if (na > 0 &&
-	    strlen(test == CVT_PRENUM ? compprefix : compsuffix) >= na) {
+	    (int)strlen(test == CVT_PRENUM ? compprefix : compsuffix) >= na) {
 	    if (mod) {
 		if (test == CVT_PRENUM)
 		    ignore_prefix(na);

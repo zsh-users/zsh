@@ -431,7 +431,7 @@ zfunalarm(void)
 	 * I love the way alarm() uses unsigned int while time_t
 	 * is probably something completely different.
 	 */
-	time_t tdiff = time(NULL) - oaltime;
+	unsigned int tdiff = time(NULL) - oaltime;
 	alarm(oalremain < tdiff ? 1 : oalremain - tdiff);
     } else
 	alarm(0);

@@ -2892,7 +2892,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     sl = strlen(s);
     if (swe > sl) {
 	swe = sl;
-	if (strlen(ns) > swe - swb + 1)
+	if ((int)strlen(ns) > swe - swb + 1)
 	    ns[swe - swb + 1] = '\0';
     }
     qs = tricat(multiquote(s + swe, 0), qisuf, "");

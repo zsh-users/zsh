@@ -1033,7 +1033,7 @@ tc_rightcurs(int ct)
    if we're anywhere in the prompt, goto the left column and write the whole
    prompt out unless ztrlen(lpromptbuf) == lpromptw : we can cheat then */
     if (vln == 0 && i < lpromptw && !(termflags & TERM_SHORT)) {
-	if (strlen(lpromptbuf) == lpromptw)
+	if ((int)strlen(lpromptbuf) == lpromptw)
 	    fputs(lpromptbuf + i, shout);
 	else if (tccan(TCRIGHT) && (tclen[TCRIGHT] * ct <= ztrlen(lpromptbuf)))
 	    /* it is cheaper to send TCRIGHT than reprint the whole prompt */
