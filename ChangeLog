@@ -1,3 +1,7 @@
+2000-05-05  Tanaka Akira  <akr@zsh.org>
+
+	* 11190: Completion/User/_look: new completion for look.
+
 2000-05-05  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11185: Etc/CONTRIBUTORS: updated for 3.1.7.
