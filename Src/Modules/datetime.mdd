@@ -1,0 +1,8 @@
+name=zsh/datetime
+
+link=either
+load=no
+
+autobins="strftime"
+
+objects="datetime.o"

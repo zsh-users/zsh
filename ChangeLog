@@ -1,5 +1,8 @@
 2002-05-26  Clint Adams  <clint@zsh.org>
 
+	* 17235: Src/Modules/datetime.c, Src/Modules/datetime.mdd:
+	strftime builtin.
+
 	* 17234: Completion/Unix/Command/_cvs:
 	don't call _path_files with empty ().
 
