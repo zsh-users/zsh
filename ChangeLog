@@ -1,5 +1,10 @@
 2002-02-16  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* users/4678: Src/hist.c: Fixed a hard-to-trigger bug in the
+	history-rewriting code that could lose the history contents.
+
+2002-02-16  Wayne Davison  <wayned@users.sourceforge.net>
+
 	* 16625: Src/hist.c: Optimized putoldhistentryontop() for use by
 	resizehistents().
 
