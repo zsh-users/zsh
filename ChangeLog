@@ -1,3 +1,14 @@
+2001-04-05  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* unposted: Functions/Prompts/prompt_bart_setup: Better handling
+	of long command strings, more efficient padding computation.
+
+	* users/3795: Functions/Misc/getjobs: Insert history entries
+	with the original job texts for jobs resumed with fg/bg/etc.
+
+	* users/3401: Functions/Misc/promptnl: Finally added this
+	function, with extensive additional comments on usage, etc.
+
 2001-04-05  Clint Adams  <schizo@debian.org>
 
 	* 13909: Completion/Base/.distfiles, Completion/X/.distfiles,
