@@ -1,3 +1,8 @@
+2002-05-16  Peter Stephenson  <pws@csr.com>
+
+	* 17171: Src/Modules/tcp.c: ztcp didn't return status 1 when a
+	connect() failed.
+
 2002-05-15  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 17166: Src/Modules/zftp.c: must check fileno of zftp control

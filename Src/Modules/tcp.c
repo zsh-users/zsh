@@ -636,6 +636,8 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	if (err) {
 	    zwarnnam(nam, "connection failed: %e", NULL, errno);
 	    tcp_close(sess);
+	    zsfree(desthost);
+	    return 1;
 	}
 	else
 	{
