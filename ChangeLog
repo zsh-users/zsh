@@ -1,3 +1,8 @@
+2000-04-18  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+
+	* 10798: Src/Zle/compmatch.c: join_clines() tested the wrong
+ 	variable
+	
 2000-04-17  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 10789: Doc/Zsh/expn.yo: better documentation for <(...) and

@@ -1893,10 +1893,10 @@ join_clines(Cline o, Cline n)
 			    for (tt = o;
 				 (to = tt->next) &&
 				     !cmp_anchors(tn, to, 1); tt = to);
-			    if (tt)
+			    if (to)
 				break;
 			}
-			if (tt) {
+			if (to) {
 			    diff = sub_join(n, o, to, 1);
 
 			    if (po)
