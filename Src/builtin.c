@@ -4239,22 +4239,19 @@ bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
 	scriptname = "(eval)";
 
     prog = parse_string(zjoin(argv, ' ', 1));
-    if (!prog) {
-	errflag = 0;
-        scriptname = oscriptname;
-        ineval = oineval;
-	return 1;
+    if (prog) {
+	lastval = 0;
+
+	execode(prog, 1, 0);
+
+	if (errflag)
+	    lastval = errflag;
+    } else {
+	lastval = 1;
     }
 
-    lastval = 0;
 
-    execode(prog, 1, 0);
-
-    if (errflag) {
-	lastval = errflag;
-	errflag = 0;
-    }
-
+    errflag = 0;
     scriptname = oscriptname;
     ineval = oineval;
 
