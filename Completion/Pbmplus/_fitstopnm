@@ -1,4 +1,0 @@
-#compdef fitstopnm
-
-_arguments '-image:image number:' '-noraw' '-scanmax' '-printmax' \
-           '-min:minimum value:' '-max:maximum value:' ':file: _pbm_file'

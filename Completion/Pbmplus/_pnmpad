@@ -1,6 +1,0 @@
-#compdef pnmpad
-
-_arguments '-black' '-white' \
-           '-l-:left border width:' '-r-:right border width:' \
-           '-t-:top border width:' '-b-:bottom border width:' \
-           ':file: _pbm_file'

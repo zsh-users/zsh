@@ -1,5 +1,0 @@
-#compdef rawtopgm
-
-_arguments '-headerskip:header bytes to skip:' \
-           '-rowskip:row padding to skip:' \
-	   ':width:' ':height:' ':grayscale bytes:'

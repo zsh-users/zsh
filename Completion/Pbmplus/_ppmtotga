@@ -1,3 +1,0 @@
-#compdef ppmtotga
-
-_arguments '-mono' '-cmap' '-rgb' '-norle' ':file: _pbm_file'

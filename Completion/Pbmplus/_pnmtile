@@ -1,3 +1,0 @@
-#compdef pnmtile
-
-_arguments ':width:' ':height:' ':file: _pbm_file'

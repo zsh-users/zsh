@@ -1,3 +1,0 @@
-#compdef ppmtobmp
-
-_arguments '-os2' '-windows' ':file: _pbm_file'

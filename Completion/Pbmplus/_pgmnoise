@@ -1,3 +1,0 @@
-#compdef pgmnoise
-
-_arguments ':width:' ':height:'

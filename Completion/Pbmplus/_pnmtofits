@@ -1,3 +1,0 @@
-#compdef pnmtofits
-
-_arguments '-max:maximum value:' '-min:minimum value:' ':file: _pbm_file'

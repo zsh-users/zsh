@@ -1,3 +1,0 @@
-#compdef ppmbrighten
-
-_arguments '-n' '-s:saturation:' '-v:value:' ':file: _pbm_file'

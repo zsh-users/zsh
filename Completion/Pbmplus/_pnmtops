@@ -1,5 +1,0 @@
-#compdef pnmtops
-
-_arguments '-scale:scale factor:' '-turn' '-noturn' '-rle' '-runlength' \
-           '-dpi:output resolution:' \
-           '-width:page width:' '-height:page height' ':file: _pbm_file'

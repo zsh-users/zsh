@@ -1,3 +1,0 @@
-#compdef pnmenlarge
-
-_arguments ':enlargement factor:' ':file: _pbm_file'

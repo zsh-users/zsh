@@ -1,3 +1,0 @@
-#compdef pbmtoepsi
-
-_arguments '--bbonly' ':file: _pbmfile'

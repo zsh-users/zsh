@@ -1,3 +1,0 @@
-#compdef ppmtosixel
-
-_arguments '-raw' '-margin' ':file: _pbm_file'

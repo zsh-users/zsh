@@ -1,6 +1,0 @@
-#compdef ppmtopj
-
-_arguments '-gamma:gamma value:' '-xpos:x position:' '-rle' '-center' \
-           '-ypos:y position:' '-back:background brightness:(dark lite)' \
-	   '-render:rendering algorithm:(none snap bw dither diffuse monodither monodiffuse clusterdither monoclusterdither)' \
-	   ':file: _pbm_file'

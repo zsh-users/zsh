@@ -1,3 +1,0 @@
-#compdef ppmshift
-
-_arguments ':shift value:' ':file: _pbm_file'

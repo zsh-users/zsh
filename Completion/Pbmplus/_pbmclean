@@ -1,3 +1,0 @@
-#compdef pbmclean
-
-_arguments '-connect' ':file: _pbm_file'

@@ -1,3 +1,0 @@
-#compdef ppmntsc
-
-_arguments ':dim factor:' ':file: _pbm_file'

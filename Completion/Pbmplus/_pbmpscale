@@ -1,3 +1,0 @@
-#compdef pbmpscale
-
-_arguments ':scale factor:' ':file: _pbm_file'

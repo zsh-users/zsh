@@ -1,6 +1,0 @@
-#compdef pnmpaste
-
-_arguments '-replace' '-or' '-and' '-xor' \
-           ':"from" picture file:_pbm_file' \
-	   ':x position:' ':y position:' \
-	   ':"into" picture file:_pbm_file'

@@ -1,3 +1,0 @@
-#compdef pgmkernel
-
-_arguments '-weight:weight:' ':width:' ':height:'

@@ -1,5 +1,0 @@
-#compdef pgmcrater
-
-_arguments '-number:number of craters:' '-gamma:factor:' \
-           '-height:height:' '-ysize:height:' \
-	   '-width:width:'   '-xsize:width:'

@@ -1,3 +1,0 @@
-#compdef zeisstopnm
-
-_arguments '-pgm' '-ppm' ':file: _pbm_file'

@@ -1,6 +1,0 @@
-#compdef rawtoppm
-
-_arguments '-headerskip:header bytes to skip:' \
-           '-rowskip:row padding to skip:' \
-	   '-rgb' '-rbg' '-grb' '-gbr' '-brg' '-bgr' '-interpixel' '-interrow' \
-	   ':width:' ':height:' ':grayscale bytes:'

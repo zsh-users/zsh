@@ -1,3 +1,0 @@
-#compdef pbmtolps
-
-_arguments '-dpi:resolution:' ':file: _pbm_file'

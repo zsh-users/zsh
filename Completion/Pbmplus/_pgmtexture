@@ -1,3 +1,0 @@
-#compdef pgmtexture
-
-_arguments '-d:distance:' ':file: _pbm_file'

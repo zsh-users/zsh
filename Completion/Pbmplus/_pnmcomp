@@ -1,5 +1,0 @@
-#compdef pnmcomp
-
-_arguments '-invert' '-xoff:x offset:' '-yoff:y offset:' \
-           '-alpha:alpha mask file:_files -g *.(#i)pgm' \
-	   ':overlay file:_pbm_file' '*:file: _pbm_file'

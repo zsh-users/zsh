@@ -1,4 +1,0 @@
-#compdef pnmcat
-
-_arguments '-white' '-black' '-leftright' '-lr' '-topbottom' '-tb' \
-           '-jtop' '-jbottom' '-jleft' '-jright' '*:file: _pbm_file'

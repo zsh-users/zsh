@@ -1,3 +1,0 @@
-#compdef ppmtoilbm
-
-_arguments '-hamif' ':file: _pbm_file'

@@ -1,3 +1,0 @@
-#compdef pbmto10x
-
-_arguments '-h' ':file: _pbm_file'

@@ -1,4 +1,0 @@
-#compdef pbmtomacp
-
-_arguments '-l:left offset:' '-r:right offset:' \
-           '-t:top offset:'  '-b:bottom offset:' ':file: _pbm_file'

@@ -1,3 +1,0 @@
-#compdef ppmtoyuvsplit
-
-_arguments ':base name:' ':file: _pbm_file'

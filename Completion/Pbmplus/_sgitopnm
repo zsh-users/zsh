@@ -1,3 +1,0 @@
-#compdef sgitopnm
-
-_arguments '-verbose' ':file: _pbm_file'

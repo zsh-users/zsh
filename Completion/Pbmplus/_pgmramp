@@ -1,3 +1,0 @@
-#compdef pgmramp
-
-_arguments '-lr' '-tb' '-rectangle' '-ellipse' ':width:' ':height:'

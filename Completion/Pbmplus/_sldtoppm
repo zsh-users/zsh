@@ -1,7 +1,0 @@
-#compdef sldtoppm
-
-_arguments '-adjust' '-dir' '-info' '-verbose' \
-	   '-width:width:'   '-xsize:width:' \
-           '-height:height:' '-ysize:height:' \
-	   '-scale:scale factor:' \
-	   '-lib:slide name:' '-Lib:slide name:' ':file: _pbm_file'

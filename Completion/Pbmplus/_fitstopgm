@@ -1,3 +1,0 @@
-#compdef fitstopgm
-
-_arguments '-image:image number:' ':file: _pbm_file'

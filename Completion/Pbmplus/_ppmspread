@@ -1,3 +1,0 @@
-#compdef ppmspread
-
-_arguments ':maximum spread amount:' ':file: _pbm_file'

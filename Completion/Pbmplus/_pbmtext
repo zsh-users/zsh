@@ -1,3 +1,0 @@
-#compdef pbmtext
-
-_arguments '-font:font file:_files -g *.(#i)pbm' '*:text:'

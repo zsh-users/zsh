@@ -1,3 +1,0 @@
-#compdef ppmdim
-
-_arguments ':diminishing factor:' ':file: _pbm_file'

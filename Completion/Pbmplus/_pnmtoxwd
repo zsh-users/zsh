@@ -1,4 +1,0 @@
-#compdef pnmtoxwd
-
-_arguments '-pseudodepth:depth of PseudoColor dumps:' '-directcolor' \
-           ':file: _pbm_file'

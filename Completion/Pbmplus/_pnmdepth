@@ -1,3 +1,0 @@
-#compdef pnmdepth
-
-_arguments ':new maximum value:' ':file: _pbm_file'
