@@ -1067,12 +1067,12 @@ default_bindings(void)
      * Both standard and keypad modes are supported.                  */
 
     /* vi command mode: arrow keys */
-    bindkey(amap, "\33[A",  refthingy(t_viuplineorhistory), NULL);
-    bindkey(amap, "\33[B",  refthingy(t_vidownlineorhistory), NULL);
+    bindkey(amap, "\33[A",  refthingy(t_uplineorhistory), NULL);
+    bindkey(amap, "\33[B",  refthingy(t_downlineorhistory), NULL);
     bindkey(amap, "\33[C",  refthingy(t_viforwardchar), NULL);
     bindkey(amap, "\33[D",  refthingy(t_vibackwardchar), NULL);
-    bindkey(amap, "\33OA",  refthingy(t_viuplineorhistory), NULL);
-    bindkey(amap, "\33OB",  refthingy(t_vidownlineorhistory), NULL);
+    bindkey(amap, "\33OA",  refthingy(t_uplineorhistory), NULL);
+    bindkey(amap, "\33OB",  refthingy(t_downlineorhistory), NULL);
     bindkey(amap, "\33OC",  refthingy(t_viforwardchar), NULL);
     bindkey(amap, "\33OD",  refthingy(t_vibackwardchar), NULL);
 

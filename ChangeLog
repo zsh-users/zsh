@@ -1,3 +1,8 @@
+2000-12-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* Zefram: 13290: Src/Zle/zle_bindings.c, Src/Zle/zle_keymap.c:
+	Back out 13285.
+
 2000-12-17  Clint Adams  <schizo@debian.org>
 
 	* 13288: Src/Modules/zftp.c: cast pointers when calling
