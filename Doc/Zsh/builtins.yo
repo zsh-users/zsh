@@ -33,6 +33,11 @@ If any arguments var(arg) are given,
 they become the positional parameters; the old positional
 parameters are restored when the var(file) is done executing.
 The exit status is the exit status of the last command executed.
+
+If a file named `var(file)tt(.zwc)' exists, is newer than var(file)
+and is a wordcode created with the tt(zcompile) builtin containing the 
+contents of var(file), that file will be used. This allows to speed up 
+processing of scripts by creating pre-compiled wordcode files for them.
 )
 findex(NOTRANS(:))
 cindex(expanding parameters)
@@ -1286,10 +1291,10 @@ Equivalent to tt(whence -c).
 findex(zcompile)
 cindex(wordcode, creation)
 cindex(compilation)
-xitem(tt(zcompile) [ tt(-U) ] [ tt(-r) | tt(-m) ] var(file) [ var(function) ... ])
+xitem(tt(zcompile) [ tt(-U) ] [ tt(-r) | tt(-m) ] var(file) [ var(name) ... ])
 item(tt(zcompile -t) var(file) [ var(name) ... ])(
 This builtin command can be used to create and display files
-containing the wordcode for functions. In the first form, a wordcode
+containing the wordcode for functions or scripts. In the first form, a wordcode
 file is created. If called with only the var(file) argument, the
 wordcode file has the name `var(file)tt(.zwc)' and will be placed in
 the same directory as the var(file). This will make the wordcode file
@@ -1303,24 +1308,29 @@ noderef(Functions)
 )
 for a description of how autoloaded functions are searched).
 
-If there is at least one var(function) argument, the wordcode for all
-these functions will be put in the created wordcode var(file) (if that 
+If there is at least one var(name) argument, the wordcode for all
+these files will be put in the created wordcode var(file) (if that 
 name does not end in tt(.zwc), this extension is automatically
-appended). Such files containing the code for multiple functions are
-intended to be used as elements of the tt(FPATH)/tt(fpath) special array.
+appended). Such digest files are intended to be used as elements of
+the tt(FPATH)/tt(fpath) special array.
 
-If the tt(-U) option is given, aliases in the var(function)s will not
-be expanded. If the tt(-r) option is given, the function(s) in the
+If the tt(-U) option is given, aliases in the var(name)d files will not
+be expanded. If the tt(-r) option is given, the wordcode in the
 file will be read and copied into the shell's memory when they are
-autoloaded. If the tt(-m) option is given instead, the wordcode file
+used. If the tt(-m) option is given instead, the wordcode file
 will be mapped into the shell's memory. This is done in such a way
 that multiple instances of the shell running on the same host will
-share this mapped function. If neither tt(-r) nor tt(-m) are given,
+share this mapped file. If neither tt(-r) nor tt(-m) are given,
 the tt(zcompile) builtin decides which style is used based on the size 
 of the resulting wordcode file. On some systems it is impossible to
-map wordcode files into memory. On such systems, the functions will
-only be read from the files, independent on the mode selected when the 
+map wordcode files into memory. On such systems, the wordcode will
+only be read from the file, independent on the mode selected when the 
 file was created.
+
+When creating wordcode files for scripts instead of functions, it is
+often better to use the tt(-r) option. Otherwise the whole wordcode
+file will remain mapped if the script defined one or more functions
+even if the rest of the file will not be used again.
 
 In every case, the created file contains two versions of the wordcode, 
 one for big-endian machines and one for small-endian machines. The
@@ -1329,12 +1339,12 @@ it is read or mapped, only one half of the file will really be used
 (and mapped).
 
 In the second form, with the tt(-t) option, an existing wordcode file is
-tested. Without further arguments, the names of the function files
+tested. Without further arguments, the names of the original files
 used for it are listed. The first line tells the version of the shell
 the file was created with and how the file will be used (mapping or
 reading the file). With arguments, only the return value is set
-to zero if all var(name)s name functiones defined in the file and
-non-zero if at least one var(name) is not contained in the wordcode file.
+to zero if all var(name)s name files contained in the wordcode file and
+non-zero if at least one var(name) is not contained in it.
 )
 findex(zmodload)
 cindex(modules, loading)

@@ -890,12 +890,15 @@ init_misc(void)
 int
 source(char *s)
 {
+    Eprog prog;
     int tempfd, fd, cj, oldlineno;
     int oldshst, osubsh, oloops;
     FILE *obshin;
-    char *old_scriptname = scriptname;
+    char *old_scriptname = scriptname, *us;
 
-    if (!s || (tempfd = movefd(open(unmeta(s), O_RDONLY | O_NOCTTY))) == -1) {
+    if (!s || 
+	(!(prog = try_source_file((us = unmeta(s)))) &&
+	 (tempfd = movefd(open(us, O_RDONLY | O_NOCTTY))) == -1)) {
 	return 1;
     }
 
@@ -908,8 +911,10 @@ source(char *s)
     oloops    = loops;           /* stored the # of nested loops we are in    */
     oldshst   = opts[SHINSTDIN]; /* store current value of this option        */
 
-    SHIN = tempfd;
-    bshin = fdopen(SHIN, "r");
+    if (!prog) {
+	SHIN = tempfd;
+	bshin = fdopen(SHIN, "r");
+    }
     subsh  = 0;
     lineno = 1;
     loops  = 0;
@@ -917,14 +922,24 @@ source(char *s)
     scriptname = s;
 
     sourcelevel++;
-    loop(0, 0);			/* loop through the file to be sourced        */
+    if (prog) {
+	pushheap();
+	errflag = 0;
+	execode(prog, 1, 0);
+	popheap();
+    } else
+	loop(0, 0);		     /* loop through the file to be sourced        */
     sourcelevel--;
-    fclose(bshin);
-    fdtable[SHIN] = 0;
 
     /* restore the current shell state */
-    SHIN = fd;                       /* the shell input fd                   */
-    bshin = obshin;                  /* file handle for buffered shell input */
+    if (prog)
+	freeeprog(prog);
+    else {
+	fclose(bshin);
+	fdtable[SHIN] = 0;
+	SHIN = fd;		     /* the shell input fd                   */
+	bshin = obshin;		     /* file handle for buffered shell input */
+    }
     subsh = osubsh;                  /* whether we are in a subshell         */
     thisjob = cj;                    /* current job number                   */
     lineno = oldlineno;              /* our current lineno                   */

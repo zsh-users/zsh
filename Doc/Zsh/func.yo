@@ -33,14 +33,25 @@ cindex(autoloading functions)
 cindex(functions, autoloading)
 A function can be marked as em(undefined) using the tt(autoload) builtin
 (or `tt(functions -u)' or `tt(typeset -fu)').  Such a function has no
-body.  When the function is first executed, each element of the tt(fpath)
-variable will first be searched for a file with the same name as the
-function plus the extension tt(.zwc) and then with the name of the
-function.  The first file will only be used if it was created with the 
-tt(zcompile) builtin command, if it contains the wordcode for the
-function and it is either older than the file with the name of the
-function in the same directory or if such a file does not exist.  The
-usual alias expansion during reading will be suppressed
+body.  When the function is first executed, the definition for it will 
+be searched using the elements of the tt(fpath) variable. For each
+element, the shell looks for three files: the element plus the
+extension tt(.zwc), a file named after the function plus the extension 
+tt(.zwc) in a directory named by the element of tt(fpath) and the name 
+of the function without the extension in the same directory. The
+youngest of these files will be used to get the definition for the
+function. The files with the tt(.zwc) extension should be wordcode
+files created with the tt(zcompile) builtin command. The first one
+(with the name of the element from tt(fpath) plus the extension) is
+normally used to contain the definitions for all functions in the
+directory. The latter is intended to be used for individual wordcode
+files for single functions. But of course it is also possible to
+create any number of wordcode files and put their names (including the 
+extension) in the tt(fpath) variable. In that case these files will be 
+searched for the definition of the function directly without comparing 
+its age to that of other files.
+
+The usual alias expansion during reading will be suppressed
 if the tt(autoload) builtin or its equivalent is given the option
 tt(-U), for wordcode files this has to be decided when creating the
 file with the tt(-U) option of the tt(zcompile) builtin command;

@@ -46,3 +46,7 @@ a test of the form `tt(if [[ -o rcs ]]; then ...)' so that it will not
 be executed when zsh is invoked with the `tt(-f)' option.
 ifnzman(includefile(Zsh/filelist.yo))
 
+For all of these files pre-compiled wordcode files may be created with
+the tt(zcompile) builtin command. If such a files exists (names like
+the original file plus the tt(.zwc) extension) and it is younger than
+the original file, the wordcode file will be used instead.

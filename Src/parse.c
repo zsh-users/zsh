@@ -2252,7 +2252,8 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	    zerrnam(nam, "too few arguments", NULL, 0);
 	    return 1;
 	}
-	if (!(f = load_dump_header(*args))) {
+	if (!(f = load_dump_header(*args)) &&
+	    !(f = load_dump_header(dyncat(*args, FD_EXT)))) {
 	    zerrnam(nam, "invalid dump file: %s", *args, 0);
 	    return 1;
 	}
@@ -2280,7 +2281,9 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
     if (!args[1])
 	return build_dump(nam, dyncat(*args, FD_EXT), args, ops['U'], map);
 
-    return build_dump(nam, *args, args + 1, ops['U'], map);
+    return build_dump(nam,
+		      (strsfx(FD_EXT, *args) ? *args : dyncat(*args, FD_EXT)),
+		      args + 1, ops['U'], map);
 }
 
 /* Load the header of a dump file. Returns NULL if the file isn't a
@@ -2538,20 +2541,93 @@ load_dump_file(char *dump, int other, int len)
 
 #endif
 
-/* See if `dump' is the name of a dump file and it has the definition
- * for the function `name'. If so, return an eprog for it. */
+/* Try to load a function from one of the possible wordcode files for it.
+ * The first argument is a element of $fpath, the second one is the name
+ * of the function searched and the last one is the possible name for the
+ * uncompiled function file (<path>/<func>). */
 
 /**/
 Eprog
-try_dump_file(char *dump, char *name, char *func)
+try_dump_file(char *path, char *name, char *file)
 {
-    char *file;
+    Eprog prog;
+    struct stat std, stc, stn;
+    int rd, rc, rn;
+    char *dig, *wc;
+
+    if (strsfx(FD_EXT, path))
+	return check_dump_file(path, name);
+
+    dig = dyncat(path, FD_EXT);
+    wc = dyncat(file, FD_EXT);
+
+    rd = stat(dig, &std);
+    rc = stat(wc, &stc);
+    rn = stat(file, &stn);
+
+    /* See if there is a digest file for the directory, it is younger than
+     * both the uncompiled function file and its compiled version (or they
+     * don't exist) and the digest file contains the definition for the
+     * function. */
+    if (!rd &&
+	(rc || std.st_mtime > stc.st_mtime) &&
+	(rn || std.st_mtime > stn.st_mtime) &&
+	(prog = check_dump_file(dig, name)))
+	return prog;
+
+    /* No digest file. Now look for the per-function compiled file. */
+    if (!rc &&
+	(rn || stc.st_mtime > stn.st_mtime) &&
+	(prog = check_dump_file(wc, name)))
+	return prog;
+
+    /* No compiled file for the function. The caller (getfpfunc() will
+     * check if the directory contains the uncompiled file for it. */
+    return NULL;
+}
+
+/* Almost the same, but for sourced files. */
+
+/**/
+Eprog
+try_source_file(char *file)
+{
+    Eprog prog;
+    struct stat stc, stn;
+    int rc, rn;
+    char *wc, *tail;
+
+    if ((tail = strrchr(file, '/')))
+	tail++;
+    else
+	tail = file;
+
+    if (strsfx(FD_EXT, file))
+	return check_dump_file(file, tail);
+
+    wc = dyncat(file, FD_EXT);
+
+    rc = stat(wc, &stc);
+    rn = stat(file, &stn);
+
+    if (!rc && (rn || stc.st_mtime > stn.st_mtime) &&
+	(prog = check_dump_file(wc, tail)))
+	return prog;
+
+    return NULL;
+}
+
+/* See if `file' names a wordcode dump file and that contains the
+ * definition for the function `name'. If so, return an eprog for it. */
+
+/**/
+static Eprog
+check_dump_file(char *file, char *name)
+{
     int isrec = 0;
     Wordcode d;
     FDHead h;
     FuncDump f;
-
-    file = (strsfx(FD_EXT, dump) ? dump : dyncat(dump, FD_EXT));
 
 #ifdef USE_MMAP
 
@@ -2575,24 +2651,9 @@ try_dump_file(char *dump, char *name, char *func)
 
 #endif
 
-    if (!f && (isrec || !(d = load_dump_header(file)))) {
-	if (!isrec) {
-	    struct stat stc, stn;
-	    char *p = (char *) zhalloc(strlen(dump) + strlen(name) +
-				       strlen(FD_EXT) + 2);
+    if (!f && (isrec || !(d = load_dump_header(file))))
+	return NULL;
 
-	    sprintf(p, "%s/%s%s", dump, name, FD_EXT);
-
-	    /* Ignore the dump file if it is older than the normal one. */
-	    if (stat(p, &stc) || (!stat(func, &stn) && stn.st_mtime > stc.st_mtime))
-		return NULL;
-
-	    if (!(d = load_dump_header(file = p)))
-		return NULL;
-
-	} else
-	    return NULL;
-    }
     if ((h = dump_find_func(d, name))) {
 	/* Found the name. If the file is already mapped, return the eprog,
 	 * otherwise map it and just go up. */
@@ -2698,6 +2759,7 @@ decrdumpcount(FuncDump f)
 		dumps = p->next;
 	    munmap((void *) f->addr, f->len);
 	    zclose(f->fd);
+	    zsfree(f->name);
 	    zfree(f, sizeof(*f));
 	}
     }
