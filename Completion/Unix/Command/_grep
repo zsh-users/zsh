@@ -1,25 +1,39 @@
-#compdef grep egrep fgrep
+#compdef grep egrep fgrep -value-,GREP_OPTIONS,-default-
 # Ulrik Haugen 2001
 
-local arguments matchers
+local arguments matchers command
+
+if [[ $service = *GREP_OPT* ]]; then
+  compset -q
+  words=( fake "$words[@]" )
+  (( CURRENT++ ))
+  command=grep
+else
+  arguments=(
+    '(-e --regexp -f --file)1: :_guard "^--*" pattern'
+    '*:files:->files'
+  )
+  command="$words[1]"
+fi
 
 (( $+_is_gnu )) || typeset -gA _is_gnu
 
-if (( ! $+_is_gnu[$words[1]] )); then
-  if [[ $(_call_program version $words[1] --help </dev/null 2>/dev/null) = *gnu* ]]
+if (( ! $+_is_gnu[$command] )); then
+  if [[ $(_call_program version $command --help </dev/null 2>/dev/null) = *gnu* ]]
   then
-    _is_gnu[$words[1]]=yes
+    _is_gnu[$command]=yes
   else
-    _is_gnu[$words[1]]=
+    _is_gnu[$command]=
   fi
 fi
 
 if [[ $service != [ef]grep ]]; then
-  matchers='(--extended-regexp --fixed-strings --basic-regexp -E -F -G)'
-  arguments=(
+  matchers='(--extended-regexp --fixed-strings --basic-regexp --perl-regexp -E -F -G -P)'
+  arguments+=(
     $matchers{--extended-regexp,-E}'[use extended regular expression]'
     $matchers{--fixed-strings,-F}'[use literal strings]'
     $matchers{--basic-regexp,-G}'[use basic regular expression]'
+    $matchers{--perl-regexp,-P}'[use perl regular expression]'
   )
 fi
 
@@ -28,21 +42,30 @@ arguments=( $arguments[@]
   '(--text -a --binary-files -I)'{--text,-a}'[process binary file as if it were text]'
   '(--before-context -B)'{--before-context=,-B+}'[specify lines of leading context]:lines'
   '(--context,-C)'{--context=,-C+}'[specify lines of context]:lines'
+  '(--color --colour)--'{color,colour}'=-[distinguish matching string]::when:(always never auto)'
   '(--byte-offset -b -c)'{--byte-offset,-b}'[print the byte offset with output lines]'
   '(--text -a -I)--binary-files=[specify type to assume for binary files]:file type:(binary without-match text)'
   '(--count -c --byte-offset -b --line-number -n)'{--count,-c}'[only print a count of matching lines]'
   '(--directories -d -r --recursive)'{--directories=,-d+}'[specify handling of directories]:action on directory:(read skip recurse)'
+  '(--devices -D)'{--devices=,-D+}'[specify handling of devices, FIFOs and sockets]:action on device:(read skip)'
   '(1)*'{--regexp=,-e+}'[specify pattern]:pattern'
   '(1)*'{--file=,-f+}'[specify pattern file]:file:_files'
   '(--with-filename -H --no-filename -h)'{--with-filename,-H}'[print filename with each match]'
   '(--no-filename -h --with-filename -H --null -Z --files-without-match -L --file-with-matches -l)'{--no-filename,-h}'[suppress printing of filenames]'
+  '--label=[provide filename to print for stdin]:filename label for stdin'
+  '--line-buffered[flush output on every line]'
   '(--text -a --binary-files)-I[process binary files as if non-matching]'
   '(--ignore-case -i -y)'{--ignore-case,-i,-y}'[case-insensitive]'
   '(--files-without-match -L --file-with-matches -l --no-filename -h)'{--files-without-match,-L}"[output non-matching files' names only]"
   '(--files-with-matches -l --files-without-match -L --no-filename -h)'{--files-with-matches,-l}"[output matching files' names only]"
+  '(--max-count -m)'{--max-count=,-m+}'[stop after specified no of matches]:max number of matches'
   '(--line-number -n -c)'{--line-number,-n}'[prefix output with line numbers]'
+  '(--only-matching -o)'{--only-matching,-o}'[show only matching part of line]'
   '(--quiet --silent -q)'{--quiet,--silent,-q}'[suppress normal output]'
-  '(--recursive -r -d --directories)'{--recursive,-r}'[recurse subdirectories]'
+  '(--recursive -r -R -d --directories)'{--recursive,-r,-R}'[recurse subdirectories]'
+  '*--include=[examine files matching specified pattern]:file pattern'
+  '*--exclude=[skip files matching specified pattern]:file pattern'
+  '*--exclude-from=[skip files matching pattern in specified file]:file:_files'
   '(--no-mesages -s)'{--no-messages,-s}'[suppress messages about unreadable]'
   '(--version -V)'{--version,-V}'[display version info]'
   '(--invert-match -v)'{--invert-match,-v}'[select non-matching lines]'
@@ -51,12 +74,10 @@ arguments=( $arguments[@]
   '(--null -Z --no-filename -h)'{--null,-Z}'[print 0 byte after FILE name]'
   '--help[display help]'
   '--mmap[memory map input]'
-  '(-e --regexp -f --file)1: :_guard "^--*" pattern'
-  '*:files:_files'
 )
 
 # remove long options?
-[[ -z "$_is_gnu[$words[1]]" ]] &&
+[[ -z "$_is_gnu[$command]" ]] &&
     arguments=( ${arguments:#(|*\)(\*|))--*} )
 
 _arguments -s $arguments[@]

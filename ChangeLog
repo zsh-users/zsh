@@ -1,3 +1,8 @@
+2002-03-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 16838: Completion/Unix/Command/_grep: complete new options of
+	grep 2.5 and value for GREP_OPTIONS parameter
+
 2002-03-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 16823: Completion/Unix/Command/_gzip,
