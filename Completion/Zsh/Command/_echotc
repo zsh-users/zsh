@@ -2,6 +2,4 @@
 
 local expl
 
-_wanted arguments expl 'terminal capability' \
-    compadd al dc dl do le up al bl cd ce cl cr \
-            dc dl do ho is le ma nd nl se so up
+_wanted arguments expl 'terminal capability' compadd -k termcap

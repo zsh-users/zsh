@@ -1,3 +1,12 @@
+2001-05-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 14567: Completion/Unix/Command/_pine,
+	Completion/Zsh/Command/.distfiles, Completion/Zsh/Command/_echotc,
+	Completion/Zsh/Command/_echoti: new echoti completion, update
+	echotc completion and update _pine to reflect pine 4.33
+
+	* 14563: Etc/MACHINES: IRIX 5.3 fails & other updates
+
 2001-05-30  Andrej Borsenkow  <bor@zsh.org>
 
 	* 14566: Test/C02cond.ztst: more testing for unimplemented
