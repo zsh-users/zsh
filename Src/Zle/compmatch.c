@@ -436,7 +436,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	  int sfx, int test, int part)
 {
     int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw;
-    int il = 0, iw = 0, t, ind, add, he = 0, bpc, obc = bc;
+    int il = 0, iw = 0, t, ind, add, he = 0, bpc, obc = bc, bslash;
     VARARR(unsigned char, ea, ll + 1);
     char *ow;
     Cmlist ms;
@@ -736,12 +736,15 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	if (mp)
 	    continue;
 
-	if (l[ind] == w[ind]) {
+	bslash = 0;
+	if (l[ind] == w[ind] ||
+	    (bslash = (lw > 1 && w[ind] == '\\' &&
+		       (ind ? (w[0] == l[0]) : (w[1] == l[0]))))) {
 	    /* No matcher could be used, but the strings have the same
 	     * character here, skip over it. */
-	    l += add; w += add;
-	    il++; iw++;
-	    ll--; lw--;
+	    l += add; w += (bslash ? (add + add ) : add);
+	    il++; iw += 1 + bslash;
+	    ll--; lw -= 1 + bslash;
 	    bc++;
 	    if (!test)
 		while (bp && bc >= (useqbr ? bp->qpos : bp->pos)) {
