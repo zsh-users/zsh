@@ -1041,7 +1041,7 @@ zfopendata(char *name, union zftp_sockaddr *zdsockp, int *is_passivep)
 	zwarnnam(name, "Must set preference S or P to transfer data", NULL, 0);
 	return 1;
     }
-    zfsess->dfd = socket(AF_INET, SOCK_STREAM, 0);
+    zfsess->dfd = socket(zfsess->peer.a.sa_family, SOCK_STREAM, 0);
     if (zfsess->dfd < 0) {
 	zwarnnam(name, "can't get data socket: %e", NULL, errno);
 	return 1;
@@ -1085,7 +1085,7 @@ zfopendata(char *name, union zftp_sockaddr *zdsockp, int *is_passivep)
 	    delim = ptr[1];
 	    if(delim < 33 || delim > 126 || ptr[2] != delim || ptr[3] != delim)
 		goto bad_epsv;
-	    ptr += 3;
+	    ptr += 4;
 	    end = strchr(ptr, delim);
 	    if(!end || end[1] != ')')
 		goto bad_epsv;

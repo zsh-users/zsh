@@ -1,3 +1,8 @@
+2002-04-25  Peter Stephenson  <pws@csr.com>
+
+	* 17041: Src/Modules/zftp.c: Typos creating a data connection
+	for zftp using IPv6.
+
 2002-04-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17035: Src/Modules/zutil.c: remove one half of 17029; the
