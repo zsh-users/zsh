@@ -2,4 +2,9 @@
 
 # A simple pattern completion, just as an example.
 
-compgen -J options -k '(-display -name -xrm)'
+if [ "$words[CURRENT-1]" = "-display" ]; then
+  _compskip=all
+  _hosts -S ':0 ' -r :
+else
+  compadd -J options - -display -name -xrm
+fi

@@ -163,7 +163,7 @@ static int ispattern, haspattern;
  * from the whole word we are completing and the second one from that    *
  * part of the word that was identified as a possible filename.          */
 
-static Comp patcomp, filecomp;
+static Patprog patcomp, filecomp;
 
 /* We store the following prefixes/suffixes:                               *
  * lpre/lsuf -- what's on the line                                         *
@@ -728,7 +728,7 @@ check_param(char *s, int set, int test)
     if ((*p == String || *p == Qstring) && p[1] != Inpar && p[1] != Inbrack) {
 	/* This is really a parameter expression (not $(...) or $[...]). */
 	char *b = p + 1, *e = b;
-	int n = 0, br = 1;
+	int n = 0, br = 1, nest = 0;
 
 	if (*b == Inbrace) {
 	    char *tb = b;
@@ -740,6 +740,10 @@ check_param(char *s, int set, int test)
 	    /* Ignore the possible (...) flags. */
 	    b++, br++;
 	    n = skipparens(Inpar, Outpar, &b);
+
+	    for (tb = p - 1; tb > s && *tb != Outbrace && *tb != Inbrace; tb--);
+	    if (tb > s && *tb == Inbrace && (tb[-1] == String || *tb == Qstring))
+		nest = 1;
 	}
 
 	/* Ignore the stuff before the parameter name. */
@@ -788,9 +792,11 @@ check_param(char *s, int set, int test)
 	     * global variables. */
 
 	    if (set) {
-		if (br >= 2)
+		if (br >= 2) {
 		    mflags |= CMF_PARBR;
-
+		    if (nest)
+			mflags |= CMF_PARNEST;
+		}
 		/* Get the prefix (anything up to the character before the name). */
 		isuf = dupstring(e);
 		untokenize(isuf);
@@ -2288,7 +2294,7 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 	for (mp = NULL, ms = mstack; !mp && ms; ms = ms->next) {
 	    for (mp = ms->matcher; mp; mp = mp->next) {
 		t = 1;
-		if (lm == mp ||
+		if ((lm && lm == mp) ||
 		    ((oll == ll || olw == lw) && test && mp->wlen < 0))
 		    /* If we were called recursively, don't use `*' patterns
 		     * at the beginning (avoiding infinite recursion). */
@@ -2329,8 +2335,9 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 			continue;
 		    if (ap) {
 			if (!pattern_match(ap, l + aoff, NULL, NULL) ||
-			    (both && !pattern_match(ap, w + aoff, NULL, NULL)))
-			    continue;
+			    (both && (!pattern_match(ap, w + aoff, NULL, NULL) ||
+				      !match_parts(l + aoff, w + aoff, alen))))
+				continue;
 		    } else if (!both || il || iw)
 			continue;
 
@@ -2340,11 +2347,12 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 			savl = l[-(llen + zoff)];
 			l[-(llen + zoff)] = '\0';
 		    }
-		    for (t = 0, tp = w, ct = 0, ict = lw - alen;
+		    for (t = 0, tp = w, ct = 0, ict = lw - alen + 1;
 			 ict;
 			 tp += add, ct++, ict--) {
 			if (both ||
-			    pattern_match(ap, tp - moff, NULL, NULL)) {
+			    (pattern_match(ap, tp - moff, NULL, NULL) &&
+			     match_parts(l + aoff , tp - moff, alen))) {
 			    if (sfx) {
 				savw = tp[-zoff];
 				tp[-zoff] = '\0';
@@ -2592,6 +2600,24 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
     return iw;
 }
 
+/* Wrapper for match_str(), only for a certain length and only doing
+ * the test. */
+
+/**/
+static int
+match_parts(char *l, char *w, int n)
+{
+    char lsav = l[n], wsav = w[n];
+    int ret;
+
+    l[n] = w[n] = '\0';
+    ret = match_str(l, w, NULL, NULL, 0, 1);
+    l[n] = lsav;
+    w[n] = wsav;
+
+    return ret;
+}
+
 /* Check if the word w is matched by the strings in pfx and sfx (the prefix
  * and the suffix from the line) or the pattern cp. In clp a cline list for
  * w is returned.
@@ -2603,7 +2629,7 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
  * and the suffix don't match the word w. */
 
 static char *
-comp_match(char *pfx, char *sfx, char *w, Comp cp,
+comp_match(char *pfx, char *sfx, char *w, Patprog cp,
 	   Cline *clp, int qu, int *bpl, int *bsl, int *exact)
 {
     char *r = NULL;
@@ -2613,7 +2639,7 @@ comp_match(char *pfx, char *sfx, char *w, Comp cp,
 	int wl;
 
 	r = w;
-	if (!domatch(r, cp, 0))
+	if (!pattry(cp, r))
 	    return NULL;
     
 	r = (qu ? quotename(r, NULL) : dupstring(r));
@@ -2922,7 +2948,7 @@ cmp_anchors(Cline o, Cline n, int join)
 	return 1;
     }
     /* Didn't work, try to build a string matching both anchors. */
-    if (join && !(o->flags & CLF_JOIN) &&
+    if (join && !(o->flags & CLF_JOIN) && o->word && n->word &&
 	(j = join_strs(o->wlen, o->word, n->wlen, n->word))) {
 	o->flags |= CLF_JOIN;
 	o->wlen = strlen(j);
@@ -3391,6 +3417,10 @@ join_clines(Cline o, Cline n)
 			 (o->flags  & (CLF_SUF | CLF_MID));
 		     t = tn);
 		if (tn && cmp_anchors(o, tn, 1)) {
+		    Cline t;
+
+		    t = tn->prefix; tn->prefix = n->prefix; n->prefix = t;
+		    t = tn->suffix; tn->suffix = n->suffix; n->suffix = t;
 		    n = tn;
 		    continue;
 		}
@@ -3423,20 +3453,18 @@ join_clines(Cline o, Cline n)
 	    }
 	    /* Now see if they have matching anchors. If not, cut the list. */
 	    if (!(o->flags & CLF_MID) && !cmp_anchors(o, n, 1)) {
-#if 0
-		/* This used to search forward for matching anchors.
-		 * Unfortunately this does the wrong thing if the prefixes
-		 * before the differing anchors match nicely. */
-
 		Cline t, tn;
 
 		for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
 
 		if (tn) {
+		    Cline t;
+
+		    t = tn->prefix; tn->prefix = n->prefix; n->prefix = t;
+		    t = tn->suffix; tn->suffix = n->suffix; n->suffix = t;
 		    n = tn;
 		    continue;
 		} else {
-#endif
 		    if (o->flags & CLF_SUF)
 			break;
 
@@ -3445,9 +3473,7 @@ join_clines(Cline o, Cline n)
 		    free_cline(o->next);
 		    o->next = NULL;
 		    o->flags |= CLF_MISS;
-#if 0
 		}
-#endif
 	    }
 	    /* Ok, they are equal, now join the sub-lists. */
 	    if (o->flags & CLF_MID)
@@ -3747,7 +3773,7 @@ addmatches(Cadata dat, char **argv)
     Cmatch cm;
     struct cmlist mst;
     Cmlist oms = mstack;
-    Comp cp = NULL;
+    Patprog cp = NULL;
     LinkList aparl = NULL, oparl = NULL, dparl = NULL;
 
     if (compquote && (qc = *compquote)) {
@@ -3838,7 +3864,7 @@ addmatches(Cadata dat, char **argv)
 		    if (haswilds(tmp)) {
 			if (is)
 			    tmp[llpl] = Star;
-			if ((cp = parsereg(tmp)))
+			if ((cp = patcompile(tmp, 0, NULL)))
 			    haspattern = 1;
 		    }
 		}
@@ -4341,7 +4367,7 @@ gen_matches_files(int dirs, int execs, int all)
 		addwhat = execs ? -8 : -5;
 		if (filecomp)
 		    /* If we have a pattern for the filename check, use it. */
-		    test = domatch(n, filecomp, 0);
+		    test = pattry(filecomp, n);
 		else {
 		    /* Otherwise use the prefix and suffix strings directly. */
 		    e = n + strlen(n) - fsl;
@@ -5332,6 +5358,10 @@ makecomplistcall(Compctl cc)
 	    offs = lip + lp;
 	    cc->refc++;
 	    ccont = 0;
+	    if (!cc->ylist && !cc->gname) {
+		endcmgroup(NULL);
+		begcmgroup("default", 0);
+	    }
 	    makecomplistor(cc, str, lincmd, lip, 0);
 	    offs = ooffs;
 	    isuf = oisuf;
@@ -5562,14 +5592,14 @@ static int
 makecomplistpc(char *os, int incmd)
 {
     Patcomp pc;
-    Comp pat;
+    Patprog pat;
     char *s = findcmd(cmdstr, 1);
     int ret = 0;
 
     for (pc = patcomps; pc; pc = pc->next) {
-	if ((pat = parsereg(pc->pat)) &&
-	    (domatch(cmdstr, pat, 0) ||
-	     (s && domatch(s, pat, 0)))) {
+	if ((pat = patcompile(pc->pat, PAT_STATIC, NULL)) &&
+	    (pattry(pat, cmdstr) ||
+	     (s && pattry(pat, s)))) {
 	    makecomplistcc(pc->cc, os, incmd);
 	    ret |= 2;
 	    if (!(ccont & CC_CCCONT))
@@ -5665,7 +5695,7 @@ makecomplistext(Compctl occ, char *os, int incmd)
 {
     Compctl compc;
     Compcond or, cc;
-    Comp comp;
+    Patprog pprog;
     int compadd, m = 0, d = 0, t, tt, i, j, a, b, ins;
     char *sc = NULL, *s, *ss;
 
@@ -5751,8 +5781,8 @@ makecomplistext(Compctl occ, char *os, int incmd)
 			if (cc->type == CCT_CURPAT ||
 			    cc->type == CCT_WORDPAT) {
 			    tokenize(ss = dupstring(cc->u.s.s[i]));
-			    t = ((comp = parsereg(ss)) &&
-				 domatch(s, comp, 0));
+			    t = ((pprog = patcompile(ss, PAT_STATIC, NULL)) &&
+				 pattry(pprog, s));
 			} else
 			    t = (!strcmp(s, rembslash(cc->u.s.s[i])));
 			break;
@@ -5766,8 +5796,8 @@ makecomplistext(Compctl occ, char *os, int incmd)
 				sc = rembslash(cc->u.l.a[i]);
 			    if (cc->type == CCT_RANGESTR ?
 				!strncmp(s, sc, strlen(sc)) :
-				((comp = parsereg(sc)) &&
-				 domatch(s, comp, 0))) {
+				((pprog = patcompile(sc, PAT_STATIC, 0)) &&
+				 pattry(pprog, s))) {
 				zsfree(s);
 				brange = j + 1;
 				t = 1;
@@ -5784,8 +5814,8 @@ makecomplistext(Compctl occ, char *os, int incmd)
 				    sc = rembslash(cc->u.l.b[i]);
 				if (cc->type == CCT_RANGESTR ?
 				    !strncmp(s, sc, strlen(sc)) :
-				    ((comp = parsereg(sc)) &&
-				     domatch(s, comp, 0))) {
+				    ((pprog = patcompile(sc, PAT_STATIC, 0)) &&
+				     pattry(pprog, s))) {
 				    zsfree(s);
 				    erange = j - 1;
 				    t = clwpos <= erange;
@@ -6049,7 +6079,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    strcpy(p + rpl + 1, rsuf);
 	} else
 	    strcpy(p + rpl, rsuf);
-	patcomp = parsereg(p);
+	patcomp = patcompile(p, 0, NULL);
 	haspattern = 1;
     }
     if (!patcomp) {
@@ -6147,7 +6177,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		(!comppatmatch || *comppatmatch == '*'))
 		p[t2++] = Star;
 	    strcpy(p + t2, fsuf);
-	    filecomp = parsereg(p);
+	    filecomp = patcompile(p, 0, NULL);
 	}
 	if (!filecomp) {
 	    untokenize(fpre);
@@ -6566,7 +6596,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     }
     if (cc->hpat) {
 	/* We have a pattern to take things from the history. */
-	Comp compc = NULL;
+	Patprog pprogc = NULL;
 	char *e, *h, hpatsav;
 	Histent he;
 	int i = addhistnum(curhist,-1,HIST_FOREIGN), n = cc->hnum;
@@ -6576,7 +6606,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    char *thpat = dupstring(cc->hpat);
 
 	    tokenize(thpat);
-	    compc = parsereg(thpat);
+	    pprogc = patcompile(thpat, 0, NULL);
 	}
 	/* n holds the number of history line we have to search. */
 	if (!n)
@@ -6593,7 +6623,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		/* We now have a word from the history, ignore it *
 		 * if it begins with a quote or `$'.              */
 		if (*h != '\'' && *h != '"' && *h != '`' && *h != '$' &&
-		    (!compc || domatch(h, compc, 0)))
+		    (!pprogc || pattry(pprogc, h)))
 		    /* Otherwise add it if it was matched. */
 		    addmatch(dupstring(h), NULL);
 		if (hpatsav)
@@ -7728,6 +7758,8 @@ do_single(Cmatch m)
 	    minfo.insc++;
 	    if (minfo.we)
 		minfo.end += minfo.insc;
+	    if (m->flags & CMF_PARNEST)
+		havesuff = 1;
 	}
 	if ((m->flags & CMF_FILE) || (m->ripre && isset(AUTOPARAMSLASH))) {
 	    /* If we have a filename or we completed a parameter name      *
@@ -7741,11 +7773,12 @@ do_single(Cmatch m)
 		t = 1;
 	    else {
 		/* Build the path name. */
-		if (m->ripre && !*psuf) {
+		if (m->ripre && !*psuf && !(m->flags & CMF_PARNEST)) {
 		    int ne = noerrs;
 
-		    p = (char *) zhalloc(strlen(m->ripre) + strlen(str) + 1);
-		    sprintf(p, "%s%s", m->ripre, str);
+		    p = (char *) zhalloc(strlen(m->ripre) + strlen(str) + 2);
+		    sprintf(p, "%s%s%c", m->ripre, str,
+			    ((m->flags & CMF_PARBR) ? Outbrace : '\0'));
 		    noerrs = 1;
 		    parsestr(p);
 		    singsub(&p);
