@@ -12,9 +12,9 @@ if (( $tmp[(I)-g*] )); then
   [[ "$glob" = *[^\\][[:blank:]]* ]] &&
       glob="{${glob//(#b)([^\\])[[:blank:]]##/${match[1]},}}"
 fi
-ign=$opts[(I)-F]
-if (( ign )); then
-  ign=( $=opts[ign+1] )
+tmp=$opts[(I)-F]
+if (( tmp )); then
+  ign=( $=opts[tmp+1] )
   if [[ $ign = _comp_ignore ]]; then
     ign=( $_comp_ignore )
   else
