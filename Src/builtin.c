@@ -50,7 +50,7 @@ static struct builtin builtins[] =
     BUILTIN("cd", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("chdir", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
-    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRUZafilrtux", NULL),
+    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafilrtux", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "v", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
@@ -60,7 +60,7 @@ static struct builtin builtins[] =
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "LRUZafilrtu", "x"),
+    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "LRTUZafilrtu", "x"),
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
     BUILTIN("fc", BINF_FCOPTS, bin_fc, 0, -1, BIN_FC, "nlreIRWAdDfEim", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
@@ -78,7 +78,7 @@ static struct builtin builtins[] =
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", 0, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
-    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRUZailrtu", NULL),
+    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZailrtu", NULL),
     BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
     BUILTIN("logout", 0, bin_break, 0, 1, BIN_LOGOUT, NULL, NULL),
 
@@ -93,7 +93,7 @@ static struct builtin builtins[] =
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", BINF_R, bin_fc, 0, -1, BIN_FC, "nrl", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "rzu0123456789pkqecnAlE", NULL),
-    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRUZafiltux", "r"),
+    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafiltux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "dfv", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL, bin_set, 0, -1, 0, NULL, NULL),
@@ -107,7 +107,7 @@ static struct builtin builtins[] =
     BUILTIN("trap", BINF_PSPECIAL, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsw", "v"),
-    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRUZafilrtuxm", NULL),
+    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafilrtuxm", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "m", "a"),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, 0, "m", "f"),
@@ -1468,11 +1468,11 @@ getasg(char *s)
 /* function to set a single parameter */
 
 /**/
-int
+Param
 typeset_single(char *cname, char *pname, Param pm, int func,
-	       int on, int off, int roff, char *value)
+	       int on, int off, int roff, char *value, Param altpm)
 {
-    int usepm, tc;
+    int usepm, tc, keeplocal = 0;
 
     /* use the existing pm? */
     usepm = pm && !(pm->flags & PM_UNSET);
@@ -1490,24 +1490,24 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	locallevel != pm->level && func != BIN_EXPORT)
 	usepm = 0;
 
-    /* attempting a type conversion? */
+    /* attempting a type conversion, or making a tied colonarray? */
     if ((tc = usepm && (((off & pm->flags) | (on & ~pm->flags)) &
-			(PM_INTEGER|PM_HASHED|PM_ARRAY))))
+			(PM_INTEGER|PM_HASHED|PM_ARRAY|PM_TIED))))
 	usepm = 0;
     if (tc && (pm->flags & PM_SPECIAL)) {
 	zerrnam(cname, "%s: can't change type of a special parameter",
 		pname, 0);
-	return 1;
+	return NULL;
     }
 
     if (usepm) {
 	if (!on && !roff && !value) {
 	    paramtab->printnode((HashNode)pm, 0);
-	    return 0;
+	    return pm;
 	}
 	if ((pm->flags & PM_RESTRICTED && isset(RESTRICTED))) {
 	    zerrnam(cname, "%s: restricted", pname, 0);
-	    return 1;
+	    return pm;
 	}
 	if (PM_TYPE(pm->flags) == PM_ARRAY && (on & PM_UNIQUE) &&
 	    !(pm->flags & PM_READONLY & ~off))
@@ -1530,9 +1530,9 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		setsparam(pname, ztrdup(value));
 	} else if (value) {
 	    zwarnnam(cname, "can't assign new value for array %s", pname, 0);
-	    return 1;
+	    return NULL;
 	}
-	return 0;
+	return pm;
     }
 
     /*
@@ -1542,10 +1542,15 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      * last case only, we need to delete the old parameter.
      */
     if (tc) {
-	if (pm->flags & PM_READONLY) {
-	    on |= ~off & PM_READONLY;
-	    pm->flags &= ~PM_READONLY;
-	}
+	/* Maintain existing readonly/exported status... */
+	on |= ~off & (PM_READONLY|PM_EXPORTED) & pm->flags;
+	/* ...but turn off existing readonly so we can delete it */
+	pm->flags &= ~PM_READONLY;
+	/*
+	 * If we're just changing the type, we should keep the
+	 * variable at the current level of localness.
+	 */
+	keeplocal = pm->level;
 	/*
 	 * Try to carry over a value, but not when changing from,
 	 * to, or between non-scalar types.
@@ -1563,17 +1568,33 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     pm = createparam(pname, on & ~PM_READONLY);
     DPUTS(!pm, "BUG: parameter not created");
     pm->ct = auxlen;
-    if (func != BIN_EXPORT)
+
+    if (altpm && PM_TYPE(pm->flags) == PM_SCALAR) {
+	/*
+	 * It seems safer to set this here than in createparam(),
+	 * to make sure we only ever use the colonarr functions
+	 * when u.data is correctly set.
+	 */
+	pm->sets.cfn = colonarrsetfn;
+	pm->gets.cfn = colonarrgetfn;
+	pm->u.data = &altpm->u.arr;
+    }
+
+    if (keeplocal)
+	pm->level = keeplocal;
+    else if (func != BIN_EXPORT)
 	pm->level = locallevel;
     if (value && !(pm->flags & (PM_ARRAY|PM_HASHED)))
 	setsparam(pname, ztrdup(value));
     pm->flags |= (on & PM_READONLY);
     if (value && (pm->flags & (PM_ARRAY|PM_HASHED))) {
 	zerrnam(cname, "%s: can't assign initial value for array", pname, 0);
-	return 1;
+	/* the only safe thing to do here seems to be unset the param */
+	unsetparam_pm(pm, 0, 1);
+	return NULL;
     }
 
-    return 0;
+    return pm;
 }
 
 /* declare, export, integer, local, readonly, typeset */
@@ -1585,7 +1606,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     Param pm;
     Asgment asg;
     Comp com;
-    char *optstr = "aiALRZlurtxU";
+    char *optstr = "aiALRZlurtxUT";
     int on = 0, off = 0, roff, bit = PM_ARRAY;
     int i;
     int returnval = 0, printflags = 0;
@@ -1619,6 +1640,9 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	off |= PM_UPPER;
     if (on & PM_HASHED)
 	off |= PM_ARRAY;
+    if (on & PM_TIED)
+	off |= PM_INTEGER | PM_ARRAY | PM_HASHED;
+
     on &= ~off;
 
     /* Given no arguments, list whatever the options specify. */
@@ -1629,6 +1653,58 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    printflags |= PRINT_NAMEONLY;
 	scanhashtable(paramtab, 1, on|roff, 0, paramtab->printnode, printflags);
 	return 0;
+    }
+
+    if (on & PM_TIED) {
+	Param apm;
+	char *name1;
+
+	if (ops['m']) {
+	    zwarnnam(name, "incompatible options for -T", NULL, 0);
+	    return 1;
+	}
+	on &= ~off;
+	if (!argv[1] || argv[2]) {
+	    zwarnnam(name, "-T requires names of scalar and array", NULL, 0);
+	    return 1;
+	}
+
+	/*
+	 * Create the tied array; this is normal except that
+	 * it has the PM_TIED flag set.  Do it first because
+	 * we need the address.
+	 */
+	if (!(asg = getasg(argv[1])))
+	    return 1;
+	name1 = ztrdup(asg->name);
+	if (!(apm=typeset_single(name, asg->name,
+				 (Param)paramtab->getnode(paramtab,
+							  asg->name),
+				 func, on | PM_ARRAY, off, roff,
+				 asg->value, NULL)))
+	    return 1;
+
+	/*
+	 * Create the tied colonarray.  We make it as a normal scalar
+	 * and fix up the oddities later.
+	 */
+	if (!(asg = getasg(argv[0])) ||
+	    !(pm=typeset_single(name, asg->name,
+				(Param)paramtab->getnode(paramtab,
+							 asg->name),
+				func, on, off, roff, asg->value, apm))) {
+	    unsetparam_pm(apm, 1, 1);
+	    return 1;
+	}
+
+	pm->ename = name1;
+	apm->ename = ztrdup(asg->name);
+
+	return 0;
+    }
+    if (off & PM_TIED) {
+	zerrnam(name, "use unset to remove tied variables", NULL, 0);
+	return 1;
     }
 
     /* With the -m option, treat arguments as glob patterns */
@@ -1664,8 +1740,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    }
 	    for (pmnode = firstnode(pmlist); pmnode; incnode(pmnode)) {
 		pm = (Param) getdata(pmnode);
-		if (typeset_single(name, pm->nam, pm, func, on, off, roff,
-				   asg->value))
+		if (!typeset_single(name, pm->nam, pm, func, on, off, roff,
+				    asg->value, NULL))
 		    returnval = 1;
 	    }
 	}
@@ -1680,9 +1756,9 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    returnval = 1;
 	    continue;
 	}
-	if (typeset_single(name, asg->name,
-			   (Param)paramtab->getnode(paramtab, asg->name),
-			   func, on, off, roff, asg->value))
+	if (!typeset_single(name, asg->name,
+			    (Param)paramtab->getnode(paramtab, asg->name),
+			    func, on, off, roff, asg->value, NULL))
 	    returnval = 1;
     }
     return returnval;

@@ -57,6 +57,12 @@ def(texinfo)(2)(\
   NOTRANS(@iftex)NL()\
   NOTRANS(@set dsq '{}')NL()\
   NOTRANS(@end iftex)NL()\
+  NOTRANS(@ifinfo)NL()\
+  NOTRANS(@dircategory Utilities)NL()\
+  NOTRANS(@direntry)NL()\
+  NOTRANS(     * ZSH: (zsh).                     The Z Shell Guide.)NL()\
+  NOTRANS(@end direntry)NL()\
+  NOTRANS(@end ifinfo)NL()\
 )
 
 def(texiifinfo)(1)(\

@@ -61,17 +61,22 @@ static struct zleparam {
 	zleunsetfn, NULL },
     { "RBUFFER", PM_SCALAR,  FN(set_rbuffer), FN(get_rbuffer),
 	zleunsetfn, NULL },
+    { "WIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_widget),
+        zleunsetfn, NULL },
+    { "LASTWIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_lwidget),
+        zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
 
 /**/
 void
-makezleparams(void)
+makezleparams(int ro)
 {
     struct zleparam *zp;
 
     for(zp = zleparams; zp->name; zp++) {
-	Param pm = createparam(zp->name, zp->type | PM_SPECIAL);
+	Param pm = createparam(zp->name, (zp->type |PM_SPECIAL|PM_REMOVABLE|
+					  (ro ? PM_READONLY : 0)));
 	if (!pm)
 	    pm = (Param) paramtab->getnode(paramtab, zp->name);
 	DPUTS(!pm, "param not set in makezleparams");
@@ -196,4 +201,18 @@ static char *
 get_rbuffer(Param pm)
 {
     return metafy((char *)line + cs, ll - cs, META_HEAPDUP);
+}
+
+/**/
+static char *
+get_widget(Param pm)
+{
+    return bindk->nam;
+}
+
+/**/
+static char *
+get_lwidget(Param pm)
+{
+    return (lbindk ? lbindk->nam : "");
 }

@@ -679,7 +679,7 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
     Comp c;
 
     /* first parse any subscription flags */
-    if (*s == '(' || *s == Inpar) {
+    if (v->pm && (*s == '(' || *s == Inpar)) {
 	int escapes = 0;
 	int waste;
 	for (s++; *s != ')' && *s != Outpar && s != *str; s++) {
@@ -765,7 +765,7 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 	} else if (rev) {
 	    v->isarr |= SCANPM_WANTVALS;
 	}
-	if (!down && PM_TYPE(v->pm->flags) == PM_HASHED)
+	if (!down && v->pm && PM_TYPE(v->pm->flags) == PM_HASHED)
 	    v->isarr &= ~SCANPM_MATCHMANY;
 	*inv = ind;
     }
@@ -785,7 +785,7 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
     singsub(&s);
 
     if (!rev) {
-	if (PM_TYPE(v->pm->flags) == PM_HASHED) {
+	if (v->pm && PM_TYPE(v->pm->flags) == PM_HASHED) {
 	    HashTable ht = v->pm->gets.hfn(v->pm);
 	    if (!ht) {
 		ht = newparamtable(17, v->pm->nam);
@@ -1371,7 +1371,7 @@ setarrvalue(Value v, char **val)
 	freearray(val);
 	return;
     }
-    if (PM_TYPE(v->pm->flags) & ~(PM_ARRAY|PM_HASHED)) {
+    if (!(PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED))) {
 	freearray(val);
 	zerr("attempt to assign array value to non-array", NULL, 0);
 	return;
@@ -1501,7 +1501,7 @@ setsparam(char *s, char *val)
 	if (!(v = getvalue(&s, 1)))
 	    createparam(t, PM_SCALAR);
 	else if (PM_TYPE(v->pm->flags) == PM_ARRAY &&
-		 !(v->pm->flags & PM_SPECIAL) && unset(KSHARRAYS)) {
+		 !(v->pm->flags & (PM_SPECIAL|PM_TIED)) && unset(KSHARRAYS)) {
 	    unsetparam(t);
 	    createparam(t, PM_SCALAR);
 	    v = NULL;
@@ -1545,7 +1545,7 @@ setaparam(char *s, char **val)
 	if (!(v = getvalue(&s, 1)))
 	    createparam(t, PM_ARRAY);
 	else if (!(PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
-		 !(v->pm->flags & PM_SPECIAL)) {
+		 !(v->pm->flags & (PM_SPECIAL|PM_TIED))) {
 	    int uniq = v->pm->flags & PM_UNIQUE;
 	    unsetparam(t);
 	    createparam(t, PM_ARRAY | uniq);
@@ -1662,26 +1662,36 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	    unsetparam_pm(altpm, 1, exp);
     }
 
-    /* If this was a local variable, we need to keep the old     *
-     * struct so that it is resurrected at the right level.      *
-     * This is partly because when an array/scalar value is set  *
-     * and the parameter used to be the other sort, unsetparam() *
-     * is called.  Beyond that, there is an ambiguity:  should   *
-     * foo() { local bar; unset bar; } make the global bar       *
-     * available or not?  The following makes the answer "no".   */
-    if ((locallevel && locallevel >= pm->level) || (pm->flags & PM_SPECIAL))
+    /*
+     * If this was a local variable, we need to keep the old
+     * struct so that it is resurrected at the right level.
+     * This is partly because when an array/scalar value is set
+     * and the parameter used to be the other sort, unsetparam()
+     * is called.  Beyond that, there is an ambiguity:  should
+     * foo() { local bar; unset bar; } make the global bar
+     * available or not?  The following makes the answer "no".
+     *
+     * Some specials, such as those used in zle, still need removing
+     * from the parameter table; they have the PM_REMOVABLE flag.
+     */
+    if ((locallevel && locallevel >= pm->level) ||
+	(pm->flags & (PM_SPECIAL|PM_REMOVABLE)) == PM_SPECIAL)
 	return;
 
-    paramtab->removenode(paramtab, pm->nam); /* remove parameter node from table */
+    /* remove parameter node from table */
+    paramtab->removenode(paramtab, pm->nam);
 
     if (pm->old) {
 	oldpm = pm->old;
 	paramtab->addnode(paramtab, oldpm->nam, oldpm);
-	if ((PM_TYPE(oldpm->flags) == PM_SCALAR) && oldpm->sets.cfn == strsetfn)
+	if ((PM_TYPE(oldpm->flags) == PM_SCALAR) &&
+	    oldpm->sets.cfn == strsetfn)
 	    adduserdir(oldpm->nam, oldpm->u.str, 0, 0);
     }
 
-    paramtab->freenode((HashNode) pm); /* free parameter node */
+    /* Even removable specials shouldn't be deleted. */
+    if (!(pm->flags & PM_SPECIAL))
+	paramtab->freenode((HashNode) pm); /* free parameter node */
 }
 
 /* Standard function to unset a parameter.  This is mostly delegated to *
@@ -1759,6 +1769,9 @@ arrsetfn(Param pm, char **x)
     if (pm->flags & PM_UNIQUE)
 	uniqarray(x);
     pm->u.arr = x;
+    /* Arrays tied to colon-arrays may need to fix the environment */
+    if (pm->ename && x)
+	arrfixenv(pm->ename, x);
 }
 
 /* Function to get value of an association parameter */
@@ -1950,7 +1963,8 @@ arrvarsetfn(Param pm, char **x)
 char *
 colonarrgetfn(Param pm)
 {
-    return zjoin(*(char ***)pm->u.data, ':');
+    char ***dptr = (char ***)pm->u.data;
+    return *dptr ? zjoin(*dptr, ':') : "";
 }
 
 /**/
@@ -1959,8 +1973,15 @@ colonarrsetfn(Param pm, char *x)
 {
     char ***dptr = (char ***)pm->u.data;
 
-    freearray(*dptr);
-    *dptr = x ? colonsplit(x, pm->flags & PM_UNIQUE) : mkarray(NULL);
+    /*
+     * If this is tied to a parameter (rather than internal) array,
+     * the array itself may be NULL.  Otherwise, we have to make
+     * sure it doesn't ever get null.
+     */
+    if (*dptr)
+	freearray(*dptr);
+    *dptr = x ? colonsplit(x, pm->flags & PM_UNIQUE) :
+	(pm->flags & PM_TIED) ? NULL : mkarray(NULL);
     if (pm->ename)
 	arrfixenv(pm->nam, *dptr);
     zsfree(x);
@@ -2399,7 +2420,7 @@ arrfixenv(char *s, char **t)
     MUSTUSEHEAP("arrfixenv");
     if (t == path)
 	cmdnamtab->emptytable(cmdnamtab);
-    u = zjoin(t, ':');
+    u = t ? zjoin(t, ':') : "";
     len_s = strlen(s);
     pm = (Param) paramtab->getnode(paramtab, s);
     for (ep = environ; *ep; ep++)
@@ -2602,6 +2623,9 @@ freeparamnode(HashNode hn)
     if (delunset)
 	pm->unsetfn(pm, 1);
     zsfree(pm->nam);
+    /* If this variable was tied by the user, ename was ztrdup'd */
+    if (pm->flags & PM_TIED)
+	zsfree(pm->ename);
     zfree(pm, sizeof(struct param));
 }
 

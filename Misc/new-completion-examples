@@ -19,21 +19,31 @@ typeset -A comps
 # With only one argument the function/variable-name __$1 is used.
 
 defcomp() {
-  local v
+  local v a=''
 
+  if [[ "$1" = -a ]] then
+    shift
+    a=yes
+  fi
   if [[ $# -eq 1 ]] then
     comps[$1]="__$1"
+    [[ -z "$a" ]] || autoload "__$1"
   else
     v="$1"
     shift
     for i; do
       comps[$i]="$v"
     done
+    [[ -z "$a" ]] || autoload "$v"
   fi
 }
 
 defpatcomp() {
-  if [[ ${+patcomps} == 1 ]] then
+  if [[ "$1" = -a ]] then
+    shift
+    autoload "$1"
+  fi
+  if (( $+patcomps )) then
     patcomps=("$patcomps[@]" "$2 $1" )
   else
     patcomps=( "$2 $1" )
@@ -68,10 +78,10 @@ call-complete() {
   local var
 
   eval var\=\$\{\+$1\}
-  if [[ "$var" == 0 ]] then
-    "$@"
-  else
+  if (( var )); then
     eval complist \$\{${1}\[\@\]\}
+  else
+    "$@"
   fi
 }
 
@@ -80,10 +90,20 @@ call-complete() {
 # arguments from the command line are gives as positional parameters.
 
 main-complete() {
-  emulate -R zsh
+  # emulate -R zsh
   local comp
+
   setopt localoptions nullglob rcexpandparam globdots
   unsetopt markdirs globsubst shwordsplit nounset
+
+  # We first try the `compctl's. This is without first (-T) and default (-D)
+  # completion. If you want them add `-T' and/or `-D' to this command.
+  # If this produces any matches, we don't try new style completion. If you
+  # want to have that tried anyway, remove the `[[ -nmatches ... ]] ...'
+  # below.
+
+  compcall
+  [[ -nmatches 0 ]] || return
 
   # An entry for `--first--' is the replacement for `compctl -T'
   # The `|| return 1' is used throughout: if a function producing matches
@@ -164,21 +184,6 @@ do-complete() {
   [[ -z "$comp" ]] || call-complete "$comp" "$@" || return 1
 }
 
-# Do sub-completion for pre-command modifiers.
-
-defcomp __precmd - noglob nocorrect exec command builtin
-__precmd() {
-  COMMAND="$1"
-  shift
-  (( CURRENT-- ))
-  if [[ CURRENT -eq 0 ]] then
-    CONTEXT=command
-  else
-    CONTEXT=argument
-  fi
-  compsub
-}
-
 # Utility function for in-path completion.
 # First argument should be an complist-option (e.g. -f, -/, -g). The other
 # arguments should be glob patterns, one per argument.
@@ -190,90 +195,123 @@ __precmd() {
 # so you may want to modify this.
 
 pfiles() {
-  local nm str pa pre epre a b c s rest
+  local nm ostr opa pre epre a b c s rest ppres
 
   setopt localoptions nullglob rcexpandparam globdots extendedglob
   unsetopt markdirs globsubst shwordsplit nounset
 
+  if [[ "$1" = -W ]] then
+    a="$2"
+    if [[ "$a[1]" = '(' ]] then
+      ppres=( $a[2,-2]/ )
+    else
+      eval ppres\=\( \$$a/ \)
+      [[ $#ppres -eq 0 ]] && ppres=( $a/ )
+    fi
+    [[ $#ppres -eq 0 ]] && ppres=( '' )
+    shift 2
+  else
+    ppres=( '' )
+  fi
+
+  str="$PREFIX*$SUFFIX"
+
+  if [[ -z "$a[1]" || "$str[1]" = [~/] || "$str" = (.|..)/* ]] then
+    a=()
+  else
+    a=(-W "( $ppres )")
+  fi
   nm=$NMATCHES
   if [[ $# -eq 0 ]] then
-    complist -f
+    complist "$a[@]" -f
   elif [[ "$1" = -g ]] then
-    complist -g "$argv[2,-1]"
+    complist "$a[@]" -g "$argv[2,-1]"
     shift
   else
-    complist $1
+    complist "$a[@]" $1
     shift
   fi
   [[ -nmatches nm ]] || return
 
-  str="$PREFIX*$SUFFIX"
-
   [[ -z "$1" ]] && 1='*'
-  if [[ $str[1] = \~ ]] then
+
+  if [[ "$str[1]" = \~ ]] then
     pre="${str%%/*}/"
     eval epre\=$pre
     str="${str#*/}"
-    pa=''
+    opa=''
+    ppres=( '' )
   else
     pre=''
     epre=''
-    if [[ $str[1] = / ]] then
+    if [[ "$str[1]" = / ]] then
       str="$str[2,-1]"
-      pa='/'
+      opa='/'
+      ppres=( '' )
     else
-      pa=''
+      [[ "$str" = (.|..)/* ]] && ppres=( '' )
+      opa=''
     fi
   fi
-  str="$str:gs/,/*,/:gs/_/*_/:gs./.*/.:gs/-/*[-_]/:gs/./*[.,]/:gs-*[.,]*[.,]*/-../-:gs.**.*."
   while [[ "$str" = */* ]] do
-    rest="${str#*/}"
-    a="${epre}${pa}(#l)${str%%/*}(-/)"
-    a=( $~a )
-    if [[ $#a -eq 0 ]] then
-      return
-    elif [[ $#a -gt 1 ]] then
-      c=()
-      s=( $rest$@ )
-      s=( "${(@)s:gs.**.*.}" )
-      for i in $a; do
-        b=( $~i/(#l)$~s )
-        eval b\=\( \$\{b:/\*\(${(j:|:)fignore}\)\} \)
-        [[ $#b -ne 0 ]] && c=( $c $i )
-      done
-      if [[ $#c -eq 0 ]] then
-        return
-      elif [[ $#c -ne 1 ]] then
-        a="$epre$pa"
-        c=( $~c/(#l)$~s )
-        eval c\=\( \$\{c:/\*\(${(j:|:)fignore}\)\} \)
-	c=( ${c#$a} )
-        for i in $c; do
-          compadd -p "$pre$pa" -W "$a" -s "/${i#*/}" -f "${i%%/*}"
-        done
-	return
-      fi
-      a=( "$c[1]" )
-    fi
-    a="$a[1]"
-    pa="$pa${a##*/}/"
-    str="$rest"
+    [[ -e "$epre$opa${str%%/*}" ]] || break
+    opa="$opa${str%%/*}/"
+    str="${str#*/}"
   done
-  a="$epre$pa"
-  s=( $str$@ )
-  s=( "${(@)s:gs.**.*.}" )
-  b=( $~a(#l)$~s )
-  eval b\=\( \$\{b:/\*\(${(j:|:)fignore}\)\} \)
-  compadd -p "$pre$pa" -W "$epre$pa" -f ${b#$a}
+
+  ostr="$str:gs/,/*,/:gs/_/*_/:gs./.*/.:gs/-/*[-_]/:gs/./*[.,]/:gs-*[.,]*[.,]*/-../-:gs.**.*."
+
+  for ppre in "$ppres[@]"; do
+    str="$ostr"
+    pa="$opa"
+    while [[ "$str" = */* ]] do
+      rest="${str#*/}"
+      a="${ppre}${epre}${pa}(#l)${str%%/*}(-/)"
+      a=( $~a )
+      if [[ $#a -eq 0 ]] then
+        continue 2
+      elif [[ $#a -gt 1 ]] then
+        c=()
+        s=( $rest$@ )
+        s=( "${(@)s:gs.**.*.}" )
+        for i in $a; do
+          b=( $~i/(#l)$~s )
+          eval b\=\( \$\{b:/\*\(${(j:|:)fignore}\)\} \)
+          [[ $#b -ne 0 ]] && c=( $c $i )
+        done
+        if [[ $#c -eq 0 ]] then
+          continue 2
+        elif [[ $#c -ne 1 ]] then
+          a="$ppre$epre$pa"
+          c=( $~c/(#l)$~s )
+          eval c\=\( \$\{c:/\*\(${(j:|:)fignore}\)\} \)
+  	  c=( ${c#$a} )
+          for i in $c; do
+            compadd -p "$pre$pa" -W "$a" -s "/${i#*/}" -f "${i%%/*}"
+          done
+  	  continue 2
+        fi
+        a=( "$c[1]" )
+      fi
+      a="$a[1]"
+      pa="$pa${a##*/}/"
+      str="$rest"
+    done
+    a="$ppre$epre$pa"
+    s=( $str$@ )
+    s=( "${(@)s:gs.**.*.}" )
+    b=( $~a(#l)$~s )
+    eval b\=\( \$\{b:/\*\(${(j:|:)fignore}\)\} \)
+    compadd -p "$pre$pa" -W "$ppre$epre$pa" -f ${b#$a}
+  done
 }
 
 # Utility function for completing files of a given type or any file.
 # In many cases you will want to call this one instead of pfiles().
 
 files() {
-  local nm
+  local nm=$NMATCHES
 
-  nm=$NMATCHES
   pfiles "$@"
 
   [[ $# -ne 0 && -nmatches nm ]] && pfiles
@@ -289,23 +327,318 @@ __default() {
 defcomp __command --command--
 __command=( -c )
 
-defcomp __math --math--
-__math=( -v )
+defcomp __vars --math--
+__vars=( -v )
 
 defcomp __subscr --subscr--
 __subscr() {
+  local t
+
+  eval t\=\$\{\(t\)$COMMAND\}
   compalso --math-- "$@"
-  # ...probably other stuff
+  [[ $t = assoc* ]] && eval complist -k \"\(\$\{\(k\)$COMMAND\}\)\"
 }
 
-# A simple pattern completion, just as an example.
+# Do sub-completion for pre-command modifiers.
 
-defpatcomp __x_options '*/X11/*'
-__x_options() {
-  complist -J options -k '(-display -name -xrm)'
+defcomp __precmd - nohup nice eval time rusage noglob nocorrect exec
+__precmd() {
+  COMMAND="$1"
+  shift
+  (( CURRENT-- ))
+  if [[ CURRENT -eq 0 ]] then
+    CONTEXT=command
+  else
+    CONTEXT=argument
+  fi
+  compsub
 }
 
-# A better example: completion for `find'.
+defcomp builtin
+__builtin() {
+  if [[ -position 2 -1 ]] then
+    compsub
+  else
+    complist -eB
+  fi
+}
+
+defcomp command
+__command() {
+  if [[ -position 2 -1 ]] then
+    compsub
+  else
+    complist -em
+  fi
+}
+  
+# Various completions...
+
+defcomp __jobs fg jobs
+__jobs=(-j -P '%')
+
+defcomp __bjobs bg
+__bjobs=(-z -P '%')
+
+defcomp __arrays shift
+__arrays=(-A)
+
+defcomp __which which whence where type
+__which=( -caF )
+
+defcomp unhash
+__unhash() {
+  [[ -mword 1 -*d* ]] && complist -n
+  [[ -mword 1 -*a* ]] && complist -a
+  [[ -mword 1 -*f* ]] && complist -F
+  [[ ! -mword 1 -* ]] && complist -m
+}
+
+defcomp hash
+__hash() {
+  if [[ -mword 1 -*d* ]] then
+    if [[ -string 1 '=' ]] then
+      pfiles -g '*(-/)'
+    else
+      complist -n -q -S '='
+    fi
+  elif [[ -string 1 '=' ]] then
+    files -g '*(*)' '*(-/)'
+  else
+    complist -m -q -S '='
+  fi
+}
+
+defcomp __funcs unfunction
+__funcs=(-F)
+
+defcomp echotc
+__echotc=(-k '(al dc dl do le up al bl cd ce cl cr dc dl do ho is le ma nd nl se so up)')
+
+defcomp __aliases unalias
+__aliases=(-a)
+
+defcomp __vars getopts read unset vared
+
+defcomp __varseq declare export integer local readonly typeset
+__varseq=(-v -S '=')
+
+defcomp disable
+__disable() {
+  [[ -mcurrent -1 -*a* ]] && complist -ea
+  [[ -mcurrent -1 -*f* ]] && complist -eF
+  [[ -mcurrent -1 -*r* ]] && complist -ew
+  [[ ! -mcurrent -1 -* ]] && complist -eB
+}
+
+defcomp enable
+__enable() {
+  [[ -mcurrent -1 -*a* ]] && complist -da
+  [[ -mcurrent -1 -*f* ]] && complist -dF
+  [[ -mcurrent -1 -*r* ]] && complist -dw
+  [[ ! -mcurrent -1 -* ]] && complist -dB
+}
+
+defcomp __limits limit unlimit
+__limits=(-k "(${(j: :)${(f)$(limit)}%% *})")
+
+defcomp source
+__source() {
+  if [[ -position 2 -1 ]] then
+    compsub
+  else
+    files
+  fi
+}
+
+defcomp setopt
+__setopt() {
+  local nm=$NMATCHES
+
+  complist -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' \
+           -s '$({ unsetopt kshoptionprint; unsetopt } 2>/dev/null)'
+  [[ -nmatches nm ]] && complist -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o
+}
+
+defcomp unsetopt
+__unsetopt() {
+  local nm=$NMATCHES
+
+  complist -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' \
+           -s '$({ unsetopt kshoptionprint; setopt } 2>/dev/null)'
+  [[ -nmatches nm ]] && complist -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o
+}
+
+defcomp autoload
+__autoload=(-s '${^fpath}/*(N:t)')
+
+defcomp bindkey
+__bindkey() {
+  if [[ -mword 1 -*[DAN]* || -mcurrent -1 -*M ]] then
+    complist -s '$(bindkey -l)'
+  else
+    complist -b
+  fi
+}
+
+defcomp fc
+__fc() {
+  if [[ -mcurrent -1 -*e ]] then
+    complist -c
+  elif [[ -mcurrent -1 -[ARWI]## ]] then
+    files
+  fi
+}
+
+defcomp sched
+__sched() {
+  [[ -position 2 -1 ]] && compsub
+}
+
+defcomp set
+__set() {
+  if [[ -mcurrent -1 [-+]o ]] then
+    complist -o
+  elif [[ -current -1 -A ]] then
+    complist -A
+  fi
+}
+
+defcomp zle
+__zle() {
+  if [[ -word 1 -N && -position 3 ]] then
+    complist -F
+  else
+    complist -b
+  fi
+}
+
+defcomp zmodload
+__zmodload() {
+  if [[ -mword 1 -*(a*u|u*a)* || -mword 1 -*a* && -position 3 -1 ]] then
+    complist -B
+  elif [[ -mword 1 -*u* ]] then
+    complist -s '$(zmodload)'
+  else
+    complist -s '${^module_path}/*(N:t:r)'
+  fi
+}
+
+defcomp trap
+__trap() {
+  if [[ -position 1 ]] then
+    complist -c
+  else
+    complist -k signals
+  fi
+}
+
+killfunc() {
+  reply=( "$(ps -x 2>/dev/null)" )
+}
+
+defcomp kill
+__kill() {
+  if [[ -iprefix '-' ]] then
+    complist -k "($signals[1,-3])"
+  else
+    complist -P '%' -j
+    complist -y killfunc -s '`ps -x 2>/dev/null | tail +2 | cut -c1-5`'
+  fi
+}
+
+defcomp wait
+__wait() {
+  complist -P '%' -j
+  complist -y killfunc -s '`ps -x 2>/dev/null | tail +2 | cut -c1-5`'
+}
+
+defcomp cd
+__cd() {
+  files -W cdpath -g '*(-/)'
+}
+
+defcomp __rlogin rlogin rsh ssh
+__rlogin() {
+  if [[ -position 1 ]] then
+    complist -k hosts
+  elif [[ -position 2 ]] then
+    complist -k '(-l)'
+  elif [[ -position 3 && -word 1 artus ]] then
+    complist -k '(puck root)'
+  fi
+}
+
+defcomp __gunzip gunzip zcat
+__gunzip() {
+  files -g '*.[gG][z]'
+}
+
+defcomp gzip
+__gzip() {
+  files -g '*~*.[gG][zZ]'
+}
+
+defcomp xfig
+__xfig() {
+  files -g '*.fig'
+}
+
+defcomp __make make gmake pmake
+__make() {
+  complist -s "\$(awk '/^[a-zA-Z0-9][^/ 	]+:/ {print \$1}' FS=: [mM]akefile)"
+}
+
+defcomp __ps gs ghostview gview psnup psselect pswrap pstops pstruct lpr
+__ps() {
+  files -g '*([pP][sS]|eps)'
+}
+
+defcomp __dvi xdvi dvips dvibook dviconcat dvicopy dvidvi dviselect dvitodvi dvitype
+__dvi() {
+  files -g '*.(dvi|DVI)'
+}
+
+defcomp __dirs rmdir df du dircmp
+__dirs() {
+  files -/ '*(-/)'
+}
+
+defcomp __uncompress uncompress zmore
+__uncompress() {
+  files -g '*.Z'
+}
+
+defcomp compress
+__compress() {
+  files -g '*~*.Z'
+}
+
+defcomp __tex tex latex slitex
+__tex() {
+  files -g '*.(tex|TEX|texinfo|texi)'
+}
+
+defcomp __pdf acroread
+__pdf() {
+  files -g '*.(pdf|PDF)'
+}
+
+defcomp tar
+__tar() {
+  local nm=$NMATCHES tf="$2"
+  compsave
+
+  if [[ ( -mword 1 *t*f* || -mword 1 *x*f* ) && -position 3 100000 ]] then
+    complist -k "( $(tar tf $tf) )"
+    compreset
+  elif [[ -mword 1 *c*f* && -position 3 100000 ]] then
+    files
+    compreset
+  elif [[ -mcurrent -1 *f* && -position 2 ]] then
+    files -g '*.(tar|TAR)'
+  fi
+}
 
 defcomp find
 __find() {
@@ -333,121 +666,9 @@ __find() {
   fi
 }
 
-# Various completions...
+# A simple pattern completion, just as an example.
 
-defcomp __gunzip gunzip zcat
-__gunzip() {
-  files -g '*.[gG][z]'
-}
-
-defcomp gzip
-__gzip() {
-  files -g '*~*.[gG][zZ]'
-}
-
-defcomp xfig
-__xfig() {
-  files -g '*.fig'
-}
-
-defcomp __make make gmake
-__make() {
-  complist -s "\$(awk '/^[a-zA-Z0-9][^/ 	]+:/ {print \$1}' FS=: [mM]akefile)"
-}
-
-defcomp __ps gs ghostview gview psnup psselect pswrap pstops pstruct lpr
-__ps() {
-  files -g '*([pP][sS]|eps)'
-}
-
-defcomp __which which whence
-__which=( -caF )
-
-defcomp __rlogin rlogin rsh ssh
-__rlogin() {
-  if [[ -position 1 ]] then
-    complist -k hosts
-  elif [[ -position 2 ]] then
-    complist -k '(-l)'
-  elif [[ -position 3 && -word 1 artus ]] then
-    complist -k '(puck root)'
-  fi
-}
-
-defcomp __dvi xdvi dvips dvibook dviconcat dvicopy dvidvi dviselect dvitodvi dvitype
-__dvi() {
-  files -g '*.(dvi|DVI)'
-}
-
-defcomp __dirs rmdir df du dircmp cd
-__dirs() {
-  files -/ '*(-/)'
-}
-
-defcomp __jobs fg bg jobs
-__jobs=(-j -P '%?')
-
-defcomp kill
-__kill() {
-  if [[ -iprefix '-' ]] then
-    complist -k signals
-  else
-    complist -P '%?' -j
-  fi
-}
-
-defcomp __uncompress uncompress zmore
-__uncompress() {
-  files -g '*.Z'
-}
-
-defcomp compress
-__compress() {
-  files -g '*~*.Z'
-}
-
-defcomp __tex tex latex glatex slitex gslitex
-__tex() {
-  files -g '*.(tex|TEX|texinfo|texi)'
-}
-
-defcomp __options setopt unsetopt
-__options=(-M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o)
-
-defcomp __funcs unfunction
-__funcs=(-F)
-
-defcomp __aliases unalias
-__aliases=(-a)
-
-defcomp __vars unset
-__vars=(-v)
-
-defcomp __enabled disable
-__enabled=(-FBwa)
-
-defcomp __disabled enable
-__disabled=(-dFBwa)
-
-defcomp __pdf acroread
-__pdf() {
-  files -g '*.(pdf|PDF)'
-}
-
-defcomp tar
-__tar() {
-  local nm tf
-  compsave
-
-  tf="$2"
-  nm=$NMATCHES
-  if [[ ( -mword 1 *t*f* || -mword 1 *x*f* ) && -position 3 100000 ]] then
-    complist -k "( $(tar tf $tf) )"
-    compreset
-  elif [[ -mword 1 *c*f* && -position 3 100000 ]] then
-    files
-    compreset
-  elif [[ -mcurrent -1 *f* && -position 2 ]] then
-    files -g '*.(tar|TAR)'
-  fi
+defpatcomp __x_options '*/X11/*'
+__x_options() {
+  complist -J options -k '(-display -name -xrm)'
 }

@@ -31,7 +31,42 @@
 #include "glob.pro"
 
 /* flag for CSHNULLGLOB */
- 
+
+typedef struct gmatch *Gmatch; 
+
+struct gmatch {
+    char *name;
+    long size;
+    long atime;
+    long mtime;
+    long ctime;
+    long links;
+    long _size;
+    long _atime;
+    long _mtime;
+    long _ctime;
+    long _links;
+};
+
+#define GS_NAME   1
+#define GS_SIZE   2
+#define GS_ATIME  4
+#define GS_MTIME  8
+#define GS_CTIME 16
+#define GS_LINKS 32
+
+#define GS_SHIFT  5
+#define GS__SIZE  (GS_SIZE << GS_SHIFT)
+#define GS__ATIME (GS_ATIME << GS_SHIFT)
+#define GS__MTIME (GS_MTIME << GS_SHIFT)
+#define GS__CTIME (GS_CTIME << GS_SHIFT)
+#define GS__LINKS (GS_LINKS << GS_SHIFT)
+
+#define GS_DESC  2048
+
+#define GS_NORMAL (GS_SIZE | GS_ATIME | GS_MTIME | GS_CTIME | GS_LINKS)
+#define GS_LINKED (GS_NORMAL << GS_SHIFT)
+
 /**/
 int badcshglob;
  
@@ -42,8 +77,8 @@ static int matchct;		/* number of matches found              */
 static char *pathbuf;		/* pathname buffer                      */
 static int pathbufsz;		/* size of pathbuf			*/
 static int pathbufcwd;		/* where did we chdir()'ed		*/
-static char **matchbuf;		/* array of matches                     */
-static char **matchptr;		/* &matchbuf[matchct]                   */
+static Gmatch matchbuf;		/* array of matches                     */
+static Gmatch matchptr;		/* &matchbuf[matchct]                   */
 static char *colonmod;		/* colon modifiers in qualifier list    */
 
 typedef struct stat *Statptr;	 /* This makes the Ultrix compiler happy.  Go figure. */
@@ -81,6 +116,7 @@ static struct qual *quals;
 static int qualct, qualorct;
 static int range, amc, units;
 static int gf_nullglob, gf_markdirs, gf_noglobdots, gf_listtypes, gf_follow;
+static int gf_sorts, gf_nsorts, gf_sortlist[11];
 
 /* Prefix, suffix for doing zle trickery */
 
@@ -213,6 +249,7 @@ insert(char *s, int checked)
 
 	if (!statted && statfullpath(s, &buf, 1))
 	    return;
+	statted = 1;
 	qo = quals;
 	for (qn = qo; qn && qn->func;) {
 	    range = qn->range;
@@ -237,19 +274,44 @@ insert(char *s, int checked)
 	    }
 	    qn = qn->next;
 	}
-    } else if (!checked && statfullpath(s, NULL, 1))
-	return;
-
+    } else if (!checked) {
+	if (statfullpath(s, NULL, 1))
+	    return;
+	statted = 1;
+    }
     news = dyncat(pathbuf, news);
     if (colonmod) {
 	/* Handle the remainder of the qualifer:  e.g. (:r:s/foo/bar/). */
 	s = colonmod;
 	modify(&news, &s);
     }
-    *matchptr++ = news;
+    if (!statted && (gf_sorts & GS_NORMAL)) {
+	statfullpath(s, &buf, 1);
+	statted = 1;
+    }
+    if (statted != 2 && (gf_sorts & GS_LINKED)) {
+	if (statted) {
+	    if (!S_ISLNK(buf.st_mode) || statfullpath(s, &buf2, 0))
+		memcpy(&buf2, &buf, sizeof(buf));
+	} else if (statfullpath(s, &buf2, 0))
+	    statfullpath(s, &buf2, 1);
+    }
+    matchptr->name = news;
+    matchptr->size = buf.st_size;
+    matchptr->atime = buf.st_atime;
+    matchptr->mtime = buf.st_mtime;
+    matchptr->ctime = buf.st_ctime;
+    matchptr->links = buf.st_nlink;
+    matchptr->_size = buf2.st_size;
+    matchptr->_atime = buf2.st_atime;
+    matchptr->_mtime = buf2.st_mtime;
+    matchptr->_ctime = buf2.st_ctime;
+    matchptr->_links = buf2.st_nlink;
+    matchptr++;
+
     if (++matchct == matchsz) {
-	matchbuf = (char **)realloc((char *)matchbuf,
-				    sizeof(char **) * (matchsz *= 2));
+	matchbuf = (Gmatch )realloc((char *)matchbuf,
+				    sizeof(struct gmatch) * (matchsz *= 2));
 
 	matchptr = matchbuf + matchct;
     }
@@ -944,21 +1006,144 @@ qgetnum(char **s)
     return v;
 }
 
-/* get octal number after qualifier */
+/* get mode spec after qualifier */
 
 /**/
 static long
-qgetoctnum(char **s)
+qgetmodespec(char **s)
 {
-    long v = 0;
+    long yes = 0, no = 0, val, mask, t;
+    char *p = *s, c, how, end;
 
-    if (!idigit(**s)) {
-	zerr("octal number expected", NULL, 0);
-	return 0;
+    if ((c = *p) == '=' || c == Equals || c == '+' || c == '-' ||
+	c == '?' || c == Quest || (c >= '0' && c <= '7')) {
+	end = 0;
+	c = 0;
+    } else {
+	end = (c == '<' ? '>' :
+	       (c == '[' ? ']' :
+		(c == '{' ? '}' :
+		 (c == Inang ? Outang :
+		  (c == Inbrack ? Outbrack :
+		   (c == Inbrace ? Outbrace : c))))));
+	p++;
     }
-    while (**s >= '0' && **s <= '7')
-	v = v * 010 + *(*s)++ - '0';
-    return v;
+    do {
+	mask = 0;
+	while (((c = *p) == 'u' || c == 'g' || c == 'o' || c == 'a') && end) {
+	    switch (c) {
+	    case 'o': mask |= 01007; break;
+	    case 'g': mask |= 02070; break;
+	    case 'u': mask |= 04700; break;
+	    case 'a': mask |= 07777; break;
+	    }
+	    p++;
+	}
+	how = ((c == '+' || c == '-') ? c : '=');
+	if (c == '+' || c == '-' || c == '=' || c == Equals)
+	    p++;
+	val = 0;
+	if (mask) {
+	    while ((c = *p++) != ',' && c != end) {
+		switch (c) {
+		case 'x': val |= 00111; break;
+		case 'w': val |= 00222; break;
+		case 'r': val |= 00444; break;
+		case 's': val |= 06000; break;
+		case 't': val |= 01000; break;
+		case '0': case '1': case '2': case '3':
+		case '4': case '5': case '6': case '7':
+		    t = ((long) c - '0');
+		    val |= t | (t << 3) | (t << 6);
+		    break;
+		default:
+		    zerr("invalid mode specification", NULL, 0);
+		    return 0;
+		}
+	    }
+	    if (how == '=' || how == '+') {
+		yes |= val & mask;
+		val = ~val;
+	    }
+	    if (how == '=' || how == '-')
+		no |= val & mask;
+	} else {
+	    t = 07777;
+	    while ((c = *p) == '?' || c == Quest ||
+		   (c >= '0' && c <= '7')) {
+		if (c == '?' || c == Quest) {
+		    t = (t << 3) | 7;
+		    val <<= 3;
+		} else {
+		    t <<= 3;
+		    val = (val << 3) | ((long) c - '0');
+		}
+		p++;
+	    }
+	    if (end && c != end && c != ',') {
+		zerr("invalid mode specification", NULL, 0);
+		return 0;
+	    }
+	    if (how == '=') {
+		yes = (yes & ~t) | val;
+		no = (no & ~t) | (~val & ~t);
+	    } else if (how == '+')
+		yes |= val;
+	    else
+		no |= val;
+	}
+    } while (end && c != end);
+
+    *s = p;
+    return ((yes & 07777) | ((no & 07777) << 12));
+}
+
+static int
+gmatchcmp(Gmatch a, Gmatch b)
+{
+    int i, *s;
+    long r;
+
+    for (i = gf_nsorts, s = gf_sortlist; i; i--, s++) {
+	switch (*s & ~GS_DESC) {
+	case GS_NAME:
+	    r = notstrcmp(&a->name, &b->name);
+	    break;
+	case GS_SIZE:
+	    r = b->size - a->size;
+	    break;
+	case GS_ATIME:
+	    r = a->atime - b->atime;
+	    break;
+	case GS_MTIME:
+	    r = a->mtime - b->mtime;
+	    break;
+	case GS_CTIME:
+	    r = a->ctime - b->ctime;
+	    break;
+	case GS_LINKS:
+	    r = b->links - a->links;
+	    break;
+	case GS__SIZE:
+	    r = b->_size - a->_size;
+	    break;
+	case GS__ATIME:
+	    r = a->_atime - b->_atime;
+	    break;
+	case GS__MTIME:
+	    r = a->_mtime - b->_mtime;
+	    break;
+	case GS__CTIME:
+	    r = a->_ctime - b->_ctime;
+	    break;
+	case GS__LINKS:
+	    r = b->_links - a->_links;
+	    break;
+	}
+	if (r)
+	    return (int) ((*s & GS_DESC) ? -r : r);
+    }
+    return 0;
 }
 
 /* Main entry point to the globbing code for filename globbing. *
@@ -976,7 +1161,8 @@ glob(LinkList list, LinkNode np)
     Complist q;				/* pattern after parsing         */
     char *ostr = (char *)getdata(np);	/* the pattern before the parser */
 					/* chops it up                   */
-
+    int first = 0, last = -1;		/* index of first/last match to  */
+				        /* return */
     MUSTUSEHEAP("glob");
     if (unset(GLOBOPT) || !haswilds(ostr)) {
 	untokenize(ostr);
@@ -994,6 +1180,7 @@ glob(LinkList list, LinkNode np)
     gf_markdirs = isset(MARKDIRS);
     gf_listtypes = gf_follow = 0;
     gf_noglobdots = unset(GLOBDOTS);
+    gf_sorts = gf_nsorts = 0;
 
     /* Check for qualifiers */
     if (isset(BAREGLOBQUAL) && str[sl - 1] == Outpar) {
@@ -1246,10 +1433,9 @@ glob(LinkList list, LinkNode np)
 			}
 			break;
 		    case 'o':
-			/* Match octal mode of file exactly. *
-			 * Currently undocumented.           */
-			func = qualeqflags;
-			data = qgetoctnum(&s);
+			/* Match modes with chmod-spec. */
+			func = qualmodeflags;
+			data = qgetmodespec(&s);
 			break;
 		    case 'M':
 			/* Mark directories with a / */
@@ -1315,6 +1501,51 @@ glob(LinkList list, LinkNode np)
 			data = qgetnum(&s);
 			break;
 
+		    case 'O':
+			{
+			    int t;
+
+			    switch (*s) {
+			    case 'n': t = GS_NAME; break;
+			    case 'L': t = GS_SIZE; break;
+			    case 'l': t = GS_LINKS; break;
+			    case 'a': t = GS_ATIME; break;
+			    case 'm': t = GS_MTIME; break;
+			    case 'c': t = GS_CTIME; break;
+			    default:
+				zerr("unknown sort specifier", NULL, 0);
+				return;
+			    }
+			    if ((sense & 2) && t != GS_NAME)
+				t <<= GS_SHIFT;
+			    if (gf_sorts & t) {
+				zerr("doubled sort specifier", NULL, 0);
+				return;
+			    }
+			    gf_sorts |= t;
+			    gf_sortlist[gf_nsorts++] = t |
+				((sense & 1) ? GS_DESC : 0);
+			    s++;
+			    break;
+			}
+		    case '[':
+		    case Inbrack:
+			{
+			    char *os = --s;
+			    struct value v;
+
+			    v.isarr = SCANPM_WANTVALS;
+			    v.pm = NULL;
+			    v.b = -1;
+			    v.inv = 0;
+			    if (getindex(&s, &v) || s == os) {
+				zerr("invalid subscript", NULL, 0);
+				return;
+			    }
+			    first = v.a;
+			    last = v.b;
+			    break;
+			}
 		    default:
 			zerr("unknown file attribute", NULL, 0);
 			return;
@@ -1353,10 +1584,14 @@ glob(LinkList list, LinkNode np)
 	zerr("bad pattern: %s", ostr, 0);
 	return;
     }
-
+    if (!gf_nsorts) {
+	gf_sortlist[0] = gf_sorts = GS_NAME;
+	gf_nsorts = 1;
+    }
     /* Initialise receptacle for matched files, *
      * expanded by insert() where necessary.    */
-    matchptr = matchbuf = (char **)zalloc((matchsz = 16) * sizeof(char *));
+    matchptr = matchbuf = (Gmatch)zalloc((matchsz = 16) *
+					 sizeof(struct gmatch));
     matchct = 0;
 
     /* The actual processing takes place here: matches go into  *
@@ -1375,18 +1610,32 @@ glob(LinkList list, LinkNode np)
 	    return;
 	} else {
 	    /* treat as an ordinary string */
-	    untokenize(*matchptr++ = dupstring(ostr));
+	    untokenize(matchptr->name = dupstring(ostr));
+	    matchptr++;
 	    matchct = 1;
 	}
     }
     /* Sort arguments in to lexical (and possibly numeric) order. *
      * This is reversed to facilitate insertion into the list.    */
-    qsort((void *) & matchbuf[0], matchct, sizeof(char *),
-	       (int (*) _((const void *, const void *)))notstrcmp);
+    qsort((void *) & matchbuf[0], matchct, sizeof(struct gmatch),
+	       (int (*) _((const void *, const void *)))gmatchcmp);
 
-    matchptr = matchbuf;
-    while (matchct--)		/* insert matches in the arg list */
-	insertlinknode(list, node, *matchptr++);
+    if (first < 0)
+	first += matchct;
+    if (last < 0)
+	last += matchct;
+    if (first < 0)
+	first = 0;
+    if (last >= matchct)
+	last = matchct - 1;
+    if (first <= last) {
+	matchptr = matchbuf + matchct - 1 - last;
+	last -= first;
+	while (last-- >= 0) {		/* insert matches in the arg list */
+	    insertlinknode(list, node, matchptr->name);
+	    matchptr++;
+	}
+    }
     free(matchbuf);
 }
 
@@ -2918,13 +3167,15 @@ qualflags(struct stat *buf, long mod)
     return mode_to_octal(buf->st_mode) & mod;
 }
 
-/* mode matches number supplied exactly  */
+/* mode matches specification */
 
 /**/
 static int
-qualeqflags(struct stat *buf, long mod)
+qualmodeflags(struct stat *buf, long mod)
 {
-    return mode_to_octal(buf->st_mode) == mod;
+    long v = mode_to_octal(buf->st_mode), y = mod & 07777, n = mod >> 12;
+
+    return ((v & y) == y && !(v & n));
 }
 
 /* regular executable file? */

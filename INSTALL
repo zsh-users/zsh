@@ -114,15 +114,18 @@ To install the dynamically-loadable modules, do the command:
 To install the zsh man page, do the command:
     make install.man
 
-To install the zsh info files, do the command:
-    make install.info
-
 Or alternatively, you can install all the above with the command:
     make install
 
-"make install.info" will only move the info files into the info directory.
-You will have to edit the topmost node of the info tree "dir" manually
-in order to have the zsh info files available to your info reader.
+To install the zsh info files (this must be done separately), do the
+command:
+    make install.info
+
+If the programme install-info is available, "make install.info" will
+insert an entry in the file "dir" in the same directory as the info
+files.  Otherwise you will have to edit the topmost node of the info
+tree "dir" manually in order to have the zsh info files available to
+your info reader.
 
 Building Zsh On Additional Architectures
 ----------------------------------------

@@ -300,18 +300,61 @@ init_io(void)
 
     /* Make sure the tty is opened read/write. */
     if (isatty(0)) {
+#ifdef TIOCNXCL
+	/*
+	 * See if the terminal claims to be busy.  If so, and fd 0
+	 * is a terminal, try and set non-exclusive use for that.
+	 * This is something to do with Solaris over-cleverness.
+	 */
+	int tmpfd;
+	if ((tmpfd = open("/dev/tty", O_RDWR | O_NOCTTY)) < 0) {
+	    if (errno == EBUSY)
+		ioctl(0, TIOCNXCL, 0);
+	} else
+	    close(tmpfd);
+#endif
 	zsfree(ttystrname);
 	if ((ttystrname = ztrdup(ttyname(0))))
 	    SHTTY = movefd(open(ttystrname, O_RDWR | O_NOCTTY));
+	/*
+	 * xterm, rxvt and probably all terminal emulators except
+	 * dtterm on Solaris 2.6 & 7 have a bug. Applications are
+	 * unable to open /dev/tty or /dev/pts/<terminal number here>
+	 * because something in Sun's STREAMS modules doesn't like
+	 * it. The open() call fails with EBUSY which is not even
+	 * listed as a possibility in the open(2) man page.  So we'll
+	 * try to outsmart The Company.  -- <dave@srce.hr>
+	 *
+	 * Presumably there's no harm trying this on any OS, given that
+	 * isatty(0) worked but opening the tty didn't.  Possibly we won't
+	 * get the tty read/write, but it's the best we can do -- pws
+	 *
+	 * Try both stdin and stdout before trying /dev/tty. -- Bart
+	 */
+#if defined(HAVE_FCNTL_H) && defined(F_GETFL)
+#define rdwrtty(fd)	((fcntl(fd, F_GETFL) & O_RDWR) == O_RDWR)
+#else
+#define rdwrtty(fd)	1
+#endif
+	if (SHTTY == -1 && rdwrtty(0)) {
+	    SHTTY = movefd(dup(0));
+	}
+    }
+    if (SHTTY == -1 && isatty(1) && rdwrtty(1) &&
+	(SHTTY = movefd(dup(1))) != -1) {
+	zsfree(ttystrname);
+	ttystrname = ztrdup(ttyname(1));
     }
     if (SHTTY == -1 &&
 	(SHTTY = movefd(open("/dev/tty", O_RDWR | O_NOCTTY))) != -1) {
 	zsfree(ttystrname);
-	ttystrname = ztrdup("/dev/tty");
+	ttystrname = ztrdup(ttyname(SHTTY));
     }
     if (SHTTY == -1) {
 	zsfree(ttystrname);
 	ttystrname = ztrdup("");
+    } else if (!ttystrname) {
+	ttystrname = ztrdup("/dev/tty");
     }
 
     /* We will only use zle if shell is interactive, *

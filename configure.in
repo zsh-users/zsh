@@ -1008,9 +1008,24 @@ char *argv[];
     aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
     solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
   esac
-  case "$host_os" in
-    hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
-    linux*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
+  case "$host" in
+    *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
+    *-linux*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
+    mips-sni-sysv4)
+      #
+      # unfortunately, we have different compilers
+      # that need different flags
+      #
+      sni_cc_version=`$CC -V 2>&1 | head -1`
+      case "$sni_cc_version" in
+        CDS* )
+         EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-Blargedynsym}"
+       ;;
+       * )
+         EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-LD-Blargedynsym}"
+       ;;
+      esac
+    ;;
   esac
   AC_CACHE_CHECK(if your dlsym() needs a leading underscore,
    zsh_cv_func_dlsym_needs_underscore,

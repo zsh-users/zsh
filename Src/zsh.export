@@ -214,6 +214,7 @@ tgoto
 tok
 tokenize
 tokstr
+tokstrings
 tputs
 trashzleptr
 tricat

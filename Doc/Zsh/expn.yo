@@ -602,6 +602,46 @@ item(tt(f))(
 Split the result of the expansion to lines. This is a shorthand
 for `tt(ps:\n:)'.
 )
+item(tt(t))(
+Don't work on the value of the parameter, but on a string describing
+the type of the parameter. This string consists of keywords separated
+by hyphens (`tt(-)'). The first keyword in the string describes the
+main type, it can be one of `tt(scalar)', `tt(array)', `tt(integer)',
+or `tt(association)'. The other keywords describe the type in more
+detail:
+
+startitem()
+item(`tt(left)')(
+for left justified parameters
+)
+item(`tt(right_blanks)')(
+for right justified parameters with leading blanks
+)
+item(`tt(right_zeros)')(
+for right justified parameters with leading zeros
+)
+item(`tt(lower)')(
+for parameters whose value is converted to all lower case when it is
+expanded
+)
+item(`tt(upper)')(
+for parameters whose value is converted to all upper case when it is
+expanded
+)
+item(`tt(readonly)')(
+for readonly parameters
+)
+item(`tt(tag)')(
+for tagged parameters
+)
+item(`tt(export)')(
+for exported parameters
+)
+item(`tt(unique)')(
+for arrays which keep only the first occurrence of duplicated values
+)
+enditem()
+)
 enditem()
 
 The following flags are meaningful with the tt(${)...tt(#)...tt(}),
@@ -1048,6 +1088,49 @@ setgid files (02000)
 item(tt(t))(
 files with the sticky bit (01000)
 )
+item(tt(o)var(spec))(
+files with access rights matching var(spec). This var(spec) may be a
+octal number optionally preceded by a `tt(=)', a `tt(PLUS())', or a
+`tt(-)'. If none of these characters is given, the behavior is the
+same as for `tt(=)'. The octal number decribes the mode bits to be
+expected, if combined with a `tt(=)', the value given must match the
+file-modes exactly, with a `tt(PLUS())', at least the bits in the
+given number must be set in the file-modes, and with a `tt(-)', the
+bits in the number must not be set. Giving a `tt(?)' instead of a
+octal digit anywhere in the number ensures that the corresponding bits 
+inthe file-modes are not checked, this is only useful in combination
+with `tt(=)'.
+
+If the qualifier `tt(o)' is followed by any other character anything
+up to the next matching character (`tt([)', `tt({)', and `tt(<)' match 
+`tt(])', `tt(})', and `tt(>)' respectively, any other character
+matches itself) is taken as a list of comma-separated
+var(sub-spec)s. Each var(sub-spec) may be either a octal number as
+described above or a list of any of the characters `tt(u)', `tt(g)',
+`tt(o)', and `tt(a)', followed by a `tt(=)', a `tt(PLUS())', or a
+`tt(-)', followed by a list of any of the characters `tt(r)', `tt(w)', 
+`tt(x)', `tt(s)', and `tt(t)', or a octal digit. The first list of
+characters specify which acess rights are to be checked. If a `tt(u)'
+is given, those for the owner of the file are used, if a `tt(g)' is
+given, those of the group are checked, a `tt(o)' means to test those
+of other users, and the `tt(a)' says to test all three groups. The
+`tt(=)', `tt(PLUS())', and `tt(-)' again says how the modes are to be
+checked and have the same meaning as described for the first form
+above. The second list of characters finally says which access rights
+are to be expected: `tt(r)' for read access, `tt(w)' for write access, 
+`tt(x)' for the right to execute the file (or to search a directory),
+`tt(s)' for the setuid and setgid bits, and `tt(t)' for the sticky
+bit.
+
+Thus, `tt(*(o70?))' gives the files for which the owner has read,
+write, and execute permission, and for which other group members have
+no rights, independent of the permissions for other user. The pattern
+`tt(*(o-100))' gives all files for which the owner does not have
+execute permission, and `tt(*(o:gu+w,o-rx))' gives the files for which 
+the owner and the other members of the group have at least write
+permission, and fo which other users don't have read or execute
+permission.
+)
 item(tt(d)var(dev))(
 files on the device var(dev)
 )
@@ -1065,8 +1148,8 @@ item(tt(u)var(id))(
 files owned by user ID var(id) if it is a number, if not, than the
 character after the `tt(u)' will be used as a separator and the string
 between it and the next matching separator
-(`tt(LPAR())', `tt([)', `tt({)', and `tt(<)'
-match `tt(RPAR())', `tt(])', `tt(})', and `tt(>)' respectively,
+(`tt([)', `tt({)', and `tt(<)'
+match `tt(])', `tt(})', and `tt(>)' respectively,
 any other character matches
 itself) will be taken as a user name, and the user ID of this user will
 be taken (e.g. `tt(u:foo:)' or `tt(u[foo])' for user `tt(foo)')
@@ -1121,6 +1204,27 @@ pindex(NULL_GLOB, setting in pattern)
 item(tt(D))(
 sets the tt(GLOB_DOTS) option for the current pattern
 pindex(GLOB_DOTS, setting in pattern)
+)
+item(tt(O)var(c))(
+specifies how the names of the files should be sorted. If var(c) is
+tt(n) they are sorted by name (the default), if var(c) is tt(L) they
+are sorted depending on the size (length) of the files, tt(l) makes
+them be sorted by the number of links, and tt(a), tt(m), and tt(c)
+make them be sorted by the time of the last access, modification, and
+inode change respectively. Note that tt(a), tt(m), and tt(c) compare
+the age to the current time, so the first name in the list is the 
+one of the youngest file. Also note that the modifiers tt(^) and tt(-) are 
+used, so `tt(*(^-OL))' gives a list of all files sorted by file size in 
+descending order working not on symbolic links but on the files they
+point to.
+)
+item(tt([)var(beg)[tt(,)var(end)]tt(]))(
+specifies which of the matched filenames should be included in the
+returned list. The syntax is the same as for array
+subscripts. var(beg) and the optional var(end) may be mathematical
+expressions. As in parameter subscripting they may be negative to make 
+them count from the last match backward. E.g.: `tt(*(^-OL[1,3]))'
+gives a list of the names of three biggest files.
 )
 enditem()
 

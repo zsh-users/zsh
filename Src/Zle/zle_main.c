@@ -45,10 +45,10 @@ int mark;
 /**/
 int c;
 
-/* the binding for this key */
+/* the bindings for the previous and for this key */
 
 /**/
-Thingy bindk;
+Thingy lbindk, bindk;
 
 /* insert mode/overwrite mode flag */
 
@@ -554,6 +554,7 @@ zleread(char *lp, char *rp, int ha)
 void
 execzlefunc(Thingy func)
 {
+    int r = 0;
     Widget w;
 
     if(func->flags & DISABLED) {
@@ -565,14 +566,13 @@ execzlefunc(Thingy func)
 	showmsg(msg);
 	zsfree(msg);
 	feep();
-    } else if((w = func->widget)->flags &
-	      (WIDGET_INT|WIDGET_COMP | WIDGET_NCOMP)) {
+    } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_NCOMP)) {
 	int wflags = w->flags;
 
 	if(!(wflags & ZLE_KEEPSUFFIX))
 	    removesuffix();
 	if(!(wflags & ZLE_MENUCMP) ||
-	   ((wflags & (WIDGET_COMP|WIDGET_NCOMP)) && compwidget != w)) {
+	   ((wflags & WIDGET_NCOMP) && compwidget != w)) {
 	    /* If we are doing a special completion, and the widget
 	     * is not the one currently in use for special completion,
 	     * we are starting a new completion.
@@ -584,16 +584,14 @@ execzlefunc(Thingy func)
 	    vilinerange = 1;
 	if(!(wflags & ZLE_LASTCOL))
 	    lastcol = -1;
-	if (wflags & WIDGET_COMP) {
-	    compwidget = w;
-	    completespecial();
-	} else if (wflags & WIDGET_NCOMP) {
+	if (wflags & WIDGET_NCOMP) {
 	    compwidget = w;
 	    completecall();
 	} else
 	    w->u.fn();
 	if (!(wflags & ZLE_NOTCOMMAND))
 	    lastcmd = wflags;
+	r = 1;
     } else {
 	List l = getshfunc(w->u.fnnam);
 
@@ -610,13 +608,19 @@ execzlefunc(Thingy func)
 	    int osc = sfcontext;
 
 	    startparamscope();
-	    makezleparams();
+	    makezleparams(0);
 	    sfcontext = SFC_WIDGET;
 	    doshfunc(w->u.fnnam, l, NULL, 0, 1);
 	    sfcontext = osc;
 	    endparamscope();
 	    lastcmd = 0;
+	    r = 1;
 	}
+    }
+    if (r) {
+	unrefthingy(lbindk);
+	refthingy(func);
+	lbindk = func;
     }
 }
 
@@ -877,9 +881,11 @@ setup_zle(Module m)
     comp_strptr = comp_str;
     getcpatptr = getcpat;
     makecomplistcallptr = makecomplistcall;
+    makecomplistctlptr = makecomplistctl;
 
     /* initialise the thingies */
     init_thingies();
+    lbindk = NULL;
 
     /* miscellaneous initialisations */
     stackhist = stackcs = -1;
@@ -920,6 +926,8 @@ finish_zle(Module m)
 {
     int i;
 
+    unrefthingy(lbindk);
+
     cleanup_keymaps();
     deletehashtable(thingytab);
 
@@ -944,6 +952,7 @@ finish_zle(Module m)
     comp_strptr = NULL;
     getcpatptr = NULL;
     makecomplistcallptr = NULL;
+    makecomplistctlptr = NULL;
 
     return 0;
 }

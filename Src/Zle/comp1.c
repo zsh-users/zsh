@@ -44,12 +44,6 @@ Cmlist cmatcher;
 /* pointers to functions required by zle and defined by compctl */
 
 /**/
-void (*printcompctlptr) _((char *, Compctl, int, int));
-
-/**/
-Compctl (*compctl_widgetptr) _((char *, char **));
-
-/**/
 void (*makecompparamsptr) _((void));
 
 /* pointers to functions required by compctl and defined by zle */
@@ -66,6 +60,8 @@ int (*getcpatptr) _((char *, int, char *, int));
 /**/
 void (*makecomplistcallptr) _((Compctl));
 
+/**/
+void (*makecomplistctlptr) _((int));
 
 /* Hash table for completion info for commands */
  

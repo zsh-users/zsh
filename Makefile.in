@@ -55,9 +55,9 @@ META-FAQ: FORCE
 install-strip:
 	$(MAKE) install STRIPFLAGS="-s"
 
-# install/uninstall everything
-install: install.bin install.modules install.man install.info
-uninstall: uninstall.bin uninstall.modules uninstall.man uninstall.info
+# install/uninstall everything (except info)
+install: install.bin install.modules install.man
+uninstall: uninstall.bin uninstall.modules uninstall.man
 
 # install/uninstall just the binary
 install.bin uninstall.bin:

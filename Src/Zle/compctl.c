@@ -1638,38 +1638,6 @@ bin_compctl(char *name, char **argv, char *ops, int func)
     return ret;
 }
 
-/* Externally callable version of get_compctl.  Used for completion widgets */
-
-/**/
-static Compctl
-compctl_widget(char *name, char **argv)
-{
-  Compctl cc = (Compctl) zcalloc(sizeof(*cc));
-  cclist = 0;
-  showmask = 0;
-
-  if (get_compctl(name, &argv, cc, 1, 0, 0)) {
-      freecompctl(cc);
-      return NULL;
-  }
-
-  if (cclist & COMP_REMOVE) {
-      zwarnnam(name, "use -D to delete widget", NULL, 0);
-      return NULL;
-  } else if (cclist) {
-      zwarnnam(name, "special options illegal in widget", NULL, 0);
-      freecompctl(cc);
-      return NULL;
-  } else if (*argv) {
-      zwarnnam(name, "command names illegal in widget", NULL, 0);
-      freecompctl(cc);
-      return NULL;
-  }
-  cc->refc++;
-
-  return cc;
-}
-
 /**/
 static int
 bin_complist(char *name, char **argv, char *ops, int func)
@@ -1677,7 +1645,7 @@ bin_complist(char *name, char **argv, char *ops, int func)
     Compctl cc;
     int ret = 0;
 
-    if (!incompfunc) {
+    if (incompfunc != 1) {
 	zerrnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
@@ -1706,7 +1674,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     char *pre = NULL, *suf = NULL, *group = NULL;
     int f = 0, q = 0, m = 0, ns = 0, a = 0;
 
-    if (!incompfunc) {
+    if (incompfunc != 1) {
 	zerrnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
@@ -1792,12 +1760,24 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	}
     }
  ca_args:
-    if (!*argv) {
-	zerrnam(name, "missing completions", NULL, 0);
+    if (!*argv)
 	return 1;
-    }
+
     addmatchesptr(ipre, ppre, psuf, prpre, pre, suf, group,
 		  f, q, m, ns, a, argv);
+    return 0;
+}
+
+/**/
+static int
+bin_compcall(char *name, char **argv, char *ops, int func)
+{
+    if (incompfunc != 1) {
+	zerrnam(name, "can only be called from completion function", NULL, 0);
+	return 1;
+    }
+    makecomplistctlptr((ops['T'] ? 0 : CFN_FIRST) |
+		       (ops['D'] ? 0 : CFN_DEFAULT));
     return 0;
 }
 
@@ -1823,7 +1803,7 @@ void makecompparams(void)
     struct compparam *cp;
 
     for (cp = compparams; cp->name; cp++) {
-	Param pm = createparam(cp->name, cp->type | PM_SPECIAL);
+	Param pm = createparam(cp->name, cp->type | PM_SPECIAL|PM_REMOVABLE);
 	if (!pm)
 	    pm = (Param) paramtab->getnode(paramtab, cp->name);
 	DPUTS(!pm, "param not set in makecompparams");
@@ -1856,7 +1836,7 @@ compunsetfn(Param pm, int exp)
 static int
 comp_wrapper(List list, FuncWrap w, char *name)
 {
-    if (!incompfunc)
+    if (incompfunc != 1)
 	return 1;
     else {
 	char *octxt, *ocmd, *opre, *osuf, *oipre;
@@ -1907,7 +1887,7 @@ ignore_prefix(int l)
 static int
 comp_check(void)
 {
-    if (!incompfunc) {
+    if (incompfunc != 1) {
 	zerr("condition can only be used in completion function", NULL, 0);
 	return 0;
     }
@@ -2119,7 +2099,8 @@ cond_nmatches(char **a, int id)
 static struct builtin bintab[] = {
     BUILTIN("compctl", 0, bin_compctl, 0, -1, 0, NULL, NULL),
     BUILTIN("complist", 0, bin_complist, 1, -1, 0, NULL, NULL),
-    BUILTIN("compadd", 0, bin_compadd, 1, -1, 0, NULL, NULL),
+    BUILTIN("compadd", 0, bin_compadd, 0, -1, 0, NULL, NULL),
+    BUILTIN("compcall", 0, bin_compcall, 0, 0, 0, "TD", NULL),
 };
 
 static struct conddef cotab[] = {
@@ -2149,8 +2130,6 @@ int
 setup_compctl(Module m)
 {
     compctltab->printnode = printcompctlp;
-    printcompctlptr = printcompctl;
-    compctl_widgetptr = compctl_widget;
     makecompparamsptr = makecompparams;
     return 0;
 }
@@ -2183,8 +2162,6 @@ int
 finish_compctl(Module m)
 {
     compctltab->printnode = NULL;
-    printcompctlptr = NULL;
-    compctl_widgetptr = NULL;
     makecompparamsptr = NULL;
     return 0;
 }

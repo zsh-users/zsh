@@ -109,7 +109,8 @@ int parend;
  
 /* text of puctuation tokens */
 
-static char *tokstrings[WHILE + 1] = {
+/**/
+char *tokstrings[WHILE + 1] = {
     NULL,	/* NULLTOK	  0  */
     ";",	/* SEPER	     */
     "\\n",	/* NEWLIN	     */
@@ -120,7 +121,7 @@ static char *tokstrings[WHILE + 1] = {
     ")",	/* OUTPAR	     */
     "||",	/* DBAR		     */
     "&&",	/* DAMPER	     */
-    ")",	/* OUTANG	  10 */
+    ">",	/* OUTANG	  10 */
     ">|",	/* OUTANGBANG	     */
     ">>",	/* DOUTANG	     */
     ">>|",	/* DOUTANGBANG	     */

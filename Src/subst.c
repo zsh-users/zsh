@@ -702,6 +702,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int whichlen = 0;
     int chkset = 0;
     int vunset = 0;
+    int wantt = 0;
     int spbreak = isset(SHWORDSPLIT) && !ssub && !qt;
     char *val = NULL, **aval = NULL;
     unsigned int fwidth = 0;
@@ -902,6 +903,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    hvals = SCANPM_WANTVALS;
 		    break;
 
+		case 't':
+		    wantt = 1;
+		    break;
+
 		default:
 		  flagerr:
 		    zerr("error in flags", NULL, 0);
@@ -978,9 +983,47 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	*s = sav;
 	v = (Value) NULL;
     } else {
-	if (!(v = fetchvalue(&s, (unset(KSHARRAYS) || inbrace) ? 1 : -1,
+	if (!(v = fetchvalue(&s, (wantt ? -1 :
+				  ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
 			     hkeys|hvals)))
 	    vunset = 1;
+
+	if (wantt) {
+	    if (v) {
+		int f = v->pm->flags;
+
+		switch (PM_TYPE(f)) {
+		case PM_SCALAR:  val = "scalar"; break;
+		case PM_ARRAY:   val = "array"; break;
+		case PM_INTEGER: val = "integer"; break;
+		case PM_HASHED:  val = "association"; break;
+		}
+		val = dupstring(val);
+		if (f & PM_LEFT)
+		    val = dyncat(val, "-left");
+		if (f & PM_RIGHT_B)
+		    val = dyncat(val, "-right_blanks");
+		if (f & PM_RIGHT_Z)
+		    val = dyncat(val, "-right_zeros");
+		if (f & PM_LOWER)
+		    val = dyncat(val, "-lower");
+		if (f & PM_UPPER)
+		    val = dyncat(val, "-upper");
+		if (f & PM_READONLY)
+		    val = dyncat(val, "-readonly");
+		if (f & PM_TAGGED)
+		    val = dyncat(val, "-tag");
+		if (f & PM_EXPORTED)
+		    val = dyncat(val, "-export");
+		if (f & PM_UNIQUE)
+		    val = dyncat(val, "-unique");
+		vunset = 0;
+	    } else
+		val = dupstring("");
+
+	    v = NULL;
+	    isarr = 0;
+	}
     }
     while (v || ((inbrace || (unset(KSHARRAYS) && vunset)) && isbrack(*s))) {
 	if (!v) {

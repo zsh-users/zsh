@@ -112,11 +112,11 @@ version.yo: $(sdir_top)/Config/version.mk
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
-# install all the documentation
-install: install.man install.info
+# install just installs the manual pages
+install: install.man
 
-# uninstall all the documentation
-uninstall: uninstall.man uninstall.info
+# uninstall just unistalls the manual pages
+uninstall: uninstall.man
 
 # install man pages, creating install directory if necessary
 install.man: $(MAN)
@@ -141,6 +141,9 @@ install.info: zsh.info
 	  else :; \
 	   fi || exit 1; \
 	done
+	if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
+	  install-info --dir-file=$(infodir)/dir $(infodir)/zsh.info; \
+	else true; fi
 
 install.html: zsh_toc.html
 	$(sdir_top)/mkinstalldirs $(htmldir)

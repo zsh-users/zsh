@@ -1,5 +1,5 @@
 This version of zsh is based on 3.1.5 and includes the following
-patches.  (The version number built into the shell has not been changed.)
+patches.
 
   Old stuff:
 
@@ -111,7 +111,7 @@ My special parameter unset fix, 4662
   Third edition
 
 I've taken the plunge and changed $ZSH_VERSION, the current one is now
-3.1.5.pws-1 .  It seemed rational to have something incremental at the
+3.1.5.pws-3 .  It seemed rational to have something incremental at the
 end for testing, so I abandoned using the date.
 
 4482 (cdmatch2)and 4641 (${assoc[0]}) now applied; 4641 was supposed
@@ -261,8 +261,70 @@ need '-tc' with -T.  However, you now do need '-tn' in cases where you
 don't want normal completion tried after a -T matches.
 
 Sven's new completion functions, 4850, 4881, 4941, 4942, 4943, 4944,
-4946, 4949, plus my addition of function pointers, 4945.  The example
-file is now in Misc/new-completion-examples.
+4946, 4949, 4950, plus my addition of function pointers, 4945.  The
+example file is now in Misc/new-completion-examples.
 
 (Effect of) fix from Helmut Jarausch in 4947 partly due to change
 missed in patch.
+
+  pws-6
+
+Sven: fix for completion after redirection, 4957
+
+Bart: add-on, 4965
+
+Andrej: configure patch for Reliant UNIX et al., 5021 (as resubmitted)
+
+Sven: compctl list with a single string, 4974
+
+Sven: compctl -M matches with *'s, 4975, 5007
+
+Sven: compadd and new-completion-examples, 4976
+
+Sven: funky new glob modifiers:  change sort order, select
+item from list, 4979; make time order work like ls -t, 4987
+
+Sven: fix completion whitespace for copy-previous-word, 4981
+
+Sven: fix for new-style completion after redirection, 4986, 4988
+
+New mirror site ftp://ftp.win.ne.jp/pub/shell/zsh/ in META-FAQ (not
+posted)
+
+Andrej: when installing info files, insert zsh.info into dir, 5016
+
+Sven: ${(t)param} flag, 5022, 5045; no unset behaviour, 5078
+
+Phil: zless, 5032, simplified by Bart, 5037, also added a `setopt
+localoptions' after spending an hour wondering why nothing worked any
+more.
+
+Me: `make install' does not do `make install.info', 5047
+
+Sven:  compcall tries old-style completion from new-style function,
+compctl -K ' func' handles newstyle completion, 5059; avoid recursion,
+5065; my dynamic fix-up, 5085
+
+Sven: inserting completion inside brace expansion, 5060
+
+Sven: extra completion context, 5092
+
+Me: typeset -T MYPATH mypath, 5094, plus fix for MYPATH=(foo),
+mypath=foo (and also existing PATH=(foo) bug), 5120
+
+Sven: doc fix for glob qualifiers, 5102
+
+Drazen Kacar, modified by me: workaround for terminal bug on Solaris,
+5103; modified by Bart, 5113
+
+Sven:  zle and widget information via variables in new completion
+functions, 5104
+
+Me: remove old zle -C, zle -C now does new completion, 5105
+
+Sven:  glob qualifier o for modes, 5107
+
+Me: fix for unsetting special zle variables, 5111
+
+Drazen Kacar, modified by me: unlock terminal device on Solaris, 5118
+(5117 was wrong)

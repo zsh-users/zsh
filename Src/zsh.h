@@ -780,6 +780,7 @@ struct shfunc {
 #define SFC_HOOK     2		/* one of the special functions */
 #define SFC_WIDGET   3		/* user defined widget */
 #define SFC_COMPLETE 4		/* called from completion code */
+#define SFC_CWIDGET  5		/* new style completion widget */
 
 /* node in list of function call wrappers */
 
@@ -916,10 +917,12 @@ struct param {
 #define PM_TAGGED	(1<<9)	/* tagged                                     */
 #define PM_EXPORTED	(1<<10)	/* exported                                   */
 #define PM_UNIQUE	(1<<11)	/* remove duplicates                          */
-#define PM_SPECIAL	(1<<12) /* special builtin parameter                  */
-#define PM_DONTIMPORT	(1<<13)	/* do not import this variable                */
-#define PM_RESTRICTED	(1<<14) /* cannot be changed in restricted mode       */
-#define PM_UNSET	(1<<15)	/* has null value                             */
+#define PM_TIED 	(1<<12)	/* array tied to colon-path or v.v. */
+#define PM_SPECIAL	(1<<13) /* special builtin parameter                  */
+#define PM_DONTIMPORT	(1<<14)	/* do not import this variable                */
+#define PM_RESTRICTED	(1<<15) /* cannot be changed in restricted mode       */
+#define PM_UNSET	(1<<16)	/* has null value                             */
+#define PM_REMOVABLE	(1<<17)	/* special can be removed from paramtab */
 
 /* Flags for extracting elements of arrays and associative arrays */
 #define SCANPM_WANTVALS   (1<<0)
