@@ -1,7 +1,7 @@
 DISTFILES_SRC='
     .distfiles
     _aliases _arrays _autoload _bg_jobs _bindkey _builtin _cd _command
-    _compdef _disable _echotc _enable _fc _functions _hash _kill
+    _compdef _disable _echotc _enable _fc _fg_jobs _functions _hash _kill
     _limits _nothing _popd _sched _set _setopt _source _stat _trap _unhash
     _unsetopt _vars_eq _wait _which _zftp _zle _zmodload
 '
