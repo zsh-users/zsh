@@ -996,7 +996,7 @@ getvisrchstr(void)
 	    visrchstr = metafy(sbuf + 1, sptr - 1, META_DUP);
 	    if (!strlen(visrchstr)) {
 	        zsfree(visrchstr);
-		visrchstr = vipenultsrchstr;
+		visrchstr = ztrdup(vipenultsrchstr);
 	    }
 	    ret = 1;
 	    sptr = 0;

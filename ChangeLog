@@ -1,5 +1,7 @@
 2001-05-29  Clint Adams  <clint@zsh.org>
 
+	* 145??: Src/Zle/zle_hist.c: fix thinko
+
 	* 145??: Src/Zle/zle_hist.c: repeat last vi history search
 	if search string is empty.
 
