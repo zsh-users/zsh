@@ -15,6 +15,10 @@
 	* 13125: Completion/User/_mailboxes: evaluate the mailboxes
 	directives in muttrc, in case of backticks.
 
+2000-11-08  Bart Schaefer  <schaefer@zsh.org>
+	* 13140: Src/utils.c: Believe the non-error not-ready return value
+	from select(), in read_poll().
+	
 2000-11-08  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* unposted: Src/Modules/zpty.c: use possible read character from
