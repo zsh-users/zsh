@@ -1,5 +1,13 @@
 2000-07-30  Andrew Main <zefram@zsh.org>
 
+	* 12436: Doc/Zsh/invoke.yo, Src/init.c: Make -b behave like
+	the csh -b, permitting more options to be stacked after it and
+	take effect.  Make -b take effect depending on SH_OPTION_LETTERS,
+	consistent with all the other single-letter options, rather than
+	having a clashing check of emulation type.
+
+2000-07-30  Andrew Main <zefram@zsh.org>
+
 	* 12434: Doc/Zsh/invoke.yo, Src/init.c, Src/options.c, Src/zsh.h,
 	Src/zsh.mdd: Allow options to be specified on the zsh command line
 	in the form of GNU-style long options.	Also handle --version

@@ -186,10 +186,10 @@ static int restricted;
 void
 parseargs(char **argv)
 {
+    int optionbreak = 0;
     char **x;
     int action, optno;
     LinkList paramlist;
-    int bourne = (emulation == EMULATE_KSH || emulation == EMULATE_SH);
 
     argzero = *argv++;
     SHIN = 0;
@@ -206,17 +206,15 @@ parseargs(char **argv)
     opts[SINGLECOMMAND] = 0;
 
     /* loop through command line options (begins with "-" or "+") */
-    while (*argv && (**argv == '-' || **argv == '+')) {
+    while (!optionbreak && *argv && (**argv == '-' || **argv == '+')) {
 	char *args = *argv;
 	action = (**argv == '-');
 	if (!argv[0][1])
 	    *argv = "--";
 	while (*++*argv) {
-	    /* The pseudo-option `--' signifies the end of options. *
-	     * `-b' does too, csh-style, unless we're emulating a   *
-	     * Bourne style shell.                                  */
-	    if (**argv == '-' || (!bourne && **argv == 'b')) {
+	    if (**argv == '-') {
 		if(!argv[0][1]) {
+		    /* The pseudo-option `--' signifies the end of options. */
 		    argv++;
 		    goto doneoptions;
 		}
@@ -240,7 +238,11 @@ parseargs(char **argv)
 		goto longoptions;
 	    }
 
-	    if (**argv == 'c') {         /* -c command */
+	    if (unset(SHOPTIONLETTERS) && **argv == 'b') {
+		/* -b ends options at the end of this argument */
+		optionbreak = 1;
+	    } else if (**argv == 'c') {
+		/* -c command */
 		cmd = *argv;
 		opts[INTERACTIVE] &= 1;
 		opts[SHINSTDIN] = 0;
@@ -321,13 +323,11 @@ parseargs(char **argv)
 static void
 printhelp(void)
 {
-    int bourne = (emulation == EMULATE_KSH || emulation == EMULATE_SH);
-
     printf("Usage: %s [<options>] [<argument> ...]\n", argzero);
     printf("\nSpecial options:\n");
     printf("  --help     show this message, then exit\n");
     printf("  --version  show zsh version number, then exit\n");
-    if(!bourne)
+    if(unset(SHOPTIONLETTERS))
 	printf("  -b         end option processing, like --\n");
     printf("  -c         take first argument as a command to execute\n");
     printf("  -o OPTION  set an option by name (see below)\n");
