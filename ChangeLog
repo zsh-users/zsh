@@ -1,5 +1,7 @@
 2001-11-06  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Functions/Misc/mere: fix for IRIX
+
 	* 16224: Src/jobs.c, Doc/Zsh/builtins.yo,
 	Completion/Unix/Type/_signals, Completion/Zsh/Command/_kill,
 	Completion/Zsh/Command/_jobs_builtin: add -n option to kill

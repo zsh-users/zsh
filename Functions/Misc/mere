@@ -21,6 +21,12 @@ if [[ -d /usr/share/lib/term &&
   terminal=lp;
 fi
 
+# IRIX has no `man' terminal.
+if [[ -d /usr/lib/nterm &&
+    ! -e /usr/lib/nterm/tab.$terminal ]]; then
+  terminal=lp;
+fi
+
 # Unixware has no `man' terminal.
 if [[ -d /usr/ucblib/doctools/nterm &&
     ! -e /usr/ucblib/doctools/nterm/tab.$terminal ]]; then
