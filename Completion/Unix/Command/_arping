@@ -1,0 +1,20 @@
+#compdef arping
+
+_arguments -s \
+	'-h[help]' \
+	'-q[quiet]' \
+	'-v[verbose]' \
+	'-r[raw]' \
+	'-R[Raw]' \
+	'-d[find duplicate replies]' \
+	'-B[255.255.255.255]' \
+	'-0[source 0.0.0.0]' \
+	'-b[source 255.255.255.255]' \
+	'-S[set source IP]:source IP address:_hosts' \
+	'-T[target IP]:target IP address:_hosts' \
+        '-p[promiscuous mode]' \
+	'-s[set source MAC address]:source MAC address:' \
+	'-t[set target MAC address]:target MAC address:' \
+	'-c[send this many requests]:count:' \
+	'-i[interface]:interface:' \
+	':address:_hosts' \

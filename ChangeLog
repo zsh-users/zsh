@@ -1,5 +1,8 @@
 2001-11-29  Clint Adams  <clint@zsh.org>
 
+	* 16293: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_arping: completion for arping.
+
 	* 16292: Completion/Unix/Command/.distfiles,
 	Completion/Unix/Command/_rsync: completion for rsync.
 
