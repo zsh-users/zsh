@@ -2390,17 +2390,14 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 	/* Option -a is to search the entire path, *
 	 * rather than just looking for one match. */
 	if (all) {
-	    char **pp, buf[PATH_MAX], *z;
+	    char **pp, *buf, *z;
 
+	    pushheap();
 	    for (pp = path; *pp; pp++) {
-		z = buf;
 		if (**pp) {
-		    strucpy(&z, *pp);
-		    *z++ = '/';
-		}
-		if ((z - buf) + strlen(*argv) >= PATH_MAX)
-		    continue;
-		strcpy(z, *argv);
+		    z = dyncat(*pp, "/");
+		} else z = NULL;
+		buf = dyncat(z, *argv);
 		if (iscom(buf)) {
 		    if (wd) {
 			printf("%s: command\n", *argv);
@@ -2420,6 +2417,7 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 		puts(wd ? ": none" : " not found");
 		returnval = 1;
 	    }
+	    popheap();
 	} else if ((cnam = findcmd(*argv, 1))) {
 	    /* Found external command. */
 	    if (wd) {

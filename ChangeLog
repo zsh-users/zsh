@@ -1,5 +1,8 @@
 2000-09-19  Clint Adams  <schizo@debian.org>
 
+	* 12847: Src/builtin.c: dynamically allocate z and buf in
+	bin_whence().
+
 	* 12846: Src/.distfiles, Src/mem.c, Src/string.c, Src/utils.c,
 	Src/zsh.mdd: Move dupstring(), ztrdup(), tricat(), zhtricat(),
 	dyncat(), dupstrpfx(), ztrduppfx(), and appstr() to string.c.
