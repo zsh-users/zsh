@@ -1,4 +1,4 @@
-#compdef mail mailx Mail mush zmail
+#compdef mail mailx Mail mush zmail nail
 
 local curcontext="$curcontext" state line expl suf
 
