@@ -2147,7 +2147,7 @@ add_match_str(Cmatcher m, char *l, char *w, int wl, int sfx)
 	wl = m->llen; w = l;
     }
     if (wl) {
-	/* Probably resie the buffer. */
+	/* Probably resize the buffer. */
 	if (matchbuflen - matchbufadded <= wl) {
 	    int blen = matchbuflen + wl + 20;
 	    char *buf;
@@ -3458,21 +3458,35 @@ join_clines(Cline o, Cline n)
 		for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
 
 		if (tn) {
-		    Cline t;
-
 		    t = tn->prefix; tn->prefix = n->prefix; n->prefix = t;
 		    t = tn->suffix; tn->suffix = n->suffix; n->suffix = t;
 		    n = tn;
+		    o->flags |= CLF_MISS;
 		    continue;
 		} else {
-		    if (o->flags & CLF_SUF)
-			break;
+		    for (t = o; (tn = t->next) && !cmp_anchors(n, tn, 1);
+			 t = tn);
 
-		    o->word = o->line = o->orig = NULL;
-		    o->wlen = 0;
-		    free_cline(o->next);
-		    o->next = NULL;
-		    o->flags |= CLF_MISS;
+		    if (tn) {
+			t = tn->prefix; tn->prefix = o->prefix; o->prefix = t;
+			t = tn->suffix; tn->suffix = o->suffix; o->suffix = t;
+			if (po)
+			    po->next = tn;
+			else
+			    oo = tn;
+			o = tn;
+			o->flags |= CLF_MISS;
+			continue;
+		    } else {
+			if (o->flags & CLF_SUF)
+			    break;
+
+			o->word = o->line = o->orig = NULL;
+			o->wlen = 0;
+			free_cline(o->next);
+			o->next = NULL;
+			o->flags |= CLF_MISS;
+		    }
 		}
 	    }
 	    /* Ok, they are equal, now join the sub-lists. */
