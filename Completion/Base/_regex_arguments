@@ -1,9 +1,5 @@
 #autoload
 
-## todo
-
-# imprement `guard' to more generic branch selection.
-
 ## usage: _regex_arguments funcname regex
 
 ## configuration key used:
@@ -23,118 +19,33 @@
 
 ## regex word definition:
 
-# elt-pattern = "/" ( pattern | "[]" )	# cutoff
-#	      | "%" pattern		# non-cutoff
-# lookahead = "@" pattern
-# parse-action = "-" zsh-code-to-eval
-# complete-action = "!" zsh-code-to-eval
+# pattern = "/" ( glob | "[]" ) "/" [ "+" | "-" ]
+# lookahead = "%" glob "%"
+# guard = "-" zsh-code-to-eval
+# action = ":" zsh-code-to-eval
 
 ## regex word sequence definition:
 
-# element = elt-pattern [ lookahead ] [ parse-action ] [ complete-action ]
+# element = pattern [ lookahead ] [ guard ] [ action ]
 #
 # regex = element 
 #	| "(" regex ")"
 #	| regex "#"
 #	| regex regex
 #	| regex "|" regex
-#	| void
-#	| null
-#
-# NOTE: void and null has no explicit representation. However null can
-# be represent with empty words such as \( \).
-
-# example: (in zsh quoted form)
-
-# $'[^\0]#\0' \#	: zero or more words
-
-## auxiliary functions definition:
-
-# nullable : regex -> bool
-# first : regex -> list of element
-# match : string * list of element -> element + {bottom}
-# right : string * element -> string
-# left : string * element -> string
-# next : regex * element -> regex + {bottom}
-# trans : string * string * regex -> (string * string * regex) + {bottom}
-
-# nullable(void) = false
-# nullable(null) = true
-# nullable(e) = false
-# nullable(r #) = true
-# nullable(r1 r2) = nullable(r1) and nullable(r2)
-# nullable(r1 | r2) = nullable(r1) or nullable(r2)
-
-# first(void) = {}
-# first(null) = {}
-# first(e) = [ e ]
-# first(r #) = first(r)
-# first(r1 r2) = nullable(r1) ? first(r1) ++ first(r2) : first(r1)
-# first(r1 | r2) = first(r1) ++ first(r2)
-
-# match(s, []) = bottom
-# match(s, [e1, e2, ...]) = e	if [[ $s = $elt-pattern[e]$lookahead[e]* ]]
-#		   	  | match(s, [e2, ...])	otherwise
-
-# right(s, e) = ${s##$elt-pattern[e]}
-# left(s, e) = ${(M)s##$elt-pattern[e]}
-
-### XXX: It can treat lookaheads if zsh provide $1, $2, ... in perl.
-
-# next(void, e) = bottom
-# next(null, e) = bottom
-# next(e1, e0) = e1 eq e0 ? null : bottom	# eq is test operator of identity equality.
-# next(r #, e) = next(r, e) != bottom ? next(r, e) (r #) : bottom
-# next(r1 r2, e) = next(r1, e) != bottom ? next(r1, e) r2 : next(r2, e)
-# next(r1 | r2, e) = next(r1, e) != bottom ? next(r1, e) : next(r2, e)
-
-# trans( (t, s, r) ) = ( (cutoff(e) ? '' : t ++ left(s, e)), right(s, e), next(r, e) )
-#   where e = match(s, first(r))
-
-# NOTE: This `next' definition is slightly different to ordinaly one.
-# This definition uses only one element of first(r) for transition
-# instead of all elements of first(r).
-
-# If _regex_arguments takes the regex r0, the first state of the state
-# machine is r0.  The state of the state machine transit as follows.
-
-# ('', s0, r0) -> trans('', s0, r0) = (t1, s1, r1) -> trans(t1, s1, r1) -> ... 
-
-# If the state is reached to bottom, the state transition is stopped.
-
-# ... -> (tN, sN, rN) -> bottom
-
-# For each transitions (tI, sI, rI) to trans(tI, sI, rI), the state
-# machine evaluate parse-action bound to match(sI, first(rI)).
-
-# In parse-action bound to match(sI, first(rI)) = e, it can refer variables:
-#  _ra_left : tI+1
-#  _ra_match : left(sI, e)
-#  _ra_right : sI+1
-
-# If the state transition is stopped, the state machine evaluate
-# complete-actions bound to first(rN) if tN and sN does not contain NUL.
-# When complete-actions are evaluated, completion focus is restricted to
-# tN ++ sN. (This is reason of tN and sN cannot contain NUL when
-# completion.)
-# Also, if there are last transitions that does not cut off the string
-# (tJ ++ sJ = tJ+1 ++ sJ+1 = ... = tN-1 ++ sN-1 = tN ++ sN),
-# complete-actions bound to them
-# --- match(sJ, first(rJ)), ..., match(sN-1, first(rN-1)) --- are also
-# evaluated before complete-actions bound to first(rN).
 
 # example:
 
 # compdef _tst tst
 
-# _regex_arguments _tst /$'[^\0]#\0' /$'[^\0]#\0' '!compadd aaa'
+# _regex_arguments _tst /$'[^\0]#\0'/ /$'[^\0]#\0'/ :'compadd aaa'
 #  _tst complete `aaa' for first argument.
 #  First $'[^\0]#\0' is required to match with command name.
 
-# _regex_arguments _tst /$'[^\0]#\0' \( /$'[^\0]#\0' '!compadd aaa' /$'[^\0]#\0' !'compadd bbb' \) \#
+# _regex_arguments _tst /$'[^\0]#\0'/ \( /$'[^\0]#\0'/ :'compadd aaa' /$'[^\0]#\0'/ :'compadd bbb' \) \#
 #  _tst complete `aaa' for (2i+1)th argument and `bbb' for (2i)th argument.
 
-# _regex_arguments _tst /$'[^\0]#\0' \( /$'[^\0]#\0' '!compadd aaa' \| /$'[^\0]#\0' !'compadd bbb' \) \#
+# _regex_arguments _tst /$'[^\0]#\0'/ \( /$'[^\0]#\0'/ :'compadd aaa' \| /$'[^\0]#\0'/ :'compadd bbb' \) \#
 #  _tst complete `aaa' or `bbb'.
 
 ## Recursive decent regex parser
@@ -146,37 +57,42 @@
 # 2 : fatal parse error
 
 _ra_parse_elt () {
-  : index=$index "[$regex[$index]]"
-  local state
+  local state act
   if (( $#regex < index )); then
     return 1
   else
     case "$regex[index]" in
-      [/%]*) state=$index
+      /*/([-+]|)) state=$index
           first=($state)
 	  last=($state)
 	  nullable=
-	  case "${regex[index][1]}" in
-	    /) cutoff[$state]=yes ;;
-	    %) cutoff[$state]= ;;
+	  case "$regex[index]" in 
+	    */+) cutoff[$state]=+;;
+	    */) cutoff[$state]=/;;
+	    */-) cutoff[$state]=-;;
 	  esac
-          pattern[$state]="${regex[index++][2,-1]}"
-	  [[ -n "$pattern[$state]" ]] && pattern[$state]="($pattern[$state])"
-	  if [[ $index -le $#regex && $regex[index] = @* ]]; then
-	    lookahead[$state]="${regex[index++][2,-1]}"
-	    [[ -n "$lookahead[$state]" ]] && lookahead[$state]="($lookahead[$state])"
+          pattern[$state]="${${regex[index++]#/}%/([-+]|)}"
+	  if [[ $pattern[$state] != "[]" ]]; then
+	    pattern[$state]="(#b)((#B)$pattern[$state])"
+	  fi
+	  if [[ $index -le $#regex && $regex[index] = %*% ]]; then
+	    lookahead[$state]="(#B)${regex[index++][2,-2]}"
 	  else
 	    lookahead[$state]=""
 	  fi
 	  if [[ $index -le $#regex && $regex[index] = -* ]]; then
-	    parse_action[$state]="${regex[index++][2,-1]}"
+	    guard[$state]="${regex[index++][2,-1]}"
 	  else
-	    parse_action[$state]=""
+	    guard[$state]=""
 	  fi
-	  if [[ $index -le $#regex && $regex[index] = \!* ]]; then
-	    complete_action[$state]="${regex[index++][2,-1]}"
+	  if [[ $index -le $#regex && $regex[index] = :* ]]; then
+	    act="${regex[index++][2,-1]}"
+	    action[$state]="$act"
+	    # `actions[$act]="${actions[$act]} $state"' is not work properly
+	    # because $act on lhs is expanded twice.
+	    : ${actions[$act]::="${actions[$act]} $state"}
 	  else
-	    complete_action[$state]=""
+	    action[$state]=""
 	  fi
 	  ;;
       \() (( index++ ))
@@ -193,7 +109,6 @@ _ra_parse_elt () {
 }
 
 _ra_parse_clo () {
-  : index=$index "[$regex[$index]]"
   _ra_parse_elt || return $?
 
   if (( index <= $#regex )) && [[ "$regex[$index]" = \# ]]; then
@@ -207,7 +122,6 @@ _ra_parse_clo () {
 }
 
 _ra_parse_seq () {
-  : index=$index "[$regex[$index]]"
   local last_seq
   local first_seq nullable_seq
   first_seq=()
@@ -248,7 +162,6 @@ _ra_parse_seq () {
 }
 
 _ra_parse_alt () {
-  : index=$index "[$regex[$index]]"
   local last_alt
   local first_alt nullable_alt 
   first_alt=()
@@ -286,8 +199,9 @@ _ra_parse_alt () {
 
 _ra_gen_func () {
   local old new
-  local state next index
-  local start="${(j/:/)first}"
+  local state index
+  local test tmp
+  local start="0"
 
   old=()
   new=($start)
@@ -295,8 +209,8 @@ _ra_gen_func () {
   print -lr - \
     "$funcname () {" \
       'setopt localoptions extendedglob' \
-      'local _ra_state _ra_left _ra_match _ra_right _ra_actions _ra_tmp' \
-      "_ra_state='$start'" \
+      'local _ra_state _ra_left _ra_right _ra_actions' \
+      "_ra_state=$start" \
       '_ra_left=' \
       '_ra_right="${(pj:\0:)${(@)words[1,CURRENT - 1]:Q}}"$'\''\0'\''"$PREFIX"' \
       '_ra_actions=()' \
@@ -307,90 +221,105 @@ _ra_gen_func () {
     state="$new[1]"
     shift new
     old=("$old[@]" "$state")
-
     print -lr - \
-	"$state)" \
-	  'case "$_ra_right" in'
-
-    for index in ${(s/:/)state}; do
-      if [[ "$pattern[$index]" != "([])" ]]; then
-	next="${(j/:/)${(@)=tbl[$index]}}"
-	print -lr - \
-	      "$pattern[$index]$lookahead[$index]*)"
-	if [[ -n "$pattern[$index]" ]]; then
-	  if [[ -n "$cutoff[$index]" ]]; then
-	    print -lr - \
-		  '_ra_match="${(M)_ra_right##'"$pattern[$index]"'}"' \
-		  '_ra_right="$_ra_right[$#_ra_match + 1, -1]"' \
-		  '_ra_left=' \
-		  'if (( $#_ra_match )); then' \
-		    '_ra_actions=()'
-	    if [[ -n "${complete_action[$index]:q}" ]]; then
-	      print -lr - \
-		  'else' \
-		    '_ra_actions=("$_ra_actions[@]" '"${complete_action[$index]:q}"')'
-	    fi
-	    print -lr - \
-		  'fi'
-	  else
-	    print -lr - \
-		  '_ra_match="${(M)_ra_right##'"$pattern[$index]"'}"' \
-		  '_ra_right="$_ra_right[$#_ra_match + 1, -1]"' \
-		  '_ra_left="$_ra_left$_ra_match"'
-	    if [[ -n "${complete_action[$index]:q}" ]]; then
-	      print -lr - \
-		  '_ra_actions=("$_ra_actions[@]" '"${complete_action[$index]:q}"')'
-	    fi
-	  fi
-	else
-	  print -lr - \
-		'_ra_match=' \
-		'_ra_actions=("$_ra_actions[@]" '"${complete_action[$index]:q}"')'
-	fi
-	print -lr - \
-		"$parse_action[$index]"
-	if [[ -n $next ]]; then
-	  print -lr - \
-		"_ra_state=$next"
-	  (( $old[(I)$next] || $new[(I)$next] )) || new=($next "$new[@]")
-	else
-	  print -lr - \
-		'_message "no arg"' \
-		'break'
-	fi
-	print -lr - \
-		';;'
-      fi
-    done
-
+	"$state)"
+    _ra_gen_parse_state
     print -lr - \
-	    '*)' \
-	      'if [[ "$_ra_left$_ra_right" = *$'\''\0'\''* ]]; then' \
-		'_message "parse failed before current word"' \
-	      'else' \
-		'compset -p $(( $#PREFIX - $#_ra_right - $#_ra_left ))'
-
-    print -lr - \
-		'for _ra_tmp in $_ra_actions; do' \
-		  'eval "$_ra_tmp"' \
-		'done'
-    for index in ${(s/:/)state}; do
-      print -lr - \
-		"$complete_action[$index]"
-    done
-
-    print -lr - \
-	      'fi' \
-	      'break' \
-	      ';;' \
-	  'esac' \
 	  ';;'
   done
 
   print -lr - \
 	'esac' \
       'done' \
+      'while (( $#_ra_actions )); do' \
+	'case "$_ra_actions[1]" in'
+
+  for tmp in "${(@k)actions}"; do
+    #print -lr - "KEY:{$tmp}" "VAL:{$actions[$tmp]}" >&2
+    print -lr - "${(j:);&:)${=actions[$tmp]}})" $tmp ';;'
+  done
+
+  print -lr - \
+	'esac' \
+	'shift _ra_actions' \
+      'done' \
     '}'
+}
+
+_ra_gen_parse_state () {
+  local actions i
+  test='if'
+  for index in $=tbl[$state]; do
+    if [[ "$pattern[$index]" != "[]" ]]; then
+      if [[ -z "$guard[$index]" ]]; then
+	print -lr - \
+	  "$test [[ \$_ra_right = $pattern[$index]$lookahead[$index]* ]]"
+      else
+	print -lr - \
+	  "$test [[ \$_ra_right = $pattern[$index]$lookahead[$index]* ]] && {" \
+	      "$guard[$index]" \
+	    "}"
+      fi
+      test='elif'
+      (( $old[(I)$index] || $new[(I)$index] )) || new=($index "$new[@]")
+      print -lr - \
+	  "then" \
+	    "_ra_state=$index" \
+	    '_ra_right="${_ra_right[mend[1] + 1, -1]}"'
+      actions=()
+      for i in $=tbl[$index]; do
+	if [[ -n $action[$i] ]]; then
+	  actions=($actions $i)
+	fi
+      done
+      case "$cutoff[$index]" in
+	+) print -lr - \
+	    '_ra_left="$_ra_left$match[1]"'
+	  if (( $#actions )); then
+	    print -lr - \
+	    "_ra_actions=($actions \$_ra_actions)"
+	  fi
+          ;;
+	/) print -lr - \
+	    '_ra_left='
+	  print -lr - \
+	    'if (( mend[1] )); then' \
+	      "_ra_actions=($actions)"
+	  if (( $#actions )); then
+	    print -lr - \
+	    'else' \
+	      "_ra_actions=($actions \$_ra_actions)"
+	  fi
+	  print -lr - \
+	    'fi'
+	  ;;
+	-) print -lr - \
+	    '_ra_left=' \
+	    "_ra_actions=($actions)"
+	  ;;
+      esac
+    fi
+  done
+
+  if [[ $test != 'if' ]]; then
+  # Some branchs are exists. But all of them are failed.
+    print -lr - \
+	  'else' \
+	    'if [[ "$_ra_left$_ra_right" = *$'\''\0'\''* ]]; then' \
+	      '_message "parse failed before current word"' \
+	      '_ra_actions=()' \
+	    'else' \
+	      'compset -p $(( $#PREFIX - $#_ra_right - $#_ra_left ))' \
+	    'fi' \
+	    'break' \
+	  'fi'
+  else
+  # There are no branch.
+    print -lr - \
+	  '_message "no more arguments"' \
+	  '_ra_actions=()' \
+	  'break'
+  fi
 }
 
 _regex_arguments () {
@@ -399,7 +328,7 @@ _regex_arguments () {
   local funcname="_regex_arguments_tmp"
   local funcdef
 
-  typeset -A tbl cutoff pattern lookahead parse_action complete_action
+  typeset -A tbl cutoff pattern lookahead guard action actions
   local regex index first last nullable
   local i state next
 
@@ -408,18 +337,16 @@ _regex_arguments () {
   local cache_test
 
   if ! [[ -f "$cache_file" ]] || ! source "$cache_file" "$@"; then
-    cache_test='[[ $# -eq '$#' && "$*" = '"${*:q}"' ]]'
-
     funcname="$1"
-    shift
 
-    regex=("$@")
+    regex=("${(@)argv[2,-1]}")
     index=1
     tbl=()
     pattern=()
     lookahead=()
-    parse_action=()
-    complete_action=()
+    guard=()
+    action=()
+    actions=()
     _ra_parse_alt
 
     if (( $? == 2 || index != $#regex + 1 )); then
@@ -431,18 +358,21 @@ _regex_arguments () {
       return 1
     fi
 
-    funcdef="$(_ra_gen_func)"
+    tbl[0]=" $first"
 
     unfunction "$funcname" 2>/dev/null
-    eval "${(F)funcdef}"
+    funcdef="$(_ra_gen_func)"
 
-    [[ -d "$cache_dir" && -w "$cache_dir" ]] && {
+    if [[ -d "$cache_dir" && -w "$cache_dir" ]]; then
       print -lr - \
-	"if $cache_test; then" \
+	'if [[ $# -eq '$#' && "$*" = '"${*:q}"' ]]; then' \
 	"$funcdef" \
 	'true; else false; fi' > "${cache_file}.$HOST.$$"
+      source "${cache_file}.$HOST.$$" "$@"
       mv "${cache_file}.$HOST.$$" "${cache_file}"
-    }
+    else
+      source =(print -lr - "$funcdef")
+    fi
   fi
 }
 
