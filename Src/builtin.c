@@ -1653,6 +1653,13 @@ getasg(char *s)
     return &asg;
 }
 
+/* for new special parameters */
+enum {
+    NS_NONE,
+    NS_NORMAL,
+    NS_SECONDS
+};
+
 /* function to set a single parameter */
 
 /**/
@@ -1661,7 +1668,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	       int on, int off, int roff, char *value, Param altpm,
 	       Options ops, int auxlen)
 {
-    int usepm, tc, keeplocal = 0, newspecial = 0;
+    int usepm, tc, keeplocal = 0, newspecial = NS_NONE, readonly;
     char *subscript;
 
     /*
@@ -1694,14 +1701,15 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	 * local.  It can be applied either to the special or in the
 	 * typeset/local statement for the local variable.
 	 */
-	newspecial = (pm->flags & PM_SPECIAL)
-	    && !(on & PM_HIDE) && !(pm->flags & PM_HIDE & ~off);
+	if ((pm->flags & PM_SPECIAL)
+	    && !(on & PM_HIDE) && !(pm->flags & PM_HIDE & ~off))
+	    newspecial = NS_NORMAL;
 	usepm = 0;
     }
 
     /* attempting a type conversion, or making a tied colonarray? */
     tc = 0;
-    if (usepm || newspecial) {
+    if (usepm || newspecial != NS_NONE) {
 	int chflags = ((off & pm->flags) | (on & ~pm->flags)) &
 	    (PM_INTEGER|PM_EFLOAT|PM_FFLOAT|PM_HASHED|
 	     PM_ARRAY|PM_TIED|PM_AUTOLOAD);
@@ -1716,11 +1724,31 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      * with a special or a parameter which isn't loaded yet (which
      * may be special when it is loaded; we can't tell yet).
      */
-    if (tc || ((usepm || newspecial) && (off & pm->flags & PM_READONLY))) {
+    if ((readonly =
+	 ((usepm || newspecial != NS_NONE) && 
+	  (off & pm->flags & PM_READONLY))) ||
+	tc) {
 	if (pm->flags & PM_SPECIAL) {
-	    zerrnam(cname, "%s: can't change type of a special parameter",
-		    pname, 0);
-	    return NULL;
+	    int err = 1;
+	    if (!readonly && !strcmp(pname, "SECONDS"))
+	    {
+		if (newspecial != NS_NONE)
+		{
+		    newspecial = NS_SECONDS;
+		    err = 0;	/* and continue */
+		    tc = 0;	/* but don't do a normal conversion */
+		} else if (!setsecondstype(pm, on, off)) {
+		    if (value && !setsparam(pname, ztrdup(value)))
+			return NULL;
+		    return pm;
+		}
+	    }
+	    if (err)
+	    {
+		zerrnam(cname, "%s: can't change type of a special parameter",
+			pname, 0);
+		return NULL;
+	    }
 	} else if (pm->flags & PM_AUTOLOAD) {
 	    zerrnam(cname, "%s: can't change type of autoloaded parameter",
 		    pname, 0);
@@ -1820,7 +1848,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	unsetparam_pm(pm, 0, 1);
     }
 
-    if (newspecial) {
+    if (newspecial != NS_NONE) {
 	Param tpm, pm2;
 	if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
 	    zerrnam(cname, "%s: restricted", pname, 0);
@@ -1866,6 +1894,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	 * because we've checked for unpleasant surprises above.
 	 */
 	pm->flags = (PM_TYPE(pm->flags) | on | PM_SPECIAL) & ~off;
+	if (newspecial == NS_SECONDS)
+	    setsecondstype(pm, on, off);
 	/*
 	 * Final tweak: if we've turned on one of the flags with
 	 * numbers, we should use the appropriate integer.

@@ -1,3 +1,10 @@
+2002-10-29  Peter Stephenson  <pws@csr.com>
+
+	* 17868: Src/builtin.c, Src/params.c, Doc/Zsh/params.yo:
+	Can `typeset -F SECONDS' to get better accuracy.  Try to
+	catch all cases when converting or creating local copy
+	(but I missed at least one --- next patch).
+
 2002-10-18  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Debian/Command/_apt: add showsrc part missing

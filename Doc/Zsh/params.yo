@@ -589,6 +589,12 @@ The number of seconds since shell invocation.  If this parameter
 is assigned a value, then the value returned upon reference
 will be the value that was assigned plus the number of seconds
 since the assignment.
+
+Unlike other special parameters, the type of the tt(SECONDS) parameter can
+be changed using the tt(typeset) command.  Only integer and one of the
+floating point types are allowed.  For example, `tt(typeset -F SECONDS)'
+causes the value to be reported as a floating point number.  The precision
+is six decimal places, although not all places may be useful.
 )
 vindex(SHLVL)
 item(tt(SHLVL) <S>)(

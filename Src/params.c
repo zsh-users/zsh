@@ -141,7 +141,7 @@ IPDEF1("EGID", egidgetfn, egidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("HISTSIZE", histsizegetfn, histsizesetfn, PM_RESTRICTED),
 IPDEF1("RANDOM", randomgetfn, randomsetfn, 0),
 IPDEF1("SAVEHIST", savehistsizegetfn, savehistsizesetfn, PM_RESTRICTED),
-IPDEF1("SECONDS", secondsgetfn, secondssetfn, 0),
+IPDEF1("SECONDS", intsecondsgetfn, intsecondssetfn, 0),
 IPDEF1("UID", uidgetfn, uidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("EUID", euidgetfn, euidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("TTYIDLE", ttyidlegetfn, nullintsetfn, PM_READONLY),
@@ -2670,7 +2670,7 @@ randomsetfn(Param pm, zlong v)
 
 /**/
 zlong
-secondsgetfn(Param pm)
+intsecondsgetfn(Param pm)
 {
     return time(NULL) - shtimer.tv_sec;
 }
@@ -2679,10 +2679,58 @@ secondsgetfn(Param pm)
 
 /**/
 void
-secondssetfn(Param pm, zlong x)
+intsecondssetfn(Param pm, zlong x)
 {
     shtimer.tv_sec = time(NULL) - x;
     shtimer.tv_usec = 0;
+}
+
+/**/
+double
+floatsecondsgetfn(Param pm)
+{
+    struct timeval now;
+    struct timezone dummy_tz;
+
+    gettimeofday(&now, &dummy_tz);
+
+    return (double)(now.tv_sec - shtimer.tv_sec) +
+	(double)(now.tv_usec - shtimer.tv_usec) / 1000000.0;
+}
+
+/**/
+void
+floatsecondssetfn(Param pm, double x)
+{
+    struct timeval now;
+    struct timezone dummy_tz;
+
+    gettimeofday(&now, &dummy_tz);
+    shtimer.tv_sec = now.tv_sec - (int)x;
+    shtimer.tv_usec = now.tv_usec - (int)((x - (double)(int)x) * 1000000.0);
+}
+
+/**/
+int
+setsecondstype(Param pm, int on, int off)
+{
+    int newflags = (pm->flags | on) & ~off;
+    int tp = PM_TYPE(newflags);
+    /* Only one of the numeric types is allowed. */
+    if (tp == PM_EFLOAT || tp == PM_FFLOAT)
+    {
+	pm->gets.ffn = floatsecondsgetfn;
+	pm->sets.ffn = floatsecondssetfn;
+    }
+    else if (tp == PM_INTEGER)
+    {
+	pm->gets.ifn = intsecondsgetfn;
+	pm->sets.ifn = intsecondssetfn;
+    }
+    else
+	return 1;
+    pm->flags = newflags;
+    return 0;
 }
 
 /* Function to get value for special parameter `USERNAME' */
@@ -3435,6 +3483,8 @@ scanendscope(HashNode hn, int flags)
 	     */
 	    Param tpm = pm->old;
 
+	    if (!strcmp(pm->nam, "SECONDS"))
+		setsecondstype(pm, PM_TYPE(tpm->flags), PM_TYPE(pm->flags));
 	    DPUTS(!tpm || PM_TYPE(pm->flags) != PM_TYPE(tpm->flags) ||
 		  !(tpm->flags & PM_SPECIAL),
 		  "BUG: in restoring scope of special parameter");
