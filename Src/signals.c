@@ -931,6 +931,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     char *name, num[4];
     int trapret = 0;
     int obreaks = breaks;
+    int isfunc;
  
     /* if signal is being ignored or the trap function		      *
      * is NULL, then return					      *
@@ -948,16 +949,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     *sigtr |= ZSIG_IGNORED;
 
     lexsave();
-    if (sig != SIGEXIT && sig != SIGDEBUG) {
-	/*
-	 * SIGEXIT and SIGDEBUG are always run synchronously, so we don't
-	 * need to save and restore the state.
-	 *
-	 * Do we actually need this at all now we queue signals
-	 * for handling in places where they won't cause trouble?
-	 */
-	execsave();
-    }
+    execsave();
     breaks = 0;
     runhookdef(BEFORETRAPHOOK, NULL);
     if (*sigtr & ZSIG_FUNC) {
@@ -970,27 +962,52 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	sprintf(num, "%d", sig);
 	zaddlinknode(args, num);
 
-	trapreturn = -1;
+	trapreturn = -1;	/* incremented by doshfunc */
 	sfcontext = SFC_SIGNAL;
 	doshfunc(name, sigfn, args, 0, 1);
 	sfcontext = osc;
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
-    } else
+
+	isfunc = 1;
+    } else {
+	trapreturn = -2;	/* not incremented, used at current level */
+
 	execode(sigfn, 1, 0);
+
+	isfunc = 0;
+    }
     runhookdef(AFTERTRAPHOOK, NULL);
 
-    if (trapreturn > 0)
+    if (trapreturn > 0 && isfunc) {
+	/*
+	 * Context was its own function.  We propagate the return
+	 * value specially.  Return value zero means don't do
+	 * anything special, so don't handle it.
+	 */
 	trapret = trapreturn;
-    else if (errflag)
+    } else if (trapreturn >= 0 && !isfunc) {
+	/*
+	 * Context was an inline trap.  If an explicit return value
+	 * was used, we need to set `lastval'.  Otherwise we use the
+	 * value restored by execrestore.  In this case, all return
+	 * values indicate an explicit return from the current function,
+	 * so always handle specially.  trapreturn is always restored by
+	 * execrestore.
+	 */
+	trapret = trapreturn + 1;
+    } else if (errflag)
 	trapret = 1;
-    if (sig != SIGEXIT && sig != SIGDEBUG)
-	execrestore();
+    execrestore();
     lexrestore();
 
     if (trapret > 0) {
-	breaks = loops;
-	errflag = 1;
+	if (isfunc) {
+	    breaks = loops;
+	    errflag = 1;
+	} else {
+	    lastval = trapret-1;
+	}
     } else {
 	breaks += obreaks;
 	if (breaks > loops)

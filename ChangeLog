@@ -1,3 +1,9 @@
+2004-03-10  Peter Stephenson  <pws@csr.com>
+
+	* 19575: Src/signals.c, Test/C03traps.ztst: Fix the problem
+	that trap '...' EXIT overrode the exit status of the function
+	it was in.
+
 2004-03-08  Clint Adams  <clint@zsh.org>
 
 	* 19566: Doc/Zsh/params.yo: change associative array
