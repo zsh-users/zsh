@@ -27,7 +27,7 @@
 0:-a cond
 
   # Find a block special file system.  This is a little tricky.
-  block=$(find /dev(|ices)/ -type b -print 2> /dev/null)
+  block=$(find /dev(|ices)/ -type b -print)
   if [[ -n $block ]]; then
     [[ -b $block[(f)1] && ! -b zerolength ]]
   else
@@ -36,8 +36,9 @@
   fi
 0D:-b cond
 
-  char=(/dev/tty*([1]))
-  [[ -c $char && ! -c $block ]]
+  # Use hardcoded /dev/tty because globbing inside /dev fails on Cygwin
+  char=/dev/tty
+  [[ -c $char && ! -c $zerolength ]]
 0:-c cond
 
   [[ -d . && ! -d zerolength ]]
@@ -67,13 +68,18 @@
   [[ -o rcs && ! -o norcs && -o noerrexit && ! -o errexit ]]
 0:-o cond
 
-  if whence mkfifo >/dev/null; then
-    mkfifo pipe
+  if ! grep '#define HAVE_FIFOS' $ZTST_testdir/../config.h; then
+    print -u8 'Warning: Not testing [[ -p pipe ]] (FIFOs not supported)'
+    [[ ! -p zerolength ]]
   else
-    mknod pipe p
+    if whence mkfifo && mkfifo pipe || mknod pipe p; then
+      [[ -p pipe && ! -p zerolength ]]
+    else
+      print -u8 'Warning: Not testing [[ -p pipe ]] (cannot create FIFO)'
+      [[ ! -p zerolength ]]
+    fi
   fi
-  [[ -p pipe && ! -p zerolength ]]
-0:-p cond
+0dD:-p cond
 
   [[ -r zerolength && ! -r unmodish ]]
 0:-r cond
