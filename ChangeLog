@@ -1,3 +1,8 @@
+2000-07-07  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 12193: configure.in, Src/Builtins/rlimits.mdd: Fix unnecessary
+	rebuilds of rlimits.o on platforms where getrlimit() is not found.
+
 2000-07-06  Oliver Kiddle  <opk@zsh.org>
 
 	* 12181: Completion/AIX/_lscfg, Completion/AIX/_object_classes,

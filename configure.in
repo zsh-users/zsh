@@ -963,6 +963,9 @@ if test $RESOURCE_H = "/dev/null" -a $ac_cv_func_getrlimit = yes; then
   AC_MSG_WARN(RLIMIT MACROS NOT FOUND:  please report to developers)
 fi])
 RLIMITS_INC_H=$zsh_cv_path_rlimit_h
+if test "$RLIMITS_INC_H" = "/dev/null"; then
+  RLIMITS_INC_H=''
+fi
 dnl rlimits.h only appears in dependencies if we are actually using it.
 dnl We are using it any time we have getrlimit, though if the macros were
 dnl not found we simply awk through /dev/null and fail to find them.
