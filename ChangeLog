@@ -1,5 +1,8 @@
 2003-02-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 18249: Completion/Linux/Command/_uml: new completion function
+	for User Mode Linux
+
 	* Doug Kearns: 18246: Completion/Unix/Command/_elinks,
 	Completion/Unix/Command/_ant, Completion/Unix/Command/_java:
 	minor update to _elinks and a couple of trivial fixes for java/ant
