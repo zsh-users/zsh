@@ -47,7 +47,7 @@ Line editor:
 - recursive editing
 - supplied widgets read-from-minibuffer, replace-string use these features
   (more intuitive prompting and argument reading than 4.0)
-- access to killed text vai $CUTBUFFER and $killring
+- access to killed text via $CUTBUFFER and $killring
 - supplied highly configurable word widgets forward-word-match etc., can
   set what constitutes a word interactively or in startup script
   (implement bash-style behaviour, replacing previous bash-* word widgets)
@@ -61,7 +61,7 @@ Local internal improvements:
 - line numbers in error messages and $PS4 output are more consistent
 - `=prog' expands only paths, no longer aliases for consistency
 - job display in prompts; `jobs' command output can be piped
-- prompts: new $RPROMPT2, %^, %y, enhanced %{, %}, %_.
+- prompts: new $RPROMPT2, %^, %j, %y, enhanced %{, %}, %_.
 - rand48() function for better randomness in arithmetic
   (if the corresponding math library function is present)
 - $SECONDS parameter can be made floating point via `typeset -F SECONDS'
