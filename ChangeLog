@@ -1,3 +1,8 @@
+2003-07-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 18841: Completion/Base/Completer/_prefix: work around problem
+	where the unambiguous part is empty making the word be removed
+
 2003-07-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 18822: Completion/Base/Completer/_expand
