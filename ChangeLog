@@ -1,3 +1,8 @@
+2005-01-26  Clint Adams  <clint@zsh.org>
+
+	* 20753: Src/system.h, Src/Zle/zle_params.c: use ZS_memmove
+	instead of memmove.
+
 2005-01-26  Peter Stephenson  <pws@csr.com>
 
 	* 20752: Src/system.h, Src/Zle/zle.h, Src/Zle/zle_hist.c,

@@ -242,8 +242,7 @@ set_lbuffer(UNUSED(Param pm), char *x)
     else
 	y = ZLENULSTR, len = 0;
     sizeline(zlell - zlecs + len);
-    memmove((char *)(zleline + len), (char *)(zleline + zlecs),
-	    (zlell - zlecs) * ZLE_CHAR_SIZE);
+    ZS_memmove(zleline + len, zleline + zlecs, zlell - zlecs);
     ZS_memcpy(zleline, y, len);
     zlell = zlell - zlecs + len;
     zlecs = len;

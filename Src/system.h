@@ -727,6 +727,7 @@ typedef wchar_t *ZLE_STRING_T;
 #define ZLETAB	L'\t'
 #define ZLENULSTR	L""
 #define ZS_memcpy wmemcpy
+#define ZS_memmove wmemmove
 #define ZC_icntrl iswcntrl
 #else
 typedef int ZLE_CHAR_T;
@@ -738,5 +739,6 @@ typedef unsigned char *ZLE_STRING_T;
 #define ZLETAB	'\t'
 #define ZLENULSTR	""
 #define ZS_memcpy memcpy
+#define ZS_memmove memmove
 #define ZC_icntrl icntrl
 #endif
