@@ -1,3 +1,8 @@
+2004-05-25  Peter Stephenson  <pws@csr.com>
+
+	* Compiled by Thorsten Kampe in zsh-users/7474:
+	Doc/Zsh/options.yo: reorder option descriptions into subheadings.
+
 2004-05-21  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 19967+: Src/builtin.c, Src/hist.c Src/params.c,
