@@ -3,6 +3,7 @@
 %prep
   zmodload -i zsh/zpty
 
+  export ZTST_testdir ZTST_srcdir
   comptest () { $ZTST_testdir/../Src/zsh -f $ZTST_srcdir/comptest -z $ZTST_testdir/../Src/zsh -d $ZTST_testdir/compdump.tmp "$@" }
 
   mkdir comp.tmp

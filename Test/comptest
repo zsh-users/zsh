@@ -1,7 +1,11 @@
 #!/usr/local/bin/zsh -f
 
+[[ -d $ZTST_testdir/Modules/zsh ]] && module_path=( $ZTST_testdir/Modules )
+
 zmodload -i zsh/zpty
 setopt extendedglob
+
+fpath=( ${ZTST_srcdir:h}/(Completion|Functions)/*~*/CVS(/) )
 
 debug=
 dump=(-D)
@@ -24,6 +28,8 @@ input="$*"
 tmp=/tmp/comptest.$$
 
 cat <<End >$tmp
+module_path=( $module_path )
+fpath=( $fpath )
 stty columns 80 rows 24
 LISTMAX=10000000
 ZLS_COLORS='no=<NO>:fi=<FI>:di=<DI>:ln=<LN>:pi=<PI>:so=<SO>:bd=<BD>:cd=<CD>:ex=<EX>:mi=<MI>:tc=<TC>:sp=<SP>:lc=<LC>:ec=<EC>\n:rc=<RC>'

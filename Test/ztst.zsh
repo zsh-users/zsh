@@ -22,6 +22,10 @@
 # still not be good enough.  Maybe we should trick it somehow.
 emulate -R zsh
 
+# Set the module load path to correspond to this build of zsh.
+# This Modules directory should have been created by "make check".
+[[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
+
 # We need to be able to save and restore the options used in the test.
 # We use the $options variable of the parameter module for this.
 zmodload -i zsh/parameter
@@ -46,6 +50,9 @@ ZTST_testname=$1
 # The source directory is not necessarily the current directory
 ZTST_srcdir=${0%/*}
 [[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_testdir/$ZTST_srcdir"
+
+# Set the function autoload paths to correspond to this build of zsh.
+fpath=( ${ZTST_srcdir:h}/(Completion|Functions)/*~*/CVS(/) )
 
 : ${TMPPREFIX:=/tmp/zsh}
 # Temporary files for redirection inside tests.
