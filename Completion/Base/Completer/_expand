@@ -150,17 +150,6 @@ if [[ -z "$compstate[insert]" ]] ;then
 else
   _tags all-expansions expansions original
 
-  if _requested all-expansions expl 'all expansions'; then
-    local disp dstr
-
-    if [[ "${#${exp}}" -ge COLUMNS ]]; then
-      disp=( -ld dstr )
-      dstr=( "${(r:COLUMNS-5:)exp} ..." )
-    else
-      disp=()
-    fi
-    compadd "$disp[@]" "$expl[@]" -UQ -qS "$suf" - "$exp"
-  fi
   if [[ $#exp -gt 1 ]] && _requested expansions; then
     local i j normal space dir
 
@@ -186,6 +175,18 @@ else
     (( $#dir ))    && compadd "$expl[@]" -UQ -qS/ -a dir
     (( $#space ))  && compadd "$expl[@]" -UQ -qS " " -a space
     (( $#normal )) && compadd "$expl[@]" -UQ -qS "" -a normal
+  fi
+  if _requested all-expansions expl 'all expansions'; then
+    local disp dstr
+
+    if [[ "${#${exp}}" -ge COLUMNS ]]; then
+      disp=( -ld dstr )
+      dstr=( "${(r:COLUMNS-5:)exp} ..." )
+    else
+      disp=()
+    fi
+    [[ -o multios ]] && exp=($exp[1] $compstate[redirect]${^exp[2,-1]})
+    compadd "$disp[@]" "$expl[@]" -UQ -qS "$suf" - "$exp"
   fi
 
   _requested original expl original && compadd "$expl[@]" -UQ - "$word"
