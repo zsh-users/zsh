@@ -33,4 +33,13 @@ case $OSTYPE in
       '(-n -w -p -a *)-A[list all in table form]' \
       '(-n -p -a -A)*:sysctl variable:_files -W /proc/sys'
   ;;
+  openbsd*)
+    : ${(A)_cache_sysctlvars:=${${(f)"$(sysctl -a)"}%% *}}
+    _arguments -s -A "-*" \
+      '(-w -A *)-a[list all string and integer variables]' \
+      '(-w -a *)-A[list all known variables]' \
+      '(-w)-n[show only values]' \
+      '(-a -A -n)-w[write variable]' \
+      '(-a -A)*:sysctl variable:_multi_parts ${words[(r)-w]:+-S=} -i . _cache_sysctlvars'
+    ;;
 esac
