@@ -1021,6 +1021,7 @@ fallback_zleread(char *lp, char *rp, int ha)
 
 /* compctl entry point pointers.  Similar to the ZLE ones. */
 
+/**/
 CompctlReadFn compctlreadptr = fallback_compctlread;
 
 /**/
