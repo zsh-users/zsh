@@ -1,3 +1,9 @@
+2003-09-24  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: improve handling
+	of label completion: now faster and uses filename to narrow
+	range if after `@'.
+
 2003-09-22  Peter Stephenson  <pws@csr.com>
 
 	* 19105: Src/init.c, Src/jobs.c: Set shout to stderr if we

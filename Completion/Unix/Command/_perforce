@@ -875,7 +875,7 @@ _perforce_files() {
     _alternative \
       "changes:change:_perforce_changes $range -tf" \
       clients:client:_perforce_clients \
-      labels:label:_perforce_labels \
+      "labels:label:_perforce_labels -tf" \
       'dates:date (+ time):_perforce_dates'
   elif [[ -prefix *\# ]]; then
     # Modify context to indicate we are in a suffix.
@@ -1138,17 +1138,17 @@ _perforce_jobviews() {
 
 (( $+functions[_perforce_labels] )) ||
 _perforce_labels() {
-    local lline match mbegin mend
-    local -a ll
+    local lline file
+    local -a ll match mbegin mend
 
-    # May be completing after `@'.
-    compset -P '*@'
+    if [[ $argv[-1] = -tf ]]; then
+      argv=($argv[1,-2])
+      # Completing after `@'.
+      file=${${(Q)PREFIX}%%@*}
+      compset -P '*@'
+    fi
 
-    _perforce_call_p4 labels labels | while read lline; do
-	if [[ $lline = (#b)'Label '([^[:blank:]]##)' '(*) ]]; then
-	    ll+=("${match[1]}:${match[2]}")
-	fi
-    done
+    ll=(${${(f)"$(_perforce_call_p4 labels labels ${file:+\$file})"}//(#b)Label\ ([^[:blank:]]##)\ (*)/$match[1]:$match[2]})
     _describe -t labels 'Perforce label' ll
 }
 
