@@ -1,3 +1,9 @@
+2000-05-23  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11537: Completion/Command/_complete_tag,
+	Completion/Command/.distfiles, Doc/Zsh/compsys.yo: new
+	_complete_tag function.
+
 2000-05-23  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11536: Doc/Zsh/mod_zutil.yo: doc clarifications for zparseopts

@@ -2460,6 +2460,18 @@ a trace of the shell commands executed by the completion system.  Each
 completion attempt gets its own file.  A command to view each of these
 files is pushed onto the editor buffer stack.
 )
+findex(_complete_tag (^Xt))
+item(tt(_complete_tag (^Xt)))(
+This widget completes symbol tags created by the tt(etags) or tt(ctags)
+programmes (note there is no connection with the completion system's tags)
+stored in a file tt(TAGS), in the format used by tt(etags), or tt(tags), in the
+format created by tt(ctags).  It will look back up the path hierarchy for
+the first occurrence of either file; if both exist, the file tt(TAGS) is
+preferred.  You can specify the full path to a tt(TAGS) or tt(tags) file by
+setting the parameter tt($TAGSFILE) or tt($tagsfile) respectively.
+The corresponding completion tags used are tt(etags) and tt(vtags), after
+emacs and vi respectively.
+)
 enditem()
 
 texinode(Completion Functions)(Completion Directories)(Bindable Commands)(Completion System)
