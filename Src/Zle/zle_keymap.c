@@ -90,6 +90,14 @@ struct bindstate {
     int prefixlen;
 };
 
+/* This structure is used when scanning for prefix bindings to remove */
+
+struct remprefstate {
+    Keymap km;
+    char *prefix;
+    int prefixlen;
+};
+
 #define BS_LIST (1<<0)
 #define BS_ALL  (1<<1)
 
@@ -836,6 +844,19 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
 	zwarnnam(name, "keymap `%s' is protected", kmname, 0);
 	return 1;
     }
+    if (func == 'r' && ops['p']) {
+	char *useq, *bseq;
+	int len;
+	struct remprefstate rps;
+	rps.km = km;
+	while ((useq = *argv++)) {
+	    bseq = getkeystring(useq, &len, 2, NULL);
+	    rps.prefix = metafy(bseq, len, META_USEHEAP);
+	    rps.prefixlen = strlen(rps.prefix);
+	    scankeymap(km, 0, scanremoveprefix, &rps);
+	}
+	return 0;
+    }
     do {
 	char *useq = *argv, *bseq, *seq, *str;
 	int len;
@@ -880,6 +901,20 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
     return ret;
 }
 
+/* Remove bindings for key sequences which have the given (proper) prefix. */
+
+/**/
+static void
+scanremoveprefix(char *seq, Thingy bind, char *str, void *magic)
+{
+    struct remprefstate *rps = magic;
+
+    if (strncmp(seq, rps->prefix, rps->prefixlen) || !seq[rps->prefixlen])
+	return;
+
+    bindkey(rps->km, seq, refthingy(t_undefinedkey), NULL);
+}
+
 /* List key bindings.  If an argument is given, list just that one *
  * binding, otherwise list the entire keymap.  If the -L option is *
  * given, list in the form of bindkey commands.                    */
@@ -913,6 +948,7 @@ bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
 	    }
 	    bs.prefix = getkeystring(argv[0], &bs.prefixlen, 2, NULL);
 	    bs.prefix = metafy(bs.prefix, bs.prefixlen, META_HREALLOC);
+	    bs.prefixlen = strlen(bs.prefix);
 	} else {
 	    bs.prefix = NULL;
 	    bs.prefixlen = 0;
@@ -1067,11 +1103,9 @@ add_cursor_key(Keymap km, int tccode, Thingy thingy, int defchar)
 	/*
 	 * Sanity checking.  If the cursor key is zero-length (unlikely,
 	 * but this is termcap we're talking about), or it's a single
-	 * character which is already bound, then we don't bind it.
+	 * character, then we don't bind it.
 	 */
-	if (!buf[0] || (!buf[1] && km->first[STOUC(buf[0])] != t_undefinedkey))
-	    ok = 0;
-	else
+	if (buf[0] && buf[1] && (buf[0] != Meta || buf[2]))
 	    ok = 1;
     }
     if (!ok) {

@@ -175,7 +175,20 @@ Only keys that are unbound or bound to tt(self-insert) are affected.
 item(tt(-r) var(in-string) ...)(
 Unbind the specified var(in-string)s in the selected keymap.
 This is exactly equivalent to binding the strings to tt(undefined-key).
+
 When tt(-R) is also used, interpret the var(in-string)s as ranges.
+
+When tt(-p) is also used, the var(in-string)s specify prefixes.  Any
+binding that has the given var(in-string) as a prefix, not including the
+binding for the var(in-string) itself, if any, will be removed.  For
+example,
+
+example(bindkey -rpM viins '^[')
+
+will remove all bindings in the vi-insert keymap beginning with an escape
+character (probably cursor keys), but leave the binding for the escape
+character itself (probably tt(vi-cmd-mode)).  This is incompatible with the
+option tt(-R).
 )
 item(tt(-s) var(in-string out-string) ...)(
 Bind each var(in-string) to each var(out-string).
