@@ -1,3 +1,8 @@
+2000-07-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12149: acconfig.h, configure.in, Src/Modules/zftp.c:
+	h_errno wasn't found on HPUX 10.20.  Maybe in some library.
+
 2000-07-04  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12156: Completion/Core/_expand, Completion/Core/_path_files: add

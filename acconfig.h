@@ -296,3 +296,6 @@
 
 /* Define to 1 if ino_t is 64 bit (for large file support) */
 #undef INO_T_IS_64_BIT
+
+/* Define to 1 if h_errno is not defined by the system */
+#undef USE_LOCAL_H_ERRNO

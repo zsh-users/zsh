@@ -816,6 +816,17 @@ zsh_STRUCT_MEMBER([
 #include <netinet/in.h>
 ], struct sockaddr_in6, sin6_scope_id)
 
+dnl Check for h_errno external variable
+AC_CACHE_CHECK(if we need our own h_errno,
+  zsh_cv_decl_h_errno_use_local,
+  [AC_TRY_LINK( ,[extern int h_errno; h_errno = 0;],
+  zsh_cv_decl_h_errno_use_local=no,
+  zsh_cv_decl_h_errno_use_local=yes)])
+
+if test $zsh_cv_decl_h_errno_use_local = yes; then
+  AC_DEFINE(USE_LOCAL_H_ERRNO)
+fi
+
 dnl ---------------
 dnl CHECK FUNCTIONS
 dnl ---------------

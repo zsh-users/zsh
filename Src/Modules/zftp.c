@@ -111,6 +111,10 @@ union zftp_sockaddr {
 #endif
 };
 
+#ifdef USE_LOCAL_H_ERRNO
+int h_errno;
+#endif
+
 /* We use the RFC 2553 interfaces.  If the functions don't exist in the library,
    simulate them. */
 
