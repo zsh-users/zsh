@@ -576,7 +576,7 @@ killrunjobs(int from_signal)
                 killed++;
         }
     if (killed)
-        zerr("warning: %d jobs SIGHUPed", NULL, killed);
+        zwarn("warning: %d jobs SIGHUPed", NULL, killed);
 }
 
 
