@@ -25,6 +25,90 @@ dnl  support, updates, enhancements, or modifications.
 dnl
 
 dnl
+dnl Code from the configure system for bash 2.03 (not zsh copyright).
+dnl If available, use support for large files unless the user specified
+dnl one of the CPPFLAGS, LDFLAGS, or LIBS variables (<eggert@twinsun.com>
+dnl via GNU patch 2.5)
+dnl
+AC_DEFUN(zsh_LARGE_FILE_SUPPORT,
+[AC_MSG_CHECKING(whether large file support needs explicit enabling)
+ac_getconfs=''
+ac_result=yes
+ac_set=''
+ac_shellvars='CPPFLAGS LDFLAGS LIBS'
+for ac_shellvar in $ac_shellvars; do
+  case $ac_shellvar in
+  CPPFLAGS) ac_lfsvar=LFS_CFLAGS ;;
+  *) ac_lfsvar=LFS_$ac_shellvar ;;
+  esac
+  (getconf $ac_lfsvar) >/dev/null 2>&1 || { ac_result=no; break; }
+  ac_getconf=`getconf $ac_lfsvar`
+  if test -n "$ac_getconf"; then
+    eval test '"${'$ac_shellvar'+set}"' = set && ac_set=$ac_shellvar
+    ac_getconfs=$ac_getconfs$ac_getconf
+    eval ac_test_$ac_shellvar="\$ac_getconf"
+  else
+    eval ac_test_$ac_shellvar="\$$ac_shellvar"
+  fi
+done
+case "$ac_result$ac_getconfs" in
+yes) ac_result=no ;;
+esac
+case "$ac_result$ac_set" in
+yes?*) test "x$ac_set" != "xLDFLAGS" -o "x$auto_ldflags" = x && {
+  ac_result="yes, but $ac_set is already set, so use its settings"
+}
+esac
+AC_MSG_RESULT($ac_result)
+case $ac_result in
+yes)
+  for ac_shellvar in $ac_shellvars; do
+    case "`eval echo $ac_shellvar-\\\$ac_test_$ac_shellvar`" in
+      CPPFLAGS*-D_LARGEFILE_SOURCE*) eval $ac_shellvar=\$ac_test_$ac_shellvar
+	;;
+      CPPFLAGS*) 
+        eval $ac_shellvar="\"-D_LARGEFILE_SOURCE \$ac_test_$ac_shellvar\""
+	;;
+      *) eval $ac_shellvar=\$ac_test_$ac_shellvar
+    esac
+  done ;;
+esac
+])
+
+dnl
+dnl zsh_64_BIT_TYPE
+dnl   Check whether the first argument works as a 64-bit type.
+dnl   If there is a non-zero third argument, we just assume it works
+dnl   when we're cross compiling.  This is to allow a type to be
+dnl   specified directly as --enable-lfs="long long".
+dnl   Sets the variable given in the second argument to the first argument
+dnl   if the test worked, `no' otherwise.  Be careful testing this, as it
+dnl   may produce two words `long long' on an unquoted substitution.
+dnl   This macro does not produce messages as it may be run several times
+dnl   before finding the right type.
+dnl
+
+AC_DEFUN(zsh_64_BIT_TYPE,
+[AC_TRY_RUN([
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+main()
+{
+  $1 foo = 0; 
+  return sizeof($1) != 8;
+}
+], $2="$1", $2=no,
+  [if test x$3 != x ; then
+    $2="$1"
+  else
+    $2=no
+  fi])
+])
+
+
+dnl
 dnl zsh_SYS_DYNAMIC_BROKEN
 dnl   Check whether static/shared library linking is broken.
 dnl
@@ -45,7 +129,7 @@ else
 fi
 echo '
 	extern char **environ;
-	void *symlist1[] = {
+	void *symlist1[[]] = {
 		(void *)&environ,
 		(void *)0
 	};
@@ -56,12 +140,25 @@ $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
 $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
 $DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -116,6 +213,18 @@ $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
 $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
 $DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
@@ -123,12 +232,14 @@ $DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
 #include <nlist.h>
 #include <link.h>
 #endif
+#endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
 #endif
 #ifndef RTLD_GLOBAL
 #define RTLD_GLOBAL 0
 #endif
+
 
 main()
 {
@@ -177,12 +288,25 @@ $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
 $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
 $DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -207,6 +331,7 @@ main()
 [zsh_cv_sys_dynamic_rtld_global=no],
 [zsh_cv_sys_dynamic_rtld_global=no]
 )
+    LDFLAGS=$save_ldflags
 else
     zsh_cv_sys_dynamic_rtld_global=no
 fi
@@ -233,12 +358,25 @@ $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5; then
     save_ldflags=$LDFLAGS
     LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS"
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -293,12 +431,25 @@ elif
     save_ldflags=$LDFLAGS
     LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS -s"
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -347,12 +498,25 @@ echo 'int fred () { return 42; }' > conftest1.c
 if $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&5 2>&5 &&
 $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS -s conftest1.o $LIBS 1>&5 2>&5; then
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -388,7 +552,7 @@ dnl
 
 AC_DEFUN(zsh_PATH_UTMP,
 [AC_CACHE_CHECK([for $1 file], [zsh_cv_path_$1],
-[for dir in /etc /usr/etc /var/adm /usr/adm /var/run ./conftest; do
+[for dir in /etc /usr/etc /var/adm /usr/adm /var/run /var/log ./conftest; do
   zsh_cv_path_$1=${dir}/$1
   test -f $zsh_cv_path_$1 && break
   zsh_cv_path_$1=no
@@ -431,3 +595,54 @@ if test $zsh_cv_struct_member_[]translit($2, [ ], [_])_$3 = yes; then
   AC_DEFINE(HAVE_[]translit($2_$3, [ a-z], [_A-Z]))
 fi
 ])
+
+dnl
+dnl zsh_ARG_PROGRAM
+dnl   Handle AC_ARG_PROGRAM substitutions into other zsh configure macros.
+dnl   After processing this macro, the configure script may refer to
+dnl   and $tzsh_name, and @tzsh@ is defined for make substitutions.
+dnl
+
+AC_DEFUN(zsh_ARG_PROGRAM,
+[AC_ARG_PROGRAM
+# Un-double any \ or $ (doubled by AC_ARG_PROGRAM).
+cat <<\EOF_SED > conftestsed
+s,\\\\,\\,g; s,\$\$,$,g
+EOF_SED
+zsh_transform_name=`echo "${program_transform_name}" | sed -f conftestsed`
+rm -f conftestsed
+tzsh_name=`echo zsh | sed -e "${zsh_transform_name}"`
+# Double any \ or $ in the transformed name that results.
+cat <<\EOF_SED >> conftestsed
+s,\\,\\\\,g; s,\$,$$,g
+EOF_SED
+tzsh=`echo ${tzsh_name} | sed -f conftestsed`
+rm -f conftestsed
+AC_SUBST(tzsh)dnl
+])
+
+AC_DEFUN(zsh_COMPILE_FLAGS,
+    [AC_ARG_ENABLE(cppflags,
+	[  --enable-cppflags=...      specify C preprocessor flags],
+	if test "$enableval" = "yes"
+	then CPPFLAGS="$1"
+	else CPPFLAGS="$enable_cppflags"
+	fi)
+    AC_ARG_ENABLE(cflags,
+	[  --enable-cflags=...        specify C compiler flags],
+	if test "$enableval" = "yes"
+	then CFLAGS="$1"
+	else CFLAGS="$enable_cflags"
+	fi)
+    AC_ARG_ENABLE(ldflags,
+	[  --enable-ldflags=...       specify linker flags],
+	if test "$enableval" = "yes"
+	then LDFLAGS="$2"
+	else LDFLAGS="$enable_ldflags"
+	fi)
+    AC_ARG_ENABLE(libs,
+	[  --enable-libs=...          specify link libraries],
+	if test "$enableval" = "yes"
+	then LIBS="$3"
+	else LIBS="$enable_libs"
+	fi)])

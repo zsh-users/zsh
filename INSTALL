@@ -130,6 +130,15 @@ you can do that on the command line like this:
 Or on systems that have the "env" program, you can do it like this:
     env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
 
+The flags CFLAGS, CPPFLAGS, LDFLAGS and LIBS can also be set as flags to
+configure, where the name appears in lower case:
+    configure --enable-cflags=-O2 --enable-libs=-lposix
+
+The advantage of this form is that `config.status --recheck' will remember
+the flags you originally specified.  You can still override the flags when
+running `make' (although these will not be passed down via `config.status
+--recheck').
+
 Check Generated Files
 ---------------------
 

@@ -48,6 +48,9 @@ dnl -----------------------------
 dnl Handle --program-prefix, --program-suffix, etc.
 zsh_ARG_PROGRAM
 
+dnl Handle setting of compile flags (CPPFLAGS, CFLAGS, LDFLAGS, LIBS).
+zsh_COMPILE_FLAGS
+
 dnl Do you want to debug zsh?
 undefine([zsh-debug])dnl
 AC_ARG_ENABLE(zsh-debug,
