@@ -943,6 +943,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 
     if (wc_code(code) != WC_PIPE)
 	return lastval = (slflags & WC_SUBLIST_NOT) != 0;
+    else if (slflags & WC_SUBLIST_NOT)
+	last1 = 0;
 
     pj = thisjob;
     ipipe[0] = ipipe[1] = opipe[0] = opipe[1] = 0;
