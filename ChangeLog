@@ -1,3 +1,8 @@
+2000-04-30  Clint Adams  <schizo@debian.org>
+
+	* 11027: Josip Rodin: Completion/User/_joe:
+	completion for joe.
+
 2000-04-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 11026: Src/builtin.c, Src/hashtable.c, Src/signals.c,
