@@ -1,3 +1,11 @@
+2001-12-21  Geoff Wing  <gcw@zsh.org>
+
+	* 16332: zshconfig.ac, Config/defs.mk.in, Src/Makefile.in,
+	Src/Makemod.in.in, Src/ansi2knr.c: remove ansi2knr.c from our
+	repository due to licence differences.  Adjust the build process
+	accordingly.  configure will now abort if the user requests ansi2knr
+	but no ansi2knr is available
+
 2001-12-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 16364: Src/params.c: further to 16351, except specials
