@@ -1676,7 +1676,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     char *p, **sp, *e;
     char *ipre = NULL, *ppre = NULL, *psuf = NULL, *prpre = NULL;
     char *pre = NULL, *suf = NULL, *group = NULL, *m = NULL, *rs = NULL;
-    char *ign = NULL, *rf = NULL;
+    char *ign = NULL, *rf = NULL, *expl = NULL;
     int f = 0, a = 0, dm;
     Cmatcher match = NULL;
 
@@ -1757,6 +1757,10 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		e = "matching specification expected after -%c";
 		dm = 1;
 		break;
+	    case 'X':
+		sp = &expl;
+		e = "string expected after -%c";
+		break;
 	    case 'r':
 		f |= CMF_REMOVE;
 		sp = &rs;
@@ -1802,7 +1806,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 
     match = cpcmatcher(match);
     addmatchesptr(ipre, ppre, psuf, prpre, pre, suf, group,
-		  rs, rf, ign, f, a, match, argv);
+		  rs, rf, ign, f, a, match, expl, argv);
     freecmatcher(match);
 
     return 0;
@@ -2049,8 +2053,8 @@ cond_strcl(char **a, int id)
 	    zerr("zle not loaded, zle condition not available", NULL, 0);
 	    return 1;
 	}
-	i = getcpatptr(comp_strptr(&ipl, NULL), i, s, id);
-	if (i != -1) {
+	i = getcpatptr(comp_strptr(&ipl, NULL, 1), i, s, id);
+	if (i != -1 && i >= ipl) {
 	    ignore_prefix(i - ipl);
 	    return 1;
 	}

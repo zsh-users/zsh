@@ -1,0 +1,4 @@
+#defkeycomp complete-word \C-xm
+local file
+file=($~PREFIX*$~SUFFIX(om[1]N))
+(( $#file )) && compadd -f $file

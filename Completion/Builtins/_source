@@ -1,0 +1,7 @@
+#defcomp source
+
+if [[ -position 2 -1 ]]; then
+  _normal "$@"
+else
+  _files
+fi

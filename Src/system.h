@@ -70,8 +70,15 @@ char *alloca _((size_t));
 # endif
 #endif
 
-#ifdef HAVE_LIBC_H     /* NeXT */
-# include <libc.h>
+/*
+ * libc.h in an optional package for Debian Linux is broken (it
+ * defines dup() as a synonym for dup2(), which has a different
+ * number of arguments), so just include it for next.
+ */
+#ifdef __NeXT__
+# ifdef HAVE_LIBC_H
+#  include <libc.h>
+# endif
 #endif
 
 #ifdef HAVE_SYS_TYPES_H

@@ -1,0 +1,37 @@
+#defkeycomp complete-word \C-xc
+
+# Function to correct a filename.  Can be used as a completion widget,
+# or as a function in its own right, in which case it will print the
+# corrected filename to standard output.
+#
+# You can adapt max_approx to the maximum number of mistakes
+# which are allowed in total.
+
+emulate -LR zsh
+setopt extendedglob
+
+local file="$PREFIX$SUFFIX" trylist
+integer approx max_approx=6
+
+[[ -z $WIDGET ]] && file=$1 
+
+if [[ -e "$file" ]]; then
+  if [[ -n $WIDGET ]]; then
+    compadd "$file"
+  else
+    print "$file"
+  fi
+  return
+fi
+
+for (( approx = 1; approx <= max_approx; approx++ )); do
+  trylist=( (#a$approx)"$file"(N) )
+  (( $#trylist )) && break
+done
+(( $#trylist )) || return 1
+
+if [[ -n $WIDGET ]]; then
+  compadd -U "${trylist[@]}"
+else
+  print "${trylist[@]}"
+fi

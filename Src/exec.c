@@ -2558,7 +2558,7 @@ execarith(Cmd cmd)
 	val = matheval(e);
     }
     if (isset(XTRACE)) {
-	fprintf(stderr, " ))\n", stderr);
+	fprintf(stderr, " ))\n");
 	fflush(stderr);
     }
     errflag = 0;

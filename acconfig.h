@@ -196,10 +196,13 @@
 /* Define to 1 if system has working FIFO's */
 #undef HAVE_FIFOS
 
-/* Define to 1 if struct rlimit use quad_t */
+/* Define to 1 if struct rlimit uses quad_t */
 #undef RLIM_T_IS_QUAD_T
 
-/* Define to 1 if rlimit use unsigned */
+/* Define to 1 if struct rlimit uses long long */
+#undef RLIM_T_IS_LONG_LONG
+
+/* Define to 1 if rlimit uses unsigned */
 #undef RLIM_T_IS_UNSIGNED
 
 /* Define to the type used in struct rlimit */

@@ -1,0 +1,3 @@
+function acroread
+
+_files -g '*.(pdf|PDF)'

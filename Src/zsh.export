@@ -173,6 +173,7 @@ refreshptr
 remlpaths
 remnulargs
 removehashnode
+require_module
 resetneeded
 restoredir
 reswdtab

@@ -214,11 +214,9 @@ static Cmlist mstack;
 
 /* The completion matchers used when building new stuff for the line. */
 
-static struct cmlist bmstack0, bmstack1;
-static Cmlist bmstack;
-static int had_lm;
+static Cmlist bmatchers;
 
-/* A list with references to all matcher we used. */
+/* A list with references to all matchers we used. */
 
 static LinkList matchers;
 
@@ -293,11 +291,23 @@ enum { COMP_COMPLETE,
 
 static int lastambig;
 
-/* Non-zero if the string on the line came from a previous completion. *
- * This is used to detect if the string should be taken as an exact    *
- * match (see do_ambiguous()).                                         */
+/* This says what of the state the line is in when completion is started *
+ * came from a previous completion. If the FC_LINE bit is set, the       *
+ * string was inserted. If FC_INWORD is set, the last completion moved   *
+ * the cursor into the word although it was at the end of it when the    *
+ * last completion was invoked.                                          *
+ * This is used to detect if the string should be taken as an exact      *
+ * match (see do_ambiguous()) and if the cursor has to be moved to the   *
+ * end of the word before generating the completions.                    */
 
 static int fromcomp;
+
+/* This holds the end-position of the last string inserted into the line. */
+
+static int lastend;
+
+#define FC_LINE   1
+#define FC_INWORD 2
 
 /**/
 void
@@ -606,6 +616,12 @@ docomplete(int lst)
 	do_menucmp(lst);
 	return;
     }
+
+    /* We may have to reset the cursor to its position after the   *
+     * string inserted by the last completion. */
+
+    if (fromcomp & FC_INWORD)
+	cs = lastend;
 
     /* Check if we have to start a menu-completion (via automenu). */
 
@@ -1567,6 +1583,83 @@ addtocline(Cline *retp, Cline *lrp,
     *lrp = ln;
 }
 
+/* This compares two cpattern lists and returns non-zero if they are
+ * equal. */
+
+static int
+cmp_cpatterns(Cpattern a, Cpattern b)
+{
+    while (a) {
+	if (a->equiv != b->equiv || memcmp(a->tab, b->tab, 256))
+	    return 0;
+	a = a->next;
+	b = b->next;
+    }
+    return 1;
+}
+
+/* This compares two cmatchers and returns non-zero if they are equal. */
+
+static int
+cmp_cmatchers(Cmatcher a, Cmatcher b)
+{
+    return (a == b ||
+	    (a->flags == b->flags &&
+	     a->llen == b->llen && a->wlen == b->wlen &&
+	     (!a->llen || cmp_cpatterns(a->line, b->line)) &&
+	     (a->wlen <= 0 || cmp_cpatterns(a->word, b->word)) &&
+	     (!(a->flags & CMF_LEFT) ||
+	      (a->lalen == b->lalen &&
+	       (!a->lalen || cmp_cpatterns(a->left, b->left)))) &&
+	     (!(a->flags & CMF_RIGHT) ||
+	      (a->ralen == b->ralen &&
+	       (!a->ralen || cmp_cpatterns(a->right, b->right))))));
+}
+
+/* Add the given matchers to the bmatcher list. */
+
+static void
+add_bmatchers(Cmatcher m)
+{
+    Cmlist old = bmatchers, *q = &bmatchers, n;
+
+    for (; m; m = m->next) {
+	if ((!m->flags && m->wlen > 0 && m->llen > 0) ||
+	    (m->flags == CMF_RIGHT && m->wlen == -1 && !m->llen)) {
+	    *q = n = (Cmlist) halloc(sizeof(struct cmlist));
+	    n->matcher = m;
+	    q = &(n->next);
+	}
+    }
+    *q = old;
+}
+
+/* This is called when the matchers in the mstack have changed to
+ * ensure that the bmatchers list contains no matchers not in mstack. */
+
+static void
+update_bmatchers(void)
+{
+    Cmlist p = bmatchers, q = NULL, ms;
+    Cmatcher mp;
+    int t;
+
+    while (p) {
+	t = 0;
+	for (ms = mstack; ms && !t; ms = ms->next)
+	    for (mp = ms->matcher; mp && !t; mp = mp->next)
+		t = cmp_cmatchers(mp, p->matcher);
+
+	p = p->next;
+	if (!t) {
+	    if (q)
+		q->next = p;
+	    else
+		bmatchers = p;
+	}
+    }
+}
+
 /* When building up cline lists that are to be inserted at the end of the
  * string or on the left hand side in the middle, we do this separately for
  * multiple runs of characters separated by the anchors of `*' match patterns.
@@ -1582,21 +1675,20 @@ end_list(int len, char *str)
     char *p = str;
 
     while (len) {
-	for (t = 0, ms = bmstack; ms && !t; ms = ms->next) {
-	    for (mp = ms->matcher; mp && !t; mp = mp->next) {
-		if (mp->flags == CMF_RIGHT && mp->wlen == -1 &&
-		    !mp->llen && len >= mp->ralen && mp->ralen &&
-		    pattern_match(mp->right, str, NULL, NULL)) {
-		    /* This is one of those patterns, so add a cline struct.
-		     * We store the anchor string in the line and the contents
-		     * (i.e. the strings between the anchors) in the word field. */
-		    *q = getcline(str, mp->ralen, p, str - p, 0);
-		    q = &((*q)->next);
-		    str += mp->ralen;
-		    len -= mp->ralen;
-		    p = str;
-		    t = 1;
-		}
+	for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
+	    mp = ms->matcher;
+	    if (mp->flags == CMF_RIGHT && mp->wlen == -1 &&
+		!mp->llen && len >= mp->ralen && mp->ralen &&
+		pattern_match(mp->right, str, NULL, NULL)) {
+		/* This is one of those patterns, so add a cline struct.
+		 * We store the anchor string in the line and the contents
+		 * (i.e. the strings between the anchors) in the word field. */
+		*q = getcline(str, mp->ralen, p, str - p, 0);
+		q = &((*q)->next);
+		str += mp->ralen;
+		len -= mp->ralen;
+		p = str;
+		t = 1;
 	    }
 	}
 	if (!t) {
@@ -1616,7 +1708,7 @@ end_list(int len, char *str)
 
 /* This builds a string that may be put on the line that fully matches the
  * given strings. The return value is NULL if no such string could be built
- * or that string, allocated on the heap.
+ * or that string in local static memory, dup it.
  * All this is a lot like the procedure in bld_new_pfx(), only slightly
  * simpler, see that function for more comments. */
 
@@ -1644,60 +1736,59 @@ join_strs(int la, char *sa, int lb, char *sb)
     }
     while (la && lb) {
 	if (*sa != *sb) {
-	    for (t = 0, ms = bmstack; ms && !t; ms = ms->next) {
-		for (mp = ms->matcher; mp && !t; mp = mp->next) {
-		    if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-			mp->wlen <= la && mp->wlen <= lb) {
-			if (pattern_match(mp->word, sa, NULL, ea)) {
-			    if (mp->llen + 1 > llen) {
-				if (llen)
-				    zfree(line, llen);
-				line = (char *) zalloc(llen = mp->llen + 20);
-			    }
-			    if ((bl = bld_line_pfx(mp->line, line, line,
-						   lb, sb, ea))) {
-				line[mp->llen] = '\0';
-				if (rr <= mp->llen) {
-				    char *or = rs;
+	    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
+		mp = ms->matcher;
+		if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
+		    mp->wlen <= la && mp->wlen <= lb) {
+		    if (pattern_match(mp->word, sa, NULL, ea)) {
+			if (mp->llen + 1 > llen) {
+			    if (llen)
+				zfree(line, llen);
+			    line = (char *) zalloc(llen = mp->llen + 20);
+			}
+			if ((bl = bld_line_pfx(mp->line, line, line,
+					       lb, sb, ea))) {
+			    line[mp->llen] = '\0';
+			    if (rr <= mp->llen) {
+				char *or = rs;
 
-				    rs = realloc(rs, (rl += 20));
-				    rr += 20;
-				    rp += rs - or;
-				}
-				memcpy(rp, line, mp->llen);
-				rp += mp->llen;
-				rr -= mp->llen;
-				sa += mp->wlen;
-				sb += bl;
-				la -= mp->wlen;
-				lb -= bl;
-				t = 1;
+				rs = realloc(rs, (rl += 20));
+				rr += 20;
+				rp += rs - or;
 			    }
-			} else if (pattern_match(mp->word, sb, NULL, ea)) {
-			    if (mp->llen + 1 > llen) {
-				if (llen)
-				    zfree(line, llen);
-				line = (char *) zalloc(llen = mp->llen + 20);
-			    }
-			    if ((bl = bld_line_pfx(mp->line, line, line,
-						   la, sa, ea))) {
-				line[mp->llen] = '\0';
-				if (rr <= mp->llen) {
-				    char *or = rs;
+			    memcpy(rp, line, mp->llen);
+			    rp += mp->llen;
+			    rr -= mp->llen;
+			    sa += mp->wlen;
+			    sb += bl;
+			    la -= mp->wlen;
+			    lb -= bl;
+			    t = 1;
+			}
+		    } else if (pattern_match(mp->word, sb, NULL, ea)) {
+			if (mp->llen + 1 > llen) {
+			    if (llen)
+				zfree(line, llen);
+			    line = (char *) zalloc(llen = mp->llen + 20);
+			}
+			if ((bl = bld_line_pfx(mp->line, line, line,
+					       la, sa, ea))) {
+			    line[mp->llen] = '\0';
+			    if (rr <= mp->llen) {
+				char *or = rs;
 
-				    rs = realloc(rs, (rl += 20));
-				    rr += 20;
-				    rp += rs - or;
-				}
-				memcpy(rp, line, mp->llen);
-				rp += mp->llen;
-				rr -= mp->llen;
-				sa += bl;
-				sb += mp->wlen;
-				la -= bl;
-				lb -= mp->wlen;
-				t = 1;
+				rs = realloc(rs, (rl += 20));
+				rr += 20;
+				rp += rs - or;
 			    }
+			    memcpy(rp, line, mp->llen);
+			    rp += mp->llen;
+			    rr -= mp->llen;
+			    sa += bl;
+			    sb += mp->wlen;
+			    la -= bl;
+			    lb -= mp->wlen;
+			    t = 1;
 			}
 		    }
 		}
@@ -1725,7 +1816,7 @@ join_strs(int la, char *sa, int lb, char *sb)
 
     *rp = '\0';
 
-    return dupstring(rs);
+    return rs;
 }
 
 /* This gets two cline lists with separated runs and joins the corresponding
@@ -1752,26 +1843,55 @@ join_ends(Cline o, Cline n, int *olp, int *nlp)
 	     * and mark the cline so that we don't try to join it again. */
 	    o->flags |= CLF_JOIN;
 	    o->llen = strlen(j);
-	    o->line = j;
+	    o->line = dupstring(j);
 	    bld_pfx(o, n, &mol, &mnl);
 	    smol += mol + o->llen;
 	    smnl += mnl + n->llen;
 	} else {
-	    /* Different anchor strings, so shorten the list. */
+	    /* Different anchors, see if we can find matching anchors
+	     * further down the lists. */
+	    Cline to, tn;
+	    int t = 0;
+
+	    /* But first build the common prefix. */
 	    bld_pfx(o, n, &mol, &mnl);
 	    smol += mol;
 	    smnl += mnl;
-	    o->flags |= CLF_MISS;
-	    o->next = NULL;
-	    o->llen = 0;
-	    if (olp)
-		*olp = smol;
-	    if (nlp)
-		*nlp = smnl;
-	    return ret;
+
+	    for (to = o; to && !t; to = to->next) {
+		for (tn = n; tn && !t; tn = tn->next) {
+		    if ((t = ((to->llen == tn->llen &&
+			       !strncmp(to->line, tn->line, to->llen)) ||
+			      (!(to->flags & CLF_JOIN) &&
+			       join_strs(to->llen, to->line,
+					 tn->llen, tn->line)))))
+			break;
+		}
+		if (t)
+		    break;
+	    }
+	    if (t) {
+		/* Found matching anchors, continue with them. */
+		o->line = to->line;
+		o->llen = to->llen;
+		o->next = to->next;
+		o->flags |= CLF_MISS;
+		n = tn;
+	    } else {
+		/* No matching anchors found, shorten the list. */
+		o->flags |= CLF_MISS;
+		o->next = NULL;
+		o->llen = 0;
+		if (olp)
+		    *olp = smol;
+		if (nlp)
+		    *nlp = smnl;
+		return ret;
+	    }
 	}
 	/* If we reached the end of the new list but not the end of the old
-	 * list, we mark the old list (saying that characters are missing here). */
+	 * list, we mark the old list (saying that characters are missing 
+	 * here). */
 	if (!(n = n->next) && o->next)
 	    o->flags |= CLF_MISS;
 	o = o->next;
@@ -1859,20 +1979,19 @@ bld_line_pfx(Cpattern pat, char *line, char *lp,
 		rl++;
 	    } else {
 		t = 0;
-		for (ms = bmstack; ms && !t; ms = ms->next) {
-		    for (mp = ms->matcher; mp && !t; mp = mp->next) {
-			if (!mp->flags && mp->wlen <= wlen && mp->llen <= l &&
-			    pattern_match(mp->line, line, NULL, ea) &&
-			    pattern_match(mp->word, word, ea, NULL)) {
-			    /* Both the line and the word pattern matched,
-			     * now skip over the matched portions. */
-			    line += mp->llen;
-			    word += mp->wlen;
-			    l -= mp->llen;
-			    wlen -= mp->wlen;
-			    rl += mp->wlen;
-			    t = 1;
-			}
+		for (ms = bmatchers; ms && !t; ms = ms->next) {
+		    mp = ms->matcher;
+		    if (!mp->flags && mp->wlen <= wlen && mp->llen <= l &&
+			pattern_match(mp->line, line, NULL, ea) &&
+			pattern_match(mp->word, word, ea, NULL)) {
+			/* Both the line and the word pattern matched,
+			 * now skip over the matched portions. */
+			line += mp->llen;
+			word += mp->wlen;
+			l -= mp->llen;
+			wlen -= mp->wlen;
+			rl += mp->wlen;
+			t = 1;
 		    }
 		}
 		if (!t)
@@ -1923,100 +2042,99 @@ bld_new_pfx(int ol, char *ow, int nl, char *nw, int *olp, int *nlp, Cline *lp)
     while (ol && nl) {
 	if (*ow != *nw) {
 	    /* Not the same character, use the patterns. */
-	    for (t = 0, ms = bmstack; ms && !t; ms = ms->next) {
-		for (mp = ms->matcher; mp && !t; mp = mp->next) {
-		    /* We use only those patterns that match a non-empty
-		     * string in both the line and the word, that match
-		     * strings no longer than the string we still have
-		     * to compare, that don't have anchors, and that don't
-		     * use the line strings for insertion. */
-		    if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-			mp->wlen <= ol && mp->wlen <= nl) {
-			/* Try the pattern only if the word-pattern matches
-			 * one of the strings. */
-			if (pattern_match(mp->word, ow, NULL, ea)) {
-			    /* Make the buffer where we build the possible
-			     * line patterns big enough. */
-			    if (mp->llen + 1 > llen) {
-				if (llen)
-				    zfree(line, llen);
-				line = (char *) zalloc(llen = mp->llen + 20);
-			    }
-			    /* Then build all the possible lines and see
-			     * if one of them matches the othe string. */
-			    if ((bl = bld_line_pfx(mp->line, line, line,
-						   nl, nw, ea))) {
-				/* Yep, one of the lines matched the other
-				 * string. */
-				if (p != ow) {
-				    /* There is still a substring that is
-				     * the same in both strings, so add
-				     * a cline for it. */
-				    char sav = *ow;
+	    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
+		mp = ms->matcher;
+		/* We use only those patterns that match a non-empty
+		 * string in both the line and the word, that match
+		 * strings no longer than the string we still have
+		 * to compare, that don't have anchors, and that don't
+		 * use the line strings for insertion. */
+		if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
+		    mp->wlen <= ol && mp->wlen <= nl) {
+		    /* Try the pattern only if the word-pattern matches
+		     * one of the strings. */
+		    if (pattern_match(mp->word, ow, NULL, ea)) {
+			/* Make the buffer where we build the possible
+			 * line patterns big enough. */
+			if (mp->llen + 1 > llen) {
+			    if (llen)
+				zfree(line, llen);
+			    line = (char *) zalloc(llen = mp->llen + 20);
+			}
+			/* Then build all the possible lines and see
+			 * if one of them matches the othe string. */
+			if ((bl = bld_line_pfx(mp->line, line, line,
+					       nl, nw, ea))) {
+			    /* Yep, one of the lines matched the other
+			     * string. */
+			    if (p != ow) {
+				/* There is still a substring that is
+				 * the same in both strings, so add
+				 * a cline for it. */
+				char sav = *ow;
 
-				    *ow = '\0';
-				    n = getcline(NULL, 0, dupstring(p),
-						 ow - p, 0);
-				    *ow = sav;
-				    if (l)
-					l->next = n;
-				    else
-					ret = n;
-				    l = n;
-				}
-				/* Then we add the line string built. */
-				line[mp->llen] = '\0';
-				n = getcline(dupstring(line), mp->llen,
-					     NULL, 0, CLF_DIFF);
+				*ow = '\0';
+				n = getcline(NULL, 0, dupstring(p),
+					     ow - p, 0);
+				*ow = sav;
 				if (l)
 				    l->next = n;
 				else
 				    ret = n;
 				l = n;
-				ow += mp->wlen;
-				nw += bl;
-				ol -= mp->wlen;
-				nl -= bl;
-				p = ow;
-				t = 1;
 			    }
-			} else if (pattern_match(mp->word, nw, NULL, ea)) {
-			    /* Now do the same for the other string. */
-			    if (mp->llen + 1 > llen) {
-				if (llen)
-				    zfree(line, llen);
-				line = (char *) zalloc(llen = mp->llen + 20);
-			    }
-			    if ((bl = bld_line_pfx(mp->line, line, line,
-						   ol, ow, ea))) {
-				if (p != ow) {
-				    char sav = *ow;
+			    /* Then we add the line string built. */
+			    line[mp->llen] = '\0';
+			    n = getcline(dupstring(line), mp->llen,
+					 NULL, 0, CLF_DIFF);
+			    if (l)
+				l->next = n;
+			    else
+				ret = n;
+			    l = n;
+			    ow += mp->wlen;
+			    nw += bl;
+			    ol -= mp->wlen;
+			    nl -= bl;
+			    p = ow;
+			    t = 1;
+			}
+		    } else if (pattern_match(mp->word, nw, NULL, ea)) {
+			/* Now do the same for the other string. */
+			if (mp->llen + 1 > llen) {
+			    if (llen)
+				zfree(line, llen);
+			    line = (char *) zalloc(llen = mp->llen + 20);
+			}
+			if ((bl = bld_line_pfx(mp->line, line, line,
+					       ol, ow, ea))) {
+			    if (p != ow) {
+				char sav = *ow;
 
-				    *ow = '\0';
-				    n = getcline(NULL, 0, dupstring(p),
-						 ow - p, 0);
-				    *ow = sav;
-				    if (l)
-					l->next = n;
-				    else
-					ret = n;
-				    l = n;
-				}
-				line[mp->llen] = '\0';
-				n = getcline(dupstring(line), mp->llen,
-					     NULL, 0, CLF_DIFF);
+				*ow = '\0';
+				n = getcline(NULL, 0, dupstring(p),
+					     ow - p, 0);
+				*ow = sav;
 				if (l)
 				    l->next = n;
 				else
 				    ret = n;
 				l = n;
-				ow += bl;
-				nw += mp->wlen;
-				ol -= bl;
-				nl -= mp->wlen;
-				p = ow;
-				t = 1;
 			    }
+			    line[mp->llen] = '\0';
+			    n = getcline(dupstring(line), mp->llen,
+					 NULL, 0, CLF_DIFF);
+			    if (l)
+				l->next = n;
+			    else
+				ret = n;
+			    l = n;
+			    ow += bl;
+			    nw += mp->wlen;
+			    ol -= bl;
+			    nl -= mp->wlen;
+			    p = ow;
+			    t = 1;
 			}
 		    }
 		}
@@ -2107,19 +2225,18 @@ join_new_pfx(Cline line, int len, char *word, int *missp)
 		    ll--;
 		    len--;
 		} else {
-		    for (t = 0, ms = bmstack; ms && !t; ms = ms->next) {
-			for (mp = ms->matcher; mp && !t; mp = mp->next) {
-			    if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-				mp->wlen <= len && mp->llen <= len &&
-				pattern_match(mp->word, word, NULL, ea) &&
-				pattern_match(mp->line, p, ea, NULL)) {
-				/* We have a matched substring, skip over. */
-				p += mp->llen;
-				word += mp->wlen;
-				ll -= mp->llen;
-				len -= mp->wlen;
-				t = 1;
-			    }
+		    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
+			mp = ms->matcher;
+			if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
+			    mp->wlen <= len && mp->llen <= len &&
+			    pattern_match(mp->word, word, NULL, ea) &&
+			    pattern_match(mp->line, p, ea, NULL)) {
+			    /* We have a matched substring, skip over. */
+			    p += mp->llen;
+			    word += mp->wlen;
+			    ll -= mp->llen;
+			    len -= mp->wlen;
+			    t = 1;
 			}
 		    }
 		    if (!t)
@@ -2148,6 +2265,7 @@ join_new_pfx(Cline line, int len, char *word, int *missp)
 		    l->next = line;
 		else
 		    ret = line;
+		l = line;
 	    }
 	} else {
 	    /* The cline doesn't have a string built by reverse matching,
@@ -2163,6 +2281,7 @@ join_new_pfx(Cline line, int len, char *word, int *missp)
 		    l->next = line;
 		else
 		    ret = line;
+		l = line;
 		len = 0;
 	    } else {
 		char sav = word[len];
@@ -2180,6 +2299,7 @@ join_new_pfx(Cline line, int len, char *word, int *missp)
 			l->next = line;
 		    else
 			ret = line;
+		    l = line;
 		    len = 0;
 		} else if (strpfx(line->word, word)) {
 		    word[len] = sav;
@@ -2190,6 +2310,7 @@ join_new_pfx(Cline line, int len, char *word, int *missp)
 			l->next = line;
 		    else
 			ret = line;
+		    l = line;
 		    len = 0;
 		} else {
 		    /* Not the same and no prefix, so we try to build a
@@ -2208,6 +2329,7 @@ join_new_pfx(Cline line, int len, char *word, int *missp)
 			    l->next = sl;
 			else
 			    ret = sl;
+			l = sl;
 			if (!mol) {
 			    send->next = next;
 			    word += len - mnl;
@@ -2238,7 +2360,11 @@ join_new_pfx(Cline line, int len, char *word, int *missp)
 static void
 bld_pfx(Cline o, Cline n, int *olp, int *nlp)
 {
-    if (o->flags & CLF_NEW) {
+    if (olp)
+	*olp = 0;
+    if (nlp)
+	*nlp = 0;
+    if (o->flags & CLF_PNEW) {
 	if (o->flags & (CLF_END | CLF_MID))
 	    /* We split the suffix in the middle and at the end into
 	     * separate runs. */
@@ -2255,7 +2381,7 @@ bld_pfx(Cline o, Cline n, int *olp, int *nlp)
 		o->flags |= CLF_MISS;
 	}
     } else if (o->flags & (CLF_END | CLF_MID)) {
-	o->flags |= CLF_NEW;
+	o->flags |= CLF_PNEW;
 	o->prefix = join_ends(end_list(o->wlen, o->word),
 			      end_list(n->wlen, n->word), olp, nlp);
     } else if (o->wlen && n->wlen) {
@@ -2280,7 +2406,7 @@ bld_pfx(Cline o, Cline n, int *olp, int *nlp)
 	     * matches both strings from the original cline structs
 	     * and thus can be put in the command line to represent
 	     * them. This cline list is stored in o. */
-	    o->flags |= CLF_NEW;
+	    o->flags |= CLF_PNEW;
 	    o->prefix = bld_new_pfx(o->wlen, o->word, n->wlen, n->word,
 				    &mol, &mnl, NULL);
 	    newl = 0;
@@ -2300,7 +2426,8 @@ bld_pfx(Cline o, Cline n, int *olp, int *nlp)
 
 	if (!o->prefix && n->wlen != o->wlen)
 	    o->flags |= CLF_MISS;
-    }
+    } else
+	o->wlen = 0;
 }
 
 /* The following function are like their counterparts above, only for
@@ -2353,20 +2480,19 @@ bld_line_sfx(Cpattern pat, char *line, char *lp,
 		rl++;
 	    } else {
 		t = 0;
-		for (ms = bmstack; ms && !t; ms = ms->next) {
-		    for (mp = ms->matcher; mp && !t; mp = mp->next) {
-			if (!mp->flags && mp->wlen <= wlen && mp->llen <= l &&
-			    pattern_match(mp->line, line - mp->llen,
-					  NULL, ea) &&
-			    pattern_match(mp->word, word - mp->wlen,
-					  ea, NULL)) {
-			    line -= mp->llen;
-			    word -= mp->wlen;
-			    l -= mp->llen;
-			    wlen -= mp->wlen;
-			    rl += mp->wlen;
-			    t = 1;
-			}
+		for (ms = bmatchers; ms && !t; ms = ms->next) {
+		    mp = ms->matcher;
+		    if (!mp->flags && mp->wlen <= wlen && mp->llen <= l &&
+			pattern_match(mp->line, line - mp->llen,
+				      NULL, ea) &&
+			pattern_match(mp->word, word - mp->wlen,
+				      ea, NULL)) {
+			line -= mp->llen;
+			word -= mp->wlen;
+			l -= mp->llen;
+			wlen -= mp->wlen;
+			rl += mp->wlen;
+			t = 1;
 		    }
 		}
 		if (!t)
@@ -2404,84 +2530,83 @@ bld_new_sfx(int ol, char *ow, int nl, char *nw, int *olp, int *nlp, Cline *lp)
     }
     while (ol && nl) {
 	if (ow[-1] != nw[-1]) {
-	    for (t = 0, ms = bmstack; ms && !t; ms = ms->next) {
-		for (mp = ms->matcher; mp && !t; mp = mp->next) {
-		    if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-			mp->wlen <= ol && mp->wlen <= nl) {
-			if (pattern_match(mp->word, ow - mp->wlen,
-					  NULL, ea)) {
-			    if (mp->llen + 1 > llen) {
-				if (llen)
-				    zfree(line, llen);
-				line = (char *) zalloc(llen = mp->llen + 20);
-			    }
-			    if ((bl = bld_line_sfx(mp->line, line, line,
-						   nl, nw, ea))) {
-				if (p != ow) {
-				    char sav = *p;
+	    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
+		mp = ms->matcher;
+		if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
+		    mp->wlen <= ol && mp->wlen <= nl) {
+		    if (pattern_match(mp->word, ow - mp->wlen,
+				      NULL, ea)) {
+			if (mp->llen + 1 > llen) {
+			    if (llen)
+				zfree(line, llen);
+			    line = (char *) zalloc(llen = mp->llen + 20);
+			}
+			if ((bl = bld_line_sfx(mp->line, line, line,
+					       nl, nw, ea))) {
+			    if (p != ow) {
+				char sav = *p;
 
-				    *p = '\0';
-				    n = getcline(NULL, 0, dupstring(ow),
-						 p - ow, 0);
-				    *p = sav;
-				    if (l)
-					l->next = n;
-				    else
-					ret = n;
-				    l = n;
-				}
-				line[mp->llen] = '\0';
-				n = getcline(dupstring(line), mp->llen,
-					     NULL, 0, CLF_DIFF);
+				*p = '\0';
+				n = getcline(NULL, 0, dupstring(ow),
+					     p - ow, 0);
+				*p = sav;
 				if (l)
 				    l->next = n;
 				else
 				    ret = n;
 				l = n;
-				ow -= mp->wlen;
-				nw -= bl;
-				ol -= mp->wlen;
-				nl -= bl;
-				p = ow;
-				t = 1;
 			    }
-			} else if (pattern_match(mp->word, nw - mp->wlen,
-						 NULL, ea)) {
-			    if (mp->llen + 1 > llen) {
-				if (llen)
-				    zfree(line, llen);
-				line = (char *) zalloc(llen = mp->llen + 20);
-			    }
-			    if ((bl = bld_line_sfx(mp->line, line, line,
-						   ol, ow, ea))) {
-				if (p != ow) {
-				    char sav = *p;
+			    line[mp->llen] = '\0';
+			    n = getcline(dupstring(line), mp->llen,
+					 NULL, 0, CLF_DIFF);
+			    if (l)
+				l->next = n;
+			    else
+				ret = n;
+			    l = n;
+			    ow -= mp->wlen;
+			    nw -= bl;
+			    ol -= mp->wlen;
+			    nl -= bl;
+			    p = ow;
+			    t = 1;
+			}
+		    } else if (pattern_match(mp->word, nw - mp->wlen,
+					     NULL, ea)) {
+			if (mp->llen + 1 > llen) {
+			    if (llen)
+				zfree(line, llen);
+			    line = (char *) zalloc(llen = mp->llen + 20);
+			}
+			if ((bl = bld_line_sfx(mp->line, line, line,
+					       ol, ow, ea))) {
+			    if (p != ow) {
+				char sav = *p;
 
-				    *p = '\0';
-				    n = getcline(NULL, 0, dupstring(ow),
-						 p - ow, 0);
-				    *p = sav;
-				    if (l)
-					l->next = n;
-				    else
-					ret = n;
-				    l = n;
-				}
-				line[mp->llen] = '\0';
-				n = getcline(dupstring(line), mp->llen,
-					     NULL, 0, CLF_DIFF);
+				*p = '\0';
+				n = getcline(NULL, 0, dupstring(ow),
+					     p - ow, 0);
+				*p = sav;
 				if (l)
 				    l->next = n;
 				else
 				    ret = n;
 				l = n;
-				ow -= bl;
-				nw -= mp->wlen;
-				ol -= bl;
-				nl -= mp->wlen;
-				p = ow;
-				t = 1;
 			    }
+			    line[mp->llen] = '\0';
+			    n = getcline(dupstring(line), mp->llen,
+					 NULL, 0, CLF_DIFF);
+			    if (l)
+				l->next = n;
+			    else
+				ret = n;
+			    l = n;
+			    ow -= bl;
+			    nw -= mp->wlen;
+			    ol -= bl;
+			    nl -= mp->wlen;
+			    p = ow;
+			    t = 1;
 			}
 		    }
 		}
@@ -2554,21 +2679,20 @@ join_new_sfx(Cline line, int len, char *word, int *missp)
 		    len--;
 		    ind++;
 		} else {
-		    for (t = 0, ms = bmstack; ms && !t; ms = ms->next) {
-			for (mp = ms->matcher; mp && !t; mp = mp->next) {
-			    if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-				mp->wlen <= len && mp->llen <= len &&
-				pattern_match(mp->word, word - mp->wlen,
-					      NULL, ea) &&
-				pattern_match(mp->line, p - mp->llen,
-					      ea, NULL)) {
-				p -= mp->llen;
-				word -= mp->wlen;
-				ll -= mp->llen;
-				len -= mp->wlen;
-				ind += mp->wlen;
-				t = 1;
-			    }
+		    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
+			mp = ms->matcher;
+			if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
+			    mp->wlen <= len && mp->llen <= len &&
+			    pattern_match(mp->word, word - mp->wlen,
+					  NULL, ea) &&
+			    pattern_match(mp->line, p - mp->llen,
+					  ea, NULL)) {
+			    p -= mp->llen;
+			    word -= mp->wlen;
+			    ll -= mp->llen;
+			    len -= mp->wlen;
+			    ind += mp->wlen;
+			    t = 1;
 			}
 		    }
 		    if (!t)
@@ -2663,7 +2787,7 @@ join_new_sfx(Cline line, int len, char *word, int *missp)
 static void
 bld_sfx(Cline o, Cline n)
 {
-    if (o->flags & CLF_NEW) {
+    if (o->flags & CLF_SNEW) {
 	int miss;
 
 	o->suffix = join_new_sfx(o->suffix, n->wlen, n->word, &miss);
@@ -2679,7 +2803,7 @@ bld_sfx(Cline o, Cline n)
 	    new = dupstring(n->word);
 	    newl = n->wlen;
 	} else if (!strpfx(o->word, n->word)) {
-	    o->flags |= CLF_NEW;
+	    o->flags |= CLF_SNEW;
 	    o->suffix = bld_new_sfx(o->wlen, o->word, n->wlen, n->word,
 				    &mol, &mnl, NULL);
 	    newl = 0;
@@ -2732,7 +2856,7 @@ join_clines(Cline o, Cline n)
 		    n = q;
 		}
 	    }
-	    if (n->flags & CLF_MID) {
+	    if (n && n->flags & CLF_MID) {
 		while (o && !(o->flags & CLF_MID)) {
 		    o->word = NULL;
 		    o->flags |= CLF_DIFF;
@@ -3128,6 +3252,7 @@ inst_cline(Cline l, int pl, int sl)
 	}
 	l = l->next;
     }
+    lastend = cs;
     /* Now place the cursor. Preferably in a position where something
      * is missing, otherwise in a place where the string differs from
      * any of the matches, or just leave it at the end. */
@@ -3281,6 +3406,7 @@ match_pfx(char *l, char *w, Cline *nlp, int *lp, Cline *rlp, int *bplp)
 				     * to continue after the matched portion. */
 				    w = q;
 				    iw = j;
+				    lw = k;
 				    l = p;
 				    il = jj;
 				    ll = kk;
@@ -3501,6 +3627,7 @@ match_sfx(char *l, char *w, Cline *nlp, int *lp, int *bslp)
 				    }
 				    w = q + 1;
 				    iw = j;
+				    lw = k;
 				    l = p + 1;
 				    il = jj;
 				    ll = kk;
@@ -3765,6 +3892,7 @@ instmatch(Cmatch m)
 	inststrlen(m->suf, 1, (l = strlen(m->suf)));
 	r += l;
     }
+    lastend = cs;
     cs = ocs;
     return r;
 }
@@ -3777,10 +3905,10 @@ instmatch(Cmatch m)
 void
 addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 	   char *suf, char *group, char *rems, char *remf, char *ign,
-	   int flags, int aflags, Cmatcher match, char **argv)
+	   int flags, int aflags, Cmatcher match, char *exp, char **argv)
 {
-    char *s, *t, *e, *me, *te, *ms, *lipre = NULL, *lpre, *lsuf, **aign = NULL;
-    int lpl, lsl, i, pl, sl, test, bpl, bsl, lsm, llpl;
+    char *s, *t, *e, *me, *ms, *lipre = NULL, *lpre, *lsuf, **aign = NULL;
+    int lpl, lsl, i, pl, sl, test, bpl, bsl, llpl, llsl;
     Aminfo ai;
     Cline lc = NULL;
     LinkList l;
@@ -3788,43 +3916,39 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
     struct cmlist mst;
     Cmlist oms = mstack;
 
-    /* Select the set of matches. */
-    if (aflags & CAF_ALT) {
-	l = fmatches;
-	ai = fainfo;
-    } else {
-	l = matches;
-	ai = ainfo;
-    }
-    /* Store the matcher in our stack of matchers. */
-    if (match) {
-	mst.next = mstack;
-	mst.matcher = match;
-	mstack = &mst;
-	if (had_lm && mnum)
-	    bmstack1.matcher = NULL;
-	else {
-	    bmstack1.matcher = match;
-	    had_lm = 1;
-	}
-	addlinknode(matchers, match);
-	match->refc++;
-    } else {
-	bmstack1.matcher = NULL;
-	if (mnum)
-	    had_lm = 1;
-    }
     /* Use menu-completion (-U)? */
     if ((aflags & CAF_MENU) && isset(AUTOMENU))
 	usemenu = 1;
-    /* Get the suffixes to ignore. */
-    if (ign)
-	aign = get_user_var(ign);
 
     /* Switch back to the heap that was used when the completion widget
      * was invoked. */
     SWITCHHEAPS(compheap) {
 	HEAPALLOC {
+	    if (exp) {
+		expl = (Cexpl) halloc(sizeof(struct cexpl));
+		expl->count = expl->fcount = 0;
+		expl->str = dupstring(exp);
+	    } else
+		expl = NULL;
+
+	    /* Store the matcher in our stack of matchers. */
+	    if (match) {
+		mst.next = mstack;
+		mst.matcher = match;
+		mstack = &mst;
+
+		if (!mnum)
+		    add_bmatchers(match);
+
+		addlinknode(matchers, match);
+		match->refc++;
+	    }
+	    if (mnum && (mstack || bmatchers))
+		update_bmatchers();
+
+	    /* Get the suffixes to ignore. */
+	    if (ign)
+		aign = get_user_var(ign);
 	    /* Get the contents of the completion variables if we have
 	     * to perform matching. */
 	    if (aflags & CAF_MATCH) {
@@ -3832,6 +3956,7 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		lpre = dupstring(compprefix);
 		llpl = strlen(lpre);
 		lsuf = dupstring(compsuffix);
+		llsl = strlen(lsuf);
 	    }
 	    /* Now duplicate the strings we have from the command line. */
 	    if (ipre)
@@ -3848,8 +3973,6 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		lsl = strlen(psuf);
 	    } else
 		lsl = 0;
-	    if (aflags & CAF_MATCH)
-		lsm = (psuf ? !strcmp(psuf, lsuf) : (!lsuf || !*lsuf));
 	    if (pre)
 		pre = dupstring(pre);
 	    if (suf)
@@ -3865,6 +3988,17 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		begcmgroup(group, (aflags & CAF_NOSORT));
 		if (aflags & CAF_NOSORT)
 		    mgroup->flags |= CGF_NOSORT;
+	    } else {
+		endcmgroup(NULL);
+		begcmgroup("default", 0);
+	    }
+	    /* Select the set of matches. */
+	    if (aflags & CAF_ALT) {
+		l = fmatches;
+		ai = fainfo;
+	    } else {
+		l = matches;
+		ai = ainfo;
 	    }
 	    if (remf) {
 		remf = dupstring(remf);
@@ -3908,19 +4042,19 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		}
 		if (aflags & CAF_MATCH) {
 		    /* Do the matching. */
-		    t = (ppre ? dyncat(ppre, s) : s);
-		    pl = sl + lpl;
-		    if ((test = (llpl <= pl && !strncmp(t, lpre, pl))))
-			test = lsm;
+		    test = (sl >= llpl + llsl &&
+			    strpfx(lpre, s) && strsfx(lsuf, s));
 		    if (!test && mstack &&
-			(ms = comp_match(lpre, lsuf,
-					 (psuf ? dyncat(t, psuf) : t),
+			(ms = comp_match(lpre, lsuf, s,
 					 &lc, (aflags & CAF_QUOTE),
 					 &bpl, &bsl)))
 			test = 1;
+
 		    if (!test)
 			continue;
-		    me = e = s + sl;
+		    pl = sl - llsl;
+		    me = s + sl - llsl;
+		    e = s + llpl;
 		} else {
 		    e = s;
 		    me = s + sl;
@@ -3928,8 +4062,10 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		}
 		/* Quoting? */
 		if (!(aflags & CAF_QUOTE)) {
-		    te = s + pl;
-		    s = quotename(s, &e, te, &pl);
+		    int tmp = me - s;
+
+		    s = quotename(s, &e, me, &tmp);
+		    me = s + tmp;
 		    sl = strlen(s);
 		}
 		/* The rest is almost the same as in addmatch(). */
@@ -3944,31 +4080,48 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		if (ppre)
 		    t = dyncat(ppre, t);
 		if (!ms && mstack) {
+		    int bl = ((aflags & CAF_MATCH) ? llpl : 0);
 		    Cline *clp = &lc, tlc;
 		    char *ss = dupstring(s), *ee = me + (ss - s);
 
 		    if (ppre && *ppre) {
-			*clp = str_cline(ppre, strlen(ppre), &tlc);
+			*clp = tlc = getcline(NULL, 0, ppre, lpl, CLF_VAR);
 			clp = &(tlc->next);
 		    }
-		    if (ee != ss + sl || (lpsuf && *lpsuf)) {
-			*clp = tlc = getcline(ss, ee - ss,
+		    if (bl) {
+			*clp = str_cline(ss, bl, &tlc);
+			clp = &(tlc->next);
+		    }
+		    if (ee != ss + sl) {
+			*clp = tlc = getcline(ss + bl, ee - ss - bl,
 					      NULL, 0, CLF_MID);
 			clp = &(tlc->next);
-			if (ee != ss + sl) {
-			    *clp = str_cline(ee, (ss + sl) - ee, &tlc);
-			    clp = &(tlc->next);
-			}
-			if (lpsuf && *lpsuf) {
-			    *clp = str_cline(lpsuf, strlen(lpsuf), &tlc);
-			    clp = &(tlc->next);
-			}
+			*clp = str_cline(ee, (ss + sl) - ee, &tlc);
+			clp = &(tlc->next);
 		    } else {
-			*clp = tlc = getcline(NULL, 0, ss, sl,
+			*clp = tlc = getcline(NULL, 0, ss + bl, sl - bl,
+					      CLF_END | CLF_VAR);
+			clp = &(tlc->next);
+		    }
+		    if (psuf && *psuf) {
+			*clp = tlc = getcline(NULL, 0, psuf, lsl,
 					      CLF_END | CLF_VAR);
 			clp = &(tlc->next);
 		    }
 		    *clp = NULL;
+		} else if (mstack) {
+		    Cline tlc;
+
+		    if (ppre && *ppre) {
+			tlc = getcline(NULL, 0, ppre, lpl, CLF_VAR);
+			tlc->next = lc;
+			lc = tlc;
+		    }
+		    if (psuf && *psuf) {
+			for (tlc = lc; tlc->next; tlc = tlc->next);
+			tlc->next = getcline(NULL, 0, psuf, lsl,
+					     CLF_END | CLF_VAR);
+		    }
 		}
 		if (ipre && *ipre) {
 		    Cline tlc = prepend_cline(ipre, lc);
@@ -4047,6 +4200,8 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		}
 	    }
 	    compnmatches = mnum;
+	    if (exp)
+		addexpl();
 	} LASTALLOC;
     } SWITCHBACKHEAPS;
 
@@ -4129,8 +4284,10 @@ addmatch(char *s, char *t)
 	    mpl = fpl; msl = fsl;
 	} else {
 	    if ((cp = filecomp)) {
-		if ((test = domatch(s, filecomp, 0)))
+		if ((test = domatch(s, filecomp, 0))) {
+		    e = s + sl;
 		    cc = 1;
+		}
 	    } else {
 		e = s + sl - fsl;
 		if ((test = !strncmp(s, fpre, fpl)))
@@ -4168,6 +4325,7 @@ addmatch(char *s, char *t)
 		strcat(tt, s);
 		if (lpsuf)
 		    strcat(tt, lpsuf);
+		e += (tt - s);
 		untokenize(s = tt);
 		sl = strlen(s);
 	    }
@@ -4196,9 +4354,10 @@ addmatch(char *s, char *t)
 		  ((addwhat & CC_EXCMDS)  && !(hn->flags & DISABLED)))) ||
 		((addwhat & CC_BINDINGS) && !(hn->flags & DISABLED))))) {
 	if (sl >= rpl + rsl || mstack) {
-	    if (cp)
+	    if (cp) {
 		test = domatch(s, patcomp, 0);
-	    else {
+		e = s + sl;
+	    } else {
 		e = s + sl - rsl;
 		if ((test = !strncmp(s, rpre, rpl)))
 		    if ((test = !strcmp(e, rsuf))) {
@@ -4888,9 +5047,11 @@ makecomplist(char *s, int incmd, int lst)
 {
     struct cmlist ms;
     Cmlist m;
+    char *os = s;
 
-    /* If we already have a list from a previous execution of this *
-     * function, skip the list building code.                      */
+    /* We build a copy of the list of matchers to use to make sure that this
+     * works even if a shell function called from the completion code changes
+     * the global matchers. */
 
     if ((m = cmatcher)) {
 	Cmlist mm, *mp = &mm;
@@ -4906,16 +5067,19 @@ makecomplist(char *s, int incmd, int lst)
 	m = mm;
     }
     compmatcher = 1;
-    bmstack = &bmstack1;
-    bmstack1.next = &bmstack0;
-    bmstack0.next = NULL;
-    bmstack0.matcher = bmstack1.matcher = NULL;
+
+    /* Walk through the global matchers. */
     for (;;) {
+	bmatchers = NULL;
 	if (m) {
 	    ms.next = NULL;
 	    ms.matcher = m->matcher;
 	    mstack = &ms;
-	    bmstack0.matcher = m->matcher;
+
+	    /* Store the matchers used in the bmatchers list which is used
+	     * when building new parts for the string to insert into the 
+	     * line. */
+	    add_bmatchers(m->matcher);
 	} else
 	    mstack = NULL;
 
@@ -4932,12 +5096,12 @@ makecomplist(char *s, int incmd, int lst)
 	    lastambig = 0;
 	amatches = 0;
 	mnum = 0;
-	had_lm = 0;
 	begcmgroup("default", 0);
 
 	ccused = newlinklist();
 	ccstack = newlinklist();
 
+	s = dupstring(os);
 	if (compfunc)
 	    callcompfunc(s, compfunc);
 	else
@@ -5004,7 +5168,7 @@ ctokenize(char *p)
 
 /**/
 char *
-comp_str(int *ipl, int *pl)
+comp_str(int *ipl, int *pl, int untok)
 {
     char *p = dupstring(compprefix);
     char *s = dupstring(compsuffix);
@@ -5012,12 +5176,14 @@ comp_str(int *ipl, int *pl)
     char *str;
     int lp, ls, lip;
 
-    ctokenize(p);
-    remnulargs(p);
-    ctokenize(s);
-    remnulargs(s);
-    ctokenize(ip);
-    remnulargs(ip);
+    if (!untok) {
+	ctokenize(p);
+	remnulargs(p);
+	ctokenize(s);
+	remnulargs(s);
+	ctokenize(ip);
+	remnulargs(ip);
+    }
     ls = strlen(s);
     lip = strlen(ip);
     lp = strlen(p);
@@ -5041,7 +5207,7 @@ makecomplistcall(Compctl cc)
     SWITCHHEAPS(compheap) {
 	HEAPALLOC {
 	    int ooffs = offs, lip, lp;
-	    char *str = comp_str(&lip, &lp);
+	    char *str = comp_str(&lip, &lp, 0);
 
 	    offs = lip + lp;
 	    cc->refc++;
@@ -5073,7 +5239,7 @@ makecomplistctl(int flags)
     SWITCHHEAPS(compheap) {
 	HEAPALLOC {
 	    int ooffs = offs, lip, lp;
-	    char *str = comp_str(&lip, &lp), *t;
+	    char *str = comp_str(&lip, &lp, 0), *t;
 	    char *os = cmdstr, **ow = clwords, **p, **q;
 	    int on = clwnum, op = clwpos;
 
@@ -5571,19 +5737,16 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	ms.next = mstack;
 	ms.matcher = cc->matcher;
 	mstack = &ms;
-	if (had_lm && mnum)
-	    bmstack1.matcher = NULL;
-	else {
-	    bmstack1.matcher = cc->matcher;
-	    had_lm = 1;
-	}
+
+	if (!mnum)
+	    add_bmatchers(cc->matcher);
+
 	addlinknode(matchers, cc->matcher);
 	cc->matcher->refc++;
-    } else {
-	bmstack1.matcher = NULL;
-	if (mnum)
-	    had_lm = 1;
     }
+    if (mnum && (mstack || bmatchers))
+	update_bmatchers();
+
     /* Insert the prefix (compctl -P), if any. */
     if (cc->prefix) {
 	int pl = 0;
@@ -6344,7 +6507,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	}
 	
 	if ((tt = cc->explain)) {
-	    if (cc->mask & CC_EXPANDEXPL && !parsestr(tt = dupstring(tt))) {
+	    tt = dupstring(tt);
+	    if ((cc->mask & CC_EXPANDEXPL) && !parsestr(tt)) {
 		singsub(&tt);
 		untokenize(tt);
 	    }
@@ -6358,7 +6522,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	begcmgroup("default", 0);
     }
     else if ((tt = cc->explain)) {
-	if (cc->mask & CC_EXPANDEXPL && !parsestr(tt = dupstring(tt))) {
+	tt = dupstring(tt);
+	if ((cc->mask & CC_EXPANDEXPL) && !parsestr(tt)) {
 	    singsub(&tt);
 	    untokenize(tt);
 	}
@@ -6631,7 +6796,7 @@ begcmgroup(char *n, int nu)
 	}
     }
     mgroup = (Cmgroup) halloc(sizeof(struct cmgroup));
-    mgroup->name = n;
+    mgroup->name = dupstring(n);
     mgroup->flags = mgroup->lcount = mgroup->mcount = 0;
     mgroup->matches = NULL;
     mgroup->ylist = NULL;
@@ -6872,7 +7037,7 @@ do_ambiguous(void)
     /* If we have to insert the first match, call do_single().  This is *
      * how REC_EXACT takes effect.  We effectively turn the ambiguous   *
      * completion into an unambiguous one.                              */
-    if (ainfo && ainfo->exact == 1 && isset(RECEXACT) && !fromcomp &&
+    if (ainfo && ainfo->exact == 1 && isset(RECEXACT) && !(fromcomp & FC_LINE) &&
 	(usemenu == 0 || unset(AUTOMENU))) {
 	do_single(ainfo->exactm);
 	invalidatelist();
@@ -6945,7 +7110,6 @@ do_ambiguous(void)
 		    merge_cline(lc, ps, lp, NULL, 0, 0);
 	    }
 	    inst_cline(lc, pl, sl);
-
 	} else {
 	    inststrlen(ps, 1, -1);
 	    ocs = cs;
@@ -6966,6 +7130,7 @@ do_ambiguous(void)
 		cs -= brsl;
 		inststrlen(brend, 1, -1);
 	    }
+	    lastend = cs;
 	    cs = ocs;
 	}
 	/* la is non-zero if listambiguous may be used. Copying and
@@ -6973,11 +7138,13 @@ do_ambiguous(void)
 	 * solution. Really. */
 	la = (ll != oll || strncmp(oline, (char *) line, ll));
 
-	/* If REC_EXACT and AUTO_MENU are set and what we inserted is an *
-	 * exact match, we want menu completion the next time round      *
-	 * so we set fromcomp,to ensure that the word on the line is not *
-	 * taken as an exact match.                                      */
-	fromcomp = isset(AUTOMENU);
+	/* If REC_EXACT and AUTO_MENU are set and what we inserted is an  *
+	 * exact match, we want menu completion the next time round       *
+	 * so we set fromcomp,to ensure that the word on the line is not  *
+	 * taken as an exact match. Also we remember if we just moved the *
+	 * cursor into the word.                                          */
+	fromcomp = ((isset(AUTOMENU) ? FC_LINE : 0) |
+		    ((atend && cs != lastend) ? FC_INWORD : 0));
 
 	/*
 	 * If the LIST_AMBIGUOUS option (meaning roughly `show a list only *

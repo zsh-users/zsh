@@ -869,7 +869,7 @@ can be specified by separating two characters by a `tt(-)'.
 A `tt(-)' or `tt(])' may be matched by including it as the
 first character in the list.
 There are also several named classes of characters, in the form
-`tt([:)var(name)(tt:])' with the following meanings:  `tt([:alnum:])'
+`tt([:)var(name)tt(:])' with the following meanings:  `tt([:alnum:])'
 alphanumeric, `tt([:alpha:])' alphabetic,
 `tt([:blank:])' space or tab,
 `tt([:cntrl:])' control character, `tt([:digit:])' decimal
@@ -988,12 +988,18 @@ item(I)(
 Case sensitive:  locally negates the effect of tt(i) or tt(l) from
 that point on.
 )
+item(tt(a)var(num))(
+Approximate matching: var(num) errors are allowed in the string matched by
+the pattern.  The rules for this are described in the next subsection.
+)
 enditem()
 
 For example, the test string tt(fooxx) can be matched by the pattern
 tt(LPAR()#i)tt(RPAR()FOOXX), but not by tt(LPAR()#l)tt(RPAR()FOOXX),
 tt(LPAR()#i)tt(RPAR()FOO)tt(LPAR()#I)tt(RPAR()XX) or
-tt(LPAR()LPAR()#i)tt(RPAR()FOOX)tt(RPAR()X).
+tt(LPAR()LPAR()#i)tt(RPAR()FOOX)tt(RPAR()X).  The string
+tt(LPAR()#ia2)tt(RPAR()readme) specifies case-insensitive matching of
+tt(readme) with up to two errors.
 
 When using the ksh syntax for grouping both tt(KSH_GLOB) and
 tt(EXTENDED_GLOB) must be set and the left parenthesis should be
@@ -1003,6 +1009,61 @@ still matches only lowercase letters.  Finally, note that when
 examining whole paths case-insensitively every directory must be
 searched for all files which match, so that a pattern of the form
 tt(LPAR()#i)tt(RPAR()/foo/bar/...) is potentially slow.
+
+subsect(Approximate Matching)
+When matching approximately, the shell keeps a count of the errors found,
+which cannot exceed the number specified in the
+tt(LPAR()#a)var(num)tt(RPAR()) flags.  Four types of error are recognised:
+
+startitem()
+item(1.)(
+Different characters, as in tt(fooxbar) and tt(fooybar).
+)
+item(2.)(
+Transposition of characters, as in tt(banana) and tt(abnana).
+)
+item(3.)(
+A character missing in the target string, as with the pattern tt(road) and
+target string tt(rod).
+)
+item(4.)(
+An extra character appearing in the target string, as with tt(stove)
+and tt(strove).
+)
+enditem()
+
+Thus, the pattern tt(LPAR()#a3)tt(RPAR()abcd) matches tt(dcba), with the
+errors occurring by using the first rule twice and the second once,
+grouping the string as tt([d][cb][a]) and tt([a][bc][d]).
+
+Non-literal parts of the pattern must match exactly, including characters
+in character ranges: hence tt(LPAR()#a1)tt(RPAR()???)  matches strings of
+length four, by applying rule 4 to an empty part of the pattern, but not
+strings of length three, since all the tt(?) must match.  Other characters
+which must match exactly are initial dots in filenames (unless the
+tt(GLOB_DOTS) option is set), and all slashes in file names, so that
+tt(a/bc) is two errors from tt(ab/c) (the slash cannot be transposed with
+another character).  Similarly, errors are counted separately for
+non-contiguous strings in the pattern, so that tt(LPAR()ab|cd)tt(RPAR()ef)
+is two errors from tt(aebf).
+
+When using exclusion via the tt(~) operator, approximate matching is
+treated entirely separately for the excluded part and must be activated
+separately.  Thus, tt(LPAR()#a1)tt(RPAR()README~READ_ME) matches
+tt(READ.ME) but not tt(READ_ME), as the trailing tt(READ_ME) is matched
+without approximation.  However,
+tt(LPAR()#a1)tt(RPAR()README~LPAR()#a1)tt(RPAR()READ_ME)
+does not match any pattern of the form tt(READ)var(?)tt(ME) as all
+such forms are now excluded.
+
+Apart from exclusions, there is only one overall error count; however, the
+maximum errors allowed may be altered locally, and this can be delimited by
+grouping.  For example,
+tt(LPAR()#a1)tt(RPAR()cat)tt(LPAR()LPAR()#a0)tt(RPAR()dog)tt(RPAR()fox)
+allows one error in total, which may not occur in the tt(dog) section, and
+the pattern
+tt(LPAR()#a1)tt(RPAR()cat)tt(LPAR()#a0)tt(RPAR()dog)tt(LPAR()#a1)tt(RPAR()fox)
+is equivalent.
 
 subsect(Recursive Globbing)
 A pathname component of the form `tt(LPAR())var(foo)tt(/RPAR()#)'

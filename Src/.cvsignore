@@ -19,6 +19,7 @@ zsh
 libzsh.so*
 sigcount.h
 signames.c
+version.h
 zshpaths.h
 zshxmods.h
 bltinmods.list

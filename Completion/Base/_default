@@ -1,0 +1,13 @@
+#defcomp -default-
+
+# We first try the `compctl's. This is without first (-T) and default (-D)
+# completion. If you want them add `-T' and/or `-D' to this command.
+# If there is a `compctl' for the command we are working on, we return
+# immediatly. If you want to use new style completion anyway, remove the
+# `|| return'. Also, you may want to use new style completion if the 
+# `compctl' didn't produce any matches. In that case remove the `|| return'
+# and at the line `[[ -nmatches 0 ]] || return' after `compcall'.
+
+compcall || return
+
+_files

@@ -103,6 +103,7 @@ t :]            [:]]#
 t [             [[]
 t ]             []]
 t []            [^]]]
+# Case insensitive matching
 t fooxx         (#i)FOOXX
 f fooxx         (#l)FOOXX
 t FOOXX         (#l)fooxx
@@ -113,5 +114,36 @@ f fooxx         ((#i)FOOX)X
 f BAR           (bar|(#i)foo)
 t FOO           (bar|(#i)foo)
 t Modules       (#i)*m*
+# Approximate matching
+t READ.ME       (#ia1)readme
+f READ..ME      (#ia1)readme
+t README        (#ia1)readm
+t READM         (#ia1)readme
+t README        (#ia1)eadme
+t EADME         (#ia1)readme
+t READEM        (#ia1)readme
+f ADME          (#ia1)readme
+f README        (#ia1)read
+t bob           (#a1)[b][b]
+f bob           (#a1)[b][b]a
+t bob           (#a1)[b]o[b]a
+f bob           (#a1)[c]o[b]
+t abcd          (#a2)XbcX
+t abcd          (#a2)ad
+t ad            (#a2)abcd
+t abcd          (#a2)bd
+t bd            (#a2)abcd
+t badc          (#a2)abcd
+# This next one is a little tricky: a[d]bc[] = a[]bc[d]
+t adbc          (#a2)abcd
+f dcba          (#a2)abcd
+# the next one is [d][cb][a] = [a][bc][d] with a transposition
+t dcba          (#a3)abcd
+t aabaXaaabY    (#a1)(a#b)#Y
+t aabaXaaabY    (#a1)(a#b)(a#b)Y
+t aaXaaaaabY    (#a1)(a#b)(a#b)Y
+f read.me       (#ia1)README~READ.ME
+t read.me       (#ia1)README~READ_ME
+f read.me       (#ia1)README~(#a1)READ_ME
 EOT
 print "$failed tests failed."

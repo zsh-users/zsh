@@ -1,0 +1,4 @@
+#defcomp -subscript-
+
+_compalso -math- "$@"
+[[ ${(Pt)${COMMAND}} = assoc* ]] && complist -k "( ${(kP)${COMMAND}} )"

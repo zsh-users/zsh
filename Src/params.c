@@ -679,10 +679,12 @@ static char **garr;
 static long
 getarg(char **str, int *inv, Value v, int a2, long *w)
 {
-    int num = 1, word = 0, rev = 0, ind = 0, down = 0, l, i;
+    int num = 1, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt;
     long r = 0;
     Comp c;
+
+    ishash = (v->pm && PM_TYPE(v->pm->flags) == PM_HASHED);
 
     /* first parse any subscription flags */
     if (v->pm && (*s == '(' || *s == Inpar)) {
@@ -771,12 +773,13 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 	} else if (rev) {
 	    v->isarr |= SCANPM_WANTVALS;
 	}
-	if (!down && v->pm && PM_TYPE(v->pm->flags) == PM_HASHED)
+	if (!down && ishash)
 	    v->isarr &= ~SCANPM_MATCHMANY;
 	*inv = ind;
     }
 
-    for (t=s, i=0; *t && ((*t != ']' && *t != Outbrack && *t != ',') || i); t++)
+    for (t=s, i=0;
+	 *t && ((*t != ']' && *t != Outbrack && (ishash || *t != ',')) || i); t++)
 	if (*t == '[' || *t == Inbrack)
 	    i++;
 	else if (*t == ']' || *t == Outbrack)
@@ -791,7 +794,7 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
     singsub(&s);
 
     if (!rev) {
-	if (v->pm && PM_TYPE(v->pm->flags) == PM_HASHED) {
+	if (ishash) {
 	    HashTable ht = v->pm->gets.hfn(v->pm);
 	    if (!ht) {
 		ht = newparamtable(17, v->pm->nam);
@@ -867,7 +870,7 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 
 	if ((c = parsereg(s))) {
 	    if (v->isarr) {
-		if (PM_TYPE(v->pm->flags) == PM_HASHED) {
+		if (ishash) {
 		    scancomp = c;
 		    if (ind)
 			v->isarr |= SCANPM_MATCHKEY;

@@ -271,9 +271,10 @@ struct cline {
 #define CLF_MISS   4
 #define CLF_DIFF   8
 #define CLF_SUF   16
-#define CLF_NEW   32
-#define CLF_VAR   64
-#define CLF_JOIN 128
+#define CLF_PNEW  32
+#define CLF_SNEW  64
+#define CLF_VAR  128
+#define CLF_JOIN 256
 
 /* Flags for makecomplist*(). Things not to do. */
 

@@ -567,6 +567,37 @@ load_module(char const *name)
     return m;
 }
 
+/* This ensures that the module with the name given as the second argument
+ * is loaded.
+ * The third argument should be non-zero if the function should complain
+ * about trying to load a module with a full path name in restricted mode.
+ * The last argument should be non-zero if this function should signal an
+ * error if the module is already loaded.
+ * The return value is the module of NULL if the module couldn't be loaded. */
+
+/**/
+Module
+require_module(char *nam, char *module, int res, int test)
+{
+    Module m = NULL;
+    LinkNode node;
+
+    node = find_module(module);
+    if (node && (m = ((Module) getdata(node)))->handle &&
+	!(m->flags & MOD_UNLOAD)) {
+	if (test) {
+	    zwarnnam(nam, "module %s already loaded.", module, 0);
+	    return NULL;
+	}
+    } else if (res && isset(RESTRICTED) && strchr(module, '/')) {
+	zwarnnam(nam, "%s: restricted", module, 0);
+	return NULL;
+    } else
+	return load_module(module);
+
+    return m;
+}
+
 /**/
 void
 add_dep(char *name, char *from)
@@ -963,22 +994,10 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 	return 0;
     } else {
 	/* load modules */
-	for (; *args; args++) {
-	    Module m;
+	for (; *args; args++)
+	    if (!require_module(nam, *args, 1, (!ops['i'])))
+		ret = 1;
 
-	    node = find_module(*args);
-	    if (node && (m = ((Module) getdata(node)))->handle &&
-		!(m->flags & MOD_UNLOAD)) {
-		if (!ops['i']) {
-		    zwarnnam(nam, "module %s already loaded.", *args, 0);
-		    ret = 1;
-		}
-	    } else if (isset(RESTRICTED) && strchr(*args, '/')) {
-		zwarnnam(nam, "%s: restricted", *args, 0);
-		ret = 1;
-	    } else if (!load_module(*args))
-		ret = 1;
-	}
 	return ret;
     }
 }

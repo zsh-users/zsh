@@ -673,7 +673,8 @@ dnl The backslash substitution is to persuade cygwin to cough up
 dnl slashes rather than doubled backslashes in the path.
 echo "#include <signal.h>" > nametmp.c
 sigfile_list="`$CPP nametmp.c |
-sed -n -e 's/^#[ 	].*\"\(.*\)\"/\1/p' -e 's/\\\\\\\\/\//g' |
+sed -n 's/^#[ 	].*\"\(.*\)\"/\1/p' |
+sed 's/\\\\\\\\/\//g' |
 $AWK '{ if (\$1 ~ \"sig\") files[[\$1]] = \$1 }
   END { for (var in files) print var }'`"
 rm -f nametmp.c
@@ -681,6 +682,7 @@ if test -z "$sigfile_list"; then
   dnl In case we don't get the stuff from the preprocesor, use the old
   dnl list of standard places.
   sigfile_list="/usr/include/bsd/sys/signal.h
+/usr/include/signum.h
 /usr/include/asm/signum.h
 /usr/include/asm/signal.h
 /usr/include/linux/signal.h
@@ -689,9 +691,13 @@ if test -z "$sigfile_list"; then
 fi
 for SIGNAL_H in $sigfile_list
 do
-  test -f $SIGNAL_H && \
-  grep '#[ 	]*define[ 	][ 	]*SIG[0-9A-Z]*[ 	]*[0-9][0-9]*' $SIGNAL_H > /dev/null && \
-  break
+  dnl Try to make sure it doesn't get confused by files that don't
+  dnl have real signal definitions in, but do #define SIG* by counting
+  dnl the number of signals.  Maybe we could even check for e.g. SIGHUP?
+  nsigs=`test -f $SIGNAL_H && \
+  grep '#[ 	]*define[ 	][ 	]*SIG[0-9A-Z]*[ 	]*[0-9][0-9]*' $SIGNAL_H | \
+  wc -l | sed 's/[ 	]//g'`
+  test "x$nsigs" != x && test "$nsigs" -ge 7 && break
 done
 zsh_cv_path_signal_h=$SIGNAL_H
 ])
@@ -729,20 +735,43 @@ dnl ------------------
 dnl rlimit type checks
 dnl ------------------
 DEFAULT_RLIM_T=long
-AC_CACHE_CHECK(if rlim_t is quad_t,
-zsh_cv_rlim_t_is_quad_t,
+AC_CACHE_CHECK(if rlim_t is longer than a long,
+zsh_cv_rlim_t_is_longer,
 [AC_TRY_RUN([
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
 #include <sys/resource.h>
 main(){struct rlimit r;exit(sizeof(r.rlim_cur) <= sizeof(long));}],
-zsh_cv_rlim_t_is_quad_t=yes,
-zsh_cv_rlim_t_is_quad_t=no,
-zsh_cv_rlim_t_is_quad_t=yes)])
-if test $zsh_cv_rlim_t_is_quad_t = yes; then
-  AC_DEFINE(RLIM_T_IS_QUAD_T)
-  DEFAULT_RLIM_T=quad_t
+zsh_cv_rlim_t_is_longer=yes,
+zsh_cv_rlim_t_is_longer=no,
+zsh_cv_rlim_t_is_longer=yes)])
+if test $zsh_cv_rlim_t_is_longer = yes; then
+  AC_CACHE_CHECK(if rlim_t is a quad,
+  zsh_cv_rlim_t_is_quad_t,
+  [AC_TRY_RUN([
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#include <stdio.h>
+#include <sys/resource.h>
+main() { 
+  struct rlimit r;
+  char buf[[20]];
+  r.rlim_cur = 0;
+  sprintf(buf, "%qd", r.rlim_cur);
+  exit(strcmp(buf, "0"));
+}],
+  zsh_cv_rlim_t_is_quad_t=yes,
+  zsh_cv_rlim_t_is_quad_t=no,
+  zsh_cv_rlim_t_is_quad_t=no)])
+  if test $zsh_cv_tlim_t_is_quad_t = yes; then
+    AC_DEFINE(RLIM_T_IS_QUAD_T)
+    DEFAULT_RLIM_T=quad_t
+  else
+    AC_DEFINE(RLIM_T_IS_LONG_LONG)
+    DEFAULT_RLIM_T='long long'
+  fi
 else
   AC_CACHE_CHECK(if the rlim_t is unsigned,
   zsh_cv_type_rlim_t_is_unsigned,
@@ -1113,7 +1142,6 @@ main()
   elif test "x$zsh_cv_func_dlsym_needs_underscore" != xno; then
     dnl Do not cache failed value
     unset zsh_cv_func_dlsym_needs_underscore
-    dynamic=no
   fi
 fi
 

@@ -37,7 +37,7 @@
 
 # include "rlimits.h"
 
-# if defined(RLIM_T_IS_QUAD_T) || defined(RLIM_T_IS_UNSIGNED)
+# if defined(RLIM_T_IS_QUAD_T) || defined(RLIM_T_IS_LONG_LONG) || defined(RLIM_T_IS_UNSIGNED)
 static rlim_t
 zstrtorlimt(const char *s, char **t, int base)
 {
@@ -62,9 +62,9 @@ zstrtorlimt(const char *s, char **t, int base)
 	*t = (char *)s;
     return ret;
 }
-# else /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_UNSIGNED */
+# else /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_LONG_LONG && !RLIM_T_IS_UNSIGNED */
 #  define zstrtorlimt(a, b, c)	zstrtol((a), (b), (c))
-# endif /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_UNSIGNED */
+# endif /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_LONG_LONG && !RLIM_T_IS_UNSIGNED */
 
 /* Display resource limits.  hard indicates whether `hard' or `soft'  *
  * limits should be displayed.  lim specifies the limit, or may be -1 *
@@ -107,9 +107,15 @@ showlimits(int hard, int lim)
 	    else
 		printf("%qdkB\n", val / 1024L);
 # else
+#  ifdef RLIM_T_IS_LONG_LONG
+		printf("%lldMB\n", val / (1024L * 1024L));
+            else
+		printf("%lldkB\n", val / 1024L);
+#  else
 		printf("%ldMB\n", val / (1024L * 1024L));
             else
 		printf("%ldkB\n", val / 1024L);
+#  endif /* RLIM_T_IS_LONG_LONG */
 # endif /* RLIM_T_IS_QUAD_T */
 	}
 }

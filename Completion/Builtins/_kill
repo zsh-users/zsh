@@ -1,0 +1,11 @@
+#defcomp kill
+
+local list
+
+if [[ -iprefix '-' ]]; then
+  complist -k "($signals[1,-3])"
+else
+  complist -P '%' -j
+  list=("$(ps 2>/dev/null)")
+  complist -y '$list' -s '`ps 2>/dev/null | tail +2 | cut -c1-5`'
+fi

@@ -162,7 +162,7 @@ xitem(tt(compadd) [ tt(-qQfnUam) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-W) var(file-prefix) ])
-xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ])
+xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ])
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 item([ tt(-M) var(match-spec) ] [ tt(--) ] [ var(words) ... ])(
 
@@ -182,14 +182,17 @@ item(tt(-S) var(suffix))(
 Like tt(-P) but gives a string that has to be inserted after the match.
 )
 item(tt(-p) var(hidden-prefix))(
-This gives a string that should be 
-...
+This gives a string that should be inserted in the line before the
+match but that should not appear in the list of matches.
 )
 item(tt(-s) var(hidden-suffix))(
-...
+Like `tt(-p)', but gives a string to insert after the match.
 )
 item(tt(-i) var(ignored-prefix))(
-...
+This gives a string to insert into the command line just before any
+string given with the `tt(-P)' option. Without `tt(-P)' the string is
+inserted before the string given with `tt(-p)' or directly before the
+match.
 )
 item(tt(-J) var(name))(
 As for tt(compctl) and tt(complist) this gives the name of the group
@@ -197,6 +200,10 @@ of matches the words should be stored in.
 )
 item(tt(-V) var(name))(
 Like tt(-J) but naming a unsorted group.
+)
+item(tt(-X) var(explanation))(
+The var(explanation) string will be printed with the list of matches,
+as for tt(compctl -X).
 )
 item(tt(-q))(
 This flag has the same meaning as for tt(compctl) and tt(complist),
@@ -382,15 +389,19 @@ given, it is true if the number of words is equal to or greater than
 var(min) and equal to or less than var(max)
 )
 item(tt(-after) var(string))(
-true if the cursor is after a word that is equal to var(string)
+true if the cursor is after a word that is equal to var(string); this
+removes all words up to and including the matched word from the
+positional parameters
 )
 item(tt(-mafter) var(pattern))(
 like tt(-after) but using pattern matching
 )
 item(tt(-between) var(string1) var(string2))(
 true if the cursor is after a word that is equal to var(string1), if
-there is also a word that is equal to va(string2), this is true only
-if the cursor is before it
+there is also a word that is equal to var(string2), this is true only
+if the cursor is before it; as a side effect, all words before
+var(string1) and after var(string2) (both inclusive) are removed from
+the positional parameters
 )
 item(tt(-mbetween) var(pattern1) var(pattern2))(
 like tt(-between) but using pattern matching

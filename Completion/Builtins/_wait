@@ -1,0 +1,7 @@
+#defcomp wait
+
+local list
+
+complist -P '%' -j
+list=("$(ps 2>/dev/null)")
+complist -y '$list' -s '`ps 2>/dev/null | tail +2 | cut -c1-5`'

@@ -478,6 +478,17 @@ bin_zle_complete(char *name, char **args, char *ops, char func)
     Thingy t;
     Widget w, cw;
 
+#ifdef DYNAMIC
+    if (!require_module(name, "compctl", 0, 0)) {
+	zerrnam(name, "can't load compctl module", NULL, 0);
+	return 1;
+    }
+#else
+    if (!makecompparamsptr) {
+	zerrnam(name, "compctl module not available", NULL, 0);
+	return 1;
+    }
+#endif
     t = rthingy(args[1]);
     cw = t->widget;
     unrefthingy(t);

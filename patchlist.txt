@@ -299,7 +299,7 @@ Phil: zless, 5032, simplified by Bart, 5037, also added a `setopt
 localoptions' after spending an hour wondering why nothing worked any
 more.
 
-Me: `make install' does not do `make install.info', 5047
+pws: `make install' does not do `make install.info', 5047
 
 Sven:  compcall tries old-style completion from new-style function,
 compctl -K ' func' handles newstyle completion, 5059; avoid recursion,
@@ -309,7 +309,7 @@ Sven: inserting completion inside brace expansion, 5060
 
 Sven: extra completion context, 5092
 
-Me: typeset -T MYPATH mypath, 5094, plus fix for MYPATH=(foo),
+pws: typeset -T MYPATH mypath, 5094, plus fix for MYPATH=(foo),
 mypath=foo (and also existing PATH=(foo) bug), 5120
 
 Sven: doc fix for glob qualifiers, 5102
@@ -320,18 +320,18 @@ Drazen Kacar, modified by me: workaround for terminal bug on Solaris,
 Sven:  zle and widget information via variables in new completion
 functions, 5104
 
-Me: remove old zle -C, zle -C now does new completion, 5105
+pws: remove old zle -C, zle -C now does new completion, 5105
 
 Sven:  glob qualifier o for modes, 5107
 
-Me: fix for unsetting special zle variables, 5111
+pws: fix for unsetting special zle variables, 5111
 
 Drazen Kacar, modified by me: unlock terminal device on Solaris, 5118
 (5117 was wrong)
 
   pws-7
 
-Me: patch for zls, 5054 (appeared in pws-6 but not in corresponding
+pws: patch for zls, 5054 (appeared in pws-6 but not in corresponding
 patchlist).
 
 Bart: finally added missing hunk from 4965 which allowed unsetting an
@@ -355,7 +355,7 @@ Sven: fix for command completion and pattern completions, 5178
 
 Sven: ${(P)...} 5183, 5199, 5200
 
-Me: compctl documentation tidy-up, 5185, 5198
+pws: compctl documentation tidy-up, 5185, 5198
 
 Sven: zle commands which use the minibuffer erase completion listings,
 5201
@@ -370,13 +370,13 @@ Sven: ${foo:q}, 5208, preliminary
 
 Sven: use ${foo:q} for quoting prefix and suffix in new completion, 5120
 
-Me: bashautolist option, 5229; Sven's addition, 5234, and doc 5235; 5269
+pws: bashautolist option, 5229; Sven's addition, 5234, and doc 5235; 5269
 
-Me: .zlogout doc, 5233
+pws: .zlogout doc, 5233
 
-Me: added note on Linux Alpha with egcs to Etc/MACHINES, not posted
+pws: added note on Linux Alpha with egcs to Etc/MACHINES, not posted
 
-Me: typeset -T fix, 5247
+pws: typeset -T fix, 5247
 
 Bart: parameter scoping docs, 5258
  
@@ -390,7 +390,7 @@ Sven: rewrite of $foo:q, 5265, +doc, 5284
 
 Sven: get matcher number in new completion function, 5266
 
-Me: interrupts in getquery() weren't gracefully handled, 5281
+pws: interrupts in getquery() weren't gracefully handled, 5281
 
   pws-8
 
@@ -409,14 +409,14 @@ Sven: compctl matcher to use reference counts, 5316
 
 Sven: keys available in zle widget functions, 5320
 
-Me: compctl -LM, 5321
+pws: compctl -LM, 5321
 
-Me: revamped signames.c generation, 5326, 5329, plus Matt fix, 5330
+pws: revamped signames.c generation, 5326, 5329, plus Matt fix, 5330
 
 Sweth, Bart, Me: Functions/allopt, basically as in 2121 with the odd
 emulate and local.
 
-Me: emulate -L, 5332
+pws: emulate -L, 5332
 
 Sven: printing of zle condition codes, 5335
 
@@ -425,9 +425,9 @@ Sven: Modularisation of new completion shell code, 5341
 Sven: ignoring ignored prefix in new conditions, 5342; related fixes,
 5343
 
-Me: patch for completion init and __normal, 5344; Sven fix, 5351
+pws: patch for completion init and __normal, 5344; Sven fix, 5351
 
-Me: "$foo[@]" didn't remove the argument if $foo wasn't set, 5349;
+pws: "$foo[@]" didn't remove the argument if $foo wasn't set, 5349;
 Bart's fix so this works on OSes other than AIX, 5361
 
 Sven: change fignore handling, 5352
@@ -437,14 +437,14 @@ failed, 5354
 
 Sven: compadd -R function for suffix removal, 5355
 
-Me: #key-* completions now allow 0 or more key bindings, 5362
+pws: #key-* completions now allow 0 or more key bindings, 5362
 
-Me: Moved Misc/Completion to Functions/Completion; added some of my own
+pws: Moved Misc/Completion to Functions/Completion; added some of my own
 new-style completions: not posted
 
-Me: 5281 now works, 5364
+pws: 5281 now works, 5364
 
-Me: make dependencies for main.o, Makemod, zshpaths.h, 5365
+pws: make dependencies for main.o, Makemod, zshpaths.h, 5365
 
   pws-9
 
@@ -458,9 +458,9 @@ Andrej: Reliant UNIX configuration, 5377
 
 Sven: Manual for new completion (so far), 5384, 5397
 
-Me: dump new completion status for fast initialisation, 5393
+pws: dump new completion status for fast initialisation, 5393
 
-Me: bug fixlet for __path_files, 5398
+pws: bug fixlet for __path_files, 5398
 
 Sven: overhaul of do_ambiguous with some bug-fixage, 5399, 5407
 
@@ -469,11 +469,11 @@ $COMPDUMP file, 5402
 
 Sven: files -> __files, 5401
 
-Me: magicequalsubst now affects all arguments ...=~...:~..., 5403
+pws: magicequalsubst now affects all arguments ...=~...:~..., 5403
 
-Me: set -x output for [[ ... ]], 5408
+pws: set -x output for [[ ... ]], 5408
 
-Me: IRIX 6.5 problems in Etc/MACHINES (see 5410 from Helmut Jarausch).
+pws: IRIX 6.5 problems in Etc/MACHINES (see 5410 from Helmut Jarausch).
 
 Sven: 5412: better matcher control.
 
@@ -483,7 +483,7 @@ Sven: 5417: multiple subscripts with undefined array
 
 Sven: 5418: small addmatches fixes
 
-Me: 5421: setting same element of assoc array in full array assignment crashed
+pws: 5421: setting same element of assoc array in full array assignment crashed
 
 Sven: 5422: braces in completions were not tokenized; array parameters were
 used uncopied
@@ -492,14 +492,73 @@ Sven: 5423: compadd accepts either - or -- to end options
 
 Sven: 5424: addmatches fix when not doing matching
 
-Me: 5425: fix pattern matching for new completion
+pws: 5425: fix pattern matching for new completion
 
 Sven: 5429: $CONTEXT strings
 
 Sven: 5430: rewrite Functions/Completions with simplified syntax (no #array
 type completions).
 
-Me: 5436: set -x for function calls and ((...)).
+pws: 5436: set -x for function calls and ((...)).
 
-Me: unposted (but see 5440): zftp changes: more return 6's, functions now
+pws: unposted (but see 5440): zftp changes: more return 6's, functions now
 do auto-open and avoid subshells.
+
+  pws-10
+
+Martin Buchholz: 5448: libc.h can't be included on Debian Linux, so only
+include it on NeXT where it's necessary.
+
+Matt: 5330: I've put this back the way it original was.  I hate sed almost
+as much as awk.
+
+Sven: 5455: keep track of which matcher specification to use
+
+Sven: 5466: compwid manual for -after and -between
+
+Sven: 5467: expn manual typo
+
+Sven: 5469: init fix and Functions/Completion/_comp_parts
+
+Sven: 5470: new completion conditions didn't handle untokenization
+consistently.
+
+Sven: 5471: range code knows not to handle associative arrays
+
+Sven: 5476: quoting of tildes in Functions/Completion/_path_files
+
+Sven: 5483: completeinword fixes
+
+Sven: 5489: control for matching in _path_files and _comp_parts
+
+Sven: 5490: unset test for AA elements when substituting
+
+pws: unposted, see 5503: remove dynamic=no from configure.in when
+underscore is needed.
+
+pws: 5508: init and dump, globbing and printing.
+
+Sven: 5511: make sure compctl is available for new completion
+
+Sven: 5512, 5525: globcomplete fix for new completion
+
+Sven: 5521: improved option handling for _path_files
+
+Sven: 5529: cleanup for Functions/Completion
+
+pws: 5531: small init fix
+
+pws: 5538: approximate pattern matching, (#a1)readme etc.
+
+Sven: 5543: compadd -X, zshcompwid manual
+
+Sven: 5544: another completion cleanup
+
+pws: 5545: silly set -x mistake
+
+Sven: 5548: _path_files, _comp_parts
+
+Matt: 5553: under _WIN32, .exe suffix is optional for commands
+
+pws: unposted: Functions/Completion moved to Completion; subdirectories
+Core, Base, Builtins, User, Commands created; Completion/README created.

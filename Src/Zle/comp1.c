@@ -49,10 +49,10 @@ void (*makecompparamsptr) _((void));
 /* pointers to functions required by compctl and defined by zle */
 
 /**/
-void (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char **));
+void (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char *, char **));
 
 /**/
-char *(*comp_strptr) _((int*,int*));
+char *(*comp_strptr) _((int*, int*, int));
 
 /**/
 int (*getcpatptr) _((char *, int, char *, int));
@@ -410,6 +410,7 @@ setup_comp1(Module m)
     cc_first.mask2 = CC_CCCONT;
     compcontext = compcommand = compprefix = compsuffix =
 	compiprefix = NULL;
+    makecompparamsptr = NULL;
     return 0;
 }
 

@@ -1,0 +1,3 @@
+#defcomp xfig
+
+_files -g '*.fig'
