@@ -49,3 +49,7 @@
 >DI:{dir2}
 >FI:{file1}
 >FI:{file2}
+
+%clean
+
+  zmodload -ui zsh/zpty

@@ -144,3 +144,6 @@
 >NO:{abyyy}
 >NO:{abzzz}
 
+%clean
+
+  zmodload -ui zsh/zpty

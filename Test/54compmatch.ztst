@@ -510,4 +510,5 @@
 >COMPADD:{}
 
 %clean
-exit 0
+
+  zmodload -ui zsh/zpty
