@@ -254,6 +254,32 @@ enum {
 #define IS_READFD(X)          (((X)>=REDIR_READWRITE && (X)<=REDIR_MERGEIN) || (X)==REDIR_INPIPE)
 #define IS_REDIROP(X)         ((X)>=OUTANG && (X)<=TRINANG)
 
+/*
+ * Values for the fdtable array.  They say under what circumstances
+ * the fd will be close.  The fdtable is an unsigned char, so these are
+ * #define's rather than an enum.
+ */
+/* Entry not used. */
+#define FDT_UNUSED		0
+/*
+ * Entry used internally by the shell, should not be visible to other
+ * processes.
+ */
+#define FDT_INTERNAL		1
+/*
+ * Entry used by output from the XTRACE option.
+ */
+#define FDT_XTRACE		2
+#ifdef PATH_DEV_FD
+/*
+ * Entry used by a process substition.
+ * The value will be incremented on entering a function and
+ * decremented on exit; we don't close entries greater than
+ * FDT_PROC_SUBST except when closing everything.
+ */
+#define FDT_PROC_SUBST		3
+#endif
+
 /* Flags for input stack */
 #define INP_FREE      (1<<0)	/* current buffer can be free'd            */
 #define INP_ALIAS     (1<<1)	/* expanding alias or history              */

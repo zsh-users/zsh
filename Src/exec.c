@@ -77,7 +77,7 @@ long lastval2;
  * by zclose.                                                      */
 
 /**/
-char *fdtable;
+unsigned char *fdtable;
 
 /* The allocated size of fdtable */
 
@@ -496,7 +496,11 @@ execute(UNUSED(Cmdnam cmdname), int dash, int defpath)
     }
 
     argv = makecline(args);
-    closem(3);
+    /*
+     * Note that we don't close fd's attached to process substitution
+     * here, which should be visible to external processes.
+     */
+    closem(FDT_XTRACE);
     child_unblock();
     if ((int) strlen(arg0) >= PATH_MAX) {
 	zerr("command too long: %s", arg0, 0);
@@ -1053,7 +1057,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 	mpipe(opipe);
 	coprocin = ipipe[0];
 	coprocout = opipe[1];
-	fdtable[coprocin] = fdtable[coprocout] = 0;
+	fdtable[coprocin] = fdtable[coprocout] = FDT_UNUSED;
     }
     /* This used to set list_pipe_pid=0 unconditionally, but in things
      * like `ls|if true; then sleep 20; cat; fi' where the sleep was
@@ -1576,7 +1580,7 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag)
 	    mfds[fd1]->fds[mfds[fd1]->ct++] = movefd(fd2);
 	}
     }
-    if (subsh_close >= 0 && !fdtable[subsh_close])
+    if (subsh_close >= 0 && fdtable[subsh_close] == FDT_UNUSED)
 	subsh_close = -1;
 }
 
@@ -2132,7 +2136,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    read(synch[0], &dummy, 1);
 	    close(synch[0]);
 #ifdef PATH_DEV_FD
-	    closem(2);
+	    closem(FDT_PROC_SUBST);
 #endif
 	    if (how & Z_ASYNC) {
 		lastpid = (zlong) pid;
@@ -2196,7 +2200,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	if (!(xtrerr = fdopen(movefd(dup(fileno(stderr))), "w")))
 	    xtrerr = stderr;
 	else
-	    fdtable[fileno(xtrerr)] = 3;
+	    fdtable[fileno(xtrerr)] = FDT_XTRACE;
     }
 
     /* Add pipeline input/output to mnodes */
@@ -2286,7 +2290,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (fn->fd2 < 10)
 		    closemn(mfds, fn->fd2);
 		if (fn->fd2 > 9 &&
-		    (fdtable[fn->fd2] ||
+		    (fdtable[fn->fd2] != FDT_UNUSED ||
 		     fn->fd2 == coprocin ||
 		     fn->fd2 == coprocout)) {
 		    fil = -1;
@@ -2414,7 +2418,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		int i;
 
 		for (i = 10; i <= max_zsh_fd; i++)
-		    if (fdtable[i] > 1)
+		    if (fdtable[i] >= FDT_PROC_SUBST)
 			fdtable[i]++;
 #endif
 		if (subsh_close >= 0)
@@ -2424,17 +2428,17 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		execshfunc((Shfunc) hn, args);
 #ifdef PATH_DEV_FD
 		for (i = 10; i <= max_zsh_fd; i++)
-		    if (fdtable[i] > 1)
-			if (--(fdtable[i]) <= 2)
+		    if (fdtable[i] >= FDT_PROC_SUBST)
+			if (--(fdtable[i]) <= FDT_PROC_SUBST)
 			    zclose(i);
 #endif
 	    } else {
 		/* It's a builtin */
 		if (forked)
-		    closem(1);
+		    closem(FDT_INTERNAL);
 		lastval = execbuiltin(args, (Builtin) hn);
 #ifdef PATH_DEV_FD
-		closem(2);
+		closem(FDT_PROC_SUBST);
 #endif
 		fflush(stdout);
 		if (save[1] == -2) {
@@ -2478,7 +2482,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    if (errflag)
 			_exit(1);
 		}
-		closem(1);
+		closem(FDT_INTERNAL);
 		if (coprocin)
 		    zclose(coprocin);
 		if (coprocout)
@@ -2711,7 +2715,12 @@ entersubsh(int how, int cl, int fake, int revertpgrp)
     forklevel = locallevel;
 }
 
-/* close internal shell fds */
+/*
+ * Close internal shell fds.
+ *
+ * Close any that are marked as used if "how" is FDT_UNUSED, else
+ * close any with the value "how".
+ */
 
 /**/
 mod_export void
@@ -2720,7 +2729,8 @@ closem(int how)
     int i;
 
     for (i = 10; i <= max_zsh_fd; i++)
-	if (fdtable[i] && (!how || fdtable[i] == how))
+	if (fdtable[i] != FDT_UNUSED &&
+	    (how == FDT_UNUSED || fdtable[i] == how))
 	    zclose(i);
 }
 
@@ -2865,7 +2875,7 @@ getoutput(char *cmd, int qt)
 
 	zclose(pipes[1]);
 	retval = readoutput(pipes[0], qt);
-	fdtable[pipes[0]] = 0;
+	fdtable[pipes[0]] = FDT_UNUSED;
 	waitforpid(pid);		/* unblocks */
 	lastval = cmdoutval;
 	return retval;
@@ -3069,7 +3079,7 @@ getproc(char *cmd)
 	    addproc(pid, NULL, 1, &bgtime);
 	return pnam;
     }
-    closem(0);
+    closem(FDT_UNUSED);
     fd = open(pnam, out ? O_WRONLY | O_NOCTTY : O_RDONLY | O_NOCTTY);
     if (fd == -1) {
 	zerr("can't open %s: %e", pnam, errno);
@@ -3094,7 +3104,7 @@ getproc(char *cmd)
 	    zclose(pipes[!out]);
 	    return NULL;
 	}
-	fdtable[pipes[!out]] = 2;
+	fdtable[pipes[!out]] = FDT_PROC_SUBST;
 	if (!out)
 	{
 	    addproc(pid, NULL, 1, &bgtime);
@@ -3103,7 +3113,7 @@ getproc(char *cmd)
     }
     entersubsh(Z_ASYNC, 1, 0, 0);
     redup(pipes[out], out);
-    closem(0);   /* this closes pipes[!out] as well */
+    closem(FDT_UNUSED);   /* this closes pipes[!out] as well */
 #endif /* PATH_DEV_FD */
 
     cmdpush(CS_CMDSUBST);
@@ -3147,7 +3157,7 @@ getpipe(char *cmd, int nullexec)
     }
     entersubsh(Z_ASYNC, 1, 0, 0);
     redup(pipes[out], out);
-    closem(0);	/* this closes pipes[!out] as well */
+    closem(FDT_UNUSED);	/* this closes pipes[!out] as well */
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
     cmdpop();

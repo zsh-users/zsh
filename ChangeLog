@@ -1,3 +1,10 @@
+2005-03-31  Peter Stephenson  <pws@csr.com>
+
+	* 21049: Src/exec.c, Src/init.c, Src/utils.c, Src/zsh.h: Don't
+	close file descriptors opened for process substitution when
+	executing external programmes in a shell function.  Rewrite
+	the corresponding code to make it more transparent.
+
 2005-03-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync:  Added --protocol.
