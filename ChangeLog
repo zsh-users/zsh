@@ -1,3 +1,8 @@
+2005-02-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* Kris Shannon: 20801: Completion/Unix/Command/_init_d: fix
+	missing $ in the param expansion that parses the init script.
+
 2005-02-07  Peter Stephenson  <pws@csr.com>
 
 	* 20798: Src/init.c: need to propagate some #ifdef's to get
