@@ -1,3 +1,12 @@
+2001-10-08  Peter Stephenson  <pws@csr.com>
+
+	* 15965: Src/exec.c, Src/glob.c, Src/subst.c: rename glob() to
+	zglob() to avoid clashes with library function.
+
+	* 15931: Src/builtin.c, Src/exec.c:  make EXIT traps work in
+	subshells the way they used to before 15844: react to explicit
+	`exit' but not falling off end of list.
+
 2001-10-08  Andrej Borsenkow  <bor@zsh.org>
 
 	* 15964: Src/Modules/tcp.c: use SOCKLEN_T
