@@ -1,3 +1,7 @@
+2000-08-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 12677: Completion/Builtins/_zmodload: use _arguments in _zmodload
+
 2000-08-16  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/.distfiles: forgot this yet again.
