@@ -1,3 +1,7 @@
+2003-11-14  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_w3m: fix typo
+
 2003-11-13  Peter Stephenson  <pws@csr.com>
 
 	* 19242: acconfig.h, zshconfig.ac, Src/Builtin.c, Src/exec.c,

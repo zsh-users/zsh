@@ -35,6 +35,6 @@ _arguments -C \
 
 case $state in
 	html)
-	_alternative 'files:file:_files -g "*.x#html"' 'urls:url:_w3mhist'
+	_alternative 'files:file:_files -g "*.x#html"' 'urls:url:_w3mhistory'
 	;;
 esac
