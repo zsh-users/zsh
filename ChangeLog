@@ -1,3 +1,8 @@
+2005-03-27  Clint Adams  <clint@zsh.org>
+
+	* Zack Cerza: 21074: Completion/Debian/Command/_aptitude: update
+	for newer aptitude.
+
 2005-03-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync: added --protocol.
