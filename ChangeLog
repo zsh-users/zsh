@@ -1,3 +1,8 @@
+2001-11-15 Chmouel Boudjnah <chmouel@mandrakesoft.com>
+
+	* 16253: Src/Zle/complete.mdd: Add Mandrake completion directory to
+	install.
+
 2001-11-15  Peter Stephenson  <pws@csr.com>
 
 	* 16241: zshconfig.ac, Src/Modules/mathfunc.c,
