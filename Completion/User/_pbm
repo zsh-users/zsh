@@ -1,5 +1,11 @@
 #compdef -P (p[bgpn]m*|*top[bgpn]m)
 
+# Completion for all (or most, you'll never know) pbmplus commands.
+# For some of them there are special cases in the biggish `case' below.
+# Note that since this function is a post-pattern function, these
+# defaults can be overridden by simple defining completion functions
+# for those commands whose arguments you want to complete differently.
+
 local pat expl ret=1
 
 if [[ "$words[1]" = pnm* ]]; then
