@@ -2490,6 +2490,23 @@ uniqarray(char **x)
 	    }
 }
 
+/**/
+void
+zhuniqarray(char **x)
+{
+    char **t, **p = x;
+
+    if (!x || !*x)
+	return;
+    while (*++p)
+	for (t = x; t < p; t++)
+	    if (!strcmp(*p, *t)) {
+		*p = NULL;
+		for (t = p--; (*t = t[1]) != NULL; t++);
+		break;
+	    }
+}
+
 /* Function to get value of special parameter `#' and `ARGC' */
 
 /**/

@@ -767,6 +767,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int flags = 0;
     int flnum = 0;
     int sortit = 0, casind = 0;
+    int unique = 0;
     int casmod = 0;
     int quotemod = 0, quotetype = 0, quoteerr = 0;
     int visiblemod = 0;
@@ -994,6 +995,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case 'z':
 		    shsplit = 1;
+		    break;
+
+		case 'n':
+		    unique = 1;
 		    break;
 
 		default:
@@ -1872,6 +1877,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    strcpy(*str, fstr);
 	    setdata(n, y);
 	    return n;
+	}
+	if (unique) {
+/*	    if(!copied) */
+		aval = arrdup(aval);
+
+	    i = arrlen(aval);
+	    if (i > 1)
+		zhuniqarray(aval);
 	}
 	if (sortit) {
 	    static CompareFn sortfn[] = {
