@@ -13,10 +13,21 @@ oldcontext="$curcontext"
 
 if [[ -n "$compcontext" ]]; then
 
-  if [[ "${(t)compcontext}" = *(array|assoc)* ]]; then
+  if [[ "${(t)compcontext}" = *array* ]]; then
     local expl
 
     _wanted values expl value compadd -a - compcontext
+
+  elif [[ "${(t)compcontext}" = *assoc* ]]; then
+    local expl tmp i
+
+    tmp=()
+    for i in "${(@k)compcontext[(R)*[^[:blank:]]]}"; do
+      tmp=( "$tmp[@]" "${i}:${compcontext[$i]}" )
+    done
+    tmp=( "$tmp[@]" "${(k@)compcontext[(R)[[:blank:]]#]}" )
+
+    _describe -t values value tmp
 
   elif [[ "$compcontext" = *:*:* ]]; then
     local tag="${${compcontext%%:*}:-values}"

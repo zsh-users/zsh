@@ -2315,9 +2315,12 @@ named `tt(_tilde)').
 Before trying to find a function for a specific context, tt(_complete) 
 checks if the parameter `tt(compcontext)' is set.  If it is set to an
 array, the elements are taken to be the possible matches which will be
-completed using the tag `tt(values)' and the description `tt(value)'.
-If `tt(compcontext)' to a string containing colons, it should be of
-the form `var(tag)tt(:)var(descr)tt(:)var(action)'. In this case the
+completed using the tag `tt(values)' and the description
+`tt(value)'.   If it is set to an associative array, the keys are used
+as the possible completions and the values (if non-empty) are used as
+descriptions for the matches.  If `tt(compcontext)' is set to a string
+containing colons, it should be of
+the form `var(tag)tt(:)var(descr)tt(:)var(action)'.  In this case the
 var(tag) and var(descr) give the tag and description to use and the
 var(action) says what should be completed in one of the forms
 described for the tt(_arguments) utility function below.

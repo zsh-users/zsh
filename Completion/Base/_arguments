@@ -78,7 +78,7 @@ if (( long )); then
 
       # Using (( ... )) gives a parse error.
 
-      let "$tmpargv[(I)(|\([^\)]#\))${opt}(|[-+=])(|\[*\])(|:*)]" ||
+      let "$tmpargv[(I)(|\([^\)]#\))(|\*)${opt}(|[-+=])(|\[*\])(|:*)]" ||
           tmp=( "$tmp[@]" "$opt" )
     done
     lopts=( "$tmp[@]" )

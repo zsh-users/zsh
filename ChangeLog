@@ -1,5 +1,9 @@
 2000-08-02  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12483: Completion/Base/_arguments, Completion/Core/_complete,
+ 	Doc/Zsh/compsys.yo: if compcontext is an assoc, the keys are the
+ 	completions and the values are their descriptions
+	
 	* 12475: Completion/Base/_arguments: prefer user-defined specs
  	over ones derived from --help output
 	
