@@ -1,0 +1,47 @@
+#compdef pmpath pmvers pmdesc pmload pmexp pmeth pmls pmcat pman pmfunc podgrep podtoc podpath
+#
+#
+# _perl_modules - zsh completion function
+#
+# Adam Spiers <adam@spiers.net>
+#
+# Calculate all installed Perl modules.  The result is cached
+# for future use.
+#
+# Bugs:
+#   - can't cope with multiple installs of Perl
+
+# Change this if you have pminst and want to use it.  The zsh code
+# actually produces better results because pminst misses modules of
+# the form Foo/bar/Baz.pm through its clumsy -d && /^[A-Z]/ && prune
+# algorithm (the zsh code does almost the same, but only misses modules
+# which don't begin with an uppercase letter).
+local try_to_use_pminst=0
+
+if [[ ${+_perl_modules} -eq 0 ]]; then
+  if [[ $try_to_use_pminst -ne 0 ]] && which pminst >/dev/null; then
+    _perl_modules=( $(pminst) )
+  else
+    local inc libdir new_pms
+    inc=( $( perl -e 'print "@INC"' ) )
+    typeset -agU _perl_modules	# _perl_modules is global, no duplicates
+    _perl_modules=( )
+
+    for libdir in $inc; do
+        # Ignore cwd - could be too expensive e.g. if we're near /
+        if [[ $libdir == '.' ]]; then break; fi
+
+	# Find all modules
+	cd $libdir
+        new_pms=( {[A-Z]*/**/,}*.pm(N) )
+	cd $OLDPWD
+
+	# Convert to Perl nomenclature
+	new_pms=( ${new_pms:r:fs#/#::#} )
+
+        _perl_modules=( $new_pms $_perl_modules )
+    done
+  fi
+fi
+
+compadd - $_perl_modules
