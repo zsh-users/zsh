@@ -1063,11 +1063,12 @@ hend(Eprog prog)
 	}
 #endif
 	/* get rid of pesky \n which we've already nulled out */
-	if (chwordpos > 1 && !chline[chwords[chwordpos-2]])
+	if (chwordpos > 1 && !chline[chwords[chwordpos-2]]) {
 	    chwordpos -= 2;
-	/* strip superfluous blanks, if desired */
-	if (isset(HISTREDUCEBLANKS))
-	    histreduceblanks();
+	    /* strip superfluous blanks, if desired */
+	    if (isset(HISTREDUCEBLANKS))
+		histreduceblanks();
+	}
 	if ((isset(HISTIGNOREDUPS) || isset(HISTIGNOREALLDUPS)) && he
 	 && histstrcmp(chline, he->text) == 0) {
 	    /* This history entry compares the same as the previous.
