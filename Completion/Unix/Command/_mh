@@ -1,25 +1,30 @@
-#compdef folder folders comp inc mark refile repl scan show next prev rmm pick whom mhn mhpath mhlist mhstore mhshow mhparam mhmail
+#compdef ali dist flist flists folder folders forw comp inc mark refile repl scan show next prev packf rmf rmm pick whom mhn mhpath mhlist mhstore mhshow mhparam mhmail
 
 # Completion for all possible MH commands.
 
-local mymhdir=${$(mhpath + 2>/dev/null):-~/Mail}
+local mymhdir=${$(_call_program mhpath mhpath + 2>/dev/null):-~/Mail}
 local mhlib=/usr/lib/mh
 
 local prev="$words[CURRENT-1]" expl
-
-# To be on the safe side, check this exists and if not, get it anyway.
-[[ -d $mymhdir ]] || mymhdir=$(mhpath +)
 
 if compset -P 1 -; then
   # get list of options, which MH commands can generate themselves
   # awk is just too icky to use for this, sorry.  send me one if
   # you come up with it.
-  _wanted options expl option \
-      compadd - $($words[1] -help | perl -ne 'if (/^\s*-\(?(\S+)/) {
-            $n = $1;
-            $n =~ s/\)//g;
-            print $n =~ s/^\[([a-z]+)\]// ? "$n\n$1$n\n" : "$n\n";
-          }')
+  local -a options disp
+  options=(
+    $($words[1] -help | perl -ne 'if (/^\s*-\(?(\S+)/) {
+       $n = $1;
+       $n =~ s/\)//g;
+       print $n =~ s/^\[([a-z]+)\]// ? "$n\n$1$n\n" : "$n\n";
+    }')
+  )
+  if zstyle -t ":completion:${curcontext}:options" prefix-hidden; then
+      _wanted options expl option compadd -d disp - "$options[@]"
+  else
+      disp=( -${options} )
+      _wanted options expl option compadd -d disp - "$options[@]"
+  fi    
   return
 elif compset -P 1 '[+@]' || [[ "$prev" = -draftfolder ]]; then
   # Complete folder names.
@@ -46,6 +51,8 @@ elif [[ "$prev" = -(form|audit|filter) ]]; then
   mhfpath=($mymhdir $mhlib)
 
   _wanted files expl 'MH template file' _files -W mhfpath -g '*(.)'
+elif [[ $service = mhmail ]]; then
+  _email_addresses
 elif [[ "$prev" = -(no|)cc ]]; then
   _wanted -C "$prev" values expl 'CC address' compadd all to cc me
 elif [[ "$prev" = -[rw]cache ]]; then
@@ -53,8 +60,8 @@ elif [[ "$prev" = -[rw]cache ]]; then
 elif [[ $service = mhparam ]]; then
   _wanted parameters expl 'MH parameter' compadd - \
     ${${(f)"$(mhparam -all)"}%%:*}
-elif [[ $service = mhmail ]]; then
-  _user_at_host
+elif [[ $service = ali ]]; then
+  _email_addresses -n MH
 else
   # Generate sequences.
   local foldnam folddir f ret
