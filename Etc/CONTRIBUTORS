@@ -54,7 +54,7 @@ Version 3.1.7
 * Tanaka Akira <akr@zsh.org>: CVS archive, numerous completion functions
   for common commands, regex shell function state machine
 
-* Geoff Wing <geoff@zsh.org>: mailing list and FTP archive, various other
+* Geoff Wing <gcw@zsh.org>: mailing list and FTP archive, various other
   bits
 
 * Sven Wischnowsky <wischnow@zsh.org>: almost all completion code including
