@@ -271,6 +271,7 @@ get_usage(void)
 }
 
 
+#ifndef HAVE_GETRUSAGE
 /* Update status of process that we have just WAIT'ed for */
 
 /**/
@@ -278,32 +279,19 @@ void
 update_process(Process pn, int status)
 {
     struct timezone dummy_tz;
-#ifdef HAVE_GETRUSAGE
-    struct timeval childs, childu;
-#else
     long childs, childu;
-#endif
 
-#ifdef HAVE_GETRUSAGE
-    childs = child_usage.ru_stime;
-    childu = child_usage.ru_utime;
-#else
     childs = shtms.tms_cstime;
     childu = shtms.tms_cutime;
-#endif
     /* get time-accounting info          */
     get_usage();
     gettimeofday(&pn->endtime, &dummy_tz);  /* record time process exited        */
 
     pn->status = status;                    /* save the status returned by WAIT  */
-#ifdef HAVE_GETRUSAGE
-    dtime(&pn->ti.sys, &childs, &child_usage.ru_stime);
-    dtime(&pn->ti.usr, &childu, &child_usage.ru_utime);
-#else
     pn->ti.st  = shtms.tms_cstime - childs; /* compute process system space time */
     pn->ti.ut  = shtms.tms_cutime - childu; /* compute process user space time   */
-#endif
 }
+#endif
 
 /* Update status of job, possibly printing it */
 
@@ -563,6 +551,9 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 {
     char *s;
     double elapsed_time, user_time, system_time;
+#ifdef HAVE_GETRUSAGE
+    double total_time;
+#endif
     int percent;
 
     if (!desc)
@@ -572,10 +563,11 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
     elapsed_time = real->tv_sec + real->tv_usec / 1000000.0;
 
 #ifdef HAVE_GETRUSAGE
-    user_time = ti->usr.tv_sec + ti->usr.tv_usec / 1000000.0;
-    system_time = ti->sys.tv_sec + ti->sys.tv_usec / 1000000.0;
+    user_time = ti->ru_utime.tv_sec + ti->ru_utime.tv_usec / 1000000.0;
+    system_time = ti->ru_stime.tv_sec + ti->ru_stime.tv_usec / 1000000.0;
     percent = 100.0 * (user_time + system_time)
 	/ (real->tv_sec + real->tv_usec / 1000000.0);
+    total_time = user_time + system_time;
 #else
     set_clktck();
     user_time    = ti->ut / (double) clktck;
@@ -620,6 +612,97 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 	    case 'P':
 		fprintf(stderr, "%d%%", percent);
 		break;
+#ifdef HAVE_STRUCT_RUSAGE_RU_NSWAP
+	    case 'W':
+		fprintf(stderr, "%ld", ti->ru_nswap);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_IXRSS
+	    case 'X':
+		fprintf(stderr, "%ld", (long)(ti->ru_ixrss / total_time));
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_IDRSS
+	    case 'D':
+		fprintf(stderr, "%ld",
+			(long) ((ti->ru_idrss
+#ifdef HAVE_STRUCT_RUSAGE_RU_ISRSS
+				 + ti->ru_isrss
+#endif
+				    ) / total_time));
+		break;
+#endif
+#if defined(HAVE_STRUCT_RUSAGE_RU_IDRSS) || \
+    defined(HAVE_STRUCT_RUSAGE_RU_ISRSS) || \
+    defined(HAVE_STRUCT_RUSAGE_RU_IXRSS)
+	    case 'K':
+		/* treat as D if X not available */
+		fprintf(stderr, "%ld",
+			(long) ((
+#ifdef HAVE_STRUCT_RUSAGE_RU_IXRSS
+				    ti->ru_ixrss
+#else
+				    0
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_IDRSS
+				    + ti->ru_idrss
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_ISRSS
+				    + ti->ru_isrss
+#endif
+				    ) / total_time));
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_MAXRSS
+	    case 'M':
+		fprintf(stderr, "%ld", ti->ru_maxrss / 1024);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_MAJFLT
+	    case 'F':
+		fprintf(stderr, "%ld", ti->ru_majflt);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_MINFLT
+	    case 'R':
+		fprintf(stderr, "%ld", ti->ru_minflt);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_INBLOCK
+	    case 'I':
+		fprintf(stderr, "%ld", ti->ru_inblock);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_OUBLOCK
+	    case 'O':
+		fprintf(stderr, "%ld", ti->ru_oublock);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_MSGRCV
+	    case 'r':
+		fprintf(stderr, "%ld", ti->ru_msgrcv);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_MSGSND
+	    case 's':
+		fprintf(stderr, "%ld", ti->ru_msgsnd);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_NSIGNALS
+	    case 'k':
+		fprintf(stderr, "%ld", ti->ru_nsignals);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_NVCSW
+	    case 'w':
+		fprintf(stderr, "%ld", ti->ru_nvcsw);
+		break;
+#endif
+#ifdef HAVE_STRUCT_RUSAGE_RU_NIVCSW
+	    case 'c':
+		fprintf(stderr, "%ld", ti->ru_nivcsw);
+		break;
+#endif
 	    case 'J':
 		fprintf(stderr, "%s", desc);
 		break;
@@ -683,8 +766,9 @@ should_report_time(Job j)
 	return 0;
 
 #ifdef HAVE_GETRUSAGE
-    reporttime -= j->procs->ti.usr.tv_sec + j->procs->ti.sys.tv_sec;
-    if (j->procs->ti.usr.tv_usec + j->procs->ti.sys.tv_usec >= 1000000)
+    reporttime -= j->procs->ti.ru_utime.tv_sec + j->procs->ti.ru_stime.tv_sec;
+    if (j->procs->ti.ru_utime.tv_usec +
+	j->procs->ti.ru_stime.tv_usec >= 1000000)
 	reporttime--;
     return reporttime <= 0;
 #else
@@ -1214,20 +1298,15 @@ shelltime(void)
 {
     struct timezone dummy_tz;
     struct timeval dtimeval, now;
-#ifdef HAVE_GETRUSAGE
-    struct rusage ru;
     child_times_t ti;
-#else
-    struct timeinfo ti;
+#ifndef HAVE_GETRUSAGE
     struct tms buf;
 #endif
 
     gettimeofday(&now, &dummy_tz);
 
 #ifdef HAVE_GETRUSAGE
-    getrusage(RUSAGE_SELF, &ru);
-    ti.sys = ru.ru_stime;
-    ti.usr = ru.ru_utime;
+    getrusage(RUSAGE_SELF, &ti);
 #else
     times(&buf);
 
@@ -1237,9 +1316,7 @@ shelltime(void)
     printtime(dtime(&dtimeval, &shtimer, &now), &ti, "shell");
 
 #ifdef HAVE_GETRUSAGE
-    getrusage(RUSAGE_CHILDREN, &ru);
-    ti.sys = ru.ru_stime;
-    ti.usr = ru.ru_utime;
+    getrusage(RUSAGE_CHILDREN, &ti);
 #else
     ti.ut = buf.tms_cutime;
     ti.st = buf.tms_cstime;

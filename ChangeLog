@@ -1,3 +1,10 @@
+2004-10-08  Peter Stephenson  <pws@csr.com>
+
+	* 20467: configure.ac, Doc/Zsh/params.yo, Src/exec.c, Src/jobs.c,
+	Src/signals.c, Src/zsh.h: Finally reintroduce the
+	TIMEFMT escapes from struct rusage removed ages ago.  Uses more
+	sophisticated autconf tests to make configuration seamless.
+
 2004-10-07  Peter Stephenson  <pws@csr.com>
 
 	* 20462: configure.ac, Src/exec.c, Src/init.c, Src/jobs.c,

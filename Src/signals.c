@@ -400,18 +400,6 @@ signal_suspend(int sig, int sig2)
     return ret;
 }
 
-/* What flavor of waitpid/wait3/wait shall we use? */
- 
-#ifdef HAVE_WAITPID
-# define  WAIT(pid, statusp, options) waitpid(pid, statusp, options)
-#else
-# ifdef HAVE_WAIT3
-#  define WAIT(pid, statusp, options) wait3((void *) statusp, options, NULL)
-# else
-#  define WAIT(pid, statusp, options) wait(statusp)
-# endif
-#endif
-
 /* the signal handler */
  
 /**/
@@ -471,7 +459,25 @@ zhandler(int sig)
 	    int *procsubval = &cmdoutval;
 	    struct execstack *es = exstack;
 
-            pid = WAIT(-1, &status, WNOHANG|WUNTRACED);  /* reap the child process */
+	    /*
+	     * Reap the child process.
+	     * If we want usage information, we need to use wait3.
+	     */
+#ifdef HAVE_WAIT3
+# ifdef HAVE_GETRUSAGE
+	    struct rusage ru;
+
+	    pid = wait3((void *)&status, WNOHANG|WUNTRACED, &ru);
+# else
+	    pid = wait3((void *)&status, WNOHANG|WUNTRACED, NULL);
+# endif
+#else
+# ifdef HAVE_WAITPID
+	    pid = waitpid(-1, &status, WNOHANG|WUNTRACED);
+# else
+	    pid = wait(&status);
+# endif
+#endif
 
             if (!pid)  /* no more children to reap */
                 break;
@@ -504,7 +510,14 @@ zhandler(int sig)
 
 	    /* Find the process and job containing this pid and update it. */
 	    if (findproc(pid, &jn, &pn, 0)) {
+#if defined(HAVE_WAIT3) && defined(HAVE_GETRUSAGE)
+		struct timezone dummy_tz;
+		gettimeofday(&pn->endtime, &dummy_tz);
+		pn->status = status;
+		pn->ti = ru;
+#else
 		update_process(pn, status);
+#endif
 		update_job(jn);
 	    } else if (findproc(pid, &jn, &pn, 1)) {
 		pn->status = status;

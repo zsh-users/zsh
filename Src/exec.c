@@ -1162,18 +1162,14 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		      (jobtab[list_pipe_job].stat & STAT_STOPPED)))) {
 		    pid_t pid;
 		    int synch[2];
-		    struct timezone dummy_tz;
 		    struct timeval bgtime;
 
 		    pipe(synch);
 
-		    gettimeofday(&bgtime, &dummy_tz);
-		    /* Any reason this isn't zfork? */
-		    if ((pid = fork()) == -1) {
+		    if ((pid = zfork(&bgtime)) == -1) {
 			trashzle();
 			close(synch[0]);
 			close(synch[1]);
-			putc('\n', stderr);
 			fprintf(stderr, "zsh: job can't be suspended\n");
 			fflush(stderr);
 			makerunning(jn);
@@ -1300,15 +1296,11 @@ execpline2(Estate state, wordcode pcode,
 	if (wc_code(code) >= WC_CURSH && (how & Z_SYNC)) {
 	    int synch[2];
 	    struct timeval bgtime;
-	    struct timezone dummy_tz;
 
 	    pipe(synch);
-	    gettimeofday(&bgtime, &dummy_tz);
-	    /* any reason this isn't zfork? */
-	    if ((pid = fork()) == -1) {
+	    if ((pid = zfork(&bgtime)) == -1) {
 		close(synch[0]);
 		close(synch[1]);
-		zerr("fork failed: %e", NULL, errno);
 	    } else if (pid) {
 		char dummy, *text;
 

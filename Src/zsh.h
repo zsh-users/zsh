@@ -740,10 +740,7 @@ struct timeinfo {
 /* node in job process lists */
 
 #ifdef HAVE_GETRUSAGE
-typedef struct {
-    struct timeval sys;
-    struct timeval usr;
-} child_times_t;
+typedef struct rusage child_times_t;
 #else
 typedef struct timeinfo child_times_t;
 #endif
