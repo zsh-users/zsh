@@ -8,7 +8,7 @@ comptestinit () {
   zmodload -i zsh/zpty
 
   comptest_zsh=${ZSH:-zsh}
-  termcap_ce="$(echotc ce)"
+  termcap_ce="$(echotc ce 2>/dev/null)"
 
   while getopts z: opt; do
     case $opt in
@@ -30,6 +30,7 @@ comptestinit () {
 "module_path=( $module_path )" \
 "fpath=( $fpath )" \
 'LISTMAX=10000000
+TERM=vt100
 stty columns 80 rows 24
 setopt zle
 bindkey -e
