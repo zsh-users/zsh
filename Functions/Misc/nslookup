@@ -34,7 +34,7 @@ while line=''; vared -he "$pmpt[@]" line; do
   zpty -r nslookup line '*
 > '
   if [[ -n "$pager" && ${#${(f)line}} -gt LINES ]]; then
-    print -nr "$line" | "$pager"
+    print -nr "$line" | eval "$pager"
   else
     print -nr "$line"
   fi
