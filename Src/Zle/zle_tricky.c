@@ -7835,7 +7835,7 @@ cut_cline(Cline l)
 	    q = p;
     }
     if (!e && q && !q->orig && !q->olen && (q->flags & CLF_MISS) &&
-	(q->word ? q->wlen : q->llen) < 3) {
+	!(q->flags & CLF_MATCHED) && (q->word ? q->wlen : q->llen) < 3) {
 	q->word = q->line = NULL;
 	q->wlen = q->llen = 0;
     }
@@ -8452,7 +8452,8 @@ do_single(Cmatch m)
 	    if (m->flags & CMF_PARNEST)
 		havesuff = 1;
 	}
-	if ((m->flags & CMF_FILE) || (partest && isset(AUTOPARAMSLASH))) {
+	if (((m->flags & CMF_FILE) || (partest && isset(AUTOPARAMSLASH))) &&
+	    cs > 0 && line[cs - 1] != '/') {
 	    /* If we have a filename or we completed a parameter name      *
 	     * and AUTO_PARAM_SLASH is set, lets see if it is a directory. *
 	     * If it is, we append a slash.                                */

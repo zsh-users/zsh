@@ -277,7 +277,12 @@ for prepath in "$prepaths[@]"; do
       # otherwise this would keep `_files' from completing all filenames
       # if none of the patterns match.
 
-      if [[ "$haspats" = no && -z "$tpre$tsuf" &&
+      if [[ -z "$tpre$tsuf" ]]; then
+        tmp1=( "$tmp2[@]" )
+	addsfx=(-S '')
+	remsfx=()
+	break;
+      elif [[ "$haspats" = no && -z "$tpre$tsuf" &&
 	"$pre" = */ && -z "$suf" ]]; then
 	PREFIX="${opre}${osuf}"
 	SUFFIX=""
