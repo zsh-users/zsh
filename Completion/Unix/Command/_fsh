@@ -1,0 +1,23 @@
+#compdef fsh
+
+_arguments \
+	'(--help)-h[help]' \
+	'(-h)--help' \
+	'(--version)-V[version]' \
+	'(-V)--version' \
+	'-r[method]:method:(rsh ssh)' \
+        '-l[login]:login:_users' \
+	'(--timeout)-T:idle timeout:' \
+	'(-T)--timeout:idle timeout:' \
+        ':remote host name:_hosts' \
+        '(-):command: _command_names -e' \
+        '*::args:->command' && return 0
+
+case "$state" in
+      command)
+        shift 1 words
+        (( CURRENT-- ))
+        _normal
+        return
+        ;;
+esac

@@ -1,3 +1,8 @@
+2001-12-26  Clint Adams  <clint@zsh.org>
+
+	* 16375: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_fsh: command completion for fsh.
+
 2001-12-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 16372: Src/jobs.c, Completion/Unix/Type/_signals: allow signals
