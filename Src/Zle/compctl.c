@@ -1837,7 +1837,7 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
 		for (n = firstnode(ccused); n; incnode(n))
 		    addlinknode(lastccused, getdata(n));
 	    } LASTALLOC;
-	} else
+	} else if (ccused)
 	    for (n = firstnode(ccused); n; incnode(n))
 		if (((Compctl) getdata(n)) != &cc_dummy)
 		    freecompctl((Compctl) getdata(n));
@@ -2497,6 +2497,8 @@ static void
 makecomplistcc(Compctl cc, char *s, int incmd)
 {
     cc->refc++;
+    if (!ccused)
+	ccused = newlinklist();
     addlinknode(ccused, cc);
 
     ccont = 0;
@@ -2955,11 +2957,13 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
     ccont |= (cc->mask2 & (CC_CCCONT | CC_DEFCONT | CC_PATCONT));
 
-    if (incompfunc != 1 && findnode(ccstack, cc))
+    if (incompfunc != 1 && ccstack && findnode(ccstack, cc))
 	return;
 
     MUSTUSEHEAP("complistflags");
 
+    if (!ccstack)
+	ccstack = newlinklist();
     addlinknode(ccstack, cc);
 
     if (incompfunc != 1 && allccs) {
