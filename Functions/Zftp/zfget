@@ -1,0 +1,64 @@
+# function zfget {
+# Get files from remote server.  Options:
+#   -G   don't to remote globbing, else do
+#   -t   update the local file times to the same time as the remote.
+#        Currently this only works if you have the `perl' command,
+#        and that perl is version 5 with the standard library.
+#        See the function zfrtime for more gory details.
+#
+# If the connection is not currently open, try to open it with the current
+# parameters (set by a previous zfopen or zfparams), then close it after
+# use.  The file is put in the current directory (i.e. using the basename
+# of the remote file only); for more control, use zfgcp.
+
+emulate -L zsh
+
+local loc rem optlist opt nglob remlist time
+integer stat do_close
+
+while [[ $1 == -* ]]; do
+  if [[ $1 == - || $1 == -- ]]; then
+    shift;
+    break;
+  fi
+  optlist=${1#-}
+  for (( i = 1; i <= $#optlist; i++)); do
+    opt=$optlist[$i]
+    case $opt in
+      G) nglob=1
+	 ;;
+      t) time=1
+	 ;;
+      *) print option $opt not recognised >&2
+	 ;;
+    esac
+  done
+  shift
+done
+
+zfautocheck
+
+for remlist in $*; do
+  # zfcd directory hack to put the front back to ~
+  if [[ $remlist == $HOME || $remlist == $HOME/* ]]; then
+    remlist="~${remlist#$HOME}"
+  fi
+  if [[ $nglob != 1 ]]; then
+    zfrglob remlist
+  fi
+  if (( $#remlist )); then
+    for rem in $remlist; do
+      loc=${rem:t}
+      if zftp get $rem >$loc; then
+	[[ $time = 1 ]] && zfrtime $rem $loc
+      else
+	stat=1
+      fi
+    done
+  fi
+done
+
+(( $do_close )) && zfclose
+
+return $stat
+# }

@@ -1,0 +1,23 @@
+# function zfput {
+# Simple put:  dump every file under the same name, but stripping
+# off any directory parts to get the remote filename (i.e. always
+# goes into current remote directory).  Use zfpcp to specify new
+# file name or new directory at remote end.
+
+emulate -L zsh
+
+local loc rem
+integer stat do_close
+
+zfautocheck
+
+for loc in $*; do
+  rem=${loc:t}
+  zftp put $rem <$loc
+  [[ $? == 0 ]] || stat=$?
+done
+
+(( $do_close )) && zfclose
+
+return $stat
+# }

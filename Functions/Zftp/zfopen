@@ -1,0 +1,42 @@
+# function zfopen {
+# Use zftp params to set parameters for open, rather than sending
+# them straight to open.  That way they are stored for a future open
+# command.
+#
+# With option -1 (just this 1ce), don't do that.
+
+emulate -L zsh
+
+local optlist opt once
+
+while [[ $1 = -* ]]; do
+  if [[ $1 = - || $1 = -- ]]; then
+    shift;
+    break;
+  fi
+  optlist=${1#-}
+  for (( i = 1; i <= $#optlist; i++)); do
+    opt=$optlist[$i]
+    case $optlist[$i] in
+      1) once=1
+	 ;;
+      *) print option $opt not recognised >&2
+	 ;;
+    esac
+  done
+  shift
+done
+
+# This is where we should try and do same name-lookupage in
+# both .netrc and .ncftp/bookmarks .  We could even try saving
+# the info in their for new hosts, like ncftp does.
+
+if [[ $once = 1 ]]; then
+  zftp open $*
+else
+  # set parameters, but only if there was at least a host
+  (( $# > 0 )) && zfparams $*
+  # now call with no parameters
+  zftp open
+fi
+# }

@@ -1,0 +1,45 @@
+# function zfrtime {
+# Set the modification time of file LOCAL to that of REMOTE.
+# If the optional TIME is passed, it should be in the FTP format
+# CCYYMMDDhhmmSS, i.e. no dot before the seconds, and in GMT.
+# This is what both `zftp remote' and `zftp local' return.
+#
+# Unfortunately, since the time returned from FTP is GMT and
+# your file needs to be set in local time, we need to do some
+# hacking around with time.  At the moment this requires perl 5
+# with the standard library.
+
+emulate -L zsh
+
+local time gmtime loctime
+
+if [[ -n $3 ]]; then
+  time=$3
+else
+  time=($(zftp remote $2 2>/dev/null))
+  [[ -n $time ]] && time=$time[2]
+fi
+[[ -z $time ]] && return 1
+
+# Now's the real *!@**!?!.  We have the date in GMT and want to turn
+# it into local time for touch to handle.  It's just too nasty
+# to handle in zsh; do it in perl.
+if perl -mTime::Local -e '($file, $t) = @ARGV;
+$yr = substr($t, 0, 4) - 1900;
+$mon = substr($t, 4, 2) - 1;
+$mday = substr($t, 6, 2) + 0;
+$hr = substr($t, 8, 2) + 0;
+$min = substr($t, 10, 2) + 0;
+$sec = substr($t, 12, 2) + 0;
+$time = Time::Local::timegm($sec, $min, $hr, $mday, $mon, $yr);
+utime $time, $time, $file and return 0;' $1 $time 2>/dev/null; then
+  print "Setting time for $1 failed.  Need perl 5." 2>1
+fi
+
+# If it wasn't for the GMT/local time thing, it would be this simple.
+#
+# time="${time[1,12]}.${time[13,14]}"
+#
+# touch -t $time $1
+
+# }

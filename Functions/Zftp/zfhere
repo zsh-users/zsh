@@ -1,0 +1,5 @@
+# function zfhere {
+# Change to the directory corresponding to $PWD on the server.
+# See zfcd for how this works.
+zfcd $PWD
+# }

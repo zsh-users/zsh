@@ -1,0 +1,28 @@
+[[ $1 = -n ]] || zmodload -ia zftp
+
+alias zfcd='noglob zfcd'
+alias zfget='noglob zfget'
+alias zfls='noglob zfls'
+alias zfdir='noglob zfdir'
+alias zfuget='noglob zfuget'
+
+# only way of getting that noglob out of the way: this is unnecessary with
+# widget-based completion and can be commented out.
+setopt completealiases
+
+#
+# zftp completions: only use these if new-style completion is not
+# active.
+#
+if [[ ${#patcomps} -eq 0 || ${patcomps[(i)zf*]} -gt ${#patcomps} ]]; then
+  compctl -f -x 'p[1]' \
+    -k '(open params user login type ascii binary mode put putat
+    get getat append appendat ls dir local remote mkdir rmdir delete
+    close quit)'  - \
+    'w[1,cd][1,ls][1,dir][1,rmdir]' -K zfcd_match -S/ -q - \
+    'W[1,get*]' -K zfget_match - 'w[1,delete][1,remote]' -K zfget_match - \
+    'w[1,open][1,params]' -k hosts -- zftp
+  compctl -K zfcd_match -S/ -q zfcd zfdir zfls
+  compctl -K zfget_match zfget zfgcp zfuget zfcget
+  compctl -k hosts zfanon zfopen zfparams
+fi

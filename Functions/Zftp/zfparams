@@ -1,0 +1,12 @@
+# function zfparams {
+
+emulate -L zsh
+
+# Set to prompt for any user or password if not given.
+# Don't worry about accounts here.
+if (( $# > 0 )); then
+  (( $# < 2 )) && 2='?'
+  (( $# < 3 )) && 3='?'
+fi
+zftp params $*
+# }
