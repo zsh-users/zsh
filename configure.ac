@@ -728,13 +728,45 @@ fi
 
 AC_CHECK_LIB(socket, socket)
 
-AC_CHECK_LIB(iconv, iconv)
+dnl ---------------
+dnl CHECK FOR ICONV
+dnl ---------------
 
-case "$host_os" in
-  cygwin | darwin*)
-    dnl cygwin iconv() is really libiconv()
-    AC_CHECK_LIB(iconv, libiconv) ;;
-esac
+dnl Find iconv. It may be in libiconv and may be iconv() or libiconv()
+if test "x$ac_cv_header_iconv_h" = "xyes"; then
+  AC_CHECK_FUNC(iconv, ac_found_iconv=yes, ac_found_iconv=no)
+  if test "x$ac_found_iconv" = "xno"; then
+    AC_CHECK_LIB(iconv, iconv, ac_found_iconv=yes)
+    if test "x$ac_found_iconv" = "xno"; then
+      AC_CHECK_LIB(iconv, libiconv, ac_found_iconv=yes)
+    fi
+    if test "x$ac_found_iconv" != "xno"; then
+      LIBS="-liconv $LIBS"
+    fi
+  fi
+fi
+if test "x$ac_found_iconv" = xyes; then
+  AC_DEFINE(HAVE_ICONV, 1, [Define if you have the iconv() function.])
+fi
+
+dnl Check if iconv uses const in prototype declaration
+if test "x$ac_found_iconv" = "xyes"; then
+  AC_CACHE_CHECK(for iconv declaration, ac_cv_iconv_const,
+    [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdlib.h>
+        #include <iconv.h>]],
+        [[#ifdef __cplusplus
+          "C"
+          #endif
+          #if defined(__STDC__) || defined(__cplusplus)
+          size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);
+          #else
+          size_t iconv();
+          #endif]])],
+      [ac_cv_iconv_const=],
+      [ac_cv_iconv_const=const])])
+  AC_DEFINE_UNQUOTED([ICONV_CONST], $ac_cv_iconv_const,
+    [Define as const if the declaration of iconv() needs const.])
+fi
 
 if test x$enable_pcre = xyes; then
 dnl pcre-config should probably be employed here

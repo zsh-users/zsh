@@ -701,7 +701,7 @@ extern short ospeed;
 #else
 # ifdef HAVE_LANGINFO_H
 #   include <langinfo.h>
-#   if defined(HAVE_ICONV_H) || defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+#   ifdef HAVE_ICONV
 #     include <iconv.h>
 #   endif
 # endif

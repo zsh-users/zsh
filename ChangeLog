@@ -1,3 +1,8 @@
+2005-02-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 20862: configure.ac, Src/system.h, Src/utils.c: attempt to
+	fix configure scripts to detect iconv properly
+
 2005-02-24  Peter Stephenson  <pws@csr.com>
 
 	* 20861: Src/Zle/complist.c, Src/Zle/zle.h, Src/Zle/zle_hist.c,
@@ -60,6 +65,7 @@
 	release.
 
 2005-02-19  Motoi Washida <a66@h8.dion.ne.jp>
+
 	* users/8522: Completion/Darwin/Command/_defaults: fixed the
 	number of spaces broken while sending the patch by email.
 
