@@ -1395,7 +1395,9 @@ dquote_parse(char endchar, int sub)
 		break;
 	    if (bct) {
 		add(Dnull);
+		cmdpush(CS_DQUOTE);
 		err = dquote_parse('"', sub);
+		cmdpop();
 		c = Dnull;
 	    } else
 		err = 1;

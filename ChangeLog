@@ -1,3 +1,8 @@
+2001-08-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15708: Src/lex.c: Fix PS2 prompt when there's an open double
+	quote inside an open braced-parameter expression.
+
 2001-08-25  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15707: Src/init.c: Fix history crash caused by re-entering
