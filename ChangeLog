@@ -1,3 +1,8 @@
+2000-07-10  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12208: Completion/Core/_path_files: avoid insertion of `+'
+ 	before ~1/<TAB>; don't use undeclared local $tmp
+	
 2000-07-08  Tanaka Akira  <akr@zsh.org>
 
 	* 12201: Completion/User/_java: fix completion for jar. complete

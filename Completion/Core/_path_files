@@ -209,21 +209,23 @@ if [[ "$pre[1]" = \~ && -z "$compstate[quote]" ]]; then
   elif [[ "$linepath" = ([-+]|)[0-9]## ]]; then
     if [[ "$linepath" != [-+]* ]]; then
       if [[ -o pushdminus ]]; then
-        linepath="-$linepath"
+        tmp1="-$linepath"
       else
-        linepath="+$linepath"
+        tmp1="+$linepath"
       fi
+    else
+      tmp1="$linepath"
     fi
     if [[ "$linepath" = -* ]]; then
-      tmp=$(( $#dirstack $linepath ))
+      tmp1=$(( $#dirstack $tmp1 ))
     else
-      tmp=$linepath[2,-1]
+      tmp1=$tmp1[2,-1]
     fi
-    [[ -o pushdminus ]] && tmp=$(( $#dirstack - $tmp ))
-    if (( ! tmp )); then
+    [[ -o pushdminus ]] && tmp1=$(( $#dirstack - $tmp1 ))
+    if (( ! tmp1 )); then
       realpath=$PWD/
-    elif [[ tmp -le $#dirstack ]]; then
-      realpath=$dirstack[tmp]/
+    elif [[ tmp1 -le $#dirstack ]]; then
+      realpath=$dirstack[tmp1]/
     else
       _message 'not enough directory stack entries'
       return 1
