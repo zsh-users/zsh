@@ -1528,7 +1528,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 
 	    /* Current shell should not fork unless the *
 	     * exec occurs at the end of a pipeline.    */
-	    if ((cflags & BINF_EXEC) && last1 == 2)
+	    if ((cflags & BINF_EXEC) && last1)
 		flags |= CFLAG_EXEC;
 
 	    /* Empty command */
@@ -2069,8 +2069,9 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    restore_params(restorelist, removelist);
 
 	} else {
-	    if (flags & CFLAG_EXEC) {
+	    if (!forked)
 		setiparam("SHLVL", --shlvl);
+	    if (flags & CFLAG_EXEC) {
 		/* If we are exec'ing a command, and we are not *
 		 * in a subshell, then save the history file.   */
 		if (!subsh && isset(RCS) && interact && !nohistsave)
