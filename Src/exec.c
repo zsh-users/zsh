@@ -124,6 +124,11 @@ mod_export int sfcontext;
 /**/
 struct execstack *exstack;
 
+/* Stack with names of functions currently active. */
+
+/**/
+mod_export Funcstack funcstack;
+
 #define execerr() if (!forked) { lastval = 1; return; } else _exit(1)
 
 static LinkList args;
@@ -3107,6 +3112,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     int oldzoptind, oldlastval, oldoptcind;
     char saveopts[OPT_SIZE], *oldscriptname;
     int obreaks = breaks;
+    struct funcstack fstack;
 
     HEAPALLOC {
 	pushheap();
@@ -3152,7 +3158,11 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 		argzero = ztrdup(argzero);
 	    }
 	}
-	runshfunc(prog, wrappers, dupstring(name));
+	fstack.name = dupstring(name);
+	fstack.prev = funcstack;
+	funcstack = &fstack;
+	runshfunc(prog, wrappers, fstack.name);
+	funcstack = fstack.prev;
 	if (retflag) {
 	    retflag = 0;
 	    breaks = obreaks;

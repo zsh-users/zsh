@@ -296,6 +296,7 @@ typedef struct param     *Param;
 typedef struct paramdef  *Paramdef;
 typedef struct cmdnam    *Cmdnam;
 typedef struct shfunc    *Shfunc;
+typedef struct funcstack *Funcstack;
 typedef struct funcwrap  *FuncWrap;
 typedef struct builtin   *Builtin;
 typedef struct nameddir  *Nameddir;
@@ -822,6 +823,13 @@ struct shfunc {
 #define SFC_WIDGET   4		/* user defined widget */
 #define SFC_COMPLETE 5		/* called from completion code */
 #define SFC_CWIDGET  6		/* new style completion widget */
+
+/* node in function stack */
+
+struct funcstack {
+    Funcstack prev;		/* previous in stack */
+    char *name;			/* name of function called */
+};
 
 /* node in list of function call wrappers */
 

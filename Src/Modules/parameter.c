@@ -555,40 +555,23 @@ scanpmdisfunctions(HashTable ht, ScanFunc func, int flags)
 
 /* Functions for the funcstack special parameter. */
 
-static LinkList funcstack;
-
 /**/
 static char **
 funcstackgetfn(Param pm)
 {
+    Funcstack f;
+    int num;
     char **ret, **p;
-    LinkNode node;
 
-    ret = (char **) zhalloc((countlinknodes(funcstack) + 1) * sizeof(char *));
+    for (f = funcstack, num = 0; f; f = f->prev, num++);
 
-    for (node = firstnode(funcstack), p = ret; node; incnode(node), p++)
-	*p = (char *) getdata(node);
+    ret = (char **) zhalloc((num + 1) * sizeof(char *));
+
+    for (f = funcstack, p = ret; f; f = f->prev, p++)
+	*p = f->name;
     *p = NULL;
 
     return ret;
-}
-
-/**/
-static int
-func_wrapper(Eprog prog, FuncWrap w, char *name)
-{
-    PERMALLOC {
-	pushnode(funcstack, ztrdup(name));
-    } LASTALLOC;
-
-    runshfunc(prog, w, name);
-
-    DPUTS(strcmp(name, (char *) getdata(firstnode(funcstack))),
-	  "funcstack wrapper with wrong function");
-
-    zsfree((char *) remnode(funcstack, firstnode(funcstack)));
-
-    return 0;
 }
 
 /* Functions for the builtins special parameter. */
@@ -1937,10 +1920,6 @@ static struct pardef partab[] = {
     { NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
 };
 
-static struct funcwrap wrapper[] = {
-    WRAPDEF(func_wrapper),
-};
-
 /**/
 int
 setup_(Module m)
@@ -1980,12 +1959,6 @@ boot_(Module m)
 	    def->pm->unsetfn = def->unsetfn;
 	}
     }
-    PERMALLOC {
-	funcstack = newlinklist();
-    } LASTALLOC;
-
-    addwrapper(m, wrapper);
-
     return 0;
 }
 
@@ -2005,9 +1978,6 @@ cleanup_(Module m)
 	    unsetparam_pm(pm, 0, 1);
 	}
     }
-    deletewrapper(m, wrapper);
-    freelinklist(funcstack, freestr);
-
     return 0;
 }
 
