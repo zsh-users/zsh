@@ -523,8 +523,9 @@ typedef struct menustack *Menustack;
 struct menustack {
     Menustack prev;
     char *line;
-    char *brbeg;
-    char *brend;
+    Brinfo brbeg;
+    Brinfo brend;
+    int nbrbeg, nbrend;
     int cs, acc, nmatches;
     struct menuinfo info;
     Cmgroup amatches, pmatches, lastmatches, lastlmatches;
@@ -605,8 +606,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 		s->lastmatches = lastmatches;
 		s->lastlmatches = lastlmatches;
 		s->acc = menuacc;
-		s->brbeg = dupstring(brbeg);
-		s->brend = dupstring(brend);
+		s->brbeg = dupbrinfo(brbeg, NULL);
+		s->brend = dupbrinfo(brend, NULL);
+		s->nbrbeg = nbrbeg;
+		s->nbrend = nbrend;
 		s->nmatches = nmatches;
 		menucmp = menuacc = 0;
 		fixsuffix();
@@ -638,8 +641,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 		s->amatches = s->pmatches =
 		    s->lastmatches = s->lastlmatches = NULL;
 		s->acc = menuacc;
-		s->brbeg = dupstring(brbeg);
-		s->brend = dupstring(brend);
+		s->brbeg = dupbrinfo(brbeg, NULL);
+		s->brend = dupbrinfo(brend, NULL);
+		s->nbrbeg = nbrbeg;
+		s->nbrend = nbrend;
 		s->nmatches = nmatches;
 		acceptlast();
 		do_menucmp(0);
@@ -670,10 +675,14 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    nmatches = u->nmatches;
 		    hasoldlist = 1;
 		}
-		zsfree(brbeg);
-		zsfree(brend);
-		brbeg = ztrdup(u->brbeg);
-		brend = ztrdup(u->brend);
+		PERMALLOC {
+		    freebrinfo(brbeg);
+		    freebrinfo(brend);
+		    brbeg = dupbrinfo(u->brbeg, &lastbrbeg);
+		    brend = dupbrinfo(u->brend, &lastbrend);
+		    nbrbeg = u->nbrbeg;
+		    nbrend = u->nbrend;
+		} LASTALLOC;
 		u = u->prev;
 		clearlist = 1;
 		setwish = 1;

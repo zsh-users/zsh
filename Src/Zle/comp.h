@@ -197,6 +197,8 @@ struct cmgroup {
     LinkList lfmatches;		/* list of matches without fignore */
     LinkList lallccs;		/* list of used compctls */
     int num;			/* number of this group */
+    int nbrbeg;			/* number of opened braces */
+    int nbrend;			/* number of closed braces */
     /* The following is collected/used during listing. */
     int dcount;			/* number of matches to list in columns */
     int cols;			/* number of columns */
@@ -229,8 +231,8 @@ struct cmatch {
     char *disp;			/* string to display (compadd -d) */
     char autoq;			/* closing quote to add automatically */
     int flags;			/* see CMF_* below */
-    int brpl;			/* the place where to put the brace prefix */
-    int brsl;			/* ...and the suffix */
+    int *brpl;			/* places where to put the brace prefixes */
+    int *brsl;			/* ...and the suffixes */
     char *rems;			/* when to remove the suffix */
     char *remf;			/* shell function to call for suffix-removal */
     int qipl;			/* length of quote-prefix */
@@ -355,6 +357,19 @@ struct cldata {
 
 typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
 			    char *, struct stat *);
+
+/* Information about one brace run. */
+
+typedef struct brinfo *Brinfo;
+
+struct brinfo {
+    Brinfo next;		/* next in list */
+    Brinfo prev;		/* previous (only for closing braces) */
+    char *str;			/* the string to insert */
+    int pos;			/* original position */
+    int qpos;			/* original position, with quoting */
+    int curpos;			/* position for current match */
+};
 
 /* Data given to hooks. */
 

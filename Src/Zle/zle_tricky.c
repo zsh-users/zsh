@@ -112,24 +112,21 @@ static int movetoend;
 /**/
 int menucmp, menuacc;
 
-/**/
-static char *lastprebr, *lastpostbr;
-
 /* Information about menucompletion. */
 
 /**/
 struct menuinfo minfo;
 
-/* This is for completion inside a brace expansion. brbeg and brend hold  *
- * strings that were temporarily removed from the string to complete.     *
- * brpl and brsl, hold the offset of these strings.                 *
- * brpcs and brscs hold the positions of the re-inserted string in the    *
- * line.                                                                  */
+/* Lists of brace-infos before/after cursor (first and last for each). */
 
 /**/
-char *brbeg = NULL, *brend = NULL;
+Brinfo brbeg, lastbrbeg, brend, lastbrend;
 
-static int brpl, brsl, brpcs, brscs, qbrpl, qbrsl, hasunqu;
+/**/
+int nbrbeg, nbrend;
+
+static char *lastprebr, *lastpostbr;
+static int hasunqu, useqbr, brpcs, brscs;
 
 /* The list of matches.  fmatches contains the matches we first ignore *
  * because of fignore.                                                 */
@@ -606,18 +603,18 @@ acceptlast(void)
     }
     menuacc++;
 
-    if (brbeg && *brbeg) {
+    if (brbeg) {
 	int l;
 
 	iremovesuffix(',', 1);
 
 	l = (brscs >= 0 ? brscs : cs) - brpcs;
 
-	zsfree(brbeg);
-	brbeg = (char *) zalloc(l + 2);
-	memcpy(brbeg, line + brpcs, l);
-	brbeg[l] = ',';
-	brbeg[l + 1] = '\0';
+	zsfree(lastbrbeg->str);
+	lastbrbeg->str = (char *) zalloc(l + 2);
+	memcpy(lastbrbeg->str, line + brpcs, l);
+	lastbrbeg->str[l] = ',';
+	lastbrbeg->str[l + 1] = '\0';
     } else {
 	int l;
 
@@ -1289,6 +1286,49 @@ unmetafy_line(void)
     (void) unmetafy((char *) line, &ll);
 }
 
+/* Free a brinfo list. */
+
+/**/
+void
+freebrinfo(Brinfo p)
+{
+    Brinfo n;
+
+    while (p) {
+	n = p->next;
+	zsfree(p->str);
+	zfree(p, sizeof(*p));
+
+	p = n;
+    }
+}
+
+/* Duplicate a brinfo list. */
+
+/**/
+Brinfo
+dupbrinfo(Brinfo p, Brinfo *last)
+{
+    Brinfo ret = NULL, *q = &ret, n = NULL;
+
+    while (p) {
+	n = *q = (Brinfo) alloc(sizeof(*n));
+	q = &(n->next);
+
+	n->next = NULL;
+	n->str = dupstring(p->str);
+	n->pos = p->pos;
+	n->qpos = p->qpos;
+	n->curpos = p->curpos;
+
+	p = p->next;
+    }
+    if (last)
+	*last = n;
+
+    return ret;
+}
+
 /* Lasciate ogni speranza.                                                  *
  * This function is a nightmare.  It works, but I'm sure that nobody really *
  * understands why.  The problem is: to make it cleaner we would need       *
@@ -1301,9 +1341,14 @@ get_comp_string(void)
     int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct;
     char *s = NULL, *linptr, *tmp, *p, *tt = NULL;
 
-    zsfree(brbeg);
-    zsfree(brend);
-    brbeg = brend = NULL;
+    freebrinfo(brbeg);
+    freebrinfo(brend);
+    brbeg = lastbrbeg = brend = lastbrend = NULL;
+    nbrbeg = nbrend = 0;
+    zsfree(lastprebr);
+    zsfree(lastpostbr);
+    lastprebr = lastpostbr = NULL;
+
     /* This global flag is used to signal the lexer code if it should *
      * expand aliases or not.                                         */
     noaliases = isset(COMPLETEALIASES);
@@ -1704,16 +1749,14 @@ get_comp_string(void)
 	    }
 
 	if (!isset(IGNOREBRACES)) {
-	    /* Try and deal with foo{xxx etc.; only simple cases
-	     * (only one inbrace, completion after inbrace and before outbrace
-	     * if present).
-	     */
-	    int myoffs = isset(COMPLETEINWORD) ? offs : strlen(s);
-	    tt = NULL;
-	    /* First check the conditions mentioned above
-	     * and locate opening brace
-	     */
-	    for (i = 0, p = s; *p; p++, i++) {
+	    /* Try and deal with foo{xxx etc. */
+	    char *curs = s + (isset(COMPLETEINWORD) ? offs : strlen(s));
+	    char *predup = dupstring(s), *dp = predup;
+	    char *bbeg = NULL, *bend = NULL, *dbeg;
+	    char *lastp = NULL, *firsts = NULL;
+	    int cant = 0, begi, boffs = offs, hascom = 0;
+
+	    for (i = 0, p = s; *p; p++, dp++, i++) {
 		/* careful, ${... is not a brace expansion...
 		 * we try to get braces after a parameter expansion right,
 		 * but this may fail sometimes. sorry.
@@ -1721,6 +1764,7 @@ get_comp_string(void)
 		if (*p == String || *p == Qstring) {
 		    if (p[1] == Inbrace || p[1] == Inpar || p[1] == Inbrack) {
 			char *tp = p + 1;
+
 			if (skipparens(*tp, (*tp == Inbrace ? Outbrace :
 					     (*tp == Inpar ? Outpar : Outbrack)),
 				       &tp)) {
@@ -1729,6 +1773,7 @@ get_comp_string(void)
 			}
 			i += tp - p;
 			p = tp;
+			dp += tp - p;
 		    } else {
 			char *tp = p + 1;
 
@@ -1754,80 +1799,186 @@ get_comp_string(void)
 				break;
 			    }
 			    if (*tp == Inbrace) {
-				tt = NULL;
+				cant = 1;
 				break;
 			    }
 			    tp--;
 			    i += tp - p;
 			    p = tp;
+			    dp += tp - p;
 			}
 		    }
-		} else if (*p == Inbrace) {
-		    if (tt) {
-			/* too many inbraces */
-			tt = NULL;
+		} else if (p < curs) {
+		    if (*p == Outbrace) {
+			cant = 1;
 			break;
 		    }
-		    tt = p;
-		} else if (*p == Outbrace && i < myoffs) {
-		    /* outbrace is before cursor pos, so nothing to complete */
-		    tt = NULL;
-		    break;
+		    if (*p == Inbrace) {
+			if (bbeg) {
+			    Brinfo new;
+			    int len = bend - bbeg;
+
+			    new = (Brinfo) zalloc(sizeof(*new));
+			    nbrbeg++;
+
+			    new->next = NULL;
+			    if (lastbrbeg)
+				lastbrbeg->next = new;
+			    else
+				brbeg = new;
+			    lastbrbeg = new;
+
+			    new->next = NULL;
+			    PERMALLOC {
+				new->str = dupstrpfx(bbeg, len);
+				untokenize(new->str);
+			    } LASTALLOC;
+			    new->pos = begi;
+			    *dbeg = '\0';
+			    new->qpos = strlen(quotename(predup, NULL));
+			    *dbeg = '{';
+			    i -= len;
+			    boffs -= len;
+			    strcpy(dbeg, dbeg + len);
+			    dp -= len;
+			}
+			bbeg = lastp = p;
+			dbeg = dp;
+			bend = p + 1;
+			begi = i;
+		    } else if (*p == Comma && bbeg) {
+			bend = p + 1;
+			hascom = 1;
+		    }
+		} else {
+		    if (*p == Inbrace) {
+			cant = 1;
+			break;
+		    }
+		    if (p == curs) {
+			if (bbeg) {
+			    Brinfo new;
+			    int len = bend - bbeg;
+
+			    new = (Brinfo) zalloc(sizeof(*new));
+			    nbrbeg++;
+
+			    new->next = NULL;
+			    if (lastbrbeg)
+				lastbrbeg->next = new;
+			    else
+				brbeg = new;
+			    lastbrbeg = new;
+
+			    PERMALLOC {
+				new->str = dupstrpfx(bbeg, len);
+				untokenize(new->str);
+			    } LASTALLOC;
+			    new->pos = begi;
+			    *dbeg = '\0';
+			    new->qpos = strlen(quotename(predup, NULL));
+			    *dbeg = '{';
+			    i -= len;
+			    boffs -= len;
+			    strcpy(dbeg, dbeg + len);
+			    dp -= len;
+			}
+			bbeg = NULL;
+		    }
+		    if (*p == Comma) {
+			if (!bbeg)
+			    bbeg = p;
+			hascom = 1;
+		    } else if (*p == Outbrace) {
+			Brinfo new;
+			int len;
+
+			if (!bbeg)
+			    bbeg = p;
+			len = p + 1 - bbeg;
+			if (!firsts)
+			    firsts = p + 1;
+			
+			new = (Brinfo) zalloc(sizeof(*new));
+			nbrend++;
+
+			if (!lastbrend)
+			    lastbrend = new;
+
+			new->next = brend;
+			brend = new;
+
+			PERMALLOC {
+			    new->str = dupstrpfx(bbeg, len);
+			    untokenize(new->str);
+			} LASTALLOC;
+			new->pos = dp - predup - len + 1;
+			new->qpos = len;
+			bbeg = NULL;
+		    }
 		}
 	    }
+	    if (cant) {
+		freebrinfo(brbeg);
+		freebrinfo(brend);
+		brbeg = lastbrbeg = brend = lastbrend = NULL;
+		nbrbeg = nbrend = 0;
+	    } else {
+		if (p == curs && bbeg) {
+		    Brinfo new;
+		    int len = bend - bbeg;
 
-	    if (tt && tt < s + myoffs) {
-		/* Braces are go:  delete opening brace */
-		char *com = NULL, *tmp;
-		int pl, sl;
+		    new = (Brinfo) zalloc(sizeof(*new));
+		    nbrbeg++;
 
-		brbeg = dupstring(tt);
-		brpl = tt - s;
-		tmp = dupstrpfx(s, tt - s);
-		qbrpl = strlen(quotename(tmp, NULL));
-		pl = 1;
-		sl = 0;
-		chuck(tt);
-		offs--;
-		myoffs--;
+		    new->next = NULL;
+		    if (lastbrbeg)
+			lastbrbeg->next = new;
+		    else
+			brbeg = new;
+		    lastbrbeg = new;
 
-		/* Look for text up to comma before cursor and delete it */
-		for (i = tt - s, p = tt; *p && i < myoffs; p++, i++)
-		    if (*p == Comma)
-			com = p;
-		if (com) {
-		    i = com - tt + 1;
-		    offs -= i;
-		    myoffs -= i;
-		    strcpy(tt, tt + i);
-		    pl += i;
+		    PERMALLOC {
+			new->str = dupstrpfx(bbeg, len);
+			untokenize(new->str);
+		    } LASTALLOC;
+		    new->pos = begi;
+		    *dbeg = '\0';
+		    new->qpos = strlen(quotename(predup, NULL));
+		    *dbeg = '{';
+		    boffs -= len;
+		    strcpy(dbeg, dbeg + len);
 		}
-		brbeg[pl] = '\0';
+		if (brend) {
+		    Brinfo bp, prev = NULL;
+		    int p, l;
 
-		/* Look for text between subsequent comma
-		 * and closing brace or end of string and delete it
-		 */
-		for (p = s + myoffs; *p && *p != Outbrace && *p != Comma; p++);
-		if (*p == Comma || *p == Outbrace) {
-		    brend = dupstring(p);
-		    sl = 1;
-		    while (*p && *p != Outbrace) {
-			chuck(p); sl++;
+		    for (bp = brend; bp; bp = bp->next) {
+			bp->prev = prev;
+			prev = bp;
+			p = bp->pos;
+			l = bp->qpos;
+			bp->pos = strlen(predup + p + l);
+			bp->qpos = strlen(quotename(predup + p + l, NULL));
+			strcpy(predup + p, predup + p + l);
 		    }
-		    if (*p == Outbrace)
-			chuck(p);
-		    brsl = strlen(s) - (p - s);
-		    brend[sl] = '\0';
-		    qbrsl = strlen(quotename(p, NULL));
 		}
-		/* we are still waiting for an outbrace and maybe commas */
-		if (brbeg)
-		    untokenize(brbeg = ztrdup(brbeg));
-		if (brend)
-		    untokenize(brend = ztrdup(brend));
+		if (hascom) {
+		    if (lastp) {
+			char sav = *lastp;
+
+			*lastp = '\0';
+			untokenize(lastprebr = ztrdup(s));
+			*lastp = sav;
+		    }
+		    if ((lastpostbr = ztrdup(firsts)))
+			untokenize(lastpostbr);
+		}
+		zsfree(s);
+		s = ztrdup(predup);
+		offs = boffs;
 	    }
 	}
-
     } LASTALLOC;
     lexrestore();
 
@@ -2043,9 +2194,9 @@ free_cline(Cline l)
 /* Copy a cline list. */
 
 static Cline
-cp_cline(Cline l)
+cp_cline(Cline l, int deep)
 {
-    Cline r = NULL, *p = &r, t;
+    Cline r = NULL, *p = &r, t, lp = NULL;
 
     while (l) {
 	if ((t = freecl))
@@ -2053,7 +2204,13 @@ cp_cline(Cline l)
 	else
 	    t = (Cline) zhalloc(sizeof(*t));
 	memcpy(t, l, sizeof(*t));
-	*p = t;
+	if (deep) {
+	    if (t->prefix)
+		t->prefix = cp_cline(t->prefix, 0);
+	    if (t->suffix)
+		t->suffix = cp_cline(t->suffix, 0);
+	}
+	*p = lp = t;
 	p = &(t->next);
 	l = l->next;
     }
@@ -2408,18 +2565,21 @@ add_match_sub(Cmatcher m, char *l, int ll, char *w, int wl)
  * is used (and return the length used). */
 
 static int
-match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test, int part)
+match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
+	  int sfx, int test, int part)
 {
     int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw;
-    int il = 0, iw = 0, t, ind, add, bc = (bp ? *bp : 0), he = 0;
+    int il = 0, iw = 0, t, ind, add, he = 0, bpc, obc = bc;
     VARARR(unsigned char, ea, ll + 1);
     char *ow;
     Cmlist ms;
     Cmatcher mp, lm = NULL;
+    Brinfo bp = NULL;
 
-    if (!test)
+    if (!test) {
 	start_match();
-
+	bp = *bpp;
+    }
     /* Adjust the pointers and get the values for subscripting and
      * incrementing. */
 
@@ -2436,9 +2596,9 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test, int part)
 
     /* If the brace is at the beginning, we have to treat it now. */
 
-    if (!test && !bc && bp) {
-	*bp = 0;
-	bp = NULL;
+    if (!test && bp && bc >= bp->pos) {
+	bp->curpos = bc;
+	bp = bp->next;
     }
     while (ll && lw) {
 	/* First try the matchers. */
@@ -2514,11 +2674,11 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test, int part)
 				savw = tp[-zoff];
 				tp[-zoff] = '\0';
 				t = match_str(l - ll, w - lw,
-					      NULL, NULL, 1, 2, part);
+					      NULL, 0, NULL, 1, 2, part);
 				tp[-zoff] = savw;
 			    } else
 				t = match_str(l + llen + moff, tp + moff,
-					      NULL, NULL, 0, 1, part);
+					      NULL, 0, NULL, 0, 1, part);
 			    if (t || !both)
 				break;
 			}
@@ -2592,12 +2752,14 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test, int part)
 		    }
 		    ll -= llen; il += llen;
 		    lw -= alen; iw += alen;
-		    bc -= llen;
+		    bc += llen;
 
-		    if (!test && bp && bc <= 0) {
-			*bp = matchbufadded + bc;
-			bp = NULL;
-		    }
+		    if (!test)
+			while (bp &&
+			       bc >= (bpc = (useqbr ? bp->qpos : bp->pos))) {
+			    bp->curpos = matchbufadded + bpc - bc + obc;
+			    bp = bp->next;
+			}
 		    ow = w;
 
 		    if (!llen && !alen) {
@@ -2689,12 +2851,14 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test, int part)
 		    }
 		    il += mp->llen; iw += mp->wlen;
 		    ll -= mp->llen; lw -= mp->wlen;
-		    bc -= mp->llen;
+		    bc += mp->llen;
 
-		    if (!test && bp && bc <= 0) {
-			*bp = matchbufadded + bc;
-			bp = NULL;
-		    }
+		    if (!test)
+			while (bp &&
+			       bc >= (bpc = (useqbr ? bp->qpos : bp->pos))) {
+			    bp->curpos = matchbufadded + bpc - bc + obc;
+			    bp = bp->next;
+			}
 		    ow = w;
 		    lm = NULL;
 		    he = 0;
@@ -2711,11 +2875,12 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test, int part)
 	    l += add; w += add;
 	    il++; iw++;
 	    ll--; lw--;
-	    bc--;
-	    if (!test && bc <= 0 && bp) {
-		*bp = matchbufadded + (sfx ? (ow - w) : (w - ow));
-		bp = NULL;
-	    }
+	    bc++;
+	    if (!test)
+		while (bp && bc >= (useqbr ? bp->qpos : bp->pos)) {
+		    bp->curpos = matchbufadded + (sfx ? (ow - w) : (w - ow)) + obc;
+		    bp = bp->next;
+		}
 	    lm = NULL;
 	    he = 0;
 	} else {
@@ -2732,12 +2897,9 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test, int part)
     if (test)
 	return (part || !ll);
 
-    if (part)
-	return il;
-
     /* In top-level calls, if ll is non-zero (unmatched portion in l),
      * we have to free the collected clines. */
-    if (ll) {
+    if (!part && ll) {
 	abort_match();
 
 	return -1;
@@ -2770,7 +2932,8 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test, int part)
     }
     /* Finally, return the number of matched characters. */
 
-    return iw;
+    *bpp = bp;
+    return (part ? il : iw);
 }
 
 /* Wrapper for match_str(), only for a certain length and only doing
@@ -2784,7 +2947,7 @@ match_parts(char *l, char *w, int n, int part)
     int ret;
 
     l[n] = w[n] = '\0';
-    ret = match_str(l, w, NULL, NULL, 0, 1, part);
+    ret = match_str(l, w, NULL, 0, NULL, 0, 1, part);
     l[n] = lsav;
     w[n] = wsav;
 
@@ -2802,8 +2965,8 @@ match_parts(char *l, char *w, int n, int part)
  * and the suffix don't match the word w. */
 
 static char *
-comp_match(char *pfx, char *sfx, char *w, Patprog cp,
-	   Cline *clp, int qu, int *bpl, int *bsl, int *exact)
+comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
+	   Brinfo *bpl, int bcp, Brinfo *bsl, int bcs, int *exact)
 {
     char *r = NULL;
 
@@ -2824,8 +2987,6 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp,
 	wl = strlen(w);
 	*clp = bld_parts(w, wl, wl, NULL);
 	*exact = 0;
-	*bpl = (qu ? qbrpl : brpl);
-	*bsl = (qu ? qbrsl : brsl);
     } else {
 	Cline pli, plil;
 	int mpl, rpl, wl;
@@ -2838,8 +2999,8 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp,
 
 	/* Always try to match the prefix. */
 
-	*bpl = (qu ? qbrpl : brpl);
-	if ((mpl = match_str(pfx, w, bpl, &rpl, 0, 0, 0)) < 0)
+	useqbr = qu;
+	if ((mpl = match_str(pfx, w, bpl, bcp, &rpl, 0, 0, 0)) < 0)
 	    return NULL;
 
 	if (sfx && *sfx) {
@@ -2863,8 +3024,8 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp,
 	    plil = matchlastpart;
 
 	    /* The try to match the suffix. */
-	    *bsl = (qu ? qbrsl : brsl);
-	    if ((msl = match_str(sfx, w + mpl, bsl, &rsl, 1, 0, 0)) < 0) {
+
+	    if ((msl = match_str(sfx, w + mpl, bsl, bcs, &rsl, 1, 0, 0)) < 0) {
 		free_cline(pli);
 
 		return NULL;
@@ -3552,8 +3713,8 @@ sub_join(Cline a, Cline b, Cline e, int anew)
 	ca = a->prefix;
 
 	while (n != op) {
-	    e->prefix = cp_cline(n);
-	    a->prefix = cp_cline(ca);
+	    e->prefix = cp_cline(n, 0);
+	    a->prefix = cp_cline(ca, 0);
 
 	    if (anew) {
 		join_psfx(e, a, NULL, NULL, 0);
@@ -3752,8 +3913,10 @@ join_clines(Cline o, Cline n)
 static Cmatch
 add_match_data(int alt, char *str, Cline line,
 	       char *ipre, char *ripre, char *isuf,
-	       char *pre, char *prpre, char *ppre, char *psuf, char *suf,
-	       int bpl, int bsl, int flags, int exact)
+	       char *pre, char *prpre,
+	       char *ppre, Cline pline,
+	       char *psuf, Cline sline,
+	       char *suf, int flags, int exact)
 {
     Cmatch cm;
     Aminfo ai = (alt ? fainfo : ainfo);
@@ -3765,10 +3928,14 @@ add_match_data(int alt, char *str, Cline line,
     DPUTS(!line, "BUG: add_match_data() without cline");
 
     cline_matched(line);
+    if (pline)
+	cline_matched(pline);
+    if (sline)
+	cline_matched(sline);
 
     /* If there is a path suffix, we build a cline list for it and
      * append it to the list for the match itself. */
-    if (psuf)
+    if (!sline && psuf)
 	salen = (psl = strlen(psuf));
     if (isuf)
 	salen += (isl = strlen(isuf));
@@ -3778,6 +3945,7 @@ add_match_data(int alt, char *str, Cline line,
     if (salen) {
 	char *asuf = (char *) zhalloc(salen);
 	Cline pp, p, s, sl = NULL;
+	
 
 	if (psl)
 	    memcpy(asuf, psuf, psl);
@@ -3791,6 +3959,15 @@ add_match_data(int alt, char *str, Cline line,
 	if (salen > qisl) {
 	    s = bld_parts(asuf, salen - qisl, salen - qisl, &sl);
 
+	    if (sline) {
+		Cline sp;
+
+		sline = cp_cline(sline, 1);
+
+		for (sp = sline; sp->next; sp = sp->next);
+		sp->next = s;
+		s = sline;
+	    }
 	    if (!(p->flags & (CLF_SUF | CLF_MID)) &&
 		!p->llen && !p->wlen && !p->olen) {
 		if (p->prefix) {
@@ -3818,9 +3995,22 @@ add_match_data(int alt, char *str, Cline line,
 	    qsl->prefix = NULL;
 	    if (sl)
 		sl->next = qsl;
-	    else
+	    else if (sline) {
+		Cline sp;
+
+		sline = cp_cline(sline, 1);
+
+		for (sp = sline; sp->next; sp = sp->next);
+		sp->next = qsl;
+		p->next = sline;
+	    } else
 		p->next = qsl;
 	}
+    } else if (sline) {
+	Cline p;
+
+	for (p = line; p->next; p = p->next);
+	p->next = cp_cline(sline, 1);
     }
     /* The prefix is handled differently because the completion code
      * is much more eager to insert the -P prefix than it is to insert
@@ -3831,15 +4021,25 @@ add_match_data(int alt, char *str, Cline line,
 	palen += (ipl = strlen(ipre));
     if (pre)
 	palen += (pl = strlen(pre));
-    if (ppre)
+    if (!pline && ppre)
 	palen += (ppl = strlen(ppre));
 
     if (pl) {
-	if (ppl) {
-	    Cline lp, p = bld_parts(ppre, ppl, ppl, &lp);
+	if (ppl || pline) {
+	    Cline lp, p;
 
-	    if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID))) {
-		lp->prefix->next = line->prefix;
+	    if (pline)
+		for (p = cp_cline(pline, 1), lp = p; lp->next; lp = lp->next);
+	    else
+		p = bld_parts(ppre, ppl, ppl, &lp);
+
+	    if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID)) &&
+		!p->llen && !p->wlen && !p->olen) {
+		Cline lpp;
+
+		for (lpp = lp->prefix; lpp->next; lpp = lpp->next);
+
+		lpp->next = line->prefix;
 		line->prefix = lp->prefix;
 		lp->prefix = NULL;
 
@@ -3876,22 +4076,35 @@ add_match_data(int alt, char *str, Cline line,
 	    lp->next = line;
 	    line = p;
 	}
-    } else if (palen) {
-	char *apre = (char *) zhalloc(palen);
+    } else if (palen || pline) {
 	Cline p, lp;
 
-	if (qipl)
-	    memcpy(apre, qipre, qipl);
-	if (ipl)
-	    memcpy(apre + qipl, ipre, ipl);
-	if (pl)
-	    memcpy(apre + qipl + ipl, pre, pl);
-	if (ppl)
-	    memcpy(apre + qipl + ipl + pl, ppre, ppl);
+	if (palen) {
+	    char *apre = (char *) zhalloc(palen);
 
-	p = bld_parts(apre, palen, palen, &lp);
-	if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID))) {
-	    lp->prefix->next = line->prefix;
+	    if (qipl)
+		memcpy(apre, qipre, qipl);
+	    if (ipl)
+		memcpy(apre + qipl, ipre, ipl);
+	    if (pl)
+		memcpy(apre + qipl + ipl, pre, pl);
+	    if (ppl)
+		memcpy(apre + qipl + ipl + pl, ppre, ppl);
+
+	    p = bld_parts(apre, palen, palen, &lp);
+
+	    if (pline)
+		for (lp->next = cp_cline(pline, 1); lp->next; lp = lp->next);
+	} else
+	    for (p = lp = cp_cline(pline, 1); lp->next; lp = lp->next);
+
+	if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID)) &&
+	    !p->llen && !p->wlen && !p->olen) {
+	    Cline lpp;
+
+	    for (lpp = lp->prefix; lpp->next; lpp = lpp->next);
+
+	    lpp->next = line->prefix;
 	    line->prefix = lp->prefix;
 	    lp->prefix = NULL;
 
@@ -3910,12 +4123,6 @@ add_match_data(int alt, char *str, Cline line,
 	    line = p;
 	}
     }
-    /* Then build the unambiguous cline list. */
-    ai->line = join_clines(ai->line, line);
-
-    mnum++;
-    ai->count++;
-    
     /* Allocate and fill the match structure. */
     cm = (Cmatch) zhalloc(sizeof(struct cmatch));
     cm->str = str;
@@ -3934,12 +4141,40 @@ add_match_data(int alt, char *str, Cline line,
     cm->pre = pre;
     cm->suf = suf;
     cm->flags = flags;
-    cm->brpl = bpl;
-    cm->brsl = bsl;
+    if (nbrbeg) {
+	int *p;
+	Brinfo bp;
+
+	cm->brpl = (int *) zhalloc(nbrbeg * sizeof(int));
+
+	for (p = cm->brpl, bp = brbeg; bp; p++, bp = bp->next)
+	    *p = bp->curpos;
+    } else
+	cm->brpl = NULL;
+    if (nbrend) {
+	int *p;
+	Brinfo bp;
+
+	cm->brsl = (int *) zhalloc(nbrend * sizeof(int));
+
+	for (p = cm->brsl, bp = brend; bp; p++, bp = bp->next)
+	    *p = bp->curpos;
+    } else
+	cm->brsl = NULL;
     cm->qipl = qipl;
     cm->qisl = qisl;
     cm->autoq = (autoq ? autoq : (inbackt ? '`' : '\0'));
     cm->rems = cm->remf = cm->disp = NULL;
+
+    if ((lastprebr || lastpostbr) && !hasbrpsfx(cm, lastprebr, lastpostbr))
+	return NULL;
+
+    /* Then build the unambiguous cline list. */
+    ai->line = join_clines(ai->line, line);
+
+    mnum++;
+    ai->count++;
+
     addlinknode((alt ? fmatches : matches), cm);
 
     newmatches = 1;
@@ -4025,15 +4260,21 @@ addmatches(Cadata dat, char **argv)
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
     char **aign = NULL, **dparr = NULL, oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL;
-    int lpl, lsl, pl, sl, bpl, bsl, bppl = -1, bssl = -1;
+    int lpl, lsl, pl, sl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
     int llpl = 0, llsl = 0, nm = mnum, gflags = 0, ohp = haspattern;
     int oisalt = 0, isalt, isexact, doadd, ois = instring, oib = inbackt;
-    Cline lc = NULL;
+    Cline lc = NULL, pline = NULL, sline = NULL;
     Cmatch cm;
     struct cmlist mst;
     Cmlist oms = mstack;
     Patprog cp = NULL;
     LinkList aparl = NULL, oparl = NULL, dparl = NULL;
+    Brinfo bp, bpl = brbeg, obpl, bsl = brend, obsl;
+
+    for (bp = brbeg; bp; bp = bp->next)
+	bp->curpos = ((dat->aflags & CAF_QUOTE) ? bp->pos : bp->qpos);
+    for (bp = brend; bp; bp = bp->next)
+	bp->curpos = ((dat->aflags & CAF_QUOTE) ? bp->pos : bp->qpos);
 
     if (dat->flags & CMF_ISPAR)
 	dat->flags |= parflags;
@@ -4153,31 +4394,53 @@ addmatches(Cadata dat, char **argv)
 		int ml;
 
 		s = dat->ppre ? dat->ppre : "";
-		bppl = brpl;
-		if ((ml = match_str(lpre, s, &bppl, NULL, 0, 0, 1)) >= 0)
+		if ((ml = match_str(lpre, s, &bpl, 0, NULL, 0, 0, 1)) >= 0) {
+		    if (matchsubs) {
+			Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0, 0);
+
+			tmp->prefix = matchsubs;
+			if (matchlastpart)
+			    matchlastpart->next = tmp;
+			else
+			    matchparts = tmp;
+		    }
+		    pline = matchparts;
 		    lpre += ml;
-		else {
-		    bppl = -1;
+		    bcp = ml;
+		    bpadd = strlen(s) - ml;
+		} else {
 		    if (llpl <= lpl && strpfx(lpre, s))
 			lpre = "";
 		    else if (llpl > lpl && strpfx(s, lpre))
 			lpre += lpl;
 		    else
 			*argv = NULL;
+		    bcp = lpl;
 		}
 
 		s = dat->psuf ? dat->psuf : "";
-		bssl = brsl;
-		if ((ml = match_str(lsuf, s, &bssl, NULL, 0, 0, 1)) >= 0)
+		if ((ml = match_str(lsuf, s, &bsl, 0, NULL, 1, 0, 1)) >= 0) {
+		    if (matchsubs) {
+			Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0, CLF_SUF);
+
+			tmp->suffix = matchsubs;
+			if (matchlastpart)
+			    matchlastpart->next = tmp;
+			else
+			    matchparts = tmp;
+		    }
+		    sline = revert_cline(matchparts);
 		    lsuf[llsl - ml] = '\0';
-		else {
-		    bssl = -1;
+		    bcs = ml;
+		    bsadd = strlen(s) - ml;
+		} else {
 		    if (llsl <= lsl && strsfx(lsuf, s))
 			lsuf = "";
 		    else if (llsl > lsl && strsfx(s, lsuf))
 			lsuf[llsl - lsl] = '\0';
 		    else
 			*argv = NULL;
+		    bcs = lsl;
 		}
 		if (comppatmatch && *comppatmatch) {
 		    int is = (*comppatmatch == '*');
@@ -4232,14 +4495,16 @@ addmatches(Cadata dat, char **argv)
 		    dat->rems = dupstring(dat->rems);
 	    }
 	    /* Walk through the matches given. */
+	    obpl = bpl;
+	    obsl = bsl;
 	    for (; (s = *argv); argv++) {
+		bpl = obpl;
+		bsl = obsl;
 		if (disp) {
 		    if (!*++disp)
 			disp = NULL;
 		}
 		sl = strlen(s);
-		bpl = brpl;
-		bsl = brsl;
 		isalt = oisalt;
 		if ((!dat->psuf || !*(dat->psuf)) && aign) {
 		    /* Do the suffix-test. If the match has one of the
@@ -4269,22 +4534,30 @@ addmatches(Cadata dat, char **argv)
 					     (!(dat->aflags & CAF_QUOTE) ?
 					      ((dat->ppre && dat->ppre) ||
 					       !(dat->flags & CMF_FILE) ? 1 : 2) : 0),
-					     &bpl, &bsl, &isexact))) {
+					     &bpl, bcp, &bsl, bcs,
+					     &isexact))) {
 		    if (dparr && !*++dparr)
 			dparr = NULL;
 		    continue;
 		}
 		if (doadd) {
-		    cm = add_match_data(isalt, ms, lc, dat->ipre, NULL,
-					dat->isuf, dat->pre, dat->prpre,
-					dat->ppre, dat->psuf, dat->suf,
-					(bppl >= 0 ? bppl : bpl),
-					(bssl >= 0 ? bssl : bsl),
-					dat->flags, isexact);
-		    cm->rems = dat->rems;
-		    cm->remf = dat->remf;
-		    if (disp)
-			cm->disp = dupstring(*disp);
+		    Brinfo bp;
+
+		    for (bp = obpl; bp; bp = bp->next)
+			bp->curpos += bpadd;
+		    for (bp = obsl; bp; bp = bp->next)
+			bp->curpos += bsadd;
+
+		    if ((cm = add_match_data(isalt, ms, lc, dat->ipre, NULL,
+					     dat->isuf, dat->pre, dat->prpre,
+					     dat->ppre, pline,
+					     dat->psuf, sline,
+					     dat->suf, dat->flags, isexact))) {
+			cm->rems = dat->rems;
+			cm->remf = dat->remf;
+			if (disp)
+			    cm->disp = dupstring(*disp);
+		    }
 		} else {
 		    if (dat->apar)
 			addlinknode(aparl, ms);
@@ -4351,24 +4624,30 @@ addmatches(Cadata dat, char **argv)
 static void
 addmatch(char *s, char *t)
 {
-    int isfile = 0, isalt = 0, isexact, bpl = brpl, bsl = brsl;
+    int isfile = 0, isalt = 0, isexact;
     char *ms = NULL, *tt;
     HashNode hn;
     Param pm;
     Cline lc = NULL;
+    Brinfo bp, bpl = brbeg, bsl = brend, bpt, bst;
 
-/*
- * addwhat: -5 is for files,
- *          -6 is for glob expansions,
- *          -8 is for executable files (e.g. command paths),
- *          -9 is for parameters
- *          -7 is for command names (from cmdnamtab)
- *          -4 is for a cdable parameter
- *          -3 is for executable command names.
- *          -2 is for anything unquoted
- *          -1 is for other file specifications
- *          (things with `~' or `=' at the beginning, ...).
- */
+    for (bp = brbeg; bp; bp = bp->next)
+	bp->curpos = ((addwhat == CC_QUOTEFLAG) ? bp->qpos : bp->pos);
+    for (bp = brend; bp; bp = bp->next)
+	bp->curpos = ((addwhat == CC_QUOTEFLAG) ? bp->qpos : bp->pos);
+
+    /*
+     * addwhat: -5 is for files,
+     *          -6 is for glob expansions,
+     *          -8 is for executable files (e.g. command paths),
+     *          -9 is for parameters
+     *          -7 is for command names (from cmdnamtab)
+     *          -4 is for a cdable parameter
+     *          -3 is for executable command names.
+     *          -2 is for anything unquoted
+     *          -1 is for other file specifications
+     *          (things with `~' or `=' at the beginning, ...).
+     */
 
     /* Just to make the code cleaner */
     hn = (HashNode) t;
@@ -4376,6 +4655,13 @@ addmatch(char *s, char *t)
 
     if (addwhat == -1 || addwhat == -5 || addwhat == -6 ||
 	addwhat == CC_FILES || addwhat == -7 || addwhat == -8) {
+	int ppl = (ppre ? strlen(ppre) : 0), psl = (psuf ? strlen(psuf) : 0);
+
+	while (bpl && bpl->curpos < ppl)
+	    bpl = bpl->next;
+	while (bsl && bsl->curpos < psl)
+	    bsl = bsl->next;
+
 	if ((addwhat == CC_FILES ||
 	     addwhat == -5) && !*psuf) {
 	    /* If this is a filename, do the fignore check. */
@@ -4390,9 +4676,9 @@ addmatch(char *s, char *t)
 	ms = ((addwhat == CC_FILES || addwhat == -6 ||
 	       addwhat == -5 || addwhat == -8) ? 
 	      comp_match(qfpre, qfsuf, s, filecomp, &lc, (ppre && *ppre ? 1 : 2),
-			 &bpl, &bsl, &isexact) :
+			 &bpl, ppl ,&bsl, psl, &isexact) :
 	      comp_match(fpre, fsuf, s, filecomp, &lc, 0,
-			 &bpl, &bsl, &isexact));
+			 &bpl, ppl, &bsl, psl, &isexact));
 	if (!ms)
 	    return;
 
@@ -4432,23 +4718,31 @@ addmatch(char *s, char *t)
 	    p1 = qlpre; s1 = qlsuf;
 	    p2 = lpre;  s2 = lsuf;
 	}
+	bpt = bpl;
+	bst = bsl;
+
 	if (!(ms = comp_match(p1, s1, s, patcomp, &lc,
 			      (addwhat == CC_QUOTEFLAG),
-			      &bpl, &bsl, &isexact)) &&
-	    !(ms = comp_match(p2, s2, s, NULL, &lc,
-			      (addwhat == CC_QUOTEFLAG),
-			      &bpl, &bsl, &isexact)))
-	    return;
+			      &bpl, strlen(p1), &bsl, strlen(s1),
+			      &isexact))) {
+	    bpl = bpt;
+	    bsl = bst;
+	    if (!(ms = comp_match(p2, s2, s, NULL, &lc,
+				  (addwhat == CC_QUOTEFLAG),
+				  &bpl, strlen(p2), &bsl, strlen(s2),
+				  &isexact)))
+		return;
+	}
     }
     if (!ms)
 	return;
     add_match_data(isalt, ms, lc, ipre, ripre, isuf, 
 		   (incompfunc ? dupstring(curcc->prefix) : curcc->prefix),
 		   prpre, 
-		   (isfile ? lppre : NULL),
-		   (isfile ? lpsuf : NULL),
+		   (isfile ? lppre : NULL), NULL,
+		   (isfile ? lpsuf : NULL), NULL,
 		   (incompfunc ? dupstring(curcc->suffix) : curcc->suffix),
-		   bpl, bsl, (mflags | isfile), isexact);
+		   (mflags | isfile), isexact);
 }
 
 #ifdef HAVE_NIS_PLUS
@@ -4794,6 +5088,10 @@ docompletion(char *s, int lst, int incmd)
 	    minfo.cur = NULL;
 	    goto compend;
 	}
+	zsfree(lastprebr);
+	zsfree(lastpostbr);
+	lastprebr = lastpostbr = NULL;
+
 	if (comppatmatch && *comppatmatch && comppatmatch != opm)
 	    haspattern = 1;
 	if (!useline && uselist) {
@@ -6512,8 +6810,13 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 			       (strlen(qipre) -
 				(*qipre == '\'' || *qipre == '\"')) : 0));
 	    line[cs] = save;
-	    if (brbeg && *brbeg)
-		strcpy(lppre + qbrpl, lppre + qbrpl + strlen(brbeg));
+	    if (brbeg) {
+		Brinfo bp;
+
+		for (bp = brbeg; bp; bp = bp->next)
+		    strcpy(lppre + bp->qpos,
+			   lppre + bp->qpos + strlen(bp->str));
+	    }
 	    if ((p = strrchr(lppre, '/'))) {
 		p[1] = '\0';
 		lppl = strlen(lppre);
@@ -6540,10 +6843,14 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    line[end] = 0;
 	    lpsuf = dupstring((char *) (line + cs));
 	    line[end] = save;
-	    if (brend && *brend) {
-		char *p = lpsuf + qbrsl - (cs - wb);
+	    if (brend) {
+		Brinfo bp;
+		char *p;
 
-		strcpy(p, p + strlen(brend));
+		for (bp = brend; bp; bp = bp->next) {
+		    p = lpsuf + (we - cs) - bp->qpos;
+		    strcpy(p, p + strlen(bp->str));
+		}
 	    }
 	    if (!(lpsuf = strchr(lpsuf, '/')) && sf2)
 		lpsuf = psuf;
@@ -7518,7 +7825,7 @@ addexpl(void)
 
 /**/
 static Cmatch
-dupmatch(Cmatch m)
+dupmatch(Cmatch m, int nbeg, int nend)
 {
     Cmatch r;
 
@@ -7534,8 +7841,24 @@ dupmatch(Cmatch m)
     r->pre = ztrdup(m->pre);
     r->suf = ztrdup(m->suf);
     r->flags = m->flags;
-    r->brpl = m->brpl;
-    r->brsl = m->brsl;
+    if (nbeg) {
+	int *p, *q, i;
+
+	r->brpl = (int *) zalloc(nbeg * sizeof(int));
+
+	for (p = r->brpl, q = m->brpl, i = nbeg; i--; p++, q++)
+	    *p = *q;
+    } else
+	r->brpl = NULL;
+    if (nend) {
+	int *p, *q, i;
+
+	r->brsl = (int *) zalloc(nend * sizeof(int));
+
+	for (p = r->brsl, q = m->brsl, i = nend; i--; p++, q++)
+	    *p = *q;
+    } else
+	r->brsl = NULL;
     r->rems = ztrdup(m->rems);
     r->remf = ztrdup(m->remf);
     r->autoq = m->autoq;
@@ -7619,7 +7942,7 @@ permmatches(int last)
 	n->matches = p = (Cmatch *) ncalloc((n->mcount + 1) *
 					    sizeof(Cmatch));
 	for (q = g->matches; *q; q++, p++)
-	    *p = dupmatch(*q);
+	    *p = dupmatch(*q, nbrbeg, nbrend);
 	*p = NULL;
 
 	n->lcount = g->lcount;
@@ -7654,6 +7977,8 @@ permmatches(int last)
 	g = g->next;
     }
     for (g = pmatches; g; g = g->next) {
+	g->nbrbeg = nbrbeg;
+	g->nbrend = nbrend;
 	for (rn = 1, q = g->matches; *q; q++) {
 	    (*q)->rnum = rn++;
 	    (*q)->gnum = mn++;
@@ -7722,7 +8047,7 @@ comp_list(char *v)
 
 /**/
 static void
-freematch(Cmatch m)
+freematch(Cmatch m, int nbeg, int nend)
 {
     if (!m) return;
 
@@ -7738,6 +8063,8 @@ freematch(Cmatch m)
     zsfree(m->rems);
     zsfree(m->remf);
     zsfree(m->disp);
+    zfree(m->brpl, nbeg * sizeof(int));
+    zfree(m->brsl, nend * sizeof(int));
 
     zfree(m, sizeof(m));
 }
@@ -7757,7 +8084,7 @@ freematches(Cmgroup g)
 	n = g->next;
 	
 	for (m = g->matches; *m; m++)
-	    freematch(*m);
+	    freematch(*m, g->nbrbeg, g->nbrend);
 
 	if (g->ylist)
 	    freearray(g->ylist);
@@ -7823,7 +8150,7 @@ cut_cline(Cline l)
 	cline_setlens(l, 0);
 	return l;
     }
-    e = l = cp_cline(l);
+    e = l = cp_cline(l, 0);
 
     /* First, search the last struct for which we have something on
      * the line. Anything before that is kept. */
@@ -7900,54 +8227,52 @@ cline_str(Cline l, int ins, int *csp)
 {
     Cline s;
     int ocs = cs, ncs, pcs, pm, pmax, pmm, sm, smax, smm, d, dm, mid;
-    int pl, sl, hasp, hass, ppos, spos, plen, slen, i, j, li = 0;
+    int i, j, li = 0;
+    Brinfo brp, brs;
 
     l = cut_cline(l);
 
-    pmm = smm = dm = ppos = spos = plen = slen = hasp = hass = 0;
-    pm = pmax = sm = smax = d = mid = pl = sl = -1;
+    pmm = smm = dm = 0;
+    pm = pmax = sm = smax = d = mid = -1;
 
     /* Get the information about the brace beginning and end we have
      * to re-insert. */
     if (ins) {
-	if ((hasp = (brbeg && *brbeg))) {
-	    plen = strlen(brbeg); pl = (hasunqu ? brpl : qbrpl);
+	Brinfo bp;
+	int olen = we - wb;
+
+	if ((brp = brbeg)) {
+	    for (bp = brbeg; bp; bp = bp->next) {
+		bp->curpos = (hasunqu ? bp->pos : bp->qpos);
+		olen -= strlen(bp->str);
+	    }
 	}
-	if ((hass = (brend && *brend))) {
-	    slen = strlen(brend);
-	    sl = we - wb - (hasunqu ? brsl : qbrsl) - plen - slen + 1;
+	if ((brs = lastbrend)) {
+	    for (bp = brend; bp; bp = bp->next)
+		olen -= strlen(bp->str);
+
+	    for (bp = brend; bp; bp = bp->next)
+		bp->curpos = olen - (hasunqu ? bp->pos : bp->qpos);
 	}
-	if (!pl) {
-	    inststrlen(brbeg, 1, -1);
-	    pl = -1; hasp = 0;
+	while (brp && !brp->curpos) {
+	    inststrlen(brp->str, 1, -1);
+	    brp = brp->next;
 	}
-	if (!sl) {
-	    inststrlen(brend, 1, -1);
-	    sl = -1; hass = 0;
+	while (brs && !brs->curpos) {
+	    inststrlen(brs->str, 1, -1);
+	    brs = brs->prev;
 	}
     }
     /* Walk through the top-level cline list. */
     while (l) {
-	if (pl >= 0)
-	    ppos = -1;
-	if (sl >= 0)
-	    spos = -1;
 	/* Insert the original string if no prefix. */
 	if (l->olen && !(l->flags & CLF_SUF) && !l->prefix) {
+	    pcs = cs + l->olen;
 	    inststrlen(l->orig, 1, l->olen);
-	    if (ins) {
-		li += l->olen;
-		if (pl >= 0 && li >= pl) {
-		    ppos = cs - (li - pl); pl = -1;
-		}
-		if (sl >= 0 && li >= sl) {
-		    spos = cs - (li - sl) - 1; sl = -1;
-		}
-	    }
 	} else {
 	    /* Otherwise insert the prefix. */
 	    for (s = l->prefix; s; s = s->next) {
-		pcs = cs;
+		pcs = cs + s->llen;
 		if (s->flags & CLF_LINE)
 		    inststrlen(s->line, 1, s->llen);
 		else
@@ -7955,15 +8280,20 @@ cline_str(Cline l, int ins, int *csp)
 		if ((s->flags & CLF_DIFF) && (!dm || (s->flags & CLF_MATCHED))) {
 		    d = cs; dm = s->flags & CLF_MATCHED;
 		}
-		if (ins) {
-		    li += s->llen;
-		    if (pl >= 0 && li >= pl) {
-			ppos = pcs + s->llen - (li - pl); pl = -1;
-		    }
-		    if (sl >= 0 && li >= sl) {
-			spos = pcs + s->llen - (li - sl) - 1; sl = -1;
-		    }
-		}
+		li += s->llen;
+	    }
+	}
+	if (ins) {
+	    int ocs, bl;
+
+	    while (brp && li >= brp->curpos) {
+		ocs = cs;
+		bl = strlen(brp->str);
+		cs = pcs - (li - brp->curpos);
+		inststrlen(brp->str, 1, bl);
+		cs = ocs + bl;
+		pcs += bl;
+		brp = brp->next;
 	    }
 	}
 	/* Remember the position if this is the first prefix with
@@ -7973,6 +8303,19 @@ cline_str(Cline l, int ins, int *csp)
 	     ((l->flags & CLF_MATCHED) && !pmm))) {
 	    pm = cs; pmax = l->min - l->max; pmm = l->flags & CLF_MATCHED;
 	}
+	if (ins) {
+	    int ocs, bl;
+
+	    while (brs && li > brs->curpos) {
+		ocs = cs;
+		bl = strlen(brs->str);
+		cs = pcs - (li - brs->curpos);
+		inststrlen(brs->str, 1, bl);
+		cs = ocs + bl;
+		pcs += bl;
+		brs = brs->prev;
+	    }
+	}
 	pcs = cs;
 	/* Insert the anchor. */
 	if (l->flags & CLF_LINE)
@@ -7980,12 +8323,18 @@ cline_str(Cline l, int ins, int *csp)
 	else
 	    inststrlen(l->word, 1, l->wlen);
 	if (ins) {
+	    int ocs, bl;
+
 	    li += l->llen;
-	    if (pl >= 0 && li >= pl) {
-		ppos = pcs + l->llen - (li - pl); pl = -1;
-	    }
-	    if (sl >= 0 && li >= sl) {
-		spos = pcs + l->llen - (li - sl) - 1; sl = -1;
+
+	    while (brp && li >= brp->curpos) {
+		ocs = cs;
+		bl = strlen(brp->str);
+		cs = pcs + l->llen - (li - brp->curpos);
+		inststrlen(brp->str, 1, bl);
+		cs = ocs + bl;
+		pcs += bl;
+		brp = brp->next;
 	    }
 	}
 	/* Remember the cursor position for suffixes and mids. */
@@ -7999,26 +8348,54 @@ cline_str(Cline l, int ins, int *csp)
 		sm = cs; smax = l->min - l->max; smm = l->flags & CLF_MATCHED;
 	    }
 	}
+	if (ins) {
+	    int ocs, bl;
+
+	    while (brs && li >= brs->curpos) {
+		ocs = cs;
+		bl = strlen(brs->str);
+		cs = pcs + l->llen - (li - brs->curpos);
+		inststrlen(brs->str, 1, bl);
+		cs = ocs + bl;
+		pcs += bl;
+		brs = brs->prev;
+	    }
+	}
 	/* And now insert the suffix or the original string. */
 	if (l->olen && (l->flags & CLF_SUF) && !l->suffix) {
 	    pcs = cs;
 	    inststrlen(l->orig, 1, l->olen);
 	    if (ins) {
+		int ocs, bl;
+
 		li += l->olen;
-		if (pl >= 0 && li >= pl) {
-		    ppos = pcs + l->olen - (li - pl); pl = -1;
+
+		while (brp && li >= brp->curpos) {
+		    ocs = cs;
+		    bl = strlen(brp->str);
+		    cs = pcs + l->olen - (li - brp->curpos);
+		    inststrlen(brp->str, 1, bl);
+		    cs = ocs + bl;
+		    pcs += bl;
+		    brp = brp->next;
 		}
-		if (sl >= 0 && li >= sl) {
-		    spos = pcs + l->olen - (li - sl) - 1; sl = -1;
+		while (brs && li >= brs->curpos) {
+		    ocs = cs;
+		    bl = strlen(brs->str);
+		    cs = pcs + l->olen - (li - brs->curpos);
+		    inststrlen(brs->str, 1, bl);
+		    cs = ocs + bl;
+		    pcs += bl;
+		    brs = brs->prev;
 		}
 	    }
 	} else {
-	    int hp = 0, hs = 0;
 	    Cline js = NULL;
 
 	    for (j = -1, i = 0, s = l->suffix; s; s = s->next) {
 		if (j < 0 && (s->flags & CLF_DIFF))
 		    j = i, js = s;
+		pcs = cs;
 		if (s->flags & CLF_LINE) {
 		    inststrlen(s->line, 0, s->llen);
 		    i += s->llen; pcs = cs + s->llen;
@@ -8027,48 +8404,54 @@ cline_str(Cline l, int ins, int *csp)
 		    i += s->wlen; pcs = cs + s->wlen;
 		}
 		if (ins) {
+		    int ocs, bl;
+
 		    li += s->llen;
-		    if (pl >= 0 && li >= pl) {
-			hp = 1; ppos = pcs - (li - pl) - i; pl = -1;
+
+		    while (brp && li >= brp->curpos) {
+			ocs = cs;
+			bl = strlen(brp->str);
+			cs = pcs - (li - brp->curpos);
+			inststrlen(brp->str, 1, bl);
+			cs = ocs + bl;
+			pcs += bl;
+			brp = brp->next;
 		    }
-		    if (sl >= 0 && li >= sl) {
-			hs = 1; spos = pcs - (li - sl) - i; sl = -1;
+		    while (brs && li >= brs->curpos) {
+			ocs = cs;
+			bl = strlen(brs->str);
+			cs = pcs - (li - brs->curpos);
+			inststrlen(brs->str, 1, bl);
+			cs = ocs + bl;
+			pcs += bl;
+			brs = brs->prev;
 		    }
 		}
 	    }
-	    if (hp)
-		ppos += i;
-	    if (hs)
-		spos += i;
 	    cs += i;
 	    if (j >= 0 && (!dm || (js->flags & CLF_MATCHED))) {
 		d = cs - j; dm = js->flags & CLF_MATCHED;
 	    }
 	}
-	/* If we reached the right positions, re-insert the braces. */
-	if (ins) {
-	    if (hasp && ppos >= 0) {
-		i = cs;
-		cs = ppos;
-		inststrlen(brbeg, 1, plen);
-		cs = i + plen;
-		hasp = 0;
-	    }
-	    if (hass && spos >= 0) {
-		i = cs;
-		cs = spos;
-		inststrlen(brend, 1, slen);
-		cs = i + slen;
-		hass = 0;
-	    }
-	}
 	l = l->next;
     }
-    if (pl >= 0)
-	inststrlen(brbeg, 1, plen);
-    if (sl >= 0)
-	inststrlen(brend, 1, slen);
+    if (ins) {
+	int ocs = cs;
 
+	for (; brp; brp = brp->next)
+	    inststrlen(brp->str, 1, -1);
+	for (; brs; brs = brs->prev)
+	    inststrlen(brs->str, 1, -1);
+
+	if (mid >= ocs)
+	    mid += cs - ocs;
+	if (pm >= ocs)
+	    pm += cs - ocs;
+	if (sm >= ocs)
+	    sm += cs - ocs;
+	if (d >= ocs)
+	    d += cs - ocs;
+    }
     /* This calculates the new cursor position. If we had a mid cline
      * with missing characters, we take this, otherwise if we have a
      * prefix with missing characters, we take that, the same for a
@@ -8089,11 +8472,6 @@ cline_str(Cline l, int ins, int *csp)
 
 	return r;
     }
-    if (ncs >= ppos)
-	ncs += plen;
-    if (ncs > spos)
-	ncs += slen;
-
     lastend = cs;
     cs = ncs;
 
@@ -8136,7 +8514,8 @@ unambig_data(int *cp)
 static int
 instmatch(Cmatch m, int *scs)
 {
-    int l, r = 0, ocs, a = cs, brb = 0;
+    int l, r = 0, ocs, a = cs, brb = 0, bradd, *brpos;
+    Brinfo bp;
 
     zsfree(lastprebr);
     zsfree(lastpostbr);
@@ -8163,17 +8542,26 @@ instmatch(Cmatch m, int *scs)
     inststrlen(m->str, 1, (l = strlen(m->str)));
     r += l;
     ocs = cs;
-    /* Re-insert the brace beginning, if any. */
-    if (brbeg && *brbeg) {
-	cs = a + m->brpl + (m->pre ? strlen(m->pre) : 0);
-	lastprebr = (char *) zalloc(cs - a + 1);
-	memcpy(lastprebr, (char *) line + a, cs - a);
-	lastprebr[cs - a] = '\0';
-	l = strlen(brbeg);
-	brpcs = cs;
-	inststrlen(brbeg, 1, l);
-	r += l;
-	ocs += l;
+    /* Re-insert the brace beginnings, if any. */
+    if (brbeg) {
+	int pcs = cs;
+
+	l = 0;
+	for (bp = brbeg, brpos = m->brpl,
+		 bradd = (m->pre ? strlen(m->pre) : 0);
+	     bp; bp = bp->next, brpos++) {
+	    cs = a + *brpos + bradd;
+	    pcs = cs;
+	    l = strlen(bp->str);
+	    bradd += l;
+	    brpcs = cs;
+	    inststrlen(bp->str, 1, l);
+	    r += l;
+	    ocs += l;
+	}
+	lastprebr = (char *) zalloc(pcs - a + 1);
+	memcpy(lastprebr, (char *) line + a, pcs - a);
+	lastprebr[pcs - a] = '\0';
 	cs = ocs;
     }
     /* Path suffix. */
@@ -8182,20 +8570,27 @@ instmatch(Cmatch m, int *scs)
 	r += l;
     }
     /* Re-insert the brace end. */
-    if (brend && *brend) {
+    if (brend) {
 	a = cs;
-	cs -= m->brsl;
-	ocs = brscs = cs;
-	l = strlen(brend);
-	inststrlen(brend, 1, l);
-	brb = cs;
-	r += l;
-	cs = a + l;
-    } else
+	for (bp = brend, brpos = m->brsl, bradd = 0; bp; bp = bp->next, brpos++) {
+	    cs = a - *brpos;
+	    ocs = brscs = cs;
+	    l = strlen(bp->str);
+	    bradd += l;
+	    inststrlen(bp->str, 1, l);
+	    brb = cs;
+	    r += l;
+	}
+	cs = a + bradd;
+	if (scs)
+	    *scs = ocs;
+    } else {
 	brscs = -1;
+
+	if (scs)
+	    *scs = cs;
+    }
     /* -S suffix */
-    if (scs)
-	*scs = cs;
     if (m->suf) {
 	inststrlen(m->suf, 1, (l = strlen(m->suf)));
 	r += l;
@@ -8205,7 +8600,7 @@ instmatch(Cmatch m, int *scs)
 	inststrlen(m->isuf, 1, (l = strlen(m->isuf)));
 	r += l;
     }
-    if (brend && *brend) {
+    if (brend) {
 	lastpostbr = (char *) zalloc(cs - brb + 1);
 	memcpy(lastpostbr, (char *) line + brb, cs - brb);
 	lastpostbr[cs - brb] = '\0';
@@ -8242,10 +8637,10 @@ hasbrpsfx(Cmatch m, char *pre, char *suf)
     brpcs = opcs;
     brscs = oscs;
 
-    ret = (((!op && !lastprebr) ||
-	    (op && lastprebr && !strcmp(op, lastprebr))) &&
-	   ((!os && !lastpostbr) ||
-	    (os && lastpostbr && !strcmp(os, lastpostbr))));
+    ret = (((!pre && !lastprebr) ||
+	    (pre && lastprebr && !strcmp(pre, lastprebr))) &&
+	   ((!suf && !lastpostbr) ||
+	    (suf && lastpostbr && !strcmp(suf, lastpostbr))));
 
     zsfree(lastprebr);
     zsfree(lastpostbr);
