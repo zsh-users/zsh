@@ -38,7 +38,7 @@
 
 /* flag for CSHNULLGLOB */
 
-typedef struct gmatch *Gmatch; 
+typedef struct gmatch *Gmatch;
 
 struct gmatch {
     char *name;
@@ -55,11 +55,12 @@ struct gmatch {
 };
 
 #define GS_NAME   1
-#define GS_SIZE   2
-#define GS_ATIME  4
-#define GS_MTIME  8
-#define GS_CTIME 16
-#define GS_LINKS 32
+#define GS_DEPTH  2
+#define GS_SIZE   4
+#define GS_ATIME  8
+#define GS_MTIME 16
+#define GS_CTIME 32
+#define GS_LINKS 64
 
 #define GS_SHIFT  5
 #define GS__SIZE  (GS_SIZE << GS_SHIFT)
@@ -68,14 +69,14 @@ struct gmatch {
 #define GS__CTIME (GS_CTIME << GS_SHIFT)
 #define GS__LINKS (GS_LINKS << GS_SHIFT)
 
-#define GS_DESC  2048
+#define GS_DESC  4096
 
 #define GS_NORMAL (GS_SIZE | GS_ATIME | GS_MTIME | GS_CTIME | GS_LINKS)
 #define GS_LINKED (GS_NORMAL << GS_SHIFT)
 
 /**/
 int badcshglob;
- 
+
 /**/
 int pathpos;		/* position in pathbuf (needed by pattern code) */
 
@@ -180,9 +181,9 @@ static struct globdata curglobdata;
     (N).gd_pathpos = pathpos; \
     (N).gd_pathbuf = pathbuf; \
     (N).gd_pathbufsz = 0; \
-    (N).gd_pathbuf = NULL; \
     (N).gd_glob_pre = glob_pre; \
     (N).gd_glob_suf = glob_suf; \
+    pathbuf = NULL; \
   } while (0)
 
 #define restore_globstate(N) \
@@ -222,18 +223,19 @@ struct complist {
 
 /**/
 static void
-addpath(char *s)
+addpath(char *s, int l)
 {
     DPUTS(!pathbuf, "BUG: pathbuf not initialised");
-    while (pathpos + (int) strlen(s) + 1 >= pathbufsz)
+    while (pathpos + l + 1 >= pathbufsz)
 	pathbuf = realloc(pathbuf, pathbufsz *= 2);
-    while ((pathbuf[pathpos++] = *s++));
-    pathbuf[pathpos - 1] = '/';
+    while (l--)
+	pathbuf[pathpos++] = *s++;
+    pathbuf[pathpos++] = '/';
     pathbuf[pathpos] = '\0';
 }
 
 /* stat the filename s appended to pathbuf.  l should be true for lstat,    *
- * false for stat.  If st is NULL, the file is only chechked for existance. *
+ * false for stat.  If st is NULL, the file is only checked for existance.  *
  * s == "" is treated as s == ".".  This is necessary since on most systems *
  * foo/ can be used to reference a non-directory foo.  Returns nonzero if   *
  * the file does not exists.                                                */
@@ -278,14 +280,17 @@ insert(char *s, int checked)
     char *news = s;
     int statted = 0;
 
+    queue_signals();
     inserts = NULL;
 
     if (gf_listtypes || gf_markdirs) {
 	/* Add the type marker to the end of the filename */
 	mode_t mode;
 	checked = statted = 1;
-	if (statfullpath(s, &buf, 1))
+	if (statfullpath(s, &buf, 1)) {
+	    unqueue_signals();
 	    return;
+	}
 	mode = buf.st_mode;
 	if (gf_follow) {
 	    if (!S_ISLNK(mode) || statfullpath(s, &buf2, 0))
@@ -306,9 +311,10 @@ insert(char *s, int checked)
 	/* Go through the qualifiers, rejecting the file if appropriate */
 	struct qual *qo, *qn;
 
-	if (!statted && statfullpath(s, &buf, 1))
+	if (!statted && statfullpath(s, &buf, 1)) {
+	    unqueue_signals();
 	    return;
-
+	}
 	news = dyncat(pathbuf, news);
 
 	statted = 1;
@@ -329,16 +335,20 @@ insert(char *s, int checked)
 	     * vice versa.                                   */
 	    if ((!((qn->func) (news, bp, qn->data, qn->sdata)) ^ qn->sense) & 1) {
 		/* Try next alternative, or return if there are no more */
-		if (!(qo = qo->or))
+		if (!(qo = qo->or)) {
+		    unqueue_signals();
 		    return;
+		}
 		qn = qo;
 		continue;
 	    }
 	    qn = qn->next;
 	}
     } else if (!checked) {
-	if (statfullpath(s, NULL, 1))
+	if (statfullpath(s, NULL, 1)) {
+	    unqueue_signals();
 	    return;
+	}
 	statted = 1;
 	news = dyncat(pathbuf, news);
     } else
@@ -346,7 +356,7 @@ insert(char *s, int checked)
 
     while (!inserts || (news = dupstring(*inserts++))) {
 	if (colonmod) {
-	    /* Handle the remainder of the qualifer:  e.g. (:r:s/foo/bar/). */
+	    /* Handle the remainder of the qualifier:  e.g. (:r:s/foo/bar/). */
 	    s = colonmod;
 	    modify(&news, &s);
 	}
@@ -388,6 +398,7 @@ insert(char *s, int checked)
 	if (!inserts)
 	    break;
     }
+    unqueue_signals();
 }
 
 /* Check to see if str is eligible for filename generation. */
@@ -494,14 +505,17 @@ scanner(Complist q)
 		    }
 		}
 		if (add) {
-		    addpath(str);
+		    addpath(str, l);
 		    if (!closure || !statfullpath("", NULL, 1))
 			scanner((q->closure) ? q : q->next);
 		    pathbuf[pathpos = oppos] = '\0';
 		}
 	    }
-	} else
+	} else {
+	    if (str[l])
+		str = dupstrpfx(str, l);
 	    insert(str, 0);
+	}
     } else {
 	/* Do pattern matching on current path section. */
 	char *fn = pathbuf[pathbufcwd] ? unmeta(pathbuf + pathbufcwd) : ".";
@@ -572,8 +586,7 @@ scanner(Complist q)
 			if (statfullpath(fn, &buf, !q->follow)) {
 			    if (errno != ENOENT && errno != EINTR &&
 				errno != ENOTDIR && !errflag) {
-				zerr("%e: %s", fn, errno);
-				errflag = 0;
+				zwarn("%e: %s", fn, errno);
 			    }
 			    continue;
 			}
@@ -599,8 +612,9 @@ scanner(Complist q)
 	    int oppos = pathpos;
 
 	    for (fn = subdirs; fn < subdirs+subdirlen; ) {
-		addpath(fn);
-		fn += strlen(fn) + 1;
+		int l = strlen(fn);
+		addpath(fn, l);
+		fn += l + 1;
 		memcpy((char *)&errsfound, fn, sizeof(int));
 		fn += sizeof(int);
 		scanner((q->closure) ? q : q->next);  /* scan next level */
@@ -676,7 +690,7 @@ parsecomplist(char *instr)
 	/* parse single path component */
 	if (!(p1 = patcompile(instr, compflags|PAT_FILET, &instr)))
 	    return NULL;
-	/* then do the remaining path compoents */
+	/* then do the remaining path components */
 	if (*instr == '/' || !*instr) {
 	    int ef = *instr == '/';
 
@@ -697,6 +711,9 @@ parsecomplist(char *instr)
 static Complist
 parsepat(char *str)
 {
+    long assert;
+    int ignore;
+
     patcompstart();
     /*
      * Check for initial globbing flags, so that they don't form
@@ -706,7 +723,7 @@ parsepat(char *str)
 	(isset(KSHGLOB) && *str == '@' && str[1] == Inpar &&
 	 str[2] == Pound)) {
 	str += (*str == Inpar) ? 2 : 3;
-	if (!patgetglobflags(&str))
+	if (!patgetglobflags(&str, &assert, &ignore))
 	    return NULL;
     }
 
@@ -802,7 +819,7 @@ qgetmodespec(char **s)
 	    }
 	    if (how == '=' || how == '-')
 		no |= val & mask;
-	} else {
+	} else if (!(end && c == end) && c != ',' && c) {
 	    t = 07777;
 	    while ((c = *p) == '?' || c == Quest ||
 		   (c >= '0' && c <= '7')) {
@@ -826,7 +843,10 @@ qgetmodespec(char **s)
 		yes |= val;
 	    else
 		no |= val;
-	}
+	} else {
+	    zerr("invalid mode specification", NULL, 0);
+	    return 0;
+        }
     } while (end && c != end);
 
     *s = p;
@@ -842,7 +862,32 @@ gmatchcmp(Gmatch a, Gmatch b)
     for (i = gf_nsorts, s = gf_sortlist; i; i--, s++) {
 	switch (*s & ~GS_DESC) {
 	case GS_NAME:
-	    r = notstrcmp(&a->name, &b->name);
+	    if (gf_numsort)
+	    	r = nstrpcmp(&b->name, &a->name);
+	    else
+	    	r = strpcmp(&b->name, &a->name);
+	    break;
+	case GS_DEPTH:
+	    {
+		char *aptr = a->name, *bptr = b->name;
+		int slasha = 0, slashb = 0;
+		/* Count slashes.  Trailing slashes don't count. */
+		while (*aptr && *aptr == *bptr)
+		    aptr++, bptr++;
+		if (*aptr)
+		    for (; aptr[1]; aptr++)
+			if (*aptr == '/') {
+			    slasha = 1;
+			    break;
+			}
+		if (*bptr)
+		    for (; bptr[1]; bptr++)
+			if (*bptr == '/') {
+			    slashb = 1;
+			    break;
+			}
+		r = slasha - slashb;
+	    }
 	    break;
 	case GS_SIZE:
 	    r = b->size - a->size;
@@ -881,13 +926,42 @@ gmatchcmp(Gmatch a, Gmatch b)
     return 0;
 }
 
+/*
+ * Duplicate a list of qualifiers using the `next' linkage (not the
+ * `or' linkage).  Return the head element and set *last (if last non-NULL)
+ * to point to the last element of the new list.  All allocation is on the
+ * heap (or off the heap?)
+ */
+static struct qual *dup_qual_list(struct qual *orig, struct qual **lastp)
+{
+    struct qual *qfirst = NULL, *qlast = NULL;
+
+    while (orig) {
+	struct qual *qnew = (struct qual *)zhalloc(sizeof(struct qual));
+	*qnew = *orig;
+	qnew->next = qnew->or = NULL;
+
+	if (!qfirst)
+	    qfirst = qnew;
+	if (qlast)
+	    qlast->next = qnew;
+	qlast = qnew;
+
+	orig = orig->next;
+    }
+
+    if (lastp)
+	*lastp = qlast;
+    return qfirst;
+}
+
 /* Main entry point to the globbing code for filename globbing. *
  * np points to a node in the list list which will be expanded  *
  * into a series of nodes.                                      */
 
 /**/
 void
-glob(LinkList list, LinkNode np, int nountok)
+zglob(LinkList list, LinkNode np, int nountok)
 {
     struct qual *qo, *qn, *ql;
     LinkNode node = prevnode(np);
@@ -896,9 +970,10 @@ glob(LinkList list, LinkNode np, int nountok)
     Complist q;				/* pattern after parsing         */
     char *ostr = (char *)getdata(np);	/* the pattern before the parser */
 					/* chops it up                   */
-    int first = 0, last = -1;		/* index of first/last match to  */
-				        /* return */
+    int first = 0, end = -1;		/* index of first match to return */
+					/* and index+1 of the last match */
     struct globdata saved;		/* saved glob state              */
+    int nobareglob = !isset(BAREGLOBQUAL);
 
     if (unset(GLOBOPT) || !haswilds(ostr)) {
 	if (!nountok)
@@ -908,13 +983,22 @@ glob(LinkList list, LinkNode np, int nountok)
     save_globstate(saved);
 
     str = dupstring(ostr);
-    sl = strlen(str);
     uremnode(list, np);
 
-    /* Initialise state variables for current file pattern */
-    qo = qn = quals = ql = NULL;
+    /* quals will hold the complete list of qualifiers (file static). */
+    quals = NULL;
+    /*
+     * qualct and qualorct indicate we have qualifiers in the last
+     * alternative, or a set of alternatives, respectively.  They
+     * are not necessarily an accurate count, however.
+     */
     qualct = qualorct = 0;
+    /*
+     * colonmod is a concatenated list of all colon modifiers found in
+     * all sets of qualifiers.
+     */
     colonmod = NULL;
+    /* The gf_* flags are qualifiers which are applied globally. */
     gf_nullglob = isset(NULLGLOB);
     gf_markdirs = isset(MARKDIRS);
     gf_listtypes = gf_follow = 0;
@@ -923,432 +1007,573 @@ glob(LinkList list, LinkNode np, int nountok)
     gf_sorts = gf_nsorts = 0;
 
     /* Check for qualifiers */
-    if (isset(BAREGLOBQUAL) && str[sl - 1] == Outpar) {
+    while (!nobareglob || isset(EXTENDEDGLOB)) {
+	struct qual *newquals;
 	char *s;
+	int sense, paren;
+	off_t data;
+	char *sdata, *newcolonmod;
+	int (*func) _((char *, Statptr, off_t, char *));
+
+	/*
+	 * Initialise state variables for current file pattern.
+	 * newquals is the root for the linked list of all qualifiers.
+	 * qo is the root of the current list of alternatives.
+	 * ql is the end of the current alternative where the `next' will go.
+	 * qn is the current qualifier node to be added.
+	 *
+	 * Here is an attempt at a diagram.  An `or' is added horizontally
+	 * to the top line, a `next' at the bottom of the right hand line.
+	 * `qn' is usually NULL unless a new `or' has just been added.
+	 *
+	 * quals -> x  -> x -> qo
+	 *          |     |    |
+	 *          x     x    x
+	 *          |          |
+	 *          x          ql
+	 *
+	 * In fact, after each loop the complete set is in the file static
+	 * `quals'.  Then, if we have a second set of qualifiers, we merge
+	 * the lists together.  This is only tricky if one or both have an
+	 * `or' in them; then we need to distribute over all alternatives.
+	 */
+	newquals = qo = qn = ql = NULL;
+
+	sl = strlen(str);
+	if (str[sl - 1] != Outpar)
+	    break;
 
 	/* Check these are really qualifiers, not a set of *
-	 * alternatives or exclusions                      */
-	for (s = str + sl - 2; *s != Inpar; s--)
-	    if (*s == Bar || *s == Outpar ||
-		(isset(EXTENDEDGLOB) && *s == Tilde))
+	 * alternatives or exclusions.  We can be more     *
+	 * lenient with an explicit (#q) than with a bare  *
+	 * set of qualifiers.                              */
+	paren = 0;
+	for (s = str + sl - 2; *s && (*s != Inpar || paren); s--) {
+	    switch (*s) {
+	    case Outpar:
+		paren++; /*FALLTHROUGH*/
+	    case Bar:
+		nobareglob = 1;
 		break;
-	if (*s == Inpar && (!isset(EXTENDEDGLOB) || s[1] != Pound)) {
-	    /* Real qualifiers found. */
-	    int sense = 0;	   /* bit 0 for match (0)/don't match (1)   */
-				   /* bit 1 for follow links (2), don't (0) */
-	    off_t data = 0;	   /* Any numerical argument required       */
-	    char *sdata = NULL; /* Any list argument required            */
-	    int (*func) _((char *, Statptr, off_t, char *));
+	    case Tilde:
+		if (isset(EXTENDEDGLOB))
+		    nobareglob = 1;
+		break;
+	    case Inpar:
+		paren--;
+		break;
+	    }
+	}
+	if (*s != Inpar)
+	    break;
+	if (isset(EXTENDEDGLOB) && s[1] == Pound) {
+	    if (s[2] == 'q') {
+		*s = 0;
+		s += 2;
+	    } else
+		break;
+	} else if (nobareglob)
+	    break;
 
-	    str[sl-1] = 0;
-	    *s++ = 0;
-	    while (*s && !colonmod) {
-		func = (int (*) _((char *, Statptr, off_t, char *)))0;
-		if (idigit(*s)) {
-		    /* Store numeric argument for qualifier */
+	/* Real qualifiers found. */
+	nobareglob = 1;
+	sense = 0;	   /* bit 0 for match (0)/don't match (1)   */
+			   /* bit 1 for follow links (2), don't (0) */
+	data = 0;	   /* Any numerical argument required       */
+	sdata = NULL;	   /* Any list argument required            */
+	newcolonmod = NULL; /* Contains trailing colon modifiers    */
+
+	str[sl-1] = 0;
+	*s++ = 0;
+	while (*s && !newcolonmod) {
+	    func = (int (*) _((char *, Statptr, off_t, char *)))0;
+	    if (idigit(*s)) {
+		/* Store numeric argument for qualifier */
+		func = qualflags;
+		data = 0;
+		sdata = NULL;
+		while (idigit(*s))
+		    data = data * 010 + (*s++ - '0');
+	    } else if (*s == ',') {
+		/* A comma separates alternative sets of qualifiers */
+		s++;
+		sense = 0;
+		if (qualct) {
+		    qn = (struct qual *)hcalloc(sizeof *qn);
+		    qo->or = qn;
+		    qo = qn;
+		    qualorct++;
+		    qualct = 0;
+		    ql = NULL;
+		}
+	    } else {
+		switch (*s++) {
+		case ':':
+		    /* Remaining arguments are history-type     *
+		     * colon substitutions, handled separately. */
+		    newcolonmod = s - 1;
+		    untokenize(newcolonmod);
+		    if (colonmod) {
+			/* remember we're searching backwards */
+			colonmod = dyncat(newcolonmod, colonmod);
+		    } else
+			colonmod = newcolonmod;
+		    break;
+		case Hat:
+		case '^':
+		    /* Toggle sense:  go from positive to *
+		     * negative match and vice versa.     */
+		    sense ^= 1;
+		    break;
+		case '-':
+		    /* Toggle matching of symbolic links */
+		    sense ^= 2;
+		    break;
+		case '@':
+		    /* Match symbolic links */
+		    func = qualislnk;
+		    break;
+		case Equals:
+		case '=':
+		    /* Match sockets */
+		    func = qualissock;
+		    break;
+		case 'p':
+		    /* Match named pipes */
+		    func = qualisfifo;
+		    break;
+		case '/':
+		    /* Match directories */
+		    func = qualisdir;
+		    break;
+		case '.':
+		    /* Match regular files */
+		    func = qualisreg;
+		    break;
+		case '%':
+		    /* Match special files: block, *
+		     * character or any device     */
+		    if (*s == 'b')
+			s++, func = qualisblk;
+		    else if (*s == 'c')
+			s++, func = qualischr;
+		    else
+			func = qualisdev;
+		    break;
+		case Star:
+		    /* Match executable plain files */
+		    func = qualiscom;
+		    break;
+		case 'R':
+		    /* Match world-readable files */
 		    func = qualflags;
-		    data = 0;
-		    sdata = NULL;
-		    while (idigit(*s))
-			data = data * 010 + (*s++ - '0');
-		} else if (*s == ',') {
-		    /* A comma separates alternative sets of qualifiers */
-		    s++;
-		    sense = 0;
-		    if (qualct) {
-			qn = (struct qual *)hcalloc(sizeof *qn);
-			qo->or = qn;
-			qo = qn;
-			qualorct++;
-			qualct = 0;
-			ql = NULL;
-		    }
-		} else
-		    switch (*s++) {
-		    case ':':
-			/* Remaining arguments are history-type     *
-			 * colon substitutions, handled separately. */
-			colonmod = s - 1;
-			untokenize(colonmod);
-			break;
-		    case Hat:
-		    case '^':
-			/* Toggle sense:  go from positive to *
-			 * negative match and vice versa.     */
-			sense ^= 1;
-			break;
-		    case '-':
-			/* Toggle matching of symbolic links */
-			sense ^= 2;
-			break;
-		    case '@':
-			/* Match symbolic links */
-			func = qualislnk;
-			break;
-		    case Equals:
-		    case '=':
-			/* Match sockets */
-			func = qualissock;
-			break;
-		    case 'p':
-			/* Match named pipes */
-			func = qualisfifo;
-			break;
-		    case '/':
-			/* Match directories */
-			func = qualisdir;
-			break;
-		    case '.':
-			/* Match regular files */
-			func = qualisreg;
-			break;
-		    case '%':
-			/* Match special files: block, *
-			 * character or any device     */
-			if (*s == 'b')
-			    s++, func = qualisblk;
-			else if (*s == 'c')
-			    s++, func = qualischr;
-			else
-			    func = qualisdev;
-			break;
-		    case Star:
-			/* Match executable plain files */
-			func = qualiscom;
-			break;
-		    case 'R':
-			/* Match world-readable files */
-			func = qualflags;
-			data = 0004;
-			break;
-		    case 'W':
-			/* Match world-writeable files */
-			func = qualflags;
-			data = 0002;
-			break;
-		    case 'X':
-			/* Match world-executable files */
-			func = qualflags;
-			data = 0001;
-			break;
-		    case 'A':
-			func = qualflags;
-			data = 0040;
-			break;
-		    case 'I':
-			func = qualflags;
-			data = 0020;
-			break;
-		    case 'E':
-			func = qualflags;
-			data = 0010;
-			break;
-		    case 'r':
-			/* Match files readable by current process */
-			func = qualflags;
-			data = 0400;
-			break;
-		    case 'w':
-			/* Match files writeable by current process */
-			func = qualflags;
-			data = 0200;
-			break;
-		    case 'x':
-			/* Match files executable by current process */
-			func = qualflags;
-			data = 0100;
-			break;
-		    case 's':
-			/* Match setuid files */
-			func = qualflags;
-			data = 04000;
-			break;
-		    case 'S':
-			/* Match setgid files */
-			func = qualflags;
-			data = 02000;
-			break;
-		    case 't':
-			func = qualflags;
-			data = 01000;
-			break;
-		    case 'd':
-			/* Match device files by device number  *
-			 * (as given by stat's st_dev element). */
-			func = qualdev;
+		    data = 0004;
+		    break;
+		case 'W':
+		    /* Match world-writeable files */
+		    func = qualflags;
+		    data = 0002;
+		    break;
+		case 'X':
+		    /* Match world-executable files */
+		    func = qualflags;
+		    data = 0001;
+		    break;
+		case 'A':
+		    func = qualflags;
+		    data = 0040;
+		    break;
+		case 'I':
+		    func = qualflags;
+		    data = 0020;
+		    break;
+		case 'E':
+		    func = qualflags;
+		    data = 0010;
+		    break;
+		case 'r':
+		    /* Match files readable by current process */
+		    func = qualflags;
+		    data = 0400;
+		    break;
+		case 'w':
+		    /* Match files writeable by current process */
+		    func = qualflags;
+		    data = 0200;
+		    break;
+		case 'x':
+		    /* Match files executable by current process */
+		    func = qualflags;
+		    data = 0100;
+		    break;
+		case 's':
+		    /* Match setuid files */
+		    func = qualflags;
+		    data = 04000;
+		    break;
+		case 'S':
+		    /* Match setgid files */
+		    func = qualflags;
+		    data = 02000;
+		    break;
+		case 't':
+		    func = qualflags;
+		    data = 01000;
+		    break;
+		case 'd':
+		    /* Match device files by device number  *
+		     * (as given by stat's st_dev element). */
+		    func = qualdev;
+		    data = qgetnum(&s);
+		    break;
+		case 'l':
+		    /* Match files with the given no. of hard links */
+		    func = qualnlink;
+		    g_amc = -1;
+		    goto getrange;
+		case 'U':
+		    /* Match files owned by effective user ID */
+		    func = qualuid;
+		    data = geteuid();
+		    break;
+		case 'G':
+		    /* Match files owned by effective group ID */
+		    func = qualgid;
+		    data = getegid();
+		    break;
+		case 'u':
+		    /* Match files owned by given user id */
+		    func = qualuid;
+		    /* either the actual uid... */
+		    if (idigit(*s))
 			data = qgetnum(&s);
-			break;
-		    case 'l':
-			/* Match files with the given no. of hard links */
-			func = qualnlink;
-			g_amc = -1;
-			goto getrange;
-		    case 'U':
-			/* Match files owned by effective user ID */
-			func = qualuid;
-			data = geteuid();
-			break;
-		    case 'G':
-			/* Match files owned by effective group ID */
-			func = qualgid;
-			data = getegid();
-			break;
-		    case 'u':
-			/* Match files owned by given user id */
-			func = qualuid;
-			/* either the actual uid... */
-			if (idigit(*s))
-			    data = qgetnum(&s);
-			else {
-			    /* ... or a user name */
-			    char sav, *tt;
+		    else {
+			/* ... or a user name */
+			char sav, *tt;
 
-			    /* Find matching delimiters */
-			    tt = get_strarg(s);
-			    if (!*tt) {
-				zerr("missing end of name",
-				     NULL, 0);
-				data = 0;
-			    } else {
+			/* Find matching delimiters */
+			tt = get_strarg(s);
+			if (!*tt) {
+			    zerr("missing end of name",
+				 NULL, 0);
+			    data = 0;
+			} else {
 #ifdef HAVE_GETPWNAM
-				struct passwd *pw;
-				sav = *tt;
-				*tt = '\0';
+			    struct passwd *pw;
+			    sav = *tt;
+			    *tt = '\0';
 
-				if ((pw = getpwnam(s + 1)))
-				    data = pw->pw_uid;
-				else {
-				    zerr("unknown user", NULL, 0);
-				    data = 0;
-				}
-				*tt = sav;
-#else /* !HAVE_GETPWNAM */
-				sav = *tt;
+			    if ((pw = getpwnam(s + 1)))
+				data = pw->pw_uid;
+			    else {
 				zerr("unknown user", NULL, 0);
 				data = 0;
-#endif /* !HAVE_GETPWNAM */
-				if (sav)
-				    s = tt + 1;
-				else
-				    s = tt;
 			    }
+			    *tt = sav;
+#else /* !HAVE_GETPWNAM */
+			    sav = *tt;
+			    zerr("unknown user", NULL, 0);
+			    data = 0;
+#endif /* !HAVE_GETPWNAM */
+			    if (sav)
+				s = tt + 1;
+			    else
+				s = tt;
 			}
-			break;
-		    case 'g':
-			/* Given gid or group id... works like `u' */
-			func = qualgid;
-			/* either the actual gid... */
-			if (idigit(*s))
-			    data = qgetnum(&s);
-			else {
-			    /* ...or a delimited group name. */
-			    char sav, *tt;
+		    }
+		    break;
+		case 'g':
+		    /* Given gid or group id... works like `u' */
+		    func = qualgid;
+		    /* either the actual gid... */
+		    if (idigit(*s))
+			data = qgetnum(&s);
+		    else {
+			/* ...or a delimited group name. */
+			char sav, *tt;
 
-			    tt = get_strarg(s);
-			    if (!*tt) {
-				zerr("missing end of name",
-				     NULL, 0);
-				data = 0;
-			    } else {
+			tt = get_strarg(s);
+			if (!*tt) {
+			    zerr("missing end of name",
+				 NULL, 0);
+			    data = 0;
+			} else {
 #ifdef HAVE_GETGRNAM
-				struct group *gr;
-				sav = *tt;
-				*tt = '\0';
+			    struct group *gr;
+			    sav = *tt;
+			    *tt = '\0';
 
-				if ((gr = getgrnam(s + 1)))
-				    data = gr->gr_gid;
-				else {
-				    zerr("unknown group", NULL, 0);
-				    data = 0;
-				}
-				*tt = sav;
-#else /* !HAVE_GETGRNAM */
-				sav = *tt;
+			    if ((gr = getgrnam(s + 1)))
+				data = gr->gr_gid;
+			    else {
 				zerr("unknown group", NULL, 0);
 				data = 0;
+			    }
+			    *tt = sav;
+#else /* !HAVE_GETGRNAM */
+			    sav = *tt;
+			    zerr("unknown group", NULL, 0);
+			    data = 0;
 #endif /* !HAVE_GETGRNAM */
-				if (sav)
-				    s = tt + 1;
-				else
-				    s = tt;
-			    }
+			    if (sav)
+				s = tt + 1;
+			    else
+				s = tt;
 			}
-			break;
-		    case 'f':
-			/* Match modes with chmod-spec. */
-			func = qualmodeflags;
-			data = qgetmodespec(&s);
-			break;
-		    case 'M':
-			/* Mark directories with a / */
-			if ((gf_markdirs = !(sense & 1)))
-			    gf_follow = sense & 2;
-			break;
-		    case 'T':
-			/* Mark types in a `ls -F' type fashion */
-			if ((gf_listtypes = !(sense & 1)))
-			    gf_follow = sense & 2;
-			break;
-		    case 'N':
-			/* Nullglob:  remove unmatched patterns. */
-			gf_nullglob = !(sense & 1);
-			break;
-		    case 'D':
-			/* Glob dots: match leading dots implicitly */
-			gf_noglobdots = sense & 1;
-			break;
-		    case 'n':
-			/* Numeric glob sort */
-			gf_numsort = !(sense & 1);
-			break;
-		    case 'a':
-			/* Access time in given range */
-			g_amc = 0;
-			func = qualtime;
-			goto getrange;
-		    case 'm':
-			/* Modification time in given range */
-			g_amc = 1;
-			func = qualtime;
-			goto getrange;
-		    case 'c':
-			/* Inode creation time in given range */
-			g_amc = 2;
-			func = qualtime;
-			goto getrange;
-		    case 'L':
-			/* File size (Length) in given range */
-			func = qualsize;
-			g_amc = -1;
-			/* Get size multiplier */
-			g_units = TT_BYTES;
-			if (*s == 'p' || *s == 'P')
-			    g_units = TT_POSIX_BLOCKS, ++s;
-			else if (*s == 'k' || *s == 'K')
-			    g_units = TT_KILOBYTES, ++s;
-			else if (*s == 'm' || *s == 'M')
-			    g_units = TT_MEGABYTES, ++s;
-		      getrange:
-			/* Get time multiplier */
-			if (g_amc >= 0) {
-			    g_units = TT_DAYS;
-			    if (*s == 'h')
-				g_units = TT_HOURS, ++s;
-			    else if (*s == 'm')
-				g_units = TT_MINS, ++s;
-			    else if (*s == 'w')
-				g_units = TT_WEEKS, ++s;
-			    else if (*s == 'M')
-				g_units = TT_MONTHS, ++s;
-			    else if (*s == 's')
-				g_units = TT_SECONDS, ++s;
-			}
-			/* See if it's greater than, equal to, or less than */
-			if ((g_range = *s == '+' ? 1 : *s == '-' ? -1 : 0))
-			    ++s;
-			data = qgetnum(&s);
-			break;
+		    }
+		    break;
+		case 'f':
+		    /* Match modes with chmod-spec. */
+		    func = qualmodeflags;
+		    data = qgetmodespec(&s);
+		    break;
+		case 'F':
+		    func = qualnonemptydir;
+		    break;
+		case 'M':
+		    /* Mark directories with a / */
+		    if ((gf_markdirs = !(sense & 1)))
+			gf_follow = sense & 2;
+		    break;
+		case 'T':
+		    /* Mark types in a `ls -F' type fashion */
+		    if ((gf_listtypes = !(sense & 1)))
+			gf_follow = sense & 2;
+		    break;
+		case 'N':
+		    /* Nullglob:  remove unmatched patterns. */
+		    gf_nullglob = !(sense & 1);
+		    break;
+		case 'D':
+		    /* Glob dots: match leading dots implicitly */
+		    gf_noglobdots = sense & 1;
+		    break;
+		case 'n':
+		    /* Numeric glob sort */
+		    gf_numsort = !(sense & 1);
+		    break;
+		case 'a':
+		    /* Access time in given range */
+		    g_amc = 0;
+		    func = qualtime;
+		    goto getrange;
+		case 'm':
+		    /* Modification time in given range */
+		    g_amc = 1;
+		    func = qualtime;
+		    goto getrange;
+		case 'c':
+		    /* Inode creation time in given range */
+		    g_amc = 2;
+		    func = qualtime;
+		    goto getrange;
+		case 'L':
+		    /* File size (Length) in given range */
+		    func = qualsize;
+		    g_amc = -1;
+		    /* Get size multiplier */
+		    g_units = TT_BYTES;
+		    if (*s == 'p' || *s == 'P')
+			g_units = TT_POSIX_BLOCKS, ++s;
+		    else if (*s == 'k' || *s == 'K')
+			g_units = TT_KILOBYTES, ++s;
+		    else if (*s == 'm' || *s == 'M')
+			g_units = TT_MEGABYTES, ++s;
+		  getrange:
+		    /* Get time multiplier */
+		    if (g_amc >= 0) {
+			g_units = TT_DAYS;
+			if (*s == 'h')
+			    g_units = TT_HOURS, ++s;
+			else if (*s == 'm')
+			    g_units = TT_MINS, ++s;
+			else if (*s == 'w')
+			    g_units = TT_WEEKS, ++s;
+			else if (*s == 'M')
+			    g_units = TT_MONTHS, ++s;
+			else if (*s == 's')
+			    g_units = TT_SECONDS, ++s;
+		    }
+		    /* See if it's greater than, equal to, or less than */
+		    if ((g_range = *s == '+' ? 1 : *s == '-' ? -1 : 0))
+			++s;
+		    data = qgetnum(&s);
+		    break;
 
-		    case 'o':
-		    case 'O':
-			{
-			    int t;
+		case 'o':
+		case 'O':
+		{
+		    int t;
 
-			    switch (*s) {
-			    case 'n': t = GS_NAME; break;
-			    case 'L': t = GS_SIZE; break;
-			    case 'l': t = GS_LINKS; break;
-			    case 'a': t = GS_ATIME; break;
-			    case 'm': t = GS_MTIME; break;
-			    case 'c': t = GS_CTIME; break;
-			    default:
-				zerr("unknown sort specifier", NULL, 0);
-				restore_globstate(saved);
-				return;
-			    }
-			    if ((sense & 2) && t != GS_NAME)
-				t <<= GS_SHIFT;
-			    if (gf_sorts & t) {
-				zerr("doubled sort specifier", NULL, 0);
-				restore_globstate(saved);
-				return;
-			    }
-			    gf_sorts |= t;
-			    gf_sortlist[gf_nsorts++] = t |
-				(((sense & 1) ^ (s[-1] == 'O')) ? GS_DESC : 0);
-			    s++;
-			    break;
-			}
-		    case 'e':
-			{
-			    char sav, *tt = get_strarg(s);
-
-			    if (!*tt) {
-				zerr("missing end of string", NULL, 0);
-				data = 0;
-			    } else {
-				sav = *tt;
-				*tt = '\0';
-				func = qualsheval;
-				sdata = dupstring(s + 1);
-				untokenize(sdata);
-				*tt = sav;
-				if (sav)
-				    s = tt + 1;
-				else
-				    s = tt;
-			    }
-			    break;
-			}
-		    case '[':
-		    case Inbrack:
-			{
-			    char *os = --s;
-			    struct value v;
-
-			    v.isarr = SCANPM_WANTVALS;
-			    v.pm = NULL;
-			    v.b = -1;
-			    v.inv = 0;
-			    if (getindex(&s, &v) || s == os) {
-				zerr("invalid subscript", NULL, 0);
-				restore_globstate(saved);
-				return;
-			    }
-			    first = v.a;
-			    last = v.b;
-			    break;
-			}
+		    switch (*s) {
+		    case 'n': t = GS_NAME; break;
+		    case 'L': t = GS_SIZE; break;
+		    case 'l': t = GS_LINKS; break;
+		    case 'a': t = GS_ATIME; break;
+		    case 'm': t = GS_MTIME; break;
+		    case 'c': t = GS_CTIME; break;
+		    case 'd': t = GS_DEPTH; break;
 		    default:
-			zerr("unknown file attribute", NULL, 0);
+			zerr("unknown sort specifier", NULL, 0);
 			restore_globstate(saved);
 			return;
 		    }
-		if (func) {
-		    /* Requested test is performed by function func */
-		    if (!qn)
-			qn = (struct qual *)hcalloc(sizeof *qn);
-		    if (ql)
-			ql->next = qn;
-		    ql = qn;
-		    if (!quals)
-			quals = qo = qn;
-		    qn->func = func;
-		    qn->sense = sense;
-		    qn->data = data;
-		    qn->sdata = sdata;
-		    qn->range = g_range;
-		    qn->units = g_units;
-		    qn->amc = g_amc;
-		    qn = NULL;
-		    qualct++;
+		    if ((sense & 2) && !(t & (GS_NAME|GS_DEPTH)))
+			t <<= GS_SHIFT;
+		    if (gf_sorts & t) {
+			zerr("doubled sort specifier", NULL, 0);
+			restore_globstate(saved);
+			return;
+		    }
+		    gf_sorts |= t;
+		    gf_sortlist[gf_nsorts++] = t |
+			(((sense & 1) ^ (s[-1] == 'O')) ? GS_DESC : 0);
+		    s++;
+		    break;
 		}
-		if (errflag) {
+		case '+':
+		case 'e':
+		{
+		    char sav, *tt;
+		    int plus;
+
+		    if (s[-1] == '+') {
+			plus = 0;
+			tt = s;
+			while (iident(*tt))
+			    tt++;
+			if (tt == s)
+			{
+			    zerr("missing identifier after `+'", NULL, 0);
+			    tt = NULL;
+			}
+		    } else {
+			plus = 1;
+			tt = get_strarg(s);
+			if (!*tt)
+			{
+			    zerr("missing end of string", NULL, 0);
+			    tt = NULL;
+			}
+		    }
+
+		    if (tt == NULL) {
+			data = 0;
+		    } else {
+			sav = *tt;
+			*tt = '\0';
+			func = qualsheval;
+			sdata = dupstring(s + plus);
+			untokenize(sdata);
+			*tt = sav;
+			if (sav)
+			    s = tt + plus;
+			else
+			    s = tt;
+		    }
+		    break;
+		}
+		case '[':
+		case Inbrack:
+		{
+		    char *os = --s;
+		    struct value v;
+
+		    v.isarr = SCANPM_WANTVALS;
+		    v.pm = NULL;
+		    v.end = -1;
+		    v.inv = 0;
+		    if (getindex(&s, &v, 0) || s == os) {
+			zerr("invalid subscript", NULL, 0);
+			restore_globstate(saved);
+			return;
+		    }
+		    first = v.start;
+		    end = v.end;
+		    break;
+		}
+		default:
+		    zerr("unknown file attribute", NULL, 0);
 		    restore_globstate(saved);
 		    return;
 		}
 	    }
+	    if (func) {
+		/* Requested test is performed by function func */
+		if (!qn)
+		    qn = (struct qual *)hcalloc(sizeof *qn);
+		if (ql)
+		    ql->next = qn;
+		ql = qn;
+		if (!newquals)
+		    newquals = qo = qn;
+		qn->func = func;
+		qn->sense = sense;
+		qn->data = data;
+		qn->sdata = sdata;
+		qn->range = g_range;
+		qn->units = g_units;
+		qn->amc = g_amc;
+
+		qn = NULL;
+		qualct++;
+	    }
+	    if (errflag) {
+		restore_globstate(saved);
+		return;
+	    }
 	}
+
+	if (quals && newquals) {
+	    /* Merge previous group of qualifiers with new set. */
+	    if (quals->or || newquals->or) {
+		/* The hard case. */
+		struct qual *qorhead = NULL, *qortail = NULL;
+		/*
+		 * Distribute in the most trivial way, by creating
+		 * all possible combinations of the two sets and chaining
+		 * these into one long set of alternatives given
+		 * by qorhead and qortail.
+		 */
+		for (qn = newquals; qn; qn = qn->or) {
+		    for (qo = quals; qo; qo = qo->or) {
+			struct qual *qfirst, *qlast;
+			int islast = !qn->or && !qo->or;
+			/* Generate first set of qualifiers... */
+			if (islast) {
+			    /* Last time round:  don't bother copying. */
+			    qfirst = qn;
+			    for (qlast = qfirst; qlast->next;
+				 qlast = qlast->next)
+				;			    
+			} else
+			    qfirst = dup_qual_list(qn, &qlast);
+			/* ... link into new `or' chain ... */
+			if (!qorhead)
+			    qorhead = qfirst;
+			if (qortail)
+			    qortail->or = qfirst;
+			qortail = qfirst;
+			/* ... and concatenate second set. */
+			qlast->next = islast ? qo : dup_qual_list(qo, NULL);
+		    }
+		}
+		quals = qorhead;
+	    } else {
+		/*
+		 * Easy: we can just chain the qualifiers together.
+		 * This is an optimisation; the code above will work, too.
+		 * We retain the original left to right ordering --- remember
+		 * we are searching for sets of qualifiers from the right.
+		 */
+		qn = newquals;
+		for ( ; newquals->next; newquals = newquals->next)
+		    ;
+		newquals->next = quals;
+		quals = qn;
+	    }
+	} else if (newquals)
+	    quals = newquals;
     }
     q = parsepat(str);
     if (!q || errflag) {	/* if parsing failed */
@@ -1387,6 +1612,7 @@ glob(LinkList list, LinkNode np, int nountok)
 	} else if (isset(NOMATCH)) {
 	    zerr("no matches found: %s", ostr, 0);
 	    free(matchbuf);
+	    restore_globstate(saved);
 	    return;
 	} else {
 	    /* treat as an ordinary string */
@@ -1400,18 +1626,18 @@ glob(LinkList list, LinkNode np, int nountok)
     qsort((void *) & matchbuf[0], matchct, sizeof(struct gmatch),
 	       (int (*) _((const void *, const void *)))gmatchcmp);
 
-    if (first < 0)
+    if (first < 0) {
 	first += matchct;
-    if (last < 0)
-	last += matchct;
-    if (first < 0)
-	first = 0;
-    if (last >= matchct)
-	last = matchct - 1;
-    if (first <= last) {
-	matchptr = matchbuf + matchct - 1 - last;
-	last -= first;
-	while (last-- >= 0) {		/* insert matches in the arg list */
+	if (first < 0)
+	    first = 0;
+    }
+    if (end < 0)
+	end += matchct + 1;
+    else if (end > matchct)
+	end = matchct;
+    if ((end -= first) > 0) {
+	matchptr = matchbuf + matchct - first - end;
+	while (end-- > 0) {		/* insert matches in the arg list */
 	    insertlinknode(list, node, matchptr->name);
 	    matchptr++;
 	}
@@ -1419,46 +1645,6 @@ glob(LinkList list, LinkNode np, int nountok)
     free(matchbuf);
 
     restore_globstate(saved);
-}
-
-/* Return the order of two strings, taking into account *
- * possible numeric order if NUMERICGLOBSORT is set.    *
- * The comparison here is reversed.                     */
-
-/**/
-static int
-notstrcmp(char **a, char **b)
-{
-    char *c = *b, *d = *a;
-    int cmp;
-
-#ifdef HAVE_STRCOLL
-    cmp = strcoll(c, d);
-#endif
-    for (; *c == *d && *c; c++, d++);
-#ifndef HAVE_STRCOLL
-    cmp = (int)STOUC(*c) - (int)STOUC(*d);
-#endif
-    if (gf_numsort && (idigit(*c) || idigit(*d))) {
-	for (; c > *b && idigit(c[-1]); c--, d--);
-	if (idigit(*c) && idigit(*d)) {
-	    while (*c == '0')
-		c++;
-	    while (*d == '0')
-		d++;
-	    for (; idigit(*c) && *c == *d; c++, d++);
-	    if (idigit(*c) || idigit(*d)) {
-		cmp = (int)STOUC(*c) - (int)STOUC(*d);
-		while (idigit(*c) && idigit(*d))
-		    c++, d++;
-		if (idigit(*c) && !idigit(*d))
-		    return 1;
-		if (idigit(*d) && !idigit(*c))
-		    return -1;
-	    }
-	}
-    }
-    return cmp;
 }
 
 /* Return the trailing character for marking file types */
@@ -1488,7 +1674,7 @@ file_type(mode_t filemode)
 /* check to see if str is eligible for brace expansion */
 
 /**/
-int
+mod_export int
 hasbraces(char *str)
 {
     char *lbr, *mbr, *comma;
@@ -1601,27 +1787,27 @@ xpandredir(struct redir *fn, LinkList tab)
 	char *s = peekfirst(&fake);
 	fn->name = s;
 	untokenize(s);
-	if (fn->type == MERGEIN || fn->type == MERGEOUT) {
+	if (fn->type == REDIR_MERGEIN || fn->type == REDIR_MERGEOUT) {
 	    if (s[0] == '-' && !s[1])
-		fn->type = CLOSE;
-	    else if (s[0] == 'p' && !s[1]) 
+		fn->type = REDIR_CLOSE;
+	    else if (s[0] == 'p' && !s[1])
 		fn->fd2 = -2;
 	    else {
 		while (idigit(*s))
 		    s++;
 		if (!*s && s > fn->name)
 		    fn->fd2 = zstrtol(fn->name, NULL, 10);
-		else if (fn->type == MERGEIN)
+		else if (fn->type == REDIR_MERGEIN)
 		    zerr("file number expected", NULL, 0);
 		else
-		    fn->type = ERRWRITE;
+		    fn->type = REDIR_ERRWRITE;
 	    }
 	}
-    } else if (fn->type == MERGEIN)
+    } else if (fn->type == REDIR_MERGEIN)
 	zerr("file number expected", NULL, 0);
     else {
-	if (fn->type == MERGEOUT)
-	    fn->type = ERRWRITE;
+	if (fn->type == REDIR_MERGEOUT)
+	    fn->type = REDIR_ERRWRITE;
 	while ((nam = (char *)ugetnode(&fake))) {
 	    /* Loop over matches, duplicating the *
 	     * redirection for each file found.   */
@@ -1635,42 +1821,10 @@ xpandredir(struct redir *fn, LinkList tab)
     return ret;
 }
 
-/* concatenate s1 and s2 in dynamically allocated buffer */
-
-/**/
-mod_export char *
-dyncat(char *s1, char *s2)
-{
-    /* This version always uses space from the current heap. */
-    char *ptr;
-    int l1 = strlen(s1);
-
-    ptr = (char *)zhalloc(l1 + strlen(s2) + 1);
-    strcpy(ptr, s1);
-    strcpy(ptr + l1, s2);
-    return ptr;
-}
-
-/* concatenate s1, s2, and s3 in dynamically allocated buffer */
-
-/**/
-mod_export char *
-tricat(char const *s1, char const *s2, char const *s3)
-{
-    /* This version always uses permanently-allocated space. */
-    char *ptr;
-
-    ptr = (char *)zalloc(strlen(s1) + strlen(s2) + strlen(s3) + 1);
-    strcpy(ptr, s1);
-    strcat(ptr, s2);
-    strcat(ptr, s3);
-    return ptr;
-}
-
 /* brace expansion */
 
 /**/
-void
+mod_export void
 xpandbraces(LinkList list, LinkNode *np)
 {
     LinkNode node = (*np), last = prevnode(node);
@@ -1701,7 +1855,7 @@ xpandbraces(LinkList list, LinkNode *np)
 	int rstart = zstrtol(str+1,&dots,10), rend = 0, err = 0, rev = 0;
 	int wid1 = (dots - str) - 1, wid2 = (str2 - dots) - 2;
 	int strp = str - str3;
-      
+
 	if (dots == str + 1 || *dots != '.' || dots[1] != '.')
 	    err++;
 	else {
@@ -1742,12 +1896,13 @@ xpandbraces(LinkList list, LinkNode *np)
 	 * set of flags saying whether each character is present; *
 	 * the final list is in lexical order.                    */
 	char ccl[256], *p;
-	unsigned char c1, c2, lastch;
+	unsigned char c1, c2;
 	unsigned int len, pl;
+	int lastch = -1;
 
 	uremnode(list, node);
 	memset(ccl, 0, sizeof(ccl) / sizeof(ccl[0]));
-	for (p = str + 1, lastch = 0; p < str2;) {
+	for (p = str + 1; p < str2;) {
 	    if (itok(c1 = *p++))
 		c1 = ztokens[c1 - STOUC(Pound)];
 	    if ((char) c1 == Meta)
@@ -1756,10 +1911,10 @@ xpandbraces(LinkList list, LinkNode *np)
 		c2 = ztokens[c2 - STOUC(Pound)];
 	    if ((char) c2 == Meta)
 		c2 = 32 ^ p[1];
-	    if (c1 == '-' && lastch && p < str2 && (int)lastch <= (int)c2) {
-		while ((int)lastch < (int)c2)
+	    if (c1 == '-' && lastch >= 0 && p < str2 && lastch <= (int)c2) {
+		while (lastch < (int)c2)
 		    ccl[lastch++] = 1;
-		lastch = 0;
+		lastch = -1;
 	    } else
 		ccl[lastch = c1] = 1;
 	}
@@ -1844,7 +1999,7 @@ struct repldata {
 };
 typedef struct repldata *Repldata;
 
-/* 
+/*
  * List of bits of matches to concatenate with replacement string.
  * The data is a struct repldata.  It is not used in cases like
  * ${...//#foo/bar} even though SUB_GLOBAL is set, since the match
@@ -2030,20 +2185,73 @@ getmatcharr(char ***ap, char *pat, int fl, int n, char *replstr)
 }
 
 /**/
+static void
+set_pat_start(Patprog p, int offs)
+{
+    /*
+     * If we are messing around with the test string by advancing up
+     * it from the start, we need to tell the pattern matcher that
+     * a start-of-string assertion, i.e. (#s), should fail.  Hence
+     * we test whether the offset of the real start of string from
+     * the actual start, passed as offs, is zero.
+     */
+    if (offs)
+	p->flags |= PAT_NOTSTART;
+    else
+	p->flags &= ~PAT_NOTSTART;
+}
+
+/**/
+static void
+set_pat_end(Patprog p, char null_me)
+{
+    /*
+     * If we are messing around with the string by shortening it at the
+     * tail, we need to tell the pattern matcher that an end-of-string
+     * assertion, i.e. (#e), should fail.  Hence we test whether
+     * the character null_me about to be zapped is or is not already a null.
+     */
+    if (null_me)
+	p->flags |= PAT_NOTEND;
+    else
+	p->flags &= ~PAT_NOTEND;
+}
+
+/**/
 static int
 igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 {
-    char *s = *sp, *t, sav;
-    int i, l = strlen(*sp), ml = ztrlen(*sp), matched = 1;
+    char *s = *sp, *t;
+    /*
+     * Note that ioff and ml count characters in the character
+     * set (Meta's are not included), while l counts characters in the
+     * string.
+     */
+    int ioff, l = strlen(*sp), ml = ztrlen(*sp), matched = 1;
 
     repllist = NULL;
 
     /* perform must-match test for complex closures */
-    if (p->mustoff && !strstr((char *)s, (char *)p + p->mustoff))
-	matched = 0;
+    if (p->mustoff)
+    {
+	/*
+	 * Yuk.  Probably we should rewrite this whole function to
+	 * use an unmetafied test string.
+	 *
+	 * Use META_HEAPDUP because we need a terminating NULL.
+	 */
+	char *muststr = metafy((char *)p + p->mustoff,
+			       p->patmlen, META_HEAPDUP);
+
+	if (!strstr(s, muststr))
+	    matched = 0;
+    }
+
+    /* in case we used the prog before... */
+    p->flags &= ~(PAT_NOTSTART|PAT_NOTEND);
 
     if (fl & SUB_ALL) {
-	i = matched && pattry(p, s);
+	int i = matched && pattry(p, s);
 	*sp = get_match_ret(*sp, 0, i ? l : 0, fl, i ? replstr : 0);
 	if (! **sp && (((fl & SUB_MATCH) && !i) || ((fl & SUB_REST) && i)))
 	    return 0;
@@ -2058,24 +2266,22 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	     * First get the longest match...
 	     */
 	    if (pattry(p, s)) {
-		char *mpos = patinput;
+		/* patmatchlen returns metafied length, as we need */
+	        int mlen = patmatchlen();
 		if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
 		    /*
 		     * ... now we know whether it's worth looking for the
 		     * shortest, which we do by brute force.
 		     */
-		    for (t = s; t < mpos; METAINC(t)) {
-			sav = *t;
-			*t = '\0';
-			if (pattry(p, s)) {
-			    mpos = patinput;
-			    *t = sav;
+		    for (t = s; t < s + mlen; METAINC(t)) {
+			set_pat_end(p, *t);
+			if (pattrylen(p, s, t - s, 0)) {
+			    mlen = patmatchlen();
 			    break;
 			}
-			*t = sav;
 		    }
 		}
-		*sp = get_match_ret(*sp, 0, mpos-s, fl, replstr);
+		*sp = get_match_ret(*sp, 0, mlen, fl, replstr);
 		return 1;
 	    }
 	    break;
@@ -2084,37 +2290,35 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    /* Smallest possible match at tail of string:  *
 	     * move back down string until we get a match. *
 	     * There's no optimization here.               */
-	    patoffset = ml;
-	    for (t = s + l; t >= s; t--, patoffset--) {
-		if (pattry(p, t)) {
+	    for (ioff = ml, t = s + l; t >= s; t--, ioff--) {
+		set_pat_start(p, t-s);
+		if (pattrylen(p, t, -1, ioff)) {
 		    *sp = get_match_ret(*sp, t - s, l, fl, replstr);
-		    patoffset = 0;
 		    return 1;
 		}
 		if (t > s+1 && t[-2] == Meta)
 		    t--;
 	    }
-	    patoffset = 0;
 	    break;
 
 	case (SUB_END|SUB_LONG):
 	    /* Largest possible match at tail of string:       *
 	     * move forward along string until we get a match. *
 	     * Again there's no optimisation.                  */
-	    for (i = 0, t = s; i < l; i++, t++, patoffset++) {
-		if (pattry(p, t)) {
-		    *sp = get_match_ret(*sp, i, l, fl, replstr);
-		    patoffset = 0;
+	    for (ioff = 0, t = s; t < s + l; ioff++, t++) {
+		set_pat_start(p, t-s);
+		if (pattrylen(p, t, -1, ioff)) {
+		    *sp = get_match_ret(*sp, t-s, l, fl, replstr);
 		    return 1;
 		}
 		if (*t == Meta)
-		    i++, t++;
+		    t++;
 	    }
-	    patoffset = 0;
 	    break;
 
 	case SUB_SUBSTR:
 	    /* Smallest at start, but matching substrings. */
+	    set_pat_start(p, l);
 	    if (!(fl & SUB_GLOBAL) && pattry(p, s + l) && !--n) {
 		*sp = get_match_ret(*sp, 0, 0, fl, replstr);
 		return 1;
@@ -2124,24 +2328,23 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    t = s;
 	    if (fl & SUB_GLOBAL)
 		repllist = newlinklist();
+	    ioff = 0;		/* offset into string */
 	    do {
 		/* loop over all matches for global substitution */
 		matched = 0;
-		for (; t < s + l; t++, patoffset++) {
+		for (; t < s + l; t++, ioff++) {
 		    /* Find the longest match from this position. */
-		    if (pattry(p, t) && patinput > t) {
-			char *mpos = patinput;
+		    set_pat_start(p, t-s);
+		    if (pattrylen(p, t, -1, ioff)) {
+			char *mpos = t + patmatchlen();
 			if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
 			    char *ptr;
 			    for (ptr = t; ptr < mpos; METAINC(ptr)) {
-				sav = *ptr;
-				*ptr = '\0';
-				if (pattry(p, t)) {
-				    mpos = patinput;
-				    *ptr = sav;
+				set_pat_end(p, *ptr);
+				if (pattrylen(p, t, ptr - t, ioff)) {
+				    mpos = t + patmatchlen();
 				    break;
 				}
-				*ptr = sav;
 			    }
 			}
 			if (!--n || (n <= 0 && (fl & SUB_GLOBAL))) {
@@ -2159,7 +2362,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 				 */
 				continue;
 			    } else {
-				patoffset = 0;
 				return 1;
 			    }
 			}
@@ -2168,7 +2370,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			 * which is already marked for replacement.
 			 */
 			matched = 1;
-			for ( ; t < mpos; t++, patoffset++)
+			for ( ; t < mpos; t++, ioff++)
 			    if (*t == Meta)
 				t++;
 			break;
@@ -2177,12 +2379,12 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			t++;
 		}
 	    } while (matched);
-	    patoffset = 0;
 	    /*
 	     * check if we can match a blank string, if so do it
 	     * at the start.  Goodness knows if this is a good idea
 	     * with global substitution, so it doesn't happen.
 	     */
+	    set_pat_start(p, l);
 	    if ((fl & (SUB_LONG|SUB_GLOBAL)) == SUB_LONG &&
 		pattry(p, s + l) && !--n) {
 		*sp = get_match_ret(*sp, 0, 0, fl, replstr);
@@ -2191,47 +2393,41 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    break;
 
 	case (SUB_END|SUB_SUBSTR):
-	    /* Shortest at end with substrings */
-	    patoffset = ml;
-	    if (pattry(p, s + l) && !--n) {
-		*sp = get_match_ret(*sp, l, l, fl, replstr);
-		patoffset = 0;
-		return 1;
-	    } /* fall through */
 	case (SUB_END|SUB_LONG|SUB_SUBSTR):
 	    /* Longest/shortest at end, matching substrings.       */
-	    patoffset--;
-	    for (t = s + l - 1; t >= s; t--, patoffset--) {
-		if (t > s && t[-1] == Meta)
-		    t--;
-		if (pattry(p, t) && patinput > t && !--n) {
-		    /* Found the longest match */
-		    char *mpos = patinput;
-		    if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
-			char *ptr;
-			for (ptr = t; ptr < mpos; METAINC(ptr)) {
-			    sav = *ptr;
-			    *ptr = '\0';
-			    if (pattry(p, t)) {
-				mpos = patinput;
-				*ptr = sav;
-				break;
-			    }
-			    *ptr = sav;
-			}
-		    }
-		    *sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
-		    patoffset = 0;
+	    if (!(fl & SUB_LONG)) {
+		set_pat_start(p, l);
+		if (pattrylen(p, s + l, -1, ml) && !--n) {
+		    *sp = get_match_ret(*sp, l, l, fl, replstr);
 		    return 1;
 		}
 	    }
-	    patoffset = ml;
-	    if ((fl & SUB_LONG) && pattry(p, s + l) && !--n) {
+	    for (ioff = ml - 1, t = s + l - 1; t >= s; t--, ioff--) {
+		if (t > s && t[-1] == Meta)
+		    t--;
+		set_pat_start(p, t-s);
+		if (pattrylen(p, t, -1, ioff) && !--n) {
+		    /* Found the longest match */
+		    char *mpos = t + patmatchlen();
+		    if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
+			char *ptr;
+			for (ptr = t; ptr < mpos; METAINC(ptr)) {
+			    set_pat_end(p, *ptr);
+			    if (pattrylen(p, t, ptr - t, ioff)) {
+				mpos = t + patmatchlen();
+				break;
+			    }
+			}
+		    }
+		    *sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
+		    return 1;
+		}
+	    }
+	    set_pat_start(p, l);
+	    if ((fl & SUB_LONG) && pattrylen(p, s + l, -1, ml) && !--n) {
 		*sp = get_match_ret(*sp, l, l, fl, replstr);
-		patoffset = 0;
 		return 1;
 	    }
-	    patoffset = 0;
 	    break;
 	}
     }
@@ -2242,6 +2438,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	Repldata rd;
 	int lleft = 0;		/* size of returned string */
 	char *ptr, *start;
+	int i;
 
 	i = 0;			/* start of last chunk we got from *sp */
 	for (nd = firstnode(repllist); nd; incnode(nd)) {
@@ -2279,6 +2476,20 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 mod_export void
 tokenize(char *s)
 {
+    zshtokenize(s, 0);
+}
+
+/**/
+mod_export void
+shtokenize(char *s)
+{
+    zshtokenize(s, isset(SHGLOB));
+}
+
+/**/
+static void
+zshtokenize(char *s, int shglob)
+{
     char *t;
     int bslash = 0;
 
@@ -2294,7 +2505,7 @@ tokenize(char *s)
 	    bslash = 1;
 	    continue;
 	case '<':
-	    if (isset(SHGLOB))
+	    if (shglob)
 		break;
 	    if (bslash) {
 		s[-1] = Bnull;
@@ -2313,8 +2524,9 @@ tokenize(char *s)
 	case '(':
 	case '|':
 	case ')':
-	    if (isset(SHGLOB))
+	    if (shglob)
 		break;
+	case '>':
 	case '^':
 	case '#':
 	case '~':
@@ -2322,6 +2534,7 @@ tokenize(char *s)
 	case ']':
 	case '*':
 	case '?':
+	case '=':
 	    for (t = ztokens; *t; t++)
 		if (*t == *s) {
 		    if (bslash)
@@ -2367,16 +2580,16 @@ remnulargs(char *s)
 
 /**/
 static int
-qualdev(char *name, struct stat *buf, off_t dv, char *dummy)
+qualdev(UNUSED(char *name), struct stat *buf, off_t dv, UNUSED(char *dummy))
 {
-    return buf->st_dev == dv;
+    return (off_t)buf->st_dev == dv;
 }
 
 /* number of hard links to file */
 
 /**/
 static int
-qualnlink(char *name, struct stat *buf, off_t ct, char *dummy)
+qualnlink(UNUSED(char *name), struct stat *buf, off_t ct, UNUSED(char *dummy))
 {
     return (g_range < 0 ? buf->st_nlink < ct :
 	    g_range > 0 ? buf->st_nlink > ct :
@@ -2387,7 +2600,7 @@ qualnlink(char *name, struct stat *buf, off_t ct, char *dummy)
 
 /**/
 static int
-qualuid(char *name, struct stat *buf, off_t uid, char *dummy)
+qualuid(UNUSED(char *name), struct stat *buf, off_t uid, UNUSED(char *dummy))
 {
     return buf->st_uid == uid;
 }
@@ -2396,7 +2609,7 @@ qualuid(char *name, struct stat *buf, off_t uid, char *dummy)
 
 /**/
 static int
-qualgid(char *name, struct stat *buf, off_t gid, char *dummy)
+qualgid(UNUSED(char *name), struct stat *buf, off_t gid, UNUSED(char *dummy))
 {
     return buf->st_gid == gid;
 }
@@ -2405,7 +2618,7 @@ qualgid(char *name, struct stat *buf, off_t gid, char *dummy)
 
 /**/
 static int
-qualisdev(char *name, struct stat *buf, off_t junk, char *dummy)
+qualisdev(UNUSED(char *name), struct stat *buf, UNUSED(off_t junk), UNUSED(char *dummy))
 {
     return S_ISBLK(buf->st_mode) || S_ISCHR(buf->st_mode);
 }
@@ -2414,7 +2627,7 @@ qualisdev(char *name, struct stat *buf, off_t junk, char *dummy)
 
 /**/
 static int
-qualisblk(char *name, struct stat *buf, off_t junk, char *dummy)
+qualisblk(UNUSED(char *name), struct stat *buf, UNUSED(off_t junk), UNUSED(char *dummy))
 {
     return S_ISBLK(buf->st_mode);
 }
@@ -2423,7 +2636,7 @@ qualisblk(char *name, struct stat *buf, off_t junk, char *dummy)
 
 /**/
 static int
-qualischr(char *name, struct stat *buf, off_t junk, char *dummy)
+qualischr(UNUSED(char *name), struct stat *buf, UNUSED(off_t junk), UNUSED(char *dummy))
 {
     return S_ISCHR(buf->st_mode);
 }
@@ -2432,7 +2645,7 @@ qualischr(char *name, struct stat *buf, off_t junk, char *dummy)
 
 /**/
 static int
-qualisdir(char *name, struct stat *buf, off_t junk, char *dummy)
+qualisdir(UNUSED(char *name), struct stat *buf, UNUSED(off_t junk), UNUSED(char *dummy))
 {
     return S_ISDIR(buf->st_mode);
 }
@@ -2441,7 +2654,7 @@ qualisdir(char *name, struct stat *buf, off_t junk, char *dummy)
 
 /**/
 static int
-qualisfifo(char *name, struct stat *buf, off_t junk, char *dummy)
+qualisfifo(UNUSED(char *name), struct stat *buf, UNUSED(off_t junk), UNUSED(char *dummy))
 {
     return S_ISFIFO(buf->st_mode);
 }
@@ -2450,7 +2663,7 @@ qualisfifo(char *name, struct stat *buf, off_t junk, char *dummy)
 
 /**/
 static int
-qualislnk(char *name, struct stat *buf, off_t junk, char *dummy)
+qualislnk(UNUSED(char *name), struct stat *buf, UNUSED(off_t junk), UNUSED(char *dummy))
 {
     return S_ISLNK(buf->st_mode);
 }
@@ -2459,7 +2672,7 @@ qualislnk(char *name, struct stat *buf, off_t junk, char *dummy)
 
 /**/
 static int
-qualisreg(char *name, struct stat *buf, off_t junk, char *dummy)
+qualisreg(UNUSED(char *name), struct stat *buf, UNUSED(off_t junk), UNUSED(char *dummy))
 {
     return S_ISREG(buf->st_mode);
 }
@@ -2468,7 +2681,7 @@ qualisreg(char *name, struct stat *buf, off_t junk, char *dummy)
 
 /**/
 static int
-qualissock(char *name, struct stat *buf, off_t junk, char *dummy)
+qualissock(UNUSED(char *name), struct stat *buf, UNUSED(off_t junk), UNUSED(char *dummy))
 {
     return S_ISSOCK(buf->st_mode);
 }
@@ -2477,7 +2690,7 @@ qualissock(char *name, struct stat *buf, off_t junk, char *dummy)
 
 /**/
 static int
-qualflags(char *name, struct stat *buf, off_t mod, char *dummy)
+qualflags(UNUSED(char *name), struct stat *buf, off_t mod, UNUSED(char *dummy))
 {
     return mode_to_octal(buf->st_mode) & mod;
 }
@@ -2486,7 +2699,7 @@ qualflags(char *name, struct stat *buf, off_t mod, char *dummy)
 
 /**/
 static int
-qualmodeflags(char *name, struct stat *buf, off_t mod, char *dummy)
+qualmodeflags(UNUSED(char *name), struct stat *buf, off_t mod, UNUSED(char *dummy))
 {
     long v = mode_to_octal(buf->st_mode), y = mod & 07777, n = mod >> 12;
 
@@ -2497,7 +2710,7 @@ qualmodeflags(char *name, struct stat *buf, off_t mod, char *dummy)
 
 /**/
 static int
-qualiscom(char *name, struct stat *buf, off_t mod, char *dummy)
+qualiscom(UNUSED(char *name), struct stat *buf, UNUSED(off_t mod), UNUSED(char *dummy))
 {
     return S_ISREG(buf->st_mode) && (buf->st_mode & S_IXUGO);
 }
@@ -2506,7 +2719,7 @@ qualiscom(char *name, struct stat *buf, off_t mod, char *dummy)
 
 /**/
 static int
-qualsize(char *name, struct stat *buf, off_t size, char *dummy)
+qualsize(UNUSED(char *name), struct stat *buf, off_t size, UNUSED(char *dummy))
 {
 #if defined(LONG_IS_64_BIT) || defined(OFF_T_IS_64_BIT)
 # define QS_CAST_SIZE()
@@ -2541,7 +2754,7 @@ qualsize(char *name, struct stat *buf, off_t size, char *dummy)
 
 /**/
 static int
-qualtime(char *name, struct stat *buf, off_t days, char *dummy)
+qualtime(UNUSED(char *name), struct stat *buf, off_t days, UNUSED(char *dummy))
 {
     time_t now, diff;
 
@@ -2576,11 +2789,11 @@ qualtime(char *name, struct stat *buf, off_t days, char *dummy)
 
 /**/
 static int
-qualsheval(char *name, struct stat *buf, off_t days, char *str)
+qualsheval(char *name, UNUSED(struct stat *buf), UNUSED(off_t days), char *str)
 {
     Eprog prog;
 
-    if ((prog = parse_string(str, 0))) {
+    if ((prog = parse_string(str))) {
 	int ef = errflag, lv = lastval, ret;
 
 	unsetparam("reply");
@@ -2607,5 +2820,32 @@ qualsheval(char *name, struct stat *buf, off_t days, char *str)
 	}
 	return !ret;
     }
+    return 0;
+}
+
+/**/
+static int
+qualnonemptydir(char *name, struct stat *buf, UNUSED(off_t days), UNUSED(char *str))
+{
+    DIR *dirh;
+    struct dirent *de;
+
+    if (!S_ISDIR(buf->st_mode))
+	return 0;
+
+    if (buf->st_nlink > 2)
+	return 1;
+
+    if (!(dirh = opendir(name)))
+	return 0;
+
+    while ((de = readdir(dirh))) {
+	if (strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
+	    closedir(dirh);
+	    return 1;
+	}
+    }
+
+    closedir(dirh);
     return 0;
 }

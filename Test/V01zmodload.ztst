@@ -1,0 +1,166 @@
+# Test basic module loading
+
+%prep
+# Figure out which modules it ought to be possible to load by looking at
+# the config.modules file.  This differs for static vs. dynamic builds.
+
+ mods=()
+ deps="$(zmodload -Ld)"
+ while read name modfile link auto load funcs
+ do
+   [[ $name == \#* ]] && continue
+   eval "$name $modfile $link $auto $load"
+   [[ $link == no ]] && continue
+   mods=($mods $name)
+   moddeps=
+   modfile=$ZTST_srcdir/../$modfile
+   eval ${${${(f)"$(<$modfile)"}[(r)moddeps=*]}:-:}
+   [[ -n $moddeps ]] && zmodload -d $name $=moddeps
+ done < $ZTST_testdir/../config.modules
+
+ zmodunload() {
+   local m n=$#
+   (( n == 0 )) && return 0
+   for m
+   do
+     if [[ -z ${(M)${(f)"$(zmodload -d)"}:#*:* $m( *|)} ]]
+     then
+       zmodload -u $m && zmodload -ud $m || return 1
+       shift
+     else
+       set $@[2,-1] $m
+     fi
+   done
+   if (( $# < n ))
+   then
+     zmodunload $*
+   else
+     zmodload -u $*
+   fi
+ }
+
+%test
+
+# This first test depends on knowing that zsh is run with +Z from the
+# Makefile, and that ztst.zsh loads the parameter module.
+
+ zmodload -L
+0:List the loaded modules
+>zmodload zsh/main
+>zmodload zsh/parameter
+
+ zmodload zsh/main
+1:Test reloading an already-loaded module
+?(eval):zmodload:1: module zsh/main already loaded.
+
+# Loop over the modules found above and attempt to load each one.  Use
+# the -i flag in case dependencies cause multiple modules to be loaded,
+# or in case some previous test suite loaded a module.
+
+ for m in $mods
+ do
+   zmodload -i $m || mods[(r)$m]=()
+ done
+0d:Test loading of all compiled modules
+
+ zmodload -e $mods
+0d:Check that zsh believes the modules did load
+
+# Now check for proper failure conditions by trying some operations on
+# a nonexistent module.
+
+ zmodload -i bogus/notamodule
+1D:Check that loading a nonexistent module fails
+
+ zmodload -u bogus/notamodule
+1D:Check that unloading a nonexistent module fails
+
+# Test adding and removing autoloads, using a nonexistent module.
+
+ zmodload -ab bogus
+ zmodload -ub bogus
+0:Add/remove autoloaded builtin
+
+ zmodload -ac bogus
+ zmodload -uc bogus
+0:Add/remove autoloaded condition
+
+ zmodload -ap bogus
+ zmodload -up bogus
+0:Add/remove autoloaded parameter
+
+ zmodload -af bogus
+ zmodload -uf bogus
+0:Add/remove autoloaded math function
+
+# If the "example" module is available, test various autoloading behavior.
+
+ if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   zmodload -u zsh/example
+   zmodload -ab zsh/example example
+   builtin example
+   zmodload -e zsh/example
+ else print -u8 Warning: zsh/example not linked: not checking autoloading
+ fi
+0d:Autoload a module via a builtin
+
+ if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   zmodload -u zsh/example
+   zmodload -ac -I zsh/example ex
+   [[ exam -ex ple ]]
+   zmodload -e zsh/example
+ else :
+ fi
+0d:Autoload a module via a condition
+
+ if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   zmodload -u zsh/example
+   zmodload -ap zsh/example exint
+   : $exint
+   zmodload -e zsh/example
+ else :
+ fi
+0d:Autoload a module via a parameter
+
+ if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   zmodload -u zsh/example
+   zmodload -af zsh/example sum
+   (( sum(1) ))
+   zmodload -e zsh/example
+ else :
+ fi
+0d:Autoload a module via a math function
+
+# Test module aliases
+
+ zmodload -A example=zsh/example
+ zmodload -A
+0:Test creating a module alias
+>example -> zsh/example
+
+ if [[ $mods[(r)zsh/example] == zsh/example ]]; then
+   zmodload -u example
+   zmodload -ab example
+   builtin example
+   zmodload -e example
+ else :
+ fi
+0d:Unload/autoload the module via its alias
+
+ zmodload -R example
+ zmodload -e example
+1:Delete the module alias again
+
+# Don't unload the main module.
+# Do unload zsh/parameter, but reload it as it is needed.
+
+ mods[(r)zsh/main]=()
+ zmodunload $mods
+ zmodload zsh/parameter
+0d:Unload the modules loaded by this test suite
+
+%clean
+
+ eval "$deps"
+ unset deps name modfile link auto load funcs mods moddeps
+ unfunction zmodunload
