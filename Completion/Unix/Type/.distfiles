@@ -9,5 +9,5 @@ _files               _pdf                 _pspdf               _users
 _groups              _perl_basepods       _signals             _users_on
 _hosts               _perl_builtin_funcs  _tar_archive         _time_zone
 _file_systems        _net_interfaces      _terminals           _locales
-_java_class          _services
+_java_class          _services		  _email_addresses
 '

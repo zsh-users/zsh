@@ -1,5 +1,7 @@
 2003-02-04  Peter Stephenson  <pws@csr.com>
 
+	* unposted: 4.1.0-dev-7.
+
 	* 18188: Src/text.c: make output case statements use balanced
 	parentheses.
 

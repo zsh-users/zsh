@@ -10,4 +10,6 @@ history-search-end          insert-files
 copy-earlier-word
 down-line-or-beginning-search
 up-line-or-beginning-search
+narrow-to-region narrow-to-region-invisible
+read-from-minibuffer replace-string
 '
