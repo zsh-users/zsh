@@ -1,4 +1,4 @@
-#compdef -command-
+#autoload
 
 # The option `-e' if given as the first argument says that we should
 # complete only external commands and executable files. This and a

@@ -24,7 +24,7 @@ if [[ CURRENT -eq 3 ]]; then
   rep=(${${rep#${PWD%%$words[2]*}}%${PWD#*$words[2]}})
   (( $#rep )) && _wanted -C replacement strings expl replacement compadd -a rep
 else
-  _directory_stack && ret=0
+  [[ CURRENT -gt 1 ]] && _directory_stack && ret=0
 
   if [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
     local tdir tdir2
