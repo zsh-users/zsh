@@ -727,6 +727,9 @@ for special parameters defined by the shell
 )
 enditem()
 )
+item(tt(u))(
+Expand only the first occurrence of each unique word.
+)
 item(tt(U))(
 Convert all letters in the result to upper case.
 )
@@ -760,9 +763,6 @@ Note that this is done very late, as for the `tt((s))' flag. So to
 access single words in the result, one has to use nested expansions as 
 in `tt(${${(z)foo}[2]})'. Likewise, to remove the quotes in the
 resulting words one would do: `tt(${(Q)${(z)foo}})'.
-)
-item(tt(n))(
-Expand only the first occurrence of each unique word.
 )
 enditem()
 

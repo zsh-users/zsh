@@ -1,3 +1,9 @@
+2001-12-17  Clint Adams  <clint@zsh.org>
+
+	* 16357: Doc/Zsh/expn.yo, Src/subst.c:
+	change (n) to (u) so (n) can be reserved.
+	for numeric sorting.
+
 2001-12-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 16351: Src/params.c: fix bug in parameter unset code

@@ -997,7 +997,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    shsplit = 1;
 		    break;
 
-		case 'n':
+		case 'u':
 		    unique = 1;
 		    break;
 
