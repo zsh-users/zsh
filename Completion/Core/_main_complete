@@ -194,7 +194,8 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
         zmodload -i zsh/complist
         MENUSELECT=0
       fi
-    else
+    fi
+    if [[ "$MENUSELECT" != 0 ]]; then
       sel=( "${(@M)_menu_style:#select*}" )
 
       if (( $#sel )); then

@@ -1,5 +1,8 @@
 2000-05-22  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11500: Completion/Core/_main_complete: another fix for
+ 	`select=long*' in menu style
+	
 	* 11497: Completion/Core/_main_complete: fix for select-long-list
  	in menu style
 	
