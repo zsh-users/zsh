@@ -5,8 +5,8 @@
 
 local linepath realpath donepath prepath testpath exppath skips skipped
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
-local pats haspats=no ignore pfxsfx rem remt sopt gopt opt
-local nm=$compstate[nmatches] menu matcher mopts atmp sort match
+local pats haspats ignore pfxsfx remt sopt gopt opt sdirs ignpar
+local nm=$compstate[nmatches] menu matcher mopts sort match
 
 typeset -U prepaths exppaths
 
@@ -111,7 +111,7 @@ if zstyle -s ":completion:${curcontext}:files" file-sort tmp1; then
   [[ "$tmp1" = *rev* ]] && sort[1]=O
 
   if [[ "$sort" = on ]]; then
-    sort=''
+    sort=
   else
     mopts=( "${(@)mopts/#-J/-V}" )
 
@@ -138,6 +138,11 @@ if zstyle -t ":completion:${curcontext}:paths" squeeze-slashes; then
 else
   skips='((.|..)/)##'
 fi
+
+zstyle -s ":completion:${curcontext}:paths" special-dirs sdirs &&
+    [[ "$sdirs" = (yes|true|on|1) ]] && sdirs=yes
+
+zstyle -s ":completion:${curcontext}:files" ignore-parents ignpar
 
 # We get the prefix and the suffix from the line and save the whole
 # original string. Then we see if we will do menucompletion.
@@ -202,7 +207,7 @@ if [[ "$pre[1]" = \~ ]]; then
   [[ "$realpath" = "$linepath" ]] && return 1
   pre="${pre#*/}"
   orig="${orig#*/}"
-  donepath=''
+  donepath=
   prepaths=( '' )
 elif [[ "$pre" = *\$*/* ]]; then
 
@@ -218,14 +223,14 @@ elif [[ "$pre" = *\$*/* ]]; then
   pre="${pre#${linepath}}"
   i="${#linepath//[^\\/]}"
   orig="${orig[1,(in:i:)/][1,-2]}"
-  donepath=''
+  donepath=
   prepaths=( '' )
 else
   # If the string does not start with a `~' we don't remove a prefix from the
   # string.
 
-  linepath=''
-  realpath=''
+  linepath=
+  realpath=
 
   if [[ "$pre[1]" = / ]]; then
     # If it is a absolute path name, we remove the first slash and put it in
@@ -241,7 +246,7 @@ else
     # `./' or `../' in which case we don't use the paths from `-W'.
     
     [[ "$pre" = (.|..)/* ]] && prepaths=( '' )
-    donepath=''
+    donepath=
   fi
 fi
 
@@ -271,7 +276,7 @@ for prepath in "$prepaths[@]"; do
 
     if [[ "$tpre" = */* ]]; then
       PREFIX="${tpre%%/*}"
-      SUFFIX=""
+      SUFFIX=
     else
       PREFIX="${tpre}"
       SUFFIX="${tsuf%%/*}"
@@ -286,11 +291,10 @@ for prepath in "$prepaths[@]"; do
       else
         tmp1=( ${^tmp1}${skipped}*(-/) )
       fi
-      if [[ -o globdots || "$PREFIX" = .* ]] &&
-         zstyle -s ":completion:${curcontext}:paths" special-dirs atmp; then
-	if [[ "$atmp" = (yes|true|1|on) ]]; then
+      if [[ -n "$sdirs" && ( -o globdots || "$PREFIX" = .* ) ]]; then
+	if [[ "$sdirs" = yes ]]; then
 	  tmp1=( "$tmp1[@]" . .. )
-	elif [[ "$atmp" = .. ]]; then
+	elif [[ "$sdirs" = .. ]]; then
 	  tmp1=( "$tmp1[@]" .. )
         fi
       fi
@@ -300,12 +304,12 @@ for prepath in "$prepaths[@]"; do
       else
         tmp1=( ${^tmp1}${skipped}${^~pats} )
       fi
-      if [[ ( "$sopt" = *[/f]* || "$pats" = *\([^[:blank:]]#/[^[:blank:]]#\)* ) &&
-            ( -o globdots || "$PREFIX" = .* ) ]] &&
-	  zstyle -s ":completion:${curcontext}:paths" special-dirs atmp; then
-	if [[ "$atmp" = (yes|true|1|on) ]]; then
+      if [[ -n "$sdirs" &&
+            ( "$sopt" = *[/f]* || "$pats" = *\([^[:blank:]]#/[^[:blank:]]#\)* ) &&
+            ( -o globdots || "$PREFIX" = .* ) ]]; then
+	if [[ "$sdirs" = yes ]]; then
 	  tmp1=( "$tmp1[@]" . .. )
-	elif [[ "$atmp" = .. ]]; then
+	elif [[ "$sdirs" = .. ]]; then
 	  tmp1=( "$tmp1[@]" .. )
         fi
       fi
@@ -368,8 +372,7 @@ for prepath in "$prepaths[@]"; do
 	###
         ### tmp1=( "$tmp2[@]" )
 	### break
-      elif [[ "$haspats" = no && -z "$tpre$tsuf" &&
-	"$pre" = */ && -z "$suf" ]]; then
+      elif [[ -n "$haspats" && -z "$tpre$tsuf$suf" && "$pre" = */ ]]; then
 	PREFIX="${opre}"
 	SUFFIX="${osuf}"
         compadd -nQS '' - "$linepath$donepath$orig"
@@ -378,11 +381,11 @@ for prepath in "$prepaths[@]"; do
       continue 2
     fi
 
-    if [[ -z "$_comp_no_ignore" && "$tpre$tsuf" != */* && $#tmp1 -ne 0 ]] &&
-       zstyle -s ":completion:${curcontext}:files" ignore-parents rem &&
-       [[ ( "$rem" != *dir* || "$pats" = '*(-/)' ) &&
-	  ( "$rem" != *..* || "$tmp1" = *../* ) ]]; then
-      if [[ "$rem" = *parent* ]]; then
+    if [[ -n "$ignpar" && -z "$_comp_no_ignore" &&
+          "$tpre$tsuf" != */* && $#tmp1 -ne 0 &&
+          ( "$ignpar" != *dir* || "$pats" = '*(-/)' ) &&
+	  ( "$ignpar" != *..* || "$tmp1" = *../* ) ]]; then
+      if [[ "$ignpar" = *parent* ]]; then
 	for i in ${(M)^tmp1:#*/*}(-/); do
 	  remt="${${i#$prepath$realpath$donepath}%/*}"
 	  while [[ "$remt" = */* &&
@@ -393,7 +396,7 @@ for prepath in "$prepaths[@]"; do
 	      _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
 	done
       fi
-      if [[ "$rem" = *pwd* ]]; then
+      if [[ "$ignpar" = *pwd* ]]; then
         for i in ${^tmp1}(-/); do
 	  [[ "$i" -ef "$PWD" ]] && _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
 	done
@@ -407,7 +410,7 @@ for prepath in "$prepaths[@]"; do
       tpre="${tpre#*/}"
     elif [[ "$tsuf" = */* ]]; then
       tpre="${tsuf#*/}"
-      tsuf=""
+      tsuf=
     else
       break
     fi
@@ -475,7 +478,7 @@ for prepath in "$prepaths[@]"; do
       if [[ -n $menu || -z "$compstate[insert]" ]] ||
          ! zstyle -t ":completion:${curcontext}:paths" expand suffix; then
         (( tmp4 )) && zstyle -t ":completion:${curcontext}:paths" ambiguous &&
-            compstate[to_end]=''
+            compstate[to_end]=
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" \
@@ -489,11 +492,11 @@ for prepath in "$prepaths[@]"; do
 	fi
       else
         if [[ "$tmp3" = */* ]]; then
-	  atmp=( -Qf "$mopts[@]" -p "$linepath$tmp2"
+	  tmp3=( -Qf "$mopts[@]" -p "$linepath$tmp2"
 	         -W "$prepath$realpath$testpath"
 	         "$pfxsfx[@]" -M "r:|/=* r:|=*" )
           for i in "$tmp1[@]"; do
-	    compadd "$atmp[@]" -s "/${i#*/}" - "${i%%/*}"
+	    compadd "$tmp3[@]" -s "/${i#*/}" - "${i%%/*}"
 	  done
         else
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
@@ -510,7 +513,7 @@ for prepath in "$prepaths[@]"; do
     # strings collected after the loop.
 
     if [[ "$tmp3" != */* ]]; then
-      tmp4=""
+      tmp4=
       break
     fi
 
@@ -528,17 +531,17 @@ for prepath in "$prepaths[@]"; do
     elif [[ "$tsuf" = */* ]]; then
       cpre="${cpre}${tpre}/"
       tpre="${tsuf#*/}"
-      tsuf=""
+      tsuf=
     else
-      tpre=""
-      tsuf=""
+      tpre=
+      tsuf=
     fi
   done
 
   if [[ -z "$tmp4" ]]; then
     if [[ "$osuf" = */* ]]; then
       PREFIX="${opre}${osuf}"
-      SUFFIX=""
+      SUFFIX=
     else
       PREFIX="${opre}"
       SUFFIX="${osuf}"

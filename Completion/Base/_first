@@ -6,29 +6,6 @@
 # This just gives some examples of things you might want to do here.
 #
 #
-# If you use the vared builtin and want completion in there to act the 
-# way completion on the right hand side of assignments is done, add
-# (or un-comment) this code:
-#
-#     if [[ -n $compstate[vared] ]]; then
-#       if [[ $compstate[vared] = *\[* ]]; then
-#         # vared on an array-element
-#         compstate[parameter]=${compstate[vared]%%\[*}
-#         compstate[context]=value
-#       else
-#         # vared on a parameter, let's see if it is an array
-#         compstate[parameter]=$compstate[vared]
-#         if [[ ${(tP)compstate[vared]} = *(array|assoc)* ]]; then
-#           compstate[context]=array_value
-#         else
-#           compstate[context]=value
-#         fi
-#       fi
-#       return
-#     fi
-#
-#
-#
 # Other things you can do here is to complete different things if the
 # word on the line matches a certain pattern. This example allows
 # completion of words from the history by adding two commas at the end 

@@ -33,6 +33,24 @@ if [[ ! -z "$comp" ]]; then
   fi
 fi
 
+# If we are inside `vared' and we don't have a $compcontext, we treat
+# this like a parameter assignment. Which it is.
+
+if [[ -n $compstate[vared] ]]; then
+  if [[ $compstate[vared] = *\[* ]]; then
+    # vared on an array-element
+    compstate[parameter]=${compstate[vared]%%\[*}
+    compstate[context]=value
+  else
+    # vared on a parameter, let's see if it is an array
+    compstate[parameter]=$compstate[vared]
+    if [[ ${(tP)compstate[vared]} = *(array|assoc)* ]]; then
+      compstate[context]=array_value
+    else
+      compstate[context]=value
+    fi
+  fi
+fi
 
 # For arguments and command names we use the `_normal' function.
 
