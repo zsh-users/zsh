@@ -610,6 +610,7 @@ do_ambiguous(void)
 	do_ambig_menu();
     } else if (ainfo) {
 	int atend = (cs == we), la, eq, tcs;
+	VARARR(char, old, we - wb);
 
 	minfo.cur = NULL;
 	minfo.asked = 0;
@@ -617,11 +618,25 @@ do_ambiguous(void)
 	fixsuffix();
 
 	/* First remove the old string from the line. */
+	tcs = cs;
 	cs = wb;
+	memcpy(old, (char *) line + wb, we - wb);
 	foredel(we - wb);
 
 	/* Now get the unambiguous string and insert it into the line. */
 	cline_str(ainfo->line, 1, NULL);
+
+	/* Sometimes the different match specs used may result in a cline
+	 * that is shorter than the original string. If that happened, we
+	 * re-insert the old string. Unless there were matches added with
+	 * -U, that is. */
+	if (lastend - wb < we - wb && !hasunmatched) {
+	    cs = wb;
+	    foredel(lastend - wb);
+	    inststrlen(old, 0, we - wb);
+	    lastend = we;
+	    cs = tcs;
+	}
 	if (eparq) {
 	    tcs = cs;
 	    cs = lastend;

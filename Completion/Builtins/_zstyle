@@ -50,6 +50,7 @@ styles=(
   packageset		 c:packageset
   path			 'c:_path_files -/'
   ports			 c:_ports
+  prefer-ignored         c:bool
   prefix-hidden		 c:bool
   prefix-needed		 c:bool
   prompt		 c:

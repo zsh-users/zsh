@@ -1267,6 +1267,23 @@ A style holding the service names of ports to complete. If this is
 not set by the user, the service names from `tt(/etc/services)' will
 be used.
 )
+item(tt(prefer-ignored))(
+This style is tested by the main completion function before calling a
+completer. The context name is formed in the same way as for the
+tt(matcher-list) style, i.e. it contains the name of the completer
+that will be called plus a hyphen and the number of the call to that
+completer.
+
+If the style is set to true and completion did not generate any normal 
+matches yet, but there are matches that were ignored because they
+matched one of the patterns given with the tt(fignore) array or the
+tt(ignored-patterns) style, these ignored matches are used immediatly
+and no other completer will be called.
+
+It is sometimes useful to set this style for the tt(correct) or
+tt(approximate) completer so that ignored matches are prefered over
+corrections.
+)
 item(tt(prefix-hidden))(
 This is used when matches with a common prefix are added (e.g. option
 names). If it is `true', this prefix will not be shown in the list of

@@ -163,10 +163,10 @@ mod_export struct cldata listdat;
 /**/
 mod_export int ispattern, haspattern;
 
-/* Non-zero if at least one match was added without -U. */
+/* Non-zero if at least one match was added without/with -U. */
 
 /**/
-mod_export int hasmatched;
+mod_export int hasmatched, hasunmatched;
 
 /* The current group of matches. */
 
@@ -304,7 +304,7 @@ do_completion(Hookdef dummy, Compldat dat)
     startauto = isset(AUTOMENU);
     movetoend = ((cs == we || isset(ALWAYSTOEND)) ? 2 : 1);
     showinglist = 0;
-    hasmatched = 0;
+    hasmatched = hasunmatched = 0;
     minmlen = 1000000;
     maxmlen = -1;
 
@@ -1522,9 +1522,12 @@ addmatches(Cadata dat, char **argv)
     /* Switch back to the heap that was used when the completion widget
      * was invoked. */
     SWITCHHEAPS(compheap) {
-	if ((doadd = (!dat->apar && !dat->opar && !dat->dpar)) &&
-	    (dat->aflags & CAF_MATCH))
-	    hasmatched = 1;
+	if ((doadd = (!dat->apar && !dat->opar && !dat->dpar))) {
+	    if (dat->aflags & CAF_MATCH)
+		hasmatched = 1;
+	    else
+		hasunmatched = 1;
+	}
 	if (dat->apar)
 	    aparl = newlinklist();
 	if (dat->opar)

@@ -62,7 +62,7 @@ fi
     _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
 if zstyle -a ":completion:${curcontext}:$1" menu val; then
-  _last_nmatches="$nm"
+  _last_nmatches=$(( $nm + $compstate[alternate_nmatches] ))
   _last_menu_style=( "$val[@]" )
 else
   _last_nmatches=-1
