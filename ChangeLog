@@ -1,7 +1,8 @@
 2004-11-18  Clint Adams  <clint@zsh.org>
 
-	* Completion/Unix/Command/_bogofilter: fix -w/-p typo, which was
+	* unposted: Completion/Unix/Command/_bogofilter: fix -w/-p typo, which was
 	noticed by Michał Politowski.
+	* unposted: Completion/Unix/Type/_pdf: complete pdf files for kpdf.
 
 2004-11-16  Peter Stephenson  <pws@csr.com>
 
