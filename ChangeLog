@@ -1,3 +1,8 @@
+2000-07-11  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* Src/exec.c: 12220: print error message for unfound autoload
+	function body at lower locallevel.
+
 2000-07-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Completion/User/_killall: Complete process IDs and

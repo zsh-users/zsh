@@ -3201,7 +3201,10 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	ksh = fksh;
 
     if (prog == &dummy_eprog) {
+	/* We're not actually in the function; decrement locallevel */
+	locallevel--;
 	zerr("%s: function definition file not found", shf->nam, 0);
+	locallevel++;
 	popheap();
 	return NULL;
     }
