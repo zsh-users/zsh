@@ -1,5 +1,7 @@
 2000-08-03  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12497: Doc/Zsh/builtins.yo: small fix for `read -r' doc
+	
 	* 12496: Completion/Core/_path_files: one more problem with
  	quoting of glob characters in filename completion
 	

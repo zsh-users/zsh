@@ -761,7 +761,8 @@ fields assigned to the last var(name).
 startitem()
 item(tt(-r))(
 Raw mode: a `tt(\)' at the end of a line does not signify line
-continuation.
+continuation and backslashes in the line don't quote the following
+character and are not removed.
 )
 item(tt(-q))(
 Read only one character from the terminal and set var(name) to
