@@ -1,3 +1,13 @@
+2001-07-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15354: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo, Doc/Zsh/compat.yo,
+	Doc/Zsh/files.yo, Doc/Zsh/func.yo, Doc/Zsh/grammar.yo,
+	Doc/Zsh/intro.yo, Doc/Zsh/invoke.yo, Doc/Zsh/jobs.yo,
+	Doc/Zsh/manual.yo, Doc/Zsh/params.yo, Doc/Zsh/prompt.yo,
+	Doc/Zsh/redirect.yo:  Add or clean up a lot of index entries.
+	Reorder the documentation for prompt escapes for readability and
+	ease of lookup (I hope).
+
 2001-07-10  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15352: Completion/Unix/Command/_man: remove not only numeric

@@ -2,8 +2,10 @@ texinode(Invocation)(Files)(Introduction)(Top)
 chapter(Invocation)
 cindex(invocation)
 sect(Invocation Options)
-cindex(flags, shell)
+cindex(shell options)
+cindex(options, shell)
 cindex(shell flags)
+cindex(flags, shell)
 The following flags are interpreted by the shell when invoked to determine
 where the shell will read commands from:
 
@@ -47,6 +49,7 @@ tt(-o) can be stacked up with preceding single-letter options, so for example
 `tt(-xo shwordsplit)' or `tt(-xoshwordsplit)' is equivalent to
 `tt(-x -o shwordsplit)'.
 
+cindex(long option)
 Options may also be specified by name in GNU long option style,
 `tt(--)var(option-name)'.  When this is done, `tt(-)' characters in the
 option name are permitted: they are translated into `tt(_)', and thus ignored.
@@ -58,6 +61,8 @@ Unlike other option syntaxes, GNU-style long options cannot be stacked with
 any other options, so for example `tt(-x-shwordsplit)' is an error,
 rather than being treated like `tt(-x --shwordsplit)'.
 
+cindex(--version)
+cindex(--help)
 The special GNU-style option `tt(--version)' is handled; it sends to standard
 output the shell's version information, then exits successfully.
 `tt(--help)' is also handled; it sends to standard output a list of options

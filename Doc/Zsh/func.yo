@@ -4,7 +4,7 @@ ifzman(\
 sect(Functions)
 )\
 cindex(functions)
-findex(function)
+findex(function, use of)
 Shell functions are defined with the tt(function) reserved word or the
 special syntax `var(funcname) tt(())'.
 Shell functions are read in and stored internally.
@@ -28,10 +28,11 @@ Function identifiers can be listed with the tt(functions) builtin.
 findex(unfunction, use of)
 Functions can be undefined with the tt(unfunction) builtin.
 sect(Autoloading Functions)
-findex(autoload, use of)
 cindex(autoloading functions)
 cindex(functions, autoloading)
 
+findex(autoload, use of)
+vindex(fpath, use of)
 A function can be marked as em(undefined) using the tt(autoload) builtin
 (or `tt(functions -u)' or `tt(typeset -fu)').  Such a function has no
 body.  When the function is first executed, the shell searches for its
@@ -44,6 +45,7 @@ autoload myfunc1 myfunc2 ...)
 The usual alias expansion during reading will be suppressed if the
 tt(autoload) builtin or its equivalent is given the option tt(-U). This is
 recommended for the use of functions supplied with the zsh distribution.
+findex(zcompile, use of)
 Note that for functions precompiled with the tt(zcompile) builtin command
 the flag tt(-U) must be provided when the tt(.zwc) file is created, as the
 corresponding information is compiled into the latter.
@@ -135,14 +137,13 @@ autoload myfunc
 myfunc args...)
 
 In fact, the tt(functions) command outputs `tt(builtin autoload -X)' as
-the body of an autoloaded function.  A true autoloaded function can be
-identified by the presence of the comment `tt(# undefined)' in the body,
-because all comments are discarded from defined functions.  This is done
-so that
+the body of an autoloaded function.  This is done so that
 
 example(eval "$(functions)")
 
-produces a reasonable result.
+produces a reasonable result.  A true autoloaded function can be
+identified by the presence of the comment `tt(# undefined)' in the body,
+because all comments are discarded from defined functions.
 
 To load the definition of an autoloaded function tt(myfunc) without
 executing tt(myfunc), use:
@@ -178,7 +179,7 @@ passed as the first argument, otherwise it is an empty string.  The
 actual command that will be executed (including expanded aliases) is
 passed in two different forms: the second argument is a single-line,
 size-limited version of the command (with things like function bodies
-elided); the third argument contains the full text what what is being
+elided); the third argument contains the full text that is being
 executed.
 )
 item(tt(TRAP)var(NAL))(
@@ -211,6 +212,7 @@ causes the trap to be executed.
 )
 enditem()
 
+findex(trap, use of)
 The functions beginning `tt(TRAP)' may alternatively be defined with the
 tt(trap) builtin:  this may be preferable for some uses, as they are then
 run in the environment of the calling process, rather than in their own

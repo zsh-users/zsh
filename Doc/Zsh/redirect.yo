@@ -139,6 +139,7 @@ file descriptor 2 would be associated
 with the terminal (assuming file descriptor 1 had been)
 and then file descriptor 1 would be associated with file var(fname).
 sect(Multios)
+cindex(multios)
 pindex(MULTIOS, use of)
 If the user tries to open a file descriptor for writing more than once,
 the shell opens the file descriptor as a pipe to a process that copies
@@ -196,22 +197,22 @@ example(echo foo > bar > baz)
 when tt(MULTIOS) is unset will truncate bar, and write `tt(foo)' into baz.
 
 sect(Redirections with no command)
-vindex(NULLCMD, use of)
-vindex(READNULLCMD, use of)
-pindex(CSH_NULLCMD, use of)
-pindex(SH_NULLCMD, use of)
 When a simple command consists of one or more redirection operators
 and zero or more parameter assignments, but no command name, zsh can
 behave in several ways.
 
+vindex(NULLCMD, use of)
+pindex(CSH_NULLCMD, use of)
 If the parameter tt(NULLCMD) is not set or the option tt(CSH_NULLCMD) is
 set, an error is caused.  This is the bf(csh) behavior and tt(CSH_NULLCMD)
 is set by default when emulating bf(csh).
 
+pindex(SH_NULLCMD, use of)
 If the option tt(SH_NULLCMD) is set, the builtin `tt(:)' is inserted as a
 command with the given redirections.  This is the default when emulating
 bf(sh) or bf(ksh).
 
+vindex(READNULLCMD, use of)
 Otherwise, if the parameter tt(NULLCMD) is set, its value will be used as a
 command with the given redirections.  If both tt(NULLCMD) and
 tt(READNULLCMD) are set, then the value of the latter will be used instead

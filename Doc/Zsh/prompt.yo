@@ -3,6 +3,8 @@ chapter(Prompt Expansion)
 ifzman(\
 sect(Prompt Expansion)
 )\
+cindex(prompt expansion)
+cindex(expansion, prompt)
 Prompt sequences undergo a special form of expansion.  This type of expansion
 is also available using the tt(-P) option to the tt(print) builtin.
 
@@ -33,12 +35,60 @@ Some escapes take an optional integer argument, which
 should appear between the `tt(%)' and the next character of the
 sequence.  The following escape sequences are recognized:
 
+subsect(Special characters)
 startitem()
 item(tt(%%))(
 A `tt(%)'.
 )
 item(tt(%RPAR()))(
 A `tt(RPAR())'.
+)
+enditem()
+
+subsect(Login information)
+startitem()
+item(tt(%l))(
+The line (tty) the user is logged in on, without `tt(/dev/)' prefix.
+If the name starts with `tt(/dev/tty)', that prefix is stripped.
+)
+item(tt(%M))(
+The full machine hostname.
+)
+item(tt(%m))(
+The hostname up to the first `tt(.)'.
+An integer may follow the `tt(%)' to specify
+how many components of the hostname are desired.  With a negative integer,
+trailing components of the hostname are shown.
+)
+item(tt(%n))(
+tt($USERNAME).
+)
+item(tt(%y))(
+The line (tty) the user is logged in on, without `tt(/dev/)' prefix.
+This does not treat `tt(/dev/tty)' names specially.
+)
+enditem()
+
+subsect(Shell state)
+startitem()
+item(tt(%#))(
+A `tt(#)' if the shell is running with privileges, a `tt(%)' if not.
+Equivalent to `tt(%(!.#.%%))'.
+The definition of `privileged', for these purposes, is that either the
+effective user ID is zero, or, if POSIX.1e capabilities are supported, that
+at least one capability is raised in either the Effective or Inheritable
+capability vectors.
+)
+item(tt(%?))(
+The return code of the last command executed just before the prompt.
+)
+item(tt(%_))(
+The status of the parser, i.e. the shell constructs (like `tt(if)' and
+`tt(for)') that have been started on the command line. If given an integer
+number that many strings will be printed; zero or negative or no integer means
+print as many as there are.  This is most useful in prompts tt(PS2) for
+continuation lines and tt(PS4) for debugging with the tt(XTRACE) option; in
+the latter case it will also work non-interactively.
 )
 xitem(tt(%d))
 item(tt(%/))(
@@ -56,39 +106,13 @@ xitem(tt(%h))
 item(tt(%!))(
 Current history event number.
 )
+item(tt(%i))(
+The line number currently being executed in the script, sourced file, or
+shell function given by tt(%N).  This is most useful for debugging as part
+of tt($PS4).
+)
 item(tt(%L))(
 The current value of tt($SHLVL).
-)
-item(tt(%M))(
-The full machine hostname.
-)
-item(tt(%m))(
-The hostname up to the first `tt(.)'.
-An integer may follow the `tt(%)' to specify
-how many components of the hostname are desired.  With a negative integer,
-trailing components of the hostname are shown.
-)
-item(tt(%S) LPAR()tt(%s)RPAR())(
-Start (stop) standout mode.
-)
-item(tt(%U) LPAR()tt(%u)RPAR())(
-Start (stop) underline mode.
-)
-item(tt(%B) LPAR()tt(%b)RPAR())(
-Start (stop) boldface mode.
-)
-xitem(tt(%t))
-item(tt(%@))(
-Current time of day, in 12-hour, am/pm format.
-)
-item(tt(%T))(
-Current time of day, in 24-hour format.
-)
-item(tt(%*))(
-Current time of day in 24-hour format, with seconds.
-)
-item(tt(%n))(
-tt($USERNAME).
 )
 item(tt(%N))(
 The name of the script, sourced file, or shell function that zsh is
@@ -97,19 +121,38 @@ none, this is equivalent to the parameter tt($0).  An integer may follow
 the `tt(%)' to specify a number of trailing path components to show; zero
 means the full path.  A negative integer specifies leading components.
 )
-item(tt(%i))(
-The line number currently being executed in the script, sourced file, or
-shell function given by tt(%N).  This is most useful for debugging as part
-of tt($PS4).
+xitem(tt(%c))
+xitem(tt(%.))
+item(tt(%C))(
+Trailing component of tt($PWD).
+An integer may follow the `tt(%)' to get more than one component.
+Unless `tt(%C)' is used, tilde contraction is performed first.  These are
+deprecated as tt(%c) and tt(%C) are equivalent to tt(%1~) and tt(%1/),
+respectively, while explicit positive integers have the same effect as for
+the latter two sequences.
+)
+enditem()
+
+subsect(Date and time)
+startitem()
+item(tt(%D))(
+The date in var(yy)tt(-)var(mm)tt(-)var(dd) format.
+)
+item(tt(%T))(
+Current time of day, in 24-hour format.
+)
+xitem(tt(%t))
+item(tt(%@))(
+Current time of day, in 12-hour, am/pm format.
+)
+item(tt(%*))(
+Current time of day in 24-hour format, with seconds.
 )
 item(tt(%w))(
 The date in var(day)tt(-)var(dd) format.
 )
 item(tt(%W))(
 The date in var(mm)tt(/)var(dd)tt(/)var(yy) format.
-)
-item(tt(%D))(
-The date in var(yy)tt(-)var(mm)tt(-)var(dd) format.
 )
 item(tt(%D{)var(string)tt(}))(
 var(string) is formatted using the tt(strftime) function.
@@ -119,46 +162,36 @@ without any preceding space if the day is a single digit, and
 tt(%K)/tt(%L) correspond to tt(%k)/tt(%l) for the hour of the day
 (24/12 hour clock) in the same way.
 )
-item(tt(%l))(
-The line (tty) the user is logged in on without tt(/dev/) prefix.
-If name starts with tt(/dev/tty) this is stripped.
-)
-item(tt(%y))(
-The line (tty) the user is logged in on without tt(/dev/) prefix.
-It does not treat tt(/dev/tty*) specially.
-)
-item(tt(%?))(
-The return code of the last command executed just before the prompt.
-)
-item(tt(%_))(
-The status of the parser, i.e. the shell constructs (like `tt(if)' and
-`tt(for)') that have been started on the command line. If given an integer
-number that many strings will be printed; zero or negative or no integer means
-print as many as there are.  This is most useful in prompts tt(PS2) for
-continuation lines and tt(PS4) for debugging with the tt(XTRACE) option; in
-the latter case it will also work non-interactively.
+enditem()
+
+subsect(Visual effects)
+startitem()
+item(tt(%B) LPAR()tt(%b)RPAR())(
+Start (stop) boldface mode.
 )
 item(tt(%E))(
-Clears to end of line.
+Clear to end of line.
 )
-item(tt(%#))(
-A `tt(#)' if the shell is running with privileges, a `tt(%)' if not.
-Equivalent to `tt(%(!.#.%%))'.
-The definition of `privileged', for these purposes, is that either the
-effective user ID is zero, or, if POSIX.1e capabilities are supported, that
-at least one capability is raised in either the Effective or Inheritable
-capability vectors.
+item(tt(%U) LPAR()tt(%u)RPAR())(
+Start (stop) underline mode.
 )
-item(tt(%v))(
-vindex(psvar, use of)
-The value of the first element of the tt(psvar) array parameter.  Following
-the `tt(%)' with an integer gives that element of the array.  Negative
-integers count from the end of the array.
+item(tt(%S) LPAR()tt(%s)RPAR())(
+Start (stop) standout mode.
 )
 item(tt(%{)...tt(%}))(
 Include a string as a literal escape sequence.
 The string within the braces should not change the cursor
 position.  Brace pairs can nest.
+)
+enditem()
+
+subsect(Conditional substrings)
+startitem()
+item(tt(%v))(
+vindex(psvar, use of)
+The value of the first element of the tt(psvar) array parameter.  Following
+the `tt(%)' with an integer gives that element of the array.  Negative
+integers count from the end of the array.
 )
 item(tt(%LPAR())var(x.true-text.false-text)tt(RPAR()))(
 Specifies a ternary expression.  The character following the var(x) is
@@ -176,26 +209,27 @@ which defaults to zero.  A negative integer will be multiplied by -1.
 The test character var(x) may be any of the following:
 
 startsitem()
+sitem(tt(!))(True if the shell is running with privileges.)
+sitem(tt(#))(True if the effective uid of the current process is var(n).)
+sitem(tt(?))(True if the exit status of the last command was var(n).)
+sitem(tt(_))(True if at least var(n) shell constructs were started.)
+sxitem(tt(C))
+sitem(tt(/))(True if the current absolute path has at least var(n) elements.)
 sxitem(tt(c))
 sxitem(tt(.))
-sitem(tt(~))(True if the current path, with prefix replacement, has at least var(n) elements.)
-sxitem(tt(/))
-sitem(tt(C))(True if the current absolute path has at least var(n) elements.)
-sitem(tt(t))(True if the time in minutes is equal to var(n).)
-sitem(tt(T))(True if the time in hours is equal to var(n).)
-sitem(tt(d))(True if the day of the month is equal to var(n).)
+sitem(tt(~))(True if the current path, with prefix replacement, has at
+least var(n) elements.)
 sitem(tt(D))(True if the month is equal to var(n) (January = 0).)
-sitem(tt(w))(True if the day of the week is equal to var(n) (Sunday = 0).)
-sitem(tt(?))(True if the exit status of the last command was var(n).)
-sitem(tt(#))(True if the effective uid of the current process is var(n).)
+sitem(tt(d))(True if the day of the month is equal to var(n).)
 sitem(tt(g))(True if the effective gid of the current process is var(n).)
+sitem(tt(L))(True if the tt(SHLVL) parameter is at least var(n).)
 sitem(tt(l))(True if at least var(n) characters have already been
 printed on the current line.)
-sitem(tt(L))(True if the tt(SHLVL) parameter is at least var(n).)
 sitem(tt(S))(True if the tt(SECONDS) parameter is at least var(n).)
+sitem(tt(T))(True if the time in hours is equal to var(n).)
+sitem(tt(t))(True if the time in minutes is equal to var(n).)
 sitem(tt(v))(True if the array tt(psvar) has at least var(n) elements.)
-sitem(tt(_))(True if at least var(n) shell constructs were started.)
-sitem(tt(!))(True if the shell is running with privileges.)
+sitem(tt(w))(True if the day of the week is equal to var(n) (Sunday = 0).)
 endsitem()
 )
 xitem(tt(%<)var(string)tt(<))
@@ -236,15 +270,5 @@ prompt '%10<...<%~%<<%# ' will print a truncated representation of the
 current directory, followed by a `tt(%)' or `tt(#)', followed by a
 space.  Without the `tt(%<<)', those two characters would be included
 in the string to be truncated.
-)
-xitem(tt(%c))
-xitem(tt(%.))
-item(tt(%C))(
-Trailing component of tt($PWD).
-An integer may follow the `tt(%)' to get more than one component.
-Unless `tt(%C)' is used, tilde contraction is performed first.  These are
-deprecated as tt(%c) and tt(%C) are equivalent to tt(%1~) and tt(%1/),
-respectively, while explicit positive integers have the same effect as for
-the latter two sequences.
 )
 enditem()

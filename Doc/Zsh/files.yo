@@ -5,8 +5,12 @@ cindex(files, startup)
 cindex(startup files)
 cindex(files, shutdown)
 cindex(shutdown files)
+pindex(RCS, use of)
+pindex(GLOBAL_RCS, use of)
 pindex(NO_RCS, use of)
 pindex(NO_GLOBAL_RCS, use of)
+vindex(ZDOTDIR, use of)
+@cindex(zshenv)
 Commands are first read from tt(/etc/zshenv); this cannot be overridden.
 Subsequent behaviour is modified by the tt(RCS) and
 tt(GLOBAL_RCS) options; the former affects all startup files, while the
@@ -18,13 +22,17 @@ default.
 
 Commands are then read from tt($ZDOTDIR/.zshenv).
 pindex(LOGIN, use of)
+cindex(zprofile)
 If the shell is a login shell, commands
 are read from tt(/etc/zprofile) and then tt($ZDOTDIR/.zprofile).
+cindex(zshrc)
 Then, if the shell is interactive,
 commands are read from tt(/etc/zshrc) and then tt($ZDOTDIR/.zshrc).
+cindex(zlogin)
 Finally, if the shell is a login shell, tt(/etc/zlogin) and
 tt($ZDOTDIR/.zlogin) are read.
 
+cindex(zlogout)
 When a login shell exits, the files tt($ZDOTDIR/.zlogout) and then
 tt(/etc/zlogout) are read.  This happens with either an explicit exit
 via the tt(exit) or tt(logout) commands, or an implicit exit by reading
@@ -35,6 +43,7 @@ Note also that the tt(RCS) option affects the saving of history files,
 i.e. if tt(RCS) is unset when the shell exits, no history file will be
 saved.
 
+vindex(HOME, use of)
 If tt(ZDOTDIR) is unset, tt(HOME) is used instead.
 Those files listed above as being in tt(/etc) may be in another
 directory, depending on the installation.

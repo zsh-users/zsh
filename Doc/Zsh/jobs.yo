@@ -2,6 +2,7 @@ texinode(Jobs & Signals)(Arithmetic Evaluation)(Functions)(Top)
 chapter(Jobs & Signals)
 sect(Jobs)
 cindex(jobs)
+pindex(MONITOR, use of)
 If the tt(MONITOR) option is set,
 an interactive shell associates a em(job) with each pipeline.
 It keeps a table of current jobs, printed by the tt(jobs)

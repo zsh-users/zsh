@@ -32,6 +32,7 @@ example(let "val = 2 + 1")
 both assigning the value 3 to the shell variable tt(foo) and returning a
 zero status.
 
+cindex(arithmetic base)
 cindex(bases, in arithmetic)
 Integers can be in bases other than 10.
 A leading `tt(0x)' or `tt(0X)' denotes hexadecimal.
@@ -64,6 +65,15 @@ then `tt(8#40 16#20)', because tt(y) has been explicitly declared to
 have output base 16, while tt(x) (assuming it does not already exist) is
 implicitly typed by the arithmetic evaluation, where it acquires the output
 base 8.
+
+pindex(C_BASES, use of)
+pindex(OCTAL_ZEROES, use of)
+If the tt(C_BASES) option is set, hexadecimal numbers in the standard C
+format, for example tt(0xFF) instead of the usual `tt(16#FF)'.  If the
+option tt(OCTAL_ZEROES) is also set (it is not by default), octal numbers
+will be treated similarly and hence appear as `tt(077)' instead of
+`tt(8#77)'.  This option has no effect on the output of bases other than
+hexadecimal and octal, and these formats are always understood on input.
 
 When an output base is specified using the `tt([#)var(base)tt(])' syntax,
 an appropriate base prefix will be output if necessary, so that the value
@@ -105,8 +115,8 @@ short-circuiting, and only one of the latter two expressions in a ternary
 operator is evaluated.  Note the precedence of the bitwise AND, OR,
 and XOR operators.
 
-cindex(math functions)
-cindex(functions, math)
+cindex(mathematical functions, use of)
+cindex(functions, math, use of)
 Mathematical functions can be called with the syntax
 `var(func)tt(LPAR())var(args)tt(RPAR())', where the function decides
 if the var(args) is used as a string or a comma-separated list of

@@ -7,6 +7,7 @@ This Info file documents Zsh, a freely available UNIX command interpreter
 (shell), which of the standard shells most closely resembles the Korn shell
 (ksh), although it is not completely compatible.
 
+cindex(version)
 Version version(), last updated date().
 )\
 

@@ -130,7 +130,8 @@ is specified, then break var(n) levels instead of just one.
 )
 findex(builtin)
 item(tt(builtin) var(name) [ var(args) ... ])(
-Executes the builtin var(name), with the given var(args).
+Executes the builtin var(name), with the given var(args), even if that
+builtin has been disabled (see tt(disable)).
 )
 alias(bye)(exit)
 module(cap)(zsh/cap)

@@ -226,7 +226,7 @@ The contents of the line read from standard input is saved
 in the parameter tt(REPLY).  var(list) is executed
 for each selection until a break or end-of-file is encountered.
 )
-cindex(subshells)
+cindex(subshell)
 item(tt(LPAR()) var(list) tt(RPAR()))(
 Execute var(list) in a subshell.  Traps set by the tt(trap) builtin
 are reset to their default values while executing var(list).
@@ -234,6 +234,7 @@ are reset to their default values while executing var(list).
 item(tt({) var(list) tt(}))(
 Execute var(list).
 )
+findex(function)
 xitem(tt(function) var(word) ... [ tt(()) ] [ var(term) ] tt({) var(list) tt(}))
 xitem(var(word) ... tt(()) [ var(term) ] tt({) var(list) tt(}))
 item(var(word) ... tt(()) [ var(term) ] var(command))(
@@ -250,6 +251,7 @@ there is a single var(word);  otherwise, the parentheses will be treated as
 forming a globbing pattern in that case.
 )
 cindex(timing)
+findex(time)
 item(tt(time) [ var(pipeline) ])(
 The var(pipeline) is executed, and timing statistics are
 reported on the standard error in the form specified
@@ -257,7 +259,8 @@ by the tt(TIMEFMT) parameter.
 If var(pipeline) is omitted, print statistics about the
 shell process and its children.
 )
-cindex(testing conditional expression)
+cindex(conditional expression)
+findex([[)
 item(tt([[) var(exp) tt(]]))(
 Evaluates the conditional expression var(exp)
 and return a zero exit status if it is true.
@@ -314,6 +317,7 @@ Another short form of tt(for).
 item(tt(for LPAR()LPAR()) [var(expr1)] tt(;) [var(expr2)] tt(;) [var(expr3)] tt(RPAR()RPAR()) var(sublist))(
 A short form of the arithmetic tt(for) command.
 )
+findex(foreach)
 item(tt(foreach) var(name) ... tt(LPAR()) var(word) ... tt(RPAR()) var(list) tt(end))(
 Another form of tt(for).
 )
@@ -394,6 +398,7 @@ tt(print) builtin, and the resulting string is considered to be
 entirely quoted.  A literal `tt(')' character can be included in the
 string by using the `tt(\')' escape.
 
+@pindex(RC_QUOTES, use of)
 All characters enclosed between a pair of single quotes (tt('')) that
 is not preceded by a `tt($)' are quoted.  A single quote cannot appear
 within single quotes unless the option tt(RC_QUOTES) is set, in which case
