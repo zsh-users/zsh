@@ -1667,15 +1667,31 @@ sect(How do I prevent the prompt overwriting output when there is no newline?)
     % echo -n foo
     % 
   )
-  and the tt(foo) has been overwritten by the prompt tt(%).  The answer is
-  simple:  put tt(unsetopt promptcr) in your tt(.zshrc).  The option \
-  tt(PROMPT_CR),
-  to print a carriage return before a new prompt, is set by default because
-  a prompt at the right hand side (mytt($RPROMPT), mytt($RPS1)) will not appear
-  in the right place, and multi-line editing will be confused about the line
-  position, unless the line starts in the left hand column.  Apart from
-  tt(PROMPT_CR), you can force this to happen by putting a newline in the
-  prompt (see question link(3.13)(313) for that).
+  and the tt(foo) has been overwritten by the prompt tt(%).  The reason this
+  happens is that the option tt(PROMPT_CR) is enabled by default, and it
+  outputs a carriage return before the prompt in order to ensure that the
+  line editor knows what column it is in (this is needed to position the
+  right-side prompt correctly (mytt($RPROMPT), mytt($RPS1)) and to avoid screen
+  corruption when performing line editing).  If you add tt(unsetopt promptcr)
+  to your tt(.zshrc), you will see any partial output, but your screen may
+  look weird until you press return or refresh the screen.
+
+  Another solution for many terminals is to define a precmd function that
+  outputs a screen-width of spaces, like this:
+  verb(
+    function precmd {
+      echo -n ${(l:$COLUMNS:::):-}
+    }
+  )
+  (Explanation: an empty parameter expansion is padded out to the number of
+  columns on the screen.)  That precmd function will only bump the screen
+  down to a new line if there was output on the prompt line, otherwise the
+  extra spaces get removed by the tt(PROMPT_CR) action.  Although this
+  typically looks fine it may result in the preceding spaces being included
+  when you select a line of text with the mouse.
+
+  One final alternative is to put a newline in your prompt -- see question
+  link(3.13)(313) for that.
 
 
 sect(What's wrong with cut and paste on my xterm?)

@@ -1,3 +1,9 @@
+2005-03-03  Peter Stephenson  <pws@csr.com>
+
+	* from Wayne, adapted: 20900: another way of preventing
+	text without a newline from being overwritten by the prompt.
+	(Originally suggested by Karl Chen in 20896.)
+
 2005-03-02  Clint Adams  <clint@zsh.org>
 
 	* 20906: Completion/Unix/Command/_make: patch from
