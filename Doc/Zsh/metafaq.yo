@@ -85,7 +85,7 @@ nofill(tt(ftp://ftp.net.lut.ac.uk/zsh/)
 tt(ftp://sunsite.org.uk/packages/zsh/))
 )
 item(USA)(
-nofill(tt(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
+nofill(tt(ftp://uiarchive.uiuc.edu/mirrors/ftp/ftp.zsh.org/pub/)
 tt(ftp://ftp.rge.com/pub/shells/zsh/)
 tt(http://zsh.disillusion.org/)
 tt(http://foad.org/zsh/))
