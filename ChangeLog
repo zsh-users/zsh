@@ -2,6 +2,8 @@
 
 	* Config/version.mk: 3.1.7-pre-1
 
+	* Functions/Misc/.distfiles: add zstyle+.
+
 	* Test/.distfiles, Test/12procsubst.ztst, Test/13parameter.ztst,
 	Test/ztst.zsh: new tests; use null glob clearing up.
 
