@@ -283,11 +283,11 @@ putpromptchar(int doprint, int endchar)
 			test = 1;
 		    break;
 		case '#':
-		    if (geteuid() == arg)
+		    if (geteuid() == (uid_t)arg)
 			test = 1;
 		    break;
 		case 'g':
-		    if (getegid() == arg)
+		    if (getegid() == (gid_t)arg)
 			test = 1;
 		    break;
 		case 'j':

@@ -515,7 +515,7 @@ finddir(char *s)
     if(!strcmp(s, finddir_full) && *finddir_full)
 	return finddir_last;
 
-    if(strlen(s) >= ffsz) {
+    if ((int)strlen(s) >= ffsz) {
 	free(finddir_full);
 	finddir_full = zalloc(ffsz = strlen(s) * 2);
     }
@@ -1908,7 +1908,7 @@ colonsplit(char *s, int uniq)
 	for (; *t && *t != ':'; t++);
 	if (uniq)
 	    for (p = ret; p < ptr; p++)
-		if (strlen(*p) == t - s && ! strncmp(*p, s, t - s))
+		if ((int)strlen(*p) == t - s && ! strncmp(*p, s, t - s))
 		    goto cont;
 	*ptr = (char *) zalloc((t - s) + 1);
 	ztrncpy(*ptr++, s, t - s);

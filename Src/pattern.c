@@ -425,7 +425,7 @@ patcompile(char *exp, int inflags, char **endexp)
 		    len = 0;
 		    for (; pscan; pscan = PATNEXT(pscan))
 			if (P_OP(pscan) == P_EXACTLY &&
-			    strlen((char *)P_OPERAND(pscan)) >= len) {
+			    (int)strlen((char *)P_OPERAND(pscan)) >= len) {
 			    lng = (char *)P_OPERAND(pscan);
 			    len = strlen(lng);
 			}
@@ -2023,7 +2023,7 @@ patmatch(Upat prog)
 		    int ptlen = strlen(patinput);
 		    int oplen = strlen(nextop);
 		    /* Are we in the right range? */
-		    if (oplen > strlen(min ? METANEXT(start) : start) ||
+		    if (oplen > (int)strlen(min ? METANEXT(start) : start) ||
 			oplen < ptlen)
 			return 0;
 		    /* Yes, just position appropriately and test. */

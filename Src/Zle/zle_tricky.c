@@ -399,7 +399,7 @@ checkparams(char *p)
 	for (hn = paramtab->nodes[t0]; n < 2 && hn; hn = hn->next)
 	    if (pfxlen(p, hn->nam) == l) {
 		n++;
-		if (strlen(hn->nam) == l)
+		if ((int)strlen(hn->nam) == l)
 		    e = 1;
 	    }
     return (n == 1) ? (getsparam(p) != NULL) :
@@ -1472,7 +1472,7 @@ get_comp_string(void)
 
     if (!isset(IGNOREBRACES)) {
 	/* Try and deal with foo{xxx etc. */
-	char *curs = s + (isset(COMPLETEINWORD) ? offs : strlen(s));
+	char *curs = s + (isset(COMPLETEINWORD) ? offs : (int)strlen(s));
 	char *predup = dupstring(s), *dp = predup;
 	char *bbeg = NULL, *bend = NULL, *dbeg = NULL;
 	char *lastp = NULL, *firsts = NULL;
