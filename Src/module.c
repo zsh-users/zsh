@@ -1776,6 +1776,7 @@ add_automathfunc(char *nam, char *module)
 
     f->name = ztrdup(nam);
     f->module = ztrdup(module);
+    f->flags = 0;
 
     if (addmathfunc(f)) {
 	zsfree(f->name);
