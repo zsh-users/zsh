@@ -37,24 +37,25 @@ elif [[ $PREFIX = [-+]* ]]; then
   local list lines ret=1
 
   # get the list of directories with their canonical number
-  lines="$(dirs -v)"
-  # turn the lines into an array, removing the current directory
-  list=(${${(f)lines}##0*})
+  # and turn the lines into an array, removing the current directory
+  lines=( ${${(f)"$(dirs -v)"}##0*} )
   if [[ ( $IPREFIX = - && ! -o pushdminus ) ||
         ( $IPREFIX = + && -o pushdminus ) ]]; then
     # reverse the numbering: it counts the last one as -0, which
     # is a little strange.
     integer tot i
-    for (( i = 1, tot = $#list-1; tot >= 0; i++, tot-- )); do
-      list[$i]="$tot${list[$i]##[0-9]#}"
+    for (( i = 1, tot = $#lines-1; i <= $#lines; i++, tot-- )); do
+      lines[$i]="$tot -- ${lines[$i]##[0-9]#[	 ]#}"
+    done
+  else
+    for (( i = 1, tot = 1; i <= $#lines; i++, tot++ )); do
+      lines[$i]="$tot -- ${lines[$i]##[0-9]#[	 ]#}"
     done
   fi
-  # make sure -y treats this as a single string
-  lines="${(F)list}"
   # get the array of numbers only
-  list=(${list%%[ 	]*})
+  list=(${lines%% *})
   _description expl 'directory stack index'
-  compgen "$expl[@]" -y '$lines' -Q -k list && ret=0
+  compadd "$expl[@]" -d lines -Q - "$list[@]" && ret=0
   [[ -z $compstate[list] ]] && compstate[list]=list && ret=0
   [[ -n $compstate[insert] ]] && compstate[insert]=menu && ret=0
 

@@ -7,7 +7,9 @@
 #   `(( compstate[nmatches] )) || compgen -nu -qS/'
 # below that.
 
-local d c s dirs list
+setopt localoptions extendedglob
+
+local d s dirs list
 
 if [[ "$SUFFIX" = */* ]]; then
   ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
@@ -17,32 +19,31 @@ else
   s=(-qS/)
 fi
 
-if compset -P +; then
-  dirs="$(dirs -v)"
-  list=("${(f)dirs}")
-  [[ -o pushdminus ]] && dirs="$(awk '{ $1 = '$#list' - $1 - 1;
-  				        printf("%s\t%s\n", $1, $2); }' <<<$dirs)"
-  list=("${(@)list%	*}")
-  c=(-y '$dirs' -k "($list)")
+if [[ -prefix [-+] ]]; then
+  lines=(${(f)"$(dirs -v)"})
+  if [[ ( -prefix - && ! -o pushdminus ) ||
+	( -prefix + && -o pushdminus ) ]]; then
+    integer tot i
+    for (( i = 1, tot = $#lines-1; i <= $#lines; i++, tot-- )); do
+      lines[$i]="$tot -- ${lines[$i]##[0-9]#[	 ]#}"
+    done
+  else
+    for (( i = 1, tot = 0; i <= $#lines; i++, tot++ )); do
+      lines[$i]="$tot -- ${lines[$i]##[0-9]#[	 ]#}"
+    done
+  fi
+  list=(${lines%% *})
 
+  compset -P '[-+]'
   _description d 'directory stack'
-elif compset -P -; then
-  dirs="$(dirs -v)"
-  list=("${(f)dirs}")
-  [[ ! -o pushdminus ]] && dirs="$(awk '{ $1 = '$#list' - $1 - 1;
-					  printf("%s\t%s\n", $1, $2); }' <<<$dirs)"
-  list=("${(@)list%	*}")
-  c=(-y '$dirs' -k "($list)")
-
-  _description d 'directory stack'
+  compadd "$d[@]" -d lines -Q - "$list[@]" 
 else
-  c=(-nu)
-
   if (( $# )); then
     d=( "$@" )
   else
     _description d 'user or named directory'
   fi
+
+  compgen "$d[@]" -nu "$s[@]"
 fi
 
-compgen "$d[@]" "$c[@]" "$s[@]"
