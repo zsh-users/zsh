@@ -126,3 +126,25 @@
   sleep 2
 0: Nested `trap ... TERM', triggered on outer loop
 >TERM1
+
+  TRAPZERR() { print error activated; }
+  fn() { print start of fn; false; print end of fn; }
+  fn
+  fn() {
+    setopt localoptions localtraps
+    unfunction TRAPZERR
+    print start of fn
+    false
+    print end of fn
+  }
+  fn
+  unfunction TRAPZERR
+  print finish
+0: basic localtraps handling
+>start of fn
+>error activated
+>end of fn
+>start of fn
+>end of fn
+>finish
+

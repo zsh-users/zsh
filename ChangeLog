@@ -1,3 +1,10 @@
+2000-04-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 11026: Src/builtin.c, Src/hashtable.c, Src/signals.c,
+	Test/08traps.ztst: fix unfunction problem for localtraps by
+	always copying traps to be saved, hence decoupling saved and actual
+	traps.
+
 2000-04-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11024: Completion/Commands/_complete_debug, Doc/Zsh/compsys.yo:

@@ -644,7 +644,8 @@ struct savetrap {
 static LinkList savetraps;
 
 /*
- * Save the current trap and unset it.
+ * Save the current trap by copying it.  This does nothing to
+ * the existing value of sigtrapped or sigfuncs.
  */
 
 static void
@@ -660,15 +661,18 @@ dosavetrap(int sig, int level)
 	 * the new one yet.
 	 */
 	char func[20];
+	Shfunc shf, newshf = NULL;
 	sprintf(func, "TRAP%s", sigs[sig]);
-	/* We call removehashnode() directly because otherwise
-	 * removeshfuncnode() would be called which in turn would
-	 * call us again so that we would end up with a NULL pointer
-	 * instead of the list for the trap. */
-	st->list = removehashnode(shfunctab, func);
+	if ((shf = (Shfunc)shfunctab->getnode2(shfunctab, func))) {
+	    /* Copy the node for saving */
+	    newshf = (Shfunc) zalloc(sizeof(*newshf));
+	    newshf->nam = ztrdup(shf->nam);
+	    newshf->flags = shf->flags;
+	    newshf->funcdef = dupeprog(shf->funcdef, 0);
+	}
+	st->list = newshf;
     } else {
-	st->list = sigfuncs[sig];
-	sigfuncs[sig] = NULL;
+	st->list = sigfuncs[sig] ? dupeprog(sigfuncs[sig], 0) : NULL;
     }
     noerrs = !!st->list;
     if (!savetraps)
@@ -774,10 +778,11 @@ removetrap(int sig)
 
     /*
      * At this point we free the appropriate structs.  If we don't
-     * want that to happen (e.g. we are saving the trap), then
-     * either the function should already have been removed from shfunctab,
-     * or the entry in sigfuncs should have been set to NULL, and then
-     * we're laughing, in a sort of vague virtual sense.
+     * want that to happen then either the function should already have been
+     * removed from shfunctab, or the entry in sigfuncs should have been set
+     * to NULL.  This is no longer necessary for saving traps as that
+     * copies the structures, so here we are remove the originals.
+     * That causes a little inefficiency, but a good deal more reliability.
      */
     if (trapped & ZSIG_FUNC) {
 	char func[20];
