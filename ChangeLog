@@ -1,7 +1,7 @@
 2001-06-17  Bart Schaefer  <schaefer@zsh.org>
 
-	* Jason Began: 3931 (see cvs.netbsd.org): Use -fPIC for gcc
-	dynamic linking rather than -fpic.
+	* Jason Began: 3931 (see cvs.netbsd.org): src/zshconfig.ac: Use
+	-fPIC for gcc dynamic linking rather than -fpic.
 
 2001-06-16  Wayne Davison  <wayned@users.sourceforge.net>
 
