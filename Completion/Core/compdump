@@ -20,7 +20,7 @@ typeset _d_file _d_f _d_bks _d_line _d_als
 _d_file=${compconfig[dumpfile]-${0:h}/compinit.dump}.$HOST.$$
 
 typeset -U _d_files
-_d_files=( ${^~fpath}/_(|*[^~])(N:t) )
+_d_files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
 
 print "#files: $#_d_files" > $_d_file
 
