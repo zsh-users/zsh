@@ -120,7 +120,7 @@ static struct builtin builtins[] =
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
 
 #ifdef DYNAMIC
-    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "LaudicIp", NULL),
+    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcdipu", NULL),
 #endif
 };
 
@@ -1793,7 +1793,9 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    continue;
 	}
 	if (!typeset_single(name, asg->name,
-			    (Param)gethashnode2(paramtab, asg->name),
+			    (Param) (paramtab == realparamtab ?
+				     gethashnode2(paramtab, asg->name) :
+				     paramtab->getnode(paramtab, asg->name)),
 			    func, on, off, roff, asg->value, NULL))
 	    returnval = 1;
     }
@@ -1974,7 +1976,9 @@ bin_unset(char *name, char **argv, char *ops, int func)
 	    }
 	    *ss = 0;
 	}
-	pm = (Param) gethashnode2(paramtab, s);
+	pm = (Param) (paramtab == realparamtab ?
+		      gethashnode2(paramtab, s) :
+		      paramtab->getnode(paramtab, s));
 	if (!pm)
 	    returnval = 1;
 	else if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {

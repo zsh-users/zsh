@@ -664,7 +664,7 @@ autoloadscan(HashNode hn, int printflags)
     if(bn->flags & BINF_ADDED)
 	return;
     if(printflags & PRINT_LIST) {
-	fputs("zmodload -a ", stdout);
+	fputs("zmodload -ab ", stdout);
 	if(bn->optstr[0] == '-')
 	    fputs("-- ", stdout);
 	quotedzputs(bn->optstr, stdout);
@@ -687,7 +687,12 @@ autoloadscan(HashNode hn, int printflags)
 int
 bin_zmodload(char *nam, char **args, char *ops, int func)
 {
-    if(ops['d'] && ops['a']) {
+    if ((ops['b'] || ops['c'] || ops['p']) && !(ops['a'] || ops['u'])) {
+	zwarnnam(nam, "-b, -c, and -p must be combined with -a or -u",
+		 NULL, 0);
+	return 1;
+    }
+    if (ops['d'] && ops['a']) {
 	zwarnnam(nam, "-d cannot be combined with -a", NULL, 0);
 	return 1;
     }
@@ -695,16 +700,20 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 	zwarnnam(nam, "what do you want to unload?", NULL, 0);
 	return 1;
     }
-    if(ops['d'])
+    if (ops['d'])
 	return bin_zmodload_dep(nam, args, ops);
-    else if(ops['a'])
+    else if ((ops['a'] || ops['b']) && !(ops['c'] || ops['p']))
 	return bin_zmodload_auto(nam, args, ops);
-    else if (ops['c'] || ops['C'])
+    else if (ops['c'] && !(ops['b'] || ops['p']))
 	return bin_zmodload_cond(nam, args, ops);
-    else if (ops['p'])
+    else if (ops['p'] && !(ops['b'] || ops['c']))
 	return bin_zmodload_param(nam, args, ops);
-    else
+    else if (!(ops['a'] || ops['b'] || ops['c'] || ops['p']))
 	return bin_zmodload_load(nam, args, ops);
+    else
+	zwarnnam(nam, "use only one of -b, -c, or -p", NULL, 0);
+
+    return 1;
 }
 
 /**/
@@ -865,7 +874,7 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 	for (p = condtab; p; p = p->next) {
 	    if (p->module) {
 		if (ops['L']) {
-		    fputs("zmodload -c", stdout);
+		    fputs("zmodload -ac", stdout);
 		    if (p->flags & CONDF_INFIX)
 			putchar('I');
 		    printf(" %s %s\n", p->module, p->name);
@@ -908,7 +917,7 @@ printautoparams(HashNode hn, int lon)
 
     if (pm->flags & PM_AUTOLOAD) {
 	if (lon)
-	    printf("zmodload -p %s %s\n", pm->u.str, pm->nam);
+	    printf("zmodload -ap %s %s\n", pm->u.str, pm->nam);
 	else
 	    printf("%s (%s)\n", pm->nam, pm->u.str);
     }
