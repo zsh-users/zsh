@@ -1,5 +1,8 @@
 2001-05-09  Peter Stephenson  <pws@csr.com>
 
+	* 14280: Doc/Zsh/options.yo: make clearer that GLOB_SUBST doesn't
+	affect braces and commas.
+
 	* unposted: back off 14140, since logically it implies tokenizing
 	braces from parameters, which opens a whole new kettle of worms.
 
