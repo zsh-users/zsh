@@ -60,7 +60,7 @@ prompt_bart_precmd () {
     psvar[8]="$history[$[${(%):-%h}-1]]" # Use history text, not just number
     psvar[9]=''				 # Padding before upper right prompt
 
-    repeat $[COLUMNS-${#${(%%f)${PS1//[%]\{[^%]#%\}/}}[1]}-1]
+    repeat $[COLUMNS-${#${(%%f)${(S)PS1//[%]\{*%\}/}}[1]}-1]
     do
 	psvar[9]="$psvar[9] "
     done
