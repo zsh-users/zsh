@@ -1021,13 +1021,6 @@ fallback_zleread(char *lp, char *rp, int ha)
 
 /* compctl entry point pointers.  Similar to the ZLE ones. */
 
-#ifdef LINKED_XMOD_comp1
-
-/**/
-CompctlReadFn compctlreadptr;
-
-#else /* !LINKED_XMOD_comp1 */
-
 CompctlReadFn compctlreadptr = fallback_compctlread;
 
 /**/
@@ -1038,5 +1031,3 @@ fallback_compctlread(char *name, char **args, char *ops, char *reply)
 	    NULL, 0);
     return 1;
 }
-
-#endif /* !LINKED_XMOD_comp1 */
