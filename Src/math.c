@@ -467,6 +467,7 @@ setvar(char *s, mnumber v)
 	zerr("lvalue required", NULL, 0);
 	v.type = MN_INTEGER;
 	v.u.l = 0;
+	return v;
     }
     if (noeval)
 	return v;
