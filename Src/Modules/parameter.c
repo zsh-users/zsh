@@ -1086,12 +1086,12 @@ scanpmhistory(HashTable ht, ScanFunc func, int flags)
     pm.level = 0;
 
     while (he) {
-	if (func != scancountparams &&
-	    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
-	     !(flags & SCANPM_WANTKEYS))) {
+	if (func != scancountparams) {
 	    sprintf(buf, "%d", he->histnum);
 	    pm.nam = dupstring(buf);
-	    pm.u.str = dupstring(he->text);
+	    if ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		!(flags & SCANPM_WANTKEYS))
+		pm.u.str = dupstring(he->text);
 	}
 	func((HashNode) &pm, flags);
 
@@ -1209,12 +1209,13 @@ scanpmjobtexts(HashTable ht, ScanFunc func, int flags)
     for (job = 1; job < MAXJOB; job++) {
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
-	    sprintf(buf, "%d", job);
-	    pm.nam = dupstring(buf);
-	    if (func != scancountparams &&
-		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
-		 !(flags & SCANPM_WANTKEYS)))
-		pm.u.str = pmjobtext(job);
+	    if (func != scancountparams) {
+		sprintf(buf, "%d", job);
+		pm.nam = dupstring(buf);
+		if ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		    !(flags & SCANPM_WANTKEYS))
+		    pm.u.str = pmjobtext(job);
+	    }
 	    func((HashNode) &pm, flags);
 	}
     }
@@ -1314,12 +1315,13 @@ scanpmjobstates(HashTable ht, ScanFunc func, int flags)
     for (job = 1; job < MAXJOB; job++) {
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
-	    sprintf(buf, "%d", job);
-	    pm.nam = dupstring(buf);
-	    if (func != scancountparams &&
-		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
-		 !(flags & SCANPM_WANTKEYS)))
-		pm.u.str = pmjobstate(job);
+	    if (func != scancountparams) {
+		sprintf(buf, "%d", job);
+		pm.nam = dupstring(buf);
+		if ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		    !(flags & SCANPM_WANTKEYS))
+		    pm.u.str = pmjobstate(job);
+	    }
 	    func((HashNode) &pm, flags);
 	}
     }
@@ -1391,12 +1393,13 @@ scanpmjobdirs(HashTable ht, ScanFunc func, int flags)
     for (job = 1; job < MAXJOB; job++) {
        if (jobtab[job].stat && jobtab[job].procs &&
            !(jobtab[job].stat & STAT_NOPRINT)) {
-           sprintf(buf, "%d", job);
-           pm.nam = dupstring(buf);
-           if (func != scancountparams &&
-               ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
-                !(flags & SCANPM_WANTKEYS)))
-               pm.u.str = pmjobdir(job);
+           if (func != scancountparams) {
+	       sprintf(buf, "%d", job);
+	       pm.nam = dupstring(buf);
+               if ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		   !(flags & SCANPM_WANTKEYS))
+		   pm.u.str = pmjobdir(job);
+	   }
            func((HashNode) &pm, flags);
        }
     }
