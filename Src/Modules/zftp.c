@@ -42,7 +42,10 @@
  */
 
 /* needed in prototypes for statics */
+struct hostent;
 struct sockaddr_in;
+struct sockaddr_in6;
+union zftp_sockaddr;
 struct zftp_session;
 typedef struct zftp_session *Zftp_session;
 
@@ -71,10 +74,131 @@ typedef struct zftp_session *Zftp_session;
 # undef HAVE_POLL
 #endif
 
-/* pinch the definition from <netinet/in.h> for deficient headers */
-#ifndef INADDR_NONE
-# define INADDR_NONE 0xffffffff
+/* Is IPv6 supported by the library? */
+
+#if defined(AF_INET6) && defined(IN6ADDR_LOOPBACK_INIT) \
+	&& defined(HAVE_INET_NTOP) && defined(HAVE_INET_PTON)
+# define SUPPORT_IPV6 1
 #endif
+
+union zftp_sockaddr {
+	struct sockaddr a;
+	struct sockaddr_in in;
+#ifdef SUPPORT_IPV6
+	struct sockaddr_in6 in6;
+#endif
+};
+
+/* We use the RFC 2553 interfaces.  If the functions don't exist in the library,
+   simulate them. */
+
+#ifndef INET_ADDRSTRLEN
+# define INET_ADDRSTRLEN 16
+#endif
+
+#ifndef INET6_ADDRSTRLEN
+# define INET6_ADDRSTRLEN 46
+#endif
+
+/**/  
+#ifndef HAVE_INET_NTOP
+
+/**/    
+static char const *
+inet_ntop(int af, void const *cp, char *buf, size_t len)
+{       
+        if(af != AF_INET) {
+                errno = EAFNOSUPPORT;
+                return NULL;
+        } 
+        if(len < INET_ADDRSTRLEN) {
+                errno = ENOSPC;
+                return NULL;
+        }
+        strcpy(buf, inet_ntoa(*(struct in_addr *)cp));
+        return buf;
+}
+
+/**/  
+#endif /* !HAVE_INET_NTOP */
+
+/**/
+#ifndef HAVE_INET_PTON
+
+/**/
+static int
+inet_pton(int af, char const *src, void *dst)
+{
+        if(af != AF_INET) {
+                errno = EAFNOSUPPORT;
+                return -1;
+        }
+        return !!inet_aton(src, dst);
+}
+
+/**/
+#endif /* !HAVE_INET_PTON */
+
+/**/
+#ifndef HAVE_GETIPNODEBYNAME
+
+/* note: this is not a complete implementation.  If ignores the flags,
+   and does not provide the memory allocation of the standard interface.
+   Each returned structure will overwrite the previous one. */
+
+/**/
+static struct hostent *
+getipnodebyname(char const *name, int af, int flags, int *errorp)
+{
+	static struct hostent ahe;
+	static char nbuf[16];
+	static char *addrlist[] = { nbuf, NULL };
+# ifdef SUPPORT_IPV6
+	static char pbuf[INET6_ADDRSTRLEN];
+# else
+	static char pbuf[INET_ADDRSTRLEN];
+# endif
+	struct hostent *he;
+	if(inet_pton(af, name, nbuf) == 1) {
+		inet_ntop(af, nbuf, pbuf, sizeof(pbuf));
+		ahe.h_name = pbuf;
+		ahe.h_aliases = addrlist+1;
+		ahe.h_addrtype = af;
+		ahe.h_length = (af == AF_INET) ? 4 : 16;
+		ahe.h_addr_list = addrlist;
+		return &ahe;
+	}
+	he = gethostbyname2(name, af);
+	if(!he)
+		*errorp = h_errno;
+	return he;
+}
+
+/**/
+# ifndef HAVE_GETHOSTBYNAME2
+
+/**/
+static struct hostent *
+gethostbyname2(char const *name, int af)
+{
+	if(af != AF_INET) {
+		h_errno = NO_RECOVERY;
+		return NULL;
+	}
+	return gethostbyname(name);
+}
+
+/**/
+# endif /* !HAVE_GETHOSTBYNAME2 */
+
+/**/
+static void
+freehostent(struct hostent *ptr)
+{
+}
+
+/**/
+#endif /* !HAVE_GETIPNODEBYNAME */
 
 /*
  * For FTP block mode
@@ -292,7 +416,8 @@ struct zftp_session {
     char **userparams;		/* user parameters set by zftp_params */
     int cfd;			/* control file descriptor */
     FILE *cin;			/* control input file */
-    struct sockaddr_in sock;	/* the socket for the control connection */
+    union zftp_sockaddr sock;	/* this end of the control connection */
+    union zftp_sockaddr peer;	/* far end of the control connection */
     int dfd;			/* data connection */
     int has_size;		/* understands SIZE? */
     int has_mdtm;		/* understands MDTM? */
@@ -846,7 +971,7 @@ zfsendcmd(char *cmd)
 
 /**/
 static int
-zfopendata(char *name, struct sockaddr_in *zdsockp, int *is_passivep)
+zfopendata(char *name, union zftp_sockaddr *zdsockp, int *is_passivep)
 {
     if (!(zfprefs & (ZFPF_SNDP|ZFPF_PASV))) {
 	zwarnnam(name, "Must set preference S or P to transfer data", NULL, 0);
@@ -858,15 +983,17 @@ zfopendata(char *name, struct sockaddr_in *zdsockp, int *is_passivep)
 	return 1;
     }
 
-    *zdsockp = zfsess->sock;
-    zdsockp->sin_family = AF_INET;
-
     if (!(zfstatusp[zfsessno] & ZFST_NOPS) && (zfprefs & ZFPF_PASV)) {
-	char *ptr;
-	int i, nums[6], err;
-	unsigned char iaddr[4], iport[2];
+	char *psv_cmd;
+	int err, salen;
 
-	if (zfsendcmd("PASV\r\n") == 6)
+#ifdef SUPPORT_IPV6
+	if(zfsess->peer.a.sa_family == AF_INET6)
+	    psv_cmd = "EPSV\r\n";
+	else
+#endif /* SUPPORT_IPV6 */
+	    psv_cmd = "PASV\r\n";
+	if (zfsendcmd(psv_cmd) == 6)
 	    return 1;
 	else if (lastcode >= 500 && lastcode <= 504) {
 	    /*
@@ -877,32 +1004,73 @@ zfopendata(char *name, struct sockaddr_in *zdsockp, int *is_passivep)
 	    zfclosedata();
 	    return zfopendata(name, zdsockp, is_passivep);
 	}
-	/*
-	 * OK, now we need to know what port we're looking at,
-	 * which is cunningly concealed in the reply.
-	 * lastmsg already has the reply code expunged.
-	 */
-	for (ptr = lastmsg; *ptr; ptr++)
-	    if (isdigit(STOUC(*ptr)))
-		break;
-	if (sscanf(ptr, "%d,%d,%d,%d,%d,%d",
-		   nums, nums+1, nums+2, nums+3, nums+4, nums+5) != 6) {
-	    zwarnnam(name, "bad response to PASV: %s", lastmsg, 0);
-	    zfclosedata();
-	    return 1;
-	}
-	for (i = 0; i < 4; i++)
-	    iaddr[i] = STOUC(nums[i]);
-	iport[0] = STOUC(nums[4]);
-	iport[1] = STOUC(nums[5]);
+	zdsockp->a.sa_family = zfsess->peer.a.sa_family;
+#ifdef SUPPORT_IPV6
+	if(zfsess->peer.a.sa_family == AF_INET6) {
+	    /* see RFC 2428 for explanation */
+	    char const *ptr, *end;
+	    char delim, portbuf[6], *pbp;
+	    unsigned long portnum;
+	    ptr = strchr(lastmsg, '(');
+	    if(!ptr) {
+	    bad_epsv:
+		zwarnnam(name, "bad response to EPSV: %s", lastmsg, 0);
+		zfclosedata();
+		return 1;
+	    }
+	    delim = ptr[1];
+	    if(delim < 33 || delim > 126 || ptr[2] != delim || ptr[3] != delim)
+		goto bad_epsv;
+	    ptr += 3;
+	    end = strchr(ptr, delim);
+	    if(!end || end[1] != ')')
+		goto bad_epsv;
+	    while(ptr != end && *ptr == '0')
+		ptr++;
+	    if(ptr == end || (end-ptr) > 5 || !isdigit(STOUC(*ptr)))
+		goto bad_epsv;
+	    memcpy(portbuf, ptr, (end-ptr));
+	    portbuf[end-ptr] = 0;
+	    portnum = strtoul(portbuf, &pbp, 10);
+	    if(*pbp || portnum > 65535UL)
+		goto bad_epsv;
+	    *zdsockp = zfsess->peer;
+	    zdsockp->in6.sin6_port = htons((unsigned)portnum);
+	    salen = sizeof(struct sockaddr_in6);
+	} else
+#endif /* SUPPORT_IPV6 */
+	{
+	    char *ptr;
+	    int i, nums[6];
+	    unsigned char iaddr[4], iport[2];
 
-	memcpy(&zdsockp->sin_addr, iaddr, sizeof(iaddr));
-	memcpy(&zdsockp->sin_port, iport, sizeof(iport));
+	    /*
+	     * OK, now we need to know what port we're looking at,
+	     * which is cunningly concealed in the reply.
+	     * lastmsg already has the reply code expunged.
+	     */
+	    for (ptr = lastmsg; *ptr; ptr++)
+		if (isdigit(STOUC(*ptr)))
+		    break;
+	    if (sscanf(ptr, "%d,%d,%d,%d,%d,%d",
+		       nums, nums+1, nums+2, nums+3, nums+4, nums+5) != 6) {
+		zwarnnam(name, "bad response to PASV: %s", lastmsg, 0);
+		zfclosedata();
+		return 1;
+	    }
+	    for (i = 0; i < 4; i++)
+		iaddr[i] = STOUC(nums[i]);
+	    iport[0] = STOUC(nums[4]);
+	    iport[1] = STOUC(nums[5]);
+
+	    memcpy(&zdsockp->in.sin_addr, iaddr, sizeof(iaddr));
+	    memcpy(&zdsockp->in.sin_port, iport, sizeof(iport));
+	    salen = sizeof(struct sockaddr_in);
+	}
 
 	/* we should timeout this connect */
 	do {
-	    err = connect(zfsess->dfd,
-			  (struct sockaddr *)zdsockp, sizeof(*zdsockp));
+	    err = connect(zfsess->dfd, (struct sockaddr *)zdsockp, salen);
 	} while (err && errno == EINTR && !errflag);
 
 	if (err) {
@@ -913,8 +1081,11 @@ zfopendata(char *name, struct sockaddr_in *zdsockp, int *is_passivep)
 
 	*is_passivep = 1;
     } else {
+#ifdef SUPPORT_IPV6
+	char portcmd[8+INET6_ADDRSTRLEN+9];
+#else
 	char portcmd[40];
-	unsigned char *addr, *port;
+#endif
 	int ret, len;
 
 	if (!(zfprefs & ZFPF_SNDP)) {
@@ -922,11 +1093,19 @@ zfopendata(char *name, struct sockaddr_in *zdsockp, int *is_passivep)
 	    return 1;
 	}
 
-	zdsockp->sin_port = 0;	/* to be set by bind() */
-	len = sizeof(*zdsockp);
+	*zdsockp = zfsess->sock;
+#ifdef SUPPORT_IPV6
+	if(zdsockp->a.sa_family == AF_INET6) {
+	    zdsockp->in6.sin6_port = 0;	/* to be set by bind() */
+	    len = sizeof(struct sockaddr_in6);
+	} else
+#endif /* SUPPORT_IPV6 */
+	{
+	    zdsockp->in.sin_port = 0;	/* to be set by bind() */
+	    len = sizeof(struct sockaddr_in);
+	}
 	/* need to do timeout stuff and probably handle EINTR here */
-	if (bind(zfsess->dfd, (struct sockaddr *)zdsockp,
-		 sizeof(*zdsockp)) < 0)
+	if (bind(zfsess->dfd, (struct sockaddr *)zdsockp, len) < 0)
 	    ret = 1;
 	else if (getsockname(zfsess->dfd, (struct sockaddr *)zdsockp,
 			     &len) < 0)
@@ -944,10 +1123,22 @@ zfopendata(char *name, struct sockaddr_in *zdsockp, int *is_passivep)
 	    return 1;
 	}
 
-	addr = (unsigned char *) &zdsockp->sin_addr;
-	port = (unsigned char *) &zdsockp->sin_port;
-	sprintf(portcmd, "PORT %d,%d,%d,%d,%d,%d\r\n",
-		addr[0],addr[1],addr[2],addr[3],port[0],port[1]);
+#ifdef SUPPORT_IPV6
+	if(zdsockp->a.sa_family == AF_INET6) {
+	    /* see RFC 2428 for explanation */
+	    strcpy(portcmd, "EPRT |2|");
+	    inet_ntop(AF_INET6, &zdsockp->in6.sin6_addr,
+		portcmd+8, INET6_ADDRSTRLEN);
+	    sprintf(strchr(portcmd, 0), "|%u|\r\n",
+		(unsigned)ntohs(zdsockp->in6.sin6_port));
+	} else
+#endif /* SUPPORT_IPV6 */
+	{
+	    unsigned char *addr = (unsigned char *) &zdsockp->in.sin_addr;
+	    unsigned char *port = (unsigned char *) &zdsockp->in.sin_port;
+	    sprintf(portcmd, "PORT %d,%d,%d,%d,%d,%d\r\n",
+		    addr[0],addr[1],addr[2],addr[3],port[0],port[1]);
+	}
 	if (zfsendcmd(portcmd) >= 5) {
 	    zwarnnam(name, "port command failed", NULL, 0);
 	    zfclosedata();
@@ -988,7 +1179,7 @@ static int
 zfgetdata(char *name, char *rest, char *cmd, int getsize)
 {
     int len, newfd, is_passive;
-    struct sockaddr_in zdsock;
+    union zftp_sockaddr zdsock;
 
     if (zfopendata(name, &zdsock, &is_passive))
 	return 1;
@@ -1618,12 +1809,12 @@ zfsenddata(char *name, int recv, int progress, off_t startat)
 static int
 zftp_open(char *name, char **args, int flags)
 {
-    struct in_addr ipaddr;
     struct protoent *zprotop;
     struct servent *zservp;
     struct hostent *zhostp = NULL;
     char **addrp, *fname;
     int err, len, tmout;
+    int herrno, af, salen;
 
     if (!*args) {
 	if (zfsess->userparams)
@@ -1671,89 +1862,104 @@ zftp_open(char *name, char **args, int flags)
     }
     zfalarm(tmout);
 
-    /*
-     * Now this is what I like.  A library which provides decent higher
-     * level functions to do things like converting address types.  It saves
-     * so much trouble.  Pity about the rest of the network interface, though.
-     */
-    ipaddr.s_addr = inet_addr(args[0]);
-    if (ipaddr.s_addr != INADDR_NONE) {
-	/*
-	 * hmmm, we don't necessarily want to do this... maybe the
-	 * user is actively trying to avoid a bad nameserver.
-	 * perhaps better just to set ZFTP_HOST to the dot address, too.
-	 * that way shell functions know how it was opened.
-	 *
-	 * 	zhostp = gethostbyaddr(&ipaddr, sizeof(ipaddr), AF_INET);
-	 *
-	 * or, we could have a `no_lookup' flag.
-	 */
-	zfsetparam("ZFTP_HOST", ztrdup(args[0]), ZFPM_READONLY);
-	zfsess->sock.sin_family = AF_INET;
-    } else {
-	zhostp = gethostbyname(args[0]);
+#ifdef SUPPORT_IPV6
+    for(af=AF_INET6; 1; af = AF_INET)
+# define SUCCEEDED() break
+# define FAILED() if(af == AF_INET) { } else continue
+#else
+    af = AF_INET;
+# define SUCCEEDED() do { } while(0)
+# define FAILED() do { } while(0)
+#endif
+    {
+    	zhostp = getipnodebyname(args[0], af, 0, &herrno);
 	if (!zhostp || errflag) {
 	    /* should use herror() here if available, but maybe
 	     * needs configure test. on AIX it's present but not
 	     * in headers.
 	     */
+	    FAILED();
 	    zwarnnam(name, "host not found: %s", args[0], 0);
 	    alarm(0);
 	    return 1;
 	}
-	zfsess->sock.sin_family = zhostp->h_addrtype;
 	zfsetparam("ZFTP_HOST", ztrdup(zhostp->h_name), ZFPM_READONLY);
-    }
 
-    zfsess->sock.sin_port = zservp->s_port;
-    zfsess->cfd = socket(zfsess->sock.sin_family, SOCK_STREAM, 0);
-    if (zfsess->cfd < 0) {
-	zwarnnam(name, "socket failed: %e", NULL, errno);
-	zfunsetparam("ZFTP_HOST");
-	alarm(0);
-	return 1;
-    }
-    /* counts as `open' so long as it's not negative */
-    zfnopen++;
+	zfsess->peer.a.sa_family = af;
+#ifdef SUPPORT_IPV6
+	if(af == AF_INET6) {
+	    zfsess->peer.in6.sin6_port = zservp->s_port;
+	    zfsess->peer.in6.sin6_flowinfo = 0;
+# ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
+	    zfsess->peer.in6.sin6_scope_id = 0;
+# endif
+	    salen = sizeof(struct sockaddr_in6);
+	} else
+#endif /* SUPPORT_IPV6 */
+	{
+	    zfsess->peer.in.sin_port = zservp->s_port;
+	    salen = sizeof(struct sockaddr_in);
+	}
 
-    /*
-     * now connect the socket.  manual pages all say things like `this is all
-     * explained oh-so-wonderfully in some other manual page'.  not.
-     */
+	zfsess->cfd = socket(af, SOCK_STREAM, 0);
+	if (zfsess->cfd < 0) {
+	    freehostent(zhostp);
+	    zfunsetparam("ZFTP_HOST");
+	    FAILED();
+	    zwarnnam(name, "socket failed: %e", NULL, errno);
+	    alarm(0);
+	    return 1;
+	}
+	/* counts as `open' so long as it's not negative */
+	zfnopen++;
 
-    err = 1;
+	/*
+	 * now connect the socket.  manual pages all say things like `this is
+	 * all explained oh-so-wonderfully in some other manual page'.  not.
+	 */
 
-    if (ipaddr.s_addr != INADDR_NONE) {
-	/* dot address */
-	memcpy(&zfsess->sock.sin_addr, &ipaddr, sizeof(ipaddr));
-	do {
-	    err = connect(zfsess->cfd, (struct sockaddr *)&zfsess->sock,
-			  sizeof(zfsess->sock));
-	} while (err && errno == EINTR && !errflag);
-    } else {
-	/* host name: try all possible IP's */
-	for (addrp = zhostp->h_addr_list; *addrp; addrp++) {
-	    memcpy(&zfsess->sock.sin_addr, *addrp, zhostp->h_length);
+	err = 1;
+
+	/* try all possible IP's */
+	for (addrp = zhostp->h_addr_list; err && *addrp; addrp++) {
+#ifdef SUPPORT_IPV6
+	    if(af == AF_INET6)
+		memcpy(&zfsess->peer.in6.sin6_addr, *addrp, zhostp->h_length);
+	    else
+#endif /* SUPPORT_IPV6 */
+		memcpy(&zfsess->peer.in.sin_addr, *addrp, zhostp->h_length);
 	    do {
-		err = connect(zfsess->cfd, (struct sockaddr *)&zfsess->sock,
-			      sizeof(zfsess->sock));
+		err = connect(zfsess->cfd, (struct sockaddr *)&zfsess->peer,
+			      salen);
 	    } while (err && errno == EINTR && !errflag);
 	    /* you can check whether it's worth retrying here */
 	}
-    }
 
+	if (err) {
+	    freehostent(zhostp);
+	    zfclose(0);
+	    FAILED();
+	    zwarnnam(name, "connect failed: %e", NULL, errno);
+	    alarm(0);
+	    return 1;
+	}
+
+	SUCCEEDED();
+    }
     alarm(0);
-
-    if (err < 0) {
-	zwarnnam(name, "connect failed: %e", NULL, errno);
-	zfclose(0);
-	return 1;
+    {
+#ifdef SUPPORT_IPV6
+	char pbuf[INET6_ADDRSTRLEN];
+#else
+	char pbuf[INET_ADDRSTRLEN];
+#endif
+	addrp--;
+	inet_ntop(af, *addrp, pbuf, sizeof(pbuf));
+	zfsetparam("ZFTP_IP", ztrdup(pbuf), ZFPM_READONLY);
     }
-    zfsetparam("ZFTP_IP", ztrdup(inet_ntoa(zfsess->sock.sin_addr)),
-	       ZFPM_READONLY);
+    freehostent(zhostp);
     /* now we can talk to the control connection */
     zcfinish = 0;
-
 
     /*
      * Move the fd out of the user-visible range.  We need to do

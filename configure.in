@@ -773,6 +773,14 @@ zsh_STRUCT_MEMBER([
 #endif
 ], struct direct, d_stat)
 
+dnl Check IPv6 socket address structure type
+zsh_STRUCT_MEMBER([
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#include <netinet/in.h>
+], struct sockaddr_in6, sin6_scope_id)
+
 dnl need to integrate this function
 dnl AC_FUNC_STRFTIME
 
@@ -783,6 +791,7 @@ AC_CHECK_FUNCS(memcpy memmove \
               sigprocmask setuid seteuid setreuid setresuid setsid strerror \
               nis_list initgroups fchdir cap_get_proc readlink nice \
 	      getgrgid getgrnam getpwent getpwnam getpwuid setpgrp \
+	      inet_pton inet_ntop getipnodebyname gethostbyname2 \
 	      fseeko ftello mmap munmap msync ftruncate setlocale)
 
 dnl ---------------

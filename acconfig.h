@@ -133,6 +133,9 @@
 /* Define if your system's struct direct has a member named d_stat.  */
 #undef HAVE_STRUCT_DIRECT_D_STAT
 
+/* Define if your system's struct sockaddr_in6 has a member named sin6_scope_id.  */
+#undef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
+
 /* Define to be a string corresponding the vendor of the machine */
 #undef VENDOR
 
