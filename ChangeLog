@@ -1,5 +1,8 @@
 2000-08-01  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* Jan Fedak: 12463: Completion/User/_slrn: new completion function
+	for slrn
+	
 	* 12462: Completion/Base/_arguments: fix for automatically
  	recognised options, don't expect an argument after each of them
 	

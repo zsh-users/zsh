@@ -1,0 +1,16 @@
+#compdef slrn
+
+_arguments \
+    '-n[do not check for new groups]' \
+    '-h[NNTP host]:NNTP host:_hosts' \
+    '-p[NNTP port]:NNTP port:_ports' \
+    '-f[name of the newsrc file to use]:the newsrc file to use:_files' \
+    '-C[use colors]' \
+    '-create[create a newsrc file by getting list of groups from server]' \
+    '-d[get new text descriptions of each group from server]' \
+    '-i[name of initialization file to use]:initialization file to use:_files' \
+    '-D-[add predefined preprocessing token]' \
+    '-k[do not process score file]' \
+    '-k0[process score file but inhibit expensive scores]' \
+    '-a[use active file for getting new news]' \
+    '-m[force XTerm mouse reporting]'
