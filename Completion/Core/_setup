@@ -9,9 +9,13 @@ if zstyle -a ":completion:${curcontext}:$1" list-colors val; then
   else
     eval "ZLS_COLORS=\"(${1})\${(j.:(${1}).)\${(@)val:gs/:/\\\:}}:\${ZLS_COLORS}\""
   fi
-elif [[ "$1" = default && -n "$ZLS_COLORS$ZLS_COLOURS" ]]; then
-  zmodload -i zsh/complist
-  ZLS_COLORS="$ZLS_COLORS$ZLS_COLOURS"
+
+# Here is the problem mentioned in _main_complete.
+
+# elif [[ "$1" = default && -n "$ZLS_COLORS$ZLS_COLOURS" ]]; then
+#   zmodload -i zsh/complist
+#   ZLS_COLORS="$ZLS_COLORS$ZLS_COLOURS"
+
 fi
 
 if zstyle -s ":completion:${curcontext}:$1" list-packed val; then

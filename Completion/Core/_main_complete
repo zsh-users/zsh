@@ -45,7 +45,14 @@ fi
 
 _setup default
 _def_menu_style=( "$_last_menu_style[@]"
-                  ${SELECTMIN+select${SELECTMIN:+\=$SELECTMIN}} )
+
+# We can't really do that because the current value of $SELECTMIN
+# may be the one set by this function.
+# There is a similar problem with $ZLS_COLORS in _setup.
+
+#                  ${SELECTMIN+select${SELECTMIN:+\=$SELECTMIN}}
+
+                )
 _last_menu_style=()
 
 # Get the names of the completers to use in the positional parameters.
