@@ -1,3 +1,11 @@
+2001-04-21  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14060: Src/builtin.c, Src/lex.c, Src/params.c,
+	Test/D06subscript.ztst: Fix problem with ${array[ix]=value}
+	introduced by 14008; fix long-standing problems with
+	`noglob typeset array[ix]=value' and `typeset 12foo=bar';
+	fix parsing problem with ((\[ ...)) introduced by 14051.
+
 2001-04-20  Clint Adams  <schizo@debian.org>
 
 	* 14055: Src/Modules/termcap.c: include termio.h if available.

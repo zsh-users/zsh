@@ -128,3 +128,11 @@
 >obrack obrack
 >] ]
 >backcbrack
+
+  print -R ${A[${A[(r)\\\\\\\\\]]}]::=zounds}
+  print -R ${A[${A[(r)\\\\\\\\\]]}]}
+  print -R $A[\\\\\]]
+0:Associative array substitution-assignment with reverse pattern subscript key
+>zounds
+>zounds
+>zounds

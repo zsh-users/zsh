@@ -1691,7 +1691,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		pm->env = NULL;
 	    }
 	    if (value && !(pm = setsparam(pname, ztrdup(value))))
-		return 0;
+		return NULL;
 	} else if (value) {
 	    zwarnnam(cname, "can't assign new value for array %s", pname, 0);
 	    return NULL;
@@ -1782,7 +1782,27 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    pm->ct = auxlen;
 	else
 	    pm->ct = 0;
-    } else {
+    } else if (strchr(pname, '[')) {
+	if (on & PM_READONLY) {
+	    zerrnam(cname,
+		    "%s: can't create readonly array elements", pname, 0);
+	    return NULL;
+	} else if (PM_TYPE(on) == PM_SCALAR) {
+	    /*
+	     * This will either complain about bad identifiers, or will set
+	     * a hash element or array slice.  This once worked by accident,
+	     * creating a stray parameter along the way via createparam(),
+	     * now called below in the isident() branch.
+	     */
+	    if (!(pm = setsparam(pname, ztrdup(value ? value : ""))))
+		return NULL;
+	    value = NULL;
+	} else {
+	    zerrnam(cname,
+		    "%s: array elements must be scalar", pname, 0);
+	    return NULL;
+	}
+    } else if (isident(pname)) {
 	/*
 	 * Create a new node for a parameter with the flags in `on' minus the
 	 * readonly flag
@@ -1790,6 +1810,9 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	pm = createparam(pname, on & ~PM_READONLY);
 	DPUTS(!pm, "BUG: parameter not created");
 	pm->ct = auxlen;
+    } else {
+	zerr("not an identifier: %s", pname, 0);
+	return NULL;
     }
 
     if (altpm && PM_TYPE(pm->flags) == PM_SCALAR) {
@@ -1808,8 +1831,14 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     else if (on & PM_LOCAL)
 	pm->level = locallevel;
     if (value && !(pm->flags & (PM_ARRAY|PM_HASHED))) {
+	Param ipm = pm;
 	if (!(pm = setsparam(pname, ztrdup(value))))
-	    return 0;
+	    return NULL;
+	if (pm != ipm) {
+	    DPUTS(ipm->flags != pm->flags,
+		  "BUG: parameter recreated with wrong flags");
+	    unsetparam_pm(ipm, 0, 1);
+	}
     } else if (newspecial && !(pm->old->flags & PM_NORESTORE)) {
 	/*
 	 * We need to use the special setting function to re-initialise

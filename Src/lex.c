@@ -1303,9 +1303,9 @@ dquote_parse(char endchar, int sub)
 	    if (c != '\n') {
 		if (c == '$' || c == '\\' || (c == '}' && !intick && bct) ||
 		    c == endchar || c == '`' ||
-		    (math && (c == '[' || c == ']' ||
-			      c == '(' || c == ')' ||
-			      c == '{' || c == '}')))
+		    (endchar == ']' && (c == '[' || c == ']' ||
+					c == '(' || c == ')' ||
+					c == '{' || c == '}')))
 		    add(Bnull);
 		else {
 		    /* lexstop is implicitly handled here */
@@ -1390,7 +1390,7 @@ dquote_parse(char endchar, int sub)
 		err = (!brct-- && math);
 	    break;
 	case '"':
-	    if (intick || (!endchar && !bct))
+	    if (intick || endchar == ']' || (!endchar && !bct))
 		break;
 	    if (bct) {
 		add(Dnull);

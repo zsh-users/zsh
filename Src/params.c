@@ -765,10 +765,17 @@ isident(char *s)
     if (!*s)			/* empty string is definitely not valid */
 	return 0;
 
-    /* find the first character in `s' not in the iident type table */
-    for (ss = s; *ss; ss++)
-	if (!iident(*ss))
-	    break;
+    if (idigit(*s)) {
+	/* If the first character is `s' is a digit, then all must be */
+	for (ss = ++s; *ss; ss++)
+	    if (!idigit(*ss))
+		break;
+    } else {
+	/* Find the first character in `s' not in the iident type table */
+	for (ss = s; *ss; ss++)
+	    if (!iident(*ss))
+		break;
+    }
 
     /* If the next character is not [, then it is *
      * definitely not a valid identifier.         */
@@ -1171,7 +1178,7 @@ getindex(char **pptr, Value v)
     int start, end, inv = 0;
     char *s = *pptr, *tbrack;
 
-    *s++ = Inbrack;
+    *s++ = '[';
     s = parse_subscript(s);	/* Error handled after untokenizing */
     /* Now we untokenize everthing except INULL() markers so we can check *
      * for the '*' and '@' special subscripts.  The INULL()s are removed  *
@@ -1191,7 +1198,7 @@ getindex(char **pptr, Value v)
 	return 1;
     }
     s = *pptr + 1;
-    if ((s[0] == '*' || s[0] == '@') && s[1] == Outbrack) {
+    if ((s[0] == '*' || s[0] == '@') && s + 1 == tbrack) {
 	if ((v->isarr || IS_UNSET_VALUE(v)) && s[0] == '@')
 	    v->isarr |= SCANPM_ISVAR_AT;
 	v->start = 0;
@@ -1223,12 +1230,11 @@ getindex(char **pptr, Value v)
 	    }
 	    if (*s == ',') {
 		zerr("invalid subscript", NULL, 0);
-		while (*s && *s != Outbrack)
-		    s++;
-		*pptr = s;
+		*tbrack = ']';
+		*pptr = tbrack+1;
 		return 1;
 	    }
-	    if (*s == Outbrack)
+	    if (s == tbrack)
 		s++;
 	} else {
 	    int com;
@@ -1243,7 +1249,7 @@ getindex(char **pptr, Value v)
 		start--;
 	    else if (start == 0 && end == 0)
 		end++;
-	    if (*s == Outbrack) {
+	    if (s == tbrack) {
 		s++;
 		if (v->isarr && start == end-1 && !com &&
 		    (!(v->isarr & SCANPM_MATCHMANY) ||
@@ -1256,6 +1262,7 @@ getindex(char **pptr, Value v)
 		s = *pptr;
 	}
     }
+    *tbrack = ']';
     *pptr = s;
     return 0;
 }
