@@ -5,6 +5,9 @@
 
 2002-04-25  Peter Stephenson  <pws@csr.com>
 
+	* users/4865: Completion/compinit: need to add NO_octalzeroes to
+	$_comp_options.
+
 	* 17041: Src/Modules/zftp.c: Minor but fatal typos creating a data
 	connection for zftp using IPv6.
 
