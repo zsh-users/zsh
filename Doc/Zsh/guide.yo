@@ -32,6 +32,7 @@ menu(Programmable Completion)
 menu(Completion Widgets)
 menu(Zsh Modules)
 menu(Completion System)
+menu(Zftp Function System)
 
  --- Indices ---
 

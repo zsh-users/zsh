@@ -72,6 +72,10 @@ static int wb, we;
 
 static int offs;
 
+/* the last completion widget called */
+
+static Widget lastcompwidget;
+
 /* These control the type of completion that will be done.  They are      *
  * affected by the choice of ZLE command and by relevant shell options.   *
  * usemenu is set to 2 if we have to start automenu and 3 if we have to   *
@@ -756,10 +760,12 @@ docomplete(int lst)
 
     /* If we are doing a menu-completion... */
 
-    if (menucmp && lst != COMP_LIST_EXPAND) {
+    if (menucmp && lst != COMP_LIST_EXPAND && compwidget &&
+	compwidget == lastcompwidget) {
 	do_menucmp(lst);
 	return;
     }
+    lastcompwidget = compwidget;
 
     /* We may have to reset the cursor to its position after the   *
      * string inserted by the last completion. */
@@ -6970,10 +6976,20 @@ do_single(Cmatch m)
 		t = 1;
 	    else {
 		/* Build the path name. */
-		p = (char *) zhalloc(strlen(prpre) + strlen(str) +
-				 strlen(psuf) + 3);
-		sprintf(p, "%s%s%s", (prpre && *prpre) ? prpre : "./", str, psuf);
+		if (m->ripre && !*psuf) {
+		    int ne = noerrs;
 
+		    p = (char *) zhalloc(strlen(m->ripre) + strlen(str) + 1);
+		    sprintf(p, "%s%s", m->ripre, str);
+		    noerrs = 1;
+		    parsestr(p);
+		    singsub(&p);
+		    noerrs = ne;
+		} else {
+		    p = (char *) zhalloc(strlen(prpre) + strlen(str) +
+				 strlen(psuf) + 3);
+		    sprintf(p, "%s%s%s", (prpre && *prpre) ? prpre : "./", str, psuf);
+		}
 		/* And do the stat. */
 		t = (!(sr = ztat(p, &buf, 0)) && S_ISDIR(buf.st_mode));
 	    }

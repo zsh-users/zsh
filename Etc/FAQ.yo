@@ -43,25 +43,15 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(1999/02/25)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(1999/04/23)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 1999/02/05
+mydit(Last-Modified:) 1999/04/23
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.2 1999/04/15 18:20:31 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.3 1999/04/25 15:43:54 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
-)
-
-bf(Changes since issue posted January 1999:)
-description(
-mydit(1.1)  deleted the bit saying startup files are not mentioned.
-mydit(3.2)  New: about startup files.
-mydit(3.7)  we just found the PRINT_EIGHT_BIT option again...
-mydit(3.22) New: about ${(e)...} and ${${...}}.
-mydit(5.2)  (In wishlist): patch exists for 3.1 to handle tying
-     texinputs/TEXINPUTS etc.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -160,10 +150,12 @@ url(http://sunsite.auc.dk/zsh/FAQ/)(http://sunsite.auc.dk/zsh/FAQ/) .
   The site also contains some contributed zsh scripts and functions;
   we are delighted to add more, or simply links to your own collection.
 
-  This document was originally written in YODL, allowing it to be
-  converted easily into various other formats.  The master source
-  file lives at url(http://sunsite.auc.dk/zsh/FAQ/zshfaq.yo)
-(http://sunsite.auc.dk/zsh/FAQ/zshfaq.yo) .
+  This document was originally written in YODL, allowing it to be converted
+  easily into various other formats.  The master source file lives at
+  url(http://sunsite.auc.dk/zsh/FAQ/zshfaq.yo)
+(http://sunsite.auc.dk/zsh/FAQ/zshfaq.yo) and the plain text version
+  can be found at url(http://sunsite.auc.dk/zsh/FAQ/zshfaq.txt)
+(http://sunsite.auc.dk/zsh/FAQ/zshfaq.txt) .
 
   Another useful source of information is the collection of FAQ articles
   posted frequently to the Usenet news groups comp.unix.questions,
@@ -297,12 +289,13 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 3.0.5 is the latest production version. The new major number 3.0
-  largely reflects the considerable internal changes in zsh to make it
-  more reliable, consistent and (where possible) compatible.  Those
-  planning on upgrading their zsh installation should take a look at
-  the list of incompatibilities at the end of link(5.1)(51).  This is
-  longer than usual due to enhanced sh, ksh and POSIX compatibility.
+  Zsh 3.0.5 is the latest production version, however a test version of
+  3.0.6 is doing the rounds and should be released soon. The new major
+  number 3.0 largely reflects the considerable internal changes in zsh to
+  make it more reliable, consistent and (where possible) compatible.  Those
+  planning on upgrading their zsh installation should take a look at the
+  list of incompatibilities at the end of link(5.1)(51).  This is longer
+  than usual due to enhanced sh, ksh and POSIX compatibility.
 
   The beta version 3.1.5 is also available.  Development of zsh is
   usually patch by patch, with each intermediate version publicly
@@ -1886,8 +1879,9 @@ this applies
      mytt(compress file) any more.  For this reason, mytt(\M-n) and
      mytt(\M-p) use tt(history-beginning-search-{forward,backward}) which
      search for a line with the same prefix up to the cursor position.
-     It is possible to write functions which go a little closer to the
-     original behaviour; further changes are still possible.
+     From 3.1.6, there is likely to be a different implementation which
+     makes this closer (though not identical) to the old behaviour.
+     The story for the tt({up,down}-line-or-search) commands is similar.
   it() In vi insert mode, the cursor keys no longer work.  The following
      will bind them:
       COMMENT(-- note space after backslash --)
@@ -2028,19 +2022,47 @@ sect(What's on the wish-list?)
   lexing/parsing/execution might also be an advantage.  Volunteers are
   particularly welcome for these tasks.
 
-  An improved line editor, with user-definable functions and binding
-  of multiple functions to keystrokes, is being developed.
-
+  Here are some things which are definitely happening, and will probably
+  appear in zsh 3.1.6.
   itemize(
-  it() Loadable module support (will be in 3.1 but much work still needs
-     doing).
+  it() Even more powerful new completion system, based on shell functions,
+     allowing much more detailed control both over generation of matches
+     for completion and how they are inserted and displayed.  A set of
+     functions which work `out of the box' will be available, including
+     many functions for external commands:  files in tar archives can
+     be listed for extraction as if they were real files; GNU commands
+     which accept the mytt(--help) option can generate completion lists for
+     themselves on the fly, etc., etc.
+     You can have old-style tt(compctl)-based completions for some commands,
+     and new-style ones for others; you can bind particular completion
+     commands of your own definition to key-strokes.
+  it() Other completion enhancements:  matching control, allowing
+     case-insensitive matching and wild card anchors, e.g. mytt(z_t<TAB>)
+     can allow a wildcard before the mytt(_) so that this will expand
+     to mytt(zle_tricky.c) --- all under user control; completions can
+     be grouped.
+  it() Case-insensitive and approximate matching in the globbing code:
+     for example, mytt((#ia2)readme) matches the string mytt(readme)
+     case-insensitively with up to two errors, such as tt(README),
+     tt(READ.ME), tt(_README_), tt(Read!Me!).  The new completion system
+     knows about these, allowing correcting completion, e.g.
+     mytt(mkaef<TAB>) can be made to complete to mytt(Makefile).
+  it() Associative arrays, declared with mytt(typeset -A aname); syntax
+     for creating, accessing and deleting elements of these.
+  it() Users can create their own tt(foopath)/tt(FOOPATH) array/path
+     combinations, just like tt(path) and tt(PATH).
+  it() A dynamically loadable library for FTP, complete with a suite of
+     functions to make it easy to use.  This allows you to use the shell's
+     capabilities for scripting, line editing, completion, I/O redirection,
+     directory management etc. within an FTP session.
+  )
+
+  Other future possibilities which have been suggested:
+  itemize(
+  it() Further improvements in integrating the line editor with shell
+     functions.
   it() Ksh compatibility could be improved.
   it() Option for glob qualifiers to follow perl syntax (a traditional item).
-  it() Binding of shell functions to key strokes, accessing editing
-     buffer from functions, executing zle functions as a command:  now
-     under development for 3.1. 
-  it() Users should be able to create their own foopath/FOOPATH array/path
-     combinations (now exists as a patch for 3.1).
   )
 
 

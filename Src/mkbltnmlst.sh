@@ -61,6 +61,6 @@ for bin_mod in $bin_mods; do
 		exit 1 ;;
 	esac
     done
-    echo "    mod.nam = \"$bin_mod\"; setup_$bin_mod(&mod); boot_$bin_mod(&mod);"
+    echo "    register_module(mod.nam = \"$bin_mod\"); setup_$bin_mod(&mod); boot_$bin_mod(&mod);"
     done_mods="$done_mods$bin_mod "
 done

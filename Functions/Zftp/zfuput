@@ -1,0 +1,115 @@
+# function zfuput {
+# Put a list of files from the server with update.
+# See zfuget for details.
+#
+# Options:
+#  -v    verbose:  print more about the files listed.
+#  -s    silent:   don't ask, just guess.  The guesses are:
+#                - if the files have different sizes but remote is older ) grab
+#                - if they have the same size but remote is newer        )
+#                  which is safe if the remote files are always the right ones.
+
+emulate -L zsh
+
+local loc rem locstats remstats doit tmpfile=${TMPPREFIX}zfuput$$
+local rstat verbose optlist opt bad i silent
+integer stat do_close
+
+zfuput_print_time() {
+  local tim=$1
+  print -n "$tim[1,4]/$tim[5,6]/$tim[7,8] $tim[9,10]:$tim[11,12].$tim[13,14]"
+  print -n GMT
+}
+
+zfuput_print () {
+  print -n "\nremote $rem ("
+  zfuput_print_time $remstats[2]
+  print -n ", $remstats[1] bytes)\nlocal $loc ("
+  zfuput_print_time $locstats[2]
+  print ", $locstats[1] bytes)"
+}
+
+while [[ $1 = -* ]]; do
+  if [[ $1 = - || $1 = -- ]]; then
+    shift;
+    break;
+  fi
+  optlist=${1#-}
+  for (( i = 1; i <= $#optlist; i++)); do
+    opt=$optlist[$i]
+    case $optlist[$i] in
+      v) verbose=1
+	 ;;
+      s) silent=1
+	 ;;
+      *) print option $opt not recognised >&2
+	 ;;
+    esac
+  done
+  shift
+done
+
+[[ -n $bad ]] && return 1
+
+zfautocheck
+
+if [[ $ZFTP_VERBOSE = *5* ]]; then
+  # should we turn it off locally?
+  print "Messages with code 550 are harmless." >&2
+fi
+
+for rem in $*; do
+  loc=${rem:t}
+  doit=y
+  remstats=()
+  if [[ ! -f $loc ]]; then
+    print "$loc: file not found" >&2
+    stat=1
+    continue
+  fi
+  zftp local $loc >$tmpfile
+  locstats=($(<$tmpfile))
+  zftp remote $rem >$tmpfile
+  rstat=$?
+  remstats=($(<$tmpfile))
+  rm -f $tmpfile
+  if [[ $rstat = 2 ]]; then
+    print "Server does not implement full command set required." 1>&2
+    return 1
+  elif [[ $rstat = 1 ]]; then
+    [[ $verbose = 1 ]] && print New file $loc
+  else
+    [[ $verbose = 1 ]] && zfuput_print
+    if (( $locstats[1] != $remstats[1] )); then
+      # Files have different sizes
+      if [[ $locstats[2] < $remstats[2] && $silent != 1 ]]; then
+	[[ $verbose != 1 ]] && zfuput_print
+	print "Remote file $rem more recent than local," 1>&2
+	print -n "but sizes are different.  Transfer anyway [y/n]? " 1>&2
+	read -q doit
+      fi
+    else
+      # Files have same size
+      if [[ $locstats[2] > $remstats[2] ]]; then
+	if [[ $silent != 1 ]]; then
+	  [[ $verbose != 1 ]] && zfuput_print
+	  print "Remote file $rem has same size as local," 1>&2
+	  print -n "but remote file is older. Transfer anyway [y/n]? " 1>&2
+	  read -q doit
+	fi
+      else
+	# presumably same file, so don't get it.
+	[[ $verbose = 1 ]] && print Not transferring
+	doit=n
+      fi
+    fi
+  fi
+  if [[ $doit = y ]]; then
+    zftp put $rem <$loc || stat=$?
+  fi
+done
+
+(( do_close )) && zfclose
+
+return $stat
+# }

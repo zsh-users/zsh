@@ -559,6 +559,7 @@ setupvals(void)
     module_path = mkarray(ztrdup(MODULE_DIR));
     modules = newlinklist();
 #endif
+    bltinmodules = newlinklist();
 
     /* Set default prompts */
     if(unset(INTERACTIVE)) {

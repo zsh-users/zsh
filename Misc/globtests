@@ -75,6 +75,7 @@ f mad.moo.cow   (*~*.*).(*~*.*)
 t moo.cow       (^*.*).(^*.*)
 f sane.moo.cow  (^*.*).(^*.*)
 f mucca.pazza   mu(^c#)?.pa(^z#)?
+f _foo~         _(|*[^~])
 t fff           ((^f))
 t fff           ((^f)#)
 t fff           ((^f)##)

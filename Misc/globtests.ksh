@@ -68,6 +68,7 @@ t foobar        !(foo)*
 t moo.cow       !(*.*).!(*.*)
 f mad.moo.cow   !(*.*).!(*.*)
 f mucca.pazza   mu!(*(c))?.pa!(*(z))?
+f _foo~         _?(*[^~])
 t fff           !(f)
 t fff           *(!(f))
 t fff           +(!(f))

@@ -327,7 +327,7 @@ zrefresh(void)
             vcs = 0;
         else if (!clearflag && lpromptbuf[0]) {
             zputs(lpromptbuf, shout);
-	    if (lpromptw == 0)
+	    if (lpromptw == 0 && lprompth == 1)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
 	}
 	if (clearflag) {
@@ -947,7 +947,7 @@ tc_rightcurs(int cl)
 		zputc('\r', shout);
 	    tc_upcurs(lprompth - 1);
 	    zputs(lpromptbuf, shout);
-	    if (lpromptw == 0)
+	    if (lpromptw == 0 && lprompth == 1)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
 	}
 	i = lpromptw;

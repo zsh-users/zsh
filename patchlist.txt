@@ -933,3 +933,37 @@ Sven: 6026: _path_files slight rewrite for speed
 pws: 6030: compsys.yo
 
 Sven: 6031: defcomp -> compdef
+
+  pws-16
+
+pws: 6053: compwid.yo
+
+Sven: 6056: compwid.yo
+
+Sven: 6058: small changes
+
+Sven: 6060: don't invalidatelist() in zle_main.c before calling completion
+functions
+
+Sven: 6062: test whether using the same widget when doing menucompletion
+
+Sven: 6066: create list of modules built into the base executable
+
+pws: 6070: ~ in character class in parentheses with extendedglob failed
+
+pws: 6074: zftp function suite moved to Functions/Zftp and provided with
+documentation.
+
+Sven: 6077: do_single() fix for old completion
+
+Tanaka Akira: 6078: _find syntax error
+
+Sven: 6079: compwid.yo typo
+
+pws: zsh-announce/94: FAQ and FAQ.yo updated
+
+Tanaka Akira: 6085: _make can hang when no [mM]akefile
+
+Tanaka Akira: 6092: _find, bad glob pattern
+
+pws: 6101: multi-line prompt ending in '\n' got another newline

@@ -1,0 +1,3 @@
+# function zfclose {
+zftp close
+# }

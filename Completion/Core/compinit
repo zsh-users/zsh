@@ -217,15 +217,30 @@ compdef() {
 # With the option `-l' as the first argument, the other arguments are
 # taken to be key names and the values for theses keys are printed, one
 # per line.
+# When listing is done and the `-L' option is given, the keys and
+# values are printed as invocations for this function, usable to be put
+# inte a setup script.
 
 compconf() {
-  local i
+  local i opt list
+
+  while getopts "lL" opt; do
+    if [[ "$opt" = l ]]; then
+      [[ -z "$list" ]] && list=yes
+    else
+      list=long
+    fi
+  done
+  shift OPTIND-1
 
   if (( $# )); then
-    if [[ "$1" = -l ]]; then
-      shift
+    if [[ -n $list ]]; then
       for i; do
-        print $compconfig[$i]
+        if [[ $list = long ]]; then
+	  (( ${+compconfig[$i]} )) && print "compconf $i='$compconfig[$i]'"
+	else
+          print $compconfig[$i]
+	fi
       done
     else
       for i; do
@@ -238,20 +253,19 @@ compconf() {
     fi
   else
     for i in ${(k)compconfig}; do
-      print ${(r:25:)i} $compconfig[$i]
+      if [[ $list = long ]]; then
+	print "compconf $i='$compconfig[$i]'"
+      else
+        print ${(r:25:)i} $compconfig[$i]
+      fi
     done
   fi
 }
 
 # Now we automatically make the definition files autoloaded.
 
-if [[ ! -o extendedglob ]]; then
-  _i_noextglob=yes
-  setopt extendedglob
-fi
-
 typeset -U _i_files
-_i_files=( ${^~fpath}/_*~*~(N:t) )
+_i_files=( ${^~fpath}/_(|*[^~])(N:t) )
 _i_initname=$0
 _i_done=''
 
@@ -268,7 +282,7 @@ fi
 if [[ -z "$_i_done" ]]; then
   for _i_dir in $fpath; do
     [[ $_i_dir = . ]] && continue
-    for _i_file in $_i_dir/_*~*~(N); do
+    for _i_file in $_i_dir/_(|*[^~])(N); do
       read -rA _i_line < $_i_file
       _i_tag=$_i_line[1]
       shift _i_line
@@ -306,6 +320,4 @@ if [[ -z "$_i_done" ]]; then
   (( _i_autodump )) && builtin . ${_i_initname:h}/compdump
 fi
 
-[[ -z "$_i_noextglob" ]] || unsetopt extendedglob
-
-unset _i_files _i_initname _i_done _i_autodump _i_noextglob
+unset _i_files _i_initname _i_done _i_autodump

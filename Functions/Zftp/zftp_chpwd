@@ -1,0 +1,39 @@
+# function zftp_chpwd {
+# You may want to alter chpwd to call this when $ZFTP_USER is set.
+
+# Cancel the filename cache for the current directory.
+zftp_fcache=()
+# ...and also empty the stored directory listing cache.
+# As this function is called when we close the connection, this
+# is the only place we need to do these two things.
+[[ -n $zfcurdir && -f $zfcurdir ]] && rm -f $zfcurdir
+zfotherargs=
+
+if [[ -z $ZFTP_USER ]]; then
+  # last call, after an FTP logout
+
+  # delete the non-current cached directory
+  [[ -n $zfotherdir && -f $zfotherdir ]] && rm -f $zfotherdir
+
+  # don't keep zflastdir between opens (do keep zflastsession)
+  zflastdir=
+
+  # return the display to standard
+  # uncomment the following line if you have a chpwd which shows directories
+  # chpwd
+else
+  [[ -n $ZFTP_PWD ]] && zflastdir=$ZFTP_PWD
+  zflastsession="$ZFTP_HOST:$ZFTP_PWD"
+  local args
+  if [[ -t 1 && -t 2 ]]; then
+    local str=$zflastsession
+    [[ ${#str} -lt 70 ]] && str="%m: %~  $str"
+    case $TERM in
+      sun-cmd) print -n -P "\033]l$str\033\\"
+	       ;;
+      xterm) print -n -P "\033]2;$str\a"
+	     ;;
+    esac
+  fi
+fi
+# }

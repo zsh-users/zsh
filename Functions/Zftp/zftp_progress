@@ -1,0 +1,18 @@
+# function zftp_progress {
+# Basic progress metre, showing the percent of the file transferred.
+# You want growing bars?  You gotta write growing bars.
+
+# Don't show progress unless stderr is a terminal
+[[ ! -t 2 ]] && return 0
+
+if [[ $ZFTP_TRANSFER = *F ]]; then
+  print 1>&2
+elif [[ -n $ZFTP_TRANSFER ]]; then
+  if [[ -n $ZFTP_SIZE ]]; then
+    local frac="$(( ZFTP_COUNT * 100 / ZFTP_SIZE ))%"
+    print -n "\r$ZFTP_FILE ($ZFTP_SIZE bytes): $ZFTP_TRANSFER $frac" 1>&2
+  else
+    print -n "\r$ZFTP_FILE: $ZFTP_TRANSFER $ZFTP_COUNT" 1>&2
+  fi
+fi
+# }

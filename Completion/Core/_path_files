@@ -153,7 +153,7 @@ if [[ "$pre[1]" = \~ ]]; then
   # prefix path by setting `prepaths'.
   
   linepath="${pre%%/*}/"
-  eval realpath\=$linepath
+  realpath=$~linepath
   [[ "$realpath" = "$linepath" ]] && return 1
   pre="${pre#*/}"
   orig="${orig#*/}"
@@ -236,8 +236,14 @@ for prepath in "$prepaths[@]"; do
       # the outer loop.
 
       if [[ $#tmp2 -eq 0 ]]; then
- 	[[ "$tmp1[1]" = */* ]] &&
-	    exppaths=( "$exppaths[@]" ${^tmp1%/*}/${tpre}${tsuf} )
+ 	if [[ "$tmp1[1]" = */* ]]; then
+	  tmp2=( "${(@)tmp1#${prepath}${realpath}}" )
+	  if [[ "$tmp2[1]" = */* ]]; then
+	    exppaths=( "$exppaths[@]" ${^tmp2%/*}/${tpre}${tsuf} )
+          else
+	    exppaths=( "$exppaths[@]" ${tpre}${tsuf} )
+	  fi
+        fi
         continue 2
       fi
 
@@ -249,8 +255,6 @@ for prepath in "$prepaths[@]"; do
         tmp1=( "${(@M)tmp1:#(${(j:|:)~${(@)tmp2:q}})}" )
       fi
     elif (( ! $#tmp1 )); then
-      [[ "$tmp1[1]" = */* ]] &&
-          exppaths=( "$exppaths[@]" ${^tmp1%/*}/${tpre}${tsuf} )
       continue 2
     fi
 
@@ -375,8 +379,8 @@ exppaths=( "${(@)exppaths:#$orig}" )
 
 if [[ -n "$compconfig[path_expand]" &&
       $#exppaths -ne 0 && nm -eq compstate[nmatches] ]]; then
-  compadd -U -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" - \
-          "${(@)exppaths}"
+  compadd -U -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+          -p "$linepath" - "${(@)exppaths}"
 fi
 
 [[ nm -eq compstate[nmatches] ]]

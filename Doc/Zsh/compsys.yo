@@ -1,4 +1,4 @@
-texinode(Completion System)()(Zsh Modules)(Top)
+texinode(Completion System)(Zftp Function System)(Zsh Modules)(Top)
 chapter(Completion System)
 cindex(completion, system)
 cindex(completion, programmable)
@@ -165,8 +165,8 @@ var(function) autoloadable (exactly equivalent to
 tt(autoload )var(function)).
 )
 xitem(tt(compconf) var(definitions...))
-xitem(tt(compconf))
-item(tt(compconf) [ tt(-l) ] var(keys...))(
+xitem(tt(compconf) [ tt(-L) ] )
+item(tt(compconf) [ tt(-l) ] [ tt(-L) ] var(keys...))(
 Several aspects of the completion system can be configured by the
 user. The configuration values are stored under the keys described
 below in the associative array `tt(compconfig)'.  After sourcing
@@ -183,7 +183,9 @@ you should not set all values at once by doing `tt(compconfig=(...))'.
 In the second form (without arguments), this function lists all keys
 and their values. If given the tt(-l) option as its first argument, as 
 in the last form, the other arguments are taken as names of keys and
-the values of these keys are printed one per line.
+the values of these keys are printed one per line. In either case, if the
+tt(-L) option is given, the keys and values are printed as calls to this
+function, usable to be put in a setup script.
 )
 enditem()
 

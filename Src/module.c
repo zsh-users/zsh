@@ -30,6 +30,12 @@
 #include "zsh.mdh"
 #include "module.pro"
 
+/* List of builtin modules. */
+
+/**/
+LinkList bltinmodules;
+
+
 /* The `zsh' module contains all the base code that can't actually be built *
  * as a separate module.  It is initialised by main(), so there's nothing   *
  * for the boot function to do.                                             */
@@ -46,6 +52,17 @@ int
 boot_zsh(Module m)
 {
     return 0;
+}
+
+/* This registers a builtin module.                                   */
+
+/**/
+void
+register_module(char *n)
+{
+    PERMALLOC {
+	addlinknode(bltinmodules, n);
+    } LASTALLOC;
 }
 
 /* addbuiltin() can be used to add a new builtin.  It returns zero on *
@@ -573,29 +590,34 @@ load_module(char const *name)
  * about trying to load a module with a full path name in restricted mode.
  * The last argument should be non-zero if this function should signal an
  * error if the module is already loaded.
- * The return value is the module of NULL if the module couldn't be loaded. */
+ * The return value is non-zero if the module was found or loaded. */
 
 /**/
-Module
+int
 require_module(char *nam, char *module, int res, int test)
 {
     Module m = NULL;
     LinkNode node;
 
+    /* First see if the module is linked in. */
+    for (node = firstnode(bltinmodules); node; incnode(node)) {
+	if (!strcmp((char *) getdata(node), nam))
+	    return 1;
+    }
     node = find_module(module);
     if (node && (m = ((Module) getdata(node)))->handle &&
 	!(m->flags & MOD_UNLOAD)) {
 	if (test) {
 	    zwarnnam(nam, "module %s already loaded.", module, 0);
-	    return NULL;
+	    return 0;
 	}
     } else if (res && isset(RESTRICTED) && strchr(module, '/')) {
 	zwarnnam(nam, "%s: restricted", module, 0);
-	return NULL;
+	return 0;
     } else
-	return load_module(module);
+	return !!load_module(module);
 
-    return m;
+    return 1;
 }
 
 /**/

@@ -579,12 +579,7 @@ execzlefunc(Thingy func)
 
 	if(!(wflags & ZLE_KEEPSUFFIX))
 	    removesuffix();
-	if(!(wflags & ZLE_MENUCMP) ||
-	   ((wflags & WIDGET_NCOMP) && compwidget != w)) {
-	    /* If we are doing a special completion, and the widget
-	     * is not the one currently in use for special completion,
-	     * we are starting a new completion.
-	     */
+	if(!(wflags & ZLE_MENUCMP)) {
 	    fixsuffix();
 	    invalidatelist();
 	}

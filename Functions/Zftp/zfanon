@@ -1,0 +1,70 @@
+# function zfanon {
+
+emulate -L zsh
+
+local opt optlist once
+
+while [[ $1 = -* ]]; do
+  if [[ $1 = - || $1 = -- ]]; then
+    shift;
+    break;
+  fi
+  optlist=${1#-}
+  for (( i = 1; i <= $#optlist; i++)); do
+    opt=$optlist[$i]
+    case $optlist[$i] in
+      1) once=1
+	 ;;
+      *) print option $opt not recognised >&2
+	 ;;
+    esac
+  done
+  shift
+done
+
+if [[ -z $EMAIL_ADDR ]]; then
+  # Exercise in futility.  There's a poem by Wallace Stevens
+  # called something like `N ways of looking at a blackbird',
+  # where N is somewhere around 0x14 to 0x18.  Now zftp is
+  # ashamed to prsent `N ways of looking at a hostname'.
+  local domain host
+  # First, maybe we've already got it.  Zen-like.
+  if [[ $HOST = *.* ]]; then
+    # assume this is the full host name
+    host=$HOST
+  elif [[ -f /etc/resolv.conf ]]; then
+    # Next, maybe we've got resolv.conf.
+    domain=$(awk '/domain/ { print $2 }' /etc/resolv.conf)
+    [[ -n $domain ]] && host=$HOST.$domain
+  fi
+  # Next, maybe we've got nlsookup.  May not work on LINUX.
+  [[ -z $host ]] && host=$(nslookup $HOST | awk '/Name:/ { print $2 }')
+  if [[ -z $host ]]; then
+    # we're running out of ideas, but this should work.
+    # after all, i wrote it...
+    # don't want user to know about this, too embarrassed.
+    local oldvb=$ZFTP_VERBOSE oldtm=$ZFTP_TMOUT
+    ZFTP_VERBOSE=
+    ZFTP_TMOUT=5
+    if zftp open $host >& /dev/null; then
+      host=$ZFTP_HOST
+      zftp close $host
+    fi
+    ZFTP_VERBOSE=$oldvb
+    ZFTP_TMOUT=$oldtm
+  fi
+  if [[ -z $host ]]; then
+    print "Can't get your hostname.  Define \$EMAIL_ADDR by hand."
+    return 1;
+  fi
+  EMAIL_ADDR="$USER@$host"
+  print "Using $EMAIL_ADDR as anonymous FTP password."
+fi
+
+if [[ $once = 1 ]]; then
+  zftp open $1 anonymous $EMAIL_ADDR
+else
+  zftp params $1 anonymous $EMAIL_ADDR
+  zftp open
+fi
+# }

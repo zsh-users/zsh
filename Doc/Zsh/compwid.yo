@@ -4,27 +4,27 @@ cindex(completion, widgets)
 cindex(completion, programmable)
 cindex(completion, controlling)
 sect(Description)
-Completion widgets are defined using the tt(-C) option to the tt(zle)
+Completion widgets are defined by the tt(-C) option to the tt(zle)
 builtin command provided by the tt(zle) module (see
 ifzman(zmanref(zshzle))\
 ifnzman(noderef(The zle Module))\
-). For example, the invocation:
+). For example,
 
-indent(nofill(
-tt(zle -C complete expand-or-complete completer)))
+indent(
+nofill(tt(zle -C complete expand-or-complete completer))
+)
 
-defines a widget named tt(complete). If this widget is bound to a key
+defines a widget named tt(complete). When this widget is bound to a key
 using the tt(bindkey) builtin command defined in the tt(zle) module
 (see 
 ifzman(zmanref(zshzle))\
 ifnzman(noderef(Zsh Line Editor))\
-) typing that key will make the completion code call the shell
-function tt(completer). This function is responsible for generating
-the possible matches using the builtins described below. Once the
-function returns, the completion code takes over control again and
-treats the matches the way the builtin widget tt(expand-or-complete)
-would do it. For this second argument, the name of any of the builtin
-widgets that handle completions can be given, i.e. it may be any of
+), typing that key will call the shell function tt(completer). This
+function is responsible for generating the possible matches using the
+builtins described below. Once the function returns, the completion code
+takes over control again and treats the matches as the builtin widget
+tt(expand-or-complete) would do.  For this second argument, the name of any
+of the builtin widgets that handle completions can be given:
 tt(complete-word), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(menu-complete),
 tt(menu-expand-or-complete), tt(reverse-menu-complete),
@@ -40,94 +40,103 @@ endmenu()
 texinode(Special Parameters)(Builtin Commands)()(Completion Widgets)
 sect(Special Parameters)
 
-Inside completion widgets some parameters have special meaning. They
-will be used inside the widget function and other shell functions
-called from it. Outside of these function they are not special to the
-shell in any way.
-
-The parameters are used to give information about the internal state
-from the completion code to the completion widget and can be set to
-give information to the completion code from the completion
-widget. Some of the builtin commands and the condition codes use or
-change the current values of these parameters. While the completion
-widget is active, these parameters are reset on each function exit to
-the values they had when the function was entered.
+Inside completion widgets, and any functions called from those, some
+parameters have special meaning; outside these function they are not
+special to the shell in any way.  These parameters are used to pass
+information between the completion code and the completion widget. Some of
+the builtin commands and the condition codes use or change the current
+values of these parameters.  Any existing values will be hidden during
+execution of completion widgets; except for tt(compstate), the parameters
+are reset on each function exit (including nested function calls from
+within the completion widget) to the values they had when the function was
+entered.
 
 startitem()
 item(tt(words))(
-This array contains the words from the line.
+This array contains the words present on the command line currently being
+edited.
 )
 item(tt(CURRENT))(
 This is the number of the current word, i.e. the word the cursor is
-currently on in the tt(words) array. Note that this value is only
-correct, if the tt(ksharrays) options is not set.
+currently on in the tt(words) array.  Note that this value is only
+correct if the tt(ksharrays) options is not set.
 )
 item(tt(PREFIX))(
-This should be set to that part of the current word that should be
-taken as the string every possible match has to begin with. Initially
-this will be set to the part of the current word from the beginning of
-the word up to the position of the cursor. When 
+Initially this will be set to the part of the current word from the
+beginning of the word up to the position of the cursor; it may be altered
+to give a common prefix for all matches.
 )
 item(tt(IPREFIX))(
-When a part of the current word should not be considered part of the
-matches, this part should be taken from the tt(PREFIX) parameter and
-appended to this parameter. This will initially be set to the empty
-string when called from the completion code.
+Initially this will be set to the empty string.  It functions like
+tt(PREFIX), and gives a string which precedes the one in tt(PREFIX) and is
+not considered part of the list of matches.  Typically, a string is
+transferred from the beginning of tt(PREFIX) to the end of tt(IPREFIX), for
+example:
+
+tt(indent(
+nofill(IPREFIX=${PREFIX%%\=*}=)
+nofill(PREFIX=${PREFIX#*=})
+))
+
+causes the part of the prefix up to and including the first equal sign not
+to be treated as part of a matched string.
 )
 item(tt(SUFFIX))(
-This should be set to that part of the current word that should be
-taken as the string every possible match has to end with. The
-completion code sets this to the part of the current word from the
-cursor position to the end.
+Initially this will be set to the part of the current word from the
+cursor position to the end; it may be altered to give a common suffix for
+all matches.  It is most useful when the option tt(COMPLETE_IN_WORD) is
+set, as otherwise the whole word on the command line is treated as a
+prefix.
 )
 item(tt(ISUFFIX))(
-Like tt(IPREFIX), but for a suffix that should not be considered part
-of the matches.
+As tt(IPREFIX), but for a suffix that should not be considered part
+of the matches; note that the tt(ISUFFIX) string follows the tt(SUFFIX)
+string.
 )
 item(tt(compstate))(
-This is an associative array with various keys and values the
-completion uses to give informtaion to the completion widget and to
-get information regarding the further processing from it. The keys
-are:
+This is an associative array with various keys and values that the
+completion code uses to exchange information with the completion widget.
+The keys are:
 
 startitem()
 item(tt(context))(
 This will be set by the completion code to the overall context
-completion is attempted in. Possible values are:
+in which completion is attempted. Possible values are:
 
 startitem()
 item(tt(command))(
-when completing for a normal command (in a command position or for an
-argument)
+when completing for a normal command (either in a command position or for
+an argument of the command).
 )
 item(tt(redirect))(
-when completing after a redirection operator
+when completing after a redirection operator.
 )
 item(tt(condition))(
-when completing inside a `tt([[)...tt(]])' conditional expressing; in
+when completing inside a `tt([[)...tt(]])' conditional expression; in
 this case the tt(words) array contains the words inside the
-conditional expression
+conditional expression.
 )
 item(tt(math))(
 when completing in a mathematical environment such as a
-`tt(LPAR()LPAR())...tt(RPAR()RPAR())' construct
+`tt(LPAR()LPAR())...tt(RPAR()RPAR())' construct.
 )
 item(tt(value))(
-when completing the value of a parameter assignment
+when completing the value of a parameter assignment.
 )
 item(tt(array_value))(
 when completing inside the value of an array parameter assignment; in
-this case the tt(words) array contains the words inside the parentheses
+this case the tt(words) array contains the words inside the parentheses.
 )
 item(tt(subscript))(
-when completing inside a parameter subscript
+when completing inside a parameter subscript.
 )
 item(tt(parameter))(
-when the name of a parameter in a parameter expansion
+when completing the name of a parameter in a parameter expansion beginning
+with tt($) but not tt(${).
 )
 item(tt(brace_parameter))(
-when the name of a parameter in a parameter expansion that started
-with tt(${)
+when completing the name of a parameter in a parameter expansion beginning
+with tt(${).
 )
 enditem()
 )
@@ -136,154 +145,147 @@ The name of the parameter when completing in a subscript or in the
 value of a parameter assignment.
 )
 item(tt(redirect))(
-The redirection operator when completing in a redirection position.
+The redirection operator when completing in a redirection position,
+i.e. one of tt(<), tt(>), etc.
 )
 item(tt(quoting))(
-If completion is done inside single quotes, this is set to the string
-tt(single). When completing inside double quotes this is set to
-tt(double). When completing inside backticks it is set to tt(backtick).
+When completing inside single quotes, this is set to the string
+tt(single); inside double quotes, the string
+tt(double); inside backticks, the string tt(backtick).
 Otherwise it is unset.
 )
 item(tt(quote))(
 When completing inside quotes, this contains the quotation character
-(i.e. either a single quote, a double quote, or a backtick).
+(i.e. either a single quote, a double quote, or a backtick).  Otherwise it
+is unset.
 )
 item(tt(nmatches))(
-This is always set to the number of matches generated and accepted by
-the completion code so far.
+The number of matches generated and accepted by the completion code so far.
 )
 item(tt(matcher))(
-When completion is used with a global match specification (i.e. a
-tt(compctl) with only a tt(-M) option), this contains the
-number of the specification string which is currently used.
+When completion is performed with a global match specification as defined
+by
+
+indent(
+nofill(tt(compctl -M) var(spec1 ... specN ...))
+)
+
+this gives the number of the specification string currently in use.
+In this case, matching is performed with each specification in turn.
 )
 item(tt(matcher_string))(
-This is set to the global match specification string currently used.
+The global match specification string var(specN) currently used.
 )
 item(tt(total_matchers))(
 The total number of global match specifications.
 )
 item(tt(restore))(
-This is set to tt(auto) before a function is entered. If a function
-unsets it or sets it to any other string, the special parameters
-mentioned above (tt(words), tt(CURRENT), tt(PREFIX), tt(IPREFIX), and
-tt(SUFFIX)) will not be restored to their previous values when the
-function exits as is normally done.
+This is set to tt(auto) before a function is entered, which forces the
+special parameters mentioned above (tt(words), tt(CURRENT), tt(PREFIX),
+tt(IPREFIX), tt(SUFFIX), and tt(ISUFFIX)) to be restored to their
+previous values when the function exits.   If a function unsets it or
+sets it to any other string, they will not be restored.
 )
 item(tt(list))(
-On entry to the completion widget this will be unset, if the set of
-matches generated will not be listed. It is set to tt(list),
-tt(autolist), or tt(ambiguous) if the matches will always be listed,
-if they will be listed due to tt(AUTO_LIST) being set, or if they will 
-be listed if there is no unambiguous string to insert and
-tt(LIST_AMBIGUOUS) is set, respectively. Inside the completion widget
-it may be set to any of these values to make the completion code as if 
-the appropriate options had been set.
+This controls whether or how the list of matches will be displayed.  If it
+is unset or empty they will never be listed; if is set to tt(list), they
+will always be listed; if tt(autolist) or tt(ambiguous), they will be
+listed when the tt(AUTO_LIST) or tt(LIST_AMBIGUOUS) options respectively
+would normally cause them to be.  It will be set appropriately on entry to
+a completion widget and may be changed there.
 )
 item(tt(force_list))(
 If the value for the tt(list) key is tt(ambiguous), the list will
 normally be shown only if there are at least two matches in the
-list. Setting tt(force_list) to an non-empty string makes the list be
+list. Setting tt(force_list) to an non-empty string forces the list to be
 shown even if there is only one match.
 )
 item(tt(list_max))(
 Initially this is set to the value of the tt(LISTMAX) parameter.
-Completion widgets may set it to any other numeric value and the value 
-stored at when the widget finishes will be used in the same way the
-value of tt(LISTMAX) is used.
+It may be set to any other numeric value; when the widget exits this value
+will be used in the same way as the value of tt(LISTMAX).
 )
 item(tt(last_prompt))(
 If this is set to an non-empty string, the completion code will move
 the cursor back to the previous prompt after the list of completions
-has been displayed. Initially this is set depending on the setting of
+has been displayed.  Initially this is set or unset according to
 the tt(ALWAYS_LAST_PROMPT) option.
 )
 item(tt(insert))(
-This will be unset by the completon code if the contents of the
-command line will not be changed. It is set to tt(unambiguous),
-tt(menu), or tt(automenu) if a common unambiguous string will be
-inserted or if the first match will be inserted and menu completion
-will be started (due to tt(MENU_COMPLETE) or tt(AUTO_MENU) being set), 
-respectively.
+This controls the manner in which a match is inserted into the command
+line.  On entry to the widget fuction, if it is unset the command line is
+not to be changed; if set to tt(unambiguous), any prefix common to all
+matches is to be inserted; if set to tt(menu) or tt(automenu) the usual
+behaviour of the tt(MENU_COMPLETE) or tt(AUTO_MENU) options, respectively,
+is to be used.
 
-On exit it may be set to any of the values above with the obvious
-result or to a number or a string of the form
-`var(group):var(match)'. If it is set to a number the match whose
-number is given will be inserted in the command line. A string like
-`tt(2:4)' specifies which match from which group should be
-inserted. In this example the fourth match of the second group is
-inserted. All groups and matches are number from one upwards. In the
-value of this key, negative numbers count backward from the last match 
-or group (with `tt(-1)' selecting the last match or group) and values
-out of the range from one to the number of matches or groups are
-wrapped around (so that a value of zero selects the last match and a
-value equal to the number of matches or groups plus one selects the
-first one).
+On exit it may be set to any of the values above, or to a number, in which
+case the match whose number is given will be inserted into the command line.
+It may also be set to a string of the form `var(group):var(match)' which
+specifies a match from a group of matches to be inserted, counting from 1
+upwards (e.g. `tt(2:4)' specifies the fourth match of the second group).
+Negative numbers count backward from the last match or group (with `tt(-1)'
+selecting the last match or group) and out-of-range values are wrapped
+around, so that a value of zero selects the last match or group and a value
+one more than the maximum selects the first.
 )
 item(tt(to_end))(
-On entry to the completion widget this is set to tt(single) if the
-cursor would be moved to the end of the word only if completion
-generated only one match and that is inserted into the line. Depending 
-on the original position of the cursor and the setting of the option
-tt(ALWAYS_TO_END) this may also be set to the string tt(match) if the
-cursor would be moved to the end if a whole match would be inserted
-(either if there is only one match or if menucompletion is used).
+Specifies the occasions on which the cursor is moved to the end of a string
+when a match is inserted.  On entry to a widget function, it may be
+tt(single) if this will happen when a single unambiguous match was inserted
+or tt(match) if it will happen any time a match is inserted (for example,
+by menucompletion; this is likely to be the effect of the tt(ALWAYS_TO_END)
+option).
 
-The value of this key after the completion widget exits will be used
-to determin when the cursor will be moved to the end of the string
-inserted into the line. If it is unset or set to the empty string, the 
-cursor will never be moved to the end. If it is set to tt(single), it
-will be moved to the end only if completion generated only one
-match. A value of tt(always) says to move the cursor always to the end 
-(even with normal completion when an unambiguous string is inserted),
-and any other value says to move the cursor to the end when a full
-match is inserted (a single match or the first match when using
-menucompletion).
+On exit, it may be set to tt(single) as above.  It may also be set to
+tt(always), or to the empty string or unset; in those cases the cursor will
+be moved to the end of the string always or never respectively.  Any
+other string is treated as tt(match).
 )
 item(tt(old_list))(
 This is set to tt(yes) if there is still a valid list of completions
-from a previous completion at the time the widget is invoked. Such a
-list exists if it was generated by the previous key press. If the list 
-is also shown on the screen, the value of this key is tt(shown).
+from a previous completion at the time the widget is invoked.  This will
+usually be the case if and only if the previous editing operation was a
+completion widget or one of the builtin completion fuctions.  If there is a
+valid list and it is also currently shown on the screen, the value of this
+key is tt(shown).
 
 After the widget has exited the value of this key is only used if it
-was set to tt(keep). In this case, the completion code will continue
-to use this old list. If the widget generated new matches, they will
+was set to tt(keep).  In this case the completion code will continue
+to use this old list.  If the widget generated new matches, they will
 not be used.
 )
 item(tt(old_insert))(
 On entry to the widget this will be set to the number of the match of
-an old list of completions that is currently inserted in the command
+an old list of completions that is currently inserted into the command
 line. If no match has been inserted, this is unset.
 
-As with tt(old_list), the value of this key will only be used if it is 
-the string tt(keep). If it was set to this value by the widget and
-there was an old match inserted in the line, this match will be kept
-and if the value of the tt(insert) key says that another match should
-be inserted, this will be inserted after the old one.
+As with tt(old_list), the value of this key will only be used if it is the
+string tt(keep). If it was set to this value by the widget and there was an
+old match inserted into the command line, this match will be kept and if
+the value of the tt(insert) key specifies that another match should be
+inserted, this will be inserted after the old one.
 )
 item(tt(exact))(
-This is set to tt(accept) if an exact match would be accepted by the
-completion code due to tt(REC_EXACT) being set or it is unset if an
-exact match would not be accepted.
-)
-item(tt(exact_string))(
-This is set to the string of an exact match if one was found and unset 
+Controls the behaviour when the tt(REC_EXACT) option is set.  It will be
+set to tt(accept) if an exact match would be accepted, and will be unset
 otherwise.
 )
+item(tt(exact_string))(
+The string of an exact match if one was found, otherwise unset.
+)
 item(tt(pattern_match))(
-If the option tt(GLOB_COMPLETE) is set, this is initially set to
-`tt(*)' and unset otherwise. If the completion widget sets it to a
-`tt(*)', the completion code will from then on behave as if
-tt(GLOB_COMPLETE) is set, i.e. if the strings in tt(PREFIX) and
-tt(SUFFIX) contain unquoted metacharacters, they will be treated as
-patterns. If the string is set to any other non-empty string, the
-strings will be treated as patterns but the code will not automatically
-insert a star at the cursor position.
+Locally controls the behaviour given by the tt(GLOB_COMPLETE) option.
+Initially it is set to `tt(*)' if and only if the option is set.
+The completion widget may set it to either of these two values, or to any
+other non-empty string.  If it is non-empty, unquoted metacharacters on the
+command line will be treated as patterns; if it is `tt(*)', then
+additionally a wildcard `tt(*)' is assumed at the cursor position; if
+it is empty or unset, metacharacters will be treated literally.
 )
 item(tt(pattern_insert))(
-Normally this is set to tt(menu) which means that menu-completion will be
-used whenever the matches were generated using pattern matching. If this
+Normally this is set to tt(menu), which specifies that menu-completion will
+be used whenever the matches were generated using pattern matching. If it
 is set to any other non-empty string by the user and menu-completion is
 not selected by other option settings, the code will insert an
 unambiguous string for the generated matches as with normal completion.
@@ -293,10 +295,10 @@ This key is read-only and will always be set to the unambiguous string
 the completion code has generated for all matches added so far.
 )
 item(tt(unambiguous_cursor))(
-This gives the position the cursor would be placed at when the
-unambiguous string would be inserted, relative to the value of the
-tt(unambiguous) key. The cursor would be placed before the character
-whise index is given by this key.
+This gives the position the cursor would be placed at if the
+unambiguous string in the tt(unambiguous) key were inserted, relative to
+the value of that key. The cursor would be placed before the character
+whose index is given by this key.
 )
 enditem()
 )
@@ -308,12 +310,13 @@ startitem()
 findex(compgen)
 item(tt(compgen) var(flags ...))(
 
-Generate matches according to the given var(flags) which can be any of 
-the option flags supported by the tt(compctl) builtin command (see
+Generate matches according to the given var(flags).  These can be any of 
+the normal option flags (not those for extended completion) supported by
+the tt(compctl) builtin command (see
 ifzman(zmanref(zshcompctl))\
 ifnzman(noderef(Programmable Completion))\
-) except for the tt(-t) and tt(-l) flags. Also, when using the tt(-K)
-flag, the function given as argument to it can not access the command
+) except for the tt(-t) and tt(-l) flags.  However, when using the tt(-K)
+flag, the function given as argument to it cannot access the command
 line with the tt(read) builtin command.
 
 The matches will be generated in the same way as if the completion code
@@ -323,11 +326,11 @@ possible completions that match the prefix and suffix from the special
 parameters desribed above. These strings will be compared with the
 generated matches using the normal matching rules and any matching
 specifications given with the tt(-M) flag to tt(compgen) and the
-global matching specifications given to the tt(compctl) builtin
-command.
+global matching specifications given via the tt(compctl -M )var(spec1 ...)
+builtin command.
 
-The return value can be used to test if matches were added. It is zero 
-if at least one match was added and non-zero otherwise.
+The return value is zero if at least one match was added and non-zero
+otherwise.
 )
 xitem(tt(compadd) [ tt(-qQfnUam) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
@@ -339,12 +342,12 @@ xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 xitem([ tt(-M) var(match-spec) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
 item([ tt(--) ] [ var(words) ... ])(
 
-This builtin command can be used to add matches and directly control
+This builtin command can be used to add matches directly and control
 all the information the completion code stores with each possible
 match. The return value is zero if at least one match was added and
 non-zero if no matches were added.
 
-The completion code breaks the string to complete into six fields in
+The completion code breaks the string to complete into seven fields in
 the order: 
 
 indent(
@@ -352,46 +355,43 @@ var(<ipre><apre><hpre><word><hsuf><asuf><isuf>)
 )
 
 The first field
-is an ignored prefix taken from the line, the contents of the
+is an ignored prefix taken from the command line, the contents of the
 tt(IPREFIX) parameter plus the string given with the tt(-i)
-option. With the tt(-U) option given, only the string from the tt(-i)
-option is used. The field var(<apre>) is a optional prefix string that 
-should automatically be added by the completion code, this is what can 
-be gievn with the tt(-P) option. The var(<hpre>) field is a string
+option. With the tt(-U) option, only the string from the tt(-i)
+option is used. The field var(<apre>) is an optional prefix string
+given with the tt(-P) option.  The var(<hpre>) field is a string
 that is considered part of the match but that should not be shown when 
-listing completions, it is given with the tt(-p) option. E.g. for
-functions that do filename generation, one might want to use this for
-a common path prefix. var(<word>) is the part of the match that should 
-appear in the list of completions, one of the tt(words) given at the
-end. The field var(<hsuf>) is like var(<hpre>) but gives a suffix that 
-should be matched but will not be listed. Finally, var(<asuf>) is the
-suffix given with tt(-S) that should automatically be added by the
-completion code and var(<isuf>) is like var(<ipre>), but taken from
-the tt(ISUFFIX) parameter and the tt(-I) option.
+listing completions, given with the tt(-p) option; for example,
+functions that do filename generation might specify
+a common path prefix this way. var(<word>) is the part of the match that
+should appear in the list of completions, one of the tt(words) given at the
+end. The suffixes var(<hsuf>), var(<asuf>) and var(<isuf>) correspond to
+the prefixes var(<hpre>), var(<apre>) and var(<ipre>) and are given by the
+options tt(-s), tt(-S) and tt(-I), respectively.
 
 The supported flags are:
 
 startitem()
 item(tt(-P) var(prefix))(
-The same as for tt(compctl) and tt(compgen), it gives a string that
-should be inserted before the given words when they are completed. The
-string given is not considered to be part of the match.
+As for tt(compctl) and tt(compgen), it gives a string to
+be inserted before the given var(words).  The
+string given is not considered as part of the match.
 )
 item(tt(-S) var(suffix))(
-Like tt(-P) but gives a string that has to be inserted after the match.
+Like tt(-P) but gives a string to be inserted after the match.
 )
 item(tt(-p) var(hidden-prefix))(
-This gives a string that should be inserted in the line before the
+This gives a string that should be inserted into the command line before the
 match but that should not appear in the list of matches. Unless the
-tt(-U) option is given, the string on the line has to match this
-string.
+tt(-U) option is given, this string must be matched as part of the string
+on the command line.
 )
 item(tt(-s) var(hidden-suffix))(
 Like `tt(-p)', but gives a string to insert after the match.
 )
 item(tt(-i) var(ignored-prefix))(
 This gives a string to insert into the command line just before any
-string given with the `tt(-P)' option. Without `tt(-P)' the string is
+string given with the `tt(-P)' option.  Without `tt(-P)' the string is
 inserted before the string given with `tt(-p)' or directly before the
 match.
 )
@@ -399,128 +399,123 @@ item(tt(-I) var(ignored-suffix))(
 Like tt(-i), but gives an ignored suffix.
 )
 item(tt(-J) var(name))(
-As for tt(compctl) and tt(compgen) this gives the name of the group
+As for tt(compctl) and tt(compgen), this gives the name of the group
 of matches the words should be stored in.
 )
 item(tt(-V) var(name))(
 Like tt(-J) but naming a unsorted group.
 )
 item(tt(-X) var(explanation))(
-The var(explanation) string will be printed with the list of matches,
-as for tt(compctl -X).
+As for tt(compctl) and tt(compgen), the var(explanation) string will be
+printed with the list of matches.
 )
 item(tt(-q))(
-This flag has the same meaning as for tt(compctl) and tt(compgen),
-too. It makes the suffix given with tt(-S) be automatically removed if 
-the next character typed is a blank or does not insert anything or if
+As for tt(compctl) and tt(compgen),
+the suffix given with tt(-S) will be automatically removed if 
+the next character typed is a blank or does not insert anything, or if
 the suffix consists of only one character and the next character typed 
 is the same character.
 )
 item(tt(-r) var(remove-chars))(
-This makes the suffix given with tt(-S) be automatically removed if
+This is a more versatile form of the tt(-q) option.
+The suffix given with tt(-S) will be automatically removed if
 the next character typed inserts one of the characters given in the
-var(remove-chars). This string is parsed as a characters class with
-the usual backslash-sequences understood, e.g. using `tt(-r "a-z\t")'
-removes the suffix if the next character typed inserts one of the
-lower case letters or a TAB, and `tt(-r "^0-9")' removes the suffix if 
-the next character typed inserts anything but a digit. One extra
+var(remove-chars).  This string is parsed as a characters class and
+understands the backslash sequences used by the tt(print) command.  For
+example, `tt(-r "a-z\t")' removes the suffix if the next character typed
+inserts a lowercase character or a TAB, and `tt(-r "^0-9")' removes the
+suffix if the next character typed inserts anything but a digit. One extra
 backslash sequence is understood in this string: `tt(\-)' stands for
 all characters that insert nothing. Thus `tt(-S "=" -q)' is the same
 as `tt(-S "=" -r "= \t\n\-")'.
 )
 item(tt(-R) var(remove-func))(
-For the cases where one wants to remove suffix and the tt(-r) option
-does not give enough control, this option can be used. It stores the
-name of the shell function var(remove-func) in the matches. If one of
-the matches is finally accepted and the tt(-S)-suffix inserted, this
-function will be called after the next character typed. It gets the
-length of the suffix as its argument and can use the special
-parameters available in zle widgets (see
+This is another form of the tt(-r) option. When a suffix given with the
+tt(-S) option has been inserted and the completion accepted, the function
+var(remove-func) will be called after the next character typed.  It is
+passed the length of the suffix as an argument and can use the special
+parameters available in ordinary (non-completion) zle widgets (see
 ifzman(zmanref(zshzle))\
 ifnzman(noderef(Zsh Line Editor))\
 ) to analyse and modify the command line.
 )
 item(tt(-f))(
-If this flag is given, the matches build are marked as being the names 
-of files. They need not be actual filenames, though. But if they are
-and the option tt(LIST_TYPES) is set, the characters describing the
-types of the files in the completion lists will be shown. This also
-makes a slash automatically be added when the name of a directory is
-completed.
+If this flag is given, all of the matches built from var(words) are
+marked as being the names of files.  They are not required to be actual
+filenames, but if they are, and the option tt(LIST_TYPES) is set, the
+characters describing the types of the files in the completion lists will
+be shown. This also forces a slash to be added when the name of a
+directory is completed.
 )
 item(tt(-W) var(file-prefix))(
 This option has the same meaning as for the tt(compctl) and
 tt(compgen) builtin commands. Here, however, only one string may be
-given, not an array. This string is used as a pathname that will be
-prepended to the given words and the prefix given with the tt(-p)
-option to perform the file-tests when showing completion
-listings. Hence it is only useful if combined with the tt(-f) flag,
-since the tests will only be performed if that flag is given.
+given, not an array. This string is a pathname that will be
+prepended to each of the matches formed by the given var(words) together 
+with any prefix specified by the tt(-p) option to form a complete filename
+for testing.  Hence it is only useful if combined with the tt(-f) flag, as
+the tests will not otherwise be performed.
 )
 item(tt(-a))(
-When used by tt(compctl) or tt(compgen) the completion code normally
+In the tt(compctl) or tt(compgen) commands, the completion code normally
 builds two sets of matches: the normal one where words with one of the 
 suffixes in the array parameter tt(fignore) are not considered
 possible matches, and the alternate set where the words excluded
 from the first set are stored. Normally only the matches in the first
-set are used. But if this set is empty, the words from the alternate
+set are used, but if this set is empty, the words from the alternate
 set are used.
 
 The tt(compadd) builtin does not use tt(fignore) parameter and
-normally stores all words in the first set. With the tt(-a)-flag
-given, however, they are all stored in the alternate set unless this
-flag is overridden by the tt(-F) option.
+normally stores all words in the first set.  With the tt(-a)-flag
+given, however, the given var(words) are stored in the alternate set unless
+this flag is overridden by the tt(-F) option.
 )
 item(tt(-F) var(array))(
-This can be used to give an array containing suffixes like the
+Specifies an array containing suffixes in the same form as the
 tt(fignore) parameter. Words with one of these suffixes are stored in
 the alternate set of matches and words without one of these suffixes
 are stored in the normal set.
 
 The var(array) may be the name of an array parameter or a list of
-literal suffixes enclosed in parentheses as in `tt(-F "(.o .h)")'. If
-the name of an array is given, the elements of the array are taken as
-the suffixes.
+literal suffixes enclosed in parentheses and quoted, as in `tt(-F "(.o
+.h)")'. If the name of an array is given, the elements of the array are
+taken as the suffixes.
 )
 item(tt(-Q))(
-As for tt(compctl) and tt(compgen) this flag instructs the completion 
+As for tt(compctl) and tt(compgen), this flag instructs the completion 
 code not to quote any metacharacters in the words when inserting them
-in the command line.
+into the command line.
 )
 item(tt(-M) var(match-spec))(
-This option allows one to give local match specifications with the
-same meaning and format as for the tt(compctl) and tt(compgen)
-builtin commands. Note that they will only be used if the tt(-m) is
-given, too.
+As for tt(compctl) and tt(compgen), this gives local match specifications.
+Note that they will only be used if the tt(-U) option is not given.
 )
 item(tt(-n))(
-Words added with tt(compadd) with this flag will be used as possible
-matches as usual but they not appear in the completion listing.
+Specifies that the words added are to be used as possible
+matches, but are not to appear in the completion listing.
 )
 item(tt(-U))(
-If this flag is given, all words given will be accepted, no matching
+If this flag is given, all words given will be accepted and no matching
 will be done by the completion code. Normally this is used in
 functions that do the matching themselves.
 
 Note that with tt(compadd) this option does not automatically turn on
-menu completion if tt(AUTO_LIST) is set as the same options for the
-tt(compctl) and tt(compgen) builtin command do.
+menu completion if tt(AUTO_LIST), unlike the corresponding option of
+tt(compctl) and tt(compgen) commands.
 )
 item(tt(-O) var(array))(
 If this option is given, the var(words) are em(not) added to the set of
-possible completions. Instead, matching is done as usual and all
-var(words) given as arguments that are matched will be stored in the
-array parameter whose name is given as var(array).
+possible completions.  Instead, matching is done as usual and all of the
+var(words) given as arguments that match the string on the command line
+will be stored in the array parameter whose name is given as var(array).
 )
 item(tt(-A) var(array))(
-Like the tt(-O) option this keeps the var(words) from being stored as
-possible completions. The matching words are instead stored in the array
-parameter given as var(array). In difference to the tt(-O) option this
-does not store the unchanged var(words) given as arguments, but instead
-the strings the completion code generated while matching. For example,
+As the tt(-O) option, except that instead of those of the var(words) which
+match being stored in var(array), the strings generated internally by the
+completion code are stored. For example,
 with a matching specification of `tt(-M "L:|no=")', the string `tt(nof)'
-on the line and the string `tt(foo)' as one of the var(words), this option
-will make the string `tt(nofoo)' be stored in the array, whereas the tt(-O)
+on the command line and the string `tt(foo)' as one of the var(words), this
+option stores the string `tt(nofoo)' in the array, whereas the tt(-O)
 option stores the `tt(foo)' originally given.
 )
 item(tt(-), tt(--))(
@@ -535,9 +530,9 @@ xitem(tt(compset -P) [ var(number) ] var(pattern))
 xitem(tt(compset -s) var(number))
 xitem(tt(compset -S) [ var(number) ] var(pattern))
 xitem(tt(compset -n) var(begin) [ var(end) ])
-item(tt(compset -p) var(beg-pat) [ var(end-pat) ])(
-This builtin allows to easily modify the special parameters and at
-the same time, to do tests on their values.
+item(tt(compset -N) var(beg-pat) [ var(end-pat) ])(
+This command simplifies modification of the special parameters,
+while its return value allows tests on them to be carried out.
 
 The options are:
 
@@ -554,19 +549,19 @@ tt(PREFIX) and appended to tt(IPREFIX).
 
 Without the optional var(number), the longest match is taken, but
 if var(number) is given, anything up to the var(number)'th match is
-moved. If the var(number) is negative, the var(number)'th longest
+moved.  If the var(number) is negative, the var(number)'th longest
 match is moved. For example, if tt(PREFIX) contains the string
-`tt(a=b=c)' doing tt(compset -P '*\=') will move the string `tt(a=b=)' 
-into the tt(IPREFIX) parameter, but tt(compset -P 1 '*\=') moves only
+`tt(a=b=c)', then tt(compset -P '*\=') will move the string `tt(a=b=)' 
+into the tt(IPREFIX) parameter, but tt(compset -P 1 '*\=') will move only
 the string `tt(a=)'.
 )
 item(tt(-s) var(number))(
-Like tt(-p), but prepend the last var(number) characters from the
-parameter tt(SUFFIX) to the contents of the parameter tt(ISUFFIX).
+As tt(-p), but transfer the last var(number) characters from the
+value of tt(SUFFIX) to the front of the value of tt(ISUFFIX).
 )
 item(tt(-S) [ var(number) ] var(pattern))(
-Like tt(-P), but matching from the end of tt(SUFFIX) and moving the
-matched portion into the parameter tt(ISUFFIX).
+As tt(-P), but match the last portion of tt(SUFFIX) and transfer the
+matched portion to the front of the value of tt(ISUFFIX).
 )
 item(tt(-n) var(begin) [ var(end) ])(
 If the current word position as specified by the parameter tt(CURRENT) 
@@ -576,52 +571,51 @@ of the parameter tt(CURRENT) is decremented by var(begin).
 
 If the optional var(end) is given, the modification is done only if
 the current word position is also less than or equal to var(end). In
-this case, the words from position var(end) onwards are removed from
-the tt(words) array, too.
+this case, the words from position var(end) onwards are also removed from
+the tt(words) array.
 
-Both of these numbers may be negative to make them count backwards
+Both var(begin) and var(end) may be negative to count backwards
 from the last element of the tt(words) array.
 )
 item(tt(-N) var(beg-pat) [ var(end-pat) ])(
-If one of the elements of the tt(words) array up to the one at the
+If one of the elements of the tt(words) array before the one at the
 index given by the value of the parameter tt(CURRENT) matches the
-pattern var(beg-pat), all elements up to the matching one are removed
-from the tt(words) array and the value of tt(CURRENT) is changed to
+pattern var(beg-pat), all elements up to and including the matching one are
+removed from the tt(words) array and the value of tt(CURRENT) is changed to
 point to the same word in the changed array.
 
-If the optional pattern var(end-pat) is also given and there is an
+If the optional pattern var(end-pat) is also given, and there is an
 element in the tt(words) array matching this pattern, the parameters
 are modified only if the index of this word is higher than the one
-given by the tt(CURRENT) parameter (meaning that the matching word has 
-to be after the cursor). In this case, the words from the word
-matching tt(end-pat) onwards are also removed from the tt(words)
+given by the tt(CURRENT) parameter (so that the matching word has 
+to be after the cursor). In this case, the words starting with the one
+matching tt(end-pat) are also removed from the tt(words)
 array. If tt(words) contains no word matching var(end-pat), the
-testing and modification is done as if it were not given.
+testing and modification is performed as if it were not given.
 )
 enditem()
 
-In all of these cases the return value is zero if the test succeded
-and the parameters were modified, and non-zero otherwise. This allows
-one to use this builtin in tests as in:
+In all the above cases the return value is zero if the test succeded
+and the parameters were modified and non-zero otherwise. This allows
+one to use this builtin in tests such as:
 
 indent(
 tt(if compset -P '*\='; then ...)
 )
 
-Which makes anything up to and including the last equal sign be
+This forces anything up to and including the last equal sign to be
 ignored by the completion code.
 )
 item(tt(compcall) [ tt(-TD) ])(
 
-This allows one to use completion definitions given with the
-tt(compctl) builtin from within completion widgets. It makes the
-completion code complete the current word according to the
-tt(compctl)s defined. Normally only tt(compctl)s given for specific
-commands are used. To make the code use the completion flags given to
-the tt(-T) option of tt(compctl), one can give the tt(-T) flag to
-tt(compctl). Likewise, the tt(-D) flag to tt(compcall) makes the
-default completion flags given to tt(compctl) with the tt(-D) option
-be used.
+This allows the use of completions defined with the tt(compctl) builtin
+from within completion widgets.  The list of matches will be generated as
+if one of the non-widget completion function (tt(complete-word), etc.)
+had been called, except that only tt(compctl)s given for specific commands
+are used. To force the code to try completions defined with the tt(-T)
+option of tt(compctl) and/or the default completion (whether defined by
+tt(compctl -D) or the builtin default) in the appropriate places, the
+tt(-T) and/or tt(-D) flags can be passed to tt(compcall).
 
 The return value can be used to test if a matching tt(compctl)
 definition was found. It is non-zero if a tt(compctl) was found and
@@ -632,30 +626,25 @@ enditem()
 texinode(Condition Codes)(Examples)(Builtin Commands)(Completion Widgets)
 sect(Condition Codes)
 
-Inside completion widgets not only the builtin commands described
-above can be used, but also some additional condition codes. These
-work on the special parameters and can be used to easily build
-completion functions that generate different matches depending on the
-strings on the line. All of these condition codes perform tests also
-done by the tt(compset) builtin, but they don't modify the contents of 
-the special parameters.
-
-The following condition codes are made available inside completion
-widgets:
+The following additional condition codes for use within the tt([[ ... ]])
+construct are available in completion widgets.  These work on the special
+parameters.  All of these tests can also be performed by the tt(compset)
+builtin, but in the case of the condition codes the contents of the special
+parameters are not modified.
 
 startitem()
 item(tt(-prefix) [ var(number) ] var(pattern))(
-true if the test for the tt(-P) option of tt(compset) would succeed
+true if the test for the tt(-P) option of tt(compset) would succeed.
 )
 item(tt(-suffix) [ var(number) ] var(pattern))(
-true if the test for the tt(-S) option of tt(compset) would succeed
+true if the test for the tt(-S) option of tt(compset) would succeed.
 )
 item(tt(-after) var(beg-pat))(
 true if the test of the tt(-N) option with only the var(beg-pat) given 
-would succeed
+would succeed.
 )
 item(tt(-between) var(beg-pat end-pat))(
-true if the test for the tt(-N) option with both patterns would succeed
+true if the test for the tt(-N) option with both patterns would succeed.
 )
 enditem()
 
@@ -674,17 +663,17 @@ indent(nofill(
 tt(bindkey '^X\t' complete)))
 
 After that the shell function tt(complete-history) will be invoked
-after typing control-X and TAB. The function should then generte the
+after typing control-X and TAB. The function should then generate the
 matches, e.g.:
 
 indent(nofill(
 tt(complete-history LPAR()RPAR() { compgen -H 0 '' })))
 
-In this the function will complete words from the history matching the 
+This function will complete words from the history matching the 
 current word.
 
-For a description of the example completion system from the
-distributions, see
+For a description of the widget-based completion system provided with the
+source code distribution, see
 ifzman(zmanref(zshcompsys))\
 ifnzman(noderef(Completion System))\
 .

@@ -625,6 +625,36 @@ getglobflags(void)
     return 0;
 }
 
+/**/
+static void
+parse_charset(void)
+{
+    /* Character set: brackets had better match */
+    if (pptr[1] == Outbrack)
+	*++pptr = ']';
+    else if ((pptr[1] == Hat || pptr[1] == '^' || pptr[1] == '!') &&
+	     pptr[2] == Outbrack)
+	*(pptr += 2) = ']';
+    while (*++pptr && *pptr != Outbrack) {
+	if (itok(*pptr)) {
+	    /* POSIX classes: make sure it's a real one,
+	     * leave the Inbrack tokenised if so.
+	     * We need to untokenize the Outbrack since otherwise
+	     * it might look like we got to the end of the range without
+	     * matching; we also need to accept ']' instead of
+	     * Outbrack in case this has already happened.
+	     */
+	    char *nptr;
+	    if (*pptr == Inbrack && pptr[1] == ':'
+		&& (nptr = strchr(pptr+2, ':')) && 
+		(*++nptr == Outbrack || *nptr == ']'))
+		*(pptr = nptr) = ']';
+	    else
+		*pptr = ztokens[*pptr - Pound];
+	}
+    }
+}
+
 /* enum used with ksh-like patterns, @(...) etc. */
 
 enum { KF_NONE, KF_AT, KF_QUEST, KF_STAR, KF_PLUS, KF_NOT };
@@ -853,24 +883,7 @@ parsecomp(int gflag)
 	    if (*pptr != Outang)
 		return NULL;
 	} else if (*pptr == Inbrack) {
-	    /* Character set: brackets had better match */
-	    if (pptr[1] == Outbrack)
-		*++pptr = ']';
-	    else if ((pptr[1] == Hat || pptr[1] == '^' || pptr[1] == '!') &&
-		     pptr[2] == Outbrack)
-		*(pptr += 2) = ']';
-	    while (*++pptr && *pptr != Outbrack) {
-		if (itok(*pptr)) {
-		    /* POSIX classes: make sure it's a real one, *
-		     * leave the Inbrack tokenised if so.        */
-		    char *nptr;
-		    if (*pptr == Inbrack && pptr[1] == ':'
-			&& (nptr = strchr(pptr+2, ':')) && 
-			*++nptr == Outbrack)
-			pptr = nptr;
-		    *pptr = ztokens[*pptr - Pound];
-		}
-	    }
+	    parse_charset();
 	    if (*pptr != Outbrack)
 		return NULL;
 	} else if (itok(*pptr) && *pptr != Star && *pptr != Quest)
@@ -912,7 +925,20 @@ parsecompsw(int gflag)
 		break;
 	    else if (*sptr == Bar && !pct)
 		break;
-	    else if (*sptr == Tilde && !pct) {
+	    else if (*sptr == Inbrack) {
+		/*
+		 * Character classes can have tokenized characters in,
+		 * so we have to parse them properly.
+		 */
+		char *bstart = pptr;
+
+		pptr = sptr;
+		parse_charset();
+		sptr = pptr;
+		pptr = bstart;
+		if (*sptr != Outbrack)
+		    break;
+	    } else if (*sptr == Tilde && !pct) {
 		tail = NULL;
 		break;
 	    }
