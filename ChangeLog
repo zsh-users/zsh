@@ -3,6 +3,11 @@
         * 17234: Completion/Unix/Command/_cvs:
 	don't call _path_files with empty ().
 
+2002-05-25  Clint Adams  <clint@zsh.org>
+
+        * 17225: Completion/Unix/Command/_cvs:
+        change $CVSIGNORE to $=CVSIGNORE.
+
 2002-05-23  Clint Adams  <clint@zsh.org>
 
         * Matt Zimmerman: 17211: Completion/Unix/Command/_cvs:
