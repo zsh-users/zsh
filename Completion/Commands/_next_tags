@@ -3,7 +3,7 @@
 # Main widget.
 
 _next_tags() {
-  local comp
+  local comp ins
 
   if [[ -z $compstate[old_list] ]]; then
     comp=()
@@ -17,12 +17,18 @@ _next_tags() {
   _next_tags_pre="${LBUFFER%${PREFIX}}"
   _next_tags_not="$_next_tags_not $_lastcomp[tags]"
 
+  if [[ -n "$compstate[old_insert]" ]]; then
+    PREFIX="$_lastcomp[prefix]"
+    SUFFIX="$_lastcomp[suffix]"
+    ins=1
+  fi
+
   _main_complete "$comp[@]"
 
   [[ $compstate[insert] = automenu ]] &&
      compstate[insert]=automenu-unambiguous
 
-  compstate[insert]=''
+  compstate[insert]="$ins"
   compstate[list]='list force'
 
   compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
@@ -36,10 +42,16 @@ _next_tags_pre() {
   # I think one should still be able to edit the current word between
   # attempts to complete it.
 
-  if [[ $_next_tags_pre != ${LBUFFER%${PREFIX}} ]]; then
+  if [[ -n $compstate[old_insert] && $WIDGET != _next_tags ]]; then
+    compstate[old_list]=keep
+    compstate[insert]=menu:2
+    return 0
+  elif [[ ${LBUFFER%${PREFIX}} != ${_next_tags_pre}* ]]; then
     unset _sort_tags
   else
     compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
+    [[ -n "$compstate[old_list]" && -n "$_next_tags_reset" ]] &&
+        _next_tags_not= _next_tags_reset=
   fi
 }
 
@@ -60,13 +72,13 @@ _next_tags_sort() {
   if [[ $funcstack[4] = _files ]]; then
     if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
       [[ "$tags" = *${${tmp[-1]##[^\\]:}%:*}* ]] &&
-          tags=( $order ) _next_tags_not=
+          tags=( $order ) _next_tags_reset=yes
     else
-      [[ "$tags" = *all-files* ]] && tags=( $order ) _next_tags_not=
+      [[ "$tags" = *all-files* ]] && tags=( $order ) _next_tags_reset=yes
     fi
   else
      [[ $#tags -ne $#order && "$tags" != *(${(j:|:)~argv})* ]] &&
-        tags=( $order ) _next_tags_not=
+        tags=( $order ) _next_tags_reset=yes
   fi
   for tag in $tags; do
     case $tag in
@@ -80,9 +92,9 @@ _next_tags_sort() {
   if [[ -z "$nodef" ]]; then
     if [[ $funcstack[4] = _files ]]; then
       if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
-        [[ "$argv" = *${${tmp[-1]##[^\\]:}%:*}* ]] && _next_tags_not=
+        [[ "$argv" = *${${tmp[-1]##[^\\]:}%:*}* ]] && _next_tags_reset=yes
       else
-        [[ "$argv" = *all-files* ]] && _next_tags_not=
+        [[ "$argv" = *all-files* ]] && _next_tags_reset=yes
       fi
     fi
     comptry "${(@)argv:#(${(j:|:)~${=_next_tags_not}})(|:*)}"

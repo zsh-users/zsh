@@ -746,11 +746,6 @@ callcompfunc(char *s, char *fn)
 		 !strcmp(compinsert, "unambiguous") ||
 		 !strcmp(compinsert, "automenu-unambiguous"))
 	    useline = 1, usemenu = 0;
-	else if (!strcmp(compinsert, "menu"))
-	    useline = 1, usemenu = 1;
-	else if (!strcmp(compinsert, "auto") ||
-		 !strcmp(compinsert, "automenu"))
-	    useline = 1, usemenu = 2;
 	else if (!strcmp(compinsert, "all"))
 	    useline = 2, usemenu = 0;
 	else if (idigit(*compinsert)) {
@@ -763,8 +758,24 @@ callcompfunc(char *s, char *fn)
 		insgnum = atoi(m + 1);
 	    }
 	    insspace = (compinsert[strlen(compinsert) - 1] == ' ');
-	} else
-	    useline = usemenu = 0;
+	} else {
+	    char *p;
+
+	    if (strpfx("menu", compinsert))
+		useline = 1, usemenu = 1;
+	    else if (strpfx("auto", compinsert))
+		useline = 1, usemenu = 2;
+	    else
+		useline = usemenu = 0;
+
+	    if (useline && (p = strchr(compinsert, ':'))) {
+		insmnum = atoi(++p);
+		if ((p = strchr(p, ':'))) {
+		    insgroup = 1;
+		    insgnum = atoi(p + 1);
+		}
+	    }
+	}
 	startauto = (compinsert &&
 		     !strcmp(compinsert, "automenu-unambiguous"));
 	useexact = (compexact && !strcmp(compexact, "accept"));

@@ -290,6 +290,12 @@ one more than the maximum selects the first. Unless the value of this
 key ends in a space, the match is inserted as in a menu-completion,
 i.e. without automatically appending a space.
 
+Both tt(menu) and tt(automenu) may also specify the the number of the
+match to insert, given after a colon, optionally followed by a second
+colon and a group number. For example, `tt(menu:2)' says to start
+menu-completion, beginning with the second match and `tt(menu:3:2)'
+says to start menu-completion with the third match in the second group.
+
 It may also be set to tt(all), which makes all matches generated be
 inserted into the line.
 )

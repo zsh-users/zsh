@@ -1,5 +1,9 @@
 2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10459: Completion/Commands/_next_tags, Doc/Zsh/compwid.yo,
+	Src/Zle/compcore.c: _next_tags should be usable with menu-
+	completion
+
 	* 10456: Src/Zle/compcore.c: Copy QIPREFIX/QISUFFIX.
 
 2000-04-04  Andrew Main  <zefram@zsh.org>
