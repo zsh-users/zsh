@@ -32,6 +32,13 @@
 
 #if defined(HAVE_GETRLIMIT) && defined(RLIM_INFINITY)
 
+enum {
+    ZLIMTYPE_MEMORY,
+    ZLIMTYPE_NUMBER,
+    ZLIMTYPE_TIME,
+    ZLIMTYPE_UNKNOWN
+};
+
 /* Generated rec array containing limits required for the limit builtin.     *
  * They must appear in this array in numerical order of the RLIMIT_* macros. */
 
@@ -85,22 +92,15 @@ showlimits(int hard, int lim)
 	    val = (hard) ? limits[rt].rlim_max : limits[rt].rlim_cur;
 	    if (val == RLIM_INFINITY)
 		printf("unlimited\n");
-	    else if (rt==RLIMIT_CPU)
+	    else if (limtype[rt] == ZLIMTYPE_TIME) {
 		/* time-type resource -- display as hours, minutes and
 		seconds. */
 		printf("%d:%02d:%02d\n", (int)(val / 3600),
 		       (int)(val / 60) % 60, (int)(val % 60));
-# ifdef RLIMIT_NPROC
-	    else if (rt == RLIMIT_NPROC)
+	    } else if (limtype[rt] == ZLIMTYPE_NUMBER || limtype[rt] == ZLIMTYPE_UNKNOWN) {
 		/* pure numeric resource */
 		printf("%d\n", (int)val);
-# endif /* RLIMIT_NPROC */
-# ifdef RLIMIT_NOFILE
-	    else if (rt == RLIMIT_NOFILE)
-		/* pure numeric resource */
-		printf("%d\n", (int)val);
-# endif /* RLIMIT_NOFILE */
-	    else if (val >= 1024L * 1024L)
+	    } else if (val >= 1024L * 1024L)
 		/* memory resource -- display with `K' or `M' modifier */
 # ifdef RLIM_T_IS_QUAD_T
 		printf("%qdMB\n", val / (1024L * 1024L));
@@ -297,7 +297,7 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 	    showlimits(hard, lim);
 	    return 0;
 	}
-	if (lim==RLIMIT_CPU) {
+	if (limtype[lim] == ZLIMTYPE_TIME) {
 	    /* time-type resource -- may be specified as seconds, or minutes or *
 	     * hours with the `m' and `h' modifiers, and `:' may be used to add *
 	     * together more than one of these.  It's easier to understand from *
@@ -315,20 +315,11 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 		    return 1;
 		}
 	    }
-	}
-# ifdef RLIMIT_NPROC
-	else if (lim == RLIMIT_NPROC)
+	} else if (limtype[lim] == ZLIMTYPE_NUMBER || limtype[lim] == ZLIMTYPE_UNKNOWN) {
 	    /* pure numeric resource -- only a straight decimal number is
 	    permitted. */
 	    val = zstrtorlimt(s, &s, 10);
-# endif /* RLIMIT_NPROC */
-# ifdef RLIMIT_NOFILE
-	else if (lim == RLIMIT_NOFILE)
-	    /* pure numeric resource -- only a straight decimal number is
-	    permitted. */
-	    val = zstrtorlimt(s, &s, 10);
-# endif /* RLIMIT_NOFILE */
-	else {
+	} else {
 	    /* memory-type resource -- `k' and `M' modifiers are permitted,
 	    meaning (respectively) 2^10 and 2^20. */
 	    val = zstrtorlimt(s, &s, 10);
