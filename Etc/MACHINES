@@ -29,6 +29,10 @@ Apple: MacOS X/Darwin 10.x
 	It can be downloaded from:
 	    http://sourceforge.net/project/showfiles.php?group_id=17203
 
+	The zsh/zpty library is not working on 10.1 and 10.2, but is on
+	10.3.  This causes the tests starting `Y' in the Test directory to
+	fail, even though the features to be tested are working.
+
 Red Hat Inc.: Cygwin
 	Should build `out-of-the-box'.  The compilation directory should
 	be on a file system mounted as binary (the mount command shows
@@ -75,10 +79,7 @@ FreeBSD: FreeBSD 2.2.7, 3.x, 4.x
 	does not work, but it does with 3.x and 4.x.
 
 HP: HP-UX 9, 10.20, 11.x (PA-RISC, Itanium)
-	Should build `out-of-the-box'.  The zsh/zpty module is not
-	working on recent versions of 11.x.  This causes all the
-	Y tests in the Tests subdirectory to fail, possibly in obscure
-	ways.  However, zsh/zpty is not needed in normal operation.
+	Should build `out-of-the-box'.
 
 	Previous problems encountered on HP-UX 11.x:
 
@@ -101,15 +102,10 @@ HP/Compaq: Tru64 4.x, 5.x
 IBM: AIX 3.2, 4.x, 5.x
 	Should build `out-of-the-box'.
 
-	AIX, unusually, requires that symbols available in dynamically
-	loaded libraries be marked explicitly.  As the developers do not
-	have direct access to AIX these markers are often missing.  The
-	usual symptom is that linking a library (.so) file fails and
-	reports a missing symbol.  Please report any such failures to the
-	maintainers.
-
 	Certain features will not work, in particular --enable-cap
-	and --enable-zsh-mem.
+	and --enable-zsh-mem.  (The feature enabled by --enable-cap
+	is apparently present, however.  Help getting this to work
+	would be appreciated.)
 
 	On 3.2, for 64-bit integer support you need to compile with gcc, as
 	the native compiler does not support ANSI simultaneously with
@@ -187,7 +183,9 @@ SGI: IRIX 6.2, 6.3, 6.5
 	is passed the option --enable-cflags='-LANG:vla=off -O' (combined
 	with other flags if necessary).
 
-	The zpty module is not currently supported.
+	The zpty module is not currently supported.  This causes the
+	tests starting `Y' in the Test directory to fail, even though
+	the features to be tested are working.
 
 Sun: SunOS 4.1.x
 	[Out of date.]

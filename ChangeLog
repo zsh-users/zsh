@@ -1,3 +1,8 @@
+2004-03-17  Peter Stephenson  <pws@csr.com>
+
+	* 19653: Etc/MACHINES: Latest OS-specific information after some
+	tweaking.
+
 2004-03-17  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Test/C02cond.ztst: mention HFS+ as possible cause
