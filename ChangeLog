@@ -1,3 +1,8 @@
+2003-04-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 18446: Completion/Linux/Command/_modutils: handle modinfo and
+	improvements to option handling
+
 2003-04-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 18443: Completion/X/Command/_dcop: new completion for dcop

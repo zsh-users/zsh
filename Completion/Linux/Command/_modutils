@@ -1,87 +1,83 @@
-#compdef modprobe rmmod
+#compdef lsmod modinfo modprobe rmmod
 
-local curcontext="$curcontext" state line expl loaded
+local curcontext="$curcontext" expl state line modules ign args
 
-_modutils_loaded_modules() {
-
-if [[ -r /proc/modules ]]; then
- loaded=(${${(f)"$(</proc/modules)"}%% *})
-elif [[ -x /sbin/lsmod ]]; then
- loaded=(${${(f)"$(/sbin/lsmod)"}[2,-1]%% *})
-else
- return 1
-fi
-
-_wanted modules expl 'loaded module' compadd -a loaded
-}
+args=(
+  '(-)'{-V,--version}'[print version]'
+  '(-)'{-h,--help}'[print help text]'
+)
 
 case "$service" in
-  rmmod)
-
-  _arguments '(--all)-a[remove all unused autocleanable modules]' \
-             '(-a)--all' \
-             '(--persist)-e[save persistent data]' \
-             '(-e)--persist' \
-             '(--help)-h[print help text]' \
-             '(-h)--help' \
-             '(--stacks)-r[remove a module stack]' \
-             '(-r)--stacks' \
-             '(--syslog)-s[output to syslog]' \
-             '(-s)--syslog' \
-             '(--verbose)-v[be verbose]' \
-             '(-v)--verbose' \
-             '(--version)-V[print version]' \
-             '(-V)--version' \
-             '*:loaded module:_modutils_loaded_modules' && return 0
+  lsmod) _arguments -s "$args[@]" && return ;;
+  
+  modinfo)
+    _arguments -s -C "$args[@]" \
+      '(-)'{-a,--author}"[display the module's author]" \
+      '(-)'{-d,--description}"[display the module's description]" \
+      '(-)'{-f+,--format}'[display module info in specified format]' \
+      '(-)'{-l,--license}"[display the module's license]" \
+      '(-)'{-n,--filename}"[display the module's filename]" \
+      '(-)'{-p,--parameters}'[display the typed parameters that a module may support]' \
+      '1:module file:->all_modules' && return
   ;;
 
   modprobe)
-
-  _modprobe_arguments=(
-             '(--all)-a[all]' \
-             '(-a)--all' \
-             '(--showconfig)-c[showconfig]' \
-             '(-c)--showconfig' \
-             '(--debug)-d[debug]' \
-             '(-d)--debug' \
-             '(--autoclean)-k[set autoclean]' \
-             '(-k)--autoclean' \
-             '(--show)-n[do not act]' \
-             '(-n)--show' \
-             '(--quiet)-q[do not complain about insmod failures]' \
-             '(-q)--quiet' \
-             '(--syslog)-s[report via syslog instead of stderr]' \
-             '(-s)--syslog' \
-             '(--type)-t[module type]:moduletype:' \
-             '(-t)--type:moduletype:' \
-             '(--verbose)-v[print all commands as executed]' \
-             '(-v)--verbose' \
-             '(--version)-V[show release version]' \
-             '(-V)--version' \
-             '(--config)-C[config file]:config file:_files' \
-             '(-C)--config:config file:_files'
-  )
-
-  _arguments -C '(--remove)-r[remove]:*:loaded module:->modprobe_remove' \
-             '(-r)--remove:*:loaded module:->modprobe_remove' \
-             '(--list)-l[list matching modules]:*:module file:->modprobe_list' \
-             '(-l)--list:*:module file:->modprobe_list' \
-	     "$_modprobe_arguments[@]" && return 0
-
+    ign='-h --help -V --version -c --showconfig'
+    _arguments -s -C "$args[@]" \
+      "(-a --all $ign)"{-a,--all}'[load all matching modules]' \
+      '(-)'{-c,--showconfig}'[show current configuration]' \
+      "(-d --debug $ign)"{-d,--debug}'[print debug info]' \
+      "(-k --autoclean $ign)"{-k,--autoclean}'[set autoclean]' \
+      "(-n --show $ign)"{-n,--show}"[don't actually perform action]" \
+      "(-q --quiet $ign)"{-q,--quiet}"[don't complain about insmod failures]" \
+      "(-s --syslog $ign)"{-s,--syslog}'[report via syslog instead of stderr]' \
+      "(* -t --type $ign)"{-t,--type}'[module type]:module type' \
+      "(-v --verbose $ign)"{-v,--verbose}'[print all commands as executed]' \
+      '(-C --config)'{-C,--config}'[specify config file]:config file:_files' \
+      "(-r --remove -l --list -t --type -a --all $ign)"{-r,--remove}'[remove module (stacks)]' \
+      "(* -l --list -r --remove $ign)"{-l,--list}'[list matching modules]' \
+      "(-c $ign)1:modules:->all_modules" \
+      "(-c -l --list -t --type $ign)*:params:->params" && return
+      
+      [[ -n $state ]] && (( $+opt_args[-r] )) && state=loaded_modules        
   ;;
 
+  rmmod)
+    _arguments -s -C "$args[@]" \
+      '(-a --all)'{-a,--all}'[remove all unused autocleanable modules]' \
+      '(-e --persist)'{-e,--persist}'[save persistent data]' \
+      '(-r --stacks)'{-r,--stacks}'[remove a module stack]' \
+      '(-s --syslog)'{-s,--syslog}'[output to syslog]' \
+      '(-v --verbose)'{-v,--verbose}'[be verbose]' \
+      '*:loaded module:->loaded_modules' && return
+  ;;
 esac 
 
 case "$state" in
-  modprobe_remove)
-        _call_function ret _modutils_$state && return ret
-        _arguments "$_modprobe_arguments[@]" \
-                   '*:loaded module:_modutils_loaded_modules'
+  loaded_modules)
+    if [[ -r /proc/modules ]]; then
+     modules=(${${(f)"$(</proc/modules)"}%% *})
+    elif [[ -x /sbin/lsmod ]]; then
+     modules=(${${(f)"$(/sbin/lsmod)"}[2,-1]%% *})
+    else
+     return 1
+    fi
+    
+    _wanted modules expl 'loaded module' compadd -a modules && return
   ;;
 
-  modprobe_list)
-        _call_function ret _modutils_$state && return ret
-        _arguments "$_modprobe_arguments[@]" \
-                   '*:module file:compadd ${^${(M)${(f)"$(modprobe -c)"}:#path*}#*[=]}/**/*.o(:t)'
+  all_modules)
+    modules=( ${${(M)${(f)"$(_call_program modules ${(M)words[1]##*/}modprobe -c 2>/dev/null)"}:#path*}#*[=]} )
+    _wanted modules expl module compadd ${^modules}/**/*.o(:t:r) && return
+  ;;
 
+  params)
+    if compset -P '*='; then
+      _message -e value 'parameter value'
+    else
+      _message -e parameter 'module parameter'
+    fi
+  ;;
 esac
+
+return 1
