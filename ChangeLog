@@ -1,3 +1,7 @@
+2000-12-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13229: Doc/Makefile.in: Include mod_term*.yo in MODDOCSRC.
+
 2000-12-04  Clint Adams  <schizo@debian.org>
 
 	* 13227: configure.in, Src/Modules/terminfo.c,
