@@ -1,3 +1,8 @@
+2000-11-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13156: Src/Modules/zpty.c: use unmetafy() to allow writing
+ 	special characters into a pty
+	
 2000-11-12  Clint Adams  <schizo@debian.org>
 
 	* unposted: Completion/Debian/_bug: fix thinkos, add new options

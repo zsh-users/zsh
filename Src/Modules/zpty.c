@@ -562,13 +562,15 @@ static int
 ptywrite(Ptycmd cmd, char **args, int nonl)
 {
     if (*args) {
-	char sp = ' ';
+	char sp = ' ', *tmp;
+	int len;
 
-	while (*args)
-	    if (ptywritestr(cmd, *args, strlen(*args)) ||
+	while (*args) {
+	    unmetafy((tmp = dupstring(*args)), &len);
+	    if (ptywritestr(cmd, tmp, len) ||
 		(*++args && ptywritestr(cmd, &sp, 1)))
 		return 1;
-
+	}
 	if (!nonl) {
 	    sp = '\n';
 	    if (ptywritestr(cmd, &sp, 1))
