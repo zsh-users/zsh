@@ -1,0 +1,77 @@
+#compdef zle
+
+local expl ret=1 st
+local -a opts compwids state
+
+compwids=(accept-and-menu-complete
+	  complete-word
+	  delete-char-or-list
+	  expand-or-complete
+	  expand-or-complete-prefix
+	  list-choices
+	  menu-complete
+	  menu-expand-or-complete
+	  reverse-menu-complete)
+
+opts=(-A -C -D -L -M -N -R -U -a -c -l \* :)
+
+_arguments -s -S \
+    "($opts)-A[define widget alias]:old widget:->widget :new widget:->widget" \
+    "($opts)-C[define completion widget]:new widget name:->comp-widget :completion widget:->builtin-comp-widget :widget shell function:->function" \
+    "($opts)-D[delete widget]:*:widget:->widget" \
+    "(${opts#-l})-L+[with -l, list as commands]:*:-:->listing" \
+    "(${opts#-[La]})-l+[list user-defined widgets]:*:-:->listing" \
+    "(${opts#-l})-a+[with -l, list all widgets]:*:-:->listing" \
+    "($opts)-M[display message]:message: " \
+    "($opts)-N[define new widget]:widget name:->widget-or-function ::widget shell function:->function" \
+    "(${opts#-c})-R+[redisplay]:*:-:->redisplay" \
+    "(${opts#-R})-c+[with -R, clear listing]:*:-:->redisplay" \
+    "($opts)-U[unget to input stack]:string: " \
+    '(-)::widget name:->call'
+
+[[ $state == listing ]] &&
+  _arguments -s -S \
+    "-l[list user-defined widgets]" \
+    "(-a)-L[list as commands]" \
+    "(-L)-a[list all widgets]" \
+    '(-)*:widget name:->widget'
+
+for st in $state; do
+  case $st in
+    (call)
+      if ((CURRENT > 2)); then
+	_arguments \
+          '(-N)-n[numeric prefix]:number: ' \
+	  '(-n)-N[reset numeric prefix]' \
+	  ':widget::' '(-)*:widget arguments: ' && ret=0
+	  # :widget:: is a placeholder so we needn't shift words
+	continue
+      fi
+      ;&
+    (widget*)
+      _wanted widgets expl widget compadd -k widgets && ret=0
+      [[ $st != *function ]] && continue
+      ;&
+    (function)
+      _wanted functions expl 'widget shell function' \
+	compadd -k functions && ret=0
+      ;;
+    (comp-widget)
+      _wanted widgets expl 'completion widget' \
+	compadd -k "widgets[(R)(*:|)(.|)(${(j(|))compwids})(|:*)]" && ret=0
+      ;&
+    (builtin-comp-widget)
+      _wanted widgets expl 'builtin completion widget' \
+	compadd -k "widgets[(I)(.|)(${(j(|))compwids})]" && ret=0
+      ;;
+    (redisplay)
+      _arguments -s \
+        "-R[redisplay]" \
+	"(*)-c[clear listing]" \
+	"(-)::status line: " "*:strings to list: " && ret=0
+      ;;
+    (*) ret=$?;;
+  esac
+done
+
+return ret
