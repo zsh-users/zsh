@@ -845,7 +845,7 @@ addhistnum(int hl, int n, int xflags)
     if (n)
 	he = movehistent(he, n, xflags);
     if (!he)
-	return dir < 0? firsthist() : curhist;
+	return dir < 0? firsthist() - 1 : curhist + 1;
     return he->histnum;
 }
 
@@ -989,12 +989,20 @@ should_ignore_line(Eprog prog)
 
     if (isset(HISTNOSTORE)) {
 	char *b = getjobtext(prog, NULL);
-	if (*b == 'b' && strncmp(b, "builtin ", 8) == 0)
+	int saw_builtin;
+	if (*b == 'b' && strncmp(b,"builtin ",8) == 0) {
 	    b += 8;
-	if (*b == 'h' && strncmp(b, "history", 7) == 0
-	 && (!b[7] || b[7] == ' '))
+	    saw_builtin = 1;
+	} else
+	    saw_builtin = 0;
+	if (*b == 'h' && strncmp(b,"history",7) == 0 && (!b[7] || b[7] == ' ')
+	 && (saw_builtin || !shfunctab->getnode(shfunctab,"history")))
 	    return 1;
-	if (*b == 'f' && b[1] == 'c' && b[2] == ' ' && b[3] == '-') {
+	if (*b == 'r' && (!b[1] || b[1] == ' ')
+	 && (saw_builtin || !shfunctab->getnode(shfunctab,"r")))
+	    return 1;
+	if (*b == 'f' && b[1] == 'c' && b[2] == ' ' && b[3] == '-'
+	 && (saw_builtin || !shfunctab->getnode(shfunctab,"fc"))) {
 	    b += 3;
 	    do {
 		if (*++b == 'l')
