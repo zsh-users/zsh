@@ -278,11 +278,13 @@ the name of an option when completing an argument to that option.
 
 The completion system represents contexts as hierarchical name s
 with components separated by colons. For example, take the context
-`tt(:complete::dvips::-o-1)'.  The tt(:complete) at the
-beginning is the `completer', which is in overall control of how completion
-is to be performed; `tt(complete)' is the basic one for
-ordinary completion, but completers may perform various related tasks
-such as correction, or modify the behaviour of a later completer (see
+`tt(:completion:complete::dvips::-o-1)'.  The tt(:completion) at the
+beginning just says that this context is used in the completion system 
+and the tt(:complete) after it is the `completer', which is in overall
+control of how completion is to be performed; `tt(complete)' is the
+basic one for ordinary completion, but completers may perform various
+related tasks such as correction, or modify the behaviour of a later
+completer (see
 ifzman(the section `Control Functions' below)\
 ifnzman(noderef(Control Functions)) 
 for more information).  Strictly, the completer is `tt(_complete)', but the
@@ -430,6 +432,10 @@ for cursor names used by X programs
 )
 item(tt(cvs))(
 used only to look up the value of the tt(disable-stat) style
+)
+item(tt(default))(
+used to look up default values for various styles that may also be set 
+for tags that are used when generating matches
 )
 item(tt(descriptions))(
 used when looking up the value of the tt(format) style for
