@@ -38,7 +38,7 @@ if [[ "$OSTYPE" == cygwin ]]; then
       upaths=($upaths ${${line##*on }%% type*})
     done
     _alternative \
-      'windowspath:WIndows path:compadd -a wpaths' \
+      'windowspath:Windows path:compadd -a wpaths' \
       'unixpath:Unix path:compadd -a upaths'
     return
   fi
@@ -416,7 +416,7 @@ if (( ! $+_fs_any )); then
       'onerror[set behaviour on error]:behaviour on error:(panic lock umount repair)'
     )
     _fs_xfs=(
-      'biosize[specify preffer buffered I/O size]:base 2 logarithm:((13:8K 14:16K 15:32K 16:64K))'
+      'biosize[specify preferred buffered I/O size]:base 2 logarithm:((13:8K 14:16K 15:32K 16:64K))'
       '(xdsm)dmapi[enable DMAPI event callouts]'
       '(dmapi)xdsm[enable DMAPI event callouts]'
       'logbufs[set number of in-memory log buffers]:(2 3 4 5 6 7 8)'

@@ -1,3 +1,8 @@
+2001-10-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16030: Completion/Unix/Command/_mount: Fix minor typos in option
+	descriptions.
+
 2001-10-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16013: Src/exec.c: Properly save/restore state around the
@@ -451,7 +456,7 @@
 	* 15629: Completion/Unix/Command/_zip: unzip -Z
 	should behave the same as zipinfo.
 
-2001-08-13  Bart Schaefer  <schaefer@brasslantern.com>
+2001-08-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15613 (plus unposted additions): Test/B02typeset.ztst: Tests for
 	correct behavior of typeset options and arguments.
