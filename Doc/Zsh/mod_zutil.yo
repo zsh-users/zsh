@@ -8,7 +8,7 @@ The tt(zsh/zutil) module only adds some builtins:
 startitem()
 findex(zstyle)
 xitem(tt(zstyle) [ tt(-L) ])
-xitem(tt(zstyle) [ tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)
+xitem(tt(zstyle) [ tt(-e) | tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)
 xitem(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])
 xitem(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])
 xitem(tt(zstyle -abs) var(context) var(style) var(name) [ var(sep) ])
@@ -33,9 +33,16 @@ tt(zstyle) will test them. If the tt(-L) option is given, listing is
 done in the form of calls to tt(zstyle).  Forms with arguments:
 
 startitem()
-item(tt(zstyle) [ tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)(
+item(tt(zstyle) [ tt(-e) | tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)(
 Defines the given var(style) for the var(pattern) with the var(strings) as
-the value.
+the value.  If the tt(-e) option is given, the var(strings) will be
+concatenated (separated by spaces) and the resulting string will be
+evaluated (in the same way as it is dome by the tt(eval) builtin
+command) when the style is looked up.  In this case the parameter
+tt(reply) will be used to get the strings to return after the
+evaluation.  Before evaluating the value, tt(reply) will be unset and
+if it is still unset after the evaluation, this will be handled as if
+the style were not set.
 )
 item(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])(
 Delete style definitions. Without arguments all definitions are deleted,

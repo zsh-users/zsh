@@ -904,29 +904,16 @@ ignoring matches.
 )
 kindex(completions, completion style)
 item(tt(completions))(
-This style is used by the tt(_expand) completer function.
-
-If this is set to an non-empty string it should be an expression
-usable inside a `tt($((...)))' arithmetical expression. The completer
-function evaluates this expression and if the result is `tt(1)', no
-expansions will be generated, but instead the completions will be
-generated as normal and all of them will be inserted into the command
-line.
+This style is used by the tt(_expand) completer function. If it is set 
+to `true', the completer will not generate expansions, but instead the
+completions will be generated as normal and all of them will be
+inserted into the command line.
 )
 kindex(condition, completion style)
 item(tt(condition))(
-This style is used by the tt(_list) completer function.
-
-If it is not set or set to the empty string, the insertion of
-matches will be delayed unconditionally.  If it is set, the value
-should be an expression usable inside a `tt($((...)))'
-arithmetical expression.  In this case, delaying will be done if the
-expression evaluates to `tt(1)'. For example, with
-
-example(zstyle ':completion:*:list:::' condition '${NUMERIC:-1} != 1')
-
-delaying will be done only if given an explicit numeric argument
-other than `tt(1)'.
+This style is used by the tt(_list) completer function to decide if
+insertion of matches should be delayed unconditionally. The default is 
+`true'.
 )
 kindex(cursor, completion style)
 item(tt(cursor))(
@@ -1112,12 +1099,10 @@ ifnzman(noderef(The zsh/zutil Module))\
 )
 kindex(glob, completion style)
 item(tt(glob))(
-Like tt(completions), this is used by the tt(_expand) completer.
-
-The value is used like the one for tt(completions) and if it evaluates to 
-`tt(1)', globbing will be attempted on the words resulting from
-substitution (see the tt(substitute) style) or the original string
-from the line.
+Like tt(completions), this is used by the tt(_expand) completer.  If
+it is set to `true' (the default), globbing will be attempted on the
+words resulting from substitution (see the tt(substitute) style) or
+the original string from the line.
 )
 kindex(group-name, completion style)
 item(tt(group-name))(
@@ -1785,26 +1770,21 @@ function.
 )
 kindex(subst-globs-only, completion style)
 item(tt(subst-globs-only))(
-This is used by the tt(_expand) completer.  As for the tt(glob) style,
-the value should be a value usable in a `tt($((...)))' arithmetical
-expression.  If it evaluates to `tt(1)', the expansion will only be
-used if it resulted from globbing; hence, if expansions resulted
-from the use of the tt(substitute) style described below, but these
-were not further changed by globbing, the expansions will be rejected.
+This is used by the tt(_expand) completer.  If it is set to `true',
+the expansion will only be used if it resulted from globbing; hence,
+if expansions resulted from the use of the tt(substitute) style
+described below, but these were not further changed by globbing, the
+expansions will be rejected.
+
+The default for this style is `false'.
 )
 kindex(substitute, completion style)
 item(tt(substitute))(
-This style controls whether the tt(_expand) completer will first try to
-expand all substitutions in the string (such as `tt($LPAR()...RPAR())'
-and `tt(${...})').  It should be set to a number or an non-empty string
-which is an expression usable inside a `tt($((...)))' arithmetical
-expression.  Expansion of substitutions will be done if the expression
-evaluates to `tt(1)'. For example, with
+This boolean style controls whether the tt(_expand) completer will
+first try to expand all substitutions in the string (such as
+`tt($LPAR()...RPAR())' and `tt(${...})').
 
-example(zstyle ':completion:*:expand:::' substitute '${NUMERIC:-1} != 1')
-
-substitution will be performed only if given an explicit numeric
-argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
+The default is `true'.
 )
 kindex(suffix, completion style)
 item(tt(suffix))(
@@ -1812,7 +1792,7 @@ This is used by the tt(_expand) completer if the word starts with a
 tilde or parameter expansion. If it is set to `true', the word will
 only be expanded if it doesn't have a suffix, i.e. if it is something
 like `tt(~foo)' or `tt($foo)', but not if it is `tt(~foo/)' or
-`tt($foo/bar)'. The default for this style is `false'.
+`tt($foo/bar)'.  The default for this style is `true'.
 )
 kindex(tag-order, completion style)
 item(tt(tag-order))(
@@ -2263,9 +2243,7 @@ contain the sequence `tt(%o)' which will be replaced by the original
 string from the line.
 
 Which kind of expansion is tried is controlled by the tt(substitute),
-tt(glob) and tt(subts-globs-only) styles.  Note that none of these
-has a default value so that they have to be set to make tt(_expand)
-generate any expansions at all.
+tt(glob) and tt(subst-globs-only) styles.
 
 There is another style, tt(completions), which allows tt(_expand) to
 display or insert all em(completions) generated for the string.  The use of
@@ -2451,10 +2429,6 @@ item(tt(_expand_word (^Xe)))(
 Performs expansion on the current word:  equivalent to the standard
 tt(expand-word) command, but using the tt(_expand) completer.  Before
 calling it, the var(function) field is set to `tt(expand-word)'.
-
-Unlike tt(_expand) this uses a `tt(1)' (one) as the default
-value for the tt(substitute) and tt(glob) styles, so both types of
-expansion will normally be performed.
 )
 findex(_generic)
 item(tt(_generic))(

@@ -21,8 +21,7 @@ local exp word sort expr expl subd suf=" " force opt asp tmp opre pre epre
 # First, see if we should insert all *completions*.
 
 if [[ "$force" = *c* ]] ||
-   { zstyle -s ":completion:${curcontext}:" completions expr &&
-     [[ "${(e):-\$[$expr]}" -eq 1 ]] }; then
+   zstyle -t ":completion:${curcontext}:" completions; then
   compstate[insert]=all
   [[ "$curcontext" = expand-word:* ]] && _complete && return 0
   return 1
@@ -34,11 +33,12 @@ else
   word="$IPREFIX$PREFIX$SUFFIX$ISUFFIX"
 fi
 
-zstyle -t ":completion:${curcontext}:" suffix &&
+zstyle -T ":completion:${curcontext}:" suffix &&
   [[ "$word" = (\~*/*|\$[a-zA-Z0-9_\[\]]##[^a-zA-Z0-9_\[\]]*|\$\{*\}?*) ]] &&
   return 1
 
 zstyle -t ":completion:${curcontext}:" accept-exact ||
+  [[ $? -eq 2 && ! -o recexact ]] ||
   { [[ "$word" = \~(|[-+]) ||
        ( "$word" = \~[-+][1-9]## && $word[3,-1] -le $#dirstack ) ||
        ( "$word" = \~* && ${#userdirs[(I)${word[2,-1]}*]}+${#nameddirs[(I)${word[2,-1]}*]} -ne 1 ) ||
@@ -54,9 +54,7 @@ exp=("$word")
 # this function from aborting on parse errors in the expansion.
 
 if [[ "$force" = *s* ]] ||
-   { { zstyle -s ":completion:${curcontext}:" substitute expr ||
-       { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
-         [[ "${(e):-\$[$expr]}" -eq 1 ]] }; then
+   zstyle -T ":completion:${curcontext}:" substitute; then
   exp=( "${(e)exp//\\[ 	
 ]/ }" )
 else
@@ -71,10 +69,7 @@ subd=("$exp[@]")
 
 # Now try globbing.
 
-[[ "$force" = *g* ]] ||
-  { { zstyle -s ":completion:${curcontext}:" glob expr ||
-      { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
-        [[ "${(e):-\$[$expr]}" -eq 1 ]] } &&
+[[ "$force" = *g* ]] || zstyle -T ":completion:${curcontext}:" glob &&
     exp=( ${~exp} )
 
 # If we don't have any expansions or only one and that is the same
@@ -87,10 +82,9 @@ subd=("$exp[@]")
 # With subst-globs-only we bail out if there were no glob expansions,
 # regardless of any substitutions
 
-[[ "$force" = *o* ]] ||
-  { zstyle -s ":completion:${curcontext}:" subst-globs-only expr &&
-      [[ "${(e):-\$[$expr]}" -eq 1 ]] } && 
-        [[ "$subd" = "$exp"(|\(N\)) ]] && return 1
+{ [[ "$force" = *o* ]] ||
+  zstyle -t ":completion:${curcontext}:" subst-globs-only } &&
+    [[ "$subd" = "$exp"(|\(N\)) ]] && return 1
 
 zstyle -s ":completion:${curcontext}:" keep-prefix tmp || tmp=changed
 if [[ "$word" = [\~\$]*/* && "$tmp" = (yes|true|on|1|changed) ]]; then
