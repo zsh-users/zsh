@@ -897,7 +897,10 @@ init_signals(void)
     signal_ignore(SIGQUIT);
 #endif
 
-    install_handler(SIGHUP);
+    if (signal_ignore(SIGHUP) == SIG_IGN)
+	opts[HUP] = 0;
+    else
+	install_handler(SIGHUP);
     install_handler(SIGCHLD);
 #ifdef SIGWINCH
     install_handler(SIGWINCH);
