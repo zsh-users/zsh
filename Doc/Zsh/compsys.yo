@@ -4069,7 +4069,7 @@ should be quoted.
 
 startitem()
 item(tt(/)var(pattern)tt(/) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(tag)tt(:)var(descr)tt(:)var(action)])(
-This is a single privitive component.
+This is a single primitive component.
 The function tests whether the combined pattern
 `tt((#b)LPAR()(#B))var(pattern)tt(RPAR())var(lookahead)tt(*)' matches
 the command line string.  If so, `var(guard)' is evaluated and
