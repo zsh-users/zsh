@@ -94,7 +94,7 @@ command to that directory.
 pindex(AUTO_CONTINUE)
 cindex(jobs, continuing automatically)
 cindex(continuing jobs automatically)
-item(tt(AUTO_CONT))(
+item(tt(AUTO_CONTINUE))(
 With this option set, stopped jobs that are removed from the job table
 with the tt(disown) builtin command are automatically sent a tt(CONT)
 signal to make them running.
