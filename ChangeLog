@@ -1,3 +1,8 @@
+2002-05-14  Peter Stephenson  <pws@csr.com>
+
+	* 17161: Src/Modules/tcp.c: length parameter to accept() wasn't
+	initialised, causing random failures.
+
 2002-05-14  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17148: Completion/Base/Utility/_arguments,
