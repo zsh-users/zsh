@@ -1,4 +1,4 @@
-2001-06-13  Oliver Kiddle  <opk@zsh.com>
+2001-06-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 14896: Completion/Zsh/Type/_command_names: don't complete read-only
 	parameters on the left side of an assignment
@@ -138,11 +138,10 @@
 	Allow processing by both autoconf-2.13 and autoconf-2.50; remove
 	config.status hack for autoconf-2.50
 
-
 2001-06-05  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
-	* 14550: Completion/Redhat/Command/_rpm: Add --nobuild and --nogpg to rpm
-	completion
+	* 14550: Completion/Redhat/Command/_rpm: Add --nobuild and --nogpg
+	to rpm completion
 
 2001-06-04  Peter Stephenson  <pws@csr.com>
 
