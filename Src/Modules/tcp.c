@@ -291,19 +291,21 @@ tcp_close(Tcp_session sess)
 {
     int err;
     
-    if (sess && sess->fd != -1)
+    if (sess)
     {  
-	err = close(sess->fd);
-	if (err)
+	if (sess->fd != -1)
 	{
-	    zwarn("connection close failed: %e", NULL, errno);
-	    return -1;
+	    err = close(sess->fd);
+	    if (err)
+	    {
+		zwarn("connection close failed: %e", NULL, errno);
+		return -1;
+	    }
 	}
 	zts_delete(sess);
 	return 0;
     }
 
-    zts_delete(sess);
     return -1;
 }
 

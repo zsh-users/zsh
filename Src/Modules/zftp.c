@@ -2679,6 +2679,13 @@ zfclose(int leaveparams)
     }
     if (zfsess->cin) {
 	fclose(zfsess->cin);
+	/*
+	 * We fdopen'd the TCP control fd; since we can't fdclose it,
+	 * we need to perform a full fclose, which invalidates the
+	 * TCP fd.
+	 */
+	if (fileno(zfsess->cin) == zfsess->control->fd)
+	    zfsess->control->fd = -1;
 	zfsess->cin = NULL;
     }
     if (zfsess->control) {

@@ -1,3 +1,9 @@
+2001-10-26  Peter Stephenson  <pws@csr.com>
+
+	* 16176: Src/Modules/tcp.c, Src/Modules/zftp.c: after fdclose(),
+	TCP control fd is no longer valid, but we still need to remove
+	the session cleanly.
+
 2001-10-26  Oliver Kiddle  <opk@zsh.org>
 
 	* 16174: Completion/Unix/Command/_zdump,
