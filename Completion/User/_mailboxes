@@ -54,7 +54,7 @@ fi
 # Files for pine must be absolute paths.
 
 if [[ "$PREFIX" != (|-f)+* &&
-      ( "${curcontext}" = *:(mail|zmail|zmlite):* ||
+      ( "${curcontext}" = *:(mail|mush|zmail|zmlite):* ||
         ( "${curcontext}" = *:pine:* && "$PREFIX" = (|-f)[/\~]* ) ) ]]; then
   _tags mailboxes files
 else
@@ -78,19 +78,35 @@ while _tags; do
       if compset -P '+|-f+'; then
         mbox_names=( "${(@)_mbox_cache#$~maildirectory/}" )
       else
-        mbox_names=( +"${(@)^_mbox_cache#$~maildirectory/}" "${_mailbox_cache[@]}" )
+        mbox_names=( +"${(@)^_mbox_cache#$~maildirectory/}"
+		    "${_mailbox_cache[@]}" )
       fi
       ;;
     (*:mh:*) # I've probably got this wrong, or at least incomplete
       (( $#_mh_cache )) && _multi_parts "${expl[@]}" / _mh_cache
       ;;
+    (*:mush:*)
+      if compset -P '+|-f+'; then
+        mbox_names=( "${(@)_mbox_cache#$~maildirectory/}" )
+      else
+        mbox_names=( +"${(@)^_mbox_cache#$~maildirectory/}"
+		     "${_mailbox_cache[@]}" )
+        mbox_short=( % \& )
+      fi
+      ;;
     (*:mutt:*)
-      mbox_names=( "${_mutt_cache[@]}" "${_mailbox_cache[@]}" "${_maildir_cache[@]}" )
+      mbox_names=( "${_mutt_cache[@]}" "${_mailbox_cache[@]}"
+		   "${_maildir_cache[@]}" )
       mbox_short=( \! \< \> );;
     (*:pine:*)
       # Pine is like mail but with no leading `+' to disambiguate;
       # any files not in $pinedirectory must be absolute paths.
-      mbox_names=( "${(@)_pine_cache#$~pinedirectory/}" "${_mbox_cache[@]}" )
+      mbox_names=( "${(@)_pine_cache#$~pinedirectory/}" "${_mbox_cache[@]}"
+		   "${_mailbox_cache[@]}" "${_mh_cache[@]}" )
+      ;;
+    (*:tkrat:*) # Has a couple of custom formats I haven't programmed for.
+      mbox_names=( "${_mbox_cache[@]}"
+		   "${_mailbox_cache[@]}" "${_mh_cache[@]}" )
       ;;
     (*:(zmail|zmlite):*)
       if compset -P '+|-f+'; then
