@@ -1,3 +1,8 @@
+2000-04-28  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 11003: Src/Zle/computil.c: fix for reporting multiple actions in
+ 	comparguments, options with non-optional arguments
+	
 2000-04-28  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: 10999: Completion/Core/compinstall: some idiot didn't

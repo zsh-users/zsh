@@ -1399,7 +1399,8 @@ ca_set_data(char *opt, Caarg arg, char **args, int single)
     for (; arg && (arg->num < 0 ||
 		   (arg->min <= ca_laststate.nth + addopt &&
 		    arg->num >= ca_laststate.nth));) {
-	if (!opt && (lopt = arg->type != CAA_OPT) && oopt > 0)
+	lopt = (arg->type == CAA_OPT);
+	if (!opt && !lopt && oopt > 0)
 	    oopt = 0;
 
 	addlinknode(descr, arg->descr);
@@ -1446,7 +1447,7 @@ ca_set_data(char *opt, Caarg arg, char **args, int single)
 	    }
 	}
     }
-    if (!single && opt && !lopt) {
+    if (!single && opt && lopt) {
 	opt = NULL;
 	arg = ca_get_arg(ca_laststate.d, ca_laststate.nth);
 
