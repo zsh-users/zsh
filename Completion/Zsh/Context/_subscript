@@ -8,7 +8,7 @@ if [[ "$1" = -q ]]; then
   shift
 fi
 
-compset -P '\(([^\(\)]|*\(*\)*)##\)' # remove subscript flags
+compset -P '\(([^\(\)]|\(*\))##\)' # remove subscript flags
 
 if [[ "$PREFIX" = :* ]]; then
   _wanted characters expl 'character class' \
