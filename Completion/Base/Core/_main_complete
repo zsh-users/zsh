@@ -57,7 +57,7 @@ fi
 # Special completion contexts after `~' and `='.
 
 if [[ -z "$compstate[quote]" ]]; then
-  if compset -P 1 '='; then
+  if [[ -o equals ]] && compset -P 1 '='; then
     compstate[context]=equal
   elif [[ "$PREFIX" != */* && "$PREFIX[1]" = '~' ]]; then
     compset -p 1
