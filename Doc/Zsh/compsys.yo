@@ -2120,11 +2120,12 @@ following forms:
 
 startitem()
 item(tt(-))(
-If any string in the value consists of only a hyphen,
-then em(only) the tags specified by the other strings in the value are
+If any value consists of only a hyphen,
+then em(only) the tags specified in the other values are
 generated.  Normally all tags not explicitly selected are tried last
 if the specified tags fail to generate any matches.  This means 
-that a value consisting only of a single hyphen turns off completion.
+that a single value consisting only of a single hyphen
+turns off completion.
 )
 item(tt(!) var(tags)...)(
 A string starting with an exclamation mark

@@ -1,5 +1,11 @@
 2002-05-08  Andrej Borsenkow  <bor@zsh.org>
 
+	* 17080: Doc/Zsh/compsys.yo: clarify tag-order style usage
+
+	* 17074: Completion/Linux/Command/.distfiles,
+	Completion/Linux/Command/_mondo: mondoarchive completion
+	(with typo correction from Bart)
+
 	* unposted: .cvsignore: add autom4te.cache. Looks like
 	autoconf-2.53 generates it for whatever reason
 
