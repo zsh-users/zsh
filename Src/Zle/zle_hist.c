@@ -30,12 +30,6 @@
 #include "zle.mdh"
 #include "zle_hist.pro"
 
-/* Are references to earlier history lines permitted?  == 0 if       *
- * editing or reading a standalone line, such as in vared or select. */
-
-/**/
-int histallowed;
-
 /* Column position of vi ideal cursor.  -1 if it is unknown -- most *
  * movements and changes do this.                                   */
 
@@ -47,27 +41,16 @@ int lastcol;
 /**/
 int histline;
 
-/* the last line in the history (the current one), metafied */
-
-/**/
-char *curhistline;
+#define ZLETEXT(X) ((X)->zle_text ? (X)->zle_text : (X)->text)
 
 /**/
 void
 remember_edits(void)
 {
-    if (histline == curhist) {
-	zsfree(curhistline);
-	curhistline = metafy((char *) line, ll, META_DUP);
-    }
-    else {
-	Histent ent = gethistent(histline);
-
-	if (metadiffer(ent->zle_text ? ent->zle_text : ent->text,
-		       (char *) line, ll)) {
-	    zsfree(ent->zle_text);
-	    ent->zle_text = metafy((char *) line, ll, META_DUP);
-	}
+    Histent ent = quietgethist(histline);
+    if (metadiffer(ZLETEXT(ent), (char *) line, ll)) {
+	zsfree(ent->zle_text);
+	ent->zle_text = metafy((char *) line, ll, META_DUP);
     }
 }
 
@@ -75,28 +58,26 @@ remember_edits(void)
 void
 forget_edits(void)
 {
-    int i;
+    Histent he;
 
-    for (i = 0; i < histentct; i++) {
-	zsfree(histentarr[i].zle_text);
-	histentarr[i].zle_text = NULL;
+    for (he = hist_ring; he; he = up_histent(he)) {
+	zsfree(he->zle_text);
+	he->zle_text = NULL;
     }
 }
 
 /**/
-void
-uphistory(void)
+int
+uphistory(char **args)
 {
-    if (zmult < 0) {
-	zmult = -zmult;
-	downhistory();
-	zmult = -zmult;
-    } else if(!zle_goto_hist(histline - zmult) && isset(HISTBEEP))
-	feep();
+    int nodups = isset(HISTIGNOREDUPS);
+    if (!zle_goto_hist(histline, -zmult, nodups) && isset(HISTBEEP))
+	return 1;
+    return 0;
 }
 
 /**/
-int
+static int
 upline(void)
 {
     int n = zmult;
@@ -130,58 +111,57 @@ upline(void)
 }
 
 /**/
-void
-uplineorhistory(void)
+int
+uplineorhistory(char **args)
 {
     int ocs = cs;
     int n = upline();
     if (n) {
-	int m = zmult;
+	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed) {
-	    feep();
-	    return;
-	}
+	if (virangeflag || !(zlereadflags & ZLRF_HISTORY))
+	    return 1;
 	zmult = n;
-	uphistory();
+	ret = uphistory(args);
 	zmult = m;
+	return ret;
     }
-}
-
-/**/
-void
-viuplineorhistory(void)
-{
-    int col = lastcol;
-    uplineorhistory();
-    lastcol = col;
-    vifirstnonblank();
-}
-
-
-/**/
-void
-uplineorsearch(void)
-{
-    int ocs = cs;
-    int n = upline();
-    if (n) {
-	int m = zmult;
-
-	cs = ocs;
-	if (virangeflag || !histallowed) {
-	    feep();
-	    return;
-	}
-	zmult = n;
-	historysearchbackward();
-	zmult = m;
-    }
+    return 0;
 }
 
 /**/
 int
+viuplineorhistory(char **args)
+{
+    int col = lastcol;
+    uplineorhistory(args);
+    lastcol = col;
+    return vifirstnonblank(args);
+}
+
+/**/
+int
+uplineorsearch(char **args)
+{
+    int ocs = cs;
+    int n = upline();
+    if (n) {
+	int m = zmult, ret;
+
+	cs = ocs;
+	if (virangeflag || !(zlereadflags & ZLRF_HISTORY))
+	    return 1;
+	zmult = n;
+	ret = historysearchbackward(args);
+	zmult = m;
+	return ret;
+    }
+    return 0;
+}
+
+/**/
+static int
 downline(void)
 {
     int n = zmult;
@@ -215,189 +195,220 @@ downline(void)
 }
 
 /**/
-void
-downlineorhistory(void)
+int
+downlineorhistory(char **args)
 {
     int ocs = cs;
     int n = downline();
     if (n) {
-	int m = zmult;
+	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed) {
-	    feep();
-	    return;
-	}
+	if (virangeflag || !(zlereadflags & ZLRF_HISTORY))
+	    return 1;
 	zmult = n;
-	downhistory();
+	ret = downhistory(args);
 	zmult = m;
+	return ret;
     }
+    return 0;
 }
 
 /**/
-void
-vidownlineorhistory(void)
+int
+vidownlineorhistory(char **args)
 {
     int col = lastcol;
-    downlineorhistory();
+    downlineorhistory(args);
     lastcol = col;
-    vifirstnonblank();
+    return vifirstnonblank(zlenoargs);
 }
 
 /**/
-void
-downlineorsearch(void)
+int
+downlineorsearch(char **args)
 {
     int ocs = cs;
     int n = downline();
     if (n) {
-	int m = zmult;
+	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed) {
-	    feep();
-	    return;
-	}
+	if (virangeflag || !(zlereadflags & ZLRF_HISTORY))
+	    return 1;
 	zmult = n;
-	historysearchforward();
+	ret = historysearchforward(args);
 	zmult = m;
+	return ret;
     }
+    return 0;
 }
 
 /**/
-void
-acceptlineanddownhistory(void)
+int
+acceptlineanddownhistory(char **args)
 {
-    char *s;
+    Histent he;
 
-    if (!(s = zle_get_event(histline + 1))) {
-	feep();
-	return;
-    }
-    pushnode(bufstack, ztrdup(s));
+    if (!(he = movehistent(quietgethist(histline), 1, HIST_FOREIGN)))
+	return 1;
+    zpushnode(bufstack, ztrdup(he->text));
     done = 1;
-    stackhist = histline + 1;
+    stackhist = he->histnum;
+    return 0;
 }
 
 /**/
-void
-downhistory(void)
+int
+downhistory(char **args)
 {
+    int nodups = isset(HISTIGNOREDUPS);
+    if (!zle_goto_hist(histline, zmult, nodups) && isset(HISTBEEP))
+	return 1;
+    return 0;
+}
+
+static int histpos, srch_hl, srch_cs = -1;
+static char *srch_str;
+
+/**/
+int
+historysearchbackward(char **args)
+{
+    Histent he;
+    int n = zmult, hp;
+    char *s, *str;
+
     if (zmult < 0) {
-	zmult = -zmult;
-	uphistory();
-	zmult = -zmult;
-    } else if(!zle_goto_hist(histline + zmult) && isset(HISTBEEP))
-	feep();
-}
-
-/**/
-void
-historysearchbackward(void)
-{
-    int histpos, histmpos, hl = histline;
-    int n = zmult;
-    char *s;
-
-    if (!n)
-	return;
-    if (n < 0) {
+	int ret;
 	zmult = -n;
-	historysearchforward();
+	ret = historysearchforward(args);
 	zmult = n;
-	return;
+	return ret;
     }
-    for (histpos = histmpos = 0; histpos < ll && !iblank(line[histpos]);
-	histpos++, histmpos++)
-	if(imeta(line[histpos]))
-	    histmpos++;
-    for (;;) {
-	hl--;
-	if (!(s = zle_get_event(hl))) {
-	    feep();
-	    return;
+    if ((str = *args))
+	hp = strlen(str);
+    else {
+	if (histline == curhist || histline != srch_hl || cs != srch_cs ||
+	    mark != 0 || memcmp(srch_str, line, histpos) != 0) {
+	    zfree(srch_str, histpos);
+	    for (histpos = 0; histpos < ll && !iblank(line[histpos]); histpos++) ;
+	    if (histpos < ll)
+		histpos++;
+	    srch_str = zalloc(histpos);
+	    memcpy(srch_str, line, histpos);
 	}
-	if (metadiffer(s, (char *) line, histpos) < 0 &&
-	    iblank(s[histmpos] == Meta ? s[histmpos+1]^32 : s[histmpos]) &&
-	    metadiffer(s, (char *) line, ll) && !--n)
-	    break;
+	str = srch_str;
+	hp = histpos;
     }
-    zle_goto_hist(hl);
+    he = quietgethist(histline);
+    while ((he = movehistent(he, -1, hist_skip_flags))) {
+	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	    continue;
+	s = ZLETEXT(he);
+	if (metadiffer(s, str, hp) < 0 &&
+	    (*args || metadiffer(s, str, ll))) {
+	    if (--n <= 0) {
+		zle_setline(he);
+		srch_hl = histline;
+		srch_cs = cs;
+		return 0;
+	    }
+	}
+    }
+    return 1;
 }
 
 /**/
-void
-historysearchforward(void)
+int
+historysearchforward(char **args)
 {
-    int histpos, histmpos, hl = histline;
-    int n = zmult;
-    char *s;
+    Histent he;
+    int n = zmult, hp;
+    char *s, *str;
 
-    if (!n)
-	return;
-    if (n < 0) {
+    if (zmult < 0) {
+	int ret;
 	zmult = -n;
-	historysearchbackward();
+	ret = historysearchbackward(args);
 	zmult = n;
-	return;
+	return ret;
     }
-    for (histpos = histmpos = 0; histpos < ll && !iblank(line[histpos]);
-	histpos++, histmpos++)
-	if(imeta(line[histpos]))
-	    histmpos++;
-    for (;;) {
-	hl++;
-	if (!(s = zle_get_event(hl))) {
-	    feep();
-	    return;
+    if ((str = *args))
+	hp = strlen(str);
+    else {
+	if (histline == curhist || histline != srch_hl || cs != srch_cs ||
+	    mark != 0 || memcmp(srch_str, line, histpos) != 0) {
+	    zfree(srch_str, histpos);
+	    for (histpos = 0; histpos < ll && !iblank(line[histpos]); histpos++) ;
+	    if (histpos < ll)
+		histpos++;
+	    srch_str = zalloc(histpos);
+	    memcpy(srch_str, line, histpos);
 	}
-	if (metadiffer(s, (char *) line, histpos) < (histline == curhist) &&
-	    (!s[histmpos] ||
-	     iblank(s[histmpos] == Meta ? s[histmpos+1]^32 : s[histmpos])) &&
-	    metadiffer(s, (char *) line, ll) && !--n)
-	    break;
+	str = srch_str;
+	hp = histpos;
     }
-    zle_goto_hist(hl);
+    he = quietgethist(histline);
+    while ((he = movehistent(he, 1, hist_skip_flags))) {
+	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	    continue;
+	s = ZLETEXT(he);
+	if (metadiffer(s, str, hp) < (he->histnum == curhist) &&
+	    (*args || metadiffer(s, str, ll))) {
+	    if (--n <= 0) {
+		zle_setline(he);
+		srch_hl = histline;
+		srch_cs = cs;
+		return 0;
+	    }
+	}
+    }
+    return 1;
 }
 
 /**/
-void
-beginningofbufferorhistory(void)
+int
+beginningofbufferorhistory(char **args)
 {
     if (findbol())
 	cs = 0;
     else
-	beginningofhistory();
+	return beginningofhistory(args);
+    return 0;
 }
 
 /**/
-void
-beginningofhistory(void)
+int
+beginningofhistory(char **args)
 {
-    if (!zle_goto_hist(firsthist()) && isset(HISTBEEP))
-	feep();
+    if (!zle_goto_hist(firsthist(), 0, 0) && isset(HISTBEEP))
+	return 1;
+    return 0;
 }
 
 /**/
-void
-endofbufferorhistory(void)
+int
+endofbufferorhistory(char **args)
 {
     if (findeol() != ll)
 	cs = ll;
     else
-	endofhistory();
+	return endofhistory(args);
+    return 0;
 }
 
 /**/
-void
-endofhistory(void)
+int
+endofhistory(char **args)
 {
-    zle_goto_hist(curhist);
+    zle_goto_hist(curhist, 0, 0);
+    return 0;
 }
 
 /**/
-void
-insertlastword(void)
+int
+insertlastword(char **args)
 {
     int n;
     char *s, *t;
@@ -406,7 +417,7 @@ insertlastword(void)
 /* multiple calls will now search back through the history, pem */
     static char *lastinsert;
     static int lasthist, lastpos;
-    int evhist = curhist - 1, save;
+    int evhist = addhistnum(curhist, -1, HIST_FOREIGN), save;
 
     if (lastinsert) {
 	int lastlen = ztrlen(lastinsert);
@@ -415,26 +426,22 @@ insertlastword(void)
 	if (lastpos <= pos &&
 	    lastlen == pos - lastpos &&
 	    memcmp(lastinsert, (char *)&line[lastpos], lastlen) == 0) {
-	    evhist = --lasthist;
+	    evhist = addhistnum(lasthist, -1, HIST_FOREIGN);
 	    cs = lastpos;
 	    foredel(pos - cs);
 	}
 	zsfree(lastinsert);
 	lastinsert = NULL;
     }
-    if (!(he = quietgethist(evhist)) || !he->nwords) {
-	feep();
-	return;
-    }
+    if (!(he = quietgethist(evhist)) || !he->nwords)
+	return 1;
     if (zmult > 0) {
 	n = he->nwords - (zmult - 1);
     } else {
 	n = 1 - zmult;
     }
-    if (n < 1 || n > he->nwords) {
-	feep();
-	return;
-    }
+    if (n < 1 || n > he->nwords)
+	return 1;
     s = he->text + he->words[2*n-2];
     t = he->text + he->words[2*n-1];
     save = *t;
@@ -448,72 +455,77 @@ insertlastword(void)
     doinsert(s);
     zmult = n;
     *t = save;
+    return 0;
 }
 
 /**/
-char *
-qgetevent(int ev)
+void
+zle_setline(Histent he)
 {
-    return ((ev == curhist) ? curhistline : quietgetevent(ev));
-}
-
-/**/
-char *
-zle_get_event(int ev)
-{
-    Histent ent;
-
-    if (ev == curhist)
-	return curhistline;
-    if (! (ent = quietgethist(ev)))
-	return NULL;
-    if (ent->zle_text)
-	return ent->zle_text;
-    return ent->text;
-}
-
-/**/
-static int
-zle_goto_hist(int ev)
-{
-    char *t;
-
     remember_edits();
-    if(!(t = zle_get_event(ev)))
-	return 0;
     mkundoent();
-    histline = ev;
-    setline(t);
+    histline = he->histnum;
+    setline(ZLETEXT(he));
     setlastline();
+    clearlist = 1;
+}
+
+/**/
+int
+setlocalhistory(char **args)
+{
+    if (zmod.flags & MOD_MULT) {
+	hist_skip_flags = zmult? HIST_FOREIGN : 0;
+    } else {
+	hist_skip_flags ^= HIST_FOREIGN;
+    }
+    return 0;
+}
+
+/**/
+int
+zle_goto_hist(int ev, int n, int skipdups)
+{
+    Histent he = movehistent(quietgethist(ev), n, hist_skip_flags);
+    if (skipdups && n) {
+	n = n < 0? -1 : 1;
+	while (he && !metadiffer(ZLETEXT(he), (char *) line, ll))
+	    he = movehistent(he, n, hist_skip_flags);
+    }
+    if (!he)
+	return 0;
+    zle_setline(he);
     return 1;
 }
 
 /**/
-void
-pushline(void)
+int
+pushline(char **args)
 {
     int n = zmult;
 
     if (n < 0)
-	return;
-    pushnode(bufstack, metafy((char *) line, ll, META_DUP));
+	return 1;
+    zpushnode(bufstack, metafy((char *) line, ll, META_DUP));
     while (--n)
-	pushnode(bufstack, ztrdup(""));
+	zpushnode(bufstack, ztrdup(""));
     stackcs = cs;
     *line = '\0';
     ll = cs = 0;
+    clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-pushlineoredit(void)
+int
+pushlineoredit(char **args)
 {
-    int ics;
+    int ics, ret;
     unsigned char *s;
     char *hline = hgetline();
 
     if (zmult < 0)
-	return;
+	return 1;
     if (hline && *hline) {
 	ics = ztrlen(hline);
 	sizeline(ics + ll + 1);
@@ -523,34 +535,36 @@ pushlineoredit(void)
 	ll += ics;
 	cs += ics;
     }
-    pushline();
-    if (!isfirstln) {
+    ret = pushline(args);
+    if (!isfirstln)
 	errflag = done = 1;
-    }
+    clearlist = 1;
+    return ret;
 }
 
 /**/
-void
-pushinput(void)
+int
+pushinput(char **args)
 {
-    int i;
+    int i, ret;
 
     if (zmult < 0)
-	return;
+	return 1;
     zmult += i = !isfirstln;
-    pushlineoredit();
+    ret = pushlineoredit(args);
     zmult -= i;
+    return ret;
 }
 
 /**/
-void
-getline(void)
+int
+getline(char **args)
 {
     char *s = (char *)getlinknode(bufstack);
 
-    if (!s)
-	feep();
-    else {
+    if (!s) {
+	return 1;
+    } else {
 	int cc;
 
 	unmetafy(s, &cc);
@@ -558,21 +572,25 @@ getline(void)
 	memcpy((char *)line + cs, s, cc);
 	cs += cc;
 	free(s);
+	clearlist = 1;
     }
+    return 0;
 }
 
 /**/
-void
-historyincrementalsearchbackward(void)
+int
+historyincrementalsearchbackward(char **args)
 {
-    doisearch(-1);
+    doisearch(args, -1);
+    return 0;
 }
 
 /**/
-void
-historyincrementalsearchforward(void)
+int
+historyincrementalsearchforward(char **args)
 {
-    doisearch(1);
+    doisearch(args, 1);
+    return 0;
 }
 
 static struct isrch_spot {
@@ -587,16 +605,12 @@ static struct isrch_spot {
 
 static int max_spot = 0;
 
-#ifdef MODULE
-
 /**/
 void
 free_isrch_spots(void)
 {
     zfree(isrch_spots, max_spot * sizeof(*isrch_spots));
 }
-
-#endif /* MODULE */
 
 /**/
 static void
@@ -638,22 +652,34 @@ get_isrch_spot(int num, int *hlp, int *posp, int *csp, int *lenp, int *dirp, int
 
 /**/
 static void
-doisearch(int dir)
+doisearch(char **args, int dir)
 {
-    char *s, *ibuf = halloc(80), *sbuf = ibuf + FIRST_SEARCH_CHAR;
+    char *s, *ibuf = zhalloc(80), *sbuf = ibuf + FIRST_SEARCH_CHAR;
     int sbptr = 0, top_spot = 0, pos, sibuf = 80;
     int nomatch = 0, skip_line = 0, skip_pos = 0;
     int odir = dir, sens = zmult == 1 ? 3 : 1;
-    int hl = histline;
+    int hl = histline, savekeys = -1, feep = 0;
     Thingy cmd;
     char *okeymap = curkeymapname;
     static char *previous_search = NULL;
     static int previous_search_len = 0;
+    Histent he;
+
+    clearlist = 1;
+
+    if (*args) {
+	int len;
+	char *arg;
+	savekeys = kungetct;
+	arg = getkeystring(*args, &len, 2, NULL);
+	ungetkeys(arg, len);
+    }
 
     strcpy(ibuf, ISEARCH_PROMPT);
     memcpy(ibuf + NORM_PROMPT_POS, (dir == 1) ? "fwd" : "bck", 3);
     remember_edits();
-    s = zle_get_event(hl);
+    he = quietgethist(hl);
+    s = ZLETEXT(he);
     selectkeymap("main", 1);
     pos = metalen(s, cs);
     for (;;) {
@@ -687,31 +713,34 @@ doisearch(int dir)
 		if (!skip_line && ((sbuf[0] == '^') ?
 		    (t = metadiffer(s, sbuf + 1, sbptr - 1) < sens ? s : NULL) :
 		    (t = hstrnstr(s, pos, sbuf, sbptr, dir, sens)))) {
-		    zle_goto_hist(hl);
+		    zle_setline(he);
 		    pos = t - s;
 		    cs = ztrsub(t, s) + (dir == 1? sbptr - (sbuf[0]=='^') : 0);
 	    	    nomatch = 0;
 		    statusline = ibuf + NORM_PROMPT_POS;
 		    break;
 		}
-		hl += dir;
-		if (!(s = zle_get_event(hl))) {
+		if (!(he = movehistent(he, dir, hist_skip_flags))) {
 		    if (sbptr == (int)isrch_spots[top_spot-1].len
 		     && (isrch_spots[top_spot-1].flags & ISS_FAILING))
 			top_spot--;
 		    get_isrch_spot(top_spot, &hl, &pos, &cs, &sbptr,
 				   &dir, &nomatch);
 		    if (!nomatch) {
-			feep();
+			feep = 1;
 			nomatch = 1;
 		    }
-		    s = last_line;
+		    he = quietgethist(hl);
+		    s = ZLETEXT(he);
 		    skip_line = 0;
 		    statusline = ibuf;
 		    break;
 		}
+		hl = he->histnum;
+		s = ZLETEXT(he);
 		pos = dir == 1? 0 : strlen(s);
-		skip_line = !strcmp(last_line, s);
+		skip_line = isset(HISTFINDNODUPS)? !!(he->flags & HIST_DUP)
+						 : !strcmp(last_line, s);
 	    }
 	} else {
 	    top_spot = 0;
@@ -721,24 +750,25 @@ doisearch(int dir)
 	sbuf[sbptr] = '_';
 	statusll = sbuf - statusline + sbptr + 1;
     ref:
-	refresh();
+	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    int i;
 	    get_isrch_spot(0, &hl, &pos, &i, &sbptr, &dir, &nomatch);
-	    s = zle_get_event(hl);
-	    zle_goto_hist(hl);
+	    he = quietgethist(hl);
+	    zle_setline(he);
+	    s = ZLETEXT(he);
 	    cs = i;
 	    break;
 	}
 	if(cmd == Th(z_clearscreen)) {
-	    clearscreen();
+	    clearscreen(zlenoargs);
 	    goto ref;
 	} else if(cmd == Th(z_redisplay)) {
-	    redisplay();
+	    redisplay(zlenoargs);
 	    goto ref;
 	} else if(cmd == Th(z_vicmdmode)) {
 	    if(selectkeymap(invicmdmode() ? "main" : "vicmd", 0))
-		feep();
+		feep = 1;
 	    goto ref;
 	} else if(cmd == Th(z_vibackwarddeletechar) ||
 	    	cmd == Th(z_backwarddeletechar)) {
@@ -746,30 +776,31 @@ doisearch(int dir)
 		get_isrch_spot(--top_spot, &hl, &pos, &cs, &sbptr,
 			       &dir, &nomatch);
 	    else
-		feep();
+		feep = 1;
 	    if (nomatch) {
 		statusline = ibuf;
 		skip_pos = 1;
 	    }
-	    s = zle_get_event(hl);
+	    he = quietgethist(hl);
+	    s = ZLETEXT(he);
 	    if (nomatch || !sbptr || (sbptr == 1 && sbuf[0] == '^')) {
 		int i = cs;
-		zle_goto_hist(hl);
+		zle_setline(he);
 		cs = i;
 	    }
 	    memcpy(ibuf + NORM_PROMPT_POS, (dir == 1) ? "fwd" : "bck", 3);
 	    continue;
 	} else if(cmd == Th(z_acceptandhold)) {
-	    acceptandhold();
+	    acceptandhold(zlenoargs);
 	    break;
 	} else if(cmd == Th(z_acceptandinfernexthistory)) {
-	    acceptandinfernexthistory();
+	    acceptandinfernexthistory(zlenoargs);
 	    break;
 	} else if(cmd == Th(z_acceptlineanddownhistory)) {
-	    acceptlineanddownhistory();
+	    acceptlineanddownhistory(zlenoargs);
 	    break;
 	} else if(cmd == Th(z_acceptline)) {
-	    acceptline();
+	    acceptline(zlenoargs);
 	    break;
 	} else if(cmd == Th(z_historyincrementalsearchbackward)) {
 	    set_isrch_spot(top_spot++, hl, pos, cs, sbptr, dir, nomatch);
@@ -809,10 +840,10 @@ doisearch(int dir)
 	    	cmd == Th(z_quotedinsert)) {
 	    if(cmd == Th(z_viquotedinsert)) {
 		sbuf[sbptr] = '^';
-		refresh();
+		zrefresh();
 	    }
 	    if ((c = getkey(0)) == EOF)
-		feep();
+		feep = 1;
 	    else
 		goto ins;
 	} else {
@@ -830,7 +861,7 @@ doisearch(int dir)
 	    }
 	ins:
 	    if (sbptr == PATH_MAX) {
-		feep();
+		feep = 1;
 		continue;
 	    }
 	    set_isrch_spot(top_spot++, hl, pos, cs, sbptr, dir, nomatch);
@@ -841,7 +872,9 @@ doisearch(int dir)
 	    }
 	    sbuf[sbptr++] = c;
 	}
-	handlefeep();
+	if (feep)
+	    handlefeep(zlenoargs);
+	feep = 0;
     }
     if (sbptr) {
 	zfree(previous_search, previous_search_len);
@@ -850,66 +883,69 @@ doisearch(int dir)
     }
     statusline = NULL;
     selectkeymap(okeymap, 1);
+    /*
+     * Don't allow unused characters provided as a string to the
+     * widget to overflow and be used as separated commands.
+     */
+    if (savekeys >= 0 && kungetct > savekeys)
+	kungetct = savekeys;
+}
+
+static Histent
+infernexthist(Histent he, char **args)
+{
+    for (he = movehistent(he, -2, HIST_FOREIGN);
+	 he; he = movehistent(he, -1, HIST_FOREIGN)) {
+	if (!metadiffer(he->text, (char *) line, ll))
+	    return movehistent(he, 1, HIST_FOREIGN);
+    }
+    return NULL;
 }
 
 /**/
-void
-acceptandinfernexthistory(void)
+int
+acceptandinfernexthistory(char **args)
 {
-    int t0;
-    char *s;
+    Histent he;
 
+    if (!(he = infernexthist(hist_ring, args)))
+	return 1;
+    zpushnode(bufstack, ztrdup(he->text));
     done = 1;
-    for (t0 = histline - 2;; t0--) {
-	if (!(s = qgetevent(t0)))
-	    return;
-	if (!metadiffer(s, (char *) line, ll))
-	    break;
-    }
-    if (!(s = qgetevent(t0 + 1)))
-	return;
-    pushnode(bufstack, ztrdup(s));
-    stackhist = t0 + 1;
+    stackhist = he->histnum;
+    return 0;
 }
 
 /**/
-void
-infernexthistory(void)
+int
+infernexthistory(char **args)
 {
-    int t0;
-    char *s;
+    Histent he;
 
-    for (t0 = histline - 2;; t0--) {
-	if (!(s = qgetevent(t0))) {
-	    feep();
-	    return;
-	}
-	if (! metadiffer(s, (char *) line, ll))
-	    break;
-    }
-    if (!(s = qgetevent(t0 + 1))) {
-	feep();
-	return;
-    }
-    zle_goto_hist(t0 + 1);
+    if (!(he = infernexthist(quietgethist(histline), args)))
+	return 1;
+    zle_setline(he);
+    return 0;
 }
 
 /**/
-void
-vifetchhistory(void)
+int
+vifetchhistory(char **args)
 {
     if (zmult < 0)
-	return;
+	return 1;
     if (histline == curhist) {
 	if (!(zmod.flags & MOD_MULT)) {
 	    cs = ll;
 	    cs = findbol();
-	    return;
+	    return 0;
 	}
     }
-    if (!zle_goto_hist((zmod.flags & MOD_MULT) ? zmult : curhist) &&
-	isset(HISTBEEP))
-	feep();
+    if (!zle_goto_hist((zmod.flags & MOD_MULT) ? zmult : curhist, 0, 0) &&
+	isset(HISTBEEP)) {
+	return 1;
+    }
+    return 0;
 }
 
 /* the last vi search */
@@ -921,8 +957,8 @@ static int visrchsense;
 static int
 getvisrchstr(void)
 {
-    char *sbuf = halloc(80);
-    int sptr = 1, ret = 0, ssbuf = 80;
+    char *sbuf = zhalloc(80);
+    int sptr = 1, ret = 0, ssbuf = 80, feep = 0;
     Thingy cmd;
     char *okeymap = curkeymapname;
 
@@ -930,13 +966,14 @@ getvisrchstr(void)
 	zsfree(visrchstr);
 	visrchstr = NULL;
     }
+    clearlist = 1;
     statusline = sbuf;
     sbuf[0] = (visrchsense == -1) ? '?' : '/';
     selectkeymap("main", 1);
     while (sptr) {
 	sbuf[sptr] = '_';
 	statusll = sptr + 1;
-	refresh();
+	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    ret = 0;
 	    break;
@@ -946,9 +983,9 @@ getvisrchstr(void)
 	    cmd = Th(z_selfinsert);
 	}
 	if(cmd == Th(z_redisplay)) {
-	    redisplay();
+	    redisplay(zlenoargs);
 	} else if(cmd == Th(z_clearscreen)) {
-	    clearscreen();
+	    clearscreen(zlenoargs);
 	} else if(cmd == Th(z_acceptline) ||
 	    	cmd == Th(z_vicmdmode)) {
 	    sbuf[sptr] = 0;
@@ -971,10 +1008,10 @@ getvisrchstr(void)
 	} else if(cmd == Th(z_viquotedinsert) || cmd == Th(z_quotedinsert)) {
 	    if(cmd == Th(z_viquotedinsert)) {
 		sbuf[sptr] = '^';
-		refresh();
+		zrefresh();
 	    }
 	    if ((c = getkey(0)) == EOF)
-		feep();
+		feep = 1;
 	    else
 		goto ins;
 	} else if(cmd == Th(z_selfinsertunmeta) || cmd == Th(z_selfinsert)) {
@@ -985,15 +1022,17 @@ getvisrchstr(void)
 	    }
 	  ins:
 	    if(sptr == ssbuf - 1) {
-		char *newbuf = halloc(ssbuf *= 2);
+		char *newbuf = zhalloc(ssbuf *= 2);
 		strcpy(newbuf, sbuf);
 		statusline = sbuf = newbuf;
 	    }
 	    sbuf[sptr++] = c;
 	} else {
-	    feep();
+	    feep = 1;
 	}
-	handlefeep();
+	if (feep)
+	    handlefeep(zlenoargs);
+	feep = 0;
     }
     statusline = NULL;
     selectkeymap(okeymap, 1);
@@ -1001,68 +1040,89 @@ getvisrchstr(void)
 }
 
 /**/
-void
-vihistorysearchforward(void)
+int
+vihistorysearchforward(char **args)
 {
+    if (*args) {
+	int ose = visrchsense, ret;
+	char *ost = visrchstr;
+
+	visrchsense = 1;
+	visrchstr = *args;
+	ret = virepeatsearch(zlenoargs);
+	visrchsense = ose;
+	visrchstr = ost;
+	return ret;
+    }
     visrchsense = 1;
     if (getvisrchstr())
-	virepeatsearch();
+	return virepeatsearch(zlenoargs);
+    return 1;
 }
 
 /**/
-void
-vihistorysearchbackward(void)
+int
+vihistorysearchbackward(char **args)
 {
+    if (*args) {
+	int ose = visrchsense, ret;
+	char *ost = visrchstr;
+
+	visrchsense = -1;
+	visrchstr = *args;
+	ret = virepeatsearch(zlenoargs);
+	visrchsense = ose;
+	visrchstr = ost;
+	return ret;
+    }
     visrchsense = -1;
     if (getvisrchstr())
-	virepeatsearch();
+	return virepeatsearch(zlenoargs);
+    return 1;
 }
 
 /**/
-void
-virepeatsearch(void)
+int
+virepeatsearch(char **args)
 {
-    int hl = histline, t0;
+    Histent he;
+    int t0;
     int n = zmult;
     char *s;
 
-    if (!visrchstr) {
-	feep();
-	return;
-    }
-    if (!n)
-	return;
-    if (n < 0) {
+    if (!visrchstr)
+	return 1;
+    if (zmult < 0) {
 	n = -n;
 	visrchsense = -visrchsense;
     }
     t0 = strlen(visrchstr);
-    for (;;) {
-	hl += visrchsense;
-	if (!(s = zle_get_event(hl))) {
-	    feep();
-	    return;
+    he = quietgethist(histline);
+    while ((he = movehistent(he, visrchsense, hist_skip_flags))) {
+	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	    continue;
+	s = ZLETEXT(he);
+	if (metadiffer(s, (char *) line, ll)
+	 && (*visrchstr == '^'? strncmp(s, visrchstr + 1, t0 - 1) == 0
+			      : hstrnstr(s, 0, visrchstr, t0, 1, 1) != 0)) {
+	    if (--n <= 0) {
+		zle_setline(he);
+		return 0;
+	    }
 	}
-	if (!metadiffer(s, (char *) line, ll))
-	    continue;
-	if (*visrchstr == '^') {
-	    if (strncmp(s, visrchstr + 1, t0 - 1) != 0)
-		continue;
-	} else if (!hstrnstr(s, 0, visrchstr, t0, 1, 1))
-	    continue;
-	if (--n <= 0)
-	    break;
     }
-    zle_goto_hist(hl);
+    return 1;
 }
 
 /**/
-void
-virevrepeatsearch(void)
+int
+virevrepeatsearch(char **args)
 {
+    int ret;
     visrchsense = -visrchsense;
-    virepeatsearch();
+    ret = virepeatsearch(args);
     visrchsense = -visrchsense;
+    return ret;
 }
 
 /* Extra function added by A.R. Iano-Fletcher.	*/
@@ -1070,70 +1130,70 @@ virevrepeatsearch(void)
 /* history-beginning-search-backward */
 
 /**/
-void
-historybeginningsearchbackward(void)
+int
+historybeginningsearchbackward(char **args)
 {
+    Histent he;
     int cpos = cs;		/* save cursor position */
-    int hl = histline;
     int n = zmult;
     char *s;
 
-    if (!n)
-	return;
-    if (n < 0) {
+    if (zmult < 0) {
+	int ret;
 	zmult = -n;
-	historybeginningsearchforward();
+	ret = historybeginningsearchforward(args);
 	zmult = n;
-	return;
+	return ret;
     }
-    for (;;) {
-	hl--;
-	if (!(s = zle_get_event(hl))) {
-	    feep();
-	    return;
-	}
+    he = quietgethist(histline);
+    while ((he = movehistent(he, -1, hist_skip_flags))) {
+	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	    continue;
+	s = ZLETEXT(he);
 	if (metadiffer(s, (char *)line, cs) < 0 &&
-	    metadiffer(s, (char *)line, ll))
-	    if (--n <= 0)
-		break;
+	    metadiffer(s, (char *)line, ll)) {
+	    if (--n <= 0) {
+		zle_setline(he);
+		cs = cpos;
+		return 0;
+	    }
+	}
     }
-
-    zle_goto_hist(hl);
-    cs = cpos;
+    return 1;
 }
 
 /* Extra function added by A.R. Iano-Fletcher.	*/
 
 /* history-beginning-search-forward */
 /**/
-void
-historybeginningsearchforward(void)
+int
+historybeginningsearchforward(char **args)
 {
+    Histent he;
     int cpos = cs;		/* save cursor position */
-    int hl = histline;
     int n = zmult;
     char *s;
 
-    if (!n)
-	return;
-    if (n < 0) {
+    if (zmult < 0) {
+	int ret;
 	zmult = -n;
-	historybeginningsearchbackward();
+	ret = historybeginningsearchbackward(args);
 	zmult = n;
-	return;
+	return ret;
     }
-    for (;;) {
-	hl++;
-	if (!(s = zle_get_event(hl))) {
-	    feep();
-	    return;
+    he = quietgethist(histline);
+    while ((he = movehistent(he, 1, hist_skip_flags))) {
+	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	    continue;
+	s = ZLETEXT(he);
+	if (metadiffer(s, (char *)line, cs) < (he->histnum == curhist) &&
+	    metadiffer(s, (char *)line, ll)) {
+	    if (--n <= 0) {
+		zle_setline(he);
+		cs = cpos;
+		return 0;
+	    }
 	}
-	if (metadiffer(s, (char *)line, cs) < (hl == curhist) &&
-	    metadiffer(s, (char *)line, ll))
-	    if (--n <= 0)
-		break;
     }
-
-    zle_goto_hist(hl);
-    cs = cpos;
+    return 1;
 }
