@@ -938,6 +938,12 @@ letter. However, strings beginning with two hyphens (like
 name. This allows the use of the `tt(-s)' option to describe
 single-letter options together with such long option names.
 
+Another option supported is `tt(-O) var(name)'. The var(name) will be
+taken as the name of an array and its elements will be given to
+functions called to generate matches when executing the
+var(actions). For example, this allows one to give options for the
+tt(compadd) builtin that should be used.
+
 Also, the tt(-M) option followed by a string may be given before the
 first description. The string will be used as the match specification
 when completing option names and values instead of the default
@@ -1034,11 +1040,18 @@ be completed. The last description says that all other arguments are
 )
 item(tt(_values))(
 This is used to complete values (strings) and their arguments or
-lists of such values. If the first argument is the option `tt(-s)',
-the second argument is used as the character that separates multiple
-values.
+lists of such values.
 
-The first argument (after the option and separator character if they
+If the first argument is the option `tt(-O) var(name)', this will be
+used in the same way as by the tt(_arguments) function. I.e. the
+elements of the var(name) array will be given to calls to tt(compadd)
+and when executing an action.
+
+Otherwise, if the first argument (or the first argument after the
+`tt(-O) var(name)' option if that is used) is the option `tt(-s)', the
+second argument is used as the character that separates multiple values.
+
+The first argument (after the options and separator character if they
 are given) is used as a string to print as a description before
 listing the values.
 
