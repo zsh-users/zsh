@@ -61,24 +61,35 @@ emulate -L zsh
 setopt extendedglob
 
 typeset _i_dumpfile _i_files _i_line _i_done _i_dir _i_autodump=1
-typeset _i_tag _i_file _i_addfiles
+typeset _i_tag _i_file _i_addfiles _i_fail=ask _i_check=yes _i_name
 
-while [[ $# -gt 0 && $1 = -[dDf] ]]; do
-  if [[ "$1" = -d ]]; then
+while [[ $# -gt 0 && $1 = -[dDiuC] ]]; do
+  case "$1" in
+  -d)
     _i_autodump=1
     shift
-    if [[ $# -gt 0 && "$1" != -[df] ]]; then
+    if [[ $# -gt 0 && "$1" != -[dfQC] ]]; then
       _i_dumpfile="$1"
       shift
     fi
-  elif [[ "$1" = -D ]]; then
+    ;;
+  -D)
     _i_autodump=0
     shift
-  elif [[ "$1" = -f ]]; then
-    # Not used any more; use _compdir
+    ;;
+  -i)
+    _i_fail=ign
     shift
+    ;;
+  -u)
+    _i_fail=use
     shift
-  fi
+    ;;
+  -C)
+    _i_check=
+    shift
+    ;;
+  esac
 done
 
 # The associative array containing the definitions for the commands.
@@ -303,172 +314,80 @@ compdef() {
   fi
 }
 
-# Do *not* use this...
-
-compconf() {
-
-  local style name val i tmp cmt
-
-  if [[ -z "$_compconf_warn" ]]; then
-    _compconf_warn=yep
-
-    print "
-
-Hello
-
-\`compconf' will be removed in the near future, we now use a more
-general (and powerful) mechanism using the \`zstyle' builtin. An
-approximation to your old setup using \`zstyle' should be available
-in the file:
-
-    \`${HOME}/.zsh-styles'
-
-Note that the values for the styles may be partly incorrect. Please
-read the manual to find out how to configure the completion system
-with styles or use the \`compinstall' function.
-
-Have fun
-
-   Sven
-" 1>&2
-    command rm -f ${HOME}/.zsh-styles
-  fi
-
-  for i; do
-    name="${i%%\=*}"
-    val="${i#*\=}"
-
-    tmp=''
-    cmt=''
-
-    case "$name" in
-    urls_path)
-      tmp="'*:urls' path ${(qq)val}"
-      ;;
-    urls_localhttp)
-      tmp="'*:urls' local ${${(qqs.:.)val}}"
-      ;;
-    describe_options)
-      tmp="'*:options' verbose 'yes'"
-      ;;
-    describe_values)
-      tmp="'*:values' verbose 'yes'"
-      ;;
-    autodescribe_options)
-      tmp="'*:options' auto-description ${(qq)val}"
-      ;;
-    description_format)
-      tmp="'*:descriptions' format ${(qq)val}"
-      ;;
-    message_format)
-      tmp="'*:messages' format ${(qq)val}"
-      ;;
-    warning_format)
-      tmp="'*:warnings' format ${(qq)val}"
-      ;;
-    option_prefix)
-      tmp="'*:options' prefix-needed yes"
-      [[ "$val" = hide* ]] &&
-          tmp="$tmp
-zstyle ':completion:*:options' prefix-hidden yes"
-      ;;    
-    group_matches)
-      tmp="'*' group-name ''"
-      ;;
-    colors_path)
-      tmp="'*:colors' path ${(qq)val}"
-      ;;
-    path_expand)
-      tmp="'*:paths' expand ${(qq)val}"
-      ;;
-    path_cursor)
-      tmp="'*:paths' cursor ${(qq)val}"
-      ;;
-    (approximate|incremental|predict|list|oldlist|match)_*)
-      tmp="'*${name%%_*}:*' ${${name#*_}//_/-} ${(qq)val}"
-      ;;
-    correct_*)
-      cmt="# This one is a bit ugly. You may want to use only \`*:correct'
-# if you also have the \`correctword_*' or \`approximate_*' keys.
-"
-      tmp="'*(correct(|-word)|approximate):*' ${name#*_} ${(qq)val}"
-      ;;
-    correctword_*)
-      tmp="'*:correct-word' ${name#correctword_} ${(qq)val}"
-      ;;
-    expand_*)
-      cmt="# This one is a bit ugly. You may want to use only \`*:expand'
-# if you also have the \`expandword_*' keys.
-"
-      tmp="'*expand(|expand-word):*' ${name#*_} ${(qq)val}"
-      ;;
-    expandword_*)
-      tmp="'expand-word:*' ${name#expandword_} ${(qq)val}"
-      ;;
-    history_*)
-      tmp="'history-words:*' ${name#history_} ${(qq)val}"
-      ;;
-    completer)
-      tmp="'*' completer ${${(qqs.:.)val}}"
-      ;;
-    last_prompt)
-      tmp="'*' last-prompt 'yes'"
-      ;;
-    esac
-    [[ -n "$tmp" ]] && style="${style}${cmt}zstyle :completion:${tmp}
-"
-  done
-
-  eval "${style}"
-
-  print "$style" >>! ${HOME}/.zsh-styles
-}
-
 # Now we automatically make the definition files autoloaded.
 
-typeset -U _i_files
-_i_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N:t) )
-if [[ $#_i_files -lt 20 || $_compdir = */Core || -d $_compdir/Core ]]; then
-  # Too few files:  we need some more directories,
-  # or we need to check that all directories (not just Core) are present.
-  if [[ -n $_compdir ]]; then
-    _i_addfiles=()
-    if [[ $_compdir = */Core ]]; then
-      # Add all the Completion subdirectories
-      _i_addfiles=(${_compdir:h}/*(/))
-    elif [[ -d $_compdir/Core ]]; then
-      # Likewise
-      _i_addfiles=(${_compdir}/*(/))
+typeset _i_wdirs _i_wfiles
+
+_i_wdirs=()
+_i_wfiles=()
+
+if [[ -n "$_i_check" ]]; then
+  _i_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N) )
+  if [[ $#_i_files -lt 20 || $_compdir = */Core || -d $_compdir/Core ]]; then
+    # Too few files:  we need some more directories,
+    # or we need to check that all directories (not just Core) are present.
+    if [[ -n $_compdir ]]; then
+      _i_addfiles=()
+      if [[ $_compdir = */Core ]]; then
+        # Add all the Completion subdirectories
+        _i_addfiles=(${_compdir:h}/*(/))
+      elif [[ -d $_compdir/Core ]]; then
+        # Likewise
+        _i_addfiles=(${_compdir}/*(/))
+      fi
+      for _i_line in {1..$#i_addfiles}; do
+        _i_file=${_i_addfiles[$_i_line]}
+        [[ -d $_i_file && -z ${fpath[(r)$_i_file]} ]] ||
+          _i_addfiles[$_i_line]=
+      done
+      fpath=($fpath $_i_addfiles)
+      _i_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N) )
     fi
-    for _i_line in {1..$#i_addfiles}; do
-      _i_file=${_i_addfiles[$_i_line]}
-      [[ -d $_i_file && -z ${fpath[(r)$_i_file]} ]] ||
-        _i_addfiles[$_i_line]=
-    done
-    fpath=($fpath $_i_addfiles)
-    _i_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N:t) )
+  fi
+  if [[ "$_i_fail" != use ]]; then
+    typeset _i_q
+
+    _i_wdirs=( ${^fpath}(Nf:g+w:,f:o+w:,^u0u${EUID}) )
+    _i_wfiles=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N^u0u${EUID}) )
+
+    case "${#_i_wdirs}:${#_i_wfiles}" in
+    0:0) _i_q= ;;
+    0:*) _i_q=files ;;
+    *:0) _i_q=directories ;;
+    *:*) _i_q='directories and files' ;;
+    esac
+
+    if [[ -n "$_i_q" ]]; then
+      if [[ "$_i_fail" = ask ]] &&
+         ! read -q "?There are insecure $_i_q, continue [yn]? "; then
+        unfunction compinit compdef
+        unset _comp_dumpfile _comp_secure compprefuncs comppostfuncs \
+              _comps _patcomps _postpatcomps _compautos _lastcomp
+
+        return 1
+      fi
+      (( $#_i_wfiles )) && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wfiles})}"  )
+      (( $#_i_wdirs ))  && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wdirs})/*}" )
+    fi
+    _comp_secure=yes
   fi
 fi
-
-
-# Rebind the standard widgets
-for _i_line in complete-word delete-char-or-list expand-or-complete \
-  expand-or-complete-prefix list-choices menu-complete \
-  menu-expand-or-complete reverse-menu-complete; do
-  zle -C $_i_line .$_i_line _main_complete
-done
-zle -la menu-select && zle -C menu-select .menu-select _main_complete
-
-_i_done=''
 
 # Make sure compdump is available, even if we aren't going to use it.
 autoload -U compdump compinstall
 
 # If we have a dump file, load it.
 
+_i_done=''
+
 if [[ -f "$_comp_dumpfile" ]]; then
-  read -rA _i_line < "$_comp_dumpfile"
-  if [[ _i_autodump -eq 1 && $_i_line[2] -eq $#_i_files ]]; then
+  if [[ -n "$_i_check" ]]; then
+    read -rA _i_line < "$_comp_dumpfile"
+    if [[ _i_autodump -eq 1 && $_i_line[2] -eq $#_i_files ]]; then
+      builtin . "$_comp_dumpfile"
+      _i_done=yes
+    fi
+  else
     builtin . "$_comp_dumpfile"
     _i_done=yes
   fi
@@ -476,21 +395,24 @@ fi
 if [[ -z "$_i_done" ]]; then
   for _i_dir in $fpath; do
     [[ $_i_dir = . ]] && continue
+    (( $_i_wdirs[(I)$_i_dir] )) && continue
     for _i_file in $_i_dir/^([^_]*|*~|*.zwc)(N); do
+      _i_name="${_i_file:t}"
+      (( $+functions[$_i_name] + $_i_wfiles[(I)$_i_file] )) && continue
       read -rA _i_line < $_i_file
       _i_tag=$_i_line[1]
       shift _i_line
       case $_i_tag in
       (\#compdef)
 	if [[ $_i_line[1] = -[pPkK](n|) ]]; then
-	  compdef ${_i_line[1]}na "${_i_file:t}" "${(@)_i_line[2,-1]}"
+	  compdef ${_i_line[1]}na "${_i_name}" "${(@)_i_line[2,-1]}"
 	else
-	  compdef -na "${_i_file:t}" "${_i_line[@]}"
+	  compdef -na "${_i_name}" "${_i_line[@]}"
 	fi
 	;;
       (\#autoload)
-	autoload -U "$_i_line[@]" ${_i_file:t}
-	[[ "$_i_line" != \ # ]] && _compautos[${_i_file:t}]="$_i_line"
+	autoload -U "$_i_line[@]" ${_i_name}
+	[[ "$_i_line" != \ # ]] && _compautos[${_i_name}]="$_i_line"
 	;;
       esac
     done
@@ -503,5 +425,15 @@ if [[ -z "$_i_done" ]]; then
   fi
 fi
 
+# Rebind the standard widgets
+for _i_line in complete-word delete-char-or-list expand-or-complete \
+  expand-or-complete-prefix list-choices menu-complete \
+  menu-expand-or-complete reverse-menu-complete; do
+  zle -C $_i_line .$_i_line _main_complete
+done
+zle -la menu-select && zle -C menu-select .menu-select _main_complete
+
 unfunction compinit
 autoload -U compinit
+
+return 0

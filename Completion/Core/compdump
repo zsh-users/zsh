@@ -16,13 +16,20 @@
 emulate -L zsh
 setopt extendedglob
 
-typeset _d_file _d_f _d_bks _d_line _d_als
+typeset _d_file _d_f _d_bks _d_line _d_als _d_files
 
 _d_file=${_comp_dumpfile-${0:h}/compinit.dump}.$HOST.$$
 [[ $_d_file = //* ]] && _d_file=${_d_file[2,-1]}
 
-typeset -U _d_files
-_d_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N:t) )
+_d_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N) )
+
+if [[ -n "$_comp_secure" ]]; then
+  _d_wdirs=( ${^fpath}(Nf:g+w:,f:o+w:,^u0u${EUID}) )
+  _d_wfiles=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N^u0u${EUID}) )
+
+  (( $#_d_wfiles )) && _d_files=( "${(@)_d_files:#(${(j:|:)_d_wfiles})}"  )
+  (( $#_d_wdirs ))  && _d_files=( "${(@)_d_files:#(${(j:|:)_d_wdirs})/*}" )
+fi
 
 print "#files: $#_d_files" > $_d_file
 

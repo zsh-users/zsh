@@ -16,7 +16,7 @@ elif [[ "$PREFIX$SUFFIX" = [0-9]# ]]; then
   match="[[:blank:]]#${PREFIX}[0-9]#${SUFFIX}[[:blank:]]*"
 else
   all=(-U)
-  match="*[[:blank:]]*[/[:blank:]]$PREFIX*$SUFFIX*"
+  match="*[[:blank:]]*[[/[:blank:]]$PREFIX*$SUFFIX*"
   nm="$compstate[nmatches]"
 fi
 
