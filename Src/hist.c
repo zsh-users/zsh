@@ -853,6 +853,7 @@ movehistent(Histent he, int n, int xflags)
 	if (!(he->flags & xflags))
 	    n--;
     }
+    checkcurline(he);
     return he;
 }
 
@@ -880,27 +881,26 @@ gethistent(int ev, int nearmatch)
 	return NULL;
 
     if (ev - hist_ring->down->histnum < hist_ring->histnum - ev) {
-	for (he = hist_ring->down; he->histnum <= ev; he = he->down) {
-	    if (he->histnum == ev)
-		return he;
+	for (he = hist_ring->down; he->histnum < ev; he = he->down) ;
+	if (nearmatch == 0) {
+	    if (he->histnum != ev)
+		return NULL;
 	}
-	if (nearmatch < 0)
-	    return up_histent(he);
-	if (nearmatch > 0)
-	    return he;
+	else if (nearmatch < 0 && (he = up_histent(he)) == NULL)
+	    return NULL;
     }
     else {
-	for (he = hist_ring; he->histnum >= ev; he = he->up) {
-	    if (he->histnum == ev)
-		return he;
+	for (he = hist_ring; he->histnum > ev; he = he->up) ;
+	if (nearmatch == 0) {
+	    if (he->histnum != ev)
+		return NULL;
 	}
-	if (nearmatch < 0)
-	    return he;
-	if (nearmatch > 0)
-	    return down_histent(he);
+	else if (nearmatch > 0 && (he = down_histent(he)) == NULL)
+	    return NULL;
     }
 
-    return NULL;
+    checkcurline(he);
+    return he;
 }
 
 /**/
@@ -1452,22 +1452,21 @@ convamps(char *out, char *in, int inlen)
 }
 
 /**/
-mod_export Histent
-quietgethistent(int ev, int nearmatch)
+mod_export void
+checkcurline(Histent he)
 {
-    if (ev == curhist && (histactive & HA_ACTIVE)) {
+    if (he->histnum == curhist && (histactive & HA_ACTIVE)) {
 	curline.text = chline;
 	curline.nwords = chwordpos/2;
 	curline.words = chwords;
     }
-    return gethistent(ev, nearmatch);
 }
 
 /**/
 mod_export Histent
 quietgethist(int ev)
 {
-    return quietgethistent(ev, GETHIST_EXACT);
+    return gethistent(ev, GETHIST_EXACT);
 }
 
 /**/

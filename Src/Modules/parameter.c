@@ -1059,7 +1059,7 @@ scanpmhistory(HashTable ht, ScanFunc func, int flags)
 {
     struct param pm;
     int i = addhistnum(curhist, -1, HIST_FOREIGN);
-    Histent he = quietgethistent(i, GETHIST_UPWARD);
+    Histent he = gethistent(i, GETHIST_UPWARD);
     char buf[40];
 
     pm.flags = PM_SCALAR | PM_READONLY;
@@ -1096,7 +1096,7 @@ histwgetfn(Param pm)
     LinkList l = newlinklist(), ll;
     LinkNode n;
     int i = addhistnum(curhist, -1, HIST_FOREIGN), iw;
-    Histent he = quietgethistent(i, GETHIST_UPWARD);
+    Histent he = gethistent(i, GETHIST_UPWARD);
 
     ll = bufferwords(NULL, NULL, NULL);
     for (n = firstnode(ll); n; incnode(n))

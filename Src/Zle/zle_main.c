@@ -641,8 +641,11 @@ execzlefunc(Thingy func, char **args)
 	if(!(wflags & ZLE_LASTCOL))
 	    lastcol = -1;
 	if (wflags & WIDGET_NCOMP) {
+	  int atcurhist = histline == curhist;
 	    compwidget = w;
 	    ret = completecall(args);
+	    if (atcurhist)
+		histline = curhist;
 	} else
 	    ret = w->u.fn(args);
 	if (!(wflags & ZLE_NOTCOMMAND))

@@ -3688,7 +3688,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	Patprog pprogc = NULL;
 	char *e, *h, hpatsav;
 	int i = addhistnum(curhist,-1,HIST_FOREIGN), n = cc->hnum;
-	Histent he = quietgethistent(i, GETHIST_UPWARD);
+	Histent he = gethistent(i, GETHIST_UPWARD);
 
 	/* Parse the pattern, if it isn't the null string. */
 	if (*(cc->hpat)) {

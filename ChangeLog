@@ -1,5 +1,10 @@
 2000-05-29  Bart Schaefer  <schaefer@zsh.org>
 
+	* Wayne Davison: 11641: Src/hist.c, Src/Modules/parameter.c,
+	Src/Zle/compctl.c, Src/Zle/zle_main.c: Make sure `curline' has
+	sane values at more points during history manipulation, so that
+	"print -s" from a ZLE widget doesn't cause confusion.
+
 	* unposted: Completion/Core/_path_files: Add a comment to explain
 	the change made in 11635.
 
