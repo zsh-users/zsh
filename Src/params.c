@@ -134,8 +134,8 @@ special_params[] ={
 #define SFN(X) BR(((void (*)_((Param, char *)))(X)))
 #define GFN(X) BR(((char *(*)_((Param)))(X)))
 #define IPDEF1(A,B,C,D) {NULL,A,PM_INTEGER|PM_SPECIAL|D,BR(NULL),SFN(C),GFN(B),stdunsetfn,10,NULL,NULL,NULL,0}
-IPDEF1("#", poundgetfn, nullsetfn, PM_READONLY),
-IPDEF1("ERRNO", errnogetfn, nullsetfn, PM_READONLY),
+IPDEF1("#", poundgetfn, nullintsetfn, PM_READONLY),
+IPDEF1("ERRNO", errnogetfn, nullintsetfn, PM_READONLY),
 IPDEF1("GID", gidgetfn, gidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("EGID", egidgetfn, egidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("HISTSIZE", histsizegetfn, histsizesetfn, PM_RESTRICTED),
@@ -143,17 +143,17 @@ IPDEF1("RANDOM", randomgetfn, randomsetfn, 0),
 IPDEF1("SECONDS", secondsgetfn, secondssetfn, 0),
 IPDEF1("UID", uidgetfn, uidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("EUID", euidgetfn, euidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
-IPDEF1("TTYIDLE", ttyidlegetfn, nullsetfn, PM_READONLY),
+IPDEF1("TTYIDLE", ttyidlegetfn, nullintsetfn, PM_READONLY),
 
 #define IPDEF2(A,B,C,D) {NULL,A,PM_SCALAR|PM_SPECIAL|D,BR(NULL),SFN(C),GFN(B),stdunsetfn,0,NULL,NULL,NULL,0}
 IPDEF2("USERNAME", usernamegetfn, usernamesetfn, PM_DONTIMPORT|PM_RESTRICTED),
-IPDEF2("-", dashgetfn, nullsetfn, PM_READONLY),
+IPDEF2("-", dashgetfn, nullstrsetfn, PM_READONLY),
 IPDEF2("histchars", histcharsgetfn, histcharssetfn, PM_DONTIMPORT),
 IPDEF2("HOME", homegetfn, homesetfn, 0),
 IPDEF2("TERM", termgetfn, termsetfn, 0),
 IPDEF2("WORDCHARS", wordcharsgetfn, wordcharssetfn, 0),
 IPDEF2("IFS", ifsgetfn, ifssetfn, PM_DONTIMPORT),
-IPDEF2("_", underscoregetfn, nullsetfn, PM_READONLY),
+IPDEF2("_", underscoregetfn, nullstrsetfn, PM_READONLY),
 
 #ifdef USE_LOCALE
 # define LCIPDEF(name) IPDEF2(name, strgetfn, lcsetfn, PM_UNSET)
@@ -176,7 +176,7 @@ LCIPDEF("LC_TIME"),
 # endif
 #endif /* USE_LOCALE */
 
-#define IPDEF4(A,B) {NULL,A,PM_INTEGER|PM_READONLY|PM_SPECIAL,BR((void *)B),SFN(nullsetfn),GFN(intvargetfn),stdunsetfn,10,NULL,NULL,NULL,0}
+#define IPDEF4(A,B) {NULL,A,PM_INTEGER|PM_READONLY|PM_SPECIAL,BR((void *)B),SFN(nullintsetfn),GFN(intvargetfn),stdunsetfn,10,NULL,NULL,NULL,0}
 IPDEF4("!", &lastpid),
 IPDEF4("$", &mypid),
 IPDEF4("?", &lastval),
@@ -224,7 +224,7 @@ IPDEF9("@", &pparams, NULL),
 
 /* The following parameters are not avaible in sh/ksh compatibility *
  * mode. All of these has sh compatible equivalents.                */
-IPDEF1("ARGC", poundgetfn, nullsetfn, PM_READONLY),
+IPDEF1("ARGC", poundgetfn, nullintsetfn, PM_READONLY),
 IPDEF2("HISTCHARS", histcharsgetfn, histcharssetfn, PM_DONTIMPORT),
 IPDEF4("status", &lastval),
 IPDEF7("prompt", &prompt),
@@ -266,7 +266,10 @@ mod_export HashTable paramtab, realparamtab;
 mod_export HashTable
 newparamtable(int size, char const *name)
 {
-    HashTable ht = newhashtable(size, name, NULL);
+    HashTable ht;
+    if (!size)
+	size = 17;
+    ht = newhashtable(size, name, NULL);
 
     ht->hash        = hasher;
     ht->emptytable  = emptyhashtable;
@@ -2189,15 +2192,24 @@ arrhashsetfn(Param pm, char **val)
     free(val);		/* not freearray() */
 }
 
-/* This function is used as the set function for      *
- * special parameters that cannot be set by the user. */
+/*
+ * These functions are used as the set function for special parameters that
+ * cannot be set by the user.  The set is incomplete as the only such
+ * parameters are scalar and integer.
+ */
 
 /**/
 void
-nullsetfn(Param pm, char *x)
+nullstrsetfn(Param pm, char *x)
 {
     zsfree(x);
 }
+
+/**/
+void
+nullintsetfn(Param pm, zlong x)
+{}
+
 
 /* Function to get value of generic special integer *
  * parameter.  data is pointer to global variable   *
