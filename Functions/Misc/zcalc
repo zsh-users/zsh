@@ -135,10 +135,13 @@ while vared -cehp "${(%)ZCALCPROMPT}" line; do
     # Latest value is stored as a string, because it might be floating
     # point or integer --- we don't know till after the evaluation, and
     # arrays always store scalars anyway.
-    eval "latest=\$(( $base $line ))"
+    # 
+    # Since it's a string, we'd better make sure we know which
+    # base it's in, so don't change that until we actually print it.
+    eval "latest=\$(( $line ))"
     argv[num++]=$latest
     psvar[1]=$num
-    print -- $latest
+    print -- $(( $base $latest ))
   fi
   line=
 done

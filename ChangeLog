@@ -1,3 +1,8 @@
+2001-08-16  Peter Stephenson  <pws@csr.com>
+
+	* 15647: Functions/Misc/zcalc:  with output not showing the
+	base (e.g. [##16]) reuse of previous values didn't work.
+
 2001-08-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15639: Src/text.c: fix bug for output of unquoted here-docs and
