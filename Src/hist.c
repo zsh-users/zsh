@@ -1435,14 +1435,21 @@ convamps(char *out, char *in, int inlen)
 
 /**/
 Histent
-quietgethist(int ev)
+quietgethistent(int ev, int nearmatch)
 {
     if (ev == curhist && (histactive & HA_ACTIVE)) {
 	curline.text = chline;
 	curline.nwords = chwordpos/2;
 	curline.words = chwords;
     }
-    return gethistent(ev, GETHIST_EXACT);
+    return gethistent(ev, nearmatch);
+}
+
+/**/
+Histent
+quietgethist(int ev)
+{
+    return quietgethistent(ev, GETHIST_EXACT);
 }
 
 /**/

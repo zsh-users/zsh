@@ -6717,8 +6717,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	/* We have a pattern to take things from the history. */
 	Patprog pprogc = NULL;
 	char *e, *h, hpatsav;
-	Histent he;
 	int i = addhistnum(curhist,-1,HIST_FOREIGN), n = cc->hnum;
+	Histent he = quietgethistent(i, GETHIST_UPWARD);
 
 	/* Parse the pattern, if it isn't the null string. */
 	if (*(cc->hpat)) {
@@ -6732,7 +6732,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    n = -1;
 
 	/* Now search the history. */
-	while (n-- && (he = quietgethist(i--))) {
+	while (n-- && he) {
 	    int iwords;
 	    for (iwords = 0; iwords < he->nwords; iwords++) {
 		h = he->text + he->words[iwords*2];
@@ -6748,6 +6748,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		if (hpatsav)
 		    *e = hpatsav;
 	    }
+	    he = up_histent(he);
 	}
     }
     if ((t = cc->mask & (CC_ARRAYS | CC_INTVARS | CC_ENVVARS | CC_SCALARS |
