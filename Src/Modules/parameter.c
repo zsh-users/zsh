@@ -230,7 +230,7 @@ setpmcommands(Param pm, HashTable ht)
 	    struct value v;
 
 	    v.isarr = v.inv = v.start = 0;
-	    v.len = -1;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
@@ -401,7 +401,7 @@ setfunctions(Param pm, HashTable ht, int dis)
 	    struct value v;
 
 	    v.isarr = v.inv = v.start = 0;
-	    v.len = -1;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
@@ -755,7 +755,7 @@ setpmoptions(Param pm, HashTable ht)
 	    char *val;
 
 	    v.isarr = v.inv = v.start = 0;
-	    v.len = -1;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
@@ -1434,7 +1434,7 @@ setpmnameddirs(Param pm, HashTable ht)
 	    char *val;
 
 	    v.isarr = v.inv = v.start = 0;
-	    v.len = -1;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
@@ -1660,7 +1660,7 @@ setaliases(Param pm, HashTable ht, int global, int dis)
 	    char *val;
 
 	    v.isarr = v.inv = v.start = 0;
-	    v.len = -1;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 

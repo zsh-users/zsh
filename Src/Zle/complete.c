@@ -1034,7 +1034,7 @@ set_compstate(Param pm, HashTable ht)
 		 pp = compkpms; cp->name; cp++, pp++)
 		if (!strcmp(hn->nam, cp->name)) {
 		    v.isarr = v.inv = v.start = 0;
-		    v.len = -1;
+		    v.end = -1;
 		    v.arr = NULL;
 		    v.pm = (Param) hn;
 		    if (cp->type == PM_INTEGER)

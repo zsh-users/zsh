@@ -203,7 +203,7 @@ setpmmapfiles(Param pm, HashTable ht)
 		struct value v;
 
 		v.isarr = v.inv = v.start = 0;
-		v.len = -1;
+		v.end = -1;
 		v.arr = NULL;
 		v.pm = (Param) hn;
 

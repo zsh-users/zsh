@@ -1138,7 +1138,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    v = (Value) hcalloc(sizeof *v);
 	    v->isarr = isarr;
 	    v->pm = pm;
-	    v->len = -1;
+	    v->end = -1;
 	    if (getindex(&s, v) || s == os)
 		break;
 	}
