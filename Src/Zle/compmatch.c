@@ -442,7 +442,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 {
     int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw;
     int il = 0, iw = 0, t, ind, add, he = 0, bpc, obc = bc, bslash;
-    VARARR(unsigned char, ea, ll + 1);
+    VARARR(unsigned char, ea, (ll > lw ? ll : lw) + 1);
     char *ow;
     Cmlist ms;
     Cmatcher mp, lm = NULL;

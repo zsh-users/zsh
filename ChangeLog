@@ -1,3 +1,7 @@
+2000-07-19  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12314: Src/Zle/compmatch.c: a bit of security for a VARARR()
+	
 2000-07-19  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 12313: Doc/Zsh/metafaq.yo: bad phrasing corrected.
