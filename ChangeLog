@@ -1,3 +1,8 @@
+2001-09-19  Peter Stephenson  <pws@csr.com>
+
+	* 15846: aczsh.m4: attempt to restore LDFLAGS from non-existent
+	saved value when testing RTLD_GLOBAL.
+
 2001-09-18  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 15837: Src/Zle/zle_hist.c: Fixed incremental search in vared
