@@ -88,7 +88,11 @@ if [[ "$state" = map* ]]; then
   local expl
 
   _description expl 'map name'
-  compadd "$expl[@]" - "$_yp_cache_maps[@]" && ret=0
+
+  # The `-M ...' allows `pa.n<TAB>' to complete to `passwd.byname'.
+
+  compadd "$expl[@]" -M 'l:.|by=by l:.|=by r:|.=* r:|=*' - \
+          "$_yp_cache_maps[@]" && ret=0
   if [[ $+options[-t] -eq 0 && "$state" != maponly ]]; then
     _description expl 'nicknames'
     compadd "$expl[@]" - "$_yp_cache_nicks[@]" && ret=0

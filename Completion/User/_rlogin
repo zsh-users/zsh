@@ -1,4 +1,4 @@
-#compdef rlogin rsh ssh
+#compdef rlogin rsh
 
 local expl
 
