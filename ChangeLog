@@ -1,3 +1,8 @@
+2001-03-28  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Commands/_complete_tag: mysterious extra
+	blank line somehow crept in at critical point.
+
 2001-03-28  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13809: Completion/Base/_arguments: don't add options as
