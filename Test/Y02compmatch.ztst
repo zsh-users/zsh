@@ -11,28 +11,30 @@
 # contains the compadd output.
 
 %prep
-  . $ZTST_srcdir/comptest
-
-  mkdir match.tmp
-  cd match.tmp
-
-  comptestinit -z $ZTST_testdir/../Src/zsh &&
-  {
-    list1=(IndianRed IndianRed2 IndianRed3 IndianRed4)
-    test_code () {
-	matcher=$1;
-	list=$2;
-	code="compdef _tst tst ; _tst () { echo -n '<COMPADD>';compadd -M '"
-	code="$code$matcher"
-	code="$code'  - ${(P)list} ; echo  -n '</COMPADD>'"
-        code="$code; $extra_cmd"
-        code="$code; echo -n '<INSERT_POSITIONS>'"
-        code="$code; echo \$compstate[insert_positions]"
-        code="$code; echo -n '</INSERT_POSITIONS>'"
-        code="$code}"
-	comptesteval "$code"
+  if ( zmodload -i zsh/zpty ) >/dev/null 2>&1; then
+    . $ZTST_srcdir/comptest
+    mkdir match.tmp
+    cd match.tmp
+    comptestinit -z $ZTST_testdir/../Src/zsh &&
+    {
+      list1=(IndianRed IndianRed2 IndianRed3 IndianRed4)
+      test_code () {
+    	matcher=$1;
+    	list=$2;
+    	code="compdef _tst tst ; _tst () { echo -n '<COMPADD>';compadd -M '"
+    	code="$code$matcher"
+    	code="$code'  - ${(P)list} ; echo  -n '</COMPADD>'"
+          code="$code; $extra_cmd"
+          code="$code; echo -n '<INSERT_POSITIONS>'"
+          code="$code; echo \$compstate[insert_positions]"
+          code="$code; echo -n '</INSERT_POSITIONS>'"
+          code="$code}"
+    	comptesteval "$code"
+      }
     }
-  }
+  else
+    ZTST_unimplemented="the zsh/zpty module is not available"
+  fi
 
 
 %test

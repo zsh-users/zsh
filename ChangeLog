@@ -1,3 +1,9 @@
+2004-03-11  Peter Stephenson  <pws@csr.com>
+
+	* 19603: Test/Y01completion.ztst, Test/Y02compmatch.ztst,
+	Test/Y03arguments.ztst: Gracefully omit tests if zsh/zpty is
+	not available.
+
 2004-03-11  Clint Adams  <clint@zsh.org>
 
 	* 19600: Completion/Unix/Command/_tla: rudimentary completion

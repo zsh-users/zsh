@@ -1,18 +1,20 @@
 # Tests for completion system.
 
 %prep
-  . $ZTST_srcdir/comptest
-
-  mkdir comp.tmp
-  cd comp.tmp
-
-  comptestinit -z $ZTST_testdir/../Src/zsh &&
-  {
-    mkdir dir1 &&
-    mkdir dir2 &&
-    touch file1 &&
-    touch file2
-  }
+  if ( zmodload -i zsh/zpty ) >/dev/null 2>&1; then
+    . $ZTST_srcdir/comptest
+    mkdir comp.tmp
+    cd comp.tmp
+    comptestinit -z $ZTST_testdir/../Src/zsh &&
+    {
+      mkdir dir1 &&
+      mkdir dir2 &&
+      touch file1 &&
+      touch file2
+    }
+  else
+    ZTST_unimplemented="the zsh/zpty module is not available"
+  fi
 
 %test
 
