@@ -725,11 +725,7 @@ checkmailpath(char **s)
 	if (**s == 0) {
 	    *v = c;
 	    zerr("empty MAILPATH component: %s", *s, 0);
-#ifndef MAILDIR_SUPPORT
-	} else if (stat(unmeta(*s), &st) == -1) {
-#else
 	} else if (mailstat(unmeta(*s), &st) == -1) {
-#endif
 	    if (errno != ENOENT)
 		zerr("%e: %s", *s, errno);
 	} else if (S_ISDIR(st.st_mode)) {

@@ -1,5 +1,8 @@
 2000-09-17  Clint Adams  <schizo@debian.org>
 
+	* unposted: Src/system.h, Src/utils.c: define mailstat()
+	as a macro if MAILDIR_SUPPORT is undefined.
+
 	* 12823: Src/builtin.c, Src/utils.c: use zsh heap instead of
 	permanent heap.
 

@@ -673,3 +673,7 @@ extern short ospeed;
 #if defined(CONFIG_LOCALE) && defined(HAVE_SETLOCALE) && defined(LC_ALL)
 # define USE_LOCALE 1
 #endif /* CONFIG_LOCALE && HAVE_SETLOCALE && LC_ALL */
+
+#ifndef MAILDIR_SUPPORT
+#define mailstat(X,Y) stat(X,Y)
+#endif
