@@ -1,3 +1,9 @@
+2000-06-23  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12044: Src/builtin.c:  read -A assigned an unnecessary null
+	if there was trailing whitespace; careful of distinction between
+	whitespace and non-whitespace field separators.
+
 2000-06-23  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12041,12043 : Completion/Core/compinit: even more compinit stuff,

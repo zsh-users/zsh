@@ -3553,6 +3553,15 @@ bin_read(char *name, char **args, char *ops, int func)
 	    }
 	    if (c == EOF || c == '\n')
 		break;
+	    /*
+	     * `first' is non-zero if any separator we encounter is a
+	     * non-whitespace separator, which means that anything
+	     * (even an empty string) between, before or after separators
+	     * is significant.  If it is zero, we have a whitespace
+	     * separator, which shouldn't cause extra empty strings to
+	     * be emitted.  Hence the test for (*buf || first) when
+	     * we assign the result of reading a word.
+	     */
 	    if (!bslash && isep(c)) {
 		if (bptr != buf || (!iwsep(c) && first)) {
 		    first |= !iwsep(c);
@@ -3587,7 +3596,7 @@ bin_read(char *name, char **args, char *ops, int func)
 	    zputs(buf, stdout);
 	    putchar('\n');
 	}
-	if (!ops['e']) {
+	if (!ops['e'] && (*buf || first)) {
 	    if (ops['A']) {
 		addlinknode(readll, buf);
 		al++;
