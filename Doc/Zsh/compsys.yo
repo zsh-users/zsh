@@ -546,7 +546,7 @@ item(tt(other-accounts))(
 used to look up the tt(users-hosts) style
 )
 item(tt(packages))(
-for packages (e.g. tt(rpm) packages)
+for packages (e.g. tt(rpm) or installed tt(Debian) packages)
 )
 item(tt(parameters))(
 for names of parameters
@@ -1108,6 +1108,15 @@ tt(only), it will try to generate matches without inserting a
 it will first try to generate matches without inserting the `tt(*)'
 and if that yields no matches, it will try again with the `tt(*)'
 inserted.
+)
+item(tt(packageset))(
+A style containing an override for the default package set
+for that context.  For example,
+
+example(zstyle :completion:complete::dpkg::--status-1 packageset avail)
+
+will cause available packages, rather than only installed packages,
+to be completed for `dpkg --status'.
 )
 item(tt(path))(
 This is used together with the the tt(urls) tag by completion

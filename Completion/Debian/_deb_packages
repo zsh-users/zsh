@@ -32,16 +32,24 @@ _deb_packages_updage_uninstalled () {
 }
 
 _deb_packages () {
-  local command="$argv[$#]" expl cachevar
+  local command="$argv[$#]" expl cachevar pkgset
 
   [[ "$command" = (installed|uninstalled|avail) ]] || {
     _message "_deb_packages:unknown command: $command"
     return
   }
 
+  zstyle -s ":completion${curcontext}" packageset pkgset
+
+  [[ "$pkgset" = (installed|uninstalled|avail|available) ]] || {
+    pkgset="$command"
+  }
+
+  [[ "$pkgset" = "available" ]] && pkgset="avail"
+
   expl=("${(@)argv[1,-2]}")
 
-  _deb_packages_updage_$command
+  _deb_packages_updage_$pkgset
 
   _tags packages && compadd "$expl[@]" - "${(e):-"\${(@)$cachevar}"}"
 }
