@@ -3,6 +3,9 @@
 # Main widget.
 
 _next_tags() {
+  setopt localoptions nullglob rcexpandparam extendedglob
+  unsetopt markdirs globsubst shwordsplit nounset ksharrays
+
   local ins ops="$PREFIX$SUFFIX"
 
   unfunction _all_labels _next_label

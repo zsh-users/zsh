@@ -1,3 +1,9 @@
+2000-06-07  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11789: Completion/Commands/_correct_word,
+ 	Completion/Commands/_expand_word, Completion/Commands/_next_tags:
+ 	setup options in bindable commands
+	
 2000-06-06  Oliver Kiddle  <opk@zsh.org>
 
 	* 11772: Completion/User/_urls: improvements to 11756 suggested by

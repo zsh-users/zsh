@@ -3,10 +3,19 @@
 # Simple completion front-end implementing spelling correction.
 # The maximum number of errors is set quite high, and
 # the numeric prefix can be used to specify a different value.
+#
+# If configurations keys with the prefix `correctword_' are
+# given they override those starting with `correct_'.
 
-local oca="$compconfig[correct_accept]"
-compconfig[correct_accept]=6n
+setopt localoptions nullglob rcexpandparam extendedglob
+unsetopt markdirs globsubst shwordsplit nounset ksharrays
+
+local curcontext="$curcontext"
+
+if [[ -z "$curcontext" ]]; then
+  curcontext="correct-word:::"
+else
+  curcontext="correct-word:${curcontext#*:}"
+fi
 
 _main_complete _correct
-
-compconfig[correct_accept]=$oca

@@ -2,6 +2,9 @@
 
 # Simple completion front-end implementing expansion.
 
+setopt localoptions nullglob rcexpandparam extendedglob
+unsetopt markdirs globsubst shwordsplit nounset ksharrays
+
 local curcontext="$curcontext"
 
 if [[ -z "$curcontext" ]]; then
