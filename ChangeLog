@@ -1,3 +1,10 @@
+2001-07-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 15266: Src/glob.c, Doc/Zsh/expn.yo: ${(S)...%%...} matches
+	were wrong; try desperately to explain that in ${(SI:...:)...%%...}
+	and ${(SI:...:)...%...} indices count matches finishing
+	progressively earlier in the string.
+
 2001-07-05  Peter Stephenson  <pws@csr.com>
 
 	* 15264: Doc/Zsh/grammar.yo: improve description of use of
