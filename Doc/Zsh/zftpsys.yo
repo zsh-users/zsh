@@ -657,6 +657,6 @@ subsect(Completion)
 Completion of local and remote files, directories, sessions and bookmarks
 is supported.  The older, tt(compctl)-style completion is defined when
 tt(zfinit) is called; support for the new widget-based completion system is
-provided in the function tt(Completion/Builtins/_zftp), which should be
+provided in the function tt(Completion/Zsh/Command/_zftp), which should be
 installed with the other functions of the completion system and hence
 should automatically be available.

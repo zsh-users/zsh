@@ -1,0 +1,70 @@
+#
+# zed
+#
+# No other shell could do this.
+# Edit small files with the command line editor.
+# Use ^X^W to save, ^C to abort.
+# Option -f: edit shell functions.  (Also if called as fned.)
+#
+# Completion: use
+# compctl -f -x 'w[1,-f]' -F -- zed
+#
+
+local var fun cleanup
+# We do not want timeout while we are editing a file
+integer TMOUT=0
+
+[[ $1 = -f || $0 = fned ]] && fun=1
+[[ $1 = -(|-|f) ]] && shift
+
+[[ -z "$1" ]] && echo 'Usage: "zed filename" or "zed -f function"' && return 1
+
+local curcontext=zed:::
+
+zstyle -m ":completion:zed:*" insert-tab '*' ||
+    zstyle ":completion:zed:*" insert-tab yes
+
+# catch interrupts
+cleanup="$(bindkey -L "^M"; bindkey -L -M emacs "^X^W"; bindkey -aL "ZZ"
+    echo "trap - INT EXIT"; trap)"
+trap "return 130" INT
+trap "$cleanup" EXIT
+
+# don't mangle !'s
+setopt localoptions nobanghist
+
+bindkey "^M" self-insert-unmeta
+# Depending on your stty's, you may be able to use ^J as accept-line, else:
+bindkey -M emacs "^X^W" accept-line
+bindkey -a "ZZ" accept-line
+
+if ((fun)) then
+  var="$(functions $1)"
+  # If function is undefined but autoloadable, load it
+  if [[ $var = *\#\ undefined* ]] then
+    local dir
+    for dir in $fpath; do
+      if [[ -f $dir/$1 ]] then
+	var="$1() {
+$(<$dir/$1)
+}"
+	break
+      fi
+    done
+  elif [[ -z $var ]] then
+    var="$1() {
+}"
+  fi
+  vared var && eval "$cleanup ;" function "$var"
+else
+  [[ -f $1 ]] && var="$(<$1)"
+  while vared var
+  do
+    (print -r -- "$var" >| $1) && break
+    echo -n -e '\a'
+  done
+fi
+
+return 0
+
+# End of zed

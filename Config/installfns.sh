@@ -14,8 +14,16 @@ allfuncs="`cd $sdir_top; echo ${allfuncs}`"
 for file in $allfuncs; do
   if test -f $sdir_top/$file; then
     if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
-      subdir="`echo $file | sed -e 's%/[^/]*$%%' -e 's%^Functions/%%'`"
-      instdir="$fndir/$subdir"
+      case "$file" in
+      Completion/*)
+        subdir="`echo $file | sed -e 's%/[^/]*/[^/]*$%%'`"
+        instdir="$fndir/$subdir"
+        ;;
+      *)
+        subdir="`echo $file | sed -e 's%/[^/]*$%%' -e 's%^Functions/%%'`"
+        instdir="$fndir/$subdir"
+        ;;
+      esac
     else
       instdir="$fndir"
     fi

@@ -1,9 +1,9 @@
 DISTFILES_SRC='
 .distfiles
-_autoload    _disable     _kill        _sched       _typeset     _zftp
-_bindkey     _echotc      _mere        _set         _unhash      _zle
-_builtin     _emulate     _precommand  _setopt      _unsetopt    _zmodload
-_cd          _enable      _print       _source      _wait        _zpty
-_command     _fc          _prompt      _stat        _which       _zstyle
-_compdef     _hash        _read        _trap        _zcompile    _zed
+_autoload    _disable     _kill        _sched       _typeset     _zed
+_bindkey     _echotc      _mere        _set         _unhash      _zftp
+_builtin     _emulate     _precommand  _setopt      _unsetopt    _zle
+_cd          _enable      _print       _source      _wait        _zmodload
+_command     _fc          _prompt      _stat        _which       _zpty
+_compdef     _hash        _read        _trap        _zcompile    _zstyle
 '

@@ -63,7 +63,8 @@ fi
 [[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_testdir/$ZTST_srcdir"
 
 # Set the function autoload paths to correspond to this build of zsh.
-fpath=( $ZTST_srcdir/../(Completion|Functions)/*~*/CVS(/) )
+fpath=( $ZTST_srcdir/../Functions/*~*/CVS(/)
+        $ZTST_srcdir/../Completion/*/*~*/CVS(/) )
 
 : ${TMPPREFIX:=/tmp/zsh}
 # Temporary files for redirection inside tests.

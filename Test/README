@@ -1,0 +1,13 @@
+There are now different sections, expressed by the first letter in the
+scripts names:
+
+ A: basic command parsing and execution
+ B: builtins
+ C: shell commands with special syntax
+ D: substititution
+ E: options
+ V: modules
+ W: builtin interactive commands and constructs
+ X: line editing
+ Y: completion
+ Z: separate systems and user contributions

@@ -43,7 +43,7 @@ fpath=( $* )
 (( $+_compdir )) || {
   local _compdir=${fpath[(r)*/$ZSH_VERSION/*]}
   [[ -z $_compdir ]] && _compdir=$fpath[1]
-  [[ -d $_compdir/../Core ]] && _compdir=${_compdir:h}
+  ### [[ -d $_compdir/../Base ]] && _compdir=${_compdir:h}
 }
 
 _i_wdirs=()
@@ -51,14 +51,14 @@ _i_wfiles=()
 
 _i_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N) )
 if [[ -n $_compdir ]]; then
-  if [[ $#_i_files -lt 20 || $_compdir = */Core || -d $_compdir/Core ]]; then
+  if [[ $#_i_files -lt 20 || $_compdir = */Base || -d $_compdir/Base ]]; then
     # Too few files: we need some more directories, or we need to check
-    # that all directories (not just Core) are present.
+    # that all directories (not just Base) are present.
     _i_addfiles=()
-    if [[ $_compdir = */Core ]]; then
+    if [[ $_compdir = */Base ]]; then
       # Add all the Completion subdirectories
       _i_addfiles=(${_compdir:h}/*(/))
-    elif [[ -d $_compdir/Core ]]; then
+    elif [[ -d $_compdir/Base ]]; then
       # Likewise
       _i_addfiles=(${_compdir}/*(/))
     fi

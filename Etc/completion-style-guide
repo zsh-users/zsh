@@ -401,13 +401,13 @@ Misc. remarks
     completely different modes), it should allow users to define
     functions that separately override the behavior for these
     different types. This can easily be achieved by using the
-    `_funcall' utility function, as in:
+    `_call_function' utility function, as in:
 
-      _funcall ret _command_$subcommand && return ret
+      _call_function ret _command_$subcommand && return ret
 
     This will try to call the function `_command_$subcommand' and if
     it exists, it will be called and the completion function exits
-    with its exit status. After this call to `funcall' the completion
-    function would contain the code for the default way to generate
-    the matches.
+    with its exit status. After this call to `call_function' the
+    completion function would contain the code for the default way to
+    generate the matches.
     See the `_rpm' and `_nslookup' files for examples.

@@ -293,11 +293,11 @@ to install them.  For other modules, the functions will be installed if and
 only if the module itself is installed.  This will usually be what you
 want; in particular, the zsh/complete and zsh/zftp modules are of much less
 use without the associated functions.  The functions listed with zsh/zle
-are optional. however.
+are optional, however.
 
 You can also use the configure option --enable-function-subdirs to allow
 shell functions to be installed into subdirectories of the function
-directory, i.e. `Core/*' files will be installed into `FNDIR/Core', and so
+directory, i.e. `Base/*' files will be installed into `FNDIR/Base, and so
 on. This also initialises $fpath/$FPATH appropriately.
 
 The option --enable-site-fndir controls whether to create and initialise

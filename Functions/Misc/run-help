@@ -1,0 +1,88 @@
+#!/usr/local/bin/zsh
+#
+# Figure out where to get the best help, and get it.
+#
+# Install this function by placing it in your FPATH and then
+# adding to your .zshrc the lines:
+#	unalias run-help
+#	autoload run-help
+#
+
+emulate -R zsh
+setopt localoptions
+
+[[ $1 == "." ]] && 1="dot"
+[[ $1 == ":" ]] && 1="colon"
+
+# Check whether Util/helpfiles has been used to generate zsh help
+if [[ $# == 0 || $1 == "-l" ]]
+then
+    if [[ -n "${HELPDIR:-}" && -d $HELPDIR ]]
+    then
+	echo "Here is a list of topics for which special help is available:"
+	echo ""
+	print -rc $HELPDIR/*(:t)
+    else
+	echo "There is no list of special help topics available at this time."
+    fi
+    return 0
+elif [[ -n "${HELPDIR:-}" && -r $HELPDIR/$1 && $1 != compctl ]]
+then
+    ${=PAGER:-more} $HELPDIR/$1
+    return $?
+fi
+
+# No zsh help; use "whence" to figure out where else we might look
+local what places newline='
+'
+integer i=0 didman=0
+
+places=( "${(@f)$(builtin whence -va $1)}" )
+
+while ((i++ < $#places))
+do
+    what=$places[$i]
+    builtin print -r $what
+    case $what in
+    (*( is an alias)*)
+	[[ ${what[(w)6]:t} != ${what[(w)1]} ]] && run-help ${what[(w)6]:t}
+	;;
+    (*( is a * function))
+	case ${what[(w)1]} in
+	(comp*) man zshcompsys;;
+	(zf*) man zshftpsys;;
+	(*) builtin functions ${what[(w)1]} | ${=PAGER:-more};;
+	esac;;
+    (*( is a * builtin))
+	case ${what[(w)1]} in
+	(compctl) man zshcompctl;;
+	(comp*) man zshcompwid;;
+	(bindkey|vared|zle) man zshzle;;
+	(*setopt) man zshoptions;;
+	(cap|getcap|setcap) ;&
+	(clone) ;&
+	(ln|mkdir|mv|rm|rmdir|sync) ;&
+	(sched) ;&
+	(stat) man zshmodules;;
+	(zftp) man zshftpsys;;
+	(*) man zshbuiltins;;
+	esac
+	;;
+    (*( is hashed to *))
+	man ${what[(w)-1]:t}
+	;;
+    (*( is a reserved word))
+	man zshmisc
+	;;
+    (*)
+	((! didman++)) && man $@
+	;;
+    esac
+    if ((i < $#places && ! didman))
+    then
+	builtin print -nP "%SPress any key for more help or q to quit%s"
+	builtin read -k what
+	[[ $what != $newline ]] && echo
+	[[ $what == [qQ] ]] && break
+    fi
+done

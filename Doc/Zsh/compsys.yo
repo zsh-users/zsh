@@ -143,8 +143,8 @@ For incomplete installations, if tt(compinit) does not find enough files
 beginning with an underscore (fewer than twenty) in the search path, it
 will try to find more by adding the directory tt(_compdir) to the search
 path.  Furthermore, if the directory in question ends in the path segment
-tt(Core), or has a subdirectory named tt(Core), tt(compinit) will add all
-subdirectories of the directory where tt(Core) is to the path: this allows
+tt(Base), or has a subdirectory named tt(Base), tt(compinit) will add all
+subdirectories of the directory where tt(Base) is to the path: this allows
 the functions to be in the same format as in the tt(zsh) source
 distribution.
 
@@ -317,7 +317,7 @@ do:
 example(compdef _pids foo)
 
 using the tt(_pids) function from the distribution to generate the
-process identifiers.  Not also the tt(_use_lo) function described
+process identifiers.  Not also the tt(_gnu_generic) function described
 below, which can be used to complete options for commands that
 understand the `tt(-)tt(-help)' option.
 
@@ -823,7 +823,7 @@ values)
 )
 kindex(version, completion tag)
 item(tt(version))(
-used by tt(_call) to look up the command to run to determine the installed
+used by tt(_call_program) to look up the command to run to determine the installed
 version of various other commands (such as tt(diff) and tt(make)).
 )
 kindex(warnings, completion tag)
@@ -2800,7 +2800,7 @@ cindex(completion system, utility functions)
 
 Descriptions follow for utility functions that may be
 useful when writing completion functions.  Most of these reside in the
-tt(Core) subdirectory. Like the example 
+tt(Base) subdirectory. Like the example 
 functions for commands in the distribution, the utility functions
 generating matches all follow the convention of returning zero if they
 generated completions and non-zero if no matching completions could be 
@@ -3344,14 +3344,14 @@ example(_example_caching_policy () {
     (( $#oldp ))
 })
 )
-findex(_call)
-item(tt(_call) var(tag) var(string) ...)(
+findex(_call_program)
+item(tt(_call-program) var(tag) var(string) ...)(
 This function is used in places where a command is called, making it
 possible for the user to override the default command call.  It looks up
 the tt(command) style with the supplied var(tag).  If the style is set, its
 value is used as the command to execute.
 
-In any case, the var(string)s from the call to tt(_call) or from the
+In any case, the var(string)s from the call to tt(_call_program) or from the
 style are concatenated with spaces between them and the resulting
 string is evaluated.  The return value is the return value of the
 command called.
@@ -3396,13 +3396,13 @@ All arguments after the requested field name are passed to
 tt(compadd) when generating matches from the style value, or to 
 the functions for the fields if they are called.
 )
-findex(_compalso)
-item(tt(_compalso) var(names) ...)(
+findex(_contexts)
+item(tt(_contexts) var(names) ...)(
 This function looks up the definitions for the context and command
 names given as arguments and calls the handler functions for them if
 there is a definition (given with the tt(compdef) function).  For
 example, the function completing inside subscripts might use
-`tt(_compalso -math-)' to include the completions generated for
+`tt(_contexts -math-)' to include the completions generated for
 mathematical environments.
 )
 findex(_describe)
@@ -3483,13 +3483,13 @@ tt(file-patterns) style.
 See tt(_path_files) below for a description of the full set of options
 accepted by tt(_files).
 )
-findex(_funcall)
-item(tt(_funcall) var(return) var(name) [ var(args) ... ])(
+findex(_call_function)
+item(tt(_call_function) var(return) var(name) [ var(args) ... ])(
 If a function var(name) exists, it is called with the arguments
 var(args). Unless it is the empty string or a single hyphen,
 var(return) is taken as the name of a parameter and the return status
 from the called function is stored in it.
-The return value of tt(_funcall) itself is zero if the function
+The return value of tt(_call_function) itself is zero if the function
 var(name) exists and was called and non-zero otherwise.
 )
 findex(_message)
@@ -3600,6 +3600,18 @@ specification that ignores a leading `tt(no)', ignores underscores and
 allows the user to type upper-case letters which will match their
 lower-case counterparts.  All arguments passed to this function are
 propagated unchanged to the tt(compadd) builtin.
+)
+findex(_options_set)
+findex(_options_unset)
+item(tt(_options_set) and tt(_options_unset))(
+These functions complete only set or unset options, with the same
+matching specification used in the tt(_options) function.
+
+Note that you need to uncomment a few lines in the tt(_main_complete)
+function for these functions to work properly.  The lines in question
+are used to store the option settings in effect before the completion
+widget locally sets the options it needs.  Hence these options are not
+generally used by the completion system.
 )
 findex(_parameters)
 item(tt(_parameters))(
@@ -3781,18 +3793,6 @@ This function passes the `tt(-V)', `tt(-J)', `tt(-1)', `tt(-2)',
 and `tt(-q)' options and their arguments to the tt(compadd) builtin
 used to add the matches.
 )
-findex(_set_options)
-findex(_unset_options)
-item(tt(_set_options) and tt(_unset_options))(
-These functions complete only set or unset options, with the same
-matching specification used in the tt(_options) function.
-
-Note that you need to uncomment a few lines in the tt(_main_complete)
-function for these functions to work properly.  The lines in question
-are used to store the option settings in effect before the completion
-widget locally sets the options it needs.  Hence these options are not
-generally used by the completion system.
-)
 findex(_setup)
 item(tt(_setup) var(tag) [ var(group) ])(
 This function expects a tag as its argument and sets up the special
@@ -3857,17 +3857,17 @@ tt(curcontext) parameter. This allows tt(_tags) to be made to use a more
 specific context name without having to change and reset the
 tt(curcontext) parameter (which would otherwise have the same effect).
 )
-findex(_use_lo)
-item(tt(_use_lo))(
+findex(_gnu_generic)
+item(tt(_gnu_generic))(
 This function is a simple wrapper around the tt(_arguments) function
 described above.  It can be used to automatically complete long
-options for commands that understand the `tt(-)tt(-help)' option
-(`tt(_use_lo)' is for `use long options').  It is not intended to be
-used from completion functions but as a top-level completion function
-in its own right.  For example, to enable option completion for the
-commands tt(foo) and tt(bar), one would call:
+options for commands that understand the `tt(-)tt(-help)' option.
+It is not intended to be used from completion functions but as a
+top-level completion function in its own right.  For example, to
+enable option completion for the commands tt(foo) and tt(bar), one
+would call:
 
-example(compdef _use_lo foo bar)
+example(compdef _gnu_generic foo bar)
 
 in one of the initialization files after the call to tt(compinit).
 
@@ -3989,21 +3989,17 @@ it to some directory which appears earlier in your tt(fpath) than the
 standard directory where it appears.
 
 startitem()
-item(tt(Core))(
-The core scripts and functions.  You will certainly need these, though will
+item(tt(Base))(
+The core functions and special completion widgets automatically bound
+to keys.  You will certainly need most of these, though will
 probably not need to alter them.  Many of these are documented above.
 )
-item(tt(Base))(
-Other functions you will almost certainly want if you are going to use
-any of the standard completion functions.  You may want to edit some of
-these files.
-)
-item(tt(Builtins))(
+item(tt(Zsh))(
 Functions for completing arguments of shell builtin commands and
 utility functions for this.  Some of these are also used by functions from
-the tt(User) directory.
+the tt(Unix) directory.
 )
-item(tt(User))(
+item(tt(Unix))(
 Functions for completing arguments of external commands and suites of
 commands.  They may need modifying for your system, although in many cases
 some attempt is made to decide which version of a command is present.  For
@@ -4012,8 +4008,7 @@ it is running on, while completion for many other utilities try to decide
 whether the GNU version of the command is in use, and hence whether the
 tt(--help) option is supported..
 )
-item(tt(Commands))(
-Functions which implement special types of completion to be bound to
-keystrokes rather than called by context.
+item(tt(X), tt(AIX), tt(BSD), ...)(
+Completion and utility function for commands available only on some systems.
 )
 enditem()

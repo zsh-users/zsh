@@ -1,8 +1,8 @@
 # Initialisation for new style completion. This mainly contains some helper
-# functions and aliases. Everything else is split into different files that
+# functions and setup. Everything else is split into different files that
 # will automatically be made autoloaded (see the end of this file).  The
 # names of the files that will be considered for autoloading are those that
-# begin with an underscores (like `_setopt').
+# begin with an underscores (like `_condition).
 #
 # The first line of each of these files is read and must indicate what
 # should be done with its contents:

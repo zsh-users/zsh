@@ -190,9 +190,9 @@ __ci_set_compdir() {
 
 __ci_set_compdir $fpath
 
-if [[ $compdir = */Core && -d $compdir/../Base ]]; then
+if [[ -d $compdir/Base ]]; then
   subdirs=1
-  compdir=${compdir:h}
+  ### compdir=${compdir:h}
 fi
 
 if [[ -z $compdir ]]; then
