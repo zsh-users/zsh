@@ -1,3 +1,8 @@
+2001-06-26  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* user/3946: Src/Zle/computil.c: fix for finding the first
+	ambiguous path component in compfiles
+
 2001-06-25  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: version zsh-4.0.2.

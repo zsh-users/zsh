@@ -3719,6 +3719,8 @@ cf_remove_other(char **names, char *pre, int *amb)
 		if ((q = strchr((p = dupstring(p)), '/')))
 		    *q = '\0';
 
+                p = dyncat(p, "/");
+
 		for (; *names; names++)
 		    if (!strpfx(p, *names)) {
 			*amb = 1;
