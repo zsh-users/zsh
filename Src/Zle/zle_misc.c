@@ -57,7 +57,7 @@ doinsert(char *str)
 }
 
 /**/
-int
+mod_export int
 selfinsert(char **args)
 {
     char s[3], *p = s;
@@ -537,6 +537,32 @@ copyprevword(char **args)
     spaceinline(len);
     memcpy((char *)&line[cs], (char *)&line[t0], len);
     cs += len;
+    return 0;
+}
+
+/**/
+int
+copyprevshellword(char **args)
+{
+    LinkList l;
+    LinkNode n;
+    int i;
+    char *p = NULL;
+
+    if ((l = bufferwords(NULL, NULL, &i)))
+        for (n = firstnode(l); n; incnode(n))
+            if (!i--) {
+                p = getdata(n);
+                break;
+            }
+
+    if (p) {
+	int len = strlen(p);
+
+	spaceinline(len);
+	memcpy(line + cs, p, len);
+	cs += len;
+    }
     return 0;
 }
 

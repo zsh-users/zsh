@@ -51,7 +51,8 @@ createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan)
     Param pm;
     HashTable ht;
 
-    if (!(pm = createparam(name, PM_SPECIAL|PM_HIDE|PM_REMOVABLE|PM_HASHED)))
+    if (!(pm = createparam(name, PM_SPECIAL|PM_HIDE|PM_HIDEVAL|
+			   PM_REMOVABLE|PM_HASHED)))
 	return NULL;
 
     pm->level = pm->old ? locallevel : 0;
@@ -59,6 +60,7 @@ createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan)
     pm->sets.hfn = hashsetfn;
     pm->unsetfn = stdunsetfn;
     pm->u.hash = ht = newhashtable(0, name, NULL);
+    pm->ct = 0;
 
     ht->hash        = hasher;
     ht->emptytable  = (TableFunc) shempty;
@@ -122,6 +124,8 @@ paramtypestr(Param pm)
 	    val = dyncat(val, "-unique");
 	if (f & PM_HIDE)
 	    val = dyncat(val, "-hide");
+	if (f & PM_HIDEVAL)
+	    val = dyncat(val, "-hideval");
 	if (f & PM_SPECIAL)
 	    val = dyncat(val, "-special");
     } else
@@ -192,9 +196,10 @@ scanpmparameters(HashTable ht, ScanFunc func, int flags)
 static void
 setpmcommand(Param pm, char *value)
 {
-    if (isset(RESTRICTED))
+    if (isset(RESTRICTED)) {
 	zwarn("restricted: %s", value, 0);
-    else {
+	zsfree(value);
+    } else {
 	Cmdnam cn = zcalloc(sizeof(*cn));
 
 	cn->flags = HASHED;
@@ -229,8 +234,8 @@ setpmcommands(Param pm, HashTable ht)
 	    Cmdnam cn = zcalloc(sizeof(*cn));
 	    struct value v;
 
-	    v.isarr = v.inv = v.a = 0;
-	    v.b = -1;
+	    v.isarr = v.inv = v.start = 0;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
@@ -400,8 +405,8 @@ setfunctions(Param pm, HashTable ht, int dis)
 	for (hn = ht->nodes[i]; hn; hn = hn->next) {
 	    struct value v;
 
-	    v.isarr = v.inv = v.a = 0;
-	    v.b = -1;
+	    v.isarr = v.inv = v.start = 0;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
@@ -451,9 +456,18 @@ getfunction(HashTable ht, char *name, int dis)
 				((shf->flags & PM_TAGGED) ? "Ut" : "U") :
 				((shf->flags & PM_TAGGED) ? "t" : "")));
 	} else {
-	    char *t = getpermtext(shf->funcdef, NULL), *h;
+	    char *t = getpermtext(shf->funcdef, NULL), *n, *h;
 
-	    h = dupstring(t);
+	    if (shf->funcdef->flags & EF_RUN) {
+		n = nicedupstring(name);
+		h = (char *) zhalloc(strlen(t) + strlen(n) + 9);
+		h[0] = '\t';
+		strcpy(h + 1, t);
+		strcat(h, "\n\t");
+		strcat(h, n);
+		strcat(h, " \"$@\"");
+	    } else
+		h = dyncat("\t", t);
 	    zsfree(t);
 	    unmetafy(h, NULL);
 
@@ -513,9 +527,18 @@ scanfunctions(HashTable ht, ScanFunc func, int flags, int dis)
 				    ((shf->flags & PM_TAGGED) ? "Ut" : "U") :
 				    ((shf->flags & PM_TAGGED) ? "t" : "")));
 		    } else {
-			char *t = getpermtext(((Shfunc) hn)->funcdef, NULL);
+			char *t = getpermtext(((Shfunc) hn)->funcdef, NULL), *n;
 
-			pm.u.str = dupstring(t);
+			if (((Shfunc) hn)->funcdef->flags & EF_RUN) {
+			    n = nicedupstring(hn->nam);
+			    pm.u.str = (char *) zhalloc(strlen(t) + strlen(n) + 9);
+			    pm.u.str[0] = '\t';
+			    strcpy(pm.u.str + 1, t);
+			    strcat(pm.u.str, "\n\t");
+			    strcat(pm.u.str, n);
+			    strcat(pm.u.str, " \"$@\"");
+			} else
+			    pm.u.str = dyncat("\t", t);
 			unmetafy(pm.u.str, NULL);
 			zsfree(t);
 		    }
@@ -736,8 +759,8 @@ setpmoptions(Param pm, HashTable ht)
 	    struct value v;
 	    char *val;
 
-	    v.isarr = v.inv = v.a = 0;
-	    v.b = -1;
+	    v.isarr = v.inv = v.start = 0;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
@@ -870,7 +893,8 @@ getpmmodule(HashTable ht, char *name)
 	    m = (Module) getdata(node);
 	    if (m->u.handle && !(m->flags & MOD_UNLOAD) &&
 		!strcmp(name, m->nam)) {
-		type = "loaded";
+		type = ((m->flags & MOD_ALIAS) ?
+			dyncat("alias:", m->u.alias) : "loaded");
 		break;
 	    }
 	}
@@ -913,6 +937,7 @@ scanpmmodules(HashTable ht, ScanFunc func, int flags)
     LinkNode node;
     Module m;
     Conddef p;
+    char *loaded = dupstring("loaded");
 
     pm.flags = PM_SCALAR | PM_READONLY;
     pm.sets.cfn = NULL;
@@ -924,12 +949,12 @@ scanpmmodules(HashTable ht, ScanFunc func, int flags)
     pm.old = NULL;
     pm.level = 0;
 
-    pm.u.str = dupstring("builtin");
-    pm.u.str = dupstring("loaded");
     for (node = firstnode(modules); node; incnode(node)) {
 	m = (Module) getdata(node);
 	if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
 	    pm.nam = m->nam;
+	    pm.u.str = ((m->flags & MOD_ALIAS) ?
+			dyncat("alias:", m->u.alias) : loaded);
 	    addlinknode(done, pm.nam);
 	    func((HashNode) &pm, flags);
 	}
@@ -1002,6 +1027,8 @@ getpmhistory(HashTable ht, char *name)
 {
     Param pm = NULL;
     Histent he;
+    char *p;
+    int ok = 1;
 
     pm = (Param) zhalloc(sizeof(struct param));
     pm->nam = dupstring(name);
@@ -1014,7 +1041,17 @@ getpmhistory(HashTable ht, char *name)
     pm->ename = NULL;
     pm->old = NULL;
     pm->level = 0;
-    if ((he = quietgethist(atoi(name))))
+
+    if (*name != '0' || name[1]) {
+	if (*name == '0')
+	    ok = 0;
+	else {
+	    for (p = name; *p && idigit(*p); p++);
+	    if (*p)
+		ok = 0;
+	}
+    }
+    if (ok && (he = quietgethist(atoi(name))))
 	pm->u.str = dupstring(he->text);
     else {
 	pm->u.str = dupstring("");
@@ -1029,7 +1066,7 @@ scanpmhistory(HashTable ht, ScanFunc func, int flags)
 {
     struct param pm;
     int i = addhistnum(curhist, -1, HIST_FOREIGN);
-    Histent he = quietgethistent(i, GETHIST_UPWARD);
+    Histent he = gethistent(i, GETHIST_UPWARD);
     char buf[40];
 
     pm.flags = PM_SCALAR | PM_READONLY;
@@ -1063,10 +1100,14 @@ static char **
 histwgetfn(Param pm)
 {
     char **ret, **p, *h, *e, sav;
-    LinkList l = newlinklist();
+    LinkList l = newlinklist(), ll;
     LinkNode n;
     int i = addhistnum(curhist, -1, HIST_FOREIGN), iw;
-    Histent he = quietgethistent(i, GETHIST_UPWARD);
+    Histent he = gethistent(i, GETHIST_UPWARD);
+
+    if ((ll = bufferwords(NULL, NULL, NULL)))
+        for (n = firstnode(ll); n; incnode(n))
+            pushnode(l, getdata(n));
 
     while (he) {
 	for (iw = he->nwords - 1; iw >= 0; iw--) {
@@ -1182,14 +1223,21 @@ static char *
 pmjobstate(int job)
 {
     Process pn;
-    char buf[256], buf2[128], *ret, *state;
+    char buf[256], buf2[128], *ret, *state, *cp;
+
+    if (job == curjob)
+	cp = ":+";
+    else if (job == prevjob)
+	cp = ":-";
+    else
+	cp = ":";
 
     if (jobtab[job].stat & STAT_DONE)
-	ret = dupstring("done");
+	ret = dyncat("done", cp);
     else if (jobtab[job].stat & STAT_STOPPED)
-	ret = dupstring("suspended");
+	ret = dyncat("suspended", cp);
     else
-	ret = dupstring("running");
+	ret = dyncat("running", cp);
 
     for (pn = jobtab[job].procs; pn; pn = pn->next) {
 
@@ -1208,7 +1256,7 @@ pmjobstate(int job)
 	else
 	    state = sigmsg(WTERMSIG(pn->status));
 
-	sprintf(buf, ":%d=%s", pn->pid, state);
+	sprintf(buf, ":%d=%s", (int)pn->pid, state);
 
 	ret = dyncat(ret, buf);
     }
@@ -1359,11 +1407,15 @@ scanpmjobdirs(HashTable ht, ScanFunc func, int flags)
 static void
 setpmnameddir(Param pm, char *value)
 {
-    if (!value || *value != '/' || strlen(value) >= PATH_MAX)
-	zwarn("invalid value: %s", value, 0);
-    else
-	adduserdir(pm->nam, value, 0, 1);
-    zsfree(value);
+    if (!value)
+	zwarn("invalid value: ''", NULL, 0);
+    else {
+	Nameddir nd = (Nameddir) zcalloc(sizeof(*nd));
+
+	nd->flags = 0;
+	nd->dir = value;
+	nameddirtab->addnode(nameddirtab, ztrdup(pm->nam), nd);
+    }
 }
 
 /**/
@@ -1399,16 +1451,20 @@ setpmnameddirs(Param pm, HashTable ht)
 	    struct value v;
 	    char *val;
 
-	    v.isarr = v.inv = v.a = 0;
-	    v.b = -1;
+	    v.isarr = v.inv = v.start = 0;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
-	    if (!(val = getstrvalue(&v)) || *val != '/' ||
-		strlen(val) >= PATH_MAX)
-		zwarn("invalid value: %s", val, 0);
-	    else
-		adduserdir(hn->nam, val, 0, 1);
+	    if (!(val = getstrvalue(&v)))
+		zwarn("invalid value: ''", NULL, 0);
+	    else {
+		Nameddir nd = (Nameddir) zcalloc(sizeof(*nd));
+
+		nd->flags = 0;
+		nd->dir = ztrdup(val);
+		nameddirtab->addnode(nameddirtab, ztrdup(hn->nam), nd);
+	    }
 	}
 
     /* The INTERACTIVE stuff ensures that the dirs are not immediatly removed
@@ -1625,8 +1681,8 @@ setaliases(Param pm, HashTable ht, int global, int dis)
 	    struct value v;
 	    char *val;
 
-	    v.isarr = v.inv = v.a = 0;
-	    v.b = -1;
+	    v.isarr = v.inv = v.start = 0;
+	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
@@ -1907,8 +1963,8 @@ boot_(Module m)
 	    if (def->hsetfn)
 		def->pm->sets.hfn = def->hsetfn;
 	} else {
-	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE |
-					PM_REMOVABLE)))
+	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE|
+					PM_HIDEVAL | PM_REMOVABLE)))
 		return 1;
 	    def->pm->sets.afn = def->setfn;
 	    def->pm->gets.afn = def->getfn;
