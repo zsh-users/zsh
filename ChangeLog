@@ -1,3 +1,9 @@
+2000-07-19  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12308: Completion/User/_man: Andrej and pws: cope with systems
+	where manual pages just have bare .Z and no number; don't be
+	too clever about suffix until we try to strip it.
+
 2000-07-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12297: Src/Zle/compcore.c: don't let duplicate matches keep us
