@@ -1,3 +1,11 @@
+2005-01-12  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: minor comment
+	change.
+
+	* 20692: Test/ztst.zsh: having POSIXLY_CORRECT set makes
+	GNU tail report warning with -<NUM>.
+
 2004-01-11  Clint Adams  <clint@zsh.org>
 
 	* unposted: config.guess, config.sub: update to 2004-11-12 and

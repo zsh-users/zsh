@@ -1830,6 +1830,10 @@ _perforce_cmd_obliterate() {
 
 (( $+functions[_perforce_cmd_opened] )) ||
 _perforce_cmd_opened() {
+  # You might think you could check for files opened on another
+  # client, and hence the -c completion should have the argument
+  # -tp, but currently Perforce doesn't allow that, so -tc is correct.
+  # This is true even if -a is also given.
   _arguments -s : \
     '-a[list for all clients]' \
     '-c+[select by change]:change:_perforce_changes -tc' \

@@ -28,6 +28,9 @@ emulate -R zsh
 [[ -n $LC_COLLATE ]] && LC_COLLATE=C
 [[ -n $LANG ]] && LANG=C
 
+# POSIXLY_CORRECT can cause spurious error messages with "tail -<num>".
+unset POSIXLY_CORRECT
+
 # Set the module load path to correspond to this build of zsh.
 # This Modules directory should have been created by "make check".
 [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
