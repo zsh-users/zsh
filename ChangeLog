@@ -1,3 +1,8 @@
+2003-07-17  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Command/_aap: adjust return code
+	in the same way as was done for old completions in 18631
+
 2003-07-17  Peter Stephenson  <pws@csr.com>
 
 	* 18864: Src/lex.c: unnecessary spaces with empty substitutions
