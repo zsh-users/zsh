@@ -1,6 +1,10 @@
 2002-03-05  Peter Stephenson  <pws@csr.com>
 
-	* unposted; Config/version.mk: version 4.1.0-dev-4.
+	* unposted: Config/version.mk: version 4.1.0-dev-4.
+
+	* unposted: Functions/Zle/.distfiles,
+	Completion/Base/Utilities/.distfiles,
+	Completion/Base/Core/.distfiles: usual fixups for distributed files.
 
 	* 16767: Src/Zle/zle_hist.c, Doc/Zsh/zle.yo, Doc/Zsh/contrib.yo,
 	Functions/Zle/copy-earlier-word:  Enhance insert-last-word to
