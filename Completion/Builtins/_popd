@@ -17,7 +17,7 @@ _wanted -V directory-stack expl 'directory stack' || return 1
 if zstyle -t ":completion${curcontext}:directory-stack" verbose; then
   # get the list of directories with their canonical number
   # and turn the lines into an array, removing the current directory
-  lines=("${PWD}" "${dirstack[@]}")
+  lines=("${dirstack[@]}")
 
   if [[ ( $PREFIX[1] = - && ! -o pushdminus ) ||
         ( $PREFIX[1] = + && -o pushdminus ) ]]; then
