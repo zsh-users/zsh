@@ -1327,7 +1327,7 @@ par_funcdef(void)
 
     if (tok == INBRACE) {
 	yylex();
-	par_save_list(&c);
+	par_list(&c);
 	if (tok != OUTBRACE) {
 	    lineno += oldlineno;
 	    ecsoffs = sbeg;
@@ -1343,8 +1343,9 @@ par_funcdef(void)
 	ecnpats = onp;
 	YYERRORV(oecused);
     } else
-	par_save_list1(&c);
+	par_list1(&c);
 
+    ecadd(WCB_END());
     ecbuf[p + num + 2] = ecused - num - p;
     ecbuf[p + num + 3] = ecnpats;
     ecbuf[p + 1] = num;
@@ -1507,7 +1508,7 @@ par_simple(int *complex, int nr)
 		int c = 0;
 
 		yylex();
-		par_save_list(&c);
+		par_list(&c);
 		if (tok != OUTBRACE) {
 		    cmdpop();
 		    lineno += oldlineno;
@@ -1530,6 +1531,7 @@ par_simple(int *complex, int nr)
 	    }
 	    cmdpop();
 
+	    ecadd(WCB_END());
 	    ecbuf[p + argc + 2] = ecused - argc - p;
 	    ecbuf[p + argc + 3] = ecnpats;
 
