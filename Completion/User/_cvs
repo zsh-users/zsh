@@ -35,34 +35,8 @@ _cvs_command () {
   if (( CURRENT == 1 )); then
     compadd "$@" ${(k)cmds} || compadd "$@" ${(kv)=cmds}
   else
-    case "${${(k)cmds[(R)* $words[1] *]}:-$words[1]}" in
-      add) _cvs_add;;
-      admin) _cvs_admin;;
-      annotate) _cvs_annotate;;
-      checkout) _cvs_checkout;;
-      commit) _cvs_commit;;
-      diff) _cvs_diff;;
-      edit) _cvs_edit;;
-      editors) _cvs_editors;;
-      export) _cvs_export;;
-      history) _cvs_history;;
-      import) _cvs_import;;
-      init) _cvs_init;;
-      log) _cvs_log;;
-      login) _cvs_login;;
-      logout) _cvs_logout;;
-      rdiff) _cvs_rdiff;;
-      release) _cvs_release;;
-      remove) _cvs_remove;;
-      status) _cvs_status;;
-      rtag) _cvs_rtag;;
-      tag) _cvs_tag;;
-      unedit) _cvs_unedit;;
-      update) _cvs_update;;
-      watch) _cvs_watch;;
-      watchers) _cvs_watchers;;
-      *) _message "unknown cvs command: $words[1]";;
-    esac
+    _cvs_"${${(k)cmds[(R)* $words[1] *]}:-$words[1]}" 2>&- ||
+      _message "unknown cvs command: $words[1]"
   fi
 }
 
