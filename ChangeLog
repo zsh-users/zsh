@@ -1,8 +1,7 @@
-2001-06-28  Clint Adams  <clint@zsh.org>
+2001-06-28  Wayne Davison  <wayned@users.sourceforge.net>
 
-        * 15079: Completion/Unix/Command/_last,
-	Completion/Unix/Type/_users: last
-	takes other arguments than users.
+	* 15172: Src/hist.c: Have prepnexthistent() remove any HIST_TEMPSTORE
+	entry that is present.
 
 2001-06-28  Peter Stephenson  <pws@csr.com>
 
@@ -20,6 +19,12 @@
 
 	* 15151: zshconfig.ac: --enable-sitefndir should be
 	--enable-site-fndir, spotted by Jos Backus.
+
+2001-06-28  Clint Adams  <clint@zsh.org>
+
+        * 15079: Completion/Unix/Command/_last,
+	Completion/Unix/Type/_users: last
+	takes other arguments than users.
 
 2001-06-26  Sven Wischnowsky  <wischnow@zsh.org>
 
