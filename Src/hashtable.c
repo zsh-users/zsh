@@ -1188,7 +1188,7 @@ emptynameddirtable(HashTable ht)
 static int
 add_userdir(nis_name table, nis_object *object, void *userdata)
 {
-    if (object->zo_data.objdata_u.en_data.en_cols.en_cols >= 6) {
+    if (object->zo_data.objdata_u.en_data.en_cols.en_cols_len >= 6) {
 	static char name[40], dir[PATH_MAX + 1];
 	register entry_col *ec =
 	    object->zo_data.objdata_u.en_data.en_cols.en_cols_val;
