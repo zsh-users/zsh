@@ -16,8 +16,8 @@ _xwit_guard () {
 
 _xwit_compopts () {
   local expl
-  _description options expl option
-  compadd "$expl[@]" - ${(k)no[(R)*~0]} || compadd "$expl[@]" - ${(k)no}
+  _wanted options expl option compadd - ${(k)no[(R)*~0]} ||
+      _loop options expl option compadd - ${(k)no}
 }
 
 _regex_arguments _xwit_parse \

@@ -2,7 +2,7 @@
 
 local expl list desc
 
-_wanted colormapids expl 'colormap id' || return 1
+_wanted colormapids || return 1
 
 list=(${(f)"$(xprop -root -f RGB_COLOR_MAP 32xcccccccxx ': $0\n'|awk -F'[ ():]' '/^[a-zA-Z_]+\(RGB_COLOR_MAP\)/ {print $5, "--", $1}')"})
 
@@ -12,4 +12,4 @@ else
   desc=()
 fi
 
-compadd "$expl[@]" "$@" "$desc[@]" - "${(@)list%% *}" 
+_loop colormapids expl 'colormap id' compadd "$@" "$desc[@]" - "${(@)list%% *}" 
