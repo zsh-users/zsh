@@ -1,3 +1,8 @@
+2001-12-18  Clint Adams  <clint@zsh.org>
+
+	* 16361: zshconfig.ac, Src/input.c:
+	include <stdio.h> to avoid implicit declarations.
+
 2001-12-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 16352: Functions/Misc/zcalc: allow output formats to be

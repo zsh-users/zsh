@@ -67,6 +67,10 @@
  * PWS 1996/12/10
  */
 
+#ifdef HAVE_STDIO_H
+#include <stdio.h>
+#endif
+
 #include "zsh.mdh"
 #include "input.pro"
 
