@@ -1065,6 +1065,8 @@ parse_cadef(char *nam, char **args)
 
 	args++;
     }
+    if (*args && !strcmp(*args, ":"))
+        args++;
     if (!*args)
 	return NULL;
 

@@ -2996,12 +2996,15 @@ Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.
 )
 findex(_arguments)
-item(tt(_arguments) [ tt(-ACS) ] [ tt(-O) var(name) ] [ tt(-M) var(matchspec) ] var(spec) ...)(
+item(tt(_arguments) [ tt(-ACS) ] [ tt(-O) var(name) ] [ tt(-M) var(matchspec) ] [ tt(:) ] var(spec) ...)(
 This function can be used to complete words on the line by describing the
 options and arguments which may be passed to the command for which
 completion is being performed.  The description is given as arguments to
 this function, with each var(spec) describing one option or normal
-argument of the command.  The forms of var(spec) understood are:
+argument of the command.  To separate these var(spec)s from the
+options given to tt(_arguments) itself, they can be preceeded by an
+argument containing a single colon.  The forms of var(spec)
+understood are:
 
 startitem()
 xitem(var(n)tt(:)var(message)tt(:)var(action))
