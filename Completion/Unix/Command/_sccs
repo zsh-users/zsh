@@ -2,10 +2,17 @@
 
 (( $+functions[_sccs_files] )) ||
 _sccs_files() {
-  local dir=${PROJECTDIR:-~+}/${PREFIX##*/}/$finalpath
-
-  compset -P '*/'
-  _files -W $dir -g \*\(:s/s.//\) "$@"
+  local dir expl ret=1 pref=$PREFIX ipref=$IPREFIX
+  dir="${(M)PREFIX##*/}$finalpath"
+  [[ $~dir = (.|..|)/* ]] || dir="${PROJECTDIR:-~+}/$dir"
+  compset -P "*/"
+  _wanted file expl file compadd "$@" - $~dir/*(N.:t:s/s.//) && ret=0
+  PREFIX="$pref"
+  IPREFIX="$ipref"
+  _wanted sccs-files expl 'sccs file' _files -W ${PROJECTDIR:-~+} \
+      -g 's.*' && ret=0
+  
+  return ret
 }
 
 local curcontext="$curcontext" state line
@@ -20,7 +27,7 @@ subcmds=(
 
 ropt='-r+[specify sccs delta id]:sccs delta id'
 copt='-c+[specify date]:date-stamp'
-sfiles=':file:_sccs_files'
+sfiles=":file:_files -g s.\*"
 
 if [[ $service = sccs ]]; then
   _arguments -C -A "-*" \
@@ -34,6 +41,7 @@ if [[ $service = sccs ]]; then
     return
   fi
   service="$words[1]"
+  sfiles=':file:_sccs_files'
   curcontext="${curcontext%:*}-$service:"
 fi
 finalpath="${opt_args[-p]:-SCCS}"

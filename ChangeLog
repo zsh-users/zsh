@@ -1,4 +1,9 @@
-2003-02-20  Oliver Kiddle <opk@zsh.org>
+2003-02-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 18269: Completion/Unix/Command/_sccs: improve file completion
+	to handle both direct and indirect references to s. files
+
+2003-02-20  Oliver Kiddle  <opk@zsh.org>
 
 	* 18263: Src/glob.c: fix saving of glob state so that globs can
 	be used from the (e) glob qualifier
