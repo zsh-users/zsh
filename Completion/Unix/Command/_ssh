@@ -17,9 +17,9 @@ _remote_files () {
     while _tags; do
       while _next_label files expl ${suf:-remote directory}; do
         [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf \
-	    ${remdispf%[*=@|]} && ret=0 
+	    ${(q)remdispf%[*=@|]} && ret=0 
 	compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
-	    ${remdispd%/} && ret=0
+	    ${(q)remdispd%/} && ret=0
       done
       (( ret )) || return 0
     done
