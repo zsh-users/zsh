@@ -1,3 +1,15 @@
+2002-08-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 16000, 16393 (Clint): Completion/Debian/Command/_debchange,
+	Completion/Debian/Command/_apt-show-versions: merge new Debian
+	completions from 4.1 branch
+
+	* 17125 (Andrej), 17245: Completion/Unix/Command/_texinfo:
+	merge texinfo completion from 4.1 branch
+
+	* 17521: Completion/Unix/Command/_ant,
+	Completion/Unix/Command/.distfiles: new completion for ant
+ 
 2002-08-14  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: version 4.0.6.
