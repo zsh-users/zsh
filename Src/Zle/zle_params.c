@@ -69,6 +69,8 @@ static struct zleparam {
         zleunsetfn, NULL },
     { "LASTWIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_lwidget),
         zleunsetfn, NULL },
+    { "KEYMAP", PM_SCALAR | PM_READONLY, NULL, FN(get_keymap),
+        zleunsetfn, NULL },
     { "KEYS", PM_SCALAR | PM_READONLY, NULL, FN(get_keys),
         zleunsetfn, NULL },
     { "NUMERIC", PM_INTEGER | PM_UNSET, FN(set_numeric), FN(get_numeric),
@@ -269,6 +271,13 @@ static char *
 get_lwidget(Param pm)
 {
     return (lbindk ? lbindk->nam : "");
+}
+
+/**/
+static char *
+get_keymap(Param pm)
+{
+    return dupstring(curkeymapname);
 }
 
 /**/

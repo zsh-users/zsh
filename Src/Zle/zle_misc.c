@@ -669,7 +669,7 @@ executenamedcommand(char *prmt)
     int len, l = strlen(prmt), feep = 0, listed = 0, curlist = 0;
     int ols = (listshown && validlist), olll = lastlistlen;
     char *ptr;
-    char *okeymap = curkeymapname;
+    char *okeymap = ztrdup(curkeymapname);
 
     clearlist = 1;
     cmdbuf = zhalloc(l + NAMLEN + 2);
@@ -685,6 +685,7 @@ executenamedcommand(char *prmt)
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    statusline = NULL;
 	    selectkeymap(okeymap, 1);
+	    zsfree(okeymap);
 	    if ((listshown = ols)) {
 		showinglist = -2;
 		lastlistlen = olll;
@@ -752,6 +753,7 @@ executenamedcommand(char *prmt)
 		    unrefthingy(r);
 		    statusline = NULL;
 		    selectkeymap(okeymap, 1);
+		    zsfree(okeymap);
 		    if ((listshown = ols)) {
 			showinglist = -2;
 			lastlistlen = olll;

@@ -388,7 +388,10 @@ selectkeymap(char *name, int fb)
 	    return 1;
 	km = openkeymap(name = ".safe");
     }
-    curkeymapname = name;
+    if(name != curkeymapname) {
+	zsfree(curkeymapname);
+	curkeymapname = ztrdup(name);
+    }
     curkeymap = km;
     return 0;
 }

@@ -660,7 +660,7 @@ doisearch(char **args, int dir)
     int odir = dir, sens = zmult == 1 ? 3 : 1;
     int hl = histline, savekeys = -1, feep = 0;
     Thingy cmd;
-    char *okeymap = curkeymapname;
+    char *okeymap = ztrdup(curkeymapname);
     static char *previous_search = NULL;
     static int previous_search_len = 0;
     Histent he;
@@ -883,6 +883,7 @@ doisearch(char **args, int dir)
     }
     statusline = NULL;
     selectkeymap(okeymap, 1);
+    zsfree(okeymap);
     /*
      * Don't allow unused characters provided as a string to the
      * widget to overflow and be used as separated commands.
@@ -960,7 +961,7 @@ getvisrchstr(void)
     char *sbuf = zhalloc(80);
     int sptr = 1, ret = 0, ssbuf = 80, feep = 0;
     Thingy cmd;
-    char *okeymap = curkeymapname;
+    char *okeymap = ztrdup(curkeymapname);
 
     if (vipenultsrchstr) {
 	zsfree(vipenultsrchstr);
@@ -1044,6 +1045,7 @@ getvisrchstr(void)
     }
     statusline = NULL;
     selectkeymap(okeymap, 1);
+    zsfree(okeymap);
     return ret;
 }
 

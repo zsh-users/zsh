@@ -305,6 +305,7 @@ xitem(tt(zle) tt(-C) var(widget) var(completion-widget) var(function))
 xitem(tt(zle) tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])
 xitem(tt(zle) tt(-M) var(string))
 xitem(tt(zle) tt(-U) var(string))
+xitem(tt(zle) tt(-K) var(keymap))
 xitem(tt(zle) tt(-I))
 xitem(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)
 item(tt(zle))(
@@ -393,6 +394,14 @@ As ZLE uses a stack, if this option is used repeatedly
 the last string pushed onto the stack will be processed first.  However,
 the characters in each var(string) will be processed in the order in which
 they appear in the string.
+)
+item(tt(-K) var(keymap))(
+Selects the keymap named var(keymap).  An error message will be displayed if
+there is no such keymap.
+
+This keymap selection affects the interpretation of following keystrokes
+within this invocation of ZLE.  Any following invocation (e.g., the next
+command line) will start as usual with the `tt(main)' keymap selected.
 )
 item(tt(-I))(
 Unusually, this option is only useful em(outside) ordinary widget functions.
@@ -518,6 +527,10 @@ cursor being moved to the appropriate end of the buffer.
 vindex(HISTNO)
 item(tt(HISTNO) (integer))(
 The current history number.
+)
+vindex(KEYMAP)
+item(tt(KEYMAP) (scalar))(
+The name of the currently selected keymap.
 )
 vindex(KEYS)
 item(tt(KEYS) (scalar))(

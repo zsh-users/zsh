@@ -339,6 +339,7 @@ bin_zle(char *name, char **args, char *ops, int func)
 	{ 'R', bin_zle_refresh, 0, -1 },
 	{ 'M', bin_zle_mesg, 1, 1 },
 	{ 'U', bin_zle_unget, 1, 1 },
+	{ 'K', bin_zle_keymap, 1, 1 },
 	{ 'I', bin_zle_invalidate, 0, 0 },
 	{ 0,   bin_zle_call, 0, -1 },
     };
@@ -462,6 +463,17 @@ bin_zle_unget(char *name, char **args, char *ops, char func)
     while (p > b)
 	ungetkey((int) *--p);
     return 0;
+}
+
+/**/
+static int
+bin_zle_keymap(char *name, char **args, char *ops, char func)
+{
+    if (!zleactive) {
+	zwarnnam(name, "can only be called from widget function", NULL, 0);
+	return 1;
+    }
+    return selectkeymap(*args, 0);
 }
 
 /**/

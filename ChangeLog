@@ -1,3 +1,10 @@
+2001-09-03  Andrew Main (Zefram)  <zefram@zsh.org>
+
+	* 15734: Doc/Zsh/zle.yo, Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_params.c,
+	Src/Zle/zle_thingy.c: zle -K option to select a keymap, and zle
+	KEYMAP parameter to examine the current selection.
+
 2001-08-28  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 15722: Completion/Unix/Command/_sh: handle zsh options.
