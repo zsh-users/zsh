@@ -1,3 +1,8 @@
+2002-05-12  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* c.f. 17128: Doc/Makefile.in: back out changes accidentally
+	committed along with 17081.
+
 2002-05-12 Andrej Borsenkow  <bor@zsh.org>
 
 	* unposted: Completion/Redhat/Command/_service: fix context

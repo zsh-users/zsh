@@ -84,27 +84,31 @@ everything: all dvi ps html
 dvi: zsh.dvi
 .PHONY: dvi
 
-zsh.dvi: zsh.texi
-	$(TEXI2DVI) zsh.texi
+zsh.dvi: $(sdir)/zsh.texi
+	$(TEXI2DVI) $(sdir)/zsh.texi
 
-texi: zsh.texi
+texi: $(sdir)/zsh.texi
 .PHONY: texi
 
-zsh.texi:
+$(sdir)/zsh.texi:
 	$(YODL) -o $@ -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
 	test -f $@
 
 info: zsh.info
 .PHONY: info
 
-zsh.info: zsh.texi
-	$(MAKEINFO) zsh.texi
+zsh.info: $(sdir)/zsh.texi
+	$(MAKEINFO) $(sdir)/zsh.texi
 
 .yo.1:
+	case $@ in \
+	  */*) target=$@ ;; \
+	  *) target=$(sdir)/$@ ;; \
+	esac; \
 	case '$(YODL)' in :*) ;; *) \
-	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $@ \
+	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
 	;; esac; \
-	test -f $@
+	test -f $$target
 
 ps: us_ps a4_ps
 .PHONY: ps
@@ -124,24 +128,28 @@ zsh_a4.ps: zsh.dvi
 html: zsh_toc.html
 .PHONY: html
 
-zsh_toc.html: zsh.texi
-	$(TEXI2HTML) zsh.texi
+zsh_toc.html: $(sdir)/zsh.texi
+	$(TEXI2HTML) $(sdir)/zsh.texi
 
 zshall.1: zsh.yo
+	case $@ in \
+	  */*) target=$@ ;; \
+	  *) target=$(sdir)/$@ ;; \
+	esac; \
 	case '$(YODL)' in :*) ;; *) \
-	    $(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $@ \
+	    $(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
 	;; esac; \
-	test -f $@
+	test -f $$target
 
 ../META-FAQ: META-FAQ.yo Zsh/metafaq.yo
 	case '$(YODL)' in :*) ;; *) \
-	    $(YODL) -I$(sdir) META-FAQ.yo | sed -e '/NEXTLINE/N' -e '/DELLINE/d' -e '/^SECTHEAD$$/{N;s/^SECTHEAD.//;h;s/./-/g;H;g;}' -e 's/  *$$//' > $@ \
+	    $(YODL) -I$(sdir) META-FAQ.yo | sed -e '/NEXTLINE/N' -e '/DELLINE/d' -e '/^SECTHEAD$$/{N;s/^SECTHEAD.//;h;s/./-/g;H;g;}' -e 's/  *$$//' > $(sdir_top)/META-FAQ \
 	;; esac
-	test -f $@
+	test -f $(sdir_top)/META-FAQ
 
 $(YODLDOC): version.yo
 
-zsh.texi: $(YODLSRC)
+$(sdir)/zsh.texi: $(YODLSRC)
 
 man: $(MAN)
 .PHONY: man
@@ -183,7 +191,7 @@ version.yo: $(sdir_top)/Config/version.mk
 	  echo 'def(version)(0)('$(VERSION)')'; \
 	  echo 'def(date)(0)('$(VERSION_DATE)')'; \
 	  echo 'ENDDEF()#' | tr '#' '\\'; \
-	) > $@
+	) > $(sdir)/version.yo
 
 Zsh/modlist.yo: $(MODDOCSRC)
 	( \
@@ -211,7 +219,7 @@ Zsh/modlist.yo: $(MODDOCSRC)
 		mod1=$$mod2; \
 		mod2=$$mod3; \
 	    done \
-	) > $@
+	) > $(sdir)/Zsh/modlist.yo
 
 Zsh/modmenu.yo: $(MODDOCSRC)
 	( \
@@ -221,7 +229,7 @@ Zsh/modmenu.yo: $(MODDOCSRC)
 		    < $(sdir)/$$modfile; \
 	    done; \
 	    echo "endmenu()" \
-	) > $@
+	) > $(sdir)/Zsh/modmenu.yo
 
 Zsh/manmodmenu.yo: $(MODDOCSRC)
 	( \
@@ -229,7 +237,7 @@ Zsh/manmodmenu.yo: $(MODDOCSRC)
 		sed -n '1{s|^COMMENT(!MOD!\(.*\)$$|menu(The \1 Module)|;p;q;}' \
 		    < $(sdir)/$$modfile; \
 	    done \
-	) > $@
+	) > $(sdir)/Zsh/manmodmenu.yo
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
@@ -245,7 +253,7 @@ uninstall: uninstall.man
 install.man: man
 	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
-	    $(INSTALL_DATA) $$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
+	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
 	done
 .PHONY: install.man
 
@@ -256,7 +264,7 @@ install.info: texi
 	mkdir infodir
 	if ( \
 	    sed '/^@setfilename/s|zsh|$(tzsh)|' \
-		< zsh.texi > infodir/tzsh.texi && \
+		< $(sdir)/zsh.texi > infodir/tzsh.texi && \
 	    (cd infodir && $(MAKEINFO) tzsh.texi) && \
 	    for file in infodir/$(tzsh).info*; do \
 		$(INSTALL_DATA) $$file $(DESTDIR)$(infodir) || exit 1; \
@@ -314,8 +322,8 @@ distclean-here: clean-here
 .PHONY: distclean-here
 
 realclean-here: distclean-here
-	rm -f Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo
-	rm -f version.yo ../META-FAQ zsh.texi $(MAN)
+	cd $(sdir) && rm -f Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo
+	cd $(sdir) && rm -f version.yo ../META-FAQ zsh.texi $(MAN)
 .PHONY: realclean-here
 
 @CLEAN_MK@
