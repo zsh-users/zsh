@@ -22,7 +22,7 @@
 # pattern = "/" ( glob | "[]" ) "/" [ "+" | "-" ]
 # lookahead = "%" glob "%"
 # guard = "-" zsh-code-to-eval
-# caction = ":" zsh-code-to-eval
+# caction = ":" tag ":" descr ":" zsh-code-to-eval
 # action = "{" zsh-code-to-eval "}"
 
 ## regex word sequence definition:
@@ -81,7 +81,6 @@ _regex_arguments () {
 	_ra_left="$_ra_line[_ra_p1 + 1, _ra_p2]"
 	_ra_right="$_ra_line[_ra_p2 + 1, -1]"
 	compset -p $(( $#PREFIX - $#_ra_line + $_ra_p1 ))
-	: "$_ra_actions[@]"
 	tmp=("${(@)_ra_actions%%:*}")
 	if (( $#tmp )); then
 	  _tags "$tmp[@]"

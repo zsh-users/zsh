@@ -1,5 +1,7 @@
 2000-05-04  Tanaka Akira  <akr@zsh.org>
 
+	* 11166: Completion/Base/_regex_arguments: remove debugging code.
+
 	* 11165: Completion/Base/_regex_arguments, Completion/Debian/_apt,
 	Completion/X/_xset, Completion/X/_xwit, Doc/Zsh/compsys.yo,
 	Src/Modules/zutil.c: _regex_arguments support tag stuff.
