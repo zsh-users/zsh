@@ -1909,7 +1909,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		    "%s: array elements must be scalar", pname, 0);
 	    return NULL;
 	}
-    } else if (isident(pname)) {
+    } else if (isident(pname) && !idigit(*pname)) {
 	/*
 	 * Create a new node for a parameter with the flags in `on' minus the
 	 * readonly flag
@@ -1918,7 +1918,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	DPUTS(!pm, "BUG: parameter not created");
 	pm->ct = auxlen;
     } else {
-	zerr("not an identifier: %s", pname, 0);
+	if (isident(pname))
+	    zerrnam(cname, "not valid in this context: %s", pname, 0);
+	else
+	    zerrnam(cname, "not an identifier: %s", pname, 0);
 	return NULL;
     }
 

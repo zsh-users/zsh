@@ -1,3 +1,8 @@
+2002-09-19  Bart Schaefer  <schaefer@zsh.org>
+
+	* 17692: Src/builtin.c: Prevent typeset of a positional parameter
+	before it can do damage, and improve the error message about it.
+
 2002-09-17  Peter Stephenson  <pws@csr.com>
 
 	* 17673: Src/exec.c, Test/A01grammar.ztst:
