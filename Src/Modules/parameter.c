@@ -1020,6 +1020,8 @@ getpmhistory(HashTable ht, char *name)
 {
     Param pm = NULL;
     Histent he;
+    char *p;
+    int ok = 1;
 
     pm = (Param) zhalloc(sizeof(struct param));
     pm->nam = dupstring(name);
@@ -1032,7 +1034,17 @@ getpmhistory(HashTable ht, char *name)
     pm->ename = NULL;
     pm->old = NULL;
     pm->level = 0;
-    if ((he = quietgethist(atoi(name))))
+
+    if (*name != '0' || name[1]) {
+	if (*name == '0')
+	    ok = 0;
+	else {
+	    for (p = name; *p && idigit(*p); p++);
+	    if (*p)
+		ok = 0;
+	}
+    }
+    if (ok && (he = quietgethist(atoi(name))))
 	pm->u.str = dupstring(he->text);
     else {
 	pm->u.str = dupstring("");

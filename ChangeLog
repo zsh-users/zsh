@@ -1,5 +1,8 @@
 2000-04-10  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10614: Src/Modules/parameter.c: more careful with checking index
+ 	of $history
+	
 	* 10609: Src/Zle/compcore.c, Src/Zle/compresult.c, Src/Zle/zle_tricky.c:
  	fix for bashautolist+automenu
 	
