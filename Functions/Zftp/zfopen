@@ -7,7 +7,7 @@
 
 emulate -L zsh
 
-local opt dir opt_1
+local opt dir opt_1 setparams
 
 while getopts :1 opt; do
   [[ $opt = "?" ]] && print "zfopen: bad option: -$OPTARG" >&2 && return 1
@@ -35,9 +35,13 @@ if [[ $opt_1 = 1 ]]; then
   fi
 else
   # set parameters, but only if there was at least a host
-  (( $# > 0 )) && zfparams $*
+  (( $# > 0 )) && zfparams $* && setparams=1
   # now call with no parameters
-  zftp open || return 1
+  if ! zftp open; then
+    [[ -n $ZFTP_HOST ]] && zftp close
+    [[ -n $setparams ]] && zfparams -
+    return 1
+  fi
 fi
 
 if [[ -n $dir ]]; then
