@@ -1,172 +1,586 @@
-#compdef -p (p[bgpn]m*|*top[bgpn]m)
+#compdef -P (p[bgpn]m*|*top[bgpn]m)
 
-local pat opts ret=1
-
-# No other completion functions, please.
-
-_compskip=all
-
-if (( ! $+_pbm_options )); then
-
-  # Most of the stuff is done by table lookup in these arrays.
-
-  typeset -gA _pbm_options _pbm_arg_options
-
-  # Options with arguments, per command.
-
-  _pbm_arg_options=(
-    pbmreduce 'value'
-    pbmtext 'font:_files:-g:*.(#i)pbm'
-    pbmtolj 'resolution'
-    pbmtolps 'dpi'
-    pbmtomacp 'l r t b'
-    pgmcrater 'number height ysize width xsize gamma'
-    pgmkernel 'weight'
-    pgmnorm 'bpercent bvalue wpercent wvalue'
-    pgmoil 'n'
-    pgmtexture 'd'
-    pgmtopbm 'value'
-    pgmtoppm 'map:_files:-g:*.(#i)ppm'
-    ppmbrighten 's v'
-    ppmdither 'dim red green blue'
-    ppmforge 'dimension hour inclination tilt mesh power glaciers ice saturation seed stars xsize width ysize height'
-    ppmnorm 'bpercent bvalue wpercent wvalue'
-    ppmquant 'map:_files:-g:*.(#i)ppm'
-    ppmtoacad 'background aspect'
-    ppmtoicr 'windowname expand display'
-    ppmtomitsu 'sharpness:compadd:1:2:3:4 enlarge:compadd:1:2:3 media:compadd:A:A4:AS:A4S copy:compadd:1:2:3:4:5:6:7:8:9'
-    ppmtopj 'gamma xpos ypos back:compadd:dark:lite render:compadd:none:snap:bw:dither:diffuse:monodither:monodiffuse:clusterdither:monoclusterdither'
-    ppmtopjxl 'gamma xshift yshift xsize width xscale ysize height yscale'
-    ppmtouil 'name'
-    ppmtoxpm 'name'
-    pnmalias 'fgcolor:_colors bgcolor:_colors weight'
-    pnmcomp 'xoff yoff alpha:_files:-g:*.(#i)pgm'
-    pnmhistmap 'max'
-    pnmindex 'size across colors'
-    pnmmargin 'color:_colors'
-    pnmscale 'xsize width ysize height xscale yscale xysize'
-    pnmtoddif 'resolution'
-    pnmtofits 'min max'
-    pnmtops 'scale dpi width height'
-    pnmtosgi 'imagename'
-    pnmtotiff 'predictor rowsperstrip'
-    pnmtoxwd 'pseudodepth'
-    asciitopgm 'd'
-    fitstopgm 'image'
-    fitstopnm 'image min max'
-    giftopnm 'image'
-    macptopbm 'extraskip'
-    pstopnm 'llx lly urx ury xborder xmax xsize yborder ymax ysize'
-    rawtopgm 'headerskip rowskip'
-    rawtoppm 'headerskip rowskip'
-    sldtoppm 'height ysize lib Lib scale width xsize'
-  )
-
-  # Options without arguments.
-
-  _pbm_options=(
-    pbmclean 'connect'
-    pbmmake 'white black gray'
-    pbmmask 'expand'
-    pbmreduce 'floyd fs threshold'
-    pbmtoepsi 'bbonly'
-    pgmenhance '1 2 3 4 5 6 7 8 9'
-    pgmramp 'lr tb rectangle ellipse'
-    pgmtopbm 'floyd fs threshold dither8 d8 cluster3 c3 cluster4 c4 cluster8 c8'
-    ppmbrighten 'n'
-    ppmdist 'intensity frequency'
-    ppmforge 'clouds night'
-    ppmpat 'gingham2 g2 gingham3 g3 madras tartan poles squig camo anticamo'
-    ppmquant 'floyd fs'
-    ppmqvga 'd q v'
-    ppmtoacad 'dxb poly white 8'
-    ppmtobmp 'os2 windows'
-    ppmtogif 'interlace'
-    ppmtoicr 'rle'
-    ppmtoilbm 'hamif'
-    ppmtomap 'sort square'
-    ppmtomitsu 'dpi300 tiny'
-    ppmtopj 'rle center'
-    ppmtopjxl 'nopack presentation dark diffuse cluster dither'
-    ppmtosixel 'raw margin'
-    ppmtotga 'mono cmap rgb norle'
-    pnmalias 'bonly fonly balias falias'
-    pnmarith 'add subtract multiply'
-    pnmcat 'white black leftright lr topbottom tb jtop jbottom jleft jright'
-    pnmcomp 'invert'
-    pnmcrop 'white black'
-    pnmflip 'leftright lr topbottom tb transpose xy rotate90 r90 ccw rotate270 r270 cw rotate180 r180'
-    pnmhistmap 'black white verbose'
-    pnmindex 'black'
-    pnmmargin 'white black'
-    pnmpad 'white black'
-    pnmpaste 'replace or and xor'
-    pnmrotate 'noantialias'
-    pnmshear 'noantialias'
-    pnmtops 'turn noturn rle runlength'
-    pnmtorast 'standard rle'
-    pnmtosgi 'verbatim rle'
-    pnmtotiff 'none packbits lzw g3 g4 2d fill msb2lsb lsb2msb'
-    pnmtoxwd 'directcolor'
-    fitstopnm 'noraw scanmax printmax'
-    g3topbm 'kludge reversebits stretch'
-    giftopnm 'verbose comments'
-    picttoppm 'verbose'
-    pstopnm 'forceplain help landscape portrait nocrop pbm pgm ppm verbose'
-    rawtoppm 'rgb rbg grb gbr brg bgr interpixel interrow'
-    sgitopnm 'verbose'
-    sldtoppm 'adjust dir info verbose'
-    tgatoppm 'debug'
-    tifftopnm 'headerdump'
-    zeisstopnm 'pgm ppm'
-  )
-fi
-
-opts=( $=_pbm_arg_options[$words[1]] )
-if (( $#opts )); then
-
-  # This Command has options with arguments. The options are already in
-  # `opts'. Now we see if we are after one of these options on the line.
-
-  local after="$opts[(I)${words[CURRENT-1][2,-1]}(|:*)]"
-
-  if (( after )); then
-
-    # We are. If the string contains a colon, anything after it is a 
-    # colon-separated list of words. We just execute this list of words
-    # as a command with its arguments.
-
-    if [[ "$opts[$after]" = *:* ]]; then
-      after="${${opts[after]#*:}//:/ }"
-      [[ -z "$after" ]] || $=after 
-    fi
-    return
-  fi
-
-  # Otherwise we just add the option names.
-
-  compadd -J options - -${^=opts%%:*}
-fi
-
-# And the names of the options without arguments.
-
-opts=( $=_pbm_options[$words[1]] )
-(( $#opts )) && compadd -J options - -${^=opts}
-
-# A small special case here: the first argument of `ppmmake' is a
-# color. More of these could be added.
-
-if [[ "$words[1]" = ppmmake && CURRENT -eq 2 ]]; then
-  _colors
-  return
-fi
-
-# Generate the filenames.
+local pat expl ret=1
 
 if [[ "$words[1]" = pnm* ]]; then
   pat='*.(#i)p[bgp]m'
+elif [[ "$words[1]" = *top[bgpn]m ]]; then
+  pat="*.(#i)${words[1]%%top[bgpn]m}"
 else
   pat="*.(#i)${words[1][1,3]}"
 fi
+  
+if [[ $# -ne 0 || $+_in_pbm -ne 0 ]]; then
+  if (( ! $# )); then
+    _description expl 'picture file'
+    set -- "$expl[@]"
+  fi
+  _path_files "$@" -g "$pat" || _files "$@" -g '*.(#i)p[bgp]m'
+  return
+fi
 
-_path_files -J files -g "$pat" || _files -J files -g '*.(#i)p[bgp]m'
+local _in_pbm=yes
+  
+case "$words[1]" in
+asciitopnm)
+  _arguments '-d:divisor:' ':height:' ':width:' ':file: _pbm'
+  ;;
+
+fitstopgm)
+  _arguments '-image:image number:' ':file: _pbm'
+  ;;
+
+fitstopnm)
+  _arguments -{noraw,scanmax,printmax} '-image:image number:' \
+             '-min:minimum value:' '-max:maximum value:' ':file: _pbm'
+  ;;
+
+g3topbm)
+  _arguments -{kludge,reversebits,stretch} ':file: _pbm'
+  ;;
+
+giftopnm)
+  _arguments -{verbose,comments} '-image:image number:' \
+             ':file: _pbm'
+  ;;
+
+macptopbm)
+  _arguments '-extraskip:number of bytes to skip:' ':file: _pbm'
+  ;;
+
+pbmclean)
+  _arguments '-connect' ':file: _pbm'
+  ;;
+
+pbmmake)
+  _arguments -{white,black,gray} ':width:' ':height:'
+  ;;
+
+pbmmask)
+  _arguments '-expand' ':file: _pbm'
+  ;;
+
+pbmpscale)
+  _arguments ':scale factor:' ':file: _pbm'
+  ;;
+
+pbmreduce)
+  _arguments -{floyd,fs,threshold} '-value:threshold value:' \
+             ':reduction factor:' ':file: _pbm'
+  ;;
+
+pbmtext)
+  _arguments '-font:font file:_files -g \*.\(\#i\)pbm' '*:text:'
+  ;;
+
+pbmto10x)
+  _arguments '-h' ':file: _pbm'
+  ;;
+
+pbmtobg|pbmtobbnbg)
+  _arguments ':raster operation:' ':x position:' ':y position:'
+  ;;
+
+pbmtoepsi)
+  _arguments '-bbonly' ':file: _pbm'
+  ;;
+
+pbmtolj)
+  _arguments '-resolution:resolution:(75 100 150 300)' ':file: _pbm'
+  ;;
+
+pbmtoln03)
+  _arguments -{l:left,r:right,t:top,b:bottom}' margin:' \
+             '-f:form length:' ':file: _pbm'
+  ;;
+
+pbmtolps)
+  _arguments '-dpi:resolution:' ':file: _pbm'
+  ;;
+
+pbmtomacp)
+  _arguments -{l:left,r:right,t:top,b:bottom}' offset:' ':file: _pbm'
+  ;;
+
+pbmtopgm)
+  _arguments ':width:' ':height:' ':file: _pbm'
+  ;;
+
+pbmtopk)
+  # This could be improved...
+  
+  _arguments '-s:design size:' '-C:coding scheme:' '-F:font family:' \
+             '-f:option file:_files' '-c:character number:' \
+             '-W:width:' '-H:height:' '-D:depth:' '-I:italic correction:' \
+             '-h:horizontal escapement:' '-v:vertical escapement:' \
+             '-x:x offset:' '-y:y offset:' \
+             ':pk file:_files -g \*.\(\#i\)pk' ':tfm file:_files -g \*.\(\#i\)tfm' \
+             '*:file: _pbm'
+  ;;
+
+pbmupc)
+  _arguments -s{1,2} ':product type:' ':manufacturer code:' \
+             ':product code:'
+  ;;
+
+pgmcrater)
+  _arguments '-number:number of craters:' '-gamma:factor:' \
+             -{height,ysize}:height: -{width,xsize}:width:
+  ;;
+
+pgmkernel)
+  _arguments '-weight:weight:' ':width:' ':height:'
+  ;;
+
+pgmnoise)
+  _arguments ':width:' ':height:'
+  ;;
+
+pgmnorm|ppmnorm)
+  _arguments '-bpercent:black percentage:' '-bvalue:black pixel value:' \
+             '-wpercent:white percentage:' '-wvalue:white pixel value:' \
+             ':file: _pbm'
+  ;;
+
+pgmoil)
+  _arguments '-n:smear size:' ':file: _pbm'
+  ;;
+
+pgmramp)
+  _arguments -{lr,tb,rectangle,ellipse} ':width:' ':height:'
+  ;;
+
+pgmtexture)
+  _arguments '-d:distance:' ':file: _pbm'
+  ;;
+
+pgmtopbm)
+  _arguments -{floyd,fs,threshold,dither8,d8,cluster3,c3,cluster4,c4,cluster8,c8} \
+             '-value:threshold value:' ':file: _pbm'
+  ;;
+
+pgmtoppm)
+  if [[ CURRENT -eq 2 ]]; then
+    if compset -P '?*-'; then
+      _x_color
+      return
+    fi
+    _x_color && ret=0
+  
+    _description expl option
+    compadd "$expl[@]" - -map && ret=0
+  
+    return ret
+  elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then
+    _description expl 'map file'
+    _files "$expl[@]" -g '*.(#i)ppm'
+  else
+    _pbm
+  fi
+  ;;
+
+pktopbm)
+  _arguments ':pk file:_files -g \*.\(\#i\)pk' '-c:character number:' \
+             '*:file: _pbm'
+  ;;
+
+pnmalias)
+  _arguments '-bgcolor:background color:_x_color' \
+             '-fgcolor:foreground color:_x_color' \
+             -{f,b}only -{f,b}alias \
+             '-weight:central aliasing weight:' ':file: _pbm'
+  ;;
+
+pnmarith)
+  _arguments -{add,subtract,multiply} '*:file: _pbm'
+  ;;
+
+pnmcat)
+  _arguments -{white,black,leftright,lr,topbottom,tb,jtop,jbottom,jleft,jright} \
+             '*:file: _pbm'
+  ;;
+
+pnmcomp)
+  _arguments '-invert' '-xoff:x offset:' '-yoff:y offset:' \
+             '-alpha:alpha mask file:_files -g \*.\(\#i\)pgm' \
+             ':overlay file:_pbm' '*:file: _pbm'
+  ;;
+
+pnmconvol)
+  _arguments ':convolution file:_pbm' ':file: _pbm'
+  ;;
+
+pnmcrop)
+  _arguments -{white,black} ':file: _pbm'
+  ;;
+
+pnmcut)
+  _arguments ':x position:' ':y position:' ':width:' ':height:' ':file: _pbm'
+  ;;
+
+pnmdepth)
+  _arguments ':new maximum value:' ':file: _pbm'
+  ;;
+
+pnmenlarge)
+  _arguments ':enlargement factor:' ':file: _pbm'
+  ;;
+
+pnmflip)
+  _arguments -{leftright,lr,topbottom,tb,transpose,xy,rotate90,r90,ccw,rotate270,r270,cw} \
+             ':file: _pbm'
+  ;;
+
+pnmgamma)
+  if [[ CURRENT -eq 2 ]]; then
+    _message 'gamma value or red gamma value'
+  elif [[ CURRENT -eq 3 ]]; then
+    _pbm && ret=0
+    _message 'green gamma value'
+  elif [[ CURRENT -eq 4 ]]; then
+    _message 'blue gamma value'
+  elif [[ CURRENT -eq 5 ]]; then
+    _pbm && ret=0
+  fi
+  
+  return ret
+  ;;
+
+pnmhistmap)
+  _arguments -{black,white,verbose} '-max:maximum value:' ':file: _pbm'
+  ;;
+
+pnmindex)
+  _arguments '-size:image size:' '-across:images per row:' \
+             '-colors:number of colors:' '-black' '*:file: _pbm'
+  ;;
+
+pnmmargin)
+  _arguments -{white,black} '-color:color: _x_color' \
+             ':border width:' ':file: _pbm'
+  ;;
+
+pnmnlfilt)
+  _arguments ':alpha value:' ':radius:' ':file: _pbm'
+  ;;
+
+pnmpad)
+  _arguments -{black,white} \
+             -{l-:left,r-:right,t-:top,b-:bottom}' border width:' \
+             ':file: _pbm'
+  ;;
+
+pnmpaste)
+  _arguments -{replace,or,and,xor} ':"from" picture file:_pbm' \
+             :{x,y}' position:'    ':"into" picture file:_pbm'
+  ;;
+
+pnmrotate)
+  _arguments '-noantialias' ':rotation angle:' ':file: _pbm'
+  ;;
+
+pnmscale)
+  local scale
+  
+  if [[ "$words[2]" = -* ]]; then
+    scale=()
+  else
+    scale=( ':scale factor:' )
+  fi
+  
+  _arguments -{xsize,width}:width: -{ysize,height}:height: \
+             '-xscale:horizontal scale factor:' \
+             '-yscale:vertical scale factor:' \
+             '-xysize:width::height:' "$scale[@]" \
+             ':file: _pbm'
+  ;;
+
+pnmshear)
+  _arguments '-noantialias' ':shearing angle:' ':file: _pbm'
+  ;;
+
+pnmtile)
+  _arguments ':width:' ':height:' ':file: _pbm'
+  ;;
+
+pnmtoddif)
+  _arguments '-resolution:horizontal resolution::vertical resolution:' \
+             ':file: _pbm' ':ddif file:_files -g \*.\(\#i\)ddif'
+  ;;
+
+pnmtofits)
+  _arguments '-max:maximum value:' '-min:minimum value:' ':file: _pbm'
+  ;;
+
+pnmtops)
+  _arguments -{turn,noturn,rle,runlength} '-scale:scale factor:' \
+             '-dpi:output resolution:' \
+             '-width:page width:' '-height:page height' ':file: _pbm'
+  ;;
+
+pnmtorast)
+  _arguments -{standard,rle} ':file: _pbm'
+  ;;
+
+pnmtosgi)
+  _arguments -{verbatim,rle} '-imagename:image name:' ':file: _pbm'
+  ;;
+
+pnmtotiff)
+  _arguments -{none,packbits,lzw,g3,g4,2d,fill,msb2lsb,lsb2msb} \
+             '-predictor:LZW predictor:((1\:without\ differencing 2\:with\ differencing))' \
+             '-rowsperstrip:number of rows per strip:' ':file: _pbm'
+  ;;
+
+pnmtoxwd)
+  _arguments '-pseudodepth:depth of PseudoColor dumps:' '-directcolor' \
+             ':file: _pbm'
+  ;;
+
+ppm3d)
+  _arguments :{left,right}' picture file:_pbm' ':horizontal offset:'
+  ;;
+
+ppmbrighten)
+  _arguments '-n' '-s:saturation:' '-v:value:' ':file: _pbm'
+  ;;
+
+ppmchange)
+  _pbm && ret=0
+  
+  if (( CURRENT & 1 )); then
+    _description expl 'new color'
+  else
+    _description expl 'old color'
+  fi
+  
+  _x_color "$expl[@]" && ret=0
+  
+  return ret
+  ;;
+
+ppmdim)
+  _arguments ':diminishing factor:' ':file: _pbm'
+  ;;
+
+ppmdist)
+  _arguments -{intensity,frequency} ':file: _pbm'
+  ;;
+
+ppmdither)
+  _arguments '-dim:matrix size:' \
+             '-red:number of red shades:' \
+             '-green:number of green shades:' \
+             '-blue:number of blue shades:' \
+             ':file: _pbm'
+  ;;
+
+ppmflash)
+  _arguments ':flash factor:' ':file: _pbm'
+  ;;
+
+ppmforge)
+  _arguments -{clouds,night} \
+             '-dimension:fractal dimension:' '-hour:hour angle:' \
+             '-inclination:inclination angle:' \
+             '-tilt:inclination angle:' \
+             '-mesh:FFT mesh size:' '-power:elevations power factor:' \
+             '-glaciers:glacier elevation:' '-ice:polar ice cap extent:' \
+             '-saturation:star color saturation:' \
+             '-seed:randum number seed:' \
+             '-stars:minimum star pixel percentage:' \
+             -{width,xsize}:width: -{height,ysize}:height:
+  ;;
+
+ppmmake)
+  _arguments ':color: _x_color' ':width:' ':height:'
+  ;;
+
+ppmmix)
+  _arguments ':fade factor:' ':file: _pbm' ':file: _pbm'
+  ;;
+
+ppmntsc)
+  _arguments ':dim factor:' ':file: _pbm'
+  ;;
+
+ppmpat)
+  _arguments -{gingham{2,3},g{2,3},madras,tartan,poles,squig,camo,anticamo} \
+             ':width:' ':height:'
+  ;;
+
+ppmquant)
+  local opt=yes
+  
+  if [[ "$words[2]" = -(fs|floyd) ]]; then
+    (( CURRENT-- ))
+    shift 1 words
+    opt=''
+  fi
+  
+  if [[ CURRENT -eq 2 ]]; then
+    _description expl option
+    if [[ -n "$opt" ]]; then
+      compadd "$expl[@]" - -map -fs -floyd && ret=0
+    else
+      compadd "$expl[@]" - -map && ret=0
+    fi
+    _message 'number of colors'
+  
+    return ret
+  elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then
+    _description expl 'map file'
+    _files "$expl[@]" -g '*.(#i)ppm'
+  else
+    _pbm
+  fi
+  ;;
+
+ppmquantall)
+  _arguments ':number of colors:' '*:file: _pbm'
+  ;;
+
+ppmshift)
+  _arguments ':shift value:' ':file: _pbm'
+  ;;
+
+ppmspread)
+  _arguments ':maximum spread amount:' ':file: _pbm'
+  ;;
+
+ppmtoacad)
+  _arguments -{dxb,poly,white,8} '-background:background color:_x_color' \
+             '-aspect:pixel aspect ratio:' ':file: _pbm'
+  ;;
+
+ppmtobmp)
+  _arguments -{os2,windows} ':file: _pbm'
+  ;;
+
+ppmtogif)
+  _arguments '-interlace' ':file: _pbm'
+  ;;
+
+ppmtoicr)
+  _arguments '-windowname:window name:' '-expand:expansion factor:' \
+             '-display:display screen:' '-rle' ':file: _pbm'
+  ;;
+
+ppmtoilbm)
+  _arguments '-hamif' ':file: _pbm'
+  ;;
+
+ppmtomap)
+  _arguments -s{ort,quare} ':file: _pbm'
+  ;;
+
+ppmtomitsu)
+  _arguments '-sharpness:sharpness:(1 2 3 4)' \
+             '-enlarge:enlargement factor:(1 2 3)' \
+             '-media:output media (default\: 1184x1350):((A\:1216x1350 A4\:1184x1452 AS\:1216x1650 A4S\:1184x1754))' \
+             '-copy:number of copies:(1 2 3 4 5 6 7 8 9)' \
+             -{dpi300,tiny} ':file: _pbm'
+  ;;
+
+ppmtopj)
+  _arguments '-gamma:gamma value:' '-xpos:x position:' -{rle,center} \
+             '-ypos:y position:' '-back:background brightness:(dark lite)' \
+             '-render:rendering algorithm:(none snap bw dither diffuse monodither monodiffuse clusterdither monoclusterdither)' \
+             ':file: _pbm'
+  ;;
+
+ppmtopjxl)
+  _arguments -{nopack,presentation,dark,diffuse,cluster,dither} \
+             '-gamma:gamma value:' \
+             '-xshift:x shift:' '-yshift:y shift:' \
+             -{xscale:x,yscale:y}' scale factor:' \
+             -{xsize,width}:width: -{ysize,height}:height: \
+             ':file: _pbm'
+  ;;
+
+ppmtosixel)
+  _arguments -{raw,margin} ':file: _pbm'
+  ;;
+
+ppmtotga)
+  _arguments -{mono,cmap,rgb,norle} ':file: _pbm'
+  ;;
+
+ppmtouil|ppmtoxpm)
+  _arguments '-name:name prefix:' ':file: _pbm'
+  ;;
+
+ppmtoyuvsplit)
+  _arguments ':base name:' ':file: _pbm'
+  ;;
+
+psidtopgm)
+  _arguments ':width:' ':height:' ':bits per sample:' \
+             ':postscript file:_files -g \*.\(\#i\)\(ps\|eps\)'
+  ;;
+
+pstopnm)
+  _arguments -{forceplain,help,landscape,portrait,nocrop,pbm,pgm,ppm,verbose} \
+             '-llx:loxer left x position:' '-lly:lower left y position:' \
+             '-urx:upper right x position:' '-ury:upper right y position:' \
+             '-xborder:x border fraction:' '-yborder:y border fraction:' \
+             '-xmax:maximum width:' '-ymax:maximum height' \
+             '-xsize:width:' '-ysize:height:' \
+             ':postscript file:_files -g \*.\(\#i\)\(ps\|eps\)'
+  ;;
+
+rawtopgm)
+  _arguments '-headerskip:header bytes to skip:' \
+             '-rowskip:row padding to skip:' \
+             ':width:' ':height:' ':grayscale bytes:'
+  ;;
+
+rawtoppm)
+  _arguments '-headerskip:header bytes to skip:' \
+             '-rowskip:row padding to skip:' \
+             -{rgb,rbg,grb,gbr,brg,bgr,interpixel,interrow} \
+             ':width:' ':height:' ':grayscale bytes:'
+  ;;
+
+rgb3toppm)
+  if [[ CURRENT -eq 2 ]]; then
+    expl='red picture file'
+  elif [[ CURRENT -eq 3 ]]; then
+    expl='green picture file'
+  elif [[ CURRENT -eq 4 ]]; then
+    expl='blue picture file'
+  fi
+  
+  if [[ -n "$expl" ]]; then
+    _description expl "$expl"
+    _files "$expl" -g '*.(#i)pgm'
+  fi
+  ;;
+
+sgitopnm)
+  _arguments '-verbose' ':file: _pbm'
+  ;;
+
+sldtoppm)
+  _arguments -{adjust,dir,info,verbose} \
+             -{width,xsize}:width: -{height,ysize}:height: \
+             '-scale:scale factor:' \
+             '-lib:slide name:' '-Lib:slide name:' ':file: _pbm'
+  ;;
+
+yuvsplittoppm)
+  _arguments ':base name:' ':width:' ':height:' '-ccir601'
+  ;;
+
+yuvtoppm)
+  _arguments ':width:' ':height:' ':image bytes:'
+  ;;
+
+zeisstopnm)
+  _arguments -p{g,p}m ':file: _pbm'
+  ;;
+
+*) 
+  _description expl 'picture file'
+  _path_files "$expl[@]" -g "$pat" || _files "$expl[@]" -g '*.(#i)p[bgp]m'
+esac
