@@ -239,7 +239,7 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
 #ifdef INO_T_IS_64_BIT
 	convbase(optr, sbuf->st_ino, 0);
 #else
-	DPUTS(sizeof(sbuf->st_ino) > 4,
+	DPUTS(sizeof(sbuf->st_ino) > sizeof(unsigned long),
 	      "Shell compiled with wrong ino_t size");
 	statulprint((unsigned long)sbuf->st_ino, optr);
 #endif
@@ -269,7 +269,7 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
 #ifdef OFF_T_IS_64_BIT
 	convbase(optr, sbuf->st_size, 0);
 #else
-	DPUTS(sizeof(sbuf->st_size) > 4,
+	DPUTS(sizeof(sbuf->st_size) > sizeof(unsigned long),
 	      "Shell compiled with wrong off_t size");
 	statulprint((unsigned long)sbuf->st_size, optr);
 #endif

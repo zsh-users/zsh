@@ -1869,6 +1869,10 @@ msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
     msearchpush(ptr, back);
 
     if (ins) {
+	/*
+	 * TODO: probably need to convert back to multibyte character
+	 * string?  Who knows...
+	 */
         s[0] = lastchar;
         s[1] = '\0';
 
@@ -2802,9 +2806,7 @@ domenuselect(Hookdef dummy, Chdata dat)
                     }
                 }
                 if (cmd == Th(z_selfinsertunmeta)) {
-                    lastchar &= 0x7f;
-                    if (lastchar == '\r')
-                        lastchar = '\n';
+		    fixunmeta();
                 }
                 wrap = 0;
                 np = msearch(p, ins, (ins ? (mode == MM_BSEARCH) : back),

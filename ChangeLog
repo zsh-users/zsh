@@ -1,5 +1,15 @@
 2005-02-18  Peter Stephenson  <pws@csr.com>
 
+	* 20823: Src/Modules/stat.c: debugging test failed on 64-bit
+	machines.
+
+	* 20822: system.h, Src/Zle/complist.c, Src/Zle/deltochar.c,
+	Src/Zle/zle.h, Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_move.c,
+	Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c,
+	Src/Zle/zle_vi.c: improve input ready for multibyte/Unicode
+	handling, massaging use of getkey() and lastchar.
+
 	* Motoi Washida: users/8522: Completion/Darwin/Command/_defaults:
 	Fix quotation in Darwin completion.
 

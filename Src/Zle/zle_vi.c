@@ -50,6 +50,11 @@ int vilinerange;
 /**/
 int vichgbufsz, vichgbufptr, vichgflag;
 
+/*
+ * TODO: need consistent handling of vichgbuf: ZLE_STRING_T or
+ * char *?  Consequently, use of lastchar in this file needs fixing
+ * too.
+ */
 /**/
 char *vichgbuf;
 
@@ -95,15 +100,15 @@ startvitext(int im)
 }
 
 /**/
-int
+ZLE_INT_T
 vigetkey(void)
 {
     Keymap mn = openkeymap("main");
     char m[3], *str;
     Thingy cmd;
 
-    if((lastchar = getkey(0)) == EOF)
-	return -1;
+    if(getbyte(0) == EOF)
+	return ZLEEOF;
 
     m[0] = lastchar;
     metafy(m, 1, META_NOALLOC);
@@ -112,23 +117,35 @@ vigetkey(void)
     else
 	cmd = t_undefinedkey;
 
+    /*
+     * TODO: if this was bound to self-insert, we may
+     * be on the first character of a multibyte string
+     * and need to acquire the rest.
+     */
     if (!cmd || cmd == Th(z_sendbreak)) {
-	return -1;
+	return ZLEEOF;
     } else if (cmd == Th(z_quotedinsert)) {
-	if ((lastchar = getkey(0)) == EOF)
-	    return -1;
+	if (getfullchar(0) == ZLEEOF)
+	    return ZLEEOF;
     } else if(cmd == Th(z_viquotedinsert)) {
-	char sav = zleline[zlecs];
+	ZLE_CHAR_T sav = zleline[zlecs];
 
 	zleline[zlecs] = '^';
 	zrefresh();
-	lastchar = getkey(0);
+	getfullchar(0);
 	zleline[zlecs] = sav;
-	if(lastchar == EOF)
-	    return -1;
-    } else if (cmd == Th(z_vicmdmode))
-	return -1;
-    return lastchar;
+	if(LASTFULLCHAR == ZLEEOF)
+	    return ZLEEOF;
+    } else if (cmd == Th(z_vicmdmode)) {
+	return ZLEEOF;
+    }
+#ifdef ZLE_UNICODE_SUPPORT
+    if (!lastchar_wide_valid)
+    {
+	getrestchar(lastchar);
+    }
+#endif
+    return LASTFULLCHAR;
 }
 
 /**/
@@ -489,7 +506,7 @@ vireplacechars(UNUSED(char **args))
 	return 1;
     }
     /* get key */
-    if((ch = vigetkey()) == -1) {
+    if((ch = vigetkey()) == ZLEEOF) {
 	vichgflag = 0;
 	return 1;
     }
@@ -593,7 +610,7 @@ virepeatchange(UNUSED(char **args))
     }
     /* repeat the command */
     inrepeat = 1;
-    ungetkeys(vichgbuf, vichgbufptr);
+    ungetbytes(vichgbuf, vichgbufptr);
     return 0;
 }
 
@@ -817,26 +834,35 @@ vicapslockpanic(UNUSED(char **args))
     statusline = "press a lowercase key to continue";
     statusll = strlen(statusline);
     zrefresh();
-    while (!islower(getkey(0)));
+#ifdef ZLE_UNICODE_SUPPORT
+    while (!iswlower(getfullchar(0)));
+#else
+    while (!islower(getfullchar(0)));
+#endif
     statusline = NULL;
     return 0;
 }
+
+#ifdef ZLE_UNICODE_SUPPORT
+#else
+#endif
 
 /**/
 int
 visetbuffer(UNUSED(char **args))
 {
-    int ch;
+    ZLE_INT_T ch;
 
     if ((zmod.flags & MOD_VIBUF) ||
-	(((ch = getkey(0)) < '1' || ch > '9') &&
-	 (ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z')))
+	(((ch = getfullchar(0)) < DIGIT_1 || ch > DIGIT_9) &&
+	 (ch < LETTER_a || ch > LETTER_z) &&
+	 (ch < LETTER_A || ch > LETTER_Z)))
 	return 1;
-    if (ch >= 'A' && ch <= 'Z')	/* needed in cut() */
+    if (ch >= LETTER_A && ch <= LETTER_Z)	/* needed in cut() */
 	zmod.flags |= MOD_VIAPP;
     else
 	zmod.flags &= ~MOD_VIAPP;
-    zmod.vibuf = tulower(ch) + (idigit(ch) ? -'1' + 26 : -'a');
+    zmod.vibuf = tulower(ch) + (idigit(ch) ? - DIGIT_1 + 26 : -LETTER_a);
     zmod.flags |= MOD_VIBUF;
     prefixflag = 1;
     return 0;
@@ -897,12 +923,12 @@ viquotedinsert(char **args)
     sob.sg_flags = (sob.sg_flags | RAW) & ~ECHO;
     ioctl(SHTTY, TIOCSETN, &sob);
 #endif
-    lastchar = getkey(0);
+    getfullchar(0);
 #ifndef HAS_TIO
     zsetterm();
 #endif
     foredel(1);
-    if(lastchar < 0)
+    if(LASTFULLCHAR == ZLEEOF)
 	return 1;
     else
 	return selfinsert(args);

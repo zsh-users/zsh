@@ -353,13 +353,14 @@ vibeginningofline(UNUSED(char **args))
     return 0;
 }
 
-static int vfindchar, vfinddir, tailadd;
+static ZLE_INT_T vfindchar;
+static int vfinddir, tailadd;
 
 /**/
 int
 vifindnextchar(char **args)
 {
-    if ((vfindchar = vigetkey()) != -1) {
+    if ((vfindchar = vigetkey()) != ZLEEOF) {
 	vfinddir = 1;
 	tailadd = 0;
 	return virepeatfind(args);
@@ -371,7 +372,7 @@ vifindnextchar(char **args)
 int
 vifindprevchar(char **args)
 {
-    if ((vfindchar = vigetkey()) != -1) {
+    if ((vfindchar = vigetkey()) != ZLEEOF) {
 	vfinddir = -1;
 	tailadd = 0;
 	return virepeatfind(args);
@@ -383,7 +384,7 @@ vifindprevchar(char **args)
 int
 vifindnextcharskip(char **args)
 {
-    if ((vfindchar = vigetkey()) != -1) {
+    if ((vfindchar = vigetkey()) != ZLEEOF) {
 	vfinddir = 1;
 	tailadd = -1;
 	return virepeatfind(args);
@@ -395,7 +396,7 @@ vifindnextcharskip(char **args)
 int
 vifindprevcharskip(char **args)
 {
-    if ((vfindchar = vigetkey()) != -1) {
+    if ((vfindchar = vigetkey()) != ZLEEOF) {
 	vfinddir = -1;
 	tailadd = 1;
 	return virepeatfind(args);
@@ -465,12 +466,12 @@ vifirstnonblank(UNUSED(char **args))
 int
 visetmark(UNUSED(char **args))
 {
-    int ch;
+    ZLE_INT_T ch;
 
-    ch = getkey(0);
-    if (ch < 'a' || ch > 'z')
+    ch = getfullchar(0);
+    if (ch < LETTER_a || ch > LETTER_z)
 	return 1;
-    ch -= 'a';
+    ch -= LETTER_a;
     vimarkcs[ch] = zlecs;
     vimarkline[ch] = histline;
     return 0;
@@ -480,15 +481,15 @@ visetmark(UNUSED(char **args))
 int
 vigotomark(UNUSED(char **args))
 {
-    int ch;
+    ZLE_INT_T ch;
 
-    ch = getkey(0);
-    if (ch == lastchar)
+    ch = getfullchar(0);
+    if (ch == LASTFULLCHAR)
 	ch = 26;
     else {
-	if (ch < 'a' || ch > 'z')
+	if (ch < LETTER_a || ch > LETTER_z)
 	    return 1;
-	ch -= 'a';
+	ch -= LETTER_a;
     }
     if (!vimarkline[ch])
 	return 1;

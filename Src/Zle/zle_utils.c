@@ -510,7 +510,7 @@ hstrnstr(char *haystack, int pos, char *needle, int len, int dir, int sens)
 mod_export int
 getzlequery(int yesno)
 {
-    int c;
+    ZLE_INT_T c;
 #ifdef FIONREAD
     int val;
 
@@ -525,18 +525,18 @@ getzlequery(int yesno)
 #endif
 
     /* get a character from the tty and interpret it */
-    c = getkey(0);
+    c = getfullchar(0);
     if (yesno) {
-	if (c == '\t')
-	    c = 'y';
+	if (c == ZLETAB)
+	    c = LETTER_y;
 	else if (icntrl(c) || c == EOF)
-	    c = 'n';
+	    c = LETTER_n;
 	else
 	    c = tulower(c);
     }
     /* echo response and return */
-    if (c != '\n')
-	putc(c, shout);
+    if (c != ZLENL)
+	putc(c, shout);		/* TODO: convert to multibyte */
     return c;
 }
 

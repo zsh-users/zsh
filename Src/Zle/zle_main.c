@@ -78,10 +78,30 @@ int done;
 /**/
 int mark;
 
-/* last character pressed */
+/*
+ * Last character pressed.
+ *
+ * Depending how far we are with processing, the lastcharacter may
+ * be a single byte read (lastchar_wide_valid is 0, lastchar_wide is not
+ * valid) or a full wide character.  This is needed because we can't be
+ * sure whether the user is typing old \M-style commands or multibyte
+ * input.
+ *
+ * Calling getfullchar or getrestchar is guaranteed to ensure we have
+ * a valid wide character (although this may be WEOF).  In many states
+ * we know this and don't need to test lastchar_wide_valid.
+ */
 
 /**/
-mod_export int lastchar;
+mod_export int
+lastchar;
+#ifdef ZLE_UNICODE_SUPPORT
+/**/
+mod_export ZLE_INT_T lastchar_wide;
+/**/
+mod_export int
+lastchar_wide_valid;
+#endif
 
 /* the bindings for the previous and for this key */
 
@@ -148,7 +168,7 @@ mod_export struct modifier zmod;
 /**/
 int prefixflag;
 
-/* Number of characters waiting to be read by the ungetkeys mechanism */
+/* Number of characters waiting to be read by the ungetbytes mechanism */
 /**/
 int kungetct;
 
@@ -196,7 +216,7 @@ zsetterm(void)
 	 * we can't set up the terminal for zle *at all* until
 	 * we are sure there is no more typeahead to come.  So
 	 * if there is typeahead, we set the flag delayzsetterm.
-	 * Then getkey() performs another FIONREAD call; if that is
+	 * Then getbyte() performs another FIONREAD call; if that is
 	 * 0, we have finally used up all the typeahead, and it is
 	 * safe to alter the terminal, which we do at that point.
 	 */
@@ -266,7 +286,7 @@ zsetterm(void)
     ti.tio.c_cc[VMIN] = 1;
     ti.tio.c_cc[VTIME] = 0;
     ti.tio.c_iflag |= (INLCR | ICRNL);
- /* this line exchanges \n and \r; it's changed back in getkey
+ /* this line exchanges \n and \r; it's changed back in getbyte
 	so that the net effect is no change at all inside the shell.
 	This double swap is to allow typeahead in common cases, eg.
 
@@ -275,12 +295,12 @@ zsetterm(void)
 	echo foo<return>  <--- typed before sleep returns
 
 	The shell sees \n instead of \r, since it was changed by the kernel
-	while zsh wasn't looking. Then in getkey() \n is changed back to \r,
+	while zsh wasn't looking. Then in getbyte() \n is changed back to \r,
 	and it sees "echo foo<accept line>", as expected. Without the double
 	swap the shell would see "echo foo\n", which is translated to
 	"echo fooecho foo<accept line>" because of the binding.
 	Note that if you type <line-feed> during the sleep the shell just sees
-	\n, which is translated to \r in getkey(), and you just get another
+	\n, which is translated to \r in getbyte(), and you just get another
 	prompt. For type-ahead to work in ALL cases you have to use
 	stty inlcr.
 
@@ -321,9 +341,16 @@ zsetterm(void)
 static char *kungetbuf;
 static int kungetsz;
 
+/*
+ * Note on ungetbyte and ungetbytes for the confused (pws):
+ * these are low level and deal with bytes before they
+ * have been converted into (possibly wide) characters.
+ * Hence the names.
+ */
+
 /**/
 void
-ungetkey(int ch)
+ungetbyte(int ch)
 {
     if (kungetct == kungetsz)
 	kungetbuf = realloc(kungetbuf, kungetsz *= 2);
@@ -332,11 +359,11 @@ ungetkey(int ch)
 
 /**/
 void
-ungetkeys(char *s, int len)
+ungetbytes(char *s, int len)
 {
     s += len;
     while (len--)
-	ungetkey(*--s);
+	ungetbyte(*--s);
 }
 
 #if defined(pyr) && defined(HAVE_SELECT)
@@ -356,7 +383,7 @@ breakread(int fd, char *buf, int n)
 #endif
 
 static int
-raw_getkey(int keytmout, char *cptr)
+raw_getbyte(int keytmout, char *cptr)
 {
     long exp100ths;
     int ret;
@@ -591,12 +618,21 @@ raw_getkey(int keytmout, char *cptr)
 
 /**/
 mod_export int
-getkey(int keytmout)
+getbyte(int keytmout)
 {
     char cc;
     unsigned int ret;
     int die = 0, r, icnt = 0;
     int old_errno = errno, obreaks = breaks;
+
+#ifdef ZLE_UNICODE_SUPPORT
+    /*
+     * Reading a single byte always invalidates the status
+     * of lastchar_wide.  We may fix this up in getrestchar
+     * if this is the last byte of a wide character.
+     */
+    lastchar_wide_valid = 0;
+#endif
 
     if (kungetct)
 	ret = STOUC(kungetbuf[--kungetct]);
@@ -612,10 +648,10 @@ getkey(int keytmout)
 	for (;;) {
 	    int q = queue_signal_level();
 	    dont_queue_signals();
-	    r = raw_getkey(keytmout, &cc);
+	    r = raw_getbyte(keytmout, &cc);
 	    restore_queue_signals(q);
 	    if (r == -2)	/* timeout */
-		return EOF;
+		return lastchar = EOF;
 	    if (r == 1)
 		break;
 	    if (r == 0) {
@@ -642,7 +678,7 @@ getkey(int keytmout)
 		errflag = 0;
 		breaks = obreaks;
 		errno = old_errno;
-		return EOF;
+		return lastchar = EOF;
 	    } else if (errno == EWOULDBLOCK) {
 		fcntl(0, F_SETFL, 0);
 	    } else if (errno == EIO && !die) {
@@ -665,14 +701,95 @@ getkey(int keytmout)
 
 	ret = STOUC(cc);
     }
+    /*
+     * TODO: if vichgbuf is to be characters instead of a multibyte
+     * string the following needs moving to getfullchar().
+     */
     if (vichgflag) {
 	if (vichgbufptr == vichgbufsz)
 	    vichgbuf = realloc(vichgbuf, vichgbufsz *= 2);
 	vichgbuf[vichgbufptr++] = ret;
     }
     errno = old_errno;
-    return ret;
+    return lastchar = ret;
 }
+
+
+/*
+ * Get a full character rather than just a single byte.
+ * (TODO: Strictly we ought to call this getbyte and the above
+ * function getbyte.)
+ */
+
+/**/
+mod_export ZLE_INT_T
+getfullchar(int keytmout)
+{
+    int inchar = getbyte(keytmout);
+
+#ifdef ZLE_UNICODE_SUPPORT
+    return getrestchar(inchar);
+#else
+    return inchar;
+#endif
+}
+
+
+/**/
+#ifdef ZLE_UNICODE_SUPPORT
+/*
+ * Get the remainder of a character if we support multibyte
+ * input strings.  It may not require any more input, but
+ * we haven't yet checked.  The character previously returned
+ * by getbyte() is passed down as inchar.
+ */
+
+/**/
+mod_export ZLE_INT_T
+getrestchar(int inchar)
+{
+    char cnull = '\0';
+    char buf[MB_CUR_MAX], *ptr;
+    wchar_t outchar;
+    int ret;
+
+    /*
+     * We are guaranteed to set a valid wide last character,
+     * although it may be WEOF (which is technically not
+     * a wide character at all...)
+     */
+    lastchar_wide_valid = 1;
+
+    if (inchar == EOF)
+	return lastchar_wide = WEOF;
+
+    /* reset shift state by converting null */
+    mbrtowc(&outchar, &cnull, 1, &ps);
+
+    ptr = buf;
+    *ptr++ = inchar;
+    /*
+     * Return may be zero if we have a NULL; handle this like
+     * any other character.
+     */
+    while ((ret = mbrtowc(&outchar, buf, ptr - buf, &ps)) < 0) {
+	if (ret == -1) {
+	    /*
+	     * Invalid input.  Hmm, what's the right thing to do here?
+	     */
+	    return lastchar_wide = WEOF;
+	}
+	/* No timeout here as we really need the character. */
+	inchar = getbyte(0);
+	if (inchar == EOF)
+	    return lastchar_wide = WEOF;
+	*ptr++ = inchar;
+    }
+    return lastchar_wide = (wint_t)outchar;
+}
+/**/
+#endif
+
 
 /**/
 void
@@ -1445,7 +1562,7 @@ setup_(UNUSED(Module m))
     zlereadptr = zleread;
     zlesetkeymapptr = zlesetkeymap;
 
-    getkeyptr = getkey;
+    getkeyptr = getbyte;
 
     /* initialise the thingies */
     init_thingies();

@@ -37,7 +37,8 @@ static Widget w_zaptochar;
 static int
 deltochar(UNUSED(char **args))
 {
-    int c = getkey(0), dest = zlecs, ok = 0, n = zmult;
+    ZLE_INT_T c = getfullchar(0);
+    int dest = zlecs, ok = 0, n = zmult;
     int zap = (bindk->widget == w_zaptochar);
 
     if (n > 0) {

@@ -27,6 +27,75 @@
  *
  */
 
+#ifdef ZLE_UNICODE_SUPPORT
+typedef wchar_t ZLE_CHAR_T;
+typedef wchar_t *ZLE_STRING_T;
+typedef int_t   ZLE_INT_T;
+#define ZLE_CHAR_SIZE	sizeof(wchar_t)
+
+/*
+ * MB_CUR_MAX is the maximum number of bytes that a single wide
+ * character will convert into.  We use it to keep strings
+ * sufficiently long.  It should always be defined, but if it isn't
+ * just assume we are using Unicode which requires 6 characters.
+ * (Note that it's not necessarily defined to a constant.)
+ */
+#ifndef MB_CUR_MAX
+#define MB_CUR_MAX 6
+#endif
+
+#define ZLENL	L'\n'
+#define ZLENUL	L'\0'
+#define ZLETAB	L'\t'
+
+#define DIGIT_1		L'1'
+#define DIGIT_9		L'9'
+#define LETTER_a	L'a'
+#define LETTER_z	L'z'
+#define LETTER_A	L'A'
+#define LETTER_Z	L'Z'
+#define LETTER_y	L'y'
+#define LETTER_n	L'n'
+
+#define ZLENULSTR	L""
+#define ZLEEOF	WEOF
+#define ZS_memcpy wmemcpy
+#define ZS_memmove wmemmove
+#define ZC_icntrl iswcntrl
+
+#define LASTFULLCHAR	lastchar_wide
+
+#else  /* Not ZLE_UNICODE_SUPPORT: old single-byte code */
+
+typedef int ZLE_CHAR_T;
+typedef unsigned char *ZLE_STRING_T;
+typedef int ZLE_INT_T;
+#define ZLE_CHAR_SIZE	sizeof(unsigned char)
+
+#define ZLENL	'\n'
+#define ZLENUL	'\0'
+#define ZLETAB	'\t'
+
+#define DIGIT_1		'1'
+#define DIGIT_9		'9'
+#define LETTER_a	'a'
+#define LETTER_z	'z'
+#define LETTER_A	'A'
+#define LETTER_Z	'Z'
+#define LETTER_y	'y'
+#define LETTER_n	'n'
+
+#define ZLENULSTR	""
+#define ZLEEOF	EOF
+#define ZS_memcpy memcpy
+#define ZS_memmove memmove
+#define ZC_icntrl icntrl
+
+#define LASTFULLCHAR	lastchar
+
+#endif
+
+
 typedef struct widget *Widget;
 typedef struct thingy *Thingy;
 

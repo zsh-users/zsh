@@ -473,7 +473,7 @@ bin_zle_unget(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 	return 1;
     }
     while (p > b)
-	ungetkey((int) *--p);
+	ungetbyte((int) *--p);
     return 0;
 }
 

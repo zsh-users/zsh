@@ -420,11 +420,12 @@ endofhistory(UNUSED(char **args))
 int
 insertlastword(char **args)
 {
-    int n, nwords, histstep = -1, wordpos = 0, deleteword = 0;
+    int n, nwords, histstep = -1, wordpos = 0, deleteword = 0, len, sz;
     char *s, *t;
     Histent he = NULL;
     LinkList l = NULL;
     LinkNode node;
+    ZLE_STRING_T zs;
 
     static char *lastinsert;
     static int lasthist, lastpos, lastlen;
@@ -554,7 +555,10 @@ insertlastword(char **args)
     memcpy(lastinsert, s, lastlen);
     n = zmult;
     zmult = 1;
-    doinsert(s);
+
+    zs = stringaszleline((unsigned char *)s, &len, &sz);
+    doinsert(zs, len);
+    zfree(zs, sz);
     zmult = n;
     *t = save;
     return 0;
@@ -780,7 +784,7 @@ doisearch(char **args, int dir)
 	char *arg;
 	savekeys = kungetct;
 	arg = getkeystring(*args, &len, 2, NULL);
-	ungetkeys(arg, len);
+	ungetbytes(arg, len);
     }
 
     strcpy(ibuf, ISEARCH_PROMPT);
@@ -951,18 +955,23 @@ doisearch(char **args, int dir)
 		sbuf[sbptr] = '^';
 		zrefresh();
 	    }
-	    if ((lastchar = getkey(0)) == EOF)
+	    if (getfullchar(0) == ZLEEOF)
 		feep = 1;
 	    else
 		goto ins;
 	} else {
 	    if(cmd == Th(z_selfinsertunmeta)) {
-		lastchar &= 0x7f;
-		if(lastchar == '\r')
-		    lastchar = '\n';
-	    } else if (cmd == Th(z_magicspace))
-		lastchar = ' ';
-	    else if (cmd != Th(z_selfinsert)) {
+		fixunmeta();
+	    } else if (cmd == Th(z_magicspace)) {
+		fixmagicspace();
+	    } else if (cmd == Th(z_selfinsert)) {
+#ifdef ZLE_UNICODE_SUPPORT
+		if (!lastchar_wide_valid)
+		    getfullcharrest(lastchar);
+#else
+		;
+#endif
+	    } else {
 		ungetkeycmd();
 		if (cmd == Th(z_sendbreak))
 		    sbptr = 0;
@@ -979,6 +988,8 @@ doisearch(char **args, int dir)
 		sbuf = ibuf + FIRST_SEARCH_CHAR;
 		sibuf *= 2;
 	    }
+	    /* TODO: use lastchar_wide if available, convert back to
+	     * multibyte string.  Yuk.  */
 	    sbuf[sbptr++] = lastchar;
 	}
 	if (feep)
@@ -1093,7 +1104,7 @@ getvisrchstr(void)
 	    break;
 	}
 	if(cmd == Th(z_magicspace)) {
-	    lastchar = ' ';
+	    fixmagicspace();
 	    cmd = Th(z_selfinsert);
 	}
 	if(cmd == Th(z_redisplay)) {
@@ -1128,15 +1139,20 @@ getvisrchstr(void)
 		sbuf[sptr] = '^';
 		zrefresh();
 	    }
-	    if ((lastchar = getkey(0)) == EOF)
+	    if (getfullchar(0) == ZLEEOF)
 		feep = 1;
 	    else
 		goto ins;
 	} else if(cmd == Th(z_selfinsertunmeta) || cmd == Th(z_selfinsert)) {
 	    if(cmd == Th(z_selfinsertunmeta)) {
-		lastchar &= 0x7f;
-		if(lastchar == '\r')
-		    lastchar = '\n';
+		fixunmeta();
+	    } else {
+#ifdef ZLE_UNICODE_SUPPORT
+		if (!lastchar_wide_valid)
+		    getrestchar(lastchar);
+#else
+		;
+#endif
 	    }
 	  ins:
 	    if(sptr == ssbuf - 1) {
@@ -1144,6 +1160,7 @@ getvisrchstr(void)
 		strcpy(newbuf, sbuf);
 		statusline = sbuf = newbuf;
 	    }
+	    /* TODO: may be wide char, convert back to multibyte string */
 	    sbuf[sptr++] = lastchar;
 	} else {
 	    feep = 1;

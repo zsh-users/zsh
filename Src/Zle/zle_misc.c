@@ -34,13 +34,13 @@
 
 /**/
 void
-doinsert(char *str)
+doinsert(ZLE_STRING_T zstr, int len)
 {
-    char *s;
-    int len = ztrlen(str);
-    int c1 = *str == Meta ? STOUC(str[1])^32 : STOUC(*str);/* first character */
+    ZLE_STRING_T s;
+    ZLE_CHAR_T c1 = *zstr;	     /* first character */
     int neg = zmult < 0;             /* insert *after* the cursor? */
     int m = neg ? -zmult : zmult;    /* number of copies to insert */
+    int count;
 
     iremovesuffix(c1, 0);
     invalidatelist();
@@ -50,8 +50,8 @@ doinsert(char *str)
     else if(zlecs + m * len > zlell)
 	spaceinline(zlecs + m * len - zlell);
     while(m--)
-	for(s = str; *s; s++)
-	    zleline[zlecs++] = *s == Meta ? *++s ^ 32 : *s;
+	for(s = zstr, count = len; count; s++, count--)
+	    zleline[zlecs++] = *s;
     if(neg)
 	zlecs += zmult * len;
 }
@@ -60,25 +60,41 @@ doinsert(char *str)
 mod_export int
 selfinsert(UNUSED(char **args))
 {
-    char s[3], *p = s;
-
-    if(imeta(lastchar)) {
-	*p++ = Meta;
-	lastchar ^= 32;
-    }
-    *p++ = lastchar;
-    *p = 0;
-    doinsert(s);
+#ifdef ZLE_UNICODE_SUPPORT
+    if (!lastchar_wide_valid)
+	getrestchar(lastchar);
+    doinsert(&lastchar_wide, 1);
+#else
+    char s = lastchar;
+    doinsert(&s, 1);
+#endif
     return 0;
+}
+
+/**/
+mod_export void
+fixunmeta(void)
+{
+    lastchar &= 0x7f;
+    if (lastchar == '\r')
+	lastchar = '\n';
+#ifdef ZLE_UNICODE_SUPPORT
+    /*
+     * TODO: can we do this better?
+     * We need a wide character to insert.
+     * selfinsertunmeta is intrinsically problematic
+     * with multibyte input.
+     */
+    lastchar_wide = (ZLE_CHAR_T)lastchar;
+    lastchar_wide_valid = TRUE;
+#endif
 }
 
 /**/
 mod_export int
 selfinsertunmeta(char **args)
 {
-    lastchar &= 0x7f;
-    if (lastchar == '\r')
-	lastchar = '\n';
+    fixunmeta();
     return selfinsert(args);
 }
 
@@ -490,11 +506,11 @@ quotedinsert(char **args)
     sob.sg_flags = (sob.sg_flags | RAW) & ~ECHO;
     ioctl(SHTTY, TIOCSETN, &sob);
 #endif
-    lastchar = getkey(0);
+    getfullchar(0);
 #ifndef HAS_TIO
     zsetterm();
 #endif
-    if (lastchar < 0)
+    if (LASTFULLCHAR == ZLEEOF)
 	return 1;
     else
 	return selfinsert(args);
@@ -506,9 +522,20 @@ digitargument(UNUSED(char **args))
 {
     int sign = (zmult < 0) ? -1 : 1;
 
+#ifdef ZLE_UNICODE_SUPPORT
+    /*
+     * It's too dangerous to allow metafied input.  See
+     * universalargument for comments on (possibly suboptimal) handling
+     * of digits.  We are assuming ASCII is a subset of the multibyte
+     * encoding.
+     */
+    if (lastchar < '0' || lastchar > '9')
+	return 1;
+#else
     /* allow metafied as well as ordinary digits */
     if ((lastchar & 0x7f) < '0' || (lastchar & 0x7f) > '9')
 	return 1;
+#endif
 
     if (!(zmod.flags & MOD_TMULT))
 	zmod.tmult = 0;
@@ -546,7 +573,22 @@ universalargument(char **args)
 	zmod.flags |= MOD_MULT;
 	return 0;
     }
-    while ((gotk = getkey(0)) != EOF) {
+    /*
+     * TODO: this is quite tricky to do when trying to maintain
+     * compatibility between the old input system and Unicode.
+     * We don't know what follows the digits, so if we try to
+     * read wide characters we may fail (e.g. we may come across an old
+     * \M-style binding).
+     *
+     * If we assume individual bytes are either explicitly ASCII or
+     * not (a la UTF-8), we get away with it; we can back up individual
+     * bytes and everything will work.  We may want to relax this
+     * assumption later.  ("Much later" - (C) Steven Singer,
+     * CSR BlueCore firmware, ca. 2000.)
+     *
+     * Hence for now this remains byte-by-byte.
+     */
+    while ((gotk = getbyte(0)) != EOF) {
 	if (gotk == '-' && !digcnt) {
 	    minus = -1;
 	    digcnt++;
@@ -554,7 +596,7 @@ universalargument(char **args)
 	    pref = pref * 10 + (gotk & 0xf);
 	    digcnt++;
 	} else {
-	    ungetkey(gotk);
+	    ungetbyte(gotk);
 	    break;
 	}
     }
@@ -765,24 +807,32 @@ executenamedcommand(char *prmt)
 	} else if(cmd == Th(z_viquotedinsert)) {
 	    *ptr = '^';
 	    zrefresh();
-	    lastchar = getkey(0);
-	    if(lastchar == EOF || !lastchar || len == NAMLEN)
+	    getfullchar(0);
+	    if(LASTFULLCHAR == ZLEEOF || !LASTFULLCHAR || len == NAMLEN)
 		feep = 1;
-	    else
+	    else {
+		/* TODO: convert back to multibyte string */
 		*ptr++ = lastchar, len++, curlist = 0;
+	    }
 	} else if(cmd == Th(z_quotedinsert)) {
-	    if((lastchar = getkey(0)) == EOF || !lastchar || len == NAMLEN)
+	    if(getfullchar(0) == ZLEEOF ||
+	       !LASTFULLCHAR || len == NAMLEN)
 		feep = 1;
-	    else
+	    else {
+		/* TODO: convert back to multibyte string */
 		*ptr++ = lastchar, len++, curlist = 0;
+	    }
 	} else if(cmd == Th(z_backwarddeletechar) ||
 	    	cmd == Th(z_vibackwarddeletechar)) {
-	    if (len)
+	    if (len) {
+		/* TODO: backward full character in multibyte string. Yuk. */
 		len--, ptr--, curlist = 0;
+	    }
 	} else if(cmd == Th(z_killregion) || cmd == Th(z_backwardkillword) ||
 		  cmd == Th(z_vibackwardkillword)) {
 	    if (len)
 		curlist = 0;
+	    /* TODO: backward full character in multibyte string. Yuk. */
 	    while (len && (len--, *--ptr != '-'));
 	} else if(cmd == Th(z_killwholeline) || cmd == Th(z_vikillline) ||
 	    	cmd == Th(z_backwardkillline)) {
@@ -812,9 +862,7 @@ executenamedcommand(char *prmt)
 		unrefthingy(r);
 	    }
 	    if(cmd == Th(z_selfinsertunmeta)) {
-		lastchar &= 0x7f;
-		if(lastchar == '\r')
-		    lastchar = '\n';
+		fixunmeta();
 		cmd = Th(z_selfinsert);
 	    }
 	    if (cmd == Th(z_listchoices) || cmd == Th(z_deletecharorlist) ||
@@ -867,11 +915,24 @@ executenamedcommand(char *prmt)
 		    len = cmdambig;
 		}
 	    } else {
-		if (len == NAMLEN || icntrl(lastchar) ||
-		    cmd != Th(z_selfinsert))
+		if (len == NAMLEN || cmd != Th(z_selfinsert))
 		    feep = 1;
-		else
-		    *ptr++ = lastchar, len++, curlist = 0;
+		else {
+#ifdef ZLE_UNICODE_SUPPORT
+		    if (!lastchar_wide_valid)
+			getrestchar(0);
+		    if (iswcntrl(lastchar))
+#else
+		    if (icntrl(lastchar))
+#endif
+		    {
+			feep = 1;
+		    }
+		    else {
+			/* TODO: convert back to multibyte string */
+			*ptr++ = lastchar, len++, curlist = 0;
+		    }
+		}
 	    }
 	}
 	if (feep)
@@ -911,6 +972,9 @@ executenamedcommand(char *prmt)
 /* Length of suffix to remove when inserting each possible character value.  *
  * suffixlen[256] is the length to remove for non-insertion editing actions. */
 
+/*
+ * TODO: Aargh, this is completely broken with wide characters.
+ */
 /**/
 mod_export int suffixlen[257];
 
@@ -1000,7 +1064,7 @@ makesuffixstr(char *f, char *s, int n)
 
 /**/
 mod_export void
-iremovesuffix(int c, int keep)
+iremovesuffix(ZLE_CHAR_T c, int keep)
 {
     if (suffixfunc) {
 	Eprog prog = getshfunc(suffixfunc);
@@ -1024,7 +1088,12 @@ iremovesuffix(int c, int keep)
 	zsfree(suffixfunc);
 	suffixfunc = NULL;
     } else {
+#ifdef ZLE_UNICODE_SUPPORT
+	/* TODO: best I can think of for now... */
+	int sl = (unsigned int)c < 256 ? suffixlen[c] : 0;
+#else
 	int sl = suffixlen[c];
+#endif
 	if(sl) {
 	    backdel(sl);
 	    if (!keep)

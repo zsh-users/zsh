@@ -1272,7 +1272,21 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 
     keybuflen = 0;
     keybuf[0] = 0;
-    while((lastchar = getkeybuf(!!lastlen)) != EOF) {
+    /*
+     * getkeybuf returns multibyte strings, which may not
+     * yet correspond to complete wide characters, regardless
+     * of the locale.  This is because we can't be sure whether
+     * the key bindings and keyboard input always return such
+     * characters.  So we always look up bindings for each
+     * chunk of string.  Intelligence within self-insert tries
+     * to fix up insertion of real wide characters properly.
+     *
+     * Note that this does not stop the user binding wide characters to
+     * arbitrary functions, just so long as the string used in the
+     * argument to bindkey is in the correct form for the locale.
+     * That's beyond our control.
+     */
+    while(getkeybuf(!!lastlen) != EOF) {
 	char *s;
 	Thingy f;
 	int loc = 1;
@@ -1296,7 +1310,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	lastchar = lastc;
     if(lastlen != keybuflen) {
 	unmetafy(keybuf + lastlen, &keybuflen);
-	ungetkeys(keybuf+lastlen, keybuflen);
+	ungetbytes(keybuf+lastlen, keybuflen);
 	if(vichgflag)
 	    vichgbufptr -= keybuflen;
 	keybuf[lastlen] = 0;
@@ -1306,11 +1320,24 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
     return keybuf;
 }
 
+/*
+ * Add a (possibly metafied) byte to the key input so far.
+ * This handles individual bytes of a multibyte string separately;
+ * see note in getkeymapcmd.  Hence there is no wide character
+ * support at this level.
+ *
+ * TODO: Need to be careful about whether we return EOF in the
+ * middle of a wide character.  However, I think we're OK since
+ * EOF and 0xff are distinct and we're reading bytes from the
+ * lower level, so EOF really does mean something went wrong.  Even so,
+ * I'm worried enough to leave this note here for now.
+ */
+
 /**/
 static int
 getkeybuf(int w)
 {
-    int c = getkey(w);
+    int c = getbyte(w);
 
     if(c < 0)
 	return EOF;
@@ -1332,7 +1359,7 @@ getkeybuf(int w)
 mod_export void
 ungetkeycmd(void)
 {
-    ungetkeys(keybuf, keybuflen);
+    ungetbytes(keybuf, keybuflen);
 }
 
 /* read a command from the current keymap, with widgets */
@@ -1359,7 +1386,7 @@ getkeycmd(void)
 	    return NULL;
 	}
 	pb = unmetafy(ztrdup(str), &len);
-	ungetkeys(pb, len);
+	ungetbytes(pb, len);
 	zfree(pb, strlen(str) + 1);
 	goto sentstring;
     }

@@ -2298,12 +2298,27 @@ doexpandhist(void)
 }
 
 /**/
+void
+fixmagicspace(void)
+{
+    lastchar = ' ';
+#ifdef ZLE_UNICODE_SUPPORT
+    /*
+     * This is redundant if the multibyte encoding extends ASCII,
+     * since lastchar is a full character, but it's safer anyway...
+     */
+    lastchar_wide = L' ';
+    lastchar_wide_valid = TRUE;
+#endif
+}
+
+/**/
 int
 magicspace(char **args)
 {
     char *bangq;
     int ret;
-    lastchar = ' ';
+    fixmagicspace();
     for (bangq = (char *)zleline; (bangq = strchr(bangq, bangchar));
 	 bangq += 2)
 	if (bangq[1] == '"' && (bangq == (char *)zleline || bangq[-1] != '\\'))
