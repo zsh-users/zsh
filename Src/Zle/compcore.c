@@ -2879,6 +2879,7 @@ freematches(Cmgroup g)
 
 	for (m = g->matches; *m; m++)
 	    freematch(*m, g->nbrbeg, g->nbrend);
+	free(g->matches);
 
 	if (g->ylist)
 	    freearray(g->ylist);

@@ -1,3 +1,8 @@
+2000-06-02  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11722: Src/Zle/compcore.c, Src/Zle/complete.c: fix some memory
+ 	leaks (thanks, Felix)
+	
 2000-06-02  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 11717: Src/glob.c, Src/params.c, Src/subst.c, Src/zsh.h,
