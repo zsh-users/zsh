@@ -254,7 +254,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
         fi
       fi
 
-      if [[ -z "$matched$mesg" ]] && _requested options &&
+      if [[ -z "$matched" ]] && _requested options &&
           { ! zstyle -t ":completion:${curcontext}:options" prefix-needed ||
           [[ "$origpre" = [-+]* ||
              ( -z "$aret$mesg" && nm -eq compstate[nmatches] ) ]] } ; then

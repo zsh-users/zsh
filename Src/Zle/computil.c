@@ -1261,6 +1261,7 @@ ca_parse_line(Cadef d)
 		    ca_laststate.ddef = ddef;
 		    ca_laststate.def = NULL;
 		    ca_laststate.opt = 1;
+		    state.curopt->active = 1;
 		} else {
 		    ca_laststate.doff = doff;
 		    ca_laststate.opt = 0;
