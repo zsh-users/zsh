@@ -486,7 +486,7 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 
 	if (!prog && !ret)
 	    break;
-    } while (!errflag &&
+    } while (!errflag && !breaks && !retflag && !contflag &&
 	     (prog ? (used < READ_MAX && (!ret || !pattry(prog, buf))) :
 	      (used < READ_LEN)));
 

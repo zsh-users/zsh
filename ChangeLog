@@ -1,5 +1,8 @@
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11181: Src/Modules/zpty.c: make zpty -r stoppable even when
+ 	SIGINT is caught (and the handler calls return or some such)
+	
 	* 11177: Functions/Misc/nslookup: make nslookup page it's output
  	if too long for screen
 	
