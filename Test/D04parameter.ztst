@@ -74,7 +74,7 @@
 1:${...:?...}, ${...?...}
 >set1v
 >
-?ZTST_execchunk:2: unset1: exiting1
+?ZTST_execchunk:1: unset1: exiting1
 ?ZTST_execchunk:2: null1: exiting2
 
   print ${set1:+word1} ${set1+word2} ${null1:+word3} ${null1+word4}

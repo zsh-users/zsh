@@ -54,30 +54,30 @@
 >Tracing: function 2>file
 >Tracing: source
 >Tracing: source 2>file
->+ZTST_execchunk:2> print Tracing: ( builtin ) 2>file
->+ZTST_execchunk:2> cat
->+ZTST_execchunk:2> print Tracing: { builtin } 2>file
->+ZTST_execchunk:2> cat
->+ZTST_execchunk:2> print Tracing: do builtin done 2>file
->+ZTST_execchunk:2> cat
+>+ZTST_execchunk:7> print Tracing: ( builtin ) 2>file
+>+ZTST_execchunk:9> cat
+>+ZTST_execchunk:11> print Tracing: { builtin } 2>file
+>+ZTST_execchunk:13> cat
+>+ZTST_execchunk:15> print Tracing: do builtin done 2>file
+>+ZTST_execchunk:17> cat
 ?+ZTST_execchunk:2> print Tracing: builtin
-?+ZTST_execchunk:2> print Tracing: builtin 2>file
-?+ZTST_execchunk:2> cat
-?+ZTST_execchunk:2> cat
-?+ZTST_execchunk:2> print Tracing: ( builtin )
-?+ZTST_execchunk:2> cat
-?+ZTST_execchunk:2> print Tracing: { builtin }
-?+ZTST_execchunk:2> cat
-?+ZTST_execchunk:2> print Tracing: do builtin done
-?+ZTST_execchunk:2> cat
-?+ZTST_execchunk:2> xtf Tracing: function
-?+xtf:0> local regression_test_dummy_variable
-?+xtf:0> print Tracing: function
-?+ZTST_execchunk:2> xtf Tracing: function 2>file
-?+xtf:0> local regression_test_dummy_variable
-?+xtf:0> print Tracing: function 2>file
-?+ZTST_execchunk:2> . ./xt.in Tracing: source
+?+ZTST_execchunk:3> print Tracing: builtin 2>file
+?+ZTST_execchunk:4> cat
+?+ZTST_execchunk:5> cat
+?+ZTST_execchunk:6> print Tracing: ( builtin )
+?+ZTST_execchunk:8> cat
+?+ZTST_execchunk:10> print Tracing: { builtin }
+?+ZTST_execchunk:12> cat
+?+ZTST_execchunk:14> print Tracing: do builtin done
+?+ZTST_execchunk:16> cat
+?+ZTST_execchunk:18> xtf Tracing: function
+?+xtf:1> local regression_test_dummy_variable
+?+xtf:2> print Tracing: function
+?+ZTST_execchunk:19> xtf Tracing: function 2>file
+?+xtf:1> local regression_test_dummy_variable
+?+xtf:2> print Tracing: function 2>file
+?+ZTST_execchunk:20> . ./xt.in Tracing: source
 ?+./xt.in:1> print Tracing: source
-?+ZTST_execchunk:2> . ./xt.in Tracing: source 2>file
+?+ZTST_execchunk:21> . ./xt.in Tracing: source 2>file
 ?+./xt.in:1> print Tracing: source 2>file
-?+ZTST_execchunk:2> set +x
+?+ZTST_execchunk:22> set +x

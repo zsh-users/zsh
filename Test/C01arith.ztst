@@ -53,11 +53,11 @@
 
   print $(( 3 ? 2 ))
 1:parsing ternary (1)
-?ZTST_execchunk:2: ':' expected
+?ZTST_execchunk:1: ':' expected
 
   print $(( 3 ? 2 : 1 : 4 ))
 1:parsing ternary (2)
-?ZTST_execchunk:2: ':' without '?'
+?ZTST_execchunk:1: ':' without '?'
 
   print $(( 0, 4 ? 3 : 1, 5 ))
 0:comma operator
@@ -91,7 +91,7 @@
 
   print $(( 13 = 42 ))
 1:bad lvalue
-?ZTST_execchunk:2: lvalue required
+?ZTST_execchunk:1: lvalue required
 
   x=/bar
   (( x = 32 ))

@@ -16,7 +16,7 @@
 
   \foo foo
 127:Not aliasing
-?ZTST_execchunk:2: command not found: foo
+?ZTST_execchunk:1: command not found: foo
 
   \bar \bar
 0:Aliasing with a backslash

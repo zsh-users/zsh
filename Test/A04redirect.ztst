@@ -200,7 +200,7 @@
   print cat input >out1
   <out1
 1:READNULLCMD with NULLCMD unset
-?ZTST_execchunk:2: redirection with no command
+?ZTST_execchunk:3: redirection with no command
 
   NULLCMD=:
   >out1

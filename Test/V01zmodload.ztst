@@ -47,7 +47,7 @@
 
  zmodload zsh/main
 1:Test reloading an already-loaded module
-?ZTST_execchunk:zmodload:2: module zsh/main already loaded.
+?ZTST_execchunk:zmodload:1: module zsh/main already loaded.
 
 # Loop over the modules found above and attempt to load each one.  Use
 # the -i flag in case dependencies cause multiple modules to be loaded,
