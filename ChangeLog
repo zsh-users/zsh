@@ -1,3 +1,8 @@
+2004-01-14  Peter Stephenson  <pws@csr.com>
+
+	* 19364: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_printenv: complete for printenv.
+
 2004-01-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 19369: Completion/Unix/Command/_getent,
