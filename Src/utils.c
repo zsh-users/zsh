@@ -2189,6 +2189,8 @@ freearray(char **s)
 {
     char **t = s;
 
+    DPUTS(!s, "freearray() with zero argument");
+
     while (*s)
 	zsfree(*s++);
     free(t);

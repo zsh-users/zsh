@@ -451,13 +451,15 @@ freecadef(Cadef d)
 	Caopt p, n;
 
 	zsfree(d->match);
-	freearray(d->defs);
+	if (d->defs)
+	    freearray(d->defs);
 
 	for (p = d->opts; p; p = n) {
 	    n = p->next;
 	    zsfree(p->name);
 	    zsfree(p->descr);
-	    freearray(p->xor);
+	    if (p->xor)
+		freearray(p->xor);
 	    freecaargs(p->args);
 	    zfree(p, sizeof(*p));
 	}
@@ -1592,13 +1594,15 @@ freecvdef(Cvdef d)
 	Cvval p, n;
 
 	zsfree(d->descr);
-	freearray(d->defs);
+	if (d->defs)
+	    freearray(d->defs);
 
 	for (p = d->vals; p; p = n) {
 	    n = p->next;
 	    zsfree(p->name);
 	    zsfree(p->descr);
-	    freearray(p->xor);
+	    if (p->xor)
+		freearray(p->xor);
 	    freecaargs(p->arg);
 	    zfree(p, sizeof(*p));
 	}
@@ -2211,7 +2215,8 @@ freecstyle(Cstyle s)
 	n = s->next;
 
 	zsfree(s->name);
-	freearray(s->vals);
+	if (s->vals)
+	    freearray(s->vals);
 	zfree(s, sizeof(*s));
 
 	s = n;
@@ -2274,7 +2279,8 @@ setcstyle(Cspat p, char *name, char **vals)
 
 	    /* Exists -> replace. */
 
-	    freearray(s->vals);
+	    if (s->vals)
+		freearray(s->vals);
 	    PERMALLOC {
 		s->vals = arrdup(vals);
 	    } LASTALLOC;
@@ -2616,7 +2622,8 @@ freectset(Ctset s)
     while (s) {
 	n = s->next;
 
-	freearray(s->tags);
+	if (s->tags)
+	    freearray(s->tags);
 	zfree(s, sizeof(*s));
 
 	s = n;
@@ -2627,7 +2634,8 @@ static void
 freectags(Ctags t)
 {
     if (t) {
-	freearray(t->all);
+	if (t->all)
+	    freearray(t->all);
 	zsfree(t->context);
 	freectset(t->sets);
 	zfree(t, sizeof(*t));
