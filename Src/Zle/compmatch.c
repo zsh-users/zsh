@@ -1398,7 +1398,7 @@ cmp_anchors(Cline o, Cline n, int join)
 	if (line) {
 	    o->flags |= CLF_LINE;
 	    o->word = NULL;
-	    n->wlen = 0;
+	    o->wlen = 0;
 	}
 	return 1;
     }
