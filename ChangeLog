@@ -13,6 +13,9 @@
 	use `@:` instead. In line, use `{}` for tex, this looks better
 	in printed output.
 
+	* unposted: aczsh.m4, conifgure.in:  Remove patch from 12686
+	that was accidentally commited
+
 2000-09-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12745: Doc/Zsh/contrib.yo: Add a cross-reference; include some
