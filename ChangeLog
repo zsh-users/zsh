@@ -1,5 +1,11 @@
 2000-04-11  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10641: Completion/Core/_approximate, Completion/Core/_match,
+ 	Completion/Core/_oldlist: make _oldlist ignore list from
+ 	_complete_help; _match runs for every match spec from
+ 	matcher-list; _approximate doesn't redefine compadd if that is
+ 	already a function
+	
 	* 10635: Completion/User/_make: _make uses $words[1] for command
  	name
 	

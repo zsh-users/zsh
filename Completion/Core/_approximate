@@ -10,7 +10,7 @@
 
 [[ _matcher_num -gt 1 || "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
 
-local _comp_correct _correct_expl comax cfgacc
+local _comp_correct _correct_expl comax cfgacc redef
 local oldcontext="${curcontext}" opm="$compstate[pattern_match]"
 
 zstyle -s ":completion:${curcontext}:" max-errors cfgacc || cfgacc='2 numeric'
@@ -40,17 +40,20 @@ _tags corrections original
 # to stick the `(#a...)' in the right place (after an
 # ignored prefix).
 
-compadd() {
-  [[ ${argv[(I)-[a-zA-Z]#U[a-zA-Z]#]} -eq 0 &&
-     "${#:-$PREFIX$SUFFIX}" -le _comp_correct ]] && return
+if (( ! $+functions[compadd] )); then
+  redef=yes
+  compadd() {
+    [[ ${argv[(I)-[a-zA-Z]#U[a-zA-Z]#]} -eq 0 &&
+       "${#:-$PREFIX$SUFFIX}" -le _comp_correct ]] && return
 
-  if [[ "$PREFIX" = \~*/* ]]; then
-    PREFIX="${PREFIX%%/*}/(#a${_comp_correct})${PREFIX#*/}"
-  else
-    PREFIX="(#a${_comp_correct})$PREFIX"
-  fi
-  builtin compadd "$_correct_expl[@]" "$@"
-}
+    if [[ "$PREFIX" = \~*/* ]]; then
+      PREFIX="${PREFIX%%/*}/(#a${_comp_correct})${PREFIX#*/}"
+    else
+      PREFIX="(#a${_comp_correct})$PREFIX"
+    fi
+    builtin compadd "$_correct_expl[@]" "$@"
+  }
+fi
 
 _comp_correct=1
 
@@ -81,7 +84,7 @@ while [[ _comp_correct -le comax ]]; do
       [[ "$compstate[list]" != list* ]] &&
           compstate[list]="$compstate[list] force"
     fi
-    unfunction compadd
+    [[ -n "$redef" ]] && unfunction compadd
     compstate[pattern_match]="$opm"
 
     return 0
@@ -91,7 +94,7 @@ while [[ _comp_correct -le comax ]]; do
   (( _comp_correct++ ))
 done
 
-unfunction compadd
+[[ -n "$redef" ]] && unfunction compadd
 compstate[pattern_match]="$opm"
 
 return 1

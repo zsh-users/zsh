@@ -9,7 +9,7 @@
 # expand-or-complete function because otherwise the pattern will
 # be expanded using globbing.
 
-[[ _matcher_num -gt 1 ]] && return 1
+### Shouldn't be needed any more: [[ _matcher_num -gt 1 ]] && return 1
 
 local tmp opm="$compstate[pattern_match]" ret=0 orig ins
 
