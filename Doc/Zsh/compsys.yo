@@ -1112,7 +1112,7 @@ when using an action of the form `tt(->)var(string)'. With this
 function the tt(context) parameter will be set to the name of the
 value whose argument is to be completed.
 
-Like tt(_arguments', tt(_values) also supports the tt(-C) option in
+Like tt(_arguments), tt(_values) also supports the tt(-C) option in
 which case you have to make the parameter tt(curcontext) local instead 
 of tt(context) (as described above).
 )
