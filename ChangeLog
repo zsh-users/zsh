@@ -1,5 +1,9 @@
 2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10965: and Felix: 10952: Completion/User/_urls,
+ 	Doc/Zsh/compsys.yo: document _wanted -C; fix for call to _wanted
+ 	in _urls
+	
 	* 10963: Src/Zle/complete.c: fix for parse error with
  	left-anchored patterns
 	

@@ -2590,7 +2590,7 @@ while _tags; do
 done)
 )
 findex(_wanted)
-item(tt(_wanted) [ tt(-12VJ) ] var(tag) var(name) var(descr) var(command) var(args) ...)(
+item(tt(_wanted) [ tt(-C) var(name) ]  [ tt(-12VJ) ] var(tag) var(name) var(descr) var(command) var(args) ...)(
 In many contexts only one type of matches can be generated but even
 then it should be tested if the tag representing those matches is
 requested by the user. This function makes that easier.
@@ -2607,6 +2607,9 @@ example(_wanted tag expl 'description' \
 Unlike tt(_requested), however, tt(_wanted) can not be called without
 the var(command). That's because tt(_wanted) also implements the loop
 over the tags, not only the one for the labels.
+
+Like tt(_tags) this function supports the tt(-C) option to give a
+different name for the argument context field.
 )
 findex(_alternative)
 item(tt(_alternative) [ tt(-C) var(name) ] var(specs) ...)(

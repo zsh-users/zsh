@@ -49,7 +49,7 @@ local localhttp_userdir="$localhttp[3]"
 
 if [[ "$1" = -f ]]; then
   shift
-  _wanted -C -f files _files "$@" && return 0
+  _wanted -C -f files expl file _files "$@" && return 0
 fi
 
 ipre="$IPREFIX"
