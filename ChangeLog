@@ -1,3 +1,7 @@
+2005-03-04  Motoi Washida  <a66@h8.dion.ne.jp>
+
+	* unposted: Completion/Darwin/Command/_softwareupdate: new completion
+
 2005-03-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 20921, 20924: Src/utils.c, Completion/Unix/Command/_iconv:
