@@ -253,8 +253,11 @@ parse_cmatcher(char *name, char *s)
 		return pcm_err;
 	    }
 	    word = NULL;
-	    wl = -1;
-	    s++;
+	    if (*++s == '*') {
+		s++;
+		wl = -2;
+	    } else
+		wl = -1;
 	} else {
 	    word = parse_pattern(name, &s, &wl, 0, &err);
 

@@ -75,7 +75,7 @@ add_bmatchers(Cmatcher m)
 
     for (; m; m = m->next) {
 	if ((!m->flags && m->wlen > 0 && m->llen > 0) ||
-	    (m->flags == CMF_RIGHT && m->wlen == -1 && !m->llen)) {
+	    (m->flags == CMF_RIGHT && m->wlen < 0 && !m->llen)) {
 	    *q = n = (Cmlist) zhalloc(sizeof(struct cmlist));
 	    n->matcher = m;
 	    q = &(n->next);
@@ -546,7 +546,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			    } else
 				t = match_str(l + llen + moff, tp + moff,
 					      NULL, 0, NULL, 0, 1, part);
-			    if (t || !both)
+			    if (t || (mp->wlen == -1 && !both))
 				break;
 			}
 		    }
@@ -1008,7 +1008,7 @@ bld_parts(char *str, int len, int plen, Cline *lp)
     while (len) {
 	for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
 	    mp = ms->matcher;
-	    if (mp && mp->flags == CMF_RIGHT && mp->wlen == -1 &&
+	    if (mp && mp->flags == CMF_RIGHT && mp->wlen < 0 &&
 		!mp->llen && len >= mp->ralen && mp->ralen &&
 		pattern_match(mp->right, str, NULL, NULL)) {
 		int olen = str - p, llen;

@@ -796,12 +796,14 @@ more such classes than the other side, the superfluous classes behave
 like normal character classes. In anchor patterns correspondence classes
 also behave like normal character classes.
 
-The pattern var(tpat) may also be a single star, `tt(*)'. This means
-that the pattern on the command line can match any number of characters
-in the trial completion. In this case the pattern must be anchored (on
-either side); the var(anchor) then determines how much of the trial
-completion is to be included --- only the characters up to the next
-appearance of the anchor will be matched.
+The pattern var(tpat) may also be one or two stars, `tt(*)' or
+`tt(**)'. This means that the pattern on the command line can match
+any number of characters in the trial completion. In this case the
+pattern must be anchored (on either side); in the case of a single
+star, the var(anchor) then determines how much of the trial completion
+is to be included --- only the characters up to the next appearance of
+the anchor will be matched. With two stars, substrings matched by the
+anchor can be matched, too.
 
 Examples:
 
@@ -862,6 +864,14 @@ followed by the empty string, followed by the anchor `tt(.)', and
 likewise for the second dot, and replaces the empty strings before the
 anchors, giving tt(c)[tt(omp)]tt(.s)[tt(ources)]tt(.u)[tt(nix)], where
 the last part of the completion is just as normal.
+
+With the pattern shown above, the string `tt(c.u)' could not be
+completed to `tt(comp.sources.unix)' because the single star means
+that no dot (matched by the anchor) can be skipped. By using two stars 
+as in `tt(r:|.=**)', however, `tt(c.u)' could be completed to
+`tt(comp.sources.unix)'. This also shows that in some cases,
+especially if the anchor is a real pattern, like a character class,
+the form with two stars may result in more matches than one would like.
 
 The second specification is needed to make this work when the cursor is
 in the middle of the string on the command line and the option
