@@ -2508,14 +2508,32 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		/* no flags, so just print */
 		shfunctab->printnode((HashNode) shf, pflags);
 	} else if (on & PM_UNDEFINED) {
+	    int signum, ok = 1;
+
 	    /* Add a new undefined (autoloaded) function to the *
 	     * hash table with the corresponding flags set.     */
 	    shf = (Shfunc) zshcalloc(sizeof *shf);
 	    shf->flags = on;
 	    shf->funcdef = mkautofn(shf);
-	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
-	    if (OPT_ISSET(ops,'X') && eval_autoload(shf, shf->nam, ops, func))
-		returnval = 1;
+
+	    if (!strncmp(*argv, "TRAP", 4) &&
+		(signum = getsignum(*argv + 4)) != -1) {
+		if (settrap(signum, shf->funcdef)) {
+		    freeeprog(shf->funcdef);
+		    zfree(shf, sizeof(*shf));
+		    returnval = 1;
+		    ok = 0;
+		}
+		else
+		    sigtrapped[signum] |= ZSIG_FUNC;
+	    }
+
+	    if (ok) {
+		shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
+		if (OPT_ISSET(ops,'X') &&
+		    eval_autoload(shf, shf->nam, ops, func))
+		    returnval = 1;
+	    }
 	} else
 	    returnval = 1;
     }
