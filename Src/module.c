@@ -1228,8 +1228,10 @@ getconddef(int inf, char *name, int autol)
 		load_module(p->module);
 		f = 0;
 		p = NULL;
-	    } else
-		break;
+	    } else {
+		deleteconddef(p);
+		return NULL;
+	    }
 	} else
 #endif
 	    break;
