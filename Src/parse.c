@@ -2782,7 +2782,7 @@ load_dump_file(char *dump, struct stat *sbuf, int other, int len)
 {
     FuncDump d;
     Wordcode addr;
-    int fd, off;
+    int fd, off, mlen;
 
     if (other) {
 	static size_t pgsz = 0;
@@ -2802,15 +2802,17 @@ load_dump_file(char *dump, struct stat *sbuf, int other, int len)
 	    pgsz--;
 	}
 	off = len & ~pgsz;
-    } else
+        mlen = len + (len - off);
+    } else {
 	off = 0;
-
+        mlen = len;
+    }
     if ((fd = open(dump, O_RDONLY)) < 0)
 	return;
 
     fd = movefd(fd);
 
-    if ((addr = (Wordcode) mmap(NULL, len, PROT_READ, MAP_SHARED, fd, off)) ==
+    if ((addr = (Wordcode) mmap(NULL, mlen, PROT_READ, MAP_SHARED, fd, off)) ==
 	((Wordcode) -1)) {
 	close(fd);
 	return;
