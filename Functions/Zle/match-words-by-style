@@ -75,7 +75,7 @@ if [[ -z $curcontext ]]; then
     local curcontext=:zle:match-words-by-style
 fi
 
-while getopts "w:s:c:C:tT" opt; do
+while getopts "w:s:c:C:" opt; do
   case $opt in
     (w)
     wordstyle=$OPTARG
@@ -140,12 +140,11 @@ case $wordstyle in
 	    # Find out what's in front.
 	    eval pat1='${LBUFFER%%(#b)('${wordpat1}')('${spacepat}')}'
 	    # Now everything from ${#pat1}+1 is wordy
-	    wordpat1=${(q)LBUFFER[${#pat1}+1,-1]}
+	    wordpat1=${LBUFFER[${#pat1}+1,-1]}
+	    wordpat2=${RBUFFER[1,${#bufwords[$nwords]}-${#wordpat1}+1]}
 
-	    # Likewise at the end...
-	    eval pat2='${RBUFFER##(#b)('${charskip}${spacepat}')('\
-${wordpat2}')('${spacepat}')}'
-	    wordpat2=${(q)RBUFFER[1,-1-${#pat2}]}
+	    wordpat1=${(q)wordpat1}
+	    wordpat2=${(q)wordpat2}
 	  fi
 	  ;;
   (*space) spacepat='[[:space:]]#'

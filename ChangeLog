@@ -1,7 +1,8 @@
 2004-12-09  Peter Stephenson  <pws@csr.com>
 
-	* 20613: Functions/Zle/match-words-by-style: fix inconsistencies
-	with embedded whitespace when matching by shell words.
+	* 20613, 20614: Functions/Zle/match-words-by-style: fix
+	inconsistencies with embedded whitespace when matching by shell
+	words.
 
 	* 20612: Doc/Zsh/contrib.yo, Functions/Zle/match-words-by-style:
 	options to match-words-by-style can override styles.
