@@ -1,6 +1,6 @@
 #autoload
 
-local curcontext="$curcontext"
+local curcontext="${curcontext:-}"
 
 if [[ -z "$curcontext" ]]; then
   curcontext="${WIDGET}:::"

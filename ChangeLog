@@ -1,3 +1,11 @@
+2004-02-10  Oliver Kiddle  <opk@zsh.org>
+
+	* 19415: Doc/Zsh/options.yo: fix documentation to indicate that
+	short_loops option is applicable to repeat loops too
+
+	* 19409: Completion/Base/Widget/_generic: handle situation where
+	the user has the nounset option set
+
 2004-02-09  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 19410: Src/Zle/compmatch.c: Another fix to avoid a match that
