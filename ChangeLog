@@ -1,5 +1,10 @@
 2001-04-12  Clint Adams  <schizo@debian.org>
 
+	* 13953: acconfig.h, configure.in, Src/Modules/terminfo.c:
+	have configure check for the existence of boolcodes,
+	numcodes, and strcodes symbols, and presume that they
+	are terminfo capability code inventories.
+
 	* 13951: Src/Modules/terminfo.c: make scanterminfo do something
 	so that ${(k)terminfo} and ${(kv)terminfo} work.
 

@@ -29,6 +29,12 @@
 
 #include "terminfo.mdh"
 #include "terminfo.pro"
+#ifdef HAVE_CURSES_H
+# include <curses.h>
+#endif
+#ifdef HAVE_TERM_H
+# include <term.h>
+#endif
 
 static char terminfo_nam[] = "terminfo";
 
@@ -202,20 +208,25 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
     int num;
     char **capname, *tistr;
 
-    static char *bools[] = {
+#ifndef HAVE_BOOLCODES
+    static char *boolcodes[] = {
 	"bw", "am", "bce", "ccc", "xhp", "xhpa", "cpix", "crxm", "xt", "xenl",
 	"eo", "gn", "hc", "chts", "km", "daisy", "hs", "hls", "in", "lpix",
 	"da", "db", "mir", "msgr", "nxon", "xsb", "npc", "ndscr", "nrrmc",
 	"os", "mc5i", "xvpa", "sam", "eslok", "hz", "ul", "xon", NULL};
+#endif
     
-    static char *numerics[] = {
+#ifndef HAVE_NUMCODES
+    static char *numcodes[] = {
 	"cols", "it", "lh", "lw", "lines", "lm", "xmc", "ma", "colors",
 	"pairs", "wnum", "ncv", "nlab", "pb", "vt", "wsl", "bitwin",
 	"bitype", "bufsz", "btns", "spinh", "spinv", "maddr", "mjump",
 	"mcs", "mls", "npins", "orc", "orhi", "orl", "orvi", "cps", "widcs",
 	NULL};
+#endif
 
-    static char *strings[] = {
+#ifndef HAVE_STRCODES
+    static char *strcodes[] = {
 	"acsc", "cbt", "bel", "cr", "cpi", "lpi", "chr", "cvr", "csr", "rmp",
 	"tbc", "mgc", "clear", "el1", "el", "ed", "hpa", "cmdch", "cwin",
 	"cup", "cud1", "home", "civis", "cub1", "mrcup", "cnorm", "cuf1",
@@ -265,6 +276,7 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 	"setab", "setaf", "setcolor", "smglr", "slines", "smgtb",
 	"ehhlm", "elhlm", "elohlm", "erhlm", "ethlm", "evhlm", "sgr1",
 	"slength", NULL};
+#endif
 
     pm = (Param) zhalloc(sizeof(struct param));
     pm->sets.cfn = NULL;
@@ -276,7 +288,7 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
     pm->old = NULL;
     
     pm->flags = PM_READONLY | PM_SCALAR;
-    for (capname = bools; *capname; capname++) {
+    for (capname = (char **)boolcodes; *capname; capname++) {
 	if ((num = tigetflag(*capname)) != -1) {
 	    pm->u.str = num ? dupstring("yes") : dupstring("no");
 	    pm->nam = dupstring(*capname);
@@ -285,7 +297,7 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
     }
     
     pm->flags = PM_READONLY | PM_INTEGER;
-    for (capname = numerics; *capname; capname++) {
+    for (capname = (char **)numcodes; *capname; capname++) {
 	if (((num = tigetnum(*capname)) != -1) && (num != -2)) {
 	    pm->u.val = num;
 	    pm->nam = dupstring(*capname);
@@ -294,7 +306,7 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
     }
     
     pm->flags = PM_READONLY | PM_SCALAR;
-    for (capname = strings; *capname; capname++) {
+    for (capname = (char **)strcodes; *capname; capname++) {
 	if ((tistr = (char *)tigetstr(*capname)) != NULL &&
 	    tistr != (char *)-1) {
 	    pm->u.str = dupstring(tistr);

@@ -299,3 +299,12 @@
 
 /* Define to 1 if h_errno is not defined by the system */
 #undef USE_LOCAL_H_ERRNO
+
+/* Define if you have the terminfo boolcodes symbol.  */
+#undef HAVE_BOOLCODES
+
+/* Define if you have the terminfo numcodes symbol.  */
+#undef HAVE_NUMCODES
+
+/* Define if you have the terminfo strcodes symbol.  */
+#undef HAVE_STRCODES

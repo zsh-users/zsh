@@ -439,7 +439,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdlib.h unistd.h sys/capability.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
-		 linux/tasks.h netinet/in_systm.h)
+		 linux/tasks.h netinet/in_systm.h curses.h term.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -515,6 +515,21 @@ case "$host_os" in
 esac
 
 AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
+AC_MSG_CHECKING(if boolcodes is available)
+AC_TRY_COMPILE([#include <curses.h>
+#include <term.h>], [char **test = boolcodes;],
+AC_DEFINE(HAVE_BOOLCODES) boolcodes=yes, boolcodes=no)
+AC_MSG_RESULT($boolcodes)
+AC_MSG_CHECKING(if numcodes is available)
+AC_TRY_COMPILE([#include <curses.h>
+#include <term.h>], [char **test = numcodes;],
+AC_DEFINE(HAVE_NUMCODES) numcodes=yes, numcodes=no)
+AC_MSG_RESULT($numcodes)
+AC_MSG_CHECKING(if strcodes is available)
+AC_TRY_COMPILE([#include <curses.h>
+#include <term.h>], [char **test = strcodes;],
+AC_DEFINE(HAVE_STRCODES) strcodes=yes, strcodes=no)
+AC_MSG_RESULT($strcodes)
 
 dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
 dnl libnsl (Network Services Library) to find yp_all
