@@ -1,4 +1,4 @@
-#compdef nedit nc ncl=nc
+#compdef nedit nc nedit-nc=nc ncl=nc
 
 local state line expl nedit_common curcontext="$curcontext" ret=1
 typeset -A opt_args
@@ -16,7 +16,7 @@ nedit_common=(
   '*:file:_files'
 )
 
-if [[ $service = *nc ]]; then
+if [[ $service = nc ]]; then
   _x_arguments -C \
     '(-noask)-ask[prompt if no server found]' \
     '(-ask)-noask[start a new server without asking if none found]' \
