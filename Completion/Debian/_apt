@@ -284,7 +284,7 @@ _describe -o option tmp2 -- tmp3 -S='
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_arbitem})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ :"$comp_arbitem"/ \|
+	/"$word"/ :"$comp_arbitem" \|
       /"(${(j:|:)long_arbitem})="/
 	-'_apt_consume_long ${match[1]%=}'
 	\( /"$word1"/ :"$comp_arbitem" \| /"$nul"/ /"$word"/ :"$comp_arbitem" \) \|
