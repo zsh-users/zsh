@@ -751,7 +751,7 @@ removetrap(int sig)
      * one, to aid in removing this one.  However, if there's
      * already one at the current locallevel we just overwrite it.
      */
-    if (isset(LOCALTRAPS) && locallevel &&
+    if ((isset(LOCALTRAPS) || sig == SIGEXIT) && locallevel &&
 	(!trapped || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)))
 	dosavetrap(sig, locallevel);
 
