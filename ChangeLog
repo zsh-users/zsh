@@ -1,3 +1,16 @@
+2001-10-24  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: create 4.0.3.
+
+	* 16135: Doc/.distfiles: pack up more of the .distfiles produced
+	by texi2html, see 16130.
+
+	* 16033: Pavel Roskin <proski@gnu.org>:
+          Src/Builtins/rlimits.c: Undefine RLIMIT_RSS if it's equal to
+        RLIMIT_VMEM to avoid duplicate case value.
+          aczsh.m4 (zsh_LARGE_FILE_SUPPORT): Ignore output of getconf
+        if it returns "undefined".
+
 2001-10-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* Sven: 16041, Bart: 16038, 16124: Src/cond.c, Src/loop.c: for
