@@ -1,6 +1,6 @@
 #compdef elinks
 
-# ELinks 0.4.2 - Text WWW browser
+# ELinks 0.9.0 - Text WWW browser
 
 local curcontext="$curcontext" state line
 typeset -A opt_args
@@ -9,6 +9,8 @@ _arguments -C -A '-*' \
   '*-anonymous[restrict to anonymous mode]::boolean:(0 1)' \
   '*-auto-submit[autosubmit first form]::boolean:(0 1)' \
   '*-base-session[clone session with given ID]:ID number:' \
+  '*-confdir[set config dir to given string]:configuration directory:_files -/' \
+  '*-conffile[configuration file name]:configuration file:_files' \
   '*-default-mime-type[MIME type to assume for documents]:MIME type:' \
   '*-dump[write formatted version of given URL to stdout]::boolean:(0 1)' \
   '*-dump-charset[codepage to use with -dump]:codepage:' \
@@ -24,6 +26,7 @@ _arguments -C -A '-*' \
   '*-session-ring[connect to session ring with given ID]:ID number:' \
   '*-source[write the source of given URL to stdout]::boolean:(0 1)' \
   '(1)*-stdin[read document from stdin]::boolean:(0 1)' \
+  '*-no-numbering[do not number links in dump output]::boolean:(0 1)' \
   '*-touch-files[touch files in ~/.elinks when running with -no-connect/-session-ring]::boolean:(0 1)' \
   '(- 1)-version[print version information and exit]' \
   '1:url:->url' && ret=0

@@ -1,3 +1,7 @@
+2004-01-13  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 19358: Completion/Unix/Command/_elinks: update for version 0.9.0
+
 2004-01-12  Peter Stephenson  <pws@csr.com>
 
 	* 19361: Src/builtin.c, Src/params.c: Memory leaks possibly
