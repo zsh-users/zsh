@@ -1460,7 +1460,8 @@ read1char(void)
 mod_export int
 noquery(int purge)
 {
-    int c, val = 0;
+    int val = 0;
+    char c;
 
 #ifdef FIONREAD
     ioctl(SHTTY, FIONREAD, (char *)&val);
