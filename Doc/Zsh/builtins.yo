@@ -1281,7 +1281,8 @@ cindex(limits, resource)
 item(tt(ulimit) [ tt(-SHacdflmnpstv) [ var(limit) ] ... ])(
 Set or display resource limits of the shell and the processes started by
 the shell.  The value of var(limit) can be a number in the unit specified
-below or the value `tt(unlimited)'.  If the tt(-H) flag is given use
+below or the value `tt(unlimited)'.  By default, only soft limits are
+manipulated. If the tt(-H) flag is given use
 hard limits instead of soft limits.  If the tt(-S) flag is given
 together with the tt(-H) flag set both hard and soft limits.  If no
 options are used, the file size limit (tt(-f)) is assumed.  If

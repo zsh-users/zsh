@@ -1,3 +1,8 @@
+2002-05-10  Peter Stephenson  <pws@csr.com>
+
+	* users/4951: Doc/Zsh/builtins.yo: make it clearer that ulimit
+	defaults to soft limits.
+
 2002-05-08  Peter Stephenson  <pws@csr.com>
 
 	* 17102: Src/Modules/tcp.c: looking up TCP sessions by fd returned
