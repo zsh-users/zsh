@@ -166,7 +166,7 @@ esac
 _arguments -C -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
   "$args[@]" \
   -c -S -E -v -a -w -C -H -P -s '(-pg)-p' '(-p)-pg' \
-  '-o:output file:_files' \
+  '-o:output file:_files -g \^\*.\(c\|h\|cc\|C\|cxx\)' \
   '-x:input file language:(c objective-c c++ c-header cpp-output c++-cpp-output assembler assembler-with-cpp none)' \
   '+e-:virtual function definitions in classes:((0\:only\ interface 1\:generate\ code))' \
   '-d-:dump:->dump' \
