@@ -1,5 +1,8 @@
 2002-09-26  Oliver Kiddle  <opk@zsh.org>
 
+	* 17632, 16546 (Felix): Completion/Unix/Command/_cvs: merge
+	changes from 4.1 branch
+
 	* 17682 (modified for 4.0): Completion/Zsh/Command/_typeset,
 	Doc/Zsh/builtins.yo: add support for -H option to completion
 

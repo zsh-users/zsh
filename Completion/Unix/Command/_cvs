@@ -125,7 +125,7 @@ _cvs_admin_t () {
 _cvs_annotate () {
   # "+lr:D:fR"
   _arguments -s \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '-f[use head revision]' \
     '(-l)-R[recursive]' \
     '(-f -D)-r+[specify revision]:tag:_cvs_revisions' \
@@ -137,7 +137,7 @@ _cvs_annotate () {
 _cvs_rannotate () {
   # "+lr:D:fR"
   _arguments -s \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '-f[use head revision]' \
     '(-l)-R[recursive]' \
     '(-f -D)-r+[specify revision]:tag:_cvs_revisions' \
@@ -149,11 +149,11 @@ _cvs_rannotate () {
 _cvs_checkout () {
   # "+ANnk:d:flRpQqcsr:D:j:P"
   _arguments -s \
-    '-A[reset sticky tags, dates and -k]' \
     '-N[don'\''t shorten module paths]' \
+    '-A[reset sticky tags, dates and -k]' \
     '-n[disable checkout program]' \
     '-f[use most recent revision if -D/-r is not matched]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '(-s)-c[module database]' \
     '(-c)-s[module database with status]' \
@@ -171,7 +171,7 @@ _cvs_commit () {
   # "+nlRm:fF:r:"
   _arguments -s \
     '-n[disable module program]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '-f[force to commit]' \
     '(-F)-m+[message]:message:_cvs_m' \
@@ -217,7 +217,7 @@ _cvs_diff () {
 
   # "+abcdefhilnpstuw0123456789BHNRC:D:F:I:L:U:V:W:k:r:"
   _arguments -s \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '-k+[keyword]:keyword substitution:_cvs_k' \
     '(-r)-D+[specify date]:date:_cvs_D' \
@@ -299,7 +299,7 @@ _cvs_diff_arg () {
 _cvs_edit () {
   # "+lRa:"
   _arguments -s \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '-a+[specify action]:action:(edit unedit commit all none)' \
     '*:file:_cvs_files'
@@ -309,7 +309,7 @@ _cvs_edit () {
 _cvs_editors () {
   # "+lR"
   _arguments -s \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '*:file:_cvs_files'
 }
@@ -321,7 +321,7 @@ _cvs_export () {
     '-N[don'\''t shorten module paths]' \
     '-n[disable checkout program]' \
     '-f[use most recent revision if -D/-r is not matched]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '-k+[keyword]:keyword substitution:_cvs_k' \
     '-d+[directory]:directory:_files -/' \
@@ -348,7 +348,7 @@ _cvs_history () {
     '*-n+[in module]:module:_cvs_modules' \
     '*-p+[in repository]:repository:' \
     '-r+[since revision]:rev:' \
-    '-t+[since tag]:tag:_cvs_revisions' \
+    '-t+[since tag]:tag:' \
     '*-u+[specify user]:user name:' \
     '-x+[specify type]:type:_cvs_history_x' \
     '-X+[debugging]:arg:' \
@@ -398,8 +398,8 @@ _cvs_log () {
   _arguments -s \
     '-b[default branch]' \
     '(-t)-h[header]' \
-    '(-R)-l[don'\''t recursive]' \
-    '(-l)-R[recursive]' \
+    '-l[don'\''t recurse]' \
+    '-R[print the name of RCS file in the repository]' \
     '-N[don'\''t list tags]' \
     '(-h)-t[header with descriptive text]' \
     '-d+[specify dates]:dates:' \
@@ -415,7 +415,7 @@ _cvs_rlog () {
   _arguments -s \
     '-b[default branch]' \
     '(-t)-h[header]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '-N[don'\''t list tags]' \
     '(-h)-t[header with descriptive text]' \
@@ -444,7 +444,7 @@ _cvs_rdiff () {
     '-u[output a unified diff]' \
     '-f[use most recent revision if -D/-r is not matched]' \
     '-s[short patch]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '-V+[specify version]:version:' \
     '-k+[keyword]:keyword substitution:_cvs_k' \
@@ -469,7 +469,7 @@ _cvs_remove () {
   # "+flR"
   _arguments -s \
     '-f[force to remove]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '*:removed file:_cvs_remove_arg'
 }
@@ -491,13 +491,13 @@ _cvs_rtag () {
     '(-d)-a[clear tag from removed files]' \
     '-n[disable tag program]' \
     '(-d)-f[force a head revision]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '(-b)-d[delete tag]' \
     '(-d)-b[create branch]' \
     '-D+[specify date]:date:_cvs_D' \
     '-r+[specify revision]:tag:_cvs_revisions' \
-    ':tag:_cvs_revisions' \
+    ':tag:' \
     '*:module:_cvs_modules'
 }
 
@@ -506,7 +506,7 @@ _cvs_status () {
   # "+vlR"
   _arguments -s \
     '-v[verbose]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '*:file:_cvs_files'
 }
@@ -516,7 +516,7 @@ _cvs_tag () {
   # "+FQqlRcdr:D:bf"
   _arguments -s \
     '(-d)-F[move tag if already exists]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '-c[check that working files unmodified]' \
     '(-b)-d[delete tag]' \
@@ -532,7 +532,7 @@ _cvs_tag () {
 _cvs_unedit () {
   # "+lR"
   _arguments -s \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '*:file:_cvs_files'
 }
@@ -541,18 +541,18 @@ _cvs_unedit () {
 _cvs_update () {
   # "+ApCPflRQqduk:r:D:j:I:W:"
   _arguments -s \
-    '-A[reset sticky tags, dates and -k]' \
     '-C[overwrite local modification]' \
+    '-A[reset sticky tags, dates and -k]' \
     '-p[check out to standard output]' \
     '-P[prune empty directory]' \
     '-f[use head revision]' \
-    '(-R)-l[don'\''t recursive]' \
+    "(-R)-l[don't recurse]" \
     '(-l)-R[recursive]' \
     '-d[create directories]' \
     '-k+[keyword]:keyword substitution:_cvs_k' \
     '(-D)-r+[specify revision]:tag:_cvs_revisions' \
     '(-r)-D+[specify date]:date:_cvs_D' \
-    '-j+[merge]:tag:_cvs_revisions' \
+    '*-j+[merge]:tag:_cvs_revisions' \
     '*-I+[ignore files]:file:_files' \
     '*-W+[wrapper specification]:spec:_files' \
     '*:file:_cvs_files'
@@ -568,14 +568,14 @@ _cvs_watch () {
     case "$words[2]" in
       on|off) # "+lR"
 	_arguments -s \
-	    '(-R)-l[don'\''t recursive]' \
+	    "(-R)-l[don't recurse]" \
 	    '(-l)-R[recursive]' \
 	    ':watch command:' \
 	    '*:file:_cvs_files'
 	;;
       add|remove) # "+lRa:"
 	_arguments -s \
-	    '(-R)-l[don'\''t recursive]' \
+	    "(-R)-l[don't recurse]" \
 	    '(-l)-R[recursive]' \
 	    '*-a+[specify action]:action:(edit unedit commit all none)' \
 	    ':watch command:' \
@@ -589,7 +589,7 @@ _cvs_watch () {
 _cvs_watchers () {
   # "+lR"
   _arguments -s \
-      '(-R)-l[don'\''t recursive]' \
+      "(-R)-l[don't recurse]" \
       '(-l)-R[recursive]' \
       '*:file:_cvs_files'
 }
@@ -674,7 +674,13 @@ _cvs_D () {
 
 (( $+functions[_cvs_k] )) ||
 _cvs_k () {
-  _tags values && compadd "$@" kv kvl k o b v
+  _values 'keyword substitution' \
+    'kv[generate keyword strings using the default form]' \
+    "kvl[include locker's name in strings if given revision is locked]" \
+    'k[generate only keyword names in keyword strings; omit their values]' \
+    'o[generate the old keyword string as present in the file before check in]' \
+    "b[binary - like \`o' but also inhibit line ending conversions]" \
+    'v[generate only keyword values for keyword strings]'
 }
 
 (( $+functions[_cvs_m] )) ||
