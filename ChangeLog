@@ -1,3 +1,8 @@
+2002-03-17  Clint Adams  <clint@zsh.org>
+
+	* 16850: Completion/Unix/Command/_rsync: remote file completion via
+	rsync and ssh, plus all options valid in rsync 2.5.2.
+
 2002-03-17  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16849: Completion/Base/Core/_dispatch: shift off `-s' argument.
