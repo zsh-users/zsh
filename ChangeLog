@@ -1,3 +1,7 @@
+2001-03-08  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: 4.0.1-pre-2.
+
 2001-03-08  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13591: Completion/User/_init_d: try to find out the sub commands
