@@ -539,7 +539,8 @@ tt(-)var(sig) ] var(job) ...)
 item(tt(kill) tt(-l) [ var(sig) ... ])(
 Sends either tt(SIGTERM) or the specified signal to the given
 jobs or processes.
-Signals are given by number or by names, without the `tt(SIG)' prefix.
+Signals are given by number or by names, with or without the `tt(SIG)'
+prefix.
 If the signal being sent is not `tt(KILL)' or `tt(CONT)', then the job
 will be sent a `tt(CONT)' signal if it is stopped.
 The argument var(job) can be the process ID of a job

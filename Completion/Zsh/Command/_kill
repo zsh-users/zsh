@@ -4,12 +4,12 @@ local curcontext="$curcontext" line state ret=1
 
 _arguments -C \
   '(-s -l 1)-n[specify signal number]:signal number' \
-  '(-n -l 1)-s[specify signal name]:signal:_signals' \
+  '(-n -l 1)-s[specify signal name]:signal:_signals -s' \
   '(-n -s)-l[list signal names or numbers of specified signals]:*:signal:_signals' \
-  '(-n -s -l)1::signal:_signals -p' \
+  '(-n -s -l)1::signal:_signals -p -s' \
   '*:processes:->processes' && ret=0
   
-if [[ -n "$state" && -prefix [%0-9]# ]]; then
+if [[ -n "$state" ]]; then
   _alternative \
     'processes:: _pids' \
     'jobs:: _jobs -t' && ret=0
