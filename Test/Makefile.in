@@ -48,7 +48,7 @@ check test:
 	for f in $(sdir)/$(TESTNUM)*.ztst; do \
 	  $(dir_top)/Src/zsh -f $(sdir)/ztst.zsh $$f; \
 	done
-	rm -rf Modules
+	rm -rf Modules .zcompdump
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 

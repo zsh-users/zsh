@@ -24,7 +24,7 @@ comptestinit () {
   }
 
   comptesteval \
-"export ZDOTDIR=$ZTST_testdir/Modules" \
+"export ZDOTDIR=$ZTST_testdir" \
 "module_path=( $module_path )" \
 "fpath=( $fpath )" \
 'LISTMAX=10000000

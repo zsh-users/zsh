@@ -5,6 +5,9 @@
 
 2000-07-03  Bart Schaefer  <schaefer@zsh.org>
 
+	* 12151: Test/Makefile.in, Test/comptest: Point ZDOTDIR into the
+	Test directory itself, and clean up .zcompdump after testing.
+
 	* 12148: Completion/Core/_path_files: Followup to 12133 as
 	suggested by Sven in 12137: Don't merge display-ordering glob
 	flags into the parens in $(...) expressions.
