@@ -21,7 +21,7 @@ _perl_pods () {
   _perl_basepods
 
   _description expl 'Perl modules and .pods'
-  _path_files "$expl[@]"  -/ -g '*.(pod|pm)'
+  _files "$expl[@]"  -g '*.(pod|pm)'
 
   [[ nm -ne "$compstate[nmatches]" ]]
 }

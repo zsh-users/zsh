@@ -1251,9 +1251,9 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 int
 bin_zmodload(char *nam, char **args, char *ops, int func)
 {
-    /* We understand only the -e option. */
+    /* We understand only the -e option (and ignore -i). */
 
-    if (ops['e']) {
+    if (ops['e'] || *args) {
 	LinkNode node;
 
 	if (!*args) {
@@ -1261,13 +1261,19 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 		nicezputs((char *) getdata(node), stdout);
 		putchar('\n');
 	    }
-	    return 0;
 	} else {
-	    for (; *args; args++)
+	    for (; *args; args++) {
 		for (node = firstnode(bltinmodules); node; incnode(node))
 		    if (!strcmp(*args, (char *) getdata(node)))
-			return 0;
+			break;
+		if (!node) {
+		    if (!ops['e'])
+			zerrnam(nam, "cannot load module: `%s'", *args, 0);
+		    return 1;
+		}
+	    }
 	}
+	return 0;
     }
     /* Otherwise we return 1 -- different from the dynamic version. */
     return 1;

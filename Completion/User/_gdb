@@ -1,8 +1,5 @@
 #compdef gdb
 
-# This uses the configuration keys `ps_args' and `ps_listargs'
-# described in the `_wait' function.
-
 local cur="$words[CURRENT]" prev w list ret=1 expl
 
 [[ "$PREFIX" = --* ]] &&
@@ -17,7 +14,7 @@ elif compset -P '-tty='; then
   compadd "$expl[@]" - /dev/tty*
 elif compset -P '-(exec|se)='; then
   _description expl executable
-  _files "$expl[@]" -/g '*(*)'
+  _files "$expl[@]" -g '*(*)'
 elif compset -P '-(symbols|core|command)='; then
   _files
 elif [[ "$PREFIX" = -* ]]; then
@@ -33,7 +30,7 @@ else
   (-d) _files -/ && return 0 ;;
   (-[csx]) _files && return 0 ;;
   (-e) _description expl executable
-       _files "$expl[@]" -/g '*(*)' && return 0 ;;
+       _files "$expl[@]" -g '*(*)' && return 0 ;;
   (-b) _description -V expl 'baud rate'
        compadd "$expl[@]" 0 50 75 110 134 150 200 300 600 1200 1800 2400 4800 \
                           9600 19200 38400 57600 115200 230400 && return 0 ;;
@@ -53,6 +50,6 @@ else
     return ret
   else
     _description expl executable
-    _files "$expl[@]" -/g '*(*)'
+    _files "$expl[@]" -g '*(*)'
   fi
 fi

@@ -1,5 +1,5 @@
 /*
- * comp.h - header file for completion
+ * compctl.h - header file for completion
  *
  * This file is part of zsh, the Z shell.
  *

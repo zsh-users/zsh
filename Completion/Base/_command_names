@@ -15,7 +15,7 @@ fi
 
 # Complete jobs in implicit fg and bg
 if [[ -z "$ext" && "$PREFIX[1]" = "%" ]]; then
-  _job -P '%'
+  _jobs
   [[ nm -ne compstate[nmatches] ]] && return
 fi
 

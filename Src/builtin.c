@@ -127,7 +127,7 @@ static struct builtin builtins[] =
 #ifdef DYNAMIC
     BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcfdipue", NULL),
 #else
-    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "e", NULL),
+    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ei", NULL),
 #endif
 };
 

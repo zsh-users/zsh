@@ -2,7 +2,7 @@
 
 local list ret=1 expl
 
-_job -P '%' && ret=0
+_jobs && ret=0
 
 list=("${(@M)${(f)$(ps ${=compconfig[ps_listargs]:-$=compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*}")
 _description expl 'process ID'

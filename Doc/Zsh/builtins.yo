@@ -1400,10 +1400,10 @@ of things implemented by modules.
 enditem()
 
 In a shell without dynamic loading only the tt(-e) option is
-supported. In such a shell the return status of tt(zmodload) without
-arguments or options is one whereas in a shell with dynamic loading
-the return status without arguments or options is always zero. This
-can be used to test if the shell supports dynamic loading of modules
-or not.
+supported and the tt(-i) option is ignored. In such a shell the return
+status of tt(zmodload) without arguments or options is one whereas in
+a shell with dynamic loading the return status without arguments or
+options is always zero. This can be used to test if the shell supports
+dynamic loading of modules or not.
 )
 enditem()
