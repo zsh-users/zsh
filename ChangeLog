@@ -1,3 +1,8 @@
+2003-02-20  Oliver Kiddle <opk@zsh.org>
+
+	* 18263: Src/glob.c: fix saving of glob state so that globs can
+	be used from the (e) glob qualifier
+
 2003-02-19  Oliver Kiddle  <opk@zsh.org>
 
 	* 18262: Completion/Base/Utility/_multi_parts: fix bug where only
