@@ -6,20 +6,12 @@
 local ret=1
 
 if [[ $PREFIX = *\[* ]]; then
-  local var=${PREFIX%%\[*}
-  local elt="${PREFIX#*\]}${SUFFIX%\]}"
-  local addclose
+  compstate[parameter]=${PREFIX%%(|\\)\[*}
 
-  compset -p $(( ${#var} + 1 ))
-  if ! compset -S \]; then
-    addclose=(-S "${${QIPREFIX:+]}:-\]}")
-  fi
-  if [[ ${(tP)var} = assoc* ]]; then
-    local expl
+  IPREFIX=${PREFIX%%\[*}\[
+  PREFIX=${PREFIX#*\[}
 
-    _wanted -C subscript association-keys expl 'association key' \
-        compadd $addclose -k "$var"
-  fi
+  _subscript -q
 else
   _parameters -g '^a*' "$@" && ret=0
   

@@ -25,6 +25,7 @@ styles=(
   domains                c:
   expand		 c:
   fake			 c:fake
+  fake-parameters	 c:fake-params
   file-patterns		 c:filepat
   file-sort              c:fsort
   force-list             c:
@@ -267,6 +268,10 @@ while [[ -n $state ]]; do
 
     fake)
       _message 'prefix and names'
+      ;;
+
+    fake-params)
+      _message 'name and optional type'
       ;;
 
     ignline) 

@@ -1020,6 +1020,17 @@ such files really exist.
 This can be useful on systems that support special filesystems whose
 top-level pathnames can not be listed or generated with glob patterns.
 )
+kindex(fake-parameters, completion style)
+item(tt(fake-parameters))(
+This is used by the completion function generating parameter names as
+matches.  Its values are names of parameters which might not yet be
+set, but which should be completed nonetheless.  Each name may also be 
+followed by a colon and a string specifying the type of the parameter
+(like `tt(scalar)', `tt(array)' or `tt(integer)').  If such a type is
+given, the name will only be completed if parameters of that type are
+requested in the particular context.  Names for which no type is
+specified will always be completed.
+)
 kindex(file-patterns, completion style)
 item(tt(file-patterns))(
 In most places where filenames are completed, the function tt(_files)
