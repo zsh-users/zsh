@@ -1,3 +1,7 @@
+2003-10-09  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Command/_nmap: update for nmap 3.48
+
 2003-10-08  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/.distfiles, Etc/.distfiles:
