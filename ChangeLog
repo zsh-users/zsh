@@ -1,3 +1,9 @@
+2003-08-22  Peter Stephenson  <pws@csr.com>
+
+	* 18959: Completion/Unix/Command/_perforce: improve global
+	option handling again; completing global options themselves
+	was infelicitous.
+
 2003-08-21  Peter Stephenson  <pws@csr.com>
 
 	* 18958: Completion/Unix/Command/_perforce: improved option

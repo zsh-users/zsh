@@ -273,8 +273,11 @@ _perforce() {
     # end of the arguments list, anyway.
     for (( i = 2; i < CURRENT; i++ )); do
 	if [[ $words[i] = -[$argopts_pass$argopts_ignore] ]]; then
-	    # word with following argument
-	    if [[ $words[i] = -[$argopts_pass] ]]; then
+	    # word with following argument --- check this
+	    # is less than the current word, else we are completing
+	    # this and shouldn't pass it down
+	    if [[ $(( i + 1 )) -lt $CURRENT && \
+		  $words[i] = -[$argopts_pass] ]]; then
 		_perforce_global_options+=(${words[i,i+1]})
 	    fi
 	    (( i++ ))
@@ -912,6 +915,8 @@ _perforce_groups() {
 _perforce_hosts_ports() {
     if compset -P '*:'; then
 	_ports
+	local expl
+	_wanted ports expl port compadd "$@" 1666
     else
 	# is this -q-able?
 	_hosts -S :
