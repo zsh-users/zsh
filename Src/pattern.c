@@ -688,7 +688,10 @@ patcompbranch(int *flagp)
 			continue;
 		    }
 		}
-	    }
+	    } else if (!*patparse)
+		break;
+	    else
+		continue;
 	} else if (isset(EXTENDEDGLOB) && *patparse == Hat) {
 	    /*
 	     * ^pat:  anything but pat.  For proper backtracking,
