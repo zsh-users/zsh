@@ -44,7 +44,7 @@ ssh-opt)
 
     case "$lstate" in
     option)
-      if compset -P '* '; then
+      if compset -P '*[= ]'; then
         case "$IPREFIX" in
         *(#i)(batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|usepriviledgedport)*)
           compadd yes no && ret=0
@@ -92,7 +92,7 @@ ssh-opt)
         esac
       else
         _description expl 'configure file option'
-        compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S ' ' - \
+        compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '=' - \
                 BatchMode ClearAllForwardings Cipher Compression CompressionLevel \
 	        Host ConnectionAttempts EscapeChar FallBackToRsh ForwardAgent \
 	        ForwardX11 GlobalKnownHostsFile HostName IdentityFile KeepAlive \

@@ -54,21 +54,22 @@ _arguments -s \
   '--rcfile:resource file:_files' \
   '--ftpproxy:FTP proxy server:_hosts' \
   '--ftpport:FTP port number:' \
-  '-q:*:query:->query' \
-  '*-v' \
-  -{V,y,-{setperms,setugids,querytags,initdb,showrc}} \
-  '-pipe:pipe command:_command_names -e' \
-  '--verify:*:verify:->verify' \
-  '-i+:*:install:->install' \
+  '-q+[query mode]:*:query:->query' \
+  '*-v[verbose mode]' \
+  --{setperms,setugids,querytags,initdb,showrc} \
+  '--pipe:pipe command:_command_names -e' \
+  -{V,y}'[verify mode]:*:verify:->verify' \
+  '--verify[verify mode]:*:verify:->verify' \
+  '-i+[install mode]:*:install:->install' \
   '--install:*:install:->install' \
-  '-U+:*:upgrade:->upgrade' \
+  '-U+[upgrade mode]:*:upgrade:->upgrade' \
   '--upgrade:*:upgrade:->upgrade' \
-  '-e+:*:uninstall:->uninstall' \
+  '-e+[uninstall mode]:*:uninstall:->uninstall' \
   '--erase:*:uninstall:->uninstall' \
-  -'b+:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
-  -'t+:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_t' \
+  -'b+[build mode (spec file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
+  -'t+[build mode (tar file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_t' \
   --{rebuild,rmsource,recompile,resign,addsign}':*:RPM package:->package' \
-  '-K+:*:sigcheck:->sigcheck' \
+  '-K+[signature check mode]:*:sigcheck:->sigcheck' \
   '--checksig:*:sigcheck:->sigcheck' \
   '--rebuilddb:*:rebuild:->rebuild' && ret=0
 
@@ -91,15 +92,15 @@ while [[ -n "$state" ]]; do
   case "$lstate" in
   query)
     _arguments -s \
-      '*-v' \
+      '*-v[verbose mode]' -q \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
       '--root:RPM root directory:_files -/' \
       '--dbpath:RPM database path:_files -/' \
       '--queryformat:RPM query format:->tags' \
-      '-f:file:_files' \
-      '-p:RPM package file:->package_file' \
+      '-f[specify file to query owner of]:file:_files' \
+      '-p[specify uninstalled package file to query]:RPM package file:->package_file' \
       '--triggeredby:RPM package:->package' \
       '--whatprovides:RPM capability:->capability' \
       '--whatrequires:RPM capability:->capability' \
@@ -107,7 +108,7 @@ while [[ -n "$state" ]]; do
     ;;
   verify)
     _arguments -s \
-      '*-v' \
+      '*-v[verbose mode]' '(-y)-V' '(-V)-y' \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -122,11 +123,13 @@ while [[ -n "$state" ]]; do
   install)
     (( $#tmp )) || tmp=(-i)
     _arguments -s "$tmp[@]" \
-      '*-v' \
+      '*-v[verbose mode]' \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
-      -{-{badreloc,excludedocs,force,hash,allfiles,ignorearch,ignoreos,includedocs,justdb,nodeps,noorder,noscripts,notriggers,percent,replacefiles,replacepkgs,test},h} \
+      '(-h)--hash' '(--hash)-h' \
+      '(--replacepkgs --replacefiles --oldpackage)--force' \
+      --{badreloc,excludedocs,allfiles,ignorearch,ignoreos,includedocs,justdb,nodeps,noorder,noscripts,notriggers,percent,replacefiles,replacepkgs,test} \
       '--relocate:relocate:->relocate' \
       '--prefix:package prefix directory:_files -/' \
       '--root:RPM root directory:_files -/' \
@@ -135,7 +138,7 @@ while [[ -n "$state" ]]; do
     ;;
   uninstall)
     _arguments -s \
-      '*-v' -e \
+      '*-v[verbose mode]' -e \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -151,7 +154,7 @@ while [[ -n "$state" ]]; do
     (( $#tmp )) || tmp=( '*:tar file:_files -g \*.\(\#i\)tar\(.\*\|\)' )
 
     _arguments -s \
-      '*-v' \
+      '*-v[verbose mode]' \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -163,7 +166,7 @@ while [[ -n "$state" ]]; do
     ;;
   sigcheck)
     _arguments -s \
-      '*-v' -K \
+      '*-v[verbose mode]' -K \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -172,7 +175,7 @@ while [[ -n "$state" ]]; do
     ;;
   rebuild)
     _arguments -s \
-      '*-v' \
+      '*-v[verbose mode]' \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -188,11 +191,13 @@ while [[ -n "$state" ]]; do
     compadd "$expl[@]" -M 'r:|-=* r:|=*' - $(rpm -qa) && ret=0
     ;;
   package_file)
-    if compset -P ftp:; then
+    if compset -P ftp://; then
       _hosts -S/ && ret=0
     else
       _description expl 'RPM package file'
       _files "$expl[@]" -g '*.(#i)rpm' && ret=0
+      _description expl 'ftp URL prefix'
+      compadd "$expl[@]" ftp://
     fi
     ;;
   tags)
