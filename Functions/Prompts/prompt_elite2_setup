@@ -1,0 +1,17 @@
+# Converted to zsh prompt theme by bash2zshprompt, written by <adam@spiers.net>
+# Created by icetrey <trey@imagin.net>
+# Added by Spidey 08/06
+prompt_elite2_setup () {
+  local GRAD1=`tty|cut -d/ -f3`
+  local COLOR1="%{$reset_color$fg_cyan%}"
+  local COLOR2="%{$bold_color$fg_cyan%}"
+  local COLOR3="%{$bold_color$fg_grey%}"
+  local COLOR4="%{$reset_color%}"
+  PS1="$COLOR3レ$COLOR1ト$COLOR2($COLOR1%n$COLOR3@$COLOR1%m$COLOR2)$COLOR1ト$COLOR2($COLOR1%!$COLOR3/$COLOR1$GRAD1$COLOR2)$COLOR1ト$COLOR2($COLOR1%D{%I:%M%P}$COLOR3:$COLOR1%D{%m/%d/%y}$COLOR2)$COLOR1ト$COLOR3-$COLOR4$prompt_newline$COLOR3タ$COLOR1ト$COLOR2($COLOR1%#$COLOR3:$COLOR1%~$COLOR2)$COLOR1ト$COLOR3-$COLOR4 " 
+  PS2="$COLOR2ト$COLOR1ト$COLOR3-$COLOR4 "
+
+  precmd () { }
+  preexec () { }
+}
+
+prompt_elite2_setup "$@"

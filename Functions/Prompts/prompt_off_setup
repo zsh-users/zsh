@@ -1,0 +1,11 @@
+# Converted to zsh prompt theme by bash2zshprompt, written by <adam@spiers.net>
+# Very simple prompt
+prompt_off_setup () {
+  PS1="%# "
+  PS2="> "
+
+  precmd () { }
+  preexec () { }
+}
+
+prompt_off_setup "$@"

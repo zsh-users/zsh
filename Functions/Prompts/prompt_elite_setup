@@ -1,0 +1,18 @@
+# Converted to zsh prompt theme by bash2zshprompt, written by <adam@spiers.net>
+
+for code in 332 304 304 371 371 371 372 300 304 304 371 372; do
+  local varname=char_$code
+  : ${(P)varname=$(echo -n "\\0$code")}
+done
+
+# Created by KrON from windowmaker on IRC
+# Changed by Spidey 08/06
+prompt_elite_setup () {
+  PS1="%{$fg_red%}$char_332$char_304%{$fg_blue%}(%{$fg_red%}%n%{$fg_blue%}@%{$fg_red%}%m%{$fg_blue%})%{$fg_red%}-%{$fg_blue%}(%{$fg_red%}%D{%I:%M%P}%{$fg_blue%}-:-%{$fg_red%}%D{%m}%{$fg_blue$fg_red%}/%D{%d}%{$fg_blue%})%{$fg_red%}$char_304-%{$fg_blue]%}$char_371%{$fg_red%}-$char_371$char_371%{$fg_blue%}$char_372$prompt_newline%{$fg_red%}$char_300$char_304%{$fg_blue%}(%{$fg_red%}%1~%{$fg_blue%})%{$fg_red%}$char_304$char_371%{$fg_blue%}$char_372%{$reset_color%}"
+  PS2="> "
+
+  precmd () { }
+  preexec () { }
+}
+
+prompt_elite_setup "$@"

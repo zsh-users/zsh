@@ -1,0 +1,33 @@
+# adam1 prompt theme
+
+prompt_adam1_setup () {
+  base_prompt="%{$bg_no_bold_blue%}%n@%m%{$reset_color%} "
+  post_prompt="%{$reset_color%}"
+
+  base_prompt_no_color=$(echo "$base_prompt" | perl -pe "s/%{.*?%}//g")
+  post_prompt_no_color=$(echo "$post_prompt" | perl -pe "s/%{.*?%}//g")
+
+  precmd  () { prompt_adam1_precmd }
+  preexec () { }
+}
+
+prompt_adam1_precmd () {
+  setopt noxtrace localoptions
+  local base_prompt_expanded_no_color base_prompt_etc
+  local prompt_length space_left
+
+  base_prompt_expanded_no_color=$(print -P "$base_prompt_no_color")
+  base_prompt_etc=$(print -P "$base_prompt%(4~|...|)%3~")
+  prompt_length=${#base_prompt_etc}
+  if [[ $prompt_length -lt 40 ]]; then
+    path_prompt="%{$fg_bold_cyan%}%(4~|...|)%3~%{$fg_bold_white%}"
+  else
+    space_left=$(( $COLUMNS - $#base_prompt_expanded_no_color - 2 ))
+    path_prompt="%{$fg_bold_green%}%${space_left}<...<%~$prompt_newline%{$fg_bold_white%}"
+  fi
+  PS1="$base_prompt$path_prompt %# $post_prompt"
+  PS2="$base_prompt$path_prompt %_> $post_prompt"
+  PS3="$base_prompt$path_prompt ?# $post_prompt"
+}
+
+prompt_adam1_setup "$@"

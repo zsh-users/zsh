@@ -1,0 +1,107 @@
+# zsh prompt themes extension
+#
+# Load with `autoload -U promptinit; promptinit'.
+
+prompt_themes=()
+typeset -gU prompt_themes
+typeset -g prompt_theme
+
+promptinit () {
+  emulate -L zsh
+  local ppath='' name
+
+  # Autoload all prompt_*_setup functions in fpath
+  for theme in $fpath/prompt_*_setup(N); do
+    if [[ $theme == */prompt_(#b)(*)_setup ]]; then
+      name="$match[1]"
+      if [[ -r "$theme" ]]; then
+        prompt_themes=($name $prompt_themes)
+        autoload -U prompt_${name}_setup
+      else
+        print "Couldn't find theme $theme" 
+      fi
+    else
+      print "eh?"
+    fi
+  done
+
+  # Color definitions come in handy
+  autoload -U colors
+  colors
+
+  # Variables common to all prompt styles
+  prompt_newline=$(echo -ne "\n%{\r%}")
+}
+
+prompt () {
+  local opt preview theme usage old_theme
+
+  usage='Usage: prompt <options>
+Options:
+    -l              List currently available prompt themes
+    -p [<themes>]   Preview given themes (defaults to all)
+    -h [<theme>]    Display help (for given theme)
+    -s <theme>      Set and save theme
+    <theme>         Switch to new theme immediately (changes not saved)'
+
+  getopts "hlps" opt
+  case "$opt" in
+    h) if [[ -n "$2" && -n $prompt_themes[(r)$2] ]]; then
+         if functions prompt_$2_help >/dev/null; then
+	   print "Help for $2 theme:\n"
+           prompt_$2_help
+         else
+           print "No help available for $2 theme"
+         fi
+       else
+         print "$usage"
+       fi
+       ;;
+    l) print Currently available prompt themes:
+       print $prompt_themes
+       return
+       ;;
+    p) if (( ! $+prompt_theme )); then
+         print "Cannot preview; current prompt is non-themeable and would"
+	 print "be destroyed."
+	 return
+       fi
+       preview=( $prompt_themes )
+       [[ -n "$2" && -n $prompt_themes[(r)$2] ]] && preview=( $*[2,-1] )
+       for theme in $preview; do
+         [[ $theme == $prompt_theme[1] ]] && continue
+         print "\nTheme: $theme"
+         prompt_${theme}_setup
+	 precmd
+	 print -n -P "${PS1}"
+	 preexec
+	 print "command arg1 arg2 ... argn"
+       done
+       print
+       prompt_${prompt_theme}_setup
+       ;;
+    s) print "Set and save not yet implemented.  Please ensure your ~/.zshrc"
+       print "contains something similar to the following:\n"
+       print "  autoload -U promptinit"
+       print "  promptinit"
+       print "  prompt $*[2,-1]"
+       ;;
+    *) if [[ -z "$1" || -z $prompt_themes[(r)$1] ]]; then
+         print "$usage"
+         return
+       fi
+       prompt_$1_setup "$*[2,-1]"
+       prompt_theme=( $* )
+
+       # Avoid screwing up the environment listing
+       PSZZZZ=$reset_color
+       RPSZZZZ=$reset_color
+       PROMPTZZZZ=$reset_color
+       RPROMPTZZZZ=$reset_color
+       promptzzzz=$reset_color
+       ;;
+  esac
+}
+
+promptinit "$@"
+
