@@ -7,11 +7,12 @@ _arguments -C -s \
   '-t+[termination character]:termination character:' \
   '-f[case insensitive]' \
   '-d[dictionary order]' \
-  ':string:->string' && return 0
+  ':string:->string' \
+  ':dictionary file:_files -f' && return 0
 
 case "$state" in
 string)
   [[ -n "$PREFIX" ]] &&
-      _wanted values expl value compadd - $(_call values $words[1] $PREFIX)
+      _wanted values expl 'word prefix' compadd - $(_call values $words[1] $PREFIX)
   ;;
 esac

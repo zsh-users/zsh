@@ -1,3 +1,8 @@
+2000-05-05  Tanaka Akira  <akr@zsh.org>
+
+	* 11204: Completion/User/_look: use more precise explanation and
+	complete an optional second argument.
+
 2000-05-05  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: 11196: Functions/Misc/zmv: allow (**/) to map to a
