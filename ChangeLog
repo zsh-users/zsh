@@ -1,3 +1,8 @@
+2000-09-18  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12833: Back out the zasprintf changes from 12814, they're not
+	being used any more and they break common builds like SunOS.
+
 2000-09-17  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12829: Src/glob.c, Src/init.c, Src/utils.c: Move dyncat() and
