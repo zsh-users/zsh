@@ -717,6 +717,7 @@ parse_cadef(char *nam, char **args)
 			    sav = *p;
 			    *p = '\0';
 			    end = dupstring(end);
+			    tokenize(end);
 			    *p = sav;
 			}
 			if (*p != ':') {
