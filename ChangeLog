@@ -1,5 +1,8 @@
 2003-07-09  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: rebrand as 4.1.1-dev-1 to
+	avoid confusion with release version.
+
 	* 18836: Src/builtin.c, Test/B04read.ztst: `read -d' failed with
 	metafied delimiters, in particular null.
 
