@@ -1828,19 +1828,24 @@ int
 list_matches(Hookdef dummy, void *dummy2)
 {
     struct chdata dat;
+    int ret;
 
+    HEAPALLOC {
 #ifdef DEBUG
-    /* Sanity check */
-    if (!validlist) {
-	showmsg("BUG: listmatches called with bogus list");
-	return 1;
-    }
+	/* Sanity check */
+	if (!validlist) {
+	    showmsg("BUG: listmatches called with bogus list");
+	    return 1;
+	}
 #endif
 
-    dat.matches = amatches;
-    dat.num = nmatches;
-    dat.cur = NULL;
-    return runhookdef(COMPLISTMATCHESHOOK, (void *) &dat);
+	dat.matches = amatches;
+	dat.num = nmatches;
+	dat.cur = NULL;
+	ret = runhookdef(COMPLISTMATCHESHOOK, (void *) &dat);
+    } LASTALLOC;
+
+    return ret;
 }
 
 /* Invalidate the completion list. */

@@ -1026,7 +1026,7 @@ makecompparams(void)
 
     comprpms[CPN_COMPSTATE] = cpm;
     tht = paramtab;
-    cpm->level = locallevel;
+    cpm->level = locallevel + 1;
     cpm->gets.hfn = get_compstate;
     cpm->sets.hfn = set_compstate;
     cpm->unsetfn = compunsetfn;
@@ -1146,8 +1146,24 @@ compunsetfn(Param pm, int exp)
 	    }
 	}
     } else if (PM_TYPE(pm->flags) == PM_HASHED) {
+	Param *p;
+	int i;
+
 	deletehashtable(pm->u.hash);
 	pm->u.hash = NULL;
+
+	for (p = compkpms, i = CP_KEYPARAMS; i--; p++)
+	    *p = NULL;
+    }
+    if (!exp) {
+	Param *p;
+	int i;
+
+	for (p = comprpms, i = CP_REALPARAMS; i; p++, i--)
+	    if (*p == pm) {
+		*p = NULL;
+		break;
+	    }
     }
 }
 
@@ -1159,18 +1175,22 @@ comp_setunset(int rset, int runset, int kset, int kunset)
 
     if (comprpms && (rset >= 0 || runset >= 0)) {
 	for (p = comprpms; rset || runset; rset >>= 1, runset >>= 1, p++) {
-	    if (rset & 1)
-		(*p)->flags &= ~PM_UNSET;
-	    if (runset & 1)
-		(*p)->flags |= PM_UNSET;
+	    if (*p) {
+		if (rset & 1)
+		    (*p)->flags &= ~PM_UNSET;
+		if (runset & 1)
+		    (*p)->flags |= PM_UNSET;
+	    }
 	}
     }
-    if (comprpms && (kset >= 0 || kunset >= 0)) {
+    if (compkpms && (kset >= 0 || kunset >= 0)) {
 	for (p = compkpms; kset || kunset; kset >>= 1, kunset >>= 1, p++) {
-	    if (kset & 1)
-		(*p)->flags &= ~PM_UNSET;
-	    if (kunset & 1)
-		(*p)->flags |= PM_UNSET;
+	    if (*p) {
+		if (kset & 1)
+		    (*p)->flags &= ~PM_UNSET;
+		if (kunset & 1)
+		    (*p)->flags |= PM_UNSET;
+	    }
 	}
     }
 }
