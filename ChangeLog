@@ -1,3 +1,14 @@
+2004-11-12  Peter Stephenson  <pws@csr.com>
+
+	* Motoi Washida <a66@h8.dion.ne.jp>: 20274, 20552:
+	Completion/Darwin/Command/_fink,
+	Completion/Darwin/Command/_hdiutil,
+	Completion/Darwin/Command/_open,
+	Completion/Darwin/Type/_mac_applications,
+	Completion/Darwin/Type/_mac_files_for_application,
+	Completion/Darwin/Type/_retrieve_mac_apps: improved completion
+	for Mac.
+
 2004-11-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20551: Completion/Unix/Command/_make: handle $$ when

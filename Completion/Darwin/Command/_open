@@ -1,12 +1,41 @@
 #compdef open
 
-local curcontext="$curcontext" state line
+_open_absolute_application_path() {
+  local expl curcontext
+  zstyle -T ":completion:${curcontext}:files" prefix-needed && \
+    [[ "$PREFIX" != [/~]* && compstate[nmatches] -ne 0 ]] && return 1
+  _wanted files expl 'application file' _path_files -P "$PREFIX[1]" -W /
+}
 
-_arguments -C \
-  '-a[specify application]:application:->open_mac_applications' \
-  '-e[open with TextEdit]' \
-  '*:files:_webbrowser'
+_open() {
+  local curcontext="$curcontext" state line expl
 
-if [[ -n "$state" ]]; then
-  _mac_applications || _files
-fi
+  _arguments -C \
+    '-a[specify application]: :->open_mac_applications' \
+    '-e[open with TextEdit]' \
+    '-f[Reads input from standard input and opens with TextEdit]' \
+    '*: :->open_files'
+
+  case "$state" in
+    open_mac_applications)
+      _alternative \
+        "commands: :_mac_applications" \
+        "files:: _open_absolute_application_path"
+      ;;
+    open_files)
+      local app
+      if [[ -n "$words[(r)-a]" ]]; then
+        app="${(Q)words[words[(i)-a] + 1]}"
+      elif [[ -n "$words[(r)-e]" || -n "$words[(r)-f]" ]]; then
+        app="Text Edit"
+      fi
+      if [[ -n "$app" ]]; then
+        _wanted files expl "file for $app" _mac_files_for_application "$app"
+      else
+        _webbrowser
+      fi
+      ;;
+  esac
+}
+
+_open "$@"

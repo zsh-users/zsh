@@ -1,51 +1,6 @@
 #autoload
 
-_mac_applications_caching_policy () {
-   # rebuild if cache is more than a day old
-   oldp=( "$1"(Nmw+1) )
-   (( $#oldp ))
-}
+_retrieve_mac_apps
 
-_mac_applications() {
-  [[ $PREFIX = */* ]] && return 1
-
-  local cache_policy
-  zstyle -s ":completion:*:*:$service:*" cache-policy cache_policy
-  if [[ -z "$cache_policy" ]]; then
-    zstyle ":completion:*:*:$service:*" cache-policy _mac_applications_caching_policy
-  fi
-
-  if ( [[ ${+apps} -eq 0 ]] || _cache_invalid Mac_applications ) \
-        && ! _retrieve_cache Mac_applications; then
-    local app_pattern="*.app"
-
-    local -a app_path 
-    zstyle -s ":completion:${curcontext}:commands" application-dir app_path
-    if [[ -z "$app_path" ]]; then
-      local -a apdptn
-      apdptn="((*~$app_pattern~Data~plugins~*Fonts~Contents)/)#"
-      app_path=({{/,/Developer,/Network,"$HOME"}/Applications/,"/Applications (Mac OS 9)/"}${~apdptn} "$HOME"/Desktop/{,*~${~app_pattern}(/)})
-    fi
-
-    local -a apps
-
-    if ! zstyle -t ":completion:${curcontext}:commands" ignore-extention; then
-      apps=("${apps[@]}" "${app_path[@]}"/${~app_pattern})
-    fi
-
-    if ! zstyle -t ":completion:${curcontext}:commands" ignore-cfm; then
-      local capps
-      capps="`awk '/^Joy\!peffpwpc/ {print FILENAME; }; { nextfile }' ${app_path}/(*~*.?~*.??~*.???~*.????)(^/)`"
-      apps=("${apps[@]}" "${(f)capps}")
-    fi
-
-    typeset -U apps
-    apps=("${apps[@]:t:r}")
-    _store_cache Mac_applications apps
-  fi
-
-  local expl
-  _wanted commands expl 'mac os x application' compadd -a apps
-}
-
-_mac_applications "$@"
+local expl
+_wanted commands expl 'Mac OS X application' compadd -- "${(@)${_mac_apps[@]:t}%.app}"
