@@ -184,9 +184,20 @@ static int type[TOKCOUNT] =
 static int
 zzlex(void)
 {
+    char decimal = '.', thousands = ',';
     int cct = 0;
+#ifdef USE_LOCALE
+    struct lconv *lc;
+#endif
 
     yyval.type = MN_INTEGER;
+
+#ifdef USE_LOCALE
+    lc = localeconv();
+    decimal = *(lc->decimal_point);
+    thousands = *(lc->thousands_sep);
+#endif
+
     for (;; cct = 0)
 	switch (*ptr++) {
 	case '+':
@@ -324,7 +335,9 @@ zzlex(void)
 	case ':':
 	    return COLON;
 	case ',':
-	    return COMMA;
+	case '.':
+	    if (*(ptr-1) == thousands) return COMMA;
+	    else break;
 	case '\0':
 	    ptr--;
 	    return EOI;
@@ -349,15 +362,15 @@ zzlex(void)
 	    }
 	/* Fall through! */
 	default:
-	    if (idigit(*--ptr) || *ptr == '.') {
+	    if (idigit(*--ptr) || *ptr == decimal) {
 		char *nptr;
 		for (nptr = ptr; idigit(*nptr); nptr++);
 
-		if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
+		if (*nptr == decimal || *nptr == 'e' || *nptr == 'E') {
 		    /* it's a float */
 		    yyval.type = MN_FLOAT;
 		    yyval.u.d = strtod(ptr, &nptr);
-		    if (ptr == nptr || *nptr == '.') {
+		    if (ptr == nptr || *nptr == decimal ) {
 			zerr("bad floating point constant", NULL, 0);
 			return EOI;
 		    }
