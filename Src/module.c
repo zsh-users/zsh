@@ -1776,7 +1776,7 @@ add_autoparam(char *nam, char *module)
     if ((pm = (Param) gethashnode2(paramtab, nam)))
 	unsetparam_pm(pm, 0, 1);
 
-    pm = setsparam(ztrdup(nam), ztrdup(module));
+    pm = setsparam(nam, ztrdup(module));
 
     pm->flags |= PM_AUTOLOAD;
 }

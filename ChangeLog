@@ -1,5 +1,7 @@
 2000-06-02  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* Felix: 11718: Src/module.c: fix for memory leak
+
 	* 11722: Src/Zle/compcore.c, Src/Zle/complete.c: fix some memory
  	leaks (thanks, Felix)
 	
