@@ -1,3 +1,10 @@
+2001-03-07  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13589: Src/mem.c, Src/parse.c, Src/zsh.h: two optimisations; use
+ 	a binary tree to avoid duplicate strings in ecstrcode(); keep a
+ 	pointer to newly allocated heaps to avoid having to search for a
+ 	heap with free space in most cases
+	
 2001-03-07  Andrej Borsenkow <bor@zsh.org>
 
 	* unposted: configure.in, aczsh.m4: support building with

@@ -522,9 +522,9 @@ struct estate {
 typedef struct eccstr *Eccstr;
 
 struct eccstr {
-    Eccstr next;
+    Eccstr left, right;
     char *str;
-    wordcode offs;
+    wordcode offs, aoffs;
     int nfunc;
 };
 

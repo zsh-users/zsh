@@ -211,9 +211,9 @@ struct heredocs *hdocs;
  * containing the characters. Longer strings are encoded as the offset
  * into the strs character array stored in the eprog struct shifted by
  * two and ored with the bit pattern 0x.
- * The ecstr() function that adds the code for a string uses a simple
- * list of strings already added so that long strings are encoded only
- * once.
+ * The ecstrcode() function that adds the code for a string uses a simple
+ * binary tree of strings already added so that long strings are encoded
+ * only once.
  *
  * Note also that in the eprog struct the pattern, code, and string
  * arrays all point to the same memory block.
@@ -320,19 +320,18 @@ ecstrcode(char *s)
 	}
 	return c;
     } else {
-	Eccstr p, q = NULL;
+	Eccstr p, *pp;
+	int cmp;
 
-	for (p = ecstrs; p; q = p, p = p->next)
-	    if (p->nfunc == ecnfunc && !strcmp(s, p->str))
+	for (pp = &ecstrs; (p = *pp); ) {
+	    if (!(cmp = p->nfunc - ecnfunc) && !(cmp = strcmp(p->str, s)))
 		return p->offs;
-
-	p = (Eccstr) zhalloc(sizeof(*p));
-	p->next = NULL;
-	if (q)
-	    q->next = p;
-	else
-	    ecstrs = p;
+	    pp = (cmp < 0 ? &(p->left) : &(p->right));
+	}
+	p = *pp = (Eccstr) zhalloc(sizeof(*p));
+	p->left = p->right = 0;
 	p->offs = ((ecsoffs - ecssub) << 2) | (t ? 1 : 0);
+	p->aoffs = ecsoffs;
 	p->str = s;
 	p->nfunc = ecnfunc;
 	ecsoffs += l;
@@ -341,12 +340,7 @@ ecstrcode(char *s)
     }
 }
 
-static int
-ecstr(char *s)
-{
-    return ecadd(ecstrcode(s));
-}
-
+#define ecstr(S) ecadd(ecstrcode(S))
 
 #define par_save_list(C) \
     do { \
@@ -379,12 +373,20 @@ init_parse(void)
 
 /* Build eprog. */
 
+static void
+copy_ecstr(Eccstr s, char *p)
+{
+    while (s) {
+	memcpy(p + s->aoffs, s->str, strlen(s->str) + 1);
+	copy_ecstr(s->left, p);
+	s = s->right;
+    }
+}
+
 static Eprog
 bld_eprog(void)
 {
     Eprog ret;
-    Eccstr p;
-    char *q;
     int l;
 
     ecadd(WCB_END());
@@ -403,10 +405,8 @@ bld_eprog(void)
     for (l = 0; l < ecnpats; l++)
 	ret->pats[l] = dummy_patprog1;
     memcpy(ret->prog, ecbuf, ecused * sizeof(wordcode));
-    for (p = ecstrs, q = ret->strs; p; p = p->next, q += l) {
-	l = strlen(p->str) + 1;
-	memcpy(q, p->str, l);
-    }
+    copy_ecstr(ecstrs, ret->strs);
+
     zfree(ecbuf, eclen);
     ecbuf = NULL;
 

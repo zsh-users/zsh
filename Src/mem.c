@@ -105,7 +105,8 @@ union mem_align {
 
 static Heap heaps;
 
-/* first heap with free space, not always correct */
+/* a heap with free space, not always correct (it will be the last heap
+ * if that was newly allocated but it may also be another one) */
 
 static Heap fheap;
 
@@ -297,7 +298,8 @@ zhalloc(size_t size)
 
     /* find a heap with enough free space */
 
-    for (h = (fheap ? fheap : heaps); h; h = h->next) {
+    for (h = ((fheap && HEAP_ARENA_SIZE >= (size + fheap->used)) ? fheap : heaps);
+	 h; h = h->next) {
 	if (HEAP_ARENA_SIZE >= (n = size + h->used)) {
 	    void *ret;
 
@@ -364,7 +366,7 @@ zhalloc(size_t size)
 	    hp->next = h;
 	else
 	    heaps = h;
-	fheap = NULL;
+	fheap = h;
 
 	unqueue_signals();
 	return arena(h);
