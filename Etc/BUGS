@@ -44,7 +44,3 @@ and ksh and may be removed in the future. A good fix would be to keep
 such patterns unchanged if they do not match regardless of the state of
 the nonomatch and nullglob options.
 ------------------------------------------------------------------------
-Numeric ranges are still too greedy with using characters; for example,
-<1-1000>33 will not match 633 because the 633 matches the range.  Some
-backtracking will be necessary.  (This is believed fixed as of 3.1.6.)
-------------------------------------------------------------------------
