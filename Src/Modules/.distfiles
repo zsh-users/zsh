@@ -4,5 +4,14 @@ DISTFILES_SRC='
     clone.mdd clone.c
     example.mdd example.c
     files.mdd files.c
+    mapfile.mdd mapfile.c
+    mathfunc.mdd mathfunc.c
+    parameter.mdd parameter.c
     stat.mdd stat.c
+    termcap.mdd termcap.c
+    terminfo.mdd terminfo.c
+    zftp.mdd zftp.c
+    zprof.mdd zprof.c
+    zutil.mdd zutil.c
+    zpty.mdd zpty.c
 '

@@ -1,0 +1,23 @@
+COMMENT(!MOD!zsh/terminfo
+Interface to the terminfo database.
+!MOD!)
+The tt(zsh/terminfo) module makes available one builtin command:
+
+startitem()
+findex(echoti)
+cindex(terminfo string, printing)
+item(tt(echoti) var(cap))(
+Output the terminfo string corresponding to the capability
+var(cap).
+)
+enditem()
+
+The tt(zsh/terminfo) module makes available one parameter:
+
+startitem()
+vindex(terminfo)
+item(tt(terminfo))(
+An associative array that maps terminfo capability names to
+their values.
+)
+enditem()
