@@ -317,3 +317,9 @@
  print ${foo%% #:*}
 0:Must-match arguments in complex patterns
 >this string has a
+
+ mkdir glob.tmp/ra=1.0_et=3.5
+ touch glob.tmp/ra=1.0_et=3.5/foo
+ print glob.tmp/ra=1.0_et=3.5/???
+0:Bug with intermediate paths with plain strings but tokenized characters
+>glob.tmp/ra=1.0_et=3.5/foo

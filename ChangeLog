@@ -1,3 +1,8 @@
+2005-03-16  Peter Stephenson  <pws@csr.com>
+
+	* 20983: Test/D02glob.ztst, Src/glob.c: fixed string segments
+	in globbed paths could be copied wrongly, resulting in failed globs.
+
 2005-03-15  Peter Stephenson  <pws@csr.com>
 
 	* 20978: Src/zle_main.c: don't propagate EOFs from recursive

@@ -223,13 +223,14 @@ struct complist {
 
 /**/
 static void
-addpath(char *s)
+addpath(char *s, int l)
 {
     DPUTS(!pathbuf, "BUG: pathbuf not initialised");
-    while (pathpos + (int) strlen(s) + 1 >= pathbufsz)
+    while (pathpos + l + 1 >= pathbufsz)
 	pathbuf = realloc(pathbuf, pathbufsz *= 2);
-    while ((pathbuf[pathpos++] = *s++));
-    pathbuf[pathpos - 1] = '/';
+    while (l--)
+	pathbuf[pathpos++] = *s++;
+    pathbuf[pathpos++] = '/';
     pathbuf[pathpos] = '\0';
 }
 
@@ -504,14 +505,17 @@ scanner(Complist q)
 		    }
 		}
 		if (add) {
-		    addpath(str);
+		    addpath(str, l);
 		    if (!closure || !statfullpath("", NULL, 1))
 			scanner((q->closure) ? q : q->next);
 		    pathbuf[pathpos = oppos] = '\0';
 		}
 	    }
-	} else
+	} else {
+	    if (str[l])
+		str = dupstrpfx(str, l);
 	    insert(str, 0);
+	}
     } else {
 	/* Do pattern matching on current path section. */
 	char *fn = pathbuf[pathbufcwd] ? unmeta(pathbuf + pathbufcwd) : ".";
@@ -608,8 +612,9 @@ scanner(Complist q)
 	    int oppos = pathpos;
 
 	    for (fn = subdirs; fn < subdirs+subdirlen; ) {
-		addpath(fn);
-		fn += strlen(fn) + 1;
+		int l = strlen(fn);
+		addpath(fn, l);
+		fn += l + 1;
 		memcpy((char *)&errsfound, fn, sizeof(int));
 		fn += sizeof(int);
 		scanner((q->closure) ? q : q->next);  /* scan next level */
