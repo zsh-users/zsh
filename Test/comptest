@@ -24,13 +24,14 @@ comptestinit () {
   }
 
   comptesteval \
+"export ZDOTDIR=$ZTST_testdir/Modules" \
 "module_path=( $module_path )" \
 "fpath=( $fpath )" \
 'LISTMAX=10000000
 stty columns 80 rows 24
 bindkey -e
 autoload -U compinit
-compinit $dump
+compinit -u
 zstyle ":completion:*:default" list-colors "no=<NO>" "fi=<FI>" "di=<DI>" "ln=<LN>" "pi=<PI>" "so=<SO>" "bd=<BD>" "cd=<CD>" "ex=<EX>" "mi=<MI>" "tc=<TC>" "sp=<SP>" "lc=<LC>" "ec=<EC>\n" "rc=<RC>"
 zstyle ":completion:*" group-name ""
 zstyle ":completion:*:messages" format "<MESSAGE>%d</MESSAGE>

@@ -1,3 +1,9 @@
+2000-06-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12039: Test/comptest: Use "compinit -u" to avoid a possible
+	prompt about security of the directories; point ZDOTDIR into
+	the temporary test directory for the .zcompdump file.
+
 2000-06-22  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12033: Completion/Core/compinit: followup to compinit-security
