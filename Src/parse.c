@@ -357,7 +357,11 @@ parse_list(void)
     incmdpos = 1;
     yylex();
     ret = par_list();
-    if (tok == LEXERR) {
+#if 0
+    if (tok == LEXERR)
+#endif
+    if (tok != ENDINPUT)
+    {
 	yyerror(0);
 	return NULL;
     }

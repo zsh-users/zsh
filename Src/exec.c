@@ -3096,6 +3096,8 @@ loadautofn(Shfunc shf)
 	zerr("%s: function definition file not found", shf->nam, 0);
 	return 1;
     }
+    if (!prog)
+	prog = &dummy_eprog;
     PERMALLOC {
 	shf->funcdef = dupeprog(stripkshdef(prog, shf->nam));
     } LASTALLOC;
