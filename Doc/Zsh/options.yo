@@ -524,7 +524,8 @@ pindex(HIST_IGNORE_SPACE)
 cindex(history, ignoring spaces)
 item(tt(HIST_IGNORE_SPACE) (tt(-g)))(
 Do not enter command lines into the history list
-if any command on the line begins with a blank.
+if the first character on the line is a space, or if one of
+the expanded aliases contained a leading space.
 )
 pindex(HIST_NO_FUNCTIONS)
 item(tt(HIST_NO_FUNCTIONS))(
