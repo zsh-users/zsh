@@ -1,3 +1,7 @@
+2000-04-19  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 10830: Doc/Makefile.in: don't force dvips to use 300 dpi.
+
 2000-04-19  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 10828: Src/module.c, Src/Zle/zle_tricky.c: ensure zsh/compctl
