@@ -1,3 +1,11 @@
+2001-05-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14235: Completion/Zsh/Context/_subscript: Improve handling of
+	b/n/s subscript flags.
+
+	* 14234: Src/Zle/computil.c: Prevent "no multi-letter values"
+	error on values of '\:' and '' in compvalues().
+
 2001-05-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14230: Completion/Zsh/Context/_subscript: Fix flag descriptions.
