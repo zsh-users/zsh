@@ -1,5 +1,12 @@
 2001-06-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 15060: Test/A02alias.ztst: Change expected return value to
+	account for 15050.
+
+	* 15060: Test/Y01completion.ztst, Test/Y02compmatch.ztst,
+	Test/Y03arguments.ztst, Test/comptest: Abandon the tests during
+	the %prep section if the zpty module can't be loaded.	
+
 	* 15057: Src/exec.c: PRINT_EXIT_VALUE for shell functions, too.
 
 2001-06-23  Bart Schaefer  <schaefer@zsh.org>

@@ -16,10 +16,10 @@
   mkdir match.tmp
   cd match.tmp
 
-  comptestinit -z $ZTST_testdir/../Src/zsh
-
-  list1=(IndianRed IndianRed2 IndianRed3 IndianRed4)
-  test_code () {
+  comptestinit -z $ZTST_testdir/../Src/zsh &&
+  {
+    list1=(IndianRed IndianRed2 IndianRed3 IndianRed4)
+    test_code () {
 	matcher=$1;
 	list=$2;
 	code="compdef _tst tst ; _tst () { echo -n '<COMPADD>';compadd -M '"
@@ -31,11 +31,9 @@
         code="$code; echo -n '</INSERT_POSITIONS>'"
         code="$code}"
 	comptesteval "$code"
+    }
   }
 
-
-
-	 
 
 %test
 

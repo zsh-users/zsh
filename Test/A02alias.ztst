@@ -15,7 +15,7 @@
 >echo
 
   \foo foo
-1:Not aliasing
+127:Not aliasing
 ?ZTST_execchunk:2: command not found: foo
 
   \bar \bar
