@@ -1,3 +1,8 @@
+2001-03-26  Clint Adams  <schizo@debian.org>
+
+	* 13777: Src/Builtins/rlimits.awk: add maxfilelocks
+	for glibc 2.2.
+
 2001-03-26  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13770: Src/Zle/computil.c: handle colons in xor lists
