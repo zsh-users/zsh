@@ -1,5 +1,9 @@
 2000-04-26  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10925: Src/Zle/compmatch.c: faster test for `*'-patterns in
+ 	matching control; prefer direct character matches over match specs
+ 	in recursive invocations of match_str()
+	
 	* 10924: Src/Zle/compmatch.c: fix for matching control; improve
  	merging cline lists
 	

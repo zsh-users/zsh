@@ -469,7 +469,39 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	bp = bp->next;
     }
     while (ll && lw) {
-	/* First try the matchers. */
+
+	/* Hm, we unconditionally first tried the matchers for the cases
+	 * where the beginnings of the line and word patterns match the
+	 * same character(s).
+	 * But first testing if the characters are the same is sooo
+	 * much faster...
+	 * Maybe it's OK to make same-character matching be preferred in
+	 * recursive calls. At least, it /seems/ to work.
+	 *
+	 * Let's try.
+	 */
+
+	bslash = 0;
+	if (test && (l[ind] == w[ind] ||
+		     (bslash = (lw > 1 && w[ind] == '\\' &&
+				(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
+	    /* No matcher could be used, but the strings have the same
+	     * character here, skip over it. */
+	    l += add; w += (bslash ? (add + add ) : add);
+	    il++; iw += 1 + bslash;
+	    ll--; lw -= 1 + bslash;
+	    bc++;
+	    if (!test)
+		while (bp && bc >= (useqbr ? bp->qpos : bp->pos)) {
+		    bp->curpos = matchbufadded + (sfx ? (ow - w) : (w - ow)) + obc;
+		    bp = bp->next;
+		}
+	    lm = NULL;
+	    he = 0;
+
+	    continue;
+	}
+	/* First try the matchers. Err... see above. */
 	for (mp = NULL, ms = mstack; !mp && ms; ms = ms->next) {
 	    for (mp = ms->matcher; mp; mp = mp->next) {
 		t = 1;
@@ -737,10 +769,12 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	if (mp)
 	    continue;
 
+	/* Same code as at the beginning, used in top-level calls. */
+
 	bslash = 0;
-	if (l[ind] == w[ind] ||
-	    (bslash = (lw > 1 && w[ind] == '\\' &&
-		       (ind ? (w[0] == l[0]) : (w[1] == l[0]))))) {
+	if (!test && (l[ind] == w[ind] ||
+		      (bslash = (lw > 1 && w[ind] == '\\' &&
+				 (ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
 	    /* No matcher could be used, but the strings have the same
 	     * character here, skip over it. */
 	    l += add; w += (bslash ? (add + add ) : add);
