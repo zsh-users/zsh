@@ -35,10 +35,14 @@ promptinit () {
 }
 
 prompt () {
-  emulate -L zsh
-  local opt preview theme usage old_theme
+  local -A prompt_opts
+  local opt
 
-  usage='Usage: prompt <options>
+  set_prompt() {
+    emulate -L zsh
+    local opt preview theme usage old_theme
+
+    usage='Usage: prompt <options>
 Options:
     -l              List currently available prompt themes
     -p [<themes>]   Preview given themes (defaults to all)
@@ -46,63 +50,81 @@ Options:
     -s <theme>      Set and save theme
     <theme>         Switch to new theme immediately (changes not saved)'
 
-  getopts "hlps" opt
-  case "$opt" in
-    h) if [[ -n "$2" && -n $prompt_themes[(r)$2] ]]; then
-         if functions prompt_$2_help >/dev/null; then
-	   print "Help for $2 theme:\n"
-           prompt_$2_help
-         else
-           print "No help available for $2 theme"
-         fi
-       else
-         print "$usage"
-       fi
-       ;;
-    l) print Currently available prompt themes:
-       print $prompt_themes
-       return
-       ;;
-    p) if (( ! $+prompt_theme )); then
-         print "Cannot preview; current prompt is non-themeable and would"
-	 print "be destroyed."
-	 return
-       fi
-       preview=( $prompt_themes )
-       [[ -n "$2" && -n $prompt_themes[(r)$2] ]] && preview=( $*[2,-1] )
-       for theme in $preview; do
-         [[ $theme == $prompt_theme[1] ]] && continue
-         print "\nTheme: $theme"
-         prompt_${theme}_setup
-	 precmd
-	 print -n -P "${PS1}"
-	 preexec
-	 print "command arg1 arg2 ... argn"
-       done
-       print
-       prompt_${prompt_theme}_setup
-       ;;
-    s) print "Set and save not yet implemented.  Please ensure your ~/.zshrc"
-       print "contains something similar to the following:\n"
-       print "  autoload -U promptinit"
-       print "  promptinit"
-       print "  prompt $*[2,-1]"
-       ;;
-    *) if [[ -z "$1" || -z $prompt_themes[(r)$1] ]]; then
-         print "$usage"
-         return
-       fi
-       prompt_$1_setup $*[2,-1]
-       prompt_theme=( $* )
+    getopts "hlps" opt
+    case "$opt" in
+      h)
+        if [[ -n "$2" && -n $prompt_themes[(r)$2] ]]; then
+          if functions prompt_$2_help >/dev/null; then
+	    print "Help for $2 theme:\n"
+            prompt_$2_help
+          else
+            print "No help available for $2 theme"
+          fi
+	else
+          print "$usage"
+	fi
+      ;;
+      l)
+        print Currently available prompt themes:
+	print $prompt_themes
+	return
+      ;;
+      p)
+        if (( ! $+prompt_theme )); then
+          print "Cannot preview; current prompt is non-themeable and would"
+	  print "be destroyed."
+	  return
+	fi
+	preview=( $prompt_themes )
+	[[ -n "$2" && -n $prompt_themes[(r)$2] ]] && preview=( $*[2,-1] )
+	for theme in $preview; do
+          [[ $theme == $prompt_theme[1] ]] && continue
+          print "\nTheme: $theme"
+          prompt_${theme}_setup
+	  precmd
+	  print -n -P "${PS1}"
+	  preexec
+	  print "command arg1 arg2 ... argn"
+	done
+	print
+	prompt_${prompt_theme}_setup
+      ;;
+      s)
+        print "Set and save not yet implemented.  Please ensure your ~/.zshrc"
+	print "contains something similar to the following:\n"
+	print "  autoload -U promptinit"
+	print "  promptinit"
+	print "  prompt $*[2,-1]"
+      ;;
+      *)
+        if [[ -z "$1" || -z $prompt_themes[(r)$1] ]]; then
+          print "$usage"
+          return
+	fi
+	prompt_$1_setup $*[2,-1]
+	prompt_theme=( $* )
 
-       # Avoid screwing up the environment listing
-       PSZZZZ=$reset_color
-       RPSZZZZ=$reset_color
-       PROMPTZZZZ=$reset_color
-       RPROMPTZZZZ=$reset_color
-       promptzzzz=$reset_color
-       ;;
-  esac
+	# Avoid screwing up the environment listing
+	PSZZZZ=$reset_color
+	RPSZZZZ=$reset_color
+	PROMPTZZZZ=$reset_color
+	RPROMPTZZZZ=$reset_color
+	promptzzzz=$reset_color
+      ;;
+    esac
+  }
+
+  set_prompt "$@"
+
+  # Set prompt options
+  for opt in ${(k)prompt_opts}; do
+    if [[ $prompt_opts[$opt] != (|un)set ]]; then
+      echo "${0##*/}: value of prompt option must be 'set' or 'unset'" >&2
+      return 1
+    else
+      $prompt_opts[$opt]opt prompt$opt
+    fi
+  done
 }
 
 promptinit "$@"
