@@ -1,3 +1,9 @@
+2001-06-08  Clint Adams  <clint@zsh.org>
+
+	* 14813: zshconfig.ac, Src/parse.c, Src/utils.c, Src/zsh.h:
+	try to autoload functions from digest files that are deleted
+	but still open.
+
 2001-06-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14796: zshconfig.ac: More reliable BROKEN_KILL_ESRCH test.

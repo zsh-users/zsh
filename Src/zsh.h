@@ -493,6 +493,7 @@ struct funcdump {
     Wordcode addr;		/* mapped region */
     int len;			/* length */
     int count;			/* reference count */
+    char *filename;
 };
 
 struct eprog {

@@ -2827,6 +2827,7 @@ load_dump_file(char *dump, struct stat *sbuf, int other, int len)
     d->addr = addr;
     d->len = len;
     d->count = 0;
+    d->filename = ztrdup(dump);
 }
 
 #endif
@@ -2854,7 +2855,7 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
     dig = dyncat(path, FD_EXT);
     wc = dyncat(file, FD_EXT);
 
-    rd = stat(dig, &std);
+    rd = zwcstat(dig, &std, dumps);
     rc = stat(wc, &stc);
     rn = stat(file, &stn);
 
@@ -2934,7 +2935,7 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
     struct stat lsbuf;
 
     if (!sbuf) {
-	if (stat(file, &lsbuf))
+	if (zwcstat(file, &lsbuf, dumps))
 	    return NULL;
 	sbuf = &lsbuf;
     }
@@ -3077,6 +3078,7 @@ decrdumpcount(FuncDump f)
 		dumps = p->next;
 	    munmap((void *) f->addr, f->len);
 	    zclose(f->fd);
+	    zsfree(f->filename);
 	    zfree(f, sizeof(*f));
 	}
     }

@@ -912,7 +912,8 @@ dnl AC_FUNC_STRFTIME
 
 AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       select poll \
-	       readlink lstat lchown faccessx fchdir ftruncate \
+	       readlink faccessx fchdir ftruncate \
+	       fstat lstat lchown \
 	       fseeko ftello \
 	       mkfifo _mktemp \
 	       waitpid wait3 \
