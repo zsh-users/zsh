@@ -158,7 +158,7 @@ get_pty(int *master, int *slave)
 
 #else /* ! __osf__ */
 
-#if __SVR4
+#if defined(__SVR4) || defined(sinix)
 
 #include <sys/stropts.h>
 
@@ -167,11 +167,12 @@ get_pty(int *master, int *slave)
 {
     int mfd, sfd;
     char *name;
+    int ret;
 
     if ((mfd = open("/dev/ptmx", O_RDWR)) < 0)
 	return 1;
 
-    if (!(name = ptsname(mfd)) || grantpt(mfd) || unlockpt(mfd)) {
+    if (grantpt(mfd) || unlockpt(mfd) || !(name = ptsname(mfd))) {
 	close(mfd);
 	return 1;
     }
@@ -179,20 +180,31 @@ get_pty(int *master, int *slave)
 	close(mfd);
 	return 1;
     }
-    if (ioctl(sfd, I_PUSH, "ptem") ||
-	ioctl(sfd, I_PUSH, "ldterm") ||
-	ioctl(sfd, I_PUSH, "ttcompat")) {
-	close(mfd);
-	close(sfd);
-	return 1;
-    }
+    if ((ret = ioctl(sfd, I_FIND, "ptem")) != 1)
+	if (ret == -1 || ioctl(sfd, I_PUSH, "ptem") == -1) {
+	    close(mfd);
+	    close(sfd);
+	    return 1;
+	}
+    if ((ret = ioctl(sfd, I_FIND, "ldterm")) != 1)
+	if (ret == -1 || ioctl(sfd, I_PUSH, "ldterm") == -1) {
+	    close(mfd);
+	    close(sfd);
+	    return 1;
+	}
+    if ((ret = ioctl(sfd, I_FIND, "ttcompat")) != 1)
+	if (ret == -1 || ioctl(sfd, I_PUSH, "ttcompat") == -1) {
+	    close(mfd);
+	    close(sfd);
+	    return 1;
+	}
     *master = mfd;
     *slave = sfd;
 
     return 0;
 }
 
-#else /* ! __SVR4 */
+#else /* ! (defined(__SVR4) || defined(sinix))  */
 
 static int
 get_pty(int *master, int *slave)
