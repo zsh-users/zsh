@@ -1283,7 +1283,7 @@ flag is given.
 )
 findex(unset)
 cindex(parameters, unsetting)
-item(tt(unset) [ tt(-fm) ] var(name) ...)(
+item(tt(unset) [ tt(-fmv) ] var(name) ...)(
 Each named parameter is unset.
 Local parameters remain local even if unset; they appear unset within scope,
 but the previous value will still reappear when the scope ends.
@@ -1296,6 +1296,9 @@ If the tt(-m) flag is specified the arguments are taken as patterns (should
 be quoted) and all parameters with matching names are unset.  Note that this
 cannot be used when unsetting associative array elements, as the subscript
 will be treated as part of the pattern.
+
+The tt(-v) flag specifies that var(name) refers to parameters. This is the
+default behaviour.
 
 tt(unset -f) is equivalent to tt(unfunction).
 )

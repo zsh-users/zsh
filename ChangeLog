@@ -1,5 +1,9 @@
 2003-02-18  Oliver Kiddle  <opk@zsh.org>
 
+	* Doug Kearns: 18259: Completion/Unix/Command/_webbrowser,
+	Completion/Unix/Type/_urls: added more browsers and correct
+	'urls' description to 'url'
+
 	* Doug Kearns: 18254: Completion/Unix/Command/_xmlsoft,
 	Completion/Unix/Command/_xsltproc: new completion for xmllint
 	(from xmlsoft.org's libxml2 library). Merged with _xsltproc as
@@ -7,9 +11,25 @@
 
 2003-02-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 18249: Completion/Linux/Command/_uml: new completion function
+	for User Mode Linux
+
 	* Doug Kearns: 18246: Completion/Unix/Command/_elinks,
 	Completion/Unix/Command/_ant, Completion/Unix/Command/_java:
 	minor update to _elinks and a couple of trivial fixes for java/ant
+
+2003-02-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 18238: Config/installfns.sh, Src/Zle/complete.mdd:
+	bashcompinit was not being installed with --enable-function-subdirs
+
+	* users/5915: Completion/Unix/Command/_ssh: two levels of quoting
+	are needed for remote files referenced with scp
+
+	* unposted: Completion/Zsh/Command/_read: complete -t option
+
+	* 18223: Src/builtin.c, Doc/Zsh/builtins.yo: satisfy POSIX
+	requirement for a -v flag to unset
 
 2003-02-08  Clint Adams  <clint@zsh.org>
 
