@@ -24,33 +24,7 @@ while _tags; do
   _requested named-directories expl 'named directory' \
       compadd "$suf[@]" "$@" -k nameddirs
 
-  if _requested directory-stack &&
-     { ! zstyle -T ":completion:${curcontext}:directory-stack" prefix-needed ||
-       [[ "$PREFIX" = [-+]* || nm -eq compstate[nmatches] ]] }; then
-    if zstyle -T ":completion:${curcontext}:directory-stack" verbose; then
-      integer i
+  _requested directory-stack && _popd "$suf[@]" && ret=0
 
-      lines=("${PWD}" "${dirstack[@]}")
-
-      if [[ ( -prefix - && ! -o pushdminus ) ||
-	    ( -prefix + && -o pushdminus ) ]]; then
-        revlines=( $lines )
-        for (( i = 1; i <= $#lines; i++ )); do
-          lines[$i]="$((i-1)) -- ${revlines[-$i]}"
-        done
-      else
-        for (( i = 1; i <= $#lines; i++ )); do
-          lines[$i]="$((i-1)) -- ${lines[$i]}"
-        done
-      fi
-      list=( ${PREFIX[1]}${^lines%% *} )
-      disp=( -ld lines )
-    else
-      list=( ${PREFIX[1]}{0..${#dirstack}} )
-      disp=()
-    fi
-    _all_labels -V directory-stack expl 'directory stack' \
-        compadd "$suf[@]" "$disp[@]" -Q -a list && ret=0
-  fi
   (( ret )) || return 0
 done

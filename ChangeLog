@@ -1,5 +1,10 @@
 2001-03-27  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13789: Completion/Base/_tilde, Completion/Builtins/_popd:
+	comment out looking up the prefix-needed style when
+	completing directory stack entries; make _tilde use _popd,
+	finally
+
 	* 3752: Completion/Commands/_history_complete_word,
 	Src/Zle/compresult.c: try to make _h_c_w smarter at the
 	beginning and end of the list; avoid list-beeping if the old
