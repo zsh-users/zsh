@@ -1,3 +1,8 @@
+2001-04-12  Clint Adams  <schizo@debian.org>
+
+	* 13951: Src/Modules/terminfo.c: make scanterminfo do something
+	so that ${(k)terminfo} and ${(kv)terminfo} work.
+
 2001-04-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13949: Completion/Zsh/Type/_directory_stack: Don't append a slash
