@@ -36,7 +36,7 @@ static Param terminfo_pm;
 /* echoti: output a terminfo capability */
 
 /**/
-int
+static int
 bin_echoti(char *name, char **argv, char *ops, int func)
 {
     char *s, *t;

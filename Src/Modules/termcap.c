@@ -33,7 +33,7 @@
 /* echotc: output a termcap */
 
 /**/
-int
+static int
 bin_echotc(char *name, char **argv, char *ops, int func)
 {
     char *s, buf[2048], *t, *u;

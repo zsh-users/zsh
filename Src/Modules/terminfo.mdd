@@ -1,5 +1,15 @@
 name=zsh/terminfo
-link='if test "x$ac_cv_func_tigetstr" = xyes; then echo either; else echo no; fi'
+
+link='if test "x$ac_cv_func_tigetstr" = xyes; then
+          if test "x$zsh_cv_shared_tigetstr" = xyes; then
+	      echo either
+	  else
+	      echo static
+	  fi
+      else
+          echo no;
+      fi
+'
 load=yes
 
 autobins="echoti"

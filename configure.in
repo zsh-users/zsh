@@ -493,7 +493,9 @@ dnl -------------------
 dnl On some systems, modules need to be linked against libc explicitly,
 dnl in case they require objects that exist only in the static version
 dnl and might not be compiled into the zsh executable.
-AC_CHECK_LIB(c, printf)
+dnl On ReliantUNIX -lc better be the last library, else funny things
+dnl may happen.
+AC_CHECK_LIB(c, printf, [LIBS="$LIBS -lc"])
 
 AC_CHECK_LIB(m, pow)
 
@@ -555,37 +557,6 @@ if test $zsh_cv_decl_ospeed_include_defines = yes; then
 elif test $zsh_cv_decl_ospeed_must_define = yes; then
   AC_DEFINE(HAVE_OSPEED)
   AC_DEFINE(MUST_DEFINE_OSPEED)
-fi
-
-dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)
-dnl  Some termcaps reportedly accept a zero buffer, but then dump core
-dnl  in tgetstr().
-dnl  Under Cygwin test program crashes but exit code is still 0. So,
-dnl  we test for a file that porgram should create
-AC_CACHE_CHECK(if tgetent accepts NULL,
-zsh_cv_func_tgetent_accepts_null,
-[AC_TRY_RUN([
-main()
-{
-    int i = tgetent((char*)0,"vt100");
-    if (i > 0) {
-	char tbuf[1024], *u;
-    	u = tbuf;
-    	tgetstr("cl", &u);
-	creat("conftest.tgetent", 0640);
-    }
-    exit(!i || i == -1);
-}
-],
-  if test -f conftest.tgetent; then
-    zsh_cv_func_tgetent_accepts_null=yes
-  else
-    zsh_cv_func_tgetent_accepts_null=no
-  fi,
-  zsh_cv_func_tgetent_accepts_null=no,
-  zsh_cv_func_tgetent_accepts_null=no)])
-if test $zsh_cv_func_tgetent_accepts_null = yes; then
-  AC_DEFINE(TGETENT_ACCEPTS_NULL)
 fi
 
 dnl --------------
@@ -845,8 +816,39 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       putenv getenv \
 	       brk sbrk \
 	       pathconf sysconf \
-	       tigetflag tigetnum tigetstr)
+	       tgetent tigetflag tigetnum tigetstr)
 AC_FUNC_STRCOLL
+
+dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)
+dnl  Some termcaps reportedly accept a zero buffer, but then dump core
+dnl  in tgetstr().
+dnl  Under Cygwin test program crashes but exit code is still 0. So,
+dnl  we test for a file that porgram should create
+AC_CACHE_CHECK(if tgetent accepts NULL,
+zsh_cv_func_tgetent_accepts_null,
+[AC_TRY_RUN([
+main()
+{
+    int i = tgetent((char*)0,"vt100");
+    if (i > 0) {
+	char tbuf[1024], *u;
+    	u = tbuf;
+    	tgetstr("cl", &u);
+	creat("conftest.tgetent", 0640);
+    }
+    exit(!i || i == -1);
+}
+],
+  if test -f conftest.tgetent; then
+    zsh_cv_func_tgetent_accepts_null=yes
+  else
+    zsh_cv_func_tgetent_accepts_null=no
+  fi,
+  zsh_cv_func_tgetent_accepts_null=no,
+  zsh_cv_func_tgetent_accepts_null=no)])
+if test $zsh_cv_func_tgetent_accepts_null = yes; then
+  AC_DEFINE(TGETENT_ACCEPTS_NULL)
+fi
 
 AC_FUNC_MMAP
 if test x$ac_cv_func_mmap_fixed_mapped = xyes; then
@@ -1471,7 +1473,10 @@ elif test "x$ac_cv_cygwin" = xyes; then
   zsh_cv_sys_dynamic_execsyms="${zsh_cv_sys_dynamic_execsyms=no}"
   zsh_cv_sys_dynamic_strip_exe="${zsh_cv_sys_dynamic_strip_exe=yes}"
   zsh_cv_sys_dynamic_strip_lib="${zsh_cv_sys_dynamic_strip_lib=yes}"
-  zsh_cv_sys_dynamic_broken="${zsh_cv_sys_dynamic_broken=no}"
+  #
+  # THAT SUCKS! and must be changed
+  #
+  zsh_cv_shared_environ="${zsh_cv_shared_environ=yes}"
   LINKMODS=LINKMODS
   MOD_EXPORT="__attribute__((__dllexport__))"
   MOD_IMPORT_VARIABLE="__attribute__((__dllimport__))"
@@ -1616,8 +1621,15 @@ main()
 fi
 
 if test "x$dynamic" = xyes; then
-  zsh_SYS_DYNAMIC_BROKEN
-  test "$zsh_cv_sys_dynamic_broken" = no || dynamic=no
+  zsh_SHARED_VARIABLE([environ], [char **])
+  test "$zsh_cv_shared_environ" = yes || dynamic=no
+dnl  test "$zsh_cv_sys_dynamic_broken" = no || dynamic=no
+  if test "$ac_cv_func_tgetent" = yes; then
+    zsh_SHARED_FUNCTION([tgetent])
+  fi
+  if test "$ac_cv_func_tigetstr" = yes; then
+    zsh_SHARED_FUNCTION([tigetstr])
+  fi
 fi
 
 if test "x$dynamic" = xyes; then

@@ -111,32 +111,59 @@ main()
 
 
 dnl
-dnl zsh_SYS_DYNAMIC_BROKEN
-dnl   Check whether static/shared library linking is broken.
+dnl zsh_SHARED_FUNCTION
+dnl
+dnl This is just a frontend to zsh_SHARED_SYMBOL
+dnl
+dnl Usage: zsh_SHARED_FUNCTION(name[,rettype[,paramtype]])
+dnl
+
+AC_DEFUN(zsh_SHARED_FUNCTION,
+[zsh_SHARED_SYMBOL($1, ifelse([$2], ,[int ],[$2]) $1 [(]ifelse([$3], ,[ ],[$3])[)], $1)])
+
+dnl
+dnl zsh_SHARED_VARIABLE
+dnl
+dnl This is just a frontend to zsh_SHARED_SYMBOL
+dnl
+dnl Usage: zsh_SHARED_VARIABLE(name[,type])
+dnl
+
+AC_DEFUN(zsh_SHARED_VARIABLE,
+[zsh_SHARED_SYMBOL($1, ifelse([$2], ,[int ],[$2]) $1, [&$1])])
+
+dnl
+dnl zsh_SHARED_SYMBOL
+dnl   Check whether symbol is available in static or shared library
 dnl
 dnl   On some systems, static modifiable library symbols (such as environ)
 dnl   may appear only in statically linked libraries.  If this is the case,
 dnl   then two shared libraries that reference the same symbol, each linked
 dnl   with the static library, could be given distinct copies of the symbol.
-dnl   If this is the case then dynamic linking is FUBAR.
+dnl
+dnl Usage: zsh_SHARED_SYMBOL(name,declaration,address)
+dnl Sets zsh_cv_shared_$1 cache variable to yes/no
 dnl
 
-AC_DEFUN(zsh_SYS_DYNAMIC_BROKEN,
-[AC_CACHE_CHECK([if static/shared library linking is broken],
-zsh_cv_sys_dynamic_broken,
+AC_DEFUN(zsh_SHARED_SYMBOL,
+[AC_CACHE_CHECK([if $1 is available in shared libraries],
+zsh_cv_shared_$1,
 [if test "$zsh_cv_func_dlsym_needs_underscore" = yes; then
     us=_
 else
     us=
 fi
 echo '
-	extern char **environ;
-	void *symlist1[[]] = {
-		(void *)&environ,
-		(void *)0
-	};
+void *zsh_getaddr1()
+{
+#ifdef __CYGWIN__
+	__attribute__((__dllimport__))	
+#endif
+	extern $2;
+	return $3;
+};
 ' > conftest1.c
-sed 's/symlist1/symlist2/' < conftest1.c > conftest2.c
+sed 's/zsh_getaddr1/zsh_getaddr2/' < conftest1.c > conftest2.c
 if $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&5 2>&5 &&
 $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
 $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
@@ -172,25 +199,33 @@ char *zsh_gl_sym_addr ;
 main()
 {
     void *handle1, *handle2;
-    void **symlist1, **symlist2;
+    void *(*zsh_getaddr1)(), *(*zsh_getaddr2)();
+    void *sym1, *sym2;
     handle1 = dlopen("./conftest1.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
     if(!handle1) exit(1);
     handle2 = dlopen("./conftest2.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
     if(!handle2) exit(1);
-    symlist1 = (void **) dlsym(handle1, "${us}symlist1");
-    symlist2 = (void **) dlsym(handle2, "${us}symlist2");
-    if(!symlist1 || !symlist2) exit(1);
-    for(; *symlist1; symlist1++, symlist2++)
-	if(*symlist1 != *symlist2)
-	    exit(1);
+    zsh_getaddr1 = (void *(*)()) dlsym(handle1, "${us}zsh_getaddr1");
+    zsh_getaddr2 = (void *(*)()) dlsym(handle2, "${us}zsh_getaddr2");
+    sym1 = zsh_getaddr1();
+    sym2 = zsh_getaddr2();
+    if(!sym1 || !sym2) exit(1);
+    if(sym1 != sym2) exit(1);
+    dlclose(handle1);
+    handle1 = dlopen("./conftest1.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
+    if(!handle1) exit(1);
+    zsh_getaddr1 = (void *(*)()) dlsym(handle1, "${us}zsh_getaddr1");
+    sym1 = zsh_getaddr1();
+    if(!sym1) exit(1);
+    if(sym1 != sym2) exit(1);
     exit(0);
 }
-], [zsh_cv_sys_dynamic_broken=no],
-[zsh_cv_sys_dynamic_broken=yes],
-[zsh_cv_sys_dynamic_broken=yes]
+], [zsh_cv_shared_$1=yes],
+[zsh_cv_shared_$1=no],
+[zsh_cv_shared_$1=no]
 )
 else
-    zsh_cv_sys_dynamic_broken=yes
+    zsh_cv_shared_$1=no
 fi
 ])
 ])
