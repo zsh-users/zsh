@@ -2053,7 +2053,7 @@ add_match_data(int alt, char *str, Cline line,
     cm->pre = pre;
     cm->suf = suf;
     cm->flags = flags;
-    if (*compqstack == '\\' ||
+    if ((*compqstack == '\\' && compqstack[1]) ||
 	(autoq && *compqstack && compqstack[1] == '\\'))
 	cm->flags |= CMF_NOSPACE;
     if (nbrbeg) {
