@@ -458,7 +458,8 @@ digitargument(char **args)
 {
     int sign = (zmult < 0) ? -1 : 1;
 
-    if (c < '0' || c > '9')
+    /* allow metafied as well as ordinary digits */
+    if ((c & 0x7f) < '0' || (c & 0x7f) > '9')
 	return 1;
 
     if (!(zmod.flags & MOD_TMULT))
