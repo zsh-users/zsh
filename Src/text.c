@@ -69,8 +69,12 @@ taddstr(char *s)
 	tlim = tbuf + tsiz;
 	tptr = tbuf + x;
     }
-    while ((c = *s++))
-	*tptr++ = (c == '\n' ? ' ' : c);
+    if (tnewlins) {
+	memcpy(tptr, s, sl);
+	tptr += sl;
+    } else
+	while ((c = *s++))
+	    *tptr++ = (c == '\n' ? ' ' : c);
 }
 
 /**/
