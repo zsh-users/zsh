@@ -101,10 +101,9 @@ _svn_subcommand () {
         '*:file:_files -g "*(^e:_svn_controlled:)"'
       )
     ;;
-    log)
+    commit)
       _svn_subcmds+=(
-        '1: : _alternative "files:file:_files -g \*\(e:_svn_controlled:\)" "urls:URL:_svn_urls"'
-	'*:file:_files -g "*(e:_svn_controlled:)"'
+        '*:file:_files -g "*(e:_svn_status:)"'
       )
     ;;
     delete)
@@ -112,7 +111,13 @@ _svn_subcommand () {
         '*:file:_files -g ".svn(/e:_svn_deletedfiles:)"'
       )
     ;;
-    revert|commit)
+    log)
+      _svn_subcmds+=(
+        '1: : _alternative "files:file:_files -g \*\(e:_svn_controlled:\)" "urls:URL:_svn_urls"'
+	'*:file:_files -g "*(e:_svn_controlled:)"'
+      )
+    ;;
+    revert)
       _svn_subcmds+=(
         '*:file:_files -g "(.svn|*)(/e:_svn_deletedfiles:,e:_svn_status:)"'
       )
