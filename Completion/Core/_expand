@@ -8,7 +8,9 @@
 # word from the line.
 
 local exp word="$PREFIX$SUFFIX" group=-V expl expl2 disp orig menu prompt
-local curcontext="${curcontext}:expand" expr descr
+local curcontext="${curcontext}" expr descr
+
+[[ "$curcontext" != :correct* ]] && curcontext="${curcontext}:correct"
 
 # First, see if we should insert all *completions*.
 

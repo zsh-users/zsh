@@ -18,7 +18,7 @@
 
 
 local comp post ret=1 _compskip _prio_num=1 _cur_context format
-local context state line opt_args val_args curcontext
+local context state line opt_args val_args curcontext="$curcontext"
 typeset -U _offered_tags _tried_tags _failed_tags _used_tags _unused_tags
 
 _offered_tags=()

@@ -17,7 +17,7 @@ local curcontext="${curcontext}" oldcontext
 
 [[ "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
 
-[[ "$curcontext" != *:correct ]] && curcontext="${curcontext}:approximate"
+[[ "$curcontext" != *:correct* ]] && curcontext="${curcontext}:approximate"
 
 oldcontext="$curcontext"
 
