@@ -141,15 +141,15 @@ Zsh is currently maintained by the members of the zsh-workers mailing list
 and coordinated by Peter Stephenson <coordinator@zsh.org>.  Please send
 any feedback and bugs reports to <zsh-workers@sunsite.dk>.
 
-There is a script "reporter" in the subdirectory Util which will print
-out your current shell environment/setup.  If you report a bug, please
-use this script and include the output from sourcing this file.  This way,
-the problem you are reporting can be recreated.
-
-You can help even more if you can reproduce the bug starting zsh with
+Reports are most helpful if you can reproduce the bug starting zsh with
 the -f option.  This skips the execution of local startup files except
 /etc/zshenv.  If a bug occurs only when some options set try to locate
 the option which triggers the bug.
+
+There is a script "reporter" in the subdirectory Util which will print out
+your current shell environment/setup.  If you cannot reproduce the bug
+with "zsh -f", use this script and include the output from sourcing this
+file.  This way, the problem you are reporting can be recreated.
 
 The known bugs in zsh are listed in the file Etc/BUGS.  Check this as
 well as the Frequently Asked Questions (FAQ) list before sending a bug

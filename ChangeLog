@@ -9,6 +9,11 @@
 	Src/zsh.h, Test/E01options.ztst: KSH_TYPESET option allows
 	assignments after typeset not to be split.
 
+2001-06-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14849: README: Request "reporter" output only if a bug cannot
+	be reproduced with 'zsh -f'.
+
 2001-06-11  Clint Adams  <clint@zsh.org>
 
 	* 14843: Src/Modules/tcp.c, Src/Modules/zftp.c:
