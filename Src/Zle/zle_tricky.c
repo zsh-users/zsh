@@ -790,7 +790,8 @@ addx(char **ptmp)
 
     if (!line[cs] || line[cs] == '\n' ||
 	(iblank(line[cs]) && (!cs || line[cs-1] != '\\')) ||
-	line[cs] == ')' || line[cs] == '`' ||
+	line[cs] == ')' || line[cs] == '`' || line[cs] == '}' ||
+	line[cs] == ';' || line[cs] == '|' || line[cs] == '&' ||
 	(instring && (line[cs] == '"' || line[cs] == '\'')) ||
 	(addspace = (comppref && !iblank(line[cs])))) {
 	*ptmp = (char *)line;
