@@ -1,0 +1,11 @@
+#compdef xargs
+
+_arguments \
+  -{p,t,x} \
+  -{e-,E}':end-of-file string:' \
+  -{i-,I}':replacement string for lines:' \
+  -{l-,L}':number of input lines:' \
+  '-n:maximum number of arguments:' \
+  '-s:maximum command line length:' \
+  ':command: _command_names -e' \
+  '*::args:_normal'
