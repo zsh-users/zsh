@@ -1,3 +1,8 @@
+2005-04-05  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync:  Made --address
+	work for both client- and daemon-mode.
+
 2005-04-04  Peter Stephenson  <pws@csr.com>
 
 	* Toby Peterson: 21083: On Mac OS X 10.4, the AS and RSS rlimits
