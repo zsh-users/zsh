@@ -58,7 +58,7 @@ prompt_bart_help () {
 }
 
 prompt_bart_precmd () {
-    setopt localoptions noxtrace noksharrays
+    setopt localoptions noxtrace noksharrays unset
     local zero='%([BSUbsu]|{*%})'
 
     # Using psvar here protects against unwanted promptsubst expansions.
@@ -111,7 +111,7 @@ prompt_bart_ps1 () {
 }
 
 prompt_bart_winch () {
-    setopt localoptions noksharrays
+    setopt localoptions noksharrays unset
 
     # Delete ourself from TRAPWINCH if not using our precmd insert.
     [[ $functions[precmd] = *prompt_bart_precmd* ]] && prompt_bart_ps1 ||
@@ -119,7 +119,7 @@ prompt_bart_winch () {
 }
 
 prompt_bart_setup () {
-    setopt localoptions noksharrays
+    setopt localoptions noksharrays unset
 
     # A few extra niceties ...
     repeat 1 case "$1:l" in
