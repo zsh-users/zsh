@@ -11,4 +11,4 @@ _arguments -s \
   '-v[enable verbose mode]' \
   '-w[enable warnings]' \
   '-h[show usage information]' \
-  '*:YODL input file:_files -g "*.(#i)yo(|dl)(-.)'
+  '*:YODL input file:_files -g "*.(#i)yo(|dl)(-.)"'
