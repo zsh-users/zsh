@@ -73,8 +73,12 @@ comp_short=\
 'if [[ $PREFIX = -'"$short_seq"' ]]; then
   apt_consume_short ${PREFIX[2,-1]}
   tmp1=(${${(M)${(s:,:)${(kj:,:)options[(R)*~0]}}:#-?}#-})
-  tmp2=(-${^tmp1})
-  compadd "$expl_opt[@]" -y "($tmp2)" - ${PREFIX}${^tmp1}
+  if [[ $PREFIX = - ]]; then
+    compadd "$expl_opt[@]" - -${^tmp1}
+  else
+    tmp2=(-${^tmp1})
+    compadd "$expl_opt[@]" -y "($tmp2)" - ${PREFIX}${^tmp1}
+  fi
 elif [[ -z "$PREFIX" ]]; then
   compadd "$expl_opt[@]" - ${(M)${(s:,:)${(kj:,:)options[(R)*~0]}}:#-?}
 fi'
