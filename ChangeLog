@@ -1,3 +1,8 @@
+2000-04-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11012: Doc/Zsh/intro.yo, Doc/Zsh/manual.yo: Reorder menus
+	to match sections in 11008.
+
 2000-04-28  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 11008: Doc/zsh.yo, Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo,
@@ -25,7 +30,7 @@
 	* 10992: Src/Zle/complist.c: avoid wrapping around both
  	horizontally and vertically at the same time
 	
-2000-04-27  Bart Schaefer  <schaefer@brasslantern.com>
+2000-04-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* Tanaka Akira: 10980: Completion for enscript.
 
@@ -4246,9 +4251,9 @@
 
 1999-10-02  Bart Schaefer  <schaefer@zsh.org>
 
-	* Src/exec.c: Start the path search over from the beginning, not
-	from where it was last left off, after removing a bad element at
-	attempted-execute-time.
+	* Src/exec.c: 8121: Start the path search over from the beginning,
+	not from where it was last left off, after removing a bad element
+	at attempted-execute-time.
 
 1999-09-30  Bart Schaefer  <schaefer@zsh.org>
 
@@ -4289,7 +4294,7 @@
 	if unable to stat(pwd).  This leaves the dirstack in an
 	inconsistent state and needs more looking-at.
 
-	* Src/exec.c: Be a little smarter about fixing up the command
+	* Src/exec.c: 8091: Be a little smarter about fixing up the command
 	table when we find a bad element at attempted-execute-time.
 
 1999-09-28  Bart Schaefer  <schaefer@zsh.org>
