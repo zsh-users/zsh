@@ -451,6 +451,10 @@ zzlex(void)
 		    int v;
 
 		    ptr++;
+		    if (!*ptr) {
+			zerr("character missing after ##", NULL, 0);
+			return EOI;
+		    }
 		    ptr = getkeystring(ptr, NULL, 6, &v);
 		    yyval.u.l = v;
 		    return NUM;

@@ -1,3 +1,8 @@
+2004-11-29  Peter Stephenson  <pws@csr.com>
+
+	* 20592: Src/math.c: $((##)) caused mayhem by passing null
+	string to getkeystring().  Report error instead.
+
 2004-11-24  Clint Adams  <clint@zsh.org>
 
 	* 20583: Completion/Unix/Command/_ssh: complete "modern" options
