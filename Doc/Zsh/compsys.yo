@@ -3918,7 +3918,7 @@ calculate completions, you can store that data in variables, and use
 this function to dump the values of those variables to a file.  Then,
 if they are needed in subsequent shell invocations, they can be
 retrieved quickly from that file via tt(_retrieve_cache), avoiding the
-needly for repeating the costly operation.
+need for repeating the costly operation.
 
 The var(cache_identifier) specifies the file which the data should be
 dumped to, and is stored in a directory specified by the
