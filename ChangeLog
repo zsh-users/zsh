@@ -1,6 +1,10 @@
+2000-09-18  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+
+	* 12835: Doc/Zsh/compwid.yo: Alphabetize list of special parameters
+
 2000-09-18  Clint Adams  <schizo@debian.org>
 
-	* 2836: Src/Modules/files.c: use ztrdup()/appstr() in lieu of
+	* 12836: Src/Modules/files.c: use ztrdup()/appstr() in lieu of
 	statically-allocated buffer in bin_ln.
 
 2000-09-18  Bart Schaefer  <schaefer@zsh.org>
