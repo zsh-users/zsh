@@ -1,3 +1,11 @@
+2002-09-16  Oliver Kiddle  <opk@zsh.org>
+
+	* Completion/Zsh/Command/_typeset, Doc/Zsh/builtins.yo:
+	add support for -H and -p options to completion
+
+	* 17542 (Thomas Stromberg <thomas@stromberg.org>):
+	Completion/Unix/Command/_mount: most systems don't have /etc/mtab
+
 2002-09-06  Oliver Kiddle  <opk@zsh.org>
 
 	* 17632: Completion/Unix/Command/_cvs: add descriptions for keyword

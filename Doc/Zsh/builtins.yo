@@ -424,7 +424,7 @@ Bring each specified var(job) in turn to the foreground.
 If no var(job) is specified, resume the current job.
 )
 findex(float)
-item(tt(float) [ {tt(PLUS())|tt(-)}tt(EFghlprtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(float) [ {tt(PLUS())|tt(-)}tt(EFHghlprtux) ] [ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
@@ -526,7 +526,7 @@ the form of a call to hash.
 )
 alias(history)(fc -l)
 findex(integer)
-item(tt(integer) [ {tt(PLUS())|tt(-)}tt(ghilprtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(integer) [ {tt(PLUS())|tt(-)}tt(Hghilprtux) ] [ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -i), except that options irrelevant to
 integers are not permitted.
 )
@@ -625,7 +625,7 @@ sitem([var(mm)tt(:)]var(ss))(minutes and seconds)
 endsitem()
 )
 findex(local)
-item(tt(local) [ {tt(PLUS())|tt(-)}tt(AEFLRUZahilprtux) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
+item(tt(local) [ {tt(PLUS())|tt(-)}tt(AEFHLRUZahilprtux) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
 Same as tt(typeset), except that the options tt(-g), and
 tt(-f) are not permitted.  In this case the tt(-x) option does not force
 the use of tt(-g), i.e. exported variables will be local to functions.
@@ -1080,7 +1080,7 @@ Equivalent to tt(whence -v).
 findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
-xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AEFLRUZafghilprtuxm) [var(n)]] [ \
+xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AEFHLRUZafghilprtuxm) [var(n)]] [ \
 var(name)[tt(=)var(value)] ... ])
 item(tt(typeset) -T [ {tt(PLUS()|tt(-))}tt(LRUZrux) ] \
   var(SCALAR)[tt(=)var(value)] var(array))(
