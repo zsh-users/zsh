@@ -81,6 +81,20 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
   esac
 done
 
+if [[ -z "$_file_pat_checked" ]] &&
+   zstyle -s ":completion${curcontext}:files" file-patterns tmp1 &&
+   [[ -n "$tmp1" ]]; then
+  if [[ "$tmp1" = '*(-/)' ]]; then
+    gopt=''
+    sopt=-/
+  else
+    gopt='-g'
+    sopt=-
+  fi
+  pats=( $=tmp1 )
+  haspats=yes
+fi
+
 if (( ! ( $#group + $#expl ) )); then
   if [[ -z "$gopt" && "$sopt" = -/ ]]; then
     _description directories expl directory

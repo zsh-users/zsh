@@ -720,6 +720,39 @@ generated this way (e.g. due to the option tt(AUTO_MENU) being set),
 this will also cycle through the names of the files in pathname
 components after the first ambiguous one.
 )
+item(tt(file-patterns))(
+The completion system uses two functions to complete filenames,
+tt(_files) and tt(_path_files), with one of them calling the other,
+but this second one is sometimes also called directly. Depending on
+how it is called, the first one uses the tags tt(globbed-files),
+tt(directories) and tt(all-files). The second one, when called
+directly, uses the tag tt(files).
+
+Using this style one can specify which filenames should be completed
+in certain contexts. It is tested by tt(_files) and, if called
+directly, tt(_path_files) with the tags mentioned above. If it is set
+for these tags, the value is taken as a list of glob-patterns that
+should be used to select filenames when completing for the tag. Note
+that with tt(_files), calling completion function may specify that
+all files are to be completed. Normally this would make tt(_files) use 
+only the tt(all-files) tag, but if this style is set for any of the
+other two tags (tt(globbed-files) and tt(directories)), these tags
+will be used, too, in the normal order given above (unless the user
+specified another order to be used with the tt(tag-order) style).
+
+For example, to make the completion system first try only filenames
+matching the pattern tt(*.o) for the tt(rm) command, one would use:
+
+example(zstyle ':completion:*::rm*:globbed-files' file-patterns '*.o')
+
+With this, using only filenames ending in tt(.o) will be the first
+choice and other filenames will only be used if what is on the line
+matches none of the tt(.o) files (or if there are none).
+
+Note also that during the execution of completion functions, the
+tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
+`tt(~)' and `tt(^)' have special meanings in the patterns.
+)
 item(tt(format))(
 If this is set for the tt(descriptions) tag, its value is used as a
 string to display above matches in completion lists. The sequence
@@ -841,6 +874,10 @@ number of patterns. All matches that are matched by any of these
 patterns will be ignored as long as there are other matches not
 matched by any of the patterns.  It is a more configurable version
 of the shell parameter tt($fignore).
+
+Note that during the execution of completion functions, the
+tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
+`tt(~)' and `tt(^)' have special meanings in the patterns.
 )
 item(tt(insert-unambiguous))(
 This is used by the tt(_match) and tt(_approximate) completer
