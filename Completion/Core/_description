@@ -38,9 +38,9 @@ if [[ -n "$gname" ]]; then
   fi
 else
   if [[ -n "$format" ]]; then
-    eval "${name}=($hide -J -default- -X \"${format}\")"
+    eval "${name}=($hide $gropt -default- -X \"${format}\")"
   else
-    eval "${name}=($hide -J -default-)"
+    eval "${name}=($hide $gropt -default-)"
   fi
 fi
 
