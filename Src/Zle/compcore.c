@@ -152,6 +152,11 @@ mod_export int nmatches;
 /**/
 mod_export int smatches;
 
+/* The number of messages. */
+
+/**/
+mod_export int nmessages;
+
 /* != 0 if only explanation strings should be printed */
 
 /**/
@@ -312,6 +317,7 @@ do_completion(Hookdef dummy, Compldat dat)
     minmlen = 1000000;
     maxmlen = -1;
     compignored = 0;
+    nmessages = 0;
 
     /* Make sure we have the completion list and compctl. */
     if (makecomplist(s, incmd, lst)) {
@@ -401,6 +407,11 @@ do_completion(Hookdef dummy, Compldat dat)
 		    clearlist = 1;
 	    } else
 		invalidatelist();
+	} else if (nmessages && forcelist) {
+	    if (uselist)
+		showinglist = -2;
+	    else
+		clearlist = 1;
 	}
     } else {
 	invalidatelist();
@@ -921,7 +932,7 @@ makecomplist(char *s, int incmd, int lst)
 	hasperm = 0;
 	hasoldlist = 1;
 
-	if (nmatches && !errflag) {
+	if ((nmatches || nmessages) && !errflag) {
 	    validlist = 1;
 
 	    redup(osi, 0);
@@ -2390,6 +2401,7 @@ addmesg(char *mesg)
     addlinknode(expls, e);
     newmatches = 1;
     mgroup->new = 1;
+    nmessages++;
 }
 
 /* The comparison function for matches (used for sorting). */

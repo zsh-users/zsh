@@ -363,7 +363,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 
   [[ -n "$mesg" ]] && _message "$mesg"
   if [[ -n "$noargs" ]]; then
-    [[ -z "$ismulti" ]] && _message "$noargs"
+    [[ -z "$ismulti" && nm -eq "$compstate[nmatches]" ]] && _message "$noargs"
   else
     has_args=yes
   fi
