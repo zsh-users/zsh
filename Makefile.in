@@ -39,14 +39,14 @@ INSTALL         = @INSTALL@
 @DEFS_MK@
 
 transform = @program_transform_name@
-tzsh = `echo zsh | sed "$(transform)"`
+tzsh = @tzsh@
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
 # default target
 all: config.h
 	@for subdir in Src Doc; do \
-	  (cd $$subdir && $(MAKE) $(MAKEDEFS) tzsh=$(tzsh) $@) || exit 1; \
+	  (cd $$subdir && $(MAKE) $(MAKEDEFS) $@) || exit 1; \
 	done
 
 check test:
@@ -71,7 +71,7 @@ uninstall: uninstall.bin uninstall.modules uninstall.man uninstall.fns
 
 # install/uninstall just the binary
 install.bin uninstall.bin:
-	@cd Src && $(MAKE) $(MAKEDEFS) tzsh=$(tzsh) $@
+	@cd Src && $(MAKE) $(MAKEDEFS) $@
 
 # install/uninstall just the modules
 install.modules uninstall.modules:
@@ -88,7 +88,7 @@ install.fns uninstall.fns:
 
 # install/uninstall just the info pages
 install.info uninstall.info:
-	@cd Doc && $(MAKE) $(MAKEDEFS) tzsh=$(tzsh) $@
+	@cd Doc && $(MAKE) $(MAKEDEFS) $@
 
 # install/uninstall just the html pages
 install.html uninstall.html:

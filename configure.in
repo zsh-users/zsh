@@ -48,6 +48,15 @@ dnl -----------------------------
 dnl Handle --program-prefix, --program-suffix, etc.
 AC_ARG_PROGRAM
 
+u_ptn=`make -f - <<EOF
+all:
+	@echo ${program_transform_name}
+EOF
+`
+tzsh=`echo zsh | sed -e "${u_ptn}"`
+
+AC_SUBST(tzsh)dnl
+
 dnl Do you want to debug zsh?
 undefine([zsh-debug])dnl
 AC_ARG_ENABLE(zsh-debug,
@@ -1601,5 +1610,6 @@ info install path         : ${zshinfo}"
 if test "$zshfndir" != no; then
 echo "functions install path    : ${zshfndir}
 installed functions       : ${FUNCTIONS_INSTALL}
+binary/info base name     : ${tzsh}
 "
 fi

@@ -42,7 +42,7 @@ LN		= @LN@
 sdir_src      = $(sdir)
 dir_src       = .
 
-tzsh = zsh
+tzsh = @tzsh@
 
 # ========= DEPENDENCIES FOR BUILDING ==========
 

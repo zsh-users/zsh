@@ -35,7 +35,7 @@ sdir            = @srcdir@
 sdir_top        = @top_srcdir@
 INSTALL         = @INSTALL@
 
-tzsh = zsh
+tzsh = @tzsh@
 
 @DEFS_MK@
 
