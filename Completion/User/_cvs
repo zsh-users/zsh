@@ -1,0 +1,680 @@
+#compdef cvs
+
+# redefine _cvs.
+
+_cvs () {
+  # "+Qqrwtnlvb:T:e:d:Hfz:s:xa"
+  _arguments -s \
+    -{a,f,H,l,n,Q,q,r,t,v,w,x} \
+    '--version' '--help' '--help-commands' '--help-synonyms' '--help-options' \
+    '--allow-root=:rootdir:_files -/' \
+    '-b+:bindir:_cvs_bindir' \
+    '-T+:temporary directory:_cvs_tempdir' \
+    '-d+:cvsroot:_cvs_root' \
+    '-e+:editor:_cvs_editor' \
+    '-s+:user variable:_cvs_user_variable' \
+    '-z+:gzip level:_cvs_gzip_level' \
+    '*::cvs command:_cvs_command'
+}
+
+# define cvs command dispatch function.
+
+if ! builtin functions _cvs_command >&-; then
+  _cvs_command () {
+    typeset -A cmds
+    cmds=(add " ad new "          admin " adm rcs "       annotate " ann "
+	  checkout " co get "     commit " ci com "       diff " di dif "
+	  edit ""                 editors ""              export " exp ex "
+	  history " hi his "      import " im imp "       init ""
+	  log " lo rlog "         login " logon lgn "     logout ""
+	  rdiff " patch pa "      release " re rel "      remove " rm delete "
+	  status " st stat "      rtag " rt rfreeze "     tag " ta freeze "
+	  unedit ""               update " up upd "       watch ""
+	  watchers "")
+
+    if (( CURRENT == 1 )); then
+      compadd "$@" ${(k)cmds} || compadd "$@" ${(kv)=cmds}
+    else
+      case "${${(k)cmds[(R)* $words[1] *]}:-$words[1]}" in
+	add) _cvs_add;;
+	admin) _cvs_admin;;
+	annotate) _cvs_annotate;;
+	checkout) _cvs_checkout;;
+	commit) _cvs_commit;;
+	diff) _cvs_diff;;
+	edit) _cvs_edit;;
+	editors) _cvs_editors;;
+	export) _cvs_export;;
+	history) _cvs_history;;
+	import) _cvs_import;;
+	init) _cvs_init;;
+	log) _cvs_log;;
+	login) _cvs_login;;
+	logout) _cvs_logout;;
+	rdiff) _cvs_rdiff;;
+	release) _cvs_release;;
+	remove) _cvs_remove;;
+	status) _cvs_status;;
+	rtag) _cvs_rtag;;
+	tag) _cvs_tag;;
+	unedit) _cvs_unedit;;
+	update) _cvs_update;;
+	watch) _cvs_watch;;
+	watchers) _cvs_watchers;;
+	*) _message "unknown cvs command: $words[1]";;
+      esac
+    fi
+  }
+fi
+
+# define completion functions for each cvs command
+
+if ! builtin functions _cvs_add >&-; then
+  _cvs_add () {
+    # "+k:m:"
+    _arguments -s \
+      '-k+:keyword substitution:_cvs_k' \
+      '-m+:message:_cvs_m' \
+      '*:file:_cvs_files_unmaintained' \
+  }
+fi
+
+if ! builtin functions _cvs_admin >&-; then
+  _cvs_admin () {
+    # "+ib::c:a:A:e:l::u::LUn:N:m:o:s:t::IqxV:k:"
+    _arguments -s \
+      -{i,L,U,I,q,x} \
+      '-b-:default branch:(1.1.1)' \
+      '-c+:comment leader (not used):' \
+      '-a+:login names (not work with CVS):' \
+      '-A+:access list to append (not work with CVS):' \
+      '-e+:access list to erase (not work with CVS):' \
+      '-l-:revision to lock:' \
+      '-u-:revision to unlock:' \
+      '-n+:symbolic-name[\:revision]:' \
+      '-N+:symbolic-name[\:revision]:' \
+      '-m+:revision\:msg:' \
+      '-o+:range to delete:' \
+      '-s+:state[\:revision]:' \
+      '-t-:descriptive text:_cvs_admin_t' \
+      '-V+:version (obsolete):' \
+      '-k+:keyword substitution:_cvs_k' \
+      '*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_admin_t >&-; then
+  _cvs_admin_t () {
+    if compset -P -; then
+      _message 'descriptive text'
+    else
+      _files "$@"
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_annotate >&-; then
+  _cvs_annotate () {
+    # "+lr:D:fR"
+    _arguments -s \
+      -{l,f,R} \
+      '-r+:tag:_cvs_revisions' \
+      '-D+:date:_cvs_D' \
+      '*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_checkout >&-; then
+  _cvs_checkout () {
+    # "+ANnk:d:flRpQqcsr:D:j:P"
+    _arguments -s \
+      -{A,N,n,f,l,R,q,c,s,P} \
+      '-k+:keyword substitution:_cvs_k' \
+      '-d+:directory:_files -/' \
+      '-r+:tag:_cvs_revisions' \
+      '-D+:date:_cvs_D' \
+      '-j+:tag:_cvs_revisions' \
+      '*:module:_cvs_modules'
+  }
+fi
+
+if ! builtin functions _cvs_commit >&-; then
+  _cvs_commit () {
+    # "+nlRm:fF:r:"
+    _arguments -s \
+      -{n,l,R,f} \
+      '-m+:message:_cvs_m' \
+      '-F+:log message file:_files' \
+      '-r+:tag:_cvs_revisions' \
+      '*:file:_cvs_files_modified'
+  }
+fi
+
+if ! builtin functions _cvs_diff >&-; then
+  _cvs_diff () {
+    # "+abcdefhilnpstuw0123456789BHNRC:D:F:I:L:U:V:W:k:r:"
+    _arguments -s \
+      -{l,R} \
+      '-D+:date:_cvs_D' \
+      '-k+:keyword substitution:_cvs_k' \
+      '-r+:tag:_cvs_revisions' \
+      -{h,p,0,1,2,3,4,5,6,7,8,9} \
+      '--binary' \
+      '--brief' \
+      '--changed-group-format=:format:' \
+      '-c' '-C+:lines:' '--context=-:lines:' \
+      '-e' '--ed' \
+      '-t' '--expand-tabs' \
+      '-f' '--forward-ed' \
+      '--horizon-lines=:lines:' \
+      '--ifdef=:name:' \
+      '-w' '--ignore-all-space' \
+      '-B' '--ignore-blank-lines' \
+      '-i' '--ignore-case' \
+      '-I+:regex:' '--ignore-matching-lines=:regex:' \
+      '-b' '--ignore-space-change' \
+      '--initial-tab' \
+      '*-L+:label:' '*--label=:label:' \
+      '--left-column' \
+      '--line-format=:format:' \
+      '-d' '--minimal' \
+      '-N' '--new-file' \
+      '--new-group-format=:format:' \
+      '--new-line-format=:format:' \
+      '--old-group-format=:format:' \
+      '--old-line-format=:format:' \
+      '--paginate' \
+      '-n' '--rcs' \
+      '-s' '--report-identical-files' \
+      '--show-c-function' \
+      '-F+:regex:' '--show-function-line=:regex:' \
+      '-y' '--side-by-side' \
+      '-H' '--speed-large-files' \
+      '--suppress-common-lines' \
+      '-a' '--text' \
+      '--unchanged-group-format=:format:' \
+      '--unchanged-line-format=:format:' \
+      '-u' '-U+:lines:' '--unified=-:lines:' \
+      '-W:columns:' '--width=:columns:' \
+      '*:file:_cvs_diff_arg'
+  }
+fi
+
+if ! builtin functions _cvs_diff_arg >&-; then
+  _cvs_diff_arg () {
+    _cvs_files_modified || _cvs_files
+  }
+fi
+
+if ! builtin functions _cvs_edit >&-; then
+  _cvs_edit () {
+    # "+lRa:"
+    _arguments -s \
+      -{l,R} \
+      '-a+:action:(edit unedit commit all none)'
+      '*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_editors >&-; then
+  _cvs_editors () {
+    # "+lR"
+    _arguments -s \
+      -{l,R} \
+      '*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_export >&-; then
+  _cvs_export () {
+    # "+Nnk:d:flRQqr:D:"
+    _arguments -s \
+      -{N,n,f,l,R,Q,q} \
+      '-k+:keyword substitution:_cvs_k' \
+      '-d+:directory:_files -/' \
+      '-r+:tag:_cvs_revisions' \
+      '-D+:date:_cvs_D' \
+      '*:module:_cvs_modules'
+  }
+fi
+
+if ! builtin functions _cvs_history >&-; then
+  _cvs_history () {
+    # "+Tacelow?D:b:f:m:n:p:r:t:u:x:X:z:"
+    _arguments -s \
+      -{T,a,c,e,l,o,w,\?} \
+      '-D+:date:_cvs_D' \
+      '-b+:string:' \
+      '-f+:arg:' \
+      '-m+:module:_cvs_modules' \
+      '-n+:arg:' \
+      '*-p+:repository:' \
+      '-r+:rev:' \
+      '-t+:tag:' \
+      '-u+:user name:' \
+      '-x+:type:_cvs_history_x' \
+      '-X+:arg:' \
+      '-z+:arg:' \
+      '*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_history_x >&-; then
+  _cvs_history_x () {
+    compset -P '*'
+
+    compadd "$@" -y '(
+    F\ --\ release
+    O\ --\ checkout
+    E\ --\ export
+    T\ --\ rtag
+    C\ --\ merge\ collision-detected
+    G\ --\ merge\ succeed
+    U\ --\ working\ file\ was\ copied
+    W\ --\ working\ file\ was\ deleted
+    A\ --\ A\ file\ was\ added
+    M\ --\ A\ file\ was\ modified
+    R\ --\ A\ file\ was\ removed
+    )' F O E T C G U W A M R
+  }
+fi
+
+if ! builtin functions _cvs_import >&-; then
+  _cvs_import () {
+    # "+Qqdb:m:I:k:W:"
+    _arguments -s \
+      -{Q,q,d} \
+      '-b+:branch:' \
+      '-m+:message:_cvs_m' \
+      '*-I+:name:_files' \
+      '-k+:keyword substitution:_cvs_k' \
+      '*-W+:spec:' \
+      ':repository:_cvs_modules' \
+      ':vendor tag:' \
+      ':release tag:'
+  }
+fi
+
+if ! builtin functions _cvs_init >&-; then
+  _cvs_init () {
+    false
+  }
+fi
+
+if ! builtin functions _cvs_login >&-; then
+  _cvs_login () {
+    false
+  }
+fi
+
+if ! builtin functions _cvs_logout >&-; then
+  _cvs_logout () {
+    false
+  }
+fi
+
+if ! builtin functions _cvs_rdiff >&-; then
+  _cvs_rdiff () {
+    # "+V:k:cuftsQqlRD:r:"
+    _arguments -s \
+      -{c,u,f,t,s,Q,q,l,R} \
+      '-V+:version:' \
+      '-k+:keyword substitution:_cvs_k' \
+      '*-D+:date:_cvs_D' \
+      '*-r+:tag:_cvs_revisions' \
+      '*:module:_cvs_modules'
+  }
+fi
+
+if ! builtin functions _cvs_release >&-; then
+  _cvs_release () {
+    # "+Qdq"
+    _arguments -s \
+      -{Q,d,q} \
+      '*:directory:_files -/'
+  }
+fi
+
+if ! builtin functions _cvs_remove >&-; then
+  _cvs_remove () {
+    # "+flR"
+    _arguments -s \
+      -{f,l,R} \
+      '*:file:_cvs_files_removed'
+  }
+fi
+
+if ! builtin functions _cvs_status >&-; then
+  _cvs_status () {
+    # "+vlR"
+    _arguments -s \
+      -{v,l,R} \
+      '*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_tag >&-; then
+  _cvs_tag () {
+    # "+FQqlRcdr:D:bf"
+    _arguments -s \
+      -{F,Q,q,l,R,c,d,b,f} \
+      '-r+:tag:_cvs_revisions' \
+      '-D+:date:_cvs_D' \
+      '*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_unedit >&-; then
+  _cvs_unedit () {
+    # "+lR"
+    _arguments -s \
+      -{l,R} \
+      '*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_update >&-; then
+  _cvs_update () {
+    # "+ApPflRQqduk:r:D:j:I:W:"
+    _arguments -s \
+      -{A,p,P,f,l,R,Q,q,d,u} \
+      '-k+:keyword substitution:_cvs_k' \
+      '-r+:tag:_cvs_revisions' \
+      '-D+:date:_cvs_D' \
+      '-j+:tag:_cvs_revisions' \
+      '*-I+:name:_files' \
+      '*-W+:spec:' \
+      '*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_watch >&-; then
+  _cvs_watch () {
+    if (( CURRENT == 2 )); then
+      compadd on off add remove
+    else
+      case "$words[2]" in
+	on|off) # "+lR"
+	  _arguments -s \
+	  -{l,R} \
+	  ':watch command:' \
+	  ':*:file:_cvs_files'
+	  ;;
+	add|remove) # "+lRa:"
+	  _arguments -s \
+	  -{l,R} \
+	  '*-a+:action:(edit unedit commit all none)' \
+	  ':watch command:' \
+	  ':*:file:_cvs_files'
+	  ;;
+      esac
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_watchers >&-; then
+  _cvs_watchers () {
+    # "+lR"
+    _arguments -s \
+      -{l,R} \
+      ':*:file:_cvs_files'
+  }
+fi
+
+if ! builtin functions _cvs_root >&-; then
+  _cvs_root () {
+    compadd "$@" $_cvs_roots || _files "$@" -/
+  }
+fi
+
+if ! builtin functions _cvs_tempdir >&-; then
+  _cvs_tempdir () {
+    compadd "$@" $TMPPREFIX:h $TMPDIR /tmp
+  }
+fi
+
+if ! builtin functions _cvs_user_variable >&-; then
+  _cvs_user_variable () {
+    if compset -P '*='; then
+      _default
+    else
+      _message "variable=value"
+    fi
+  }
+fi
+
+# define completion functions for cvs global options.
+
+if ! builtin functions _cvs_bindir >&-; then
+  _cvs_bindir () {
+    compadd "$@" /usr/local/bin || _files "$@" -/
+  }
+fi
+
+if ! builtin functions _cvs_editor >&-; then
+  _cvs_editor () {
+    compadd "$@" vi
+  }
+fi
+
+if ! builtin functions _cvs_gzip_level >&-; then
+  _cvs_gzip_level () {
+    compadd "$@" 9
+  }
+fi
+
+# define completion functions for cvs common options and arguments.
+
+if ! builtin functions _cvs_D >&-; then
+  _cvs_D () {
+    compadd "$@" today yesterday week\ ago month\ ago
+  }
+fi
+
+if ! builtin functions _cvs_k >&-; then
+  _cvs_k () {
+    compadd "$@" kv kvl k o b v
+  }
+fi
+
+if ! builtin functions _cvs_m >&-; then
+  _cvs_m () {
+    _message "log message"
+  }
+fi
+
+if ! builtin functions _cvs_modules >&-; then
+  _cvs_modules () {
+    local root=$CVSROOT
+    [[ -f CVS/Root ]] && root=$(<CVS/Root)
+
+    if [[ $root = :* || ! -d $root ]]; then
+      _message "module name"
+    else
+      compadd - \
+	$root/^CVSROOT(:t) \
+	${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_revisions >&-; then
+  _cvs_revisions () {
+    compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##}%%[ 	]*}
+  }
+fi
+
+# define completion functions for files maintained by cvs.
+
+if ! builtin functions _cvs_setup_prefix >&-; then
+  _cvs_setup_prefix () {
+    if [[ -prefix */ ]]; then
+      qpref="${PREFIX%/*}/"
+      pref=$~qpref
+    else
+      qpref=
+      pref=./
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_extract_directory_entries >&-; then
+  _cvs_extract_directory_entries () {
+    entries=($entries ${${${(M)rawentries:#D/*}#D/}%%/*})
+  }
+fi
+
+if ! builtin functions _cvs_extract_file_entries >&-; then
+  _cvs_extract_file_entries () {
+    entries=($entries ${${${(M)rawentries:#/*}#/}%%/*})
+  }
+fi
+
+if ! builtin functions _cvs_extract_modifiedfile_entries >&-; then
+  _cvs_extract_modifiedfile_entries () {
+    if [[ -n "$compconfig[_cvs_disable_stat]" ]] ||
+      ! { zmodload -e stat || zmodload stat }; then
+      _cvs_extract_file_entries
+      return
+    fi
+
+    local ents pats
+    ents=(${${${${(M)rawentries:#/*}#/}/\\/[^\\/]#\\///}%/[^/]#/[^/]#})
+    pats=(${${${(f)"$(LANG=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${pref}*(D))"}##*/}/ //})
+    eval 'ents=(${ents:#('${(j:|:)${(@)pats:q}}')})'
+    entries=($entries ${ents%%/*})
+  }
+fi
+
+if ! builtin functions _cvs_setup_allentries >&-; then
+  _cvs_setup_allentries () {
+    entries=()
+    if [[ -f ${pref}CVS/Entries ]]; then
+      local rawentries
+      rawentries=(${(f)"$(<${pref}CVS/Entries)"})
+      _cvs_extract_file_entries
+      _cvs_extract_directory_entries
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_setup_direntries >&-; then
+  _cvs_setup_direntries () {
+    entries=()
+    if [[ -f ${pref}CVS/Entries ]]; then
+      local rawentries
+      rawentries=(${(f)"$(<${pref}CVS/Entries)"})
+      _cvs_extract_directory_entries
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_setup_modentries >&-; then
+  _cvs_setup_modentries () {
+    entries=()
+    if [[ -f ${pref}CVS/Entries ]]; then
+      local rawentries
+      rawentries=(${(f)"$(<${pref}CVS/Entries)"})
+      _cvs_extract_modifiedfile_entries
+      _cvs_extract_directory_entries
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_directories >&-; then
+  _cvs_directories () {
+    if [[ -d ${pref}CVS ]]; then
+      _cvs_setup_direntries
+      (( $#entries )) && compgen "$@" -g "${(j:|:)${(@)entries:q}}"
+    else
+      _files "$@"
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_files >&-; then
+  _cvs_files () {
+    local qpref pref entries
+    _cvs_setup_prefix
+    if [[ -d ${pref}CVS ]]; then
+      _cvs_setup_allentries
+      (( $#entries )) && compgen "$@" -g "${(j:|:)${(@)entries:q}}"
+    else
+      _files "$@"
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_files_modified >&-; then
+  _cvs_files_modified () {
+    local qpref pref entries
+    _cvs_setup_prefix
+    if [[ -d ${pref}CVS ]]; then
+      _cvs_setup_modentries
+      (( $#entries )) && compgen "$@" -g "${(j:|:)${(@)entries:q}}"
+    else
+      _files "$@"
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_files_removed >&-; then
+  _cvs_files_removed () {
+    local qpref pref entries
+    _cvs_setup_prefix
+    if [[ -d ${pref}CVS ]]; then
+      _cvs_setup_allentries
+      setopt localoptions unset
+      local omit
+      omit=(${pref}*(D:t))
+      eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
+      compadd "$@" -P "$qpref" - ${entries:q} ||
+      _cvs_directories "$@"
+    else
+      _files "$@"
+    fi
+  }
+fi
+
+if ! builtin functions _cvs_files_unmaintained >&-; then
+  _cvs_files_unmaintained () {
+    local qpref pref entries
+    _cvs_setup_prefix
+    if [[ -d ${pref}CVS ]]; then
+      _cvs_setup_allentries
+      setopt localoptions unset
+      local omit
+      omit=($_cvs_ignore_default ${entries:q} ${=cvsignore})
+      [[ -r ~/.cvsignore ]] && omit=($omit $(<~/.cvsignore))
+      [[ -r ${pref}.cvsignore ]] && omit=($omit $(<${pref}.cvsignore))
+      compgen "$@" -g '*~(*/|)('${(j:|:)omit}')(D)' ||
+      compgen "$@" -g '*~(*/|)('${(j:|:)${(@)entries:q}}')(D)' ||
+      _cvs_directories "$@"
+    else
+      _files "$@"
+    fi
+  }
+fi
+
+# define configuration variables.
+
+if (( ! $+_cvs_roots )); then
+  if [[ -f ~/.cvspass ]]; then
+    _cvs_roots=(${${(f)"$(<~/.cvspass)"}%% *})
+  else
+    _cvs_roots=()
+  fi
+fi
+
+if (( ! $+_cvs_ignore_default )); then
+  _cvs_ignore_default=(
+    RCS SCCS CVS CVS.adm RCSLOG 'cvslog.*' tags TAGS .make.state .nse_depinfo
+    '*\~' '\#*' '.\#*' ',*' '_$*' '*$' '*.old' '*.bak' '*.BAK' '*.orig' '*.rej'
+    '.del-*' '*.a' '*.olb' '*.o' '*.obj' '*.so' '*.exe' '*.Z' '*.elc' '*.ln'
+    core
+  )
+fi
+
+# call real _cvs.
+
+_cvs "$@"
