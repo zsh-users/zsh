@@ -1,16 +1,16 @@
 #compdef mtr
 
 _arguments -C \
-	'(-h --help)'{-h,--help}'[help]' \
-	'(-v --version)'{-v,--version}'[version]' \
-	'(-r --report)'{-r,--report}'[report mode]' \
-	'(-c --report-cycles)'{-c,--report-cycles}'[report cycles]:number of pings' \
-	'(-p --psize)'{-p,--psize}'[packet size]:number of bytes' \
-	'(-t --curses)'{-t,--curses}'[curses UI]' \
-	'(-n --no-dns)'{-n,--no-dns}'[no DNS lookups]' \
-	'(-g --gtk)'{-g,--gtk}'[GTK+ UI]' \
-	'(-s --split)'{-s,--split}'[output for a split-user interface]' \
-	'(-l --raw)'{-l,--raw}'[raw output format]' \
-	'(-a --address)'{-a,--address}'[source address]:source IP:_hosts' \
-	'(-i --interval)'{-i,--interval}'[ping interval]:number of seconds' \
-	':destination host:_hosts'
+  '(-h --help)'{-h,--help}'[help]' \
+  '(-v --version)'{-v,--version}'[version]' \
+  '(-r --report)'{-r,--report}'[report mode]' \
+  '(-c --report-cycles)'{-c,--report-cycles}'[report cycles]:number of pings' \
+  '(-p --psize)'{-p,--psize}'[packet size]:number of bytes' \
+  '(-t --curses)'{-t,--curses}'[curses UI]' \
+  '(-n --no-dns)'{-n,--no-dns}'[no DNS lookups]' \
+  '(-g --gtk)'{-g,--gtk}'[GTK+ UI]' \
+  '(-s --split)'{-s,--split}'[output for a split-user interface]' \
+  '(-l --raw)'{-l,--raw}'[raw output format]' \
+  '(-a --address)'{-a,--address}'[source address]:source IP:_hosts' \
+  '(-i --interval)'{-i,--interval}'[ping interval]:number of seconds' \
+  ':destination host:_hosts'

@@ -1,5 +1,10 @@
 2004-03-12  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_mtr, Completion/Unix/Command/_vux,
+	Completion/Unix/Command/_tla: fix indentation, missing local
+	and add to .distfiles
+
 	* 19616: configure.ac: use correct shared library link options
 	for gcc on HP/UX
 

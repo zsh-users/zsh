@@ -1,9 +1,11 @@
 #compdef tla
 
+local -a subcmds
+
 subcmds=(${${${(M)${(f)"$(_call_program tla tla help)"}:#[ 	]* : *}% : *}##[ 	]##} )
 
 if (( CURRENT == 2 )); then
-     _describe -t commands 'tla command' compadd - "$subcmds[@]"
+  _describe -t commands 'tla command' compadd - "$subcmds[@]"
 else
-     _files
+  _files
 fi

@@ -5,60 +5,59 @@ local expl
 case "$service" in
   (vux)
 
-  _arguments -s -C \
-	'-x:action:((play\:play\ music generate\:generate\ new\ scorelist
-	            merge\:merge\ new\ songs
-		    weed\:prune\ songs\ from\ scorelist
-		    ratings\:show\ statistics force\:force-rate))' \
-	'-s:file:_files' \
-	'-a:file:_files' \
-	'-z:file:_files' \
-	'-y:file:_files' \
-	'-p:file:_files' \
-	'-w:ratings:(b t)' \
-	'-W:repeats:(a c)' \
-	'-G:age bypass method:(t s n)' \
-	'-e:pattern:' \
-	'-O:device:_files' \
-	'-M:minimum age val:' \
-	'-S[Disable saving scorelist]' \
-	'-A[Disable saving agelist]' \
-	'-Z[Disable saving countlist]' \
-	'-Y[Disable missing log]' \
-	'-c[Disable rating check]' \
-	'-d[Disable rating updates on play]' \
-	'-l[Disable rating updates on skip]' \
-	'-j[Disable repeat check]' \
-	'-b[Disable repeat updates on play]' \
-	'-k[Disable repeat updates on skip]' \
-	'-n[Disable player]' \
-	'-t:percent:' \
-	'-T:percent:' \
-	'-C:factor:' \
-	'-D:factor:' \
-	'-I:factor:' \
-	'-U:rating:' \
-	'-X:score:' \
-	'-N:count:' \
-	'-f:rating:' \
-	'-J[Accelerate decreases]' \
-	'-K[Accelerate increases]' \
-	'-u[Check age before rating]' \
-	'-R[Show ratings after processing]' \
-	'-V[Verbose file manipulation]' \
-	'-v[Show version and exit]' \
-	'-F[Skip songs with -n and -xf]' \
-	'-q[Minimize vux output]' \
-	'-P[Always play new songs]' \
-	'-g[print stats in xgraph format]' \
-	'-h[Show summary of options]'
+    _arguments -s -C \
+      '-x:action:((play\:play\ music generate\:generate\ new\ scorelist
+	           merge\:merge\ new\ songs
+		   weed\:prune\ songs\ from\ scorelist
+		   ratings\:show\ statistics force\:force-rate))' \
+      '-s:file:_files' \
+      '-a:file:_files' \
+      '-z:file:_files' \
+      '-y:file:_files' \
+      '-p:file:_files' \
+      '-w:ratings:(b t)' \
+      '-W:repeats:(a c)' \
+      '-G:age bypass method:(t s n)' \
+      '-e:pattern' \
+      '-O:device:_files' \
+      '-M:minimum age val' \
+      '-S[Disable saving scorelist]' \
+      '-A[Disable saving agelist]' \
+      '-Z[Disable saving countlist]' \
+      '-Y[Disable missing log]' \
+      '-c[Disable rating check]' \
+      '-d[Disable rating updates on play]' \
+      '-l[Disable rating updates on skip]' \
+      '-j[Disable repeat check]' \
+      '-b[Disable repeat updates on play]' \
+      '-k[Disable repeat updates on skip]' \
+      '-n[Disable player]' \
+      '-t:percent' \
+      '-T:percent' \
+      '-C:factor' \
+      '-D:factor' \
+      '-I:factor' \
+      '-U:rating' \
+      '-X:score' \
+      '-N:count' \
+      '-f:rating' \
+      '-J[Accelerate decreases]' \
+      '-K[Accelerate increases]' \
+      '-u[Check age before rating]' \
+      '-R[Show ratings after processing]' \
+      '-V[Verbose file manipulation]' \
+      '-v[Show version and exit]' \
+      '-F[Skip songs with -n and -xf]' \
+      '-q[Minimize vux output]' \
+      '-P[Always play new songs]' \
+      '-g[print stats in xgraph format]' \
+      '-h[Show summary of options]'
   ;;
 
   (vuxctl)
 
-  _wanted vuxcmd expl 'vux control command' \
+    _wanted vuxcmd expl 'vux control command' \
       compadd start clean double half up down next previous forward \
 	      replay pause resume stop reload save history help
   ;;
-
 esac
