@@ -240,7 +240,11 @@ The process ID of the last background command invoked.
 )
 vindex(#)
 item(tt(#) <S>)(
-The number of positional parameters in decimal.
+The number of positional parameters in decimal.  Note that some confusion
+may occur with the syntax tt($#)var(param) which substitutes the length of
+var(param).  Use tt(${#}) to resolve ambiguities.  In particular, the
+sequence `tt($#-)var(...)' in an arithmetic expression is interpreted as
+the length of the parameter tt(-), q.v.
 )
 vindex(ARGC)
 item(tt(ARGC) <S> <Z>)(

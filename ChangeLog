@@ -1,3 +1,8 @@
+2000-12-04  Peter Stephenson  <pws@csr.com>
+
+	* 13220: Doc/Zsh/params.yo: mention problems with $# e.g. `$#-'
+	in arithmetic.
+
 2000-12-03  Clint Adams  <schizo@debian.org>
 
 	* 13216: Doc/Zsh/.distfiles, Doc/Zsh/builtins.yo,
