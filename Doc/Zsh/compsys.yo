@@ -583,34 +583,17 @@ preference to tt(description_format). The latter is used only if the
 former is unset or set to the empty string.
 )
 item(tt(_display))(
-This function generates a display list usable for the `tt(-y)' option
-of tt(compadd) and tt(compgen). For this it takes its second argument
-as an array of possible matches with descriptions. The array may
-either be given as the name of an array parameter or directly as a
-list of words in parentheses.
-
-Each element of the array should contain a match, optionally followed
-by a colon and the description for this match. With this
-tt(_display) builds a string with one match and its description per
-line. Matches witout descriptions are appended at the end and aligned
-in multiple columns. After that, the first argument is taken as a
-parameter name and the string built is stored in it.
-
-Before the building the list, however, this function first uses
-tt(compadd) to remove all strings from the array that don't match the
-string on the line (so that they don't appear in the list). This means 
-that the special parameters tt(PREFIX) and tt(SUFFIX) have to be set
-up correctly before this function is called. This call to tt(compadd)
-also uses the other arguments given to tt(_display), by directly
-giving them to tt(compadd).
-
-Finally, if the array is given as the name of a parameter, this
-paramete will be changed to include only those strings that match the
-string on the line.
+This function generates a display list usable for the `tt(-d)' option
+of tt(compadd). For this it takes its arguments except the first one
+as possible matches with descriptions. The strings should contain the
+match, optionally followed by a colon and the description for this
+match. From this tt(_display) builds an array with elements containing 
+the matches and their descriptions, where the descriptions are aligned.
+After that, the first argument is taken as a parameter name and the
+array built is stored in it.
 
 The return value of tt(_display) is zero if there was at least one
-matching string and the display string could be built and non-zero
-otherwise.
+match with a description non-zero otherwise.
 )
 item(tt(_multi_parts))(
 This function gets two arguments: a separator character and an

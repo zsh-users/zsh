@@ -230,18 +230,24 @@ parse_cmatcher(char *name, char *s)
 			     &err);
 	if (err)
 	    return pcm_err;
-	if (!*s || !*++s) {
-	    zwarnnam(name, ((fl & CMF_RIGHT) ? "missing right anchor" : "missing word pattern"), NULL, 0);
-	    return pcm_err;
+	if ((fl & CMF_RIGHT) && (!*s || !*++s)) {
+	    zwarnnam(name, "missing right anchor", NULL, 0);
+	} else if (!(fl & CMF_RIGHT)) {
+	    if (!*s) {
+		zwarnnam(name, "missing word pattern", NULL, 0);
+		return pcm_err;
+	    }
+	    s++;
 	}
 	if (fl & CMF_RIGHT) {
 	    right = parse_pattern(name, &s, &ral, '=', &err);
 	    if (err)
 		return pcm_err;
-	    if (!*s || !*++s) {
+	    if (!*s) {
 		zwarnnam(name, "missing word pattern", NULL, 0);
 		return pcm_err;
 	    }
+	    s++;
 	} else
 	    right = NULL;
 
@@ -1726,7 +1732,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	return 1;
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre =
-	dat.pre = dat.suf = dat.group = dat.rems = dat.remf =
+	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp = 
 	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = dat.ylist = NULL;
     dat.match = NULL;
     dat.flags = 0;
@@ -1839,6 +1845,13 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	    case 'D':
 		sp = &(dat.dpar);
 		e = "parameter name expected after -%c";
+		break;
+	    case 'd':
+		sp = &(dat.disp);
+		e = "parameter name expected after -%c";
+		break;
+	    case 'l':
+		dat.flags |= CMF_DISPLINE;
 		break;
 	    case '-':
 		argv++;

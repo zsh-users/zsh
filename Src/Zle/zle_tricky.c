@@ -3778,7 +3778,7 @@ add_match_data(int alt, char *str, Cline line,
     cm->qipl = qipl;
     cm->qisl = qisl;
     cm->autoq = (autoq ? autoq : (inbackt ? '`' : '\0'));
-    cm->rems = cm->remf = NULL;
+    cm->rems = cm->remf = cm->disp = NULL;
     addlinknode((alt ? fmatches : matches), cm);
 
     /* One more match for this explanation. */
@@ -3853,7 +3853,7 @@ addmatches(Cadata dat, char **argv)
 {
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
     char **aign = NULL, **dparr = NULL, oaq = autoq, *oppre = dat->ppre;
-    char *oqp = qipre, *oqs = qisuf, qc;
+    char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL;
     int lpl, lsl, pl, sl, bpl, bsl, llpl = 0, llsl = 0, nm = mnum;
     int oisalt = 0, isalt, isexact, doadd, ois = instring, oib = inbackt;
     Cline lc = NULL;
@@ -3923,6 +3923,9 @@ addmatches(Cadata dat, char **argv)
 	    /* Get the suffixes to ignore. */
 	    if (dat->ign)
 		aign = get_user_var(dat->ign);
+	    /* Get the display strings. */
+	    if (dat->disp)
+		disp = get_user_var(dat->disp) - 1;
 	    /* Get the contents of the completion variables if we have
 	     * to perform matching. */
 	    if (dat->aflags & CAF_MATCH) {
@@ -4041,6 +4044,10 @@ addmatches(Cadata dat, char **argv)
 	    }
 	    /* Walk through the matches given. */
 	    for (; (s = *argv); argv++) {
+		if (disp) {
+		    if (!*++disp)
+			disp = NULL;
+		}
 		sl = strlen(s);
 		bpl = brpl;
 		bsl = brsl;
@@ -4085,6 +4092,8 @@ addmatches(Cadata dat, char **argv)
 					bpl, bsl, dat->flags, isexact);
 		    cm->rems = dat->rems;
 		    cm->remf = dat->remf;
+		    if (disp)
+			cm->disp = dupstring(*disp);
 		} else {
 		    if (dat->apar)
 			addlinknode(aparl, ms);
@@ -4647,7 +4656,7 @@ docompletion(char *s, int lst, int incmd)
 				up++;
 				putc('\n', shout);
 			    }
-			    up += printfmt((*e)->str, (*e)->count, 1);
+			    up += printfmt((*e)->str, (*e)->count, 1, 1);
 			    nn = 1;
 			}
 			e++;
@@ -5076,7 +5085,7 @@ makecomplist(char *s, int incmd, int lst)
 
 	if (amatches && !oldlist)
 	    amatches->ccs = (Compctl *) makearray(ccused, 0,
-						  &(amatches->ccount), NULL);
+						  &(amatches->ccount), NULL, NULL);
 	else {
 	    LinkNode n;
 
@@ -7001,6 +7010,14 @@ strbpcmp(char **aa, char **bb)
 static int
 matchcmp(Cmatch *a, Cmatch *b)
 {
+    if ((*a)->disp) {
+	if ((*b)->disp)
+	    return strcmp((*a)->disp, (*b)->disp);
+	return -1;
+    }
+    if ((*b)->disp)
+	return 1;
+
     return strbpcmp(&((*a)->str), &((*b)->str));
 }
 
@@ -7015,9 +7032,9 @@ matcheq(Cmatch a, Cmatch b)
     return matchstreq(a->ipre, b->ipre) &&
 	matchstreq(a->pre, b->pre) &&
 	matchstreq(a->ppre, b->ppre) &&
-	matchstreq(a->str, b->str) &&
 	matchstreq(a->psuf, b->psuf) &&
-	matchstreq(a->suf, b->suf);
+	matchstreq(a->suf, b->suf) &&
+	!a->disp && !b->disp &&	matchstreq(a->str, b->str);
 }
 
 /* Make an array from a linked list. The second argument says whether *
@@ -7027,11 +7044,11 @@ matcheq(Cmatch a, Cmatch b)
 
 /**/
 static Cmatch *
-makearray(LinkList l, int s, int *np, int *nlp)
+makearray(LinkList l, int s, int *np, int *nlp, int *llp)
 {
     Cmatch *ap, *bp, *cp, *rp;
     LinkNode nod;
-    int n, nl = 0;
+    int n, nl = 0, ll = 0;
 
     /* Build an array for the matches. */
     rp = ap = (Cmatch *) ncalloc(((n = countlinknodes(l)) + 1) *
@@ -7067,21 +7084,30 @@ makearray(LinkList l, int s, int *np, int *nlp)
 	    for (bp = ap; bp[1] && matcheq(*ap, bp[1]); bp++, n--);
 	    ap = bp;
 	    /* Mark those, that would show the same string in the list. */
-	    for (; bp[1] && !strcmp((*ap)->str, (bp[1])->str); bp++)
+	    for (; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
+		     !strcmp((*ap)->str, (bp[1])->str); bp++)
 		(bp[1])->flags |= CMF_NOLIST;
 	}
-	for (ap = rp; *ap; ap++)
+	for (ap = rp; *ap; ap++) {
+	    if ((*ap)->disp && ((*ap)->flags & CMF_DISPLINE))
+		ll++;
 	    if ((*ap)->flags & CMF_NOLIST)
 		nl++;
+	}
 	*cp = NULL;
     } else
-	for (ap = rp; *ap; ap++)
+	for (ap = rp; *ap; ap++) {
+	    if ((*ap)->disp && ((*ap)->flags & CMF_DISPLINE))
+		ll++;
 	    if ((*ap)->flags & CMF_NOLIST)
 		nl++;
+	}
     if (np)
 	*np = n;
     if (nlp)
 	*nlp = nl;
+    if (llp)
+	*llp = ll;
     return rp;
 }
 
@@ -7111,7 +7137,7 @@ begcmgroup(char *n, int nu)
     }
     mgroup = (Cmgroup) zhalloc(sizeof(struct cmgroup));
     mgroup->name = dupstring(n);
-    mgroup->flags = mgroup->lcount = mgroup->mcount = 0;
+    mgroup->flags = mgroup->lcount = mgroup->llcount = mgroup->mcount = 0;
     mgroup->matches = NULL;
     mgroup->ylist = NULL;
     mgroup->expls = NULL;
@@ -7183,6 +7209,7 @@ dupmatch(Cmatch m)
     r->autoq = m->autoq;
     r->qipl = m->qipl;
     r->qisl = m->qisl;
+    r->disp = dupstring(m->disp);
 
     return r;
 }
@@ -7197,7 +7224,7 @@ permmatches(void)
     Cmatch *p, *q;
     Cexpl *ep, *eq, e, o;
     Compctl *cp, *cq;
-    int nn, nl, fi = 0, gn = 1, mn = 1, rn;
+    int nn, nl, ll, fi = 0, gn = 1, mn = 1, rn;
 
     if (hasperm)
 	freematches();
@@ -7217,15 +7244,17 @@ permmatches(void)
 
 	    g->matches = makearray(g->lmatches,
 				   ((g->flags & CGF_NOSORT) ? 0 : 2),
-				   &nn, &nl);
+				   &nn, &nl, &ll);
 	    g->mcount = nn;
 	    if ((g->lcount = nn - nl) < 0)
 		g->lcount = 0;
+	    g->llcount = ll;
 	    if (g->ylist) {
 		g->lcount = arrlen(g->ylist);
 		smatches = 2;
 	    }
-	    g->expls = (Cexpl *) makearray(g->lexpls, 0, &(g->ecount), NULL);
+	    g->expls = (Cexpl *) makearray(g->lexpls, 0, &(g->ecount),
+					   NULL, NULL);
 
 	    g->ccount = 0;
 	    g->ccs = NULL;
@@ -7254,6 +7283,7 @@ permmatches(void)
 	*p = NULL;
 
 	n->lcount = g->lcount;
+	n->llcount = g->llcount;
 	if (g->ylist)
 	    n->ylist = arrdup(g->ylist);
 	else
@@ -7312,6 +7342,7 @@ freematch(Cmatch m)
     zsfree(m->prpre);
     zsfree(m->rems);
     zsfree(m->remf);
+    zsfree(m->disp);
 
     zfree(m, sizeof(m));
 }
@@ -8094,14 +8125,14 @@ sfxlen(char *s, char *t)
 
 /**/
 int
-printfmt(char *fmt, int n, int dopr)
+printfmt(char *fmt, int n, int dopr, int doesc)
 {
     char *p = fmt, nc[DIGBUFSIZE];
     int l = 0, cc = 0, b = 0, s = 0, u = 0, m;
 
     for (; *p; p++) {
 	/* Handle the `%' stuff (%% == %, %n == <number of matches>). */
-	if (*p == '%') {
+	if (doesc && *p == '%') {
 	    if (*++p) {
 		m = 0;
 		switch (*p) {
@@ -8180,7 +8211,8 @@ printfmt(char *fmt, int n, int dopr)
 Cmatch *
 skipnolist(Cmatch *p)
 {
-    while (*p && ((*p)->flags & CMF_NOLIST))
+    while (*p && (((*p)->flags & CMF_NOLIST) ||
+		  ((*p)->disp && ((*p)->flags & CMF_DISPLINE))))
 	p++;
 
     return p;
@@ -8255,7 +8287,14 @@ ilistmatches(Hookdef dummy, Chdata dat)
 	    }
 	} else {
 	    for (p = g->matches; (m = *p); p++) {
-		if (!(m->flags & CMF_NOLIST)) {
+		if (m->disp) {
+		    if (m->flags & CMF_DISPLINE) {
+			nlines += 1 + printfmt(m->disp, 0, 0, 0);
+			g->flags |= CGF_HASDL;
+		    } else if ((l = strlen(m->disp)) > longest)
+			longest = l;
+		    nlist++;
+		} else if (!(m->flags & CMF_NOLIST)) {
 		    if ((l = niceztrlen(m->str)) > longest)
 			longest = l;
 		    nlist++;
@@ -8265,7 +8304,7 @@ ilistmatches(Hookdef dummy, Chdata dat)
 	if ((e = g->expls)) {
 	    while (*e) {
 		if ((*e)->count)
-		    nlines += 1 + printfmt((*e)->str, (*e)->count, 0);
+		    nlines += 1 + printfmt((*e)->str, (*e)->count, 0, 1);
 		e++;
 	    }
 	}
@@ -8310,7 +8349,8 @@ ilistmatches(Hookdef dummy, Chdata dat)
 	 (!complistmax && nlines >= lines))) {
 	int qup;
 	zsetterm();
-	qup = printfmt("zsh: do you wish to see all %n possibilities? ", nlist, 1);
+	qup = printfmt("zsh: do you wish to see all %n possibilities? ",
+		       nlist, 1, 1);
 	fflush(shout);
 	if (getzlequery() != 'y') {
 	    if (clearflag) {
@@ -8349,7 +8389,7 @@ ilistmatches(Hookdef dummy, Chdata dat)
 			putc('\n', shout);
 			pnl = 0;
 		    }
-		    printfmt((*e)->str, (*e)->count, 1);
+		    printfmt((*e)->str, (*e)->count, 1, 1);
 		    pnl = 1;
 		}
 		e++;
@@ -8391,9 +8431,21 @@ ilistmatches(Hookdef dummy, Chdata dat)
 		}
 	    }
 	} else if (g->lcount) {
-	    int n = g->lcount, nl = (n + ncols - 1) / ncols, nc = nl, i, j, a = 0;
+	    int n = g->lcount - g->llcount, nl = (n + ncols - 1) / ncols;
+	    int nc = nl, i, j, a = 0;
 	    Cmatch *q;
 
+	    if (g->flags & CGF_HASDL) {
+		for (p = g->matches; (m = *p); p++)
+		    if (m->disp && (m->flags & CMF_DISPLINE)) {
+			if (pnl) {
+			    putc('\n', shout);
+			    pnl = 0;
+			}
+			printfmt(m->disp, 0, 1, 0);
+			pnl = 1;
+		    }
+	    }
 	    if (n && pnl) {
 		putc('\n', shout);
 		pnl = 0;
@@ -8404,11 +8456,11 @@ ilistmatches(Hookdef dummy, Chdata dat)
 		while (n && i--) {
 		    if (!(m = *q))
 			break;
-		    nicezputs(m->str, shout);
+		    nicezputs((m->disp ? m->disp : m->str), shout);
 		    if (i)
-			a = longest - niceztrlen(m->str);
+			a = longest - niceztrlen(m->disp ? m->disp : m->str);
 
-		    if (of && m->flags & CMF_FILE) {
+		    if (of && !m->disp && m->flags & CMF_FILE) {
 			struct stat buf;
 			char *pb;
 
@@ -8475,7 +8527,7 @@ listlist(LinkList l)
     smatches = 1;
     validlist = 1;
     memset(&dg, 0, sizeof(struct cmgroup));
-    dg.ylist = (char **) makearray(l, 1, &(dg.lcount), NULL);
+    dg.ylist = (char **) makearray(l, 1, &(dg.lcount), NULL, NULL);
     amatches = &dg;
     ilistmatches(NULL, NULL);
     amatches = am;

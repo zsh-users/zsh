@@ -794,13 +794,9 @@ while true; do
         eval ws\=\( "${action[3,-3]}" \)
 
 	if [[ -n "$compconfig[describe_values]" &&
-              "$compconfig[describe_values]" != *\!${cmd}* ]]; then
-          if _display tmp ws -M 'r:|[_-]=* r:|=*'; then
-            compadd "$expl[@]" -y tmp - "${(@)ws%%:*}"
-          else
-            [[ -n "$matched" ]] && compadd -Q -S -s "$SUFFIX" - "$PREFIX"
-            _message "$descr"
-          fi
+              "$compconfig[describe_values]" != *\!${cmd}* ]] &&
+           _display tmp "$ws[@]"; then
+	  compadd "$expl[@]" -M 'r:|[_-]=* r:|=*' -ld tmp - "${(@)ws%%:*}"
         else
 	  compadd "$expl[@]" - "${(@)ws%%:*}"
         fi
@@ -841,51 +837,47 @@ while true; do
     if [[ -n "$sopts" && -n "$PREFIX" &&
       "$PREFIX" = [-+]${~soptseq}[$sopts] ]]; then
       if [[ "$PREFIX" = [-+]${~soptseq1} ]]; then
-        local dpre="$PREFIX" dsuf="$SUFFIX"
-
-	PREFIX=''
-	SUFFIX=''
         if [[ -z "$compconfig[describe_options]" ||
-              "$compconfig[describe_options]" = *\!${cmd}* ]] ||
-           ! _display tmp odescr; then
-          tmp=( "${dpre[1]}${(@o)^${(@)${(@M)${=:-${(k)opts} ${(k)dopts} ${(k)odopts}}:#[-+]?(|=)}#?}%=}" )
-        fi
-	PREFIX="$dpre"
-	SUFFIX="$dsuf"
-        compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -y tmp - \
+              "$compconfig[describe_options]" = *\!${cmd}* ]]; then
+          tmp=( "${PREFIX[1]}${(@)^${(@)${(@M)${=:-${(k)opts} ${(k)dopts} ${(k)odopts}}:#[-+]?(|=)}#?}%=}" )
+          compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -d tmp - \
                 "${PREFIX}${(@k)^opts[(I)${PREFIX[1]}?]#?}" \
 	        "${PREFIX}${(@k)^dopts[(I)${PREFIX[1]}?]#?}" \
 	        "${PREFIX}${(@)^${(@k)odopts[(I)${PREFIX[1]}?(|=)]#?}%=}" && 
-            ret=0
+              ret=0
+        elif _display tmp "${(@Mo)odescr:#[-+]?:*}"; then
+          compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -ld tmp - \
+	          "${PREFIX}${(@)^${(@)${(@Mo)odescr:#[-+]?:*}%%:*}#?}" && ret=0
+        else
+          compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -d tmp - \
+	          "${PREFIX}${(@)^${(@)${(@Mo)odescr:#[-+]?:*}%%:*}#?}" && ret=0
+        fi
       else
         # The last option takes an argument in the next word.
 
         compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' - "${PREFIX}" && ret=0
       fi
     else
-      tmp=''
       if [[ -n "$compconfig[describe_options]" &&
-            "$compconfig[describe_options]" != *\!${cmd}* ]]; then
-        if _display tmp odescr; then
-          if (( $#dopts )); then
-            compadd -n "$expl[@]" -QS '' -M 'r:|[_-]=* r:|=*' -y tmp - \
-                    "${(@k)dopts}" && ret=0
-            compadd -n -J option -Q -M 'r:|[_-]=* r:|=*' - \
-                    "${(@k)opts}" "${(@k)odopts[(I)*[^=]]}" && ret=0
-            compadd -n -J option -QqS= -M 'r:|[_-]=* r:|=*' - \
-                    "${(@k)odopts[(I)*=]%=}" && ret=0
-          elif (( ${(@k)#odopts[(I)*=]} )); then
-            compadd -n "$expl[@]" -QqS= -M 'r:|[_-]=* r:|=*' -y tmp - \
-                    "${(@k)odopts[(I)*=]%=}" && ret=0
-            compadd -n -J option -Q -M 'r:|[_-]=* r:|=*' - \
-                    "${(@k)opts}" "${(@k)odopts[(I)*[^=]]}" && ret=0
-          else
-            compadd -n "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -y tmp - \
-                    "${(@k)opts}" "${(@k)odopts[(I)*[^=]]}" && ret=0
-          fi
+            "$compconfig[describe_options]" != *\!${cmd}* ]] &&
+	 _display descr "$odescr[@]"; then
+	ws=( "${(k)opts[@]}" "${(@k)odopts[(I)*[^=]]}" )
+	if (( $#ws )); then
+	  tmp=( "${(@M)descr:#(${(j:|:)~ws}) *}" )
+          compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -ld tmp - \
+                  "$ws[@]" && ret=0
+	fi
+	if (( $#dopts )); then
+	  tmp=( "${(@M)descr:#(${(kj:|:)~dopts}) *}" )
+          compadd "$expl[@]" -QS '' -M 'r:|[_-]=* r:|=*' -ld tmp - \
+                  "${(@k)dopts}" && ret=0
         fi
-      fi
-      if [[ -z "$tmp" ]]; then
+	if (( ${(@k)#odopts[(I)*=]} )); then
+	  tmp=( "${(@M)descr:#(${(kj:|:)~odopts[(I)*=]}) *}" )
+          compadd "$expl[@]" -QqS= -M 'r:|[_-]=* r:|=*' -ld tmp - \
+                  "${(@k)odopts[(I)*=]%=}" && ret=0
+        fi
+      else
         compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' - \
                 "${(@k)opts}" "${(@k)odopts[(I)*[^=]]}" && ret=0
         compadd "$expl[@]" -QqS= -M 'r:|[_-]=* r:|=*' - \

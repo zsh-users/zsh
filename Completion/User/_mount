@@ -191,7 +191,7 @@ if [[ "$words[1]" = mount ]]; then
       '-u[remount file system]' \
       ':dev or dir:->devordir' \
       ':mount point:_files -/'
-
+    )
     fss=( advfs ufs nfs mfs cdfs )
     ;;
   *)
@@ -204,7 +204,9 @@ if [[ "$words[1]" = mount ]]; then
       '-f[fake mount]' \
       ':dev or dir:->devordir' \
       ':mount point:_files -/'
+    )
     fss=( ufs )
+    ;;
   esac
 
   _arguments "$args[@]" && ret=0
@@ -228,7 +230,7 @@ case "$state" in
 fstype)
   compset -P '*,'
   _description expl 'file system type'
-  compadd "$expl[@]" -qS, -M 'L:no=' - "$fss[@]" && ret=0
+  compadd "$expl[@]" -qS, -M 'L:|no=' - "$fss[@]" && ret=0
   ;;
 fsopt)
   eval 'tmp=(' '"$_fs_'${(s:,:)^${options[-t]:-${deffs}}}'[@]"' ')'

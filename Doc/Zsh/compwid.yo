@@ -366,11 +366,11 @@ otherwise.
 )
 findex(compadd)
 cindex(completion widgets, adding specified matches)
-xitem(tt(compadd) [ tt(-qQfenUam) ] [ tt(-F) var(array) ])
+xitem(tt(compadd) [ tt(-qQfenUaml) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
-xitem([ tt(-W) var(file-prefix) ] [ tt(-y) var(array) ])
+xitem([ tt(-W) var(file-prefix) ] [ tt(-y) var(array) ] [ tt(-d) var(array) ])
 xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ])
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 xitem([ tt(-M) var(match-spec) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
@@ -435,6 +435,23 @@ This gives a number of strings to display instead of the matches. This
 is like the tt(-y) option of the tt(compctl) builtin command but the
 var(array) argument may only be the name of an array parameter or a
 literal array in parentheses containing the strings to display.
+)
+item(tt(-d) var(array))(
+This adds per-match display strings. The var(array) should contain one 
+element per var(word) given. The completion code will then display the 
+first element instead of the first var(word), and so on. The
+var(array) may be given as the name of a array parameter or directly
+as a space-separated list of words in parentheses.
+
+If there are fewer display strings than var(words), the leftover
+var(words) will be displayed unchanged and if there are more display
+strings than var(words), the leftover display strings will be silently
+ignored.
+)
+item(tt(-l))(
+This option only has an effect if used together with the tt(-d)
+options. If it is given, the display strings are listed one per line,
+not arrayed in columns.
 )
 item(tt(-J) var(name))(
 As for tt(compctl) and tt(compgen), this gives the name of the group

@@ -184,6 +184,7 @@ struct cmgroup {
     int mcount;			/* number of matches */
     Cmatch *matches;		/* the matches */
     int lcount;			/* number of things to list here */
+    int llcount;		/* number of line-displays */
     char **ylist;		/* things to list */
     int ecount;			/* number of explanation string */
     Cexpl *expls;		/* explanation strings */
@@ -199,6 +200,7 @@ struct cmgroup {
 
 #define CGF_NOSORT  1		/* don't sort this group */
 #define CGF_LINES   2		/* these are to be printed on different lines */
+#define CGF_HASDL   4		/* has disply strings printed on sseparate lines */
 
 /* This is the struct used to hold matches. */
 
@@ -212,6 +214,7 @@ struct cmatch {
     char *prpre;		/* path prefix for opendir */
     char *pre;			/* prefix string from -P */
     char *suf;			/* suffix string from -S */
+    char *disp;			/* string to display (compadd -d) */
     char autoq;			/* closing quote to add automatically */
     int flags;			/* see CMF_* below */
     int brpl;			/* the place where to put the brace prefix */
@@ -224,13 +227,13 @@ struct cmatch {
     int gnum;			/* global number */
 };
 
-#define CMF_FILE     1		/* this is a file */
-#define CMF_REMOVE   2		/* remove the suffix */
-#define CMF_ISPAR    4		/* is paramter expansion */
-#define CMF_PARBR    8		/* paramter expansion with a brace */
-#define CMF_PARNEST 16		/* nested paramter expansion */
-#define CMF_NOLIST  32		/* should not be listed */
-
+#define CMF_FILE      1		/* this is a file */
+#define CMF_REMOVE    2		/* remove the suffix */
+#define CMF_ISPAR     4		/* is paramter expansion */
+#define CMF_PARBR     8		/* paramter expansion with a brace */
+#define CMF_PARNEST  16		/* nested paramter expansion */
+#define CMF_NOLIST   32		/* should not be listed */
+#define CMF_DISPLINE 64		/* display strings one per line */
 
 /* Stuff for completion matcher control. */
 
@@ -315,6 +318,7 @@ struct cadata {
     char *apar;			/* array to store matches in (-A) */
     char *opar;			/* array to store originals in (-O) */
     char *dpar;			/* array to delete non-matches in (-D) */
+    char *disp;			/* array with display lists (-d) */
 };
 
 /* Data given to hooks. */

@@ -371,7 +371,14 @@ complistmatches(Hookdef dummy, Chdata dat)
 	    }
 	} else {
 	    for (p = g->matches; (m = *p); p++) {
-		if (!(m->flags & CMF_NOLIST)) {
+		if (m->disp) {
+		    if (m->flags & CMF_DISPLINE) {
+			nlines += 1 + printfmt(m->disp, 0, 0, 0);
+			g->flags |= CGF_HASDL;
+		    } else if ((l = strlen(m->disp)) > longest)
+			longest = l;
+		    nlist++;
+		} else if (!(m->flags & CMF_NOLIST)) {
 		    if ((l = niceztrlen(m->str)) > longest)
 			longest = l;
 		    nlist++;
@@ -382,7 +389,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 	if ((e = g->expls)) {
 	    while (*e) {
 		if ((*e)->count)
-		    nlines += 1 + printfmt((*e)->str, (*e)->count, 0);
+		    nlines += 1 + printfmt((*e)->str, (*e)->count, 0, 1);
 		e++;
 	    }
 	}
@@ -390,7 +397,7 @@ complistmatches(Hookdef dummy, Chdata dat)
     longest += 2 + of;
     if ((ncols = (columns + 1) / longest)) {
 	for (g = amatches; g; g = g->next)
-	    nlines += (g->lcount + ncols - 1) / ncols;
+	    nlines += (g->lcount - g->llcount + ncols - 1) / ncols;
     } else {
 	ncols = 1;
 	opl = 1;
@@ -406,7 +413,12 @@ complistmatches(Hookdef dummy, Chdata dat)
 		}
 	    } else
 		for (p = g->matches; (m = *p); p++)
-		    if (!(m->flags & CMF_NOLIST))
+		    if (m->disp) {
+			if (m->flags & CMF_DISPLINE)
+			    nlines += 1 + printfmt(m->disp, 0, 0, 0);
+			else
+			    nlines += 1 + ((1 + niceztrlen(m->disp)) / columns);
+		    } else if (!(m->flags & CMF_NOLIST))
 			nlines += 1 + ((1 + niceztrlen(m->str)) / columns);
 	}
     }
@@ -430,7 +442,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 	 (!complistmax && nlines >= lines))) {
 	int qup;
 	zsetterm();
-	qup = printfmt("zsh: do you wish to see all %n possibilities? ", nlist, 1);
+	qup = printfmt("zsh: do you wish to see all %n possibilities? ", nlist, 1, 1);
 	fflush(shout);
 	if (getzlequery() != 'y') {
 	    if (clearflag) {
@@ -496,7 +508,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 				tcout(TCCLEAREOD);
 			}
 		    }
-		    l = printfmt((*e)->str, (*e)->count, 1);
+		    l = printfmt((*e)->str, (*e)->count, 1, 1);
 		    ml += l;
 		    if (cl >= 0 && (cl -= l) <= 1) {
 			cl = -1;
@@ -558,10 +570,47 @@ complistmatches(Hookdef dummy, Chdata dat)
 		}
 	    }
 	} else if (g->lcount) {
-	    int n = g->lcount, nl = (n + ncols - 1) / ncols, nc = nl, i, j, a = 0;
+	    int n = g->lcount - g->llcount, nl = (n + ncols - 1) / ncols;
+	    int nc = nl, i, j, a = 0;
 	    int zt;
 	    Cmatch *q;
 
+	    if (g->flags & CGF_HASDL) {
+		for (p = g->matches; (m = *p); p++)
+		    if (m->disp && (m->flags & CMF_DISPLINE)) {
+			if (pnl) {
+			    putc('\n', shout);
+			    pnl = 0;
+			    ml++;
+			    if (cl >= 0 && --cl <= 1) {
+				cl = -1;
+				if (tccan(TCCLEAREOD))
+				    tcout(TCCLEAREOD);
+			    }
+			}
+			hasm = 1;
+			if (mselect >= 0) {
+			    for (i = 0; i < ncols; i++) {
+				mtab[i + (ncols * ml)] = p;
+				mgtab[i + (ncols * ml)] = g;
+			    }
+			}
+			if (m->gnum == mselect) {
+			    mline = ml;
+			    mmatch = p;
+			    mgroup = g;
+			    cc = COL_MA;
+			} else
+			    cc = COL_NO;
+			zcputs(&col, cc);
+			printfmt(m->disp, 0, 1, 0);
+			if (col.cols[COL_EC])
+			    tputs(col.cols[COL_EC], 1, putshout);
+			else
+			    zcputs(&col, COL_NO);
+			pnl = 1;
+		    }
+	    }
 	    if (n && pnl) {
 		putc('\n', shout);
 		pnl = 0;
@@ -601,7 +650,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 			cc = COL_MA;
 		    } else
 			cc = -1;
-		    if (m->flags & CMF_FILE) {
+		    if (!m->disp && m->flags & CMF_FILE) {
 			struct stat buf;
 			char *pb;
 
@@ -624,11 +673,11 @@ complistmatches(Hookdef dummy, Chdata dat)
 			    putc(file_type(buf.st_mode), shout);
 		    } else {
 			zcputs(&col, cc >= 0 ? cc : COL_NO);
-			nicezputs(m->str, shout);
+			nicezputs((m->disp ? m->disp : m->str), shout);
 			if (of)
 			    putc(' ', shout);
 		    }
-		    a = longest - niceztrlen(m->str) - 2 - of;
+		    a = longest - niceztrlen(m->disp ? m->disp : m->str) - 2 - of;
 		    while (a--)
 			putc(' ', shout);
 		    if (col.cols[COL_EC])

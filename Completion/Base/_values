@@ -285,29 +285,25 @@ else
   [[ -n "$sep" && ${#snames}+${#names}+${#onames} -ne 1 ]] &&
       expl=( "-qS$sep" "$expl[@]" )
 
-  tmp=''
   if [[ -n "$compconfig[describe_values]" &&
-        "$compconfig[describe_values]" != *\!${words[1]}* ]]; then
-    if _display tmp odescr -M 'r:|[_-]=* r:|=*'; then
-      if (( $#snames )); then
-        compadd "$expl[@]" -y tmp -M 'r:|[_-]=* r:|=*' - \
-                "$snames[@]" && ret=0
-        compadd -n -S= -J "_$gdescr" -M 'r:|[_-]=* r:|=*' - \
-                "${(@k)names}" && ret=0
-        compadd -n -qS= -J "_$gdescr" -M 'r:|[_-]=* r:|=*' - \
-                "${(@k)onames}" && ret=0
-      elif (( $#names )); then
-        compadd -n -S= "$expl[@]" -y tmp -M 'r:|[_-]=* r:|=*' - \
-                "${(@k)names}" && ret=0
-        compadd -n -qS= -J "_$gdescr" -M 'r:|[_-]=* r:|=*' - \
-                "${(@k)onames}" && ret=0
-      else
-        compadd -n -qS= "$expl[@]" -y tmp -M 'r:|[_-]=* r:|=*' - \
-                "${(@k)onames}" && ret=0
-      fi
+        "$compconfig[describe_values]" != *\!${words[1]}* ]] &&
+     _display descr "$odescr[@]"; then
+    if (( $#snames )); then
+      tmp=( "${(@M)descr:#(${(j:|:)~snames}) *}" )
+      compadd "$expl[@]" -ld tmp -M 'r:|[_-]=* r:|=*' - \
+              "${(@)tmp%% *}" && ret=0
     fi
-  fi
-  if [[ -z "$tmp" ]]; then
+    if (( $#names )); then
+      tmp=( "${(@M)descr:#(${(kj:|:)~names}) *}" )
+      compadd -S= "$expl[@]" -ld tmp -M 'r:|[_-]=* r:|=*' - \
+              "${(@)tmp%% *}" && ret=0
+    fi
+    if (( $#onames )); then
+      tmp=( "${(@M)descr:#(${(kj:|:)~onames}) *}" )
+      compadd -qS= "$expl[@]" -ld tmp -M 'r:|[_-]=* r:|=*' - \
+              "${(@)tmp%% *}" && ret=0
+    fi
+  else
     compadd "$expl[@]" -M 'r:|[_-]=* r:|=*' - "$snames[@]" && ret=0
     compadd -S= "$expl[@]" -M 'r:|[_-]=* r:|=*' - "${(@k)names}" && ret=0
     compadd -qS= "$expl[@]" -M 'r:|[_-]=* r:|=*' - "${(@k)onames}" && ret=0
@@ -356,11 +352,12 @@ else
 
       eval ws\=\( "${action[3,-3]}" \)
 
-      if _display tmp ws; then
-        compadd "$expl[@]" -y tmp - "${(@)ws%%:*}"
+      if [[ -n "$compconfig[describe_values]" &&
+            "$compconfig[describe_values]" != *\!${cmd}* ]] &&
+         _display tmp "$ws[@]"; then
+	compadd "$expl[@]" -M 'r:|[_-]=* r:|=*' -ld tmp - "${(@)ws%%:*}"
       else
-        _message "$descr"
-        return 1
+	compadd "$expl[@]" - "${(@)ws%%:*}"
       fi
     elif [[ "$action" = \(*\) ]]; then
 
