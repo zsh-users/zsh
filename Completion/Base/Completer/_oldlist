@@ -15,7 +15,7 @@ zstyle -s ":completion:${curcontext}:" old-list list
 
 if [[ -n $compstate[old_list] && $list != never &&
       $LASTWIDGET != _complete_help && $WIDGET != _complete_help ]]; then
-  if [[ $WIDGET = *list* && ( $list = always || $list != shown ) ]]; then
+  if [[ $WIDGETSTYLE = *list* && ( $list = always || $list != shown ) ]]; then
     compstate[old_list]=keep
     return 0
   elif [[ $list = *${_lastcomp[completer]}* ]]; then
@@ -39,11 +39,11 @@ if [[ -z $compstate[old_insert] && -n $compstate[old_list] &&
       $LASTWIDGET != _complete_help && $WIDGET != _complete_help ]]; then
   compstate[old_list]=keep
   return 0
-elif [[ $WIDGET = *complete(|-prefix|-word) ]] &&
+elif [[ $WIDGETSTYLE = *complete(|-prefix|-word) ]] &&
      zstyle -T ":completion:${curcontext}:" old-menu; then
   if [[ -n $compstate[old_insert] ]]; then
     compstate[old_list]=keep
-    if [[ $WIDGET = *reverse* ]]; then
+    if [[ $WIDGETSTYLE = *reverse* ]]; then
       compstate[insert]=$(( compstate[old_insert] - 1 ))
     else
       compstate[insert]=$(( compstate[old_insert] + 1 ))

@@ -1,3 +1,7 @@
+2004-09-16  Peter Stephenson  <pws@csr.com>
+
+	* 20364: Functions/Completer/_oldlist: use $WIDGETSTYLE.
+
 2004-09-13  Peter Stephenson  <pws@csr.com>
 
 	* 20363: Src/init.c, Src/Zle/zle_main.c: exiting after 10 EOFs
