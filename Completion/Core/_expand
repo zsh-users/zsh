@@ -7,11 +7,11 @@
 # the expansions done produce no result or do not change the original
 # word from the line.
 
-setopt localoptions nullglob
+setopt localoptions nullglob nonomatch
 
 [[ _matcher_num -gt 1 ]] && return 1
 
-local exp word sort expr expl subd suf=" " force opt
+local exp word sort expr expl subd suf=" " force opt asp tmp opre pre epre
 
 (( $# )) &&
     while getopts gsco opt; do
@@ -46,8 +46,8 @@ if [[ "$force" = *s* ]] ||
    { { zstyle -s ":completion:${curcontext}:" substitute expr ||
        { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
          [[ "${(e):-\$[$expr]}" -eq 1 ]] }; then
-  exp=( ${(f)"$(print -lR - ${(e)exp//\\[ 	
-]/ })"} ) 2>/dev/null
+  exp=( "${(e)exp//\\[ 	
+]/ }" )
 else
   exp=( "${exp:s/\\\$/\$}" )
 fi
@@ -81,18 +81,42 @@ subd=("$exp[@]")
       [[ "${(e):-\$[$expr]}" -eq 1 ]] } && 
         [[ "$subd" = "$exp"(|\(N\)) ]] && return 1
 
+zstyle -s ":completion:${curcontext}:" keep-prefix tmp || tmp=changed
+if [[ "$word" = [\~\$]*/* && "$tmp" = (yes|true|on|1|changed) ]]; then
+  epre=( ${(e)~${word%%/*}} )
+  if [[ -n "$epre" && $#epre -eq 1 ]]; then
+    opre="${word%%/*}"
+    pre="$epre[1]"
+    [[ "$tmp" != changed || $#exp -gt 1 ||
+       "${opre}${exp[1]#${pre}}" != "$word" ]] && exp=( ${opre}${^exp#${pre}} )
+  fi
+  [[ $#exp -eq 1 && "$exp[1]" = "$word" ]] && return 1
+fi
+
 # Now add as matches whatever the user requested.
 
 zstyle -s ":completion:${curcontext}:" sort sort
 
 [[ "$sort" = (yes|true|1|on) ]] && exp=( "${(@o)exp}" )
 
+if zstyle -s ":completion:${curcontext}:" add-space tmp; then
+  if [[ "$tmp" != *subst* || "$word" != *\$* || "$exp[1]" = *\$* ]]; then
+    [[ "$tmp" = *file* ]] && asp=file
+    [[ "$tmp" = *(yes|true|1|on|subst)* ]] && asp="yes$asp"
+  fi
+else
+  asp=file
+fi
+
 # If there is only one expansion, add a suitable suffix
 
 if (( $#exp == 1 )); then
-  if [[ -d $exp && "$exp[1]" != */ ]]; then
+  if [[ -d ${exp[1]/${opre}/${pre}} && "$exp[1]" != */ ]]; then
     suf=/
-  elif ! zstyle -T ":completion:${curcontext}:" add-space; then
+  elif [[ "$asp" = yes* ||
+          ( "$asp" = *file && -f "${exp[1]/${opre}/${pre}}" ) ]]; then
+    suf=' '
+  else
     suf=
   fi
 fi
@@ -120,30 +144,30 @@ else
     compadd "$disp[@]" "$expl[@]" -UQ -qS "$suf" - "$exp"
   fi
   if [[ $#exp -gt 1 ]] && _requested expansions; then
-    local i normal dir
+    local i j normal space dir
 
     if [[ "$sort" = menu ]]; then
       _description expansions expl expansions "o:$word"
     else
       _description -V expansions expl expansions "o:$word"
     fi
-    if zstyle -T ":completion:${curcontext}:" add-space; then
-      suf=' '
-    else
-      suf=
-    fi
     normal=()
+    space=()
     dir=()
 
     for i in "$exp[@]"; do
-      if [[ -d "$i" && "$i" != */ ]]; then
+      j="${i/${opre}/${pre}}"
+      if [[ -d "$j" && "$i" != */ ]]; then
         dir=( "$dir[@]" "$i" )
+      elif [[ "$asp" = yes* || ( "$asp" = *file && -f "$j" ) ]]; then
+        space=( "$space[@]" "$i" )
       else
 	normal=( "$normal[@]" "$i" )
       fi
     done
     (( $#dir ))    && compadd "$expl[@]" -UQ -qS/ -a dir
-    (( $#normal )) && compadd "$expl[@]" -UQ -qS "$suf" -a normal
+    (( $#space ))  && compadd "$expl[@]" -UQ -qS " " -a space
+    (( $#normal )) && compadd "$expl[@]" -UQ -qS "" -a normal
   fi
 
   _requested original expl original && compadd "$expl[@]" -UQ - "$word"

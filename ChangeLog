@@ -1,5 +1,8 @@
 2000-06-08  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11815: Completion/Core/_expand, Doc/Zsh/compsys.yo: trying to
+ 	improve _expand; new keep-prefix style, add-space gives more control
+	
 	* 11814: Src/Zle/zle_tricky.c: make C-code expansion add a space
  	only when more than one word was generated
 	
