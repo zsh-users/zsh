@@ -6,6 +6,9 @@
 
 2000-06-07  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* user/3124: Completion/Core/_normal, Src/Zle/compctl.c: optimise
+ 	command lookup in old and new completion
+	
 	* 11794: Src/Zle/compcore.c, Src/Zle/complist.c, Src/Zle/zle_tricky.c:
  	hopefully more consistent beeping with menu-selection
 	

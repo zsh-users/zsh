@@ -2469,7 +2469,7 @@ makecomplistcmd(char *os, int incmd, int flags)
     return ret;
 }
 
-/* This add the matches for the pattern compctls. */
+/* This adds the matches for the pattern compctls. */
 
 /**/
 static int
@@ -2477,8 +2477,11 @@ makecomplistpc(char *os, int incmd)
 {
     Patcomp pc;
     Patprog pat;
-    char *s = findcmd(cmdstr, 1);
+    char *s;
     int ret = 0;
+
+    s = ((shfunctab->getnode(shfunctab, cmdstr) ||
+	  builtintab->getnode(builtintab, cmdstr)) ? NULL : findcmd(cmdstr, 1));
 
     for (pc = patcomps; pc; pc = pc->next) {
 	if ((pat = patcompile(pc->pat, PAT_STATIC, NULL)) &&
