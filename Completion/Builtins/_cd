@@ -25,41 +25,7 @@ if [[ CURRENT -eq 3 ]]; then
   rep=(${${rep#${PWD%%$words[2]*}}%${PWD#*$words[2]}})
   _description expl replacement
   (( ! $#rep )) || compadd "$expl[@]" $rep
-elif [[ $PREFIX = [-+]* ]]; then
-  # pushd: just complete the numbers, but show the full directory list with
-  # numbers.
-  # For - we do the same thing, but reverse the numbering (other
-  # way round if pushdminus is set).
-  # The test is for pu* because I have an alias pu since I'm too
-  # lazy to type pushd.
-  IPREFIX=$PREFIX[1]
-  PREFIX=$PREFIX[2,-1]
-  local list lines revlines ret=1 i
-
-  # get the list of directories with their canonical number
-  # and turn the lines into an array, removing the current directory
-  lines=( ${${(f)"$(dirs -v)"}##0*} )
-  if [[ ( $IPREFIX = - && ! -o pushdminus ) ||
-        ( $IPREFIX = + && -o pushdminus ) ]]; then
-    integer i
-    revlines=( $lines )
-    for (( i = 1; i <= $#lines; i++ )); do
-      lines[$i]="$((i-1)) -- ${revlines[-$i]##[0-9]#[	 ]#}"
-    done
-  else
-    for (( i = 1; i <= $#lines; i++ )); do
-      lines[$i]="$i -- ${lines[$i]##[0-9]#[	 ]#}"
-    done
-  fi
-  # get the array of numbers only
-  list=(${lines%% *})
-  _description expl 'directory stack index'
-  compadd "$expl[@]" -ld lines -V dirs -Q - "$list[@]" && ret=0
-  [[ -z $compstate[list] ]] && compstate[list]=list && ret=0
-  [[ -n $compstate[insert] ]] && compstate[insert]=menu && ret=0
-
-  return ret
-elif [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
+elif _popd || [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
   local tdir tdir2
   # With cdablevars, we can convert foo/bar/... to ~foo/bar/... if
   # there is no directory foo.  In that case we could also complete
