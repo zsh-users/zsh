@@ -3,7 +3,7 @@
 # If given the `-m <pattern>' option, this tries to complete only pids
 # of processes whose command line match the `<pattern>'.
 
-local out pids index list expl match desc listargs args all nm ret=1
+local out pids list expl match desc listargs args all nm ret=1
 
 _tags processes || return 1
 
@@ -27,8 +27,7 @@ desc="$out[1]"
 out=( "${(@M)out[2,-1]:#${~match}}" )
 
 if [[ "$desc" = (#i)(|*[[:blank:]])pid(|[[:blank:]]*) ]]; then
-  index="${#desc[1,(r)(#i)[[:blank:]]pid]}"
-  pids=( "${(@)${(@M)out#${(l:index::?:)~:-}[^[:blank:]]#}##*[[:blank:]]}" )
+  pids=( "${(@)${(@M)out#${(l.${#desc[1,(r)(#i)[[:blank:]]pid]}..?.)~:-}[^[:blank:]]#}##*[[:blank:]]}" )
 else
   pids=( "${(@)${(@M)out##[^0-9]#[0-9]#}##*[[:blank:]]}" )
 fi

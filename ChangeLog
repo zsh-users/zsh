@@ -1,3 +1,7 @@
+2000-08-16  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* unposted: Completion/Builtins/_pids: remove unnecessary local parameter
+
 2000-08-15  Peter Stephenson  <pws@csr.com>
 
 	* 12650: Completion/Builtins/_zmodload: don't lists aliases if
