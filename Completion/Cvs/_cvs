@@ -1,0 +1,14 @@
+#compdef cvs
+
+# "+Qqrwtnlvb:T:e:d:Hfz:s:xa"
+_arguments -s \
+  -{a,f,H,l,n,Q,q,r,t,v,w,x} \
+  '--version' '--help' '--help-commands' '--help-synonyms' '--help-options' \
+  '--allow-root=-:rootdir:_files -/' \
+  '-b+:bindir:_cvs_bindir' \
+  '-T+:temporary directory:_cvs_tempdir' \
+  '-d+:cvsroot:_cvs_root' \
+  '-e+:editor:_cvs_editor' \
+  '-s+:user variable:_cvs_user_variable' \
+  '-z:gzip level:_cvs_gzip_level' \
+  '*::cvs command:_cvs_command'

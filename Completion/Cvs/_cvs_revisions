@@ -1,0 +1,3 @@
+#autoload
+
+compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##}%%[ 	]*}

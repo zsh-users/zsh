@@ -1,0 +1,7 @@
+#autoload
+
+# "+k:m:"
+_arguments -s \
+  '-k+:keyword substitution:_cvs_k' \
+  '-m+:message:_cvs_m' \
+  '*:file:_cvs_files_unmaintained' \

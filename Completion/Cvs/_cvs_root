@@ -1,0 +1,11 @@
+#autoload
+
+if (( ! $+_cvs_roots )); then
+  if [[ -f ~/.cvspass ]]; then
+    _cvs_roots=(${${(f)"$(<~/.cvspass)"}%% *})
+  else
+    _cvs_roots=()
+  fi
+fi
+
+compadd "$@" $_cvs_roots || _files "$@" -/

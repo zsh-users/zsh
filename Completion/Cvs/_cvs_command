@@ -1,0 +1,42 @@
+#autoload
+
+typeset -A commands
+commands=(add "ad new"            admin "adm rcs"         annotate ann
+	  checkout "co get"       commit "ci com"         diff "di dif"
+	  edit ""                 editors ""              export "exp ex"
+	  history "hi his"        import "im imp"         init ""
+	  log "lo rlog"           login "logon lgn"       logout ""
+	  rdiff patch             release "re rel"        remove "rm delete"
+	  status "st stat"        rtag "rt rfreeze"       tag "ta freeze"
+	  unedit ""               update "up upd"         watch ""
+	  watchers "")
+
+if (( CURRENT == 1 )); then
+  compadd ${(k)commands} || compadd ${(kv)=commands}
+else
+  case "$words[1]" in
+    add|ad|new) _cvs_add;;
+    admin|adm|rcs) _cvs_admin;;
+    annotate|ann) _cvs_annotate;;
+    checkout|co|get) _cvs_checkout;;
+    commit|ci|com) _cvs_commit;;
+    diff|di|dif) _cvs_diff;;
+    edit) _cvs_edit;;
+    editors) _cvs_editors;;
+    export|exp|ex) _cvs_export;;
+    history|hi|his) _cvs_history;;
+    import|im|imp) _cvs_import;;
+    init) _cvs_init;;
+    login|logon|lgn|logout) _cvs_login;;
+    rdiff|patch|pa) _cvs_rdiff;;
+    release|re|rel) _cvs_release;;
+    remove|rm|delete) _cvs_remove;;
+    status|st|stat) _cvs_status;;
+    tag|ta|freeze) _cvs_tag;;
+    unedit) _cvs_unedit;;
+    update|up|upd) _cvs_update;;
+    watch) _cvs_watch;;
+    watchers) _cvs_watchers;;
+    *) _message "unknown cvs command: $words[1]";;
+  esac
+fi

@@ -1,0 +1,9 @@
+#autoload
+
+if [[ -prefix */ ]]; then
+  qpref="${PREFIX%/*}/"
+  pref=$~qpref
+else
+  qpref=
+  pref=./
+fi

@@ -331,9 +331,12 @@ while [[ cur -gt 0 ]]; do
 
       if [[ -n "$uns" ]]; then
 	uns="${(j::)${(@k)oneshot[(I)${ws[1][1]}[$uns]]#[-+]}}"
-	unset "opts[${(@)^opts[(I)${ws[1][1]}[$uns]]}]" \
-	      "dopts[${(@)^dopts[(I)${ws[1][1]}[$uns]]}]" \
-	      "odopts[${(@)^odopts[(I)${ws[1][1]}[$uns]]}]"
+	tmp=(
+	  "opts[${(@)^opts[(I)${ws[1][1]}[$uns]]}]"
+	  "dopts[${(@)^dopts[(I)${ws[1][1]}[$uns]]}]"
+	  "odopts[${(@)^odopts[(I)${ws[1][1]}[$uns]]}]"
+	)
+	(( $#tmp )) && unset "$tmp[@]"
       fi
 
       # If we didn't find a matching option description and we were
@@ -442,9 +445,12 @@ else
 
     if [[ -n "$uns" ]]; then
       uns="${(j::)${(@k)oneshot[(I)${ws[1][1]}[$uns]]#[-+]}}"
-      unset "opts[${(@)^opts[(I)${pre[1]}[$uns]]}]" \
-	    "dopts[${(@)^dopts[(I)${pre[1]}[$uns]]}]" \
-	    "odopts[${(@)^odopts[(I)${pre[1]}[$uns]]}]"
+      tmp=(
+	"opts[${(@)^opts[(I)${pre[1]}[$uns]]}]"
+	"dopts[${(@)^dopts[(I)${pre[1]}[$uns]]}]"
+	"odopts[${(@)^odopts[(I)${pre[1]}[$uns]]}]"
+      )
+      (( $#tmp )) && unset "$tmp[@]"
     fi
 
     if [[ -n "$opt" ]]; then
@@ -458,7 +464,7 @@ else
 	if [[ -n "$sopts" && -n "$PREFIX" && "$PREFIX" = [-+]${~soptseq}[$sopts] ]]; then
 	  if [[ "$PREFIX" = [-+]${~soptseq1} ]]; then
 	    compadd "$expl[@]" -Q \
-                    -y "( ${(k)opts} ${(k)dopts} ${(k)odopts} )" - \
+                    -y "( ${(j: :)${(@M)${(@k)opts}:#[-+]?}} ${(j: :)${(@M)${(@k)dopts}:#[-+]?}} ${(j: :)${(@M)${(@k)odopts}:#[-+]?}} )" - \
                     "${PREFIX}${(@k)^opts[(I)${PREFIX[1]}?]#?}" \
 		    "${PREFIX}${(@k)^dopts[(I)${PREFIX[1]}?]#?}" \
 		    "${PREFIX}${(@k)^odopts[(I)${PREFIX[1]}?]#?}" && ret=0

@@ -1,0 +1,11 @@
+#autoload
+
+# "+ANnk:d:flRpQqcsr:D:j:P"
+_arguments -s \
+  -{A,N,n,f,l,R,q,c,s,P} \
+  '-k+:keyword substitution:_cvs_k' \
+  '-d+:directory:_files -/' \
+  '-r+:tag:_cvs_revisions' \
+  '-D+:date:_cvs_D' \
+  '-j+:tag:_cvs_revisions' \
+  '*:module:_cvs_modules'

@@ -1,0 +1,7 @@
+#autoload
+
+if compset -P -; then
+  _message 'descriptive text'
+else
+  _files "$@"
+fi

@@ -1,0 +1,12 @@
+#autoload
+
+# "+ApPflRQqduk:r:D:j:I:W:"
+_arguments -s \
+  -{A,p,P,f,l,R,Q,q,d,u} \
+  '-k+:keyword substitution:_cvs_k' \
+  '-r+:tag:_cvs_revisions' \
+  '-D+:date:_cvs_D' \
+  '-j+:tag:_cvs_revisions' \
+  '*-I+:name:_files' \
+  '*-W+:spec:' \
+  '*:file:_cvs_files'

@@ -1,0 +1,10 @@
+#autoload
+
+local qpref pref entries
+_cvs_setup_prefix
+if [[ -d ${pref}CVS ]]; then
+  _cvs_setup_allentries
+  (( $#entries )) && compgen "$@" -g "${(j:|:)${(@)entries:q}}"
+else
+  _files "$@"
+fi
