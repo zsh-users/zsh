@@ -1,5 +1,9 @@
 2000-04-19  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10828: Src/module.c, Src/Zle/zle_tricky.c: ensure zsh/compctl
+ 	(ick!) module is loaded when zle is loaded from init file but
+ 	zsh/complete isn't
+	
 	* 10816: Completion/Core/_main_complete, Doc/Zsh/compsys.yo,
  	Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: default for
  	list-prompt style, %[MLP] use fixed-width strings, %[mlp] use

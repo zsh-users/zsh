@@ -523,6 +523,9 @@ docomplete(int lst)
     if (undoing)
 	setlastline();
 
+    if (!module_loaded("zsh/complete"))
+	load_module("zsh/compctl");
+
     if (runhookdef(BEFORECOMPLETEHOOK, (void *) &lst))
 	return 0;
 
