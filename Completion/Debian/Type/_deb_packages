@@ -1,0 +1,80 @@
+#autoload
+
+# Usage: _deb_packages expl... avail|installed|uninstalled
+
+_deb_packages_update_avail () {
+  if ( [[ ${+_deb_packages_cache_avail} -eq 0 ]] ||
+      _cache_invalid DEBS_avail ) && ! _retrieve_cache DEBS_avail;
+  then
+    _deb_packages_cache_avail=(
+      ${(f)"$(apt-cache dumpavail | awk '/^Package:/ { print $2 }')"}
+    )
+
+    _store_cache DEBS_avail _deb_packages_cache_avail
+  fi
+  cachevar=_deb_packages_cache_avail
+}
+
+_deb_packages_update_installed () {
+  if ( [[ ${+_deb_packages_cache_installed} -eq 0 ]] ||
+      _cache_invalid DEBS_installed ) && ! _retrieve_cache DEBS_installed;
+  then
+    _deb_packages_cache_installed=(
+      ${${${(f)"$(dpkg --get-selections)"}:#*deinstall}%%	*}
+    )
+    _store_cache DEBS_installed _deb_packages_cache_installed
+  fi
+  cachevar=_deb_packages_cache_installed
+}
+
+_deb_packages_update_uninstalled () {
+  _deb_packages_update_avail
+  _deb_packages_update_installed
+  if (( ! $+_deb_packages_cache_uninstalled )); then
+    _deb_packages_cache_uninstalled=(
+      ${_deb_packages_cache_avail:#${(j:|:)~${_deb_packages_cache_installed:q}}}
+    )
+  fi
+  cachevar=_deb_packages_cache_uninstalled
+}
+
+_deb_packages () {
+  local command="$argv[$#]" expl cachevar pkgset update_policy
+
+  zstyle -s ":completion:*:*:$service:*" cache-policy update_policy
+  if [[ -z "$update_policy" ]]; then
+    zstyle ":completion:*:*:$service:*" cache-policy _debs_caching_policy
+  fi
+
+  [[ "$command" = (installed|uninstalled|avail) ]] || {
+    _message "_deb_packages:unknown command: $command"
+    return
+  }
+
+  zstyle -s ":completion:${curcontext}:" packageset pkgset
+
+  [[ "$pkgset" = (installed|uninstalled|avail|available) ]] || {
+    pkgset="$command"
+  }
+
+  [[ "$pkgset" = "available" ]] && pkgset="avail"
+
+  expl=("${(@)argv[1,-2]}")
+
+  _deb_packages_update_$pkgset
+
+  _tags packages && compadd "$expl[@]" - "${(@P)cachevar}"
+}
+
+ _debs_caching_policy () {
+    # rebuild if cache is more than a week old
+      oldp=( "$1"(mw+1) )
+        (( $#oldp )) && return 0
+
+	  [[ /var/cache/apt/pkgcache.bin -nt "$1" ||
+	     /var/lib/dpkg/available -nt "$1" ]]
+	  }
+
+
+
+_deb_packages "$@"
