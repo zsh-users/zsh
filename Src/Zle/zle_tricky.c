@@ -7272,13 +7272,23 @@ makearray(LinkList l, int s, int *np, int *nlp, int *llp)
 		nl++;
 	}
 	*cp = NULL;
-    } else
+    } else {
+	for (ap = rp; *ap; ap++) {
+	    for (bp = cp = ap + 1; *bp; bp++) {
+		if (!matcheq(*ap, *bp))
+		    *cp++ = *bp;
+		else
+		    n--;
+	    }
+	    *cp = NULL;
+	}
 	for (ap = rp; *ap; ap++) {
 	    if ((*ap)->disp && ((*ap)->flags & CMF_DISPLINE))
 		ll++;
 	    if ((*ap)->flags & CMF_NOLIST)
 		nl++;
 	}
+    }
     if (np)
 	*np = n;
     if (nlp)
