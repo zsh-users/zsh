@@ -1,0 +1,16 @@
+#compdef acroread pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf
+
+local expl ext=''
+
+# ghostscript:
+#  pdf2dsc pdf2ps
+# xpdf:
+#  pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf
+
+if [[ "$1" == '-z' ]]; then
+  ext='(|.gz|.Z)'
+  shift
+fi
+
+_description files expl 'PDF file'
+_files "$@" "$expl[@]" -g "*.(#i)pdf$ext"
