@@ -1,3 +1,10 @@
+2001-04-30  Andrej Borsenkow <bor@zsh.org>
+
+	* Bart: 14144 (modified):  Src/Modules/stat.c
+	The S_IXUSR, S_IXGRP, S_IXOTH are made external variables in
+	Cygwin 1.3.1 and cannot be used as static array initializer
+	anymore.
+
 2001-04-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/3837: Completion/compinit: Add `NO_kshglob' to

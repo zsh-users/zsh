@@ -54,12 +54,32 @@ statmodeprint(mode_t mode, char *outbuf, int flags)
     }
     if (flags & STF_STRING) {
 	static const char *modes = "?rwxrwxrwx";
-	static const mode_t mflags[] = { S_IRUSR, S_IWUSR, S_IXUSR,
-					 S_IRGRP, S_IWGRP, S_IXGRP,
-					 S_IROTH, S_IWOTH, S_IXOTH };
+	static const mode_t mflags[9] = {
+#ifdef __CYGWIN__
+	    0
+#else
+	    S_IRUSR, S_IWUSR, S_IXUSR,
+	    S_IRGRP, S_IWGRP, S_IXGRP,
+	    S_IROTH, S_IWOTH, S_IXOTH
+#endif
+	};
 	const mode_t *mfp = mflags;
 	char pm[11];
 	int i;
+
+#ifdef __CYGWIN__
+	if (mflags[0] == 0) {
+	    mflags[0] = S_IRUSR;
+	    mflags[1] = S_IWUSR;
+	    mflags[2] = S_IXUSR;
+	    mflags[3] = S_IRGRP;
+	    mflags[4] = S_IWGRP;
+	    mflags[5] = S_IXGRP;
+	    mflags[6] = S_IROTH;
+	    mflags[7] = S_IWOTH;
+	    mflags[8] = S_IXOTH;
+	}
+#endif
 
 	if (S_ISBLK(mode))
 	    *pm = 'b';
