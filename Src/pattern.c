@@ -2577,7 +2577,7 @@ patmatch(Upat prog)
 
 		if (P_OP(scan) == P_EXACTLY) {
 		    char *nextexact = savexact;
-		    DPUTS(!savexact || !*savexact,
+		    DPUTS(!savexact,
 			  "BUG: exact match has not set exactpos");
 		    CHARINC(nextexact);
 

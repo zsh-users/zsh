@@ -1,5 +1,8 @@
 2004-11-19  Peter Stephenson  <pws@csr.com>
 
+	* 20568: Src/pattern.c: in debug test, checking for NULL
+	character is no longer valid.
+
 	* 20566: Src/signames2.awk: prefer SIGCHLD to SIGCLD.
 	Also (unposted) prefer SIGPOLL to SIGIO.
 
