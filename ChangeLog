@@ -1,5 +1,7 @@
 2004-02-29  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
+	* unposted: Doc/Zsh/compsys.yo: fix typo
+
 	* 19498: Completion/Unix/Command/_antiword: update for version 0.35
 
 2004-02-28  Doug Kearns  <djkea2@mugca.its.monash.edu.au>

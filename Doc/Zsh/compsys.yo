@@ -3832,7 +3832,7 @@ As an example, consider a command taking the options tt(-n) and
 tt(-none), where tt(-n) must be followed by a numeric value in the
 same word.  By using:
 
-example(_argument '-n-: :_guard "[0-9]#" "numeric value"' '-none')
+example(_arguments '-n-: :_guard "[0-9]#" "numeric value"' '-none')
 
 tt(_arguments) can be made to both display the message `tt(numeric
 value)' and complete options after `tt(-n<TAB>)'.  If the `tt(-n)' is
