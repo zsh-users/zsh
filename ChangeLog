@@ -1,5 +1,8 @@
 2003-04-04  Peter Stephenson  <pws@csr.com>
 
+	* 18435: Src/builtin.c, Src/params.c: spotted by Oliver: unsetting
+	a readonly variable returned status 0.
+
 	* 18434: Completion/Unix/Type/_signals: -a option was handled the
 	wrong way round so e.g. `kill -' completed pseudo-signals.
 

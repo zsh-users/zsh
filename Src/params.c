@@ -2214,18 +2214,18 @@ unsetparam(char *s)
 /* Unset a parameter */
 
 /**/
-mod_export void
+mod_export int
 unsetparam_pm(Param pm, int altflag, int exp)
 {
     Param oldpm, altpm;
 
     if ((pm->flags & PM_READONLY) && pm->level <= locallevel) {
 	zerr("read-only variable: %s", pm->nam, 0);
-	return;
+	return 1;
     }
     if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
 	zerr("%s: restricted", pm->nam, 0);
-	return;
+	return 1;
     }
     pm->unsetfn(pm, exp);
     if ((pm->flags & PM_EXPORTED) && pm->env) {
@@ -2267,7 +2267,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
      */
     if ((pm->level && locallevel >= pm->level) ||
 	(pm->flags & (PM_SPECIAL|PM_REMOVABLE)) == PM_SPECIAL)
-	return;
+	return 0;
 
     /* remove parameter node from table */
     paramtab->removenode(paramtab, pm->nam);
@@ -2292,6 +2292,8 @@ unsetparam_pm(Param pm, int altflag, int exp)
     }
 
     paramtab->freenode((HashNode) pm); /* free parameter node */
+
+    return 0;
 }
 
 /* Standard function to unset a parameter.  This is mostly delegated to *

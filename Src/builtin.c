@@ -2580,8 +2580,10 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		zerrnam(name, "%s: invalid element for unset", s, 0);
 		returnval = 1;
 	    }
-	} else
-	    unsetparam_pm(pm, 0, 1);
+	} else {
+	    if (unsetparam_pm(pm, 0, 1))
+		returnval = 1;
+	}
 	if (ss)
 	    *ss = '[';
     }
