@@ -29,3 +29,48 @@ while true; do sed -e 's/foo/bar/' Src/builtin.c >/dev/null; done
 # ignoring the error messages from sed.
 # ^Z is more of a problem since you have to catch the sed.
 while true; do sed -e 's/foo/bar/' non-existent-file >/dev/null; done
+
+# Try
+#   ^Z
+#   fg
+#   ^Z
+#   fg
+fn() {
+  local a
+  while read a; do :; done
+  less "$@"
+}
+cat foo | fn bar
+
+# Try
+#   ^Z
+#   fg
+fn() {
+  cat builtin.c
+}
+fn | while read a; do :; done
+
+# Try
+#   ^Z
+#   fg
+#   q
+#   ^Z
+#   fg
+#   q
+fn() {
+  less builtin.c
+  echo done
+}
+x=2; while (( x-- )); do f; done
+
+# Try
+#   ^C
+# This won't work because zcat doesn't tell us that it received a signal.
+# But
+#   ^Z
+#   fg
+#   ^C (probably a second ^C is needed: if the continued zcat is still running)
+# works.
+# (See also the file Etc/BUGS)
+while true; do zcat foo.gz > /dev/null; done
+

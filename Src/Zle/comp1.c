@@ -105,6 +105,7 @@ int incompfunc;
 /**/
 zlong compcurrent,
       compnmatches,
+      compnnmatches,
       compmatcher,
       compmatchertot,
       complistmax;

@@ -34,6 +34,7 @@ Globbing changes:
   - Case-insensitive and approximate globbing.
   - Ordering and indexing of globbing matches, e.g. *(om[1]) picks
     most recently modified file.
+  - General file mode qualifier with chmod(1)-like syntax, e.g. *(f:u+wx:)
 
 New loadable modules:
   - zftp, plus associated function suite, for turning your zsh session

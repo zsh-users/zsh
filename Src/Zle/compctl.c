@@ -2210,6 +2210,7 @@ static struct compparam compkparams[] = {
     { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
     { "old_insert", PM_SCALAR, VAL(compoldins), NULL, NULL },
     { "vared", PM_SCALAR, VAL(compvared), NULL, NULL },
+    { "normal_nmatches", PM_INTEGER, VAL(compnnmatches), NULL, NULL },
     { NULL, 0, NULL, NULL, NULL }
 };
 

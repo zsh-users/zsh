@@ -241,6 +241,7 @@ lexsave(void)
     cmdsp = 0;
     inredir = 0;
     hdocs = NULL;
+    histactive = 0;
 
     ls->next = lstack;
     lstack = ls;

@@ -1,4 +1,145 @@
+1999-07-19  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: version 3.1.6-test-2
+
+	* pws: 7192: Src/glob.c: bug with null in pattern if at end of
+	  test string (matched as if a real character).
+
+1999-07-18  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7185: Src/glob.c: don't use strcoll() for character
+	  ranges [...] because it can have side effects.
+
+	* pws: 7184: Src/lex.c: histactive didn't get get zeroed before
+	  non-interactive history use, hence interactive lines with
+	  remhist() were junked more than once.
+
+	* Wayne: 7181: Doc/Zsh/options.y, Doc/Zsh/params.yo: history docs.
+
+	* Wayne: 7180: Src/Zle/complist.c, Src/utils.c: warnings.
+
+1999-07-16  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7172: Doc/Zsh/options.yo, Src/builtin.c, Src/exec.c,
+	  Src/options.c, Src/utils.c, Src/zsh.h: minor bugs with
+	  7164 fixed; CHASE_DOTS resolves ..'s to physical path;
+	  CHASE_LINKS doesn't do logical path rationalization;
+	  xsymlink() and xsymlinks() simplified and option-dependence
+	  removed.
+
+	* Sven: 7171: Src/builtin.c: alternate form of Digital/gcc
+	  bug workaround.
+
+1999-07-15  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7164: Src/builtin.c, Src/exec.c: AUTOCD now allows
+	  paths with symlinks (as real cd always did); simplify code
+	  for testing for existing directory on foo/.. before removing
+	  foo/..; as a side effect, relative cd's from directory which
+	  has been deleted don't work.
+
+	* Sven: 7161: Src/Zle/comp.h, Src/Zle/complist.c,
+	  Src/Zle/zle_tricky.c, Completion/Base/_brace_parameter:
+	  be more careful with quote-prefix/suffix and path-prefix/suffix
+	  especially with accept-and-menu-complete.
+
+	* pws: 7155: Functions/Zftp/zfgoto, Functions/Zftp/zfinit:
+	  zfgoto can cd without needing to re-login; zfinit uses
+	  zmodload -e to check for zftp.
+
+	* Sven: 7154: Src/Zle/complist.c, Src/Zle/zle_refresh.c,
+	  Src/Zle/zle_tricky.c, Doc/Zsh/mod_complist.yo: don't
+	  list too many times on ambiguous completion; don't do
+	  menu-selection if no alwayslastprompt behaviour.
+
+1999-07-14  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7148: INSTALL: User subdirectory
+
+	* Thomas Köhler: 7146: Completion/User/_make: didn't work.
+
+	* pws: 7145: Completion/User/_sh: use compset -q for completing
+	  after -c option	  
+
+	* Sven: 7143: Src/Zle/complist.c, Src/Zle/zle_tricky.c:
+	  listing got confused with only hidden matches.
+
+	* Sven: 7141: Completion/Core/_path_files: if there are
+	  no completions in a valid directory when we have a path ending
+	  in /, use the directory as a completion, to avoid
+	  correction/approximation of the existing directory.
+
+	* pws: 7139: Src/builtin.c: not particularly pleasant fix
+	  to problem that `cd nonexistent/..' silently did nothing, while
+	  making `cd ..' work even if current directory has gone.
+
+	* Sven: 7138: Completion/User/_hosts, Completion/User/_x_options:
+	  _hosts passes arguments as options to compadd.
+
+	* Oliver: 7136: Completion/User/_rlogin,
+	  Completion/User/_x_options: use _hosts.
+
+	* Sven: 7135: Src/Zle/zle_tricky.c, Completion/Core/_path_files:
+	  change quoting of files again.
+
+	* Sven: 7133: Doc/Zsh/expn.yo, Doc/Zsh/mod_complist.yo:
+	  ZLS_COLOURS not required for complist to work.
+
+	* pws: 7127: configure.in: help now shows --disable-dynamic
+	  and --disable-lfs.
+
+	* Sven: 7126: Src/Zle/comp.h, Src/Zle/comp1.c, Src/Zle/compctl.c,
+	  Src/Zle/zle_tricky.c, Doc/Zsh/compwid.yo,
+	  Functions/Zle/incremental-complete-word:  compstate key
+	  normal_nmatches; more i-c-w prompt escapes
+
+	* Sven: 7123: Src/Zle/zle_tricky.c: clear list on expansion
+	  failure.
+
+1999-07-13  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7119: Src/Zle/zle_tricky.c: status from expansion
+	  functions.
+
+	* Sven: 7116: Doc/Zsh/compwid.yo, Doc/Zsh/expn.yo: minor
+	  changes.
+
+	* pws: 7114: Src/parse.c, Src/utils.c: line numbers again:
+	  flushing line in a script made lineno appear one too large;
+	  introduce zwarn() function.
+
+	* Sven/pws: 7112: Src/Zle/zle_params.c, Doc/Zsh/zle.yo: change
+	  array keys to scalar KEYS, works more like read -k;
+	  documentation.
+
+	* Sven: 7110: Src/Modules/zftp.c, Doc/Zsh/compsys.yo,
+	  Etc/MACHINES: signed char warnings in zftp; document
+	  _long_options options; Digital UNIX problem.
+
+	* Sven: 2432: Src/builtin.c: workaround Digital UNIX 4.0 +
+	  gcc 2.8.1 bug.
+	
+	* Sven: zsh-users/2430: Etc/NEWS: mention chmod-like mode glob
+	  qualifier.
+
+	* Sven: 7108: Misc/job-control-tests: more tests
+
+	* Bart: 7107: configure.in: too many x's in lfs handling.
+
+	* Sven: 7106: Functions/Zle/incremental-complete-word: prompting
+	  changes.
+
+	* pws: unposted: update .distfiles and .cvsignore:  _sh, _su
+	  zshcompsys.yo, zshcompwid.yo, zshzftp.yo, zshcompsys.1,
+	  zshcompwid.1, zshzftp.1 were missing from the distribution.
+
+	* Sven: 7105: Src/Zle/Zle_tricky.c: restore the command line
+	  in more places.
+
 1999-07-12  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Sven: 7103: Src/Zle/zle_tricky.c, Doc/Zsh/compwid.yo: update
+	  CURRENT with compset -q; modify test for quoted delimiters.
 
 	* pws: version 3.1.6-test-1
 

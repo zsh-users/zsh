@@ -1192,7 +1192,7 @@ grouping the string as tt([d][cb][a]) and tt([a][bc][d]).
 Non-literal parts of the pattern must match exactly, including characters
 in character ranges: hence tt(LPAR()#a1)tt(RPAR()???)  matches strings of
 length four, by applying rule 4 to an empty part of the pattern, but not
-strings of length three, since all the tt(?) must match.  Other characters
+strings of length two, since all the tt(?) must match.  Other characters
 which must match exactly are initial dots in filenames (unless the
 tt(GLOB_DOTS) option is set), and all slashes in file names, so that
 tt(a/bc) is two errors from tt(ab/c) (the slash cannot be transposed with
@@ -1351,7 +1351,7 @@ bit.
 
 Thus, `tt(*(f70?))' gives the files for which the owner has read,
 write, and execute permission, and for which other group members have
-no rights, independent of the permissions for other user. The pattern
+no rights, independent of the permissions for other users. The pattern
 `tt(*(f-100))' gives all files for which the owner does not have
 execute permission, and `tt(*(f:gu+w,o-rx))' gives the files for which 
 the owner and the other members of the group have at least write
@@ -1455,7 +1455,7 @@ returned list. The syntax is the same as for array
 subscripts. var(beg) and the optional var(end) may be mathematical
 expressions. As in parameter subscripting they may be negative to make 
 them count from the last match backward. E.g.: `tt(*(-OL[1,3]))'
-gives a list of the names of three biggest files.
+gives a list of the names of the three largest files.
 )
 enditem()
 

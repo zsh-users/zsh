@@ -658,6 +658,9 @@ set_pwd_env(void)
     }
 }
 
+/* set if we are resolving links to their true paths */
+static int chasinglinks;
+
 /* The main pwd changing function.  The real work is done by other     *
  * functions.  cd_get_dest() does the initial argument processing;     *
  * cd_do_chdir() actually changes directory, if possible; cd_new_pwd() *
@@ -670,7 +673,6 @@ bin_cd(char *nam, char **argv, char *ops, int func)
 {
     LinkNode dir;
     struct stat st1, st2;
-    int chaselinks;
 
     if (isset(RESTRICTED)) {
 	zwarnnam(nam, "restricted", NULL, 0);
@@ -694,7 +696,7 @@ bin_cd(char *nam, char **argv, char *ops, int func)
 	for (s = *argv; *++s; ops[STOUC(*s)] = 1);
     }
   brk:
-    chaselinks = ops['P'] || (isset(CHASELINKS) && !ops['L']);
+    chasinglinks = ops['P'] || (isset(CHASELINKS) && !ops['L']);
     PERMALLOC {
 	pushnode(dirstack, ztrdup(pwd));
 	if (!(dir = cd_get_dest(nam, argv, ops, func))) {
@@ -702,7 +704,7 @@ bin_cd(char *nam, char **argv, char *ops, int func)
 	    LASTALLOC_RETURN 1;
 	}
     } LASTALLOC;
-    cd_new_pwd(func, dir, chaselinks);
+    cd_new_pwd(func, dir);
 
     if (stat(unmeta(pwd), &st1) < 0) {
 	zsfree(pwd);
@@ -710,7 +712,7 @@ bin_cd(char *nam, char **argv, char *ops, int func)
     } else if (stat(".", &st2) < 0)
 	chdir(unmeta(pwd));
     else if (st1.st_ino != st2.st_ino || st1.st_dev != st2.st_dev) {
-	if (chaselinks) {
+	if (chasinglinks) {
 	    zsfree(pwd);
 	    pwd = metafy(zgetcwd(), -1, META_DUP);
 	} else {
@@ -915,40 +917,49 @@ static char *
 cd_try_chdir(char *pfix, char *dest, int hard)
 {
     char *buf;
+    int dlen, dochaselinks = 0;
 
     /* handle directory prefix */
     if (pfix && *pfix) {
 	if (*pfix == '/')
 	    buf = tricat(pfix, "/", dest);
 	else {
-	    int pwl = strlen(pwd);
 	    int pfl = strlen(pfix);
+	    dlen = strlen(pwd);
 
-	    buf = zalloc(pwl + pfl + strlen(dest) + 3);
+	    buf = zalloc(dlen + pfl + strlen(dest) + 3);
 	    strcpy(buf, pwd);
-	    buf[pwl] = '/';
-	    strcpy(buf + pwl + 1, pfix);
-	    buf[pwl + 1 + pfl] = '/';
-	    strcpy(buf + pwl + pfl + 2, dest);
+	    buf[dlen] = '/';
+	    strcpy(buf + dlen + 1, pfix);
+	    buf[dlen + 1 + pfl] = '/';
+	    strcpy(buf + dlen + pfl + 2, dest);
 	}
     } else if (*dest == '/')
 	buf = ztrdup(dest);
     else {
-	int pwl = strlen(pwd);
+	dlen = strlen(pwd);
 
-	buf = zalloc(pwl + strlen(dest) + 2);
+	buf = zalloc(dlen + strlen(dest) + 2);
 	strcpy(buf, pwd);
-	buf[pwl] = '/';
-	strcpy(buf + pwl + 1, dest);
+	buf[dlen] = '/';
+	strcpy(buf + dlen + 1, dest);
     }
 
-    /* Normalise path.  See the definition of fixdir() for what this means. */
-    fixdir(buf);
+    /* Normalise path.  See the definition of fixdir() for what this means.
+     * We do not do this if we are chasing links.
+     */
+    if (!chasinglinks)
+	dochaselinks = fixdir(buf);
+    else
+	unmetafy(buf, &dlen);
 
     if (lchdir(buf, NULL, hard)) {
-	zsfree(buf);
+	free(buf);
 	return NULL;
     }
+    /* the chdir succeeded, so decide if we should force links to be chased */
+    if (dochaselinks)
+	chasinglinks = 1;
     return metafy(buf, -1, META_NOALLOC);
 }
 
@@ -956,7 +967,7 @@ cd_try_chdir(char *pfix, char *dest, int hard)
 
 /**/
 static void
-cd_new_pwd(int func, LinkNode dir, int chaselinks)
+cd_new_pwd(int func, LinkNode dir)
 {
     List l;
     char *new_pwd, *s;
@@ -972,7 +983,7 @@ cd_new_pwd(int func, LinkNode dir, int chaselinks)
     } else if (func == BIN_CD && unset(AUTOPUSHD))
 	zsfree(getlinknode(dirstack));
 
-    if (chaselinks) {
+    if (chasinglinks) {
 	s = new_pwd;
 	new_pwd = findpwd(s);
 	zsfree(s);
@@ -1039,17 +1050,20 @@ printdirstack(void)
 }
 
 /* Normalise a path.  Segments consisting of ., and foo/.. *
- * combinations, are removed and the path is unmetafied.   */
+ * combinations, are removed and the path is unmetafied.
+ * Returns 1 if we found a ../ path which should force links to
+ * be chased, 0 otherwise.
+ */
 
 /**/
-static void
+int
 fixdir(char *src)
 {
-    char *dest = src;
-    char *d0 = dest;
-#ifdef __CYGWIN__
+    char *dest = src, *d0 = dest;
+#ifdef __CYGWIN
     char *s0 = src;
 #endif
+    int ret = 0;
 
 /*** if have RFS superroot directory ***/
 #ifdef HAVE_SUPERROOT
@@ -1081,19 +1095,40 @@ fixdir(char *src)
 	    while (dest > d0 + 1 && dest[-1] == '/')
 		dest--;
 	    *dest = '\0';
-	    return;
+	    return ret;
 	}
 	if (src[0] == '.' && src[1] == '.' &&
-	  (src[2] == '\0' || src[2] == '/')) {
-	    if (dest > d0 + 1) {
-		/* remove a foo/.. combination */
-		for (dest--; dest > d0 + 1 && dest[-1] != '/'; dest--);
-		if (dest[-1] != '/')
-		    dest--;
+	    (src[2] == '\0' || src[2] == '/')) {
+	    if (isset(CHASEDOTS)) {
+		ret = 1;
+		/* and treat as normal path segment */
+	    } else {
+		if (dest > d0 + 1) {
+		    /*
+		     * remove a foo/.. combination:
+		     * first check foo exists, else return.
+		     */
+		    struct stat st;
+		    *dest = '\0';
+		    if (stat(d0, &st) < 0 || !S_ISDIR(st.st_mode)) {
+			char *ptrd, *ptrs;
+			if (dest == src)
+			    *dest = '.';
+			for (ptrs = src, ptrd = dest; *ptrs; ptrs++, ptrd++)
+			    *ptrd = (*ptrs == Meta) ? (*++ptrs ^ 32) : *ptrs;
+			*ptrd = '\0';
+			return 1;
+		    }
+		    for (dest--; dest > d0 + 1 && dest[-1] != '/'; dest--);
+		    if (dest[-1] != '/')
+			dest--;
+		}
+		src++;
+		while (*++src == '/');
+		continue;
 	    }
-	    src++;
-	    while (*++src == '/');
-	} else if (src[0] == '.' && (src[1] == '/' || src[1] == '\0')) {
+	}
+	if (src[0] == '.' && (src[1] == '/' || src[1] == '\0')) {
 	    /* skip a . section */
 	    while (*++src == '/');
 	} else {
@@ -3249,12 +3284,11 @@ bin_read(char *name, char **args, char *ops, int func)
 	    nchars = 1;
 	args++;
     }
-
-    firstarg = *args;
-    if (*args && **args == '?')
-	args++;
-    /* default result parameter */
+    /* This `*args++ : *args' looks a bit weird, but it works around a bug
+     * in gcc-2.8.1 under DU 4.0. */
+    firstarg = (*args && **args == '?' ? *args++ : *args);
     reply = *args ? *args++ : ops['A'] ? "reply" : "REPLY";
+
     if (ops['A'] && *args) {
 	zwarnnam(name, "only one array argument allowed", NULL, 0);
 	return 1;

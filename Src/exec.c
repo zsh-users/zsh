@@ -3144,9 +3144,24 @@ static int
 cancd2(char *s)
 {
     struct stat buf;
-    char *us = unmeta(s);
+    char *us, *us2 = NULL;
 
+    /*
+     * If CHASEDOTS and CHASELINKS are not set, we want to rationalize the
+     * path by removing foo/.. combinations in the logical rather than
+     * the physical path.  If either is set, we test the physical path.
+     */
+    if (!isset(CHASEDOTS) && !isset(CHASELINKS)) {
+	if (*s != '/')
+	    us = tricat(pwd[1] ? pwd : "", "/", s);
+	else
+	    us = ztrdup(s);
+	fixdir(us2 = us);
+    } else
+	us = unmeta(s);
     return !(access(us, X_OK) || stat(us, &buf) || !S_ISDIR(buf.st_mode));
+    if (us2)
+	free(us2);
 }
 
 /**/

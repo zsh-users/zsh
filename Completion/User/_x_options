@@ -3,7 +3,8 @@
 # A simple pattern completion, just as an example.
 
 if [ "$words[CURRENT-1]" = "-display" ]; then
-  compgen -k hosts -S':0'
+  _compskip=''
+  _hosts -S :0
 else
-  compadd -J options - -display -name -xrm
+  compadd -P- -J options - display name xrm
 fi

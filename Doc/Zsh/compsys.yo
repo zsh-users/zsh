@@ -31,7 +31,7 @@ next section.
 
 Usually, tt(compinstall) will insert code into tt(.zshrc), although if
 that is not writable it will save it in another file and tell you that
-file's locations.  Note that it is up to you to make sure that the lines
+file's location.  Note that it is up to you to make sure that the lines
 added to tt(.zshrc) are actually run; you may, for example, need to move
 them to an earlier place in the file if tt(.zshrc) usually returns early.
 So long as you keep them all together (including the comment lines at the
@@ -92,7 +92,7 @@ will only need to run this yourself if you change the configuration
 (e.g. using tt(compdef)) and then want to dump the new one.  The name of
 the old dumped file will be remembered for this purpose.
 
-If the parameter tt(_compdir) is set, tt(compinit) uses it has a directory
+If the parameter tt(_compdir) is set, tt(compinit) uses it as a directory
 where completion functions can be found; this is only necessary if they are
 not already in the function search path.
 
@@ -489,7 +489,7 @@ non-empty string it should be an expression usable inside a `tt($((...)))'
 arithmetical expression. In this case, expansion of substitutions will
 be done if the expression evaluates to `tt(1)'. For example, with
 
-example(compconf expand_substitute='NUMERIC != 1')
+example(compconf expand_substitute='${NUMERIC:-1} != 1')
 
 substitution will be performed only if given an explicit numeric
 argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
@@ -720,8 +720,8 @@ is used.
 )
 item(tt(_parameters))(
 This should be used to complete parameter names if you need some of the
-extra options of tt(compadd). It first tries to complete only non-local
-parameters. All arguments are passed unchanged to the tt(compadd) builtin.
+extra options of tt(compadd). All arguments are passed unchanged to
+the tt(compadd) builtin.
 )
 item(tt(_options))(
 This can be used to complete option names. The difference to the
@@ -780,9 +780,19 @@ descriptions that contain `tt(=DIR)' or `tt(=PATH)'. These builtin
 patterns can be overridden by patterns given as arguments, however.
 
 This function also accepts the `tt(-X)', `tt(-J)', and `tt(-V)'
-options which are passed unchanged to `tt(compadd)'. Finally, it
-accepts the option `tt(-t)'; if this is given, completion is only done
-on words starting with two hyphens.
+options which are passed unchanged to `tt(compadd)'. If the
+option `tt(-t)' is given, completion is only done on words starting
+with two hyphens. The option `tt(-i) var(patterns)' can be used to
+give patterns for options which should not be completed. The patterns
+can be given as the name of an array parameter or as a literal list in 
+parentheses. E.g. `tt(-i "(--(en|dis)able-FEATURE*)")' will ignore the
+options `tt(--enable-FEATURE)' and `tt(--diable-FEATURE)'. Finally,
+the option `tt(-s) var(pairs)' can be used to describe options
+aliases. Each var(pair) consists of a pattern and a
+replacement. E.g. some tt(configure)-scripts describe options only as
+`tt(--enable-foo)', but also accept `tt(disable-foo)'. To allow
+completion of the second form, one would use
+`tt(-s "(#--enable- --disable-)")'.
 )
 enditem()
 

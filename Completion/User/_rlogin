@@ -1,7 +1,7 @@
 #compdef rlogin rsh ssh
 
 if [[ CURRENT -eq 2 ]]; then
-  compgen -k hosts
+  _hosts
 elif [[ CURRENT -eq 3 ]]; then
   compadd - -l
 else

@@ -12,9 +12,9 @@ not automatically be loaded if it is not linked in:  on systems with
 dynamic loading, `tt(zmodload complist)' is required.
 
 subsect(Parameters)
-For both extensions one of the parameters tt(ZLS_COLORS) or tt(ZLS_COLOURS)
-must be set, even if the value is empty (which uses all the default values
-given below). These describe how matches are highlighted. The format of the
+The parameters tt(ZLS_COLORS) and tt(ZLS_COLOURS) describe how matches
+are highlighted. To turn on highlighting an empty value suffices, in
+which case all the default values given below will be used. The format of the
 value of these parameters is the same as used by the GNU version of the
 tt(ls) command: a colon-separated list of specifications of the form
 `var(name)=var(value)'. The var(name) may be one of the following strings,
@@ -79,7 +79,12 @@ the default values will have no visual effect.
 
 subsect(Menu selection)
 The tt(complist) module also offers an alternative style of selecting
-matches from a list, called menu-selection. It can be invoked directly by
+matches from a list, called menu-selection, which can be used if the
+shell is set up to return to the last prompt after showing a
+completion list (see the tt(ALWAYS_LAST_PROMPT) option in
+ifzman(zmanref(zshoptions))\
+ifnzman(noderef(Options))\
+). It can be invoked directly by
 the widget tt(menu-select) defined by the module.  Alternatively,
 the parameter tt(SELECTMIN) can be set to an integer, which give the
 minimum number of matches that must be present before menu selection is

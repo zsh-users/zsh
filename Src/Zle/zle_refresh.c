@@ -53,7 +53,8 @@ int nlnct;
 /**/
 int showinglist;
 
-/* Non-zero if a completion list was displayed. */
+/* > 0 if a completion list is displayed below the prompt,
+ * < 0 if a list is displayed above the prompt. */
 
 /**/
 int listshown;
@@ -265,7 +266,7 @@ zrefresh(void)
     if (inlist)
 	return;
 
-    if (clearlist && listshown) {
+    if (clearlist && listshown > 0) {
 	if (tccan(TCCLEAREOD)) {
 	    int ovln = vln, ovcs = vcs;
 	    char *nb = nbuf[vln];
@@ -331,7 +332,8 @@ zrefresh(void)
                 tcout(TCCLEAREOD);
             else
                 cleareol = 1;   /* request: clear to end of line */
-	    listshown = 0;
+	    if (listshown > 0)
+		listshown = 0;
 	}
         if (t0 > -1)
             olnct = t0;

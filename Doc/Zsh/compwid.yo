@@ -175,6 +175,12 @@ is unset.
 item(tt(nmatches))(
 The number of matches generated and accepted by the completion code so far.
 )
+item(tt(normal_nmatches))(
+Like tt(nmatches), but counts only matches in the normal set. I.e. file
+names with one of the suffixes from the tt(fignore) array and matches
+put into the alternate set using the tt(-a) option of the tt(compadd)
+builtin command (see below) are not counted.
+)
 item(tt(matcher))(
 When completion is performed with a global match specification as defined
 by
@@ -410,7 +416,7 @@ item(tt(-I) var(ignored-suffix))(
 Like tt(-i), but gives an ignored suffix.
 )
 item(tt(-y) var(array))(
-This gives a number of string to display instead of the matches. This
+This gives a number of strings to display instead of the matches. This
 is like the tt(-y) option of the tt(compctl) builtin command but the
 var(array) argument may only be the name of an array parameter or a
 literal array in parentheses containing the strings to display.
@@ -483,7 +489,7 @@ from the first set are stored. Normally only the matches in the first
 set are used, but if this set is empty, the words from the alternate
 set are used.
 
-The tt(compadd) builtin does not use tt(fignore) parameter and
+The tt(compadd) builtin does not use the tt(fignore) parameter and
 normally stores all words in the first set.  With the tt(-a)-flag
 given, however, the given var(words) are stored in the alternate set unless
 this flag is overridden by the tt(-F) option.
@@ -518,7 +524,7 @@ will be done by the completion code. Normally this is used in
 functions that do the matching themselves.
 
 Note that with tt(compadd) this option does not automatically turn on
-menu completion if tt(AUTO_LIST), unlike the corresponding option of
+menu completion if tt(AUTO_LIST) is set, unlike the corresponding option of
 tt(compctl) and tt(compgen) commands.
 )
 item(tt(-O) var(array))(
@@ -622,9 +628,9 @@ testing and modification is performed as if it were not given.
 item(tt(-q))(
 The word
 currently being completed is split in separate words at the spaces. The 
-resulting words are stored in the tt(words) array, and tt(PREFIX),
-tt(SUFFIX), tt(QIPREFIX), and tt(QISUFFIX) are modified to reflect the 
-word part that is completed.
+resulting words are stored in the tt(words) array, and tt(CURRENT),
+tt(PREFIX), tt(SUFFIX), tt(QIPREFIX), and tt(QISUFFIX) are modified to
+reflect the word part that is completed.
 )
 enditem()
 

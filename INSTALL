@@ -246,9 +246,12 @@ plus those provide functions for the line editor, i.e.
   FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* Zle/*'
 and if the --enable-dynamic option was given, the functions in
 Functions/Zftp, which require the zftp module to be available (see the
-zshzftpsys manual page), will be included as well.  There are also some
-miscellaneous functions with documentation in comments; the complete set
-of functions can be installed with
+zshzftpsys manual page), will be included as well.  Note, however, that
+some of the functions in the User subdirectory are version- and
+system-specific.
+
+There are also some miscellaneous functions with documentation in comments;
+the complete set of functions can be installed with
   FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* \
   Misc/* Zftp/* Zle/*'
 Note you should set this by hand to include `Zftp/*' if you have zftp

@@ -4,32 +4,55 @@
 # to a key.
 
 # This allows incremental completion of a word.  After starting this
-# command, a list of completion choices is shown after every character you
-# type, which you can delete with ^h or DEL.  RET will accept the
-# completion so far.  You can hit TAB to do normal completion and ^g to
-# abort back to the state when you started.
+# command, a list of completion choices can be shown after every character
+# you type, which you can delete with ^h or DEL.  RET will accept the
+# completion so far.  You can hit TAB to do normal completion, ^g to
+# abort back to the state when you started, and ^d to list the matches.
 #
-# Completion keys:
-#   incremental_prompt   Prompt to show in status line during icompletion;
-#                        the sequence `%u' is replaced by the unambiguous
-#                        part of all matches if there is any and it is
-#                        different from the word on the line
-# incremental_stop       Pattern matching keys which will cause icompletion
-#                         to stop and the key to be re-executed
-# incremental_break      Pattern matching keys which will cause icompletion
-#                         to stop and the key to be discarded
-# incremental_completer  Set of completers, like the `completer' key
-#   incremental_list     If set to a non-empty string, the matches will be
-#                        listed on every key-press
+# This works best with the new function based completion system.
+#
+# Configuration keys:
+#
+#  incremental_prompt
+#    Prompt to show in status line during icompletion. The sequence `%u'
+#    is replaced by the unambiguous part of all matches if there is any
+#    and it is different from the word on the line. A `%s' is replaced
+#    with `-no match-', `-no prefix-', or an empty string if there is
+#    no completion matching the word on the line, if the matches have 
+#    no common prefix different from the word on the line or if there is
+#    such a common prefix, respectively. The sequence `%c' is replaced
+#    by the name of the completer function that generated the matches
+#    (without the leading underscore). Finally, `%n' is replaced by the
+#    number of matches generated and `%a' is replaced by an empty string
+#    if the matches are in the normal set (i.e. the one without file names
+#    with one of the suffixes from `fignore') and with ` -alt-' if the
+#    matches are in the alternate set.
+#
+#  incremental_stop
+#    Pattern matching keys which will cause icompletion to stop and the
+#    key to be re-executed.
+#
+#  incremental_break
+#    Pattern matching keys which will cause icompletion to stop and the
+#    key to be discarded.
+#
+#  incremental_completer
+#    Set of completers, like the `completer' key for normal completion.
+#
+#  incremental_list
+#    If set to a non-empty string, the matches will be listed on every
+#    key-press.
+
 
 emulate -L zsh
 unsetopt autolist menucomplete automenu # doesn't work well
 
-local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt word lastl lastr wid twid
+local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt word
+local lastl lastr wid twid num alt
 
 [[ -n "$compconfig[incremental_completer]" ]] &&
-set ${(s.:.)compconfig[incremental_completer]}
-pmpt="${compconfig[incremental_prompt]-incremental completion...}"
+    set ${(s.:.)compconfig[incremental_completer]}
+pmpt="${compconfig[incremental_prompt]-incremental (%c): %u%s}"
 
 if [[ -n "$compconfig[incremental_list]" ]]; then
   wid=list-choices
@@ -40,12 +63,22 @@ fi
 zle $wid "$@"
 LBUFFER="$lbuf"
 RBUFFER="$rbuf"
-if [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
+if (( ! _lastcomp[nmatches] )); then
   word=''
+  state='-no match-'
+elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
+  word=''
+  state='-no prefix-'
 else
   word="${_lastcomp[unambiguous]}"
+  state=''
 fi
-zle -R "${pmpt//\\%u/$word}"
+num=$_lastcomp[normal_nmatches]
+if (( ! num )); then
+  num="${_lastcomp[nmatches]}"
+  alt=' -alt-'
+fi
+zle -R "${${${${${pmpt//\\%u/$word}//\\%s/$state}//\\%c/${_lastcomp[completer][2,-1]}}//\\%n/$num}//\\%a/$alt}"
 read -k key
 
 while [[ '#key' -ne '#\\r' && '#key' -ne '#\\n' &&
@@ -72,12 +105,24 @@ while [[ '#key' -ne '#\\r' && '#key' -ne '#\\n' &&
   zle $twid "$@"
   LBUFFER="$lastl"
   RBUFFER="$lastr"
-  if [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
+  if (( ! _lastcomp[nmatches] )); then
     word=''
+    state='-no match-'
+  elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
+    word=''
+    state='-no prefix-'
   else
     word="${_lastcomp[unambiguous]}"
+    state=''
   fi
-  zle -R "${pmpt//\\%u/$word}"
+  num=$_lastcomp[normal_nmatches]
+  if (( ! num )); then
+    num="${_lastcomp[nmatches]}"
+    alt=' -alt-'
+  else
+    alt=''
+  fi
+  zle -R "${${${${${pmpt//\\%u/$word}//\\%s/$state}//\\%c/${_lastcomp[completer][2,-1]}}//\\%n/$num}//\\%a/$alt}"
   read -k key
 done
 

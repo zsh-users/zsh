@@ -2261,7 +2261,7 @@ zftp_type(char *name, char **args, int flags)
 	fflush(stdout);
 	return 0;
     } else {
-	nt = toupper(*str);
+	nt = toupper(STOUC(*str));
 	/*
 	 * RFC959 specifies other types, but these are the only
 	 * ones we know what to do with.
@@ -2294,7 +2294,7 @@ zftp_mode(char *name, char **args, int flags)
 	fflush(stdout);
 	return 0;
     }
-    nt = str[0] = toupper(*str);
+    nt = str[0] = toupper(STOUC(*str));
     if (str[1] || (nt != 'S' && nt != 'B')) {
 	zwarnnam(name, "transfer mode %s not recognised", str, 0);
 	return 1;
@@ -2651,7 +2651,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
     if ((prefs = getsparam("ZFTP_PREFS"))) {
 	zfprefs = 0;
 	for (ptr = prefs; *ptr; ptr++) {
-	    switch (toupper(*ptr)) {
+	    switch (toupper(STOUC(*ptr))) {
 	    case 'S':
 		/* sendport */
 		zfprefs |= ZFPF_SNDP;

@@ -507,7 +507,10 @@ If unset, the history is not saved.
 )
 vindex(HISTSIZE)
 item(tt(HISTSIZE) <S>)(
-The maximum size of the history list.
+The maximum number of events stored in the internal history list.
+If you use the tt(HIST_EXPIRE_DUPS_FIRST) option, setting this value
+larger than the tt(SAVEHIST) size will give you the difference as a
+cushion for saving duplicated history events.
 )
 vindex(HOME)
 item(tt(HOME) <S>)(

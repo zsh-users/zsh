@@ -67,7 +67,10 @@ line=${line#*@}
 host=${line%%:*}
 dir=${line#*:}
 
-if [[ $user = ftp || $user = anonymous ]]; then
+if [[ $ZFTP_USER = $user && $ZFTP_HOST = $host ]]; then
+  # We're already there, just change directory
+  zfcd ${dir:-~}
+elif [[ $user = ftp || $user = anonymous ]]; then
   # Anonymous ftp, so we don't need password etc.
   zfanon $host && [[ -n $dir ]] && zfcd $dir
 elif [[ $zflastsession = ${host}:* && $user = $zflastuser ]]; then

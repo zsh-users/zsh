@@ -30,23 +30,12 @@
 #include "zsh.mdh"
 #include "utils.pro"
 
-/* Print an error */
-
-/**/
-void
-zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
-{
-    int waserr;
-
-    waserr = errflag;
-    zerrnam(cmd, fmt, str, num);
-    errflag = waserr;
-}
-
 /* name of script being sourced */
 
 /**/
 char *scriptname;
+
+/* Print an error */
  
 /**/
 void
@@ -57,7 +46,27 @@ zerr(const char *fmt, const char *str, int num)
 	    errflag = 1;
 	return;
     }
+    zwarn(fmt, str, num);
     errflag = 1;
+}
+
+/**/
+void
+zerrnam(const char *cmd, const char *fmt, const char *str, int num)
+{
+    if (errflag || noerrs)
+	return;
+
+    zwarnnam(cmd, fmt, str, num);
+    errflag = 1;
+}
+
+/**/
+void
+zwarn(const char *fmt, const char *str, int num)
+{
+    if (errflag || noerrs)
+	return;
     trashzle();
     /*
      * scriptname is set when sourcing scripts, so that we get the
@@ -68,25 +77,29 @@ zerr(const char *fmt, const char *str, int num)
     nicezputs((isset(SHINSTDIN) && !locallevel) ? "zsh" :
 	      scriptname ? scriptname : argzero, stderr);
     fputs(": ", stderr);
-    zerrnam(NULL, fmt, str, num);
+    zerrmsg(fmt, str, num);
 }
 
 /**/
 void
-zerrnam(const char *cmd, const char *fmt, const char *str, int num)
+zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
 {
-    if (cmd) {
-	if (errflag || noerrs)
-	    return;
-	errflag = 1;
-	trashzle();
-	if (unset(SHINSTDIN) || locallevel) {
-	    nicezputs(scriptname ? scriptname : argzero, stderr);
-	    fputs(": ", stderr);
-	}
-	nicezputs(cmd, stderr);
+    if (errflag || noerrs)
+	return;
+    trashzle();
+    if (unset(SHINSTDIN) || locallevel) {
+	nicezputs(scriptname ? scriptname : argzero, stderr);
 	fputs(": ", stderr);
     }
+    nicezputs(cmd, stderr);
+    fputs(": ", stderr);
+    zerrmsg(fmt, str, num);
+}
+
+/**/
+void
+zerrmsg(const char *fmt, const char *str, int num)
+{
     while (*fmt)
 	if (*fmt == '%') {
 	    fmt++;
@@ -302,7 +315,7 @@ slashsplit(char *s)
 
 /**/
 static int
-xsymlinks(char *s, int flag)
+xsymlinks(char *s)
 {
     char **pp, **opp;
     char xbuf2[PATH_MAX*2], xbuf3[PATH_MAX*2];
@@ -325,15 +338,9 @@ xsymlinks(char *s, int flag)
 	    *p = '\0';
 	    continue;
 	}
-	if (unset(CHASELINKS)) {
-	    strcat(xbuf, "/");
-	    strcat(xbuf, *pp);
-	    zsfree(*pp);
-	    continue;
-	}
 	sprintf(xbuf2, "%s/%s", xbuf, *pp);
 	t0 = readlink(unmeta(xbuf2), xbuf3, PATH_MAX);
-	if (t0 == -1 || !flag) {
+	if (t0 == -1) {
 	    strcat(xbuf, "/");
 	    strcat(xbuf, *pp);
 	    zsfree(*pp);
@@ -342,9 +349,9 @@ xsymlinks(char *s, int flag)
 	    metafy(xbuf3, t0, META_NOALLOC);
 	    if (*xbuf3 == '/') {
 		strcpy(xbuf, "");
-		xsymlinks(xbuf3 + 1, flag);
+		xsymlinks(xbuf3 + 1);
 	    } else
-		xsymlinks(xbuf3, flag);
+		xsymlinks(xbuf3);
 	    zsfree(*pp);
 	}
     }
@@ -352,19 +359,19 @@ xsymlinks(char *s, int flag)
     return ret;
 }
 
-/* expand symlinks in s, and remove other weird things */
+/*
+ * expand symlinks in s, and remove other weird things:
+ * note that this always expands symlinks.
+ */
 
 /**/
 char *
 xsymlink(char *s)
 {
-    if (unset(CHASELINKS))
-	return ztrdup(s);
     if (*s != '/')
 	return NULL;
     *xbuf = '\0';
-    if (!xsymlinks(s + 1, 1))
-	return ztrdup(s);
+    xsymlinks(s + 1);
     if (!*xbuf)
 	return ztrdup("/");
     return ztrdup(xbuf);
@@ -374,15 +381,10 @@ xsymlink(char *s)
 void
 print_if_link(char *s)
 {
-    int chase;
-
     if (*s == '/') {
-	chase = opts[CHASELINKS];
-	opts[CHASELINKS] = 1;
 	*xbuf = '\0';
-	if (xsymlinks(s + 1, 1))
+	if (xsymlinks(s + 1))
 	    printf(" -> "), zputs(*xbuf ? xbuf : "/", stdout);
-	opts[CHASELINKS] = chase;
     }
 }
 
@@ -573,7 +575,8 @@ getnameddir(char *name)
 	/* Retrieve an entry from the password table/database for this user. */
 	struct passwd *pw;
 	if ((pw = getpwnam(name))) {
-	    char *dir = xsymlink(pw->pw_dir);
+	    char *dir = isset(CHASELINKS) ? xsymlink(pw->pw_dir)
+		: ztrdup(pw->pw_dir);
 	    adduserdir(name, dir, ND_USERNAME, 1);
 	    str = dupstring(dir);
 	    zsfree(dir);
@@ -3202,7 +3205,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     int meta = 0, control = 0;
 
     if (fromwhere == 6)
-	t = tmp;
+	t = buf = tmp;
     else if (fromwhere != 4)
 	t = buf = zhalloc(strlen(s) + 1);
     else {

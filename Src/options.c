@@ -91,6 +91,7 @@ static struct optname optns[] = {
 {NULL, "braceccl",	      0,			 BRACECCL},
 {NULL, "bsdecho",	      OPT_EMULATE|OPT_SH,	 BSDECHO},
 {NULL, "cdablevars",	      0,			 CDABLEVARS},
+{NULL, "chasedots",	      0,			 CHASEDOTS},
 {NULL, "chaselinks",	      0,			 CHASELINKS},
 {NULL, "clobber",	      OPT_ALL,			 CLOBBER},
 {NULL, "completealiases",     0,			 COMPLETEALIASES},

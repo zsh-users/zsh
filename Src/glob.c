@@ -2724,6 +2724,9 @@ charmatch(Comp c, char *x, char *y)
      * Here we bypass tulower() and tuupper() for speed.
      */
     int xi = (STOUC(UNMETA(x)) & 0xff), yi = (STOUC(UNMETA(y)) & 0xff);
+    /* A NULL is a real null, since a \000 would be metafied. */
+    if (!*x || !*y)
+	return 0;
     return xi == yi ||
 	(((c->stat & C_IGNCASE) ?
 	  ((isupper(xi) ? tolower(xi) : xi) ==
@@ -2926,7 +2929,10 @@ rangematch(char **patptr, int ch, int rchar)
      * and optional ^ have already been skipped.          */
 
     char *pat = *patptr;
-#ifdef HAVE_STRCOLL
+    /* We don't use strcoll() for ranges, since it can have side
+     * effects.  It's less necessary now we have [:posix:] ranges.
+     */
+#if 0
     char l_buf[2], r_buf[2], ch_buf[2];
 
     ch_buf[0] = ch;
@@ -2944,7 +2950,7 @@ rangematch(char **patptr, int ch, int rchar)
 		break;
 	} else if (*pat == '-' && pat[-1] != rchar &&
 		   pat[1] != Outbrack) {
-#ifdef HAVE_STRCOLL
+#if 0
 	    l_buf[0] = PPAT(-1);
 	    r_buf[0] = PAT(1);
 	    if (strcoll(l_buf, ch_buf) <= 0 &&

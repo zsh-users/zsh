@@ -67,7 +67,7 @@ static struct zleparam {
         zleunsetfn, NULL },
     { "LASTWIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_lwidget),
         zleunsetfn, NULL },
-    { "keys", PM_ARRAY | PM_READONLY, NULL, FN(get_keys),
+    { "KEYS", PM_SCALAR | PM_READONLY, NULL, FN(get_keys),
         zleunsetfn, NULL },
     { "NUMERIC", PM_INTEGER | PM_UNSET, FN(set_numeric), FN(get_numeric),
         unset_numeric, NULL },
@@ -247,29 +247,10 @@ get_lwidget(Param pm)
 }
 
 /**/
-static char **
+static char *
 get_keys(Param pm)
 {
-    char **r, **q, *p, *k, c;
-
-    r = (char **) zhalloc((strlen(keybuf) + 1) * sizeof(char *));
-    for (q = r, p = keybuf; (c = *p); q++, p++) {
-	k = *q = (char *) zhalloc(5);
-	if (c & 0x80) {
-	    *k++ = 'M';
-	    *k++ = '-';
-	    c &= 0x7f;
-	}
-	if (c < 32 || c == 0x7f) {
-	    *k++ = '^';
-	    c ^= 64;
-	}
-	*k++ = c;
-	*k = '\0';
-    }
-    *q = NULL;
-
-    return r;
+    return keybuf;
 }
 
 /**/

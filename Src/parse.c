@@ -72,7 +72,13 @@ struct list dummy_list;
 
 #define YYERROR  { tok = LEXERR; return NULL; }
 #define YYERRORV { tok = LEXERR; return; }
-#define COND_ERROR(X,Y) do{herrflush();zerr(X,Y,0);YYERROR}while(0)
+#define COND_ERROR(X,Y) do { \
+  zwarn(X,Y,0); \
+  herrflush(); \
+  if (noerrs != 2) \
+    errflag = 1; \
+  YYERROR \
+} while(0)
 
 #define make_list()     allocnode(N_LIST)
 #define make_sublist()  allocnode(N_SUBLIST)
@@ -140,11 +146,13 @@ par_event(void)
     }
     if (!l) {
 	if (errflag) {
-	    yyerror();
+	    yyerror(0);
 	    return NULL;
 	}
+	yyerror(1);
 	herrflush();
-	yyerror();
+	if (noerrs != 2)
+	    errflag = 1;
 	return NULL;
     } else {
 	l->right = par_event();
@@ -163,7 +171,7 @@ parse_list(void)
     yylex();
     ret = par_list();
     if (tok == LEXERR) {
-	yyerror();
+	yyerror(0);
 	return NULL;
     }
     return ret;
@@ -1480,7 +1488,7 @@ par_cond_multi(char *a, LinkList l)
 
 /**/
 static void
-yyerror(void)
+yyerror(int noerr)
 {
     int t0;
 
@@ -1488,9 +1496,11 @@ yyerror(void)
 	if (!yytext || !yytext[t0] || yytext[t0] == '\n')
 	    break;
     if (t0 == 20)
-	zerr("parse error near `%l...'", yytext, 20);
+	zwarn("parse error near `%l...'", yytext, 20);
     else if (t0)
-	zerr("parse error near `%l'", yytext, t0);
+	zwarn("parse error near `%l'", yytext, t0);
     else
-	zerr("parse error", NULL, 0);
+	zwarn("parse error", NULL, 0);
+    if (!noerr && noerrs != 2)
+	errflag = 1;
 }

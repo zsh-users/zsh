@@ -205,11 +205,30 @@ tt(AUTO_CD) option set) is not a directory, and does not begin with a
 slash, try to expand the expression as if it were preceded by a `tt(~)' (see
 noderef(Filename Expansion)).
 )
+pindex(CHASE_DOTS)
+cindex(cd, with .. in argument)
+item(tt(CHASE_DOTS))(
+When changing to a directory containing a path segment `tt(..)' which would
+otherwise be treated as cancelling the previous segment in the path (in
+other words, `tt(foo/..)' would be removed from the path, or if `tt(..)' is
+the first part of the path, the last part of tt($PWD) would be deleted),
+instead resolve the path to the physical directory.  This option is
+overridden by tt(CHASE_LINKS).
+
+For example, suppose tt(/foo/bar) is a link to the directory tt(/alt/rod).
+Without this option set, `tt(cd /foo/bar/..)' changes to tt(/foo); with it
+set, it changes to tt(/alt).  The same applies if the current directory
+is tt(/foo/bar) and `tt(cd ..)' is used.  Note that all other symbolic
+links in the path will also be resolved.
+)
 pindex(CHASE_LINKS)
 cindex(links, symbolic)
 cindex(symbolic links)
 item(tt(CHASE_LINKS) (tt(-w)))(
 Resolve symbolic links to their true values when changing directory.
+This also has the effect of tt(CHASE_DOTS), i.e. a `tt(..)' path segment
+will be treated as referring to the physical parent, even if the preceeding
+path segment is a symbolic link.
 )
 pindex(CLOBBER)
 cindex(clobbering, of files)
@@ -416,9 +435,13 @@ isn't there.
 pindex(HIST_EXPIRE_DUPS_FIRST)
 cindex(history, expiring duplicates)
 item(tt(HIST_EXPIRE_DUPS_FIRST))(
-If the internal history needs to be trimmed to add a new line,
-setting this option will cause the oldest duplicate history line to
-be lost before losing a unique line from the list.
+If the internal history needs to be trimmed to add the current command line,
+setting this option will cause the oldest history event that has a duplicate
+to be lost before losing a unique event from the list.
+You should be sure to set the value of tt(HISTSIZE) to a larger number
+than tt(SAVEHIST) in order to give you some room for the duplicated
+events, otherwise this option will behave just like
+tt(HIST_IGNORE_ALL_DUPS) once the history fills up with unique events.
 )
 pindex(HIST_IGNORE_ALL_DUPS)
 cindex(history, ignoring all duplicates)

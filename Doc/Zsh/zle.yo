@@ -154,12 +154,9 @@ vindex(LASTWIDGET)
 item(tt(LASTWIDGET) (scalar))(
 The name of the last widget that was executed.
 )
-vindex(keys)
-item(tt(keys) (array))(
-The keys typed to invoke this widget, one element per
-key. Control-keys are reported with a leading `tt(^)', as in `tt(^A)',
-and meta-keys are reported with a leading `tt(M-)', as in `tt(M-a)' and 
-`tt(M-^A)'.
+vindex(KEYS)
+item(tt(KEYS) (scalar))(
+The keys typed to invoke this widget, as a literal string.
 )
 vindex(NUMERIC)
 item(tt(NUMERIC) (integer))(

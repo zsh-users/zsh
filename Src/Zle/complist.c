@@ -308,8 +308,8 @@ complistmatches(Hookdef dummy, Chdata dat)
     Cmatch *p, m;
     Cexpl *e;
     int nlines = 0, ncols, nlist = 0, longest = 1, pnl = 0, opl = 0;
-    int of = isset(LISTTYPES);
-    int mc, ml = 0, cc, hasm = 0, cl;
+    int of = isset(LISTTYPES), cf;
+    int mc, ml = 0, cc, hasm = 0, cl = -1;
     struct listcols col;
 
     if (minfo.asked == 2) {
@@ -317,15 +317,6 @@ complistmatches(Hookdef dummy, Chdata dat)
 	return (noselect = 1);
     }
     getcols(&col);
-
-    /* Set the cursor below the prompt. */
-    if (inselect)
-	clearflag = 0;
-    trashzle();
-    showinglist = listshown = 0;
-
-    clearflag = (isset(USEZLE) && !termflags &&
-		 complastprompt && *complastprompt);
 
     for (g = amatches; g; g = g->next) {
 	char **pp = g->ylist;
@@ -403,6 +394,19 @@ complistmatches(Hookdef dummy, Chdata dat)
 			nlines += 1 + ((1 + niceztrlen(m->str)) / columns);
 	}
     }
+    cf = (isset(USEZLE) && !termflags && complastprompt && *complastprompt);
+    if (!nlines || (mselect >= 0 && (!cf || (nlines + nlnct - 1) >= lines))) {
+	showinglist = listshown = 0;
+	noselect = 1;
+	return 1;
+    }
+    /* Set the cursor below the prompt. */
+    if (inselect)
+	clearflag = 0;
+    trashzle();
+    showinglist = listshown = 0;
+
+    clearflag = cf;
 
     /* Maybe we have to ask if the user wants to see the list. */
     if ((!minfo.cur || !minfo.asked) &&
@@ -654,20 +658,20 @@ complistmatches(Hookdef dummy, Chdata dat)
 	    pnl = 1;
 	g = g->next;
     }
-
     if (clearflag) {
 	/* Move the cursor up to the prompt, if always_last_prompt *
 	 * is set and all that...                                  */
 	if ((nlines += nlnct - 1) < lines) {
 	    tcmultout(TCUP, TCMULTUP, nlines);
 	    showinglist = -1;
-	    listshown = 1;
 	} else
 	    clearflag = 0, putc('\n', shout);
     } else
 	putc('\n', shout);
+    listshown = (clearflag ? 1 : -1);
     if (!hasm || nlines >= lines)
 	noselect = 1;
+
     return noselect;
 }
 
@@ -676,7 +680,7 @@ typedef struct menustack *Menustack;
 struct menustack {
     Menustack prev;
     char *line;
-    int cs;
+    int cs, acc;
     struct menuinfo info;
     Cmgroup amatches, pmatches, lmatches;
 };
@@ -742,19 +746,19 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->amatches = amatches;
 	    s->pmatches = pmatches;
 	    s->lmatches = lmatches;
-	    menucmp = 0;
+	    s->acc = menuacc;
+	    menucmp = menuacc = 0;
 	    fixsuffix();
 	    validlist = 0;
 	    pmatches = NULL;
 	    invalidatelist();
 	    menucomplete(zlenoargs);
 	    if (dat->num < 2 || !minfo.cur || !*(minfo.cur)) {
-		noselect = 1;
-		clearlist = 1;
+		noselect = clearlist = listshown = 1;
 		zrefresh();
 		break;
 	    }
-	    clearlist = 1;
+	    clearlist = listshown = 1;
 	    mselect = (*(minfo.cur))->gnum;
 	    continue;
 	} else if (cmd == Th(z_acceptandhold) ||
@@ -767,6 +771,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->cs = cs;
 	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
 	    s->amatches = s->pmatches = s->lmatches = NULL;
+	    s->acc = menuacc;
 	    acceptlast();
 	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
@@ -782,6 +787,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    spaceinline(l = strlen(u->line));
 	    strncpy((char *) line, u->line, l);
 	    cs = u->cs;
+	    menuacc = u->acc;
 	    memcpy(&minfo, &(u->info), sizeof(struct menuinfo));
 	    p = &(minfo.cur);
 	    if (u->pmatches && pmatches != u->pmatches) {

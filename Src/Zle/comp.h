@@ -218,6 +218,8 @@ struct cmatch {
     int brsl;			/* ...and the suffix */
     char *rems;			/* when to remove the suffix */
     char *remf;			/* shell function to call for suffix-removal */
+    int qipl;			/* length of quote-prefix */
+    int qisl;			/* length of quote-suffix */
     int rnum;			/* group relative number */
     int gnum;			/* global number */
 };
@@ -349,25 +351,25 @@ struct chdata {
 
 
 #define CPN_NMATCHES   0
-#define CP_NMATCHES    (1 <<  CPN_NMATCHES)
+#define CP_NMATCHES    (1 << CPN_NMATCHES)
 #define CPN_MATCHER    1
-#define CP_MATCHER     (1 <<  CPN_MATCHER)
+#define CP_MATCHER     (1 << CPN_MATCHER)
 #define CPN_MATCHERSTR 2
-#define CP_MATCHERSTR  (1 <<  CPN_MATCHERSTR)
+#define CP_MATCHERSTR  (1 << CPN_MATCHERSTR)
 #define CPN_MATCHERTOT 3
-#define CP_MATCHERTOT  (1 <<  CPN_MATCHERTOT)
+#define CP_MATCHERTOT  (1 << CPN_MATCHERTOT)
 #define CPN_CONTEXT    4
-#define CP_CONTEXT     (1 <<  CPN_CONTEXT)
+#define CP_CONTEXT     (1 << CPN_CONTEXT)
 #define CPN_PARAMETER  5
-#define CP_PARAMETER   (1 <<  CPN_PARAMETER)
+#define CP_PARAMETER   (1 << CPN_PARAMETER)
 #define CPN_REDIRECT   6
-#define CP_REDIRECT    (1 <<  CPN_REDIRECT)
+#define CP_REDIRECT    (1 << CPN_REDIRECT)
 #define CPN_QUOTE      7
-#define CP_QUOTE       (1 <<  CPN_QUOTE)
+#define CP_QUOTE       (1 << CPN_QUOTE)
 #define CPN_QUOTING    8
-#define CP_QUOTING     (1 <<  CPN_QUOTING)
+#define CP_QUOTING     (1 << CPN_QUOTING)
 #define CPN_RESTORE    9
-#define CP_RESTORE     (1 <<  CPN_RESTORE)
+#define CP_RESTORE     (1 << CPN_RESTORE)
 #define CPN_LIST       10
 #define CP_LIST        (1 << CPN_LIST)
 #define CPN_FORCELIST  11
@@ -398,6 +400,8 @@ struct chdata {
 #define CP_OLDINS      (1 << CPN_OLDINS)
 #define CPN_VARED      24
 #define CP_VARED       (1 << CPN_VARED)
+#define CPN_NNMATCHES  25
+#define CP_NNMATCHES   (1 << CPN_NNMATCHES)
 
-#define CP_KEYPARAMS   25
+#define CP_KEYPARAMS   26
 #define CP_ALLKEYS     ((unsigned int) 0xffffff)

@@ -2,4 +2,4 @@
 
 : ${(A)hosts:=${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
 
-compgen -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' -k hosts
+compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" - "$hosts[@]"
