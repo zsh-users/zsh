@@ -45,6 +45,7 @@ ZTST_testname=$1
 
 # The source directory is not necessarily the current directory
 ZTST_srcdir=${0%/*}
+[[ ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_testdir/$ZTST_srcdir"
 
 : ${TMPPREFIX:=/tmp/zsh}
 # Temporary files for redirection inside tests.
