@@ -67,6 +67,20 @@ _ssh () {
           *(#i)(batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|useprivileged)*)
 	    _wanted values expl 'truth value' compadd yes no && ret=0
             ;;
+          *(#i)ciphers*)
+            _values -s , 'encryption cipher' \
+		'aes128-cbc' \
+		'3des-cbc' \
+		'blowfish-cbc' \
+		'cast128-cbc' \
+		'arcfour' \
+		'aes192-cbc' \
+		'aes256-cbc' \
+		'rijndael128-cbc' \
+		'rijndael192-cbc' \
+		'rijndael256-cbc' \
+		'rijndael-cbc@lysator.liu.se' && ret=0
+            ;;
           *(#i)cipher*)
 	    _wanted values expl 'encryption cipher' \
                 compadd idea des 3des blowfish arcfour tss none && ret=0
@@ -85,6 +99,11 @@ _ssh () {
           *(#i)(local|remote)forward*)
             state=forward
             ;;
+          *(#i)protocol*)
+            _values -s , 'protocol version' \
+		'1' \
+		'2' && ret=0
+	    ;;
           *(#i)proxycommand*)
             compset -q
             shift 1 words
@@ -109,7 +128,7 @@ _ssh () {
         else
           _wanted values expl 'configure file option' \
               compadd -M 'm:{a-z}={A-Z}' -S '=' - \
-                  BatchMode ClearAllForwardings Cipher Compression \
+                  BatchMode ClearAllForwardings Cipher Ciphers Compression \
                   CompressionLevel Host ConnectionAttempts EscapeChar \
                   FallBackToRsh ForwardAgent ForwardX11 \
                   GlobalKnownHostsFile HostName IdentityFile KeepAlive \
