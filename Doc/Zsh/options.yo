@@ -374,6 +374,8 @@ cindex(command execution, enabling)
 item(tt(EXEC) (tt(PLUS()n), ksh: tt(PLUS()n)) <D>)(
 Do execute commands.  Without this option, commands are
 read and checked for syntax errors, but not executed.
+This option cannot be turned off in an interactive shell,
+except when `tt(-n)' is supplied to the shell at startup.
 )
 pindex(EXTENDED_GLOB)
 cindex(globbing, extended)

@@ -647,6 +647,9 @@ dosetopt(int optno, int value, int force)
 	    for (s = rparams; *s; s++)
 		restrictparam(*s);
 	}
+    } else if(!force && optno == EXECOPT && !value && interact) {
+	/* cannot set noexec when interactive */
+	return -1;
     } else if(!force && (optno == INTERACTIVE || optno == SHINSTDIN ||
 	    optno == SINGLECOMMAND)) {
 	if (opts[optno] == value)
