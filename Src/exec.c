@@ -1356,14 +1356,28 @@ closemn(struct multio **mfds, int fd)
 	closeallelse(mn);
 	if (mn->rflag) {
 	    /* tee process */
-	    while ((len = read(mn->pipe, buf, TCBUFSIZE)) > 0)
+	    while ((len = read(mn->pipe, buf, TCBUFSIZE)) != 0) {
+		if (len < 0) {
+		    if (errno == EINTR)
+			continue;
+		    else
+			break;
+		}
 		for (i = 0; i < mn->ct; i++)
 		    write(mn->fds[i], buf, len);
+	    }
 	} else {
 	    /* cat process */
 	    for (i = 0; i < mn->ct; i++)
-		while ((len = read(mn->fds[i], buf, TCBUFSIZE)) > 0)
+		while ((len = read(mn->fds[i], buf, TCBUFSIZE)) != 0) {
+		    if (len < 0) {
+			if (errno == EINTR)
+			    continue;
+			else
+			    break;
+		    }
 		    write(mn->pipe, buf, len);
+		}
 	}
 	_exit(0);
     }
