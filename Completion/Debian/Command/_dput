@@ -1,9 +1,7 @@
 #compdef dput
 
 if (( ! $+_dput_sites )); then
-  _dput_sites=(
-$(grep "^\[" /etc/dput.cf | sed -e 's,\[,,g' -e 's,\],,g')
-)
+  _dput_sites=( ${${(M)${(f)"$(</etc/dput.cf)"}:#\[*}//[][]/} )
 fi
 
 _arguments '(-c)--config[config file]:config file:' \

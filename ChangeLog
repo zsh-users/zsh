@@ -1,3 +1,8 @@
+2001-11-18  Clint Adams  <clint@zsh.org>
+
+	* 16264: Completion/Debian/Command/_dput:
+	Use parameter expansion instead of grep and sed.
+
 2001-11-16  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 16258: Completion/Mandrake/Command/_urpmi:
