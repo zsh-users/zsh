@@ -1,5 +1,20 @@
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11195: Completion/AIX/_lsdev, Completion/Builtins/_bindkey,
+ 	Completion/Builtins/_compdef, Completion/Builtins/_zcompile,
+ 	Completion/Builtins/_zpty, Completion/Builtins/_zstyle,
+ 	Completion/User/_archie, Completion/User/_bzip2,
+ 	Completion/User/_compress, Completion/User/_enscript,
+ 	Completion/User/_finger, Completion/User/_gzip,
+ 	Completion/User/_imagemagick, Completion/User/_look,
+ 	Completion/User/_lynx, Completion/User/_lzop,
+ 	Completion/User/_mutt, Completion/User/_nedit,
+ 	Completion/User/_nslookup, Completion/User/_socket,
+ 	Completion/User/_telnet, Completion/User/_wget,
+ 	Completion/User/_whois, Completion/X/_xauth: completion function
+ 	cleanup for `_arguments' with the `-C' option and using it's
+ 	return value
+	
 	* 11193: Src/Zle/comp.h, Src/Zle/compcore.c: some more memory
  	initialisation after allocation; shouldn't possibly have done any
  	harm

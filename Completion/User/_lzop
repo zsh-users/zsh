@@ -1,6 +1,6 @@
 #compdef lzop
 
-local expl state line decompress disp
+local expl state line decompress disp curcontext="$curcontext"
 typeset -A opt_args
 
 _arguments -C -s \
@@ -74,7 +74,7 @@ _arguments -C -s \
   '--color[assume a color ANSI terminal]' \
   '--intro[display intro sequence]' \
   '--filter=[preprocess data with a special multimedia filter]:number' \
-  '*:files:->files'
+  '*:files:->files' && return 0
 
 case "$state" in
   files)

@@ -1,9 +1,9 @@
 #compdef zcompile
 
-local context state line expl
+local state line expl curcontext="$curcontext"
 typeset -A opt_args
 
-_arguments -s \
+_arguments -C -s \
     '(-t -c -m -a)-U[don'\''t expand aliases]' \
     '(-t -M)-R[mark as read]' \
     '(-t -R)-M[mark as mapped]' \

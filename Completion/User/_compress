@@ -1,6 +1,7 @@
 #compdef compress uncompress
 
 local expl state line bits common_args1 common_args2 decompress
+local curcontext="$curcontext"
 typeset -A opt_args
 bits=( {9..16} )
 
@@ -18,18 +19,18 @@ common_args2=( \
 
 case "${words[1]:t}" in
   compress)
-    _arguments -s \
+    _arguments -C -s \
       "-b[specify maximum number of bits used to replace common substring]:bits:(${bits[*]})" \
       '-C[produce output compatible with BSD 2.0]' \
       '(-b -C)-d[decompress]' \
-      "${common_args2[@]}"
+      "${common_args2[@]}" && return 0
   ;;
   uncompress)
-    _arguments -s "${common_args2[@]}"
+    _arguments -C -s "${common_args2[@]}" && return 0
     decompress=yes
   ;;
   zcat)
-    _arguments -s "${common_args1[@]}"
+    _arguments -C -s "${common_args1[@]}" && return 0
     decompress=yes
   ;;
 esac
@@ -37,9 +38,11 @@ esac
 if [[ "$state" = files ]]; then
   if [[ -z "$decompress" ]] || (( $+opt_args[-d] )); then
     _description files expl 'file to compress'
-    _files "$expl[@]" -g '*~*.Z'
+    _files "$expl[@]" -g '*~*.Z' && return 0
   else
     _description files expl 'compressed file'
-    _files "$expl[@]" -g '*.Z'
+    _files "$expl[@]" -g '*.Z' && return 0
   fi
 fi
+
+return 1

@@ -1,6 +1,7 @@
 #compdef nedit nc
 
-local state line expl nedit_common
+local state line expl nedit_common curcontext="$curcontext"
+typeset -A opt_args ret=1
 
 nedit_common=( \
   '-read[open file read only]' \
@@ -18,7 +19,7 @@ if [[ $words[1] = *nc ]]; then
     '(-noask)-ask[prompt if no server found]' \
     '(-ask)-noask[start a new server without asking if none found]' \
     '-svrcmd[command to run server]:server command:_command_names -e' \
-    "$nedit_common[@]"
+    "$nedit_common[@]" && ret=0
 else
   _x_arguments -C \
     '-server[designate this session as an nedit server]' \
@@ -41,10 +42,12 @@ else
     '(-fg)-foreground:foreground color:_x_color' \
     '(-foreground)-fg[specify foreground color]:foreground color:_x_color' \
     '*-import[load additional preferences file]:nedit preferences file:_files' \
-    "$nedit_common[@]"
+    "$nedit_common[@]" && ret=0
 fi
 
 [[ $state = lang && -f ~/.nedit ]] &&
     _wanted neditlanguages expl 'language mode' \
         compadd -  ${(f)"$(sed -n \
-            '/^nedit.languageMode/,/^nedit/ s/.*	\([^:]*\).*/\1/p' < ~/.nedit)"}
+            '/^nedit.languageMode/,/^nedit/ s/.*	\([^:]*\).*/\1/p' < ~/.nedit)"} && ret=0
+
+return ret

@@ -7,7 +7,8 @@
 #
 # Where appropriate, will complete keymaps instead of widgets.
 
-local state expl line
+local state expl line curcontext="$curcontext"
+typeset -A opt_args
 
 _arguments -C -s \
   '(-v -a -M -l -D -A -N)-e[select emacs keymap and bind it to main]' \

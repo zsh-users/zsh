@@ -1,8 +1,6 @@
 #compdef gzip gunzip gzcat
 
-local decompress
-local expl
-local curcontext="$curcontext" state line
+local decompress expl curcontext="$curcontext" state line
 typeset -A opt_args
 
 case "${words[1]:t}" in
@@ -10,7 +8,7 @@ gunzip|zcat|gzcat)
   decompress=yes
   ;&
 gzip)
-  _arguments -s \
+  _arguments -C -s \
     '(--to-stdout --stdout)-c[write on standard output]' \
     '(-c --stdout)--to-stdout[write on standard output]' \
     '(-c --to-stdout)--stdout[write on standard output]' \
@@ -53,7 +51,7 @@ gzip)
     '(--fast -1 -2 -3 -4 -5 -6 -7    -9 --best)-8' \
     '(--fast -1 -2 -3 -4 -5 -6 -7 -8    --best)-9' \
     '(--fast -1 -2 -3 -4 -5 -6 -7 -8 -9       )--best' \
-    '*:files:->files'
+    '*:files:->files' && return 0
   ;;
 esac
 

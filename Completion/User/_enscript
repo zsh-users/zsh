@@ -1,8 +1,9 @@
 #compdef enscript
 
-local state context line opt_args
+local state context line curcontext="$curcontext"
+typeset -A opt_args
 
-_arguments -s \
+_arguments -C -s \
   '(   -2 --columns)-1' \
   '(-1    --columns)-2' \
   '(-1 -2          )--columns=:columns:' \
@@ -126,7 +127,7 @@ _arguments -s \
   '--ul-gray=:underlay text'\''s gray level:(.8)' \
   '--ul-position=:underlay text'\''s position:(+0+0 -0-0)' \
   '--ul-style=:underlay text'\''s style:(outline filled)' \
-  '*:filename:_files'
+  '*:filename:_files' && return 0
 
 case "$state" in
 commandline)

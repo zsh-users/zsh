@@ -1,18 +1,17 @@
 #compdef look
 
-local context state line
+local curcontext="$curcontext" state line
 typeset -A opt_args
 
-_arguments -s \
+_arguments -C -s \
   '-t+[termination character]:termination character:' \
   '-f[case insensitive]' \
   '-d[dictionary order]' \
-  ':string:->string'
+  ':string:->string' && return 0
 
 case "$state" in
 string)
-  if [[ -n "$PREFIX" ]]; then
-    compadd - $(_call values $words[1] $PREFIX)
-  fi
+  [[ -n "$PREFIX" ]] &&
+      _wanted values expl value compadd - $(_call values $words[1] $PREFIX)
   ;;
 esac

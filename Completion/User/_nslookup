@@ -19,7 +19,8 @@
 # other characters than lower case letters, we try to call the function
 # `_nslookup_host'.
 
-local context curstate="$curcontext" expl ret=1 setopts
+local state curcontext="$curcontext" expl ret=1 setopts
+typeset -A opt_args
 
 setopts=(
   'all[print current values]' \

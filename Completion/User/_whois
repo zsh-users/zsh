@@ -118,7 +118,7 @@ _whois_single () {
 
   _arguments -C \
     "$_whois_arguments[@]" \
-    ':identifier:->identifier'
+    ':identifier:->identifier' && return 0
 
   case "$state" in
   identifier)
@@ -150,7 +150,7 @@ _whois_multi () {
 
   _arguments -C \
     "$_whois_arguments[@]" \
-    '*::identifier:->identifier'
+    '*::identifier:->identifier' && return 0
 
   case "$state" in
   identifier)

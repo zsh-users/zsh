@@ -14,7 +14,7 @@ _arguments -C \
   '-r[display set of values in a column]:columnname:->columnname' \
   '(-P)-S[specify a device state]:device state:(Available Defined Stopped)' \
   '-s[specify a device subclass]:device subclass:->subclass' \
-  '-t[specify a device type name]:device type name:->devtype'
+  '-t[specify a device type name]:device type name:->devtype' && return 0
 
 case $state in
   class)

@@ -1,6 +1,6 @@
 #compdef display animate import montage convert combine mogrify xtp
 
-local context state line expl formats
+local state line expl formats curcontext="$curcontext"
 typeset -A opt_args
 
 # Things that could be improved:
@@ -187,7 +187,7 @@ montage)
   ;;
 
 convert)
-  _arguments -M 'm:{a-z}={A-Z}' \
+  _arguments -C -M 'm:{a-z}={A-Z}' \
       '-adjoin[join images]' \
       '-antialias[remove pixel aliasing]' \
       '-append[append image sequence]' \

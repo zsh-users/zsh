@@ -1,6 +1,7 @@
 #compdef zpty
 
-local state line list names expl
+local state line list names expl curcontext="$curcontext"
+typeset -A opt_args
 
 _arguments -C -s \
   '(-d -w -r -L)-e[echo input characters]' \

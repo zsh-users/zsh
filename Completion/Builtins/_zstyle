@@ -92,7 +92,7 @@ parameters path-directories paths pods ports prefixes processes ps regex
 sequences sessions signals strings tags targets types urls users values
 warnings widgets windows zsh-options)
 
-_arguments ':context:->contexts' ':style:->styles' '*:argument:->style-arg'
+_arguments -C ':context:->contexts' ':style:->styles' '*:argument:->style-arg'
 
 while [[ -n $state ]]; do
   ostate=$state

@@ -1,39 +1,38 @@
 #compdef mutt
 
-local state line muttrc="~/.muttrc" ret=1
+local curcontext="$curcontext" state line ret=1
+typeset -A opt_args
 
- _arguments \
- '::recipient:->userhost' \
- '-a:MIME attachment:_files' \
- '-b:BCC recipient:->userhost' \
- '-c:CC recipient:->userhost' \
- '-e:post-init configuration:' \
- '-f+:mailbox:_mailboxes' \
- '-F+:init file:_files' \
- '-h+:help' \
- '-H+:draft file:_files' \
- '-i:include file:_files' \
- '-m+:default mailbox type:(mbox MMDF MH Maildir)' \
- '-n+:bypass system configuration:' \
- '-p+:resume postponed message:' \
- '-R+:open in read-only mode:' \
- '-s+:subject:' \
- '-v+:version:' \
- '-x+:emulate mailx compose:' \
- '-y+:start listing mailboxes:' \
- '-z+:start only if new messages:' \
- '-Z+:open first mailbox with new mail:' && ret=0
+_arguments -C \
+    '::recipient:->userhost' \
+    '-a:MIME attachment:_files' \
+    '-b:BCC recipient:->userhost' \
+    '-c:CC recipient:->userhost' \
+    '-e:post-init configuration:' \
+    '-f+:mailbox: _mailboxes' \
+    '-F+:init file:_files' \
+    '-h+:help:' \
+    '-H+:draft file:_files' \
+    '-i:include file:_files' \
+    '-m+:default mailbox type:(mbox MMDF MH Maildir)' \
+    '-n+:bypass system configuration:' \
+    '-p+:resume postponed message:' \
+    '-R+:open in read-only mode:' \
+    '-s+:subject:' \
+    '-v+:version:' \
+    '-x+:emulate mailx compose:' \
+    '-y+:start listing mailboxes:' \
+    '-z+:start only if new messages:' \
+    '-Z+:open first mailbox with new mail:' && ret=0
 
 if [[ "$state" = userhost ]]; then
-      if compset -P '*@'; then
-        _description expl 'remote host name'
-        _hosts "$expl[@]" -q -S,
-        return
-      else
-          _description expl 'login name'
-          _users "$expl[@]" -q -S@ && ret=0
-        fi
-      fi
+  if compset -P '*@'; then
+    _description hosts expl 'remote host name'
+    _hosts "$expl[@]" -q -S, && return 0
+  else
+    _description users expl 'login name'
+    _users "$expl[@]" -q -S@ && return 0
+  fi
+fi
 
 return ret
-fi
