@@ -398,7 +398,7 @@ tt(print) builtin, and the resulting string is considered to be
 entirely quoted.  A literal `tt(')' character can be included in the
 string by using the `tt(\')' escape.
 
-@pindex(RC_QUOTES, use of)
+pindex(RC_QUOTES, use of)
 All characters enclosed between a pair of single quotes (tt('')) that
 is not preceded by a `tt($)' are quoted.  A single quote cannot appear
 within single quotes unless the option tt(RC_QUOTES) is set, in which case
