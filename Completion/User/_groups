@@ -1,13 +1,14 @@
 #compdef newgrp
 
-local expl groups
+local expl groups tmp
 
 _wanted groups expl group || return 1
 
 if ! zstyle -a ":completion:${curcontext}:" groups groups; then
   (( $+_cache_groups )) ||
-      if (( ${+commands[ypcat]} )); then
-        : ${(A)_cache_groups:=${${(s: :)$(_call groups ypcat group.byname)}%%:*}} # If you use YP
+      if (( ${+commands[ypcat]} )) &&
+	  tmp=$(_call groups ypcat group.byname); then
+        : ${(A)_cache_groups:=${${(f)tmp}%%:*}} # If you use YP
       else
         : ${(A)_cache_groups:=${${(s: :)$(</etc/group)}%%:*}}
       fi
