@@ -190,7 +190,7 @@ _ssh () {
         _alternative \
 	    'files:: _files' \
 	    'hosts:host:_ssh_hosts -S:' \
-	    'users:user:_ssh_users -S@' && ret=0
+	    'users:user:_ssh_users -qS@' && ret=0
       fi
     fi
     return ret

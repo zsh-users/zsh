@@ -1,3 +1,10 @@
+2000-11-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* E. Jay Birkenbilt: 13171, 13172: Completion/User/_rlogin,
+	Completion/User/_ssh: Don't autoremove a trailing `:' after
+	completing a host name, but do autoremove a trailing `@' after
+	completing a user name.
+
 2000-11-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13167: Completion/User/_perl_modules: Avoid cd entirely.
