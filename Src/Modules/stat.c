@@ -462,6 +462,10 @@ bin_stat(char *name, char **args, char *ops, int func)
 	for (aptr = args; *aptr; aptr++)
 	    nargs++;
 
+    if (ops['g']) {
+	flags |= STF_GMT;
+	ops['s'] = 1;
+    }
     if (ops['s'] || ops['r'])
 	flags |= STF_STRING;
     if (ops['r'] || !ops['s'])
@@ -470,8 +474,6 @@ bin_stat(char *name, char **args, char *ops, int func)
 	flags |= STF_FILE;
     if (ops['t'])
 	flags |= STF_NAME;
-    if (ops['g'])
-	flags |= STF_GMT;
 
     if (!(arrnam || hashnam)) {
 	if (nargs > 1)
