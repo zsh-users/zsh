@@ -3107,7 +3107,8 @@ zftpexithook(Hookdef d, void *dummy)
 int
 setup_(Module m)
 {
-    return 0;
+    /* setup_ returns 0 for success. require_module returns 1 for success. */
+    return !require_module("", "zsh/net/tcp", 0, 0);
 }
 
 /**/

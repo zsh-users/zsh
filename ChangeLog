@@ -1,3 +1,10 @@
+2001-10-26  Peter Stephenson  <pws@csr.com>
+
+	* 16171: Doc/Zsh/zftpsys.yo: minor changes of phrasing.
+
+	* 15793: Src/Modules/zftp.c: require zsh/net/tcp explicitly from
+	setup_ function for zftp.
+
 2001-10-25  Peter Stephenson  <pws@csr.com>
 
 	* 16145: Src/Builtins/rlimits.c: try to handle both RLIMITS_VMEM
