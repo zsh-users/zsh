@@ -6,7 +6,7 @@ _tags jobs || return 1
 
 if [[ "$1" = -t ]]; then
   zstyle -t ":completion${curcontext}:jobs" prefix-needed &&
-      [[ "$PREFIX" != %* || compstate[nmatches] -eq 0 ]] && return 1
+      [[ "$PREFIX" != %* && compstate[nmatches] -ne 0 ]] && return 1
   shift
 fi
 zstyle -t ":completion${curcontext}:jobs" prefix-hidden && pfx=''
