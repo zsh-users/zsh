@@ -1111,7 +1111,10 @@ execpline2(Estate state, wordcode pcode,
 
     if (pline_level == 1) {
 	if ((how & Z_ASYNC) || (!sfcontext && !sourcelevel))
-	    strcpy(list_pipe_text, getjobtext(state->prog, state->pc - 1));
+	    strcpy(list_pipe_text,
+		   getjobtext(state->prog,
+			      state->pc + (WC_PIPE_TYPE(pcode) == WC_PIPE_END ?
+					   0 : 1)));
 	else
 	    list_pipe_text[0] = '\0';
     }
@@ -1141,7 +1144,7 @@ execpline2(Estate state, wordcode pcode,
 	    } else if (pid) {
 		char dummy, *text;
 
-		text = getjobtext(state->prog, state->pc - 2);
+		text = getjobtext(state->prog, state->pc);
 		addproc(pid, text);
 		close(synch[1]);
 		read(synch[0], &dummy, 1);
