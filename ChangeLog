@@ -1,5 +1,7 @@
 2000-05-03  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* Andrej: 11067: Completion/Builtins/_zcompile: handle -t option
+
 	* 11113: Doc/Zsh/expn.yo, Src/hist.c, Src/subst.c,
  	Src/Modules/parameter.c, Src/Zle/zle_misc.c: new (z) parameter
  	flag to do shell-word splitting on the value

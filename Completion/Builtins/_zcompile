@@ -4,14 +4,15 @@ local context state line expl
 typeset -A opt_args
 
 _arguments -s \
-    '(-c -m -a)-U[don'\''t expand aliases]' \
-    '(-M)-R[mark as read]' \
-    '(-R)-M[mark as mapped]' \
-    '(-c -z -m -a)-k[ksh-style autoloading]' \
-    '(-c -k -m -a)-z[zsh-style autoloading]' \
-    '(-U -z -k)-c[currently defined functions]' \
-    '(-U -z -k)-m[use names as patterns]' \
-    '(-U -z -k)-a[write autoload functions]' \
+    '(-t -c -m -a)-U[don'\''t expand aliases]' \
+    '(-t -M)-R[mark as read]' \
+    '(-t -R)-M[mark as mapped]' \
+    '(-t -c -z -m -a)-k[ksh-style autoloading]' \
+    '(-t -c -k -m -a)-z[zsh-style autoloading]' \
+    '(-t -U -z -k)-c[currently defined functions]' \
+    '(-t -U -z -k)-m[use names as patterns]' \
+    '(-t -U -z -k)-a[write autoload functions]' \
+    '(-M -R -U -z -k -a -c -m)-t[show table of contents]' \
     ':zwc file:_files' \
     '*:function:->function' && return 0
 
