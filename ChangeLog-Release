@@ -1130,7 +1130,7 @@
 
 2000-05-02  Andrew Main  <zefram@zsh.org>
 
-	* zefram103: Src/Makemod.in.in: make sure .{e,}pro files are
+	* 11074: Src/Makemod.in.in: make sure .{e,}pro files are
 	non-empty, to keep the AIX compiler quiet.
 
 2000-05-02  Peter Stephenson  <pws@cambridgesiliconradio.com>
@@ -1806,11 +1806,11 @@
 
 2000-04-06  Andrew Main  <zefram@zsh.org>
 
-	* zefram2: Src/lex.c: Support "3&> foo" etc.
+	* 10555: Src/lex.c: Support "3&> foo" etc.
 
 2000-04-06  Andrew Main  <zefram@zsh.org>
 
-	* zefram1: configure.in, Etc/zsh-development-guide: List of tools
+	* 10552: configure.in, Etc/zsh-development-guide: List of tools
 	required for development work, and a little more conspicuous
 	explanation of the config.status hack.
 
