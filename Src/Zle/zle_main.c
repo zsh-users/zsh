@@ -736,7 +736,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     int create = 0;
     int type = PM_SCALAR, obreaks = breaks, haso = 0;
     char *p1 = NULL, *p2 = NULL;
-    FILE *oshout;
+    FILE *oshout = NULL;
 
     if (zleactive) {
 	zwarnnam(name, "ZLE cannot be used recursively (yet)", NULL, 0);

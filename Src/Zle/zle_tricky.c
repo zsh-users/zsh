@@ -1333,9 +1333,9 @@ get_comp_string(void)
 	    /* Try and deal with foo{xxx etc. */
 	    char *curs = s + (isset(COMPLETEINWORD) ? offs : strlen(s));
 	    char *predup = dupstring(s), *dp = predup;
-	    char *bbeg = NULL, *bend = NULL, *dbeg;
+	    char *bbeg = NULL, *bend = NULL, *dbeg = NULL;
 	    char *lastp = NULL, *firsts = NULL;
-	    int cant = 0, begi, boffs = offs, hascom = 0;
+	    int cant = 0, begi = 0, boffs = offs, hascom = 0;
 
 	    for (i = 0, p = s; *p; p++, dp++, i++) {
 		/* careful, ${... is not a brace expansion...
@@ -1898,7 +1898,7 @@ listlist(LinkList l)
 	totl += len;
     }
     if ((ncols = ((columns + 2) / longest))) {
-	int tlines, tline, tcols, maxlen, nth, width;
+	int tlines = 0, tline, tcols = 0, maxlen, nth, width;
 
 	nlines = (num + ncols - 1) / ncols;
 

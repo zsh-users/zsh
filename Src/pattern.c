@@ -1294,7 +1294,7 @@ pattry(Patprog prog, char *string)
 mod_export int
 pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 {
-    int i, maxnpos;
+    int i, maxnpos = 0;
     char **sp, **ep;
     char *progstr = (char *)prog + prog->startoff;
 

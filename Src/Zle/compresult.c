@@ -135,8 +135,9 @@ cline_str(Cline l, int ins, int *csp)
 
     l = cut_cline(l);
 
-    pmm = smm = dm = 0;
+    pmm = smm = dm = pcs = scs = 0;
     pm = pmax = sm = smax = d = mid = cbr = -1;
+    brp = brs = NULL;
 
     /* Get the information about the brace beginning and end we have
      * to re-insert. */

@@ -66,42 +66,6 @@ cdisp_calc(Cdisp disp, char **args)
     }
 }
 
-/* Build and return the array with the description-aligned strings. */
-
-static char **
-cdisp_build(Cdisp disp, char *sep, char **args)
-{
-    int sl = strlen(sep), pre = disp->pre, suf;
-    VARARR(char, buf, disp->pre + disp->suf + sl + 1);
-    char **ret, **rp, *cp, *copy, *cpp, oldc;
-
-    ret = (char **) zalloc((arrlen(args) + 1) * sizeof(char *));
-
-    memcpy(buf + pre, sep, sl);
-    suf = pre + sl;
-
-    for (rp = ret; *args; args++) {
-	copy = dupstring(*args);
-	for (cp = cpp = copy; *cp && *cp != ':'; cp++) {
-	    if (*cp == '\\' && cp[1])
-		cp++;
-	    *cpp++ = *cp;
-	}
-	oldc = *cpp;
-	*cpp = '\0';
-	if (((cpp == cp && oldc == ':') || *cp == ':') && cp[1]) {
-	    memset(buf, ' ', pre);
-	    memcpy(buf, copy, (cpp - copy));
-	    strcpy(buf + suf, cp + 1);
-	    *rp++ = ztrdup(buf);
-	} else
-	    *rp++ = ztrdup(copy);
-    }
-    *rp = NULL;
-
-    return ret;
-}
-
 /* Help fuer `_describe'. */
 
 typedef struct cdset *Cdset;
@@ -1600,8 +1564,8 @@ parse_cvdef(char *nam, char **args)
     Cvdef ret;
     Cvval val, *valp;
     Caarg arg;
-    char **oargs = args, sep, *name, *descr, *p, *q, **xor, c;
-    int xnum, multi, vtype, hassep;
+    char **oargs = args, sep = '\0', *name, *descr, *p, *q, **xor, c;
+    int xnum, multi, vtype, hassep = 0;
 
     if (args[0][0] == '-' && args[0][1] == 's' && !args[0][2]) {
 	if (args[1][0] && args[1][1]) {
