@@ -1594,6 +1594,16 @@ char *argv[];
       ;;
     esac
   else
+    case "$host" in
+      *openbsd*)
+	DLLD="${DLLD=$CC}"
+	DLLDARG="${LDARG}"
+      ;;
+      * )
+	DLLD="${DLLD=ld}"
+	DLLDARG=""
+      ;;
+    esac
     DLLD="${DLLD=ld}"
     DLLDARG=""
   fi
@@ -1614,7 +1624,7 @@ char *argv[];
     netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;
     aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
     solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
-    openbsd*)     DLLDFLAGS="${DLLDFLAGS=-Bshareable}" ;;
+    openbsd*)     DLLDFLAGS="${DLLDFLAGS=-shared -fPIC}" ;;
   esac
   case "$host" in
     *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
