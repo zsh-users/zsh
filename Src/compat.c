@@ -376,7 +376,7 @@ zgetcwd(void)
     return zgetdir(NULL);
 }
 
-/* chdir with arbitrary long pathname.  Returns 0 on success, 0 on normal *
+/* chdir with arbitrary long pathname.  Returns 0 on success, -1 on normal *
  * failure and -2 when chdir failed and the current directory is lost.  */
 
 /**/
@@ -418,17 +418,16 @@ zchdir(char *dir)
 	dir = s;
     }
 #ifdef HAVE_FCHDIR
-    if (currdir == -1 || (currdir >= 0 && fchdir(currdir))) {
-	if (currdir >= 0)
+    if (currdir >= 0) {
+	if (fchdir(currdir) < 0) {
 	    close(currdir);
-	return -2;
-    }
-    if (currdir >= 0)
+	    return -2;
+	}
 	close(currdir);
-    return -1;
-#else
-    return currdir == -2 ? -1 : -2;
+	return -1;
+    }
 #endif
+    return currdir == -2 ? -1 : -2;
 }
 
 /*
