@@ -1,3 +1,7 @@
+2003-02-26  Clint Adams  <clint@zsh.org>
+
+	* 18303: zshconfig.ac: fix some always-true test evaluations.
+
 2003-02-26  Oliver Kiddle  <opk@zsh.org>
 
 	* 18299: Completion/Base/Core/_main_complete,
