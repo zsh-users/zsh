@@ -535,7 +535,8 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    }
 		    /* Give up if we don't have enough characters for the
 		     * line-string and the anchor. */
-		    if (ll < llen + alen || lw < alen + aol)
+		    if (ll < llen + alen ||
+			(sfx ? (lw < alen + aol) : (lw < alen || iw < aol)))
 			continue;
 
 		    if (mp->flags & CMF_LEFT) {
@@ -571,7 +572,8 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		     * string matched by the `*'. */
 		    if (sfx && (savl = l[-(llen + zoff)]))
 			l[-(llen + zoff)] = '\0';
-		    for (t = 0, tp = w, ct = 0, ict = lw - alen + 1;
+		    for (t = 0, tp = w, ct = 0,
+			     ict = lw - alen + 1 - (sfx ? aol : 0);
 			 ict;
 			 tp += add, ct++, ict--) {
 			if ((both &&

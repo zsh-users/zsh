@@ -1,3 +1,8 @@
+2000-06-07  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11796: Src/Zle/compmatch.c: try to get the tests for `strings
+ 	long enough' right in anchor matching code
+	
 2000-06-07  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11711: Andrej Borsenkow: Test/ztst.zsh: Ignore diff output
