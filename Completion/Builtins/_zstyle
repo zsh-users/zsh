@@ -1,7 +1,8 @@
 #compdef zstyle
 
-local curcontext="$curcontext" state ostate line expl ctop
-local nm=$compstat[nmatches]
+local curcontext="$curcontext" state context ostate line expl ctop
+local nm=$compstate[nmatches]
+typeset -A opt_args
 
 typeset -A styles
 # Assoc array of styles; the values give the possible top-level
