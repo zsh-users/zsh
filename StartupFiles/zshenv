@@ -1,5 +1,5 @@
 #
-# Generic .zshenv file for zsh 2.7
+# Example .zshenv file for zsh 4.0
 #
 # .zshenv is sourced on all invocations of the
 # shell, unless the -f option is set.  It should
@@ -8,6 +8,9 @@
 # .zshenv should not contain commands that product
 # output or assume the shell is attached to a tty.
 #
+
+# THIS FILE IS NOT INTENDED TO BE USED AS /etc/zshenv, NOR WITHOUT EDITING
+return 0	# Remove this line after editing this file as appropriate
 
 export X11HOME=/usr/X11
 

@@ -1,3 +1,8 @@
+2002-04-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: StartupFiles/zshenv, StartupFiles/zlogin: remove
+	references to "zsh 2.7", change "Generic" to "Example".
+
 2002-04-25  Peter Stephenson  <pws@csr.com>
 
 	* 17046: Src/math.c: OCTAL_ZEROES with a `0' on its own was
