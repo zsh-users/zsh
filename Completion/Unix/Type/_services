@@ -1,0 +1,23 @@
+#autoload
+
+local -a inits xinetds alls
+local expl ret=1
+
+if chkconfig --list > /dev/null 2>&1; then
+  alls=( ${(f)"$(LANGUAGE=C LANG=C LC_ALL=C chkconfig --list)"} )
+  inits=( ${${${alls[1,(r)xinetd based*]}[1,-2]}/%[[:space:]]*/} )
+  xinetds=( ${${${${alls[(r)xinetd based*,-1]}[2,-1]}/#[[:space:]]#}/%:*} )
+else
+  inits=( /etc/init.d/*(:t) )
+fi
+
+_tags init xinetd
+
+while _tags; do
+  _requested init expl 'init services' \
+    compadd  -a inits && ret=0
+  _requested xinetd expl 'xinetd services' \
+    compadd  -a xinetds && ret=0
+done
+
+return $ret

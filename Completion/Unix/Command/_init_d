@@ -1,21 +1,24 @@
 #compdef -P */(init|rc[0-9S]#).d/*
 
-local magic cmds what
+local magic cmds what script
 
 # This should probably be system specific...
+
+script=$words[1]
+[[ $script = */* ]] || script=/etc/init.d/$script
 
 # If the file starts with `#!' we hope that this is a shell script
 # and get lines looking like <space>foo|bar) with the words in $what.
 
 what='(st(art|op|atus)|(force-|)re(start|load)|debug_(up|down)|dump(|_stats)|add|delete|clean|list)'
 
-[[ -f $words[1] ]] && read -u0k 2 magic < $words[1] && [[ $magic = '#!' ]] &&
-    cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $words[1])"}:#[[:blank:]]#\'#${~what}(\|${~what})#\'#\)*}}//[^a-z_-]} )
+read -u0k 2 magic < $script && [[ $magic = '#!' ]] &&
+    cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $script)"}:#[[:blank:]]#(\'|)${~what}(\|{~what})#(\'|)\)}}//[^a-z_]} )
 
 # This would be the pattern to use every line of the form <space>foo).
 # Some people say this might match too many lines...
 #
-#    cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $words[1])"}:#[[:blank:]]#(\'|)[a-z_|]##(\'|)\)}}//[^a-z_]} )
+#    cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $script)"}:#[[:blank:]]#(\'|)[a-z_|]##\'|)\)}}//[^a-z_]} )
 
 (( $#cmds )) || zstyle -a ":completion:${curcontext}:commands" commands cmds ||
     cmds=(start stop)

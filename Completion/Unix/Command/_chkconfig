@@ -9,13 +9,8 @@ linux*)
     '(-)--level[specify runlevels to apply to]:-:_values -s "" "run levels" 1 2 3 4 5 6 7' \
     '(- 2)--add[add new service]' \
     '(- 2)--del[remove service from chkconfig management]' \
-    '1:service name:->services' \
+    '1:service name:_services' \
     '2:state:(on off reset)' && ret=0
-
-  if [[ -n "$state" ]]; then
-    _wanted services expl 'system service' \
-	compadd ${${${(f)"$($words[1] --list)"}%%[ :]*}##$'\t'*} && ret=0
-  fi
 ;;
 irix*)
   _arguments -C \

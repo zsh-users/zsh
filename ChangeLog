@@ -1,3 +1,21 @@
+2002-05-08  Andrej Borsenkow  <bor@zsh.org>
+
+        * 17080: Doc/Zsh/compsys.yo: clarify tag-order style usage
+
+        * 17076: Completion/Redhat/Command/.distfiles,
+        Completion/Redhat/Command/_service, Completion/Unix/Command/_chkconfig,
+        Completion/Unix/Command/_init_d, Completion/Unix/Type/.distfiles,
+        Completion/Unix/Type/_services: use new helper _services to complete
+        init/xinetd services; make chkconfig use it; completion of
+        service command
+
+        * 17075: Completion/Mandrake/Command/_urpmi: _urpmi
+        completion update
+
+        * 17074: Completion/Linux/Command/.distfiles,
+        Completion/Linux/Command/_mondo, Src/Zle/complete.mdd:
+        mondoarchive completion (with typo correction from Bart)
+
 2002-05-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 17072; based on 17066 (Danek Duvall):
@@ -280,6 +298,16 @@
 	* 16449: Completion/Unix/Command/_chkconfig: new completion for
 	both the IRIX and RedHat chkconfig commands
 
+2002-01-14  Andrej Borsenkow  <bor@zsh.org>
+
+        * 16443: Completion/Mandrake/Command/_urpmi: fix
+        urpmi.addmedia --distrib. Set cache policy on just the first call.
+
+2002-01-13  Andrej Borsenkow  <bor@zsh.org>
+
+	* 16437: Completion/Mandrake/Command/_urpmi: adapt
+	to new urpmi version in cooker
+
 2002-01-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 16396: Completion/Unix/Command/_chown: fix argument handling bugs
@@ -390,6 +418,11 @@
         * 16264: Completion/Debian/Command/_dput:
         Use parameter expansion instead of grep and sed.
 
+2001-11-16  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
+
+        * 16258: Completion/Mandrake/Command/_urpmi:
+        Fix typo in _urpmi for urpmi.addmedia.
+
 2001-11-15  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_clint_setup:
@@ -398,6 +431,11 @@
         * 16257: Completion/Debian/Command/.distfiles,
         Completion/Debian/Command/_dput: completion for
         dput as contributed by Tollef Fog Heen <tollef@add.no>.
+
+2001-11-15  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
+
+        * 16253: Src/Zle/complete.mdd: Add Mandrake completion directory to
+        install.
 
 2001-11-15  Peter Stephenson  <pws@csr.com>
 
@@ -409,6 +447,12 @@
 	Functions/Zle/bash-kill-word,
 	Functions/Zle/bash-backward-kill-word:
 	Zle widgets with bash-style word delimiting.
+
+
+2001-11-14  Andrej Borsenkow  <bor@zsh.org>
+        
+        * 16247: Completion/Mandrake/Command/_urpmi: completion
+        for Mandrake urpmi command suit.
 
 2001-11-06  Oliver Kiddle  <opk@zsh.org>
 
