@@ -42,10 +42,13 @@ sed_separate='
     s/;;*/;/g
 '
 
+filelist=filelist$$
+trap 'rm -f $filelist; rm -rf $disttree; exit 1' 1 2 15
 (
     cd $sdir_top
-    find . \( -name '*.*' -prune -false \) -o \( -name .distfiles -print \)
-) | while read dfn; do
+    find . \( -name '*.*' -prune \) -o \( -name .distfiles -print \)
+) > $filelist
+( while read dfn; do
     subdir=`echo $dfn | sed 's,/\.distfiles$,,'`
     echo >&2 "Processing directory $subdir..."
     eval "DISTFILES_$type="
@@ -55,7 +58,7 @@ sed_separate='
 	cmds=`echo "$distfiles" | sed -e "$sed_separate"`
 	eval "$cmds"
 	if test -n "$deplist" && test -f $dir_top/$subdir/Makefile; then
-	    ( cd $dir_top/$subdir && "$@" $deplist ) || exit 1
+	    ( trap '' 1 2 15; cd $dir_top/$subdir && "$@" $deplist ) || exit 1
 	fi
 	$sdir_top/mkinstalldirs $disttree/$subdir || exit 1
 	for f in $deplist `test -z "$globlist" || ( cd $dir_top/$subdir && eval "echo $globlist")`; do
@@ -71,6 +74,14 @@ sed_separate='
 	    fi
 	done
     fi
-done
+done ) < $filelist
+
+status=$?
+rm -f $filelist
+trap '' 1 2 15
+if test $status -ne 0; then
+    rm -rf $disttree
+    exit $status
+fi
 
 exec chmod -R a+rX,u+w,go-w $disttree
