@@ -15,6 +15,8 @@ compaudit() {                           # Define and then call
 emulate -L zsh
 setopt extendedglob
 
+[[ -x /usr/bin/getent ]] || getent() { cat /etc/$1 }
+
 # The positional parameters are the directories to check, else fpath.
 if (( $# )); then
   local _compdir=''
@@ -87,7 +89,7 @@ while IFS=: read GROUP _i_pw _i_gid GROUPMEM; do
   else
     (( _i_gid == EGID )) && break       # Somewhat arbitrary
   fi
-done < /etc/group
+done <<(getent group)
 
 # We search for:
 # - world/group-writable directories in fpath not owned by root and the user
