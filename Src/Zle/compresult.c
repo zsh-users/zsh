@@ -1827,9 +1827,9 @@ list_matches(Hookdef dummy, void *dummy2)
 mod_export int
 invalidate_list(void)
 {
-    if (showinglist == -2)
-	listmatches();
     if (validlist) {
+	if (showinglist == -2)
+	    zrefresh();
 	freematches(lastmatches);
 	lastmatches = NULL;
 	hasoldlist = 0;

@@ -640,7 +640,8 @@ Thingy
 executenamedcommand(char *prmt)
 {
     Thingy cmd;
-    int len, l = strlen(prmt), ols = listshown, feep = 0, listed = 0, curlist = 0;
+    int len, l = strlen(prmt), feep = 0, listed = 0, curlist = 0;
+    int ols = (listshown && validlist);
     char *ptr;
     char *okeymap = curkeymapname;
 
