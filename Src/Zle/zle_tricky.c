@@ -7612,7 +7612,7 @@ cut_cline(Cline l)
      * the line. Anything before that is kept. */
 
     for (p = l; p; p = p->next)
-	if (p->orig || p->olen)
+	if (p->orig || p->olen || !(p->flags & CLF_NEW))
 	    e = p->next;
 
     /* Then keep all structs without missing characters. */
