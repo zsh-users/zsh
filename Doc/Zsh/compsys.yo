@@ -92,7 +92,10 @@ If the number of completion files changes, tt(compinit) will recognise this
 and produce a new dump file.  However, if the name of a function or the
 arguments in the first line of a tt(#compdef) function (as described below)
 change, it is easiest to delete the dump file by hand so that
-tt(compinit) will re-create it the next time it is run.
+tt(compinit) will re-create it the next time it is run.  The check
+performed to see if there are new functions can be omitted by giving
+the option tt(-C).  In this case the dump file will only be created if
+there isn't one already.
 
 The dumping is actually done by another function, tt(compdump), but you
 will only need to run this yourself if you change the configuration
@@ -102,6 +105,16 @@ the old dumped file will be remembered for this purpose.
 If the parameter tt(_compdir) is set, tt(compinit) uses it as a directory
 where completion functions can be found; this is only necessary if they are
 not already in the function search path.
+
+For security reasons tt(compinit) also checks if the completion system
+would use files not owned by root or the current user or files in
+directories that are world- or group-writable or that are not owned by 
+root or the current user.  If such files or directories are found,
+tt(Compinit) will ask if the completion system should really be used.
+To avoid these tests and make all files found be used without asking,
+the option tt(-u) can be given and to make tt(compinit) silently
+ignore all insecure files and directories the options tt(-i) can be
+given.
 
 subsect(Autoloaded files)
 cindex(completion system, autoloaded functions)
