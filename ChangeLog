@@ -1,5 +1,9 @@
 2000-04-20  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10861: Completion/Bsd/.distfiles, Completion/Bsd/_bsd_pkg,
+ 	Completion/Bsd/_cvsup, Completion/Bsd/_kld: new completions for
+ 	FreeBSD commands
+	
 	* 10854: Completion/Commands/_expand_word, Completion/Core/_expand,
  	Doc/Zsh/compsys.yo: default values for styles in _expand_word,
  	listing expansions with ^Xd, _expand uses add-space style
