@@ -101,6 +101,11 @@ mod_export Histent hist_ring;
 /**/
 int histsiz;
  
+/* desired history-file size (in lines) */
+ 
+/**/
+int savehistsiz;
+ 
 /* if = 1, we have performed history substitution on the current line *
  * if = 2, we have used the 'p' modifier                              */
  
@@ -922,7 +927,7 @@ putoldhistentryontop(short keep_going)
     if (isset(HISTEXPIREDUPSFIRST) && !(he->flags & HIST_DUP)) {
 	static int max_unique_ct = 0;
 	if (!keep_going)
-	    max_unique_ct = getiparam("SAVEHIST");
+	    max_unique_ct = savehistsiz;
 	do {
 	    if (max_unique_ct-- <= 0 || he == hist_ring) {
 		max_unique_ct = 0;
@@ -1984,10 +1989,9 @@ savehistfile(char *fn, int err, int writeflags)
     FILE *out;
     Histent he;
     int xcurhist = curhist - !!(histactive & HA_ACTIVE);
-    int savehist = getiparam("SAVEHIST");
     int extended_history = isset(EXTENDEDHISTORY);
 
-    if (!interact || savehist <= 0 || !hist_ring
+    if (!interact || savehistsiz <= 0 || !hist_ring
      || (!fn && !(fn = getsparam("HISTFILE"))))
 	return;
     if (writeflags & HFILE_FAST) {
@@ -1998,7 +2002,7 @@ savehistfile(char *fn, int err, int writeflags)
 	}
 	if (!he || !lockhistfile(fn, 0))
 	    return;
-	if (histfile_linect > savehist + savehist / 5)
+	if (histfile_linect > savehistsiz + savehistsiz / 5)
 	    writeflags &= ~HFILE_FAST;
     }
     else {
@@ -2079,7 +2083,7 @@ savehistfile(char *fn, int err, int writeflags)
 
 	    hist_ring = NULL;
 	    curhist = histlinect = 0;
-	    histsiz = savehist;
+	    histsiz = savehistsiz;
 	    histactive = 0;
 	    createhisttable(); /* sets histtab */
 
