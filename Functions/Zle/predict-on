@@ -56,7 +56,7 @@ insert-and-predict () {
 	  local crs curcontext="${curcontext}"
 
           [[ -z "$curcontext" ]] && curcontext=:::
-          curcontext="${curcontext#*:}predict:"
+          curcontext="predict:${curcontext#*:}"
 
 	  comppostfuncs=( predict-limit-list )
 	  zle complete-word
