@@ -1,3 +1,8 @@
+2001-05-17  Tanaka Akira  <akr@zsh.org>
+
+	* 14377: Completion/Unix/Command/_cvs: support new .cvspass format
+	introduced by cvs-1.11.1.
+
 2001-05-17  Peter Stephenson  <pws@csr.com>
 
 	* 14376: Completion/Unix/Command/_lp: type with compset.

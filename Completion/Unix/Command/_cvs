@@ -614,7 +614,7 @@ _cvs_root () {
       id="$(LC_ALL=C ls -l "$cvspassfile")"
     fi
     if [[ "$id" != "$_cvs_pass_id" ]]; then
-      _cvs_roots=($_cvs_roots ${${(f)"$(<$cvspassfile)"}%% *})
+      _cvs_roots=($_cvs_roots ${${${${(f)"$(<$cvspassfile)"}#/1 }%% *}/:2401\\//:/})
       _cvs_pass_id="$id"
     fi
   fi
