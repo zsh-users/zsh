@@ -1,3 +1,9 @@
+2003-12-03  Peter Stephenson  <pws@csr.com>
+
+	* 19269: Src/pattern.c, Misc/globtests, Test/D02glob.ztst:
+	8-bit characters didn't work in character classes where
+	chars were signed.
+
 2003-11-28  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_elinks: update for version 0.4.3

@@ -2265,7 +2265,7 @@ patmatchrange(char *range, int ch)
 		DPUTS(1, "BUG: unknown metacharacter in range.");
 		break;
 	    }
-	} else if (*range == ch)
+	} else if (STOUC(*range) == ch)
 	    return 1;
     }
     return 0;
