@@ -2488,7 +2488,7 @@ tt(completer) style using the tt(-e) option to zstyle so that some
 completers are only used when completion is attempted a second time on 
 the same string, e.g.:
 
-example(zstyle ':completion:*' completer '
+example(zstyle -e ':completion:*' completer '
   if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]]; then
     _last_try="$HISTNO$BUFFER$CURSOR"
     reply=(_complete _match _prefix)
