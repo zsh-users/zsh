@@ -1,3 +1,9 @@
+2003-08-05  Peter Stephenson  <pws@csr.com>
+
+	* 18926: Src/Zle/complist.c: fix (without knowing how) insertion
+	of file names requiring metafication into the command line on
+	a successful menu selection.
+
 2003-08-01  Peter Stephenson  <pws@csr.com>
 
 	* 18920: Src/utils.c, Completion/Core/Base/_main_complete: update

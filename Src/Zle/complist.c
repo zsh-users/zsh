@@ -2801,7 +2801,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 		acc = 1;
 	    break;
 	}
+	metafy_line();
 	do_single(**p);
+	unmetafy_line();
 	mselect = (**p)->gnum;
     }
     if (u)
@@ -2817,7 +2819,9 @@ domenuselect(Hookdef dummy, Chdata dat)
         clearlist = listshown = 1;
     if (acc && validlist && minfo.cur) {
 	menucmp = lastambig = hasoldlist = 0;
+	metafy_line();
 	do_single(*(minfo.cur));
+	unmetafy_line();
     }
     if (wasnext || broken) {
 	menucmp = 2;
