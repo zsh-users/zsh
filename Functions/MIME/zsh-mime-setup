@@ -62,9 +62,8 @@ zstyle -a :mime: mime-types type_files ||
 zstyle -a :mime: mailcap cap_files ||
   cap_files=(~/.mailcap /etc/mailcap)
 
-TRAPEXIT() { unfunction mime-setup-add-type >&/dev/null; return 0; }
-
-mime-setup-add-type() {
+{
+  mime-setup-add-type() {
     local type suffix
     local -a array
 
@@ -90,115 +89,117 @@ mime-setup-add-type() {
 	    fi
 	fi
     done
-}
+  }
 
-# Loop through files to find suffixes for MIME types.
-# Earlier entries take precedence, so the files need to be listed
-# with the user's own first.  This also means pre-existing
-# values in suffix_type_map are respected.
-for file in $type_files; do
+  # Loop through files to find suffixes for MIME types.
+  # Earlier entries take precedence, so the files need to be listed
+  # with the user's own first.  This also means pre-existing
+  # values in suffix_type_map are respected.
+  for file in $type_files; do
     [[ -r $file ]] || continue
 
     # For once we rely on the fact that read handles continuation
     # lines ending in backslashes, i.e. there's no -r.
     while read line; do
-	# Skip blank or comment lines.
-	[[ $line = [[:space:]]#(\#*|) ]] && continue
+      # Skip blank or comment lines.
+      [[ $line = [[:space:]]#(\#*|) ]] && continue
 
-	# There are two types of line you find in MIME type files.
-	# The original simple sort contains the type name then suffixes
-	# separated by whitespace.  However, Netscape insists
-	# on adding lines with backslash continuation with
-	# key="value" pairs.  So we'd better handle both.
-	if [[ $line = *=* ]]; then
-	    # Gory.
-	    # This relies on the fact that a typical entry:
-	    #   type=video/x-mpeg2 desc="MPEG2 Video" exts="mpv2,mp2v"
-	    # looks like a parameter assignment.  However, we really
-	    # don't want to be screwed up by future extensions,
-	    # so we split the elements to an array and pick out the
-	    # ones we're interested in.
-	    type= exts=
+      # There are two types of line you find in MIME type files.
+      # The original simple sort contains the type name then suffixes
+      # separated by whitespace.  However, Netscape insists
+      # on adding lines with backslash continuation with
+      # key="value" pairs.  So we'd better handle both.
+      if [[ $line = *=* ]]; then
+        # Gory.
+        # This relies on the fact that a typical entry:
+        #   type=video/x-mpeg2 desc="MPEG2 Video" exts="mpv2,mp2v"
+        # looks like a parameter assignment.  However, we really
+        # don't want to be screwed up by future extensions,
+        # so we split the elements to an array and pick out the
+        # ones we're interested in.
+        type= exts=
 
-	    # Syntactically split line to preserve quoted words.
-	    array=(${(z)line})
-	    for elt in $array; do
-		if [[ $elt = (type|exts)=* ]]; then
-		    eval $elt
-		fi
-	    done
+        # Syntactically split line to preserve quoted words.
+        array=(${(z)line})
+        for elt in $array; do
+          if [[ $elt = (type|exts)=* ]]; then
+            eval $elt
+          fi
+        done
 
-	    # Get extensions by splitting on comma
-	    array=(${(s.,.)exts})
+        # Get extensions by splitting on comma
+        array=(${(s.,.)exts})
 
-	    [[ -n $type ]] && mime-setup-add-type $type $array
-	else
-	    # Simple.
-	    mime-setup-add-type ${=line}
-	fi
+        [[ -n $type ]] && mime-setup-add-type $type $array
+      else
+        # Simple.
+        mime-setup-add-type ${=line}
+      fi
     done <$file
-done
-
+  done
+} always {
+  unfunction mime-setup-add-type >&/dev/null
+}
 
 # Loop through files to find handlers for types.
 for file in $cap_files; do
-    [[ -r $file ]] || continue
+  [[ -r $file ]] || continue
 
-    # Oh, great.  We need to preserve backslashes inside the line,
-    # but need to manage continuation lines.
-    while read -r line; do
-	# Skip blank or comment lines.
-	[[ $line = [[:space:]]#(\#*|) ]] && continue
+  # Oh, great.  We need to preserve backslashes inside the line,
+  # but need to manage continuation lines.
+  while read -r line; do
+    # Skip blank or comment lines.
+    [[ $line = [[:space:]]#(\#*|) ]] && continue
 
-	while [[ $line = (#b)(*)\\ ]]; do
-	    line=$match[1]
-	    read -r line2 || break
-	    line+=$line2
-	done
+    while [[ $line = (#b)(*)\\ ]]; do
+      line=$match[1]
+      read -r line2 || break
+      line+=$line2
+    done
 
-	# Guess what, this file has a completely different format.
-	# See mailcap(4).
-	# The biggest unpleasantness here is that the fields are
-	# delimited by semicolons, but the command field, which
-	# is the one we want to extract, may itself contain backslashed
-	# semicolons.
-	if [[ $line = (#b)[[:space:]]#([^[:space:]\;]##)[[:space:]]#\;(*) ]]
-	then
-	    # this is the only form we can handle, but there's no point
-	    # issuing a warning for other forms.
-	    type=$match[1]
-            line=$match[2]
-	    # See if it has flags after the command.
-	    if [[ $line = (#b)(([^\;\\]|\\\;|\\[^\;])#)\;(*) ]]; then
-		line=$match[1]
-		flags=$match[3]
-	    else
-		flags=
-	    fi
-	    # Remove quotes from semicolons
-	    line=${line//\\\;/\;}
-	    # and remove any surrounding white space --- this might
-	    # make the handler empty.
-	    line=${${line##[[:space:]]#}%%[[:space:]]}
-	    if [[ -z $type_handler_map[$type] ]]; then
-		if [[ -n $o_verbose ]]; then
-		    print -r "Adding handler for type $type:
+    # Guess what, this file has a completely different format.
+    # See mailcap(4).
+    # The biggest unpleasantness here is that the fields are
+    # delimited by semicolons, but the command field, which
+    # is the one we want to extract, may itself contain backslashed
+    # semicolons.
+    if [[ $line = (#b)[[:space:]]#([^[:space:]\;]##)[[:space:]]#\;(*) ]]
+    then
+      # this is the only form we can handle, but there's no point
+      # issuing a warning for other forms.
+      type=$match[1]
+      line=$match[2]
+      # See if it has flags after the command.
+      if [[ $line = (#b)(([^\;\\]|\\\;|\\[^\;])#)\;(*) ]]; then
+        line=$match[1]
+        flags=$match[3]
+      else
+        flags=
+      fi
+      # Remove quotes from semicolons
+      line=${line//\\\;/\;}
+      # and remove any surrounding white space --- this might
+      # make the handler empty.
+      line=${${line##[[:space:]]#}%%[[:space:]]}
+      if [[ -z $type_handler_map[$type] ]]; then
+        if [[ -n $o_verbose ]]; then
+          print -r "Adding handler for type $type:
   $line" >&2
-		fi
-		type_handler_map[$type]=$line
-		type_flags_map[$type]=$flags
-		if [[ -n $flags && -n $o_verbose ]]; then
-		    print -r "  with flags $flags" >&2
-		fi
-	    elif [[ -n $o_verbose ]]; then
-		print -r "Skipping handler for already defined type $type:
-  $line" >&2
-		if [[ -n $flags ]]; then
-		    print -r " with flags $flags" >&2
-		fi
-	    fi
 	fi
-    done <$file
+	type_handler_map[$type]=$line
+	type_flags_map[$type]=$flags
+	if [[ -n $flags && -n $o_verbose ]]; then
+	  print -r "  with flags $flags" >&2
+	fi
+      elif [[ -n $o_verbose ]]; then
+	print -r "Skipping handler for already defined type $type:
+  $line" >&2
+	if [[ -n $flags ]]; then
+	  print -r " with flags $flags" >&2
+	fi
+      fi
+    fi
+  done <$file
 done
 
 
