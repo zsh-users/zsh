@@ -144,7 +144,7 @@ by `tt(bindkey -m)'.
 findex(vared)
 cindex(parameters, editing)
 cindex(editing parameters)
-item(tt(vared) [ tt(-Aach) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ] var(name))(
+item(tt(vared) [ tt(-Aache) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ] var(name))(
 The value of the parameter var(name) is loaded into the edit
 buffer, and the line editor is invoked.  When the editor exits,
 var(name) is set to the string value returned by the editor.
@@ -161,7 +161,9 @@ created automatically, even without tt(-c).
 If the tt(-p) flag is given, the following string will be taken as
 the prompt to display at the left.  If the tt(-r) flag is given,
 the following string gives the prompt to display at the right.  If the
-tt(-h) flag is specified, the history can be accessed from ZLE.
+tt(-h) flag is specified, the history can be accessed from ZLE. If the 
+tt(-e) flag is given, typing tt(^D) (Control-D) on an empty line
+causes tt(vared) to exit immediatly with a non-zero return value.
 )
 findex(zle)
 cindex(widgets, rebinding)

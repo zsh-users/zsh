@@ -8,19 +8,23 @@ local tmp line compcontext=nslookup curcontext=':nslookup' pmpt
 trap 'return 130' INT
 trap 'zpty -d nslookup' EXIT
 
-zstyle -s ':nslookup' prompt pmpt || pmpt='> '
+pmpt=()
+zstyle -s ':nslookup' prompt tmp && pmpt=(-p "$tmp")
+zstyle -s ':nslookup' rprompt tmp && pmpt=("$pmpt[@]" -r "$tmp")
+(( $#pmpt )) || pmpt=(-p '> ')
 
 zpty nslookup nslookup
 
 zpty -r nslookup line '*> '
 print -nr "$line"
 
-while line=''; vared -p "$pmpt" line; do
+while line=''; vared -he "$pmpt[@]" line; do
+  print -s "$line"
   [[ "$line" = exit ]] && break
 
   zpty -w nslookup "$line"
 
-  zpty -r nslookup line '*> '
+  zpty -r nslookup line '*> ' || break
   print -nr "$line"
 done
 

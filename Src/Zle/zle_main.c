@@ -734,7 +734,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     char *s, *t, *ova = varedarg;
     Value v;
     Param pm = 0;
-    int create = 0;
+    int create = 0, ifl;
     int type = PM_SCALAR, obreaks = breaks, haso = 0;
     char *p1 = NULL, *p2 = NULL;
     FILE *oshout = NULL;
@@ -787,6 +787,10 @@ bin_vared(char *name, char **args, char *ops, int func)
 		/* -h option -- enable history */
 		ops['h'] = 1;
 		break;
+	    case 'e':
+		/* -e option -- enable EOF */
+		ops['e'] = 1;
+		break;
 	    default:
 		/* unrecognised option character */
 		zwarnnam(name, "unknown option: %s", *args, 0);
@@ -834,7 +838,15 @@ bin_vared(char *name, char **args, char *ops, int func)
 	pushnode(bufstack, ztrdup(s));
     } LASTALLOC;
     varedarg = *args;
+    ifl = isfirstln;
+    if (ops['e'])
+	isfirstln = 1;
+    if (ops['h'])
+	hbegin(1);
     t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
+    if (ops['h'])
+	hend();
+    isfirstln = ifl;
     varedarg = ova;
     if (haso) {
 	close(SHTTY);
