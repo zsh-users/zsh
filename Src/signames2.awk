@@ -6,7 +6,7 @@
 # NB: On SunOS 4.1.3 - user-functions don't work properly, also \" problems
 # Without 0 + hacks some nawks compare numbers as strings
 #
-/^XXNAMES XXSIG[A-Z][A-Z0-9]* [1-9][0-9]*/ {
+/^XXNAMES XXSIG[A-Z][A-Z0-9]*[\t ][\t ]*[1-9][0-9]*/ {
     sigindex = index($0, "SIG")
     sigtail = substr($0, sigindex, 80)
     split(sigtail, tmp)
@@ -63,7 +63,11 @@ END {
     printf "#include %czsh.mdh%c\n", 34, 34
     printf "\n"
     printf "/**/\n"
-    printf "char *sigmsg[SIGCOUNT+2] = {\n"
+    printf "#define sigmsg(sig) ((sig) <= SIGCOUNT ? sig_msg[sig]"
+    printf " : %c%s%c)", 34, "unknown signal", 34
+    printf "\n"
+    printf "/**/\n"
+    printf "mod_export char *sig_msg[SIGCOUNT+2] = {\n"
     printf "\t%c%s%c,\n", 34, "done", 34
 
     for (i = 1; i <= 0 + max; i++)

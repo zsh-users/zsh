@@ -1,3 +1,8 @@
+2004-03-03  Peter Stephenson  <pws@csr.com>
+
+	* 19523: Src/signames2.awk: attempt to work around awk
+	problem on AIX 5.
+
 2004-03-02  Peter Stephenson  <pws@csr.com>
 
 	* zsh-users/7100: Completion/Base/Core/_main_complete:
