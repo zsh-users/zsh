@@ -1,3 +1,16 @@
+2003-04-07  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 18439: Completion/Cygwin/.distfiles,
+	Completion/Cygwin/Command/_cygcheck,
+	Completion/Cygwin/Command/_cygpath,
+	Completion/Cygwin/Command/_cygrunsrv,
+	Completion/Cygwin/Command/_cygserver,
+	Completion/Cygwin/Command/_cygstart, Completion/Cygwin/Command/_dumper,
+	Completion/Cygwin/Command/_getclip, Completion/Cygwin/Command/_getfacl,
+	Completion/Cygwin/Command/_mkshortcut, Completion/Cygwin/Command/_mkzsh,
+	Completion/Cygwin/Command/_pscp, Completion/Cygwin/Command/_putclip:
+	cygwin completion functions.
+
 2003-04-04  Peter Stephenson  <pws@csr.com>
 
 	* 18435: Src/builtin.c, Src/params.c: spotted by Oliver: unsetting
