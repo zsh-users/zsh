@@ -1,5 +1,7 @@
 2000-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11679: Src/Zle/compcore.c: fix for ignore-line style
+	
 	* 11678: Completion/Base/_arguments: avoid reporting the same
  	->state more than once
 	

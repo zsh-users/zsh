@@ -1895,6 +1895,10 @@ addmatches(Cadata dat, char **argv)
 		argv = &ms;
 	    }
 	}
+	if (dat->ppre)
+	    ppl = strlen(dat->ppre);
+	if (dat->psuf)
+	    psl = strlen(dat->psuf);
 	for (; (s = *argv); argv++) {
 	    bpl = obpl;
 	    bsl = obsl;
