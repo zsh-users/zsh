@@ -293,9 +293,9 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
             fi
           fi
         fi
-        shift "${#descrs} ? 1 : 0" descrs
-        shift "${#actions} ? 1 : 0" actions
-        shift "${#subcs} ? 1 : 0" subcs
+        shift descrs
+        shift actions
+        shift subcs
       done
 
       if [[ -z "$matched$hasopts" ]] && _requested options &&

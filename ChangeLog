@@ -1,3 +1,9 @@
+2000-05-29  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11624: Completion/Base/_arguments, Completion/Builtins/_zpty,
+ 	Doc/Zsh/compsys.yo, Src/Zle/computil.c: fixes for _arguments with
+ 	sets; make _zpty not use sets
+	
 2000-05-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11618: Completion/Base/_arguments: Fix bad shift.

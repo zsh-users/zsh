@@ -2867,6 +2867,13 @@ options will be completed after the first non-option argument on the
 line. With tt(-S), no option will be completed after a `tt(-)tt(-)' on 
 the line and this argument will otherwise be ignored.
 
+Note that using multiple sets will be slower than using only one set
+because the completion code has to parse the command line once for
+every set. So more than one set should only be used if the command
+syntax is too complicated. Note also that a option specification with
+rest-arguments (as in `tt(-foo:*:...)' often allows to avoid the use
+of multiple sets.
+
 Another option supported is `tt(-O) var(name)'. The var(name) will be
 taken as the name of an array and its elements will be given to
 functions called to generate matches when executing the

@@ -510,7 +510,8 @@ parse_caarg(int mult, int type, int num, int opt, char *oname, char **def,
 		*p = ':';
 	} else
 	    ret->action = ztrdup(rembslashcolon(p + 1));
-    }
+    } else
+	ret->action = ztrdup("");
     *def = p;
 
     return ret;
@@ -588,7 +589,7 @@ parse_cadef(char *nam, char **args)
     /* Now get the -s, -A, -S and -M options. */
 
     args++;
-    while ((p = *args) && *p == '-') {
+    while ((p = *args) && *p == '-' && p[1]) {
 	for (q = ++p; *q; q++)
 	    if (*q == 'M') {
 		q = "";
@@ -1226,7 +1227,7 @@ ca_parse_line(Cadef d, int multi, int first)
     Caopt ptr, wasopt, dopt;
     struct castate state;
     char *line, *pe, **argxor = NULL;
-    int cur, doff, argend;
+    int cur, doff, argend, arglast;
     Patprog endpat = NULL;
 
     /* Free old state. */
@@ -1284,7 +1285,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	 line; line = compwords[cur++]) {
 	ddef = adef = NULL;
 	dopt = NULL;
-	doff = state.singles = 0;
+	doff = state.singles = arglast = 0;
 
 	if (ca_inactive(d, argxor, cur, 0) ||
 	    ((d->flags & CDF_SEP) && !strcmp(line, "--"))) {
@@ -1423,6 +1424,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	    if ((d->flags & CDF_ARG) && ca_inactive(d, NULL, cur + 1, 1))
 		return 1;
 
+	    arglast = 1;
 	    if (state.inopt) {
 		state.inopt = 0;
 		state.nargbeg = cur - 1;
@@ -1434,7 +1436,11 @@ ca_parse_line(Cadef d, int multi, int first)
 		(state.def->type == CAA_RREST ||
 		 state.def->type == CAA_RARGS)) {
 		state.inrest = 0;
-		state.opt = (cur == state.nargbeg + 1);
+		state.opt = (cur == state.nargbeg + 1 &&
+			     (!*line || 
+			      ((*line == '-' || *line == '+') &&
+			       (!line[1] ||
+				(*line == '-' && line[1] == '-' && !line[2])))));
 		state.optbeg = state.nargbeg;
 		state.argbeg = cur - 1;
 		state.argend = argend;
@@ -1510,6 +1516,10 @@ ca_parse_line(Cadef d, int multi, int first)
 		}
 	    } else {
 		ca_laststate.def = adef;
+		ca_laststate.opt = (!arglast || !*line || 
+				    ((*line == '-' || *line == '+') &&
+				     (!line[1] ||
+				      (*line == '-' && line[1] == '-' && !line[2]))));
 		ca_laststate.ddef = NULL;
 		ca_laststate.dopt = NULL;
 		ca_laststate.optbeg = state.nargbeg;
@@ -1801,7 +1811,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    for (; lstate; lstate = lstate->snext) {
 		if (lstate->actopts &&
 		    (lstate->opt || (lstate->doff && lstate->def) ||
-		     (lstate->def &&
+		     (lstate->def && lstate->def->opt &&
 		      (lstate->def->type == CAA_OPT ||
 		       (lstate->def->type >= CAA_RARGS &&
 			lstate->def->num < 0)))) &&

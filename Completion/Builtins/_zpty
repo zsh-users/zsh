@@ -3,19 +3,42 @@
 local state line list names expl curcontext="$curcontext"
 typeset -A opt_args
 
+
 _arguments -C -s \
-  '(-r)*::args:_normal' \
- - eb \
-  '-e[echo input characters]' \
-  '-b[io to pseudo-terminal blocking]' \
- - d \
-  '-d[delete command]:*:name:->name' \
- - w \
-  '-w[send string to command]:name:->name:*:strings to write' \
- - L \
-  '-L[list defined commands as calls]' \
- - r \
-  '(*)-r[read string from command]:name:->name:param:_parameters' && return 0
+  '(-r -w -L -d)-e[echo input characters]' \
+  '(-r -w -L -d)-b[io to pseudo-terminal blocking]' \
+  '(-r -w -L -e -b)-d[delete command]:*:name:->name' \
+  '(-r -L -e -b -d)-w[send string to command]:name:->name:*:strings to write' \
+  '(: -r -w -e -b -d)-L[list defined commands as calls]' \
+  '(: -w -L -e -b -d)-r[read string from command]:name:->name:param: _parameters:pattern:' \
+  '(-r -w -L -d):zpty command name:' \
+  '(-r -w -L -d):cmd: _command_names -e' \
+  '(-r -w -L -d)*::args:_precommand' && return 0
+
+# One could use sets, but that's more expensive and zpty is simple enough.
+#
+# _arguments -C -s \
+#   - read \
+#     '-r[read string from command]' \
+#     ':name:->name' \
+#     ':param: _parameters' \
+#     ':pattern:' \
+#   - write \
+#     '-w[send string to command]' \
+#     ':name:->name' \
+#     '*:strings to write' \
+#   - list \
+#     '-L[list defined commands as calls]' \
+#   - delete \
+#     '-d[delete command]' \
+#     '*:name:->name' \
+#   - start \
+#     '-e[echo input characters]' \
+#     '-b[io to pseudo-terminal blocking]' \
+#     ':zpty command name:' \
+#     ':cmd: _command_names -e' \
+#     '*::args:_precommand' && return 0
+
 
 if [[ $state = name ]]; then
   if ! zmodload -e zsh/zpty; then
@@ -26,8 +49,10 @@ if [[ $state = name ]]; then
   names=( ${list%%:*} )
   if zstyle -T ":completion:${curcontext}" verbose; then
     zformat -a list ' --' ${${(f)"$(zpty)"}#*\) }
-    _wanted names expl 'zpty command names' compadd -d list - "$names[@]"
+    _wanted names expl 'zpty command name' compadd -d list - "$names[@]"
   else
-    _wanted names expl 'zpty command names' compadd - "$names[@]"
+    _wanted names expl 'zpty command name' compadd - "$names[@]"
   fi
+else
+  return 1
 fi
