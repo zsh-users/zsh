@@ -1,3 +1,8 @@
+2001-06-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 15159: Completion/X/Command/_vnc: fix for two digit display numbers,
+	use _values for -encodings option and complete for xvncviewer
+
 2001-06-28  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* Bart: 15106, small changes in 15152: Completion/Zsh/Command/_cd,
