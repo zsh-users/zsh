@@ -1,0 +1,48 @@
+#compdef w3m
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+_arguments \
+  '-t[tabwidth]:tabwidth:' \
+  '-r[ignore backspace effect]' \
+  '-l[preserved lines]:number of lines:' \
+  '-B[load bookmark]' \
+  '-bookmark:bookmark file:_files' \
+  '-T[content-type]:content type:' \
+  '-m[internet message mode]' \
+  '-v[visual startup mode]' \
+  '-M[monochrome display]' \
+  '-F[automatically render frame]' \
+  '-dump' \
+  '-cols:column width:' \
+  '-dump_source' \
+  '-dump_head' \
+  '+:goto line:' \
+  '-num[show line number]' \
+  '-no-proxy' \
+  '-no-mouse' \
+  '-cookie' \
+  '-no-cookie' \
+  '-no-graph' \
+  '-S[squeeze multiple blank lines]' \
+  '-W[toggle wrap search mode]' \
+  '-X[do not use termcap init/deinit]' \
+  '-o[option]:option-value:' \
+  '-config:configfile:_files' \
+  '-debug' \
+  ':url:->url' && return 0
+
+case $state in
+	url)
+	local _w3mhistory
+
+	if [[ -s ~/.w3m/history ]]; then
+	   _w3mhistory=(${(f)"$(<$HOME/.w3m/history)"})
+	   compadd $_w3mhistory
+	fi
+
+	_urls || _files -g '*.html'
+	;;
+
+esac

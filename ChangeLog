@@ -1,3 +1,7 @@
+2001-03-06  Clint Adams  <schizo@debian.org>
+
+	* unposted: Completion/User/_w3m: complete for w3m.
+
 2001-03-06  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13576: Src/lex.c, Src/parse.c: make the parser use real memory
