@@ -1,3 +1,7 @@
+2004-03-12  Peter Stephenson  <pws@csr.com>
+
+	* 19615: Etc/MACHINES: update information.
+
 2004-03-12  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/.distfiles,
