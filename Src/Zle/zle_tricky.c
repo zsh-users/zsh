@@ -783,8 +783,20 @@ docomplete(int lst)
 			}
 		}
 		ret = docompletion(s, lst, lincmd);
-	    } else if (ret)
-		clearlist = 1;
+            } else {
+                if (ret)
+                    clearlist = 1;
+                if (!strcmp(ol, (char *)line)) {
+                    /* We may have removed some quotes. For completion, other
+                     * parts of the code re-install them, but for expansion
+                     * we have to do it here. */
+                    cs = 0;
+                    foredel(ll);
+                    spaceinline(origll);
+                    memcpy(line, origline, origll);
+                    cs = origcs;
+                }
+            }
 	} else
 	    /* Just do completion. */
 	    ret = docompletion(s, lst, lincmd);
@@ -1348,7 +1360,7 @@ get_comp_string(void)
                 *p = '\'';
             else if (level && *p == Dnull)
                 *p = '"';
-            else if (*p == String && p[1] == Inbrace)
+            else if ((*p == String || *p == Qstring) && p[1] == Inbrace)
                 level++;
             else if (*p == Outbrace)
                 level--;
@@ -1722,9 +1734,15 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	goto end;
     }
     if (lst == COMP_LIST_EXPAND) {
-	/* Only the list of expansions was requested. */
-	ret = listlist(vl);
-	showinglist = 0;
+	/* Only the list of expansions was requested. Restore the 
+         * command line. */
+        cs = 0;
+        foredel(ll);
+        spaceinline(origll);
+        memcpy(line, origline, origll);
+        cs = origcs;
+        ret = listlist(vl);
+        showinglist = 0;
 	goto end;
     }
     /* Remove the current word and put the expansions there. */

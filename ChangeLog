@@ -1,3 +1,9 @@
+2001-05-16  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14359: Src/Zle/zle_tricky.c: more fixage for expansion: just
+	convert the command line to the original when expansion
+	shouldn't or couldn't do something sensible on the line
+
 2001-05-15  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 14357: Src/hashtable.c, Src/hist.c, Src/zsh.h, Doc/Zsh/options.yo:
