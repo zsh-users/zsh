@@ -81,6 +81,11 @@ def(texiiftex)(1)(\
   ARG1\
   NOTRANS(@end iftex)NL()\
 )
+def(texiifnottex)(1)(\
+  NOTRANS(@ifnottex)NL()\
+  ARG1\
+  NOTRANS(@end ifnottex)NL()\
+)
 
 def(texipage)(0)(\
   NOTRANS(@page)\

@@ -46,6 +46,7 @@ def(texinfo)(2)(CMT())
 
 def(texiifinfo)(1)()
 def(texiiftex)(1)()
+def(texiifnottex)(1)()
 
 def(texipage)(0)(CMT())
 def(texititlepage)(0)(CMT())
@@ -61,8 +62,9 @@ COMMENT(--- section divisions ---)
 
 def(chapter)(1)(CMT())
 
+COMMENT(--- the "" works around a yodl bug ---)
 def(sect)(1)(\
-  NOTRANS(.SH ")UPPERCASE(ARG1)(0)"NL()\
+  NOTRANS(.SH )UPPERCASE(ARG1)(0)""NL()\
   STDPAR()\
   CMT()\
 )
@@ -162,6 +164,12 @@ def(itemiz)(1)(\
 
 COMMENT(--- special effects ---)
 
+def(example)(1)(\
+  NOTRANS(.RS)NL()NOTRANS(.nf)NL()\
+  NOTRANS(\fB)ARG1NOTRANS(\fP)\
+  NL()NOTRANS(.fi)NL()NOTRANS(.RE)\
+)
+
 def(nofill)(1)(\
   NOTRANS(.nf)NL()\
   ARG1\
@@ -169,9 +177,9 @@ def(nofill)(1)(\
 )
 
 def(indent)(1)(\
-  NOTRANS(.RS)\
+  NOTRANS(.RS)NL()NOTRANS(.nf)NL()\
   ARG1\
-  NOTRANS(.RE)\
+  NL()NOTRANS(.fi)NL()NOTRANS(.RE)\
 )
 
 COMMENT(--- hyperlink menus ---)

@@ -81,7 +81,8 @@ Doc/zsh.texi	Everything the man pages have, but in texinfo format.  These
 		By default, these will be installed in /usr/local/info,
 		although you can change this with the --infodir option to
 		configure or editing the user configuration section of the
-		top level Makefile.
+		top level Makefile.  Version 4.0 or above of the
+		Texinfo tools are recommended for processing this file.
 
 Also include in the distribution are:
 

@@ -40,7 +40,7 @@ INSTALL         = @INSTALL@
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS = dvips
-TEXI2HTML = texi2html -expandinfo -split_chapter
+TEXI2HTML = texi2html -expand info -split chapter
 
 .SUFFIXES: .yo .1
 
@@ -297,14 +297,14 @@ uninstall.info:
 # install HTML manual
 install.html: html
 	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
-	for file in zsh_*.html; do \
+	for file in zsh*.html; do \
 	    $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir) || exit 1; \
 	done
 .PHONY: install.html
 
 # uninstall HTML manual
 uninstall.html:
-	rm -f $(DESTDIR)$(htmldir)/zsh_*.html
+	rm -f $(DESTDIR)$(htmldir)/zsh*.html
 .PHONY: uninstall.html
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
