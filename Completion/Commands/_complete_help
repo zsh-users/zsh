@@ -44,21 +44,22 @@ tags in context :completion:${i}:"
     text="${text}${tmp}"
   done
 
-  text="$text
+  if [[ ${NUMERIC:-1} -ne 1 ]]; then
+    text="$text
 "
-  for i in "${(@ok)help_sfuncs}"; do
-    text="${text}
+    for i in "${(@ok)help_sfuncs}"; do
+      text="${text}
 styles in context ${i}"
-    tmp=()
-    for j in "${(@s.:.)help_sfuncs[$i][2,-1]}"; do
-      tmp=( "$tmp[@]" "${(@s.,.)help_styles[${i}${j}][2,-1]}" )
-    done
-    zformat -a tmp '  (' "$tmp[@]"
-    tmp=( '
+      tmp=()
+      for j in "${(@s.:.)help_sfuncs[$i][2,-1]}"; do
+        tmp=( "$tmp[@]" "${(@s.,.)help_styles[${i}${j}][2,-1]}" )
+      done
+      zformat -a tmp '  (' "$tmp[@]"
+      tmp=( '
     '${^tmp}')' )
-    text="${text}${tmp}"
-  done
-
+      text="${text}${tmp}"
+    done
+  fi
   compstate[list]='list force'
   compstate[insert]=''
 

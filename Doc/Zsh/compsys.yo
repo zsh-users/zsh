@@ -355,8 +355,7 @@ ifzman(the section `Bindable Commands' below)\
 ifnzman(noderef(Bindable Commands))
 can be invoked to find out the context and tag names and styles used at a particular
 point in completion.  It shows a list of context names and the 
-tag names used in those contexts and then a list of context names and
-the styles used in those contexts if completion were tried at the
+tag names used in those contexts if completion were tried at the
 current cursor position.  Hence one can easily find out all the
 information needed to change the behaviour of the tt(tag-order) style
 for a particular context.
@@ -2200,8 +2199,10 @@ read, call tt(_read_comp) with a numeric argument.
 findex(_complete_help (^Xh))
 item(tt(_complete_help (^Xh)))(
 This widget displays information about the context names, 
-the tags, the styles, and the completion functions used 
-when completing at the current cursor position.
+the tags, and the completion functions used 
+when completing at the current cursor position. If given a numeric
+argument other than tt(1) (as in `tt(ESC-2 ^Xh)'), then the styles
+used and the contexts for which they are used will be shown, too.
 
 Note that, depending on the control flow in the completion functions
 called, the information about the styles may be
