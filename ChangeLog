@@ -1,3 +1,8 @@
+2005-02-21  Peter Stephenson  <pws@csr.com>
+
+	* 20833: Src/Zle/zle.h: typo in 20822: int_t should have
+	been wint_t.
+
 2005-02-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync:  A little more

@@ -30,7 +30,7 @@
 #ifdef ZLE_UNICODE_SUPPORT
 typedef wchar_t ZLE_CHAR_T;
 typedef wchar_t *ZLE_STRING_T;
-typedef int_t   ZLE_INT_T;
+typedef wint_t   ZLE_INT_T;
 #define ZLE_CHAR_SIZE	sizeof(wchar_t)
 
 /*
