@@ -33,15 +33,13 @@ char *realloc _((void *, size_t));
 char *calloc _((size_t, size_t));
 #endif
 
-#ifndef HAVE_TERMCAP_H
+#if !(defined(HAVE_TERMCAP_H) || defined(HAVE_TERM_H))
 extern int tgetent _((char *bp, char *name));
 extern int tgetnum _((char *id));
 extern int tgetflag _((char *id));
 extern char *tgetstr _((char *id, char **area));
 extern char *tgoto _((char *cm, int destcol, int destline));
-# ifndef HAVE_TERM_H
 extern int tputs _((char *cp, int affcnt, int (*outc) (int)));
-# endif
 #endif
 
 /* MISSING PROTOTYPES FOR VARIOUS OPERATING SYSTEMS */

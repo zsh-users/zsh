@@ -29,17 +29,14 @@
 
 #include "terminfo.mdh"
 #include "terminfo.pro"
-#ifdef HAVE_CURSES_H
-# include <curses.h>
-#endif
-#ifdef HAVE_TERM_H
-# include <term.h>
-#endif
 
 static char terminfo_nam[] = "terminfo";
 
 /**/
 #ifdef HAVE_TIGETSTR
+# ifdef HAVE_CURSES_H
+#  include <curses.h>
+# endif
 
 static Param terminfo_pm;
 

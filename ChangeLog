@@ -1,3 +1,9 @@
+2001-04-12  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 13965: Src/system.h, Src/prototypes.h, Src/Modules/terminfo.c:
+	Use <term.h> for termcap protos when it is found but <termcap.h>
+	is not; don't include <curses.h> unless it will be used.
+
 2001-04-12  Clint Adams  <schizo@debian.org>
 
 	* 13961: Src/prototypes.h: entertain the possibility that
