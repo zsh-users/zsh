@@ -976,13 +976,16 @@ execpline(Estate state, wordcode slcode, int how, int last1)
         list_pipe_pid = 0;
 	nowait = 0;
 	simple_pline = (WC_PIPE_TYPE(code) == WC_PIPE_END);
-	list_pipe_job = (simple_pline ? 0 : newjob);
+	list_pipe_job = newjob;
     }
     lastwj = lpforked = 0;
     execpline2(state, code, how, opipe[0], ipipe[1], last1);
     pline_level--;
     if (how & Z_ASYNC) {
 	lastwj = newjob;
+
+        if (thisjob == list_pipe_job)
+            list_pipe_job = 0;
 	jobtab[thisjob].stat |= STAT_NOSTTY;
 	if (slflags & WC_SUBLIST_COPROC) {
 	    zclose(ipipe[1]);

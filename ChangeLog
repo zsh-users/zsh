@@ -1,3 +1,9 @@
+2001-05-28  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14503: Src/exec.c: another attempt at fixing the job problem
+	from 14327; make execpline() reset list_pipe_job to zero if it
+	would be set for a job started in the background
+
 2001-05-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Etc/MACHINES: Mention failure of gcc 2.7.1 on HPUX,
