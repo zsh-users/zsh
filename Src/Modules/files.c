@@ -255,14 +255,15 @@ static int
 domove(char *nam, MoveFunc move, char *p, char *q, int flags)
 {
     struct stat st;
-    char *qbuf;
-    char pbuf[PATH_MAX + 1];
-    strcpy(pbuf, unmeta(p));
+    char *pbuf, *qbuf;
+
+    pbuf = ztrdup(unmeta(p));
     qbuf = unmeta(q);
     if(flags & MV_NODIRS) {
 	errno = EISDIR;
 	if(lstat(pbuf, &st) || S_ISDIR(st.st_mode)) {
 	    zwarnnam(nam, "%s: %e", p, errno);
+	    zsfree(pbuf);
 	    return 1;
 	}
     }
@@ -270,6 +271,7 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
 	int doit = flags & MV_FORCE;
 	if(S_ISDIR(st.st_mode)) {
 	    zwarnnam(nam, "%s: cannot overwrite directory", q, 0);
+	    zsfree(pbuf);
 	    return 1;
 	} else if(flags & MV_INTER) {
 	    nicezputs(nam, stderr);
@@ -277,8 +279,10 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
 	    nicezputs(q, stderr);
 	    fputs("'? ", stderr);
 	    fflush(stderr);
-	    if(!ask())
+	    if(!ask()) {
+		zsfree(pbuf);
 		return 0;
+	    }
 	    doit = 1;
 	} else if((flags & MV_ASKNW) &&
 		!S_ISLNK(st.st_mode) &&
@@ -289,8 +293,10 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
 	    fprintf(stderr, "', overriding mode %04o? ",
 		mode_to_octal(st.st_mode));
 	    fflush(stderr);
-	    if(!ask())
+	    if(!ask()) {
+		zsfree(pbuf);
 		return 0;
+	    }
 	    doit = 1;
 	}
 	if(doit && !(flags & MV_ATOMIC))
@@ -298,8 +304,10 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
     }
     if(move(pbuf, qbuf)) {
 	zwarnnam(nam, "%s: %e", p, errno);
+	zsfree(pbuf);
 	return 1;
     }
+    zsfree(pbuf);
     return 0;
 }
 

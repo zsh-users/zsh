@@ -1,3 +1,7 @@
+2000-09-19  Clint Adams  <schizo@debian.org>
+
+	* 12845: Src/Modules/files.c: dynamically allocate pbuf in domove().
+
 2000-09-18  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12835: Doc/Zsh/compwid.yo: Alphabetize list of special parameters
