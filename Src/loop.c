@@ -138,6 +138,8 @@ execfor(Estate state, int do_exec)
 		break;
 	    contflag = 0;
 	}
+	if (retflag)
+	    break;
 	if (iscond && !errflag) {
 	    str = dupstring(advance);
 	    if (isset(XTRACE)) {
@@ -258,7 +260,7 @@ execselect(Estate state, int do_exec)
 		break;
 	    contflag = 0;
 	}
-	if (errflag)
+	if (retflag || errflag)
 	    break;
     }
   done:
@@ -357,6 +359,10 @@ execwhile(Estate state, int do_exec)
 	    lastval = oldval;
 	    break;
 	}
+	if (retflag) {
+	    lastval = oldval;
+	    break;
+	}
 	execlist(state, 1, 0);
 	if (breaks) {
 	    breaks--;
@@ -364,11 +370,13 @@ execwhile(Estate state, int do_exec)
 		break;
 	    contflag = 0;
 	}
-	freeheap();
 	if (errflag) {
 	    lastval = 1;
 	    break;
 	}
+	if (retflag)
+	    break;
+	freeheap();
 	oldval = lastval;
     }
     cmdpop();
@@ -410,6 +418,8 @@ execrepeat(Estate state, int do_exec)
 	    lastval = 1;
 	    break;
 	}
+	if (retflag)
+	    break;
     }
     cmdpop();
     popheap();
@@ -447,6 +457,8 @@ execif(Estate state, int do_exec)
 	    run = 1;
 	    break;
 	}
+	if (retflag)
+	    break;
 	s = 1;
 	state->pc = next;
     }
@@ -532,7 +544,7 @@ execcase(Estate state, int do_exec)
 	if (pprog && pattry(pprog, word)) {
 	    execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
 				do_exec));
-	    while (wc_code(code) == WC_CASE &&
+	    while (!retflag && wc_code(code) == WC_CASE &&
 		   WC_CASE_TYPE(code) == WC_CASE_AND) {
 		state->pc = next;
 		code = *state->pc;
