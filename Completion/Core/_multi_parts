@@ -128,9 +128,10 @@ while true; do
                     -M "r:|${sep}=* r:|=* $match" - "$tmp1[1]"
           fi
         fi
-	return 0
+	return
       fi
     elif (( $#tmp1 )); then
+      local ret=1
 
       # More than one match. First we get all strings that match the
       # rest from the line.
@@ -164,10 +165,10 @@ while true; do
 	  if [[ "$i" = *${sep}* ]]; then
             compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
 	            -p "$pref" \
-                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}"
+                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}" && ret=0
           else
             compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
-                    -M "r:|${sep}=* r:|=* $match" - "$i"
+                    -M "r:|${sep}=* r:|=* $match" - "$i" && ret=0
           fi
         done
       else
@@ -179,14 +180,14 @@ while true; do
 	  if [[ "$i" = *${sep}* ]]; then
             compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
 	            -p "$pref" -s "${i#*${sep}}" \
-                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}"
+                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}" && ret=0
           else
             compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
-                    -M "r:|${sep}=* r:|=* $match" - "$i"
+                    -M "r:|${sep}=* r:|=* $match" - "$i" && ret=0
           fi
         done
       fi
-      return 0
+      return ret
     else
       # We are here if no string matched what's on the line. In this
       # case we insert the expanded prefix we collected if it differs
@@ -205,7 +206,7 @@ while true; do
         compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
                 -M "r:|${sep}=* r:|=* $match" - "$pref$pre"
       fi
-      return 0
+      return
     fi
   fi
 
