@@ -1,3 +1,8 @@
+2001-05-10  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14293: Src/Zle/computil.c: barf if a empty string is given as
+	one of the separators for _values
+
 2001-05-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: configure.in: Clean up 14275+14290 a bit at Andrej's

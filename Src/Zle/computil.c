@@ -2096,7 +2096,7 @@ parse_cvdef(char *nam, char **args)
 
     while (args[0][0] == '-' && (args[0][1] == 's' || args[0][1] == 'S') &&
            !args[0][2]) {
-	if (args[1][0] && args[1][1]) {
+	if (!args[1][0] || (args[1][0] && args[1][1])) {
 	    zwarnnam(nam, "invalid separator: %s", args[1], 0);
 	    return NULL;
 	}
