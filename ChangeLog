@@ -1,5 +1,8 @@
 2001-04-02  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* unposted, kind of: moving functions and scripts around, renaming
+	them, accidentally deleted them and re-installing them, etc.
+
 	* 13868: Src/Zle/compmatch.c, Src/Zle/computil.c: make
 	`_arguments -S' still complete long options after `--<TAB>';
 	fix for cursor positioning with partial word match specs
