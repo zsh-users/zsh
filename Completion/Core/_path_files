@@ -11,12 +11,17 @@
 # with one of the suffixes thus given are treated like files with one
 # of the suffixes in the `fignore' array in normal completion.
 #
-# This function supports one configuration key:
+# This function supports two configuration keys:
 #
 #  path_expand
 #    If this is set to a non-empty string, the partially typed path
 #    from the line will be expanded as far as possible even if trailing
 #    pathname components can not be completed.
+#
+#  path_cursor
+#    If this is set to an non-empty string, the cursor will be placed
+#    in the path after the ambiguous pathname component even when using
+#    menucompletion.
 
 local linepath realpath donepath prepath testpath exppath
 local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf
@@ -28,12 +33,11 @@ typeset -U prepaths exppaths
 setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset
 
+local sopt='-' gopt='' opt
 exppaths=()
 prepaths=('')
 ignore=()
 group=()
-sopt='-'
-gopt=''
 pats=()
 addpfx=()
 addsfx=()
@@ -222,7 +226,7 @@ for prepath in "$prepaths[@]"; do
     # Get the matching files by globbing.
 
     if [[ "$tpre$tsuf" = */* ]]; then
-      tmp1=( ${^tmp1}*(D/) )
+      tmp1=( ${^tmp1}*(-D/) )
     else
       tmp1=( ${^tmp1}${^~pats} )
     fi
@@ -231,7 +235,7 @@ for prepath in "$prepaths[@]"; do
       # See which of them match what's on the line.
 
       tmp2=("$tmp1[@]")
-      compadd -D tmp1 "$ignore[@]" - "${(@)tmp1##*/}"
+      compadd -D tmp1 "$ignore[@]" - "${(@)tmp1:t}"
 
       # If no file matches, save the expanded path and continue with
       # the outer loop.
@@ -240,7 +244,7 @@ for prepath in "$prepaths[@]"; do
  	if [[ "$tmp2[1]" = */* ]]; then
 	  tmp2=( "${(@)tmp2#${prepath}${realpath}}" )
 	  if [[ "$tmp2[1]" = */* ]]; then
-	    exppaths=( "$exppaths[@]" ${^tmp2%/*}/${tpre}${tsuf} )
+	    exppaths=( "$exppaths[@]" ${^tmp2:h:q}/${tpre}${tsuf} )
           else
 	    exppaths=( "$exppaths[@]" ${tpre}${tsuf} )
 	  fi
@@ -248,6 +252,25 @@ for prepath in "$prepaths[@]"; do
         continue 2
       fi
     elif (( ! $#tmp1 )); then
+      # A little extra hack: if we were completing `foo/<TAB>' and `foo'
+      # contains no files, this will normally produce no matches and other
+      # completers might think that's it's their time now. But if the next
+      # completer is _correct or something like that, this will result in
+      # an attempt to correct a valid directory name. So we just add the
+      # original string in such a case so that the command line doesn't 
+      # change but other completers still think there are matches.
+
+      # Problem:  this seems to stop _files from finding directory
+      # completions if there were no file completions, for
+      # example `_files *(*)' no longer completes subdirectories after
+      # a /.  For now, make this a configuration option, but
+      # probably it needs to be done better.
+
+      if [[ -n "$compconfig[path_keepdir]" && -z "$tpre$tsuf" &&
+	"$pre" = */ && -z "$suf" ]]; then
+        compadd -nQS '' - "$linepath$donepath$orig"
+        tmp4=-
+      fi
       continue 2
     fi
 
@@ -304,34 +327,35 @@ for prepath in "$prepaths[@]"; do
       # it as far as possible.
 
       if [[ -n $menu ]]; then
+        [[ -n "$compconfig[path_cursor]" ]] && compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
-	  compadd -Uf -p "$linepath$testpath" -s "/${tmp3#*/}" \
+	  compadd -QUf -p "$linepath${testpath:q}" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
-		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
+		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
 		  "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
-		  - "${(@)tmp1%%/*}"
+		  - "${(@)${(@)tmp1%%/*}:q}"
 	else
-	  compadd -Uf -p "$linepath$testpath" \
+	  compadd -QUf -p "$linepath${testpath:q}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
 		   "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
 		   "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
-		   - "$tmp1[@]"
+		   - "${(@)tmp1:q}"
 	fi
       else
         if [[ "$tmp3" = */* ]]; then
           for i in "$tmp1[@]"; do
-	    compadd -Uf -p "$linepath$testpath" -s "/${i#*/}" \
+	    compadd -QUf -p "$linepath${testpath:q}" -s "/${${i#*/}:q}" \
 		    -W "$prepath$realpath$testpath" "$ignore[@]" \
 		    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
 		    "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
-		    - "${i%%/*}"
+		    - "${${i%%/*}:q}"
 	  done
         else
-	  compadd -Uf -p "$linepath$testpath" \
+	  compadd -QUf -p "$linepath${testpath:q}" \
 		  -W "$prepath$realpath$testpath" "$ignore[@]" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
 		  "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
-		  - "$tmp1[@]"
+		  - "${(@)tmp1:q}"
         fi
       fi
       tmp4=-
@@ -356,11 +380,11 @@ for prepath in "$prepaths[@]"; do
   done
 
   if [[ -z "$tmp4" ]]; then
-    compadd -Uf -p "$linepath$testpath" \
+    compadd -QUf -p "$linepath${testpath:q}" \
 	    -W "$prepath$realpath$testpath" "$ignore[@]" \
 	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
 	    "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
-	    - "$tmp1[@]"
+	    - "${(@)tmp1:q}"
   fi
 done
 
@@ -371,9 +395,9 @@ done
 exppaths=( "${(@)exppaths:#$orig}" )
 
 if [[ -n "$compconfig[path_expand]" &&
-      $#exppaths -ne 0 && nm -eq compstate[nmatches] ]]; then
-  compadd -U -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
-          -p "$linepath" - "${(@)exppaths}"
+      $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
+  compadd -QU -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+          -M 'r:|/=* r:|=*' -p "$linepath" - "$exppaths[@]"
 fi
 
-[[ nm -eq compstate[nmatches] ]]
+[[ nm -ne compstate[nmatches] ]]

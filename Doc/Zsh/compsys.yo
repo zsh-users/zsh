@@ -1,87 +1,125 @@
 texinode(Completion System)(Zftp Function System)(Zsh Modules)(Top)
 chapter(Completion System)
-cindex(completion, system)
+cindex(completion system)
 cindex(completion, programmable)
 cindex(completion, controlling)
 sect(Description)
 
 This describes the shell code for the new completion system.  It consists
-of two scripts and a few other files that define shell functions.
-The shell functions which implement completion behaviour and which may
-be bound to keystrokes, are referred to as `widgets'.  All are contained
-in the following subdirectories of the tt(Completion) directory of the main
-distribution directory.
-
-startitem()
-item(tt(Core))(
-The core scripts and functions.  You will certainly need these, though will
-probably not need to alter them.  The contents of this directory is
-described in more detail below.
-)
-item(tt(Base))(
-Other functions you will almost certainly want if you are going to use
-any of the standard completion functions.  You may want to edit some of
-these files.
-)
-item(tt(Builtins))(
-Functions for completing arguments of shell builtin commands.
-)
-item(tt(User))(
-Functions for completing arguments of external commands and suites of
-commands.  They may need modifying for your system.
-)
-item(tt(Commands))(
-Functions which implement special types of completion to be bound to
-keystrokes rather than called by context.
-)
-enditem()
-
-You should decide which files you will be using and copy them to a
-directory (or multiple directories) of your own which should appear in your
-tt($fpath) variable so that the functions can be autoloaded.
+of varsious shell functions; those beginning `tt(comp)' are to be called
+directly by the user, while those beginning `tt(_)' are called by the
+completion code.  The shell functions of the second set which implement
+completion behaviour and which may be bound to keystrokes, are referred to
+as `widgets'.
 
 startmenu()
-menu(Initialisation)
+menu(Initialization)
 menu(Control Functions)
 menu(Completion Functions)
+menu(Completion Directories)
+menu(Bindable Commands)
 endmenu()
 
-texinode(Initialisation)(Control Functions)()(Completion System)
-sect(Initialisation)
+texinode(Initialization)(Control Functions)()(Completion System)
+sect(Initialization)
+findex(compinstall)
+cindex(completion system, installing)
 
-To initialise the system, the script tt(compinit) should be sourced with
-`tt(source )var(<path>)tt(/compinit)' or
-`tt(. )var(<path>)tt(/compinit)'. This will define a few utility functions,
-arrange for all the necessary shell functions to be autoloaded, and will
-then re-bind all keys that do completion to use the new system.
+The function tt(compinstall) can be run by a user to set up the completion
+system for use, which also provides options for more advanced usage.
+However, if the system was installed completely, it should be enough to
+call the shell function tt(compinit) from your initialization file; see the
+next section.
 
-subsect(Arguments)
+Usually, tt(compinstall) will insert code into tt(.zshrc), although if
+that is not writable it will save it in another file and tell you that
+file's location.  Note that it is up to you to make sure that the lines
+added to tt(.zshrc) are actually run; you may, for example, need to move
+them to an earlier place in the file if tt(.zshrc) usually returns early.
+So long as you keep them all together (including the comment lines at the
+start and finish), you can rerun tt(compinstall) and it will correctly
+locate and modify these lines.  Note, however, that any code you add to
+this section by hand is likely to be lost if you rerun tt(compinstall).
+The new code will take effect next time you start the shell, or run
+tt(.zshrc) by hand.
+
+To run it, you will need to make sure it is in a directory mentioned in your
+tt($fpath) parameter, and that it is autoloaded (`tt(autoload -U
+compinstall)' is recommended).  It will ask you various questions about how
+you would like completion set up.  It is in two parts; the basic part
+locates the completion files and decides where to put your personal
+dumpfile, used to speed up initialization after the first time.  After
+that, you will be asked if you wish to go on to the advanced set-up; if you
+answer tt(n), you can rerun tt(compinstall) later without having to
+re-enter any of the basic settings.
+
+You can abort the installation any time you are being prompted for
+information, and your tt(.zshrc) will not be altered at all.
+
+After initialization all the builtin completion widgets such as
+tt(expand-or-complete) will be redefined to use the new completion system.
+Should you need to, you can still bind keys to the old functions by putting
+a `tt(.)' in front, e.g. `tt(.expand-or-complete)'.
+
+subsect(Use of compinit)
+findex(compinit)
+cindex(completion system, initializing)
+
+This section describes the use of tt(compinit) to initialize completion for
+the current session when run directly by the user; if you have run
+tt(compinstall) it will be called automatically from your tt(.zshrc).
+
+To initialize the system, the function tt(compinit) should be in a
+directory mentioned in the tt($fpath) variable, and should be autoloaded
+(`tt(autoload -U compinit)' is recommended).  When run, it will define a
+few utility functions, arrange for all the necessary shell functions to be
+autoloaded, and will then re-bind all keys that do completion to use the
+new system.
 
 To speed up the running of tt(compinit), it can be made to produce a dumped
-configuration which will be read in on future invocations.  The easiest way
-to do this is by adding the option tt(-d) whenever tt(compinit) is sourced.
-In this case the dumped file will have the same name as the sourced file,
-but with tt(.dump) appended to the end; alternatively, an explicit file
-name can be given following the tt(-d).  On the next call to tt(compinit
--d), the dumped file will be read instead.
+configuration which will be read in on future invocations; this is the
+default, although it can be turned off by calling tt(compinit) with the
+option tt(-D).  The dumped file is tt(.zcompdump) in the same
+directory as the startup files (i.e. tt($ZDOTDIR) or tt($HOME));
+alternatively, an explicit file name can be given by `tt(compinit -d)
+var(dumpfile)'.  On the next call to tt(compinit), the dumped file will be
+read instead of a full initialization.
 
 If the number of completion files changes, tt(compinit) will recognise this
 and produce a new dump file.  However, if the name of a function or the
-arguments in the first line of a tt(#compdef) funcion (as described below)
+arguments in the first line of a tt(#compdef) function (as described below)
 change, it is easiest to delete the dump file by hand so that the next time
 tt(compinit) will re-create it.
 
-The dumping is actually done by another script, tt(compdump), but you will
-only need to source this yourself if you change the configuration
+The dumping is actually done by another function, tt(compdump), but you
+will only need to run this yourself if you change the configuration
 (e.g. using tt(compdef)) and then want to dump the new one.  The name of
-the old dumped file will be remembered for this.
+the old dumped file will be remembered for this purpose.
+
+If the parameter tt(_compdir) is set, tt(compinit) uses it as a directory
+where completion functions can be found; this is only necessary if they are
+not already in the function search path.
 
 subsect(Autoloaded files)
+cindex(completion system, autoloaded functions)
 
 The convention for autoloaded functions used in completion is that they
 start with an underscore; as already mentioned, the tt(fpath/FPATH)
-parameter must contain the directory in which they are stored.  When
-tt(compinit) is sourced, it searches all such files accessible via
+parameter must contain the directory in which they are stored.  If tt(zsh)
+was properly installed on your system, then tt(fpath/FPATH) automatically
+contains the required directories.
+
+For incomplete installations, if tt(compinit) does not find enough files
+beginning with an underscore (fewer than twenty) in the search path, it
+will try to find more by adding the directory tt(_compdir) to the search
+path; if you have run tt(compinstall), this will be set automatically.
+Furthermore, if the directory in question ends in the path segment
+tt(Core), or has a subdirectory named tt(Core), tt(compinit) will add all
+subdirectories of the directory where tt(Core) is to the path: this allows
+the functions to be in the same format as in the tt(zsh) source
+distribution.
+
+When tt(compinit) is run, it searches all such files accessible via
 tt(fpath/FPATH) and reads the first line of each of them.  This line should
 contain one of the tags described below. Files whose first line does not
 start with one of these tags are not considered to be part of the
@@ -104,12 +142,18 @@ var(pattern) (a standard globbing pattern).  Note that only one
 var(pattern) may be given.
 )
 item(tt(#compdef -k) var(style key-sequences...))(
-This can be used bind special completion functions to the
+This can be used to bind special completion functions to the
 var(key-sequences).  It creates a widget behaving like the builtin widget
 var(style), which must be one of those that perform completion, namely
 tt(complete-word), tt(delete-char-or-list), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(list-choices), tt(menu-complete),
-tt(menu-expand-or-complete), or tt(reverse-menu-complete).
+tt(menu-expand-or-complete), or tt(reverse-menu-complete). If the
+tt(complist) module is loaded (see
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The complist Module))\
+), the tt(menu-select) widget can be used, too.  If the option tt(-n) is
+also given, the bindings will not be used if the key is already bound (that
+is, is bound to something other than tt(undefined-key)).
 
 The widget is then bound to all the var(key-sequences) given, if any: when
 one of the var(key-sequences) is typed, the function in the file will
@@ -135,6 +179,8 @@ subsect(Functions)
 The tt(compinit) file defines the following functions, which may
 also be called directly by the user.
 
+findex(compdef)
+cindex(completion system, adding definitions)
 startitem()
 xitem(tt(compdef) [ tt(-an) ] var(function names...))
 xitem(tt(compdef -d) var(names...))
@@ -158,15 +204,21 @@ and will otherwise behave like the builtin widget whose name is given as
 the var(style) argument. The widgets usable for this are:
 tt(complete-word), tt(delete-char-or-list), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(list-choices), tt(menu-complete),
-tt(menu-expand-or-complete), and tt(reverse-menu-complete).
+tt(menu-expand-or-complete), and tt(reverse-menu-complete), as well as
+tt(menu-select) if the tt(complist) module is loaded.  The option tt(-n)
+prevents the key being bound if it is already to bound to something other
+than tt(undefined-key).
 
 In each of the forms supporting it the tt(-a) option makes the
 var(function) autoloadable (exactly equivalent to
 tt(autoload )var(function)).
 )
+findex(compconf)
+cindex(completion system, configuring)
 xitem(tt(compconf) var(definitions...))
 xitem(tt(compconf) [ tt(-L) ] )
 item(tt(compconf) [ tt(-l) ] [ tt(-L) ] var(keys...))(
+vindex(compconfig)
 Several aspects of the completion system can be configured by the
 user. The configuration values are stored under the keys described
 below in the associative array `tt(compconfig)'.  After sourcing
@@ -189,11 +241,12 @@ function, usable to be put in a setup script.
 )
 enditem()
 
-texinode(Control Functions)(Completion Functions)(Initialisation)(Completion System)
+texinode(Control Functions)(Completion Functions)(Initialization)(Completion System)
 sect(Control Functions)
+cindex(completion system, choosing completers)
 
-The initialisation script tt(compinit) re-binds all the keys which perform
-completion to newly created widgets that all call the supplied widget
+The initialization script tt(compinit) redefines all the widgets
+which perform completion to call the supplied widget
 function tt(_main_complete). This function acts as a wrapper calling
 the so-called `completer' functions that generate matches. If
 tt(_main_complete) is
@@ -203,9 +256,7 @@ set of functions to try is taken from the colon-separated list in the
 configuration key tt(completer). For example, to use normal
 completion and correction if that doesn't generate any matches:
 
-indent(
-nofill(tt(compconf completer=_complete:_correct))
-)
+example(compconf completer=_complete:_correct)
 
 after sourcing tt(compinit). The default value for this configuration key
 set up in tt(compinit) is `tt(_complete)', i.e. normally only ordinary
@@ -214,9 +265,15 @@ of the completer functions to decide if other completers should be
 called. If the return value is zero, no other completers are tried and the
 tt(_main_complete) function returns.
 
+The widget function tt(_main_complete) also uses the configuration key 
+tt(last_prompt). If this is set to tt(always), the cursor is moved up
+to the last prompt after printing a list of matches even if a numeric
+argument was given.
+
 The following completer functions are contained in the distribution (users
 may write their own):
 
+cindex(completion system, completers)
 startitem()
 item(tt(_complete))(
 This completer generates all possible completions in a context-sensitive
@@ -284,6 +341,11 @@ Default implementations are supplied for each of these
 contexts, in most cases named after the context itself
 (e.g. completion for the `tt(-tilde-)' context is done by the function 
 named `tt(_tilde)').
+
+Before trying to find a function for a specific context, tt(_complete) 
+checks if the parameter `tt(compcontext)' is set to a non-empty
+value. If it is, the value is taken as the name of the context to use
+and the function defined for that context will be called.
 )
 item(tt(_approximate))(
 This completer function uses the tt(_complete) completer to generate
@@ -301,9 +363,7 @@ counted. The resulting list of corrected and completed strings is then
 presented to the user. The intended use of this completer function is to
 try after the normal tt(_complete) completer by setting:
 
-indent(
-nofill(tt(compconf completer=_complete:_approximate))
-)
+example(compconf completer=_complete:_approximate)
 
 This will give correcting completion if and only if
 normal completion doesn't yield any possible completions. When
@@ -325,16 +385,14 @@ If the value for this key contains a lower- or upper-case `tt(n)', the
 completer function will take any numeric argument as the
 maximum number of errors allowed. For example, with
 
-indent(
-nofill(tt(compconf approximate_accept=2n))
-)
+example(compconf approximate_accept=2n)
 
 two errors will be allowed if no numeric argument is given. However,
 with a numeric argument of six (as in `tt(ESC-6 TAB)'), up to six
 errors are accepted.  Hence with a value of `tt(0n)', no correcting
 completion will be attempted unless a numeric argument is given.
 
-If the value contains `tt(n)' or `tt(N)' and a exclamation mark
+If the value contains `tt(n)' or `tt(N)' and an exclamation mark
 (`tt(!)'), tt(_approximate) will var(not) try to generate corrected
 completions when given a numeric argument, so in this case the number given
 should be greater than zero.  For example, `tt(2n!)' specifies that
@@ -389,10 +447,8 @@ configuration parameters beginning tt(correct_) are used.
 
 For example, with:
 
-indent(tt(
-nofill(compconf completer=_complete:_correct:_approximate)
-nofill(compconf correct_accept='2n!' approximate_accept=3n))
-)
+example(compconf completer=_complete:_correct:_approximate
+compconf correct_accept='2n!' approximate_accept=3n)
 
 correction will accept up to two errors. If a numeric argument is
 given, correction will not be performed, but correcting completion will be,
@@ -410,7 +466,7 @@ generated by the tt(_correct) completer -- and probably more.
 item(tt(_match))(
 This completer is intended to be used after the tt(_complete)
 completer. It allows one to give patterns on the command line and
-to complete all strings metching these patterns from the set of possible
+to complete all strings matching these patterns from the set of possible
 completions for the context the cursor is in, without having to set
 the tt(GLOB_COMPLETE) option.
 
@@ -421,6 +477,12 @@ configuration key tt(match_original) has a value of `tt(only)', no
 `tt(*)' will be inserted. If tt(match_original) has any other non-empty
 string as its value, this completer will first try to generate matches
 without, then with a `tt(*)' inserted at the cursor position.
+
+The generated matches will be offered in a menucompletion unless the
+tt(match_insert) configuration key is set to a string starting with
+`tt(unambig)'. In this case menucompletion will only be started if no
+unambiguous string could be generated that is at least as long as the
+original string.
 )
 item(tt(_expand))(
 This completer function does not really do completion, but instead
@@ -444,9 +506,7 @@ non-empty string it should be an expression usable inside a `tt($((...)))'
 arithmetical expression. In this case, expansion of substitutions will
 be done if the expression evaluates to `tt(1)'. For example, with
 
-indent(
-nofill(tt(compconf expand_substitute='NUMERIC != 1'))
-)
+example(compconf expand_substitute='${NUMERIC:-1} != 1')
 
 substitution will be performed only if given an explicit numeric
 argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
@@ -502,9 +562,7 @@ should be set to an expression usable inside a `tt($((...)))'
 arithmetical expression. In this case, delaying will be done if the
 expression evaluates to `tt(1)'. For example, with
 
-indent(
-nofill(tt(compconf list_condition='NUMERIC != 1'))
-)
+example(compconf list_condition='NUMERIC != 1')
 
 delaying will be done only if given an explicit numeric argument
 other than `tt(1)'.
@@ -543,7 +601,10 @@ it is set to tt(never), this will not be done (the behaviour without the
 tt(_oldlist) completer).  If it is unset, or any other value, then the
 existing list of completions will be displayed if it is not already;
 otherwise, the standard completion list will be generated:  this is the
-default behaviour of tt(_oldlist).
+default behaviour of tt(_oldlist). However, if there is an old list
+and this key contains the name of the completer function that
+generated the list, then the old list will be used even if it was
+generated by a widget which does not do listing.
 
 For example, suppose you type tt(^Xc) to use the tt(_correct_word)
 widget, which generates a list of corrections for the word under the
@@ -551,15 +612,24 @@ cursor.  Usually, typing tt(^D) would generate a standard list of
 completions for the word on the command line, and show that.  With
 tt(_oldlist), it will instead show the list of corrections already
 generated.
+
+As another example consider the tt(_match) completer: with the
+tt(match_insert) key set to tt(unambig) it inserts only an
+unambiguous prefix string if there is any. But since this may remove
+parts of the original pattern, attempting completion again may result
+in more matches than on the first attempt. But by using the
+tt(_oldlist) completer and setting this key to tt(_match), the list of 
+matches generated on the first attempt will be used again.
 )
 item(tt(oldlist_menu))(
 Controls how menu completion behaves when a completion has already been
-inserted and the user types a standard completion key type as tt(TAB).
+inserted and the user types a standard completion key type such as tt(TAB).
 The default behaviour of tt(_oldlist) is that menu completion always
 continues with the existing list of completions.  If this key is set to
 tt(never), however, a new completion is started if the old list was
 generated by a different completion command (the behaviour without the
 tt(_oldlist) completer).
+
 For example, suppose you type tt(^Xc) to generate a list of corrections,
 and menu completion is started in one of the usual ways.  Usually, typing
 tt(TAB) at this point would start trying to complete the line as it now
@@ -568,17 +638,11 @@ list of completions.
 )
 enditem()
 )
-item(tt(_closequotes))(
-When a completion starts in quotes, this completer will recognise the fact
-and insert a matching closing quote if there is not already one later on
-the line.  It should come earlier in the list of completers than any of the
-completers which generate matches.  It can be confused by some of the more
-sophisticated forms of completion.
-)
 enditem()
 
-texinode(Completion Functions)()(Control Functions)(Completion System)
+texinode(Completion Functions)(Completion Directories)(Control Functions)(Completion System)
 sect(Utility Functions)
+cindex(completion system, utility functions)
 
 Descriptions follow for utility functions that may be
 useful when writing completion functions.  Most of these reside in the
@@ -616,7 +680,7 @@ one can write a pattern completion function that keeps other functions
 from being tried simply by setting this parameter to any value.
 )
 item(tt(_multi_parts))(
-This functions gets two arguments: a separator character and an
+This function gets two arguments: a separator character and an
 array.  As usual, the array may be either the
 name of an array parameter or a literal array in the form
 `tt(LPAR()foo bar)tt(RPAR())' (i.e. a list of words separated by white 
@@ -657,22 +721,39 @@ over which filenames should be ignored as done by the tt(fignore)
 parameter in normal completion.
 
 The function tt(_files) calls tt(_path_files) with all the arguments
-it was passed and, if that generated no matches, call tt(_path_files) again
+it was passed and, if that generated no matches, calls tt(_path_files) again
 without any tt(-g) or tt(-/) option, thus generating all filenames.
 
 These functions also accept the `tt(-J)', `tt(-V)', `tt(-X)', `tt(-P)',
 `tt(-S)', `tt(-q)', `tt(-r)', and `tt(-R)' options from the
 tt(compadd) builtin.
 
-Finally, the tt(_path_files) function supports one configuration key:
-tt(path_expand). If this is set to any non-empty string, the partially
+Finally, the tt(_path_files) function supports three configuration keys.
+startitem()
+item(tt(path_expand))(
+If this is set to any non-empty string, the partially
 typed path from the line will be expanded as far as possible even if
 trailing pathname components can not be completed.
 )
+item(tt(path_cursor))(
+If this is set to a non-empty string, the cursor will be left
+after the first ambiguous pathname component even when menucompletion
+is used.
+)
+item(tt(path_keepdir))(
+If this is set to a non-empty string, then if completion immediately after
+a slash fails, treat the original string as a successful completion.  This
+prevents a valid directory being treated as a candidate for correction.
+However, it has the side effect that a pattern completion, such as
+`tt(files -g *(*))', will no longer try to complete directories in this
+position if there are no file matches.
+)
+enditem()
+)
 item(tt(_parameters))(
 This should be used to complete parameter names if you need some of the
-extra options of tt(compadd). It first tries to complete only non-local
-parameters. All arguments are passed unchanged to the tt(compadd) builtin.
+extra options of tt(compadd). All arguments are passed unchanged to
+the tt(compadd) builtin.
 )
 item(tt(_options))(
 This can be used to complete option names. The difference to the
@@ -717,11 +798,9 @@ not start with a square bracket or parenthesis, it should be the name of a
 command (probably with arguments) that should be invoked to complete 
 after the equal sign. Example:
 
-indent(
-nofill(tt(_long_options '*\*'     '(yes no)' \))
-nofill(tt(              '*=FILE*' '_files' \))
-nofill(tt(              '*=DIR*'  '_files -/'))
-)
+example(_long_options '*\*'     '(yes no)' \ 
+              '*=FILE*' '_files' \ 
+              '*=DIR*'  '_files -/')
 
 Here, `tt(yes)' and `tt(no)' will be completed as the argument of
 options whose description ends in a star, file names for options that
@@ -733,8 +812,115 @@ descriptions that contain `tt(=DIR)' or `tt(=PATH)'. These builtin
 patterns can be overridden by patterns given as arguments, however.
 
 This function also accepts the `tt(-X)', `tt(-J)', and `tt(-V)'
-options which are passed unchanged to `tt(compadd)'. Finally, it
-accepts the option `tt(-t)'; if this is given, completion is only done
-on words starting with two hyphens.
+options which are passed unchanged to `tt(compadd)'. If the
+option `tt(-t)' is given, completion is only done on words starting
+with two hyphens. The option `tt(-i) var(patterns)' can be used to
+give patterns for options which should not be completed. The patterns
+can be given as the name of an array parameter or as a literal list in 
+parentheses. E.g. `tt(-i "(--(en|dis)able-FEATURE*)")' will ignore the
+options `tt(--enable-FEATURE)' and `tt(--diable-FEATURE)'. Finally,
+the option `tt(-s) var(pairs)' can be used to describe options
+aliases. Each var(pair) consists of a pattern and a
+replacement. E.g. some tt(configure)-scripts describe options only as
+`tt(--enable-foo)', but also accept `tt(disable-foo)'. To allow
+completion of the second form, one would use
+`tt(-s "(#--enable- --disable-)")'.
+)
+enditem()
+
+texinode(Completion Directories)(Bindable Commands)(Completion Functions)(Completion System)
+sect(Completion Directories)
+cindex(completion system, directory structure)
+
+In the source distribution, the files are contained in various
+subdirectories of the tt(Completion) directory.  They may have been
+installed in the same structure, or into one single function directory.
+The following is a description of the files found in the original directory
+structure.  If you wish to alter an installed file, you will need to copy
+it to some directory which appears earlier in your tt(fpath) than the
+standard directory where it appears.
+
+startitem()
+item(tt(Core))(
+The core scripts and functions.  You will certainly need these, though will
+probably not need to alter them.  Many of these are docmented above.
+)
+item(tt(Base))(
+Other functions you will almost certainly want if you are going to use
+any of the standard completion functions.  You may want to edit some of
+these files.
+)
+item(tt(Builtins))(
+Functions for completing arguments of shell builtin commands.
+)
+item(tt(User))(
+Functions for completing arguments of external commands and suites of
+commands.  They may need modifying for your system.
+)
+item(tt(Commands))(
+Functions which implement special types of completion to be bound to
+keystrokes rather than called by context.
+)
+enditem()
+
+texinode(Bindable Commands)()(Completion Directories)(Completion System)
+sect(Bindable Commands)
+cindex(completion system, bindable commands)
+
+In addition to the context-dependent completions provided, which are
+expected to work in an intuitively obvious way, there are a few widgets
+implementing special behaviour which can be bound separately to keys.  The
+following is a list of these and their default bindings.
+
+startitem()
+item(tt(_correct_filename (^XC)))(
+Correct the filename path at the cursor position.  Allows up to six errors
+in the name.  Can also be called with an argument to correct
+a filepath, independently of zle; the correction is printed on standard
+output.
+)
+item(tt(_correct_word) (^Xc))(
+Performs correction of the current argument using the usual contextual
+completions as possible choices.
+)
+item(tt(_expand_word (^Xe)))(
+Performs expansion on the current word:  equivalent to the standard
+tt(expand-word) command, but using all the `tt(expand_*)' configuration
+keys described previously.  In addition, each such key can be overridden by
+a key starting with the string `tt(expandword_)'; for example, the
+tt(expandword_substitute) key if defined overrides the
+tt(expand_substitute) key.
+)
+item(tt(_history_complete_word) (\e/))(
+Complete words from the shell's command history.
+)
+item(tt(_most_recent_file (^Xm)))(
+Complete the name of the most recently modified file matching the pattern
+on the command line (which may be blank).  If given a numeric argument
+var(N), complete the var(N)th most recently modified file.  Note the
+completion, if any, is always unique.
+)
+item(tt(_read_comp (^X^R)))(
+Prompt the user for a string, and use that to perform completion on the
+current word.  There are two possibilities for the string.  First, it can
+be a set of words beginning `tt(_)', for example `tt(_files -/)', in which
+case the function with any arguments will be called to generate the
+completions.  Unambiguous parts of the function name will be completed
+automatically (normal completion is not available at this point) until a
+space is typed.
+
+Otherwise, any other string, for example `tt(-b)', will be passed as
+arguments to tt(compgen) and should hence be a set of flags specifying the
+type of completion.
+
+A very restricted set of editing commands is available when reading the
+string:  `tt(DEL)' and `tt(^H)' delete the last character; `tt(^U)' deletes
+the line, and `tt(^C)' and `tt(^G)' abort the function, while `tt(RET)'
+accepts the completion.  Note the string is used verbatim as a command
+line, so arguments must be quoted in accordance with standard shell rules.
+
+Once a string has been read, the next call to tt(_read_comp) will use the
+existing string instead of reading a new one.  To force a new string to be
+read, call tt(_read_comp) with a numeric argument.
 )
 enditem()
