@@ -35,16 +35,17 @@ _cvs () {
 	_cvstargets
 	;;
       annotate|ann) # "+lr:D:fR"
-	_complete_opts l '' r: '' D: '' f '' R '' || _cvstargets
+	_complete_opts l '' r: "$complete_r" D: "$complete_D" f '' R '' ||
+	_cvstargets
 	;;
       checkout|co|get) # "+ANnk:d:flRpQqcsr:D:j:P"
-	_complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R ''\
-	  p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' \
-	  P '' ||
+	_complete_opts A '' N '' n '' k: "$complete_k" d: '_files -/' f '' \
+	  l '' R '' p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" \
+	  j: "$complete_r" P '' ||
 	_cvsrepositories
 	;;
       commit|ci|com) # "+nlRm:fF:r:"
-	_complete_opts n '' l '' R '' m: "$complete_m" f '' F: '' \
+	_complete_opts n '' l '' R '' m: "$complete_m" f '' F: _files \
 	  r: "$complete_r" ||
 	_cvstargets_modified
 	;;
@@ -56,15 +57,15 @@ _cvs () {
 	_cvstargets_modified || _cvstargets
 	;;
       edit) # "+lRa:"
-	_complete_opts l '' R '' a: '' || _cvstargets
+	_complete_opts l '' R '' a: 'compadd edit unedit commit all none' ||
+	_cvstargets
 	;;
       editors) # "+lR"
 	_complete_opts l '' R '' || _cvstargets
 	;;
-      export|exp|ex) # "+ANnk:d:flRpQqcsr:D:j:P"
-	_complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R '' \
-	  p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' \
-	  P '' ||
+      export|exp|ex) # "+Nnk:d:flRQqr:D:"
+	_complete_opts N '' n '' k: "$complete_k" d: '_files -/' f '' l '' \
+	  R '' Q '' q '' r: "$complete_r" D: "$complete_D" ||
 	_cvsrepositories
 	;;
       history|hi|his) # "+Tacelow?D:b:f:m:n:p:r:t:u:x:X:z:"
@@ -74,7 +75,7 @@ _cvs () {
 	_cvstargets
 	;;
       import|im|imp) # "+Qqdb:m:I:k:W:"
-	_complete_opts Q '' q '' d '' b: '' m: "$complete_m" I: '' \
+	_complete_opts Q '' q '' d '' b: '' m: "$complete_m" I: _files \
 	  k: "$complete_k" W: '' ||
 	case $[CURRENT-com] in
 	  1) _cvsrepositories;;
@@ -113,8 +114,8 @@ _cvs () {
 	;;
       update|up|upd) # "+ApPflRQqduk:r:D:j:I:W:"
 	_complete_opts A '' p '' P '' f '' l '' R '' Q '' q '' d '' u '' \
-	  k: "$complete_k" r: "$complete_r" D: "$complete_D" j: '' I: '' \
-	  W: '' ||
+	  k: "$complete_k" r: "$complete_r" D: "$complete_D" j: "$complete_r" \
+	  I: '' W: '' ||
 	_cvstargets
 	;;
       watch)
@@ -126,7 +127,9 @@ _cvs () {
 	      _complete_opts l '' R '' || _cvstargets
 	      ;;
 	    add|remove) # "+lRa:"
-	      _complete_opts l '' R '' a: '' || _cvstargets
+	      _complete_opts l '' R '' \
+	        a: 'compadd edit unedit commit all none' || \
+	      _cvstargets
 	      ;;
 	  esac
 	fi
@@ -247,11 +250,11 @@ _cvsentries_modified () {
 _cvsdirs () {
   if [[ -d ${pref}CVS ]]; then
     _cvsdirentries
-    if (( $#entries )); then
-      compgen "$@" -g '('${(j:|:)entries:q}')'
-    else
-      false
-    fi
+    case $#entries in
+      0) false;;
+      1) compgen "$@" -g "${entries:q}";;
+      *) compgen "$@" -g '('${(j:|:)entries:q}')';;
+    esac
   else
     _files
   fi
@@ -262,11 +265,11 @@ _cvstargets () {
   _cvsprefix
   if [[ -d ${pref}CVS ]]; then
     _cvsentries
-    if (( $#entries )); then
-      compgen -g '('${(j:|:)entries:q}')'
-    else
-      false
-    fi
+    case $#entries in
+      0) false;;
+      1) compgen -g "${entries:q}";;
+      *) compgen -g '('${(j:|:)entries:q}')';;
+    esac
   else
     _files
   fi
@@ -277,11 +280,11 @@ _cvstargets_modified () {
   _cvsprefix
   if [[ -d ${pref}CVS ]]; then
     _cvsentries_modified
-    if (( $#entries )); then
-      compgen -g '('${(j:|:)entries:q}')'
-    else
-      false
-    fi
+    case $#entries in
+      0) false;;
+      1) compgen -g "${entries:q}";;
+      *) compgen -g '('${(j:|:)entries:q}')';;
+    esac
   else
     _files 
   fi
