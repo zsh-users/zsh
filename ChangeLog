@@ -1,3 +1,9 @@
+2003-02-25  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Zsh/Context/_value, Doc/Zsh/compsys.yo:
+	fix out of date documentation and move description of special
+	contexts from _complete's to #compdef's description
+
 2003-02-24  Peter Stephenson  <pws@csr.com>
 
 	* 18230: Completion/Unix/Type/_path_files: If globbing failed

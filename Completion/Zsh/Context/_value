@@ -1,10 +1,10 @@
 #compdef -value- -array-value- -value-,-default-,-default-
 
 # You can customize completion for different parameters by writing
-# functions with the tag-line `#compdef -T value <name>'.
-# The function searches for the strings `<param-name>:<param-type>'
-# and `<param-name>'. If the line contains a command (as in `make foo=<TAB>')
-# the string `<command>:<param-name>:<param-type>' is also searched for.
+# functions with the tag-line `#compdef -value-,<name>,<command>' where
+# <name> is the name of the parameter (or name-key when completing an
+# associative array value) and <command> is either `-default-' or the
+# name of the command from the command-line.
 
 if [[ "$service" != -value-,* ]]; then
   local strs ctx=
