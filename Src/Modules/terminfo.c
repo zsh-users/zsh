@@ -175,10 +175,6 @@ getterminfo(HashTable ht, char *name)
     pm = (Param) zhalloc(sizeof(struct param));
     pm->nam = dupstring(name);
     pm->flags = PM_READONLY;
-    pm->sets.cfn = NULL;
-    pm->gets.cfn = strgetfn;
-    pm->sets.ifn = NULL;
-    pm->gets.ifn = intgetfn;
     pm->unsetfn = NULL;
     pm->ct = 0;
     pm->env = NULL;
@@ -189,21 +185,29 @@ getterminfo(HashTable ht, char *name)
     if (((num = tigetnum(name)) != -1) && (num != -2)) {
 	pm->u.val = num;
 	pm->flags |= PM_INTEGER;
+	pm->sets.ifn = NULL;
+	pm->gets.ifn = intgetfn;
     }
     else if ((num = tigetflag(name)) != -1) {
 	pm->u.str = num ? dupstring("yes") : dupstring("no");
 	pm->flags |= PM_SCALAR;
+        pm->sets.cfn = NULL;
+        pm->gets.cfn = strgetfn;
     }
     else if ((tistr = (char *)tigetstr(name)) != NULL && tistr != (char *)-1)
     {
 	pm->u.str = dupstring(tistr);
 	pm->flags |= PM_SCALAR;
+        pm->sets.cfn = NULL;
+        pm->gets.cfn = strgetfn;
     }
     else
     {
 	/* zwarn("no such capability: %s", name, 0); */
 	pm->u.str = dupstring("");
 	pm->flags |= PM_UNSET;
+        pm->sets.cfn = NULL;
+        pm->gets.cfn = strgetfn;
     }
     return (HashNode) pm;
 }
@@ -287,10 +291,6 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 #endif
 
     pm = (Param) zhalloc(sizeof(struct param));
-    pm->sets.cfn = NULL;
-    pm->gets.cfn = strgetfn;
-    pm->sets.ifn = NULL;
-    pm->gets.ifn = intgetfn;
     pm->unsetfn = NULL;
     pm->ct = 0;
     pm->env = NULL;
@@ -298,6 +298,9 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
     pm->old = NULL;
     
     pm->flags = PM_READONLY | PM_SCALAR;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+
     for (capname = (char **)boolnames; *capname; capname++) {
 	if ((num = tigetflag(*capname)) != -1) {
 	    pm->u.str = num ? dupstring("yes") : dupstring("no");
@@ -305,8 +308,11 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 	    func((HashNode) pm, flags);
 	}
     }
-    
+
     pm->flags = PM_READONLY | PM_INTEGER;
+    pm->sets.ifn = NULL;
+    pm->gets.ifn = intgetfn;
+
     for (capname = (char **)numnames; *capname; capname++) {
 	if (((num = tigetnum(*capname)) != -1) && (num != -2)) {
 	    pm->u.val = num;
@@ -314,8 +320,11 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 	    func((HashNode) pm, flags);
 	}
     }
-    
+
     pm->flags = PM_READONLY | PM_SCALAR;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+
     for (capname = (char **)strnames; *capname; capname++) {
 	if ((tistr = (char *)tigetstr(*capname)) != NULL &&
 	    tistr != (char *)-1) {
