@@ -50,12 +50,12 @@ evalcond(Estate state)
     switch (ctype) {
     case COND_NOT:
 	if (tracingcond)
-	    fprintf(stderr, " %s", condstr[ctype]);
+	    fprintf(xtrerr, " %s", condstr[ctype]);
 	return !evalcond(state);
     case COND_AND:
 	if (evalcond(state)) {
 	    if (tracingcond)
-		fprintf(stderr, " %s", condstr[ctype]);
+		fprintf(xtrerr, " %s", condstr[ctype]);
 	    return evalcond(state);
 	} else {
 	    state->pc = pcode + (WC_COND_SKIP(code) + 1);
@@ -64,7 +64,7 @@ evalcond(Estate state)
     case COND_OR:
 	if (!evalcond(state)) {
 	    if (tracingcond)
-		fprintf(stderr, " %s", condstr[ctype]);
+		fprintf(xtrerr, " %s", condstr[ctype]);
 	    return evalcond(state);
 	} else {
 	    state->pc = pcode + (WC_COND_SKIP(code) + 1);
@@ -136,9 +136,9 @@ evalcond(Estate state)
 		singsub(&rt);
 		untokenize(rt);
 	    }
-	    fprintf(stderr, " %s %s %s", left, condstr[ctype], rt);
+	    fprintf(xtrerr, " %s %s %s", left, condstr[ctype], rt);
 	} else
-	    fprintf(stderr, " -%c %s", ctype, left);
+	    fprintf(xtrerr, " -%c %s", ctype, left);
     }
 
     if (ctype >= COND_EQ && ctype <= COND_GE) {
@@ -410,10 +410,10 @@ tracemodcond(char *name, char **args, int inf)
     for (aptr = args; *aptr; aptr++)
 	untokenize(*aptr);
     if (inf) {
-	fprintf(stderr, " %s %s %s", args[0], name, args[1]);
+	fprintf(xtrerr, " %s %s %s", args[0], name, args[1]);
     } else {
-	fprintf(stderr, " %s", name);
+	fprintf(xtrerr, " %s", name);
 	while (*args)
-	    fprintf(stderr, " %s", *args++);
+	    fprintf(xtrerr, " %s", *args++);
     }
 }

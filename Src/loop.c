@@ -66,8 +66,8 @@ execfor(Estate state, int do_exec)
 	    char *str2 = dupstring(str);
 	    untokenize(str2);
 	    printprompt4();
-	    fprintf(stderr, "%s\n", str2);
-	    fflush(stderr);
+	    fprintf(xtrerr, "%s\n", str2);
+	    fflush(xtrerr);
 	}
 	if (!errflag)
 	    matheval(str);
@@ -105,8 +105,8 @@ execfor(Estate state, int do_exec)
 		if (*str) {
 		    if (isset(XTRACE)) {
 			printprompt4();
-			fprintf(stderr, "%s\n", str);
-			fflush(stderr);
+			fprintf(xtrerr, "%s\n", str);
+			fflush(xtrerr);
 		    }
 		    val = mathevali(str);
 		} else
@@ -125,8 +125,8 @@ execfor(Estate state, int do_exec)
 		break;
 	    if (isset(XTRACE)) {
 		printprompt4();
-		fprintf(stderr, "%s=%s\n", name, str);
-		fflush(stderr);
+		fprintf(xtrerr, "%s=%s\n", name, str);
+		fflush(xtrerr);
 	    }
 	    setsparam(name, ztrdup(str));
 	}
@@ -144,8 +144,8 @@ execfor(Estate state, int do_exec)
 	    str = dupstring(advance);
 	    if (isset(XTRACE)) {
 		printprompt4();
-		fprintf(stderr, "%s\n", str);
-		fflush(stderr);
+		fprintf(xtrerr, "%s\n", str);
+		fflush(xtrerr);
 	    }
 	    singsub(&str);
 	    if (!errflag)
@@ -517,8 +517,8 @@ execcase(Estate state, int do_exec)
 	    pat2 = dupstring(pat);
 	    untokenize(pat2);
 	    printprompt4();
-	    fprintf(stderr, "case %s (%s)\n", word, pat2);
-	    fflush(stderr);
+	    fprintf(xtrerr, "case %s (%s)\n", word, pat2);
+	    fflush(xtrerr);
 	    state->pc++;
 	} else
 	    state->pc += 2;

@@ -791,9 +791,14 @@ checkmailpath(char **s)
 /* This prints the XTRACE prompt. */
 
 /**/
+FILE *xtrerr = 0;
+
+/**/
 void
 printprompt4(void)
 {
+    if (!xtrerr)
+	xtrerr = stderr;
     if (prompt4) {
 	int l;
 	char *s = dupstring(prompt4);
@@ -801,7 +806,7 @@ printprompt4(void)
 	unmetafy(s, &l);
 	s = unmetafy(promptexpand(metafy(s, l, META_NOALLOC), 0, NULL, NULL), &l);
 
-	fprintf(stderr, "%s", s);
+	fprintf(xtrerr, "%s", s);
     }
 }
 

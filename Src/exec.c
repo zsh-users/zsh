@@ -1195,12 +1195,12 @@ makecline(LinkList list)
 
 	for (node = firstnode(list); node; incnode(node)) {
 	    *ptr++ = (char *)getdata(node);
-	    zputs(getdata(node), stderr);
+	    zputs(getdata(node), xtrerr);
 	    if (nextnode(node))
-		fputc(' ', stderr);
+		fputc(' ', xtrerr);
 	}
-	fputc('\n', stderr);
-	fflush(stderr);
+	fputc('\n', xtrerr);
+	fflush(xtrerr);
     } else {
 	for (node = firstnode(list); node; incnode(node))
 	    *ptr++ = (char *)getdata(node);
@@ -1404,7 +1404,7 @@ addvars(Estate state, Wordcode pc, int export)
 	name = ecgetstr(state, 1);
 	untokenize(name);
 	if (xtr)
-	    fprintf(stderr, "%s=", name);
+	    fprintf(xtrerr, "%s=", name);
 	if ((isstr = (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR))) {
 	    vl = newlinklist();
 	    addlinknode(vl, ecgetstr(state, 1));
@@ -1437,7 +1437,7 @@ addvars(Estate state, Wordcode pc, int export)
 		val = ztrdup(ugetnode(vl));
 	    }
 	    if (xtr)
-		fprintf(stderr, "%s ", val);
+		fprintf(xtrerr, "%s ", val);
 	    if (export && !strchr(name, '[')) {
 		if (export < 0 && isset(RESTRICTED) &&
 		    (pm = (Param) paramtab->removenode(paramtab, name)) &&
@@ -1470,10 +1470,10 @@ addvars(Estate state, Wordcode pc, int export)
 
 	*ptr = NULL;
 	if (xtr) {
-	    fprintf(stderr, "( ");
+	    fprintf(xtrerr, "( ");
 	    for (ptr = arr; *ptr; ptr++)
-		fprintf(stderr, "%s ", *ptr);
-	    fprintf(stderr, ") ");
+		fprintf(xtrerr, "%s ", *ptr);
+	    fprintf(xtrerr, ") ");
 	}
 	setaparam(name, arr);
 	if (errflag) {
@@ -1698,8 +1698,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    else
 			lastval = cmdoutval;
 		    if (isset(XTRACE)) {
-			fputc('\n', stderr);
-			fflush(stderr);
+			fputc('\n', xtrerr);
+			fflush(xtrerr);
 		    }
 		    return;
 		}
@@ -1935,6 +1935,12 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	goto err;
     }
 
+    /* Make a copy of stderr for xtrace output before redirecting */
+    fflush(xtrerr);
+    if (xtrerr == stderr &&
+	!(xtrerr = fdopen(movefd(dup(fileno(stderr))), "w")))
+	xtrerr = stderr;
+
     /* Add pipeline input/output to mnodes */
     if (input)
 	addfd(forked, save, mfds, 0, input, 0);
@@ -2088,7 +2094,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    for (i = 0; i < 10; i++)
 		if (save[i] != -2)
 		    zclose(save[i]);
-	    return;
+	    goto done;
 	}
 	/*
 	 * If nullexec is 2, we have variables to add with the redirections
@@ -2098,8 +2104,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    addvars(state, varspc, 0);
 	lastval = errflag ? errflag : cmdoutval;
 	if (isset(XTRACE)) {
-	    fputc('\n', stderr);
-	    fflush(stderr);
+	    fputc('\n', xtrerr);
+	    fflush(xtrerr);
 	}
     } else if (isset(EXECOPT) && !errflag) {
 	/*
@@ -2138,7 +2144,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    restore_params(restorelist, removelist);
 		    lastval = 1;
 		    fixfds(save);
-		    return;
+		    goto done;
 		}
 	    }
 
@@ -2239,6 +2245,14 @@ execcmd(Estate state, int input, int output, int how, int last1)
     if (forked)
 	_exit(lastval);
     fixfds(save);
+
+ done:
+    if (xtrerr != stderr) {
+	fil = fileno(xtrerr);
+	fclose(xtrerr);
+	zclose(fil);
+	xtrerr = stderr;
+    }
 }
 
 /* Arrange to have variables restored. */
@@ -2870,13 +2884,13 @@ execcond(Estate state, int do_exec)
     state->pc--;
     if (isset(XTRACE)) {
 	printprompt4();
-	fprintf(stderr, "[[");
+	fprintf(xtrerr, "[[");
 	tracingcond++;
     }
     stat = !evalcond(state);
     if (isset(XTRACE)) {
-	fprintf(stderr, " ]]\n");
-	fflush(stderr);
+	fprintf(xtrerr, " ]]\n");
+	fflush(xtrerr);
 	tracingcond--;
     }
     return stat;
@@ -2893,18 +2907,18 @@ execarith(Estate state, int do_exec)
 
     if (isset(XTRACE)) {
 	printprompt4();
-	fprintf(stderr, "((");
+	fprintf(xtrerr, "((");
     }
     e = ecgetstr(state, 1);
     singsub(&e);
     if (isset(XTRACE))
-	fprintf(stderr, " %s", e);
+	fprintf(xtrerr, " %s", e);
 
     val = mathevali(e);
 
     if (isset(XTRACE)) {
-	fprintf(stderr, " ))\n");
-	fflush(stderr);
+	fprintf(xtrerr, " ))\n");
+	fflush(xtrerr);
     }
     errflag = 0;
     return !val;
@@ -3017,11 +3031,11 @@ execshfunc(Shfunc shf, LinkList args)
 	if (args)
 	    for (lptr = firstnode(args); lptr; incnode(lptr)) {
 		if (lptr != firstnode(args))
-		    fputc(' ', stderr);
-		fprintf(stderr, "%s", (char *)getdata(lptr));
+		    fputc(' ', xtrerr);
+		fprintf(xtrerr, "%s", (char *)getdata(lptr));
 	    }
-	fputc('\n', stderr);
-	fflush(stderr);
+	fputc('\n', xtrerr);
+	fflush(xtrerr);
     }
     ocs = cmdstack;
     ocsp = cmdsp;

@@ -351,13 +351,13 @@ execbuiltin(LinkList args, Builtin bn)
     /* display execution trace information, if required */
     if (xtr) {
 	printprompt4();
-	fprintf(stderr, "%s", name);
+	fprintf(xtrerr, "%s", name);
 	if (xarg)
-	    fprintf(stderr, " %s", xarg);
+	    fprintf(xtrerr, " %s", xarg);
 	while (*oargv)
-	    fprintf(stderr, " %s", *oargv++);
-	fputc('\n', stderr);
-	fflush(stderr);
+	    fprintf(xtrerr, " %s", *oargv++);
+	fputc('\n', xtrerr);
+	fflush(xtrerr);
     }
     /* call the handler function, and return its return value */
     return (*(bn->handlerfunc)) (name, argv, ops, bn->funcid);

@@ -331,6 +331,9 @@ init_io(void)
 	SHTTY = -1;
     }
 
+    /* Send xtrace output to stderr -- see execcmd() */
+    xtrerr = stderr;
+
     /* Make sure the tty is opened read/write. */
     if (isatty(0)) {
 	zsfree(ttystrname);
