@@ -1,3 +1,8 @@
+2004-04-01  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 19717: Doc/Zsh/expn.y, Src/glob.c: use F glob qualifier
+	for `full' (non-empty) directories.
+
 2004-03-31  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Misc/zrecompile: change "mv" to "mv -f"

@@ -1630,6 +1630,9 @@ startitem()
 item(tt(/))(
 directories
 )
+item(tt(F))(
+`full' (i.e. non-empty) directories
+)
 item(tt(.))(
 plain files
 )

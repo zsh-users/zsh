@@ -1322,6 +1322,9 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    func = qualmodeflags;
 		    data = qgetmodespec(&s);
 		    break;
+		case 'F':
+		    func = qualnonemptydir;
+		    break;
 		case 'M':
 		    /* Mark directories with a / */
 		    if ((gf_markdirs = !(sense & 1)))
@@ -2797,5 +2800,26 @@ qualsheval(char *name, struct stat *buf, off_t days, char *str)
 	}
 	return !ret;
     }
+    return 0;
+}
+
+/**/
+static int
+qualnonemptydir(char *name, struct stat *buf, off_t days, char *str)
+{
+    DIR *dirh = opendir(name);
+    struct dirent *de;
+
+    if (dirh == NULL)
+	return 0;
+
+    while ((de = readdir(dirh))) {
+	if (strcmp(de->d_name, ".") && strcmp(de->d_name, "..")) {
+	    closedir(dirh);
+	    return 1;
+	}
+    }
+
+    closedir(dirh);
     return 0;
 }
