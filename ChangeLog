@@ -1,3 +1,8 @@
+2002-02-01  Oliver Kiddle  <opk@zsh.org>
+
+	* Akinori Musha: 16534: Completion/BSD/Command/_bsd_pkg:
+	a few bug fixes and some wording fixes
+
 2002-01-31  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_oliver_setup: add example of
@@ -1298,7 +1303,7 @@
 	line-display strings can be hidden; hi and du capabalities in
 	complist are only used if set by the user
 
-	* 15402 (Akinora Musha): Completion/Unix/Command/_cvs: add
+	* 15402 (Akinori Musha): Completion/Unix/Command/_cvs: add
 	support for -R option on BSDs
 
 2001-07-17  Oliver Kiddle  <opk@zsh.org>
