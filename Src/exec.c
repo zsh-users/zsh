@@ -1908,14 +1908,23 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    case MERGEOUT:
 		if(fn->fd2 < 10)
 		    closemn(mfds, fn->fd2);
-		fil = dup(fn->fd2);
+		if(fn->fd2 > 9) {
+		    fil = -1;
+		    errno = EBADF;
+		} else {
+		    int fd = fn->fd2;
+		    if(fd == -2)
+			fd = (fn->type == MERGEOUT) ? coprocout : coprocin;
+		    fil = dup(fd);
+		}
 		if (fil == -1) {
 		    char fdstr[4];
 
 		    closemnodes(mfds);
 		    fixfds(save);
-		    sprintf(fdstr, "%d", fn->fd2);
-		    zerr("%s: %e", fdstr, errno);
+		    if(fn->fd2 != -2)
+		    	sprintf(fdstr, "%d", fn->fd2);
+		    zerr("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr, errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, fn->type == MERGEOUT);

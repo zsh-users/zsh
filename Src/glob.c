@@ -1580,7 +1580,7 @@ xpandredir(struct redir *fn, LinkList tab)
 	    if (s[0] == '-' && !s[1])
 		fn->type = CLOSE;
 	    else if (s[0] == 'p' && !s[1]) 
-		fn->fd2 = (fn->type == MERGEOUT) ? coprocout : coprocin;
+		fn->fd2 = -2;
 	    else {
 		while (idigit(*s))
 		    s++;
