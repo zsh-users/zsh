@@ -3428,8 +3428,8 @@ bin_read(char *name, char **args, char *ops, int func)
 	     *readpmpt && *readpmpt != '?'; readpmpt++);
 	if (*readpmpt++) {
 	    if (keys || isatty(0)) {
-		zputs(readpmpt, (haso ? shout : stderr));
-		fflush(haso ? shout : stderr);
+		zputs(readpmpt, shout);
+		fflush(shout);
 	    }
 	    readpmpt[-1] = '\0';
 	}
@@ -3469,8 +3469,7 @@ bin_read(char *name, char **args, char *ops, int func)
 	    else
 		settyinfo(&shttyinfo);
 	    if (haso) {
-		close(SHTTY);
-		fclose(shout);
+		fclose(shout);	/* close(SHTTY) */
 		shout = oshout;
 		SHTTY = -1;
 	    }
@@ -3502,8 +3501,7 @@ bin_read(char *name, char **args, char *ops, int func)
 
 	    /* dispose of result appropriately, etc. */
 	    if (haso) {
-		close(SHTTY);
-		fclose(shout);
+		fclose(shout);	/* close(SHTTY) */
 		shout = oshout;
 		SHTTY = -1;
 	    }

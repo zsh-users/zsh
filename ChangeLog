@@ -1,8 +1,13 @@
+2000-05-02  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 11077: Relocate misplaced redirection from 11043.
+
+	* 11036, 11063: Always write the `read -q' prompt to shout;
+	elminate some redundant close() calls.
+
 2000-05-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 11078: README: update download location for yodl
-
-2000-05-02  Tanaka Akira  <akr@m17n.org>
 
 	* 11075: install completion functions for AIX and BSD.
 

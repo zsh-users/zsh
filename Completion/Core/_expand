@@ -39,7 +39,7 @@ exp=("$word")
   { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( ${(f)"$(print -lR - ${(e)exp//\\[ 	
-]/ } 2>/dev/null)"} )
+]/ })"} ) 2>/dev/null
 
 # If the array is empty, store the original string again.
 

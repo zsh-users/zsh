@@ -30,6 +30,27 @@
 #include "zle.mdh"
 #include "zle_main.pro"
 
+/* != 0 if in a shell function called from completion, such that read -[cl]  *
+ * will work (i.e., the line is metafied, and the above word arrays are OK). */
+
+/**/
+mod_export int incompctlfunc;
+
+/* != 0 if we are in a new style completion function */
+
+/**/
+mod_export int incompfunc;
+
+/* != 0 if completion module is loaded */
+
+/**/
+mod_export int hascompmod;
+
+/* ZLRF_* flags passed to zleread() */
+
+/**/
+int zlereadflags;
+
 /* != 0 if we're done editing */
 
 /**/
@@ -45,10 +66,10 @@ int mark;
 /**/
 int c;
 
-/* the binding for this key */
+/* the bindings for the previous and for this key */
 
 /**/
-Thingy bindk;
+mod_export Thingy lbindk, bindk;
 
 /* insert mode/overwrite mode flag */
 
@@ -67,7 +88,10 @@ static int baud;
 /* flags associated with last command */
 
 /**/
-int lastcmd;
+mod_export int lastcmd;
+
+/**/
+mod_export Widget compwidget;
 
 /* the status line, and its length */
 
@@ -90,7 +114,7 @@ int undoing;
 /* current modifier status */
 
 /**/
-struct modifier zmod;
+mod_export struct modifier zmod;
 
 /* Current command prefix status.  This is normally 0.  Prefixes set *
  * this to 1.  Each time round the main loop, this is checked: if it *
@@ -103,25 +127,49 @@ struct modifier zmod;
 /**/
 int prefixflag;
 
-/* != 0 if there is a pending beep (usually indicating an error) */
+/* Number of characters waiting to be read by the ungetkeys mechanism */
+/**/
+int kungetct;
 
 /**/
-int feepflag;
+mod_export char *zlenoargs[1] = { NULL };
+
+#ifdef FIONREAD
+static int delayzsetterm;
+#endif
 
 /* set up terminal */
 
 /**/
-void
-setterm(void)
+mod_export void
+zsetterm(void)
 {
     struct ttyinfo ti;
 
-#if defined(CLOBBERS_TYPEAHEAD) && defined(FIONREAD)
+#if defined(FIONREAD)
     int val;
 
     ioctl(SHTTY, FIONREAD, (char *)&val);
-    if (val)
+    if (val) {
+	/*
+	 * Problems can occur on some systems when switching from
+	 * canonical to non-canonical input.  The former is usually
+	 * set while running programmes, but the latter is necessary
+	 * for zle.  If there is input in canonical mode, then we
+	 * need to read it without setting up the terminal.  Furthermore,
+	 * while that input gets processed there may be more input
+	 * being typed (i.e. further typeahead).  This means that
+	 * we can't set up the terminal for zle *at all* until
+	 * we are sure there is no more typeahead to come.  So
+	 * if there is typeahead, we set the flag delayzsetterm.
+	 * Then getkey() performs another FIONREAD call; if that is
+	 * 0, we have finally used up all the typeahead, and it is
+	 * safe to alter the terminal, which we do at that point.
+	 */
+	delayzsetterm = 1;
 	return;
+    } else
+	delayzsetterm = 0;
 #endif
 
 /* sanitize the tty */
@@ -151,10 +199,14 @@ setterm(void)
 #  ifdef OXTABS
     ti.tio.c_oflag &= ~OXTABS;
 #  else
+#   ifdef XTABS
     ti.tio.c_oflag &= ~XTABS;
+#   endif
 #  endif
 # endif
+#ifdef ONLCR
     ti.tio.c_oflag |= ONLCR;
+#endif
     ti.tio.c_cc[VQUIT] =
 # ifdef VDISCARD
 	ti.tio.c_cc[VDISCARD] =
@@ -233,7 +285,7 @@ setterm(void)
 }
 
 static char *kungetbuf;
-static int kungetct, kungetsz;
+static int kungetsz;
 
 /**/
 void
@@ -269,14 +321,14 @@ breakread(int fd, char *buf, int n)
 #endif
 
 /**/
-int
+mod_export int
 getkey(int keytmout)
 {
     char cc;
     unsigned int ret;
     long exp100ths;
     int die = 0, r, icnt = 0;
-    int old_errno = errno;
+    int old_errno = errno, obreaks = breaks;
 
 #ifdef HAVE_SELECT
     fd_set foofd;
@@ -291,7 +343,19 @@ getkey(int keytmout)
     if (kungetct)
 	ret = STOUC(kungetbuf[--kungetct]);
     else {
-	if (keytmout) {
+#ifdef FIONREAD
+	if (delayzsetterm) {
+	    int val;
+	    ioctl(SHTTY, FIONREAD, (char *)&val);
+	    if (!val)
+		zsetterm();
+	}
+#endif
+	if (keytmout
+#ifdef FIONREAD
+	    && ! delayzsetterm
+#endif
+	    ) {
 	    if (keytimeout > 500)
 		exp100ths = 500;
 	    else if (keytimeout > 0)
@@ -354,6 +418,7 @@ getkey(int keytmout)
 		if (!errflag && !retflag && !breaks)
 		    continue;
 		errflag = 0;
+		breaks = obreaks;
 		errno = old_errno;
 		return EOF;
 	    } else if (errno == EWOULDBLOCK) {
@@ -362,7 +427,7 @@ getkey(int keytmout)
 		ret = opts[MONITOR];
 		opts[MONITOR] = 1;
 		attachtty(mypgrp);
-		refresh();	/* kludge! */
+		zrefresh();	/* kludge! */
 		opts[MONITOR] = ret;
 		die = 1;
 	    } else if (errno != 0) {
@@ -372,7 +437,7 @@ getkey(int keytmout)
 	    }
 	}
 	if (cc == '\r')		/* undo the exchange of \n and \r determined by */
-	    cc = '\n';		/* setterm() */
+	    cc = '\n';		/* zsetterm() */
 	else if (cc == '\n')
 	    cc = '\r';
 
@@ -391,7 +456,7 @@ getkey(int keytmout)
 
 /**/
 unsigned char *
-zleread(char *lp, char *rp, int ha)
+zleread(char *lp, char *rp, int flags)
 {
     unsigned char *s;
     int old_errno = errno;
@@ -404,7 +469,6 @@ zleread(char *lp, char *rp, int ha)
 
     baud = getiparam("BAUD");
     costmult = (baud) ? 3840000L / baud : 0;
-    tv.tv_sec = 0;
 #endif
 
     /* ZLE doesn't currently work recursively.  This is needed in case a *
@@ -440,98 +504,98 @@ zleread(char *lp, char *rp, int ha)
     insmode = unset(OVERSTRIKE);
     eofsent = 0;
     resetneeded = 0;
-    lpptbuf = promptexpand(lp, 1, NULL, NULL);
+    lpromptbuf = promptexpand(lp, 1, NULL, NULL);
     pmpt_attr = txtchange;
-    rpptbuf = promptexpand(rp, 1, NULL, NULL);
+    rpromptbuf = promptexpand(rp, 1, NULL, NULL);
     rpmpt_attr = txtchange;
-    histallowed = ha;
-    PERMALLOC {
-	histline = curhist;
-#ifdef HAVE_SELECT
-	FD_ZERO(&foofd);
-#endif
-	undoing = 1;
-	line = (unsigned char *)zalloc((linesz = 256) + 2);
-	virangeflag = lastcmd = done = cs = ll = mark = 0;
-	curhistline = NULL;
-	vichgflag = 0;
-	viinsbegin = 0;
-	statusline = NULL;
-	selectkeymap("main", 1);
-	fixsuffix();
-	if ((s = (unsigned char *)getlinknode(bufstack))) {
-	    setline((char *)s);
-	    zsfree((char *)s);
-	    if (stackcs != -1) {
-		cs = stackcs;
-		stackcs = -1;
-		if (cs > ll)
-		    cs = ll;
-	    }
-	    if (stackhist != -1) {
-		histline = stackhist;
-		stackhist = -1;
-	    }
-	}
-	initundo();
-	if (isset(PROMPTCR))
-	    putc('\r', shout);
-	if (tmout)
-	    alarm(tmout);
-	zleactive = 1;
-	resetneeded = 1;
-	errflag = retflag = 0;
-	lastcol = -1;
-	initmodifier(&zmod);
-	prefixflag = 0;
-	feepflag = 0;
-	refresh();
-	while (!done && !errflag) {
 
-	    statusline = NULL;
-	    vilinerange = 0;
-	    reselectkeymap();
-	    bindk = getkeycmd();
-	    if (!ll && isfirstln && c == eofchar) {
-		eofsent = 1;
-		break;
-	    }
-	    if (bindk) {
-		execzlefunc(bindk);
-		handleprefixes();
-		/* for vi mode, make sure the cursor isn't somewhere illegal */
-		if (invicmdmode() && cs > findbol() &&
-		    (cs == ll || line[cs] == '\n'))
-		    cs--;
-		if (undoing)
-		    handleundo();
-	    } else {
-		errflag = 1;
-		break;
-	    }
+    zlereadflags = flags;
+    histline = curhist;
 #ifdef HAVE_SELECT
-	    if (baud && !(lastcmd & ZLE_MENUCMP)) {
-		FD_SET(SHTTY, &foofd);
-		if ((tv.tv_usec = cost * costmult) > 500000)
-		    tv.tv_usec = 500000;
-		if (!kungetct && select(SHTTY+1, (SELECT_ARG_2_T) & foofd,
-					NULL, NULL, &tv) <= 0)
-		    refresh();
-	    } else
+    FD_ZERO(&foofd);
 #endif
-		if (!kungetct)
-		    refresh();
-	    handlefeep();
+    undoing = 1;
+    line = (unsigned char *)zalloc((linesz = 256) + 2);
+    virangeflag = lastcmd = done = cs = ll = mark = 0;
+    vichgflag = 0;
+    viinsbegin = 0;
+    statusline = NULL;
+    selectkeymap("main", 1);
+    selectlocalmap(NULL);
+    fixsuffix();
+    if ((s = (unsigned char *)getlinknode(bufstack))) {
+	setline((char *)s);
+	zsfree((char *)s);
+	if (stackcs != -1) {
+	    cs = stackcs;
+	    stackcs = -1;
+	    if (cs > ll)
+		cs = ll;
 	}
+	if (stackhist != -1) {
+	    histline = stackhist;
+	    stackhist = -1;
+	}
+    }
+    initundo();
+    if (isset(PROMPTCR))
+	putc('\r', shout);
+    if (tmout)
+	alarm(tmout);
+    zleactive = 1;
+    resetneeded = 1;
+    errflag = retflag = 0;
+    lastcol = -1;
+    initmodifier(&zmod);
+    prefixflag = 0;
+    zrefresh();
+    while (!done && !errflag) {
+
 	statusline = NULL;
-	invalidatelist();
-	trashzle();
-	free(lpptbuf);
-	free(rpptbuf);
-	zleactive = 0;
-	alarm(0);
-    } LASTALLOC;
-    zsfree(curhistline);
+	vilinerange = 0;
+	reselectkeymap();
+	selectlocalmap(NULL);
+	bindk = getkeycmd();
+	if (!ll && isfirstln && c == eofchar) {
+	    eofsent = 1;
+	    break;
+	}
+	if (bindk) {
+	    if (execzlefunc(bindk, zlenoargs))
+		handlefeep(zlenoargs);
+	    handleprefixes();
+	    /* for vi mode, make sure the cursor isn't somewhere illegal */
+	    if (invicmdmode() && cs > findbol() &&
+		(cs == ll || line[cs] == '\n'))
+		cs--;
+	    if (undoing)
+		handleundo();
+	} else {
+	    errflag = 1;
+	    break;
+	}
+#ifdef HAVE_SELECT
+	if (baud && !(lastcmd & ZLE_MENUCMP)) {
+	    FD_SET(SHTTY, &foofd);
+	    tv.tv_sec = 0;
+	    if ((tv.tv_usec = cost * costmult) > 500000)
+		tv.tv_usec = 500000;
+	    if (!kungetct && select(SHTTY+1, (SELECT_ARG_2_T) & foofd,
+				    NULL, NULL, &tv) <= 0)
+		zrefresh();
+	} else
+#endif
+	    if (!kungetct)
+		zrefresh();
+    }
+    statusline = NULL;
+    invalidatelist();
+    trashzle();
+    free(lpromptbuf);
+    free(rpromptbuf);
+    zleactive = zlereadflags = lastlistlen = 0;
+    alarm(0);
+
     freeundo();
     if (eofsent) {
 	free(line);
@@ -548,9 +612,10 @@ zleread(char *lp, char *rp, int ha)
 /* execute a widget */
 
 /**/
-void
-execzlefunc(Thingy func)
+int
+execzlefunc(Thingy func, char **args)
 {
+    int r = 0, ret = 0;
     Widget w;
 
     if(func->flags & DISABLED) {
@@ -561,8 +626,8 @@ execzlefunc(Thingy func)
 	zsfree(nm);
 	showmsg(msg);
 	zsfree(msg);
-	feep();
-    } else if((w = func->widget)->flags & WIDGET_INT) {
+	ret = 1;
+    } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_NCOMP)) {
 	int wflags = w->flags;
 
 	if(!(wflags & ZLE_KEEPSUFFIX))
@@ -575,12 +640,18 @@ execzlefunc(Thingy func)
 	    vilinerange = 1;
 	if(!(wflags & ZLE_LASTCOL))
 	    lastcol = -1;
-	w->u.fn();
-	lastcmd = wflags;
+	if (wflags & WIDGET_NCOMP) {
+	    compwidget = w;
+	    ret = completecall(args);
+	} else
+	    ret = w->u.fn(args);
+	if (!(wflags & ZLE_NOTCOMMAND))
+	    lastcmd = wflags;
+	r = 1;
     } else {
-	List l = getshfunc(w->u.fnnam);
+	Eprog prog = getshfunc(w->u.fnnam);
 
-	if(l == &dummy_list) {
+	if(prog == &dummy_eprog) {
 	    /* the shell function doesn't exist */
 	    char *nm = niceztrdup(w->u.fnnam);
 	    char *msg = tricat("No such shell function `", nm, "'");
@@ -588,15 +659,36 @@ execzlefunc(Thingy func)
 	    zsfree(nm);
 	    showmsg(msg);
 	    zsfree(msg);
-	    feep();
+	    ret = 1;
 	} else {
-	  startparamscope();
-	  makezleparams();
-	  doshfunc(l, NULL, 0, 1);
-	  endparamscope();
-	  lastcmd = 0;
+	    int osc = sfcontext, osi = movefd(0), olv = lastval;
+	    LinkList largs = NULL;
+
+	    if (*args) {
+		largs = newlinklist();
+		addlinknode(largs, dupstring(w->u.fnnam));
+		while (*args)
+		    addlinknode(largs, dupstring(*args++));
+	    }
+	    startparamscope();
+	    makezleparams(0);
+	    sfcontext = SFC_WIDGET;
+	    doshfunc(w->u.fnnam, prog, largs, 0, 0);
+	    ret = lastval;
+	    lastval = olv;
+	    sfcontext = osc;
+	    endparamscope();
+	    lastcmd = 0;
+	    r = 1;
+	    redup(osi, 0);
 	}
     }
+    if (r) {
+	unrefthingy(lbindk);
+	refthingy(func);
+	lbindk = func;
+    }
+    return ret;
 }
 
 /* initialise command modifiers */
@@ -628,17 +720,30 @@ handleprefixes(void)
 	initmodifier(&zmod);
 }
 
+/* this exports the argument we are currently vared'iting if != NULL */
+
+/**/
+mod_export char *varedarg;
+
 /* vared: edit (literally) a parameter value */
 
 /**/
 static int
 bin_vared(char *name, char **args, char *ops, int func)
 {
-    char *s;
-    char *t;
-    Param pm;
-    int create = 0;
+    char *s, *t, *ova = varedarg;
+    struct value vbuf;
+    Value v;
+    Param pm = 0;
+    int create = 0, ifl;
+    int type = PM_SCALAR, obreaks = breaks, haso = 0;
     char *p1 = NULL, *p2 = NULL;
+    FILE *oshout = NULL;
+
+    if (zleactive) {
+	zwarnnam(name, "ZLE cannot be used recursively (yet)", NULL, 0);
+	return 1;
+    }
 
     /* all options are handled as arguments */
     while (*args && **args == '-') {
@@ -648,6 +753,12 @@ bin_vared(char *name, char **args, char *ops, int func)
 		/* -c option -- allow creation of the parameter if it doesn't
 		yet exist */
 		create = 1;
+		break;
+	    case 'a':
+		type = PM_ARRAY;
+		break;
+	    case 'A':
+		type = PM_HASHED;
 		break;
 	    case 'p':
 		/* -p option -- set main prompt string */
@@ -677,12 +788,19 @@ bin_vared(char *name, char **args, char *ops, int func)
 		/* -h option -- enable history */
 		ops['h'] = 1;
 		break;
+	    case 'e':
+		/* -e option -- enable EOF */
+		ops['e'] = 1;
+		break;
 	    default:
 		/* unrecognised option character */
 		zwarnnam(name, "unknown option: %s", *args, 0);
 		return 1;
 	    }
 	args++;
+    }
+    if (type && !create) {
+	zwarnnam(name, "-%s ignored", type == PM_ARRAY ? "a" : "A", 0);
     }
 
     /* check we have a parameter name */
@@ -691,63 +809,98 @@ bin_vared(char *name, char **args, char *ops, int func)
 	return 1;
     }
     /* handle non-existent parameter */
-    if (!(s = getsparam(args[0]))) {
-	if (create)
-	    createparam(args[0], PM_SCALAR);
-	else {
-	    zwarnnam(name, "no such variable: %s", args[0], 0);
-	    return 1;
-	}
-    }
-
-    if(zleactive) {
-	zwarnnam(name, "ZLE cannot be used recursively (yet)", NULL, 0);
+    s = args[0];
+    v = fetchvalue(&vbuf, &s, (!create || type == PM_SCALAR),
+		   SCANPM_WANTKEYS|SCANPM_WANTVALS|SCANPM_MATCHMANY);
+    if (!v && !create) {
+	zwarnnam(name, "no such variable: %s", args[0], 0);
+	return 1;
+    } else if (v) {
+	s = getstrvalue(v);
+	pm = v->pm;
+    } else if (*s) {
+	zwarnnam(name, "invalid parameter name: %s", args[0], 0);
 	return 1;
     }
 
+    if (SHTTY == -1) {
+	/* need to open /dev/tty specially */
+	if ((SHTTY = open("/dev/tty", O_RDWR|O_NOCTTY)) == -1) {
+	    zwarnnam(name, "can't access terminal", NULL, 0);
+	    return 1;
+	}
+	oshout = shout;
+	init_shout();
+
+	haso = 1;
+    }
     /* edit the parameter value */
-    PERMALLOC {
-	pushnode(bufstack, ztrdup(s));
-    } LASTALLOC;
-    t = (char *) zleread(p1, p2, ops['h']);
+    zpushnode(bufstack, ztrdup(s));
+
+    varedarg = *args;
+    ifl = isfirstln;
+    if (ops['e'])
+	isfirstln = 1;
+    if (ops['h'])
+	hbegin(1);
+    t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
+    if (ops['h'])
+	hend();
+    isfirstln = ifl;
+    varedarg = ova;
+    if (haso) {
+	fclose(shout);	/* close(SHTTY) */
+	shout = oshout;
+	SHTTY = -1;
+    }
     if (!t || errflag) {
 	/* error in editing */
 	errflag = 0;
+	breaks = obreaks;
 	return 1;
     }
     /* strip off trailing newline, if any */
     if (t[strlen(t) - 1] == '\n')
 	t[strlen(t) - 1] = '\0';
     /* final assignment of parameter value */
-    pm = (Param) paramtab->getnode(paramtab, args[0]);
-    if (pm && PM_TYPE(pm->flags) == PM_ARRAY) {
+    if (create && (!pm || (type && PM_TYPE(pm->flags) != type))) {
+	if (pm)
+	    unsetparam(args[0]);
+	createparam(args[0], type);
+	pm = 0;
+    }
+    if (!pm)
+	pm = (Param) paramtab->getnode(paramtab, args[0]);
+    if (pm && (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED))) {
 	char **a;
 
-	PERMALLOC {
-	    a = spacesplit(t, 1);
-	} LASTALLOC;
-	setaparam(args[0], a);
+	a = spacesplit(t, 1, 0);
+	if (PM_TYPE(pm->flags) == PM_ARRAY)
+	    setaparam(args[0], a);
+	else
+	    sethparam(args[0], a);
     } else
 	setsparam(args[0], t);
     return 0;
 }
 
 /**/
-void
-describekeybriefly(void)
+int
+describekeybriefly(char **args)
 {
     char *seq, *str, *msg, *is;
     Thingy func;
 
     if (statusline)
-	return;
+	return 1;
+    clearlist = 1;
     statusline = "Describe key briefly: _";
     statusll = strlen(statusline);
-    refresh();
+    zrefresh();
     seq = getkeymapcmd(curkeymap, &func, &str);
     statusline = NULL;
     if(!*seq)
-	return;
+	return 1;
     msg = bindztrdup(seq);
     msg = appstr(msg, " is ");
     if (!func)
@@ -758,6 +911,7 @@ describekeybriefly(void)
     zsfree(is);
     showmsg(msg);
     zsfree(msg);
+    return 0;
 }
 
 #define MAXFOUND 4
@@ -788,13 +942,13 @@ scanfindfunc(char *seq, Thingy func, char *str, void *magic)
 }
 
 /**/
-void
-whereis(void)
+int
+whereis(char **args)
 {
     struct findfunc ff;
 
     if (!(ff.func = executenamedcommand("Where is: ")))
-	return;
+	return 1;
     ff.found = 0;
     ff.msg = niceztrdup(ff.func->nam);
     scankeymap(curkeymap, 1, scanfindfunc, &ff);
@@ -804,56 +958,97 @@ whereis(void)
 	ff.msg = appstr(ff.msg, " et al");
     showmsg(ff.msg);
     zsfree(ff.msg);
+    return 0;
 }
 
 /**/
-void
+mod_export void
 trashzle(void)
 {
     if (zleactive) {
-	/* This refresh() is just to get the main editor display right and *
-	 * get the cursor in the right place.  For that reason, we disable *
-	 * list display (which would otherwise result in infinite          *
-	 * recursion [at least, it would if refresh() didn't have its      *
-	 * extra `inlist' check]).                                         */
+	/* This zrefresh() is just to get the main editor display right and *
+	 * get the cursor in the right place.  For that reason, we disable  *
+	 * list display (which would otherwise result in infinite           *
+	 * recursion [at least, it would if zrefresh() didn't have its      *
+	 * extra `inlist' check]).                                          */
 	int sl = showinglist;
 	showinglist = 0;
-	refresh();
+	zrefresh();
 	showinglist = sl;
 	moveto(nlnct, 0);
 	if (clearflag && tccan(TCCLEAREOD)) {
 	    tcout(TCCLEAREOD);
-	    clearflag = 0;
+	    clearflag = listshown = 0;
 	}
 	if (postedit)
 	    fprintf(shout, "%s", postedit);
 	fflush(shout);
 	resetneeded = 1;
-	settyinfo(&shttyinfo);
+	if (!(zlereadflags & ZLRF_NOSETTY))
+	  settyinfo(&shttyinfo);
     }
     if (errflag)
 	kungetct = 0;
 }
 
+/* Hook functions. Used to allow access to zle parameters if zle is
+ * active. */
+
+static int
+zlebeforetrap(Hookdef dummy, void *dat)
+{
+    if (zleactive) {
+	startparamscope();
+	makezleparams(1);
+    }
+    return 0;
+}
+
+static int
+zleaftertrap(Hookdef dummy, void *dat)
+{
+    if (zleactive)
+	endparamscope();
+
+    return 0;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLR", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANL",          NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRaU", NULL),
+};
+
+/* The order of the entries in this table has to match the *HOOK
+ * macros in zle.h */
+
+/**/
+mod_export struct hookdef zlehooks[] = {
+    HOOKDEF("list_matches", NULL, 0),
+    HOOKDEF("complete", NULL, 0),
+    HOOKDEF("before_complete", NULL, 0),
+    HOOKDEF("after_complete", NULL, 0),
+    HOOKDEF("accept_completion", NULL, 0),
+    HOOKDEF("reverse_menu", NULL, 0),
+    HOOKDEF("invalidate_list", NULL, 0),
 };
 
 /**/
 int
-boot_zle(Module m)
+setup_(Module m)
 {
     /* Set up editor entry points */
     trashzleptr = trashzle;
     gotwordptr = gotword;
-    refreshptr = refresh;
+    refreshptr = zrefresh;
     spaceinlineptr = spaceinline;
     zlereadptr = zleread;
 
+    getkeyptr = getkey;
+
     /* initialise the thingies */
     init_thingies();
+    lbindk = NULL;
 
     /* miscellaneous initialisations */
     stackhist = stackcs = -1;
@@ -862,25 +1057,50 @@ boot_zle(Module m)
     /* initialise the keymap system */
     init_keymaps();
 
-    addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    varedarg = NULL;
+
+    incompfunc = incompctlfunc = hascompmod = 0;
+
+    clwords = (char **) zcalloc((clwsize = 16) * sizeof(char *));
+
     return 0;
 }
 
-#ifdef MODULE
+/**/
+int
+boot_(Module m)
+{
+    addhookfunc("before_trap", (Hookfn) zlebeforetrap);
+    addhookfunc("after_trap", (Hookfn) zleaftertrap);
+    addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    addhookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
+    return 0;
+}
 
 /**/
 int
-cleanup_zle(Module m)
+cleanup_(Module m)
 {
-    int i;
-
     if(zleactive) {
 	zerrnam(m->nam, "can't unload the zle module while zle is active",
 	    NULL, 0);
 	return 1;
     }
-
+    deletehookfunc("before_trap", (Hookfn) zlebeforetrap);
+    deletehookfunc("after_trap", (Hookfn) zleaftertrap);
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    deletehookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
+    return 0;
+}
+
+/**/
+int
+finish_(Module m)
+{
+    int i;
+
+    unrefthingy(lbindk);
+
     cleanup_keymaps();
     deletehashtable(thingytab);
 
@@ -901,7 +1121,9 @@ cleanup_zle(Module m)
     spaceinlineptr = noop_function_int;
     zlereadptr = fallback_zleread;
 
+    getkeyptr = NULL;
+
+    zfree(clwords, clwsize * sizeof(char *));
+
     return 0;
 }
-
-#endif /* MODULE */
