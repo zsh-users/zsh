@@ -1,3 +1,8 @@
+2002-04-25  Clint Adams  <clint@zsh.org>
+
+	* 17044: Completion/Unix/Command/_w3m: complete all files, not
+	just *.html.
+
 2002-04-25  Peter Stephenson  <pws@csr.com>
 
 	* 17041: Src/Modules/zftp.c: Minor but fatal typos creating a data
