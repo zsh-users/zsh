@@ -1,3 +1,9 @@
+2000-06-12  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11867: Src/builtin.c, Src/params.c, Src/zsh.h,
+	Doc/Zsh/builtins.yo: don't use -H flag for parameters mentioned
+	explicitly or by pattern.
+
 2000-06-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11866: Functions/Misc/colors, Functions/Prompts/promptinit:  Set

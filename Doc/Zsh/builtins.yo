@@ -1132,9 +1132,11 @@ item(tt(-H))(
 Hide value: specifies that tt(typeset) will not display the value of the
 parameter when listing parameters; the display for such parameters is
 always as if the `tt(PLUS())' flag had been given.  Use of the parameter is
-in other respects normal.  This is on by default for the parameters in the
-tt(zsh/parameter) and tt(zsh/mapfile) modules.  Note, however, that unlike
-the tt(-h) flag this is also useful for non-special parameters.
+in other respects normal, and the option does not apply if the parameter is
+specified by name, or by pattern with the tt(-m) option.  This is on by
+default for the parameters in the tt(zsh/parameter) and tt(zsh/mapfile)
+modules.  Note, however, that unlike the tt(-h) flag this is also useful
+for non-special parameters.
 )
 item(tt(-i))(
 Use an internal integer representation.  If var(n) is nonzero it

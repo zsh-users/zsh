@@ -1598,7 +1598,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     if (usepm) {
 	on &= ~PM_LOCAL;
 	if (!on && !roff && !value) {
-	    paramtab->printnode((HashNode)pm, 0);
+	    paramtab->printnode((HashNode)pm, PRINT_INCLUDEVALUE);
 	    return pm;
 	}
 	if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {

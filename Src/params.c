@@ -3181,7 +3181,8 @@ printparamnode(HashNode hn, int printflags)
 	    printf("exported ");
     }
 
-    if ((printflags & PRINT_NAMEONLY) || (p->flags & PM_HIDEVAL)) {
+    if ((printflags & PRINT_NAMEONLY) ||
+	((p->flags & PM_HIDEVAL) && !(printflags & PRINT_INCLUDEVALUE))) {
 	zputs(p->nam, stdout);
 	putchar('\n');
 	return;
