@@ -64,7 +64,8 @@ cut_cline(Cline l)
 	    q = p;
     }
     if (!e && q && !q->orig && !q->olen && (q->flags & CLF_MISS) &&
-	!(q->flags & CLF_MATCHED) && (q->word ? q->wlen : q->llen) < 3) {
+	(!(q->flags & CLF_MATCHED) || (!q->prefix && !q->suffix)) &&
+	(q->word ? q->wlen : q->llen) < 3) {
 	q->word = q->line = NULL;
 	q->wlen = q->llen = 0;
     }
