@@ -21,7 +21,7 @@ if (( ! $+_color_cache )); then
     file=( /usr/{lib,{{X11R6,openwin},local{,/X11{,R6}}}/lib}/X11/rgb.txt(N) )
 
     (( $#file )) &&
-        _color_cache=( "${(@)${(@f)$(< $file[1])}[2,-1]##*		}" )
+        _color_cache=( "${(@)${(@)${(@f)$(< $file[1])}[2,-1]##*		}:#* *}" )
   fi
 
   # Stupid default value.
