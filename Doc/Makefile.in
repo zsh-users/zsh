@@ -51,7 +51,7 @@ zshoptions.1 zshparam.1 zshzftpsys.1 zshzle.1 zshall.1
 
 # yodl documentation
 
-YODLDOC = $(MAN) zsh.texi
+YODLDOC = $(MAN) texi
 
 MODDOCSRC = \
 Zsh/mod_cap.yo Zsh/mod_clone.yo \
@@ -73,22 +73,27 @@ Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
-all: $(MAN) zsh.texi ../META-FAQ
+all: man texi ../META-FAQ
 .PHONY: all
 
-everything: all zsh.dvi zsh_us.ps zsh_a4.ps zsh_toc.html
+everything: all dvi ps html
 .PHONY: everything
+
+dvi: zsh.dvi
+.PHONY: dvi
 
 zsh.dvi: $(sdir)/zsh.texi
 	$(TEXI2DVI) $(sdir)/zsh.texi
 
-zsh.texi $(sdir)/zsh.texi:
-	case $@ in \
-	  */*) target=$@ ;; \
-	  *) target=$(sdir)/$@ ;; \
-	esac; \
-	$(YODL) -o $$target -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
-	test -f $$target
+texi: $(sdir)/zsh.texi
+.PHONY: texi
+
+$(sdir)/zsh.texi:
+	$(YODL) -o $@ -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
+	test -f $@
+
+info: zsh.info
+.PHONY: info
 
 zsh.info: $(sdir)/zsh.texi
 	$(MAKEINFO) $(sdir)/zsh.texi
@@ -103,11 +108,23 @@ zsh.info: $(sdir)/zsh.texi
 	;; esac; \
 	test -f $$target
 
+ps: us_ps a4_ps
+.PHONY: ps
+
+us_ps: zsh_us.ps
+.PHONY: us_ps
+
 zsh_us.ps: zsh.dvi
 	$(DVIPS) -t letter -o $@ zsh.dvi
 
+a4_ps: zsh_a4.ps
+.PHONY: a4_ps
+
 zsh_a4.ps: zsh.dvi
 	$(DVIPS) -t a4 -o $@ zsh.dvi
+
+html: zsh_toc.html
+.PHONY: html
 
 zsh_toc.html: $(sdir)/zsh.texi
 	$(TEXI2HTML) $(sdir)/zsh.texi
@@ -130,7 +147,10 @@ zshall.1: zsh.yo
 
 $(YODLDOC): version.yo
 
-zsh.texi: $(YODLSRC)
+$(sdir)/zsh.texi: $(YODLSRC)
+
+man: $(MAN)
+.PHONY: man
 
 $(MAN): zmacros.yo zman.yo
 
@@ -225,7 +245,7 @@ uninstall: uninstall.man
 .PHONY: uninstall
 
 # install man pages, creating install directory if necessary
-install.man: $(MAN)
+install.man: man
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
 	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
@@ -233,7 +253,7 @@ install.man: $(MAN)
 .PHONY: install.man
 
 # install info pages, creating install directory if necessary
-install.info: zsh.texi
+install.info: texi
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(infodir)
 	rm -rf infodir
 	mkdir infodir
@@ -267,7 +287,7 @@ uninstall.info:
 .PHONY: uninstall.info
 
 # install HTML manual
-install.html: zsh_toc.html
+install.html: html
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
 	for file in zsh_*.html; do \
 	    $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir) || exit 1; \
