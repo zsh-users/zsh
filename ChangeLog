@@ -1,3 +1,9 @@
+2001-07-06  Peter Stephenson  <pws@csr.com>
+
+	* 15291, 15292: Src/math.c, Src/zsh.h, Test/C01arith.yo:
+	fix bug that assignment to scalar in math mode failed if
+	scalar had non-math value in it.
+
 2001-07-06  Clint Adams  <clint@zsh.org>
 
 	* 15250: zsh/pcre module will load gracefully even

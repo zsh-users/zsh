@@ -88,3 +88,13 @@
   print ${(t)newarray} ${#newarray} ${newarray[1]}
 0:setting array elements in math context
 >array 1 2
+
+  print $(( 13 = 42 ))
+1:bad lvalue
+?ZTST_execchunk:2: lvalue required
+
+  x=/bar
+  (( x = 32 ))
+  print $x
+0:assigning to scalar which contains non-math string
+>32

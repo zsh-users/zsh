@@ -476,7 +476,7 @@ static struct mathvalue *stack;
 
 /**/
 static void
-push(mnumber val, char *lval)
+push(mnumber val, char *lval, int getme)
 {
     if (sp == STACKSZ - 1)
 	zerr("stack overflow", NULL, 0);
@@ -484,8 +484,21 @@ push(mnumber val, char *lval)
 	sp++;
     stack[sp].val = val;
     stack[sp].lval = lval;
+    if (getme)
+	stack[sp].val.type = MN_UNSET;
 }
 
+/**/
+static mnumber
+pop(int noget)
+{
+    struct mathvalue *mv = stack+sp;
+
+    if (mv->val.type == MN_UNSET && !noget)
+	mv->val = getnparam(mv->lval);
+    sp--;
+    return mv->val;
+}
 
 /**/
 static mnumber
@@ -615,8 +628,8 @@ op(int what)
     if (tp & (OP_A2|OP_A2IR|OP_A2IO|OP_E2|OP_E2IO)) {
 	/* Make sure anyone seeing this message reports it. */
 	DPUTS(sp < 1, "BUG: math: not enough wallabies in outback.");
-	b = stack[sp--].val;
-	a = stack[sp--].val;
+	b = pop(0);
+	a = pop(what == EQ);
 
 	if (tp & (OP_A2IO|OP_E2IO)) {
 	    /* coerce to integers */
@@ -785,13 +798,15 @@ op(int what)
 	}
 	if (tp & (OP_E2|OP_E2IO)) {
 	    lv = stack[sp+1].lval;
-	    push(setvar(lv,c), lv);
+	    push(setvar(lv,c), lv, 0);
 	} else
-	    push(c,NULL);
+	    push(c,NULL, 0);
 	return;
     }
 
     spval = &stack[sp].val;
+    if (stack[sp].val.type == MN_UNSET)
+	*spval = getnparam(stack[sp].lval);
     switch (what) {
     case NOT:
 	if (spval->type & MN_FLOAT) {
@@ -837,11 +852,11 @@ op(int what)
 	break;
     case QUEST:
 	DPUTS(sp < 2, "BUG: math: three shall be the number of the counting.");
-	c = stack[sp--].val;
-	b = stack[sp--].val;
-	a = stack[sp--].val;
+	c = pop(0);
+	b = pop(0);
+	a = pop(0);
 	/* b and c can stay different types in this case. */
-	push(((a.type & MN_FLOAT) ? a.u.d : a.u.l) ? b : c, NULL);
+	push(((a.type & MN_FLOAT) ? a.u.d : a.u.l) ? b : c, NULL, 0);
 	break;
     case COLON:
 	zerr("':' without '?'", NULL, 0);
@@ -872,7 +887,11 @@ static void
 bop(int tk)
 {
     mnumber *spval = &stack[sp].val;
-    int tst = (spval->type & MN_FLOAT) ? (zlong)spval->u.d : spval->u.l; 
+    int tst;
+
+    if (stack[sp].val.type == MN_UNSET)
+	*spval = getnparam(stack[sp].lval);
+    tst = (spval->type & MN_FLOAT) ? (zlong)spval->u.d : spval->u.l; 
 
     switch (tk) {
     case DAND:
@@ -938,7 +957,15 @@ mathevall(char *s, int prek, char **ep)
     DPUTS(!errflag && sp,
 	  "BUG: math: wallabies roaming too freely in outback");
 
-    ret = stack[0].val;
+    if (errflag) {
+	ret.type = MN_INTEGER;
+	ret.u.l = errflag;
+    } else {
+	if (stack[0].val.type == MN_UNSET)
+	    ret = getnparam(stack[0].lval);
+	else
+	    ret = stack[0].val;
+    }
 
     if (--mlevel) {
 	lastbase = xlastbase;
@@ -1056,16 +1083,16 @@ mathparse(int pc)
 	    return;
 	switch (mtok) {
 	case NUM:
-	    push(yyval, NULL);
+	    push(yyval, NULL, 0);
 	    break;
 	case ID:
-	    push((noeval ? zero_mnumber : getnparam(yylval)), yylval);
+	    push(zero_mnumber, yylval, !noeval);
 	    break;
 	case CID:
-	    push((noeval ? zero_mnumber : getcvar(yylval)), yylval);
+	    push((noeval ? zero_mnumber : getcvar(yylval)), yylval, 0);
 	    break;
 	case FUNC:
-	    push((noeval ? zero_mnumber : callmathfunc(yylval)), yylval);
+	    push((noeval ? zero_mnumber : callmathfunc(yylval)), yylval, 0);
 	    break;
 	case M_INPAR:
 	    mathparse(TOPPREC);

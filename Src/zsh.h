@@ -75,6 +75,7 @@ typedef struct {
 
 #define MN_INTEGER 1		/* mnumber is integer */
 #define MN_FLOAT   2		/* mnumber is floating point */
+#define MN_UNSET   4		/* mnumber not yet retrieved */
 
 typedef struct mathfunc *MathFunc;
 typedef mnumber (*NumMathFunc)(char *, int, mnumber *, int);
