@@ -1,3 +1,10 @@
+2000-07-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12133: Completion/Core/_expand, Completion/Core/_path_files:
+	Discard error output from parameter expansions and use "eval" to
+	protect the completion system from parse errors and other garbage
+	in the strings taken from the command line.
+
 2000-06-29  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12125: Src/parse.c, Test/09funcdef.ztst: fix for `foo () print

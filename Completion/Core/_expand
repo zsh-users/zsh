@@ -63,7 +63,7 @@ if [[ "$force" = *s* ]] ||
       eval exp\=\( ${${(q)exp}:gs/\\{/\{/:gs/\\}/\}/} \)
   exp=( ${${(e)exp//\\[ 	
 ]/ }//(#b)([ 	
-])/\\$match[1]} )
+])/\\$match[1]} ) 2>/dev/null
 else
   exp=( ${exp:s/\\\$/\$} )
 fi
@@ -77,7 +77,7 @@ subd=("$exp[@]")
 # Now try globbing.
 
 [[ "$force" = *g* ]] || zstyle -T ":completion:${curcontext}:" glob &&
-    exp=( ${~exp} )
+    eval 'exp=( ${~exp} )' 2>/dev/null
 
 # If we don't have any expansions or only one and that is the same
 # as the original string, we let other completers run.
