@@ -1571,6 +1571,8 @@ singledraw()
 static int
 complistmatches(Hookdef dummy, Chdata dat)
 {
+    static int onlnct = -1;
+
     Cmgroup oamatches = amatches;
 
     amatches = dat->matches;
@@ -1650,11 +1652,12 @@ complistmatches(Hookdef dummy, Chdata dat)
     last_cap = (char *) zhalloc(max_caplen + 1);
     *last_cap = '\0';
 
-    if (mlbeg >= 0 && mlbeg == molbeg)
+    if (!mnew && onlnct == nlnct && mlbeg >= 0 && mlbeg == molbeg)
         singledraw();
     else if (!compprintlist(mselect >= 0) || !clearflag)
 	noselect = 1;
 
+    onlnct = nlnct;
     molbeg = mlbeg;
     mocol = mcol;
     moline = mline;
@@ -1769,8 +1772,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 		for (x = mcols; x; x--, p++)
 		    if (*p && *p != mtexpl && **p && mselect == (**p)->gnum)
 			break;
-		if (x)
+		if (x) {
+                    mcol = mcols - x;
 		    break;
+                }
 	    }
 	    if (y < mlines)
 		mline = y;
@@ -1971,7 +1976,6 @@ domenuselect(Hookdef dummy, Chdata dat)
 		break;
 	    }
 	    setwish = 1;
-            molbeg = -42;
 	    continue;
 	} else if (cmd == Th(z_undo)) {
 	    int l;
@@ -2327,7 +2331,6 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = 1;
 	    mline = -1;
-            molbeg = -42;
 	    continue;
 	} else if (cmd == Th(z_reversemenucomplete) ||
 		   !strcmp(cmd->nam, "reverse-menu-complete")) {
@@ -2336,7 +2339,6 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = 1;
 	    mline = -1;
-            molbeg = -42;
 	    continue;
 	} else if (cmd == Th(z_undefinedkey)) {
 	    continue;

@@ -1,3 +1,8 @@
+2002-05-27  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17237: Src/Zle/complist.c: follow-up to 17222, make the
+	optimisation work for some more keys again
+
 2002-05-26  Clint Adams  <clint@zsh.org>
 
 	* 17235: Src/Modules/datetime.c, Src/Modules/datetime.mdd:
