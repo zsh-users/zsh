@@ -6,7 +6,7 @@
 #    The array that contains 3-tuples `host:port:user'.
 
 local state line expl
-typeset -A options
+typeset -A opt_args
 
 if (( ! $+_telnet_short )); then
   local k help="$(telnet -\? < /dev/null 2>&1)"
@@ -69,14 +69,14 @@ case "$state" in
 hosts)
   _description expl 'host'
   _combination telnet_hosts_ports_users \
-    ${options[-l]:+users=${options[-l]:q}} \
+    ${opt_args[-l]:+users=${opt_args[-l]:q}} \
     hosts "$expl[@]"
   ;;
 
 ports)
   _description expl 'port'
   _combination telnet_hosts_ports_users \
-    ${options[-l]:+users=${options[-l]:q}} \
+    ${opt_args[-l]:+users=${opt_args[-l]:q}} \
     hosts="${line[2]:q}" \
     ports "$expl[@]"
   ;;

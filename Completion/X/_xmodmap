@@ -3,7 +3,7 @@
 setopt localoptions extendedglob
 
 local state line ret=1
-typeset -A options
+typeset -A opt_args
 
 _x_arguments \
   -{help,grammar,verbose,quiet} \

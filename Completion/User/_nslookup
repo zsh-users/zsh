@@ -113,7 +113,7 @@ if [[ -n "$compcontext" ]]; then
     return
     ;;
   set)
-    typeset -A values
+    typeset -A val_args
 
     _values 'state information' "$setopts[@]" && ret=0
 
@@ -130,7 +130,7 @@ fi
 
 if [[ -z "$state" ]]; then
   local line
-  typeset -A options
+  typeset -A opt_args
 
   _arguments \
     "-${(@)^${(@M)setopts:#*\]:*}/\[/=[}" \

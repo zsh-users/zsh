@@ -44,7 +44,7 @@ local ret=1 tmp expl
 # Used by `_arguments', made local here.
 
 local state lstate line
-typeset -A options
+typeset -A opt_args
 
 state=''
 

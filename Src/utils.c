@@ -91,8 +91,10 @@ zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
 	nicezputs(scriptname ? scriptname : argzero, stderr);
 	fputs(": ", stderr);
     }
-    nicezputs(cmd, stderr);
-    fputs(": ", stderr);
+    if (cmd) {
+	nicezputs(cmd, stderr);
+	fputs(": ", stderr);
+    }
     zerrmsg(fmt, str, num);
 }
 

@@ -1,7 +1,7 @@
 #compdef lynx
 
 local state line
-typeset -A options
+typeset -A opt_args
 
 _arguments \
   '-accept_all_cookies' \

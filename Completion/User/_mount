@@ -6,7 +6,7 @@
 # are below these table.
 
 local state line ret=1 args fss deffs=iso9660 descr tmp
-typeset -A options
+typeset -A opt_args
 
 if (( ! $+_fs_any )); then
 
@@ -233,30 +233,30 @@ fstype)
   compadd "$expl[@]" -qS, -M 'L:|no=' - "$fss[@]" && ret=0
   ;;
 fsopt)
-  eval 'tmp=(' '"$_fs_'${(s:,:)^${options[-t]:-${deffs}}}'[@]"' ')'
+  eval 'tmp=(' '"$_fs_'${(s:,:)^${opt_args[-t]:-${deffs}}}'[@]"' ')'
   tmp=( "$_fs_any[@]" "${(@)tmp:#}" )
   _values -s , 'file system options' "$tmp[@]" && ret=0
   ;;
 devordir)
-  if (( $+options[-a] )); then
+  if (( $+opt_args[-a] )); then
     _message "no device or directory with option \`-a'"
   else
     _description expl device
     compadd "$expl[@]" /dev/* && ret=0
-    if (( ! $+options[-t] )); then
+    if (( ! $+opt_args[-t] )); then
       _description expl 'mount point'
       _files "$expl[@]" -/ && ret=0
     fi
   fi
   ;;
 udevordir)
-  if (( $+options[-a] )); then
+  if (( $+opt_args[-a] )); then
     _message "no device or directory with option \`-a'"
   else
     tmp=( "${(@f)$(< /etc/mtab)}" )
     _description expl device
     compadd "$expl[@]" - "${(@)${(@)tmp%% *}:#none}" && ret=0
-    if (( ! $+options[-t] )); then
+    if (( ! $+opt_args[-t] )); then
       _description expl 'mount point'
       compadd "$expl[@]" - "${(@)${(@)tmp#* }%% *}"
     fi

@@ -812,8 +812,8 @@ ca_get_opt(Cadef d, char *line, int full, char **end)
 		return p;
     } else {
 	for (p = d->opts; p; p = p->next)
-	    if (p->active && p->args && p->type != CAO_NEXT &&
-		strpfx(p->name, line)) {
+	    if (p->active && ((!p->args || p->type == CAO_NEXT) ?
+			      !strcmp(p->name, line) : strpfx(p->name, line))) {
 		if (end) {
 		    int l = strlen(p->name);
 

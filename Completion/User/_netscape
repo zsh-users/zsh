@@ -1,6 +1,7 @@
 #compdef netscape
 
-local state
+local state line
+typeset -A opt_args
 
 _x_arguments \
   '-xrm:resource:_x_resource' \
@@ -69,7 +70,8 @@ if [ "$state" = "urls" ]; then
     compadd authors blank cache document fonts global hype image-cache \
         license logo memory-cache mozilla plugins
   else
-    compadd -S '' about: mocha: javascript:
+    _description expl 'URL prefix'
+    compadd "$expl[@]" -S '' about: mocha: javascript:
     _urls "$@"
   fi
 fi

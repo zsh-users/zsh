@@ -1,7 +1,7 @@
 #compdef wget
 
 local state line
-typeset -A options
+typeset -A opt_args
 
 local tmp1 tmp2
 

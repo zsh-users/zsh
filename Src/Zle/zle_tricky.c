@@ -5452,6 +5452,7 @@ set_comp_sep(void)
 
     if (compisuffix)
 	s = dyncat(s, compisuffix);
+    untokenize(s);
 
     return sep_comp_string("", s, lip + lp, 0);
 }

@@ -1,7 +1,7 @@
 #compdef ypcat ypmatch yppasswd ypwhich ypset ypserv ypbind yppush yppoll ypxfr domainname
 
 local line state ret=1
-typeset -A options
+typeset -A opt_args
 
 if (( ! $+_yp_cache_maps )); then
   _yp_cache_maps=( "${(@)${(@f)$(ypwhich -m)}%% *}" )
@@ -93,7 +93,7 @@ if [[ "$state" = map* ]]; then
 
   compadd "$expl[@]" -M 'l:.|by=by l:.|=by r:|.=* r:|=*' - \
           "$_yp_cache_maps[@]" && ret=0
-  if [[ $+options[-t] -eq 0 && "$state" != maponly ]]; then
+  if [[ $+opt_args[-t] -eq 0 && "$state" != maponly ]]; then
     _description expl 'nicknames'
     compadd "$expl[@]" - "$_yp_cache_nicks[@]" && ret=0
   fi

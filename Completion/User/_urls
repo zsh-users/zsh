@@ -37,7 +37,7 @@
 #    name used by a user placing web pages within their home area.
 #    e.g. compconf urls_localhttp=www:/usr/local/apache/htdocs:public_html
 
-local ipre scheme host user dirs files ret=1
+local ipre scheme host user dirs files ret=1 expl
 
 if [[ "$1" = -f ]]; then
   shift
@@ -54,9 +54,10 @@ if [[ -prefix [-+.a-z0-9]#: ]]; then
   scheme="${PREFIX%%:*}"
   compset -P "[-+.a-z0-9]#:"
 else
-  [ -d $compconfig[urls_path]/bookmark ] &&
-      compadd "$@" -S '' bookmark: && ret=0
-  compadd "$@" -S '' file: ftp:// gopher:// http:// && ret=0
+  _description expl 'URL prefix'
+  [[ -d $compconfig[urls_path]/bookmark ]] &&
+      compadd "$@" "$expl[@]" -S '' bookmark: && ret=0
+  compadd "$@" "$expl[@]" -S '' file: ftp:// gopher:// http:// && ret=0
   return $ret
 fi
 

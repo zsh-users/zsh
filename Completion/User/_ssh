@@ -2,7 +2,7 @@
 
 _ssh () {
   local state lstate line ret=1 expl args
-  typeset -A options
+  typeset -A opt_args
 
   local accounts_users_hosts
 
@@ -143,7 +143,7 @@ _ssh () {
         else
           _description expl 'remote host name'
           _ssh_hosts "$expl[@]" && ret=0
-          if (( ! $+options[-l] )); then
+          if (( ! $+opt_args[-l] )); then
             _description expl 'login name'
             _ssh_users "$expl[@]" -S@ -q && ret=0
           fi
@@ -230,7 +230,7 @@ _ssh_hosts () {
     _combination accounts_users_hosts "users=${IPREFIX/@}" hosts "$@"
   else
     _combination accounts_users_hosts \
-      ${options[-l]:+"users=${options[-l]:q}"} hosts "$@"
+      ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
   fi
 }
 

@@ -9,7 +9,7 @@ if compset -N --; then
   fi
 else
   local state line ret=1
-  typeset -A options
+  typeset -A opt_args
 
   _x_arguments \
     '-q[quiet startup]' \

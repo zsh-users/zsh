@@ -59,14 +59,14 @@ if compvalues -i "$@"; then
       expl=( "-qS$sep" "$expl[@]" )
 
   if [[ "$action" = -\>* ]]; then
-    compvalues -v values
+    compvalues -v val_args
     state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
     compstate[restore]=''
     return 1
   else
-    typeset -A values
+    typeset -A val_args
 
-    compvalues -v values
+    compvalues -v val_args
 
     if [[ "$action" = \ # ]]; then
 

@@ -171,18 +171,18 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
       _description expl "$descr"
 
       if [[ "$action" = -\>* ]]; then
-        comparguments -W line options
+        comparguments -W line opt_args
         state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
         compstate[restore]=''
         aret=yes
       else
         if [[ -z "$local" ]]; then
           local line
-          typeset -A options
+          typeset -A opt_args
           local=yes
         fi
 
-        comparguments -W line options
+        comparguments -W line opt_args
 
         if [[ "$action" = \ # ]]; then
 

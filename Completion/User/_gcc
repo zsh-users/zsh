@@ -1,7 +1,7 @@
 #compdef gcc
 
 local state line ret=1 expl args
-typeset -A options
+typeset -A opt_args
 
 args=()
 case $MACHTYPE in

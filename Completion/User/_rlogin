@@ -21,7 +21,7 @@ _rlogin () {
     ;;
   rsh|remsh)
     local state line ret=1
-    typeset -A options
+    typeset -A opt_args
 
     _arguments -s \
       '-n[ignore stdin]' \
@@ -39,7 +39,7 @@ _rlogin () {
     ;;
   rcp)
     local state line ret=1
-    typeset -A options
+    typeset -A opt_args
 
     _arguments -s \
       '-p[preserve modification times]' \
@@ -71,7 +71,7 @@ _rlogin_hosts () {
     _combination accounts_users_hosts "users=${IPREFIX/@}" hosts "$@"
   else
     _combination accounts_users_hosts \
-      ${options[-l]:+"users=${options[-l]:q}"} hosts "$@"
+      ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
   fi
 }
 

@@ -6,7 +6,7 @@
 #    The array that contains paris `host:port'.
 
 local state line expl
-typeset -A options
+typeset -A opt_args
 
 if [[ $CURRENT -eq 2 && (
   -z "$compconfig[option_prefix]" ||
@@ -41,7 +41,7 @@ command)
   ;;
 
 arg1)
-  if (( $+options[-s] )); then
+  if (( $+opt_args[-s] )); then
     _description expl 'port to listen'
     _ports "$expl[@]"
   else
@@ -51,7 +51,7 @@ arg1)
   ;;
 
 arg2)
-  if (( ! $+options[-s] )); then
+  if (( ! $+opt_args[-s] )); then
     _description expl 'port to connect'
     _combination socket_hosts_ports hosts="${line[2]:q}" ports "$expl[@]"
   fi
