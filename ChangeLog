@@ -1,3 +1,9 @@
+2002-03-07  Clint Adams  <clint@zsh.org>
+
+	* 16778: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_irssi: completion by Istvan
+	Sebestyen for irssi.
+
 2002-03-07  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16776: Src/Zle/zle_tricky.c: don't try to build the
