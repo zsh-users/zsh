@@ -415,9 +415,9 @@ for prepath in "$prepaths[@]"; do
     # Next we see if this component is ambiguous.
 
     if [[ "$tmp3" = */* ]]; then
-      tmp4=( "${(@)tmp1:#${tmp1[1]%%/*}/*}" )
+       tmp4=$tmp1[(I)^${tmp1[1]%%/*}/*]
     else
-      tmp4=( "${(@)tmp1:#${tmp1[1]}}" )
+       tmp4=$tmp1[(I)^${tmp1[1]}]
     fi
 
     if [[ "$tpre" = */* ]]; then
@@ -430,7 +430,7 @@ for prepath in "$prepaths[@]"; do
       tmp2="${cpre}${tpre}"
     fi
 
-    if (( $#tmp4 )) ||
+    if (( tmp4 )) ||
        [[ -n "$compstate[pattern_match]" && "$tmp2" != "${(q)tmp2}" ]]; then
       # It is. For menucompletion we now add the possible completions
       # for this component with the unambigous prefix we have built
@@ -444,7 +444,7 @@ for prepath in "$prepaths[@]"; do
 
       if [[ -n $menu ]] ||
          ! zstyle -t ":completion:${curcontext}:paths" expand suffix; then
-        (( $#tmp4 )) && zstyle -t ":completion:${curcontext}:paths" cursor &&
+        (( tmp4 )) && zstyle -t ":completion:${curcontext}:paths" cursor &&
             compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" -s "/${tmp3#*/}" \
