@@ -1,5 +1,8 @@
 2000-05-29  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* users/3101: Doc/Zsh/compsys.yo: make handling of default tag clearer
+ 	in the docs
+	
 	* 11634: Src/Zle/compcore.c, Src/Zle/compmatch.c, Src/Zle/compresult.c:
  	matching bugs with patterns with two anchors
 	

@@ -491,7 +491,8 @@ for cursor names used by X programs
 kindex(default, completion tag)
 item(tt(default))(
 used to look up default values for various styles that may also be set 
-for tags that are used when generating matches
+for tags that are used when generating matches; note that this tag is
+used when only the var(function) field of the context name is set up
 )
 kindex(descriptions, completion tag)
 item(tt(descriptions))(
@@ -761,6 +762,15 @@ interpreted as `false'.  The behavior for any other value is undefined
 unless the description for the particular style mentions other
 possible values; in particular, the default value may be either on or off
 if the style is not set.
+
+Some of these styles are tested for every tag used to add possible
+matches and for the tt(default) tag (most notably tt(menu),
+tt(list-colors) and the styles controlling the completion listing like 
+tt(list-packed) and tt(last-prompt)). When tested for the tt(default)
+tag, only the var(function) field of the context will be set up, so
+the default value will normally be set like:
+
+example(zstyle ':completion:*:default' menu ...)
 
 startitem()
 kindex(accept-exact, completion style)
@@ -1477,7 +1487,7 @@ kindex(menu, completion style)
 item(tt(menu))(
 If this is set to true in a given context, using any of the tags defined
 for a given completion, menu completion will be used.  The tag
-`tt(default)' can be used to match any tag, but a specific tag will take
+`tt(default)' can be used to set the default value, but a specific tag will take
 precedence.  If none of the values found in this way is true but at least
 one is set to `tt(auto)' the behaviour will be as for the tt(AUTO_MENU)
 option.  Finally, if one of the values is explicitly set to false, menu
