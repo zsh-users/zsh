@@ -12,6 +12,23 @@ contributing patches and feedback to the mailing list.  These guidelines
 are very simple and hopefully should make for a more orderly development
 of zsh.
 
+Tools
+-----
+
+To develop (as opposed to just build) zsh, you'll need a few specialised
+tools:
+
+* GNU autoconf, version 2.12 or later.  (Earlier versions mostly work,
+  but part of the configuration system now relies on part of the format
+  of the config.status files that get generated.  See the comments in
+  configure.in and at the end of Src/mkmakemod.sh for an explanation.)
+
+* GNU m4.  (Required by autoconf.)
+
+* yodl.
+
+* texi2html.
+
 Patches
 -------
 
@@ -39,6 +56,30 @@ Patches
 * There is now a zsh patch archive.  To have your patches appear in the
   archive, send them to the mailing list with a Subject: line starting
   with "PATCH:".
+
+Testing
+-------
+
+* Because zsh has a huge number of different options and interacts with
+  a wide range of human and artificial life, it is very difficult to
+  test the shell thoroughly.  For this purpose, the Test subdirectory
+  exists.  It consists of a driver script (ztst.zsh) and various test
+  files (*.ztst) in a format which is described in 50cd.ztst, which acts
+  as a template.  It is designed to make it easy to provide input to
+  chunks of shell code and to test the corresponding standard output,
+  error output and exit status.
+
+* There is not much there yet, but please don't let that put you off adding
+  tests for basic syntactic features, builtins, options etc. which you
+  know to be flakey or to have had difficulties in the past.  Better
+  support for testing job control and interactive features is expected
+  to follow eventually (this may require additional external software
+  e.g. `expect').
+
+* The directory is not part of the usual process of building and
+  installation.  To run the tests, go to Test and `make check'.  Please
+  report any errors with all the usual information about the zsh version
+  and the system you are using.
 
 C coding style
 --------------
@@ -99,63 +140,82 @@ C coding style
   type of the function, and finally the name of the function with typed
   arguments.  These lines must not be indented.  The script generating
   function prototypes and the ansi2knr program depend on this format.
-  If the function is not used outside the file it is defined in, it
-  should be declared "static"; this keyword goes on the type line,
-  before the return type.
 
-* Global variable declarations must similarly be preceded by a
+* Variable declarations must similarly be preceded by a
   line containing only "/**/", for the prototype generation script.
   The declaration itself should be all on one line (except for multi-line
   initialisers).
+
+* Preprocessor directives thst affect the function/variable declarations must
+  also be preceded by a "/**/" line, so that they get copied into the
+  prototype lists.
+
+* There are three levels of visibility for a function or variable.  It can
+  be file-local, for which it must be marked with the keyword "static" at
+  the front of the declaration.  It can be visible to other object files in
+  the same module, for which it requires no extra keyword.  Or it can be
+  made available to the entire program (including other dynamically loaded
+  modules), for which it must be marked with the pseudo-keyword "mod_export"
+  at the front of the declaration.  Symbols should have the least visibility
+  possible.
 
 * Leave a blank line between the declarations and statements in a compound
   statement, if both are present.  Use blank lines elsewhere to separate
   groups of statements in the interests of clarity.  There should never
   be two consecutive blank lines.
 
+* Each .c file *must* #include the .mdh header for the module it is a
+  part of and then its own .pro file (for local prototypes).  It may
+  also #include other system headers.  It *must not* #include any other
+  module's headers or any other .pro files.
+
 Modules
 -------
 
-Modules are described by a file named `foo.mdd' for a module
-`foo'. This file is actually a shell script that will sourced when zsh 
-is build. To describe the module it can/should set the following shell 
-variables:
+Modules have hierarchical names.  Name segments are separated by `/', and
+each segment consists of alphanumerics plus `_'.  Relative names are never
+used; the naming hierarchy is strictly for organisational convenience.
 
+Each module is described by a file with a name ending in `.mdd' somewhere
+under the Src directory.  This file is actually a shell script that will
+sourced when zsh is build. To describe the module it can/should set the
+following shell variables:
+
+  - name            name of the module
   - moddeps         modules on which this module depends (default none)
-  - nozshdep        non-empty indicates no dependence on the `zsh' pseudo-module
+  - nozshdep        non-empty indicates no dependence on the `zsh/main' pseudo-module
   - alwayslink      if non-empty, always link the module into the executable
   - autobins        builtins defined by the module, for autoloading
   - autoinfixconds  infix condition codes defined by the module, for
                     autoloading (without the leading `-')
   - autoprefixconds like autoinfixconds, but for prefix condition codes
   - autoparams      parameters defined by the module, for autoloading
+  - automathfuncs   math functions defined by the module, for autoloading
   - objects         .o files making up this module (*must* be defined)
-  - proto           .pro files for this module (default generated from $objects)
+  - proto           .syms files for this module (default generated from $objects)
   - headers         extra headers for this module (default none)
   - hdrdeps         extra headers on which the .mdh depends (default none)
   - otherincs       extra headers that are included indirectly (default none)
 
-Be sure to put the values in quotes. For further enlightenment have a
-look at the `mkmakemod.sh' script in the Src directory of the
-distribution.
+Be sure to put the values in quotes. For further enlightenment have a look
+at the `mkmakemod.sh' script in the Src directory of the distribution.
 
 Modules have to define four functions which will be called automatically
-by the zsh core. The first one, named `setup_foo' for a module named
-`foo', should set up any data needed in the module, at least any data
-other modules may be interested in. The second one, named `boot_foo',
-should register all builtins, conditional codes, and function wrappers
-(i.e. anything that will be visible to the user) and will be called
-after the `setup'-function. 
-The third one, named `cleanup_foo' for module `foo' is called when the
-user tries to unload a module and should de-register the builtins
-etc. The last function, `finish_foo' is called when the module is
-actually unloaded and should finalize all the data initialized in the 
-`setup'-function. Since the last two functions are only executed when
-the module is used as an dynamically loaded module you can surround
-it with `#ifdef MODULE' and `#endif'.
-In short, the `cleanup'-function should undo what the `boot'-function
-did, and the `finish'-function should undo what the `setup'-function
+by the zsh core. The first one, named `setup_', should set up any data
+needed in the module, at least any data other modules may be interested
+in. The second one, named `boot_', should register all builtins,
+conditional codes, and function wrappers (i.e. anything that will be
+visible to the user) and will be called after the `setup_'-function.
+
+The third one, named `cleanup_', is called when the user tries to unload
+a module and should de-register the builtins etc. The last function,
+`finish_' is called when the module is actually unloaded and should
+finalize all the data initialized in the `setup_'-function.
+
+In short, the `cleanup_'-function should undo what the `boot_'-function
+did, and the `finish_'-function should undo what the `setup_'-function
 did.
+
 All of these functions should return zero if they succeeded and
 non-zero otherwise.
 
@@ -397,6 +457,90 @@ builtins and condition codes:
     deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
     ...
   }
+
+Modules can also define math functions. Again, they are described
+using a table:
+
+  static struct mathfunc mftab[] = {
+    NUMMATHFUNC("sum", math_sum, 1, -1, 0),
+    STRMATHFUNC("length", math_length, 0),
+  };
+
+The `NUMMATHFUNC()' macro defines a math function that gets an array
+of mnumbers (the zsh type for representing values in arithmetic
+expressions) taken from the string in parentheses at the function
+call. Its arguments are the name of the function, the C-function
+implementing it, the minimum and maximum number of arguments (as
+usual, the later may be `-1' to specify that the function accepts any
+number of arguments), and finally an integer that is given unchanged
+to the C-function (to be able to implement multiple math functions in
+one C-function).
+
+The `STRMATHFUNC()' macro defines a math function that gets the string 
+in parentheses at the call as one string argument (without the
+parentheses). The arguments are the name of the function, the
+C-function, and an integer used like the last argument of
+`NUMMATHFUNC()'.
+
+The C-functions implementing the math functions look like this:
+
+  /**/
+  static mnumber
+  math_sum(char *name, int argc, mnumber *argv, int id)
+  {
+    ...
+  }
+
+  /**/
+  static mnumber
+  math_length(char *name, char *arg, int id)
+  {
+    ...
+  }
+
+Functions defined with `NUMMATHFUNC' get the name of the function, the 
+number of numeric arguments, an array with these arguments, and the
+last argument from the macro-call. Functions defined with
+`STRMATHFUNC' get the name of the function, the string between the
+parentheses at the call, and the last argument from the macro-call.
+
+Both types of functions return an mnumber which is a descriminated
+union looking like:
+
+  typedef struct {
+    union {
+      zlong l;
+      double d;
+    } u;
+    int type;
+  } mnumber;
+
+The `type' field should be set to `MN_INTEGER' or `MN_FLOAT' and
+depending on its value either `u.l' or `u.d' contains the value.
+
+To register and de-register math functions, the functions
+`addmathfuncs()' and `deletemathfuncs()' are used:
+
+  /**/
+  int
+  boot_example(Module m)
+  {
+    int ret;
+
+    ret = addmathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
+    ...
+  }
+
+  /**/
+  int
+  cleanup_example(Module m)
+  {
+    deletemathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
+    ...
+  }
+
+The arguments and return values are as for the functions used to
+register and de-register parameters, conditions, etc.
 
 Modules can also define function hooks. Other modules can then add
 functions to these hooks to make the first module call these functions
@@ -671,3 +815,20 @@ Documentation
   All the above should appear on their own, separated by newlines from the
   surrounding text.  No extra newlines after the opening or before the
   closing parenthesis are required.
+
+Module names
+------------
+
+Modules have hierarchical names.  Name segments are separated by `/', and
+each segment consists of alphanumerics plus `_'.  Relative names are never
+used; the naming hierarchy is strictly for organisational convenience.
+
+Top-level name segments should be organisational identifiers, assigned
+by the Zsh Development Group and recorded here:
+
+top-level identifier  organisation
+--------------------  ------------
+x_*                   reserved for private experimental use
+zsh                   The Zsh Development Group (contact: <coordinator@zsh.org>)
+
+Below the top level, naming authority is delegated.

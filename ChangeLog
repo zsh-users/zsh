@@ -1,3 +1,9 @@
+2000-04-06  Andrew Main  <zefram@zsh.org>
+
+	* zefram1: configure.in, Etc/zsh-development-guide: List of tools
+	required for development work, and a little more conspicuous
+	explanation of the config.status hack.
+
 2000-04-06  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
 	* 10543: Makefile.in: avoid distcleaning Test twice
