@@ -1,3 +1,8 @@
+2001-02-02  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* Peter: 13427: Completion/Core/_expand: fix for handling quoting
+ 	for filenames with weird characters
+
 2001-02-01  Oliver Kiddle  <opk@zsh.org>
 
 	* 13422: README, Completion/User/_urls, Doc/Zsh/manual.yo,
