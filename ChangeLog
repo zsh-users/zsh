@@ -1,3 +1,9 @@
+2000-08-02  Clint Adams  <schizo@debian.org>
+
+        * 12472: configure.in, Src/Modules/files.c,
+	Src/Modules/parameter.c: use pathconf() instead
+	of PATH_MAX if possible.
+
 2000-08-02  Adam Spiers  <adam@spiers.net>
 
 	* 12486: Completion/Base/{.distfiles,_cache_invalid,_retrieve_cache,

@@ -1397,7 +1397,17 @@ scanpmjobdirs(HashTable ht, ScanFunc func, int flags)
 static void
 setpmnameddir(Param pm, char *value)
 {
+#ifdef HAVE_PATHCONF
+    int pathmax = 0;
+
+    pathmax = pathconf(value, _PC_PATH_MAX);
+    if (pathmax == -1) {
+      zwarn("%s: %e", value, errno);
+    }
+    else if (!value || *value != '/' || strlen(value) >= pathmax)
+#else
     if (!value || *value != '/' || strlen(value) >= PATH_MAX)
+#endif
 	zwarn("invalid value: %s", value, 0);
     else
 	adduserdir(pm->nam, value, 0, 1);
@@ -1420,6 +1430,9 @@ setpmnameddirs(Param pm, HashTable ht)
 {
     int i;
     HashNode hn, next, hd;
+#ifdef HAVE_PATHCONF
+    int pathmax = 0;
+#endif
 
     if (!ht)
 	return;
@@ -1442,8 +1455,17 @@ setpmnameddirs(Param pm, HashTable ht)
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
+#ifdef HAVE_PATHCONF
+            if((pathmax = pathconf(val, _PC_PATH_MAX)) == -1)
+                zwarn("%s: %e", val, errno);
+            else
+#endif
 	    if (!(val = getstrvalue(&v)) || *val != '/' ||
+#ifdef HAVE_PATHCONF
 		strlen(val) >= PATH_MAX)
+#else
+                strlen(val) >= pathmax)
+#endif
 		zwarn("invalid value: %s", val, 0);
 	    else
 		adduserdir(hn->nam, val, 0, 1);
