@@ -1365,6 +1365,7 @@ struct histent {
 #define HFILE_SKIPDUPS		0x0004
 #define HFILE_SKIPFOREIGN	0x0008
 #define HFILE_FAST		0x0010
+#define HFILE_GOT_SIGNAL	0x0020
 #define HFILE_USE_OPTIONS	0x8000
 
 /******************************************/
