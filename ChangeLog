@@ -1,3 +1,10 @@
+2001-05-28  Clint Adams  <clint@zsh.org>
+
+	* 14509: Completion/Base/Core/_setup, Doc/Zsh/compsys.yo,
+	Doc/Zsh/mod_complist.yo: clobber both ZLS_COLORS and ZLS_COLOURS
+	during compinit, and slightly clarify this behavior in the
+	documentation.
+
 2001-05-28  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14507: Src/Zle/compresult.c: fix for cursor positioning with

@@ -20,7 +20,7 @@ if zstyle -a ":completion:${curcontext}:$1" list-colors val; then
 #   ZLS_COLORS="$ZLS_COLORS$ZLS_COLOURS"
 
 elif [[ "$1" = default ]]; then
-  unset ZLS_COLORS
+  unset ZLS_COLORS ZLS_COLOURS
 fi
 
 if zstyle -t ":completion:${curcontext}:$1" list-packed; then

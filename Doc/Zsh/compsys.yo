@@ -1483,7 +1483,7 @@ kindex(list-colors, completion style)
 item(tt(list-colors))(
 If the tt(zsh/complist) module is used, this style can be used to set
 color specifications as with the tt(ZLS_COLORS) and tt(ZLS_COLOURS)
-parameters (see
+parameters, which will not be honored under this completion system (see
 ifzman(the section `The zsh/complist Module' in zmanref(zshmodules))\
 ifnzman(noderef(The zsh/complist Module))\
 ).

@@ -127,7 +127,7 @@ ifnzman(noderef(Other Functions))\
 `tt($colors[red])' to get the code for foreground color red and
 `tt($colors[bg-green])' for the code for background color green.
 
-If the completion system based around shell functions is used, these
+If the completion system invoked by compinit is used, these
 parameters should not be set directly because the system controls them 
 itself.  Instead, the tt(list-colors) style should be used (see
 ifzman(the section `Completion System Configuration' in zmanref(zshcompsys))\
