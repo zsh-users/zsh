@@ -22,6 +22,13 @@
 	* 17562: Completion/Unix/Command/_valgrind: Function for
 	Julian Seward's memory checking tool, version 1.0.0.
 
+2002-08-18  Clint Adams  <clint@zsh.org>
+
+	* 17558: Src/Modules/.distfiles, Src/Modules/socket.c,
+	Src/Modules/socket.mdd, Doc/Zsh/.distfiles, Doc/Zsh/builtins.yo,
+	Doc/Zsh/mod_socket.yo: zsh/net/socket module, including zsocket
+	builtin.
+
 2002-08-17  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_clint_setup: correct %v typo.
