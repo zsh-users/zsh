@@ -349,7 +349,7 @@ bin_zle(char *name, char **args, char *ops, int func)
     if(op->o)
 	for(opp = op; (++opp)->o; )
 	    if(ops[STOUC(opp->o)]) {
-		zerrnam(name, "incompatible operation selection options",
+		zwarnnam(name, "incompatible operation selection options",
 		    NULL, 0);
 		return 1;
 	    }
@@ -357,10 +357,10 @@ bin_zle(char *name, char **args, char *ops, int func)
     /* check number of arguments */
     for(n = 0; args[n]; n++) ;
     if(n < op->min) {
-	zerrnam(name, "not enough arguments for -%c", NULL, op->o);
+	zwarnnam(name, "not enough arguments for -%c", NULL, op->o);
 	return 1;
     } else if(op->max != -1 && n > op->max) {
-	zerrnam(name, "too many arguments for -%c", NULL, op->o);
+	zwarnnam(name, "too many arguments for -%c", NULL, op->o);
 	return 1;
     }
 
@@ -397,7 +397,7 @@ bin_zle_refresh(char *name, char **args, char *ops, char func)
     int sl = statusll, ocl = clearlist;
 
     if (!zleactive) {
-	zerrnam(name, "can only be called from widget function", NULL, 0);
+	zwarnnam(name, "can only be called from widget function", NULL, 0);
 	return 1;
     }
     statusline = NULL;
@@ -441,7 +441,7 @@ static int
 bin_zle_mesg(char *name, char **args, char *ops, char func)
 {
     if (!zleactive) {
-	zerrnam(name, "can only be called from widget function", NULL, 0);
+	zwarnnam(name, "can only be called from widget function", NULL, 0);
 	return 1;
     }
     showmsg(*args);
@@ -457,7 +457,7 @@ bin_zle_unget(char *name, char **args, char *ops, char func)
     char *b = *args, *p = b + strlen(b);
 
     if (!zleactive) {
-	zerrnam(name, "can only be called from widget function", NULL, 0);
+	zwarnnam(name, "can only be called from widget function", NULL, 0);
 	return 1;
     }
     while (p > b)
@@ -534,10 +534,10 @@ bin_zle_link(char *name, char **args, char *ops, char func)
     Thingy t = (Thingy) thingytab->getnode(thingytab, args[0]);
 
     if(!t) {
-	zerrnam(name, "no such widget `%s'", args[0], 0);
+	zwarnnam(name, "no such widget `%s'", args[0], 0);
 	return 1;
     } else if(bindwidget(t->widget, rthingy(args[1]))) {
-	zerrnam(name, "widget name `%s' is protected", args[1], 0);
+	zwarnnam(name, "widget name `%s' is protected", args[1], 0);
 	return 1;
     }
     return 0;
@@ -556,7 +556,7 @@ bin_zle_new(char *name, char **args, char *ops, char func)
     if(!bindwidget(w, rthingy(args[0])))
 	return 0;
     freewidget(w);
-    zerrnam(name, "widget name `%s' is protected", args[0], 0);
+    zwarnnam(name, "widget name `%s' is protected", args[0], 0);
     return 1;
 }
 
@@ -568,14 +568,14 @@ bin_zle_complete(char *name, char **args, char *ops, char func)
     Widget w, cw;
 
     if (!require_module(name, "zsh/complete", 0, 0)) {
-	zerrnam(name, "can't load complete module", NULL, 0);
+	zwarnnam(name, "can't load complete module", NULL, 0);
 	return 1;
     }
     t = rthingy((args[1][0] == '.') ? args[1] : dyncat(".", args[1]));
     cw = t->widget;
     unrefthingy(t);
     if (!cw || !(cw->flags & ZLE_ISCOMP)) {
-	zerrnam(name, "invalid widget `%s'", args[1], 0);
+	zwarnnam(name, "invalid widget `%s'", args[1], 0);
 	return 1;
     }
     w = zalloc(sizeof(*w));
@@ -586,7 +586,7 @@ bin_zle_complete(char *name, char **args, char *ops, char func)
     w->u.comp.func = ztrdup(args[2]);
     if (bindwidget(w, rthingy(args[0]))) {
 	freewidget(w);
-	zerrnam(name, "widget name `%s' is protected", args[0], 0);
+	zwarnnam(name, "widget name `%s' is protected", args[0], 0);
 	return 1;
     }
     return 0;
@@ -608,7 +608,7 @@ bin_zle_call(char *name, char **args, char *ops, char func)
 		sfcontext != SFC_WIDGET);
     }
     if(!zleactive || incompctlfunc || incompfunc || sfcontext != SFC_WIDGET) {
-	zerrnam(name, "widgets can only be called when ZLE is active",
+	zwarnnam(name, "widgets can only be called when ZLE is active",
 	    NULL, 0);
 	return 1;
     }

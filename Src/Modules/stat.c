@@ -347,10 +347,10 @@ bin_stat(char *name, char **args, char *ops, int func)
 		    iwhich = aptr - statelts;
 		}
 	    if (found > 1) {
-		zerrnam(name, "%s: ambiguous stat element", arg, 0);
+		zwarnnam(name, "%s: ambiguous stat element", arg, 0);
 		return 1;
 	    } else if (found == 0) {
-		zerrnam(name, "%s: no such stat element", arg, 0);
+		zwarnnam(name, "%s: no such stat element", arg, 0);
 		return 1;
 	    }
 	    /* if name of link requested, turn on lstat */
@@ -365,7 +365,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 		    if (arg[1]) {
 			arrnam = arg+1;
 		    } else if (!(arrnam = *++args)) {
-			zerrnam(name, "missing parameter name\n",
+			zwarnnam(name, "missing parameter name",
 				NULL, 0);
 			return 1;
 		    }
@@ -375,7 +375,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 		    if (arg[1]) {
 			hashnam = arg+1;
 		    } else if (!(hashnam = *++args)) {
-			zerrnam(name, "missing parameter name\n",
+			zwarnnam(name, "missing parameter name",
 				NULL, 0);
 			return 1;
 		    }
@@ -387,12 +387,12 @@ bin_stat(char *name, char **args, char *ops, int func)
 		    if (arg[1]) {
 			sfd = arg+1;
 		    } else if (!(sfd = *++args)) {
-			zerrnam(name, "missing file descriptor\n", NULL, 0);
+			zwarnnam(name, "missing file descriptor", NULL, 0);
 			return 1;
 		    }
 		    fd = zstrtol(sfd, &sfd, 10);
 		    if (*sfd) {
-			zerrnam(name, "bad file descriptor\n", NULL, 0);
+			zwarnnam(name, "bad file descriptor", NULL, 0);
 			return 1;
 		    }
 		    break;
@@ -400,14 +400,14 @@ bin_stat(char *name, char **args, char *ops, int func)
 		    if (arg[1]) {
 			timefmt = arg+1;
 		    } else if (!(timefmt = *++args)) {
-			zerrnam(name, "missing time format\n", NULL, 0);
+			zwarnnam(name, "missing time format", NULL, 0);
 			return 1;
 		    }
 		    /* force string format in order to use time format */
 		    ops['s'] = 1;
 		    break;
 		} else {
-		    zerrnam(name, "bad option: -%c", NULL, *arg);
+		    zwarnnam(name, "bad option: -%c", NULL, *arg);
 		    return 1;
 		}
 	    }

@@ -388,7 +388,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     Cmatcher match = NULL;
 
     if (incompfunc != 1) {
-	zerrnam(name, "can only be called from completion function", NULL, 0);
+	zwarnnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre =
@@ -521,7 +521,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		argv++;
 		goto ca_args;
 	    default:
-		zerrnam(name, "bad option: -%c", NULL, *p);
+		zwarnnam(name, "bad option: -%c", NULL, *p);
 		return 1;
 	    }
 	    if (sp) {
@@ -535,7 +535,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 			*sp = *argv;
 		    p = "" - 1;
 		} else {
-		    zerrnam(name, e, NULL, *p);
+		    zwarnnam(name, e, NULL, *p);
 		    return 1;
 		}
 		if (dm) {
@@ -800,11 +800,11 @@ bin_compset(char *name, char **argv, char *ops, int func)
     char *sa = NULL, *sb = NULL;
 
     if (incompfunc != 1) {
-	zerrnam(name, "can only be called from completion function", NULL, 0);
+	zwarnnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
     if (argv[0][0] != '-') {
-	zerrnam(name, "missing option", NULL, 0);
+	zwarnnam(name, "missing option", NULL, 0);
 	return 1;
     }
     switch (argv[0][1]) {
@@ -816,7 +816,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
     case 'S': test = CVT_SUFPAT; break;
     case 'q': return set_comp_sep();
     default:
-	zerrnam(name, "bad option -%c", NULL, argv[0][1]);
+	zwarnnam(name, "bad option -%c", NULL, argv[0][1]);
 	return 1;
     }
     if (argv[0][2]) {
@@ -825,7 +825,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
 	na = 2;
     } else {
 	if (!(sa = argv[1])) {
-	    zerrnam(name, "missing string for option -%c", NULL, argv[0][1]);
+	    zwarnnam(name, "missing string for option -%c", NULL, argv[0][1]);
 	    return 1;
 	}
 	sb = argv[2];
@@ -833,7 +833,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
     }
     if (((test == CVT_PRENUM || test == CVT_SUFNUM) ? !!sb :
 	 (sb && argv[na]))) {
-	zerrnam(name, "too many arguments", NULL, 0);
+	zwarnnam(name, "too many arguments", NULL, 0);
 	return 1;
     }
     switch (test) {

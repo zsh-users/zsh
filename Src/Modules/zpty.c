@@ -261,17 +261,17 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
     char *cmd;
 
     if (!(cmd = findcmd(*args, 1))) {
-	zerrnam(nam, "unknown command: %s", *args, 0);
+	zwarnnam(nam, "unknown command: %s", *args, 0);
 	return 1;
     }
     if (get_pty(&master, &slave)) {
-	zerrnam(nam, "can't open pseudo terminal", NULL, 0);
+	zwarnnam(nam, "can't open pseudo terminal", NULL, 0);
 	return 1;
     }
     if ((pid = fork()) == -1) {
 	close(master);
 	close(slave);
-	zerrnam(nam, "couldn't create pty command: %s", pname, 0);
+	zwarnnam(nam, "couldn't create pty command: %s", pname, 0);
 	return 1;
     } else if (!pid) {
 	if (!echo) {
@@ -404,14 +404,14 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	char *p;
 
 	if (args[2]) {
-	    zerrnam(nam, "too many arguments", NULL, 0);
+	    zwarnnam(nam, "too many arguments", NULL, 0);
 	    return 1;
 	}
 	p = dupstring(args[1]);
 	tokenize(p);
 	remnulargs(p);
 	if (!(prog = patcompile(p, PAT_STATIC, NULL))) {
-	    zerrnam(nam, "bad pattern: %s", args[1], 0);
+	    zwarnnam(nam, "bad pattern: %s", args[1], 0);
 	    return 1;
 	}
     }
@@ -526,17 +526,17 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 		      ops['d'] || ops['L'])) ||
 	(ops['d'] && (ops['b'] || ops['e'] || ops['L'])) ||
 	(ops['L'] && (ops['b'] || ops['e']))) {
-	zerrnam(nam, "illegal option combination", NULL, 0);
+	zwarnnam(nam, "illegal option combination", NULL, 0);
 	return 1;
     }
     if (ops['r'] || ops['w']) {
 	Ptycmd p;
 
 	if (!*args) {
-	    zerrnam(nam, "missing pty command name", NULL, 0);
+	    zwarnnam(nam, "missing pty command name", NULL, 0);
 	    return 1;
 	} else if (!(p = getptycmd(*args))) {
-	    zerrnam(nam, "no such pty command: %s", *args, 0);
+	    zwarnnam(nam, "no such pty command: %s", *args, 0);
 	    return 1;
 	}
 	checkptycmd(p);
@@ -563,11 +563,11 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	return ret;
     } else if (*args) {
 	if (!args[1]) {
-	    zerrnam(nam, "missing command", NULL, 0);
+	    zwarnnam(nam, "missing command", NULL, 0);
 	    return 1;
 	}
 	if (getptycmd(*args)) {
-	    zerrnam(nam, "pty command name already used: %s", *args, 0);
+	    zwarnnam(nam, "pty command name already used: %s", *args, 0);
 	    return 1;
 	}
 	return newptycmd(nam, *args, args + 1, ops['e'], ops['b']);

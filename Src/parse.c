@@ -2268,12 +2268,12 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	Wordcode f;
 
 	if (!*args) {
-	    zerrnam(nam, "too few arguments", NULL, 0);
+	    zwarnnam(nam, "too few arguments", NULL, 0);
 	    return 1;
 	}
 	if (!(f = load_dump_header(*args)) &&
 	    !(f = load_dump_header(dyncat(*args, FD_EXT)))) {
-	    zerrnam(nam, "invalid dump file: %s", *args, 0);
+	    zwarnnam(nam, "invalid dump file: %s", *args, 0);
 	    return 1;
 	}
 	if (args[1]) {
@@ -2292,7 +2292,7 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	}
     }
     if (!*args) {
-	zerrnam(nam, "too few arguments", NULL, 0);
+	zwarnnam(nam, "too few arguments", NULL, 0);
 	return 1;
     }
     map = (ops['m'] ? 2 : (ops['r'] ? 0 : 1));
@@ -2390,7 +2390,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 	dump = dyncat(dump, FD_EXT);
 
     if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
-	zerrnam(nam, "can't write dump file: %s", dump, 0);
+	zwarnnam(nam, "can't write dump file: %s", dump, 0);
 	return 1;
     }
     progs = newlinklist();
@@ -2402,7 +2402,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 	    if (fd >= 0)
 		close(fd);
 	    close(dfd);
-	    zerrnam(nam, "can't open file: %s", *files, 0);
+	    zwarnnam(nam, "can't open file: %s", *files, 0);
 	    noaliases = ona;
 	    unlink(dump);
 	    return 1;
@@ -2414,7 +2414,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 	    close(fd);
 	    close(dfd);
 	    zfree(file, flen);
-	    zerrnam(nam, "can't read file: %s", *files, 0);
+	    zwarnnam(nam, "can't read file: %s", *files, 0);
 	    noaliases = ona;
 	    unlink(dump);
 	    return 1;

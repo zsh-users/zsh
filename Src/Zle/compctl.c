@@ -508,7 +508,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    char *p;
 
 		    if (cl) {
-			zerrnam(name, "illegal option -%c", NULL, **argv);
+			zwarnnam(name, "illegal option -%c", NULL, **argv);
 			return 1;
 		    }
 		    if ((*argv)[1]) {
@@ -654,7 +654,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'l':
 		if (cl) {
-		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", NULL, **argv);
 		    return 1;
 		} else if ((*argv)[1]) {
 		    cct.subcmd = (*argv) + 1;
@@ -670,7 +670,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'h':
 		if (cl) {
-		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", NULL, **argv);
 		    return 1;
 		} else if ((*argv)[1]) {
 		    cct.substr = (*argv) + 1;
@@ -783,7 +783,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'C':
 		if (cl) {
-		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", NULL, **argv);
 		    return 1;
 		}
 		if (first && !hx) {
@@ -796,7 +796,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'D':
 		if (cl) {
-		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", NULL, **argv);
 		    return 1;
 		}
 		if (first && !hx) {
@@ -810,7 +810,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
  	    case 'T':
 		if (cl) {
-		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", NULL, **argv);
 		    return 1;
 		}
 		if (first && !hx) {
@@ -823,7 +823,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
  		break;
 	    case 'L':
 		if (cl) {
-		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", NULL, **argv);
 		    return 1;
 		}
 		if (!first || hx) {
@@ -834,7 +834,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'x':
 		if (cl) {
-		    zerrnam(name, "extended completion not allowed", NULL, 0);
+		    zwarnnam(name, "extended completion not allowed", NULL, 0);
 		    return 1;
 		}
 		if (!argv[1]) {
@@ -869,7 +869,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 	if (*++argv && (!ready || ready == 2) &&
 	    **argv == '+' && !argv[0][1]) {
 	    if (cl) {
-		zerrnam(name, "xor'ed completion illegal", NULL, 0);
+		zwarnnam(name, "xor'ed completion illegal", NULL, 0);
 		return 1;
 	    }
 	    /* There's an alternative (+) completion:  assign
@@ -1681,7 +1681,7 @@ static int
 bin_compcall(char *name, char **argv, char *ops, int func)
 {
     if (incompfunc != 1) {
-	zerrnam(name, "can only be called from completion function", NULL, 0);
+	zwarnnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
     return makecomplistctl((ops['T'] ? 0 : CFN_FIRST) |
