@@ -1,3 +1,8 @@
+2003-02-18  Oliver Kiddle  <opk@zsh.org>
+
+	* Doug Kearns: 18254: Completion/Unix/Command/_xmllint: new
+	completion for xmllint (from xmlsoft.org's libxml2 library)
+
 2003-02-17  Peter Stephenson  <pws@csr.com>
 
 	* 18252: Src/input.c, Src/loop.c, Src/zsh.h, Src/Zle/zle_main.c:

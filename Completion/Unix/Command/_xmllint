@@ -1,0 +1,71 @@
+#compdef xmllint
+
+# xmllint: using libxml version 20503
+
+local encoding
+encoding=(
+  UTF-8
+  UTF-16
+  ISO-10646-UCS-2
+  ISO-10646-UCS-4
+  ISO-8859-1
+  ISO-8859-2
+  ISO-8859-3
+  ISO-8859-4
+  ISO-8859-5
+  ISO-8859-6
+  ISO-8859-7
+  ISO-8859-8
+  ISO-8859-9
+  ISO-2022-JP
+  SHIFT_JIS
+  EUC-JP
+)
+
+_arguments \
+  '--version[display the version of the XML library used]' \
+  '--debug[dump a debug tree of the in-memory document]' \
+  '--shell[run a navigating shell]' \
+  '--debugent[debug the entities defined in the document]' \
+  '--copy[used to test the internal copy implementation]' \
+  '--recover[output what was parsable on broken XML documents]' \
+  '--noent[substitute entity references by their value]' \
+  "(--output -o)--noout[don't output the result tree]" \
+  '--htmlout[output results as HTML]' \
+  '--nowrap[do not put HTML doc wrapper]' \
+  '--valid[validate the document in addition to std well-formed check]' \
+  '(--dtdvalid --relaxng)--postvalid[do a posteriori validation, i.e after parsing]' \
+  '(--postvalid --relaxng)--dtdvalid[do a posteriori validation against a given DTD]:DTD:->url' \
+  '--timing[print some timings]' \
+  '(--noout --output -o)'{--output,-o}'[save to a given file]:output file:_files' \
+  '--repeat[repeat 100 times, for timing or profiling]' \
+  '--insert[ad-hoc test for valid insertions]' \
+  '--compress[turn on gzip compression of output]' \
+  '(--html)--sgml[use the DocBook SGML parser]' \
+  '(--sgml)--html[use the HTML parser]' \
+  '--push[use the push mode of the parser]' \
+  '--memory[parse from memory]' \
+  '--nowarning[do not emit warnings from parser/validator]' \
+  '--noblanks[drop (ignorable?) blanks spaces]' \
+  '--format[reformat/reindent the input]' \
+  '--testIO[test user I/O support]' \
+  '--encode[output in the given encoding]:encoding:(${encoding[@]})' \
+  '(--nocatalogs)--catalogs[use SGML catalogs]' \
+  '(--catalogs)--nocatalogs[deactivate all catalogs]' \
+  '--auto[generate a small doc on the fly]' \
+  '--xinclude[do XInclude processing]' \
+  '--loaddtd[fetch external DTD]' \
+  '--dtdattr[loaddtd + populate the tree with inherited attributes]' \
+  '--dropdtd[remove the DOCTYPE of the input docs]' \
+  '--stream[use the streaming interface to process very large files]' \
+  '--chkregister[verify the node registration code]' \
+  '(--dtdvalid --postvalid)--relaxng[do RelaxNG validation against the schema]:schema:->url' \
+  '*:XML file:->url' && return
+
+if [[ "$state" = url ]]; then
+  _alternative \
+    'files:file:_files' \
+    'urls:url:_urls' && return
+fi
+
+return 1
