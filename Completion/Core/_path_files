@@ -10,7 +10,7 @@ local nm=$compstate[nmatches] menu match matcher
 
 typeset -U prepaths exppaths
 
-setopt localoptions nullglob rcexpandparam globdots
+setopt localoptions nullglob rcexpandparam
 unsetopt markdirs globsubst shwordsplit nounset
 
 local sopt='-' gopt='' opt
