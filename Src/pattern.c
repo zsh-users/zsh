@@ -344,7 +344,16 @@ patcompile(char *exp, int inflags, char **endexp)
 
     if (!(patflags & PAT_ANY)) {
 	/* Look for a really pure string, with no tokens at all. */
-	if (!patglobflags)
+	if (!patglobflags
+#ifdef __CYGWIN__
+	    /*
+	     * If the OS treats files case-insensitively and we
+	     * are looking at files, we don't need to use pattern
+	     * matching to find the file.
+	     */
+	    || (!(patglobflags & ~GF_IGNCASE) && (patflags & PAT_FILE))
+#endif
+	    )
 	    for (strp = exp; *strp &&
 		     (!(patflags & PAT_FILE) || *strp != '/') && !itok(*strp);
 		 strp++)
