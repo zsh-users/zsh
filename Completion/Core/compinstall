@@ -1394,18 +1394,16 @@ To enable this, edit a prompt to show when scrolling is active; an empty
 string turns this feature off.  It can contain \`%l' to show the number of
 matches as \`current_number/total_number', \`%p' to show the fraction of
 the way down the list, or font-control sequences such as %B, %U, %S and the
-corresponding %b, %u, %s; quotes will be added automatically.  Note that
-this is the default behaviour; delete the whole line to turn it off, in
-which case the display of completions which don't fit on the screen is
-controlled by the LISTMAX parameter (currently ${LISTMAX:-unset}), which
-specifies the maximum number to show without asking.  Hit return to keep
-the current value.
+corresponding %b, %u, %s; quotes will be added automatically.  Delete the
+whole line to turn this behaviour off, in which case the display of
+completions which don't fit on the screen is controlled by the LISTMAX
+parameter (currently ${LISTMAX:-unset}), which specifies the maximum number
+to show without asking.  Hit return to keep the current value.
 "
          [[ -z $haslistp ]] &&
 	   listp='%SAt %p: Hit TAB for more, or the character to insert%s'
 	 vared -eh -p 'prompt> ' -c listp
-	 # Unconditionally use listp; will become '' if empty.
-	 haslistp=1
+	 [[ -z $listp ]] && haslistp=
 	 ;;
       q) return 1
          ;;
