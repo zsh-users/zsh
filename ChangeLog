@@ -1,3 +1,238 @@
+1999-12-08  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Config/version.mk: version 3.1.6-pws-11.
+
+	* pws: Src/Modules/zftp.c: command name buffer wasn't large enough
+	  for "zftp session".
+
+	* pws: Makefile.in, Etc/zsh-development-guide, Test/Makefile.in:
+	  targets for testing should be `check' and `test', which are there
+	  already.
+
+	* Zefram: 8952: Util/mkdisttree.sh: portability and error handling
+	  improvements.
+
+	* Zefram: 8950: Config/defs.mk.in, Doc/.cvsignore, Doc/.distfiles,
+	  Doc/Makefile.in, Makefile.in, Src/Makefile.in: revised name
+	  transformation: nothing in the build tree and everything out of
+	  it is transformed; also fix make portability problems.
+
+	* Zefram: 8946: Makefile.in: distclean in Test; old stamp-h.in
+	  creation bug.
+
+	* Sven: 8945: Doc/Zsh/mod_complist.yo, Src/Zle/compcore.c,
+	  Src/Zle/complist.c: `mu'ltiple is now `du'plicate.
+
+	* Sven: 8944: Completion/Core/_main_complete,
+	  Completion/Core/_setup, Doc/Zsh/compsys.yo,
+	  Doc/Zsh/mod_complist.yo: more detailed choices for when to use
+	  menu completion via menu style.  One mod_complist.yo hunk
+	  omitted due to clash with 8942.
+	
+	* Bart: 8942: Doc/Zsh/mod_complist.yo: completion doc fixes.
+
+	* Sven: 8939: Doc/Zsh/mod_complist.yo, Src/Zle/comp.h,
+	  Src/Zle/compcore.c, Src/Zle/complist.c, Src/Zle/compresult.c:
+	  menu selection with hidden entries.
+
+1999-12-07  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Clint: 8933: Doc/Makefile.in: make man pages refer to one
+	  another when transforming file name.
+
+	* Sven: 8932: Src/Zle/computil.c, Src/Zle/zle_tricky.c,
+	  Functions/Zle/incremental-complete-word, Doc/Zsh/compsys.yo,
+	  Doc/Zsh/mod_computil.yo, Completion/Core/_approximate,
+	  Completion/Core/_description, Completion/Core/_expand,
+	  Completion/Core/_message, Completion/Core/_tags:
+	  More standard styles used in _expand and _approximate;
+	  hidden style can apply to any tag; _description does
+	  more printf-type formatting and tests a `format' tag.
+
+	* Clint: 8931: Doc/Makefile.in: sed portability.
+
+	* pws: 8936: configure.in, Etc/zsh-development-guide,
+	  Test/Makefile.in, Test/cd.ztst, Test/ztst.zsh (plus
+	  unposted Test/.cvsignore and Test/.distfiles): basis for
+	  new testing system.
+
+	* Sven: 8930: Completion/Core/_setup, Doc/Zsh/compsys.yo:
+	  _setup gets one argument and has doc.
+
+1999-12-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Bart: 8923: aczsh.m4, configure.in: configuration for
+	  program_transform_name.
+
+	* Bart: 8917: Doc/Makefile.in: better transforming for installed
+	  filenames.
+
+	* Clint: 8915: Doc/Makefile.in: more name transformation stuff
+	  for manual names.
+
+	* Sven: 8911: Src/Zle/comp.h, Src/Zle/compcore.c,
+	  Src/Zle/complete.c, Src/Zle/compresult.c, Doc/Zsh/compsys.yo,
+	  Doc/Zsh/compwid.yo, Doc/Zsh/params.yo,
+	  Completion/Commands/_complete_help,
+	  Completion/Core/_approximate, Completion/Core/_expand,
+	  Completion/Core/_list, Completion/Core/_main_complete,
+	  Completion/Core/_message, Completion/Core/_setup,
+	  Completion/Core/_style: added some completion styles and
+	  some compstate keys.
+
+	* Sven: 8910: Src/Modules/parameter.c, Src/builtin.c, Src/exec.c,
+	  Src/module.c: don't try to unload modules when shell exits
+	  normally; fix bug with parameter module that old parameters
+	  didn't get removed properly.
+
+	* Sven: 8906: Completion/Core/_path_files: trailing / in vars with
+	  _path_files -W varname now optional.
+
+	* Bart: 8903, 8904, 8905: Makefile.in, configure.in, Doc/.cvsignore,
+	  Doc/.distfiles, Doc/Makefile.in, Src/Makefile.in: More
+	  consistent renaming when altering programme name.
+
+	* Sven: 8902: Completion/Commands/_history_complete_word:
+	  directions broken.
+
+1999-12-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Andrej/Sven/Clint: 8892: Completion/User/_sudo: completion
+	  for sudo.
+
+1999-12-03  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: unposted: Completion/User/.distfiles,
+	  Completion/Core/.distfiles: add _zdump and _setup.
+
+	* Clint: 8889: Completion/User/_zdump: completion for zdump.
+
+	* Clint: 8879: configure.in: fix some sub-makes in configure.in.
+
+	* Sven: 8876, 8883: Completion/Core/_approximate,
+	  Completion/Core/_expand, Completion/Core/_setup,
+          Doc/Zsh/compsys.yo: better grouping support in _expand and
+	  _approximate using _setup.
+
+	* Sven: 8874: Completion/Base/_arguments, Completion/User/_use_lo:
+	  fix with _arguments --.
+
+	* Sven: 8869: Completion/Builtins/_cd, Doc/Zsh/compsys.yo:
+	  local-directories and path-directories tags for cd completion.
+
+	* Sven: 8868: Src/Zle/complist.c: better memory of which colour
+	  was just used.
+
+	* Sven: 8864: Completion/Core/_description,
+	  Completion/Core/_files, Completion/Core/_main_complete,
+	  Completion/Core/compinit, Doc/Zsh/compsys.yo,
+	  Doc/Zsh/compwid.yo, Doc/Zsh/mod_complist.yo, Src/Zle/computil.c:
+	  list-colors style sets up ZLS_COLO[U]RS appropriately.
+
+	* Clint: 8863: Makefile.in, configure.in, Doc/Makefile.in,
+	  Src/Makefile.in: only calculate basename of renamed zsh once.
+
+	* Clint: 8862: Src/builtin.c: fix problem failing to unload zle
+	  with abrupt shell termination.
+
+	* Bart: 8860: Doc/Makefile.in: fix zsh.info build with 8857.
+
+	* Bart: 8857: Doc/Makefile.in: fix zsh.yo.in reference when
+	  source and build trees are separate.
+
+	* Sven: 8852: Src/Zle/complist.c, Src/pattern.c,
+	  Doc/Zsh/mod_complist.yo: whacky colouring of different parts
+	  of listing strings.
+
+	* Sven: 8851: Src/Zle/compcore.c, Src/Zle/complist.c,
+	  Doc/Zsh/mod_complist.yo: grouping possible in ZLS_COLO[U]RS
+
+	* Zefram: 8843: Etc/zsh-development-guide, Src/.cvsignore,
+	  Src/.distfiles, Src/Builtins/.cvsignore, Src/Makefile.in,
+	  Src/Makemod.in.in, Src/Modules/.cvsignore,
+	  Src/Zle/.cvsignore, Src/Zle/.distfiles,
+	  Src/Zle/compcore.c, Src/Zle/complete.c,
+	  Src/Zle/complete.mdd, Src/Zle/compmatch.c,
+	  Src/Zle/compresult.c, Src/Zle/zle.mdd,
+	  Src/Zle/zle_bindings.c, Src/Zle/zle_keymap.c,
+	  Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/Zle/zle_params.c, Src/Zle/zle_refresh.c,
+	  Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c,
+	  Src/Zle/zle_utils.c, Src/builtin.c, Src/compat.c,
+	  Src/cond.c, Src/exec.c, Src/glob.c, Src/hashtable.c,
+	  Src/hist.c, Src/init.c, Src/input.c, Src/jobs.c,
+	  Src/lex.c, Src/linklist.c, Src/loop.c, Src/makepro.awk,
+	  Src/math.c, Src/mem.c, Src/mkmakemod.sh, Src/module.c,
+	  Src/options.c, Src/params.c, Src/parse.c, Src/pattern.c,
+	  Src/prompt.c, Src/signals.c, Src/signames2.awk,
+	  Src/subst.c, Src/text.c, Src/utils.c, Src/zsh.h:
+	  use mod_export keyword to generate symbols in .export
+	  files automatically.
+
+	* Clint: 8842: Completion/Debian/_dupload,
+	  Completion/Debian/.distfiles: completion for dupload.
+
+	* Clint: 8841: Doc/zsh.yo.in: patch to 8827.
+
+	* Sven: 8840: Src/Zle/compcore.c, Doc/Zsh/compsys.yo,
+	  Etc/completion-style-guide, Completion/Base/_arguments,
+	  Completion/Base/_brace_parameter, Completion/Base/_describe,
+	  Completion/Base/_first, Completion/Base/_jobs,
+	  Completion/Base/_subscript, Completion/Base/_tilde,
+	  Completion/Base/_values, Completion/Builtins/_popd,
+	  Completion/Commands/_history_complete_word,
+	  Completion/Core/_alternative, Completion/Core/_description,
+	  Completion/Core/_files, Completion/Core/_parameters,
+	  Completion/Core/_path_files, Completion/Core/_requested,
+	  Completion/Core/_tags, Completion/Core/_wanted,
+	  Completion/Core/compinit, Completion/Debian/_apt,
+	  Completion/Linux/_rpm, Completion/User/_bunzip2,
+	  Completion/User/_bzip2, Completion/User/_compress,
+	  Completion/User/_dd, Completion/User/_dvi, Completion/User/_gdb,
+	  Completion/User/_gprof, Completion/User/_gs,
+	  Completion/User/_gunzip, Completion/User/_gzip,
+	  Completion/User/_mh, Completion/User/_mutt,
+	  Completion/User/_netscape, Completion/User/_nslookup,
+	  Completion/User/_pack, Completion/User/_pbm,
+	  Completion/User/_pdf, Completion/User/_ps,
+	  Completion/User/_pspdf, Completion/User/_ssh,
+	  Completion/User/_strip, Completion/User/_tar_archive,
+	  Completion/User/_tex, Completion/User/_tiff,
+	  Completion/User/_uncompress, Completion/User/_unpack,
+	  Completion/User/_users_on, Completion/X/_x_window,
+	  Completion/X/_xmodmap: tags can now be used to define groups for
+	  display.
+
+	* Zefram: 8839: Src/.cvsignore, Src/Builtins/.cvsignore,
+	  Src/Makemod.in.in, Src/Modules/.cvsignore, Src/Zle/.cvsignore,
+	  Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complete.c,
+	  Src/Zle/compmatch.c, Src/Zle/compresult.c, Src/makepro.awk,
+	  Src/mkmakemod.sh, Src/zsh.mdd: separate local and global
+	  prototype files.
+
+	* Sven: 8838: Doc/Zsh/compsys.yo: colons in argument specifiers.
+
+	* Alexandre: 8836: Completion/User/_prompt: fix for _arguments
+	  use.
+
+	* Sven: 8834: Src/Zle/compcore.c, Src/Zle/complete.c: make sure
+	  grouping commands create groups.
+
+	* Zefram: 8833: Src/Modules/zftp.c: forward declaration of
+	  struct in_addr.
+
+1999-11-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Clint: 8827: Makefile.in, Doc/.cvsignore, Doc/.distfiles,
+	  Doc/Makefile.in, Src/Makefile.in: partial program transform
+	  support in texinfo docs.
+
+	* Zefram: 8826: configure.in, Src/Modules/zftp.c: workaround
+	  for systems without inet_aton().
+
+	* Clint: 8824: Src/Makefile.in: use AC_ARG_PROGRAM, already set
+	  by configure.
+
 1999-11-29  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws: Convig/version.mk: version 3.1.6-pws-10

@@ -1,3 +1,5 @@
 DISTFILES_SRC='
-    Makefile.in cd.ztst ztst.zsh
+    .cvsignore .distfiles Makefile.in
+    ztst.zsh
+    cd.ztst
 '

@@ -175,11 +175,12 @@ install.bin-L: $(LIBZSH)
 
 # uninstall binary
 uninstall.bin-here: uninstall.bin-@L@
+	tzsh=`echo zsh | sed '$(transform)'`; \
 	rm -f $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh)
 
 uninstall.bin-N:
 uninstall.bin-L:
-	rm -f $(DESTDIR)$(libdir)/$(tzsh)/$(LIBZSH)
+	rm -f $(DESTDIR)$(libdir)/zsh/$(LIBZSH)
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
