@@ -9,7 +9,7 @@ if [[ CURRENT -eq 2 || CURRENT -eq 3 && $words[CURRENT-1] = -* ]]; then
     fi
     _groups && return 0
   else
-    if [[ $OSTYPE = (solaris*|hpux*) ]]; then
+    if [[ $OSTYPE = (solaris*|hpux*|*bsd*) ]]; then
       suf=':'
     else
       suf='.'

@@ -1,3 +1,8 @@
+2001-07-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 15393 (Akinori Musha): Completion/Unix/Command/_chown: use
+	colon separator for BSD
+
 2001-07-17  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15400: Completion/Unix/Type/_path_files,
