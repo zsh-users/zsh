@@ -1,3 +1,7 @@
+2000-08-27  Oliver Kiddle  <opk@zsh.org>
+
+	* 12708: Completion/AIX/_logical_volumes: new AIX completion function
+
 2000-08-23  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12692: Alexandre: 12691; 12692: Completion/User/_gv,
