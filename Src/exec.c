@@ -1336,9 +1336,6 @@ addvars(LinkList l, int export)
     for (n = firstnode(l); n; incnode(n)) {
 	v = (Varasg) getdata(n);
 	name = dupstring(v->name);
-	singsub(&name);
-	if (errflag)
-	    return;
 	untokenize(name);
 	if (xtr)
 	    fprintf(stderr, "%s=", name);
@@ -1370,15 +1367,13 @@ addvars(LinkList l, int export)
 	    }
 	    if (xtr)
 		fprintf(stderr, "%s ", val);
-	    if (export) {
-		if (export < 0) {
-		    /* We are going to fork so do not bother freeing this */
-		    pm = (Param) paramtab->removenode(paramtab, name);
-		    if (isset(RESTRICTED) && (pm->flags & PM_RESTRICTED)) {
-			zerr("%s: restricted", pm->nam, 0);
-			zsfree(val);
-			return;
-		    }
+	    if (export && !strchr(name, '[')) {
+		if (export < 0 && isset(RESTRICTED) &&
+		    (pm = (Param) paramtab->removenode(paramtab, name)) &&
+		    (pm->flags & PM_RESTRICTED)) {
+		    zerr("%s: restricted", pm->nam, 0);
+		    zsfree(val);
+		    return;
 		}
 		allexp = opts[ALLEXPORT];
 		opts[ALLEXPORT] = 1;
