@@ -1,3 +1,8 @@
+2002-02-09  Clint Adams  <clint@zsh.org>
+
+	* unposted: Functions/Prompts/prompt_clint_setup:
+	improve APM and screen handling.
+
 2002-02-08  Clint Adams  <clint@zsh.org>
 
 	* Matt Zimmerman: 16590: Completion/Unix/Type/_dict_words:

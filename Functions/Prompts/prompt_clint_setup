@@ -13,7 +13,7 @@ EOF
 prompt_clint_setup () {
   local -a pcc
   local -A pc
-  local p_date p_tty p_plat p_ver p_userpwd p_apm p_shlvlhist p_rc p_end
+  local p_date p_tty p_plat p_ver p_userpwd p_apm p_shlvlhist p_rc p_end p_win
 
   pcc[1]=${1:-'red'}
   pcc[2]=${2:-'cyan'}
@@ -25,13 +25,17 @@ prompt_clint_setup () {
   pc['\]']="%{$fg_no_bold[$pcc[1]]%}]"
   pc['<']="%{$fg_no_bold[$pcc[1]]%}<"
   pc['>']="%{$fg_no_bold[$pcc[1]]%}>"
+  pc['\(']="%{$fg_no_bold[$pcc[1]]%}("
+  pc['\)']="%{$fg_no_bold[$pcc[1]]%})"
 
   p_date="$pc['\[']%{$fg_no_bold[$pcc[2]]%}%D{%a %y/%m/%d %R %Z}$pc['\]']"
   p_tty="$pc['\[']%{$fg_no_bold[$pcc[3]]%}%l$pc['\]']"
   p_plat="$pc['\[']%{$fg_no_bold[$pcc[2]]%}${MACHTYPE}/${OSTYPE}/$(uname -r)$pc['\]']"
   p_ver="$pc['\[']%{$fg_no_bold[$pcc[2]]%}${ZSH_VERSION}$pc['\]']"
 
-  p_userpwd="$pc['<']%{$fg_no_bold[$pcc[3]]%}%n@%m%{$fg_bold[$pcc[5]]%}:%{$fg_no_bold[$pcc[4]]%}%~$pc['>']"
+  [[ -n "$WINDOW" ]] && p_win="$pc['\(']%{$fg_bold[$pcc[4]]%}$WINDOW$pc['\)']"
+
+  p_userpwd="$pc['<']%{$fg_no_bold[$pcc[3]]%}%n@%m$p_win%{$fg_bold[$pcc[5]]%}:%{$fg_no_bold[$pcc[4]]%}%~$pc['>']"
   [[ -f /proc/apm ]] && p_apm="%(2v.-%2v-.)"
 
   p_shlvlhist="%{$reset_color%}zsh%(2L./$SHLVL.) %B%h%b "
@@ -64,10 +68,12 @@ prompt_clint_precmd () {
 
 prompt_clint_apm_precmd () {
   setopt noxtrace localoptions
-  local bat
+  local bat ac
 
   bat=${${="$(</proc/apm)"}[7]/%/%%}
-  [[ $bat == ("100%"|"-1%") ]] && psvar[2]=() || psvar[2]=$bat
+  [[ ${${="$(</proc/apm)"}[4]} == "0x01" ]] && ac="AC+"
+
+  [[ $bat == ("100%"|"-1%") ]] && psvar[2]=() || psvar[2]="$ac$bat"
 }
 
 prompt_clint_setup "$@"
