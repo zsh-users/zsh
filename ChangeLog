@@ -1,3 +1,9 @@
+2000-10-23  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13037: Completion/Core/_path_files, Doc/Zsh/compsys.yo: change
+ 	some tags used in filename completion: no tag for file-sort,
+ 	fake-files and ignore-parents, paths for accept-exact
+	
 2000-10-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13057: Src/Zle/zle_main.c: `vared -h' should not imply `vared -e';

@@ -848,7 +848,7 @@ matches.  If it is set to `true' for at least one match which is the
 same as the string on the line, this match will immediately be
 accepted.
 
-When completing filenames (where it is looked up for the tt(files)
+When completing pathnames (where it is looked up for the tt(paths)
 tag), this style also accepts any number of patterns as the value. If
 this is used, pathnames matching one of these patterns will be
 accepted immediately even if the command line contains some more
@@ -1014,8 +1014,8 @@ components after the first ambiguous one.
 )
 kindex(fake-files, completion style)
 item(tt(fake-files))(
-Currently, this style is only used when completing files and looked up 
-with the tag tt(files).  Its values are of the form
+This style is used when completing files and looked up 
+without a tag.  Its values are of the form
 `var(dir)tt(:)var(names...)'.  This will add the var(names) (strings
 separated by spaces) as
 possible matches when completing in the directory var(dir), even if no 
@@ -1098,7 +1098,7 @@ tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
 kindex(file-sort, completion style)
 item(tt(file-sort))(
 The completion function that generates filenames as possible matches
-uses this style with the tt(files) tag to determine in which order the 
+uses this style without a tag to determine in which order the 
 names should be listed and completed when using menu completion.  The
 value may be one of `tt(size)' to sort them by the size of the file,
 `tt(links)' to sort them by the number of links to the file,
@@ -1271,7 +1271,8 @@ in question accepts the option more than once.
 )
 kindex(ignore-parents, completion style)
 item(tt(ignore-parents))(
-The style is tested for the tt(files) tag to determine whether to ignore
+The style is tested by the function completing pathnames without a tag to
+determine whether to ignore
 the names of directories already mentioned in the current word, or the
 name of the current working directory.  The value must include one or both
 of the following strings:

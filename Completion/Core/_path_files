@@ -96,7 +96,7 @@ fi
 
 (( $#matcher )) && mopts=( "$mopts[@]" "$matcher[@]" )
 
-if zstyle -s ":completion:${curcontext}:files" file-sort tmp1; then
+if zstyle -s ":completion:${curcontext}:" file-sort tmp1; then
   case "$tmp1" in
   *size*)             sort=oL;;
   *links*)            sort=ol;;
@@ -141,10 +141,10 @@ zstyle -s ":completion:${curcontext}:paths" special-dirs sdirs
 [[ "$pats" = ((|*[[:blank:]])\*(|[[:blank:]]*)|*\([^[:blank:]]#/[^[:blank:]]#\)*) ]] &&
     sopt=$sopt/
 
-zstyle -a ":completion:${curcontext}:files" accept-exact accex
-zstyle -a ":completion:${curcontext}:files" fake-files fake
+zstyle -a ":completion:${curcontext}:paths" accept-exact accex
+zstyle -a ":completion:${curcontext}:" fake-files fake
 
-zstyle -s ":completion:${curcontext}:files" ignore-parents ignpar
+zstyle -s ":completion:${curcontext}:" ignore-parents ignpar
 
 if [[ -n "$compstate[pattern_match]" &&
       ( ( -z "$SUFFIX" && "$PREFIX" = (|*[^\$])\([^\|\~]##\) ) ||
