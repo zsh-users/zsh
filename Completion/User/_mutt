@@ -1,6 +1,6 @@
 #compdef mutt
 
-local curcontext="$curcontext" state line ret=1
+local curcontext="$curcontext" state line muttrc="~/.muttrc" ret=1
 
  _arguments -C \
  '::recipient:->userhost' \

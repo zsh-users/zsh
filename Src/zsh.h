@@ -1651,3 +1651,9 @@ typedef unsigned char * (*ZleReadFn) _((char *, char *, int));
 /***************************************/
 
 #define mod_export
+
+/***************************************/
+/* Hooks in core.                      */
+/***************************************/
+
+#define EXITHOOK (zshhooks + 0)

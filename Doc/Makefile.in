@@ -51,7 +51,7 @@ zshoptions.1 zshparam.1 zshzftpsys.1 zshzle.1 zshall.1
 
 # yodl documentation
 
-YODLDOC = $(MAN) texi
+YODLDOC = $(MAN) zsh.texi
 
 MODDOCSRC = \
 Zsh/mod_cap.yo Zsh/mod_clone.yo \
@@ -60,7 +60,7 @@ Zsh/mod_computil.yo \
 Zsh/mod_deltochar.yo Zsh/mod_example.yo Zsh/mod_files.yo \
 Zsh/mod_mapfile.yo Zsh/mod_mathfunc.yo Zsh/mod_parameter.yo Zsh/mod_sched.yo \
 Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo Zsh/mod_zleparameter.yo \
-Zsh/mod_zutil.yo Zsh/mod_zprof.yo
+Zsh/mod_zutil.yo Zsh/mod_zprof.yo Zsh/mod_zpty.yo
 
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
@@ -73,30 +73,25 @@ Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
-all: man texi ../META-FAQ
+all: $(MAN) zsh.texi ../META-FAQ
 .PHONY: all
 
-everything: all dvi ps html
+everything: all zsh.dvi zsh_us.ps zsh_a4.ps zsh_toc.html
 .PHONY: everything
 
-dvi: zsh.dvi
-.PHONY: dvi
-
 zsh.dvi: $(sdir)/zsh.texi
-	$(TEXI2DVI) $<
+	$(TEXI2DVI) $(sdir)/zsh.texi
 
-texi: $(sdir)/zsh.texi
-.PHONY: texi
-
-$(sdir)/zsh.texi:
-	$(YODL) -o $@ -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
-	test -f $@
-
-info: zsh.info
-.PHONY: info
+zsh.texi $(sdir)/zsh.texi:
+	case $@ in \
+	  */*) target=$@ ;; \
+	  *) target=$(sdir)/$@ ;; \
+	esac; \
+	$(YODL) -o $$target -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
+	test -f $$target
 
 zsh.info: $(sdir)/zsh.texi
-	$(MAKEINFO) $<
+	$(MAKEINFO) $(sdir)/zsh.texi
 
 .yo.1:
 	case $@ in \
@@ -108,26 +103,14 @@ zsh.info: $(sdir)/zsh.texi
 	;; esac; \
 	test -f $$target
 
-ps: us_ps a4_ps
-.PHONY: ps
-
-us_ps: zsh_us.ps
-.PHONY: us_ps
-
 zsh_us.ps: zsh.dvi
-	$(DVIPS) -t letter -o $@ $<
-
-a4_ps: zsh_a4.ps
-.PHONY: a4_ps
+	$(DVIPS) -t letter -o $@ zsh.dvi
 
 zsh_a4.ps: zsh.dvi
-	$(DVIPS) -t a4 -o $@ $<
-
-html: zsh_toc.html
-.PHONY: html
+	$(DVIPS) -t a4 -o $@ zsh.dvi
 
 zsh_toc.html: $(sdir)/zsh.texi
-	$(TEXI2HTML) $<
+	$(TEXI2HTML) $(sdir)/zsh.texi
 
 zshall.1: zsh.yo
 	case $@ in \
@@ -147,10 +130,7 @@ zshall.1: zsh.yo
 
 $(YODLDOC): version.yo
 
-$(sdir)/zsh.texi: $(YODLSRC)
-
-man: $(MAN)
-.PHONY: man
+zsh.texi: $(YODLSRC)
 
 $(MAN): zmacros.yo zman.yo
 
@@ -245,7 +225,7 @@ uninstall: uninstall.man
 .PHONY: uninstall
 
 # install man pages, creating install directory if necessary
-install.man: man
+install.man: $(MAN)
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
 	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
@@ -253,7 +233,7 @@ install.man: man
 .PHONY: install.man
 
 # install info pages, creating install directory if necessary
-install.info: texi
+install.info: zsh.texi
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(infodir)
 	rm -rf infodir
 	mkdir infodir
@@ -287,7 +267,7 @@ uninstall.info:
 .PHONY: uninstall.info
 
 # install HTML manual
-install.html: html
+install.html: zsh_toc.html
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
 	for file in zsh_*.html; do \
 	    $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir) || exit 1; \

@@ -1,4 +1,211 @@
+2000-02-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Config/version.mk: 3.1.6-dev-18
+
+	* Tanaka Akira: 9683: Completion/User/_diff_options: shut up error
+	messages (after other attempts from Oliver and Bart).
+
+	* Alexandre: 9681: Completion/User/_prcs: argument handling.
+
+	* Sven: 9680: Completion/Core/_files,
+	Completion/Core/_multi_parts, Completion/Core/_path_files,
+	Completion/Core/_sep_parts: use of -M option.
+
+	* Sven: 9677, 9679: Completion/Commands/_read_comp,
+	Completion/Core/_approximate, Completion/Core/_expand,
+	Completion/Core/_main_complete, Completion/Core/_match,
+	Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo,
+	Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/compctl.c,
+	Src/Zle/complete.c: $compmatchers bites the dust, use new matcher
+	style.
+
+	* Sven: 9676: Src/Zle/computil.c: yet more argument subtleties.
+
+	* Tanaka Akira: 9674: Test/10prompt.ztst: some nameless idiot got
+	the bits of the date wrong.
+
+	* Sven: 9664: Completion/Core/_path_files: optimisation with
+	arrays.
+
+	* Sven: 9659: Doc/Zsh/compsys.yo: mention complete-in-words
+	behaviour.
+
+	* Sven: 9657: Completion/Core/_approximate,
+	Completion/Core/_description, Completion/Core/_main_complete,
+	Completion/Core/_matcher, Completion/Core/_path_files,
+	Completion/Core/_prefix, Doc/Zsh/compsys.yo, Src/Zle/complete.c
+	(plus Completion/Core/.distfiles change by hand): new _matcher
+	completer allows more control along the lines of $compmatchers.
+
+	* Johan: 9653: Functions/Misc/is-at-least,
+	Functions/Misc/.distfiles (added by hand): function to check
+	version numbers.
+
+	* Johan: 9651: Completion/User/_cvs: handle no CVS tags case better.
+
+	* Sven: 9650: Completion/User/_gunzip, Completion/User/_gzip:
+	handle .tgz files.
+
+	* Sven: 9648: Completion/Core/_files,
+	Completion/Core/_multi_parts, Completion/Core/_path_files,
+	Completion/Core/_sep_parts, Doc/Zsh/mod_zutil.yo,
+	Src/Modules/zutil.c: Bartised version of zparseopts;
+	fix _path_files -S ''.
+
+	* Bart: 9639: Doc/Zsh/options.yo, Doc/Zsh/redirect.yo: typos in
+	9625.
+
+	* Tanaka Akira: 9638: Completion/User/_cvs: _cvs_rtag had no
+	default implementation.
+
+	* Sven: 9635: Completion/Core/_description,
+	Completion/Core/_files, Completion/Core/_multi_parts,
+	Completion/Core/_path_files, Completion/Core/_sep_parts,
+	Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c, Src/Modules/zutil.mdd:
+	improved performance for completion functions; option-parsing
+	builtin.
+
+	* Akim Demaille <akim@epita.fr>: 9634: Src/builtin.c: trap '' 1
+	segfaulted.
+
+	* Sven: 9633: Src/init.c: change logic in 9591.
+
+	* Sven: 9632: Test/05command.ztst: error spotted by improved
+	autoload error checking.
+
+	* Alexandre: 9625: Src/zsh.h, Src/options.c, Src/init.c,
+	Src/exec.c, Doc/Zsh/redirect.yo, Doc/Zsh/options.yo: SHNULLCMD and
+	CSHNULLCMD options to allow better sh/csh emulation without
+	fiddling with parameters.
+
+	* Sven: 9623: Completion/Core/_path_files: another version of
+	9616.
+
+	* Sven: 9621: Src/Zle/computil.c: completion incorrectly adding
+	space.
+
+	* Sven: 9619: Completion/User/_texi: completion for texinfo;
+	added Completion/User/.distfiles by hand.
+
+	* Sven: 9618: Src/Zle/computil.c: memory leak in caching.
+
+	* Sven: 9616: Completion/Core/_path_files: bad test with a
+	pattern.
+
+	* Sven: 9615: Completion/Builtins/_zstyle, Doc/Zsh/compsys.yo:
+	rename and document some styles.
+
+	* Sven: 9614: Src/exec.c: esglob wasn't initialised properly.
+
+	* Alexandre: 9606: Completion/Builtins/_zstyle: two missing
+	styles.
+
+	* Sven: 9600: Src/exec.c: wordcode problem in execpline().
+
+	* Bart: 9591: Src/init.c: zsh/compctl didn't get loaded
+	automatically any more.
+
+	* Geoff: 9589: Doc/Makefile.in: put back ^A's from 9584.
+
+	* Tanaka Akira: 9585: Doc/Makefile.in: possible logic problems
+	with 9584.
+
+	* Geoff: 9584: Doc/Makefile.in: sh problems with creating
+	modlist.yo.
+
+	* Alexandre: 9583: Functions/Misc/nslookup: fix context name for
+	new scheme.
+
+	* Sven: 9390, 9394, hunk from 9396: ./Doc/Makefile.in,
+	Doc/Zsh/mod_zpty.yo, Doc/Zsh/.distfiles, Functions/Misc/nslookup,
+	Src/Modules/.distfiles, Src/Modules/zpty.c, Src/Modules/zpty.mdd,
+	Src/builtin.c, Src/init.c, Src/zsh.h: zpty module.
+
+2000-02-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Tanaka Akira: 9579: Completion/Debian/_deb_packages: was using
+	bad cache variable.
+
+2000-02-04  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9569: Completion/Core/_main_complete,
+	Completion/Core/_prefix, Doc/Zsh/compsys.yo, Src/Zle/compcore.c:
+	new complete-prefix completer _prefix; fix suffix matching
+	problems.
+
+	* Sven: 9568: Src/Zle/computil.c: fix difficulties with remaining
+	arguments.
+
+	* Sven: 9562: Completion/Base/_arg_compile,
+	Completion/Base/_arguments, Completion/Base/_command_names,
+	Completion/Builtins/_hash, Completion/User/_gdb,
+	Completion/User/_ssh, Completion/User/_strip, Completion/X/_xrdb,
+	Completion/X/_xutils, Src/Zle/computil.c: failure to follow links
+	completing commands; bad long option handling in some cases
+
+	* Sven: 9560 (second hunk only): Src/Zle/computil.c: more
+	argument fixes.
+
+	* Sven: 9559: Doc/Zsh/compsys.yo: better documentation for `+'
+	argument handling.
+
+	* Sven: 9558: Src/exec.c, Src/parse.c: trapping of autoloading
+	errors wasn't up to scratch.
+
+	* Alexandre: 9557: Completion/User/_flex: problem handling
+	`+' argument.
+
+2000-02-03  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Oliver: 9547: Src/parse.c, Src/hist.c: more fixups for exporting
+	on AIX.
+
+	* Sven: 9546: Completion/Base/_arguments,
+	Completion/Base/_combination, Completion/Base/_describe,
+	Completion/Base/_first, Completion/Base/_jobs,
+	Completion/Base/_subscript, Completion/Base/_tilde,
+	Completion/Base/_values, Completion/Builtins/_pids,
+	Completion/Builtins/_popd, Completion/Builtins/_sched,
+	Completion/Builtins/_signals, Completion/Builtins/_stat,
+	Completion/Builtins/_zftp, Completion/Builtins/_zstyle,
+	Completion/Commands/_complete_help,
+	Completion/Commands/_correct_word,
+	Completion/Commands/_expand_word,
+	Completion/Commands/_history_complete_word,
+	Completion/Core/_alternative, Completion/Core/_approximate,
+	Completion/Core/_complete, Completion/Core/_correct,
+	Completion/Core/_description, Completion/Core/_expand,
+	Completion/Core/_files, Completion/Core/_list,
+	Completion/Core/_main_complete, Completion/Core/_match,
+	Completion/Core/_menu, Completion/Core/_message,
+	Completion/Core/_normal, Completion/Core/_oldlist,
+	Completion/Core/_path_files, Completion/Core/_setup,
+	Completion/Core/_sort_tags, Completion/Core/_tags,
+	Completion/Core/compinit, Completion/Debian/_apt,
+	Completion/Debian/_deb_packages, Completion/User/_cvs,
+	Completion/User/_domains, Completion/User/_groups,
+	Completion/User/_hosts, Completion/User/_ports,
+	Completion/User/_socket, Completion/User/_urls,
+	Completion/User/_users, Completion/X/_x_color, Doc/Zsh/compsys.yo,
+	Etc/completion-style-guide,
+	Functions/Zle/incremental-complete-word, Functions/Zle/predict-on:
+	more consistent form for style contexts in completion system,
+	:completion:<func>:<completer>:<command>:<argument>:<tag>.
+
+	* Sven: 9545: Src/Modules/zutil.c: don't use freed structs.
+
+	* Tanaka Akira: 9544: Src/Modules/zutil.c: handle case for
+	undefined match data in zregexparse.
+
+	* Sven: 9542: Src/Zle/complete.c: use permanently allocated memory
+	for copied special parameters.
+
+	* Sven: 9541: Src/Modules/zutil.c: zstyle looks up style names
+	first.
+
 2000-02-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Config/version.mk: version 3.1.6-dev-17
 
 	* Bart: 9533: Src/signals.c: make sure shell doesn't send itself
 	SIGHUP when exiting.

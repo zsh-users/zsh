@@ -38,9 +38,5 @@ if (( ! $+_mailbox_cache )) then
   _mailbox_cache=($_mailbox_cache $mboxes $maildirboxes $MHboxes)
 fi
 
-if _wanted files expl 'mailbox specification'; then
-    local opre=$PREFIX
-    [[ $PREFIX = +* ]] && PREFIX="$~maildirectory/${PREFIX#+}"
+_wanted files expl 'mailbox specification' &&
     compadd "$@" "$expl[@]" - "$_mailbox_cache[@]"
-    PREFIX=$opre
-fi

@@ -11,4 +11,5 @@ DISTFILES_SRC='
     zftp.mdd zftp.c
     zprof.mdd zprof.c
     zutil.mdd zutil.c
+    zpty.mdd zpty.c
 '
