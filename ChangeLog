@@ -1,3 +1,8 @@
+2000-07-12  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12228: Src/hist.c, Src/lex.c: fix for (z) flag, don't take # as
+ 	comment
+	
 2000-07-12  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 12227: Completion/Core/compinstall: add select-prompt handling

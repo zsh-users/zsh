@@ -673,7 +673,7 @@ gettok(void)
     /* chars in initial position in word */
 
     if (c == hashchar &&
-	(isset(INTERACTIVECOMMENTS) ||
+	((zleparse != 3 && isset(INTERACTIVECOMMENTS)) ||
 	 (!zleparse && !expanding &&
 	  (!interact || unset(SHINSTDIN) || strin)))) {
 	/* History is handled here to prevent extra  *

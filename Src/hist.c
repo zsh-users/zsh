@@ -2058,15 +2058,15 @@ mod_export LinkList
 bufferwords(LinkList list, char *buf, int *index)
 {
     int num = 0, cur = -1, got = 0, ne = noerrs, ocs = cs;
-    int owb = wb, owe = we, oadx = addedx, ozp = zleparse;
+    int owb = wb, owe = we, oadx = addedx, ozp = zleparse, oexp = expanding;
     char *p;
 
     if (!list)
 	list = newlinklist();
 
-    zleparse = 1;
+    zleparse = 3;
     addedx = 0;
-    noerrs = 1;
+    noerrs = expanding = 1;
     lexsave();
     if (buf) {
 	int l = strlen(buf);
@@ -2133,6 +2133,7 @@ bufferwords(LinkList list, char *buf, int *index)
     inpop();
     errflag = 0;
     zleparse = ozp;
+    expanding = oexp;
     noerrs = ne;
     lexrestore();
     cs = ocs;
