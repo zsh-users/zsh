@@ -38,4 +38,4 @@ _kld() {
   esac
 }
 
-[[ -o kshautoload ]] || _kld "$@"
+_kld "$@"

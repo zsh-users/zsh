@@ -65,4 +65,4 @@ _bsd_pkg() {
   esac
 }
 
-[[ -o kshautoload ]] || _bsd_pkg "$@"
+_bsd_pkg "$@"
