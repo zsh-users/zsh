@@ -362,7 +362,10 @@ getcols(Listcols c)
     memset(c, 0, sizeof(*c));
     s = dupstring(s);
     while (*s)
-	s = getcoldef(c, s);
+	if (*s == ':')
+	    s++;
+	else
+	    s = getcoldef(c, s);
 
     /* Use default values for those that aren't set explicitly. */
     for (i = 0; i < NUM_COLS; i++) {

@@ -10,7 +10,7 @@ if zstyle -a ":completion:${curcontext}:$1" list-colors val; then
     _comp_colors=( "$val[@]" )
   else
     _comp_colors=( "$_comp_colors[@]"
-                   "(${2})${(@)^val:#\(*\)*}" "${(M@)val:#\(*\)*}" )
+                   "(${2})${(@)^val:#(|\(*\)*)}" "${(M@)val:#\(*\)*}" )
   fi
 
 # Here is the problem mentioned in _main_complete.
