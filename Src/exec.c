@@ -2917,25 +2917,24 @@ execfuncdef(Estate state, int do_exec)
 {
     Shfunc shf;
     char *s;
-    int signum, nprg, npats, num, len, plen, i;
-    Wordcode beg = state->pc, end, names;
+    int signum, nprg, npats, len, plen, i;
+    Wordcode beg = state->pc, end;
     Eprog prog;
     Patprog *pp;
+    LinkList names;
 
     end = beg + WC_FUNCDEF_SKIP(state->pc[-1]);
-    num = state->pc[0];
-    names = state->pc + 1;
-    nprg = state->pc[1 + num] - 4;
-    npats = state->pc[2 + num];
-
-    state->pc += num + 3;
+    names = ecgetlist(state, *state->pc++, 1);
+    nprg = *state->pc++ - 4;
+    npats = *state->pc++;
 
     plen = (end - state->pc) * sizeof(wordcode);
     len = plen + (npats * sizeof(Patprog));
 
+    execsubst(names);
+
     PERMALLOC {
-	while (num--) {
-	    s = ecrawstr(state->prog, names++);
+	while ((s = (char *) ugetnode(names))) {
 	    prog = (Eprog) zalloc(sizeof(*prog));
 	    prog->heap = 0;
 	    prog->len = len;
