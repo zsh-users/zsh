@@ -78,7 +78,7 @@ _cvs_add () {
 
 (( $+functions[_cvs_admin] )) ||
 _cvs_admin () {
-  # "+ib::c:a:A:e:l::u::LUn:N:m:o:s:t::IqxV:k:"
+  # "+ib::c:a:A:e::l::u::LUn:N:m:o:s:t::IqxV:k:"
   _arguments -s \
     -{i,x} \
     '(-U)-L[set lock strict]' \
@@ -89,7 +89,7 @@ _cvs_admin () {
     '-c+:comment leader (not used):' \
     '-a+:login names (not work with CVS):' \
     '-A+:access list to append (not work with CVS):' \
-    '-e+:access list to erase (not work with CVS):' \
+    '-e-:access list to erase (not work with CVS):' \
     '-l-[lock]:revision to lock:' \
     '-u-[unlock]:revision to unlock:' \
     '-n+[name revision]:symbolic-name(\:revision):' \
@@ -122,6 +122,18 @@ _cvs_annotate () {
     '(-f -D)-r+[specify revision]:tag:_cvs_revisions' \
     '(-f -r)-D+[specify date]:date:_cvs_D' \
     '*:file:_cvs_files'
+}
+
+(( $+functions[_cvs_rannotate] )) ||
+_cvs_rannotate () {
+  # "+lr:D:fR"
+  _arguments -s \
+    '(-R)-l[don'\''t recursive]' \
+    '-f[use head revision]' \
+    '(-l)-R[recursive]' \
+    '(-f -D)-r+[specify revision]:tag:_cvs_revisions' \
+    '(-f -r)-D+[specify date]:date:_cvs_D' \
+    '*:file:_cvs_modules'
 }
 
 (( $+functions[_cvs_checkout] )) ||
@@ -387,6 +399,23 @@ _cvs_log () {
     '-s+[specify states]:states:(Exp Stab Rel dead)' \
     '-w-[specify logins]:logins:' \
     '*:file:_cvs_files'
+}
+
+(( $+functions[_cvs_rlog] )) ||
+_cvs_rlog () {
+  # "+bd:hlNRr::s:tw::"
+  _arguments -s \
+    '-b[default branch]' \
+    '(-t)-h[header]' \
+    '(-R)-l[don'\''t recursive]' \
+    '(-l)-R[recursive]' \
+    '-N[don'\''t list tags]' \
+    '(-h)-t[header with descriptive text]' \
+    '-d+[specify dates]:dates:' \
+    '-r-[specify revisions]:revisions:' \
+    '-s+[specify states]:states:(Exp Stab Rel dead)' \
+    '-w-[specify logins]:logins:' \
+    '*:file:_cvs_modules'
 }
 
 (( $+functions[_cvs_login] )) ||
