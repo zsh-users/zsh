@@ -1,3 +1,9 @@
+2000-06-28  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12093: Src/Zle/compcore.c, Src/Zle/complist.c, Src/Zle/compresult.c:
+ 	make a-a-i-n-h in menu selection work with one match; better undo
+ 	behaviour for menu selection
+	
 2000-06-27  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* 12086: Doc/Zsh/compsys.yo: Move _use_lo doc into alphabetical

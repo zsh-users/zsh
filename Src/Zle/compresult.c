@@ -1093,7 +1093,7 @@ comp_mod(int v, int m)
 /* This handles the beginning of menu-completion. */
 
 /**/
-static void
+void
 do_ambig_menu(void)
 {
     Cmatch *mc;

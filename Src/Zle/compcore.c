@@ -37,7 +37,7 @@ static Widget lastcompwidget;
 /* Flags saying what we have to do with the result. */
 
 /**/
-int useexact, useline, uselist, forcelist, startauto;
+int useexact, useline, uselist, forcelist, iforcemenu, startauto;
 
 /* Non-zero if we should go back to the last prompt. */
 
@@ -349,7 +349,10 @@ do_completion(Hookdef dummy, Compldat dat)
 
     if (comppatmatch && *comppatmatch && comppatmatch != opm)
 	haspattern = 1;
-    if (useline < 0)
+    if (iforcemenu) {
+	do_ambig_menu();
+	ret = 0;
+    } else if (useline < 0)
 	ret = selfinsert(zlenoargs);
     else if (!useline && uselist) {
 	/* All this and the guy only wants to see the list, sigh. */

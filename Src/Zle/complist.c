@@ -1782,11 +1782,15 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    menucmp = menuacc = hasoldlist = 0;
 	    minfo.cur = NULL;
 	    fixsuffix();
+	    handleundo();
 	    validlist = 0;
 	    amatches = pmatches = lastmatches = NULL;
 	    invalidate_list();
+	    iforcemenu = 1;
 	    menucomplete(zlenoargs);
-	    if (dat->num < 2 || !minfo.cur || !*(minfo.cur)) {
+	    iforcemenu = 0;
+
+	    if (dat->num < 1 || !minfo.cur || !*(minfo.cur)) {
 		noselect = clearlist = listshown = 1;
 		onlyexpl = 0;
 		zrefresh();
@@ -1821,6 +1825,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->origcs = origcs;
 	    s->origll = origll;
 	    accept_last();
+	    handleundo();
 	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
 
@@ -1852,6 +1857,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if (!u)
 		break;
 
+	    handleundo();
 	    cs = 0;
 	    foredel(ll);
 	    spaceinline(l = strlen(u->line));
