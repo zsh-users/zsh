@@ -84,6 +84,7 @@ dnl   specified directly as --enable-lfs="long long".
 dnl   Sets the variable given in the second argument to the first argument
 dnl   if the test worked, `no' otherwise.  Be careful testing this, as it
 dnl   may produce two words `long long' on an unquoted substitution.
+dnl   Also check that the compiler does not mind it being cast to int.
 dnl   This macro does not produce messages as it may be run several times
 dnl   before finding the right type.
 dnl
@@ -97,6 +98,7 @@ AC_DEFUN(zsh_64_BIT_TYPE,
 main()
 {
   $1 foo = 0; 
+  int bar = (int) foo;
   return sizeof($1) != 8;
 }
 ], $2="$1", $2=no,
