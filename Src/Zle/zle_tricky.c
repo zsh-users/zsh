@@ -6932,7 +6932,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	/* Now search the history. */
 	while (n-- && he) {
 	    int iwords;
-	    for (iwords = 0; iwords < he->nwords; iwords++) {
+	    for (iwords = he->nwords - 1; iwords >= 0; iwords--) {
 		h = he->text + he->words[iwords*2];
 		e = he->text + he->words[iwords*2+1];
 		hpatsav = *e;

@@ -23,8 +23,8 @@ else
     _description -V expl 'history word'
   fi
   compgen "$expl[@]" -Q -H 0 ''
-  compstate[insert]=1
   if [[ -n "$compconfig[history_stop]" ]]; then
+    compstate[insert]=1
     _hist_menu_length="$compstate[nmatches]"
     _hist_menu_end=''
   fi
