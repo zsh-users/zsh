@@ -1,0 +1,3 @@
+autobins="cap getcap setcap"
+
+objects="cap.o"

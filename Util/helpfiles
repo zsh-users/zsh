@@ -1,0 +1,182 @@
+#!/usr/local/bin/perl -- -*-perl-*-
+
+# helpfiles:  make help files for Z-shell builtins from the manual entries.
+
+# Create help files for zsh commands in the current directory;
+# assumes no other files are present.
+# No overwriting check;  `.' becomes `dot', `:' becomes `colon'.
+
+# Any command claiming to be `same as <foo>' or `equivalent to <foo>'
+# has its help file appended to the end of <foo>'s and replaced by a
+# link to <foo>.  (Arguably the help file should be put at the start
+# instead.)
+
+# Takes one filename argument, or stdin: the zsh manual page as a plain
+# ascii file: `man zshbuiltins | colcrt -' (remember the -) should do
+# the trick.
+
+# If you don't have colcrt, try 'col -bx'.  The x is necessary so that
+# spaces don't turn into tabs, which messes up the calculations of
+# indentation on machines which randomly wrap lines round to the
+# previous line (so you see what we're up against).
+
+# Example usage:
+#    cd ~/zsh-3.0.0				# or wherever
+#    mkdir Help
+#    cd Help
+#    man zsh | colcrt - | helpfiles
+#    run-help() {
+#      typeset zhelp=~/zsh-3.0.0/Help		# or wherever
+#      [[ $1 = . ]] && 1=dot
+#      [[ $1 = : ]] && 1=colon
+#      if [[ $1 = compctl ]]; then
+#         man zshcompctl
+#      elif [[ -f $zhelp/$1 ]]; then
+#    	  ${=PAGER:-more} $zhelp/$1
+#      else
+#    	  man $1
+#      fi
+#    }
+# now <Esc>-h works for shell builtins.
+
+while (<>) {
+    last if /^\s*SHELL BUILTIN COMMANDS/;
+    /zshbuiltins/ && $zb++;
+    last if ($zb && /^\s*DESCRIPTIONS/);
+}
+
+$print = 0;
+
+sub namesub {
+    local($cmd) = shift;
+    if ($cmd =~ /^\w+$/) {
+	$cmd;
+    } elsif ($cmd eq '.') {
+	'dot';
+    } elsif ($cmd eq ':') {
+	'colon';
+    } else {
+	undef;
+    }
+}
+
+sub getsame {
+    local($_) = shift;
+    if (/same\s*as\s*(\S+)/i || /equivalent\s*to\s*(\S+)/i) {
+	local($name) = $1;
+	($name =~ /[.,]$/) && chop($name);
+	return $name;
+    } else {
+	return undef;
+    }
+}
+
+sub newcmd {
+    local($_) = shift;
+    local($cmd);
+    # new command
+    if (defined($cmd = &namesub($_))) {
+	# in case there's something nasty here like a link..
+	unlink $cmd;
+	open (OUT, ">$cmd");
+	select OUT;
+	$print = 1;
+    } else {
+	$print = 0;
+    }
+}
+
+sub doprint {
+    local($_) = shift;
+
+    s/^$indentstr//o;		# won't work if too many tabs
+    print;
+}
+
+while (<>) { last unless /^\s*$/; }
+
+/^(\s+)(\S+)/;
+$indentstr = $1;
+$indent = length($1);
+&newcmd($2);
+print if $print;
+
+BUILTINS: while (<>) {
+    next if /^\w/;
+
+    undef($undented);
+    if (/^\s*$/ || ($undented = (/^(\s*)/  && length($1) < $indent))) {
+	$undented && &doprint($_);
+	while (defined($_ = <>) && /(^\w)|(^\s*$)/) { 
+	    last BUILTINS if /^STARTUP\/SHUTDOWN FILES/;
+	}
+        if (/^\s*Page/) {
+	    do {
+		$_ = <>;
+	    } while (defined($_) && /^\s*$/);
+	    if (/^\s*ZSHBUILTINS/) {
+		do {
+		    $_ = <>;
+		} while (defined($_) && /^\s*$/);
+	    }
+	}
+	# In zshall, the zshcompctl manual page comes after the
+	# builtins.
+	if (/ZSHCOMPCTL\(1\).*ZSHCOMPCTL\(1\)/) {
+	    last BUILTINS;
+	}
+	if (/^(\s*)/ && length($1) < $indent) {
+	    # This may be just a bug on the SGI, or maybe something
+	    # more sinister (don\'t laugh, this is nroff).
+	    s/^\s*/ /;
+	    $defer = $_;
+	    do {
+		$_ = <>;
+	    } while (defined($_) && /^\s*$/);
+	    last unless defined($_);
+	}
+	if (/^(\s+)(\S+)/ && length($1) == $indent) {
+	    &newcmd($2);
+	}  else {
+	    print "\n";
+	}
+        if ($print) {
+	    if (defined($defer)) {
+		chop;
+		&doprint("$_$defer");
+		undef($defer);
+	    } else {
+		&doprint($_);
+	    }
+	}
+    } else {
+	&doprint($_) if $print;
+    }
+}
+
+select STDOUT;
+close OUT;
+
+foreach $file (<*>) {
+    open (IN, $file);
+    if ($sameas = (&getsame($_ = <IN>) || &getsame($_ = <IN>))) {
+	defined($sameas = &namesub($sameas)) || next;
+#	print "$file is the same as $sameas\n";
+	seek (IN, 0, 0);
+
+	# Copy this to base builtin.
+	open (OUT, ">>$sameas");
+	select OUT;
+	print "\n";
+	while (<IN>) { print; }
+	close IN;
+	select STDOUT;
+	close OUT;
+
+	# Make this a link to that.
+	unlink $file;
+	symlink ($sameas, $file);
+    }
+}
+
+__END__

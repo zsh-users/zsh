@@ -1,0 +1,8 @@
+DISTFILES_SRC='
+    .cvsignore .distfiles .exrc
+    cap.mdd cap.c
+    clone.mdd clone.c
+    example.mdd example.c
+    files.mdd files.c
+    stat.mdd stat.c
+'

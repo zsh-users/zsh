@@ -1,0 +1,3 @@
+autobins="sched"
+
+objects="sched.o"

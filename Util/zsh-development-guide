@@ -1,0 +1,138 @@
+------------------------------
+GUIDELINES FOR ZSH DEVELOPMENT
+------------------------------
+
+Zsh is currently developed and maintained by the Zsh Development Group.
+This development takes place by mailing list.  Check the META-FAQ for the
+various zsh mailing lists and how to subscribe to them.  The development
+is very open and anyone is welcomed and encouraged to join and contribute.
+Because zsh is a very large package whose development can sometimes
+be very rapid, I kindly ask that people observe a few guidelines when
+contributing patches and feedback to the mailing list.  These guidelines
+are very simple and hopefully should make for a more orderly development
+of zsh.
+
+Patches
+-------
+
+* Send all patches to the mailing list rather than directly to me.
+
+* Send only context diffs "diff -c oldfile newfile".  They are much
+  easier to read and understand while also allowing the patch program
+  to patch more intelligently.  Please make sure the filenames in
+  the diff header are relative to the top-level directory of the zsh
+  distribution; for example, it should say "Src/init.c" rather than
+  "init.c" or "zsh/Src/init.c".
+
+* Please put only one bug fix or feature enhancement in a single patch and
+  only one patch per mail message.  This helps me to multiplex the many
+  (possibly conflicting) patches that I receive for zsh.  You shouldn't
+  needlessly split patches, but send them in the smallest LOGICAL unit.
+
+* If a patch depends on other patches, then please say so.  Also please
+  mention what version of zsh this patch is for.
+
+* Please test your patch and make sure it applies cleanly. It takes
+  considerably more time to manually merge a patch into the baseline code.
+
+* There is now a zsh patch archive.  To have your patches appear in the
+  archive, send them to the mailing list with a Subject: line starting
+  with "PATCH:".
+
+C coding style
+--------------
+
+* The primary language is ANSI C as defined by the 1989 standard, but the
+  code should always be compatible with late K&R era compilers ("The C
+  Programming Language" 1st edition, plus "void" and "enum").  There are
+  many hacks to avoid the need to actually restrict the code to K&R C --
+  check out the configure tests -- but always bear the compatibility
+  requirements in mind.  In particular, preprocessing directives must
+  have the "#" unindented, and string pasting is not available.
+
+* Conversely, there are preprocessor macros to provide safe access to some
+  language features not present in pure ANSI C, such as variable-length
+  arrays.  Always use the macros if you want to use these facilities.
+
+* Avoid writing code that generates warnings under gcc with the default
+  options set by the configure script.  For example, write
+  "if ((foo = bar))" rather than "if (foo = bar)".
+
+* Please try not using lines longer than 79 characters.
+
+* The indent/brace style is Kernighan and Ritchie with 4 characters
+  indentations (with leading tab characters replacing sequences of
+  8 spaces).  This means that the opening brace is the last character
+  in the line of the if/while/for/do statement and the closing brace
+  has its own line:
+
+      if (foo) {
+	  do that
+      }
+
+* Put only one simple statement on a line.  The body of an if/while/for/do
+  statement has its own line with 4 characters indentation even if there
+  are no braces.
+
+* Do not use space between the function name and the opening parenthesis.
+  Use space after if/for/while.  Use space after type casts.
+
+* Do not use (unsigned char) casts since some compilers do not handle
+  them properly.  Use the provided STOUC(X) macro instead.
+
+* If you use emacs 19.30 or newer you can put the following line to your
+  ~/.emacs file to make these formatting rules the default:
+
+    (add-hook 'c-mode-common-hook (function (lambda () (c-set-style "BSD"))))
+
+* Function declarations must look like this:
+
+  /**/
+  int
+  foo(char *s, char **p)
+  {
+      function body
+  }
+
+  There must be an empty line, a line with "/**/", a line with the
+  type of the function, and finally the name of the function with typed
+  arguments.  These lines must not be indented.  The script generating
+  function prototypes and the ansi2knr program depend on this format.
+  If the function is not used outside the file it is defined in, it
+  should be declared "static"; this keyword goes on the type line,
+  before the return type.
+
+* Global variable declarations must similarly be preceded by a
+  line containing only "/**/", for the prototype generation script.
+  The declaration itself should be all on one line (except for multi-line
+  initialisers).
+
+* Leave a blank line between the declarations and statements in a compound
+  statement, if both are present.  Use blank lines elsewhere to separate
+  groups of statements in the interests of clarity.  There should never
+  be two consecutive blank lines.
+
+Documentation
+-------------
+
+* Edit only the .yo files.  All other formats (man pages, TeXinfo, HTML,
+  etc.) are automatically generated from the yodl source.
+
+* Always use the correct markup.  em() is used for emphasis, and bf()
+  for citations.  tt() marks text that is literal input to or output
+  from the shell.  var() marks metasyntactic variables.
+
+* In addition to appropriate markup, always use quotes (`') where
+  appropriate.  Specifically, use quotes to mark text that is not a part
+  of the actual text of the documentation (i.e., that it is being quoted).
+  In principle, all combinations of quotes and markup are possible,
+  because the purposes of the two devices are completely orthogonal.
+  For example,
+
+      Type `tt(xyzzy)' to let zsh know you have played tt(advent).
+      Saying `plugh' aloud doesn't have much effect, however.
+
+  In this case, "zsh" is normal text (a name), "advent" is a command name
+  ocurring in the main text, "plugh" is a normal word that is being quoted
+  (it's the user that says `plugh', not the documentation), and "xyzzy"
+  is some text to be typed literally that is being quoted.

@@ -1,0 +1,5 @@
+moddeps="comp1"
+
+autobins="compctl"
+
+objects="compctl.o"
