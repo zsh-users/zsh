@@ -1,4 +1,4 @@
 #compdef make gmake pmake
 
-compgen -s "\$(awk '/^[a-zA-Z0-9][^\/ 	]+:/ {print \$1}' FS=: [mM]akefile /dev/null)" ||
-_files
+compgen -s "\$(awk '/^[_a-zA-Z0-9][-._a-zA-Z0-9]*[^\/ 	]+:/ {print \$1}' FS=: [mM]akefile /dev/null)" ||
+compgen -f
