@@ -1,3 +1,8 @@
+2001-11-21  Bart Schaefer  <schaefer@zsh.org>
+
+	* Sven: 16249: Src/parse.c: Clear pending here-documents upon a
+	parse error.
+
 2001-11-18  Clint Adams  <clint@zsh.org>
 
 	* 16264: Completion/Debian/Command/_dput:
