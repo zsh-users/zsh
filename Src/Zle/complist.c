@@ -1809,12 +1809,23 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   cmd == Th(z_downlineorhistory) ||
 		   cmd == Th(z_downlineorsearch) ||
 		   cmd == Th(z_vidownlineorhistory)) {
+	    int omline;
+	    Cmatch **op;
+
 	    wrap = 0;
 
 	down:
 
+	    omline = mline;
+	    op = p;
+
 	    do {
 		if (mline == mlines - 1) {
+		    if (wrap & 2) {
+			mline = omline; 
+			p = op;
+			break;
+		    }
 		    p -= mline * mcols;
 		    mline = 0;
 		    wrap |= 1;
@@ -1832,12 +1843,23 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   cmd == Th(z_uplineorhistory) ||
 		   cmd == Th(z_uplineorsearch) ||
 		   cmd == Th(z_viuplineorhistory)) {
+	    int omline;
+	    Cmatch **op;
+
 	    wrap = 0;
 
 	up:
 
+	    omline = mline;
+	    op = p;
+
 	    do {
 		if (!mline) {
+		    if (wrap & 2) {
+			mline = omline; 
+			p = op;
+			break;
+		    }
 		    mline = mlines - 1;
 		    p += mline * mcols;
 		    wrap |= 1;
@@ -1948,17 +1970,22 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    p = lp;
 	} else if (cmd == Th(z_forwardchar) || cmd == Th(z_viforwardchar)) {
 	    int omcol;
-	    Cmatch *op;
+	    Cmatch **op;
 
 	    wrap = 0;
 
 	right:
 
 	    omcol = mcol;
-	    op = *p;
+	    op = p;
 
 	    do {
 		if (mcol == mcols - 1) {
+		    if (wrap & 1) {
+			p = op;
+			mcol = omcol;
+			break;
+		    }
 		    p -= mcol;
 		    mcol = 0;
 		    wrap |= 2;
@@ -1966,24 +1993,29 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    mcol++;
 		    p++;
 		}
-	    } while (!*p || (mcol != omcol && *p == op));
+	    } while (!*p || (mcol != omcol && *p == *op));
 	    wishcol = mcol;
 
 	    if (wrap == 2)
 		goto down;
 	} else if (cmd == Th(z_backwardchar) || cmd == Th(z_vibackwardchar)) {
 	    int omcol;
-	    Cmatch *op;
+	    Cmatch **op;
 
 	    wrap = 0;
 
 	left:
 
 	    omcol = mcol;
-	    op = *p;
+	    op = p;
 
 	    do {
 		if (!mcol) {
+		    if (wrap & 1) {
+			p = op;
+			mcol = omcol;
+			break;
+		    }
 		    mcol = mcols - 1;
 		    p += mcol;
 		    wrap |= 2;
@@ -1991,7 +2023,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    mcol--;
 		    p--;
 		}
-	    } while (!*p || (mcol != omcol && *p == op));
+	    } while (!*p || (mcol != omcol && *p == *op));
 	    wishcol = mcol;
 
 	    if (wrap == 2)

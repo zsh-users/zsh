@@ -1,3 +1,8 @@
+2000-04-28  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 10992: Src/Zle/complist.c: avoid wrapping around both
+ 	horizontally and vertically at the same time
+	
 2000-04-27  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* Tanaka Akira: 10980: Completion for enscript.
