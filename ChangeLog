@@ -1,5 +1,8 @@
 2005-03-07  Clint Adams  <clint@zsh.org>
 
+	* 20944: Completion/Debian/Command/_uscan: completion for
+	uscan command.
+
 	* 20943: Completion/Linux/Command/_tune2fs: completion for
 	tune2fs command.
 
