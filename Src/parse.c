@@ -978,7 +978,7 @@ par_for(int *complex)
     incmdpos = 1;
     while (tok == SEPER)
 	yylex();
-    if (tok == DO) {
+    if (tok == DOLOOP) {
 	yylex();
 	par_save_list(complex);
 	if (tok != DONE)
@@ -1260,7 +1260,7 @@ par_while(int *complex)
     incmdpos = 1;
     while (tok == SEPER)
 	yylex();
-    if (tok == DO) {
+    if (tok == DOLOOP) {
 	yylex();
 	par_save_list(complex);
 	if (tok != DONE)
@@ -1304,7 +1304,7 @@ par_repeat(int *complex)
     yylex();
     while (tok == SEPER)
 	yylex();
-    if (tok == DO) {
+    if (tok == DOLOOP) {
 	yylex();
 	par_save_list(complex);
 	if (tok != DONE)

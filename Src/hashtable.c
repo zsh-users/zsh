@@ -925,7 +925,7 @@ static struct reswd reswds[] = {
     {NULL, "}", 0, OUTBRACE},
     {NULL, "case", 0, CASE},
     {NULL, "coproc", 0, COPROC},
-    {NULL, "do", 0, DO},
+    {NULL, "do", 0, DOLOOP},
     {NULL, "done", 0, DONE},
     {NULL, "elif", 0, ELIF},
     {NULL, "else", 0, ELSE},

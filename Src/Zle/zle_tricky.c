@@ -1105,7 +1105,7 @@ get_comp_string(void)
 	/* We reached the end. */
 	if (tok == ENDINPUT)
 	    break;
-	if ((ins && (tok == DO || tok == SEPER)) ||
+	if ((ins && (tok == DOLOOP || tok == SEPER)) ||
 	    (ins == 2 && i == 2) || (ins == 3 && i == 3) ||
 	    tok == BAR    || tok == AMPER     ||
 	    tok == BARAMP || tok == AMPERBANG ||

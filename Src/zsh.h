@@ -209,7 +209,7 @@ enum {
     OUTBRACE,   /* }         */
     CASE,	/* case      */
     COPROC,	/* coproc    */
-    DO,		/* do        */
+    DOLOOP,	/* do        */
     DONE,	/* done      */ /* 45 */
     ELIF,	/* elif      */
     ELSE,	/* else      */

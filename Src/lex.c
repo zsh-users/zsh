@@ -393,7 +393,7 @@ ctxtlex(void)
     case BAR:
     case BARAMP:
     case INOUTPAR:
-    case DO:
+    case DOLOOP:
     case THEN:
     case ELIF:
     case ELSE:

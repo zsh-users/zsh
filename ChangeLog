@@ -1,3 +1,9 @@
+2004-03-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 19595: Src/hashtable.c, Src/lex.c, Src/parse.c, Src/zsh.h,
+	Src/Zle/zle_tricky.c: rename DO to DOLOOP to avoid conflict with
+	a DO in curses.h on Tru64 5.1
+
 2004-03-10  Peter Stephenson  <pws@csr.com>
 
 	* 19575: Src/signals.c, Test/C03traps.ztst: Fix the problem
