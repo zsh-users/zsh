@@ -1,5 +1,8 @@
 2001-06-08  Clint Adams  <clint@zsh.org>
 
+	* 14815: Src/utils.c: actually check the filename of
+	the dump.
+
 	* 14813: zshconfig.ac, Src/parse.c, Src/utils.c, Src/zsh.h:
 	try to autoload functions from digest files that are deleted
 	but still open.
