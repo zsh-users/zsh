@@ -1,5 +1,8 @@
 2000-05-06  Tanaka Akira  <akr@zsh.org>
 
+	* 11224: Util/mkdisttree.sh: problem with pattern matching `.' in
+	find.
+
 	* 11223: Completion/Base/_regex_arguments, Completion/Debian/_apt,
 	Completion/X/_xset, Completion/X/_xwit, Doc/Zsh/compsys.yo:
 	_regex_arguments use _alternative.
