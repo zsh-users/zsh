@@ -870,7 +870,7 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 AC_FUNC_STRCOLL
 
 AC_FUNC_MMAP
-if test $ac_cv_func_mmap = yes; then
+if test x$ac_cv_func_mmap_fixed_mapped = xyes; then
   AC_CHECK_FUNCS(munmap msync)
 fi
 

@@ -1,5 +1,8 @@
 2000-08-14  Bart Schaefer  <schaefer@zsh.org>
 
+	* Andrej: 12620: configure.in, Src/system.h: Fix cache variable
+	test for mmap, remove cygwin special-case.
+
 	* 12617: configure.in: Use AC_FUNC_MMAP rather than just test for
 	existence of mmap.
 
