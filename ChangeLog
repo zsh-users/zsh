@@ -1,3 +1,8 @@
+2002-04-08  Peter Stephenson  <pws@csr.com>
+
+	* 16942: Src/glob.c: Allow zero-length matches in parameter
+	substitutions.
+
 2002-04-04  Oliver Kiddle  <opk@zsh.org>
 
 	* 16935: Completion/Unix/Command/_ssh: update list of options
