@@ -1,6 +1,5 @@
 #compdef talk ntalk ytalk finger
 
-local expl nm="$compstate[nmatches]"
 local accounts_users_hosts
 
 local varname="$words[1]_accounts"
