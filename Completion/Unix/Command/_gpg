@@ -18,28 +18,28 @@ _arguments -C -s -S -A "-*" \
   '--list-keys[list all keys]' \
   '--list-public-keys[list all public keys]' \
   '--list-secret-keys[list all secret keys]' \
-  '--list-sigs[lists keys and signatures]:key attachment:_pub-keys-list' \
-  '--check-sigs[lists key, signatures and check them]:key attachment:_pub-keys-list' \
-  '--fingerprint[list all keys with their fingerprints]:key attachment:_pub-keys-list' \
+  '--list-sigs[lists keys and signatures]:key attachment:->public-keys' \
+  '--check-sigs[lists key, signatures and check them]:key attachment:->public-keys' \
+  '--fingerprint[list all keys with their fingerprints]:key attachment:->public-keys' \
   '--list-packets[list only the sequence of packets]' \
   '--gen-key[generate a new pair key]' \
-  '--edit-key[a menu for edit yours keys]:key attachment:_pub-keys-list' \
-  '--sign-key[sign a key]:key attachment:_pub-keys-list '\
-  '--lsign-key[sign a key but mark as non-exportable]:key attachment:_pub-keys-list' \
+  '--edit-key[a menu for edit yours keys]:key attachment:->public-keys' \
+  '--sign-key[sign a key]:key attachment:->public-keys'\
+  '--lsign-key[sign a key but mark as non-exportable]:key attachment:->public-keys' \
   '--nrsign-key[sign a key non-revocably]' \
-  '--delete-key[remove key from public keyring]:key attachment:_pub-keys-list' \
-  '--delete-secret-key[remove key from public & private keyring]:key attachment:_sec-keys-list' \
-  '--delete-secret-and-public-key:key attachment:_sec-keys-list' \
+  '--delete-key[remove key from public keyring]:key attachment:->public-keys' \
+  '--delete-secret-key[remove key from public & private keyring]:key attachment:->secret-keys' \
+  '--delete-secret-and-public-key:key attachment:->secret-keys' \
   '--gen-revoke[generate a revocation certificate]' \
   '--desig-revoke[generate a designated revocation certificate]' \
   '--export[export all key from all keyrings]' \
-  '--send-keys[send keys to a keyserver]:key attachment:_pub-keys-list' \
+  '--send-keys[send keys to a keyserver]:key attachment:->public-keys' \
   '--export-all[export all key and not OpenPGP compatible keys]' \
-  '--export-secret-keys:key attachment:_sec-keys-list' \
-  '--export-secret-subkeys:key attachment:_sec-keys-list' \
+  '--export-secret-keys:key attachment:->secret-keys' \
+  '--export-secret-subkeys:key attachment:->secret-keys' \
   '--import[import a gpg key from a file]:_files attachment:_files' \
   '--fast-import[import a file without build trustdb]:_files attachment:_files' \
-  '--recv-keys[receive a list of keys from a keyserver]:key attachment:_pub-keys-list' \
+  '--recv-keys[receive a list of keys from a keyserver]:key attachment:->public-keys' \
   '--refresh-keys[update all keys from a keyserver]' \
   '--search-keys[search for keys on a key server]' \
   '--update-trustdb[update the trust database]' \
@@ -58,12 +58,12 @@ _arguments -C -s -S -A "-*" \
   '(-a --armor)'{-a,--armor}'[create ASCII armored output]' \
   '(-o --output)'{-o+,--output}'[write output to file]:output file:_files' \
   '(-u --local-user)'{-u+,--local-user}'[use name as the user ID to sign]:user attachment:_users'\
-  '--default-key[specify default user-id for signatures]:key:->secret-key' \
-  '*'{-r+,--recipient}'[specify user to encrypt for]:recipient:->public-key' \
-  '--default-recipient[specify default recipient]:recipient:->public-key' \
+  '--default-key[specify default user-id for signatures]:key:->secret-keys' \
+  '*'{-r+,--recipient}'[specify user to encrypt for]:recipient:->public-keys' \
+  '--default-recipient[specify default recipient]:recipient:->public-keys' \
   '--default-recipient-self[use default key as default recipient]' \
   '--no-default-recipient[reset default recipient]' \
-  '*--encrypt-to[specify recipient]:->public-key' \
+  '*--encrypt-to[specify recipient]:->public-keys' \
   '(--encrypt-to)--no-encrypt-to[disable the use of all --encrypt-to keys]' \
   '(-q --quiet)*'{-v,--verbose}'[increase amount of output]' \
   '(-q --quiet -v --verbose)'{-q,--quiet}'[reduce amount of output]' \
@@ -86,8 +86,8 @@ _arguments -C -s -S -A "-*" \
   --show-photos --no-show-photos '--photo-viewer:command:_command_names -e'\
   --exec-path:path:_dir_list' \
   --show-keyring[display keyring name when listing keys]' \
-  '--keyring[add specified file to list of keyrings]:file' \
-  '--secret-keyring[add specified file to list of secret keyrings]:file' \
+  '--keyring[add specified file to list of keyrings]:file:_files' \
+  '--secret-keyring[add specified file to list of secret keyrings]:file:_files' \
   --homedir:directory:_directories \
   '--charset:character set:(iso-8859-1 iso-8859-2 koi8-r utf-8)' \
   '--utf8-strings' '--no-utf8-strings[arguments are not in UTF8]' \
@@ -131,26 +131,26 @@ _arguments -C -s -S -A "-*" \
 
 if [[ $state = args ]]; then
   if (( ${+opt_args[--export]} || ${+opt_args[--list-keys]} )); then
-    state=public-key
+    state=public-keys
   elif (( ${+opt_args[--list-secret-keys]} )); then
-    state=secret-key
+    state=secret-keys
   else
     _files && return
   fi
 fi
 
 case "$state" in
-  public-key)
+  public-keys)
     _wanted public-keys expl 'public key' \
-	compadd ${${(Mo)$(gpg --list-keys 2>/dev/null):%<*>}//(<|>)/} && return
+	compadd ${${(Mo)$(_call_program public-keys gpg --list-keys 2>/dev/null):%<*>}//(<|>)/} && return
   ;;
-  secret-key)
-    _wanted secretkeys expl 'secret key' compadd \
-	${${(Mo)$(gpg --list-secret-keys 2>/dev/null):%<*>}//(<|>)/} && return
+  secret-keys)
+    _wanted secret-keys expl 'secret key' compadd \
+	${${(Mo)$(_call_program secret-keys gpg --list-secret-keys 2>/dev/null):%<*>}//(<|>)/} && return
   ;;
   ciphers)
     _wanted ciphers expl cipher compadd \
-        ${${(s.,.)${(M)${(f)"$(gpg --version)"}:#Cipher*}#*:}# } && return
+        ${${(s.,.)${(M)${(f)"$(_call_program ciphers gpg --version)"}:#Cipher*}#*:}# } && return
   ;;
 esac
 
