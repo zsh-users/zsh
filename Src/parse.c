@@ -34,7 +34,10 @@
  
 /**/
 mod_export int incmdpos;
- 
+
+/**/
+int aliasspaceflag;
+
 /* != 0 if we are in the middle of a [[ ... ]] */
  
 /**/
@@ -80,9 +83,8 @@ struct heredocs *hdocs;
 /* 
  * Word code.
  *
- * For now we simply post-process the syntax tree produced by the
- * parser. We compile it into a struct eprog. Some day the parser
- * above should be changed to emit the word code directly.
+ * The parser now produces word code, reducing memory consumption compared
+ * to the nested structs we had before.
  *
  * Word code layout:
  *
@@ -154,7 +156,7 @@ struct heredocs *hdocs;
  *     - followed by body
  *
  *   WC_WHILE
- *     - data contains type (while, until) and ofsset to after body
+ *     - data contains type (while, until) and offset to after body
  *     - followed by condition
  *     - followed by body
  *
@@ -209,9 +211,9 @@ struct heredocs *hdocs;
  * containing the characters. Longer strings are encoded as the offset
  * into the strs character array stored in the eprog struct shifted by
  * two and ored with the bit pattern 0x.
- * The ecstr() function that adds the code for a string uses a simple
- * list of strings already added so that long strings are encoded only
- * once.
+ * The ecstrcode() function that adds the code for a string uses a simple
+ * binary tree of strings already added so that long strings are encoded
+ * only once.
  *
  * Note also that in the eprog struct the pattern, code, and string
  * arrays all point to the same memory block.
@@ -233,6 +235,11 @@ Eccstr ecstrs;
 /**/
 int ecsoffs, ecssub, ecnfunc;
 
+#define EC_INIT_SIZE         256
+#define EC_DOUBLE_THRESHOLD  32768
+#define EC_INCREMENT         1024
+
+
 /* Adjust pointers in here-doc structs. */
 
 static void
@@ -253,10 +260,11 @@ ecispace(int p, int n)
     int m;
 
     if ((eclen - ecused) < n) {
-	int a = (n > 256 ? n : 256);
+	int a = (eclen < EC_DOUBLE_THRESHOLD ? eclen : EC_INCREMENT);
 
-	ecbuf = (Wordcode) hrealloc((char *) ecbuf, eclen * sizeof(wordcode),
-				    (eclen + a) * sizeof(wordcode));
+	if (n > a) a = n;
+
+	ecbuf = (Wordcode) zrealloc((char *) ecbuf, (eclen + a) * sizeof(wordcode));
 	eclen += a;
     }
     if ((m = ecused - p) > 0)
@@ -271,9 +279,10 @@ static int
 ecadd(wordcode c)
 {
     if ((eclen - ecused) < 1) {
-	ecbuf = (Wordcode) hrealloc((char *) ecbuf, eclen * sizeof(wordcode),
-				    (eclen + 256) * sizeof(wordcode));
-	eclen += 256;
+	int a = (eclen < EC_DOUBLE_THRESHOLD ? eclen : EC_INCREMENT);
+
+	ecbuf = (Wordcode) zrealloc((char *) ecbuf, (eclen + a) * sizeof(wordcode));
+	eclen += a;
     }
     ecbuf[ecused] = c;
     ecused++;
@@ -311,19 +320,18 @@ ecstrcode(char *s)
 	}
 	return c;
     } else {
-	Eccstr p, q = NULL;
+	Eccstr p, *pp;
+	int cmp;
 
-	for (p = ecstrs; p; q = p, p = p->next)
-	    if (p->nfunc == ecnfunc && !strcmp(s, p->str))
+	for (pp = &ecstrs; (p = *pp); ) {
+	    if (!(cmp = p->nfunc - ecnfunc) && !(cmp = strcmp(p->str, s)))
 		return p->offs;
-
-	p = (Eccstr) zhalloc(sizeof(*p));
-	p->next = NULL;
-	if (q)
-	    q->next = p;
-	else
-	    ecstrs = p;
+	    pp = (cmp < 0 ? &(p->left) : &(p->right));
+	}
+	p = *pp = (Eccstr) zhalloc(sizeof(*p));
+	p->left = p->right = 0;
 	p->offs = ((ecsoffs - ecssub) << 2) | (t ? 1 : 0);
+	p->aoffs = ecsoffs;
 	p->str = s;
 	p->nfunc = ecnfunc;
 	ecsoffs += l;
@@ -332,12 +340,7 @@ ecstrcode(char *s)
     }
 }
 
-static int
-ecstr(char *s)
-{
-    return ecadd(ecstrcode(s));
-}
-
+#define ecstr(S) ecadd(ecstrcode(S))
 
 #define par_save_list(C) \
     do { \
@@ -358,7 +361,9 @@ ecstr(char *s)
 static void
 init_parse(void)
 {
-    ecbuf = (Wordcode) zhalloc((eclen = 256) * sizeof(wordcode));
+    if (ecbuf) zfree(ecbuf, eclen);
+
+    ecbuf = (Wordcode) zalloc((eclen = EC_INIT_SIZE) * sizeof(wordcode));
     ecused = 0;
     ecstrs = NULL;
     ecsoffs = ecnpats = 0;
@@ -368,12 +373,20 @@ init_parse(void)
 
 /* Build eprog. */
 
+static void
+copy_ecstr(Eccstr s, char *p)
+{
+    while (s) {
+	memcpy(p + s->aoffs, s->str, strlen(s->str) + 1);
+	copy_ecstr(s->left, p);
+	s = s->right;
+    }
+}
+
 static Eprog
 bld_eprog(void)
 {
     Eprog ret;
-    Eccstr p;
-    char *q;
     int l;
 
     ecadd(WCB_END());
@@ -387,16 +400,24 @@ bld_eprog(void)
     ret->prog = (Wordcode) (ret->pats + ecnpats);
     ret->strs = (char *) (ret->prog + ecused);
     ret->shf = NULL;
-    ret->alloc = EA_HEAP;
+    ret->flags = EF_HEAP;
     ret->dump = NULL;
     for (l = 0; l < ecnpats; l++)
 	ret->pats[l] = dummy_patprog1;
     memcpy(ret->prog, ecbuf, ecused * sizeof(wordcode));
-    for (p = ecstrs, q = ret->strs; p; p = p->next, q += l) {
-	l = strlen(p->str) + 1;
-	memcpy(q, p->str, l);
-    }
+    copy_ecstr(ecstrs, ret->strs);
+
+    zfree(ecbuf, eclen);
+    ecbuf = NULL;
+
     return ret;
+}
+
+/**/
+mod_export int
+empty_eprog(Eprog p)
+{
+    return (!p || !p->prog || *p->prog == WCB_END());
 }
 
 /*
@@ -411,6 +432,7 @@ parse_event(void)
 {
     tok = ENDINPUT;
     incmdpos = 1;
+    aliasspaceflag = 0;
     yylex();
     init_parse();
     return ((par_event()) ? bld_eprog() : NULL);
@@ -452,6 +474,7 @@ par_event(void)
 	}
     }
     if (!r) {
+	tok = LEXERR;
 	if (errflag) {
 	    yyerror(0);
 	    ecused--;
@@ -466,9 +489,10 @@ par_event(void)
     } else {
 	int oec = ecused;
 
-	par_event();
-	if (ecused == oec)
+	if (!par_event()) {
+	    ecused = oec;
 	    ecbuf[p] |= wc_bdata(Z_END);
+	}
     }
     return 1;
 }
@@ -484,10 +508,8 @@ parse_list(void)
     yylex();
     init_parse();
     par_list(&c);
-#if 0 
-   if (tok == LEXERR)
-#endif
-   if (tok != ENDINPUT) {
+    if (tok != ENDINPUT) {
+	tok = LEXERR;
 	yyerror(0);
 	return NULL;
     }
@@ -696,7 +718,7 @@ par_pline(int *complex)
 	for (r = p + 1; wc_code(ecbuf[r]) == WC_REDIR; r += 3);
 
 	ecispace(r, 3);
-	ecbuf[r] = WCB_REDIR(MERGEOUT);
+	ecbuf[r] = WCB_REDIR(REDIR_MERGEOUT);
 	ecbuf[r + 1] = 2;
 	ecbuf[r + 2] = ecstrcode("1");
 
@@ -793,10 +815,6 @@ par_cmd(int *complex)
 	par_funcdef();
 	cmdpop();
 	break;
-    case TIME:
-	*complex = 1;
-	par_time();
-	break;
     case DINBRACK:
 	cmdpush(CS_COND);
 	par_dinbrack();
@@ -807,6 +825,20 @@ par_cmd(int *complex)
 	ecstr(tokstr);
 	yylex();
 	break;
+    case TIME:
+	{
+	    static int inpartime = 0;
+
+	    if (!inpartime) {
+		*complex = 1;
+		inpartime = 1;
+		par_time();
+		inpartime = 0;
+		break;
+	    }
+	}
+	tok = STRING;
+	/* fall through */
     default:
 	{
 	    int sr;
@@ -1369,9 +1401,13 @@ par_time(void)
 
     p = ecadd(0);
     ecadd(0);
-    f = par_sublist2(&c);
-    ecbuf[p] = WCB_TIMED((p + 1 == ecused) ? WC_TIMED_EMPTY : WC_TIMED_PIPE);
-    set_sublist_code(p + 1, WC_SUBLIST_END, f, ecused - 2 - p, c);
+    if ((f = par_sublist2(&c)) < 0) {
+	ecused--;
+	ecbuf[p] = WCB_TIMED(WC_TIMED_EMPTY);
+    } else {
+	ecbuf[p] = WCB_TIMED(WC_TIMED_PIPE);
+	set_sublist_code(p + 1, WC_SUBLIST_END, f, ecused - 2 - p, c);
+    }
 }
 
 /*
@@ -1500,10 +1536,11 @@ par_simple(int *complex, int nr)
 		}
 		yylex();
 	    } else {
-		int ll, sl, c = 0;
+		int ll, sl, pl, c = 0;
 
 		ll = ecadd(0);
 		sl = ecadd(0);
+		pl = ecadd(WCB_PIPE(WC_PIPE_END, 0));
 
 		par_cmd(&c);
 
@@ -1546,21 +1583,21 @@ par_simple(int *complex, int nr)
  */
 
 static int redirtab[TRINANG - OUTANG + 1] = {
-    WRITE,
-    WRITENOW,
-    APP,
-    APPNOW,
-    READ,
-    READWRITE,
-    HEREDOC,
-    HEREDOCDASH,
-    MERGEIN,
-    MERGEOUT,
-    ERRWRITE,
-    ERRWRITENOW,
-    ERRAPP,
-    ERRAPPNOW,
-    HERESTR,
+    REDIR_WRITE,
+    REDIR_WRITENOW,
+    REDIR_APP,
+    REDIR_APPNOW,
+    REDIR_READ,
+    REDIR_READWRITE,
+    REDIR_HEREDOC,
+    REDIR_HEREDOCDASH,
+    REDIR_MERGEIN,
+    REDIR_MERGEOUT,
+    REDIR_ERRWRITE,
+    REDIR_ERRWRITENOW,
+    REDIR_ERRAPP,
+    REDIR_ERRAPPNOW,
+    REDIR_HERESTR,
 };
 
 /**/
@@ -1590,8 +1627,8 @@ par_redir(int *rp)
     name = tokstr;
 
     switch (type) {
-    case HEREDOC:
-    case HEREDOCDASH: {
+    case REDIR_HEREDOC:
+    case REDIR_HEREDOCDASH: {
 	/* <<[-] name */
 	struct heredocs **hd;
 
@@ -1612,25 +1649,28 @@ par_redir(int *rp)
 	yylex();
 	return;
     }
-    case WRITE:
-    case WRITENOW:
+    case REDIR_WRITE:
+    case REDIR_WRITENOW:
 	if (tokstr[0] == Outang && tokstr[1] == Inpar)
 	    /* > >(...) */
-	    type = OUTPIPE;
+	    type = REDIR_OUTPIPE;
 	else if (tokstr[0] == Inang && tokstr[1] == Inpar)
 	    YYERRORV(ecused);
 	break;
-    case READ:
+    case REDIR_READ:
 	if (tokstr[0] == Inang && tokstr[1] == Inpar)
 	    /* < <(...) */
-	    type = INPIPE;
+	    type = REDIR_INPIPE;
 	else if (tokstr[0] == Outang && tokstr[1] == Inpar)
 	    YYERRORV(ecused);
 	break;
-    case READWRITE:
+    case REDIR_READWRITE:
 	if ((tokstr[0] == Inang || tokstr[0] == Outang) && tokstr[1] == Inpar)
-	    type = tokstr[0] == Inang ? INPIPE : OUTPIPE;
+	    type = tokstr[0] == Inang ? REDIR_INPIPE : REDIR_OUTPIPE;
 	break;
+    case REDIR_HERESTR:
+        remnulargs(name = dupstring(name));
+        break;
     }
     yylex();
 
@@ -1990,7 +2030,7 @@ dupeprog(Eprog p, int heap)
 	return p;
 
     r = (heap ? (Eprog) zhalloc(sizeof(*r)) : (Eprog) zalloc(sizeof(*r)));
-    r->alloc = EA_REAL;
+    r->flags = (heap ? EF_HEAP : EF_REAL) | (p->flags & EF_RUN);
     r->dump = NULL;
     r->len = p->len;
     r->npats = p->npats;
@@ -2196,6 +2236,12 @@ init_eprog(void)
  * file should be mapped or read and if this header is the `other' one),
  * the version string in a field of 40 characters and the descriptions
  * for the functions in the dump file.
+ *
+ * NOTES:
+ *  - This layout has to be kept; everything after it may be changed.
+ *  - When incompatible changes are made, the FD_MAGIC and FD_OMAGIC
+ *    numbers have to be changed.
+ *
  * Each description consists of a struct fdhead followed by the name,
  * aligned to sizeof(wordcode) (i.e. 4 bytes).
  */
@@ -2280,13 +2326,18 @@ dump_find_func(Wordcode h, char *name)
 int
 bin_zcompile(char *nam, char **args, char *ops, int func)
 {
-    int map, flags;
+    int map, flags, ret;
     char *dump;
 
-    if (ops['k'] && ops['z']) {
+    if ((ops['k'] && ops['z']) || (ops['R'] && ops['M']) ||
+	(ops['c'] && (ops['U'] || ops['k'] || ops['z'])) ||
+	(!(ops['c'] || ops['a']) && ops['m'])) {
 	zwarnnam(nam, "illegal combination of options", NULL, 0);
 	return 1;
     }
+    if ((ops['c'] || ops['a']) && isset(KSHAUTOLOAD))
+	zwarnnam(nam, "functions will use zsh style autoloading", NULL, 0);
+
     flags = (ops['k'] ? FDHF_KSHLOAD :
 	     (ops['z'] ? FDHF_ZSHLOAD : 0));
 
@@ -2297,11 +2348,10 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "too few arguments", NULL, 0);
 	    return 1;
 	}
-	if (!(f = load_dump_header(*args)) &&
-	    !(f = load_dump_header(dyncat(*args, FD_EXT)))) {
-	    zwarnnam(nam, "invalid dump file: %s", *args, 0);
-	    return 1;
-	}
+	if (!(f = load_dump_header(nam, (strsfx(FD_EXT, *args) ? *args :
+					 dyncat(*args, FD_EXT)), 1)))
+		return 1;
+
 	if (args[1]) {
 	    for (args++; *args; args++)
 		if (!dump_find_func(f, *args))
@@ -2310,7 +2360,7 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	} else {
 	    FDHead h, e = (FDHead) (f + fdheaderlen(f));
 
-	    printf("function dump file (%s) for zsh-%s\n",
+	    printf("zwc file (%s) for zsh-%s\n",
 		   ((fdflags(f) & FDF_MAP) ? "mapped" : "read"), fdversion(f));
 	    for (h = firstfdhead(f); h < e; h = nextfdhead(h))
 		printf("%s\n", fdname(h));
@@ -2321,19 +2371,24 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	zwarnnam(nam, "too few arguments", NULL, 0);
 	return 1;
     }
-    if ((ops['c'] && ops['U']) || (!ops['c'] && ops['M'])) {
-	zwarnnam(nam, "illegal combination of options", NULL, 0);
-	return 1;
+    map = (ops['M'] ? 2 : (ops['R'] ? 0 : 1));
+
+    if (!args[1] && !(ops['c'] || ops['a'])) {
+	queue_signals();
+	ret = build_dump(nam, dyncat(*args, FD_EXT), args, ops['U'], map, flags);
+	unqueue_signals();
+	return ret;
     }
-    map = (ops['m'] ? 2 : (ops['r'] ? 0 : 1));
-
-    if (!args[1] && !ops['c'])
-	return build_dump(nam, dyncat(*args, FD_EXT), args, ops['U'], map, flags);
-
     dump = (strsfx(FD_EXT, *args) ? *args : dyncat(*args, FD_EXT));
 
-    return (ops['c'] ? build_cur_dump(nam, dump, args + 1, ops['M'], map, flags) :
-	    build_dump(nam, dump, args + 1, ops['U'], map, flags));
+    queue_signals();
+    ret = ((ops['c'] || ops['a']) ?
+	   build_cur_dump(nam, dump, args + 1, ops['m'], map,
+			  (ops['c'] ? 1 : 0) | (ops['a'] ? 2 : 0)) :
+	   build_dump(nam, dump, args + 1, ops['U'], map, flags));
+    unqueue_signals();
+
+    return ret;
 }
 
 /* Load the header of a dump file. Returns NULL if the file isn't a
@@ -2341,18 +2396,29 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 
 /**/
 static Wordcode
-load_dump_header(char *name)
+load_dump_header(char *nam, char *name, int err)
 {
-    int fd;
+    int fd, v = 0;
     wordcode buf[FD_PRELEN + 1];
 
-    if ((fd = open(name, O_RDONLY)) < 0)
+    if ((fd = open(name, O_RDONLY)) < 0) {
+	if (err)
+	    zwarnnam(nam, "can't open zwc file: %s", name, 0);
 	return NULL;
-
+    }
     if (read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
 	((FD_PRELEN + 1) * sizeof(wordcode)) ||
-	(fdmagic(buf) != FD_MAGIC && fdmagic(buf) != FD_OMAGIC) ||
-	strcmp(ZSH_VERSION, fdversion(buf))) {
+	(v = (fdmagic(buf) != FD_MAGIC && fdmagic(buf) != FD_OMAGIC))) {
+	if (err) {
+	    if (v) {
+		char msg[80];
+
+		sprintf(msg, "zwc file has wrong version (zsh-%s): %%s",
+			fdversion(buf));
+		zwarnnam(nam, msg , name, 0);
+	    } else
+		zwarnnam(nam, "invalid zwc file: %s" , name, 0);
+	}
 	close(fd);
 	return NULL;
     } else {
@@ -2369,6 +2435,7 @@ load_dump_header(char *name)
 	    if (lseek(fd, o, 0) == -1 ||
 		read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
 		((FD_PRELEN + 1) * sizeof(wordcode))) {
+		zwarnnam(nam, "invalid zwc file: %s" , name, 0);
 		close(fd);
 		return NULL;
 	    }
@@ -2381,6 +2448,7 @@ load_dump_header(char *name)
 		 len - ((FD_PRELEN + 1) * sizeof(wordcode))) !=
 	    len - ((FD_PRELEN + 1) * sizeof(wordcode))) {
 	    close(fd);
+	    zwarnnam(nam, "invalid zwc file: %s" , name, 0);
 	    return NULL;
 	}
 	close(fd);
@@ -2480,7 +2548,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	dump = dyncat(dump, FD_EXT);
 
     if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
-	zwarnnam(nam, "can't write dump file: %s", dump, 0);
+	zwarnnam(nam, "can't write zwc file: %s", dump, 0);
 	return 1;
     }
     progs = newlinklist();
@@ -2533,7 +2601,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	wcf = (WCFunc) zhalloc(sizeof(*wcf));
 	wcf->name = *files;
 	wcf->prog = prog;
-	wcf->flags = flags;
+	wcf->flags = ((prog->flags & EF_RUN) ? FDHF_KSHLOAD : flags);
 	addlinknode(progs, wcf);
 
 	flen = (strlen(*files) + sizeof(wordcode)) / sizeof(wordcode);
@@ -2554,8 +2622,8 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 }
 
 static int
-cur_add_func(Shfunc shf, LinkList names, LinkList progs,
-	     int *hlen, int *tlen, int flags)
+cur_add_func(char *nam, Shfunc shf, LinkList names, LinkList progs,
+	     int *hlen, int *tlen, int what)
 {
     Eprog prog;
     WCFunc wcf;
@@ -2563,22 +2631,30 @@ cur_add_func(Shfunc shf, LinkList names, LinkList progs,
     if (shf->flags & PM_UNDEFINED) {
 	int ona = noaliases;
 
+	if (!(what & 2)) {
+	    zwarnnam(nam, "function is not loaded: %s", shf->nam, 0);
+	    return 1;
+	}
 	noaliases = (shf->flags & PM_UNALIASED);
 	if (!(prog = getfpfunc(shf->nam, NULL)) || prog == &dummy_eprog) {
 	    noaliases = ona;
-
+	    zwarnnam(nam, "can't load function: %s", shf->nam, 0);
 	    return 1;
 	}
 	if (prog->dump)
 	    prog = dupeprog(prog, 1);
 	noaliases = ona;
-    } else
+    } else {
+	if (!(what & 1)) {
+	    zwarnnam(nam, "function is already loaded: %s", shf->nam, 0);
+	    return 1;
+	}
 	prog = dupeprog(shf->funcdef, 1);
-
+    }
     wcf = (WCFunc) zhalloc(sizeof(*wcf));
     wcf->name = shf->nam;
     wcf->prog = prog;
-    wcf->flags = flags;
+    wcf->flags = ((prog->flags & EF_RUN) ? FDHF_KSHLOAD : FDHF_ZSHLOAD);
     addlinknode(progs, wcf);
     addlinknode(names, shf->nam);
 
@@ -2592,7 +2668,8 @@ cur_add_func(Shfunc shf, LinkList names, LinkList progs,
 
 /**/
 static int
-build_cur_dump(char *nam, char *dump, char **names, int match, int map, int flags)
+build_cur_dump(char *nam, char *dump, char **names, int match, int map,
+	       int what)
 {
     int dfd, hlen, tlen;
     LinkList progs, lnames;
@@ -2602,7 +2679,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map, int flag
 	dump = dyncat(dump, FD_EXT);
 
     if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
-	zwarnnam(nam, "can't write dump file: %s", dump, 0);
+	zwarnnam(nam, "can't write zwc file: %s", dump, 0);
 	return 1;
     }
     progs = newlinklist();
@@ -2617,9 +2694,8 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map, int flag
 
 	for (i = 0; i < shfunctab->hsize; i++)
 	    for (hn = shfunctab->nodes[i]; hn; hn = hn->next)
-		if (cur_add_func((Shfunc) hn, lnames, progs,
-				 &hlen, &tlen, flags)) {
-		    zwarnnam(nam, "can't load function: %s", shf->nam, 0);
+		if (cur_add_func(nam, (Shfunc) hn, lnames, progs,
+				 &hlen, &tlen, what)) {
 		    errflag = 0;
 		    close(dfd);
 		    unlink(dump);
@@ -2632,13 +2708,6 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map, int flag
 	HashNode hn;
 
 	for (; *names; names++) {
-	    if (!strcmp(*names, "-k")) {
-		flags = (flags & ~(FDHF_KSHLOAD | FDHF_ZSHLOAD)) | FDHF_KSHLOAD;
-		continue;
-	    } else if (!strcmp(*names, "-z")) {
-		flags = (flags & ~(FDHF_KSHLOAD | FDHF_ZSHLOAD)) | FDHF_ZSHLOAD;
-		continue;
-	    }
 	    tokenize(pat = dupstring(*names));
 	    if (!(pprog = patcompile(pat, PAT_STATIC, NULL))) {
 		zwarnnam(nam, "bad pattern: %s", *names, 0);
@@ -2650,9 +2719,8 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map, int flag
 		for (hn = shfunctab->nodes[i]; hn; hn = hn->next)
 		    if (!listcontains(lnames, hn->nam) &&
 			pattry(pprog, hn->nam) &&
-			cur_add_func((Shfunc) hn, lnames, progs,
-				     &hlen, &tlen, flags)) {
-			zwarnnam(nam, "can't load function: %s", shf->nam, 0);
+			cur_add_func(nam, (Shfunc) hn, lnames, progs,
+				     &hlen, &tlen, what)) {
 			errflag = 0;
 			close(dfd);
 			unlink(dump);
@@ -2661,13 +2729,6 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map, int flag
 	}
     } else {
 	for (; *names; names++) {
-	    if (!strcmp(*names, "-k")) {
-		flags = (flags & ~(FDHF_KSHLOAD | FDHF_ZSHLOAD)) | FDHF_KSHLOAD;
-		continue;
-	    } else if (!strcmp(*names, "-z")) {
-		flags = (flags & ~(FDHF_KSHLOAD | FDHF_ZSHLOAD)) | FDHF_ZSHLOAD;
-		continue;
-	    }
 	    if (errflag ||
 		!(shf = (Shfunc) shfunctab->getnode(shfunctab, *names))) {
 		zwarnnam(nam, "unknown function: %s", *names, 0);
@@ -2676,8 +2737,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map, int flag
 		unlink(dump);
 		return 1;
 	    }
-	    if (cur_add_func(shf, lnames, progs, &hlen, &tlen, flags)) {
-		zwarnnam(nam, "can't load function: %s", shf->nam, 0);
+	    if (cur_add_func(nam, shf, lnames, progs, &hlen, &tlen, what)) {
 		errflag = 0;
 		close(dfd);
 		unlink(dump);
@@ -2721,11 +2781,11 @@ static FuncDump dumps;
 /* Load a dump file (i.e. map it). */
 
 static void
-load_dump_file(char *dump, int other, int len)
+load_dump_file(char *dump, struct stat *sbuf, int other, int len)
 {
     FuncDump d;
     Wordcode addr;
-    int fd, off;
+    int fd, off, mlen;
 
     if (other) {
 	static size_t pgsz = 0;
@@ -2745,15 +2805,17 @@ load_dump_file(char *dump, int other, int len)
 	    pgsz--;
 	}
 	off = len & ~pgsz;
-    } else
+        mlen = len + (len - off);
+    } else {
 	off = 0;
-
+        mlen = len;
+    }
     if ((fd = open(dump, O_RDONLY)) < 0)
 	return;
 
     fd = movefd(fd);
 
-    if ((addr = (Wordcode) mmap(NULL, len, PROT_READ, MAP_SHARED, fd, off)) ==
+    if ((addr = (Wordcode) mmap(NULL, mlen, PROT_READ, MAP_SHARED, fd, off)) ==
 	((Wordcode) -1)) {
 	close(fd);
 	return;
@@ -2761,7 +2823,8 @@ load_dump_file(char *dump, int other, int len)
     d = (FuncDump) zalloc(sizeof(*d));
     d->next = dumps;
     dumps = d;
-    d->name = ztrdup(dump);
+    d->dev = sbuf->st_dev;
+    d->ino = sbuf->st_ino;
     d->fd = fd;
     d->map = addr + (other ? (len - off) / sizeof(wordcode) : 0);
     d->addr = addr;
@@ -2785,9 +2848,12 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
     int rd, rc, rn;
     char *dig, *wc;
 
-    if (strsfx(FD_EXT, path))
-	return check_dump_file(path, name, ksh);
-
+    if (strsfx(FD_EXT, path)) {
+	queue_signals();
+	prog = check_dump_file(path, NULL, name, ksh);
+	unqueue_signals();
+	return prog;
+    }
     dig = dyncat(path, FD_EXT);
     wc = dyncat(file, FD_EXT);
 
@@ -2799,20 +2865,24 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
      * both the uncompiled function file and its compiled version (or they
      * don't exist) and the digest file contains the definition for the
      * function. */
+    queue_signals();
     if (!rd &&
 	(rc || std.st_mtime > stc.st_mtime) &&
 	(rn || std.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(dig, name, ksh)))
+	(prog = check_dump_file(dig, &std, name, ksh))) {
+	unqueue_signals();
 	return prog;
-
+    }
     /* No digest file. Now look for the per-function compiled file. */
     if (!rc &&
 	(rn || stc.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(wc, name, ksh)))
+	(prog = check_dump_file(wc, &stc, name, ksh))) {
+	unqueue_signals();
 	return prog;
-
+    }
     /* No compiled file for the function. The caller (getfpfunc() will
      * check if the directory contains the uncompiled file for it. */
+    unqueue_signals();
     return NULL;
 }
 
@@ -2832,18 +2902,24 @@ try_source_file(char *file)
     else
 	tail = file;
 
-    if (strsfx(FD_EXT, file))
-	return check_dump_file(file, tail, NULL);
-
+    if (strsfx(FD_EXT, file)) {
+	queue_signals();
+	prog = check_dump_file(file, NULL, tail, NULL);
+	unqueue_signals();
+	return prog;
+    }
     wc = dyncat(file, FD_EXT);
 
     rc = stat(wc, &stc);
     rn = stat(file, &stn);
 
+    queue_signals();
     if (!rc && (rn || stc.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(wc, tail, NULL)))
+	(prog = check_dump_file(wc, &stc, tail, NULL))) {
+	unqueue_signals();
 	return prog;
-
+    }
+    unqueue_signals();
     return NULL;
 }
 
@@ -2852,12 +2928,19 @@ try_source_file(char *file)
 
 /**/
 static Eprog
-check_dump_file(char *file, char *name, int *ksh)
+check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
 {
     int isrec = 0;
     Wordcode d;
     FDHead h;
     FuncDump f;
+    struct stat lsbuf;
+
+    if (!sbuf) {
+	if (stat(file, &lsbuf))
+	    return NULL;
+	sbuf = &lsbuf;
+    }
 
 #ifdef USE_MMAP
 
@@ -2870,7 +2953,7 @@ check_dump_file(char *file, char *name, int *ksh)
 #ifdef USE_MMAP
 
     for (f = dumps; f; f = f->next)
-	if (!strcmp(file, f->name)) {
+	if (f->dev == sbuf->st_dev && f->ino == sbuf->st_ino) {
 	    d = f->map;
 	    break;
 	}
@@ -2881,7 +2964,7 @@ check_dump_file(char *file, char *name, int *ksh)
 
 #endif
 
-    if (!f && (isrec || !(d = load_dump_header(file))))
+    if (!f && (isrec || !(d = load_dump_header(NULL, file, 0))))
 	return NULL;
 
     if ((h = dump_find_func(d, name))) {
@@ -2895,7 +2978,7 @@ check_dump_file(char *file, char *name, int *ksh)
 	    Patprog *pp;
 	    int np;
 
-	    prog->alloc = EA_MAP;
+	    prog->flags = EF_MAP;
 	    prog->len = h->len;
 	    prog->npats = np = h->npats;
 	    prog->pats = pp = (Patprog *) zalloc(np * sizeof(Patprog));
@@ -2915,7 +2998,7 @@ check_dump_file(char *file, char *name, int *ksh)
 
 	    return prog;
 	} else if (fdflags(d) & FDF_MAP) {
-	    load_dump_file(file, (fdflags(d) & FDF_OTHER), fdother(d));
+	    load_dump_file(file, sbuf, (fdflags(d) & FDF_OTHER), fdother(d));
 	    isrec = 1;
 	    goto rec;
 	} else
@@ -2946,7 +3029,7 @@ check_dump_file(char *file, char *name, int *ksh)
 
 	    prog = (Eprog) zalloc(sizeof(*prog));
 
-	    prog->alloc = EA_REAL;
+	    prog->flags = EF_REAL;
 	    prog->len = h->len + po;
 	    prog->npats = np = h->npats;
 	    prog->pats = pp = (Patprog *) d;
@@ -2997,10 +3080,19 @@ decrdumpcount(FuncDump f)
 		dumps = p->next;
 	    munmap((void *) f->addr, f->len);
 	    zclose(f->fd);
-	    zsfree(f->name);
 	    zfree(f, sizeof(*f));
 	}
     }
+}
+
+/**/
+mod_export void
+closedumps(void)
+{
+    FuncDump p;
+
+    for (p = dumps; p; p = p->next)
+	zclose(p->fd);
 }
 
 #else
@@ -3015,11 +3107,17 @@ decrdumpcount(FuncDump f)
 {
 }
 
+/**/
+mod_export void
+closedumps(void)
+{
+}
+
 #endif
 
 /**/
 int
-dump_autoload(char *file, int on, char *ops, int func)
+dump_autoload(char *nam, char *file, int on, char *ops, int func)
 {
     Wordcode h;
     FDHead n, e;
@@ -3029,7 +3127,7 @@ dump_autoload(char *file, int on, char *ops, int func)
     if (!strsfx(FD_EXT, file))
 	file = dyncat(file, FD_EXT);
 
-    if (!(h = load_dump_header(file)))
+    if (!(h = load_dump_header(nam, file, 1)))
 	return 1;
 
     for (n = firstfdhead(h), e = (FDHead) (h + fdheaderlen(h)); n < e;
@@ -3043,3 +3141,4 @@ dump_autoload(char *file, int on, char *ops, int func)
     }
     return ret;
 }
+

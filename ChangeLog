@@ -1,3 +1,7 @@
+2001-07-24  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15470: Src/parse.c: remove nulargs in here strings
+
 2001-07-20  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15433: Src/Zle/computil.c: don't use compsuffix when it might
