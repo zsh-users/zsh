@@ -25,7 +25,7 @@ expandVars() {
 	    (\$*)
 		# avoid parsing second $ in $$
 		tmp=${tmp#\$}
-		continue
+		;&
 	    (*)
 		continue
 		;;
