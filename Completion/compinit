@@ -134,6 +134,7 @@ _comp_options=(
     NO_globsubst
     NO_shwordsplit
     NO_shglob
+    NO_kshglob
     NO_ksharrays
     NO_cshnullglob
     NO_allexport

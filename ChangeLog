@@ -1,3 +1,8 @@
+2001-04-29  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/3837: Completion/compinit: Add `NO_kshglob' to
+	$_comp_options.
+
 2001-04-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14151: Src/params.c, Src/subst.c, Src/system.h: BDIGBUFSIZE is
