@@ -1,3 +1,7 @@
+2003-06-18  Peter Stephenson  <pws@csr.com>
+
+	* unposted: README, Etc/NEWS, Config/version.mk: version 4.0.7.
+
 2003-06-16  Peter Stephenson  <pws@csr.com>
 
 	* 17967, 17985 (Bart Schaefer <schaefer@zsh.org>):

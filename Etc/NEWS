@@ -1,7 +1,165 @@
 -------------------------------------
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
-				     
+
+Changes since 4.0.1
+-------------------
+
+The vast majority of changes since 4.0.1 are bug fixes.
+
+A few additional completion handlers have been added.
+
+As noted in the README file, the way of quoting a `/' in the source text of
+substitutions of the form ${foo/source/rep} and ${foo/source//rep} has
+changed.
+
+New features in zsh version 4.0.1
+---------------------------------
+
+Compared with 3.1.9, there are mostly incremental improvements to
+  - the new completion system --- more functions, completers, styles...
+  - the line editor
+  - handling of signals and traps
+  - the configuration system, particularly for modules
+  - Cygwin support (now essentially complete)
+  - arithmetic evaluation
+  - the zpty (pseudoterminal handling) module
+  - the test suite
+plus various bug fixes and compatibility improvements.
+
+The alias modules (zle.so as an alias for zsh/zle.so, etc.) have been
+removed; use `zmodload -A' to load modules under other names.  This is
+irrelevant if you are upgrading from 3.0.
+
+Compared with the 3.0 series of releases (the last stable set), the most
+significant of a large number of improvements in the shell are:
+  - Dynamically loadable modules with hierarchical naming system
+  - Shell functions as editor functions, with much additional builtin support
+  - Incredibly rich new completion system; just needs a single
+    initialization command to provide completion for all sorts of commands
+    and contexts
+  - Associative arrays
+  - Lots of new features in parameter substitution and globbing; more
+    logical handling of nested parameter substitutions
+  - Rewritten pattern-matching (globbing) code supports approximate
+    and case-insensitive matching and backreferences
+  - Various custom modules for pty's, FTP, special parameters, etc.
+  - Rewrites of many internal parts of the code: execution code to
+    provide compilation to internal representation, pattern matching
+  - Floating point arithmetic and mathematical functions module
+  - A test suite
+  - Various new options for compatibility with this, that and the other
+See the 3.1.x changes below for more detail.
+
+New features in zsh version 3.1.8 and 3.1.9
+-------------------------------------------
+These are primarily bug-fix versions.  There are only a few user-visible
+changes.
+ - Array slices ${array[a,b]} with b < a now correctly have zero length.
+
+New features in zsh version 3.1.7
+---------------------------------
+Further enhancements to new completion system:
+ - Comprehensive context-sensitive configuration via `styles', which
+   can be set by the menu-driven front end in compinstall
+ - General mechanism for setting patterns to be ignored in a completion;
+   overriding  of patterns to be matched for functions
+ - New completers: _prefix to complete word before cursor, _ignored
+   to complete using words so far ignored (like $fignore but more
+   powerful), _history to complete words from shell history
+ - Multiple use of completers with different options, similarly splitting
+   of different types of completion (`tags') so they are considered with
+   different styles
+ - Many more supplied completions for standard commands which work out of
+   the box, and better handling of command line options/arguments which
+   behave in the usual way   
+ - $fpath now set up to use installed functions by default; functions
+   can be loaded just by `autoload -U compinit; compinit'
+ - Much improved handling of nested quoting and nested braces
+ - New LIST_PACKED and LIST_ROWS_FIRST completion options and corresponding
+   styles
+ - compctl library separated out (frozen but still supported)
+ - User-friendly introduction available at zsh website
+   http://sunsite.auc.dk/zsh/
+
+Additions to complist listing library (coloured completion and menu
+selection):
+ - Listings can be shown page by page (are by default for new completion)
+ - Menu selection allows full up and down scrolling of long lists
+
+Other editing features:
+ - new parameters $PENDING, $MARK, $BUFFERLINES
+ - Easy display of a prompt from within an editing widget
+
+Code parsing, storing and execution:
+ - Completely new system of storing code internally, greatly optimised
+ - Much less memory for shell functions etc.
+ - Can compile shell functions to .zwc `wordcode' functions for fast
+   loading
+ - Can create `digest' files of entire directories in .zwc format
+
+Parameters:
+ - Floating point support added, similar to ksh93, `typeset -F' and
+   `typeset -E' declare floating point variables; usual C/Fortran-like
+   rules for integer/float conversion
+ - Mathematical library zsh/mathfunc contains all the standard mathematical
+   functions for use in arithmetical expressions
+ - Improved parsing of arithmetical expressions and better error messages
+ - Special parameters can be made local
+ - `typeset -h' hides specialness of parameters, either as parameter
+   attribute or when declaring new local variable
+ - Local parameters can now be exported as in other shells; new option
+   GLOBAL_EXPORTS on by default provides old behaviour that `typeset -x'
+   referred to global parameters.
+ - zsh/parameter module enhanced: now needed for new completion; parameters
+   provided have `-h' flag set so that they are hidden by `typeset', so
+   that existing functions don't need to be changed
+ - Quotes can be stripped from parameter values with ${(Q)...}, providing
+   reverse of ${(q...)...} facility
+
+Globbing and pattern matching:
+ - Pattern matching rewritten for efficiency
+ - Supports `backreferences', i.e. extracting parenthesised chunks of
+   matches, e.g.
+     [[ $foo = (#b)(*/)[^/]* ]]
+   stores the part of $foo up to the last / in $match[1] and the indexes of
+   the match in $mbegin[1], $mend[1].  (#m) is also available to set $MATCH
+   to the entire match and corresponding $MBEGIN, $MEND:  useful in
+   parameter substitutions like ${.../.../...}.
+ - (#s) and (#e) match start and end of pattern like ^ and $ in regular
+   expression, useful in complex expressions such as ((#s)|/)dirname((#e)|/)
+   and in parameter expressions.
+
+ - Depth-first/last listing of recursive glob lists
+
+Functions etc.:
+ - `autoload -X' inside a function body instructs the shell to
+   bootstrap the function at that point
+ - `autoload +X fn' says load the function fn but don't execute it
+ - Prompt `themes' make customization of prompts easier
+
+Modules:
+ - New hierarchical naming scheme for modules; supplied modules go into
+   zsh subdirectory, so zle becomes zsh/zle etc.; aliases supplied for
+   compatibility for existing code, but the new format should be used in
+   future.
+ - zmodload is more consistent between dynamically and statically linked
+   shells
+ - zsh/zftp and its function suite support multiple sessions (zfsession
+   command); zftransfer allows transfer of files between two ftp sessions
+   with no local file; use styles for e.g. progress style; IPv6 supported;
+   recursive put `zfput -r' for uploads
+ - zsh/zpty module creates pseudoterminal and allows builtin `expect'-like
+   behaviour
+
+Other:
+ - Test suite, not yet complete (`make test')
+ - use of Linux task limits
+ - Many fixes including output redirection with `setopt xtrace' and
+   other redirection fixes; NIS+ problem.
+ - Better null-command behaviour in sh and csh emulation
+ - Internal memory usage optimisations
+
 New features in zsh version 3.1.6 (beta version)
 ------------------------------------------------
 Note also the changes for 3.0.6, which include changes between 3.1.5. and
@@ -183,7 +341,7 @@ New features in zsh version 3.0
 -------------------------------
 
 Trailing "/" in a glob pattern now works like in other shell thus it
-can no longer be used as a sorthand for "(/)".
+can no longer be used as a shorthand for "(/)".
 
 Much improved sh/ksh emulation.  When zsh is invoked as sh it mostly
 conforms to POSIX 1003.2.
