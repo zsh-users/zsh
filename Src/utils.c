@@ -2058,6 +2058,8 @@ sepjoin(char **s, char *sep, int heap)
 	if (ifs) {
 	    *p++ = *ifs;
 	    *p++ = *ifs == Meta ? ifs[1] ^ 32 : '\0';
+	} else {
+	    *p++ = ' ';
 	}
 	*p = '\0';
     }
