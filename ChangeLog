@@ -1,5 +1,7 @@
 2000-04-06  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* Makefile.in: avoid distcleaning Test twice (10543)
+
 	* Completion/Core/_files, Doc/Zsh/compsys.yo: tag in file-patterns
  	optional, use `files' as default (10542)
 

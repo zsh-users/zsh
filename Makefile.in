@@ -105,7 +105,6 @@ check test:
 distclean-here:
 	@cd Completion && $(MAKE) $(MAKEDEFS) $@
 	@cd Functions && $(MAKE) $(MAKEDEFS) $@
-	@cd Test && $(MAKE) $(MAKEDEFS) $@
 	rm -f Makefile config.h config.status config.log config.cache stamp-h Config/defs.mk
 
 realclean-here:
