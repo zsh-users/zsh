@@ -1,3 +1,9 @@
+2003-04-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* unposted, c.f. 2003-04-14: Doc/Zsh/compsys.yo: finish
+	rewrite (from _description onwards).  Suspicious-looking
+	_regex_arguments entry.
+
 2003-04-24  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Type/_perl_basepods: use _message
