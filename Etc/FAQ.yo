@@ -49,7 +49,7 @@ description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
 mydit(Last-Modified:) 1999/07/30
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.10 1999/09/22 12:36:12 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.11 1999/10/17 04:53:07 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
 )
@@ -275,8 +275,7 @@ sect(On what machines will it run?)
   appreciated if you could add any necessary preprocessor code and
   alter configure.in and acconfig.h to configure zsh automatically,
   then send the required context diffs to the list (see question
-  link(5.2)(52)).  Changes based on version 2.5 are very unlikely to
-  be useful.
+  link(5.2)(52)).  Please make sure you have the latest version first.
 
   To get it to work, retrieve the source distribution (see question
   link(1.6)(16)), un-gzip it, un-tar it and read the INSTALL file in the top
@@ -638,7 +637,7 @@ link(2.3)(23).
     it() Traps and signals:
   itemize(
     it()* Traps are not local to functions.  The option LOCAL_TRAPS is
-          be available from 3.1.6.
+          available from 3.1.6.
     it()  TRAPERR has become TRAPZERR (this was forced by UNICOS which
         has SIGERR).
   )
@@ -787,7 +786,7 @@ label(23)
      \!:1-4        $*[1,4]
      \!:1-         $*[1,$#-1]      (or $*[1,-2])
      \!^-          $*[1,$#-1]
-     \!*:q         "$@"            ($*:q doesn't work (yet))
+     \!*:q         "$@"
      \!*:x         $=*             ($*:x doesn't work (yet))
         )
 
@@ -1319,9 +1318,9 @@ sect(How does base arithmetic work?)
   )
   or even
   verb(
-    foo=$[16#ff]
+    foo=$((16#ff))
   )
-  (note that `foo=$((16#ff))' is now supported).  The original syntax was
+  The original syntax was
   verb(
     (( foo = [16]ff ))
   )
@@ -1607,6 +1606,16 @@ powerful, and also potentially confusing, features of zsh; here I give
 a short introduction.  There is a set of example completions supplied
 with the source in Misc/compctl-examples; completion definitions for
 many of the most obvious commands can be found there.
+
+If this confuses you, you may like to know that there is a new, more
+elegant completion system which appeared in version 3.1.6.  This is based
+on functions called automatically for completion in particular contexts
+(for example, there is a function called tt(_cd) to handle completion for
+the tt(cd) command) and is installed automatically with the shell, so all
+you need to do, in principal, is to arrange for this to be loaded.  Putting
+`tt(autoload -U compinit; compinit)' in your tt(.zshrc) should be enough if
+the system is installed properly.  The rest of this section talks about the
+old completion system.
 
 sect(What is completion?)
 
@@ -1965,7 +1974,8 @@ this applies
      mytt(\M-p) use tt(history-beginning-search-{forward,backward}) which
      search for a line with the same prefix up to the cursor position.
      From 3.1.6, there is a different implementation which makes this
-     closer (though not identical) to the old behaviour. The story for the
+     closer (though not identical) to the old behaviour, and the
+     traditional bindings have been restored.. The story for the 
      tt({up,down}-line-or-search) commands is similar.
   it() In vi insert mode, the cursor keys no longer work.  The following
      will bind them:

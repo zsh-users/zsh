@@ -14,7 +14,14 @@ if [[ -n $_comp_correct ]]; then
   approx="(#a${_comp_correct})"
 fi
 
-(( $#manpath )) || manpath=( ${(s.:.)$(manpath 2>/dev/null)} ) ||
+if (( ! $#manpath )); then
+  local mp
+  mp=($(manpath 2>/dev/null))
+  [[ "$mp" == *:* ]] && mp=( ${(s.:.)mp} )
+  manpath=( $mp )
+fi
+
+(( $#manpath )) ||
   manpath=( /usr/man(-/N) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/N) )
 
 # `sman' is the SGML manual directory for Solaris 7.

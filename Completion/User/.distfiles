@@ -1,11 +1,12 @@
 DISTFILES_SRC='
     .distfiles
-    _a2ps _bison _bunzip2 _bzip2 _chown _compress _configure _cvs _dd
-    _dir_list _dirs _dvi _find _flex _gcc _gdb _gprof _groups _gs _gunzip
-    _gv _gzip _hosts _ispell _lynx _mailboxes _make _man _mh _mount _mutt
-    _my_accounts _nslookup _other_accounts _patch _pbm _pdf _perl_basepods
-    _perl_builtin_funcs _perl_modules _perldoc _ports _ps _pspdf _rcs
-    _rlogin _sh _socket _ssh _strip _stty _su _tar _tar_archive _telnet
-    _tex _tiff _uncompress _urls _use_lo _users _users_on _webbrowser _wget
-    _xargs _yodl _yp
+    _a2ps _archie _bison _bunzip2 _bzip2 _chown _compress _configure _cvs
+    _dd _dir_list _dirs _dvi _find _flex _gcc _gdb _gprof _groups _gs
+    _gunzip _gv _gzip _hosts _ispell _killall _lynx _mailboxes _make _man
+    _mh _mount _mutt _my_accounts _netscape _nslookup _other_accounts
+    _pack _patch _pbm _pdf _perl_basepods _perl_builtin_funcs
+    _perl_modules _perldoc _ports _prompt _ps _pspdf _rcs _rlogin _sh
+    _socket _ssh _strip _stty _su _tar _tar_archive _telnet _tex _tiff
+    _uncompress _unpack _urls _use_lo _user_at_host _users _users_on
+    _webbrowser _wget _whereis _whois _xargs _yodl _yp
 '

@@ -186,7 +186,6 @@ static struct optname optns[] = {
 {NULL, "shinstdin",	      OPT_SPECIAL,		 SHINSTDIN},
 {NULL, "shoptionletters",     OPT_EMULATE|OPT_BOURNE,	 SHOPTIONLETTERS},
 {NULL, "shortloops",	      OPT_EMULATE|OPT_NONBOURNE, SHORTLOOPS},
-{NULL, "shjobcontrol",	      OPT_EMULATE|OPT_NONZSH,	 SHJOBCONTROL},
 {NULL, "shwordsplit",	      OPT_EMULATE|OPT_BOURNE,	 SHWORDSPLIT},
 {NULL, "singlecommand",	      OPT_SPECIAL,		 SINGLECOMMAND},
 {NULL, "singlelinezle",	      OPT_KSH,			 SINGLELINEZLE},

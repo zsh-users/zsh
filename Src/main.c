@@ -87,7 +87,8 @@ main(int argc, char **argv)
     for (;;) {
 	do
 	    loop(1,0);
-	while (tok != ENDINPUT && (tok != LEXERR || isset(SHINSTDIN)));
+	while (tok != ENDINPUT &&
+	       (tok != LEXERR || noerrexit || isset(SHINSTDIN)));
 	if (tok == LEXERR) {
 	    stopmsg = 1;
 	    zexit(lastval, 0);

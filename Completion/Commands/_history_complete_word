@@ -1,107 +1,31 @@
-#compdef -K _history-complete-older complete-word \e/ _history-complete-newer complete-word \e,
-#
-# Complete words from the history
-#
-# by Adam Spiers, with help gratefully received from
-# Sven Wischnowsky and Bart Schaefer
-#
-# Available configuration keys:
-#
-#   history_list -- display lists of available matches
-#   history_stop -- prevent looping at beginning and end of matches
-#                   during menu-completion
-#   history_sort -- sort matches lexically (default is to sort by age)
-#   history_remove_all_dups --
-#                   remove /all/ duplicate matches rather than just
-#                   consecutives
-#
+#compdef -k complete-word \e/
 
-_history_complete_word () {
-  local expl direction
+local expl
 
-  if [[ $WIDGET = *newer ]]; then
-    direction=older
+if [[ -n "$compstate[old_list]" && -n "$compconfig[history_stop]" ]]; then
+  if [[ -z "$_hist_menu_end" &&
+        compstate[old_insert] -lt _hist_menu_length ]]; then
+    compstate[old_list]=keep
+    compstate[insert]=$((compstate[old_insert]+1))
   else
-    direction=newer
-  fi
-
-  [[ -z "$compconfig[history_list]" ]] && compstate[list]=''
-
-  if [[ -n "$compstate[old_list]" &&
-    ( -n "$compconfig[history_stop]" || "$compstate[insert]" = menu ) ]]; then
-    # array of matches is newest -> oldest (reverse of history order)
-    if [[ "$direction" == 'older' ]]; then
-      if [[ compstate[old_insert] -eq $_hist_menu_length ||
-            "$_hist_stop" == 'oldest' ]]; then
-        _hist_stop='oldest'
-        [[ "$compconfig[history_stop]" = verbose ]] &&
-          _message 'beginning of history reached'
-      elif [[ "$_hist_stop" == 'newest' ]]; then
-        zle -Rc
-        _history_complete_word_gen_matches
-      else
-        compstate[old_list]=keep
-        (( compstate[insert] = compstate[old_insert] + 1 ))
-      fi
-    elif [[ "$direction" == 'newer' ]]; then
-      if [[ compstate[old_insert] -eq 1 || "$_hist_stop" == 'newest' ]]; then
-        _hist_stop='newest'
-        [[ "$compconfig[history_stop]" = verbose ]] &&
-          _message 'end of history reached'
-      elif [[ "$_hist_stop" == 'oldest' ]]; then
-        zle -Rc
-        _history_complete_word_gen_matches
-      else
-        compstate[old_list]=keep
-        (( compstate[insert] = compstate[old_insert] - 1 ))
-      fi
-    fi
-  else
-    _hist_stop=''
-    _hist_old_prefix="$PREFIX"
-    _history_complete_word_gen_matches
-  fi
-
-  [[ -n "$compstate[nmatches]" ]]
-}
-
-_history_complete_word_gen_matches () {
-  if [[ -n "$compconfig[history_list]" ]]; then
-    if [[ -n "$compconfig[history_sort]" ]]; then
-      _description expl 'history word'
+    _hist_menu_end=yes
+    if [[ "$compconfig[history_stop]" = verbose ]]; then
+      _message 'end of history reached'
     else
-      _description -V expl 'history word'
-    fi
-  else
-    if [[ -n "$compconfig[history_sort]" ]]; then
-      expl=()
-    else
-      expl=('-V' '')
+      compstate[old_list]=keep
+      compstate[insert]=_hist_menu_length
     fi
   fi
-
-  [[ -n "$_hist_stop" ]] && PREFIX="$_hist_old_prefix"
-
-  local rem_dups
-  if [[ -n "$compconfig[history_remove_all_dups]" ]]; then
-    rem_dups=''
+else
+  if [[ -n "$compconfig[history_sort]" ]]; then
+    _description expl 'history word'
   else
-    rem_dups='-1'
+    _description -V expl 'history word'
   fi
-
-  compgen "$expl[@]" $rem_dups -Q -H 0 ''
-  _hist_menu_length="$compstate[nmatches]"
-
-  case "$direction" in 
-    newer)  compstate[insert]=$_hist_menu_length
-	    [[ -n "$_hist_stop" ]] && (( compstate[insert]-- ))
-            ;;
-    older)  compstate[insert]=1
-	    [[ -n "$_hist_stop" ]] && (( compstate[insert]++ ))
-            ;;
-  esac
-
-  [[ -n "$_hist_stop" ]] && _hist_stop=''
-}
-
-_history_complete_word "$@"
+  compgen "$expl[@]" -Q -H 0 ''
+  if [[ -n "$compconfig[history_stop]" ]]; then
+    compstate[insert]=1
+    _hist_menu_length="$compstate[nmatches]"
+    _hist_menu_end=''
+  fi
+fi

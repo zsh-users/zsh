@@ -2,6 +2,6 @@ DISTFILES_SRC='
     .distfiles
     _x_arguments _x_borderwidth _x_color _x_cursor _x_display _x_extension
     _x_font _x_geometry _x_keysym _x_locale _x_modifier _x_name _x_resource
-    _x_selection_timeout _x_title _x_window _xdvi _xfig _xmodmap
+    _x_selection_timeout _x_title _x_window _xdvi _xfig _xmodmap _xrdb
     _xt_arguments _xt_session_id _xterm _xutils _xv
 '

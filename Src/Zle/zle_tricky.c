@@ -811,7 +811,7 @@ check_param(char *s, int set, int test)
 		*b != '=' && *b != Equals &&
 		*b != '~' && *b != Tilde)
 		break;
-	if (*b == '#' || *b == Pound || *b == '+')
+	if (*b == '#' || *b == Pound || *b == '+' || *b == ' ')
 	    b++;
 
 	e = b;
@@ -6927,14 +6927,20 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     if (cc->mask & (CC_JOBS | CC_RUNNING | CC_STOPPED)) {
 	/* Get job names. */
 	int i;
-	char *j;
+	char *j, *jj;
 
 	for (i = 0; i < MAXJOB; i++)
 	    if ((jobtab[i].stat & STAT_INUSE) &&
 		jobtab[i].procs && jobtab[i].procs->text) {
 		int stopped = jobtab[i].stat & STAT_STOPPED;
 
-		j = dupstring(jobtab[i].procs->text);
+		j = jj = dupstring(jobtab[i].procs->text);
+		/* Find the first word. */
+		for (; *jj; jj++)
+		    if (*jj == ' ') {
+			*jj = '\0';
+			break;
+		    }
 		if ((cc->mask & CC_JOBS) ||
 		    (stopped && (cc->mask & CC_STOPPED)) ||
 		    (!stopped && (cc->mask & CC_RUNNING)))

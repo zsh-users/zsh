@@ -78,7 +78,7 @@ MF_TAN,
 MF_TANH,
 MF_Y0,
 MF_Y1,
-MF_YN
+MF_YN,
 };
 
 /*

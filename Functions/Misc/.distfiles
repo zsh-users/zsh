@@ -1,6 +1,6 @@
 DISTFILES_SRC='
     .distfiles
-    acx allopt cat cdmatch cdmatch2 checkmail cx harden mere multicomp
+    acx allopt cat cdmatch cdmatch2 checkmail colors cx harden mere multicomp
     nslookup proto pushd randline run-help yp yu zed zless zls
 '
 

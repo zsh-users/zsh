@@ -1,3 +1,367 @@
+1999-10-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* Config/version.mk: Set version string to 3.1.6-bart-7.
+
+	* Completion/User/_whois: Tanaka: 8296: New completion for "whois".
+
+	* Completion/User/_archie: Tanaka: 8295: New completion for "archie".
+
+1999-10-15  Bart Schaefer  <schaefer@zsh.org>
+
+	* Completion/Debian/_apt, Completion/Base/_regex_arguments:
+	Tanaka: 8289: Misc. cleanup.
+
+	* Completion/User/_pbm: Tanaka: 8287: Add missing
+	continuation-line backslashes.
+
+	* Completion/User/_urls: Tanaka: 8286: Misc. cleanup.
+
+	* Misc/bash2zshprompt: Adam: 8278: Emit "setopt promptsubst".
+
+	* Completion/User/_urls: Oliver: 8276: More autoremoval fixes.
+
+	* Src/Zle/zle_tricky.c: Sven: 8283: Fix bug in tracking number of
+	matches added.
+
+	* Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo:
+	Sven: 8283: Improve documentation about match-specs.
+
+	* Completion/Core/compinit: Sven: 8273: "compconf -L" sorts its
+	output.
+
+	* Completion/Core/compinit, Src/Zle/computil.c,
+	Src/Zle/computil.mdd, Src/xmods.conf: Sven: 8272: The computil
+	module is now auto-autoloaded; minor bugfix.
+
+	* Doc/Zsh/mod_complist.yo, Doc/Zsh/mod_computil.yo,
+	Doc/Zsh/mod_deltochar.yo, Doc/Zsh/modules.yo: Sven: 8272: Assorted
+	computil documentation.
+
+	* Completion/Base/_describe, Completion/Base/_values: Sven: 8272:
+	Clean-up related to usages of new computil functions.
+
+	* Src/Zle/computil.c, Completion/Base/_arguments: Sven: 8270:
+	Assorted computil debugging.
+
+	* Src/math.c: Sven: 8267: Fix core dump caused by bad error handling.
+
+	* Completion/User/_urls: Tanaka: 8263: Avoid bad autoremove behavior.
+
+	* Completion/User/_killall, Completion/User/_pack,
+	Completion/User/_unpack, Completion/User/_whereis: Oliver: 8262:
+	More new completers.
+
+	* Completion/User/_uncompress, Completion/User/_users,
+	Completion/User/_gzip, Completion/User/_hosts: Oliver: 8262: Fix
+	misc. minor omissions.
+
+	* Completion/Builtins/_nothing: Oliver: 8262: Use this for the
+	"whoami" command.
+
+	* Src/zsh.h, Src/params.c: Sven: 8254: Implement (k) and (K)
+	subscript modifiers.
+
+	* Doc/Zsh/params.yo: Sven: 8254: Document the new (k) and (K)
+	subscript modifiers.
+
+	* Functions/Prompts/prompt_adam2_setup,
+	Functions/Prompts/prompt_fire_setup,
+	Functions/Prompts/prompt_redhat_setup,
+	Functions/Prompts/promptinit: Fix a few bugs, mostly involving
+	`setopt promptsubst'.
+
+	* Functions/Prompts/promptinit: Sven: 8251: Tweak to properly
+	expand the $fpath array.
+
+	* Src/Zle/compctl.c, Src/Zle/compctl.mdd: Sven: 8249: Add the
+	"compmatchers" array.
+
+	* Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo: Sven: 8249: Clarify
+	documentaion of declarations needed by some completers; document a
+	couple of new features.
+
+	* Completion/Core/_description, Completion/Core/_files,
+	Completion/Core/_main_complete, Completion/Core/_message,
+	Completion/Core/_multi_parts, Completion/Core/_path_files,
+	Completion/Core/_sep_parts: Sven: 8249: Accept standard compadd
+	arguments, fix a few bugs, use the new compconfig[warning_format],
+	etc.
+
+	* Completion/Builtins/_nothing: Sven: 8249: A completer which just
+	prints a warning that the current context does not expect any
+	words at all (e.g., a command that takes no arguments).
+
+1999-10-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* Completion/Core/_main_complete, Completion/Core/compinit: Sven:
+	8256: Missing hunks of 8227.
+
+	* Src/Zle/zle_tricky.c: Sven: 8247: When completing with a match
+	spec, don't insert anchors if there are characters missing to the
+	left of them.
+
+	* Src/Zle/zle_tricky.c: Sven: 8244: Fix failure to list ambiguous
+	matches completing after a quote.
+
+	* configure.in: Tanaka: 8241: Test for a gcc 2.95 bug.
+
+	* Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c,
+	Doc/Zsh/builtins.yo: Zefram: 8229: Support for the AIO_OPS and
+	AIO_MEM resource limits.
+
+1999-10-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/Zle/compctl.c, Src/Zle/computil.c, Src/Zle/computil.mdd,
+	Src/Zle/zle_tricky.c, Doc/Zsh/compsys.yo,
+	Completion/Core/compinit, Completion/Base/_arguments,
+	Completion/Base/_describe, Completion/Base/_values: Sven: 8219:
+	Add and make use of the "computil" module, which moves several of
+	the operations previously done by shell functions into C code.
+
+	* Completion/User/_netscape: Oliver: 8230: Better browser and url
+	completion.
+
+	* Completion/User/_tiff: Sven: 8132: Change "options" to "opt_args".
+
+	* Src/Zle/zle_tricky.c: Sven: 8231: Remove unnecessary tokenization.
+
+	* Src/utils.c: Sven: 8231: Don't attempt to use a null name in
+	zwarnnam().
+
+	* Doc/Zsh/compsys.yo, Completion/X/_xmodmap,
+	Completion/User/_flex, Completion/User/_gcc,
+	Completion/User/_gprof, Completion/User/_gs,
+	Completion/User/_lynx, Completion/User/_mount,
+	Completion/User/_nslookup, Completion/User/_rlogin,
+	Completion/User/_socket, Completion/User/_ssh,
+	Completion/User/_telnet, Completion/User/_urls,
+	Completion/User/_wget, Completion/User/_yp, Completion/Linux/_rpm:
+	Sven: 8231,8232: Rename "options" as "opt_args" in a lot of places
+	to avoid conflicts with the parameters module.
+
+	* Completion/User/_urls, Completion/User/_webbrowser,
+	Doc/Zsh/compsys.yo: Oliver: 8230: Better browser and url
+	completion.
+
+	* Functions/Zle/incremental-complete-word, Doc/Zsh/compsys.yo,
+	Doc/Zsh/compwid.yo, Doc/Zsh/zle.yo, Src/Zle/comp.h,
+	Src/Zle/comp1.c, Src/Zle/compctl.c, Src/Zle/complist.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_params.c, Src/Zle/zle_tricky.c:
+	Sven: 8227: Compute the list of matches more frequently and
+	earlier so that compstate[nmatches] is accurate more often;
+	replace compstate[normal_nmatches] with
+	compstate[alternate_nmatches] as a consequence; add
+	compstate[list_lines] and BUFFERLINES for testing how big a screen
+	is needed to edit; add an array comppostfuncs to hold callback
+	shell functions run during completion; fix a display bug.
+
+	* Src/Zle/zle_tricky.c: Sven: 8222: More cursor position
+	heuristics: prefer to place the cursor in the matched portion of
+	an ambiguous word, rather than in a prefix or suffix.
+
+	* Completion/Core/_approximate, Completion/Core/_complete,
+	Completion/Core/_expand, Completion/Core/_list,
+	Completion/Core/_main_complete, Completion/Core/_match,
+	Completion/Core/_path_files, Completion/Base/_default: Sven: 8217:
+	Remove large comments that are now redundant with the compsys
+	manual; misc other cleanup.
+
+	* Src/Zle/zle_tricky.c: Sven: 8216: Improve code readability.
+
+	* Src/Zle/zle_tricky.c: Sven: 8215: Fix problem with
+	accept-and-menu-complete.
+
+	* Functions/Misc/nslookup: A space is required between "read -k"
+	and the number of bytes to read.
+
+	* Doc/Zsh/builtins.yo: Document vagaries of "read -k" argument
+	parsing.
+
+1999-10-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* config.sub: Handle newer flavors of hppa2.0 as computed by
+	configure.
+
+1999-10-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* Completion/Core/_path_files: Sven: 8206: Fix setting of PREFIX
+	when there's a leading slash.
+
+	* Src/Zle/zle_tricky.c: Sven: 8205: Misc. fixes involving uninit'd
+	variables, ragged alignment of output in calclist(), etc.
+
+	* Completion/User/_yodl: Sven: 8204: Handle .yo file-suffix as
+	well as .yodl.
+
+	* Completion/Builtins/_cd, Completion/Base/_tilde: Oliver: 8181:
+	Clean up directory stack handling.
+
+1999-10-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/options.c: Zefram: 8152: A batch of tweaks to emulation
+	behavior (exec change omitted).
+
+	* Doc/Zsh/options.yo, Src/options.c: Zefram: 8154: Change default
+	behavior of shortloops (extendedglob change omitted).
+
+	* Src/exec.c: Add the coproc descriptors to those that can't be
+	copied by redirection.
+
+	* Doc/Zsh/redirect.yo: Zefram: 8186: More accurate redirection doc.
+
+	* Src/exec.c: Tweak 8187 to test the fdtable[] array rather than
+	simply > 9.
+
+	* Src/glob.c, Src/exec.c: Zefram: 8187: Don't permit redirection
+	to grab zsh's internal descriptors.
+
+	* Doc/Zsh/redirect.yo: Document the "&>" redirection and the use
+	of multi-digit numbers on the RHS of "<&" and ">&" redirections.
+
+	* Src/lex.c: Fix parsing of the "&>" redirection.
+
+	* Src/exec.c: Plug lead of a copy of the coproc input descriptor.
+
+1999-10-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* Completion/User/_urls: Oliver K: 8155: Handle "file:" urls.
+
+	* Src/Zle/zle_tricky.c: Tweak last patch slightly to avoid the
+	possibility of returning NULL.
+
+	* Src/Zle/zle_tricky.c: Don't prematurely free/recreate the cached
+	value of $compstate[ambiguous].
+
+	* Functions/Prompts/promptinit: This function requires extendedglob.
+
+1999-10-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* Functions/Misc/colors:
+	Adam: 8147: Use $'...' rather than $(echo -n '...').
+
+	* Misc/bash2zshprompt: Adam: 8144: Small fix.
+
+	* Misc/bash2zshprompt, Functions/Prompts/prompt_adam1_setup,
+	Functions/Prompts/prompt_adam2_setup,
+	Functions/Prompts/prompt_blue_setup,
+	Functions/Prompts/prompt_combo_setup,
+	Functions/Prompts/prompt_cyan_setup,
+	Functions/Prompts/prompt_elite2_setup,
+	Functions/Prompts/prompt_elite_setup,
+	Functions/Prompts/prompt_fire_setup,
+	Functions/Prompts/prompt_green_setup,
+	Functions/Prompts/prompt_magenta_setup,
+	Functions/Prompts/prompt_off_setup,
+	Functions/Prompts/prompt_red_setup,
+	Functions/Prompts/prompt_redhat_setup,
+	Functions/Prompts/prompt_suse_setup,
+	Functions/Prompts/prompt_white_setup,
+	Functions/Prompts/prompt_yellow_setup,
+	Functions/Prompts/promptinit, Functions/Misc/colors,
+	Completion/User/_prompt: Adam: 8129: "Themed prompts" system
+	copied (and translated) from bash.
+
+	* INSTALL, configure.in: Adam: 8145: Install the themed-prompt stuff.
+
+	* Src/Modules/stat.c, Src/system.h: Zefram: 8137: Support for
+	Solaris "doors".
+
+	* Src/jobs.c: Reattach the tty and resize the terminal after a
+	foreground job is stopped.
+
+1999-10-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/Zle/zle_refresh.c: Geoff: 8126: Fix infinite loop in
+	tc_rightcurs().
+
+1999-10-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/builtin.c, Doc/Zsh/builtins.yo: PWS: 8093: Back out 8084.
+
+	* Src/prompt.c: Use zcalloc() to allocate the buffer in
+	promptexpand(), so as not to leave garbage beyond the end of the
+	prompt after expansion.
+
+	* Src/builtin.c: When computing the new directory for $PWD, don't
+	duplicate a trailing slash.
+
+	* Etc/FAQ.yo: PWS: zsh-announce/100: Latest FAQ changes.
+
+1999-10-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/exec.c: Start the path search over from the beginning, not
+	from where it was last left off, after removing a bad element at
+	attempted-execute-time.
+
+1999-09-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* Doc/Zsh/compsys.yo, Completion/Commands/_bash_completions: PWS:
+	8108: Completions for bash equivalence.
+
+	* Doc/Makefile.in: Adam: 8106: Use $(DESTDIR) when installing
+	info, too.
+
+	* Completion/User/_my_accounts, Completion/User/_other_accounts,
+	Completion/User/_user@host, Completion/User/_user_at_host: Adam:
+	8101: Change @ to _at_ in file names.
+
+	* Completion/User/_perl_modules, Completion/User/_perldoc: Adam:
+	8100: Small bugfix, whitespace cleanup.
+
+	* Completion/Core/compinit, Doc/Zsh/compsys.yo: PWS: 8098: Add
+	"compdef -K" to map multiple widgets to the same function.
+
+	* Doc/Zsh/guide.yo: PWS: 8097: Renamed to manual.yo.
+
+	* Doc/Zsh/guide.yo, Doc/Zsh/intro.yo, Doc/Zsh/manual.yo,
+	Doc/Makefile.in, Doc/zsh.yo, Doc/ztexi.yo: PWS: 8097: Rename
+	"guide" to "manual" as PWS is working on another "guide."
+
+	* Completion/User/_a2ps: Alexandre Duret-Lutz: 8094: Update for
+	newer versions of a2ps.
+
+	* Src/params.c: Don't use tokenized strings as associative array keys.
+
+	* Src/exec.c: PWS: 8086: Don't singsub() the LHS of assignments at
+	exec time.
+
+	* Src/Zle/complist.c: PWS: 8072: Fix allocation state bug (massive
+	reindentation but no other real changes).
+
+	* Doc/Zsh/builtins.yo: PWS: 8084: Reset $PWD in the "pwd" builtin
+	if unable to stat(pwd).  This leaves the dirstack in an
+	inconsistent state and needs more looking-at.
+
+	* Src/exec.c: Be a little smarter about fixing up the command
+	table when we find a bad element at attempted-execute-time.
+
+1999-09-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/builtin.c: PWS: 8084: Reset $PWD in the "pwd" builtin if
+	unable to stat(pwd).  This leaves the dirstack in an inconsistent
+	state and needs more looking-at.
+
+	* Completion/User/_man: Tanaka: 8082: Fix PWS's silly thinko.
+
+1999-09-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* Completion/User/_user@host: Adam: 8065: Add forgotten file used
+	by _my_accounts and _other_accounts.
+
+	* Doc/Zsh/compsys.yo: Adam: 8064: Documentation for _my_accounts
+	and _other_accounts usages.
+
+	* Completion/User/_my_accounts, Completion/User/_other_accounts:
+	Adam: 8064,8065,8066: Assorted fixes and documentation.
+
+	* Completion/User/_man: Adam: 8062: Fix to handle colon-delimited
+	"manpath" output (as corrected by PWS: 8067.)
+
+1999-09-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/signals.c: PWS: 8056: Wrap getiparam() in HEAPALLOC block
+	for math evaluation reasons.
+
 1999-09-26  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: Config/version.mk: 3.1.6-pws-6
@@ -391,6 +755,9 @@
 	  Completion/Commands/_verbose_list, Completion/Core/_oldlist:
 	  _verbose_list widget makes completion function lists
 	  progressively more verbose.
+
+	* Sven: 7796: _arguments uses describe_values config key; other
+	  misc. fixes.
 
 	* Sven: 7795: Completion/User/_mount: mounting excitement.
 

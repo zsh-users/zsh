@@ -1,5 +1,6 @@
 DISTFILES_SRC='
     .distfiles
+    bash2zshprompt
     c2z compctl-examples globtests globtests.ksh
     job-control-tests lete2ctl
 '

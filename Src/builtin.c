@@ -3153,8 +3153,7 @@ zexit(int val, int from_signal)
     HEAPALLOC {
 	if (isset(MONITOR) && !stopmsg && !from_signal) {
 	    scanjobs();    /* check if jobs need printing           */
-	    if (unset(SHJOBCONTROL))
-	        checkjobs();   /* check if any jobs are running/stopped */
+	    checkjobs();   /* check if any jobs are running/stopped */
 	    if (stopmsg) {
 		stopmsg = 2;
 		LASTALLOC_RETURN;

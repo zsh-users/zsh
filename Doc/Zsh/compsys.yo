@@ -1716,15 +1716,6 @@ This is used by functions that complete color names. It should be set
 to the pathname of a file containing color names in the format of an
 X11 tt(rgb.txt) file.
 )
-item(tt(history_list))(
-If this is set to a non-empty string, the tt(_history_complete_word)
-bindable command will list all available matches.
-)
-item(tt(history_remove_all_dups))(
-If this is set to a non-empty string, the tt(_history_complete_word)
-bindable command will remove all duplicate matches, rather than just
-removing consecutive duplicates.
-)
 item(tt(history_sort))(
 If this is set to a non-empty string, completion functions that
 generate words from the history as possible matches sort these words
