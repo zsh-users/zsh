@@ -1,13 +1,51 @@
 #autoload
 
-local colors i
+local val
 
-for i; do
-  if _style -a "$i" list-colors colors; then
-    if [[ "$1" = default ]]; then
-      ZLS_COLORS="${(j.:.)${(@)colors:gs/:/\\\:}}"
-    else
-      eval "ZLS_COLORS=\"(${i})\${(j.:(${i}).)\${(@)colors:gs/:/\\\:}}:\${ZLS_COLORS}\""
-    fi
+if _style -a "$1" list-colors val; then
+  if [[ "$1" = default ]]; then
+    ZLS_COLORS="${(j.:.)${(@)val:gs/:/\\\:}}"
+  else
+    eval "ZLS_COLORS=\"(${i})\${(j.:(${i}).)\${(@)val:gs/:/\\\:}}:\${ZLS_COLORS}\""
   fi
-done
+fi
+
+if _style -s "$1" list-packed val; then
+  if [[ "$val" = (yes|true|1|on) ]]; then
+    compstate[list]="${compstate[list]} packed"
+  else
+    compstate[list]="${compstate[list]:gs/packed//}"
+  fi
+else
+  compstate[list]="$_saved_list"
+fi
+
+if _style -s "$1" list-rows-first val; then
+  if [[ "$val" = (yes|true|1|on) ]]; then
+    compstate[list]="${compstate[list]} rows"
+  else
+    compstate[list]="${compstate[list]:gs/rows//}"
+  fi
+else
+  compstate[list]="$_saved_list"
+fi
+
+if _style -s "$1" last-prompt val; then
+  if [[ "$val" = (yes|true|1|on) ]]; then
+    compstate[last_prompt]=yes
+  else
+    compstate[last_prompt]=''
+  fi
+else
+  compstate[last_prompt]="$_saved_lastprompt"
+fi
+
+if _style -s "$1" accept-exact val; then
+  if [[ "$val" = (yes|true|1|on) ]]; then
+    compstate[exact]=accept
+  else
+    compstate[exact]=''
+  fi
+else
+  compstate[exact]="$_saved_exact"
+fi

@@ -19,6 +19,9 @@
 
 local comp post ret=1 _compskip _prio_num=1 _cur_context format
 local context state line opt_args val_args curcontext="$curcontext"
+local _saved_exact="$compstate[exact]" \
+      _saved_lastprompt="$compstate[last_prompt]" \
+      _saved_list="$compstate[list]"
 typeset -U _offered_tags _tried_tags _failed_tags _used_tags _unused_tags
 
 _offered_tags=()
@@ -82,8 +85,7 @@ if [[ compstate[nmatches] -eq 0 &&
       -n "$format" && $#_lastdescr -ne 0 ]]; then
   local str
 
-  compstate[list]=list
-  compstate[force_list]=yes
+  compstate[list]='list force'
   compstate[insert]=''
 
   case $#_lastdescr in
@@ -94,8 +96,6 @@ if [[ compstate[nmatches] -eq 0 &&
 
   compadd -UX "${format//\\%d/$str}" -n ''
 fi
-
-_style '' last-prompt && compstate[last_prompt]=yes
 
 _lastcomp=( "${(@kv)compstate}" )
 _lastcomp[completer]="$comp"

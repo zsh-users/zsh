@@ -235,16 +235,21 @@ is unset or empty they will never be listed; if its value begins with
 tt(list), they will always be listed; if it begins with tt(autolist)
 or tt(ambiguous), they will be listed when the tt(AUTO_LIST) or
 tt(LIST_AMBIGUOUS) options respectively would normally cause them to
-be.  Finally, if the value contains the string tt(explanations), only
-the explanation strings, if any, will be listed. It will be set
+be.
+
+If the substring tt(force) appears in the value, this makes the
+list be shown even if there is only one match. Normally, the list
+would be shown only if there are at least two matches.
+
+The value contains the substring tt(packed) if the tt(LIST_PACKED)
+option is set. If this substring is given for all matches added of a
+group, this group will show the tt(LIST_PACKED) behavior. The same is
+done for the tt(LIST_ROWS_FIRST) option with the substring tt(rows).
+
+Finally, if the value contains the string tt(explanations), only the
+explanation strings, if any, will be listed. It will be set
 appropriately on entry to a completion widget and may be changed
 there.
-)
-item(tt(force_list))(
-If the value for the tt(list) key is tt(autolist) or tt(ambiguous), the list will
-normally be shown only if there are at least two matches in the
-list. Setting tt(force_list) to an non-empty string forces the list to be
-shown even if there is only one match.
 )
 item(tt(list_max))(
 Initially this is set to the value of the tt(LISTMAX) parameter.
@@ -259,18 +264,21 @@ line to this value, this is available as the value of the tt(BLINES)
 special parameter.
 )
 item(tt(last_prompt))(
-If this is set to an non-empty string, the completion code will move
-the cursor back to the previous prompt after the list of completions
-has been displayed.  Initially this is set or unset according to
-the tt(ALWAYS_LAST_PROMPT) option.
+If this is set to an non-empty string for every match added, the
+completion code will move the cursor back to the previous prompt after
+the list of completions has been displayed.  Initially this is set or
+unset according to the tt(ALWAYS_LAST_PROMPT) option.
 )
 item(tt(insert))(
 This controls the manner in which a match is inserted into the command
 line.  On entry to the widget function, if it is unset the command line is
 not to be changed; if set to tt(unambiguous), any prefix common to all
-matches is to be inserted; if set to tt(menu) or tt(automenu) the usual
-behaviour of the tt(MENU_COMPLETE) or tt(AUTO_MENU) options, respectively,
-is to be used.
+matches is to be inserted; if set to tt(automenu-unambiguous), the
+common prefix is to be inserted and the next invocation of the
+completion code may start menu-completion (due to the tt(AUTO_MENU)
+option being set); if set to tt(menu) or tt(automenu) menu-completion
+will be started for the matches currently generated due to (in the
+latter case this will happen because the tt(AUTO_MENU) is set).
 
 On exit it may be set to any of the values above (where setting it to
 the empty string is the same as unsetting it), or to a number, in which

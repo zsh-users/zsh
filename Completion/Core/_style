@@ -1,21 +1,21 @@
 #autoload
 
-local val ret
+local _val _ret
 
 # Should we return the value?
 
 case "$1" in
 -b)
-  compstyles -S "$context" "$2" val
-  ret="$?"
+  compstyles -S "${curcontext}${2:+:${2}}" "$3" _val
+  _ret="$?"
 
-  if [[ "$val" = (#I)(yes|true|1|on) ]]; then
-    eval "${3}=yes"
+  if [[ "$_val" = (yes|true|1|on) ]]; then
+    eval "${4}=yes"
   else
-    eval "${3}=no"
+    eval "${4}=no"
   fi
 
-  return ret;
+  return _ret
   ;;
 -s)
   compstyles -S "${curcontext}${2:+:${2}}" "$3" "$4"
@@ -33,11 +33,11 @@ esac
 
 [[ "$1" = -(|-) ]] && shift
 
-if compstyles -S "${curcontext}${1:+:${1}}" "$2" val; then
+if compstyles -S "${curcontext}${1:+:${1}}" "$2" _val; then
   if [[ $# -eq 3 ]]; then
-    [[ "$val" = ${~3} ]]
+    [[ "$_val" = ${~3} ]]
   else
-    [[ "$val" = (#I)(yes|true|1|on) ]]
+    [[ "$_val" = (yes|true|1|on) ]]
   fi
 else
   return 1

@@ -81,6 +81,8 @@ struct cmgroup {
 #define CGF_HASDL    4		/* has display strings printed on separate lines */
 #define CGF_UNIQALL  8		/* remove all duplicates */
 #define CGF_UNIQCON 16		/* remove consecutive duplicates */
+#define CGF_PACKED  32		/* LIST_PACKED for this group */
+#define CGF_ROWS    64		/* LIST_ROWS_FIRST for this group */
 
 /* This is the struct used to hold matches. */
 
@@ -107,15 +109,17 @@ struct cmatch {
     int gnum;			/* global number */
 };
 
-#define CMF_FILE       1	/* this is a file */
-#define CMF_REMOVE     2	/* remove the suffix */
-#define CMF_ISPAR      4	/* is paramter expansion */
-#define CMF_PARBR      8	/* paramter expansion with a brace */
-#define CMF_PARNEST   16	/* nested paramter expansion */
-#define CMF_NOLIST    32	/* should not be listed */
-#define CMF_DISPLINE  64	/* display strings one per line */
-#define CMF_HIDE     128	/* temporarily hide this one */
-#define CMF_NOSPACE  256	/* don't add a space */
+#define CMF_FILE     (1<< 0)	/* this is a file */
+#define CMF_REMOVE   (1<< 1)	/* remove the suffix */
+#define CMF_ISPAR    (1<< 2)	/* is paramter expansion */
+#define CMF_PARBR    (1<< 3)	/* paramter expansion with a brace */
+#define CMF_PARNEST  (1<< 4)	/* nested paramter expansion */
+#define CMF_NOLIST   (1<< 5)	/* should not be listed */
+#define CMF_DISPLINE (1<< 6)	/* display strings one per line */
+#define CMF_HIDE     (1<< 7)	/* temporarily hide this one */
+#define CMF_NOSPACE  (1<< 8)	/* don't add a space */
+#define CMF_PACKED   (1<< 9)	/* prefer LIST_PACKED */
+#define CMF_ROWS     (1<<10)	/* prefer LIST_ROWS_FIRST */
 
 /* Stuff for completion matcher control. */
 
@@ -322,43 +326,41 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
 #define CP_RESTORE     (1 << CPN_RESTORE)
 #define CPN_LIST       10
 #define CP_LIST        (1 << CPN_LIST)
-#define CPN_FORCELIST  11
-#define CP_FORCELIST   (1 << CPN_FORCELIST)
-#define CPN_INSERT     12
+#define CPN_INSERT     11
 #define CP_INSERT      (1 << CPN_INSERT)
-#define CPN_EXACT      13
+#define CPN_EXACT      12
 #define CP_EXACT       (1 << CPN_EXACT)
-#define CPN_EXACTSTR   14
+#define CPN_EXACTSTR   13
 #define CP_EXACTSTR    (1 << CPN_EXACTSTR)
-#define CPN_PATMATCH   15
+#define CPN_PATMATCH   14
 #define CP_PATMATCH    (1 << CPN_PATMATCH)
-#define CPN_PATINSERT  16
+#define CPN_PATINSERT  15
 #define CP_PATINSERT   (1 << CPN_PATINSERT)
-#define CPN_UNAMBIG    17
+#define CPN_UNAMBIG    16
 #define CP_UNAMBIG     (1 << CPN_UNAMBIG)
-#define CPN_UNAMBIGC   18
+#define CPN_UNAMBIGC   17
 #define CP_UNAMBIGC    (1 << CPN_UNAMBIGC)
-#define CPN_LISTMAX    19
+#define CPN_LISTMAX    18
 #define CP_LISTMAX     (1 << CPN_LISTMAX)
-#define CPN_LASTPROMPT 20
+#define CPN_LASTPROMPT 19
 #define CP_LASTPROMPT  (1 << CPN_LASTPROMPT)
-#define CPN_TOEND      21
+#define CPN_TOEND      20
 #define CP_TOEND       (1 << CPN_TOEND)
-#define CPN_OLDLIST    22
+#define CPN_OLDLIST    21
 #define CP_OLDLIST     (1 << CPN_OLDLIST)
-#define CPN_OLDINS     23
+#define CPN_OLDINS     22
 #define CP_OLDINS      (1 << CPN_OLDINS)
-#define CPN_VARED      24
+#define CPN_VARED      23
 #define CP_VARED       (1 << CPN_VARED)
-#define CPN_ANMATCHES  25
+#define CPN_ANMATCHES  24
 #define CP_ANMATCHES   (1 << CPN_ANMATCHES)
-#define CPN_LISTLINES  26
+#define CPN_LISTLINES  25
 #define CP_LISTLINES   (1 << CPN_LISTLINES)
-#define CPN_QUOTES     27
+#define CPN_QUOTES     26
 #define CP_QUOTES      (1 << CPN_QUOTES)
 
-#define CP_KEYPARAMS   28
-#define CP_ALLKEYS     ((unsigned int) 0xfffffff)
+#define CP_KEYPARAMS   27
+#define CP_ALLKEYS     ((unsigned int) 0x7ffffff)
 
 /* Hooks. */
 

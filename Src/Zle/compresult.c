@@ -586,7 +586,7 @@ do_ambiguous(void)
     /* If we have to insert the first match, call do_single().  This is *
      * how REC_EXACT takes effect.  We effectively turn the ambiguous   *
      * completion into an unambiguous one.                              */
-    if (ainfo && ainfo->exact == 1 && useexact && !(fromcomp & FC_LINE)) {
+    if (ainfo && ainfo->exact == 1 && !(fromcomp & FC_LINE)) {
 	minfo.cur = NULL;
 	do_single(ainfo->exactm);
 	invalidatelist();
@@ -669,7 +669,7 @@ do_ambiguous(void)
     if (uselist && (usemenu != 2 || (!listshown && !oldlist)) &&
 	((!showinglist && (!listshown || !oldlist)) ||
 	 (usemenu == 3 && !oldlist)) &&
-	(smatches >= 2 || (compforcelist && *compforcelist)))
+	(smatches >= 2 || forcelist))
 	showinglist = -2;
 
     return ret;
@@ -1151,6 +1151,8 @@ calclist(void)
 	char **pp = g->ylist;
 	int nl = 0, l, glong = 1, gshort = columns, ndisp = 0, totl = 0;
 
+	g->flags |= CGF_PACKED | CGF_ROWS;
+
 	if (!onlyexpl && pp) {
 	    /* We have an ylist, lets see, if it contains newlines. */
 	    hidden = 1;
@@ -1211,6 +1213,10 @@ calclist(void)
 			mlens[m->gnum] = l;
 		    }
 		    nlist++;
+		    if (!(m->flags & CMF_PACKED))
+			g->flags &= ~CGF_PACKED;
+		    if (!(m->flags & CMF_ROWS))
+			g->flags &= ~CGF_ROWS;
 		} else if (!(m->flags & CMF_NOLIST)) {
 		    l = niceztrlen(m->str);
 		    ndisp++;
@@ -1221,6 +1227,10 @@ calclist(void)
 		    totl += l;
 		    mlens[m->gnum] = l;
 		    nlist++;
+		    if (!(m->flags & CMF_PACKED))
+			g->flags &= ~CGF_PACKED;
+		    if (!(m->flags & CMF_ROWS))
+			g->flags &= ~CGF_ROWS;
 		} else
 		    hidden = 1;
 	    }
@@ -1289,11 +1299,14 @@ calclist(void)
 	    nlines += glines;
 	}
     }
-    if (!onlyexpl && isset(LISTPACKED)) {
+    if (!onlyexpl) {
 	char **pp;
 	int *ws, tlines, tline, tcols, maxlen, nth, width;
 
 	for (g = amatches; g; g = g->next) {
+	    if (!(g->flags & CGF_PACKED))
+		continue;
+
 	    ws = g->widths = (int *) zalloc(columns * sizeof(int));
 	    memset(ws, 0, columns * sizeof(int));
 	    tlines = g->lins;
@@ -1308,7 +1321,7 @@ calclist(void)
 		    for (i = 0; *pp; i++, pp++)
 			ylens[i] = strlen(*pp) + add;
 
-		    if (isset(LISTROWSFIRST)) {
+		    if (g->flags & CGF_ROWS) {
 			int count, tcol, first, maxlines = 0, llines;
 
 			for (tcols = columns / g->shortest; tcols > g->cols;
@@ -1366,7 +1379,7 @@ calclist(void)
 		    }
 		}
 	    } else if (g->width) {
-		if (isset(LISTROWSFIRST)) {
+		if (g->flags & CGF_ROWS) {
 		    int addlen, count, tcol, maxlines = 0, llines, i;
 		    Cmatch *first;
 
@@ -1477,12 +1490,12 @@ int asklist(void)
     trashzle();
     showinglist = listshown = 0;
 
-    clearflag = (isset(USEZLE) && !termflags &&
-		 complastprompt && *complastprompt);
+    clearflag = (isset(USEZLE) && !termflags && dolastprompt);
 
     /* Maybe we have to ask if the user wants to see the list. */
     if ((!minfo.cur || !minfo.asked) &&
-	((complistmax && listdat.nlist > complistmax) ||
+	((complistmax > 0 && listdat.nlist >= complistmax) ||
+	 (complistmax < 0 && listdat.nlines <= -complistmax) ||
 	 (!complistmax && listdat.nlines >= lines))) {
 	int qup;
 	zsetterm();
@@ -1599,7 +1612,7 @@ printlist(int over, CLPrintFunc printm)
 			    while (a--)
 				putc(' ', shout);
 			}
-			pq += (isset(LISTROWSFIRST) ? 1 : nc);
+			pq += ((g->flags & CGF_ROWS) ? 1 : nc);
 			mc++;
 			n--;
 		    }
@@ -1612,7 +1625,7 @@ printlist(int over, CLPrintFunc printm)
 				tcout(TCCLEAREOD);
 			}
 		    }
-		    pp += (isset(LISTROWSFIRST) ? g->cols : 1);
+		    pp += ((g->flags & CGF_ROWS) ? g->cols : 1);
 		}
 	    }
 	} else if (!listdat.onlyexpl && g->lcount) {
@@ -1678,7 +1691,8 @@ printlist(int over, CLPrintFunc printm)
 		    printed++;
 
 		    if (--n)
-			for (j = (isset(LISTROWSFIRST) ? 1 : nc); j && *q; j--)
+			for (j = ((g->flags & CGF_ROWS) ? 1 : nc);
+			     j && *q; j--)
 			    q = skipnolist(q + 1);
 		    mc++;
 		}
@@ -1696,7 +1710,8 @@ printlist(int over, CLPrintFunc printm)
 			    tcout(TCCLEAREOD);
 		    }
 		    if (nl)
-			for (j = (isset(LISTROWSFIRST) ? g->cols : 1); j && *p; j--)
+			for (j = ((g->flags & CGF_ROWS) ? g->cols : 1);
+			     j && *p; j--)
 			    p = skipnolist(p + 1);
 		}
 	    }

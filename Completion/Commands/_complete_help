@@ -18,8 +18,7 @@ _complete_help() {
 tags in context \`${i}': ${help_tags[$i]}"
   done
 
-  compstate[list]=list
-  compstate[force_list]=yes
+  compstate[list]='list force'
   compstate[insert]=''
 
   compadd -UX "$text[2,-1]" -n ''

@@ -26,8 +26,7 @@ if [[ ( -z "$expr" || "${(e):-\$[$expr]}" -eq 1 ) &&
   # to compare the next time.
 
   compstate[insert]=''
-  compstate[list]=list
-  compstate[force_list]=yes
+  compstate[list]='list force'
   _list_prefix="$pre"
   _list_suffix="$suf"
 fi

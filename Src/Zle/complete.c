@@ -66,7 +66,6 @@ char *compiprefix,
      *compquoting,
      *comprestore,
      *complist,
-     *compforcelist,
      *compinsert,
      *compexact,
      *compexactstr,
@@ -948,7 +947,6 @@ static struct compparam compkparams[] = {
     { "quoting", PM_SCALAR | PM_READONLY, VAL(compquoting), NULL, NULL },
     { "restore", PM_SCALAR, VAL(comprestore), NULL, NULL },
     { "list", PM_SCALAR, NULL, VAL(set_complist), VAL(get_complist) },
-    { "force_list", PM_SCALAR, VAL(compforcelist), NULL, NULL },
     { "insert", PM_SCALAR, VAL(compinsert), NULL, NULL },
     { "exact", PM_SCALAR, VAL(compexact), NULL, NULL },
     { "exact_string", PM_SCALAR, VAL(compexactstr), NULL, NULL },
@@ -1363,8 +1361,8 @@ setup_complete(Module m)
 	compcontext = compparameter = compredirect = compquote =
 	compquoting = comprestore = complist = compinsert =
 	compexact = compexactstr = comppatmatch = comppatinsert =
-	compforcelist = complastprompt = comptoend = 
-	compoldlist = compoldins = compvared = compqstack = NULL;
+	complastprompt = comptoend = compoldlist = compoldins =
+	compvared = compqstack = NULL;
 
     hascompmod = 1;
 
@@ -1431,7 +1429,6 @@ finish_complete(Module m)
     zsfree(compquoting);
     zsfree(comprestore);
     zsfree(complist);
-    zsfree(compforcelist);
     zsfree(compinsert);
     zsfree(compexact);
     zsfree(compexactstr);

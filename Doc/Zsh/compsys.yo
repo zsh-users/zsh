@@ -762,11 +762,13 @@ values. In all these cases any of the strings `tt(true)', `tt(on)',
 every other value (or if the style is not set at all for the context
 in which it is looked up) stands for `false'.
 
-em(NOTE: Maybe we should sort them differently. Or maybe we should
-explain some of them only when explaining the completers that use
-them.)
-
 startitem()
+item(tt(accept-exact))(
+This is tested for the default tag and the tags used when generating
+matches. If it is set to `true' for at least one match which is the
+same as the string on the line, this match will immediatly be
+accepted.
+)
 item(tt(arguments))(
 The value of this style is given to the tt(ps) command by functions
 that call it when generating process identifiers as matches.
@@ -933,10 +935,13 @@ completion only if no unambiguous string could be generated that is at
 least as long as the original string from the line.
 )
 item(tt(last-prompt))(
-This is used by the main completion function tt(_main_complete) with
-no particular context name. If it 
-is `true', the cursor will always be moved back to the last prompt if
-that is still visible, independent of the setting of the
+This is used to determine if thecompletion code should try to put the
+cursor back onto the previous command line after showing a completion
+listing (as for the tt(ALWAYS_LAST_PROMPT) option). Like several other 
+styles it is tested for the tt(default) tag and all tags used when
+generating matches. The cursor will be moved back to the previous line 
+if this style is `true' for all types of matches added. Note also that 
+this is independent of the numeric argument -- unlike the
 tt(ALWAYS_LAST_PROMPT) option.
 )
 item(tt(list))(
@@ -1003,6 +1008,18 @@ example(compstyle '*:default' list-colors ${(s.:.)LS_COLORS})
 And to get the default colors (which are the same as for the GNU
 tt(ls) command) one should set the style to an empty value.
 )
+item(tt(list-packed))(
+Like the tt(list-colors) style, this is tested with the tt(default)
+tag and all tags used when generating matches. If it is set to `true'
+for a tag, the matches added for it will be listed as if the
+tt(LIST_PACKED) option were set for them. If it is set to `false',
+they are listed normally.
+)
+item(tt(list-rows-first))(
+This style is tested like the tt(list-packed) style and determines if
+matches are to be listed in a rows-first fashion, as for the
+tt(LIST_ROWS_FIRST) option.
+)
 item(tt(local))(
 This style is used by completion functions which generate URLs as
 possible matches to add suitable matches when a URL points to a
@@ -1041,7 +1058,7 @@ This is used by the tt(_expand) completer. If it is unset or set to
 an empty value, the words resulting from expansion (if any) will
 simply be inserted in the command line, replacing the original
 string. However, if this style is set to a non-empty value, the user
-can cycle through the expansion as in menucompletion. Unless the value
+can cycle through the expansions as in menucompletion. Unless the value
 contains the string `tt(only)', the user will still be offered all
 expansions at once as one of the strings to insert in the command
 line; normally, this possibility is offered first, but if the value
@@ -1771,6 +1788,12 @@ returns zero and non-zero otherwise. If you want to test the style not
 only for a boolean value, you can give a third argument which is then
 used as a pattern and tt(_style) returns zero if the pattern matches
 the value defined for the style.
+
+The tt(-t) and tt(-f) options can be used to test for slightly
+different interpretions of boolean values. If they are given with a
+tag and a style-name as arguments, the return value is zero only if
+the style is set and the value is equal (or, in case of then tt(-f)
+option: unequal) to one of the values mentioned above.
 
 If you want to retrieve the value defined for the style, you can use
 one of the options tt(-b) (to retrieve it as a boolean value, i.e. one 

@@ -37,7 +37,12 @@ static Widget lastcompwidget;
 /* Flags saying what we have to do with the result. */
 
 /**/
-int useexact, useline, uselist;
+int useexact, useline, uselist, forcelist, startauto;
+
+/* Non-zero if we should go back to the last prompt. */
+
+/**/
+int dolastprompt;
 
 /* Non-zero if we should keep an old list. */
 
@@ -276,6 +281,8 @@ do_completion(Hookdef dummy, Compldat dat)
 	hasunqu = 0;
 	useline = (lst != COMP_LIST_COMPLETE);
 	useexact = isset(RECEXACT);
+	zsfree(compexactstr);
+	compexactstr = ztrdup("");
 	uselist = (useline ?
 		   ((isset(AUTOLIST) && !isset(BASHAUTOLIST)) ? 
 		    (isset(LISTAMBIGUOUS) ? 3 : 2) : 0) : 1);
@@ -283,14 +290,19 @@ do_completion(Hookdef dummy, Compldat dat)
 	opm = comppatmatch = ztrdup(useglob ? "*" : "");
 	zsfree(comppatinsert);
 	comppatinsert = ztrdup("menu");
-	zsfree(compforcelist);
-	compforcelist = ztrdup("");
+	forcelist = 0;
 	haspattern = 0;
 	complistmax = getiparam("LISTMAX");
 	zsfree(complastprompt);
-	complastprompt = ztrdup(((isset(ALWAYSLASTPROMPT) && zmult == 1) ||
-				(unset(ALWAYSLASTPROMPT) && zmult != 1)) ?
+	complastprompt = ztrdup((dolastprompt =
+				 ((isset(ALWAYSLASTPROMPT) && zmult == 1) ||
+				  (unset(ALWAYSLASTPROMPT) && zmult != 1))) ?
 				"yes" : "");
+	zsfree(complist);
+	complist = ztrdup(isset(LISTROWSFIRST) ?
+			  (isset(LISTPACKED) ? "packed rows" : "rows") :
+			  (isset(LISTPACKED) ? "packed" : ""));
+	startauto = isset(AUTOMENU);
 	movetoend = ((cs == we || isset(ALWAYSTOEND)) ? 2 : 1);
 	showinglist = 0;
 	hasmatched = 0;
@@ -360,7 +372,7 @@ do_completion(Hookdef dummy, Compldat dat)
 	    menucmp = 0;
 	    minfo.cur = NULL;
 
-	    if (compforcelist && *compforcelist && uselist)
+	    if (forcelist)
 		showinglist = -2;
 	    else
 		invalidatelist();
@@ -378,7 +390,7 @@ do_completion(Hookdef dummy, Compldat dat)
 		minfo.cur = NULL;
 		minfo.asked = 0;
 		do_single(m->matches[0]);
-		if (compforcelist && *compforcelist) {
+		if (forcelist) {
 		    if (uselist)
 			showinglist = -2;
 		    else
@@ -388,7 +400,7 @@ do_completion(Hookdef dummy, Compldat dat)
 	    }
 	} else {
 	    invalidatelist();
-	    if (compforcelist && *compforcelist)
+	    if (forcelist)
 		clearlist = 1;
 	    cs = 0;
 	    foredel(ll);
@@ -450,7 +462,7 @@ before_complete(Hookdef dummy, int *lst)
 
     /* Check if we have to start a menu-completion (via automenu). */
 
-    if (isset(AUTOMENU) && lastambig &&
+    if (startauto && lastambig &&
 	(!isset(BASHAUTOLIST) || lastambig == 2))
 	usemenu = 2;
 
@@ -495,7 +507,7 @@ callcompfunc(char *s, char *fn)
 	rset = CP_ALLREALS;
 	kset = CP_ALLKEYS &
 	    ~(CP_PARAMETER | CP_REDIRECT | CP_QUOTE | CP_QUOTING |
-	      CP_EXACTSTR | CP_FORCELIST | CP_OLDLIST | CP_OLDINS |
+	      CP_EXACTSTR | CP_OLDLIST | CP_OLDINS |
 	      (useglob ? 0 : CP_PATMATCH));
 	zsfree(compvared);
 	if (varedarg) {
@@ -641,11 +653,20 @@ callcompfunc(char *s, char *fn)
 	case 2: complist = "autolist"; break;
 	case 3: complist = "ambiguous"; break;
 	}
+	if (isset(LISTPACKED))
+	    complist = dyncat(complist, " packed");
+	if (isset(LISTROWSFIRST))
+	    complist = dyncat(complist, " rows");
+
 	complist = ztrdup(complist);
 	zsfree(compinsert);
 	if (useline) {
 	    switch (usemenu) {
-	    case 0: compinsert = "unambiguous"; break;
+	    case 0:
+		compinsert = (isset(AUTOMENU) ?
+			      "automenu-unambiguous" :
+			      "unambiguous");
+		break;
 	    case 1: compinsert = "menu"; break;
 	    case 2: compinsert = "automenu"; break;
 	    }
@@ -722,13 +743,14 @@ callcompfunc(char *s, char *fn)
 	    uselist = 3;
 	else
 	    uselist = 0;
-
+	forcelist = (complist && strstr(complist, "force"));
 	onlyexpl = (complist && strstr(complist, "expl"));
 
 	if (!compinsert)
 	    useline = 0;
 	else if (!strcmp(compinsert, "unambig") ||
-		 !strcmp(compinsert, "unambiguous"))
+		 !strcmp(compinsert, "unambiguous") ||
+		 !strcmp(compinsert, "automenu-unambiguous"))
 	    useline = 1, usemenu = 0;
 	else if (!strcmp(compinsert, "menu"))
 	    useline = 1, usemenu = 1;
@@ -749,6 +771,8 @@ callcompfunc(char *s, char *fn)
 	    insspace = (compinsert[strlen(compinsert) - 1] == ' ');
 	} else
 	    useline = usemenu = 0;
+	startauto = (compinsert &&
+		     !strcmp(compinsert, "automenu-unambiguous"));
 	useexact = (compexact && !strcmp(compexact, "accept"));
 
 	if (!comptoend || !*comptoend)
@@ -1545,6 +1569,8 @@ addmatches(Cadata dat, char **argv)
     qipre = ztrdup(compqiprefix ? compqiprefix : "");
     qisuf = ztrdup(compqisuffix ? compqisuffix : "");
 
+    useexact = (compexact && !strcmp(compexact, "accept"));
+
     /* Switch back to the heap that was used when the completion widget
      * was invoked. */
     SWITCHHEAPS(compheap) {
@@ -2075,7 +2101,11 @@ add_match_data(int alt, char *str, Cline line,
 	cm->isuf = (isuf && *isuf ? isuf : NULL);
     cm->pre = pre;
     cm->suf = suf;
-    cm->flags = flags;
+    cm->flags = (flags |
+		 (complist ?
+		  ((strstr(complist, "packed") ? CMF_PACKED : 0) |
+		   (strstr(complist, "rows")   ? CMF_ROWS   : 0)) : 0));
+
     if ((*compqstack == '\\' && compqstack[1]) ||
 	(autoq && *compqstack && compqstack[1] == '\\'))
 	cm->flags |= CMF_NOSPACE;
@@ -2117,6 +2147,8 @@ add_match_data(int alt, char *str, Cline line,
 
     newmatches = 1;
 
+    if (!complastprompt || !*complastprompt)
+	dolastprompt = 0;
     /* One more match for this explanation. */
     if (curexpl) {
 	if (alt)
@@ -2140,8 +2172,8 @@ add_match_data(int alt, char *str, Cline line,
     /* Do we have an exact match? More than one? */
     if (exact) {
 	if (!ai->exact) {
-	    ai->exact = 1;
-	    if (incompfunc) {
+	    ai->exact = useexact;
+	    if (incompfunc && (!compexactstr || !*compexactstr)) {
 		/* If a completion widget is active, we make the exact
 		 * string available in `compstate'. */
 
@@ -2160,7 +2192,7 @@ add_match_data(int alt, char *str, Cline line,
 		comp_setunset(0, 0, CP_EXACTSTR, 0);
 	    }
 	    ai->exactm = cm;
-	} else {
+	} else if (useexact) {
 	    ai->exact = 2;
 	    ai->exactm = NULL;
 	    if (incompfunc)

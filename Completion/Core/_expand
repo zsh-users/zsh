@@ -84,8 +84,6 @@ fi
 
 exp=( "${(@)${(@)${(@q)exp}//\\\\=/=}/#=/\\=}" )
 
-_setup original expansions all-expansions
-
 # We have expansions, should we menucomplete them?
 
 if [[ -z "$menu" ]]; then
@@ -95,16 +93,20 @@ if [[ -z "$menu" ]]; then
   # probably also adding the original string.
 
   if [[ -z "$compstate[insert]" ]]; then
+    _setup all-expansions
     compadd -U -V all-expansions -Q - "$exp[@]"
   else
-    [[ -n "$orig" && "$orig" != *last* ]] &&
-        compadd "$expl[@]" -UQ -V original - "$word"
+    if [[ -n "$orig" && "$orig" != *last* ]]; then
+      _setup original
+      compadd "$expl[@]" -UQ -V original - "$word"
+    fi
+    _setup expansions
+    compadd -UQ -V expansions - "$exp"
 
-    compadd -UQ -V _expand - "$exp"
-
-    [[ -n "$orig" && "$orig" = *last* ]] &&
-        compadd "$expl[@]" -UQ -V original - "$word"
-
+    if [[ -n "$orig" && "$orig" = *last* ]]; then
+      _setup original
+      compadd "$expl[@]" -UQ -V original - "$word"
+    fi
     compstate[insert]=menu
   fi
 else
@@ -115,24 +117,29 @@ else
   # Now add the expansion string, probably also adding the original
   # and/or the string containing all expanded string.
 
-  [[ -n "$orig" && "$orig" != *last* ]] &&
-      compadd "$expl[@]" -UQ -V original - "$word"
-
-  [[ $#exp -ne 1 && "$menu" = *last* && "$menu" != *only* ]] &&
-      compadd "$expl2[@]" -UQ -V all-expansions - "$exp"
-
+  if [[ -n "$orig" && "$orig" != *last* ]]; then
+    _setup original
+    compadd "$expl[@]" -UQ -V original - "$word"
+  fi
+  if [[ $#exp -ne 1 && "$menu" = *last* && "$menu" != *only* ]]; then
+    _setup all-expansions
+    compadd "$expl2[@]" -UQ -V all-expansions - "$exp"
+  fi
+  _setup expansions
   if [[ -z "$prompt" ]]; then
     compadd -UQ $group expansions - "$exp[@]"
   else
     compadd -UQ -X "${prompt//\\%o/$word}" \
             $group expansions - "$exp[@]"
   fi
-  [[ $#exp -ne 1 && "$menu" != *last* && "$menu" != *only* ]] &&
-      compadd "$expl2[@]" -UQ -V all-expansions - "$exp"
-
-  [[ -n "$orig" && "$orig" = *last* ]] &&
-      compadd "$expl[@]" -UQ -V original - "$word"
-
+  if [[ $#exp -ne 1 && "$menu" != *last* && "$menu" != *only* ]]; then
+    _setup all-expansions
+    compadd "$expl2[@]" -UQ -V all-expansions - "$exp"
+  fi
+  if [[ -n "$orig" && "$orig" = *last* ]]; then
+    _setup original
+    compadd "$expl[@]" -UQ -V original - "$word"
+  fi
   compstate[insert]=menu
 fi
 
