@@ -1,3 +1,10 @@
+2003-07-04  Peter Stephenson  <pws@csr.com>
+
+	* 18807: baptiste daroussin <daroussi@ece.fr>:
+	Completion/Linux/Command/.distfiles,
+	Completion/Linux/Command/_pkgtool: Completion for Slackware
+	package management tool.
+
 2003-07-03  Peter Stephenson  <pws@csr.com>
 
 	* users/6367: Doc/Zsh/contrib.yo: match-words-by-style was

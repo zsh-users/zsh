@@ -1,0 +1,84 @@
+#compdef installpkg upgradepkg removepkg pkgtool explodepkg makepkg 
+
+_slackware_pkg() {
+  local flags
+
+  case "$service" in
+  installpkg)
+    flags=(
+      '-warn[warn if files will be overwritten, but do not install]'
+      '-root=[install someplace else, like /mnt]:Root directory:_path_files -/'
+      '-infobox[use dialog to draw an info box]'
+      '-menu[confirm package installation with a menu]'
+      '-ask[used with menu mode: always ask if a package should be installed regardless of what the package'\''s priority is]'
+      '-priority[provide a priority for the entire package list to use instead of the priority in the tagfile]:Priority list:(ADD REC OPT SKP)'
+      '-tagfile[specify a different file to use for package priorities.  The default is "tagfile" in the package'\''s directory]:Tagfile:_files -/'
+    )
+
+    _arguments -s \
+      $flags[@] \
+      '*:Slackware packages:_files -g \*.tgz'
+    ;;
+
+  removepkg)
+    flags=(
+      '-warn[Generate  a  report  to  the  standard output about which files and directories would be removed, but does not actually remove the package.]'
+      '-preserve[If specified, the complete package subtree is reconstructed in /tmp/preserved_packages/packagename.]'
+      '-copy[Construct a copy of the package under /tmp/preserved_packages/packagename, but don'\''t remove it.  (same effect as -warn -preserve)]'
+      '-keep[Save the  intermediate  files  created  by  removepkg  (delete_list,  required_files,  uniq_list,  del_link_list,  required_links, required_list).  Mostly useful for debugging purposes.]'
+    )
+
+    _arguments -s \
+      $flags[@] \
+      '*:Package name:_files -W /var/log/packages/ -/'
+    ;;
+
+  upgradepkg)
+    flags=(
+      '--install-new[the behavior is modified to install new packages in addition to upgrading existing ones.]'
+      '--reinstall[upgrade all packages even if the same version is already installed.]'
+      '--verbose[Show all the gory details of the upgrade.]'
+    )
+
+
+    _arguments -s \
+      $flags[@] \
+      '*:Slackware packages:_files -g \*.tgz'
+    ;;
+
+    
+  explodepkg)
+    _arguments -s \
+    '*:Slackware packages:_files -g \*.tgz'
+    ;;
+
+  makepkg)
+    flags=(
+      '(--linkadd -l)'{--linkadd,-l}'[moves symlinks into doinst.sh: recommended]:Answer:(y n)'
+      '(--chown -c)'{--chown,-c}'[resets all permissions to root:root 755 - not generally recommended]:Answer:(y n)'
+    )
+
+
+    _arguments -s \
+      $flags[@] 
+    ;;
+
+
+
+  pkgtool)
+    flags=(
+    '-sets[Install the disk sets A, B, C. Seperate the disk set names by '\''#'\'' symbols.]'
+    '-source_mounted[When this flag is present, pkgtool will not attempt to unmount and remount the source device with each disk.]'
+    '-ignore_tagfile[When this flag is present, pkgtool will install every *.tgz package encountered no matter what the tagfiles say.]'
+    '-tagfile[This flag is used to specify from the command line which tagfile should be used for the installation.]:Tagfile:_files -/'
+    '-source_dir[Used  when installing multiple packages from disk sets. This is the directory in which the subdirectories for each disk are found.]:Source directory:_path_files -/'
+    '-target_dir[The directory where the target root directory is located. This is '/' when installing on the hard drive, or typically '\''/mnt'\''  when installing from an install disk.]:Target directory:_path_files -W -/'
+    '-source_device[The source device to install from. This is not used if you'\''ve provided the -source_mounted flag. It'\''s usually used when installing from floppy.]:Source device:_files -/'
+    )
+    _arguments -s \
+      $flags[@] 
+      ;;
+  esac
+}
+
+_slackware_pkg "$@"
