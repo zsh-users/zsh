@@ -365,7 +365,9 @@ set_cutbuffer(Param pm, char *x)
 	free(cutbuf.buf);
     cutbuf.flags = 0;
     if (x) {
-	unmetafy(x, (int *)&cutbuf.len);
+	int n;
+	unmetafy(x, &n);
+	cutbuf.len = n;
 	cutbuf.buf = zalloc(cutbuf.len);
 	memcpy((char *)cutbuf.buf, x, cutbuf.len);
 	free(x);
@@ -418,9 +420,10 @@ set_killring(Param pm, char **x)
 	kringsize = arrlen(x);
 	kring = (Cutbuffer)zshcalloc(kringsize * sizeof(struct cutbuffer));
 	for (p = x; *p; p++) {
-	    int len = strlen(*p);
+	    int n, len = strlen(*p);
 	    kptr = kring + kpos;
-	    unmetafy(*p, (int *)&kptr->len);
+	    unmetafy(*p, &n);
+	    kptr->len = n;
 	    kptr->buf = (char *)zalloc(kptr->len);
 	    memcpy(kptr->buf, *p, kptr->len);
 	    zfree(*p, len+1);
