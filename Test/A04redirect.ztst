@@ -50,9 +50,33 @@
 0:Here-documents stripping tabs
 >barbar
 
+  cat <<-$'$HERE '`$(THERE) `'$((AND)) '"\EVERYWHERE"
+# tabs again.  sorry about the max miller.
+	Here's a funny thing.  Here is a funny thing.
+	I went home last night.  There's a funny thing.
+	Man walks into a $foo.  Ouch, it's an iron $foo.
+	$HERE `$(THERE) `$((AND)) \EVERYWHERE
+0:Here-documents don't perform shell expansion on the initial word
+>Here's a funny thing.  Here is a funny thing.
+>I went home last night.  There's a funny thing.
+>Man walks into a $foo.  Ouch, it's an iron $foo.
+
+  cat <<-$'\x45\x4e\x44\t\x44\x4f\x43'
+# tabs again
+	This message is unfathomable.
+	END	DOC
+0:Here-documents do perform $'...' expansion on the initial word
+>This message is unfathomable.
+
   cat <<<"This is a line with a $foo in it"
 0:'<<<' redirection
 >This is a line with a bar in it
+
+  cat <<<$'a\nb\nc'
+0:here-strings with $'...' quoting
+>a
+>b
+>c
 
   exec 3>redir  &&  print hello >&3  &&  print goodbye >&3  && cat redir
 0:'>&' redirection
