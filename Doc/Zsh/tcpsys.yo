@@ -506,6 +506,11 @@ zmanref(zshzle)
 ifnzman(\
 noderef(Zle Builtins)
 ).
+
+While active, the function sets the parameter tt(TCP_HANDLER_ACTIVE) to 1.
+This allows shell code called internally (for example, by setting
+tt(tcp_on_read)) to tell if is being called when the shell is otherwise
+idle at the editor prompt.
 )
 findex(tcp_output)
 item(tt(tcp_output [ -q ] -P) var(prompt) tt(-F) var(fd) tt(-S) var(sess))(
@@ -570,6 +575,12 @@ Array. May be set directly.  A set of extended globbing patterns which,
 if matched in tt(tcp_output), will cause the line not to be printed to
 standard output.  The patterns should be defined as described for the
 arguments to tt(tcp_expect).  Output of line to log files is not affected.
+)
+vindex(TCP_HANDLER_ACTIVE)
+item(tt(TCP_HANDLER_ACTIVE))(
+Scalar.  Set to 1 within tt(tcp_fd_handler) to indicate to functions
+called recursively that they have been called during an editor session.
+Otherwise unset.
 )
 vindex(TCP_LINE)
 item(tt(TCP_LINE))(
@@ -691,6 +702,13 @@ tt(tcp_read) (which includes lines read by tt(tcp_expect)) is compared
 against the pattern.  If the line matches, the command given in the key is
 called with two arguments: the name of the session from which the line was
 read, and the line itself.
+
+If any function called to handle a line returns a non-zero status, the
+line is not output.  Thus a tt(tcp_on_read) handler containing only
+the instruction `tt(return 1)' can be used to suppress output of
+particular lines (see, however, tt(tcp_filter) above).  However, the line
+is still stored in tt(TCP_LINE) and tt(tcp_lines); this occurs after all
+tt(tcp_on_read) processing.
 )
 enditem()
 

@@ -1,4 +1,5 @@
 local line name=${tcp_by_fd[$1]}
+local TCP_HANDLER_ACTIVE=1
 if [[ -n $name ]]
 then
   local TCP_INVALIDATE_ZLE

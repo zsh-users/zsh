@@ -60,7 +60,7 @@ setopt extendedglob cbases
 
 zmodload -i zsh/mathfunc
 
-local opt drain line quiet block read_fd all sess key val
+local opt drain line quiet block read_fd all sess key val noprint
 local -A read_fds
 read_fds=()
 float timeout timeout_all endtime
@@ -140,10 +140,10 @@ local helper_stat=2 skip tpat reply REPLY
 float newtimeout
 
 if [[ ${(t)SECONDS} != float* ]]; then
-    # If called from another function, don't override
-    typeset -F TCP_SECONDS_START=$SECONDS
-    # Get extra accuracy by making SECONDS floating point locally
-    typeset -F SECONDS
+  # If called from another function, don't override
+  typeset -F TCP_SECONDS_START=$SECONDS
+  # Get extra accuracy by making SECONDS floating point locally
+  typeset -F SECONDS
 fi
 
 if (( timeout_all )); then
@@ -198,22 +198,26 @@ while (( ${#read_fds} )); do
 
     helper_stat=0
     sess=${tcp_by_fd[$read_fd]}
+
+    # Handle user-defined triggers
+    noprint=${TCP_SILENT:+-q}
+    if (( ${+tcp_on_read} )); then
+      # Call the function given in the key for each matching value.
+      # It is this way round because function names must be
+      # unique, while patterns do not need to be.  Furthermore,
+      # this keeps the use of subscripting under control.
+      for key val in ${(kv)tcp_on_read}; do
+	if [[ $line = ${~val} ]]; then
+	  $key "$sess" "$line" || noprint=-q
+	fi
+      done
+    fi
+
     tcp_output -P "${TCP_PROMPT=<-[%s] }" -S $sess -F $read_fd \
-      ${TCP_SILENT:+-q} "$line"
+        $noprint "$line"
     # REPLY is now set to the line with an appropriate prompt.
     tcp_lines+=($REPLY)
     TCP_LINE=$REPLY TCP_LINE_FD=$read_fd
-
-    # Handle user-defined triggers
-    if (( ${+tcp_on_read} )); then
-	# Call the function given in the key for each matching value.
-	# It is this way round because function names must be
-	# unique, while patterns do not need to be.  Furthermore,
-	# this keeps the use of subscripting under control.
-	for key val in ${(kv)tcp_on_read}; do
-	    [[ $line = ${~val} ]] && $key "$sess" "$line"
-	done
-    fi
 
     # Only handle one line from one device at a time unless draining.
     [[ -z $drain ]] && return $stat
