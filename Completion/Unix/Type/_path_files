@@ -120,7 +120,9 @@ if zstyle -s ":completion:${curcontext}:" file-sort tmp1; then
 
     tmp2=()
     for tmp1 in "$pats[@]"; do
-      if [[ "$tmp1" = (#b)(*[^\$])(\(\([^\|~]##\)\)) ]]; then
+      if [[ "$tmp1" = (#b)(*[^\$])"(#q"(*)")" ]]; then
+	tmp2=( "$tmp2[@]" "${match[1]}(#q${sort}${match[2]})" )
+      elif [[ "$tmp1" = (#b)(*[^\$])(\(\([^\|~]##\)\)) ]]; then
         tmp2=( "$tmp2[@]" "${match[1]}((${sort}${match[2][3,-1]}" )
       elif [[ "$tmp1" = (#b)(*[^\$])(\([^\|~]##\)) ]]; then
         tmp2=( "$tmp2[@]" "${match[1]}(${sort}${match[2][2,-1]}" )
@@ -168,7 +170,9 @@ if [[ -n "$compstate[pattern_match]" &&
   fi
   tmp2=()
   for tmp1 in "$pats[@]"; do
-    if [[ "$tmp1" = (#b)(*[^\$])(\(\([^\|~]##\)\)) ]]; then
+    if [[ "$tmp1" = (#b)(*[^\$])"(#q"(*)")" ]]; then
+      tmp2=( "$tmp2[@]" "${match[1]}(#q${tmp3}${match[2]})" )
+    elif [[ "$tmp1" = (#b)(*[^\$])(\(\([^\|~]##\)\)) ]]; then
       tmp2=( "$tmp2[@]" "${match[1]}((${tmp3}${match[2][3,-1]}" )
     elif [[ "$tmp1" = (#b)(*[^\$])(\([^\|~]##\)) ]]; then
       tmp2=( "$tmp2[@]" "${match[1]}(${tmp3}${match[2][2,-1]}" )

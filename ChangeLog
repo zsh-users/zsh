@@ -1,5 +1,10 @@
 2004-04-27  Peter Stephenson  <pws@csr.com>
 
+	* 19839 (plus suggestion from 19842):
+	Completion/Unix/Type/_path_files: handle existing (#q)'s
+	in qualifiers when adding sort options and adding back
+	qualifiers from command line.
+
 	* 19840: Src/Zle/zle_main.c: also, vared now only takes
 	one normal argument.
 
