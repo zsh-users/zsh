@@ -187,6 +187,18 @@
 # command are appended to the remaining words of the style before calling
 # the command.
 #
+# Programmes taking p4-style arguments
+# ====================================
+#
+# It is possible to use the _perforce completion with other commands
+# which behave like a subcommand of p4 by setting the service type
+# to p4-<subcommand>.  For example,
+#   compdef _perforce p4cvsmap=p4-files
+# says that the command `p4cvsmap' takes arguments like `p4 files'.
+# Often the options will be different; if this is a problem, you
+# will need to write your own completer which loads _perforce and
+# calls its functions directly.
+#
 # TODO
 # ====
 #

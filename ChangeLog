@@ -1,5 +1,12 @@
 2003-04-03  Peter Stephenson  <pws@csr.com>
 
+	* 18432: Completion/Unix/Command/_mh,
+	Completion/Unix/Command/_perforce, Doc/Zsh/expn.yo,
+	Functions/TCP/tcp_spam, Functions/Zle/transpose-words-match:
+	miscellany: use _path_files for more control in _mh; check
+	arguments in tcp_spam; handle negative prefix arguments in
+	transpose-words-match; a few comments elsewhere.
+
 	* unposted: Functions/Zle/.distfiles, Functions/Zle/bash-*: remove
 	bash-* word functions in favour of selectable ones (18394).
 

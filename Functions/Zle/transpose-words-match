@@ -15,16 +15,24 @@ autoload match-words-by-style
 
 local curcontext=":zle:$WIDGET" skip
 local -a matched_words
-integer count=${NUMERIC:-1}
+integer count=${NUMERIC:-1} neg
+
+(( count < 0 )) && (( count = -count, neg = 1 ))
 
 while (( count-- > 0 )); do
     match-words-by-style
 
     [[ -z "$matched_words[2]$matched_words[5]" ]] && return 1
 
-    LBUFFER="$matched_words[1]$matched_words[5]${(j..)matched_words[3,4]}\
+    if (( neg )); then
+	LBUFFER="$matched_words[1]"
+	RBUFFER="$matched_words[5]${(j..)matched_words[3,4]}\
+$matched_words[2]${(j..)matched_words[6,7]}"
+    else
+	LBUFFER="$matched_words[1]$matched_words[5]${(j..)matched_words[3,4]}\
 $matched_words[2]"
-    RBUFFER="${(j..)matched_words[6,7]}"
+	RBUFFER="${(j..)matched_words[6,7]}"
+    fi
 
 done
 

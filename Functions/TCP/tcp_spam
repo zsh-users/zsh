@@ -75,6 +75,10 @@ if (( ! ${#sessions} )); then
   print "No connections to spam." >&2
   return 1
 fi
+if (( ! $# )); then
+  print "No commands given." >&2
+  return 1
+fi
 
 if [[ -n $transmit ]]; then
   cmd=tcp_send

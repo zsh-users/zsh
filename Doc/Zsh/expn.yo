@@ -374,6 +374,11 @@ noderef(Parameters)
 for a description of parameters, including arrays, associative arrays,
 and subscript notation to access individual array elements.
 
+Note in particular the fact that words of unquoted parameters are not
+automatically split on whitespace unless the option tt(SH_WORD_SPLIT) is
+set; see references to this option below for more details.  This is an
+important difference from other shells.
+
 In the expansions discussed below that require a pattern, the form of
 the pattern is the same as that used for filename generation;
 see noderef(Filename Generation).  Note that these patterns, along with
