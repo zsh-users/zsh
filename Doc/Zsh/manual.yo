@@ -115,7 +115,7 @@ menu(Examples)
 
 Zsh Modules
 
-includefile(Zsh/modmenu.yo)
+includefile(Zsh/manmodmenu.yo)
 endmenu()
 texinode(The Z Shell Manual)(Introduction)(Top)(Top)
 chapter(The Z Shell Manual)

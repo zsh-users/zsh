@@ -67,7 +67,7 @@ Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
 Zsh/exec.yo Zsh/expn.yo \
 Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/manual.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
-Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo $(MODDOCSRC) \
+Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo $(MODDOCSRC) \
 Zsh/options.yo Zsh/params.yo Zsh/prompt.yo Zsh/redirect.yo Zsh/restricted.yo \
 Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
 
@@ -178,9 +178,7 @@ Zsh/modlist.yo: $(MODDOCSRC)
 		echo ")"; \
 	    done; \
 	    echo "enditem()"; \
-	    echo "startmenu()"; \
 	    echo "includefile(Zsh/modmenu.yo)"; \
-	    echo "endmenu()"; \
 	    set '' $(MODDOCSRC); \
 	    unset mod1 mod2 mod3; \
 	    test ".$$2" != . && \
@@ -200,11 +198,21 @@ Zsh/modlist.yo: $(MODDOCSRC)
 
 Zsh/modmenu.yo: $(MODDOCSRC)
 	( \
+	    echo "startmenu()"; \
+	    for modfile in $(MODDOCSRC); do \
+		sed -n '1{s|^COMMENT(!MOD!\(.*\)$$|menu(The \1 Module)|;p;q;}' \
+		    < $(sdir)/$$modfile; \
+	    done; \
+	    echo "endmenu()" \
+	) > $(sdir)/Zsh/modmenu.yo
+
+Zsh/manmodmenu.yo: $(MODDOCSRC)
+	( \
 	    for modfile in $(MODDOCSRC); do \
 		sed -n '1{s|^COMMENT(!MOD!\(.*\)$$|menu(The \1 Module)|;p;q;}' \
 		    < $(sdir)/$$modfile; \
 	    done \
-	) > $(sdir)/Zsh/modmenu.yo
+	) > $(sdir)/Zsh/manmodmenu.yo
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
@@ -278,6 +286,7 @@ clean-here:
 	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.log
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
 	rm -rf infodir
+	rm -f *.1 Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo
 .PHONY: clean-here
 
 distclean-here: clean-here
