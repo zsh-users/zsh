@@ -4031,8 +4031,6 @@ addmatches(Cadata dat, char **argv)
 	    }
 	    compnmatches = mnum;
 	    compnnmatches = nmnum;
-	    if (dat->exp)
-		addexpl();
 	    if (dat->apar)
 		set_param(dat->apar, aparl);
 	    if (dat->opar)
@@ -4040,9 +4038,19 @@ addmatches(Cadata dat, char **argv)
 	    if (dat->dpar)
 		set_param(dat->dpar, dparl);
 	    if (dat->ylist) {
-		endcmgroup(get_user_var(dat->ylist));
-		begcmgroup("default", 0);
-	    }
+		if (dat->group) {
+		    endcmgroup(get_user_var(dat->ylist));
+		    begcmgroup(dat->group, (dat->aflags & CAF_NOSORT));
+		    if (dat->exp)
+			addexpl();
+		} else {
+		    if (dat->exp)
+			addexpl();
+		    endcmgroup(get_user_var(dat->ylist));
+		    begcmgroup("default", 0);
+		}
+	    } else if (dat->exp)
+		addexpl();
 	} LASTALLOC;
     } SWITCHBACKHEAPS;
 
@@ -6724,7 +6732,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    incompctlfunc = 0;
 	    uv = "reply";
 	}
-	
+	if (uv)
+	    yaptr = get_user_var(uv);
 	if ((tt = cc->explain)) {
 	    tt = dupstring(tt);
 	    if ((cc->mask & CC_EXPANDEXPL) && !parsestr(tt)) {
@@ -6732,13 +6741,16 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		untokenize(tt);
 	    }
 	    expl->str = tt;
-	    addexpl();
+	    if (cc->gname) {
+		endcmgroup(yaptr);
+		begcmgroup(cc->gname, cc->mask2 & CC_NOSORT);
+		addexpl();
+	    } else {
+		addexpl();
+		endcmgroup(yaptr);
+		begcmgroup("default", 0);
+	    }
 	}
-	if (uv && (yaptr = get_user_var(uv)))
-	    endcmgroup(yaptr);
-	else
-	    endcmgroup(NULL);
-	begcmgroup("default", 0);
     } else if ((tt = cc->explain)) {
 	tt = dupstring(tt);
 	if ((cc->mask & CC_EXPANDEXPL) && !parsestr(tt)) {
@@ -8135,7 +8147,7 @@ ilistmatches(Hookdef dummy, Chdata dat)
 		nl = !!strchr(*pp++, '\n');
 
 	    pp = g->ylist;
-	    if (nl) {
+	    if (nl || !pp[1]) {
 		/* Yup, there are newlines, count lines. */
 		char *nlptr, *sptr;
 

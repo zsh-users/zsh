@@ -344,7 +344,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 		nl = !!strchr(*pp++, '\n');
 
 	    pp = g->ylist;
-	    if (nl) {
+	    if (nl || !pp[1]) {
 		/* Yup, there are newlines, count lines. */
 		char *nlptr, *sptr;
 
