@@ -875,7 +875,7 @@ get_cadef(char *nam, char **args)
     Cadef *p, *min, new;
     int i, na = arrlen(args);
 
-    for (i = MAX_CACACHE, p = cadef_cache, min = NULL; *p && i--; p++)
+    for (i = MAX_CACACHE, p = cadef_cache, min = NULL; *p && i; p++, i--)
 	if (*p && na == (*p)->ndefs && arrcmp(args, (*p)->defs)) {
 	    (*p)->lastt = time(0);
 
@@ -1003,6 +1003,7 @@ ca_inactive(Cadef d, char **xor)
 
 struct castate {
     Cadef d;
+    int nopts;
     Caarg def, ddef;
     Caopt curopt;
     int opt, arg, argbeg, optbeg, nargbeg, restbeg;
@@ -1029,7 +1030,7 @@ ca_parse_line(Cadef d)
     /* Free old state. */
 
     if (ca_alloced) {
-	int i = ca_laststate.d->nopts;
+	int i = ca_laststate.nopts;
 	LinkList *p = ca_laststate.oargs;
 
 	freelinklist(ca_laststate.args, freestr);
@@ -1048,6 +1049,7 @@ ca_parse_line(Cadef d)
     /* Default values for the state. */
 
     state.d = d;
+    state.nopts = d->nopts;
     state.def = state.ddef = NULL;
     state.curopt = NULL;
     state.argbeg = state.optbeg = state.nargbeg = state.restbeg =
