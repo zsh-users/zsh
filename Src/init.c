@@ -1122,11 +1122,12 @@ mod_export ZleVoidFn refreshptr = noop_function;
 mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
 # ifdef UNLINKED_XMOD_zshQszle
 mod_export ZleReadFn zlereadptr = autoload_zleread;
+mod_export ZleVoidIntFn zlesetkeymapptr = autoload_zlesetkeymap;
 # else /* !UNLINKED_XMOD_zshQszle */
 mod_export ZleReadFn zlereadptr = fallback_zleread;
+mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 # endif /* !UNLINKED_XMOD_zshQszle */
 
-mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 #endif /* !LINKED_XMOD_zshQszle */
 
 /**/
@@ -1152,6 +1153,16 @@ fallback_zleread(char *lp, char *rp, int ha)
 
     return (unsigned char *)shingetline();
 }
+
+/**/
+static void
+autoload_zlesetkeymap(int mode)
+{
+    zlesetkeymapptr = noop_function_int;
+    load_module("zsh/zle");
+    (*zlesetkeymapptr)(mode);
+}
+
 
 /* compctl entry point pointers.  Similar to the ZLE ones. */
 

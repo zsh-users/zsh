@@ -1,4 +1,14 @@
+2003-05-15  Peter Stephenson  <pws@csr.com>
+
+	* 18539: Src/init.c: upgrade 18536 to autoload zle on
+	`set -o vi' or `set -o emacs'.
+
 2003-05-14  Peter Stephenson  <pws@csr.com>
+
+	* 18536: Doc/Zsh/options.yo, Src/init.c, Src/options.c,
+	Src/zsh.h, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c:
+	Add EMACS and VI options for POSIX-style
+	keymap changes; only implemented for compatibility.
 
 	* Jonathan Paisley <jp-www@dcs.gla.ac.uk>: 18513:
 	Src/Zle/complist.c: Work around a bad pointer access after

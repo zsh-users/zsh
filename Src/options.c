@@ -107,6 +107,7 @@ static struct optname optns[] = {
 {NULL, "cshjunkiequotes",     OPT_EMULATE|OPT_CSH,	 CSHJUNKIEQUOTES},
 {NULL, "cshnullcmd",	      OPT_EMULATE|OPT_CSH,	 CSHNULLCMD},
 {NULL, "cshnullglob",	      OPT_EMULATE|OPT_CSH,	 CSHNULLGLOB},
+{NULL, "emacs",		      0,			 EMACSMODE},
 {NULL, "equals",	      OPT_EMULATE|OPT_ZSH,	 EQUALS},
 {NULL, "errexit",	      OPT_EMULATE,		 ERREXIT},
 {NULL, "errreturn",	      OPT_EMULATE,		 ERRRETURN},
@@ -204,6 +205,7 @@ static struct optname optns[] = {
 {NULL, "typesetsilent",	      OPT_EMULATE|OPT_BOURNE,	 TYPESETSILENT},
 {NULL, "unset",		      OPT_EMULATE|OPT_BSHELL,	 UNSET},
 {NULL, "verbose",	      0,			 VERBOSE},
+{NULL, "vi",		      0,			 VIMODE},
 {NULL, "xtrace",	      0,			 XTRACE},
 {NULL, "zle",		      OPT_SPECIAL,		 USEZLE},
 {NULL, "braceexpand",	      OPT_ALIAS, /* ksh/bash */	 -IGNOREBRACES},
@@ -679,6 +681,9 @@ dosetopt(int optno, int value, int force)
     } else if(optno == CDABLEVARS && value) {
 	    return -1;
 #endif /* GETPWNAM_FAKED */
+    } else if ((optno == EMACSMODE || optno == VIMODE) && value) {
+	(*zlesetkeymapptr)(optno);
+	opts[(optno == EMACSMODE) ? VIMODE : EMACSMODE] = 0;
     }
     opts[optno] = value;
     if (optno == BANGHIST || optno == SHINSTDIN)
