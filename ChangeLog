@@ -1,3 +1,8 @@
+2002-11-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 17961: Armin Wolfermann: Completion/Unix/Command/_sysctl:
+	add OpenBSD support in _sysctl
+
 2002-11-22  Oliver Kiddle  <opk@zsh.org>
 
 	* 17958: Completion/Zsh/Command/_print, Completion/Zsh/Command/_read,
