@@ -317,6 +317,7 @@ $ZTST_curline"
       ZTST_hashmark
       ZTST_verbose 1 "Running test: $ZTST_message"
       ZTST_verbose 2 "ZTST_test: expecting status: $ZTST_xstatus"
+      ZTST_verbose 2 "Input: $ZTST_in, output: $ZTST_out, error: $ZTST_terr"
 
       ZTST_execchunk <$ZTST_in >$ZTST_tout 2>$ZTST_terr
 
@@ -345,6 +346,7 @@ $(<$ZTST_terr)}"
       if [[ $ZTST_flags != *D* ]] && ! ZTST_diff -c $ZTST_err $ZTST_terr; then
 	ZTST_testfailed "error output differs from expected as shown above for:
 $ZTST_code"
+	return 1
       fi
     fi
     ZTST_verbose 1 "Test successful."
