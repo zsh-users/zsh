@@ -83,8 +83,7 @@ while true; do
   else
     # No exact match, see how many strings match what's on the line.
 
-    tmp2=( "${(@)matches%%${sep}*}" )
-    compadd -O tmp1 - "$tmp2[@]"
+    compadd -O tmp1 - "${(@)matches%%${sep}*}"
 
     if [[ $#tmp1 -eq 1 ]]; then
 

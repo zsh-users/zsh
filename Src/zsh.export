@@ -4,6 +4,7 @@ addbuiltins
 addconddefs
 addedx
 addhashnode
+addparamdefs
 addwrapper
 arrvargetfn
 arrvarsetfn
@@ -40,6 +41,7 @@ current_limits
 deletebuiltins
 deleteconddefs
 deletehashtable
+deleteparamdefs
 deletewrapper
 domatch
 doshfunc

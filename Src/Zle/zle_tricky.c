@@ -87,6 +87,10 @@ static int usemenu, useglob, useexact, useline, uselist;
 
 static int oldlist, oldins;
 
+/* Non-zero if we have to redisplay the list of matches. */
+
+static int showagain = 0;
+
 /* The match and group number to insert when starting menucompletion.   */
 
 static int insmnum, insgnum, insgroup;
@@ -555,7 +559,7 @@ acceptandmenucomplete(void)
 /* These are flags saying if we are completing in the command *
  * position, in a redirection, or in a parameter expansion.   */
 
-static int lincmd, linredir, ispar, linwhat;
+static int lincmd, linredir, ispar, linwhat, linarr;
 
 /* The string for the redirection operator. */
 
@@ -758,10 +762,14 @@ docomplete(int lst)
     char *s, *ol;
     int olst = lst, chl = 0, ne = noerrs, ocs;
 
+    if (showagain && validlist)
+	showinglist = -2;
+    showagain = 0;
+
     /* If we are doing a menu-completion... */
 
-    if (menucmp && lst != COMP_LIST_EXPAND && compwidget &&
-	compwidget == lastcompwidget) {
+    if (menucmp && lst != COMP_LIST_EXPAND && 
+	(!compwidget || compwidget == lastcompwidget)) {
 	do_menucmp(lst);
 	return;
     }
@@ -872,7 +880,7 @@ docomplete(int lst)
 	    }
 	    if (lst == COMP_EXPAND_COMPLETE)
 		do {
-		    /* check if there is a parameter expresiion. */
+		    /* Check if there is a parameter expression. */
 		    for (; *q && *q != String; q++);
 		    if (*q == String && q[1] != Inpar && q[1] != Inbrack) {
 			if (*++q == Inbrace) {
@@ -1128,7 +1136,7 @@ unmetafy_line(void)
 static char *
 get_comp_string(void)
 {
-    int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, inarr, ia, parct;
+    int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct;
     char *s = NULL, *linptr, *tmp, *p, *tt = NULL;
 
     zsfree(brbeg);
@@ -1192,7 +1200,7 @@ get_comp_string(void)
 	inpush(dupstrspace((char *) linptr), 0, NULL);
 	strinbeg();
 	stophist = 2;
-	i = tt0 = cp = rd = ins = oins = inarr = parct = ia = 0;
+	i = tt0 = cp = rd = ins = oins = linarr = parct = ia = 0;
 
 	/* This loop is possibly the wrong way to do this.  It goes through *
 	 * the previously massaged command line using the lexer.  It stores *
@@ -1211,11 +1219,11 @@ get_comp_string(void)
 	    linredir = (inredir && !ins);
 	    oins = ins;
 	    /* Get the next token. */
-	    if (inarr)
+	    if (linarr)
 		incmdpos = 0;
 	    ctxtlex();
 	    if (tok == ENVARRAY) {
-		inarr = 1;
+		linarr = 1;
 		zsfree(varname);
 		varname = ztrdup(tokstr);
 	    } else if (tok == INPAR)
@@ -1224,7 +1232,7 @@ get_comp_string(void)
 		if (parct)
 		    parct--;
 		else
-		    inarr = 0;
+		    linarr = 0;
 	    }
 	    if (inredir)
 		rdstr = tokstrings[tok];
@@ -1267,7 +1275,7 @@ get_comp_string(void)
 		clwpos = i;
 		cp = lincmd;
 		rd = linredir;
-		ia = inarr;
+		ia = linarr;
 		if (inwhat == IN_NOTHING && incond)
 		    inwhat = IN_COND;
 	    } else if (linredir)
@@ -1515,12 +1523,53 @@ get_comp_string(void)
 	     */
 	    for (i = 0, p = s; *p; p++, i++) {
 		/* careful, ${... is not a brace expansion...
-		 * in fact, if it's got a substitution in it's too
-		 * hard for us anyway.  sorry.
+		 * we try to get braces after a parameter expansion right,
+		 * but this may fail sometimes. sorry.
 		 */
 		if (*p == String || *p == Qstring) {
-		    tt = NULL;
-		    break;
+		    if (p[1] == Inbrace || p[1] == Inpar || p[1] == Inbrack) {
+			char *tp = p + 1;
+			if (skipparens(*tp, (*tp == Inbrace ? Outbrace :
+					     (*tp == Inpar ? Outpar : Outbrack)),
+				       &tp)) {
+			    tt = NULL;
+			    break;
+			}
+			i += tp - p;
+			p = tp;
+		    } else {
+			char *tp = p + 1;
+
+			for (; *tp == '^' || *tp == Hat ||
+				 *tp == '=' || *tp == Equals ||
+				 *tp == '~' || *tp == Tilde ||
+				 *tp == '#' || *tp == Pound || *tp == '+';
+			     tp++);
+			if (*tp == Quest || *tp == Star || *tp == String ||
+			    *tp == Qstring || *tp == '?' || *tp == '*' ||
+			    *tp == '$' || *tp == '-' || *tp == '!' ||
+			    *tp == '@')
+			    p++, i++;
+			else {
+			    if (idigit(*tp))
+				while (idigit(*tp))
+				    tp++;
+			    else if (iident(*tp))
+				while (iident(*tp))
+				    tp++;
+			    else {
+				tt = NULL;
+				break;
+			    }
+			    if (*tp == Inbrace) {
+				tt = NULL;
+				break;
+			    }
+			    tp--;
+			    i += tp - p;
+			    p = tp;
+			}
+		    }
 		} else if (*p == Inbrace) {
 		    if (tt) {
 			/* too many inbraces */
@@ -3472,14 +3521,10 @@ set_param(char *name, LinkList l)
 
 /**/
 int
-addmatches(char *ipre, char *isuf,
-	   char *ppre, char *psuf, char *prpre, char *pre,
-	   char *suf, char *group, char *rems, char *remf, char *ign,
-	   int flags, int aflags, Cmatcher match, char *exp, 
-	   char *apar, char *opar, char **argv)
+addmatches(Cadata dat, char **argv)
 {
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
-    char **aign = NULL;
+    char **aign = NULL, **dparr;
     int lpl, lsl, pl, sl, bpl, bsl, llpl = 0, llsl = 0, nm = mnum;
     int oisalt = 0, isalt, isexact, doadd;
     Cline lc = NULL;
@@ -3487,45 +3532,52 @@ addmatches(char *ipre, char *isuf,
     struct cmlist mst;
     Cmlist oms = mstack;
     Comp cp = NULL;
-    LinkList aparl = NULL, oparl = NULL;
+    LinkList aparl = NULL, oparl = NULL, dparl = NULL;
 
     /* Switch back to the heap that was used when the completion widget
      * was invoked. */
     SWITCHHEAPS(compheap) {
 	HEAPALLOC {
-	    doadd = (!apar && !opar);
-	    if (apar)
+	    doadd = (!dat->apar && !dat->opar && !dat->dpar);
+	    if (dat->apar)
 		aparl = newlinklist();
-	    if (opar)
+	    if (dat->opar)
 		oparl = newlinklist();
-	    if (exp) {
+	    if (dat->dpar) {
+		if (*(dat->dpar) == '(')
+		    dparr = NULL;
+		else if ((dparr = get_user_var(dat->dpar)) && !*dparr)
+		    dparr = NULL;
+		dparl = newlinklist();
+	    }
+	    if (dat->exp) {
 		expl = (Cexpl) zhalloc(sizeof(struct cexpl));
 		expl->count = expl->fcount = 0;
-		expl->str = dupstring(exp);
+		expl->str = dupstring(dat->exp);
 	    } else
 		expl = NULL;
 
 	    /* Store the matcher in our stack of matchers. */
-	    if (match) {
+	    if (dat->match) {
 		mst.next = mstack;
-		mst.matcher = match;
+		mst.matcher = dat->match;
 		mstack = &mst;
 
 		if (!mnum)
-		    add_bmatchers(match);
+		    add_bmatchers(dat->match);
 
-		addlinknode(matchers, match);
-		match->refc++;
+		addlinknode(matchers, dat->match);
+		dat->match->refc++;
 	    }
 	    if (mnum && (mstack || bmatchers))
 		update_bmatchers();
 
 	    /* Get the suffixes to ignore. */
-	    if (ign)
-		aign = get_user_var(ign);
+	    if (dat->ign)
+		aign = get_user_var(dat->ign);
 	    /* Get the contents of the completion variables if we have
 	     * to perform matching. */
-	    if (aflags & CAF_MATCH) {
+	    if (dat->aflags & CAF_MATCH) {
 		lipre = dupstring(compiprefix);
 		lisuf = dupstring(compisuffix);
 		lpre = dupstring(compprefix);
@@ -3533,8 +3585,8 @@ addmatches(char *ipre, char *isuf,
 		llpl = strlen(lpre);
 		llsl = strlen(lsuf);
 		/* Test if there is an existing -P prefix. */
-		if (pre && *pre) {
-		    pl = pfxlen(pre, lpre);
+		if (dat->pre && *dat->pre) {
+		    pl = pfxlen(dat->pre, lpre);
 		    llpl -= pl;
 		    lpre += pl;
 		}
@@ -3557,79 +3609,76 @@ addmatches(char *ipre, char *isuf,
 		}
 	    }
 	    /* Now duplicate the strings we have from the command line. */
-	    if (ipre)
-		ipre = (lipre ? dyncat(lipre, ipre) : dupstring(ipre));
+	    if (dat->ipre)
+		dat->ipre = (lipre ? dyncat(lipre, dat->ipre) :
+			     dupstring(dat->ipre));
 	    else if (lipre)
-		ipre = lipre;
-	    if (isuf)
-		isuf = (lisuf ? dyncat(lisuf, isuf) : dupstring(isuf));
+		dat->ipre = lipre;
+	    if (dat->isuf)
+		dat->isuf = (lisuf ? dyncat(lisuf, dat->isuf) :
+			     dupstring(dat->isuf));
 	    else if (lisuf)
-		isuf = lisuf;
-	    if (ppre) {
-		ppre = dupstring(ppre);
-		lpl = strlen(ppre);
+		dat->isuf = lisuf;
+	    if (dat->ppre) {
+		dat->ppre = dupstring(dat->ppre);
+		lpl = strlen(dat->ppre);
 	    } else
 		lpl = 0;
-	    if (psuf) {
-		psuf = dupstring(psuf);
-		lsl = strlen(psuf);
+	    if (dat->psuf) {
+		dat->psuf = dupstring(dat->psuf);
+		lsl = strlen(dat->psuf);
 	    } else
 		lsl = 0;
-	    if (aflags & CAF_MATCH) {
-		s = ppre ? ppre : "";
-		if (llpl <= lpl && strpfx(lpre, s)) {
-		    llpl = 0;
+	    if (dat->aflags & CAF_MATCH) {
+		s = dat->ppre ? dat->ppre : "";
+		if (llpl <= lpl && strpfx(lpre, s))
 		    lpre = "";
-		} else if (llpl > lpl && strpfx(s, lpre)) {
-		    llpl -= lpl;
+		else if (llpl > lpl && strpfx(s, lpre))
 		    lpre += lpl;
-		} else
+		else
 		    *argv = NULL;
-		s = psuf ? psuf : "";
-		if (llsl <= lsl && strsfx(lsuf, s)) {
-		    llsl = 0;
+		s = dat->psuf ? dat->psuf : "";
+		if (llsl <= lsl && strsfx(lsuf, s))
 		    lsuf = "";
-		} else if (llsl > lsl && strsfx(s, lsuf)) {
+		else if (llsl > lsl && strsfx(s, lsuf))
 		    lsuf[llsl - lsl] = '\0';
-		    llsl -= lsl;
-		} else
+		else
 		    *argv = NULL;
 	    }
 	    if (*argv) {
-		if (pre)
-		    pre = dupstring(pre);
-		if (suf)
-		    suf = dupstring(suf);
-		if (!prpre && (prpre = ppre)) {
-		    singsub(&prpre);
-		    untokenize(prpre);
+		if (dat->pre)
+		    dat->pre = dupstring(dat->pre);
+		if (dat->suf)
+		    dat->suf = dupstring(dat->suf);
+		if (!dat->prpre && (dat->prpre = dat->ppre)) {
+		    singsub(&(dat->prpre));
+		    untokenize(dat->prpre);
 		} else
-		    prpre = dupstring(prpre);
+		    dat->prpre = dupstring(dat->prpre);
 		/* Select the group in which to store the matches. */
-		if (group) {
+		if (dat->group) {
 		    endcmgroup(NULL);
-		    begcmgroup(group, (aflags & CAF_NOSORT));
-		    if (aflags & CAF_NOSORT)
+		    begcmgroup(dat->group, (dat->aflags & CAF_NOSORT));
+		    if (dat->aflags & CAF_NOSORT)
 			mgroup->flags |= CGF_NOSORT;
 		} else {
 		    endcmgroup(NULL);
 		    begcmgroup("default", 0);
 		}
 		/* Select the set of matches. */
-		oisalt = (aflags & CAF_ALT);
+		oisalt = (dat->aflags & CAF_ALT);
 
-		if (remf) {
-		    remf = dupstring(remf);
-		    rems = NULL;
-		} else if (rems)
-		    rems = dupstring(rems);
+		if (dat->remf) {
+		    dat->remf = dupstring(dat->remf);
+		    dat->rems = NULL;
+		} else if (dat->rems)
+		    dat->rems = dupstring(dat->rems);
 
 		/* Probably quote the prefix and suffix for testing. */
-		if (!cp && (aflags & CAF_MATCH) && !(aflags & CAF_QUOTE)) {
+		if (!cp && (dat->aflags & CAF_MATCH) &&
+		    !(dat->aflags & CAF_QUOTE)) {
 		    lpre = quotename(lpre, NULL);
 		    lsuf = quotename(lsuf, NULL);
-		    llpl = strlen(lpre);
-		    llsl = strlen(lsuf);
 		}
 	    }
 	    /* Walk through the matches given. */
@@ -3638,7 +3687,7 @@ addmatches(char *ipre, char *isuf,
 		bpl = brpl;
 		bsl = brsl;
 		isalt = oisalt;
-		if ((!psuf || !*psuf) && aign) {
+		if ((!dat->psuf || !*(dat->psuf)) && aign) {
 		    /* Do the suffix-test. If the match has one of the
 		     * suffixes from ign, we put it in the alternate set. */
 		    char **pt = aign;
@@ -3649,39 +3698,52 @@ addmatches(char *ipre, char *isuf,
 			    && !strcmp(*pt, s + sl - filell))
 			    isalt = 1;
 
-		    if (isalt && !doadd)
+		    if (isalt && !doadd) {
+			if (dparr && !*++dparr)
+			    dparr = NULL;
 			continue;
+		    }
 		}
-		if (!(aflags & CAF_MATCH)) {
+		if (!(dat->aflags & CAF_MATCH)) {
 		    ms = dupstring(s);
 		    lc = bld_parts(ms, sl, -1, NULL);
 		    isexact = 0;
 		} else if (!(ms = comp_match(lpre, lsuf, s, cp, &lc,
-					     !(aflags & CAF_QUOTE),
-					     &bpl, &bsl, &isexact)))
+					     !(dat->aflags & CAF_QUOTE),
+					     &bpl, &bsl, &isexact))) {
+		    if (dparr && !*++dparr)
+			dparr = NULL;
 		    continue;
-
+		}
 		if (doadd) {
-		    cm = add_match_data(isalt, ms, lc, ipre, ipre, isuf, pre, 
-					prpre, ppre, psuf, suf, bpl, bsl,
-					flags, isexact);
-		    cm->rems = rems;
-		    cm->remf = remf;
+		    cm = add_match_data(isalt, ms, lc, dat->ipre, dat->ipre,
+					dat->isuf, dat->pre, dat->prpre,
+					dat->ppre, dat->psuf, dat->suf,
+					bpl, bsl, dat->flags, isexact);
+		    cm->rems = dat->rems;
+		    cm->remf = dat->remf;
 		} else {
-		    if (apar)
+		    if (dat->apar)
 			addlinknode(aparl, ms);
-		    if (opar)
+		    if (dat->opar)
 			addlinknode(oparl, s);
+		    if (dat->dpar && dparr) {
+			addlinknode(dparl, *dparr);
+			if (!*++dparr)
+			    dparr = NULL;
+		    }
 		    free_cline(lc);
 		}
 	    }
 	    compnmatches = mnum;
-	    if (exp)
+	    if (dat->exp)
 		addexpl();
-	    if (apar)
-		set_param(apar, aparl);
-	    if (opar)
-		set_param(opar, oparl);
+	    if (dat->apar)
+		set_param(dat->apar, aparl);
+	    if (dat->opar)
+		set_param(dat->opar, oparl);
+	    if (dat->dpar)
+		set_param(dat->dpar, dparl);
 	} LASTALLOC;
     } SWITCHBACKHEAPS;
 
@@ -4128,6 +4190,7 @@ docompletion(char *s, int lst, int incmd)
 				(unset(ALWAYSLASTPROMPT) && zmult != 1)) ?
 				"yes" : "");
 	movetoend = ((cs == we || isset(ALWAYSTOEND)) ? 2 : 1);
+	showinglist = 0;
 
 	/* Make sure we have the completion list and compctl. */
 	if (makecomplist(s, incmd, lst)) {
@@ -4217,14 +4280,22 @@ callcompfunc(char *s, char *fn)
 
     if ((list = getshfunc(fn)) != &dummy_list) {
 	char **p, *tmp;
-	int set, aadd = 0, usea = 1, icf = incompfunc, osc = sfcontext;
+	int aadd = 0, usea = 1, icf = incompfunc, osc = sfcontext;
+	unsigned int set;
 	Param *ocpms = comppms;
 
 	comppms = (Param *) zalloc(CP_NUM * sizeof(Param));
 
-	set = -1 & ~(CP_PARAMETER | CP_REDIRECT | CP_QUOTE | CP_QUOTING |
-		     CP_EXACTSTR | CP_FORCELIST | CP_OLDLIST | CP_OLDINS |
-		     (useglob ? 0 : CP_PATMATCH));
+	set = CP_ALLMASK &
+	    ~(CP_PARAMETER | CP_REDIRECT | CP_QUOTE | CP_QUOTING |
+	      CP_EXACTSTR | CP_FORCELIST | CP_OLDLIST | CP_OLDINS |
+	      (useglob ? 0 : CP_PATMATCH));
+	zsfree(compvared);
+	if (varedarg) {
+	    compvared = ztrdup(varedarg);
+	    set |= CP_VARED;
+	} else
+	    compvared = ztrdup("");
 	if (!*complastprompt)
 	    set &= ~CP_LASTPROMPT;
 	zsfree(compcontext);
@@ -4257,7 +4328,7 @@ callcompfunc(char *s, char *fn)
 	} else
 	    switch (linwhat) {
 	    case IN_ENV:
-		compcontext = "array_value";
+		compcontext = (linarr ? "array_value" : "value");
 		compparameter = varname;
 		set |= CP_PARAMETER;
 		if (!clwpos) {
@@ -4551,6 +4622,7 @@ makecomplist(char *s, int incmd, int lst)
 	insmnum = insgnum = 1;
 	insgroup = oldlist = oldins = 0;
 	begcmgroup("default", 0);
+	menucmp = 0;
 
 	ccused = newlinklist();
 	ccstack = newlinklist();
@@ -6717,11 +6789,13 @@ unambig_data(int *cp)
     return scache;
 }
 
-/* Insert the given match. This returns the number of characters inserted.*/
+/* Insert the given match. This returns the number of characters inserted.
+ * scs is used to return the position where a automatically created suffix
+ * has to be inserted. */
 
 /**/
 static int
-instmatch(Cmatch m)
+instmatch(Cmatch m, int *scs)
 {
     int l, r = 0, ocs, a = cs;
 
@@ -6771,6 +6845,7 @@ instmatch(Cmatch m)
     } else
 	brscs = -1;
     /* -S suffix */
+    *scs = cs;
     if (m->suf) {
 	inststrlen(m->suf, 1, (l = strlen(m->suf)));
 	r += l;
@@ -6842,13 +6917,13 @@ do_ambiguous(void)
 
 	/* If REC_EXACT and AUTO_MENU are set and what we inserted is an  *
 	 * exact match, we want menu completion the next time round       *
-	 * so we set fromcomp,to ensure that the word on the line is not  *
+	 * so we set fromcomp, to ensure that the word on the line is not *
 	 * taken as an exact match. Also we remember if we just moved the *
 	 * cursor into the word.                                          */
 	fromcomp = ((isset(AUTOMENU) ? FC_LINE : 0) |
 		    ((atend && cs != lastend) ? FC_INWORD : 0));
 
-	/* Probably move the cursor to then end. */
+	/* Probably move the cursor to the end. */
 	if (movetoend == 3)
 	    cs = lastend;
 
@@ -6907,7 +6982,7 @@ ztat(char *nam, struct stat *buf, int ls)
 static void
 do_single(Cmatch m)
 {
-    int l, sr = 0;
+    int l, sr = 0, scs;
     int havesuff = 0;
     char *str = m->str, *ppre = m->ppre, *psuf = m->psuf, *prpre = m->prpre;
 
@@ -6937,7 +7012,7 @@ do_single(Cmatch m)
     foredel(l);
 
     /* And then we insert the new string. */
-    menulen = instmatch(m);
+    menulen = instmatch(m, &scs);
     menuend = cs;
     cs = menupos + menulen;
 
@@ -6956,6 +7031,7 @@ do_single(Cmatch m)
     } else {
 	/* There is no user-specified suffix, *
 	 * so generate one automagically.     */
+	cs = scs;
 	if (m->ripre && (m->flags & CMF_PARBR)) {
 	    /*{{*/
 	    /* Completing a parameter in braces.  Add a removable `}' suffix. */
@@ -7006,6 +7082,8 @@ do_single(Cmatch m)
 		}
 	    }
 	}
+	if (!menuinsc)
+	    cs = menupos + menulen;
     }
     /* If completing in a brace expansion... */
     if (brbeg) {
@@ -7018,7 +7096,7 @@ do_single(Cmatch m)
 	} else if (!menucmp) {
 	    /*{{*/
 	    /* Otherwise, add a `,' suffix, and let `}' remove it. */
-	    cs = menuend;
+	    cs = scs;
 	    havesuff = 1;
 	    inststrlen(",", 1, 1);
 	    menuinsc++;
@@ -7492,7 +7570,12 @@ listlist(LinkList l)
     struct cmgroup dg;
     Cmgroup am = amatches;
     int vl = validlist, sm = smatches;
+    char *oclp = complastprompt;
 
+    if (listshown)
+	showagain = 1;
+
+    complastprompt = ((zmult == 1) == !!isset(ALWAYSLASTPROMPT) ? "yes" : NULL);
     smatches = 1;
     validlist = 1;
     amatches = &dg;
@@ -7503,6 +7586,7 @@ listlist(LinkList l)
     amatches = am;
     validlist = vl;
     smatches = sm;
+    complastprompt = oclp;
 }
 
 /* Expand the history references. */

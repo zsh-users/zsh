@@ -361,6 +361,7 @@ the parameter is then substituted.
 item(tt(${)var(name)tt(:?)var(word)tt(}))(
 If var(name) is set and is non-null, then substitute
 its value; otherwise, print var(word) and exit from the shell.
+Interactive shells do not exit.
 If var(word) is omitted, then a standard message is printed.
 )
 item(tt(${)var(name)tt(:PLUS())var(word)tt(}))(
@@ -596,11 +597,12 @@ Pad the resulting words on the left.  Each word will be truncated if
 required and placed in a field var(expr) characters wide.  The space
 to the left will be filled with var(string1) (concatenated as often
 as needed) or spaces if var(string1) is not given.  If both
-var(string1) and var(string2) are given, this string will be placed
-exactly once directly to the left of the resulting word.
+var(string1) and var(string2) are given, this string is inserted
+once directly to the left of each word, before padding.
 )
 item(tt(r:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
-As tt(l), but pad the words on the right.
+As tt(l), but pad the words on the right and insert var(string2)
+on the right.
 )
 item(tt(j:)var(string)tt(:))(
 Join the words of arrays together using var(string) as a separator.

@@ -539,18 +539,24 @@ load_module(char const *name)
 	m = zcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
 	m->handle = handle;
+	m->flags |= MOD_SETUP;
+	PERMALLOC {
+	    node = addlinknode(modules, m);
+	} LASTALLOC;
 	if (setup_module(m) || init_module(m)) {
 	    finish_module(m);
+	    remnode(modules, node);
 	    zsfree(m->nam);
 	    zfree(m, sizeof(*m));
+	    m->flags &= ~MOD_SETUP;
 	    return NULL;
 	}
-	PERMALLOC {
-	    addlinknode(modules, m);
-	} LASTALLOC;
+	m->flags &= ~MOD_SETUP;
 	return m;
     } 
     m = (Module) getdata(node);
+    if (m->flags & MOD_SETUP)
+	return m;
     if (m->flags & MOD_UNLOAD)
 	m->flags &= ~MOD_UNLOAD;
     else if (m->handle)
@@ -570,17 +576,22 @@ load_module(char const *name)
     if (!m->handle) {
 	if (!(m->handle = do_load_module(name)))
 	    return NULL;
+	m->flags |= MOD_SETUP;
 	if (setup_module(m)) {
 	    finish_module(m->handle);
 	    m->handle = NULL;
+	    m->flags &= ~MOD_SETUP;
 	    return NULL;
 	}
     }
+    m->flags |= MOD_SETUP;
     if (init_module(m)) {
 	finish_module(m->handle);
 	m->handle = NULL;
+	m->flags &= ~MOD_SETUP;
 	return NULL;
     }
+    m->flags &= ~MOD_SETUP;
     return m;
 }
 
@@ -690,6 +701,8 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 	return bin_zmodload_auto(nam, args, ops);
     else if (ops['c'] || ops['C'])
 	return bin_zmodload_cond(nam, args, ops);
+    else if (ops['p'])
+	return bin_zmodload_param(nam, args, ops);
     else
 	return bin_zmodload_load(nam, args, ops);
 }
@@ -883,6 +896,66 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 		zwarnnam(nam, "failed to add condition %s", cnam, 0);
 		ret = 1;
 	    }
+	} while(*args);
+	return ret;
+    }
+}
+
+static void
+printautoparams(HashNode hn, int lon)
+{
+    Param pm = (Param) hn;
+
+    if (pm->flags & PM_AUTOLOAD) {
+	if (lon)
+	    printf("zmodload -p %s %s\n", pm->u.str, pm->nam);
+	else
+	    printf("%s (%s)\n", pm->nam, pm->u.str);
+    }
+}
+
+/**/
+static int
+bin_zmodload_param(char *nam, char **args, char *ops)
+{
+    int ret = 0;
+
+    if (ops['u']) {
+	/* remove autoloaded parameters */
+	for (; *args; args++) {
+	    Param pm = (Param) gethashnode2(paramtab, *args);
+
+	    if (!pm) {
+		if (!ops['i']) {
+		    zwarnnam(nam, "%s: no such parameter", *args, 0);
+		    ret = 1;
+		}
+	    } else if (!(pm->flags & PM_AUTOLOAD)) {
+		zwarnnam(nam, "%s: parameter is already defined", *args, 0);
+		ret = 1;
+	    } else
+		unsetparam_pm(pm, 0, 1);
+	}
+	return ret;
+    } else if (!*args) {
+	scanhashtable(paramtab, 1, 0, 0, printautoparams, ops['L']);
+	return 0;
+    } else {
+	/* add autoloaded parameters */
+	char *modnam;
+
+	modnam = *args++;
+	if(isset(RESTRICTED) && strchr(modnam, '/')) {
+	    zwarnnam(nam, "%s: restricted", modnam, 0);
+	    return 1;
+	}
+	do {
+	    char *pnam = *args ? *args++ : modnam;
+	    if (strchr(pnam, '/')) {
+		zwarnnam(nam, "%s: `/' is illegal in a parameter", pnam, 0);
+		ret = 1;
+	    } else
+		add_autoparam(pnam, modnam);
 	} while(*args);
 	return ret;
     }
@@ -1114,6 +1187,71 @@ addconddefs(char const *nam, Conddef c, int size)
     return hadf ? hads : 1;
 }
 
+/* This adds the given parameter definition. The return value is zero on *
+ * success and 1 on failure. */
+
+/**/
+int
+addparamdef(Paramdef d)
+{
+    Param pm;
+
+    if ((pm = (Param) gethashnode2(paramtab, d->name)))
+	unsetparam_pm(pm, 0, 1);
+
+    if (!(pm = createparam(d->name, d->flags)) &&
+	!(pm = (Param) paramtab->getnode(paramtab, d->name)))
+	return 1;
+
+    pm->level = 0;
+    pm->u.data = d->var;
+    pm->sets.ifn = (void (*)(Param, long)) d->set;
+    pm->gets.ifn = (long (*)(Param)) d->get;
+    pm->unsetfn = (void (*)(Param, int)) d->unset;
+
+    return 0;
+}
+
+/* This adds multiple parameter definitions. This is like addbuiltins(). */
+
+/**/
+int
+addparamdefs(char const *nam, Paramdef d, int size)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (addparamdef(d)) {
+	    zwarnnam(nam, "error when adding parameter `%s'", d->name, 0);
+	    hadf = 1;
+	} else
+	    hads = 2;
+	d++;
+    }
+    return hadf ? hads : 1;
+}
+
+/* Delete parameters defined. No error checking yet. */
+
+/**/
+int
+deleteparamdef(Paramdef d)
+{
+    unsetparam(d->name);
+    return 0;
+}
+
+/**/
+int
+deleteparamdefs(char const *nam, Paramdef d, int size)
+{
+    while (size--) {
+	deleteparamdef(d);
+	d++;
+    }
+    return 1;
+}
+
 #ifdef DYNAMIC
 
 /* This adds a definition for autoloading a module for a condition. */
@@ -1186,6 +1324,22 @@ deleteconddefs(char const *nam, Conddef c, int size)
 	c++;
     }
     return hadf ? hads : 1;
+}
+
+/* This adds a definition for autoloading a module for a parameter. */
+
+/**/
+void
+add_autoparam(char *nam, char *module)
+{
+    Param pm;
+
+    if ((pm = (Param) gethashnode2(paramtab, nam)))
+	unsetparam_pm(pm, 0, 1);
+
+    pm = setsparam(ztrdup(nam), ztrdup(module));
+
+    pm->flags |= PM_AUTOLOAD;
 }
 
 #endif

@@ -940,7 +940,7 @@ pws: 6053: compwid.yo
 
 Sven: 6056: compwid.yo
 
-Sven: 6058: small changes
+Sven: 6058: small changes in _path_files, compinit and documentation
 
 Sven: 6060: don't invalidatelist() in zle_main.c before calling completion
 functions
@@ -967,3 +967,52 @@ Tanaka Akira: 6085: _make can hang when no [mM]akefile
 Tanaka Akira: 6092: _find, bad glob pattern
 
 pws: 6101: multi-line prompt ending in '\n' got another newline
+
+  pws-17
+
+Geoff: 6104: multi-line prompt fix (6101 backed off)
+
+Sven: 6105: _make patch whitespace
+
+Bart: 6106: short documentation fixes in expn.yo, options.yo, redirect.yo
+
+Sven: 6109: completion in parameter assignment should set context `value'
+
+Sven: 6113: compadd -D, nuke element in an array for each failed match
+
+Sven: 6117: position of ignored suffix in inserted match
+
+pws: 6118: _closequote and _oldlist completers
+
+Sven: 6119: don't insert word separator before ignored suffix
+
+Sven: 6121: try harder with braces after a parameter expansion
+
+Sven: 6124: menu completion wasn't consistent between tabs
+
+Sven: 6128: completion after an expansion; list after a non-completion list
+
+Sven: 6129: comments for struct cadata
+
+Ville Herva: 6131, see 6126: reset tv.tv_sec before select for Linux
+
+Sven: 6132: compctl.mdd
+
+Sven: 6133: autoloaded parameters
+
+Sven: 6150: alwayslastprompt sometimes failed in M-x
+
+Sven: 6152: compstate[vared]
+
+Sven: 6153: realparamtab to smooth access to autoloaded parameters
+
+Bart: 6162: autoloadable parameter code links without dynamic loading
+
+pws: 6165: globsubst'd foo='~/bin' depended on extendedglob being set
+
+Sven: 6167: show unloaded parameters as undefined
+
+Bart: 6171 as rewritten in 6174: old RedHat Linux doesn't have normall
+definitions for poll.
+
+pws: 6180: Completion/Core/compinstall

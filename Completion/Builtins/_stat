@@ -1,0 +1,10 @@
+#compdef stat
+
+if [[ "$words[CURRENT-1]" = -[AH] ]]; then
+  compgen -A
+else
+  [[ "$PREFIX[1]" = + ]] &&
+      compadd - +device +inode +mode +nlink +uid +gid +rdev +size \
+                +atime +mtime +ctime +blksize +block +link
+  _files
+fi

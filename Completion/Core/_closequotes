@@ -1,0 +1,11 @@
+#autoload
+
+# If the current completion is in quotes, add the closing quote.
+# This can clash with some of the more sophisticated forms of completion
+
+if [[ -n $compstate[quote] && $RBUFFER != *${compstate[quote]}* ]]; then
+  compstate[restore]=''
+  ISUFFIX="$ISUFFIX$compstate[quote]"
+fi
+
+return 1

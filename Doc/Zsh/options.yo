@@ -670,7 +670,7 @@ tt(trap) and
 tt(unset).
 )
 pindex(PRINT_EIGHT_BIT)
-cindex(exit status, printing)
+cindex(eight bit characters, printing)
 item(tt(PRINT_EIGHT_BIT))(
 Print eight bit characters literally in completion lists, etc.
 This option is not necessary if your system correctly returns the

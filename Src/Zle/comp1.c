@@ -52,7 +52,7 @@ void (*comp_setunsetptr) _((int, int));
 /* pointers to functions required by compctl and defined by zle */
 
 /**/
-int (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char *, char *, char *, char **));
+int (*addmatchesptr) _((Cadata, char **));
 
 /**/
 char *(*comp_strptr) _((int *, int *, int));
@@ -129,7 +129,8 @@ char **compwords,
      *complastprompt,
      *comptoend,
      *compoldlist,
-     *compoldins;
+     *compoldins,
+     *compvared;
 
 /**/
 Param *comppms;
@@ -445,7 +446,7 @@ setup_comp1(Module m)
 	compquoting = comprestore = complist = compinsert =
 	compexact = compexactstr = comppatmatch = comppatinsert =
 	compforcelist = complastprompt = comptoend = 
-	compoldlist = compoldins = NULL;
+	compoldlist = compoldins = compvared = NULL;
     makecompparamsptr = NULL;
     comp_setunsetptr = NULL;
     return 0;
@@ -497,6 +498,7 @@ finish_comp1(Module m)
     zsfree(comptoend);
     zsfree(compoldlist);
     zsfree(compoldins);
+    zsfree(compvared);
     return 0;
 }
 

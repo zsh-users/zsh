@@ -71,6 +71,9 @@
 #ifdef HAVE_POLL_H
 # include <poll.h>
 #endif
+#if defined(HAVE_POLL) && !defined(POLLIN) && !defined(POLLNORM)
+# undef HAVE_POLL
+#endif
 
 /* pinch the definition from <netinet/in.h> for deficient headers */
 #ifndef INADDR_NONE

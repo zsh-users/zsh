@@ -270,6 +270,31 @@ struct cpattern {
 #define CAF_ALT      4
 #define CAF_MATCH    8
 
+/* Data for compadd and addmatches() */
+
+typedef struct cadata *Cadata;
+
+struct cadata {
+    char *ipre;			/* ignored prefix (-i) */
+    char *isuf;			/* ignored suffix (-I) */
+    char *ppre;			/* `path' prefix (-p) */
+    char *psuf;			/* `path' suffix (-s) */
+    char *prpre;		/* expanded `path' prefix (-W) */
+    char *pre;			/* prefix to insert (-P) */
+    char *suf;			/* suffix to insert (-S) */
+    char *group;		/* name of the group (-[JV]) */
+    char *rems;			/* remove suffix on chars... (-r) */
+    char *remf;			/* function to remove suffix (-R) */
+    char *ign;			/* ignored suffixes (-F) */
+    int flags;			/* CMF_* flags (-[fqn]) */
+    int aflags;			/* CAF_* flags (-[QUa]) */
+    Cmatcher match;		/* match spec (parsed from -M) */
+    char *exp;			/* explanation (-X) */
+    char *apar;			/* array to store matches in (-A) */
+    char *opar;			/* array to store originals in (-O) */
+    char *dpar;			/* array to delete non-matches in (-D) */
+};
+
 /* Flags for special parameters. */
 
 #define CP_WORDS      (1 <<  0)
@@ -306,7 +331,8 @@ struct cpattern {
 #define CP_TOEND      (1 << 28)
 #define CP_OLDLIST    (1 << 29)
 #define CP_OLDINS     (1 << 30)
+#define CP_VARED      (1 << 31)
 
-#define CP_NUM              31
+#define CP_NUM              32
 
-#define CP_ALLMASK    ((int) ((((unsigned int) 1) << CP_NUM) - 1))
+#define CP_ALLMASK    ((unsigned int) 0xffffffff)

@@ -3379,16 +3379,14 @@ tokenize(char *s)
 	    *t = Inang;
 	    *s = Outang;
 	    break;
-	case '^':
-	case '#':
-	case '~':
-	    if (unset(EXTENDEDGLOB))
-		break;
 	case '(':
 	case '|':
 	case ')':
 	    if (isset(SHGLOB))
 		break;
+	case '^':
+	case '#':
+	case '~':
 	case '[':
 	case ']':
 	case '*':

@@ -41,6 +41,7 @@ comp_setunsetptr
 comp_strptr
 compsuffix
 comptoend
+compvared
 compwords
 freecmatcher
 freecmlist

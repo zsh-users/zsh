@@ -413,7 +413,6 @@ zleread(char *lp, char *rp, int flags)
 
     baud = getiparam("BAUD");
     costmult = (baud) ? 3840000L / baud : 0;
-    tv.tv_sec = 0;
 #endif
 
     /* ZLE doesn't currently work recursively.  This is needed in case a *
@@ -523,6 +522,7 @@ zleread(char *lp, char *rp, int flags)
 #ifdef HAVE_SELECT
 	    if (baud && !(lastcmd & ZLE_MENUCMP)) {
 		FD_SET(SHTTY, &foofd);
+		tv.tv_sec = 0;
 		if ((tv.tv_usec = cost * costmult) > 500000)
 		    tv.tv_usec = 500000;
 		if (!kungetct && select(SHTTY+1, (SELECT_ARG_2_T) & foofd,
@@ -656,14 +656,18 @@ handleprefixes(void)
 	initmodifier(&zmod);
 }
 
+/* this exports the argument we are currently vared'iting if != NULL */
+
+/**/
+char *varedarg;
+
 /* vared: edit (literally) a parameter value */
 
 /**/
 static int
 bin_vared(char *name, char **args, char *ops, int func)
 {
-    char *s;
-    char *t;
+    char *s, *t, *ova = varedarg;
     Value v;
     Param pm = 0;
     int create = 0;
@@ -753,7 +757,9 @@ bin_vared(char *name, char **args, char *ops, int func)
     PERMALLOC {
 	pushnode(bufstack, ztrdup(s));
     } LASTALLOC;
+    varedarg = *args;
     t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
+    varedarg = ova;
     if (!t || errflag) {
 	/* error in editing */
 	errflag = 0;
@@ -926,6 +932,8 @@ setup_zle(Module m)
 
     /* initialise the keymap system */
     init_keymaps();
+
+    varedarg = NULL;
 
     return 0;
 }

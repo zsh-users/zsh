@@ -120,7 +120,7 @@ static struct builtin builtins[] =
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
 
 #ifdef DYNAMIC
-    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "LaudicI", NULL),
+    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "LaudicIp", NULL),
 #endif
 };
 
@@ -1485,7 +1485,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     int usepm, tc, keeplocal = 0;
 
     /* use the existing pm? */
-    usepm = pm && !(pm->flags & PM_UNSET);
+    usepm = pm && !(pm->flags & (PM_UNSET | PM_AUTOLOAD));
 
     /* Always use an existing pm if special at current locallevel */
     if (pm && (pm->flags & PM_SPECIAL) && pm->level == locallevel)
@@ -1793,7 +1793,9 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    continue;
 	}
 	if (!typeset_single(name, asg->name,
-			    (Param)paramtab->getnode(paramtab, asg->name),
+			    (Param) (paramtab == realparamtab ?
+				     gethashnode2(paramtab, asg->name) :
+				     paramtab->getnode(paramtab, asg->name)),
 			    func, on, off, roff, asg->value, NULL))
 	    returnval = 1;
     }
@@ -1945,7 +1947,7 @@ bin_unset(char *name, char **argv, char *ops, int func)
 			next = (Param) pm->next;
 			if ((!(pm->flags & PM_RESTRICTED) ||
 			    unset(RESTRICTED)) && domatch(pm->nam, com, 0)) {
-			    unsetparam(pm->nam);
+			    unsetparam_pm(pm, 0, 1);
 			    match++;
 			}
 		    }
@@ -1974,7 +1976,9 @@ bin_unset(char *name, char **argv, char *ops, int func)
 	    }
 	    *ss = 0;
 	}
-	pm = (Param) paramtab->getnode(paramtab, s);
+	pm = (Param) (paramtab == realparamtab ?
+		      gethashnode2(paramtab, s) :
+		      paramtab->getnode(paramtab, s));
 	if (!pm)
 	    returnval = 1;
 	else if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {

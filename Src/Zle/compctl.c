@@ -1691,17 +1691,22 @@ bin_compgen(char *name, char **argv, char *ops, int func)
 static int
 bin_compadd(char *name, char **argv, char *ops, int func)
 {
-    char *p, **sp, *e;
-    char *ipre = NULL, *isuf = NULL, *ppre = NULL, *psuf = NULL, *prpre = NULL;
-    char *pre = NULL, *suf = NULL, *group = NULL, *m = NULL, *rs = NULL;
-    char *ign = NULL, *rf = NULL, *expl = NULL, *apar = NULL, *opar = NULL;
-    int f = 0, a = CAF_MATCH, dm;
+    struct cadata dat;
+    char *p, **sp, *e, *m = NULL;
+    int dm;
     Cmatcher match = NULL;
 
     if (incompfunc != 1) {
 	zerrnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
+    dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre =
+	dat.pre = dat.suf = dat.group = dat.rems = dat.remf =
+	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
+    dat.match = NULL;
+    dat.flags = 0;
+    dat.aflags = CAF_MATCH;
+
     for (; *argv && **argv ==  '-'; argv++) {
 	if (!(*argv)[1]) {
 	    argv++;
@@ -1713,64 +1718,64 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	    dm = 0;
 	    switch (*p) {
 	    case 'q':
-		f |= CMF_REMOVE;
+		dat.flags |= CMF_REMOVE;
 		break;
 	    case 'Q':
-		a |= CAF_QUOTE;
+		dat.aflags |= CAF_QUOTE;
 		break;
 	    case 'f':
-		f |= CMF_FILE;
+		dat.flags |= CMF_FILE;
 		break;
 	    case 'F':
-		sp = &ign;
+		sp = &(dat.ign);
 		e = "string expected after -%c";
 		break;
 	    case 'n':
-		f |= CMF_NOLIST;
+		dat.flags |= CMF_NOLIST;
 		break;
 	    case 'U':
-		a &= ~CAF_MATCH;
+		dat.aflags &= ~CAF_MATCH;
 		break;
 	    case 'P':
-		sp = &pre;
+		sp = &(dat.pre);
 		e = "string expected after -%c";
 		break;
 	    case 'S':
-		sp = &suf;
+		sp = &(dat.suf);
 		e = "string expected after -%c";
 		break;
 	    case 'J':
-		sp = &group;
+		sp = &(dat.group);
 		e = "group name expected after -%c";
 		break;
 	    case 'V':
-		if (!group)
-		    a |= CAF_NOSORT;
-		sp = &group;
+		if (!dat.group)
+		    dat.aflags |= CAF_NOSORT;
+		sp = &(dat.group);
 		e = "group name expected after -%c";
 		break;
 	    case 'i':
-		sp = &ipre;
+		sp = &(dat.ipre);
 		e = "string expected after -%c";
 		break;
 	    case 'I':
-		sp = &isuf;
+		sp = &(dat.isuf);
 		e = "string expected after -%c";
 		break;
 	    case 'p':
-		sp = &ppre;
+		sp = &(dat.ppre);
 		e = "string expected after -%c";
 		break;
 	    case 's':
-		sp = &psuf;
+		sp = &(dat.psuf);
 		e = "string expected after -%c";
 		break;
 	    case 'W':
-		sp = &prpre;
+		sp = &(dat.prpre);
 		e = "string expected after -%c";
 		break;
 	    case 'a':
-		a |= CAF_ALT;
+		dat.aflags |= CAF_ALT;
 		break;
 	    case 'M':
 		sp = &m;
@@ -1778,25 +1783,29 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		dm = 1;
 		break;
 	    case 'X':
-		sp = &expl;
+		sp = &(dat.exp);
 		e = "string expected after -%c";
 		break;
 	    case 'r':
-		f |= CMF_REMOVE;
-		sp = &rs;
+		dat.flags |= CMF_REMOVE;
+		sp = &(dat.rems);
 		e = "string expected after -%c";
 		break;
 	    case 'R':
-		f |= CMF_REMOVE;
-		sp = &rf;
+		dat.flags |= CMF_REMOVE;
+		sp = &(dat.remf);
 		e = "function name expected after -%c";
 		break;
 	    case 'A':
-		sp = &apar;
+		sp = &(dat.apar);
 		e = "parameter name expected after -%c";
 		break;
 	    case 'O':
-		sp = &opar;
+		sp = &(dat.opar);
+		e = "parameter name expected after -%c";
+		break;
+	    case 'D':
+		sp = &(dat.dpar);
 		e = "parameter name expected after -%c";
 		break;
 	    case '-':
@@ -1830,12 +1839,11 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     if (!*argv)
 	return 1;
 
-    match = cpcmatcher(match);
-    a = addmatchesptr(ipre, isuf, ppre, psuf, prpre, pre, suf, group,
-		      rs, rf, ign, f, a, match, expl, apar, opar, argv);
+    dat.match = match = cpcmatcher(match);
+    dm = addmatchesptr(&dat, argv);
     freecmatcher(match);
 
-    return a;
+    return dm;
 }
 
 #define CVT_RANGENUM 0
@@ -2165,6 +2173,7 @@ static struct compparam {
     { "to_end", PM_SCALAR, VAL(comptoend), NULL, NULL },
     { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
     { "old_insert", PM_SCALAR, VAL(compoldins), NULL, NULL },
+    { "vared", PM_SCALAR, VAL(compvared), NULL, NULL },
     { NULL, 0, NULL, NULL, NULL }
 };
 
@@ -2308,7 +2317,7 @@ compunsetfn(Param pm, int exp)
 
 /**/
 void
-comp_setunset(int set, int unset)
+comp_setunset(unsigned int set, unsigned int unset)
 {
     Param *p;
 
@@ -2334,11 +2343,11 @@ comp_wrapper(List list, FuncWrap w, char *name)
     else {
 	char *orest, *opre, *osuf, *oipre, *oisuf, **owords;
 	long ocur;
-	int unset = 0, m, sm;
+	unsigned int unset = 0, m, sm;
 	Param *pp;
 
 	m = CP_WORDS | CP_CURRENT | CP_PREFIX | CP_SUFFIX | 
-	    CP_IPREFIX | CP_RESTORE;
+	    CP_IPREFIX | CP_ISUFFIX | CP_RESTORE;
 	for (pp = comppms, sm = 1; m; pp++, m >>= 1, sm <<= 1) {
 	    if ((m & 1) && ((*pp)->flags & PM_UNSET))
 		unset |= sm;
@@ -2373,7 +2382,8 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	    } LASTALLOC;
 	    comp_setunset(CP_COMPSTATE |
 			  (~unset & (CP_WORDS | CP_CURRENT | CP_PREFIX |
-				     CP_SUFFIX | CP_IPREFIX | CP_RESTORE)),
+				     CP_SUFFIX | CP_IPREFIX | CP_ISUFFIX |
+				     CP_RESTORE)),
 			  unset);
 	} else
 	    comp_setunset(CP_COMPSTATE | (~unset & CP_RESTORE),

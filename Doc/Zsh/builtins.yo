@@ -1175,9 +1175,12 @@ xitem(tt(zmodload) tt(-d) [ tt(-L) ] [ var(name) [ var(dep) ... ] ])
 xitem(tt(zmodload) tt(-du) var(name) [ var(dep) ... ])
 xitem(tt(zmodload) tt(-a) [ tt(-iL) ] [ var(name) [ var(builtin) ... ] ])
 xitem(tt(zmodload) tt(-au) [ tt(-i) ] var(builtin) ...)
-xitem(tt(zmodload) tt(-c) [ tt(-iI) ] [ var(name) [ var(cond) ... ] ])
+xitem(tt(zmodload) tt(-c) [ tt(-iI) ] var(name) [ var(cond) ... ])
 xitem(tt(zmodload) tt(-cu) [ tt(-iI) ] var(cond) ...)
-item(tt(zmodload) tt(-c) [ tt(-IL) ])(
+xitem(tt(zmodload) tt(-c) [ tt(-IL) ])
+xitem(tt(zmodload) tt(-p) [ tt(-i) ] var(name) [ var(parameter) ... ])
+xitem(tt(zmodload) tt(-pu) [ tt(-i) ] var(parameter) ... ])
+item(tt(zmodload) tt(-p) [ tt(-L) ])(
 tt(zmodload) performs operations relating to zsh's loadable modules.
 This feature is not available on all operating systems,
 or on all installations on a particular operating system.
@@ -1253,5 +1256,8 @@ names. Without this option prefix condition names are defined.
 Together with the tt(-u) option definitions for autoloaded conditions
 are removed. If given no condition names all defined names are listed
 (as a series of tt(zmodload) commands if the tt(-L) option is given).
+
+The tt(-p) option is like the tt(-c) option, but makes tt(zmodload)
+work on autoloaded parameters instead of condition codes.
 )
 enditem()

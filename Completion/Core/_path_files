@@ -230,14 +230,15 @@ for prepath in "$prepaths[@]"; do
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.
 
-      compadd -O tmp2 "$ignore[@]" - "${(@)tmp1##*/}"
+      tmp2=("$tmp1[@]")
+      compadd -D tmp1 "$ignore[@]" - "${(@)tmp1##*/}"
 
       # If no file matches, save the expanded path and continue with
       # the outer loop.
 
-      if [[ $#tmp2 -eq 0 ]]; then
- 	if [[ "$tmp1[1]" = */* ]]; then
-	  tmp2=( "${(@)tmp1#${prepath}${realpath}}" )
+      if [[ $#tmp1 -eq 0 ]]; then
+ 	if [[ "$tmp2[1]" = */* ]]; then
+	  tmp2=( "${(@)tmp2#${prepath}${realpath}}" )
 	  if [[ "$tmp2[1]" = */* ]]; then
 	    exppaths=( "$exppaths[@]" ${^tmp2%/*}/${tpre}${tsuf} )
           else
@@ -245,14 +246,6 @@ for prepath in "$prepaths[@]"; do
 	  fi
         fi
         continue 2
-      fi
-
-      # Remove all files that weren't matched.
-
-      if [[ "$tmp1[1]" = */* ]]; then
-        tmp1=( "${(@M)tmp1:#*/(${(j:|:)~${(@)tmp2:q}})}" )
-      else
-        tmp1=( "${(@M)tmp1:#(${(j:|:)~${(@)tmp2:q}})}" )
       fi
     elif (( ! $#tmp1 )); then
       continue 2

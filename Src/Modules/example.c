@@ -30,22 +30,45 @@
 #include "example.mdh"
 #include "example.pro"
 
+/* parameters */
+
+static long intparam;
+static char *strparam;
+static char **arrparam;
+
+
 /**/
 static int
 bin_example(char *nam, char **args, char *ops, int func)
 {
     unsigned char c;
+    char **oargs = args, **p = arrparam;
+    long i = 0;
 
     printf("Options: ");
     for (c = 32; ++c < 128;)
 	if (ops[c])
 	    putchar(c);
     printf("\nArguments:");
-    for (; *args; args++) {
+    for (; *args; i++, args++) {
 	putchar(' ');
 	fputs(*args, stdout);
     }
     printf("\nName: %s\n", nam);
+    printf("\nInteger Parameter: %ld\n", intparam);
+    printf("String Parameter: %s\n", strparam ? strparam : "");
+    printf("Array Parameter:");
+    if (p)
+	while (*p) printf(" %s", *p++);
+    printf("\n");
+
+    intparam = i;
+    zsfree(strparam);
+    strparam = ztrdup(*oargs ? *oargs : "");
+    freearray(arrparam);
+    PERMALLOC {
+	arrparam = arrdup(oargs);
+    } LASTALLOC;
     return 0;
 }
 
@@ -103,6 +126,12 @@ static struct conddef cotab[] = {
     CONDDEF("ex", CONDF_INFIX, cond_i_ex, 0, 0, 0),
 };
 
+static struct paramdef patab[] = {
+    INTPARAMDEF("exint", &intparam),
+    STRPARAMDEF("exstr", &strparam),
+    ARRPARAMDEF("exarr", &arrparam),
+};
+
 static struct funcwrap wrapper[] = {
     WRAPDEF(ex_wrapper),
 };
@@ -120,8 +149,15 @@ setup_example(Module m)
 int
 boot_example(Module m)
 {
+    intparam = 42;
+    strparam = ztrdup("example");
+    arrparam = (char **) zalloc(3 * sizeof(char *));
+    arrparam[0] = ztrdup("example");
+    arrparam[1] = ztrdup("array");
+    arrparam[2] = NULL;
     return !(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
 	     addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab)) |
+	     addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab)) |
 	     !addwrapper(m, wrapper));
 }
 
@@ -133,6 +169,7 @@ cleanup_example(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
+    deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
     deletewrapper(m, wrapper);
     return 0;
 }
