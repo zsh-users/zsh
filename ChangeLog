@@ -1,3 +1,10 @@
+2002-03-04  Peter Stephenson  <pws@csr.com>
+
+	* 16759: Src/builtin.c: from Eric Norum <eric.norum@usask.ca>:
+	cd prints output whenever the target directory is not obvious
+	to the user.  This confuses scripts, so restrict it to
+	interactive mode.
+
 2002-03-04  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16755: Completion/compdump, Completion/compinit,
