@@ -950,7 +950,7 @@ vifetchhistory(char **args)
 
 /* the last vi search */
 
-static char *visrchstr;
+static char *visrchstr, *vipenultsrchstr;
 static int visrchsense;
 
 /**/
@@ -962,8 +962,12 @@ getvisrchstr(void)
     Thingy cmd;
     char *okeymap = curkeymapname;
 
+    if (vipenultsrchstr) {
+	zsfree(vipenultsrchstr);
+    }
+
     if (visrchstr) {
-	zsfree(visrchstr);
+	vipenultsrchstr = visrchstr;
 	visrchstr = NULL;
     }
     clearlist = 1;
@@ -990,6 +994,10 @@ getvisrchstr(void)
 	    	cmd == Th(z_vicmdmode)) {
 	    sbuf[sptr] = 0;
 	    visrchstr = metafy(sbuf + 1, sptr - 1, META_DUP);
+	    if (!strlen(visrchstr)) {
+	        zsfree(visrchstr);
+		visrchstr = vipenultsrchstr;
+	    }
 	    ret = 1;
 	    sptr = 0;
 	} else if(cmd == Th(z_backwarddeletechar) ||

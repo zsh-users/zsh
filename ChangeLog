@@ -1,3 +1,8 @@
+2001-05-29  Clint Adams  <clint@zsh.org>
+
+	* 145??: Src/Zle/zle_hist.c: repeat last vi history search
+	if search string is empty.
+
 2001-05-29  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/compdump, Completion/BSD/Command/_cvsup,
@@ -21,7 +26,7 @@
 
 2001-05-29  Bart Schaefer  <schaefer@zsh.org>
 
-	* 1454?: INSTALL: Mention "make check" and its usage.
+	* 14545: INSTALL: Mention "make check" and its usage.
 
 2001-05-29  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
