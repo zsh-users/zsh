@@ -1,0 +1,27 @@
+#compdef -k complete-word \C-x?
+
+setopt localoptions ${_comp_options[@]}
+
+setopt localtraps noerrexit ; trap - ZERR
+
+(( $+_debug_count )) || integer -g _debug_count
+local tmp=${TMPPREFIX}${$}${words[1]:t}$[++_debug_count]
+local w="${(qq)words}"
+
+exec 3>&-	# Too bad if somebody else is using it ...
+[[ -t 2 ]] && exec 3>&2 2>| $tmp
+
+setopt xtrace
+_main_complete
+integer ret=$?
+unsetopt xtrace
+
+[[ -t 3 ]] && {
+    print -sR "${VISUAL:-${EDITOR:-${PAGER:-more}}} ${(q)tmp} ;: $w"
+    _message -r "Trace output left in $tmp (up-history to view)"
+    [[ $compstate[nmatches] -le 1 && $compstate[list] != *force* ]] &&
+        compstate[list]='list force messages'
+    exec 2>&3 3>&-
+}
+
+return ret
