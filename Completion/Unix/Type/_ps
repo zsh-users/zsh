@@ -1,0 +1,14 @@
+#compdef ps2epsi ps2pdf psmulti pswrap
+
+local expl ext=''
+
+# ghostscript:
+#  ps2epsi ps2pdf
+
+if [[ "$1" == '-z' ]]; then
+  ext='(|.gz|.Z)'
+  shift
+fi
+
+_description files expl 'PostScript file'
+_files "$@" "$expl[@]" -g "*.(#i)(ps|eps)$ext"
