@@ -2615,19 +2615,21 @@ cv_parse_word(Cvdef d)
                     ign = strlen(as);
             }
         }
+        more = dupstring(more);
+
         if (ign)
             ignore_suffix(ign);
 
         while (more && *more) {
-            if ((val = cv_next(d, &str, &arg))) {
+            if ((val = cv_next(d, &more, &arg))) {
                 zaddlinknode(state.vals, ztrdup(val->name));
                 if (arg) {
-                    if (str) {
-                        char sav = str[-1];
+                    if (more) {
+                        char sav = more[-1];
 
-                        str[-1] = '\0';
+                        more[-1] = '\0';
                         zaddlinknode(state.vals, ztrdup(arg));
-                        str[-1] = sav;
+                        more[-1] = sav;
                     } else {
                         zaddlinknode(state.vals, tricat(arg, compsuffix, ""));
                         nosfx = 1;
