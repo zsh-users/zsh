@@ -1,5 +1,8 @@
 2000-04-26  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* Adam Spiers: 10892: Completion/User/_perl_modules: ensure perl
+	is there and better pattern for searching modules
+
 	* Tanaka Akira: 10890: Completion/User/_gunzip,
 	Completion/User/_gzip, Completion/User/_zcat: new completion for
 	GNU zip commands
