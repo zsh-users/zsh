@@ -5,28 +5,46 @@
 # Edit small files with the command line editor.
 # Use ^X^W to save, ^C to abort.
 # Option -f: edit shell functions.  (Also if called as fned.)
-#
-# Completion: use
-# compctl -f -x 'w[1,-f]' -F -- zed
-#
 
-local var fun
+local var opt zed_file_name
 # We do not want timeout while we are editing a file
-integer TMOUT=0
+integer TMOUT=0 okargs=1 fun bind
 
-[[ $1 = -f || $0 = fned ]] && fun=1
-[[ $1 = -(|-|f) ]] && shift
+while getopts "fb" opt; do
+  case $opt in
+    (f)
+    fun=1
+    ;;
 
-[[ -z "$1" ]] && echo 'Usage: "zed filename" or "zed -f function"' && return 1
+    (b)
+    bind=1
+    ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+[[ $0 = fned ]] && fun=1
+(( bind )) && okargs=0
+
+if (( $# != okargs )); then
+    echo 'Usage:
+zed filename
+zed -f function
+zed -b'
+    return 1
+fi
 
 local curcontext=zed:::
 
 zstyle -m ":completion:zed:*" insert-tab '*' ||
     zstyle ":completion:zed:*" insert-tab yes
 
-if ! bindkey -M zed >&/dev/null; then
+if (( bind )) || ! bindkey -M zed >&/dev/null; then
   # Make the zed keymap a copy of the current main.
   bindkey -N zed main
+  # Save the current main.  In zle widgets called from
+  # zed we may want to set this temporally.
+  bindkey -A main zed-normal-keymap
 
   # Assign some default keys.
   # Depending on your stty's, you may be able to use ^J as accept-line, else:
@@ -35,12 +53,19 @@ if ! bindkey -M zed >&/dev/null; then
   # a nicety.
   bindkey -M zed '^x^w' accept-line
   bindkey -M zed '^M' self-insert-unmeta
+
+  # Make zed-set-file-name available.
+  # Assume it's in fpath; there's no error at this point if it isn't
+  autoload -U zed-set-file-name
+  zle -N zed-set-file-name
 fi
-if ! bindkey -M zed-vicmd >&/dev/null; then
+if (( bind )) || ! bindkey -M zed-vicmd >&/dev/null; then
   bindkey -N zed-vicmd vicmd
 
   bindkey -M zed-vicmd "ZZ" accept-line
 fi
+
+(( bind )) && return 0
 
 # don't mangle !'s
 setopt localoptions nobanghist
@@ -49,25 +74,22 @@ if ((fun)) then
   var="$(functions $1)"
   # If function is undefined but autoloadable, load it
   if [[ $var = *\#\ undefined* ]] then
-    local dir
-    for dir in $fpath; do
-      if [[ -f $dir/$1 ]] then
-	var="$1() {
-$(<$dir/$1)
-}"
-	break
-      fi
-    done
+      autoload +X $1
   elif [[ -z $var ]] then
     var="$1() {
 }"
   fi
   vared -M zed -m zed-vicmd var && eval function "$var"
 else
+  zed_file_name=$1
   [[ -f $1 ]] && var="$(<$1)"
   while vared -M zed -m zed-vicmd var
   do
-    (print -r -- "$var" >| $1) && break
+    {
+      print -r -- "$var" >| $zed_file_name
+    } always {
+      (( TRY_BLOCK_ERROR = 0 ))
+    } && break
     echo -n -e '\a'
   done
 fi

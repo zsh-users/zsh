@@ -1311,11 +1311,12 @@ referred to in tt(ZCALCPROMPT) as `tt(%1v)'.  The default prompt is
 See the comments in the function for a few extra tips.
 )
 findex(zed)
-item(tt(zed) [ tt(-f) ] var(name))(
+xitem(tt(zed) [ tt(-f) ] var(name))
+item(tt(zed -b))(
 This function uses the ZLE editor to edit a file or function.
 
-Only one var(name) argument is recognized (additional arguments are
-ignored).  If the tt(-f) option is given, the name is taken to be that of
+Only one var(name) argument is allowed.
+If the tt(-f) option is given, the name is taken to be that of
 a function; if the function is marked for autoloading, tt(zed) searches
 for it in the tt(fpath) and loads it.  Note that functions edited this way
 are installed into the current shell, but em(not) written back to the
@@ -1331,18 +1332,29 @@ is run.  They can be used to provide special key bindings used only in zed.
 
 If it creates the keymap, tt(zed) rebinds the return key to insert a line
 break and `tt(^X^W)' to accept the edit in the tt(zed) keymap, and binds
-`tt(ZZ)' to accept the edit in the tt(zed-vicmd) keymap.  If the tt(zed)
-keymap is created by hand, the user will need to bind:
+`tt(ZZ)' to accept the edit in the tt(zed-vicmd) keymap.
 
-example(zle -M zed '^M' self-insert-unmeta
-zle -M zed '^X^W' accept-line)
-
-for this behaviour, and if tt(zed-vicmd) is created by hand,
-
-example(zle -M zed-vicmd 'ZZ' accept-line)
+The bindings alone can be installed by running `tt(zed -b)'.  This is
+suitable for putting into a startup file.  Note that, if rerun,
+this will overwrite the existing tt(zed) and tt(zed-vicmd) keymaps.
 
 Completion is available, and styles may be set with the context prefix
 `tt(:completion:zed)'.
+
+A zle widget tt(zed-set-file-name) is available.  This can be called by
+name from within zed using `tt(\ex zed-set-file-name)' (note, however, that
+because of zed's rebindings you will have to type tt(^j) at the end instead
+of the return key), or can be bound to a key in either of the tt(zed) or
+tt(zed-vicmd) keymaps after `tt(zed -b)' has been run.  When the widget is
+called, it prompts for a new name for the file being edited.  When zed
+exits the file will be written under that name and the original file will
+be left alone.  The widget has no effect with `tt(zed -f)'.
+
+While tt(zed-set-file-name) is running, zed uses the keymap
+tt(zed-normal-keymap), which is linked from the main keymap in effect
+at the time zed initialised its bindings.  (This is to make the return key
+operate normally.)  The result is that if the main keymap has been changed,
+the widget won't notice.  This is not a concern for most users.
 )
 findex(zcp)
 findex(zln)
