@@ -1,3 +1,8 @@
+2005-02-18  Peter Stephenson  <pws@csr.com>
+
+	* Motoi Washida: users/8522: Completion/Darwin/Command/_defaults:
+	Fix quotation in Darwin completion.
+
 2005-02-16  Peter Stephenson  <pws@csr.com>
 
 	* 20816: Src/Builtins/rlimits.awk: extra tricks to get limit

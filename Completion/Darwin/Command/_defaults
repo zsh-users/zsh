@@ -14,9 +14,10 @@ _defaults_domains(){
 }
 
 _defaults_keys(){
-  local ks="$(_call_program keys defaults read "$words[2]" 2>/dev/null | sed '/^    [[:alpha:]"]/ { s/^    //; s/ = .*$//; p;}; d')"
+  local ks
+  ks=(${${${${(M)${(f)"$(defaults read "$words[2]" 2>/dev/null)"}:# [^ ]*=*}# }%% = *}:Q})
   local expl
-  _wanted keys expl 'key' compadd ${(f)ks}
+  _wanted keys expl 'key' compadd "$ks[@]"
 }
 
 _defaults(){
