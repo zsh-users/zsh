@@ -2557,7 +2557,9 @@ gethere(char *str, int typ)
 	int ef = errflag;
 
 	parsestr(buf);
-	errflag = ef;
+
+	if (!errflag)
+	    errflag = ef;
     }
     s = dupstring(buf);
     zfree(buf, bsiz);
