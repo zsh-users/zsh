@@ -12,10 +12,70 @@ oldcontext="$curcontext"
 # If we have a user-supplied context name, use only that.
 
 if [[ -n "$compcontext" ]]; then
-  ccarray[3]="$compcontext"
 
-  comp="$_comps[$compcontext]"
-  [[ -z "$comp" ]] || "$comp"
+  if [[ "${(t)compcontext}" = *(array|assoc)* ]]; then
+    local expl
+
+    _wanted values expl value compadd -a - compcontext
+
+  elif [[ "$compcontext" = *:*:* ]]; then
+    local tag="${${compcontext%%:*}:-values}"
+    local descr="${${${compcontext#${tag}:}%%:*}:-value}"
+    local action="${compcontext#${tag}:${descr}:}" expl ws ret=1
+
+    case "$action" in
+    \ #)
+      _message "$descr";;
+
+    \(\(*\)\))
+      eval ws\=\( "${action[3,-3]}" \)
+
+      _describe -t "$tag" "$descr" ws;;
+
+    \(*\))
+      eval ws\=\( "${action[2,-2]}" \)
+
+      _wanted "$tag" expl "$descr" compadd -a - ws;;
+
+    \{*\})
+      _tags "$tag"
+      while _tags; do
+        while _next_label "$tag" expl "$descr"; do
+          eval "$action[2,-2]" && ret=0
+	done
+	(( ret )) || break
+      done;;
+
+    \ *)
+      eval ws\=\( "$action" \)
+
+      _tags "$tag"
+      while _tags; do
+        while _next_label "$tag" expl "$descr"; do
+          "$ws[@]"
+	done
+	(( ret )) || break
+      done;;
+
+    *)
+      eval ws\=\( "$action" \)
+
+      _tags "$tag"
+      while _tags; do
+        while _next_label "$tag" expl "$descr"; do
+          "$ws[1]" "$expl[@]" "${(@)ws[2,-1]}"
+	done
+	(( ret )) || break
+      done;;
+
+    esac
+
+  else
+    ccarray[3]="$compcontext"
+
+    comp="$_comps[$compcontext]"
+    [[ -z "$comp" ]] || "$comp"
+  fi
 
   return
 fi
