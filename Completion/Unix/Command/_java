@@ -44,7 +44,7 @@ java)
     '-version[print version]' \
     '-help[print help message]' \
     '(- 1)-jar[specify a program capsulated as jar]:jar:_files -g \*.jar' \
-    '(-):class:->class' \
+    '(-):class:_java_class -m main' \
     '*::args: _normal' \
      && return 0
   ;;
@@ -57,7 +57,7 @@ javadoc)
     '-package[display packages, public/protected classes and members only]' \
     '-private[display all classes and members]' \
     '-help[print help message]' \
-    '-doclet[specify a doclet]:doclet:->doclet' \
+    '-doclet[specify a doclet]:doclet:_java_class -t doclet' \
     '-docletpath[specify a path to search doclet]:doclet path:->docletpath' \
     '-1.1[Javadoc 1.1 compatible output]' \
     '-sourcepath[specify path for source files]:source path:->sourcepath' \
@@ -140,7 +140,7 @@ javah|javah_g)
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-old[generate old JDK1.0-style header files]' \
     '-force[force output]' \
-    '*:fully qualified classname:->class' && return 0
+    '*:fully qualified classname:_java_class -m main' && return 0
   ;;
 
 javap)
@@ -159,7 +159,7 @@ javap)
     '-classpath[specify path for user class files]:class path:->classpath' \
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-extdirs[specify directories for extensions]:extensions directories:->extdirs' \
-    '*:class:->class' && return 0
+    '*:class:_java_class' && return 0
   ;;
 
 extcheck)
@@ -182,7 +182,7 @@ rmic)
     '-verbose[print verbose messages]' \
     '-v1.1[JDK 1.1 stub protocol]' \
     '-v1.2[JDK 1.2 stub protocol]' \
-    '*:package qualified class name:->class' && return 0
+    '*:package qualified class name:_java_class' && return 0
   ;;
 
 rmiregistry)
@@ -501,15 +501,6 @@ property)
   else
     _message -e property-names 'property name'
   fi
-  ;;
-
-class|doclet)
-  match=()
-  compset -P '(#b)(*.)'
-  basedir=${match[1]//.//}
-  _alternative \
-    'classes:class:compadd $basedir*.class(.:t:s/.class//)' \
-    'packages:package:compadd -qS. $basedir*~$basedir*.*(/:t)'
   ;;
 
 docsrc)
