@@ -3584,6 +3584,7 @@ mod_export void
 endparamscope(void)
 {
     locallevel--;
+    saveandpophiststack(0); /* Pops anything from a higher locallevel */
     scanhashtable(paramtab, 0, 0, 0, scanendscope, 0);
 }
 
