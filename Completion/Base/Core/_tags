@@ -41,6 +41,7 @@ if (( $# )); then
     "$_sort_tags" "$@"
   else
     zstyle -a ":completion:${curcontext}:" tag-order order ||
+        (( ! ${@[(I)options]} )) ||
         order=('(|*-)argument-* (|*-)option[-+]* values' options)
 
     for tag in $order; do
