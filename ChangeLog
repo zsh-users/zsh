@@ -1,3 +1,8 @@
+2002-10-10  Clint Adams  <clint@zsh.org>
+
+        * 17810 (Martin Waitz): Src/utils.c: bung up memory leak with
+        POSIX.1e capabilities.
+
 2002-10-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 17760: Src/lex.c Src/parse.c: Fix case-pattern parsing bug in sh

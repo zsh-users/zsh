@@ -3670,7 +3670,10 @@ privasserted(void)
 	    cap_flag_value_t val;
 	    cap_value_t n;
 	    for(n = 0; !cap_get_flag(caps, n, CAP_EFFECTIVE, &val); n++)
-		if(val) return 1;
+		if(val) {
+		    cap_free(caps);
+		    return 1;
+		}
 	    cap_free(caps);
 	}
     }
