@@ -82,7 +82,7 @@ fi
 # by NFS group sharing with an untrustworthy machine).  So we must assume
 # that this has not happened, and pick the best group.
 
-local GROUP GROUPMEM _i_pw _i_gid
+local GROUP GROUPMEM _i_pw _i_gid _i_ulwdirs
 while IFS=: read GROUP _i_pw _i_gid GROUPMEM; do
   if (( UID == EUID )); then
     [[ $GROUP == $LOGNAME ]] && break
@@ -108,6 +108,13 @@ else
   _i_wdirs=( ${^fpath}(Nf:g+w:,f:o+w:,^u0u${EUID})
              ${^fpath}/..(Nf:g+w:,f:o+w:,^u0u${EUID}) )
 fi
+
+if [[ -f /etc/debian_version ]]
+then
+_i_ulwdirs=( ${(M)_i_wdirs:#/usr/local/*} )
+_i_wdirs=( ${_i_wdirs:#/usr/local/*} ${^_i_ulwdir}(Nf:g+ws:^g:staff:,f:o+w:,^u0) )
+fi
+
 _i_wdirs=( $_i_wdirs ${^fpath}.zwc^([^_]*|*~)(N^u0u${EUID}) )
 _i_wfiles=( ${^fpath}/^([^_]*|*~)(N^u0u${EUID}) )
 

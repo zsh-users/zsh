@@ -1,5 +1,9 @@
 2001-09-06  Clint Adams  <clint@zsh.org>
 
+	* 15740: Completion/compaudit: don't whine about
+	/usr/local/**/*(/) in $fpath being root:staff 2755
+	if we think we're on Debian.
+
 	* 15739: Completion/compaudit: use getent instead
 	of /etc/group if possible.
 
