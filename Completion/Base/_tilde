@@ -4,6 +4,8 @@
 # for you or if there are too many of them, you may want to use
 # `compadd -qS/ - "$friends[@]"' or something like that.
 
+[[ -n "$compstate[quote]" ]] && return 1
+
 local expl suf dirs list lines revlines i ret disp nm="$compstate[nmatches]"
 
 if [[ "$SUFFIX" = */* ]]; then
