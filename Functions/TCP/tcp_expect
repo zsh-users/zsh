@@ -37,8 +37,12 @@
 emulate -L zsh
 setopt extendedglob
 
-# Get extra accuracy by making SECONDS floating point locally
-typeset -F SECONDS
+if [[ ${(t)SECONDS} != float* ]]; then
+    # If called from another function, use that
+    typeset -F TCP_SECONDS_START=$SECONDS
+    # Get extra accuracy by making SECONDS floating point locally
+    typeset -F SECONDS
+fi
 
 # Variables are all named _expect_* to avoid problems with the -p param.
 local _expect_opt _expect_pvar

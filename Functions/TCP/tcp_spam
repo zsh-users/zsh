@@ -4,6 +4,8 @@
 #    If not given and tcp_spam_list is set to a list of sessions,
 #    only those will be spammed.  If tcp_no_spam_list is set, those
 #    will (also) be excluded from spamming.
+# -e use `eval' to run the command list instead of executing as
+#    a normal command line.
 # -l sess1,sess2    give comma separated list of sessions to spam
 # -r reverse, spam in opposite order (default is alphabetic, -r means
 #    omegapsiic).  Note tcp_spam_list is not sorted (but may be reversed).
@@ -19,13 +21,16 @@
 emulate -L zsh
 setopt extendedglob
 
-local TCP_SESS cmd opt verbose reverse sesslist transmit all
+local cursess=$TCP_SESS sessstr
+local TCP_SESS cmd opt verbose reverse sesslist transmit all eval
 local match mbegin mend REPLY
 local -a sessions
 
-while getopts "al:rtv" opt; do
+while getopts "ael:rtv" opt; do
     case $opt in
 	(a) all=1
+	    ;;
+	(e) eval=1
 	    ;;
 	(l) sessions+=(${(s.,.)OPTARG})
 	    ;;
@@ -82,7 +87,7 @@ fi
 
 if [[ -n $transmit ]]; then
   cmd=tcp_send
-else
+elif [[ -z $eval ]]; then
   cmd=$1
   shift
 fi
@@ -95,7 +100,18 @@ for TCP_SESS in $sessions; do
     tcp_on_spam $TCP_SESS $cmd $*
     [[ $REPLY = done ]] && continue
   fi
-  [[ -n $verbose ]] && zformat -f REPLY $TCP_PROMPT "s:$TCP_SESS" \
-    "f:${tcp_by_name[$TCP_SESS]}" && print -r $REPLY
-  eval $cmd '$*'
+  if [[ -n $verbose ]]; then
+      if [[ $TCP_SESS = $cursess ]]; then
+	  sessstr="c:1"
+      else
+	  sessstr="c:0"
+      fi
+      zformat -f REPLY $TCP_PROMPT "s:$TCP_SESS" \
+	  "f:${tcp_by_name[$TCP_SESS]}" $sessstr && print -r $REPLY
+  fi
+  if [[ -n $eval ]]; then
+      eval $*
+  else
+      eval $cmd '$*'
+  fi
 done

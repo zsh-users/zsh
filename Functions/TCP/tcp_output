@@ -1,7 +1,7 @@
 emulate -L zsh
 setopt extendedglob
 
-local opt tprompt sess read_fd tpat quiet
+local opt tprompt sess read_fd tpat quiet cursess
 
 while getopts "F:P:qS:" opt; do
   case $opt in
@@ -29,7 +29,12 @@ fi
 # where data is coming from; also, it allows more predictable
 # behaviour in tcp_expect.
 if [[ -n $tprompt ]]; then
-  zformat -f REPLY $tprompt "s:$sess" "f:$read_fd"
+  if [[ $sess = $TCP_SESS ]]; then
+      cursess="c:1"
+  else
+      cursess="c:0"
+  fi
+  zformat -f REPLY $tprompt "s:$sess" "f:$read_fd" $cursess
   # We will pass this back up.
   REPLY="$REPLY$*"
 else

@@ -1,5 +1,12 @@
 2003-07-04  Peter Stephenson  <pws@csr.com>
 
+	* 18810: Doc/Zsh/tcpsys.yo, Functions/TCP/tcp_expect,
+	Functions/TCP/tcp_open, Functions/TCP/tcp_output,
+	Functions/TCP/tcp_point, Functions/TCP/tcp_read,
+	Functions/TCP/tcp_send, Functions/TCP/tcp_shoot,
+	Functions/TCP/tcp_spam, Functions/TCP/tcp_wait: Various
+	enhancements and bug fixes for the TCP function suite.
+
 	* 18571: Doc/Zsh/params.yo: Note easy way of replacing
 	associative array elements using +=.  (Posted ages ago
 	and forgotten about.)

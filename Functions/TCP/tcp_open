@@ -53,11 +53,19 @@
 emulate -L zsh
 setopt extendedglob cbases
 
+# Global set up for TCP function suite.
+
 zmodload -i zsh/net/tcp || return 1
 zmodload -i zsh/zutil
 autoload -U tcp_alias tcp_close tcp_command tcp_expect tcp_fd_handler
 autoload -U tcp_log tcp_output tcp_proxy tcp_read tcp_rename tcp_send
-autoload -U tcp_sess tcp_spam tcp_talk tcp_wait
+autoload -U tcp_sess tcp_spam tcp_talk tcp_wait tcp_point tcp_shoot
+
+# TCP_SECONDS_START is only set if we override TCP_SECONDS locally,
+# so provide a global value for convenience.  Should probably always be 0.
+(( ${+TCP_SECONDS_START} )) || typeset -gF TCP_SECONDS_START
+
+# Processing for new connection.
 
 local opt accept fake nozle sessfile sess quiet
 local -a sessnames sessargs

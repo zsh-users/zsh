@@ -353,7 +353,7 @@ The command is run in the background, so tt(tcp_proxy) can then accept new
 connections.  It continues to accept new connections until interrupted.
 )
 findex(tcp_spam)
-item(tt(tcp_spam [-rtv] [ -a | -s ) var(sess) tt(| -l) var(sess)tt(,... ]) var(cmd) tt(...))(
+item(tt(tcp_spam [-ertv] [ -a | -s ) var(sess) tt(| -l) var(sess)tt(,... ]) var(cmd) tt(...))(
 Execute `var(cmd) tt(...)' for each session in turn.  Note this executes
 the command and arguments; it does not send the command line as data
 unless the tt(-t) (transmit) option is given.
@@ -374,6 +374,9 @@ The tt(-v) flag specifies that a tt($TCP_PROMPT) will be output before each
 session.  This is output after any modification to TCP_SESS by the
 user-defined tt(tcp_on_spam) function described below.  (Obviously that
 function is able to generate its own output.)
+
+If the option tt(-e) is present, the line given as var(cmd ...) is executed
+using tt(eval), otherwise it is executed without any further processing.
 )
 findex(tcp_talk)
 item(tt(tcp_talk))(
@@ -403,7 +406,33 @@ installed.
 )
 enditem()
 
-sect(TCP User-defined Function)
+subsect(`One-shot' file transfer)
+startitem()
+xitem(tt(tcp_point) var(port))
+item(tt(tcp_shoot) var(host) var(port))(
+This pair of functions provide a simple way to transfer a file between
+two hosts within the shell.  Note, however, that bulk data transfer is
+currently done using tt(cat).  tt(tcp_point) reads any data arriving at
+var(port) and sends it to standard output; tt(tcp_shoot) connects to
+var(port) on var(host) and sends its standard input.  Any unused var(port)
+may be used; the standard mechanism for picking a port is to think of a
+random four-digit number above 1024 until one works.
+
+To transfer a file from host tt(woodcock) to host tt(springes), on
+tt(springes):
+
+example(tcp_point 8091 >output_file)
+
+and on tt(woodcock):
+
+example(tcp_shoot springes 8091 <input_file)
+
+As these two functions do not require tt(tcp_open) to set up a TCP
+connection first, they may need to be autoloaded separately.
+)
+enditem()
+
+sect(TCP User-defined Functions)
 
 Certain functions, if defined by the user, will be called by the function
 system in certain contexts.  This facility depends on the module
@@ -485,9 +514,23 @@ output, from within tt(tcp_read) and (if tt($TCP_OUTPUT) is set)
 tt(tcp_send).
 
 The var(prompt) to use is specified by tt(-P); the default is the empty
-string.  It can contain `tt(%s)' which is replaced by the session name, or
-`tt(%f)' which is replaced by the session's file descriptor; `tt(%%)' is
-replaced by a single `tt(%)'.
+string.  It can contain:
+startitem()
+item(tt(%c))(
+Expands to 1 if the session is the current session, otherwise 0.  Used
+with ternary expresions such as `tt(%LPAR()c.-.PLUS()RPAR())' to
+output `tt(PLUS())' for the current session and `tt(-)' otherwise.
+)
+item(tt(%f))(
+Replaced by the session's file descriptor.
+)
+item(tt(%s))(
+Replaced by the session name.
+)
+item(tt(%%))(
+Replaced by a single `tt(%)'.
+)
+enditem()
 
 The option tt(-q) suppresses output to standard output, but not to any log
 files which are configured.
@@ -514,33 +557,33 @@ setting outside the function.  Likewise, `tt(local TCP_SESS=)var(sess)'
 sets a session for the duration of a function.
 
 startitem()
-findex(tcp_expect_lines)
+vindex(tcp_expect_lines)
 item(tt(tcp_expect_lines))(
 Array.  The set of lines read during the last call to tt(tcp_expect),
 including the last (tt($TCP_LINE)).
 )
-findex(tcp_filter)
+vindex(tcp_filter)
 item(tt(tcp_filter))(
 Array. May be set directly.  A set of extended globbing patterns which,
 if matched in tt(tcp_output), will cause the line not to be printed to
 standard output.  The patterns should be defined as described for the
 arguments to tt(tcp_expect).  Output of line to log files is not affected.
 )
-findex(TCP_LINE)
+vindex(TCP_LINE)
 item(tt(TCP_LINE))(
 The last line read by tt(tcp_read), and hence also tt(tcp_expect).
 )
-findex(TCP_LINE_FD)
+vindex(TCP_LINE_FD)
 item(tt(TCP_LINE_FD))(
 The file descriptor from which tt($TCP_LINE) was read.
 tt(${tcp_by_fd[$TCP_LINE_FD]}) will give the corresponding session name.
 )
-findex(tcp_lines)
+vindex(tcp_lines)
 item(tt(tcp_lines))(
 Array. The set of lines read during the last call to tt(tcp_read),
 including the last (tt($TCP_LINE)).
 )
-findex(TCP_LOG)
+vindex(TCP_LOG)
 item(tt(TCP_LOG))(
 May be set directly, although it is also controlled by tt(tcp_log).
 The name of a file to which output from all sessions will be sent.
@@ -555,11 +598,11 @@ will be sent; the full filename is tt(${TCP_LOG_SESS}.)var(sess).
 Output to each file is raw; no prompt is added.  If it is not an absolute
 path name, it will follow the user's current directory.
 )
-findex(tcp_nospam_list)
+vindex(tcp_nospam_list)
 item(tt(tcp_nospam_list))(
 Array.  May be set directly.  See tt(tcp_spam) for how this is used.
 )
-findex(TCP_OUTPUT)
+vindex(TCP_OUTPUT)
 item(tt(TCP_OUTPUT))(
 May be set directly.  If a non-empty string, any data sent to a session by
 tt(tcp_send) will be logged.  The prompt has the same format as
@@ -567,44 +610,85 @@ tt(TCP_PROMPT) and the same rules for its use apply:  it is used in a file
 specified by tt($TCP_LOG), but not in a file generated from
 tt($TCP_LOG_SESS).
 )
-findex(TCP_PROMPT)
+vindex(TCP_PROMPT)
 item(tt(TCP_PROMPT))(
 May be set directly.  Used as the prefix for data read by tt(tcp_read)
 which is printed to standard output or to the log file given by
 tt($TCP_LOG), if any.  Any `tt(%s)', `tt(%f)' or `tt(%%)' occurring in the
 string will be replaced by the name of the session, the session's
-underlying file descriptor, or a single `tt(%)', respectively.
+underlying file descriptor, or a single `tt(%)', respectively.  The
+expression `tt(%c)' expands to 1 if the session being read is the current
+session, else 0; this is most useful in ternary expressions such as
+`tt(%LPAR()c.-.PLUS()RPAR())' which outputs `tt(PLUS())' if the session is
+the current one, else `tt(-)'.
 )
-findex(TCP_READ_DEBUG)
+vindex(TCP_READ_DEBUG)
 item(tt(TCP_READ_DEBUG))(
 May be set directly.  If this has non-zero length, tt(tcp_read) will give
 some limited diagnostics about data being read.
 )
-findex(TCP_SESS)
+vindex(TCP_SECONDS_START)
+item(tt(TCP_SECONDS_START))(
+This value is created and initialised to zero by tcp_open.
+
+The functions tt(tcp_read) and tt(tcp_expect) use the shell's
+tt(SECONDS) parameter for their own timing purposes.  If that parameter
+is not of floating point type on entry to one of the functions, it will
+create a local parameter tt(SECONDS) which is floating point and set the
+parameter tt(TCP_SECONDS_START) to the previous value of tt($SECONDS).
+If the parameter is already floating point, it is used without a local
+copy being created and tt(TCP_SECONDS_START) is not set.  As the global
+value is zero, the shell elapsed time is guaranteed to be the sum of
+tt($SECONDS) and tt($TCP_SECONDS_START).
+
+This can be avoided by setting tt(SECONDS) globally to a floating point
+value using `tt(typeset -F SECONDS)'; then the TCP functions will never
+make a local copy and never set tt(TCP_SECONDS_START) to a non-zero value.
+)
+vindex(TCP_SESS)
 item(tt(TCP_SESS))(
 May be set directly.  The current session; must refer to one of the
 sessions established by tt(tcp_open).
 )
-findex(TCP_SILENT)
+vindex(TCP_SILENT)
 item(tt(TCP_SILENT))(
 May be set directly, although it is also controlled by tt(tcp_log).
 If of non-zero length, data read by tt(tcp_read) will not be written to
 standard output, though may still be written to a log file.
 )
-findex(tcp_spam_list)
+vindex(tcp_spam_list)
 item(tt(tcp_spam_list))(
 Array.  May be set directly.  See the description of the function
 tt(tcp_spam) for how this is used.
 )
-findex(TCP_TALK_ESCAPE)
+vindex(TCP_TALK_ESCAPE)
 item(tt(TCP_TALK_ESCAPE))(
 May be set directly.  See the description of the function tt(tcp_talk) for
 how this is used.
 )
-findex(TCP_TIMEOUT)
+vindex(TCP_TIMEOUT)
 item(tt(TCP_TIMEOUT))(
 May be set directly.  Currently this is only used by the function
 tt(tcp_command), see above.
+)
+enditem()
+
+sect(TCP User-defined Parameters)
+
+The following parameters are not set by the function system, but have
+a special effect if set by the user.
+
+startitem()
+vindex(tcp_on_read)
+item(tt(tcp_on_read))(
+This should be an associative array; if it is not, the behaviour is
+undefined.  Each key is the name of a shell function or other command,
+and the corresponding value is a shell pattern (using tt(EXTENDED_GLOB)).
+Every line read from a TCP session directly or indirectly using
+tt(tcp_read) (which includes lines read by tt(tcp_expect)) is compared
+against the pattern.  If the line matches, the command given in the key is
+called with two arguments: the name of the session from which the line was
+read, and the line itself.
 )
 enditem()
 

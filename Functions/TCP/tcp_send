@@ -3,6 +3,7 @@ setopt extendedglob cbases
 
 local opt quiet all sess fd nonewline
 local -a sessions write_fds
+integer mystat
 
 while getopts "al:nqs:" opt; do
     case $opt in
@@ -56,6 +57,11 @@ local TCP_SESS
 
 for TCP_SESS in $sessions; do
     fd=${tcp_by_name[$TCP_SESS]}
+    if [[ -z $fd ]]; then
+	print "No such session: $TCP_SESS" >&2
+	mystat=1
+	continue
+    fi
     print $nonewline -r -- $* >&$fd
     if [[ $? -ne 0 || -n $TCP_FD_CLOSED ]]; then
 	print "Session ${TCP_SESS}: fd $fd unusable." >&2
@@ -65,3 +71,5 @@ for TCP_SESS in $sessions; do
 	tcp_output -P "$TCP_OUTPUT" -S $TCP_SESS -F $fd -q "${(j. .)*}"
     fi
 done
+
+return $mystat
