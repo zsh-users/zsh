@@ -142,9 +142,9 @@ _rpm () {
     verify)
       _arguments -s \
         '(-y --verify)-V' '(-V --verify)-y' '(-y -V)--verify' \
-        "${commonopts[@]}" "${pathopts[@]}" \
+        "${commonopts[@]}" "${packageopts[@]}" "${pathopts[@]}" \
         --no{deps,md5,files} \
-        '*:RPM package:->package' && ret=0
+        '*:RPM package:->package_or_file' && ret=0
       ;;
     upgrade)
       tmp=( '(--upgrade)-U' '(-U)--upgrade' '(--force)--oldpackage' )
