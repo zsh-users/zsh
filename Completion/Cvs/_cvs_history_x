@@ -1,7 +1,7 @@
 #autoload
 
 compset -P '*'
-# It should describe meaning.
+
 compadd "$@" -y '(
 F\ --\ release
 O\ --\ checkout

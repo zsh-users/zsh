@@ -2,14 +2,46 @@
 
 # "+abcdefhilnpstuw0123456789BHNRC:D:F:I:L:U:V:W:k:r:"
 _arguments -s \
-  -{a,b,c,d,e,f,h,i,l,n,p,s,t,u,w,0,1,2,3,4,5,6,7,8,9,B,H,N,R} \
-  '-C:lines:' \
+  -{l,R} \
   '-D+:date:_cvs_D' \
-  '-F+:regex:' \
-  '-I+:regex:' \
-  '*-L+:label:' \
-  '-U:lines:' \
-  '-W:columns:' \
   '-k+:keyword substitution:_cvs_k' \
   '-r+:tag:_cvs_revisions' \
+  -{h,p,0,1,2,3,4,5,6,7,8,9} \
+  '--binary' \
+  '--brief' \
+  '--changed-group-format=:format:' \
+  '-c' '-C+:lines:' '--context=-:lines:' \
+  '-e' '--ed' \
+  '-t' '--expand-tabs' \
+  '-f' '--forward-ed' \
+  '--horizon-lines=:lines:' \
+  '--ifdef=:name:' \
+  '-w' '--ignore-all-space' \
+  '-B' '--ignore-blank-lines' \
+  '-i' '--ignore-case' \
+  '-I+:regex:' '--ignore-matching-lines=:regex:' \
+  '-b' '--ignore-space-change' \
+  '--initial-tab' \
+  '*-L+:label:' '*--label=:label:' \
+  '--left-column' \
+  '--line-format=:format:' \
+  '-d' '--minimal' \
+  '-N' '--new-file' \
+  '--new-group-format=:format:' \
+  '--new-line-format=:format:' \
+  '--old-group-format=:format:' \
+  '--old-line-format=:format:' \
+  '--paginate' \
+  '-n' '--rcs' \
+  '-s' '--report-identical-files' \
+  '--show-c-function' \
+  '-F+:regex:' '--show-function-line=:regex:' \
+  '-y' '--side-by-side' \
+  '-H' '--speed-large-files' \
+  '--suppress-common-lines' \
+  '-a' '--text' \
+  '--unchanged-group-format=:format:' \
+  '--unchanged-line-format=:format:' \
+  '-u' '-U+:lines:' '--unified=-:lines:' \
+  '-W:columns:' '--width=:columns:' \
   '*:file:_cvs_diff_arg'
