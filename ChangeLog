@@ -1,3 +1,10 @@
+2002-01-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16435: Src/builtin.c: Fix core dump in `hash'.
+
+	* 16419: Doc/Zsh/compsys.yo: Document some _arguments options
+	in the syntax summary line.
+
 2001-01-16  Clint Adams  <clint@zsh.org>
 
 	* Matt Zimmerman: 16463: Completion/Debian/Command/_apt:
