@@ -1168,7 +1168,7 @@ void
 comp_list(char *v)
 {
     zsfree(complist);
-    complist = ztrdup(v);
+    complist = v;
 
     onlyexpl = (v ? ((strstr(v, "expl") ? 1 : 0) |
 		     (strstr(v, "messages") ? 2 : 0)) : 0);

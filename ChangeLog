@@ -1,3 +1,8 @@
+2000-06-05  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11745: Src/builtin.c, Src/Modules/parameter.c, Src/Zle/compresult.c:
+ 	some more memory leak fixes
+	
 2000-06-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11743: Completion/Linux/_rpm: Complete http as well as ftp URLs

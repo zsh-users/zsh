@@ -2162,7 +2162,7 @@ mkautofn(Shfunc shf)
     p->strs = NULL;
     p->shf = shf;
     p->npats = 0;
-    p->pats = NULL;
+    p->pats = (Patprog *) p->prog;
     p->flags = EF_REAL;
     p->dump = NULL;
 

@@ -192,9 +192,10 @@ scanpmparameters(HashTable ht, ScanFunc func, int flags)
 static void
 setpmcommand(Param pm, char *value)
 {
-    if (isset(RESTRICTED))
+    if (isset(RESTRICTED)) {
 	zwarn("restricted: %s", value, 0);
-    else {
+	zsfree(value);
+    } else {
 	Cmdnam cn = zcalloc(sizeof(*cn));
 
 	cn->flags = HASHED;
