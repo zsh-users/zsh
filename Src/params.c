@@ -1879,7 +1879,7 @@ assignsparam(char *s, char *val, int augment)
     Value v;
     char *t = s;
     char *ss, *copy, *var;
-    size_t lv;
+    size_t lvar;
     mnumber lhs, rhs;
     int sstart;
 
@@ -1975,10 +1975,10 @@ assignsparam(char *s, char *val, int augment)
 		var = getstrvalue(v);
 		v->start = sstart;
 		copy = val;
-		lv = strlen(var);
-		val = (char *)zalloc(lv + strlen(var));
+		lvar = strlen(var);
+		val = (char *)zalloc(lvar + strlen(val) + 1);
 		strcpy(val, var);
-		strcpy(val + lv, copy);
+		strcpy(val + lvar, copy);
 		zsfree(copy);
 		break;
 	    }
