@@ -1,5 +1,8 @@
 2000-08-03  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12496: Completion/Core/_path_files: one more problem with
+ 	quoting of glob characters in filename completion
+	
 	* 12494: Doc/Zsh/options.yo, Src/Zle/zle_main.c: make binding of
  	^D be used in first column if ignoreeof is set and ^D is bound to
  	a shell function widget
