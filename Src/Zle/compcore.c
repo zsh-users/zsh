@@ -500,16 +500,17 @@ before_complete(Hookdef dummy, int *lst)
 
 /**/
 int
-after_complete(Hookdef dummy, Compldat dat)
+after_complete(Hookdef dummy, int *dat)
 {
     if (menucmp && !oldmenucmp) {
-	struct chdata dat;
+	struct chdata cdat;
 	int ret;
 
-	dat.matches = amatches;
-	dat.num = nmatches;
-	dat.cur = NULL;
-	if ((ret = runhookdef(MENUSTARTHOOK, (void *) &dat))) {
+	cdat.matches = amatches;
+	cdat.num = nmatches;
+	cdat.cur = NULL;
+	if ((ret = runhookdef(MENUSTARTHOOK, (void *) &cdat))) {
+	    dat[1] = 0;
 	    menucmp = menuacc = 0;
 	    if (ret == 2) {
 		fixsuffix();

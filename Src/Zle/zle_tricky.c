@@ -536,7 +536,7 @@ static int
 docomplete(int lst)
 {
     char *s, *ol;
-    int olst = lst, chl = 0, ne = noerrs, ocs, ret = 0;
+    int olst = lst, chl = 0, ne = noerrs, ocs, ret = 0, dat[2];
 
     if (undoing)
 	setlastline();
@@ -777,9 +777,11 @@ docomplete(int lst)
     zsfree(qword);
     unmetafy_line();
 
-    runhookdef(AFTERCOMPLETEHOOK, (void *) &lst);
+    dat[0] = lst;
+    dat[1] = ret;
+    runhookdef(AFTERCOMPLETEHOOK, (void *) dat);
 
-    return ret;
+    return dat[1];
 }
 
 /* 1 if we are completing the prefix */

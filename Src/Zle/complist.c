@@ -1624,7 +1624,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     Thingy cmd;
     Menustack u = NULL;
     int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
-    int space, lbeg = 0, step = 1, wrap, pl = nlnct, broken = 0;
+    int space, lbeg = 0, step = 1, wrap, pl = nlnct, broken = 0, first = 1;
     char *s;
 
     if (fdat || (dummy && (!(s = getsparam("MENUSELECT")) ||
@@ -1712,6 +1712,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 	lbeg = mlbeg;
 	onlyexpl = 0;
 	showinglist = -2;
+	if (first && !listshown && isset(LISTBEEP))
+	    zbeep();
+	first = 0;
 	zrefresh();
 	inselect = 1;
 	if (noselect) {
@@ -1745,9 +1748,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 
     getk:
 
-	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak))
+	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
+	    zbeep();
 	    break;
-	else if (cmd == Th(z_acceptline)) {
+	} else if (cmd == Th(z_acceptline)) {
 	    acc = 1;
 	    break;
 	} else if (cmd == Th(z_acceptandinfernexthistory)) {
