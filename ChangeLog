@@ -1,3 +1,9 @@
+2001-11-15  Clint Adams  <clint@zsh.org>
+
+	* 16257: Completion/Debian/Command/.distfiles,
+	Completion/Debian/Command/_dput: completion for
+	dput as contributed by Tollef Fog Heen <tollef@add.no>.
+
 2001-11-15  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk, Etc/.distfiles, Util/.distfiles,
