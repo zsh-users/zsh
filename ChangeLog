@@ -1,5 +1,8 @@
 2005-03-18  Peter Stephenson  <pws@csr.com>
 
+	* 21014: Src/Zle/zle_hist.c: remember_edits() was broken,
+	which meant that searching the current line didn't work.
+
 	* zsh-users/8609: Doc/Zsh/expn.yo: document order of (u), (o)
 	and (O) parameter expansion flags.
 

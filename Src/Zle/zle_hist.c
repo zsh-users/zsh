@@ -107,7 +107,9 @@ remember_edits(void)
 	    ZS_memcmp(ent->zle_text, zleline, zlell) != 0) {
 	    if (ent->zle_text)
 		free(ent->zle_text);
-	    ent->zle_text = stringaszleline(ent->text, &ent->zle_len, NULL);
+	    ent->zle_text = zalloc(zlell * ZLE_CHAR_SIZE);
+	    ent->zle_len = zlell;
+	    ZS_memcpy(ent->zle_text, zleline, zlell);
 	}
     }
 }
