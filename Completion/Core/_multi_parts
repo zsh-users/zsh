@@ -31,7 +31,7 @@ fi
 
 sep="$1"
 if [[ "${2[1]}" = '(' ]]; then
-  matches=( ${2[2,-2]} )
+  matches=( ${=2[2,-2]} )
 else
   matches=( "${(@P)2}" )
 fi
