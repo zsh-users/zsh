@@ -1599,6 +1599,7 @@ setstrvalue(Value v, char *val)
     }
     if (v->pm->flags & PM_HASHED) {
 	zerr("%s: attempt to set slice of associative array", v->pm->nam, 0);
+	zsfree(val);
 	return;
     }
     v->pm->flags &= ~PM_UNSET;
@@ -2377,12 +2378,12 @@ strsetfn(Param pm, char *x)
 
 /* Function to get value of an array parameter */
 
+static char *nullarray = NULL;
+
 /**/
 char **
 arrgetfn(Param pm)
 {
-    static char *nullarray = NULL;
-
     return pm->u.arr ? pm->u.arr : &nullarray;
 }
 
@@ -2558,7 +2559,9 @@ strvargetfn(Param pm)
 mod_export char **
 arrvargetfn(Param pm)
 {
-    return *((char ***)pm->u.data);
+    char **arrptr = *((char ***)pm->u.data);
+
+    return arrptr ? arrptr : &nullarray;
 }
 
 /* Function to set value of generic special array parameter.    *
@@ -2577,7 +2580,15 @@ arrvarsetfn(Param pm, char **x)
 	freearray(*dptr);
     if (pm->flags & PM_UNIQUE)
 	uniqarray(x);
-    *dptr = x ? x : mkarray(NULL);
+    /*
+     * Special tied arrays point to variables accessible in other
+     * ways which need to be set to NULL.  We can't do this
+     * with user tied variables since we can leak memory.
+     */
+    if ((pm->flags & PM_SPECIAL) & !x)
+	*dptr = mkarray(NULL);
+    else
+	*dptr = x;
     if (pm->ename && x)
 	arrfixenv(pm->ename, x);
 }

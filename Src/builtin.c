@@ -2255,7 +2255,15 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	    return 1;
 	}
 
+	/*
+	 * pm->ename is only deleted when the struct is, so
+	 * we need to free it here if it already exists.
+	 */
+	if (pm->ename)
+	    zsfree(pm->ename);
 	pm->ename = ztrdup(asg->name);
+	if (apm->ename)
+	    zsfree(apm->ename);
 	apm->ename = ztrdup(asg0.name);
 	if (oldval)
 	    setsparam(asg0.name, oldval);

@@ -1,3 +1,11 @@
+2004-01-12  Peter Stephenson  <pws@csr.com>
+
+	* 19361: Src/builtin.c, Src/params.c: Memory leaks possibly
+	indicated by valgrind.  Retying a pair of variables leaked
+	a string.  Attempting to assign to a slice of an associative
+	array (error) could leak the value.  Unsetting the array part
+	of a user tied array leaked a couple of bytes.
+
 2004-01-09  Peter Stephenson  <pws@csr.com>
 
 	* 19354: Doc/Zsh/compctl.yo, Doc/Zsh/intro.yo: Fix section
