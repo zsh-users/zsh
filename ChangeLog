@@ -1,5 +1,8 @@
 2002-07-08  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 17439: Src/Zle/zle_tricky.c: remove qword, it isn't needed
+	anymore
+
 	* 17438: Completion/Base/Widget/_complete_help: don't display
 	_dispatch as one of the called functions
 

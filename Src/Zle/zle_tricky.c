@@ -104,10 +104,6 @@ mod_export int validlist;
 /**/
 mod_export int showagain = 0;
 
-/* This holds the word we are completing in quoted from. */
-
-static char *qword;
-
 /* This holds the word we are working on without braces removed. */
 
 static char *origword;
@@ -596,7 +592,6 @@ docomplete(int lst)
     } else
 	ol = NULL;
     inwhat = IN_NOTHING;
-    qword = NULL;
     zsfree(qipre);
     qipre = ztrdup("");
     zsfree(qisuf);
@@ -629,7 +624,6 @@ docomplete(int lst)
 	    popheap();
 	    unmetafy_line();
 	    zsfree(s);
-	    zsfree(qword);
 	    active = 0;
 	    return 1;
 	}
@@ -814,7 +808,6 @@ docomplete(int lst)
     /* Reset the lexer state, pop the heap. */
     lexrestore();
     popheap();
-    zsfree(qword);
     unmetafy_line();
 
     dat[0] = lst;
@@ -1391,7 +1384,6 @@ get_comp_string(void)
 	parse_subst_string(s);
     }
     /* This variable will hold the current word in quoted form. */
-    qword = ztrdup(s);
     offs = cs - wb;
     if ((p = parambeg(s))) {
 	for (p = s; *p; p++)
@@ -1434,7 +1426,7 @@ get_comp_string(void)
         }
     }
     /* While building the quoted form, we also clean up the command line. */
-    for (p = s, tt = qword, i = wb, j = 0; *p; p++, tt++, i++)
+    for (p = s, i = wb, j = 0; *p; p++, i++)
 	if (INULL(*p)) {
 	    if (i < cs)
 		offs--;
@@ -1442,21 +1434,18 @@ get_comp_string(void)
 		j = 1-j;
 	    if (p[1] || *p != Bnull) {
 		if (*p == Bnull) {
-		    *tt = '\\';
 		    if (cs == i + 1)
 			cs++, offs++;
 		} else {
 		    ocs = cs;
 		    cs = i;
 		    foredel(1);
-		    chuck(tt--);
 		    if ((cs = ocs) > i--)
 			cs--;
 		    we--;
 		}
 	    } else {
 		ocs = cs;
-		*tt = '\0';
 		cs = we;
 		backdel(1);
 		if (ocs == we)
