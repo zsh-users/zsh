@@ -1,3 +1,9 @@
+2000-09-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12773: Doc/Zsh/contrib.yo, Functions/Zle/smart-insert-last-word:
+	Add the smart-insert-last-word function from zsh-users/3272.
+	Change "completion style" to "widget style" in a few places.
+
 2000-09-07  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12769: Completion/Builtins/_cd: more sensible value
