@@ -1,3 +1,7 @@
+2002-07-04  Clint Adams  <clint@zsh.org>
+
+	* 17417: Src/Modules/datetime.c: remove unused fluff.
+
 2002-07-04  Peter Stephenson  <pws@csr.com>
 
 	* 17410: Doc/Zsh/contrib.yo, Functions/Zle/narrow-to-region,

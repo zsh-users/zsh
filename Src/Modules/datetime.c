@@ -31,12 +31,10 @@
 #include "datetime.pro"
 #include <time.h>
 
-static char datetime_nam[] = "datetime";
-
 static int
 bin_strftime(char *nam, char **argv, char *ops, int func)
 {
-    int ret = 0, bufsize, x;
+    int bufsize, x;
     char *endptr = NULL, *buffer = NULL;
     time_t secs;
     struct tm *t;
