@@ -1,3 +1,7 @@
-moddeps="compctl zle"
+name=zsh/computil
+
+moddeps="zsh/complete zsh/zle"
 
 objects="computil.o"
+
+autobins="compdescribe comparguments compvalues compquote comptags comptry compfiles compgroups"
