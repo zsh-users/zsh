@@ -1,17 +1,57 @@
-# Converted to zsh prompt theme by bash2zshprompt, written by <adam@spiers.net>
 # Created by icetrey <trey@imagin.net>
 # Added by Spidey 08/06
-prompt_elite2_setup () {
-  local GRAD1=`tty|cut -d/ -f3`
-  local COLOR1="%{$reset_color$fg_cyan%}"
-  local COLOR2="%{$bold_color$fg_cyan%}"
-  local COLOR3="%{$bold_color$fg_grey%}"
-  local COLOR4="%{$reset_color%}"
-  PS1="$COLOR3Ú$COLOR1Ä$COLOR2($COLOR1%n$COLOR3@$COLOR1%m$COLOR2)$COLOR1Ä$COLOR2($COLOR1%!$COLOR3/$COLOR1$GRAD1$COLOR2)$COLOR1Ä$COLOR2($COLOR1%D{%I:%M%P}$COLOR3:$COLOR1%D{%m/%d/%y}$COLOR2)$COLOR1Ä$COLOR3-$COLOR4$prompt_newline$COLOR3À$COLOR1Ä$COLOR2($COLOR1%#$COLOR3:$COLOR1%~$COLOR2)$COLOR1Ä$COLOR3-$COLOR4 " 
-  PS2="$COLOR2Ä$COLOR1Ä$COLOR3-$COLOR4 "
+# Converted to zsh prompt theme by <adam@spiers.net>
 
-  precmd () { }
+prompt_elite2_help () {
+  cat <<EOH
+This prompt is color-scheme-able.  You can invoke it thus:
+
+  prompt elite2 [<text-color> [<parentheses-color>]]
+
+The default colors are both cyan.  This theme works best with a dark
+background.
+
+Recommended fonts for this theme: nexus or vga or similar.  If you
+don't have any of these, the 8-bit characters will probably look stupid.
+EOH
+}
+
+prompt_elite2_setup () {
+  local text_col=${1:-'cyan'}
+  local parens_col=${2:-$text_col}
+
+  for code in 332 304 304 371 371 371 372 300 304 304 371 372; do
+    local varname=char_$code
+    : ${(P)varname=$(echo -n "\\0$code")}
+  done
+
+  local tty=`tty|cut -d/ -f3`
+  local text="%{$fg_no_bold[$text_col]%}"
+  local parens="%{$fg_bold[$parens_col]%}"
+  local punctuation_color="%{$fg_bold[grey]%}"
+  local reset="%{$reset_color%}"
+
+  PS1="$punctuation_colorÚ$textÄ$parens($text%n$punctuation_color@$text%m$parens)$textÄ$parens($text%!$punctuation_color/$text$tty$parens)$textÄ$parens($text%D{%I:%M%P}$punctuation_color:$text%D{%m/%d/%y}$parens)$textÄ$punctuation_color-$reset$prompt_newline$punctuation_colorÀ$textÄ$parens($text%#$punctuation_color:$text%~$parens)$textÄ$punctuation_color-$reset " 
+
+  PS2="$parensÄ$textÄ$punctuation_color-$reset "
+
+  precmd () { setopt promptsubst }
   preexec () { }
+}
+
+prompt_elite2_preview () {
+  local color colors
+  colors=(red yellow green blue magenta)
+
+  if (( ! $#* )); then
+    for (( i = 1; i <= $#colors; i++ )); do
+      color=$colors[$i]
+      prompt_preview_theme elite2 $color
+      (( i < $#colors )) && print
+    done
+  else
+    prompt_preview_theme elite2 "$@"
+  fi
 }
 
 prompt_elite2_setup "$@"

@@ -2,17 +2,19 @@
 
 prompt_adam2_help () {
   cat <<'EOF'
-This prompt is color-theme-able.  You can invoke it thus:
+This prompt is color-scheme-able.  You can invoke it thus:
 
-  prompt adam2 [ plain ] <color1> <color2> <color3>
+  prompt adam2 [ plain ] [<color1> [<color2> [<color3>]]]
 
 where the colors are for the hyphens, current directory, and user@host
-bits respectively.
+bits respectively.  The default colors are cyan, green, and cyan.
+This theme works best with a dark background.
 
-And you probably thought adam1 was overkill.  If you've ever seen a
-more complex prompt in your whole life, please e-mail it to me at
-<adam@spiers.net>; I'd love to know that I'm not the saddest person
-on the planet.
+Recommended fonts for this theme: nexus or vga or similar.  If you
+don't have any of these, then specify the `plain' option to use 7-bit
+replacements for the 8-bit characters.
+
+And you probably thought adam1 was overkill.
 EOF
 }
 
@@ -27,46 +29,39 @@ prompt_adam2_setup () {
     prompt_gfx_blc='\`'
     prompt_gfx_hyphen='-'
   else
-    prompt_gfx_tlc=$(echo "\xda")
-    prompt_gfx_mlc=$(echo "\xc3")
-    prompt_gfx_blc=$(echo "\xc0")
-    prompt_gfx_hyphen=$(echo "\xc4")
+    prompt_gfx_tlc=$'\xda'
+    prompt_gfx_mlc=$'\xc3'
+    prompt_gfx_blc=$'\xc0'
+    prompt_gfx_hyphen=$'\xc4'
   fi
 
   # Colour scheme
-  prompt_scheme_color1=${1:-'cyan'}    # hyphens
-  prompt_scheme_color2=${2:-'green'}   # current directory
-  prompt_scheme_color3=${3:-'cyan'}    # user@host
+  prompt_adam2_color1=${1:-'cyan'}    # hyphens
+  prompt_adam2_color2=${2:-'green'}   # current directory
+  prompt_adam2_color3=${3:-'cyan'}    # user@host
 
-  local num
-  for num in 1 2 3; do
-    # Grok this!
-    eval "prompt_color$num="'${(P)$(echo "fg_no_bold_$prompt_scheme_color'"$num\")}"
-    eval "prompt_bold_color$num="'${(P)$(echo "fg_bold_$prompt_scheme_color'"$num\")}"
-  done
-
-  prompt_gfx_tbox=$(echo "%{$prompt_bold_color1%}${prompt_gfx_tlc}%{$prompt_color1%}${prompt_gfx_hyphen}")
-  prompt_gfx_bbox=$(echo "%{$prompt_bold_color1%}${prompt_gfx_blc}${prompt_gfx_hyphen}%{$prompt_color1%}")
+  prompt_gfx_tbox="%{$fg_bold[$prompt_adam2_color1]%}${prompt_gfx_tlc}%{$fg_no_bold[$prompt_adam2_color1]%}${prompt_gfx_hyphen}"
+  prompt_gfx_bbox="%{$fg_bold[$prompt_adam2_color1]%}${prompt_gfx_blc}${prompt_gfx_hyphen}%{$fg_no_bold[$prompt_adam2_color1]%}"
 
   # This is a cute hack.  Well I like it, anyway.
-  prompt_gfx_bbox_to_mbox=$(echo "%{\e[A\r$prompt_bold_color1${prompt_gfx_mlc}$prompt_color1${prompt_gfx_hyphen}\e[B%}")
+  prompt_gfx_bbox_to_mbox=$(print -n "%{\e[A\r$fg_bold[$prompt_adam2_color1]${prompt_gfx_mlc}$fg_no_bold[$prompt_adam2_color1]${prompt_gfx_hyphen}\e[B%}")
 
-  prompt_l_paren=$(echo "%{$fg_bold_grey%}(")
-  prompt_r_paren=$(echo "%{$fg_bold_grey%})")
+  prompt_l_paren=$'%{$fg_bold[grey]%}('
+  prompt_r_paren=$'%{$fg_bold[grey]%})'
 
-  prompt_l_bracket=$(echo "%{$fg_bold_grey%}[")
-  prompt_r_bracket=$(echo "%{$fg_bold_grey%}]")
+  prompt_l_bracket=$'%{$fg_bold[grey]%}['
+  prompt_r_bracket=$'%{$fg_bold[grey]%}]'
 
-  prompt_machine=$(echo "%{$prompt_color3%}%n%{$prompt_bold_color3%}@%{$prompt_color3%}%m")
+  prompt_machine="%{$fg_no_bold[$prompt_adam2_color3]%}%n%{$fg_bold[$prompt_adam2_color3]%}@%{$fg_no_bold[$prompt_adam2_color3]%}%m"
 
   prompt_padding_text=`perl -e "print qq{${prompt_gfx_hyphen}} x 200"`
 
-  prompt_line_1a="$prompt_gfx_tbox$prompt_l_paren%{$prompt_bold_color2%}%~$prompt_r_paren%{$prompt_color1%}"
+  prompt_line_1a="$prompt_gfx_tbox$prompt_l_paren%{$fg_bold[$prompt_adam2_color2]%}%~$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]%}"
   prompt_line_1a_no_color=$(echo "$prompt_line_1a" | perl -pe "s/%{.*?%}//g")
-  prompt_line_1b=$(echo "$prompt_l_paren$prompt_machine$prompt_r_paren%{$prompt_color1%}${prompt_gfx_hyphen}")
+  prompt_line_1b="$prompt_l_paren$prompt_machine$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]%}${prompt_gfx_hyphen}"
   prompt_line_1b_no_color=$(echo "$prompt_line_1b" | perl -pe "s/%{.*?%}//g")
 
-  prompt_line_2="$prompt_gfx_bbox${prompt_gfx_hyphen}%{$fg_bold_white%}"
+  prompt_line_2="$prompt_gfx_bbox${prompt_gfx_hyphen}%{$fg_bold[white]%}"
 
   prompt_char="%(!.#.>)"
 
@@ -98,19 +93,19 @@ prompt_adam2_precmd () {
       prompt_line_1="$prompt_line_1a$prompt_padding"
     else
       prompt_pwd_size=$(( $COLUMNS - 5 ))
-      prompt_line_1="$prompt_gfx_tbox$prompt_l_paren%{$prompt_bold_color2%}%$prompt_pwd_size<...<%~%<<$prompt_r_paren%{$prompt_color1$prompt_gfx_hyphen%}"
+      prompt_line_1="$prompt_gfx_tbox$prompt_l_paren%{$fg_bold[$prompt_adam2_color2]%}%$prompt_pwd_size<...<%~%<<$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]$prompt_gfx_hyphen%}"
     fi
   fi
 
   pre_prompt="$prompt_line_1$prompt_newline$prompt_line_2"
 
-  PS1="$pre_prompt%{$fg_bold_white%}$prompt_char "
-  PS2="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold_white%}%_> "
-  PS3="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold_white%}?# "
+  PS1="$pre_prompt%{$fg_bold[white]%}$prompt_char "
+  PS2="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold[white]%}%_> "
+  PS3="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold[white]%}?# "
 }
 
 prompt_adam2_preexec () {
-  print -n "$fg_no_bold_white"
+  print -n "$fg_no_bold[white]"
 }
 
 prompt_adam2_setup "$@"

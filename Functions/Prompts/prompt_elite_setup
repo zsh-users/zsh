@@ -1,18 +1,45 @@
-# Converted to zsh prompt theme by bash2zshprompt, written by <adam@spiers.net>
-
-for code in 332 304 304 371 371 371 372 300 304 304 371 372; do
-  local varname=char_$code
-  : ${(P)varname=$(echo -n "\\0$code")}
-done
-
 # Created by KrON from windowmaker on IRC
 # Changed by Spidey 08/06
+# Converted to zsh prompt theme by <adam@spiers.net>
+
+prompt_elite_help () {
+  cat <<EOH
+This prompt is color-scheme-able.  You can invoke it thus:
+
+  prompt elite [<text-color> [<punctuation-color>]]
+
+The default colors are red and blue respectively.  This theme is
+intended for use with a black background.
+
+Recommended fonts for this theme: nexus or vga or similar.  If you
+don't have any of these, the 8-bit characters will probably look stupid.
+EOH
+}
+
 prompt_elite_setup () {
-  PS1="%{$fg_red%}$char_332$char_304%{$fg_blue%}(%{$fg_red%}%n%{$fg_blue%}@%{$fg_red%}%m%{$fg_blue%})%{$fg_red%}-%{$fg_blue%}(%{$fg_red%}%D{%I:%M%P}%{$fg_blue%}-:-%{$fg_red%}%D{%m}%{$fg_blue$fg_red%}/%D{%d}%{$fg_blue%})%{$fg_red%}$char_304-%{$fg_blue]%}$char_371%{$fg_red%}-$char_371$char_371%{$fg_blue%}$char_372$prompt_newline%{$fg_red%}$char_300$char_304%{$fg_blue%}(%{$fg_red%}%1~%{$fg_blue%})%{$fg_red%}$char_304$char_371%{$fg_blue%}$char_372%{$reset_color%}"
+  local text=${1:-'red'}
+  local punctuation=${2:-'blue'}
+
+  for code in 332 304 304 371 371 371 372 300 304 304 371 372; do
+    local varname=char_$code
+    : ${(P)varname=$(echo -n "\\0$code")}
+  done
+
+  PS1="%{$fg[$text]%}$char_332$char_304%{$fg[$punctuation]%}(%{$fg[$text]%}%n%{$fg[$punctuation]%}@%{$fg[$text]%}%m%{$fg[$punctuation]%})%{$fg[$text]%}-%{$fg[$punctuation]%}(%{$fg[$text]%}%D{%I:%M%P}%{$fg[$punctuation]%}-:-%{$fg[$text]%}%D{%m}%{$fg[$punctuation]$fg[$text]%}/%D{%d}%{$fg[$punctuation]%})%{$fg[$text]%}$char_304-%{$fg[$punctuation]]%}$char_371%{$fg[$text]%}-$char_371$char_371%{$fg[$punctuation]%}$char_372$prompt_newline%{$fg[$text]%}$char_300$char_304%{$fg[$punctuation]%}(%{$fg[$text]%}%1~%{$fg[$punctuation]%})%{$fg[$text]%}$char_304$char_371%{$fg[$punctuation]%}$char_372%{$reset_color%}"
   PS2="> "
 
-  precmd () { }
+  precmd () { setopt promptsubst }
   preexec () { }
+}
+
+prompt_elite_preview () {
+  if (( ! $#* )); then
+    prompt_preview_theme elite
+    print
+    prompt_preview_theme elite green yellow
+  else
+    prompt_preview_theme elite "$@"
+  fi
 }
 
 prompt_elite_setup "$@"

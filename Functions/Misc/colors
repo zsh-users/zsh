@@ -1,67 +1,85 @@
 # Put standard ANSI color codes in environment for easy use
-
 reset_color=$'\e[0m'
 bold_color=$'\e[1m'
 
 # Foreground
 
-fg_grey=$'\e[30m'
-fg_red=$'\e[31m'
-fg_green=$'\e[32m'
-fg_yellow=$'\e[33m'
-fg_blue=$'\e[34m'
-fg_magenta=$'\e[35m'
-fg_cyan=$'\e[36m'
-fg_white=$'\e[37m'
+typeset -Ag fg
+fg=(
+  grey      $'\e[30m'
+  red       $'\e[31m'
+  green     $'\e[32m'
+  yellow    $'\e[33m'
+  blue      $'\e[34m'
+  magenta   $'\e[35m'
+  cyan      $'\e[36m'
+  white     $'\e[37m'
+)
+fg_zzzz="$reset_color"
 
-fg_no_bold_grey=$'\e[0;30m'
-fg_no_bold_red=$'\e[0;31m'
-fg_no_bold_green=$'\e[0;32m'
-fg_no_bold_yellow=$'\e[0;33m'
-fg_no_bold_blue=$'\e[0;34m'
-fg_no_bold_magenta=$'\e[0;35m'
-fg_no_bold_cyan=$'\e[0;36m'
-fg_no_bold_white=$'\e[0;37m'
+typeset -Ag fg_no_bold
+fg_no_bold=(
+  grey      $'\e[0;30m'
+  red       $'\e[0;31m'
+  green     $'\e[0;32m'
+  yellow    $'\e[0;33m'
+  blue      $'\e[0;34m'
+  magenta   $'\e[0;35m'
+  cyan      $'\e[0;36m'
+  white     $'\e[0;37m'
+)
+fg_no_bold_zzzz="$reset_color"
 
-fg_bold_grey=$'\e[1;30m'
-fg_bold_red=$'\e[1;31m'
-fg_bold_green=$'\e[1;32m'
-fg_bold_yellow=$'\e[1;33m'
-fg_bold_blue=$'\e[1;34m'
-fg_bold_magenta=$'\e[1;35m'
-fg_bold_cyan=$'\e[1;36m'
-fg_bold_white=$'\e[1;37m'
+typeset -Ag fg_bold
+fg_bold=(
+  grey      $'\e[1;30m'
+  red       $'\e[1;31m'
+  green     $'\e[1;32m'
+  yellow    $'\e[1;33m'
+  blue      $'\e[1;34m'
+  magenta   $'\e[1;35m'
+  cyan      $'\e[1;36m'
+  white     $'\e[1;37m'
+)
+fg_bold_zzzz="$reset_color"
 
 # Background
 
-bg_grey=$'\e[40m'
-bg_red=$'\e[41m'
-bg_green=$'\e[42m'
-bg_yellow=$'\e[43m'
-bg_blue=$'\e[44m'
-bg_magenta=$'\e[45m'
-bg_cyan=$'\e[46m'
-bg_white=$'\e[47m'
+typeset -Ag bg
+bg=(
+  grey      $'\e[40m'
+  red       $'\e[41m'
+  green     $'\e[42m'
+  yellow    $'\e[43m'
+  blue      $'\e[44m'
+  magenta   $'\e[45m'
+  cyan      $'\e[46m'
+  white     $'\e[47m'
+)
+bg_zzzz="$reset_color"
 
-bg_no_bold_grey=$'\e[0;40m'
-bg_no_bold_red=$'\e[0;41m'
-bg_no_bold_green=$'\e[0;42m'
-bg_no_bold_yellow=$'\e[0;43m'
-bg_no_bold_blue=$'\e[0;44m'
-bg_no_bold_magenta=$'\e[0;45m'
-bg_no_bold_cyan=$'\e[0;46m'
-bg_no_bold_white=$'\e[0;47m'
+typeset -Ag bg_no_bold
+bg_no_bold=(
+  grey      $'\e[0;40m'
+  red       $'\e[0;41m'
+  green     $'\e[0;42m'
+  yellow    $'\e[0;43m'
+  blue      $'\e[0;44m'
+  magenta   $'\e[0;45m'
+  cyan      $'\e[0;46m'
+  white     $'\e[0;47m'
+)
+bg_no_bold_zzzz="$reset_color"
 
-bg_bold_grey=$'\e[1;40m'
-bg_bold_red=$'\e[1;41m'
-bg_bold_green=$'\e[1;42m'
-bg_bold_yellow=$'\e[1;43m'
-bg_bold_blue=$'\e[1;44m'
-bg_bold_magenta=$'\e[1;45m'
-bg_bold_cyan=$'\e[1;46m'
-bg_bold_white=$'\e[1;47m'
-
-# Stop these screwing the environment listing up
-bg_zzzz=$reset_color
-fg_zzzz=$reset_color
-bold_zzzz=$reset_color
+typeset -Ag bg_bold
+bg_bold=(
+  grey      $'\e[1;40m'
+  red       $'\e[1;41m'
+  green     $'\e[1;42m'
+  yellow    $'\e[1;43m'
+  blue      $'\e[1;44m'
+  magenta   $'\e[1;45m'
+  cyan      $'\e[1;46m'
+  white     $'\e[1;47m'
+)
+bg_bold_zzzz="$reset_color"
