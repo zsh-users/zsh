@@ -1,3 +1,12 @@
+2000-11-27  Peter Stephenson  <pws@csr.com>
+
+	* 13197: configure.in: fix problems with use of link parameter,
+	directories for reading old config.modules file, and inconsistent
+	values for auto parameter.
+
+	* 13196: Etc/zsh-development-guide: Use of `either' keyword for
+	`link' module parameter.
+
 2000-11-26  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 13194: INSTALL, configure.in, Config/defs.mk.in,
