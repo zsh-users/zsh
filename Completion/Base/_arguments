@@ -285,7 +285,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 
               # Otherwise we call it with the description-arguments.
 
-              eval "action=( $action )"
+              set -A action ${=~action}
               while _next_label "$subc" expl "$descr"; do
                 "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}"
 	      done
@@ -293,9 +293,9 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
             fi
           fi
         fi
-        shift 1 descrs
-        shift 1 actions
-        shift 1 subcs
+        shift "${#descrs} ? 1 : 0" descrs
+        shift "${#actions} ? 1 : 0" actions
+        shift "${#subcs} ? 1 : 0" subcs
       done
 
       if [[ -z "$matched$hasopts" ]] && _requested options &&

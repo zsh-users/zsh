@@ -1,3 +1,7 @@
+2000-05-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11618: Completion/Base/_arguments: Fix bad shift.
+
 2000-05-28  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 11616: Src/Modules/zftp.c: configure test for netinet/in_systm.h
