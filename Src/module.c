@@ -1346,7 +1346,7 @@ bin_zmodload_math(char *nam, char **args, char *ops)
     int ret = 0;
 
     if (ops['u']) {
-	/* remove autoloaded conditions */
+	/* remove autoloaded math functions */
 	for (; *args; args++) {
 	    MathFunc f = getmathfunc(*args, 0);
 
@@ -1355,7 +1355,7 @@ bin_zmodload_math(char *nam, char **args, char *ops)
 		    zwarnnam(nam, "%s: no such math function", *args, 0);
 		    ret = 1;
 		}
-	    } else if (f->flags & CONDF_ADDED) {
+	    } else if (f->flags & MFF_ADDED) {
 		zwarnnam(nam, "%s: math function is already defined", *args, 0);
 		ret = 1;
 	    } else
@@ -1377,7 +1377,7 @@ bin_zmodload_math(char *nam, char **args, char *ops)
 	}
 	return 0;
     } else {
-	/* add autoloaded conditions */
+	/* add autoloaded math functions */
 	char *modnam;
 
 	modnam = *args++;
@@ -2119,6 +2119,8 @@ add_automathfunc(char *nam, char *module)
 
 	return 1;
     }
+    f->flags &= ~MFF_ADDED; /* still to autoload, not added yet */
+
     return 0;
 }
 

@@ -1,3 +1,8 @@
+2001-05-18  Peter Stephenson  <pws@csr.com>
+
+	* 14382: Src/module.c: zmodload -uf wouldn't work even if the
+	math function hadn't been loaded yet.
+
 2001-05-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14381: Src/subst.c: try to make ${(e)..} work for complicated
