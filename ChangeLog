@@ -1,3 +1,8 @@
+2001-04-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14108: Src/Modules/termcap.c: Don't define USES_TERM* if the
+	corresponding HAVE_TERM* constants are not defined.
+
 2001-04-26  Oliver Kiddle  <opk@zsh.org>
 
 	* 14112: Completion/Base/Utility/.distfiles,

@@ -27,36 +27,45 @@
  *
  */
 
-#define USES_TERMCAP_H 1
-#define USES_TERM_H 1
+/*
+ * We need to include the zsh headers later to avoid clashes with
+ * the definitions on some systems, however we need the configuration
+ * file to decide whether we should avoid curses.h, which clashes
+ * with several zsh constants on some systems (e.g. SunOS 4).
+ */
+#include "../../config.h"
+
+#ifdef HAVE_TGETENT
+# if defined(HAVE_CURSES_H) && defined(HAVE_TERM_H)
+#  define USES_TERM_H 1
+# else
+#  ifdef HAVE_TERMCAP_H
+#   define USES_TERMCAP_H 1
+#  endif
+# endif
+#endif
+
 #include "termcap.mdh"
 #include "termcap.pro"
 
 static char termcap_nam[] = "termcap";
 
-/* echotc: output a termcap */
-
 #ifdef HAVE_TGETENT
-# if defined(HAVE_CURSES_H) && defined(HAVE_TERM_H)
+# ifdef USES_TERM_H
 #  ifdef HAVE_TERMIO_H
 #   include <termio.h>
 #  endif
 #  include <curses.h>
 #  include <term.h>
 # else
-#  ifdef HAVE_TERMCAP_H
+#  ifdef USES_TERMCAP_H
 #   include <termcap.h>
-#  else
-#   ifdef HAVE_CURSES_H
-#    include <curses.h>
-#   endif
-#   ifdef HAVE_TERM_H
-#    include <term.h>
-#   endif
 #  endif
 # endif
 
 static Param termcap_pm;
+
+/* echotc: output a termcap */
 
 /**/
 static int
