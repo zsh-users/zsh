@@ -141,7 +141,6 @@ _arguments -s \
   '(-T --temp-dir)'{-T,--temp-dir=}'[create temporary files in specified directory]:directory:_files -/' \
   '(-y --fuzzy)'{-y,--fuzzy}'[find similar file for basis if no destination file]' \
   '--compare-dest=[also compare destination files relative to specified directory]:directory:_files -/' \
-  '--copy-dest=[like --compare-dest, but also includes copies of unchanged files]:directory:_files -/' \
   '--link-dest=[hardlink to files in specified directory hierarchy when unchanged]:directory:_files -/' \
   '(-z --compress)'{-z,--compress}'[compress file data during the transfer]' \
   '(-C --cvs-exclude)'{-C,--cvs-exclude}'[auto-ignore files the same way CVS does]' \
