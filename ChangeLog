@@ -1,3 +1,8 @@
+2002-01-16  Clint Adams  <clint@zsh.org>
+
+	* Matt Zimmerman: 16463: Completion/Debian/Command/_apt:
+	completion for apt-cache showsrc.
+
 2002-01-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 16461: Completion/AIX/Command/_lspv
