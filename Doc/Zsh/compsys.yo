@@ -3083,8 +3083,10 @@ the values. For options that have more than one argument these are
 given as one string, separated by colons. All colons in the original
 arguments are preceded with backslashes.
 
-The parameter `tt(context)' will be set to the automatically created
-context names. These are either strings of the form
+The parameter `tt(context)' (only set in the calling function when
+using an action of the form `tt(->)var(string)', not during the
+evaluation of other var(action)s) will be set to the automatically
+created context names. These are either strings of the form
 `tt(option)var(-opt)tt(-)var(n)' for the var(n)'th argument of the
 option var(-opt), or strings of the form `tt(argument-)var(n)' for
 the var(n)'th argument (for rest arguments the var(n) is the string

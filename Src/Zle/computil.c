@@ -1198,14 +1198,12 @@ ca_parse_line(Cadef d, int multi)
 
 	    if (state.def->type == CAA_REST || state.def->type == CAA_RARGS ||
 		state.def->type == CAA_RREST) {
-		if (state.curopt)
-		    state.oopt++;
 		if (state.def->end && pattry(endpat, line)) {
 		    state.def = NULL;
 		    state.curopt = NULL;
 		    state.opt = state.arg = 1;
 		    state.argend = ca_laststate.argend = cur - 1;
-		    continue;
+		    goto cont;
 		}
 	    } else if ((state.def = state.def->next)) {
 		state.argbeg = cur;
@@ -1378,6 +1376,8 @@ ca_parse_line(Cadef d, int multi)
 	    endpat = patcompile(state.def->end, 0, NULL);
 
 	/* Copy the state into the global one. */
+
+    cont:
 
 	if (cur + 1 == compcurrent) {
 	    memcpy(&ca_laststate, &state, sizeof(state));
