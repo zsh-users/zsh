@@ -16,6 +16,9 @@ fi
 
 # `sman' is the SGML manual directory for Solaris 7.
 
+[ "$manpath" ] || manpath=$(manpath 2>/dev/null) || \
+  manpath=( /usr/man(-/N) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/N) )
+
 if [[ $words[2] = (<->*|ln) ]]; then
   rep=(
   $manpath/(sman|man|cat)${words[2]}/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t) )
