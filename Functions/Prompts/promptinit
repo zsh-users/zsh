@@ -12,7 +12,7 @@ promptinit () {
   local ppath='' name
 
   # Autoload all prompt_*_setup functions in fpath
-  for theme in $fpath/prompt_*_setup(N); do
+  for theme in $^fpath/prompt_*_setup(N); do
     if [[ $theme == */prompt_(#b)(*)_setup ]]; then
       name="$match[1]"
       if [[ -r "$theme" ]]; then
