@@ -1,0 +1,19 @@
+#compdef zcat
+
+(( $+_is_gnu )) || typeset -gA _is_gnu
+
+if (( ! $+_is_gnu[$words[1]] )); then
+  if [[ $(_call_program version $words[1] --license </dev/null 2>&1) = *GNU* ]]
+  then
+    _is_gnu[$words[1]]=yes
+  else
+    _is_gnu[$words[1]]=
+  fi
+fi
+
+if [[ -n "$_is_gnu[$words[1]]" ]]
+then
+  _gzip "$@"
+else
+  _compress "$@"
+fi
