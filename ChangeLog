@@ -1,5 +1,7 @@
 2002-03-05  Peter Stephenson  <pws@csr.com>
 
+	* unposted; Config/version.mk: version 4.1.0-dev-4.
+
 	* 16767: Src/Zle/zle_hist.c, Doc/Zsh/zle.yo, Doc/Zsh/contrib.yo,
 	Functions/Zle/copy-earlier-word:  Enhance insert-last-word to
 	pick different lines from the history (including the current
