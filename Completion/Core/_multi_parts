@@ -162,14 +162,27 @@ while true; do
 	  tmp2=()
         fi
         for i in "${(@M)matches:#(${(j:|:)~tmp1})*}"; do
-	  if [[ "$i" = *${sep}* ]]; then
+	  case "$i" in
+	  *${sep})
             compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
 	            -p "$pref" \
                     -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}" && ret=0
-          else
+            ;;
+	  ${sep}*)
+            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+	            -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $match" - "$sep" && ret=0
+            ;;
+	  *${sep}*)
+            compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
+	            -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}" && ret=0
+            ;;
+          *)
             compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
                     -M "r:|${sep}=* r:|=* $match" - "$i" && ret=0
-          fi
+            ;;
+          esac
         done
       else
         # With normal completion we add all matches one-by-one with
@@ -178,7 +191,7 @@ while true; do
 
         for i in "${(@M)matches:#(${(j:|:)~tmp1})*}"; do
 	  if [[ "$i" = *${sep}* ]]; then
-            compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
+            compadd "$group[@]" "$expl[@]" "$opts[@]" \
 	            -p "$pref" -s "${i#*${sep}}" \
                     -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}" && ret=0
           else
