@@ -966,6 +966,15 @@ when the primary prompt is being displayed on the left.
 This does not work if the tt(SINGLELINEZLE) option is set.
 It is expanded in the same way as tt(PS1).
 )
+vindex(RPROMPT2)
+xitem(tt(RPROMPT2) <S>)
+vindex(RPS2)
+item(tt(RPS2) <S>)(
+This prompt is displayed on the right-hand side of the screen
+when the secondary prompt is being displayed on the left.
+This does not work if the tt(SINGLELINEZLE) option is set.
+It is expanded in the same way as tt(PS2).
+)
 vindex(SAVEHIST)
 item(tt(SAVEHIST))(
 The maximum number of history events to save in the history file.

@@ -65,6 +65,7 @@ char *argzero,		/* $0           */
      *prompt4,		/* $PROMPT4     */
      *readnullcmd,	/* $READNULLCMD */
      *rprompt,		/* $RPROMPT     */
+     *rprompt2,		/* $RPROMPT2    */
      *sprompt,		/* $SPROMPT     */
      *wordchars,	/* $WORDCHARS   */
      *zsh_name;		/* $ZSH_NAME    */
@@ -193,12 +194,14 @@ IPDEF7("OPTARG", &zoptarg),
 IPDEF7("NULLCMD", &nullcmd),
 IPDEF7("POSTEDIT", &postedit),
 IPDEF7("READNULLCMD", &readnullcmd),
-IPDEF7("RPROMPT", &rprompt),
 IPDEF7("PS1", &prompt),
+IPDEF7("RPS1", &rprompt),
+IPDEF7("RPROMPT", &rprompt),
 IPDEF7("PS2", &prompt2),
+IPDEF7("RPS2", &rprompt2),
+IPDEF7("RPROMPT2", &rprompt2),
 IPDEF7("PS3", &prompt3),
 IPDEF7("PS4", &prompt4),
-IPDEF7("RPS1", &rprompt),
 IPDEF7("SPROMPT", &sprompt),
 IPDEF7("0", &argzero),
 

@@ -1,3 +1,8 @@
+2002-01-31  Oliver Kiddle  <opk@zsh.org>
+
+	* Derek Peschel: 16492: Src/params.c, Src/input.c, Doc/Zsh/params.yo:
+	add RPROMPT2 variable for right prompts in multi-line commands
+
 2002-01-31  Andrew Main (Zefram)  <zefram@zsh.org>
 
 	* 16527: Src/Zle/zle_refresh.c: Don't lose the rprompt when

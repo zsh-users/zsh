@@ -226,8 +226,11 @@ inputline(void)
 
     /* If reading code interactively, work out the prompts. */
     if (interact && isset(SHINSTDIN)) {
-	if (!isfirstln)
+	if (!isfirstln) {
 	    ingetcpmptl = prompt2;
+	    if (rprompt2)
+		ingetcpmptr = rprompt2;
+	}
 	else {
 	    ingetcpmptl = prompt;
 	    if (rprompt)
