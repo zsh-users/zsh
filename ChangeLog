@@ -1,3 +1,9 @@
+2000-09-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12829: Src/glob.c, Src/init.c, Src/utils.c: Move dyncat() and
+	tricat() to utils.c; rewrite 12814, 12818, 12827 and 12828 for
+	less allocation-intensive behavior.
+
 2000-09-18  Clint Adams  <schizo@debian.org>
 
 	* 12828: Src/utils.c: dynamically allocate 'dir' in mailstat.

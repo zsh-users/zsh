@@ -3468,19 +3468,54 @@ appstr(char *base, char const *append)
     return strcat(realloc(base, strlen(base) + strlen(append) + 1), append);
 }
 
+/* concatenate s1, s2, and s3 in dynamically allocated buffer */
+
+/**/
+mod_export char *
+tricat(char const *s1, char const *s2, char const *s3)
+{
+    /* This version always uses permanently-allocated space. */
+    char *ptr;
+    size_t l1 = strlen(s1);
+    size_t l2 = strlen(s2);
+
+    ptr = (char *)zalloc(l1 + l2 + strlen(s3) + 1);
+    strcpy(ptr, s1);
+    strcpy(ptr + l1, s2);
+    strcpy(ptr + l1 + l2, s3);
+    return ptr;
+}
+
 /**/
 mod_export char *
 zhtricat(char const *s1, char const *s2, char const *s3)
 {
     char *ptr;
+    size_t l1 = strlen(s1);
+    size_t l2 = strlen(s2);
     
-    ptr = (char *)zhalloc(strlen(s1) + strlen(s2) + strlen(s3) + 1);
+    ptr = (char *)zhalloc(l1 + l2 + strlen(s3) + 1);
     strcpy(ptr, s1);
-    strcat(ptr, s2);
-    strcat(ptr, s3);
+    strcpy(ptr + l1, s2);
+    strcpy(ptr + l1 + l2, s3);
     return ptr;
 }
 
+/* concatenate s1 and s2 in dynamically allocated buffer */
+
+/**/
+mod_export char *
+dyncat(char *s1, char *s2)
+{
+    /* This version always uses space from the current heap. */
+    char *ptr;
+    size_t l1 = strlen(s1);
+
+    ptr = (char *)zhalloc(l1 + strlen(s2) + 1);
+    strcpy(ptr, s1);
+    strcpy(ptr + l1, s2);
+    return ptr;
+}
 
 /**/
 static int
@@ -3781,6 +3816,8 @@ mode_to_octal(mode_t mode)
  *
  *     This is good enough for most mail-checking applications.
  */
+
+/**/
 int
 mailstat(char *path, struct stat *st)
 {
@@ -3788,9 +3825,10 @@ mailstat(char *path, struct stat *st)
        struct                  dirent *fn;
        struct stat             st_ret, st_tmp;
        static struct stat      st_new_last, st_ret_last;
-       char                    *dir, *file;
+       char                    *dir, *file = 0;
        int                     i;
        time_t                  atime = 0, mtime = 0;
+       size_t                  plen = strlen(path), dlen;
 
        /* First see if it's a directory. */
        if ((i = stat(path, st)) != 0 || !S_ISDIR(st->st_mode))
@@ -3804,17 +3842,19 @@ mailstat(char *path, struct stat *st)
        st_ret.st_mode  |= S_IFREG;
 
        /* See if cur/ is present */
-       dir = dyncat(path, "/cur");
+       dir = appstr(ztrdup(path), "/cur");
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_atime = st_tmp.st_atime;
 
        /* See if tmp/ is present */
-       dir = dyncat(path, "/tmp");
+       dir[plen] = 0;
+       dir = appstr(dir, "/tmp");
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_mtime = st_tmp.st_mtime;
 
        /* And new/ */
-       dir = dyncat(path, "/new");
+       dir[plen] = 0;
+       dir = appstr(dir, "/new");
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_mtime = st_tmp.st_mtime;
 
@@ -3830,14 +3870,23 @@ mailstat(char *path, struct stat *st)
 
        /* Loop over new/ and cur/ */
        for (i = 0; i < 2; i++) {
-	   dir = tricat(path, "/", i ? "cur" : "new");
-	   if ((dd = opendir(dir)) == NULL)
+	   dir[plen] = 0;
+	   dir = appstr(dir, i ? "/cur" : "/new");
+	   if ((dd = opendir(dir)) == NULL) {
+	       zsfree(file);
+	       zsfree(dir);
 	       return 0;
+	   }
+	   dlen = strlen(dir) + 1; /* include the "/" */
 	   while ((fn = readdir(dd)) != NULL) {
 	       if (fn->d_name[0] == '.')
 		   continue;
-
-	       file = zhtricat(dir, "/", fn->d.name);
+	       if (file) {
+		   file[dlen] = 0;
+		   file = appstr(file, fn->d_name);
+	       } else {
+		   file = tricat(dir, "/", fn->d_name);
+	       }
 	       if (stat(file, &st_tmp) != 0)
 		   continue;
 	       st_ret.st_size += st_tmp.st_size;
@@ -3850,6 +3899,8 @@ mailstat(char *path, struct stat *st)
 	   }
 	   closedir(dd);
        }
+       zsfree(file);
+       zsfree(dir);
 
        if (atime) st_ret.st_atime = atime;
        if (mtime) st_ret.st_mtime = mtime;

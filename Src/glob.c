@@ -1661,38 +1661,6 @@ xpandredir(struct redir *fn, LinkList tab)
     return ret;
 }
 
-/* concatenate s1 and s2 in dynamically allocated buffer */
-
-/**/
-mod_export char *
-dyncat(char *s1, char *s2)
-{
-    /* This version always uses space from the current heap. */
-    char *ptr;
-    int l1 = strlen(s1);
-
-    ptr = (char *)zhalloc(l1 + strlen(s2) + 1);
-    strcpy(ptr, s1);
-    strcpy(ptr + l1, s2);
-    return ptr;
-}
-
-/* concatenate s1, s2, and s3 in dynamically allocated buffer */
-
-/**/
-mod_export char *
-tricat(char const *s1, char const *s2, char const *s3)
-{
-    /* This version always uses permanently-allocated space. */
-    char *ptr;
-
-    ptr = (char *)zalloc(strlen(s1) + strlen(s2) + strlen(s3) + 1);
-    strcpy(ptr, s1);
-    strcat(ptr, s2);
-    strcat(ptr, s3);
-    return ptr;
-}
-
 /* brace expansion */
 
 /**/
