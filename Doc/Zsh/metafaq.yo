@@ -156,6 +156,6 @@ A userguide is currently in preparation.  It is intended to complement the
 manual, with explanations and hints on issues where the manual can be
 cabbalistic, hierographic, or downright mystifying (for example, the word
 `hierographic' does not exist).  It can be viewed in its current state at
-tt(http://sunsite.auc.dk/zsh/Guide/).  As of this writing, chapters dealing
-with startup files and their contents and the new completion system are
-essentially complete.
+tt(http://sunsite.auc.dk/zsh/Guide/).  At the time of writing, chapters
+dealing with startup files and their contents and the new completion system
+were essentially complete.

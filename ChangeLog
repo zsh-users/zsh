@@ -1,5 +1,7 @@
 2000-07-19  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 12313: Doc/Zsh/metafaq.yo: bad phrasing corrected.
+
 	* 12308: Completion/User/_man: Andrej and pws: cope with systems
 	where manual pages just have bare .Z and no number; don't be
 	too clever about suffix until we try to strip it.
