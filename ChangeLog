@@ -1,3 +1,8 @@
+2001-08-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* users/4092: Src/hist.c: Don't drop the last line of the history
+	file when handling a signal.
+
 2001-08-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15639: Src/text.c: fix bug for output of unquoted here-docs and
