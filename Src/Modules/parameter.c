@@ -1889,7 +1889,8 @@ boot_parameter(Module m)
 	    if (def->hsetfn)
 		def->pm->sets.hfn = def->hsetfn;
 	} else {
-	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE)))
+	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE |
+					PM_REMOVABLE)))
 		return 1;
 	    def->pm->sets.afn = def->setfn;
 	    def->pm->gets.afn = def->getfn;

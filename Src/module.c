@@ -839,47 +839,6 @@ autoloadscan(HashNode hn, int printflags)
     putchar('\n');
 }
 
-/* Cleanup and finish all modules. */
-
-/**/
-void
-exit_modules(void)
-{
-    Module m;
-    char *name;
-    LinkNode node, next, mn, dn;
-    int del, used;
-
-    while (nonempty(modules)) {
-	for (node = firstnode(modules); (next = node); node = next) {
-	    incnode(next);
-	    del = used = 0;
-	    name = ((Module) getdata(node))->nam;
-	    for (mn = firstnode(modules); !used && mn; incnode(mn)) {
-		m = (Module) getdata(mn);
-		if (m->deps && m->u.handle)
-		    for (dn = firstnode(m->deps); dn; incnode(dn))
-			if (!strcmp((char *) getdata(dn), name)) {
-			    if (m->flags & MOD_UNLOAD)
-				del = 1;
-			    else {
-				used = 1;
-				break;
-			    }
-			}
-	    }
-	    if (!used) {
-		m = (Module) getdata(node);
-		if (del)
-		    m->wrapper++;
-		unload_module(m, NULL, 1);
-		if (del)
-		    m->wrapper--;
-	    }
-	}
-    }
-}
-
 /**/
 int
 bin_zmodload(char *nam, char **args, char *ops, int func)
@@ -1274,7 +1233,7 @@ bin_zmodload_param(char *nam, char **args, char *ops)
 
 /**/
 int
-unload_module(Module m, LinkNode node, int force)
+unload_module(Module m, LinkNode node)
 {
     if ((m->flags & MOD_INIT_S) &&
 	!(m->flags & MOD_UNLOAD) &&
@@ -1335,11 +1294,11 @@ unload_module(Module m, LinkNode node, int force)
 			}
 		    }
 		    if (du)
-			unload_module(dm, NULL, 0);
+			unload_module(dm, NULL);
 		}
 	    }
 	}
-	if(!m->deps || force) {
+	if(!m->deps) {
 	    if (!node) {
 		for (node = firstnode(modules); node; incnode(node))
 		    if (m == (Module) getdata(node))
@@ -1387,7 +1346,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 		m = (Module) getdata(node);
 		if (del)
 		    m->wrapper++;
-		if (unload_module(m, node, 0))
+		if (unload_module(m, node))
 		    ret = 1;
 		if (del)
 		    m->wrapper--;

@@ -3073,7 +3073,7 @@ runshfunc(List list, FuncWrap wrap, char *name)
 
 	if (!wrap->module->wrapper &&
 	    (wrap->module->flags & MOD_UNLOAD))
-	    unload_module(wrap->module, NULL, 0);
+	    unload_module(wrap->module, NULL);
 
 	if (!cont)
 	    return;

@@ -3201,9 +3201,6 @@ zexit(int val, int from_signal)
 	if (in_exit++ && from_signal) {
 	    LASTALLOC_RETURN;
 	}
-	zleactive = 0;
-	exit_modules();
-
 	if (isset(MONITOR)) {
 	    /* send SIGHUP to any jobs left running  */
 	    killrunjobs(from_signal);
