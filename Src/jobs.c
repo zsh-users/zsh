@@ -268,7 +268,8 @@ update_job(Job jn)
 	    }
 	    return;
 	}
-    } else {                   /* job is done, so remember return value */
+    }
+    {                   /* job is done or stopped, remember return value */
 	lastval2 = val;
 	/* If last process was run in the current shell, keep old status
 	 * and let it handle its own traps, but always allow the test
@@ -293,7 +294,7 @@ update_job(Job jn)
 	if (mypgrp != pgrp && inforeground &&
 	    (jn->gleader == pgrp || (pgrp > 1 && kill(-pgrp, 0) == -1))) {
 	    if (list_pipe) {
-		if (pgrp > 1 && kill(-pgrp, 0) == -1) {
+		if (somestopped || (pgrp > 1 && kill(-pgrp, 0) == -1)) {
 		    attachtty(mypgrp);
 		    /* check window size and adjust if necessary */
 		    adjustwinsize(0);
