@@ -27,7 +27,14 @@ _complete_help() {
       esac
       help_styles[${2}${_f}]="${help_styles[${2}${_f}]},${_t} ${3}:${_f}"
     fi
-    builtin zstyle "$@"
+
+    # No need to call the completers more than once with different match specs.
+
+    if [[ "$3" = matcher-list ]]; then
+      eval "${4}=( '' )"
+    else
+      builtin zstyle "$@"
+    fi
   }
 
   _main_complete

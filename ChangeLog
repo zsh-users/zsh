@@ -1,5 +1,8 @@
 2000-05-02  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11053: Completion/Commands/_complete_help: always use empty
+ 	matcher-list style in _complete_help
+	
 	* 11052: Src/Zle/computil.c: fix for _arguments, use
  	on-line-argument-numbers only for normal arguments, not for
  	arguments of options
