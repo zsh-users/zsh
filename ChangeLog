@@ -1,3 +1,7 @@
+2004-04-20  Oliver Kiddle  <opk@zsh.org>
+
+	* 19800: Test/B02typeset.ztst: reverse sense of `declare +m' test
+
 2004-04-19  Clint Adams  <clint@zsh.org>
 
 	* 19798: Completion/Unix/Command/.distfiles,
@@ -6,7 +10,7 @@
 
 2004-04-19  Peter Stephenson  <pws@csr.com>
 
-	* zsh=users/7365: Doc/Zsh/options.yo, Src/jobs.c, Src/options.c,
+	* zsh-users/7365: Doc/Zsh/options.yo, Src/jobs.c, Src/options.c,
 	Src/signals.c, Src/zsh.h, plus unposted Etc/NEWS hunk: new option
 	TRAPS_ASYNC, turn off to stop traps being run while waiting
 	for a child process.

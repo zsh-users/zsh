@@ -3,7 +3,7 @@
 # everything that follows is processed by an "eval" within a function.
 
 # Equivalences:
-#  declare	typeset			but declare does not accept -m
+#  declare	typeset
 #  export	typeset -x		and typeset -x implies -g
 #  float	typeset -E
 #  functions	typeset -f
@@ -100,9 +100,9 @@
 >local l o c a l
 >scalar a r r a y
 
- declare +m
-1:Differences of declare and typeset
-?(eval):1: bad option: -m
+ declare +m scalar
+0:declare previously lacked -m/+m options
+>scalar
 
  scope10
  print $outer
