@@ -24,9 +24,16 @@
 	list=$2;
 	code="compdef _tst tst ; _tst () { echo -n '<COMPADD>';compadd -M '"
 	code="$code$matcher"
-	code="$code'  - ${(P)list} ; echo  -n '</COMPADD>'}"
+	code="$code'  - ${(P)list} ; echo  -n '</COMPADD>'"
+        code="$code; $extra_cmd"
+        code="$code; echo -n '<INSERT_POSITIONS>'"
+        code="$code; echo \$compstate[insert_positions]"
+        code="$code; echo -n '</INSERT_POSITIONS>'"
+        code="$code}"
 	comptesteval "$code"
   }
+
+
 
 	 
 
@@ -37,78 +44,91 @@
 0:Match Error for "z:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unknown match specification character `z'}
+>INSERT_POSITIONS:{}
 
  test_code m: list1
  comptest  $'tst \t'
 0:Match Error for "m:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
+>INSERT_POSITIONS:{}
 
  test_code M: list1
  comptest $'tst \t'
 0:Match Error for "M:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
+>INSERT_POSITIONS:{}
 
  test_code r: list1
  comptest $'tst \t'
 0:Match Error "r:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
+>INSERT_POSITIONS:{}
 
  test_code R: list1
  comptest $'tst \t'
 0:Match Error "R:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
+>INSERT_POSITIONS:{}
 
  test_code l: list1
  comptest $'tst \t'
 0:Match Error for "l:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
+>INSERT_POSITIONS:{}
 
  test_code L: list1
  comptest $'tst \t'
 0:Match Error for "L:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
+>INSERT_POSITIONS:{}
 
  test_code 'm:{0-9' list1
  comptest $'tst \t'
 0:Match Error for "m:{0-9"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unterminated character class}
+>INSERT_POSITIONS:{}
 
  test_code 'm:{0-9}' list1
  comptest $'tst \t'
 0:Match Error for "m:{0-9}"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing word pattern}
+>INSERT_POSITIONS:{}
 
  test_code 'm:{0-9}={' list1
  comptest $'tst \t'
 0:Match Error for "m:{0-9}={"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unterminated character class}
+>INSERT_POSITIONS:{}
 
  test_code 'm:{0-9}={0-' list1
  comptest $'tst \t'
 0:Match Error for "m:{0-9}={0-"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unterminated character class}
+>INSERT_POSITIONS:{}
 
  test_code 'm:{0-9}={-' list1
  comptest $'tst \t'
 0:Match Error for "m:{0-9}={-"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unterminated character class}
+>INSERT_POSITIONS:{}
 
  test_code r: list1
  comptest $'tst \t'
 0:Match Error "r:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
+>INSERT_POSITIONS:{}
 
   example1_list=(
 	kshoptionprint        shglob              
@@ -124,6 +144,7 @@
 0:Documentation example for options, input "nolistbee"
 >line: {tst nolistbeep }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{14}
 
 
  test_code $options_matcher example1_list
@@ -131,18 +152,21 @@
 0:Documentation example for options, input "list_bee"
 >line: {tst list_beep }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{13}
 
  test_code $options_matcher example1_list
  comptest $'tst ListBee\t'
 0:Documentation example for options, input "ListBee"
 >line: {tst ListBeep }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{12}
 
  test_code $options_matcher example1_list
  comptest $'tst NOList\tB\t'
 0:Documentation example for options, input "NOList"
 >line: {tst NOList}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{10}
 >NO:{NOListambiguous}
 >NO:{NOListbeep}
 >NO:{NOListpacked}
@@ -150,6 +174,7 @@
 >NO:{NOListtypes}
 >line: {tst NOListBeep }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{14}
 
 
  test_code $options_matcher example1_list
@@ -157,6 +182,7 @@
 0:Documentation example for options, input "NO_List\t__\tB\t"
 >line: {tst NO_List}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{11}
 >NO:{NO_Listambiguous}
 >NO:{NO_Listbeep}
 >NO:{NO_Listpacked}
@@ -164,6 +190,7 @@
 >NO:{NO_Listtypes}
 >line: {tst NO_List__}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{13}
 >NO:{NO_List__ambiguous}
 >NO:{NO_List__beep}
 >NO:{NO_List__packed}
@@ -171,12 +198,14 @@
 >NO:{NO_List__types}
 >line: {tst NO_List__Beep }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{17}
 
  test_code $options_matcher example1_list
  comptest $'tst __\tN\t__o\t___\tlist_\tbeep__\t'
 0:Documentation example for options, input "__\tN\t__o\t___\tlist_\tbeep__\t" 
 >line: {tst __}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{6}
 >NO:{__kshoptionprint}
 >NO:{__listambiguous}
 >NO:{__listbeep}
@@ -191,20 +220,26 @@
 >NO:{__shwordsplit}
 >line: {tst __N}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst __N__o}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst __N__o___}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst __N__o___list_}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst __N__o___list_beep__}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 
  test_code $options_matcher example1_list
  comptest $'tst __\tNo\t___\tlist_\tbeep__\t'
 0:Documentation example for options, input "__\tNo\t___\tlist_\tbeep__\t" 
 >line: {tst __}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{6}
 >NO:{__kshoptionprint}
 >NO:{__listambiguous}
 >NO:{__listbeep}
@@ -219,12 +254,16 @@
 >NO:{__shwordsplit}
 >line: {tst __No}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst __No___}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst __No___list_}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst __No___list_beep__}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 
 
  test_code $options_matcher example1_list
@@ -232,6 +271,7 @@
 0:Documentation example for options, input "___\tlist_\tbeep__\t" 
 >line: {tst ___}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{7}
 >NO:{___kshoptionprint}
 >NO:{___listambiguous}
 >NO:{___listbeep}
@@ -246,6 +286,7 @@
 >NO:{___shwordsplit}
 >line: {tst ___list_}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{12}
 >NO:{___list_ambiguous}
 >NO:{___list_beep}
 >NO:{___list_packed}
@@ -253,18 +294,21 @@
 >NO:{___list_types}
 >line: {tst ___list_beep__ }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{18}
 
  test_code 'B:[nN][oO]= M:_= M:{A-Z}={a-z}' example1_list
  comptest $'tst __no_listbe\t'
 0:Documentation example for options, input "__no_listbe"
 >line: {tst __no_listbeep }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{17}
 
  test_code 'B:[nN][oO]= M:_= M:{A-Z}={a-z}' example1_list
  comptest $'tst nonono_listbe\t'
 0:Documentation example for options, input "nonono_listbe"
 >line: {tst nonono_listbeep }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{19}
 
  lower_insensitive_M="M:{a-z}={A-Z}"
  lower_insensitive_m="m:{a-z}={A-Z}"
@@ -274,20 +318,24 @@
 0:Documentation example for lowercase insenitive M, input "ab\tC\t"
 >line: {tst ab}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{6}
 >NO:{abC}
 >NO:{abc}
 >line: {tst abC }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{7}
 
  test_code $lower_insensitive_m example2_list
  comptest $'tst A\t\t'
 0:Documentation example for lowercase insenitive m, input "A\t\t" 
 >line: {tst A}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{5}
 >NO:{ABC}
 >NO:{Abc}
 >line: {tst ABC}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{5}
 
  example3_list=(ABC Abc abc)
  case_insensitive_M="M:{a-zA-Z}={A-Za-z}"
@@ -297,10 +345,12 @@
 0:Documentation example for case insenitive M, input "aB\t\t"
 >line: {tst aB}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{6}
 >NO:{aBC}
 >NO:{aBc}
 >line: {tst aBC}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{6}
 
 
  test_code $case_insensitive_m example3_list
@@ -308,8 +358,10 @@
 0:Documentation example for case insenitive m, input "aB\t\t"
 >line: {tst a}{BC}
 >COMPADD:{}
+>INSERT_POSITIONS:{5:7}
 >line: {tst a}{BC}
 >COMPADD:{}
+>INSERT_POSITIONS:{5:7}
 >NO:{ABC}
 >NO:{Abc}
 >NO:{abc}
@@ -330,14 +382,17 @@
 0:Documentation example using input c.s.u
 >line: {tst comp.sources.unix }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{21}
 
  test_code $example4_matcher example4_list
  comptest $'tst c.g.\ta\t.\tp\ta\tg\t'
 0:Documentation example using input c.g.\ta\t.\tp\ta\tg\t
 >line: {tst comp.graphics.}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{18}
 >line: {tst comp.graphics.a}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{19}
 >NO:{comp.graphics.algorithms}
 >NO:{comp.graphics.animation}
 >NO:{comp.graphics.api}
@@ -353,31 +408,38 @@
 >NO:{comp.graphics.apps.ulead}
 >line: {tst comp.graphics.apps.}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{23}
 >line: {tst comp.graphics.apps.p}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{24}
 >NO:{comp.graphics.apps.pagemaker}
 >NO:{comp.graphics.apps.paint-shop-pro}
 >NO:{comp.graphics.apps.photoshop}
 >line: {tst comp.graphics.apps.pa}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{25}
 >NO:{comp.graphics.apps.pagemaker}
 >NO:{comp.graphics.apps.paint-shop-pro}
 >line: {tst comp.graphics.apps.pagemaker }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{32}
 
  test_code $example4_matcher example4_list
  comptest $'tst c...pag\t'
 0:Documentation example using input c...pag\t
 >line: {tst comp.graphics.apps.pagemaker }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{32}
 
  test_code $example4_matcher example4_list
  comptest $'tst c...pa\tg\t'
 0:Documentation example using input c...pa\tg\t
 >line: {tst comp.graphics.apps.pa}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{25}
 >line: {tst comp.graphics.apps.pagemaker }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{32}
 
  example5_matcher='r:|[.,_-]=* r:|=*'
  example5_list=(veryverylongfile.c veryverylongheader.h)
@@ -386,8 +448,10 @@
 0:Documentation example using input v.c\t
 >line: {tst  veryverylongfile.c }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{23}
 >line: {tst  veryverylongfile.c veryverylongheader.h }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{44}
 
 
  example6_list=(LikeTHIS FooHoo 5foo123 5bar234)
@@ -396,18 +460,21 @@
 0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input H
 >line: {tst H}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 
  test_code 'r:|[A-Z0-9]=* r:|=*' example6_list
  comptest $'tst 2\t'
 0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input 2
 >line: {tst 2}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 
  test_code 'r:|[A-Z0-9]=** r:|=*' example6_list
  comptest $'tst H\t'
 0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input 2
 >line: {tst H}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{4}
 >NO:{FooHoo}
 >NO:{LikeTHIS}
 
@@ -416,8 +483,10 @@
 0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input 2
 >line: {tst 5}{23}
 >COMPADD:{}
+>INSERT_POSITIONS:{5:7}
 >line: {tst 5}{23}
 >COMPADD:{}
+>INSERT_POSITIONS:{5:7}
 >NO:{5bar234}
 >NO:{5foo123}
 
@@ -428,8 +497,10 @@
 0:Documentation example using "r:[^A-Z0-9]||[A-Z0-9]=** r:|=*"
 >line: {tst FooHoo }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{10}
 >line: {tst FooHoo 5bar234 }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{18}
 
 
  workers_7311_matcher="m:{a-z}={A-Z} r:|[.,_-]=* r:|=*"
@@ -439,19 +510,23 @@
 0:Bug from workers 7311
 >line: {tst a-a}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 
  test_code $workers_7311_matcher workers_7311_list
  comptest $'tst a\t\t-d.\t'
 0:Bug from workers_7311 
 >line: {tst Abc}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{7}
 >line: {tst Abc}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{7}
 >NO:{Abc-Def-Ghij.txt}
 >NO:{Abc-def.ghi.jkl_mno.pqr.txt}
 >NO:{Abc_def_ghi_jkl_mno_pqr.txt}
 >line: {tst Abc-def.ghi.jkl_mno.pqr.txt }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{31}
 
  workers_10886_matcher="r:|[A-Z0-9]=* r:|=*"
  workers_10886_list=(BW UWB W)
@@ -460,6 +535,7 @@
 0:Bug from workers 10886
 >line: {tst W }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{5}
 
  workers_11081_matcher='m:{a-zA-Z}={A-Za-z} r:|[.,_-]=* r:[^A-Z0-9]||[A-Z0-9]=* r:[A-Z0-9]||[^A-Z0-9]=* r:[^0-9]||[0-9]=* r:|=*'
  workers_11081_list=(build.out build.out1 build.out2)
@@ -468,13 +544,16 @@
 0:Bug from workers 11081
 >line: {tst build.out}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{13}
 >line: {tst build.out}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{13}
 >NO:{build.out}
 >NO:{build.out1}
 >NO:{build.out2}
 >line: {tst build.out}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{13}
 
 
  workers_11388_matcher='r:|[:.]=* r:|=*'
@@ -484,6 +563,7 @@
 0:Non-bug from workers 11388
 >line: {tst :}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{}
 
  workers_11388_matcher='r:|[:.]=** r:|=*'
  workers_11388_list=(a.b:0 c.d:1)
@@ -492,6 +572,7 @@
 0:Non-bug from workers 11388
 >line: {tst }{.:}
 >COMPADD:{}
+>INSERT_POSITIONS:{4:5:6}
 
  workers_11586_matcher='r:|.=** r:[^0-9]||[0-9]=**'
  workers_11586_list=(c00.abc c01.abc.def.00.0)
@@ -500,14 +581,17 @@
 0:Bug from workers 11586
 >line: {tst c00}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{6}
 >NO:{c00.abc}
 >NO:{c01.abc.def.00.0}
 >line: {tst c00.}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{7:8}
 >NO:{c00.abc}
 >NO:{c01.abc.def.00.0}
 >line: {tst c00.abc }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{11}
 
  workers_12995a_matcher='r:|/=* r:|=*'
  workers_12995a_list=(u1 u1/q1 u1/q1/e1 u2 u2/q1 u2/q1/e2 u2/q1/e2/a1 u2/q1/e2/a2 u3 u3/q1 u4 u4/q u4/q/a1 u4/q/a2)
@@ -516,14 +600,66 @@
 0:First test from workers 12995
 >line: {tst u4/q/a}{}
 >COMPADD:{}
+>INSERT_POSITIONS:{10}
 
  workers_12995b_matcher='m:{a-z}={A-Z} r:|/=* r:|=*'
  workers_12995b_list=(../Completion/Core ../Completion/Commands)
- test_code $workers_12995b_matcher workers_12995b_list
+ test_code $workers_12995b_matcher workers_12995b_list 
  comptest $'tst ../com/cor\002\002\002\002\002\002\002\t'
 0:Second test from workers 12995
 >line: {tst ../Completion/Core }{}
 >COMPADD:{}
+>INSERT_POSITIONS:{22}
+
+ workers_13320_matcher='r:|[.,_-]=** r:[^0-9]||[0-9]=**'
+ workers_13320_list=(glibc-2.1.94-3.i386.rpm glibc-devel-2.1.94-3.i386.rpm)
+ workers_13320_list=($workers_13320_list  glibc-profile-2.1.94-3.i386.rpm)
+ test_code $workers_13320_matcher workers_13320_list
+ comptest $'tst glibc-2.1\t'
+0:Test from workers 13320
+>line: {tst glibc}{-2.1.94-3.i386.rpm}
+>COMPADD:{}
+>INSERT_POSITIONS:{9:27}
+
+ workers_13345a_matcher='r:|[.,_-]=**'
+ workers_13345a_list=(A.B.C A.B.C.D A.C)
+ test_code $workers_13345a_matcher workers_13345a_list
+ comptest $'tst A.C\t'
+0:First test from workers 13345
+>line: {tst A.C}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{5:7}
+>NO:{A.B.C}
+>NO:{A.B.C.D}
+>NO:{A.C}
+
+
+ workers_13345b_matcher='r:|[.,_-]=** r:[^0-9]||[0-9]=**'
+ workers_13345b_list=(a-b_1_2_2  a-b_2_0.gz a-b_2_0.zip)
+ test_code $workers_13345b_matcher workers_13345b_list
+ comptest $'tst a-b_2\t'
+0:Second test from workers 13345
+>line: {tst a-b_2_}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{8:10}
+
+ workers_13382_matcher='r:|.=**'
+ workers_13382_list=(a.b.c  a.b.c.d  aA.bB.cB.dA  aA.bB.cC.dD  aD.bC.cB.dA aA.bC.cB.dA)
+ test_code $workers_13382_matcher workers_13382_list
+ comptest $'tst a...\tA\tC\t'
+0:Test for insert positions
+>line: {tst a.b.c.d}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{5:7:9:11}
+>line: {tst a.b}{.cB.dA}
+>COMPADD:{}
+>INSERT_POSITIONS:{5:7:13}
+>line: {tst a}{.bC.cB.dA}
+>COMPADD:{}
+>INSERT_POSITIONS:{5:14}
+>NO:{aA.bC.cB.dA}
+>NO:{aD.bC.cB.dA}
+
 
 %clean
 
