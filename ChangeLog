@@ -1,5 +1,7 @@
 2005-02-21  Peter Stephenson  <pws@csr.com>
 
+	* 20837: Doc/Zsh/contrib.yo: typos.
+
 	* 20834: Completion/X/Command/_kfmclient: use _webbrowser for
 	file/URL arguments.
 

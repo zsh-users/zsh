@@ -641,8 +641,8 @@ Typing the keystrokes for this widget with the cursor placed on or to the
 left of an integer causes that integer to be incremented by one.  With a
 numeric prefix argument, the number is incremented by the amount of the
 argument (decremented if the prefix argument is negative).  The shell
-parameter tt(incarg) may be set to change the default increment something
-other than one.
+parameter tt(incarg) may be set to change the default increment to
+something other than one.
 
 example(bindkey '^X+' incarg)
 )
@@ -1048,7 +1048,7 @@ an arbitrary string and is only used by the tt(throw) and tt(catch)
 functions.  An exception is for the most part treated the same as a
 shell error, i.e. an unhandled exception will cause the shell to abort all
 processing in a function or script and to return to the top level in an
-interative shell.
+interactive shell.
 )
 item(tt(catch) var(exception-pattern))(
 The function tt(catch) returns status zero if an exception was thrown and
@@ -1150,7 +1150,7 @@ mapping between suffixes and executable files unless the option tt(-f)
 is given.  Note, however, that this does not override existing suffix
 aliases assigned to handlers other than tt(zsh-mime-handler).
 Calling tt(zsh-mime-setup) with the option tt(-l) lists the existing
-mapping without altering it.  Calling tt(zsh-mime-setup) with the option
+mappings without altering them.  Calling tt(zsh-mime-setup) with the option
 tt(-v) causes verbose output to be shown during the setup operation.
 
 The system respects the tt(mailcap) flags tt(needsterminal) and
@@ -1203,8 +1203,8 @@ enditem()
 Examples:
 
 example(zstyle ':mime:*' mailcap ~/.mailcap /usr/local/etc/mailcap
-zstyle ':mime:.txt' handler less %s
-zstyle ':mime:.txt' flags needsterminal)
+zstyle ':mime:.txt:' handler less %s
+zstyle ':mime:.txt:' flags needsterminal)
 
 When tt(zsh-mime-setup) is subsequently run, it will look for
 tt(mailcap) entries in the two files given.  Files of suffix tt(.txt)
@@ -1215,8 +1215,9 @@ terminal.
 As there are several steps to dispatching a command, the following
 should be checked if attempting to execute a file by extension
 tt(.)var(ext) does not have the expected effect.
-starteit()
-eit()(
+
+startitem()
+item()(
 The command `tt(alias -s) var(ext)' should show
 `tt(ps=zsh-mime-handler)'.  If it shows something else, another suffix
 alias was already installed and was not overwritten.  If it shows
@@ -1225,7 +1226,7 @@ handler was found in the tt(.mime.types) and tt(mailcap) combination for
 tt(.ext) files.  In that case, appropriate handling should be added to
 tt(~/.mime.types) and tt(mailcap).
 )
-eit()(
+item()(
 If the extension is handled by tt(zsh-mime-handler) but the file is
 not opened correctly, either the handler defined for the type is
 incorrect, or the flags associated with it are in appropriate.  Running
@@ -1239,7 +1240,7 @@ An example of a suitable tt(mailcap) entry for such a program is:
 
 example(text/html; /usr/bin/lynx '%s'; needsterminal)
 )
-endeit()
+enditem()
 )
 item(tt(pick-web-browser))(
 This function is separate from the two MIME functions described above
