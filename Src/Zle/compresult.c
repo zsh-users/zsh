@@ -719,7 +719,8 @@ do_single(Cmatch m)
 	/* We are currently not in a menu-completion, *
 	 * so set the position variables.             */
 	minfo.pos = wb;
-	minfo.we = (movetoend >= 2 || (movetoend == 1 && !menucmp));
+	minfo.we = (movetoend >= 2 || (movetoend == 1 && !menucmp) ||
+		    (!movetoend && cs == we));
 	minfo.end = we;
     }
     /* If we are already in a menu-completion or if we have done a *
