@@ -484,6 +484,21 @@ has been set, and tt(transpose-words-match) is called with the cursor on
 the var(X) of tt(foo)var(X)tt(bar), where var(X) can be any character, then
 the resulting expression is tt(bar)var(X)tt(foo).
 
+Here are some examples of use of the styles, actually taken from the
+simplified interface in tt(select-word-style):
+
+example(zstyle ':zle:*' word-style standard
+zstyle ':zle:*' word-chars '')
+
+Implements bash-style word handling for all widgets, i.e. only
+alphanumerics are word characters; equivalent to setting
+the parameter tt(WORDCHARS) empty for the given context.
+
+example(style ':zle:*kill*' word-style space)
+
+Uses space-delimited words for widgets with the word `kill' in the name.
+Neither of the styles tt(word-chars) nor tt(word-class) is used in this case.
+
 The word matching and all the handling of tt(zstyle) settings is actually
 implemented by the function tt(match-words-by-style).  This can be used to
 create new user-defined widgets.  The calling function should set the local
@@ -498,6 +513,22 @@ tt(skip-chars) style, (5) the word at or following the cursor (6) any
 non-word characters following that word (7) the remainder of the line.  Any
 of the elements may be an empty string; the calling function should test
 for this to decide whether it can perform its function.
+)
+tindex(delete-whole-word-match)
+item(tt(delete-whole-word-match))(
+This is another function which works like the tt(-match) functions
+described immediately above, i.e. using styles to decide the word
+boundaries.  However, it is not a replacement for any existing function.
+
+The basic behaviour is to delete the word around the cursor.  There is no
+numeric prefix handling; only the single word around the cursor is
+considered.  If the widget contains the string tt(kill), the removed text
+will be placed in the cutbuffer for future yanking.  This can be obtained
+by defining tt(kill-whole-word-match) as follows:
+
+example(zle -N kill-whole-word-match delete-whole-word-match)
+
+and then binding the widget tt(kill-whole-word-match).
 )
 tindex(copy-earlier-word)
 item(tt(copy-earlier-word))(

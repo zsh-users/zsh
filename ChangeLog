@@ -1,3 +1,9 @@
+2003-10-13  Peter Stephenson  <pws@csr.com>
+
+	* 19183: Doc/Zsh/contrib.yo,
+	Functions/Zle/delete-whole-word-match:  New word-matching function
+	to delete entire word around cursor.
+
 2003-10-09  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_nmap: update for nmap 3.48
