@@ -1,3 +1,7 @@
+2001-06-18  Peter Stephenson  <pws@csr.com>
+
+	* 14959: Src/signals.c: more renames for 14951.
+
 2001-06-18  Andrej Borsenkow <bor@zsh.org>
 
 	* unposted: zshconfig.ac:  forgot to change
