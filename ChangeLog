@@ -676,8 +676,8 @@
 	up color/colour assoc arrays to map the full range of ANSI text
 	properties; preserve more state during themed prompt previewing.
 
-	* Alexandre: 11864: Src/Zle/complist.c: Shift an array the opposite
-	way to fix colored listings crash.
+	* Alexandre: unposted: Src/Zle/complist.c: Shift an array the
+	opposite way to fix colored listings crash.
 
 2000-06-11  Tanaka Akira  <akr@zsh.org>
 
