@@ -35,7 +35,7 @@ _arguments \
   '--nowrap[do not put HTML doc wrapper]' \
   '--valid[validate the document in addition to std well-formed check]' \
   '(--dtdvalid --relaxng)--postvalid[do a posteriori validation, i.e after parsing]' \
-  '(--postvalid --relaxng)--dtdvalid[do a posteriori validation against a given DTD]:DTD:->url' \
+  '(--postvalid --relaxng)--dtdvalid[do a posteriori validation against a given DTD]:DTD:_webbrowser' \
   '--timing[print some timings]' \
   '(--noout --output -o)'{--output,-o}'[save to a given file]:output file:_files' \
   '--repeat[repeat 100 times, for timing or profiling]' \
@@ -59,13 +59,5 @@ _arguments \
   '--dropdtd[remove the DOCTYPE of the input docs]' \
   '--stream[use the streaming interface to process very large files]' \
   '--chkregister[verify the node registration code]' \
-  '(--dtdvalid --postvalid)--relaxng[do RelaxNG validation against the schema]:schema:->url' \
-  '*:XML file:->url' && return
-
-if [[ "$state" = url ]]; then
-  _alternative \
-    'files:file:_files' \
-    'urls:url:_urls' && return
-fi
-
-return 1
+  '(--dtdvalid --postvalid)--relaxng[do RelaxNG validation against the schema]:schema:_webbrowser' \
+  '*:XML file:_webbrowser'

@@ -1,5 +1,7 @@
 2003-02-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 18257: Completion/Unix/Command/_xmllint: make use of _webbrowser
+
 	* Doug Kearns: 18254: Completion/Unix/Command/_xmllint: new
 	completion for xmllint (from xmlsoft.org's libxml2 library)
 
