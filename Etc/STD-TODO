@@ -59,6 +59,11 @@ All parameters in ksh are indexed arrays.  That's why $array has to mean
 ${array[0]}, and why subscripts can't be used to extract substrings from
 scalars.
 
+`typeset a' in ksh does not initialise `a' to be a scalar with the empty
+string as its value but leaves it undefined. If it is used in array
+context, its value will be that of an empty array so, for example
+"${a[@]}" will return nothing.
+
 In ksh,
 	exec 3<file
 causes file 3 to be close on exec.  DGK says: "This allows scripts to
