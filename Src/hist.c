@@ -922,6 +922,10 @@ prepnexthistent(void)
 
     if (curline_in_ring)
 	unlinkcurline();
+    if (hist_ring && hist_ring->flags & HIST_TMPSTORE) {
+	curhist--;
+	freehistnode((HashNode)hist_ring);
+    }
 
     if (histlinect < histsiz) {
 	he = (Histent)zcalloc(sizeof *he);
