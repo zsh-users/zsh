@@ -1,3 +1,9 @@
+2001-10-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 16064: Src/builtin.c, Src/utils.c, Test/B03print.ztst:
+	fix return code of printf after math errors, incomplete comment
+	in utils.c and tests of printf now that math evaluation is used
+
 2001-10-16  Clint Adams  <clint@zsh.org>
 
 	* 16062: Src/Modules/zftp.c: use O_EXCL

@@ -3125,6 +3125,10 @@ bin_print(char *name, char **args, char *ops, int func)
 
 	    if (*c == '*') {
 		if (*args) width = (int)mathevali(*args++);
+		if (errflag) {
+	    	    errflag = 0;
+		    ret = 1;
+		}
 		c++;
 	    } else if (idigit(*c)) {
 		width = strtoul(c, &endptr, 0);
@@ -3136,6 +3140,10 @@ bin_print(char *name, char **args, char *ops, int func)
 		c++;
 		if (*c == '*') {
 		    prec = (*args) ? (int)mathevali(*args++) : 0;
+		    if (errflag) {
+	    	    	errflag = 0;
+			ret = 1;
+		    }
 		    c++;
 		} else if (idigit(*c)) {
 		    prec = strtoul(c, &endptr, 0);
@@ -3147,7 +3155,6 @@ bin_print(char *name, char **args, char *ops, int func)
 	    /* ignore any size modifier */
 	    if (*c == 'l' || *c == 'L' || *c == 'h') c++;
 
-	    errflag = 0;
 	    d[1] = '\0';
 	    switch (*d = *c) {
 	    case 'c':
@@ -3226,6 +3233,7 @@ bin_print(char *name, char **args, char *ops, int func)
 			if (errflag) {
 			    zlongval = 0;
 			    errflag = 0;
+			    ret = 1;
 			}
 			print_val(zlongval)
 			break;
@@ -3238,11 +3246,12 @@ bin_print(char *name, char **args, char *ops, int func)
 			if (errflag) {
 			    doubleval = 0;
 			    errflag = 0;
+			    ret = 1;
 			}
 			print_val(doubleval)
 			break;
 		    case 3:
-#ifdef ZSH_64_BIT_TYPE
+#ifdef ZSH_64_BIT_UTYPE
  		    	*d++ = 'l';
 #endif
 		    	*d++ = 'l', *d++ = *c, *d = '\0';
@@ -3250,6 +3259,7 @@ bin_print(char *name, char **args, char *ops, int func)
 			if (errflag) {
 			    doubleval = 0;
 			    errflag = 0;
+			    ret = 1;
 			}
 			print_val(zulongval)
 		    }

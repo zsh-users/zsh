@@ -2929,8 +2929,9 @@ hasspecial(char const *s)
  * pointer it points to may point to a position in s and in e the position  *
  * of the corresponding character in the quoted string is returned.         *
  * The last argument should be zero if this is to be used outside a string, *
- * one if it is to be quoted for the inside of a single quoted string, and  *
- * two if it is for the inside of  double quoted string.                    *
+ * one if it is to be quoted for the inside of a single quoted string,      *
+ * two if it is for the inside of a double quoted string, and               *
+ * three if it is for the inside of a posix quoted string.                  *
  * The string may be metafied and contain tokens.                           */
 
 /**/

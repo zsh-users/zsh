@@ -78,6 +78,10 @@
 0:initial quote to get numeric value of character with double
 >6.6E+01
 
+ printf '%x\n' $(printf '"\xf0')
+0:numeric value of high numbered character
+>f0
+
 # code will probably be changed to print the literal `%s' in this case
  printf '\x25s\n' arg
 0:using \x25 to introduce a format specifier
@@ -95,23 +99,14 @@
 0:width/precision specified in arguments
 > 10.20
 
- printf '%d\n' 3000000000
-1d:out of range numeric result
-?(eval):printf:1: `3000000000' arithmetic overflow
-
- printf '%G\n' letters
-1:non numeric argument
-?(eval):printf:1: `letters' expected numeric value
->0
-
- print -f '%d\n' 2e4
-1:letters in numeric argument
-?(eval):print:1: `2e4' not completely converted
->2
-
  printf '%z'
-1:test invalid directive
+1:use of invalid directive
 ?(eval):printf:1: %z: invalid directive
+
+ printf '%d\n' 3a
+1:bad arithmetic expression
+?(eval):1: bad math expression: operator expected at `a'
+>0
 
  print -m -f 'format - %s.\n' 'z' a b c
 0:format not printed if no arguments left after -m removal
@@ -133,3 +128,15 @@
 >one	a:0x1%
 >two	b:0x2%
 >three	c:0x3%
+
+ printf '%0+- #-08.5dx\n' 123
+0:maximal length format specification
+>+00123  x
+
+ printf '%*smorning\n' -5 good
+0:negative width specified
+>good morning
+
+ printf '%.*g\n' -1 .1
+0:negative precision specified
+>0.1
