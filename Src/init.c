@@ -113,8 +113,8 @@ loop(int toplevel, int justonce)
 	if (!(list = parse_event())) {	/* if we couldn't parse a list */
 	    hend();
 	    if ((tok == ENDINPUT && !errflag) ||
-		(tok == LEXERR && (!noerrexit || emulation == EMULATE_KSH)
-		 && (!isset(SHINSTDIN) || !toplevel)) || justonce)
+		(tok == LEXERR && (!isset(SHINSTDIN) || !toplevel)) ||
+		justonce)
 		break;
 	    continue;
 	}

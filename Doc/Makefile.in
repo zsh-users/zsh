@@ -81,11 +81,10 @@ zsh.texi: zsh.yo
 	test -f $(sdir)/zsh.texi
 
 .yo.1:
-	@case $@ in \
+	case $@ in \
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
-	$(YODL) -o $$target -I$(sdir) -w zman.yo version.yo $< ; \
 	$(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target || exit 1; \
 	test -f $$target
 
@@ -99,11 +98,10 @@ zsh_toc.html: zsh.texi
 	$(TEXI2HTML) $(sdir)/zsh.texi
 
 zshall.1: zsh.yo
-	@case $@ in \
+	case $@ in \
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
-	echo $(YODL) -o $$target -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo; \
 	$(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target || exit 1; \
 	test -f $$target
 
