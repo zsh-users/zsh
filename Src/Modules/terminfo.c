@@ -109,10 +109,6 @@ static struct builtin bintab[] = {
     BUILTIN("echoti", 0, bin_echoti, 1, -1, 0, NULL, NULL),
 };
 
-/* This says if we are cleaning up when the module is unloaded. */
-
-static int incleanup;
-
 /**/
 #ifdef HAVE_TIGETSTR
 
@@ -337,8 +333,6 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 int
 setup_(Module m)
 {
-    incleanup = 0;
-
     return 0;
 }
 
@@ -365,11 +359,7 @@ cleanup_(Module m)
 {
 #ifdef HAVE_TIGETSTR
     Param pm;
-#endif
 
-    incleanup = 1;
-
-#ifdef HAVE_TIGETSTR
     if ((pm = (Param) paramtab->getnode(paramtab, terminfo_nam)) &&
 	pm == terminfo_pm) {
 	pm->flags &= ~PM_READONLY;

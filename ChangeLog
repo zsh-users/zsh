@@ -1,5 +1,8 @@
 2001-04-26  Clint Adams  <clint@zsh.org>
 
+        * 14125: Src/Modules/termcap.c, Src/Modules/terminfo.c:
+	remove static incleanup flag since it is not used.
+
         * 14123: acconfig.h, configure.in, Src/Modules/termcap.c:
 	don't include curses.h in termcap.c if term.h doesn't need it.
 
