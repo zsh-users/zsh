@@ -515,18 +515,38 @@ case "$host_os" in
 esac
 
 AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
+AC_MSG_CHECKING(if term.h needs curses.h)
+AC_TRY_COMPILE([#include <term.h>], [char **test = boolcodes;], boolcodes_with_only_term_h=yes,
+boolcodes_with_only_term_h=no)
+AC_TRY_COMPILE([#include <curses.h>
+#include <term.h>], [char **test = boolcodes;], boolcodes_with_curses_h_and_term_h=yes,
+boolcodes_with_curses_h_and_term_h=no)
+if test "x$boolcodes_with_curses_h_and_term_h" = xyes && test "x$boolcodes_with_only_term_h" = xno;
+then
+AC_DEFINE(TERM_H_NEEDS_CURSES_H)
+AC_MSG_RESULT(yes)
+else
+AC_MSG_RESULT(no)
+fi
+
 AC_MSG_CHECKING(if boolcodes is available)
-AC_TRY_LINK([#include <curses.h>
+AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
+#include <curses.h>
+#endif
 #include <term.h>], [char **test = boolcodes;],
 AC_DEFINE(HAVE_BOOLCODES) boolcodes=yes, boolcodes=no)
 AC_MSG_RESULT($boolcodes)
 AC_MSG_CHECKING(if numcodes is available)
-AC_TRY_LINK([#include <curses.h>
+AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
+#include <curses.h>
+#endif
 #include <term.h>], [char **test = numcodes;],
 AC_DEFINE(HAVE_NUMCODES) numcodes=yes, numcodes=no)
 AC_MSG_RESULT($numcodes)
 AC_MSG_CHECKING(if strcodes is available)
-AC_TRY_LINK([#include <curses.h>
+AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
+#include <curses.h>
+#endif
 #include <term.h>], [char **test = strcodes;],
 AC_DEFINE(HAVE_STRCODES) strcodes=yes, strcodes=no)
 AC_MSG_RESULT($strcodes)

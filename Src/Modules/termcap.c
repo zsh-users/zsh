@@ -55,7 +55,9 @@ static char termcap_nam[] = "termcap";
 #  ifdef HAVE_TERMIO_H
 #   include <termio.h>
 #  endif
-#  include <curses.h>
+#  ifdef TERM_H_NEEDS_CURSES_H
+#   include <curses.h>
+#  endif
 #  include <term.h>
 # else
 #  ifdef USES_TERMCAP_H
