@@ -5,4 +5,5 @@ prompt_adam2_setup    prompt_fade_setup     prompt_suse_setup
 prompt_bart_setup     prompt_fire_setup     prompt_zefram_setup
 prompt_bigfade_setup  prompt_off_setup      promptinit
 prompt_elite2_setup   prompt_oliver_setup   prompt_clint_setup
+prompt_walters_setup
 '

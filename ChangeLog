@@ -1,3 +1,9 @@
+2002-02-07  Clint Adams  <clint@zsh.org>
+
+	* unposted: Functions/Prompts/.distfiles,
+	Functions/Prompts/prompt_walters_setup: Colin Walters's
+	prompt, adapted for the theme system.
+
 2002-02-06  Clint Adams  <clint@zsh.org>
 
 	* 16577: Src/hist.c: don't return a single dot as the
