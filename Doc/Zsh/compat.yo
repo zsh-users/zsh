@@ -7,7 +7,15 @@ cindex(compatibility)
 cindex(sh, compatibility)
 cindex(ksh, compatibility)
 Zsh tries to emulate bf(sh) or bf(ksh) when it is invoked as
-tt(sh) or tt(ksh) respectively.  In this mode the following
+tt(sh) or tt(ksh) respectively; more precisely, it looks at the first
+letter of the name by which it was invoked, excluding any initial `tt(r)'
+(assumed to stand for `restricted'), and if that is `tt(s)' or `tt(k)' it
+will emulate bf(sh) or bf(ksh).  Furthermore, if invoked as tt(su) (which
+happens on certain systems when the shell is executed by the tt(su)
+command), the shell will try to find an alternative name from the tt(SHELL)
+environment variable and perform emulation based on that.
+
+In bf(sh) and bf(ksh) compatibility modes the following
 parameters are not special and not initialized by the shell:
 tt(ARGC),
 tt(argv),
@@ -32,9 +40,9 @@ The usual zsh startup/shutdown scripts are not executed.  Login shells
 source tt(/etc/profile) followed by tt($HOME/.profile).  If the
 tt(ENV) environment variable is set on invocation, tt($ENV) is sourced
 after the profile scripts.  The value of tt(ENV) is subjected to
-parameter expansion, command substitution, and arithmetic expansion before
-being interpreted as a pathname.  Note that the tt(PRIVILEGED) option
-also affects the execution of startup files.
+parameter expansion, command substitution, and arithmetic expansion
+before being interpreted as a pathname.  Note that the tt(PRIVILEGED)
+option also affects the execution of startup files.
 
 The following options are set if the shell is invoked as tt(sh) or
 tt(ksh):
@@ -44,6 +52,7 @@ tt(NO_BG_NICE),
 tt(NO_EQUALS),
 tt(NO_FUNCTION_ARGZERO),
 tt(GLOB_SUBST),
+tt(NO_GLOBAL_EXPORT),
 tt(NO_HUP),
 tt(INTERACTIVE_COMMENTS),
 tt(KSH_ARRAYS),

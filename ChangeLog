@@ -1,3 +1,7 @@
+2000-05-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11264: Doc/Zsh/compat.yo: Missed bit for 10771.
+
 2000-05-08  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11260: Doc/Zsh/options.yo: docs for 11044
