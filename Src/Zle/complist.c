@@ -1852,7 +1852,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    int l;
 
 	    if (!u)
-		goto getk;
+		break;
 
 	    cs = 0;
 	    foredel(ll);

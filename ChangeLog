@@ -1,5 +1,8 @@
 2000-06-19  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11992: Src/Zle/complist.c: make undo break out of menu selection
+ 	if nothing to undo inside it
+	
 	* 11985: Completion/Debian/_dpkg, Doc/Zsh/compsys.yo, Src/Zle/computil.c:
  	_arguments: small fix for -s and new `!...' for things not to
  	complete (but to understand)
