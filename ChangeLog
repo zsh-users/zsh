@@ -1,3 +1,8 @@
+2004-04-28  Clint Adams  <clint@zsh.org>
+
+	* 19845: Completion/Debian/Command/_apt-move: apt-move
+	completion function from Steven Kowalik.
+
 2004-04-27  Peter Stephenson  <pws@csr.com>
 
 	* 19839 (plus suggestion from 19842):

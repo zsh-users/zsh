@@ -1,9 +1,8 @@
 DISTFILES_SRC='
 .distfiles
-_apt _aptitude _apt-show-versions
-_bts	_bug
-_debchange _dpkg       _dpkg_source  _dput  _dupload
-_update-alternatives   _make-kpkg    _debfoster
-_auto-apt _debsign
-_update-rc.d
+_apt               _bts _dpkg         _update-alternatives
+_aptitude          _bug _dpkg_source  _update-rc.d
+_apt-move          _debchange   _dput
+_apt-show-versions  _debfoster  _dupload
+_auto-apt          _debsign     _make-kpkg
 '
