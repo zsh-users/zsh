@@ -3484,7 +3484,24 @@ scanendscope(HashNode hn, int flags)
 	    Param tpm = pm->old;
 
 	    if (!strcmp(pm->nam, "SECONDS"))
+	    {
 		setsecondstype(pm, PM_TYPE(tpm->flags), PM_TYPE(pm->flags));
+		/*
+		 * We restore SECONDS by adding back in the elapsed
+		 * time (from the point we reset shtimer) rather
+		 * than restoring it completely, since SECONDS should
+		 * run in the calling function, too.
+		 */
+		if (PM_TYPE(pm->flags) == PM_INTEGER)
+		{
+		    pm->sets.ifn(pm, pm->gets.ifn(pm) + tpm->u.val);
+		}
+		else
+		{
+		    pm->sets.ffn(pm, pm->gets.ffn(pm) + tpm->u.dval);
+		}
+		tpm->flags |= PM_NORESTORE;
+	    }
 	    DPUTS(!tpm || PM_TYPE(pm->flags) != PM_TYPE(tpm->flags) ||
 		  !(tpm->flags & PM_SPECIAL),
 		  "BUG: in restoring scope of special parameter");

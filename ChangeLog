@@ -1,5 +1,8 @@
 2002-10-29  Peter Stephenson  <pws@csr.com>
 
+	* 17873: Src/params.c: When restoring SECONDS after a function,
+	take account of time spent in the function.
+
 	* 17872: Src/builtin.c: Make sure `typeset SECONDS' uses a
 	suitable type when creating a new local parameter.
 
