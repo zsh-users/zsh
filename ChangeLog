@@ -1,28 +1,5 @@
 2002-03-25  Oliver Kiddle  <opk@zsh.org>
 
-	* 16396: Completion/Unix/Command/_chown: fix argument handling bugs
-
-	* Akinori Musha: 16534: Completion/BSD/Command/_bsd_pkg:
-	a few bug fixes and some wording fixes
-
-	* users/4561: Completion/Unix/Command/_zip: fix bug with finding
-	the zipfile's name in the current command-line.
-
-	* 16384: Completion/X/Type/.distfiles, Completion/X/Type/_x_visual,
-	Completion/X/Command/.distfiles, Completion/X/Command/_xloadimage,
-	Completion/X/Command/_netscape, Completion/X/Command/_x_utils,
-	Completion/X/Command/_xfig, Completion/X/Command/_xv:
-	new completion for xli/xloadimage and factor out completion
-	of X visuals
-
-	* 16366: Completion/X/Command/_vnc, Completion/Unix/Command/_java,
-	Completion/Unix/Command/_samba: add missing description
-	argument in _values calls
-
-	* 16366 (modified for 4.0): Completion/Unix/Type/_net_interfaces,
-	Completion/Unix/Command/_ifconfig, Completion/Unix/Type/.distfiles,
-	Completion/Unix/Command/.distfiles: new ifconfig completion
-
 	* Clint: 15079: Completion/Unix/Command/_last: completion for last
 
 	* 16804: Completion/Unix/Command/_sccs,
@@ -122,6 +99,11 @@
 	* 16540: Completion/Unix/Command/_rsync: include short options and
 	local files.
 
+2002-02-01  Oliver Kiddle  <opk@zsh.org>
+
+	* Akinori Musha: 16534: Completion/BSD/Command/_bsd_pkg:
+	a few bug fixes and some wording fixes
+
 2002-01-31  Oliver Kiddle  <opk@zsh.org>
 
 	* Derek Peschel: 16493: Src/params.c: correct typos
@@ -159,6 +141,22 @@
 	* 16449: Completion/Unix/Command/_chkconfig: new completion for
 	both the IRIX and RedHat chkconfig commands
 
+2002-01-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 16396: Completion/Unix/Command/_chown: fix argument handling bugs
+
+2002-01-02  Oliver Kiddle  <opk@zsh.org>
+
+	* users/4561: Completion/Unix/Command/_zip: fix bug with finding
+	the zipfile's name in the current command-line.
+
+	* 16384: Completion/X/Type/.distfiles, Completion/X/Type/_x_visual,
+	Completion/X/Command/.distfiles, Completion/X/Command/_xloadimage,
+	Completion/X/Command/_netscape, Completion/X/Command/_x_utils,
+	Completion/X/Command/_xfig, Completion/X/Command/_xv:
+	new completion for xli/xloadimage and factor out completion
+	of X visuals
+
 2001-12-26  Clint Adams  <clint@zsh.org>
 
         * 16375: Completion/Unix/Command/.distfiles,
@@ -171,6 +169,16 @@
 	repository due to licence differences.  Adjust the build process
 	accordingly.  configure will now abort if the user requests ansi2knr
 	but no ansi2knr is available
+
+2001-12-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 16366: Completion/X/Command/_vnc, Completion/Unix/Command/_java,
+	Completion/Unix/Command/_samba: add missing description
+	argument in _values calls
+
+	* 16366 (modified for 4.0): Completion/Unix/Type/_net_interfaces,
+	Completion/Unix/Command/_ifconfig, Completion/Unix/Type/.distfiles,
+	Completion/Unix/Command/.distfiles: new ifconfig completion
 
 2001-12-18  Oliver Kiddle  <opk@zsh.org>
 
