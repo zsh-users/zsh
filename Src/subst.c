@@ -428,7 +428,7 @@ strcatsub(char **d, char *pb, char *pe, char *src, int l, char *s, int glbsub,
     int pl = pe - pb;
 
     if (!pl && (!s || !*s)) {
-	dest = (*d = (copied ? src : dupstring(src)));
+	*d = dest = (copied ? src : dupstring(src));
 	if (glbsub)
 	    tokenize(dest);
     } else {
@@ -701,9 +701,13 @@ get_intarg(char **s)
 
 /* Parsing for the (e) flag. */
 
-static int
-subst_parse_str(char *s, int single)
+static char *
+subst_parse_str(char **sp, int single)
 {
+    char *s;
+
+    *sp = s = dupstring(*sp);
+
     if (!parsestr(s)) {
 	if (!single) {
 	    for (; *s; s++)
@@ -1788,7 +1792,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (prenum || postnum)
 		    x = dopadding(x, prenum, postnum, preone, postone,
 				  premul, postmul);
-		if (eval && subst_parse_str(x, (qt && !nojoin)))
+		if (eval && subst_parse_str(&x, (qt && !nojoin)))
 		    return NULL;
 		xlen = strlen(x);
 		for (tn = firstnode(&tl);
@@ -1824,7 +1828,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (prenum || postnum)
 		x = dopadding(x, prenum, postnum, preone, postone,
 			      premul, postmul);
-	    if (eval && subst_parse_str(x, (qt && !nojoin)))
+	    if (eval && subst_parse_str(&x, (qt && !nojoin)))
 		return NULL;
 	    xlen = strlen(x);
 	    strcatsub(&y, ostr, aptr, x, xlen, NULL, globsubst, copied);
@@ -1839,7 +1843,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (prenum || postnum)
 		    x = dopadding(x, prenum, postnum, preone, postone,
 				  premul, postmul);
-		if (eval && subst_parse_str(x, (qt && !nojoin)))
+		if (eval && subst_parse_str(&x, (qt && !nojoin)))
 		    return NULL;
 		if (qt && !*x && isarr != 2)
 		    y = dupstring(nulstring);
@@ -1855,7 +1859,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (prenum || postnum)
 		x = dopadding(x, prenum, postnum, preone, postone,
 			      premul, postmul);
-	    if (eval && subst_parse_str(x, (qt && !nojoin)))
+	    if (eval && subst_parse_str(&x, (qt && !nojoin)))
 		return NULL;
 	    xlen = strlen(x);
 	    *str = strcatsub(&y, aptr, aptr, x, xlen, fstr, globsubst, copied);
@@ -1874,7 +1878,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if (prenum || postnum)
 	    x = dopadding(x, prenum, postnum, preone, postone,
 			  premul, postmul);
-	if (eval && subst_parse_str(x, (qt && !nojoin)))
+	if (eval && subst_parse_str(&x, (qt && !nojoin)))
 	    return NULL;
 	xlen = strlen(x);
 	*str = strcatsub(&y, ostr, aptr, x, xlen, fstr, globsubst, copied);
