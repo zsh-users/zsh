@@ -1,5 +1,8 @@
 2003-04-18  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Zsh/Context/_tilde: fix bug where 0 was
+	not returned when adding a named directory as a match
+
 	* 18450: Functions/Misc/zcalc: use math context for completion
 
 	* 18450: Doc/Zsh/compsys.yo: corrections and a couple of rewordings

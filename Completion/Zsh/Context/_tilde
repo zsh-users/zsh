@@ -22,7 +22,7 @@ while _tags; do
   _requested users && _users "$suf[@]" "$@" && ret=0
 
   _requested named-directories expl 'named directory' \
-      compadd "$suf[@]" "$@" -k nameddirs
+      compadd "$suf[@]" "$@" -k nameddirs && ret=0
 
   _requested directory-stack && _directory_stack "$suf[@]" && ret=0
 
