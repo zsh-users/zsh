@@ -1065,6 +1065,11 @@ command will always insert matches as if menu-completion were started
 and it will stop when the last match is inserted. If this style is set
 to tt(verbose) a message will be displayed when the last match is reached.
 )
+item(tt(strings))(
+This is used with the tt(jobs) tag. If it is `true', the completions
+will use the shortest unambiguous strings of the jobs' command lines
+instead of the job numbers.
+)
 item(tt(substitute))(
 If this is unset or set to the empty string, the tt(_expand) completer
 will first try to expand all substitutions in the string (such as
