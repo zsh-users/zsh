@@ -1829,6 +1829,8 @@ skipwsep(char **s)
     return i;
 }
 
+/* see findsep() below for handling of `quote' argument */
+
 /**/
 mod_export char **
 spacesplit(char *s, int allownull, int heap, int quote)
@@ -1854,7 +1856,7 @@ spacesplit(char *s, int allownull, int heap, int quote)
     else if (!allownull && t != s)
 	*ptr++ = dup("");
     while (*s) {
-	if (isep(*s == Meta ? s[1] ^ 32 : *s)) {
+	if (isep(*s == Meta ? s[1] ^ 32 : *s) || (quote && *s == '\\')) {
 	    if (*s == Meta)
 		s++;
 	    s++;
@@ -1891,7 +1893,8 @@ findsep(char **s, char *sep, int quote)
      * quote is a flag that '\<sep>' should not be treated as a separator.
      * in this case we need to be able to strip the backslash directly
      * in the string, so the calling function must have sent us something
-     * modifiable.  currently this only works for sep == NULL.
+     * modifiable.  currently this only works for sep == NULL.  also in
+     * in this case only, we need to turn \\ into \.
      */
     int i;
     char *t, *tt;
@@ -1899,7 +1902,7 @@ findsep(char **s, char *sep, int quote)
     if (!sep) {
 	for (t = *s; *t; t++) {
 	    if (quote && *t == '\\' &&
-		isep(t[1] == Meta ? (t[2] ^ 32) : t[1])) {
+		(isep(t[1] == Meta ? (t[2] ^ 32) : t[1]) || t[1] == '\\')) {
 		chuck(t);
 		if (*t == Meta)
 		    t++;

@@ -839,13 +839,16 @@ bin_vared(char *name, char **args, char *ops, int func)
 	    tptr = tmparr = (char **)zhalloc(sizeof(char *)*(arrlen(arr)+1));
 	    for (aptr = arr; *aptr; aptr++) {
 		int sepcount = 0;
-		/* See if this word contains a separator character */
+		/*
+		 * See if this word contains a separator character
+		 * or backslash
+		 */
 		for (t = *aptr; *t; t++) {
 		    if (*t == Meta) {
 			if (isep(t[1] ^ 32))
 			    sepcount++;
 			t++;
-		    } else if (isep(*t))
+		    } else if (isep(*t) || *t == '\\')
 			sepcount++;
 		}
 		if (sepcount) {
@@ -858,7 +861,7 @@ bin_vared(char *name, char **args, char *ops, int func)
 			    if (isep(t[1] ^ 32))
 				*nptr++ = '\\';
 			    *nptr++ = *t++;
-			} else if (isep(*t))
+			} else if (isep(*t) || *t == '\\')
 			    *nptr++ = '\\';
 			*nptr++ = *t++;
 		    }

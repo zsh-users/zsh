@@ -1,3 +1,9 @@
+2000-08-29  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 12719: Doc/Zsh/mod_zle.yo, Src/utils.c, Src/Zle/zle_main.c:
+	handle quoting of separators in arrays when there might also be
+	real backslashes around.
+
 2000-08-29  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12717: Src/Zle/zle_tricky.c: fix for unbalanced calls to
