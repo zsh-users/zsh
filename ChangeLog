@@ -1,5 +1,7 @@
 2000-05-03  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11094: Doc/Zsh/compsys.yo: more doc fixes
+	
 	* 11092: Completion/Base/_arguments, Src/Zle/compcore.c: make sure
  	that completion messages are displayed even when there are no
  	matches

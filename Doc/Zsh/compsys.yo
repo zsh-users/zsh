@@ -2921,11 +2921,13 @@ exclusive. Such a list is given in parentheses at the beginning, as in
 `tt((-two -three 1)-one:...)' or `tt((-foo):...)'. In the first
 example, the options `tt(-two)' and `tt(-three)' and the first
 argument will not be offered as possible completions if the option
-`tt(-one)' is on the line before the cursor. Also, the list may
-contain a single star as one of its elements to specify that the
-description for the rest arguments should not be used and it may
-contain a colon to specify that the descriptions for all normal
-(non-option-) arguments should not be used.
+`tt(-one)' is on the line before the cursor and in the second example
+the argument described by the specification will not be offered if the
+option tt(-foo) is on the line. Also, the list may contain a single
+star as one of its elements to specify that the description for the
+rest arguments should not be used and it may contain a colon to
+specify that the descriptions for all normal (non-option-) arguments
+should not be used.
 
 In each of the cases above, the var(action) says how the possible
 completions should be generated. In cases where only one of a fixed
