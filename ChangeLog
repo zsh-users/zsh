@@ -1,5 +1,8 @@
 2003-07-07  Oliver Kiddle  <opk@zsh.org>
 
+	* spotted by Bart: 18817: Functions/Prompts/prompt_adam2_setup:
+	need to quote % anchor in substitution
+
 	* 18822: Completion/Base/Completer/_expand, Doc/Zsh/compsys.yo:
 	fix accept-exact style not not bail out when it shouldn't and
 	add a setting to continue on and do normal completion

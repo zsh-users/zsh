@@ -76,8 +76,8 @@ prompt_adam2_precmd () {
 }
 
 prompt_adam2_choose_prompt () {
-  local prompt_line_1a_width=${#${(S%%)prompt_line_1a//%\{*%\}}}
-  local prompt_line_1b_width=${#${(S%%)prompt_line_1b//%\{*%\}}}
+  local prompt_line_1a_width=${#${(S%%)prompt_line_1a//\%\{*%\}}}
+  local prompt_line_1b_width=${#${(S%%)prompt_line_1b//\%\{*%\}}}
 
   local prompt_padding_size=$(( COLUMNS
                                   - prompt_line_1a_width
