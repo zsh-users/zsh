@@ -137,4 +137,10 @@ item(tt(userdirs))(
 This association maps user names to the pathnames of their home
 directories.
 )
+vindex(funcstack)
+item(tt(funcstack))(
+This array contains the names of the functions currently being
+executed. The first element is the name of the function using the
+parameter.
+)
 enditem()

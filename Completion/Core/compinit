@@ -113,6 +113,10 @@ fi
 
 comppostfuncs=()
 
+# Loading it now ensures that the `funcstack' parameter is always correct.
+
+zmodload -i parameter
+
 # This function is used to register or delete completion functions. For
 # registering completion functions, it is invoked with the name of the
 # function as it's first argument (after the options). The other
