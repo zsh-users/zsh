@@ -1,5 +1,8 @@
 2004-02-26  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
+	* unposted: Completion/Unix/Command/_raggle: reword --help
+	description and add a version string 
+
 	* 19468: Completion/Unix/Command/_elinks,
 	Completion/Unix/Command/_gpg, Completion/Unix/Command/_imagemagick,
 	Completion/Unix/Command/_java, Completion/Unix/Command/_links,

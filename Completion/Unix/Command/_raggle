@@ -1,5 +1,7 @@
 #compdef raggle
 
+# Raggle v0.3.0
+
 _arguments \
   '(-a --add --add-feed)'{-a,--add,--add-feed}"[add a new feed (requires '--url')]" \
   '--ascii[use ASCII characters instead of ANSI for window borders]' \
@@ -8,7 +10,7 @@ _arguments \
   '(-e --edit --edit-feed)'{-e,--edit,--edit-feed}'[edit an existing feed]:feed ID:' \
   '(--import-opml)--export-opml[export feeds to OPML]:OPML file:_files -g "*.opml(-.)"' \
   "--force[force behavior Raggle won't normally allow]" \
-  '(-)'{-h,--help,--usage}'[display this usage screen]' \
+  '(-)'{-h,--help,--usage}'[display help information]' \
   '(--export-opml)--import-opml[import feeds from an OPML file]:OPML file:_files -g "*.opml(-.)"' \
   '(-i --invalidate)'{-i,--invalidate}'[invalidate a feed (force an update)]:feed ID:' \
   '(-l --list)'{-l,--list}"[list existing feeds (use '--verbose' to show URLs as well)]" \
