@@ -338,11 +338,12 @@ patcompile(char *exp, int inflags, char **endexp)
 
     if (!(patflags & PAT_ANY)) {
 	/* Look for a really pure string, with no tokens at all. */
-	for (strp = exp; *strp &&
-		 (!(patflags & PAT_FILE) || *strp != '/') && !itok(*strp);
-	     strp++)
-	    ;
-	if (*strp && *strp != '/') {
+	if (!patglobflags)
+	    for (strp = exp; *strp &&
+		     (!(patflags & PAT_FILE) || *strp != '/') && !itok(*strp);
+		 strp++)
+		;
+	if (!strp || (*strp && *strp != '/')) {
 	    /* No, do normal compilation. */
 	    strp = NULL;
 	    if (patcompswitch(0, &flags) == 0)
