@@ -65,8 +65,10 @@ static Param terminfo_pm;
 static int
 bin_echoti(char *name, char **argv, char *ops, int func)
 {
-    char *s, *t, *u;
-    int num, argct;
+    char *s, *t, **u;
+    int arg, num, strarg = 0;
+    long pars[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    char *strcap[] = { "pfkey", "pfloc", "pfx", "pln", "pfxl", NULL };
 
     s = *argv++;
     /* This depends on the termcap stuff in init.c */
@@ -98,28 +100,32 @@ bin_echoti(char *name, char **argv, char *ops, int func)
 	zwarnnam(name, "no such terminfo capability: %s", s, 0);
 	return 1;
     }
-    /* count the number of arguments required */
-    for (argct = 0, u = t; *u; u++)
-        if (*u == '%') {
-            if (u++, (*u == 'd' || *u == '2' || *u == '3' || *u == '.' ||
-                      *u == '+'))
-                argct++;
-        }
-    /* check that the number of arguments provided is correct */
-    if (arrlen(argv) != argct) {
-        zwarnnam(name, (arrlen(argv) < argct) ? "not enough arguments" :
-                 "too many arguments", NULL, 0);
+    /* check that the number of arguments provided is not too high */
+    if (arrlen(argv) > 9) {
+        zwarnnam(name, "too many arguments", NULL, 0);
         return 1;
     }
+
+    /* check if we have a capability taking non-integers for parameters */
+    for (u = strcap; *u && !strarg; u++)
+      strarg = !strcmp(s, *u);
+
+    /* get the arguments */
+    for (arg=0; argv[arg]; arg++) {
+	if (strarg && arg > 0)
+            pars[arg] = (long) argv[arg];
+	else
+            pars[arg] = atoi(argv[arg]);
+    }
+
     /* output string, through the proper termcap functions */
-    if (!argct)
-        tputs(t, 1, putraw);
+    if (!arg)
+        putp(t);
     else {
-        num = (argv[1]) ? atoi(argv[1]) : atoi(*argv);
-        tputs(tparm(t, atoi(*argv)), num, putraw);
+        putp(tparm(t, pars[0], pars[1], pars[2], pars[3], pars[4],
+	              pars[5], pars[6], pars[7], pars[8]));
     }
     return 0;
-
 }
 
 /**/

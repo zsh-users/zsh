@@ -2,6 +2,8 @@
 
 	* Stephen Rüger: 19255: Completion/Debian/Command/_apt: update
 	to work with APT 0.5.14
+	* Oliver: 18626: Src/Modules/terminfo.c: Try to do a better job
+	of arg support for echoti, fixing compile problem on 64-bit Solaris
 
 2003-12-16  Oliver Kiddle  <opk@zsh.org>
 
