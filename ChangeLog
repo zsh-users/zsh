@@ -1,3 +1,7 @@
+2001-02-14  Clint Adams  <schizo@debian.org>
+
+	* 13478: Src/builtins.c: don't call dyncat with a NULL argument.
+
 2001-02-14  Peter Stephenson  <pws@csr.com>
 
 	* 13473: Makefile.in, Doc/Zsh/options.yo: small changes suggested

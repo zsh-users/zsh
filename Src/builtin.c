@@ -2468,14 +2468,14 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 	/* Option -a is to search the entire path, *
 	 * rather than just looking for one match. */
 	if (all) {
-	    char **pp, *buf, *z;
+	    char **pp, *buf;
 
 	    pushheap();
 	    for (pp = path; *pp; pp++) {
 		if (**pp) {
-		    z = dyncat(*pp, "/");
-		} else z = NULL;
-		buf = dyncat(z, *argv);
+		    buf = zhtricat(*pp, "/", *argv);
+		} else buf = ztrdup(*argv);
+
 		if (iscom(buf)) {
 		    if (wd) {
 			printf("%s: command\n", *argv);
