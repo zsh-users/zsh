@@ -2683,8 +2683,7 @@ zfclose(int leaveparams)
     }
     if (zfsess->control.fd != -1) {
 	zfnopen--;
-	close(zfsess->control.fd);
-	zfsess->control.fd = -1;
+	tcp_close(&(zfsess->control));
     }
 
     if (zfstatfd != -1) {

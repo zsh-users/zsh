@@ -230,13 +230,21 @@ freehostent(struct hostent *ptr)
 mod_export int
 tcp_socket(int domain, int type, int protocol, Tcp_session sess)
 {
-	sess->fd = socket(domain, type, protocol);
-	return sess->fd;
+    sess->fd = socket(domain, type, protocol);
+    return sess->fd;
 }
 
 static void
 tcp_cleanup(void)
 {
+}
+
+/**/
+mod_export int
+tcp_close(Tcp_session sess)
+{
+    close(sess->fd);
+    sess->fd = -1;
 }
 
 /* The load/unload routines required by the zsh library interface */
