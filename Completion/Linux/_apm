@@ -1,0 +1,17 @@
+#compdef apm
+_arguments -C -s \
+    '(--version)-V[print the apm program and exit immediately]' \
+    '(-V)--version[print the apm program and exit immediately]' \
+    '(--verbose)-v[print information about APM BIOS and Linux APM driver version]' \
+    '(-v)--verbose[print information about APM BIOS and Linux APM driver version]' \
+    '(--minutes)-m[print total minutes remaining instead of using an hh:mm format]' \
+    '(-m)--minutes[print total minutes remaining instead of using an hh:mm format]' \
+    '(--suspend)-s[put the machine into suspend mode if possible]' \
+    '(-s)--suspend[put the machine into suspend mode if possible]' \
+    '(--stanbdby)-S[put the machine into standby mode if possible]' \
+    '(-S)--standby[put the machine into standby mode if possible]' \
+    '(--noignore)-n[tell the system not to ignore system-generated APM message]' \
+    '(-n)--noignore[tell the system not to ignore system-generated APM message]' \
+    '(--ignore)-i[tell the system to ignore system-generated APM message]' \
+    '(-i)--ignore[tell the system to ignore system-generated APM message]'
+

@@ -1,3 +1,7 @@
+2001-04-01 Chmouel Boudjnah <chmouel@mandrakesoft.com>
+
+	* 13861: Completion/Linux/_apm: Completion for apm command (linux only).
+
 2001-03-30  Clint Adams  <schizo@debian.org>
 
 	* 13860: Completion/Debian/_deb_packages: caching layer support.
