@@ -588,6 +588,58 @@ zle -N predict-off
 bindkey '^X^Z' predict-on
 bindkey '^Z' predict-off)
 )
+tindex(read-from-minibuffer)
+item(tt(read-from-minibuffer))(
+This is most useful when called as a function from inside a widget, but will
+work correctly as a widget in its own right.  It prompts for a value
+below the current command line; a value may be input using all of the
+standard zle operations (and not merely the restricted set available
+when executing, for example, tt(execute-named-cmd)).  The value is then
+returned to the calling function in the parameter tt($REPLY) and the
+editing buffer restored to its previous state.  If the read was aborted
+by a keyboard break (typically tt(^G)), the function returns status 1
+and tt($REPLY) is not set.  If an argument is supplied to the function
+it is taken as a prompt, otherwise `tt(? )' is used.
+
+The name is a slight misnomer, as in fact the shell's own minibuffer is
+not used.  Hence it is still possible to call tt(executed-named-cmd) and
+similar functions while reading a value.
+)
+tindex(replace-string)
+tindex(replace-pattern)
+item(tt(replace-string), tt(replace-pattern))(
+The function tt(replace-string) implements two widgets.
+If defined under the same name as the function, it prompts for two
+strings; the first (source) string will be replaced by the second
+everywhere it occurs in the line editing buffer.
+
+If the widget name contains the word `tt(pattern)', for example by
+defining the widget using the command `tt(zle -N replace-pattern
+replace-string)', then the replacement is done by pattern matching.  All
+zsh extended globbing patterns can be used in the source string; note
+that unlike filename generation the pattern does not need to match an
+entire word, nor do glob qualifiers have any effect.  In addition, the
+replacement string can contain parameter or command substitutions.
+Furthermore, a `tt(&)' in the replacement string will be replaced with
+the matched source string, and a backquoted digit `tt(\)var(N)' will be
+replaced by the var(N)th parenthesised expression matched.  The form
+`tt(\{)var(N)tt(})' may be used to protect the digit from following
+digits.
+
+For example, starting from the line:
+
+example(print This line contains fan and fond)
+
+and invoking tt(replace-pattern) with the source string `tt(f(?)n)' and
+the replacment string `tt(c\1r)' produces the not very useful line:
+
+example(print This line contains car and cord)
+
+The range of the replacement string can be limited by using the
+tt(narrow-to-region-invisible) widget.  One limitation of the current
+version is that tt(undo) will cycle through changes to the replacement
+and source strings before undoing the replacement itself.
+)
 tindex(smart-insert-last-word)
 item(tt(smart-insert-last-word))(
 This function may replace the tt(insert-last-word) widget, like so:

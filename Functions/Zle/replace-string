@@ -1,0 +1,45 @@
+emulate -L zsh
+setopt extendedglob
+
+autoload read-from-minibuffer
+
+local p1="Replace: " p2="   with: "
+local src rep REPLY MATCH MBEGIN MEND curwidget=$WIDGET
+local -a match mbegin mend
+
+read-from-minibuffer $p1 || return 1
+src=$REPLY
+
+read-from-minibuffer "$p1$src$p2" || return 1
+rep=$REPLY
+
+if [[ $curwidget = *pattern* ]]; then
+    local rep2
+    # The following horror is so that an & preceded by an even
+    # number of backslashes is active, without stripping backslashes,
+    # while preceded by an odd number of backslashes is inactive,
+    # with one backslash being stripped.  A similar logic applies
+    # to \digit.
+    while [[ $rep = (#b)([^\\]#)(\\\\)#(\\|)(\&|\\<->|\\\{<->\})(*) ]]; do
+	if [[ -n $match[3] ]]; then
+	    # Expression is quoted, strip quotes
+	    rep2="${match[1]}${match[2]}${match[4]}"
+	else
+	    rep2+="${match[1]}${match[2]}"
+	    if [[ $match[4] = \& ]]; then
+		rep2+='${MATCH}'
+	    elif [[ $match[4] = \\\{* ]]; then
+		rep2+='${match['${match[4][3,-2]}']}'
+	    else
+		rep2+='${match['${match[4][2,-1]}']}'
+	    fi
+	fi
+	rep=${match[5]}
+    done
+    rep2+=$rep
+    LBUFFER=${LBUFFER//(#bm)$~src/${(e)rep2}}
+    RBUFFER=${RBUFFER//(#bm)$~src/${(e)rep2}}
+else
+    LBUFFER=${LBUFFER//$src/$rep}
+    RBUFFER=${RBUFFER//$src/$rep}
+fi

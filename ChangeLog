@@ -1,3 +1,9 @@
+2003-02-03  Peter Stephenson  <pws@csr.com>
+
+	* 18174: Doc/Zsh/contrib.yo, Functions/Zle/read-from-minibuffer,
+	Functions/Zle/replace-string:  New widgets for reading values
+	during editing and for performing string and pattern replacements.
+
 2003-01-30  Clint Adams  <clint@zsh.org>
 
 	* unposted: config.guess, config.sub: update to 2003-01-10 and

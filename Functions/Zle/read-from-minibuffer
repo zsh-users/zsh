@@ -1,0 +1,20 @@
+local savelbuffer=$LBUFFER saverbuffer=$RBUFFER
+local savepredisplay=$PREDISPLAY savepostdisplay=$POSTDISPLAY
+
+LBUFFER=
+RBUFFER=
+PREDISPLAY="$PREDISPLAY$savelbuffer$saverbuffer$POSTDISPLAY
+${1:-? }"
+POSTDISPLAY=
+
+zle recursive-edit
+integer stat=$?
+
+(( stat )) || REPLY=$BUFFER
+
+LBUFFER=$savelbuffer
+RBUFFER=$saverbuffer
+PREDISPLAY=$savepredisplay
+POSTDISPLAY=$savepostdisplay
+
+return $stat
