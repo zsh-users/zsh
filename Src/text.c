@@ -182,6 +182,7 @@ struct tstack {
 	} _redir;
 	struct {
 	    char *strs;
+	    Wordcode end;
 	} _funcdef;
 	struct {
 	    Wordcode end;
@@ -372,11 +373,13 @@ gettext2(Estate state)
 		    taddnl();
 		    n = tpush(code, 1);
 		    n->u._funcdef.strs = state->strs;
+		    n->u._funcdef.end = end;
 		    state->strs = (char *) (p + (*state->pc));
 		    state->pc += 2;
 		}
 	    } else {
 		state->strs = s->u._funcdef.strs;
+		state->pc = s->u._funcdef.end;
 		tindent--;
 		taddnl();
 		taddstr("}");
