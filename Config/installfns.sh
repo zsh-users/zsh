@@ -13,7 +13,7 @@ for file in $FUNCTIONS_INSTALL; do
   if test -f "$sdir/$file"; then
     install="$install $file"
   else
-    install="$install `echo $sdir/$file | sed -e \"s%$sdir/%%g\"`"
+    install="$install `echo '' $sdir/$file | sed -e \"s% $sdir/%%g\"`"
   fi
 done
 
