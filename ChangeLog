@@ -1,3 +1,8 @@
+2004-02-26  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Modules/zpty.c: silenced a compiler warning
+	about an unused variable.
+
 2004-02-26  Peter Stephenson  <pws@csr.com>
 
 	* unposted: .cvsignore, .distfiles, README, Config/version.mk,
