@@ -20,6 +20,8 @@
 
 # cf. XrmParseCommand(3X11), X11R6.4/xc/lib/Xt/Initialize.c, X(5)
 
+local ret
+
 _arguments \
   -+{rv,synchronous} \
   -{reverse,iconic} \
@@ -42,3 +44,9 @@ _arguments \
   '-xrm:resource:_x_resource' \
   '-xtsessionID:session ID:_xt_session_id' \
   "$@"
+
+ret=$?
+
+[[ "$ret" = 300 ]] && compstate[restore]=''
+
+return ret

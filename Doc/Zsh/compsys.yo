@@ -965,7 +965,8 @@ An var(action) of the form `tt(->)var(string)' is used by functions
 that implement a state machine. In this case, the `var(string)' (with
 all leading and trailing spaces and tabs removed) will be stored in
 the global parameter tt(state) and the function returns with a return
-value of one after setting the global `tt(line)' and `tt(options)'
+value of 300 (to make it distinguishable from other return values)
+after setting the global `tt(line)' and `tt(options)'
 parameters as described below and without resetting any changes made
 to the special parameters such as tt(PREFIX) and tt(words).
 

@@ -740,7 +740,7 @@ while true; do
       options=( "${(@kv)_options}" )
       state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
       compstate[restore]=''
-      return 1
+      return 300
     else
       if [[ "${(t)line}" != *local* ]]; then
         local line

@@ -1,6 +1,14 @@
 #compdef -P */X11/*
 
+local ret
+
 _arguments \
   '-display:display:_x_display' \
   '-geometry:geometry:_x_geometry' \
   "$@"
+
+ret=$?
+
+[[ "$ret" = 300 ]] && compstate[restore]=''
+
+return ret
