@@ -62,15 +62,15 @@ _mailboxes() {
 _mailbox_cache () {
   # Depends on $maildirectory and $pinedirectory from _mailboxes!
 
-  local i j muttrc="${muttrc:-~/.muttrc}"
+  local i j _mc_tmp muttrc="${muttrc:-~/.muttrc}"
   local -aU dirboxes
   typeset -aU -g _mailbox_cache
   typeset -aU -g _maildir_cache _mbox_cache _mh_cache _mutt_cache _pine_cache
 
 
   [[ -f ${~muttrc:-.} ]] &&
-    _mutt_cache=( ${=${(M)${(f)"$(<${~muttrc})"}:#mailboxes *}#mailboxes *} )
-
+    _mc_tmp=${=${(M)${(f)"$(<${~muttrc})"}:#mailboxes *}#mailboxes *} &&
+    _mutt_cache=( ${=${(Xe)_mc_tmp}} )
 
   _mbox_cache=( ${~maildirectory}/*(^/) )
   _pine_cache=( ${~pinedirectory}/**/*(.) )
