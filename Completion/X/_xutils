@@ -46,12 +46,30 @@ xev)
     '-rv'
   ;;
 xhost)
-  local expl type ret=1
+  local expl type ret=1 tmp
 
   if compset -P '-'; then
-    _wanted displays expl 'disallow access' &&
-        compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - \
-                "${${(@M)${(@f)$(xhost)}[2,-1]:#LOCAL:*}#INET:}"
+    tmp=(${(f)"$(xhost)"})
+    shift tmp
+    tmp=(${tmp:#LOCAL:|<*>})
+    if [[ "$tmp" = *:* ]]; then
+      if compset -P '(#b)(*):'; then
+	type="$match[1]"
+	_wanted displays expl 'disallow access' &&
+	    {
+	      compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - \
+		      ${${(M)tmp:#(#i)$type:*}#(#i)$type:} ||
+	      _hosts "$expl[@]"
+	    }
+      else
+	_alternative \
+	    'types:name family:compadd -S: ${(L)tmp%%:*}' \
+	    'hosts:host:compadd ${(@)tmp#*:}' && ret=0
+      fi
+    else
+      _wanted displays expl 'disallow access' &&
+	  { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - $tmp || _hosts "$expl[@]" }
+    fi
   else
     compset -P +
 
