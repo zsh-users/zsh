@@ -6,7 +6,7 @@
 #
 # Configuration styles used:
 #
-#  urls:path
+#  path
 #    The path to a directory containing a URL database, such as:
 #
 #      % cd ~/.zsh/urls
@@ -29,14 +29,14 @@
 #      % cat bookmark/zsh/meta
 #      http://www.zsh.org/
 #
-#  urls:local
+#  local
 #    Specify a local web server as an array with three elements:
 #      <hostname> <doc root> <user area>
 #    where hostname is the name of the web server, doc root is the path to
 #    the default web pages for the server and user area is the directory
 #    name used by a user placing web pages within their home area.
 #    E.g.:
-#      zstyle '*:urls:local' www /usr/local/apache/htdocs public_html
+#      zstyle ':completion:*:urls' local www /usr/local/apache/htdocs public_html
 
 local ipre scheme host user uhosts ret=1 expl
 local urls_path localhttp

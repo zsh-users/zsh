@@ -358,7 +358,7 @@ Have fun
       tmp="'*:options' prefix-needed yes"
       [[ "$val" = hide* ]] &&
           tmp="$tmp
-zstyle '*:options' prefix-hidden yes"
+zstyle ':completion*:options' prefix-hidden yes"
       ;;    
     group_matches)
       tmp="'*' group-name ''"
@@ -403,7 +403,7 @@ zstyle '*:options' prefix-hidden yes"
       tmp="'*' last-prompt 'yes'"
       ;;
     esac
-    [[ -n "$tmp" ]] && style="${style}${cmt}zstyle ${tmp}
+    [[ -n "$tmp" ]] && style="${style}${cmt}zstyle :completion${tmp}
 "
   done
 
