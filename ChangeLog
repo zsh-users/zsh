@@ -1,3 +1,9 @@
+2001-04-02  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13868: Src/Zle/compmatch.c, Src/Zle/computil.c: make
+	`_arguments -S' still complete long options after `--<TAB>';
+	fix for cursor positioning with partial word match specs
+
 2001-04-02  Clint Adams  <schizo@debian.org>
 
  	* 13866: Completion/Debian/_apt: complete a release

@@ -1316,7 +1316,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	doff = state.singles = arglast = 0;
 
 	if (ca_inactive(d, argxor, cur, 0) ||
-	    ((d->flags & CDF_SEP) && !strcmp(line, "--"))) {
+	    ((d->flags & CDF_SEP) && cur != compcurrent && !strcmp(line, "--"))) {
 	    if (ca_inactive(d, NULL, cur, 1))
 		return 1;
 	    continue;
