@@ -1,3 +1,8 @@
+2001-05-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 14355: Completion/Unix/Command/_modutils: fix bug where /sbin/lsmod
+	was redirected in instead of being run
+
 2001-05-15  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14350: Completion/Base/Completer/_expand, Src/Zle/zle_tricky.c:

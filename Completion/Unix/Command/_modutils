@@ -1,19 +1,18 @@
 #compdef modprobe rmmod
 
-local loaded
+local expl loaded
 
 _modutils_loaded_modules() {
 
-if [[ -f /proc/modules ]]; then
+if [[ -r /proc/modules ]]; then
  loaded=(${${(f)"$(</proc/modules)"}%% *})
 elif [[ -x /sbin/lsmod ]]; then
- loaded=(${${${(f)"$(</sbin/lsmod)"}%% *}%Module})
+ loaded=(${${(f)"$(/sbin/lsmod)"}[2,-1]%% *})
 else
  return 1
 fi
 
-compadd -a loaded
-return 0
+_wanted modules expl 'loaded module' compadd -a loaded
 }
 
 case "$service" in
