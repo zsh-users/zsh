@@ -1,5 +1,10 @@
 2002-05-14  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 17148: Completion/Base/Utility/_arguments,
+	Completion/Unix/Type/_services: fix for _arguments: don't use
+	argument-tag when completing options; fix for _services: leave
+	loop when matches were produced
+
 	* 17147: Completion/Base/Utility/_describe,
 	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo,
 	Src/Zle/computil.c: allow users to give the maximum number of

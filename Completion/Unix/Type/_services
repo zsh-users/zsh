@@ -18,6 +18,7 @@ while _tags; do
     compadd  -a inits && ret=0
   _requested xinetd expl 'xinetd services' \
     compadd  -a xinetds && ret=0
+  (( ret )) || break
 done
 
 return $ret

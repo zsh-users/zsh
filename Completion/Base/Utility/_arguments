@@ -335,9 +335,11 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
          [[ -z "$hasopts" &&
             -z "$matched" &&
             ( -z "$aret" || "$PREFIX" = "$origpre" ) ]] &&
-          { ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
+          { ! zstyle -T ":completion:${oldcontext%:*}:options" prefix-needed ||
             [[ "$origpre" = [-+]* || -z "$aret$mesg$tried" ]] } ; then
-	local prevpre="$PREFIX" previpre="$IPREFIX"
+	local prevpre="$PREFIX" previpre="$IPREFIX" prevcontext="$curcontext"
+
+        curcontext="${oldcontext%:*}:options"
 
 	hasopts=yes
 
@@ -389,6 +391,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
         fi
 	PREFIX="$prevpre"
 	IPREFIX="$previpre"
+        curcontext="$prevcontext"
       fi
       [[ -n "$tried" && "${${alwopt:+$origpre}:-$PREFIX}" != [-+]* ]] && break
     done
