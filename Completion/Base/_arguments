@@ -270,8 +270,9 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 
               # Anything inside `(...)' is added directly.
 
-              _all_labels "$subc" expl "$descr" \
-                  compadd "$subopts[@]" - ${=action[2,-2]}
+              eval ws\=\( "${action[2,-2]}" \)
+
+              _all_labels "$subc" expl "$descr" compadd "$subopts[@]" -a - ws
 	      tried=yes
             elif [[ "$action" = \{*\} ]]; then
 
@@ -294,7 +295,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 
               # Otherwise we call it with the description-arguments.
 
-              set -A action ${=~action}
+	      eval "action=( $action )"
               while _next_label "$subc" expl "$descr"; do
                 "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}"
 	      done

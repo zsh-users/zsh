@@ -119,8 +119,9 @@ if compvalues -i "$@"; then
 
       # Anything inside `(...)' is added directly.
 
-      _all_labels arguments expl "$descr" \
-          compadd "$subopts[@]" - ${=action[2,-2]}
+      eval ws\=\( "${action[2,-2]}" \)
+
+      _all_labels arguments expl "$descr" compadd "$subopts[@]" -a - ws
     elif [[ "$action" = \{*\} ]]; then
 
       # A string in braces is evaluated.
