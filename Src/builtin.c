@@ -3019,9 +3019,13 @@ bin_print(char *name, char **args, Options ops, int func)
     zulong zulongval;
     char *stringval;
     
-    if (func == BIN_PRINTF)
-	fmt = *args++;
-    else if (func == BIN_ECHO && isset(BSDECHO))
+    if (func == BIN_PRINTF) {
+        if (!strcmp(*args, "--") && !*++args) {
+            zwarnnam(name, "not enough arguments", NULL, 0);
+	    return 1;
+        }
+  	fmt = *args++;
+    } else if (func == BIN_ECHO && isset(BSDECHO))
 	ops->ind['E'] = 1;
     else if (OPT_HASARG(ops,'f'))
 	fmt = OPT_ARG(ops,'f');
