@@ -11,30 +11,32 @@ xitem(tt(zpty) tt(-w) [ tt(-n) ] var(name) var(strings ...))
 xitem(tt(zpty) tt(-r) var(name) [ var(param) [ var(pattern) ] ])
 item(tt(zpty) [ tt(-L) ])(
 In the first form, the var(command) is started with the var(args) as
-arguments. After this, the var(name) can be used in further calls to
-tt(zpty) to refer to this command. With the tt(-e) option given, the
+arguments.  The command runs under a newly assigned pseudo-terminal; this
+is useful for running commands non-interactively which expect an
+interactive environment.  The var(name) given is used to refer to this
+command in later calls to tt(pty).  With the tt(-e) option given, the
 pseudo-terminal will be set up so that input characters are echoed and 
 with the tt(-b) option given, input and output from and to the
 pseudo-terminal will be blocking.
 
 The second form with the tt(-d) option is used to delete commands
-started before by giving their var(names). If no var(names) are given, 
-all commands are deleted. Deleting a command makes the HUP signal be
-sent to the process started for it.
+previously started by supplying a list of their var(name)s.  If no
+var(names) are given, all commands are deleted.  Deleting a command causes
+the HUP signal to be sent to the corresponding process.
 
-The tt(-w) option can be used to sent the command var(name) the given
-var(strings) as input (separated by spaces). If the tt(-n) option is
-not given, a newline will be sent after the last var(string).
+The tt(-w) option can be used to send the command var(name) the given
+var(strings) as input (separated by spaces).  If the tt(-n) option is
+not given, a newline will be added at the end.
 
 The tt(-r) option can be used to read the output of the command
-var(name). Without a var(param) argument, the string read will be
-printed to standard output. With a var(param) argument, the string
-read will be put in the parameter named var(param). If the
+var(name).  Without a var(param) argument, the string read will be
+printed to standard output.  With a var(param) argument, the string
+read will be put in the parameter named var(param).  If the
 var(pattern) is also given, output will be read until the whole string 
 read matches the var(pattern).
 
 The last form without any arguments is used to list the commands
-currently defined. If the tt(-L) option is given, this is done in the
+currently defined.  If the tt(-L) option is given, this is done in the
 form of calls to the tt(zpty) builtin.
 )
 enditem()

@@ -279,7 +279,7 @@ file, but only the basename is used for the remote file name.
 With the option tt(-r), if any of the var(files) are directories they are
 sent recursively with all their subdirectories, including files beginning
 with `tt(.)'.  This requires that the remote machine understand UNIX file
-semantics. as `tt(/)' is used as a directory separator.
+semantics, since `tt(/)' is used as a directory separator.
 )
 findex(zfuput)
 item(tt(zfuput [ -vs ] var(file1) ...))(
@@ -367,7 +367,7 @@ var(sess1) and var(sess2) must be distinct.
 
 The operation is performed using pipes, so it is required that the
 connections still be valid in a subshell, which is not the case under some
-operating systems.
+versions operating systems, presumably due to a system bug.
 )
 enditem()
 
@@ -376,7 +376,7 @@ The two functions tt(zfmark) and tt(zfgoto) allow you to `bookmark' the
 present location (host, user and directory) of the current FTP connection
 for later use.  The file to be used for storing and retrieving bookmarks is
 given by the parameter tt($ZFTP_BMFILE); if not set when one of the two
-functions is called, it will be set to the file tt(.zfbfmarks) in the
+functions is called, it will be set to the file tt(.zfbkmarks) in the
 directory where your zsh startup files live (usually tt(~)).
 
 startitem()
@@ -471,7 +471,7 @@ findex(zftp_chpwd, supplied version)
 item(tt(zftp_chpwd))(
 This function is called every time a connection is opened, or closed, or
 the remote directory changes.  This version alters the title bar of an
-tt(xterm) compatible or tt(sun-cmd) terminal emulator to reflect the 
+tt(xterm)-compatible or tt(sun-cmd) terminal emulator to reflect the 
 local and remote hostnames and current directories.  It works best when
 combined with the function tt(chpwd).  In particular, a function of 
 the form

@@ -28,7 +28,7 @@ hash table.
 )
 vindex(functions)
 item(tt(functions))(
-This association maps names of enabled functions to their
+This associative array maps names of enabled functions to their
 definitions. Setting a key in it is like defining a function with the
 name given by the key and the body given by the value. Unsetting a key
 removes the definition for the function named by the key.
@@ -39,7 +39,7 @@ Like tt(functions) but for disabled functions.
 )
 vindex(builtins)
 item(tt(builtins))(
-This association gives information about the builtin commands
+This associative array gives information about the builtin commands
 currently enabled. The keys are the names of the builtin commands and
 the values are either `tt(undefined)' for builtin commands that will
 automatically be loaded from a module if invoked or `tt(defined)' for
@@ -90,7 +90,7 @@ Setting or unsetting keys in this array is not possible.
 )
 vindex(modules)
 item(tt(modules))(
-An association giving information about module. The keys are the names
+An associative array giving information about modules. The keys are the names
 of the modules builtin, loaded, or registered to be autoloaded. The
 value says which state the named module is in and is one of the
 strings tt(builtin), tt(loaded), or tt(autoloaded).
@@ -105,7 +105,7 @@ directory, the current working directory.
 )
 vindex(history)
 item(tt(history))(
-This association maps history event numbers to the full history lines.
+This associative array maps history event numbers to the full history lines.
 )
 vindex(historywords)
 item(tt(historywords))(
@@ -113,16 +113,17 @@ A special array containing the words stored in the history.
 )
 vindex(jobdirs)
 item(tt(jobdirs))(
-This association maps job numbers to the directories from which the job was started (which may not be the current directory of the job).
+This associative array maps job numbers to the directories from which the
+job was started (which may not be the current directory of the job).
 )
 vindex(jobtexts)
 item(tt(jobtexts))(
-This association maps job numbers to the texts of the command lines
+This associative array maps job numbers to the texts of the command lines
 that were used to start the jobs.
 )
 vindex(jobstates)
 item(tt(jobstates))(
-This association gives information about the states of the jobs
+This associative array gives information about the states of the jobs
 currently known. The keys are the job numbers and the values are
 strings of the form
 `var(job-state):var(pid)tt(=)var(state)tt(...)'. The var(job-state)
@@ -134,12 +135,12 @@ of that process.
 )
 vindex(nameddirs)
 item(tt(nameddirs))(
-This association maps the names of named directories to the pathnames
+This associative array maps the names of named directories to the pathnames
 they stand for.
 )
 vindex(userdirs)
 item(tt(userdirs))(
-This association maps user names to the pathnames of their home
+This associative array maps user names to the pathnames of their home
 directories.
 )
 vindex(funcstack)

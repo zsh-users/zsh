@@ -259,20 +259,20 @@ immediately after return from the widget.
 )
 item(tt(-M) var(string))(
 As with the tt(-R) option, the var(string) will be displayed below the 
-command line. But unlike the tt(-R) option the string not be put into
+command line; unlike the tt(-R) option, the string will not be put into
 the status line but will instead be printed normally below the
-prompt. This means that the var(string) will still be displayed after
+prompt.  This means that the var(string) will still be displayed after
 the widget returns (until it is overwritten by subsequent commands).
 )
 item(tt(-U) var(string))(
 This pushes the characters in the var(string) onto the input stack of
-ZLE. After the widget currently executed finishes ZLE will behave as
+ZLE.  After the widget currently executed finishes ZLE will behave as
 if the characters in the var(string) were typed by the user.
 
-Note that since ZLE uses a stack, using tt(zle) with this option more
-than once will make the last string pushed be used first. The
-characters in each var(string) will be used in the order in which they
-appear in the string, though.
+As ZLE uses a stack, if this option is used repeatedly
+the last string pushed onto the stack will be processed first.  However,
+the characters in each var(string) will be processed in the order in which
+they appear in the string.
 )
 item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
 Invoke the specified widget.  This can only be done when ZLE is
@@ -303,7 +303,7 @@ it should call the tt(beep) widget directly.
 )
 enditem()
 
-With no options and no arguments, only the returns status will be
+With no options and no arguments, only the return status will be
 set. It is zero if ZLE is currently active and widgets could be
 invoked using this builtin command and non-zero if ZLE is not active.
 )

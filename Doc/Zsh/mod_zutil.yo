@@ -14,14 +14,14 @@ xitem(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])
 xitem(tt(zstyle -abhs) var(context) var(style) var(name) [ var(sep) ])
 xitem(tt(zstyle -Tt) var(context) var(style) [ var(strings) ...])
 item(tt(zstyle -m) var(context) var(style) var(pattern))(
-This builtin command is used to define and lookup styles. Styles are
+This builtin command is used to define and lookup styles.  Styles are
 pairs of names and values, where the values consist of any number of
-strings. They are stored together with patterns and lookup is done by
+strings.  They are stored together with patterns and lookup is done by
 giving a string, called the `context', which is compared to the
-patterns. The definition stored for the first matching pattern will be 
-returned. For this, the patterns are ordered from most specific to
+patterns.  The definition stored for the first matching pattern will be 
+returned.  For this, the patterns are ordered from most specific to
 less specific and patterns that are equally specific keep the order in 
-which they were defined. A pattern is considered to be more specific
+which they were defined.  A pattern is considered to be more specific
 than another if it contains more components (substrings separated by
 colons) or if the patterns for the components are more specific, where 
 simple strings are considered to be more specific than patterns and
@@ -95,36 +95,36 @@ enditem()
 findex(zformat)
 xitem(tt(zformat -f) var(param) var(format) var(specs) ...)
 item(tt(zformat -a) var(array) var(sep) var(specs) ...)(
-This builtin provides to different forms of formatting. The first form 
-is selected with the tt(-f) option. If this is given, the var(format)
+This builtin provides two different forms of formatting. The first form 
+is selected with the tt(-f) option. In this case the var(format)
 string will be modified by replacing sequences starting with a percent 
-sign in it with strings from the var(specs). Each var(spec) has to be
-of the form `var(char)tt(:)var(string)' and this will make every
-appearance of the sequence `tt(%)var(char)' in var(format) be replaced 
-with the var(string). The `tt(%)' sequence may also contain optional
+sign in it with strings from the var(specs).  Each var(spec) should be
+of the form `var(char)tt(:)var(string)' which will cause every
+appearance of the sequence `tt(%)var(char)' in var(format) to be replaced 
+by the var(string).  The `tt(%)' sequence may also contain optional
 minimum and maximum field width specifications between the `tt(%)' and 
 the `var(char)' in the form `tt(%)var(min)tt(.)var(max)tt(c)',
 i.e. the minimum field width is given first and if the maximum field
-width is used, it has to be preceded by a dot. Giving a minimum field
+width is used, it has to be preceded by a dot.  Specifying a minimum field
 width makes the result be padded with spaces to the right if the
-var(string) is shorter than the requested width. Padding to the left
-can be achieved by giving a negative minimum field width. If a maximum 
-field width is given, the var(string) will be truncated after that
-many characters. After all `tt(%)' sequences for the given var(specs)
+var(string) is shorter than the requested width.  Padding to the left
+can be achieved by giving a negative minimum field width.  If a maximum 
+field width is specified, the var(string) will be truncated after that
+many characters.  After all `tt(%)' sequences for the given var(specs)
 have been processed, the resulting string is stored in the parameter
 var(param).
 
-The second form, using the tt(-a) option, can be used to get aligned
-strings. Here, the var(specs) are of the form
+The second form, using the tt(-a) option, can be used for alignin
+strings.  Here, the var(specs) are of the form
 `var(left)tt(:)var(right)' where `var(left)' and `var(right)' are
-arbitrary strings. These strings are modified by replacing the colons
-with the var(sep) string and padding the var(left) strings with spaces 
+arbitrary strings.  These strings are modified by replacing the colons
+by the var(sep) string and padding the var(left) strings with spaces 
 to the right so that the var(sep) strings in the result (and hence the 
 var(right) strings after them) are all aligned if the strings are
-printed below each other. All strings without a colon are left
+printed below each other.  All strings without a colon are left
 unchanged and all strings with a empty var(right) string have the
-trailing colon removed. In both cases the lengths of the strings
-are not used to determine how the other strings have to be aligned.
+trailing colon removed.  In both cases the lengths of the strings
+are not used to determine how the other strings are to be aligned.
 The resulting strings are stored in the var(array).
 )
 findex(zregexparse)
@@ -133,46 +133,51 @@ This implements the internals of the `tt(_regex_arguments)'.
 )
 findex(zparseopts)
 item(tt(zparseopts) [ tt(-D) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(specs))(
-This builtin simplifies the parsing of options in the positional
-parameters. Each var(spec) describes one option and should be of the
-form `var(name)[tt(+)][tt(:)[tt(:)][tt(-)]][tt(=)var(array)]'. The var(name)
-is the name of the option (without the leading `tt(-)'). If only that
-is given, the option takes no argument and if it is found in the
-positional parameters it will be placed in the var(array) given with
-the tt(-a) option. If the optional `tt(=)var(array)' is given, it will 
-be put into that array instead. If one or two colons are given, the
-option takes an argument. With one colon, this argument is mandatory
-and with two colons it is optional. The argument will be inserted into 
-the var(array), too. For mandatory arguments it is added as a separate 
-string and for optional arguments it is put into one string together
-with the option name unless the `tt(-)' option is given. In this case
-the argument will be put into the same word even for mandatory
+This builtin simplifies the parsing of options in positional
+parameters, i.e. the set of arguments given by tt($*).  Each var(spec)
+describes one option and should be of the form
+`var(name)[tt(+)][tt(:)[tt(:)][tt(-)]][tt(=)var(array)]'.  The var(name) is
+the name of the option (without the leading `tt(-)').  If only the option
+name is given, the option takes no argument and if it is found in the
+positional parameters it will be placed in the var(array) specified with
+the tt(-a) option; if the optional `tt(=)var(array)' is given, it will
+instead be put into that array.  If one or two colons are given, the
+option takes an argument; with one colon, the argument is mandatory
+and with two colons it is optional.  The argument will also be inserted into 
+the var(array).  A mandatory arguments is added as a separate 
+string and an optional argument is put into a single string together
+with the option name, unless a `tt(-)' appears after the colon, in
+which case the argument will be put into the same word even for mandatory
 arguments (note that this makes empty strings as arguments
-indistinguishable). Finally, if the `tt(+)' is given and the option
-appears more than once in the positional parameters, it will be
-inserted more than once in the var(array), too. Without the `tt(+)'
+indistinguishable).  Finally, if a `tt(+)' appears after var(name) the
+option may appears more than once in the positional parameters and will
+hence be inserted more than once in the var(array); without the `tt(+)'
 the option will be inserted only once in the var(array) with arguments 
-of later options overwriting earlier once. If any of the special
-character needs to appear in the option name it must be preceded by a
+of later options overwriting earlier once.  Any of the special
+characters can appear in the option name provided it is preceded by a
 backslash.
 
 If the tt(-A) option is given, the options and their values will also
 be put into an associative array with the option names as keys and the 
-arguments (if any) as the values. Note that it is an error to give
+arguments (if any) as the values.  Note that it is an error to give
 var(specs) without a `tt(=)var(array)' and not use either the tt(-a)
 or tt(-A) option.
 
 If the tt(-D) option is given, all options found are removed from the
-positional parameters leaving only the strings from the first one that 
-was not described by any of the var(specs) to the last (note that this 
-is the usual rule used by tt(zparseopts) to find out when to stop
-processing options).
+positional parameters, up to but not including any not described by the
+var(specs).  This means that any options processed by tt(zparseopts) are
+removed from the positional parameters.
 
-For example, calling `tt(zparseopts a=foo b:=bar c+:=bar)' with the
-strings `tt(-a)', `tt(-bx)', `tt(-c)', `tt(y)', `tt(-cz)', `tt(baz)'
-and `tt(-cend)' as positional arguments will set the array tt(foo) to
-contain the element `tt(-a)' and the array tt(bar) to the strings
-`tt(-b)', `tt(x)', `tt(-c)', `tt(y)', `tt(-c)', and `tt(z)'. The
-`tt(baz)' and all strings after it will not be used.
+For example,
+
+example(set -- -a -bx -c y -cz baz -cend
+zparseopts a=foo b:=bar c+:=bar)
+
+will have the effect of
+
+example(foo=(-a)
+bar=(-b x -c y -c z))
+
+The arguments from `tt(baz)' on will not be used.
 )
 enditem()

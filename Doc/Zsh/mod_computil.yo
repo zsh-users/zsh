@@ -4,22 +4,22 @@ completion system.
 !MOD!)
 cindex(completion, utility)
 The tt(zsh/computil) module adds several builtin commands that are used by
-some of the completion functions in the shell function based
-completions system (see
+some of the completion functions in the completion system based on shell
+functions (see 
 ifzman(zmanref(zshcompsys))\
 ifnzman(noderef(Completion System))
-). Except for tt(compquote) these builtin commands are very
+).  Except for tt(compquote) these builtin commands are very
 specialised and thus not very interesting when writing your own
-completion functions. In short, these builtin commands are:
+completion functions.  In summary, these builtin commands are:
 
 startitem()
 item(tt(compquote) var(names) ...)(
 There may be reasons to write completion functions that have to add
-the matches using the tt(-Q) option to tt(compadd) and do the quoting
-themselves. Instead of interpreting the first character of the
+the matches using the tt(-Q) option to tt(compadd) and perform quoting
+themselves.  Instead of interpreting the first character of the
 tt(all_quotes) key of the tt(compstate) special association and using
 the tt(q) flag for parameter expansions, one can use this builtin
-command. The arguments are the names of scalar or array parameters
+command.  The arguments are the names of scalar or array parameters
 and the values of these parameters are quoted as needed for the
 innermost quoting level.
 
@@ -28,25 +28,25 @@ The return value is non-zero in case of an error and zero otherwise.
 item(tt(compdescribe))(
 This is used by the tt(_describe) function to build the displays for
 the matches and to get the strings to add as matches with their
-options. The first call has to give the tt(-i) or tt(-I) option as the 
-first argument. In the first case, display strings without the
-descriptions will be generated, in the second case, the string used to
-separate the matches from their descriptions has to be given as the
-second argument and the descriptions (if any) will be shown. All other 
+options.  On the first call one of the options tt(-i) or tt(-I) should be
+supplied as the first argument.  In the first case, display strings without
+the descriptions will be generated, in the second case, the string used to
+separate the matches from their descriptions must be given as the
+second argument and the descriptions (if any) will be shown.  All other 
 arguments are like the definition arguments to tt(_describe) itself.
 
 Once tt(compdescribe) has been called with either the tt(-i) or the
 tt(-I) option, it can be repeatedly called with the tt(-g) option and
-the names of five arrays as its arguments. This will step through the
+the names of five arrays as its arguments.  This will step through the
 different sets of matches and store the options in the first array,
 the strings with descriptions in the second, the matches for these in
 the third, the strings without descriptions in the fourth, and the
-matches for them in the fifth array. These are then directly given to
+matches for them in the fifth array.  These are then directly given to
 tt(compadd) to register the matches with the completion code.
 )
 item(tt(comparguments))(
 This is used by the tt(_arguments) function to do the argument and
-command line parsing. Like tt(compdescribe) it has an option tt(-i) to 
+command line parsing.  Like tt(compdescribe) it has an option tt(-i) to 
 do the parsing and initialize some internal state and various options
 to access the state information to decide what should be completed.
 )
