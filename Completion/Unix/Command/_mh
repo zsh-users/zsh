@@ -1,4 +1,4 @@
-#compdef dist flist flists folder folders forw comp inc mark refile repl scan show next prev packf rmf rmm pick whom mhn mhpath mhlist mhstore mhshow mhparam
+#compdef burst dist flist flists folder folders forw comp inc mark refile repl scan show next prev packf rmf rmm pick whom mhn mhpath mhlist mhstore mhshow mhparam
 
 # Completion for all possible MH commands.
 local mymhdir=${$(_call_program mhpath mhpath + 2>/dev/null):-~/Mail}

@@ -3,13 +3,35 @@
 _svn () {
 
   _arguments -s \
+    '(-)--help[print help information]' \
+    '(- *)--version[print client version information]' \
     '*::svn command:_svn_command'
 }
 
 _svnadmin () {
 
   _arguments -s \
+    '(-)--help[print help information]' \
+    '(- *)--version[print client version information]' \
     '*::svnadmin command:_svnadmin_command'
+}
+
+(( $+functions[_svn_controlled] )) ||
+_svn_controlled() {
+  [[ -f ${(M)REPLY##*/}.svn/text-base/${REPLY##*/}.svn-base ]]
+}
+
+(( $+functions[_svn_urls] )) ||
+_svn_urls() {
+  local expl
+
+  if [[ -prefix *: ]]; then
+    _urls
+  else
+    compset -S '[^:]*'
+    _wanted url-schemas expl 'URL schema' compadd -S '' - \
+        file:// http:// https:// svn:// svn+ssh:// 
+  fi    
 }
 
 (( $+functions[_svn_command] )) ||
@@ -19,12 +41,12 @@ _svn_command () {
   if (( ! $+_svn_cmds )); then
     typeset -gA _svn_cmds
     _svn_cmds=(
-	${=${(f)${${"$(svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
+      ${=${(f)${${"$(_call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
     )
   fi
 
   if (( CURRENT == 1 )); then
-    _tags commands && { compadd "$@" -k _svn_cmds || compadd "$@" ${_svn_cmds} }
+    _tags commands && { compadd "$@" -k _svn_cmds || compadd "$@" ${(s.:.)_svn_cmds} }
   else
     local curcontext="$curcontext"
 
@@ -42,36 +64,56 @@ _svn_command () {
 _svn_subcommand () {
   local subcmd _svn_subcmds _svn_subcmd_usage
 
-  _svn_subcmd_usage=${${(M)${(f)"$(svn help $1)"}:#usage:*}#usage: $1 }
+  _svn_subcmd_usage=${${(M)${(f)"$(_call_program options svn help $1)"}:#usage:*}#usage: $1 }
 
   _svn_subcmds=(
-    ${${=${${${(M)${(f)"$(svn help $1)"##*Valid options:}:#*:*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}[2,-1]}
+    ${${=${${${(M)${(f)"$(_call_program options svn help $1)"##*Valid options:}:#*:*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}[2,-1]}
   )
 
-  [[ "$_svn_subcmd_usage" == *URL* ]] && _svn_subcmds=($_svn_subcmds ":url:_urls")
-  [[ "$_svn_subcmd_usage" == *PATH* ]] && _svn_subcmds=($_svn_subcmds "*:path:_files")
+  case $1 in;
+    add)
+      _svn_subcmds=( $_svn_subcmds
+        '*:file:_files -g "*(^e:_svn_controlled:)"'
+      )
+    ;;
+    log)
+      _svn_subcmds=( $_svn_subcmds
+        '1: : _alternative "files:file:_files -g \*\(e:_svn_controlled:\)" "urls:url:_svn_urls"'
+	'*:file:_files -g "*(e:_svn_controlled:)"'
+      )
+    ;;
+    *)
+      case $_svn_subcmd_usage in
+        *(TARGET|URL*PATH)*)
+          _svn_subcmds=( $_svn_subcmds
+	    '*: : _alternative "files:file:_files" "urls:url:_svn_urls"'
+	  )
+	;;
+        *URL*) _svn_subcmds=( $_svn_subcmds ':url:_svn_urls' ) ;;
+        *PATH*) _svn_subcmds=( $_svn_subcmds '*:file:_files' ) ;;
+      esac
+    ;;
+  esac
 
-    _arguments \
-    	"$_svn_subcmds[@]" && ret=0
+  _arguments "$_svn_subcmds[@]" && ret=0
 
-    return ret
-
+  return ret
 }
 
 
-(( $+functions[_svn_admincommand] )) ||
+(( $+functions[_svnadmin_command] )) ||
 _svnadmin_command () {
   local cmd
 
   if (( ! $+_svnadmin_cmds )); then
     typeset -gA _svnadmin_cmds
     _svnadmin_cmds=(
-	${=${(f)${${"$(svnadmin help)"#l#*Available subcommands:}}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
+      ${=${(f)${${"$(_call_program commands svnadmin help)"#l#*Available subcommands:}}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
     )
   fi
 
   if (( CURRENT == 1 )); then
-    _tags commands && { compadd "$@" -k _svnadmin_cmds || compadd "$@" ${(kv)=_svnadmin_cmds} }
+    _tags commands && { compadd "$@" -k _svnadmin_cmds || compadd "$@" ${(s.:.)_svnadmin_cmds}  }
   else
     local curcontext="$curcontext"
 
@@ -89,28 +131,27 @@ _svnadmin_command () {
 _svnadmin_subcommand () {
   local subcmd _svnadmin_subcmds _svnadmin_subcmd_usage
 
-  _svnadmin_subcmd_usage=${${(M)${(f)"$(svnadmin help $1)"}:#$1: usage:*}#$1: usage: svnadmin $1 }
+  _svnadmin_subcmd_usage=${${(M)${(f)"$(_call_program options svnadmin help $1)"}:#$1: usage:*}#$1: usage: svnadmin $1 }
 
   _svnadmin_subcmds=(
-    ${${=${${${(M)${(f)"$(svnadmin help $1)"##*Valid options:}:#*:*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}[2,-1]}
+    ${${=${${${(M)${(f)"$(_call_program options svnadmin help $1)"##*Valid options:}:#*:*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}[2,-1]}
   )
 
   [[ "$_svnadmin_subcmd_usage" == *REPOS_PATH* ]] &&
   _svnadmin_subcmds=($_svnadmin_subcmds ":path:_files -/")
 
-    _arguments \
-    	"$_svnadmin_subcmds[@]" && ret=0
+  _arguments "$_svnadmin_subcmds[@]" && ret=0
 
-    return ret
+  return ret
 
 }
 
 
 _subversion () {
-    case $service in
-    	(svn) _svn "$@" ;;
-	(svnadmin) _svnadmin "$@" ;;
-    esac
+  case $service in
+    (svn) _svn "$@" ;;
+    (svnadmin) _svnadmin "$@" ;;
+  esac
 }
 
 _subversion "$@"

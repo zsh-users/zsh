@@ -68,4 +68,4 @@ arguments=( \
 [[ -z "$_is_gnu[$words[1]]" ]] &&
     arguments=( ${arguments:#(|*\)(\*|))--*} )
 
-_arguments -s $arguments
+_arguments -S -s $arguments
