@@ -1,3 +1,9 @@
+2000-05-16  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11403(?): Completion/Core/_expand, Src/Zle/compcore.c,
+	Src/Zle/complist.c: fix scrolling in menu-selection with matches
+	spanning multiple lines
+	
 2000-05-16  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: one hunk of 11381: Completion/Builtins/_vars_eq:

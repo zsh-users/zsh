@@ -108,9 +108,17 @@ if [[ -z "$compstate[insert]" ]] ;then
 else
   _tags all-expansions expansions original
 
-  _requested all-expansions expl 'all expansions' &&
-      compadd "$expl[@]" -UQ -qS "$suf" - "$exp"
+  if _requested all-expansions expl 'all expansions'; then
+    local disp dstr
 
+    if [[ $#exp -ge COLUMNS ]]; then
+      disp=( -ld dstr )
+      dstr=( "${(r:COLUMNS-5:)exp} ..." )
+    else
+      disp=()
+    fi
+    compadd "$disp[@]" "$expl[@]" -UQ -qS "$suf" - "$exp"
+  fi
   if [[ $#exp -gt 1 ]] && _requested expansions; then
     local i normal dir
 

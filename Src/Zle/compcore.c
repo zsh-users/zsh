@@ -507,6 +507,7 @@ after_complete(Hookdef dummy, Compldat dat)
 	if ((ret = runhookdef(MENUSTARTHOOK, (void *) &dat))) {
 	    menucmp = menuacc = 0;
 	    if (ret == 2) {
+		fixsuffix();
 		cs = 0;
 		foredel(ll);
 		inststr(origline);

@@ -384,6 +384,7 @@ getcols(Listcols c)
 static int noselect, mselect, inselect, mcol, mline, mcols, mlines, mmlen;
 static int selected, mlbeg = -1, mlend = 9999999, mscroll, mrestlines;
 static int mnew, mlastcols, mlastlines, mhasstat, mfirstl, mlastm;
+static int mlprinted;
 static char *mstatus, *mlistp;
 static Cmatch **mtab, **mmtabp;
 static Cmgroup *mgtab, *mgtabp;
@@ -533,7 +534,7 @@ clprintfmt(Listcols c, char *p, int ml)
 static int
 clnicezputs(Listcols c, char *s, int ml)
 {
-    int cc, i = 0, col = 0, ask;
+    int cc, i = 0, col = 0, ask, oml = ml;
     char *t;
 
     initiscol(c);
@@ -550,18 +551,22 @@ clnicezputs(Listcols c, char *s, int ml)
 	    cc = *s++ ^ 32;
 
 	for (t = nicechar(cc); *t; t++) {
-	    if (ml == mlend - 1 && col == columns - 1)
+	    if (ml == mlend - 1 && col == columns - 1) {
+		mlprinted = ml - oml;
 		return 0;
+	    }
 	    putc(*t, shout);
 	    if (++col == columns) {
 		ml++;
-		if (mscroll && !--mrestlines && (ask = asklistscroll(ml)))
+		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
+		    mlprinted = ml - oml;
 		    return ask;
-
+		}
 		col = 0;
 	    }
 	}
     }
+    mlprinted = ml - oml;
     return 0;
 }
 
@@ -727,8 +732,10 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 
     if ((stat = !fmt)) {
 	if (mlbeg >= 0) {
-	    if (!(fmt = mstatus))
+	    if (!(fmt = mstatus)) {
+		mlprinted = 0;
 		return 0;
+	    }
 	    cc = -1;
 	} else
 	    fmt = mlistp;
@@ -881,7 +888,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    *stop = 1;
 		    if (stat && n)
 			mfirstl = -1;
-		    return l + (cc / columns);
+		    return (mlprinted = l + (cc / columns));
 		}
 	    }
 	}
@@ -892,7 +899,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
     if (stat && n)
 	mfirstl = -1;
 
-    return l + (cc / columns);
+    return (mlprinted = l + (cc / columns));
 }
 
 /* This is like zputs(), but allows scrolling. */
@@ -932,7 +939,7 @@ compzputs(char const *s, int ml)
 static int
 compnicezputs(char *s, int ml)
 {
-    int c, col = 0, ask;
+    int c, col = 0, ask, oml = ml;
     char *t;
 
     while ((c = *s++)) {
@@ -946,18 +953,22 @@ compnicezputs(char *s, int ml)
 	    c = *s++ ^ 32;
 
 	for (t = nicechar(c); *t; t++) {
-	    if (ml == mlend - 1 && col == columns - 1)
+	    if (ml == mlend - 1 && col == columns - 1) {
+		mlprinted = ml - oml;
 		return 0;
+	    }
 	    putc(*t, shout);
 	    if (++col == columns) {
 		ml++;
-		if (mscroll && !--mrestlines && (ask = asklistscroll(ml)))
+		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
+		    mlprinted = ml - oml;
 		    return ask;
-
+		}
 		col = 0;
 	    }
 	}
     }
+    mlprinted = ml - oml;
     return 0;
 }
 
@@ -1024,6 +1035,14 @@ compprintlist(int showall)
 			mfirstl = ml;
 		    l = compprintfmt((*e)->str, (*e)->count, dolist(ml), 1,
 				     ml, &stop);
+		    if (mselect >= 0) {
+			int mm = (mcols * ml), i;
+
+			for (i = mcols; i--; ) {
+			    mtab[mm + i] = NULL;
+			    mgtab[mm + i] = NULL;
+			}
+		    }
 		    if (stop)
 			goto end;
 		    if (!lasttype && ml >= mlbeg) {
@@ -1035,8 +1054,8 @@ compprintlist(int showall)
 			lastp = NULL;
 			lastused = 1;
 		    }
-		    ml += l;
-		    if (dolistcl(ml) && cl >= 0 && (cl -= l) <= 1) {
+		    ml += mlprinted;
+		    if (dolistcl(ml) && cl >= 0 && (cl -= mlprinted) <= 1) {
 			cl = -1;
 			if (tccan(TCCLEAREOD))
 			    tcout(TCCLEAREOD);
@@ -1155,6 +1174,12 @@ compprintlist(int showall)
 			    printed++;
 			if (clprintm(g, p, 0, ml, 1, 0, NULL, NULL))
 			    goto end;
+			ml += mlprinted;
+			if (dolistcl(ml) && (cl -= mlprinted) <= 1) {
+			    cl = -1;
+			    if (tccan(TCCLEAREOD))
+				tcout(TCCLEAREOD);
+			}
 			pnl = 1;
 		    }
 		    if (!mnew && ml > mlend)
@@ -1220,6 +1245,12 @@ compprintlist(int showall)
 
 		    if (dolist(ml))
 			printed++;
+		    ml += mlprinted;
+		    if (dolistcl(ml) && (cl -= mlprinted) < 1) {
+			cl = -1;
+			if (tccan(TCCLEAREOD))
+			    tcout(TCCLEAREOD);
+		    }
 		    if (mfirstl < 0)
 			mfirstl = ml;
 
@@ -1321,6 +1352,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 		putc(' ', shout);
 	    zcoff();
 	}
+	mlprinted = 0;
 	return 0;
     }
     m = *mp;
@@ -1334,8 +1366,10 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 		mgtab[mm + i] = g;
 	    }
 	}
-	if (!dolist(ml))
+	if (!dolist(ml)) {
+	    mlprinted = printfmt(m->disp, 0, 0, 0) / columns;
 	    return 0;
+	}
 	if (m->gnum == mselect) {
 	    int mm = (mcols * ml);
 	    mline = ml;
@@ -1377,8 +1411,10 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 		mgtab[mx + mm + i] = g;
 	    }
 	}
-	if (!dolist(ml))
+	if (!dolist(ml)) {
+	    mlprinted = niceztrlen(m->disp ? m->disp : m->str) / columns;
 	    return 0;
+	}
 	if (m->gnum == mselect) {
 	    int mm = mcols * ml;
 
@@ -1406,6 +1442,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    return 1;
 	}
 	len = niceztrlen(m->disp ? m->disp : m->str);
+	mlprinted = len / columns;
 
 	 if (isset(LISTTYPES) && buf) {
 	    if (m->gnum != mselect) {
@@ -1571,7 +1608,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     Thingy cmd;
     Menustack u = NULL;
     int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
-    int space, lbeg = 0, step = 1, wrap;
+    int space, lbeg = 0, step = 1, wrap, pl = nlnct;
     char *s;
 
     if (fdat || (dummy && (!(s = getsparam("MENUSELECT")) ||
@@ -1620,11 +1657,13 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if (y < mlines)
 		mline = y;
 	}
-	space = lines - nlnct - mhasstat;
+	space = lines - pl - mhasstat;
 	while (mline < mlbeg)
 	    if ((mlbeg -= step) < 0)
 		mlbeg = 0;
-
+#if 0
+	/* Attempt to ensure that the explanations for groups are scrolled
+	 * in. Doesn't work because there are other NULL fields. */
 	if (mlbeg && lbeg != mlbeg) {
 	    Cmatch **p = mtab + ((mlbeg - 1) * columns), **q;
 	    int c;
@@ -1639,10 +1678,24 @@ domenuselect(Hookdef dummy, Chdata dat)
 		mlbeg--;
 	    }
 	}
+#endif
 	while (mline >= mlbeg + space)
 	    if ((mlbeg += step) + space > mlines)
 		mlbeg = mlines - space;
+	if (lbeg != mlbeg) {
+	    Cmatch **p = mtab + (mlbeg * columns), **q;
+	    int c;
 
+	    while (mlbeg < mlines) {
+		for (q = p, c = columns; c; q++, c--)
+		    if (*q)
+			break;
+		if (c)
+		    break;
+		p += columns;
+		mlbeg++;
+	    }
+	}
 	lbeg = mlbeg;
 	onlyexpl = 0;
 	showinglist = -2;
@@ -1877,7 +1930,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   cmd == Th(z_viforwardword) ||
 		   cmd == Th(z_viforwardwordend) ||
 		   cmd == Th(z_forwardword)) {
-	    int i = lines - nlnct - 1, oi = i, ll = 0;
+	    int i = lines - pl - 1, oi = i, ll = 0;
 	    Cmatch **lp = NULL;
 
 	    if (mline == mlines - 1)
@@ -1904,7 +1957,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	} else if (cmd == Th(z_emacsbackwardword) ||
 		   cmd == Th(z_vibackwardword) ||
 		   cmd == Th(z_backwardword)) {
-	    int i = lines - nlnct - 1, oi = i, ll = 0;
+	    int i = lines - pl - 1, oi = i, ll = 0;
 	    Cmatch **lp = NULL;
 
 	    if (!mline)
