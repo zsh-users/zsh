@@ -892,7 +892,8 @@ getpmmodule(HashTable ht, char *name)
 	    m = (Module) getdata(node);
 	    if (m->u.handle && !(m->flags & MOD_UNLOAD) &&
 		!strcmp(name, m->nam)) {
-		type = "loaded";
+		type = ((m->flags & MOD_ALIAS) ?
+			dyncat("alias:", m->u.alias) : "loaded");
 		break;
 	    }
 	}
@@ -935,6 +936,7 @@ scanpmmodules(HashTable ht, ScanFunc func, int flags)
     LinkNode node;
     Module m;
     Conddef p;
+    char *loaded = dupstring("loaded");
 
     pm.flags = PM_SCALAR | PM_READONLY;
     pm.sets.cfn = NULL;
@@ -946,12 +948,12 @@ scanpmmodules(HashTable ht, ScanFunc func, int flags)
     pm.old = NULL;
     pm.level = 0;
 
-    pm.u.str = dupstring("builtin");
-    pm.u.str = dupstring("loaded");
     for (node = firstnode(modules); node; incnode(node)) {
 	m = (Module) getdata(node);
 	if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
 	    pm.nam = m->nam;
+	    pm.u.str = ((m->flags & MOD_ALIAS) ?
+			dyncat("alias:", m->u.alias) : loaded);
 	    addlinknode(done, pm.nam);
 	    func((HashNode) &pm, flags);
 	}

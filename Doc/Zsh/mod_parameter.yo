@@ -91,9 +91,10 @@ Setting or unsetting keys in this array is not possible.
 vindex(modules)
 item(tt(modules))(
 An associative array giving information about modules. The keys are the names
-of the modules builtin, loaded, or registered to be autoloaded. The
+of the modules loaded, registered to be autoloaded, or aliased. The
 value says which state the named module is in and is one of the
-strings tt(builtin), tt(loaded), or tt(autoloaded).
+strings `tt(loaded)', `tt(autoloaded)', or `tt(alias:)var(name)',
+where var(name) is the name the module is aliased to.
 
 Setting or unsetting keys in this array is not possible.
 )

@@ -1,5 +1,8 @@
 2000-08-16  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12654: Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c: make
+ 	$modules report aliases correctly
+	
 	* unposted: Completion/Builtins/_pids: remove unnecessary local parameter
 
 2000-08-15  Peter Stephenson  <pws@csr.com>
