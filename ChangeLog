@@ -1,3 +1,8 @@
+2004-01-11  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/X/Command/_gnome-gv: move gnome-gv
+	completion from C/U/C to C/X/C.
+
 2005-01-11  Peter Stephenson  <pws@csr.com>
 
 	* 20688: Etc/FAQ.yo: add notes on Unicode/UTF-8 adapted from
