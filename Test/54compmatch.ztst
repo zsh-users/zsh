@@ -481,5 +481,21 @@
 >line: {tst }{.:}
 >COMPADD:{}
 
+ workers_11586_matcher='r:|.=** r:[^0-9]||[0-9]=**'
+ workers_11586_list=(c00.abc c01.abc.def.00.0)
+ test_code $workers_11586_matcher workers_11586_list
+ comptest $'tst c00\t.\ta\t'
+0:Bug from workers 11586
+>line: {tst c00}{}
+>COMPADD:{}
+>NO:{c00.abc}
+>NO:{c01.abc.def.00.0}
+>line: {tst c00.}{}
+>COMPADD:{}
+>NO:{c00.abc}
+>NO:{c01.abc.def.00.0}
+>line: {tst c00.abc }{}
+>COMPADD:{}
+
 %clean
 exit 0
