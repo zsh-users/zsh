@@ -1,3 +1,8 @@
+2003-12-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 19299: Completion/Unix/Command/_mount: try to handle
+	completion of devices better
+
 2003-12-15  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/zle.yo: add an extra comment to
