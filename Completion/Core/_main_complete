@@ -23,7 +23,7 @@ exec </dev/null	# ZLE closes stdin, which can cause errors
 # Failed returns from this code are not real errors
 setopt localtraps noerrexit ; trap - ZERR
 
-local func funcs ret=1 tmp _compskip format nm call match min i num\
+local func funcs ret=1 tmp _compskip format nm call match min max i num\
       _completers _completer _completer_num curtag _comp_force_list \
       _matchers _matcher _matcher_num _comp_tags _comp_mesg \
       context state line opt_args val_args curcontext="$curcontext" \
@@ -181,7 +181,7 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
       sel=( "${(@M)_menu_style:#(yes|true|1|on)*}" )
 
       if (( $#sel )); then
-	min=0
+	min=9999999
         for i in "$sel[@]"; do
           if [[ "$i" = *\=* ]]; then
   	    num="${i#*\=}"
@@ -189,38 +189,36 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
   	  else
   	    num=$nm
   	  fi
-  	  [[ num -gt min ]] && min="$num"
+  	  [[ num -lt min ]] && min="$num"
   
-	  [[ min -ge nm ]] && break
+	  (( min )) || break
         done
       fi
-      if [[ ( -n "$min" && nm -le min ) ||
+      sel=( "${(@M)_menu_style:#(no|false|0|off)*}" )
+
+      if (( $#sel )); then
+	max=9999999
+        for i in "$sel[@]"; do
+          if [[ "$i" = *\=* ]]; then
+  	    num="${i#*\=}"
+  	    [[ num -lt 0 ]] && num=0
+  	  else
+  	    num=0
+  	  fi
+  	  [[ num -lt max ]] && max="$num"
+  
+	  (( max )) || break
+        done
+      fi
+      if [[ ( -n "$min" && nm -ge min && ( -z "$max" || nm -lt max ) ) ||
             ( -n "$_menu_style[(r)auto*]" &&
               "$compstate[insert]" = automenu ) ]]; then
         compstate[insert]=menu
+      elif [[ -n "$max" && nm -ge max ]]; then
+        compstate[insert]=unambiguous
       elif [[ -n "$_menu_style[(r)auto*]" &&
               "$compstate[insert]" != automenu ]]; then
         compstate[insert]=automenu-unambiguous
-      else
-        sel=( "${(@M)_menu_style:#(no|false|0|off)*}" )
-
-        if (( $#sel )); then
-	  min=9999999
-          for i in "$sel[@]"; do
-            if [[ "$i" = *\=* ]]; then
-  	      num="${i#*\=}"
-  	      [[ num -lt 0 ]] && num=0
-  	    else
-  	      num=0
-  	    fi
-  	    [[ num -lt min ]] && min="$num"
-  
-	    (( min )) || break
-          done
-        else
-          min=
-        fi
-        [[ -n "$min" && nm -ge min ]] && compstate[insert]=unambiguous
       fi
     fi
   fi

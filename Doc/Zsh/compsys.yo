@@ -1595,7 +1595,7 @@ example, with the tt(MENU_COMPLETE) option).
 
 Using the form `tt(yes=)var(num)', where `tt(yes)' may be any of the
 true values (`tt(yes)', `tt(true)', `tt(on)' and `tt(1)') turns on
-menu completion if there at most var(num) matches.  Using this for one
+menu completion if there at least var(num) matches.  Using this for one
 of the `false' values (as in `tt(no=10)') makes menu completion
 em(not) be used if there are var(num) or more matches.  Of course,
 this is only useful when menu completion is normally used, e.g. by
