@@ -25,14 +25,12 @@
 # error message.
 
 predict-on() {
-    setopt localoptions unset noksharrays
     zle -N self-insert insert-and-predict
     zle -N magic-space insert-and-predict
     zle -N backward-delete-char delete-backward-and-predict
     zle -N delete-char-or-list delete-no-predict
 }
 predict-off() {
-    setopt localoptions unset noksharrays
     zle -A .self-insert self-insert
     zle -A .magic-space magic-space
     zle -A .backward-delete-char backward-delete-char
@@ -53,6 +51,8 @@ insert-and-predict () {
 	if [[ ${KEYS[-1]} != ' ' ]]
 	then
 	  integer curs=$CURSOR
+	  local -a +h comppostfuncs
+	  comppostfuncs=( predict-limit-list )
 	  zle complete-word
 	  CURSOR=$curs
 	fi
@@ -79,8 +79,20 @@ delete-backward-and-predict() {
   fi
 }
 delete-no-predict() {
-  predict-off
+  [[ $WIDGET != delete-char-or-list || -n $RBUFFER ]] && predict-off
   zle .$WIDGET "$@"
 }
+
+# This is a helper function for autocompletion to prevent long lists
+# of matches from forcing a "do you wish to see all ...?" prompt.
+
+predict-limit-list() {
+  if [[ compstate[list_lines]+BUFFERLINES -gt LINES ]]; then
+    compstate[list]=''
+    compstate[force_list]=yes
+  fi
+}
+
+# Handle zsh autoloading conventions
 
 [[ -o kshautoload ]] || predict-on "$@"
