@@ -1559,9 +1559,6 @@ struct heap {
     size_t size;		/* size of heap                              */
     size_t used;		/* bytes used from the heap                  */
     struct heapstack *sp;	/* used by pushheap() to save the value used */
-#ifdef PAD_64_BIT
-    size_t dummy;		/* Make sure sizeof(heap) is a multiple of 8 */
-#endif
 #define arena(X)	((char *) (X) + sizeof(struct heap))
 };
 
