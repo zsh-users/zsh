@@ -1308,18 +1308,23 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	return 1;
     }
     /* default values of first and last, and range checking */
+    if (last == -1) {
+	if (ops['l'] && first < curhist) {
+	    last = addhistnum(curline.histnum,-1,0);
+	    if (last < firsthist())
+		last = firsthist();
+	}
+	else
+	    last = first;
+    }
     if (first == -1) {
 	first = ops['l']? addhistnum(curline.histnum,-16,0)
-	    : addhistnum(curline.histnum,-1,0);
+			: addhistnum(curline.histnum,-1,0);
+	if (first < 1)
+	    first = 1;
+	if (last < first)
+	    last = first;
     }
-    if (last == -1)
-	last = ops['l']? addhistnum(curline.histnum,-1,0) : first;
-    if (first < firsthist())
-	first = firsthist() - (last < firsthist());
-    if (last > curhist)
-	last = curhist;
-    else if (last < first)
-	last = first;
     if (ops['l']) {
 	/* list the required part of the history */
 	retval = fclist(stdout, !ops['n'], ops['r'], ops['D'],
