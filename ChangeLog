@@ -1,3 +1,9 @@
+2001-12-09  Clint Adams  <clint@zsh.org>
+
+        * 16315: Completion/Unix/Command/.distfiles,
+        Completion/Unix/Command/_spamassassin: completion for
+        spamassassin.
+
 2001-11-29  Clint Adams  <clint@zsh.org>
 
         * 16293: Completion/Unix/Command/.distfiles,
