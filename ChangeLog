@@ -1,3 +1,9 @@
+2005-02-28  Peter Stephenson  <pws@csr.com>
+
+	* 20888: Doc/Zsh/builtins.yo, Src/jobs.c: allow the prefix
+	SIG in signal names used with the trap and kill builtins, for
+	compatibility.
+
 2005-02-26  Andrey Borzenkov  <bor@zsh.org>
 
 	* 20872: Src/Zle/zle_utils.c, Src/Zle/zle_vi.c, Src/Zle/zle_word.c:

@@ -1157,8 +1157,9 @@ cindex(trapping signals)
 item(tt(trap) [ var(arg) [ var(sig) ... ] ])(
 var(arg) is a series of commands (usually quoted to protect it from
 immediate evaluation by the shell) to be read and executed when the shell
-receives var(sig).  Each var(sig) can be given as a number
-or as the name of a signal.
+receives var(sig).  Each var(sig) can be given as a number,
+or as the name of a signal either with or without the string tt(SIG)
+in front.
 If var(arg) is `tt(-)', then all traps var(sig) are reset to their
 default values.  If var(arg) is the empty string, then this signal
 is ignored by the shell and by the commands it invokes.

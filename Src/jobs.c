@@ -1874,6 +1874,8 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    while (*++argv) {
 			sig = zstrtol(*argv, &signame, 10);
 			if (signame == *argv) {
+			    if (!strncmp(signame, "SIG", 3))
+				signame += 3;
 			    for (sig = 1; sig <= SIGCOUNT; sig++)
 				if (!cstrpcmp(sigs + sig, &signame))
 				    break;
@@ -1942,7 +1944,8 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		} else
 		    signame = *argv;
 		makeuppercase(&signame);
-		if (!strncmp(signame, "SIG", 3)) signame+=3;
+		if (!strncmp(signame, "SIG", 3))
+		    signame+=3;
 
 		/* check for signal matching specified name */
 		for (sig = 1; sig <= SIGCOUNT; sig++)
@@ -2032,6 +2035,9 @@ getsignum(char *s)
 	return x;
 
     /* search for signal by name */
+    if (!strncmp(s, "SIG", 3))
+	s += 3;
+
     for (i = 0; i < VSIGCOUNT; i++)
 	if (!strcmp(s, sigs[i]))
 	    return i;
