@@ -400,7 +400,10 @@ getkey(int keytmout)
 #endif
 	}
 	for (;;) {
+	    int q = queue_signal_level();
+	    dont_queue_signals();
 	    r = read(SHTTY, &cc, 1);
+	    restore_queue_signals(q);
 	    if (r == 1)
 		break;
 	    if (r == 0) {

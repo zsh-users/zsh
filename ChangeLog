@@ -1,3 +1,10 @@
+2001-05-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14375: Src/Zle/zle_main.c: Permit signals to be handled during
+	read from the terminal in zleread().  (This changes only nested
+	calls from widgets such as incremental search; signals were never
+	queued for top-level reads.)
+
 2001-05-16  Clint Adams  <clint@zsh.org>
 
 	* 14361, 14362: Completion/Unix/Command/_modutils: use
