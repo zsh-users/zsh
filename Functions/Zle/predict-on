@@ -1,0 +1,64 @@
+# This set of functions implements a sort of magic history searching.
+# After predict-on, typing characters causes the editor to look backward
+# in the history for the first line beginning with what you have typed
+# so far.  After predict-off, editing returns to normal for the line found.
+# In fact, you often don't even need to use predict-off, because if the
+# line doesn't match something in the history, adding a key at the end
+# behaves as normal --- though editing in the middle is liable to delete
+# the rest of the line.
+#
+# To use it:
+#   autoload -U predict-on
+#   zle -N predict-on
+#   zle -N predict-off
+#   bindkey '...' predict-on
+#   bindkey '...' predict-off
+# Note that all the functions are defined when you first call type the
+# predict-on key, which means typing the predict-off key before that gives
+# a harmless error message.
+
+predict-on() {
+    zle -N self-insert insert-and-predict
+    zle -N magic-space insert-and-predict
+    zle -N backward-delete-char delete-backward-and-predict
+}
+predict-off() {
+    zle -A .self-insert self-insert
+    zle -A .magic-space magic-space
+    zle -A .backward-delete-char backward-delete-char
+}
+insert-and-predict () {
+  emulate -L zsh
+  if [[ ${RBUFFER[1]} = ${KEYS[-1]} ]]
+  then
+    # same as what's typed, just move on
+    ((++CURSOR))
+  else
+    LBUFFER="$LBUFFER$KEYS"
+    if [[ $LASTWIDGET == (self-insert|magic-space|backward-delete-char) ]]
+    then
+      zle .history-beginning-search-backward || RBUFFER=""
+    fi
+  fi
+  return 0
+}
+delete-backward-and-predict() {
+  emulate -L zsh
+  if [[ -n "$LBUFFER" ]]
+  then
+    # If the last widget was e.g. a motion, then probably the intent is
+    # to actually edit the line, not change the search prefix.
+    if [[ $LASTWIDGET == (self-insert|magic-space|backward-delete-char) ]]
+    then
+      ((--CURSOR))
+      zle .history-beginning-search-forward || RBUFFER=""
+      return 0
+    else
+      # Depending on preference, you might call "predict-off" here,
+      # and also set up forward deletions to turn off prediction.
+      LBUFFER="$LBUFFER[1,-2]"
+    fi
+  fi
+}
+
+[[ -o kshautoload ]] || predict-on "$@"

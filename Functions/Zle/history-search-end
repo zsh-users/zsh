@@ -1,0 +1,28 @@
+# function history-search-end {
+#
+# This implements functions like history-beginning-search-{back,for}ward,
+# but takes the cursor to the end of the line after moving in the
+# history, like history-search-{back,for}ward.  To use them:
+#   zle -N history-beginning-search-backward-end history-search-end
+#   zle -N history-beginning-search-forward-end history-search-end
+#   bindkey '...' history-beginning-search-backward-end
+#   bindkey '...' history-beginning-search-forward-end
+
+integer ocursor=$CURSOR
+
+if [[ $LASTWIDGET = history-beginning-search-*-end ]]; then
+  # Last widget called set $hbs_pos.
+  CURSOR=$hbs_pos
+else
+  hbs_pos=$CURSOR
+fi
+
+if zle .${WIDGET%-end}; then
+  # success, go to end of line
+  zle .end-of-line
+else
+  # failure, restore position
+  CURSOR=$ocursor
+  return 1
+fi
+# }
