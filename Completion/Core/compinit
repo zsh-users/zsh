@@ -389,7 +389,7 @@ funcall() {
 
   shift
 
-  if builtin functions "$1" >& /dev/null; then
+  if (( $+functions[$1] )); then
     "$@"
     _ret="$?"
     [[ -n "$_name" ]] && eval "${_name}=${_ret}"

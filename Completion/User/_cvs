@@ -19,7 +19,7 @@ _cvs () {
 
 # define cvs command dispatch function.
 
-builtin functions _cvs_command >&- ||
+(( $+functions[_cvs_command] )) ||
 _cvs_command () {
   typeset -A cmds
   cmds=(add " ad new "          admin " adm rcs "       annotate " ann "
@@ -45,7 +45,7 @@ _cvs_ () {
 
 # define completion functions for each cvs command
 
-builtin functions _cvs_add >&- ||
+(( $+functions[_cvs_add] )) ||
 _cvs_add () {
   # "+k:m:"
   _arguments -s \
@@ -54,7 +54,7 @@ _cvs_add () {
     '*:file:_cvs_files_unmaintained' \
 }
 
-builtin functions _cvs_admin >&- ||
+(( $+functions[_cvs_admin] )) ||
 _cvs_admin () {
   # "+ib::c:a:A:e:l::u::LUn:N:m:o:s:t::IqxV:k:"
   _arguments -s \
@@ -77,7 +77,7 @@ _cvs_admin () {
     '*:file:_cvs_files'
 }
 
-builtin functions _cvs_admin_t >&- ||
+(( $+functions[_cvs_admin_t] )) ||
 _cvs_admin_t () {
   if compset -P -; then
     _message 'descriptive text'
@@ -86,7 +86,7 @@ _cvs_admin_t () {
   fi
 }
 
-builtin functions _cvs_annotate >&- ||
+(( $+functions[_cvs_annotate] )) ||
 _cvs_annotate () {
   # "+lr:D:fR"
   _arguments -s \
@@ -96,7 +96,7 @@ _cvs_annotate () {
     '*:file:_cvs_files'
 }
 
-builtin functions _cvs_checkout >&- ||
+(( $+functions[_cvs_checkout] )) ||
 _cvs_checkout () {
   # "+ANnk:d:flRpQqcsr:D:j:P"
   _arguments -s \
@@ -109,7 +109,7 @@ _cvs_checkout () {
     '*:module:_cvs_modules'
 }
 
-builtin functions _cvs_commit >&- ||
+(( $+functions[_cvs_commit] )) ||
 _cvs_commit () {
   # "+nlRm:fF:r:"
   _arguments -s \
@@ -120,7 +120,7 @@ _cvs_commit () {
     '*:file:_cvs_files_modified'
 }
 
-builtin functions _cvs_diff >&- ||
+(( $+functions[_cvs_diff] )) ||
 _cvs_diff () {
   # "+abcdefhilnpstuw0123456789BHNRC:D:F:I:L:U:V:W:k:r:"
   _arguments -s \
@@ -169,12 +169,12 @@ _cvs_diff () {
     '*:file:_cvs_diff_arg'
 }
 
-builtin functions _cvs_diff_arg >&- ||
+(( $+functions[_cvs_diff_arg] )) ||
 _cvs_diff_arg () {
   _cvs_files_modified || _cvs_files
 }
 
-builtin functions _cvs_edit >&- ||
+(( $+functions[_cvs_edit] )) ||
 _cvs_edit () {
   # "+lRa:"
   _arguments -s \
@@ -183,7 +183,7 @@ _cvs_edit () {
     '*:file:_cvs_files'
 }
 
-builtin functions _cvs_editors >&- ||
+(( $+functions[_cvs_editors] )) ||
 _cvs_editors () {
   # "+lR"
   _arguments -s \
@@ -191,7 +191,7 @@ _cvs_editors () {
     '*:file:_cvs_files'
 }
 
-builtin functions _cvs_export >&- ||
+(( $+functions[_cvs_export] )) ||
 _cvs_export () {
   # "+Nnk:d:flRQqr:D:"
   _arguments -s \
@@ -203,7 +203,7 @@ _cvs_export () {
     '*:module:_cvs_modules'
 }
 
-builtin functions _cvs_history >&- ||
+(( $+functions[_cvs_history] )) ||
 _cvs_history () {
   # "+Tacelow?D:b:f:m:n:p:r:t:u:x:X:z:"
   _arguments -s \
@@ -223,7 +223,7 @@ _cvs_history () {
     '*:file:_cvs_files'
 }
 
-builtin functions _cvs_history_x >&- ||
+(( $+functions[_cvs_history_x] )) ||
 _cvs_history_x () {
   _values -s '' 'type' \
     'F[release]' \
@@ -239,7 +239,7 @@ _cvs_history_x () {
     'R[A file was removed]'
 }
 
-builtin functions _cvs_import >&- ||
+(( $+functions[_cvs_import] )) ||
 _cvs_import () {
   # "+Qqdb:m:I:k:W:"
   _arguments -s \
@@ -254,22 +254,34 @@ _cvs_import () {
     ':release tag:'
 }
 
-builtin functions _cvs_init >&- ||
+(( $+functions[_cvs_init] )) ||
 _cvs_init () {
   false
 }
 
-builtin functions _cvs_login >&- ||
+(( $+functions[_cvs_log] )) ||
+_cvs_log () {
+  # "+bd:hlNRr::s:tw::"
+  _arguments -s \
+    -{b,h,l,N,R,t} \
+    '-d+:dates:' \
+    '-r-:revisions:' \
+    '-s+:states:' \
+    '-w-:logins:' \
+    '*:file:_cvs_files'
+}
+
+(( $+functions[_cvs_login] )) ||
 _cvs_login () {
   false
 }
 
-builtin functions _cvs_logout >&- ||
+(( $+functions[_cvs_logout] )) ||
 _cvs_logout () {
   false
 }
 
-builtin functions _cvs_rdiff >&- ||
+(( $+functions[_cvs_rdiff] )) ||
 _cvs_rdiff () {
   # "+V:k:cuftsQqlRD:r:"
   _arguments -s \
@@ -281,7 +293,7 @@ _cvs_rdiff () {
     '*:module:_cvs_modules'
 }
 
-builtin functions _cvs_release >&- ||
+(( $+functions[_cvs_release] )) ||
 _cvs_release () {
   # "+Qdq"
   _arguments -s \
@@ -289,7 +301,7 @@ _cvs_release () {
     '*:directory:_files -/'
 }
 
-builtin functions _cvs_remove >&- ||
+(( $+functions[_cvs_remove] )) ||
 _cvs_remove () {
   # "+flR"
   _arguments -s \
@@ -297,7 +309,7 @@ _cvs_remove () {
     '*:file:_cvs_files_removed'
 }
 
-builtin functions _cvs_status >&- ||
+(( $+functions[_cvs_status] )) ||
 _cvs_status () {
   # "+vlR"
   _arguments -s \
@@ -305,7 +317,7 @@ _cvs_status () {
     '*:file:_cvs_files'
 }
 
-builtin functions _cvs_tag >&- ||
+(( $+functions[_cvs_tag] )) ||
 _cvs_tag () {
   # "+FQqlRcdr:D:bf"
   _arguments -s \
@@ -315,7 +327,7 @@ _cvs_tag () {
     '*:file:_cvs_files'
 }
 
-builtin functions _cvs_unedit >&- ||
+(( $+functions[_cvs_unedit] )) ||
 _cvs_unedit () {
   # "+lR"
   _arguments -s \
@@ -323,7 +335,7 @@ _cvs_unedit () {
     '*:file:_cvs_files'
 }
 
-builtin functions _cvs_update >&- ||
+(( $+functions[_cvs_update] )) ||
 _cvs_update () {
   # "+ApPflRQqduk:r:D:j:I:W:"
   _arguments -s \
@@ -337,7 +349,7 @@ _cvs_update () {
     '*:file:_cvs_files'
 }
 
-builtin functions _cvs_watch >&- ||
+(( $+functions[_cvs_watch] )) ||
 _cvs_watch () {
   if (( CURRENT == 2 )); then
     compadd on off add remove
@@ -360,7 +372,7 @@ _cvs_watch () {
   fi
 }
 
-builtin functions _cvs_watchers >&- ||
+(( $+functions[_cvs_watchers] )) ||
 _cvs_watchers () {
   # "+lR"
   _arguments -s \
@@ -368,17 +380,17 @@ _cvs_watchers () {
     ':*:file:_cvs_files'
 }
 
-builtin functions _cvs_root >&- ||
+(( $+functions[_cvs_root] )) ||
 _cvs_root () {
   compadd "$@" $_cvs_roots || _files "$@" -/
 }
 
-builtin functions _cvs_tempdir >&- ||
+(( $+functions[_cvs_tempdir] )) ||
 _cvs_tempdir () {
   compadd "$@" $TMPPREFIX:h $TMPDIR /tmp
 }
 
-builtin functions _cvs_user_variable >&- ||
+(( $+functions[_cvs_user_variable] )) ||
 _cvs_user_variable () {
   if compset -P '*='; then
     _default
@@ -389,39 +401,39 @@ _cvs_user_variable () {
 
 # define completion functions for cvs global options.
 
-builtin functions _cvs_bindir >&- ||
+(( $+functions[_cvs_bindir] )) ||
 _cvs_bindir () {
   compadd "$@" /usr/local/bin || _files "$@" -/
 }
 
-builtin functions _cvs_editor >&- ||
+(( $+functions[_cvs_editor] )) ||
 _cvs_editor () {
   compadd "$@" vi
 }
 
-builtin functions _cvs_gzip_level >&- ||
+(( $+functions[_cvs_gzip_level] )) ||
 _cvs_gzip_level () {
   compadd "$@" 9
 }
 
 # define completion functions for cvs common options and arguments.
 
-builtin functions _cvs_D >&- ||
+(( $+functions[_cvs_D] )) ||
 _cvs_D () {
   compadd "$@" today yesterday week\ ago month\ ago
 }
 
-builtin functions _cvs_k >&- ||
+(( $+functions[_cvs_k] )) ||
 _cvs_k () {
   compadd "$@" kv kvl k o b v
 }
 
-builtin functions _cvs_m >&- ||
+(( $+functions[_cvs_m] )) ||
 _cvs_m () {
   _message "log message"
 }
 
-builtin functions _cvs_modules >&- ||
+(( $+functions[_cvs_modules] )) ||
 _cvs_modules () {
   local root=$CVSROOT
   [[ -f CVS/Root ]] && root=$(<CVS/Root)
@@ -435,14 +447,14 @@ _cvs_modules () {
   fi
 }
 
-builtin functions _cvs_revisions >&- ||
+(( $+functions[_cvs_revisions] )) ||
 _cvs_revisions () {
   compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##}%%[ 	]*}
 }
 
 # define completion functions for files maintained by cvs.
 
-builtin functions _cvs_setup_prefix >&- ||
+(( $+functions[_cvs_setup_prefix] )) ||
 _cvs_setup_prefix () {
   if [[ -prefix */ ]]; then
     qpref="${PREFIX%/*}/"
@@ -453,17 +465,17 @@ _cvs_setup_prefix () {
   fi
 }
 
-builtin functions _cvs_extract_directory_entries >&- ||
+(( $+functions[_cvs_extract_directory_entries] )) ||
 _cvs_extract_directory_entries () {
   entries=($entries ${${${(M)rawentries:#D/*}#D/}%%/*})
 }
 
-builtin functions _cvs_extract_file_entries >&- ||
+(( $+functions[_cvs_extract_file_entries] )) ||
 _cvs_extract_file_entries () {
   entries=($entries ${${${(M)rawentries:#/*}#/}%%/*})
 }
 
-builtin functions _cvs_extract_modifiedfile_entries >&- ||
+(( $+functions[_cvs_extract_modifiedfile_entries] )) ||
 _cvs_extract_modifiedfile_entries () {
   if [[ -n "$compconfig[cvs_disable_stat]" ]] ||
     ! { zmodload -e stat || zmodload stat }; then
@@ -478,7 +490,7 @@ _cvs_extract_modifiedfile_entries () {
   entries=($entries ${ents%%/*})
 }
 
-builtin functions _cvs_setup_allentries >&- ||
+(( $+functions[_cvs_setup_allentries] )) ||
 _cvs_setup_allentries () {
   entries=()
   if [[ -f ${pref}CVS/Entries ]]; then
@@ -489,7 +501,7 @@ _cvs_setup_allentries () {
   fi
 }
 
-builtin functions _cvs_setup_direntries >&- ||
+(( $+functions[_cvs_setup_direntries] )) ||
 _cvs_setup_direntries () {
   entries=()
   if [[ -f ${pref}CVS/Entries ]]; then
@@ -499,7 +511,7 @@ _cvs_setup_direntries () {
   fi
 }
 
-builtin functions _cvs_setup_modentries >&- ||
+(( $+functions[_cvs_setup_modentries] )) ||
 _cvs_setup_modentries () {
   entries=()
   if [[ -f ${pref}CVS/Entries ]]; then
@@ -510,7 +522,7 @@ _cvs_setup_modentries () {
   fi
 }
 
-builtin functions _cvs_directories >&- ||
+(( $+functions[_cvs_directories] )) ||
 _cvs_directories () {
   if [[ -d ${pref}CVS ]]; then
     _cvs_setup_direntries
@@ -520,7 +532,7 @@ _cvs_directories () {
   fi
 }
 
-builtin functions _cvs_files >&- ||
+(( $+functions[_cvs_files] )) ||
 _cvs_files () {
   local qpref pref entries
   _cvs_setup_prefix
@@ -532,7 +544,7 @@ _cvs_files () {
   fi
 }
 
-builtin functions _cvs_files_modified >&- ||
+(( $+functions[_cvs_files_modified] )) ||
 _cvs_files_modified () {
   local qpref pref entries
   _cvs_setup_prefix
@@ -544,7 +556,7 @@ _cvs_files_modified () {
   fi
 }
 
-builtin functions _cvs_files_removed >&- ||
+(( $+functions[_cvs_files_removed] )) ||
 _cvs_files_removed () {
   local qpref pref entries
   _cvs_setup_prefix
@@ -561,7 +573,7 @@ _cvs_files_removed () {
   fi
 }
 
-builtin functions _cvs_files_unmaintained >&- ||
+(( $+functions[_cvs_files_unmaintained] )) ||
 _cvs_files_unmaintained () {
   local qpref pref entries
   _cvs_setup_prefix

@@ -88,8 +88,8 @@ if (( ${(P)+${var}} )); then
   fi
   tmp=( ${tmp%%$sep*} )
 
-  compadd "$@" - $tmp || { builtin functions _$key >&- && _$key "$@" }
+  compadd "$@" - $tmp || { (( $+functions[_$key] )) && "_$key" "$@" }
 else
-  builtin functions _$key >&- && _$key "$@"
+  (( $+functions[_$key] )) && "_$key" "$@"
 fi
 
