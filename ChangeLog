@@ -1,3 +1,9 @@
+2001-12-14  Clint Adams  <clint@zsh.org>
+
+        * 16335: Completion/Debian/Command/_apt:
+        add -g, --all-names, --recurse, pkgnames, dotty, policy
+        completions for apt-cache.
+
 2001-12-11  Clint Adams  <clint@zsh.org>
 
 	* 16326: Completion/Debian/Command/_dpkg: glob for udebs
