@@ -1,5 +1,8 @@
 2000-12-27  Clint Adams  <schizo@debian.org>
 
+	* 13315: Completion/User/_killall: strip parentheses and
+	path heads.
+
 	* 13314: Completion/User/_killall: ignore commands that begin
 	with hyphens (login shells).
 
