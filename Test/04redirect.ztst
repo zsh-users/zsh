@@ -64,6 +64,7 @@
 >hello
 >goodbye
 
+  exec 3<&-
   read foo <&-
 1:'<&-' redirection
 
