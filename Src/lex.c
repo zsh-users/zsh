@@ -1556,7 +1556,7 @@ exalias(void)
 
 	if (tok == STRING) {
 	    /* Check for an alias */
-	    an = noaliases ? NULL :
+	    an = (noaliases || unset(ALIASESOPT)) ? NULL :
 		(Alias) aliastab->getnode(aliastab, yytext);
 	    if (an && !an->inuse && ((an->flags & ALIAS_GLOBAL) || incmdpos ||
 				     inalmore)) {

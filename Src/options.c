@@ -69,6 +69,7 @@ mod_export HashTable optiontab;
  * to avoid formatting problems.
  */
 static struct optname optns[] = {
+{NULL, "aliases",	      OPT_EMULATE|OPT_ALL,	 ALIASESOPT},
 {NULL, "allexport",	      OPT_EMULATE,		 ALLEXPORT},
 {NULL, "alwayslastprompt",    OPT_ALL,			 ALWAYSLASTPROMPT},
 {NULL, "alwaystoend",	      0,			 ALWAYSTOEND},

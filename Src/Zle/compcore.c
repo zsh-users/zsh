@@ -1237,7 +1237,7 @@ set_comp_sep(void)
     LinkNode n;
     int owe = we, owb = wb, ocs = cs, swb, swe, scs, soffs, ne = noerrs;
     int tl, got = 0, i = 0, cur = -1, oll = ll, sl, remq;
-    int ois = instring, oib = inbackt, noffs = lp;
+    int ois = instring, oib = inbackt, noffs = lp, ona = noaliases;
     char *tmp, *p, *ns, *ol = (char *) line, sav, *qp, *qs, *ts, qc = '\0';
 
     s += lip;
@@ -1299,7 +1299,7 @@ set_comp_sep(void)
 	}
 	i++;
     } while (tok != ENDINPUT && tok != LEXERR);
-    noaliases = 0;
+    noaliases = ona;
     strinend();
     inpop();
     errflag = zleparse = 0;

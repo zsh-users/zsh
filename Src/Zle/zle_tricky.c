@@ -964,6 +964,7 @@ static char *
 get_comp_string(void)
 {
     int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
+    int ona = noaliases;
     char *s = NULL, *linptr, *tmp, *p, *tt = NULL;
 
     freebrinfo(brbeg);
@@ -1236,12 +1237,12 @@ get_comp_string(void)
 	    addedx = 0;
 	    goto start;
 	}
-	noaliases = 0;
+	noaliases = ona;
 	lexrestore();
 	return NULL;
     }
 
-    noaliases = 0;
+    noaliases = ona;
 
     /* Check if we are in an array subscript.  We simply assume that  *
      * we are in a subscript if we are in brackets.  Correct solution *
@@ -2138,7 +2139,7 @@ int
 doexpandhist(void)
 {
     unsigned char *ol;
-    int oll, ocs, ne = noerrs, err;
+    int oll, ocs, ne = noerrs, err, ona = noaliases;
 
     pushheap();
     metafy_line();
@@ -2165,7 +2166,7 @@ doexpandhist(void)
      * means that the expanded string is unusable.                       */
     err = errflag;
     noerrs = ne;
-    noaliases = 0;
+    noaliases = ona;
     strinend();
     inpop();
     zleparse = 0;

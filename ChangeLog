@@ -1,3 +1,10 @@
+2001-02-28  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13554: Completion/Core/compinit, Doc/Zsh/options.yo, Src/lex.c,
+ 	Src/options.c, Src/zsh.h, Src/Zle/compcore.c, Src/Zle/compctl.c,
+ 	Src/Zle/zle_tricky.c: add `aliases' option to be able to disable
+ 	alias expansion
+	
 2001-02-26  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13536: Completion/Base/_sub_commands, Completion/Core/_normal,

@@ -137,6 +137,7 @@ _comp_options=(
     NO_ksharrays
     NO_cshnullglob
     NO_allexport
+    NO_aliases
 )
 
 # These can hold names of functions that are to be called before/after all

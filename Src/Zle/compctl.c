@@ -2753,7 +2753,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     LinkNode n;
     int owe = we, owb = wb, ocs = cs, swb, swe, scs, soffs, ne = noerrs;
     int sl = strlen(ss), tl, got = 0, i = 0, cur = -1, oll = ll, remq;
-    int ois = instring, oib = inbackt;
+    int ois = instring, oib = inbackt, ona = noaliases;
     char *tmp, *p, *ns, *ol = (char *) line, sav, *oaq = autoq, *qp, *qs;
     char *ts, qc = '\0';
 
@@ -2813,7 +2813,7 @@ sep_comp_string(char *ss, char *s, int noffs)
 	}
 	i++;
     } while (tok != ENDINPUT && tok != LEXERR);
-    noaliases = 0;
+    noaliases = ona;
     strinend();
     inpop();
     errflag = zleparse = 0;
@@ -3648,6 +3648,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	LinkList foo = newlinklist();
 	LinkNode n;
 	int first = 1, ng = opts[NULLGLOB], oowe = we, oowb = wb;
+	int ona = noaliases;
 	char *tmpbuf;
 
 	opts[NULLGLOB] = 1;
@@ -3669,7 +3670,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		addlinknode(foo, ztrdup(tokstr));
 	    first = 0;
 	} while (tok != ENDINPUT && tok != LEXERR);
-	noaliases = 0;
+	noaliases = ona;
 	strinend();
 	inpop();
 	errflag = zleparse = 0;

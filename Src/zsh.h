@@ -1305,6 +1305,7 @@ struct histent {
 
 enum {
     OPT_INVALID,
+    ALIASESOPT,
     ALLEXPORT,
     ALWAYSLASTPROMPT,
     ALWAYSTOEND,

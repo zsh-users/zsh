@@ -53,6 +53,11 @@ tt(KSH_OPTION_PRINT) is set), `tt(setopt)' shows all options whose settings
 are changed from the default.
 
 startitem()
+pindex(ALIASES)
+cindex(aliases, expansion)
+item(tt(ALIASES) <D>)(
+Expand aliases.
+)
 pindex(ALL_EXPORT)
 cindex(export, automatic)
 item(tt(ALL_EXPORT) (tt(-a), ksh: tt(-a)))(
