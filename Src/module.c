@@ -1181,13 +1181,13 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 		nicezputs((char *) getdata(node), stdout);
 		putchar('\n');
 	    }
+	    return 0;
 	} else {
 	    for (; *args; args++)
 		for (node = firstnode(bltinmodules); node; incnode(node))
-		    if (strcmp(*args, (char *) getdata(node)))
-			return 1;
+		    if (!strcmp(*args, (char *) getdata(node)))
+			return 0;
 	}
-	return 0;
     }
     /* Otherwise we return 1 -- different from the dynamic version. */
     return 1;
