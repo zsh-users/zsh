@@ -332,6 +332,22 @@ moves the mark to the next match
 item(tt(reverse-menu-complete))(
 moves the mark to the previous match
 )
+item(tt(viinsert))(
+this toggles between normal and interactive mode; in interactive mode
+the keys bound to tt(self-insert) and tt(self-insert-unmeta) insert
+into the command line as in normal editing mode but without leaving
+menu selection; after each character completion is tried again and the
+list changes to contain only the new matches; the completion widgets
+make the longest unambiguous string be inserted in the command line
+and tt(undo) and tt(backward-delete-char) go back to the previous set
+of matches
+)
+item(tt(history-incremental-search-forward),
+tt(history-incremental-search-backward))(
+this starts incremental searches in the list of completions displayed;
+in this mode, tt(accept-line) only leaves incremental search, going
+back to the normal menu selection mode
+)
 enditem()
 
 All movement functions wrap around at the edges; any other zle function not

@@ -1,3 +1,11 @@
+2002-06-26  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17366: Completion/Base/Core/_main_complete,
+	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo,
+	Doc/Zsh/mod_complist.yo, Src/Zle/compcore.c, Src/Zle/complist.c,
+	Src/Zle/compresult.c: two new modes for menu selection:
+	incremental search and interactive
+
 2002-06-24  Peter Stephenson  <pws@csr.com>
 
 	* 17361: Src/zle_hist.c: Be safer about NULL returns from

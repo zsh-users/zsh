@@ -1824,6 +1824,13 @@ To turn on menu completion or menu selection when a certain number of
 matches is generated em(or) the list of matches does not fit onto the
 screen, both of `tt(yes=)' and `tt(select=)' can be given twice, once
 with a number and once with `tt(long)' or `tt(long-list)'.
+
+Finally, the two special modes of menu selection, namely interactive
+mode and incremental search can be pre-selected with this style. By
+including the word `tt(interactive)' in the value, interactive mode
+will be entered immediately when menu selection is started and the
+string `tt(search)' does the same for incremental search. To select
+backward incremental search, include the string `tt(search-backward)'.
 )
 kindex(muttrc, completion style)
 item(tt(muttrc))(

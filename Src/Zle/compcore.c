@@ -360,7 +360,7 @@ do_completion(Hookdef dummy, Compldat dat)
 	haspattern = 1;
     if (iforcemenu) {
 	if (nmatches)
-	    do_ambig_menu();
+            do_ambig_menu();
 	ret = !nmatches;
     } else if (useline < 0)
 	ret = selfinsert(zlenoargs);

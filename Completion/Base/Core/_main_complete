@@ -267,6 +267,19 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
         unset MENUSELECT
       fi
     fi
+    if [[ -n "$MENUSELECT" ]]; then
+      if [[ -n "$_menu_style[(r)interactive*]" ]]; then
+        MENUMODE=interactive
+      elif [[ -n "$_menu_style[(r)search*]" ]]; then
+        if [[ -n "$_menu_style[(r)*backward*]" ]]; then
+          MENUMODE=search-backward
+        else
+          MENUMODE=search-forward
+        fi
+      else
+        unset MENUMODE
+      fi
+    fi
   fi
 elif [[ nm -lt 1 && -n "$_comp_mesg" ]]; then
   compstate[insert]=''

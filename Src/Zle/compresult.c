@@ -744,8 +744,9 @@ do_ambiguous(void)
      * unambiguous prefix.                                               */
     lastambig = 1;
 
-    if (usemenu || (haspattern && comppatinsert &&
-		    !strcmp(comppatinsert, "menu"))) {
+    if (iforcemenu != -1 &&
+        (usemenu || (haspattern && comppatinsert &&
+                     !strcmp(comppatinsert, "menu")))) {
 	/* We are in a position to start using menu completion due to one  *
 	 * of the menu completion options, or due to the menu-complete-    *
 	 * word command, or due to using GLOB_COMPLETE which does menu-    *
@@ -961,9 +962,10 @@ do_single(Cmatch m)
     cs = minfo.pos;
     foredel(l);
 
-    if (m->flags & CMF_ALL)
+    if (m->flags & CMF_ALL) {
 	do_allmatches(0);
-    else {
+        return;
+    }
 
     /* And then we insert the new string. */
     minfo.len = instmatch(m, &scs);
@@ -1136,7 +1138,6 @@ do_single(Cmatch m)
 	runhookdef(INSERTMATCHHOOK, (void *) &dat);
 	minfo.cur = om;
     }
-    }
 }
 
 /* Do completion, given that we are in the middle of a menu completion.  We *
@@ -1283,6 +1284,9 @@ do_ambig_menu(void)
 {
     Cmatch *mc;
 
+    if (iforcemenu == -1)
+        do_ambiguous();
+
     if (usemenu != 3) {
 	menucmp = 1;
 	menuacc = 0;
@@ -1324,7 +1328,8 @@ do_ambig_menu(void)
     }
 #endif
     mc = (minfo.group)->matches + insmnum;
-    do_single(*mc);
+    if (iforcemenu != -1)
+        do_single(*mc);
     minfo.cur = mc;
 }
 

@@ -206,7 +206,8 @@ while (( $#state )); do
       ;;
 
     boolauto) 
-      _wanted values expl boolean compadd true false auto select
+      _wanted values expl boolean \
+          compadd true false auto select search search-backward interactive
       ;;
 
     cmdorcont)
