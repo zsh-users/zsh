@@ -167,7 +167,7 @@ install.bin-here: zsh install.bin-@L@
 	    $(LN) $(DESTDIR)$(bindir)/zsh $(DESTDIR)$(bindir)/zsh.old; \
 	else :; fi
 	rm -f $(DESTDIR)$(bindir)/zsh.new
-	$(LN) $(DESTDIR)$(bindir)/zsh-$(VERSION) $(DESTDIR)(bindir)/zsh.new
+	$(LN) $(DESTDIR)$(bindir)/zsh-$(VERSION) $(DESTDIR)$(bindir)/zsh.new
 	mv $(DESTDIR)$(bindir)/zsh.new $(DESTDIR)$(bindir)/zsh
 
 install.bin-N:
