@@ -1,0 +1,128 @@
+#compdef -command-line-
+
+local comp command cmd1 cmd2 pat val name i ret=1 _compskip="$_compskip"
+local curcontext="$curcontext" service
+
+# If we get the option `-s', we don't reset `_compskip'. This ensures
+# that a value set in the function for the `-first-' context is kept,
+# but that we still use pattern functions when we were called form
+# another completion function.
+
+[[ "$1" = -s ]] || _compskip=''
+
+# Completing in command position? If not we set up `cmd1' and `cmd2' as
+# two strings we have to search in the completion definition arrays (e.g.
+# a path and the last path name component).
+
+command="$words[1]"
+if [[ CURRENT -eq 1 ]]; then
+  curcontext="${curcontext%:*:*}:-command-:"
+
+  comp="$_comps[-command-]"
+  [[ -z "$comp" ]] || "$comp" && ret=0
+
+  return ret
+else
+  if (( $+builtins[$command] + $+functions[$command] )); then
+    cmd1="$command"
+    curcontext="${curcontext%:*:*}:${cmd1}:"
+  elif [[ "$command[1]" = '=' ]]; then
+    eval cmd1\=$command
+    cmd2="$command[2,-1]"
+    curcontext="${curcontext%:*:*}:${cmd2}:"
+  elif [[ "$command" = ..#/* ]]; then
+    cmd1="${PWD}/$command"
+    cmd2="${command:t}"
+    curcontext="${curcontext%:*:*}:${cmd2}:"
+  elif [[ "$command" = */* ]]; then
+    cmd1="$command"
+    cmd2="${command:t}"
+    curcontext="${curcontext%:*:*}:${cmd2}:"
+  else
+    cmd1="$command"
+    cmd2="$commands[$command]"
+    curcontext="${curcontext%:*:*}:${cmd1}:"
+  fi
+fi
+
+# See if there are any matching pattern completions.
+
+if [[ "$_compskip" != (all|*patterns*) ]]; then
+  service="${_services[$cmd1]:-$cmd1}"
+  for i in "${(@)_patcomps[(K)$cmd1]}"; do
+    "$i" && ret=0
+    if [[ "$_compskip" = *patterns* ]]; then
+      break
+    elif [[ "$_compskip" = all ]]; then
+      _compskip=''
+      return ret
+    fi
+  done
+  if [[ -n "$cmd2" ]]; then
+    service="${_services[$cmd2]:-$cmd2}"
+    for i in "${(@)_patcomps[(K)$cmd2]}"; do
+      "$i" && ret=0
+      if [[ "$_compskip" = *patterns* ]]; then
+        break
+      elif [[ "$_compskip" = all ]]; then
+        _compskip=''
+        return ret
+      fi
+    done
+  fi
+fi
+
+# Now look up the two names in the normal completion array.
+
+ret=1
+name="$cmd1"
+comp="$_comps[$cmd1]"
+service="${_services[$cmd1]:-$cmd1}"
+
+[[ -z "$comp" ]] &&
+    name="$cmd2" comp="$_comps[$cmd2]" service="${_services[$cmd2]:-$cmd2}"
+
+# And generate the matches, probably using default completion.
+
+if [[ -n "$comp" ]]; then
+  _compskip=patterns
+  "$comp" && ret=0
+  [[ "$_compskip" = (all|*patterns*) ]] && return ret
+elif [[ "$_compskip" != *default* ]]; then
+  name=-default-
+  comp="$_comps[-default-]"
+fi
+
+if [[ "$_compskip" != (all|*patterns*) ]]; then
+  service="${_services[$cmd1]:-$cmd1}"
+  for i in "${(@)_postpatcomps[(K)$cmd1]}"; do
+    _compskip=default
+    "$i" && ret=0
+    if [[ "$_compskip" = *patterns* ]]; then
+      break
+    elif [[ "$_compskip" = all ]]; then
+      _compskip=''
+      return ret
+    fi
+  done
+  if [[ -n "$cmd2" ]]; then
+    service="${_services[$cmd2]:-$cmd2}"
+    for i in "${(@)_postpatcomps[(K)$cmd2]}"; do
+      _compskip=default
+      "$i" && ret=0
+      if [[ "$_compskip" = *patterns* ]]; then
+        break
+      elif [[ "$_compskip" = all ]]; then
+        _compskip=''
+        return ret
+      fi
+    done
+  fi
+fi
+
+[[ "$name" = -default- && -n "$comp" && "$_compskip" != (all|*default*) ]] &&
+  service="${_services[-default-]:--default-}" && "$comp" && ret=0
+
+_compskip=''
+
+return ret
