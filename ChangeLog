@@ -1,3 +1,7 @@
+2004-07-25  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/contrib.yo: documentation for "zargs".
+
 2004-07-23  Oliver Kiddle  <opk@zsh.org>
 
 	* 20180 (based on Jean-Baptiste Quenot's 20177):

@@ -1271,6 +1271,49 @@ If you quit in the middle of a game, the next invocation of the tt(tetris)
 widget will continue where you left off.  If you lost, it will start a new
 game.
 )
+findex(zargs)
+item(tt(zargs) [ var(option) ... tt(-)tt(-) ] [ var(input) ... ] [ tt(-)tt(-) var(command) [ var(arg) ... ] ])(
+This function works like GNU xargs, except that instead of reading lines
+of arguments from the standard input, it takes them from the command line.
+This is useful because zsh, especially with recursive glob operators,
+often can construct a command line for a shell function that is longer
+than can be accepted by an external command.
+
+The var(option) list represents options of the tt(zargs) command itself,
+which are the same as those of tt(xargs).  The var(input) list is the
+collection of strings (often file names) that become the arguments of the
+tt(command), analogous to the standard input of tt(xargs).  Finally, the
+var(arg) list consists of those arguments (usually options) that are
+passed to the var(command) each time it runs.  The var(arg) list precedes
+the elements from the tt(input) list in each run.  If no var(command) is
+provided, then no var(arg) list may be provided, and in that event the
+default command is `tt(print)' with arguments `tt(-r -)tt(-)'.
+
+For example, to get a long tt(ls) listing of all plain files in the
+current directory or its subdirectories:
+
+example(autoload -U zargs
+zargs -- **/*(.) -- ls -l)
+
+Note that `tt(-)tt(-)' is used both to mark the end of the var(option)
+list and to mark the end of the var(input) list, so it must appear twice
+whenever the var(input) list may be empty.  If there is guaranteed to be
+at least one var(input) and the first var(input) does not begin with a
+`tt(-)', then the first `tt(-)tt(-)' may be omitted.
+
+In the event that the string `tt(-)tt(-)' is or may be an var(INPUT), the
+tt(-e) option may be used to change the end-of-inputs marker.  Note that
+this does em(not) change the end-of-options marker.  For example, to use
+`tt(..)' as the marker:
+
+example(zargs -e.. -- **/*(.) .. ls -l)
+
+This is a good choice in that example because no plain file can be named
+`tt(..)', but the best end-marker depends on the circumstances.
+
+For details of the other tt(zargs) options, see zmanref(xargs) or run
+tt(zargs) with the tt(-)tt(-help) option.
+)
 findex(zcalc)
 item(tt(zcalc) [ var(expression) ... ])(
 A reasonably powerful calculator based on zsh's arithmetic evaluation
