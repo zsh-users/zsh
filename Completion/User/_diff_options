@@ -2,23 +2,20 @@
 
 local of ofwuc ouc oss ofwy ofwg ofwl cmd
 
-(( $+_diff_is_gnu )) || typeset -gA _diff_is_gnu
+(( $+_is_gnu )) || typeset -gA _is_gnu
 
-if (( ! $+_diff_is_gnu[$words[1]] )); then
-  if [[ "$words[1]" = *diff ]]; then
-    cmd="$words[1]"
-  else
-    cmd=diff
-  fi
+cmd="$1"
+shift
 
+if (( ! $+_is_gnu[$cmd] )); then
   if [[ $(_call version $cmd -v </dev/null 2>/dev/null) = *GNU* ]]; then
-    _diff_is_gnu[$words[1]]=yes
+    _is_gnu[$cmd]=yes
   else
-    _diff_is_gnu[$words[1]]=
+    _is_gnu[$cmd]=
   fi
 fi
 
-if [[ -n "$_diff_is_gnu[$words[1]]" ]]; then
+if [[ -n "$_is_gnu[$cmd]" ]]; then
   # output formats 
   of="-y --side-by-side -n --rcs -e -f --ed -q --brief -c -C --context -u -U \
   --unified --old-group-format --new-group-format --changed-group-format \
