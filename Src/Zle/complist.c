@@ -1122,21 +1122,12 @@ compprintlist(int showall)
 		    n = lastn;
 		    nl = lastnl;
 		    lastused = 1;
+		    pnl = 0;
 		} else
 		    p = g->matches;
 
 		for (; (m = *p); p++) {
 		    if (m->disp && (m->flags & CMF_DISPLINE)) {
-			if (!lasttype && ml >= mlbeg) {
-			    lasttype = 2;
-			    lastg = g;
-			    lastbeg = mlbeg;
-			    lastml = ml;
-			    lastp = p;
-			    lastn = n;
-			    lastnl = nl;
-			    lastused = 1;
-			}
 			if (pnl) {
 			    if (dolistnl(ml) && compprintnl(ml))
 				goto end;
@@ -1147,6 +1138,16 @@ compprintlist(int showall)
 				if (tccan(TCCLEAREOD))
 				    tcout(TCCLEAREOD);
 			    }
+			}
+			if (!lasttype && ml >= mlbeg) {
+			    lasttype = 2;
+			    lastg = g;
+			    lastbeg = mlbeg;
+			    lastml = ml;
+			    lastp = p;
+			    lastn = n;
+			    lastnl = nl;
+			    lastused = 1;
 			}
 			if (mfirstl < 0)
 			    mfirstl = ml;

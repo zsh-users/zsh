@@ -1,5 +1,8 @@
 2000-04-20  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10868: Src/Zle/complist.c: fix off-by-one error in scrolled
+ 	menu-selections
+	
 	* 10861: Completion/Bsd/.distfiles, Completion/Bsd/_bsd_pkg,
  	Completion/Bsd/_cvsup, Completion/Bsd/_kld: new completions for
  	FreeBSD commands
