@@ -245,11 +245,13 @@ globlist(LinkList list, int nountok)
 mod_export void
 singsub(char **s)
 {
+    int omi = mult_isarr;
     local_list1(foo);
 
     init_list1(foo, *s);
 
     prefork(&foo, PF_SINGLE);
+    mult_isarr = omi;
     if (errflag)
 	return;
     *s = (char *) ugetnode(&foo);
