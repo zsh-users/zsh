@@ -35,9 +35,12 @@ _cvs_command () {
   if (( CURRENT == 1 )); then
     compadd "$@" ${(k)cmds} || compadd "$@" ${(kv)=cmds}
   else
-    _cvs_"${${(k)cmds[(R)* $words[1] *]}:-$words[1]}" 2>&- ||
-      _message "unknown cvs command: $words[1]"
+    _cvs_"${${(k)cmds[(R)* $words[1] *]}:-${words[1]:#*~(${(@kj:|:)~cmds})}}"
   fi
+}
+
+_cvs_ () {
+  _message "unknown cvs command: $words[1]"
 }
 
 # define completion functions for each cvs command
@@ -582,9 +585,11 @@ _cvs_files_unmaintained () {
 
 # define configuration variables.
 
+local tmp
+
 (( $+_cvs_roots )) ||
-if [[ -f ~/.cvspass ]]; then
-  _cvs_roots=(${${(f)"$(<~/.cvspass)"}%% *})
+if [[ -f "${tmp::=${CVS_PASSFILE:-$HOME/.cvspass}}" ]]; then
+  _cvs_roots=(${${(f)"$(<$tmp)"}%% *})
 else
   _cvs_roots=()
 fi
