@@ -40,7 +40,7 @@ INSTALL         = @INSTALL@
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS = dvips
-TEXI2HTML = texi2html -expandinfo -split_chapter
+TEXI2HTML = texi2html -expand info -split chapter
 
 .SUFFIXES: .yo .1
 

@@ -1,3 +1,8 @@
+2001-10-24  Peter Stephenson  <pws@csr.com>
+
+	* 16130: Doc/.cvsignore, Doc/Makefile.in, Doc/Zsh/manual.yo:
+	Fix for texi2html 1.64.
+
 2001-10-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16111: Src/Builtins/rlimits.c: Report error on attempt to set
