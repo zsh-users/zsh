@@ -1,3 +1,8 @@
+2002-04-28  Clint Adams  <clint@zsh.org>
+
+        * unposted: Completion/Unix/Command/_spamassassin:
+        add missing bracket.
+
 2002-04-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: StartupFiles/zshenv, StartupFiles/zlogin: remove
