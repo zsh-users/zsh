@@ -1618,8 +1618,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	opts[PROMPTPERCENT] = opp;
     }
     if (quotemod) {
-	if (--quotetype > 2)
-	    quotetype = 2;
+	if (--quotetype > 3)
+	    quotetype = 3;
 	if (isarr) {
 	    char **ap;
 
@@ -1628,7 +1628,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    ap = aval;
 
 	    if (quotemod > 0) {
-		if (quotetype) {
+		if (quotetype == 3)
+		    for (; *ap; ap++)
+			*ap = nicedupstring(*ap);
+		else if (quotetype) {
 		    int sl;
 		    char *tmp;
 
@@ -1665,7 +1668,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (!copied)
 		val = dupstring(val), copied = 1;
 	    if (quotemod > 0) {
-		if (quotetype) {
+		if (quotetype == 3)
+		    val = nicedupstring(val);
+		else if (quotetype) {
 		    int sl;
 		    char *tmp;
 

@@ -2867,12 +2867,12 @@ zputs(char const *s, FILE *stream)
 /* Create a visibly-represented duplicate of a string. */
 
 /**/
-char *
-niceztrdup(char const *s)
+static char *
+nicedup(char const *s, int heap)
 {
     int c, len = strlen(s) * 5;
-    char *buf = zalloc(len);
-    char *p = buf, *n, *ret;
+    VARARR(char, buf, len);
+    char *p = buf, *n;
 
     while ((c = *s++)) {
 	if (itok(c)) {
@@ -2887,9 +2887,21 @@ niceztrdup(char const *s)
 	while(*n)
 	    *p++ = *n++;
     }
-    ret = metafy(buf, p - buf, META_DUP);
-    zfree(buf, len);
-    return ret;
+    return metafy(buf, p - buf, (heap ? META_HEAPDUP : META_DUP));
+}
+
+/**/
+char *
+niceztrdup(char const *s)
+{
+    return nicedup(s, 0);
+}
+
+/**/
+char *
+nicedupstring(char const *s)
+{
+    return nicedup(s, 1);
 }
 
 /* Unmetafy and output a string, displaying special characters readably. */
