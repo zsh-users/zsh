@@ -64,7 +64,8 @@ if (( $# )); then
              fi
              ;;
       \!*)   comptry "${(@)argv:#(${(j:|:)~${=~tag[2,-1]}})}";;
-      ?*)    comptry -m "$tag";;
+      ?*)    eval "tag=( ${${tag:s/\\:/\\\\\\\\\\\\:}//(#b)([][()|*?^#~<>])/\\${match[1]}} )" 
+             comptry -m "${${(@)tag// /\\ }}";;
       esac
     done
 

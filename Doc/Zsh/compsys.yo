@@ -947,13 +947,15 @@ If the tt(file-patterns) style is set, the default tags are not
 used. Instead, the value of the style says which tags and which
 patterns are to be offered. The strings in the value contain
 specifications of the form
-`var(patterns)tt(:)var(tag)'; each string may contain any number of
-such specifications. The var(patterns) give one or more glob 
-patterns separated by commas that are to be used to generate
+`var(pattern)tt(:)var(tag)'; each string may contain any number of
+such specifications. The var(pattern) gives a glob 
+pattern that is to be used to generate
 filenames. If it contains the sequence `tt(%p)', that is replaced by
 the pattern(s) given by the calling function.
 Colons in the pattern have to be preceded by a backslash to
-make them distinguishable from the colon before the var(tag). The
+make them distinguishable from the colon before the var(tag). If more
+than one pattern is needed, the patterns can be given inside braces,
+separated by commas. The
 var(tag)s of all strings in the value will be offered by tt(_files)
 (again, one after another) and used when looking up other styles. For
 strings containing more than one specification, the filenames for all
@@ -1707,8 +1709,9 @@ for a description of these special parameters).
 )
 enditem()
 
-In each of the cases above, the tag may also be a pattern. In this
-case all of the offered tags matching this pattern will be used except 
+In each of the cases above, the tag may also be a pattern or more than 
+one pattern inside braces and separated by commas. In this
+case all of the offered tags matching the pattern(s) will be used except 
 for those that are given explicitly in the same string. There are
 probably two main uses of this. One is the case where one wants to try
 one of the tags more than once, setting other styles differently for

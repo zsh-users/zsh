@@ -6,7 +6,11 @@ zparseopts -a opts \
     '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:
 
 type="${(@j::M)${(@)tmp#-}#?}"
-(( $tmp[(I)-g*] )) && glob="${(j:,:)${(@M)tmp:#-g*}#-g}"
+if (( $tmp[(I)-g*] )); then
+  glob="${${${${(@M)tmp:#-g*}#-g}##[[:blank:]]#}%%[[:blank:]]#}"
+  [[ "$glob" = *[^\\][[:blank:]]* ]] &&
+      glob="{${glob//(#b)([^\\])[[:blank:]]##/${match[1]},}}"
+fi
 ign=$opts[(I)-F]
 if (( ign )); then
   ign=( $=opts[ign+1] )
@@ -22,7 +26,7 @@ fi
 if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
   [[ "$type" = */* ]] && glob="$glob,*(-/)"
   pats=()
-  for i in ${tmp//\\%p/ ${${glob:-\*}//:/\\:} }; do
+  for i in ${tmp//\\%p/${${glob:-\*}//:/\\:} }; do
     if [[ $i = *[^\\]:* ]]; then
       pats=( "$pats[@]" " $i " )
     else
@@ -45,9 +49,9 @@ else
 fi
 
 for def in "$pats[@]"; do
-  def="${def##[[:blank:]]#}"
-  while [[ "$def" = *[^\\][[:blank:]]* ]]; do
-    sdef="${${(M)def#*[^\\][[:blank:]]}%%[[:blank:]]#}"
+  eval "def=( ${${def:s/\\:/\\\\\\\\\\\\:}//(#b)([][()|*?^#~<>])/\\${match[1]}} )"
+  for sdef in "$def[@]"; do
+
     tag="${${sdef#*[^\\]:}%%:*}"
     pat="${${${sdef%%:${tag}*}//\\\\:/:}//,/ }"
 
@@ -70,7 +74,6 @@ for def in "$pats[@]"; do
         fi
       done
     done
-    def="${${def#${sdef}}##[[:blank:]]#}"
   done
   (( ret )) || return 0
 done

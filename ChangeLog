@@ -1,5 +1,9 @@
 2000-04-12  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10695: Completion/Core/_files, Completion/Core/_tags,
+ 	Doc/Zsh/compsys.yo: allow brace expansion on patterns for
+ 	file-patterns and tag-order
+	
 	* 10692: Src/builtin.c: missing initialisation for next field in
  	assignments for substitutions for fc builtin
 
