@@ -1,0 +1,9 @@
+#autoload
+
+local globalresults
+
+[[ -z $words[CURRENT] ]] && return 1
+
+globalresults=($(global --completion $words[CURRENT]))
+
+compadd -M 'm:{a-zA-Z}={A-Za-z}' -a "$@" - globalresults

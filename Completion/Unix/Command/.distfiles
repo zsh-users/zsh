@@ -18,4 +18,5 @@ _last         _loadkeys     _modutils     _ruby         _sysctl _links _samba
 _user_admin   _rsync        _arping	  _spamassassin _mtools       _ifconfig
 _fsh          _chkconfig    _cdcd         _irssi        _mysqldiff    _sccs
 _netcat       _larch        _valgrind     _texinfo	_figlet
+_global       _global_tags
 '
