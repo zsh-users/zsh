@@ -846,12 +846,14 @@ rm -f nametmp.c
 if test -z "$sigfile_list"; then
   dnl In case we don't get the stuff from the preprocesor, use the old
   dnl list of standard places.
-  sigfile_list="/usr/include/bsd/sys/signal.h
+  sigfile_list="/usr/include/sys/iso/signal_iso.h
+/usr/include/bsd/sys/signal.h
 /usr/include/signum.h
 /usr/include/asm/signum.h
 /usr/include/asm/signal.h
 /usr/include/linux/signal.h
 /usr/include/sys/signal.h
+/usr/include/bits/signum.h
 /dev/null"
 fi
 for SIGNAL_H in $sigfile_list
@@ -864,6 +866,9 @@ do
   wc -l | sed 's/[ 	]//g'`
   test "x$nsigs" != x && test "$nsigs" -ge 7 && break
 done
+if test $SIGNAL_H = "/dev/null"; then
+  AC_MSG_ERROR(SIGNAL MACROS NOT FOUND:  please report to developers)
+fi
 zsh_cv_path_signal_h=$SIGNAL_H
 ])
 SIGNAL_H=$zsh_cv_path_signal_h
@@ -878,6 +883,7 @@ AC_CACHE_CHECK(where the RLIMIT macros are located,zsh_cv_path_rlimit_h,
                    /usr/include/asm/resource.h	     dnl
                    /usr/include/linux/resource.h     dnl
                    /usr/include/sys/resource.h       dnl
+                   /usr/include/bits/resource.h      dnl
                    /usr/include/resourcebits.h       dnl
                    /dev/null;
 do
@@ -887,7 +893,7 @@ do
 done
 zsh_cv_path_rlimit_h=$RESOURCE_H
 if test $RESOURCE_H = "/dev/null" -a $ac_cv_func_getrlimit = yes; then
-  echo "RLIMIT MACROS NOT FOUND:  please report to developers"
+  AC_MSG_WARN(RLIMIT MACROS NOT FOUND:  please report to developers)
 fi])
 RLIMITS_INC_H=$zsh_cv_path_rlimit_h
 dnl rlimits.h only appears in dependencies if we are actually using it.
