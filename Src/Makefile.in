@@ -42,6 +42,9 @@ LN		= @LN@
 sdir_src      = $(sdir)
 dir_src       = .
 
+transform=@program_transform_name@
+tzsh=`echo zsh | sed '$(transform)'`
+
 # ========= DEPENDENCIES FOR BUILDING ==========
 
 LINK        = $(CC) $(LDFLAGS) $(EXELDFLAGS) $(EXTRA_LDFLAGS) -o $@
@@ -159,14 +162,14 @@ uninstall.bin: uninstall.bin-here
 # install binary, creating install directory if necessary
 install.bin-here: zsh install.bin-@L@
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(bindir)
-	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh $(DESTDIR)$(bindir)/zsh-$(VERSION)
-	if test -f $(DESTDIR)$(bindir)/zsh; then \
-	    rm -f $(DESTDIR)$(bindir)/zsh.old; \
-	    $(LN) $(DESTDIR)$(bindir)/zsh $(DESTDIR)$(bindir)/zsh.old; \
+	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION)
+	if test -f $(DESTDIR)$(bindir)/$(tzsh); then \
+	    rm -f $(DESTDIR)$(bindir)/$(tzsh).old; \
+	    $(LN) $(DESTDIR)$(bindir)/$(tzsh) $(DESTDIR)$(bindir)/$(tzsh).old; \
 	else :; fi
-	rm -f $(DESTDIR)$(bindir)/zsh.new
-	$(LN) $(DESTDIR)$(bindir)/zsh-$(VERSION) $(DESTDIR)$(bindir)/zsh.new
-	mv $(DESTDIR)$(bindir)/zsh.new $(DESTDIR)$(bindir)/zsh
+	rm -f $(DESTDIR)$(bindir)/$(tzsh).new
+	$(LN) $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh).new
+	mv $(DESTDIR)$(bindir)/$(tzsh).new $(DESTDIR)$(bindir)/$(tzsh)
 
 install.bin-N:
 install.bin-L: $(LIBZSH)
@@ -175,7 +178,7 @@ install.bin-L: $(LIBZSH)
 
 # uninstall binary
 uninstall.bin-here: uninstall.bin-@L@
-	rm -f $(DESTDIR)$(bindir)/zsh-$(VERSION) $(DESTDIR)$(bindir)/zsh
+	rm -f $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh)
 
 uninstall.bin-N:
 uninstall.bin-L:
