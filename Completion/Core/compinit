@@ -98,9 +98,10 @@ else
   _comp_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
 fi
 
-# This can hold names of functions that are to be called after all
+# These can hold names of functions that are to be called before/after all
 # matches have been generated.
 
+compprefuncs=()
 comppostfuncs=()
 
 # Loading it now ensures that the `funcstack' parameter is always correct.

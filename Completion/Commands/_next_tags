@@ -1,49 +1,45 @@
-#autoload
+#compdef -k complete-word \C-xn
 
-# To use this, put _next_tags at the beginning of the completer style,
-# define it as a completion widget and bind it to a key, e.g.:
-#
-#  zle -C _next_tags complete-word _next_tags
-#  bindkey '^Xn' _next_tags
-#
-# Makes it be bound to ^Xn.
-
-
-# Main widget/completer.
+# Main widget.
 
 _next_tags() {
+  local comp
 
-  if [[ $#funcstack -gt 1 ]]; then
-
-    # Called as completer, probably `remove' our helper function. A better
-    # test would be nice, but I think one should still be able to edit the
-    # current word between attempts to complete it.
-
-    [[ $_next_tags_pre != ${LBUFFER%${PREFIX}} ]] && unset _sort_tags
-
-    return 1
+  if [[ -z $compstate[old_list] ]]; then
+    comp=()
   else
-    local comp
+    comp=(_complete)
+  fi
 
-    if [[ -z $compstate[old_list] ]]; then
-      comp=()
-    else
-      comp=(_next_tags _complete)
-    fi
+  (( $+_sort_tags )) || _next_tags_not=
 
-    (( $+_sort_tags )) || _next_tags_not=
+  _sort_tags=_next_tags_sort
+  _next_tags_pre="${LBUFFER%${PREFIX}}"
+  _next_tags_not="$_next_tags_not $_lastcomp[tags]"
 
-    _sort_tags=_next_tags_sort
-    _next_tags_pre="${LBUFFER%${PREFIX}}"
-    _next_tags_not="$_next_tags_not $_lastcomp[tags]"
+  _main_complete "$comp[@]"
 
-    _main_complete "$comp[@]"
+  [[ $compstate[insert] = automenu ]] &&
+     compstate[insert]=automenu-unambiguous
 
-    [[ $compstate[insert] = automenu ]] &&
-       compstate[insert]=automenu-unambiguous
+  compstate[insert]=''
+  compstate[list]='list force'
 
-    compstate[insert]=''
-    compstate[list]='list force'
+  compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
+}
+
+# Pre-completion function.
+
+_next_tags_pre() {
+
+  # Probably `remove' our sort function. A better test would be nice, but
+  # I think one should still be able to edit the current word between
+  # attempts to complete it.
+
+  if [[ $_next_tags_pre != ${LBUFFER%${PREFIX}} ]]; then
+    unset _sort_tags
+  else
+    compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
   fi
 }
 

@@ -19,7 +19,7 @@
 setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
-local ctxt post ret=1 tmp _compskip format _comp_ignore \
+local ctxt func funcs ret=1 tmp _compskip format _comp_ignore \
       _completers _completer _completer_num curtag \
       _matchers _matcher _matcher_num _comp_tags \
       context state line opt_args val_args curcontext="$curcontext" \
@@ -67,6 +67,14 @@ _last_menu_style=()
 
 _completers=( "$@" )
 _completer_num=1
+
+# Call the pre-functions.
+
+funcs=( "$compprefuncs[@]" )
+compprefuncs=()
+for func in "$funcs[@]"; do
+  "$func"
+done
 
 for _completer; do
   ctxt=":completion:${curcontext/::/:${_completer[2,-1]}-${(M)#_completers[1,_completer_num]:#$_completer}:}:"
@@ -190,10 +198,11 @@ fi
 
 # Now call the post-functions.
 
-for post in "$comppostfuncs[@]"; do
-  "$post"
-done
+funcs=( "$comppostfuncs[@]" )
 comppostfuncs=()
+for func in "$funcs[@]"; do
+  "$func"
+done
 
 _lastcomp=( "${(@kv)compstate}" )
 _lastcomp[completer]="$_completer"

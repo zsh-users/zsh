@@ -1581,12 +1581,6 @@ value of the completer functions to decide if other completers should be
 called. If the return value is zero, no other completers are tried and the
 tt(_main_complete) function returns.
 
-Immediately before returning the tt(_main_complete) function calls all
-functions whose names are given in the tt(comppostfuncs) array and
-then resets it to an empty array. This can be used by completion
-functions or by other ZLE widgets calling completion to register code
-that is to be executed after all matches have been added.
-
 The following completer functions are contained in the distribution (users
 may write their own):
 
@@ -1979,6 +1973,14 @@ functions for commands in the distribution, the utility functions
 generating matches all follow the convention of returning zero if they
 generated completions and non-zero if no matching completions could be 
 added.
+
+When writing completion functions or other ZLE widgets that call
+completion, it might be interesting to know about two more features
+offered by the tt(_main_complete) function. The arrays
+tt(compprefuncs) and tt(comppostfuncs) may be set to contain names of
+functions that are to be called immediately before or after completion 
+has been tried. The functions will only be called once, unless they
+put themselves into the array again.
 
 startitem()
 findex(_funcall)
