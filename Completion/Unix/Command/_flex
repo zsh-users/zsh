@@ -1,0 +1,44 @@
+#compdef flex
+
+local curcontext="$curcontext" state line ret=1
+typeset -A opt_args
+
+_arguments -C -s \
+  --help --version \
+  '-b[generate backing-up information]' \
+  '-d[make scanner running in debug mode]' \
+  '-f[generate fast scanner (full table)]' \
+  '-h[show help]' \
+  '-i[generate case-insensitive scanner]' \
+  '-l[maximum compatibility with lex]' \
+  '-p[generate performance report]' \
+  '-s[suppress default rule]' \
+  '-t[write scanner to stdout]' \
+  '-v[show summary of statistics about scanner]' \
+  '-w[suppress warnings]' \
+  '-B[generate batch scanner]' \
+  '-F[use fast scanner table representation]' \
+  '-I[generate interactive scanner]' \
+  '-L[don'"'"'t generate #line directives]' \
+  '-T[trace mode]' \
+  '-V[show version]' \
+  '-7[generate 7-bit scanner]' \
+  '-8[generate 8-bit scanner]' \
+  '-\+[generate C++ scanner class]' \
+  '-C-[specify degree of table compression]:table compression:->tabcomp' \
+  '-o-[specify output file]:output file:_files' \
+  '-P-[change yy prefix]:prefix string:' \
+  '-S-[override skeleton file]:skeleton file:_files' \
+  '*:input files:_files -g \*.\(\#i\)\(f\|\)lex' && ret=0
+
+if [[ -n "$state" ]]; then
+  _values -s '' 'table compression' \
+    'a[align tables]' \
+    'e[construct equivalence classes]' \
+    '(m)f[generate full tables]' \
+    '(m)F[generate fast tables]' \
+    '(f F)m[construct meta-equivalence classes]' \
+    'r[don'"'"'t use stdio library]' && ret=0
+fi
+
+return ret
