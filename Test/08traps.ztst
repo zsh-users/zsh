@@ -148,3 +148,30 @@
 >end of fn
 >finish
 
+  TRAPZERR() { print 'ERR-or!'; }
+  f() { print f; false; }
+  t() { print t; }
+  f
+  f && t
+  t && f && true
+  t && f
+  testunset() {
+    setopt localtraps
+    unset -f TRAPZERR
+    print testunset
+    false
+    true
+  }
+  testunset
+  f
+1: more sophisticated error trapping
+>f
+>ERR-or!
+>f
+>t
+>t
+>f
+>ERR-or!
+>testunset
+>f
+>ERR-or!
