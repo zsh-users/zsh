@@ -1,5 +1,9 @@
 2003-04-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 18449: Completion/Unix/Type/_dict_words,
+	Completion/Unix/Command/_dict: complete dictionary databases and
+	matching strategies and handle suffixes better
+
 	* users/6013: GoTaR <gotar@poczta.onet.pl>: Completion/Unix/Type/_ps,
 	Completion/Unix/Type/_pdf, Completion/X/Command/_gqview:
 	new gqview completion and complete .ps/.pdf files for more commands
