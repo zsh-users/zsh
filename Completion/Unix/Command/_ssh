@@ -1,15 +1,15 @@
 #compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen
 
 _remote_files () {
-  # This is extremely simple-minded; could parse "ls -F" output to do
-  # colorings and LIST_TYPES and so on, but I'm just not that ambitious.
+  # Rather than simple directory discrimination, there should be
+  # coloring based on all the different ls -F classifiers.
   local expl remfiles
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
-    remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${words[CURRENT]#*:}\*)"})
+    remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${words[CURRENT]#*:}\* 2>/dev/null)"})
 
     _wanted files expl 'remote files' \
-      compadd ${${remfiles:#*/}/[*=@](#e)/}
+      compadd ${${remfiles:#*/}/[*=@|](#e)/}
 
     _wanted dirs expl 'remote directories' \
       compadd -S/ ${${(M)remfiles:#*/}/\\/(#e)/}

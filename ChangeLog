@@ -1,7 +1,7 @@
 2002-02-04  Clint Adams  <clint@zsh.org>
 
-	* 16553: Completion/Unix/Command/_ssh: differentiate between
-	files and directories during remote scp completion.
+	* 16553, 16555: Completion/Unix/Command/_ssh: differentiate
+	between files and directories during remote scp completion.
 
 2002-02-03  Felix Rosencrantz  <f_rosencrantz@yahoo.com>
 
