@@ -21,6 +21,7 @@ _cvs () {
 
 (( $+functions[_cvs_command] )) ||
 _cvs_command () {
+  local cmd
   typeset -A cmds
   cmds=(add " ad new "          admin " adm rcs "       annotate " ann "
 	checkout " co get "     commit " ci com "       diff " di dif "
@@ -37,13 +38,14 @@ _cvs_command () {
   else
     local curcontext="$curcontext"
 
-    curcontext="${curcontext%:*}:$words[1]"
-    _cvs_"${${(k)cmds[(R)* $words[1] *]}:-${(k)cmds[(i)$words[1]]}}"
+    cmd="${${(k)cmds[(R)* $words[1] *]}:-${(k)cmds[(i)$words[1]]}}"
+    if (( $#cmd )); then
+      curcontext="${curcontext%:*}:$cmd"
+      _cvs_$cmd
+    else
+      _message "unknown cvs command: $words[1]"
+    fi
   fi
-}
-
-_cvs_ () {
-  _message "unknown cvs command: $words[1]"
 }
 
 # define completion functions for each cvs command
@@ -388,7 +390,25 @@ _cvs_watchers () {
 
 (( $+functions[_cvs_root] )) ||
 _cvs_root () {
-  _tags files && { compadd "$@" $_cvs_roots || _files "$@" -/ }
+  local cvspassfile id
+
+  typeset -gU _cvs_roots
+
+  if [[ -f "${cvspassfile::=${CVS_PASSFILE:-$HOME/.cvspass}}" ]]; then
+    if zmodload -e stat; then
+      id="$(LANG=C builtin stat -g +mtime -F '%Y/%m/%d-%T' "$cvspassfile")"
+    else
+      id="$(LANG=C ls -l "$cvspassfile")"
+    fi
+    if [[ "$id" != "$_cvs_pass_id" ]]; then
+      _cvs_roots=($_cvs_roots ${${(f)"$(<$cvspassfile)"}%% *})
+      _cvs_pass_id="$id"
+    fi
+  fi
+
+  _tags files && {
+    compadd -M 'r:|[:@./]=* r:|=*' "$@" $_cvs_roots || _files "$@" -/
+  }
 }
 
 (( $+functions[_cvs_tempdir] )) ||
@@ -604,15 +624,6 @@ _cvs_files_unmaintained () {
 }
 
 # define configuration variables.
-
-local tmp
-
-(( $+_cvs_roots )) ||
-if [[ -f "${tmp::=${CVS_PASSFILE:-$HOME/.cvspass}}" ]]; then
-  _cvs_roots=(${${(f)"$(<$tmp)"}%% *})
-else
-  _cvs_roots=()
-fi
 
 (( $+_cvs_ignore_default )) ||
 _cvs_ignore_default=(
