@@ -26,3 +26,5 @@ case "$curcontext" in
 esac
 
 comptry "$@"
+
+return 0

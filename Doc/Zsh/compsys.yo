@@ -1435,7 +1435,10 @@ Strings in the value may also be of the form `var(func)tt(())'. In
 this case the function var(func) will be called which can then define
 in which order tags are to be used based on additional context
 information. See the tt(_sort_tags) function below for a description
-of how such functions can be implemented.
+of how such functions can be implemented. The return value of the
+function is used to decide if the following values for the style
+should be used. If it is zero, they are used and if it is non-zero,
+they are not used.
 
 If no style has been defined for a context, the strings tt(arguments
 values), tt(options), tt(globbed-files), tt(directories) and
