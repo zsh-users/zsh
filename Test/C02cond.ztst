@@ -195,6 +195,16 @@ F:are not recorded. This does not indicate a problem in the shell.
   [ `echo 0` -lt `echo 1` ]
 0:substituion in `[' builtin
 
+  fn() {
+    # careful: first file must exist to trigger bug
+    [[ -e unmodified ]] || print Where\'s my file\?
+    [[ unmodified -nt NonExistentFile ]]
+    print status = $?
+  }
+  fn
+0:-nt shouldn't abort on non-existent files
+>status = 1
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish

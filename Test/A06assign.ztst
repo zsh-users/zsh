@@ -264,3 +264,16 @@
 >hello
 >hello
 >hello
+
+ repeat 10 FOO=BAR BAR=FOO echo $FOO $BAR
+0:save and restore multiple variables around builtin
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>

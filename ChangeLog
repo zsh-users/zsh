@@ -1,3 +1,8 @@
+2005-02-02  Peter Stephenson  <pws@csr.com>
+
+	* 20777: Test/A06assign.ztst, Test/C02cond.ztst: tests for
+	users/8422 and 20774.
+
 2005-02-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* 20774: Src/exec.c: fix e.g. "FOO=BAR BAR=FOO echo" failure to
