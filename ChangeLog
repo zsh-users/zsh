@@ -1,3 +1,9 @@
+2005-04-06  Peter Stephenson  <pws@csr.com>
+
+	* Carlos Phillips <carlos.phillips@mail.mcgill.ca>:
+	private email: Completion/Unix/Command/_darcs: much improved
+	completion for darcs.
+
 2005-04-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync:  Made --address
