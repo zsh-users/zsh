@@ -348,7 +348,7 @@ _cvs_history () {
     '*-n+[in module]:module:_cvs_modules' \
     '*-p+[in repository]:repository:' \
     '-r+[since revision]:rev:' \
-    '-t+[since tag]:tag:' \
+    '-t+[since tag]:tag:_cvs_revisions' \
     '*-u+[specify user]:user name:' \
     '-x+[specify type]:type:_cvs_history_x' \
     '-X+[debugging]:arg:' \
@@ -497,7 +497,7 @@ _cvs_rtag () {
     '(-d)-b[create branch]' \
     '-D+[specify date]:date:_cvs_D' \
     '-r+[specify revision]:tag:_cvs_revisions' \
-    ':tag:' \
+    ':tag:_cvs_revisions' \
     '*:module:_cvs_modules'
 }
 
@@ -524,7 +524,7 @@ _cvs_tag () {
     '(-d)-f[force a head revision]' \
     '-r+[specify revision]:tag:_cvs_revisions' \
     '-D+[specify date]:date:_cvs_D' \
-    ':tag:' \
+    ':tag:_cvs_revisions' \
     '*:file:_cvs_files'
 }
 

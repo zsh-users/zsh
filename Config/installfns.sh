@@ -2,32 +2,39 @@
 
 fndir=$DESTDIR$fndir
 
-$sdir_top/mkinstalldirs $fndir || exit 1;
+/bin/sh $sdir_top/mkinstalldirs $fndir || exit 1;
 
-# If the source directory is somewhere else, we need to force
-# the shell to expand it in that directory, then strip it off.
-install=
-for file in $FUNCTIONS_INSTALL; do
-  if test -f "$sdir/$file"; then
-    install="$install $file"
-  else
-    install="$install `echo '' $sdir/$file | sed -e \"s% $sdir/% %g\"`"
-  fi
-done
+allfuncs="`grep ' functions=.' ${dir_top}/config.modules |
+  sed -e '/^#/d' -e '/ link=no/d' -e 's/^.* functions=//'`"
 
-for file in $install; do
-  if test -f $sdir/$file; then
+allfuncs="`cd $sdir_top; echo ${allfuncs}`"
+
+# We now have a list of files, but we need to use `test -f' to check
+# (1) the glob got expanded (2) we are not looking at directories.
+for file in $allfuncs; do
+  if test -f $sdir_top/$file; then
+    case "$file" in
+      */CVS/*) continue;;
+    esac
     if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
-      subfile="$file"
-      subdir="`echo $file | sed -e 's%/[^/]*$%%'`"
-      instdir="$fndir/$subdir"
+      case "$file" in
+      Completion/comp*)
+        subdir="`echo $file | sed -e 's%/[^/]*/[^/]*$%%'`"
+        instdir="$fndir/Completion"
+        ;;
+      Completion/*)
+        subdir="`echo $file | sed -e 's%/[^/]*/[^/]*$%%'`"
+        instdir="$fndir/$subdir"
+        ;;
+      *)
+        subdir="`echo $file | sed -e 's%/[^/]*$%%' -e 's%^Functions/%%'`"
+        instdir="$fndir/$subdir"
+        ;;
+      esac
     else
-      subfile="`echo $file | sed -e 's%^.*/%%'`"
       instdir="$fndir"
     fi
-    $sdir_top/mkinstalldirs $instdir || exit 1
-    $INSTALL_DATA $sdir/$file $instdir || exit 1
+    test -d $instdir || /bin/sh $sdir_top/mkinstalldirs $instdir || exit 1
+    $INSTALL_DATA $sdir_top/$file $instdir || exit 1
   fi
 done
-
-exit 0

@@ -240,6 +240,11 @@
 	* users/4092: Src/hist.c: Don't lose the last history line
 	when a signal causes us to rewrite the history file.
 
+2001-08-07  Peter Stephenson  <pws@csr.com>
+
+	* 15583: Config/installfns.sh: ignore CVS directories for
+	all function installations, not just with subdirectories.
+
 2001-08-06  Oliver Kiddle  <opk@zsh.org>
 
 	* 15574: Completion/Unix/Command/_cvs, Completion/Unix/Type/_users,
@@ -258,6 +263,17 @@
 
         * 15551: Completion/Unix/Command/_gzip: handle -l and -t
         as done for -d; only complete presumably compressed files.
+
+2001-07-27  Peter Stephenson  <pws@csr.com>
+
+	* 15508: Completion/Unix/Command/_cvs: cvs tag told you it was
+	going to complete a tag, but then didn't.
+
+2001-07-26  Peter Stephenson  <pws@csr.com>
+
+	* 15498: Doc/Zsh/builtins.yo, Doc/Zsh/zle.yo: fix cross-refs
+	for zle builtins and add extra texinfo nodes for zle keymaps,
+	builtins and widgets.
 
 2001-07-26  Oliver Kiddle  <opk@zsh.org>
 
@@ -315,6 +331,11 @@
 
 	* 15308: Src/builtin.c: Fix infinite loop on `r OLD=NEW' when OLD
 	is the empty string, by rejecting replacements with an empty OLD.
+
+2001-07-06  Peter Stephenson  <pws@csr.com>
+
+	* 15279: Doc/Zsh/expn.yo: describe those ${(S)...%%...} things
+	so that even I understand what the code does.
 
 2001-07-06  Oliver Kiddle  <opk@zsh.org>
 
