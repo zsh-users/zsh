@@ -1,3 +1,8 @@
+2003-08-01  Peter Stephenson  <pws@csr.com>
+
+	* 18916: Src/utils.c: Unsetting IFS could cause segmentation
+	fault (any time IFS was used to join an array).
+
 2003-07-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 18914: Completion/Base/Utility/_nothing,
