@@ -1,4 +1,5 @@
 #compdef killall
 
-compset -P 1 - && _wanted -C - signals expl signal &&
-    compadd "$expl[@]" $signals[1,-3]
+_alternative \
+    'signals:: _signals -p' \
+    'processes:process:{ compadd "$expl[@]" ${$(ps ho comm 2> /dev/null):#(ps|COMMAND)} }'
