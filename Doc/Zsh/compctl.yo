@@ -666,7 +666,9 @@ sect(Matching Control)
 It is possible by use of the tt(-M) var(spec) flag to specify how the
 characters in the string to be completed (referred to here as the
 command line) map onto the characters in the list of matches produced by
-the completion code (referred to here as the trial completions).
+the completion code (referred to here as the trial completions). Note
+that this is not used if the command line contains a glob pattern and
+the tt(GLOB_COMPLETE) option is set.
 
 The var(spec) consists of one or more matching descriptions separated by
 whitespace. Each description consists of a letter followed by a colon,

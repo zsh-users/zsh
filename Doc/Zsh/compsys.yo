@@ -495,6 +495,9 @@ tt(match_insert) configuration key is set to a string starting with
 `tt(unambig)'. In this case menucompletion will only be started if no
 unambiguous string could be generated that is at least as long as the
 original string.
+
+Note that the matcher specifications defined globally or used by the
+completion functions will not be used.
 )
 item(tt(_expand))(
 This completer function does not really do completion, but instead

@@ -157,7 +157,7 @@ int newmatches;
 
 /* Number of permanently allocated matches and groups. */
 
-static int permmnum, permgnum;
+static int permmnum, permgnum, lastpermmnum, lastpermgnum;
 
 /* The total number of matches and the number of matches to be listed. */
 
@@ -5123,7 +5123,7 @@ callcompfunc(char *s, char *fn)
 	    comptoend = ztrdup("match");
 	zsfree(compoldlist);
 	zsfree(compoldins);
-	if (hasoldlist && permmnum) {
+	if (hasoldlist && lastpermmnum) {
 	    if (listshown)
 		compoldlist = "shown";
 	    else
@@ -5359,6 +5359,8 @@ makecomplist(char *s, int incmd, int lst)
 	    }
 	    permmatches(1);
 	    amatches = pmatches;
+	    lastpermmnum = permmnum;
+	    lastpermgnum = permgnum;
 	} LASTALLOC;
 
 	lastmatches = pmatches;
@@ -8592,7 +8594,7 @@ do_ambig_menu(void)
 	    minfo.cur = NULL;
     }
     if (insgroup) {
-	insgnum = comp_mod(insgnum, permgnum);
+	insgnum = comp_mod(insgnum, lastpermgnum);
 	for (minfo.group = amatches;
 	     minfo.group && (minfo.group)->num != insgnum + 1;
 	     minfo.group = (minfo.group)->next);
@@ -8603,7 +8605,7 @@ do_ambig_menu(void)
 	}
 	insmnum = comp_mod(insmnum, (minfo.group)->mcount);
     } else {
-	insmnum = comp_mod(insmnum, permmnum);
+	insmnum = comp_mod(insmnum, lastpermmnum);
 	for (minfo.group = amatches;
 	     minfo.group && (minfo.group)->mcount <= insmnum;
 	     minfo.group = (minfo.group)->next)

@@ -329,6 +329,10 @@ other non-empty string.  If it is non-empty, unquoted metacharacters on the
 command line will be treated as patterns; if it is `tt(*)', then
 additionally a wildcard `tt(*)' is assumed at the cursor position; if
 it is empty or unset, metacharacters will be treated literally.
+
+Note that the matcher specifications given globally or to one of the
+builtin commands adding matches are not used if this is set to a
+non-empty string.
 )
 item(tt(pattern_insert))(
 Normally this is set to tt(menu), which specifies that menu-completion will
