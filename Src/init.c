@@ -37,7 +37,7 @@
 #include "version.h"
 
 /**/
-int noexitct = 0;
+mod_export int noexitct = 0;
 
 /* buffer for $_ and its length */
 
