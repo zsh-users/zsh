@@ -1,5 +1,8 @@
 2000-09-04  Bart Schaefer  <schaefer@zsh.org>
 
+	* 12733: Functions/Misc/colors: Restore `grey' and other
+	accidentally-misplaced elements in the `fg*' and `bg*' arrays.
+
 	* 12732: Src/params.c: Suppress base# prefix when base is 10 even
 	if the [##base] format of 12722 was not used.
 
