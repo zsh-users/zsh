@@ -1,6 +1,6 @@
 moddeps="comp1"
 
-autobins="compctl complist compadd compset"
+autobins="compctl compgen compadd compset"
 
 autoprefixconds="prefix suffix between after"
 
