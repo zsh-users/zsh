@@ -1399,11 +1399,15 @@ scanpmjobdirs(HashTable ht, ScanFunc func, int flags)
 static void
 setpmnameddir(Param pm, char *value)
 {
-    if (!value || *value != '/')
-	zwarn("invalid value: %s", value, 0);
-    else
-	adduserdir(pm->nam, value, 0, 1);
-    zsfree(value);
+    if (!value)
+	zwarn("invalid value: ''", NULL, 0);
+    else {
+	Nameddir nd = (Nameddir) zcalloc(sizeof(*nd));
+
+	nd->flags = 0;
+	nd->dir = value;
+	nameddirtab->addnode(nameddirtab, ztrdup(pm->nam), nd);
+    }
 }
 
 /**/
@@ -1444,10 +1448,15 @@ setpmnameddirs(Param pm, HashTable ht)
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
-	    if (!(val = getstrvalue(&v)) || *val != '/')
-		zwarn("invalid value: %s", val, 0);
-	    else
-		adduserdir(hn->nam, val, 0, 1);
+	    if (!(val = getstrvalue(&v)))
+		zwarn("invalid value: ''", NULL, 0);
+	    else {
+		Nameddir nd = (Nameddir) zcalloc(sizeof(*nd));
+
+		nd->flags = 0;
+		nd->dir = ztrdup(val);
+		nameddirtab->addnode(nameddirtab, ztrdup(hn->nam), nd);
+	    }
 	}
 
     /* The INTERACTIVE stuff ensures that the dirs are not immediatly removed

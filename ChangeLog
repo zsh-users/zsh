@@ -1,3 +1,8 @@
+2000-10-30  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13095: Src/Modules/parameter.c: make assignament to $nameddirs
+ 	behave like hash -d
+	
 2000-10-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* users/3472: Completion/User/_rcs: use return value of _files,
