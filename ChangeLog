@@ -4,6 +4,8 @@
 
 2000-04-17  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10788: Src/text.c: display newlines as spaces in job-texts
+	
 	* 10782: Src/Zle/computil.c: fix for exclusion lists for -+o
  	specifications
 	

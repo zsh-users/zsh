@@ -58,6 +58,7 @@ static void
 taddstr(char *s)
 {
     int sl = strlen(s);
+    char c;
 
     while (tptr + sl >= tlim) {
 	int x = tptr - tbuf;
@@ -68,8 +69,8 @@ taddstr(char *s)
 	tlim = tbuf + tsiz;
 	tptr = tbuf + x;
     }
-    strcpy(tptr, s);
-    tptr += sl;
+    while ((c = *s++))
+	*tptr++ = (c == '\n' ? ' ' : c);
 }
 
 /**/
