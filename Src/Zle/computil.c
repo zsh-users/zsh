@@ -3159,7 +3159,7 @@ cfp_matcher_pats(char *matcher, char *add)
 		if (m->wlen < 0 && !m->llen && m->ralen == 1) {
 		    for (tmp = add, tl = al, mp = ms; tl; tl--, tmp++, mp++) {
 			if (pattern_match(m->right, tmp, NULL, NULL)) {
-			    if (*mp) {
+			    if (*mp || (tmp == add && *tmp == '.')) {
 				*tmp = '\0';
 				al = tmp - add;
 				break;
@@ -3190,7 +3190,7 @@ cfp_matcher_pats(char *matcher, char *add)
 		    }
 	}
 	if (*add) {
-	    char *ret = "", buf[259];
+	    char *ret = "", buf[259], *oadd = add;
 
 	    for (mp = ms; *add; add++, mp++) {
 		if (!(m = *mp)) {

@@ -1,5 +1,8 @@
 2000-06-19  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11981: Src/Zle/computil.c: more careful when optimising patterns
+ 	in compfiles
+	
 	* 11977: Completion/Core/_options, Completion/Core/_set_options,
  	Completion/Core/_unset_options, Doc/Zsh/compwid.yo,
  	Src/Zle/comp.h, Src/Zle/complete.c, Src/Zle/compmatch.c,
