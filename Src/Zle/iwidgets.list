@@ -44,6 +44,7 @@
 "end-of-history", endofhistory, 0
 "end-of-line", endofline, 0
 "end-of-line-hist", endoflinehist, 0
+"end-of-list", endoflist, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "exchange-point-and-mark", exchangepointandmark, 0
 "execute-last-named-cmd", NULL, 0
 "execute-named-cmd", NULL, 0

@@ -59,6 +59,11 @@ mod_export int showinglist;
 /**/
 mod_export int listshown;
 
+/* Length of last list displayed (if it is below the prompt). */
+
+/**/
+mod_export int lastlistlen;
+
 /* Non-zero if ALWAYS_LAST_PROMPT has been used, meaning that the *
  * screen below the buffer display should not be cleared by       *
  * zrefresh(), but should be by trashzle().                       */
@@ -282,7 +287,7 @@ zrefresh(void)
 	    clearflag = 0;
 	    resetneeded = 1;
 	}
-	listshown = 0;
+	listshown = lastlistlen = 0;
 	if (showinglist != -2)
 	    showinglist = 0;
     }

@@ -593,7 +593,7 @@ zleread(char *lp, char *rp, int flags)
     trashzle();
     free(lpromptbuf);
     free(rpromptbuf);
-    zleactive = zlereadflags = 0;
+    zleactive = zlereadflags = lastlistlen = 0;
     alarm(0);
 
     freeundo();

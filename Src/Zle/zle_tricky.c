@@ -2009,6 +2009,8 @@ listlist(LinkList l)
 	    putc('\n', shout);
 	settyinfo(&shttyinfo);
     }
+    lastlistlen = (clearflag ? nlines : 0);
+
     if (ncols) {
 	if (isset(LISTROWSFIRST)) {
 	    for (col = 1, p = data, lenp = lens; *p;
@@ -2252,4 +2254,27 @@ expandorcompleteprefix(char **args)
     ret = expandorcomplete(args);
     comppref = 0;
     return ret;
+}
+
+/**/
+int
+endoflist(char **args)
+{
+    if (lastlistlen > 0) {
+	int i;
+
+	clearflag = 0;
+	trashzle();
+
+	for (i = lastlistlen; i > 0; i--)
+	    putc('\n', shout);
+
+	showinglist = lastlistlen = 0;
+
+	if (sfcontext)
+	    zrefresh();
+
+	return 0;
+    }
+    return 1;
 }

@@ -416,12 +416,18 @@ bin_zle_refresh(char *name, char **args, char *ops, char func)
 
 	    zmult = 1;
 	    listlist(l);
+	    if (statusline)
+		lastlistlen++;
 	    showinglist = clearlist = 0;
 	    zmult = zmultsav;
-	} else if (ops['c'])
+	} else if (ops['c']) {
 	    clearlist = 1;
-    } else if (ops['c'])
+	    lastlistlen = 0;
+	}
+    } else if (ops['c']) {
 	clearlist = listshown = 1;
+	lastlistlen = 0;
+    }
     zrefresh();
 
     clearlist = ocl;

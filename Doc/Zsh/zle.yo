@@ -129,6 +129,10 @@ The offset of the cursor, within the edit buffer.  This is in the range
 Attempts to move the cursor outside the buffer will result in the
 cursor being moved to the appropriate end of the buffer.
 )
+vindex(MARK)
+item(tt(MARK) (integer))(
+Like tt(CURSOR), but for the mark.
+)
 vindex(LBUFFER)
 item(tt(LBUFFER) (scalar))(
 The part of the buffer that lies to the left of the cursor position.
@@ -937,6 +941,11 @@ item(tt(reverse-menu-complete))(
 Perform menu completion, like tt(menu-complete), except that if
 a menu completion is already in progress, move to the em(previous)
 completion rather than the next.
+)
+tindex(end-of-list)
+item(tt(end-of-list))(
+When a previous completion displayed a list below the prompt, this
+widget can be used to move the prompt below the list.
 )
 enditem()
 texinode(Miscellaneous)()(Completion)(Zsh Line Editor)

@@ -1528,6 +1528,7 @@ mod_export int asklist(void)
     showinglist = listshown = 0;
 
     clearflag = (isset(USEZLE) && !termflags && dolastprompt);
+    lastlistlen = 0;
 
     /* Maybe we have to ask if the user wants to see the list. */
     if ((!minfo.cur || !minfo.asked) &&
@@ -1756,16 +1757,20 @@ printlist(int over, CLPrintFunc printm, int showall)
 	    pnl = 1;
 	g = g->next;
     }
+    lastlistlen = 0;
     if (clearflag) {
 	/* Move the cursor up to the prompt, if always_last_prompt *
 	 * is set and all that...                                  */
 	if ((ml = listdat.nlines + nlnct - 1) < lines) {
 	    tcmultout(TCUP, TCMULTUP, ml);
 	    showinglist = -1;
+
+	    lastlistlen = listdat.nlines;
 	} else
 	    clearflag = 0, putc('\n', shout);
     } else
 	putc('\n', shout);
+
     listshown = (clearflag ? 1 : -1);
 
     return printed;

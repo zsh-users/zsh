@@ -641,7 +641,7 @@ executenamedcommand(char *prmt)
 {
     Thingy cmd;
     int len, l = strlen(prmt), feep = 0, listed = 0, curlist = 0;
-    int ols = (listshown && validlist);
+    int ols = (listshown && validlist), olll = lastlistlen;
     char *ptr;
     char *okeymap = curkeymapname;
 
@@ -659,9 +659,10 @@ executenamedcommand(char *prmt)
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    statusline = NULL;
 	    selectkeymap(okeymap, 1);
-	    if ((listshown = ols))
+	    if ((listshown = ols)) {
 		showinglist = -2;
-	    else if (listed)
+		lastlistlen = olll;
+	    } else if (listed)
 		clearlist = listshown = 1;
 
 	    return NULL;
@@ -725,9 +726,10 @@ executenamedcommand(char *prmt)
 		    unrefthingy(r);
 		    statusline = NULL;
 		    selectkeymap(okeymap, 1);
-		    if ((listshown = ols))
+		    if ((listshown = ols)) {
 			showinglist = -2;
-		    else if (listed)
+			lastlistlen = olll;
+		    } else if (listed)
 			clearlist = listshown = 1;
 		    return r;
 		}
