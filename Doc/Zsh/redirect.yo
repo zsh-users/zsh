@@ -92,11 +92,31 @@ The input/output from/to the coprocess is moved to the standard input/output.
 )
 xitem(tt(>&) var(word))
 item(tt(&>) var(word))(
-Same as `tt(>) var(word) tt(2>&1)'.  Note that with tt(&>), var(word) is
-never interpreted as a file descriptor, even if it is a number.
+(Except where `tt(>&) var(word)' matches one of the above syntaxes;
+`tt(&>)' can always be used to avoid this ambiguity.)
+Redirects both standard output and standard error (file descriptor 2)
+in the manner of `tt(>) var(word)'.
+Note that this does em(not) have the same effect as `tt(>) var(word) tt(2>&1)'
+in the presence of multios (see the section below).
 )
-item(tt(>>&) var(word))(
-Same as `tt(>>) var(word) tt(2>&1)'.
+xitem(tt(>&|) var(word))
+xitem(tt(>&!) var(word))
+xitem(tt(&>|) var(word))
+item(tt(&>!) var(word))(
+Redirects both standard output and standard error (file descriptor 2)
+in the manner of `tt(>|) var(word)'.
+)
+xitem(tt(>>&) var(word))
+item(tt(&>>) var(word))(
+Redirects both standard output and standard error (file descriptor 2)
+in the manner of `tt(>>) var(word)'.
+)
+xitem(tt(>>&|) var(word))
+xitem(tt(>>&!) var(word))
+xitem(tt(&>>|) var(word))
+item(tt(&>>!) var(word))(
+Redirects both standard output and standard error (file descriptor 2)
+in the manner of `tt(>>|) var(word)'.
 )
 enditem()
 
