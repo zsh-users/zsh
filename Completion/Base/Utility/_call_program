@@ -1,0 +1,13 @@
+#autoload +X
+
+local tmp
+
+if zstyle -s ":completion:${curcontext}:${1}" command tmp; then
+  if [[ "$tmp" = -* ]]; then
+    eval "$tmp[2,-1]" "$argv[2,-1]"
+  else
+    eval "$tmp"
+  fi
+else
+  eval "$argv[2,-1]"
+fi
