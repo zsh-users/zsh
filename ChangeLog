@@ -1,3 +1,12 @@
+2003-01-07  Oliver Kiddle  <opk@zsh.org>
+
+	* 18058: Completion/Unix/Command/_lsof, Completion/Unix/Command/_mt,
+	Completion/Unix/Command/_xsltproc, Completion/Unix/Command/_rlogin,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_ant,
+	Completion/Unix/Command/.distfiles: new completions for lsof, mt and
+	xsltproc, complete remote files for rcp, allow multiple port
+	redirections with ssh and a typo correction in _ant
+
 2002-12-18  Peter Stephenson  <pws@csr.com>
 
 	* 18015: Src/math.c: empty math parse e.g. $(( )) acts like a zero.
