@@ -1,3 +1,0 @@
-#compdef apachectl
-
-_sub_commands start startssl stop restart fullstatus status graceful configtest help
