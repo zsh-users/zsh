@@ -39,13 +39,19 @@ static char termcap_nam[] = "termcap";
 #ifdef HAVE_TGETENT
 # ifdef HAVE_TERMCAP_H
 #  include <termcap.h>
-# endif
-
-# ifdef HAVE_CURSES_H
-#  include <curses.h>
-# endif
-# ifdef HAVE_TERM_H
-#  include <term.h>
+#  ifdef HAVE_TERM_H
+#   include <term.h>
+#  endif
+# else
+#  ifdef HAVE_TERMIO_H
+#   include <termio.h>
+#  endif
+#  ifdef HAVE_CURSES_H
+#   include <curses.h>
+#  endif
+#  ifdef HAVE_TERM_H
+#   include <term.h>
+#  endif
 # endif
 
 static Param termcap_pm;

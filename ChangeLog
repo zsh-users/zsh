@@ -1,5 +1,8 @@
 2001-04-20  Clint Adams  <schizo@debian.org>
 
+	* 14055: Src/Modules/termcap.c: include termio.h if available.
+	This prevents Solaris 8 from choking on term.h.
+
 	* 14053: Src/Modules/termcap.c, Src/Modules/termcap.mdd:
 	add ${termcap} special parameter in the style of ${terminfo}.
 
