@@ -1,3 +1,8 @@
+2000-12-23  Clint Adams  <schizo@debian.org>
+
+	* Chip Salzenberg: 13310: Completion/Debian/_apt:
+	correct typo for apt-cache completion.
+
 2000-12-17  Bart Schaefer  <schaefer@zsh.org>
 
 	* Zefram: 13290: Src/Zle/zle_bindings.c, Src/Zle/zle_keymap.c:

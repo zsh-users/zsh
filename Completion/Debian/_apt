@@ -402,7 +402,7 @@ _apt-cache () {
     -q,--quiet:intlevel \
     -i,--important:bool \
     -f,--full:bool \
-    --name-only:bool \
+    --names-only:bool \
     -c,--config-file:configfile \
     -o,--option:arbitem \
     -- \
