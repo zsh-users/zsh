@@ -1189,6 +1189,14 @@ item(tt(TRANSIENT_RPROMPT))(
 Remove any right prompt from display when accepting a command
 line.  This may be useful with terminals with other cut/paste methods.
 )
+pindex(TRAPS_ASYNC)
+cindex(traps, asynchronous)
+item(tt(TRAPS_ASYNC) <C> <Z>)(
+While waiting for a program to exit, run traps immediately.  Otherwise
+the trap is run after the program has exited.  Note this does not affect
+the point at which traps are run for any case other than when the shell is
+waiting for a child process.
+)
 pindex(TYPESET_SILENT)
 item(tt(TYPESET_SILENT))(
 If this is unset, executing any of the `tt(typeset)' family of
@@ -1366,6 +1374,7 @@ endsitem()
 subsect(sh/ksh emulation set)
 startsitem()
 sitem(tt(-C))(em(NO_)CLOBBER)
+sitem(tt(-T))(TRAPS_ASYNC)
 sitem(tt(-X))(MARK_DIRS)
 sitem(tt(-a))(ALL_EXPORT)
 sitem(tt(-b))(NOTIFY)

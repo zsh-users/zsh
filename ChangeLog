@@ -1,3 +1,10 @@
+2004-04-19  Peter Stephenson  <pws@csr.com>
+
+	* zsh=users/7365: Doc/Zsh/options.yo, Src/jobs.c, Src/options.c,
+	Src/signals.c, Src/zsh.h, plus unposted Etc/NEWS hunk: new option
+	TRAPS_ASYNC, turn off to stop traps being run while waiting
+	for a child process.
+
 2004-04-18  Clint Adams  <clint@zsh.org>
 
 	* 19792: Completion/X/Command/_mplayer: complete .m2v and .m2p,

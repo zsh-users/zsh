@@ -19,6 +19,11 @@ Changes since zsh version 4.2.0
   unnecessary confusion if, for example, both DEBUG and EXIT traps
   were set.  The new behaviour is more compatible with other shells.
 
+- New option TRAPS_ASYNC which if set allows traps to run while the
+  shell is waiting for a child process.  This is the traditional zsh
+  behaviour; POSIX requires the option to be unset.  In sh/ksh
+  compatibility mode the option is turned off by default and the option
+  letter -T turns it on, for compatibility with FreeBSD sh.
 
 New features between zsh versions 4.0 and 4.2
 ---------------------------------------------

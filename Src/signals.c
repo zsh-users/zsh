@@ -49,7 +49,7 @@ mod_export int nsigtrapped;
 /* Variables used by signal queueing */
 
 /**/
-mod_export int queueing_enabled, queue_front, queue_rear;
+mod_export int queueing_enabled, queue_front, queue_rear, queue_not_sigchld;
 /**/
 mod_export int signal_queue[MAX_QUEUE_SIZE];
 /**/
@@ -425,7 +425,8 @@ zhandler(int sig)
     }
 #endif
 
-    if (queueing_enabled) {           /* Are we queueing signals now?      */
+    /* Are we queueing signals now?      */
+    if (queueing_enabled && (sig != SIGCHLD || !queue_not_sigchld)) {
         int temp_rear = ++queue_rear % MAX_QUEUE_SIZE;
 
 	DPUTS(temp_rear == queue_front, "BUG: signal queue full");
