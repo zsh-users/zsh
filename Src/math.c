@@ -57,24 +57,37 @@ static int unary = 1;
  * RL = right-to-left associativity *
  * BOOL = short-circuiting boolean   */
 
-#define LR 0
-#define RL 1
-#define BOOL 2
+#define LR   0x0000
+#define RL   0x0001
+#define BOOL 0x0002
 
 #define MTYPE(x)  ((x) & 3)
 
 /*
- * OP_A2 2 argument
- * OP_A2IR 2 argument with return type integer
- * OP_A2IO 2 arguments, must be integer, returning integer
- * OP_E2 2 argument with assignment
- * OP_E2IO 2 arguments with assignment, must be integer, return integer
+ * OP_A2    2 arguments
+ * OP_A2IR  2 arguments, return integer
+ * OP_A2IO  2 arguments, must be integer, return integer
+ * OP_E2    2 arguments with assignment
+ * OP_E2IO  2 arguments with assignment, must be integer, return integer
+ * OP_OP    None of the above, but occurs where we are expecting an operator
+ *          rather than an operand.
+ * OP_OPF   Followed by an operator, not an operand.
+ *
+ * OP_A2*, OP_E2*, OP_OP*:
+ *   Occur when we need an operator; the next object must be an operand,
+ *   unless OP_OPF is also supplied.
+ *
+ * Others:
+ *   Occur when we need an operand; the next object must also be an operand,
+ *   unless OP_OPF is also supplied.
  */
-#define OP_A2   4
-#define OP_A2IR 8
-#define OP_A2IO 16
-#define OP_E2   32
-#define OP_E2IO 64
+#define OP_A2   0x0004
+#define OP_A2IR 0x0008
+#define OP_A2IO 0x0010
+#define OP_E2   0x0020
+#define OP_E2IO 0x0040
+#define OP_OP   0x0080
+#define OP_OPF  0x0100
 
 #define M_INPAR 0
 #define M_OUTPAR 1
@@ -152,17 +165,17 @@ static int prec[TOKCOUNT] =
 
 static int type[TOKCOUNT] =
 {
-/*  0 */    LR, LR, RL, RL, RL,
-/*  5 */    RL, RL, RL, LR|OP_A2IO, LR|OP_A2IO,
-/* 10 */    LR|OP_A2IO, LR|OP_A2, LR|OP_A2, LR|OP_A2IO, LR|OP_A2,
-/* 15 */    LR|OP_A2, LR|OP_A2IO, LR|OP_A2IO, LR|OP_A2IR, LR|OP_A2IR,
-/* 20 */    LR|OP_A2IR, LR|OP_A2IR, LR|OP_A2IR, LR|OP_A2IR, BOOL|OP_A2IO,
-/* 25 */    BOOL|OP_A2IO, LR|OP_A2IO, RL, RL, RL|OP_E2,
-/* 30 */    RL|OP_E2, RL|OP_E2, RL|OP_E2, RL|OP_E2, RL|OP_E2IO,
-/* 35 */    RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO,
-/* 40 */    BOOL|OP_E2IO, BOOL|OP_E2IO, RL|OP_A2IO, RL|OP_A2, RL,
-/* 45 */    RL, RL, LR, LR, RL|OP_A2,
-/* 50 */    LR, RL|OP_E2
+/*  0 */  LR, LR|OP_OP|OP_OPF, RL, RL, RL|OP_OP|OP_OPF,
+/*  5 */  RL|OP_OP|OP_OPF, RL, RL, LR|OP_A2IO, LR|OP_A2IO,
+/* 10 */  LR|OP_A2IO, LR|OP_A2, LR|OP_A2, LR|OP_A2IO, LR|OP_A2,
+/* 15 */  LR|OP_A2, LR|OP_A2IO, LR|OP_A2IO, LR|OP_A2IR, LR|OP_A2IR,
+/* 20 */  LR|OP_A2IR, LR|OP_A2IR, LR|OP_A2IR, LR|OP_A2IR, BOOL|OP_A2IO,
+/* 25 */  BOOL|OP_A2IO, LR|OP_A2IO, RL|OP_OP, RL|OP_OP, RL|OP_E2,
+/* 30 */  RL|OP_E2, RL|OP_E2, RL|OP_E2, RL|OP_E2, RL|OP_E2IO,
+/* 35 */  RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO,
+/* 40 */  BOOL|OP_E2IO, BOOL|OP_E2IO, RL|OP_A2IO, RL|OP_A2, RL|OP_OP,
+/* 45 */  RL, RL, LR|OP_OPF, LR|OP_OPF, RL|OP_A2,
+/* 50 */  LR|OP_OPF, RL|OP_E2
 };
 
 #define LVCOUNT 32
@@ -188,7 +201,6 @@ zzlex(void)
 		return (unary) ? PREPLUS : POSTPLUS;
 	    }
 	    if (*ptr == '=') {
-		unary = 1;
 		ptr++;
 		return PLUSEQ;
 	    }
@@ -199,19 +211,16 @@ zzlex(void)
 		return (unary) ? PREMINUS : POSTMINUS;
 	    }
 	    if (*ptr == '=') {
-		unary = 1;
 		ptr++;
 		return MINUSEQ;
 	    }
 	    return (unary) ? UMINUS : MINUS;
 	case '(':
-	    unary = 1;
 	    return M_INPAR;
 	case ')':
 	    return M_OUTPAR;
 	case '!':
 	    if (*ptr == '=') {
-		unary = 1;
 		ptr++;
 		return NEQ;
 	    }
@@ -219,7 +228,6 @@ zzlex(void)
 	case '~':
 	    return COMP;
 	case '&':
-	    unary = 1;
 	    if (*ptr == '&') {
 		if (*++ptr == '=') {
 		    ptr++;
@@ -232,7 +240,6 @@ zzlex(void)
 	    }
 	    return AND;
 	case '|':
-	    unary = 1;
 	    if (*ptr == '|') {
 		if (*++ptr == '=') {
 		    ptr++;
@@ -245,7 +252,6 @@ zzlex(void)
 	    }
 	    return OR;
 	case '^':
-	    unary = 1;
 	    if (*ptr == '^') {
 		if (*++ptr == '=') {
 		    ptr++;
@@ -258,7 +264,6 @@ zzlex(void)
 	    }
 	    return XOR;
 	case '*':
-	    unary = 1;
 	    if (*ptr == '*') {
 		if (*++ptr == '=') {
 		    ptr++;
@@ -272,21 +277,18 @@ zzlex(void)
 	    }
 	    return MUL;
 	case '/':
-	    unary = 1;
 	    if (*ptr == '=') {
 		ptr++;
 		return DIVEQ;
 	    }
 	    return DIV;
 	case '%':
-	    unary = 1;
 	    if (*ptr == '=') {
 		ptr++;
 		return MODEQ;
 	    }
 	    return MOD;
 	case '<':
-	    unary = 1;
 	    if (*ptr == '<') {
 		if (*++ptr == '=') {
 		    ptr++;
@@ -299,7 +301,6 @@ zzlex(void)
 	    }
 	    return LES;
 	case '>':
-	    unary = 1;
 	    if (*ptr == '>') {
 		if (*++ptr == '=') {
 		    ptr++;
@@ -312,14 +313,12 @@ zzlex(void)
 	    }
 	    return GRE;
 	case '=':
-	    unary = 1;
 	    if (*ptr == '=') {
 		ptr++;
 		return DEQ;
 	    }
 	    return EQ;
 	case '$':
-	    unary = 0;
 	    yyval.u.l = mypid;
 	    return NUM;
 	case '?':
@@ -328,20 +327,15 @@ zzlex(void)
 		unary = 0;
 		return NUM;
 	    }
-	    unary = 1;
 	    return QUEST;
 	case ':':
-	    unary = 1;
 	    return COLON;
 	case ',':
-	    unary = 1;
 	    return COMMA;
 	case '\0':
-	    unary = 1;
 	    ptr--;
 	    return EOI;
 	case '[':
-	    unary = 0;
 	    {
 		int base = zstrtol(ptr, &ptr, 10);
 
@@ -356,7 +350,6 @@ zzlex(void)
 	    break;
 	case '0':
 	    if (*ptr == 'x' || *ptr == 'X') {
-		unary = 0;
 		/* Should we set lastbase here? */
 		yyval.u.l = zstrtol(++ptr, &ptr, lastbase = 16);
 		return NUM;
@@ -365,7 +358,6 @@ zzlex(void)
 	default:
 	    if (idigit(*--ptr) || *ptr == '.') {
 		char *nptr;
-		unary = 0;
 		for (nptr = ptr; idigit(*nptr); nptr++);
 
 		if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
@@ -395,7 +387,6 @@ zzlex(void)
 		    ptr++;
 		    ptr = getkeystring(ptr, NULL, 6, &v);
 		    yyval.u.l = v;
-		    unary = 0;
 		    return NUM;
 		}
 		cct = 1;
@@ -408,7 +399,6 @@ zzlex(void)
 		    zerr("too many identifiers (complain to author)", NULL, 0);
 		    return EOI;
 		}
-		unary = 0;
 		while (iident(*++ptr));
 		if (*ptr == '[') {
 		    int l;
@@ -429,7 +419,6 @@ zzlex(void)
 	    }
 	    else if (cct) {
 		yyval.u.l = poundgetfn(NULL);
-		unary = 0;
 		return NUM;
 	    }
 	    return EOI;
@@ -515,6 +504,8 @@ op(int what)
     LV lv;
     int tp = type[what];
 
+    if (errflag)
+	return;
     if (sp < 0) {
 	zerr("bad math expression: stack empty", NULL, 0);
 	return;
@@ -904,6 +895,40 @@ mathevalarg(char *s, char **ss)
     return (x.type & MN_FLOAT) ? (zlong)x.u.d : x.u.l;
 }
 
+/*
+ * Make sure we have an operator or an operand, whatever is expected.
+ * For this purpose, unary operators constitute part of an operand.
+ */
+
+/**/
+static void
+checkunary(int tp, char *ptr)
+{
+    int errmsg = 0;
+    if (tp & (OP_A2|OP_A2IR|OP_A2IO|OP_E2|OP_E2IO|OP_OP)) {
+	if (unary)
+	    errmsg = 1;
+    } else {
+	if (!unary)
+	    errmsg = 2;
+    }
+    if (errmsg) {
+	char errbuf[40];
+	int len, over = 0;
+	while (inblank(*ptr))
+	    ptr++;
+	len = strlen(ptr);
+	if (len > 10) {
+	    len = 10;
+	    over = 1;
+	}
+	sprintf(errbuf, "bad math expression: %s expected at `%%l%s'",
+		errmsg == 2 ? "operator" : "operand",
+		over ? "..." : ""); 
+	zerr(errbuf, ptr, len);
+    }
+    unary = !(tp & OP_OPF);
+}
 
 /* operator-precedence parse the string and execute */
 
@@ -913,10 +938,12 @@ mathparse(int pc)
 {
     zlong q;
     int otok, onoeval;
+    char *optr = ptr;
 
     if (errflag)
 	return;
     mtok = zzlex();
+    checkunary(type[mtok], optr);
     while (prec[mtok] <= pc) {
 	if (errflag)
 	    return;
@@ -964,6 +991,8 @@ mathparse(int pc)
 	    op(otok);
 	    continue;
 	}
+	optr = ptr;
 	mtok = zzlex();
+	checkunary(type[mtok], optr);
     }
 }
