@@ -1,0 +1,15 @@
+#compdef xsetroot
+
+case "$words[CURRENT-1]" in
+-cursor) _files -/g '*.(#i)(xbm|curs(|or))'; return;;
+-cursor_name) _cursors; return;;
+-bitmap) _files -/g '*.(#i)xbm'; return;;
+-([fb]g|solid)) _colors; return;;
+esac
+
+if [[ CURRENT -gt 2 && "$words[CURRENT-2]" = -cursor ]]; then
+  _files -/g '*.(#i)(xbm|curs(|or)|mask)'
+else
+  compadd -M 'm:-=_ r:|_=*' - -help -def -cursor -cursor_name -bitmap -mod -gray -grey \
+                       -fg -bg -rv -solid -name
+fi
