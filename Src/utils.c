@@ -2029,10 +2029,12 @@ sepjoin(char **s, char *sep, int heap)
     if (!*s)
 	return heap ? "" : ztrdup("");
     if (!sep) {
-	sep = sepbuf;
-	sepbuf[0] = *ifs;
-	sepbuf[1] = *ifs == Meta ? ifs[1] ^ 32 : '\0';
-	sepbuf[2] = '\0';
+	p = sep = sepbuf;
+	if (ifs) {
+	    *p++ = *ifs;
+	    *p++ = *ifs == Meta ? ifs[1] ^ 32 : '\0';
+	}
+	*p = '\0';
     }
     sl = strlen(sep);
     for (t = s, l = 1 - sl; *t; l += strlen(*t) + sl, t++);
