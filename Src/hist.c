@@ -980,7 +980,7 @@ should_ignore_line(Eprog prog)
 		    zsfree(t);
 		    return 1;
 		}
-	    } while (isalpha(*b));
+	    } while (ialpha(*b));
 	}
 	zsfree(t);
     }

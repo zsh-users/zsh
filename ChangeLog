@@ -1,5 +1,8 @@
 2000-07-31  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12439: Src/hist.c: isalpha() -> ialpha(); avoid a compiler
+ 	warning
+	
 	* 12438: Doc/Zsh/compsys.yo: clarify manual for menu style;
  	select= and yes= may be given both a number and one of the long*
  	values at the same time
