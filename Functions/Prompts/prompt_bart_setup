@@ -59,6 +59,7 @@ prompt_bart_help () {
 
 prompt_bart_precmd () {
     setopt localoptions noxtrace noksharrays
+    local zero='%([BSUbsu]|{*%})'
 
     # Using psvar here protects against unwanted promptsubst expansions.
 
@@ -67,11 +68,10 @@ prompt_bart_precmd () {
 
     # Compute the size of the upper left prompt and set psvar[9] if needed.
     psvar[9]=()
-    ((${#${(f)${(%%)${(S)PS1//[%]\{*%\}/}}}[1]} > COLUMNS-2)) && psvar[9]=''
-    : ${(S)PS1//[%]\{*%\}/}		# Bug workaround, up to 4.0.1-pre-3
+    ((${#${(f)${(%%)${(S)PS1//$~zero/}}}[1]} > COLUMNS-1)) && psvar[9]=''
 
     # Compute and set the padding between upper left and right prompts.
-    psvar[8]=${(l:COLUMNS-${#${(f)${(%%)${(S)PS1//[%]\{*%\}/}}}[1]}-1:: :)}
+    psvar[8]=${(l:COLUMNS-${#${(f)${(%%)${(S)PS1//$~zero/}}}[1]}-1:: :)}
 }
 
 prompt_bart_ps1 () {
@@ -96,14 +96,14 @@ prompt_bart_ps1 () {
 
     # Assemble the new prompt
     ps1=( ${(f)PS1} )		# Split the existing prompt at newlines
-    ps1=( "%$[COLUMNS-3]>..>"	# Begin truncation (upper left prompt)
+    ps1=( "%$[COLUMNS-1]>..>"	# Begin truncation (upper left prompt)
 	"$host"
 	"$hist1"		# Empty when too wide for one line
 	"$dir"
 	"%<<"			# End truncation (end upper left prompt)
 	"$space"		# Pad line to upper right position
-	"%$[COLUMNS-16](l.  . $date)"
-	"%$[COLUMNS-6](l.. $time)"
+	"%$[COLUMNS-16](l. . $date)"
+	"%$[COLUMNS-8](l.. $time)"
 	"$hist2"		# Empty when $hist1 is not empty
 	$'\n'
 	$ps1[-1] )		# Keep last line of the existing prompt
