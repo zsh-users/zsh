@@ -3,24 +3,27 @@
 # Usage: _urls [-f]
 # Options:
 #  -f : complete files.
-
-# To complete URLs, you must make a URL database locally such as:
 #
-# % cd ~/.zsh/urls
-# % find . -ls
-# ... drwxr-xr-x ... 512 Sep  3 02:46 .
-# ... drwxr-xr-x ... 512 Sep  3 02:48 ./http
-# ... drwxr-xr-x ... 512 Sep  3 02:52 ./http/www.zsh.org
-# ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla
-# ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers
-# ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999
-# ... -rw-r--r-- ...   0 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999/index.html
-# ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk
-# ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk/zsh
-# ... drwxr-xr-x ... 512 Sep  3 02:47 ./bookmark
-# ... drwxr-xr-x ... 512 Sep  3 02:48 ./bookmark/zsh
-# ... -rw-r--r-- ...  27 Sep  3 02:47 ./bookmark/zsh/home
-# ... -rw-r--r-- ...  20 Sep  3 02:48 ./bookmark/zsh/meta
+# Configuration key used:
+#
+#  urls_dir
+#    The path to a directory containing a URL database, such as:
+#
+#      % cd ~/.zsh/urls
+#      % find . -ls
+#      ... drwxr-xr-x ... 512 Sep  3 02:46 .
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http
+#      ... drwxr-xr-x ... 512 Sep  3 02:52 ./http/www.zsh.org
+#      ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla
+#      ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers
+#      ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999
+#      ... -rw-r--r-- ...   0 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999/index.html
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk/zsh
+#      ... drwxr-xr-x ... 512 Sep  3 02:47 ./bookmark
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./bookmark/zsh
+#      ... -rw-r--r-- ...  27 Sep  3 02:47 ./bookmark/zsh/home
+#      ... -rw-r--r-- ...  20 Sep  3 02:48 ./bookmark/zsh/meta
 
 local ipre scheme dirs files
 
@@ -29,8 +32,8 @@ if [[ "$1" = -f ]]; then
   _files "$@" && return
 fi
 
-if [[ -z "$compconfig[_urls_dir]" ]]; then
-  compconfig[_urls_dir]=${ZDOTDIR:-$HOME}/.zsh/urls
+if [[ -z "$compconfig[urls_dir]" ]]; then
+  compconfig[urls_dir]=${ZDOTDIR:-$HOME}/.zsh/urls
 fi
 
 ipre="$IPREFIX"
@@ -49,12 +52,12 @@ case "$scheme" in
 esac
 
 if [[ "$scheme" = bookmark &&
-      -f "$compconfig[_urls_dir]/$scheme/$PREFIX$SUFFIX" &&
-      -s "$compconfig[_urls_dir]/$scheme/$PREFIX$SUFFIX" ]]; then
-  compadd "$@" -QU -- "$ipre$(<"$compconfig[_urls_dir]/$scheme/$PREFIX$SUFFIX")"
+      -f "$compconfig[urls_dir]/$scheme/$PREFIX$SUFFIX" &&
+      -s "$compconfig[urls_dir]/$scheme/$PREFIX$SUFFIX" ]]; then
+  compadd "$@" -QU -- "$ipre$(<"$compconfig[urls_dir]/$scheme/$PREFIX$SUFFIX")"
 else
-  dirs=($compconfig[_urls_dir]/$scheme/$PREFIX*$SUFFIX(/:t))
-  files=($compconfig[_urls_dir]/$scheme/$PREFIX*$SUFFIX(.:t))
+  dirs=($compconfig[urls_dir]/$scheme/$PREFIX*$SUFFIX(/:t))
+  files=($compconfig[urls_dir]/$scheme/$PREFIX*$SUFFIX(.:t))
   compset -P '*/'
   compadd "$@" -Q -S '/' - $dirs
   if [[ "$scheme" = bookmark ]]; then
