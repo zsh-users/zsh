@@ -795,8 +795,8 @@ item(tt(S))(
 Search substrings as well as beginnings or ends; with tt(#) start
 from the beginning and with tt(%) start from the end of the string.
 With substitution via tt(${)...tt(/)...tt(}) or
-tt(${)...tt(//)...tt(}), specifies that the shortest instead of the
-longest match should be replaced.
+tt(${)...tt(//)...tt(}), specifies non-greedy matching, i.e. that the
+shortest instead of the longest match should be replaced.
 )
 item(tt(I:)var(expr)tt(:))(
 Search the var(expr)th match (where var(expr) evaluates to a number).

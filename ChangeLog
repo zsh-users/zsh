@@ -1,5 +1,9 @@
 2001-08-15  Adam Spiers  <adam@spiers.net>
 
+	* unposted: Doc/Zsh/expn.yo: mention the word `greedy' in the
+	docs for the S flag, to make it easier to find for those used to
+	Perl-speak.
+
 	* unposted: Doc/Zsh/compsys.yo: add missing docs for cache-policy
 	style.
 
