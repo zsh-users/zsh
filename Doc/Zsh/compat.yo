@@ -1,8 +1,5 @@
-texinode(Compatibility)(Prompt Expansion)(Conditional Expressions)(Top)
-chapter(Compatibility)
-ifzman(\
+texinode(Compatibility)(Restricted Shell)()(Invocation)
 sect(Compatibility)
-)\
 cindex(compatibility)
 cindex(sh, compatibility)
 cindex(ksh, compatibility)

@@ -21,3 +21,22 @@ item(tt(-s))(
 Read command from the standard input.
 )
 enditem()
+
+For further options, which are common to invocation and the tt(set)
+builtin, see
+ifzman(zmanref(zshoptions))\
+ifnzman(noderef(Options))\
+.  Flags may be specified by name using the tt(-o) option.  For example,
+
+example(zsh -x -o shwordsplit scr)
+
+runs the script tt(scr), setting the tt(XTRACE) option by the corresponding
+letter `tt(-x)' and the tt(SH_WORD_SPLIT) option by name.
+
+startmenu()
+menu(Compatibility)
+menu(Restricted Shell)
+endmenu()
+
+includefile(Zsh/compat.yo)
+includefile(Zsh/restricted.yo)

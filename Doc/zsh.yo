@@ -53,9 +53,7 @@ ifnzman(includefile(Zsh/func.yo))
 ifnzman(includefile(Zsh/jobs.yo))
 ifnzman(includefile(Zsh/arith.yo))
 ifnzman(includefile(Zsh/cond.yo))
-ifnzman(includefile(Zsh/compat.yo))
 ifnzman(includefile(Zsh/prompt.yo))
-ifnzman(includefile(Zsh/restricted.yo))
 ifnzman(includefile(Zsh/expn.yo))
 ifnzman(includefile(Zsh/params.yo))
 ifnzman(includefile(Zsh/options.yo))

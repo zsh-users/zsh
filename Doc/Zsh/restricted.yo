@@ -1,8 +1,5 @@
-texinode(Restricted Shell)(Expansion)(Prompt Expansion)(Top)
-chapter(Restricted Shell)
-ifzman(\
+texinode(Restricted Shell)()(Compatibility)(Invocation)
 sect(Restricted Shell)
-)\
 cindex(restricted shell)
 pindex(RESTRICTED)
 When the basename of the command used to invoke zsh starts with the letter

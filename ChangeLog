@@ -1,3 +1,7 @@
+2000-05-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11485, 11488: Relocate "Compatibility" and "Restricted Shell" docs.
+
 2000-05-22  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 11501: Completion/Linux/_rpm: --buildarch is like --target.

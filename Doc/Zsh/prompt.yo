@@ -1,4 +1,4 @@
-texinode(Prompt Expansion)(Restricted Shell)(Compatibility)(Top)
+texinode(Prompt Expansion)(Expansion)(Conditional Expressions)(Top)
 chapter(Prompt Expansion)
 ifzman(\
 sect(Prompt Expansion)
@@ -42,21 +42,14 @@ A `tt(RPAR())'.
 )
 xitem(tt(%d))
 item(tt(%/))(
-Present working directory (tt($PWD)).
+Present working directory (tt($PWD)).  If an integer follows the `tt(%)',
+it specifies a number of trailing components of tt($PWD) to show; zero
+means the whole path.
 )
 item(tt(%~))(
-tt($PWD).
-If it has a named directory as its prefix, that part is replaced
-by a `tt(~)' followed by the name of the directory.
-If it starts with tt($HOME), that part is
-replaced by a `tt(~)'.
-)
-xitem(tt(%c))
-xitem(tt(%.))
-item(tt(%C))(
-Trailing component of tt($PWD).
-An integer may follow the `tt(%)' to get more than one component.
-Unless `tt(%C)' is used, tilde contraction is performed first.
+As tt(%d) and tt(%/), but if tt($PWD) has a named directory as its prefix,
+that part is replaced by a `tt(~)' followed by the name of the directory.
+If it starts with tt($HOME), that part is replaced by a `tt(~)'.
 )
 xitem(tt(%h))
 item(tt(%!))(
@@ -95,6 +88,18 @@ Current time of day in 24-hour format, with seconds.
 item(tt(%n))(
 tt($USERNAME).
 )
+item(tt(%N))(
+The name of the script, sourced file, or shell function that zsh is
+currently executing, whichever was started most recently.  If there is
+none, this is equivalent to the parameter tt($0).  An integer may follow
+the `tt(%)' to specify a number of trailing path components to show; zero
+means the full path.
+)
+item(tt(%i))(
+The line number currently being executed in the script, sourced file, or
+shell function given by tt(%N).  This is most useful for debugging as part
+of tt($PS4).
+)
 item(tt(%w))(
 The date in var(day)tt(-)var(dd) format.
 )
@@ -122,7 +127,9 @@ item(tt(%_))(
 The status of the parser, i.e. the shell constructs (like `tt(if)' and
 `tt(for)') that have been started on the command line. If given an integer
 number that many strings will be printed; zero or no integer means
-print as many as there are.
+print as many as there are.  This is most useful in prompts tt(PS2) for
+continuation lines and tt(PS4) for debugging with the tt(XTRACE) option; in
+the latter case it will also work non-interactively.
 )
 item(tt(%E))(
 Clears to end of line.
@@ -175,6 +182,8 @@ sitem(tt(w))(True if the day of the week is equal to var(n) (Sunday = 0).)
 sitem(tt(?))(True if the exit status of the last command was var(n).)
 sitem(tt(#))(True if the effective uid of the current process is var(n).)
 sitem(tt(g))(True if the effective gid of the current process is var(n).)
+sitem(tt(l))(True if at least var(n) characters have already been
+printed on the current line.)
 sitem(tt(L))(True if the tt(SHLVL) parameter is at least var(n).)
 sitem(tt(S))(True if the tt(SECONDS) parameter is at least var(n).)
 sitem(tt(v))(True if the array tt(psvar) has at least var(n) elements.)
@@ -185,25 +194,50 @@ endsitem()
 xitem(tt(%<)var(string)tt(<))
 xitem(tt(%>)var(string)tt(>))
 item(tt(%[)var(xstring)tt(]))(
-Specifies truncation behaviour.
+Specifies truncation behaviour for the remainder of the prompt string.
 The third, deprecated, form is equivalent to `tt(%)var(xstringx)',
 i.e. var(x) may be `tt(<)' or `tt(>)'.
 The numeric argument, which in the third form may appear immediately
 after the `tt([)', specifies the maximum permitted length of
-the various strings that can be displayed in the prompt.  If this
-integer is zero, or missing, truncation is disabled.  Truncation is
-initially disabled.
+the various strings that can be displayed in the prompt.
 The var(string) will be displayed in
-place of the truncated portion of any string.
+place of the truncated portion of any string; note this does not
+undergo prompt expansion.
 
 The forms with `tt(<)' truncate at the left of the string,
 and the forms with `tt(>)' truncate at the right of the string.
 For example, if the current directory is `tt(/home/pike)',
 the prompt `tt(%8<..<%/)' will expand to `tt(..e/pike)'.
 In this string, the terminating character (`tt(<)', `tt(>)' or `tt(])'),
-or in fact any character, may be quoted by a preceding `tt(\)'.
-% escapes are em(not) recognised.
+or in fact any character, may be quoted by a preceding `tt(\)'; note
+when using tt(print -P), however, that this must be doubled as the
+string is also subject to standard tt(print) processing, in addition
+to any backslashes removed by a double quoted string:  the worst case
+is therefore `tt(print -P "%<\\\\<<...")'.
+
 If the var(string) is longer than the specified truncation length,
 it will appear in full, completely replacing the truncated string.
+
+The part of the prompt string to be truncated runs to the end of the
+string, or to the end of the next enclosing group of the `tt(%LPAR())'
+construct, or to the next truncation encountered at the same grouping
+level (i.e. truncations inside a `tt(%LPAR())' are separate), which
+ever comes first.  In particular, a truncation with argument zero
+(e.g. `tt(%<<)') marks the end of the range of the string to be
+truncated while turning off truncation from there on. For example, the
+prompt '%10<...<%~%<<%# ' will print a truncated representation of the
+current directory, followed by a `tt(%)' or `tt(#)', followed by a
+space.  Without the `tt(%<<)', those two characters would be included
+in the string to be truncated.
+)
+xitem(tt(%c))
+xitem(tt(%.))
+item(tt(%C))(
+Trailing component of tt($PWD).
+An integer may follow the `tt(%)' to get more than one component.
+Unless `tt(%C)' is used, tilde contraction is performed first.  These are
+deprecated as tt(%c) and tt(%C) are equivalent to tt(%1~) and tt(%1/),
+respectively, while explicit positive integers have the same effect as for
+the latter two sequences.
 )
 enditem()
