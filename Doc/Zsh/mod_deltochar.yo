@@ -6,7 +6,7 @@ startitem()
 tindex(delete-to-char)
 item(tt(delete-to-char))(
 Read a character from the keyboard, and
-delete from the cursor position up to and including the next
+delete from the cursor position up to but not including the next
 (or, with repeat count var(n), the var(n)th) instance of that character.
 )
 enditem()

@@ -43,7 +43,8 @@ deltochar(char **args)
 	    while (dest != ll && line[dest] != c)
 		dest++;
 	    if (dest != ll) {
-		dest++;
+		if (n > 0)
+		    dest++;
 		if (!n) {
 		    forekill(dest - cs, 0);
 		    ok++;
@@ -59,7 +60,7 @@ deltochar(char **args)
 		dest--;
 	    if (line[dest] == c) {
 		if (!n) {
-		    backkill(cs - dest, 1);
+		    backkill(cs - dest - 1, 1);
 		    ok++;
 		}
 		if (dest)
