@@ -133,7 +133,7 @@ if [[ -n "$tmp" || $compstate[old_list] = keep ||
 
   _menu_style=( "$_menu_style[@]" "$_def_menu_style[@]" )
 
-  if [[ "$compstate[insert]" = *menu ]]; then
+  if [[ "$compstate[insert]" = *menu* ]]; then
     if [[ -n "$_menu_style[(r)no-select*]" ]]; then
       unset SELECTMIN
     else
