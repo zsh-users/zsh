@@ -61,7 +61,7 @@ and unsorted, both without removing duplicates, with removing all
 duplicates and with removing consecutive duplicates).
 )
 findex(compquote)
-item(tt(compquote) var(names) ...)(
+item(tt(compquote) [ tt(-p) ] var(names) ...)(
 There may be reasons to write completion functions that have to add
 the matches using the tt(-Q) option to tt(compadd) and perform quoting
 themselves.  Instead of interpreting the first character of the
@@ -69,7 +69,9 @@ tt(all_quotes) key of the tt(compstate) special association and using
 the tt(q) flag for parameter expansions, one can use this builtin
 command.  The arguments are the names of scalar or array parameters
 and the values of these parameters are quoted as needed for the
-innermost quoting level.
+innermost quoting level.  If the tt(-p) option is given, quoting is
+done as if there is some prefix before the values of the parameters,
+so that a leading equal sign will not be quoted.
 
 The return value is non-zero in case of an error and zero otherwise.
 )

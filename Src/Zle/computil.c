@@ -2559,6 +2559,24 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
     return 1;
 }
 
+static char *
+comp_quote(char *str, int prefix)
+{
+    int x;
+    char *ret;
+
+    if ((x = (prefix && *str == '=')))
+	*str = 'x';
+
+    ret = bslashquote(str, NULL, (*compqstack == '\'' ? 1 :
+				  (*compqstack == '"' ? 2 : 0)));
+
+    if (x)
+	*str = *ret = '=';
+
+    return ret;
+}
+
 static int
 bin_compquote(char *nam, char **args, char *ops, int func)
 {
@@ -2578,15 +2596,7 @@ bin_compquote(char *nam, char **args, char *ops, int func)
 	if ((v = getvalue(&vbuf, &name, 0))) {
 	    switch (PM_TYPE(v->pm->flags)) {
 	    case PM_SCALAR:
-		{
-		    char *val = getstrvalue(v);
-
-		    val = bslashquote(val, NULL,
-				      (*compqstack == '\'' ? 1 :
-				       (*compqstack == '"' ? 2 : 0)));
-
-		    setstrvalue(v, ztrdup(val));
-		}
+		setstrvalue(v, ztrdup(comp_quote(getstrvalue(v), ops['p'])));
 		break;
 	    case PM_ARRAY:
 		{
@@ -2596,10 +2606,7 @@ bin_compquote(char *nam, char **args, char *ops, int func)
 		    char **p = new;
 
 		    for (; *val; val++, p++)
-			*p = ztrdup(bslashquote(*val, NULL,
-						(*compqstack == '\'' ? 1 :
-						 (*compqstack == '"' ? 2 :
-						  0))));
+			*p = ztrdup(comp_quote(*val, ops['p']));
 		    *p = NULL;
 
 		    setarrvalue(v, new);
@@ -3242,11 +3249,12 @@ cfp_opt_pats(char **pats, char *matcher)
 	if (*s != '\\' || !s[1] || s[1] == '*' || s[1] == '?' ||
 	    s[1] == '<' || s[1] == '>' || s[1] == '(' || s[1] == ')' ||
 	    s[1] == '[' || s[1] == ']' || s[1] == '|' || s[1] == '#' ||
-	    s[1] == '^' || s[1] == '~') {
+	    s[1] == '^' || s[1] == '~' || s[1] == '=') {
 	    if ((s == compprefix || s[-1] != '\\') &&
 		(*s == '*' || *s == '?' || *s == '<' || *s == '>' ||
 		 *s == '(' || *s == ')' || *s == '[' || *s == ']' ||
-		 *s == '|' || *s == '#' || *s == '^' || *s == '~'))
+		 *s == '|' || *s == '#' || *s == '^' || *s == '~' ||
+		 *s == '='))
 		*t++ = '\\';
 	    *t++ = *s;
 	}
@@ -3653,7 +3661,7 @@ static struct builtin bintab[] = {
     BUILTIN("compdescribe", 0, bin_compdescribe, 3, -1, 0, NULL, NULL),
     BUILTIN("comparguments", 0, bin_comparguments, 1, -1, 0, NULL, NULL),
     BUILTIN("compvalues", 0, bin_compvalues, 1, -1, 0, NULL, NULL),
-    BUILTIN("compquote", 0, bin_compquote, 1, -1, 0, NULL, NULL),
+    BUILTIN("compquote", 0, bin_compquote, 1, -1, 0, "p", NULL),
     BUILTIN("comptags", 0, bin_comptags, 1, -1, 0, NULL, NULL),
     BUILTIN("comptry", 0, bin_comptry, 0, -1, 0, NULL, NULL),
     BUILTIN("compfiles", 0, bin_compfiles, 1, -1, 0, NULL, NULL),

@@ -63,7 +63,7 @@ if [[ "$force" = *s* ]] ||
       eval exp\=\( ${${(q)exp}:gs/\\{/\{/:gs/\\}/\}/} \)
   eval 'exp=( ${${(e)exp//\\[ 	
 ]/ }//(#b)([ 	
-\\])/\\$match[1]} )' 2>/dev/null
+])/\\$match[1]} )' 2>/dev/null
 else
   exp=( ${exp:s/\\\$/\$} )
 fi
@@ -77,14 +77,14 @@ subd=("$exp[@]")
 # Now try globbing.
 
 [[ "$force" = *g* ]] || zstyle -T ":completion:${curcontext}:" glob &&
-    eval 'exp=( ${~exp} ); exp=( ${exp//(#b)([][()|*?^#~<>\\])/\\${match[1]}} )' 2>/dev/null
+    eval 'exp=( ${~exp} ); exp=( ${exp//(#b)([][()|*?^#~<>\\=])/\\${match[1]}} )' 2>/dev/null
 
 # If we don't have any expansions or only one and that is the same
 # as the original string, we let other completers run.
 
 (( $#exp )) || exp=("$subd[@]")
 
-[[ $#exp -eq 1 && "$exp[1]" = "$word"(|\(N\)) ]] && return 1
+[[ $#exp -eq 1 && "${exp[1]//\\}" = "${word//\\}"(|\(N\)) ]] && return 1
 
 # With subst-globs-only we bail out if there were no glob expansions,
 # regardless of any substitutions

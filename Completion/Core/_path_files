@@ -421,7 +421,7 @@ for prepath in "$prepaths[@]"; do
     # There are more components, so skip over the next components and make a
     # slash be added.
 
-    tmp1=( ${tmp1//(#b)([][()|*?^#~<>\\])/\\${match[1]}} )
+    tmp1=( ${tmp1//(#b)([][()|*?^#~<>\\=])/\\${match[1]}} )
     tmp2="${(M)tpre##((.|..|)/)##}"
     if [[ -n "$tmp2" ]]; then
       skipped="/$tmp2"
@@ -470,7 +470,14 @@ for prepath in "$prepaths[@]"; do
       # it as far as possible.
 
       tmp2="$testpath"
-      compquote tmp1 tmp2
+      if [[ -n "$linepath" ]]; then
+        compquote -p tmp2 tmp1
+      elif [[ -n "$tmp2" ]]; then
+        compquote -p tmp1
+        compquote tmp2
+      else
+        compquote tmp1 tmp2
+      fi
 
       if [[ -n $menu || -z "$compstate[insert]" ]] ||
          ! zstyle -t ":completion:${curcontext}:paths" expand suffix; then
@@ -544,7 +551,12 @@ for prepath in "$prepaths[@]"; do
       tmp4="${testpath#${mid}}"
       tmp3="${mid%/*/}"
       tmp2="${${mid%/}##*/}"
-      compquote tmp4 tmp3 tmp2 tmp1
+      if [[ -n "$linepath" ]]; then
+        compquote -p tmp3
+      else
+        compquote tmp3
+      fi
+      compquote tmp4 tmp2 tmp1
       for i in "$tmp1[@]"; do
         compadd -Qf "$mopts[@]" -p "$linepath$tmp3/" -s "/$tmp4$i" \
                 -W "$prepath$realpath${mid%/*/}/" \
@@ -559,7 +571,14 @@ for prepath in "$prepaths[@]"; do
         SUFFIX="${osuf}"
       fi
       tmp4="$testpath"
-      compquote tmp4 tmp1
+      if [[ -n "$linepath" ]]; then
+        compquote -p tmp4 tmp1
+      elif [[ -n "$tmp4" ]]; then
+        compquote -p tmp1
+        compquote tmp4
+      else
+        compquote tmp4 tmp1
+      fi
       compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -W "$prepath$realpath$testpath" \
 	      "$pfxsfx[@]" -M "r:|/=* r:|=*" -a tmp1
     fi
