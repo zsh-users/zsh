@@ -18,6 +18,15 @@
 	* 15172: Src/hist.c: Have prepnexthistent() remove any HIST_TEMPSTORE
 	entry that is present.
 
+2001-06-28  Peter Stephenson  <pws@csr.com>
+
+	* 15169: README, Doc/zman.yo, Doc/ztexi.yo, Doc/Zsh/manual.yo:
+	handle top node in a way texinfo 4.0 likes better.  May require
+	upgrading texinfo.
+
+	* 15160 and Andrej zsh-users/3973: Doc/Makefile.in: install
+	zsh.html if generated.
+
 2001-06-28  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Etc/zsh-development-guide, Test/B01cd.ztst: fix typos
