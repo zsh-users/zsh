@@ -5,12 +5,13 @@ The tt(zsh/zpty) module offers one builtin:
 
 startitem()
 findex(zpty)
-item(tt(zpty) [ tt(-e) ] [ tt(-b) ] var(name) var(command) [ var(args ...) ])(
-In the first form, the var(command) is started with the var(args) as
-arguments.  The command runs under a newly assigned pseudo-terminal; this
-is useful for running commands non-interactively which expect an
-interactive environment.  The var(name) is used to refer to this command
-in later calls to tt(zpty).
+item(tt(zpty) [ tt(-e) ] [ tt(-b) ] var(name) [ var(arg ...) ])(
+The arguments following var(name) are concatenated with spaces between,
+then executed as a command, as if passed to the tt(eval) builtin.  The
+command runs under a newly assigned pseudo-terminal; this is useful for
+running commands non-interactively which expect an interactive
+environment.  The var(name) is not part of the command, but is used to
+refer to this command in later calls to tt(zpty).
 
 With the tt(-e) option, the pseudo-terminal is set up so that input
 characters are echoed.

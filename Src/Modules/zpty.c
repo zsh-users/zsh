@@ -171,7 +171,7 @@ get_pty(int master, int *retfd)
     int ret;
 
     if (master) {
-	if ((mfd = open("/dev/ptmx", O_RDWR)) < 0)
+	if ((mfd = open("/dev/ptmx", O_RDWR|O_NOCTTY)) < 0)
 	    return 1;
 
 	if (grantpt(mfd) || unlockpt(mfd) || !(name = ptsname(mfd))) {
@@ -182,7 +182,7 @@ get_pty(int master, int *retfd)
 
 	return 0;
     }
-    if ((sfd = open(name, O_RDWR)) < 0) {
+    if ((sfd = open(name, O_RDWR|O_NOCTTY)) < 0) {
 	close(mfd);
 	return 1;
     }
@@ -242,7 +242,7 @@ get_pty(int master, int *retfd)
 	    name[8] = *p1;
 	    for (p2 = char2; *p2; p2++) {
 		name[9] = *p2;
-		if ((mfd = open(name, O_RDWR)) >= 0) {
+		if ((mfd = open(name, O_RDWR|O_NOCTTY)) >= 0) {
 		    *retfd = mfd;
 
 		    return 0;
@@ -251,7 +251,7 @@ get_pty(int master, int *retfd)
 	}
     }
     name[5] = 't';
-    if ((sfd = open(name, O_RDWR)) >= 0) {
+    if ((sfd = open(name, O_RDWR|O_NOCTTY)) >= 0) {
 	*retfd = sfd;
 
 	return 0;
@@ -268,12 +268,14 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 {
     Ptycmd p;
     int master, slave, pid;
-    char *cmd;
+    Eprog prog;
 
-    if (!(cmd = findcmd(*args, 1))) {
-	zwarnnam(nam, "unknown command: %s", *args, 0);
+    prog = parse_string(zjoin(args, ' ', 1), 0);
+    if (!prog) {
+	errflag = 0;
 	return 1;
     }
+
     if (get_pty(1, &master)) {
 	zwarnnam(nam, "can't open pseudo terminal: %e", NULL, errno);
 	return 1;
@@ -283,41 +285,40 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	close(master);
 	return 1;
     } else if (!pid) {
+	/* This code copied from the clone module, except for getting *
+	 * the descriptor from get_pty() and duplicating it to 0/1/2. */
 
-	pid = getpid();
-
+	clearjobtab();
+	ppid = getppid();
+	mypid = getpid();
 #ifdef HAVE_SETSID
-	setsid();
-#else
-#ifdef TIOCNOTTY
-	{
-	    int t = open("/dev/tty", O_RDWR);
-
-	    ioctl(t, TIOCNOTTY, 0);
-	    close(t);
-	}
+	if (setsid() != mypid) {
+	    zwarnnam(nam, "failed to create new session: %e", NULL, errno);
 #endif
+#ifdef TIOCNOTTY
+	    if (ioctl(SHTTY, TIOCNOTTY, 0))
+		zwarnnam(nam, "%e", NULL, errno);
+	    setpgrp(0L, mypid);
+#endif
+#ifdef HAVE_SETSID
+	}
 #endif
 
 	if (get_pty(0, &slave))
 	    exit(1);
+#ifdef TIOCGWINSZ
+	/* Set the window size before associating with the terminal *
+	 * so that we don't get hit with a SIGWINCH.  I'm paranoid. */
+	if (interact) {
+	    struct ttyinfo info;
 
-#ifdef TIOCSCTTY
-	ioctl(slave, TIOCSCTTY, 0);
-#endif
-
-	/* This is taken from attachtty(). Should we exit in case of
-	 * failure? */
-
-#ifdef HAVE_TCSETPGRP
-	tcsetpgrp(slave, pid);
-#else
-# if ardent
-	setpgrp();
-# else
-	ioctl(slave, TIOCSPGRP, &pid);
-# endif
-#endif
+	    if (ioctl(slave, TIOCGWINSZ, (char *) &info.winsize) == 0) {
+		info.winsize.ws_row = lines;
+		info.winsize.ws_col = columns;
+		ioctl(slave, TIOCSWINSZ, (char *) &info.winsize);
+	    }
+	}
+#endif /* TIOCGWINSZ */
 
 	if (!echo) {
 	    struct ttyinfo info;
@@ -336,21 +337,9 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	    }
 	}
 
-#ifdef TIOCGWINSZ
-	if (interact) {
-	    struct ttyinfo info;
-
-	    if (ioctl(slave, TIOCGWINSZ, (char *) &info.winsize) == 0) {
-		info.winsize.ws_row = lines;
-		info.winsize.ws_col = columns;
-		ioctl(slave, TIOCSWINSZ, (char *) &info.winsize);
-	    }
-	}
-#endif /* TIOCGWINSZ */
-
-	signal_default(SIGTERM);
-	signal_default(SIGINT);
-	signal_default(SIGQUIT);
+#ifdef TIOCSCTTY
+	ioctl(slave, TIOCSCTTY, 0);
+#endif
 
 	close(0);
 	close(1);
@@ -360,16 +349,18 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	dup2(slave, 1);
 	dup2(slave, 2);
 
+	closem(0);
 	close(slave);
 	close(master);
+	close(coprocin);
+	close(coprocout);
+	init_io();
+	setsparam("TTY", ztrdup(ttystrname));
 
-	if (SHTTY != -1)
-	    close(SHTTY);
-
-	closedumps();
-
-	execve(cmd, args, environ);
-	exit(0);
+	execode(prog, 1, 0);
+	opts[INTERACTIVE] = 0;
+	stopmsg = 2;
+	zexit(lastval, 0);
     }
     master = movefd(master);
 

@@ -1,5 +1,14 @@
 2000-11-05  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/Modules/zpty.c: Cloned shell is non-interactive
+	for purposes of calling zexit(), so it doesn't print job status,
+	save history, etc.
+
+	* 13123: Doc/Zsh/mod_zpty.yo, Src/utils.c, Src/Modules/zpty.c:
+	Change `zpty' to act as a combination of `clone' and `eval', to
+	remove the limitation that only external commands can be run on
+	the pty.  Also fix typos in utils.c.
+
 	* 13120: Doc/Zsh/mod_zpty.yo, Functions/Misc/nslookup,
 	Src/utils.c, Src/Modules/zpty.c: Merge Sven's uncommitted patch
 	from 13061 with 13116.  WARNING: This reverses the meaning of
