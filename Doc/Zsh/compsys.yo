@@ -1484,10 +1484,6 @@ item(tt(users-hosts-ports))(
 Like tt(users-hosts) but used for commands like tt(telnet) and
 containing strings of the form `var(user)tt(@)var(host)tt(:)var(port)'.
 )
-item(tt(users-hosts-ports))(
-Like tt(users-hosts) but used for commands like tt(telnet) and
-containing strings of the form `var(user)tt(@)var(host)tt(:)var(port)'.
-)
 item(tt(verbose))(
 This is used in several contexts to decide if only a simple or a
 verbose list of matches should be generated. For example some commands 
