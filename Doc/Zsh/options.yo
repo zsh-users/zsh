@@ -1140,7 +1140,7 @@ This also affects the value of the tt(-) special parameter.
 )
 pindex(SHORT_LOOPS)
 item(tt(SHORT_LOOPS) <C> <Z>)(
-Allow the short forms of tt(for), tt(select),
+Allow the short forms of tt(for), tt(repeat), tt(select),
 tt(if), and tt(function) constructs.
 )
 pindex(SH_WORD_SPLIT)
