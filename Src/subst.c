@@ -750,6 +750,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int casmod = 0;
     int quotemod = 0, quotetype = 0, quoteerr = 0;
     int visiblemod = 0;
+    int shsplit = 0;
     char *sep = NULL, *spsep = NULL;
     char *premul = NULL, *postmul = NULL, *preone = NULL, *postone = NULL;
     char *replstr = NULL;	/* replacement string for /orig/repl */
@@ -969,6 +970,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case '%':
 		    presc++;
+		    break;
+
+		case 'z':
+		    shsplit = 1;
 		    break;
 
 		default:
@@ -1747,6 +1752,34 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		val = dupstring(val), copied = 1;
 	    val = nicedupstring(val);
 	}
+    }
+    if (shsplit) {
+	LinkList list = NULL;
+
+	if (isarr) {
+	    char **ap;
+	    for (ap = aval; *ap; ap++)
+		list = bufferwords(list, *ap, NULL);
+	    isarr = 0;
+	} else
+	    list = bufferwords(NULL, val, NULL);
+
+	if (!firstnode(list))
+	    val = dupstring("");
+	else if (!nextnode(firstnode(list)))
+	    val = getdata(firstnode(list));
+	else {
+	    char **ap;
+	    LinkNode node;
+
+	    aval = ap = (char **) zhalloc((countlinknodes(list) + 1) *
+					  sizeof(char *));
+	    for (node = firstnode(list); node; incnode(node))
+		*ap++ = (char *) getdata(node);
+	    *ap = NULL;
+	    mult_isarr = isarr = 2;
+	}
+	copied = 1;
     }
     if (isarr) {
 	char *x;

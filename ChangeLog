@@ -1,5 +1,9 @@
 2000-05-03  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11113: Doc/Zsh/expn.yo, Src/hist.c, Src/subst.c,
+ 	Src/Modules/parameter.c, Src/Zle/zle_misc.c: new (z) parameter
+ 	flag to do shell-word splitting on the value
+	
 	* 11110: Completion/Core/_expand, Src/Zle/complist.c: remove
  	backslashes before `$' in _expand when `substitute' is unset; fix
  	for clearing end-of-list lines in menu-selection

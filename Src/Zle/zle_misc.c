@@ -549,7 +549,7 @@ copyprevshellword(char **args)
     int i;
     char *p = NULL;
 
-    l = bufferwords(&i);
+    l = bufferwords(NULL, NULL, &i);
 
     for (n = firstnode(l); n; incnode(n))
 	if (!i--) {

@@ -676,6 +676,10 @@ item(tt(f))(
 Split the result of the expansion to lines. This is a shorthand
 for `tt(ps:\n:)'.
 )
+item(tt(z))(
+Split the result of the expansion into words using shell parsing to
+find the words, i.e. taking into account any quoting in the value.
+)
 item(tt(t))(
 Use a string describing the type of the parameter where the value
 of the parameter would usually appear. This string consists of keywords

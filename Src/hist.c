@@ -2037,17 +2037,28 @@ unlockhistfile(char *fn)
 
 /**/
 mod_export LinkList
-bufferwords(int *index)
+bufferwords(LinkList list, char *buf, int *index)
 {
-    LinkList list = newlinklist();
     int num = 0, cur = -1, got = 0, ne = noerrs, ocs = cs;
     char *p;
+
+    if (!list)
+	list = newlinklist();
 
     zleparse = 1;
     addedx = 0;
     noerrs = 1;
     lexsave();
-    if (!isfirstln && chline) {
+    if (buf) {
+	int l = strlen(buf);
+
+	p = (char *) zhalloc(l + 2);
+	memcpy(p, buf, l);
+	p[l] = ' ';
+	p[l + 1] = '\0';
+	inpush(p, 0, NULL);
+	cs = 0;
+    } else if (!isfirstln && chline) {
 	p = (char *) zhalloc(hptr - chline + ll + 2);
 	memcpy(p, chline, hptr - chline);
 	memcpy(p + (hptr - chline), line, ll);
@@ -2074,6 +2085,17 @@ bufferwords(int *index)
 	    untokenize((p = dupstring(tokstr)));
 	    addlinknode(list, p);
 	    num++;
+	} else if (buf) {
+	    if (IS_REDIROP(tok) && tokfd >= 0) {
+		char b[20];
+
+		sprintf(b, "%d%s", tokfd, tokstrings[tok]);
+		addlinknode(list, dupstring(b));
+		num++;
+	    } else if (tok != NEWLIN) {
+		addlinknode(list, dupstring(tokstrings[tok]));
+		num++;
+	    }
 	}
 	if (!got && !zleparse) {
 	    got = 1;
