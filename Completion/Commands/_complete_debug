@@ -5,8 +5,9 @@ unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 (( $+_debug_count )) || integer -g _debug_count
 local tmp=${TMPPREFIX}${$}${words[1]:t}$[++_debug_count]
-local w="${(qqq)words}"
+local w="${(qq)words}"
 
+exec 3>&-	# Too bad if somebody else is using it ...
 [[ -t 2 ]] && exec 3>&2 2>| $tmp
 
 setopt xtrace
@@ -14,7 +15,7 @@ _main_complete
 integer ret=$?
 unsetopt xtrace
 
-[[ -t 2 ]] || {
+[[ -t 3 ]] && {
     ## Calling "print -s" during completion is presently broken.
     # _message -r "Trace output left in $tmp (up-history to view)"
     # print -sR "${VISUAL:-${EDITOR:-${PAGER:-more}}} $tmp ;: $w"

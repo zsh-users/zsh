@@ -1,5 +1,8 @@
 2000-05-11  Bart Schaefer  <schaefer@zsh.org>
 
+	* 11332: Completion/Commands/_complete_debug: Test descriptors
+	correctly for redirect/restore of stderr; plus aesthetic tweak.
+
 	* 11326: Src/exec.c: Don't reinitialize SHTTY upon "exec < file"
 	when ZLE is active.
 
@@ -12,21 +15,21 @@
 	* 11324: Completion/Base/_argument_sets, Completion/Base/_arguments,
  	Src/Zle/computil.c: make _argument_sets add the options as
  	defaults when there is nothing else to complete
-	
+
 	* 11321: Completion/Core/_files: _files used alternative tag-order
  	values even if not needed
-	
+
 	* 11320: Completion/Base/_argument_sets, Completion/Base/_arguments,
  	Doc/Zsh/compsys.yo, Src/Zle/computil.c: allow internally-mutually
  	exclusive sets in _argument_sets; fixes for _argument_sets and the
  	C-code forit
-	
+
 	* 11319: Completion/Core/_main_complete, Doc/Zsh/compsys.yo,
  	Doc/Zsh/mod_complist.yo, Src/Zle/compcore.c, Src/Zle/complist.c:
  	make ^G in menu-selection restore the old command line; add
  	select=long* values for menu style to start menu-selection if list
  	is too long for screen
-	
+
 2000-05-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 11315: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo,
