@@ -1,0 +1,32 @@
+#autoload
+
+# This is needlessly mutt-biased and should be fixed.
+
+local expl muttboxes mboxes dirboxes MHboxes maildirboxes muttrc="~/.muttrc" maildirectory="~/Mail"
+
+test -f "$compconfig[muttrc_path]" && muttrc=$compconfig[muttrc_path]
+test -f "$compconfig[maildirectory]" && maildirectory=$compconfig[maildirectory]
+
+if (( ! $+_mailbox_cache )) then
+
+test ${muttrc} || test -f ${~muttrc} && muttboxes=( ${(@)$(grep mailboxes ${~muttrc})[2,-1]} )
+
+mboxes=(${~maildirectory}/*(^/))
+dirboxes=(${~maildirectory}/*(/))
+
+for i in $dirboxes
+do 
+if test -d "${i}/cur"
+then
+maildirboxes=($maildirboxes $i)
+else
+MHboxes=($MHboxes $i)
+fi
+done
+
+_mailbox_cache=(\! \< \> $muttboxes $mboxes $maildirboxes $MHboxes)
+
+fi
+
+_description expl 'mailbox specification'
+compadd "$@" "$expl[@]" - "$_mailbox_cache[@]"
