@@ -1058,26 +1058,46 @@ ca_inactive(Cadef d, char **xor, int cur, int opts)
     if ((xor || opts) && cur <= compcurrent) {
 	Caopt opt;
 	char *x;
-	int sl = (d->set ? strlen(d->set) : -1);
+	int sl = (d->set ? strlen(d->set) : -1), set = 0;
 
 	for (; (x = (opts ? "-" : *xor)); xor++) {
 	    if (ca_xor)
 		addlinknode(ca_xor, x);
+	    set = 0;
 	    if (sl > 0) {
-		if (strpfx(d->set, x))
+		if (strpfx(d->set, x)) {
 		    x += sl;
-		else if (!strncmp(d->set, x, sl - 1))
-		    return 1;
+		    set = 1;
+		} else if (!strncmp(d->set, x, sl - 1)) {
+		    Caopt p;
+
+		    for (p = d->opts; p; p = p->next)
+			if (p->set)
+			    p->active = 0;
+			
+		    x = ":";
+		    set = 1;
+		}
 	    }
-	    if (x[0] == ':' && !x[1])
-		d->argsactive = 0;
-	    else if (x[0] == '-' && !x[1]) {
+	    if (x[0] == ':' && !x[1]) {
+		if (set) {
+		    Caarg a;
+
+		    for (a = d->args; a; a = a->next)
+			if (a->set)
+			    a->active = 0;
+		    if (d->rest && (!set || d->rest->set))
+			d->rest->active = 0;
+		} else
+		    d->argsactive = 0;
+	    } else if (x[0] == '-' && !x[1]) {
 		Caopt p;
 
 		for (p = d->opts; p; p = p->next)
-		    p->active = 0;
+		    if (!set || p->set)
+			p->active = 0;
 	    } else if (x[0] == '*' && !x[1]) {
-		if (d->rest)
+		if (d->rest && (!set || d->rest->set))
 		    d->rest->active = 0;
 	    } else if (x[0] >= '0' && x[0] <= '9') {
 		int n = atoi(x);
@@ -1086,9 +1106,9 @@ ca_inactive(Cadef d, char **xor, int cur, int opts)
 		while (a && a->num < n)
 		    a = a->next;
 
-		if (a && a->num == n)
+		if (a && a->num == n && (!set || a->set))
 		    a->active = 0;
-	    } else if ((opt = ca_get_opt(d, x, 1, NULL)))
+	    } else if ((opt = ca_get_opt(d, x, 1, NULL)) && (!set || opt->set))
 		opt->active = 0;
 
 	    if (opts)
@@ -1319,7 +1339,7 @@ ca_parse_line(Cadef d, int multi)
 		state.nargbeg = cur - 1;
 		state.argend = argend;
 	    }
-	    if (!d->args && !d->rest)
+	    if (!d->args && !d->rest && *line != '-' && *line != '+')
 		return 1;
 	    if ((adef = state.def = ca_get_arg(d, state.nth)) &&
 		(state.def->type == CAA_RREST ||

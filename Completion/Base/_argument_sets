@@ -1,10 +1,20 @@
 #autoload
 
 local all ret=1 end xor has_args had_args ostate ocontext oopt_args r
+local nm="$compstate[nmatches]"
 local opre="$PREFIX" oipre="$IPREFIX" ocur="$CURRENT"
 local osuf="$SUFFIX" oisuf="$ISUFFIX" owords
+local _ms_match _ms_opt _ms_soptmid _ms_soptmidadd _ms_soptend
+local _ms_optnext _ms_optdirect _ms_optequal
 
-owords="$words[@]"
+_ms_soptmid=()
+_ms_soptmidadd=()
+_ms_soptend=()
+_ms_optnext=()
+_ms_optdirect=()
+_ms_optequal=()
+
+owords=("$words[@]")
 
 end=$argv[(i)-]
 [[ end -gt $# ]] && return 1
@@ -16,14 +26,22 @@ shift end
 xor=()
 ostate=()
 ocontext=()
+oopt_args=()
 
 while true; do
   end=$argv[(i)-]
 
-  _arguments -m xor "$1" "$all[@]" "${(@)argv[2,end-1]}"
+  if [[ "$1" = \(*\) ]]; then
+    _arguments -m xor "${1[2,-2]}" "$all[@]" \
+               "$1${(@)^argv[2,end-1]:#\(*}" \
+               "${1[1,-2]} ${(@)${(@M)^argv[2,end-1]:#\(*}#?}"
+  else
+    _arguments -m xor "$1" "$all[@]" "${(@)argv[2,end-1]}"
+  fi
+  
   r=$?
 
-  oopt_args=( "$oopt_args[@]" "${(kv)opt_args}" )
+  oopt_args=( "$oopt_args[@]" "${(@kv)opt_args}" )
   if [[ r -eq 300 ]]; then
     ret=300
     ostate=( "$ostate[@]" "$state[@]" )
@@ -39,6 +57,14 @@ while true; do
 
   shift end
 done
+
+[[ -n "$_ms_opt" ]] &&
+  _describe -o option \
+            _ms_soptmid _ms_soptmidadd -Q -S '' -- \
+	    _ms_soptend -Q -- \
+	    _ms_optnext -Q -M "$_ms_match" -- \
+	    _ms_optdirect -QS '' -M "$_ms_match" -- \
+	    _ms_optequal -QqS= -M "$_ms_match" && [[ ret -eq 1 ]] && ret=0
 
 opt_args=( "$oopt_args[@]" )
 

@@ -1,5 +1,10 @@
 2000-05-11  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11320: Completion/Base/_argument_sets, Completion/Base/_arguments,
+ 	Doc/Zsh/compsys.yo, Src/Zle/computil.c: allow internally-mutually
+ 	exclusive sets in _argument_sets; fixes for _argument_sets and the
+ 	C-code forit
+	
 	* 11319: Completion/Core/_main_complete, Doc/Zsh/compsys.yo,
  	Doc/Zsh/mod_complist.yo, Src/Zle/compcore.c, Src/Zle/complist.c:
  	make ^G in menu-selection restore the old command line; add

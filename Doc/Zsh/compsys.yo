@@ -3252,6 +3252,20 @@ option `tt(-c)' will not be completed any more, but if `tt(-a)' is
 given, both sets will still be considered valid, because it appears
 before the first hyphen, so both sets contain this option.
 
+If the name-string is of the form `tt(LPAR())var(name)tt(RPAR())' then 
+all specifications in the set have an implicit exclusion list
+containing the name of the set, i.e. all specifications are mutual
+exclusive with all other specifications in the same set. This is
+useful for defining multiple sets of options which are mutual
+exclusive and in which the options are aliases for each other. E.g.:
+
+example(_argument_sets \ 
+    -a -b \ 
+  - '(compress)' \
+    {-c,--compress}'[compress]' \ 
+  - '(uncompress)' \ 
+    {-d,--decompress}'[decompress]')
+
 Don't expect too much with complicated options that get their
 arguments in the same string and `tt(->)var(state)' actions or with
 the tt(-C) option that is given to tt(_arguments), otherwise most

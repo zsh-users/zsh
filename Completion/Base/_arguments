@@ -163,10 +163,12 @@ done
 zstyle -s ":completion:${curcontext}:options" auto-description autod
 
 if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
-  local nm="$compstate[nmatches]" action noargs aret expl local
+  local action noargs aret expl local
   local next direct odirect equal single match matched ws tmp1 tmp2 tmp3
   local opts subc tc prefix suffix descrs actions subcs
   local origpre="$PREFIX" origipre="$IPREFIX"
+
+  [[ -z "$ismulti" ]] && local nm="$compstate[nmatches]"
 
   if comparguments -D descrs actions subcs; then
     if comparguments -O next direct odirect equal; then
@@ -314,17 +316,32 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 	    tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
 	    tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
 
-            _describe -o option \
-                      tmp1 tmp2 -Q -S '' -- \
-		      tmp3 -Q
+	    if [[ -n "$ismulti" ]]; then
+	      _ms_opt=yes
+	      _ms_soptmid=( "$_ms_soptmid[@]" "$tmp1[@]" )
+	      _ms_soptmidadd=( "$_ms_soptmidadd[@]" "$tmp2[@]" )
+	      _ms_soptend=( "$_ms_soptend[@]" "$tmp3[@]" )
+	    else
+              _describe -o option \
+                        tmp1 tmp2 -Q -S '' -- \
+		        tmp3 -Q
+            fi
           fi
           single=yes
         else
           next=( "$next[@]" "$odirect[@]" )
-          _describe -o option \
-            next -Q -M "$match" -- \
-            direct -QS '' -M "$match" -- \
-            equal -QqS= -M "$match"
+	  if [[ -n "$ismulti" ]]; then
+	    _ms_opt=yes
+	    _ms_match="$_ms_match $match"
+	    _ms_optnext=( "$_ms_optnext[@]" "$next[@]" )
+	    _ms_optdirect=( "$_ms_optdirect[@]" "$direct[@]" )
+	    _ms_optequal=( "$_ms_optequal[@]" "$equal[@]" )
+	  else
+            _describe -o option \
+                      next -Q -M "$match" -- \
+                      direct -QS '' -M "$match" -- \
+                      equal -QqS= -M "$match"
+          fi
         fi
 	PREFIX="$prevpre"
 	IPREFIX="$previpre"
