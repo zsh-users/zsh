@@ -1,5 +1,8 @@
 2001-10-14  Bart Schaefer  <schaefer@zsh.org>
 
+	* 16031: Src/Modules/tcp.c: Don't need <arpa/telnet.h>; misc.
+	inconsequential reformatting.
+
 	* 16030: Completion/Unix/Command/_mount: Fix minor typos in option
 	descriptions.
 

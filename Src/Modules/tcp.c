@@ -35,9 +35,6 @@
  */
 #include "tcp.h"
 
-/* it's a TELNET based protocol, but don't think I like doing this */
-#include <arpa/telnet.h>
-
 /*
  * We use poll() in preference to select because some subset of manuals says
  * that's the thing to do, plus it's a bit less fiddly.  I don't actually
@@ -55,8 +52,8 @@
 int h_errno;
 #endif
 
-/* We use the RFC 2553 interfaces.  If the functions don't exist in the library,
-   simulate them. */
+/* We use the RFC 2553 interfaces.  If the functions don't exist in the
+ * library, simulate them. */
 
 #ifndef INET_ADDRSTRLEN
 # define INET_ADDRSTRLEN 16
@@ -458,7 +455,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 
 	setiparam("REPLY", sess->fd);
 
-	if(verbose)
+	if (verbose)
 	    fprintf(shout, "%d listener is on fd %d\n", ntohs(sess->sock.in.sin_port), sess->fd);
 
 	return 0;
@@ -492,7 +489,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
 
-	if(test) {
+	if (test) {
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
 # ifdef HAVE_POLL
 	    struct pollfd pfd;
@@ -500,7 +497,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 
 	    pfd.fd = lfd;
 	    pfd.events = POLLIN;
-	    if((ret = poll(&pfd, 1, 0)) == 0) return 1;
+	    if ((ret = poll(&pfd, 1, 0)) == 0) return 1;
 	    else if (ret == -1)
 	    {
 		zwarnnam(nam, "poll error: %e", NULL, errno);
@@ -516,7 +513,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    tv.tv_sec = 0;
 	    tv.tv_usec = 0;
 	    
-	    if(ret = select(lfd+1, &rfds, NULL, NULL, &tv)) return 1;
+	    if (ret = select(lfd+1, &rfds, NULL, NULL, &tv)) return 1;
 	    else if (ret == -1)
 	    {
 		zwarnnam(nam, "select error: %e", NULL, errno);
@@ -549,12 +546,11 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 
 	setiparam("REPLY", sess->fd);
 
-	if(verbose)
+	if (verbose)
 	    fprintf(shout, "%d is on fd %d\n", ntohs(sess->peer.in.sin_port), sess->fd);
     }
     else
     {
-	
 	if (!dargs[0]) {
 	    LinkNode node;
 	    for(node = firstnode(ztcp_sessions); node; incnode(node))
@@ -573,7 +569,13 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 			remotename = ztpeer->h_name;
 		    else
 			remotename = ztrdup(inet_ntoa(sess->sock.in.sin_addr));
-		    fprintf(shout, "%s:%d %s %s:%d is on fd %d%s\n", localname, ntohs(sess->sock.in.sin_port), (sess->flags & ZTCP_LISTEN) ? "-<" : (sess->flags & ZTCP_INBOUND) ? "<-" : "->", remotename, ntohs(sess->peer.in.sin_port), sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
+		    fprintf(shout, "%s:%d %s %s:%d is on fd %d%s\n",
+			    localname, ntohs(sess->sock.in.sin_port),
+			    ((sess->flags & ZTCP_LISTEN) ? "-<" :
+			     ((sess->flags & ZTCP_INBOUND) ? "<-" : "->")),
+			    remotename, ntohs(sess->peer.in.sin_port),
+			    sess->fd,
+			    (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
 		}
 	    }
 	    return 0;
@@ -639,14 +641,14 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    setiparam("REPLY", sess->fd);
 
 	    if (verbose)
-		fprintf(shout, "%s:%d is now on fd %d\n", desthost, destport, sess->fd);
+		fprintf(shout, "%s:%d is now on fd %d\n",
+			desthost, destport, sess->fd);
 	}
 	
 	zsfree(desthost);
     }
 
     return 0;
-    
 }
 
 static struct builtin bintab[] = {
