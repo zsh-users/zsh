@@ -1,5 +1,9 @@
 2003-02-17  Peter Stephenson  <pws@csr.com>
 
+	* 18252: Src/input.c, Src/loop.c, Src/zsh.h, Src/Zle/zle_main.c:
+	pass ignoreeof settings as flag to zle_main.c, only use option
+	in input.c.
+
 	* 18251: Src/parse.c, Src/loop.c: 15030 broke `select' a year
 	and a half ago and no-one noticed till now; also make `select'
 	return on an EOF without complaining.

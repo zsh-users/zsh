@@ -616,7 +616,7 @@ getkey(int keytmout)
 		   an infinite loop.  The simple way around this was to add
 		   the counter (icnt) so that this happens 20 times and than
 		   the shell gives up (yes, this is a bit dirty...). */
-		if (isset(IGNOREEOF) && icnt++ < 20)
+		if ((zlereadflags & ZLRF_IGNOREEOF) && icnt++ < 20)
 		    continue;
 		stopmsg = 1;
 		zexit(1, 0);
@@ -681,7 +681,8 @@ zlecore(void)
 	reselectkeymap();
 	selectlocalmap(NULL);
 	bindk = getkeycmd();
-	if (!ll && isfirstln && unset(IGNOREEOF) && c == eofchar) {
+	if (!ll && isfirstln && !(zlereadflags & ZLRF_IGNOREEOF) &&
+	    c == eofchar) {
 	    eofsent = 1;
 	    break;
 	}
@@ -865,7 +866,7 @@ execzlefunc(Thingy func, char **args)
 	int wflags = w->flags;
 
 	if (keybuf[0] == eofchar && !keybuf[1] &&
-	    !ll && isfirstln && isset(IGNOREEOF)) {
+	    !ll && isfirstln && (zlereadflags & ZLRF_IGNOREEOF)) {
 	    showmsg((!islogin) ? "zsh: use 'exit' to exit." :
 		    "zsh: use 'logout' to logout.");
 	    ret = 1;
@@ -986,7 +987,7 @@ bin_vared(char *name, char **args, Options ops, int func)
     struct value vbuf;
     Value v;
     Param pm = 0;
-    int create = 0, ifl, ieof;
+    int create = 0, ifl;
     int type = PM_SCALAR, obreaks = breaks, haso = 0;
     char *p1 = NULL, *p2 = NULL;
     FILE *oshout = NULL;
@@ -1145,10 +1146,7 @@ bin_vared(char *name, char **args, Options ops, int func)
     if (OPT_ISSET(ops,'h'))
 	hbegin(2);
     isfirstln = OPT_ISSET(ops,'e');
-    ieof = opts[IGNOREEOF];
-    opts[IGNOREEOF] = 0;
     t = (char *) zleread(p1, p2, OPT_ISSET(ops,'h') ? ZLRF_HISTORY : 0);
-    opts[IGNOREEOF] = ieof;
     if (OPT_ISSET(ops,'h'))
 	hend(NULL);
     isfirstln = ifl;

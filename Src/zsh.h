@@ -1747,6 +1747,7 @@ struct heap {
 
 #define ZLRF_HISTORY	0x01	/* OK to access the history list */
 #define ZLRF_NOSETTY	0x02	/* Don't set tty before return */
+#define ZLRF_IGNOREEOF  0x04	/* Ignore an EOF from the keyboard */
 
 /****************/
 /* Entry points */
