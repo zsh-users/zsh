@@ -1,5 +1,8 @@
 2002-04-12  Clint Adams  <clint@zsh.org>
 
+	* 16973: Completion/Debian/Command/_apt: complete package name
+	argument to apt-cache policy.
+
 	* 16972: Completion/Unix/Type/_hosts: complete for aaaa, zone, mx,
 	soa, txt.
 

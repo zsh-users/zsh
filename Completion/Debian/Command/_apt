@@ -471,7 +471,7 @@ _apt-cache () {
     /$'depends\0'/ \| \
     /$'pkgnames\0'/ \| \
     /$'dotty\0'/ \| \
-    /$'policy\0'/ \| \
+    /$'policy\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends pkgnames dotty policy'
 
   _apt-cache () {
