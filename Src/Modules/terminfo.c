@@ -198,6 +198,8 @@ getterminfo(HashTable ht, char *name)
     {
 	pm->u.str = dupstring(tistr);
 	pm->flags |= PM_SCALAR;
+	pm->sets.cfn = NULL;
+	pm->gets.cfn = strgetfn;
     }
     else
     {
