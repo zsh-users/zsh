@@ -2,7 +2,7 @@
 
 # Complete files and expand tilde expansions in it.
 
-if (( $argv[(I)-W*] )); then
+if [[ ( -o magicequalsubst && "$IPREFIX" = *\= ) || $argv[(I)-W*] -ne 0 ]]; then
   _files "$@"
   return
 fi
