@@ -1,0 +1,15 @@
+local classpath
+#Should probably add some sort of cache.
+#First use -classpath/-cp, then CLASSPATH, then assume .
+classpath=${opt_args[-classpath]:-${opt_args[-cp]:-${CLASSPATH:-.}}}
+local c i
+#Should we call _multipart insteads of compadd
+for i in ${(z)classpath//:/ }; do
+	if [ -f $i ] && [[ "$i" == *.(jar|zip|war|ear) ]]; then
+		c=(${${${(M)$(_call_program jar_classes jar -tf $i)##*.class}%%.class}:gs#/#.#})
+		compadd -M 'r:|.=* r:|=*' -- $c
+	elif [ -d $i ]; then
+		c=(**/*.class(.:r:s/.class//:gs#/#.#))
+		compadd -M 'r:|.=* r:|=*' -- $c
+	fi
+done
