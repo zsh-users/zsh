@@ -1,3 +1,11 @@
+2002-01-21  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16472: Completion/Base/Completer/_complete,
+	Completion/Base/Core/_normal, Completion/Base/Utility/_contexts,
+	Completion/Unix/Command/_su, Doc/Zsh/compsys.yo: allow
+	arguments to be given to functions used by compdef (actually,
+	the strings are eval'uated, so this should be powerful enough)
+
 2002-01-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 16464: Completion/Base/Widget/_complete_debug,

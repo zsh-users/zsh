@@ -16,7 +16,5 @@ fi
 
 shell="${${(M@)${(@f)$(</etc/passwd)}:#$usr*}##*:}"
 compset -n $base
-for name in $shell $shell:t -default-; do
-  comp="$_comps[$name]"
-  [[ -n "$comp" ]] && "$comp" && return
-done  
+
+_contexts -o $shell $shell:t -default-

@@ -7,11 +7,17 @@
 # `_contexts -math-' to get the completions that would be generated for a
 # mathematical context.
 
-local i tmp ret=1 service
+local i tmp ret=1 service or
+
+if [[ $1 = -o ]]; then
+  or=yes
+  shift
+fi
 
 for i; do
   tmp="$_comps[$i]"
-  [[ -z "$tmp" ]] || service="${_services[$i]:-$i}" && "$tmp" && ret=0
+  [[ -n "$tmp" ]] && service="${_services[$i]:-$i}" && eval "$tmp" && ret=0
+  [[ -n "$or" && ret -eq 0 ]] && return 0
 done
 
 return ret

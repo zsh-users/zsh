@@ -19,7 +19,7 @@ if [[ CURRENT -eq 1 ]]; then
   curcontext="${curcontext%:*:*}:-command-:"
 
   comp="$_comps[-command-]"
-  [[ -z "$comp" ]] || "$comp" && ret=0
+  [[ -n "$comp" ]] && eval "$comp" && ret=0
 
   return ret
 else
@@ -86,7 +86,7 @@ service="${_services[$cmd1]:-$cmd1}"
 
 if [[ -n "$comp" ]]; then
   _compskip=patterns
-  "$comp" && ret=0
+  eval "$comp" && ret=0
   [[ "$_compskip" = (all|*patterns*) ]] && return ret
 elif [[ "$_compskip" != *default* ]]; then
   name=-default-
@@ -121,7 +121,7 @@ if [[ "$_compskip" != (all|*patterns*) ]]; then
 fi
 
 [[ "$name" = -default- && -n "$comp" && "$_compskip" != (all|*default*) ]] &&
-  service="${_services[-default-]:--default-}" && "$comp" && ret=0
+  service="${_services[-default-]:--default-}" && eval "$comp" && ret=0
 
 _compskip=''
 

@@ -270,6 +270,15 @@ with the tt(#compdef) tag and an argument of the form
 `var(cmd)tt(=)var(service)'.  This kind of use makes the arguments of
 the var(cmd)s be completed as those for the var(services).
 
+In the first case and the following cases the var(function) may actually
+be a string containing any shell code and that string will be executed
+via the tt(eval) builtin command.  This allows to easily define completions
+for commands that need to call one of the completion functions with
+arguments.  For example to make files ending in `tt(.h)' be completed as
+arguments to the command tt(foo), one would use:
+
+example(compdef '_files -g "*.h"' foo)
+
 If the
 tt(-n) option is given, any existing completion behaviour for particular
 contexts or commands will not be altered.  These definitions can be deleted
@@ -3518,13 +3527,17 @@ tt(compadd) when generating matches from the style value, or to
 the functions for the fields if they are called.
 )
 findex(_contexts)
-item(tt(_contexts) var(names) ...)(
+item(tt(_contexts) [ tt(-o) ] var(names) ...)(
 This function looks up the definitions for the context and command
 names given as arguments and calls the handler functions for them if
 there is a definition (given with the tt(compdef) function).  For
 example, the function completing inside subscripts might use
 `tt(_contexts -math-)' to include the completions generated for
 mathematical environments.
+
+If the tt(-o) option is given, tt(_contexts) returns after the first
+context for which completions could be generated, without trying the
+other contexts.
 )
 findex(_describe)
 item(tt(_describe) [ tt(-o) ] var(descr) var(name1) [ var(name2) ] var(opts) ... tt(-)tt(-) ...)(

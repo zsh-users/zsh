@@ -85,7 +85,7 @@ if [[ -n "$compcontext" ]]; then
     ccarray[3]="$compcontext"
 
     comp="$_comps[$compcontext]"
-    [[ -z "$comp" ]] || "$comp"
+    [[ -n "$comp" ]] && eval "$comp"
   fi
 
   return
@@ -94,10 +94,10 @@ fi
 # An entry for `-first-' is the replacement for `compctl -T'
 
 comp="$_comps[-first-]"
-if [[ ! -z "$comp" ]]; then
+if [[ -n "$comp" ]]; then
   service="${_services[-first-]:--first-}"
   ccarray[3]=-first-
-  "$comp" && ret=0
+  eval "$comp" && ret=0
   if [[ "$_compskip" = all ]]; then
     _compskip=
     return ret
@@ -135,8 +135,8 @@ else
     fi
     comp="$_comps[-default-]"
   fi
-  [[ -z "$comp" ]] ||
-      service="${_services[-default-]:--default-}" && "$comp" && ret=0
+  [[ -n "$comp" ]] &&
+      service="${_services[-default-]:--default-}" && eval "$comp" && ret=0
 fi
 
 _compskip=
