@@ -1,3 +1,10 @@
+2002-02-03  Felix Rosencrantz  <f_rosencrantz@yahoo.com>
+
+	* 16546: Completion/Unix/Command/_cvs,
+	Completion/Unix/Command/_perl: Fixed problem with cvs/arguments -A
+	flag.  Fixed problem with "cvs log -R".  Also, _perl completes
+	the arguments to a perl script with _normal.
+
 2002-02-03  Clint Adams  <clint@zsh.org>
 
 	* 16540: Completion/Unix/Command/_rsync: include short options and

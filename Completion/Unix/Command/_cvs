@@ -149,8 +149,8 @@ _cvs_rannotate () {
 _cvs_checkout () {
   # "+ANnk:d:flRpQqcsr:D:j:P"
   _arguments -s \
-    '-A[reset sticky tags, dates and -k]' \
     '-N[don'\''t shorten module paths]' \
+    '-A[reset sticky tags, dates and -k]' \
     '-n[disable checkout program]' \
     '-f[use most recent revision if -D/-r is not matched]' \
     '(-R)-l[don'\''t recursive]' \
@@ -398,8 +398,8 @@ _cvs_log () {
   _arguments -s \
     '-b[default branch]' \
     '(-t)-h[header]' \
-    '(-R)-l[don'\''t recursive]' \
-    '(-l)-R[recursive]' \
+    '-l[don'\''t recurse]' \
+    '-R[Print the name of RCS file in the repository]' \
     '-N[don'\''t list tags]' \
     '(-h)-t[header with descriptive text]' \
     '-d+[specify dates]:dates:' \
@@ -541,8 +541,8 @@ _cvs_unedit () {
 _cvs_update () {
   # "+ApCPflRQqduk:r:D:j:I:W:"
   _arguments -s \
-    '-A[reset sticky tags, dates and -k]' \
     '-C[overwrite local modification]' \
+    '-A[reset sticky tags, dates and -k]' \
     '-p[check out to standard output]' \
     '-P[prune empty directory]' \
     '-f[use head revision]' \
