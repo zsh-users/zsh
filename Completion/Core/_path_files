@@ -224,12 +224,19 @@ for prepath in "$prepaths[@]"; do
 
     if [[ "$tpre$tsuf" = */* ]]; then
       tmp2=( ${^tmp1}*(-/) )
-      [[ ! -o globdots && "$PREFIX" = .* ]] &&
-          tmp2=( "$tmp2[@]" ${^tmp1}.*(-/) . .. )
+      if [[ ! -o globdots && "$PREFIX" = .* ]]; then
+        tmp2=( "$tmp2[@]" ${^tmp1}.*(-/) )
+	zstyle -t ":completion${curcontext}:paths" special-dirs &&
+	    tmp2=( "$tmp2[@]" . .. )
+      fi
     else
       tmp2=( ${^tmp1}${^~pats} )
-      [[ ! -o globdots && "$PREFIX" = .* ]] &&
-          tmp2=( "$tmp2[@]" ${^tmp1}.${^~pats} . .. )
+      if [[ ! -o globdots && "$PREFIX" = .* ]]; then
+        tmp2=( "$tmp2[@]" ${^tmp1}.${^~pats} )
+        [[ "$sopt" = */* ]] &&
+	    zstyle -t ":completion${curcontext}:paths" special-dirs &&
+	    tmp2=( "$tmp2[@]" . .. )
+      fi
     fi
     tmp1=( "$tmp2[@]" )
 

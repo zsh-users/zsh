@@ -647,7 +647,8 @@ for names of directories in directories from the tt(cdpath) array when
 completing for the tt(cd) builtin command
 )
 item(tt(paths))(
-used to look up the values of the tt(expand) and tt(cursor) styles
+used to look up the values of the tt(expand), tt(cursor) and
+tt(special-dirs) styles
 )
 item(tt(pods))(
 for perl pods
@@ -1190,6 +1191,11 @@ This is also used by the tt(_expand) completer. Here, if it is set to
 to tt(menu), then the expansions are only sorted when they are offered 
 as single strings (not in the string containing all possible
 expansions).
+)
+item(tt(special-dirs))(
+Normally, the completion code will not produce the directory names
+tt(.) and tt(..) as possible completions. If this style is set to
+`true', it will.
 )
 item(tt(stop))(
 If set to `true', the tt(_history_complete_word) bindable
@@ -1894,8 +1900,8 @@ These functions also accept the `tt(-J)', `tt(-V)', `tt(-1)',
 `tt(-2)', `tt(-n)', `tt(-X)', `tt(-M)', `tt(-P)', `tt(-S)', `tt(-q)',
 `tt(-r)', and `tt(-R)' options from the tt(compadd) builtin.
 
-Finally, the tt(_path_files) function  uses the styles tt(expand) and
-tt(cursor) with the tt(paths) tag.
+Finally, the tt(_path_files) function  uses the styles tt(expand),
+tt(cursor) and tt(special-dirs) with the tt(paths) tag.
 )
 findex(_parameters)
 item(tt(_parameters))(
