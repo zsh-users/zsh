@@ -31,7 +31,7 @@ autoload -U zfstat zftp_chpwd zftp_progress zftransfer zftype zfuget zfuput
 # zftp completions: only use these if new-style completion is not
 # active.
 #
-if [[ ${#_patcomps} -eq 0 || -z ${_patcomps[(i)zf*]} ]]; then
+if [[ ${#_patcomps} -eq 0 || -z ${_patcomps[(r)zf*]} ]]; then
   # only way of getting that noglob out of the way: this is unnecessary with
   # widget-based completion
   setopt completealiases
