@@ -111,7 +111,9 @@ if $first_stage; then
     sed -e '/^#/d' -e 's/ .*/ /' -e 's/^name=/ /'`"
     module_list="${bin_mods}${dyn_mods}"
 
-    if grep '%@D@%D%' config.status >/dev/null; then
+    # check both 2.13 and 2.50 syntax
+    if grep '%@D@%D%' config.status >/dev/null ||
+       grep ',@D@,D,' config.status >/dev/null; then
 	is_dynamic=true
     else
 	is_dynamic=false
@@ -463,7 +465,12 @@ if $first_stage; then
 
 fi
 
-if $second_stage; then
+if $second_stage ; then
+    if grep 'Hack for autoconf-2.13' ./config.status > /dev/null 2>&1 ; then
+        bang=\!
+    else
+	bang=
+    fi
 
     trap "rm -f $the_subdir/${the_makefile}" 1 2 15
 
@@ -472,7 +479,7 @@ if $second_stage; then
     # tree, this is a problem.  zsh's configure script edits config.status,
     # adding the feature that an input filename starting with "!" has the
     # "!" removed and is not mangled further.
-    CONFIG_FILES=$the_subdir/${the_makefile}:\!$the_subdir/${the_makefile}.in CONFIG_HEADERS= ${CONFIG_SHELL-/bin/sh} ./config.status
+    CONFIG_FILES=$the_subdir/${the_makefile}:$bang$the_subdir/${the_makefile}.in CONFIG_HEADERS= ${CONFIG_SHELL-/bin/sh} ./config.status
 
 fi
 

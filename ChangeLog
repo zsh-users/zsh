@@ -1,3 +1,11 @@
+001-06-06  Andrej Borsenkow  <bor@zsh.org>
+
+	* unposted; based on 14679 (me) and 14693 (Bart): configure.ac,
+	zshconfig.ac, .distfiles, Makefile.in, configure.in, Src/mkmakemod.sh:
+	Allow processing by both autoconf-2.13 and autoconf-2.50; remove
+	config.status hack for autoconf-2.50
+
+
 2001-06-05  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 14550: Completion/Redhat/Command/_rpm: Add --nobuild and --nogpg to rpm
