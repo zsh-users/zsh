@@ -1,3 +1,7 @@
+2001-06-18  Peter Stephenson  <pws@csr.com>
+
+	* 14959: Src/signals.c: more renames for 14951.
+
 2001-06-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14952: Src/parse.c: make zcompile unlink() the zwc file first

@@ -105,7 +105,7 @@ install_handler(int sig)
 # ifdef BSD_SIGNALS
     struct sigvec vec;
  
-    vec.sv_handler = (SIGNAL_HANDTYPE) handler;
+    vec.sv_handler = (SIGNAL_HANDTYPE) zhandler;
     vec.sv_mask = sigmask(sig);    /* mask out this signal while in handler    */
 #  ifdef SV_INTERRUPT
     vec.sv_flags = SV_INTERRUPT;   /* make sure system calls are not restarted */
@@ -115,9 +115,9 @@ install_handler(int sig)
 #  ifdef SYSV_SIGNALS
     /* we want sigset rather than signal because it will   *
      * block sig while in handler.  signal usually doesn't */
-    sigset(sig, handler);
+    sigset(sig, zhandler);
 #  else  /* NO_SIGNAL_BLOCKING (bummer) */
-    signal(sig, handler);
+    signal(sig, zhandler);
 
 #  endif /* SYSV_SIGNALS  */
 # endif  /* BSD_SIGNALS   */
