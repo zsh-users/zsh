@@ -52,7 +52,7 @@ insert-and-predict () {
 	RBUFFER=""
 	if [[ ${KEYS[-1]} != ' ' ]]
 	then
-	  unsetopt automenu
+	  unsetopt automenu recexact
 	  integer curs=$CURSOR pos nchar=${#LBUFFER//[^${KEYS[-1]}]}
 	  local -a +h comppostfuncs
 	  comppostfuncs=( predict-limit-list )
