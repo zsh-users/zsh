@@ -99,9 +99,10 @@ esac
 case $state in
   suffixes)
     compset -P '*:'
-    compset -S ':*' || suf=":"
+    compset -S ':*' || suf=":."
     suffixes=( *.*(N:e) )
-    _wanted suffixes expl suffixes compadd -S "$suf" -r " " .$^suffixes && return 0
+    _wanted suffixes expl suffixes \
+	compadd -S "$suf" -r ": \t" .$^suffixes && return 0
   ;;
   files)
     if [[ $service = zip ]] && (( ! ${+opt_args[-d]} )); then
@@ -113,9 +114,10 @@ case $state in
       [[ -z $zipfile[1] ]] && return 1
       if [[ $zipfile[1] !=  $_zip_cache_list ]]; then
 	_zip_cache_name="$zipfile[1]"
-	_zip_cache_list=( $(zipinfo -1 $_zip_cache_name) )
+	_zip_cache_list=( ${(f)"$(zipinfo -1 $_zip_cache_name)"} )
       fi
-     _wanted files expl 'file from archive' _multi_parts / _zip_cache_list
+     _wanted files expl 'file from archive' \
+	 _multi_parts / _zip_cache_list && return 0
     fi
   ;;
 esac

@@ -1,3 +1,9 @@
+2001-03-12  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/User/_zip, Completion/User/_hosts: handle
+	filenames containing spaces in zip archives and don't complete lftp
+	from _hosts
+
 2001-03-12  Chmouel Boudjnah <chmouel@mandrakesoft.com>
 
 	* 13601: Completion/User/_lftp: Add completion for lftp
