@@ -54,7 +54,7 @@ for x_mod in $x_mods; do
 	echo "    add_autoparam(\"$param\", \"$x_mod\");"
     done
     for mfunc in $automathfuncs; do
-	echo "    add_automath(\"$mfunc\", \"$x_mod\");"
+	echo "    add_automathfunc(\"$mfunc\", \"$x_mod\");"
     done
     echo "  }"
     for dep in $moddeps; do

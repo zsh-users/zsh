@@ -1,3 +1,9 @@
+2004-01-19  Peter Stephenson  <pws@csr.com>
+
+	* Vincent Stemen <zsh@hightek.org>: users/7011:
+	Src/mkbltnmlst.sh: add_automathfunc was misnamed in
+	shell script.
+
 2004-01-16  Peter Stephenson  <pws@csr.com>
 
 	* 19382: Functions/Misc/zmv: better error message if move failed
