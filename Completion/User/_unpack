@@ -1,0 +1,6 @@
+#compdef unpack pcat
+
+local expl
+
+_description expl 'compressed file'
+_files "$expl[@]" -g '*.z'
