@@ -19,9 +19,6 @@
 
 2000-05-09  Tanaka Akira  <akr@zsh.org>
 
-	* 11280: Completion/User/_make: suppress an error with closed stdin
-	on OpenBSD.
-
 	* 11278: Completion/User/_ssh: disable forwarding to use ssh.
 
 2000-05-09  Sven Wischnowsky  <wischnow@zsh.org>
