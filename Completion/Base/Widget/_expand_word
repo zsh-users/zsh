@@ -2,8 +2,6 @@
 
 # Simple completion front-end implementing expansion.
 
-eval "$_comp_setup"
-
 local curcontext="$curcontext"
 
 if [[ -z "$curcontext" ]]; then

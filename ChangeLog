@@ -1,3 +1,8 @@
+2001-05-30  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14558: Completion/Base/Widget/_correct_word,
+	Completion/Base/Widget/_expand_word: some cleanup
+
 2001-05-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* unposted: Zsh/Doc/metafaq.yo: make line spacing consistent.

@@ -3,11 +3,6 @@
 # Simple completion front-end implementing spelling correction.
 # The maximum number of errors is set quite high, and
 # the numeric prefix can be used to specify a different value.
-#
-# If configurations keys with the prefix `correctword_' are
-# given they override those starting with `correct_'.
-
-eval "$_comp_setup"
 
 local curcontext="$curcontext"
 
