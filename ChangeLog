@@ -1,3 +1,11 @@
+2000-10-04  Tanaka Akira  <akr@zsh.org>
+
+	* 12872: Completion/User/_cvs: Fix modules completion when a cvsroot
+	specified in a command line begins with tilde.  Generate subcommand
+	list from `cvs --help-commands' and `cvs --help-synonyms'.  Complete
+	remote modules. Complete vendor branch for a second argument of
+	`cvs import'.  Use _call.
+
 2000-10-02  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12869: Src/builtin.c, Src/exec.c, Src/glob.c, Src/signals.c,

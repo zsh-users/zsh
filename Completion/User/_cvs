@@ -36,24 +36,26 @@ _cvs () {
 
 (( $+functions[_cvs_command] )) ||
 _cvs_command () {
-  local cmd cvsroot="${opt_args[-d]:Q}"
-  typeset -A cmds
-  cmds=(add " ad new "          admin " adm rcs "       annotate " ann "
-	checkout " co get "     commit " ci com "       diff " di dif "
-	edit ""                 editors ""              export " exp ex "
-	history " hi his "      import " im imp "       init ""
-	log " lo rlog "         login " logon lgn "     logout ""
-	rdiff " patch pa "      release " re rel "      remove " rm delete "
-	status " st stat "      rtag " rt rfreeze "     tag " ta freeze "
-	unedit ""               update " up upd "       watch ""
-	watchers "")
+  local cmd cvsroot="$CVSROOT"
+  [[ -f CVS/Root ]] && cvsroot="$(<CVS/Root)"
+  [[ -n "$opt_args[-d]" ]] && cvsroot=${(e)~opt_args[-d]:Q}
+
+  if (( ! $+_cvs_cmds )); then
+    typeset -gA _cvs_cmds
+    _cvs_cmds=(
+      ${(f)${(F)${${(M)${(f)"$(_call commands cvs --help-commands 2>&1)"}:# *}/(#b) #([a-z]##) */$match[1]
+ }}}
+      ${(f)${(F)${${(M)${(f)"$(_call synonyms cvs --help-synonyms 2>&1)"}:# *}/(#b) #([a-z]#)   #([a-z]#) ([a-z]#)/$match[1]
+ $match[2] $match[3] }}}
+    )
+  fi
 
   if (( CURRENT == 1 )); then
-    _tags commands && { compadd "$@" -k cmds || compadd "$@" ${(kv)=cmds} }
+    _tags commands && { compadd "$@" -k _cvs_cmds || compadd "$@" ${(kv)=_cvs_cmds} }
   else
     local curcontext="$curcontext"
 
-    cmd="${${(k)cmds[(R)* $words[1] *]}:-${(k)cmds[(i)$words[1]]}}"
+    cmd="${${(k)_cvs_cmds[(R)* $words[1] *]}:-${(k)_cvs_cmds[(i)$words[1]]}}"
     if (( $#cmd )); then
       curcontext="${curcontext%:*:*}:cvs-${cmd}:"
       _cvs_$cmd
@@ -355,13 +357,13 @@ _cvs_import () {
   # "+Qqdb:m:I:k:W:"
   _arguments -s \
     '-d[use file modification time]' \
-    '-b+[specify vendor branch]:branch:' \
+    '-b+[specify vendor branch]:branch:(1.1.3)' \
     '-m+[message]:message:_cvs_m' \
     '*-I+[ignore files]:name:_files' \
     '-k+[keyword]:keyword substitution:_cvs_k' \
     '*-W+[wrapper specification]:spec:_files' \
     ':repository:_cvs_modules' \
-    ':vendor tag:' \
+    ':vendor tag:_cvs_vendor_branches' \
     ':release tag:'
 }
 
@@ -555,6 +557,11 @@ _cvs_watchers () {
       '*:file:_cvs_files'
 }
 
+(( $+functions[_cvs_version] )) ||
+_cvs_version () {
+  false
+}
+
 (( $+functions[_cvs_loadstat] )) ||
 _cvs_loadstat () {
   zstyle -t ":completion:${curcontext}:" disable-stat && return 1
@@ -584,7 +591,9 @@ _cvs_root () {
   fi
 
   _tags files && {
-    compadd -M 'r:|[:@./]=** r:|=**' "$@" -a _cvs_roots || _files "$@" -/
+    compadd -M 'r:|[:@./]=** r:|=**' "$@" -a _cvs_roots || {
+      compset -P ':(local|fork):'; _files "$@" -W / -/
+    }
   }
 }
 
@@ -638,43 +647,163 @@ _cvs_m () {
 
 (( $+functions[_cvs_modules] )) ||
 _cvs_modules () {
-  local root="$CVSROOT" expl
-  [[ -f CVS/Root ]] && root=$(<CVS/Root)
-  [[ -n "$cvsroot" ]] && root="$cvsroot"
+  if compset -P '(#m)(*/)'; then
+    _cvs_sub_modules "$cvsroot" "${MATCH%/}"
+  else
+    _cvs_top_modules "$cvsroot"
+  fi
+}
 
-  if [[ $root = :* || ! -d $root ]]; then
-    if [[ $_cvs_modules_root != $root ]]; then
-      _cvs_modules_root="$root"
+(( $+functions[_cvs_top_modules] )) ||
+_cvs_top_modules () {
+  local root="$1"
+
+  if [[ -d $root ]]; then
+    _wanted modules expl 'module name' \
+        compadd - $root/*(/:t) \
+            ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
+  else
+    if [[ "$_cvs_top_modules_cache_key" != "$root" ]]; then
+      _cvs_top_modules_cache_key="$root"
+      _cvs_top_modules_cache_mods=()
       if zstyle -T ":completion:${curcontext}:" remote-access; then
-	_cvs_modules_cache=(${(M)${${(f)"$(CVS_IGNORE_REMOTE_ROOT= cvs -d "$root" co -c)"}%%[ 	]*}:#?*})
-      else
-	_cvs_modules_cache=()
+	_cvs_remote_directories "$root" . _cvs_top_modules_cache_mods
+	_cvs_top_modules_cache_mods=(
+	  "$_cvs_top_modules_cache_mods[@]"
+	  ${(M)${${(f)"$(
+	    CVS_IGNORE_REMOTE_ROOT= _call modules cvs -d "$root" co -c
+	  )"}%%[ 	]*}:#?*}
+	)
       fi
     fi
-    if (( $#_cvs_modules_cache )); then
-      _wanted modules expl 'module name' compadd -a _cvs_modules_cache
+    if (( $#_cvs_top_modules_cache_mods )); then
+      _wanted modules expl 'module name' \
+        compadd -a _cvs_top_modules_cache_mods
     else
       _message 'module name'
     fi
-  else
+  fi
+}
+
+(( $+functions[_cvs_sub_modules] )) ||
+_cvs_sub_modules () {
+  local root="$1" dir="$2" ignore
+
+  if [[ -d $root ]]; then
     _wanted modules expl 'module name' \
-        compadd - $root/^CVSROOT(:t) \
-            ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
+	_path_files -W "($root/$dir)" -/ -F "(Attic */Attic)"
+  else
+    if [[ $_cvs_sub_modules_cache_key != "$root $dir" ]]; then
+      _cvs_sub_modules_cache_key="$root $dir"
+      _cvs_sub_modules_cache_mods=()
+      if zstyle -T ":completion:${curcontext}:" remote-access; then
+	_cvs_remote_directories "$root" "$dir" _cvs_sub_modules_cache_mods
+      fi
+    fi
+    if (( $#_cvs_sub_modules_cache_mods )); then
+      _wanted modules expl 'module name' \
+        compadd -qS/ -a _cvs_sub_modules_cache_mods
+    else
+      _message 'module name'
+    fi
+  fi
+}
+
+# _cvs_run cvsroot directory cvs-arguments...
+(( $+functions[_cvs_run] )) ||
+_cvs_run () {
+  local cvsroot="$1" dir="$2"
+  shift 2
+  local d=/tmp/zsh-cvs-work-$$
+  mkdir $d >&/dev/null
+  cd $d
+  mkdir CVS >&/dev/null
+  print -r - "$cvsroot" > CVS/Root
+  print "$dir" > CVS/Repository
+  print D > CVS/Entries
+  CVS_IGNORE_REMOTE_ROOT= cvs "$@"
+  cd $OLDPWD
+  rm -rf $d
+}
+
+# _cvs_remote_directories cvsroot directory [variable]
+(( $+functions[_cvs_remote_directories] )) ||
+_cvs_remote_directories () {
+  local root="$1" dir="$2" subdirs
+  shift 2
+  subdirs=(${${(M)${(f)"$(_call directories _cvs_run "$root" "$dir" update -r00 -d -p 2>&1)"}:#* New directory \`*\' -- ignored}/(#b)*\`(*)\'*/$match[1]})
+  if (( $# )); then
+    eval "$1=(\"\$subdirs[@]\")"
+  else
+    if (( $#subdirs )); then
+      print -lr - $subdirs
+    fi
+  fi
+}
+
+(( $+functions[_cvs_vendor_branches] )) ||
+_cvs_vendor_branches () {
+  local expl vendor_branch
+  if [[ -n $opt_args[-b] ]]; then
+    _cvs_extract_vendor_branch -b "$opt_args[-b]" "$cvsroot" "$line[1]" \
+      vendor_branch
+  else
+    _cvs_extract_vendor_branch "$cvsroot" "$line[1]" vendor_branch
+  fi
+  if (( $#vendor_branch )); then
+    _wanted values expl 'vendor branch' compadd -a vendor_branch
+  else
+    _message 'vendor branch'
+  fi
+}
+
+# _cvs_extract_vendor_branch [-b numeric-branch] cvsroot directory [variable]
+(( $+functions[_cvs_extract_vendor_branch] )) ||
+_cvs_extract_vendor_branch () {
+  local numeric='1\.1\.1'
+  if [[ $1 = -b ]]; then
+    numeric="${2//./\\.}"
+    shift 2
+  fi
+  local root="$1" dir="$2"
+  shift 2
+
+  local vtags
+  vtags=($(
+    _call tags _cvs_run "$root" "$dir" -Q log -h 2>/dev/null |
+    sed -ne $'/^symbolic names:/{
+n
+:loop
+/^[^ \t]/d
+/: '"$numeric"$'$/b found
+n
+b loop
+:found
+s/^[ \t]*\\(.*\\): '"$numeric"$'$/\\1/p
+n
+/^[ \t]/b found
+q
+}'))
+  if (( $# )); then
+    eval "$1=(\"\$vtags[@]\")"
+  else
+    if (( $#vtags )); then
+      print -lr - "$vtags[@]"
+    fi
   fi
 }
 
 (( $+functions[_cvs_revisions] )) ||
 _cvs_revisions () {
-  local root="$CVSROOT" expl
-  [[ -f CVS/Root ]] && root=$(<CVS/Root)
-  [[ -n "$cvsroot" ]] && root="$cvsroot"
+  local expl
 
-  if [[ $_cvs_revisions_key != $root:$PWD ]]; then
-    _cvs_revisions_key="$root:$PWD"
+  if [[ $_cvs_revisions_key != $cvsroot:$PWD ]]; then
+    _cvs_revisions_key="$cvsroot:$PWD"
     if zstyle -T ":completion:${curcontext}:" remote-access; then
       _cvs_revisions_cache=(
-	$(CVS_IGNORE_REMOTE_ROOT= cvs -d "$root" -q status -vl .|
-	  sed -n -e '/No Tags Exist/d' -e 's/^	\([A-Za-z][-_0-9A-Za-z]*\).*/\1/p'|
+	$(CVS_IGNORE_REMOTE_ROOT= _call tags cvs -d "$cvsroot" -q status -vl .|
+	  sed -n -e '/No Tags Exist/d' \
+	         -e 's/^	\([A-Za-z][-_0-9A-Za-z]*\).*/\1/p'|
 	  sort|uniq)
       )
     else
