@@ -1,0 +1,10 @@
+#compdef setopt
+
+# If you first want to complete only unset options, un-comment the lines
+# setting the _options_unset  array and then use:
+#
+#   _options_unset || _options
+#
+# here.
+
+_options
