@@ -923,18 +923,19 @@ par_for(int *complex)
 	yylex();
 	type = WC_FOR_COND;
     } else {
-	int np, n, posix_in, ona = noaliases, onc = nocorrect;
+	int np = 0, n, posix_in, ona = noaliases, onc = nocorrect;
 	infor = 0;
 	if (tok != STRING || !isident(tokstr))
 	    YYERRORV(oecused);
-	np = ecadd(0);
+	if (!sel)
+	    np = ecadd(0);
 	n = 0;
 	incmdpos = 1;
 	noaliases = nocorrect = 1;
 	for (;;) {
 	    n++;
 	    ecstr(tokstr);
-	    yylex();	
+	    yylex();
 	    if (tok != STRING || !strcmp(tokstr, "in") || sel)
 		break;
 	    if (!isident(tokstr) || errflag)
@@ -946,7 +947,8 @@ par_for(int *complex)
 	}
 	noaliases = ona;
 	nocorrect = onc;
-	ecbuf[np] = n;
+	if (!sel)
+	    ecbuf[np] = n;
 	posix_in = isnewlin;
 	while (isnewlin)
 	    yylex();

@@ -202,7 +202,7 @@ execselect(Estate state, int do_exec)
     wordcode code = state->pc[-1];
     char *str, *s, *name;
     LinkNode n;
-    int i, usezle;
+    int i, usezle, oignoreeof = opts[IGNOREEOF];
     FILE *inp;
     size_t more;
     LinkList args;
@@ -238,6 +238,7 @@ execselect(Estate state, int do_exec)
     inp = fdopen(dup(usezle ? SHTTY : 0), "r");
     more = selectlist(args, 0);
     loop = state->pc;
+    opts[IGNOREEOF] = 0;
     for (;;) {
 	for (;;) {
 	    if (empty(bufstack)) {
@@ -301,6 +302,7 @@ execselect(Estate state, int do_exec)
     fclose(inp);
     loops--;
     state->pc = end;
+    opts[IGNOREEOF] = oignoreeof;
     return lastval;
 }
 

@@ -1,3 +1,9 @@
+2003-02-17  Peter Stephenson  <pws@csr.com>
+
+	* 18251: Src/parse.c, Src/loop.c: 15030 broke `select' a year
+	and a half ago and no-one noticed till now; also make `select'
+	return on an EOF without complaining.
+
 2003-02-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 18249: Completion/Linux/Command/_uml: new completion function
