@@ -193,7 +193,8 @@ Zsh/modlist.yo: $(MODDOCSRC)
 	( \
 	    echo "startitem()"; \
 	    for modfile in $(MODDOCSRC); do \
-		sed -n '1{s|^COMMENT(!MOD!\(.*\)$$|item(tt(\1))(|;p;d;};/^!MOD!)$$/q;p' \
+		sed -ne '1{s|^COMMENT(!MOD!\(.*\)$$|item(tt(\1))(|;p;d;}' \
+		    -e '/^!MOD!)$$/q;p' \
 		    < $(sdir)/$$modfile; \
 		echo ")"; \
 	    done; \

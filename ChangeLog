@@ -1,3 +1,8 @@
+2000-06-02  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11733: Doc/Makefile.in: Solaris sed was behaving strangely with
+	the commands to create Zsh/modlist.yo.
+
 2000-06-02  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 11723: Src/glob.c:  Fixed glob-array indexing.
