@@ -3,7 +3,4 @@
 shift words
 (( CURRENT-- ))
 
-# We now want to go back to doing ordinary completion on the new word,
-# so restore the default _compskip.
-_compskip=''
 _normal

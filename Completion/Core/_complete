@@ -31,7 +31,7 @@ fi
 # For arguments and command names we use the `_normal' function.
 
 if [[ "$compstate[context]" = command ]]; then
-  _normal
+  _normal -s
 else
   # Let's see if we have a special completion definition for the other
   # possible contexts.
