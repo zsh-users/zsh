@@ -1,6 +1,6 @@
 DISTFILES_SRC='
     .distfiles
-    _a2ps _archie _bison _bunzip2 _bzip2 _chown _compress
+    _a2ps _archie _bison _bzip2 _chown _compress
     _configure _cvs _dd _diff _diff_options _dir_list _dirs
     _domains _dvi _enscript
     _find _finger _fakeroot _flex _gcc _gdb  _getconf _gprof _groups
