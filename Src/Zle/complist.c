@@ -2201,9 +2201,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    menucomplete(zlenoargs);
 	    iforcemenu = 0;
 
-	    if (dat->num < 1 || !minfo.cur || !*(minfo.cur)) {
+	    if ((dat ? dat->num : nmatches) < 1 || !minfo.cur || !*(minfo.cur)) {
 		nolist = 1;
-		if (dat->nmesg || nmessages) {
+		if ((dat ? (dat->nmesg || nmessages) : nmessages)) {
 		    showinglist = -2;
 		    zrefresh();
 		} else {
@@ -2768,13 +2768,13 @@ domenuselect(Hookdef dummy, Chdata dat)
     mselect = mlastcols = mlastlines = -1;
     mstatus = NULL;
     inselect = mhasstat = 0;
-    if (acc) {
+    if (acc && validlist && minfo.cur) {
 	menucmp = lastambig = hasoldlist = 0;
 	do_single(*(minfo.cur));
     }
     if (wasnext || broken) {
 	menucmp = 2;
-	showinglist = -2;
+	showinglist = (validlist ? -2 : 0);
 	minfo.asked = 0;
 	if (!noselect) {
 	    int nos = noselect;
@@ -2784,7 +2784,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	}
     }
     if (!noselect && (!dat || acc)) {
-	showinglist = -2;
+	showinglist = (validlist ? -2 : 0);
 	onlyexpl = oe;
 	if (!smatches)
 	    clearlist = 1;
