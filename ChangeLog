@@ -1,5 +1,7 @@
 2000-09-20  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
+	* 12848: Doc/Zsh/zle.yo: Alphabetize list of parameters
+
 	* 12842 with corrections of Bart: Doc/Zsh/contrib.yo: Clarify
 	digest file usage.
 

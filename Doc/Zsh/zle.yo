@@ -128,6 +128,12 @@ The entire contents of the edit buffer.  If it is written to, the
 cursor remains at the same offset, unless that would put it outside the
 buffer.
 )
+vindex(BUFFERLINES)
+item(tt(BUFFERLINES))(
+The number of screen lines needed for the edit buffer currently
+displayed on screen (i.e. without any changes to the preceding
+parameters done after the last redisplay).
+)
 vindex(CURSOR)
 item(tt(CURSOR) (integer))(
 The offset of the cursor, within the edit buffer.  This is in the range
@@ -135,9 +141,17 @@ The offset of the cursor, within the edit buffer.  This is in the range
 Attempts to move the cursor outside the buffer will result in the
 cursor being moved to the appropriate end of the buffer.
 )
-vindex(MARK)
-item(tt(MARK) (integer))(
-Like tt(CURSOR), but for the mark.
+vindex(HISTNO)
+item(tt(HISTNO) (integer))(
+The current history number.
+)
+vindex(KEYS)
+item(tt(KEYS) (scalar))(
+The keys typed to invoke this widget, as a literal string.
+)
+vindex(LASTWIDGET)
+item(tt(LASTWIDGET) (scalar))(
+The name of the last widget that was executed.
 )
 vindex(LBUFFER)
 item(tt(LBUFFER) (scalar))(
@@ -145,35 +159,9 @@ The part of the buffer that lies to the left of the cursor position.
 If it is assigned to, only that part of the buffer is replaced, and the
 cursor remains between the new tt($LBUFFER) and the old tt($RBUFFER).
 )
-vindex(RBUFFER)
-item(tt(RBUFFER) (scalar))(
-The part of the buffer that lies to the right of the cursor position.
-If it is assigned to, only that part of the buffer is replaced, and the
-cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
-)
-vindex(BUFFERLINES)
-item(tt(BUFFERLINES))(
-The number of screen lines needed for the edit buffer currently
-displayed on screen (i.e. without any changes to the preceding
-parameters done after the last redisplay).
-)
-vindex(PREBUFFER)
-item(tt(PREBUFFER) (scalar))(
-In a multi-line input at the secondary prompt, this read-only parameter
-contains the contents of the lines before the one the cursor is
-currently in.
-)
-vindex(WIDGET)
-item(tt(WIDGET) (scalar))(
-The name of the widget currently being executed.
-)
-vindex(LASTWIDGET)
-item(tt(LASTWIDGET) (scalar))(
-The name of the last widget that was executed.
-)
-vindex(KEYS)
-item(tt(KEYS) (scalar))(
-The keys typed to invoke this widget, as a literal string.
+vindex(MARK)
+item(tt(MARK) (integer))(
+Like tt(CURSOR), but for the mark.
 )
 vindex(NUMERIC)
 item(tt(NUMERIC) (integer))(
@@ -183,16 +171,28 @@ called with the tt(zle) builtin command will use the value
 assigned. If it is unset inside a widget function, builtin widgets
 called behave as if no numeric argument was given.
 )
-vindex(HISTNO)
-item(tt(HISTNO) (integer))(
-The current history number.
-)
 vindex(PENDING)
 item(tt(PENDING) (integer))(
 The number of bytes pending for input, i.e. the number of bytes which have
 already been typed and can immediately be read. On systems where the shell
 is not able to get this information, this parameter will always have a
 value of zero.
+)
+vindex(PREBUFFER)
+item(tt(PREBUFFER) (scalar))(
+In a multi-line input at the secondary prompt, this read-only parameter
+contains the contents of the lines before the one the cursor is
+currently in.
+)
+vindex(RBUFFER)
+item(tt(RBUFFER) (scalar))(
+The part of the buffer that lies to the right of the cursor position.
+If it is assigned to, only that part of the buffer is replaced, and the
+cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
+)
+vindex(WIDGET)
+item(tt(WIDGET) (scalar))(
+The name of the widget currently being executed.
 )
 enditem()
 sect(Standard Widgets)
