@@ -54,7 +54,7 @@ zsh_COMPILE_FLAGS($CPPFLAGS, $CFLAGS, $LDFLAGS, $LIBS)
 dnl Do you want to debug zsh?
 undefine([zsh-debug])dnl
 AC_ARG_ENABLE(zsh-debug,
-[  --enable-zsh-debug         use it if you want to debug zsh],
+[  --enable-zsh-debug         compile with debug code and debugger symbols],
 [if test x$enableval = xyes; then
   AC_DEFINE(DEBUG)
 fi])
@@ -62,7 +62,7 @@ fi])
 dnl Do you want zsh memory allocation routines.
 undefine([zsh-mem])dnl
 AC_ARG_ENABLE(zsh-mem,
-[  --enable-zsh-mem           use zsh memory allocation routines],
+[  --enable-zsh-mem           compile with zsh memory allocation routines],
 [if test x$enableval = xyes; then
   AC_DEFINE(ZSH_MEM)
 fi])
@@ -78,7 +78,7 @@ fi])
 dnl Do you want to print warnings when errors in memory allocation.
 undefine([zsh-mem-warning])dnl
 AC_ARG_ENABLE(zsh-mem-warning,
-[  --enable-zsh-mem-warning   print warnings when error in memory allocation],
+[  --enable-zsh-mem-warning   print warnings for errors in memory allocation],
 [if test x$enableval = xyes; then
   AC_DEFINE(ZSH_MEM_WARNING)
 fi])
@@ -100,21 +100,15 @@ AC_ARG_ENABLE(zsh-hash-debug,
   AC_DEFINE(ZSH_HASH_DEBUG)
 fi])
 
-dnl Do you want large file support, if available?
-undefine([lfs])dnl
-AC_ARG_ENABLE(lfs,
-[  --disable-lfs              turn off support for large files],
-[lfs="$enableval"], [lfs=yes])
-
 dnl Pathnames for global zsh scripts
 undefine([etcdir])dnl
 AC_ARG_ENABLE(etcdir,
-[  --enable-etcdir=directory  default directory for global zsh scripts],
+[  --enable-etcdir=DIR        the default directory for global zsh scripts],
 [etcdir="$enableval"], [etcdir=/etc])
 
 undefine([zshenv])dnl
 AC_ARG_ENABLE(zshenv,
-[  --enable-zshenv=pathname   the full pathname of the global zshenv script],
+[  --enable-zshenv=FILE       the full pathname of the global zshenv script],
 [zshenv="$enableval"],
 [if test "x$etcdir" = xno; then
   zshenv=no
@@ -127,7 +121,7 @@ fi
 
 undefine([zshrc])dnl
 AC_ARG_ENABLE(zshrc,
-[  --enable-zshrc=pathname    the full pathname of the global zshrc script],
+[  --enable-zshrc=FILE        the full pathname of the global zshrc script],
 [zshrc="$enableval"],
 [if test "x$etcdir" = xno; then
   zshrc=no
@@ -140,7 +134,7 @@ fi
 
 undefine([zprofile])dnl
 AC_ARG_ENABLE(zprofile,
-[  --enable-zprofile=pathname the full pathname of the global zprofile script],
+[  --enable-zprofile=FILE     the full pathname of the global zprofile script],
 [zprofile="$enableval"],
 [if test "x$etcdir" = xno; then
   zprofile=no
@@ -153,7 +147,7 @@ fi
 
 undefine([zlogin])dnl
 AC_ARG_ENABLE(zlogin,
-[  --enable-zlogin=pathname   the full pathname of the global zlogin script],
+[  --enable-zlogin=FILE       the full pathname of the global zlogin script],
 [zlogin="$enableval"],
 [if test "x$etcdir" = xno; then
   zlogin=no
@@ -166,7 +160,7 @@ fi
 
 undefine([zlogout])dnl
 AC_ARG_ENABLE(zlogout,
-[  --enable-zlogout=pathname  the full pathname of the global zlogout script],
+[  --enable-zlogout=FILE      the full pathname of the global zlogout script],
 [zlogout="$enableval"],
 [if test "x$etcdir" = xno; then
   zlogout=no
@@ -183,21 +177,22 @@ AC_SUBST(zprofile)dnl
 AC_SUBST(zlogin)dnl
 AC_SUBST(zlogout)dnl
 
+dnl Do you want large file support, if available?
+undefine([lfs])dnl
+AC_ARG_ENABLE(lfs,
+[  --disable-lfs              turn off support for large files],
+[lfs="$enableval"], [lfs=yes])
+
 dnl Do you want dynamically loaded binary modules.
 undefine([dynamic])dnl
 AC_ARG_ENABLE(dynamic,
 [  --disable-dynamic          turn off dynamically loaded binary modules],
 [dynamic="$enableval"], [dynamic=yes])
 
-dnl Do you want to compile as K&R C.
-AC_ARG_ENABLE(ansi2knr,
-[  --enable-ansi2knr          translate source to K&R C before compiling],
-[ansi2knr="$enableval"], [ansi2knr=default])
-
 dnl Do you want to disable restricted on r* commands
 undefine([restricted-r])dnl
 AC_ARG_ENABLE(restricted-r,
-[  --disable-restricted-r     turn off restricted shell if the invoked command is r*],
+[  --disable-restricted-r     turn off r* invocation for restricted shell],
 [if test x$enableval = xyes; then
   AC_DEFINE(RESTRICTED_R)
 fi],
@@ -213,9 +208,14 @@ fi],
 AC_DEFINE(CONFIG_LOCALE)
 )
 
+dnl Do you want to compile as K&R C.
+AC_ARG_ENABLE(ansi2knr,
+[  --enable-ansi2knr          translate source to K&R C before compiling],
+[ansi2knr="$enableval"], [ansi2knr=default])
+
 undefine([fndir])dnl
 AC_ARG_ENABLE(fndir,
-[  --enable-fndir=DIR         where functions go],
+[  --enable-fndir=DIR         the directory in which to install functions],
 dnl ${VERSION} to be determined at compile time.
 [if test $enableval = yes; then
   fndir=${datadir}/${tzsh_name}/'${VERSION}'/functions
@@ -225,7 +225,7 @@ fi], [fndir=${datadir}/${tzsh_name}/'${VERSION}'/functions])
 
 undefine([sitefndir])dnl
 AC_ARG_ENABLE(sitefndir,
-[  --enable-site-fndir=DIR    where site functions (not version specific) go],
+[  --enable-site-fndir=DIR    same for site functions (not version specific)],
 [if test $enableval = yes; then
   sitefndir=${datadir}/${tzsh_name}/site-functions
 else
@@ -250,7 +250,7 @@ AC_SUBST(FUNCTIONS_SUBDIRS)dnl
 dnl Do you want maildir support?
 undefine([maildir_support])dnl
 AC_ARG_ENABLE(maildir-support,
-[  --enable-maildir-support   Enable maildir support in MAIL and MAILPATH],
+[  --enable-maildir-support   enable maildir support in MAIL and MAILPATH],
 [if test x$enableval = xyes; then
   AC_DEFINE(MAILDIR_SUPPORT)
 fi])
@@ -258,7 +258,7 @@ fi])
 dnl Do you want to set a maximum function depth?
 undefine([max_function_depth])dnl
 AC_ARG_ENABLE(max-function-depth,
-[  --enable-max-function-depth=MAX   Limit function depth to MAX],
+[  --enable-max-function-depth=MAX   limit function depth to MAX],
 [if test x$enableval = xyes; then
   AC_DEFINE(MAX_FUNCTION_DEPTH, 4096)
 else
@@ -417,6 +417,45 @@ if test $zsh_cv_c_variable_length_arrays = yes; then
   AC_DEFINE(HAVE_VARIABLE_LENGTH_ARRAYS)
 fi
 
+AC_MSG_CHECKING(what to set MAXJOB to)
+dnl Do you want to alter the maximum job table size?
+undefine([max_jobtable_size])dnl
+AC_ARG_ENABLE(max-jobtable-size,
+[  --enable-max-jobtable-size=MAX    limit job table size to MAX],
+
+[if test x$enableval = xyes; then
+
+  if test $ac_cv_header_linux_tasks_h = yes; then
+   AC_EGREP_CPP(yes,
+   [#include <linux/tasks.h>
+    #ifdef MAX_TASKS_PER_USER
+    yes
+    #endif
+   ],
+   maxj=max)
+  fi
+
+   if test x$maxj = xmax; then
+    AC_DEFINE(MAXJOB, MAX_TASKS_PER_USER)
+    AC_DEFINE(NEED_LINUX_TASKS_H)
+    AC_MSG_RESULT(${msg}MAX_TASKS_PER_USER)
+   else
+    AC_DEFINE(MAXJOB, 256)
+    AC_MSG_RESULT(${msg}256)
+   fi
+
+ elif test x$enableval = xno; then
+ AC_DEFINE(MAXJOB,512)
+ AC_MSG_RESULT(${msg}512)
+ else
+ AC_DEFINE_UNQUOTED(MAXJOB,$enableval)
+ AC_MSG_RESULT(${msg}${enableval}) 
+fi],
+[
+AC_DEFINE(MAXJOB, 50)
+ AC_MSG_RESULT(${msg}50) 
+])
+
 dnl ------------------
 dnl CHECK FOR PROGRAMS
 dnl ------------------
@@ -508,11 +547,19 @@ AC_CHECK_LIB(m, pow)
 
 dnl Prefer BSD termcap library to SysV curses library, except on certain
 dnl SYSV-derived systems.
-case "$host_os" in
+AC_ARG_WITH(curses-terminfo,
+[  --with-curses-terminfo     use terminfo support from curses library],
+[if test x$withval = xyes; then
+  termcap_curses_order="curses ncurses termcap"
+  AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
+else
+  termcap_curses_order="termcap curses ncurses"
+fi],
+[case "$host_os" in
   aix*|hpux10.*|hpux11.*|solaris*)
       termcap_curses_order="curses ncurses termcap" ;;
   *)             termcap_curses_order="termcap curses ncurses" ;;
-esac
+esac])dnl
 
 AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
 AC_MSG_CHECKING(if term.h needs curses.h)
@@ -1424,45 +1471,6 @@ main() {
       AC_DEFINE(GETPWNAM_FAKED)
     fi
 fi
-
-AC_MSG_CHECKING(what to set MAXJOB to)
-dnl Do you want to alter the maximum job table size?
-undefine([max_jobtable_size])dnl
-AC_ARG_ENABLE(max-jobtable-size,
-[  --enable-max-jobtable-size=MAX   Limit job table size to MAX],
-
-[if test x$enableval = xyes; then
-
-  if test $ac_cv_header_linux_tasks_h = yes; then
-   AC_EGREP_CPP(yes,
-   [#include <linux/tasks.h>
-    #ifdef MAX_TASKS_PER_USER
-    yes
-    #endif
-   ],
-   maxj=max)
-  fi
-
-   if test x$maxj = xmax; then
-    AC_DEFINE(MAXJOB, MAX_TASKS_PER_USER)
-    AC_DEFINE(NEED_LINUX_TASKS_H)
-    AC_MSG_RESULT(${msg}MAX_TASKS_PER_USER)
-   else
-    AC_DEFINE(MAXJOB, 256)
-    AC_MSG_RESULT(${msg}256)
-   fi
-
- elif test x$enableval = xno; then
- AC_DEFINE(MAXJOB,512)
- AC_MSG_RESULT(${msg}512)
- else
- AC_DEFINE_UNQUOTED(MAXJOB,$enableval)
- AC_MSG_RESULT(${msg}${enableval}) 
-fi],
-[
-AC_DEFINE(MAXJOB, 50)
- AC_MSG_RESULT(${msg}50) 
-])
 
 
 dnl ---------------

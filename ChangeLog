@@ -3,6 +3,12 @@
 	* 14181: Src/params.c: follow-up to 14151: use BDIGBUFSIZE in
 	two other places.
 
+2001-05-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14177: configure.in: Add --with-curses-terminfo to force search
+	order for tgetent and search for tigetstr.  Reorder some other
+	options and reword their help messages.
+
 2001-04-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14169: configure.in: Improve some AC_TRY_LINK tests so that they
