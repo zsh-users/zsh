@@ -54,6 +54,7 @@ list-choices-with-report () {
 }
 finish () {
   print "<WIDGET><finish>"
+  sleep 1
   exit 0
 }
 zle -N expand-or-complete-with-report
@@ -68,14 +69,23 @@ End
 export PS1="<PROMPT>"
 zpty zsh "$zsh" -f
 
-zpty -r zsh log "*<PROMPT>*"
+zpty -r zsh log1 "*<PROMPT>*" || { 
+  print first prompt doesn\'t appered.
+  exit 1
+}
 
 zpty -w zsh ". $tmp"
-zpty -r zsh log "*<PROMPT>*"
+zpty -r zsh log2 "*<PROMPT>*" || {
+  print second prompt doesn\'t appered.
+  exit 1
+}
 rm $tmp
 
-zpty -w zsh "$input"$'\C-Z'
-zpty -r zsh log "*<WIDGET><finish>*"
+zpty -n -w zsh "$input"$'\C-Z'
+zpty -r zsh log "*<WIDGET><finish>*" || {
+  print finish widget doesn\'t invoked.
+  exit 1
+}
 
 if [[ -n "$debug" ]]; then
   print -lr - "$log" > /tmp/comptest.debug

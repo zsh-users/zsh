@@ -104,11 +104,11 @@
 >DESCRIPTION:{desc1}
 >NO:{arg1}
 
-# code='compdef _tst tst; _tst () { _arguments "-\+[opt]" }'
-# comptest -c "$code" $'tst -\C-D'
-#0:_arguments
-#>DESCRIPTION:{option}
-#>NO:{-+ -- opt}
+ code='compdef _tst tst; _tst () { _arguments "-\+[opt]" }'
+ comptest -c "$code" $'tst -\C-D'
+0:_arguments
+>DESCRIPTION:{option}
+>NO:{-+ -- opt}
 
  code='compdef _tst tst; _tst () { _arguments "1:desc1:(arg1)" }'
  comptest -c "$code" $'tst \t'
