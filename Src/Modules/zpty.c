@@ -430,13 +430,19 @@ deleteallptycmds(void)
 static void
 checkptycmd(Ptycmd cmd)
 {
-    if (cmd->read != -1)
+    char c;
+    int r;
+
+    if (cmd->read != -1 || cmd->fin)
 	return;
-    if (!read_poll(cmd->fd, &cmd->read, 0) &&
-	kill(cmd->pid, 0) < 0) {
-	cmd->fin = 1;
-	zclose(cmd->fd);
+    if ((r = read(cmd->fd, &c, 1)) < 0) {
+	if (kill(cmd->pid, 0) < 0) {
+	    cmd->fin = 1;
+	    zclose(cmd->fd);
+	}
+	return;
     }
+    if (r) cmd->read = (int) c;
 }
 
 static int

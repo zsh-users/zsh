@@ -1,5 +1,8 @@
 2001-02-13  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13462: Src/Modules/zpty.c: try to make the -t option of zpty
+ 	smarter
+	
 	* 13459: Completion/Core/_path_files: wehn using glob_complete,
  	don't treat everything starting with a tilde as a pattern
 	
