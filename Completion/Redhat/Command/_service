@@ -5,9 +5,10 @@
 # _sub_command happy
 
 # we are interested in init service only
-local ctx="${curcontext/%[^:]#:[^:]#/argument-1:}"
-zstyle -T  ":completion:$ctx" tag-order && \
-  zstyle ":completion:$ctx" tag-order init -
+# FIXME: this is commented out because it currently does not work
+#local ctx="${curcontext}argument-1:"
+#zstyle -T  ":completion:${ctx}" tag-order && \
+#  zstyle ":completion:${ctx}" tag-order init -
 
 
 _arguments -s \
