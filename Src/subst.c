@@ -1366,15 +1366,20 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	     * If there isn't one, we're just going to delete that,
 	     * i.e. replace it with an empty string.
 	     *
-	     * This allows quotation of the slash with '\\/'. Why
-	     * two?  Well, for a non-quoted string we can check for
-	     * Bnull+/, which is what you get from `\/', but inside
-	     * double quotes the Bnull isn't there, so it's not
-	     * consistent.
+	     * We used to use double backslashes to quote slashes,
+	     * but actually that was buggy and using a single backslash
+	     * is easier and more obvious.
 	     */
 	    for (ptr = s; (c = *ptr) && c != '/'; ptr++)
-		if (c == '\\' && ptr[1] == '/')
-		    chuck(ptr);
+	    {
+		if ((c == Bnull || c == '\\') && ptr[1])
+		{
+		    if (ptr[1] == '/')
+			chuck(ptr);
+		    else
+			ptr++;
+		}
+	    }
 	    replstr = (*ptr && ptr[1]) ? ptr+1 : "";
 	    *ptr = '\0';
 	}

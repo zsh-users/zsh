@@ -1,3 +1,9 @@
+2003-05-07  Peter Stephenson  <pws@csr.com>
+
+	* 18508: Src/subst.c, Test/D04parameter.ztst: quoting of the `/'
+	separating source and replacment text in ${foo//bar/stuff} was
+	buggy.
+
 2003-04-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 18467: Src/Zle/computil.c: null pointer dereferenced with
