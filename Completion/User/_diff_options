@@ -3,8 +3,8 @@
 local of ofwuc ouc oss ofwy ofwg ofwl
 
 (( $+_diff_is_gnu )) || {
-	_diff_is_gnu=0
-        [[ $(command diff -v >/dev/null 2>&1) == *GNU* ]] && _diff_is_gnu=1
+	_diff_is_gnu=0;
+        [[ $(command diff -v </dev/null 2>/dev/null) == *GNU* ]] && _diff_is_gnu=1
 }
 
 if (( _diff_is_gnu ))
