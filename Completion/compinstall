@@ -1529,7 +1529,7 @@ completions?
 #       squeeze-slashes,
 __ci_do_file_styles() {
   local key files cursor expand speciald ignorep squeezes select
-  local prefon suffon lssuffixes
+  local prefon suffon lssuffixes preserve
 
   __ci_get_this_style file-sort files
   __ci_get_this_style ignore-parents ignorep
@@ -1537,6 +1537,8 @@ __ci_do_file_styles() {
   __ci_get_this_style squeeze-slashes squeezes
   __ci_get_this_style expand expand
   __ci_get_this_style list-suffixes lssuffixes
+  __ci_get_this_style preserve-prefix preserve
+  [[ -n $preserve ]] && preserve=${(Q)preserve}
 
   while true; do
     clear
@@ -1553,6 +1555,8 @@ __ci_do_file_styles() {
 
 5.  Configure how multiple paths are expanded and displayed, 
     e.g. /f/b -> /foo/bar
+
+6.  Keep certain prefixes unchanged, such as \`//resource/'.
 
 q.  Return without saving.
 0.  Done setting options for filename completion.
@@ -1729,6 +1733,21 @@ Do you want this behaviour ([y]es, [n]o, [k]eep current setting)?
 	    ([nN]) lssuffixes=;;
 	  esac
 	  ;;
+      (6) print "\
+On some systems, there are special forms for the start of a filename
+which should be left alone by the completion system.  For example, Cygwin
+uses a double slash to indicate a network resource, hence a prefix of
+the form \`//resource/' should be left alone.  This style gives a pattern
+to match any such prefixes; alternatives separated by \`|' are therefore
+possible.  Edit the pattern as you like.  If this is empty, the shell will not
+handle any prefixes specially."
+          if [[ -z $preserve ]]; then
+	      preserve="//[^/]##/"
+	      print "
+Accept the default to handle network resources as just described."
+	  fi
+	  vared -eh -p "pattern> " preserve
+	  ;;
       (q) return 1
 	 ;;
     esac
@@ -1741,6 +1760,9 @@ Do you want this behaviour ([y]es, [n]o, [k]eep current setting)?
   __ci_set_this_style squeeze-slashes squeezes
   __ci_set_this_style expand expand
   __ci_set_this_style list-suffixes lssuffixes
+  # pattern, always quote
+  [[ -n $preserve ]] && preserve=${(qq)preserve}
+  __ci_set_this_style preserve-prefix preserve
 
   return 0
 }

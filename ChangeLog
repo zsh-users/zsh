@@ -1,5 +1,7 @@
 2003-03-07  Peter Stephenson  <pws@csr.com>
 
+	* 18327: Completion/compinstall: add handling for preserve-prefix.
+
 	* 18325: Src/Modules/parameter.c: options on by default weren't
 	handled correctly.
 
