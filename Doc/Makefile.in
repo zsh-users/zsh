@@ -164,24 +164,24 @@ uninstall: uninstall.man
 
 # install man pages, creating install directory if necessary
 install.man: $(MAN)
-	$(sdir_top)/mkinstalldirs $(mandir)/man1
+	$(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
 	  if test -f $$file; then \
-	    $(INSTALL_DATA) $$file $(mandir)/man1; \
+	    $(INSTALL_DATA) $$file $(DESTDIR)$(mandir)/man1; \
 	  elif test -f $(sdir)/$$file; then \
-	    $(INSTALL_DATA) $(sdir)/$$file $(mandir)/man1; \
+	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1; \
 	  else :; \
 	  fi || exit 1; \
 	done
 
 # install info pages, creating install directory if necessary
 install.info: zsh.info
-	$(sdir_top)/mkinstalldirs $(infodir)
+	$(sdir_top)/mkinstalldirs $(DESTDIR)$(infodir)
 	for file in zsh.info zsh.info-[1-9]*; do \
 	  if test -f $$file; then \
-	    $(INSTALL_DATA) $$file $(infodir); \
+	    $(INSTALL_DATA) $$file $(DESTDIR)$(infodir); \
 	  elif test -f $(sdir)/$$file; then \
-	    $(INSTALL_DATA) $(sdir)/$$file $(infodir); \
+	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(infodir); \
 	  else :; \
 	   fi || exit 1; \
 	done
@@ -190,18 +190,18 @@ install.info: zsh.info
 	else true; fi
 
 install.html: zsh_toc.html
-	$(sdir_top)/mkinstalldirs $(htmldir)
-	$(INSTALL_DATA) *.html $(htmldir)
+	$(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
+	$(INSTALL_DATA) *.html $(DESTDIR)$(htmldir)
 
 # uninstall man pages
 uninstall.man:
 	for file in $(MAN); do \
-	  rm -f $(mandir)/man1/$$file; \
+	  rm -f $(DESTDIR)$(mandir)/man1/$$file; \
 	done
 
 # uninstall info pages
 uninstall.info:
-	rm -f $(infodir)/zsh.info $(infodir)/zsh.info-[1-9]*
+	rm -f $(DESTDIR)$(infodir)/zsh.info $(DESTDIR)$(infodir)/zsh.info-[1-9]*
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
