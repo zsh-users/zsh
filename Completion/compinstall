@@ -200,13 +200,13 @@ fi
 if [[ -z $compdir ]]; then
   # Start up a new zsh and get its default fpath.  If some swine has
   # tinkered with this in /etc/zshenv we're out of luck.
-  lines=${(f)"$(zsh -fc 'print -l $ZSH_VERSION $fpath')"}
-  lines=$lines[1]
+  lines=(${(f)"$(zsh -fc 'print -l $ZSH_VERSION $fpath')"})
+  line=$lines[1]
   shift lines
   # If the zsh in that path isn't right, maybe the user's shell is elsewhere.
   if [[ $line != $ZSH_VERSION && -x $SHELL ]]; then
-    lines=${(f)"$($SHELL -fc 'print -l $ZSH_VERSION $fpath' 2>/dev/null)"}
-    lines=$lines[1]
+    lines=(${(f)"$($SHELL -fc 'print -l $ZSH_VERSION $fpath' 2>/dev/null)"})
+    line=$lines[1]
     shift lines
   fi
   if [[ $line != $ZSH_VERSION ]]; then
