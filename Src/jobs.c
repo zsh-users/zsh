@@ -1292,8 +1292,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		    thisjob = job;
 		    if ((jobtab[job].stat & STAT_SUPERJOB) &&
 			((!jobtab[job].procs->next ||
-			  WIFEXITED(jobtab[job].procs->status) ||
-			  WIFSIGNALED(jobtab[job].procs->status))) &&
+			  killpg(jobtab[job].gleader, 0) == -1)) &&
 			jobtab[jobtab[job].other].gleader)
 			attachtty(jobtab[jobtab[job].other].gleader);
 		    else

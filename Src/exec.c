@@ -1760,13 +1760,6 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 #ifdef PATH_DEV_FD
 	    closem(2);
 #endif
-
-	    /* If there is already a group leader but that has died, we make
-	     * this one the leader. */
-	    if (pline_level == 1 && jobtab[thisjob].procs &&
-		kill(jobtab[thisjob].gleader, 0) == -1)
-		jobtab[thisjob].gleader = pid;
-
 	    if (how & Z_ASYNC) {
 		lastpid = (zlong) pid;
 	    } else if (!jobtab[thisjob].stty_in_env &&
@@ -2243,7 +2236,7 @@ entersubsh(int how, int cl, int fake)
 	}
     } else if (thisjob != -1 && cl) {
 	if (jobtab[list_pipe_job].gleader && (list_pipe || list_pipe_child)) {
-	    if (kill(jobtab[list_pipe_job].gleader, 0) == -1 ||
+	    if (killpg(jobtab[list_pipe_job].gleader, 0) == -1 ||
 		setpgrp(0L, jobtab[list_pipe_job].gleader) == -1) {
 		jobtab[list_pipe_job].gleader =
 		    jobtab[thisjob].gleader = (list_pipe_child ? mypgrp : getpid());
