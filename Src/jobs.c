@@ -64,12 +64,12 @@ mod_export struct job *jobtab;
 /* Size of the job table. */
 
 /**/
-mod_export size_t jobtabsize;
+mod_export int jobtabsize;
 
 /* The highest numbered job in the jobtable */
 
 /**/
-mod_export size_t maxjob;
+mod_export int maxjob;
 
 /* If we have entered a subshell, the original shell's job table. */
 static struct job *oldjobtab;
@@ -1365,7 +1365,7 @@ init_jobs(char **argv, char **envp)
 int
 expandjobtab(void)
 {
-    size_t newsize = jobtabsize + MAXJOBS_ALLOC;
+    int newsize = jobtabsize + MAXJOBS_ALLOC;
     struct job *newjobtab;
 
     if (newsize > MAX_MAXJOBS)
@@ -1399,7 +1399,7 @@ expandjobtab(void)
 void
 maybeshrinkjobtab(void)
 {
-    size_t jobbound;
+    int jobbound;
 
     queue_signals();
     jobbound = maxjob + MAXJOBS_ALLOC - (maxjob % MAXJOBS_ALLOC);
