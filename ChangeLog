@@ -1,5 +1,8 @@
 2002-01-02  Oliver Kiddle  <opk@zsh.org>
 
+	* users/4561: Completion/Unix/Command/_zip: fix bug with finding
+	the zipfile's name in the current command-line.
+
 	* 16384: Completion/X/Type/.distfiles, Completion/X/Type/_x_visual,
 	Completion/X/Command/.distfiles, Completion/X/Command/_xloadimage,
 	Completion/X/Command/_netscape, Completion/X/Command/_x_utils,
