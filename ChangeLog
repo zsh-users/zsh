@@ -1,5 +1,8 @@
 2000-05-09  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11272: Completion/Base/_arguments: fix for _arguments without
+ 	options and no more arguments to complete
+	
 	* 11270: Doc/Zsh/compsys.yo, Src/Zle/computil.c: new -A and -S
  	options to _arguments; `-opt=-' specs for options whose argument
  	has to come after the `='

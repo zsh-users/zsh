@@ -182,8 +182,10 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
     else
       noargs='no arguments'
     fi
-    comparguments -O next direct odirect equal || return 1
-
+    if ! comparguments -O next direct odirect equal; then
+      _message "$noargs"
+      return 1
+    fi
     opts=yes
     _tags options
   fi
