@@ -1,6 +1,11 @@
 2004-09-20  Bart Schaefer  <schaefer@zsh.org>
 
-	* 20387: Src/init.c, Src/zle_main.c: rather than counting the EOF
+	* 20388: Src/Zle/zle_main.c: arrange that "zle internal-widget"
+	called from a "zle -N" widget does not trip the ignoreeof warning.
+	This is the long-documented behavior, but may break old "zle -N"
+	widgets designed as wrappers around delete-char-or-list.
+
+	* 20387: Src/init.c, Src/Zle/zle_main.c: rather than counting EOF
 	keystrokes as in 20363, pretend that we received an EOF each time
 	the "use 'logout' to logout" warning is printed, and let the top-
 	level loop keep the count.  This way, disabling the warning (by

@@ -897,7 +897,13 @@ execzlefunc(Thingy func, char **args)
     } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_NCOMP)) {
 	int wflags = w->flags;
 
-	if (keybuf[0] == eofchar && !keybuf[1] &&
+	/*
+	 * The rule is that "zle -N" widgets suppress EOF warnings.  When
+	 * a "zle -N" widget invokes "zle another-widget" we pass through
+	 * this code again, but with actual arguments rather than with the
+	 * zlenoargs placeholder.
+	 */
+	if (keybuf[0] == eofchar && !keybuf[1] && args == zlenoargs &&
 	    !ll && isfirstln && (zlereadflags & ZLRF_IGNOREEOF)) {
 	    showmsg((!islogin) ? "zsh: use 'exit' to exit." :
 		    "zsh: use 'logout' to logout.");
