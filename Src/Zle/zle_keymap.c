@@ -1029,6 +1029,7 @@ static void
 add_cursor_key(Keymap km, int tccode, Thingy thingy, int defchar)
 {
     char buf[2048];
+    int ok = 0;
 
     /*
      * Be careful not to try too hard with bindings for dubious or
@@ -1042,7 +1043,18 @@ add_cursor_key(Keymap km, int tccode, Thingy thingy, int defchar)
 	cursorptr = buf;
 	tputs(tcstr[tccode], 1, add_cursor_char);
 	*cursorptr = '\0';
-    } else {
+
+	/*
+	 * Sanity checking.  If the cursor key is zero-length (unlikely,
+	 * but this is termcap we're talking about), or it's a single
+	 * character which is already bound, then we don't bind it.
+	 */
+	if (!buf[0] || (!buf[1] && km->first[STOUC(buf[0])] != t_undefinedkey))
+	    ok = 0;
+	else
+	    ok = 1;
+    }
+    if (!ok) {
 	/* Assume the normal VT100-like values. */
 	sprintf(buf, "\33[%c", defchar);
     }
