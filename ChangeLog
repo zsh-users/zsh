@@ -1,5 +1,8 @@
 2001-10-05  Clint Adams  <clint@zsh.org>
 
+        * 15940: Completion/Unix/Command/_mount:
+        complete -o utf8 for mount -t vfat.
+
         * 15939: Completion/Unix/Command/_mount:
 	complete xfs mount options (for Linux).
 
