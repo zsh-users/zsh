@@ -1,3 +1,9 @@
+2003-03-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 18390: Completion/Unix/Command/_prcs,
+	Completion/Unix/Command/_xmlsoft: tidy up _prcs and update
+	_xmlsoft for latest version of xsltproc
+
 2003-03-26  Peter Stephenson  <pws@csr.com>
 
 	* 18389: Test/A01grammar.ztst: `select' test, test for

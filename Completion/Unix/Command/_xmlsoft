@@ -1,7 +1,7 @@
 #compdef xsltproc xmllint
 
 # xmllint: using libxml version 20503
-# xsltproc: using libxslt version 10021
+# xsltproc: using libxslt version 10027
 
 case $service in
   xsltproc)
@@ -20,7 +20,11 @@ case $service in
       '(--html)--docbook[input document is SGML docbook]' \
       '--param[pass a parameter,value pair]:name::value (xpath expression)' \
       '--stringparam[pass a parameter]:name::value' \
+      '--path[provide a set of paths for resources]:paths:_files -/' \
       '--nonet[refuse to fetch DTDs or entities over network]' \
+      '--nowrite[refuse to write to any file or resource]' \
+      '--nomkdir[refuse to create directories]' \
+      '--writesubtree[allow file write only with the path subtree]:path:_files -/' \
       '--catalogs[use SGML catalogs]' \
       '--xinclude[do XInclude processing on document input]' \
       {--profile,--norman}'[dump profiling information]' \
