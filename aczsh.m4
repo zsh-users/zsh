@@ -646,3 +646,33 @@ AC_DEFUN(zsh_COMPILE_FLAGS,
 	then LIBS="$4"
 	else LIBS="$enable_libs"
 	fi)])
+
+# zsh_SEARCH_LIBS(FUNCTION, SEARCH-LIBS,
+#                [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# This is derived from autoconf 2.49a AC_SEARCH_LIBS
+# with the following differences:
+#  - no extra libs argument
+#  - SEARCH-LIBS are taken literally - use -lfoo not foo. That
+#    makes it possible to pass several libs, e.g. "-lsocket -lnsl"
+# --------------------------------------------------------
+# Search for a library defining FUNC, if it's not already available.
+AC_DEFUN([zsh_SEARCH_LIBS],
+[AC_CACHE_CHECK([for library containing $1], [zsh_cv_search_$1],
+[zsh_func_search_save_LIBS="$LIBS"
+zsh_cv_search_$1=no
+AC_TRY_LINK_FUNC([$1], [zsh_cv_search_$1="none required"])
+test "$zsh_cv_search_$1" = no && for zsh_lib in $2; do
+LIBS="$zsh_lib $zsh_func_search_save_LIBS"
+AC_TRY_LINK_FUNC([$1],
+[zsh_cv_search_$1="$zsh_lib"
+break])
+done
+LIBS="$zsh_func_search_save_LIBS"])
+if test "$zsh_cv_search_$1" = no; then
+  ifelse([$4], , :, [$4])
+else
+  test "$zsh_cv_search_$1" = "none required" || LIBS="$zsh_cv_search_$1 $LIBS"
+  ifelse([$3], , , [$3])
+fi
+])
+

@@ -1,3 +1,7 @@
+2000-09-04  Peter Stephenson  <pws@csr.com>
+
+	* Config/version.mk: 3.1.9-dev-6
+
 2000-09-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12733: Functions/Misc/colors: Restore `grey' and other

@@ -512,7 +512,9 @@ dnl -------------------
 dnl On some systems, modules need to be linked against libc explicitly,
 dnl in case they require objects that exist only in the static version
 dnl and might not be compiled into the zsh executable.
-AC_CHECK_LIB(c, printf)
+dnl Also, on SINIX -lc MUST BE after -lsocket, so this test
+dnl adds -lc as the last library
+AC_CHECK_LIB(c, printf, [LIBS="$LIBS -lc"])
 
 AC_CHECK_LIB(m, pow)
 
@@ -528,12 +530,43 @@ for lib in $termcap_curses_order; do
   AC_CHECK_LIB(${lib}, tgetent, [LIBS="-l$lib $LIBS"; break])
 done
 
-dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
-dnl libnsl (Network Services Library) to find yp_all
-AC_CHECK_FUNCS(yp_all)
-if test $ac_cv_func_yp_all = no; then
-  AC_CHECK_LIB(nsl, yp_all)
-fi
+dnl Check for network libraries.
+dnl This is really sad and messy story
+dnl Zsh needs three groups of functions:
+dnl   NIS (a.k.a. Yellow Pages)
+dnl   socket
+dnl   resolver
+dnl Depending on particlular OS (or even on particular OS version)
+dnl these function may be found in -lc, -lnsl, -lresolv, -lsocket.
+dnl Sometimes libraries depend on other (notorious -lnsl that is needed
+dnl on SVR4-derived systems to get any network functionality at all)
+dnl or must follow particular order (SINIX, that has two incompatible
+dnl versions of gethostbyname() in -lsocket and -lresolv).
+dnl So, this test tries to find minimal set of needed libraries;
+dnl it tries to preserve user settings (if needed libs were explcitly
+dnl specified) and -lresolv after -lsocket order.
+
+#
+# First check for -lnsl. Good chances, that if it exists, it
+# will be neeeded anyway.
+#
+zsh_SEARCH_LIBS(yp_all, -lnsl)
+
+#
+# Check for resolver functions to make sure, that 
+# -lresolv will be after -lsocket on SINIX
+#
+
+zsh_SEARCH_LIBS(inet_aton, -lnsl -lresolv "-lresolv -lnsl")
+zsh_SEARCH_LIBS(inet_pton, -lnsl -lresolv "-lresolv -lnsl")
+zsh_SEARCH_LIBS(inet_ntop, -lnsl -lresolv "-lresolv -lnsl")
+zsh_SEARCH_LIBS(gethostbyname2, -lnsl -lresolv "-lresolv -lnsl")
+
+#
+# ... and check for socket support
+#
+
+zsh_SEARCH_LIBS(socket, -lnsl -lsocket "-lsocket -lnsl")
 
 dnl I am told that told that unicos reqire these for nis_list
 if test `echo $host_os | sed 's/^\(unicos\).*/\1/'` = unicos; then
@@ -545,8 +578,6 @@ if test "x$dynamic" = xyes; then
 fi
 
 AC_CHECK_LIB(cap, cap_get_proc)
-
-AC_CHECK_LIB(socket, socket)
 
 dnl ---------------------
 dnl CHECK TERMCAP LIBRARY
@@ -857,7 +888,7 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       gethostname gethostbyname2 getipnodebyname \
 	       inet_aton inet_pton inet_ntop \
 	       getlogin getpwent getpwnam getpwuid getgrgid getgrnam \
-	       initgroups nis_list \
+	       initgroups yp_all nis_list \
 	       setuid seteuid setreuid setresuid setsid \
 	       memcpy memmove strstr strerror \
 	       cap_get_proc \
