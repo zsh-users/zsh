@@ -1208,7 +1208,7 @@ printif(char *str, int c)
 int
 bin_fc(char *nam, char **argv, char *ops, int func)
 {
-    int first = -1, last = -1, retval, minflag = 0;
+    int first = -1, last = -1, retval;
     char *s;
     struct asgment *asgf = NULL, *asgl = NULL;
     Patprog pprog = NULL;
@@ -1267,7 +1267,6 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     }
     /* interpret and check first history line specifier */
     if (*argv) {
-	minflag = **argv == '-';
 	first = fcgetcomm(*argv);
 	if (first == -1) {
 	    unqueue_signals();
@@ -1299,9 +1298,9 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     if (last == -1)
 	last = ops['l']? addhistnum(curline.histnum,-1,0) : first;
     if (first < firsthist())
-	first = firsthist();
-    if (last == -1)
-	last = (minflag) ? curhist : first;
+	first = firsthist() - (last < firsthist());
+    if (last > curhist)
+	last = curhist;
     else if (last < first)
 	last = first;
     if (ops['l']) {
@@ -1365,13 +1364,11 @@ fcgetcomm(char *s)
 
     /* First try to match a history number.  Negative *
      * numbers indicate reversed numbering.           */
-    if ((cmd = atoi(s))) {
+    if ((cmd = atoi(s)) != 0 || *s == '0') {
 	if (cmd < 0)
 	    cmd = addhistnum(curline.histnum,cmd,HIST_FOREIGN);
-	if (cmd >= curline.histnum) {
-	    zwarnnam("fc", "bad history number: %d", 0, cmd);
-	    return -1;
-	}
+	if (cmd < 0)
+	    cmd = 0;
 	return cmd;
     }
     /* not a number, so search by string */
