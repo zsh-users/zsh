@@ -10,18 +10,21 @@ local cur="$words[CURRENT]" prev w list ret=1 expl
 if compset -P '-(cd|directory)='; then
   _files -/
 elif compset -P '-tty='; then
-  _wanted devices expl 'terminal device' && compadd "$expl[@]" - /dev/tty*
+  _wanted devices expl 'terminal device' compadd - /dev/tty*
 elif compset -P '-(exec|se)='; then
   _description files expl executable
   _files "$expl[@]" -g '*(-*)'
 elif compset -P '-(symbols|core|command)='; then
   _files
 elif [[ "$PREFIX" = -* ]]; then
-  if _wanted options expl option; then
-    compadd "$expl[@]" -QS '' - -symbols\= -exec\= -se\= -core\= -command\= \
-                                -directory\= -cd\= -tty\=
-    compadd "$expl[@]"        - -help -h -s -e -c -x -d -nx -n -quiet -q \
-	  		        -batch -fullname -f -b
+  if _wanted options; then
+    while _try options expl option; do
+      compadd "$expl[@]" -QS '' - -symbols\= -exec\= -se\= -core\= -command\= \
+                                  -directory\= -cd\= -tty\= && ret=0
+      compadd "$expl[@]"        - -help -h -s -e -c -x -d -nx -n -quiet -q \
+	    		          -batch -fullname -f -b && ret=0
+      (( ret )) || return 0
+    done
   fi
 else
   prev="$words[CURRENT-1]"
@@ -31,10 +34,9 @@ else
   (-[csx]) _files && return 0 ;;
   (-e)     _description files expl executable
            _files "$expl[@]" -g '*(-*)' && return 0 ;;
-  (-b)     _wanted -V values expl 'baud rate' &&
-               compadd "$expl[@]" 0 50 75 110 134 150 200 300 600 1200 1800 \
-			          2400 4800 9600 19200 38400 57600 115200 \
-			          230400 && return 0 ;;
+  (-b)     _wanted -V values expl 'baud rate' \
+               compadd 0 50 75 110 134 150 200 300 600 1200 1800 2400 4800 \
+		       9600 19200 38400 57600 115200 230400 && return 0 ;;
   esac
 
   w=( "${(@)words[2,-1]}" )

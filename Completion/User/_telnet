@@ -46,25 +46,25 @@ _arguments -C -s \
 
 case "$state" in
 hosts)
-  _wanted hosts expl host &&
+  _wanted hosts expl host \
       _combination -s '[@:]' '' users-hosts-ports \
           ${opt_args[-l]:+users=${opt_args[-l]:q}} \
-          hosts "$expl[@]"
+          hosts -
   ;;
 
 ports)
-  _wanted ports expl port &&
+  _wanted ports expl port \
       _combination -s '[@:]' '' users-hosts-ports \
           ${opt_args[-l]:+users=${opt_args[-l]:q}} \
           hosts="${line[1]:q}" \
-          ports "$expl[@]"
+          ports -
   ;;
 
 users)
-  _wanted users expl user &&
+  _wanted users expl user \
       _combination -s '[@:]' '' users-hosts-ports \
       ${line[2]:+hosts="${line[2]:q}"} \
       ${line[3]:+ports="${line[3]:q}"} \
-      users "$expl[@]"
+      users -
   ;;
 esac

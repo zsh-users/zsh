@@ -51,7 +51,7 @@ _deb_packages () {
 
   _deb_packages_update_$pkgset
 
-  _tags packages && compadd "$expl[@]" - "${(@P)cachevar}"
+  _wanted packages && compadd "$expl[@]" - "${(@P)cachevar}"
 }
 
 _deb_packages "$@"

@@ -34,7 +34,7 @@
 # completion of words from the history by adding two commas at the end 
 # and hitting TAB.
 #
-#     if [[ "$PREFIX" = *,, ]] && _tags history-words; then
+#     if [[ "$PREFIX" = *,, ]] && _wanted history-words; then
 #       local max i=1 expl
 #     
 #       PREFIX="$PREFIX[1,-2]"

@@ -142,8 +142,7 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
     _tar_cache_name=$tf
   fi
 
-  _wanted files expl 'file from archive' &&
-      _multi_parts "$expl[@]" / _tar_cache_list
+  _wanted files expl 'file from archive' _multi_parts / _tar_cache_list
 else
     _files
 fi

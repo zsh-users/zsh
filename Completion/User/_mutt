@@ -25,8 +25,6 @@ local curcontext="$curcontext" state line ret=1
  '-Z+:open first mailbox with new mail:' && ret=0
 
 if [[ "$state" = userhost ]]; then
-  _tags hosts || return 1
-
   if compset -P '*@'; then
     _description hosts expl 'remote host name'
     _hosts "$expl[@]" -q -S, && return 0

@@ -29,5 +29,4 @@ fi
 
 local expl
 
-_wanted pods expl 'Perl base pods' &&
-    compadd "$expl[@]" - $_perl_basepods
+_wanted pods expl 'Perl base pods' compadd - $_perl_basepods

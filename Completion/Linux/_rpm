@@ -189,12 +189,12 @@ while [[ -n "$state" ]]; do
     state=package_file
     ;&
   package)
-    _wanted packages expl 'RPM package' &&
-        compadd "$expl[@]" -M 'r:|-=* r:|=*' - $(_call packages rpm -qa) && ret=0
+    _wanted packages expl 'RPM package' \
+        compadd -M 'r:|-=* r:|=*' - $(_call packages rpm -qa) && ret=0
     ;;
   package_file)
     if compset -P ftp://; then
-      _tags hosts && _hosts -S/ && ret=0
+      _hosts -S/ && ret=0
     else
       _alternative \
           'files:RPM package file:_files -g \*.\(\#i\)rpm' \
@@ -203,8 +203,8 @@ while [[ -n "$state" ]]; do
     ;;
   tags)
     if compset -P '*\{'; then
-      _wanted tags expl 'RPM tag' &&
-          compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '\}' - \
+      _wanted tags expl 'RPM tag' \
+          compadd -M 'm:{a-z}={A-Z}' -S '\}' - \
                   "${(@)${(@f)$(_call tags rpm --querytags)}#RPMTAG_}" && ret=0
     else
       _message 'RPM format'
@@ -219,8 +219,6 @@ while [[ -n "$state" ]]; do
     else
       _description directories expl 'old path'
     fi
-
-    _tags directories || return 1
 
     _files "$expl[@]" -/ && ret=0
     ;;

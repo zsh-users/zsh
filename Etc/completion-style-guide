@@ -9,21 +9,21 @@ whenever you are about to add matches, you should use a tag for them
 and test if the user wants this type of matches to be generated.
 However, this only really needs to be done if no other function in the
 call chain has tested that already or if you can offer different types
-of matches.
+of matches or if you can handle tag aliases in some sophisticated way.
 
 Most of the utility functions do the testing themselves, so you don't
 have to worry about that at all. For example if you are adding matches 
 with `_files', `_hosts' or functions like these, you can just call
-them and they do the tests needed. The functions `_arguments' and
-`_values' do that too, but there is a small difference. These
-functions effectively change the context name and if you are using the
-`->state' form for actions, this changed name component has to be
-reported back to the function calling `_arguments' or `_values'. This
-is done with the parameter `context', so you have to make that local
-in the calling function in the same way as you have to make local
-`line', `state', and `{opt,val}_args'. This parameter `context' should
-then be used when you start adding matches by giving it to functions
-like `_tags' via the `-C' options, as in:
+them and they do the tests needed and the loops over the tag aliases.
+The functions `_arguments' and `_values' do that too, but there is a
+small difference. These functions effectively change the context
+name and if you are using the `->state' form for actions, this changed
+name component has to be reported back to the function calling
+`_arguments' or `_values'. This is done with the parameter `context',
+so you have to make that local in the calling function in the same way
+as you have to make local `line', `state', and `{opt,val}_args'. This
+parameter `context' should then be used when you start adding matches
+by giving it to functions like `_tags' via the `-C' options, as in:
 
   local context ...
   ...
@@ -62,31 +62,72 @@ example).
 
 Then, before adding the matches, see if matches of that type are
 requested by the user in the current context. If you will add only one 
-type of matches, this is very simple. You can use the function `_tags' 
-or the function `_wanted' for this. `_tags' is normally used to offer
-multiple types of matches by giving the tags for them as arguments. But 
-in any case its return value is zero only if at least one of these
-types is requested by the user, so you can just do:
+type of matches, this is very simple. You can use the function
+`_wanted' for this. Its return value is zero only if the type of
+matches is requested by the user, so you can just do:
 
-  _tags names || return 1
+  _wanted names || return 1
 
-  _description names expl 'name'
-  compadd "$expl[@]" - alice bob
+  _loop names expl 'name' compadd - alice bob
 
-Since this sequence of command is used so often, the `_wanted'
-function was added which just calls `_tags' with its first argument
-(i.e. the first argument is a tag) and then calls `_description' with
-all its arguments. The return value is as for `_tags' -- zero if the 
-matches should be added. So the example becomes:
+The `_loop' function implements the loop over the tag aliases and
+handles the user-defined description, using (in the example) the
+parameter `expl' to store options to give to the command. These option 
+are inserted into the command line either directly before a single
+hyphen if there is such an argument or after the first word if there
+is no single hyphen. Since using `_loop' is so much more conveient
+than writing the loop with the `_try' function (see below), but some
+function called to generate matches don't accept a single hyphen as
+argument anywhere but want the options built as their last arguments,
+`_loop' will *replace* the hyphen with the options if the hyphen is
+the last argument. A good example for such a function is
+`_combination' which can be called like:
 
-  _wanted names expl 'name' && compadd "$expl[@]" alice bob
+  _loop foo expl 'descr...' _combination ... -
+
+And the `-' will be replaced by the options that are to be given to
+`compadd'.
+
+Since the above sequence of command is used so often, the `_wanted'
+function can also accept the same arguments as `_loop'. In this case
+it will do the test for the requested tag and then just call `_loop',
+so:
+
+  _wanted names expl 'name' compadd - alice bob
 
 Note that you can also give the `-J' and `-V' options with the
 optional `1' or `2' preceding them supported by `_description':
 
-  _wanted -2V names expl 'name' && compadd ...
+  _wanted -2V names expl 'name' compadd ...
 
-The more complicated case is where you can offer multiple types of
+In some cases one needs to call multiple functions or call `compadd'
+more than once to generate the matches. In such a case one needs to
+implement the loop over the tag aliases directly. This is done with the 
+`_try' function. Like this:
+
+  while _try names expl 'name'; do
+    compadd "$expl[@]" - alice bob && ret=0
+    _other_names "$expl[@]" && ret=0
+  done
+  return ret
+
+Simple enough, I hope. But `_try' can do some more: utility functions
+normally accept options which are then given to `compadd'. Since these 
+may contain options for the description and `_try' may generate such
+options, too, it isn't entirely trivial to decide which of these
+options should take precedence. But `_try' can do the work for you
+here. All you have to do is to give the options your utility function
+gets to `_try', as in:
+
+  while _try names expl 'name' "$@"; do
+    compadd "$expl[@]" - alice bob
+    ...
+  done
+
+That's all. Note that the positional argument "$@" are *not* given to
+`compadd'. They will be stuffed into the `expl' array by `_try'.
+
+The most complicated case is where you can offer multiple types of
 matches. In this case the user should be able to say which types he
 wants to see at all and of those which he wants to see he should be
 able to say which types should be tried first. The generic solution
@@ -97,10 +138,7 @@ for this uses `_tags' and `_requested':
   _tags friends users hosts
 
   while _tags; do
-    if _requested friends; then
-      _description friends expl friend
-      compad "$expl[@]" alice bob && ret=0
-    fi
+    _requested friends expl friend compad alice bob && ret=0
     _requested users && _users && ret=0
     _requested hosts && _hosts && ret=0
 
@@ -116,38 +154,26 @@ tried and so on. `_tags' without arguments just makes the next set be
 tried (on the first call it makes the first set be used). The function
 `_requested' then tests if the tag given as its first argument is in
 the set currently used and returns zero if it is,  i.e. if matches of
-that type should be added now.
+that type should be added now. The arguments accepted by `_requested'
+are the same as for `_wanted'. I.e. you can call it with only the tag
+to test, with the `tag array description' or with that plus the
+command to execute.
 
-But `_requested' can do more: since it is very common that you add
-different types of matches in different groups, with each group having 
-its own description the sequence of `_requested' followed by
-`_description' would be used very often. Hence, `_requested' can
-accept extra arguments which will be given to a call to `_description' 
-if the tag given as the first argument is to be used. I.e. we could
-change the example above to:
+In some cases (like the `users' and `hosts' tags in the example) you
+don't need do the loop over the tag aliases yourself, because the
+utility functions like `_users' and `_hosts' do it automatically.
 
-  local expl ret=1
-
-  _tags friends users hosts
-
-  while _tags; do
-    _requested friends expl friend && compadd "$expl[@]" alice bob && ret=0
-    _requested users && _users && ret=0
-    _requested hosts && _hosts && ret=0
-
-    (( ret )) || break   # leave the loop if matches were added
-  done
-
-This looks better already. But in many cases such as this one you can
+This looks good already. But in many cases such as this one you can
 also use the function `_alternative' which simply implements a loop
-like this one. It gets arguments of the form `tag:descr:action'. E.g.:
+like the one above. It gets arguments of the form `tag:descr:action'.
+E.g.:
 
   _alternative \
       'friends:friend:(alice bob)' \
       'users:: _users' \
       'hosts:: _hosts'
 
-Which does the same as the previous examples. (Note the empty
+Which does the same as the previous example. (Note the empty
 descriptions in the last two arguments -- the actions start with a
 space so that they are executed without giving the description
 build by `_alternative', i.e. we just use the description added by

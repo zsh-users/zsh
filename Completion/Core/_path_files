@@ -20,7 +20,7 @@ exppaths=()
 zparseopts -a mopts \
     'P:=pfxsfx' 'S:=pfxsfx' 'q=pfxsfx' 'r:=pfxsfx' 'R:=pfxsfx' \
     'W:=prepaths' 'F:=ignore' 'M+:=matcher' \
-    J: V: X: 1: 2: n: 'f=tmp1' '/=tmp1' 'g+:-=tmp1'
+    J+: V+: X+: 1: 2: n: 'f=tmp1' '/=tmp1' 'g+:-=tmp1'
 
 sopt="-${(@j::M)${(@)tmp1#-}#?}"
 (( $tmp1[(I)-[/g]*] )) && haspats=yes
@@ -53,20 +53,6 @@ if (( $#ignore )); then
     ignore=( ${(P)ignore[2]} )
   fi
 fi  
-
-if [[ -z "$_file_pat_checked" ]] &&
-   zstyle -s ":completion:${curcontext}:files" file-patterns tmp1 &&
-   [[ -n "$tmp1" ]]; then
-  if [[ "$tmp1" = '*(-/)' ]]; then
-    gopt=''
-    sopt=-/
-  else
-    gopt=yes
-    sopt=-
-  fi
-  pats=( $=tmp1 )
-  haspats=yes
-fi
 
 # If we were given no file selection option, we behave as if we were given
 # a `-f'.
@@ -155,7 +141,7 @@ eorig="$orig"
 
 # If given no `-F' option, we may want to use $fignore, turned into patterns.
 
-[[ $#ignore -eq 0 && -z $gopt && -n $FIGNORE ]] && 
+[[ $#ignore -eq 0 && ( -z $gopt || "$pats" = \ #\*\ # ) && -n $FIGNORE ]] && 
    ignore=( "?*${^fignore[@]}" )
 
 if (( $#ignore )); then

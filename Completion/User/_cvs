@@ -34,7 +34,7 @@ _cvs_command () {
 	watchers "")
 
   if (( CURRENT == 1 )); then
-    _tags commands && { compadd "$@" ${(k)cmds} || compadd "$@" ${(kv)=cmds} }
+    _wanted commands && { compadd "$@" ${(k)cmds} || compadd "$@" ${(kv)=cmds} }
   else
     local curcontext="$curcontext"
 
@@ -371,7 +371,7 @@ _cvs_watch () {
   local expl
 
   if (( CURRENT == 2 )); then
-    _wanted values expl 'watch comamnd' && compadd on off add remove
+    _wanted values expl 'watch command' compadd on off add remove
   else
     case "$words[2]" in
       on|off) # "+lR"
@@ -427,14 +427,14 @@ _cvs_root () {
     fi
   fi
 
-  _tags files && {
+  _wanted files && {
     compadd -M 'r:|[:@./]=* r:|=*' "$@" $_cvs_roots || _files "$@" -/
   }
 }
 
 (( $+functions[_cvs_tempdir] )) ||
 _cvs_tempdir () {
-  _tags directories && compadd "$@" $TMPPREFIX:h $TMPDIR /tmp
+  _wanted directories && compadd "$@" $TMPPREFIX:h $TMPDIR /tmp
 }
 
 (( $+functions[_cvs_user_variable] )) ||
@@ -450,29 +450,29 @@ _cvs_user_variable () {
 
 (( $+functions[_cvs_bindir] )) ||
 _cvs_bindir () {
-  _tags directories && { compadd "$@" /usr/local/bin || _files "$@" -/ }
+  _wanted directories && { compadd "$@" /usr/local/bin || _files "$@" -/ }
 }
 
 (( $+functions[_cvs_editor] )) ||
 _cvs_editor () {
-  _tags commands && compadd "$@" vi
+  _wanted commands && compadd "$@" vi
 }
 
 (( $+functions[_cvs_gzip_level] )) ||
 _cvs_gzip_level () {
-  _tags values && compadd "$@" 9
+  _wanted values && compadd "$@" 9
 }
 
 # define completion functions for cvs common options and arguments.
 
 (( $+functions[_cvs_D] )) ||
 _cvs_D () {
-  _tags values && compadd "$@" today yesterday week\ ago month\ ago
+  _wanted values && compadd "$@" today yesterday week\ ago month\ ago
 }
 
 (( $+functions[_cvs_k] )) ||
 _cvs_k () {
-  _tags values && compadd "$@" kv kvl k o b v
+  _wanted values && compadd "$@" kv kvl k o b v
 }
 
 (( $+functions[_cvs_m] )) ||
@@ -489,9 +489,8 @@ _cvs_modules () {
   if [[ $root = :* || ! -d $root ]]; then
     _message "module name"
   else
-    _wanted modules expl module &&
-        compadd "$expl[@]" - \
-            $root/^CVSROOT(:t) \
+    _wanted modules expl module \
+        compadd - $root/^CVSROOT(:t) \
             ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
   fi
 }
@@ -500,7 +499,7 @@ _cvs_modules () {
 _cvs_revisions () {
   local expl
 
-  _wanted values expl revision &&
+  _wanted values expl revision \
       compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##(No Tags Exist)#}%%[ 	]*}
 }
 
@@ -618,7 +617,7 @@ _cvs_files_removed () {
     local omit
     omit=(${pref}*(D:t))
     eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
-    _tags directories && compadd "$@" -P "$qpref" - ${entries:q} ||
+    _wanted directories && compadd "$@" -P "$qpref" - ${entries:q} ||
         _cvs_directories "$@"
   else
     _files "$@"

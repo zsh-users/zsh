@@ -273,8 +273,8 @@ dump)
     'p[annotate assembler output]' && ret=0
   ;;
 library)
-  _wanted libraries expl library &&
-      compadd "$expl[@]" - ${^=LD_LIBRARY_PATH:-/usr/lib /usr/local/lib}/lib*.(a|so*)(:t:fr:s/lib//) && ret=0
+  _wanted libraries expl library \
+      compadd - ${^=LD_LIBRARY_PATH:-/usr/lib /usr/local/lib}/lib*.(a|so*)(:t:fr:s/lib//) && ret=0
   ;;
 esac
 

@@ -40,7 +40,7 @@ _rlogin () {
       if compset -P '*:'; then
 	_files && ret=0
       elif compset -P '*@'; then
-        _tags hosts && _rlogin_hosts -S: -q && ret=0
+        _wanted hosts && _rlogin_hosts -S: -q && ret=0
       else
         _alternative \
 	    'files:: _files' \
@@ -54,11 +54,11 @@ _rlogin () {
 }
 
 _rlogin_users () {
-  _tags users && _combination -s '[:@]' my-accounts users-hosts users "$@"
+  _wanted users && _combination -s '[:@]' my-accounts users-hosts users "$@"
 }
 
 _rlogin_hosts () {
-  _tags hosts &&
+  _wanted hosts &&
       if [[ "$IPREFIX" == *@ ]]; then
         _combination -s '[:@]' my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@"
       else

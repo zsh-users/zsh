@@ -1,8 +1,8 @@
 #autoload
 
-local expl disp jobs job jids pfx='%' desc how
+local expl disp jobs job jids pfx='%' desc how expls
 
-_tags jobs || return 1
+_wanted jobs || return 1
 
 if [[ "$1" = -t ]]; then
   zstyle -T ":completion:${curcontext}:jobs" prefix-needed &&
@@ -15,15 +15,15 @@ zstyle -T ":completion:${curcontext}:jobs" verbose       && desc=yes
 if [[ "$1" = -r ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )
   shift
-  _description jobs expl 'running job'
+  expls='running job'
 elif [[ "$1" = -s ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )
   shift
-  _description jobs expl 'suspended job'
+  expls='suspended job'
 else
   [[ "$1" = - ]] && shift
   jids=( "${(@k)jobtexts}" )
-  _description jobs expl job
+  expls=job
 fi
 
 if [[ -n "$desc" ]]; then
@@ -79,7 +79,7 @@ else
 fi
 
 if [[ -n "$desc" ]]; then
-  compadd "$@" "$expl[@]" -ld disp - "%$^jobs[@]"
+  _loop jobs expl "$expls" compadd "$@" -ld disp - "%$^jobs[@]"
 else
-  compadd "$@" "$expl[@]" - "%$^jobs[@]"
+  _loop jobs expl "$expls" compadd "$@" - "%$^jobs[@]"
 fi

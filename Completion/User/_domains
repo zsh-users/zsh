@@ -16,5 +16,5 @@ if ! zstyle -a ":completion:${curcontext}:domains" domains domains; then
   domains=( "$_cache_domains[@]" )
 fi
 
-_wanted domains expl domain &&
-    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" "$expl[@]" - "$domains[@]"
+_wanted domains expl domain \
+    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" - "$domains[@]"

@@ -54,21 +54,18 @@ _ssh () {
         if compset -P '*[= ]'; then
           case "$IPREFIX" in
           *(#i)(batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|usepriviledgedport)*)
-	    _wanted values expl 'truth value' && compadd "$expl[@]" yes no &&
-                ret=0
+	    _wanted values expl 'truth value' compadd yes no && ret=0
             ;;
           *(#i)cipher*)
-	    _wanted values expl 'encryption cipher' &&
-                compadd "$expl[@]" idea des 3des blowfish arcfour tss none && \
-                    ret=0
+	    _wanted values expl 'encryption cipher' \
+                compadd idea des 3des blowfish arcfour tss none && ret=0
             ;;
           *(#i)globalknownhostsfile*)
             _description files expl 'global file with known hosts'
             _files "$expl[@]" && ret=0
             ;;
           *(#i)hostname*)
-	    _wanted hosts expl 'real host name to log into' &&
-                _ssh_hosts "$expl[@]" && ret=0
+	    _wanted hosts expl 'real host name to log into' _ssh_hosts && ret=0
             ;;
           *(#i)identityfile*)
             _description files expl 'SSH identity file'
@@ -84,16 +81,14 @@ _ssh () {
             _normal && ret=0
             ;;
           *(#i)stricthostkeychecking*)
-            _wanted values expl 'checking type' &&
-	        compadd "$expl[@]" yes no ask
+            _wanted values expl 'checking type' compadd yes no ask && ret=0
             ;;
           *(#i)userknownhostsfile*)
             _description files expl 'user file with known hosts'
             _files "$expl[@]" && ret=0
             ;;
           *(#i)user*)
-	    _wanted users expl 'user to log in as' &&
-                _ssh_users "$expl[@]" && ret=0
+	    _wanted users expl 'user to log in as' _ssh_users && ret=0
             ;;
           *(#i)xauthlocation*)
             _description files expl 'xauth program'
@@ -101,8 +96,8 @@ _ssh () {
             ;;
           esac
         else
-          _wanted values expl 'configure file option' &&
-              compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '=' - \
+          _wanted values expl 'configure file option' \
+              compadd -M 'm:{a-z}={A-Z}' -S '=' - \
                   BatchMode ClearAllForwardings Cipher Compression \
                   CompressionLevel Host ConnectionAttempts EscapeChar \
                   FallBackToRsh ForwardAgent ForwardX11 \
@@ -121,7 +116,7 @@ _ssh () {
           if compset -P '*:'; then
             _message 'port number'
           else
-	    _wanted hosts expl host && _ssh_hosts -qS: "$expl[@]"
+	    _wanted hosts expl host _ssh_hosts -qS:
           fi
         else
           _message 'listen-port number'
@@ -136,8 +131,7 @@ _ssh () {
         ;;
       userhost)
         if compset -P '*@'; then
-	  _wanted hosts expl 'remote host name' &&
-              _ssh_hosts "$expl[@]" && ret=0
+	  _wanted hosts expl 'remote host name' _ssh_hosts && ret=0
         else
           if (( $+opt_args[-l] )); then
 	    tmp=()
@@ -180,7 +174,7 @@ _ssh () {
       if compset -P '*:'; then
         _remote_files && ret=0
       elif compset -P '*@'; then
-        _wanted hosts expl host && _ssh_hosts -S: "$expl[@]" && ret=0
+        _wanted hosts expl host _ssh_hosts -S: && ret=0
       else
         _alternative \
 	    'files:: _files' \

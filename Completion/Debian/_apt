@@ -75,7 +75,7 @@ _apt_arguments () {
   nul=$'\0'
   qnul="\$'\\0'"
 
-  comp_bool='_tags values && compadd "$expl_bool[@]" '"$bool"
+  comp_bool='_wanted values && compadd "$expl_bool[@]" '"$bool"
   comp_intlevel= #"_message 'intlevel'"
   comp_configfile='_files "$expl_configfile[@]"'
   comp_arbitem= #"_message 'Foo::Bar=bar'"
@@ -384,7 +384,7 @@ _apt-get () {
     /$'check\0'/ \| \
     /$'source\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'help\0/' \| \
-    /"[]"/	:'_tags actions && compadd "$expl_action[@]" update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source help'
+    /"[]"/	:'_wanted actions expl_action action compadd update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source help'
 
   _apt-get () {
     local expl_action expl_packages
@@ -422,7 +422,7 @@ _apt-cache () {
     /$'search\0'/ /$'[^\0]#\0'/ :'_message "pattern"' \| \
     /$'show\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'depends\0'/ \| \
-    /"[]"/ :'_tags actions && compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'
+    /"[]"/ :'_wanted actions expl_action action compadd help add gencaches showpkg stats dump dumpavail unmet check search show depends'
 
   _apt-cache () {
     local expl_action expl_packages expl_pkg_cache expl_src_cache
@@ -451,7 +451,7 @@ _apt-cdrom () {
     -o,--option:arbitem \
     -- \
     /$'add\0'/ \| \
-    /"[]"/	:'_tags actions && compadd "$expl_action[@]" add'
+    /"[]"/	:'_wanted actions expl_action action compadd add'
 
   _apt-cdrom () {
     local expl_action expl_mount_point
@@ -473,11 +473,11 @@ _apt-config () {
     -- \
     /$'shell\0'/ \
       \( \
-	/$'[^\0]#\0'/ :'_tags parameters && compadd "$expl_shell_var[@]" - "${(@k)parameters}"' \
-	/$'[^\0]#\0'/ :'_tags configuration-keys && compadd "$expl_config_key[@]" - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
+	/$'[^\0]#\0'/ :'_wanted parameters expl_shell_var "shell variable to assign" compadd - "${(@k)parameters}"' \
+	/$'[^\0]#\0'/ :'_wanted configuration-keys expl_config_key "configuration key" compadd - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
       \) \# \| \
     /$'dump\0'/ \| \
-    /"[]"/	:'_tags actions && compadd "$expl_action[@]" shell dump'
+    /"[]"/	:'_wanted actions expl_action action compadd shell dump'
 
   _apt-config () {
     local expl_action expl_shell_var expl_config_key

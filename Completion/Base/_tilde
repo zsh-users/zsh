@@ -18,10 +18,10 @@ _tags users named-directories directory-stack
 
 while _tags; do
   _requested users && _users "$suf[@]" "$@" && ret=0
-  _requested named-directories expl 'named directory' &&
-      compadd "$suf[@]" "$expl[@]" "$@" - "${(@k)nameddirs}"
+  _requested named-directories expl 'named directory' \
+      compadd "$suf[@]" "$@" - "${(@k)nameddirs}"
 
-  if _requested -V directory-stack expl 'directory stack' &&
+  if _requested directory-stack &&
      { ! zstyle -T ":completion:${curcontext}:directory-stack" prefix-needed ||
        [[ "$PREFIX" = [-+]* || nm -eq compstate[nmatches] ]] }; then
     if zstyle -T ":completion:${curcontext}:directory-stack" verbose; then
@@ -46,7 +46,8 @@ while _tags; do
       list=( ${PREFIX[1]}{0..${#dirstack}} )
       disp=()
     fi
-    compadd "$expl[@]" "$suf[@]" "$disp[@]" -Q - "$list[@]" && ret=0
+    _loop -V directory-stack expl 'directory stack' \
+        compadd "$suf[@]" "$disp[@]" -Q - "$list[@]" && ret=0
   fi
   (( ret )) || return 0
 done

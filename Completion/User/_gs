@@ -25,8 +25,8 @@ else
     if [[ "$PREFIX" = *\=* ]]; then
       _message 'systemdict definition value'
     else
-      _wanted names expl 'systemdict definition name' &&
-          compadd "$expl[@]" -M 'm:{a-z}={A-Z}' - \
+      _wanted names expl 'systemdict definition name' \
+          compadd -M 'm:{a-z}={A-Z}' - \
                   DISKFONTS NOCACHE NOBIND NODISPLAY NOPAUSE PLATFONTS SAFER \
                   WRITESYSTEMDICT && ret=0
     fi
@@ -35,8 +35,8 @@ else
     if compset -P '*='; then
       case "$IPREFIX" in
       *DEVICE\=)
-        _wanted devices expl 'ghostscript device' &&
-            compadd "$expl[@]" - "${(@)${=${$(_call devices gs -h)##* devices:}%%Search path:*}:#}" && ret=0
+        _wanted devices expl 'ghostscript device' \
+            compadd - "${(@)${=${$(_call devices gs -h)##* devices:}%%Search path:*}:#}" && ret=0
         ;;
       *OutputFile\=)
         _description files expl 'output file'
@@ -47,9 +47,8 @@ else
         return 1
       esac
     else
-      _wanted names expl 'systemdict name' &&
-          compadd "$expl[@]" -S\= -M 'm:{a-z}={A-Z}' - DEVICE OutputFile &&
-              ret=0
+      _wanted names expl 'systemdict name' \
+          compadd -S\= -M 'm:{a-z}={A-Z}' - DEVICE OutputFile && ret=0
     fi
     ;;
   esac

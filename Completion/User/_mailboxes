@@ -2,7 +2,7 @@
 
 _mailboxes() {
   #emulate -L zsh
-  local expl nm="$compstate[nmatches]"
+  local expl ret=1
   local pinedirectory="${pinedirectory:-~/mail}"
   local maildirectory="${maildirectory:-~/Mail}"
 
@@ -40,15 +40,14 @@ _mailboxes() {
   esac
 
   while _tags; do
-    if _requested mailboxes expl 'mailbox specification'; then
-      _mua_mailboxes "$expl[@]"
-    fi
+    _requested mailboxes expl 'mailbox specification' _mua_mailboxes && ret=0
+
     if _requested files expl 'mailbox file'; then
       [[ "${curcontext}" != *:(mail|mush|zmail|zmlite):* ]] &&
 	compset -P -f
-      _path_files "$expl[@]"
+      _files "$expl[@]" && ret=0
     fi
-    [[ nm -ne $compstate[nmatches] ]] && return 0
+    (( ret )) || return 0
   done
 
   return 1
@@ -96,6 +95,7 @@ _mua_mailboxes() {
 
   local -a mbox_short
   local -aU mbox_names
+  local ret=1
 
   case "${curcontext}" in
     (*:elm:*) # I've probably got this wrong, or at least incomplete
@@ -111,7 +111,7 @@ _mua_mailboxes() {
       fi
       ;;
     (*:mh:*) # I've probably got this wrong, or at least incomplete
-      (( $#_mh_cache )) && _multi_parts "${expl[@]}" / _mh_cache
+      (( $#_mh_cache )) && _multi_parts "${expl[@]}" / _mh_cache && ret=0
       ;;
     (*:mush:*)
       if compset -P %; then
@@ -155,7 +155,6 @@ _mua_mailboxes() {
        ;;
   esac
 
-  local ret=1
   (( $#mbox_names )) && _multi_parts "$@" / mbox_names && ret=0
   (( $#mbox_short )) && compadd "$@" - "$mbox_short[@]" && ret=0
   return ret

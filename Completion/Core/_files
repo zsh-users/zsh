@@ -1,105 +1,61 @@
 #autoload
 
-local opts opt type=file glob group gopts dopts aopts tmp _file_pat_checked=yes
-local hasign ign
+local opts tmp glob pats tags expl tag ret=1 i pat descr minus
+local _comp_default_tags
 
 zparseopts -a opts \
-    '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X: M+: F: \
-    'J:=group' 'V:=group'
+    '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:
 
 type="${(@j::M)${(@)tmp#-}#?}"
-[[ -n "$type" ]] || type=f
-if (( $tmp[(I)-g*] )); then
-  gopts=( -g ${(j: :)${(M)tmp:#-g*}#-g} )
+(( $tmp[(I)-g*] )) && glob="${(j: :)${(M)tmp:#-g*}#-g}"
+
+if zstyle -a ":completion:${curcontext}:" file-patterns pats; then
+  [[ "$type" = */* ]] && glob="$glob *(-/)"
+  pats=( \ ${(M)^${pats/#:/ ${glob:-\*}:}:#*[^\\]:*} )
 else
-  gopts=()
-fi
-(( $opts[(I)-F] )) && hasign=yes
-
-[[ "$group[2]" = files ]] && opts=("$opts[@]" "$group[@]") group=()
-
-ign=()
-
-zstyle -s ":completion:${curcontext}:all-files" file-patterns tmp &&
-    [[ -n "$tmp" ]] &&
-        aopts=(-g "$tmp")
-
-if zstyle -s ":completion:${curcontext}:directories" file-patterns tmp &&
-   [[ -n "$tmp" ]]; then
-  dopts=(-g "$tmp")
-  if [[ "$type" = (*/*g*|*g*/*) ]]; then
-    type=g
-  elif [[ "$type" != *[/g]* ]]; then
-    type="${type}/"
-  fi
-else
-  dopts=(-/)
-fi
-if zstyle -s ":completion:${curcontext}:globbed-files" file-patterns tmp &&
-   [[ -n "$tmp" ]]; then
-  gopts=(-g "$tmp")
-  if [[ "$type" != (*/*g*|*g*/*) ]]; then
-    if [[ "$type" = *[g/]* ]]; then
-      type=g
+  if [[ "$type" = *g* ]]; then
+    if [[ "$type" = */* ]]; then
+      pats=( " ${glob//:/\\:} *(-/):globbed-files" '*:all-files' )
     else
-      type=ga
+      pats=( " ${glob//:/\\:}:globbed-files"
+             '*(-/):directories' '*:all-files' )
     fi
+  elif [[ "$type" = */* ]]; then
+    pats=( '*(-/):directories' '*:all-files' )
+  else
+    pats=( '*:all-files' )
   fi
 fi
 
-case "$type" in
-*/*g*|*g*/*) _tags globbed-files all-files             ;;
-*a*g*|*g*a*) _tags globbed-files all-files             ;;
-*g*)         _tags globbed-files directories all-files ;;
-*/*)         _tags directories all-files               ;;
-*)           _tags all-files                           ;;
-esac
+tags=( "${(@)${(@)pats#*[^\\]:}%%:*}" )
+_comp_default_tags=( "$tags[@]" )
+
+_tags "$tags[@]"
 
 while _tags; do
-  if _requested all-files; then
-    if (( $#group )); then
-      group[2]=all-files
-      _setup all-files
-      [[ -z "$hasign" ]] &&
-        zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
-	  ign=(-F _comp_ignore)
-    fi
-    _path_files "$opts[@]" "$ign[@]" "$aopts[@]"
-    return
-  elif _requested directories; then
-    if _requested globbed-files; then
-      if (( $#group )); then
-        group[2]=globbed-files
-	_setup globbed-files
-        [[ -z "$hasign" ]] &&
-          zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
-	    ign=(-F _comp_ignore)
+
+  for tag in "$tags[@]"; do
+
+    if _requested "$tag"; then
+
+      i="$pats[(I)*[^\\\\]:${tag}(|:*)]"
+      pat="${${pats[i]%%:${tag}*}//\\\\:/:}"
+
+      if [[ i -gt 0 && "$pat" != \ # ]]; then
+        if [[ "$pats[i]" = *:${tag}:* ]]; then
+          descr="${pats[i]#*:${tag}:}"
+          minus=()
+        else
+          descr=file
+	  minus=(-)
+        fi
+        _loop "$tag" expl "$descr" \
+            _path_files -g "$pat" "$opts[@]" "$minus[@]" && ret=0
       fi
-      _path_files "$opts[@]" "$ign[@]" "$dopts[@]" "$gopts[@]" && return 0
-    else
-      if (( $#group )); then
-        group[2]=directories
-	_setup directories
-        [[ -z "$hasign" ]] &&
-          zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
-	    ign=(-F _comp_ignore)
-      fi
-      _path_files "$opts[@]" "$ign[@]" "$dopts[@]" && return 0
     fi
-  elif _requested globbed-files; then
-    if (( $#group )); then
-      group[2]=globbed-files
-      _setup globbed-files
-      [[ -z "$hasign" ]] &&
-        zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
-	  ign=(-F _comp_ignore)
-    fi
-    if [[ "$type" = (*/*g*|*g*/*) ]]; then
-      _path_files "$opts[@]" "$ign[@]" "$dopts[@]" "$gopts[@]" && return 0
-    else
-      _path_files "$opts[@]" "$ign[@]" "$gopts[@]" && return 0
-    fi
-  fi
+  done
+
+  (( ret )) || return 0
 done
 
 return 1

@@ -33,5 +33,5 @@ else
   rep=( $manpath/(sman|man|cat)*/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t) )
 fi
 
-(( $#rep )) && _wanted manuals expl 'manual page' &&
-    compadd "$expl[@]" - ${rep%%.[^.]##(.gz|.bz2|)}
+(( $#rep )) && _wanted manuals expl 'manual page' \
+    compadd - ${rep%%.[^.]##(.gz|.bz2|)}

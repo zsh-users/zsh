@@ -20,7 +20,7 @@ setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 local ctxt post ret=1 tmp _compskip format _comp_ignore \
-      _completers _completer _completer_num \
+      _completers _completer _completer_num curtag \
       _matchers _matcher _matcher_num _comp_tags \
       context state line opt_args val_args curcontext="$curcontext" \
       _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
@@ -30,6 +30,9 @@ local ctxt post ret=1 tmp _compskip format _comp_ignore \
       _saved_insert="${compstate[insert]}"
 
 typeset -U _lastdescr
+
+_comp_opts=()
+_comp_tries=()
 
 [[ -z "$curcontext" ]] && curcontext=:::
 

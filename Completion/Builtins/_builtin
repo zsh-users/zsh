@@ -7,6 +7,5 @@ if (( $CURRENT > 2 )); then
 else
   local expl
 
-  _wanted commands expl 'builtin command' &&
-      compadd "$expl[@]" "$@" - "${(k@)builtins}"
+  _wanted commands expl 'builtin command' compadd "$@" - "${(k@)builtins}"
 fi

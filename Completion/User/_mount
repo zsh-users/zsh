@@ -539,11 +539,11 @@ case "$state" in
 fstype)
   compset -P '*,'
 
-  _wanted types expl 'file system type' &&
+  _wanted types expl 'file system type' \
       compadd "$expl[@]" -qS, -M 'L:|no=' - "$fss[@]" && ret=0
   ;;
 fsopt)
-  _tags options || return 1
+  _wanted options || return 1
 
   eval 'tmp=(' '"$_fs_'${(s:,:)^${opt_args[$typeops]:-${deffs}}}'[@]"' ')'
   tmp=( "$_fs_any[@]" "${(@)tmp:#}" )

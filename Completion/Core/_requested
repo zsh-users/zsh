@@ -1,15 +1,20 @@
 #autoload
 
-local tag
+local gopt=-J
 
-if [[ "$1" = -[VJ]* ]]; then
-  tag="$2"
-else
-  tag="$1"
+if [[ "$1" = -([12]|)[VJ] ]]; then
+  gopt="$1"
+  shift
 fi
 
-comptags -R "$tag" && _comp_tags="$_comp_tags $tag" &&
-    if [[ $# -gt 1 ]]; then
-      _description "$@"
-      return 0
-    fi
+if comptags -R "$1"; then
+  _comp_tags="$_comp_tags $1"
+  if [[ $# -gt 3 ]]; then
+    _loop "$gopt" "$@"
+  elif [[ $# -gt 1 ]]; then
+    _description "$gopt" "$@"
+  fi
+  return 0
+else
+  return 1
+fi

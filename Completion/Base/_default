@@ -12,7 +12,7 @@ if { zstyle -s ':completion:${curcontext}:' use-compctl ctl ||
   compcall "$opt[@]" || return 0
 fi
 
-_tags files || return 1
+_wanted files || return 1
 
 _files && return 0
 

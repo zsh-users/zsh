@@ -2180,6 +2180,8 @@ struct ctags {
 struct ctset {
     Ctset next;
     char **tags;		/* the tags */
+    char *tag;			/* last tag checked for -A */
+    char **ptr;			/* ptr into tags for -A */
 };
 
 /* Array of tag-set infos. Index is the locallevel. */
@@ -2201,6 +2203,7 @@ freectset(Ctset s)
 
 	if (s->tags)
 	    freearray(s->tags);
+	zsfree(s->tag);
 	zfree(s, sizeof(*s));
 
 	s = n;
@@ -2240,12 +2243,20 @@ settags(char **tags)
 /* Check if an array contains a string. */
 
 static int
-arrcontains(char **a, char *s)
+arrcontains(char **a, char *s, int colon)
 {
-    while (*a)
-	if (!strcmp(s, *a++))
-	    return 1;
+    char *p, *q;
 
+    while (*a) {
+	if (colon) {
+	    for (p = s, q = *a++; *p && *q && *p != ':' && *q != ':'; p++, q++)
+		if (*p != *q)
+		    break;
+	    if ((!*p || *p == ':') && (!*q || *q == ':'))
+		return 1;
+	} else if (!strcmp(*a++, s))
+	    return 1;
+    }
     return 0;
 }
 
@@ -2266,7 +2277,8 @@ bin_comptags(char *nam, char **args, char *ops, int func)
 	zwarnnam(nam, "nesting level too deep", NULL, 0);
 	return 1;
     }
-    if (args[0][1] != 'i' && !comptags[locallevel]) {
+    if ((args[0][1] != 'i' && args[0][1] != 'A' && !comptags[locallevel]) ||
+	(args[0][1] == 'A' && !comptags[lasttaglevel])) {
 	zwarnnam(nam, "no tags registered", NULL, 0);
 	return 1;
     }
@@ -2277,6 +2289,7 @@ bin_comptags(char *nam, char **args, char *ops, int func)
     case 'N': min = 0; max =  0; break;
     case 'R': min = 1; max =  1; break;
     case 'S': min = 1; max =  1; break;
+    case 'A': min = 2; max =  2; break;
     default:
 	zwarnnam(nam, "invalid option: %s", args[0], 0);
 	return 1;
@@ -2317,7 +2330,42 @@ bin_comptags(char *nam, char **args, char *ops, int func)
 	    Ctset s;
 
 	    return !((s = comptags[locallevel]->sets) &&
-		     arrcontains(s->tags, args[1]));
+		     arrcontains(s->tags, args[1], 1));
+	}
+    case 'A':
+	{
+	    Ctset s;
+
+	    if (comptags[lasttaglevel] && (s = comptags[lasttaglevel]->sets)) {
+		char **q, *v = NULL;
+		int l = strlen(args[1]);
+
+		if (!s->tag || strcmp(s->tag, args[1])) {
+		    zsfree(s->tag);
+		    s->tag = ztrdup(args[1]);
+		    s->ptr = s->tags;
+		}
+		for (q = s->ptr; *q; q++) {
+		    if (strpfx(args[1], *q)) {
+			if (!(*q)[l]) {
+			    v = *q;
+			    break;
+			} else if ((*q)[l] == ':') {
+			    v = (*q) + l + 1;
+			    break;
+			}
+		    }
+		}
+		if (!v) {
+		    zsfree(s->tag);
+		    s->tag = NULL;
+		    return 1;
+		}
+		s->ptr = q + 1;
+		setsparam(args[2], ztrdup(v));
+		return 0;
+	    }
+	    return 1;
 	}
     case 'S':
 	if (comptags[locallevel]->sets) {
@@ -2350,11 +2398,11 @@ bin_comptry(char *nam, char **args, char *ops, int func)
 	args = arrdup(args);
 
 	for (p = q = args, all = comptags[lasttaglevel]->all; *p; p++)
-	    if (arrcontains(all, *p)) {
+	    if (arrcontains(all, *p, 1)) {
 		Ctset s;
 
 		for (s = comptags[lasttaglevel]->sets; s; s = s->next)
-		    if (arrcontains(s->tags, *p))
+		    if (arrcontains(s->tags, *p, 0))
 			break;
 
 		if (!s)
@@ -2367,6 +2415,8 @@ bin_comptry(char *nam, char **args, char *ops, int func)
 
 	    s->tags = zarrdup(args);
 	    s->next = NULL;
+	    s->ptr = NULL;
+	    s->tag = NULL;
 
 	    if ((l = comptags[lasttaglevel]->sets)) {
 		while (l->next)

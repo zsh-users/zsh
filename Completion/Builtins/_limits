@@ -2,5 +2,4 @@
 
 local expl
 
-_wanted limits expl 'process limits' &&
-    compadd "$expl[@]" ${${(f)"$(limit)"}%% *}
+_wanted limits expl 'process limits' compadd ${${(f)"$(limit)"}%% *}

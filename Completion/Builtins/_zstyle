@@ -41,7 +41,6 @@ styles=(
   list-packed		 c:bool
   list-rows-first	 c:bool
   local			 c:
-  matcher		 c:
   matcher-list		 c:
   max-errors		 c:
   menu			 c:boolauto
@@ -94,9 +93,9 @@ while [[ -n $state ]]; do
 
   case "$ostate" in
     contexts)
-      if _wanted contexts expl context; then
+      if _wanted contexts; then
         if [[ $PREFIX != :*: ]]; then
-	  compadd -P : -S : "$expl[@]" completion zftp
+	  _loop contexts expl context compadd -P : -S : completion zftp
         elif [[ $PREFIX = :completion:* ]]; then
           mesg=''
           case "$PREFIX" in
@@ -118,8 +117,8 @@ while [[ -n $state ]]; do
       else
         ctop=cz
       fi
-      _wanted styles expl style &&
-         compadd "$expl[@]" -M 'r:|-=* r:|=*' - ${(k)styles[(R)[^:]#[$ctop][^:]#:*]}
+      _wanted styles expl style \
+         compadd -M 'r:|-=* r:|=*' - ${(k)styles[(R)[^:]#[$ctop][^:]#:*]}
       ;;
       
     style-arg)
@@ -127,32 +126,28 @@ while [[ -n $state ]]; do
       ;;
 
     bool) 
-      _wanted values expl boolean &&
-	compadd "$expl[@]" true false
+      _wanted values expl boolean compadd true false
       ;;
 
     boolauto) 
-      _wanted values expl boolean &&
-	compadd "$expl[@]" true false auto select
+      _wanted values expl boolean compadd true false auto select
       ;;
 
     cursor)
       if [[ "$words[2]" = *:completion:inc* ]]; then
-        _wanted values expl 'cursor positioning' &&
-	  compadd "$expl[@]" complete key default
+        _wanted values expl 'cursor positioning' compadd complete key default
       elif [[ "$words[2]" = *:completion::* ]]; then
-        _wanted values expl 'cursor positioning' &&
-	  compadd "$expl[@]" true false
+        _wanted values expl 'cursor positioning' compadd true false
       else
-        _wanted values expl 'cursor positioning' &&
-	  compadd "$expl[@]" complete key default true false
+        _wanted values expl 'cursor positioning' \
+	  compadd complete key default true false
       fi
       ;;
 
     completer)
-      _wanted values expl completer &&
-	compadd "$expl[@]" _complete _approximate _correct _match \
-          _expand _list _menu _oldlist
+      _wanted values expl completer \
+	compadd _complete _approximate _correct _match \
+                _expand _list _menu _oldlist _next_tags
       ;;
 
     user-host-port)
@@ -177,32 +172,32 @@ while [[ -n $state ]]; do
       ;;
 
     listwhen)
-      _wanted values expl 'when to list completions' &&
-	compadd "$expl[@]" always never sometimes
+      _wanted values expl 'when to list completions' \
+	compadd always never sometimes
       ;;
 
     packageset)
-      _wanted values expl 'default package set' &&
-        compadd "$expl[@]" available installed uninstalled
+      _wanted values expl 'default package set' \
+        compadd available installed uninstalled
       ;;
 
     progress)
-      _wanted values expl 'progress meter style' &&
-        compadd "$expl[@]" none bar percent
+      _wanted values expl 'progress meter style' \
+        compadd none bar percent
       ;;
 
     sdirs)
-      _wanted values expl 'whether to complete . or ..' &&
-        compadd "$expl[@]" true false ..
+      _wanted values expl 'whether to complete . or ..' \
+        compadd true false ..
       ;;
 
     stop)
-      _wanted values expl 'when to insert matches' &&
-	compadd "$expl[@]" true false verbose
+      _wanted values expl 'when to insert matches' \
+	compadd true false verbose
       ;;
 
     tag)
-      _wanted tags expl tag && compadd "$expl[@]" - $taglist
+      _wanted tags expl tag compadd - $taglist
       ;;
 
     user-host)
@@ -215,13 +210,13 @@ while [[ -n $state ]]; do
       ;;
 
     ignorepar)
-      _wanted values expl 'which parents to ignore' &&
-        compadd "$expl[@]" parent pwd .. directory
+      _wanted values expl 'which parents to ignore' \
+        compadd parent pwd .. directory
       ;;
 
     single-ignored)
-      _wanted values expl 'how to handle single alternate match' &&
-          compadd "$expl[@]" - show menu
+      _wanted values expl 'how to handle single alternate match' \
+          compadd - show menu
       ;;
 
     _*)

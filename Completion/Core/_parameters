@@ -3,10 +3,6 @@
 # This should be used to complete parameter names if you need some of the
 # extra options of compadd. It completes only non-local parameters.
 
-local pars expl
+local expl
 
-_wanted parameters expl parameter || return 1
-
-pars=( ${(k)parameters[(R)^*local*]} )
-
-compadd "$expl[@]" "$@" - $pars
+_wanted parameters expl parameter compadd "$@" - ${(k)parameters[(R)^*local*]}

@@ -2,5 +2,4 @@
 
 local expl
 
-_wanted functions expl 'shell function' &&
-    compadd "$expl[@]" "$@" - "${(k@)functions}"
+_wanted functions expl 'shell function' compadd "$@" - "${(k@)functions}"

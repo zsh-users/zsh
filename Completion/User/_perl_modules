@@ -49,4 +49,4 @@ fi
 
 local expl
 
-_wanted modules expl 'Perl modules' && compadd "$expl[@]" "$opts[@]" - $_perl_modules
+_wanted modules expl 'Perl modules' compadd "$opts[@]" - $_perl_modules

@@ -55,20 +55,23 @@ xhost)
     if [[ "$tmp" = *:* ]]; then
       if compset -P '(#b)(*):'; then
 	type="$match[1]"
-	_wanted displays expl 'disallow access' &&
-	    {
-	      compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - \
-		      ${${(M)tmp:#(#i)$type:*}#(#i)$type:} ||
-	      _hosts "$expl[@]"
-	    }
+	_wanted displays &&
+            while _try displays expl 'disallow access'; do
+	      { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - \
+		        ${${(M)tmp:#(#i)$type:*}#(#i)$type:} ||
+	            _hosts "$expl[@]" } && return 0
+	    done
       else
 	_alternative \
 	    'types:name family:compadd -S: ${(L)tmp%%:*}' \
 	    'hosts:host:compadd ${(@)tmp#*:}' && ret=0
       fi
     else
-      _wanted displays expl 'disallow access' &&
-	  { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - $tmp || _hosts "$expl[@]" }
+      _wanted displays &&
+          while _try displays expl 'disallow access'; do
+	    { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - $tmp ||
+              _hosts "$expl[@]" } && return 0
+          done
     fi
   else
     compset -P +

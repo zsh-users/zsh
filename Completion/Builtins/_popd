@@ -12,7 +12,7 @@ local expl list lines revlines disp
 ! zstyle -T ":completion:${curcontext}:directory-stack" prefix-needed ||
     [[ $PREFIX = [-+]* ]] || return 1
 
-_wanted -V directory-stack expl 'directory stack' || return 1
+_wanted directory-stack || return 1
 
 if zstyle -T ":completion:${curcontext}:directory-stack" verbose; then
   # get the list of directories with their canonical number
@@ -39,4 +39,5 @@ else
   disp=()
 fi
 
-compadd "$expl[@]" "$@" "$disp[@]" -Q - "$list[@]"
+_loop -V directory-stack expl 'directory stack' \
+    compadd "$@" "$disp[@]" -Q - "$list[@]"

@@ -82,9 +82,12 @@ if [[ -n "$state" ]]; then
     [[ "$what" = *ksym* ]] && _x_keysym "$suf[@]" && ret=0
 
   else
-    if _wanted commands expl command; then
-      compadd "$expl[@]" -S ' ' keycode keysym clear add remove && ret=0
-      compadd "$expl[@]" -S ' = ' pointer && ret=0
+    if _wanted commands; then
+      while _try commands expl command; do
+        compadd "$expl[@]" -S ' ' keycode keysym clear add remove && ret=0
+        compadd "$expl[@]" -S ' = ' pointer && ret=0
+        (( ret )) || return 0
+      done
     fi
   fi
 fi

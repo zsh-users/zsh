@@ -2,11 +2,11 @@
 
 local expl
 
-_tags users || return 1
+_wanted users || return 1
 
 if which users >/dev/null; then
-  _description users expl 'users logged on'
-  compadd "$@" "$expl[@]" - $(_call users users) && return 0
+  _loop users expl 'users logged on' \
+      compadd "$@" - $(_call users users) && return 0
 else
   # Other methods of finding out users logged on should be added here
   return 1

@@ -16,9 +16,9 @@ if [[ $PREFIX = *\[* ]]; then
   if [[ ${(tP)var} = assoc* ]]; then
     local expl
 
-    _wanted -C subscript association-keys expl 'association key' &&
-        compadd "$expl[@]" $addclose - ${(kP)var}
+    _wanted -C subscript association-keys expl 'association key' \
+        compadd $addclose - ${(kP)var}
   fi
 else
-  _tags parameters && _parameters
+  _wanted parameters && _parameters
 fi

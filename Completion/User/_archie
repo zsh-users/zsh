@@ -26,6 +26,6 @@ case "$state" in
 serverhost)
   : ${(A)archie_servers:=${(M)$(_call hosts archie -L):#archie.*}}
 
-  _wanted hosts expl 'archie servers' && compadd "$expl[@]" -  $archie_servers
+  _wanted hosts expl 'archie servers' compadd -  $archie_servers
   ;;
 esac

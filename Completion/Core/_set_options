@@ -6,6 +6,5 @@
 
 local expl
 
-_wanted zsh-options expl 'set zsh option' &&
-    compadd "$expl[@]" "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' - \
-            $=_set_options
+_wanted zsh-options expl 'set zsh option' \
+    compadd "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' - $=_set_options

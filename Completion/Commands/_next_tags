@@ -52,8 +52,13 @@ _next_tags() {
 _next_tags_sort() {
   local order tags tag nodef
 
-  zstyle -a ":completion:${curcontext}:" tag-order order ||
-    order=( 'arguments values' options globbed-files directories all-files )
+  if ! zstyle -a ":completion:${curcontext}:" tag-order order; then
+    if (( $+_comp_default_tags )); then
+      order=( "$_comp_default_tags[@]" )
+    else
+      order=( 'arguments values' options )
+    fi
+  fi
 
   # But we also remove the tags we've already tried...
 

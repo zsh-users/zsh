@@ -36,14 +36,15 @@ if (( ! $+_lp_cache )); then
 fi
 
 if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
-  if _wanted printers expl printer; then
+  if _wanted printers; then
     if zstyle -T ":completion:${curcontext}:printers" verbose; then
       zformat -a list ' -- ' "$_lp_cache[@]"
       disp=(-ld list)
     else
       disp=()
     fi
-    compadd "$expl[@]" "$disp[@]" - "${(@)_lp_cache%%:*}" && return 0
+    _loop printers expl printer \
+        compadd "$disp[@]" - "${(@)_lp_cache%%:*}" && return 0
 
     (( $+_lp_alias_cache )) || return 1
 
@@ -70,7 +71,7 @@ else
       _tags users jobs
 
       while _tags; do
-        if _requested users expl user; then
+        if _requested users; then
           strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
           if [[ -z "$shown" ]] &&
              zstyle -T ":completion:${curcontext}:users" verbose; then
@@ -79,9 +80,10 @@ else
           else
   	  disp=()
           fi
-          compadd "$expl[@]" "$disp[@]" - "$strs[@]" || _users && ret=0
+	  _loop users expl user compadd "$disp[@]" - "$strs[@]" ||
+              _users && ret=0
         fi
-        if _requested jobs expl job; then
+        if _requested jobs; then
           strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
           if [[ -z "$shown" ]] &&
              zstyle -T ":completion:${curcontext}:jobs" verbose; then
@@ -90,7 +92,7 @@ else
           else
   	  disp=()
           fi
-          compadd "$expl[@]" "$disp[@]" - "$strs[@]" && ret=0
+          _loop jobs expl job compadd "$disp[@]" - "$strs[@]" && ret=0
         fi
         (( ret )) || return 0
       done

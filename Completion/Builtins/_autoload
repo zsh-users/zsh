@@ -2,5 +2,4 @@
 
 local expl
 
-_wanted functions expl 'shell function' &&
-    compadd "$expl[@]" - ${^fpath}/*(N:t)
+_wanted functions expl 'shell function' compadd - ${^fpath}/*(N:t)

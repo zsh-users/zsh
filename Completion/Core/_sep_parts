@@ -23,7 +23,7 @@ local matchflags opt group expl nm=$compstate[nmatches] opre osuf opts match
 # Get the options.
 
 zparseopts -D -a opts \
-    'J:=group' 'V:=group' P: F: S: r: R: q 1 2 n 'X:=expl' 'M+:=match'
+    'J+:=group' 'V+:=group' P: F: S: r: R: q 1 2 n 'X+:=expl' 'M+:=match'
 
 if (( $#match )); then
   match="${match[2]}"

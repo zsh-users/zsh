@@ -70,7 +70,8 @@ zero if the style is defined for at least one matching pattern, has
 only one string in its value and that is equal to one of tt(true),
 tt(yes), tt(on) or tt(1). If any var(strings) are given the return
 zero if and only if at least one of the var(strings) is equal to at
-least one of the strings in the value.
+least one of the strings in the value. If the style is not defined,
+the return value is tt(2).
 
 The tt(-T) option is like tt(-t) but returns zero if the style is not
 set for any matching pattern.

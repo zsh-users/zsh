@@ -3,7 +3,7 @@
 # This can be used to add options or values with descriptions as matches.
 
 local _opt _expl _tmps _tmpd _tmpmd _tmpms _ret=1 _showd _nm _hide _args
-local _type=values
+local _type=values _descr
 
 # Get the option.
 
@@ -14,37 +14,40 @@ fi
 
 # Do the tests. `showd' is set if the descriptions should be shown.
 
-_tags "$_type" || return 1
+_wanted "$_type" || return 1
 
 zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes
 
-_description "$_type" _expl "$1"
+_descr="$1"
 shift
-
-if [[ -n "$_showd" ]]; then
-  compdescribe -I ' -- ' "$@"
-else
-  compdescribe -i "$@"
-fi
 
 [[ "$_type" = options ]] &&
     zstyle -t ":completion:${curcontext}:options" prefix-hidden && _hide=yes
 
-while compdescribe -g _args _tmpd _tmpmd _tmps _tmpms; do
+while _try "$_type" _expl "$_descr"; do
 
-  # See if we should remove the option prefix characters.
-
-  if [[ -n "$_hide" ]]; then
-    if [[ "$PREFIX" = --* ]]; then
-      _tmpd=( "${(@)_tmpd#--}" )
-      _tmps=( "${(@)_tmps#--}" )
-    elif [[ "$PREFIX" = [-+]* ]]; then
-      _tmpd=( "${(@)_tmpd#[-+]}" )
-      _tmps=( "${(@)_tmps#[-+]}" )
-    fi
+  if [[ -n "$_showd" ]]; then
+    compdescribe -I ' -- ' "$@"
+  else
+    compdescribe -i "$@"
   fi
-  compadd "$_args[@]" "$_expl[@]" -ld _tmpd - "$_tmpmd[@]" && _ret=0
-  compadd "$_args[@]" "$_expl[@]" -d _tmps  - "$_tmpms[@]" && _ret=0
-done
 
+  while compdescribe -g _args _tmpd _tmpmd _tmps _tmpms; do
+
+    # See if we should remove the option prefix characters.
+
+    if [[ -n "$_hide" ]]; then
+      if [[ "$PREFIX" = --* ]]; then
+        _tmpd=( "${(@)_tmpd#--}" )
+        _tmps=( "${(@)_tmps#--}" )
+      elif [[ "$PREFIX" = [-+]* ]]; then
+        _tmpd=( "${(@)_tmpd#[-+]}" )
+        _tmps=( "${(@)_tmps#[-+]}" )
+      fi
+    fi
+
+    compadd "$_args[@]" "$_expl[@]" -ld _tmpd - "$_tmpmd[@]" && _ret=0
+    compadd "$_args[@]" "$_expl[@]" -d _tmps  - "$_tmpms[@]" && _ret=0
+  done
+done
 return _ret

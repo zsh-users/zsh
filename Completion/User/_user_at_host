@@ -22,9 +22,9 @@ if [[ -prefix 1 *@ ]]; then
 
   compset -P 1 '*@'
 
-  _wanted -C user-at hosts expl "host for $user" &&
-      _combination -s '[:@]' "${tag}" users-hosts users="$user" hosts "$expl[@]" "$@"
+  _wanted -C user-at hosts expl "host for $user" \
+      _combination -s '[:@]' "${tag}" users-hosts users="$user" hosts "$@" -
 else
-  _wanted users expl "user" &&
-      _combination -s '[:@]' "${tag}" users-hosts users -S@ -q "$expl[@]" "$@"
+  _wanted users expl "user" \
+      _combination -s '[:@]' "${tag}" users-hosts users -S@ -q "$@" -
 fi

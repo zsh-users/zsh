@@ -430,7 +430,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 			     !strcmp(s->vals[0], "on") ||
 			     !strcmp(s->vals[0], "1"));
 	    }
-	    return (args[0][1] == 't');
+	    return (args[0][1] == 't' ? (s ? 1 : 2) : 0);
 	}
 	break;
     case 'm':

@@ -2,5 +2,4 @@
 
 local expl
 
-_wanted arrays expl array &&
-    compadd "$expl[@]" - "${(@k)parameters[(R)*array*]}"
+_wanted arrays expl array compadd - "${(@k)parameters[(R)*array*]}"

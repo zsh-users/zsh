@@ -49,16 +49,18 @@ local localhttp_userdir="$localhttp[3]"
 
 if [[ "$1" = -f ]]; then
   shift
-  _tags -C -f files && _files "$@" && return
+  _wanted -C -f files && _files "$@" && return
 fi
 
 ipre="$IPREFIX"
 
-if ! compset -P '(#b)([-+.a-z0-9]#):' &&
-   _wanted -C argument prefixes expl 'URL prefix'; then
-  [[ -d $urls_path/bookmark ]] &&
-    compadd "$@" "$expl[@]" -S '' bookmark: && ret=0
-  compadd "$@" "$expl[@]" -S '' file: ftp:// gopher:// http:// && ret=0
+if ! compset -P '(#b)([-+.a-z0-9]#):' && _wanted -C argument prefixes; then
+  while _try prefixes expl 'URL prefix' "$@"; do
+    [[ -d $urls_path/bookmark ]] &&
+      compadd "$expl[@]" -S '' bookmark: && ret=0
+    compadd "$expl[@]" -S '' file: ftp:// gopher:// http:// && ret=0
+    (( ret )) || return 0
+  done
   return ret
 fi
 scheme="$match[1]"
@@ -66,35 +68,40 @@ scheme="$match[1]"
 case "$scheme" in
   http|ftp|gopher)
     if ! compset -P //; then
-      _wanted -C "$scheme" prefixes expl 'end of prefix' &&
-          compadd "$expl[@]" "$@" -S '' //
+      _wanted -C "$scheme" prefixes expl 'end of prefix' compadd "$@" -S '' //
       return
     fi
   ;;
   file)
     if ! compset -P //; then
-      _wanted -C file files expl 'local file' || return 1
+      _wanted -C file files || return 1
 
-      if [[ -prefix / ]]; then
-	_path_files "$expl[@]" "$@" -S '' -g '*(^/)' && ret=0
-	_path_files "$expl[@]" "$@" -S/ -r '/' -/ && ret=0
-      elif [[ -z "$PREFIX" ]]; then
-	compadd "$expl[@]" -S '/' -r '/' - "${PWD%/}" && ret=0
-      fi
+      while _try files expl 'local file' "$@"; do
+        if [[ -prefix / ]]; then
+	  _path_files "$expl[@]" -S '' -g '*(^/)' && ret=0
+	  _path_files "$expl[@]" -S/ -r '/' -/ && ret=0
+        elif [[ -z "$PREFIX" ]]; then
+	  compadd "$expl[@]" -S '/' -r '/' - "${PWD%/}" && ret=0
+        fi
+	(( ret )) || return 0
+      done
       return ret
     fi
   ;;
   bookmark)
     if [[ -f "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" &&
 	  -s "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" ]]; then
-      _wanted -C bookmark bookmarks expl bookmarks &&
-          compadd "$expl[@]" "$@" -U - \
+      _wanted -C bookmark bookmarks expl bookmarks \
+          compadd "$@" -U - \
               "$ipre$(<"$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}")" && ret=0
     else
-      if _wanted -C bookmark files expl 'bookmark'; then
-        _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && 
-            ret=0
-        _path_files -W "$urls_path/$scheme" -S/ -r '/' -/ && ret=0
+      if _wanted -C bookmark files; then
+        while _try files expl 'bookmark'; do
+          _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && 
+              ret=0
+          _path_files -W "$urls_path/$scheme" -S/ -r '/' -/ && ret=0
+          (( ret )) || return 0
+        done
       fi
     fi
     return ret
@@ -102,19 +109,22 @@ case "$scheme" in
 esac
 
 # Complete hosts
-if ! compset -P '(#b)([^/]#)/' &&
-   _wanted hosts expl host; then
+if ! compset -P '(#b)([^/]#)/' && _wanted hosts; then
   uhosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
-  (( $#uhosts )) || _hosts -S/ && ret=0
-  [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
-  compadd "$expl[@]" "$@" -S/ - $uhosts && ret=0
+
+  while _try hosts expl host "$@"; do
+    (( $#uhosts )) || _hosts -S/ && ret=0
+    [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
+    compadd "$expl[@]" -S/ - $uhosts && ret=0
+    (( ret )) || return 0
+  done
   return ret
 fi
 host="$match[1]"
 
 # Complete part after hostname
 
-_wanted -C local files expl 'local file' || return 1
+_wanted -C local files || return 1
 
 if [[ "$localhttp_servername" = "$host" ]]; then
   if compset -P \~; then
@@ -123,14 +133,23 @@ if [[ "$localhttp_servername" = "$host" ]]; then
       return
     fi
     user="$match[1]"
-    _path_files "$expl[@]" -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
-    _path_files "$expl[@]" -W ~$user/$localhttp_userdir -S/ -r '/' -/ && ret=0
+    while _try files expl 'local file'; do
+      _path_files "$expl[@]" -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
+      _path_files "$expl[@]" -W ~$user/$localhttp_userdir -S/ -r '/' -/ && ret=0
+      (( ret )) || return 0
+    done
   else
-    _path_files "$expl[@]" -W $localhttp_documentroot -g '*(^/)' && ret=0
-    _path_files "$expl[@]" -W $localhttp_documentroot -S/ -r '/' -/ && ret=0
+    while _try files expl 'local file'; do
+      _path_files "$expl[@]" -W $localhttp_documentroot -g '*(^/)' && ret=0
+      _path_files "$expl[@]" -W $localhttp_documentroot -S/ -r '/' -/ && ret=0
+      (( ret )) || return 0
+    done
   fi
 else
-  _path_files "$expl[@]" -W $urls_path/$scheme/$host -g '*(^/)' && ret=0
-  _path_files "$expl[@]" -W $urls_path/$scheme/$host -S/ -r '/' -/ && ret=0
+  while _try files expl 'local file'; do
+    _path_files "$expl[@]" -W $urls_path/$scheme/$host -g '*(^/)' && ret=0
+    _path_files "$expl[@]" -W $urls_path/$scheme/$host -S/ -r '/' -/ && ret=0
+    (( ret )) || return 0
+  done
 fi
 return $ret

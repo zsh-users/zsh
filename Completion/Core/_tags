@@ -50,21 +50,31 @@ if (( $# )); then
              fi
              ;;
       \!*)   comptry "${(@)argv:#(${(j:|:)~${=tag[2,-1]}})}";;
-      ?*)    comptry ${=tag};;
+      ?*)    comptry ${${(ps: :)${tag//\\\\ /$'\0'}}//$'\0'/ };;
       esac
     done
 
-    [[ -z "$nodef" ]] && comptry "$@"
+    if [[ -z "$nodef" ]]; then
+      if (( $+_comp_default_tags )); then
+        for tag in "$_comp_default_tags[@]"; do
+          comptry "$tag"
+        done
+      else
+        comptry "$@"
+      fi
+    fi
   else
 
-    # The first ones give the default behaviour.
+    # Use default tags...
 
-    comptry arguments values
-    comptry options
-    comptry globbed-files
-    comptry directories
-    comptry all-files
-
+    if (( $+_comp_default_tags )); then
+      for tag in "$_comp_default_tags[@]"; do
+        comptry "$tag"
+      done
+    else
+      comptry arguments values
+      comptry options
+    fi
     comptry "$@"
   fi
 

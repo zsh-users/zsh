@@ -20,7 +20,7 @@ done
 
 [[ "$1" = -(|-) ]] && shift
 
-if _wanted signals expl signal &&
+if _wanted signals &&
        { [[ -z "$minus" ]] ||
          ! zstyle -T ":completion:${curcontext}:signals" prefix-needed ||
          [[ "$PREFIX" = -* ]] } ; then
@@ -32,6 +32,7 @@ if _wanted signals expl signal &&
   else
     disp=()
   fi
-  compadd "$@" "$expl[@]" "$disp[@]" -M 'm:{a-z}=${A-Z}' - \
-          "${minus}${(@)^signals[1,last]}"
+  _loop signals expl signal \
+      compadd "$@" "$disp[@]" -M 'm:{a-z}={A-Z}' - \
+              "${minus}${(@)^signals[1,last]}"
 fi

@@ -9,5 +9,5 @@ if ! zstyle -a ":completion:${curcontext}:hosts" hosts hosts; then
   hosts=( "$_cache_hosts[@]" )
 fi
 
-_wanted hosts expl host &&
-    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" "$expl[@]" - "$hosts[@]"
+_wanted hosts expl host \
+    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" - "$hosts[@]"

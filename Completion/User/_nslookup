@@ -60,7 +60,7 @@ if [[ -n "$compcontext" ]]; then
 
     _funcall ret _nslookup_redirect && return ret
 
-    _tags -C redirection files || return 1
+    _wanted -C redirection files || return 1
 
     if [[ "$words[1]" != (finger|ls) ]]; then
       _message "redirection not allowed for command \`$words[1]'"
@@ -86,7 +86,7 @@ if [[ -n "$compcontext" ]]; then
 
   case "$words[1]" in
   (|l)server)
-    _wanted hosts expl 'new default server' && _hosts "$expl[@]"
+    _wanted hosts expl 'new default server' _hosts
     return
     ;;
   root|exit|help|\?)
@@ -119,7 +119,7 @@ if [[ -n "$compcontext" ]]; then
     [[ -z "$state" ]] && return ret
     ;;
   *)
-    _wanted hosts expl 'server' && _hosts "$expl[@]"
+    _wanted hosts expl 'server' _hosts
     return
   esac
 fi

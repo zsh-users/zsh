@@ -9,10 +9,12 @@ else
 
   while _tags; do
     _requested files && _files && ret=0
-    _requested options expl 'inode element' &&
+    _requested options &&
         { ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
           [[ "$PREFIX[1]" = + || ret -eq 1 ]] } &&
-        compadd "$expl[@]" - +device +inode +mode +nlink +uid +gid +rdev \
-                             +size +atime +mtime +ctime +blksize +block +link
+        _loop options expl 'inode element' \
+            compadd - +device +inode +mode +nlink +uid +gid +rdev \
+                      +size +atime +mtime +ctime +blksize +block +link
+    (( ret )) || return 0
   done
 fi

@@ -3,23 +3,23 @@
 local expl
 
 if [[ "$PREFIX" = :* ]]; then
-  _wanted characters expl 'character class' &&
-      compadd "$expl[@]" -p: -S ':]' alnum alpha blank cntrl digit graph \
-                                     lower print punct space upper xdigit
+  _wanted characters expl 'character class' \
+      compadd -p: -S ':]' alnum alpha blank cntrl digit graph \
+                          lower print punct space upper xdigit
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
-  _wanted association-keys expl 'association key' &&
-      if [[ "$RBUFFER" = \]* ]]; then
-        compadd "$expl[@]" -S '' - "${(@kP)${compstate[parameter]}}"
-      else
-        compadd "$expl[@]" -S ']' - "${(@kP)${compstate[parameter]}}"
-      fi
+  local suf
+
+  [[ "$RBUFFER" != \]* ]] && suf=']'
+
+  _wanted association-keys expl 'association key' \
+      compadd -S "$suf" - "${(@kP)${compstate[parameter]}}"
 elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   local list i j ret=1 disp
 
   _tags indexes parameters
 
   while _tags; do
-    if _requested -V indexes expl 'array index'; then
+    if _requested indexes; then
       ind=( {1..${#${(P)${compstate[parameter]}}}} )
       if zstyle -T ":completion:${curcontext}:indexes" verbose; then
         list=()
@@ -38,9 +38,11 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
       fi
 
       if [[ "$RBUFFER" = \]* ]]; then
-        compadd "$expl[@]" -S '' "$disp[@]" - "$ind[@]" && ret=0
+        _loop -V indexes expl 'array index' \
+            compadd -S '' "$disp[@]" - "$ind[@]" && ret=0
       else
-        compadd "$expl[@]" -S ']' "$disp[@]" - "$ind[@]" && ret=0
+        _loop -V indexes expl 'array index' \
+            compadd -S ']' "$disp[@]" - "$ind[@]" && ret=0
       fi
     fi
     _requested parameters && _parameters && ret=0

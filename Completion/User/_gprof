@@ -17,7 +17,7 @@ _arguments -C -s -{a,b,c,D,h,i,l,L,s,T,v,w,x,y,z} \
 if [[ -n "$state" ]]; then
   local cmd pair expl
 
-  _tags functions || return 1
+  _wanted functions || return 1
 
   [[ "$state" = pair ]] && pair=yes
 

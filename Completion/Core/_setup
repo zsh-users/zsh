@@ -18,42 +18,34 @@ if zstyle -a ":completion:${curcontext}:$1" list-colors val; then
 
 fi
 
-if zstyle -s ":completion:${curcontext}:$1" list-packed val; then
-  if [[ "$val" = (yes|true|1|on) ]]; then
-    compstate[list]="${compstate[list]} packed"
-  else
-    compstate[list]="${compstate[list]:gs/packed//}"
-  fi
+if zstyle -t ":completion:${curcontext}:$1" list-packed; then
+  compstate[list]="${compstate[list]} packed"
+elif [[ $? -eq 1 ]]; then
+  compstate[list]="${compstate[list]:gs/packed//}"
 else
   compstate[list]="$_saved_list"
 fi
 
-if zstyle -s ":completion:${curcontext}:$1" list-rows-first val; then
-  if [[ "$val" = (yes|true|1|on) ]]; then
-    compstate[list]="${compstate[list]} rows"
-  else
-    compstate[list]="${compstate[list]:gs/rows//}"
-  fi
+if zstyle -t ":completion:${curcontext}:$1" list-rows-first; then
+  compstate[list]="${compstate[list]} rows"
+elif [[ $? -eq 1 ]]; then
+  compstate[list]="${compstate[list]:gs/rows//}"
 else
   compstate[list]="$_saved_list"
 fi
 
-if zstyle -s ":completion:${curcontext}:$1" last-prompt val; then
-  if [[ "$val" = (yes|true|1|on) ]]; then
-    compstate[last_prompt]=yes
-  else
-    compstate[last_prompt]=''
-  fi
+if zstyle -t ":completion:${curcontext}:$1" last-prompt; then
+  compstate[last_prompt]=yes
+elif [[ $? -eq 1 ]]; then
+  compstate[last_prompt]=''
 else
   compstate[last_prompt]="$_saved_lastprompt"
 fi
 
-if zstyle -s ":completion:${curcontext}:$1" accept-exact val; then
-  if [[ "$val" = (yes|true|1|on) ]]; then
-    compstate[exact]=accept
-  else
-    compstate[exact]=''
-  fi
+if zstyle -t ":completion:${curcontext}:$1" accept-exact; then
+  compstate[exact]=accept
+elif [[ $? -eq 1 ]]; then
+  compstate[exact]=''
 else
   compstate[exact]="$_saved_exact"
 fi

@@ -806,33 +806,38 @@ this will also cycle through the names of the files in pathname
 components after the first ambiguous one.
 )
 item(tt(file-patterns))(
-The completion system uses two functions to complete filenames,
-tt(_files) and tt(_path_files), with one of them calling the other,
-but this second one is sometimes also called directly. Depending on
-how it is called, the first one uses the tags tt(globbed-files),
-tt(directories) and tt(all-files). The second one, when called
-directly, uses the tag tt(files).
+In most places where filenames are completed, the function tt(_files)
+is used which can be configured with this style. If the style is
+unset, tt(_files) offers up to three tags: tt(globbed-files),
+tt(directories) and tt(all-files), depending on the types of files
+expected by the caller of tt(_files). Using the tt(tag-order) style
+described below it is possible to specify when which type of files
+should be tried.
 
-Using this style one can specify which filenames should be completed
-in certain contexts. It is tested by tt(_files) and, if called
-directly, tt(_path_files) with the tags mentioned above. If it is set
-for these tags, the value is taken as a list of glob-patterns that
-should be used to select filenames when completing for the tag. Note
-that with tt(_files), calling completion functions may specify that
-all files are to be completed. Normally this would make tt(_files) use 
-only the tt(all-files) tag, but if this style is set for any of the
-other two tags (tt(globbed-files) and tt(directories)), these tags
-will be used, too, in the normal order given above (unless the user
-specified another order to be used with the tt(tag-order) style).
+If the tt(file-patterns) style is set, the default tags are not
+used. Instead, the value of the style says which tags and which
+patterns are to be offered. The strings in the value are of the form
+`var(patterns)tt(:)var(tag)'. The var(patterns) gives one or more glob 
+patterns separated by spaces that are to be used to generate
+filenames. If it is the empty string, i.e. the string starts with a
+colon, then the glob patterns supplied by the completion function will 
+be used. Colons in the pattern have to be preceded by a backslash to
+make them distinguishable from the colon before the var(tag). The
+var(tag)s of all strings in the value will be offered by tt(_files)
+and used when looking up other styles. The var(tag) may also be
+followed by an optional second colon and a description. If that is
+given, this description will be used for the `tt(%d)' in the value of
+the tt(format) style (if that is set) instead of the default
+description supplied by the completion function. If the description
+given here contains itself a `tt(%d)', that is replaced with the
+description supplied by the completion function.
 
-For example, to make the completion system first try only filenames
-matching the pattern tt(*.o) for the tt(rm) command, one would use:
+For example, to make the tt(rm) command first complete only names of
+object files and the names of all files if no object file matches
+the string on the line, one would do:
 
-example(zstyle ':completion:*:*:rm:*:globbed-files' file-patterns '*.o')
-
-With this, using only filenames ending in tt(.o) will be the first
-choice and other filenames will only be used if what is on the line
-matches none of the tt(.o) files (or if there are none).
+example(zstyle ':completion:*:*:rm:*' file-patterns \
+  '*.o:object-files' ':all-files')
 
 Note also that during the execution of completion functions, the
 tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
@@ -1416,7 +1421,7 @@ The values for the style are sets of space-separated lists of tags.
 The tags in each value will be tried at the same time; if no match is
 found, the next value is used.
 
-For example,
+For example (with the tt(file-patterns) style not set for tt(gunzip)),
 
 example(zstyle ':completion:*:complete:gunzip:*' tag-order \ 
     'globbed-files directories' all-files)
@@ -1434,6 +1439,37 @@ the end if the selected tags did not generate any matches.  This means
 that a value of only one hyphen turns off completion in a particular
 context.
 
+In strings not starting with an exclamation mark, it is also possible
+to specify tag aliases instead of only tags. These are of the form
+`var(tag)tt(:)var(alias)', where var(tag) is one of the tags offered
+by the completion function for the current context and var(alias) is a 
+name. For this, the completion function will generate matches in the
+same way as for the var(tag) but it will use the var(alias) in place
+of the tag in the context names used to look up styles. This can be
+used to make the completion system try a certain tag more than once,
+supplying different style settings for each attempt. For example,
+
+example(zstyle ':completion:*:*:-command-:*' tag-order 'functions:-non-comp'
+zstyle '*:-non-comp' ignored-patterns '_*')
+
+Makes completion in command position first try only names of shell
+functions that don't match the pattern `tt(_*)'. If that generates no
+matches, the default of trying all the other things that can be
+completed in command position is used, including the names of all
+shell functions. Note that the var(alias) used in this example
+`tt(-non-comp)' with the hyphen at the bginning is not in any way
+special to the completion system. But since no other tag starts with a 
+hyphen, using such a name allows to use a context pattern as short as
+the one in the second line without making it ambiguous.
+
+The var(alias) may optionally be followed by a second colon and a
+description. This description will then be used for the `tt(%d)' in
+the value of the tt(format) style instead of the default description
+supplied by the completion function. Spaces in the description have to 
+be quoted by preceding them with a backslash and a `tt(%d)' appearing
+in the description is replaced with the description given by the
+completion function.
+
 Strings in the value may also be of the form `var(func)tt(())'. In
 this case the function var(func) will be called which can then define
 in which order tags are to be used based on additional context
@@ -1441,12 +1477,27 @@ information. See the tt(_sort_tags) function below for a description
 of how such functions can be implemented. The return value of the
 function is used to decide if the following values for the style
 should be used. If it is zero, they are used and if it is non-zero,
-they are not used.
+they are not used. For example:
+
+example(non-empty() { [[ -n $PREFIX ]] }
+zstyle ':completion:*:*:-command-:*' tag-order 'non-empty()')
+
+Makes completion in command position happen only if the string on the
+line is not empty (this is tested using the tt(PREFIX)
+parameter which is special in completion widgets, see
+ifzman(zshcompwid)\
+ifnzman(the section noderef(Completion System))\
+)\
+for a description of these special parameters).
 
 If no style has been defined for a context, the strings tt(arguments
-values), tt(options), tt(globbed-files), tt(directories) and
-tt(all-files) plus all tags offered by the completion function will be 
-used to provide a sensible default behavior.
+values) and tt(options) plus all tags offered by the completion
+function will be used to provide a sensible default behavior. The tags 
+given used by the tt(_files) function (either the default tags
+tt(globbed-files), tt(directories) and tt(all-files) or the tags
+specified by the tt(file-patterns) style) will be added one-by-one so
+that the different patterns represented by them will be tried one
+after another.
 )
 item(tt(use-compctl))(
 If this style is set to a string not equal to tt(false), tt(0),
@@ -2060,8 +2111,69 @@ tt(curcontext) parameter. This allows to make tt(_tags) use a more
 specific context name without having to change and reset the
 tt(curcontext) parameter (which would otherwise have the same effect).
 )
+findex(_try)
+item(tt(_try) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(options) ... ])(
+This function should be called repeatedly to generate the tag
+aliases. On each call it will check if another tag alias is to be used 
+and, if there is at least one, zero is returned. If no more tag
+aliases are to be used, a non-zero status is returned.
+
+The tt(-12JV) options and the first three arguments are given to the
+tt(_desciption) function using the alias tag instead of the first
+argument is appropriate. The var(options) given after the var(descr)
+should be other options to be used for tt(compadd) or whatever
+function is to be called to add the matches. tt(_try) will store these 
+var(options) in the parameter whose var(name) is given as the second
+argument. This is done in such a way that the description given by the 
+user to the tt(tag-order) style is prefered over the one given to
+tt(_try).
+
+Note that this function must not be called without a previous call to
+tt(_tags), tt(_wanted) or tt(_requested) because it uses the alias
+tags for the current tag found by these functions.
+
+A normal use of this function for the alias tags for the tag tt(foo)
+looks like this:
+
+example(local expl ret=1
+...
+_wanted foo || return 1
+...
+while _try foo expl '...'; do
+  compadd "$expl[@]" ... && ret=0
+done
+...
+return ret
+)
+)
+findex(_loop)
+item(tt(_loop) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(command) var(args) ... ])(
+This is a convenient interface to the tt(_try) function, implementing
+the loop shown in the example above. The var(command) is the one that
+should be called to generate the matches. The options stored in the
+parameter var(name) will automatically be inserted into the var(args)
+given to the var(command). Normally, they are put directly after the
+var(command), but if one of the var(args) is a single hyphen, they are 
+inserted directly before that. If the hyphen is the last argument,
+that will be removed from the argument list before the var(command) is 
+called. This allows to use tt(_loop) in almost all cases where the
+matches can be generated by a single call to the tt(compadd) builtin
+command or by a call to one of the utility functions.
+
+For example:
+
+example(local expl
+...
+_wanted foo || return 1
+...
+_loop foo expl '...' compadd ... - $matches)
+
+Will complete the strings from the tt(matches) parameter, using
+tt(compadd) with additional options which will take precedence over
+those generated by tt(_loop).
+)
 findex(_requested)
-item(tt(_requested) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(specs) ... ])(
+item(tt(_requested) [ tt(-12VJ) ] var(tag) [ var(name) var(descr) [ var(command) var(args) ... ] ])(
 A function that uses tt(_tags) to register tags and then calls it to
 loop over the requested sets of tags should call this function to
 check if a certain tag is currently requested. This normally has to be 
@@ -2080,17 +2192,21 @@ So, the first argument for tt(_requested) is used as the name of a tag
 and if that tag is currently requested, the return value is zero (and
 non-zero otherwise).
 
-If more than one argument is given, tt(_requested) calls the
-tt(_description) function with all arguments, including the options.
-This is often useful to do both the testing of the tag and
-getting the description for the matches one is about to add at
+If the var(name) and the var(descr) are given, tt(_requested) calls the
+tt(_description) function with these arguments, including the options.
+
+If the var(command) is given, the tt(_loop) function will be called
+immediatly with the same arguments.
+
+This is often useful to do both the testing of the tag,
+getting the description for the matches and adding the matches at
 once. E.g.:
 
 example(local expl ret=1
 _tags foo bar baz
 while _tags; do
-  _requested foo expl 'description' &&
-      compadd "$expl[@]" foobar foobaz && ret=0
+  _requested foo expl 'description' \
+      compadd foobar foobaz && ret=0
   ...
   (( ret )) || break
 done)
@@ -2107,20 +2223,14 @@ With the var(tag) it calls tt(_tags) and if that returns zero
 if you want to offer only one tag and immediatly want to use the
 description built, you can just do:
 
-example(_wanted tag expl 'description' &&
-    compadd "$expl[@]" matches...)
-
-Note that you only need to use this function if you need a
-description. If, for example, you use one of the utility functions
-that adds a description itself, you only need to call tt(_tags) as in:
-
-example(_tags tag && _helper)
+example(_wanted tag expl 'description' \
+    compadd matches...)
 )
 findex(_alternative)
 item(tt(_alternative) [ tt(-C) var(name) ] var(specs) ...)(
 This function is useful if you offer multiple tags and building the
 matches for them is easy enough. It basically implements a loop like
-the one described above.
+the one described for the tt(_tags) function above above.
 
 The tags to use and what to do if the tags are requested are described 
 using the var(specs) which are of the form:
@@ -2139,6 +2249,11 @@ example(_alternative \
 
 to offer usernames and hostnames as possible matches (which are
 generated by the tt(_users) and tt(_hosts) functions respectively).
+
+Note that, like tt(_arguments) this will also use tt(_loop) to execute 
+the actions, so one doesn't need to call that explicitly unless
+another tag is to be used, for example in a function called from
+tt(_alternative).
 
 Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.
@@ -2168,6 +2283,9 @@ use the tt(prefix-hidden), tt(prefix-needed) and tt(verbose) styles
 to find out if the strings should be added at all and if the
 descriptions should be shown. Without the `tt(-o)' option, only the
 tt(verbose) style is used.
+
+tt(_describe) uses the tt(_loop) function to generate the matches, so
+that one doesn't need to put it into a loop over the tag aliases.
 )
 findex(_multi_parts)
 item(tt(_multi_parts) var(sep) var(array))(
@@ -2231,9 +2349,10 @@ option from the tt(compadd) builtin is supported, giving direct control
 over which filenames should be ignored. If no such option is given,
 the tt(ignored-suffixes) style is used.
 
-The function tt(_files) calls tt(_path_files) with all the arguments
-it was passed and, if that generated no matches, calls tt(_path_files) again
-without any tt(-g) or tt(-/) option, thus generating all filenames.
+The function tt(_files) uses the tt(file-patterns) style and calls
+tt(_path_files) with all the arguments it was passed except for tt(-g) 
+and tt(-/). These two options are used depending on the setting of the 
+tt(file-patterns) style.
 
 These functions also accept the `tt(-J)', `tt(-V)', `tt(-1)',
 `tt(-2)', `tt(-n)', `tt(-X)', `tt(-M)', `tt(-P)', `tt(-S)', `tt(-q)',
@@ -2415,6 +2534,11 @@ in the description will be shown above the matches. These arguments
 are taken from the array parameter tt(expl) which will be set up
 before executing the var(action) and hence may be used in it (normally 
 in an expansion like `tt($expl[@])').
+
+Except for the `tt(->)var(string)' form, the var(action) will be
+executed by calling the tt(_loop) function to process all tag aliases,
+so one doesn't need to call that explicitly unless another tag is to
+be used, for example in a function called in the var(action).
 
 In places where no sensible matches can be generated, the action
 should consist of only a space. This will make the var(message) be

@@ -194,9 +194,12 @@ if [[ -n "$state" ]]; then
       ;;
     esac
   else
-    if _wanted values expl 'compression scheme'; then
-      compadd "$expl[@]" - none g4 packbits && ret=0
-      compadd "$expl[@]" -qS: - lzw zip jpeg g3 && ret=0
+    if _wanted values; then
+      while _try values expl 'compression scheme'; do
+        compadd "$expl[@]" - none g4 packbits && ret=0
+        compadd "$expl[@]" -qS: - lzw zip jpeg g3 && ret=0
+	(( ret )) || return 0
+      done
     fi
   fi
 fi

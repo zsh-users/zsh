@@ -28,5 +28,4 @@ fi
 
 local expl
 
-_wanted functions expl 'Perl built-in functions' &&
-    compadd "$expl[@]" - $_perl_builtin_funcs
+_wanted functions expl 'Perl built-in functions' compadd - $_perl_builtin_funcs
