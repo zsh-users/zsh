@@ -33,10 +33,12 @@
 /* global variables for shell parameters in new style completion */
 
 /**/
-mod_export zlong compcurrent;
+mod_export
+zlong compcurrent,
+      complistmax;
 /**/
-zlong complistmax,
-      complistlines;
+zlong complistlines,
+      compignored;
 
 /**/
 mod_export
@@ -181,66 +183,99 @@ parse_cmatcher(char *name, char *s)
 {
     Cmatcher ret = NULL, r = NULL, n;
     Cpattern line, word, left, right;
-    int fl, ll, wl, lal, ral, err;
+    int fl, fl2, ll, wl, lal, ral, err, both;
 
     if (!*s)
 	return NULL;
 
     while (*s) {
+	lal = ral = both = fl2 = 0;
+	left = right = NULL;
+
 	while (*s && inblank(*s)) s++;
 
 	if (!*s) break;
 
 	switch (*s) {
+	case 'b': fl2 = CMF_INTER;
 	case 'l': fl = CMF_LEFT; break;
+	case 'e': fl2 = CMF_INTER;
 	case 'r': fl = CMF_RIGHT; break;
 	case 'm': fl = 0; break;
+	case 'B': fl2 = CMF_INTER;
 	case 'L': fl = CMF_LEFT | CMF_LINE; break;
+	case 'E': fl2 = CMF_INTER;
 	case 'R': fl = CMF_RIGHT | CMF_LINE; break;
 	case 'M': fl = CMF_LINE; break;
 	default:
-	    zwarnnam(name, "unknown match specification character `%c'", NULL, *s);
+	    if (name)
+		zwarnnam(name, "unknown match specification character `%c'",
+			 NULL, *s);
 	    return pcm_err;
 	}
 	if (s[1] != ':') {
-	    zwarnnam(name, "missing `:'", NULL, 0);
+	    if (name)
+		zwarnnam(name, "missing `:'", NULL, 0);
 	    return pcm_err;
 	}
 	s += 2;
 	if (!*s) {
-	    zwarnnam(name, "missing patterns", NULL, 0);
+	    if (name)
+		zwarnnam(name, "missing patterns", NULL, 0);
 	    return pcm_err;
 	}
-	if (fl & CMF_LEFT) {
+	if ((fl & CMF_LEFT) && !fl2) {
 	    left = parse_pattern(name, &s, &lal, '|', &err);
 	    if (err)
 		return pcm_err;
+
+	    if ((both = (*s && s[1] == '|')))
+		s++;
+
 	    if (!*s || !*++s) {
-		zwarnnam(name, "missing line pattern", NULL, 0);
+		if (name)
+		    zwarnnam(name, "missing line pattern", NULL, 0);
 		return pcm_err;
 	    }
 	} else
 	    left = NULL;
 
-	line = parse_pattern(name, &s, &ll, ((fl & CMF_RIGHT) ? '|' : '='),
+	line = parse_pattern(name, &s, &ll,
+			     (((fl & CMF_RIGHT) && !fl2) ? '|' : '='),
 			     &err);
 	if (err)
 	    return pcm_err;
-	if ((fl & CMF_RIGHT) && (!*s || !*++s)) {
-	    zwarnnam(name, "missing right anchor", NULL, 0);
-	} else if (!(fl & CMF_RIGHT)) {
+	if (both) {
+	    right = line;
+	    ral = ll;
+	    line = NULL;
+	    ll = 0;
+	}
+	if ((fl & CMF_RIGHT) && !fl2 && (!*s || !*++s)) {
+	    if (name)
+		zwarnnam(name, "missing right anchor", NULL, 0);
+	} else if (!(fl & CMF_RIGHT) || fl2) {
 	    if (!*s) {
-		zwarnnam(name, "missing word pattern", NULL, 0);
+		if (name)
+		    zwarnnam(name, "missing word pattern", NULL, 0);
 		return pcm_err;
 	    }
 	    s++;
 	}
-	if (fl & CMF_RIGHT) {
+	if ((fl & CMF_RIGHT) && !fl2) {
+	    if (*s == '|') {
+		left = line;
+		lal = ll;
+		line = NULL;
+		ll = 0;
+		s++;
+	    }
 	    right = parse_pattern(name, &s, &ral, '=', &err);
 	    if (err)
 		return pcm_err;
 	    if (!*s) {
-		zwarnnam(name, "missing word pattern", NULL, 0);
+		if (name)
+		    zwarnnam(name, "missing word pattern", NULL, 0);
 		return pcm_err;
 	    }
 	    s++;
@@ -249,7 +284,8 @@ parse_cmatcher(char *name, char *s)
 
 	if (*s == '*') {
 	    if (!(fl & (CMF_LEFT | CMF_RIGHT))) {
-		zwarnnam(name, "need anchor for `*'", NULL, 0);
+		if (name)
+		    zwarnnam(name, "need anchor for `*'", NULL, 0);
 		return pcm_err;
 	    }
 	    word = NULL;
@@ -262,16 +298,18 @@ parse_cmatcher(char *name, char *s)
 	    word = parse_pattern(name, &s, &wl, 0, &err);
 
 	    if (!word && !line) {
-		zwarnnam(name, "need non-empty word or line pattern", NULL, 0);
+		if (name)
+		    zwarnnam(name, "need non-empty word or line pattern",
+			     NULL, 0);
 		return pcm_err;
 	    }
 	}
 	if (err)
 	    return pcm_err;
 
-	n = (Cmatcher) zcalloc(sizeof(*ret));
+	n = (Cmatcher) hcalloc(sizeof(*ret));
 	n->next = NULL;
-	n->flags = fl;
+	n->flags = fl | fl2;
 	n->line = line;
 	n->llen = ll;
 	n->word = word;
@@ -365,7 +403,7 @@ parse_class(Cpattern p, unsigned char *s, unsigned char e)
 
     n = !n;
     while (*s && (k || *s != e)) {
-	if (s[1] == '-' && s[2] != e) {
+	if (s[1] == '-' && s[2] && s[2] != e) {
 	    /* a run of characters */
 	    for (j = (int) *s; j <= (int) s[2]; j++)
 		p->tab[j] = (eq ? i++ : n);
@@ -391,7 +429,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	zwarnnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
-    dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre =
+    dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre = dat.mesg =
 	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp = 
 	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
     dat.match = NULL;
@@ -414,11 +452,20 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	    case 'Q':
 		dat.aflags |= CAF_QUOTE;
 		break;
+	    case 'C':
+		dat.aflags |= CAF_ALL;
+		break;
 	    case 'f':
 		dat.flags |= CMF_FILE;
 		break;
 	    case 'e':
 		dat.flags |= CMF_ISPAR;
+		break;
+	    case 'a':
+		dat.aflags |= CAF_ARRAYS;
+		break;
+	    case 'k':
+		dat.aflags |= CAF_ARRAYS|CAF_KEYS;
 		break;
 	    case 'F':
 		sp = &(dat.ign);
@@ -476,9 +523,6 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		sp = &(dat.prpre);
 		e = "string expected after -%c";
 		break;
-	    case 'a':
-		dat.aflags |= CAF_ALT;
-		break;
 	    case 'M':
 		sp = &m;
 		e = "matching specification expected after -%c";
@@ -486,6 +530,10 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		break;
 	    case 'X':
 		sp = &(dat.exp);
+		e = "string expected after -%c";
+		break;
+	    case 'x':
+		sp = &(dat.mesg);
 		e = "string expected after -%c";
 		break;
 	    case 'r':
@@ -539,25 +587,28 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		    return 1;
 		}
 		if (dm) {
-		    if (mstr)
-			mstr = tricat(mstr, " ", m);
-		    else
+		    if (mstr) {
+			char *tmp = tricat(mstr, " ", m);
+			zsfree(mstr);
+			mstr = tmp;
+		    } else
 			mstr = ztrdup(m);
 		    m = NULL;
 		}
 	    }
 	}
     }
+
+ ca_args:
+
     if (mstr && (match = parse_cmatcher(name, mstr)) == pcm_err) {
 	zsfree(mstr);
 	return 1;
     }
     zsfree(mstr);
 
- ca_args:
-
-    if (!*argv && !dat.group &&
-	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON)))
+    if (!*argv && !dat.group && !dat.mesg &&
+	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON|CAF_ALL)))
 	return 1;
 
     dat.match = match = cpcmatcher(match);
@@ -742,7 +793,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		char *p, sav;
 
 		if (!(l = strlen(compprefix)))
-		    return 0;
+		    return ((na == 1 || na == -1) && pattry(pp, compprefix));
 		if (na < 0) {
 		    p = compprefix + l;
 		    na = -na;
@@ -768,7 +819,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		char *p;
 
 		if (!(ol = l = strlen(compsuffix)))
-		    return 0;
+		    return ((na == 1 || na == -1) && pattry(pp, compsuffix));
 		if (na < 0) {
 		    p = compsuffix;
 		    na = -na;
@@ -906,15 +957,19 @@ static struct compparam compkparams[] = {
     { "unambiguous", PM_SCALAR | PM_READONLY, NULL, NULL, VAL(get_unambig) },
     { "unambiguous_cursor", PM_INTEGER | PM_READONLY, NULL, NULL,
       VAL(get_unambig_curs) },
+    { "unambiguous_positions", PM_SCALAR | PM_READONLY, NULL, NULL,
+      VAL(get_unambig_pos) },
+    { "insert_positions", PM_SCALAR | PM_READONLY, NULL, NULL,
+      VAL(get_insert_pos) },
     { "list_max", PM_INTEGER, VAL(complistmax), NULL, NULL },
     { "last_prompt", PM_SCALAR, VAL(complastprompt), NULL, NULL },
     { "to_end", PM_SCALAR, VAL(comptoend), NULL, NULL },
     { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
     { "old_insert", PM_SCALAR, VAL(compoldins), NULL, NULL },
     { "vared", PM_SCALAR, VAL(compvared), NULL, NULL },
-    { "alternate_nmatches", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_anmatches) },
     { "list_lines", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_listlines) },
     { "all_quotes", PM_SCALAR | PM_READONLY, VAL(compqstack), NULL, NULL },
+    { "ignored", PM_INTEGER | PM_READONLY, VAL(compignored), NULL, NULL },
     { NULL, 0, NULL, NULL, NULL }
 };
 
@@ -1004,8 +1059,8 @@ set_compstate(Param pm, HashTable ht)
 	    for (cp = compkparams,
 		 pp = compkpms; cp->name; cp++, pp++)
 		if (!strcmp(hn->nam, cp->name)) {
-		    v.isarr = v.inv = v.a = 0;
-		    v.b = -1;
+		    v.isarr = v.inv = v.start = 0;
+		    v.end = -1;
 		    v.arr = NULL;
 		    v.pm = (Param) hn;
 		    if (cp->type == PM_INTEGER)
@@ -1025,14 +1080,7 @@ set_compstate(Param pm, HashTable ht)
 static zlong
 get_nmatches(Param pm)
 {
-    return num_matches(1);
-}
-
-/**/
-static zlong
-get_anmatches(Param pm)
-{
-    return num_matches(0);
+    return (permmatches(0) ? 0 : nmatches);
 }
 
 /**/
@@ -1060,7 +1108,7 @@ get_complist(Param pm)
 static char *
 get_unambig(Param pm)
 {
-    return unambig_data(NULL);
+    return unambig_data(NULL, NULL, NULL);
 }
 
 /**/
@@ -1069,9 +1117,31 @@ get_unambig_curs(Param pm)
 {
     int c;
 
-    unambig_data(&c);
+    unambig_data(&c, NULL, NULL);
 
     return c;
+}
+
+/**/
+static char *
+get_unambig_pos(Param pm)
+{
+    char *p;
+
+    unambig_data(NULL, &p, NULL);
+
+    return p;
+}
+
+/**/
+static char *
+get_insert_pos(Param pm)
+{
+    char *p;
+
+    unambig_data(NULL, NULL, &p);
+
+    return p;
 }
 
 /**/
@@ -1307,7 +1377,7 @@ setup_(Module m)
 	compexact = compexactstr = comppatmatch = comppatinsert =
 	complastprompt = comptoend = compoldlist = compoldins =
 	compvared = compqstack = NULL;
-
+    complistmax = 0;
     hascompmod = 1;
 
     return 0;
