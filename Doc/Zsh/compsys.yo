@@ -215,7 +215,7 @@ tt(#compdef -p) function tag.
 The fourth form is like the third, but the var(function) will be
 called only if no function for the command itself was found or if one
 was found and it set the tt(_compskip) parameter to a value em(not)
-containing the sub-string `tt(patterns)'.
+containing the substring `tt(patterns)'.
 
 The fifth form defines a widget with the same name as the var(function)
 which will be called for each of the var(key-sequences); this is like the
@@ -943,6 +943,14 @@ Finally, this function can be made to automatically call the
 tt(_long_options) function where appropriate by giving it the string
 `tt(--)' as an argument. All arguments after this will be given
 unchanged to the tt(_long_options) function.
+
+This function also uses one configuration key: tt(option_prefix). If
+this is set to a string containing `tt(short)' or `tt(all)' as a
+substring, option names beginning with a single minus sign are added
+as possible matches only if the word on the line begins with a minus
+sign. If the value contains one of the substrings `tt(long)' or
+`tt(all)', option names beginning with two minus signs will be
+added as matches only if the two minus signs are given on the line.
 
 Example:
 

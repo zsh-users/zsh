@@ -3,7 +3,9 @@
 # Complete the arguments of the current command according to the
 # descriptions given as arguments to this function.
 
-local long args rest ws cur nth def nm expl descr action opt arg tmp
+setopt localoptions extendedglob
+
+local long args rest ws cur nth def nm expl descr action opt arg tmp ret=1
 
 # Associative arrays used to collect information about the options.
 
@@ -336,10 +338,17 @@ else
       # We aren't in an argument directly after a option name, so
       # all option names are possible matches.
 
-      _description expl option
-      compadd "$expl[@]" - "${(@k)opts}" "${(@k)mopts}" \
-                           "${(@k)dopts}" "${(@k)dmopts}" \
-			   "${(@k)odopts}" "${(@k)odmopts}"
+      if [[ "$compconfig[option_prefix]" != *(short|all)* ||
+            "$PREFIX" = -* ]]; then
+        _description expl option
+        compadd "$expl[@]" - "${(@k)opts}" "${(@k)mopts}" \
+                             "${(@k)dopts}" "${(@k)dmopts}" \
+			     "${(@k)odopts}" "${(@k)odmopts}" && ret=0
+      fi
+      [[ $#long -ne 0 &&
+         ( "$compconfig[option_prefix]" != *(long|all)* ||
+           "$PREFIX" = --* ) ]] && \
+          _long_options && ret=0
     fi
   fi
 
@@ -362,7 +371,7 @@ else
 
       # An empty action means that we should just display a message.
       _message "$descr"
-      return 1
+      return ret
     elif [[ "$action[1]" = \( ]]; then
 
       # Anything inside `(...)' is added directly.
