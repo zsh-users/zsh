@@ -563,11 +563,15 @@ AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
 case "$LIBS" in
 *curses*)
 AC_CHECK_HEADERS(curses.h, [],
-AC_CACHE_CHECK(for Solaris 8 curses.h mistake, ac_cv_solaris_curses_h,
+[AC_CACHE_CHECK(for Solaris 8 curses.h mistake, ac_cv_header_curses_solaris,
 AC_TRY_COMPILE([#include <curses.h>], [],
 [ac_cv_header_curses_h=yes
-AC_DEFINE(HAVE_CURSES_H)],
-ac_cv_header_curses_h=no)))
+ac_cv_header_curses_solaris=yes],
+ac_cv_header_curses_h=no
+ac_cv_header_curses_solaris=no))
+if test x$ac_cv_header_curses_solaris = xyes; then
+AC_DEFINE(HAVE_CURSES_H)
+fi])
 AC_CHECK_HEADERS(term.h,
 [AC_MSG_CHECKING(if term.h needs curses.h)
 AC_TRY_COMPILE([#include <term.h>], [char **test = boolcodes;], boolcodes_with_only_term_h=yes,
