@@ -46,3 +46,8 @@ that extended function semantics are allowed.
   variables are global in the POSIX form.  (Zsh uses local dynamic scope.)
 - XTRACE is always local and turned off in the "function" form, unless
   explicitly enabled with "typeset -ft".
+
+Ksh automatically searches FPATH for any command not found in PATH, and
+autoloads the file if found.  The "autoload" command is only required if
+you want FPATH to be searched before PATH, e.g. because the function has
+the same name as a command in PATH.
