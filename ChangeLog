@@ -1,4 +1,4 @@
-2001-04-05  Bart Schaefer  <schaefer@brasslantern.com>
+2001-04-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_bart_setup: Better handling
 	of long command strings, more efficient padding computation.
@@ -19,7 +19,7 @@
 	* 13908: Completion/Base/Utility/_arguments: complete only
 	those single letter options with the right prefix character
 
-	* 13907: Src/params.c: fix for reverse subscripting of strings
+	* 13907: Src/params.c: fix for forward subscripting of strings
 	as second part of subscript ($a[x,(r)..])
 
 2001-04-04  Sven Wischnowsky  <wischnow@zsh.org>
