@@ -15,7 +15,7 @@ setopt localoptions
 [[ $1 == ":" ]] && 1="colon"
 
 # Check whether Util/helpfiles has been used to generate zsh help
-if [[ $1 == "-l" ]]
+if [[ $# == 0 || $1 == "-l" ]]
 then
     if [[ -n "${HELPDIR:-}" && -d $HELPDIR ]]
     then
