@@ -1,0 +1,6 @@
+#compdef kill
+
+_alternative \
+    'signals:: _signals -p' \
+    'processes:: _pids' \
+    'jobs:: _jobs -t'
