@@ -1,0 +1,31 @@
+#compdef links
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+_arguments -C \
+       '-async-dns:bool:(0 1)' \
+       '-max-connections:max:' \
+       '-max-connections-to-host:max:' \
+       '-retries:retries:' \
+       '-receive-timeout:secs:' \
+       '-unrestartable-receive-timeout:secs:' \
+       '-format-cache-size:pages:' \
+       '-memory-cache-size:kilobytes:' \
+       '-http-proxy:hostport:_hosts' \
+       '-ftp-proxy:hostport:_hosts' \
+       '-download-dir:_files -/' \
+       '-assume-codepage:codepage:' \
+       '-anonymous' \
+       '-dump' \
+       '-no-connect' \
+       '-source' \
+       '-version' \
+       '-help' \
+       ':url:->html' && return 0
+
+case "$state" in
+html)
+  _files -g '*.html' || _urls
+  ;;
+esac

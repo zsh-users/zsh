@@ -1,3 +1,9 @@
+2001-08-22  Clint Adams  <clint@zsh.org>
+
+        * 15683: Completion/Unix/Command/.distfiles,
+        Completion/Unix/Command/_links: completion for
+        links(1).
+
 2001-08-21  Clint Adams  <clint@zsh.org>
 
         * 15675: Src/Builtins/rlimits.awk: handle case
