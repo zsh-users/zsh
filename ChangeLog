@@ -1,5 +1,7 @@
 2000-05-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 11301: Src/Zle/zle_misc.c: AIX dependency fix
+
 	* 11300: Completion/User/_nedit: fix breakage from 11195
 
 2000-05-10  Peter Stephenson  <pws@cambridgesiliconradio.com>

@@ -57,7 +57,7 @@ doinsert(char *str)
 }
 
 /**/
-int
+mod_export int
 selfinsert(char **args)
 {
     char s[3], *p = s;
