@@ -416,13 +416,32 @@ add_match_sub(Cmatcher m, char *l, int ll, char *w, int wl)
 
     /* And add the cline. */
     if (wl || ll) {
-	n = get_cline(l, ll, w, wl, NULL, 0,
-		      flags | ((m && m->wlen == -2) ? CLF_SKIP : 0));
-	if (matchlastsub)
-	    matchlastsub->next = n;
-	else
-	    matchsubs = n;
-	matchlastsub = n;
+	Cline p, lp;
+
+	if ((p = n = bld_parts(w, wl, ll, &lp)) && n != lp) {
+	    for (; p->next != lp; p = p->next);
+
+	    if (matchsubs) {
+		matchlastsub->next = n->prefix;
+		n->prefix = matchsubs;
+	    }
+	    matchsubs = matchlastsub = lp;
+
+	    if (matchlastpart)
+		matchlastpart->next = n;
+	    else
+		matchparts = n;
+	    p->next = 0;
+	    matchlastpart = p;
+	} else {
+	    n = get_cline(l, ll, w, wl, NULL, 0,
+			  flags | ((m && m->wlen == -2) ? CLF_SKIP : 0));
+	    if (matchlastsub)
+		matchlastsub->next = n;
+	    else
+		matchsubs = n;
+	    matchlastsub = n;
+	}
     }
 }
 
@@ -792,7 +811,6 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			    add_match_sub(NULL, NULL, 0, w, ow - w);
 			else
 			    add_match_sub(NULL, NULL, 0, ow, w - ow);
-
 			add_match_sub(mp, tl, mp->llen, tw, mp->wlen);
 		    }
 		    if (sfx) {
@@ -1870,31 +1888,29 @@ join_clines(Cline o, Cline n)
 	    if ((o->flags & CLF_NEW) && !(n->flags & CLF_NEW)) {
 		Cline t, tn;
 
-		for (t = o; (tn = t->next) && (tn->flags & CLF_NEW); t = tn);
-		if (tn && cmp_anchors(tn, n, 0)) {
+		for (t = o; (tn = t->next) &&
+			 ((tn->flags & CLF_NEW) || !cmp_anchors(tn, n, 0));
+		     t = tn);
+		if (tn) {
 		    diff = sub_join(n, o, tn, 1);
 
 		    if (po)
 			po->next = tn;
 		    else
 			oo = tn;
+
 		    t->next = NULL;
 		    free_cline(o);
 		    x = o;
 		    o = tn;
-#if 0
-		    /*** These should be handled different from the ones
-			 that compare anchors. */
+
 		    if (po && po->prefix && cmp_anchors(x, po, 0)) {
 			po->flags |= CLF_MISS;
 			po->max += diff;
 		    } else {
-#endif
 			o->flags |= CLF_MISS;
 			o->max += diff;
-#if 0
 		    }
-#endif
 		    continue;
 		}
 	    }
@@ -1907,19 +1923,13 @@ join_clines(Cline o, Cline n)
 		if (tn) {
 		    diff = sub_join(o, n, tn, 0);
 
-#if 0
-		    /*** These should be handled different from the ones
-			 that compare anchors. */
 		    if (po && po->prefix && cmp_anchors(n, pn, 0)) {
 			po->flags |= CLF_MISS;
 			po->max += diff;
 		    } else {
-#endif
 			o->flags |= CLF_MISS;
 			o->max += diff;
-#if 0
 		    }
-#endif
 		    n = tn;
 		    continue;
 		}
@@ -1989,13 +1999,13 @@ join_clines(Cline o, Cline n)
 		    else
 			oo = to;
 		    o = to;
-		} else
-		    for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
-
+		}
 		if (tn) {
 		    diff = sub_join(o, n, tn, 0);
+
 		    o->flags |= CLF_MISS;
 		    o->max += diff;
+
 		    n = tn;
 		    po = o;
 		    o = o->next;
@@ -2099,4 +2109,3 @@ join_clines(Cline o, Cline n)
 	return oo;
     }
 }
-

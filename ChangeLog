@@ -1,3 +1,9 @@
+2001-01-10  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13336: Src/Zle/compmatch.c, Src/Zle/compresult.c,
+ 	Test/54compmatch.ztst: fix cursor positioning with partial-word
+ 	match specs using `**'
+	
 2001-01-08  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13331: Src/Zle/compcore.c, Src/Zle/compresult.c: fix for

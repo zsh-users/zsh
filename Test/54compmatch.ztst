@@ -414,9 +414,9 @@
  test_code 'r:|[A-Z0-9]=** r:|=*' example6_list
  comptest $'tst 2\t\t'
 0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input 2
->line: {tst 523}{}
+>line: {tst 5}{23}
 >COMPADD:{}
->line: {tst 523}{}
+>line: {tst 5}{23}
 >COMPADD:{}
 >NO:{5bar234}
 >NO:{5foo123}

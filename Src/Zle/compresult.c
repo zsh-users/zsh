@@ -163,13 +163,14 @@ static char *
 cline_str(Cline l, int ins, int *csp)
 {
     Cline s;
-    int ocs = cs, ncs, pcs, scs, pm, pmax, pmm, sm, smax, smm, d, dm, mid;
+    int ocs = cs, ncs, pcs, scs;
+    int pm, pmax, pmm, pma, sm, smax, smm, sma, d, dm, mid;
     int i, j, li = 0, cbr;
     Brinfo brp, brs;
 
     l = cut_cline(l);
 
-    pmm = smm = dm = pcs = scs = 0;
+    pmm = pma = smm = sma = dm = pcs = scs = 0;
     pm = pmax = sm = smax = d = mid = cbr = -1;
     brp = brs = NULL;
 
@@ -242,9 +243,11 @@ cline_str(Cline l, int ins, int *csp)
 	/* Remember the position if this is the first prefix with
 	 * missing characters. */
 	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF) &&
-	    ((pmax < (l->min - l->max) && (!pmm || (l->flags & CLF_MATCHED))) ||
+	    (((pmax < (l->max - l->min) || (pma && l->max != l->min)) &&
+	      (!pmm || (l->flags & CLF_MATCHED))) ||
 	     ((l->flags & CLF_MATCHED) && !pmm))) {
-	    pm = cs; pmax = l->min - l->max; pmm = l->flags & CLF_MATCHED;
+	    pm = cs; pmax = l->max - l->min; pmm = l->flags & CLF_MATCHED;
+	    pma = ((l->prefix || l->suffix) && l->min == cline_sublen(l));
 	}
 	if (ins) {
 	    int ocs, bl;
@@ -289,10 +292,11 @@ cline_str(Cline l, int ins, int *csp)
 	    if (l->flags & CLF_MID)
 		mid = cs;
 	    else if ((l->flags & CLF_SUF) && 
-		     ((smax < (l->min - l->max) &&
+		     (((smax < (l->min - l->max) || (sma && l->max != l->min)) &&
 		       (!smm || (l->flags & CLF_MATCHED))) ||
 		      ((l->flags & CLF_MATCHED) && !smm))) {
 		sm = cs; smax = l->min - l->max; smm = l->flags & CLF_MATCHED;
+		sma = ((l->prefix || l->suffix) && l->min == cline_sublen(l));
 	    }
 	}
 	if (ins) {
