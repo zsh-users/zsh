@@ -66,6 +66,8 @@ statmodeprint(mode_t mode, char *outbuf, int flags)
 	    *pm = 'c';
 	else if (S_ISDIR(mode))
 	    *pm = 'd';
+	else if (S_ISDOOR(mode))
+	    *pm = 'D';
 	else if (S_ISFIFO(mode))
 	    *pm = 'p';
 	else if (S_ISLNK(mode))

@@ -409,6 +409,7 @@ struct timezone {
 # undef S_ISBLK
 # undef S_ISCHR
 # undef S_ISDIR
+# undef S_ISDOOR
 # undef S_ISFIFO
 # undef S_ISLNK
 # undef S_ISMPB
@@ -435,6 +436,9 @@ struct timezone {
 #endif
 #if !defined(S_ISDIR) && defined(S_IFDIR)
 # define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+#if !defined(S_ISDOOR) && defined(S_IFDOOR)      /* Solaris */
+# define S_ISDOOR(m) (((m) & S_IFMT) == S_IFDOOR)
 #endif
 #if !defined(S_ISFIFO) && defined(S_IFIFO)
 # define S_ISFIFO(m) (((m) & S_IFMT) == S_IFIFO)
@@ -474,6 +478,9 @@ struct timezone {
 #endif
 #ifndef S_ISDIR
 # define S_ISDIR(m) ((void)(m), 0)
+#endif
+#ifndef S_ISDOOR
+# define S_ISDOOR(m) ((void)(m), 0)
 #endif
 #ifndef S_ISFIFO
 # define S_ISFIFO(m) ((void)(m), 0)
