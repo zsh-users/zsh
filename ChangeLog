@@ -1,5 +1,8 @@
 2003-12-18  Peter Stephenson  <pws@csr.com>
 
+	* 19315: Src/lex.c, Src/math.c, Src/params.c, Src/Zle/compcore.c,
+	Src/Zle/zle_main.c: missing mod_export definitions.
+
 	* unposted: Config/version.mk, Completion/Unix/Command/.distfiles:
 	zsh-4.0.8.
 

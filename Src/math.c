@@ -40,7 +40,7 @@ int noeval;
 /* integer zero */
 
 /**/
-mnumber zero_mnumber;
+mod_export mnumber zero_mnumber;
 
 /* last input base we used */
 

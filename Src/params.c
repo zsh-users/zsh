@@ -763,7 +763,7 @@ copyparam(Param tpm, Param pm, int toplevel)
 /* Return 1 if the string s is a valid identifier, else return 0. */
 
 /**/
-int
+mod_export int
 isident(char *s)
 {
     char *ss;

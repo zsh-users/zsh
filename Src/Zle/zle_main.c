@@ -64,7 +64,7 @@ int mark;
 /* last character pressed */
 
 /**/
-int c;
+mod_export int c;		/* YUK! */
 
 /* the bindings for the previous and for this key */
 
@@ -99,9 +99,9 @@ mod_export Widget compwidget;
 /* the status line, and its length */
 
 /**/
-char *statusline;
+mod_export char *statusline;
 /**/
-int statusll;
+mod_export int statusll;
 
 /* The current history line and cursor position for the top line *
  * on the buffer stack.                                          */

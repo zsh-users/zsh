@@ -44,7 +44,7 @@ mod_export char *tokstr;
 /**/
 mod_export int tok;
 /**/
-int tokfd;
+mod_export int tokfd;
 
 /* lexical analyzer error flag */
  
