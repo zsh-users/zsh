@@ -1,5 +1,8 @@
 2003-04-24  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Type/_perl_basepods: use _message
+	instead of echo for error message
+
 	* 18468: Completion/Unix/Type/_perl_builtin_funcs: follow Bart's
 	suggestion of using perldoc itself to retrieve the documentation
 

@@ -8,7 +8,7 @@
 # The result is cached for future use.
 #
 
-if [[ ${+_perl_basepods} -eq 0 ]]; then
+if (( ! $+_perl_basepods )); then
   typeset -agU _perl_basepods
 
   if (( ${+commands[basepods]} )); then
@@ -19,7 +19,7 @@ if [[ ${+_perl_basepods} -eq 0 ]]; then
     podpath=$(perl -MConfig -e 'print "$Config{installprivlib}/pod"')
 
     if [[ ! -e $podpath/perl.pod ]]; then
-      echo "Couldn't find perl.pod from Config.pm; giving up."
+      _message "can't find perl.pod from Config.pm; giving up"
       return 1
     else
       _perl_basepods=( ${podpath}/*.pod(:r:t) )
@@ -29,4 +29,4 @@ fi
 
 local expl
 
-_wanted pods expl 'Perl base pods' compadd -a _perl_basepods
+_wanted pods expl 'perl base pods' compadd -a - _perl_basepods
