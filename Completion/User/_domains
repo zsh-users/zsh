@@ -10,7 +10,7 @@ if ! zstyle -a ":completion${curcontext}:domains" domains domains; then
         [[ "$tmp" = (domain|search)* ]] &&
             _cache_domains=( "$_cache_domains[@]" "${=${tmp%%[ 	]#}#*[ 	]}" )
       done < /etc/resolv.conf
-      _cache_domains=( "${(@)_nslookup_domains:#[ 	]#}" )
+      _cache_domains=( "${(@)_cache_domains:#[ 	]#}" )
     fi
   fi
   domains=( "$_cache_domains[@]" )
