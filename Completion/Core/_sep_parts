@@ -18,7 +18,7 @@
 # `-X explanation' options.
 
 local str arr sep test testarr tmparr prefix suffixes matchers autosuffix
-local matchflags opt group expl nm=$compstate[nmatches] opre osuf
+local matchflags opt group expl nm=$compstate[nmatches]
 
 # Get the options.
 
@@ -34,8 +34,6 @@ shift OPTIND-1
 
 # Get the string from the line.
 
-opre="$PREFIX"
-osuf="$SUFFIX"
 str="$PREFIX$SUFFIX"
 SUFFIX=""
 prefix=""
@@ -146,8 +144,6 @@ done
 
 # Add the matches for each of the suffixes.
 
-PREFIX="$pre"
-SUFFIX="$suf"
 for i in "$suffixes[@]"; do
   compadd -U "$group[@]" "$expl[@]" "$matchers[@]" "$autosuffix[@]" \
           -i "$IPREFIX" -I "$ISUFFIX" -p "$prefix" -s "$i" - "$testarr[@]"

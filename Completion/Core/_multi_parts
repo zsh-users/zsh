@@ -7,7 +7,7 @@
 # The parts of words from the array that are separated by the
 # separator character are then completed independently.
 
-local sep matches pref npref i tmp1 group expl menu pre suf opre osuf cpre
+local sep matches pref npref i tmp1 group expl menu pre suf
 typeset -U tmp2
 
 # Get the options.
@@ -40,8 +40,6 @@ fi
 
 pre="$PREFIX"
 suf="$SUFFIX"
-opre="$PREFIX"
-osuf="$SUFFIX"
 orig="$PREFIX$SUFFIX"
 
 # Special handling for menucompletion?
@@ -102,17 +100,14 @@ while true; do
         matches=( "${(@M)matches:#${tmp1[1]}*}" )
 	tmp2=( "${(@M)matches:#${tmp1[1]}${sep}*}" )
 
-	PREFIX="${cpre}${pre}"
-	SUFFIX="$suf"
-
 	if (( $#tmp2 )); then
-	  compadd "$group[@]" "$expl[@]" -p "$pref" -qS "$sep" \
-                  -M "r:|${sep}=* r:|=*" - "$tmp1[1]"
+	  compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+	          -p "$pref" -qS "$sep" - "$tmp1[1]"
         else
-	  compadd "$group[@]" "$expl[@]" -p "$pref" \
-                  -M "r:|${sep}=* r:|=*" - "$tmp1[1]"
+	  compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+	          -p "$pref" - "$tmp1[1]"
         fi
-	return 0
+	return 1
       fi
     elif (( $#tmp1 )); then
 
@@ -123,14 +118,6 @@ while true; do
       SUFFIX="$suf"
       compadd -O matches -M "r:|${sep}=* r:|=*" - "$matches[@]"
 
-      if [[ "$pre" = *${sep}* ]]; then
- 	PREFIX="${cpre}${pre%%${sep}*}"
-	SUFFIX="${sep}${pre#*${sep}}${suf}"
-      else
-        PREFIX="${cpre}${pre}"
-	SUFFIX="$suf"
-      fi
-
       if [[ -n "$menu" ]]; then
         # With menucompletion we just add matches for the matching
         # components with the prefix we collected and the rest from the
@@ -138,12 +125,11 @@ while true; do
 
         tmp2="$pre$suf"
         if [[ "$tmp2" = *${sep}* ]]; then
-          compadd "$group[@]" "$expl[@]" \
-                  -p "$pref" -s "${sep}${tmp2#*${sep}}" \
-                  -M "r:|${sep}=* r:|=*" - "$tmp1[@]"
+          compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+	          -p "$pref" -s "${sep}${tmp2#*${sep}}" - "$tmp1[@]"
         else
-          compadd "$group[@]" "$expl[@]" -p "$pref"\
-                  -M "r:|${sep}=* r:|=*" - "$tmp1[@]"
+          compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+	          -p "$pref" - "$tmp1[@]"
         fi
       else
         # With normal completion we add all matches one-by-one with
@@ -152,12 +138,11 @@ while true; do
 
         for i in "${(@M)matches:#(${(j:|:)~tmp1})*}"; do
 	  if [[ "$i" = *${sep}* ]]; then
-            compadd "$group[@]" "$expl[@]" -S '' \
-	            -p "$pref" -s "${i#*${sep}}" \
-                    -M "r:|${sep}=* r:|=*" - "${i%%${sep}*}${sep}"
+            compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+	            -S '' -p "$pref" -s "${i#*${sep}}" - "${i%%${sep}*}${sep}"
           else
-            compadd "$group[@]" "$expl[@]" -S '' -p "$pref" \
-                    -M "r:|${sep}=* r:|=*" - "$i"
+            compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+	            -S '' -p "$pref" - "$i"
           fi
         done
       fi
@@ -169,15 +154,12 @@ while true; do
 
       [[ "$orig" = "$pref$pre$suf" ]] && return 1
 
-      PREFIX="${cpre}${pre}"
-      SUFFIX="$suf"
-
       if [[ -n "$suf" ]]; then
-        compadd "$group[@]" "$expl[@]" -s "$suf" \
-                -M "r:|${sep}=* r:|=*" - "$pref$pre"
+        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+	        -s "$suf" - "$pref$pre"
       else
-        compadd "$group[@]" "$expl[@]" -S '' \
-                -M "r:|${sep}=* r:|=*" - "$pref$pre"
+        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+	        -S '' - "$pref$pre$suf"
       fi
       return 0
     fi
@@ -193,10 +175,8 @@ while true; do
   # Now we set `pre' and `suf' to their new values.
 
   if [[ "$pre" = *${sep}* ]]; then
-    cpre="${cpre}${pre%%${sep}*}${sep}"
     pre="${pre#*${sep}}"
   elif [[ "$suf" = *${sep}* ]]; then
-    cpre="${cpre}${pre}${suf%%${sep}*}${sep}"
     pre="${suf#*${sep}}"
     suf=""
   else
@@ -204,11 +184,9 @@ while true; do
     # unambiguous prefix and that differs from the original string,
     # we insert it.
 
-    PREFIX="${opre}${osuf}"
-    SUFFIX=""
-
     [[ -n "$pref" && "$orig" != "$pref" ]] &&
-        compadd "$group[@]" "$expl[@]" -S '' -M "r:|${sep}=* r:|=*" - "$pref"
+        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+	        -S '' - "$pref"
 
     return
   fi

@@ -24,7 +24,7 @@
 #    menucompletion.
 
 local linepath realpath donepath prepath testpath exppath
-local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf opre osuf cpre
+local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf
 local pats haspats=no ignore group expl addpfx addsfx remsfx
 local nm=$compstate[nmatches] menu
 
@@ -118,8 +118,6 @@ fi
 
 pre="$PREFIX"
 suf="$SUFFIX"
-opre="$PREFIX"
-osuf="$SUFFIX"
 orig="${PREFIX}${SUFFIX}"
 
 [[ $compstate[insert] = (*menu|[0-9]*) || -n "$_comp_correct" ||
@@ -293,8 +291,6 @@ for prepath in "$prepaths[@]"; do
 
       if [[ "$haspats" = no && -z "$tpre$tsuf" &&
 	"$pre" = */ && -z "$suf" ]]; then
-	PREFIX="${opre}${osuf}"
-	SUFFIX=""
         compadd -nQS '' - "$linepath$donepath$orig"
         tmp4=-
       fi
@@ -353,27 +349,19 @@ for prepath in "$prepaths[@]"; do
       # collected as the suffixes to make the completion code expand
       # it as far as possible.
 
-      if [[ "$tmp3" = */* ]]; then
-        PREFIX="${linepath}${cpre}${tmp3%%/*}"
-	SUFFIX="/${tmp3#*/}"
-      else
-        PREFIX="${linepath}${cpre}${tmp3}"
-	SUFFIX=""
-      fi
-
       if [[ -n $menu ]]; then
         [[ -n "$compconfig[path_cursor]" ]] && compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
 	  compadd -QUf -p "$linepath${testpath:q}" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
-+ 		  "$group[@]" "$expl[@]" \
+		  "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
 		  - "${(@)${(@)tmp1%%/*}:q}"
 	else
 	  compadd -QUf -p "$linepath${testpath:q}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
 		   "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
-		   "$group[@]" "$expl[@]" \
+		   "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
 		   - "${(@)tmp1:q}"
 	fi
       else
@@ -382,14 +370,14 @@ for prepath in "$prepaths[@]"; do
 	    compadd -QUf -p "$linepath${testpath:q}" -s "/${${i#*/}:q}" \
 		    -W "$prepath$realpath$testpath" "$ignore[@]" \
 		    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
-		    "$group[@]" "$expl[@]" \
+		    "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
 		    - "${${i%%/*}:q}"
 	  done
         else
 	  compadd -QUf -p "$linepath${testpath:q}" \
 		  -W "$prepath$realpath$testpath" "$ignore[@]" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
-		  "$group[@]" "$expl[@]" \
+		  "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
 		  - "${(@)tmp1:q}"
         fi
       fi
@@ -411,17 +399,14 @@ for prepath in "$prepaths[@]"; do
     testpath="${testpath}${tmp1[1]%%/*}/"
     tmp1=( "${(@)tmp1#*/}" )
 
-    cpre="${cpre}${tmp3%%/*}/"
     tmp3="${tmp3#*/}"
   done
 
-  if [[ -z "$tmp4" ]]; then 
-     PREFIX="${opre}${osuf}"
-     SUFFIX=""
-     compadd -QUf -p "$linepath${testpath:q}" \
+  if [[ -z "$tmp4" ]]; then
+    compadd -QUf -p "$linepath${testpath:q}" \
 	    -W "$prepath$realpath$testpath" "$ignore[@]" \
 	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
-	    "$group[@]" "$expl[@]" \
+	    "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
 	    - "${(@)tmp1:q}"
   fi
 done
@@ -434,9 +419,7 @@ exppaths=( "${(@)exppaths:#$orig}" )
 
 if [[ -n "$compconfig[path_expand]" &&
       $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
-   PREFIX="${opre}${osuf}"
-   SUFFIX=""
-   compadd -Q -S '' "$group[@]" "$expl[@]" \
+  compadd -QU -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
           -M 'r:|/=* r:|=*' -p "$linepath" - "$exppaths[@]"
 fi
 
