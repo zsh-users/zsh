@@ -20,6 +20,10 @@ elif [[ "$1" = -t* ]]; then
   shift
 fi
 
+[[ "$_type" = options && ! -prefix [-+]* ]] && \
+    zstyle -T ":completion:${curcontext}:options" prefix-needed &&
+        return 1
+
 # Do the tests. `showd' is set if the descriptions should be shown.
 
 zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes

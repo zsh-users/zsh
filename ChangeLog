@@ -1,3 +1,9 @@
+2003-04-22  Oliver Kiddle  <opk@zsh.org>
+
+	* 18458: Completion/Unix/Command/_renice: new completion for renice
+
+	* 18458: Completion/Base/Utility/_describe: handle the prefix-needed style
+
 2003-04-19  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
 	* 18455: Completion/Unix/Command/_screen,
