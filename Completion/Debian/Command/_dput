@@ -1,0 +1,29 @@
+#compdef dput
+
+if (( ! $+_dput_sites )); then
+  _dput_sites=(
+$(grep "^\[" /etc/dput.cf | sed -e 's,\[,,g' -e 's,\],,g')
+)
+fi
+
+_arguments '(-c)--config[config file]:config file:' \
+           '(--config)-c[config file]:config file:' \
+           '(--debug)-d[debug mode]' \
+           '(-d)--debug[debug mode]' \
+           '(--dinstall)-D[run dinstall after upload]' \
+           '(-D)--dinstall[run dinstall after upload]' \
+           '(--force)-f[force upload of already uploaded package]' \
+           '(-f)--force[force upload of already uploaded package]' \
+           '(--lintian)-l[run lintian before upload]' \
+           '(-l)--lintian[run lintian before upload]' \
+           '(-o)--check-only[check the package, do not upload]' \
+           '(--check-only)-o[check the package, do not upload]' \
+           '(--print)-p[print configuration]' \
+           '(-p)--print[print configuration]' \
+           '(--simulate)-s[simulate an upload only]' \
+           '(-s)--simulate[simulate an upload only]' \
+           '(--unchecked)-u[do not check GPG signature on the changes file]' \
+           '(-u)--unchecked[do not check GPG signature on the changes file]' \
+           '(-v)--version[version]' \
+           '(--version)-v[version]' \
+           '*:changes file:_files -g \*.changes' \
