@@ -951,6 +951,7 @@ cd_try_chdir(char *pfix, char *dest, int hard)
     else
 	unmetafy(buf, &dlen);
 
+    if (lchdir(dest, NULL, hard))	/* Try plain relative first */
     if (lchdir(buf, NULL, hard)) {
 	free(buf);
 	return NULL;
