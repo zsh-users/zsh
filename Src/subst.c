@@ -730,6 +730,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int arrasg = 0;
     int eval = 0;
     int aspar = 0;
+    int presc = 0;
     int nojoin = 0;
     char inbrace = 0;		/* != 0 means ${...}, otherwise $... */
     char hkeys = 0;
@@ -932,6 +933,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case 't':
 		    wantt = 1;
+		    break;
+
+		case '%':
+		    presc = 1;
 		    break;
 
 		default:
@@ -1567,6 +1572,28 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		makelowercase(&val);
 	    else
 		makecapitals(&val);
+	}
+    }
+    if (presc) {
+	int len;
+
+	if (isarr) {
+	    char **ap;
+
+	    if (!copied)
+		aval = arrdup(aval), copied = 1;
+	    ap = aval;
+	    for (; *ap; ap++) {
+		unmetafy(*ap, &len);
+		*ap = unmetafy(promptexpand(metafy(*ap, len, META_NOALLOC),
+					    0, NULL, NULL), &len);
+	    }
+	} else {
+	    if (!copied)
+		val = dupstring(val), copied = 1;
+	    unmetafy(val, &len);
+	    val = unmetafy(promptexpand(metafy(val, len, META_NOALLOC),
+					0, NULL, NULL), &len);
 	}
     }
     if (quotemod) {

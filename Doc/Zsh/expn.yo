@@ -587,6 +587,10 @@ Quote the resulting words with backslashes.
 item(tt(Q))(
 Remove one level of quotes from the resulting words.
 )
+item(tt(%))(
+Expand all tt(%) escapes in the resulting words in the same way as in
+prompts (see noderef(Prompt Expansion)).
+)
 item(tt(X))(
 With this flag parsing errors occuring with the tt(Q) flag or the
 pattern matching forms such as `tt(${)var(name)tt(#)var(pattern)tt(})' 
