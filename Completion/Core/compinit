@@ -27,6 +27,17 @@
 #     rather than by the context.  The widget has the same name as
 #     the autoload file and can be bound using bindkey in the normal way.
 #
+#   `#compdef -K <widget-name> <style> <key-sequence> [ ... ]
+#     This is similar to -k, except it takes any number of sets of
+#     three arguments.  In each set, the widget <widget-name> will
+#     be defined, which will behave as <style>, as with -k, and will
+#     be bound to <key-sequence>, exactly one of which must be defined.
+#     <widget-name> must be different for each:  this must begin with an
+#     underscore, else one will be added, and should not clash with other
+#     completion widgets (names based on the name of the function are the
+#     clearest), but is otherwise arbitrary.  It can be tested in the
+#     function by the parameter $WIDGET.
+#
 #   `#autoload'
 #     this is for helper functions that are not used to
 #     generate matches, but should automatically be loaded
@@ -157,11 +168,11 @@ compdef() {
     return 1
   fi
   
-  while getopts "anpPkd" opt; do
+  while getopts "anpPkKd" opt; do
     case "$opt" in
     a)    autol=yes;;
     n)    new=yes;;
-    [pPk]) if [[ -n "$type" ]]; then
+    [pPkK]) if [[ -n "$type" ]]; then
             # Error if both `-p' and `-k' are given (or one of them
 	    # twice).
             echo "$0: type already set to $type"
@@ -171,6 +182,8 @@ compdef() {
 	    type=pattern
 	  elif [[ "$opt" = P ]]; then
 	    type=postpattern
+	  elif [[ "$opt" = K ]]; then
+	    type=widgetkey
 	  else
 	    type=key
 	  fi
@@ -211,6 +224,24 @@ compdef() {
       fi
       _postpatcomps=("$_postpatcomps[@]" "$1 $func")
       ;;
+    widgetkey)
+      while [[ -n $1 ]]; do
+	if [[ $# -lt 3 ]]; then
+	  echo "$0: compdef -K requires <widget> <comp-widget> <key>"
+	  return 1
+	fi
+	[[ $1 = _* ]] || 1="_$1"
+	[[ $2 = .* ]] || 2=".$2"
+	zle -C "$1" "$2" "$func"
+	if [[ -n $new ]]; then
+	  bindkey "$3" | read -A opt
+	  [[ $opt[-1] = undefined-key ]] && bindkey "$3" "$1"
+	else
+	  bindkey "$3" "$1"
+	fi
+	shift 3
+      done
+      ;;	 
     key)
       if [[ $# -lt 2 ]]; then
         echo "$0: missing keys"
@@ -416,7 +447,7 @@ if [[ -z "$_i_done" ]]; then
       shift _i_line
       case $_i_tag in
       (\#compdef)
-	if [[ $_i_line[1] = -[pPk](n|) ]]; then
+	if [[ $_i_line[1] = -[pPkK](n|) ]]; then
 	  compdef ${_i_line[1]}na "${_i_file:t}" "${(@)_i_line[2,-1]}"
 	else
 	  compdef -na "${_i_file:t}" "${_i_line[@]}"

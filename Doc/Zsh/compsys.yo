@@ -176,6 +176,22 @@ be invoked to generate the matches. The widget created has the same
 name as the file and can also be bound to other keys using tt(bindkey) 
 as usual.
 )
+item(tt(#compdef -K) var(widget-name) var(style) var(key-sequences) ...)(
+This is similar to tt(-k), with the same var(style) and var(key-sequences)
+arguments arguments, preceeded by a string giving the name of a widget.
+In this case only one var(key-sequences) argument may be given, but the
+entire set of three arguments may be repeated with a different set of
+arguments.  In particular, the var(widget-name) must be distinct in each
+set.  It should begin with `tt(_)', else one will be added, and should not
+clash with the name of any existing widget: names based on the name of the
+function are most useful.  For example,
+
+example(#compdef -K _foo_complete complete-word "^X^C" \ 
+  _foo_list list-choices "^X^D")
+
+(all on one line) defines a widget tt(_foo_complete) for completion, bound
+to `tt(^X^C)', and a widget tt(_foo_list) for listing, bound to `tt(^X^D)'.
+)
 item(tt(#autoload))(
 This is used for files defining utility function that are not to be
 called directly as completion functions but should be loaded automatically
@@ -201,7 +217,8 @@ xitem(tt(compdef) [ tt(-an) ] var(function names...))
 xitem(tt(compdef -d) var(names...))
 xitem(tt(compdef -p) [ tt(-a) ] var(function pattern))
 xitem(tt(compdef -P) [ tt(-a) ] var(function pattern))
-item(tt(compdef -k) [ tt(-a) ] var(function style key-sequences...))(
+xitem(tt(compdef -k) [ tt(-an) ] var(function style key-sequences...))
+item(tt(compdef -K) [ tt(-an) ] var(function name style key-sequences ...))(
 The first form tells the completion system to call the given
 var(function) when completing for the contexts or commands
 whose var(names) are given:  this is like the tt(#compdef) tag.  If the
@@ -209,16 +226,16 @@ tt(-n) option is given, any existing completion behaviour for particular
 contexts or commands will not be altered.  These definitions can be deleted
 by giving the tt(-d) option as in the second form.
 
-The third form is similar to the first, but var(function) will be called
-for all commands whose name matches the var(pattern); this is like the
-tt(#compdef -p) function tag.
+The form with tt(-p) is similar to the first, but var(function) will be
+called for all commands whose name matches the var(pattern); this is like
+the tt(#compdef -p) function tag.
 
-The fourth form is like the third, but the var(function) will be
+The form with tt(-P) is like the third, but the var(function) will be
 called only if no function for the command itself was found or if one
 was found and it set the tt(_compskip) parameter to a value em(not)
 containing the substring `tt(patterns)'.
 
-The fifth form defines a widget with the same name as the var(function)
+The form with tt(-k) defines a widget with the same name as the var(function)
 which will be called for each of the var(key-sequences); this is like the
 tt(#compdef -k) tag.  The function should generate the completions needed
 and will otherwise behave like the builtin widget whose name is given as
@@ -229,6 +246,12 @@ tt(menu-expand-or-complete), and tt(reverse-menu-complete), as well as
 tt(menu-select) if the tt(complist) module is loaded.  The option tt(-n)
 prevents the key being bound if it is already to bound to something other
 than tt(undefined-key).
+
+The form with tt(-K) is similar and defines multiple widgets based on the
+same var(function), each of which requires the set of three arguments
+var(name), var(style) and var(key-sequences), where the latter two are as
+for tt(-k) and the first must be a unique widget name beginning with an
+underscore.
 
 In each of the forms supporting it the tt(-a) option makes the
 var(function) autoloadable (exactly equivalent to

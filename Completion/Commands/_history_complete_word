@@ -1,4 +1,4 @@
-#compdef -k complete-word \e/ \e,
+#compdef -K _history-complete-older complete-word \e/ _history-complete-newer complete-word \e,
 #
 # Complete words from the history
 #
@@ -19,19 +19,11 @@
 _history_complete_word () {
   local expl direction
 
-  case "$KEYS" in 
-    ',')  direction='newer'
-            ;;
-    '/')  direction='older'
-            ;;
-        *)  print <<EOF
-The keypress \`$KEYS\' was not understood by _history_complete_word.
-You must alter _history_complete_word if you want to bind it to keys
-other than the defaults, so that it knows which direction the key
-should move in the history.
-EOF
-            return 1
-  esac
+  if [[ $WIDGET = *newer ]]; then
+    direction=older
+  else
+    direction=newer
+  fi
 
   [[ -z "$compconfig[history_list]" ]] && compstate[list]=''
 
