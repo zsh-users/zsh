@@ -1,3 +1,10 @@
+2001-03-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (but see 13646 and users/3563): Doc/Zsh/contrib.yo,
+	Functions/Misc/.distfiles, Functions/Misc/zkdb: Function to read
+	keyboard sequences and save them in an associative array for later
+	reference (much improved from posted version, which was broken).
+
 2001-03-15  Peter Stephenson  <pws@csr.com>
 
 	* users/3671: Completion/User/_java: complete in middle of

@@ -75,6 +75,8 @@ installation; if it is not, copy tt(Functions/Misc/run-help) to an
 appropriate directory.
 
 subsect(Recompiling Functions)
+cindex(functions, recompiling)
+cindex(zrecompile utility)
 
 If you frequently edit your zsh functions, or periodically update your zsh
 installation to track the latest developments, you may find that function
@@ -82,7 +84,7 @@ digests compiled with the tt(zcompile) builtin are frequently out of date
 with respect to the function source files.  This is not usually a problem,
 because zsh always looks for the newest file when loading a function, but
 it may cause slower shell startup and function loading.  Also, if a digest
-file is explicitly used as element of tt(fpath), zsh won't check whether
+file is explicitly used as an element of tt(fpath), zsh won't check whether
 any of its source files has changed.
 
 The tt(zrecompile) autoloadable function, found in tt(Functions/Misc), can
@@ -160,7 +162,51 @@ Once the digests have been created and your tt(fpath) modified to refer to
 them, you can keep them up to date by running tt(zrecompile) with no
 arguments.
 
+subsect(Keyboard Definition)
+cindex(keyboard definition)
+
+findex(zkbd)
+The large number of possible combinations of keyboards, workstations,
+terminals, emulators, and window systems makes it impossible for zsh to
+have built-in key bindings for every situation.  The tt(zkbd) utility,
+found in Functions/Misc, can help you quickly create key bindings for your
+configuration.
+
+Run tt(zkbd) either as an autoloaded function, or as a shell script:
+
+example(zsh -f ~/zsh-version()/Functions/Misc/zkbd)
+
+When you run tt(zkbd), it first asks you to enter your terminal type; if
+the default it offers is correct, just press return.  It then asks you to
+press a number of different keys to determine characteristics of your
+keyboard and terminal; tt(zkbd) warns you if it finds anything out of the
+ordinary, such as a Delete key that sends neither tt(^H) nor tt(^?).
+
+The keystrokes read by tt(zkbd) are recorded as a definition for an
+associative array named tt(key), written to a file in the subdirectory
+tt(.zkbd) within either your tt(HOME) or tt(ZDOTDIR) directory.  The name
+of the file is composed from the tt(TERM), tt(VENDOR) and tt(OSTYPE)
+parameters, joined by hyphens.
+
+You may read this file into your tt(.zshrc) or another startup file with
+the "source" or "." commands, then reference the tt(key) parameter in
+bindkey commands, like this:
+
+example(source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
+[[ -n ${key[Left]} ]] && bindkey "${key[Left]}" backward-char
+[[ -n ${key[Right]} ]] && bindkey "${key[Right]}" forward-char
+# etc.)
+
+Note that in order for `tt(autoload zkbd)' to work, the tt(zkdb) file must
+be in one of the directories named in your tt(fpath) array (see
+ifzman(zmanref(zshparam))\
+ifnzman(noderef(Parameters Used By The Shell))\
+).  This should already be the case if you have a standard zsh
+installation; if it is not, copy tt(Functions/Misc/zkbd) to an
+appropriate directory.
+
 subsect(Dumping Shell State)
+cindex(reporter utility)
 
 Occasionally you may encounter what appears to be a bug in the shell,
 particularly if you are using a beta version of zsh or a development
@@ -747,6 +793,11 @@ item(tt(zln) [ tt(-finqQsvw) ] var(srcpat) var(dest))(
 Same as tt(zmv -C) and tt(zmv -L), respectively.  These functions do not
 appear in the zsh distribution, but can be created by linking tt(zmv) to
 the names tt(zcp) and tt(zln) in some directory in your tt(fpath).
+)
+item(tt(zkbd))(
+See `Keyboard Definition'
+ifzman(above)\
+ifnzman((noderef(Utilities))).
 )
 findex(zmv)
 item(tt(zmv) [ tt(-finqQsvw) ] [ -C | -L | -M | -p var(program) ] [ -o var(optstring) ] var(srcpat) var(dest) )(
