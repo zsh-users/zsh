@@ -937,7 +937,7 @@ After that the shell function tt(complete-files) will be invoked
 after typing control-X and TAB. The function should then generate the
 matches, e.g.:
 
-example(complete-filles LPAR()RPAR() { compadd - * })
+example(complete-files LPAR()RPAR() { compadd - * })
 
 This function will complete files in the current directory matching the 
 current word.
