@@ -291,73 +291,86 @@ downhistory(void)
 	feep();
 }
 
+static int histpos, srch_hl, srch_cs = -1;
+static char *srch_str;
+
 /**/
 void
 historysearchbackward(void)
 {
-    int histpos, histmpos, hl = histline;
+    int hl = histline;
     int n = zmult;
     char *s;
 
-    if (!n)
-	return;
-    if (n < 0) {
+    if (zmult < 0) {
 	zmult = -n;
 	historysearchforward();
 	zmult = n;
 	return;
     }
-    for (histpos = histmpos = 0; histpos < ll && !iblank(line[histpos]);
-	histpos++, histmpos++)
-	if(imeta(line[histpos]))
-	    histmpos++;
+    if (hl == curhist || hl != srch_hl || cs != srch_cs || mark != 0
+     || memcmp(srch_str, line, histpos) != 0) {
+	zfree(srch_str, histpos);
+	for (histpos = 0; histpos < ll && !iblank(line[histpos]); histpos++) ;
+	if (histpos < ll)
+	    histpos++;
+	srch_str = zalloc(histpos);
+	memcpy(srch_str, line, histpos);
+    }
     for (;;) {
 	hl--;
 	if (!(s = zle_get_event(hl))) {
 	    feep();
 	    return;
 	}
-	if (metadiffer(s, (char *) line, histpos) < 0 &&
-	    iblank(s[histmpos] == Meta ? s[histmpos+1]^32 : s[histmpos]) &&
-	    metadiffer(s, (char *) line, ll) && !--n)
-	    break;
+	if (metadiffer(s, srch_str, histpos) < 0 &&
+	    metadiffer(s, srch_str, ll)) {
+	    if (--n <= 0)
+		break;
+	}
     }
     zle_goto_hist(hl);
+    srch_hl = hl;
+    srch_cs = cs;
 }
 
 /**/
 void
 historysearchforward(void)
 {
-    int histpos, histmpos, hl = histline;
+    int hl = histline;
     int n = zmult;
     char *s;
 
-    if (!n)
-	return;
-    if (n < 0) {
+    if (zmult < 0) {
 	zmult = -n;
 	historysearchbackward();
 	zmult = n;
 	return;
     }
-    for (histpos = histmpos = 0; histpos < ll && !iblank(line[histpos]);
-	histpos++, histmpos++)
-	if(imeta(line[histpos]))
-	    histmpos++;
+    if (hl == curhist || hl != srch_hl || cs != srch_cs || mark != 0
+     || memcmp(srch_str, line, histpos) != 0) {
+	zfree(srch_str, histpos);
+	for (histpos = 0; histpos < ll && !iblank(line[histpos]); histpos++) ;
+	if (histpos < ll)
+	    histpos++;
+	srch_str = zalloc(histpos);
+	memcpy(srch_str, line, histpos);
+    }
     for (;;) {
 	hl++;
 	if (!(s = zle_get_event(hl))) {
 	    feep();
 	    return;
 	}
-	if (metadiffer(s, (char *) line, histpos) < (histline == curhist) &&
-	    (!s[histmpos] ||
-	     iblank(s[histmpos] == Meta ? s[histmpos+1]^32 : s[histmpos])) &&
-	    metadiffer(s, (char *) line, ll) && !--n)
-	    break;
+	if (metadiffer(s, srch_str, histpos) < (hl == curhist) &&
+	    metadiffer(s, srch_str, ll))
+	    if (--n <= 0)
+		break;
     }
     zle_goto_hist(hl);
+    srch_hl = hl;
+    srch_cs = cs;
 }
 
 /**/
@@ -721,7 +734,7 @@ doisearch(int dir)
 	sbuf[sbptr] = '_';
 	statusll = sbuf - statusline + sbptr + 1;
     ref:
-	refresh();
+	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    int i;
 	    get_isrch_spot(0, &hl, &pos, &i, &sbptr, &dir, &nomatch);
@@ -809,7 +822,7 @@ doisearch(int dir)
 	    	cmd == Th(z_quotedinsert)) {
 	    if(cmd == Th(z_viquotedinsert)) {
 		sbuf[sbptr] = '^';
-		refresh();
+		zrefresh();
 	    }
 	    if ((c = getkey(0)) == EOF)
 		feep();
@@ -936,7 +949,7 @@ getvisrchstr(void)
     while (sptr) {
 	sbuf[sptr] = '_';
 	statusll = sptr + 1;
-	refresh();
+	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    ret = 0;
 	    break;
@@ -971,7 +984,7 @@ getvisrchstr(void)
 	} else if(cmd == Th(z_viquotedinsert) || cmd == Th(z_quotedinsert)) {
 	    if(cmd == Th(z_viquotedinsert)) {
 		sbuf[sptr] = '^';
-		refresh();
+		zrefresh();
 	    }
 	    if ((c = getkey(0)) == EOF)
 		feep();
@@ -1030,9 +1043,7 @@ virepeatsearch(void)
 	feep();
 	return;
     }
-    if (!n)
-	return;
-    if (n < 0) {
+    if (zmult < 0) {
 	n = -n;
 	visrchsense = -visrchsense;
     }
@@ -1078,9 +1089,7 @@ historybeginningsearchbackward(void)
     int n = zmult;
     char *s;
 
-    if (!n)
-	return;
-    if (n < 0) {
+    if (zmult < 0) {
 	zmult = -n;
 	historybeginningsearchforward();
 	zmult = n;
@@ -1114,9 +1123,7 @@ historybeginningsearchforward(void)
     int n = zmult;
     char *s;
 
-    if (!n)
-	return;
-    if (n < 0) {
+    if (zmult < 0) {
 	zmult = -n;
 	historybeginningsearchbackward();
 	zmult = n;

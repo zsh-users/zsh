@@ -47,7 +47,7 @@ int nlnct;
 
 /* Most lines of the buffer we've shown at once with the current list *
  * showing.  == 0 if there is no list.  == -1 if a new list has just  *
- * been put on the screen.  == -2 if refresh() needs to put up a new  *
+ * been put on the screen.  == -2 if zrefresh() needs to put up a new *
  * list.                                                              */
 
 /**/
@@ -55,7 +55,7 @@ int showinglist;
 
 /* Non-zero if ALWAYS_LAST_PROMPT has been used, meaning that the *
  * screen below the buffer display should not be cleared by       *
- * refresh(), but should be by trashzle().                        */
+ * zrefresh(), but should be by trashzle().                       */
 
 /**/
 int clearflag;
@@ -75,7 +75,7 @@ int cost;
 #endif
 
 /* Oct/Nov 94: <mason> some code savagely redesigned to fix several bugs -
-   refreshline() & tc_rightcurs() majorly rewritten; refresh() fixed -
+   refreshline() & tc_rightcurs() majorly rewritten; zrefresh() fixed -
    I've put my fingers into just about every routine in here -
    any queries about updates to mason@werple.net.au */
 
@@ -224,7 +224,7 @@ static int cleareol,		/* clear to end-of-line (if can't cleareod) */
 
 /**/
 void
-refresh(void)
+zrefresh(void)
 {
     static int inlist;		/* avoiding recursion                        */
     int canscroll = 0,		/* number of lines we are allowed to scroll  */
@@ -240,7 +240,7 @@ refresh(void)
     char **qbuf;		/* tmp					     */
 
     /* If this is called from listmatches() (indirectly via trashzle()), and *
-     * that was called from the end of refresh(), then we don't need to do   *
+     * that was called from the end of zrefresh(), then we don't need to do  *
      * anything.  All this `inlist' code is actually unnecessary, but it     *
      * improves speed a little in a common case.                             */
     if (inlist)
@@ -263,7 +263,7 @@ refresh(void)
 	termflags &= ~TERM_SHORT;
     if (resetneeded) {
 	onumscrolls = 0;
-	setterm();
+	zsetterm();
 #ifdef TIOCGWINSZ
 	if (winchanged) {
 	    moveto(0, 0);
@@ -547,7 +547,7 @@ individually */
 	inlist = 1;
 	listmatches();
 	inlist = 0;
-	refresh();
+	zrefresh();
     }
     if (showinglist == -1)
 	showinglist = nlnct;

@@ -420,7 +420,7 @@ void
 handlefeep(void)
 {
     if(feepflag)
-	beep();
+	zbeep();
     feepflag = 0;
 }
 

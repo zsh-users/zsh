@@ -219,3 +219,6 @@
 
 /* Define to 1 if you want to use dynamically loaded modules */
 #undef DYNAMIC
+
+/* Define to 1 if you want to use dynamically loaded modules on AIX */
+#undef AIXDYNAMIC

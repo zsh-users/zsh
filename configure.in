@@ -210,11 +210,11 @@ if test -n "$auto_cflags"; then
   fi
 fi
 if test -n "$auto_ldflags"; then
-  if test "${enable_zsh_debug}" = yes; then
-    LDFLAGS=-g
-  else
-    LDFLAGS=-s
-  fi
+  case "${enable_zsh_debug}$host_os" in
+    yesaix*) ;;  # AIX ld does not accept -g
+    yes*)    LDFLAGS=-g ;;
+    *)       LDFLAGS=-s ;;
+  esac
 fi
 
 dnl ----------
@@ -401,12 +401,10 @@ AC_CHECK_LIB(c, printf)
 
 dnl Prefer BSD termcap library to SysV curses library, except on certain
 dnl versions of AIX and HP-UX.
-if test `echo $host_os | sed 's/^.*\(aix\)[[1-9]]\.[[0-9]].*$/\1/'` = aix ||
-    test `echo $host_os | sed 's/^.*\(hpux\)10\..*$/\1/'` = hpux; then
-  termcap_curses_order="curses ncurses termcap"
-else
-  termcap_curses_order="termcap curses ncurses"
-fi
+case "$host_os" in
+  aix*|hpux10.*) termcap_curses_order="curses ncurses termcap" ;;
+  *)             termcap_curses_order="termcap curses ncurses" ;;
+esac
 
 for lib in $termcap_curses_order; do
   AC_CHECK_LIB(${lib}, tgetent, [LIBS="-l$lib $LIBS"; break])
@@ -617,8 +615,9 @@ AC_CHECK_FUNCS(memcpy memmove \
               sigprocmask setuid seteuid setreuid setresuid setsid strerror \
               nis_list initgroups fchdir cap_get_proc readlink nice \
 	      getgrgid getgrnam getpwent getpwnam getpwuid)
+
 if test $dynamic = yes; then
-  AC_CHECK_FUNCS(dlopen dlerror dlsym dlclose)
+  AC_CHECK_FUNCS(dlopen dlerror dlsym dlclose load loadquery loadbind unload)
 fi
 
 
@@ -900,14 +899,37 @@ dnl ---------------
 dnl dynamic loading
 dnl ---------------
 L=N
-if test "$ac_cv_func_dlopen" != yes; then
-  dynamic=no
-elif test "$ac_cv_func_dlsym" != yes; then
-  dynamic=no
-elif test "$ac_cv_func_dlerror" != yes; then
-  dynamic=no
+aixdynamic=no
+if test "$ac_cv_func_dlopen"  != yes ||
+   test "$ac_cv_func_dlsym"   != yes ||
+   test "$ac_cv_func_dlerror" != yes; then
+  if test "$ac_cv_func_load"      != yes ||
+     test "$ac_cv_func_unload"    != yes ||
+     test "$ac_cv_func_loadbind"  != yes ||
+     test "$ac_cv_func_loadquery" != yes; then
+    dynamic=no
+  elif test "x$dynamic" = xyes; then
+    aixdynamic=yes
+  fi
 fi
-if test "x$dynamic" = xyes; then
+
+test -n "$GCC" && LDARG=-Wl,
+
+if test "x$aixdynamic" = xyes; then
+  DL_EXT="${DL_EXT=so}"
+  DLLD="${DLLD=$CC}"
+  zsh_cv_func_dlsym_needs_underscore=no
+  DLLDFLAGS=${DLLDFLAGS=}
+  EXTRA_LDFLAGS=${EXTRA_LDFLAGS=}
+  EXPOPT=${LDARG}-bE:
+  IMPOPT=${LDARG}-bI:
+  zsh_cv_sys_dynamic_clash_ok="${zsh_cv_sys_dynamic_clash_ok=yes}"
+  zsh_cv_sys_dynamic_rtld_global="${zsh_cv_sys_dynamic_rtld_global=yes}"
+  zsh_cv_sys_dynamic_execsyms="${zsh_cv_sys_dynamic_execsyms=yes}"
+  zsh_cv_sys_dynamic_strip_exe="${zsh_cv_sys_dynamic_strip_exe=yes}"
+  zsh_cv_sys_dynamic_strip_lib="${zsh_cv_sys_dynamic_strip_lib=yes}"
+  zsh_cv_sys_dynamic_broken="${zsh_cv_sys_dynamic_broken=no}"
+elif test "x$dynamic" = xyes; then
   AC_CACHE_CHECK(if your system use ELF binaries,
    zsh_cv_sys_elf,
    [AC_TRY_RUN([/* Test for whether ELF binaries are produced */
@@ -947,10 +969,11 @@ char *argv[];
   case "$host_os" in
     hpux*)        DLLDFLAGS="${DLLDFLAGS=-b}" ;;
     linux*|irix*|osf*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
-    solaris*)     DLLDFLAGS="${DLLDFLAGS=-G}" ;;
     sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
     netbsd*)      DLLDFLAGS="${DLLDFLAGS=-x -shared --whole-archive}" ;;
+    aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
+    solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
   esac
   case "$host_os" in
     hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
@@ -958,7 +981,7 @@ char *argv[];
   esac
   AC_CACHE_CHECK(if your dlsym() needs a leading underscore,
    zsh_cv_func_dlsym_needs_underscore,
-   [cat >conftest.c <<EOM
+   [echo failed >conftestval && cat >conftest.c <<EOM
 fred () { }
 EOM
     $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest.c 1>&5 2>&5 &&
@@ -1006,8 +1029,12 @@ main()
     zsh_cv_func_dlsym_needs_underscore=failed
     dynamic=no,
     zsh_cv_func_dlsym_needs_underscore=no)])
-  if test "$zsh_cv_func_dlsym_needs_underscore" = yes; then
+  if test "x$zsh_cv_func_dlsym_needs_underscore" = xyes; then
     AC_DEFINE(DLSYM_NEEDS_UNDERSCORE)
+  elif test "x$zsh_cv_func_dlsym_needs_underscore" != xno; then
+    dnl Do not cache failed value
+    unset zsh_cv_func_dlsym_needs_underscore
+    dynamic=no
   fi
 fi
 
@@ -1045,13 +1072,23 @@ else
   D=N
 fi
 
+if test "x$aixdynamic" = xyes; then
+  E=E
+  AC_DEFINE(AIXDYNAMIC)dnl
+else
+  E=N
+fi
+
 AC_DEFINE_UNQUOTED(DL_EXT, "$DL_EXT")dnl
 AC_SUBST(D)dnl
 AC_SUBST(DL_EXT)dnl
 AC_SUBST(DLLD)dnl
 AC_SUBST(DLCFLAGS)dnl
 AC_SUBST(DLLDFLAGS)dnl
+AC_SUBST(E)dnl
 AC_SUBST(EXTRA_LDFLAGS)dnl
+AC_SUBST(EXPOPT)dnl
+AC_SUBST(IMPOPT)dnl
 AC_SUBST(L)dnl
 AC_SUBST(RTLD_GLOBAL_OK)dnl
 

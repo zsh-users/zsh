@@ -2627,14 +2627,14 @@ bin_getopts(char *name, char **argv, char *ops, int func)
     if(opch == ':' || !(p = memchr(optstr, opch, lenoptstr))) {
 	p = "?";
 err:
-      zsfree(zoptarg);
+	zsfree(zoptarg);
 	if(quiet) {
 	    setsparam(var, ztrdup(p));
 	    zoptarg = metafy(optbuf, lenoptbuf, META_DUP);
 	} else {
 	    zerr(*p == '?' ? "bad option: -%c" :
 		"argument expected after -%c option", NULL, opch);
-          zoptarg=ztrdup("");
+	    zoptarg=ztrdup("");
 	    errflag = 0;
 	}
 	return 0;

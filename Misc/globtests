@@ -103,5 +103,14 @@ t :]            [:]]#
 t [             [[]
 t ]             []]
 t []            [^]]]
+t fooxx         (#i)FOOXX
+f fooxx         (#l)FOOXX
+t FOOXX         (#l)fooxx
+f fooxx         (#i)FOO(#I)X(#i)X
+t fooXx         (#i)FOO(#I)X(#i)X
+t fooxx         ((#i)FOOX)x
+f fooxx         ((#i)FOOX)X
+f BAR           (bar|(#i)foo)
+t FOO           (bar|(#i)foo)
 EOT
 print "$failed tests failed."

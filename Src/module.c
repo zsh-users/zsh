@@ -161,18 +161,50 @@ deletebuiltins(char const *nam, Builtin binl, int size)
     return hadf ? hads : 1;
 }
 
+#ifdef AIXDYNAMIC
+
+#include <sys/ldr.h>
+
+static char *dlerrstr[256];
+
+/**/
+static void *
+load_and_bind(const char *fn)
+{
+    void *ret = (void *) load((char *) fn, L_NOAUTODEFER, NULL);
+
+    if (ret) {
+	LinkNode node;
+	int err = loadbind(0, (void *) addbuiltin, ret);
+	for (node = firstnode(modules); !err && node; incnode(node)) {
+	    Module m = (Module) getdata(node);
+	    if (m->handle)
+		err |= loadbind(0, m->handle, ret);
+	}
+
+	if (err) {
+	    loadquery(L_GETMESSAGES, dlerrstr, sizeof(dlerrstr));
+	    unload(ret);
+	    ret = NULL;
+	}
+    } else
+	loadquery(L_GETMESSAGES, dlerrstr, sizeof(dlerrstr));
+
+    return ret;
+}
+
+#define dlopen(X,Y) load_and_bind(X)
+#define dlclose(X)  unload(X)
+#define dlerror()   (dlerrstr[0])
+
+#else
+
 #ifdef HAVE_DLFCN_H
 # include <dlfcn.h>
 #else
 # include <sys/types.h>
 # include <nlist.h>
 # include <link.h>
-#endif
-#ifndef RTLD_LAZY
-# define RTLD_LAZY 1
-#endif
-#ifndef RTLD_GLOBAL
-# define RTLD_GLOBAL 0
 #endif
 #ifndef HAVE_DLCLOSE
 # define dlclose(X) ((X), 0)
@@ -189,6 +221,16 @@ deletebuiltins(char const *nam, Builtin binl, int size)
 # define STR_CLEANUP   "cleanup_"
 # define STR_CLEANUP_S "cleanup_%s"
 #endif /* !DLSYM_NEEDS_UNDERSCORE */
+
+#endif /* !AIXDYNAMIC */
+
+#ifndef RTLD_LAZY
+# define RTLD_LAZY 1
+#endif
+#ifndef RTLD_GLOBAL
+# define RTLD_GLOBAL 0
+#endif
+
 typedef int (*Module_func) _((Module));
 
 /**/
@@ -257,6 +299,24 @@ find_module(const char *name)
     return NULL;
 }
 
+#ifdef AIXDYNAMIC
+
+/**/
+static int
+init_module(Module m)
+{
+    return ((int (*)_((int,Module))) m->handle)(1, m);
+}
+
+/**/
+static int
+cleanup_module(Module m)
+{
+    return ((int (*)_((int,Module))) m->handle)(0, m);
+}
+
+#else
+
 /**/
 static int
 init_module(Module m)
@@ -287,6 +347,39 @@ init_module(Module m)
     zwarnnam(m->nam, "no boot function", NULL, 0);
     return 1;
 }
+
+/**/
+static int
+cleanup_module(Module m)
+{
+    char *s, *t;
+#ifndef DYNAMIC_NAME_CLASH_OK
+    char buf[PATH_MAX + 1];
+#endif
+    Module_func fn;
+
+    s = strrchr(m->nam, '/');
+    if (s)
+	s = dupstring(++s);
+    else
+	s = m->nam;
+    if ((t = strrchr(s, '.')))
+	*t = '\0';
+#ifdef DYNAMIC_NAME_CLASH_OK
+    fn = (Module_func) dlsym(m->handle, STR_CLEANUP);
+#else /* !DYNAMIC_NAME_CLASH_OK */
+    if (strlen(s) + 9 > PATH_MAX)
+	return 1;
+    sprintf(buf, STR_CLEANUP_S, s);
+    fn = (Module_func) dlsym(m->handle, buf);
+#endif /* !DYNAMIC_NAME_CLASH_OK */
+    if(fn)
+	return fn(m);
+    zwarnnam(m->nam, "no cleanup function", NULL, 0);
+    return 1;
+}
+
+#endif /* !AIXDYNAMIC */
 
 /**/
 Module
@@ -335,37 +428,6 @@ load_module(char const *name)
 	return NULL;
     }
     return m;
-}
-
-/**/
-static int
-cleanup_module(Module m)
-{
-    char *s, *t;
-#ifndef DYNAMIC_NAME_CLASH_OK
-    char buf[PATH_MAX + 1];
-#endif
-    Module_func fn;
-
-    s = strrchr(m->nam, '/');
-    if (s)
-	s = dupstring(++s);
-    else
-	s = m->nam;
-    if ((t = strrchr(s, '.')))
-	*t = '\0';
-#ifdef DYNAMIC_NAME_CLASH_OK
-    fn = (Module_func) dlsym(m->handle, STR_CLEANUP);
-#else /* !DYNAMIC_NAME_CLASH_OK */
-    if (strlen(s) + 9 > PATH_MAX)
-	return 1;
-    sprintf(buf, STR_CLEANUP_S, s);
-    fn = (Module_func) dlsym(m->handle, buf);
-#endif /* !DYNAMIC_NAME_CLASH_OK */
-    if(fn)
-	return fn(m);
-    zwarnnam(m->nam, "no cleanup function", NULL, 0);
-    return 1;
 }
 
 /**/

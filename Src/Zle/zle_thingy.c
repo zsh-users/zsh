@@ -244,7 +244,9 @@ unbindwidget(Thingy t, int override)
 static void
 freewidget(Widget w)
 {
-    if(!(w->flags & WIDGET_INT))
+    if ((w->flags & WIDGET_COMP) && w->u.cc)
+	freecompctl(w->u.cc);
+    else if(!(w->flags & WIDGET_INT))
 	zsfree(w->u.fnnam);
     zfree(w, sizeof(*w));
 }
@@ -334,6 +336,7 @@ bin_zle(char *name, char **args, char *ops, int func)
 	{ 'D', bin_zle_del,  1, -1 },
 	{ 'A', bin_zle_link, 2,  2 },
 	{ 'N', bin_zle_new,  1,  2 },
+	{ 'C', bin_zle_compctl, 1, -1},
 	{ 0,   bin_zle_call, 0, -1 },
     };
     struct opn const *op, *opp;
@@ -385,17 +388,24 @@ scanlistwidgets(HashNode hn, int list)
     if(w->flags & WIDGET_INT)
 	return;
     if(list) {
-	fputs("zle -N ", stdout);
+	fputs((w->flags & WIDGET_COMP) ? "zle -C " : "zle -N ", stdout);
 	if(t->nam[0] == '-')
 	    fputs("-- ", stdout);
 	quotedzputs(t->nam, stdout);
-	if(strcmp(t->nam, w->u.fnnam)) {
+	if (w->flags & WIDGET_COMP) {
+	    if (printcompctlptr && w->u.cc)
+		printcompctlptr(NULL, w->u.cc, PRINT_LIST);
+	} else if(strcmp(t->nam, w->u.fnnam)) {
 	    fputc(' ', stdout);
 	    quotedzputs(w->u.fnnam, stdout);
 	}
     } else {
 	nicezputs(t->nam, stdout);
-	if(strcmp(t->nam, w->u.fnnam)) {
+	if (w->flags & WIDGET_COMP) {
+	    fputs(" -C", stdout);
+	    if (printcompctlptr && w->u.cc)
+		printcompctlptr(NULL, w->u.cc, PRINT_TYPE);
+	} else if(strcmp(t->nam, w->u.fnnam)) {
 	    fputs(" (", stdout);
 	    nicezputs(w->u.fnnam, stdout);
 	    fputc(')', stdout);
@@ -454,6 +464,44 @@ bin_zle_new(char *name, char **args, char *ops, char func)
     freewidget(w);
     zerrnam(name, "widget name `%s' is protected", args[0], 0);
     return 1;
+}
+
+/**/
+static int
+bin_zle_compctl(char *name, char **args, char *ops, char func)
+{
+    Compctl cc = NULL;
+    Widget w;
+    char *wname = args[0];
+
+    if (!compctl_widgetptr) {
+	zwarnnam(name, "compctl module is not loaded", NULL, 0);
+	return 1;
+    }
+
+    args++;
+
+    if (*args && !(cc = compctl_widgetptr(name, args)))
+	return 1;
+
+    w = zalloc(sizeof(*w));
+    w->flags = WIDGET_COMP|ZLE_MENUCMP|ZLE_KEEPSUFFIX;
+    w->first = NULL;
+    w->u.cc = cc;
+    if(bindwidget(w, rthingy(wname))) {
+	freewidget(w);
+	zerrnam(name, "widget name `%s' is protected", wname, 0);
+	return 1;
+    }
+    if (ops['m'])
+	w->flags |= ZLE_USEMENU;
+    else if (ops['M'])
+	w->flags |= ZLE_NOMENU;
+    if (ops['g'])
+	w->flags |= ZLE_USEGLOB;
+    else if (ops['G'])
+	w->flags |= ZLE_NOGLOB;
+    return 0;
 }
 
 /**/

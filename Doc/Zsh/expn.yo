@@ -777,6 +777,9 @@ Matches the enclosed pattern.  This is used for grouping.
 If the tt(KSH_GLOB) option is set, then a
 `tt(@)', `tt(*)', `tt(+)', `tt(?)' or `tt(!)' immediately preceding
 the `tt(LPAR())' is treated specially, as detailed below.
+Note that grouping cannot currently extend over multiple directories:
+a `tt(/)' separating a directory terminates processing of the current
+group; processing resumes after the end of the group.
 )
 item(var(x)tt(|)var(y))(
 Matches either var(x) or var(y).
@@ -840,6 +843,43 @@ Match anything but the expression in parentheses.
 (Like `tt(LPAR()^LPAR())...tt(RPAR()RPAR())'.)
 )
 enditem()
+subsect(Globbing Flags)
+There are various flags which affect any text to their right up to the
+end of the enclosing group or to the end of the pattern; they require
+the tt(EXTENDED_GLOB) option. All take the form
+tt(LPAR()#)var(X)tt(RPAR()) where var(X) may be one of the following
+characters:
+
+startitem()
+item(i)(
+Case insensitive:  upper or lower case characters in the pattern match
+upper or lower case characters.
+)
+item(l)(
+Lower case characters in the pattern match upper or lower case
+characters; upper case characters in the pattern still only match
+upper case characters.
+)
+item(I)(
+Case sensitive:  locally negates the effect of tt(i) or tt(l) from
+that point on.
+)
+enditem()
+
+For example, the test string tt(fooxx) can be matched by the pattern
+tt(LPAR()#i)tt(RPAR()FOOXX), but not by tt(LPAR()#l)tt(RPAR()FOOXX),
+tt(LPAR()#i)tt(RPAR()FOO)tt(LPAR()#I)tt(RPAR()XX) or
+tt(LPAR()LPAR()#i)tt(RPAR()FOOX)tt(RPAR()X).
+
+When using the ksh syntax for grouping both tt(KSH_GLOB) and
+tt(EXTENDED_GLOB) must be set and the left parenthesis should be
+preceded by tt(@).  Note also that the flags do not affect letters
+inside tt([...]) groups, in other words tt(LPAR()#i)tt(RPAR()[a-z])
+still matches only lowercase letters.  Finally, note that when
+examining whole paths case-insensitively every directory must be
+searched for all files which match, so that a pattern of the form
+tt(LPAR()#i)tt(RPAR()/foo/bar/...) is potentially slow.
+
 subsect(Recursive Globbing)
 A pathname component of the form `tt(LPAR())var(foo)tt(/RPAR()#)'
 matches a path consisting of zero or more directories

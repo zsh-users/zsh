@@ -207,6 +207,7 @@ main()
 [zsh_cv_sys_dynamic_rtld_global=no],
 [zsh_cv_sys_dynamic_rtld_global=no]
 )
+    LDFLAGS=$save_ldflags
 else
     zsh_cv_sys_dynamic_rtld_global=no
 fi

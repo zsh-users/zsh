@@ -1,3 +1,5 @@
+hasexport=1
+
 moddeps="comp1"
 
 autobins="bindkey vared zle"

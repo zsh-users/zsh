@@ -1992,8 +1992,8 @@ restore_params(LinkList restorelist, LinkList removelist)
 		}
 	    } else
 		paramtab->addnode(paramtab, pm->nam, pm);
-	    if (pm->flags & PM_EXPORTED)
-		pm->env = addenv(pm->nam, getsparam(pm->nam));
+	    if ((pm->flags & PM_EXPORTED) && ((s = getsparam(pm->nam))))
+		pm->env = addenv(pm->nam, s);
 	}
     }
 }

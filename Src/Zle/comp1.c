@@ -31,15 +31,33 @@
 
 #include "comp1.pro"
 
-/* default completion infos */
+/* Default completion infos */
  
 /**/
 struct compctl cc_compos, cc_default, cc_first, cc_dummy;
  
-/* hash table for completion info for commands */
+/* Global matcher. */
+
+/**/
+Cmlist cmatcher;
+
+/* pointers to functions required by zle */
+
+/**/
+void (*printcompctlptr) _((char *, Compctl, int));
+
+/**/
+Compctl (*compctl_widgetptr) _((char *, char **));
+
+/* Hash table for completion info for commands */
  
 /**/
 HashTable compctltab;
+
+/* List of pattern compctls */
+
+/**/
+Patcomp patcomps;
 
 /* Words on the command line, for use in completion */
  
@@ -53,6 +71,16 @@ char **clwords;
 
 /**/
 int incompctlfunc;
+
+
+/* This variable and the functions rembslash() and quotename() came from     *
+ * zle_tricky.c, but are now used in compctl.c, too.                         */
+
+/* 1 if we are completing in a string */
+
+/**/
+int instring;
+
 
 /**/
 static void
@@ -71,6 +99,8 @@ createcompctltable(void)
     compctltab->enablenode  = NULL;
     compctltab->freenode    = freecompctlp;
     compctltab->printnode   = NULL;
+
+    patcomps = NULL;
 }
 
 /**/
@@ -103,6 +133,7 @@ freecompctl(Compctl cc)
     zsfree(cc->prefix);
     zsfree(cc->suffix);
     zsfree(cc->hpat);
+    zsfree(cc->gname);
     zsfree(cc->subcmd);
     if (cc->cond)
 	freecompcond(cc->cond);
@@ -119,6 +150,9 @@ freecompctl(Compctl cc)
     }
     if (cc->xor && cc->xor != &cc_default)
 	freecompctl(cc->xor);
+    if (cc->matcher)
+	freecmatcher(cc->matcher);
+    zsfree(cc->mstr);
     zfree(cc, sizeof(struct compctl));
 }
 
@@ -163,6 +197,56 @@ freecompcond(void *a)
 	    }
 	    zfree(c, sizeof(struct compcond));
 	}
+    }
+}
+
+/**/
+void
+freecmlist(Cmlist l)
+{
+    Cmlist n;
+
+    while (l) {
+	n = l->next;
+	freecmatcher(l->matcher);
+	zsfree(l->str);
+
+	zfree(l, sizeof(struct cmlist));
+
+	l = n;
+    }
+}
+
+/**/
+void
+freecmatcher(Cmatcher m)
+{
+    Cmatcher n;
+
+    while (m) {
+	n = m->next;
+	freecpattern(m->line);
+	freecpattern(m->word);
+	freecpattern(m->left);
+	freecpattern(m->right);
+
+	zfree(m, sizeof(struct cmatcher));
+
+	m = n;
+    }
+}
+
+/**/
+void
+freecpattern(Cpattern p)
+{
+    Cpattern n;
+
+    while (p) {
+	n = p->next;
+	zfree(p, sizeof(struct cpattern));
+
+	p = n;
     }
 }
 
@@ -261,6 +345,89 @@ compctlread(char *name, char **args, char *ops, char *reply)
     return 0;
 }
 
+/* Copy the given string and remove backslashes from the copy and return it. */
+
+/**/
+char *
+rembslash(char *s)
+{
+    char *t = s = dupstring(s);
+
+    while (*s)
+	if (*s == '\\') {
+	    chuck(s);
+	    if (*s)
+		s++;
+	} else
+	    s++;
+
+    return t;
+}
+
+/* Quote the string s and return the result.  If e is non-zero, the        *
+ * pointer it points to may point to a position in s and in e the position *
+ * of the corresponding character in the quoted string is returned.  Like  *
+ * e, te may point to a position in the string and pl is used to return    *
+ * the position of the character pointed to by te in the quoted string.    *
+ * The string is metafied and may contain tokens.                          */
+
+/**/
+char *
+quotename(const char *s, char **e, char *te, int *pl)
+{
+    const char *u, *tt;
+    char *v, buf[PATH_MAX * 2];
+    int sf = 0;
+
+    tt = v = buf;
+    u = s;
+    for (; *u; u++) {
+	if (e && *e == u)
+	    *e = v, sf |= 1;
+	if (te == u)
+	    *pl = v - tt, sf |= 2;
+	if (ispecial(*u) &&
+	    (!instring || (isset(BANGHIST) &&
+			   *u == (char)bangchar) ||
+	     (instring == 2 &&
+	      (*u == '$' || *u == '`' || *u == '\"')) ||
+	     (instring == 1 && *u == '\''))) {
+	    if (*u == '\n' || (instring == 1 && *u == '\'')) {
+		if (unset(RCQUOTES)) {
+		    *v++ = '\'';
+		    if (*u == '\'')
+			*v++ = '\\';
+		    *v++ = *u;
+		    *v++ = '\'';
+		} else if (*u == '\n')
+		    *v++ = '"', *v++ = '\n', *v++ = '"';
+		else
+		    *v++ = '\'', *v++ = '\'';
+		continue;
+	    } else
+		*v++ = '\\';
+	}
+	if(*u == Meta)
+	    *v++ = *u++;
+	*v++ = *u;
+    }
+    *v = '\0';
+    if (strcmp(buf, s))
+	tt = dupstring(buf);
+    else
+	tt = s;
+    v += tt - buf;
+    if (e && (sf & 1))
+	*e += tt - buf;
+
+    if (e && *e == u)
+	*e = v;
+    if (te == u)
+	*pl = v - tt;
+
+    return (char *) tt;
+}
+
 /**/
 int
 boot_comp1(Module m)
@@ -269,10 +436,13 @@ boot_comp1(Module m)
     clwords = (char **) zcalloc((clwsize = 16) * sizeof(char *));
     createcompctltable();
     cc_compos.mask = CC_COMMPATH;
+    cc_compos.mask2 = 0;
     cc_default.refc = 10000;
     cc_default.mask = CC_FILES;
+    cc_default.mask2 = 0;
     cc_first.refc = 10000;
     cc_first.mask = 0;
+    cc_first.mask2 = CC_CCCONT;
     return 0;
 }
 

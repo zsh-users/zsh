@@ -12,7 +12,7 @@ headers="../config.h system.h zsh.h sigcount.h signals.h \
 prototypes.h hashtable.h ztype.h"
 
 :<<\Make
-signames.c: signames.awk @SIGNAL_H@
+signames.c: signames.awk ../config.h @SIGNAL_H@
 	$(AWK) -f $(sdir)/signames.awk @SIGNAL_H@ > $@
 
 sigcount.h: signames.c

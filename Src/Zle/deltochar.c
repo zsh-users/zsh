@@ -45,7 +45,7 @@ deltochar(void)
 	    if (dest != ll) {
 		dest++;
 		if (!n) {
-		    foredel(dest - cs);
+		    forekill(dest - cs, 0);
 		    ok++;
 		}
 	    }
@@ -57,9 +57,13 @@ deltochar(void)
 	while (n++ && dest != 0) {
 	    while (dest != 0 && line[dest] != c)
 		dest--;
-	    if (line[dest] == c && !n) {
-		backdel(cs - dest);
-		ok++;
+	    if (line[dest] == c) {
+		if (!n) {
+		    backkill(cs - dest, 1);
+		    ok++;
+		}
+		if (dest)
+		    dest--;
 	    }
 	}
     }
@@ -71,7 +75,8 @@ deltochar(void)
 int
 boot_deltochar(Module m)
 {
-    w_deletetochar = addzlefunction("delete-to-char", deltochar, ZLE_KEEPSUFFIX);
+    w_deletetochar = addzlefunction("delete-to-char", deltochar,
+                                    ZLE_KILL | ZLE_KEEPSUFFIX);
     if (w_deletetochar)
 	return 0;
     zwarnnam(m->nam, "name clash when adding ZLE function `delete-to-char'",

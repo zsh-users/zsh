@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh -f
 
-setopt kshglob
+setopt kshglob extendedglob
 
 failed=0
 while read res str pat; do
@@ -87,5 +87,14 @@ t zoox          @(!(z*)|*x)
 t foo           *(!(foo))
 f foob          !(foo)b*
 t foobb         !(foo)b*
+t fooxx         (#i)FOOXX
+f fooxx         (#l)FOOXX
+t FOOXX         (#l)fooxx
+f fooxx         (#i)FOO@(#I)X@(#i)X
+t fooXx         (#i)FOO@(#I)X@(#i)X
+t fooxx         @((#i)FOOX)x
+f fooxx         @((#i)FOOX)X
+f BAR           @(bar|(#i)foo)
+t FOO           @(bar|(#i)foo)
 EOT
 print "$failed tests failed."

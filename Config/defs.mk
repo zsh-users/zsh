@@ -56,6 +56,8 @@ EXELDFLAGS      = @EXELDFLAGS@
 LIBS            = @LIBS@
 DL_EXT          = @DL_EXT@
 DLLD            = @DLLD@
+EXPOPT          = @EXPOPT@
+IMPOPT          = @IMPOPT@
 
 # utilities
 AWK             = @AWK@

@@ -10,6 +10,7 @@ list(tt(compctl) [ tt(-CDT) ] var(options) \
   [ tt(-x) var(pattern) var(options) tt(-) ... tt(--) ] \
   [ tt(PLUS()) var(options) [ tt(-x) ... tt(--) ] ... [tt(PLUS())] ] \
   [ var(command) ... ])
+list(tt(compctl) tt(-M) var(match-specs) ...)
 list(tt(compctl) tt(-L) [ tt(-CDT) ] [ var(command) ... ])
 list(tt(compctl) tt(PLUS()) var(command) ...)
 endlist()
@@ -28,6 +29,7 @@ menu(Command Flags)
 menu(Option Flags)
 menu(Alternative Completion)
 menu(Extended Completion)
+menu(Matching Control)
 menu(Example)
 endmenu()
 texinode(Command Flags)(Option Flags)()(Programmable Completion)
@@ -44,7 +46,19 @@ item(var(command) ...)(
 controls completion for the named commands, which must be listed last
 on the command line.  If completion is attempted for a command with a
 pathname containing slashes and no completion definition is found, the
-search is retried with the last pathname component.  Note that aliases
+search is retried with the last pathname component. If the command starts
+with a tt(=), completion is tried with the pathname of the command.
+
+The strings may also be patterns (i.e. they may contain an unquoted
+occurrence of characters used to form patterns in the shell). When 
+completion is attempted, the shell first tries all such pattern compctls.
+If one matches the command name on the line or if the pathname of the
+command on the line matches a pattern, it is used. The patterns are tested
+in reverse order, i.e. the pattern compctl defined last overrides all
+previously defined pattern compctls. Unless the option list of that compctl
+contains an tt(-t) flag with a \tt(c) character, no more compctls are tried.
+
+Note that aliases
 are expanded before the command name is determined unless the
 tt(COMPLETE_ALIASES) option is set.  Commands should not be combined
 with the tt(-C), tt(-D) or tt(-T) flags.
@@ -63,7 +77,7 @@ been issued, filenames are completed.
 item(tt(-T))(
 supplies completion flags to be used before any other processing is
 done, even those given to specific commands with other compctl
-definitions.  This is only useful when combined with extended
+definitions.  This is especially useful when combined with extended
 completion (the tt(-x) flag, see noderef(Extended Completion) below).
 Using this flag you can define default behavior
 which will apply to all commands without exception, or you can alter
@@ -95,6 +109,9 @@ If the tt(PLUS()) flag is alone and followed immediately by the var(command)
 list, the completion behavior for all the commands in the list is reset to
 the default.  In other words, completion will subsequently use the
 options specified by the tt(-D) flag.
+
+The form with tt(-M) as the first and only option defines global
+matching specifications described below in noderef(Matching Control).
 texinode(Option Flags)(Alternative Completion)(Command Flags)(Programmable Completion)
 sect(Option Flags)
 startlist()
@@ -106,6 +123,8 @@ list([ tt(-Q) ] [ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 list([ tt(-W) var(file-prefix) ])
 list([ tt(-q) ] [ tt(-X) var(explanation) ] [ tt(-Y) var(explanation) ])
 list([ tt(-y) var(func-or-var) ] [ tt(-l) var(cmd) ] [ tt(-U) ])
+list([ tt(-t) var(continue) ] [ tt(-J) var(name) ] [ tt(-V) var(name) ])
+list([ tt(-M) var(match-spec) ])
 endlist()
 
 The remaining var(options) specify the type of command arguments
@@ -256,7 +275,7 @@ passed two arguments: the prefix and the suffix of the word on which
 completion is to be attempted, in other words those characters before
 the cursor position, and those from the cursor position onwards.  The
 whole command line can be accessed with the tt(-c) and tt(-l) flags
-of the tt(read) builtin.  The
+of the tt(read) builtin. The
 function should set the variable tt(reply) to an array containing
 the completions (one completion per element); note that tt(reply)
 should not be made local to the function.  From such a function the
@@ -322,6 +341,9 @@ nofill(tt(compctl -/ -W ~/Mail maildirs))
 
 completes any subdirectories to any depth beneath the directory
 tt(~/Mail), although that prefix does not appear on the command line.
+The var(suffix) may also be of the form accepted by the tt(-k) flag, i.e.
+the name of an array or a literal list in parenthesis. In this cases all
+words are used as prefixes.
 )
 item(tt(-q))(
 If used with a suffix as specified by the tt(-S) option, this
@@ -331,7 +353,7 @@ tt(AUTO_REMOVE_SLASH) option).  The option is most useful for list
 separators (comma, colon, etc.).
 )
 item(tt(-l) var(cmd))(
-This option cannot be combined with any other.  It restricts the range
+This option restricts the range
 of command line words that are considered to be arguments.  If
 combined with one of the extended completion patterns `tt(p[)...tt(])',
 `tt(r[)...tt(])', or `tt(R[)...tt(])'  (see noderef(Extended Completion)
@@ -355,7 +377,10 @@ will be deleted.  This is most useful with a function (given by the
 tt(-K) option) which can examine the word components passed to it
 (or via the tt(read) builtin's tt(-c) and tt(-l) flags) and
 use its own criteria to decide what matches.  If there is no
-completion, the original word is retained.
+completion, the original word is retained.  Since the produced 
+possible completions seldom seldom have interesting common prefixes
+and suffixes, menucompletion is started immediatly if tt(AUTO_MENU) is
+set and this flag is used.
 )
 item(tt(-y) var(func-or-var))(
 The list provided by var(func-or-var) is displayed instead of the list
@@ -382,12 +407,45 @@ Print var(explanation) when trying completion on the current set of
 options. A `tt(%n)' in this string is replaced by the number of matches.
 The explanation only appears if completion was tried and there was
 no unique match, or when listing completions.
+The sequences tt(%B), tt(%b), tt(%S), tt(%s), tt(%U), and tt(%u) specify
+output attributes (bold, standout, and underline) as in prompts.
 )
 item(tt(-Y) var(explanation))(
 Identical to tt(-X), except that the var(explanation) first undergoes
 expansion following the usual rules for strings in double quotes.
 The expansion will be carried out after any functions are called for
 the tt(-K) or tt(-y) options, allowing them to set variables.
+)
+item(tt(-J))(
+This gives the name of the group the matches should be placed in. Groups
+are listed and sorted separately. Also, menucompletion will offer the matches
+in the groups in the order, in which the groups were defined. If no group
+name is explicitly given, the matches are stored in a group named var(default).
+The first time a group name is encountered, a group with that name is created.
+After that all matches with the same group name are stored in that group.
+)
+item(tt(-V))(
+Like tt(-J), but the matches in the group will not be sorted in the listing and
+with menucompletion. These unsorted groups are in a different name space than
+the sorted ones. I.e. it is possible to have a sorted and a unsorted group
+with the same name and the matches in those groups will not be mixed.
+)
+item(tt(-t) var(continue))(
+The var(continue)-string contains a set of characters that specify if 
+and when completion should continue to produce matches where it normally
+would not do that. The character tt(c) means that completion continues
+with the next suitable compctl (i.e. if you don't specify this in a
+tt(compctl -T), compctls for commands are never used). The character
+tt(PLUS()) is used to continue with the matches for the next alternative
+completion (see below). The characters tt(-) and tt(x) may be used in
+sub-lists for extended completion (see below). They will make the completion
+code use the flag list after the next tt(-) (if the corresponding pattern
+matches) and the default flag list (those before the tt(-x)), respectively.
+)
+item(tt(-M) var(match-spec))(
+This defines additional matching control specifications that should be used
+only when testing words for the list of flags this flag appears in. The format
+of the var(match-spec) string is described below in noderef(Matching Control).
 )
 enditem()
 texinode(Alternative Completion)(Extended Completion)(Option Flags)(Programmable Completion)
@@ -402,7 +460,9 @@ tried with the options before the first `tt(PLUS())'. If this produces no
 matches completion is tried with the flags after the `tt(PLUS())' and so on. If
 there are no flags after the last `tt(PLUS())' and a match has not been found
 up to that point, default completion is tried.
-texinode(Extended Completion)(Example)(Alternative Completion)(Programmable Completion)
+If the list of flags contains a tt(-t) with a tt(PLUS()) character, the next
+list of flags is used even if the current list produced matches.
+texinode(Extended Completion)(Matching Control)(Alternative Completion)(Programmable Completion)
 sect(Extended Completion)
 startlist()
 list(tt(compctl) [ tt(-CDT) ] var(options) \
@@ -498,13 +558,187 @@ var(max) inclusive.
 item(tt(r[)var(str1)tt(,)var(str2)tt(])...)(
 Matches if the cursor is after a word with prefix var(str1).  If there
 is also a word with prefix var(str2) on the command line it matches
-only if the cursor is before this word.
+only if the cursor is before this word. If the comma and var(str2) are
+omitted, it matches if the cursor is after a word with prefix var(str1).
 )
 item(tt(R[)var(str1)tt(,)var(str2)tt(])...)(
 Like tt(r) but using pattern matching instead.
 )
 enditem()
-texinode(Example)()(Extended Completion)(Programmable Completion)
+texinode(Matching Control)(Example)(Extended Completion)(Programmable Completion)
+sect(Matching Control)
+
+Matching specifications are used to describe that certain strings
+on the command line match possibly different strings in the words produced
+by the completion code.
+
+Matching specification strings consist of one or more matching
+descriptions separated by whitespace. Each description consists of
+a letter followed by a colon and the patterns describing which character
+sequences on the line match which character sequences in the words.
+
+The letters understood are: tt(l), tt(r), tt(m), tt(L), tt(R), and tt(M).
+startitem()
+item(tt(m) and tt(M))(
+These describe patterns that match anywhere in the words. The colon should
+be followed by two patterns separated by an equal sign. The pattern on the
+left side describes the substrings that are to be matched on the command line,
+the pattern on the right side describes the substrings matched in the word.
+)
+item(tt(l) and tt(L))(
+These letters are for patterns that are anchored by another pattern on
+the left side. In this case the colon has to be followed by the pattern
+for the anchor, a pipe symbol, the pattern for the command line, an equal
+sign, and the pattern for the word. Patterns anchored on the left side match
+only if the anchor-pattern matches directly before the line pattern and if
+the string in the word before the word pattern matches the string before
+the line pattern in the line string.
+)
+item(tt(r) and tt(R))(
+Like tt(l) and tt(L) with the difference that the line and word patterns
+are anchored on the right side. Also, here the pattern for the anchor has
+to come after the pattern for the line, again separated by a pipe symbol.
+)
+enditem()
+
+Each pattern is either an empty string or consists of a sequence of
+character (possibly quoted), question marks, character classes, and
+correspondence classes. Normal characters match only themselves, question
+marks match any character, and character classes are formed as for
+globbing and match the same characters as there.
+Correspondence classes are formed like character classes with two
+differences: they are delimited by a pair of braces and negated
+classes are not allowed (i.e. the characters tt(!) and tt(^) have no
+special meaning directly after the opening brace).
+
+Correspondence classes are used to conveniently describe that several
+characters on the line match several other characters in the word. For 
+example, if you want to define the any lowercase letter on the line
+matches the corresponding uppercase letter in the word all you need to 
+write down is: `tt(m:{a-z}={A-Z})'. More than one correspondence class
+may be given on either side of the equal sign, in this case the first
+class on the left says which character matches for the first class on
+the right, the second class on either side work together, and so on.
+If one side has more such classes than the other side, the superfluous
+classes behave like normal character classes. In anchor patterns
+correspondence classes always behave like normal character classes.
+
+The word pattern may also be a single star (tt(*)). This means that
+the line pattern matches any number of characters in the word. In this 
+case the pattern has to be anchored (on any side) and the line pattern 
+matches all characters in the word up to a character sequence that
+matches the anchor.
+
+For anchors the empty string as a pattern has a special meaning. Such
+empty anchors match only the beginning (in the case of an left side
+anchor) or end (for right side anchors) of the command line string or
+word.
+
+The distinction between the lowercase and the uppercase forms of the
+specification characters is used to define which matched substring
+should be put in the match and the generated command line. The
+lowercase forms use the substring from the word, so this should be
+used if the exact words produced by the completion code need to be
+used. The uppercase forms use the substring from the command line and
+should be used if the typed string need to be retained.
+
+Examples:
+
+startitem()
+The option tt(-o) produces option names in all-lowercase form, without 
+underscores, and without the optional tt(no) at the beginning even
+though the buitlins tt(setopt) and tt(unsetopt) understand opotion
+names with uppercase letters, underscores, and the optional tt(no).
+So we want to be able to say, that in this case an prefix tt(no) and
+any underscore may be ignored when trying to match the produced words, 
+and that uppercase letters on the line match the corresponding
+lowercase letters in the words. This can be done with:
+
+indent(
+tt(compctl -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o setopt unsetopt)
+)
+
+The first part says that the pattern `tt([nN][oO])' at the beginning
+(note the empty anchor before the pipe symbol) of the string on the
+line matches the the empty string in the produced words, i.e. it need
+not be there. The second part says that an underscore anywhere on the
+line need not be present in the word, and the third part uses
+correspondence classes as in the example above to say that any
+uppercase letter on the line matches the corresponding lowercase
+letter in the word. The use of the uppercase forms of the
+specification characters (tt(L) and tt(M)) guarantees that the special 
+wrinting on the command line (and especially the option tt(no)) will
+not be erased.
+
+As a second example we will make completion case insensitive. For this 
+we use the form of tt(compctl) that defines matching specification that
+are to be used everywhere, i.e. a tt(compctl) with tt(-M) as the only
+option given.
+
+The pattern needed was already explained above, this gives us:
+
+indent(
+tt(compctl -M 'm:{a-z}={A-Z}')
+)
+
+This makes lowercase letters match their uppercase counterparts. If we 
+want to make uppercase letters match the lowercase forms, we would
+have to use:
+
+indent(
+tt(compctl -M 'm:{a-z}={A-Z} m:{A-Z}={a-z}')
+)
+
+A nice example for the use of tt(*) patterns is partial word
+completion. Sometimes you would like to make strings like tt(c.s.u)
+complete to strings like tt(comp.source.unix), i.e. you consider the
+word to consist of multiple parts (separated by the dot in the
+example) and each part should be completed separately. Defining such
+forms of matching is simple, for example if we want to separately
+complete word parts separated by dots, commas, underscores, and
+hyphens, we can do this by saying:
+
+indent(
+tt(compctl -M 'r:|[.,_-]=* r:|=*')
+)
+
+The first specification says that an empty string on the line before
+one of our special characters matches any number of characters in the
+word which has the effect we wanted. The second specification is
+needed to make this work when the cursor is in the middle of the word
+and the option tt(COMPLETE_IN_WORD) is set. In this case the
+completion code would normally try to match word that end with the
+string that is already on the command line, but in our example we
+would like the code to match words even if they contain extra
+characters after the string on the line. Hence we say that the empty
+string at the end of the string on the line matches any characters at
+the end of the word.
+
+The form of tt(compctl) that defines the global matching
+specifications is a bit more powerful than described until now. It
+accepts not only one specification strin, but any number of them. When 
+completion is attempted, the code first uses the definitions from the
+first string. If no words could be matched with these specifications,
+it tries the whole thing again with the specifications from the second 
+string, and so on. This allows one to define simple and fast matches
+to be used first, more powerful matchers as a second choice, and so on.
+
+As an example we would like to make the code match words that contain
+the string on the line as a substring (anywhere, not just at the
+beginning). But since this could produce more matches than we want,
+this should be tried only if the matchers described above don't
+produce any matches. E.g.:
+
+indent(
+tt(compctl -M 'r:|[.,_-]=* r:|=*' 'l:|=* r:|=*')
+)
+
+If using the first specification string does not produce matches, the
+second one is tried. The two descriptions it this string say that the
+empty string at the beginning and end of the string on the line
+matches any characters at the beginning or end of the word.
+enditem()
+texinode(Example)()(Matching Control)(Programmable Completion)
 sect(Example)
 nofill(tt(compctl -u -x 's[tt(PLUS())] c[-1,-f],s[-f+PLUS()]' -g '~/Mail/*(:t)' \ 
     - 's[-f],c[-1,-f]' -f -- mail))

@@ -510,6 +510,10 @@ adduserdir(char *s, char *t, int flags, int always)
     if ((flags & ND_USERNAME) && nameddirtab->getnode2(nameddirtab, s))
 	return;
 
+    /* Never hash PWD, because it's never useful */
+    if (!strcmp(s, "PWD"))
+	return;
+
     /* Normal parameter assignments generate calls to this function, *
      * with always==0.  Unless the AUTO_NAME_DIRS option is set, we  *
      * don't let such assignments actually create directory names.   *
@@ -854,7 +858,7 @@ adjustwinsize(void)
     setiparam("LINES", shttyinfo.winsize.ws_row);
     if (zleactive && (oldcols != columns || oldrows != lines)) {
 	resetneeded = winchanged = 1;
-	refresh();
+	zrefresh();
     }
 #endif   /* TIOCGWINSZ */
 }
@@ -1129,13 +1133,13 @@ checkrmall(char *s)
     if(isset(RMSTARWAIT)) {
 	fputs("? (waiting ten seconds)", shout);
 	fflush(shout);
-	beep();
+	zbeep();
 	sleep(10);
 	fputc('\n', shout);
     }
     fputs(" [yn]? ", shout);
     fflush(shout);
-    beep();
+    zbeep();
     return (getquery("ny", 1) == 'y');
 }
 
@@ -1181,7 +1185,7 @@ getquery(char *valid_chars, int purge)
 	    write(SHTTY, "\n", 1);
 	    break;
 	}
-	beep();
+	zbeep();
 	if (icntrl(c))
 	    write(SHTTY, "\b \b", 3);
 	write(SHTTY, "\b \b", 3);
@@ -1327,7 +1331,7 @@ spckword(char **s, int hist, int cmd, int ask)
 	    zputs(pptbuf, shout);
 	    free(pptbuf);
 	    fflush(shout);
-	    beep();
+	    zbeep();
 	    x = getquery("nyae ", 0);
 	} else
 	    x = 'y';
@@ -2286,7 +2290,7 @@ mkarray(char *s)
 
 /**/
 void
-beep(void)
+zbeep(void)
 {
     if (isset(BEEP))
 	write(SHTTY, "\07", 1);

@@ -426,7 +426,7 @@ quotedinsert(void)
 #endif
     c = getkey(0);
 #ifndef HAS_TIO
-    setterm();
+    zsetterm();
 #endif
     if (c < 0)
 	feep();
@@ -621,7 +621,7 @@ executenamedcommand(char *prmt)
     for (;;) {
 	*ptr = '_';
 	statusll = l + len + 1;
-	refresh();
+	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    statusline = NULL;
 	    selectkeymap(okeymap, 1);
@@ -633,7 +633,7 @@ executenamedcommand(char *prmt)
 	    redisplay();
 	} else if(cmd == Th(z_viquotedinsert)) {
 	    *ptr = '^';
-	    refresh();
+	    zrefresh();
 	    c = getkey(0);
 	    if(c == EOF || !c || len == NAMLEN)
 		feep();

@@ -126,7 +126,7 @@ vigetkey(void)
 	char sav = line[cs];
 
 	line[cs] = '^';
-	refresh();
+	zrefresh();
 	c = getkey(0);
 	line[cs] = sav;
 	if(c == EOF) {
@@ -814,10 +814,10 @@ viswapcase(void)
 void
 vicapslockpanic(void)
 {
-    beep();
+    zbeep();
     statusline = "press a lowercase key to continue";
     statusll = strlen(statusline);
-    refresh();
+    zrefresh();
     while (!islower(getkey(0)));
     statusline = NULL;
 }
@@ -891,7 +891,7 @@ viquotedinsert(void)
 
     spaceinline(1);
     line[cs] = '^';
-    refresh();
+    zrefresh();
 #ifndef HAS_TIO
     sob = shttyinfo.sgttyb;
     sob.sg_flags = (sob.sg_flags | RAW) & ~ECHO;
@@ -899,7 +899,7 @@ viquotedinsert(void)
 #endif
     c = getkey(0);
 #ifndef HAS_TIO
-    setterm();
+    zsetterm();
 #endif
     foredel(1);
     if(c < 0)

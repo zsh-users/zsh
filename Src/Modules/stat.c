@@ -85,6 +85,7 @@ statmodeprint(mode_t mode, char *outbuf, int flags)
 
 	for (i = 1; i <= 9; i++)
 	    pm[i] = (mode & *mfp++) ? modes[i] : '-';
+	pm[10] = '\0';
 
 	if (mode & S_ISUID)
 	    pm[3] = (mode & S_IXUSR) ? 's' : 'S';

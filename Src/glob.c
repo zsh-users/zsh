@@ -110,6 +110,8 @@ struct comp {
 #define C_CLOSURE	(C_ONEHASH|C_TWOHASH|C_OPTIONAL|C_STAR)
 #define C_LAST		16
 #define C_PATHADD	32
+#define C_LCMATCHUC	64
+#define C_IGNCASE	128
 
 /* Test macros for the above */
 #define CLOSUREP(c)	(c->stat & C_CLOSURE)
@@ -305,15 +307,24 @@ scanner(Complist q)
     if (!q)
 	return;
 
-    if ((closure = q->closure))	/* (foo/)# - match zero or more dirs */
+    if ((closure = q->closure)) {
+	/* (foo/)# - match zero or more dirs */
 	if (q->closure == 2)	/* (foo/)## - match one or more dirs */
 	    q->closure = 1;
 	else
 	    scanner(q->next);
+    }
     c = q->comp;
     /* Now the actual matching for the current path section. */
-    if (!(c->next || c->left) && !haswilds(c->str)) {
-	/* It's a straight string to the end of the path section. */
+    if (!(c->next || c->left) && !haswilds(c->str)
+	&& (!(c->stat & (C_LCMATCHUC|C_IGNCASE))
+	    || !strcmp(".", c->str) || !strcmp("..", c->str))) {
+	/*
+	 * We always need to match . and .. explicitly, even if we're
+	 * checking other strings for case-insensitive matches.
+	 *
+	 * It's a straight string to the end of the path section.
+	 */
 	int l = strlen(c->str);
 
 	if (l + !l + pathpos - pathbufcwd >= PATH_MAX) {
@@ -436,6 +447,52 @@ scanner(Complist q)
 
 /* Parse a series of path components pointed to by pptr */
 
+/* Flags to apply to current level of grourping */
+
+static int addflags;
+
+/**/
+static Comp
+compalloc(void)
+{
+    Comp c = (Comp) alloc(sizeof *c);
+    c->stat |= addflags;
+    return c;
+}
+
+/**/
+static int
+getglobflags()
+{
+    /* (#X): assumes we are still positioned on the initial '(' */
+    pptr++;
+    while (*++pptr && *pptr != Outpar) {
+	switch (*pptr) {
+	case 'l':
+	    /* Lowercase in pattern matches lower or upper in target */
+	    addflags |= C_LCMATCHUC;
+	    break;
+
+	case 'i':
+	    /* Fully case insensitive */
+	    addflags |= C_IGNCASE;
+	    break;
+
+	case 'I':
+	    /* Restore case sensitivity */
+	    addflags &= ~(C_LCMATCHUC|C_IGNCASE);
+	    break;
+
+	default:
+	    return 1;
+	}
+    }
+    if (*pptr != Outpar)
+	return 1;
+    pptr++;
+    return 0;
+}
+
 /* enum used with ksh-like patterns, @(...) etc. */
 
 enum { KF_NONE, KF_AT, KF_QUEST, KF_STAR, KF_PLUS, KF_NOT };
@@ -447,7 +504,7 @@ static Comp
 parsecomp(int gflag)
 {
     int kshfunc;
-    Comp c = (Comp) alloc(sizeof *c), c1, c2;
+    Comp c = compalloc(), c1, c2;
     char *cstr, *ls = NULL;
 
     /* In case of alternatives, code coming up is stored in tail. */
@@ -468,10 +525,10 @@ parsecomp(int gflag)
 	    c->str = dupstrpfx(cstr, pptr - cstr);
 	    pptr++;
 
-	    c1 = (Comp) alloc(sizeof *c1);
+	    c1 = compalloc();
 	    c1->stat |= C_STAR;
 
-	    c2 = (Comp) alloc(sizeof *c2);
+	    c2 = compalloc();
 	    if (!(c2->exclude = parsecomp(gflag)))
 		return NULL;
 	    if (!*pptr || *pptr == '/')
@@ -513,6 +570,39 @@ parsecomp(int gflag)
 		pptr++;
 	}
 
+	if (*pptr == Inpar && pptr[1] == Pound) {
+	    /* Found some globbing flags */
+	    char *eptr = pptr;
+	    if (kshfunc != KF_NONE)
+		eptr--;
+	    if (getglobflags())
+		return NULL;
+	    if (eptr == cstr) {
+		/* if no string yet, carry on and get one. */
+		c->stat = addflags;
+		cstr = pptr;
+		continue;
+	    }
+	    c->str = dupstrpfx(cstr, eptr - cstr);
+	    /*
+	     * The next bit simply handles the case where . or ..
+	     * is followed by a set of flags, but we need to force
+	     * them to be handled as a string.  Hardly worth it.
+	     */
+	    if (!*pptr || (!mode && *pptr == '/') || *pptr == Bar ||
+		(isset(EXTENDEDGLOB) && *pptr == Tilde &&
+		 pptr[1] && pptr[1] != Outpar && pptr[1] != Bar) ||
+		*pptr == Outpar) {
+		if (*pptr == '/' || !*pptr ||
+		    (isset(EXTENDEDGLOB) && *pptr == Tilde &&
+		     (gflag & GF_TOPLEV)))
+		    c->stat |= C_LAST;
+		return c;
+	    }
+	    if (!(c->next = parsecomp(gflag)))
+		return NULL;
+	    return c;
+	}
 	if (*pptr == Inpar) {
 	    /* Found a group (...) */
 	    char *startp = pptr, *endp;
@@ -552,16 +642,16 @@ parsecomp(int gflag)
 	    pptr = startp;
 	    c->str = dupstrpfx(cstr, (pptr - cstr) - (kshfunc != KF_NONE));
 	    pptr++;
-	    c2 = (Comp) alloc(sizeof *c);
+	    c2 = compalloc();
 	    c->next = c2;
 	    c2->next = (dpnd || kshfunc == KF_NOT) ?
-		c1 : (Comp) alloc(sizeof *c);
+		c1 : compalloc();
 	    if (!(c2->left = parsecompsw(0)))
 		return NULL;
 	    if (kshfunc == KF_NOT) {
 		/* we'd actually rather it didn't match.  Instead, match *
 		 * a star and put the parsed pattern into exclude.       */
-		Comp c3 = (Comp) alloc(sizeof *c3);
+		Comp c3 = compalloc();
 		c3->stat |= C_STAR;
 
 		c2->exclude = c2->left;
@@ -584,7 +674,7 @@ parsecomp(int gflag)
 	     */
 	    c->str = dupstrpfx(cstr, pptr - cstr);
 	    pptr++;
-	    c1 = (Comp) alloc(sizeof *c1);
+	    c1 = compalloc();
 	    c1->stat |= C_STAR;
 	    if (!(c2 = parsecomp(gflag)))
 		return NULL;
@@ -596,13 +686,13 @@ parsecomp(int gflag)
 	    /* repeat whatever we've just had (ls) zero or more times */
 	    if (!ls)
 		return NULL;
-	    c2 = (Comp) alloc(sizeof *c);
+	    c2 = compalloc();
 	    c2->str = dupstrpfx(ls, pptr - ls);
 	    pptr++;
 	    if (*pptr == Pound) {
 		/* need one or more matches: cheat by copying previous char */
 		pptr++;
-		c->next = c1 = (Comp) alloc(sizeof *c);
+		c->next = c1 = compalloc();
 		c1->str = c2->str;
 	    } else
 		c1 = c;
@@ -669,6 +759,7 @@ static Comp
 parsecompsw(int gflag)
 {
     Comp c1, c2, c3, excl = NULL, stail = tail;
+    int oaddflags = addflags;
     char *sptr;
 
     /*
@@ -709,7 +800,7 @@ parsecompsw(int gflag)
     tail = stail;
     if (*pptr == Bar || excl) {
 	/* found an alternative or something to exclude */
-	c2 = (Comp) alloc(sizeof *c2);
+	c2 = compalloc();
 	if (*pptr == Bar) {
 	    /* get the next alternative after the | */
 	    pptr++;
@@ -728,8 +819,10 @@ parsecompsw(int gflag)
 	    c2->next = stail;
 	if (gflag & GF_PATHADD)
 	    c2->stat |= C_PATHADD;
-	return c2;
+	c1 = c2;
     }
+    if (!(gflag & GF_TOPLEV))
+	addflags = oaddflags;
     return c1;
 }
 
@@ -758,7 +851,7 @@ parsecomplist(void)
 	    errflag = 1;
 	    return NULL;
 	}
-	p1->comp = (Comp) alloc(sizeof *p1->comp);
+	p1->comp = compalloc();
 	p1->comp->stat |= C_LAST;	/* end of path component  */
 	p1->comp->str = dupstring("*");
 	*p1->comp->str = Star;		/* match anything...      */
@@ -814,8 +907,28 @@ static Complist
 parsepat(char *str)
 {
     mode = 0;			/* path components present */
+    addflags = 0;
     pptr = str;
     tail = NULL;
+    /*
+     * Check for initial globbing flags, so that they don't form
+     * a bogus path component.
+     */
+    if (*pptr == Inpar && pptr[1] == Pound && isset(EXTENDEDGLOB) &&
+	getglobflags())
+	return NULL;
+
+    /* Now there is no (#X) in front, we can check the path. */
+    if (!pathbuf)
+	pathbuf = zalloc(pathbufsz = PATH_MAX);
+    DPUTS(pathbufcwd, "BUG: glob changed directory");
+    if (*pptr == '/') {		/* pattern has absolute path */
+	pptr++;
+	pathbuf[0] = '/';
+	pathbuf[pathpos = 1] = '\0';
+    } else			/* pattern is relative to pwd */
+	pathbuf[pathpos = 0] = '\0';
+
     return parsecomplist();
 }
 
@@ -897,7 +1010,7 @@ glob(LinkList list, LinkNode np)
 	    if (*s == Bar || *s == Outpar ||
 		(isset(EXTENDEDGLOB) && *s == Tilde))
 		break;
-	if (*s == Inpar) {
+	if (*s == Inpar && (!isset(EXTENDEDGLOB) || s[1] != Pound)) {
 	    /* Real qualifiers found. */
 	    int sense = 0;	/* bit 0 for match (0)/don't match (1)   */
 				/* bit 1 for follow links (2), don't (0) */
@@ -1234,15 +1347,6 @@ glob(LinkList list, LinkNode np)
 	    }
 	}
     }
-    if (!pathbuf)
-	pathbuf = zalloc(pathbufsz = PATH_MAX);
-    DPUTS(pathbufcwd, "BUG: glob changed directory");
-    if (*str == '/') {		/* pattern has absolute path */
-	str++;
-	pathbuf[0] = '/';
-	pathbuf[pathpos = 1] = '\0';
-    } else			/* pattern is relative to pwd */
-	pathbuf[pathpos = 0] = '\0';
     q = parsepat(str);
     if (!q || errflag) {	/* if parsing failed */
 	if (unset(BADPATTERN)) {
@@ -1267,7 +1371,7 @@ glob(LinkList list, LinkNode np)
     /* Deal with failures to match depending on options */
     if (matchct)
 	badcshglob |= 2;	/* at least one cmd. line expansion O.K. */
-    else if (!gf_nullglob)
+    else if (!gf_nullglob) {
 	if (isset(CSHNULLGLOB)) {
 	    badcshglob |= 1;	/* at least one cmd. line expansion failed */
 	} else if (isset(NOMATCH)) {
@@ -1279,6 +1383,7 @@ glob(LinkList list, LinkNode np)
 	    untokenize(*matchptr++ = dupstring(ostr));
 	    matchct = 1;
 	}
+    }
     /* Sort arguments in to lexical (and possibly numeric) order. *
      * This is reversed to facilitate insertion into the list.    */
     qsort((void *) & matchbuf[0], matchct, sizeof(char *),
@@ -1373,11 +1478,12 @@ hasbraces(char *str)
 		    *str++ = '{', *str = '}';
 		else
 		    bc++;
-	    } else if (*str == Outbrace)
+	    } else if (*str == Outbrace) {
 		if (!bc)
 		    *str = '}';
 		else if (!--bc)
 		    return 1;
+	    }
 	return 0;
     }
     /* Otherwise we need to look for... */
@@ -1554,11 +1660,12 @@ xpandbraces(LinkList list, LinkNode *np)
 	else if (*str2 == Outbrace) {
 	    if (--bc == 0)
 		break;
-	} else if (bc == 1)
+	} else if (bc == 1) {
 	    if (*str2 == Comma)
 		++comma;	/* we have {foo,bar} */
 	    else if (*str2 == '.' && str2[1] == '.')
 		dotdot++;	/* we have {num1..num2} */
+	}
     DPUTS(bc, "BUG: unmatched brace in xpandbraces()");
     if (!comma && dotdot) {
 	/* Expand range like 0..10 numerically: comma or recursive
@@ -2489,7 +2596,10 @@ matchonce(Comp c)
 	    }
 	    continue;
 	}
-	if (*pptr == *pat) {
+	if (*pptr == *pat ||
+	    (((c->stat & C_IGNCASE) ? (tulower(*pat) == tulower(*pptr)) :
+	      (c->stat & C_LCMATCHUC) ?
+	      (islower(*pat) && tuupper(*pat) == *pptr) : 0))) {
 	    /* just plain old characters */
 	    pptr++;
 	    pat++;
@@ -2508,6 +2618,7 @@ parsereg(char *str)
 {
     remnulargs(str);
     mode = 1;			/* no path components */
+    addflags = 0;
     pptr = str;
     tail = NULL;
     return parsecompsw(GF_TOPLEV);

@@ -593,6 +593,12 @@ extern char PC, *BC, *UP;
 extern short ospeed;
 #endif
 
+/* Rename some global zsh variables to avoid *
+ * possible name clashes with libc           */
+
+#define cs zshcs
+#define ll zshll
+
 #ifndef O_NOCTTY
 # define O_NOCTTY 0
 #endif

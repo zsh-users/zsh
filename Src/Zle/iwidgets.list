@@ -24,7 +24,7 @@
 "beginning-of-line", beginningofline, 0
 "beginning-of-line-hist", beginningoflinehist, 0
 "capitalize-word", capitalizeword, 0
-"clear-screen", clearscreen, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
+"clear-screen", clearscreen, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "complete-word", completeword, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "copy-prev-word", copyprevword, 0
 "copy-region-as-kill", copyregionaskill, ZLE_KEEPSUFFIX
@@ -32,7 +32,7 @@
 "delete-char-or-list", deletecharorlist, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "delete-word", deleteword, ZLE_KEEPSUFFIX
 "describe-key-briefly", describekeybriefly, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
-"digit-argument", digitargument, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
+"digit-argument", digitargument, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "down-case-word", downcaseword, 0
 "down-history", downhistory, 0
 "down-line-or-history", downlineorhistory, ZLE_LINEMOVE | ZLE_LASTCOL
@@ -73,7 +73,7 @@
 "magic-space", magicspace, 0
 "menu-complete", menucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "menu-expand-or-complete", menuexpandorcomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX
-"neg-argument", negargument, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
+"neg-argument", negargument, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "overwrite-mode", overwritemode, 0
 "pound-insert", poundinsert, 0
 "push-input", pushinput, 0
@@ -95,7 +95,7 @@
 "transpose-words", transposewords, 0
 "undefined-key", undefinedkey, 0
 "undo", undo, 0
-"universal-argument", universalargument, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
+"universal-argument", universalargument, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "up-case-word", upcaseword, 0
 "up-history", uphistory, 0
 "up-line-or-history", uplineorhistory, ZLE_LINEMOVE | ZLE_LASTCOL
@@ -145,8 +145,8 @@
 "vi-open-line-below", viopenlinebelow, 0
 "vi-oper-swap-case", vioperswapcase, 0
 "vi-pound-insert", vipoundinsert, 0
-"vi-put-after", viputafter, ZLE_YANK
-"vi-put-before", viputbefore, ZLE_YANK
+"vi-put-after", viputafter, ZLE_YANK | ZLE_KEEPSUFFIX
+"vi-put-before", viputbefore, ZLE_YANK | ZLE_KEEPSUFFIX
 "vi-quoted-insert", viquotedinsert, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "vi-repeat-change", virepeatchange, 0
 "vi-repeat-find", virepeatfind, 0
@@ -168,5 +168,5 @@
 "what-cursor-position", whatcursorposition, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "where-is", whereis, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "which-command", processcmd, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
-"yank", yank, ZLE_YANK
-"yank-pop", yankpop, ZLE_YANK
+"yank", yank, ZLE_YANK | ZLE_KEEPSUFFIX
+"yank-pop", yankpop, ZLE_YANK | ZLE_KEEPSUFFIX

@@ -31,7 +31,7 @@
 #define zleread(X,Y,H)  zlereadptr(X,Y,H)
 #define spaceinline(X)  spaceinlineptr(X)
 #define gotword()       gotwordptr()
-#define refresh()       refreshptr()
+#define zrefresh()      refreshptr()
 
 #define compctlread(N,A,O,R) compctlreadptr(N,A,O,R)
 

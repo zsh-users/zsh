@@ -145,6 +145,11 @@ if $first_stage; then
     echo "PROTOS  =$all_proto"
     echo "SUBDIRS =$all_subdirs"
     echo
+    echo "ENTRYOBJ = \$(dir_src)/modentry..o"
+    echo "NNTRYOBJ ="
+    echo "ENTRYOPT = -emodentry"
+    echo "NNTRYOPT ="
+    echo
 
     echo "##### ===== INCLUDING Makemod.in.in ===== #####"
     echo
@@ -161,7 +166,7 @@ if $first_stage; then
     remote_mdhs=
     for module in $here_modules; do
 
-	unset moddeps nozshdep alwayslink
+	unset moddeps nozshdep alwayslink hasexport
 	unset autobins
 	unset objects proto headers hdrdeps otherincs
 	. $top_srcdir/$the_subdir/${module}.mdd
@@ -172,8 +177,10 @@ if $first_stage; then
 
 	dobjects=`echo $objects '' | sed 's,\.o ,..o ,g'`
 	modhdeps=
+	imports=
 	for dep in $moddeps; do
 	    eval "loc=\$loc_$dep"
+	    imports="$imports \$(IMPOPT)\$(sdir_top)/$loc/$dep.export"
 	    case $the_subdir in
 		$loc)
 		    mdh="${dep}.mdh"
@@ -199,9 +206,11 @@ if $first_stage; then
 	echo "##### ===== DEPENDENCIES GENERATED FROM ${module}.mdd ===== #####"
 	echo
 	echo "MODOBJS_${module} = $objects"
-	echo "MODDOBJS_${module} = $dobjects"
+	echo "MODDOBJS_${module} = $dobjects \$(@E@NTRYOBJ)"
 	echo "PROTO_${module} = $proto"
 	echo "INCS_${module} = \$(PROTO_${module}) $otherincs"
+	echo "EXPIMP_${module} = $imports ${hasexport+\$(EXPOPT)\$(sdir)/$module.export}"
+	echo "NXPIMP_${module} ="
 	echo
 	echo "proto.${module}: \$(PROTO_${module})"
 	echo "\$(PROTO_${module}): \$(PROTODEPS)"
@@ -212,7 +221,7 @@ if $first_stage; then
 	if test -z "$alwayslink"; then
 	    echo "${module}.\$(DL_EXT): \$(MODDOBJS_${module})"
 	    echo '	rm -f $@'
-	    echo "	\$(DLLINK) \$(MODDOBJS_${module}) \$(LIBS)"
+	    echo "	\$(DLLINK) \$(@E@XPIMP_$module) \$(@E@NTRYOPT) \$(MODDOBJS_${module}) \$(LIBS)"
 	    echo
 	fi
 	echo "${module}.mdhi: ${module}.mdhs \$(INCS_${module})"

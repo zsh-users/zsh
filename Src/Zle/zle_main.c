@@ -69,6 +69,9 @@ static int baud;
 /**/
 int lastcmd;
 
+/**/
+Widget compwidget;
+
 /* the status line, and its length */
 
 /**/
@@ -112,7 +115,7 @@ int feepflag;
 
 /**/
 void
-setterm(void)
+zsetterm(void)
 {
     struct ttyinfo ti;
 
@@ -362,7 +365,7 @@ getkey(int keytmout)
 		ret = opts[MONITOR];
 		opts[MONITOR] = 1;
 		attachtty(mypgrp);
-		refresh();	/* kludge! */
+		zrefresh();	/* kludge! */
 		opts[MONITOR] = ret;
 		die = 1;
 	    } else if (errno != 0) {
@@ -372,7 +375,7 @@ getkey(int keytmout)
 	    }
 	}
 	if (cc == '\r')		/* undo the exchange of \n and \r determined by */
-	    cc = '\n';		/* setterm() */
+	    cc = '\n';		/* zsetterm() */
 	else if (cc == '\n')
 	    cc = '\r';
 
@@ -485,7 +488,7 @@ zleread(char *lp, char *rp, int ha)
 	initmodifier(&zmod);
 	prefixflag = 0;
 	feepflag = 0;
-	refresh();
+	zrefresh();
 	while (!done && !errflag) {
 
 	    statusline = NULL;
@@ -516,11 +519,11 @@ zleread(char *lp, char *rp, int ha)
 		    tv.tv_usec = 500000;
 		if (!kungetct && select(SHTTY+1, (SELECT_ARG_2_T) & foofd,
 					NULL, NULL, &tv) <= 0)
-		    refresh();
+		    zrefresh();
 	    } else
 #endif
 		if (!kungetct)
-		    refresh();
+		    zrefresh();
 	    handlefeep();
 	}
 	statusline = NULL;
@@ -562,12 +565,17 @@ execzlefunc(Thingy func)
 	showmsg(msg);
 	zsfree(msg);
 	feep();
-    } else if((w = func->widget)->flags & WIDGET_INT) {
+    } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_COMP)) {
 	int wflags = w->flags;
 
 	if(!(wflags & ZLE_KEEPSUFFIX))
 	    removesuffix();
-	if(!(wflags & ZLE_MENUCMP)) {
+	if(!(wflags & ZLE_MENUCMP) ||
+	   ((wflags & WIDGET_COMP) && compwidget != w)) {
+	    /* If we are doing a special completion, and the widget
+	     * is not the one currently in use for special completion,
+	     * we are starting a new completion.
+	     */
 	    fixsuffix();
 	    invalidatelist();
 	}
@@ -575,8 +583,13 @@ execzlefunc(Thingy func)
 	    vilinerange = 1;
 	if(!(wflags & ZLE_LASTCOL))
 	    lastcol = -1;
-	w->u.fn();
-	lastcmd = wflags;
+	if (wflags & WIDGET_COMP) {
+	    compwidget = w;
+	    completespecial();
+	} else
+	    w->u.fn();
+	if (!(wflags & ZLE_NOTCOMMAND))
+	    lastcmd = wflags;
     } else {
 	List l = getshfunc(w->u.fnnam);
 
@@ -743,7 +756,7 @@ describekeybriefly(void)
 	return;
     statusline = "Describe key briefly: _";
     statusll = strlen(statusline);
-    refresh();
+    zrefresh();
     seq = getkeymapcmd(curkeymap, &func, &str);
     statusline = NULL;
     if(!*seq)
@@ -811,14 +824,14 @@ void
 trashzle(void)
 {
     if (zleactive) {
-	/* This refresh() is just to get the main editor display right and *
-	 * get the cursor in the right place.  For that reason, we disable *
-	 * list display (which would otherwise result in infinite          *
-	 * recursion [at least, it would if refresh() didn't have its      *
-	 * extra `inlist' check]).                                         */
+	/* This zrefresh() is just to get the main editor display right and *
+	 * get the cursor in the right place.  For that reason, we disable  *
+	 * list display (which would otherwise result in infinite           *
+	 * recursion [at least, it would if zrefresh() didn't have its      *
+	 * extra `inlist' check]).                                          */
 	int sl = showinglist;
 	showinglist = 0;
-	refresh();
+	zrefresh();
 	showinglist = sl;
 	moveto(nlnct, 0);
 	if (clearflag && tccan(TCCLEAREOD)) {
@@ -838,7 +851,7 @@ trashzle(void)
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLR", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANL",          NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgG",     NULL),
 };
 
 /**/
@@ -848,7 +861,7 @@ boot_zle(Module m)
     /* Set up editor entry points */
     trashzleptr = trashzle;
     gotwordptr = gotword;
-    refreshptr = refresh;
+    refreshptr = zrefresh;
     spaceinlineptr = spaceinline;
     zlereadptr = zleread;
 

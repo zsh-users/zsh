@@ -55,12 +55,17 @@ NLIST = `cat stamp-modobjs`
 LIBZSH = libzsh-$(VERSION).$(DL_EXT)
 NIBZSH =
 
+ZSH_EXPORT = $(EXPOPT)$(sdir)/zsh.export
+ZSH_NXPORT =
+ENTRYOBJ   = modentry..o
+NNTRYOBJ   =
+
 LDRUNPATH = LD_RUN_PATH=$(libdir)/zsh
 NDRUNPATH =
 
 zsh: $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS)
 	rm -f $@
-	$(@L@DRUNPATH) $(LINK) $(MAIN_OBJS) $(@L@LIST) $(@L@IBZSH) $(LIBS)
+	$(@L@DRUNPATH) $(LINK) $(MAIN_OBJS) $(@L@LIST) $(ZSH_@E@XPORT) $(@L@IBZSH) $(LIBS)
 
 $(LIBZSH): $(LIBOBJS) $(NSTMP)
 	rm -f $@
@@ -113,6 +118,11 @@ modules-bltin:
 	else \
 	    echo > $@; \
 	fi
+
+modules: $(@E@NTRYOBJ)
+
+$(ENTRYOBJ): FORCE
+	@$(MAKE) -f Makemod $(MAKEDEFS) $@
 
 # ========== ANSI TO K&R CONVERSION ==========
 

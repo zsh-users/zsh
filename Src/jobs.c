@@ -214,7 +214,7 @@ update_job(Job jn)
     if ((isset(NOTIFY) || job == thisjob) && (jn->stat & STAT_LOCKED)) {
 	printjob(jn, !!isset(LONGLISTJOBS), 0);
 	if (zleactive)
-	    refresh();
+	    zrefresh();
     }
     if (sigtrapped[SIGCHLD] && job != thisjob)
 	dotrap(SIGCHLD);

@@ -32,6 +32,11 @@
 typedef struct compctlp  *Compctlp;
 typedef struct compctl   *Compctl;
 typedef struct compcond  *Compcond;
+typedef struct patcomp   *Patcomp;
+typedef struct cmatcher  *Cmatcher;
+typedef struct cmlist    *Cmlist;
+typedef struct cpattern  *Cpattern;
+typedef struct cline     *Cline;
 
 /* node for compctl hash table (compctltab) */
 
@@ -40,6 +45,14 @@ struct compctlp {
     char *nam;			/* command name                     */
     int flags;			/* CURRENTLY UNUSED                 */
     Compctl cc;			/* pointer to the compctl desc.     */
+};
+
+/* for the list of pattern compctls */
+
+struct patcomp {
+    Patcomp next;
+    char *pat;
+    Compctl cc;
 };
 
 /* compctl -x condition */
@@ -85,7 +98,7 @@ struct compcond {
 struct compctl {
     int refc;			/* reference count                         */
     Compctl next;		/* next compctl for -x                     */
-    unsigned long mask;		/* mask of things to complete (CC_*)       */
+    unsigned long mask, mask2;		/* mask of things to complete (CC_*)       */
     char *keyvar;		/* for -k (variable)                       */
     char *glob;			/* for -g (globbing)                       */
     char *str;			/* for -s (expansion)                      */
@@ -97,12 +110,15 @@ struct compctl {
     char *withd;		/* for -w (with directory                  */
     char *hpat;			/* for -H (history pattern)                */
     int hnum;			/* for -H (number of events to search)     */
+    char *gname;
     Compctl ext;		/* for -x (first of the compctls after -x) */
     Compcond cond;		/* for -x (condition for this compctl)     */
     Compctl xor;		/* for + (next of the xor'ed compctls)     */
+    Cmatcher matcher;		/* matcher control (-M) */
+    char *mstr;			/* matcher string */
 };
 
-/* objects to complete */
+/* objects to complete (mask) */
 #define CC_FILES	(1<<0)
 #define CC_COMMPATH	(1<<1)
 #define CC_REMOVE	(1<<2)
@@ -135,3 +151,120 @@ struct compctl {
 
 #define CC_EXPANDEXPL	(1<<30)
 #define CC_RESERVED	(1<<31)
+
+/* objects to complete (mask2) */
+#define CC_NOSORT	(1<<0)
+#define CC_XORCONT	(1<<1)
+#define CC_CCCONT	(1<<2)
+#define CC_PATCONT	(1<<3)
+#define CC_DEFCONT	(1<<4)
+
+typedef struct cexpl *Cexpl;
+typedef struct cmgroup *Cmgroup;
+typedef struct cmatch *Cmatch;
+
+/* This is for explantion strings. */
+
+struct cexpl {
+    char *str;			/* the string */
+    int count;			/* the number of matches */
+    int fcount;			/* number of matches with fignore ignored */
+
+};
+
+/* This describes a group of matches. */
+
+struct cmgroup {
+    char *name;			/* the name of this group */
+    Cmgroup prev;		/* previous on the list */
+    Cmgroup next;		/* next one in list */
+    int flags;			/* see CGF_* below */
+    int mcount;			/* number of matches */
+    Cmatch *matches;		/* the matches */
+    int lcount;			/* number of things to list here */
+    char **ylist;		/* things to list */
+    int ecount;			/* number of explanation string */
+    Cexpl *expls;		/* explanation strings */
+    int ccount;			/* number of compctls used */
+    Compctl *ccs;		/* the compctls used */
+    LinkList lexpls;		/* list of explanation string while building */
+    LinkList lmatches;		/* list of matches */
+    LinkList lfmatches;		/* list of matches without fignore */
+    LinkList lallccs;		/* list of used compctls */
+};
+
+
+#define CGF_NOSORT  1		/* don't sort this group */
+#define CGF_LINES   2		/* these are to be printed on different lines */
+
+/* This is the struct used to hold matches. */
+
+struct cmatch {
+    char *str;			/* the match itself */
+    char *ipre;			/* ignored prefix, has to be re-inserted */
+    char *ripre;		/* ignored prefix, unquoted */
+    char *ppre;			/* the path prefix */
+    char *psuf;			/* the path suffix */
+    char *prpre;		/* path prefix for opendir */
+    char *pre;			/* prefix string from -P */
+    char *suf;			/* suffix string from -S */
+    int flags;			/* see CMF_* below */
+    int brpl;			/* the place where to put the brace prefix */
+    int brsl;			/* ...and the suffix */
+};
+
+#define CMF_FILE     1		/* this is a file */
+#define CMF_REMOVE   2		/* remove the suffix */
+#define CMF_PARBR    4		/* paramter expansion with a brace */
+#define CMF_NOLIST   8		/* should not be listed */
+
+
+/* Stuff for completion matcher control. */
+
+struct cmlist {
+    Cmlist next;		/* next one in the list of global matchers */
+    Cmatcher matcher;		/* the matcher definition */
+    char *str;			/* the string for it */
+};
+
+struct cmatcher {
+    Cmatcher next;		/* next matcher */
+    int flags;			/* see CMF_* below */
+    Cpattern line;		/* what matches on the line */
+    int llen;			/* length of line pattern */
+    Cpattern word;		/* what matches in the word */
+    int wlen;			/* length of word pattern */
+    Cpattern left;		/* left anchor */
+    int lalen;			/* length of left anchor */
+    Cpattern right;		/* right anchor */
+    int ralen;			/* length of right anchor */
+};
+
+
+#define CMF_LINE  1
+#define CMF_LEFT  2
+#define CMF_RIGHT 4
+
+
+struct cpattern {
+    Cpattern next;		/* next sub-pattern */
+    unsigned char tab[256];	/* table of matched characters */
+    int equiv;			/* if this is a {...} class */
+};
+
+
+struct cline {
+    Cline next;			/* next chunk */
+    char *line;			/* string to insert if !word */
+    int llen;			/* length of line */
+    char *word;			/* prefered string to insert */
+    int wlen;			/* length of word */
+    Cmatcher matcher;		/* which matcher was used */
+    int flags;			/* see CLF_* below */
+};
+
+#define CLF_END   1
+#define CLF_MID   2
+#define CLF_MISS  4
+#define CLF_DIFF  8
+#define CLF_SUF  16
