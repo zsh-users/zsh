@@ -1,3 +1,8 @@
+2004-04-18  Clint Adams  <clint@zsh.org>
+
+	* 19792: Completion/X/Command/_mplayer: complete .m2v and .m2p,
+	thanks to Rene H. Larsen.
+
 2004-04-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 19790: Completion/Zsh/Command/_zcompile: complete functions
