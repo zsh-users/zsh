@@ -1480,10 +1480,11 @@ addhistnode(HashTable ht, char *nam, void *nodeptr)
     HashNode oldnode = addhashnode2(ht, nam, nodeptr);
     Histent he = (Histent)nodeptr;
     if (oldnode && oldnode != (HashNode)nodeptr) {
-	if (he->flags & HIST_MAKEUNIQUE
+	if (he->flags & (HIST_MAKEUNIQUE | HIST_TMPSTORE)
 	 || (he->flags & HIST_FOREIGN && (Histent)oldnode == he->up)) {
+	    (void) addhashnode2(ht, oldnode->nam, oldnode); /* restore hash */
 	    he->flags |= HIST_DUP;
-	    addhashnode(ht, oldnode->nam, oldnode); /* Remove the new dup */
+	    he->flags &= ~HIST_MAKEUNIQUE;
 	}
 	else {
 	    oldnode->flags |= HIST_DUP;
