@@ -1,3 +1,9 @@
+2004-08-23  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20282: Src/Zle/zle_hist.c: fixed a problem with a negative
+	NUMERIC causing wrong movement in combo zle commands such as
+	up-/down-line-or-history and up-/down-line-or-search.
+
 2004-08-18  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20269, 20270: Completion/Unix/Command/_make: Don't output the
