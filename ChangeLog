@@ -1,3 +1,8 @@
+2000-06-23  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12041: Completion/Core/compinit: even more compiinit stuff,
+ 	change prompt, search for insecure parent dirs
+	
 2000-06-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 12040: Src/builtin.c: typeset -r on existing parameter set

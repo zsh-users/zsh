@@ -347,8 +347,20 @@ if [[ -n "$_i_check" ]]; then
   if [[ "$_i_fail" != use ]]; then
     typeset _i_q
 
-    _i_wdirs=( ${^fpath}(Nf:g+w:,f:o+w:,^u0u${EUID}) )
-    _i_wfiles=( ${^~fpath:/.}/^([^_]*|*~)(N^u0u${EUID}) )
+    # We search for:
+    # - world/group-writable directories in fpath not owned by root or the user
+    # - parent-directories of directories in fpath that are world/group-writable
+    #   and not owned by root or the user (that would allow someone to put a
+    #   digest file for one of the directories into the parent directory)
+    # - digest files for one of the directories in fpath not owned by root or
+    #   the user
+    # - and for files in directories from fpath not owned by root or the user
+    #   (including zwc files)
+
+    _i_wdirs=( ${^fpath}(Nf:g+w:,f:o+w:,^u0u${EUID})
+               ${^fpath}/..(Nf:g+w:,f:o+w:,^u0u${EUID})
+               ${^fpath}.zwc^([^_]*|*~)(N^u0u${EUID}) )
+    _i_wfiles=( ${^fpath}/^([^_]*|*~)(N^u0u${EUID}) )
 
     case "${#_i_wdirs}:${#_i_wfiles}" in
     0:0) _i_q= ;;
@@ -359,7 +371,7 @@ if [[ -n "$_i_check" ]]; then
 
     if [[ -n "$_i_q" ]]; then
       if [[ "$_i_fail" = ask ]]; then
-        if ! read -q "?There are insecure $_i_q, continue [yn]? "; then
+        if ! read -q "?There are insecure $_i_q, continue [ny]? "; then
           unfunction compinit compdef
           unset _comp_dumpfile _comp_secure compprefuncs comppostfuncs \
                 _comps _patcomps _postpatcomps _compautos _lastcomp
@@ -369,8 +381,8 @@ if [[ -n "$_i_check" ]]; then
         _i_wfiles=()
 	_i_wdirs=()
       else
-        (( $#_i_wfiles )) && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wfiles})}"  )
-        (( $#_i_wdirs ))  && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wdirs})/*}" )
+        (( $#_i_wfiles )) && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wfiles%.zwc})}"  )
+        (( $#_i_wdirs ))  && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wdirs%.zwc})/*}" )
       fi
     fi
     _comp_secure=yes
