@@ -610,6 +610,7 @@ cd_get(char **params)
             }
             break;
 
+	default: /* This silences the "might be used uninitialized" warnings */
         case CRT_EXPL:
             {
                 int dlen = columns - cd_state.gpre - cd_state.slen;
