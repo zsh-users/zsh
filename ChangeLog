@@ -1,3 +1,8 @@
+2000-12-17  Clint Adams  <schizo@debian.org>
+
+	* 13287: Completion/Debian/_dpkg: complete multiple
+	arguments for -i.
+
 2000-12-16  Clint Adams  <schizo@debian.org>
 
 	* unposted: Completion/User/.distfiles: add _mere
