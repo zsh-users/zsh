@@ -1,3 +1,8 @@
+2002-03-17  Clint Adams  <clint@zsh.org>
+
+        * 16846: Completion/X/Command/_xdvi: complete .dvi.gz and .dvi.bz2
+        too.
+
 2002-03-10  Clint Adams  <clint@zsh.org>
 
         * unposted: Etc/BUGS, Etc/TODO: update relevant
