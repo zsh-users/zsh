@@ -401,7 +401,10 @@ init_io(void)
     if (opts[MONITOR] && interact && (SHTTY != -1)) {
 	if ((mypgrp = GETPGRP()) > 0) {
 	    while ((ttpgrp = gettygrp()) != -1 && ttpgrp != mypgrp) {
+		sleep(1);	/* give parent time to change pgrp */
 		mypgrp = GETPGRP();
+		if (mypgrp == mypid)
+		    attachtty(mypgrp);
 		if (mypgrp == gettygrp())
 		    break;
 		killpg(mypgrp, SIGTTIN);
@@ -411,7 +414,6 @@ init_io(void)
 	    opts[MONITOR] = 0;
     } else
 	opts[MONITOR] = 0;
-    attachtty(GETPGRP());
 #else
     opts[MONITOR] = 0;
 #endif
