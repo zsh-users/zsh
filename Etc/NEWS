@@ -2,8 +2,8 @@
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
 
-New features between zsh versions 4.0 and 4.1
----------------------------------------------
+New features between zsh versions 4.0 and 4.1.1
+-----------------------------------------------
 
 Configuration:
 - upgraded to use autoconf post-2.50

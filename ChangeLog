@@ -1,3 +1,8 @@
+2003-06-18  Peter Stephenson  <pws@csr.com>
+
+	* unposted: README, Etc/NEWS, Config/version.mk: version 4.1.1,
+	finally.
+
 2003-06-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 18607: Completion/Unix/Command/_rlogin: correctly handle
