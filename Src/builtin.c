@@ -3518,6 +3518,8 @@ bin_getopts(char *name, char **argv, char *ops, int func)
 
     /* find place in relevant argument */
     str = unmetafy(dupstring(args[zoptind - 1]), &lenstr);
+    if (!lenstr)		/* Definitely not an option. */
+	return 1;
     if(optcind >= lenstr) {
 	optcind = 0;
 	if(!args[zoptind++])
