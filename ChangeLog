@@ -1,3 +1,8 @@
+2004-10-16  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 20490: Src/pattern.c, Src/zsh.h: use lengths for test strings in
+	patterns instead of null termination.
+
 2004-10-14  Peter Stephenson  <pws@csr.com>
 
 	* 20482: Src/Zle/complist.c: A TAB after entering interactive
