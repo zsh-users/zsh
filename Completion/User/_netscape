@@ -56,15 +56,9 @@ if [[ "$state" = "remote" ]]; then
       fi
     ;;
     *)
-      if [[ -z "$QIPREFIX" ]]; then
-	_wanted commands expl 'remote commands' \
-  	    compadd -s'(' -S '' -M 'm:{a-zA-Z}={A-Za-z}' - \
-                    $remote_commands && ret=0
-      else
-	_wanted commands expl 'remote commands' \
-            compadd -qS '(' -M 'm:{a-zA-Z}={A-Za-z}' - \
-                    $remote_commands && ret=0
-      fi
+      _wanted commands expl 'remote commands' \
+  	  compadd -qS "${${QIPREFIX:+(}:-\(}" -M 'm:{a-zA-Z}={A-Za-z}' - \
+                  $remote_commands && ret=0
     ;;
   esac
 fi
