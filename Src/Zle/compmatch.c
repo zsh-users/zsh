@@ -351,7 +351,6 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
 
     p = bld_parts(s, sl, osl, &lp);
 
-    p->flags &= ~CLF_NEW;
     if (m && (m->flags & CMF_LEFT)) {
 	lp->flags |= CLF_SUF;
 	lp->suffix = lp->prefix;
@@ -384,7 +383,8 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
     lp->line = l; lp->llen = wl;
     lp->word = w; lp->wlen = wl;
     lp->orig = o; lp->olen = ol;
-    lp->flags &= ~CLF_NEW;
+    if (o || ol)
+	lp->flags &= ~CLF_NEW;
 
     /* Finally, put the new parts on the list. */
     if (matchlastpart)
