@@ -61,7 +61,7 @@ static int
 bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int err=1, verbose=0, test=0, targetfd=0;
-    SOCKLEN_T len;
+    ZSOCKLEN_T len;
     struct sockaddr_un soun;
     int sfd;
 

@@ -972,7 +972,7 @@ zfopendata(char *name, union tcp_sockaddr *zdsockp, int *is_passivep)
 #else
 	char portcmd[40];
 #endif
-	SOCKLEN_T len;
+	ZSOCKLEN_T len;
 	int ret;
 
 	if (!(zfprefs & ZFPF_SNDP)) {
@@ -1065,7 +1065,7 @@ zfclosedata(void)
 static int
 zfgetdata(char *name, char *rest, char *cmd, int getsize)
 {
-    SOCKLEN_T len;
+    ZSOCKLEN_T len;
     int newfd, is_passive;
     union tcp_sockaddr zdsock;
 
@@ -1702,7 +1702,7 @@ zftp_open(char *name, char **args, int flags)
     char **addrp, *fname, *tmpptr, *portnam = "ftp";
     char *hostnam, *hostsuffix;
     int err, tmout, port = -1;
-    SOCKLEN_T  len;
+    ZSOCKLEN_T  len;
     int herrno, af, hlen;
 
     if (!*args) {

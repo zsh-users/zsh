@@ -340,7 +340,7 @@ static int
 bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int herrno, err=1, destport, force=0, verbose=0, test=0, targetfd=0;
-    SOCKLEN_T  len;
+    ZSOCKLEN_T  len;
     char **addrp, *desthost, *localname, *remotename;
     struct hostent *zthost = NULL, *ztpeer = NULL;
     struct servent *srv;

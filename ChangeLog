@@ -1,3 +1,8 @@
+2004-11-16  Peter Stephenson  <pws@csr.com>
+
+	* 20556: AIX 5.3 has a SOCKLEN_T definition, so use
+	ZSOCKLEN_T internally.
+
 2004-11-12  Peter Stephenson  <pws@csr.com>
 
 	* Motoi Washida <a66@h8.dion.ne.jp>: 20274, 20552:

@@ -695,6 +695,7 @@ dnl zsh_CHECK_SOCKLEN_T
 dnl
 dnl	check type of third argument of some network functions; currently
 dnl	tested are size_t *, unsigned long *, int *.
+dnl     call the result ZSOCKLEN_T since some systems have SOCKLEN_T already
 dnl
 AC_DEFUN([zsh_CHECK_SOCKLEN_T],[
   AC_CACHE_CHECK(
@@ -714,7 +715,7 @@ AC_DEFUN([zsh_CHECK_SOCKLEN_T],[
       zsh_cv_type_socklen_t=int
     fi]
   )
-  AC_DEFINE_UNQUOTED([SOCKLEN_T], [$zsh_cv_type_socklen_t],
+  AC_DEFINE_UNQUOTED([ZSOCKLEN_T], [$zsh_cv_type_socklen_t],
   [Define to the base type of the third argument of accept])]
 )
 
