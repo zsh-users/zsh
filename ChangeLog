@@ -1,3 +1,10 @@
+2000-05-09  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 11288: Completion/Commands/_complete_help,
+	Completion/Core/_main_complete: Reopen stdin from /dev/null,
+	because ZLE closes it during any widget function, which confuses
+	some external programs.
+
 2000-05-09  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: 11285: Src/Modules/zftp.c: move cleanup code to

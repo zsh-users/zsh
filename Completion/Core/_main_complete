@@ -18,6 +18,7 @@
 
 setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
+exec </dev/null	# ZLE closes stdin, which can cause errors
 
 local func funcs ret=1 tmp _compskip format nm \
       _completers _completer _completer_num curtag _comp_force_list \
