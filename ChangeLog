@@ -1,3 +1,9 @@
+2000-08-08  Peter Stephenson  <pws@csr.com>
+
+	* 12561: Completion/Builtins/_zmodload, Doc/Zsh/builtins.yo,
+	Src/builtin.c, Src/module.c, Src/zsh.h: aliases for modules
+	done internally via `zmodload -[AR]'.
+
 2000-08-07  Peter Stephenson  <pws@csr.com>
 
 	* 12555: Fix static linking on cygwin.
