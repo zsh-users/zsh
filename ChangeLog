@@ -1,5 +1,8 @@
 2000-06-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12070: Completion/Core/_ignored: fix for completer lookup in
+ 	_ignored
+	
 	* 12068: Doc/Zsh/mod_computil.yo, Src/Zle/computil.c: remove
  	compfmt; a bit of explanation for compfiles and compgroups
 	
