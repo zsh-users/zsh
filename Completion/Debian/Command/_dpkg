@@ -24,7 +24,7 @@ _dpkg_common_actions=(
 
 _dpkg_actions=(
   '(--install -i)'{--install,-i}'[install packages]:*:Debian packages:->install'
-  '--unpack[unpack package]:Debian package:_files -g \*.u\#deb'
+  '--unpack[unpack package]:Debian package:_files -g \*.deb'
   '--configure[reconfigure specified packages]:*:package:->configure'
   '(--remove -r)'{--remove,-r}'[remove package]:*:package:->remove'
   '(--purge -P)'{--purge,-P}'[purge package]:*:package:->purge'
@@ -101,7 +101,7 @@ case "$state" in
              "$_dpkg_options_recursive[@]" \
 	     '*:directory:_path_files -/' \
 	   - nonrecur \
-	     '*:Debian package:_path_files -g \*.u\#deb'
+	     '*:Debian package:_path_files -g \*.deb'
   ;;
   remove|purge|status|listfiles)
         _call_function ret _dpkg_$state && return ret

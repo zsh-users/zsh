@@ -1,3 +1,8 @@
+2002-05-28  Clint Adams  <clint@zsh.org>
+
+	* 17244: Completion/Debian/Command/_dpkg:
+	don't complete udebs for --unpack or -i.
+
 2002-05-27  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17237: Src/Zle/complist.c: follow-up to 17222, make the
