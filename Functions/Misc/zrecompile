@@ -128,11 +128,13 @@ if [[ -n $pats ]]; then
         # If the file is mapped, it might be mapped right now, so keep the
 	# old file by renaming it.
 
-	if { [[ ! -f $zwc ]] || mv $zwc ${zwc}.old } &&
-             zcompile $map $tmp $zwc $files 2> /dev/null; then
-          [[ -z $quiet ]] && print succeeded
-        else
-          [[ -z $quiet ]] && print failed
+	if [[ -z "$quiet" ]] &&
+           { [[ ! -f $zwc ]] || mv $zwc ${zwc}.old } &&
+           zcompile $map $tmp $zwc $files; then
+          print succeeded
+	elif ! { { [[ ! -f $zwc ]] || mv $zwc ${zwc}.old } &&
+                 zcompile $map $tmp $zwc $files 2> /dev/null } then
+          [[ -z $quiet ]] && print "re-compiling ${zwc}: failed"
           ret=1
         fi
       fi
@@ -230,10 +232,13 @@ for zwc; do
         # If the file is mapped, it might be mapped right now, so keep the
 	# old file by renaming it.
 
-	if mv $zwc ${zwc}.old && zcompile $map $zwc $files 2> /dev/null; then
-          [[ -z $quiet ]] && print $mesg
-        else
-          [[ -z $quiet ]] && print failed
+	if [[ -z "$quiet" ]] &&
+           mv $zwc ${zwc}.old &&
+           zcompile $map $zwc $files; then
+          print $mesg
+	elif ! { mv $zwc ${zwc}.old &&
+                 zcompile $map $zwc $files 2> /dev/null } then
+          [[ -z $quiet ]] && print "re-compiling ${zwc}: failed"
           ret=1
         fi
       fi
