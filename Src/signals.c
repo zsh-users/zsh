@@ -945,7 +945,16 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     *sigtr |= ZSIG_IGNORED;
 
     lexsave();
-    execsave();
+    if (sig != SIGEXIT && sig != SIGDEBUG) {
+	/*
+	 * SIGEXIT and SIGDEBUG are always run synchronously, so we don't
+	 * need to save and restore the state.
+	 *
+	 * Do we actually need this at all now we queue signals
+	 * for handling in places where they won't cause trouble?
+	 */
+	execsave();
+    }
     breaks = 0;
     runhookdef(BEFORETRAPHOOK, NULL);
     if (*sigtr & ZSIG_FUNC) {
@@ -972,7 +981,8 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	trapret = trapreturn;
     else if (errflag)
 	trapret = 1;
-    execrestore();
+    if (sig != SIGEXIT && sig != SIGDEBUG)
+	execrestore();
     lexrestore();
 
     if (trapret > 0) {

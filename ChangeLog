@@ -1,5 +1,9 @@
 2002-05-29  Peter Stephenson  <pws@csr.com>
 
+	* 17250: Src/signals.c: don't execsave()/execrestore() around
+	traps which are executed synchronously, which caused unexpected
+	return statuses from `trap "return ..." EXIT'.
+
 	* 17249: Src/Modules/tcp.c: send output from `ztcp' or `ztcp -v'
 	to stdout, not the zle file descriptor.
 
