@@ -1,3 +1,7 @@
+2001-10-01  Peter Stephenson  <pws@csr.com>
+
+	* 15917: Test/C03traps.ztst: test for EXIT trap fix in 15844.
+
 2001-09-30  Clint Adams  <clint@zsh.org>
 
 	* 15915: Completion/Debian/Command/_bts:
@@ -24,7 +28,7 @@
 
 2001-09-27  Peter Stephenson  <pws@csr.com>
 
-	* Config/version.mk, Completion/Unix/Command/.distfiles,
+	* unposted: Config/version.mk, Completion/Unix/Command/.distfiles,
 	Doc/Zsh/.distfiles, Functions/Misc/.distfiles,
 	Functions/Zle/.distfiles, Test/.distfiles: version 4.1.0-dev-2,
 	with the usual fix for the list of distributed files.
@@ -58,8 +62,8 @@
 
 2001-09-24  Peter Stephenson  <pws@csr.com>
 
-	* Src/builtin.c, Src/exec.c: Unwind function calls before exiting
-	shell from exit command to allow EXIT traps to run.
+	* 15844: Src/builtin.c, Src/exec.c: Unwind function calls before
+	exiting	shell from exit command to allow EXIT traps to run.
 
 2001-09-21  Andrew Main (Zefram)  <zefram@zsh.org>
 

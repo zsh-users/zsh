@@ -45,6 +45,18 @@
 0:Nested `trap - EXIT' on `TRAPEXIT'
 >EXIT1
 
+# We can't test an EXIT trap for the shell as a whole, because
+# we're inside a function scope which we don't leave when the
+# subshell exits.  Not sure if that's the correct behaviour, but
+# it's sort of consistent.
+  ( fn1() { trap 'print Function 1 going' EXIT; exit; print Not reached; }
+    fn2() { trap 'print Function 2 going' EXIT; fn1; print Not reached; }
+    fn2
+  )
+0:EXIT traps on functions when exiting from function
+>Function 1 going
+>Function 2 going
+
   fn1() {
     trap
     trap 'print INT1' INT
