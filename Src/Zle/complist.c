@@ -887,7 +887,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    if (*p == '\n') {
 		if (dopr == 1 && mlbeg >= 0 && tccan(TCCLEAREOL))
 		    tcout(TCCLEAREOL);
-		l += 1 + (cc / columns);
+		l += 1 + ((cc - 1) / columns);
 		cc = 0;
 	    }
 	    if (dopr == 1) {
@@ -909,9 +909,12 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    }
 	}
     }
-    if (dopr && mlbeg >= 0 && tccan(TCCLEAREOL))
-	tcout(TCCLEAREOL);
-
+    if (dopr) {
+        if (!(cc % columns))
+            fputs(" \010", shout);
+        if (mlbeg >= 0 && tccan(TCCLEAREOL))
+            tcout(TCCLEAREOL);
+    }
     if (stat && n)
 	mfirstl = -1;
 

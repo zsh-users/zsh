@@ -1949,7 +1949,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 			    putc(' ', shout);
 		    }
 		}
-		l += 1 + (cc / columns);
+		l += 1 + ((cc - 1) / columns);
 		cc = 0;
 	    }
 	    if (dopr) {
@@ -1960,6 +1960,8 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 	}
     }
     if (dopr) {
+        if (!(cc % columns))
+            fputs(" \010", shout);
 	if (tccan(TCCLEAREOL))
 	    tcout(TCCLEAREOL);
 	else {
