@@ -61,6 +61,11 @@
 	* 18872: Completion/Unix/Command/_java: update javac completion for
 	SDK 1.4.x and rename serialvar to serialver
 
+2003-07-20  Clint Adams  <clint@zsh.org>
+
+	* 18874: Completion/Unix/Command/_subversion: PATH can mean
+	files too.
+
 2003-07-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 18866: Etc/completion-style-guide: document conventions used
@@ -87,6 +92,13 @@
 
 	* 18822: Completion/Base/Completer/_expand
 	fix accept-exact style not not bail out when it shouldn't
+
+2003-07-07  Clint Adams  <clint@zsh.org>
+
+	* 18831: Completion/Unix/Command/_subversion: completion for
+	svn and svnadmin.
+	* 18832: Completion/Debian/Command/_debsign: completion for
+	debsign, by Matt Zimmerman.
 
 2003-07-04  Oliver Kiddle  <opk@zsh.org>
 
