@@ -1831,13 +1831,21 @@ skipwsep(char **s)
 
 /**/
 mod_export char **
-spacesplit(char *s, int allownull, int heap)
+spacesplit(char *s, int allownull, int heap, int quote)
 {
     char *t, **ret, **ptr;
     int l = sizeof(*ret) * (wordcount(s, NULL, -!allownull) + 1);
     char *(*dup)(const char *) = (heap ? dupstring : ztrdup);
 
     ptr = ret = (heap ? (char **) hcalloc(l) : (char **) zcalloc(l));
+
+    if (quote) {
+	/*
+	 * we will be stripping quoted separators by hacking string,
+	 * so make sure it's hackable.
+	 */
+	s = dupstring(s);
+    }
 
     t = s;
     skipwsep(&s);
@@ -1853,7 +1861,7 @@ spacesplit(char *s, int allownull, int heap)
 	    skipwsep(&s);
 	}
 	t = s;
-	findsep(&s, NULL);
+	findsep(&s, NULL, quote);
 	if (s > t || allownull) {
 	    *ptr = (heap ? (char *) hcalloc((s - t) + 1) :
 		    (char *) zcalloc((s - t) + 1));
@@ -1871,13 +1879,30 @@ spacesplit(char *s, int allownull, int heap)
 
 /**/
 static int
-findsep(char **s, char *sep)
+findsep(char **s, char *sep, int quote)
 {
+    /*
+     * *s is the string we are looking along, which will be updated
+     * to the point we have got to.
+     *
+     * sep is a possibly multicharacter separator to look for.  If NULL,
+     * use normal separator characters.
+     *
+     * quote is a flag that '\<sep>' should not be treated as a separator.
+     * in this case we need to be able to strip the backslash directly
+     * in the string, so the calling function must have sent us something
+     * modifiable.  currently this only works for sep == NULL.
+     */
     int i;
     char *t, *tt;
 
     if (!sep) {
 	for (t = *s; *t; t++) {
+	    if (quote && *t == '\\' &&
+		isep(t[1] == Meta ? (t[2] ^ 32) : t[1])) {
+		chuck(t);
+		continue;
+	    }
 	    if (*t == Meta) {
 		if (isep(t[1] ^ 32))
 		    break;
@@ -1928,7 +1953,7 @@ findword(char **s, char *sep)
     if (sep) {
 	sl = strlen(sep);
 	r = *s;
-	while (! findsep(s, sep)) {
+	while (! findsep(s, sep, 0)) {
 	    r = *s += sl;
 	}
 	return r;
@@ -1942,7 +1967,7 @@ findword(char **s, char *sep)
 	    break;
     }
     *s = t;
-    findsep(s, sep);
+    findsep(s, sep, 0);
     return t;
 }
 
@@ -1955,7 +1980,7 @@ wordcount(char *s, char *sep, int mul)
     if (sep) {
 	r = 1;
 	sl = strlen(sep);
-	for (; (c = findsep(&s, sep)) >= 0; s += sl)
+	for (; (c = findsep(&s, sep, 0)) >= 0; s += sl)
 	    if ((c && *(s + sl)) || mul)
 		r++;
     } else {
@@ -1975,7 +2000,7 @@ wordcount(char *s, char *sep, int mul)
 		if (mul <= 0)
 		    skipwsep(&s);
 	    }
-	    findsep(&s, NULL);
+	    findsep(&s, NULL, 0);
 	    t = s;
 	    if (mul <= 0)
 		skipwsep(&s);
@@ -2023,7 +2048,7 @@ sepsplit(char *s, char *sep, int allownull, int heap)
     char *t, *tt, **r, **p;
 
     if (!sep)
-	return spacesplit(s, allownull, heap);
+	return spacesplit(s, allownull, heap, 0);
 
     sl = strlen(sep);
     n = wordcount(s, sep, 1);
@@ -2032,7 +2057,7 @@ sepsplit(char *s, char *sep, int allownull, int heap)
 
     for (t = s; n--;) {
 	tt = t;
-	findsep(&t, sep);
+	findsep(&t, sep, 0);
 	*p = (heap ? (char *) hcalloc(t - tt + 1) :
 	      (char *) zcalloc(t - tt + 1));
 	strncpy(*p, tt, t - tt);

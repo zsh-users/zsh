@@ -823,7 +823,46 @@ bin_vared(char *name, char **args, char *ops, int func)
 	zwarnnam(name, "no such variable: %s", args[0], 0);
 	return 1;
     } else if (v) {
-	s = getstrvalue(v);
+	if (v->isarr) {
+	    /* Array: check for separators and quote them. */
+	    char **arr = getarrvalue(v), **aptr, **tmparr, **tptr;
+	    tptr = tmparr = (char **)zhalloc(sizeof(char *)*(arrlen(arr)+1));
+	    for (aptr = arr; *aptr; aptr++) {
+		int sepcount = 0;
+		/* See if this word contains a separator character */
+		for (t = *aptr; *t; t++) {
+		    if (*t == Meta) {
+			if (isep(t[1] ^ 32))
+			    sepcount++;
+			t++;
+		    } else if (isep(*t))
+			sepcount++;
+		}
+		if (sepcount) {
+		    /* Yes, so allocate enough space to quote it. */
+		    char *newstr, *nptr;
+		    newstr = zhalloc(strlen(*aptr)+sepcount+1);
+		    /* Go through string quoting separators */
+		    for (t = *aptr, nptr = newstr; *t; ) {
+			if (*t == Meta) {
+			    if (isep(t[1] ^ 32))
+				*nptr++ = '\\';
+			    *nptr++ = *t++;
+			} else if (isep(*t))
+			    *nptr++ = '\\';
+			*nptr++ = *t++;
+		    }
+		    *nptr = '\0';
+		    /* Stick this into the array of words to join up */
+		    *tptr++ = newstr;
+		} else
+		    *tptr++ = *aptr; /* No, keep original array element */
+	    }
+	    *tptr = NULL;
+	    s = sepjoin(tmparr, NULL, 0);
+	} else {
+	    s = ztrdup(getstrvalue(v));
+	}
 	pm = v->pm;
     } else if (*s) {
 	zwarnnam(name, "invalid parameter name: %s", args[0], 0);
@@ -842,7 +881,7 @@ bin_vared(char *name, char **args, char *ops, int func)
 	haso = 1;
     }
     /* edit the parameter value */
-    zpushnode(bufstack, ztrdup(s));
+    zpushnode(bufstack, s);
 
     varedarg = *args;
     ifl = isfirstln;
@@ -881,7 +920,11 @@ bin_vared(char *name, char **args, char *ops, int func)
     if (pm && (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED))) {
 	char **a;
 
-	a = spacesplit(t, 1, 0);
+	/*
+	 * Use spacesplit with fourth argument 1: identify quoted separators,
+	 * unquote but don't split.
+	 */
+	a = spacesplit(t, 1, 0, 1);
 	if (PM_TYPE(pm->flags) == PM_ARRAY)
 	    setaparam(args[0], a);
 	else

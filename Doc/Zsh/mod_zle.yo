@@ -161,6 +161,12 @@ an array parameter, or the tt(-A) flag to create an associative array.
 If the type of an existing parameter does not match the type to be
 created, the parameter is unset and recreated.
 
+If an array or array slice is being edited, separator characters as defined
+in tt($IFS) will be shown quoted with a backslash.  Conversely, when the
+edited text is split into an array, a backslash quotes an immediately
+following separator character; no other special handling of backslashes, or
+any handling of quotes, is performed.
+
 Individual elements of existing array or associative array parameters
 may be edited by using subscript syntax on var(name).  New elements are
 created automatically, even without tt(-c).

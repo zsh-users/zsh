@@ -2744,7 +2744,7 @@ readoutput(int in, int qt)
 	}
 	addlinknode(ret, buf);
     } else {
-	char **words = spacesplit(buf, 0, 1);
+	char **words = spacesplit(buf, 0, 1, 0);
 
 	while (*words) {
 	    if (isset(GLOBSUBST))

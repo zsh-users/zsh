@@ -1,3 +1,8 @@
+2000-07-27  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12414: Doc/Zsh/mod_zle.yo, Src/exec.c, Src/utils.c,
+	Src/Zle/zle_main.c: vared quotes separators when editing arrays.
+
 2000-07-27  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12408: Test/55arguments.ztst: fix completion test (55*) because
