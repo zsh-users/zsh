@@ -12,9 +12,9 @@ local expl last minus pre sigs
 
 zparseopts -D -K -E 'p=minus' 'a=last' 's=pre'
 if [[ -z "$last" ]]; then
-  last=-1
-else
   last=-3
+else
+  last=-1
 fi
 [[ -n "$minus" ]] && minus='-'
 
