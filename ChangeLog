@@ -1,3 +1,8 @@
+2004-03-05  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: config.guess, config.sub: update to versions from
+	autoconf 2.59 (both dated October 23, 2003).
+
 2004-03-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 19540: Completion/Unix/Command/_gpg, Completion/X/Command/_mplayer:
