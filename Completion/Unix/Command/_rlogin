@@ -5,7 +5,7 @@ _rcp_remote_files () {
   local expl remfiles remdispf remdispd suf ret=1
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
-    remfiles=(${(M)${(f)"$(rsh ${IPREFIX%:} ls -d1F ${PREFIX%%[^./][^/]#}\* 2>/dev/null)"}%%[^/]#(|/)})
+    remfiles=(${(M)${(f)"$(rsh ${IPREFIX%:} ls -d1F ${(Q)PREFIX%%[^./][^/]#}\* 2>/dev/null)"}%%[^/]#(|/)})
     compset -P '*/'
     compset -S '/*' || suf='remote file'
 
@@ -16,9 +16,9 @@ _rcp_remote_files () {
     while _tags; do
       while _next_label files expl ${suf:-remote directory}; do
         [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf \
-	    ${remdispf%[*=@|]} && ret=0 
+	    ${(q)remdispf%[*=@|]} && ret=0 
 	compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
-	    ${remdispd%/} && ret=0
+	    ${(q)remdispd%/} && ret=0
       done
       (( ret )) || return 0
     done

@@ -1,3 +1,8 @@
+2003-06-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 18607: Completion/Unix/Command/_rlogin: correctly handle
+	quoting for remote files for rcp completion
+
 2003-06-05  Peter Stephenson  <pws@csr.com>
 
 	* users/6154: Src/subst.c: anchors didn't work with //
