@@ -499,6 +499,7 @@ while [[ cur -gt 0 ]]; do
 	line=( "$line[@]" "$ws[1]" )
 	[[ -n "$inopt" ]] && nargbeg=$(( beg - 1 ))
 	inopt=''
+        [[ -z "$args[nth]" && "$rest" = \*::* ]] && break
 	(( nth++ ))
       fi
     fi
