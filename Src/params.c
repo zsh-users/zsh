@@ -1393,7 +1393,7 @@ mod_export char *
 getstrvalue(Value v)
 {
     char *s, **ss;
-    char buf[(sizeof(zlong) * 8) + 4];
+    char buf[BDIGBUFSIZE];
 
     if (!v)
 	return hcalloc(1);
@@ -1535,7 +1535,7 @@ getnumvalue(Value v)
 void
 export_param(Param pm)
 {
-    char buf[(sizeof(zlong) * 8) + 4], *val;
+    char buf[BDIGBUFSIZE], *val;
 
     if (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED)) {
 #if 0	/* Requires changes elsewhere in params.c and builtin.c */
