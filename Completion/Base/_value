@@ -23,7 +23,7 @@ _value () {
        [[ "$PREFIX$SUFFIX" = *:* ]]; then
       compset -P '*:'
       compset -S ':*'
-      _default -qS: "$@"
+      _default -r '\-\n\t /:' "$@"
     else
       _default "$@"
     fi
@@ -46,7 +46,7 @@ _value:LDFLAGS () {
   elif compset -P '-R'; then
     compset -P '*:'
     compset -S ':*'
-    _files -/ -S/ -r ' :' "$@"
+    _files -/ -S/ -r '\n\t\- /:' "$@"
   else
     _default "$@"
   fi
