@@ -403,7 +403,7 @@ static char *last_cap;
 static void
 zlrputs(Listcols c, char *cap)
 {
-    if (strcmp(last_cap, cap)) {
+    if (!*last_cap || strcmp(last_cap, cap)) {
 	VARARR(char, buf, lr_caplen + max_caplen + 1);
 
 	strcpy(buf, c->files[COL_LC]->col);
@@ -435,9 +435,10 @@ zcputs(Listcols c, char *group, int colour)
 static void
 zcoff(void)
 {
-    if (mcolors.files[COL_EC] && mcolors.files[COL_EC]->col)
+    if (mcolors.files[COL_EC] && mcolors.files[COL_EC]->col) {
 	tputs(mcolors.files[COL_EC]->col, 1, putshout);
-    else
+	*last_cap = '\0';
+    } else
 	zcputs(&mcolors, NULL, COL_NO);
 }
 
