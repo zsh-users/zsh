@@ -1,3 +1,8 @@
+2000-09-06  Peter Stephenson  <pws@csr.com>
+
+	* 12762: Akinori MUSHA: configure.in, Completion/Bsd/_kld:
+	changes for new FreeBSD releases.
+
 2000-09-06  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12761: Doc/ztexi.yo: `` was converted into " by makeinfo;

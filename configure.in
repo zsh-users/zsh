@@ -1580,7 +1580,7 @@ char *argv[];
   esac
   case "$host" in
     *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
-    *-freebsd3*|*-freebsd4*|*-linux*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
+    *-freebsd[3-9]*|*-linux*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
     mips-sni-sysv4)
       #
       # unfortunately, we have different compilers
