@@ -1661,11 +1661,16 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    } else if (varspc) {
 			nullexec = 2;
 			break;
-		    } else if (!nullcmd || !*nullcmd ||
-			       (cflags & BINF_PREFIX)) {
+		    } else if (((!nullcmd || !*nullcmd || opts[IGNORENULLCMD])
+				&& !opts[SHNULLCMD]) 
+			       ||(cflags & BINF_PREFIX)) {
 			zerr("redirection with no command", NULL, 0);
 			errflag = lastval = 1;
 			return;
+		    } else if (!nullcmd || !*nullcmd || opts[IGNORENULLCMD]) {
+			if (!args)
+			    args = newlinklist();
+			addlinknode(args, dupstring(":"));
 		    } else if (readnullcmd && *readnullcmd &&
 			       ((Redir) peekfirst(redir))->type == READ &&
 			       !nextnode(firstnode(redir))) {

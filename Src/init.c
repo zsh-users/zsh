@@ -659,17 +659,8 @@ setupvals(void)
     mypid = (zlong) getpid();
     term  = ztrdup("");
 
-    /* The following variable assignments cause zsh to behave more *
-     * like Bourne and Korn shells when invoked as "sh" or "ksh".  *
-     * NULLCMD=":" and READNULLCMD=":"                             */
-
-    if (emulation == EMULATE_KSH || emulation == EMULATE_SH) {
-	nullcmd     = ztrdup(":");
-	readnullcmd = ztrdup(":");
-    } else {
-	nullcmd     = ztrdup("cat");
-	readnullcmd = ztrdup("more");
-    }
+    nullcmd     = ztrdup("cat");
+    readnullcmd = ztrdup("more");
 
     /* We cache the uid so we know when to *
      * recheck the info for `USERNAME'     */

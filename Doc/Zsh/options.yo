@@ -533,6 +533,13 @@ of tt(exit) or tt(logout) instead.
 However, ten consecutive EOFs will cause the shell to exit anyway,
 to avoid the shell hanging if its tty goes away.
 )
+pindex(IGNORE_NULLCMD)
+vindex(NULLCMD, ignoring)
+vindex(READNULLCMD, ignoring)
+item(tt(IGNORE_NULLCMD) <C> <K> <S>)(
+The values of tt(NULLCMD) and tt(READNULLCMD) are not used when running
+redirections with no commands (see noderef(Redirection)).
+)
 pindex(INC_APPEND_HISTORY)
 cindex(history, incremental appending to a file)
 item(tt(INC_APPEND_HISTORY))(
@@ -977,6 +984,14 @@ necessarily affect the state the option will have while the shell is
 running - that is purely an indicator of whether on not commands are
 em(actually) being read from standard input.
 The value of this option cannot be changed anywhere other than the command line.
+)
+pindex(SH_NULLCMD)
+cindex(sh, redirections with no command)
+cindex(ksh, redirections with no command)
+item(tt(SH_NULLCMD) <K> <S>)(
+If the variable tt(NULLCMD) is unset or if the option tt(IGNORE_NULLCMD) 
+is set, this option make redirections with no command have the
+standard Bourn shell behaviour (see noderef(Redirection)).
 )
 pindex(SH_OPTION_LETTERS)
 cindex(sh, single letter options style)
