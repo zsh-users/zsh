@@ -1,0 +1,439 @@
+#autoload
+
+# Complete the arguments of the current command according to the
+# descriptions given as arguments to this function.
+
+local long cmd="$words[1]" descr mesg subopts opt usecc autod
+local oldcontext="$curcontext" hasopts rawret optarg singopt alwopt
+
+long=$argv[(I)--]
+if (( long )); then
+  local name tmp tmpargv
+
+  if [[ long -eq 1 ]]; then
+    tmpargv=()
+  else
+    tmpargv=( "${(@)argv[1,long-1]}" )
+  fi
+
+  name=${~words[1]}
+  [[ "$name" = [^/]*/* ]] && name="$PWD/$name"
+
+  name="_args_cache_${name}"
+  name="${name//[^a-zA-Z0-9_]/_}"
+
+  if (( ! ${(P)+name} )); then
+    local iopts sopts pattern tmpo dir cur cache
+    typeset -U lopts
+
+    cache=()
+
+    # We have to build a new long-option cache, get the `-i' and
+    # `-s' options.
+
+    set -- "${(@)argv[long+1,-1]}"
+
+    iopts=()
+    sopts=()
+    while [[ "$1" = -[is]* ]]; do
+      if [[ "$1" = -??* ]]; then
+        tmp="${1[3,-1]}"
+        cur=1
+      else
+        tmp="$2"
+	cur=2
+      fi
+      if [[ "$tmp[1]" = '(' ]]; then
+	tmp=( ${=tmp[2,-2]} )
+      else
+	tmp=( "${(@P)tmp}" )
+      fi
+      if [[ "$1" = -i* ]]; then
+        iopts=( "$iopts[@]" "$tmp[@]" )
+      else
+        sopts=( "$sopts[@]" "$tmp[@]" )
+      fi
+      shift cur
+    done
+
+    # Now get the long option names by calling the command with `--help'.
+    # The parameter expansion trickery first gets the lines as separate
+    # array elements. Then we select all lines whose first non-blank
+    # character is a hyphen. Since some commands document more than one
+    # option per line, separated by commas, we convert commas into
+    # newlines and then split the result again at newlines after joining 
+    # the old array elements with newlines between them. Then we select
+    # those elements that start with two hyphens, remove anything up to
+    # those hyphens and anything from the space or tab after the
+    # option up to the end.
+
+    lopts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$(_call_program options ${~words[1]} --help 2>&1)//\[--/
+--}:#[ 	]#-*}//,/
+}}:#[ 	]#--*}#*--}%%[]	 ]*}:#}")
+
+    # Remove options also described by user-defined specs.
+
+    tmp=()
+    for opt in "${(@)lopts:#--}"; do
+
+      # Using (( ... )) gives a parse error.
+
+      let "$tmpargv[(I)(|\([^\)]#\))(|\*)${opt}(|[-+=])(|\[*\])(|:*)]" ||
+          tmp=( "$tmp[@]" "$opt" )
+    done
+    lopts=( "$tmp[@]" )
+
+    # Now remove all ignored options ...
+
+    while (( $#iopts )); do
+      lopts=( ${lopts:#$~iopts[1]} )
+      shift iopts
+    done
+
+    # ... and add "same" options
+
+    while (( $#sopts )); do
+      lopts=( $lopts ${lopts/$~sopts[1]/$sopts[2]} )
+      shift 2 sopts
+    done
+
+    # Then we walk through the descriptions plus a few builtin ones.
+    # The last one matches all options; the `special' description and action
+    # makes those options be completed without an argument description.
+
+    set -- "$@" '*=FILE*:file:_files' \
+           '*=(DIR|PATH)*:directory:_files -/' '*: :  '
+
+    while (( $# )); do
+
+      # First, we get the pattern and the action to use and take them
+      # from the positional parameters.
+
+      pattern="${${${(M)1#*[^\\]:}[1,-2]}//\\\\:/:}"
+      descr="${1#${pattern}}"
+      if [[ "$pattern" = *\(-\) ]]; then
+        pattern="$pattern[1,-4]"
+	dir=-
+      else
+        dir=
+      fi
+      shift
+
+      # We get all options matching the pattern and take them from the
+      # list we have built. If no option matches the pattern, we
+      # continue with the next.
+
+      tmp=("${(@M)lopts:##$~pattern}")
+      lopts=("${(@)lopts:##$~pattern}")
+
+      (( $#tmp )) || continue
+
+      opt=''
+
+      # If there are option strings with a `[=', we take these to get an
+      # optional argument.
+
+      tmpo=("${(@M)tmp:#*\[\=*}")
+      if (( $#tmpo )); then
+        tmp=("${(@)tmp:#*\[\=*}")
+        tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
+
+        if [[ "$descr" = ::* ]]; then
+	  cache=( "$cache[@]" "${(@)^tmpo}=${dir}${descr}" )
+        else
+	  cache=( "$cache[@]" "${(@)^tmpo}=${dir}:${descr}" )
+        fi
+      fi
+
+      # Descriptions with `=': mandatory argument.
+
+      tmpo=("${(@M)tmp:#*\=*}")
+      if (( $#tmpo )); then
+        tmp=("${(@)tmp:#*\=*}")
+        tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
+
+	cache=( "$cache[@]" "${(@)^tmpo}=${dir}${descr}" )
+      fi
+
+      # Everything else is just added as an option without arguments or
+      # as described by $descr.
+
+      if (( $#tmp )); then
+        tmp=("${(@)tmp//[^a-zA-Z0-9-]}")
+        if [[ -n "$descr" && "$descr" != ': :  ' ]]; then
+	  cache=( "$cache[@]" "${(@)^tmp}${descr}" )
+        else
+	  cache=( "$cache[@]" "$tmp[@]" )
+        fi
+      fi
+    done
+    set -A "$name" "${(@)cache:# #}"
+  fi
+  set -- "$tmpargv[@]" "${(@P)name}"
+fi
+
+subopts=()
+singopt=()
+while [[ "$1" = -(O*|[CRWsw]) ]]; do
+  case "$1" in
+  -C)  usecc=yes; shift ;;
+  -O)  subopts=( "${(@P)2}" ); shift 2 ;;
+  -O*) subopts=( "${(@P)${1[3,-1]}}" ); shift ;;
+  -R)  rawret=yes; shift;;
+  -w)  optarg=yes; shift;;
+  -s)  singopt=(-s); shift;;
+  -W)  alwopt=arg; shift;;
+  esac
+done
+
+[[ "$PREFIX" = [-+] ]] && alwopt=arg
+
+zstyle -s ":completion:${curcontext}:options" auto-description autod
+
+if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
+  local action noargs aret expl local tried ret=1
+  local next direct odirect equal single matcher matched ws tmp1 tmp2 tmp3
+  local opts subc tc prefix suffix descrs actions subcs anum
+  local origpre="$PREFIX" origipre="$IPREFIX" nm="$compstate[nmatches]"
+
+  if comparguments -D descrs actions subcs; then
+    if comparguments -O next direct odirect equal; then
+      opts=yes
+      _tags "$subcs[@]" options
+    else
+      _tags "$subcs[@]"
+    fi
+  else
+    if comparguments -a; then
+      noargs='no more arguments'
+    else
+      noargs='no arguments'
+    fi
+    if comparguments -O next direct odirect equal; then
+      opts=yes
+      _tags options
+    elif [[ $? -eq 2 ]]; then
+        compadd -Q - "${PREFIX}${SUFFIX}"
+        return 0
+    else
+      _message "$noargs"
+      return 1
+    fi
+  fi
+
+  comparguments -M matcher
+
+  context=()
+  state=()
+
+  while true; do
+    while _tags; do
+      anum=1
+      if [[ -z "$tried" ]]; then
+        while [[ anum -le  $#descrs ]]; do
+
+	  action="$actions[anum]"
+	  descr="$descrs[anum]"
+	  subc="$subcs[anum++]"
+
+          if [[ -n "$matched" ]] || _requested "$subc"; then
+
+            curcontext="${oldcontext%:*}:$subc"
+
+            _description "$subc" expl "$descr"
+
+            if [[ "$action" = \=\ * ]]; then
+              action="$action[3,-1]"
+              words=( "$subc" "$words[@]" )
+	      (( CURRENT++ ))
+            fi
+
+            if [[ "$action" = -\>* ]]; then
+	      action="${${action[3,-1]##[ 	]#}%%[ 	]#}"
+	      if (( ! $state[(I)$action] )); then
+                comparguments -W line opt_args
+                state=( "$state[@]" "$action" )
+	        if [[ -n "$usecc" ]]; then
+	          curcontext="${oldcontext%:*}:$subc"
+	        else
+	          context=( "$context[@]" "$subc" )
+	        fi
+                compstate[restore]=''
+                aret=yes
+              fi
+            else
+              if [[ -z "$local" ]]; then
+                local line
+                typeset -A opt_args
+                local=yes
+              fi
+
+              comparguments -W line opt_args
+
+              if [[ "$action" = \ # ]]; then
+
+                # An empty action means that we should just display a message.
+
+	        _message "$descr"
+	        mesg=yes
+	        tried=yes
+                alwopt=${alwopt:-yes}
+              elif [[ "$action" = \(\(*\)\) ]]; then
+
+                # ((...)) contains literal strings with descriptions.
+
+                eval ws\=\( "${action[3,-3]}" \)
+
+                _describe -t "$subc" "$descr" ws -M "$matcher" "$subopts[@]" ||
+                    alwopt=${alwopt:-yes}
+	        tried=yes
+
+              elif [[ "$action" = \(*\) ]]; then
+
+                # Anything inside `(...)' is added directly.
+
+                eval ws\=\( "${action[2,-2]}" \)
+
+                _all_labels "$subc" expl "$descr" compadd "$subopts[@]" -a - ws ||
+                    alwopt=${alwopt:-yes}
+	        tried=yes
+              elif [[ "$action" = \{*\} ]]; then
+
+                # A string in braces is evaluated.
+
+                while _next_label "$subc" expl "$descr"; do
+                  eval "$action[2,-2]" && ret=0
+                done
+                (( ret )) && alwopt=${alwopt:-yes}
+	        tried=yes
+              elif [[ "$action" = \ * ]]; then
+
+                # If the action starts with a space, we just call it.
+
+	        eval "action=( $action )"
+                while _next_label "$subc" expl "$descr"; do
+                  "$action[@]" && ret=0
+                done
+                (( ret )) && alwopt=${alwopt:-yes}
+	        tried=yes
+              else
+
+                # Otherwise we call it with the description-arguments.
+
+	        eval "action=( $action )"
+                while _next_label "$subc" expl "$descr"; do
+                  "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}" && ret=0
+	        done
+                (( ret )) && alwopt=${alwopt:-yes}
+	        tried=yes
+              fi
+            fi
+          fi
+        done
+      fi
+      if [[ -z "$hasopts" &&
+            -z "$matched" &&
+            ( -z "$tried" || -n "$alwopt" ) &&
+            ( -z "$aret" || "$PREFIX" = "$origpre" ) ]] &&
+          _requested options &&
+          { ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
+            [[ "$origpre" = [-+]* || -z "$aret$mesg$tried" ]] } ; then
+	local prevpre="$PREFIX" previpre="$IPREFIX"
+
+	hasopts=yes
+
+	PREFIX="$origpre"
+	IPREFIX="$origipre"
+
+        if [[ -z "$alwopt" || -z "$tried" || "$alwopt" = arg ]] &&
+           comparguments -s single; then
+
+          if [[ "$single" = direct ]]; then
+            _all_labels options expl option \
+	        compadd -QS '' - "${PREFIX}${SUFFIX}"
+          elif [[ -z "$optarg" && "$single" = next ]]; then
+            _all_labels options expl option \
+	        compadd -Q - "${PREFIX}${SUFFIX}"
+          elif [[ "$single" = equal ]]; then
+            _all_labels options expl option \
+	        compadd -QqS= - "${PREFIX}${SUFFIX}"
+          else
+
+	    tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
+
+            [[ "$PREFIX" = [-+]* ]] && tmp1=( "${(@M)tmp1:#${PREFIX[1]}*}" )
+
+            [[ "$single" = next ]] &&
+                tmp1=( "${(@)tmp1:#[-+]${PREFIX[-1]}((#e)|:*)}" )
+
+	    [[ "$PREFIX" != --* ]] && tmp1=( "${(@)tmp1:#--*}" )
+	    tmp3=( "${(M@)tmp1:#[-+]?[^:]*}" )
+	    tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
+	    tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
+
+            _describe -o option \
+                      tmp1 tmp2 -Q -S '' -- \
+		      tmp3 -Q
+
+            [[ -n "$optarg" && "$single" = next && nm -eq $compstate[nmatches] ]] &&
+                _all_labels options expl option \
+	            compadd -Q - "${PREFIX}${SUFFIX}"
+
+          fi
+          single=yes
+        else
+          next=( "$next[@]" "$odirect[@]" )
+          _describe -o option \
+                    next -Q -M "$matcher" -- \
+                    direct -QS '' -M "$matcher" -- \
+                    equal -QqS= -M "$matcher"
+        fi
+	PREFIX="$prevpre"
+	IPREFIX="$previpre"
+      fi
+      [[ -n "$tried" && "${${alwopt:+$origpre}:-$PREFIX}" != [-+]* ]] && break
+    done
+    if [[ -n "$opts" && -z "$aret" &&
+          -z "$matched" &&
+          ( -z "$tried" || -n "$alwopt" ) &&
+          nm -eq compstate[nmatches] ]]; then
+
+      PREFIX="$origpre"
+      IPREFIX="$origipre"
+
+      prefix="${PREFIX#*\=}"
+      suffix="$SUFFIX"
+      PREFIX="${PREFIX%%\=*}"
+      SUFFIX=''
+
+      compadd -M "$matcher" -D equal - "${(@)equal%%:*}"
+
+      if [[ $#equal -eq 1 ]]; then
+        PREFIX="$prefix"
+	SUFFIX="$suffix"
+	IPREFIX="${IPREFIX}${equal[1]%%:*}="
+	matched=yes
+
+	comparguments -L "${equal[1]%%:*}" descrs actions subcs
+
+	_tags "$subcs[@]"
+
+	continue
+      fi
+    fi
+    break
+  done
+
+  [[ -z "$aret" || -z "$usecc" ]] && curcontext="$oldcontext"
+
+  if [[ -n "$aret" ]]; then
+    [[ -n $rawret ]] && return 300
+  else
+    [[ -n "$noargs" && nm -eq "$compstate[nmatches]" ]] && _message "$noargs"
+  fi
+  # Set the return value.
+
+  [[ nm -ne "$compstate[nmatches]" ]]
+else
+  return 1
+fi

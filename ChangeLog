@@ -1,3 +1,12 @@
+2001-06-06  Sven Wischnowsky <wischnow@zsh.org>
+
+	* 14736: Doc/Zsh/compsys.yo: make docs for _wanted and
+	_requested clearer (command has to allow options passed to it)
+
+	* 14733: Completion/Base/Utility/_arguments: two fixes: try all
+	actions that have to be tried (but only once), execute actions
+	if we aren't after an option already (in the same word)
+
 2001-06-04  Peter Stephenson  <pws@csr.com>
 
 	* Config/version.mk: relabelled this version 4.0.1-dev-0
