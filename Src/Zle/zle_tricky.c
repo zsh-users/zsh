@@ -760,8 +760,8 @@ docomplete(int lst)
 
     /* If we are doing a menu-completion... */
 
-    if (menucmp && lst != COMP_LIST_EXPAND && compwidget &&
-	compwidget == lastcompwidget) {
+    if (menucmp && lst != COMP_LIST_EXPAND && 
+	(!compwidget || compwidget == lastcompwidget)) {
 	do_menucmp(lst);
 	return;
     }
@@ -4598,6 +4598,7 @@ makecomplist(char *s, int incmd, int lst)
 	insmnum = insgnum = 1;
 	insgroup = oldlist = oldins = 0;
 	begcmgroup("default", 0);
+	menucmp = 0;
 
 	ccused = newlinklist();
 	ccstack = newlinklist();
