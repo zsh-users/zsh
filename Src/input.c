@@ -549,3 +549,17 @@ inpop(void)
 	inpoptop();
     } while (remcont);
 }
+
+/*
+ * Expunge any aliases from the input stack; they shouldn't appear
+ * in the history and need to be flushed explicitly when we encounter
+ * an error.
+ */
+
+/**/
+void
+inpopalias(void)
+{
+    while (inbufflags & INP_ALIAS)
+	inpoptop();
+}

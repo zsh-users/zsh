@@ -1,5 +1,8 @@
 2003-08-11  Peter Stephenson  <pws@csr.com>
 
+	* 18941: Src/hist.c, Src/input.c: Alias text could end up in
+	history after a parsing error during alias expansion.
+
 	* 18938: Src/lex.c, Src/Math.c, Src/Zle/zle_main.c,
 	Src/Zle/compcore.c: Mark some data symbols for export, shutting
 	up Cygwin's dllwrap.  Note that c from zle_main.c is not marked
