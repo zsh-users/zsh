@@ -3,4 +3,5 @@ DISTFILES_SRC='
 _gv        _netscape  _xauth     _xfig      _mozilla   _xterm     _xwit
 _nedit     _vnc       _x_utils   _xdvi      _xmodmap   _xset      _xv
 _acroread  _dcop      _gqview    _xloadimage _mplayer
+_kfmclient
 '

@@ -82,8 +82,13 @@ if [[ -n $DISPLAY ]]; then
   for browser in $xbrowsers; do
     if [[ $windows[(I)(#i)$browser] -ne 0 ]]; then
       if [[ $browser = konqueror ]]; then
-	# I'm sure there's documentation for this somewhere...
-	dcop $(dcop|grep konqueror) default openBrowserWindow $url
+	# kfmclient is less hairy and better supported than direct
+	# use of dcop.  Run kfmclient --commands
+	# for more information.  Note that as konqueror is a fully
+	# featured file manager, this will actually do complete
+	# MIME handling, not just web pages.
+	kfmclient openURL $url ||
+	  dcop $(dcop|grep konqueror) default openBrowserWindow $url
       else
 	# Mozilla bells and whistles are described at:
 	# http://www.mozilla.org/unix/remote.html

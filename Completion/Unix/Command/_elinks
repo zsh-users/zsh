@@ -11,7 +11,7 @@ _arguments -C -A '-*' \
   '*-base-session[clone session with given ID]:ID number:' \
   '*-confdir[set config dir to given string]:configuration directory:_files -/' \
   '*-conffile[configuration file name]:configuration file:_files' \
-  '*-default-mime-type[MIME type to assume for documents]:MIME type:' \
+  '*-default-mime-type[MIME type to assume for documents]:MIME type:_mime_types' \
   '*-dump[write formatted version of given URL to stdout]::boolean:(0 1)' \
   '*-dump-charset[codepage to use with -dump]:codepage:' \
   '*-dump-width[width of document formatted with -dump]:width:' \

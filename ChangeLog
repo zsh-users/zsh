@@ -1,5 +1,13 @@
 2004-07-26  Peter Stephenson  <pws@csr.com>
 
+	* 20199: Completion/Unix/Command/_elinks,
+	Completion/Unix/Type/.distfiles, Completion/Unix/Type/_mime_types,
+	Completion/X/Command/.distfiles, Completion/X/Command/_kfmclient,
+	Doc/Zsh/contrib.yo, Functions/MIME/pick-web-browser,
+	Functions/MIME/zsh-mime-setup: add completion for MIME types
+	and kfmclient, use kfmclient to talk to konqueror and
+	improve mime-types and mailcap styles.
+
 	* 20198: Src/exec.c, Src/signals.c, Test/C03traps.ztst,
 	Test/Makefile.in, Test/ztst.zsh: EXIT traps were freed before
 	being run.  This isn't recommended by most programming text books.

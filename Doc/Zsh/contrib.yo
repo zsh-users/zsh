@@ -1045,11 +1045,13 @@ item(mime-types)(
 A list of files in the format of tt(~/.mime.types) and
 tt(/etc/mime.types) to be read during setup, replacing the default list
 which consists of those two files.  The context is tt(:mime:).
+A tt(PLUS()) in the list will be replaced by the default files.
 )
 item(mailcap)(
 A list of files in the format of tt(~/.mailcap) and
 tt(/etc/mailcap) to be read during setup, replacing the default list
 which consists of those two files.  The context is tt(:mime:).
+A tt(PLUS()) in the list will be replaced by the default files.
 )
 item(handler)(
 Specifies a handler for a suffix; the suffix is given by the context as

@@ -10,4 +10,5 @@ _groups              _perl_basepods       _signals             _users_on
 _hosts               _tar_archive         _time_zone
 _file_systems        _net_interfaces      _terminals           _locales
 _java_class          _services		  _email_addresses     _global_tags
+_mime_types
 '

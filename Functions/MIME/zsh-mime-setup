@@ -53,14 +53,30 @@ fi
 # to handlers and their flags.
 typeset -A suffix_type_map type_handler_map type_flags_map
 
+local -a default_type_files default_cap_files
 local -a type_files cap_files array match mbegin mend
 local file line type suffix exts elt flags line2
+integer ind
+
+default_type_files=(~/.mime.types /etc/mime.types)
+default_cap_files=(~/.mailcap /etc/mailcap)
 
 # Customizable list of files to examine.
-zstyle -a :mime: mime-types type_files ||
-  type_files=(~/.mime.types /etc/mime.types)
-zstyle -a :mime: mailcap cap_files ||
-  cap_files=(~/.mailcap /etc/mailcap)
+if zstyle -a :mime: mime-types type_files; then
+  while (( (ind = ${type_files[(I)+]}) > 0 )); do
+    type_files[$ind]=($default_type_files)
+  done
+else
+  type_files=($default_type_files)
+fi
+
+if zstyle -a :mime: mailcap cap_files; then
+  while (( (ind = ${cap_files[(I)+]}) > 0 )); do
+    cap_files[$ind]=($default_cap_files)
+  done
+else
+  cap_files=($default_cap_files)
+fi
 
 {
   mime-setup-add-type() {
