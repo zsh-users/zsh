@@ -1,0 +1,38 @@
+#compdef ant -value-,ANT_ARGS,-default-
+
+typeset -A opt_args
+local state line curcontext="$curcontext"
+local target='*:target:->target'
+
+if [[ $service = *ANT_ARGS* ]]; then
+  compset -q
+  words=( fake "$words[@]" )
+  (( CURRENT++ ))
+  unset target
+fi
+
+_arguments -C \
+  '-help[display usage information]' \
+  '-projecthelp[print project hjelp information]' \
+  '-version[display version information]' \
+  '-diagnostics[display info useful to problem diagnosis]' \
+  '(-q -quiet)'{-q,-quiet}'[be extra quiet]' \
+  '(-v -verbose)'{-v,-verbose}'[be more verbose]' \
+  '-debug[print debugging information]' \
+  '-emacs[produce logging information without adornments]' \
+  '(-l -logfile)'{-l,-logfile}'[use specified file for log]:logfile:_files' \
+  '-logger[the class which is to perform logging]:classname:_java_class' \
+  '-listener[add an instance of class as a project listener]:classname:_java_class' \
+  '(-f -file -buildfile)'{-f,-file,-buildfile}'[use specified build file]:build file:_files' \
+  '*-D[specify property with value to use]:property' \
+  '-propertyfile[load properties from specfied file]:property file:_files' \
+  '-inputhandler[specify class which will handle input requests]:class:_java_class' \
+  '-find[search for buildfile]:file:_files' \
+  $target && return
+
+if [[ -n $state ]]; then
+  targets=( $(sed -n 's/ *<target name="\([^"]*\)".*/\1/p' < build.xml) )
+  # ant can be used to get a list of targets for us like this but it is slow
+  # targets=( ${${(M)${(f)"$(_call_program targets $words[1] -projecthelp)"}:# *}# } )
+  _wanted targets expl target compadd -a targets
+fi
