@@ -1278,7 +1278,7 @@ makecline(LinkList list)
 
 	for (node = firstnode(list); node; incnode(node)) {
 	    *ptr++ = (char *)getdata(node);
-	    zputs(getdata(node), xtrerr);
+	    quotedzputs(getdata(node), xtrerr);
 	    if (nextnode(node))
 		fputc(' ', xtrerr);
 	}
@@ -1548,8 +1548,10 @@ addvars(Estate state, Wordcode pc, int export)
 		untokenize(peekfirst(vl));
 		val = ztrdup(ugetnode(vl));
 	    }
-	    if (xtr)
-		fprintf(xtrerr, "%s ", val);
+	    if (xtr) {
+		quotedzputs(val, xtrerr);
+		fputc(' ', xtrerr);
+	    }
 	    if (export && !strchr(name, '[')) {
 		if (export < 0 && isset(RESTRICTED) &&
 		    (pm = (Param) paramtab->removenode(paramtab, name)) &&
@@ -1589,8 +1591,10 @@ addvars(Estate state, Wordcode pc, int export)
 	*ptr = NULL;
 	if (xtr) {
 	    fprintf(xtrerr, "( ");
-	    for (ptr = arr; *ptr; ptr++)
-		fprintf(xtrerr, "%s ", *ptr);
+	    for (ptr = arr; *ptr; ptr++) {
+		quotedzputs(*ptr, xtrerr);
+		fputc(' ', xtrerr);
+	    }
 	    fprintf(xtrerr, ") ");
 	}
 	assignaparam(name, arr, WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
@@ -3207,7 +3211,7 @@ execshfunc(Shfunc shf, LinkList args)
 	    for (lptr = firstnode(args); lptr; incnode(lptr)) {
 		if (lptr != firstnode(args))
 		    fputc(' ', xtrerr);
-		fprintf(xtrerr, "%s", (char *)getdata(lptr));
+		quotedzputs((char *)getdata(lptr), xtrerr);
 	    }
 	fputc('\n', xtrerr);
 	fflush(xtrerr);

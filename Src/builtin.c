@@ -369,10 +369,14 @@ execbuiltin(LinkList args, Builtin bn)
 	if (xtr) {
 	    printprompt4();
 	    fprintf(xtrerr, "%s", name);
-	    if (xarg)
-		fprintf(xtrerr, " %s", xarg);
-	    while (*oargv)
-		fprintf(xtrerr, " %s", *oargv++);
+	    if (xarg) {
+	        fputc(' ', xtrerr);
+	        quotedzputs(xarg, xtrerr);
+	    }
+	    while (*oargv) {
+	        fputc(' ', xtrerr);
+	        quotedzputs(*oargv++, xtrerr);
+	    }
 	    fputc('\n', xtrerr);
 	    fflush(xtrerr);
 	}
