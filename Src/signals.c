@@ -523,8 +523,10 @@ handler(int sig)
         if (sigtrapped[SIGALRM]) {
 	    int tmout;
             dotrap(SIGALRM);
-            if ((tmout = getiparam("TMOUT")))
-                alarm(tmout);           /* reset the alarm */
+	    HEAPALLOC {
+		if ((tmout = getiparam("TMOUT")))
+		    alarm(tmout);           /* reset the alarm */
+	    } LASTALLOC;
         } else {
 	    int idle = ttyidlegetfn(NULL);
 	    int tmout = getiparam("TMOUT");
