@@ -367,7 +367,7 @@ fi
 dnl Checking if the compiler supports variable-length arrays
 AC_CACHE_CHECK(if the compiler supports variable-length arrays,
 zsh_cv_c_variable_length_arrays,
-[AC_TRY_COMPILE([int foo();], [int i[foo()];],
+[AC_TRY_COMPILE([int foo(), n;], [int i[foo()], a[n+1];],
   zsh_cv_c_variable_length_arrays=yes,
   zsh_cv_c_variable_length_arrays=no)])
 if test $zsh_cv_c_variable_length_arrays = yes; then
