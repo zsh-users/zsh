@@ -1,3 +1,7 @@
+2002-03-27  Oliver Kiddle  <opk@zsh.org>
+
+	* 16908: Doc/Zsh/compsys.yo: alter _generic example to be more robust
+
 2002-03-24  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 16890: Src/hist.c, Src/params.c: Made SAVEHIST a special parameter,
@@ -17,7 +21,7 @@
 
 2002-03-19  Oliver Kiddle  <opk@zsh.org>
 
-	* 16864: Completion/Unix/Command/ssh: fix remote file completion
+	* 16864: Completion/Unix/Command/_ssh: fix remote file completion
 	with relative paths
 
 	* unposted: Completion/Unix/Command/_grep: argument to -C must

@@ -1934,7 +1934,7 @@ matches.  E.g. for options this means that the `tt(-)', `tt(+)', or
 `tt(-)tt(-)' has to be on the line to make option names be completed at
 all.
 
-The default style for this style is `true'.
+The default value for this style is `true'.
 )
 kindex(preserve-prefix, completion style)
 item(tt(preserve-prefix))(
@@ -2398,7 +2398,7 @@ binding, for example:
 example(zle -C all-matches complete-word _generic
 bindkey '^Xa' all-matches
 zstyle ':completion:all-matches:*' old-matches only
-zstyle ':completion:all-matches:*' completer _all_matches)
+zstyle ':completion:all-matches::::' completer _all_matches)
 )
 findex(_approximate)
 item(tt(_approximate))(
