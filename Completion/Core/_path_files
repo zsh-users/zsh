@@ -253,6 +253,7 @@ for prepath in "$prepaths[@]"; do
 
     # Get the matching files by globbing.
 
+    tmp2=( "$tmp1[@]" )
     if [[ "$tpre$tsuf" = */* ]]; then
       if [[ ! -o globdots && "$PREFIX" = .* ]]; then
         tmp1=( ${^tmp1}${skipped}*(-/) ${^tmp1}${skipped}.*(-/) )
@@ -287,7 +288,6 @@ for prepath in "$prepaths[@]"; do
       # See which of them match what's on the line.
 
       if [[ -n "$_comp_correct" ]]; then
-        tmp2=( "$tmp1[@]" )
         builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
 
         if [[ $#tmp1 -eq 0 ]]; then
@@ -333,6 +333,7 @@ for prepath in "$prepaths[@]"; do
       # if none of the patterns match.
 
       if [[ -z "$tpre$tsuf" && -n "$pre$suf" ]]; then
+        tmp1=( "$tmp2[@]" )
 	pfxsfx=(-S '' "$pfxsfx[@]")
 	break
       elif [[ "$haspats" = no && -z "$tpre$tsuf" &&
@@ -382,7 +383,7 @@ for prepath in "$prepaths[@]"; do
     # There are more components, so skip over the next components and make a
     # slash be added.
 
-    tmp2="${(M)tpre##((.|..|)/)##}"   ###
+    tmp2="${(M)tpre##((.|..|)/)##}"
     if [[ -n "$tmp2" ]]; then
       skipped="/$tmp2"
       tpre="${tpre#$tmp2}"
