@@ -12,6 +12,7 @@ setopt localoptions nonomatch
 [[ _matcher_num -gt 1 ]] && return 1
 
 local exp word sort expr expl subd suf=" " force opt asp tmp opre pre epre
+local gal
 
 (( $# )) &&
     while getopts gsco opt; do
@@ -48,6 +49,12 @@ zstyle -t ":completion:${curcontext}:" accept-exact ||
        ( "$word" = *\$[a-zA-Z0-9_]## && 
          ${#parameters[(I)${word##*\$}*]} -ne 1 ) ]] && return 1 }
 
+# We have to temporarily remove the global aliases because they can make
+# the evals fail.
+
+gal=( ${(kv)galiases} )
+(( $#gal )) && builtin unalias ${(k)galiases}
+
 # In exp we will collect the expansions.
 
 exp=("$word")
@@ -83,14 +90,20 @@ subd=("$exp[@]")
 
 (( $#exp )) || exp=("$subd[@]")
 
-[[ $#exp -eq 1 && "${exp[1]//\\}" = "${word//\\}"(|\(N\)) ]] && return 1
+if [[ $#exp -eq 1 && "${exp[1]//\\}" = "${word//\\}"(|\(N\)) ]]; then
+  galiases=( $gal )
+  return 1
+fi
 
 # With subst-globs-only we bail out if there were no glob expansions,
 # regardless of any substitutions
 
-{ [[ "$force" = *o* ]] ||
-  zstyle -t ":completion:${curcontext}:" subst-globs-only } &&
-    [[ "$subd" = "$exp"(|\(N\)) ]] && return 1
+if { [[ "$force" = *o* ]] ||
+    zstyle -t ":completion:${curcontext}:" subst-globs-only } &&
+    [[ "$subd" = "$exp"(|\(N\)) ]]; then
+  galiases=( $gal )
+  return 1
+fi
 
 zstyle -s ":completion:${curcontext}:" keep-prefix tmp || tmp=changed
 if [[ "$word" = [\~\$]*/* && "$tmp" = (yes|true|on|1|changed) ]]; then
@@ -101,7 +114,12 @@ if [[ "$word" = [\~\$]*/* && "$tmp" = (yes|true|on|1|changed) ]]; then
     [[ "$tmp" != changed || $#exp -gt 1 ||
        "${opre}${exp[1]#${pre}}" != "$word" ]] && exp=( ${opre}${^exp#${pre}} )
   fi
+
+  galiases=( $gal )
+
   [[ $#exp -eq 1 && "$exp[1]" = "$word" ]] && return 1
+else
+  galiases=( $gal )
 fi
 
 # Now add as matches whatever the user requested.

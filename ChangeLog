@@ -1,5 +1,8 @@
 2000-10-10  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12942: Completion/Core/_expand: temporarily remove global
+ 	aliases to avoid error message inside the evals
+	
 	* 12941: Src/Zle/compmatch.c: follow-up to 12930, make it first
  	try exact character matches, but enable it to go back to try match
  	specs if it fails after accepting such character matches
