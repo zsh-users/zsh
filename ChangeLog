@@ -1,3 +1,8 @@
+2005-02-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 20867: Completion/Unix/Command/_ant: handle imported files
+	that are specified using a relative path
+
 2005-02-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 20866: Src/Zle/zle_misc.c: two mistakes in 20861.

@@ -88,8 +88,9 @@ case $state in
       fi
       if [[ -f $buildfile ]]; then
         importedfiles=( $(sed -n "s/ *<import[^>]* file=[\"']\([^\"']*\)[\"'].*/\1/p" < $buildfile) )
-        targets=( $(cat $buildfile $importedfiles |
-	    sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" ) )
+        targets=( $(sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" $buildfile) )
+        (( $#importedfiles )) && targets+=( $(cd $buildfile:h;
+	    sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" $importedfiles) )
 	_wanted targets expl target compadd -a targets && ret=0
       else
 	_message -e targets target
