@@ -35,7 +35,7 @@ case $service in
       '(-N -A)2:password'
       '(2)-s+[specify location of smb.conf]:smb.conf location:_files'
       '(2)-O+[specify socket options]:socket options'
-      '(2)-R+[specify name resolution order]:name resolution order:_values -s " " lmhosts host wins bcast'
+      '(2)-R+[specify name resolution order]:name resolution order:_values -s " " "name resolution order" lmhosts host wins bcast'
       '(2 -L -D -T)-M+[send message]:host:_hosts'
       '(2)-i+[specify NetBIOS scope]:scope'
       '(2)-N[suppress password prompt]'

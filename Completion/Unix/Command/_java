@@ -360,10 +360,11 @@ case "$state" in
 debug)
   if [[ -prefix :*, ]]; then
     compset -P :
-    _values -s , lines vars source
+    _values -s , "debug info" lines vars source
   else
-    compadd -P: none
-    compadd -P: -qS, lines vars source
+    _description debuginfo expl "debug info"
+    compadd -P: "$expl[@]" none
+    compadd -P: -qS, "$expl[@]" lines vars source
   fi
   ;;
 
