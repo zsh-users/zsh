@@ -1,3 +1,9 @@
+2003-05-14  Peter Stephenson  <pws@csr.com>
+
+	* Jonathan Paisley <jp-www@dcs.gla.ac.uk>: 18513:
+	Src/Zle/complist.c: Work around a bad pointer access after
+	resizing the terminal in menu selection.
+
 2003-05-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 18525: Src/utils.c: add manual UTF-8 conversion as extra
