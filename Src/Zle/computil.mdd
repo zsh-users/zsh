@@ -1,4 +1,4 @@
-moddeps="complete"
+moddeps="complete zle"
 
 objects="computil.o"
 

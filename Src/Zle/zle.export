@@ -16,6 +16,7 @@ clearscreen
 clwnum
 clwords
 clwpos
+clwsize
 cmdstr
 compfunc
 compwidget

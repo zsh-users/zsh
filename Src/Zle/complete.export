@@ -19,6 +19,7 @@ comppatmatch
 compprefix
 compqiprefix
 compqisuffix
+compqstack
 compquote
 compsuffix
 compwords
@@ -58,6 +59,7 @@ mflags
 minfo
 mnum
 mstack
+multiquote
 nmatches
 onlyexpl
 parse_cmatcher
@@ -68,5 +70,6 @@ restrict_range
 ripre
 set_gmatcher
 set_list_array
+tildequote
 update_bmatchers
 ztat

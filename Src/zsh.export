@@ -89,6 +89,7 @@ findcmd
 freearray
 freeheap
 freelinklist
+freepatprog
 freestr
 freestruct
 getaparam
@@ -106,6 +107,7 @@ getsignum
 getsparam
 getstrvalue
 gettempname
+getvalue
 global_heapalloc
 global_permalloc
 globlist
@@ -227,10 +229,13 @@ runhookdef
 runshfunc
 scancountparams
 scanhashtable
+sepjoin
 setaparam
+setarrvalue
 sethparam
 setlimits
 setsparam
+setstrvalue
 settrap
 settyinfo
 sfcontext
@@ -260,7 +265,6 @@ struncpy
 strvargetfn
 strvarsetfn
 switch_heaps
-SHTTY
 tclen
 tcstr
 termflags
