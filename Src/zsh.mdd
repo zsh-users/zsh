@@ -12,6 +12,8 @@ headers="../config.h system.h zsh.h sigcount.h signals.h \
 prototypes.h hashtable.h ztype.h"
 
 :<<\Make
+@CONFIG_MK@
+
 signames.c: signames1.awk signames2.awk ../config.h @SIGNAL_H@
 	$(AWK) -f $(sdir)/signames1.awk @SIGNAL_H@ >sigtmp.c
 	$(CPP) sigtmp.c >sigtmp.out
@@ -28,7 +30,7 @@ params.o: version.h
 version.h: $(sdir_top)/Config/version.mk
 	echo '#define ZSH_VERSION "'$(VERSION)'"' > $@
 
-zshpaths.h: FORCE Makemod
+zshpaths.h: Makemod $(CONFIG_INCS)
 	@echo '#define MODULE_DIR "'$(MODDIR)'"' > zshpaths.h.tmp
 	@if test x$(fndir) != xno; then \
 	  echo '#define FPATH_DIR "'$(fndir)'"' >> zshpaths.h.tmp; \
