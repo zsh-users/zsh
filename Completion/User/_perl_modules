@@ -31,6 +31,7 @@ if [[ ${+_perl_modules} -eq 0 ]]; then
     else
       # If perl isn't there, one wonders why the user's trying to
       # complete Perl modules.  Maybe her $path is wrong?
+      _message "Didn't find perl on \$PATH; guessing @INC ..."
 
       setopt localoptions extendedglob
       inc=( /usr/lib/perl5{,/{site_perl/,}<5->.([0-9]##)}(N) 
