@@ -924,14 +924,17 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		       (ishash || c != ',')) || i); t++) {
 	/* Untokenize INULL() except before brackets, for parsestr() */
 	if (INULL(c)) {
-	    if (t[1] == '[' || t[1] == ']') {
+	    c = t[1];
+	    if (c == '[' || c == ']' ||
+		c == '(' || c == ')' ||
+		c == '{' || c == '}') {
 		/* This test handles nested subscripts in hash keys */
 		if (ishash && i)
-		    *t = ztokens[c - Pound];
+		    *t = ztokens[*t - Pound];
 		needtok = 1;
 		++t;
 	    } else
-		*t = ztokens[c - Pound];
+		*t = ztokens[*t - Pound];
 	    continue;
 	}
 	/* Inbrack and Outbrack are probably never found here ... */
@@ -950,7 +953,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
      * are not backslashed after parsestr().  Otherwise leave them alone *
      * so that the brackets will be escaped when we patcompile() or when *
      * subscript arithmetic is performed (for nested subscripts).        */
-    if (ishash && !rev)
+    if (ishash && (keymatch || !rev))
 	remnulargs(s);
     if (needtok) {
 	if (parsestr(s))
@@ -1034,8 +1037,10 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		}
 	    }
 	}
-	tokenize(s);
-	remnulargs(s);
+	if (!keymatch) {
+	    tokenize(s);
+	    remnulargs(s);
+	}
 
 	if (keymatch || (pprog = patcompile(s, 0, NULL))) {
 	    int len;
@@ -1044,10 +1049,9 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		if (ishash) {
 		    scanprog = pprog;
 		    scanstr = s;
-		    if (keymatch) {
-			untokenize(s);
+		    if (keymatch)
 			v->isarr |= SCANPM_KEYMATCH;
-		    } else if (ind)
+		    else if (ind)
 			v->isarr |= SCANPM_MATCHKEY;
 		    else
 			v->isarr |= SCANPM_MATCHVAL;
