@@ -1,6 +1,6 @@
 2002-01-27  Clint Adams  <clint@zsh.org>
 
-	* 16504: Src/builtin.c: warn on fclose or fflush
+	* 16504, 16505: Src/builtin.c: warn on fclose or fflush
 	errors in bin_print.
 
 2002-01-27  Bart Schaefer  <schaefer@zsh.org>

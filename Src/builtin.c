@@ -2869,7 +2869,7 @@ mod_export LinkList bufstack;
 int
 bin_print(char *name, char **args, char *ops, int func)
 {
-    int nnl = 0, fd, argc, n;
+    int nnl = 0, fd, argc, n, ret = 0;
     int *len;
     Histent ent;
     FILE *fout = stdout;
