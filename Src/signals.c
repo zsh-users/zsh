@@ -282,7 +282,7 @@ signal_unblock(sigset_t set)
  * be the given signal mask       */
 
 /**/
-sigset_t
+mod_export sigset_t
 signal_setmask(sigset_t set)
 {
     sigset_t oset;

@@ -163,7 +163,7 @@ zerrmsg(const char *fmt, const char *str, int num)
  * This is used instead of putchar since it can be a macro. */
 
 /**/
-int
+mod_export int
 putraw(int c)
 {
     putc(c, stdout);
