@@ -15,7 +15,7 @@ _defaults_domains(){
 
 _defaults_keys(){
   local ks
-  ks=(${${${${(M)${(f)"$(defaults read "$words[2]" 2>/dev/null)"}:# [^ ]*=*}# }%% = *}:Q})
+  ks=(${${${${(M)${(f)"$(defaults read "$words[2]" 2>/dev/null)"}:#    [^ ]*=*}#    }%% = *}:Q})
   local expl
   _wanted keys expl 'key' compadd "$ks[@]"
 }
