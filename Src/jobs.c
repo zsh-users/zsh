@@ -1289,7 +1289,13 @@ bin_fg(char *name, char **argv, char *ops, int func)
 
 	if (func == BIN_WAIT && isanum(*argv)) {
 	    /* wait can take a pid; the others can't. */
-	    waitforpid((long)atoi(*argv));
+	    pid_t pid = (long)atoi(*argv);
+	    Job j;
+	    Process p;
+	    if (findproc(pid, &j, &p))
+		waitforpid(pid);
+	    else
+		zwarnnam(name, "pid %d is not a child of this shell", 0, pid);
 	    retval = lastval2;
 	    thisjob = ocj;
 	    continue;

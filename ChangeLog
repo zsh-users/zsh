@@ -1,3 +1,9 @@
+2000-07-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12393: Src/jobs.c: The `wait' builtin searches the job table for
+	any process ID it's asked to wait for, and rejects those it
+	doesn't find.
+
 2000-07-28  Peter Stephenson  <pws@csr.com>
 
 	* 12421: Src/Makemod.in.in: extra tab
