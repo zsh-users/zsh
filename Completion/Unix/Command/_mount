@@ -734,16 +734,16 @@ udevordir)
     local dev_tmp mp_tmp mline
 
     case "$OSTYPE" in
-    freebsd*)
+    linux*|irix*)
+      tmp=( "${(@f)$(< /etc/mtab)}" )
+      dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
+      mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
+      ;;
+    *)
       /sbin/mount | while read mline; do
         dev_tmp=( $dev_tmp $mline[(w)1] )
         mp_tmp=( $mp_tmp $mline[(w)3] )
       done
-      ;;
-    *)
-      tmp=( "${(@f)$(< /etc/mtab)}" )
-      dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
-      mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
       ;;
     esac
 
