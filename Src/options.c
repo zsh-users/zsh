@@ -694,3 +694,48 @@ dashgetfn(Param pm)
     *val = '\0';
     return buf;
 }
+
+/* Print option list for --help */
+
+/**/
+void
+printoptionlist(void)
+{
+    short *lp;
+    char c;
+
+    printf("\nNamed options:\n");
+    scanhashtable(optiontab, 1, 0, OPT_ALIAS, printoptionlist_printoption, 0);
+    printf("\nOption aliases:\n");
+    scanhashtable(optiontab, 1, OPT_ALIAS, 0, printoptionlist_printoption, 0);
+    printf("\nOption letters:\n");
+    for(lp = optletters, c = FIRST_OPT; c <= LAST_OPT; lp++, c++) {
+	if(!*lp)
+	    continue;
+	printf("  -%c  ", c);
+	printoptionlist_printequiv(*lp);
+    }
+}
+
+/**/
+static void
+printoptionlist_printoption(HashNode hn, int ignored)
+{
+    Optname on = (Optname) hn;
+
+    if(on->flags & OPT_ALIAS) {
+	printf("  --%-19s  ", on->nam);
+	printoptionlist_printequiv(on->optno);
+    } else
+	printf("  --%s\n", on->nam);
+}
+
+/**/
+static void
+printoptionlist_printequiv(int optno)
+{
+    int isneg = optno < 0;
+
+    optno *= (isneg ? -1 : 1);
+    printf("  equivalent to --%s%s\n", isneg ? "no-" : "", optns[optno-1].nam);
+}

@@ -1,3 +1,12 @@
+2000-07-30  Andrew Main <zefram@zsh.org>
+
+	* 12434: Doc/Zsh/invoke.yo, Src/init.c, Src/options.c, Src/zsh.h,
+	Src/zsh.mdd: Allow options to be specified on the zsh command line
+	in the form of GNU-style long options.	Also handle --version
+	and --help.  Do not permit extra option letters to be stacked
+	after `-whatever-' (they used to be ignored).  Exit if the
+	command line specifies an option name that doesn't exist.
+
 2000-07-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12393: Src/jobs.c: The `wait' builtin searches the job table for

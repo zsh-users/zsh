@@ -34,6 +34,8 @@
 
 #include "init.pro"
 
+#include "version.h"
+
 /**/
 int noexitct = 0;
 
@@ -207,15 +209,35 @@ parseargs(char **argv)
     while (*argv && (**argv == '-' || **argv == '+')) {
 	char *args = *argv;
 	action = (**argv == '-');
-	if(!argv[0][1])
+	if (!argv[0][1])
 	    *argv = "--";
 	while (*++*argv) {
 	    /* The pseudo-option `--' signifies the end of options. *
 	     * `-b' does too, csh-style, unless we're emulating a   *
 	     * Bourne style shell.                                  */
 	    if (**argv == '-' || (!bourne && **argv == 'b')) {
-		argv++;
-		goto doneoptions;
+		if(!argv[0][1]) {
+		    argv++;
+		    goto doneoptions;
+		}
+		if(*argv != args+1 || **argv != '-')
+		    goto badoptionstring;
+		/* GNU-style long options */
+		++*argv;
+		if (!strcmp(*argv, "version")) {
+		    printf("zsh %s (%s-%s-%s)\n",
+			    ZSH_VERSION, MACHTYPE, VENDOR, OSTYPE);
+		    exit(0);
+		}
+		if (!strcmp(*argv, "help")) {
+		    printhelp();
+		    exit(0);
+		}
+		/* `-' characters are allowed in long options */
+		for(args = *argv; *args; args++)
+		    if(*args == '-')
+			*args = '_';
+		goto longoptions;
 	    }
 
 	    if (**argv == 'c') {         /* -c command */
@@ -230,9 +252,11 @@ parseargs(char **argv)
 		    zerr("string expected after -o", NULL, 0);
 		    exit(1);
 		}
-		if(!(optno = optlookup(*argv)))
+	    longoptions:
+		if (!(optno = optlookup(*argv))) {
 		    zerr("no such option: %s", *argv, 0);
-		else if (optno == RESTRICTED)
+		    exit(1);
+		} else if (optno == RESTRICTED)
 		    restricted = action;
 		else
 		    dosetopt(optno, action, 1);
@@ -241,6 +265,7 @@ parseargs(char **argv)
 		/* zsh's typtab not yet set, have to use ctype */
 		while (*++*argv)
 		    if (!isspace(STOUC(**argv))) {
+		    badoptionstring:
 			zerr("bad option string: `%s'", args, 0);
 			exit(1);
 		    }
@@ -292,6 +317,27 @@ parseargs(char **argv)
     argzero = ztrdup(argzero);
 }
 
+/**/
+static void
+printhelp(void)
+{
+    int bourne = (emulation == EMULATE_KSH || emulation == EMULATE_SH);
+
+    printf("Usage: %s [<options>] [<argument> ...]\n", argzero);
+    printf("\nSpecial options:\n");
+    printf("  --help     show this message, then exit\n");
+    printf("  --version  show zsh version number, then exit\n");
+    if(!bourne)
+	printf("  -b         end option processing, like --\n");
+    printf("  -c         take first argument as a command to execute\n");
+    printf("  -o OPTION  set an option by name (see below)\n");
+    printf("\nNormal options are named.  An option may be turned on by\n");
+    printf("`-o OPTION', `--OPTION', `+o no_OPTION' or `+-no-OPTION'.  An\n");
+    printf("option may be turned off by `-o no_OPTION', `--no-OPTION',\n");
+    printf("`+o OPTION' or `+-OPTION'.  Options are listed below only in\n");
+    printf("`--OPTION' or `--no-OPTION' form.\n");
+    printoptionlist();
+}
 
 /**/
 mod_export void

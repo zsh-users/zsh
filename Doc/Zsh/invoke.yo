@@ -4,34 +4,76 @@ cindex(invocation)
 sect(Invocation Options)
 cindex(flags, shell)
 cindex(shell flags)
-If the tt(-s) flag is not present and an argument is given,
-the first argument is taken to be the pathname of a script to
-execute.  The remaining arguments are assigned to the positional
-parameters.  The following flags are interpreted by the shell
-when invoked:
+The following flags are interpreted by the shell when invoked to determine
+where the shell will read commands from:
 
 startitem()
-item(tt(-c) var(string))(
-Read commands from var(string).
+item(tt(-c))(
+Take the first argument as a command to execute, rather than reading commands
+from a script or standard input.  If any further arguments are given, the
+first one is assigned to tt($0), rather than being used as a positional
+parameter.
 )
 item(tt(-i))(
 Force shell to be interactive.
 )
 item(tt(-s))(
-Read command from the standard input.
+Force shell to read commands from the standard input.
+If the tt(-s) flag is not present and an argument is given,
+the first argument is taken to be the pathname of a script to
+execute.
 )
 enditem()
+
+After the first one or two arguments have been appropriated as described above,
+the remaining arguments are assigned to the positional parameters.
 
 For further options, which are common to invocation and the tt(set)
 builtin, see
 ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Options))\
-.  Flags may be specified by name using the tt(-o) option.  For example,
+.
+
+Options may be specified by name using the tt(-o) option.  tt(-o) acts like
+a single-letter option, but takes a following string as the option name.
+For example,
 
 example(zsh -x -o shwordsplit scr)
 
 runs the script tt(scr), setting the tt(XTRACE) option by the corresponding
 letter `tt(-x)' and the tt(SH_WORD_SPLIT) option by name.
+Options may be turned em(off) by name by using tt(PLUS()o) instead of tt(-o).
+tt(-o) can be stacked up with preceding single-letter options, so for example
+`tt(-xo shwordsplit)' or `tt(-xoshwordsplit)' is equivalent to
+`tt(-x -o shwordsplit)'.
+
+Options may also be specified by name in GNU long option style,
+`tt(--)var(option-name)'.  When this is done, `tt(-)' characters in the
+option name are permitted: they are translated into `tt(_)', and thus ignored.
+So, for example, `tt(zsh --sh-word-split)' invokes zsh with the
+tt(SH_WORD_SPLIT) option turned on.  Like other option syntaxes, options can
+be turned off by replacing the initial `tt(-)' with a `tt(PLUS())'; thus
+`tt(+-sh-word-split)' is equivalent to `tt(--no-sh-word-split)'.
+Unlike other option syntaxes, GNU-style long options cannot be stacked with
+any other options, so for example `tt(-x-shwordsplit)' is an error,
+rather than being treated like `tt(-x --shwordsplit)'.
+
+The special GNU-style option `tt(--version)' is handled; it sends to standard
+output the shell's version information, then exits successfully.
+`tt(--help)' is also handled; it sends to standard output a list of options
+that can be used when invoking the shell, then exits successfully.
+
+Option processing may be finished, allowing following arguments that start with
+`tt(-)' or `tt(PLUS())' to be treated as normal arguments, in two ways.
+Firstly, a lone `tt(-)' (or `tt(PLUS())') as an argument by itself ends option
+processing.  Secondly, a special option `tt(--)' (or `tt(PLUS()-)'), which may
+be specified on its own (which is the standard POSIX usage) or may be stacked
+with preceding options (so `tt(-x-)' is equivalent to `tt(-x --)').  Options
+are not permitted to be stacked after `tt(--)' (so `tt(-x-f)' is an error),
+but note the GNU-style option form discussed above, where `tt(--shwordsplit)'
+is permitted and does not end option processing.
+Except when emulating sh or ksh, the option `tt(-b)' is treated the same way
+as `tt(--)' for the purpose of ending option processing.
 
 startmenu()
 menu(Compatibility)
