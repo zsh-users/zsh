@@ -1,3 +1,8 @@
+2003-04-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* IKEGAMI Tsutomu: SourceForge bug 722366: initialisation of pwd
+	from PWD in environment didn't metafy.
+
 2003-04-23  Oliver Kiddle  <opk@zsh.org>
 
 	* 18462: Completion/Unix/Command/_sh: complete files in addition
