@@ -1,6 +1,6 @@
 #compdef bzip2 bunzip2 bzcat=bunzip2 bzip2recover
 
-local decompress expl state line curcontext="$curcontext"
+local decompress expl state line curcontext="$curcontext" ret=1
 typeset -A opt_args
 
 case "$service" in
@@ -39,7 +39,7 @@ case "$service" in
     '(-1 -2 -3 -4 -5 -6    -8 -9)-7' \
     '(-1 -2 -3 -4 -5 -6 -7    -9)-8' \
     '(-1 -2 -3 -4 -5 -6 -7 -8	)-9' \
-    '*:files:->files' && return 0
+    '*:files:->files' && ret=0
   ;;
 esac
 
@@ -49,11 +49,11 @@ if [[ "$state" = files ]]; then
       $+opt_args[--test] )) && unset decompress
   if [[ -z "$decompress" ]]; then
     _description files expl 'compressed file'
-    _files "$expl[@]" -g '*.(bz2|tbz|tbz2)' && return 0
+    _files "$expl[@]" -g '*.(bz2|tbz|tbz2)' && return
   else
     _description files expl 'file to compress'
-    _files "$expl[@]" -g '*~*.(bz2|tbz|tbz2)' && return 0
+    _files "$expl[@]" -g '*~*.(bz2|tbz|tbz2)' && return
   fi
 fi
 
-return 1
+return ret

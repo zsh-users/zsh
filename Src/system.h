@@ -27,8 +27,14 @@
  *
  */
 
+#if 0
+/*
+ * Setting _XPG_IV here is actually wrong and is not needed
+ * with currently supported versions (5.43C20 and above)
+ */
 #ifdef sinix
 # define _XPG_IV 1
+#endif
 #endif
 
 /* NeXT has half-implemented POSIX support *
@@ -194,19 +200,21 @@ struct timezone {
 # define VARARR(X,Y,Z)	X *(Y) = (X *) alloca(sizeof(X) * (Z))
 #endif
 
-/* we should be getting this value from pathconf(_PC_PATH_MAX) */
-/* but this is too much trouble                                */
+/* we should handle unlimited sizes from pathconf(_PC_PATH_MAX) */
+/* but this is too much trouble                                 */
 #ifndef PATH_MAX
 # ifdef MAXPATHLEN
 #  define PATH_MAX MAXPATHLEN
 # else
-   /* so we will just pick something */
-#  define PATH_MAX 1024
+#  ifdef _POSIX_PATH_MAX
+#   define PATH_MAX _POSIX_PATH_MAX
+#  else
+    /* so we will just pick something */
+#   define PATH_MAX 1024
+#  endif
 # endif
 #endif
 
-/* we should be getting this value from sysconf(_SC_OPEN_MAX) */
-/* but this is too much trouble                               */
 #ifndef OPEN_MAX
 # ifdef NOFILE
 #  define OPEN_MAX NOFILE
@@ -214,6 +222,9 @@ struct timezone {
    /* so we will just pick something */
 #  define OPEN_MAX 64
 # endif
+#endif
+#ifndef HAVE_SYSCONF
+# define zopenmax() ((long) OPEN_MAX)
 #endif
 
 #ifdef HAVE_FCNTL_H
@@ -298,10 +309,6 @@ struct timezone {
 #  include <sgtty.h>
 # endif  /* HAVE_TERMIO_H  */
 #endif   /* HAVE_TERMIOS_H */
-
-#ifdef HAVE_TERMCAP_H
-# include <termcap.h>
-#endif
 
 #if defined(GWINSZ_IN_SYS_IOCTL) || defined(CLOBBERS_TYPEAHEAD)
 # include <sys/ioctl.h>
@@ -399,8 +406,10 @@ struct timezone {
 /* DIGBUFSIZ is the length of a buffer which can hold the -LONG_MAX-1 *
  * (or with ZSH_64_BIT_TYPE maybe -LONG_LONG_MAX-1)                   *
  * converted to printable decimal form including the sign and the     *
- * terminating null character. Below 0.30103 > lg 2.                  */
-#define DIGBUFSIZE ((int)(((sizeof(zlong) * 8) - 1) * 0.30103) + 3)
+ * terminating null character. Below 0.30103 > lg 2.                  *
+ * BDIGBUFSIZE is for a number converted to printable binary form.    */
+#define DIGBUFSIZE ((int)(((sizeof(zlong) * 8) - 1) * 30103/100000) + 3)
+#define BDIGBUFSIZE ((int)((sizeof(zlong) * 8) + 4))
 
 /* If your stat macros are broken, we will *
  * just undefine them.                     */
@@ -642,3 +651,13 @@ extern short ospeed;
 #if defined(CONFIG_LOCALE) && defined(HAVE_SETLOCALE) && defined(LC_ALL)
 # define USE_LOCALE 1
 #endif /* CONFIG_LOCALE && HAVE_SETLOCALE && LC_ALL */
+
+#ifndef MAILDIR_SUPPORT
+#define mailstat(X,Y) stat(X,Y)
+#endif
+
+#ifdef __CYGWIN__
+# define IS_DIRSEP(c) ((c) == '/' || (c) == '\\')
+#else
+# define IS_DIRSEP(c) ((c) == '/')
+#endif

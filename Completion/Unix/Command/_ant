@@ -1,7 +1,7 @@
 #compdef ant
 
 typeset -A opt_args
-local state line curcontext="$curcontext"
+local state line curcontext="$curcontext" ret=1
 local target='*:target:->target'
 
 _arguments -C \
@@ -21,11 +21,13 @@ _arguments -C \
   '-propertyfile[load properties from specified file]:property file:_files' \
   '-inputhandler[specify class which will handle input requests]:class:_java_class' \
   '-find[search for buildfile]:file:_files' \
-  $target && return
+  $target && ret=0
 
 if [[ -n $state ]]; then
   targets=( $(sed -n 's/ *<target name="\([^"]*\)".*/\1/p' < build.xml) )
   # ant can be used to get a list of targets for us like this but it is slow
   # targets=( ${${(M)${(f)"$(_call_program targets $words[1] -projecthelp)"}:# *}# } )
-  _wanted targets expl target compadd -a targets
+  _wanted targets expl target compadd -a targets && ret=0
 fi
+
+return ret

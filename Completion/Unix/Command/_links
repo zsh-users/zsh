@@ -1,6 +1,6 @@
 #compdef links
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
 _arguments -C \
@@ -25,10 +25,13 @@ _arguments -C \
   '(-help)-source[dump the source page]' \
   '(-help)-unrestartable-receive-timeout[timeout on non restartable connections]:secs:' \
   '(-help)-version[prints the links version number and exit]' \
-  ':url:->html' && return 0
+  ':url:->html' && ret=0
 
 case "$state" in
 html)
   _files -g '*.html' || _urls
+  return
   ;;
 esac
+
+return ret

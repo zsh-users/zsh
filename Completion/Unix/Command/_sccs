@@ -8,7 +8,7 @@ _sccs_files() {
   _files -W $dir -g \*\(:s/s.//\) "$@"
 }
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 local subcmds ropt copt sfiles finalpath
 
@@ -27,12 +27,13 @@ if [[ $service = sccs ]]; then
     '-r[run with real and not effective user ID]' \
     '-d+[specify root prefix]:root prefix:_directories' \
     '-p+[specify subdirectory of history file]:path to history file:_directories' \
-    '*::command:->subcmd' && return 0
+    '*::command:->subcmd' && ret=0
 
   if (( CURRENT == 1 )); then
-    _wanted commands expl 'sccs command' compadd -a subcmds
-    return
+    _wanted commands expl 'sccs command' compadd -a subcmds && ret=0
   fi
+  (( ret )) || return 0
+
   service="$words[1]"
   curcontext="${curcontext%:*}-$service:"
 fi

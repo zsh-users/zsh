@@ -1,6 +1,6 @@
 #compdef gzip gunzip gzcat=gunzip
 
-local decompress expl curcontext="$curcontext" state line
+local decompress expl curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
 case "$service" in
@@ -51,7 +51,7 @@ gzip)
     '(--fast -1 -2 -3 -4 -5 -6 -7    -9 --best)-8' \
     '(--fast -1 -2 -3 -4 -5 -6 -7 -8    --best)-9' \
     '(--fast -1 -2 -3 -4 -5 -6 -7 -8 -9       )--best' \
-    '*:files:->files' && return 0
+    '*:files:->files' && ret=0
   ;;
 esac
 
@@ -64,19 +64,21 @@ files)
   if (( $+opt_args[-r] || $+opt_args[--recursive] )); then
     if [[ -z "$decompress" ]]; then
       _description directories expl 'directory to compress'
-      _files "$expl[@]" -/
+      _files "$expl[@]" -/ && return
     else
       _description directories expl 'compressed directory'
-      _files "$expl[@]" -/
+      _files "$expl[@]" -/ && return
     fi
   else
     if [[ -z "$decompress" ]]; then
       _description files expl 'file to compress'
-      _files "$expl[@]" -g '*~*.(([tT]|)[gG]|)[zZ]'
+      _files "$expl[@]" -g '*~*.(([tT]|)[gG]|)[zZ]' && return
     else
       _description files expl 'compressed file'
-      _files "$expl[@]" -g '*.(([tT]|)[gG]|)[zZ]'
+      _files "$expl[@]" -g '*.(([tT]|)[gG]|)[zZ]' && return
     fi
   fi
   ;;
 esac
+
+return ret

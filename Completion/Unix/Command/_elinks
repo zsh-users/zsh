@@ -25,7 +25,7 @@ _arguments -C -A '-*' \
   '(1)*-stdin[read document from stdin]::boolean:(0 1)' \
   '*-touch-files[touch files in ~/.elinks when running with -no-connect/-session-ring]::boolean:(0 1)' \
   '(- 1)-version[print version information and exit]' \
-  '1:url:->url' && return
+  '1:url:->url' && ret=0
 
 if [[ "$state" = url ]]; then
   local elinks_bookmarks
@@ -40,4 +40,4 @@ if [[ "$state" = url ]]; then
     'urls:url:_urls' && return
 fi
 
-return 1
+return ret
