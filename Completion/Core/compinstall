@@ -1053,9 +1053,7 @@ listings.
 
 3.  Make completion verbose, using option descriptions etc. (on by default).
 
-4.  Allow scrolling of long completion lists and set the prompt.
-
-5.  Make single-valued options display the value's description as
+4.  Make single-valued options display the value's description as
     part of the option's description.
 
 q.  Return without saving.
@@ -1126,25 +1124,6 @@ you want?
           esac
 	 ;;
       4) print "\
-You can make completion lists scroll when they don't fit on the screen.
-To do this, edit a prompt to show when scrolling is active; an empty string
-turns this feature off.  It can contain \`%l' to show the number of matches
-as \`current_number/total_number', \`%p' to show the fraction of the way
-down the list, or font-control sequences such as %B, %U, %S and the
-corresponding %b, %u, %s; quotes will be added automatically.  Note that
-this is the default behaviour; delete the whole line to turn it off, in
-which case the display of completions which don't fit on the screen is
-controlled by the LISTMAX parameter (currently ${LISTMAX:-unset}), which
-specifies the maximum number to show without asking.  Hit return to keep
-the current value.
-"
-         [[ -z $haslistp ]] &&
-	   listp='%SAt %p: Hit TAB for more, or the character to insert%s'
-	 vared -eh -p 'prompt> ' -c listp
-	 # Unconditionally use listp; will become '' if empty.
-	 haslistp=1
-	 ;;
-      5) print "\
 Many commands have options which take a single argument.  In some cases,
 completion is not set up to describe the option even though it has a
 description for the argument.  You can enter a string containing \`%d',
@@ -1172,8 +1151,6 @@ Quotation will be added automatically.
   __ci_set_this_style format format
   __ci_set_this_style group-name groupn
   __ci_set_this_style verbose verbose
-  [[ -n $haslistp ]] && listp=${(qq)listp}
-  __ci_set_this_style list-prompt listp
   [[ -n $autod ]] && autod=${(qq)autod}
   __ci_set_this_style auto-description autod
 }
@@ -1267,6 +1244,9 @@ __ci_do_selection() {
 
   __ci_get_this_style list-colors listc
   __ci_get_this_style menu menu
+  __ci_get_this_style list-prompt listp
+  [[ -n $listp ]] && haslistp=1
+  listp=${(Q)listp}
 
   while true; do
     clear
@@ -1276,6 +1256,8 @@ __ci_do_selection() {
 1.   Use coloured lists for listing completions.
 
 2.   Use cursor keys to select completions from completion lists.
+
+3.   Allow scrolling of long selection lists and set the prompt.
 
 q.   Return without saving.
 0.   Done setting options for insertion.
@@ -1325,13 +1307,17 @@ number of completions.  Please enter:
 - 0 or 1, to turn this feature on unconditionally
 - a higher number to turn this feature on when there are that many
   completions
+- an \`l' for \`long' to turn it on for completions which don't fit on the
+  screen
+- an \`ll' for \`long list' to turn it on for completions which don't fit
+  on the screen, even for commands which only do listing of completions.
 - a negative number to turn this feature off
 - an empty line to leave the setting the way it is.
 "
          while true; do
            vared -eh -p 'value> ' select
-	   [[ -z $select || $select = (-|)<-> ]] && break;
-	   print "Type a number or an empty line." >&2
+	   [[ -z $select || $select = ((-|)<->|l#) ]] && break;
+	   print "Type a number, l, ll, or an empty line." >&2
 	 done
 	 amenu=(${=menu})
 	 elt=${amenu[(i)*select*]}
@@ -1344,6 +1330,18 @@ number of completions.  Please enter:
 	        fi
 		menu="$amenu"
 		;;
+	   l#) if [[ $select = l ]]; then
+                 select=long
+               else
+                 select=long-list
+               fi
+               if [[ -n $elt ]]; then
+                 amenu[$elt]="select=$select"
+               else
+                 amenu=($amenu "select=$select")
+               fi
+	       menu="$amenu"
+               ;;
 	   -<->) if [[ -n $elt ]]; then
 		    # i never liked the way indexing was done anyway
 		    if [[ $elt -eq 1 ]]; then
@@ -1356,6 +1354,28 @@ number of completions.  Please enter:
 		 ;;
 	 esac
          ;;
+      3) print "\
+You can make completion lists scroll when they don't fit on the screen.
+Note this is different from scrolling in menu selection --- a more basic
+pager is used which should work even with fairly stupid terminals.
+
+To enable this, edit a prompt to show when scrolling is active; an empty 
+string turns this feature off.  It can contain \`%l' to show the number of
+matches as \`current_number/total_number', \`%p' to show the fraction of
+the way down the list, or font-control sequences such as %B, %U, %S and the
+corresponding %b, %u, %s; quotes will be added automatically.  Note that
+this is the default behaviour; delete the whole line to turn it off, in
+which case the display of completions which don't fit on the screen is
+controlled by the LISTMAX parameter (currently ${LISTMAX:-unset}), which
+specifies the maximum number to show without asking.  Hit return to keep
+the current value.
+"
+         [[ -z $haslistp ]] &&
+	   listp='%SAt %p: Hit TAB for more, or the character to insert%s'
+	 vared -eh -p 'prompt> ' -c listp
+	 # Unconditionally use listp; will become '' if empty.
+	 haslistp=1
+	 ;;
       q) return 1
          ;;
     esac
@@ -1363,6 +1383,8 @@ number of completions.  Please enter:
 
   __ci_set_this_style list-colors listc
   __ci_set_this_style menu menu
+  [[ -n $haslistp ]] && listp=${(qq)listp}
+  __ci_set_this_style list-prompt listp
 
   return 0
 }
@@ -1385,7 +1407,8 @@ __ci_do_display() {
 2.  Change how completions are inserted: includes options for sorting,
     and keeping the original or an unambiguous prefix with correction etc.
 
-3.  Configure coloured/highlighted completion lists and selection of items.
+3.  Configure coloured/highlighted completion lists, selection of items
+    and scrolling.
 
 4.  Change whether old-style \`compctl' completions will be used.
 

@@ -1,3 +1,8 @@
+2000-05-15  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11375: Completion/Core/compinstall: menu select keyword takes
+	values long and long-list.
+
 2000-05-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 11376: Makefile.in: install functions before man pages
