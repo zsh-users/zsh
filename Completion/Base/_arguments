@@ -24,7 +24,7 @@ if (( long )); then
   name="${name//[^a-zA-Z0-9_]/_}"
 
   if (( ! ${(P)+name} )); then
-    local iopts sopts pattern tmpo cur opt cache
+    local iopts sopts pattern tmpo cur cache
     typeset -U lopts
 
     cache=()
@@ -287,8 +287,7 @@ if comparguments -i "$autod" "$@"; then
         fi
       fi
       if [[ -n "$opts" && -z "$aret$matched" &&
-            nm -ne compstate[nmatches] ]] &&
-          _requested arguments; then
+            nm -eq compstate[nmatches] ]]; then
 
         local prefix suffix
 
@@ -303,8 +302,10 @@ if comparguments -i "$autod" "$@"; then
 	  SUFFIX="$suffix"
 	  IPREFIX="${IPREFIX}${equal[1]%%:*}="
 	  matched=yes
-	  comparguments -L "$equal[1]" descr action subc
+
+	  comparguments -L "${equal[1]%%:*}" descr action subc
 	  curcontext="${oldcontext}:$subc"
+
 	  continue
         fi
       fi

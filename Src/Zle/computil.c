@@ -2730,8 +2730,16 @@ bin_comptry(char *nam, char **args, char *ops, int func)
 	args = arrdup(args);
 
 	for (p = q = args, all = comptags[lasttaglevel]->all; *p; p++)
-	    if (arrcontains(all, *p))
-		*q++ = *p;
+	    if (arrcontains(all, *p)) {
+		Ctset s;
+
+		for (s = comptags[lasttaglevel]->sets; s; s = s->next)
+		    if (arrcontains(s->tags, *p))
+			break;
+
+		if (!s)
+		    *q++ = *p;
+	    }
 	*q = NULL;
 
 	if (*args) {
