@@ -715,6 +715,11 @@ item(tt(values))(
 when completing a value out of a set of values (or a list of such
 values)
 )
+kindex(version, completion tag)
+item(tt(version))(
+used by tt(_call) to look up the command to run to determine the installed
+version of various other commands (currently tt(diff) and tt(make)).
+)
 kindex(warnings, completion tag)
 item(tt(warnings))(
 used to look up the tt(format) style for warnings

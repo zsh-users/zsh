@@ -1,3 +1,8 @@
+2000-04-10  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 10628: Doc/Zsh/compsys.yo, Completion/User/_make: Check for
+	GNU make using "_call version ..." as was done for GNU diff.
+
 2000-04-10  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
 	* 10625: Src/parse.c, Src/signals.c: detect ignored signals

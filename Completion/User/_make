@@ -1,6 +1,17 @@
-#compdef make gmake pmake
+#compdef make gmake pmake dmake
 
 local prev="$words[CURRENT-1]" file expl tmp
+
+(( $+_is_gnu )) || typeset -gA _is_gnu
+
+if (( ! $+_is_gnu[$1] )); then
+  if [[ $(_call version $1 -v -f /dev/null </dev/null 2>/dev/null) = *GNU* ]]
+  then
+    _is_gnu[$1]=yes
+  else
+    _is_gnu[$1]=
+  fi
+fi
 
 if [[ "$prev" = -[CI] ]]; then
   _files -/
@@ -14,17 +25,23 @@ else
     file=Makefile
   elif [[ -e makefile ]]; then
     file=makefile
+  elif [[ -e GNUmakefile ]]; then
+    file=GNUmakefile
   else
     file=''
   fi
 
   if [[ -n "$file" ]] && _wanted targets; then
-    tmp=(
-          $(awk '/^[a-zA-Z0-9][^\/\t]+:/ {print $1}
+    if [[ -n "$_is_gnu[$1]" ]]; then
+      tmp=( $(make -nsp --no-print-directory -f "$file" .PHONY | awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}' FS=:) )
+    else
+      tmp=(
+            $(awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}
  	      /^\.include  *<bsd\.port\.(subdir\.|pre\.)?mk>/ || /^\.include  *".*mk\/bsd\.pkg\.(subdir\.)?mk"/ {
  	        print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum" }' \
  	     FS=: $file)
-         )
+           )
+    fi
     _all_labels targets expl 'make target' compadd "$tmp[@]" && return 0
   fi
   compset -P 1 '*='
