@@ -14,7 +14,7 @@ _arguments -C -s -A "-*" -S \
   '(-r -b -f -m -s -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
   '-b[recognise bindkey escape sequences]' \
   '-m[remove arguments matching specified pattern]' \
-  '(-r -n -R -l -N -c)-f[print arguments as for the printf builtin]:format' \
+  '(-r -n -R -l -N -c)-f+[print arguments as for the printf builtin]:format' \
   '(-u -p -z)-s[place results in the history list]' \
   '(-c -f)-n[do not add a newline to the result]' \
   '(-N -c -f)-l[print arguments separated by newlines]' \
@@ -22,7 +22,9 @@ _arguments -C -s -A "-*" -S \
   '(-O)-o[sort arguments in ascending order]' \
   '(-o)-O[sort arguments in descending order]' \
   '-i[case-insensitive sorting]' \
-  '(-n -l -N -f)-c[print arguments in columns]' \
+  '(-n -l -N -f -s -z)-a[with -c/-C, print arguments across before down]' \
+  '(-n -l -N -f -C -s -z)-c[print arguments in columns]' \
+  '(-n -l -N -f -c -s -z)-C+[print arguments in specified number of columns]:columns' \
   '(-s -p -z)-u+[specify file-descriptor to print arguments to]:file-descriptor:_file_descriptors' \
   '(-s -p -u)-z[push arguments onto editing buffer stack]' \
   '-D[substitute any arguments which are named directories using ~ notation]' \

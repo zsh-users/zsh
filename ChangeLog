@@ -1,3 +1,9 @@
+2002-11-22  Oliver Kiddle  <opk@zsh.org>
+
+	* 17958: Completion/Zsh/Command/_print, Completion/Zsh/Command/_read,
+	Completion/Zsh/Command/_ulimit: change _print to reflect changes in
+	17940, add missing options in _ulimit and minor update to _read
+
 2002-11-20  Peter Stephenson  <pws@csr.com>
 
 	* 17940: Src/builtin.c, Doc/Zsh/builtin.yo: print -C <cols> prints
