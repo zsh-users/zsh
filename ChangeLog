@@ -1,3 +1,7 @@
+2001-06-13  Andrej Borsenkow <bor@zsh.org>
+
+	* 14766: Src/prompt.c: uniform %l substitution
+
 2001-06-13  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/compinstall: spotted by Bart: assignments

@@ -113,15 +113,26 @@ promptpath(char *p, int npath, int tilde)
 
     if (npath) {
 	char *sptr;
-	for (sptr = modp + strlen(modp); sptr > modp; sptr--) {
-	    if (*sptr == '/' && !--npath) {
-		sptr++;
-		break;
+	if (npath > 0) {
+	    for (sptr = modp + strlen(modp); sptr > modp; sptr--) {
+		if (*sptr == '/' && !--npath) {
+		    sptr++;
+		    break;
+		}
 	    }
+	    if (*sptr == '/' && sptr[1] && sptr != modp)
+		sptr++;
+	    stradd(sptr);
+	} else {
+	    char cbu;
+	    for (sptr = modp+1; *sptr; sptr++)
+		if (*sptr == '/' && !++npath)
+		    break;
+	    cbu = *sptr;
+	    *sptr = 0;
+	    stradd(modp);
+	    *sptr = cbu;
 	}
-	if (*sptr == '/' && sptr[1] && sptr != modp)
-	    sptr++;
-	stradd(sptr);
     } else
 	stradd(modp);
 
@@ -190,7 +201,7 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
 static int
 putpromptchar(int doprint, int endchar)
 {
-    char *ss, *tmbuf = NULL;
+    char *ss, *tmbuf = NULL, *hostnam;
     int t0, arg, test, sep;
     struct tm *tm;
     time_t timet;
@@ -199,14 +210,26 @@ putpromptchar(int doprint, int endchar)
     for (; *fm && *fm != endchar; fm++) {
 	arg = 0;
 	if (*fm == '%' && isset(PROMPTPERCENT)) {
-	    if (idigit(*++fm)) {
-		arg = zstrtol(fm, &fm, 10);
+	    int minus = 0;
+	    fm++;
+	    if (*fm == '-') {
+		minus = 1;
+		fm++;
 	    }
+	    if (idigit(*fm)) {
+		arg = zstrtol(fm, &fm, 10);
+		if (minus)
+		    arg *= -1;
+	    } else if (minus)
+		arg = -1;
 	    if (*fm == '(') {
 		int tc, otrunclen;
 
 		if (idigit(*++fm)) {
 		    arg = zstrtol(fm, &fm, 10);
+		} else if (arg < 0) {
+		    /* negative numbers don't make sense here */
+		    arg *= -1;
 		}
 		test = 0;
 		ss = pwd;
@@ -349,18 +372,29 @@ putpromptchar(int doprint, int endchar)
 		bp += strlen(bp);
 		break;
 	    case 'M':
-		stradd(hostnam);
+		queue_signals();
+		if ((hostnam = getsparam("HOST")))
+		    stradd(hostnam);
+		unqueue_signals();
 		break;
 	    case 'm':
 		if (!arg)
 		    arg++;
-		for (ss = hostnam; *ss; ss++)
-		    if (*ss == '.' && !--arg)
-			break;
-		t0 = *ss;
-		*ss = '\0';
-		stradd(hostnam);
-		*ss = t0;
+		queue_signals();
+		if (!(hostnam = getsparam("HOST")))
+		    break;
+		if (arg < 0) {
+		    for (ss = hostnam + strlen(hostnam); ss > hostnam; ss--)
+			if (ss[-1] == '.' && !++arg)
+			    break;
+		    stradd(ss);
+		} else {
+		    for (ss = hostnam; *ss; ss++)
+			if (*ss == '.' && !--arg)
+			    break;
+		    stradd(*ss ? dupstrpfx(hostnam, ss - hostnam) : hostnam);
+		}
+		unqueue_signals();
 		break;
 	    case 'S':
 		txtchangeset(TXTSTANDOUT, TXTNOSTANDOUT);
@@ -481,8 +515,8 @@ putpromptchar(int doprint, int endchar)
 		break;
 	    case 'l':
 		if (*ttystrname) {
-		    ss = (strncmp(ttystrname, "/dev/tty", 8) ?
-			    ttystrname + 5 : ttystrname + 8);
+                   ss = (strncmp(ttystrname, "/dev/", 5) ?
+                           ttystrname : ttystrname + 5);
 		    stradd(ss);
 		} else
 		    stradd("()");
@@ -509,6 +543,8 @@ putpromptchar(int doprint, int endchar)
 	    case 'v':
 		if (!arg)
 		    arg = 1;
+		else if (arg < 0)
+		    arg += arrlen(psvar) + 1;
 		if (arrlen(psvar) >= arg)
 		    stradd(psvar[arg - 1]);
 		break;
@@ -732,7 +768,7 @@ countprompt(char *str, int *wp, int *hp, int overf)
 static int
 prompttrunc(int arg, int truncchar, int doprint, int endchar)
 {
-    if (arg) {
+    if (arg > 0) {
 	char ch = *fm, *ptr, *truncstr;
 	int truncatleft = ch == '<';
 	int w = bp - buf;
