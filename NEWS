@@ -7,7 +7,7 @@ Changes since zsh version 4.2.0
 
 - The glob qualifier F indicates a non-empty directory.  Hence *(F)
   indicates all subdirectories with entries, *(/^F) means all
-  subdirectories with non entries.
+  subdirectories with no entries.
 
 - fc -p and fc -P provide push/pop for the status of the shell's
   history (both internal and using the history file).  With automatic
@@ -18,8 +18,8 @@ Changes since zsh version 4.2.0
 - A new `try block' and `always block' syntax has been introduced
   to make it easier to ensure the shell runs important tidy-up code
   in the event of an error.  It also runs after a break, continue, or
-  return, including a return forced by the ERR_RETURN option,
-  but not an exit, which is immediate).  The syntax is:
+  return, including a return forced by the ERR_RETURN option
+  (but not an exit, which is immediate).  The syntax is:
     `{'  try-block-list `}' `always' `{' always-block-list `}'
   where no newline or semicolon may appear between `}' and `always'.
   This is compatible with all previous valid zsh syntax as an `always'
@@ -27,10 +27,10 @@ Changes since zsh version 4.2.0
     { echo Code run in current shell } always { echo Tidy-up code }
 
 - A new zle widget reset-prompt has been added to re-expand the current
-  prompt.  Note that this does not take account of changes to the
-  prompt variables themselves, only the expansion of the text.  The
-  same effect is now forced by a job change notification, making
-  the %j prompt escape and %(j..) ternary expression more useful.
+  prompt.  Changes to the variable in use as well as changes in its
+  expanions are both taken into account.  The same effect is now forced by
+  a job change notification, making the %j prompt escape and %(j..) ternary
+  expression more useful.
 
 - The zftp module supports ports following the hostname in the normal suffix
   notation, `host:port'.  This requires IPv6 colon-style addresses to be

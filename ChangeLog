@@ -1,5 +1,7 @@
 2004-07-12  Peter Stephenson  <pws@csr.com>
 
+	* unposted: NEWS: read it through and tidied it up.
+
 	* 20151: NEWS: notes on (F) and history -p.
 
 	* unposted: improve 20150 by setting pointer to NULL when
