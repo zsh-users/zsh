@@ -959,7 +959,7 @@ _cvs_nonentried_files () {
   realdir=${(e)~linedir}
   [[ -f "$realdir"CVS/Entries ]] && {
     omitpats=(
-      ${${${${(M)${(f)"$(<"$realdir"CVS/Entries)"}:#(D|)/*}#(D|)/}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}
+      ${${${${(M)${${(f)"$(<"$realdir"CVS/Entries)"}:#/*/-*}:#(D|)/*}#(D|)/}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}
       $_cvs_ignore_default
       ${=cvsignore}
     )
