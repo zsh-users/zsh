@@ -162,6 +162,18 @@
 >1:  [[ read.me = (#ia1)README~READ.ME ]]
 >0:  [[ read.me = (#ia1)README~READ_ME ]]
 >1:  [[ read.me = (#ia1)README~(#a1)READ_ME ]]
+>0:  [[ test = *((#s)|/)test((#e)|/)* ]]
+>0:  [[ test/path = *((#s)|/)test((#e)|/)* ]]
+>0:  [[ path/test = *((#s)|/)test((#e)|/)* ]]
+>0:  [[ path/test/ohyes = *((#s)|/)test((#e)|/)* ]]
+>1:  [[ atest = *((#s)|/)test((#e)|/)* ]]
+>1:  [[ testy = *((#s)|/)test((#e)|/)* ]]
+>1:  [[ testy/path = *((#s)|/)test((#e)|/)* ]]
+>1:  [[ path/atest = *((#s)|/)test((#e)|/)* ]]
+>1:  [[ atest/path = *((#s)|/)test((#e)|/)* ]]
+>1:  [[ path/testy = *((#s)|/)test((#e)|/)* ]]
+>1:  [[ path/testy/ohyes = *((#s)|/)test((#e)|/)* ]]
+>1:  [[ path/atest/ohyes = *((#s)|/)test((#e)|/)* ]]
 >0 tests failed.
 
   globtest globtests.ksh

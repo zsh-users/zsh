@@ -14,6 +14,13 @@ while read res str pat; do
     (( failed++ ))
   fi
 done <<EOT
+# a few simple things certain nameless idiots have been known to mess up
+t foo~                foo~
+t foo~                (foo~)
+t foo~                (foo~|)
+t foo.c               *.c~boo*
+f foo.c               *.c~boo*~foo*
+# closures
 t fofo                (fo#)#
 t ffo                 (fo#)#
 t foooofo             (fo#)#
@@ -75,6 +82,7 @@ f mad.moo.cow   (*~*.*).(*~*.*)
 t moo.cow       (^*.*).(^*.*)
 f sane.moo.cow  (^*.*).(^*.*)
 f mucca.pazza   mu(^c#)?.pa(^z#)?
+f _foo~         _(|*[^~])
 t fff           ((^f))
 t fff           ((^f)#)
 t fff           ((^f)##)
@@ -94,6 +102,8 @@ t zoox          (^z*|*x)
 t foo           (^foo)#
 f foob          (^foo)b*
 t foobb         (^foo)b*
+f foob          (*~foo)b*
+t foobb         (*~foo)b*
 f zsh           ^z*
 t a%1X          [[:alpha:][:punct:]]#[[:digit:]][^[:lower:]]
 f a%1           [[:alpha:][:punct:]]#[[:digit:]][^[:lower:]]
@@ -103,5 +113,71 @@ t :]            [:]]#
 t [             [[]
 t ]             []]
 t []            [^]]]
+# Case insensitive matching
+t fooxx         (#i)FOOXX
+f fooxx         (#l)FOOXX
+t FOOXX         (#l)fooxx
+f fooxx         (#i)FOO(#I)X(#i)X
+t fooXx         (#i)FOO(#I)X(#i)X
+t fooxx         ((#i)FOOX)x
+f fooxx         ((#i)FOOX)X
+f BAR           (bar|(#i)foo)
+t FOO           (bar|(#i)foo)
+t Modules       (#i)*m*
+t fooGRUD       (#i)(bar|(#I)foo|(#i)rod)grud
+f FOOGRUD       (#i)(bar|(#I)foo|(#i)rod)grud
+t readme        (#i)readme~README|readme
+# the readme doesn't get excluded the second time...
+t readme        (#i)readme~README|readme~README
+# Ranges with backtracking
+t 633           <1-1000>33
+t 633           <-1000>33
+t 633           <1->33
+t 633           <->33
+# Approximate matching
+t READ.ME       (#ia1)readme
+f READ..ME      (#ia1)readme
+t README        (#ia1)readm
+t READM         (#ia1)readme
+t README        (#ia1)eadme
+t EADME         (#ia1)readme
+t READEM        (#ia1)readme
+f ADME          (#ia1)readme
+f README        (#ia1)read
+t bob           (#a1)[b][b]
+f bob           (#a1)[b][b]a
+t bob           (#a1)[b]o[b]a
+f bob           (#a1)[c]o[b]
+t abcd          (#a2)XbcX
+t abcd          (#a2)ad
+t ad            (#a2)abcd
+t abcd          (#a2)bd
+t bd            (#a2)abcd
+t badc          (#a2)abcd
+# This next one is a little tricky: a[d]bc[] = a[]bc[d]
+t adbc          (#a2)abcd
+f dcba          (#a2)abcd
+# the next one is [d][cb][a] = [a][bc][d] with a transposition
+t dcba          (#a3)abcd
+t aabaXaaabY    (#a1)(a#b)#Y
+t aabaXaaabY    (#a1)(a#b)(a#b)Y
+t aaXaaaaabY    (#a1)(a#b)(a#b)Y
+t aaaXaaabY     (#a1)(a##b)##Y
+t aaaXbaabY     (#a1)(a##b)##Y
+f read.me       (#ia1)README~READ.ME
+t read.me       (#ia1)README~READ_ME
+f read.me       (#ia1)README~(#a1)READ_ME
+t test          *((#s)|/)test((#e)|/)*
+t test/path     *((#s)|/)test((#e)|/)*
+t path/test     *((#s)|/)test((#e)|/)*
+t path/test/ohyes *((#s)|/)test((#e)|/)*
+f atest         *((#s)|/)test((#e)|/)*
+f testy         *((#s)|/)test((#e)|/)*
+f testy/path    *((#s)|/)test((#e)|/)*
+f path/atest    *((#s)|/)test((#e)|/)*
+f atest/path    *((#s)|/)test((#e)|/)*
+f path/testy    *((#s)|/)test((#e)|/)*
+f path/testy/ohyes *((#s)|/)test((#e)|/)*
+f path/atest/ohyes *((#s)|/)test((#e)|/)*
 EOT
 print "$failed tests failed."

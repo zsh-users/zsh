@@ -1,3 +1,9 @@
+2000-04-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 10547: Doc/Zsh/expn.yo, Misc/globtests, Src/pattern.c,
+	Src/subst.c, Test/11glob.ztst, Test/ztst.zsh: add
+	(#s) and (#e) to match at start and end of string.
+
 2000-04-06  Andrew Main  <zefram@zsh.org>
 
 	* zefram2: Src/lex.c: Support "3&> foo" etc.

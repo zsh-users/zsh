@@ -1299,6 +1299,17 @@ item(tt(a)var(num))(
 Approximate matching: var(num) errors are allowed in the string matched by
 the pattern.  The rules for this are described in the next subsection.
 )
+item(tt(s), tt(e))(
+Unlike the other flags, these have only a local effect, and each must
+appear on its own:  `tt((#s))' and `tt((#e))' are the only valid forms.
+The `tt((#s))' flag succeeds only at the start of the test string, and the
+`tt((#e))' flag succeeds only at the end of the test string; they
+correspond to `tt(^)' and `tt($)' in standard regular expressions.  They
+are useful for matching path segments in patterns.  For example,
+`tt(*((#s)|/)test((#e)|/)*)' matches a path segment `tt(test)' in any of
+the following strings: tt(test), tt(test/at/start), tt(at/end/test),
+tt(in/test/middle).
+)
 enditem()
 
 For example, the test string tt(fooxx) can be matched by the pattern

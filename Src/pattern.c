@@ -83,6 +83,8 @@ typedef union upat *Upat;
 #define	P_ONEHASH 0x06	/* node	Match this (simple) thing 0 or more times. */
 #define	P_TWOHASH 0x07	/* node	Match this (simple) thing 1 or more times. */
 #define P_GFLAGS  0x08	/* long Match nothing and set globbing flags */
+#define P_ISSTART 0x09  /* no   Match start of string. */
+#define P_ISEND   0x0a  /* no   Match end of string. */
 /* numbered so we can test bit 5 for a branch */
 #define	P_BRANCH  0x20	/* node	Match this alternative, or the next... */
 #define	P_WBRANCH 0x21	/* uc* node P_BRANCH, but match at least 1 char */
@@ -645,34 +647,44 @@ patcompbranch(int *flagp)
 	    /* Globbing flags. */
 	    char *pp1 = patparse;
 	    int oldglobflags = patglobflags;
+	    long assert;
 	    patparse += (*patparse == '@') ? 3 : 2;
-	    if (!patgetglobflags(&patparse))
-		return 0;	    
-	    if (pp1 == patstart) {
-		/* Right at start of pattern, the simplest case.
-		 * Put them into the flags and don't emit anything.
+	    if (!patgetglobflags(&patparse, &assert))
+		return 0;
+	    if (assert) {
+		/*
+		 * Start/end assertion looking like flags, but
+		 * actually handled as a normal node
 		 */
-		((Patprog)patout)->globflags = patglobflags;
-		continue;
-	    } else if (!*patparse) {
-		/* Right at the end, so just leave the flags for
-		 * the next Patprog in the chain to pick up.
-		 */
-		break;
-	    }
-	    /*
-	     * Otherwise, we have to stick them in as a pattern
-	     * matching nothing.
-	     */
-	    if (oldglobflags != patglobflags) {
-		/* Flags changed */
-		union upat up;
-		latest = patnode(P_GFLAGS);
-		up.l = patglobflags;
-		patadd((char *)&up, 0, sizeof(union upat), 0);
+		latest = patnode(assert);
+		flags = 0;
 	    } else {
-		/* No effect. */
-		continue;
+		if (pp1 == patstart) {
+		    /* Right at start of pattern, the simplest case.
+		     * Put them into the flags and don't emit anything.
+		     */
+		    ((Patprog)patout)->globflags = patglobflags;
+		    continue;
+		} else if (!*patparse) {
+		    /* Right at the end, so just leave the flags for
+		     * the next Patprog in the chain to pick up.
+		     */
+		    break;
+		}
+		/*
+		 * Otherwise, we have to stick them in as a pattern
+		 * matching nothing.
+		 */
+		if (oldglobflags != patglobflags) {
+		    /* Flags changed */
+		    union upat up;
+		    latest = patnode(P_GFLAGS);
+		    up.l = patglobflags;
+		    patadd((char *)&up, 0, sizeof(union upat), 0);
+		} else {
+		    /* No effect. */
+		    continue;
+		}
 	    }
 	} else if (isset(EXTENDEDGLOB) && *patparse == Hat) {
 	    /*
@@ -707,10 +719,12 @@ patcompbranch(int *flagp)
 
 /**/
 int
-patgetglobflags(char **strp)
+patgetglobflags(char **strp, long *assertp)
 {
     char *nptr, *ptr = *strp;
     zlong ret;
+
+    *assertp = 0;
     /* (#X): assumes we are still positioned on the first X */
     for (; *ptr && *ptr != Outpar; ptr++) {
 	switch (*ptr) {
@@ -763,11 +777,22 @@ patgetglobflags(char **strp)
 	    patglobflags &= ~GF_MATCHREF;
 	    break;
 
+	case 's':
+	    *assertp = P_ISSTART;
+	    break;
+
+	case 'e':
+	    *assertp = P_ISEND;
+	    break;
+
 	default:
 	    return 0;
 	}
     }
     if (*ptr != Outpar)
+	return 0;
+    /* Start/end assertions must appear on their own. */
+    if (*assertp && (*strp)[1] != Outpar)
 	return 0;
     *strp = ptr + 1;
     return 1;
@@ -1989,6 +2014,14 @@ patmatch(Upat prog)
 	     * anything here.
 	     */
 	    return 0;
+	case P_ISSTART:
+	    if (patinput != patinstart)
+		fail = 1;
+	    break;
+	case P_ISEND:
+	    if (*patinput)
+		fail = 1;
+	    break;
 	case P_END:
 	    if (!(fail = (*patinput && !(patflags & PAT_NOANCH))))
 		return 1;
@@ -2386,6 +2419,12 @@ patprop(Upat op)
 	break;
     case P_GFLAGS:
 	p = "GFLAGS";
+	break;
+    case P_ISSTART:
+	p = "ISSTART";
+	break;
+    case P_ISEND:
+	p = "ISEND";
 	break;
     case P_NOTHING:
 	p = "NOTHING";

@@ -14,16 +14,21 @@
 
 # Produce verbose messages if non-zero.
 # If 1, produce reports of tests executed; if 2, also report on progress.
-ZTST_verbose=0
+# Defined in such a way that any value from the environment is used.
+: ${ZTST_verbose:=0}
 
 # We require all options to be reset, not just emulation options.
 # Unfortunately, due to the crud which may be in /etc/zshenv this might
 # still not be good enough.  Maybe we should trick it somehow.
 emulate -R zsh
 
+# Set the module load path to correspond to this build of zsh.
+# This Modules directory should have been created by "make check".
+[[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
+
 # We need to be able to save and restore the options used in the test.
 # We use the $options variable of the parameter module for this.
-zmodload -i parameter
+zmodload -i zsh/parameter
 
 # Note that both the following are regular arrays, since we only use them
 # in whole array assignments to/from $options.
@@ -42,18 +47,31 @@ ZTST_mainopts=(${(kv)options})
 ZTST_testdir=$PWD
 ZTST_testname=$1
 
+# The source directory is not necessarily the current directory,
+# but if $0 doesn't contain a `/' assume it is.
+if [[ $0 = */* ]]; then
+  ZTST_srcdir=${0%/*}
+else
+  ZTST_srcdir=$PWD
+fi
+[[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_testdir/$ZTST_srcdir"
+
+# Set the function autoload paths to correspond to this build of zsh.
+fpath=( $ZTST_srcdir/../(Completion|Functions)/*~*/CVS(/) )
+
+: ${TMPPREFIX:=/tmp/zsh}
 # Temporary files for redirection inside tests.
-ZTST_in=${TMPPREFIX-:/tmp/zsh}.ztst.in.$$
+ZTST_in=${TMPPREFIX}.ztst.in.$$
 # hold the expected output
-ZTST_out=${TMPPREFIX-:/tmp/zsh}.ztst.out.$$
-ZTST_err=${TMPPREFIX-:/tmp/zsh}.ztst.err.$$
+ZTST_out=${TMPPREFIX}.ztst.out.$$
+ZTST_err=${TMPPREFIX}.ztst.err.$$
 # hold the actual output from the test
-ZTST_tout=${TMPPREFIX-:/tmp/zsh}.ztst.tout.$$
-ZTST_terr=${TMPPREFIX-:/tmp/zsh}.ztst.terr.$$
+ZTST_tout=${TMPPREFIX}.ztst.tout.$$
+ZTST_terr=${TMPPREFIX}.ztst.terr.$$
 
 ZTST_cleanup() {
-  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp \
-         $ZTST_in $ZTST_out $ZTST_err $ZTST_tout $ZTST_terr
+  cd $ZTST_testdir
+  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp ${TMPPREFIX}.ztst*$$
 }
 
 # This cleanup always gets performed, even if we abort.  Later,
@@ -67,10 +85,11 @@ rm -rf dummy.tmp *.tmp
 # Report failure.  Note that all output regarding the tests goes to stdout.
 # That saves an unpleasant mixture of stdout and stderr to sort out.
 ZTST_testfailed() {
-  print "Test $ZTST_testname failed: $1"
+  print -r "Test $ZTST_testname failed: $1"
   if [[ -n $ZTST_message ]]; then
-    print "Was testing: $ZTST_message"
+    print -r "Was testing: $ZTST_message"
   fi
+  print -r "$ZTST_testname: test failed."
   ZTST_cleanup
   exit 1
 }
@@ -79,7 +98,7 @@ ZTST_testfailed() {
 ZTST_verbose() {
   local lev=$1
   shift
-  [[ -n $ZTST_verbose && $ZTST_verbose -ge $lev ]] && print $* >&8
+  [[ -n $ZTST_verbose && $ZTST_verbose -ge $lev ]] && print -- $* >&8
 }
 
 [[ ! -r $ZTST_testname ]] && ZTST_testfailed "can't read test file."
@@ -97,7 +116,7 @@ ZTST_cursect=''
 ZTST_getline() {
   local IFS=
   while true; do
-    read ZTST_curline <&9 || return 1
+    read -r ZTST_curline <&9 || return 1
     [[ $ZTST_curline == \#* ]] || return 0
   done
 }
@@ -144,7 +163,7 @@ $ZTST_code"
 
 # Read in a piece for redirection.
 ZTST_getredir() {
-  local char=${ZTST_curline[1]}
+  local char=${ZTST_curline[1]} fn
   ZTST_redir=${ZTST_curline[2,-1]}
   while ZTST_getline; do
     [[ $ZTST_curline[1] = $char ]] || break
@@ -153,6 +172,22 @@ ${ZTST_curline[2,-1]}"
   done
   ZTST_verbose 2 "ZTST_getredir: read redir for '$char':
 $ZTST_redir"
+
+case $char in
+  '<') fn=$ZTST_in
+       ;;
+  '>') fn=$ZTST_out
+       ;;
+  '?') fn=$ZTST_err
+       ;;
+   *)  ZTST_testfailed "bad redir operator: $char"
+       ;;
+esac
+if [[ $ZTST_flags = *q* ]]; then
+  print -r -- "${(e)ZTST_redir}" >>$fn
+else
+  print -r -- "$ZTST_redir" >>$fn
+fi
 }
 
 # Execute an indented chunk.  Redirections will already have
@@ -209,27 +244,24 @@ $ZTST_curline"
 	    fi
 	    ;;
 	[[:space:]]##[^[:space:]]*) ZTST_getchunk
-	  [[ $ZTST_curline != [-0-9]* ]] &&
-	  ZTST_testfailed "expecting test status at:
-$ZTST_curline"
-          ZTST_xstatus=$ZTST_curline
-	  if [[ $ZTST_curline == (#b)([^:]##):(*) ]]; then
+	  if [[ $ZTST_curline == (#b)([-0-9]##)([[:alpha:]]#)(:*)# ]]; then
 	    ZTST_xstatus=$match[1]
-	    ZTST_message=$match[2]
+	    ZTST_flags=$match[2]
+	    ZTST_message=${match[3]:+${match[3][2,-1]}}
+	  else
+	    ZTST_testfailed "expecting test status at:
+$ZTST_curline"
 	  fi
 	  ZTST_getline
 	  found=1
 	  ;;
 	'<'*) ZTST_getredir
-	  print -r "${(e)ZTST_redir}" >>$ZTST_in
 	  found=1
 	  ;;
 	'>'*) ZTST_getredir
-          print -r "${(e)ZTST_redir}" >>$ZTST_out
 	  found=1
 	  ;;
 	'?'*) ZTST_getredir
-	  print -r "${(e)ZTST_redir}" >>$ZTST_err
 	  found=1
 	  ;;
 	*) ZTST_testfailed "bad line in test block:
@@ -240,8 +272,7 @@ $ZTST_curline"
 
     # If we found some code to execute...
     if [[ -n $ZTST_code ]]; then
-      ZTST_verbose 1 "Running test:
-$ZTST_message"
+      ZTST_verbose 1 "Running test: $ZTST_message"
       ZTST_verbose 2 "ZTST_test: expecting status: $ZTST_xstatus"
 
       ZTST_execchunk <$ZTST_in >$ZTST_tout 2>$ZTST_terr
@@ -249,7 +280,9 @@ $ZTST_message"
       # First check we got the right status, if specified.
       if [[ $ZTST_xstatus != - && $ZTST_xstatus != $ZTST_status ]]; then
 	ZTST_testfailed "bad status $ZTST_status, expected $ZTST_xstatus from:
-$ZTST_code"
+$ZTST_code${$(<$ZTST_terr):+
+Error output:
+$(<$ZTST_terr)}"
       fi
 
       ZTST_verbose 2 "ZTST_test: test produced standard output:
@@ -258,11 +291,13 @@ ZTST_test: and standard error:
 $(<$ZTST_terr)"
 
       # Now check output and error.
-      if ! diff -c $ZTST_out $ZTST_tout; then
+      if [[ $ZTST_flags != *d* ]] && ! diff -c $ZTST_out $ZTST_tout; then
 	ZTST_testfailed "output differs from expected as shown above for:
-$ZTST_code"
+$ZTST_code${$(<$ZTST_terr):+
+Error output:
+$(<$ZTST_terr)}"
       fi
-      if ! diff -c $ZTST_err $ZTST_terr; then
+      if [[ $ZTST_flags != *D* ]] && ! diff -c $ZTST_err $ZTST_terr; then
 	ZTST_testfailed "error output differs from expected as shown above for:
 $ZTST_code"
       fi
