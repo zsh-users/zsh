@@ -1,3 +1,7 @@
+2000-05-16  Tanaka Akira  <akr@zsh.org>
+
+	* 11420: Src/Modules/zpty.c: try more pty device files.
+
 2000-05-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11419: Test/Makefile.in: Interpolate TESTNUM variable in the
