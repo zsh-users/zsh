@@ -1,6 +1,6 @@
 #autoload
 
-local opts tmp glob pats expl tag i pat descr end ign ret=1
+local opts tmp glob pat pats expl tag i def descr end ign ret=1
 
 zparseopts -a opts \
     '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:
@@ -19,9 +19,16 @@ else
   ign=
 fi
 
-if zstyle -a ":completion:${curcontext}:" file-patterns pats; then
+if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
   [[ "$type" = */* ]] && glob="$glob *(-/)"
-  pats=( \ ${(M)^${pats//\\%p/ ${glob:-\*} }:#*[^\\]:*} )
+  pats=()
+  for i in ${tmp//\\%p/ ${${glob:-\*}//:/\\:} }; do
+    if [[ $i = *[^\\]:* ]]; then
+      pats=( "$pats[@]" " $i" )
+    else
+      pats=( "$pats[@]" " ${i}:files" )
+    fi
+  done
 else
   if [[ "$type" = *g* ]]; then
     if [[ "$type" = */* ]]; then
@@ -37,14 +44,14 @@ else
   fi
 fi
 
-for tag in "${(@)${(@)pats#*[^\\]:}%%:*}"; do
+for def in "$pats[@]"; do ###"${(@)${(@)pats#*[^\\]:}%%:*}"; do
 
-  i="$pats[(I)*[^\\\\]:${tag}(|:*)]"
-  pat="${${pats[i]%%:${tag}*}//\\\\:/:}"
+  tag="${${def#*[^\\]:}%%:*}"
+  pat="${${def%%:${tag}*}//\\\\:/:}"
 
-  if [[ i -gt 0 && "$pat" != \ # ]]; then
-    if [[ "$pats[i]" = *:${tag}:* ]]; then
-      descr="${pats[i]#*:${tag}:}"
+  if [[ "$pat" != \ # ]]; then
+    if [[ "$def" = *:${tag}:* ]]; then
+      descr="${def#*:${tag}:}"
     else
       descr=file
       end=yes

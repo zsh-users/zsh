@@ -942,7 +942,8 @@ the pattern(s) given by the calling function.
 Colons in the pattern have to be preceded by a backslash to
 make them distinguishable from the colon before the var(tag). The
 var(tag)s of all strings in the value will be offered by tt(_files)
-(again, one after another) and used when looking up other styles. The
+(again, one after another) and used when looking up other styles. If
+no `tt(:)var(tag)' is given the tt(files) tag will be used. The
 var(tag) may also be
 followed by an optional second colon and a description. If that is
 given, this description will be used for the `tt(%d)' in the value of

@@ -1,5 +1,8 @@
 2000-04-06  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* Completion/Core/_files, Doc/Zsh/compsys.yo: tag in file-patterns
+ 	optional, use `files' as default (10542)
+
 	* 10531: Src/init.c: use `zsh' as command name in error messages
 	even with -c
 
