@@ -1,5 +1,8 @@
 2003-05-22  Peter Stephenson  <pws@csr.com>
 
+	* 18569: Src/subst.c: error with numeric sorting of parameters;
+	owing to typo pointers could become corrupt.
+
 	* 18559, 18562: README, Doc/Zsh/mod_socket.yo, Doc/Zsh/mod_tcp.yo,
 	Doc/Zsh/zle.yo, Src/zsh.h, Src/Modules/files.c,
 	Src/Modules/socket.c, Src/Modules/tcp.c Src/Zle/zle_keymap.c

@@ -554,7 +554,7 @@ nstrpcmp(const void *a, const void *b)
     cmp = (int)STOUC(*c) - (int)STOUC(*d);
 #endif
     if (idigit(*c) || idigit(*d)) {
-	for (; c > *(char **)b && idigit(c[-1]); c--, d--);
+	for (; c > *(char **)a && idigit(c[-1]); c--, d--);
 	if (idigit(*c) && idigit(*d)) {
 	    while (*c == '0')
 		c++;
