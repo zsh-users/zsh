@@ -359,7 +359,7 @@ upcaseword(UNUSED(char **args))
 	while (zlecs != zlell && !iword(zleline[zlecs]))
 	    zlecs++;
 	while (zlecs != zlell && iword(zleline[zlecs])) {
-	    zleline[zlecs] = ZS_toupper(zleline[zlecs]);
+	    zleline[zlecs] = ZC_toupper(zleline[zlecs]);
 	    zlecs++;
 	}
     }
@@ -381,7 +381,7 @@ downcaseword(UNUSED(char **args))
 	while (zlecs != zlell && !iword(zleline[zlecs]))
 	    zlecs++;
 	while (zlecs != zlell && iword(zleline[zlecs])) {
-	    zleline[zlecs] = ZS_tolower(zleline[zlecs]);
+	    zleline[zlecs] = ZC_tolower(zleline[zlecs]);
 	    zlecs++;
 	}
     }
@@ -406,8 +406,8 @@ capitalizeword(UNUSED(char **args))
 	while (zlecs != zlell && iword(zleline[zlecs]) && !isalpha(zleline[zlecs]))
 	    zlecs++;
 	while (zlecs != zlell && iword(zleline[zlecs])) {
-	    zleline[zlecs] = (first) ? ZS_toupper(zleline[zlecs]) :
-		ZS_tolower(zleline[zlecs]);
+	    zleline[zlecs] = (first) ? ZC_toupper(zleline[zlecs]) :
+		ZC_tolower(zleline[zlecs]);
 	    first = 0;
 	    zlecs++;
 	}

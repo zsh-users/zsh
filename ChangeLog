@@ -1,3 +1,8 @@
+2005-02-26  Andrey Borzenkov  <bor@zsh.org>
+
+	* 20872: Src/Zle/zle_utils.c, Src/Zle/zle_vi.c, Src/Zle/zle_word.c:
+	Fix ZC_ vs. ZS_ confusion.
+
 2005-02-25  Peter Stephenson  <pws@csr.com>
 
 	* 20869: Src/Zle/zle.h, Src/Zle/zle_hist.c, Src/Zle/zle_main.c,

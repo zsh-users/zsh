@@ -571,9 +571,9 @@ vioperswapcase(UNUSED(char **args))
 	/* swap the case of all letters within range */
 	while (zlecs < c2) {
 	    if (islower(zleline[zlecs]))
-		zleline[zlecs] = ZS_toupper(zleline[zlecs]);
+		zleline[zlecs] = ZC_toupper(zleline[zlecs]);
 	    else if (isupper(zleline[zlecs]))
-		zleline[zlecs] = ZS_tolower(zleline[zlecs]);
+		zleline[zlecs] = ZC_tolower(zleline[zlecs]);
 	    zlecs++;
 	}
 	/* go back to the first line of the range */
@@ -811,9 +811,9 @@ viswapcase(UNUSED(char **args))
     eol = findeol();
     while (zlecs < eol && n--) {
 	if (islower(zleline[zlecs]))
-	    zleline[zlecs] = ZS_toupper(zleline[zlecs]);
+	    zleline[zlecs] = ZC_toupper(zleline[zlecs]);
 	else if (isupper(zleline[zlecs]))
-	    zleline[zlecs] = ZS_tolower(zleline[zlecs]);
+	    zleline[zlecs] = ZC_tolower(zleline[zlecs]);
 	zlecs++;
     }
     if (zlecs && zlecs == eol)
@@ -858,7 +858,8 @@ visetbuffer(UNUSED(char **args))
 	zmod.flags |= MOD_VIAPP;
     else
 	zmod.flags &= ~MOD_VIAPP;
-    zmod.vibuf = ZS_tolower(ch);
+    /* FIXME how portable is it for multibyte encoding? */
+    zmod.vibuf = ZC_tolower(ch);
     if (ch >= ZWC('1') && ch <= ZWC('9'))
 	zmod.vibuf += - (int)ZWC('1') + 26;
     else

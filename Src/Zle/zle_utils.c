@@ -578,10 +578,10 @@ getzlequery(int yesno)
     if (yesno) {
 	if (c == ZWC('\t'))
 	    c = ZWC('y');
-	else if (ZS_icntrl(c) || c == ZLEEOF)
+	else if (ZC_icntrl(c) || c == ZLEEOF)
 	    c = ZWC('n');
 	else
-	    c = ZS_tolower(c);
+	    c = ZC_tolower(c);
     }
     /* echo response and return */
     if (c != ZWC('\n'))
