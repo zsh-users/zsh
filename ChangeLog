@@ -1,3 +1,12 @@
+2003-04-03  Peter Stephenson  <pws@csr.com>
+
+	* c.f. 18431: acconfig.h, aczsh.m4, zshconfig.ac,
+	Doc/Zsh/builtins.yo, Src/Builtins/rlimits.c:  Attempt
+	to resolve the raging RLIIMT_* problems.  Use configure tests
+	for all values which need testing.  Use RLIMIT_AS for
+	`ulimit -v' if RLIMIT_VMEM is not present and make sure the value
+	gets multiplied by 1024.
+
 2003-04-01  Peter Stephenson  <pws@csr.com>
 
 	* 18418: Test/A01grammar.ztst, Test/D04parameter.ztst:

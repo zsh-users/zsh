@@ -1221,6 +1221,75 @@ if test $zsh_cv_type_rlim_t = no; then
   AC_DEFINE_UNQUOTED(rlim_t, $DEFAULT_RLIM_T)
 fi
 
+
+dnl On some systems the RLIMIT_* don't evaluate to integers at compile time
+dnl (they may be enums).  In this case we are not able to do preprocessor
+dnl comparisions and need our tests to determine what values exist and
+dnl if there are clashing definitions.
+
+zsh_LIMIT_PRESENT(RLIMIT_AIO_MEM)
+zsh_LIMIT_PRESENT(RLIMIT_AIO_OPS)
+zsh_LIMIT_PRESENT(RLIMIT_AS)
+zsh_LIMIT_PRESENT(RLIMIT_LOCKS)
+zsh_LIMIT_PRESENT(RLIMIT_MEMLOCK)
+zsh_LIMIT_PRESENT(RLIMIT_NPROC)
+zsh_LIMIT_PRESENT(RLIMIT_NOFILE)
+zsh_LIMIT_PRESENT(RLIMIT_PTHREAD)
+zsh_LIMIT_PRESENT(RLIMIT_RSS)
+zsh_LIMIT_PRESENT(RLIMIT_SBSIZE)
+zsh_LIMIT_PRESENT(RLIMIT_TCACHE)
+zsh_LIMIT_PRESENT(RLIMIT_VMEM)
+
+AC_CACHE_CHECK(if RLIMIT_VMEM and RLIMIT_RSS are the same,
+zsh_cv_rlimit_vmem_is_rss,
+[AC_TRY_RUN([
+#include <sys/types.h>
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#include <sys/resource.h>
+int main()
+{
+int ret = 1;
+#if defined(HAVE_RLIMIT_VMEM) && defined(HAVE_RLIMIT_RSS)
+if (RLIMIT_RSS == RLIMIT_VMEM) ret = 0;
+#endif
+return ret;
+}],
+  zsh_cv_rlimit_vmem_is_rss=yes,
+  zsh_cv_rlimit_vmem_is_rss=no,
+  zsh_cv_rlimit_vmem_is_rss=no)])
+
+if test $zsh_cv_rlimit_vmem_is_rss = yes; then
+  AC_DEFINE(RLIMIT_VMEM_IS_RSS)
+fi
+
+
+AC_CACHE_CHECK(if RLIMIT_VMEM and RLIMIT_AS are the same,
+zsh_cv_rlimit_vmem_is_as,
+[AC_TRY_RUN([
+#include <sys/types.h>
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#include <sys/resource.h>
+int main()
+{
+int ret = 1;
+#if defined(HAVE_RLIMIT_VMEM) && defined(HAVE_RLIMIT_AS)
+if (RLIMIT_AS == RLIMIT_VMEM) ret = 0;
+#endif
+return ret;
+}],
+  zsh_cv_rlimit_vmem_is_as=yes,
+  zsh_cv_rlimit_vmem_is_as=no,
+  zsh_cv_rlimit_vmem_is_as=no)])
+
+if test $zsh_cv_rlimit_vmem_is_as = yes; then
+  AC_DEFINE(RLIMIT_VMEM_IS_AS)
+fi
+
+
 dnl ----------------------------
 dnl CHECK FOR /dev/fd FILESYSTEM
 dnl ----------------------------

@@ -710,3 +710,21 @@ AC_DEFUN([zsh_CHECK_SOCKLEN_T],[
   AC_DEFINE_UNQUOTED([SOCKLEN_T], [$zsh_cv_type_socklen_t])]
 )
 
+dnl Check for limit $1 e.g. RLIMIT_RSS.
+AC_DEFUN(zsh_LIMIT_PRESENT,
+[AC_CACHE_CHECK([for limit $1],
+zsh_cv_have_$1,
+[AC_TRY_COMPILE([
+#include <sys/types.h>
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#include <sys/resource.h>],
+[$1],
+  zsh_cv_have_$1=yes,
+  zsh_cv_have_$1=no)])
+
+if test $zsh_cv_have_$1 = yes; then
+  AC_DEFINE(HAVE_$1)
+fi])
+

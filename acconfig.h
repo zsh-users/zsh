@@ -238,6 +238,48 @@
 /* Define to the type used in struct rlimit */
 #undef rlim_t
 
+/* Define to 1 if RLIMIT_AIO_MEM is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_AIO_MEM
+
+/* Define to 1 if RLIMIT_AIO_OPS is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_AIO_OPS
+
+/* Define to 1 if RLIMIT_AS is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_AS
+
+/* Define to 1 if RLIMIT_LOCKS is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_LOCKS
+
+/* Define to 1 if RLIMIT_MEMLOCK is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_MEMLOCK
+
+/* Define to 1 if RLIMIT_NPROC is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_NPROC
+
+/* Define to 1 if RLIMIT_NOFILE is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_NOFILE
+
+/* Define to 1 if RLIMIT_PTHREAD is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_PTHREAD
+
+/* Define to 1 if RLIMIT_RSS is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_RSS
+
+/* Define to 1 if RLIMIT_SBSIZE is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_SBSIZE
+
+/* Define to 1 if RLIMIT_TCACHE is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_TCACHE
+
+/* Define to 1 if RLIMIT_VMEM is present (whether or not as a macro) */
+#undef HAVE_RLIMIT_VMEM
+
+/* Define to 1 if RLIMIT_VMEM and RLIMIT_RSS both exist and are equal */
+#undef RLIMIT_VMEM_IS_RSS
+
+/* Define to 1 if RLIMIT_VMEM and RLIMIT_AS both exist and are equal */
+#undef RLIMIT_VMEM_IS_AS
+
 /* Define to 1 if /bin/sh does not interpret \ escape sequences */
 #undef SH_USE_BSD_ECHO
 
