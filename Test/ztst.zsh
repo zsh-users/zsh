@@ -107,6 +107,9 @@ ZTST_verbose() {
   shift
   [[ -n $ZTST_verbose && $ZTST_verbose -ge $lev ]] && print -- $* >&8
 }
+ZTST_hashmark() {
+  [[ ZTST_verbose -le 0 && -t 8 ]] && print -nu8 ${(pl:SECONDS::\#::\#\r:)}
+}
 
 [[ ! -r $ZTST_testname ]] && ZTST_testfailed "can't read test file."
 
@@ -292,6 +295,7 @@ $ZTST_curline"
 
     # If we found some code to execute...
     if [[ -n $ZTST_code ]]; then
+      ZTST_hashmark
       ZTST_verbose 1 "Running test: $ZTST_message"
       ZTST_verbose 2 "ZTST_test: expecting status: $ZTST_xstatus"
 
