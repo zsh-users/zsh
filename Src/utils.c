@@ -1300,7 +1300,7 @@ read1char(void)
     char c;
 
     while (read(SHTTY, &c, 1) != 1) {
-	if (errno != EINTR || errflag)
+	if (errno != EINTR || errflag || retflag || breaks || contflag)
 	    return -1;
     }
     return STOUC(c);
