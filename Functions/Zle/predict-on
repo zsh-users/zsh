@@ -36,10 +36,15 @@ predict-off() {
   zle -A .backward-delete-char backward-delete-char
 }
 insert-and-predict () {
-  emulate -L zsh
-  if [[ ${RBUFFER[1]} = ${KEYS[-1]} ]]
+  setopt localoptions noshwordsplit noksharrays
+  if [[ $LBUFFER = *$'\012'* ]]
   then
-    # same as what's typed, just move on
+    # Editing a multiline buffer, it's unlikely prediction is wanted
+    zle .$WIDGET "$@"
+    return
+  elif [[ ${RBUFFER[1]} = ${KEYS[-1]} ]]
+  then
+    # Same as what's typed, just move on
     ((++CURSOR))
   else
     LBUFFER="$LBUFFER$KEYS"
@@ -92,12 +97,15 @@ insert-and-predict () {
   return 0
 }
 delete-backward-and-predict() {
-  emulate -L zsh
   if [[ -n "$LBUFFER" ]]
   then
+    setopt localoptions noshwordsplit noksharrays
+    if [[ $LBUFFER = *$'\012'* ]] then
+      # Editing a multiline buffer, it's unlikely prediction is wanted
+      zle .$WIDGET "$@"
     # If the last widget was e.g. a motion, then probably the intent is
     # to actually edit the line, not change the search prefix.
-    if [[ $LASTWIDGET == (self-insert|magic-space|backward-delete-char) ]]
+    elif [[ $LASTWIDGET == (self-insert|magic-space|backward-delete-char) ]]
     then
       ((--CURSOR))
       zle .history-beginning-search-forward || RBUFFER=""
@@ -118,7 +126,8 @@ delete-no-predict() {
 
 predict-limit-list() {
   if (( compstate[list_lines]+BUFFERLINES > LINES ||
-	( compstate[list_max] != 0 && compstate[nmatches] > compstate[list_max] ) ))
+	( compstate[list_max] != 0 &&
+	    compstate[nmatches] > compstate[list_max] ) ))
   then
     compstate[list]=''
     compstate[force_list]=yes
