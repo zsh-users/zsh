@@ -21,9 +21,28 @@ _svn_controlled() {
   [[ -f ${(M)REPLY##*/}.svn/text-base/${REPLY##*/}.svn-base ]]
 }
 
-(( $+functions[_svn_adm_files] )) ||
-_svn_adm_files() {
-  compadd ${${(M)${(f)"$(svn status)"}:#(#s)[ADM]*}##[ADM] ##}
+(( $+functions[_svn_deletedfiles] )) ||
+_svn_deletedfiles() {
+  # Typical usage would be _files -g '.svn(/e:_svn_deletedfiles:)' 
+  local cont controlled
+  reply=( )
+  [[ $REPLY = (*/|).svn ]] || return
+  controlled=( $REPLY/text-base/*.svn-base(N:r:t) )
+  for cont in ${controlled}; do
+    [[ -e $REPLY:h/$cont ]] || reply+=( ${REPLY%.svn}$cont )
+  done
+}
+
+(( $+functions[_svn_status] )) ||
+_svn_status() {
+  local dir=$REPLY:h
+  local pat="${1:-([ADMR]|?M)}"
+
+  if (( ! $+_cache_svn_status[$dir] )); then
+    _cache_svn_status[$dir]="$(_call_program files svn status -N $dir)"
+  fi
+
+  (( ${(M)#${(f)_cache_svn_status[$dir]}:#(#s)${~pat}*$REPLY} ))
 }
 
 (( $+functions[_svn_urls] )) ||
@@ -68,6 +87,7 @@ _svn_command () {
 (( $+functions[_svn_subcommand] )) ||
 _svn_subcommand () {
   local subcmd _svn_subcmds _svn_subcmd_usage
+  typeset -A _cache_svn_status
 
   _svn_subcmd_usage=${${(M)${(f)"$(LC_MESSAGES=C _call_program options svn help $1)"}:#usage:*}#usage: $1 }
 
@@ -87,9 +107,14 @@ _svn_subcommand () {
 	'*:file:_files -g "*(e:_svn_controlled:)"'
       )
     ;;
-    (revert)
+    delete)
       _svn_subcmds+=(
-	'*:file:_svn_adm_files'
+        '*:file:_files -g ".svn(/e:_svn_deletedfiles:)"'
+      )
+    ;;
+    revert|commit)
+      _svn_subcmds+=(
+        '*:file:_files -g "(.svn|*)(/e:_svn_deletedfiles:,e:_svn_status:)"'
       )
     ;;
     *)

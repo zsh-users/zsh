@@ -1,3 +1,8 @@
+2005-03-31  Oliver Kiddle  <opk@zsh.org>
+
+	* 21076: Completion/Unix/Command/_subversion: use _files with
+	(e) glob qualifier to handle completing files by their status
+
 2005-03-27  Clint Adams  <clint@zsh.org>
 
 	* 21075: Completion/Unix/Command/_baz: update baz completion
