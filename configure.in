@@ -214,10 +214,10 @@ undefine([fndir])dnl
 AC_ARG_ENABLE(fndir,
 [  --enable-fndir=DIR         where functions go (default DATADIR/zsh/functions)],
 [if test $enableval = yes; then
-  fndir=${datadir}/${tzsh_name}/functions/${VERSION}
+  fndir=${datadir}/${tzsh_name}/${VERSION}/functions
 else
   fndir="$enableval"
-fi], [fndir=${datadir}/${tzsh_name}/functions/${VERSION}])
+fi], [fndir=${datadir}/${tzsh_name}/${VERSION}/functions])
 
 undefine([function_subdirs])
 AC_ARG_ENABLE(function-subdirs,
