@@ -1,5 +1,8 @@
 2002-03-25  Oliver Kiddle  <opk@zsh.org>
 
+	* 16804: Completion/Unix/Command/_sccs,
+	Completion/Unix/Command/.distfiles: completion for sccs
+
 	* 16864: Completion/Unix/Command/ssh: fix remote file completion
 	with relative paths
 
