@@ -1697,9 +1697,14 @@ sethparam(char *s, char **val)
 	    v = NULL;
 	}
     }
-    if (!v)
-	if (!(v = getvalue(&t, 1)))
-	    return NULL;
+    if (!v) {
+	int k = opts[KSHARRAYS];	/* Remember the value of KSHARRAYS */
+	opts[KSHARRAYS] = 0;		/* and clear it to avoid special-  */
+	v = getvalue(&t, 1);		/* case of $array --> ${array[0]}. */
+	opts[KSHARRAYS] = k;		/* OK because we can't assign to a */
+	if (!v)				/* slice of an association anyway, */
+	    return NULL;		/* so ANY subscript will be wrong. */
+    }
     setarrvalue(v, val);
     return v->pm;
 }
