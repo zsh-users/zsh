@@ -91,8 +91,8 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("popd", 0, bin_cd, 0, 2, BIN_POPD, NULL, NULL),
-    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPbnrslzNu0123456789pioOcm-", NULL),
-    BUILTIN("printf", 0, bin_printf, 1, -1, 0, NULL, NULL),
+    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPbnrsflzNu0123456789pioOcm-", NULL),
+    BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, NULL, NULL),
     BUILTIN("pushd", 0, bin_cd, 0, 2, BIN_PUSHD, NULL, NULL),
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
@@ -296,10 +296,19 @@ execbuiltin(LinkList args, Builtin bn)
 	    }
 	    arg = (char *) ugetnode(args);
 	    /* for the "print" builtin, the options after -R are treated as
-	    options to "echo" */
-	    if ((flags & BINF_PRINTOPTS) && ops['R']) {
-		optstr = "ne";
-		flags |= BINF_ECHOPTS;
+	    options to "echo" and -f takes an extra argument */
+	    if (flags & BINF_PRINTOPTS) {
+		if (ops['R'] && !ops['f']) {
+		    optstr = "ne";
+		    flags |= BINF_ECHOPTS;
+		} else if (execop == 'f') {
+		    if (!arg) {
+			zwarnnam(name, "-f: format argument expected", NULL, 0);
+			return 1;
+		    }
+		    auxdata = arg;
+		    arg = (char *) ugetnode(args);
+		}
 	    }
 	    /* the option -- indicates the end of the options */
 	    if (ops['-'])
@@ -2871,16 +2880,41 @@ bin_false(char *name, char **argv, char *ops, int func)
 /**/
 mod_export LinkList bufstack;
 
-/* echo, print, pushln */
+/* echo, print, printf, pushln */
+
+#define print_val(VAL) \
+  if (width >= 0) { \
+      if (prec >= 0) \
+	  count += fprintf(fout, start, width, prec, VAL); \
+      else \
+	  count += fprintf(fout, start, width, VAL); \
+  } else { \
+      if (prec >= 0) \
+	  count += fprintf(fout, start, prec, VAL); \
+      else \
+	  count += fprintf(fout, start, VAL); \
+  }
 
 /**/
 int
 bin_print(char *name, char **args, char *ops, int func)
 {
-    int nnl = 0, fd, argc, n;
+    int flen, width, prec, type, argc, n, nnl = 0, ret = 0;
     int *len;
-    Histent ent;
+    char *start, *endptr, *c, *fmt = NULL;
+    char **first, nullstr = '\0', save = '\0';
+    zlong count = 0;
     FILE *fout = stdout;
+
+    double doubleval;
+    int intval;
+    unsigned int uintval;
+    char *stringval;
+
+    if (func == BIN_PRINTF) auxdata = *args++;
+    if (auxdata)
+	fmt = getkeystring(auxdata, &flen, ops['b'] ? 2 : 0, &nnl);
+    first = args;
 
     /* -m option -- treat the first argument as a pattern and remove
      * arguments not matching */
@@ -2894,16 +2928,19 @@ bin_print(char *name, char **args, char *ops, int func)
 	    zwarnnam(name, "bad pattern : %s", *args, 0);
 	    return 1;
 	}
-	for (p = ++args; *p; p++)
-	    if (!pattry(pprog, *p))
-		for (t = p--; (*t = t[1]); t++);
+	for (t = p = ++args; *p; p++)
+	    if (pattry(pprog, *p))
+		*t++ = *p;
+	*t = NULL;
+	first = args;
+	if (fmt && !*args) return 0;
     }
     /* compute lengths, and interpret according to -P, -D, -e, etc. */
     argc = arrlen(args);
     len = (int *) hcalloc(argc * sizeof(int));
     for(n = 0; n < argc; n++) {
 	/* first \ sequences */
-	if (!ops['e'] && (ops['R'] || ops['r'] || ops['E']))
+	if (fmt || !ops['e'] && (ops['R'] || ops['r'] || ops['E']))
 	    unmetafy(args[n], &len[n]);
 	else
 	    args[n] = getkeystring(args[n], &len[n], ops['b'] ? 2 :
@@ -2948,6 +2985,7 @@ bin_print(char *name, char **args, char *ops, int func)
     if (ops['s']) {
 	int nwords = 0, nlen, iwords;
 	char **pargs = args;
+	Histent ent;
 
 	queue_signals();
 	ent = prepnexthistent();
@@ -2971,8 +3009,11 @@ bin_print(char *name, char **args, char *ops, int func)
 	unqueue_signals();
 	return 0;
     }
+
     /* -u and -p -- output to other than standard output */
     if (ops['u'] || ops['p']) {
+	int fd;
+
 	if (ops['u']) {
 	    for (fd = 0; fd < 10; fd++)
 		if (ops[fd + '0'])
@@ -2993,15 +3034,15 @@ bin_print(char *name, char **args, char *ops, int func)
 
     /* -o and -O -- sort the arguments */
     if (ops['o']) {
+	if (fmt && !*args) return 0;
 	if (ops['i'])
 	    qsort(args, arrlen(args), sizeof(char *), cstrpcmp);
-
 	else
 	    qsort(args, arrlen(args), sizeof(char *), strpcmp);
     } else if (ops['O']) {
+	if (fmt && !*args) return 0;
 	if (ops['i'])
 	    qsort(args, arrlen(args), sizeof(char *), invcstrpcmp);
-
 	else
 	    qsort(args, arrlen(args), sizeof(char *), invstrpcmp);
     }
@@ -3041,62 +3082,37 @@ bin_print(char *name, char **args, char *ops, int func)
 	    fclose(fout);
 	return 0;
     }
+    
     /* normal output */
-    for (; *args; args++, len++) {
-	fwrite(*args, *len, 1, fout);
-	if (args[1])
-	    fputc(ops['l'] ? '\n' : ops['N'] ? '\0' : ' ', fout);
+    if (!fmt) {
+	for (; *args; args++, len++) {
+	    fwrite(*args, *len, 1, fout);
+	    if (args[1])
+		fputc(ops['l'] ? '\n' : ops['N'] ? '\0' : ' ', fout);
+	}
+	if (!(ops['n'] || nnl))
+	    fputc(ops['N'] ? '\0' : '\n', fout);
+	if (fout != stdout)
+	    fclose(fout);
+	return 0;
     }
-    if (!(ops['n'] || nnl))
-	fputc(ops['N'] ? '\0' : '\n', fout);
-    if (fout != stdout)
-	fclose(fout);
-    return 0;
-}
-
-/* printf */
-
-#define print_val(VAL) \
-  if (width >= 0) { \
-      if (prec >= 0) \
-	  printf(start, width, prec, VAL); \
-      else \
-	  printf(start, width, VAL); \
-  } else { \
-      if (prec >= 0) \
-	  printf(start, prec, VAL); \
-      else \
-	  printf(start, VAL); \
-  }
-
-/**/
-int
-bin_printf(char *name, char **args, char *ops, int func)
-{
-    int len, nnl, width, prec, type, ret = 0;
-    char *start, *endptr, *c, *fmt = getkeystring(*args, &len, 0, &nnl);
-    char **first = ++args, nullstr = '\0', save = '\0';
-
-    double doubleval;
-    int intval;
-    unsigned int uintval;
-    char *stringval;
-
+    
+    /* printf style output */
     do {
-
-	for (c = fmt;c-fmt < len;c++) {
-	    type = prec = width = -1;
-
+	for (c = fmt;c-fmt < flen;c++) {
 	    if (*c != '%') {
-		putchar(*c);
+		putc(*c, fout);
+		++count;
 		continue;
 	    }
 
 	    start = c++;
 	    if (*c == '%') {
 		putchar('%');
+		++count;
 		continue;
 	    }
+	    type = prec = width = -1;
 
 	    if (strchr("+- #", *c)) c++;
 
@@ -3126,34 +3142,26 @@ bin_printf(char *name, char **args, char *ops, int func)
 	    switch (*c) {
 	    case 'c':
 		if (*args) {
-		    if (**args == Meta)
-			intval = (*args)[1] ^ 32;
-		    else
-			intval = **args;
+		    intval = **args;
 		    args++;
 		} else
 		    intval = 0;
 		print_val(intval);
 		break;
 	    case 's':
-		if (*args)
-		    stringval = unmetafy(*args++, NULL);
-		else
-		    stringval = &nullstr;
+		stringval = *args ? *args++ : &nullstr;
 		print_val(stringval);
 		break;
 	    case 'b':
 		if (*args) {
 		    int l;
-		    char *b = getkeystring(*args++, &l, 0, &nnl);
-		    fwrite(b, l, 1, stdout);
+		    char *b = getkeystring(*args++, &l, ops['b'] ? 2 : 0, &nnl);
+		    fwrite(b, l, 1, fout);
+		    count += l;
 		}
-		continue;
+		break;
 	    case 'q':
-		if (*args)
-		    stringval = bslashquote(unmetafy(*args++, NULL), NULL, 0);
-		else
-		    stringval = &nullstr;
+		stringval = *args ? bslashquote(*args++, NULL, 0) : &nullstr;
 		*c = 's';
 		print_val(stringval);
 		break;
@@ -3174,6 +3182,9 @@ bin_printf(char *name, char **args, char *ops, int func)
 	    case 'X':
 		type=3;
 		break;
+	    case 'n':
+		if (*args) setiparam(*args++, count);
+		break;
 	    default:
 		zerrnam(name, "%s: invalid directive", start, 0);
 		ret = 1;
@@ -3185,12 +3196,12 @@ bin_printf(char *name, char **args, char *ops, int func)
 			doubleval = (*args)[1];
 			print_val(doubleval);
 		    } else {
-		    	intval = (*args)[1];
+			intval = (*args)[1];
 			print_val(intval);
 		    }
 		    args++;
 		} else {
-	    	    switch (type) {
+		    switch (type) {
 		    case 1:
 			intval = (*args) ? strtol(*args, &endptr, 0) : 0;
 			print_val(intval);
@@ -3224,6 +3235,8 @@ bin_printf(char *name, char **args, char *ops, int func)
     /* if there are remaining args, reuse format string */
     } while (*args && args != first);
 
+    if (fout != stdout)
+	fclose(fout);
     return ret;
 }
 
@@ -3429,16 +3442,12 @@ bin_break(char *name, char **argv, char *ops, int func)
 	}
 	/*FALLTHROUGH*/
     case BIN_EXIT:
-	if (locallevel > forklevel) {
+	if (locallevel) {
 	    /*
 	     * We don't exit directly from functions to allow tidying
 	     * up, in particular EXIT traps.  We still need to perform
 	     * the usual interactive tests to see if we can exit at
 	     * all, however.
-	     *
-	     * The forklevel test means we *do* exit from a subshell
-	     * inside a function when we reach the level of the
-	     * function itself.
 	     */
 	    if (stopmsg || (zexit(0,2), !stopmsg)) {
 		retflag = 1;

@@ -10,18 +10,19 @@ eflag="${words[1,CURRENT-1][(r)-*R*]:+-e[enable escapes]}"
   pflag='(-s -u -z)-p[print arguments to input of coprocess]'
 
 _arguments -C -s -A "-*" -S \
-  '-r[ignore escape conventions of echo]' \
-  '(-r -b -m -s -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
+  '(-f)-r[ignore escape conventions of echo]' \
+  '(-r -b -f -m -s -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
   '-b[recognise bindkey escape sequences]' \
   '-m[remove arguments matching specified pattern]' \
+  '(-r -n -R -l -N -c)-f[print arguments as for the printf builtin]:format' \
   '(-u -p -z)-s[place results in the history list]' \
-  '(-N -c)-n[do not add a newline to the result]' \
-  '(-N -c)-l[print arguments separated by newlines]' \
-  '(-n -l -c)-N[print arguments separated and terminated by nulls]' \
+  '(-c -f)-n[do not add a newline to the result]' \
+  '(-N -c -f)-l[print arguments separated by newlines]' \
+  '(-n -l -c -f)-N[print arguments separated and terminated by nulls]' \
   '(-O)-o[sort arguments in ascending order]' \
   '(-o)-O[sort arguments in descending order]' \
   '-i[case-insensitive sorting]' \
-  '(-n -l -N)-c[print arguments in columns]' \
+  '(-n -l -N -f)-c[print arguments in columns]' \
   '(-s -p -z)-u+[specify file-descriptor to print arguments to]:file-descriptor:_file_descriptors' \
   '(-s -p -u)-z[push arguments onto editing buffer stack]' \
   '-D[substitute any arguments which are named directories using ~ notation]' \

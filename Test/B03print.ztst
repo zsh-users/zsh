@@ -1,0 +1,135 @@
+# Tests for the echo, print, printf and pushln builtins
+
+# Tested elsewhere:
+#  Use of print -p to output to coprocess	A01grammar
+#  Prompt expansion with print -P		D01prompt
+#  -l, -r, -R and -n indirectly tested in various places
+
+# Not yet tested:
+#  echo and pushln
+#  print's -b -c -s -z -N options
+
+
+%test
+
+ print -D "${HOME:-~}"
+0:replace directory name
+>~
+
+ print -u2 'error message'
+0:output to file-descriptor
+?error message
+
+ print -o foo bar Baz
+0:argument sorting
+>Baz bar foo
+
+ print -f
+1:print -f needs a format specified
+?(eval):print:1: -f: format argument expected
+
+ print -Of '%s\n' foo bar baz
+0:reverse argument sorting
+>foo
+>baz
+>bar
+
+ print -io a B c
+0:case-insensitive argument sorting
+>a B c
+
+ print -m '[0-9]' one 2 three 4 five 6
+0:removal of non-matching arguments
+>2 4 6
+
+ printf '%s\n' string
+0:test s format specifier
+>string
+
+ printf '%b' '\t\\\n'
+0:test b format specifier
+>	\
+
+# test %q here - it doesn't quite work yet
+
+ printf '%c\n' char
+0:test c format specifier
+>c
+
+ printf '%.10e%n\n' 1 count >/dev/null
+ printf '%d\n' $count
+0:test n format specifier
+>16
+
+ printf '%d\n' 123
+0:test d format specifier
+>123
+
+ printf '%g\n' 123.45
+0:test g format specifier
+>123.45
+
+# Is anyone not using ASCII
+ printf '%d\n' \'A
+0:initial quote to get numeric value of character with int
+>65
+
+ printf '%.1E\n' \'B
+0:initial quote to get numeric value of character with double
+>6.6E+01
+
+# code will probably be changed to print the literal `%s' in this case
+ printf '\x25s\n' arg
+0:using \x25 to introduce a format specifier
+>arg
+
+ printf '%3c\n' c
+0:width specified in format specifier
+>  c
+
+ printf '%.4s\n' chopped
+0:precision specified in format specifier
+>chop
+
+ printf '%*.*f\n' 6 2 10.2
+0:width/precision specified in arguments
+> 10.20
+
+ printf '%d\n' 3000000000
+1d:out of range numeric result
+?(eval):printf:1: `3000000000' arithmetic overflow
+
+ printf '%G\n' letters
+1:non numeric argument
+?(eval):printf:1: `letters' expected numeric value
+>0
+
+ print -f '%d\n' 2e4
+1:letters in numeric argument
+?(eval):print:1: `2e4' not completely converted
+>2
+
+ printf '%z'
+1:test invalid directive
+?(eval):printf:1: %z: invalid directive
+
+ print -m -f 'format - %s.\n' 'z' a b c
+0:format not printed if no arguments left after -m removal
+
+ print -f 'format - %s.\n'
+0:format printed despite lack of arguments
+>format - .
+
+ printf 'x%4sx\n'
+0:with no arguments empty string where string needed
+>x    x
+
+ printf '%d\n'
+0:with no arguments, zero used where number needed
+>0
+
+ printf '%s\t%c:%#x%%\n' one a 1 two b 2 three c 3
+0:multiple arguments with format reused
+>one	a:0x1%
+>two	b:0x2%
+>three	c:0x3%

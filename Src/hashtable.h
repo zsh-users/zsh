@@ -56,6 +56,7 @@
 #define BIN_ECHO     22
 #define BIN_DISABLE  23
 #define BIN_ENABLE   24
+#define BIN_PRINTF   25
 
 /* These currently depend on being 0 and 1. */
 #define BIN_SETOPT    0

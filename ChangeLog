@@ -1,3 +1,10 @@
+2001-10-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 15973: Completion/Zsh/Command/_print, Doc/Zsh/builtins.yo,
+	Src/builtin.c, Src/hashtable.h, Test/.distfiles, Test/B03print.ztst:
+	merge bin_printf and bin_print to allow print -f option and add
+	%n format specifier and tests
+
 2001-10-08  Peter Stephenson  <pws@csr.com>
 
 	* 15965: Src/exec.c, Src/glob.c, Src/subst.c: rename glob() to
