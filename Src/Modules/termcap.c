@@ -32,6 +32,8 @@
 
 /* echotc: output a termcap */
 
+#ifdef HAVE_TGETENT
+
 /**/
 static int
 bin_echotc(char *name, char **argv, char *ops, int func)
@@ -99,6 +101,12 @@ bin_echotc(char *name, char **argv, char *ops, int func)
     }
     return 0;
 }
+
+#else /* ! HAVE_TGETENT */
+
+#define bin_echotc bin_notavail
+
+#endif /* HAVE_TGETENT */
 
 static struct builtin bintab[] = {
     BUILTIN("echotc", 0, bin_echotc, 1, -1, 0, NULL, NULL),

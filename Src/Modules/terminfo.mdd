@@ -7,10 +7,15 @@ link='if test "x$ac_cv_func_tigetstr" = xyes; then
 	      echo static
 	  fi
       else
+          echo either;
+      fi
+'
+load='if test "x$ac_cv_func_tigetstr" = xyes; then
+          echo yes;
+      else
           echo no;
       fi
 '
-load=yes
 
 autobins="echoti"
 autoparams="terminfo"

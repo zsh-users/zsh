@@ -35,13 +35,15 @@ static Param terminfo_pm;
 
 /* echoti: output a terminfo capability */
 
+#ifdef HAVE_TIGETSTR
+
 /**/
 static int
 bin_echoti(char *name, char **argv, char *ops, int func)
 {
     char *s, *t;
     int num;
-    
+
     s = *argv++;
     /* This depends on the termcap stuff in init.c */
     if (termflags & TERM_BAD)
@@ -53,7 +55,7 @@ bin_echoti(char *name, char **argv, char *ops, int func)
 	printf("%d\n", num);
 	return 0;
     }
-    
+
     switch (tigetflag(s)) {
     case -1:
 	break;
@@ -64,7 +66,7 @@ bin_echoti(char *name, char **argv, char *ops, int func)
 	puts("yes");
 	return 0;
     }
-    
+
 /* get a string-type capability */
     t = (char *)tigetstr(s);
     if (!t || t == (char *)-1 || !*t) {
@@ -72,10 +74,16 @@ bin_echoti(char *name, char **argv, char *ops, int func)
 	zwarnnam(name, "no such terminfo capability: %s", s, 0);
 	return 1;
     }
-    
+
     tputs(t, 1, putchar);
     return 0;
 }
+
+#else
+
+#define bin_echoti bin_notavail
+
+#endif
 
 static struct builtin bintab[] = {
     BUILTIN("echoti", 0, bin_echoti, 1, -1, 0, NULL, NULL),
@@ -84,6 +92,8 @@ static struct builtin bintab[] = {
 /* This says if we are cleaning up when the module is unloaded. */
 
 static int incleanup;
+
+#ifdef HAVE_TIGETSTR
 
 /* Empty dummy function for special hash parameters. */
 
@@ -101,19 +111,19 @@ createtihash()
 {
     Param pm;
     HashTable ht;
-    
+
     unsetparam(terminfo_nam);
-    
+
     if (!(pm = createparam(terminfo_nam, PM_SPECIAL|PM_HIDE|PM_HIDEVAL|
 			   PM_REMOVABLE|PM_HASHED)))
 	return NULL;
-    
+
     pm->level = pm->old ? locallevel : 0;
     pm->gets.hfn = hashgetfn;
     pm->sets.hfn = hashsetfn;
     pm->unsetfn = stdunsetfn;
     pm->u.hash = ht = newhashtable(7, terminfo_nam, NULL);
-    
+
     ht->hash        = hasher;
     ht->emptytable  = (TableFunc) shempty;
     ht->filltable   = NULL;
@@ -142,9 +152,9 @@ getterminfo(HashTable ht, char *name)
 	return NULL;
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
 	return NULL;
-    
+
     unmetafy(name, &len);
-    
+
     pm = (Param) zhalloc(sizeof(struct param));
     pm->nam = dupstring(name);
     pm->flags = PM_READONLY;
@@ -156,7 +166,7 @@ getterminfo(HashTable ht, char *name)
     pm->ename = NULL;
     pm->old = NULL;
     pm->level = 0;
-    
+
     if (((num = tigetnum(name)) != -1) && (num != -2)) {
 	pm->u.val = num;
 	pm->flags |= PM_INTEGER;
@@ -172,12 +182,11 @@ getterminfo(HashTable ht, char *name)
     }
     else
     {
-	zwarn("no such capability: %s", name, 0);
+	/* zwarn("no such capability: %s", name, 0); */
 	pm->u.str = dupstring("");
 	pm->flags |= PM_UNSET;
     }
     return (HashNode) pm;
-    
 }
 
 /**/
@@ -186,12 +195,14 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 {
 }
 
+#endif /* HAVE_TIGETSTR */
+
 /**/
 int
 setup_(Module m)
 {
     incleanup = 0;
-    
+
     return 0;
 }
 
@@ -199,9 +210,13 @@ setup_(Module m)
 int
 boot_(Module m)
 {
+#ifdef HAVE_TIGETSTR
     setupterm((char *)0, 1, (int *)0);
 
-    return !createtihash() || !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    if (!createtihash())
+    	return 1;
+#endif
+    return  !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
 /**/
@@ -209,14 +224,16 @@ int
 cleanup_(Module m)
 {
     Param pm;
-    
+
     incleanup = 1;
-    
+
+#ifdef HAVE_TIGETSTR
     if ((pm = (Param) paramtab->getnode(paramtab, terminfo_nam)) &&
 	pm == terminfo_pm) {
 	pm->flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
+#endif
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }
@@ -227,7 +244,3 @@ finish_(Module m)
 {
     return 0;
 }
-
-
-
-

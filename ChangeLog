@@ -1,3 +1,10 @@
+2001-04-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13922: Src/Modules/termcap.c, Src/Modules/termcap.mdd,
+	Src/Modules/terminfo.c, Src/Modules/terminfo.mdd: Loading these
+	modules should work even if the corresponding library is not
+	available; in that case echotc or echoti uses bin_notavail.
+
 2001-04-09  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: 4.0.1-pre-3.
