@@ -7,7 +7,7 @@
 # If configurations keys with the prefix `correctword_' are
 # given they override those starting with `correct_'.
 
-setopt localoptions $_comp_options
+setopt localoptions ${_comp_options[@]}
 
 local curcontext="$curcontext"
 

@@ -16,7 +16,7 @@
 #   range -- range of history words to complete
 
 _history_complete_word () {
-  setopt localoptions $_comp_options
+  setopt localoptions ${_comp_options[@]}
 
   local expl direction stop curcontext="$curcontext"
   local max slice hmax=$#historywords

@@ -1,6 +1,6 @@
 #compdef -k complete-word \C-x?
 
-setopt localoptions $_comp_options
+setopt localoptions ${_comp_options[@]}
 
 setopt localtraps noerrexit ; trap - ZERR
 

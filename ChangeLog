@@ -1,3 +1,14 @@
+2001-02-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/3649: Completion/Commands/_bash_completions,
+	Completion/Commands/_complete_debug,
+	Completion/Commands/_complete_help,
+	Completion/Commands/_correct_word,
+	Completion/Commands/_expand_word,
+	Completion/Commands/_history_complete_word,
+	Completion/Commands/_next_tags: Same as 13555 below, but for all
+	the other places where $_comp_options was referenced.
+
 2001-02-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 13555: Completion/Core/_main_complete: handle ksh_arrays on the
