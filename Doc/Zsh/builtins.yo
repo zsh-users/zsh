@@ -702,8 +702,7 @@ item(tt(-p))(
 Print the arguments to the input of the coprocess.
 )
 item(tt(-z))(
-Push the arguments onto the editing buffer stack, separated by spaces;
-no escape sequences are recognized.
+Push the arguments onto the editing buffer stack, separated by spaces.
 )
 item(tt(-D))(
 Treat the arguments as directory names, replacing prefixes with tt(~)

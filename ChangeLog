@@ -6,6 +6,9 @@
 
 2001-09-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 15865: Doc/Zsh/builtins.yo: Fix ancient `print -z' doc bug
+	(see zsh-workers/214 (yes, really, 214)).
+
 	* 15864: Doc/Zsh/params.yo: Document that assignment to TERM
 	is necessary to re-initialize the terminal.
 
