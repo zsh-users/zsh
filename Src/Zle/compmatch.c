@@ -535,8 +535,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    }
 		    /* Give up if we don't have enough characters for the
 		     * line-string and the anchor. */
-		    if (ll < llen + alen ||
-			(sfx ? (lw < alen + aol) : (lw < alen || iw < aol)))
+		    if (ll < llen + alen || lw < alen)
 			continue;
 
 		    if (mp->flags & CMF_LEFT) {
@@ -561,8 +560,9 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			if (!pattern_match(ap, l + aoff, NULL, NULL) ||
 			    (both &&
 			     (!pattern_match(ap, w + aoff, NULL, NULL) ||
-			      (aol && !pattern_match(aop, w + aoff - aol,
-						     NULL, NULL)) ||
+			      (aol && aol <= aoff + iw &&
+			       !pattern_match(aop, w + aoff - aol,
+					      NULL, NULL)) ||
 			      !match_parts(l + aoff, w + aoff, alen, part))))
 				continue;
 		    } else if (!both || il || iw)
@@ -572,19 +572,20 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		     * string matched by the `*'. */
 		    if (sfx && (savl = l[-(llen + zoff)]))
 			l[-(llen + zoff)] = '\0';
-		    for (t = 0, tp = w, ct = 0,
-			     ict = lw - alen + 1 - (sfx ? aol : 0);
+		    for (t = 0, tp = w, ct = 0, ict = lw - alen + 1;
 			 ict;
 			 tp += add, ct++, ict--) {
 			if ((both &&
 			     (!ap || !test ||
 			      !pattern_match(ap, tp + aoff, NULL, NULL) ||
-			      (aol && !pattern_match(aop, tp + aoff - aol,
-						     NULL, NULL)))) ||
+			      (aol && aol <= aoff + ct + iw &&
+			       !pattern_match(aop, tp + aoff - aol,
+					      NULL, NULL)))) ||
 			    (!both &&
 			     pattern_match(ap, tp - moff, NULL, NULL) &&
-			     (!aol || pattern_match(aop, tp - moff - aol,
-						    NULL, NULL)) &&
+			     (!aol || (aol <= iw + ct - moff &&
+				       pattern_match(aop, tp - moff - aol,
+						     NULL, NULL))) &&
 			     (mp->wlen == -1 ||
 			      match_parts(l + aoff , tp - moff,
 						      alen, part)))) {
