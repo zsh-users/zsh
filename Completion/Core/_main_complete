@@ -98,6 +98,4 @@ _lastcomp[isuffix]="$ISUFFIX"
 _lastcomp[qiprefix]="$QIPREFIX"
 _lastcomp[qisuffix]="$QISUFFIX"
 
-unset _compskip
-
 return ret

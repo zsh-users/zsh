@@ -188,6 +188,8 @@ while [[ cur -gt 0 ]]; do
       # associative array so that we don't offer them again.
 
       def="$opts[$ws[1]]"
+      optbeg="$beg"
+      argbeg="$beg"
       [[ -n "$oneshot[$ws[1]]" ]] && unset "opts[$ws[1]]"
     else
       uns=''

@@ -21,7 +21,7 @@ comp="$_comps[-first-]"
 if [[ ! -z "$comp" ]]; then
   "$comp"
   if [[ "$_compskip" = all ]]; then
-    unset _compskip
+    _compskip=''
     (( compstate[nmatches] ))
     return
   fi
@@ -55,7 +55,7 @@ else
 
   if [[ -z "$comp" ]]; then
     if [[ "$_compskip" = *default* ]]; then
-      unset _compskip
+      _compskip=''
       return 1
     fi
     comp="$_comps[-default-]"
@@ -63,6 +63,6 @@ else
   [[ -z "$comp" ]] || "$comp"
 fi
 
-unset _compskip
+_compskip=''
 
 (( compstate[nmatches] ))

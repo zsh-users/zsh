@@ -1,21 +1,31 @@
 #compdef -command-
 
-local nm=$compstate[nmatches] ret=1 expl
+# The option `-e' if given as the first argument says that we should
+# complete only external commands and executable files. This and a
+# `-' as the first argument is then removed from the arguments.
 
+local nm=$compstate[nmatches] ret=1 expl type=-c
+
+if [[ "$1" = -e ]]; then
+  type=-m
+  shift
+elif [[ "$1" = - ]]; then
+  shift
+fi
 
 # Complete jobs in implicit fg and bg
-if [[ "$PREFIX[1]" = "%" ]]; then
+if [[ $type = -c && "$PREFIX[1]" = "%" ]]; then
   _description expl job
-  compgen "$expl[@]" -j -P '%'
+  compgen "$expl[@]" "$@" -j -P '%'
   [[ nm -ne compstate[nmatches] ]] && return
 fi
 
 _description expl command
-compgen "$expl[@]" -c && ret=0
+compgen "$expl[@]" "$@" $type && ret=0
 
 if [[ nm -eq compstate[nmatches] ]]; then
   _description expl 'executable file or directory'
-  _path_files "$expl[@]" -/g "*(*)"
+  _path_files "$expl[@]" "$@" -/g "*(*)"
 else
   return ret
 fi

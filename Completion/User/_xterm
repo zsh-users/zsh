@@ -19,7 +19,7 @@ _arguments \
   '-cr:text cursor color:_color' \
   '-cu' '+cu' \
   '-dc' '+dc' \
-  '-e:*::program: _normal' \
+  '-e:program: _command_names -e:*::program arguments: _normal' \
   '-fb:bold font:' \
   '-fi:icon font:' \
   '-hc:background color for highlighted text:_color' \
@@ -61,7 +61,7 @@ _arguments \
   '-bd:border color:_color' \
   '-bg:background color:_color' \
   '-bw:border width:' \
-  '-display:display:' \
+  '-display:display:_x_display' \
   '-fg:foreground color:_color' \
   '-fn:font:' \
   '-geometry:geometry:' \
