@@ -15,8 +15,50 @@ to be currently accurate.  If you feel that you or someone else have
 been unfairly omitted from this list please mail the current maintainer
 at <coordinator@zsh.org>.
 
-Version 3.1.7
+Version 4.0.1
 -------------
+
+Clint Adams <schizo@debian.org>: Completion functions, general
+configuration and module issues.
+
+Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>: Cygwin support,
+configuration, completion functions.
+
+Chmouel Boudjnah <chmouel@mandrakesoft.com>: configuration support.
+
+Wayne Davison <wayned@users.sourceforege.net>: History code.
+
+Alexandre Duret-Lutz: completion functions and substitution code.
+
+Oliver Kiddle <opk@zsh.org>: Modules and completion functions, AIX support.
+
+Andrew Main <zefram@zsh.org>: Parameters and arithmetic, configuration.
+
+Felix Rosencrantz <f_rosencrantz@yahoo.com>: Test code and shell functions.
+
+Bart Schaefer <schaefer@zsh.org>: bits of everything in all parts of code;
+general sanity control.
+
+Adam Spiers <adam@spiers.net>: Completion and other functions, completion
+caching.
+
+Peter Stephenson <pws@zsh.org>: configuration and installation, parameters,
+completion functions and configuration.
+
+Tanaka Akira <akr@zsh.org>: Completion and test functions.
+
+Geoff Wing <gcw@zsh.org>: FTP and mailing list archive
+
+Sven Wischnowsky <wischnow@zsh.org>: Most of the completion code, zpty,
+signal queuing, parameters, builtins, builtouts, built-here-and-theres;
+mend garden shed, rewire electricity, reinstall shutters, fix TV aerial in
+howling gale...
+
+Other patches from E. Jay Birkenbilt,, Jan Fedak, Ulrik Haugen, Paul
+Johnson, Fr. Br. George (George V Kouryachy).
+
+Versions 3.1.7 to 3.1.9
+-----------------------
 
 * Clint Adams <schizo@debian.org>: configuration, various fixes esp. in
   completion

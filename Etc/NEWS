@@ -2,6 +2,44 @@
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
 				     
+New features in zsh version 4.0.1
+---------------------------------
+
+Compared with 3.1.9, there are mostly incremental improvements to
+  - the new completion system --- more functions, completers, styles...
+  - the line editor
+  - handling of signals and traps
+  - the configuration system, particularly for modules
+  - Cygwin support (now essentially complete)
+  - arithmetic evaluation
+  - the zpty (pseudoterminal handling) module
+  - the test suite
+plus various bug fixes and compatibility improvements.
+
+The alias modules (zle.so as an alias for zsh/zle.so, etc.) have been
+removed; use `zmodload -A' to load modules under other names.  This is
+irrelevant if you are upgrading from 3.0.
+
+Compared with the 3.0 series of releases (the last stable set), the most
+significant of a large number of improvements in the shell are:
+  - Dynamically loadable modules with hierarchical naming system
+  - Shell functions as editor functions, with much additional builtin support
+  - Incredibly rich new completion system; just needs a single
+    initialization command to provide completion for all sorts of commands
+    and contexts
+  - Associative arrays
+  - Lots of new features in parameter substitution and globbing; more
+    logical handling of nested parameter substitutions
+  - Rewritten pattern-matching (globbing) code supports approximate
+    and case-insensitive matching and backreferences
+  - Various custom modules for pty's, FTP, special parameters, etc.
+  - Rewrites of many internal parts of the code: execution code to
+    provide compilation to internal representation, pattern matching
+  - Floating point arithmetic and mathematical functions module
+  - A test suite
+  - Various new options for compatibility with this, that and the other
+See the 3.1.x changes below for more detail.
+
 New features in zsh version 3.1.8 and 3.1.9
 -------------------------------------------
 These are primarily bug-fix versions.  There are only a few user-visible
