@@ -1,0 +1,186 @@
+# Tests for both trap builtin and TRAP* functions.
+
+%prep
+
+  setopt localtraps
+  mkdir traps.tmp && cd traps.tmp
+
+%test
+
+  fn1() {
+    trap 'print EXIT1' EXIT
+    fn2() { trap 'print EXIT2' EXIT; }
+    fn2
+  }
+  fn1
+0:Nested `trap ... EXIT'
+>EXIT2
+>EXIT1
+
+  fn1() {
+    TRAPEXIT() { print EXIT1; }
+    fn2() { TRAPEXIT() { print EXIT2; }; }
+    fn2
+  }
+  fn1
+0: Nested TRAPEXIT
+>EXIT2
+>EXIT1
+
+  fn1() {
+    trap 'print EXIT1' EXIT
+    fn2() { trap - EXIT; }
+    fn2
+  }
+  fn1
+0:Nested `trap - EXIT' on `trap ... EXIT'
+>EXIT1
+
+  fn1() {
+    TRAPEXIT() { print EXIT1; }
+    fn2() { trap - EXIT; }
+    fn2
+  }
+  fn1
+0:Nested `trap - EXIT' on `TRAPEXIT'
+>EXIT1
+
+  fn1() {
+    trap
+    trap 'print INT1' INT
+    fn2() { trap 'print INT2' INT; trap; }
+    trap
+    fn2
+    trap
+  }
+  fn1
+0: Nested `trap ... INT', not triggered
+>trap -- 'print INT1' INT
+>trap -- 'print INT2' INT
+>trap -- 'print INT1' INT
+
+   fn1() {
+    trap
+    TRAPINT() { print INT1; }
+    fn2() { TRAPINT() { print INT2; }; trap; }
+    trap
+    fn2
+    trap
+  }
+  fn1
+0: Nested `trap ... INT', not triggered
+>TRAPINT () {
+>	print INT1
+>}
+>TRAPINT () {
+>	print INT2
+>}
+>TRAPINT () {
+>	print INT1
+>}
+
+  fn1() {
+    trap 'print INT1' INT
+    fn2() { trap - INT; trap; }
+    trap
+    fn2
+    trap
+  }
+  fn1
+0: Nested `trap - INT' on untriggered `trap ... INT'
+>trap -- 'print INT1' INT
+>trap -- 'print INT1' INT
+
+# Testing the triggering of traps here is very unpleasant.
+# The delays are attempts to avoid race conditions, though there is
+# no guarantee that they will work.  Note the subtlety that the
+# `sleep' in the function which receives the trap does *not* get the
+# signal, only the parent shell, which is waiting for a SIGCHILD.
+# (At least, that's what I think is happening.) Thus we have to wait at
+# least the full two seconds to make sure we have got the output from the
+# execution of the trap.
+
+  print 'This test takes at least three seconds...' >&8
+  fn1() {
+    trap 'print TERM1' TERM
+    fn2() { trap 'print TERM2; return 1' TERM; sleep 2; }
+    fn2 &
+    sleep 1
+    kill -TERM $!
+    sleep 2
+  }
+  fn1
+0: Nested `trap ... TERM', triggered on inner loop
+>TERM2
+
+  print 'This test, too, takes at least three seconds...' >&8
+  fn1() {
+    trap 'print TERM1; return 1' TERM
+    fn2() { trap 'print TERM2; return 1' TERM; }
+    fn2
+    sleep 2
+  }
+  fn1 &
+  sleep 1
+  kill -TERM $!
+  sleep 2
+0: Nested `trap ... TERM', triggered on outer loop
+>TERM1
+
+  TRAPZERR() { print error activated; }
+  fn() { print start of fn; false; print end of fn; }
+  fn
+  fn() {
+    setopt localoptions localtraps
+    unfunction TRAPZERR
+    print start of fn
+    false
+    print end of fn
+  }
+  fn
+  unfunction TRAPZERR
+  print finish
+0: basic localtraps handling
+>start of fn
+>error activated
+>end of fn
+>start of fn
+>end of fn
+>finish
+
+  TRAPZERR() { print 'ERR-or!'; }
+  f() { print f; false; }
+  t() { print t; }
+  f
+  f && t
+  t && f && true
+  t && f
+  testunset() {
+    setopt localtraps
+    unset -f TRAPZERR
+    print testunset
+    false
+    true
+  }
+  testunset
+  f
+1: more sophisticated error trapping
+>f
+>ERR-or!
+>f
+>t
+>t
+>f
+>ERR-or!
+>testunset
+>f
+>ERR-or!
+
+  f() {
+    setopt localtraps
+    TRAPWINCH() { print "Window changed.  That wrecked the test."; }
+  }
+  f
+  f
+  functions TRAPWINCH
+1:Unsetting ordinary traps with localtraps.
