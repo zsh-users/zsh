@@ -2912,7 +2912,7 @@ bin_print(char *name, char **args, char *ops, int func)
     int flen, width, prec, type, argc, n, narg;
     int nnl = 0, ret = 0, maxarg = 0;
     int flags[5], *len;
-    char *start, *endptr, *c, *d, *flag, *buf, *tmpf, spec[11], *fmt = NULL;
+    char *start, *endptr, *c, *d, *flag, *buf, spec[11], *fmt = NULL;
     char **first, *curarg, *flagch = "0+- #", save = '\0', nullstr = '\0';
     size_t rcount, mcount, count = 0;
     FILE *fout = stdout;
@@ -3123,7 +3123,7 @@ bin_print(char *name, char **args, char *ops, int func)
     	if ((fout = open_memstream(&buf, &mcount)) == NULL)
 	    zwarnnam(name, "open_memstream failed", NULL, 0);
 #else
-	tmpf = gettempname();
+	char *tmpf = gettempname();
     	if ((fout = fopen(tmpf, "w+")) == NULL)
 	    zwarnnam(name, "can't open temp file: %e", NULL, errno);
 	unlink(tmpf);
