@@ -47,14 +47,14 @@ _cvs () {
       commit|ci|com) # "+nlRm:fF:r:"
 	_complete_opts n '' l '' R '' m: "$complete_m" f '' F: _files \
 	  r: "$complete_r" ||
-	_cvstargets_modified
+	_cvsmodified
 	;;
       diff|di|dif) # "+abcdefhilnpstuw0123456789BHNRC:D:F:I:L:U:V:W:k:r:"
 	_complete_opts a '' b '' c '' d '' e '' f '' h '' i '' l '' n '' p '' \
 	  s '' t '' u '' w '' 0 '' 1 '' 2 '' 3 '' 4 '' 5 '' 6 '' 7 '' 8 '' \
 	  9 '' B '' H '' N '' R '' C: '' D: "$complete_D" F: '' I: '' L: '' \
 	  U: '' V: '' W: '' k: "$complete_k" r: "$complete_r" ||
-	_cvstargets_modified || _cvstargets
+	_cvsmodified || _cvstargets
 	;;
       edit) # "+lRa:"
 	_complete_opts l '' R '' a: 'compadd edit unedit commit all none' ||
@@ -184,56 +184,55 @@ _cvsprefix () {
   fi
 }
 
-_cvsdirentries () {
-  setopt localoptions nullglob unset
-  if [[ -f ${pref}CVS/Entries ]]; then
-    entries=(${${${(M)${(f)"$(<${pref}CVS/Entries)"}:#D/*}#D/}%%/*})
-  else
-    entries=()
-  fi
+_cvsentries_dir () {
+  entries=($entries ${${${(M)rawentries:#D/*}#D/}%%/*})
 }
 
-_cvsentries () {
-  setopt localoptions nullglob unset
-  if [[ -f ${pref}CVS/Entries ]]; then
-    entries=(${${${${(f)"$(<${pref}CVS/Entries)"}:#D}#(D|)/}%%/*})
-  else
-    entries=()
-  fi
+_cvsentries_plain () {
+  entries=($entries ${${${(M)rawentries:#/*}#/}%%/*})
 }
 
 _cvsentries_modified () {
   if (( $+_cvsentries_modified_disable_stat )) ||
     ! { zmodload -e stat || zmodload stat }; then
-    _cvsentries
+    _cvsentries_plain
     return
   fi
 
+  local ents pats
+  ents=(${${${${(M)rawentries:#/*}#/}/\\/[^\\/]#\\///}%/[^/]#/[^/]#})
+  pats=(${${${(f)"$(LANG=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${pref}*(D))"}##*/}/ //})
+  eval 'ents=(${ents:#('${(j:|:)pats:q}')})'
+  entries=($entries ${ents%%/*})
+}
+
+_cvsdirentries () {
   entries=()
-  local line Entries
-  typeset -A mtime
-
-  if [[ -f "${pref}CVS/Entries" ]]; then
-    Entries="$(<${pref}CVS/Entries)"
-  else
-    return
+  if [[ -f ${pref}CVS/Entries ]]; then
+    local rawentries
+    rawentries=(${(f)"$(<${pref}CVS/Entries)"})
+    _cvsentries_dir
   fi
+}
 
-  local LANG=C
-  local OLDTZ="$TZ"; if ! (( $+TZ )); then unset OLDTZ; fi; export TZ=GMT
+_cvsentries () {
+  entries=()
+  if [[ -f ${pref}CVS/Entries ]]; then
+    local rawentries
+    rawentries=(${(f)"$(<${pref}CVS/Entries)"})
+    _cvsentries_plain
+    _cvsentries_dir
+  fi
+}
 
-  mtime=(${(s:/:)${(j:/:)${${${${(M)${(f)Entries}:#/*}#/}%/*/*}/\\/*\\///}}})
-  entries=(${${${(M)${(f)Entries}:#D/*}#D/}%%/*})
-  builtin stat -n +mtime -F '%a %b %e %T %Y' "$pref${(@k)^mtime}" |
-  while read line
-  do
-    line=${line#$pref}
-    if [[ x"$mtime[${line%% *}]" != x"${line#* }" ]]; then
-      entries=($entries "${line%% *}")
-    fi
-  done
-
-  if (( $+OLDTZ )); then TZ="$OLDTZ"; else unset TZ; fi
+_cvsmodentries () {
+  entries=()
+  if [[ -f ${pref}CVS/Entries ]]; then
+    local rawentries
+    rawentries=(${(f)"$(<${pref}CVS/Entries)"})
+    _cvsentries_modified
+    _cvsentries_dir
+  fi
 }
 
 _cvsdirs () {
@@ -264,11 +263,11 @@ _cvstargets () {
   fi
 }
 
-_cvstargets_modified () {
+_cvsmodified () {
   local qpref pref entries
   _cvsprefix
   if [[ -d ${pref}CVS ]]; then
-    _cvsentries_modified
+    _cvsmodentries
     case $#entries in
       0) false;;
       1) compgen -g "${entries:q}";;
