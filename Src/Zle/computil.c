@@ -260,8 +260,6 @@ cd_prep()
                 *strp++ = gs;
             }
 
-        qsort(grps, lines, sizeof(Cdstr), cd_sort);
-
         cd_state.gpre = 0;
         for (i = 0; i < cd_state.maxg; i++)
             cd_state.gpre += wids[i] + 2;
@@ -269,6 +267,23 @@ cd_prep()
         if (cd_state.gpre > cd_state.maxmlen && cd_state.maxglen > 1)
             return 1;
 
+        qsort(grps, lines, sizeof(Cdstr), cd_sort);
+
+        for (i = lines, strp = grps; i > 1; i--, strp++) {
+            strp2 = strp + 1;
+            if (!strcmp((*strp)->desc, (*strp2)->desc))
+                continue;
+            for (j = i - 2, strp2++; j > 0; j--, strp2++)
+                if (!strcmp((*strp)->desc, (*strp2)->desc)) {
+                    Cdstr tmp = *strp2;
+
+                    memmove(strp + 2, strp + 1,
+                            (strp2 - strp - 1) * sizeof(Cdstr));
+
+                    *++strp = tmp;
+                    i--;
+                }
+        }
         expl =  (Cdrun) zalloc(sizeof(*run));
         expl->type = CRT_EXPL;
         expl->strs = grps[0];
@@ -666,6 +681,10 @@ cd_get(char **params)
                 dpys = (char **) zalloc((i + 1) * sizeof(char *));
 
                 for (dp = dpys, str = run->strs; str; str = str->run) {
+                    if (str->run && !strcmp(str->desc, str->run->desc)) {
+                        *dp++ = ztrdup("");
+                        continue;
+                    }
                     memset(dbuf + cd_state.slen, ' ', dlen - 1);
                     dbuf[dlen + cd_state.slen - 1] = '\0';
                     strcpy(dbuf, cd_state.sep);

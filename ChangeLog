@@ -1,3 +1,9 @@
+2002-05-23  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17212: Src/Zle/computil.c: allow multiple lines in option
+	completion lists to share the same description, for (hopefully)
+	cleaner displays
+
 2002-05-23  Clint Adams  <clint@zsh.org>
 
 	* Matt Zimmerman: 17211: Completion/Unix/Command/_cvs:
