@@ -1,3 +1,8 @@
+2003-02-04  Peter Stephenson  <pws@csr.com>
+
+	* 18188: Src/text.c: make output case statements use balanced
+	parentheses.
+
 2003-02-03  Peter Stephenson  <pws@csr.com>
 
 	* 18175: Completion/Unix/Command/_p4: Completion for Perforce.

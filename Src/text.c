@@ -521,6 +521,7 @@ gettext2(Estate state)
 			taddnl();
 		    else
 			taddchr(' ');
+		    taddstr("(");
 		    code = *state->pc++;
 		    taddstr(ecgetstr(state, EC_NODUP, NULL));
 		    state->pc++;
@@ -537,6 +538,7 @@ gettext2(Estate state)
 		    taddnl();
 		else
 		    taddchr(' ');
+		taddstr("(");
 		code = *state->pc++;
 		taddstr(ecgetstr(state, EC_NODUP, NULL));
 		state->pc++;
