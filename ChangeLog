@@ -1,5 +1,10 @@
 2001-08-06  Oliver Kiddle  <opk@zsh.org>
 
+	* 15574: Completion/Unix/Command/_cvs, Completion/Unix/Type/_users,
+	Completion/Unix/Command/_user_admin, Completion/Unix/Type/_groups,
+	Completion/Unix/Type/_directories: new _user_admin completion for
+	useradd, groupmod etc and remove redundant duplication in _cvs
+
 	* 15562, Akinori Musha: 15559, 15563: Completion/BSD/Command/_chflags,
 	Completion/Unix/Command/_chown, Completion/Unix/Command/_sysctl:
 	new BSD completion and fix _chown for symlinks

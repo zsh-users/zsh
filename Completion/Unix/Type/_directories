@@ -1,0 +1,3 @@
+#compdef rmdir df du dircmp dirs
+
+_files -/ "$@"

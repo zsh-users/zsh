@@ -1,0 +1,19 @@
+#compdef newgrp groupdel
+
+local expl groups tmp
+
+_tags groups || return 1
+
+if ! zstyle -a ":completion:${curcontext}:" groups groups; then
+  (( $+_cache_groups )) ||
+      if (( ${+commands[ypcat]} )) &&
+	  tmp=$(_call_program groups ypcat group.byname 2>/dev/null); then
+        : ${(A)_cache_groups:=${${(f)tmp}%%:*}} # If you use YP
+      else
+        : ${(A)_cache_groups:=${${(s: :)$(</etc/group)}%%:*}}
+      fi
+
+  groups=( "$_cache_groups[@]" )
+fi
+
+_wanted groups expl group compadd "$@" -a groups

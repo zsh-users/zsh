@@ -163,7 +163,6 @@ _cvs_checkout () {
     '(-D)-r+[specify revision]:tag:_cvs_revisions' \
     '(-r)-D+[specify date]:date:_cvs_D' \
     '-j+[merge]:tag:_cvs_revisions' \
-    '-j+[merge]:tag:_cvs_revisions' \
     '*:module:_cvs_modules'
 }
 
