@@ -1,3 +1,8 @@
+2003-09-22  Peter Stephenson  <pws@csr.com>
+
+	* 19112: Completion/Unix/Command/_perforce: several improvements
+	and bug fixes.
+
 2003-09-21  Oliver Kiddle  <opk@zsh.org>
 
 	* users/6606: Completion/Base/Utility/_sep_parts: handle any
