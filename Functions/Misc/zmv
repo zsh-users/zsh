@@ -1,0 +1,165 @@
+# function zmv {
+# zmv, zcp, zln:
+#
+# Use zsh pattern matching to move, copy or link files, depending on
+# the last two characters of the function name.  The general syntax is
+#   zmv '<inpat>' '<outstring>'
+# <inpat> is a globbing pattern, so it should be quoted to prevent it from
+# immediate expansion, while <outstring> is a string that will be
+# re-evaluated and hence may contain parameter substitutions, which should
+# also be quoted.  Each set of parentheses in <inpat> (apart from those
+# around glob qualifiers and globbing flags) may be referred to by a
+# positional parameter in <outstring>, i.e. the first (...) matched is
+# given by $1, and so on.  For example,
+#   zmv '([a-z])(*).txt' '${(U)1}$2.txt'
+# renames algernon.txt to Algernon.txt, boris.txt to Boris.txt and so on.
+# The original file matched can be referred to as $f in the second
+# argument; accidental or deliberate use of other parameters is at owner's
+# risk and is not covered by the (non-existent) guarantee.
+#
+# Any error --- a substitution resulted in an empty string, a
+# substitution did not change the file name, two substitutions gave the
+# same result, the destination was an existing regular file and -f was not
+# given --- causes the entire function to abort without doing anything.
+#
+# Options:
+#  -f  force overwriting of destination files.  Not currently passed
+#      down to the mv/cp/ln command due to vagaries of implementations
+#      (but you can use -o-f to do that).
+#  -i  interactive: show each line to be executed and ask the user whether
+#      to execute it.  Y or y will execute it, anything else will skip it.
+#      Note that you just need to type one character.
+#  -n  no execution: print what would happen, but don't do it.
+#  -q  don't allow bare glob qualifiers in the filename pattern, see below.
+#  -s  symbolic, passed down to ln; only works with zln or z?? -L.
+#  -v  verbose: print line as it's being executed.
+#  -o <optstring>
+#      <optstring> will be split into words and passed down verbatim
+#      to the cp, ln or mv called to perform the work.  It will probably
+#      begin with a `-'.
+#  -p <program>
+#      Call <program> instead of cp, ln or mv.  Whatever it does, it should
+#      at least understand the form '<program> -- <oldname> <newname>',
+#      where <oldname> and <newname> are filenames generated.
+#  -C
+#  -L
+#  -M  Force cp, ln or mv, respectively, regardless of the name of the
+#      function.
+#
+# Bugs:
+#   Parenthesised expressions can be confused with glob qualifiers, for
+#   example a trailing '(*)' is treated as a glob qualifier.  Use -q to
+#   turn off glob qualifiers, or (yuk) add a suitable dummy qualifier
+#   (e.g. `(.)') or dummy pattern (e.g. `(|)') at the end.
+#
+#   The second argument is re-evaluated in order to expand the parameters,
+#   so quoting may be a bit haphazard.  In particular, a double quote
+#   will need an extra level of quoting.
+#
+#   The pattern is always treated as an extendedglob pattern.
+#
+# Unbugs:
+#   You don't need braces around the 1 in expressions like '$1t' as
+#   non-positional parameters may not start with a number, although
+#   paranoiacs like the author will probably put them there anyway.
+
+emulate -L zsh
+setopt extendedglob
+
+local f g args match mbegin mend files action myname tmpf opt exec
+local opt_f opt_i opt_n opt_q opt_s opt_M opt_C opt_L opt_o opt_p
+local pat repl errstr
+typeset -A from to
+integer stat
+
+while getopts ":o:p:MCLfinqsv" opt; do
+  if [[ $opt = "?" ]]; then
+    print -P "%N: unrecognized option: -$OPTARG" >&2
+    return 1
+  fi
+  eval "opt_$opt=${OPTARG:--$opt}"
+done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
+
+[[ -n $opt_q ]] && setopt nobareglobqual
+[[ -n $opt_M ]] && action=mv
+[[ -n $opt_C ]] && action=cp
+[[ -n $opt_L ]] && action=ln
+[[ -n $opt_p ]] && action=$opt_p
+
+if (( $# != 2 )); then
+  print -P "Usage: %N oldpattern newpattern
+  e.g. %N '(*).lis' '\$1.txt'" >&2
+  return 1
+fi
+
+pat=$1
+repl=$2
+
+if [[ -z $action ]]; then
+  # We can't necessarily get the name of the function directly, because
+  # of no_function_argzero stupidity.
+  tmpf=${TMPPREFIX}zmv$$
+  print -P %N >$tmpf
+  myname=$(<$tmpf)
+  rm -f $tmpf
+
+  action=$myname[-2,-1]
+
+  if [[ $action != (cp|mv|ln) ]]; then
+    print "Action $action not recognised: must be cp, mv or ln." >&2
+    return 1
+  fi
+fi
+
+
+if [[ -n $opt_s && $action != ln ]]; then
+  print -P "%N: invalid option: -s" >&2
+  return 1
+fi
+
+files=(${~pat})
+
+if [[ -o bareglobqual && $pat = (#b)(*)\([^\)\|\~]##\) ]]; then
+  # strip off qualifiers for use as ordinary pattern
+  pat=$match[1]
+fi
+
+errs=()
+
+for f in $files; do
+  [[ -e $f && $f = (#b)${~pat} ]] || continue
+  set -- $match
+  eval g=\"$repl\"
+  if [[ -z $g ]]; then
+    errs=($errs "$f expanded to empty string")
+  elif [[ $f = $g ]]; then
+    errs=($errs "$f not altered by substitution")
+  elif [[ -n $from[$g] && ! -d $g ]]; then
+    errs=($errs "$f and $from[$g] both map to $g")
+  elif [[ -f $g && -z $opt_f ]]; then
+    errs=($errs "file exists: $g")
+  fi
+  from[$g]=$f
+  to[$f]=$g
+done
+
+if (( $#errs )); then
+  print -P "%N: error(s) in substitution:" >&2
+  print -l $errs >&2
+  return 1
+fi
+
+for f in $files; do
+  exec=($action ${=opt_o} $opt_s -- $f $to[$f])
+  [[ -n $opt_i$opt_n$opt_v ]] && print -- $exec
+  if [[ -n $opt_i ]]; then
+    read -q 'opt?Execute? ' || continue
+  fi
+  if [[ -z $opt_n ]]; then
+    $exec || stat=1
+  fi
+done
+
+return $stat
+# }
