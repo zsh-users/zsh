@@ -3076,7 +3076,7 @@ zftp_rmsession(char *name, char **args, int flags)
 static int
 bin_zftp(char *name, char **args, char *ops, int func)
 {
-    char fullname[11] = "zftp ";
+    char fullname[20] = "zftp ";
     char *cnam = *args++, *prefs, *ptr;
     Zftpcmd zptr;
     int n, ret = 0;
