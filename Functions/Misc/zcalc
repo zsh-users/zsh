@@ -106,6 +106,7 @@ zcalc_restore() {
 trap zcalc_restore HUP INT QUIT EXIT
 
 local line ans base defbase forms match mbegin mend psvar optlist opt arg
+local compcontext="-math-"
 integer num outdigits outform=1
 
 forms=( '%2$g' '%.*g' '%.*f' '%.*E' )
