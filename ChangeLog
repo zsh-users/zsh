@@ -1,3 +1,11 @@
+2005-01-25  Peter Stephenson  <pws@csr.com>
+
+	* 20742: Src/system.h, Src/Zle/zle.h, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c, Src/Zle/zle_params.c, Src/Zle/zle_utils.c:
+	More Unicode stuff.  A few more definitions, some conversion
+	utilities between line and string, fix types and sizes for
+	cutbuffer/killring and undo.
+
 2005-01-24  Peter Stephenson  <pws@csr.com>
 
 	* users/8422: Src/cond.c: [[ ... -nt ... ]] and [[ ... -ot ... ]]

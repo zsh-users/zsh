@@ -709,6 +709,7 @@ extern short ospeed;
 #ifdef ZLE_UNICODE_SUPPORT
 typedef wchar_t ZLE_CHAR_T;
 typedef wchar_t *ZLE_STRING_T;
+#define ZLE_CHAR_SIZE	sizeof(wchar_t)
 
 /*
  * MB_CUR_MAX is the maximum number of bytes that a single wide
@@ -720,7 +721,14 @@ typedef wchar_t *ZLE_STRING_T;
 #ifndef MB_CUR_MAX
 #define MB_CUR_MAX 6
 #endif
+
+#define ZLENL	L'\n'
+#define ZLENUL	L'\0'
 #else
 typedef int ZLE_CHAR_T;
 typedef unsigned char *ZLE_STRING_T;
+#define ZLE_CHAR_SIZE	sizeof(unsigned char)
+
+#define ZLENL	'\n'
+#define ZLENUL	'\0'
 #endif

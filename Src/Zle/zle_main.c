@@ -719,7 +719,7 @@ zlecore(void)
 	    handleprefixes();
 	    /* for vi mode, make sure the cursor isn't somewhere illegal */
 	    if (invicmdmode() && zlecs > findbol() &&
-		(zlecs == zlell || zleline[zlecs] == '\n'))
+		(zlecs == zlell || zleline[zlecs] == ZLENL))
 		zlecs--;
 	    if (undoing)
 		handleundo();
@@ -819,8 +819,8 @@ zleread(char **lp, char **rp, int flags, int context)
     zlecontext = context;
     histline = curhist;
     undoing = 1;
-    zleline = (unsigned char *)zalloc((linesz = 256) + 2);
-    *zleline = '\0';
+    zleline = (unsigned char *)zalloc(((linesz = 256) + 2) * ZLE_CHAR_SIZE);
+    *zleline = ZLENUL;
     virangeflag = lastcmd = done = zlecs = zlell = mark = 0;
     vichgflag = 0;
     viinsbegin = 0;
@@ -877,15 +877,16 @@ zleread(char **lp, char **rp, int flags, int context)
 
     freeundo();
     if (eofsent) {
-	free(zleline);
-	zleline = NULL;
+	s = NULL;
     } else {
-	zleline[zlell++] = '\n';
-	zleline = (unsigned char *) metafy((char *) zleline, zlell, META_REALLOC);
+	zleline[zlell++] = ZLENL;
+	s = zlegetline(NULL, NULL);
     }
+    free(zleline);
+    zleline = NULL;
     forget_edits();
     errno = old_errno;
-    return zleline;
+    return s;
 }
 
 /* execute a widget */
@@ -1512,10 +1513,10 @@ finish_(UNUSED(Module m))
     free_isrch_spots();
     if (rdstrs)
         freelinklist(rdstrs, freestr);
-    zfree(cutbuf.buf, cutbuf.len);
+    free(cutbuf.buf);
     if (kring) {
 	for(i = kringsize; i--; )
-	    zfree(kring[i].buf, kring[i].len);
+	    free(kring[i].buf);
 	zfree(kring, kringsize * sizeof(struct cutbuffer));
     }
     for(i = 35; i--; )

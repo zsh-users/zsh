@@ -51,7 +51,7 @@ struct cutbuffer vibuf[35];
 /* the line before last mod (for undo purposes) */
 
 /**/
-char *lastline;
+ZLE_STRING_T lastline;
 /**/
 int lastlinesz, lastll, lastcs;
 
@@ -67,7 +67,9 @@ void
 sizeline(int sz)
 {
     while (sz > linesz)
-	zleline = (ZLE_STRING_T)realloc(zleline, (linesz *= 4) + 2);
+	zleline = 
+	    (ZLE_STRING_T)realloc(zleline,
+				  ((linesz *= 4) + 2) * ZLE_CHAR_SIZE);
 }
 
 /*
@@ -82,22 +84,36 @@ zleaddtoline(ZLE_CHAR_T chr)
     zleline[zlecs++] = chr;
 }
 
+/*
+ * Input a line in internal zle format, possibly using wide characters,
+ * possibly not, together with its length and the cursor position.
+ * Output an ordinary string, using multibyte characters instead of wide
+ * characters where appropriate and with the contents metafied.
+ *
+ * If outll is non-NULL, assign the new length.  If outcs is non-NULL,
+ * assign the new character position.
+ *
+ * If useheap is 1, memory is returned from the heap, else is allocated
+ * for later freeing.
+ */
+
 /**/
 mod_export unsigned char *
-zlegetline(int *ll, int *cs)
+zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outll,
+		int *outcs, int useheap)
 {
-    char *s;
 #ifdef ZLE_UNICODE_SUPPORT
+    char *s;
     char *mb_cursor;
     int i, j;
     size_t mb_len = 0;
 
-    mb_cursor = s = zalloc(zlell * MB_CUR_MAX);
+    mb_cursor = s = zalloc(inll * MB_CUR_MAX);
 
-    for(i=0;i<=zlell;i++) {
-	if (i == zlecs)
-	    *cs = mb_len;
-	j = wctomb(mb_cursor, zleline[i]);
+    for(i=0;i<=inll;i++) {
+	if (outcs != NULL && i == incs)
+	    *outcs = mb_len;
+	j = wctomb(mb_cursor, instr[i]);
 	if (j == -1) {
 	    /* invalid char; what to do? */
 	} else {
@@ -105,14 +121,130 @@ zlegetline(int *ll, int *cs)
 	}
     }
 
-    *ll = mb_len;
-#else
-    *ll = zlell;
-    *cs = zlecs;
+    if (outll != NULL)
+	*outll = mb_len;
+    if (useheap)
+    {
+	unsigned char *ret =
+	    (unsigned char *) metafy((char *) s, mb_len, META_HEAPDUP);
 
-    s = ztrdup(zleline);
+	zfree((char *)s, inll * MB_CUR_MAX);
+
+	return ret;
+    }
+    else
+    {
+	return (unsigned char *) metafy((char *) s, mb_len, META_REALLOC);
+    }
+#else
+    if (outll != NULL)
+	*outll = inll;
+    if (outcs != NULL)
+	*outcs = incs;
+
+    return (unsigned char *) metafy((char *) instr, inll,
+				    useheap ? META_HEAPDUP : META_DUP);
 #endif
-    return (unsigned char *) metafy((char *) s, zlell, META_REALLOC);
+}
+
+
+/*
+ * Input a NULL-terminated metafied string instr.
+ * Output a line in internal zle format, together with its length
+ * in the appropriate character units.  Note that outll may not be NULL.
+ *
+ * If outsz is non-NULL, the number of allocated characters in the
+ * string is written there.  For compatibility with use of the linesz
+ * variable (allocate size of zleline), at least two characters are
+ * allocated more than needed for immediate use.  (The extra characters
+ * may take a newline and a null at a later stage.)  These are not
+ * included in *outsz.
+ *
+ * Note that instr is modified in place, hence should be copied
+ * first if necessary;
+ *
+ * Memory for the returned string is permanently allocated.  *outsz may
+ * be longer than the *outll returned.  Hence it should be freed with
+ * zfree(outstr, *outsz) or free(outstr), not zfree(outstr, *outll).
+ */
+
+/**/
+mod_export ZLE_STRING_T
+stringaszleline(unsigned char *instr, int *outll, int *outsz)
+{
+    ZLE_STRING_T outstr;
+    int ll, sz;
+#ifdef ZLE_UNICODE_SUPPORT
+    int cll;
+    mbstate_t ps;
+#endif
+
+    unmetafy(instr, &ll);
+
+    /*
+     * ll is the maximum number of characters there can be in
+     * the output string; the closer to ASCII the string, the
+     * better the guess.  For the 2 see above.
+     */
+    sz = (ll + 2) * ZLE_CHAR_SIZE;
+    if (outsz)
+	*outsz = ll;
+    outstr = (ZLE_STRING_T)zalloc(sz);
+
+#ifdef ZLE_UNICODE_SUPPORT
+    if (ll) {
+	/* reset shift state by converting null. */
+	char cnull = '\0';
+	char *inptr = (char *)instr;
+	wchar_t *outptr = outstr;
+
+	mbrtowc(outstr, &cnull, 1, &ps);
+
+	while (ll) {
+	    size_t ret = mbrtowc(outptr, inptr, ll, &ps);
+
+	    /*
+	     * At this point we don't handle either incomplete (-2) or
+	     * invalid (-1) multibyte sequences.  Use the current length
+	     * and return.
+	     */
+	    if (ret == (size_t)-1 || ret == (size_t)-2)
+		break;
+
+	    /*
+	     * Careful: converting a wide NUL returns zero, but we
+	     * want to treat NULs as regular characters.
+	     * The NUL does get converted, however, so test that.
+	     * Assume it was represented by a single ASCII NUL;
+	     * certainly true for Unicode and unlikely to be false
+	     * in any non-pathological multibyte representation.
+	     */
+	    if (*outptr == L'\0' && ret == 0)
+		ret = 1;
+
+	    inptr += ret;
+	    outptr++;
+	    ll -= ret;
+	}
+	*outll = outptr - outstr;
+    }
+    else
+	*outll = 0;
+#else
+    memcpy((char *)outstr, (char *)instr, ll);
+    *outll = ll;
+#endif
+
+    return outstr;
+}
+
+
+
+/**/
+mod_export unsigned char *
+zlegetline(int *ll, int *cs)
+{
+    return zlelineasstring(zleline, zlell, zlecs, ll, cs, 0);
 }
 
 
@@ -128,7 +260,7 @@ spaceinline(int ct)
     for (i = zlell; --i >= zlecs;)
 	zleline[i + ct] = zleline[i];
     zlell += ct;
-    zleline[zlell] = '\0';
+    zleline[zlell] = ZLENUL;
 
     if (mark > zlecs)
 	mark += ct;
@@ -147,7 +279,7 @@ shiftchars(int to, int cnt)
 	zleline[to] = zleline[to + cnt];
 	to++;
     }
-    zleline[zlell = to] = '\0';
+    zleline[zlell = to] = ZLENUL;
 }
 
 /**/
@@ -181,9 +313,9 @@ cut(int i, int ct, int dir)
 	struct cutbuffer *b = &vibuf[zmod.vibuf];
 
 	if (!(zmod.flags & MOD_VIAPP) || !b->buf) {
-	    zfree(b->buf, b->len);
-	    b->buf = (char *)zalloc(ct);
-	    memcpy(b->buf, (char *) zleline + i, ct);
+	    free(b->buf);
+	    b->buf = (ZLE_STRING_T)zalloc(ct * ZLE_CHAR_SIZE);
+	    memcpy((char *)b->buf, (char *)(zleline + i), ct * ZLE_CHAR_SIZE);
 	    b->len = ct;
 	    b->flags = vilinerange ? CUTBUFFER_LINE : 0;
 	} else {
@@ -191,26 +323,32 @@ cut(int i, int ct, int dir)
 
 	    if(vilinerange)
 		b->flags |= CUTBUFFER_LINE;
-	    b->buf = realloc(b->buf, ct + len + !!(b->flags & CUTBUFFER_LINE));
+	    b->buf = (ZLE_STRING_T)
+		realloc((char *)b->buf,
+			(ct + len + !!(b->flags & CUTBUFFER_LINE))
+			* ZLE_CHAR_SIZE);
 	    if (b->flags & CUTBUFFER_LINE)
-		b->buf[len++] = '\n';
-	    memcpy(b->buf + len, (char *) zleline + i, ct);
+		b->buf[len++] = ZLENL;
+	    memcpy((char *)(b->buf + len), (char *)(zleline + i),
+		   ct * ZLE_CHAR_SIZE);
 	    b->len = len + ct;
 	}
 	return;
     } else {
 	/* Save in "1, shifting "1-"8 along to "2-"9 */
 	int n;
-	zfree(vibuf[34].buf, vibuf[34].len);
+	free(vibuf[34].buf);
 	for(n=34; n>26; n--)
 	    vibuf[n] = vibuf[n-1];
-	vibuf[26].buf = (char *)zalloc(ct);
-	memcpy(vibuf[26].buf, (char *) zleline + i, ct);
+	vibuf[26].buf = (ZLE_STRING_T)zalloc(ct * ZLE_CHAR_SIZE);
+	memcpy((char *)vibuf[26].buf, (char *)(zleline + i),
+	       ct * ZLE_CHAR_SIZE);
 	vibuf[26].len = ct;
 	vibuf[26].flags = vilinerange ? CUTBUFFER_LINE : 0;
     }
     if (!cutbuf.buf) {
-	cutbuf.buf = ztrdup("");
+	cutbuf.buf = (ZLE_STRING_T)zalloc(ZLE_CHAR_SIZE);
+	cutbuf.buf[0] = ZLENUL;
 	cutbuf.len = cutbuf.flags = 0;
     } else if (!(lastcmd & ZLE_KILL)) {
 	Cutbuffer kptr;
@@ -221,22 +359,26 @@ cut(int i, int ct, int dir)
 	    kringnum = (kringnum + 1) % kringsize;
 	kptr = kring + kringnum;
 	if (kptr->buf)
-	    zfree(kptr->buf, kptr->len);
+	    free(kptr->buf);
 	*kptr = cutbuf;
-	cutbuf.buf = ztrdup("");
+	cutbuf.buf = (ZLE_STRING_T)zalloc(ZLE_CHAR_SIZE);
+	cutbuf.buf[0] = ZLENUL;
 	cutbuf.len = cutbuf.flags = 0;
     }
     if (dir) {
-	char *s = (char *)zalloc(cutbuf.len + ct);
+	ZLE_STRING_T s = (ZLE_STRING_T)zalloc((cutbuf.len + ct)*ZLE_CHAR_SIZE);
 
-	memcpy(s, (char *) zleline + i, ct);
-	memcpy(s + ct, cutbuf.buf, cutbuf.len);
+	memcpy(s, (char *) (zleline + i), ct * ZLE_CHAR_SIZE);
+	memcpy((char *)(s + ct), (char *)cutbuf.buf,
+	       cutbuf.len * ZLE_CHAR_SIZE);
 	free(cutbuf.buf);
 	cutbuf.buf = s;
 	cutbuf.len += ct;
     } else {
-	cutbuf.buf = realloc(cutbuf.buf, cutbuf.len + ct);
-	memcpy(cutbuf.buf + cutbuf.len, (char *) zleline + i, ct);
+	cutbuf.buf = realloc((char *)cutbuf.buf,
+			     (cutbuf.len + ct) * ZLE_CHAR_SIZE);
+	memcpy((char *)(cutbuf.buf + cutbuf.len), (char *) (zleline + i),
+	       ct * ZLE_CHAR_SIZE);
 	cutbuf.len += ct;
     }
     if(vilinerange)
@@ -263,11 +405,19 @@ foredel(int ct)
 void
 setline(char const *s)
 {
-    sizeline(strlen(s));
-    strcpy((char *) zleline, s);
-    unmetafy((char *) zleline, &zlell);
+    char *scp = ztrdup(s);
+    /*
+     * TBD: we could make this more efficient by passing the existing
+     * allocated line to stringaszleline.
+     */
+    free(zleline);
+
+    zleline = stringaszleline(scp, &zlell, &linesz);
+
     if ((zlecs = zlell) && invicmdmode())
 	zlecs--;
+
+    free(scp);
 }
 
 /**/
@@ -276,7 +426,7 @@ findbol(void)
 {
     int x = zlecs;
 
-    while (x > 0 && zleline[x - 1] != '\n')
+    while (x > 0 && zleline[x - 1] != ZLENL)
 	x--;
     return x;
 }
@@ -287,7 +437,7 @@ findeol(void)
 {
     int x = zlecs;
 
-    while (x != zlell && zleline[x] != '\n')
+    while (x != zlell && zleline[x] != ZLENL)
 	x++;
     return x;
 }
@@ -328,15 +478,18 @@ hstrnstr(char *haystack, int pos, char *needle, int len, int dir, int sens)
     return NULL;
 }
 
-/* Query the user, and return a single character response.  The *
- * question is assumed to have been printed already, and the    *
- * cursor is left immediately after the response echoed.        *
- * (Might cause a problem if this takes it onto the next line.) *
- * If yesno is non-zero:                                        *
- * <Tab> is interpreted as 'y'; any other control character is  *
- * interpreted as 'n'.  If there are any characters in the      *
- * buffer, this is taken as a negative response, and no         *
- * characters are read.  Case is folded.                        */
+/*
+ * Query the user, and return a single character response.  The question
+ * is assumed to have been printed already, and the cursor is left
+ * immediately after the response echoed.  (Might cause a problem if
+ * this takes it onto the next line.)  If yesno is non-zero: <Tab> is
+ * interpreted as 'y'; any other control character is interpreted as
+ * 'n'.  If there are any characters in the buffer, this is taken as a
+ * negative response, and no characters are read.  Case is folded.
+ *
+ * TBD: this may need extending to return a wchar_t or possibly
+ * a wint_t.
+ */
 
 /**/
 mod_export int
@@ -496,8 +649,9 @@ initundo(void)
     changes = curchange = zalloc(sizeof(*curchange));
     curchange->prev = curchange->next = NULL;
     curchange->del = curchange->ins = NULL;
-    lastline = zalloc(lastlinesz = linesz);
-    memcpy(lastline, zleline, lastll = zlell);
+    curchange->dell = curchange->insl = 0;
+    lastline = zalloc((lastlinesz = linesz) * ZLE_CHAR_SIZE);
+    memcpy(lastline, zleline, (lastll = zlell) * ZLE_CHAR_SIZE);
     lastcs = zlecs;
 }
 
@@ -518,8 +672,8 @@ freechanges(struct change *p)
 
     for(; p; p = n) {
 	n = p->next;
-	zsfree(p->del);
-	zsfree(p->ins);
+	free(p->del);
+	free(p->ins);
 	zfree(p, sizeof(*p));
     }
 }
@@ -537,9 +691,10 @@ handleundo(void)
     if(curchange->next) {
 	freechanges(curchange->next);
 	curchange->next = NULL;
-	zsfree(curchange->del);
-	zsfree(curchange->ins);
+	free(curchange->del);
+	free(curchange->ins);
 	curchange->del = curchange->ins = NULL;
+	curchange->dell = curchange->insl = 0;
     }
     nextchanges->prev = curchange->prev;
     if(curchange->prev)
@@ -561,7 +716,7 @@ mkundoent(void)
     int sh = zlell < lastll ? zlell : lastll;
     struct change *ch;
 
-    if(lastll == zlell && !memcmp(lastline, zleline, zlell))
+    if(lastll == zlell && !memcmp(lastline, zleline, zlell * ZLE_CHAR_SIZE))
 	return;
     for(pre = 0; pre < sh && zleline[pre] == lastline[pre]; )
 	pre++;
@@ -574,14 +729,24 @@ mkundoent(void)
     ch->off = pre;
     ch->old_cs = lastcs;
     ch->new_cs = zlecs;
-    if(suf + pre == lastll)
+    if(suf + pre == lastll) {
 	ch->del = NULL;
-    else
-	ch->del = metafy(lastline + pre, lastll - pre - suf, META_DUP);
-    if(suf + pre == zlell)
+	ch->dell = 0;
+    } else {
+	ch->dell = lastll - pre - suf;
+	ch->del = (ZLE_STRING_T)zalloc(ch->dell * ZLE_CHAR_SIZE);
+	memcpy((char *)ch->del, (char *)(lastline + pre),
+	       ch->dell * ZLE_CHAR_SIZE);
+    }
+    if(suf + pre == zlell) {
 	ch->ins = NULL;
-    else
-	ch->ins = metafy((char *)zleline + pre, zlell - pre - suf, META_DUP);
+	ch->insl = 0;
+    } else {
+	ch->insl = zlell - pre - suf;
+	ch->ins = (ZLE_STRING_T)zalloc(ch->insl * ZLE_CHAR_SIZE);
+	memcpy((char *)ch->ins, (char *)(zleline + pre),
+	       ch->insl * ZLE_CHAR_SIZE);
+    }
     if(nextchanges) {
 	ch->flags = CH_PREV;
 	ch->prev = endnextchanges;
@@ -602,8 +767,8 @@ void
 setlastline(void)
 {
     if(lastlinesz != linesz)
-	lastline = realloc(lastline, lastlinesz = linesz);
-    memcpy(lastline, zleline, lastll = zlell);
+	lastline = realloc(lastline, (lastlinesz = linesz) * ZLE_CHAR_SIZE);
+    memcpy(lastline, zleline, (lastll = zlell) * ZLE_CHAR_SIZE);
     lastcs = zlecs;
 }
 
@@ -637,16 +802,12 @@ unapplychange(struct change *ch)
     }
     zlecs = ch->off;
     if(ch->ins)
-	foredel(ztrlen(ch->ins));
+	foredel(ch->insl);
     if(ch->del) {
-	char *c = ch->del;
-
-	spaceinline(ztrlen(c));
-	for(; *c; c++)
-	    if(*c == Meta)
-		zleline[zlecs++] = STOUC(*++c) ^ 32;
-	    else
-		zleline[zlecs++] = STOUC(*c);
+	spaceinline(ch->dell);
+	memcpy((char *)(zleline + zlecs), (char *)ch->del,
+	       ch->dell * ZLE_CHAR_SIZE);
+	zlecs += ch->dell;
     }
     zlecs = ch->old_cs;
     return 1;
@@ -682,16 +843,12 @@ applychange(struct change *ch)
     }
     zlecs = ch->off;
     if(ch->del)
-	foredel(ztrlen(ch->del));
+	foredel(ch->dell);
     if(ch->ins) {
-	char *c = ch->ins;
-
-	spaceinline(ztrlen(c));
-	for(; *c; c++)
-	    if(*c == Meta)
-		zleline[zlecs++] = STOUC(*++c) ^ 32;
-	    else
-		zleline[zlecs++] = STOUC(*c);
+	spaceinline(ch->insl);
+	memcpy((char *)(zleline + zlecs), (char *)ch->ins,
+	       ch->insl * ZLE_CHAR_SIZE);
+	zlecs += ch->insl;
     }
     zlecs = ch->new_cs;
     return 1;

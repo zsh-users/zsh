@@ -99,8 +99,10 @@ struct change {
     int flags;			/* see below */
     int hist;			/* history line being changed */
     int off;			/* offset of the text changes */
-    char *del;			/* characters to delete (metafied) */
-    char *ins;			/* characters to insert (metafied) */
+    ZLE_STRING_T del;		/* characters to delete */
+    int dell;			/* no. of characters in del */
+    ZLE_STRING_T ins;		/* characters to insert */
+    int insl;			/* no. of characters in ins */
     int old_cs, new_cs;		/* old and new cursor positions */
 };
 
@@ -123,12 +125,15 @@ typedef void (*KeyScanFunc) _((char *, Thingy, char *, void *));
 
 #define removesuffix() iremovesuffix(256, 0)
 
-/* Cut/kill buffer type.  The buffer itself is purely binary data, *
- * not NUL-terminated.  len is a length count.  flags uses the     *
- * CUTBUFFER_* constants defined below.                            */
+/*
+ * Cut/kill buffer type.  The buffer itself is purely binary data, not
+ * NUL-terminated.  len is a length count (N.B. number of characters,
+ * not size in bytes).  flags uses the CUTBUFFER_* constants defined
+ * below.
+ */
 
 struct cutbuffer {
-    char *buf;
+    ZLE_STRING_T buf;
     size_t len;
     char flags;
 };

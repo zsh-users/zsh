@@ -418,7 +418,8 @@ static char *
 get_cutbuffer(UNUSED(Param pm))
 {
     if (cutbuf.buf)
-	return metafy(cutbuf.buf, cutbuf.len, META_HEAPDUP);
+	return (char *)
+	    zlelineasstring(cutbuf.buf, cutbuf.len, 0, NULL, NULL, 1);
     else
 	return "";
 }
@@ -433,10 +434,8 @@ set_cutbuffer(UNUSED(Param pm), char *x)
     cutbuf.flags = 0;
     if (x) {
 	int n;
-	unmetafy(x, &n);
+	cutbuf.buf = stringaszleline((unsigned char *)x, &n, NULL);
 	cutbuf.len = n;
-	cutbuf.buf = zalloc(cutbuf.len);
-	memcpy((char *)cutbuf.buf, x, cutbuf.len);
 	free(x);
     } else {
 	cutbuf.buf = NULL;
@@ -469,7 +468,7 @@ set_killring(UNUSED(Param pm), char **x)
     if (kring) {
 	for (kptr = kring, kcnt = 0; kcnt < kringsize; kcnt++, kptr++)
 	    if (kptr->buf)
-		zfree(kptr->buf, kptr->len);
+		free(kptr->buf);
 	zfree(kring, kringsize * sizeof(struct cutbuffer));
 	kring = NULL;
 	kringsize = kringnum = 0;
@@ -489,10 +488,10 @@ set_killring(UNUSED(Param pm), char **x)
 	for (p = x; *p; p++) {
 	    int n, len = strlen(*p);
 	    kptr = kring + kpos;
-	    unmetafy(*p, &n);
+
+	    kptr->buf = stringaszleline((unsigned char *)*p, &n, NULL);
 	    kptr->len = n;
-	    kptr->buf = (char *)zalloc(kptr->len);
-	    memcpy(kptr->buf, *p, kptr->len);
+
 	    zfree(*p, len+1);
 	    kpos = (kpos + kringsize -1 ) % kringsize;
 	}
@@ -524,11 +523,9 @@ get_killring(UNUSED(Param pm))
 	Cutbuffer kptr = kring + kpos;
 	if (kptr->buf)
 	{
-	    /*
-	     * Need to use HEAPDUP to make sure there's room for the
-	     * terminating NULL.
-	     */
-	    *p++ = metafy((char *)kptr->buf, kptr->len, META_HEAPDUP);
+	    /* Allocate on heap. */
+	    *p++ = (char *)zlelineasstring(kptr->buf, kptr->len,
+					   0, NULL, NULL, 1);
 	}
 	else
 	    *p++ = dupstring("");

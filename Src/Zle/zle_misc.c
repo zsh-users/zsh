@@ -358,7 +358,8 @@ yank(UNUSED(char **args))
     while (n--) {
 	kct = -1;
 	spaceinline(kctbuf->len);
-	memcpy((char *)zleline + zlecs, kctbuf->buf, kctbuf->len);
+	memcpy((char *)(zleline + zlecs), (char *)kctbuf->buf,
+	       kctbuf->len * ZLE_CHAR_SIZE);
 	zlecs += kctbuf->len;
 	yanke = zlecs;
     }
@@ -412,13 +413,13 @@ yankpop(UNUSED(char **args))
 	 *    was full, we could loop round and round it, otherwise
 	 *    we just stopped when we hit the first empty buffer.
 	 */
-    } while (!buf->buf || !*buf->buf);
+    } while (!buf->buf || *buf->buf == ZLENUL);
 
     zlecs = yankb;
     foredel(yanke - yankb);
     cc = buf->len;
     spaceinline(cc);
-    memcpy((char *)zleline + zlecs, buf->buf, cc);
+    memcpy((char *)(zleline + zlecs), (char *)buf->buf, cc * ZLE_CHAR_SIZE);
     zlecs += cc;
     yanke = zlecs;
     return 0;
