@@ -109,7 +109,7 @@ bin_echotc(char *name, char **argv, char *ops, int func)
     /* get a string-type capability */
     u = buf;
     t = tgetstr(s, &u);
-    if (!t || !*t) {
+    if (t == (char *)-1 || !t || !*t) {
 	/* capability doesn't exist, or (if boolean) is off */
 	zwarnnam(name, "no such capability: %s", s, 0);
 	return 1;
@@ -225,15 +225,34 @@ gettermcap(HashTable ht, char *name)
     pm->level = 0;
     u = buf;
 
+    /* logic in the following cascade copied from echotc, above */
+
     if ((num = tgetnum(name)) != -1) {
 	pm->u.val = num;
 	pm->flags |= PM_INTEGER;
+	return (HashNode) pm;
     }
-    else if ((num = tgetflag(name)) != -1) {
-	pm->u.str = num ? dupstring("yes") : dupstring("no");
+#if !defined(NCURSES_VERSION) || !defined(COLOR_PAIR)
+    if ((num = tgetflag(name)) > 0) {
+	pm->u.str = dupstring("yes");
 	pm->flags |= PM_SCALAR;
+	return (HashNode) pm;
     }
-    else if ((tcstr = (char *)tgetstr(name,&u)) != NULL && tcstr != (char *)-1)
+#else /* NCURSES_VERSION && COLOR_PAIR */
+    switch (tgetflag(name)) {
+    case -1:
+	break;
+    case 0:
+	pm->u.str = dupstring("no");
+	pm->flags |= PM_SCALAR;
+	return (HashNode) pm;
+    default:
+	pm->u.str = dupstring("yes");
+	pm->flags |= PM_SCALAR;
+	return (HashNode) pm;
+    }
+#endif /* NCURSES_VERSION && COLOR_PAIR */
+    if ((tcstr = tgetstr(name, &u)) != NULL && tcstr != (char *)-1)
     {
 	pm->u.str = dupstring(tcstr);
 	pm->flags |= PM_SCALAR;
@@ -262,7 +281,7 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
 	"mi", "ms", "nx", "xb", "NP", "ND", "NR", "os", "5i", "YD", "YE",
 	"es", "hz", "ul", "xo", NULL};
 #endif
-    
+
 #ifndef HAVE_NUMCODES
     static char *numcodes[] = {
 	"co", "it", "lh", "lw", "li", "lm", "sg", "ma", "Co", "pa", "MW",
@@ -322,7 +341,7 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
     pm->ename = NULL;
     pm->old = NULL;
     u = buf;
-    
+
     pm->flags = PM_READONLY | PM_SCALAR;
     for (capcode = (char **)boolcodes; *capcode; capcode++) {
 	if ((num = tgetflag(*capcode)) != -1) {
@@ -331,7 +350,7 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
 	    func((HashNode) pm, flags);
 	}
     }
-    
+
     pm->flags = PM_READONLY | PM_INTEGER;
     for (capcode = (char **)numcodes; *capcode; capcode++) {
 	if ((num = tgetnum(*capcode)) != -1) {
@@ -340,7 +359,7 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
 	    func((HashNode) pm, flags);
 	}
     }
-    
+
     pm->flags = PM_READONLY | PM_SCALAR;
     for (capcode = (char **)strcodes; *capcode; capcode++) {
 	if ((tcstr = (char *)tgetstr(*capcode,&u)) != NULL &&

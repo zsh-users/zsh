@@ -1,3 +1,9 @@
+2001-05-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14516: Use the same ncurses compilation test in gettermcap() as
+	was already used in echotc().  This needs more work, hence the
+	delay in getting it committed.
+
 2001-05-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 14567: Completion/Unix/Command/_pine,
@@ -25,7 +31,7 @@
 
 2001-05-29  Clint Adams  <clint@zsh.org>
 
-	* 145??: Src/Zle/zle_hist.c: fix thinko
+	* 14553: Src/Zle/zle_hist.c: fix thinko
 
 	* 14552: Src/Zle/zle_hist.c: repeat last vi history search
 	if search string is empty.
