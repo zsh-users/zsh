@@ -1,6 +1,6 @@
 2003-04-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
-	* 18477: Src/Zle/computil.c: null pointer dereferenced with
+	* 18467: Src/Zle/computil.c: null pointer dereferenced with
 	_arguments '*-+bar'.
 
 	* 18466: Src/Modules/tcp.c, Src/Modules/tcp.h: Only the module's
