@@ -35,6 +35,9 @@ Cygnus Solutions: Cygwin on Intel
 	INSTALL for how to add these to the base executable).  In
 	particular zsh/zftp and zsh/mathfunc are known to work.
 
+	Some of the tests in the Test subdirectory are known to fail:
+	this is because the UNIX environment is not completely implemented.
+
 Data General: DG/UX 5.4R3.10 MU01 (various AViiONs)
 	Should build `out-of-the-box'.
 
