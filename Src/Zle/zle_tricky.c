@@ -3811,13 +3811,8 @@ addmatches(Cadata dat, char **argv)
 	    /* Get the contents of the completion variables if we have
 	     * to perform matching. */
 	    if (dat->aflags & CAF_MATCH) {
-		if (dat->aflags & CAF_QUOTE) {
-		    lipre = dupstring(compiprefix);
-		    lisuf = dupstring(compisuffix);
-		} else {
-		    lipre = quotename(compiprefix, NULL);
-		    lisuf = quotename(compisuffix, NULL);
-		}
+		lipre = dupstring(compiprefix);
+		lisuf = dupstring(compisuffix);
 		lpre = dupstring(compprefix);
 		lsuf = dupstring(compsuffix);
 		llpl = strlen(lpre);
@@ -5030,8 +5025,6 @@ comp_str(int *ipl, int *pl, int untok)
 	remnulargs(p);
 	ctokenize(s);
 	remnulargs(s);
-	ctokenize(ip);
-	remnulargs(ip);
     }
     lp = strlen(p);
     ls = strlen(s);

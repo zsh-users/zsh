@@ -1888,7 +1888,7 @@ ignore_prefix(int l)
     char *tmp, sav = compprefix[l];
 
     compprefix[l] = '\0';
-    tmp = tricat(compiprefix, rembslash(compprefix), "");
+    tmp = tricat(compiprefix, compprefix, "");
     zsfree(compiprefix);
     compiprefix = tmp;
     compprefix[l] = sav;
@@ -1903,7 +1903,7 @@ ignore_suffix(int l)
     char *tmp, sav;
 
     l = strlen(compsuffix) - l;
-    tmp = tricat(rembslash(compsuffix + l), compisuffix, "");
+    tmp = tricat(compsuffix + l, compisuffix, "");
     zsfree(compisuffix);
     compisuffix = tmp;
     sav = compsuffix[l];
@@ -2126,9 +2126,11 @@ bin_compset(char *name, char **argv, char *ops, int func)
     case CVT_RANGEPAT:
 	tokenize(sa);
 	sa = rembslash(sa);
+	remnulargs(sa);
 	if (sb) {
 	    tokenize(sb);
 	    sb = rembslash(sb);
+	    remnulargs(sb);
 	}
 	break;
     case CVT_PRENUM:
@@ -2144,6 +2146,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
 	    na = -1;
 	tokenize(sa);
 	sa = rembslash(sa);
+	remnulargs(sa);
 	break;
     }
     return !do_comp_vars(test, na, sa, nb, sb, 1);
