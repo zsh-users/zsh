@@ -837,9 +837,9 @@ endtrapscope(void)
 	    exitfn = removehashnode(shfunctab, "TRAPEXIT");
 	} else {
 	    exitfn = sigfuncs[SIGEXIT];
-	    sigfuncs[SIGEXIT] = NULL;
 	}
-	unsettrap(SIGEXIT);
+	sigfuncs[SIGEXIT] = NULL;
+	sigtrapped[SIGEXIT] = 0;
     }
 
     if (savetraps) {
