@@ -3059,27 +3059,164 @@ cfp_test_exact(LinkList names, char *skipped)
     return (found ? ret : NULL);
 }
 
+static char *
+cfp_matcher_pats(char *matcher, char *add)
+{
+    Cmatcher m = parse_cmatcher(NULL, matcher);
+
+    if (m && m != pcm_err) {
+	char *tmp;
+	int al = strlen(add), tl;
+	VARARR(Cmatcher, ms, al);
+	Cmatcher *mp;
+	Cpattern stopp;
+	int stopl = 0;
+
+	memset(ms, 0, al * sizeof(Cmatcher));
+
+	for (; m && *add; m = m->next) {
+	    stopp = NULL;
+	    if (!(m->flags & (CMF_LEFT|CMF_RIGHT))) {
+		if (m->llen == 1 && m->wlen == 1) {
+		    for (tmp = add, tl = al, mp = ms; tl; tl--, tmp++, mp++) {
+			if (pattern_match(m->line, tmp, NULL, NULL)) {
+			    if (*mp) {
+				*tmp = '\0';
+				al = tmp - add;
+				break;
+			    } else
+				*mp = m;
+			}
+		    }
+		} else {
+		    stopp = m->line;
+		    stopl = m->llen;
+		}
+	    } else if (m->flags & CMF_RIGHT) {
+		if (m->wlen < 0 && !m->llen && m->ralen == 1) {
+		    for (tmp = add, tl = al, mp = ms; tl; tl--, tmp++, mp++) {
+			if (pattern_match(m->right, tmp, NULL, NULL)) {
+			    if (*mp) {
+				*tmp = '\0';
+				al = tmp - add;
+				break;
+			    } else
+				*mp = m;
+			}
+		    }
+		} else if (m->llen) {
+		    stopp = m->line;
+		    stopl = m->llen;
+		} else {
+		    stopp = m->right;
+		    stopl = m->ralen;
+		}
+	    } else {
+		if (!m->lalen)
+		    return "";
+
+		stopp = m->left;
+		stopl = m->lalen;
+	    }
+	    if (stopp)
+		for (tmp = add, tl = al; tl >= stopl; tl--, tmp++)
+		    if (pattern_match(stopp, tmp, NULL, NULL)) {
+			*tmp = '\0';
+			al = tmp - add;
+			break;
+		    }
+	}
+	if (*add) {
+	    char *ret = "", buf[259];
+
+	    for (mp = ms; *add; add++, mp++) {
+		if (!(m = *mp)) {
+		    buf[0] = *add;
+		    buf[1] = '\0';
+		} else if (m->flags & CMF_RIGHT) {
+		    buf[0] = '*';
+		    buf[1] = *add;
+		    buf[2] = '\0';
+		} else {
+		    unsigned char *t, c;
+		    char *p = buf;
+		    int i;
+
+		    for (i = 256, t = m->word->tab; i--; t++)
+			if (*t)
+			    break;
+		    if (i) {
+			t = m->word->tab;
+			*p++ = '[';
+			if (m->line->equiv && m->word->equiv) {
+			    *p++ = *add;
+			    c = m->line->tab[STOUC(*add)];
+			    for (i = 0; i < 256; i++)
+				if (m->word->tab[i] == c) {
+				    *p++ = (char) i;
+				    break;
+				}
+			} else {
+			    if (*add == ']' || t[STOUC(']')])
+				*p++ = ']';
+			    for (i = 0; i < 256; i++, t++)
+				if (*t && ((char) i) != *add &&
+				    i != ']' && i != '-' &&
+				    i != '^' && i != '!')
+				    *p++ = (char) i;
+			    *p++ = *add;
+			    t = m->word->tab;
+			    if (*add != '^' && t[STOUC('^')])
+				*p++ = '^';
+			    if (*add != '!' && t[STOUC('!')])
+				*p++ = '!';
+			    if (*add != '-' && t[STOUC('-')])
+				*p++ = '-';
+			}
+			*p++ = ']';
+			*p = '\0';
+		    } else {
+			*p = '?';
+			p[1] = '\0';
+		    }
+		}
+		ret = dyncat(ret, buf);
+	    }
+	    return ret;
+	}
+    }
+    return add;
+}
+
 static void
 cfp_opt_pats(char **pats, char *matcher)
 {
     char *add, **p, *q, *t, *s;
 
-    /**** For now we don't try to improve the patterns if there are match
-     *    specs. We should work on this some more...
-     *
-     *    And another one: we can do this with comppatmatch if the word
-     *    doesn't contain wildcards, unless the approximate matcher is
-     *    active. Better: unless there is a compadd function. I.e., we
-     *    need one more piece of information from the shell code, at least
-     *    I'd prefer to get it from _path_files in case we find other
-     *    conditions for not trying to improve patterns. */
-
-    if ((comppatmatch && *comppatmatch) || *matcher ||
-	!compprefix || !*compprefix)
+    if (!compprefix || !*compprefix)
 	return;
 
-    add = rembslash(compprefix);
-
+    if (comppatmatch && *comppatmatch) {
+	tokenize(t = rembslash(dyncat(compprefix, compsuffix)));
+	remnulargs(t);
+	if (haswilds(t))
+	    return;
+    }
+    add = (char *) zhalloc(sizeof(compprefix) * 2 + 1);
+    for (s = compprefix, t = add; *s; s++) {
+	if (*s != '\\' || !s[1] || s[1] == '*' || s[1] == '?' ||
+	    s[1] == '<' || s[1] == '>' || s[1] == '(' || s[1] == ')' ||
+	    s[1] == '[' || s[1] == ']' || s[1] == '|' || s[1] == '#' ||
+	    s[1] == '^' || s[1] == '~') {
+	    if ((s == compprefix || s[-1] != '\\') &&
+		(*s == '*' || *s == '?' || *s == '<' || *s == '>' ||
+		 *s == '(' || *s == ')' || *s == '[' || *s == ']' ||
+		 *s == '|' || *s == '#' || *s == '^' || *s == '~'))
+		*t++ = '\\';
+	    *t++ = *s;
+	}
+    }
+    *t = '\0';
     for (p = pats; *add && (q = *p); p++) {
 	if (*q) {
 	    q = dupstring(q);
@@ -3124,6 +3261,9 @@ cfp_opt_pats(char **pats, char *matcher)
 	}
     }
     if (*add) {
+	if (*matcher && !(add = cfp_matcher_pats(matcher, add)))
+	    return;
+
 	for (p = pats; *p; p++)
 	    if (**p == '*')
 		*p = dyncat(add, *p);
@@ -3189,8 +3329,8 @@ cfp_add_sdirs(LinkList final, LinkList orig, char *skipped, char *sdirs)
 }
 
 static LinkList
-cf_pats(int dirs, LinkList names, char *skipped, char *matcher, char *sdirs,
-	char **pats)
+cf_pats(int dirs, int noopt, LinkList names, char *skipped, char *matcher,
+	char *sdirs, char **pats)
 {
     LinkList ret;
     char *dpats[2];
@@ -3203,7 +3343,8 @@ cf_pats(int dirs, LinkList names, char *skipped, char *matcher, char *sdirs,
 	dpats[1] = NULL;
 	pats = dpats;
     }
-    cfp_opt_pats(pats, matcher);
+    if (!noopt)
+	cfp_opt_pats(pats, matcher);
 
     return cfp_add_sdirs(cfp_bld_pats(dirs, names, skipped, pats),
 			 names, skipped, sdirs);
@@ -3255,14 +3396,13 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 	zwarnnam(nam, "missing option: %s", *args, 0);
 	return 1;
     }
-    if (args[0][2]) {
-	zwarnnam(nam, "invalid option: %s", *args, 0);
-	return 1;
-    }
     switch (args[0][1]) {
     case 'p':
     case 'P':
-	{
+	if (args[0][2] && (args[0][2] != '-' || args[0][3])) {
+	    zwarnnam(nam, "invalid option: %s", *args, 0);
+	    return 1;
+	} else {
 	    char **tmp;
 	    LinkList l;
 
@@ -3277,12 +3417,16 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 	    }
 	    for (l = newlinklist(); *tmp; tmp++)
 		addlinknode(l, *tmp);
-	    set_list_array(args[1], cf_pats((args[0][1] == 'P'), l, args[2],
-					    args[3], args[4], args + 5));
+	    set_list_array(args[1], cf_pats((args[0][1] == 'P'), !!args[0][2],
+					    l, args[2], args[3], args[4],
+					    args + 5));
 	    return 0;
 	}
     case 'i':
-	{
+	if (args[0][2]) {
+	    zwarnnam(nam, "invalid option: %s", *args, 0);
+	    return 1;
+	} else {
 	    char **tmp;
 	    LinkList l;
 

@@ -1029,7 +1029,7 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
  * corresponding character. */
 
 /**/
-static int
+mod_export int
 pattern_match(Cpattern p, char *s, unsigned char *in, unsigned char *out)
 {
     unsigned char c;

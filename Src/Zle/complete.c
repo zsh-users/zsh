@@ -204,16 +204,20 @@ parse_cmatcher(char *name, char *s)
 	case 'R': fl = CMF_RIGHT | CMF_LINE; break;
 	case 'M': fl = CMF_LINE; break;
 	default:
-	    zwarnnam(name, "unknown match specification character `%c'", NULL, *s);
+	    if (name)
+		zwarnnam(name, "unknown match specification character `%c'",
+			 NULL, *s);
 	    return pcm_err;
 	}
 	if (s[1] != ':') {
-	    zwarnnam(name, "missing `:'", NULL, 0);
+	    if (name)
+		zwarnnam(name, "missing `:'", NULL, 0);
 	    return pcm_err;
 	}
 	s += 2;
 	if (!*s) {
-	    zwarnnam(name, "missing patterns", NULL, 0);
+	    if (name)
+		zwarnnam(name, "missing patterns", NULL, 0);
 	    return pcm_err;
 	}
 	if (fl & CMF_LEFT) {
@@ -225,7 +229,8 @@ parse_cmatcher(char *name, char *s)
 		s++;
 
 	    if (!*s || !*++s) {
-		zwarnnam(name, "missing line pattern", NULL, 0);
+		if (name)
+		    zwarnnam(name, "missing line pattern", NULL, 0);
 		return pcm_err;
 	    }
 	} else
@@ -242,10 +247,12 @@ parse_cmatcher(char *name, char *s)
 	    ll = 0;
 	}
 	if ((fl & CMF_RIGHT) && (!*s || !*++s)) {
-	    zwarnnam(name, "missing right anchor", NULL, 0);
+	    if (name)
+		zwarnnam(name, "missing right anchor", NULL, 0);
 	} else if (!(fl & CMF_RIGHT)) {
 	    if (!*s) {
-		zwarnnam(name, "missing word pattern", NULL, 0);
+		if (name)
+		    zwarnnam(name, "missing word pattern", NULL, 0);
 		return pcm_err;
 	    }
 	    s++;
@@ -262,7 +269,8 @@ parse_cmatcher(char *name, char *s)
 	    if (err)
 		return pcm_err;
 	    if (!*s) {
-		zwarnnam(name, "missing word pattern", NULL, 0);
+		if (name)
+		    zwarnnam(name, "missing word pattern", NULL, 0);
 		return pcm_err;
 	    }
 	    s++;
@@ -271,7 +279,8 @@ parse_cmatcher(char *name, char *s)
 
 	if (*s == '*') {
 	    if (!(fl & (CMF_LEFT | CMF_RIGHT))) {
-		zwarnnam(name, "need anchor for `*'", NULL, 0);
+		if (name)
+		    zwarnnam(name, "need anchor for `*'", NULL, 0);
 		return pcm_err;
 	    }
 	    word = NULL;
@@ -284,7 +293,9 @@ parse_cmatcher(char *name, char *s)
 	    word = parse_pattern(name, &s, &wl, 0, &err);
 
 	    if (!word && !line) {
-		zwarnnam(name, "need non-empty word or line pattern", NULL, 0);
+		if (name)
+		    zwarnnam(name, "need non-empty word or line pattern",
+			     NULL, 0);
 		return pcm_err;
 	    }
 	}
