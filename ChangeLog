@@ -1,3 +1,12 @@
+2000-07-28  Peter Stephenson  <pws@csr.com>
+
+	* Andrej: 12419: Src/builtin.c, Src/params.c: use putenv() and
+	getenv() if available and try to make minimal assumptions about
+	environment handling.
+
+	* Andrej: 12411: check for brk() and sbrk() and use sbrk() if no
+	brk().
+
 2000-07-27  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 12415: Src/utils.c: fix bug in 12414 when quoting metafied field

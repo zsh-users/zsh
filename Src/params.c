@@ -455,10 +455,13 @@ void
 createparamtable(void)
 {
     Param ip, pm;
-    char **new_environ, **envp, **envp2, **sigptr, **t;
-    char **old_environ = environ;
+#ifndef HAVE_PUTENV
+    char **new_environ;
+    int  envsize;
+#endif
+    char **envp, **envp2, **sigptr, **t;
     char buf[50], *str, *iname, *hostnam;
-    int num_env, oae = opts[ALLEXPORT];
+    int  oae = opts[ALLEXPORT];
 #ifdef HAVE_UNAME
     struct utsname unamebuf;
     char *machinebuf;
@@ -501,15 +504,19 @@ createparamtable(void)
 
     setsparam("LOGNAME", ztrdup((str = getlogin()) && *str ? str : cached_username));
 
+#ifndef HAVE_PUTENV
     /* Copy the environment variables we are inheriting to dynamic *
      * memory, so we can do mallocs and frees on it.               */
-    num_env = arrlen(environ);
-    new_environ = (char **) zalloc(sizeof(char *) * (num_env + 1));
-    *new_environ = NULL;
+    envsize = sizeof(char *)*(1 + arrlen(environ));
+    new_environ = (char **) zalloc(envsize);
+    memcpy (new_environ, environ, envsize);
+    environ = new_environ;
+#endif
 
     /* Now incorporate environment variables we are inheriting *
-     * into the parameter hash table.                          */
-    for (envp = new_environ, envp2 = environ; *envp2; envp2++) {
+     * into the parameter hash table. Copy them into dynamic   *
+     * memory so that we can free them if needed               */
+    for (envp = envp2 = environ; *envp2; envp2++) {
 	for (str = *envp2; *str && *str != '='; str++);
 	if (*str == '=') {
 	    iname = NULL;
@@ -517,25 +524,22 @@ createparamtable(void)
 	    if (!idigit(**envp2) && isident(*envp2) && !strchr(*envp2, '[')) {
 		iname = *envp2;
 		if ((!(pm = (Param) paramtab->getnode(paramtab, iname)) ||
-		     !(pm->flags & PM_DONTIMPORT)) &&
-		    (pm = setsparam(iname, metafy(str + 1, -1, META_DUP))) &&
-		    !(pm->flags & PM_EXPORTED)) {
+		     !(pm->flags & PM_DONTIMPORT || pm->flags & PM_EXPORTED)) &&
+		    (pm = setsparam(iname, metafy(str + 1, -1, META_DUP)))) {
 		    *str = '=';
 		    pm->flags |= PM_EXPORTED;
-		    pm->env = *envp++ = ztrdup(*envp2);
-		    *envp = NULL;
-		    if (pm->flags & PM_SPECIAL) {
-			environ = new_environ;
-			pm->env = replenv(pm->env, getsparam(pm->nam),
-					  pm->flags);
-			environ = old_environ;
-		    }
+		    if (pm->flags & PM_SPECIAL)
+			pm->env = mkenvstr (pm->nam,
+					    getsparam(pm->nam), pm->flags);
+		    else
+			pm->env = ztrdup(*envp2);
+		    *envp++ = pm->env;
 		}
 	    }
 	    *str = '=';
 	}
     }
-    environ = new_environ;
+    *envp = '\0';
     opts[ALLEXPORT] = oae;
 
     pm = (Param) paramtab->getnode(paramtab, "HOME");
@@ -660,7 +664,6 @@ createparam(char *name, int flags)
 		 */
 		if (oldpm->env) {
 		    delenv(oldpm->env);
-		    zsfree(oldpm->env);
 		    oldpm->env = NULL;
 		}
 		paramtab->removenode(paramtab, name);
@@ -1489,7 +1492,7 @@ export_param(Param pm)
     else
 	val = pm->gets.cfn(pm);
     if (pm->env)
-	pm->env = replenv(pm->env, val, pm->flags);
+	pm->env = replenv(pm->nam, val, pm->flags);
     else {
 	pm->flags |= PM_EXPORTED;
 	pm->env = addenv(pm->nam, val, pm->flags);
@@ -2006,7 +2009,6 @@ unsetparam_pm(Param pm, int altflag, int exp)
     pm->unsetfn(pm, exp);
     if ((pm->flags & PM_EXPORTED) && pm->env) {
 	delenv(pm->env);
-	zsfree(pm->env);
 	pm->env = NULL;
     }
 
@@ -2824,8 +2826,7 @@ pipestatsetfn(Param pm, char **x)
 void
 arrfixenv(char *s, char **t)
 {
-    char **ep, *u;
-    int len_s;
+    char *u;
     Param pm;
 
     pm = (Param) paramtab->getnode(paramtab, s);
@@ -2838,24 +2839,47 @@ arrfixenv(char *s, char **t)
     if (pm->flags & PM_HASHELEM)
 	return;
     u = t ? zjoin(t, ':', 1) : "";
-    len_s = strlen(s);
-    for (ep = environ; *ep; ep++)
-	if (!strncmp(*ep, s, len_s) && (*ep)[len_s] == '=') {
-	    pm->env = replenv(*ep, u, pm->flags);
-	    return;
-	}
+    if (findenv(s, 0)) {
+	pm->env = replenv(s, u, pm->flags);
+	return;
+    }
     if (isset(ALLEXPORT))
 	pm->flags |= PM_EXPORTED;
     if (pm->flags & PM_EXPORTED)
 	pm->env = addenv(s, u, pm->flags);
 }
 
-/* Given *name = "foo", it searchs the environment for string *
- * "foo=bar", and returns a pointer to the beginning of "bar" */
+#ifndef HAVE_PUTENV
 
-/**/
-mod_export char *
-zgetenv(char *name)
+static int
+putenv(char *str)
+{
+    char **ep;
+    int num_env;
+
+
+    /* First check if there is already an environment *
+     * variable matching string `name'.               */
+    if (findenv (str, &num_env)) {
+	environ[num_env] = str;
+    } else {
+    /* Else we have to make room and add it */
+	num_env = arrlen(environ);
+	environ = (char **) zrealloc(environ, (sizeof(char *)) * (num_env + 2));
+
+	/* Now add it at the end */
+	ep = environ + num_env;
+	*ep = str;
+	*(ep + 1) = NULL;
+    }
+    return 0;
+}
+#endif
+
+#ifndef HAVE_GETENV
+
+static char *
+getenv(char *name)
 {
     char **ep, *s, *t;
  
@@ -2865,6 +2889,37 @@ zgetenv(char *name)
 	    return s + 1;
     }
     return NULL;
+}
+#endif
+
+/**/
+static int
+findenv (char *name, int *pos)
+{
+    char **ep, *eq;
+    int  nlen;
+
+
+    eq = strchr (name, '=');
+    nlen = eq ? eq - name : strlen (name);
+    for (ep = environ; *ep; ep++) 
+	if (!strncmp (*ep, name, nlen) && *((*ep)+nlen) == '=') {
+	    if (pos)
+		*pos = ep - environ;
+	    return 1;
+	}
+    
+    return 0;
+}
+
+/* Given *name = "foo", it searchs the environment for string *
+ * "foo=bar", and returns a pointer to the beginning of "bar" */
+
+/**/
+mod_export char *
+zgetenv(char *name)
+{
+    return getenv(name);
 }
 
 /**/
@@ -2881,27 +2936,51 @@ copyenvstr(char *s, char *value, int flags)
     }
 }
 
+static char *
+addenv_internal(char *name, char *value, int flags, int add)
+{
+    char *oldenv = 0, *newenv = 0, *env = 0;
+    int pos;
+
+    /* First check if there is already an environment *
+     * variable matching string `name'. If not, and   *
+     * we are not requested to add new, return        */
+    if (findenv (name, &pos))
+	oldenv = environ[pos];
+    else if (!add)
+	return NULL;
+
+    newenv = mkenvstr (name, value, flags);
+    if (putenv (newenv)) {
+	zsfree (newenv);
+	return NULL;
+    }
+    /*
+     * Under Cygwin we must use putenv() to maintain consistency.
+     * Unfortunately, current version (1.1.2) copies argument and may
+     * silently reuse exisiting environment string. This tries to
+     * check for both cases
+     */
+    if (findenv (name, &pos)) {
+	env = environ[pos];
+	if (env != oldenv)
+	    zsfree (oldenv);
+	if (env != newenv)
+	    zsfree (newenv);
+	return env;
+    }
+
+    return NULL; /* Cannot happen */
+}
+
 /* Change the value of an existing environment variable */
 
 /**/
 char *
-replenv(char *e, char *value, int flags)
+replenv(char *name, char *value, int flags)
 {
-    char **ep, *s;
-    int len_value;
 
-    for (ep = environ; *ep; ep++)
-	if (*ep == e) {
-	    for (len_value = 0, s = value;
-		 *s && (*s++ != Meta || *s++ != 32); len_value++);
-	    s = e;
-	    while (*s++ != '=');
-	    *ep = (char *) zrealloc(e, s - e + len_value + 1);
-	    s = s - e + *ep - 1;
-	    copyenvstr(s, value, flags);
-	    return *ep;
-	}
-    return NULL;
+    return addenv_internal (name, value, flags, 0);
 }
 
 /* Given strings *name = "foo", *value = "bar", *
@@ -2934,28 +3013,7 @@ mkenvstr(char *name, char *value, int flags)
 char *
 addenv(char *name, char *value, int flags)
 {
-    char **ep, *s, *t;
-    int num_env;
-
-    /* First check if there is already an environment *
-     * variable matching string `name'.               */
-    for (ep = environ; *ep; ep++) {
-	for (s = *ep, t = name; *s && *s == *t; s++, t++);
-	if (*s == '=' && !*t) {
-	    zsfree(*ep);
-	    return *ep = mkenvstr(name, value, flags);
-	}
-    }
-
-    /* Else we have to make room and add it */
-    num_env = arrlen(environ);
-    environ = (char **) zrealloc(environ, (sizeof(char *)) * (num_env + 2));
-
-    /* Now add it at the end */
-    ep = environ + num_env;
-    *ep = mkenvstr(name, value, flags);
-    *(ep + 1) = NULL;
-    return *ep;
+    return addenv_internal (name, value, flags, 1);
 }
 
 /* Delete a pointer from the list of pointers to environment *
@@ -2971,8 +3029,10 @@ delenv(char *x)
 	if (*ep == x)
 	    break;
     }
-    if (*ep)
+    if (*ep) {
 	for (; (ep[0] = ep[1]); ep++);
+    }
+    zsfree(x);
 }
 
 /**/
@@ -3105,7 +3165,6 @@ scanendscope(HashNode hn, int flags)
 	    pm->ct = tpm->ct;
 	    if (pm->env) {
 		delenv(pm->env);
-		zsfree(pm->env);
 	    }
 	    pm->env = NULL;
 

@@ -861,7 +861,9 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       getrlimit \
 	       setlocale \
 	       uname \
-	       signgam)
+	       signgam \
+	       putenv getenv \
+	       brk sbrk)
 AC_FUNC_STRCOLL
 
 if test $ac_cv_func_setpgrp = yes; then

@@ -1634,7 +1634,6 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		    pm->env = addenv(pname, getsparam(pname), pm->flags);
 	    } else if (pm->env && !(pm->flags & PM_HASHELEM)) {
 		delenv(pm->env);
-		zsfree(pm->env);
 		pm->env = NULL;
 	    }
 	    if (value)
@@ -1711,7 +1710,6 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	tpm->ct = pm->ct;
 	if (pm->env) {
 	    delenv(pm->env);
-	    zsfree(pm->env);
 	}
 	tpm->env = pm->env = NULL;
 
