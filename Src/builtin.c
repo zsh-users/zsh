@@ -2145,7 +2145,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
     }
 
     if (!(OPT_ISSET(ops,'g') || OPT_ISSET(ops,'x') || OPT_ISSET(ops,'m')) || 
-	OPT_ISSET(ops,'g') == 2 || *name == 'l' ||
+	OPT_PLUS(ops,'g') || *name == 'l' ||
 	(!isset(GLOBALEXPORT) && !OPT_ISSET(ops,'g')))
 	on |= PM_LOCAL;
 
@@ -2263,7 +2263,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 		returnval = 1;
 		continue;
 	    }
-	    if (OPT_PLUS(ops,'m') == 2 && !asg->value) {
+	    if (OPT_PLUS(ops,'m') && !asg->value) {
 		scanmatchtable(paramtab, pprog, on|roff, 0,
 			       paramtab->printnode, printflags);
 		continue;
@@ -2351,7 +2351,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
     int on = 0, off = 0, pflags = 0;
 
     /* Do we have any flags defined? */
-    if (OPT_ISSET(ops,'u') == 2)
+    if (OPT_PLUS(ops,'u'))
 	off |= PM_UNDEFINED;
     else if (OPT_MINUS(ops,'u') || OPT_ISSET(ops,'X'))
 	on |= PM_UNDEFINED;
