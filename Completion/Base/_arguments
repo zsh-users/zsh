@@ -113,7 +113,7 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
 
       # Then we walk through the descriptions plus a few builtin ones.
 
-      set -- "${(@)argv[nth+1,-1]}" '*=FILE*:file:_files' \
+      set -- "$@" '*=FILE*:file:_files' \
              '*=(DIR|PATH)*:directory:_files -/' '*:unknown:'
 
       while (( $# )); do
