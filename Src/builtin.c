@@ -2659,7 +2659,7 @@ bin_hash(char *name, char **argv, char *ops, int func)
 		zwarnnam(name, "bad pattern : %s", *argv, 0);
 		returnval = 1;
 	    }
-	} else if((asg = getasg(*argv))->value) {
+	} else if ((asg = getasg(*argv)) && asg->value) {
 	    if(isset(RESTRICTED)) {
 		zwarnnam(name, "restricted: %s", asg->value, 0);
 		returnval = 1;
