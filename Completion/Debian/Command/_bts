@@ -77,11 +77,13 @@ else
 	 then
 	  _wanted tag expl 'tag' \
 	  compadd patch wontfix moreinfo unreproducible fixed \
-	          security potato woody sid
+	          security potato woody sid help pending upstream \
+		  sarge experimental
 	 else
 	  _wanted tag expl 'tag' \
 	  compadd patch wontfix moreinfo unreproducible fixed \
-	          security potato woody sid
+	          security potato woody sid help pending upstream \
+		  sarge experimental
 	  _wanted sep expl 'separator' compadd -S ' ' , .
 	 fi
 	;;
