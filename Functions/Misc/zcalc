@@ -87,8 +87,8 @@ emulate -L zsh
 setopt extendedglob
 
 # can't be local since required in EXIT trap
-zcalc_orighist=$HISTFILE 
-local temphist=${TMPPREFIX}hist SAVEHIST=$HISTSIZE
+zcalc_orighist=$HISTFILE
+local temphist=${TMPPREFIX}zcalc_hist.$$ SAVEHIST=$HISTSIZE
 HISTFILE=$temphist
 fc -W
 
