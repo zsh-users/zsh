@@ -12,13 +12,13 @@ _perl () {
     '-d[run scripts under debugger]' \
     '-d\:-[run under control of a debugging/tracing module]:debugging/tracing module:_perl_modules' \
     '-D-:set debugging flags (argument is a bit mask or flags): ' \
-    "-e+:one line of script. Several -e's allowed. Omit [programfile]." \
+    "*-e+:one line of script. Several -e's allowed. Omit [programfile]." \
     "-F-:split() pattern for autosplit (-a). The //'s are optional.: " \
     '-h[list help summary]' \
     '-i-[edit <> files in place (make backup if extension supplied)]:backup file extension: ' \
-    '-I-[specify @INC/#include directory (may be used more than once)]:include path:_files -/' \
+    '*-I-[specify @INC/#include directory (may be used more than once)]:include path:_files -/' \
     '-l-[enable line ending processing, specifies line terminator]:output record separator in octal: ' \
-    {-m,-M}"-[module.. executes \`use/no module...' before executing your script.]:module:_perl_m_opt" \
+    \*{-m,-M}"-[module.. executes \`use/no module...' before executing your script.]:module:_perl_m_opt" \
     "-n[assume 'while (<>) { ... }' loop around your script]" \
     "-p[assume loop like -n but print line also like sed]" \
     "-P[run script through C preprocessor before compilation]" \
