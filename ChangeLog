@@ -1,5 +1,9 @@
 2000-06-11  Bart Schaefer  <schaefer@zsh.org>
 
+	* 11866: Functions/Misc/colors, Functions/Prompts/promptinit:  Set
+	up color/colour assoc arrays to map the full range of ANSI text
+	properties; preserve more state during themed prompt previewing.
+
 	* Alexandre: 11864: Src/Zle/complist.c: Shift an array the opposite
 	way to fix colored listings crash.
 

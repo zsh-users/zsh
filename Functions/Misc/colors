@@ -1,67 +1,79 @@
-# Put standard ANSI color codes in environment for easy use
+# Put standard ANSI color codes in shell parameters for easy use.
+# Note that some terminals do not support all combinations.
 
-reset_color="$(echo -n '\e[0m')"
-bold_color="$(echo -n '\e[1m')"
+typeset -Ag color colour
+
+color=(
+# Attribute codes:
+  00 none
+  01 bold
+  02 faint                  22 normal
+  03 standout               23 no-standout
+  04 underline              24 no-underline
+  05 blink                  25 no-blink
+  07 reverse                27 no-reverse
+  08 conceal
+
+# Text color codes:
+  30 black                  40 bg-black
+  31 red                    41 bg-red
+  32 green                  42 bg-green
+  33 yellow                 43 bg-yellow
+  34 blue                   44 bg-blue
+  35 magenta                45 bg-magenta
+  36 cyan                   46 bg-cyan
+  37 white                  47 bg-white
+  39 default                49 bg-default
+)
+
+# A word about black and white:  The "normal" shade of white is really a
+# very pale grey on many terminals; to get truly white text, you have to
+# use bold white, and to get a truly white background you have to use
+# bold reverse white bg-xxx where xxx is your desired foreground color
+# (and which means the foreground is also bold).
+
+# Map in both directions; could do this with e.g. ${(k)colors[(i)normal]},
+# but it's clearer to include them all both ways.
+
+local k
+for k in ${(k)color}; do color[${color[$k]}]=$k; done
+
+# Add "fg-" keys for all the text colors, for clarity.
+
+for k in ${color[(I)3?]}; do color[fg-${color[$k]}]=$k; done
+
+# This is inaccurate, but the prompt theme system needs it.
+
+color[grey]=${color[black]}
+color[fg-grey]=${color[grey]}
+color[bg-grey]=${color[bg-black]}
+
+# Assistance for the color-blind.
+
+colour=(${(kv)color})	# A case where ksh namerefs would be useful ...
+
+# The following are terminal escape sequences used by colored prompt themes.
+
+local lc=$'\e[' rc=m	# Standard ANSI terminal escape values
+
+typeset -Hg reset_color bold_color
+reset_color="$lc${color[none]}$rc"
+bold_color="$lc${color[bold]}$rc"
 
 # Foreground
 
-fg_grey="$(echo -n '\e[30m')"
-fg_red="$(echo -n '\e[31m')"
-fg_green="$(echo -n '\e[32m')"
-fg_yellow="$(echo -n '\e[33m')"
-fg_blue="$(echo -n '\e[34m')"
-fg_magenta="$(echo -n '\e[35m')"
-fg_cyan="$(echo -n '\e[36m')"
-fg_white="$(echo -n '\e[37m')"
-
-fg_no_bold_grey="$(echo -n '\e[0;30m')"
-fg_no_bold_red="$(echo -n '\e[0;31m')"
-fg_no_bold_green="$(echo -n '\e[0;32m')"
-fg_no_bold_yellow="$(echo -n '\e[0;33m')"
-fg_no_bold_blue="$(echo -n '\e[0;34m')"
-fg_no_bold_magenta="$(echo -n '\e[0;35m')"
-fg_no_bold_cyan="$(echo -n '\e[0;36m')"
-fg_no_bold_white="$(echo -n '\e[0;37m')"
-
-fg_bold_grey="$(echo -n '\e[1;30m')"
-fg_bold_red="$(echo -n '\e[1;31m')"
-fg_bold_green="$(echo -n '\e[1;32m')"
-fg_bold_yellow="$(echo -n '\e[1;33m')"
-fg_bold_blue="$(echo -n '\e[1;34m')"
-fg_bold_magenta="$(echo -n '\e[1;35m')"
-fg_bold_cyan="$(echo -n '\e[1;36m')"
-fg_bold_white="$(echo -n '\e[1;37m')"
+typeset -AHg fg fg_bold fg_no_bold
+for k in ${(v)color[(I)fg-*]}; do
+    fg[${color[$k]}]="$lc$k$rc"
+    fg_bold[${color[$k]}]="$lc${color[bold]};$k$rc"
+    fg_no_bold[${color[$k]}]="$lc${color[normal]};$k$rc"
+done
 
 # Background
 
-bg_grey="$(echo -n '\e[40m')"
-bg_red="$(echo -n '\e[41m')"
-bg_green="$(echo -n '\e[42m')"
-bg_yellow="$(echo -n '\e[43m')"
-bg_blue="$(echo -n '\e[44m')"
-bg_magenta="$(echo -n '\e[45m')"
-bg_cyan="$(echo -n '\e[46m')"
-bg_white="$(echo -n '\e[47m')"
-
-bg_no_bold_grey="$(echo -n '\e[0;40m')"
-bg_no_bold_red="$(echo -n '\e[0;41m')"
-bg_no_bold_green="$(echo -n '\e[0;42m')"
-bg_no_bold_yellow="$(echo -n '\e[0;43m')"
-bg_no_bold_blue="$(echo -n '\e[0;44m')"
-bg_no_bold_magenta="$(echo -n '\e[0;45m')"
-bg_no_bold_cyan="$(echo -n '\e[0;46m')"
-bg_no_bold_white="$(echo -n '\e[0;47m')"
-
-bg_bold_grey="$(echo -n '\e[1;40m')"
-bg_bold_red="$(echo -n '\e[1;41m')"
-bg_bold_green="$(echo -n '\e[1;42m')"
-bg_bold_yellow="$(echo -n '\e[1;43m')"
-bg_bold_blue="$(echo -n '\e[1;44m')"
-bg_bold_magenta="$(echo -n '\e[1;45m')"
-bg_bold_cyan="$(echo -n '\e[1;46m')"
-bg_bold_white="$(echo -n '\e[1;47m')"
-
-# Stop these screwing the environment listing up
-bg_zzzz=$reset_color
-fg_zzzz=$reset_color
-bold_zzzz=$reset_color
+typeset -AHg bg bg_bold bg_no_bold
+for k in ${(v)color[(I)bg-*]}; do
+    bg[${color[$k]}]="$lc$k$rc"
+    bg_bold[${color[$k]}]="$lc${color[bold]};$k$rc"
+    bg_no_bold[${color[$k]}]="$lc${color[normal]};$k$rc"
+done
