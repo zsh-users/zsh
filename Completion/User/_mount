@@ -6,7 +6,7 @@
 # are below these table.
 
 local curcontext="$curcontext" state line ret=1
-local args fss deffs=iso9660 descr tmp typeopt=-t _nfs_access _nfs_ufs
+local args fss deffs=iso9660 descr tmp typeops=-t _nfs_access _nfs_ufs
 
 typeset -A opt_args
 
@@ -72,6 +72,102 @@ if (( ! $+_fs_any )); then
   )
 
   case "$OSTYPE" in
+  aix*)
+    _fs_any=(
+      'bsy[prevent mount over cwd of process]'
+      'log[logical volume to log operations]:logical volume name'
+      'nodev[cannot open devices from mount]'
+      'nosuid[prevent running setuid/setgid from mount]'
+      "$_fs_any[@]"
+    )
+    
+    _fs_nfs=(
+      '(fg)bg[mount in background]'
+      '(bg)fg[mount in foreground]'
+      'vers[NFS version]:NFS version:(2 3)'
+      'proto[specify transport protocol]'
+      'retry[number of retries]:no. of retries'
+      'rsize[read buffer size]:read buffer size'
+      'wsize[write buffer size]:write buffer size'
+      'llock[local locking]'
+      'timeo[time-out period]:time-out period'
+      'retrans[NFS transmissions]:no. of NFS transmissions'
+      'port[IP port no]:IP port no'
+      '(hard)soft[error on no server response]'
+      '(soft)hard[retry pending server response]'
+      '(nointr)intr[allow keyboard interrupts on hard mount]'
+      '(intr)nointr[disallow keyboard interrupts on hard mount]'
+      'posix[exchange pathconf info on NFS version 2 mount]'
+      'secure[use DES encryption]'
+      'grpid[inherit group id of parent directory]'
+      '(acl)noacl[don'"'"'t use access control lists]'
+      '(noacl)acl[Use acces control lists for this mount]'
+      'noac[no attribute or directory caching]'
+      'shortdev[server lack support for 32-bit device special files]'
+      "$_nfs_access[@]"
+    )
+    ;;
+  irix*)
+    _fs_any=(
+      'nodev[cannot open devices from mount]'
+      'nosuid[prevent running setuid/setgid from mount]'
+      'grpid[inherit group id of parent directory]'
+      "$_fs_any[@]"
+    )
+    
+    _fs_efs=(
+      'raw[raw device pathname to filesystem]:raw device pathname:->devordir'
+      '(nofsck)fsck[fsck should check this filesystem by default]'
+      '(fsck)nofsck[fsck should not check this filesystem by default]'
+      '(noquota)quota[turn on quotas]'
+      '(quota)noquota[turn off quotas]'
+      'lbsize[no of bytes transferred in each operation]:bytes'
+    )
+    
+    _fs_iso9660=(
+      'setx[set execute permissions on every file]'
+      'notranslate[don'\''t translate filenames]'
+      'cache[no of 2048 blocks for directory cache]:cache size'
+      'noext[ignore rock ridge extensions]'
+      '(nosusp)susp[enable system use sharing protocol]'
+      '(susp)nosusp[disable system use sharing protocol]'
+      '(norrip)rrip[enable rock ridge extensions]'
+      '(rrip)norrip[disable rock ridge extensions]'
+      'nmconv[specify filename translation]:filename translation:(c l m)'
+    )
+      
+    _fs_nfs=(
+      '(fg)bg[mount in background]'
+      '(bg)fg[mount in foreground]'
+      'retry[number of retries]:no. of retries'
+      'rsize[read buffer size]:read buffer size'
+      'wsize[write buffer size]:write buffer size'
+      'timeo[time-out period]:time-out period'
+      'retrans[NFS transmissions]:no. of NFS transmissions'
+      'port[IP port no]:IP port no'
+      '(hard)soft[error on no server response]'
+      '(soft)hard[retry pending server response]'
+      'intr[allow keyboard interrupts on hard mount]'
+      'noac[no attribute caching]'
+      'private[use local locking and do not flush on last close]'
+      'symttl[time-to-live of cached symbolic links]:seconds'
+      "$_nfs_access[@]"
+    )
+    
+    _fs_cachefs=(
+      'backfstype[type of the back file system]:back file system type:(efs nfs iso9660 dos hfs cachefs)'
+      'backpath[specify back file system location]:back file system location:_files -/'
+      'cachedir[name of the cache directory]:name of cache directory:_files -/'
+      'cacheid[cache ID]:cache ID'
+      '(write-around)non-shared[cache not shared]'
+      '(non-shared)write-around[cache shared]'
+      'noconst[disable consistency checking]'
+      'local-access[check permissions locally]'
+      'purge[purge any cached information]'
+      "$_nfs_access[@]"
+    ) 
+    
+    ;;  
   solaris*)
     _fs_s5fs=(
       'remount[remount file system]'
@@ -135,17 +231,17 @@ if (( ! $+_fs_any )); then
       "$_fs_s5fs[@]"
     ) 
     _fs_cachefs=(
-      "$_nfs_access[@]"
       'backfstype[type of the back file system]:back file system type:(nfs hsfs)'
       'backpath[specify back file system location]:back file system location:_files -/'
       'cacheid[specify a cache ID]:cache ID:'
       'local-access[check permissions locally]'
-      'noconst[disables cache consistency checking]'
-      'purge[purge any cached informations]'
-      '(suid)nosuid[ignore suid and sgid bits]'
-      '(nosuid)suid[use suid and sgib bits]'
+      'noconst[disable cache consistency checking]'
+      'purge[purge any cached information]'
+      '(suid)nosuid[ignore setuid and setgid bits]'
+      '(nosuid)suid[use setuid and setgid bits]'
       '(write-around)non-shared[purge cache on writes]'
       '(non-shared)write-around[keep file in cache on writes]'
+      "$_nfs_access[@]"
     )
     ;;
   osf*)
@@ -283,6 +379,41 @@ if [[ "$words[1]" = mount ]]; then
   # option for file system type selection when it is not '-t'.
 
   case "$OSTYPE" in
+  aix*)
+    args=( -s
+      '-a[mount all filesystems in /etc/fstab]'
+      '-f[forced mount]'
+      '-n[remote node]:remote node:_hosts'
+      '-p[mount as removable file system]'
+      '-r[mount read-only]'
+      '-t[specify file system type]:file system type:->fstype'
+      '-o[specify file system options]:file system option:->fsopt'
+      '-v[filesystem defined by /etc/vfs]:VfsName'
+      ':dev or dir:->devordir'
+      ':mount point:_files -/'
+    )
+    fss=( jfs nfs cdrfs )
+    deffs=jfs
+    ;;
+  irix*)
+    args=( -s
+      '-a[mount all filesystems in /etc/fstab]'
+      '-b[mount all filesystems in /etc/fstab except those listed]:list of directories:_files -/ -S,'
+      '-c[check any dirty filesystems before mounting]'
+      '-f[fake a new /etc/mtab entry, but don'\''t mount any filesystems]'
+      '-h[mount all filesystems associated with host]:hostnames:_hosts'
+      '-n[mount filesystem without making entry in /etc/mtab]'
+      '-o[specify file system options]:file system option:->fsopt'
+      '-p[print list of mounted filesystems in format suitable for /etc/fstab]'
+      '-r[mount read-only]'
+      '-t[specify file system type]:file system type:->fstype'
+      '-v[verbose]'
+      '-M[use alternate mtab]:alternate mtab:_files'
+      '-P[with -p, prepend prefix to paths]:prefix'
+    )
+    fss=( efs proc fd nfs iso9660 dos hfs cachefs )
+    deffs=efs
+    ;;
   linux*)
     args=( -s
       '-h[show help]'
@@ -303,6 +434,8 @@ if [[ "$words[1]" = mount ]]; then
     fss=( minix ext ext2 xiafs hpfs msdos umsdos vfat proc nfs iso9660
           smbfs ncpfs affs ufs romfs sysv adfs autofs coda devpts efs
           hfs ntfs qnx4 smbfs udf )
+    [[ -r /proc/filesystems ]] &&
+        fss=( ${$(</proc/filesystems)#nodev} )
     ;;
   osf*)
     args=( -s
@@ -364,15 +497,42 @@ else
 
   # Completion for umount.
 
-  _arguments -C -s \
-    '-h[show help]' \
-    '-V[show version]' \
-    '-v[verbose mode]' \
-    '-n[don'"'"'t write /etc/mtab]' \
-    '-r[remount read-only on failure]' \
-    '-a[unmount all file systems from /etc/mtab]' \
-    '-t[specify file system type]:file system type:->fstype' \
-    '*:dev or dir:->udevordir' && ret=0
+  case "$OSTYPE" in
+    aix*)
+      args=(
+	'-a[unmount all mounted file systems]'
+	'-f[force unmount]'
+	'-n[remote node]:remote node:_hosts'
+	'-t[specify file system type]:file system type:->fstype'
+	'*:dev or dir:->udevordir'
+      )
+    ;;
+    irix*)
+      args=(
+	'-a[unmount all mounted file systems]'
+	'-b[unmount all filesystems in /etc/fstab except those listed]:list of directories:_files -/ -S,'
+	'-h[unmount all filesystems associated with host]:hostnames:_hosts'
+	'-k[kill all processes with files open on filesystems before unmounting]'
+	'-t[unmount all filesystems of specified type]:file system type:->fstype'
+	'-v[verbose]'
+      )
+    ;;  
+    *)
+      args=( \
+	'-h[show help]'
+	'-V[show version]'
+	'-v[verbose mode]'
+	'-n[don'"'"'t write /etc/mtab]'
+	'-r[remount read-only on failure]'
+	'-a[unmount all file systems from /etc/mtab]'
+	'-t[specify file system type]:file system type:->fstype'
+	'*:dev or dir:->udevordir'
+      )
+    ;;
+  esac
+
+  _arguments -C -s "$args[@]" && ret=0
+
 fi
 
 case "$state" in
