@@ -509,7 +509,6 @@ callmathfunc(char *o)
 		    addlinknode(l, q);
 		    if (errflag || mtok != COMMA)
 			break;
-		    a++;
 		}
 	    }
 	    if (*a && !errflag)
