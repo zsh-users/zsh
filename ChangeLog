@@ -1,5 +1,8 @@
 2001-03-18  Clint Adams  <schizo@debian.org>
 
+	* 13662: Completion/Debian/_apt: new build-dep command
+	in apt-get.
+
 	* 13661: Completion/SysV/.distfiles,
 	Completion/SysV/_sysv_initscripts: complete arguments
 	for SysV initscripts.

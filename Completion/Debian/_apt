@@ -379,8 +379,9 @@ _apt-get () {
     /$'autoclean\0'/ \| \
     /$'check\0'/ \| \
     /$'source\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'build-dep\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'help\0/' \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source help'
+    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source build-dep help'
 
   _apt-get () {
     local expl_action expl_packages
