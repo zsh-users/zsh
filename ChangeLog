@@ -15,7 +15,7 @@
 	zlegetline caller so that the octet-based and wide-character
 	versions should return the same string.
 
-2005-01-21  Bart Schaefer  <schaefer@brasslantern.com>
+2005-01-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. zsh-users/8409): Functions/Zle/keeper: "keeper"
 	suite from unixreview.com article.
@@ -131,7 +131,7 @@
 
 	* 20687: NEWS: news for 4.2.2.
 
-2005-01-11  Bart Schaefer  <schaefer@brasslantern.com>
+2005-01-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 20666 (tweaked): Src/exec.c: In closemn(), discard the multio
 	structure when it has only one descriptor so far, to avoid
