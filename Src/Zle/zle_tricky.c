@@ -3963,7 +3963,7 @@ addmatches(Cadata dat, char **argv)
     char **aign = NULL, **dparr = NULL, oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL;
     int lpl, lsl, pl, sl, bpl, bsl, bppl = -1, bssl = -1;
-    int llpl = 0, llsl = 0, nm = mnum;
+    int llpl = 0, llsl = 0, nm = mnum, gflags;
     int oisalt = 0, isalt, isexact, doadd, ois = instring, oib = inbackt;
     Cline lc = NULL;
     Cmatch cm;
@@ -4145,20 +4145,19 @@ addmatches(Cadata dat, char **argv)
 		} else
 		    dat->prpre = dupstring(dat->prpre);
 		/* Select the group in which to store the matches. */
+		gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
+			  ((dat->aflags & CAF_UNIQALL) ? CGF_UNIQALL : 0) |
+			  ((dat->aflags & CAF_UNIQCON) ? CGF_UNIQCON : 0));
 		if (dat->group) {
 		    endcmgroup(NULL);
-		    begcmgroup(dat->group, (dat->aflags & CAF_NOSORT));
-		    if (dat->aflags & CAF_NOSORT)
-			mgroup->flags |= CGF_NOSORT;
+		    begcmgroup(dat->group, gflags);
 		} else {
 		    endcmgroup(NULL);
 		    begcmgroup("default", 0);
 		}
 		if (dat->ylist) {
 		    endcmgroup(NULL);
-		    begcmgroup(NULL, (dat->aflags & CAF_NOSORT));
-		    if (dat->aflags & CAF_NOSORT)
-			mgroup->flags |= CGF_NOSORT;
+		    begcmgroup(NULL, gflags);
 		}
 		/* Select the set of matches. */
 		oisalt = (dat->aflags & CAF_ALT);
@@ -4247,7 +4246,7 @@ addmatches(Cadata dat, char **argv)
 	    if (dat->ylist) {
 		if (dat->group) {
 		    endcmgroup(get_user_var(dat->ylist));
-		    begcmgroup(dat->group, (dat->aflags & CAF_NOSORT));
+		    begcmgroup(dat->group, gflags);
 		    if (dat->exp)
 			addexpl();
 		} else {
@@ -6164,7 +6163,7 @@ findnode(LinkList list, void *dat)
 static void
 makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 {
-    int t, sf1, sf2, ooffs, um = usemenu, delit, oaw;
+    int t, sf1, sf2, ooffs, um = usemenu, delit, oaw, gflags;
     char *p, *sd = NULL, *tt, *s1, *s2, *os =  dupstring(s);
     struct cmlist ms;
 
@@ -6199,18 +6198,19 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     curcc = cc;
 
     mflags = 0;
+    gflags = (((cc->mask2 & CC_NOSORT ) ? CGF_NOSORT  : 0) |
+	      ((cc->mask2 & CC_UNIQALL) ? CGF_UNIQALL : 0) |
+	      ((cc->mask2 & CC_UNIQCON) ? CGF_UNIQCON : 0));
     if (cc->gname) {
 	endcmgroup(NULL);
-	begcmgroup(cc->gname, cc->mask2 & CC_NOSORT);
+	begcmgroup(cc->gname, gflags);
     }
     if (cc->ylist) {
 	endcmgroup(NULL);
-	begcmgroup(NULL, cc->mask2 & CC_NOSORT);
+	begcmgroup(NULL, gflags);
     }
     if (cc->mask & CC_REMOVE)
 	mflags |= CMF_REMOVE;
-    if (cc->mask2 & CC_NOSORT)
-	mgroup->flags |= CGF_NOSORT;
     if (cc->explain) {
 	expl = (Cexpl) zhalloc(sizeof(struct cexpl));
 	expl->count = expl->fcount = 0;
@@ -7006,7 +7006,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    expl->str = tt;
 	    if (cc->gname) {
 		endcmgroup(yaptr);
-		begcmgroup(cc->gname, cc->mask2 & CC_NOSORT);
+		begcmgroup(cc->gname, gflags);
 		addexpl();
 	    } else {
 		addexpl();
@@ -7227,7 +7227,7 @@ matcheq(Cmatch a, Cmatch b)
 
 /**/
 static Cmatch *
-makearray(LinkList l, int s, int u, int *np, int *nlp, int *llp)
+makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 {
     Cmatch *ap, *bp, *cp, *rp;
     LinkNode nod;
@@ -7242,57 +7242,75 @@ makearray(LinkList l, int s, int u, int *np, int *nlp, int *llp)
 	*ap++ = (Cmatch) getdata(nod);
     *ap = NULL;
 
-    if (s == 1) {
-	char **ap, **bp, **cp;
+    if (!type) {
+	if (flags) {
+	    char **ap, **bp, **cp;
 
-	/* Now sort the array (it contains strings). */
-	qsort((void *) rp, n, sizeof(char *),
-	      (int (*) _((const void *, const void *)))strbpcmp);
+	    /* Now sort the array (it contains strings). */
+	    qsort((void *) rp, n, sizeof(char *),
+		  (int (*) _((const void *, const void *)))strbpcmp);
 
-	/* And delete the ones that occur more than once. */
-	for (ap = cp = (char **) rp; *ap; ap++) {
-	    *cp++ = *ap;
-	    for (bp = ap; bp[1] && !strcmp(*ap, bp[1]); bp++, n--);
-	    ap = bp;
-	}
-	*cp = NULL;
-    } else if (s) {
-	/* Now sort the array (it contains matches). */
-	qsort((void *) rp, n, sizeof(Cmatch),
-	      (int (*) _((const void *, const void *)))matchcmp);
-
-	/* And delete the ones that occur more than once. */
-	for (ap = cp = rp; *ap; ap++) {
-	    *cp++ = *ap;
-	    for (bp = ap; bp[1] && matcheq(*ap, bp[1]); bp++, n--);
-	    ap = bp;
-	    /* Mark those, that would show the same string in the list. */
-	    for (; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
-		     !strcmp((*ap)->str, (bp[1])->str); bp++)
-		(bp[1])->flags |= CMF_NOLIST;
-	}
-	for (ap = rp; *ap; ap++) {
-	    if ((*ap)->disp && ((*ap)->flags & CMF_DISPLINE))
-		ll++;
-	    if ((*ap)->flags & CMF_NOLIST)
-		nl++;
-	}
-	*cp = NULL;
-    } else if (u) {
-	for (ap = rp; *ap; ap++) {
-	    for (bp = cp = ap + 1; *bp; bp++) {
-		if (!matcheq(*ap, *bp))
-		    *cp++ = *bp;
-		else
-		    n--;
+	    /* And delete the ones that occur more than once. */
+	    for (ap = cp = (char **) rp; *ap; ap++) {
+		*cp++ = *ap;
+		for (bp = ap; bp[1] && !strcmp(*ap, bp[1]); bp++, n--);
+		ap = bp;
 	    }
 	    *cp = NULL;
 	}
-	for (ap = rp; *ap; ap++) {
-	    if ((*ap)->disp && ((*ap)->flags & CMF_DISPLINE))
-		ll++;
-	    if ((*ap)->flags & CMF_NOLIST)
-		nl++;
+    } else {
+	if (!(flags & CGF_NOSORT)) {
+	    /* Now sort the array (it contains matches). */
+	    qsort((void *) rp, n, sizeof(Cmatch),
+		  (int (*) _((const void *, const void *)))matchcmp);
+
+	    if (!(flags & (CGF_UNIQALL | CGF_UNIQCON))) {
+		/* And delete the ones that occur more than once. */
+		for (ap = cp = rp; *ap; ap++) {
+		    *cp++ = *ap;
+		    for (bp = ap; bp[1] && matcheq(*ap, bp[1]); bp++, n--);
+		    ap = bp;
+		    /* Mark those, that would show the same string in the list. */
+		    for (; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
+			     !strcmp((*ap)->str, (bp[1])->str); bp++)
+			(bp[1])->flags |= CMF_NOLIST;
+		}
+		*cp = NULL;
+	    }
+	    for (ap = rp; *ap; ap++) {
+		if ((*ap)->disp && ((*ap)->flags & CMF_DISPLINE))
+		    ll++;
+		if ((*ap)->flags & CMF_NOLIST)
+		    nl++;
+	    }
+	} else {
+	    if (!(flags & CGF_UNIQALL) && !(flags & CGF_UNIQCON)) {
+		for (ap = rp; *ap; ap++) {
+		    for (bp = cp = ap + 1; *bp; bp++) {
+			if (!matcheq(*ap, *bp))
+			    *cp++ = *bp;
+			else
+			    n--;
+		    }
+		    *cp = NULL;
+		}
+	    } else if (!(flags & CGF_UNIQCON)) {
+		for (ap = cp = rp; *ap; ap++) {
+		    *cp++ = *ap;
+		    for (bp = ap; bp[1] && matcheq(*ap, bp[1]); bp++, n--);
+		    ap = bp;
+		    for (; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
+			     !strcmp((*ap)->str, (bp[1])->str); bp++)
+			(bp[1])->flags |= CMF_NOLIST;
+		}
+		*cp = NULL;
+	    }
+	    for (ap = rp; *ap; ap++) {
+		if ((*ap)->disp && ((*ap)->flags & CMF_DISPLINE))
+		    ll++;
+		if ((*ap)->flags & CMF_NOLIST)
+		    nl++;
+	    }
 	}
     }
     if (np)
@@ -7308,13 +7326,14 @@ makearray(LinkList l, int s, int u, int *np, int *nlp, int *llp)
 
 /**/
 static void
-begcmgroup(char *n, int nu)
+begcmgroup(char *n, int flags)
 {
     if (n) {
 	Cmgroup p = amatches;
 
 	while (p) {
-	    if (p->name && ((nu && !p->lallccs) || (!nu && p->lallccs)) &&
+	    if (p->name &&
+		flags == (p->flags & (CGF_NOSORT|CGF_UNIQALL|CGF_UNIQCON)) &&
 		!strcmp(n, p->name)) {
 		mgroup = p;
 
@@ -7330,7 +7349,8 @@ begcmgroup(char *n, int nu)
     }
     mgroup = (Cmgroup) zhalloc(sizeof(struct cmgroup));
     mgroup->name = dupstring(n);
-    mgroup->flags = mgroup->lcount = mgroup->llcount = mgroup->mcount = 0;
+    mgroup->lcount = mgroup->llcount = mgroup->mcount = 0;
+    mgroup->flags = flags;
     mgroup->matches = NULL;
     mgroup->ylist = NULL;
     mgroup->expls = NULL;
@@ -7339,7 +7359,7 @@ begcmgroup(char *n, int nu)
     mgroup->lmatches = matches = newlinklist();
     mgroup->lfmatches = fmatches = newlinklist();
 
-    mgroup->lallccs = allccs = (nu ? NULL : newlinklist());
+    mgroup->lallccs = allccs = ((flags & CGF_NOSORT) ? NULL : newlinklist());
 
     mgroup->next = amatches;
     amatches = mgroup;
@@ -7435,9 +7455,7 @@ permmatches(void)
 		/* We have no matches, try ignoring fignore. */
 		g->lmatches = g->lfmatches;
 
-	    g->matches = makearray(g->lmatches,
-				   ((g->flags & CGF_NOSORT) ? 0 : 2), 1,
-				   &nn, &nl, &ll);
+	    g->matches = makearray(g->lmatches, 1, g->flags, &nn, &nl, &ll);
 	    g->mcount = nn;
 	    if ((g->lcount = nn - nl) < 0)
 		g->lcount = 0;
@@ -9172,7 +9190,7 @@ listlist(LinkList l)
     smatches = 1;
     validlist = 1;
     memset(&dg, 0, sizeof(struct cmgroup));
-    dg.ylist = (char **) makearray(l, 1, 0, &(dg.lcount), NULL, NULL);
+    dg.ylist = (char **) makearray(l, 0, 1, &(dg.lcount), NULL, NULL);
     amatches = &dg;
     ilistmatches(NULL, NULL);
     amatches = am;

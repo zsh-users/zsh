@@ -2,8 +2,8 @@
 
 local gropt=-J
 
-if [[ "$1" = -V ]]; then
-  gropt=-V
+if [[ "$1" = -[VJ]* ]]; then
+  gropt="$1"
   shift
 fi
 

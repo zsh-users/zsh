@@ -161,6 +161,8 @@ struct compctl {
 #define CC_CCCONT	(1<<2)
 #define CC_PATCONT	(1<<3)
 #define CC_DEFCONT	(1<<4)
+#define CC_UNIQCON      (1<<5)
+#define CC_UNIQALL      (1<<6)
 
 typedef struct cexpl *Cexpl;
 typedef struct cmgroup *Cmgroup;
@@ -206,9 +208,11 @@ struct cmgroup {
 };
 
 
-#define CGF_NOSORT  1		/* don't sort this group */
-#define CGF_LINES   2		/* these are to be printed on different lines */
-#define CGF_HASDL   4		/* has disply strings printed on sseparate lines */
+#define CGF_NOSORT   1		/* don't sort this group */
+#define CGF_LINES    2		/* these are to be printed on different lines */
+#define CGF_HASDL    4		/* has display strings printed on separate lines */
+#define CGF_UNIQALL  8		/* remove all duplicates */
+#define CGF_UNIQCON 16		/* remove consecutive duplicates */
 
 /* This is the struct used to hold matches. */
 
@@ -301,6 +305,8 @@ struct menuinfo {
 #define CAF_NOSORT   2
 #define CAF_ALT      4
 #define CAF_MATCH    8
+#define CAF_UNIQCON 16
+#define CAF_UNIQALL 32
 
 /* Data for compadd and addmatches() */
 

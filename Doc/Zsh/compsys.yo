@@ -566,8 +566,10 @@ above the matches added. These options also will make sure that the
 matches are placed in a separate group (the second argument is used as 
 the name of the group) if the configuration key tt(group_matches) is
 set to a non-empty string. Normally a sorted group will be used for this
-(with the `tt(-J)' option), but if the option `tt(-V)' is given, a
-unsorted group will be used instead.
+(with the `tt(-J)' option), but if a option starting with `tt(-V)' or
+`tt(-J)' is given, that option will be included in the array, so that
+it is possible to make the group unsorted by given the option
+`tt(-V)', `tt(-V1)', or `tt(-V2)'.
 
 In most cases, this function will be used like this:
 

@@ -750,6 +750,14 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		cct.mask2 |= CC_NOSORT;
 		break;
+	    case '1':
+		cct.mask2 |= CC_UNIQALL;
+		cct.mask2 &= ~CC_UNIQCON;
+		break;
+	    case '2':
+		cct.mask2 |= CC_UNIQCON;
+		cct.mask2 &= ~CC_UNIQALL;
+		break;
 	    case 'M':
 		if (cclist & COMP_LIST) {
 		    cclist |= COMP_LISTMATCH;
@@ -1439,7 +1447,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
     }
 
     /* loop through flags w/o args that are set, printing them if so */
-    if (flags & t) {
+    if ((flags & t) || (flags2 & (CC_UNIQALL | CC_UNIQCON))) {
 	printf(" -");
 	if ((flags & (CC_ALREG | CC_ALGLOB)) == (CC_ALREG | CC_ALGLOB))
 	    putchar('a'), flags &= ~(CC_ALREG | CC_ALGLOB);
@@ -1450,6 +1458,10 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 	    flags >>= 1;
 	    t >>= 1;
 	}
+	if (flags2 & CC_UNIQALL)
+	    putchar('1');
+	else if (flags2 & CC_UNIQCON)
+	    putchar('2');
     }
     if (flags2 & (CC_XORCONT | CC_PATCONT | CC_DEFCONT)) {
 	printf(" -t");
@@ -1787,6 +1799,14 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		    dat.aflags |= CAF_NOSORT;
 		sp = &(dat.group);
 		e = "group name expected after -%c";
+		break;
+	    case '1':
+		if (!(dat.aflags & CAF_UNIQCON))
+		    dat.aflags |= CAF_UNIQALL;
+		break;
+	    case '2':
+		if (!(dat.aflags & CAF_UNIQALL))
+		    dat.aflags |= CAF_UNIQCON;
 		break;
 	    case 'y':
 		sp = &(dat.ylist);
