@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+
+use IO::File;
+
+my @differ = qw(diff -bw);
+my $oldtmp = "/tmp/difflog$$.old";
+my $newtmp = "/tmp/difflog$$.new";
+
+my $newfn = pop(@ARGV);
+my $oldfn = pop(@ARGV);
+my (%oldhash, %newhash);
+
+read_file($newfn, \%newhash);
+read_file($oldfn, \%oldhash);
+
+my @oldentries = reverse sort keys %oldhash;
+my @newentries = reverse sort keys %newhash;
+
+my $old = 0;
+my $new = 0;
+
+while ($old < @oldentries && $new < @newentries)
+{
+  my $cmp = $oldentries[$old] cmp $newentries[$new];
+  if ($cmp > 0)
+  {
+    printf("only in %s: %s\n\n", $oldfn, $oldentries[$old++]);
+  }
+  elsif ($cmp < 0)
+  {
+    printf("only in %s: %s\n\n", $newfn, $newentries[$new++]);
+  }
+  else
+  {
+    if ($oldhash{$oldentries[$old]} ne $newhash{$newentries[$new]}) {
+      my $oldfh = new IO::File("/tmp/difflog$$.old", 'w');
+      $oldfh->print($oldhash{$oldentries[$old]});
+      $oldfh->close();
+      my $newfh = new IO::File("/tmp/difflog$$.new", 'w');
+      $newfh->print($newhash{$newentries[$new]});
+      $newfh->close();
+      open(DIFF, join(' ', @differ, @ARGV, $oldtmp, $newtmp, '|'));
+      my @lines = <DIFF>;
+      close(DIFF);
+      unlink </tmp/difflog$$.*>;
+      if (@lines)
+      {
+	print "diff for ", $oldentries[$old], ":\n";
+	map {
+	  s/$oldtmp/$oldfn/;
+	  s/$newtmp/$newfn/;
+	} @lines;
+	print @lines, "\n";
+      }
+    }
+    ++$old;
+    ++$new;
+  }
+}
+
+while ($old < @oldentries)    
+{
+  printf("only in %s: %s\n", $oldfn, $oldentries[$old++]);
+}
+
+while ($new < @newentries)
+{
+  printf("only in %s: %s\n", $newfn, $newentries[$new++]);
+}
+
+sub read_file
+{
+  my $fn = shift;
+  my $hashref = shift;
+  my $fh = new IO::File($fn, 'r');
+  my ($tag, $date, $entry, $block);
+
+  my $attrib = q[(:?(:?workers?|users?)/)?\d+];
+  $attrib = q[(?:\w+\s+)*] . $attrib;
+  $attrib = q[(?:[^/]*\D:\s*)?] . $attrib;
+  $attrib = qq[(?:unposted|$attrib)];
+  $attrib = qq[(?:(?:$attrib,\\s*)*$attrib)];
+
+  $hashref->{unattributed} = $block = '';
+
+  while (my $line = $fh->getline())
+  {
+    if ($line =~ /(\d{4}-\d\d-\d\d)\s+.+\s+<.+\@.+>/i) {
+      $date = $1;
+      $block =~ s/\n*\Z/\n/;
+      if ($entry) {
+	$hashref->{$entry} .= "$tag\n$block";
+      } elsif ($tag) {
+	$hashref->{unattributed} .= "\n$tag$block";
+      }
+      $entry = $block = '';
+      $tag = $line;
+    } elsif ($line =~ /\* ((?:$attrib)[^:]*):/) {
+      my $next = $1;
+      if ($entry) {
+	$block =~ s/\n*\Z/\n/;
+	$hashref->{$entry} .= "$tag\n$block";
+      }
+      if (exists($hashref->{$next})) {
+	$hashref->{$next} .= "\n";
+      } else {
+	$hashref->{$next} = '';
+      }
+      $entry = $next;
+      $block = $line;
+    } else {
+      $block .= $line;
+    }
+  }
+  $fh->close();
+}
