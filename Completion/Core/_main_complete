@@ -20,7 +20,8 @@ setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 local comp post ret=1 _compskip format _comp_ignore \
-      _completers _completers_left _comp_matcher \
+      _completers _completer _completer_num \
+      _matchers _matcher _matcher_num \
       context state line opt_args val_args curcontext="$curcontext" \
       _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
       _saved_exact="${compstate[exact]}" \
@@ -62,14 +63,22 @@ _last_menu_style=()
 # And now just call the completer functions defined.
 
 _completers=( "$@" )
-_completers_left=( "$@" )
+_completer_num=1
 
-for comp; do
-  if "$comp"; then
-    ret=0
-    break;
-  fi
-  shift 1 _completers_left
+for _completer; do
+  _matcher="${_completer[2,-1]}-${(M)#_completers[1,_completer_num]:#$_completer}"
+  zstyle -a ":completion:${curcontext/::/:${_matcher}:}:" matcher-list _matchers ||
+      _matchers=( '' )
+
+  _matcher_num=1
+  for _matcher in "$_matchers[@]"; do
+    if "$_completer"; then
+      ret=0
+      break 2
+    fi
+    (( _matcher_num++ ))
+  done
+  (( _completer_num++ ))
 done
 
 if [[ $compstate[nmatches] -gt 1 ]]; then

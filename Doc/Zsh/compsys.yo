@@ -1089,11 +1089,50 @@ matches as described in
 ifzman(the section `Matching Control' in zmanref(zshcompwid))\
 ifnzman(noderef(Matching Control))\
 .
+)
+item(tt(matcher-list))(
+This style is used by the main completion function to retrieve match
+specifications that are to be used everywhere. Its value should be a
+list of such specifications. The completion system will try them one
+after another for each completer selected. For example, to first try
+simple completion and, if that generates no matches, case-insensitive
+completion one would do:
 
-This style is also used by the tt(_matcher) completer, see
-ifzman(the section `Control Functions' below)\
-ifnzman(noderef(Control Functions)) 
-for more information.
+example(zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}')
+
+But the style allows even finer control: the style is looked up for
+every completer tried with the name of the completer (without the
+leading underscore) in the context name. For example, if one uses the
+completers tt(_complete) and tt(_prefix) and wants to try
+case-insensitive completion only when using the tt(_complete)
+completer, one would do:
+
+example(zstyle ':completion:*' completer _complete _prefix
+zstyle ':completion:*:complete*:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}')
+
+Note that there is no colon directly after the `tt(complete)'. That's
+because the completion system really uses the name of the completer
+followed by a minus sign and a number in the var(completer) field of
+the context name. This is useful if, for example, one wants to try
+normal completion without a match specification and with
+case-insensitive matching first, correction if that doesn't generate
+any matches and partial-word completion if that doesn't yield any
+matches either. In such a case one can give the tt(_complete)
+completer more than once in the tt(completer) style and give different
+match specification to them, as in:
+
+example(zstyle ':completion:*' completer _complete _correct _complete
+zstyle ':completion:*:complete-1:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*:complete-2:*' matcher-list \
+    'm:{a-zA-Z}={A-Za-z} r:|[-_./]=* r:|=*')
+
+Note that in any case an unset style makes the completion code use no
+global match specification. Also, some completers (like tt(_correct)
+and tt(_approximate)) do not use the match specifications. But even if 
+such completers are used one can use the simple form to set this style 
+(as in the first example above) because such completers will make sure 
+that they are executed only once even if multiple match specifications 
+have been given.
 )
 item(tt(max-errors))(
 This is used by the tt(_approximate) and tt(_correct) completer functions
@@ -1608,42 +1647,6 @@ could be generated that is at least as long as the original string.
 
 Note that the matcher specifications defined globally or used by the
 completion functions will not be used.
-)
-findex(_matcher)
-item(tt(_matcher))(
-This completer allows to define a match specification (see
-ifzman(the section `Matching Control' in zmanref(zshcompwid))\
-ifnzman(noderef(Matching Control))\
-) that is to be used by all following completers. This is comparable
-to the global match specifications that can be defined for the
-tt(compctl) builtin, but gives much better control. The match
-specification to use is looked up using the tt(matcher) style. For
-this, the completer field of the context name will contain the string
-`tt(matcher-)var(n)', where `var(n)' is the number of the call to
-tt(_matcher). For example:
-
-example(zstyle ':completion:::::' completer _matcher _complete _matcher _complete
-zstyle ':completion:*:matcher-1:::' matcher 'm:{a-z-}={A-Z_}'
-zstyle ':completion:*:matcher-2:::' matcher 'm:{a-z-}={A-Z_}' 'r:|[-_./]=* r:|=*')
-
-Since tt(_matcher) is called as the first completer, the tt(_complete) 
-completer called after it will first use the match specification
-`tt(m:{a-z-}={A-Z_})'. If that doesn't generate any matches, the next
-call to tt(_matcher) will make the second call to tt(_complete) use
-the specification `tt(r:|[-_./]=* r:|=*)' in addition to the one
-already used by the first attempt (but note that the specification has 
-to be given again).
-
-If the tt(matcher) style is not set for one of the invocations of
-tt(_matcher), this has the same effect as setting it to the empty
-string: it makes the following completion function not use any match
-specifications besides those used by the functions themselves.
-
-Note that currently only the tt(_complete) completer and the
-tt(_prefix) completer (if it has its own tt(completer) style
-containing tt(_complete)) use the match specifications, so one doesn't 
-need to repeat all completers one wants to use after each call to
-tt(_matcher) in the completer list.
 )
 findex(_expand)
 item(tt(_expand))(

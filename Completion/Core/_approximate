@@ -5,12 +5,13 @@
 # shown in a list and one can cycle through them as in a menucompletion
 # or get the corrected prefix.
 
+# We don't try correction if the string is too short or we have tried it
+# already.
+
+[[ _matcher_num -gt 1 || "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
+
 local _comp_correct _correct_expl comax cfgacc
 local curcontext="${curcontext}" oldcontext opm="$compstate[pattern_match]"
-
-# We don't try correction if the string is too short.
-
-[[ "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
 
 [[ "$curcontext" != [^:]#:correct:* ]] &&
     curcontext="${curcontext/:[^:]#:/:approximate:}"

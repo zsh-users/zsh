@@ -7,6 +7,8 @@
 # the expansions done produce no result or do not change the original
 # word from the line.
 
+[[ _matcher_num -gt 1 ]] && return 1
+
 local exp word="$PREFIX$SUFFIX" sort expr expl subd suf=" "
 local curcontext="${curcontext/:[^:]#:/:expand:}"
 

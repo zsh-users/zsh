@@ -1,5 +1,7 @@
 #autoload
 
+[[ _matcher_num -gt 1 ]] && return 1
+
 local curcontext="${curcontext/:[^:]#:/:oldlist:}" list
 
 zstyle -s ":completion:${curcontext}:" list list

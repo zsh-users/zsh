@@ -4,10 +4,10 @@
 
 [[ -n "$SUFFIX" ]] || return 1
 
-local curcontext="${curcontext/:[^:]#:/:prefix-${(M)#${(@)_completers[1,-$#_completers_left]}:#_prefix}:}" comp i
+local curcontext="${curcontext/:[^:]#:/:prefix-${(M)#_completers[1,_completer_num]:#_prefix}:}" comp i
 
 zstyle -a ":completion:${curcontext}:" completer comp ||
-  comp=( "${(@)_completers[1,-${#_completers_left}-1][(R)_prefix,-1]}" )
+  comp=( "${(@)_completers[1,_completer_num][(R)_prefix,-1]}" )
 
 if zstyle -t ":completion:${curcontext}:" add-space; then
   ISUFFIX=" $SUFFIX"
@@ -16,14 +16,8 @@ else
 fi
 SUFFIX=''
 
-local _completers _completer_left
-
-_completers=( "$comp[@]" )
-_completers_left=( "$comp[@]" )
-
 for i in "$comp[@]"; do
   [[ "$i" != _prefix ]] && "$i" && return 0
-  shift 1 _completers_left
 done
 
 return 1

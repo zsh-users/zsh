@@ -4,6 +4,8 @@
 # insert possible completions only after the list has been shown at
 # least once.
 
+[[ _matcher_num -gt 1 ]] && return 1
+
 local pre suf expr curcontext="${curcontext/:[^:]#:/:list:}"
 
 # Get the strings to compare.

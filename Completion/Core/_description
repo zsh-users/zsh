@@ -27,7 +27,7 @@ zstyle -s ":completion:${curcontext}:$1" group-name gname &&
     [[ -z "$gname" ]] && gname="$1"
 zstyle -s ":completion:${curcontext}:$1" matcher match &&
     opts=($opts -M "${(q)match}")
-[[ -n "$_comp_matcher" ]] && opts=($opts -M "${(q)_comp_matcher}")
+[[ -n "$_matcher" ]] && opts=($opts -M "${(q)_matcher}")
 
 if zstyle -a ":completion:${curcontext}:$1" ignored-patterns _comp_ignore; then
   opts=( $opts -F _comp_ignore)
