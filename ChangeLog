@@ -1,5 +1,8 @@
 2004-06-08  Peter Stephenson  <pws@csr.com>
 
+	* Philippe Troin, 19996, plus 20025: configure.ac, INSTALL: add
+	configure option --with-tcsetpgrp.
+
 	* 20024: Doc/Zsh/func.yo: Improve documentation for TRAPNAL
 	functions.
 

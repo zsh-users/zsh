@@ -1766,24 +1766,53 @@ dnl for instance, BeOS R4.51 does not support it yet
 dnl -----------
 AH_TEMPLATE([BROKEN_TCSETPGRP],
 [Define to 1 if tcsetpgrp() doesn't work, ie BeOS R4.51.])
-if test -t 0 && test $ac_cv_func_tcsetpgrp = yes; then
+AC_ARG_WITH(tcsetpgrp,
+[  --with-tcsetpgrp        assumes that tcsetpgrp() exists and works correctly],[
+case "x$withval" in
+    xyes) zsh_working_tcsetpgrp=yes;;
+    xno)  zsh_working_tcsetpgrp=no;;
+    *)    AC_ERROR([please use --with-tcsetpgrp=yes or --with-tcsetpgrp=no]);;
+esac],[zsh_working_tcsetpgrp=check])
+if test "x$ac_cv_func_tcsetpgrp" = xyes; then
+case "x$zsh_working_tcsetpgrp" in
+  xcheck)
+    trap "" SIGTTOU > /dev/null 2>&1 || :
     AC_CACHE_CHECK(if tcsetpgrp() actually works,
     zsh_cv_sys_tcsetpgrp,
     [AC_TRY_RUN([
 #include <sys/types.h>
 #include <unistd.h>
+#include <fcntl.h>
 main() {
+    int fd;
     int ret;
-    ret=tcsetpgrp(0, tcgetpgrp(0));
-    exit(ret<0);
+    fd=open("/dev/tty", O_RDWR);
+    if (fd < 0) exit(2);
+    ret=tcsetpgrp(fd, tcgetpgrp(fd));
+    if (ret < 0) exit(1);
+    exit(0);
 }
 ],
-      zsh_cv_sys_tcsetpgrp=yes,
-      zsh_cv_sys_tcsetpgrp=no,
-      zsh_cv_sys_tcsetpgrp=yes)])
-    if test $zsh_cv_sys_tcsetpgrp = no; then
-      AC_DEFINE(BROKEN_TCSETPGRP)
-    fi
+      zsh_cv_sys_tcsetpgrp=yes, [
+case $? in
+    1) zsh_cv_sys_tcsetpgrp=no;;
+    2) zsh_cv_sys_tcsetpgrp=notty;;
+    *) zsh_cv_sys_tcsetpgrp=error;;
+esac
+      ], zsh_cv_sys_tcsetpgrp=yes)])
+    case "x$zsh_cv_sys_tcsetpgrp" in
+      xno)    AC_DEFINE(BROKEN_TCSETPGRP);;
+      xyes)   :;;
+      xnotty) AC_MSG_ERROR([no controlling tty
+Try running configure with --with-tcsetpgrp or --without-tcsetpgrp]);;
+      *)      AC_MSG_ERROR([unexpected return status]);;
+    esac
+    trap - SIGTTOU > /dev/null 2>&1 || :
+    ;;
+  xyes) :;;
+  xno)  AC_DEFINE(BROKEN_TCSETPGRP);;
+  *)    AC_MSG_ERROR([unexpected value zsh_working_tcsetpgrp=$zsh_working_tcsetpgrp]);;
+esac
 fi
 
 dnl -----------
