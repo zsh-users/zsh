@@ -108,6 +108,10 @@ mod_export int showagain = 0;
 
 static char *qword;
 
+/* This holds the word we are working on without braces removed. */
+
+static char *origword;
+
 /* The quoted prefix/suffix and a flag saying if we want to add the
  * closing quote. */
 
@@ -685,17 +689,17 @@ docomplete(int lst)
 	    inwhat = IN_CMD;
 
 	if (lst == COMP_SPELL) {
-	    char *x, *q, *ox;
+	    char *w = dupstring(origword), *x, *q, *ox;
 
-	    for (q = s; *q; q++)
+	    for (q = w; *q; q++)
 		if (INULL(*q))
 		    *q = Nularg;
 	    cs = wb;
 	    foredel(we - wb);
 	    HEAPALLOC {
-		untokenize(x = ox = dupstring(s));
-		if (*s == Tilde || *s == Equals || *s == String)
-		    *x = *s;
+		untokenize(x = ox = dupstring(w));
+		if (*w == Tilde || *w == Equals || *w == String)
+		    *x = *w;
 		spckword(&x, 0, lincmd, 0);
 		ret = !strcmp(x, ox);
 	    } LASTALLOC;
@@ -708,7 +712,7 @@ docomplete(int lst)
 	    int ocs = cs, ne = noerrs;
 
 	    noerrs = 1;
-	    ret = doexpansion(s, lst, olst, lincmd);
+	    ret = doexpansion(origword, lst, olst, lincmd);
 	    lastambig = 0;
 	    noerrs = ne;
 
@@ -1329,6 +1333,9 @@ get_comp_string(void)
 		chuck(p--);
 	    }
 
+	zsfree(origword);
+	origword = ztrdup(s);
+
 	if (!isset(IGNOREBRACES)) {
 	    /* Try and deal with foo{xxx etc. */
 	    char *curs = s + (isset(COMPLETEINWORD) ? offs : strlen(s));
@@ -1353,8 +1360,8 @@ get_comp_string(void)
 			    break;
 			}
 			i += tp - p;
-			p = tp;
 			dp += tp - p;
+			p = tp;
 		    } else {
 			char *tp = p + 1;
 
@@ -1385,8 +1392,8 @@ get_comp_string(void)
 			    }
 			    tp--;
 			    i += tp - p;
-			    p = tp;
 			    dp += tp - p;
+			    p = tp;
 			}
 		    }
 		} else if (p < curs) {
