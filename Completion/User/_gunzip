@@ -3,4 +3,4 @@
 local expl
 
 _description files expl 'compressed file'
-_files "$expl[@]" -g '*.[gG][z]'
+_files "$expl[@]" -g '*.([tT]|)[gG][z]'
