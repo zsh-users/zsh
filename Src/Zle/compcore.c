@@ -938,6 +938,7 @@ multiquote(char *s, int ign)
 	}
 	return (s == os ? dupstring(s) : s);
     }
+    DPUTS(1, "BUG: null pointer in multiquote()");
     return NULL;
 }
 
@@ -956,6 +957,7 @@ tildequote(char *s, int ign)
 
 	return s;
     }
+    DPUTS(1, "BUG: null pointer in tildequote()");
     return NULL;
 }
 
