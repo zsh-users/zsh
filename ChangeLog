@@ -1,3 +1,8 @@
+2004-09-20  Peter Stephenson  <pws@csr.com>
+
+	* 20391: Src/params.c: SHLVL didn't get updated in the
+	environment if it was already present.
+
 2004-09-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* 20388: Src/Zle/zle_main.c: arrange that "zle internal-widget"

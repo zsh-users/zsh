@@ -594,8 +594,8 @@ createparamtable(void)
 	addenv(pm, pm->u.str);
     pm = (Param) paramtab->getnode(paramtab, "SHLVL");
     sprintf(buf, "%d", (int)++shlvl);
-    if (!(pm->flags & PM_EXPORTED))
-	addenv(pm, buf);
+    /* shlvl value in environment needs updating unconditionally */
+    addenv(pm, buf);
 
     /* Add the standard non-special parameters */
     set_pwd_env();
