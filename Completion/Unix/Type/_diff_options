@@ -103,7 +103,7 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
     "$@"
 else
   case $OSTYPE in
-    solaris2.9)
+    solaris2.<9->)
       args=( '(-c -e -f -C)-u[output a unified diff]' )
     ;&
     solaris*)
