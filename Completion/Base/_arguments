@@ -848,10 +848,10 @@ while true; do
         compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' - "${PREFIX}" && ret=0
       fi
     else
-      tmp1=( "${(k)opts[@]}" "${(@k)odopts[(I)*[^=]]}" )
-      tmp1=( "${(@M)odescr:#(${(kj:|:)~tmp1}):*}" )
+      tmp1=( "${(@k)opts}" "${(@k)odopts[(I)*[^=]]}" )
+      tmp1=( "${(@M)odescr:#(${(j:|:)~tmp1}):*}" )
       tmp2=( "${(@M)odescr:#(${(kj:|:)~dopts}):*}" )
-      tmp3=( "${(@M)odescr:#(${(kj:|:)~odopts[(I)*=]}):*}" )
+      tmp3=( "${(@M)odescr:#(${(kj:|:)~odopts[(I)*=]%=}):*}" )
       _describe -o -c "$cmd" option \
         tmp1 -Q -M 'r:|[_-]=* r:|=*' -- \
         tmp2 -QS '' -M 'r:|[_-]=* r:|=*' -- \
@@ -860,8 +860,8 @@ while true; do
   fi
 
   if [[ nm -eq compstate[nmatches] && 
-        ( -z "$single" ||
-          ( $#_args_cache_long -ne 0 && "$PREFIX" = --*=* ) ) ]]; then
+        ( ( -z "$single" && "$PREFIX" = [-+]*\=* ) ||
+          ( $#_args_cache_long -ne 0 && "$PREFIX" = --*\=* ) ) ]]; then
     tmp=( "${(@Mk)odopts:#[^:]#\=}" )
     prefix="${PREFIX#*\=}"
     suffix="$SUFFIX"
