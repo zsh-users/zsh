@@ -683,6 +683,55 @@ bin_zformat(char *nam, char **args, char *ops, int func)
 /* Zregexparse stuff. */
 
 typedef struct {
+    char **match;
+    char **mbegin;
+    char **mend;
+} MatchData;
+
+static void
+savematch(MatchData *m)
+{
+    char **a;
+
+    PERMALLOC {
+	a = getaparam("match");
+	m->match = a ? arrdup(a) : NULL;
+	a = getaparam("mbegin");
+	m->mbegin = a ? arrdup(a) : NULL;
+	a = getaparam("mend");
+	m->mend = a ? arrdup(a) : NULL;
+    } LASTALLOC;
+}
+
+static void
+restorematch(MatchData *m)
+{
+    if (m->match)
+	setaparam("match", m->match);
+    else
+	unsetparam("match");
+    if (m->mbegin)
+	setaparam("mbegin", m->mbegin);
+    else
+	unsetparam("mbegin");
+    if (m->mend)
+	setaparam("mend", m->mend);
+    else
+	unsetparam("mend");
+}
+
+static void
+freematch(MatchData *m)
+{
+    if (m->match)
+	freearray(m->match);
+    if (m->mbegin)
+	freearray(m->mbegin);
+    if (m->mend)
+	freearray(m->mend);
+}
+
+typedef struct {
     int cutoff;
     char *pattern;
     Patprog patprog;
@@ -692,8 +741,8 @@ typedef struct {
 } RParseState;
 
 typedef struct {
-  RParseState *state;
-  LinkList actions;
+    RParseState *state;
+    LinkList actions;
 } RParseBranch;
 
 typedef struct {
@@ -982,14 +1031,9 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
     nexts = sm->in;
     addlinknode(nextslist, nexts);
     do {
-	char **savematch1, **savembegin1, **savemend1;
-	char **savematch2, **savembegin2, **savemend2;
+	MatchData match1, match2;
 
-	PERMALLOC {
-	    savematch1 = arrdup(getaparam("match"));
-	    savembegin1 = arrdup(getaparam("mbegin"));
-	    savemend1 = arrdup(getaparam("mend"));
-	} LASTALLOC;
+	savematch(&match1);
 
 	for (ln = firstnode(nexts); ln; ln = nextnode(ln)) {
 	    int i;
@@ -1012,18 +1056,8 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 		  if (*subj++ == Meta)
 		    subj++;
 
-		PERMALLOC {
-		    savematch2 = arrdup(getaparam("match"));
-		    savembegin2 = arrdup(getaparam("mbegin"));
-		    savemend2 = arrdup(getaparam("mend"));
-		} LASTALLOC;
-
-		if (savematch1)
-		    setaparam("match", savematch1);
-		if (savembegin1)
-		    setaparam("mbegin", savembegin1);
-		if (savemend1)
-		    setaparam("mend", savemend1);
+		savematch(&match2);
+		restorematch(&match1);
 
 		for (aln = firstnode(br->actions); aln; aln = nextnode(aln)) {
 		    char *action = getdata(aln);
@@ -1031,12 +1065,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 		    if (action)
 			execstring(action, 1, 0);
 		}
-		if (savematch2)
-		    setaparam("match", savematch2);
-		if (savembegin2)
-		    setaparam("mbegin", savembegin2);
-		if (savemend2)
-		    setaparam("mend", savemend2);
+		restorematch(&match2);
 
 		point2 += len;
 		setiparam(var2, point2);
@@ -1051,14 +1080,8 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 		break;
 	    }
 	}
-	if (!ln) {
-	    if (savematch1)
-		freearray(savematch1);
-	    if (savembegin1)
-		freearray(savembegin1);
-	    if (savemend1)
-		freearray(savemend1);
-	}
+	if (!ln)
+	    freematch(&match1);
     } while (ln);
 
     if (!comp && !*subj)
