@@ -1,3 +1,9 @@
+2001-04-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 13981: Src/Modules/zftp.c: Don't define gethostbyname2()
+	as static, since it can clash with the system header files
+	on a system that provides the prototype but not the object.
+
 2001-04-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13973: Completion/Unix/Type/_path_files: Parameter expansions
