@@ -1,5 +1,8 @@
 2003-04-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 18466: Src/Modules/tcp.c, Src/Modules/tcp.h: Only the module's
+	C source file should include the corresponding .mdh file.
+
 	* IKEGAMI Tsutomu: SourceForge bug 722366: initialisation of pwd
 	from PWD in environment didn't metafy.
 

@@ -34,6 +34,7 @@
  * doesn't exist on cygwin.
  */
 #include "tcp.h"
+#include "tcp.mdh"
 
 /*
  * We use poll() in preference to select because some subset of manuals says

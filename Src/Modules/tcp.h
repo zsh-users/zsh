@@ -83,7 +83,6 @@ struct tcp_session {
     int flags;
 };
 
-#include "tcp.mdh"
 #include "tcp.pro"
 
 #ifndef INET_ADDRSTRLEN
