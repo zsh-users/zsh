@@ -68,6 +68,7 @@ fi
 
 # Now look up the two names in the normal completion array.
 
+ret=1
 name="$cmd1"
 comp="$_comps[$cmd1]"
 

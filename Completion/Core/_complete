@@ -39,6 +39,7 @@ fi
 
 # For arguments and command names we use the `_normal' function.
 
+ret=1
 if [[ "$compstate[context]" = command ]]; then
   curcontext="$oldcontext"
   _normal -s && ret=0

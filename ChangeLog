@@ -1,5 +1,8 @@
 2000-06-29  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12119: Completion/Core/_complete, Completion/Core/_normal: try
+ 	to return the right value
+	
 	* 12118: Completion/Core/_expand: don't expand partially typed
  	parameter expansions
 	
