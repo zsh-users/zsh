@@ -2801,7 +2801,7 @@ getherestr(struct redir *fn)
     untokenize(t);
     unmetafy(t, &len);
     t[len++] = '\n';
-    s = gettempname();
+    s = gettempname(NULL, 1);
     if (!s || (fd = open(s, O_CREAT|O_WRONLY|O_EXCL|O_NOCTTY, 0600)) == -1)
 	return -1;
     write(fd, t, len);
@@ -2975,7 +2975,7 @@ getoutputfile(char *cmd)
 	return NULL;
     if (!(prog = parsecmd(cmd)))
 	return NULL;
-    if (!(nam = gettempname()))
+    if (!(nam = gettempname(NULL, 1)))
 	return NULL;
 
     nam = ztrdup(nam);
@@ -3022,7 +3022,7 @@ getoutputfile(char *cmd)
 static char *
 namedpipe(void)
 {
-    char *tnam = gettempname();
+    char *tnam = gettempname(NULL, 1);
 
 # ifdef HAVE_MKFIFO
     if (mkfifo(tnam, 0600) < 0)
