@@ -347,8 +347,6 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
     u = buf;
 
     pm->flags = PM_READONLY | PM_SCALAR;
-    pm->sets.cfn = NULL;
-    pm->gets.cfn = strgetfn;
 
     for (capcode = (char **)boolcodes; *capcode; capcode++) {
 	if ((num = ztgetflag(*capcode)) != -1) {

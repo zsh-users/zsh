@@ -1,3 +1,8 @@
+2003-03-07  Peter Stephenson  <pws@csr.com>
+
+	* 18325: Src/Modules/parameter.c: options on by default weren't
+	handled correctly.
+
 2003-02-26  Clint Adams  <clint@zsh.org>
 
         * 18303: zshconfig.ac: fix some always-true test evaluations.
