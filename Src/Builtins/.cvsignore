@@ -1,6 +1,10 @@
 Makefile
 Makefile.in
+*.export
+so_locations
 *.pro
+*.epro
+*.syms
 *.o
 *.o.c
 *.so
@@ -9,3 +13,4 @@ Makefile.in
 *.mdhs
 *.mdh.tmp
 rlimits.h
+*.swp

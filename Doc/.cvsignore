@@ -14,3 +14,4 @@ zsh.log zsh.dvi
 zsh.tp zsh.tps
 zsh_*.ps
 infodir
+*.swp

@@ -11,3 +11,4 @@ stamp-h
 stamp-h.in
 cscope.out
 autom4te.cache
+*.swp

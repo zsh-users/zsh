@@ -1,6 +1,10 @@
 Makefile
 Makefile.in
+*.export
+so_locations
 *.pro
+*.epro
+*.syms
 *.o
 *.o.c
 *.so
@@ -8,3 +12,4 @@ Makefile.in
 *.mdhi
 *.mdhs
 *.mdh.tmp
+*.swp

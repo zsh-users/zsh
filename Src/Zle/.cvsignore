@@ -1,6 +1,10 @@
 Makefile
 Makefile.in
+*.export
+so_locations
 *.pro
+*.epro
+*.syms
 *.o
 *.o.c
 *.so
@@ -12,3 +16,4 @@ thingies.list
 widgets.list
 zle_things.h
 zle_widget.h
+*.swp

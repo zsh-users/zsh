@@ -1,5 +1,11 @@
 2003-05-05  Andrey Borzenkov  <bor@zsh.org>
 
+	* unposted: .cvsignore, Completion/.cvsignore, Config/.cvsignore,
+	Doc/.cvsignore, Doc/Zsh/.cvsignore, Etc/.cvsignore,
+	Functions/.cvsignore, Src/.cvsignore, Src/Builtins/.cvsignore,
+	Src/Modules/.cvsignore, Src/Zle/.cvsignore, Test/.cvsignore:
+	add *.swp (vim)
+
 	* unposted: Etc/CONTRIBUTORS: my name spelling changed ...
 
 	* 18476: Src/Zle/complist.c, Src/Zle/zle_refresh.c: fix
