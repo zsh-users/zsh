@@ -76,8 +76,9 @@ which no alias has been defined.
 findex(autoload)
 cindex(functions, autoloading)
 cindex(autoloading functions)
-item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(UXmt) ] [ var(name) ... ])(
-Equivalent to tt(functions -u), with the exception of tt(-X)/tt(+X).
+item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(UXmt) ] [ tt(-w) ] [ var(name) ... ])(
+Equivalent to tt(functions -u), with the exception of tt(-X)/tt(+X)
+and tt(-w).
 
 The flag tt(-X) may be used only inside a shell function, and may not be
 followed by a var(name).  It causes the calling function to be marked for
@@ -93,6 +94,9 @@ This does em(not) replace any existing definition of the function.  The
 exit status is nonzero (failure) if the function was already defined or
 when no definition was found.  In the latter case the function remains
 undefined and marked for autoloading.
+
+With the tt(-w) flag, the var(name)s are taken as names of wordcode
+files and all functions defined in them are marked for autoloading.
 )
 findex(bg)
 cindex(jobs, backgrounding)

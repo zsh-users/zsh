@@ -2801,3 +2801,30 @@ decrdumpcount(FuncDump f)
 }
 
 #endif
+
+/**/
+int
+dump_autoload(char *file, int on, char *ops, int func)
+{
+    Wordcode h;
+    FDHead n, e;
+    Shfunc shf;
+    int ret = 0;
+
+    if (!strsfx(FD_EXT, file))
+	file = dyncat(file, FD_EXT);
+
+    if (!(h = load_dump_header(file)))
+	return 1;
+
+    for (n = firstfdhead(h), e = (FDHead) (h + fdheaderlen(h)); n < e;
+	 n = nextfdhead(n)) {
+	shf = (Shfunc) zcalloc(sizeof *shf);
+	shf->flags = on;
+	shf->funcdef = mkautofn(shf);
+	shfunctab->addnode(shfunctab, ztrdup(fdname(n) + n->tail), shf);
+	if (ops['X'] && eval_autoload(shf, shf->nam, ops, func))
+	    ret = 1;
+    }
+    return ret;
+}

@@ -43,7 +43,7 @@ static struct builtin builtins[] =
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmr", NULL),
-    BUILTIN("autoload", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "tUX", "u"),
+    BUILTIN("autoload", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "tUXw", "u"),
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
     BUILTIN("bye", 0, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
@@ -1996,7 +1996,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
 /* Helper for bin_functions() when run as "autoload -X" */
 
-static int
+/**/
+int
 eval_autoload(Shfunc shf, char *name, char *ops, int func)
 {
     if (!(shf->flags & PM_UNDEFINED))
@@ -2114,7 +2115,12 @@ bin_functions(char *name, char **argv, char *ops, int func)
 
     /* Take the arguments literally -- do not glob */
     for (; *argv; argv++) {
-	if ((shf = (Shfunc) shfunctab->getnode(shfunctab, *argv))) {
+	if (ops['w']) {
+	    if (dump_autoload(*argv, on, ops, func)) {
+		zwarnnam(name, "invalid wordcode file: %s", *argv, 0);
+		returnval = 1;
+	    }
+	} else if ((shf = (Shfunc) shfunctab->getnode(shfunctab, *argv))) {
 	    /* if any flag was given */
 	    if (on|off) {
 		/* turn on/off the given flags */
@@ -2140,7 +2146,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 }
 
 /**/
-static Eprog
+Eprog
 mkautofn(Shfunc shf)
 {
     Eprog p;
