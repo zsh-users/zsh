@@ -2881,7 +2881,7 @@ Note that using multiple sets will be slower than using only one set
 because the completion code has to parse the command line once for
 every set. So more than one set should only be used if the command
 syntax is too complicated. Note also that a option specification with
-rest-arguments (as in `tt(-foo:*:...)' often allows to avoid the use
+rest-arguments (as in `tt(-foo:*:...)') often allows to avoid the use
 of multiple sets.
 
 Another option supported is `tt(-O) var(name)'. The var(name) will be
