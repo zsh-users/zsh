@@ -33,4 +33,12 @@ fi
 
 args=( "$@" )
 
+local -a cmdpath
+if zstyle -a ":completion:${curcontext}" command-path cmdpath &&
+   [[ $#cmdpath -gt 0 ]]
+then
+  local -a +h path
+  local -A +h commands
+  path=( $cmdpath )
+fi
 _alternative -O args "$defs[@]"

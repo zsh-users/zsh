@@ -1140,6 +1140,11 @@ command for each attempt to generate the completion list.  Hence
 care should be taken to specify only commands that take a short
 time to run, and in particular to avoid any that may never terminate.
 )
+kindex(command-path, completion style)
+item(tt(command-path))(
+This is a list of directories to search for commands to complete.  The
+default for this style is the value of the special parameter tt(path).
+)
 kindex(commands, completion style)
 item(tt(commands))(
 This is used by the function completing sub-commands for the system

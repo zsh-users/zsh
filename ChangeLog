@@ -1,3 +1,9 @@
+2004-05-01  Clint Adams  <clint@zsh.org>
+
+	* 19863: Completion/Zsh/Type/_command_names, Doc/Zsh/compsys.yo:
+	allow search path for command names to be overridden by means of new
+	command-path style.
+
 2004-04-28  Clint Adams  <clint@zsh.org>
 
 	* 19845: Completion/Debian/Command/_apt-move: apt-move
