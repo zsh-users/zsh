@@ -39,7 +39,9 @@ extern int tgetnum _((char *id));
 extern int tgetflag _((char *id));
 extern char *tgetstr _((char *id, char **area));
 extern char *tgoto _((char *cm, int destcol, int destline));
+# ifndef HAVE_TERM_H
 extern int tputs _((char *cp, int affcnt, int (*outc) (int)));
+# endif
 #endif
 
 /* MISSING PROTOTYPES FOR VARIOUS OPERATING SYSTEMS */
@@ -51,7 +53,7 @@ extern int tputs _((char *cp, int affcnt, int (*outc) (int)));
 # define WRITE_ARG_2_T char *
 #endif
 
-#if defined(__hpux) && defined(_HPUX_SOURCE)
+#if defined(__hpux) && defined(_HPUX_SOURCE) && !defined(_XPG4_EXTENDED)
 # define SELECT_ARG_2_T int *
 #else
 # define SELECT_ARG_2_T fd_set *
@@ -66,7 +68,9 @@ char *mktemp _((char *));
 # ifndef HAVE_IOCTL_PROTO
 int ioctl _((int d, unsigned long request, void *argp));
 # endif
+# ifndef HAVE_MKNOD_PROTO
 int mknod _((const char *pathname, int mode, dev_t device));
+# endif
 int nice _((int increment));
 int select _((int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval *timeout));
 #endif

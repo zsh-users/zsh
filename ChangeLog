@@ -1,3 +1,8 @@
+2001-04-12  Clint Adams  <schizo@debian.org>
+
+	* 13961: Src/prototypes.h: entertain the possibility that
+	tputs is defined in term.h.
+
 2001-04-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 13958: Completion/Zsh/Type/_directory_stack: a hopefully correct
