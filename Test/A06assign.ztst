@@ -1,0 +1,279 @@
+# Tests of parameter assignments
+
+%test
+
+ typeset -A assoc
+ assoc=(one 1 two 2 odd)
+1:assign to association with odd no. of values
+?(eval):2: bad set of key/value pairs for associative array
+
+# tests of var+=scalar
+
+ s+=foo
+ echo $s
+0:append scalar to unset scalar
+>foo
+
+ s=foo
+ s+=bar
+ echo $s
+0:append to scalar
+>foobar
+
+ set -- a b c
+ 2+=end
+ echo $2
+0:append to positional parameter
+>bend
+
+ a=(first second)
+ a+=last
+ print -l $a
+0:add scalar to array
+>first
+>second
+>last
+
+ setopt ksharrays
+ a=(first second)
+ a+=last
+ print -l $a
+ unsetopt ksharrays
+0:add scalar to array with ksharrays set
+>firstlast
+
+ a=(1 2)
+ a[@]+=3
+ print -l $a
+0:add scalar to array with alternate syntax
+>1
+>2
+>3
+
+ integer i=10
+ i+=20
+ (( i == 30 ))
+0:add to integer
+
+ float f=3.4
+ f+=2.3
+ printf "%g\n" f
+0:add to float
+>5.7
+
+ typeset -A hash
+ hash=(one 1)
+ h+=string
+ [[ $h[@] == string ]]
+0:add scalar to association
+
+# tests of var+=(array)
+
+ unset a
+ a+=(1 2 3)
+ print -l $a
+0:add array to unset parameter
+>1
+>2
+>3
+
+ a=(a)
+ a+=(b)
+ print -l $a
+0:add array to existing array
+>a
+>b
+
+ s=foo
+ s+=(bar)
+ print -l $s
+0:add array to scalar
+>foo
+>bar
+
+ integer i=1
+ i+=(2 3)
+ print -l $i
+0:add array to integer
+>1
+>2
+>3
+
+ float f=2.5
+ f+=(3.5 4.5)
+ printf '%g\n' $f
+0:add array to float
+>2.5
+>3.5
+>4.5
+
+ typeset -A h
+ h+=(a 1 b 2)
+ print -l $h
+0:add to empty association
+>1
+>2
+
+ typeset -A h
+ h=(a 1)
+ h+=(b 2 c 3)
+ print -l $h
+0:add to association
+>1
+>2
+>3
+
+# tests of var[range]+=scalar
+
+ s=sting
+ s[2]+=art
+ echo $s
+0:insert scalar inside another
+>starting
+
+ s=inert
+ s[-4]+=s
+ echo $s
+0:insert scalar inside another with negative index
+>insert
+
+ s=append
+ s[2,6]+=age
+ echo $s
+0:append scalar to scalar using a range
+>appendage
+
+ s=123456789
+ s[3,-5]+=X
+ echo $s
+0:insert scalar inside another, specifying a slice
+>12345X6789
+
+ a=(a b c)
+ a[2]+=oo
+ echo $a
+0:append to array element
+>a boo c
+
+ a=(a b c d)
+ a[-2]+=ool
+ echo $a
+0:append to array element with negative index
+>a b cool d
+
+ a=(a b c d)
+ a[2,-1]+=oom
+ echo $a
+0:append to array element, specifying a slice
+>a b c doom
+
+ setopt ksharrays
+ a=(a b c d)
+ a[0]+=0
+ echo $a
+ unsetopt ksharrays
+0:append to array element with ksharrays set
+>a0
+
+ typeset -A h
+ h=(one foo)
+ h[one]+=bar
+ echo $h
+0:append to association element
+>foobar
+
+ typeset -A h
+ h[foo]+=bar
+ echo ${(kv)h}
+0:append to non-existent association element
+>foo bar
+
+ typeset -A h
+ h=(one a two b three c four d)
+ h[(I)*o*]+=append
+1:attempt to append to slice of association
+?(eval):3: h: attempt to set slice of associative array
+
+ integer i=123
+ i[2]+=6
+1:attempt to add to indexed integer variable
+?(eval):2: attempt to add to slice of a numeric variable
+
+ float f=1234.5
+ f[2,4]+=3
+1:attempt to add to slice of float variable
+?(eval):2: attempt to add to slice of a numeric variable
+
+ unset u
+ u[3]+=third
+ echo $u[1]:$u[3]
+0:append to unset variable with index
+>:third
+ 
+# tests of var[range]+=(array)
+
+ a=(1 2 3)
+ a[2]+=(a b)
+ echo $a
+0:insert array inside another
+>1 2 a b 3
+
+ a=(a b c)
+ a[-1]+=(d)
+ echo $a
+0:append to array using negative index
+>a b c d
+
+ a=(1 2 3 4)
+ a[-1,-3]+=(x)
+ echo $a
+0:insert array using negative range
+>1 2 x 3 4
+
+ s=string
+ s[2]+=(a b)
+1:attempt to insert array into string
+?(eval):2: s: attempt to assign array value to non-array
+
+ integer i=365
+ i[2]+=(1 2)
+1:attempt to insert array into string
+?(eval):2: i: attempt to assign array value to non-array
+
+ typeset -A h
+ h=(a 1)
+ h[a]+=(b 2)
+1:attempt to append array to hash element
+?(eval):3: h: attempt to set slice of associative array
+
+ unset u
+ u[-34,-2]+=(a z)
+ echo $u
+0:add array to indexed unset variable
+>a z
+
+ repeat 10 PATH=. echo hello
+0:saving and restoring of exported special parameters
+>hello
+>hello
+>hello
+>hello
+>hello
+>hello
+>hello
+>hello
+>hello
+>hello
+
+ repeat 10 FOO=BAR BAR=FOO echo $FOO $BAR
+0:save and restore multiple variables around builtin
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
