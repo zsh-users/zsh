@@ -1035,7 +1035,7 @@ ca_parse_line(Cadef d)
 	    state.optbeg = state.argbeg = state.inopt = cur;
 	    state.singles = (!pe || !*pe);
 
-	    for (p = line + 1; p <= pe; p++) {
+	    for (p = line + 1; p < pe; p++) {
 		if ((tmpopt = d->single[STOUC(*p)])) {
 		    PERMALLOC {
 			state.oargs[tmpopt->num] = newlinklist();

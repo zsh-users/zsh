@@ -37,7 +37,7 @@
 #    name used by a user placing web pages within their home area.
 #    e.g. compconf urls_localhttp=www:/usr/local/apache/htdocs:public_html
 
-local ipre scheme host user hosts ret=1 expl
+local ipre scheme host user uhosts ret=1 expl
 local urls_path="${compconfig[urls_path]:-${ZDOTDIR:-$HOME}/.zsh/urls}"
 local localhttp_servername="${${(@s.:.)compconfig[urls_localhttp]}[1]}"
 local localhttp_documentroot="${${(@s.:.)compconfig[urls_localhttp]}[2]}"
@@ -93,10 +93,11 @@ esac
 
 # Complete hosts
 if ! compset -P '(#b)([^/]#)/'; then
-  hosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
-  (( $#hosts )) || _hosts -S/ && ret=0
-  [[ "$scheme" = http ]] && hosts=($hosts $localhttp_servername)
-  compadd "$@" -QS/ - $hosts && ret=0
+  uhosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
+  (( $#uhosts )) || _hosts -S/ && ret=0
+  [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
+  _description expl host
+  compadd "$expl[@]" "$@" -QS/ - $uhosts && ret=0
   return $ret
 fi
 host="$match[1]"

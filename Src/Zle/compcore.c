@@ -334,7 +334,7 @@ do_completion(Hookdef dummy, Compldat dat)
 
 	    while (1) {
 		if (!first)
-		    acceptlast();
+		    accept_last();
 		first = 0;
 
 		if (!--nm)

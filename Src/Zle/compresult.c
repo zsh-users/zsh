@@ -1042,7 +1042,7 @@ do_ambig_menu(void)
     } else {
 	if (oldlist) {
 	    if (oldins && minfo.cur)
-		acceptlast();
+		accept_last();
 	} else
 	    minfo.cur = NULL;
     }
@@ -1798,10 +1798,11 @@ printlist(int over, CLPrintFunc printm)
 			    q = skipnolist(q + 1);
 		    mc++;
 		}
-		while (i-- > 0)
-		    printm(g, NULL, mc++, ml, (!i),
+		while (i-- > 0) {
+		    printm(g, NULL, mc, ml, (!i),
 			   (g->widths ? g->widths[mc] : g->width), NULL, NULL);
-
+		    mc++;
+		}
 		if (n) {
 		    putc('\n', shout);
 		    ml++;

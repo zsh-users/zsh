@@ -1781,7 +1781,7 @@ scanpmgaliases(HashTable ht, ScanFunc func, int flags)
 static void
 scanpmdisgaliases(HashTable ht, ScanFunc func, int flags)
 {
-    scanpmaliases(ht, func, flags, 1, DISABLED);
+    scanaliases(ht, func, flags, 1, DISABLED);
 }
 
 /* Table for defined parameters. */
