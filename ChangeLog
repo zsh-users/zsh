@@ -1,3 +1,8 @@
+2002-02-18  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16667: Completion/Base/Utility/_arguments: fix test for
+	prefix-needed
+
 2002-02-17  Clint Adams  <clint@zsh.org>
 
 	* 16662: Completion/Unix/Command/_cdcd: use parameter expansion
