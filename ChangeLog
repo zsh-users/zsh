@@ -1,5 +1,8 @@
 2000-04-11  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10635: Completion/User/_make: _make uses $words[1] for command
+ 	name
+	
 	* 10632: Completion/Base/_brace_parameter, Completion/Base/_condition,
  	Completion/Base/_default, Completion/Base/_describe,
  	Completion/Base/_first, Completion/Base/_jobs,

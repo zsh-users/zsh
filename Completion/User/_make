@@ -4,12 +4,12 @@ local prev="$words[CURRENT-1]" file expl tmp
 
 (( $+_is_gnu )) || typeset -gA _is_gnu
 
-if (( ! $+_is_gnu[$1] )); then
-  if [[ $(_call version $1 -v -f /dev/null </dev/null 2>/dev/null) = *GNU* ]]
+if (( ! $+_is_gnu[$words[1]] )); then
+  if [[ $(_call version $words[1] -v -f /dev/null </dev/null 2>/dev/null) = *GNU* ]]
   then
-    _is_gnu[$1]=yes
+    _is_gnu[$words[1]]=yes
   else
-    _is_gnu[$1]=
+    _is_gnu[$words[1]]=
   fi
 fi
 
@@ -31,7 +31,7 @@ else
     file=''
   fi
 
-  if [[ -n "$file" ]] && _wanted targets; then
+  if [[ -n "$file" ]] && _tags targets; then
     if [[ -n "$_is_gnu[$1]" ]]; then
       tmp=( $(make -nsp --no-print-directory -f "$file" .PHONY | awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}' FS=:) )
     else
@@ -42,7 +42,7 @@ else
  	     FS=: $file)
            )
     fi
-    _all_labels targets expl 'make target' compadd "$tmp[@]" && return 0
+    _wanted targets expl 'make target' compadd "$tmp[@]" && return 0
   fi
   compset -P 1 '*='
   _files
