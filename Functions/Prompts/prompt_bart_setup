@@ -2,8 +2,8 @@ zmodload -i zsh/parameter || return 1
 
 prompt_bart_help () {
     setopt localoptions nocshnullcmd noshnullcmd
-    [[ $ZSH_VERSION < 3.1.6-dev-20 ]] &&
-	print 'Requires 3.1.6-dev-19 plus zsh-workers/10168.'$'\n'
+    [[ $ZSH_VERSION < 4.2.2 ]] &&
+	print 'Requires ZSH_VERSION 4.2.2'$'\n'
     <<-\EOF
 	This prompt gives the effect of left and right prompts on the upper
 	line of a two-line prompt.  It also illustrates including history
@@ -17,8 +17,10 @@ prompt_bart_help () {
 	given.  The defaults look best on a light background.
 
 	The "off" token temporarily disables the theme; "on" restores it.
+	No background colors or hardwired cursor motion escapes are used,
+	and it is not necessary to setopt promptsubst.
 	EOF
-    [[ $(read -Ek 1 "?${(%):-%S[press return]%s}") == [Qq] ]] &&
+    [[ $(read -sek 1 "?${(%):-%S[press return]%s}") == [Qq] ]] &&
 	print -nP '\r%E' && return
     <<-\EOF
 
@@ -39,7 +41,7 @@ prompt_bart_help () {
 	the upper left prompt grows too wide.  The clock is not live; it
 	changes only after each command, as does the rest of the prompt.
 	EOF
-    [[ $(read -Ek 1 "?${(%):-%S[press return]%s}") == [Qq] ]] &&
+    [[ $(read -sek 1 "?${(%):-%S[press return]%s}") == [Qq] ]] &&
 	print -nP '\r%E' && return
     <<-\EOF
 
@@ -51,27 +53,43 @@ prompt_bart_help () {
 	This prompt hijacks psvar[7] through [9] to avoid having to reset
 	the entire PS1 string on every command.  It uses TRAPWINCH to set
 	the position of the upper right prompt on a window resize, so the
-	prompt may not match the window width until the next command.  No
-	background colors or hardwired cursor motion escapes are used, and
-	it is not necessary to setopt promptsubst.
+	prompt may not match the window width until the next command.
+
+	When setopt nopromptcr is in effect, an ANSI terminal protocol
+	exchange is attempted in order to determine the current cursor
+	column, and the width of the upper prompt is adjusted accordingly.
+	If your terminal is not ANSI compliant, this may cause unexpected
+	behavior, and in any case it may consume typeahead.  (Recommended
+	workaround is to setopt promptcr.)
 	EOF
+    [[ $(read -sek 1 "?${(%):-%S[done]%s}") == $'\n' ]] ||
+	print -nP '\n%E'
 }
+
+integer PSCOL=1
 
 prompt_bart_precmd () {
     setopt localoptions noxtrace noksharrays unset
-    local zero='%([BSUbsu]|{*%})'
+    local zero='%([BSUbsu]|{*%})' escape colno lineno
 
     # Using psvar here protects against unwanted promptsubst expansions.
 
-    psvar[7]="$history[$[${(%):-%h}-1]]" # Use history text, not just number
-    psvar[8]=''				 # No padding until we compute it
+    psvar[7]="$history[$[HISTCMD-1]]"	# Use history text, not just number
+    psvar[8]=''				# No padding until we compute it
+    psvar[9]=()
+
+    # Reset the truncation widths for upcoming computations
+    ((PSCOL == 1)) || { PSCOL=1 ; prompt_bart_ps1 }
+    [[ -o promptcr ]] || IFS='[;' read -s -d R escape\?$'\e[6n' lineno PSCOL
+    ((PSCOL == 1)) || prompt_bart_ps1
+    ((colno = COLUMNS-PSCOL))
 
     # Compute the size of the upper left prompt and set psvar[9] if needed.
-    psvar[9]=()
-    ((${#${(f)${(%%)${(S)PS1//$~zero/}}}[1]} > COLUMNS-1)) && psvar[9]=''
+    ((${#${(f)${(%%)${(S)PS1//$~zero/}}}[1]} > colno)) && psvar[9]=''
 
     # Compute and set the padding between upper left and right prompts.
-    psvar[8]=${(l:COLUMNS-${#${(f)${(%%)${(S)PS1//$~zero/}}}[1]}-1:: :)}
+    (((colno -= ${#${(f)${(%%)${(S)PS1//$~zero/}}}[1]}) > 0)) &&
+	psvar[8]=${(l:colno:: :)}
 }
 
 prompt_bart_ps1 () {
@@ -96,17 +114,19 @@ prompt_bart_ps1 () {
 
     # Assemble the new prompt
     ps1=( ${(f)PS1} )		# Split the existing prompt at newlines
-    ps1=( "%$[COLUMNS-1]>..>"	# Begin truncation (upper left prompt)
+    ps1=(
+        "%$[COLUMNS-PSCOL]>..>"	# Begin truncation (upper left prompt)
 	"$host"
 	"$hist1"		# Empty when too wide for one line
 	"$dir"
 	"%<<"			# End truncation (end upper left prompt)
 	"$space"		# Pad line to upper right position
-	"%$[COLUMNS-16](l. . $date)"
-	"%$[COLUMNS-8](l.. $time)"
+	"%$[COLUMNS-PSCOL-15](l. . $date)"
+	"%$[COLUMNS-PSCOL-7](l.. $time)"
 	"$hist2"		# Empty when $hist1 is not empty
 	$'\n'
-	$ps1[-1] )		# Keep last line of the existing prompt
+	$ps1[-1]		# Keep last line of the existing prompt
+	)
     PS1="${(j::)ps1}"
 }
 
