@@ -420,7 +420,7 @@ _apt-cache () {
     /$'unmet\0'/ \| \
     /$'check\0'/ \| \
     /$'search\0'/ \| \
-    /$'show\0'/ \| \
+    /$'show\0'/ /$'[^\0]#\0'/ :'_deb_packages avail "$expl_packages[@]"' \# \| \
     /$'depends\0'/ \| \
     /"[]"/ :'compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'
 
