@@ -1,3 +1,8 @@
+2002-04-17  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16998: Src/Zle/computil.c: make compvalues unquote the string
+	from the line like comparguments does
+
 2002-04-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* users/4836: Completion/Unix/Type/_path_files: make

@@ -2319,6 +2319,23 @@ cv_get_val(Cvdef d, char *name)
     return NULL;
 }
 
+static Cvval
+cv_quote_get_val(Cvdef d, char *name)
+{
+    int ne;
+
+    /* remove quotes */
+    name = dupstring(name);
+    ne = noerrs;
+    noerrs = 2;
+    parse_subst_string(name);
+    noerrs = ne;
+    remnulargs(name);
+    untokenize(name);
+
+    return cv_get_val(d, name);
+}
+
 /* Handle a xor list. */
 
 static void
@@ -2371,7 +2388,7 @@ cv_next(Cvdef d, char **sp, char **ap)
         do {
             sav = *++s;
             *s = '\0';
-            if ((r = cv_get_val(d, v))) {
+            if ((r = cv_quote_get_val(d, v))) {
                 *s = sav;
 
                 break;
@@ -2415,7 +2432,7 @@ cv_next(Cvdef d, char **sp, char **ap)
             sav = *sap;
             *sap = '\0';
         }
-        if ((!(r = cv_get_val(d, s)) || r->type == CVV_NOARG) && skip)
+        if ((!(r = cv_quote_get_val(d, s)) || r->type == CVV_NOARG) && skip)
             ns = as;
 
         if (sap)
@@ -2437,7 +2454,7 @@ cv_next(Cvdef d, char **sp, char **ap)
         } else
             *ap = sap = NULL;
 
-        r = cv_get_val(d, s);
+        r = cv_quote_get_val(d, s);
 
         if (sap)
             *sap = sav;
