@@ -470,11 +470,18 @@ add(int c)
 {
     *bptr++ = c;
     if (bsiz == ++len) {
+#if 0
 	int newbsiz;
 
 	newbsiz = bsiz * 8;
 	while (newbsiz < inbufct)
 	    newbsiz *= 2;
+	bptr = len + (tokstr = (char *)hrealloc(tokstr, bsiz, newbsiz));
+	bsiz = newbsiz;
+#endif
+
+	int newbsiz = bsiz + 32;
+
 	bptr = len + (tokstr = (char *)hrealloc(tokstr, bsiz, newbsiz));
 	bsiz = newbsiz;
     }
@@ -556,7 +563,7 @@ gettok(void)
     /* word includes the last character read and possibly \ before ! */
     if (dbparens) {
 	len = 0;
-	bptr = tokstr = (char *)ncalloc(bsiz = 256);
+	bptr = tokstr = (char *)ncalloc(bsiz = 32);
 	hungetc(c);
 	cmdpush(CS_MATH);
 	c = dquote_parse(infor ? ';' : ')', 0);
@@ -671,7 +678,7 @@ gettok(void)
 	    }
 	    if (incmdpos) {
 		len = 0;
-		bptr = tokstr = (char *)ncalloc(bsiz = 256);
+		bptr = tokstr = (char *)ncalloc(bsiz = 32);
 		return cmd_or_math(CS_MATH) ? DINPAR : INPAR;
 	    }
 	} else if (d == ')')
@@ -818,7 +825,7 @@ gettokstr(int c, int sub)
     peek = STRING;
     if (!sub) {
 	len = 0;
-	bptr = tokstr = (char *)ncalloc(bsiz = 256);
+	bptr = tokstr = (char *)ncalloc(bsiz = 32);
     }
     for (;;) {
 	int act;

@@ -2905,6 +2905,8 @@ execautofn(Cmd cmd, LinkList args, int flags)
     int noalias = noaliases;
     List l;
 
+    pushheap();
+
     noaliases = (shf->flags & PM_UNALIASED);
     l = getfpfunc(shf->nam);
     noaliases = noalias;
@@ -2929,6 +2931,8 @@ execautofn(Cmd cmd, LinkList args, int flags)
 	} LASTALLOC;
 	shf->flags &= ~PM_UNDEFINED;
     }
+    popheap();
+
     execlist(shf->funcdef, 1, 0);
     return lastval;
 }
@@ -2942,6 +2946,8 @@ loadautofn(Shfunc shf)
     int noalias = noaliases;
     List l;
 
+    pushheap();
+
     noaliases = (shf->flags & PM_UNALIASED);
     l = getfpfunc(shf->nam);
     noaliases = noalias;
@@ -2954,6 +2960,8 @@ loadautofn(Shfunc shf)
 	shf->funcdef = dupstruct(stripkshdef(l, shf->nam));
     } LASTALLOC;
     shf->flags &= ~PM_UNDEFINED;
+
+    popheap();
 
     return 0;
 }
@@ -3118,9 +3126,14 @@ getfpfunc(char *s)
 		    HEAPALLOC {
 			r = parse_string(d, 1);
 		    } LASTALLOC;
+
+		    zfree(d, len + 1);
+
 		    return r;
 		} else
 		    close(fd);
+
+		zfree(d, len + 1);
 	    } else {
 		close(fd);
 	    }
