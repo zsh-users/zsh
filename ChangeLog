@@ -1,3 +1,10 @@
+2005-01-24  Peter Stephenson  <pws@csr.com>
+
+	* users/8422: Src/cond.c: [[ ... -nt ... ]] and [[ ... -ot ... ]]
+	with non-existent files (or any failed state) were recorded
+	as errors, causing initialisation scripts, functions, etc., etc.
+	to exit.
+
 2005-01-23  Clint Adams  <clint@zsh.org>
 
 	* 20737, 20739: Completion/Unix/Command/_subversion: run svn

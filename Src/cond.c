@@ -336,7 +336,7 @@ evalcond(Estate state, char *fromtest)
 		return 1;
 	    a = st->st_mtime;
 	    if (!(st = getstat(right)))
-		return 2;
+		return 1;
 	    return !((ctype == COND_NT) ? a > st->st_mtime : a < st->st_mtime);
 	}
     case COND_EF:
