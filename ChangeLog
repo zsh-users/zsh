@@ -1,3 +1,7 @@
+2001-04-02  Clint Adams  <schizo@debian.org>
+
+	* 13884: Completion/Linux/_apm: Add FreeBSD 4.1 apm options.
+
 2001-04-02  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* Config/installfns.sh, Src/zsh.mdd: more cleanup after

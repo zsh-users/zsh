@@ -1,4 +1,11 @@
 #compdef apm
+
+# this needs intelligence
+local kludge=linux
+
+if [[ $kludge == "linux" ]]
+then
+
 _arguments -C -s \
     '(--version)-V[print the apm program and exit immediately]' \
     '(-V)--version[print the apm program and exit immediately]' \
@@ -15,3 +22,19 @@ _arguments -C -s \
     '(--ignore)-i[tell the system to ignore system-generated APM message]' \
     '(-i)--ignore[tell the system to ignore system-generated APM message]'
 
+else
+     
+_arguments -C \
+     '-a[display AC line status]' \
+     '-b[display battery status]' \
+     '-d[disable/enable display suspension]:bool:' \
+     '-e[disable/enable apm functions]:bool:' \
+     '-h[disable/enable HLT in kernel context switch]:bool:' \
+     '-l[display remaining battery percentage]' \
+     '-r[enable resume wakeup timer]' \
+     '-s[display status of APM support]' \
+     '-t[display estimated remaining battery life in seconds]' \
+     '-Z[transition system into standby mode]' \
+     '-z[suspend the system]'
+
+fi
