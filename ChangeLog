@@ -1,3 +1,7 @@
+2002-01-31  Oliver Kiddle  <opk@zsh.org>
+
+	* Derek Peschel: 16493: Src/params.c: correct typos
+
 2002-01-27  Clint Adams  <clint@zsh.org>
 
 	* 16504, 16505: Src/builtin.c: warn on fclose or fflush
