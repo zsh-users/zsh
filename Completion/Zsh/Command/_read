@@ -1,0 +1,18 @@
+#compdef read
+
+local pflag expl line curcontext="$curcontext"
+
+# -p flag only relevant if we have a coprocess
+(:>&p) 2>/dev/null &&
+  pflag='(-q -u -z)-p[input is read from the coprocess]'
+
+_arguments -C -s -A "-*" -S \
+  '-r[raw mode]' \
+  '(-p -k -u -z)-q[read y or n character from terminal]' \
+  '(-q)-k[specify number of characters to read]:number of characters' \
+  '(-q -u -p)-z[read entry from editor buffer stack]' \
+  '(-E)-e[input read is echoed and not assigned]' \
+  '(-e)-E[input read is echoed]' \
+  '-A[first name is taken as an array]' \
+  '(-q -z -p)-u+[specify file-descriptor to read from]:file-descriptor:_file_descriptors' \
+  $pflag '1:varprompt:_vars -qS\?' '*:vars:_vars'
