@@ -69,7 +69,7 @@ widgets[] = {
  */
 
 /**/
-struct thingy thingies[] = {
+mod_export struct thingy thingies[] = {
 #define T(name, th_flags, w_idget, t_next) \
     { NULL, name, th_flags, 2, w_idget, t_next },
 #include "thingies.list"
@@ -200,9 +200,9 @@ int metabind[128] = {
     /* M-K */ z_undefinedkey,
     /* M-L */ z_downcaseword,
     /* M-M */ z_undefinedkey,
-    /* M-N */ z_historybeginningsearchforward,
+    /* M-N */ z_historysearchforward,
     /* M-O */ z_undefinedkey,
-    /* M-P */ z_historybeginningsearchbackward,
+    /* M-P */ z_historysearchbackward,
     /* M-Q */ z_pushline,
     /* M-R */ z_undefinedkey,
     /* M-S */ z_spellword,
@@ -232,9 +232,9 @@ int metabind[128] = {
     /* M-k */ z_undefinedkey,
     /* M-l */ z_downcaseword,
     /* M-m */ z_undefinedkey,
-    /* M-n */ z_historybeginningsearchforward,
+    /* M-n */ z_historysearchforward,
     /* M-o */ z_undefinedkey,
-    /* M-p */ z_historybeginningsearchbackward,
+    /* M-p */ z_historysearchbackward,
     /* M-q */ z_pushline,
     /* M-r */ z_undefinedkey,
     /* M-s */ z_spellword,
@@ -396,8 +396,8 @@ int vicmdbind[128] = {
     /* g */ z_undefinedkey,
     /* h */ z_vibackwardchar,
     /* i */ z_viinsert,
-    /* j */ z_downlineorhistory,
-    /* k */ z_uplineorhistory,
+    /* j */ z_vidownlineorhistory,
+    /* k */ z_viuplineorhistory,
     /* l */ z_viforwardchar,
     /* m */ z_visetmark,
     /* n */ z_virepeatsearch,
