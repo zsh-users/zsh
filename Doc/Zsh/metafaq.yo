@@ -161,3 +161,7 @@ cabbalistic, hierographic, or downright mystifying (for example, the word
 tt(http://zsh.sunsite.dk/Guide/).  At the time of writing, chapters
 dealing with startup files and their contents and the new completion system
 were essentially complete.
+sect(The Zsh Wiki)
+A `wiki' website for zsh has been created at tt(http://www.zshwiki.org/).
+This is a site which can be added to and modified directly by users without
+any special permission.  You can add your own zsh tips and configurations.
