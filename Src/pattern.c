@@ -427,7 +427,7 @@ patcompswitch(int paren, int *flagp)
 #ifdef BACKREFERENCES
     int parno = 0;
 #endif
-    int flags, gfchanged = 0, savflags = patflags, savglobflags = patglobflags;
+    int flags, gfchanged = 0, savglobflags = patglobflags;
     Upat ptr;
 
     *flagp = 0;
@@ -491,8 +491,13 @@ patcompswitch(int paren, int *flagp)
 	    up.p = NULL;
 	    patadd((char *)&up, 0, sizeof(up), 0);
 	    /* / is not treated as special if we are at top level */
-	    if (!paren)
-		patflags &= ~PAT_FILE;
+	    if (!paren && *patendseg == '/') {
+		tilde++;
+		patendseg++;
+		patendseglen--;
+		patendstr++;
+		patendstrlen--;
+	    }
 	} else {
 	    excsync = 0;
 	    br = patnode(P_BRANCH);
@@ -529,7 +534,13 @@ patcompswitch(int paren, int *flagp)
 	    }
 	}
 	newbr = patcompbranch(&flags);
-	patflags = savflags;
+	if (tilde == 2) {
+	    /* restore special treatment of / */
+	    patendseg--;
+	    patendseglen++;
+	    patendstr--;
+	    patendstrlen++;
+	}
 	if (!newbr)
 	    return 0;
 	if (gfnode)
