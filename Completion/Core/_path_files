@@ -19,7 +19,7 @@ exppaths=()
 
 zparseopts -a mopts \
     'P:=pfxsfx' 'S:=pfxsfx' 'q=pfxsfx' 'r:=pfxsfx' 'R:=pfxsfx' \
-    'W:=prepaths' 'F:=ignore' 'M+=matcher' \
+    'W:=prepaths' 'F:=ignore' 'M+:=matcher' \
     J: V: X: 1: 2: n: 'f=tmp1' '/=tmp1' 'g+:-=tmp1'
 
 sopt="-${(@j::M)${(@)tmp1#-}#?}"
