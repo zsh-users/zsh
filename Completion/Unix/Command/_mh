@@ -1,0 +1,85 @@
+#compdef folder folders comp inc mark refile repl scan show next prev rmm pick whom mhn mhpath mhlist mhstore mhshow mhparam mhmail
+
+# Completion for all possible MH commands.
+
+local mymhdir=${$(mhpath + 2>/dev/null):-~/Mail}
+local mhlib=/usr/lib/mh
+
+local prev="$words[CURRENT-1]" expl
+
+# To be on the safe side, check this exists and if not, get it anyway.
+[[ -d $mymhdir ]] || mymhdir=$(mhpath +)
+
+if compset -P 1 -; then
+  # get list of options, which MH commands can generate themselves
+  # awk is just too icky to use for this, sorry.  send me one if
+  # you come up with it.
+  _wanted options expl option \
+      compadd - $($words[1] -help | perl -ne 'if (/^\s*-\(?(\S+)/) {
+            $n = $1;
+            $n =~ s/\)//g;
+            print $n =~ s/^\[([a-z]+)\]// ? "$n\n$1$n\n" : "$n\n";
+          }')
+  return
+elif compset -P 1 '[+@]' || [[ "$prev" = -draftfolder ]]; then
+  # Complete folder names.
+  local mhpath
+
+  if [[ $IPREFIX != '@' ]]; then
+    [[ $IPREFIX = '+' ]] || IPREFIX=+
+    mhpath=$mymhdir
+  else
+    mhpath=$(mhpath)
+  fi
+
+  _wanted files expl 'MH folder' _path_files -W mhpath -/
+elif [[ "$prev" = -(editor|(whatnow|rmm|show|more)proc) ]]; then
+  _command_names -e
+elif [[ "$prev" = -file ]]; then
+  _files
+elif [[ "$prev" = -(form|audit|filter) ]]; then
+  # Need some MH template file, which may be in our own MH directory
+  # or with the standard library.
+  local mhfpath
+  # This is the only place we need mhlib, so leave the test till here.
+  mhlib=${${$(mhparam mhlproc 2>/dev/null):h}:-/usr/lib/mh}
+  mhfpath=($mymhdir $mhlib)
+
+  _wanted files expl 'MH template file' _files -W mhfpath -g '*(.)'
+elif [[ "$prev" = -(no|)cc ]]; then
+  _wanted -C "$prev" values expl 'CC address' compadd all to cc me
+elif [[ "$prev" = -[rw]cache ]]; then
+  _wanted -C "$prev" values expl cache compadd public private never ask
+elif [[ $service = mhparam ]]; then
+  _wanted parameters expl 'MH parameter' compadd - \
+    ${${(f)"$(mhparam -all)"}%%:*}
+elif [[ $service = mhmail ]]; then
+  _user_at_host
+else
+  # Generate sequences.
+  local foldnam folddir f ret
+
+  for f in $words; do
+    [[ $f = [@+]* ]] && foldnam=$f
+  done
+  if [[ $foldnam = '+'* ]]; then
+    folddir=$mymhdir/${foldnam#+}
+  elif [[ $foldnam = '@'* ]]; then
+    folddir=$(mhpath)/${foldnam#@}
+  else
+    folddir=$(mhpath)
+    # leaving foldnam empty works here
+  fi
+
+  _tags sequences
+  while _tags; do
+    while _next_label sequences expl sequence; do
+      compadd "$expl[@]" $(mark $foldnam 2>/dev/null | awk -F: '{ print $1 }') &&
+        ret=0
+      compadd "$expl[@]" reply next cur prev first last all unseen && ret=0
+      _files "$expl[@]" -W folddir -g '<->' && ret=0
+    done
+    (( ret )) || return 0
+  done
+  return ret
+fi
