@@ -1,3 +1,8 @@
+2002-07-29  Peter Stephenson  <pws@csr.com>
+
+	* 17485?: Src/builtin.c: TYPESET_SILENT part of 17334 used
+	incorrect test.
+
 2002-07-26  Oliver Kiddle  <opk@zsh.org>
 
 	* 17484: Completion/Unix/Command/_netcat,

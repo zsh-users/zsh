@@ -1691,7 +1691,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	if (!on && !roff && !value) {
 	    if (ops['p'])
 		paramtab->printnode((HashNode)pm, PRINT_TYPESET);
-	    else if (unset(TYPESETSILENT) && !ops['m'])
+	    else if (unset(TYPESETSILENT) || ops['m'])
 		paramtab->printnode((HashNode)pm, PRINT_INCLUDEVALUE);
 	    return pm;
 	}
