@@ -2097,7 +2097,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		/* If this is 'exec < file', read from stdin, *
 		 * not terminal, unless `file' is a terminal. */
 		if (nullexec == 1 && fn->fd1 == 0 &&
-		    isset(SHINSTDIN) && interact)
+		    isset(SHINSTDIN) && interact && !zleactive)
 		    init_io();
 		break;
 	    case CLOSE:

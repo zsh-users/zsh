@@ -1,6 +1,11 @@
+2000-05-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11326: Src/exec.c: Don't reinitialize SHTTY upon "exec < file"
+	when ZLE is active.
+
 2000-05-11  Oliver Kiddle  <opk@zsh.org>
 
-	* 11329: Completion/User/_groups: redirect ypcat to stderr
+	* 11329: Completion/User/_groups: redirect ypcat stderr to /dev/null
 
 2000-05-11  Sven Wischnowsky  <wischnow@zsh.org>
 
