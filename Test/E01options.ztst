@@ -344,6 +344,14 @@
 0:NO_EXEC option
 >before
 
+  setopt NO_eval_lineno
+  eval 'print $LINENO'
+  setopt eval_lineno
+  eval 'print $LINENO'
+0:EVAL_LINENO option
+>2
+>1
+
   # The EXTENDED_GLOB test doesn't test globbing fully --- it just tests
   # that certain patterns are treated literally with the option off
   # and as patterns with the option on.
@@ -706,14 +714,20 @@
 ?(eval):14: no such file or directory: pathtestdir/findme
 
   setopt posixbuiltins
+  PATH= command -v print
+  PATH= command -V print
   PATH= command print foo
   unsetopt posixbuiltins
   print unsetting...
+  PATH= command -V print
   PATH= command print foo
 127:POSIX_BUILTINS option
+>print
+>print is a shell builtin
 >foo
 >unsetting...
-?(eval):5: command not found: print
+>print is a shell builtin
+?(eval):8: command not found: print
 
 # This option seems to be problematic.  I don't quite know how it works.
 ##   func() {
