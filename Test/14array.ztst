@@ -49,3 +49,7 @@
   echo .$foo[-4,5].
 0:Array indexing
 >.d e.
+
+  echo .$foo[-6,-2].
+0:Array indexing
+>.b c d e f.
