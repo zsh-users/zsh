@@ -5,6 +5,16 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 Changes since zsh version 4.2.0
 -------------------------------
 
+- The glob qualifier F indicates a non-empty directory.  Hence *(F)
+  indicates all subdirectories with entries, *(/^F) means all
+  subdirectories with non entries.
+
+- fc -p and fc -P provide push/pop for the status of the shell's
+  history (both internal and using the history file).  With automatic
+  scoping (fc -ap) it becomes easy to use a temporary history in a
+  function.  This has been added to the calculator function zcalc to make
+  its internal history work more seamlessly.
+
 - A new `try block' and `always block' syntax has been introduced
   to make it easier to ensure the shell runs important tidy-up code
   in the event of an error.  It also runs after a break, continue, or

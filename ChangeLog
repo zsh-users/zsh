@@ -1,3 +1,8 @@
+2004-07-12  Peter Stephenson  <pws@csr.com>
+
+	* unposted: improve 20150 by setting pointer to NULL when
+	freed.
+
 2004-07-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 20150: Src/Zle/compresult.c: repost of ancient attempt

@@ -1770,7 +1770,10 @@ calclist(int showall)
     }
     else
 	for (g = amatches; g; g = g->next)
+	{
 	    zfree(g->widths, 0);
+	    g->widths = NULL;
+	}
     listdat.valid = 1;
     listdat.hidden = hidden;
     listdat.nlist = nlist;
