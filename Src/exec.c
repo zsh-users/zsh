@@ -2553,8 +2553,12 @@ gethere(char *str, int typ)
     if (t > buf && t[-1] == '\n')
 	t--;
     *t = '\0';
-    if (!qt)
+    if (!qt) {
+	int ef = errflag;
+
 	parsestr(buf);
+	errflag = ef;
+    }
     s = dupstring(buf);
     zfree(buf, bsiz);
     return s;
