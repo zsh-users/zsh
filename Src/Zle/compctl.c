@@ -857,7 +857,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    default:
-		if (!first && (**argv == '-' || **argv == '+'))
+		if (!first && (**argv == '-' || **argv == '+') && !argv[0][1])
 		    (*argv)--, argv--, ready = 1;
 		else {
 		    zwarnnam(name, "bad option: -%c", NULL, **argv);

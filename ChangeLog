@@ -1,3 +1,7 @@
+2004-02-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 19422: Src/Zle/compctl.c: fix crash if given a long option
+
 2004-02-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 19420: acconfig.h, aczsh.m4, configure.ac, Makefile.in,
