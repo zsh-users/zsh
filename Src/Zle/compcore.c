@@ -2654,6 +2654,8 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 	    }
 	} else {
 	    if (!(flags & CGF_UNIQALL) && !(flags & CGF_UNIQCON)) {
+                int dup;
+
 		for (ap = rp; *ap; ap++) {
 		    for (bp = cp = ap + 1; *bp; bp++) {
 			if (!matcheq(*ap, *bp))
@@ -2662,6 +2664,17 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 			    n--;
 		    }
 		    *cp = NULL;
+                    if (!(*ap)->disp) {
+                        for (dup = 0, bp = ap + 1; *bp; bp++)
+                            if (!(*bp)->disp &&
+                                !((*bp)->flags & CMF_MULT) &&
+                                !strcmp((*ap)->str, (*bp)->str)) {
+                                (*bp)->flags |= CMF_MULT;
+                                dup = 1;
+                            }
+                        if (dup)
+                            (*ap)->flags |= CMF_FMULT;
+                    }
 		}
 	    } else if (!(flags & CGF_UNIQCON)) {
 		int dup;
