@@ -1,3 +1,11 @@
+2004-03-24  Peter Stephenson  <pws@csr.com>
+
+	* 19674 plus unposted changes suggested in 19676:
+	configure.ac, Doc/Zsh/mod_zftp.yo, Src/Modules/zftp.c,
+	Etc/NEWS, Functions/Zftp/zfstat: Add support for non-standard
+	ports to core zftp.  Not yet handled by the function system
+	(except zfstat reports port): needed in lastloc	and bookmarks.
+
 2004-03-23  Peter Stephenson  <pws@csr.com>
 
 	* 19661: Danek Duvall: Completion/Unix/Type/_diff_options:

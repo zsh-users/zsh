@@ -1053,7 +1053,8 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       nl_langinfo \
 	       erand48 open_memstream \
 	       wctomb iconv \
-	       grantpt unlockpt ptsname)
+	       grantpt unlockpt ptsname \
+	       htons ntohs)
 AC_FUNC_STRCOLL
 
 if test x$enable_cap = xyes; then

@@ -1,17 +1,21 @@
-texinode(The zftp Module)(The zle Module)(The stat Module)(Zsh Modules)
-sect(The zftp Module)
-The tt(zftp) module makes available one builtin command:
+COMMENT(!MOD!zsh/zftp
+A builtin FTP client.
+!MOD!)
+The tt(zsh/zftp) module makes available one builtin command:
 
 startitem()
 findex(zftp)
 cindex(FTP)
 cindex(files, transferring)
 item(tt(zftp) var(subcommand) [ var(args) ])(
-The tt(zftp) module is a client for FTP (file transfer protocol).  It
+The tt(zsh/zftp) module is a client for FTP (file transfer protocol).  It
 is implemented as a builtin to allow full use of shell command line
 editing, file I/O, and job control mechanisms.  Often, users will
-access it via shell functions providing higher level abilities such as
-username and password lookup.  However, it is entirely usable in its
+access it via shell functions providing a more powerful interface; a set is
+provided with the tt(zsh) distribution and is described in
+ifzman(zmanref(zshzftpsys))\
+ifnzman(noderef(Zftp Function System))\
+.  However, the tt(zftp) command is entirely usable in its
 own right.
 
 All commands consist of the command name tt(zftp) followed by the name
@@ -27,15 +31,25 @@ cindex(zftp, subcommands)
 
 startitem()
 cindex(FTP, starting a session)
-item(tt(open) var(host) [ var(user) [ var(password) [ var(account) ] ] ])(
+item(tt(open) var(host)[tt(:)var(port)] [ var(user) [ var(password) [ var(account) ] ] ])(
 Open a new FTP session to var(host), which may be the name of a TCP/IP
-connected host or an IP number in the standard dot notation.
+connected host or an IP number in the standard dot notation.  If the
+argument is in the form var(host)tt(:)var(port), open a connection to
+TCP port var(port) instead of the standard FTP port 21.  This may be
+the name of a TCP service or a number:  see the description of
+tt(ZFTP_PORT) below for more information.
+
+If IPv6 addresses in colon format are used, the var(host) should be
+surrounded by quoted square brackets to distinguish it from the var(port),
+for example tt('[fe80::203:baff:fe02:8b56]').  For consistency this is
+allowed with all forms of var(host).
+
 Remaining arguments are passed to the tt(login) subcommand.  Note that
 if no arguments beyond var(host) are supplied, tt(open) will em(not)
 automatically call tt(login).  If no arguments at all are supplied,
 tt(open) will use the parameters set by the tt(params) subcommand.
 
-After a successful open, the shell variables tt(ZFTP_HOST),
+After a successful open, the shell variables tt(ZFTP_HOST), tt(ZFTP_PORT),
 tt(ZFTP_IP) and tt(ZFTP_SYSTEM) are available; see `Variables'
 below.
 )
@@ -60,37 +74,50 @@ xitem(tt(params) [ var(host) [ var(user) [ var(password) \
 item(tt(params) tt(-))(
 Store the given parameters for a later tt(open) command with no
 arguments.  Only those given on the command line will be remembered.
-Any of the parameters may, however, be specified as a `tt(?)', which
-may need to be quoted to protect it from shell expansion:  in this case,
-the appropriate parameter will be read from stdin as with the
-tt(login) subcommand, including special handling of var(password).
-
 If no arguments are given, the parameters currently set are printed,
-although the password will appear as a line of stars.
+although the password will appear as a line of stars; the return value is
+one if no parameters were set, zero otherwise.
+
+Any of the parameters may be specified as a `tt(?)', which
+may need to be quoted to protect it from shell expansion.  In this case,
+the appropriate parameter will be read from stdin as with the
+tt(login) subcommand, including special handling of var(password).  If the
+`tt(?)' is followed by a string, that is used as the prompt for reading the
+parameter instead of the default message (any necessary punctuation and
+whitespace should be included at the end of the prompt).  The first letter
+of the parameter (only) may be quoted with a `tt(\)'; hence an argument
+tt("\\$word") guarantees that the string from the shell parameter tt($word)
+will be treated literally, whether or not it begins with a `tt(?)'.
 
 If instead a single `tt(-)' is given, the existing parameters, if any,
 are deleted.  In that case, calling tt(open) with no arguments will
 cause an error.
 
 The list of parameters is not deleted after a tt(close), however it
-will be deleted if the tt(zftp) module is unloaded.
+will be deleted if the tt(zsh/zftp) module is unloaded.
 
 For example,
 
-nofill(tt(zftp params ftp.elsewhere.xx juser '?'))
+example(zftp params ftp.elsewhere.xx juser '?Password for juser: ')
 
 will store the host tt(ftp.elsewhere.xx) and the user tt(juser) and
-then prompt the user for the corresponding password.
+then prompt the user for the corresponding password with the given prompt.
+)
+item(tt(test))(
+Test the connection; if the server has reported
+that it has closed the connection (maybe due to a timeout), return
+status 2; if no connection was open anyway, return status 1; else
+return status 0.  The tt(test) subcommand is
+silent, apart from messages printed by the tt($ZFTP_VERBOSE)
+mechanism, or error messages if the connection closes.  There is no
+network overhead for this test.
 
-This command may also be used to set up a transfer which then takes
-place completely in the background, freeing tt(zftp) for concurrent
-foreground use.  For example,
+The test is only supported on systems with either the tt(select(2)) or
+tt(poll(2)) system calls; otherwise the message `tt(not
+supported on this system)' is printed instead.
 
-nofill(tt(zftp params ftp.soreeyes.ca bubble squeak))
-nofill(tt(LPAR()zftp open; zftp get foo >bar; zftp close)tt(RPAR() &))
-
---- here, the connection is restricted to a background subshell and
-you are free to open a simultaneous connection in the foreground.
+The tt(test) subcommand will automatically be called at the start of any
+other subcommand for the current session when a connection is open.
 )
 item(tt(cd) var(directory))(
 Change the remote directory to var(directory).  Also alters the shell
@@ -114,7 +141,7 @@ Otherwise, up to vagaries of the server implementation, behaves
 similar to tt(dir).
 )
 item(tt(type) [ var(type) ])(
-Change the type for transfer to var(type), or print the current type
+Change the type for the transfer to var(type), or print the current type
 if var(type) is absent.  The allowed values are `tt(A)' (ASCII),
 `tt(I)' (Image, i.e. binary), or `tt(B)' (a synonym for `tt(I)').
 
@@ -185,7 +212,7 @@ item(tt(mkdir) var(directory))(
 Create a new directory var(directory) on the server.
 )
 item(tt(rmdir) var(directory))(
-Delete the diretory var(directory)  on the server.
+Delete the directory var(directory)  on the server.
 )
 item(tt(rename) var(old-name) var(new-name))(
 Rename file var(old-name) to var(new-name) on the server.
@@ -197,7 +224,7 @@ only need this if instructed by the server to use it.
 item(tt(quote) var(args...))(
 Send the raw FTP command sequence to the server.  You should be
 familiar with the FTP command set as defined in RFC959 before doing
-this.  Useful comands may include tt(STAT) and tt(HELP).  Note also
+this.  Useful commands may include tt(STAT) and tt(HELP).  Note also
 the mechanism for returning messages as described for the variable
 tt(ZFTP_VERBOSE) below, in particular that all messages from the
 control connection are sent to standard error.
@@ -205,8 +232,33 @@ control connection are sent to standard error.
 xitem(tt(close))
 item(tt(quit))(
 Close the current data connection.  This unsets the shell parameters
-tt(ZFTP_HOST), tt(ZFTP_IP), tt(ZFTP_SYSTEM), tt(ZFTP_USER),
-tt(ZFTP_ACCOUNT) and tt(ZFTP_PWD).
+tt(ZFTP_HOST), tt(ZFTP_PORT), tt(ZFTP_IP), tt(ZFTP_SYSTEM), tt(ZFTP_USER),
+tt(ZFTP_ACCOUNT), tt(ZFTP_PWD), tt(ZFTP_TYPE) and tt(ZFTP_MODE).
+)
+item(tt(session) [ var(sessname) ])(
+Allows multiple FTP sessions to be used at once.  The name of the session
+is an arbitrary string of characters; the default session is called
+`tt(default)'.  If this command is called without an argument, it will list
+all the current sessions; with an argument, it will either switch to the
+existing session called var(sessname), or create a new session of that name.
+
+Each session remembers the status of the connection, the set of
+connection-specific shell parameters (the same set as are unset when a
+connection closes, as given in the description of tt(close)), and any user
+parameters specified with the tt(params) subcommand.  Changing to a
+previous session restores those values; changing to a new session
+initialises them in the same way as if tt(zftp) had just been loaded.  The
+name of the current session is given by the parameter tt(ZFTP_SESSION).
+)
+item(tt(rmsession) [ var(sessname) ])(
+Delete a session; if a name is not given, the current session is deleted.
+If the current session is deleted, the earliest existing session becomes
+the new current session, otherwise the current session is not changed.
+If the session being deleted is the only one, a new session called
+`tt(default)' is created and becomes the current session; note that this is
+a new session even if the session being deleted is also called
+`tt(default)'. It is recommended that sessions not be deleted while
+background commands which use tt(zftp) are still active.
 )
 enditem()
 
@@ -216,6 +268,7 @@ The following shell parameters are used by tt(zftp).  Currently none
 of them are special.
 
 startitem()
+vindex(ZFTP_TMOUT)
 item(tt(ZFTP_TMOUT))(
 Integer.  The time in seconds to wait for a network operation to
 complete before returning an error.  If this is not set when the
@@ -235,6 +288,18 @@ opened as an IP number, tt(ZFTP_HOST) contains that instead; this
 saves the overhead for a name lookup, as IP numbers are most commonly
 used when a nameserver is unavailable.
 )
+vindex(ZFTP_PORT)
+item(tt(ZFTP_PORT))(
+Readonly.  The number of the remote TCP port to which the connection is
+open (even if the port was originally specified as a named service).
+Usually this is the standard FTP port, 21.
+
+In the unlikely event that your system does not have the appropriate
+conversion functions, this appears in network byte order.  If your
+system is little-endian, the port then consists of two swapped bytes and the
+standard port will be reported as 5376.  In that case, numeric ports passed
+to tt(zftp open) will also need to be in this format.
+)
 vindex(ZFTP_SYSTEM)
 item(tt(ZFTP_SYSTEM))(
 Readonly.  The system type string returned by the server in response
@@ -251,8 +316,8 @@ vindex(ZFTP_USER)
 item(tt(ZFTP_USER))(
 Readonly.  The username currently logged in, if any.
 )
-vindex(ZFTP_ACCT)
-item(tt(ZFTP_ACCT))(
+vindex(ZFTP_ACCOUNT)
+item(tt(ZFTP_ACCOUNT))(
 Readonly.  The account name of the current user, if any.  Most servers
 do not require an account name.
 )
@@ -263,12 +328,19 @@ Readonly.  The current directory on the server.
 vindex(ZFTP_CODE)
 item(tt(ZFTP_CODE))(
 Readonly.  The three digit code of the last FTP reply from the server
-as a string.  This can still be read after the connection is closed.
+as a string.  This can still be read after the connection is closed, and
+is not changed when the current session changes.
 )
 vindex(ZFTP_REPLY)
 item(tt(ZFTP_REPLY))(
 Readonly.  The last line of the last reply sent by the server.  This
-can still be read after the connection is closed.
+can still be read after the connection is closed, and is not changed when
+the current session changes.
+)
+vindex(ZFTP_SESSION)
+item(tt(ZFTP_SESSION))(
+Readonly.  The name of the current FTP session; see the description of the
+tt(session) subcommand.
 )
 vindex(ZFTP_PREFS)
 item(tt(ZFTP_PREFS))(
@@ -311,7 +383,7 @@ digit reply code is defined by RFC959 to correspond to:
 
 startitem()
 item(1.)(
-A positive prelimnary reply.
+A positive preliminary reply.
 )
 item(2.)(
 A positive completion reply.
@@ -350,14 +422,14 @@ subsect(Functions)
 cindex(zftp, functions)
 
 startitem()
-findex(zftp_chpwd)
+findex(zftp_chpwd, specification)
 item(tt(zftp_chpwd))(
 If this function is set by the user, it is called every time the
 directory changes on the server, including when a user is logged
 in, or when a connection is closed.  In the last case, tt($ZFTP_PWD)
 will be unset; otherwise it will reflect the new directory.
 )
-findex(zftp_progress)
+findex(zftp_progress, specification)
 item(tt(zftp_progress))(
 If this function is set by the user, it will be called during
 a tt(get), tt(put) or tt(append) operation each time sufficient data
@@ -405,17 +477,25 @@ Sometimes the progress meter may cause disruption.  It is up to the
 user to decide whether the function should be defined and to use
 tt(unfunction) when necessary.
 )
+enditem()
 
 subsect(Problems)
 cindex(zftp, problems)
 
-With the exception noted for the tt(params) subcommand, a connection
-may not be opened in the left hand side of a pipe as this occurs in a
-subshell and the file information is not updated in the main shell.
-In the case of type or mode changes or closing the connection in a
-subshell, the information is returned but variables are not updated
-until the next call to tt(zftp).  Other status changes in subshells
-will not be reflected by changes to the variables (but should
-be otherwise harmless).
+A connection may not be opened in the left hand side of a pipe as this
+occurs in a subshell and the file information is not updated in the main
+shell.  In the case of type or mode changes or closing the connection in a
+subshell, the information is returned but variables are not updated until
+the next call to tt(zftp).  Other status changes in subshells will not be
+reflected by changes to the variables (but should be otherwise harmless).
 
-enditem()
+Deleting sessions while a tt(zftp) command is active in the background can
+have unexpected effects, even if it does not use the session being deleted.
+This is because all shell subprocesses share information on the state of
+all connections, and deleting a session changes the ordering of that
+information.
+
+On some operating systems, the control connection is not valid after a
+fork(), so that operations in subshells, on the left hand side of a
+pipeline, or in the background are not possible, as they should be.  This
+is presumably a bug in the operating system.

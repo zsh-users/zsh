@@ -2,6 +2,19 @@
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
 
+Changes since zsh version 4.2.0
+-------------------------------
+
+The zftp module supports ports following the hostname in the normal suffix
+notation, `host:port'.  This requires IPv6 colon-style addresses to be
+specified in suitably quoted square brackets, for example:
+
+  zftp open '[f000::baaa]'
+  zftp open '[f000::baaa]:ftp'
+
+(the two are equivalent).
+
+
 New features between zsh versions 4.0 and 4.2
 ---------------------------------------------
 

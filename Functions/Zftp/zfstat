@@ -19,6 +19,7 @@ done
 
 if [[ -n $ZFTP_HOST ]]; then
   print "Host:\t\t$ZFTP_HOST"
+  print "Port:\t\t$ZFTP_PORT"
   print "IP:\t\t$ZFTP_IP"
   [[ -n $ZFTP_SYSTEM ]] && print "System type:\t$ZFTP_SYSTEM"
   if [[ -n $ZFTP_USER ]]; then

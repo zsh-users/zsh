@@ -195,7 +195,7 @@ static struct builtin bintab[] = {
  * currently there aren't any, which is the way I like it.
  */
 static char *zfparams[] = {
-    "ZFTP_HOST", "ZFTP_IP", "ZFTP_SYSTEM", "ZFTP_USER",
+    "ZFTP_HOST", "ZFTP_PORT", "ZFTP_IP", "ZFTP_SYSTEM", "ZFTP_USER",
     "ZFTP_ACCOUNT", "ZFTP_PWD", "ZFTP_TYPE", "ZFTP_MODE", NULL
 };
 
@@ -1699,8 +1699,9 @@ zftp_open(char *name, char **args, int flags)
     struct protoent *zprotop;
     struct servent *zservp;
     struct hostent *zhostp = NULL;
-    char **addrp, *fname;
-    int err, tmout;
+    char **addrp, *fname, *tmpptr, *portnam = "ftp";
+    char *hostnam, *hostsuffix;
+    int err, tmout, port = -1;
     SOCKLEN_T  len;
     int herrno, af, hlen;
 
@@ -1721,12 +1722,56 @@ zftp_open(char *name, char **args, int flags)
     if (zfsess->control)
 	zfclose(0);
 
+    hostnam = dupstring(args[0]);
+    /*
+     * Check for IPv6 address in square brackets (RFC2732).
+     * We are more lenient and allow any form for the host here.
+     */
+    if (hostnam[0] == '[') {
+	hostnam++;
+	hostsuffix = strchr(hostnam, ']');
+	if (!hostsuffix || (hostsuffix[1] && hostsuffix[1] != ':')) {
+	    zwarnnam(name, "Invalid host format: %s", hostnam, 0);
+	    return 1;
+	}
+	*hostsuffix++ = '\0';
+    }
+    else
+	hostsuffix = hostnam;
+
+    if ((tmpptr = strchr(hostsuffix, ':'))) {
+	char *endptr;
+
+	*tmpptr++ = '\0';
+	port = (int)zstrtol(tmpptr, &endptr, 10);
+	/*
+	 * If the port is not numeric, look it up by name below.
+	 */
+	if (*endptr) {
+	    portnam = tmpptr;
+	    port = -1;
+	}
+#if defined(HAVE_NTOHS) && defined(HAVE_HTONS)
+	else {
+	    port = (int)htons((unsigned short)port);
+	}
+#endif
+    }
+
     /* this is going to give 0.  why bother? */
     zprotop = getprotobyname("tcp");
-    zservp = getservbyname("ftp", "tcp");
+    if (!zprotop) {
+	zwarnnam(name, "Can't find protocol TCP (is your network functional)?",
+		 NULL, 0);
+	return 1;
+    }
+    if (port < 0)
+	zservp = getservbyname(portnam, "tcp");
+    else
+	zservp = getservbyport(port, "tcp");
 
     if (!zprotop || !zservp) {
-	zwarnnam(name, "Somebody stole FTP!", NULL, 0);
+	zwarnnam(name, "Can't find port for service `%s'", portnam, 0);
 	return 1;
     }
 
@@ -1762,7 +1807,9 @@ zftp_open(char *name, char **args, int flags)
 # define FAILED() do { } while(0)
 #endif
     {
-	zhostp = zsh_getipnodebyname(args[0], af, 0, &herrno);
+	off_t tcp_port;
+
+	zhostp = zsh_getipnodebyname(hostnam, af, 0, &herrno);
 	if (!zhostp || errflag) {
 	    /* should use herror() here if available, but maybe
 	     * needs configure test. on AIX it's present but not
@@ -1771,11 +1818,18 @@ zftp_open(char *name, char **args, int flags)
 	     * on the other hand, herror() is obsolete
 	     */
 	    FAILED();
-	    zwarnnam(name, "host not found: %s", args[0], 0);
+	    zwarnnam(name, "host not found: %s", hostnam, 0);
 	    alarm(0);
 	    return 1;
 	}
 	zfsetparam("ZFTP_HOST", ztrdup(zhostp->h_name), ZFPM_READONLY);
+	/* careful with pointer types */
+#if defined(HAVE_NTOHS) && defined(HAVE_HTONS)
+	tcp_port = (off_t)ntohs((unsigned short)zservp->s_port);
+#else
+	tcp_port = (off_t)zservp->s_port;
+#endif
+	zfsetparam("ZFTP_PORT", &tcp_port, ZFPM_READONLY|ZFPM_INTEGER);
 
 #ifdef SUPPORT_IPV6
 	if(af == AF_INET6) {
@@ -1795,6 +1849,7 @@ zftp_open(char *name, char **args, int flags)
 	    }
 	    freehostent(zhostp);
 	    zfunsetparam("ZFTP_HOST");
+	    zfunsetparam("ZFTP_PORT");
 	    FAILED();
 	    zwarnnam(name, "socket failed: %e", NULL, errno);
 	    alarm(0);
@@ -1815,8 +1870,7 @@ zftp_open(char *name, char **args, int flags)
 	    if(hlen != zhostp->h_length)
 		zwarnnam(name, "address length mismatch", NULL, 0);
 	    do {
-		err = tcp_connect(zfsess->control, *addrp, zhostp, zservp->s_port);
-	    } while (err && errno == EINTR && !errflag);
+		err = tcp_connect(zfsess->control, *addrp, zhostp, zservp->s_port);	    } while (err && errno == EINTR && !errflag);
 	    /* you can check whether it's worth retrying here */
 	}
 
