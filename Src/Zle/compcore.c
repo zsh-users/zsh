@@ -670,6 +670,10 @@ callcompfunc(char *s, char *fn)
 	    untokenize(ss);
 	    compsuffix = ztrdup(ss);
 	}
+        zsfree(complastprefix);
+        zsfree(complastsuffix);
+        complastprefix = ztrdup(compprefix);
+        complastsuffix = ztrdup(compsuffix);
 	zsfree(compiprefix);
 	zsfree(compisuffix);
 	if (parwb < 0) {

@@ -1752,7 +1752,8 @@ struct menusearch {
 #define MAX_STATUS 128
 
 static char *
-setmstatus(char *status, int *csp, int *llp, int *lenp)
+setmstatus(char *status, char *sline, int sll, int scs,
+           int *csp, int *llp, int *lenp)
 {
     char *p, *s, *ret = NULL;
     int pl, sl, max;
@@ -1771,17 +1772,14 @@ setmstatus(char *status, int *csp, int *llp, int *lenp)
         strncpy(s, (char *) line + cs, lastend - cs);
         s[lastend - cs] = '\0';
 
-        cs = wb;
-        foredel(lastend - wb);
-        pl = strlen(compprefix);
-        sl = strlen(compsuffix);
-        spaceinline(pl + sl);
-        strncpy(line + wb, compprefix, pl);
-        strncpy(line + wb + pl, compsuffix, sl);
-        cs = wb + pl;
+        cs = 0;
+        foredel(ll);
+        spaceinline(sll);
+        memcpy(line, sline, sll);
+        cs = scs;
     } else {
-        p = compprefix;
-        s = compsuffix;
+        p = complastprefix;
+        s = complastsuffix;
     }
     pl = strlen(p);
     sl = strlen(s);
@@ -1973,7 +1971,7 @@ domenuselect(Hookdef dummy, Chdata dat)
             spaceinline(l);
             strncpy((char *) line, origline, l);
             cs = origcs;
-            setmstatus(status, NULL, NULL, NULL);
+            setmstatus(status, NULL, 0 , 0, NULL, NULL, NULL);
         } else if (strpfx("search", s)) {
             mode = (strstr(s, "back") ? MM_BSEARCH : MM_FSEARCH);
         }
@@ -2056,7 +2054,7 @@ domenuselect(Hookdef dummy, Chdata dat)
         if (first && !listshown && isset(LISTBEEP))
             zbeep();
         if (first) {
-            modeline = dyncat(compprefix, compsuffix);
+            modeline = dyncat(complastprefix, complastsuffix);
             modecs = cs;
             modell = ll;
             modelen = minfo.len;
@@ -2141,13 +2139,16 @@ domenuselect(Hookdef dummy, Chdata dat)
                 spaceinline(l);
                 strncpy((char *) line, origline, l);
                 cs = origcs;
-                setmstatus(status, NULL, NULL, NULL);
+                setmstatus(status, NULL, 0, 0, NULL, NULL, NULL);
 
                 continue;
             }
 	} else if (cmd == Th(z_acceptandinfernexthistory) ||
                    (mode == MM_INTER && (cmd == Th(z_selfinsert) ||
                                          cmd == Th(z_selfinsertunmeta)))) {
+            char *saveline = NULL;
+            int savell;
+            int savecs;
 	    Menustack s = (Menustack) zhalloc(sizeof(*s));
 
 	    s->prev = u;
@@ -2195,15 +2196,27 @@ domenuselect(Hookdef dummy, Chdata dat)
                 else
                     selfinsertunmeta(zlenoargs);
 
+                saveline = (char *) zhalloc(ll);
+                memcpy(saveline, line, ll);
+                savell = ll;
+                savecs = cs;
                 iforcemenu = -1;
             } else
                 mode = 0;
 	    menucomplete(zlenoargs);
 	    iforcemenu = 0;
 
-	    if ((dat ? dat->num : nmatches) < 1 || !minfo.cur || !*(minfo.cur)) {
+            if (cmd != Th(z_acceptandinfernexthistory))
+                modeline = setmstatus(status, saveline, savell, savecs,
+                                      &modecs, &modell, &modelen);
+
+	    if (nmatches < 1 || !minfo.cur || !*(minfo.cur)) {
 		nolist = 1;
-		if ((dat ? (dat->nmesg || nmessages) : nmessages)) {
+                if (mode == MM_INTER) {
+                    statusline = status;
+                    statusll = strlen(status);
+                }
+		if (nmessages) {
 		    showinglist = -2;
 		    zrefresh();
 		} else {
@@ -2219,11 +2232,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    zrefresh();
 		    showinglist = clearlist = 0;
 		}
+                statusline = NULL;
+                statusll = 0;
+
 		goto getk;
 	    }
-            if (cmd != Th(z_acceptandinfernexthistory))
-                modeline = setmstatus(status, &modecs, &modell, &modelen);
-
 	    clearlist = listshown = 1;
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = wasnext = 1;

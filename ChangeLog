@@ -1,3 +1,10 @@
+2002-07-04  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17403: Src/Zle/compcore.c, Src/Zle/complete.c,
+	Src/Zle/complist.c: in menu selection, use copies of
+	comp{pre,suf}fix to make sure they exist; fix display problem
+	with non-empty iprefix
+
 2002-07-03  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17394: Src/Zle/complist.c: fix for interactive mode when menu

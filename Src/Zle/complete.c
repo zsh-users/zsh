@@ -46,6 +46,8 @@ char **compwords,
      **compredirs,
      *compprefix,
      *compsuffix,
+     *complastprefix,
+     *complastsuffix,
      *compisuffix,
      *compqiprefix,
      *compqisuffix,
@@ -1405,6 +1407,8 @@ setup_(Module m)
 	compexact = compexactstr = comppatmatch = comppatinsert =
 	complastprompt = comptoend = compoldlist = compoldins =
 	compvared = compqstack = NULL;
+    complastprefix = ztrdup("");
+    complastsuffix = ztrdup("");
     complistmax = 0;
     hascompmod = 1;
 
@@ -1458,6 +1462,8 @@ finish_(Module m)
 	freearray(compredirs);
     zsfree(compprefix);
     zsfree(compsuffix);
+    zsfree(complastprefix);
+    zsfree(complastsuffix);
     zsfree(compiprefix);
     zsfree(compisuffix);
     zsfree(compqiprefix);
