@@ -59,7 +59,8 @@ if (( ! $+functions[compadd] )); then
       PREFIX="(#a${_comp_correct})$PREFIX"
     # fi
 
-    (( $_correct_group )) && _correct_expl[_correct_group]=${argv[(R)-*[JV]]}
+    (( $_correct_group && $argv[(I)-*[JV]] )) &&
+        _correct_expl[_correct_group]=${argv[(R)-*[JV]]}
 
     builtin compadd "$_correct_expl[@]" "$@"
   }

@@ -1,3 +1,8 @@
+2001-08-16  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15638: Completion/Base/Completer/_approximate: make sure that
+	there is one of the group-options before using it
+
 2001-08-15  Geoff Wing  <gcw@zsh.org>
 	
 	* 15621: Src/Zle/zle_refresh.c: display of status line was being
