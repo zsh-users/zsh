@@ -340,7 +340,7 @@ xitem([ tt(-W) var(file-prefix) ])
 xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ])
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 xitem([ tt(-M) var(match-spec) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
-item([ tt(--) ] [ var(words) ... ])(
+item([ tt(-D) var(array) ] [ tt(--) ] [ var(words) ... ])(
 
 This builtin command can be used to add matches directly and control
 all the information the completion code stores with each possible
@@ -517,6 +517,13 @@ with a matching specification of `tt(-M "L:|no=")', the string `tt(nof)'
 on the command line and the string `tt(foo)' as one of the var(words), this
 option stores the string `tt(nofoo)' in the array, whereas the tt(-O)
 option stores the `tt(foo)' originally given.
+)
+item(tt(-D) var(array))(
+As with tt(-O), the var(words) are not added to the set of possible
+completions. Instead, the completion code tests every var(word) if 
+it matches what is on the line. If the var(n)'th var(word) does not
+match, the var(n)'th element of the var(array) is removed. Elements
+for which the corresponding var(word) is matched are retained.
 )
 item(tt(-), tt(--))(
 This flag ends the list of flags and options. All arguments after it

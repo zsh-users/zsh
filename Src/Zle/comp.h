@@ -270,6 +270,31 @@ struct cpattern {
 #define CAF_ALT      4
 #define CAF_MATCH    8
 
+/* Data for compadd and addmatches() */
+
+typedef struct cadata *Cadata;
+
+struct cadata {
+    char *ipre;
+    char *isuf;
+    char *ppre;
+    char *psuf;
+    char *prpre;
+    char *pre;
+    char *suf;
+    char *group;
+    char *rems;
+    char *remf;
+    char *ign;
+    int flags;
+    int aflags;
+    Cmatcher match;
+    char *exp;
+    char *apar;
+    char *opar;
+    char *dpar;
+};
+
 /* Flags for special parameters. */
 
 #define CP_WORDS      (1 <<  0)

@@ -3472,14 +3472,10 @@ set_param(char *name, LinkList l)
 
 /**/
 int
-addmatches(char *ipre, char *isuf,
-	   char *ppre, char *psuf, char *prpre, char *pre,
-	   char *suf, char *group, char *rems, char *remf, char *ign,
-	   int flags, int aflags, Cmatcher match, char *exp, 
-	   char *apar, char *opar, char **argv)
+addmatches(Cadata dat, char **argv)
 {
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
-    char **aign = NULL;
+    char **aign = NULL, **dparr;
     int lpl, lsl, pl, sl, bpl, bsl, llpl = 0, llsl = 0, nm = mnum;
     int oisalt = 0, isalt, isexact, doadd;
     Cline lc = NULL;
@@ -3487,45 +3483,52 @@ addmatches(char *ipre, char *isuf,
     struct cmlist mst;
     Cmlist oms = mstack;
     Comp cp = NULL;
-    LinkList aparl = NULL, oparl = NULL;
+    LinkList aparl = NULL, oparl = NULL, dparl = NULL;
 
     /* Switch back to the heap that was used when the completion widget
      * was invoked. */
     SWITCHHEAPS(compheap) {
 	HEAPALLOC {
-	    doadd = (!apar && !opar);
-	    if (apar)
+	    doadd = (!dat->apar && !dat->opar && !dat->dpar);
+	    if (dat->apar)
 		aparl = newlinklist();
-	    if (opar)
+	    if (dat->opar)
 		oparl = newlinklist();
-	    if (exp) {
+	    if (dat->dpar) {
+		if (*(dat->dpar) == '(')
+		    dparr = NULL;
+		else if ((dparr = get_user_var(dat->dpar)) && !*dparr)
+		    dparr = NULL;
+		dparl = newlinklist();
+	    }
+	    if (dat->exp) {
 		expl = (Cexpl) zhalloc(sizeof(struct cexpl));
 		expl->count = expl->fcount = 0;
-		expl->str = dupstring(exp);
+		expl->str = dupstring(dat->exp);
 	    } else
 		expl = NULL;
 
 	    /* Store the matcher in our stack of matchers. */
-	    if (match) {
+	    if (dat->match) {
 		mst.next = mstack;
-		mst.matcher = match;
+		mst.matcher = dat->match;
 		mstack = &mst;
 
 		if (!mnum)
-		    add_bmatchers(match);
+		    add_bmatchers(dat->match);
 
-		addlinknode(matchers, match);
-		match->refc++;
+		addlinknode(matchers, dat->match);
+		dat->match->refc++;
 	    }
 	    if (mnum && (mstack || bmatchers))
 		update_bmatchers();
 
 	    /* Get the suffixes to ignore. */
-	    if (ign)
-		aign = get_user_var(ign);
+	    if (dat->ign)
+		aign = get_user_var(dat->ign);
 	    /* Get the contents of the completion variables if we have
 	     * to perform matching. */
-	    if (aflags & CAF_MATCH) {
+	    if (dat->aflags & CAF_MATCH) {
 		lipre = dupstring(compiprefix);
 		lisuf = dupstring(compisuffix);
 		lpre = dupstring(compprefix);
@@ -3533,8 +3536,8 @@ addmatches(char *ipre, char *isuf,
 		llpl = strlen(lpre);
 		llsl = strlen(lsuf);
 		/* Test if there is an existing -P prefix. */
-		if (pre && *pre) {
-		    pl = pfxlen(pre, lpre);
+		if (dat->pre && *dat->pre) {
+		    pl = pfxlen(dat->pre, lpre);
 		    llpl -= pl;
 		    lpre += pl;
 		}
@@ -3557,79 +3560,76 @@ addmatches(char *ipre, char *isuf,
 		}
 	    }
 	    /* Now duplicate the strings we have from the command line. */
-	    if (ipre)
-		ipre = (lipre ? dyncat(lipre, ipre) : dupstring(ipre));
+	    if (dat->ipre)
+		dat->ipre = (lipre ? dyncat(lipre, dat->ipre) :
+			     dupstring(dat->ipre));
 	    else if (lipre)
-		ipre = lipre;
-	    if (isuf)
-		isuf = (lisuf ? dyncat(lisuf, isuf) : dupstring(isuf));
+		dat->ipre = lipre;
+	    if (dat->isuf)
+		dat->isuf = (lisuf ? dyncat(lisuf, dat->isuf) :
+			     dupstring(dat->isuf));
 	    else if (lisuf)
-		isuf = lisuf;
-	    if (ppre) {
-		ppre = dupstring(ppre);
-		lpl = strlen(ppre);
+		dat->isuf = lisuf;
+	    if (dat->ppre) {
+		dat->ppre = dupstring(dat->ppre);
+		lpl = strlen(dat->ppre);
 	    } else
 		lpl = 0;
-	    if (psuf) {
-		psuf = dupstring(psuf);
-		lsl = strlen(psuf);
+	    if (dat->psuf) {
+		dat->psuf = dupstring(dat->psuf);
+		lsl = strlen(dat->psuf);
 	    } else
 		lsl = 0;
-	    if (aflags & CAF_MATCH) {
-		s = ppre ? ppre : "";
-		if (llpl <= lpl && strpfx(lpre, s)) {
-		    llpl = 0;
+	    if (dat->aflags & CAF_MATCH) {
+		s = dat->ppre ? dat->ppre : "";
+		if (llpl <= lpl && strpfx(lpre, s))
 		    lpre = "";
-		} else if (llpl > lpl && strpfx(s, lpre)) {
-		    llpl -= lpl;
+		else if (llpl > lpl && strpfx(s, lpre))
 		    lpre += lpl;
-		} else
+		else
 		    *argv = NULL;
-		s = psuf ? psuf : "";
-		if (llsl <= lsl && strsfx(lsuf, s)) {
-		    llsl = 0;
+		s = dat->psuf ? dat->psuf : "";
+		if (llsl <= lsl && strsfx(lsuf, s))
 		    lsuf = "";
-		} else if (llsl > lsl && strsfx(s, lsuf)) {
+		else if (llsl > lsl && strsfx(s, lsuf))
 		    lsuf[llsl - lsl] = '\0';
-		    llsl -= lsl;
-		} else
+		else
 		    *argv = NULL;
 	    }
 	    if (*argv) {
-		if (pre)
-		    pre = dupstring(pre);
-		if (suf)
-		    suf = dupstring(suf);
-		if (!prpre && (prpre = ppre)) {
-		    singsub(&prpre);
-		    untokenize(prpre);
+		if (dat->pre)
+		    dat->pre = dupstring(dat->pre);
+		if (dat->suf)
+		    dat->suf = dupstring(dat->suf);
+		if (!dat->prpre && (dat->prpre = dat->ppre)) {
+		    singsub(&(dat->prpre));
+		    untokenize(dat->prpre);
 		} else
-		    prpre = dupstring(prpre);
+		    dat->prpre = dupstring(dat->prpre);
 		/* Select the group in which to store the matches. */
-		if (group) {
+		if (dat->group) {
 		    endcmgroup(NULL);
-		    begcmgroup(group, (aflags & CAF_NOSORT));
-		    if (aflags & CAF_NOSORT)
+		    begcmgroup(dat->group, (dat->aflags & CAF_NOSORT));
+		    if (dat->aflags & CAF_NOSORT)
 			mgroup->flags |= CGF_NOSORT;
 		} else {
 		    endcmgroup(NULL);
 		    begcmgroup("default", 0);
 		}
 		/* Select the set of matches. */
-		oisalt = (aflags & CAF_ALT);
+		oisalt = (dat->aflags & CAF_ALT);
 
-		if (remf) {
-		    remf = dupstring(remf);
-		    rems = NULL;
-		} else if (rems)
-		    rems = dupstring(rems);
+		if (dat->remf) {
+		    dat->remf = dupstring(dat->remf);
+		    dat->rems = NULL;
+		} else if (dat->rems)
+		    dat->rems = dupstring(dat->rems);
 
 		/* Probably quote the prefix and suffix for testing. */
-		if (!cp && (aflags & CAF_MATCH) && !(aflags & CAF_QUOTE)) {
+		if (!cp && (dat->aflags & CAF_MATCH) &&
+		    !(dat->aflags & CAF_QUOTE)) {
 		    lpre = quotename(lpre, NULL);
 		    lsuf = quotename(lsuf, NULL);
-		    llpl = strlen(lpre);
-		    llsl = strlen(lsuf);
 		}
 	    }
 	    /* Walk through the matches given. */
@@ -3638,7 +3638,7 @@ addmatches(char *ipre, char *isuf,
 		bpl = brpl;
 		bsl = brsl;
 		isalt = oisalt;
-		if ((!psuf || !*psuf) && aign) {
+		if ((!dat->psuf || !*(dat->psuf)) && aign) {
 		    /* Do the suffix-test. If the match has one of the
 		     * suffixes from ign, we put it in the alternate set. */
 		    char **pt = aign;
@@ -3649,39 +3649,52 @@ addmatches(char *ipre, char *isuf,
 			    && !strcmp(*pt, s + sl - filell))
 			    isalt = 1;
 
-		    if (isalt && !doadd)
+		    if (isalt && !doadd) {
+			if (dparr && !*++dparr)
+			    dparr = NULL;
 			continue;
+		    }
 		}
-		if (!(aflags & CAF_MATCH)) {
+		if (!(dat->aflags & CAF_MATCH)) {
 		    ms = dupstring(s);
 		    lc = bld_parts(ms, sl, -1, NULL);
 		    isexact = 0;
 		} else if (!(ms = comp_match(lpre, lsuf, s, cp, &lc,
-					     !(aflags & CAF_QUOTE),
-					     &bpl, &bsl, &isexact)))
+					     !(dat->aflags & CAF_QUOTE),
+					     &bpl, &bsl, &isexact))) {
+		    if (dparr && !*++dparr)
+			dparr = NULL;
 		    continue;
-
+		}
 		if (doadd) {
-		    cm = add_match_data(isalt, ms, lc, ipre, ipre, isuf, pre, 
-					prpre, ppre, psuf, suf, bpl, bsl,
-					flags, isexact);
-		    cm->rems = rems;
-		    cm->remf = remf;
+		    cm = add_match_data(isalt, ms, lc, dat->ipre, dat->ipre,
+					dat->isuf, dat->pre, dat->prpre,
+					dat->ppre, dat->psuf, dat->suf,
+					bpl, bsl, dat->flags, isexact);
+		    cm->rems = dat->rems;
+		    cm->remf = dat->remf;
 		} else {
-		    if (apar)
+		    if (dat->apar)
 			addlinknode(aparl, ms);
-		    if (opar)
+		    if (dat->opar)
 			addlinknode(oparl, s);
+		    if (dat->dpar && dparr) {
+			addlinknode(dparl, *dparr);
+			if (!*++dparr)
+			    dparr = NULL;
+		    }
 		    free_cline(lc);
 		}
 	    }
 	    compnmatches = mnum;
-	    if (exp)
+	    if (dat->exp)
 		addexpl();
-	    if (apar)
-		set_param(apar, aparl);
-	    if (opar)
-		set_param(opar, oparl);
+	    if (dat->apar)
+		set_param(dat->apar, aparl);
+	    if (dat->opar)
+		set_param(dat->opar, oparl);
+	    if (dat->dpar)
+		set_param(dat->dpar, dparl);
 	} LASTALLOC;
     } SWITCHBACKHEAPS;
 
