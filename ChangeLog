@@ -1,3 +1,10 @@
+2004-02-23  Oliver Kiddle  <opk@zsh.org>
+
+	* 19457: Completion/Unix/Command/_rar, Completion/Unix/Command/_sed,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_uniq:
+	new sed and uniq completions, add descriptions for
+	rar commands and update completion for ssh-keygen
+
 2004-02-20  Peter Stephenson  <pws@csr.com>
 
 	* 19456: configure.ac, Src/system.h, Src/Modules/zpty.c,

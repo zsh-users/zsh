@@ -1,0 +1,26 @@
+#compdef uniq
+
+local args
+
+args=(
+  '(-c --count)'{-c,--count}'[prefix lines by the number of occurrences]'
+  '(-d --repeated)'{-d,--repeated}'[only print duplicate lines]'
+  '(-D --all-repeated)'{-D,--all-repeated=}'[print all duplicate lines]:delimit method:(none prepend separate)'
+  '(-f --skip-fields)'{-f,--skip-fields=}'[avoid comparing initial fields]:number of fields'
+  '(-i --ignore-case)'{-i,--ignore-case}'[ignore differences in case when comparing]'
+  '(-s --skip-chars)'{-s,--skip-chars=}'[avoid comparing initial characters]:number of characters'
+  '(-t --separator)'{-t,--separator=}'[specify field delimiter]:separator'
+  '(-u --unique)'{-u,--unique}'[only print unique lines]'
+  '(-w --check-chars)'{-w,--check-chars=}'[specify maximum number of characters to compare]:characters'
+  '(-W --check-fields)'{-W,--check-fields=}'[specify maximum number of fields to compare]:fields'
+  '(- *)--help[display help information]'
+  '(- *)--version[display version information]'
+)
+
+if ! _pick_variant gnu=Free\ Soft unix --version; then
+  args=( ${(M)args:#(|\*)(|\(*\))-[cdufs]*} )
+fi
+
+_arguments "$args[@]" \
+  '1::input file:_files' \
+  '2::output file:_files'
