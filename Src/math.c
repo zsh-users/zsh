@@ -947,7 +947,7 @@ mathevalarg(char *s, char **ss)
 
 /**/
 static void
-checkunary(int mtokc, char *ptr)
+checkunary(int mtokc, char *mptr)
 {
     int errmsg = 0;
     int tp = type[mtokc];
@@ -959,11 +959,11 @@ checkunary(int mtokc, char *ptr)
 	    errmsg = 2;
     }
     if (errmsg) {
-	char errbuf[40];
+	char errbuf[80];
 	int len, over = 0;
-	while (inblank(*ptr))
-	    ptr++;
-	len = strlen(ptr);
+	while (inblank(*mptr))
+	    mptr++;
+	len = ztrlen(mptr);
 	if (len > 10) {
 	    len = 10;
 	    over = 1;
@@ -971,7 +971,7 @@ checkunary(int mtokc, char *ptr)
 	sprintf(errbuf, "bad math expression: %s expected at `%%l%s'",
 		errmsg == 2 ? "operator" : "operand",
 		over ? "..." : ""); 
-	zerr(errbuf, ptr, len);
+	zerr(errbuf, mptr, len);
     }
     unary = !(tp & OP_OPF);
 }
