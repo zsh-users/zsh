@@ -61,10 +61,11 @@
 # other words, parenthesising of wildcards is independent of any existing
 # parentheses.
 #
-# Any error --- a substitution resulted in an empty string, a
-# substitution did not change the file name, two substitutions gave the
-# same result, the destination was an existing regular file and -f was not
-# given --- causes the entire function to abort without doing anything.
+# Any file whose name is not changed by the substitution is simply ignored.
+# Any error --- a substitution resulted in an empty string, two
+# substitutions gave the same result, the destination was an existing
+# regular file and -f was not given --- causes the entire function to abort
+# without doing anything.
 #
 # Options:
 #  -f  force overwriting of destination files.  Not currently passed
@@ -76,7 +77,8 @@
 #  -n  no execution: print what would happen, but don't do it.
 #  -q  Turn bare glob qualifiers off:  now assumed by default, so this
 #      has no effect.
-#  -Q  Force bare glob qualifiers on.
+#  -Q  Force bare glob qualifiers on.  Don't turn this on unless you are
+#      actually using glob qualifiers in a pattern (see below).
 #  -s  symbolic, passed down to ln; only works with zln or z?? -L.
 #  -v  verbose: print line as it's being executed.
 #  -o <optstring>
@@ -119,7 +121,7 @@ setopt extendedglob
 local f g args match mbegin mend files action myname tmpf opt exec
 local opt_f opt_i opt_n opt_q opt_Q opt_s opt_M opt_C opt_L 
 local opt_o opt_p opt_v opt_w MATCH MBEGIN MEND
-local pat repl errstr fpat
+local pat repl errstr fpat hasglobqual opat
 typeset -A from to
 integer stat
 
@@ -190,17 +192,29 @@ if [[ -n $opt_w ]]; then
   fi
 fi
 
+if [[ -n $opt_Q && $pat = (#b)(*)\([^\)\|\~]##\) ]]; then
+  hasglobqual=q
+  # strip off qualifiers for use as ordinary pattern
+  opat=$match[1]
+fi
+
 if [[ $pat = (#b)(*)\((\*\*##/)\)(*) ]]; then
   fpat="$match[1]$match[2]$match[3]"
+  # Now make sure we do depth-first searching.
+  # This is so that the names of any files are altered before the
+  # names of the directories they are in.
+  if [[ -n $opt_Q && -n $hasglobqual ]]; then
+    fpat[-1]="odon)"
+  else
+    setopt bareglobqual
+    fpat="${fpat}(odon)"
+  fi
 else
   fpat=$pat
 fi
 files=(${~fpat})
 
-if [[ -o bareglobqual && $pat = (#b)(*)\([^\)\|\~]##\) ]]; then
-  # strip off qualifiers for use as ordinary pattern
-  pat=$match[1]
-fi
+[[ -n $hasglobqual ]] && pat=$opat
 
 errs=()
 
@@ -219,7 +233,9 @@ for f in $files; do
   if [[ -z $g ]]; then
     errs=($errs "$f expanded to empty string")
   elif [[ $f = $g ]]; then
-    errs=($errs "$f not altered by substitution")
+    # don't cause error: more useful just to skip
+    #   errs=($errs "$f not altered by substitution")
+    continue
   elif [[ -n $from[$g] && ! -d $g ]]; then
     errs=($errs "$f and $from[$g] both map to $g")
   elif [[ -f $g && -z $opt_f ]]; then
