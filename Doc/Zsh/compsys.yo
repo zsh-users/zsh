@@ -48,9 +48,9 @@ immediately.  However, if tt(compinstall) has removed definitions, you will
 need to restart the shell to see the changes.
 
 To run tt(compinstall) you will need to make sure it is in a directory
-mentioned in your tt($fpath) parameter, which should already be the case if
+mentioned in your tt(fpath) parameter, which should already be the case if
 zsh was properly configured as long as your startup files do not remove the
-appropriate directories from tt($fpath).  Then it must be autoloaded
+appropriate directories from tt(fpath).  Then it must be autoloaded
 (`tt(autoload -U compinstall)' is recommended).  You can abort the
 installation any time you are being prompted for information, and your
 tt(.zshrc) will not be altered at all; changes only take place right at the
@@ -65,7 +65,7 @@ the current session when run directly by the user; if you have run
 tt(compinstall) it will be called automatically from your tt(.zshrc).
 
 To initialize the system, the function tt(compinit) should be in a
-directory mentioned in the tt($fpath) variable, and should be autoloaded
+directory mentioned in the tt(fpath) parameter, and should be autoloaded
 (`tt(autoload -U compinit)' is recommended), and then run simply as
 `tt(compinit)'.  This will define a
 few utility functions, arrange for all the necessary shell functions to be
@@ -110,14 +110,25 @@ where completion functions can be found; this is only necessary if they are
 not already in the function search path.
 
 For security reasons tt(compinit) also checks if the completion system
-would use files not owned by root or the current user or files in
+would use files not owned by root or by the current user, or files in
 directories that are world- or group-writable or that are not owned by 
-root or the current user.  If such files or directories are found,
-tt(Compinit) will ask if the completion system should really be used.
-To avoid these tests and make all files found be used without asking,
-the option tt(-u) can be given and to make tt(compinit) silently
-ignore all insecure files and directories the options tt(-i) can be
-given.
+root or by the current user.  If such files or directories are found,
+tt(compinit) will ask if the completion system should really be used.  To
+avoid these tests and make all files found be used without asking, use the
+option tt(-u), and to make tt(compinit) silently ignore all insecure files
+and directories use the option tt(-i).  This security check is skipped
+entirely when the tt(-C) option is given.
+
+findex(compaudit)
+The security check can be retried at any time by running the function
+tt(compaudit).  This is the same check used by tt(compinit), but when it
+is executed directly any changes to tt(fpath) are made local to the
+function so they do not persist.  The directories to be checked may be
+passed as arguments; if none are given, tt(compaudit) uses tt(fpath) and
+tt(_compdir) to find completion system directories, adding missing ones
+to tt(fpath) as necessary.  To force a check of exactly the directories
+currently named in tt(fpath), set tt(_compdir) to an empty string before
+calling tt(compaudit) or tt(compinit).
 
 subsect(Autoloaded files)
 cindex(completion system, autoloaded functions)

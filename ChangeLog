@@ -1,3 +1,9 @@
+2000-07-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12377: Completion/Core/compaudit, Completion/Core/compinit,
+	Doc/Zsh/compsys.yo: Separate compinit security checks into their
+	own callable function.
+
 2000-07-26  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12378: Completion/Base/_arguments: make `_arguments --' use
