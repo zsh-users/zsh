@@ -1,3 +1,8 @@
+2000-05-17  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11429: Completion/Core/_main_complete: fix completion after
+ 	tilde and equal sign inside quotes
+	
 2000-05-17  Tanaka Akira  <akr@zsh.org>
 
 	* 11426: Src/Modules/zpty.c: don't use #elif.

@@ -45,11 +45,13 @@ fi
 
 # Special completion contexts after `~' and `='.
 
-if compset -P 1 '='; then
-  compstate[context]=equal
-elif [[ "$PREFIX" != */* && "$PREFIX[1]" = '~' ]]; then
-  compset -p 1
-  compstate[context]=tilde
+if [[ -z "$compstate[quote]" ]]; then
+  if compset -P 1 '='; then
+    compstate[context]=equal
+  elif [[ "$PREFIX" != */* && "$PREFIX[1]" = '~' ]]; then
+    compset -p 1
+    compstate[context]=tilde
+  fi
 fi
 
 # Initial setup.
