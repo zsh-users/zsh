@@ -1340,7 +1340,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	    zwarnnam("fc", "too many arguments", NULL, 0);
 	    return 1;
 	}
-	return !saveandpophiststack(-1);
+	return !saveandpophiststack(-1, HFILE_USE_OPTIONS);
     }
     /* with the -m option, the first argument is taken *
      * as a pattern that history lines have to match   */
@@ -4111,8 +4111,11 @@ zexit(int val, int from_where)
     }
     if (isset(RCS) && interact) {
 	if (!nohistsave) {
-	    saveandpophiststack(1);
-	    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
+	    int writeflags = HFILE_USE_OPTIONS;
+	    if (from_where == 1)
+		writeflags |= HFILE_NO_REWRITE;
+	    saveandpophiststack(1, writeflags);
+	    savehistfile(NULL, 1, writeflags);
 	}
 	if (islogin && !subsh) {
 	    sourcehome(".zlogout");
