@@ -7,7 +7,8 @@
 2004-03-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: config.guess, config.sub: update to versions from
-	autoconf 2.59 (both dated October 23, 2003).
+	autoconf 2.59 (the timestamps are 2003-10-03 and 2003-08-18,
+	respectively).
 
 2004-03-05  Oliver Kiddle  <opk@zsh.org>
 
