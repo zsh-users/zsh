@@ -3211,6 +3211,7 @@ loadautofn(Shfunc shf)
 
     if (prog == &dummy_eprog) {
 	zerr("%s: function definition file not found", shf->nam, 0);
+	shf->funcdef = prog;
 	return 1;
     }
     if (!prog)
