@@ -48,7 +48,7 @@ arg1)
 arg2)
   if (( ! $+opt_args[-s] )); then
     _wanted ports expl 'port to connect' &&
-        _combination '' hosts-ports hosts="${line[2]:q}" ports "$expl[@]"
+        _combination '' hosts-ports hosts="${line[1]:q}" ports "$expl[@]"
   fi
   ;;
 esac
