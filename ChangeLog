@@ -1,3 +1,9 @@
+2000-04-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 11033: Completion/Commands/.distfiles,
+	Completion/User/.distfiles, Config/version.mk, Etc/NEWS:
+	new NEWS and minor fixes for version 3.1.7-pre-2.
+
 2000-04-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11032: Src/init.c: Fix signed-ness problem reported by OPK.
