@@ -35,7 +35,7 @@
 # and hitting TAB.
 #
 #     if [[ "$PREFIX" = *,, ]]; then
-#       local max i=1
+#       local max i=1 expl
 #     
 #       PREFIX="$PREFIX[1,-2]"
 #       # If a numeric prefix is given, we use it as the number of
@@ -50,7 +50,12 @@
 #       # We first search in the last ten lines, then in the last
 #       # twenty lines, and so on...
 #       while [[ i -le max ]]; do
-#         if compgen -X "%Bhistory ($n):%b" -Q -H $(( i*10 )) ''; then
+#         if [[ -n "$compconfig[history_sort]" ]]; then
+#           _description expl "history ($n)"
+#         else
+#           _description -V expl "history ($n)"
+#         fi
+#         if compgen "$expl[@]" -Q -H $(( i*10 )) ''; then
 #           # We have found at least one matching word, so we switch
 #           # on menu-completion and make sure that no other
 #           # completion function is called by setting _compskip.

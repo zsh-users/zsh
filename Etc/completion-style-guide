@@ -35,7 +35,11 @@ For now this is just a list of things one should or shouldn't do.
     configuration key to allow users to select the behavior they
     prefer. Names for configuration keys should look like `prefix_name',
     where `prefix' is the (probably abbreviated) name of your function
-    and `name' describes what can be configured.
+    (without any leading underscore) and `name' describes what can be
+    configured.
+    If you want to have this completion function to be included in the
+    distribution, it would help if you describe the configuration key
+    at the end of the `compsys.yo' manual.
     When testing the values of configuration keys, the empty string
     should result in the same behavior as if the key were unset. This
     can be achieved by the test `[[ -n "$compconfig[prefix_name]" ]]'.

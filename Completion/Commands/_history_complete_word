@@ -2,5 +2,9 @@
 
 local expl
 
-_description expl 'history word'
+if [[ -n "$compconfig[history_sort]" ]]; then
+  _description expl 'history word'
+else
+  _description -V expl 'history word'
+fi
 compgen "$expl[@]" -Q -H 0 ''

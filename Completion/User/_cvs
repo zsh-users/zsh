@@ -468,7 +468,7 @@ _cvs_extract_file_entries () {
 
 builtin functions _cvs_extract_modifiedfile_entries >&- ||
 _cvs_extract_modifiedfile_entries () {
-  if [[ -n "$compconfig[_cvs_disable_stat]" ]] ||
+  if [[ -n "$compconfig[cvs_disable_stat]" ]] ||
     ! { zmodload -e stat || zmodload stat }; then
     _cvs_extract_file_entries
     return
