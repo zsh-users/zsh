@@ -1,5 +1,7 @@
 2000-05-03  Tanaka Akira  <akr@m17n.org>
 
+	* 11109: Completion/X/_xauth: new completion for xauth.
+
 	* 11106: Completion/User/_mount: fix glob for device files.
 
 2000-05-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
