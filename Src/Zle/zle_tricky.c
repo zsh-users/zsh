@@ -1311,6 +1311,7 @@ get_comp_string(void)
 	    } else
 		insubscr = 1;
 	}
+	parse_subst_string(s);
     }
     /* This variable will hold the current word in quoted form. */
     qword = ztrdup(s);

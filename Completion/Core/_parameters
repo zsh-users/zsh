@@ -12,4 +12,4 @@ pattern=(-g \*)
 zparseopts -D -K -E g:=pattern
 
 _wanted parameters expl parameter compadd "$@" \
-    -k "parameters[(R)${pattern[2]}~*local*]"
+   -Q -k "parameters[(R)${pattern[2]}~*local*]"
