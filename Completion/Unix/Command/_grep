@@ -57,7 +57,7 @@ arguments=( $arguments[@]
 
 # remove long options?
 [[ -z "$_is_gnu[$words[1]]" ]] &&
-    arguments=( ${${${arguments:#(|*\)(\*|))--*}//--[^ )]#/}/\( #\)/} )
+    arguments=( ${arguments:#(|*\)(\*|))--*} )
 
 _arguments -s $arguments[@]
 
