@@ -989,14 +989,13 @@ patcomppiece(int *flagp)
 		patparse = nptr;
 		len |= 1;
 	    }
-	    if (*patparse == '-') {
-		patparse++;
-		if (idigit(*patparse)) {
-		    to = (zrange_t) zstrtol((char *)patparse,
-					      (char **)&nptr, 10);
-		    patparse = nptr;
-		    len |= 2;
-		}
+	    DPUTS(*patparse != '-', "BUG: - missing from numeric glob");
+	    patparse++;
+	    if (idigit(*patparse)) {
+		to = (zrange_t) zstrtol((char *)patparse,
+					  (char **)&nptr, 10);
+		patparse = nptr;
+		len |= 2;
 	    }
 	    if (*patparse != Outang)
 		return 0;

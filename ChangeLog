@@ -1,3 +1,9 @@
+2000-04-04  Andrew Main  <zefram@zsh.org>
+
+	* 10444: Src/lex.c, Src/pattern.c: Insist on proper syntax
+	for numeric globbing (with the "-").  Also fix the bug whereby
+	"echo 1<2-3>" would lose the "1".
+
 2000-04-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws: Config/version.mk: 3.1.6-dev-21.
