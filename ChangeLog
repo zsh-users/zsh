@@ -1,5 +1,8 @@
 2003-06-25  Clint Adams  <clint@zsh.org>
 
+	* 18628: Completion/Debian/Command/_bug: update completion of
+	reportbug and querybts to modern usage.
+
 	* 18627: Completion/Unix/Command/_imagemagick: -resize and
  	-shave options to mogrify.
 
