@@ -1,3 +1,11 @@
+2001-05-31  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14607: Completion/Base/Utility/_arguments, Src/Zle/computil.c:
+	fix tag-order problem with _arguments (completion after an
+	option that gets an argument in the same word); and a fix for
+	completion after -ab, where -a gets an argument in the next
+	word and -b gets one in the same word
+
 2001-05-31  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Doc/Makefile.in, Doc/Zsh/compsys.yo: correct alphabetical

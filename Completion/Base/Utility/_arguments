@@ -233,7 +233,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 	descr="$descrs[anum]"
 	subc="$subcs[anum++]"
 
-        if [[ -n "$matched" ]] || _requested "$subc"; then
+        if [[ -z "$tried" ]] && { [[ -n "$matched" ]] || _requested "$subc" }; then
 
           curcontext="${oldcontext%:*}:$subc"
 
@@ -328,7 +328,8 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
         fi
       done
       if [[ -z "$hasopts" &&
-            ( -z "$matched" || -n "$alwopt" ) &&
+            -z "$matched" &&
+            ( -z "$tried" || -n "$alwopt" ) &&
             ( -z "$aret" || "$PREFIX" = "$origpre" ) ]] &&
           _requested options &&
           { ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
@@ -389,7 +390,8 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
       [[ -n "$tried" && "${${alwopt:+$origpre}:-$PREFIX}" != [-+]* ]] && break
     done
     if [[ -n "$opts" && -z "$aret" &&
-          ( -z "$matched$mesg" || -n "$alwopt" ) &&
+          -z "$matched" &&
+          ( -z "$tried" || -n "$alwopt" ) &&
           nm -eq compstate[nmatches] ]]; then
 
       PREFIX="$origpre"

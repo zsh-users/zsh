@@ -1436,7 +1436,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	    char *p;
 	    Caopt tmpopt;
 
-	    if (sopts && nonempty(sopts))
+	    if (cur != compcurrent && sopts && nonempty(sopts))
 		state.curopt = (Caopt) uremnode(sopts, firstnode(sopts));
 
 	    if (!state.oargs[state.curopt->num])
