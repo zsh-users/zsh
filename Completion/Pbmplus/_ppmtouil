@@ -1,0 +1,3 @@
+#compdef ppmtouil ppmtoxpm
+
+_arguments '-name:name prefix:' ':file: _pbm_file'

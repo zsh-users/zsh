@@ -1,0 +1,3 @@
+#compdef yuvtoppm
+
+_arguments ':width:' ':height:' 'image bytes:'

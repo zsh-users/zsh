@@ -1,0 +1,3 @@
+#compdef ppmmix
+
+_arguments ':fade factor:' ':file: _pbm_file' ':file: _pbm_file'

@@ -5,5 +5,5 @@ _long_options -i '(--(disable|enable)-FEATURE* --(with|without)-PACKAGE*)' \
 	           #--enable- --disable-
 		   #--with- --without-
 		   #--without- --with-)' \
-	      '*=(E|)PREFIX*' '_files -/' \
-              '*=PROGRAM*'    '_command_names'
+	      '*=(E|)PREFIX*:prefix directory:_files -/' \
+              '*=PROGRAM*:program:_command_names'

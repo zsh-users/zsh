@@ -1,3 +1,6 @@
 #compdef bg
 
-compgen -z -P '%'
+local expl
+
+_description expl 'suspended job'
+compgen "$expl[@]" -z -P '%'

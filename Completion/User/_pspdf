@@ -1,6 +1,11 @@
 #compdef gs gsbj gsdj gsdj500 gslj gslp gsnd ps2ascii ghostview gv gview mgv ggv pstoedit pstotgif
 
+local ret=1
+
 # ghostscript:
 #  gs gsbj gsdj gsdj500 gslj gslp gsnd ps2ascii
 
-_files -g '*.(#i)(ps|eps|pdf)'
+_ps && ret=0
+_pdf && ret=0
+
+return ret

@@ -91,6 +91,14 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:" opt; do
   esac
 done
 
+if (( ! ( $#group + $#expl ) )); then
+  if [[ "$sopt" = -/ ]]; then
+    _description expl directory
+  else
+    _description expl file
+  fi
+fi
+
 [[ -n "$tmp1" && $#addsfx -ne 0 ]] && addsfx[1]=-qS
 
 # If we were given no file selection option, we behave as if we were given

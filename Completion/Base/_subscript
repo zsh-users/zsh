@@ -1,17 +1,22 @@
 #compdef -subscript-
 
+local expl
+
 if [[ "$PREFIX" = :* ]]; then
+  _description expl 'character class'
   compadd -p: -S ':]' alnum alpha blank cntrl digit graph lower print punct \
       space upper xdigit
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
+  _description expl 'association key'
   if [[ "$RBUFFER" = \]* ]]; then
-    compadd -S '' - "${(@kP)${compstate[parameter]}}"
+    compadd "$expl[@]" -S '' - "${(@kP)${compstate[parameter]}}"
   else
-    compadd -S ']' - "${(@kP)${compstate[parameter]}}"
+    compadd "$expl[@]" -S ']' - "${(@kP)${compstate[parameter]}}"
   fi
 elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   local list i j
 
+  _description expl 'array index'
   ind=( {1..${#${(P)${compstate[parameter]}}}} )
   list=()
   for i in "$ind[@]"; do
@@ -21,9 +26,9 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   done
 
   if [[ "$RBUFFER" = \]* ]]; then
-    compadd -S '' -V default -y list - "$ind[@]"
+    compadd "$expl[@]" -S '' -V default -y list - "$ind[@]"
   else
-    compadd -S ']' -V default -y list - "$ind[@]"
+    compadd "$expl[@]" -S ']' -V default -y list - "$ind[@]"
   fi
 else
   _compalso -math-

@@ -1,15 +1,22 @@
 #compdef xsetroot
 
+local expl
+
 case "$words[CURRENT-1]" in
--cursor) _files -/g '*.(#i)(xbm|curs(|or))'; return;;
 -cursor_name) _cursors; return;;
--bitmap) _files -/g '*.(#i)xbm'; return;;
 -([fb]g|solid)) _colors; return;;
+-cursor) _description expl 'cursor file'
+         _files "$expl[@]" -/g '*.(#i)(xbm|curs(|or))'; return;;
+-bitmap) _description expl 'bitmap file'
+         _files "$expl[@]" -/g '*.(#i)xbm'; return;;
 esac
 
 if [[ CURRENT -gt 2 && "$words[CURRENT-2]" = -cursor ]]; then
-  _files -/g '*.(#i)(xbm|curs(|or)|mask)'
+  _description expl 'cursor mask file'
+  _files "$expl[@]" -/g '*.(#i)(xbm|curs(|or)|mask)'
 else
-  compadd -M 'm:-=_ r:|_=*' - -help -def -cursor -cursor_name -bitmap -mod -gray -grey \
-                       -fg -bg -rv -solid -name
+  _description expl option
+  compadd "$expl[@]" -M 'm:-=_ r:|_=*' - \
+          -help -def -cursor -cursor_name -bitmap -mod -gray -grey \
+          -fg -bg -rv -solid -name
 fi

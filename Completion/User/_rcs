@@ -5,8 +5,9 @@ local nm=$compstate[nmatches]
 [[ $words[1] = ci || $words[1] = rcs ]] && _files
 
 if [[ $compstate[nmatches] -eq nm && -d RCS && $words[1] != ci ]]; then
-  local rep
+  local rep expl
 
   rep=(RCS/$PREFIX*$SUFFIX,v(:t:s/\,v//))
-  (( $#rep )) && compadd - $rep
+  _description expl 'RCS file'
+  (( $#rep )) && compadd "$expl[@]" - $rep
 fi

@@ -1,7 +1,11 @@
 #compdef zle
 
+local expl
+
 if [[ "$words[2]" = -N && CURRENT -eq 3 ]]; then
-  compgen -F
+  _description expl 'widget shell function'
+  compgen "$expl[@]" -F
 else
-  compgen -b
+  _description expl widget
+  compgen "$expl[@]" -b
 fi

@@ -7,7 +7,8 @@ local lp ls n q suf=''
 if [[ "$SUFFIX" = *\}* ]]; then
   ISUFFIX="${SUFFIX#*\}}$ISUFFIX"
   SUFFIX="${SUFFIX%%\}*}"
-elif [[ "$LBUFFER" = *\$\{[^}]#\$\{[^}]#$PREFIX ]]; then
+elif [[ "$LBUFFER" = *\$\{[^}]#\$\{[^}]#$PREFIX ||
+        "$compstate[insert]" = *menu* ]]; then
   suf='}'
 else
   suf='} '

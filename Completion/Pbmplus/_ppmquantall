@@ -1,0 +1,3 @@
+#compdef ppmquantall
+
+_arguments ':number of colors:' '*:file: _pbm_file'

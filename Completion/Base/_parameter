@@ -1,3 +1,7 @@
 #compdef -parameter-
 
-_parameters -S ' ' -r '['
+if [[ "$compstate[insert]" = *menu* ]]; then
+  _parameters
+else
+  _parameters -S ' ' -r '['
+fi

@@ -1,3 +1,6 @@
 #compdef autoload
 
-compadd - ${^fpath}/*(N:t)
+local expl
+
+_description expl 'shell function'
+compadd "$expl[@]" - ${^fpath}/*(N:t)

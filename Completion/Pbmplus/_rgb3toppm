@@ -1,0 +1,16 @@
+#compdef rgb3toppm
+
+local expl
+
+if [[ CURRENT -eq 2 ]]; then
+  expl='red picture file'
+elif [[ CURRENT -eq 3 ]]; then
+  expl='green picture file'
+elif [[ CURRENT -eq 4 ]]; then
+  expl='blue picture file'
+fi
+
+if [[ -n "$expl" ]]; then
+  _description expl "$expl"
+  _files "$expl" -g '*.(#i)pgm'
+fi

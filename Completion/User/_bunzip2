@@ -1,3 +1,6 @@
 #compdef bunzip2 bzcat
 
-_files -g '*.bz2'
+local expl
+
+_description expl 'compressed file'
+_files "$expl[@]" -g '*.bz2'

@@ -72,11 +72,11 @@ if [[ "$PREFIX" = --* ]]; then
 
   # ...long options after `--'.
 
-  _long_options '--owner*'          "_tilde" \
-                '*=(PROG|COMMAND)*' "_command_names" \
-		'*=ARCHIVE*'        "_tar_archive" \
-		'*=NAME*'           "_files" \
-		'*=CONTROL*'        "[t numbered nil existing never simple]"
+  _long_options '--owner*:user:_tilde' \
+                '*=(PROG|COMMAND)*:program:_command_names' \
+		'*=ARCHIVE*:archive: _tar_archive' \
+		'*=NAME*:file:_files' \
+		'*=CONTROL*:version control:[t numbered nil existing never simple]'
 
 elif [[ ( CURRENT -gt 2 && "$words[CURRENT-1]" = -*f* &&
           "$words[CURRENT-1]" != --* ) ||
@@ -93,7 +93,7 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
   # filenames cached, plus the name of the tarfile so we know if it
   # changes.
 
-  local largs=-tf
+  local largs=-tf expl
 
   if [[ $_tar_cmd = *z* ]]; then
     largs=-tzf
@@ -110,7 +110,8 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
     _tar_cache_name=$tf
   fi
 
-  _multi_parts / _tar_cache_list
+  _description expl 'file from archive'
+  _multi_parts "$expl[@]" / _tar_cache_list
 else
   
   # See if we should use a path prefix.  We have to use eval as the dir can

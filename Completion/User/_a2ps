@@ -22,18 +22,18 @@ if [[ "$words[1]" != "$_a2ps_cache_cmd" ]]; then
   )
 fi
 
-_long_options -t '*\*'                '(yes no)' \
-                 '*=DIRECTION'        '(rows columns)' \
-                 '*=TYPE'             '(r n nr rn any)' \
-		 '--highlight-level*' '(none normal heavy)' \
-		 '--version-control*' '(none off t numbered nil 
+_long_options -t '*\*:toggle:(yes no)' \
+                 '*=DIRECTION:direction:(rows columns)' \
+                 '*=TYPE:type:(r n nr rn any)' \
+		 '--highlight-level*:highlight:(none normal heavy)' \
+		 '--version-control*:version control:(none off t numbered nil 
 		                        existing never simple)' \
-	         '--pretty-print*'    "[${_a2ps_cache_values[1]}]" \
-	         '--encoding*'        "(${_a2ps_cache_values[2]})" \
-	         '--medium*'          "[${_a2ps_cache_values[3]}]" \
-	         '--prologue*'        "[${_a2ps_cache_values[4]}]" \
-	         '--ppd*'             "[${_a2ps_cache_values[5]}]" \
-	         '--printer*'         "[${_a2ps_cache_values[6]}]" \
-	         '--user-option*'     "[${_a2ps_cache_values[7]}]" \
-	         '--variable*'        "[${_a2ps_cache_values[8]}]" ||
+	         "--pretty-print*:style:[${_a2ps_cache_values[1]}]" \
+	         "--encoding*:encoding:(${_a2ps_cache_values[2]})" \
+	         "--medium*:medium:[${_a2ps_cache_values[3]}]" \
+	         "--prologue*:prologue:[${_a2ps_cache_values[4]}]" \
+	         "--ppd*:printer description:[${_a2ps_cache_values[5]}]" \
+	         "--printer*:printer:[${_a2ps_cache_values[6]}]" \
+	         "--user-option*:user option:[${_a2ps_cache_values[7]}]" \
+	         "--variable*:variable:[${_a2ps_cache_values[8]}]" ||
     _files -F fignore -g '*~*.(ps|PS|eps|EPS)'

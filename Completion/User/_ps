@@ -1,5 +1,7 @@
 #compdef ps2epsi ps2pdf epsffit extractres fixdlsrps fixfmps fixmacps fixpsditps fixpspps fixscribeps fixtpps fixwfwps fixwpps fixwwps includeres psbook psmerge psnup psresize psselect pstops psmulti pswrap lpr lp
 
+local expl
+
 # ghostscript:
 #  ps2epsi ps2pdf
 # psutils:
@@ -7,4 +9,5 @@
 #  fixscribeps fixtpps fixwfwps fixwpps fixwwps includeres psbook psmerge
 #  psnup psresize psselect pstops
 
-_files -g '*.(#i)(ps|eps)'
+_description expl 'postscript file'
+_files "$expl[@]" -g '*.(#i)(ps|eps)'

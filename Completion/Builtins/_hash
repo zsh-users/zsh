@@ -1,13 +1,17 @@
 #compdef hash
 
+local expl
+
 if [[ "$words[2]" = -*d* ]]; then
   if compset -P 1 '*\='; then
     _path_files -g '*(-/)'
   else
-    compgen -n -q -S '='
+    _description expl 'named directory'
+    compgen "$expl[@]" -n -q -S '='
   fi
 elif compset -P 1 '*\='; then
   _files -/g '*(*)'
 else
-  compgen -m -q -S '='
+  _description expl command
+  compgen "$expl[@]" -m -q -S '='
 fi

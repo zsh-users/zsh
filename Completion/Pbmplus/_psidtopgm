@@ -1,0 +1,4 @@
+#compdef psidtopgm
+
+_arguments ':width:' ':height:' ':bits per sample:' \
+           ':postscript file:_files -g *.(#i)(ps|eps)'

@@ -4,10 +4,14 @@ if [[ CURRENT -eq 2 || CURRENT -eq 3 && $words[CURRENT-1] = -* ]]; then
   if [[ $words[1] = chgrp ]] || compset -P '*[:.]'; then
     _groups
   else
+    local expl
+
+    _description expl user
+
     if [[ $OSTYPE = (solaris*|hpux*) ]]; then
-      compgen -u -S ':' -q
+      compgen "$expl[@]" -u -S ':' -q
     else
-      compgen -u -S '.' -q
+      compgen "$expl[@]" -u -S '.' -q
     fi
   fi
 else

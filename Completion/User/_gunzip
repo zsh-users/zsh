@@ -1,3 +1,6 @@
 #compdef gunzip zcat
 
-_files -g '*.[gG][z]'
+local expl
+
+_description expl 'compressed file'
+_files "$expl[@]" -g '*.[gG][z]'

@@ -1,0 +1,3 @@
+#compdef macptopbm
+
+_arguments '-extraskip:number of bytes to skip:' ':file: _pbm_file'

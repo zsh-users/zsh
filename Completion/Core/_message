@@ -1,0 +1,19 @@
+#autoload
+
+local format
+
+format="$compconfig[message_format]"
+[[ -z "$format" ]] && "$compconfig[description_format]"
+
+if [[ -n "$format" ]]; then
+  if [[ $compstate[nmatches] -eq 0 ]]; then
+    compstate[list]=list
+    compstate[insert]=''
+    compadd -UX "${format//\\%d/$1}" -n ''
+  else
+    compadd -X "${format//\\%d/$1}" -n ''
+  fi
+  compstate[force_list]=yes
+else
+  compadd -n ''
+fi

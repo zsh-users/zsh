@@ -1,0 +1,5 @@
+#compdef pnmtotiff
+
+_arguments '-none' '-packbits' '-lzw' '-g3' '-g4' '-2d' '-fill' \
+           '-predictor:LZW predictor:(1 2)' '-msb2lsb' '-lsb2msb' \
+	   '-rowsperstrip:number of rows per strip:' ':file: _pbm_file'

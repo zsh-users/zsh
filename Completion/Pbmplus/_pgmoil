@@ -1,0 +1,3 @@
+#compdef pgmoil
+
+_arguments '-n:smear size:' ':file: _pbm_file'

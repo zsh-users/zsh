@@ -1,3 +1,6 @@
 #compdef bzip2
 
-_files -g '*~*.bz2'
+local expl
+
+_description expl 'file to compress'
+_files "$expl[@]" -g '*~*.bz2'

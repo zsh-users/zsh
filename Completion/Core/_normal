@@ -29,13 +29,15 @@ fi
 
 # See if there are any matching pattern completions.
 
-if [[ "$_compskip" != *patterns* ]]; then
+if [[ "$_compskip" != (all|*patterns*) ]]; then
   for i in "$_patcomps[@]"; do
     pat="${i% *}"
     val="${i#* }"
     if [[ "$cmd1" == $~pat || "$cmd2" == $~pat ]]; then
       "$val" && ret=0
-      if [[ "$_compskip" = *patterns* || "$_compskip" = all ]]; then
+      if [[ "$_compskip" = *patterns* ]]; then
+        break
+      elif [[ "$_compskip" = all ]]; then
         unset _compskip
         return ret
       fi
@@ -55,15 +57,36 @@ fi
 
 # And generate the matches, probably using default completion.
 
-if [[ -z "$comp" ]]; then
-  if [[ "$_compskip" = *default* ]]; then
-    unset _compskip
-    return 1
+if [[ -n "$comp" ]]; then
+  _compskip=patterns
+  "$comp" && ret=0
+  [[ "$_compskip" = (all|*patterns*) ]] && return ret
+else
+  if [[ "$_compskip" != *default* ]]; then
+    name=-default-
+    comp="$_comps[-default-]"
   fi
-  name=-default-
-  comp="$_comps[-default-]"
 fi
-[[ -z "$comp" ]] || "$comp" && ret=0
+  
+if [[ "$_compskip" != (all|*patterns*) ]]; then
+  for i in "$_postpatcomps[@]"; do
+    pat="${i% *}"
+    val="${i#* }"
+    if [[ "$cmd1" == $~pat || "$cmd2" == $~pat ]]; then
+      _compskip=default
+      "$val" && ret=0
+      if [[ "$_compskip" = *patterns* ]]; then
+	break
+      elif [[ "$_compskip" = all ]]; then
+        unset _compskip
+        return ret
+      fi
+    fi
+  done
+fi
+
+[[ "$name" = -default- && -n "$comp" && "$_compskip" != (all|*default*) ]] &&
+  "$comp" && ret=0
 
 unset _compskip
 

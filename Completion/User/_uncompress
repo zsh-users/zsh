@@ -1,3 +1,6 @@
 #compdef uncompress zmore
 
+local expl
+
+_description expl 'compressed file'
 _files -g '*.Z'

@@ -1,5 +1,7 @@
 #autoload
 
+local expl
+
 if (( ! $+_color_cache )); then
   local file
 
@@ -17,4 +19,6 @@ if (( ! $+_color_cache )); then
   fi
 fi
 
-compadd -M 'm:{a-z}={A-Z} m:-=\  r:|[ A-Z0-9]=* r:|=*' - "$_color_cache[@]"
+_description expl 'color specification'
+compadd "$@" "$expl[@]" -M 'm:{a-z}={A-Z} m:-=\  r:|[ A-Z0-9]=* r:|=*' - \
+        "$_color_cache[@]"

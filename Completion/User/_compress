@@ -1,3 +1,6 @@
 #compdef compress
 
-_files -g '*~*.Z'
+local expl
+
+_description expl 'file to compress'
+_files "$expl[@]" -g '*~*.Z'

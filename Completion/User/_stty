@@ -1,12 +1,16 @@
 #compdef stty
 
+local expl
+
 if [[ "$words[CURRENT-1]" = \
   (*erase|discard|status|dsusp|intr|kill|lnext|quit|reprint|start|s*p) ]]
 then
-     compadd '^-' '^h' '^?' '^c' '^u'
+  _description expl 'control character'
+  compadd "$expl[@]" '^-' '^h' '^?' '^c' '^u'
 else
+  _description expl setting
   compset -P '[-+]'
-  compadd rows columns intr quit erase kill eof eol \
+  compadd "$expl[@]" rows columns intr quit erase kill eof eol \
     eol2 start stop susp dsusp reprint discard werase lnext \
     parenb parodd cs8 cstopb hupcl cread clocal parext \
     ignbrk brkint ignpar parmrk inpck istrip inlcr igncr icrnl iuclc \

@@ -1,3 +1,10 @@
 #compdef which whence where type
 
-compgen -caF
+local expl
+
+_description expl command
+compgen "$expl[@]" -c
+_description expl alias
+compgen "$expl[@]" -a
+_description expl 'shell function'
+compgen "$expl[@]" -F

@@ -1,3 +1,6 @@
 #compdef limit unlimit
 
-compadd ${${(f)"$(limit)"}%% *}
+local expl
+
+_description expl 'process limits'
+compadd "$expl[@]" ${${(f)"$(limit)"}%% *}

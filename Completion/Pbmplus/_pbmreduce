@@ -1,0 +1,4 @@
+#compdef pbmreduce
+
+_arguments '-floyd' '-fs' '-threshold' '-value:threshold value:' \
+           ':reduction factor:' ':file: _pbm_file'

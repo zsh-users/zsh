@@ -151,6 +151,10 @@ called when completing for a command whose name matches the given
 var(pattern) (a standard globbing pattern).  Note that only one
 var(pattern) may be given.
 )
+item(tt(#compdef -P) var(pattern))(
+Like the previous one, but the function will be called only if no
+completion function for the command on the line could be found.
+)
 item(tt(#compdef -k) var(style key-sequences...))(
 This can be used to bind special completion functions to the
 var(key-sequences).  It creates a widget behaving like the builtin widget
@@ -195,6 +199,7 @@ startitem()
 xitem(tt(compdef) [ tt(-an) ] var(function names...))
 xitem(tt(compdef -d) var(names...))
 xitem(tt(compdef -p) [ tt(-a) ] var(function pattern))
+xitem(tt(compdef -P) [ tt(-a) ] var(function pattern))
 item(tt(compdef -k) [ tt(-a) ] var(function style key-sequences...))(
 The first form tells the completion system to call the given
 var(function) when completing for the contexts or commands
@@ -207,7 +212,12 @@ The third form is similar to the first, but var(function) will be called
 for all commands whose name matches the var(pattern); this is like the
 tt(#compdef -p) function tag.
 
-The fourth form defines a widget with the same name as the var(function)
+The fourth form is like the third, but the var(function) will be
+called only if no function for the command itself was found or if one
+was found and it set the tt(_compskip) parameter to a value em(not)
+containing the sub-string `tt(patterns)'.
+
+The fifth form defines a widget with the same name as the var(function)
 which will be called for each of the var(key-sequences); this is like the
 tt(#compdef -k) tag.  The function should generate the completions needed
 and will otherwise behave like the builtin widget whose name is given as
@@ -694,6 +704,37 @@ tt(-first-) context. With this
 one can write a pattern completion function that keeps other functions 
 from being tried simply by setting this parameter to any value.
 )
+item(tt(_description))(
+This function gets two arguments: the name of an array and a
+string. It tests if the configuration key tt(description_format) is
+set and if it is, it stores some options in the array that can then be 
+given to the tt(compadd) and tt(compgen) builtin commands to make the
+value of the tt(description_format) key (with the sequence `tt(%d)'
+replaced by the string given as the second argument) be displayed
+above the matches added. These options also will make sure that the
+matches are placed in a separate group (the second argument is used as 
+the name of the group) if the configuration key tt(group_matches) is
+set to a non-empty string. Normally a sorted group will be used for this
+(with the `tt(-J)' option), but if the option `tt(-V)' is given, a
+unsorted group will be used instead.
+
+In most cases, this function will be used like this:
+
+example(local expl
+_description expl file
+compadd "$expl[@]" - "$files[@]")
+)
+item(tt(_message))(
+This function takes one argument which is used like the second
+argument to the tt(_description) function. However, the resulting
+string will always be shown, not only if some matches were
+generated. This is useful to display help texts in places where no
+completions can be generated automatically.
+
+This function also uses the configuration key tt(message_format) in
+preference to tt(description_format). The latter is used only if the
+former is unset or set to the empty string.
+)
 item(tt(_multi_parts))(
 This function gets two arguments: a separator character and an
 array.  As usual, the array may be either the
@@ -791,19 +832,21 @@ names. Note that this means that you should be careful to make sure
 that this function is not called for a command that does not support
 this option.
 
-For options that get an argument after a `tt(=)', the function also
-automatically tries to find out what should be completed as the argument.
+For options that get an argument after a `tt(=)', the function also tries
+to automatically find out what should be completed as the argument.
 The possible completions for option-arguments can be described with
-the arguments to this function. This is done by giving pairs of
-patterns and actions as consecutive arguments. The actions specify
-what should be done to complete arguments of those options whose
-description match the pattern. The action may be a list of words in
-brackets or in parentheses, separated by spaces. A list in square brackets
-denotes possible values for an optional argument, a list in parentheses
+the arguments to this function. Each argument contains one description
+of the form <pattern>:<message>:<action>. The message will be printed 
+above the possible completion if the `description_format' configuration
+key is set (see above). The actions specify what
+should be done to complete arguments of those options that match 
+the pattern. The action may be a list of words in brackets or in
+parentheses, separated by spaces. A list in brackets denotes
+possible values for an optional argument, a list in parentheses
 gives words to complete for mandatory arguments. If the action does
-not start with a square bracket or parenthesis, it should be the name of a
+not start with a bracket or parentheses, it should be the name of a
 command (probably with arguments) that should be invoked to complete 
-after the equal sign. Example:
+after the equal sign. E.g.:
 
 example(_long_options '*\*'     '(yes no)' \ 
               '*=FILE*' '_files' \ 
@@ -818,8 +861,7 @@ for option descriptions containing `tt(=FILE)' and paths for option
 descriptions that contain `tt(=DIR)' or `tt(=PATH)'. These builtin
 patterns can be overridden by patterns given as arguments, however.
 
-This function also accepts the `tt(-X)', `tt(-J)', and `tt(-V)'
-options which are passed unchanged to `tt(compadd)'. If the
+If the
 option `tt(-t)' is given, completion is only done on words starting
 with two hyphens. The option `tt(-i) var(patterns)' can be used to
 give patterns for options which should not be completed. The patterns
@@ -832,6 +874,102 @@ replacement. E.g. some tt(configure)-scripts describe options only as
 `tt(--enable-foo)', but also accept `tt(disable-foo)'. To allow
 completion of the second form, one would use
 `tt(-s "(#--enable- --disable-)")'.
+)
+item(tt(_arguments))(
+Like tt(_long_options), this function is in the tt(Base) subdirectory.
+
+This function can be used to complete words on the line by simply
+describing the arguments the command on the line gets. The description 
+is given as arguments to this function, with each argument describing
+one option or normal argument of the command. The descriptions
+understood are:
+
+startitem()
+item(var(n)tt(:)var(message)tt(:)var(action))(
+This describes the var(n)'th normal argument. The var(message) will be 
+printed above the matches generated and the var(action) says what can
+be completed in this position (see below).
+)
+item(tt(:)var(message)tt(:)var(action))(
+Like the previous one, but describing the em(next) argument. I.e. if
+you want to describe all arguments a command can get, you can leave
+out the numbers in the description and just use this form to describe
+them one after another in the order they have to appear on the line.
+)
+item(tt(*:)var(message)tt(:)var(action))(
+This describes how arguments are to be completed for which no
+description with one of the first two forms was given. This also means 
+that any number of arguments can be completed.
+)
+item(var(opt-spec)[var(description) ...])(
+This describes an option and (if at least one var(description) is
+given) the arguments that have to come after the option. If no
+var(description) is given, this will only be used to offer the option
+name as a possible completion in the right places. Each
+var(description) has to be of the form
+`tt(:)var(message)tt(:)var(action)' or
+`tt(::)var(message)tt(:)var(action)', where the second form describes
+an optional argument and the first one describes a mandatory argument.
+
+In the simplest form the var(opt-spec) is just the option name
+beginning with a minus or a plus sign, such as `tt(-foo)'. In this
+case, the first argument for the option (if any) has to come as a
+separate word directly after the option and the option may appear only 
+once on the line (and if it is already on the line, the option name
+will not be offered as a possible completion again). If the first
+argument for the option has to come directly after the option name
+em(in the same word), a minus sign should be added to the end of the
+var(opt-spec), as in `tt(-foo-)'. If the first argument may be given
+in one string with the option name, but may also be given as a
+separate argument after the option, a plus sign should be used
+instead. Finally, if the option may be given more than once, a star
+(`tt(*)') should be added in front of the var(opt-spec).
+enditem()
+
+In each of the cases above, the var(action) says how the possible
+completions should be generated. In cases where only one of a fixed
+set of strings can be completed, these string can directly be given as 
+a list in parentheses, as in `tt(:foo:(foo bar baz))'. If the
+var(action) does not begin with an opening parentheses, it will be
+split into separate words and executed. If the var(action) starts with 
+a space, this list of words will be invoked unchanged, otherwise it
+will be invoked with some extra string placed after the first word
+which can be given as arguments to the tt(compadd) and tt(compgen)
+builtins and which make sure that the var(message) given in the
+description will be shown above the matches.
+
+Finally, this function can be made to automatically call the
+tt(_long_options) function where appropriate by giving it the string
+`tt(--)' as an argument. All arguments after this will be given
+unchanged to the tt(_long_options) function.
+
+Example:
+
+example(_arguments '-l+:left border:' \
+           '-format:paper size:(letter A4)' \
+	   '*-copy:output file:_files::resolution:(300 600)' \
+	   ':postscript file:_files -g *.(ps|eps)' \
+	   '*:page number:')
+
+This describes three options `tt(-l)', `tt(-format)', and
+`tt(-copy)'. The first one gets one argument described as `var(left
+border)' for which no completion will be offered because of the empty
+action. The argument may come directly after the `tt(-l)' or it may be 
+given as the next word on the line. The `tt(-format)' option gets one
+argument (in the next word) described as `var(paper size)' for which
+only the strings `tt(letter)' and `tt(A4)' will be completed. The
+`tt(-copy)' option differs from the first two in that it may appear
+more than once on the command line and in that it accepts two
+arguments. The first one is mandatory and will be completed as a
+filename. The second one is optional (because of the second colon
+before the description `var(resolution)') and will be completed from
+the strings `tt(300)' and `tt(600)'.
+
+The last two descriptions say what should be completed as
+arguments. The first one describes the first argument as a
+`var(postscript file)' and makes files ending in `tt(ps)' or `tt(eps)' 
+be completed. The last description says that all other arguments are
+`var(page numbers)' but does not give possible completions.
 )
 enditem()
 

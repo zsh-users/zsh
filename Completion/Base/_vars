@@ -4,17 +4,22 @@
 # `vared compconfig[<TAB>'.  However, in this version the [ must be
 # added by hand.
 
+local expl
+
 if [[ $PREFIX = *\[* ]]; then
   local var=${PREFIX%%\[*}
   local elt="${PREFIX#*\]}${SUFFIX%\]}"
   local addclose
+
   compset -p $(( ${#var} + 1 ))
   if ! compset -S \]; then
     addclose=(-S ']')
   fi
   if [[ ${(tP)var} = assoc* ]]; then
-    compadd $addclose - ${(kP)var}
+    _description expl 'association key'
+    compadd "$expl[@]" $addclose - ${(kP)var}
   fi
 else
-  compgen -v
+  _description expl parameter
+  compgen "$expl[@]" -v
 fi

@@ -1,0 +1,3 @@
+#compdef asciitopnm
+
+_arguments '-d:divisor:' ':height:' ':width:' ':file: _pbm_file'

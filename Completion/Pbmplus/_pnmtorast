@@ -1,0 +1,3 @@
+#compdef pnmtorast
+
+_arguments '-standard' '-rle' ':file: _pbm_file'

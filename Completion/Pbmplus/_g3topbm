@@ -1,0 +1,3 @@
+#compdef g3topbm
+
+_arguments '-kludge' '-reversebits' '-stretch' ':file: _pbm_file'

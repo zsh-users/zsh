@@ -14,6 +14,8 @@
 emulate -L zsh
 setopt extendedglob nonomatch
 
+local expl
+
 if [[ CURRENT -eq 3 ]]; then
   # cd old new: look for old in $PWD and see what can replace it
   local rep
@@ -21,7 +23,8 @@ if [[ CURRENT -eq 3 ]]; then
   rep=(${~PWD/$words[2]/*}~$PWD(-/N))
   # Now remove all the common parts of $PWD and the completions from this
   rep=(${${rep#${PWD%%$words[2]*}}%${PWD#*$words[2]}})
-  (( ! $#rep )) || compadd $rep
+  _description expl replacement
+  (( ! $#rep )) || compadd "$expl[@]" $rep
 elif [[ $PREFIX = [-+]* ]]; then
   # pushd: just complete the numbers, but show the full directory list with
   # numbers.
@@ -50,7 +53,8 @@ elif [[ $PREFIX = [-+]* ]]; then
   lines="${(F)list}"
   # get the array of numbers only
   list=(${list%%[ 	]*})
-  compgen -y '$lines' -Q -k list && ret=0
+  _description expl 'directory stack index'
+  compgen "$expl[@]" -y '$lines' -Q -k list && ret=0
   [[ -z $compstate[list] ]] && compstate[list]=list && ret=0
   [[ -n $compstate[insert] ]] && compstate[insert]=menu && ret=0
 

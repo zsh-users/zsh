@@ -1,0 +1,3 @@
+#compdef ppmtogif
+
+_arguments '-interlace' ':file: _pbm_file'

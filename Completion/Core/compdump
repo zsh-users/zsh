@@ -39,6 +39,12 @@ for _d_f in "$_patcomps[@]"; do
 done >> $_d_file
 print ")" >> $_d_file
 
+print "\n_postpatcomps=(" >> $_d_file
+for _d_f in "$_postpatcomps[@]"; do
+  print -r - "'${_d_f//\'/'\\''}'"
+done >> $_d_file
+print ")" >> $_d_file
+
 print >> $_d_file
 
 # Now dump the key bindings. We dump all bindings for zle widgets

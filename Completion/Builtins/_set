@@ -1,9 +1,11 @@
 #compdef set
 
-local prev="$words[CURRENT-1]"
+local prev="$words[CURRENT-1]" expl
 
 if [[ "$prev" = [-+]o ]]; then
-  compgen -o
+  _description expl 'zsh option'
+  compgen "$expl[@]" -o
 elif [[ "$prev" = -A ]]; then
-  compgen -A
+  _description expl array
+  compgen "$expl[@]" -A
 fi

@@ -16,7 +16,7 @@ the option, respectively. Unsetting a key in this array is like
 setting it to the value tt(off).
 )
 vindex(commands)
-item(tt(command))(
+item(tt(commands))(
 This array gives access to the command hash table. The keys are the
 names of external commands, the values are the pathnames of the files
 that would be executed when the command would be invoked. Setting a

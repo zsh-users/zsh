@@ -1,5 +1,7 @@
 #autoload
 
+local expl
+
 if (( ! $+_cursor_cache )); then
   local file
 
@@ -12,4 +14,5 @@ if (( ! $+_cursor_cache )); then
   fi
 fi
 
-compadd -M 'm:-=_ r:|_=*' - "$_cursor_cache[@]"
+_description expl 'cursor name'
+compadd "$@" "$expl[@]" -M 'm:-=_ r:|_=*' - "$_cursor_cache[@]"

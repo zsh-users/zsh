@@ -1,2 +1,6 @@
 #compdef -kn complete-word \e/
-compgen -Q -H 0 ''
+
+local expl
+
+_description expl 'history word'
+compgen "$expl[@]" -Q -H 0 ''

@@ -1,10 +1,22 @@
 #compdef disable
 
-local prev="$words[CURRENT-1]" ret=1
+local prev="$words[CURRENT-1]" ret=1 expl
 
-[[ "$prev" = -*a* ]] && compgen -ea && ret=0
-[[ "$prev" = -*f* ]] && compgen -eF && ret=0
-[[ "$prev" = -*r* ]] && compgen -ew && ret=0
-[[ "$prev" != -* ]]  && compgen -eB && ret=0
+if [[ "$prev" = -*a* ]]; then
+  _description expl alias
+  compgen "$expl[@]" -ea && ret=0
+fi
+if [[ "$prev" = -*f* ]]; then
+  _description expl 'shell function'
+  compgen "$expl[@]" -eF && ret=0
+fi
+if [[ "$prev" = -*r* ]]; then
+  _description expl 'reserved word'
+  compgen "$expl[@]" -ew && ret=0
+fi
+if [[ "$prev" != -* ]]; then
+  _description expl 'builtin command'
+  compgen "$expl[@]" -eB && ret=0
+fi
 
 return ret

@@ -68,10 +68,12 @@ while [[ $# -gt 0 && $1 = -[dDf] ]]; do
 done
 
 # The associative array containing the definitions for the commands.
-# Definitions for patterns will be stored in the normal array `_patcomps'.
+# Definitions for patterns will be stored in the normal arrays `_patcomps'
+# and `_postpatcomps'.
 
 typeset -gA _comps
 _patcomps=()
+_postpatcomps=()
 
 # The associative array use to report information about the last
 # cmpletion to the outside.
@@ -106,6 +108,9 @@ fi
 # function will be invoked when completing for a command whose name 
 # matches the pattern given as argument after the function name (in this
 # case only one argument is accepted).
+# The option `-P' is like `-p', but the function will be called after
+# trying to find a function defined for the command on the line if no
+# such function could be found.
 # With the `-k' option a function for a special completion keys is 
 # defined and immediatly bound to those keys. Here, the extra arguments
 # are the name of one of the builtin completion widgets and any number
@@ -147,11 +152,11 @@ compdef() {
 
   # Get the options.
 
-  while getopts "anpkd" opt; do
+  while getopts "anpPkd" opt; do
     case "$opt" in
     a)    autol=yes;;
     n)    new=yes;;
-    [pk]) if [[ -n "$type" ]]; then
+    [pPk]) if [[ -n "$type" ]]; then
             # Error if both `-p' and `-k' are given (or one of them
 	    # twice).
             echo "$0: type already set to $type"
@@ -159,6 +164,8 @@ compdef() {
 	  fi
 	  if [[ "$opt" = p ]]; then
 	    type=pattern
+	  elif [[ "$opt" = P ]]; then
+	    type=postpattern
 	  else
 	    type=key
 	  fi
@@ -186,6 +193,13 @@ compdef() {
       # between the pattern and the function name.
 
       _patcomps=("$_patcomps[@]" "$1 $func")
+      ;;
+    postpattern)
+      if [[ $# -gt 1 ]]; then
+        echo "$0: only one pattern allowed"
+	return 1
+      fi
+      _postpatcomps=("$_postpatcomps[@]" "$1 $func")
       ;;
     key)
       if [[ $# -lt 2 ]]; then
@@ -230,7 +244,12 @@ compdef() {
     pattern)
       # Note the space.
       for i; do
-        _patcomps=("${(@)patcomps:#$i *}")
+        _patcomps=("${(@)_patcomps:#$i *}")
+      done
+      ;;
+    postpattern)
+      for i; do
+        _postpatcomps=("${(@)_postpatcomps:#$i *}")
       done
       ;;
     key)
@@ -359,7 +378,7 @@ if [[ -z "$_i_done" ]]; then
       shift _i_line
       case $_i_tag in
       (\#compdef)
-	if [[ $_i_line[1] = -[pk](n|) ]]; then
+	if [[ $_i_line[1] = -[pPk](n|) ]]; then
 	  compdef ${_i_line[1]}a "${_i_file:t}" "${(@)_i_line[2,-1]}"
 	else
 	  compdef -na "${_i_file:t}" "${_i_line[@]}"

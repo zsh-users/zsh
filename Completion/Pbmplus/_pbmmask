@@ -1,0 +1,3 @@
+#compdef pbmmask
+
+_arguments '-expand' ':file: _pbm_file'

@@ -11,10 +11,12 @@
 #    options for the ps command that are to be used when creating
 #    the list to display during completion.
 
-local list ret=1
+local list ret=1 expl
 
-compgen -P '%' -j && ret=0
+_description expl job
+compgen "$expl[@]" -P '%' -j && ret=0
 list=("${(@Mr:COLUMNS-1:)${(f)$(ps ${compconfig[ps_listargs]:-$compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*}")
-compadd -y list - ${${${(f)"$(ps $compconfig[ps_args] 2>/dev/null)"}[2,-1]## #}%% *} && ret=0
+_description expl 'process ID'
+compadd "$expl[@]" -y list - ${${${(f)"$(ps $compconfig[ps_args] 2>/dev/null)"}[2,-1]## #}%% *} && ret=0
 
 return ret

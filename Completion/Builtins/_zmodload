@@ -1,11 +1,14 @@
 #compdef zmodload
 
-local fl="$words[2]"
+local fl="$words[2]" expl
 
 if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && CURRENT -ge 4 ]]; then
-  compgen -B
+  _description expl 'builtin command'
+  compgen "$expl[@]" -B
 elif [[ "$fl" = -*u* ]]; then
+  _description expl module
   compadd - $(zmodload)
 else
+  _description expl 'module file'
   compadd - ${^module_path}/*(N:t:r)
 fi

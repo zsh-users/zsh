@@ -1,3 +1,6 @@
 #compdef strip
 
-_files -g '*(*)'
+local expl
+
+_description expl executable
+_files "$expl[@]" -g '*(*)'

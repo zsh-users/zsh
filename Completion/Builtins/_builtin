@@ -5,5 +5,8 @@ if (( $CURRENT > 2 )); then
   (( CURRENT -- ))
   _normal
 else
-  compgen -eB
+  local expl
+
+  _description expl 'builtin command'
+  compgen "$expl[@]" -eB
 fi

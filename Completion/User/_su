@@ -1,12 +1,13 @@
 #compdef su
 
-local shell comp name usr base
+local shell comp name usr base expl
 
 [[ $words[2] != - ]]
 (( base=$?+2 ))
 
 if [[ CURRENT -eq base ]]; then
-  compgen -u && return
+  _description expl user
+  compgen "$expl[@]" -u && return
   usr=root
 elif [[ CURRENT -ge base+1 ]]; then
   usr=$words[base]
@@ -14,9 +15,9 @@ else
   return
 fi
 
-shell=${"$(egrep "^$usr:" </etc/passwd)"##*:}
+shell="${${(M@)${(@f)$(</etc/passwd)}:#root*}##*:}"
 compset -n $base
 for name in $shell $shell:t -default-; do
   comp="$_comps[$name]"
-  [[ ! -z "$comp" ]] && "$comp" && return
+  [[ -n "$comp" ]] && "$comp" && return
 done  

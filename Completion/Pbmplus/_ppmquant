@@ -1,0 +1,26 @@
+#compdef ppmquant
+
+local ret=1 expl opt=yes
+
+if [[ "$words[2]" = -(fs|floyd) ]]; then
+  (( CURRENT-- ))
+  shift 1 words
+  opt=''
+fi
+
+if [[ CURRENT -eq 2 ]]; then
+  _description expl option
+  if [[ -n "$opt" ]]; then
+    compadd "$expl[@]" - -map -fs -floyd && ret=0
+  else
+    compadd "$expl[@]" - -map && ret=0
+  fi
+  _message 'number of colors'
+
+  return ret
+elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then
+  _description expl 'map file'
+  _files "$expl[@]" -g '*.(#i)ppm'
+else
+  _pbm_file
+fi

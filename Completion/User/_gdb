@@ -3,33 +3,38 @@
 # This uses the configuration keys `ps_args' and `ps_listargs'
 # described in the `_wait' function.
 
-local cur="$words[CURRENT]" prev w list ret=1
+local cur="$words[CURRENT]" prev w list ret=1 expl
 
-_long_options -t '*=(CORE|SYM)FILE'	'_files' \
-		 '*=EXECFILE'   	'_files *(*)' \
-		 '*=TTY'		'compadd /dev/tty*' && return 0
+_long_options -t '*=(CORE|SYM)FILE:core file:_files' \
+		 '*=EXECFILE:executable:_files *(*)' \
+		 '*=TTY:terminal device:compadd /dev/tty*' && return 0
 
 if compset -P '-(cd|directory)='; then
   _files -/
 elif compset -P '-tty='; then
-  compadd - /dev/tty*
+  _description expl 'terminal device'
+  compadd "$expl[@]" - /dev/tty*
 elif compset -P '-(exec|se)='; then
-  _files -/g '*(*)'
+  _description expl executable
+  _files "$expl[@]" -/g '*(*)'
 elif compset -P '-(symbols|core|command)='; then
   _files
-elif compset -P -; then
-  compadd -QS '' - symbols\= exec\= se\= core\= command\= directory\= \
-	           cd\= tty\=
-  compadd - help h s e c x d nx n quiet q batch fullname f b
+elif [[ "$PREFIX" = -* ]]; then
+  _description expl option
+  compadd "$expl[@]" -QS '' - symbols\= exec\= se\= core\= command\= \
+                              directory\= cd\= tty\=
+  compadd "$expl[@]" - help h s e c x d nx n quiet q batch fullname f b
 else
   prev="$words[CURRENT-1]"
 
   case "$prev" in
   (-d) _files -/ && return 0 ;;
-  (-e) _files -/g '*(*)' && return 0 ;;
   (-[csx]) _files && return 0 ;;
-  (-b) compadd -V baud 0 50 75 110 134 150 200 300 600 1200 1800 2400 4800 \
-                       9600 19200 38400 57600 115200 230400 && return 0 ;;
+  (-e) _description expl executable
+       _files "$expl[@]" -/g '*(*)' && return 0 ;;
+  (-b) _description -V expl 'baud rate'
+       compadd "$expl[@]" 0 50 75 110 134 150 200 300 600 1200 1800 2400 4800 \
+                          9600 19200 38400 57600 115200 230400 && return 0 ;;
   esac
   w=( "${(@)words[2,-1]}" )
   while [[ "$w[1]" = -* ]]; do
@@ -39,12 +44,14 @@ else
 
   if [[ $#w -gt 1 ]]; then
     _files && ret=0
+    _description expl 'process ID'
     list=("${(F)${(@Mr:COLUMNS-1:)${(f)$(ps ${compconfig[ps_listargs]:-$compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${w[1]:t}}}
 ")
-    compadd -y list - ${${${(M)${(f)"$(ps $compconfig[ps_args] 2>/dev/null)"}:#*${w[1]:t}*}## #}%% *} && ret=0
+    compadd "$expl[@]" -y list - ${${${(M)${(f)"$(ps $compconfig[ps_args] 2>/dev/null)"}:#*${w[1]:t}*}## #}%% *} && ret=0
 
     return ret
   else
+    _description expl executable
     _files -/g '*(*)'
   fi
 fi

@@ -1,0 +1,3 @@
+#compdef pnmrotate
+
+_arguments '-noantialias' ':rotation angle:' ':file: _pbm_file'

@@ -1,3 +1,6 @@
 #compdef disown fg jobs
 
-compgen -j -P '%'
+local expl
+
+_description expl job
+compgen "$expl[@]" -j -P '%'

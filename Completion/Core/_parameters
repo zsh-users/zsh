@@ -4,9 +4,13 @@
 # extra options of compadd. It completes only non-local parameters. All
 # arguments are given to compadd.
 
+local expl
+
+_description expl parameter
+
 if zmodload -e parameter; then
   setopt localoptions extendedglob
-  compadd "$@" - ${(k)parameters[(R)^*local*]}
+  compadd "$expl[@]" "$@" - ${(k)parameters[(R)^*local*]}
 else
-  compadd "$@" - ${${${(f)"$(typeset +)"}:#*local *}##* }
+  compadd "$expl[@]" "$@" - ${${${(f)"$(typeset +)"}:#*local *}##* }
 fi

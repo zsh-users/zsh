@@ -1,0 +1,3 @@
+#compdef pbmtopgm
+
+_arguments ':width:' ':height:' ':file: _pbm_file'

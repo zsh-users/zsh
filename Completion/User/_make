@@ -1,6 +1,6 @@
 #compdef make gmake pmake
 
-local prev="$words[CURRENT-1]" file ret=1
+local prev="$words[CURRENT-1]" file ret=1 expl
 
 if [[ "$prev" = -[CI] ]]; then
   _files -/
@@ -18,7 +18,8 @@ else
     file=''
   fi
 
+  _description expl 'make target'
   [[ -n "$file" ]] &&
-    compadd - $(awk '/^[a-zA-Z0-9][^\/ 	]+:/ {print $1}' FS=: $file) && ret=0
+    compadd "$expl[@]" - $(awk '/^[a-zA-Z0-9][^\/ 	]+:/ {print $1}' FS=: $file) && ret=0
   (( ret )) && { compset -P 1 '*\='; _files }
 fi

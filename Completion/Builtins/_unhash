@@ -1,10 +1,22 @@
 #compdef unhash
 
-local fl="$words[2]" ret=1
+local fl="$words[2]" ret=1 expl
 
-[[ "$fl" = -*d* ]] && compgen -n && ret=0
-[[ "$fl" = -*a* ]] && compgen -a && ret=0
-[[ "$fl" = -*f* ]] && compgen -F && ret=0
-[[ "$fl" != -* ]]  && compgen -m && ret=0
+if [[ "$fl" = -*d* ]]; then
+  _description expl 'named directory'
+  compgen "$expl[@]" -n && ret=0
+fi
+if [[ "$fl" = -*a* ]]; then
+  _description expl alias
+  compgen "$expl[@]" -a && ret=0
+fi
+if [[ "$fl" = -*f* ]]; then
+  _description expl 'shell function'
+  compgen "$expl[@]" -F && ret=0
+fi
+if [[ "$fl" != -* ]]; then
+  _description expl command
+  compgen "$expl[@]" -m && ret=0
+fi
 
 return ret

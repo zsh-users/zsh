@@ -9,9 +9,11 @@
 # For options that get an argument after a `=', the function also tries
 # to automatically find out what should be completed as the argument.
 # The possible completions for option-arguments can be described with
-# the arguments to this function. This is done by giving pairs of
-# patterns and actions as consecutive arguments. The actions specify
-# what should be done to complete arguments of those options that match 
+# the arguments to this function. Each argument contains one description
+# of the form <pattern>:<message>:<action>. The message will be printed 
+# above the possible completion if the `description_format' configuration
+# key is set (see the `_main_complete' file). The actions specify what
+# should be done to complete arguments of those options that match 
 # the pattern. The action may be a list of words in brackets or in
 # parentheses, separated by spaces. A list in brackets denotes
 # possible values for an optional argument, a list in parentheses
@@ -20,9 +22,9 @@
 # command (probably with arguments) that should be invoked to complete 
 # after the equal sign. E.g.:
 #
-#  _long_options '*\*'     '(yes no)' \
-#                '*=FILE*' '_files' \
-#                '*=DIR*'  '_files -/'
+#  _long_options '*\*:toggle:(yes no)' \
+#                '*=FILE*:file:_files' \
+#                '*=DIR*:directory:_files -/'
 #
 # This makes `yes' and `no' be completed as the argument of options
 # whose description ends in a star, file names for options that
@@ -46,23 +48,18 @@
 #      E.g. configure often lists only --enable but accepts both
 #      --enable and --disable options.
 #      _long_options -s '(#--enable- --disable)' will accept both forms.
-#
-# This function also accepts the `-X', `-J', and `-V' options which
-# are given to `compadd'. 
 
-local opt expl group test i name action ret=1 tmp suffix iopts sopts
+local opt test i name action descr expl ret=1 tmp suffix iopts sopts
 
 setopt extendedglob
 
 # Get the options.
 
-group=()
 expl=()
+
 if [[ $1 = -*~--* ]]; then
-  while getopts "J:V:X:ti:s:" opt; do
+  while getopts "ti:s:" opt; do
     case "$opt" in
-      [JV]) group=("-$opt" "$OPTARG");;
-      X)    expl=(-X "$OPTARG");;
       t)    test=yes;;
       i)    if [[ "$OPTARG[1]" = '(' ]]; then
               iopts=( ${=OPTARG[2,-2]} )
@@ -99,7 +96,7 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
   # No, store the new command name and clear the old parameters.
 
   _lo_cache_cmd="$tmp"
-  (( $+_lo_cache_actions )) && unset "$_lo_cache_names[@]" _lo_cache_actions _lo_cache_names
+  (( $+_lo_cache_actions )) && unset "$_lo_cache_names[@]" _lo_cache_actions _lo_cache_names _lo_cache_descr
 
   local opts pattern anum=1 tmpo str
   typeset -U opts
@@ -136,16 +133,17 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
   # use the positional parameters we were given and a few standard
   # ones. Then we loop through this table.
 
-  set -- "$@" '*=FILE*' '_files' '*=(DIR|PATH)*' '_files -/' '*' ''
+  set -- "$@" '*=FILE*:file:_files' '*=(DIR|PATH)*:directory:_files -/' '*:unknown:'
 
   while [[ $# -gt 1 ]]; do
 
     # First, we get the pattern and the action to use and take them
     # from the positional parameters.
 
-    pattern="$1"
-    action="$2"
-    shift 2
+    pattern="${1%%:*}"
+    descr="${${1#*:}%%:*}"
+    action="${1#*:*:}"
+    shift
 
     # We get all options matching the pattern and take them from the
     # list we have built. If no option matches the pattern, we
@@ -188,6 +186,7 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
         tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
         _lo_cache_names[anum]="_lo_cache_optarg_$anum"
         _lo_cache_actions[anum]="$action"
+	_lo_cache_descr[anum]="$descr"
         eval "_lo_cache_optarg_${anum}=(\"\$tmpo[@]\")"
 	(( anum++ ))
       fi
@@ -201,6 +200,7 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
         tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
         _lo_cache_names[anum]="_lo_cache_arg_$anum"
         _lo_cache_actions[anum]="$action"
+	_lo_cache_descr[anum]="$descr"
         eval "_lo_cache_arg_${anum}=(\"\$tmpo[@]\")"
 	(( anum++ ))
       fi
@@ -216,6 +216,7 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
     if (( $#tmp )); then
       _lo_cache_names[anum]="$name"
       _lo_cache_actions[anum]="$action"
+      _lo_cache_descr[anum]="$descr"
       eval "${name}=(\"\$tmp[@]\")"
       (( anum++ ))
     fi
@@ -232,7 +233,7 @@ if [[ "$str" = *\=* ]]; then
   # It contains a `=', now we ignore anything up to it, but first save 
   # the old contents of the special parameters we change.
 
-  local oipre opre osuf pre parto parta pat patflags anum=1
+  local oipre opre osuf pre parto parta partd pat patflags anum=1
 
   oipre="$IPREFIX"
   opre="$PREFIX"
@@ -247,14 +248,23 @@ if [[ "$str" = *\=* ]]; then
 
   for name in "$_lo_cache_names[@]"; do
     action="$_lo_cache_actions[anum]"
+    descr="$_lo_cache_descr[anum]"
     if (( ${(@)${(@P)name}[(I)$pre]} )); then
       IPREFIX="${oipre}${pre}="
       PREFIX="${str#*\=}"
       SUFFIX=""
+
+      _description expl "$descr"
+
       if [[ "$action[1]" = (\[|\() ]]; then
-        compadd - ${=action[2,-2]}
+        compadd "$expl[@]" - ${=action[2,-2]}
       elif (( $#action )); then
-        $=action
+        if [[ "$action" = \ * ]]; then
+          $=action
+        else
+	  action=($=action)
+	  $action[1] "$expl[@]" $action[2,-1]
+        fi
       fi
 
       # We found the option string, return.
@@ -276,6 +286,7 @@ if [[ "$str" = *\=* ]]; then
       if [[ -z "$parto" ]]; then
         parto="$tmp[1]"
 	parta="$action"
+	partd="$descr"
       else
         parto=-
       fi
@@ -292,11 +303,17 @@ if [[ "$str" = *\=* ]]; then
     IPREFIX="${oipre}${parto}="
     PREFIX="${str#*\=}"
     SUFFIX=""
+
+    _description expl "$partd"
+
     if (( $#parta )); then
       if [[ "$parta[1]" = (\[|\() ]]; then
-        compadd - ${=parta[2,-2]}
-      else
+        compadd "$expl[@]" - ${=parta[2,-2]}
+      elif [[ "$parta" = \ * ]]; then
         $=parta
+      else
+	action=($=parta)
+	$action[1] "$expl[@]" $action[2,-1]
       fi
     else
       compadd -S '' - "$PREFIX"
@@ -329,15 +346,17 @@ anum=1
 for name in "$_lo_cache_names[@]"; do
   action="$_lo_cache_actions[anum]"
 
+  _description expl option
+
   if [[ "$name" = *_optarg_* ]]; then
-    compadd -M 'r:|-=* r:|=*' -Qq "$suffix[@]" -s "$str" - \
-            "${(@P)name}" && ret=0
+    compadd "$expl[@]" -M 'r:|-=* r:|=*' \
+            -Qq "$suffix[@]" -s "$str" - "${(@P)name}" && ret=0
   elif [[ "$name" = *_arg_* ]]; then
-    compadd -M 'r:|-=* r:|=*' -Q "$suffix[@]" -s "$str" - \
-            "${(@P)name}" && ret=0
+    compadd "$expl[@]" -M 'r:|-=* r:|=*' \
+            -Q "$suffix[@]" -s "$str" - "${(@P)name}" && ret=0
   elif [[ -z "$str" ]]; then
-    compadd -M 'r:|-=* r:|=*' -Q - \
-            "${(@P)name}" && ret=0
+    compadd "$expl[@]" -M 'r:|-=* r:|=*' - \
+            -Q "${(@P)name}" && ret=0
   fi
   (( anum++ ))
 done

@@ -1,0 +1,4 @@
+#compdef pbmupc
+
+_arguments '-s1' '-s2' ':product type:' ':manufacturer code:' \
+           ':product code:'

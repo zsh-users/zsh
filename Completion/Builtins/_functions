@@ -1,3 +1,6 @@
 #compdef functions unfunction
 
-compgen -F
+local expl
+
+_description expl 'shell function'
+compgen "$expl[@]" -F

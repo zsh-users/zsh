@@ -1,3 +1,8 @@
 #compdef -equal-
 
-compgen -am
+local expl
+
+_description expl alias
+compgen "$expl[@]" -a
+_description expl command
+compgen "$expl[@]" -m

@@ -2,7 +2,7 @@
 
 setopt localoptions rcexpandparam
 
-local rep
+local rep expl
 
 if [[ $words[2] = (<->*|ln) ]]; then
   rep=( $manpath/(man|cat)${words[2]}/$PREFIX*$SUFFIX.<->*(N:t:r) )
@@ -10,4 +10,5 @@ else
   rep=( $manpath/(man|cat)*/$PREFIX*$SUFFIX.<->*(N:t:r) )
 fi
 
-(( $#rep )) && compadd - $rep
+_description expl 'manual page'
+(( $#rep )) && compadd "$expl[@]" - $rep

@@ -7,7 +7,7 @@
 #   `(( compstate[nmatches] )) || compgen -nu -qS/'
 # below that.
 
-local c s dirs list
+local d c s dirs list
 
 if [[ "$SUFFIX" = */* ]]; then
   ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
@@ -24,6 +24,8 @@ if compset -P +; then
   				        printf("%s\t%s\n", $1, $2); }' <<<$dirs)"
   list=("${(@)list%	*}")
   c=(-y '$dirs' -k "($list)")
+
+  _description d 'directory stack'
 elif compset -P -; then
   dirs="$(dirs -v)"
   list=("${(f)dirs}")
@@ -31,8 +33,16 @@ elif compset -P -; then
 					  printf("%s\t%s\n", $1, $2); }' <<<$dirs)"
   list=("${(@)list%	*}")
   c=(-y '$dirs' -k "($list)")
+
+  _description d 'directory stack'
 else
   c=(-nu)
+
+  if (( $# )); then
+    d=( "$@" )
+  else
+    _description d user
+  fi
 fi
 
-compgen "$c[@]" "$s[@]"
+compgen "$d[@]" "$c[@]" "$s[@]"

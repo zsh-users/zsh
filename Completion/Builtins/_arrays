@@ -1,3 +1,6 @@
 #compdef shift
 
-compgen -A
+local expl
+
+_description expl array
+compgen "$expl[@]" -A

@@ -1,3 +1,6 @@
 #compdef xfig
 
-_files -g '*.fig'
+local expl
+
+_description expl 'xfig file'
+_files "$expl[@]" -g '*.fig'

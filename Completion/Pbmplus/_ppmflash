@@ -1,0 +1,3 @@
+#compdef ppmflash
+
+_arguments ':flash factor:' ':file: _pbm_file'

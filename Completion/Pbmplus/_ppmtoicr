@@ -1,0 +1,4 @@
+#compdef ppmtoicr
+
+_arguments '-windowname:window name:' '-expand:expansion factor:' \
+           '-display:display screen:' '-rle' ':file: _pbm_file'

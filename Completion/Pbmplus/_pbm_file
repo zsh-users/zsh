@@ -1,0 +1,20 @@
+#compdef -P (p[bgpn]m*|*top[bgpn]m)
+
+local expl
+
+if [[ "$words[1]" = pnm* ]]; then
+  pat='*.(#i)p[bgp]m'
+elif [[ "$words[1]" = *top[bgpn]m ]]; then
+  pat="*.(#i)${words[1]%%top[bgpn]m}"
+else
+  pat="*.(#i)${words[1][1,3]}"
+fi
+
+if (( $# )); then
+  expl=( "$@" )
+else
+  _description expl 'picture file'
+fi
+
+_path_files "$expl[@]" -g "$pat" ||
+    _files "$expl[@]" -g '*.(#i)p[bgp]m'

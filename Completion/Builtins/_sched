@@ -1,3 +1,7 @@
 #compdef sched
 
+if [[ CURRENT -eq 2 ]]; then
+  _message 'time specification'
+  return 1
+fi
 compset -n 3 && _normal

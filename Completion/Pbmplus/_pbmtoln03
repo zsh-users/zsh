@@ -1,0 +1,5 @@
+#compdef pbmtoln03
+
+_arguments '-l:left margin:' '-r:right margin:' \
+           '-t:top margin:'  '-b:bottom margin:' \
+           '-f:form length:' ':file: _pbm_file'

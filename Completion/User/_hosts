@@ -1,5 +1,8 @@
 #compdef ftp ncftp ping rwho rup xping traceroute nslookup telnet
 
+local expl
+
 : ${(A)hosts:=${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
 
-compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" - "$hosts[@]"
+_description expl host
+compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" "$expl[@]" - "$hosts[@]"

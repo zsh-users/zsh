@@ -7,8 +7,12 @@
 #
 # Where appropriate, will complete keymaps instead of widgets.
 
+local expl
+
 if [[ "$words[2]" = -*[DAN]* || "$words[CURRENT-1]" = -*M ]]; then
-  compadd - $(bindkey -l)
+  _description expl keymap
+  compadd "$expl[@]" - $(bindkey -l)
 else
-  compgen -b -M 'r:|-=* r:|=*'
+  _description expl widget
+  compgen "$expl[@]" -b -M 'r:|-=* r:|=*'
 fi

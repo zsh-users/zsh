@@ -1,7 +1,11 @@
 #compdef trap
 
+local expl
+
 if [[ CURRENT -eq 2 ]]; then
-  compgen -c
+  _description expl command
+  compgen "$expl[@]" -c
 else
-  compgen -k signals
+  _description expl signal
+  compgen "$expl[@]" -k signals
 fi

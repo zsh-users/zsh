@@ -1,0 +1,3 @@
+#compdef pbmtolj
+
+_arguments '-resolution:resolution:(75 100 150 300)' ':file: _pbm_file'

@@ -1,0 +1,3 @@
+#compdef pnmnlfilt
+
+_arguments ':alpha value:' ':radius:' ':file: _pbm_file'

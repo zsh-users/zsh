@@ -1,0 +1,3 @@
+#compdef pbmtobg pbmtobbnbg
+
+_arguments ':raster operation:' ':x position:' ':y position:'

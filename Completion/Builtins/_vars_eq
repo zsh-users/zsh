@@ -1,3 +1,6 @@
 #compdef declare export integer local readonly typeset
 
-compgen -v -q -S '='
+local expl
+
+_description expl parameter
+compgen "$expl[@]" -v -q -S '='

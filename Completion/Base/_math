@@ -1,5 +1,7 @@
 #compdef -math-
 
+local expl
+
 if [[ "$PREFIX" = *[^a-zA-Z0-9_]* ]]; then
   IPREFIX="$IPREFIX${PREFIX%%[a-zA-Z0-9_]#}"
   PREFIX="${PREFIX##*[^a-zA-Z0-9_]}"
@@ -9,10 +11,5 @@ if [[ "$SUFFIX" = *[^a-zA-Z0-9_]* ]]; then
   SUFFIX="${SUFFIX%%[^a-zA-Z0-9_]*}"
 fi
 
-compgen -v
-#compdef -math-
-
-IPREFIX="$IPREFIX${PREFIX%[a-zA-Z0-9_]*}"
-PREFIX="${PREFIX##*[^a-zA-Z0-9_]}"
-
-compgen -v
+_description expl parameter
+compgen "$expl[@]" -v

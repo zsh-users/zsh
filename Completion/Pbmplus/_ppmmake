@@ -1,0 +1,3 @@
+#compdef ppmmake
+
+_arguments ':color: _colors' ':width:' ':height:'

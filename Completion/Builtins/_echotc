@@ -1,3 +1,7 @@
 #compdef echotc
 
-compadd al dc dl do le up al bl cd ce cl cr dc dl do ho is le ma nd nl se so up
+local expl
+
+_description expl 'terminal capability'
+compadd "$expl[@]" \
+        al dc dl do le up al bl cd ce cl cr dc dl do ho is le ma nd nl se so up

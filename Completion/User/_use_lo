@@ -3,8 +3,4 @@
 # This is for GNU-like commands which understand the --help option,
 # but which do not otherwise require special completion handling.
 
-if [[ $PREFIX = --* ]]; then
-  _long_options
-else
-  _default
-fi
+_long_options -t || _default
