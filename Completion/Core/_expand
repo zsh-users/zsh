@@ -58,6 +58,14 @@
 
 local exp word="$PREFIX$SUFFIX" group=-V expl expl2 disp
 
+# First, see if we should insert all *completions*.
+
+if [[ -n "$compconfig[expand_completions]" &&
+      "${(e):-\$[$compconfig[expand_substitute]]}" -eq 1 ]]; then
+  compstate[insert]=all
+  return 1
+fi
+
 # Do this only for the first global matcher.
 
 [[ "$compstate[matcher]" -le 1 ]] || return 1

@@ -479,6 +479,10 @@ tt(expand_menu), tt(expand_original), and tt(expand_prompt), see
 ifzman(the section `Completion System Configuration' below)\
 ifnzman(noderef(Completion System Configuration)).
 
+In a different mode selected by the tt(expand_completions)
+configuration key, all em(completions) generated for the string on the 
+line are inserted.
+
 None of these configuration keys has a default value.
 )
 item(tt(_list))(
@@ -1323,8 +1327,16 @@ tt(compadd) and thus may contain the control sequences `tt(%n)',
 `tt(%B)', etc. Also, the sequence `tt(%o)' in this string will be
 replaced by the original string.
 )
+item(tt(expand_completions))(
+If this is set and non-empty, its value will be evaluated in the same
+way as tt(expand_substitute) and if the result is `tt(1)', no
+expansions will be generated, but instead the completions will be
+generated as normal and all of them will be inserted in the command
+line.
+)
 item(tt(expandword_substitute), tt(expandword_glob),
-tt(expandword_menu),tt(expandword_original), tt(expandword_prompt))(
+tt(expandword_menu), tt(expandword_original), tt(expandword_prompt),
+tt(expandword_completions))(
 If these keys are set, they are used by the tt(_expand_word) bindable
 command to override the values for the configuration keys with the
 tt(expand_) prefix.
