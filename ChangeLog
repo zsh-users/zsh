@@ -1,3 +1,8 @@
+2002-03-10  Clint Adams  <clint@zsh.org>
+
+        * unposted: Etc/BUGS, Etc/TODO: update relevant
+	issues.
+
 2002-03-07  Clint Adams  <clint@zsh.org>
 
         * 16778: Completion/Unix/Command/.distfiles,

@@ -2,10 +2,6 @@
 KNOWN BUGS IN ZSH
 -----------------
 
-When a shell is exited from within a function, the only EXIT trap which is
-run is the one for the function itself, if any.  In particular, an EXIT
-trap set for the shell itself will not be executed in this case.
-------------------------------------------------------------------------
 On some terminals, display of lines with exactly 80 characters is
 problematic.  zsh assumes that the terminal does not print an extra
 newline in this case, but some terminals (e.g. aixterm) do.
@@ -48,7 +44,5 @@ and ksh and may be removed in the future. A good fix would be to keep
 such patterns unchanged if they do not match regardless of the state of
 the nonomatch and nullglob options.
 ------------------------------------------------------------------------
-Numeric ranges are still too greedy with using characters; for example,
-<1-1000>33 will not match 633 because the 633 matches the range.  Some
-backtracking will be necessary.  (This is believed fixed as of 3.1.6.)
+It is currently impossible to time builtins.
 ------------------------------------------------------------------------
