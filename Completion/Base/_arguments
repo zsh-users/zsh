@@ -161,8 +161,6 @@ while getopts ':O:C' opt; do
   fi
 done
 
-shift OPTIND-1
-
 _style -s options auto-description autod
 
 if comparguments -i "$autod" "$@"; then

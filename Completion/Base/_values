@@ -11,8 +11,6 @@ while getopts ':O:C' opt; do
   fi
 done
 
-shift OPTIND-1
-
 if compvalues -i "$@"; then
 
   local noargs args opts descr action expl sep subc
