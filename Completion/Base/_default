@@ -6,7 +6,8 @@
 # immediatly. If you want to use new style completion anyway, remove the
 # `|| return'. Also, you may want to use new style completion if the 
 # `compctl' didn't produce any matches. In that case remove the `|| return'
-# and at the line `[[ -nmatches 0 ]] || return' after `compcall'.
+# and insert the line `[[ compstate[nmatches] -eq 0 ]] || return' after
+# `compcall'.
 
 compcall || return
 

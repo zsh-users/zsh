@@ -562,3 +562,104 @@ Matt: 5553: under _WIN32, .exe suffix is optional for commands
 
 pws: unposted: Functions/Completion moved to Completion; subdirectories
 Core, Base, Builtins, User, Commands created; Completion/README created.
+
+  pws-11
+
+pws: 5557: configure.in for making sure signals really are defined in the
+file found.  This was in pws-10, but the patch didn't appear on the list
+for four days.
+
+Larry P. Schrof: 5550: last -> previous in history documentation
+
+Sven: 5560: subscripting fixes in params.c: flags for scalars and
+converting integer AA element to string
+
+pws: 5561: attempted (untested) fix for QNX4 compilation; halloc() is now
+zhalloc().  (By private email from probin@qnx.co.uk, it seems the QNX
+problems are more considerable with 3.1.5.)
+
+Sven: 5564, 5577, 5579: massive new completion reworking with $words,
+$compstate, etc., etc.
+
+Sven: 5565, 5576: $NUMERIC gives the numeric argument in a zle widget
+
+Sven: 5566: $foo[(b.<index>.i)<match>] starts searching $foo for for
+<match> at <index>
+
+Sven: 5571: Functions/Builtins/_cd tests if $cdpath is set
+
+Sven: 5574, 5578: Completion/README notes
+
+Sven: 5582: _path_files will expand /u/ -> /usr/ even if /u exists if
+nothing later on would match otherwise (got that?)
+
+pws: 5583: post-patch restructuring of _mh, _zftp, _most_recent_file.
+
+Sven: 5586: addmatch fix (old completion wasn't working)
+
+Sven: 5588: fix _most_recent_file idiocy
+
+Sven: 5590: compadd -p, -s and -P fixes
+
+Sven: 5593: _path_files -w
+
+Matt: 5596: Makefile dependencies for module compilation
+
+pws; 5597: Use separate file mymods.conf for your own builtin modules
+rather than the automatically generated modules-bltin.
+
+Sven: 5598: a neater way of handling compadd -p/-P
+
+Sven: 5599: _comp_parts, _path_files tweaks
+
+Sven: 5601: compstate[exact_string] and compstate[total_matchers]
+
+pws: 5602: _tar
+
+Sven: 5603: compstat[pattern_match]
+
+Sven: 5604: approximate completion.  (this is it.  every other shell is out
+of the game.)
+
+Sven: 5605: explanation listing fix
+
+Sven: 5613: copy scalar variable used for compgen -y
+
+Bart: 5614: Completion/Base/_match_test works out of the box
+
+Sven: 5620: fix for completion inside expansible braces
+
+Sven: 5621: manual for nmatches and matcher
+
+Sven: 5622: zshcompwid manual: clarifications
+
+Sven: 5623: -X strings with compadd were mishandled
+
+Sven: 5624: CCORIG required to be offered original string when correcting
+using COMPCORRECT
+
+pws: 5628: _builtin, _cd, _most_recent_file
+
+Sven: 5629: approximate correction patches
+
+Sven: 5631: compilation warnings
+
+Sven: 5637: mustuseheap check in complistflags
+
+Sven: 5640: _multi_parts, _path_files, _tar
+
+Andrej: 5650: more tricks with _configure
+
+Sven: 5651: widespread completion fixes
+
+Sven: 5659: globcomplete changes
+
+Sven: 5662: / following brace parameter
+
+Sven: 5663: compctl -i _completion_function
+
+Sven: 5665: return values from completion functions
+
+Sven: 5666: calling inststrlen() with a null string
+
+pws: from autoconf 2.13: new config.sub

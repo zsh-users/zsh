@@ -1,3 +1,7 @@
 #defcomp -command-
 
-complist -c
+local nm=$compstate[nmatches]
+
+compgen -c
+
+[[ nm -eq compstate[nmatches] ]] && _path_files -/g "*(*)"

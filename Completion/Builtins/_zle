@@ -1,7 +1,7 @@
 #defcomp zle
 
-if [[ -word 1 -N && -position 3 ]]; then
-  complist -F
+if [[ "$words[2]" = -N && CURRENT -eq 3 ]]; then
+  compgen -F
 else
-  complist -b
+  compgen -b
 fi

@@ -465,7 +465,7 @@ transposewords(void)
 	    return;
 	}
 	for (p1 = p2; p1 && iword(line[p1 - 1]); p1--);
-	pp = temp = (char *)halloc(p4 - p1 + 1);
+	pp = temp = (char *)zhalloc(p4 - p1 + 1);
 	struncpy(&pp, (char *) line + p3, p4 - p3);
 	struncpy(&pp, (char *) line + p2, p3 - p2);
 	struncpy(&pp, (char *) line + p1, p2 - p1);

@@ -1,5 +1,6 @@
 #defcomp - nohup nice eval time rusage noglob nocorrect exec
 
-[[ -position 1 -1 ]]
+shift words
+(( CURRENT-- ))
 
-_normal "$@"
+_normal

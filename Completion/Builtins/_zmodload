@@ -1,9 +1,11 @@
 #defcomp zmodload
 
-if [[ -mword 1 -*(a*u|u*a)* || -mword 1 -*a* && -position 3 -1 ]]; then
-  complist -B
-elif [[ -mword 1 -*u* ]]; then
-  complist -s '$(zmodload)'
+local fl="$words[2]"
+
+if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && -position 4 -1 ]]; then
+  compgen -B
+elif [[ "$fl" = -*u* ]]; then
+  compgen -s '$(zmodload)'
 else
-  complist -s '${^module_path}/*(N:t:r)'
+  compgen -s '${^module_path}/*(N:t:r)'
 fi

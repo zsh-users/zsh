@@ -567,7 +567,7 @@ makequote(char *str, size_t *len)
 	if (*l == '\'')
 	    qtct++;
     *len += 2 + qtct*3;
-    l = ol = (char *)halloc(*len);
+    l = ol = (char *)zhalloc(*len);
     *l++ = '\'';
     for (; str < end; str++)
 	if (*str == '\'') {
@@ -613,7 +613,7 @@ executenamedcommand(char *prmt)
     char *okeymap = curkeymapname;
 
     clearlist = 1;
-    cmdbuf = halloc(l + NAMLEN + 2);
+    cmdbuf = zhalloc(l + NAMLEN + 2);
     strcpy(cmdbuf, prmt);
     statusline = cmdbuf;
     selectkeymap("main", 1);
@@ -794,7 +794,7 @@ makeparamsuffix(int br, int n)
     if(br) {
 	suffixlen['#'] = suffixlen['%'] = suffixlen['?'] = n;
 	suffixlen['-'] = suffixlen['+'] = suffixlen['='] = n;
-	/*{*/ suffixlen['}'] = n;
+	/*{*/ suffixlen['}'] = suffixlen['/'] = n;
     }
 }
 

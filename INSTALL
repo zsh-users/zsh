@@ -56,10 +56,11 @@ Controlling what is compiled into the main zsh binary
 
 By default the comp1, compctl, zle, sched and rlimits modules are compiled
 into non-dynamic zsh and no modules are compiled into the main binary if
-dynamic loading is available.  This can be overridden by creating the
-Src/modules-bltin file with the list of modules which are to be compiled
-into the main binary.  See the zshmodules manual page for the list of
-available modules.
+dynamic loading is available.  This can be overridden by creating the file
+mymods.conf in the compilation directory (Src, unless you have told
+configure to use another directory) with the list of modules which are to
+be compiled into the main binary.  See the zshmodules manual page for the
+list of available modules.
 
 Compiler Options or Using a Different Compiler
 ----------------------------------------------

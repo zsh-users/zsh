@@ -1,11 +1,69 @@
 #defcomp tar
 
-local nm=$NMATCHES tf="$2"
+# Tar completion.  Features:
+#  - Assumes tar commands are in second position, tar archive is in third
+#    e.g. tar xvzf zsh-3.0.5.tar.gz ...
+#    Could search better.  Send me the patch.
+#  - `tar' can be called anything, will use the correct name
+#  - Preferentially completes *.tar and *.TAR files in third position
+#  - unless z or Z appears in the commands, in which case prefer *.tar.gz
+#    and similar (GNU tar).
+#  - From fourth position on, if command is x or t, completes files inside
+#    archive.  This is supposed to look pretty much as if the files are
+#    in an ordinary directory hierarchy.  Handles extraction from compressed
+#    archives (GNU tar).
+#  - Anywhere -- appears, gets a list of long options to complete from
+#    tar itself (GNU tar); this needs perl.  If you have GNU tar but not
+#    perl:  your system manager is weird.
+#  - Things like --directory=... are also completed correctly.
 
-if [[ ( -mword 1 *t*f* || -mword 1 *x*f* ) && -position 3 100000 ]]; then
-  complist -k "( $(tar tf $tf) )"
-elif [[ -mword 1 *c*f* && -position 3 100000 ]]; then
+emulate -LR zsh
+setopt extendedglob
+
+local nm=$NMATCHES tcmd="$words[2]" tf="$words[3]"
+
+if [[ $PREFIX = *=* ]]; then
+  # For GNU tar arguments like --directory=
+  IPREFIX=${PREFIX%%\=*}=
+  PREFIX=${PREFIX#*=}
+  if [[ $IPREFIX = --directory* ]]; then
+    _path_files -/
+  else
+    _files
+  fi
+elif [[ $PREFIX = --* ]]; then
+  # gnu tar, generate completions from --help
+  # ones followed by = get that as a suffix
+  local -a ownlist eqlist
+  local comp
+  $words[1] --help |
+  perl -ne 'while (/--[^[\s,='\'']+=?/g) { print "$&\n"; }' |
+  while read comp; do
+    if [[ $comp = *= ]]; then
+      eqlist[$#eqlist+1]=${comp%=}
+    else
+      ownlist[$#ownlist+1]=$comp
+    fi
+  done
+  compgen -S '=' -k eqlist
+  compgen -k ownlist
+elif [[ "$tcmd" = *[tx]*f* && $CURRENT -ge 4 ]] then
+  # Listing or extracting a particular file.  We run `tar t...'
+  # on the file, keeping the list of filenames cached, plus the
+  # name of the tarfile so we know if it changes.
+  local largs=-tf
+
+  [[ $words[2] = *z* ]] && largs=-tzf
+  [[ $words[2] = *Z* ]] && largs=-tZf
+  if [[ $tf != $tar_cache_name ]]; then
+    tar_cache_list=("${(@f)$($words[1] $largs $tf)}")
+    tar_cache_name=$tf
+  fi
+  _multi_parts / tar_cache_list
+elif [[ "$tcmd" = *c*f* && $CURRENT -ge 4 ]] then
   _files
-elif [[ -mcurrent -1 *f* && -position 2 ]]; then
+elif [[ "$tcmd" = *[zZ]*f* && $CURRENT -eq 3 ]] then
+  _files -g '*.((tar|TAR).(gz|Z)|.tgz)'
+elif [[ "$tcmd" = *f* && $CURRENT -eq 3 ]] then
   _files -g '*.(tar|TAR)'
 fi

@@ -1,12 +1,12 @@
 #defcomp stty
 
-if [[ -mcurrent -1 \
+if [[ "$words[CURRENT-1]" = \
   (*erase|discard|status|dsusp|intr|kill|lnext|quit|reprint|start|s*p) ]]
 then
-     compadd -m -Q '^-' '^h' '^?' '^c' '^u'
+     compadd -Q '^-' '^h' '^?' '^c' '^u'
 else
   [[ -string '-' || -string '+' ]]
-  compadd -m rows columns intr quit erase kill eof eol \
+  compadd rows columns intr quit erase kill eof eol \
     eol2 start stop susp dsusp reprint discard werase lnext \
     parenb parodd cs8 cstopb hupcl cread clocal parext \
     ignbrk brkint ignpar parmrk inpck istrip inlcr igncr icrnl iuclc \

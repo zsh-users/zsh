@@ -1,4 +1,5 @@
 #defcomp -subscript-
 
-_compalso -math- "$@"
-[[ ${(Pt)${COMMAND}} = assoc* ]] && complist -k "( ${(kP)${COMMAND}} )"
+_compalso -math-
+[[ ${(Pt)${compstate[parameter]}} = assoc* ]] &&
+    compgen -k "( ${(kP)${compstate[parameter]}} )"

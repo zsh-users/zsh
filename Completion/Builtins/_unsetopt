@@ -1,7 +1,8 @@
 #defcomp unsetopt
 
-local nm=$NMATCHES
+local nm=$compstate[nmatches]
 
-complist -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' \
+compgen -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' \
          -s '$({ unsetopt kshoptionprint; setopt } 2>/dev/null)'
-[[ -nmatches nm ]] && complist -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o
+[[ compstate[nmatches] -eq nm ]] &&
+    compgen -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o

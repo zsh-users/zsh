@@ -266,7 +266,11 @@ zrefresh(void)
 
 /* Nov 96: <mason>  I haven't checked how complete this is.  sgtty stuff may
    or may not work */
+#if defined(SGTABTYPE)
     oxtabs = ((SGTTYFLAG & SGTABTYPE) == SGTABTYPE);
+#else
+    oxtabs = 0;
+#endif
 
     cleareol = 0;		/* unset */
     more_start = more_end = 0;	/* unset */
@@ -615,7 +619,7 @@ refreshline(int ln)
     if (cleareol 		/* request to clear to end of line */
 	|| !nllen 		/* no line buffer given */
 	|| (ln == 0 && (put_rpmpt != oput_rpmpt))) {	/* prompt changed */
-	p1 = halloc(winw + 2);
+	p1 = zhalloc(winw + 2);
 	if (nllen)
 	    strncpy(p1, nl, nllen);
 	memset(p1 + nllen, ' ', winw - nllen);
@@ -627,7 +631,7 @@ refreshline(int ln)
 	    nl = p1;		/* don't keep the padding for prompt line */
 	nllen = winw;
     } else if (ollen > nllen) { /* make new line at least as long as old */
-	p1 = halloc(ollen + 1);
+	p1 = zhalloc(ollen + 1);
 	strncpy(p1, nl, nllen);
 	memset(p1 + nllen, ' ', ollen - nllen);
 	p1[ollen] = '\0';

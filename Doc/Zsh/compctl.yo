@@ -124,9 +124,9 @@ startlist()
 list([ tt(-fcFBdeaRGovNAIOPZEnbjrzu/) ])
 list([ tt(-k) var(array) ] [ tt(-g) var(globstring) ] \
   [ tt(-s) var(subststring) ])
-list([ tt(-K) var(function) ] [ tt(-H) var(num pattern) ])
+list([ tt(-K) var(function) ] [ tt(-i) var(function) ])
 list([ tt(-Q) ] [ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
-list([ tt(-W) var(file-prefix) ])
+list([ tt(-W) var(file-prefix) ] [ tt(-H) var(num pattern) ])
 list([ tt(-q) ] [ tt(-X) var(explanation) ] [ tt(-Y) var(explanation) ])
 list([ tt(-y) var(func-or-var) ] [ tt(-l) var(cmd) ] [ tt(-U) ])
 list([ tt(-t) var(continue) ] [ tt(-J) var(name) ] [ tt(-V) var(name) ])
@@ -280,7 +280,8 @@ completions.  The tt(fignore) special parameter is not applied to the
 resulting files.  Note that tt(-g) is faster for filenames.
 )
 item(tt(-K) var(function))(
-Call the given function to get the completions.  The function is
+Call the given function to get the completions.  Unless the name
+starts with an underscode, the function is
 passed two arguments: the prefix and the suffix of the word on which
 completion is to be attempted, in other words those characters before
 the cursor position, and those from the cursor position onwards.  The
@@ -299,6 +300,13 @@ compctl -K whoson talk))
 
 completes only logged-on users after `tt(talk)'.  Note that `tt(whoson)' must
 return an array, so `tt(reply=`users`)' would be incorrect.
+)
+item(tt(-i) var(function))(
+Like tt(-K), but the function is invoked in a context like that for
+completion widgets, see 
+ifzman(zmanref(zshzle))\
+ifnzman(noderef(The zle Module))\
+for more information.
 )
 item(tt(-H) var(num pattern))(
 The possible completions are taken from the last var(num) history
@@ -427,9 +435,19 @@ printed literally and if they appear output in columns is suppressed.
 )
 item(tt(-X) var(explanation))(
 Print var(explanation) when trying completion on the current set of
-options. A `tt(%n)' in this string is replaced by the number of matches.
+options. A `tt(%n)' in this string is replaced by the number of
+matches that were added for this explanation string.
 The explanation only appears if completion was tried and there was
-no unique match, or when listing completions.
+no unique match, or when listing completions. Explanation strings 
+will be listed together with the matches of the group specified
+together with the tt(-X) option (using the tt(-J) or tt(-V)
+option). If the same explanation string is given to multiple tt(-X)
+options, the string appears only once (for each group) and the number
+of matches shown for the `tt(%n)' is the total number of all matches
+for each of these uses. In any case, the explanation string will only
+be shown if there was at least one match added for the explanation
+string.
+
 The sequences tt(%B), tt(%b), tt(%S), tt(%s), tt(%U), and tt(%u) specify
 output attributes (bold, standout, and underline) as in prompts.
 )

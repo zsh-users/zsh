@@ -529,7 +529,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone, char 
     if (lr == ls)
 	return str;
 
-    r = ret = (char *)halloc(lr + 1);
+    r = ret = (char *)zhalloc(lr + 1);
 
     if (prenum) {
 	if (postnum) {
@@ -1831,7 +1831,7 @@ modify(char **str, char **ptr)
 		    tc = *tt;
 		    *tt = '\0';
 		    nl = al + strlen(t) + strlen(copy);
-		    ptr1 = tmp = (char *)halloc(nl + 1);
+		    ptr1 = tmp = (char *)zhalloc(nl + 1);
 		    if (all)
 			for (ptr2 = all; *ptr2;)
 			    *ptr1++ = *ptr2++;

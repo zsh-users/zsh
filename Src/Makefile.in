@@ -112,8 +112,10 @@ FORCE:
 
 # ========== LINKING IN MODULES ==========
 
-modules-bltin:
-	if test @D@ = N; then \
+modules-bltin: Makefile
+	if test -f mymods.conf; then \
+	    cat mymods.conf > $@; \
+	elif test @D@ = N; then \
 	    cat $(sdir)/xmods.conf > $@; \
 	elif test @RTLD_GLOBAL_OK@ != yes; then \
 	    echo comp1 > $@; \
@@ -175,18 +177,21 @@ uninstall.bin-L:
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
-@@clean.mk@@
+# Since module cleanup rules depend on Makemod, they come first.  This
+# forces module stuff to get cleaned before Makemod itself gets
+# deleted.
 
 mostlyclean-here:
 	rm -f stamp-modobjs stamp-modobjs.tmp
 
 clean-here:
 	rm -f modules.index.tmp modules.stamp zsh ansi2knr.o ansi2knr
+	rm -f modules.index modules-bltin
 	rm -f libzsh-*.$(DL_EXT)
 
 distclean-here:
 	rm -f TAGS tags
-	rm -f modules.index modules-bltin Makefile
+	rm -f Makefile mymods.conf
 
 mostlyclean: mostlyclean-modules
 clean: clean-modules
@@ -195,6 +200,8 @@ realclean: realclean-modules
 
 mostlyclean-modules clean-modules distclean-modules realclean-modules: Makemod
 	@$(MAKE) -f Makemod $(MAKEDEFS) `echo $@ | sed 's/-modules//'`
+
+@@clean.mk@@
 
 # ========== RECURSIVE MAKES ==========
 

@@ -46,10 +46,13 @@ Cmlist cmatcher;
 /**/
 void (*makecompparamsptr) _((void));
 
+/**/
+void (*comp_setunsetptr) _((int, int));
+
 /* pointers to functions required by compctl and defined by zle */
 
 /**/
-void (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char *, char **));
+int (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char *, char **));
 
 /**/
 char *(*comp_strptr) _((int*, int*, int));
@@ -58,7 +61,7 @@ char *(*comp_strptr) _((int*, int*, int));
 int (*getcpatptr) _((char *, int, char *, int));
 
 /**/
-void (*makecomplistcallptr) _((Compctl));
+int (*makecomplistcallptr) _((Compctl));
 
 /**/
 int (*makecomplistctlptr) _((int));
@@ -96,14 +99,29 @@ int incompfunc;
 /**/
 long compcurrent,
      compnmatches,
-     compmatcher;
+     compmatcher,
+     compmatchertot;
 
 /**/
-char *compcontext,
-     *compcommand,
+char **compwords,
      *compprefix,
      *compsuffix,
-     *compiprefix;
+     *compiprefix,
+     *compmatcherstr,
+     *compcontext,
+     *compparameter,
+     *compredirect,
+     *compquote,
+     *compquoting,
+     *comprestore,
+     *complist,
+     *compinsert,
+     *compexact,
+     *compexactstr,
+     *comppatmatch;
+
+/**/
+Param *comppms;
 
 /* The function rembslash() came from zle_tricky.c, but is now used *
  * in compctl.c, too.                                               */
@@ -154,6 +172,7 @@ freecompctl(Compctl cc)
     zsfree(cc->glob);
     zsfree(cc->str);
     zsfree(cc->func);
+    zsfree(cc->widget);
     zsfree(cc->explain);
     zsfree(cc->ylist);
     zsfree(cc->prefix);
@@ -408,9 +427,14 @@ setup_comp1(Module m)
     cc_first.refc = 10000;
     cc_first.mask = 0;
     cc_first.mask2 = CC_CCCONT;
-    compcontext = compcommand = compprefix = compsuffix =
-	compiprefix = NULL;
+    comppms = NULL;
+    compwords = NULL;
+    compprefix = compsuffix = compiprefix = compmatcherstr = 
+	compcontext = compparameter = compredirect = compquote =
+	compquoting = comprestore = complist = compinsert =
+	compexact = compexactstr = comppatmatch = NULL;
     makecompparamsptr = NULL;
+    comp_setunsetptr = NULL;
     return 0;
 }
 
@@ -437,11 +461,22 @@ finish_comp1(Module m)
     deletehashtable(compctltab);
     zfree(clwords, clwsize * sizeof(char *));
     compctlreadptr = fallback_compctlread;
-    zsfree(compcontext);
-    zsfree(compcommand);
+    freearray(compwords);
     zsfree(compprefix);
-    zsfree(compiprefix);
     zsfree(compsuffix);
+    zsfree(compiprefix);
+    zsfree(compmatcherstr);
+    zsfree(compcontext);
+    zsfree(compparameter);
+    zsfree(compredirect);
+    zsfree(compquote);
+    zsfree(compquoting);
+    zsfree(comprestore);
+    zsfree(complist);
+    zsfree(compinsert);
+    zsfree(compexact);
+    zsfree(compexactstr);
+    zsfree(comppatmatch);
     return 0;
 }
 

@@ -67,6 +67,8 @@ static struct zleparam {
         zleunsetfn, NULL },
     { "keys", PM_ARRAY | PM_READONLY, NULL, FN(get_keys),
         zleunsetfn, NULL },
+    { "NUMERIC", PM_INTEGER | PM_READONLY, FN(set_numeric), FN(get_numeric),
+        zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
 
@@ -97,6 +99,7 @@ makezleparams(int ro)
 	    case PM_INTEGER:
 		pm->sets.ifn = (void (*) _((Param, long))) zp->setfn;
 		pm->gets.ifn = (long (*) _((Param))) zp->getfn;
+		pm->ct = 10;
 		break;
 	}
 	pm->unsetfn = zp->unsetfn;
@@ -225,9 +228,9 @@ get_keys(Param pm)
 {
     char **r, **q, *p, *k, c;
 
-    r = (char **) halloc((strlen(keybuf) + 1) * sizeof(char *));
+    r = (char **) zhalloc((strlen(keybuf) + 1) * sizeof(char *));
     for (q = r, p = keybuf; (c = *p); q++, p++) {
-	k = *q = (char *) halloc(5);
+	k = *q = (char *) zhalloc(5);
 	if (c & 0x80) {
 	    *k++ = 'M';
 	    *k++ = '-';
@@ -243,4 +246,18 @@ get_keys(Param pm)
     *q = NULL;
 
     return r;
+}
+
+/**/
+static void
+set_numeric(Param pm, long x)
+{
+    zmult = x;
+}
+
+/**/
+static long
+get_numeric(Param pm)
+{
+    return zmult;
 }

@@ -1,12 +1,35 @@
 #defcomp configure
 
+setopt localoptions extendedglob
+
 if [[ $PREFIX = *=* ]]; then
   # Complete filenames after e.g. --prefix=
   IPREFIX=${PREFIX%%=*}=
   PREFIX=${PREFIX#*=}
-  complist -f
+  compgen -f
 else
   # Generate a list of options from configure --help
-  complist -s '$($COMMAND --help |
-  sed -n -e '\''s/^ *\(--[-a-z0-9]*\)[    =,].*$/\1/p'\'')'
+  local -a pars
+  local i
+  pars=($($words[1] --help | awk '$1 ~ /--[a-z]*.*/ {print $1}'))
+  for i in $pars
+  do
+    case $i in
+      (--(((en|dis)able-FEATURE)|(with(out|)-PACKAGE))*)
+        : Skip standard help output
+      ;;
+      --enable)
+        : Skip standard help output
+      ;;
+      --*\[=* )
+        compadd -M 'r:|-=* r:|=*' -q -S = -- ${i%%\[=*}
+      ;;
+      --*=* )
+        compadd -M 'r:|-=* r:|=*' -S = -- ${i%%=*}
+      ;;
+      * )
+        compadd -M 'r:|-=* r:|=*' -- $i
+      ;;
+    esac
+  done
 fi

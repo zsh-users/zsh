@@ -154,10 +154,14 @@ zsetterm(void)
 #  ifdef OXTABS
     ti.tio.c_oflag &= ~OXTABS;
 #  else
+#   ifdef XTABS
     ti.tio.c_oflag &= ~XTABS;
+#   endif
 #  endif
 # endif
+#ifdef ONLCR
     ti.tio.c_oflag |= ONLCR;
+#endif
     ti.tio.c_cc[VQUIT] =
 # ifdef VDISCARD
 	ti.tio.c_cc[VDISCARD] =

@@ -3,11 +3,12 @@
 # Utility function for completing files of a given type or any file.
 # In many cases you will want to call this one instead of _path_files().
 
-local nm=$NMATCHES
+local nm=$compstate[nmatches] ret
 
 _path_files "$@"
+ret=$?
 
-if [[ $# -ne 0 && -nmatches nm ]]; then
+if [[ $# -ne 0 && compstate[nmatches] -eq nm ]]; then
   local opt opts
 
   # We didn't get any matches for those types of files described by
@@ -23,4 +24,6 @@ if [[ $# -ne 0 && -nmatches nm ]]; then
   done
 
   _path_files "$opts[@]"
+else
+  return $ret
 fi

@@ -154,6 +154,10 @@ key. Control-keys are reported with a leading `tt(^)', as in `tt(^A)',
 and meta-keys are repoted with a leading `tt(M-)', as in `tt(M-a)' and 
 `tt(M-^A)'.
 )
+vindex(NUMERIC)
+item(tt(NUMERIC) (integer))(
+The numeric argument.
+)
 enditem()
 sect(Standard Widgets)
 cindex(widgets, standard)

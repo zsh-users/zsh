@@ -1,7 +1,7 @@
 #defcomp bindkey
 
-if [[ -mword 1 -*[DAN]* || -mcurrent -1 -*M ]]; then
-  complist -s '$(bindkey -l)'
+if [[ "$words[2]" = -*[DAN]* || "$words[CURRENT-1] = -*M ]]; then
+  compgen -s '$(bindkey -l)'
 else
-  complist -b
+  compgen -b
 fi

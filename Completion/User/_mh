@@ -1,4 +1,4 @@
-#defcomp folder comp inc mark refile repl scan show next prev rmm pick whom mhn mhpath mhpatch
+#defcomp folder folders comp inc mark refile repl scan show next prev rmm pick whom mhn mhpath
 
 # Completion for all possible MH commands.
 # Alter the following two to your own mh directory and the directory
@@ -7,6 +7,8 @@
 local mymhdir=~/Mail
 local mhlib=/usr/lib/mh
 
+local prev="$words[CURRENT-1]"
+
 # To be on the safe side, check this exists and if not, get it anyway.
 [[ -d $mymhdir ]] || mymhdir=$(mhpath +)
 
@@ -14,13 +16,13 @@ if [[ -iprefix - ]]; then
   # get list of options, which MH commands can generate themselves
   # awk is just too icky to use for this, sorry.  send me one if
   # you come up with it.
-  compadd -m $($COMMAND -help | perl -ne 'if (/^\s*-\(?(\S+)/) {
+  compadd - $($words[1] -help | perl -ne 'if (/^\s*-\(?(\S+)/) {
     $n = $1;
     $n =~ s/\)//g;
     print $n =~ s/^\[([a-z]+)\]// ? "$n\n$1$n\n" : "$n\n";
   }')
   return
-elif [[ -iprefix '+' || -iprefix '@' || -current -1 -draftfolder ]]; then
+elif [[ -iprefix '+' || -iprefix '@' || "$prev" = -draftfolder ]]; then
   # Complete folder names.
   local mhpath
   if [[ $IPREFIX != '@' ]]; then
@@ -31,12 +33,12 @@ elif [[ -iprefix '+' || -iprefix '@' || -current -1 -draftfolder ]]; then
   fi
 
   # painless, or what?
-  complist -W mhpath -/
-elif [[ -mcurrent -1 -(editor|(whatnow|rmm|show|more)proc) ]]; then
-  complist -c
-elif [[ -current -1 -file ]]; then
-  complist -f
-elif [[ -mcurrent -1 -(form|audit|filter) ]]; then
+  _path_files -W mhpath -/
+elif [[ "$prev" = -(editor|(whatnow|rmm|show|more)proc) ]]; then
+  compgen -c
+elif [[ "$prev" = -file ]]; then
+  compgen -f
+elif [[ "$prev" = -(form|audit|filter) ]]; then
   # Need some MH template file, which may be in our own MH directory
   # or with the standard library.
   local mhfpath
@@ -44,11 +46,11 @@ elif [[ -mcurrent -1 -(form|audit|filter) ]]; then
   [[ -d $mhlib ]] || { mhlib=$(mhparam mhlproc); mhlib=$mhlib:h; }
   mhfpath=($mymhdir $mhlib)
 
-  complist -W mhfpath -g '*(.)'
-elif [[ -mcurrent -1 -(no|)cc ]]; then
-  compadd -m all to cc me
-elif [[ -mcurrent -1 -[rw]cache ]]; then
-  compadd -m public private never ask
+  compgen -W mhfpath -g '*(.)'
+elif [[ "$prev" = -(no|)cc ]]; then
+  compadd all to cc me
+elif [[ "$prev" = -[rw]cache ]]; then
+  compadd public private never ask
 else
   # Generate sequences.
   local foldnam folddir f
@@ -64,7 +66,7 @@ else
     # leaving foldnam empty works here
   fi
 
-  complist -s '$(mark $foldnam | awk -F: '\''{ print $1 }'\'')'
-  compadd -m reply next cur prev first last all unseen
-  complist -W folddir -g '<->'
+  compgen -s '$(mark $foldnam 2>/dev/null | awk -F: '\''{ print $1 }'\'')'
+  compadd reply next cur prev first last all unseen
+  compgen -W folddir -g '<->'
 fi

@@ -5,6 +5,8 @@ addconddefs
 addedx
 addhashnode
 addwrapper
+arrvargetfn
+arrvarsetfn
 aliastab
 alloc_stackp
 appstr
@@ -69,6 +71,7 @@ getaparam
 gethashnode
 gethashnode2
 gethparam
+getintvalue
 getiparam
 getkeystring
 getlinknode
@@ -82,7 +85,6 @@ global_heapalloc
 global_permalloc
 globlist
 gotwordptr
-halloc
 hasam
 hashcmd
 hasher
@@ -135,6 +137,7 @@ ncalloc
 new_heaps
 newhashtable
 newlinklist
+newparamtable
 nicechar
 nicezputs
 niceztrdup
@@ -250,6 +253,7 @@ zexit
 zfree
 zgetdir
 zgetenv
+zhalloc
 zjoin
 zleactive
 zleparse

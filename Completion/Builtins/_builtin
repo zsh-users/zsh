@@ -1,7 +1,9 @@
 #defcomp builtin
 
-if [[ -position 2 -1 ]]; then
-  _normal "$@"
+if (( $CURRENT > 2 )); then
+  shift words
+  (( CURRENT -- ))
+  _normal
 else
-  complist -eB
+  compgen -eB
 fi

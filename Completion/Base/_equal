@@ -1,0 +1,3 @@
+#defcomp -equal-
+
+compgen -am

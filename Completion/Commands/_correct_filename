@@ -17,7 +17,8 @@ integer approx max_approx=6
 
 if [[ -e "$file" ]]; then
   if [[ -n $WIDGET ]]; then
-    compadd "$file"
+    compadd -U -i "$IPREFIX" "$file"
+    [[ -n "$compstate[insert]" ]] && compstate[insert]=menu
   else
     print "$file"
   fi
@@ -31,7 +32,8 @@ done
 (( $#trylist )) || return 1
 
 if [[ -n $WIDGET ]]; then
-  compadd -U "${trylist[@]}"
+  compadd -U -i "$IPREFIX" -U "${trylist[@]}"
+  [[ -n "$compstate[insert]" ]] && compstate[insert]=menu
 else
   print "${trylist[@]}"
 fi

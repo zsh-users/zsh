@@ -1,21 +1,23 @@
 #defcomp find
 
+local prev="$words[CURRENT-1]"
+
 if [[ -mbetween -(ok|exec) \\\; ]]; then
-  _normal "$@"
+  _normal
 elif [[ -iprefix - ]]; then
-  complist -s 'daystart {max,min,}depth follow noleaf version xdev \
+  compgen -s 'daystart {max,min,}depth follow noleaf version xdev \
     {a,c,}newer {a,c,m}{min,time} empty false {fs,x,}type gid inum links \
     {i,}{l,}name {no,}{user,group} path perm regex size true uid used \
     exec {f,}print{f,0,} ok prune ls'
-elif [[ -position 1 ]]; then
-  complist -g '. ..'
+elif [[ -position 2 ]]; then
+  compgen -g '. ..'
   _files -g '(-/)'
-elif [[ -mcurrent -1 -((a|c|)newer|fprint(|0|f)) ]]; then
+elif [[ "$prev" = -((a|c|)newer|fprint(|0|f)) ]]; then
   _files
-elif [[ -current -1 -fstype ]]; then
-  complist -k '(ufs 4.2 4.3 nfs tmp mfs S51K S52K)'
-elif [[ -current -1 -group ]]; then
-  complist -k groups
-elif [[ -current -1 -user ]]; then
-  complist -u
+elif [[ "$prev" = -fstype ]]; then
+  compgen -k '(ufs 4.2 4.3 nfs tmp mfs S51K S52K)'
+elif [[ "$prev" = -group ]]; then
+  compgen -k groups
+elif [[ "$prev" = -user ]]; then
+  compgen -u
 fi

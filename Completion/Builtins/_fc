@@ -1,7 +1,9 @@
 #defcomp fc
 
-if [[ -mcurrent -1 -*e ]]; then
-  complist -c
-elif [[ -mcurrent -1 -[ARWI]## ]]; then
+local prev="$words[CURRENT-1]"
+
+if [[ "$prev" = -*e ]]; then
+  compgen -c
+elif [[ "$prev" = -[ARWI]## ]]; then
   _files
 fi

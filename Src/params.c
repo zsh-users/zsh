@@ -680,6 +680,7 @@ static long
 getarg(char **str, int *inv, Value v, int a2, long *w)
 {
     int num = 1, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
+    int beg = 0, hasbeg = 0;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt;
     long r = 0;
     Comp c;
@@ -731,6 +732,18 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 		*t = sav;
 		s = t;
 		break;
+	    case 'b':
+		hasbeg = 1;
+		t = get_strarg(++s);
+		if (!*t)
+		    goto flagerr;
+		sav = *t;
+		*t = '\0';
+		if ((beg = mathevalarg(s + 1, &d)) > 0)
+		    beg--;
+		*t = sav;
+		s = t;
+		break;
 	    case 'p':
 		escapes = 1;
 		break;
@@ -767,14 +780,15 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
     else if (v->isarr & SCANPM_WANTVALS)
 	*inv = 0;
     else {
-	if (ind) {
-	    v->isarr |= SCANPM_WANTKEYS;
-	    v->isarr &= ~SCANPM_WANTVALS;
-	} else if (rev) {
-	    v->isarr |= SCANPM_WANTVALS;
+	if (v->isarr) {
+	    if (ind) {
+		v->isarr |= SCANPM_WANTKEYS;
+		v->isarr &= ~SCANPM_WANTVALS;
+	    } else if (rev)
+		v->isarr |= SCANPM_WANTVALS;
+	    if (!down && ishash)
+		v->isarr &= ~SCANPM_MATCHMANY;
 	}
-	if (!down && ishash)
-	    v->isarr &= ~SCANPM_MATCHMANY;
 	*inv = ind;
     }
 
@@ -869,6 +883,8 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 	tokenize(s);
 
 	if ((c = parsereg(s))) {
+	    int len;
+
 	    if (v->isarr) {
 		if (ishash) {
 		    scancomp = c;
@@ -887,28 +903,43 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 		    ta = getarrvalue(v);
 		if (!ta || !*ta)
 		    return 0;
-		if (down)
-		    for (r = -1, p = ta + arrlen(ta) - 1; p >= ta; r--, p--) {
-			if (domatch(*p, c, 0) && !--num)
-			    return r;
-		} else
-		    for (r = 1, p = ta; *p; r++, p++)
-			if (domatch(*p, c, 0) && !--num)
-			    return r;
+		len = arrlen(ta);
+		if (beg < 0)
+		    beg += len;
+		if (beg >= 0 && beg < len) {
+		    if (down) {
+			if (!hasbeg)
+			    beg = len - 1;
+			for (r = 1 + beg, p = ta + beg; p >= ta; r--, p--) {
+			    if (domatch(*p, c, 0) && !--num)
+				return r;
+			}
+		    } else
+			for (r = 1 + beg, p = ta + beg; *p; r++, p++)
+			    if (domatch(*p, c, 0) && !--num)
+				return r;
+		}
 	    } else if (word) {
 		ta = sepsplit(d = s = getstrvalue(v), sep, 1);
-		if (down) {
-		    for (p = ta + (r = arrlen(ta)) - 1; p >= ta; p--, r--)
-			if (domatch(*p, c, 0) && !--num)
-			    break;
-		    if (p < ta)
-			return 0;
-		} else {
-		    for (r = 1, p = ta; *p; r++, p++)
-			if (domatch(*p, c, 0) && !--num)
-			    break;
-		    if (!*p)
-			return 0;
+		len = arrlen(ta);
+		if (beg < 0)
+		    beg += len;
+		if (beg >= 0 && beg < len) {
+		    if (down) {
+			if (!hasbeg)
+			    beg = len - 1;
+			for (r = 1 + beg, p = ta + beg; p >= ta; p--, r--)
+			    if (domatch(*p, c, 0) && !--num)
+				break;
+			if (p < ta)
+			    return 0;
+		    } else {
+			for (r = 1 + beg, p = ta + beg; *p; r++, p++)
+			    if (domatch(*p, c, 0) && !--num)
+				break;
+			if (!*p)
+			    return 0;
+		    }
 		}
 		if (a2)
 		    r++;
@@ -924,35 +955,46 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 		d = getstrvalue(v);
 		if (!d || !*d)
 		    return 0;
-		if (a2) {
-		    if (down)
-			for (r = -2, t = d + strlen(d) - 1; t >= d; r--, t--) {
-			    sav = *t;
-			    *t = '\0';
-			    if (domatch(d, c, 0) && !--num) {
+		len = strlen(d);
+		if (beg < 0)
+		    beg += len;
+		if (beg >= 0 && beg < len) {
+		    if (a2) {
+			if (down) {
+			    if (!hasbeg)
+				beg = len - 1;
+			    for (r = beg, t = d + beg; t >= d; r--, t--) {
+				sav = *t;
+				*t = '\0';
+				if (domatch(d, c, 0) && !--num) {
+				    *t = sav;
+				    return r;
+				}
 				*t = sav;
-				return r;
 			    }
-			    *t = sav;
-		    } else
-			for (r = 0, t = d; *t; r++, t++) {
-			    sav = *t;
-			    *t = '\0';
-			    if (domatch(d, c, 0) && !--num) {
+			} else
+			    for (r = beg, t = d + beg; *t; r++, t++) {
+				sav = *t;
+				*t = '\0';
+				if (domatch(d, c, 0) && !--num) {
+				    *t = sav;
+				    return r;
+				}
 				*t = sav;
-				return r;
 			    }
-			    *t = sav;
-			}
-		} else {
-		    if (down)
-			for (r = -1, t = d + strlen(d) - 1; t >= d; r--, t--) {
-			    if (domatch(t, c, 0) && !--num)
-				return r;
-		    } else
-			for (r = 1, t = d; *t; r++, t++)
-			    if (domatch(t, c, 0) && !--num)
-				return r;
+		    } else {
+			if (down) {
+			    if (!hasbeg)
+				beg = len - 1;
+			    for (r = beg + 1, t = d + beg; t >= d; r--, t--) {
+				if (domatch(t, c, 0) && !--num)
+				    return r;
+			    }
+			} else
+			    for (r = beg + 1, t = d + beg; *t; r++, t++)
+				if (domatch(t, c, 0) && !--num)
+				    return r;
+		    }
 		}
 		return 0;
 	    }
@@ -1177,7 +1219,8 @@ getstrvalue(Value v)
 	    }
 	    LASTALLOC_RETURN s;
 	case PM_INTEGER:
-	    convbase(s = buf, v->pm->gets.ifn(v->pm), v->pm->ct);
+	    convbase(buf, v->pm->gets.ifn(v->pm), v->pm->ct);
+	    s = dupstring(buf);
 	    break;
 	case PM_SCALAR:
 	    s = v->pm->gets.cfn(v->pm);

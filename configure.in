@@ -618,12 +618,6 @@ zsh_STRUCT_MEMBER([
 #endif
 ], struct direct, d_stat)
 
-dnl ---------------
-dnl CHECK FUNCTIONS
-dnl ---------------
-AC_FUNC_GETPGRP
-AC_FUNC_STRCOLL
-
 dnl need to integrate this function
 dnl AC_FUNC_STRFTIME
 
@@ -633,7 +627,22 @@ AC_CHECK_FUNCS(memcpy memmove \
               sigblock sigsetmask sigrelse sighold killpg sigaction getrlimit \
               sigprocmask setuid seteuid setreuid setresuid setsid strerror \
               nis_list initgroups fchdir cap_get_proc readlink nice \
-	      getgrgid getgrnam getpwent getpwnam getpwuid)
+	      getgrgid getgrnam getpwent getpwnam getpwuid setpgrp)
+
+dnl ---------------
+dnl CHECK FUNCTIONS
+dnl ---------------
+if test $ac_cv_func_setpgrp = yes; then
+  AC_FUNC_GETPGRP
+else
+  dnl If there is no setpgrp, the test for getpgrp(void) will fail
+  dnl because the program will not compile.  However, in that case
+  dnl we can be reasonably confident we are not dealing with a
+  dnl Berkeleyesque system, so assume getpgrp does take void.
+  ac_cv_func_getpgrp_void=yes
+  AC_DEFINE(GETPGRP_VOID)
+fi
+AC_FUNC_STRCOLL
 
 if test $dynamic = yes; then
   AC_CHECK_FUNCS(dlopen dlerror dlsym dlclose load loadquery loadbind unload \
@@ -822,6 +831,17 @@ AC_CACHE_CHECK(for RFS superroot directory, zsh_cv_sys_superroot,
 [test -d /../.LOCALROOT && zsh_cv_sys_superroot=yes || zsh_cv_sys_superroot=no])
 if test $zsh_cv_sys_superroot = yes; then
   AC_DEFINE(HAVE_SUPERROOT)
+fi
+
+dnl CHECK FOR SYSTEMS REQUIRING GETCWD
+AC_CACHE_CHECK(whether we should use the native getcwd,
+zsh_cv_use_getcwd,
+[case "${host_cpu}-${host_vendor}-${host_os}" in
+    *QNX*) zsh_cv_use_getcwd=no ;;
+    *) zsh_cv_use_getcwd=yes ;;
+ esac])
+if test $zsh_cv_use_getcwd = yes; then
+  AC_DEFINE(USE_GETCWD)
 fi
 
 dnl -------------

@@ -227,7 +227,7 @@ Note the same record of the last var(l) and var(r) is maintained
 across all forms of expansion.
 
 By default, a history reference with no event specification refers to the same
-line as the last history reference on that command line, unless it is the
+line as the previous history reference on that command line, unless it is the
 first history reference in a command.  In that case, a history reference
 with no event specification always refers to the previous command.  However,
 if the option tt(CSH_JUNKIE_HISTORY) is set,

@@ -9,28 +9,28 @@ _compskip=1
 
 local subcom
 
-if [[ $COMMAND = zftp ]]; then
+if [[ $words[1] = zftp ]]; then
   if [[ $CURRENT -eq 1 ]]; then
-    compadd -m open params user login type ascii binary mode put \
+    compadd open params user login type ascii binary mode put \
       putat get getat append appendat ls dir local remote mkdir rmdir
     return
   fi
-  subcom=$1
+  subcom=$words[2]
 else
-  subcom=$COMMAND
+  subcom=$words[1]
 fi
 
 case $subcom in
   *(cd|ls|dir))
    # complete remote directories; we could be smarter about hiding prefixes
    zfcd_match $PREFIX $SUFFIX
-   (( $#reply )) && compadd -m -S/ -q $reply
+   (( $#reply )) && compadd -S/ -q - $reply
    ;;
 
   *(get(|at)|gcp|delete|remote))
    # complete remote files
    zfget_match $PREFIX $SUFFIX
-   (( $#reply )) && compadd -F fignore -m $reply
+   (( $#reply )) && compadd -F fignore - $reply
    ;;
 
   *(put(|at)|pcp))
@@ -40,7 +40,7 @@ case $subcom in
 
   *(open|anon|params))
   # complete hosts:  should do cleverer stuff with user names
-  complist -k hosts
+  compgen -k hosts
   ;;
 
   *)

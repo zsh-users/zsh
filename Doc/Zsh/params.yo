@@ -155,6 +155,11 @@ if combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them give
 the var(n)th or var(n)th last match (if var(expr) evaluates to
 var(n)).  This flag is ignored when the array is associative.
 )
+item(tt(b:)var(expr)tt(:))(
+if combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them begin
+at the var(n)th or var(n)th last element, word, or character (if var(expr)
+evaluates to var(n)).  This flag is ignored when the array is associative.
+)
 enditem()
 texinode(Positional Parameters)(Local Parameters)(Array Parameters)(Parameters)
 sect(Positional Parameters)

@@ -924,7 +924,7 @@ both tt(typeset -xT ...) and tt(export -T ...) work, but only the
 scalar will be marked for export.
 
 If no var(name) is present, the names and values of all parameters are
-printed.  In this case the attribute flags restrict the the display to
+printed.  In this case the attribute flags restrict the display to
 only those parameters that have the specified attributes.  Using
 `tt(PLUS())' rather than `tt(-)' to introduce the flag causes the
 attribute to be turned off, and suppresses printing of the names and

@@ -93,7 +93,7 @@ zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 	    case 'l': {
 		char *s;
 		num = metalen(str, num);
-		s = halloc(num + 1);
+		s = zhalloc(num + 1);
 		memcpy(s, str, num);
 		s[num] = '\0';
 		nicezputs(s, stderr);
@@ -2807,7 +2807,7 @@ metafy(char *buf, int len, int heap)
 	    break;
 	case META_USEHEAP:
 	case META_HEAPDUP:
-	    buf = memcpy(halloc(len + meta + 1), buf, len);
+	    buf = memcpy(zhalloc(len + meta + 1), buf, len);
 	    break;
 	case META_STATIC:
 #ifdef DEBUG
@@ -3372,7 +3372,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     int meta = 0, control = 0;
 
     if (fromwhere != 4)
-	buf = halloc(strlen(s) + 1);
+	buf = zhalloc(strlen(s) + 1);
     else {
 	buf = s;
 	s += 2;

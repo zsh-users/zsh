@@ -1,7 +1,7 @@
 #defcomp trap
 
-if [[ -position 1 ]]; then
-  complist -c
+if [[ CURRENT -eq 2 ]]; then
+  compgen -c
 else
-  complist -k signals
+  compgen -k signals
 fi

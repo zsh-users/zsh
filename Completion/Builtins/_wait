@@ -2,6 +2,6 @@
 
 local list
 
-complist -P '%' -j
+compgen -P '%' -j
 list=("$(ps 2>/dev/null)")
-complist -y '$list' -s '`ps 2>/dev/null | tail +2 | cut -c1-5`'
+compgen -y '$list' -s '`ps 2>/dev/null | tail +2 | cut -c1-5`'

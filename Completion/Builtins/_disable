@@ -1,6 +1,8 @@
 #defcomp disable
 
-[[ -mcurrent -1 -*a* ]] && complist -ea
-[[ -mcurrent -1 -*f* ]] && complist -eF
-[[ -mcurrent -1 -*r* ]] && complist -ew
-[[ ! -mcurrent -1 -* ]] && complist -eB
+local prev="$words[CURRENT-1]"
+
+[[ "$prev" = -*a* ]] && compgen -ea
+[[ "$prev" = -*f* ]] && compgen -eF
+[[ "$prev" = -*r* ]] && compgen -ew
+[[ "$prev" != -* ]] && compgen -eB

@@ -2,10 +2,10 @@
 setopt localoptions rcexpandparam
 
 local rep
-if [[ $2 = (<->*|ln) ]]; then
-  rep=( $manpath/(man|cat)$2/$PREFIX*$SUFFIX.<->*(N:t:r) )
+if [[ $words[2] = (<->*|ln) ]]; then
+  rep=( $manpath/(man|cat)${words[2]}/$PREFIX*$SUFFIX.<->*(N:t:r) )
 else
   rep=( $manpath/(man|cat)*/$PREFIX*$SUFFIX.<->*(N:t:r) )
 fi
 
-(( $#rep )) && compadd -m $rep
+(( $#rep )) && compadd - $rep

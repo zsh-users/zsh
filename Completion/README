@@ -11,14 +11,15 @@ loading much faster.  For example,
   [[ -f ~/completion/compinit ]] && . ~/completion/compinit -d
 This will rebind any keys which do completion to use the new system.
 For more detailed instructions, including how to add new completions, see
-the top of Core/compinit .
+the top of Core/compinit.
 
 The subdirectories contain:
 
 Core:
   The basic functions and files to be sourced.  You will certainly need
-  these, and will most likely not feel like altering them (or, in some
-  cases, even reading them, unless you are a shell wizard).  The files are:
+  these, and will most likely not want to alter them --- if you do, it
+  would probably help to give your version a different name.  The files
+  are:
   compinit
     As already described, this is not a function, but is sourced once
     (with the `source' or `.' commands) to set up the completion system.
@@ -29,6 +30,9 @@ Core:
   _comp_parts
     Utility used for completing words with multiple separate parts, such as
     `<user>@<host>'
+  _multi_parts
+    Utility for completion parts of words given a separator character and 
+    a list of words.
   _compalso
     Utility for calling a function to add additional completions to an
     already existing set.
@@ -46,7 +50,7 @@ Core:
     it is wider than just command+argument.)
   _path_files
     The function usually called to complete filenames and directories.  It
-    replaces the standard -f and -/ options for the basic completion
+    replaces the standard -f, -g and -/ options for the basic completion
     commands:  it can do various extra tricks, such as expanding a whole
     path at once, e.g. F/C/C/_p<TAB> -> Functions/Completion/Core/_path_files
 Base:
@@ -65,22 +69,29 @@ Base:
     as you wish.
   _match_pattern
   _match_test
-    These are used by Base/_path_files (and hence also Base/_files) for
-    file completion with control over matching (whether to complete
-    case-insensitively, or to allow insertion before `.', etc.)  See
-    _match_test for instructions.  Note _path_files expects these files
-    to be present.
+    These are used by Base/_path_files (and hence also Base/_files)
+    and Base/_comp_parts for file completion with control over
+    matching (whether to complete case-insensitively, or to allow
+    insertion before `.', etc.)  See _match_test for instructions.
+    Note _path_files expects these files to be present.
   _precommand
     Allows completion when the first word on the line has to be ignored,
     for example `noglob ...' should ignore the noglob and just complete
     as if it wasn't there.  Add other such commands to the top line.
   _redirect
-    Completes after `<' or `<': this version calls _files.
+    Completes after `<' or `>': this version calls _files.
   _subscript
     For completion in subscripts of parameters, e.g $foo[...].
   _vars
     Completion for commands which need variables (so this could also be in
     the Builtins directory), but also in math environments such as ((...)).
+  _tilde
+    Completion after `~', defaults to user names and named directories.
+  _equal
+    Completion after `=', normally command and alias names are used.
+  _parameter
+  _brace_parameter
+    For completion inside parameter expansions ($... and ${...).
 Builtins:
   Define completions for various shell builtins.  The top line of each file
   says which builtins they apply to; in many cases you can guess from the

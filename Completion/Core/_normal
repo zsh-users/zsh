@@ -1,24 +1,25 @@
 #autoload
 
-local comp cmd1 cmd2 pat val name
+local comp command cmd1 cmd2 pat val name i ret
 
 # Completing in command position? If not we set up `cmd1' and `cmd2' as
 # two strings we have search in the completion definition arrays (e.g.
 # a path and the last path name component).
 
-if [[ $CONTEXT == command ]]; then
+command="$words[1]"
+if [[ CURRENT -eq 1 ]]; then
   comp="$_comps[-command-]"
-  [[ -z "$comp" ]] || "$comp" "$@"
+  [[ -z "$comp" ]] || "$comp"
   return
-elif [[ "$COMMAND[1]" == '=' ]]; then
-  eval cmd1\=$COMMAND
-  cmd2="$COMMAND[2,-1]"
-elif [[ "$COMMAND" == */* ]]; then
-  cmd1="$COMMAND"
-  cmd2="${COMMAND:t}"
+elif [[ "$command[1]" == '=' ]]; then
+  eval cmd1\=$command
+  cmd2="$command[2,-1]"
+elif [[ "$command" == */* ]]; then
+  cmd1="$command"
+  cmd2="${command:t}"
 else
-  cmd1="$COMMAND"
-  eval cmd2=$(whence -p $COMMAND)
+  cmd1="$command"
+  eval cmd2=$(whence -p $command)
 fi
 
 # See if there are any matching pattern completions.
@@ -27,10 +28,11 @@ for i in "$_patcomps[@]"; do
   pat="${i% *}"
   val="${i#* }"
   if [[ "$cmd1" == $~pat || "$cmd2" == $~pat ]]; then
-    "$val" "$@"
+    "$val"
+    ret=$?
     if (( $+_compskip )); then
       unset _compskip
-      return
+      return $ret
     fi
   fi
 done
@@ -51,4 +53,4 @@ if [[ -z "$comp" ]]; then
   name=-default-
   comp="$_comps[-default-]"
 fi
-[[ -z "$comp" ]] || "$comp" "$@"
+[[ -z "$comp" ]] || "$comp"

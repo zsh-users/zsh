@@ -653,7 +653,7 @@ get_isrch_spot(int num, int *hlp, int *posp, int *csp, int *lenp, int *dirp, int
 static void
 doisearch(int dir)
 {
-    char *s, *ibuf = halloc(80), *sbuf = ibuf + FIRST_SEARCH_CHAR;
+    char *s, *ibuf = zhalloc(80), *sbuf = ibuf + FIRST_SEARCH_CHAR;
     int sbptr = 0, top_spot = 0, pos, sibuf = 80;
     int nomatch = 0, skip_line = 0, skip_pos = 0;
     int odir = dir, sens = zmult == 1 ? 3 : 1;
@@ -936,7 +936,7 @@ static int visrchsense;
 static int
 getvisrchstr(void)
 {
-    char *sbuf = halloc(80);
+    char *sbuf = zhalloc(80);
     int sptr = 1, ret = 0, ssbuf = 80;
     Thingy cmd;
     char *okeymap = curkeymapname;
@@ -1001,7 +1001,7 @@ getvisrchstr(void)
 	    }
 	  ins:
 	    if(sptr == ssbuf - 1) {
-		char *newbuf = halloc(ssbuf *= 2);
+		char *newbuf = zhalloc(ssbuf *= 2);
 		strcpy(newbuf, sbuf);
 		statusline = sbuf = newbuf;
 	    }

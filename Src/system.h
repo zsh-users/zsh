@@ -51,7 +51,7 @@
 #endif
 
 #ifndef HAVE_ALLOCA
-# define alloca halloc
+# define alloca zhalloc
 #else
 # ifdef __GNUC__
 #  define alloca __builtin_alloca

@@ -1,7 +1,9 @@
 #defcomp set
 
-if [[ -mcurrent -1 [-+]o ]]; then
-  complist -o
-elif [[ -current -1 -A ]]; then
-  complist -A
+local prev="$words[CURRENT-1]"
+
+if [[ "$prev" = [-+]o ]]; then
+  compgen -o
+elif [[ "$prev" = -A ]]; then
+  compgen -A
 fi

@@ -2177,7 +2177,7 @@ get_match_ret(char *s, int b, int e, int fl, char *replstr)
     if (replstr) {
 	if ((fl & SUB_GLOBAL) && repllist) {
 	    /* We are replacing the chunk, just add this to the list */
-	    Repldata rd = (Repldata) halloc(sizeof(*rd));
+	    Repldata rd = (Repldata) zhalloc(sizeof(*rd));
 	    rd->b = b;
 	    rd->e = e;
 	    addlinknode(repllist, rd);
@@ -2481,7 +2481,7 @@ getmatch(char **sp, char *pat, int fl, int n, char *replstr)
 	    i = rd->e;		/* start of next chunk of *sp */
 	}
 	lleft += l - i;	/* final chunk from *sp */
-	start = t = halloc(lleft+1);
+	start = t = zhalloc(lleft+1);
 	i = 0;
 	for (nd = firstnode(repllist); nd; incnode(nd)) {
 	    rd = (Repldata) getdata(nd);

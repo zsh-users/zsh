@@ -34,7 +34,7 @@
 	There are two ways to allocate memory in zsh.  The first way is
 	to call zalloc/zcalloc, which call malloc/calloc directly.  It
 	is legal to call realloc() or free() on memory allocated this way.
-	The second way is to call halloc/hcalloc, which allocates memory
+	The second way is to call zhalloc/hcalloc, which allocates memory
 	from one of the memory pools on the heap stack.  Such memory pools 
 	will automatically created when the heap allocation routines are
 	called.  To be sure that they are freed at appropriate times
@@ -55,7 +55,7 @@
 	it will all be freed when the pool is destroyed.  In fact,
 	attempting to free this memory may result in a core dump.
 	The pair of pointers ncalloc and alloc may point to either
-	zalloc & zcalloc or halloc & hcalloc; permalloc() sets them to the
+	zalloc & zcalloc or zhalloc & hcalloc; permalloc() sets them to the
 	former, and heapalloc() sets them to the latter. This can be useful.
 	For example, the dupstruct() routine duplicates a syntax tree,
 	allocating the new memory for the tree using alloc().  If you want
@@ -78,7 +78,7 @@
 /**/
 int useheap;
 
-/* Current allocation pointers.  ncalloc() is either zalloc() or halloc(); *
+/* Current allocation pointers.  ncalloc() is either zalloc() or zhalloc(); *
  * alloc() is either zcalloc() or hcalloc().                               */
 
 /**/
@@ -110,7 +110,7 @@ global_heapalloc(void)
     int luh = useheap;
 
     alloc = hcalloc;
-    ncalloc = halloc;
+    ncalloc = zhalloc;
     useheap = 1;
     return luh;
 }
@@ -262,7 +262,7 @@ popheap(void)
 
 /**/
 void *
-halloc(size_t size)
+zhalloc(size_t size)
 {
     Heap h;
     size_t n;
@@ -329,7 +329,7 @@ hrealloc(char *p, size_t old, size_t new)
     if (old == new)
 	return p;
     if (!old && !p)
-	return halloc(new);
+	return zhalloc(new);
 
     /* find the heap with p */
 
@@ -343,7 +343,7 @@ hrealloc(char *p, size_t old, size_t new)
 
     if (p + old < arena(h) + h->used) {
 	if (new > old) {
-	    char *ptr = (char *) halloc(new);
+	    char *ptr = (char *) zhalloc(new);
 	    memcpy(ptr, p, old);
 #ifdef ZSH_MEM_DEBUG
 	    memset(p, 0xff, old);
@@ -380,7 +380,7 @@ hrealloc(char *p, size_t old, size_t new)
 	h->used += new - old;
 	return p;
     } else {
-	char *t = halloc(new);
+	char *t = zhalloc(new);
 	memcpy(t, p, old > new ? new : old);
 	h->used -= old;
 #ifdef ZSH_MEM_DEBUG
@@ -398,7 +398,7 @@ hcalloc(size_t size)
 {
     void *ptr;
 
-    ptr = halloc(size);
+    ptr = zhalloc(size);
     memset(ptr, 0, size);
     return ptr;
 }

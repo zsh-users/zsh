@@ -103,6 +103,7 @@ struct compctl {
     char *glob;			/* for -g (globbing)                       */
     char *str;			/* for -s (expansion)                      */
     char *func;			/* for -K (function)                       */
+    char *widget;		/* for -i (function)                       */
     char *explain;		/* for -X (explanation)                    */
     char *ylist;		/* for -y (user-defined desc. for listing) */
     char *prefix, *suffix;	/* for -P and -S (prefix, suffix)          */
@@ -284,7 +285,37 @@ struct cline {
 /* Flags for compadd and addmatches(). */
 
 #define CAF_QUOTE    1
-#define CAF_MENU     2
-#define CAF_NOSORT   4
-#define CAF_ALT      8
-#define CAF_MATCH   16
+#define CAF_NOSORT   2
+#define CAF_ALT      4
+#define CAF_MATCH    8
+
+/* Flags for special parameters. */
+
+#define CP_WORDS      (1 <<  0)
+#define CP_CURRENT    (1 <<  1)
+#define CP_PREFIX     (1 <<  2)
+#define CP_SUFFIX     (1 <<  3)
+#define CP_IPREFIX    (1 <<  4)
+#define CP_COMPSTATE  (1 <<  5)
+
+#define CP_REALPARAMS        6
+
+#define CP_NMATCHES   (1 <<  6)
+#define CP_MATCHER    (1 <<  7)
+#define CP_MATCHERSTR (1 <<  8)
+#define CP_MATCHERTOT (1 <<  9)
+#define CP_CONTEXT    (1 << 10)
+#define CP_PARAMETER  (1 << 11)
+#define CP_REDIRECT   (1 << 12)
+#define CP_QUOTE      (1 << 13)
+#define CP_QUOTING    (1 << 14)
+#define CP_RESTORE    (1 << 15)
+#define CP_LIST       (1 << 16)
+#define CP_INSERT     (1 << 17)
+#define CP_EXACT      (1 << 18)
+#define CP_EXACTSTR   (1 << 19)
+#define CP_PATMATCH   (1 << 20)
+
+#define CP_NUM              21
+
+#define CP_ALLMASK    ((1 << CP_NUM) - 1)

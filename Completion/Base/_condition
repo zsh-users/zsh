@@ -1,10 +1,12 @@
 #defcomp -condition-
 
-if [[ -current -1 -o ]]; then
-  complist -o -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}'
-elif [[ -current -1 -nt || -current -1 -ot || -current -1 -ef ]]; then
+local prev="$words[CURRENT-1]"
+
+if [[ "$prev" = -o ]]; then
+  compgen -o -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}'
+elif [[ "$prev" = -([no]t|ef) ]]; then
   _files
 else
   _files
-  complist -v
+  compgen -v
 fi

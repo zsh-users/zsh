@@ -21,11 +21,11 @@
 # `_match_test' and `_match_pattern' for this.
 
 local str arr sep test testarr tmparr prefix suffixes matchers autosuffix
-local matchflags opt group expl
+local matchflags opt group expl nm=$compstate[nmatches]
 
 # Test if we should use this function for the global matcher in use.
 
-_match_test _comp_parts || return
+_match_test _comp_parts || return 1
 
 # Get the options.
 
@@ -42,6 +42,7 @@ shift OPTIND-1
 # Get the string from the line.
 
 str="$PREFIX$SUFFIX"
+[[ -o globcomplete ]] && str="$str:q"
 prefix=""
 
 # Walk through the arguments to find the longest unambiguous prefix.
@@ -63,12 +64,14 @@ while [[ $# -gt 1 ]]; do
   test="${str%%${sep}*}"
   matchflags=""
   _match_pattern _comp_parts test matchflags
+  [[ -n "$_comp_correct" ]] && matchflags="$matchflags(#a$_comp_correct)"
   test="${matchflags}${test}"
   testarr=( "${(@M)${(@P)arr}:#${~test}*}" )
+  testarr=( "${(@)testarr:#}" )
 
   # If there are no matches we give up. If there is more than one
   # match, this is the part we will complete.
-  (( $#testarr )) || return
+  (( $#testarr )) || return 1
   [[ $#testarr -gt 1 ]] && break
 
   # Only one match, add it to the prefix and skip over it in `str',
@@ -89,11 +92,13 @@ if [[ $# -le 1 || "$str" != *${2}* ]]; then
   matchflags=""
   test="$str"
   _match_pattern _comp_parts test matchflags
+  [[ -n "$_comp_correct" ]] && matchflags="$matchflags(#a$_comp_correct)"
   test="${matchflags}${test}"
   testarr=( "${(@M)${(@P)arr}:#${~test}*}" )
+  testarr=( "${(@)testarr:#}" )
 fi
 
-[[ $#testarr -eq 0 || ${#testarr[1]} -eq 0 ]] && return
+[[ $#testarr -eq 0 || ${#testarr[1]} -eq 0 ]] && return 1
 
 # Now we build the suffixes to give to the completion code.
 shift
@@ -114,6 +119,7 @@ while [[ $# -gt 0 && "$str" == *${1}* ]]; do
   fi
   matchflags=""
   _match_pattern _comp_parts test matchflags
+  [[ -n "$_comp_correct" ]] && matchflags="$matchflags(#a$_comp_correct)"
   test="${matchflags}${test}"
 
   # We incrementally add suffixes by appending to them the seperators
@@ -124,7 +130,9 @@ while [[ $# -gt 0 && "$str" == *${1}* ]]; do
     tmparr=( ${=arr[2,-2]} )
     arr=tmparr
   fi
-  suffixes=("${^suffixes[@]}${1}${(@M)^${(@P)arr}:#${~test}*}")
+  tmparr=( "${(@M)${(@P)arr}:#${~test}*}" )
+  tmparr=( "${(@)testarr:#}" )
+  suffixes=("${^suffixes[@]}${1}$^tmparr")
 
   # We want the completion code to generate the most specific suffix
   # for us, so we collect matching specifications that allow partial
@@ -143,5 +151,10 @@ done
 
 # Add the matches for each of the suffixes.
 for i in "$suffixes[@]"; do
-  compadd "$group[@]" "$expl[@]" "$matchers[@]" "$autosuffix[@]" -p "$prefix" -s "$i" - "$testarr[@]"
+  compadd -U "$group[@]" "$expl[@]" "$matchers[@]" "$autosuffix[@]" \
+          -i "$IPREFIX" -p "$prefix" -s "$i" - "$testarr[@]"
 done
+
+# This sets the return value to indicate that we added matches (or not).
+
+[[ nm -ne compstate[nmatches] ]]

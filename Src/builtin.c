@@ -1072,12 +1072,14 @@ fixdir(char *src)
 	    *dest = '\0';
 	    return;
 	}
-	if (dest > d0 + 1 && src[0] == '.' && src[1] == '.' &&
+	if (src[0] == '.' && src[1] == '.' &&
 	  (src[2] == '\0' || src[2] == '/')) {
-	    /* remove a foo/.. combination */
-	    for (dest--; dest > d0 + 1 && dest[-1] != '/'; dest--);
-	    if (dest[-1] != '/')
-		dest--;
+	    if (dest > d0 + 1) {
+		/* remove a foo/.. combination */
+		for (dest--; dest > d0 + 1 && dest[-1] != '/'; dest--);
+		if (dest[-1] != '/')
+		    dest--;
+	    }
 	    src++;
 	    while (*++src == '/');
 	} else if (src[0] == '.' && (src[1] == '/' || src[1] == '\0')) {

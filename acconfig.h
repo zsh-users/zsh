@@ -73,6 +73,9 @@
 /* Define to 1 if you have RFS superroot directory. */
 #undef HAVE_SUPERROOT
 
+/* Define to 1 if you need to use the native getcwd */
+#undef USE_GETCWD
+
 /* Define to the path of the /dev/fd filesystem */
 #undef PATH_DEV_FD
 

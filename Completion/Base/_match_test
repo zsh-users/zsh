@@ -1,9 +1,9 @@
 #autoload
 
 # This function is called at the beginning of functions that do matching in
-# shell code. It should test the value of the `MATCHER' special parameter
-# and return non-zero if the calling function should try to generate matches
-# for the global match specification in use.
+# shell code. It should test the value of `compstate[matcher]' and return
+# non-zero if the calling function should try to generate matches for the
+# global match specification in use.
 #
 # This function gets one argument, the name of the function calling it.
 #
@@ -12,4 +12,4 @@
 # match specifications and modify the function `_match_pattern' to build the
 # pattern to use in the calling function.
 
-(( MATCHER == 1 ))
+(( compstate[matcher] <= 1 ))

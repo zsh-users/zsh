@@ -10,7 +10,7 @@
 # the match specs currently in use do.
 # In the calling function this pattern may be changed again or used only 
 # in parts. The second parameter whose name is given as the third argument
-# allows to give pattern flags liek `(#l)' that are to be used whenever
+# allows to give pattern flags like `(#l)' that are to be used whenever
 # matching is done.
 #
 # As an example, if you have global match specifications like:
@@ -20,12 +20,12 @@
 # This function would look like:
 #
 #   eval "${3}='(#l)'"
-#   [[ MATCHER -eq 2 ]] && eval "$1='${(P)2:gs/./*./:gs/-/*-/}'"
+#   [[ compstate[matcher] -eq 2 ]] && eval "$2='${(P)2:gs/./*./:gs/-/*-/}'"
 #
 # The first line makes sure that matching is done case-insensitive as
 # specified by `m:{a-z}={A-Z}'. The second line replaces dots and hyphens
 # in the given string by patterns matching any characters before them,
 # like the `r:|[.-]=* r:|=*'. To make this work, the function `_match_test'
-# would have to be changed to `(( MATCHERS <= 2 ))'
+# would have to be changed to `(( compstate[matcher] <= 2 ))'
 #
 # The default implementation of this function is empty.
