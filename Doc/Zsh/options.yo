@@ -329,7 +329,7 @@ read and checked for syntax errors, but not executed.
 )
 pindex(EXTENDED_GLOB)
 cindex(globbing, extended)
-item(tt(EXTENDED_GLOB) <Z>)(
+item(tt(EXTENDED_GLOB))(
 Treat the `tt(#)', `tt(~)' and `tt(^)' characters as part of patterns
 for filename generation, etc.  (An initial unquoted `tt(~)'
 always produces named directory expansion.)
