@@ -1,0 +1,24 @@
+#compdef make-kpkg
+
+_arguments \
+       '--help' \
+       '--revision:number:' \
+       '--append-to-version:suffix:' \
+       '--flavour:flavour:' \
+       '--added-modules:module list:' \
+       '--added-patches:patches list' \
+       '--arch:architecture:' \
+       '--cross-compile:target:' \
+       '--subarch:subarchitecture:' \
+       '--arch-in-name' \
+       '--pgpsign:name:' \
+       '--config:target:(oldconfig config menuconfig xconfig old menu x)' \
+       '--targets' \
+       '--noexec' \
+       '--initrd' \
+       '--zimage[make zImage instead of bzImage]' \
+       '--bzimage[make bzImage instead of zImage]' \
+       '--rootcmd:root command:(sudo fakeroot)' \
+       '--us[unsigned source]' \
+       '--uc[unsigned changelog]' \
+       '*:target:(clean buildpackage binary kernel-source kernel-headers kernel-doc kernel-image build modules modules_config modules_image modules_clean configure debian libc-kheaders)'

@@ -1,5 +1,9 @@
 2001-12-17  Clint Adams  <clint@zsh.org>
 
+	* Completion/Debian/Command/.distfiles,
+	* Completion/Debian/Command/_make-kpkg: completion for
+	make-kpkg.
+
 	* ref 16347: Src/params.c, Src/subst.c:
 	tweaks pointed out by Zefram.
 
