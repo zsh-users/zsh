@@ -1,3 +1,11 @@
+2000-06-02  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 11717: Src/glob.c, Src/params.c, Src/subst.c, Src/zsh.h,
+	Src/Modules/mapfile.c, Src/Modules/parameter.c, Src/Zle/complete.c:
+	make $array[-4,4] work again.
+
+	* unposted: Test/14array.ztst: added array-indexing tests.
+
 2000-06-01  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 11716: Src/params.c: Made $array[0,0] work like $array[0].
