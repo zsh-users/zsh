@@ -1086,7 +1086,7 @@ get_comp_string(void)
 	    else
 		linarr = 0;
 	}
-	if (inredir) {
+	if (inredir && IS_REDIROP(tok)) {
             rdstr = rdstrbuf;
             if (tokfd >= 0)
                 sprintf(rdop, "%d%s", tokfd, tokstrings[tok]);

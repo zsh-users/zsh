@@ -1,5 +1,8 @@
 2002-03-07  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 16776: Src/Zle/zle_tricky.c: don't try to build the
+	redirection string for the loops (for, foreach, select)
+
 	* 16774: Functions/Misc/zrecompile: make zrecompile show the
 	error messages from zcompile unless the -q option is given
 
