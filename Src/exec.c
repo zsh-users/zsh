@@ -3070,7 +3070,10 @@ execfuncdef(Estate state, int do_exec)
     LinkList names;
 
     end = beg + WC_FUNCDEF_SKIP(state->pc[-1]);
-    names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
+    if (!(names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
+	state->pc = end;
+	return 0;
+    }
     nprg = end - beg;
     sbeg = *state->pc++;
     nstrs = *state->pc++;

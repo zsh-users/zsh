@@ -1,3 +1,7 @@
+2000-08-28  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12710: Src/exec.c: fix for `function' without names
+	
 2000-08-27  Oliver Kiddle  <opk@zsh.org>
 
 	* 12708: Completion/AIX/_logical_volumes: new AIX completion function
