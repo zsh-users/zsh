@@ -528,7 +528,9 @@ putpromptchar(int doprint, int endchar)
 		    tm = localtime(&timet);
 		    for(t0=80; ; t0*=2) {
 			addbufspc(t0);
-			if (ztrftime(bp, t0, tmfmt, tm))
+			if (ztrftime(bp, t0, tmfmt, tm) ||
+			    !strcmp("%P", tmfmt) ||
+			    !strcmp("%p", tmfmt))
 			    break;
 		    }
 		    bp += strlen(bp);

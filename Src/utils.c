@@ -1831,7 +1831,8 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		 */
 		*buf = '\0';
 		tmp[1] = fmt[-1];
-		if (!strftime(buf, bufsize + 2, tmp, tm))
+		if (!strftime(buf, bufsize + 2, tmp, tm) &&
+		    tmp[1]!='p' && tmp[1]!='P')
 		    return 0;
 		decr = strlen(buf);
 		buf += decr;
