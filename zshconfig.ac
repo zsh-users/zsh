@@ -1625,7 +1625,7 @@ char *argv[];
     case "$host_os" in
       hpux*)                 DLCFLAGS="${DLCFLAGS=+z}" ;;
       sunos*)                DLCFLAGS="${DLCFLAGS=-pic}" ;;
-      solaris*|sysv4*|esix*) DLCFLAGS="${DLCFLAGS=-Kpic}" ;;
+      solaris*|sysv4*|esix*) DLCFLAGS="${DLCFLAGS=-KPIC}" ;;
     esac
   fi
   case "$host_os" in
