@@ -19,7 +19,7 @@
 setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
-local func funcs ret=1 tmp _compskip format \
+local func funcs ret=1 tmp _compskip format nm \
       _completers _completer _completer_num curtag \
       _matchers _matcher _matcher_num _comp_tags \
       context state line opt_args val_args curcontext="$curcontext" \
@@ -105,8 +105,9 @@ for tmp in "$_completers[@]"; do
 done
 
 curcontext="${curcontext/:[^:]#:/::}"
+nm=$compstate[nmatches]
 
-if [[ $compstate[old_list] = keep || $compstate[nmatches] -gt 1 ]]; then
+if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
   [[ _last_nmatches -ge 0 && _last_nmatches -ne $compstate[nmatches] ]] &&
       _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
@@ -160,7 +161,7 @@ if [[ $compstate[old_list] = keep || $compstate[nmatches] -gt 1 ]]; then
       fi
     fi
   fi
-elif [[ $compstate[nmatches] -eq 0 &&
+elif [[ nm -eq 0 &&
         $#_lastdescr -ne 0 && $compstate[old_list] != keep ]] &&
      zstyle -s ":completion:${curcontext}:warnings" format format; then
 
@@ -195,6 +196,7 @@ for func in "$funcs[@]"; do
 done
 
 _lastcomp=( "${(@kv)compstate}" )
+_lastcomp[nmatches]=$nm
 _lastcomp[completer]="$_completer"
 _lastcomp[prefix]="$PREFIX"
 _lastcomp[suffix]="$SUFFIX"

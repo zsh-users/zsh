@@ -1,5 +1,8 @@
 2000-04-12  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10691: Completion/Core/_main_complete, Completion/Core/_oldlist:
+ 	keep _oldlist from using the dummy match inserted for warnings
+	
 	* 10690: Doc/Zsh/compwid.yo, Src/Zle/compcore.c, Src/Zle/compctl.c,
  	Src/Zle/compresult.c: comment out the code to allow
  	$compstate[insert] to select the group
