@@ -1,3 +1,8 @@
+2000-06-06  Oliver Kiddle  <opk@zsh.org>
+
+	* 11772: Completion/User/_urls: improvements to 11756 suggested by
+	Bart in 11763 
+
 2000-06-06  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11777: Completion/Core/_expand: make _expand ignore empty
