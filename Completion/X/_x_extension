@@ -15,5 +15,5 @@ else
   [[ "$1" = - ]] && shift
 
   _wanted extensions expl 'X extensions' \
-      compadd "$@" -M 'm:{a-z}={A-Z} r:|-=* r:|=*' - "$_xe_cache[@]"
+      compadd "$@" -M 'm:{a-z}={A-Z} r:|-=* r:|=*' - _xe_cache
 fi

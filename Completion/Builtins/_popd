@@ -38,4 +38,4 @@ else
 fi
 
 _wanted -V directory-stack expl 'directory stack' \
-    compadd "$@" "$disp[@]" -Q - "$list[@]"
+    compadd "$@" "$disp[@]" -Q -a list

@@ -22,7 +22,7 @@ if [[ CURRENT -eq 3 ]]; then
   rep=(${~PWD/$words[2]/*}~$PWD(-/N))
   # Now remove all the common parts of $PWD and the completions from this
   rep=(${${rep#${PWD%%$words[2]*}}%${PWD#*$words[2]}})
-  (( $#rep )) && _wanted -C replacement strings expl replacement compadd $rep
+  (( $#rep )) && _wanted -C replacement strings expl replacement compadd -a rep
 elif _popd || [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
   local tdir tdir2
 

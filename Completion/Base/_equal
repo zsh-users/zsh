@@ -1,3 +1,9 @@
-#defcomp -equal-
+#compdef -equal-
 
-compgen -am
+local args
+
+args=( "$@" )
+
+_alternative -O args \
+    'commands:command:compadd -k commands' \
+    'aliases:alias:compadd -k aliases'

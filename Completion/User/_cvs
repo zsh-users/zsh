@@ -49,7 +49,7 @@ _cvs_command () {
 	watchers "")
 
   if (( CURRENT == 1 )); then
-    _tags commands && { compadd "$@" ${(k)cmds} || compadd "$@" ${(kv)=cmds} }
+    _tags commands && { compadd "$@" -k cmds || compadd "$@" ${(kv)=cmds} }
   else
     local curcontext="$curcontext"
 
@@ -584,7 +584,7 @@ _cvs_root () {
   fi
 
   _tags files && {
-    compadd -M 'r:|[:@./]=** r:|=**' "$@" $_cvs_roots || _files "$@" -/
+    compadd -M 'r:|[:@./]=** r:|=**' "$@" -a _cvs_roots || _files "$@" -/
   }
 }
 
@@ -652,7 +652,7 @@ _cvs_modules () {
       fi
     fi
     if (( $#_cvs_modules_cache )); then
-      _wanted modules expl 'module name' compadd - $_cvs_modules_cache
+      _wanted modules expl 'module name' compadd -a _cvs_modules_cache
     else
       _message 'module name'
     fi
@@ -683,7 +683,7 @@ _cvs_revisions () {
   fi
 
   if (( $#_cvs_revisions_cache )); then
-    _wanted values expl revision compadd - $_cvs_revisions_cache
+    _wanted values expl revision compadd -a _cvs_revisions_cache
   else
     _message revision
   fi
@@ -813,7 +813,7 @@ _cvs_nonexisting_entries () {
       ${${${${(M)${(f)"$(<"$realdir"CVS/Entries)"}:#(D|)/*}#(D|)/}%%/*}:#${(j:|:)~${files//(#m)[][*?()<|^~#\\]/\\$MATCH}}}
     )
     compquote files
-    _wanted files expl file compadd -Qp "$linedir" $files
+    _wanted files expl file compadd -Qp -a linedir files
   }
 }
 

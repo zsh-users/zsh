@@ -29,9 +29,9 @@ _arguments -C -s \
 
 case $state in
   keymap)
-    _wanted -C -M keymaps expl keymap compadd - "$keymaps[@]"
+    _wanted -C -M keymaps expl keymap compadd -a keymaps
   ;;
   widget)
-    _wanted widgets expl widget compadd -M 'r:|-=* r:|=*' - "${(@k)widgets}"
+    _wanted widgets expl widget compadd -M 'r:|-=* r:|=*' -k widgets
   ;;
 esac

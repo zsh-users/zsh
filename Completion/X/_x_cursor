@@ -14,5 +14,5 @@ if (( ! $+_cursor_cache )); then
   fi
 fi
 
-_description expl 'cursor name'
-compadd "$@" "$expl[@]" -M 'm:-=_ r:|_=*' - "$_cursor_cache[@]"
+_wanted cursors expl 'cursor name' \
+    compadd "$@" -M 'm:-=_ r:|_=*' -a _cursor_cache

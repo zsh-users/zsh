@@ -151,7 +151,7 @@ while [[ -n $state ]]; do
     completer)
       _wanted values expl completer \
 	compadd _complete _approximate _correct _match \
-                _expand _list _menu _oldlist _next_tags
+                _expand _list _menu _oldlist _ignored _prefix _history
       ;;
 
     fsort)
@@ -212,7 +212,7 @@ while [[ -n $state ]]; do
       elif compset -P '*:'; then
         _message 'tag alias'
       else
-        _wanted tags expl tag compadd - $taglist
+        _wanted tags expl tag compadd -a taglist
       fi
       ;;
 

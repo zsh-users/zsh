@@ -1,9 +1,11 @@
-#defcomp zmodload
+#compdef zmodload
 
-if [[ -mword 1 -*(a*u|u*a)* || -mword 1 -*a* && -position 3 -1 ]]; then
-  complist -B
-elif [[ -mword 1 -*u* ]]; then
-  complist -s '$(zmodload)'
+local fl="$words[2]" expl
+
+if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && CURRENT -ge 4 ]]; then
+  _wanted builtins expl 'builtin command' compadd "$@" -k builtins
+elif [[ "$fl" = -*u* ]]; then
+  _wanted modules expl module compadd -k modules
 else
-  complist -s '${^module_path}/*(N:t:r)'
+  _wanted files expl 'module file' _files -W module_path -/g '*.s[ol](:r)'
 fi

@@ -59,7 +59,7 @@ _perl_config_vars () {
   (( compstate[quoting] )) && delimiter=' '
 
   compset -P '* ' && compset -q
-  compadd "$expl[@]" $add_colon -S$delimiter -q - $_perl_config_vars
+  compadd "$expl[@]" $add_colon -S$delimiter -q -a _perl_config_vars
 }
 
 _perl "$@"

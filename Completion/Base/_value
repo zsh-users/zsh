@@ -10,7 +10,7 @@ _value () {
           "${(Pt)${compstate[parameter]}}" = assoc* ]]; then
     if (( CURRENT & 1 )); then
       _wanted association-keys expl 'association key' \
-          compadd - "${(@kP)${compstate[parameter]}}"
+          compadd -k "$compstate[parameter]"
     else
       compstate[parameter]="${compstate[parameter]}-${words[CURRENT-1]}"
       _value "$@"

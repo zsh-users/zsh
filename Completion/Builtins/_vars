@@ -17,7 +17,7 @@ if [[ $PREFIX = *\[* ]]; then
     local expl
 
     _wanted -C subscript association-keys expl 'association key' \
-        compadd $addclose - ${(kP)var}
+        compadd $addclose -k "$var"
   fi
 else
   _parameters

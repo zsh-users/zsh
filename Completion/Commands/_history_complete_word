@@ -70,7 +70,7 @@ _history_complete_word () {
 }
 
 _history_complete_word_gen_matches () {
-  local opt
+  local opt h_words
 
   [[ -n "$_hist_stop" ]] && PREFIX="$_hist_old_prefix"
 
@@ -85,8 +85,9 @@ _history_complete_word_gen_matches () {
     opt="${opt}V"
   fi
 
+  h_words=( "${(@)historywords[2,-1]}" )
   _wanted "$opt" history-words expl 'history word' \
-      compadd -Q - "$historywords[@]"
+      compadd -Q -a h_words
 
   zstyle -t ":completion:${curcontext}:history-words" list ||
       compstate[list]=

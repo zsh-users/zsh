@@ -73,7 +73,7 @@ xhost)
       _tags displays
       while _tags; do
         while _next_label displays expl 'disallow access'; do
-	  { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - $tmp ||
+	  { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' -a tmp ||
             _hosts "$expl[@]" } && ret=0
         done
 	(( ret )) || return 0

@@ -4,4 +4,7 @@
 # names of the options that were set when it was called in the array
 # `_set_options'.
 
-compadd "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' - $=_unset_options
+local expl
+
+_wanted zsh-options expl 'unset zsh option' \
+    compadd "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -a _unset_options

@@ -28,11 +28,11 @@ if [[ $state = hashval ]]; then
       _wanted -C value files expl directories _path_files -/
     else
       _wanted -C name named-directories expl 'named directory' \
-          compadd -q -S '=' - "${(@k)nameddirs}"
+          compadd -q -S '=' -k nameddirs
     fi
   elif compset -P 1 '*='; then
     _wanted -C value values expl 'executable file' _files -g '*(-*)'
   else
-    _wanted -C name commands expl command compadd -q -S '=' - "${(@k)commands}"
+    _wanted -C name commands expl command compadd -q -S '=' -k commands
   fi
 fi

@@ -17,7 +17,7 @@ if zstyle -T ":completion:${curcontext}" verbose && [[ -e /proc/$$/fd ]]; then
       list=( ${list[@]} "$i -- $(ls -l /proc/$$/fd/$i|sed 's/.*-> //' )" )
     done
   fi
-  _wanted file-descriptors expl 'file descriptors' compadd "$@" -d list - "$fds[@]"  
+  _wanted file-descriptors expl 'file descriptors' compadd "$@" -d list -a fds
 else
-  _wanted file-descriptors expl 'file descriptors' compadd "$@" - "$fds[@]"
+  _wanted file-descriptors expl 'file descriptors' compadd "$@" -a fds
 fi

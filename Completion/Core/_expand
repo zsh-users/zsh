@@ -104,7 +104,7 @@ if [[ -z "$compstate[insert]" ]] ;then
     _description -V expansions expl expansions "o:$word"
   fi
 
-  compadd "$expl[@]" -UQ -qS "$suf" - "$exp[@]"
+  compadd "$expl[@]" -UQ -qS "$suf" -a exp
 else
   _tags all-expansions expansions original
 
@@ -142,8 +142,8 @@ else
 	normal=( "$normal[@]" "$i" )
       fi
     done
-    (( $#dir ))    && compadd "$expl[@]" -UQ -qS/ - "$dir[@]"
-    (( $#normal )) && compadd "$expl[@]" -UQ -qS "$suf" - "$normal[@]"
+    (( $#dir ))    && compadd "$expl[@]" -UQ -qS/ -a dir
+    (( $#normal )) && compadd "$expl[@]" -UQ -qS "$suf" -a normal
   fi
 
   _requested original expl original && compadd "$expl[@]" -UQ - "$word"

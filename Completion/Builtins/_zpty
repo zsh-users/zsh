@@ -49,9 +49,9 @@ if [[ $state = name ]]; then
   names=( ${list%%:*} )
   if zstyle -T ":completion:${curcontext}" verbose; then
     zformat -a list ' --' ${${(f)"$(zpty)"}#*\) }
-    _wanted names expl 'zpty command name' compadd -d list - "$names[@]"
+    _wanted names expl 'zpty command name' compadd -d list -a names
   else
-    _wanted names expl 'zpty command name' compadd - "$names[@]"
+    _wanted names expl 'zpty command name' compadd -a names
   fi
 else
   return 1

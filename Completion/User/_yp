@@ -96,10 +96,10 @@ if [[ "$state" = map* ]]; then
   while _tags; do
     # The `-M ...' allows `pa.n<TAB>' to complete to `passwd.byname'.
     _requested maps expl 'map name' \
-        compadd -M 'l:.|by=by l:.|=by r:|.=* r:|=*' - \
-                "$_yp_cache_maps[@]" && ret=0
+        compadd -M 'l:.|by=by l:.|=by r:|.=* r:|=*' -a \
+                _yp_cache_maps && ret=0
     _requested nicknames expl nicknames \
-        compadd - "$_yp_cache_nicks[@]" && ret=0
+        compadd -a _yp_cache_nicks && ret=0
     (( ret )) || return 0
   done
 elif [[ "$state" = servers ]]; then

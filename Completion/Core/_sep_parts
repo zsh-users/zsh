@@ -58,9 +58,9 @@ while [[ $# -gt 1 ]]; do
   # Get the matching array elements.
 
   PREFIX="${str%%(|\\)${sep}*}"
-  builtin compadd -O testarr - "${(@P)arr}"
+  builtin compadd -O testarr -a "$arr"
   [[ $#testarr -eq 0 && -n "$_comp_correct" ]] &&
-    compadd -O testarr - "${(@P)arr}"
+    compadd -O testarr -a "$arr"
 
   # If there are no matches we give up. If there is more than one
   # match, this is the part we will complete.
@@ -88,9 +88,9 @@ if [[ $# -le 1 || "$str" != *${2}* ]]; then
   # No more separators, build the matches.
 
   PREFIX="$str"
-  builtin compadd -O testarr - "${(@P)arr}"
+  builtin compadd -O testarr -a "$arr"
   [[ $#testarr -eq 0 && -n "$_comp_correct" ]] &&
-    compadd -O testarr - "${(@P)arr}"
+    compadd -O testarr -a "$arr"
 fi
 
 [[ $#testarr -eq 0 || ${#testarr[1]} -eq 0 ]] && return 1
@@ -125,9 +125,9 @@ while [[ $# -gt 0 && "$str" == *${1}* ]]; do
     arr=tmparr
   fi
 
-  builtin compadd -O tmparr - "${(@P)arr}"
+  builtin compadd -O tmparr -a "$arr"
   [[ $#tmparr -eq 0 && -n "$_comp_correct" ]] &&
-    compadd -O tmparr - "${(@P)arr}"
+    compadd -O tmparr - "$arr"
 
   suffixes=("${(@)^suffixes[@]}${(q)1}${(@)^tmparr}")
 
@@ -155,7 +155,7 @@ PREFIX="$pre"
 SUFFIX="$suf"
 for i in "$suffixes[@]"; do
   compadd -U "$group[@]" "$expl[@]" "$matchers[@]" "$autosuffix[@]" "$opts[@]" \
-          -i "$IPREFIX" -I "$ISUFFIX" -p "$prefix" -s "$i" - "$testarr[@]"
+          -i "$IPREFIX" -I "$ISUFFIX" -p "$prefix" -s "$i" -a testarr
 done
 
 # This sets the return value to indicate that we added matches (or not).

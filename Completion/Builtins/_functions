@@ -1,3 +1,5 @@
-#defcomp unfunction
+#compdef functions unfunction
 
-complist -F
+local expl
+
+_wanted functions expl 'shell function' compadd "$@" -k functions

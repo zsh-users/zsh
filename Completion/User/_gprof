@@ -49,7 +49,7 @@ if [[ -n "$state" ]]; then
       expl=function
     fi
     _wanted functions expl "$expl" \
-        compadd -M 'r:|_=* r:|=*' - "$_gprof_funcs[@]" && ret=0
+        compadd -M 'r:|_=* r:|=*' -a _gprof_funcs && ret=0
   else
     return 1
   fi

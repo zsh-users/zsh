@@ -1,7 +1,10 @@
-#defcomp zle
+#compdef zle
 
-if [[ -word 1 -N && -position 3 ]]; then
-  complist -F
+local expl
+
+if [[ "$words[2]" = -N && CURRENT -eq 3 ]]; then
+  _wanted -C -N functions expl 'widget shell function' \
+      compadd "$@" -k functions
 else
-  complist -b
+  _wanted widgets expl widget compadd -k widgets
 fi

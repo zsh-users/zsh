@@ -2,4 +2,7 @@
 
 # This should be used to complete all option names.
 
-compgen "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o
+local expl
+
+_wanted zsh-options expl 'zsh option' \
+    compadd "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -k options

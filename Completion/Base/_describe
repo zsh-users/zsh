@@ -52,8 +52,8 @@ while _tags; do
         fi
       fi
 
-      compadd "$_args[@]" "$_expl[@]" -ld _tmpd - "$_tmpmd[@]" && _ret=0
-      compadd "$_args[@]" "$_expl[@]" -d _tmps  - "$_tmpms[@]" && _ret=0
+      compadd "$_args[@]" "$_expl[@]" -ld _tmpd -a _tmpmd && _ret=0
+      compadd "$_args[@]" "$_expl[@]" -d _tmps  -a _tmpms && _ret=0
     done
   done
   (( _ret )) || return 0

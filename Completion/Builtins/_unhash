@@ -7,8 +7,8 @@ _arguments -C -s \
   '(-d -f *)-a[remove aliases]:*:aliases:_aliases' \
   '(-d -a *)-f[remove functions]:*:functions:_functions' \
   '-m[treat arguments as patterns]' \
-  '*:commands:_command_names -e'  && return 0
+  '*:commands: _command_names -e'  && return 0
 
 if [[ "$state" = nameddir ]]; then
-  _wanted nameddir expl 'named directory' compadd - ${(@k)nameddirs}
+  _wanted nameddir expl 'named directory' compadd -k nameddirs
 fi

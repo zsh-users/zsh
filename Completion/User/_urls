@@ -124,7 +124,7 @@ if ! compset -P '(#b)([^/]#)/'; then
       compset -S '/*' || suf="/"
       (( $#uhosts )) || _hosts -S "$suf" "$expl[@]" && ret=0
       [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
-      compadd -S "$suf" "$expl[@]" - $uhosts && ret=0
+      compadd -S "$suf" "$expl[@]" -a uhosts && ret=0
     done
     (( ret )) || return 0
   done

@@ -1,5 +1,41 @@
 2000-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11549: Completion/Base/_combination, Completion/Base/_command_names,
+ 	Completion/Base/_describe, Completion/Base/_equal,
+ 	Completion/Base/_subscript, Completion/Base/_tilde,
+ 	Completion/Base/_value, Completion/Builtins/_aliases,
+ 	Completion/Builtins/_bindkey, Completion/Builtins/_builtin,
+ 	Completion/Builtins/_cd, Completion/Builtins/_command,
+ 	Completion/Builtins/_compdef, Completion/Builtins/_functions,
+ 	Completion/Builtins/_hash, Completion/Builtins/_popd,
+ 	Completion/Builtins/_unhash, Completion/Builtins/_vars,
+ 	Completion/Builtins/_which, Completion/Builtins/_zcompile,
+ 	Completion/Builtins/_zle, Completion/Builtins/_zmodload,
+ 	Completion/Builtins/_zpty, Completion/Builtins/_zstyle,
+ 	Completion/Commands/_bash_completions,
+ 	Completion/Commands/_history_complete_word,
+ 	Completion/Core/_all_labels, Completion/Core/_expand,
+ 	Completion/Core/_file_descriptors, Completion/Core/_history,
+ 	Completion/Core/_multi_parts, Completion/Core/_next_label,
+ 	Completion/Core/_options, Completion/Core/_path_files,
+ 	Completion/Core/_requested, Completion/Core/_sep_parts,
+ 	Completion/Core/_set_options, Completion/Core/_unset_options,
+ 	Completion/Core/_wanted, Completion/User/_archie,
+ 	Completion/User/_cvs, Completion/User/_domains,
+ 	Completion/User/_gprof, Completion/User/_groups,
+ 	Completion/User/_hosts, Completion/User/_lp,
+ 	Completion/User/_mailboxes, Completion/User/_make,
+ 	Completion/User/_mount, Completion/User/_mysql_utils,
+ 	Completion/User/_netscape, Completion/User/_perl,
+ 	Completion/User/_perl_basepods,
+ 	Completion/User/_perl_builtin_funcs,
+ 	Completion/User/_perl_modules, Completion/User/_ports,
+ 	Completion/User/_rcs, Completion/User/_urls,
+ 	Completion/User/_users, Completion/User/_yp,
+ 	Completion/X/_x_color, Completion/X/_x_cursor,
+ 	Completion/X/_x_extension, Completion/X/_x_font,
+	Completion/X/_x_keysym, Completion/X/_xutils: use compadd -[ak]
+	
 	* Andrej: 11660: Completion/User/_man: fix for ${..//..} with % in 
 	search string
 

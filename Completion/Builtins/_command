@@ -1,7 +1,10 @@
-#defcomp command
+#compdef command
 
-if [[ -position 2 -1 ]]; then
-  _normal "$@"
+if [[ CURRENT -ge 3 ]]; then
+  compset -n 2
+  _normal
 else
-  complist -em
+  local expl
+
+  _wanted commands expl 'external command' compadd "$@" -k commands
 fi

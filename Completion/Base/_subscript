@@ -12,7 +12,7 @@ elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
   [[ "$RBUFFER" != \]* ]] && suf=']'
 
   _wanted association-keys expl 'association key' \
-      compadd -S "$suf" - "${(@kP)${compstate[parameter]}}"
+      compadd -S "$suf" -k "$compstate[parameter]"
 elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   local list i j ret=1 disp
 
@@ -39,10 +39,10 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
 
       if [[ "$RBUFFER" = \]* ]]; then
         _all_labels -V indexes expl 'array index' \
-            compadd -S '' "$disp[@]" - "$ind[@]" && ret=0
+            compadd -S '' "$disp[@]" -a ind && ret=0
       else
         _all_labels -V indexes expl 'array index' \
-            compadd -S ']' "$disp[@]" - "$ind[@]" && ret=0
+            compadd -S ']' "$disp[@]" -a ind && ret=0
       fi
     fi
     _requested parameters && _parameters && ret=0

@@ -1,7 +1,11 @@
-#defcomp builtin
+#compdef builtin
 
-if [[ -position 2 -1 ]]; then
-  _normal "$@"
+if (( $CURRENT > 2 )); then
+  shift words
+  (( CURRENT -- ))
+  _normal
 else
-  complist -eB
+  local expl
+
+  _wanted commands expl 'builtin command' compadd "$@" -k builtins
 fi

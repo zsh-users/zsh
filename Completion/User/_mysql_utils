@@ -64,7 +64,7 @@ _mysql_databases () {
                    )
   shift _mysql_databases
 
-  compadd "$expl[@]" - $_mysql_databases
+  compadd "$expl[@]" -a _mysql_databases
 }
 
 _mysql_tables () {
@@ -79,7 +79,7 @@ _mysql_tables () {
   # remove header
   shift _mysql_tables
 
-  compadd "$expl[@]" - $_mysql_tables
+  compadd "$expl[@]" -a _mysql_tables
 }
 
 _mysql_variables () {
@@ -205,7 +205,7 @@ _mysqladmin_commands () {
        )
 
   if (( CURRENT == 1 )); then
-    _wanted commands expl command compadd "$@" - $cmds
+    _wanted commands expl command compadd "$@" -a cmds
   else
     local curcontext="$curcontext"
 

@@ -515,7 +515,7 @@ for prepath in "$prepaths[@]"; do
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
 	          -W "$prepath$realpath$testpath" \
 		   "$pfxsfx[@]" -M "r:|/=* r:|=*" \
-		   - "$tmp1[@]"
+		   -a tmp1
 	fi
       else
         if [[ "$tmp3" = */* ]]; then
@@ -529,7 +529,7 @@ for prepath in "$prepaths[@]"; do
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
                   -W "$prepath$realpath$testpath" \
 		  "$pfxsfx[@]" -M "r:|/=* r:|=*" \
-		  - "$tmp1[@]"
+		  -a tmp1
         fi
       fi
       tmp4=-
@@ -591,7 +591,7 @@ for prepath in "$prepaths[@]"; do
       tmp4="$testpath"
       compquote tmp4 tmp1
       compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -W "$prepath$realpath$testpath" \
-	      "$pfxsfx[@]" -M "r:|/=* r:|=*" - "$tmp1[@]"
+	      "$pfxsfx[@]" -M "r:|/=* r:|=*" -a tmp1
     fi
   fi
 done
@@ -605,7 +605,7 @@ if zstyle -t ":completion:${curcontext}:paths" expand prefix &&
       "$exppaths" != "$eorig" ]]; then
   PREFIX="${opre}"
   SUFFIX="${osuf}"
-  compadd -Q "$mopts[@]" -S '' -M "r:|/=* r:|=*" -p "$linepath" - "$exppaths[@]"
+  compadd -Q "$mopts[@]" -S '' -M "r:|/=* r:|=*" -p "$linepath" -a exppaths
 fi
 
 [[ nm -ne compstate[nmatches] ]]

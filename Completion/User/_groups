@@ -16,4 +16,4 @@ if ! zstyle -a ":completion:${curcontext}:" groups groups; then
   groups=( "$_cache_groups[@]" )
 fi
 
-_wanted groups expl group compadd "$@" - "$groups[@]"
+_wanted groups expl group compadd "$@" -a groups

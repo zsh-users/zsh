@@ -59,7 +59,7 @@ pref=''
 # If the string from the line matches at least one of the strings,
 # we use only the matching strings.
 
-compadd -O tmp1 -M "r:|${sep}=* r:|=* $matcher" - "$matches[@]"
+compadd -O tmp1 -M "r:|${sep}=* r:|=* $matcher" -a matches
 
 (( $#tmp1 )) && matches=( "$tmp1[@]" )
 
@@ -138,7 +138,7 @@ while true; do
 
       PREFIX="$pre"
       SUFFIX="$suf"
-      compadd -O matches -M "r:|${sep}=* r:|=* $matcher" - "$matches[@]"
+      compadd -O matches -M "r:|${sep}=* r:|=* $matcher" -a matches
 
       if [[ "$pre" = *${sep}* ]]; then
  	PREFIX="${cpre}${pre%%${sep}*}"

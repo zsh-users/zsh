@@ -1,3 +1,13 @@
-#defcomp ftp ncftp ping rwho rup xping traceroute nslookup
+#compdef ftp ncftp ping rwho rup xping traceroute host
 
-complist -k hosts
+local expl hosts
+
+if ! zstyle -a ":completion:${curcontext}:hosts" hosts hosts; then
+  (( $+_cache_hosts )) ||
+      : ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+
+  hosts=( "$_cache_hosts[@]" )
+fi
+
+_wanted hosts expl host \
+    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" -a hosts

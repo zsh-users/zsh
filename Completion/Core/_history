@@ -16,7 +16,7 @@
 #                          remove /all/ duplicate matches rather than just
 #                          consecutives
 
-local opt expl 
+local opt expl h_words
 
 if zstyle -t ":completion:${curcontext}:" remove-all-dups; then
   opt=-
@@ -32,5 +32,5 @@ fi
 
 # We skip the first element of historywords so the current word doesn't
 # interfere with the completion
-_wanted "$opt" history-words expl 'history word' \
-    compadd -Q - "${(@)historywords[2,-1]}"
+h_words=( "${(@)historywords[2,-1]}" )
+_wanted "$opt" history-words expl 'history word' compadd -Q -a h_words

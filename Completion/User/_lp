@@ -26,7 +26,7 @@ else
           else
   	  disp=()
           fi
-	  _all_labels users expl user compadd "$disp[@]" - "$strs[@]" ||
+	  _all_labels users expl user compadd "$disp[@]" -a strs ||
               _users && ret=0
         fi
         if _requested jobs; then
@@ -38,7 +38,7 @@ else
           else
   	  disp=()
           fi
-          _all_labels jobs expl job compadd "$disp[@]" - "$strs[@]" && ret=0
+          _all_labels jobs expl job compadd "$disp[@]" -a strs && ret=0
         fi
         (( ret )) || return 0
       done

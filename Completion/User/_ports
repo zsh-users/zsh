@@ -1,8 +1,12 @@
 #autoload
 
-local expl
+local expl ports
 
-: ${(A)ports:=${${(M)${${(f)"$(</etc/services)"}:#\#*}#*/tcp}%%[ 	]*}}
+if ! zstyle -a ":completion:${curcontext}:" ports ports; then
+  (( $+_cache_ports )) ||
+      : ${(A)_cache_ports:=${${(M)${${(f)"$(</etc/services)"}:#\#*}#*/tcp}%%[ 	]*}}
 
-_description expl port
-compadd "$@" "$expl[@]" - "$ports[@]"
+  ports=( "$_cache_ports[@]" )
+fi
+
+_wanted ports expl port compadd "$@" -a ports

@@ -8,5 +8,5 @@ if [[ $compstate[nmatches] -eq nm && -d RCS && $cmd != ci ]]; then
   local rep expl
 
   rep=(RCS/$PREFIX*$SUFFIX,v(:t:s/\,v//))
-  (( $#rep )) && _wanted files expl 'RCS file' compadd - $rep
+  (( $#rep )) && _wanted files expl 'RCS file' compadd -a rep
 fi

@@ -1,25 +1,27 @@
 #autoload
 
 # Usage:
-#   _combination [-s S] V[:K1:...] Ki1[:Ni1]=Pi1 Ki2[:Ni2]=Pi2 ... Kim[:Nim]=Pim Kj[:Nj] EXPL...
+#   _combination [-s S] TAG STYLE \
+#     Ki1[:Ni1]=Pi1 Ki2[:Ni2]=Pi2 ... Kim[:Nim]=Pim Kj[:Nj] EXPL...
 #
-#  It is assumed that V is formed as PRE_K1_..._Kn if `:K1:...' is not specified.
+#  STYLE should be of the form K1-K2-...-Kn.
 #
 # Example: telnet
 #
-#  Assume an user sets the variable `telnet_hosts_ports_users' as:
+#  Assume an user sets the style `users-hosts-ports' as for the my-accounts
+#  tag:
 #
-#    telnet_hosts_ports_users=(
-#      host0:: host1::user1 host2::user2
-#      mail-server:{smtp,pop3}:
-#      news-server:nntp:
-#      proxy-server:8000:
-#    )
+#    zstyle ':completion:*:*:telnet:*:my-accounts' users-hosts-ports \
+#      @host0: user1@host1: user2@host2:
+#      @mail-server:{smtp,pop3}
+#      @news-server:nntp
+#      @proxy-server:8000
+# 
 #
-#  `_telnet completes' hosts as:
+#  `_telnet' completes hosts as:
 #
-#    _combination telnet_hosts_ports_users \
-#      ${options[-l]:+users=${options[-l]:q}} \
+#    _combination my-accounts users-hosts-ports \
+#      ${opt_args[-l]:+users=${opt_args[-l]:q}} \
 #      hosts "$expl[@]"
 #
 #  This completes `host1', `host2', `mail-server', `news-server' and
@@ -28,8 +30,8 @@
 # 
 #  `_telnet' completes ports as:
 #
-#    _combination telnet_hosts_ports_users \
-#      ${options[-l]:+users=${options[-l]:q}} \
+#    _combination my-accounts users-hosts-ports \
+#      ${opt_args[-l]:+users=${opt_args[-l]:q}} \
 #      hosts="${line[2]:q}" \
 #      ports "$expl[@]"
 #
@@ -39,7 +41,7 @@
 #
 #  `_telnet' completes users for an argument of option `-l' as:
 #
-#    _combination telnet_hosts_ports_users \
+#    _combination my-accounts users-hosts-ports \
 #      ${line[2]:+hosts="${line[2]:q}"} \
 #      ${line[3]:+ports="${line[3]:q}"} \
 #      users "$expl[@]"
@@ -48,25 +50,23 @@
 #  the port argument if they are exist. And if it is failed, `_users' is
 #  called.
 
-local sep var keys pats key num tmp
+local sep tag style keys pats key num tmp
 
 if [[ "$1" = -s ]]; then
   sep="$2"
   shift 2
+elif [[ "$1" = -s* ]]; then
+  sep="${1[3,-1]}"
+  shift
 else
   sep=:
 fi
 
-var=$1
-shift
+tag="$1"
+style="$2"
+shift 2
 
-if [[ $var = *:* ]]; then
-  keys=( ${(s/:/)var} )
-  shift keys
-  var="${var%%:*}"
-else
-  keys=( "${(@s:_:)${var#*_}}" )
-fi
+keys=( ${(s/-/)style} )
 pats=( "${(@)keys/*/*}" )
 
 while [[ "$1" = *=* ]]; do
@@ -81,15 +81,14 @@ key="${1%:*}"
 num="${${1##*:}:-1}"
 shift
 
-if (( ${(P)+${var}} )); then
-  eval "tmp=( \"\${(@M)${var}:#\${(j($sep))~pats}}\" )"
+if zstyle -a ":completion:${curcontext}:$tag" "$style" tmp; then
+  eval "tmp=( \"\${(@M)tmp:#\${(j($sep))~pats}}\" )"
   if (( keys[(in:num:)$key] != 1 )); then
-    eval "tmp=( \${tmp#\${(j(${sep}))~\${(@)\${(@)keys[2,(rn:num:)\$key]}/*/*}}$sep} )"
+    eval "tmp=( \${tmp#\${(j(${sep}))~\${(@)\${(@)keys[2,(rn:num:)\$key]}/*/*}}${~sep}} )"
   fi
-  tmp=( ${tmp%%$sep*} )
+  tmp=( ${tmp%%${~sep}*} )
 
-  compadd "$@" - $tmp || { builtin functions _$key >&- && _$key "$@" }
+  compadd "$@" -a tmp || { (( $+functions[_$key] )) && "_$key" "$@" }
 else
-  builtin functions _$key >&- && _$key "$@"
+  (( $+functions[_$key] )) && "_$key" "$@"
 fi
-
