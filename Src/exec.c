@@ -2918,7 +2918,7 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
  * was executed.                                            */
 {
     char **tab, **x, *oargv0 = NULL;
-    int oldzoptind, oldlastval;
+    int oldzoptind, oldlastval, oldoptcind;
     char saveopts[OPT_SIZE], *oldscriptname;
     int obreaks = breaks;
 
@@ -2935,6 +2935,8 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 	scriptname = dupstring(name);
 	oldzoptind = zoptind;
 	zoptind = 1;
+	oldoptcind = optcind;
+	optcind = 0;
 
 	/* We need to save the current options even if LOCALOPTIONS is *
 	 * not currently set.  That's because if it gets set in the    *
@@ -2974,6 +2976,7 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 	    zsfree(argzero);
 	    argzero = oargv0;
 	}
+	optcind = oldoptcind;
 	zoptind = oldzoptind;
 	scriptname = oldscriptname;
 	pparams = tab;

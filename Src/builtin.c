@@ -2936,6 +2936,9 @@ bin_shift(char *name, char **argv, char *ops, int func)
     return ret;
 }
 
+/**/
+int optcind;
+
 /* getopts: automagical option handling for shell scripts */
 
 /**/
@@ -2945,7 +2948,6 @@ bin_getopts(char *name, char **argv, char *ops, int func)
     int lenstr, lenoptstr, quiet, lenoptbuf;
     char *optstr = unmetafy(*argv++, &lenoptstr), *var = *argv++;
     char **args = (*argv) ? argv : pparams;
-    static int optcind = 0;
     char *str, optbuf[2] = " ", *p, opch;
 
     /* zoptind keeps count of the current argument number.  The *
@@ -2994,8 +2996,8 @@ bin_getopts(char *name, char **argv, char *ops, int func)
 	p = "?";
 err:
 	zsfree(zoptarg);
+	setsparam(var, ztrdup(p));
 	if(quiet) {
-	    setsparam(var, ztrdup(p));
 	    zoptarg = metafy(optbuf, lenoptbuf, META_DUP);
 	} else {
 	    zerr(*p == '?' ? "bad option: -%c" :
