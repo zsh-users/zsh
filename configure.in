@@ -213,11 +213,12 @@ AC_DEFINE(CONFIG_LOCALE)
 undefine([fndir])dnl
 AC_ARG_ENABLE(fndir,
 [  --enable-fndir=DIR         where functions go (default DATADIR/zsh/functions)],
+dnl ${VERSION} to be determined at compile time.
 [if test $enableval = yes; then
-  fndir=${datadir}/${tzsh_name}/${VERSION}/functions
+  fndir=${datadir}/${tzsh_name}/'${VERSION}'/functions
 else
   fndir="$enableval"
-fi], [fndir=${datadir}/${tzsh_name}/${VERSION}/functions])
+fi], [fndir=${datadir}/${tzsh_name}/'${VERSION}'/functions])
 
 undefine([function_subdirs])
 AC_ARG_ENABLE(function-subdirs,
