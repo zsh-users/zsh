@@ -562,9 +562,9 @@ bin_set(char *nam, char **args, Options ops, int func)
 		if (!*++*args)
 		    args++;
 		if (!*args) {
-		    zwarnnam(nam, "string expected after -o", NULL, 0);
+		    printoptionstates(hadplus);
 		    inittyptab();
-		    return 1;
+		    return 0;
 		}
 		if(!(optno = optlookup(*args)))
 		    zwarnnam(nam, "no such option: %s", *args, 0);

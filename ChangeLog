@@ -1,3 +1,8 @@
+2003-05-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 18530: Src/builtin.c, Src/options.c, Doc/Zsh/builtins.yo:
+	print option states with `set -o' or `set +o' 
+
 2003-05-15  Peter Stephenson  <pws@csr.com>
 
 	* 18539: Src/init.c: upgrade 18536 to autoload zle on

@@ -973,7 +973,7 @@ cindex(parameters, positional)
 cindex(parameters, setting array)
 cindex(array parameters, setting)
 pindex(KSH_ARRAYS, use of)
-item(tt(set) [ {tt(PLUS())|tt(-)}var(options) | {tt(PLUS())|tt(-)}tt(o) var(option_name) ] ... [ {tt(PLUS())|tt(-)}tt(A) [ var(name) ] ] [ var(arg) ... ])(
+item(tt(set) [ {tt(PLUS())|tt(-)}var(options) | {tt(PLUS())|tt(-)}tt(o) [ var(option_name) ] ] ... [ {tt(PLUS())|tt(-)}tt(A) [ var(name) ] ] [ var(arg) ... ])(
 Set the options for the shell and/or set the positional parameters, or
 declare and set an array.  If the tt(-s) option is given, it causes the
 specified arguments to be sorted before assigning them to the positional
@@ -981,7 +981,10 @@ parameters (or to the array var(name) if tt(-A) is used).  With tt(PLUS()s)
 sort arguments in descending order.  For the meaning of the other flags, see
 ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Options))\
-.  Flags may be specified by name using the tt(-o) option.
+.  Flags may be specified by name using the tt(-o) option. If no option
+name is supplied with tt(-o), the current option states are printed.
+With tt(PLUS()o) they are printed in a form that can be used as input
+to the shell.
 
 If the tt(-A) flag is specified, var(name) is set to an array containing
 the given var(arg)s; if no var(name) is specified, all arrays are printed

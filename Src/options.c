@@ -710,6 +710,33 @@ dashgetfn(Param pm)
     return buf;
 }
 
+/* print options for set -o/+o */
+
+/**/
+void
+printoptionstates(int hadplus)
+{
+    scanhashtable(optiontab, 1, 0, OPT_ALIAS, printoptionnodestate, hadplus);
+}
+
+/**/
+static void
+printoptionnodestate(HashNode hn, int hadplus)
+{
+    Optname on = (Optname) hn;
+    int optno = on->optno;
+
+    if (hadplus) {
+        if (defset(on) != isset(optno))
+	    printf("set -o %s%s\n", defset(on) ? "no" : "", on->nam);
+    } else {
+	if (defset(on))
+	    printf("no%-19s %s\n", on->nam, isset(optno) ? "off" : "on");
+	else
+	    printf("%-21s %s\n", on->nam, isset(optno) ? "on" : "off");
+    }
+}
+
 /* Print option list for --help */
 
 /**/
