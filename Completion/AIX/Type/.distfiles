@@ -1,0 +1,4 @@
+DISTFILES_SRC='
+.distfiles
+_logical_volumes   _object_classes    _physical_volumes  _volume_groups
+'

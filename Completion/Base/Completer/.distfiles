@@ -1,0 +1,6 @@
+DISTFILES_SRC='
+.distfiles
+_all_matches   _correct       _history       _match         _prefix
+_approximate   _expand        _ignored       _menu
+_complete      _expand_alias  _list          _oldlist
+'

@@ -1,0 +1,17 @@
+DISTFILES_SRC='
+.distfiles
+_a2ps         _dvi          _gzip         _man          _rcs          _w3m
+_apachectl    _enscript     _iconv        _mh           _rlogin       _webbrowser
+_archie       _fakeroot     _imagemagick  _mount        _sh           _wget
+_arp          _fetchmail    _init_d       _mutt         _slrn         _whereis
+_bison        _find         _ispell       _mysql_utils  _socket       _whois
+_bzip2        _finger       _java         _ncftp        _ssh          _xargs
+_chown        _flex         _joe          _nslookup     _strip        _yodl
+_compress     _gcc          _killall      _pack         _stty         _yp
+_configure    _gdb          _look         _patch        _su           _zcat
+_cpio         _getconf      _lp           _pbm          _sudo         _zdump
+_cvs          _gnu_generic  _ls           _perl         _tar          _zip
+_dd           _gprof        _lynx         _perldoc      _telnet
+_dict         _grep         _lzop         _prcs         _tiff
+_diff         _gs           _make         _psutils      _tin
+'

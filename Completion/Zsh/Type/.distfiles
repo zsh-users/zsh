@@ -1,0 +1,7 @@
+DISTFILES_SRC='
+.distfiles
+_aliases           _file_descriptors  _jobs_fg           _options_unset
+_arrays            _functions         _limits            _parameters
+_command_names     _jobs              _options           _vars
+_directory_stack   _jobs_bg           _options_set
+'
