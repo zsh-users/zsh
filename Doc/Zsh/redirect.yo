@@ -138,6 +138,19 @@ If the order of redirections were reversed,
 file descriptor 2 would be associated
 with the terminal (assuming file descriptor 1 had been)
 and then file descriptor 1 would be associated with file var(fname).
+
+The `tt(|&)' command separator described in
+ifzman(em(Simple Commands & Pipelines) in zmanref(zshmisc))\
+ifnzman(noderef(Simple Commands & Pipelines))
+is a shorthand for `tt(2>&1 |)'.
+
+For output redirections only, if var(word) is of the form
+`tt(>LPAR())var(list)tt(RPAR())' then the output is piped to the command
+represented by var(list).  See
+ifzman(\
+em(Process Substitution) in zmanref(zshexpn))\
+ifnzman(\
+noderef(Process Substitution)).
 sect(Multios)
 cindex(multios)
 pindex(MULTIOS, use of)
