@@ -34,6 +34,11 @@
 	permissions on directories in the fpath; also in case of symlinks,
 	find parent with ${^fpath:h} rather than ${^fpath}/..
 
+2003-09-21  Oliver Kiddle  <opk@zsh.org>
+
+	* users/6606: Completion/Base/Utility/_sep_parts: handle any
+	matching control options passed down
+
 2003-09-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/6529 + unposted: StartupFiles/zshenv: updated the comments
