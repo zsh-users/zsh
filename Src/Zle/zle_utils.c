@@ -128,6 +128,9 @@ forekill(int ct, int dir)
 void
 cut(int i, int ct, int dir)
 {
+    if (!ct)
+	return;
+
     if (zmod.flags & MOD_VIBUF) {
 	struct cutbuffer *b = &vibuf[zmod.vibuf];
 

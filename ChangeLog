@@ -1,8 +1,11 @@
 2001-03-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13767: Src/Zle/zle_utils.c: avoid adding empty strings to
+	the kill ring
+
 	* 13763: Completion/Builtins/_pids, Doc/Zsh/compsys.yo: _pids
-	* shouldn't start menu completion if the current word starts
-	* with a hyphen; typo fix in compsys.yo
+	shouldn't start menu completion if the current word starts
+	with a hyphen; typo fix in compsys.yo
 
 2001-03-25  Bart Schaefer  <schaefer@zsh.org>
 
