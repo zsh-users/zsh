@@ -1,4 +1,4 @@
-2001-06-09  Bart Schaefer  <schaefer@brasslantern.com>
+2001-06-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14824: Test/comptest: Avoid echotc (improvement on 14792).
 
