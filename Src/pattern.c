@@ -399,7 +399,7 @@ patcompile(char *exp, int inflags, char **endexp)
 	patendstr++;
 	patendseglen--;
 	patendstrlen--;
-	remnulargs(exp);
+	remnulargs(patparse);
 	patglobflags = 0;
     }
     /*
@@ -419,10 +419,20 @@ patcompile(char *exp, int inflags, char **endexp)
 	    || (!(patglobflags & ~GF_IGNCASE) && (patflags & PAT_FILE))
 #endif
 	    )
+	{
+	    /*
+	     * Waah!  I wish I understood this.
+	     * Empty metafied strings have an initial Nularg.
+	     * This never corresponds to a real character in
+	     * a glob pattern or string, so skip it.
+	     */
+	    if (*exp == Nularg)
+		exp++;
 	    for (strp = exp; *strp &&
 		     (!(patflags & PAT_FILE) || *strp != '/') && !itok(*strp);
 		 strp++)
 		;
+	}
 	if (!strp || (*strp && *strp != '/')) {
 	    /* No, do normal compilation. */
 	    strp = NULL;
@@ -1010,6 +1020,9 @@ patcomppiece(int *flagp)
 
 	/* Get length of string without metafication. */
 	nmeta = 0;
+	/* inherited from domatch, but why, exactly? */
+	if (*str0 == Nularg)
+	    str0++;
 	for (ptr = str0; ptr < patparse; ptr++) {
 	    if (*ptr == Meta) {
 		nmeta++;

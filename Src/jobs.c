@@ -565,9 +565,9 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 #ifdef HAVE_GETRUSAGE
     user_time = ti->ru_utime.tv_sec + ti->ru_utime.tv_usec / 1000000.0;
     system_time = ti->ru_stime.tv_sec + ti->ru_stime.tv_usec / 1000000.0;
-    percent = 100.0 * (user_time + system_time)
-	/ (real->tv_sec + real->tv_usec / 1000000.0);
     total_time = user_time + system_time;
+    percent = 100.0 * total_time
+	/ (real->tv_sec + real->tv_usec / 1000000.0);
 #else
     set_clktck();
     user_time    = ti->ut / (double) clktck;

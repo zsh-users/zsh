@@ -1,3 +1,10 @@
+2004-10-22  Peter Stephenson  <pws@csr.com>
+
+	* 20513: Src/pattern.c, Test/D02glob.ztst: tests of zero length
+	patterns didn't work after 20500.
+
+	* unposted: Src/jobs.c: trivial optimisation.
+
 2004-10-20  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20505: Src/utils.c, Src/builtin.c, Src/exec.c, Src/hist.c,
