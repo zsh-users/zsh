@@ -265,8 +265,12 @@ for prepath in "$prepaths[@]"; do
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.
 
-      tmp2=("$tmp1[@]")
-      compadd -D tmp1 "$ignore[@]" "$matcher[@]" - "${(@)tmp1:t}"
+      builtin compadd -D tmp1 "$ignore[@]" "$matcher[@]" - "${(@)tmp1:t}"
+
+      if [[ $#tmp1 -eq 0 && -n "$_comp_correct" ]]; then
+        tmp1=( "$tmp2[@]" )
+	compadd -D tmp1 "$ignore[@]" "$matcher[@]" - "${(@)tmp2:t}"
+      fi
 
       # If no file matches, save the expanded path and continue with
       # the outer loop.

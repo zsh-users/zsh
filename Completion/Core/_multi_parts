@@ -93,7 +93,11 @@ while true; do
   else
     # No exact match, see how many strings match what's on the line.
 
-    compadd -O tmp1 - "${(@)matches%%${sep}*}"
+    builtin compadd -O tmp1 - "${(@)matches%%${sep}*}"
+
+    [[ $#tmp1 -eq 0 && -n "$_comp_correct" ]] &&
+      compadd -O tmp1 - "${(@)matches%%${sep}*}"
+
     tmp2=( "$tmp1[@]" )
     tmp1=( "$tmp2[@]" )
 
