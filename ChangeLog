@@ -1,3 +1,8 @@
+2001-08-07  Peter Stephenson  <pws@csr.com>
+
+	* 15583: Config/installfns.sh: ignore CVS directories for
+	all function installations, not just with subdirectories.
+
 2001-08-07  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15584: Src/parse.c: increment zwc fie version (which means

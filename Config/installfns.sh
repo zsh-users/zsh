@@ -13,9 +13,11 @@ allfuncs="`cd $sdir_top; echo ${allfuncs}`"
 # (1) the glob got expanded (2) we are not looking at directories.
 for file in $allfuncs; do
   if test -f $sdir_top/$file; then
+    case "$file" in
+      */CVS/*) continue;;
+    esac
     if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
       case "$file" in
-      */CVS/*) continue;;
       Completion/comp*)
         subdir="`echo $file | sed -e 's%/[^/]*/[^/]*$%%'`"
         instdir="$fndir/Completion"
