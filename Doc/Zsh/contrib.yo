@@ -81,7 +81,9 @@ installation to track the latest developments, you may find that function
 digests compiled with the tt(zcompile) builtin are frequently out of date
 with respect to the function source files.  This is not usually a problem,
 because zsh always looks for the newest file when loading a function, but
-it may cause slower shell startup and function loading.
+it may cause slower shell startup and function loading.  Also, if a digest
+file is explicitly used as element of tt(fpath), zsh won't check whether
+any of its source files has changed.
 
 The tt(zrecompile) autoloadable function, found in tt(Functions/Misc), can
 be used to keep function digests up to date.
