@@ -1464,11 +1464,12 @@ get_comp_string(void)
 			lastbrbeg = new;
 
 			new->next = NULL;
-			new->str = ztrduppfx(bbeg, len);
+			new->str = dupstrpfx(bbeg, len);
+			new->str = ztrdup(bslashquote(new->str, NULL, instring));
 			untokenize(new->str);
 			new->pos = begi;
 			*dbeg = '\0';
-			new->qpos = strlen(quotename(predup, NULL));
+			new->qpos = strlen(bslashquote(predup, NULL, instring));
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
@@ -1511,11 +1512,12 @@ get_comp_string(void)
 			    brbeg = new;
 			lastbrbeg = new;
 
-			new->str = ztrduppfx(bbeg, len);
+			new->str = dupstrpfx(bbeg, len);
+			new->str = ztrdup(bslashquote(new->str, NULL, instring));
 			untokenize(new->str);
 			new->pos = begi;
 			*dbeg = '\0';
-			new->qpos = strlen(quotename(predup, NULL));
+			new->qpos = strlen(bslashquote(predup, NULL, instring));
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
@@ -1547,7 +1549,8 @@ get_comp_string(void)
 		    new->next = brend;
 		    brend = new;
 
-		    new->str = ztrduppfx(bbeg, len);
+		    new->str = dupstrpfx(bbeg, len);
+		    new->str = ztrdup(bslashquote(new->str, NULL, instring));
 		    untokenize(new->str);
 		    new->pos = dp - predup - len + 1;
 		    new->qpos = len;
@@ -1575,11 +1578,12 @@ get_comp_string(void)
 		    brbeg = new;
 		lastbrbeg = new;
 
-		new->str = ztrduppfx(bbeg, len);
+		new->str = dupstrpfx(bbeg, len);
+		new->str = ztrdup(bslashquote(new->str, NULL, instring));
 		untokenize(new->str);
 		new->pos = begi;
 		*dbeg = '\0';
-		new->qpos = strlen(quotename(predup, NULL));
+		new->qpos = strlen(bslashquote(predup, NULL, instring));
 		*dbeg = '{';
 		boffs -= len;
 		strcpy(dbeg, dbeg + len);
@@ -1594,7 +1598,7 @@ get_comp_string(void)
 		    p = bp->pos;
 		    l = bp->qpos;
 		    bp->pos = strlen(predup + p + l);
-		    bp->qpos = strlen(quotename(predup + p + l, NULL));
+		    bp->qpos = strlen(bslashquote(predup + p + l, NULL, instring));
 		    strcpy(predup + p, predup + p + l);
 		}
 	    }

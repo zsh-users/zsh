@@ -1,3 +1,8 @@
+2000-06-29  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12113: Completion/Core/_expand, Src/Zle/zle_tricky.c: quote
+ 	brace-strings
+	
 2000-06-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12112: Src/params.c: Don't make namedirs out of hash elements.

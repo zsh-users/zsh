@@ -59,8 +59,9 @@ if [[ "$force" = *s* ]] ||
    zstyle -T ":completion:${curcontext}:" substitute; then
   [[ ! -o ignorebraces && "${#${exp}//[^\{]}" = "${#${exp}//[^\}]}" ]] &&
       eval exp\=\( ${${(q)exp}:gs/\\{/\{/:gs/\\}/\}/} \)
-  exp=( ${(e)exp//\\[ 	
-]/ } )
+  exp=( ${${(e)exp//\\[ 	
+]/ }//(#b)([ 	
+])/\\$match[1]} )
 else
   exp=( ${exp:s/\\\$/\$} )
 fi
