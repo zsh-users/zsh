@@ -427,8 +427,13 @@ if $first_stage; then
 	    echo "	    done; \\"
 	    if test "$CYGWIN" = yes; then
 		echo "	    echo '# ifndef IMPORTING_MODULE_${q_name} '; \\"
-		echo "	    echo '#  undef mod_import_variable'; \\"
-		echo "	    echo '#  define mod_import_variable __attribute__((__dllimport__))'; \\"
+		echo "      echo '#  ifdef MODULE'; \\"
+		echo "	    echo '#   undef mod_import_variable'; \\"
+		echo "	    echo '#   define mod_import_variable __attribute__((__dllimport__))'; \\"
+		echo "      echo '#  else /* MODULE */'; \\"
+		echo "      echo '#   undef mod_import_variable'; \\"
+		echo "      echo '#   define mod_import_variable'; \\"
+		echo "      echo '#  endif /* MODULE */'; \\"
 		echo "	    echo '# endif /* IMPORTING_MODULE_${q_name} */'; \\"
 	    fi
 	    echo "	    echo; \\"
