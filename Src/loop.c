@@ -38,7 +38,7 @@ int loops;
 /* # of continue levels */
  
 /**/
-int contflag;
+mod_export int contflag;
  
 /* # of break levels */
  

@@ -1008,7 +1008,7 @@ ifnzman(noderef(Local Parameters))\
 retain their special attributes when made local.
 
 For each var(name)tt(=)var(value) assignment, the parameter
-var(name) set to var(value).  Note that arrays currently cannot be
+var(name) is set to var(value).  Note that arrays currently cannot be
 assigned in tt(typeset) expressions, only scalars and integers.
 
 For each remaining var(name) that refers to a parameter that is set, the
