@@ -213,14 +213,9 @@ parseargs(char **argv)
 	    }
 
 	    if (**argv == 'c') {         /* -c command */
-		if (!*++argv) {
-		    zerr("string expected after -c", NULL, 0);
-		    exit(1);
-		}
-		cmd = *argv++;
+		cmd = *argv;
 		opts[INTERACTIVE] &= 1;
 		opts[SHINSTDIN] = 0;
-		goto doneoptions;
 	    } else if (**argv == 'o') {
 		if (!*++*argv)
 		    argv++;
@@ -257,6 +252,13 @@ parseargs(char **argv)
     }
     doneoptions:
     paramlist = newlinklist();
+    if (cmd) {
+	if (!*argv) {
+	    zerr("string expected after -%s", cmd, 0);
+	    exit(1);
+	}
+	cmd = *argv++;
+    }
     if (*argv) {
 	if (unset(SHINSTDIN)) {
 	    argzero = *argv;
