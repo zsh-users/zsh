@@ -1268,7 +1268,7 @@ set_comp_sep(void)
     LinkList foo = newlinklist();
     LinkNode n;
     int owe = we, owb = wb, ocs = cs, swb, swe, scs, soffs, ne = noerrs;
-    int tl, got = 0, i = 0, j, cur = -1, oll = ll, sl;
+    int tl, got = 0, i = 0, j, cur = -1, oll = ll, sl, css = 0;
     int remq = 0, dq = 0, odq, sq = 0, osq, issq = 0, sqq = 0, lsq = 0, qa = 0;
     int ois = instring, oib = inbackt, noffs = lp, ona = noaliases;
     char *tmp, *p, *ns, *ol = (char *) line, sav, *qp, *qs, *ts, qc = '\0';
@@ -1312,6 +1312,10 @@ set_comp_sep(void)
             if (*p == '\\' && p[1] == '\\') {
                 dq++;
                 chuck(p);
+                if (j > cs) {
+                    cs++;
+                    css++;
+                }
                 if (!*p)
                     break;
             }
@@ -1343,9 +1347,13 @@ set_comp_sep(void)
 	if (tok == ENDINPUT || tok == LEXERR)
 	    break;
 	if (tokstr && *tokstr) {
-            for (p = tokstr; dq && *p; p++)
-                if (*p == Bnull)
+            for (p = tokstr; dq && *p; p++) {
+                if (*p == Bnull) {
                     dq--;
+                    if (p[1] == '\\')
+                        dq--;
+                }
+            }
             if (issq) {
                 for (p = tokstr, lsq = 0; *p; p++) {
                     if (sq && *p == Snull)
@@ -1369,7 +1377,7 @@ set_comp_sep(void)
 	    swb = wb - 1 - dq - sq;
 	    swe = we - 1 - dq - sq;
             sqq = lsq;
-	    soffs = cs - swb;
+	    soffs = cs - swb - css;
 	    chuck(p + soffs);
 	    ns = dupstring(p);
 	}
@@ -1423,8 +1431,11 @@ set_comp_sep(void)
 		if (*p == Bnull && p[1]) {
                     if (remq)
                         swb -= 2;
-                    if (odq)
+                    if (odq) {
                         swb--;
+                        if (p[1] == '\\')
+                            swb--;
+                    }
                 }
 	    }
 	    if (p[1] || *p != Bnull) {

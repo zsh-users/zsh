@@ -1,3 +1,9 @@
+2002-05-15  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17163: Src/Zle/compcore.c: follow-up to 17135,
+	backslash-quoted backslashes in double quotes weren't right,
+	yet
+
 2002-05-14  Peter Stephenson  <pws@csr.com>
 
 	* 17162: Src/Modules/tcp.c: prevent warning on gethostbyaddr()
