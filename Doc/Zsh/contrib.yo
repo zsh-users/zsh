@@ -119,9 +119,9 @@ example(zrecompile -p \
            ~/zsh/comp.zwc ~/zsh/Completion/*/_*)
 
 This compiles tt(~/.zshrc) into tt(~/.zshrc.zwc) if that doesn't exist or
-if it is older than tt(~/.zshrc). The wordcode file will be marked for
+if it is older than tt(~/.zshrc). The compiled file will be marked for
 reading instead of mapping. The same is done for tt(~/.zcompdump) and
-tt(~/.zcompdump.zwc), but this wordcode file is marked for mapping. The
+tt(~/.zcompdump.zwc), but this compiled file is marked for mapping. The
 last line re-creates the file tt(~/zsh/comp.zwc) if any of the files
 matching the given pattern is newer than it.
 
