@@ -86,22 +86,13 @@
 emulate -L zsh
 setopt extendedglob
 
-# can't be local since required in EXIT trap
-zcalc_orighist=$HISTFILE
-local temphist=${TMPPREFIX}zcalc_hist.$$ SAVEHIST=$HISTSIZE
-HISTFILE=$temphist
-fc -W
-
-local HISTSIZE=0
-HISTSIZE=$SAVEHIST
-HISTFILE=~/.zcalc_history
-[[ -f $HISTFILE ]] && fc -R
+# push to our own history file
+fc -p ~/.zcalc_history
 
 zcalc_restore() {
     unfunction zcalc_restore
-    fc -W
-    HISTFILE=$zcalc_orighist
-    fc -R
+    # pop back to original history
+    fc -P
 }
 trap zcalc_restore HUP INT QUIT EXIT
 
