@@ -1,5 +1,8 @@
 2001-12-11  Clint Adams  <clint@zsh.org>
 
+	* 16326: Completion/Debian/Command/_dpkg: glob for udebs
+	as well as debs.
+
         * 16326: Completion/Unix/Command/_webbrowser,
         Completion/X/Command/.distfiles, Completion/X/Command/_mozilla:
         completion for mozilla, some more web browsers in _webbrowser.
