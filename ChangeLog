@@ -1,3 +1,8 @@
+2003-07-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 18811: Completion/Unix/Type/_files: needed to quote % in
+	substitution as users/6154 caused it to be interpreted as an anchor
+
 2003-07-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 18520, 13691 (Mario Lang), 13701 (Sven):
