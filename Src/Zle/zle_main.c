@@ -101,6 +101,11 @@ mod_export ZLE_INT_T lastchar_wide;
 /**/
 mod_export int
 lastchar_wide_valid;
+
+/**/
+mod_export ZLE_STRING_T zle_wordchars;
+#else
+# define zle_wordchars wordchars;
 #endif
 
 /* the bindings for the previous and for this key */
@@ -1507,6 +1512,17 @@ trashzle(void)
 	kungetct = 0;
 }
 
+/**/
+mod_export void
+wordcharstrigger(void)
+{
+#ifdef ZLE_UNICODE_SUPPORT
+    zrealloc(zle_wordchars, strlen(wordchars)*MB_CUR_MAX);
+    mbsrtowcs(zle_wordchars, &wordchars, strlen(wordchars), NULL);
+    /* TODO: error handling here */
+#endif
+}
+
 /* Hook functions. Used to allow access to zle parameters if zle is
  * active. */
 
@@ -1572,6 +1588,7 @@ setup_(UNUSED(Module m))
     kungetbuf = (char *) zalloc(kungetsz = 32);
     comprecursive = 0;
     rdstrs = NULL;
+    wordcharstriggerptr = wordcharstrigger;
 
     /* initialise the keymap system */
     init_keymaps();
@@ -1645,6 +1662,7 @@ finish_(UNUSED(Module m))
     zlegetlineptr = NULL;
     zlereadptr = fallback_zleread;
     zlesetkeymapptr= noop_function_int;
+    wordcharstriggerptr = noop_function;
 
     getkeyptr = NULL;
 

@@ -1,3 +1,9 @@
+2005-04-08  Clint Adams  <clint@zsh.org>
+
+	* 21124: Src/Zle/zle_main.c, Src/init.c, Src/params.c:
+	have zle cache a wide-char version of WORDCHARS each time
+	it's changed (when ZLE_UNICODE_SUPPORT is defined).
+
 2005-04-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 21107: configure.ac: handle case where there is a native iconv
