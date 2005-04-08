@@ -1,5 +1,8 @@
 2005-04-08  Clint Adams  <clint@zsh.org>
 
+	* 21125: Src/Zle/zle_main.c: do an initial conversion when
+	zle is loaded.
+
 	* 21124: Src/Zle/zle_main.c, Src/init.c, Src/params.c:
 	have zle cache a wide-char version of WORDCHARS each time
 	it's changed (when ZLE_UNICODE_SUPPORT is defined).

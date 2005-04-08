@@ -1589,6 +1589,7 @@ setup_(UNUSED(Module m))
     comprecursive = 0;
     rdstrs = NULL;
     wordcharstriggerptr = wordcharstrigger;
+    wordcharstrigger();
 
     /* initialise the keymap system */
     init_keymaps();
