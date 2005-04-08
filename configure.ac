@@ -743,6 +743,11 @@ if test "x$ac_cv_header_iconv_h" = "xyes"; then
     if test "x$ac_found_iconv" != "xno"; then
       LIBS="-liconv $LIBS"
     fi
+  else
+    dnl Handle case where there is a native iconv but iconv.h is from libiconv
+    AC_CHECK_DECL(_libiconv_version,
+      [ AC_CHECK_LIB(iconv, libiconv, LIBS="-liconv $LIBS") ],,
+      [ #include <iconv.h> ])
   fi
 fi
 if test "x$ac_found_iconv" = xyes; then

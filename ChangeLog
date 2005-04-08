@@ -1,3 +1,8 @@
+2005-04-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 21107: configure.ac: handle case where there is a native iconv
+	but GNU libiconv's iconv.h is picked up first
+
 2005-04-06  Clint Adams  <clint@zsh.org>
 
 	* 21096: Completion/X/Command/_gv: update for gv 3.6,
