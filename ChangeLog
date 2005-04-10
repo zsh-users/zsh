@@ -1,3 +1,8 @@
+2005-04-10  Clint Adams  <clint@zsh.org>
+
+	* unposted: config.guess, config.sub: update to 2005-03-24 and
+	2005-02-10, respectively.
+
 2005-04-08  Clint Adams  <clint@zsh.org>
 
 	* 21125: Src/Zle/zle_main.c: do an initial conversion when
