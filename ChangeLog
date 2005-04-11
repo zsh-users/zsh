@@ -1,3 +1,9 @@
+2005-04-11  Peter Stephenson  <pws@csr.com>
+
+	* 21131: Src/init.c, Test/A01grammar.ztst: exit with status 127
+	when a script is not found, making the error message more
+	sensible.
+
 2005-04-10  Clint Adams  <clint@zsh.org>
 
 	* unposted: config.guess, config.sub: update to 2005-03-24 and
