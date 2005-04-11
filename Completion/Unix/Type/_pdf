@@ -1,4 +1,4 @@
-#compdef pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf pdfopt pdffonts kpdf
+#compdef pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext pdfopt pdffonts kpdf
 
 local expl ext=''
 
@@ -8,7 +8,7 @@ local expl ext=''
 #  pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf pdffonts
 
 if [[ "$1" == '-z' ]]; then
-  ext='(|.gz|.Z)'
+  ext='(|.gz|.bz2|.Z)'
   shift
 fi
 

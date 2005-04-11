@@ -1,3 +1,9 @@
+2005-04-11  Clint Adams  <clint@zsh.org>
+
+	* 21132: Completion/Unix/Type/_pdf, Completion/X/Command/_xpdf:
+	complete xpdf options, and also complete .pdf.bz2 files when
+	completing compressed PDF files.
+
 2005-04-11  Peter Stephenson  <pws@csr.com>
 
 	* 21131: Src/init.c, Test/A01grammar.ztst: exit with status 127
