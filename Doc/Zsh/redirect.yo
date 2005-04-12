@@ -149,6 +149,31 @@ file descriptor 2 would be associated
 with the terminal (assuming file descriptor 1 had been)
 and then file descriptor 1 would be associated with file var(fname).
 
+If instead of a digit one of the operators above is preceded by
+a valid identifier enclosed in braces, the shell will open a new
+file descriptor that is guaranteed to be at least 10 and set the
+parameter named by the identifier to the file descriptor opened.
+No whitespace is allowed between the closing brace and the redirection
+character.  The option tt(IGNORE_BRACES) must not be set.
+For example:
+
+indent(... {myfd}>&1)
+
+This opens a new file descriptor that is a duplicate of file descriptor
+1 and sets the parameter tt(myfd) to the number of the file descriptor,
+which will be at least 10.  The new file descriptor can be written to using
+the syntax tt(>&$myfd).
+
+The syntax tt({)var(varid)tt(}>&-), for example tt({myfd}>&-), may be used
+to close a file descriptor opened in this fashion.  Note that the
+parameter given by var(varid) must previously be set to a file descriptor
+in this case.
+
+It is an error to open or close a file descriptor in this fashion when the
+parameter is readonly.  However, it is not an error to read or write a file
+descriptor using tt(<&$)var(param) or tt(>&$)var(param) if var(param) is
+readonly.
+
 The `tt(|&)' command separator described in
 ifzman(em(Simple Commands & Pipelines) in zmanref(zshmisc))\
 ifnzman(noderef(Simple Commands & Pipelines))

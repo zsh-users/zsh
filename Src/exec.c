@@ -1293,7 +1293,8 @@ execpline2(Estate state, wordcode pcode,
 	wordcode code;
 
 	state->pc++;
-	for (pc = state->pc; wc_code(code = *pc) == WC_REDIR; pc += 3);
+	for (pc = state->pc; wc_code(code = *pc) == WC_REDIR;
+	     pc += WC_REDIR_WORDS(code));
 
 	mpipe(pipes);
 
@@ -1532,32 +1533,52 @@ closeallelse(struct multio *mn)
 	}
 }
 
-/* A multio is a list of fds associated with a certain fd.       *
- * Thus if you do "foo >bar >ble", the multio for fd 1 will have *
- * two fds, the result of open("bar",...), and the result of     *
- * open("ble",....).                                             */
+/*
+ * A multio is a list of fds associated with a certain fd.
+ * Thus if you do "foo >bar >ble", the multio for fd 1 will have
+ * two fds, the result of open("bar",...), and the result of
+ * open("ble",....).
+ */
 
-/* Add a fd to an multio.  fd1 must be < 10, and may be in any state. *
- * fd2 must be open, and is `consumed' by this function.  Note that   *
- * fd1 == fd2 is possible, and indicates that fd1 was really closed.  *
- * We effectively do `fd2 = movefd(fd2)' at the beginning of this     *
- * function, but in most cases we can avoid an extra dup by delaying  *
- * the movefd: we only >need< to move it if we're actually doing a    *
- * multiple redirection.                                              */
+/*
+ * Add a fd to an multio.  fd1 must be < 10, and may be in any state.
+ * fd2 must be open, and is `consumed' by this function.  Note that
+ * fd1 == fd2 is possible, and indicates that fd1 was really closed.
+ * We effectively do `fd2 = movefd(fd2)' at the beginning of this
+ * function, but in most cases we can avoid an extra dup by delaying
+ * the movefd: we only >need< to move it if we're actually doing a
+ * multiple redirection.
+ *
+ * If varid is not NULL, we open an fd above 10 and set the parameter
+ * named varid to that value.  fd1 is not used.
+ */
 
 /**/
 static void
-addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag)
+addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
+      char *varid)
 {
     int pipes[2];
 
-    if (!mfds[fd1] || unset(MULTIOS)) {
+    if (varid) {
+	/* fd will be over 10, don't touch mfds */
+	fd1 = movefd(fd2);
+	fdtable[fd1] = FDT_EXTERNAL;
+	setiparam(varid, (zlong)fd1);
+	/*
+	 * If setting the parameter failed, close the fd else
+	 * it will leak.
+	 */
+	if (errflag)
+	    zclose(fd1);
+    } else if (!mfds[fd1] || unset(MULTIOS)) {
 	if(!mfds[fd1]) {		/* starting a new multio */
 	    mfds[fd1] = (struct multio *) zhalloc(sizeof(struct multio));
 	    if (!forked && save[fd1] == -2)
 		save[fd1] = (fd1 == fd2) ? -1 : movefd(fd1);
 	}
-	redup(fd2, fd1);
+	if (!varid)
+	    redup(fd2, fd1);
 	mfds[fd1]->ct = 1;
 	mfds[fd1]->fds[0] = fd1;
 	mfds[fd1]->rflag = rflag;
@@ -2207,9 +2228,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     /* Add pipeline input/output to mnodes */
     if (input)
-	addfd(forked, save, mfds, 0, input, 0);
+	addfd(forked, save, mfds, 0, input, 0, NULL);
     if (output)
-	addfd(forked, save, mfds, 1, output, 1);
+	addfd(forked, save, mfds, 1, output, 1, NULL);
 
     /* Do process substitutions */
     if (redir)
@@ -2226,14 +2247,14 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		fixfds(save);
 		execerr();
 	    }
-	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 0);
+	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 0, fn->varid);
 	} else if (fn->type == REDIR_OUTPIPE) {
 	    if (fn->fd2 == -1) {
 		closemnodes(mfds);
 		fixfds(save);
 		execerr();
 	    }
-	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 1);
+	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 1, fn->varid);
 	} else {
 	    if (fn->type != REDIR_HERESTR && xpandredir(fn, redir))
 		continue;
@@ -2258,7 +2279,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			zwarn("%e", NULL, errno);
 		    execerr();
 		}
-		addfd(forked, save, mfds, fn->fd1, fil, 0);
+		addfd(forked, save, mfds, fn->fd1, fil, 0, fn->varid);
 		break;
 	    case REDIR_READ:
 	    case REDIR_READWRITE:
@@ -2274,7 +2295,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			zwarn("%e: %s", fn->name, errno);
 		    execerr();
 		}
-		addfd(forked, save, mfds, fn->fd1, fil, 0);
+		addfd(forked, save, mfds, fn->fd1, fil, 0, fn->varid);
 		/* If this is 'exec < file', read from stdin, *
 		 * not terminal, unless `file' is a terminal. */
 		if (nullexec == 1 && fn->fd1 == 0 &&
@@ -2282,9 +2303,32 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    init_io();
 		break;
 	    case REDIR_CLOSE:
+		if (fn->varid) {
+		    char *s = fn->varid;
+		    struct value vbuf;
+		    Value v;
+		    int bad = 0;
+
+		    if (!(v = getvalue(&vbuf, &s, 0))) {
+			bad = 1;
+		    } else if (v->pm->flags & PM_READONLY) {
+			bad = 2;
+		    } else {
+			fn->fd1 = (int)getintvalue(v);
+			bad = errflag;
+		    }
+		    if (bad) {
+			zwarn(bad == 2 ?
+			      "can't close file descriptor from readonly parameter" :
+			      "parameter %s does not contain a file descriptor",
+			      fn->varid, 0);
+			execerr();
+		    }
+		}
 		if (!forked && fn->fd1 < 10 && save[fn->fd1] == -2)
 		    save[fn->fd1] = movefd(fn->fd1);
-		closemn(mfds, fn->fd1);
+		if (fn->fd1 < 10)
+		    closemn(mfds, fn->fd1);
 		zclose(fn->fd1);
 		break;
 	    case REDIR_MERGEIN:
@@ -2292,7 +2336,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (fn->fd2 < 10)
 		    closemn(mfds, fn->fd2);
 		if (fn->fd2 > 9 &&
-		    (fdtable[fn->fd2] != FDT_UNUSED ||
+		    ((fdtable[fn->fd2] != FDT_UNUSED &&
+		      fdtable[fn->fd2] != FDT_EXTERNAL) ||
 		     fn->fd2 == coprocin ||
 		     fn->fd2 == coprocout)) {
 		    fil = -1;
@@ -2313,7 +2358,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    zwarn("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr, errno);
 		    execerr();
 		}
-		addfd(forked, save, mfds, fn->fd1, fil, fn->type == REDIR_MERGEOUT);
+		addfd(forked, save, mfds, fn->fd1, fil,
+		      fn->type == REDIR_MERGEOUT, fn->varid);
 		break;
 	    default:
 		if (IS_APPEND_REDIR(fn->type))
@@ -2336,10 +2382,13 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			zwarn("%e: %s", fn->name, errno);
 		    execerr();
 		}
-		addfd(forked, save, mfds, fn->fd1, fil, 1);
+		addfd(forked, save, mfds, fn->fd1, fil, 1, fn->varid);
 		if(IS_ERROR_REDIR(fn->type))
-		    addfd(forked, save, mfds, 2, dfil, 1);
+		    addfd(forked, save, mfds, 2, dfil, 1, NULL);
 		break;
+	    }
+	    if (errflag) {
+		execerr();
 	    }
 	}
     }
@@ -2845,6 +2894,7 @@ getoutput(char *cmd, int qt)
 	WC_SUBLIST_TYPE(pc[1]) == WC_SUBLIST_END &&
 	wc_code(pc[2]) == WC_PIPE && WC_PIPE_TYPE(pc[2]) == WC_PIPE_END &&
 	wc_code(pc[3]) == WC_REDIR && WC_REDIR_TYPE(pc[3]) == REDIR_READ && 
+	!WC_REDIR_VARID(pc[3]) &&
 	!pc[4] &&
 	wc_code(pc[6]) == WC_SIMPLE && !WC_SIMPLE_ARGC(pc[6])) {
 	/* $(< word) */

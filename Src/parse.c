@@ -111,6 +111,8 @@ struct heredocs *hdocs;
  *     - must precede command-code (or WC_ASSIGN)
  *     - data contains type (<, >, ...)
  *     - followed by fd1 and name from struct redir
+ *     - for the extended form {var}>... where the fd is assigned
+ *       to var, there is an extra item to contain var
  *
  *   WC_ASSIGN
  *     - data contains type (scalar, array) and number of array-elements
@@ -737,7 +739,8 @@ par_pline(int *complex)
     } else if (tok == BARAMP) {
 	int r;
 
-	for (r = p + 1; wc_code(ecbuf[r]) == WC_REDIR; r += 3);
+	for (r = p + 1; wc_code(ecbuf[r]) == WC_REDIR;
+	     r += WC_REDIR_WORDS(ecbuf[r]));
 
 	ecispace(r, 3);
 	ecbuf[r] = WCB_REDIR(REDIR_MERGEOUT);
@@ -779,8 +782,7 @@ par_cmd(int *complex)
     if (IS_REDIROP(tok)) {
 	*complex = 1;
 	while (IS_REDIROP(tok)) {
-	    nr++;
-	    par_redir(&r);
+	    nr += par_redir(&r, NULL);
 	}
     }
     switch (tok) {
@@ -871,10 +873,10 @@ par_cmd(int *complex)
 		if (!nr)
 		    return 0;
 	    } else {
-		/* Three codes per redirection. */
+		/* Take account of redirections */
 		if (sr > 1) {
 		    *complex = 1;
-		    r += (sr - 1) * 3;
+		    r += sr - 1;
 		}
 	    }
 	}
@@ -883,7 +885,7 @@ par_cmd(int *complex)
     if (IS_REDIROP(tok)) {
 	*complex = 1;
 	while (IS_REDIROP(tok))
-	    par_redir(&r);
+	    (void)par_redir(&r, NULL);
     }
     incmdpos = 1;
     incasepat = 0;
@@ -1510,6 +1512,9 @@ par_dinbrack(void)
  * simple	: { COMMAND | EXEC | NOGLOB | NOCORRECT | DASH }
 					{ STRING | ENVSTRING | ENVARRAY wordlist OUTPAR | redir }
 					[ INOUTPAR { SEPER } ( list1 | INBRACE list OUTBRACE ) ]
+ *
+ * Returns 0 if no code, else 1 plus the number of code words
+ * used up by redirections.
  */
 
 /**/
@@ -1517,7 +1522,7 @@ static int
 par_simple(int *complex, int nr)
 {
     int oecused = ecused, isnull = 1, r, argc = 0, p, isfunc = 0, sr = 0;
-    int c = *complex;
+    int c = *complex, nrediradd;
 
     r = ecused;
     for (;;) {
@@ -1576,16 +1581,55 @@ par_simple(int *complex, int nr)
 
     for (;;) {
 	if (tok == STRING) {
+	    int redir_var = 0;
+
 	    *complex = 1;
 	    incmdpos = 0;
-	    ecstr(tokstr);
-	    argc++;
-	    yylex();
+
+	    if (!isset(IGNOREBRACES) && *tokstr == Inbrace)
+	    {
+		char *eptr = tokstr + strlen(tokstr) - 1;
+		char *ptr = eptr;
+
+		if (*ptr == Outbrace && ptr > tokstr + 1)
+		{
+		    while (--ptr > tokstr)
+			if (!iident(*ptr))
+			    break;
+		    if (ptr == tokstr)
+		    {
+			char *toksave = tokstr;
+			char *idstring = dupstrpfx(tokstr+1, eptr-tokstr-1);
+			redir_var = 1;
+			yylex();
+
+			if (IS_REDIROP(tok) && tokfd == -1)
+			{
+			    *complex = c = 1;
+			    nrediradd = par_redir(&r, idstring);
+			    p += nrediradd;
+			    sr += nrediradd;
+			}
+			else
+			{
+			    ecstr(toksave);
+			    argc++;
+			}
+		    }
+		}
+	    }
+
+	    if (!redir_var)
+	    {
+		ecstr(tokstr);
+		argc++;
+		yylex();
+	    }
 	} else if (IS_REDIROP(tok)) {
 	    *complex = c = 1;
-	    par_redir(&r);
-	    p += 3;		/* 3 codes per redirection */
-	    sr++;
+	    nrediradd = par_redir(&r, NULL);
+	    p += nrediradd;
+	    sr += nrediradd;
 	} else if (tok == INOUTPAR) {
 	    int oldlineno = lineno, onp, so, oecssub = ecssub;
 
@@ -1670,6 +1714,8 @@ par_simple(int *complex, int nr)
 
 /*
  * redir	: ( OUTANG | ... | TRINANG ) STRING
+ *
+ * Return number of code words required for redirection
  */
 
 static int redirtab[TRINANG - OUTANG + 1] = {
@@ -1691,10 +1737,10 @@ static int redirtab[TRINANG - OUTANG + 1] = {
 };
 
 /**/
-static void
-par_redir(int *rp)
+static int
+par_redir(int *rp, char *idstring)
 {
-    int r = *rp, type, fd1, oldcmdpos, oldnc;
+    int r = *rp, type, fd1, oldcmdpos, oldnc, ncodes;
     char *name;
 
     oldcmdpos = incmdpos;
@@ -1706,7 +1752,7 @@ par_redir(int *rp)
     fd1 = tokfd;
     yylex();
     if (tok != STRING && tok != ENVSTRING)
-	YYERRORV(ecused);
+	YYERROR(ecused);
     incmdpos = oldcmdpos;
     nocorrect = oldnc;
 
@@ -1721,23 +1767,35 @@ par_redir(int *rp)
     case REDIR_HEREDOCDASH: {
 	/* <<[-] name */
 	struct heredocs **hd;
+	int htype = type;
 
-	/* If we ever need more than three codes (or less), we have to change
-	 * the factors in par_cmd() and par_simple(), too. */
-	ecispace(r, 3);
-	*rp = r + 3;
+	if (idstring)
+	{
+	    type |= REDIR_VARID_MASK;
+	    ncodes = 4;
+	}
+	else
+	    ncodes = 3;
+
+	/* If we ever to change the number of codes, we have to change
+	 * the definition of WC_REDIR_WORDS. */
+	ecispace(r, ncodes);
+	*rp = r + ncodes;
 	ecbuf[r] = WCB_REDIR(type);
 	ecbuf[r + 1] = fd1;
+
+	if (idstring)
+	    ecbuf[r + 3] = ecstrcode(idstring);
 
 	for (hd = &hdocs; *hd; hd = &(*hd)->next);
 	*hd = zalloc(sizeof(struct heredocs));
 	(*hd)->next = NULL;
-	(*hd)->type = type;
+	(*hd)->type = htype;
 	(*hd)->pc = r;
 	(*hd)->str = tokstr;
 
 	yylex();
-	return;
+	return ncodes;
     }
     case REDIR_WRITE:
     case REDIR_WRITENOW:
@@ -1745,14 +1803,14 @@ par_redir(int *rp)
 	    /* > >(...) */
 	    type = REDIR_OUTPIPE;
 	else if (tokstr[0] == Inang && tokstr[1] == Inpar)
-	    YYERRORV(ecused);
+	    YYERROR(ecused);
 	break;
     case REDIR_READ:
 	if (tokstr[0] == Inang && tokstr[1] == Inpar)
 	    /* < <(...) */
 	    type = REDIR_INPIPE;
 	else if (tokstr[0] == Outang && tokstr[1] == Inpar)
-	    YYERRORV(ecused);
+	    YYERROR(ecused);
 	break;
     case REDIR_READWRITE:
 	if ((tokstr[0] == Inang || tokstr[0] == Outang) && tokstr[1] == Inpar)
@@ -1761,13 +1819,25 @@ par_redir(int *rp)
     }
     yylex();
 
-    /* If we ever need more than three codes (or less), we have to change
-     * the factors in par_cmd() and par_simple(), too. */
-    ecispace(r, 3);
-    *rp = r + 3;
+    /* If we ever to change the number of codes, we have to change
+     * the definition of WC_REDIR_WORDS. */
+    if (idstring)
+    {
+	type |= REDIR_VARID_MASK;
+	ncodes = 4;
+    }
+    else
+	ncodes = 3;
+
+    ecispace(r, ncodes);
+    *rp = r + ncodes;
     ecbuf[r] = WCB_REDIR(type);
     ecbuf[r + 1] = fd1;
     ecbuf[r + 2] = ecstrcode(name);
+    if (idstring)
+	ecbuf[r + 3] = ecstrcode(idstring);
+
+    return ncodes;
 }
 
 /**/
@@ -2316,6 +2386,10 @@ ecgetredirs(Estate s)
 	r->type = WC_REDIR_TYPE(code);
 	r->fd1 = *s->pc++;
 	r->name = ecgetstr(s, EC_DUP, NULL);
+	if (WC_REDIR_VARID(code))
+	    r->varid = ecgetstr(s, EC_DUP, NULL);
+	else
+	    r->varid = NULL;
 
 	addlinknode(ret, r);
 

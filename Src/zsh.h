@@ -246,6 +246,8 @@ enum {
     REDIR_INPIPE,		/* < <(...) */
     REDIR_OUTPIPE		/* > >(...) */
 };
+#define REDIR_TYPE_MASK	(0x1f)
+#define REDIR_VARID_MASK (0x20)
 
 #define IS_WRITE_FILE(X)      ((X)>=REDIR_WRITE && (X)<=REDIR_READWRITE)
 #define IS_APPEND_REDIR(X)    (IS_WRITE_FILE(X) && ((X) & 2))
@@ -267,9 +269,14 @@ enum {
  */
 #define FDT_INTERNAL		1
 /*
+ * Entry visible to other processes, for example created using
+ * the {varid}> file syntax.
+ */
+#define FDT_EXTERNAL		2
+/*
  * Entry used by output from the XTRACE option.
  */
-#define FDT_XTRACE		2
+#define FDT_XTRACE		3
 #ifdef PATH_DEV_FD
 /*
  * Entry used by a process substition.
@@ -277,7 +284,7 @@ enum {
  * decremented on exit; we don't close entries greater than
  * FDT_PROC_SUBST except when closing everything.
  */
-#define FDT_PROC_SUBST		3
+#define FDT_PROC_SUBST		4
 #endif
 
 /* Flags for input stack */
@@ -453,6 +460,7 @@ struct redir {
     int type;
     int fd1, fd2;
     char *name;
+    char *varid;
 };
 
 /* The number of fds space is allocated for  *
@@ -629,8 +637,11 @@ struct eccstr {
 #define WC_PIPE_LINENO(C)   (wc_data(C) >> 1)
 #define WCB_PIPE(T,L)       wc_bld(WC_PIPE, ((T) | ((L) << 1)))
 
-#define WC_REDIR_TYPE(C)    wc_data(C)
+#define WC_REDIR_TYPE(C)    (wc_data(C) & REDIR_TYPE_MASK)
+#define WC_REDIR_VARID(C)   (wc_data(C) & REDIR_VARID_MASK)
 #define WCB_REDIR(T)        wc_bld(WC_REDIR, (T))
+/* Size of redir is 4 words if REDIR_VARID_MASK is set, else 3 */
+#define WC_REDIR_WORDS(C)   (WC_REDIR_VARID(C) ? 4 : 3)
 
 #define WC_ASSIGN_TYPE(C)   (wc_data(C) & ((wordcode) 1))
 #define WC_ASSIGN_TYPE2(C)  ((wc_data(C) & ((wordcode) 2)) >> 1)

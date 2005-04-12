@@ -235,3 +235,28 @@
 0:null redir with NULLCMD=cat
 <input
 >input
+
+  exec {myfd}>logfile
+  print This is my logfile. >&$myfd
+  print Examining contents of logfile...
+  cat logfile
+0:Using {fdvar}> syntax to open a new file descriptor
+>Examining contents of logfile...
+>This is my logfile.
+
+  exec {myfd}>&-
+  print This message should disappear >&$myfd
+1q:Closing file descriptor using brace syntax
+?(eval):2: $myfd: bad file descriptor
+
+  typeset -r myfd
+  echo This should not appear {myfd}>nologfile
+1:Error opening file descriptor using readonly variable
+?(eval):2: read-only variable: myfd
+
+  typeset +r myfd
+  exec {myfd}>newlogfile
+  typeset -r myfd
+  exec {myfd}>&-
+1:Error closing file descriptor using readonly variable
+?(eval):4: can't close file descriptor from readonly parameter

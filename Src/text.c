@@ -789,10 +789,15 @@ getredirs(LinkList redirs)
 	case REDIR_MERGEOUT:
 	case REDIR_INPIPE:
 	case REDIR_OUTPIPE:
-	    if (f->fd1 != (IS_READFD(f->type) ? 0 : 1))
+	    if (f->varid) {
+		taddchr('{');
+		taddstr(f->varid);
+		taddchr('}');
+	    } else if (f->fd1 != (IS_READFD(f->type) ? 0 : 1))
 		taddchr('0' + f->fd1);
 	    taddstr(fstr[f->type]);
-	    taddchr(' ');
+	    if (f->type != REDIR_MERGEIN && f->type != REDIR_MERGEOUT)
+		taddchr(' ');
 	    if (f->type == REDIR_HERESTR) {
                 if (has_token(f->name)) {
                     taddchr('\"');
