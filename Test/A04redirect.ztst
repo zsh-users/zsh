@@ -3,6 +3,10 @@
 %prep
   mkdir redir.tmp && cd redir.tmp
 
+  myfd=99
+  (echo >&$myfd) 2>msg
+  bad_fd_msg="${$(<msg)##*:}"
+
 %test
 
   print 'This is file redir' >redir  &&  cat redir
@@ -247,7 +251,7 @@
   exec {myfd}>&-
   print This message should disappear >&$myfd
 1q:Closing file descriptor using brace syntax
-?(eval):2: $myfd: bad file descriptor
+?(eval):2: $myfd:$bad_fd_msg
 
   typeset -r myfd
   echo This should not appear {myfd}>nologfile

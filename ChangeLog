@@ -1,5 +1,8 @@
 2005-04-12  Peter Stephenson  <pws@csr.com>
 
+	* 21134: Test/A04redirect.ztst: error for bad file descriptor
+	can vary between systems.
+
 	* 21133: Doc/Zsh/redirect.yo, Src/exec.c, Src/parse.c, Src/text.c,
 	Src/zsh.h, Test/A04redirect.ztst: New {myfd}> syntax for
 	allocating file descriptors.
