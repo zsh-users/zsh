@@ -1,3 +1,8 @@
+2005-04-12  Clint Adams  <clint@zsh.org>
+
+	* 21135: Completion/Unix/Command/_screen: complete attached
+	sessions after screen -x.
+
 2005-04-11  Clint Adams  <clint@zsh.org>
 
 	* 21132: Completion/Unix/Type/_pdf, Completion/X/Command/_xpdf:
