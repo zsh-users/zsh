@@ -83,7 +83,7 @@ _arguments -C \
   '-U[tell screen to use UTF-8 encoding]' \
   '(-)-v[print screen version]' \
   '(-)-wipe[do nothing, clean up SockDir]' \
-  '-x[attach to a not detached screen (multi display mode)]' \
+  '-x[attach to a not detached screen (multi display mode)]: :->attached-sessions' \
   '-X[execute command as a screen command in the specified session]:screencmd:(${scr_cmds[@]})' \
   '*::arguments: _normal'
 
