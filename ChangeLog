@@ -1,3 +1,8 @@
+2005-04-13  Peter Stephenson  <pws@csr.com>
+
+	* 21136: Test/C03traps.ztst: don't leave TRAPEXIT file lying
+	around in Test directory.
+
 2005-04-12  Clint Adams  <clint@zsh.org>
 
 	* 21135: Completion/Unix/Command/_screen: complete attached
