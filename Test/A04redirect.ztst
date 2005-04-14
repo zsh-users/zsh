@@ -248,6 +248,11 @@
 >Examining contents of logfile...
 >This is my logfile.
 
+  setopt noclobber
+  exec {myfd}>logfile2
+1q:NO_CLOBBER prevents overwriting parameter with allocated fd
+?(eval):2: can't clobber parameter myfd containing file descriptor $myfd
+
   exec {myfd}>&-
   print This message should disappear >&$myfd
 1q:Closing file descriptor using brace syntax
@@ -256,7 +261,7 @@
   typeset -r myfd
   echo This should not appear {myfd}>nologfile
 1:Error opening file descriptor using readonly variable
-?(eval):2: read-only variable: myfd
+?(eval):2: can't allocate file descriptor to readonly parameter myfd
 
   typeset +r myfd
   exec {myfd}>newlogfile

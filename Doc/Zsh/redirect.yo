@@ -174,6 +174,27 @@ parameter is readonly.  However, it is not an error to read or write a file
 descriptor using tt(<&$)var(param) or tt(>&$)var(param) if var(param) is
 readonly.
 
+If the option tt(CLOBBER) is unset, it is an error to open a file
+descriptor using a parameter that is already set to an open file descriptor
+previously allocated by this mechanism.  Unsetting the parameter before
+using it for allocating a file descriptor avoids the error.
+
+Note that this mechanism merely allocates or closes a file descriptor; it
+does not perform any redirections from or to it.  It is usually convenient
+to allocate a file descriptor prior to use as an argument to tt(exec).  The
+following shows a typical sequence of allocation, use, and closing of a
+file descriptor:
+
+example(integer myfd
+exec {myfd}>~/logs/mylogfile.txt
+print This is a log message. >&$myfd
+exec {myfd}>&-)
+
+Note that the expansion of the variable in the expression tt(>&$myfd)
+occurs at the point the redirection is opened.  This is after the expansion
+of command arguments and after any redirections to the left on the command
+line have been processed.
+
 The `tt(|&)' command separator described in
 ifzman(em(Simple Commands & Pipelines) in zmanref(zshmisc))\
 ifnzman(noderef(Simple Commands & Pipelines))
@@ -229,6 +250,10 @@ or even
 example(sort <f{oo,ubar})
 
 is equivalent to `tt(cat foo fubar | sort)'.
+
+Expansion of the redirection argument occurs at the point the redirection
+is opened, at the point described above for the expansion of the variable
+in tt(>&$myfd).
 
 Note that a pipe is an implicit redirection; thus
 

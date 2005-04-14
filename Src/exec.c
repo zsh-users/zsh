@@ -1405,6 +1405,41 @@ untokenize(char *s)
     }
 }
 
+/* Check that we can use a parameter for allocating a file descriptor. */
+
+static int
+checkclobberparam(struct redir *f)
+{
+    struct value vbuf;
+    Value v;
+    char *s = f->varid;
+    int fd;
+
+    if (!s)
+	return 1;
+
+    if (!(v = getvalue(&vbuf, &s, 0)))
+	return 1;
+
+    if (v->pm->flags & PM_READONLY) {
+	zwarn("can't allocate file descriptor to readonly parameter %s",
+	      f->varid, 0);
+	/* don't flag a system error for this */
+	errno = 0;
+	return 0;
+    }
+
+    if (!isset(CLOBBER) && (fd = (int)getintvalue(v)) &&
+	fd <= max_zsh_fd && fdtable[fd] == FDT_EXTERNAL) {
+	zwarn("can't clobber parameter %s containing file descriptor %d",
+	     f->varid, fd);
+	/* don't flag a system error for this */
+	errno = 0;
+	return 0;
+    }
+    return 1;
+}
+
 /* Open a file for writing redirection */
 
 /**/
@@ -2239,17 +2274,22 @@ execcmd(Estate state, int input, int output, int how, int last1)
     /* Do io redirections */
     while (redir && nonempty(redir)) {
 	fn = (Redir) ugetnode(redir);
+
 	DPUTS(fn->type == REDIR_HEREDOC || fn->type == REDIR_HEREDOCDASH,
 	      "BUG: unexpanded here document");
 	if (fn->type == REDIR_INPIPE) {
-	    if (fn->fd2 == -1) {
+	    if (!checkclobberparam(fn) || fn->fd2 == -1) {
+		if (fn->fd2 != -1)
+		    zclose(fn->fd2);
 		closemnodes(mfds);
 		fixfds(save);
 		execerr();
 	    }
 	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 0, fn->varid);
 	} else if (fn->type == REDIR_OUTPIPE) {
-	    if (fn->fd2 == -1) {
+	    if (!checkclobberparam(fn) || fn->fd2 == -1) {
+		if (fn->fd2 != -1)
+		    zclose(fn->fd2);
 		closemnodes(mfds);
 		fixfds(save);
 		execerr();
@@ -2271,11 +2311,14 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		continue;
 	    switch(fn->type) {
 	    case REDIR_HERESTR:
-		fil = getherestr(fn);
+		if (!checkclobberparam(fn))
+		    fil = -1;
+		else
+		    fil = getherestr(fn);
 		if (fil == -1) {
 		    closemnodes(mfds);
 		    fixfds(save);
-		    if (errno != EINTR)
+		    if (errno && errno != EINTR)
 			zwarn("%e", NULL, errno);
 		    execerr();
 		}
@@ -2283,7 +2326,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		break;
 	    case REDIR_READ:
 	    case REDIR_READWRITE:
-		if (fn->type == REDIR_READ)
+		if (!checkclobberparam(fn))
+		    fil = -1;
+		else if (fn->type == REDIR_READ)
 		    fil = open(unmeta(fn->name), O_RDONLY | O_NOCTTY);
 		else
 		    fil = open(unmeta(fn->name),
@@ -2335,7 +2380,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    case REDIR_MERGEOUT:
 		if (fn->fd2 < 10)
 		    closemn(mfds, fn->fd2);
-		if (fn->fd2 > 9 &&
+		if (!checkclobberparam(fn))
+		    fil = -1;
+		else if (fn->fd2 > 9 &&
 		    ((fdtable[fn->fd2] != FDT_UNUSED &&
 		      fdtable[fn->fd2] != FDT_EXTERNAL) ||
 		     fn->fd2 == coprocin ||
@@ -2355,14 +2402,18 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    fixfds(save);
 		    if (fn->fd2 != -2)
 		    	sprintf(fdstr, "%d", fn->fd2);
-		    zwarn("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr, errno);
+		    if (errno)
+			zwarn("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr,
+			      errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil,
 		      fn->type == REDIR_MERGEOUT, fn->varid);
 		break;
 	    default:
-		if (IS_APPEND_REDIR(fn->type))
+		if (!checkclobberparam(fn))
+		    fil = -1;
+		else if (IS_APPEND_REDIR(fn->type))
 		    fil = open(unmeta(fn->name),
 			       (unset(CLOBBER) && !IS_CLOBBER_REDIR(fn->type)) ?
 			       O_WRONLY | O_APPEND | O_NOCTTY :
@@ -2378,7 +2429,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			close(fil);
 		    closemnodes(mfds);
 		    fixfds(save);
-		    if (errno != EINTR)
+		    if (errno && errno != EINTR)
 			zwarn("%e: %s", fn->name, errno);
 		    execerr();
 		}
@@ -2387,7 +2438,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    addfd(forked, save, mfds, 2, dfil, 1, NULL);
 		break;
 	    }
+	    /* May be error in addfd due to setting parameter. */
 	    if (errflag) {
+		closemnodes(mfds);
+		fixfds(save);
 		execerr();
 	    }
 	}
@@ -3234,6 +3288,9 @@ mpipe(int *pp)
  * If the second argument is 1, this is part of
  * an "exec < <(...)" or "exec > >(...)" and we shouldn't
  * wait for the job to finish before continuing.
+ * Likewise, we shouldn't wait if we are opening the file
+ * descriptor using the {fd}>>(...) notation since it stays
+ * valid for subsequent commands.
  */
 
 /**/
@@ -3249,7 +3306,7 @@ spawnpipes(LinkList l, int nullexec)
 	f = (Redir) getdata(n);
 	if (f->type == REDIR_OUTPIPE || f->type == REDIR_INPIPE) {
 	    str = f->name;
-	    f->fd2 = getpipe(str, nullexec);
+	    f->fd2 = getpipe(str, nullexec || f->varid);
 	}
     }
 }
