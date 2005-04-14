@@ -12,6 +12,8 @@
     true
   fi
 
+  function copycat { cat "$@" }
+
 %test
   paste <(cut -f1 FILE1) <(cut -f3 FILE2)
 0:<(...) substitution
@@ -29,3 +31,8 @@
 >< First	Second	Third	Fourth
 >---
 >> Erste	Zweite	Dritte	Vierte
+
+  copycat <(print First) <(print Zweite)
+0:FDs remain open for external commands called from functions
+>First
+>Zweite

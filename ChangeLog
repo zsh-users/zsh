@@ -1,3 +1,7 @@
+2005-04-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21064: Test/D03procsubst.ztst: test case for 21049.
+
 2005-04-13  Peter Stephenson  <pws@csr.com>
 
 	* 21136: Test/C03traps.ztst: don't leave TRAPEXIT file lying
