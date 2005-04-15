@@ -77,7 +77,7 @@ long lastval2;
  * by zclose.                                                      */
 
 /**/
-unsigned char *fdtable;
+mod_export unsigned char *fdtable;
 
 /* The allocated size of fdtable */
 
@@ -87,7 +87,7 @@ int fdtable_size;
 /* The highest fd that marked with nonzero in fdtable */
 
 /**/
-int max_zsh_fd;
+mod_export int max_zsh_fd;
 
 /* input fd from the coprocess */
 
@@ -2360,13 +2360,22 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			bad = 2;
 		    } else {
 			fn->fd1 = (int)getintvalue(v);
-			bad = errflag;
+			if (errflag)
+			    bad = 1;
+			else if (fn->fd1 > max_zsh_fd)
+			    bad = 3;
+			else if (fn->fd1 >= 10 &&
+				 fdtable[fn->fd1] == FDT_INTERNAL)
+			    bad = 4;
 		    }
 		    if (bad) {
-			zwarn(bad == 2 ?
-			      "can't close file descriptor from readonly parameter" :
-			      "parameter %s does not contain a file descriptor",
-			      fn->varid, 0);
+			const char *bad_msg[] = {
+			    "parameter %s does not contain a file descriptor",
+			    "can't close file descriptor from readonly parameter %s",
+			    "file descriptor %d out of range, not closed",
+			    "file descriptor %d used by shell, not closed"
+			};
+			zwarn(bad_msg[bad-1], fn->varid, fn->fd1);
 			execerr();
 		    }
 		}

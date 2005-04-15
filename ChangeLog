@@ -1,3 +1,8 @@
+2005-04-15  Peter Stephenson  <pws@csr.com>
+
+	* 21143: Src/exec.c, Src/Modules/socket.c: be more careful when
+	closing or opening sockets onto file descriptors.
+
 2005-04-14  Peter Stephenson  <pws@csr.com>
 
 	* 21141: Doc/Zsh/redirect.yo, Src/exec.c, Test/A04redirect.ztst:

@@ -78,6 +78,11 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 		     OPT_ARG(ops, 'd'), 0);
 	    return 1;
 	}
+	if (targetfd <= max_zsh_fd && fdtable[targetfd] != FDT_UNUSED) {
+	    zwarnnam(nam, "file descriptor %d is in use by the shell",
+		     NULL, targetfd);
+	    return 1;
+	}
     }
 
     if (OPT_ISSET(ops,'l')) {
