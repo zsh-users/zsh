@@ -1,3 +1,10 @@
+2005-04-16  Clint Adams  <clint@zsh.org>
+
+        * 21147: Completion/Unix/Command/_baz,
+	Completion/Unix/Command/_tla, Completion/Unix/Type/_arch_archives,
+	Completion/Unix/Type/_arch_namespace: factor out some common code
+	from _tla and _baz, and fix some breakage from 21075.
+
 2005-04-12  Clint Adams  <clint@zsh.org>
 
 	* 21135: Completion/Unix/Command/_screen: complete attached
