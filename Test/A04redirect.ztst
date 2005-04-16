@@ -268,4 +268,4 @@
   typeset -r myfd
   exec {myfd}>&-
 1:Error closing file descriptor using readonly variable
-?(eval):4: can't close file descriptor from readonly parameter
+?(eval):4: can't close file descriptor from readonly parameter myfd

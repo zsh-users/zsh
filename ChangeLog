@@ -1,3 +1,8 @@
+2005-04-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (see 21148): Test/A04redirect.ztst: update test for
+	change in error message.
+
 2005-04-16  Clint Adams  <clint@zsh.org>
 
 	* 21147: Completion/Unix/Command/_baz,
