@@ -20,32 +20,20 @@ if zstyle -s ":completion:${curcontext}" hide-shortopts hide_short; then
 fi
 
 # completion functions
-
 (( $+functions[_baz_archives] )) ||
-_baz_archives () {
-  local expl completions library name_arg='-n'
-  if [[ -n $argv[(r)--library] ]]; then
-    library='library-'
-    # remove parameter from $@ before calling compadd
-    argv[(r)--library]=()
-    name_arg=
-  fi
-  completions=($(_call_program baz $BAZ ${library:-}archives $name_arg))
-  _description -V archives expl "${library:-}archives"
-  compadd "$@" "$expl[@]" -- "$completions[@]"
-}
+_baz_archives () { _arch_archives baz "$@" }
 
 (( $+functions[_baz_categories] )) ||
-_baz_categories () { _baz_namespace 1 "$argv[@]" }
+_baz_categories () { _arch_namespace baz 1 "$argv[@]" }
 
 (( $+functions[_baz_branches] )) ||
-_baz_branches () {_baz_namespace 2 "$argv[@]" }
+_baz_branches () { _arch_namespace baz 2 "$argv[@]" }
 
 (( $+functions[_baz_versions] )) ||
-_baz_versions () { _baz_namespace 3 "$argv[@]" }
+_baz_versions () { _arch_namespace baz 3 "$argv[@]" }
 
 (( $+functions[_baz_revisions] )) ||
-_baz_revisions () { _baz_namespace 4 "$argv[@]" }
+_baz_revisions () { _arch_namespace baz 4 "$argv[@]" }
 
 (( $+functions[_baz_local_revisions] )) ||
 _baz_local_revisions () {
@@ -56,102 +44,6 @@ _baz_local_revisions () {
   compadd "$expl2[@]" `$BAZ logs --full $($BAZ log-versions | grep -v $tree_version)`
   # This is incredibly slow.
   # Should complete based on -A, -R, -d
-}
-
-(( $+functions[_baz_namespace] )) ||
-_baz_namespace () { #double as arch_namespace_categories
-# takes an integer argument specifying how many components:
-# 1: category
-# 2: branch
-# 3: version
-# 4: revision
-  local suffix expl archive=`$BAZ my-default-archive 2> /dev/null`
-  local trailing_dashes=0
-  [[ -n $argv[(r)--trailing-dashes] ]] && trailing_dashes=1
-  local library
-  [[ -n $argv[(r)--library] ]] && library='library-';
-  local exclude_library_revisions=0
-  [[ -n $argv[(r)--exclude-library-revisions] ]] && exclude_library_revisions=1
-
-  if [ $1 -gt 1 ] || (( trailing_dashes )); then
-    suffix=(-q -S --)
-  fi
-  if [[ $PREFIX = */* ]]; then
-    compset -P '*/'
-    archive=${IPREFIX%/*}
-    _description -V categories expl "${library:-}categories in $archive"
-    compadd $suffix "$expl[@]" `$BAZ ${library:-}categories $archive`
-  elif [ -z $IPREFIX ]; then
-    local index=$(( words[(i)-A] + 1 ))
-    (( index < CURRENT )) || index=$(( words[(i)--archive] + 1 ))
-    (( index < CURRENT )) && archive=$words[$index]
-
-    if [ $archive ]; then
-      _description -V categories expl "${library:-}categories in $archive"
-      compadd "$expl[@]" $suffix `$BAZ ${library:-}categories $archive`
-    fi
-
-    _baz_archives -S / ${library:+--library}
-  fi
-  if [ $archive ] && [ $1 -gt 1 ] && [[ $PREFIX != *@* ]] \
-     && [[ $PREFIX = *--* ]]; then
-  #this match could be better
-    _baz_namespace_branches $(($1 - 1))
-  fi
-}
-
-(( $+functions[_baz_namespace_branches] )) ||
-_baz_namespace_branches () {
-  local suffix expl
-  if [ $1 -gt 1 ] || (( $trailing_dashes )); then
-    suffix=(-q -S --)
-  fi
-  if [[ $IPREFIX != *-- ]]; then
-    compset -P 1 '*--'
-    local category=${IPREFIX%--}
-    _description -V branches expl "${library:-}branches"
-    compadd $suffix "$expl[@]" \
-      ${${(@)$($BAZ ${library:-}branches $archive/$category)}##*--}
-  fi
-  if [ $1 -gt 1 ] && [[ $IPREFIX = *-- ]] && [[ $PREFIX = *--* ]]; then
-    _baz_namespace_versions $(($1 - 1))
-  fi
-}
-
-(( $+functions[_baz_namespace_versions] )) ||
-_baz_namespace_versions () {
-  local suffix expl
-  if [ $1 -gt 1 ]; then
-    suffix=(-q -S --)
-  fi
-  if [[ $IPREFIX != *--*-- ]] || [[ $IPREFIX != */*--*-- ]]; then
-    compset -P 1 '*--'
-    local branch=${IPREFIX%--}
-    _description -V versions expl "${library:-}versions"
-    compadd $suffix "$expl[@]" \
-      ${${(@)$($BAZ ${library:-}versions $archive/$branch)}##*--}
-  fi
-  if [ $1 -gt 1 ] && [[ $IPREFIX = *--*-- ]] && ([[ $IPREFIX = */*--*-- ]] \
-    || [[ $PREFIX != */* ]]) && [[ $PREFIX = *--* ]]; then
-    _baz_namespace_revisions
-  fi
-}
-
-(( $+functions[_baz_namespace_revisions] )) ||
-_baz_namespace_revisions () {
-  local expl
-  if [[ $IPREFIX != *--*--*-- ]] || [[ $IPREFIX != */*--*--*-- ]]; then
-    compset -P 1 '*--'
-    local version=${IPREFIX%--}
-    _description -V revisions expl "${library:-}revisions"
-    local completions c
-    completions=(
-      ${${(@)$($BAZ ${library:-}revisions $archive/$version)}##*--}
-    )
-    (( exclude_library_revisions )) && \
-        foreach c ($($BAZ library-revisions $archive/$version)); do completions[(r)$c]=(); done
-    compadd "$expl[@]" -a completions
-  fi
 }
 
 (( $+functions[_baz_config] )) ||

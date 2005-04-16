@@ -1,3 +1,10 @@
+2005-04-15  Clint Adams  <clint@zsh.org>
+
+	* 21147: Completion/Unix/Command/_baz,
+	Completion/Unix/Command/_tla, Completion/Unix/Type/_arch_archives,
+	Completion/Unix/Type/_arch_namespace: factor out some common code
+	from _tla and _baz, and fix some breakage from 21075.
+
 2005-04-15  Peter Stephenson  <pws@csr.com>
 
 	* 21143: Src/exec.c, Src/Modules/socket.c: be more careful when
