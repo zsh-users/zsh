@@ -1,5 +1,9 @@
 2005-04-17  Clint Adams  <clint@zsh.org>
 
+	* 21153: Completion/Debian/Command/_module-assistant: incorporate
+	most of the features of Stephen Rueger's _module-assistant, posted
+	as 21152.
+
 	* 21151: Completion/Debian/Command/_module-assistant: completion
 	for module-assistant.
 
