@@ -1,5 +1,8 @@
 2005-04-17  Clint Adams  <clint@zsh.org>
 
+	* 21151: Completion/Debian/Command/_module-assistant: completion
+	for module-assistant.
+
 	* 21150: Completion/Unix/Command/_baz,
 	Completion/Unix/Command/_tla: handle parsing of subcommand help
 	output a bit more sanely.
