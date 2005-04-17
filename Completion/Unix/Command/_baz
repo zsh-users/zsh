@@ -490,8 +490,7 @@ _baz_main () {
 
     arguments=()
     local input
-    input=(${${(f)"$($BAZ $cmd -h)"}#  })
-    shift 6 input
+    input=(${${(M)${(f)"$($BAZ $cmd -h)"}:#  *}#  })
 
     local i j=1
     local short long arg desc action
@@ -513,6 +512,7 @@ _baz_main () {
         (( i++ ))
         desc[j]="$desc[j] ${input[i]##*  }"
       fi
+      [[ "$short[j]" == -[hHV] ]] && continue
       desc[j]="${${desc[j]//\[/\\[}//\]/\\]}" # escape brackets
 
       case $arg[j] in

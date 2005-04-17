@@ -527,8 +527,7 @@ _tla_main () {
 
     arguments=()
     local input
-    input=(${${(f)"$($TLA $cmd -h)"}#  })
-    shift 6 input
+    input=(${${(M)${(f)"$($TLA $cmd -h)"}:#  *}#  })
 
     local i j=1
     local short long arg desc action
@@ -550,6 +549,7 @@ _tla_main () {
         (( i++ ))
         desc[j]="$desc[j] ${input[i]##*  }"
       fi
+      [[ "$short[j]" == -[hHV] ]] && continue
       desc[j]="${${desc[j]//\[/\\[}//\]/\\]}" # escape brackets
 
       case $arg[j] in

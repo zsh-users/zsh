@@ -1,3 +1,9 @@
+2005-04-17  Clint Adams  <clint@zsh.org>
+
+	* 21150: Completion/Unix/Command/_baz,
+	Completion/Unix/Command/_tla: handle parsing of subcommand help
+	output a bit more sanely.
+
 2005-04-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (see 21148): Test/A04redirect.ztst: update test for
