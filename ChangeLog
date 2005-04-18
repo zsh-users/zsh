@@ -1,3 +1,7 @@
+2005-04-18  Felix Rosencrantz <f_rosencrantz@gmail.com>
+	*  21154: Completion/Unix/Command/_perforce: add pid completion for
+	monitor (clear|terminate) commands.
+
 2005-04-17  Clint Adams  <clint@zsh.org>
 
 	* 21153: Completion/Debian/Command/_module-assistant: incorporate

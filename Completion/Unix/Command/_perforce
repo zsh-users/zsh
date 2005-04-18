@@ -1311,6 +1311,15 @@ _perforce_statuses() {
 }
 
 
+(( $+functions[_perforce_pids] )) ||
+_perforce_pids() {
+  local -a ul
+
+  ul=(${${${(f)"$(_perforce_call_p4 monitor monitor show 2>/dev/null)"}# *}/\ /:})
+  [[ $#ul -eq 1 && $ul[1] = '' ]] && ul=()
+  _describe -t id 'process ID' ul
+}
+
 
 (( $+functions[_perforce_users] )) ||
 _perforce_users() {
@@ -1808,7 +1817,7 @@ _perforce_cmd_monitor() {
       ;;
 
       (terminate|clear)
-      _message "process ID"
+      _perforce_pids
       ;;
 
       (*)
