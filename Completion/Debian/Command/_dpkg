@@ -87,9 +87,9 @@ case "$service" in
 	"$_dpkg_common_actions[@]" && return 0
   ;;
   dpkg-reconfigure)
-    _arguments -s \
-      '(-f --frontend)'{-f,--frontend}'[select frontend to use]:frontend' \
-      '(-p --priority)'{-p,--priority}'[specify min priority of questions]:priority' \
+    _arguments -sw \
+      '(-f --frontend)'{-f,--frontend}'[select frontend to use]:frontend:(dialog readline noninteractive gnome kde editor web)' \
+      '(-p --priority)'{-p,--priority}'[specify min priority of questions]:priority:(low medium high critical)' \
       '--default-priority[use default question priority]' \
       '(*)--all[reconfigure all installed packages using debconf]' \
       '(-u --unseen-only)'{-u,--unseen-only}'[only ask questions not yet seen are asked]' \

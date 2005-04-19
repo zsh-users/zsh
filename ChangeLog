@@ -1,3 +1,8 @@
+2005-04-19  Clint Adams  <clint@zsh.org>
+
+	* 21156: Completion/Debian/Command/_dpkg: tweaks to
+	dpkg-reconfigure completion.
+
 2005-04-18  Felix Rosencrantz <f_rosencrantz@gmail.com>
 	*  21154: Completion/Unix/Command/_perforce: add pid completion for
 	monitor (clear|terminate) commands.
