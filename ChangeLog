@@ -1,3 +1,8 @@
+2005-04-19  Clint Adams  <clint@zsh.org>
+
+	* 21156: Completion/Debian/Command/_dpkg: tweaks to
+        dpkg-reconfigure completion.
+
 2005-04-17  Clint Adams  <clint@zsh.org>
 
         * 21153: Completion/Debian/Command/_module-assistant: incorporate
