@@ -1,3 +1,8 @@
+2005-04-21  Clint Adams  <clint@zsh.org>
+
+	* users/8733: Completion/Unix/Command/_surfraw: rudimentary
+	completion for surfraw.
+
 2005-04-19  Clint Adams  <clint@zsh.org>
 
 	* 21156: Completion/Debian/Command/_dpkg: tweaks to
