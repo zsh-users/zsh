@@ -1,3 +1,8 @@
+2005-04-22  Geoff Wing  <gcw@zsh.org>
+
+	* 20162: Src/Zle/compresult.c: in printlist() don't output new line
+	if we haven't printed anything
+
 2005-04-21  Clint Adams  <clint@zsh.org>
 
 	* users/8733: Completion/Unix/Command/_surfraw: rudimentary
