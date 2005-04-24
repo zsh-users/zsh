@@ -103,6 +103,8 @@ _deb_packages () {
 
   _deb_packages_update_$pkgset
 
+  typeset -gH $cachevar
+
   _tags packages && compadd "$expl[@]" - "${(@P)cachevar}"
 }
 

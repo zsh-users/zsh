@@ -63,7 +63,7 @@ _svn_command () {
   local cmd
 
   if (( ! $+_svn_cmds )); then
-    typeset -gA _svn_cmds
+    typeset -gHA _svn_cmds
     _svn_cmds=(
       ${=${(f)${${"$(LC_MESSAGES=C _call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
     )
@@ -87,7 +87,7 @@ _svn_command () {
 (( $+functions[_svn_subcommand] )) ||
 _svn_subcommand () {
   local subcmd _svn_subcmds _svn_subcmd_usage
-  typeset -A _cache_svn_status
+  typeset -gHA _cache_svn_status
 
   _svn_subcmd_usage=${${(M)${(f)"$(LC_MESSAGES=C _call_program options svn help $1)"}:#usage:*}#usage: $1 }
 
@@ -146,7 +146,7 @@ _svnadmin_command () {
   local cmd
 
   if (( ! $+_svnadmin_cmds )); then
-    typeset -gA _svnadmin_cmds
+    typeset -gHA _svnadmin_cmds
     _svnadmin_cmds=(
       ${=${(f)${${"$(LC_MESSAGES=C _call_program commands svnadmin help)"#l#*Available subcommands:}}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
     )

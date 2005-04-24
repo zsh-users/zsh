@@ -1,3 +1,13 @@
+2005-04-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* Tobias Gruetzmacher 21168 (slightly tweaked):
+	Completion/Debian/Command/_apt,
+	Completion/Debian/Type/_deb_packages,
+	Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_subversion: localize some completion
+	variables that were unnecessarily made global, and hide from
+	typeset display the values of a few others.
+
 2005-04-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21170: Src/glob.c, Src/pattern.c: optimise length calculations
@@ -20,7 +30,7 @@
 	dpkg-reconfigure completion.
 
 2005-04-18  Felix Rosencrantz <f_rosencrantz@gmail.com>
-	*  21154: Completion/Unix/Command/_perforce: add pid completion for
+	* 21154: Completion/Unix/Command/_perforce: add pid completion for
 	monitor (clear|terminate) commands.
 
 2005-04-17  Clint Adams  <clint@zsh.org>

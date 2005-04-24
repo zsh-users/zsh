@@ -40,7 +40,11 @@ fi
 # are below these table.
 
 local curcontext="$curcontext" state line suf ret=1
-local args deffs=iso9660 tmp typeops=-t _nfs_access _nfs_ufs
+local args deffs=iso9660 tmp typeops=-t _fs_any _nfs_access _fs_nfs _nfs_ufs \
+_fs_ufs _fs_efs _fs_iso9660 _fs_cachefs _fs_s5fs _fs_tmpfs _fs_pcfs _fs_hsfs \
+_fs_advfs _fs_cdfs _fs_affs _fs_ext2 _fs_fat _fs_ext3 _fs_msdos _fs_umsdos \
+_fs_vfat _fs_hpfs _fs_ntfs _fs_reiserfs _fs_smbfs _fs_xfs _fs_std _fs_devfs \
+_fs_fdesc _fs_kernfs _fs_linprocfs _fs_procfs
 
 typeset -A opt_args
 
