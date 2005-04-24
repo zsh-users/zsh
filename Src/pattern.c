@@ -1496,7 +1496,7 @@ pattrystart(void)
 mod_export int
 pattry(Patprog prog, char *string)
 {
-    return pattryrefs(prog, string, -1, 0, NULL, NULL, NULL);
+    return pattryrefs(prog, string, -1, -1, 0, NULL, NULL, NULL);
 }
 
 /*
@@ -1507,19 +1507,22 @@ pattry(Patprog prog, char *string)
 
 /**/
 mod_export int
-pattrylen(Patprog prog, char *string, int len, int offset)
+pattrylen(Patprog prog, char *string, int len, int unmetalen, int offset)
 {
-    return pattryrefs(prog, string, len, offset, NULL, NULL, NULL);
+    return pattryrefs(prog, string, len, unmetalen, offset, NULL, NULL, NULL);
 }
 
 /*
- * Test prog against string with given length stringlen, which
- * may be -1 to indicate a null-terminated string.  The input
- * string is metafied; the length is the raw string length, not the
- * number of possibly metafied characters.
+ * Test prog against string with given lengths.  The input
+ * string is metafied; stringlen is the raw string length, and
+ * unmetalen the number of characters in the original string (some
+ * of which may now be metafied).  Either value may be -1
+ * to indicate a null-terminated string which will be counted.  Note
+ * there may be a severe penalty for this if a lot of matching is done
+ * on one string.
  *
  * offset is the position in the original string (not seen by
- * the patter module) at which we are trying to match.
+ * the pattern module) at which we are trying to match.
  * This is added in to the positions recorded in patbeginp and patendp
  * when we are looking for substrings.  Currently this only happens
  * in the parameter substitution code.
@@ -1535,10 +1538,11 @@ pattrylen(Patprog prog, char *string, int len, int offset)
 
 /**/
 mod_export int
-pattryrefs(Patprog prog, char *string, int stringlen, int patoffset,
+pattryrefs(Patprog prog, char *string, int stringlen, int unmetalen,
+	   int patoffset,
 	   int *nump, int *begp, int *endp)
 {
-    int i, maxnpos = 0, ret, needfullpath, unmetalen, unmetalenp;
+    int i, maxnpos = 0, ret, needfullpath, unmetalenp;
     int origlen;
     char **sp, **ep, *tryalloced, *ptr;
     char *progstr = (char *)prog + prog->startoff;
@@ -1564,7 +1568,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int patoffset,
     needfullpath = (patflags & PAT_HAS_EXCLUDP) && pathpos;
 
     /* Get the length of the full string when unmetafied. */
-    unmetalen = ztrsub(string + stringlen, string);
+    if (unmetalen < 0)
+	unmetalen = ztrsub(string + stringlen, string);
     if (needfullpath)
 	unmetalenp = ztrsub(pathbuf + pathpos, pathbuf);
     else

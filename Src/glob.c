@@ -2223,11 +2223,12 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 {
     char *s = *sp, *t;
     /*
-     * Note that ioff and ml count characters in the character
+     * Note that ioff and uml count characters in the character
      * set (Meta's are not included), while l counts characters in the
-     * string.
+     * metafied string.  umlen is a counter for (unmetafied) character
+     * lengths.
      */
-    int ioff, l = strlen(*sp), ml = ztrlen(*sp), matched = 1;
+    int ioff, l = strlen(*sp), uml = ztrlen(*sp), matched = 1, umlen;
 
     repllist = NULL;
 
@@ -2273,9 +2274,9 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		     * ... now we know whether it's worth looking for the
 		     * shortest, which we do by brute force.
 		     */
-		    for (t = s; t < s + mlen; METAINC(t)) {
+		    for (t = s, umlen = 0; t < s + mlen; METAINC(t), umlen++) {
 			set_pat_end(p, *t);
-			if (pattrylen(p, s, t - s, 0)) {
+			if (pattrylen(p, s, t - s, umlen, 0)) {
 			    mlen = patmatchlen();
 			    break;
 			}
@@ -2290,9 +2291,10 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    /* Smallest possible match at tail of string:  *
 	     * move back down string until we get a match. *
 	     * There's no optimization here.               */
-	    for (ioff = ml, t = s + l; t >= s; t--, ioff--) {
+	    for (ioff = uml, t = s + l, umlen = 0; t >= s;
+		 t--, ioff--, umlen++) {
 		set_pat_start(p, t-s);
-		if (pattrylen(p, t, -1, ioff)) {
+		if (pattrylen(p, t, s + l - t, umlen, ioff)) {
 		    *sp = get_match_ret(*sp, t - s, l, fl, replstr);
 		    return 1;
 		}
@@ -2305,9 +2307,10 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    /* Largest possible match at tail of string:       *
 	     * move forward along string until we get a match. *
 	     * Again there's no optimisation.                  */
-	    for (ioff = 0, t = s; t < s + l; ioff++, t++) {
+	    for (ioff = 0, t = s, umlen = uml; t < s + l;
+		 ioff++, t++, umlen--) {
 		set_pat_start(p, t-s);
-		if (pattrylen(p, t, -1, ioff)) {
+		if (pattrylen(p, t, s + l - t, umlen, ioff)) {
 		    *sp = get_match_ret(*sp, t-s, l, fl, replstr);
 		    return 1;
 		}
@@ -2329,19 +2332,22 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    if (fl & SUB_GLOBAL)
 		repllist = newlinklist();
 	    ioff = 0;		/* offset into string */
+	    umlen = uml;
 	    do {
 		/* loop over all matches for global substitution */
 		matched = 0;
-		for (; t < s + l; t++, ioff++) {
+		for (; t < s + l; t++, ioff++, umlen--) {
 		    /* Find the longest match from this position. */
 		    set_pat_start(p, t-s);
-		    if (pattrylen(p, t, -1, ioff)) {
+		    if (pattrylen(p, t, s + l - t, umlen, ioff)) {
 			char *mpos = t + patmatchlen();
 			if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
 			    char *ptr;
-			    for (ptr = t; ptr < mpos; METAINC(ptr)) {
+			    int umlen2;
+			    for (ptr = t, umlen2 = 0; ptr < mpos;
+				 METAINC(ptr), umlen2++) {
 				set_pat_end(p, *ptr);
-				if (pattrylen(p, t, ptr - t, ioff)) {
+				if (pattrylen(p, t, ptr - t, umlen2, ioff)) {
 				    mpos = t + patmatchlen();
 				    break;
 				}
@@ -2370,7 +2376,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			 * which is already marked for replacement.
 			 */
 			matched = 1;
-			for ( ; t < mpos; t++, ioff++)
+			for ( ; t < mpos; t++, ioff++, umlen--)
 			    if (*t == Meta)
 				t++;
 			break;
@@ -2397,23 +2403,26 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    /* Longest/shortest at end, matching substrings.       */
 	    if (!(fl & SUB_LONG)) {
 		set_pat_start(p, l);
-		if (pattrylen(p, s + l, -1, ml) && !--n) {
+		if (pattrylen(p, s + l, 0, 0, uml) && !--n) {
 		    *sp = get_match_ret(*sp, l, l, fl, replstr);
 		    return 1;
 		}
 	    }
-	    for (ioff = ml - 1, t = s + l - 1; t >= s; t--, ioff--) {
+	    for (ioff = uml - 1, t = s + l - 1, umlen = 1; t >= s;
+		 t--, ioff--, umlen++) {
 		if (t > s && t[-1] == Meta)
 		    t--;
 		set_pat_start(p, t-s);
-		if (pattrylen(p, t, -1, ioff) && !--n) {
+		if (pattrylen(p, t, s + l - t, umlen, ioff) && !--n) {
 		    /* Found the longest match */
 		    char *mpos = t + patmatchlen();
 		    if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
 			char *ptr;
-			for (ptr = t; ptr < mpos; METAINC(ptr)) {
+			int umlen2;
+			for (ptr = t, umlen2 = 0; ptr < mpos;
+			     METAINC(ptr), umlen2++) {
 			    set_pat_end(p, *ptr);
-			    if (pattrylen(p, t, ptr - t, ioff)) {
+			    if (pattrylen(p, t, ptr - t, umlen2, ioff)) {
 				mpos = t + patmatchlen();
 				break;
 			    }
@@ -2424,7 +2433,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		}
 	    }
 	    set_pat_start(p, l);
-	    if ((fl & SUB_LONG) && pattrylen(p, s + l, -1, ml) && !--n) {
+	    if ((fl & SUB_LONG) && pattrylen(p, s + l, 0, 0, uml) && !--n) {
 		*sp = get_match_ret(*sp, l, l, fl, replstr);
 		return 1;
 	    }

@@ -1,3 +1,9 @@
+2005-04-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 21170: Src/glob.c, Src/pattern.c: optimise length calculations
+	which were causing inefficieny in ${...//.../...} on large
+	string.
+
 2005-04-22  Geoff Wing  <gcw@zsh.org>
 
 	* 20162: Src/Zle/compresult.c: in printlist() don't output new line

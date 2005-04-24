@@ -601,7 +601,7 @@ putmatchcol(Listcols c, char *group, char *n)
 
     for (pc = c->pats; pc; pc = pc->next)
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
-	    pattryrefs(pc->pat, n, -1, 0, &nrefs, begpos, endpos)) {
+	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
 	    if (pc->cols[1]) {
 		patcols = pc->cols;
 
@@ -639,7 +639,7 @@ putfilecol(Listcols c, char *group, char *n, mode_t m)
 
     for (pc = c->pats; pc; pc = pc->next)
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
-	    pattryrefs(pc->pat, n, -1, 0, &nrefs, begpos, endpos)) {
+	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
 	    if (pc->cols[1]) {
 		patcols = pc->cols;
 
