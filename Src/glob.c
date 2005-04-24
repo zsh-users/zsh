@@ -2293,6 +2293,8 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	     * There's no optimization here.               */
 	    for (ioff = uml, t = s + l, umlen = 0; t >= s;
 		 t--, ioff--, umlen++) {
+		if (t > s && t[-1] == Meta)
+		    t--;
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, s + l - t, umlen, ioff)) {
 		    *sp = get_match_ret(*sp, t - s, l, fl, replstr);
@@ -2308,7 +2310,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	     * move forward along string until we get a match. *
 	     * Again there's no optimisation.                  */
 	    for (ioff = 0, t = s, umlen = uml; t < s + l;
-		 ioff++, t++, umlen--) {
+		 ioff++, METAINC(t), umlen--) {
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, s + l - t, umlen, ioff)) {
 		    *sp = get_match_ret(*sp, t-s, l, fl, replstr);
@@ -2336,7 +2338,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    do {
 		/* loop over all matches for global substitution */
 		matched = 0;
-		for (; t < s + l; t++, ioff++, umlen--) {
+		for (; t < s + l; METAINC(t), ioff++, umlen--) {
 		    /* Find the longest match from this position. */
 		    set_pat_start(p, t-s);
 		    if (pattrylen(p, t, s + l - t, umlen, ioff)) {
