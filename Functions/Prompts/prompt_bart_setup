@@ -80,7 +80,10 @@ prompt_bart_precmd () {
 
     # Reset the truncation widths for upcoming computations
     ((PSCOL == 1)) || { PSCOL=1 ; prompt_bart_ps1 }
-    [[ -o promptcr ]] || IFS='[;' read -s -d R escape\?$'\e[6n' lineno PSCOL
+    if [[ -o promptcr ]]
+    then print -nP "${(l.COLUMNS.. .)}\e[s${(pl.COLUMNS..\b.)}%E\e[u"
+    else IFS='[;' read -s -d R escape\?$'\e[6n' lineno PSCOL
+    fi
     ((PSCOL == 1)) || prompt_bart_ps1
     ((colno = COLUMNS-PSCOL))
 
