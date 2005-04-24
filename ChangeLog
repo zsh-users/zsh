@@ -1,3 +1,9 @@
+2005-04-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 21170: Src/glob.c, Src/pattern.c, Src/complist.c: optimise
+	length calculations which were causing inefficieny in
+	${...//.../...} on large string.
+
 2005-04-19  Clint Adams  <clint@zsh.org>
 
 	* 21156: Completion/Debian/Command/_dpkg: tweaks to
