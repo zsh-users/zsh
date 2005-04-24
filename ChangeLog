@@ -1,5 +1,26 @@
 2005-04-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/parse.c: get rid of unused third argument of
+	zwcstat().
+
+	* unposted: Functions/Prompts/prompt_bart_setup: employ a variant
+	of Oliver's suggestion from 21117 to handle promptcr better.
+
+	* unposted: Doc/Zsh/builtins.yo, Doc/Zsh/compctl.yo,
+	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/invoke.yo, Doc/Zsh/mod_zutil.yo, Doc/Zsh/tcpsys.yo:
+	fix a lot of places where info compilation was reducing two
+	hyphens to only one.
+
+	* unposted: Doc/Makefile.in: yodl with a little less echo.
+
+	* unposted (cf. 20494): Completion/Base/Widget/_generic,
+	Doc/Zsh/compsys.yo: pass the positional parameters of _generic
+	through to _main_complete.
+
+	* 21174: Src/glob.c: additional Meta-increment/decrement of
+	pointers when walking metafied strings (goes with 21170).
+
 	* Tobias Gruetzmacher 21168 (slightly tweaked):
 	Completion/Debian/Command/_apt,
 	Completion/Debian/Type/_deb_packages,
@@ -159,7 +180,7 @@
 	* 21086: Completion/Unix/Command/_rsync: fix module completion,
 	redirect rsync errors to /dev/null, use -S "" as suggested
 	by Oliver.
-	
+
 	* 21085: Completion/Mandrake/Command/_urpmi: update for 10.2,
 	add parsehdlist, use urpmq --list options to get media and
 	package list
@@ -1090,7 +1111,7 @@
 
 	* 20496: Src/utils.c: made zclose() not call close() when the
 	fd arg is < 0.
-	
+
 	* unposted: Src/Zle/zle_main.c: initialize the first byte of
 	the allocated "line" buffer so that we avoid uninitialized-
 	memory warnings in valgrind.
