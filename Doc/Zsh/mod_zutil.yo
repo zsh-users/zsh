@@ -192,7 +192,7 @@ xitem(var(name))
 item(var(name)tt(+))(
 The var(name) is the name of the option without the leading `tt(-)'.  To
 specify a GNU-style long option, one of the usual two leading `tt(-)' must
-be included in var(name); for example, a `tt(--file)' option is
+be included in var(name); for example, a `tt(-)tt(-file)' option is
 represented by a var(name) of `tt(-file)'.
 
 If a `tt(+)' appears after var(name), the option is appended to var(array)

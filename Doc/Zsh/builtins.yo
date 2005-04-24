@@ -507,7 +507,7 @@ item(tt(getopts) var(optstring) var(name) [ var(arg) ... ])(
 Checks the var(arg)s for legal options.  If the var(arg)s are omitted,
 use the positional parameters.  A valid option argument
 begins with a `tt(PLUS())' or a `tt(-)'.  An argument not beginning with
-a `tt(PLUS())' or a `tt(-)', or the argument `tt(--)', ends the options.
+a `tt(PLUS())' or a `tt(-)', or the argument `tt(-)tt(-)', ends the options.
 Note that a single `tt(-)' is not considered a valid option argument.
 var(optstring) contains the letters that tt(getopts)
 recognizes.  If a letter is followed by a `tt(:)', that option
@@ -1085,7 +1085,7 @@ the array.  This means that
 
 example(set -A array -x -- foo)
 
-sets tt(array) to `tt(-x -- foo)' if tt(KSH_ARRAYS) is not set, but sets
+sets tt(array) to `tt(-x -)tt(- foo)' if tt(KSH_ARRAYS) is not set, but sets
 the array to tt(foo) and turns on the option `tt(-x)' if it is set.
 
 If the tt(-A) flag is not present, but there are arguments beyond the

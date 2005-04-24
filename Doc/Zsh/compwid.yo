@@ -11,7 +11,7 @@ features is described in
 ifzman(zmanref(zshcompsys))\
 ifnzman(the next chapter, noderef(Completion System)),
 and users with no interest in adding to that system (or, potentially,
-writing their own --- see dictionary entry for `hubris') should skip this
+writing their own DASH()- see dictionary entry for `hubris') should skip this
 section.  The older system based on the tt(compctl) builtin command is
 described in
 ifzman(zmanref(zshcompctl))\
@@ -445,7 +445,7 @@ xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ] [ tt
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 xitem([ tt(-D) var(array) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
 xitem([ tt(-E) var(number) ])
-item([ tt(-M) var(match-spec) ] [ tt(--) ] [ var(words) ... ])(
+item([ tt(-M) var(match-spec) ] [ tt(-)tt(-) ] [ var(words) ... ])(
 
 This builtin command can be used to add matches directly and control
 all the information the completion code stores with each possible
@@ -925,7 +925,7 @@ The pattern var(tpat) may also be one or two stars, `tt(*)' or
 any number of characters in the trial completion. In this case the
 pattern must be anchored (on either side); in the case of a single
 star, the var(anchor) then determines how much of the trial completion
-is to be included --- only the characters up to the next appearance of
+is to be included DASH()- only the characters up to the next appearance of
 the anchor will be matched. With two stars, substrings matched by the
 anchor can be matched, too.
 
@@ -983,7 +983,7 @@ A nice example for the use of tt(*) patterns is partial word
 completion. Sometimes you would like to make strings like `tt(c.s.u)'
 complete to strings like `tt(comp.source.unix)', i.e. the word on the
 command line consists of multiple parts, separated by a dot in this
-example, where each part should be completed separately --- note,
+example, where each part should be completed separately DASH()- note,
 however, that the case where each part of the word, i.e. `tt(comp)',
 `tt(source)' and `tt(unix)' in this example, is to be completed from
 separate sets of matches

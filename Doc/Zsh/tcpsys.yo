@@ -394,7 +394,7 @@ The current implementation is somewhat deficient in terms of use of the
 command history.  For this reason, many users will prefer to use some form
 of alternative approach for sending data easily to the current session.
 One simple approach is to alias some special character (such as `tt(%)') to
-`tt(tcp_command --)'.
+`tt(tcp_command -)tt(-)'.
 )
 findex(tcp_wait)
 item(tt(tcp_wait))(

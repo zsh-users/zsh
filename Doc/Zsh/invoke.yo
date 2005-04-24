@@ -51,32 +51,33 @@ tt(-o) can be stacked up with preceding single-letter options, so for example
 
 cindex(long option)
 Options may also be specified by name in GNU long option style,
-`tt(--)var(option-name)'.  When this is done, `tt(-)' characters in the
+`tt(-)tt(-)var(option-name)'.  When this is done, `tt(-)' characters in the
 option name are permitted: they are translated into `tt(_)', and thus ignored.
-So, for example, `tt(zsh --sh-word-split)' invokes zsh with the
+So, for example, `tt(zsh -)tt(-sh-word-split)' invokes zsh with the
 tt(SH_WORD_SPLIT) option turned on.  Like other option syntaxes, options can
 be turned off by replacing the initial `tt(-)' with a `tt(PLUS())'; thus
-`tt(+-sh-word-split)' is equivalent to `tt(--no-sh-word-split)'.
+`tt(+-sh-word-split)' is equivalent to `tt(-)tt(-no-sh-word-split)'.
 Unlike other option syntaxes, GNU-style long options cannot be stacked with
 any other options, so for example `tt(-x-shwordsplit)' is an error,
-rather than being treated like `tt(-x --shwordsplit)'.
+rather than being treated like `tt(-x -)tt(-shwordsplit)'.
 
 cindex(--version)
 cindex(--help)
-The special GNU-style option `tt(--version)' is handled; it sends to standard
-output the shell's version information, then exits successfully.
-`tt(--help)' is also handled; it sends to standard output a list of options
-that can be used when invoking the shell, then exits successfully.
+The special GNU-style option `tt(-)tt(-version)' is handled; it sends to
+standard output the shell's version information, then exits successfully.
+`tt(-)tt(-help)' is also handled; it sends to standard output a list of
+options that can be used when invoking the shell, then exits successfully.
 
 Option processing may be finished, allowing following arguments that start with
 `tt(-)' or `tt(PLUS())' to be treated as normal arguments, in two ways.
-Firstly, a lone `tt(-)' (or `tt(PLUS())') as an argument by itself ends option
-processing.  Secondly, a special option `tt(--)' (or `tt(PLUS()-)'), which may
-be specified on its own (which is the standard POSIX usage) or may be stacked
-with preceding options (so `tt(-x-)' is equivalent to `tt(-x --)').  Options
-are not permitted to be stacked after `tt(--)' (so `tt(-x-f)' is an error),
-but note the GNU-style option form discussed above, where `tt(--shwordsplit)'
-is permitted and does not end option processing.
+Firstly, a lone `tt(-)' (or `tt(PLUS())') as an argument by itself ends
+option processing.  Secondly, a special option `tt(-)tt(-)' (or
+`tt(PLUS()-)'), which may be specified on its own (which is the standard
+POSIX usage) or may be stacked with preceding options (so `tt(-x-)' is
+equivalent to `tt(-x -)tt(-)').  Options are not permitted to be stacked
+after `tt(-)tt(-)' (so `tt(-x-f)' is an error), but note the GNU-style
+option form discussed above, where `tt(-)tt(-shwordsplit)' is permitted
+and does not end option processing.
 
 Except when the bf(sh)/bf(ksh) emulation single-letter options are in effect,
 the option `tt(-b)' (or `tt(PLUS()b)') ends option processing.

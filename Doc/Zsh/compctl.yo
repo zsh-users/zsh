@@ -26,8 +26,8 @@ findex(compctl)
 startlist()
 list(tt(compctl) [ tt(-CDT) ] var(options) [ var(command) ... ])
 list(tt(compctl) [ tt(-CDT) ] var(options) \
-  [ tt(-x) var(pattern) var(options) tt(-) ... tt(--) ] \
-  [ tt(PLUS()) var(options) [ tt(-x) ... tt(--) ] ... [tt(PLUS())] ] \
+  [ tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-) ] \
+  [ tt(PLUS()) var(options) [ tt(-x) ... tt(-)tt(-) ] ... [tt(PLUS())] ] \
   [ var(command) ... ])
 list(tt(compctl) tt(-M) var(match-specs) ...)
 list(tt(compctl) tt(-L) [ tt(-CDTM) ] [ var(command) ... ])
@@ -562,11 +562,11 @@ texinode(Extended Completion)(Example)(Alternative Completion)(Completion Using 
 sect(Extended Completion)
 startlist()
 list(nofill(tt(compctl) [ tt(-CDT) ] var(options) \
-tt(-x) var(pattern) var(options) tt(-) ... tt(--)
+tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-)
   [ var(command) ... ]))
 list(nofill(tt(compctl) [ tt(-CDT) ] var(options) \
-[ tt(-x) var(pattern) var(options) tt(-) ... tt(--) ]
-  [ tt(PLUS()) var(options) [ tt(-x) ... tt(--) ] ... [tt(PLUS())] ] \
+[ tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-) ]
+  [ tt(PLUS()) var(options) [ tt(-x) ... tt(-)tt(-) ] ... [tt(PLUS())] ] \
 [ var(command) ... ]))
 endlist()
 

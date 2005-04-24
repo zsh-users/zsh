@@ -8,4 +8,4 @@ else
   curcontext="${WIDGET}:${curcontext#*:}"
 fi
 
-_main_complete
+_main_complete "$@"

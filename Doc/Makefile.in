@@ -110,11 +110,12 @@ zsh.info: $(sdir)/zsh.texi
 	$(MAKEINFO) $(sdir)/zsh.texi
 
 .yo.1:
-	case $@ in \
+	@case $@ in \
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
 	case '$(YODL)' in :*) ;; *) \
+	    echo $(YODL) -o $$target -I$(sdir) -w zman.yo version.yo $< ; \
 	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
 	;; esac; \
 	test -f $$target
@@ -141,11 +142,12 @@ zsh_toc.html: $(sdir)/zsh.texi
 	$(TEXI2HTML) $(sdir)/zsh.texi
 
 zshall.1: zsh.yo
-	case $@ in \
+	@case $@ in \
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
 	case '$(YODL)' in :*) ;; *) \
+	    echo $(YODL) -o $$target -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo; \
 	    $(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
 	;; esac; \
 	test -f $$target
