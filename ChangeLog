@@ -1,3 +1,8 @@
+2005-04-25  Peter Stephenson  <pws@csr.com>
+
+	* users/8752: stripping IFS characters after reading a line
+	in the read builtin wasn't sensitive to metafied characters.
+
 2005-04-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/parse.c: get rid of unused third argument of
