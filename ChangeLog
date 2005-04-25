@@ -1,3 +1,11 @@
+2005-04-25  Peter Stephenson  <pws@csr.com>
+
+	* 21184: Test/B04read.ztst: test for foregoing fix.
+
+	* users/8752: Src/builtin.c: stripping IFS characters after
+	reading a line in the read builtin wasn't sensitive to metafied
+	characters.
+
 2005-04-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21170: Src/glob.c, Src/pattern.c, Src/complist.c: optimise
