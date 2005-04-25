@@ -69,3 +69,10 @@
 0:read with null delimiter
 >Testing the
 >null hypothesis
+
+# Note that trailing NULLs are not stripped even if they are in
+# $IFS; only whitespace characters contained in $IFS are stripped.
+ print -n $'Aaargh, I hate nulls.\0\0\0' | read line
+ print ${#line}
+0:read with trailing metafied characters
+>24
