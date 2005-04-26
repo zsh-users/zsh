@@ -599,3 +599,8 @@
 >said
 >i
 >willJOYCE
+
+  foo=
+  print "${${foo}/?*/replacement}"
+0:Quoted zero-length strings are handled properly
+>

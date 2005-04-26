@@ -1,3 +1,9 @@
+2005-04-26  Peter Stephenson  <pws@csr.com>
+
+	* 21195 (c.f. 21194 from Bart): Src/pattern.c,
+	Test/D04parameter.ztst: 21170 broke handling of zero-length
+	quoted test strings.
+
 2005-04-25  Peter Stephenson  <pws@csr.com>
 
 	* 21184: Test/B04read.ztst: test for foregoing fix.
