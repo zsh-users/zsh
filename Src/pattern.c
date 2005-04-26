@@ -1552,8 +1552,10 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalen,
 	*nump = 0;
     }
     /* inherited from domatch, but why, exactly? */
-    if (*string == Nularg)
+    if (*string == Nularg) {
 	string++;
+	unmetalen--;
+    }
 
     if (stringlen < 0)
 	stringlen = strlen(string);
