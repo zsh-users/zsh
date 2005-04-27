@@ -888,6 +888,10 @@ removetrap(int sig)
 void
 starttrapscope(void)
 {
+    /* No special SIGEXIT behaviour inside another trap. */
+    if (intrap)
+	return;
+
     /*
      * SIGEXIT needs to be restored at the current locallevel,
      * so give it the next higher one. dosavetrap() is called
@@ -917,8 +921,11 @@ endtrapscope(void)
     /*
      * Remember the exit trap, but don't run it until
      * after all the other traps have been put back.
+     * Don't do this inside another trap.
      */
-    if ((exittr = sigtrapped[SIGEXIT])) {
+    if (intrap)
+	exittr = 0;
+    else if ((exittr = sigtrapped[SIGEXIT])) {
 	if (exittr & ZSIG_FUNC) {
 	    exitfn = removehashnode(shfunctab, "TRAPEXIT");
 	} else {
