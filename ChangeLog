@@ -3,6 +3,12 @@
 	* 21197: Src/exec.c, Src/signals.c: LOCAL_TRAPS didn't restore
 	a trap when modified inside another trap.
 
+2005-04-27  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync:  Made some
+	options repeatable (--include, --exclude, --filter, -f)
+	and added the one new option that will be in 2.6.5.
+
 2005-04-26  Peter Stephenson  <pws@csr.com>
 
 	* 21195 (c.f. 21194 from Bart): Src/pattern.c,
@@ -26,24 +32,24 @@
 2005-04-19  Clint Adams  <clint@zsh.org>
 
 	* 21156: Completion/Debian/Command/_dpkg: tweaks to
-        dpkg-reconfigure completion.
+	dpkg-reconfigure completion.
 
 2005-04-17  Clint Adams  <clint@zsh.org>
 
-        * 21153: Completion/Debian/Command/_module-assistant: incorporate
-        most of the features of Stephen Rueger's _module-assistant, posted
-        as 21152.
+	* 21153: Completion/Debian/Command/_module-assistant: incorporate
+	most of the features of Stephen Rueger's _module-assistant, posted
+	as 21152.
 
-        * 21151: Completion/Debian/Command/_module-assistant: completion
-        for module-assistant.
+	* 21151: Completion/Debian/Command/_module-assistant: completion
+	for module-assistant.
 
-        * 21150: Completion/Unix/Command/_baz,
-        Completion/Unix/Command/_tla: handle parsing of subcommand help
-        output a bit more sanely.
+	* 21150: Completion/Unix/Command/_baz,
+	Completion/Unix/Command/_tla: handle parsing of subcommand help
+	output a bit more sanely.
 
 2005-04-16  Clint Adams  <clint@zsh.org>
 
-        * 21147: Completion/Unix/Command/_baz,
+	* 21147: Completion/Unix/Command/_baz,
 	Completion/Unix/Command/_tla, Completion/Unix/Type/_arch_archives,
 	Completion/Unix/Type/_arch_namespace: factor out some common code
 	from _tla and _baz, and fix some breakage from 21075.
@@ -56,7 +62,7 @@
 2005-04-11  Clint Adams  <clint@zsh.org>
 
 	* 21132: Completion/Unix/Type/_pdf, Completion/X/Command/_xpdf:
-        complete xpdf options, and also complete .pdf.bz2 files when
+	complete xpdf options, and also complete .pdf.bz2 files when
 	completing compressed PDF files.
 
 2005-04-10  Clint Adams  <clint@zsh.org>
