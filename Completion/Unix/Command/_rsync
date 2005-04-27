@@ -164,11 +164,11 @@ _arguments -s \
   '(--compare-dest --copy-dest)*--link-dest=[hardlink to files in specified directory hierarchy when unchanged]:directory:_files -/' \
   '(-z --compress)'{-z,--compress}'[compress file data during the transfer]' \
   '(-C --cvs-exclude)'{-C,--cvs-exclude}'[auto-ignore files the same way CVS does]' \
-  '(-f --filter)'{-f,--filter=}'[add a file-filtering rule]:rule:' \
+  '*'{-f,--filter=}'[add a file-filtering rule]:rule:' \
   '*-F[same as --filter="dir-merge /.rsync-filter", repeated: --filter="- .rsync-filter"]' \
-  '--exclude=[exclude files matching pattern]:pattern:' \
+  '*--exclude=[exclude files matching pattern]:pattern:' \
   '--exclude-from=[read exclude patterns from specified file]:file:_files' \
-  '--include=[do not exclude files matching pattern]:pattern:' \
+  '*--include=[do not exclude files matching pattern]:pattern:' \
   '--include-from=[read include patterns from specified file]:file:_files' \
   '--files-from=[read list of source-file names from specified file]:file:_files' \
   '(-0 --from0)'{-0,--from0}'[all *-from file lists are delimited by nulls]' \
@@ -183,5 +183,6 @@ _arguments -s \
   '--password-file=[read password from file]:file:_files' \
   '--list-only[list the files instead of copying them]' \
   '--write-batch=[write a batched update to the specified file]:file:' \
+  '--only-write-batch=[like --write-batch but w/o updating destination]:file:' \
   '--protocol=[force an older protocol version to be used]:number:' \
   '--read-batch=[read a batched update from the specified file]:file:'
