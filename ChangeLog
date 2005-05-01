@@ -1,3 +1,8 @@
+2005-04-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21215: Test/C03traps.ztst: clean up TRAPEXIT file left behind by
+	autoloaded trap test.
+
 2005-04-27  Peter Stephenson  <pws@csr.com>
 
 	* 21197: Src/exec.c, Src/signals.c: LOCAL_TRAPS didn't restore

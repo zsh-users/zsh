@@ -228,14 +228,14 @@
 # Autoloaded traps are horrid, but unfortunately people expect
 # them to work if we support them.
   echo "print Running exit trap" >TRAPEXIT
-  $ZTST_testdir/../Src/zsh -fc '
+  ${${ZTST_exe##[^/]*}:-$ZTST_testdir/$ZTST_exe} -fc '
     fpath=(. $fpath)
     autoload TRAPEXIT
     print "Exiting, attempt 1"
     exit
     print "What?"
   '
-  $ZTST_testdir/../Src/zsh -fc '
+  ${${ZTST_exe##[^/]*}:-$ZTST_testdir/$ZTST_exe} -fc '
     fpath=(. $fpath)
     autoload TRAPEXIT;
     fn() { print Some function }
@@ -249,3 +249,7 @@
 >Some function
 >Exiting, attempt 2
 >Running exit trap
+
+%clean
+
+  rm -f TRAPEXIT
