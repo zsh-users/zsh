@@ -1,3 +1,9 @@
+2005-05-05  Clint Adams  <clint@zsh.org>
+
+	* Jesse Weinstein: 21230 (reformatted as 21231):
+	Completion/Debian/Command/_dpkg: complete -W/--show
+	for dpkg-deb.
+
 2005-04-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21215: Test/C03traps.ztst: clean up TRAPEXIT file left behind by
