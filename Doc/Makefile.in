@@ -114,11 +114,10 @@ zsh.info: $(sdir)/zsh.texi
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
-	case '$(YODL)' in :*) ;; *) \
+	case '$(YODL)' in :*) touch $$target ;; *) \
 	    echo $(YODL) -o $$target -I$(sdir) -w zman.yo version.yo $< ; \
 	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
 	;; esac; \
-	test -f $$target
 
 ps: us_ps a4_ps
 .PHONY: ps
@@ -146,17 +145,15 @@ zshall.1: zsh.yo
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
-	case '$(YODL)' in :*) ;; *) \
+	case '$(YODL)' in :*) touch $$target ;; *) \
 	    echo $(YODL) -o $$target -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo; \
 	    $(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
 	;; esac; \
-	test -f $$target
 
 ../META-FAQ: META-FAQ.yo Zsh/metafaq.yo
-	case '$(YODL)' in :*) ;; *) \
+	case '$(YODL)' in :*) touch $(sdir_top)/META-FAQ ;; *) \
 	    $(YODL) -I$(sdir) META-FAQ.yo | sed -e '/NEXTLINE/N' -e '/DELLINE/d' -e '/^SECTHEAD$$/{N;s/^SECTHEAD.//;h;s/./-/g;H;g;}' -e 's/  *$$//' > $(sdir_top)/META-FAQ \
 	;; esac
-	test -f $(sdir_top)/META-FAQ
 
 $(YODLDOC): version.yo
 
