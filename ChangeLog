@@ -1,3 +1,8 @@
+2005-05-07  Clint Adams  <clint@zsh.org>
+
+	* Jesse Weinstein: 21233: Completion/Debian/Command/_dpkg:
+	completion for dpkg-query.
+
 2005-05-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21229: Doc/Makefile.in: fix fake build run when yodl isn't found
