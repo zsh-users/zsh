@@ -1,3 +1,8 @@
+2005-05-09  Clint Adams  <clint@zsh.org>
+
+	* 21239: Completion/Unix/Command/_ccal: completion for
+	ccal.
+
 2005-05-09  Peter Stephenson  <pws@csr.com>
 
 	* 21211: Doc/Zsh/expn.yo, Src/pattern.c, Test/D02glob.ztst:
