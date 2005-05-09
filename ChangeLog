@@ -1,3 +1,8 @@
+2005-05-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21235, 21236: Completion/Unix/Command/_ssh: fix remote filename
+	quoting and wrong exit status, both in _remote_files.
+
 2005-05-07  Clint Adams  <clint@zsh.org>
 
 	* Jesse Weinstein: 21233: Completion/Debian/Command/_dpkg:
