@@ -1224,19 +1224,82 @@ A `tt(-)' or `tt(])' may be matched by including it as the
 first character in the list.
 cindex(character classes)
 There are also several named classes of characters, in the form
-`tt([:)var(name)tt(:])' with the following meanings:  `tt([:alnum:])'
-alphanumeric, `tt([:alpha:])' alphabetic,
-`tt([:ascii:])' 7-bit,
-`tt([:blank:])' space or tab,
-`tt([:cntrl:])' control character, `tt([:digit:])' decimal
-digit, `tt([:graph:])' printable character except whitespace,
-`tt([:lower:])' lowercase letter, `tt([:print:])' printable character,
-`tt([:punct:])' printable character neither alphanumeric nor whitespace,
-`tt([:space:])' whitespace character, `tt([:upper:])' uppercase letter, 
-`tt([:xdigit:])' hexadecimal digit.  These use the macros provided by
+`tt([:)var(name)tt(:])' with the following meanings.
+The first set use the macros provided by
 the operating system to test for the given character combinations,
-including any modifications due to local language settings:  see
-manref(ctype)(3).  Note that the square brackets are additional
+including any modifications due to local language settings, see
+manref(ctype)(3):
+
+startitem()
+item(tt([:alnum:]))(
+The character is alphanumeric
+)
+item(tt([:alpha:]))
+(
+The character is alphabetic
+)
+item(tt([:ascii:]))(
+The character is 7-bit, i.e. is a single-byte character without
+the top bit set.
+)
+item(tt([:blank:]))(
+The character is either space or tab
+)
+item(tt([:cntrl:]))(
+The character is a control character
+)
+item(tt([:digit:]))(
+The character is a decimal digit
+)
+item(tt([:graph:]))(
+The character is a printable character other than whitespace
+)
+item(tt([:lower:]))(l
+The character is a lowercase letter
+)
+item(tt([:print:]))(
+The character is printable
+)
+item(tt([:punct:]))(
+The character is printable but neither alphanumeric nor whitespace
+)
+item(tt([:space:]))(
+The character is whitespace
+)
+item(tt([:upper:]))(
+The character is an uppercase letter
+)
+item(tt([:xdigit:]))(
+The character is a hexadecimal digit
+)
+enditem()
+
+Another set of named classes is handled internally by the shell and
+is not sensitive to the locale:
+
+startitem()
+item(tt([:IDENT:]))(
+The character is allowed to form part of a shell identifier, such
+as a parameter name
+)
+item(tt([:IFS:]))(
+The character is used as an input field separator, i.e. is contained in the
+tt(IFS) parameter
+)
+item(tt([:IFSSPACE:]))(
+The character is an IFS white space character; see the documentation
+for tt(IFS) in
+ifzman(the zmanref(zshparams) manual page)\
+ifnzman(noderef(Parameters Used By The Shell))\
+.
+)
+item(tt([:WORD:]))(
+The character is treated as part of a word; this test is sensitive
+to the value of the tt(WORDCHARS) parameter
+)
+enditem()
+
+Note that the square brackets are additional
 to those enclosing the whole set of characters, so to test for a
 single alphanumeric character you need `tt([[:alnum:]])'.  Named
 character sets can be used alongside other types,

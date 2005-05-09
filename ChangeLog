@@ -1,3 +1,8 @@
+2005-05-09  Peter Stephenson  <pws@csr.com>
+
+	* 21211: Doc/Zsh/expn.yo, Src/pattern.c, Test/D02glob.ztst:
+	Add [[:IDENT:]], [[:IFS:]], [[:IFSSPACE:]], [[:WORD:]] tests.
+
 2005-05-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21235, 21236: Completion/Unix/Command/_ssh: fix remote filename

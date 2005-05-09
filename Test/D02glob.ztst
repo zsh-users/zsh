@@ -323,3 +323,28 @@
  print glob.tmp/ra=1.0_et=3.5/???
 0:Bug with intermediate paths with plain strings but tokenized characters
 >glob.tmp/ra=1.0_et=3.5/foo
+
+ doesmatch() {
+   setopt localoptions extendedglob
+   print -n $1 $2\ 
+   if [[ $1 = $~2 ]]; then print yes; else print no; fi;
+ }
+ doesmatch MY_IDENTIFIER '[[:IDENT:]]##'
+ doesmatch YOUR:IDENTIFIER '[[:IDENT:]]##'
+ IFS=$'\n' doesmatch $'\n' '[[:IFS:]]'
+ IFS=' ' doesmatch $'\n' '[[:IFS:]]'
+ IFS=':' doesmatch : '[[:IFSSPACE:]]'
+ IFS=' ' doesmatch ' ' '[[:IFSSPACE:]]'
+ WORDCHARS="" doesmatch / '[[:WORD:]]'
+ WORDCHARS="/" doesmatch / '[[:WORD:]]'
+0:Named character sets handled internally
+>MY_IDENTIFIER [[:IDENT:]]## yes
+>YOUR:IDENTIFIER [[:IDENT:]]## no
+>
+> [[:IFS:]] yes
+>
+> [[:IFS:]] no
+>: [[:IFSSPACE:]] no
+>  [[:IFSSPACE:]] yes
+>/ [[:WORD:]] no
+>/ [[:WORD:]] yes
