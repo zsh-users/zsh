@@ -180,4 +180,9 @@ prompt_bart_setup () {
     return 0
 }
 
+prompt_bart_preview () {
+    local +h PS1='%# '
+    prompt_preview_theme bart "$@"
+}
+
 [[ -o kshautoload ]] || prompt_bart_setup "$@"

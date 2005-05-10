@@ -20,19 +20,21 @@ prompt_elite2_setup () {
   local text_col=${1:-'cyan'}
   local parens_col=${2:-$text_col}
 
-  for code in 332 304 304 371 371 371 372 300 304 304 371 372; do
-    local varname=char_$code
-    : ${(P)varname=$(echo -n "\\0$code")}
+  for code in 332 304 300; do
+    local char_$code=$(echo -n "\\0$code")
   done
 
   local text="%{$fg_no_bold[$text_col]%}"
   local parens="%{$fg_bold[$parens_col]%}"
-  local punctuation_color="%{$fg_bold[grey]%}"
+  local punct="%{$fg_bold[grey]%}"
   local reset="%{$reset_color%}"
 
-  PS1="$punctuation_colorÚ$textÄ$parens($text%n$punctuation_color@$text%m$parens)$textÄ$parens($text%!$punctuation_color/$text%y$parens)$textÄ$parens($text%D{%I:%M%P}$punctuation_color:$text%D{%m/%d/%y}$parens)$textÄ$punctuation_color-$reset$prompt_newline$punctuation_colorÀ$textÄ$parens($text%#$punctuation_color:$text%~$parens)$textÄ$punctuation_color-$reset " 
+  local lpar="$parens($text"
+  local rpar="$parens)$text"
 
-  PS2="$parensÄ$textÄ$punctuation_color-$reset "
+  PS1="$punct$char_332$text$char_304$lpar%n$punct@$text%m$rpar$char_304$lpar%!$punct/$text%y$rpar$char_304$lpar%D{%I:%M%P}$punct:$text%D{%m/%d/%y}$rpar$char_304$punct-$reset$prompt_newline$punct$char_300$text$char_304$lpar%#$punct:$text%~$rpar$char_304$punct-$reset " 
+
+  PS2="$parens$char_304$text$char_304$punct-$reset "
 
   precmd () { setopt promptsubst }
   preexec () { }

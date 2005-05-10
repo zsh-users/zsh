@@ -185,6 +185,7 @@ prompt_preview_theme () {
   print ":"
   prompt_${1}_setup "$@[2,-1]"
   precmd
+  [[ -o promptcr ]] && print -n $'\r'; :
   print -P "${PS1}command arg1 arg2 ... argn"
   preexec
 }

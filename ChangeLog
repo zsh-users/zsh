@@ -1,3 +1,14 @@
+2005-05-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (see 21240): Functions/Prompts/prompt_bart_setup,
+	Functions/Prompts/prompt_bigfade_setup,
+	Functions/Prompts/prompt_elite2_setup,
+	Functions/Prompts/prompt_elite_setup,
+	Functions/Prompts/prompt_fade_setup,
+	Functions/Prompts/prompt_fire_setup, Functions/Prompts/promptinit:
+	assorted cleanup triggered by the discovery that elite2 has never
+	really worked correctly.
+
 2005-05-09  Clint Adams  <clint@zsh.org>
 
 	* 21239: Completion/Unix/Command/_ccal: completion for
