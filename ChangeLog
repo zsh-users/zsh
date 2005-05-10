@@ -1,3 +1,8 @@
+2005-05-10  Oliver Kiddle  <opk@zsh.org>
+
+	* Haakon Riiser: 21188: Completion/X/Command/_acroread: handle
+	acroread 7.x
+
 2005-05-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (see 21240): Functions/Prompts/prompt_bart_setup,
@@ -122,6 +127,7 @@
 	dpkg-reconfigure completion.
 
 2005-04-18  Felix Rosencrantz <f_rosencrantz@gmail.com>
+
 	* 21154: Completion/Unix/Command/_perforce: add pid completion for
 	monitor (clear|terminate) commands.
 
