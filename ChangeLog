@@ -1,3 +1,8 @@
+2005-05-10  Oliver Kiddle  <opk@zsh.org>
+
+	* Haakon Riiser: 21188: Completion/X/Command/_acroread: handle
+	acroread 7.x
+
 2005-05-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21229: Doc/Makefile.in: fix fake build run when yodl isn't found
