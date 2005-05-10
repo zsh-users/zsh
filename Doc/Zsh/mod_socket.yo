@@ -10,6 +10,8 @@ cindex(sockets, Unix domain)
 item(tt(zsocket) [ tt(-altv) ] [ tt(-d) var(fd) ] [ var(args) ])(
 tt(zsocket) is implemented as a builtin to allow full use of shell
 command line editing, file I/O, and job control mechanisms.
+)
+enditem()
 
 subsect(Outbound Connections)
 cindex(sockets, outbound Unix domain)
@@ -60,7 +62,5 @@ if no incoming connection is pending.  Otherwise
 it will wait for one.
 
 In order to elicit more verbose output, use tt(-v).
-)
-enditem()
 )
 enditem()
