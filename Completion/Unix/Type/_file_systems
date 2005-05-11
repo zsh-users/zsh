@@ -16,9 +16,9 @@ case $OSTYPE in
   ;;
   osf*) fss=( advfs ufs nfs mfs cdfs ) ;;
   solaris*) fss=( ufs nfs hsfs s5fs pcfs cachefs tmpfs ) ;;
-  freebsd*)
+  freebsd*|dragonfly*)
     fss=( cd9660 devfs ext2fs fdesc kernfs linprocfs mfs msdos nfs 
-          ntfs null nwfs portal procfs std ufs umap union )
+          ntfs null nwfs portal procfs std udf ufs umap union )
   ;;
   *)
     # default for all other systems

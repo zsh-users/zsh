@@ -12,7 +12,7 @@ case $OSTYPE in
       disp=(-ld list)
     fi
   ;;
-  darwin*|freebsd*) intf=( $(ifconfig -l) ) ;;
+  darwin*|freebsd*|dragonfly*) intf=( $(ifconfig -l) ) ;;
   irix*) intf=( ${${${(f)"$(/usr/etc/netstat -i)"}%% *}[2,-1]} ) ;;
   linux*) intf=( /proc/sys/net/ipv4/conf/*~*(all|default)(N:t) ) ;;
   *) intf=( $(ifconfig -a|sed -n 's/^\([^ 	:]*\).*/\1/p') ) ;;

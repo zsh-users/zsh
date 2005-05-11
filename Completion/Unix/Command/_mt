@@ -44,7 +44,7 @@ if _pick_variant gnu=GNU unix --version; then
     'densities:explain some common density codes'
     'datcompression:enquire or set compression status'
   )
-elif [[ $OSTYPE = freebsd* ]]; then
+elif [[ $OSTYPE = (freebsd|dragonfly)* ]]; then
   cmds=( ${cmds:#(asf|eof):*}
     'smk:write specified number of setmarks at current position'
     'fss:forward space by specified number of setmarks'

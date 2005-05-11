@@ -7,7 +7,7 @@ _cvs() {
 
   # "+Qqrwtnlvb:T:e:d:Hfz:s:xa"
   case $OSTYPE in
-  freebsd*|openbsd*)
+  freebsd*|openbsd*|dragonfly*)
     extra='-R[read only access]'
     ;;
   esac

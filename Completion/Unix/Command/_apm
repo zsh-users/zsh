@@ -11,7 +11,7 @@ if [[ $OSTYPE == linux* ]]; then
     '(-n --noignore)'{-n,--noignore}'[tell the system not to ignore system-generated APM message]' \
     '(-i --ignore)'{-i,--ignore}'[tell the system to ignore system-generated APM message]' && return
 
-elif [[ $OSTYPE == freebsd* ]]; then
+elif [[ $OSTYPE == (freebsd|dragonfly)* ]]; then
 
   _arguments \
     '-a[display AC line status]' \

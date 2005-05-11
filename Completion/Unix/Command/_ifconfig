@@ -19,7 +19,7 @@ case $OSTYPE in
       {,-}trailers {,-}link{0,1,2}
     )
   ;;
-  freebsd*)
+  freebsd*|dragonfly*)
     args=( -s $updown
       '(-a -l -u -d -m -L 1 *)-C[list interface cloners]'
       '(-l -C)-m[list supported media]'

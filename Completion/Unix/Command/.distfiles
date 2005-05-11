@@ -3,17 +3,18 @@ DISTFILES_SRC='
 _a2ps           _aap            _ant            _antiword       _apachectl      
 _apm            _arp            _arping         _attr           
 _baz	        _bison          _bittorrent     _bogofilter     _bzip2
-_cal            _cdcd           _cdrecord       _chkconfig      _chmod          
-_chown          _compress       _configure      _cpio           _cvs            
+_cal            _ccal           _cdcd           _cdrecord       _chkconfig
+_chmod          _chown          _compress       _configure      _cpio
+_cvs
 _darcs          _dd             _dict           _diff           _du             
 _dvi            _ecasound       _elinks         _elm            _enscript       
 _fakeroot       _fetchmail      _figlet         _find           _finger         
-_flex           _fsh            
+_flex           _fortune        _fsh            _fuser
 _gcc            _gdb            _getconf        _getent         _global         
 _gnu_generic    _gpg            _gphoto2        _gprof          _grep           
-_gs             _gzip           
+_groff          _gs             _gzip           
 _iconv          _ifconfig       _imagemagick    _init_d         _irssi          
-_ispell         _java           _joe            _killall         
+_ispell         _java           _joe            _killall        _knock 
 _last           _less           _links          _loadkeys       _look           
 _lp             _ls             _lsof           _lynx           _lzop           
 _mail           _make           _man            _mencal         _mh             
@@ -26,9 +27,9 @@ _printenv       _psutils        _python
 _raggle         _rar            _rcs            _renice         _rlogin         
 _rsync          _ruby           
 _sablotron      _samba          _sccs           _screen         _sed            
-_sh             _slrn           _socket         _spamassassin   _ssh            
-_strip          _stty           _su             _subversion     _sudo           
-_sysctl         
+_sh             _showmount      _slrn           _socket         _spamassassin
+_ssh            _strip          _stty           _su             _subversion
+_sudo           _surfraw        _sysctl         
 _tar            _telnet         _texinfo        _tidy           _tiff           
 _tin            _tla            
 _unace          _uniq           _user_admin     _vorbis         _vux            

@@ -25,7 +25,7 @@ if (( ! EUID )); then
   unset own
 fi
 
-if [[ $OSTYPE = freebsd* ]]; then
+if [[ $OSTYPE = (freebsd|dragonfly)* ]]; then
   flags=( $flags[@]
     '(nouunlnk)uunlnk[set the user undeletable flag]'
     '(uunlnk)nouunlnk[unset the user undeletable flag]'
