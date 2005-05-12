@@ -1852,7 +1852,7 @@ _perforce_cmd_opened() {
 
 (( $+functions[_perforce_cmd_passwd] )) ||
 _perforce_cmd_passwd() {
-  _arguments -s : : \
+  _arguments -s : \
     '-O[explicit old password]:old password: ' \
     '-P[explicit new password]:new password: ' \
     '1::user name:_perforce_users'
