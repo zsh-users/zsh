@@ -1,3 +1,7 @@
+2005-05-13  Motoi Washida <a66@h8.dion.ne.jp>
+	* users/8826: Completion/Darwin/Type/_retrieve_mac_apps: search
+	applications using spotlight. 
+
 2005-05-12  Felix Rosencrantz <f.rosencrantz@gmail.com>
 
 	* 21257: Completion/Unix/Command/_perforce: fix minor typo
