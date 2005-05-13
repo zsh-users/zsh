@@ -1,5 +1,8 @@
 2005-05-13  Oliver Kiddle  <opk@zsh.org>
 
+	* Jesse W: 21244 (modified): Completion/Darwin/Command/_qtplay:
+	new completion for qtplay (Quick Time wrapper for Mac OS X)
+
 	* unposted: Completion/X/Command/_qiv: new completion for qiv
 
 2005-05-13  Motoi Washida <a66@h8.dion.ne.jp>
