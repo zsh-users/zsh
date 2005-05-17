@@ -1,3 +1,7 @@
+2005-05-17  Peter Stephenson  <pws@csr.com>
+
+	* 21264: Doc/Zsh/arith.yo: document the return status of (( ... )).
+
 2005-05-17  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: Etc/FAQ.yo: update mirror sites

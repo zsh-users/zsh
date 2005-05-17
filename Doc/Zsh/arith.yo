@@ -21,7 +21,10 @@ command which begins with a `tt(LPAR()LPAR())', all the characters until a
 matching `tt(RPAR()RPAR())' are treated as a quoted expression and
 arithmetic expansion performed as for an argument of tt(let).  More
 precisely, `tt(LPAR()LPAR())var(...)tt(RPAR()RPAR())' is equivalent to
-`tt(let ")var(...)tt(")'.  For example, the following statement
+`tt(let ")var(...)tt(")'.  The return status is 0 if the arithmetic value
+of the expression is non-zero, and 1 otherwise.
+
+For example, the following statement
 
 example((( val = 2 + 1 )))
 
