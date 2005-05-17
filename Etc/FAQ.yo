@@ -322,67 +322,50 @@ label(16)
   `testing' subdirectory: such up-to-the-minute development versions should
   only be retrieved if you actually plan to help test the latest version of
   the shell.  The following list also appears on the WWW at
-  url(http://www.zsh.org)(http://www.zsh.org) .
+  url(http://www.zsh.org/)(http://www.zsh.org/) .
 
   description(
-    mydit(Home site) url(ftp://ftp.zsh.org)(ftp://ftp.zsh.org)
-    mydit()          url(http://www.zsh.org/pub/zsh/)
-(http://www.zsh.org/pub/zsh/)
-    mydit(Australia) url(ftp://ftp.ips.gov.au/mirror/zsh/)
-(ftp://ftp.ips.gov.au/mirror/zsh/)
-    mydit(Denmark)   url(ftp://sunsite.dk/pub/unix/shells/zsh)
-(ftp://sunsite.dk/pub/unix/shells/zsh)
+    mydit(Home site) url(ftp://ftp.zsh.org/)(ftp://ftp.zsh.org/)
+    mydit()          (also url(http://www.zsh.org/pub/zsh/)
+(http://www.zsh.org/pub/zsh/))
+    mydit(Denmark)   url(ftp://mirrors.dotsrc.org/zsh/)
+(ftp://mirrors.dotsrc.org/zsh/)
+    mydit()          (also url(http://mirrors.dotsrc.org/zsh/)
+(http://mirrors.dotsrc.org/zsh/))
     mydit(Finland)   url(ftp://ftp.funet.fi/pub/unix/shells/zsh/)
 (ftp://ftp.funet.fi/pub/unix/shells/zsh/)
-    mydit(France)    url(ftp://ftp.cenatls.cena.dgac.fr/shells/zsh/)
-(ftp://ftp.cenatls.cena.dgac.fr/shells/zsh/)
+    mydit(France)    url(ftp://nephtys.lip6.fr/pub/unix/shells/zsh/)
+(ftp://nephtys.lip6.fr/pub/unix/shells/zsh/)
     mydit(Germany)   url(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
 (ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
-    mydit()          url(ftp://ftp.uni-trier.de/pub/unix/shell/zsh/)
-(ftp://ftp.uni-trier.de/pub/unix/shell/zsh/)
     mydit(Hungary)   url(ftp://ftp.cs.elte.hu/pub/zsh/)
 (ftp://ftp.cs.elte.hu/pub/zsh/)
     mydit()          (also url(http://www.cs.elte.hu/pub/zsh/)
-(http://www.cs.elte.hu/pub/zsh/) )
+(http://www.cs.elte.hu/pub/zsh/))
     mydit()          url(ftp://ftp.kfki.hu/pub/packages/zsh/)
 (ftp://ftp.kfki.hu/pub/packages/zsh/)
-    mydit(Israel)    \
-url(ftp://ftp.math.technion.ac.il/pub/zsh/)
+    mydit(Israel)    url(ftp://ftp.math.technion.ac.il/pub/zsh/)
 (ftp://ftp.math.technion.ac.il/pub/zsh/)
-    mydit()          \
-url(http://www.math.technion.ac.il/pub/zsh/)
-(http://www.math.technion.ac.il/pub/zsh/)
-    mydit(Italy)     url(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
-(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
-    mydit(Japan)     url(ftp://ftp.nisiq.net/pub/shells/zsh/)
-(ftp://ftp.nis.co.jp/pub/shells/zsh/)
-    mydit()          url(ftp://ftp.win.ne.jp/pub/shell/zsh/)
-(ftp://ftp.win.ne.jp/pub/shell/zsh/)
-    mydit(Norway)    url(ftp://ftp.uit.no/pub/unix/shells/zsh/)
-(ftp://ftp.uit.no/pub/unix/shells/zsh/)
+    mydit()          (also url(http://www.math.technion.ac.il/pub/zsh/)
+(http://www.math.technion.ac.il/pub/zsh/))
+    mydit(Netherlands) url(ftp://ftp.demon.nl/pub/mirrors/zsh/)
+(ftp://ftp.demon.nl/pub/mirrors/zsh/)
     mydit(Poland)    url(ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/)
 (ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/)
-    mydit(Romania)   url(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/)
-(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/)
-    mydit()          url(ftp://ftp.kappa.ro/pub/mirrors/ftp.zsh.org/pub/zsh/)
+    mydit(Romania)   url(ftp://ftp.kappa.ro/pub/mirrors/ftp.zsh.org/pub/zsh/)
 (ftp://ftp.kappa.ro/pub/mirrors/ftp.zsh.org/pub/zsh/)
-    mydit(Slovenia)  url(ftp://ftp.siol.net/mirrors/zsh/)
-(ftp://ftp.siol.net/mirrors/zsh/)
     mydit(Sweden)    url(ftp://ftp.lysator.liu.se/pub/unix/zsh/)
 (ftp://ftp.lysator.liu.se/pub/unix/zsh/)
-    mydit(UK)        url(ftp://ftp.net.lut.ac.uk/zsh/)
-(ftp://ftp.net.lut.ac.uk/zsh/)
-    mydit()          (also by FSP at port 21)
-    mydit()          url(ftp://sunsite.org.uk/packages/zsh/)
+    mydit(UK)        url(ftp://sunsite.org.uk/packages/zsh/)
 (ftp://sunsite.org.uk/packages/zsh/)
     mydit(USA)       url(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
 (ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
     mydit()          url(ftp://ftp.rge.com/pub/shells/zsh/)
 (ftp://ftp.rge.com/pub/shells/zsh/)
-    mydit()          url(ftp://foad.org/pub/zsh/)
-(ftp://foad.org/pub/zsh/)
-    mydit()          url(http://foad.org/zsh/)
-(http://foad.org/zsh/)
+    mydit()          url(ftp://archive.progeny.com/zsh/)
+(ftp://archive.progeny.com/zsh/)
+    mydit()          (also url(http://archive.progeny.com/zsh/)
+(http://archive.progeny.com/zsh/))
   )
 
   The Windows port mentioned above is maintained separately by email(Amol
@@ -391,15 +374,15 @@ url(http://www.math.technion.ac.il/pub/zsh/)
   not be developed further.  You can get it from:
 
   description(
-    mydit()        url(ftp://ftp.blarg.net/users/amol/zsh)
-(ftp://ftp.blarg.net/users/amol/zsh)  
+    mydit()        url(ftp://ftp.blarg.net/users/amol/zsh/)
+(ftp://ftp.blarg.net/users/amol/zsh/)  
   )
 
   There is no port of version 4 for Windows, but newer releases compile under
   Cygwin, a freely available UNIX-style environment for the Win32 API.  You
   can find information about this at 
-  url(http://sourceware.cygnus.com/cygwin)\
-(http://sourceware.cygnus.com/cygwin).
+  url(http://www.cygwin.com/)\
+(http://www.cygwin.com/).
 
   Likewise the OS/2 port is available from email(TAMURA Kent
   <kent@tril.ibm.co.jp>) at

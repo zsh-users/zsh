@@ -1,3 +1,7 @@
+2005-05-17  Geoff Wing  <gcw@zsh.org>
+
+	* unposted: Etc/FAQ.yo: update mirror sites
+
 2005-05-13  Oliver Kiddle  <opk@zsh.org>
 
 	* Jesse W: 21244 (modified): Completion/Darwin/Command/_qtplay:
