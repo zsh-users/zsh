@@ -1,3 +1,8 @@
+2005-05-21  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_webbrowser: add firefox to list of
+	basic URL completed web browsers
+
 2005-05-17  Peter Stephenson  <pws@csr.com>
 
 	* 21264: Doc/Zsh/arith.yo: document the return status of (( ... )).
@@ -1986,6 +1991,7 @@
 2004-04-17  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 19775: Completion/Unix/Command/_php: new completion for php
+
 	* unposted: Completion/Unix/Command/_elinks: declare and initialise
 	return value parameter
 
