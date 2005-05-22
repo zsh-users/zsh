@@ -10,6 +10,7 @@ exec 3>&-	# Too bad if somebody else is using it ...
 [[ -t 2 ]] && { exec 3>&2 2>| $tmp ; trap 'exec 2>&3 3>&-' EXIT INT }
 
 setopt xtrace
+: $ZSH_NAME $ZSH_VERSION
 _main_complete
 integer ret=$?
 unsetopt xtrace

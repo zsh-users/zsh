@@ -1,7 +1,12 @@
+2005-05-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Completion/Base/Widget/_complete_debug: add a colon
+	command so name and version of zsh appear in debug output.
+
 2005-05-21  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
-	* unposted: Completion/Unix/Command/_webbrowser: add firefox to list of
-	basic URL completed web browsers
+	* unposted: Completion/Unix/Command/_webbrowser: add firefox to
+	list of basic URL completed web browsers
 
 2005-05-17  Peter Stephenson  <pws@csr.com>
 
