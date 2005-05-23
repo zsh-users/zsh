@@ -1,3 +1,9 @@
+2005-05-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Functions/Prompts/prompt_bart_setup: print whitespace
+	to stderr for promptcr adjustments, because the prompt itself is
+	printed to stderr.
+
 2005-05-23  Peter Stephenson  <pws@csr.com>
 
 	* 21270: Src/system.h: don't use poll() on Apple.
