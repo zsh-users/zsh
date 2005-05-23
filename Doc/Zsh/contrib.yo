@@ -858,6 +858,18 @@ example(zle -N insert-last-assignment smart-insert-last-word
 zstyle :insert-last-assignment match '[[:alpha:]][][[:alnum:]]#=*'
 bindkey '\e=' insert-last-assignment)
 )
+tindex(which-command)
+item(tt(which-command))(
+This function is a drop-in replacement for the builtin widget
+tt(which-command).  It has enhanced behaviour, in that it correctly
+detects whether or not the command word needs to be expanded as an
+alias; if so, it continues tracing the command word from the expanded
+alias until it reaches the command that will be executed.
+
+The style tt(whence) is available in the context tt(:zle:$WIDGET); this
+may be set to an array to give the command and options that will be used to
+investigate the command word found.  The default is tt(whence -c).
+)
 enditem()
 
 subsect(Styles)

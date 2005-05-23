@@ -1,3 +1,11 @@
+2005-05-23  Peter Stephenson  <pws@csr.com>
+
+	* users/8863: Doc/Zsh/contrib.yo, Functions/Zle/which-command:
+	enhanced which-command that traces the final command better.
+
+	* users/8856: Src/Zle/zle_tricky.c: which-command shouldn't expand
+	aliases before passing first argument.
+
 2005-05-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Completion/Base/Widget/_complete_debug: add a colon
