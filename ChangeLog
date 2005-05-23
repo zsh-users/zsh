@@ -1,5 +1,7 @@
 2005-05-23  Peter Stephenson  <pws@csr.com>
 
+	* 21270: Src/system.h: don't use poll() on Apple.
+
 	* users/8863: Doc/Zsh/contrib.yo, Functions/Zle/which-command:
 	enhanced which-command that traces the final command better.
 
