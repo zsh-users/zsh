@@ -1,3 +1,7 @@
+2005-05-23  Peter Stephenson  <pws@csr.com>
+
+	* 21270: Src/system.h: don't use poll() on Apple.
+
 2005-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* Haakon Riiser: 21188: Completion/X/Command/_acroread: handle
