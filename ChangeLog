@@ -1,3 +1,8 @@
+2005-05-26  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 21275 (modified): Completion/Unix/Command/_raggle: update raggle
+	completion for version 0.4.0
+
 2005-05-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_bart_setup: print whitespace
@@ -19,6 +24,7 @@
 	* unposted: Completion/Base/Widget/_complete_debug: add a colon
 	command so name and version of zsh appear in debug output.
 
+>>>>>>> 1.2661
 2005-05-21  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_webbrowser: add firefox to
