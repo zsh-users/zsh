@@ -24,7 +24,6 @@
 	* unposted: Completion/Base/Widget/_complete_debug: add a colon
 	command so name and version of zsh appear in debug output.
 
->>>>>>> 1.2661
 2005-05-21  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_webbrowser: add firefox to
