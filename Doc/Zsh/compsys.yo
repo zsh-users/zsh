@@ -3819,7 +3819,7 @@ after the call to tt(compinit).
 
 The completion system as supplied is conservative in its use of this
 function, since it is important to be sure the command understands the
-option `tt(-)'tt(-help)'.
+option `tt(-)tt(-help)'.
 )
 findex(_guard)
 item(tt(_guard) [ var(options) ] var(pattern descr))(
