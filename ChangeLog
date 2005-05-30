@@ -1,3 +1,7 @@
+2005-05-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 21266: Completion/Unix/Command/_mh: improve completion of sequences
+
 2005-05-23  Peter Stephenson  <pws@csr.com>
 
 	* 21270: Src/system.h: don't use poll() on Apple.
