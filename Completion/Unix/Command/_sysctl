@@ -1,0 +1,45 @@
+#compdef sysctl
+
+case $OSTYPE in
+  freebsd[5-9].*|freebsd4.[4-9]*)
+    local -a sysctlvars
+    sysctlvars=( $(sysctl -aN) )
+    _arguments -s -A "-*" \
+      '(*)-a[list all]' \
+      '-b[binary output]' \
+      '(-n)-N[show only variable names]' \
+      '(-N)-n[show only variable values]' \
+      '(-x)-o[show opaques as well (values suppressed)]' \
+      '(-o)-x[show opaques as well (entire values)]' \
+      '(-a)*:sysctl variable:_multi_parts -i . sysctlvars'
+  ;;
+  freebsd[0-4].*|darwin*|dragonfly*)
+    : ${(A)_cache_sysctlvars:=${${$(sysctl -A 2>/dev/null):#[^a-z]*}%%:*}}
+    _arguments -s -A "-*" \
+      '(-w -X *)-a[list all]' \
+      '(-w -X *)-A[show all opaques (values suppressed)]' \
+      '(-w)-b[binary output]' \
+      '(-w)-n[show only variable values]' \
+      '(-a -A -b -n -X)-w[write mode]' \
+      '(-a -A -w *)-X[show all opaques (entire values)]' \
+      '(-a -A -X)*:sysctl variable:_multi_parts ${words[(r)-w]:+-S=} -i . _cache_sysctlvars'
+  ;;
+  linux*)
+    _arguments -A "-*" \
+      '-n[show only variable values]' \
+      '(-n -p -a -A)-w[write mode]' \
+      '(-n -w -a -A *)-p[specify file to load sysctl settings from]:file:_files' \
+      '(-n -w -p -A *)-a[list all]' \
+      '(-n -w -p -a *)-A[list all in table form]' \
+      '(-n -p -a -A)*:sysctl variable:_files -W /proc/sys'
+  ;;
+  openbsd*)
+    : ${(A)_cache_sysctlvars:=${${(f)"$(sysctl -a)"}%% *}}
+    _arguments -s -A "-*" \
+      '(-w -A *)-a[list all string and integer variables]' \
+      '(-w -a *)-A[list all known variables]' \
+      '(-w)-n[show only values]' \
+      '(-a -A -n)-w[write variable]' \
+      '(-a -A)*:sysctl variable:_multi_parts ${words[(r)-w]:+-S=} -i . _cache_sysctlvars'
+    ;;
+esac

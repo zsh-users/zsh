@@ -34,7 +34,6 @@
  * upper bound on the number of bytes we read (even if we are give a
  * pattern). */
 
-#define READ_LEN 1024
 #define READ_MAX (1024 * 1024)
 
 typedef struct ptycmd *Ptycmd;
@@ -46,8 +45,11 @@ struct ptycmd {
     int fd;
     int pid;
     int echo;
-    int block;
+    int nblock;
     int fin;
+    int read;
+    char *old;
+    int olen;
 };
 
 static Ptycmd ptycmds;
@@ -152,41 +154,62 @@ getptycmd(char *name)
     return NULL;
 }
 
-/**** maybe we should use configure here */
-/**** and we certainly need more/better #if tests */
+#ifdef USE_DEV_PTMX
 
-#ifdef __osf__
-
-static int
-get_pty(int *master, int *slave)
-{
-    return openpty(master, slave, NULL, NULL, NULL);
-}
-
-#else /* ! __osf__ */
-
-#if defined(__SVR4) || defined(sinix)
-
+#ifdef HAVE_SYS_STROPTS_H
 #include <sys/stropts.h>
+#endif
+
+#if defined(I_FIND) && defined(I_PUSH)
+/*
+ * These tests are ad hoc.  Unfortunately if you get the wrong ioctl,
+ * STREAMS simply hangs up, so there's no obvious way of doing this
+ * more systematically.
+ *
+ * Apparently Solaris needs all three ioctls, but HP-UX doesn't need
+ * ttcompat.  The Solaris definition has been extended to all __SVR4
+ * as a guess; I have no idea if this is right.
+ */
+#ifdef __SVR4
+#define USE_STREAMS_IOCTLS
+#define USE_STREAMS_TTCOMPAT
+#endif
+#ifdef __hpux
+#define USE_STREAMS_IOCTLS
+#endif
+#endif
 
 static int
-get_pty(int *master, int *slave)
+get_pty(int master, int *retfd)
 {
-    int mfd, sfd;
-    char *name;
+    static char *name;
+    static int mfd, sfd;
+#ifdef USE_STREAMS_IOCTLS
     int ret;
+#endif
 
-    if ((mfd = open("/dev/ptmx", O_RDWR)) < 0)
-	return 1;
+    if (master) {
+	if ((mfd = open("/dev/ptmx", O_RDWR|O_NOCTTY)) < 0)
+	    return 1;
 
-    if (grantpt(mfd) || unlockpt(mfd) || !(name = ptsname(mfd))) {
+	if (grantpt(mfd) || unlockpt(mfd) || !(name = ptsname(mfd))) {
+	    close(mfd);
+	    return 1;
+	}
+	*retfd = mfd;
+
+	return 0;
+    }
+    if ((sfd = open(name, O_RDWR
+#ifndef __CYGWIN__
+		    /* It is not clear whether this flag is actually needed. */
+		    |O_NOCTTY
+#endif
+	)) < 0) {
 	close(mfd);
 	return 1;
     }
-    if ((sfd = open(name, O_RDWR)) < 0) {
-	close(mfd);
-	return 1;
-    }
+#ifdef USE_STREAMS_IOCTLS
     if ((ret = ioctl(sfd, I_FIND, "ptem")) != 1)
        if (ret == -1 || ioctl(sfd, I_PUSH, "ptem") == -1) {
 	   close(mfd);
@@ -199,81 +222,127 @@ get_pty(int *master, int *slave)
 	   close(sfd);
 	   return 1;
        }
+#ifdef USE_STREAMS_TTCOMPAT
     if ((ret = ioctl(sfd, I_FIND, "ttcompat")) != 1)
        if (ret == -1 || ioctl(sfd, I_PUSH, "ttcompat") == -1) {
 	   close(mfd);
 	   close(sfd);
 	   return 1;
        }
-    *master = mfd;
-    *slave = sfd;
+#endif
+#endif
+
+    *retfd = sfd;
 
     return 0;
 }
 
-#else /* ! (defined(__SVR4) || defined(sinix)) */
+#else /* No /dev/ptmx or no pt functions */
 
 static int
-get_pty(int *master, int *slave)
+get_pty(int master, int *retfd)
 {
 
 #ifdef __linux
     static char char1[] = "abcdefghijklmnopqrstuvwxyz";
     static char char2[] = "0123456789abcdef";
-#else /* ! __linux */
-    static char char1[] = "pq";
+#elif defined(__FreeBSD__) || defined(__DragonFly__)
+    static char char1[] = "pqrsPQRS";
+    static char char2[] = "0123456789abcdefghijklmnopqrstuv";
+#else /* __FreeBSD__ || __DragonFly__ */
+    static char char1[] = "pqrstuvwxyzPQRST";
     static char char2[] = "0123456789abcdef";
-#endif /* __linux */
+#endif
 
-    char name[11], *p1, *p2;
-    int mfd, sfd;
+    static char name[11];
+    static int mfd, sfd;
+    char *p1, *p2;
 
-    strcpy(name, "/dev/ptyxx");
+    if (master) {
+	strcpy(name, "/dev/ptyxx");
 
-    for (p1 = char1; *p1; p1++) {
-	name[8] = *p1;
-	for (p2 = char2; *p2; p2++) {
-	    name[9] = *p2;
-	    if ((mfd = open(name, O_RDWR)) >= 0) {
-		name[5] = 't';
-		if ((sfd = open(name, O_RDWR)) >= 0) {
-		    *master = mfd;
-		    *slave = sfd;
+	for (p1 = char1; *p1; p1++) {
+	    name[8] = *p1;
+	    for (p2 = char2; *p2; p2++) {
+		name[9] = *p2;
+		if ((mfd = open(name, O_RDWR|O_NOCTTY)) >= 0) {
+		    *retfd = mfd;
 
 		    return 0;
 		}
-		name[5] = 'p';
-		close(mfd);
 	    }
 	}
     }
+    name[5] = 't';
+    if ((sfd = open(name, O_RDWR|O_NOCTTY)) >= 0) {
+	*retfd = sfd;
+
+	return 0;
+    }
+    close(mfd);
+
     return 1;
 }
 
-#endif /* __SVR4 */
-#endif /* __osf__ */
+#endif /* /dev/ptmx or alternatives */
 
 static int
-newptycmd(char *nam, char *pname, char **args, int echo, int block)
+newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 {
     Ptycmd p;
     int master, slave, pid;
-    char *cmd;
+    Eprog prog;
 
-    if (!(cmd = findcmd(*args, 1))) {
-	zwarnnam(nam, "unknown command: %s", *args, 0);
+    prog = parse_string(zjoin(args, ' ', 1));
+    if (!prog) {
+	errflag = 0;
 	return 1;
     }
-    if (get_pty(&master, &slave)) {
-	zwarnnam(nam, "can't open pseudo terminal", NULL, 0);
+
+    if (get_pty(1, &master)) {
+	zwarnnam(nam, "can't open pseudo terminal: %e", NULL, errno);
 	return 1;
     }
     if ((pid = fork()) == -1) {
+	zwarnnam(nam, "can't create pty command %s: %e", pname, errno);
 	close(master);
-	close(slave);
-	zwarnnam(nam, "couldn't create pty command: %s", pname, 0);
 	return 1;
     } else if (!pid) {
+	/* This code copied from the clone module, except for getting *
+	 * the descriptor from get_pty() and duplicating it to 0/1/2. */
+
+	clearjobtab(0);
+	ppid = getppid();
+	mypid = getpid();
+#ifdef HAVE_SETSID
+	if (setsid() != mypid) {
+	    zwarnnam(nam, "failed to create new session: %e", NULL, errno);
+#endif
+#ifdef TIOCNOTTY
+	    if (ioctl(SHTTY, TIOCNOTTY, 0))
+		zwarnnam(nam, "%e", NULL, errno);
+	    setpgrp(0L, mypid);
+#endif
+#ifdef HAVE_SETSID
+	}
+#endif
+
+	if (get_pty(0, &slave))
+	    exit(1);
+#ifdef TIOCGWINSZ
+	/* Set the window size before associating with the terminal *
+	 * so that we don't get hit with a SIGWINCH.  I'm paranoid. */
+	if (interact) {
+	    struct ttyinfo info;
+
+	    if (ioctl(slave, TIOCGWINSZ, (char *) &info.winsize) == 0) {
+		info.winsize.ws_row = lines;
+		info.winsize.ws_col = columns;
+		ioctl(slave, TIOCSWINSZ, (char *) &info.winsize);
+	    }
+	}
+#endif /* TIOCGWINSZ */
+
 	if (!echo) {
 	    struct ttyinfo info;
 
@@ -291,21 +360,9 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
 	    }
 	}
 
-#ifdef TIOCGWINSZ
-	if (interact) {
-	    struct ttyinfo info;
-
-	    if (ioctl(slave, TIOCGWINSZ, (char *) &info.winsize) == 0) {
-		info.winsize.ws_row = lines;
-		info.winsize.ws_col = columns;
-		ioctl(slave, TIOCSWINSZ, (char *) &info.winsize);
-	    }
-	}
-#endif /* TIOCGWINSZ */
-
-	signal_default(SIGTERM);
-	signal_default(SIGINT);
-	signal_default(SIGQUIT);
+#ifdef TIOCSCTTY
+	ioctl(slave, TIOCSCTTY, 0);
+#endif
 
 	close(0);
 	close(1);
@@ -315,15 +372,20 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
 	dup2(slave, 1);
 	dup2(slave, 2);
 
+	closem(0);
 	close(slave);
+	close(master);
+	close(coprocin);
+	close(coprocout);
+	init_io();
+	setsparam("TTY", ztrdup(ttystrname));
 
-	setpgrp(0L, getpid());
-
-	execve(cmd, args, environ);
-	exit(0);
+	opts[INTERACTIVE] = 0;
+	execode(prog, 1, 0);
+	stopmsg = 2;
+	zexit(lastval, 0);
     }
     master = movefd(master);
-    close(slave);
 
     p = (Ptycmd) zalloc(sizeof(*p));
 
@@ -332,13 +394,16 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
     p->fd = master;
     p->pid = pid;
     p->echo = echo;
-    p->block = block;
+    p->nblock = nblock;
     p->fin = 0;
+    p->read = -1;
+    p->old = NULL;
+    p->olen = 0;
 
     p->next = ptycmds;
     ptycmds = p;
 
-    if (!block)
+    if (nblock)
 	ptynonblock(master);
 
     return 0;
@@ -362,11 +427,11 @@ deleteptycmd(Ptycmd cmd)
     zsfree(p->name);
     freearray(p->args);
 
+    zclose(cmd->fd);
+
     /* We kill the process group the command put itself in. */
 
     kill(-(p->pid), SIGHUP);
-
-    zclose(cmd->fd);
 
     zfree(p, sizeof(*p));
 }
@@ -387,17 +452,26 @@ deleteallptycmds(void)
 static void
 checkptycmd(Ptycmd cmd)
 {
-    if (kill(cmd->pid, 0) < 0) {
-	cmd->fin = 1;
-	zclose(cmd->fd);
+    char c;
+    int r;
+
+    if (cmd->read != -1 || cmd->fin)
+	return;
+    if ((r = read(cmd->fd, &c, 1)) < 0) {
+	if (kill(cmd->pid, 0) < 0) {
+	    cmd->fin = 1;
+	    zclose(cmd->fd);
+	}
+	return;
     }
+    if (r) cmd->read = (int) c;
 }
 
 static int
 ptyread(char *nam, Ptycmd cmd, char **args)
 {
-    int blen = 256, used = 0, ret = 1;
-    char *buf = (char *) zhalloc(blen + 1);
+    int blen, used, seen = 0, ret = 0;
+    char *buf;
     Patprog prog = NULL;
 
     if (*args && args[1]) {
@@ -414,6 +488,25 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	    zwarnnam(nam, "bad pattern: %s", args[1], 0);
 	    return 1;
 	}
+    } else
+	fflush(stdout);
+
+    if (cmd->old) {
+	used = cmd->olen;
+	buf = (char *) zhalloc((blen = 256 + used) + 1);
+	memcpy(buf, cmd->old, cmd->olen);
+	zfree(cmd->old, cmd->olen);
+	cmd->old = NULL;
+	cmd->olen = 0;
+    } else {
+	used = 0;
+	buf = (char *) zhalloc((blen = 256) + 1);
+    }
+    if (cmd->read != -1) {
+	buf[used] = (char) cmd->read;
+	buf[used + 1] = '\0';
+	seen = used = 1;
+	cmd->read = -1;
     }
     do {
 	if (!ret) {
@@ -421,84 +514,94 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	    if (cmd->fin)
 		break;
 	}
-	if ((ret = read(cmd->fd, buf + used, 1)) == 1) {
+	if (cmd->read != -1 || (ret = read(cmd->fd, buf + used, 1)) == 1) {
+	    if (cmd->read != -1) {
+		ret = 1;
+		buf[used] = (char) cmd->read;
+		cmd->read = -1;
+	    }
+	    seen = 1;
 	    if (++used == blen) {
-		buf = hrealloc(buf, blen, blen << 1);
-		blen <<= 1;
+		if (!*args) {
+		    write(1, buf, used);
+		    used = 0;
+		} else {
+		    buf = hrealloc(buf, blen, blen << 1);
+		    blen <<= 1;
+		}
 	    }
 	}
 	buf[used] = '\0';
 
-	/**** Hm. If we leave the loop when ret < 0 the user would have
-	 *    to make sure that `zpty -r' is tried more than once if
-	 *    there will be some output and we only got the ret == -1
-	 *    because the output is not yet available.
-	 *    The same for the `write' below. */
+	if (!prog && (ret <= 0 || (*args && buf[used - 1] == '\n')))
+	    break;
+    } while (!(errflag || breaks || retflag || contflag) &&
+	     used < READ_MAX && !(prog && ret && pattry(prog, buf)));
 
-	if (ret < 0 && (cmd->block
+    if (prog && ret < 0 &&
 #ifdef EWOULDBLOCK
-			|| errno != EWOULDBLOCK
+	errno == EWOULDBLOCK
 #else
 #ifdef EAGAIN
-			|| errno != EAGAIN
+	errno == EAGAIN
 #endif
 #endif
-			))
-	    break;
+	) {
+	cmd->old = (char *) zalloc(cmd->olen = used);
+	memcpy(cmd->old, buf, cmd->olen);
 
-	if (!prog && !ret)
-	    break;
-    } while (!errflag &&
-	     (prog ? (used < READ_MAX && (!ret || !pattry(prog, buf))) :
-	      (used < READ_LEN)));
-
+	return 1;
+    }
     if (*args)
 	setsparam(*args, ztrdup(metafy(buf, used, META_HREALLOC)));
-    else {
-	fflush(stdout);
+    else if (used)
 	write(1, buf, used);
-    }
-    return !used;
+
+    return (seen ? 0 : cmd->fin + 1);
 }
 
 static int
 ptywritestr(Ptycmd cmd, char *s, int len)
 {
-    int written;
+    int written, all = 0;
 
-    for (; len; len -= written, s += written) {
-	if ((written = write(cmd->fd, s, len)) < 0 &&
-	    (cmd->block
+    for (; !errflag && !breaks && !retflag && !contflag && len;
+	 len -= written, s += written) {
+	if ((written = write(cmd->fd, s, len)) < 0 && cmd->nblock &&
 #ifdef EWOULDBLOCK
-			|| errno != EWOULDBLOCK
+	    errno == EWOULDBLOCK
 #else
 #ifdef EAGAIN
-			|| errno != EAGAIN
+	    errno == EAGAIN
 #endif
 #endif
-	     ))
-	    return 1;
+	    )
+	    return !all;
 	if (written < 0) {
 	    checkptycmd(cmd);
 	    if (cmd->fin)
 		break;
 	    written = 0;
 	}
+	if (written > 0)
+	    all += written;
     }
-    return 0;
+    return (all ? 0 : cmd->fin + 1);
 }
 
 static int
 ptywrite(Ptycmd cmd, char **args, int nonl)
 {
     if (*args) {
-	char sp = ' ';
+	char sp = ' ', *tmp;
+	int len;
 
-	while (*args)
-	    if (ptywritestr(cmd, *args, strlen(*args)) ||
+	while (*args) {
+	    unmetafy((tmp = dupstring(*args)), &len);
+	    if (ptywritestr(cmd, tmp, len) ||
 		(*++args && ptywritestr(cmd, &sp, 1)))
 		return 1;
-
+	}
 	if (!nonl) {
 	    sp = '\n';
 	    if (ptywritestr(cmd, &sp, 1))
@@ -517,19 +620,23 @@ ptywrite(Ptycmd cmd, char **args, int nonl)
 
 /**/
 static int
-bin_zpty(char *nam, char **args, char *ops, int func)
+bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    if ((ops['r'] && ops['w']) ||
-	((ops['r'] || ops['w']) && (ops['d'] || ops['e'] ||
-				    ops['b'] || ops['L'])) ||
-	(ops['n'] && (ops['b'] || ops['e'] || ops['r'] ||
-		      ops['d'] || ops['L'])) ||
-	(ops['d'] && (ops['b'] || ops['e'] || ops['L'])) ||
-	(ops['L'] && (ops['b'] || ops['e']))) {
+    if ((OPT_ISSET(ops,'r') && OPT_ISSET(ops,'w')) ||
+	((OPT_ISSET(ops,'r') || OPT_ISSET(ops,'w')) && 
+	 (OPT_ISSET(ops,'d') || OPT_ISSET(ops,'e') ||
+	  OPT_ISSET(ops,'b') || OPT_ISSET(ops,'L'))) ||
+	(OPT_ISSET(ops,'w') && OPT_ISSET(ops,'t')) ||
+	(OPT_ISSET(ops,'n') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e') ||
+				OPT_ISSET(ops,'r') || OPT_ISSET(ops,'t') ||
+				OPT_ISSET(ops,'d') || OPT_ISSET(ops,'L'))) ||
+	(OPT_ISSET(ops,'d') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e') ||
+				OPT_ISSET(ops,'L') || OPT_ISSET(ops,'t'))) ||
+	(OPT_ISSET(ops,'L') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e')))) {
 	zwarnnam(nam, "illegal option combination", NULL, 0);
 	return 1;
     }
-    if (ops['r'] || ops['w']) {
+    if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'w')) {
 	Ptycmd p;
 
 	if (!*args) {
@@ -539,13 +646,16 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "no such pty command: %s", *args, 0);
 	    return 1;
 	}
-	checkptycmd(p);
 	if (p->fin)
+	    return 2;
+	if (OPT_ISSET(ops,'t') && p->read == -1 &&
+	    !read_poll(p->fd, &p->read, 0, 0))
 	    return 1;
-	return (ops['r'] ?
+
+	return (OPT_ISSET(ops,'r') ?
 		ptyread(nam, p, args + 1) :
-		ptywrite(p, args + 1, ops['n']));
-    } else if (ops['d']) {
+		ptywrite(p, args + 1, OPT_ISSET(ops,'n')));
+    } else if (OPT_ISSET(ops,'d')) {
 	Ptycmd p;
 	int ret = 0;
 
@@ -561,6 +671,18 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	    deleteallptycmds();
 
 	return ret;
+    } else if (OPT_ISSET(ops,'t')) {
+	Ptycmd p;
+
+	if (!*args) {
+	    zwarnnam(nam, "missing pty command name", NULL, 0);
+	    return 1;
+	} else if (!(p = getptycmd(*args))) {
+	    zwarnnam(nam, "no such pty command: %s", *args, 0);
+	    return 1;
+	}
+	checkptycmd(p);
+	return p->fin;
     } else if (*args) {
 	if (!args[1]) {
 	    zwarnnam(nam, "missing command", NULL, 0);
@@ -570,16 +692,17 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "pty command name already used: %s", *args, 0);
 	    return 1;
 	}
-	return newptycmd(nam, *args, args + 1, ops['e'], ops['b']);
+	return newptycmd(nam, *args, args + 1, OPT_ISSET(ops,'e'), 
+			 OPT_ISSET(ops,'b'));
     } else {
 	Ptycmd p;
 	char **a;
 
 	for (p = ptycmds; p; p = p->next) {
 	    checkptycmd(p);
-	    if (ops['L'])
+	    if (OPT_ISSET(ops,'L'))
 		printf("%s %s%s%s ", nam, (p->echo ? "-e " : ""),
-		       (p->block ? "-b " : ""), p->name);
+		       (p->nblock ? "-b " : ""), p->name);
 	    else if (p->fin)
 		printf("(finished) %s: ", p->name);
 	    else
@@ -596,19 +719,19 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 }
 
 static int
-ptyhook(Hookdef d, void *dummy)
+ptyhook(UNUSED(Hookdef d), UNUSED(void *dummy))
 {
     deleteallptycmds();
     return 0;
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("zpty", 0, bin_zpty, 0, -1, 0, "ebdrwLn", NULL),
+    BUILTIN("zpty", 0, bin_zpty, 0, -1, 0, "ebdrwLnt", NULL),
 };
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -635,7 +758,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

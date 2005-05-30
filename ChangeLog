@@ -2,6 +2,15 @@
 
 	* 21270: Src/system.h: don't use poll() on Apple.
 
+2005-05-11  Oliver Kiddle  <opk@zsh.org>
+
+	* Joerg Sonnenberger: 21252: configure.ac, Src/Modules/zpty.c,
+	Completion/BSD/Command/_chflags, Completion/Unix/Command/_apm,
+	Completion/Unix/Command/_cvs, Completion/Unix/Command/_ifconfig,
+	Completion/Unix/Command/_mount, Completion/Unix/Command/_mt,
+	Completion/Unix/Command/_sysctl, Completion/Unix/Type/_file_systems,
+	Completion/Unix/Type/_net_interfaces: Dragonfly BSD support
+
 2005-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* Haakon Riiser: 21188: Completion/X/Command/_acroread: handle

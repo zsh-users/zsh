@@ -2172,7 +2172,7 @@ char *argv[];
     esac
   fi
   case "$host_os" in
-    freebsd*|linux*|irix*|osf*|gnu*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
+    freebsd*|linux*|irix*|osf*|gnu*|dragonfly*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
     sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
     netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;

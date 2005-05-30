@@ -1,0 +1,45 @@
+#compdef chflags
+
+local flags own='-g *(-u$EUID)'
+
+flags=(
+  '(noopaque)opaque[set the opaque flag]'
+  '(opaque)noopaque[unset the opaque flag]'
+  '(dump)nodump[set the nodump flag]'
+  '(nodump)dump[unset the nodump flag]'
+  '(nouappnd)uappnd[set the user append-only flag]'
+  '(uappnd)nouappnd[unset the user append-only flag]'
+  '(nouchg)uchg[set the user immutable flag]'
+  '(uchg)nouchg[unset the user immutable flag]'
+)
+
+if (( ! EUID )); then
+  flags=( $flags[@]
+    '(noarch)arch[set the archived flag]'
+    '(arch)noarch[unset the archived flag]'
+    '(nosappnd)sappnd[set the system append-only flag]'
+    '(sappnd)nosappnd[unset the system append-only flag]'
+    '(noschg)schg[set the system immutable flag]'
+    '(schg)noschg[unset the system immutable flag]'
+  )
+  unset own
+fi
+
+if [[ $OSTYPE = (freebsd|dragonfly)* ]]; then
+  flags=( $flags[@]
+    '(nouunlnk)uunlnk[set the user undeletable flag]'
+    '(uunlnk)nouunlnk[unset the user undeletable flag]'
+  )
+  (( EUID )) || flags=( $flags[@]
+    '(nosunlnk)sunlnk[set the system undeletable flag]'
+    '(sunlnk)nosunlnk[unset the system undeletable flag]'
+  )
+fi
+
+_arguments -s -A "-*" \
+  '(-L -P)-H[follow symlinks on the command line (specify with -R)]' \
+  '(-H -P)-L[follow all symlinks (specify with -R)]' \
+  '(-L -H)-P[do not follow symlinks (specify with -R)]' \
+  '-R[recurse directories]' \
+  ':file flag:_values -s , "file flags" $flags[@]' \
+  '*:file:_files "$own"'
