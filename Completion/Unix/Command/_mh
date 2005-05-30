@@ -1,4 +1,4 @@
-#compdef ali burst dist flist flists folder folders forw comp inc mark refile repl scan show next prev packf rmf rmm pick whom mhn mhpath mhlist mhstore mhshow mhparam mhmail
+#compdef ali anno burst comp dist flist flists folder folders forw inc mark mhlist mhmail mhn mhparam mhpath mhshow mhstore msgchk next packf pick prev refile repl rmf rmm scan show sortm whom
 
 # Completion for all possible MH commands.
 local mymhdir=${$(_call_program mhpath mhpath + 2>/dev/null):-~/Mail}
@@ -19,10 +19,10 @@ if compset -P 1 -; then
     }')
   )
   if zstyle -t ":completion:${curcontext}:options" prefix-hidden; then
-      _wanted options expl option compadd -d disp - "$options[@]"
+    _wanted options expl option compadd -d disp - "$options[@]"
   else
-      disp=( -${options} )
-      _wanted options expl option compadd -d disp - "$options[@]"
+    disp=( -${options} )
+    _wanted options expl option compadd -d disp - "$options[@]"
   fi    
   return
 elif compset -P 1 '[+@]' || [[ "$prev" = -draftfolder ]]; then
@@ -61,9 +61,13 @@ elif [[ $service = mhparam ]]; then
     ${${(f)"$(mhparam -all)"}%%:*}
 elif [[ $service = ali ]]; then
   _email_addresses -n MH
+elif compset -P '*:'; then
+  _message -e number 'number of messages'
 else
   # Generate sequences.
-  local foldnam folddir f ret
+  local foldnam folddir f sequences mhneg ret=1
+
+  compset -P '*-' # ignore start of message range
 
   for f in $words; do
     [[ $f = [@+]* ]] && foldnam=$f
@@ -77,13 +81,15 @@ else
     # leaving foldnam empty works here
   fi
 
+  sequences=( ${${(f)"$(mark $foldnam 2>/dev/null)"}%%:*} )
+  mhneg="$(mhparam Sequence-Negation)" && sequences=( {,$mhneg}$^sequences )
+  sequences+=( all first last prev next )
   _tags sequences
   while _tags; do
     while _next_label sequences expl sequence; do
-      compadd "$expl[@]" $(mark $foldnam 2>/dev/null | awk -F: '{ print $1 }') &&
-        ret=0
-      compadd "$expl[@]" reply next cur prev first last all unseen && ret=0
-      _path_files "$expl[@]" -W folddir -g '<->(-.)' && ret=0
+      compadd -S ' ' -r '-: \t\n\-' "$expl[@]" -a sequences && ret=0
+      _path_files -S ' ' -r '-: \t\n\-' "$expl[@]" -W folddir -g '<->(-.)' &&
+          ret=0
     done
     (( ret )) || return 0
   done

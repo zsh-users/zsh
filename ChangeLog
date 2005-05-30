@@ -1,3 +1,7 @@
+2005-05-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 21266: Completion/Unix/Command/_mh: improve completion of sequences
+
 2005-05-26  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* 21275 (modified): Completion/Unix/Command/_raggle: update raggle
