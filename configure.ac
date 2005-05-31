@@ -1239,7 +1239,7 @@ sigfile_list="`$CPP nametmp.c |
 sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
        -e 's/^#[ 	].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
-$AWK '{ if (\$1 ~ \"sig\") files[[\$1]] = \$1 }
+$AWK '{ if ($1 ~ /sig/) files[[$1]] = $1 }
   END { for (var in files) print var }'`"
 rm -f nametmp.c
 if test -z "$sigfile_list"; then
@@ -1287,7 +1287,7 @@ errfile_list="`$CPP nametmp.c |
 sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
        -e 's/^#[ 	0-9].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
-$AWK '{ if (\$1 ~ \"err\") files[[\$1]] = \$1 }
+$AWK '{ if ($1 ~ /err/) files[[$1]] = $1 }
   END { for (var in files) print var }'`"
 rm -f nametmp.c
 for ERRNO_H in $errfile_list /dev/null
@@ -1319,7 +1319,7 @@ resourcefile_list="`$CPP restmp.c |
 sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
        -e 's/^#[ 	].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
-$AWK '{ if (\$1 ~ \"resource\") files[[\$1]] = \$1 }
+$AWK '{ if ($1 ~ /resource/) files[[$1]] = $1 }
   END { for (var in files) print var }'`"
 rm -f restmp.c
 if test -z "$resourcefile_list"; then

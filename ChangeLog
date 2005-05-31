@@ -1,3 +1,8 @@
+2005-05-31  Geoff Wing  <gcw@zsh.org>
+
+	* 21290: configure.ac: don't need backslash quoting within single-quote
+	areas.  Change constant RE boundary characters to slash.
+
 2005-05-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 21266: Completion/Unix/Command/_mh: improve completion of sequences
