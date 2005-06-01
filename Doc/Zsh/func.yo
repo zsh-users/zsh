@@ -222,11 +222,14 @@ Executed when the shell exits,
 or when the current function exits if defined inside a function.
 )
 findex(TRAPZERR)
+findex(TRAPERR)
 item(tt(TRAPZERR))(
 Executed whenever a command has a non-zero exit status.  However, the
 function is not executed if the command occurred in a sublist followed by
 `tt(&&)' or `tt(||)'; only the final command in a sublist of this type
-causes the trap to be executed.
+causes the trap to be executed.  The function tt(TRAPERR) acts the same as
+tt(TRAPZERR) on systems where there is no tt(SIGERR) (this is the usual
+case).
 )
 enditem()
 

@@ -1165,7 +1165,9 @@ default values.  If var(arg) is the empty string, then this signal
 is ignored by the shell and by the commands it invokes.
 
 If var(sig) is tt(ZERR) then var(arg) will be executed
-after each command with a nonzero exit status.
+after each command with a nonzero exit status.  tt(ERR) is an alias
+for tt(ZERR) on systems that have no tt(SIGERR) signal (this is the
+usual case).
 If var(sig) is tt(DEBUG) then var(arg) will be executed
 after each command.
 If var(sig) is tt(0) or tt(EXIT)
