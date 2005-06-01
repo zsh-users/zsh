@@ -5,26 +5,26 @@ local context state line
 typeset -A opt_args
 _arguments  \
   '(--action -a)'{-a,--action=-}':Use specified action instead of default:(open edit explore print find)' \
-  '(--open -o)'{-o,--open}'[Short for: --action open]' \
-  '(--explore -x)'{-x,--explore}'[Short for: --action explore]' \
-  '(--edit -e)'{-e,--edit}'[Short for: --action edit]' \
-  '(--find -f)'{-f,--find}'[Short for: --action find]' \
-  '(--print -p)'{-p,--print}'[Short for: --action print]' \
+  '(--open -o)'{-o,--open}'[short for: --action open]' \
+  '(--explore -x)'{-x,--explore}'[short for: --action explore]' \
+  '(--edit -e)'{-e,--edit}'[short for: --action edit]' \
+  '(--find -f)'{-f,--find}'[short for: --action find]' \
+  '(--print -p)'{-p,--print}'[short for: --action print]' \
   '(--directory -d)'{-d,--directory=-}':Set working directory:_directories' \
-  '--hide[Hides the window and activates another window]' \
-  '--maximize[Maximizes the specified window]' \
-  '--minimize[Minimizes the specified window and activates the next top-level window in the z-order]' \
-  '--restore[Activates and displays the window. If the window is minimized or maximized, Windows restores it to its original size and position. An application should specify this flag when restoring a minimized window]' \
-  '--show[Activates the window and displays it in its current size and position]' \
-  '--showmaximized[Activates the window and displays it as a maximized window]' \
-  '--showminimized[Activates the window and displays it as a minimized window]' \
-  '--showminnoactive[Displays the window as a minimized window. The active window remains active]' \
-  '--showna[Displays the window in its current state. The active window remains active]' \
-  '--shownoactivate[Displays a window in its most recent size and position. The active window remains active]' \
-  '--shownormal[Activates and displays a window. If the window is minimized or maximized, Windows restores it to its original size and position. An application should specify this flag when displaying the window for the first time]' \
-  '(--help -?)'{'-?',--help}'[Show this help message]' \
-  '--usage[Display brief usage message]' \
-  '--version[Display version information]' \
-  '--license[Display licensing information]' \
-  '--reference[Open MSDN reference for ShellExecute]' \
+  '--hide[hides the window and activates another window]' \
+  '--maximize[maximizes the specified window]' \
+  '--minimize[minimizes the specified window and activates the next top-level window in the z-order]' \
+  '--restore[activates and displays the window. If the window is minimized or maximized, Windows restores it to its original size and position. An application should specify this flag when restoring a minimized window]' \
+  '--show[activates the window and displays it in its current size and position]' \
+  '--showmaximized[activates the window and displays it as a maximized window]' \
+  '--showminimized[activates the window and displays it as a minimized window]' \
+  '--showminnoactive[displays the window as a minimized window. The active window remains active]' \
+  '--showna[displays the window in its current state. The active window remains active]' \
+  '--shownoactivate[displays a window in its most recent size and position. The active window remains active]' \
+  '--shownormal[activates and displays a window. If the window is minimized or maximized, Windows restores it to its original size and position. An application should specify this flag when displaying the window for the first time]' \
+  '(--help -?)'{'-?',--help}'[show this help message]' \
+  '--usage[display brief usage message]' \
+  '--version[display version information]' \
+  '--license[display licensing information]' \
+  '--reference[open MSDN reference for ShellExecute]' \
   '*:program: _command_names -e:*::program arguments: _normal'

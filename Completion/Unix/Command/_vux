@@ -21,17 +21,17 @@ case "$service" in
       '-e:pattern' \
       '-O:device:_files' \
       '-M:minimum age val' \
-      '-S[Disable saving scorelist]' \
-      '-A[Disable saving agelist]' \
-      '-Z[Disable saving countlist]' \
-      '-Y[Disable missing log]' \
-      '-c[Disable rating check]' \
-      '-d[Disable rating updates on play]' \
-      '-l[Disable rating updates on skip]' \
-      '-j[Disable repeat check]' \
-      '-b[Disable repeat updates on play]' \
-      '-k[Disable repeat updates on skip]' \
-      '-n[Disable player]' \
+      '-S[disable saving scorelist]' \
+      '-A[disable saving agelist]' \
+      '-Z[disable saving countlist]' \
+      '-Y[disable missing log]' \
+      '-c[disable rating check]' \
+      '-d[disable rating updates on play]' \
+      '-l[disable rating updates on skip]' \
+      '-j[disable repeat check]' \
+      '-b[disable repeat updates on play]' \
+      '-k[disable repeat updates on skip]' \
+      '-n[disable player]' \
       '-t:percent' \
       '-T:percent' \
       '-C:factor' \
@@ -41,17 +41,17 @@ case "$service" in
       '-X:score' \
       '-N:count' \
       '-f:rating' \
-      '-J[Accelerate decreases]' \
-      '-K[Accelerate increases]' \
-      '-u[Check age before rating]' \
-      '-R[Show ratings after processing]' \
-      '-V[Verbose file manipulation]' \
-      '-v[Show version and exit]' \
-      '-F[Skip songs with -n and -xf]' \
-      '-q[Minimize vux output]' \
-      '-P[Always play new songs]' \
+      '-J[accelerate decreases]' \
+      '-K[accelerate increases]' \
+      '-u[check age before rating]' \
+      '-R[show ratings after processing]' \
+      '-V[verbose file manipulation]' \
+      '-v[show version and exit]' \
+      '-F[skip songs with -n and -xf]' \
+      '-q[minimize vux output]' \
+      '-P[always play new songs]' \
       '-g[print stats in xgraph format]' \
-      '-h[Show summary of options]'
+      '-h[show summary of options]'
   ;;
 
   (vuxctl)

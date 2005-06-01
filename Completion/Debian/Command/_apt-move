@@ -3,11 +3,11 @@
 local state line
 
 _arguments \
-  '-c[Specify an alternative configuration file]' \
-  '-d[Override the DIST setting]' \
-  '-f[Override the MAXDELETE setting]' \
-  '-q[Be quiet; suppress normal output]' \
-  '-t[Show what apt-move would do, but do not actually do anything]' \
+  '-c[specify an alternative configuration file]' \
+  '-d[override the DIST setting]' \
+  '-f[override the MAXDELETE setting]' \
+  '-q[be quiet; suppress normal output]' \
+  '-t[show what apt-move would do, but do not actually do anything]' \
   '1: :->cmds' \
   '*: :->args' && return 0
 

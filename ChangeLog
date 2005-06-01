@@ -1,3 +1,13 @@
+2005-06-01  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 21294: Completion/Cygwin/Command/_cygstart,
+	Completion/Debian/Command/_apt-move,
+	Completion/Debian/Command/_module-assistant,
+	Completion/Unix/Command/_ccal, Completion/Unix/Command/_perl,
+	Completion/Unix/Command/_surfraw, Completion/Unix/Command/_vux,
+	Completion/X/Command/_kfmclient: fix incorrectly capitalized completion
+	descriptions
+
 2005-05-31  Geoff Wing  <gcw@zsh.org>
 
 	* 21290: configure.ac: don't need backslash quoting within single-quote

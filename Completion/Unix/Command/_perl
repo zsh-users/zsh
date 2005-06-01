@@ -18,7 +18,7 @@ _perl () {
     '-i-[edit <> files in place (make backup if extension supplied)]:backup file extension: ' \
     '*-I-[specify @INC/#include directory (may be used more than once)]:include path:_files -/' \
     '-l-[enable line ending processing, specifies line terminator]:output record separator in octal: ' \
-    \*{-m,-M}"-[module.. executes \`use/no module...' before executing your script.]:module:_perl_m_opt" \
+    \*{-m,-M}"-[module.. executes \`use/no module...' before executing your script]:module:_perl_m_opt" \
     "-n[assume 'while (<>) { ... }' loop around your script]" \
     "-p[assume loop like -n but print line also like sed]" \
     "-P[run script through C preprocessor before compilation]" \
@@ -29,7 +29,7 @@ _perl () {
     "-U[allow unsafe operations]" \
     "-v[print version number, patchlevel plus VERY IMPORTANT perl info]" \
     "-V-[print perl configuration information]:configuration keys:_perl_config_vars" \
-    '-w[TURN WARNINGS ON FOR COMPILATION OF YOUR SCRIPT. Recommended.]' \
+    '-w[turn warnings on for compilation of your script. Recommended]' \
     '-x-[strip off text before #!perl line and perhaps cd to directory]:directory to cd to:_files -/' \
     '1:Perl script:_files -/ -g "*.(p[ml]|PL)(-.)"' \
     '*::args: _normal' 

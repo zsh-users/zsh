@@ -45,7 +45,7 @@ _arguments \
   '--config=:configuration  file:_files' \
   '--dcopserver=:DCOP server: ' \
   '--nocrashhandler[disable crash handler, allow core dumps]' \
-  '--waitforwm[Wait for a WM_NET compatible window manager]' \
+  '--waitforwm[wait for a WM_NET compatible window manager]' \
   '--style=:GUI style for application: ' \
   '--geometry=:client window geometry:_x_geometry' \
   '1:client command:(openURL openProfile openProperties exec move
