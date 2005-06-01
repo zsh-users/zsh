@@ -1,5 +1,7 @@
 2005-06-01  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/builtin.c: need const for result of getsigname().
+
 	* 21296: Doc/Zsh/builtins.yo [this hunk missing from post],
 	Doc/Zsh/func.yo, Src/builtin.c, Src/jobs.c, Src/zsh.h:
 	Allow ERR signal as alias for ZERR on systems that don't

@@ -4978,7 +4978,7 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    shfunctab->printnode(hn, 0);
 		DPUTS(!hn, "BUG: I did not find any trap functions!");
 	    } else if (sigtrapped[sig]) {
-		char *name = getsigname(sig);
+		const char *name = getsigname(sig);
 		if (!siglists[sig])
 		    printf("trap -- '' %s\n", name);
 		else {
