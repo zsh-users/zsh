@@ -38,7 +38,7 @@ _arguments -C -s \
 if [[ "$state" = feed ]]; then
   local feeds
   feeds=(
-    ${${(M)${${(f)"$(_call_program screen-sessions $words[1] \
+    ${${(M)${${(f)"$(_call_program feeds $words[1] \
         --list)"}/(#s)[[:blank:]]/}:#[0-9]##,*}/, /:}
   )
   _describe -t feeds "RSS feed" feeds && return 0
