@@ -1,5 +1,9 @@
 2005-06-07  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
+	* unposted: Completion/Zsh/Command/_dirs: fix typo in opt description 
+
+2005-06-06  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
 	* unposted: Completion/Unix/Command/_raggle: fix typo in tag name
 
 2005-06-02  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
