@@ -1,5 +1,8 @@
 2005-06-08  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
+	* 21310: Completion/Unix/Type/_global_tags: pass an array to compadd;
+	redirect stderr to /dev/null when generating matches with _call_program
+
 	* 21302: Completion/Linux/Command/_pkgtool,
 	Completion/Unix/Command/_ant, Completion/Unix/Command/_bogofilter,
 	Completion/Unix/Command/_cdrecord, Completion/Unix/Command/_chkconfig,
