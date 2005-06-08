@@ -1,5 +1,8 @@
 2005-06-08  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
+	* 21306: Completion/Zsh/Command/_disable: add -s option for removing
+	suffix aliases
+
 	* 21310: Completion/Unix/Type/_global_tags: pass an array to compadd;
 	redirect stderr to /dev/null when generating matches with _call_program
 

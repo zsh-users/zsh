@@ -1,8 +1,9 @@
 #compdef disable
 
 _arguments -C -s -A "-*" -S \
-  "(-f -r)-a[act on aliases]:*:aliases:(${(k)aliases} ${(k)galiases})" \
-  "(-a -r)-f[act on functions]:*:functions:(${(k)functions})" \
-  "(-a -f)-r[act on reserved words]:*:reserved-words:compadd -k reswords" \
+  "(-f -r -s)-a[act on regular or global aliases]:*:regular or global aliases:(${(k)aliases} ${(k)galiases})" \
+  "(-a -r -s)-f[act on functions]:*:functions:(${(k)functions})" \
+  "(-a -f -s)-r[act on reserved words]:*:reserved-words:compadd -k reswords" \
+  "(-a -f -r)-s[act on suffix aliases]:*:suffix aliases:(${(k)saliases})" \
   '-m[treat arguments as patterns]' \
   "*:builtin command:(${(k)builtins})"
