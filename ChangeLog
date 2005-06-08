@@ -1,5 +1,8 @@
 2005-06-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 21314: Doc/Zsh/compsys.yo: declare expl local in example use
+	of _wanted 
+
 	* unposted: Completion/Linux/Command/_yast: new yast completion
 
 	* 21313: Completion/Unix/Type/_email_addresses: make code for

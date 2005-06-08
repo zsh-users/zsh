@@ -4370,7 +4370,8 @@ is carried out automatically by tt(_wanted).
 Hence to offer only one tag and immediately add the corresponding
 matches with the given description:
 
-example(_wanted tag expl 'description' \ 
+example(local expl
+_wanted tag expl 'description' \ 
     compadd matches...)
 
 Note that, as for tt(_requested), the var(command) must be able to
