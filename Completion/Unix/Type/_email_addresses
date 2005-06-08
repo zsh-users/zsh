@@ -14,7 +14,16 @@
 # plugins
 (( $+functions[_email-mail] )) ||
 _email-mail() {
-  reply=( ${${${(M)${(f)"$(<$files[$plugin])"}:#alias*}##alias[[:blank:]]##}/[[:blank:]]##/:} )
+  local rc rcfiles i
+
+  rcfiles=( $files[$plugin] )
+  for ((i=1;i<=$#rcfiles;i++)); do
+    rcfiles+=( ${~${(M)${(f)"$(<$rcfiles[i])"}:#source*}##source[[:blank:]]##}(N) )
+  done
+  reply=()
+  for rc in $rcfiles; do
+    reply+=( ${${${(M)${(f)"$(<$rc)"}:#alias*}##alias[[:blank:]]##}/[[:blank:]]##/:} )
+  done
   return 300
 }
 (( $+functions[_email-mutt] )) || _email-mutt() { _email-mail }
@@ -79,7 +88,7 @@ _email-local() {
 _email_addresses() {
   local -a plugins reply list args
   local -A opts files
-  local plugin rcfile expl ret fret
+  local plugin rcfile muttrc expl ret fret
 
   local __specialx='][()<>@,;:\\".'
   local __spacex=" 	"				# Space, tab
@@ -119,7 +128,10 @@ _email_addresses() {
   fi
 
   # get list of all plugins except any with missing config files
-  files=( MH ${MH:-~/.mh_profile} mutt ~/.muttrc mush ~/.mushrc mail ${MAILRC:-~/.mailrc} pine ~/.addressbook )
+  if ! zstyle -s ":completion:${curcontext}:email-addresses" muttrc muttrc; then
+    [[ -e ~/mutt/muttrc ]] && muttrc="~/mutt/muttrc" || muttrc="~/.muttrc"
+  fi
+  files=( MH ${MH:-~/.mh_profile} mutt $muttrc mush ~/.mushrc mail ${MAILRC:-~/.mailrc} pine ~/.addressbook )
   plugins=( 
     ${${(k)functions[(I)_email-*]#*-}:#(${(kj.|.)~files})}
     $files(Ne:'REPLY=( ${(k)files[(r)$REPLY]} ):')
