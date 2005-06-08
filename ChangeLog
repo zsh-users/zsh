@@ -1,5 +1,7 @@
 2005-06-08  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Linux/Command/_yast: new yast completion
+
 	* 21313: Completion/Unix/Type/_email_addresses: make code for
 	extracting mutt aliases do a better job of finding rc files
 
