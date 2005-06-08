@@ -1,5 +1,38 @@
 2005-06-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 21315: Completion/AIX/Command/_floppy,
+	Completion/AIX/Command/_lsdev, Completion/AIX/Command/_lslv,
+	Completion/AIX/Command/_lsvg, Completion/AIX/Type/_logical_volumes,
+	Completion/AIX/Type/_object_classes,
+	Completion/AIX/Type/_physical_volumes,
+	Completion/AIX/Type/_volume_groups,
+	Completion/Darwin/Type/_mac_applications,
+	Completion/Debian/Command/_bug, Completion/Unix/Command/_gs,
+	Completion/Unix/Command/_imagemagick, Completion/Unix/Command/_java,
+	Completion/Unix/Command/_last, Completion/Unix/Command/_links,
+	Completion/Unix/Command/_lsof, Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_perldoc, Completion/Unix/Command/_user_admin,
+	Completion/Unix/Command/_yp, Completion/Unix/Command/_zdump,
+	Completion/Unix/Type/_dir_list, Completion/Unix/Type/_domains,
+	Completion/Unix/Type/_file_systems, Completion/Unix/Type/_groups,
+	Completion/Unix/Type/_hosts, Completion/Unix/Type/_java_class,
+	Completion/Unix/Type/_locales, Completion/Unix/Type/_perl_basepods,
+	Completion/Unix/Type/_perl_modules, Completion/Unix/Type/_pids,
+	Completion/Unix/Type/_ports, Completion/Unix/Type/_printers,
+	Completion/Unix/Type/_services, Completion/Unix/Type/_tex,
+	Completion/Unix/Type/_texi, Completion/Unix/Type/_time_zone,
+	Completion/Unix/Type/_users, Completion/X/Type/_x_cursor,
+	Completion/X/Type/_x_extension, Completion/X/Type/_x_font,
+	Completion/X/Type/_x_keysym, Completion/Zsh/Command/_print,
+	Completion/Zsh/Command/_read, Completion/Zsh/Command/_unhash,
+	Completion/Zsh/Type/_arrays, Completion/Zsh/Type/_file_descriptors,
+	Completion/Zsh/Type/_functions, Completion/Zsh/Type/_jobs_bg,
+	Completion/Zsh/Type/_jobs_fg, Completion/Zsh/Type/_limits,
+	Completion/Zsh/Type/_options, Completion/Zsh/Type/_options_set,
+	Completion/Zsh/Type/_options_unset: make completion functions
+	give precendence to descriptions passed as parameters and
+	cleanup	descriptons in calling functions
+
 	* 21314: Doc/Zsh/compsys.yo: declare expl local in example use
 	of _wanted 
 

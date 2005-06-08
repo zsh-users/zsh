@@ -2,7 +2,7 @@
 
 local i fds expl list link sep
 
-for i in {0..9}; [[ -e /dev/fd/$i ]] && fds=( ${fds[@]} $i )
+for i in {0..9}; [[ -e /dev/fd/$i ]] && fds+=( $i )
 
 if zstyle -T ":completion:${curcontext}:" verbose && [[ -e /proc/$$/fd ]]; then
   zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
@@ -10,20 +10,20 @@ if zstyle -T ":completion:${curcontext}:" verbose && [[ -e /proc/$$/fd ]]; then
   if zmodload -e zsh/stat; then
     for i in "${fds[@]}"; do
       stat +link -A link /proc/$$/fd/$i
-      list=( ${list[@]} "$i $sep ${link[1]}" )
+      list+=( "$i $sep ${link[1]}" )
     done
   elif (( $+commands[readlink] )); then
-    for i in "${fds[@]}"; list=( ${list[@]} "$i $sep $(readlink /proc/$$/fd/$i)" )
+    for i in "${fds[@]}"; list+=( "$i $sep $(readlink /proc/$$/fd/$i)" )
   else
     for i in "${fds[@]}"; do
-      list=( ${list[@]} "$i $sep $(ls -l /proc/$$/fd/$i|sed 's/.*-> //' )" )
+      list+=( "$i $sep $(ls -l /proc/$$/fd/$i|sed 's/.*-> //' )" )
     done
   fi
 
   if (( $list[(I)* $sep ?*] )); then
-    _wanted file-descriptors expl 'file descriptors' compadd "$@" -d list -a fds
+    _wanted file-descriptors expl 'file descriptor' compadd "$@" -d list -a - fds
     return
   fi
 fi
 
-_wanted file-descriptors expl 'file descriptors' compadd "$@" -a fds
+_wanted file-descriptors expl 'file descriptor' compadd -a "$@" - fds

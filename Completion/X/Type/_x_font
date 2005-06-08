@@ -13,4 +13,4 @@ if (( ! $+_font_cache )); then
 fi
 
 _wanted fonts expl font \
-    compadd -M 'r:|-=* r:|=*' "$@" -S '' -a _font_cache
+    compadd -M 'r:|-=* r:|=*' "$@" -S '' -a - _font_cache

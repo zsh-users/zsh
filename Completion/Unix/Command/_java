@@ -27,7 +27,7 @@ javac)
 
 jdb)
   jdb_args=(
-    '-host[specify hostname to connect]:hostname:_hosts'
+    '-host[specify host to connect to]:host:_hosts'
     '-password[specify password]:password:'
   )
   ;&
@@ -140,7 +140,7 @@ javah|javah_g)
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-old[generate old JDK1.0-style header files]' \
     '-force[force output]' \
-    '*:fully qualified classname:_java_class -m main ${(kv)opt_args[(i)-classpath]}' && return 0
+    '*:class:_java_class -m main ${(kv)opt_args[(i)-classpath]}' && return 0
   ;;
 
 javap)
@@ -187,7 +187,7 @@ rmic)
 
 rmiregistry)
   if (( CURRENT == 2 )); then
-    _wanted ports expl 'port to listen' _ports && return
+    _wanted ports expl 'port to listen on' _ports && return
   else
     _message 'no more arguments'
   fi

@@ -11,5 +11,5 @@ if zstyle -T ":completion:${curcontext}:" verbose; then
 else
   disp=()
 fi
-_wanted logicalvolumes expl 'logical volumes' \
+_wanted logicalvolumes expl 'logical volume' \
     compadd "$disp[@]" "$@" - "$names[@]"

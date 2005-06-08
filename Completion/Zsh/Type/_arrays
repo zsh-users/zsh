@@ -2,4 +2,4 @@
 
 local expl
 
-_wanted arrays expl array _parameters "$@" -g '*array*'
+_wanted arrays expl array _parameters "$@" - -g '*array*'

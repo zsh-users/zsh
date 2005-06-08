@@ -14,8 +14,7 @@ _rb_commonargs=(
   '(-B --bts)'{-B,--bts=}'[use alternate BTS]:system:(debian gnome kde tdyc kde-debian)'
   '(-l --ldap)'{-l,--ldap}'[enable LDAP support]'
   '(-l --ldap)--no-ldap[disable LDAP support]'
-  '(--http_proxy)--proxy=:proxyhost:_hosts'
-  '(--proxy)--http_proxy=:proxyhost:_hosts'
+  '(--proxy --http_proxy)'--{http_,}'proxy=:proxy host:_hosts'
 )
 
 case "$service" in

@@ -7,18 +7,12 @@ if chkconfig --list > /dev/null 2>&1; then
   alls=( ${(f)"$(LANGUAGE=C LANG=C LC_ALL=C chkconfig --list)"} )
   inits=( ${${${alls[1,(r)xinetd based*]}[1,-2]}/%[[:space:]]*/} )
   xinetds=( ${${${${alls[(r)xinetd based*,-1]}[2,-1]}/#[[:space:]]#}/%:*} )
+
+  _alternative \
+    'init:init service:compadd -a inits' \
+    'xinetd:xinetd service:compadd -a xinetds' && ret=0
 else
-  inits=( /etc/init.d/*(-*:t) )
+  _wanted services expl service compadd "$@" - /etc/init.d/*(-*:t) && ret=0
 fi
 
-_tags init xinetd
-
-while _tags; do
-  _requested init expl 'init services' \
-    compadd  -a inits && ret=0
-  _requested xinetd expl 'xinetd services' \
-    compadd  -a xinetds && ret=0
-  (( ret )) || break
-done
-
-return $ret
+return ret

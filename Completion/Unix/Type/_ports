@@ -9,4 +9,4 @@ if ! zstyle -a ":completion:${curcontext}:" ports ports; then
   ports=( "$_cache_ports[@]" )
 fi
 
-_wanted ports expl port compadd "$@" -a ports
+_wanted ports expl port compadd -a "$@" - ports

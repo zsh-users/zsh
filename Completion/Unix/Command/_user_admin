@@ -18,23 +18,23 @@ if [[ $service = user* ]]; then
     '(-D)-e+[specify expiration date]:expiration date (YYYY-MM-DD)'
     '(-D)-f+[specify inactive days]:inactive days'
     '(-D)-g+[initial group]:initial group:_groups'
-    '(-D)-G+[supplementary groups]:supplementary groups:_groups -S,'
+    '(-D)-G+[supplementary groups]:supplementary group:_groups -S,'
     "(-D)-s+[shell]:shell:( $shells /bin/false )"
     '(-D -M)-m[create home directory]'
     '(-D)-u[uid]:uid'
     '(-D)-o[allow non unique uid]'
   )
-  [[ $OSTYPE = linux* ]] && args=( $args[@]
+  [[ $OSTYPE = linux* ]] && args+=(
       '(-D -U -L)-p+[specify encrypted password]:encrypted password' )
 
   if [[ $service = useradd ]]; then
-    (( redhat )) || args=( $args[@]
+    (( redhat )) || args+=(
       "(-D -k -m)-M[don't create home]"
       '(-D)-r[create system account]'
       "(-D)-n[don't create mirrored user]"
     )
     [[ $OSTYPE = linux* ]] || sun=" -s"
-    args=( $args[@]
+    args+=(
       "(-c -G -m -k -M -p -u -o -n -r$sun)-D[modify or display defaults]"
       '(-D -M)-k[skeleton home directory]:skeleton directory:_directories -W /'
       ':username'
@@ -44,7 +44,7 @@ if [[ $service = user* ]]; then
 	"(-U -p)-L[lock user's password]"
 	"(-L -p)-U[unlock user's password]"
     )
-    args=( $args[@]
+    args+=(
       '-l[specify new user name]:new username'
       ':username:_users'
     )
@@ -52,15 +52,15 @@ if [[ $service = user* ]]; then
 else
   args=( '-g+[gid]:gid' '-o[allow non unique gid]' )
   if [[ $service = groupadd ]]; then
-    args=( $args[@] ':group name' )
+    args+=( ':group name' )
     (( redhat )) || args=( $args[@]
       '-r[create system group]'
       '-f[force]'
     )
   else
-    args=( $args[@]
+    args+=(
       '-n[specify new group name]:new group name'
-      ':group name:_groups'
+      ':group:_groups'
     )
   fi
 fi

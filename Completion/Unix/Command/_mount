@@ -24,8 +24,8 @@ if [[ "$OSTYPE" == cygwin ]]; then
     local -a wpaths upaths
     mount | while read -r line; do
       [[ $line == ?:\ * ]] && continue
-      wpaths=($wpaths ${line%% on*})
-      upaths=($upaths ${${line##*on }%% type*})
+      wpaths+=( ${line%% on*} )
+      upaths+=( ${${line##*on }%% type*} )
     done
     _alternative \
       'windowspath:Windows path:compadd -a wpaths' \
@@ -552,10 +552,10 @@ if [[ "$service" = mount ]]; then
   irix*)
     args=( -s
       '-a[mount all filesystems in /etc/fstab]'
-      '-b[mount all filesystems in /etc/fstab except those listed]:list of directories:_dir_list -s,'
+      '-b[mount all filesystems in /etc/fstab except those listed]:mount point:_dir_list -s,'
       '-c[check any dirty filesystems before mounting]'
       "-f[fake a new /etc/mtab entry, but don't mount any filesystems]"
-      '-h[mount all filesystems associated with host]:hostnames:_hosts'
+      '-h[mount all filesystems associated with host]:host:_hosts'
       '-n[mount filesystem without making entry in /etc/mtab]'
       '-o[specify file system options]:file system option:->fsopt'
       '-p[print list of mounted filesystems in format suitable for /etc/fstab]'
@@ -681,8 +681,8 @@ else
     irix*)
       args=(
 	'-a[unmount all mounted file systems]'
-	'-b[unmount all filesystems in /etc/fstab except those listed]:list of directories:_dir_list -s,'
-	'-h[unmount all filesystems associated with host]:hostnames:_hosts'
+	'-b[unmount all filesystems in /etc/fstab except those listed]:mount point:_dir_list -s,'
+	'-h[unmount all filesystems associated with host]:host:_hosts'
 	'-k[kill all processes with files open on filesystems before unmounting]'
 	'-t[unmount all filesystems of specified type]:file system type:_file_systems'
 	'-v[verbose]'
@@ -709,7 +709,7 @@ else
 	'(*)-a[unmount all mounted file systems]'
 	'-A[unmount all mounted file systems except the root]'
 	'-f[force unmount]'
-	'-h[unmount all filesystems associated with host]:hostnames:_hosts'
+	'-h[unmount all filesystems associated with host]:host:_hosts'
 	'-t[unmount all filesystems of specified type]:file system type:->fslist'
 	'-v[verbose mode]'
 	'*:dev or dir:->udevordir'
@@ -775,8 +775,8 @@ devordir)
 	  ;;
 	*)
 	  [[ $mline[(w)3] == swap ]] || \
-	    dev_tmp=( $dev_tmp $mline[(w)1] ) \
-	    mp_tmp=( $mp_tmp $mline[(w)2] )
+	    dev_tmp+=( $mline[(w)1] ) \
+	    mp_tmp+=( $mline[(w)2] )
 	  ;;
       esac
     done < /etc/fstab
@@ -808,8 +808,8 @@ udevordir)
     ;;
   *)
     /sbin/mount | while read mline; do
-      mp_tmp=( $mp_tmp $mline[(w)1] )
-      dev_tmp=( $dev_tmp $mline[(w)3] )
+      mp_tmp+=( $mline[(w)1] )
+      dev_tmp+=( $mline[(w)3] )
     done
     ;;
   esac

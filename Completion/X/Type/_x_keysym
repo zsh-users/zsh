@@ -19,4 +19,4 @@ if (( ! $+_keysym_cache )); then
 fi
 
 _wanted keysyms expl 'key symbol' \
-    compadd "$@" -M 'm:{a-z}={A-Z} r:|-=* r:|=*' -a _keysym_cache
+    compadd "$@" -M 'm:{a-z}={A-Z} r:|-=* r:|=*' -a - _keysym_cache

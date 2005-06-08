@@ -15,7 +15,7 @@ else
     '-q[quiet startup]' \
     '-g-[set device size]:device size (<width>x<height>):' \
     '-r-[set resolution]:resolution (<val> or <x>x<y>):' \
-    '-I[add search paths]:search paths:_dir_list' \
+    '-I[add to library file search path]:directory:_dir_list' \
     \*-{d,D}'-[define name with definition]:def:->dname' \
     \*-{s,S}'-[define name with value]:def:->sname' \
     '*:PostScript or PDF file:_pspdf' && ret=0

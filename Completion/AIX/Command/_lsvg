@@ -7,4 +7,4 @@ _arguments -C -s \
   '(-o -n -M -p)-l[list logical volumes in volume group]' \
   '(-o -n -l -p)-M[list mapping of physical and logical partition numbers]' \
   '(-o -n -l -M)-p[list physical volumes used by volume group]' \
-  '*:volume groups:_volume_groups'
+  '*:volume group:_volume_groups'

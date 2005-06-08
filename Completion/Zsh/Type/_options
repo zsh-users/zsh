@@ -5,4 +5,4 @@
 local expl
 
 _wanted zsh-options expl 'zsh option' \
-    compadd "$@" -M 'B:[nN][oO]= M:_= M:{A-Z}={a-z}' -k options
+    compadd "$@" -M 'B:[nN][oO]= M:_= M:{A-Z}={a-z}' -k - options

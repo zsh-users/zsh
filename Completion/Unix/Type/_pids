@@ -38,7 +38,7 @@ else
 fi
 
 _wanted processes expl 'process ID' \
-    compadd "$@" "$desc[@]" "$all[@]" -a pids && ret=0
+    compadd "$@" "$desc[@]" "$all[@]" -a - pids && ret=0
 
 if [[ -n "$all" ]]; then
   zstyle -s ":completion:${curcontext}:processes" insert-ids out || out=menu

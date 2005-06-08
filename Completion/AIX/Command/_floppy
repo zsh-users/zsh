@@ -2,4 +2,4 @@
 
 local expl
 
-_wanted floppyfiles expl 'files on floppy' compadd - ${$(dosdir)[1,-5]:l}
+_wanted floppyfiles expl 'file on floppy' compadd - ${$(dosdir)[1,-5]:l}

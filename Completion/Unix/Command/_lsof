@@ -27,7 +27,7 @@ _arguments -s -S \
   '(-s)-o[list file offset]' \
   '-O[avoid overheads of bypassing potential blocking]' \
   '-P[inhibit conversion of port numbers to port names]' \
-  '-p[list files for specified processes]:processes:_pids' \
+  '-p[list files for specified processes]:process ID:_pids' \
   '-r[repeat listing endlessly]::delay (seconds)' \
   '+r[repeat listing until no files listed]::delay (seconds)' \
   '-R[list parent PID]' \
@@ -35,7 +35,7 @@ _arguments -s -S \
   '-S[specify timeout for kernel functions that might deadlock]:timeout (seconds)' \
   '-T[select reporting of TCP/TPI info]::info type:((q\:queue\ length\ reporting s\:state\ reporting w\:window\ size\ reporting))' \
   '(+w -w)-t[terse output]' \
-  '-u[list files owned by specified users]:user list:_users' \
+  '-u[list files owned by specified users]:user:_users -S,' \
   '-U[list Unix domain socket files]' \
   '(-)-v[list version info]' \
   '-V[indicate unsuccessfully searched for items]' \

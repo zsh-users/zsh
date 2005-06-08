@@ -3,4 +3,4 @@
 local expl
 
 _description files expl 'texinfo file'
-_files "$expl[@]" -g '*.(texinfo|texi)(-.)'
+_files "$@" "$expl[@]" -g '*.(texinfo|texi)(-.)'

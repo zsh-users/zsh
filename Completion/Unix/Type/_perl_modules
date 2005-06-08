@@ -18,9 +18,6 @@
 #   modules which don't begin with an uppercase letter).
 
 _perl_modules () {
-  local opts
-  zparseopts -D -a opts S: q
-
   # Set a sensible default caching policy.  This has to be done inside
   # this function otherwise we wouldn't know the context for the style.
   local update_policy
@@ -87,7 +84,7 @@ _perl_modules () {
 
   local expl
 
-  _wanted modules expl 'Perl modules' compadd "$opts[@]" -a $perl_modules
+  _wanted modules expl 'Perl module' compadd "$@" -a - $perl_modules
 }
 
 _perl_modules_caching_policy () {

@@ -2,4 +2,4 @@
 
 local expl
 
-_wanted functions expl 'shell function' compadd "$@" -k functions
+_wanted functions expl 'shell function' compadd -k "$@" - functions

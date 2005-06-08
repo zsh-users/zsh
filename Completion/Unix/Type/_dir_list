@@ -4,6 +4,8 @@
 #  -s <sep> to specify the separator (default is a colon)
 #  -S       to say that the separator should be added as a suffix (instead
 #           of the default slash)
+# any description passed should apply to an individual directory and not
+# to the entire list
 
 local sep=: dosuf suf
 
@@ -24,4 +26,4 @@ else
   suf=()
 fi
 
-_files "$suf[@]" -r "${sep}"' /\t\t\-' -/ "$@"
+_directories "$suf[@]" -r "${sep}"' /\t\t\-' "$@"

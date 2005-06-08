@@ -3,4 +3,5 @@
 _retrieve_mac_apps
 
 local expl
-_wanted commands expl 'Mac OS X application' compadd -- "${(@)${_mac_apps[@]:t}%.app}"
+_wanted commands expl 'Mac OS X application' \
+    compadd "$@" - "${(@)${_mac_apps[@]:t}%.app}"

@@ -1,13 +1,13 @@
 #compdef ypcat ypmatch yppasswd ypwhich ypset ypserv ypbind yppush yppoll ypxfr domainname
 
-local curcontext="$curcontext" line state ret=1
+local curcontext="$curcontext" line state expl ret=1
 typeset -A opt_args
 
 if (( ! $+_yp_cache_maps )); then
   _yp_cache_maps=( "${(@)${(@f)$(_call_program maps ypwhich -m)}%% *}" )
   _yp_cache_nicks=( "${(@)${(@)${(@f)$(_call_program names ypwhich -x)}#*\"}%%\"*}" )
   _yp_args=(
-    '(-x)-d[specify domain]:domain name:' \
+    '(-x)-d[specify domain]:domain name' \
     '(-x)-k[display keys]' \
     '(-x)-t[inhibit nicknames]' \
     '(: -d -k -t)-x[display nicknames]' \
@@ -28,7 +28,7 @@ yppasswd)
   ;;
 ypwhich)
   _arguments -C \
-    '(-x)-d[specify domain]:domain name:' \
+    '(-x)-d[specify domain]:domain name' \
     '(-x -V2 -m -t)-V1[identify version 1 servers]' \
     '(-x -V1 -m -t)-V2[identify version 2 servers]' \
     '(: -x -V1 -V2 -m)-t[specify map name]:map name:->maponly' \
@@ -40,8 +40,8 @@ ypset)
   _arguments -C \
     '(-V2)-V1[bind version 1 servers]' \
     '(-V1)-V2[bind version 2 servers]' \
-    '-d[specify domain]:domain name:' \
-    '-h[specify host]:set binding on host:_hosts' \
+    '-d[specify domain]:domain name' \
+    '-h[set NIS binding on specified host]:host:_hosts' \
     ':server:_hosts' && ret=0
     ;;
 ypserv)
@@ -57,24 +57,24 @@ ypbind)
   ;;
 yppush)
   _arguments -C \
-    '-d[specify domain]:domain name:' \
+    '-d[specify domain]:domain name' \
     '-v[print messages]' \
     ':map name:->map' && ret=0
   ;;
 yppoll)
   _arguments -C \
-    '-d[specify domain]:domain name:' \
-    '-h[specify host]:ask server on host:_hosts' \
+    '-d[specify domain]:domain name' \
+    '-h[ask specified yp server]:host:_hosts' \
     ':map name:->map' && ret=0
   ;;
 ypxfr)
   _arguments -C \
     '-a[specify database routines]:database routines:((b\:btree d\:dbm/ndbm h\:hash))' \
     '-f[force transfer]' \
-    '-c[don'"'"'t clear current map]' \
-    '-d[specify domain]:domain name:' \
-    '-h[specify host]:get map from host:_hosts' \
-    '-C[call back]:transaction ID: :program number: :IP address: :port number:' \
+    "-c[don't clear current map]" \
+    '-d[specify domain]:domain name' \
+    '-h[get map from specified host instead of master]:host:_hosts' \
+    '-C[call back]:transaction ID: :program number: :IP address: :port number' \
     ':map name:->map' && ret=0
   ;;
 domainname)
@@ -86,8 +86,6 @@ esac
 [[ "$state" = keymap ]] && _message -e keys 'key'
 
 if [[ "$state" = map* ]]; then
-  local expl
-
   if [[ $+opt_args[-t] -eq 0 && "$state" != maponly ]]; then
     _tags maps nicknames
   else

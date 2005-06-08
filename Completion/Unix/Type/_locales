@@ -9,4 +9,4 @@ else
   locales=( /usr/lib/locale/*(:t) )
 fi
 
-_wanted locales expl locale compadd "$@" -a locales
+_wanted locales expl locale compadd -a "$@" - locales

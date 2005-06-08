@@ -4,7 +4,7 @@ local expl ret=1 list disp sep tmp
 
 if (( $+commands[lsallq] )); then
   # Use AIX's command to list print queues
-  _wanted printers expl printer compadd $(lsallq)
+  _wanted printers expl printer compadd "$@" - $(lsallq)
   return
 fi
 
@@ -30,11 +30,11 @@ if (( ! $+_lp_cache )); then
           disp=''
         fi
         if [[ -n "$disp" ]]; then
-          _lp_cache=( "$_lp_cache[@]" "${names[1]}:${disp}" )
-  	_lp_alias_cache=( "$_lp_alias_cache[@]" "${(@)^names[2,-1]:#*\ *}:${disp}" )
+          _lp_cache+=( "${names[1]}:${disp}" )
+  	  _lp_alias_cache+=( "${(@)^names[2,-1]:#*\ *}:${disp}" )
         else
-          _lp_cache=( "$_lp_cache[@]" "${names[1]}" )
-  	_lp_alias_cache=( "$_lp_alias_cache[@]" "${(@)names[2,-1]:#*\ *}" )
+          _lp_cache+=( "${names[1]}" )
+  	  _lp_alias_cache+=( "${(@)names[2,-1]:#*\ *}" )
         fi
       fi
     done < $file[1]
@@ -56,7 +56,7 @@ else
   disp=()
 fi
 _wanted printers expl printer \
-    compadd "$disp[@]" - "${(@)_lp_cache%%:*}" && return 0
+    compadd "$@" "$disp[@]" - "${(@)_lp_cache%%:*}" && return 0
 
 (( $+_lp_alias_cache )) || return 1
 
@@ -67,6 +67,6 @@ else
   disp=()
 fi
 _wanted printers expl printer \
-    compadd "$disp[@]" - "${(@)_lp_alias_cache%%:*}" && return 0
+    compadd "$@" "$disp[@]" - "${(@)_lp_alias_cache%%:*}" && return 0
 
 return 1

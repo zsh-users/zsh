@@ -17,5 +17,5 @@ _arguments -s -A "-*" -S \
   '(-e)-E[input read is echoed]' \
   '(-q -z -p)-s[suppress terminal echoing]' \
   '-A[first name is taken as an array]' \
-  '(-q -z -p)-u+[specify file-descriptor to read from]:file-descriptor:_file_descriptors' \
+  '(-q -z -p)-u+[specify file descriptor to read from]:file descriptor:_file_descriptors' \
   $pflag '1:varprompt:_vars -qS\?' '*:vars:_vars'

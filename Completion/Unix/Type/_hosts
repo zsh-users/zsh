@@ -18,4 +18,4 @@ if ! zstyle -a ":completion:${curcontext}:hosts" hosts hosts; then
 fi
 
 _wanted hosts expl host \
-    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" -a hosts
+    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' -a "$@" - hosts

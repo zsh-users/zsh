@@ -17,4 +17,4 @@ if ! zstyle -a ":completion:${curcontext}:domains" domains domains; then
 fi
 
 _wanted domains expl domain \
-    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" -a domains
+    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' -a "$@" - domains

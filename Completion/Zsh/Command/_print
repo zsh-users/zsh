@@ -25,7 +25,7 @@ _arguments -C -s -A "-*" -S \
   '(-n -l -N -f -s -z)-a[with -c/-C, print arguments across before down]' \
   '(-n -l -N -f -C -s -z)-c[print arguments in columns]' \
   '(-n -l -N -f -c -s -z)-C+[print arguments in specified number of columns]:columns' \
-  '(-s -p -z)-u+[specify file-descriptor to print arguments to]:file-descriptor:_file_descriptors' \
+  '(-s -p -z)-u+[specify file descriptor to print arguments to]:file descriptor:_file_descriptors' \
   '(-s -p -u)-z[push arguments onto editing buffer stack]' \
   '-D[substitute any arguments which are named directories using ~ notation]' \
   '-P[perform prompt expansion]' \
