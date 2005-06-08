@@ -1,6 +1,6 @@
 #autoload
 
-local fss
+local expl fss
 
 case $OSTYPE in
   aix*) fss=( jfs nfs cdrfs ) ;;

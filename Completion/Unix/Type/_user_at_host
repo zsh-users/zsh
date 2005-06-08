@@ -5,7 +5,7 @@
 # with `-t tag'.
 # A `-' or `--' as the first argument is ignored.
 
-local suf tag=accounts
+local expl suf tag=accounts
 
 if [[ "$1" = -t?* ]]; then
   tag="${1[3,-1]}"

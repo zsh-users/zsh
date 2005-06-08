@@ -1,6 +1,6 @@
 #compdef chkconfig
 
-local curcontext="$curcontext" state line ret=1
+local curcontext="$curcontext" state line expl ret=1
 
 case $OSTYPE in
 linux*)

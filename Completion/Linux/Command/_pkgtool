@@ -1,5 +1,7 @@
 #compdef installpkg upgradepkg removepkg pkgtool explodepkg makepkg 
 
+local expl
+
 case "$service" in
   installpkg)
     _arguments \

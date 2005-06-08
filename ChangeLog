@@ -1,3 +1,18 @@
+2005-06-08  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 21302: Completion/Linux/Command/_pkgtool,
+	Completion/Unix/Command/_ant, Completion/Unix/Command/_bogofilter,
+	Completion/Unix/Command/_cdrecord, Completion/Unix/Command/_chkconfig,
+	Completion/Unix/Command/_chmod, Completion/Unix/Command/_gs,
+	Completion/Unix/Command/_look, Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_python, Completion/Unix/Command/_rar,
+	Completion/Unix/Type/_file_systems, Completion/Unix/Type/_global_tags,
+	Completion/Unix/Type/_locales, Completion/Unix/Type/_user_at_host,
+	Completion/X/Command/_mozilla, Completion/X/Command/_mplayer,
+	Completion/X/Command/_netscape, Completion/X/Type/_x_visual,
+	Completion/Zsh/Context/_equal: make sure expl is declared local in
+	completion functions
+
 2005-06-07  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Zsh/Command/_dirs: fix typo in opt description 

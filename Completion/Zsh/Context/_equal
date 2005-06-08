@@ -1,3 +1,5 @@
 #compdef -equal-
 
+local expl
+
 _wanted commands expl command compadd -k commands

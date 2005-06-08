@@ -1,6 +1,6 @@
 #compdef rar unrar
 
-local common
+local common expl
 
 common=(
   '-ad[append archive name to destination path]'

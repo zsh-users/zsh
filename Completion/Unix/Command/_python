@@ -2,7 +2,7 @@
 
 # Python 2.4
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
 _arguments -s -S \

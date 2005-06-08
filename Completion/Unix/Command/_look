@@ -1,6 +1,6 @@
 #compdef look
 
-local curcontext="$curcontext" state line ret=1
+local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 
 _arguments -C -s \

@@ -1,7 +1,7 @@
 #compdef mplayer gmplayer
 
 local suf ret=1 curcontext="$curcontext"
-local -a vals state line
+local -a vals state line expl
 
 _x_arguments -C -s \
   '!-abs:buffer size' \

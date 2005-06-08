@@ -1,6 +1,6 @@
 #compdef -value-,LANG,-default- -value-,LANGUAGE,-default- -P -value-,LC_*,-default-
 
-local locales
+local expl locales
 
 if (( $+commands[locale] )); then
   locales=( $(_call_program locales locale -a) )

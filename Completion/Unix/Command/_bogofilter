@@ -1,6 +1,6 @@
 #compdef bogoutil bogotune bogofilter
 
-local ret bogotokens
+local expl ret bogotokens
 
 _bogoutil_caching_policy () {
 

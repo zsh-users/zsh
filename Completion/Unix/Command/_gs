@@ -8,7 +8,7 @@ if compset -N --; then
     return 1
   fi
 else
-  local curcontext="$curcontext" state line ret=1
+  local curcontext="$curcontext" state line expl ret=1
   typeset -A opt_args
 
   _x_arguments -C \

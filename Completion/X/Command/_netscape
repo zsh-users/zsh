@@ -1,6 +1,6 @@
 #compdef netscape
 
-local curcontext="$curcontext" state line ret=1 suf files
+local curcontext="$curcontext" state line expl ret=1 suf files
 typeset -A opt_args
 
 _x_arguments -C \
