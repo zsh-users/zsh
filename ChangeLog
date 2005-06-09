@@ -1,3 +1,7 @@
+2005-06-09  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_less: fix typo in state name
+
 2005-06-08  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_ant: add missing options specific
