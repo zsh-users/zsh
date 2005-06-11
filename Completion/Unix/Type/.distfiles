@@ -7,7 +7,7 @@ _directories         _other_accounts      _printers            _urls
 _domains             _path_files          _ps                  _user_at_host
 _files               _pdf                 _pspdf               _users
 _groups              _perl_basepods       _signals             _users_on
-_hosts               _tar_archive         _time_zone
+_hosts               _tar_archive         _time_zone           _ctags_tags
 _file_systems        _net_interfaces      _terminals           _locales
 _java_class          _services		  _email_addresses     _global_tags
 _mime_types

@@ -103,7 +103,7 @@ if [[ -n "$state" ]]; then
       if (( $+LESSGLOBALTAGS )); then
         _global_tags
       else
-        _message -e ctags tag
+        _ctags_tags
       fi
     ;;
   esac

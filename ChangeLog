@@ -1,5 +1,9 @@
 2005-06-11  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
+	* 21316 (modified): Completion/Unix/Command/_less,
+	Completion/Unix/Type/_ctags_tags: new completion for ctags tags; update
+	less -t completion to use it
+	
 	* 21320: Completion/Unix/Command/_screen: complete -D and -R with the
 	appropriate session types; fix incorrect completion of -c and -dmS
 	options
