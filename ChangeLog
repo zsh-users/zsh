@@ -1,3 +1,8 @@
+2005-06-11  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 21321: Completion/Unix/Command/_antiword: update antiword completion
+	for version 0.36
+
 2005-06-09  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_less: fix typo in state name

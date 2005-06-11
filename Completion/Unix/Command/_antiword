@@ -1,17 +1,23 @@
 #compdef antiword
 
-# Version: 0.35  (14 Nov 2003)
+# Version: 0.36.1  (09 Dec 2004)
+
+local papersizes
+
+papersizes=( 10x14 a3 a4 a5 b4 b5 executive folio legal letter note quarto statement tabloid )
 
 _arguments -s -S \
-  '(-i -L -p -x)-t[text output (default)]' \
-  '(-t -w -x)-p+[PostScript output]:paper size:(10x14 a3 a4 a5 b4 b5 executive folio legal letter note quarto statement tabloid)' \
-  '(-i -L -p -t -w)-x[XML output]:DTD:(db)' \
-  '-m+[character mapping file]:mapping file:_files' \
-  '(-i -L -p -x)-w+[width in characters of text output]:line width:' \
-  '(-t -w -x)-i+[image level (PostScript only)]:image level:((0\:use\ non\ standard\ extensions\ from\ Ghostscript 1\:show\ no\ images 2\:PostScript\ level\ 2\ compatible 3\:PostScript\ level\ 3\ compatible))' \
-  '(-t -w -x)-L[use landscape mode (PostScript only)]' \
+  '(         -w    -f -p -t -x)-a+[Adobe PDF output]:paper size:(${papersizes[@]})' \
+  '(-i -L       -a    -p -t -x)-f[formatted text output]' \
+  '(         -w -a -f    -t -x)-p+[PostScript output]:paper size:(${papersizes[@]})' \
+  '(-i -L       -a -f -p    -x)-t[text output (default)]' \
+  '(-i -L -m -w -a -f -p -t   )-x+[XML output]:DTD:(db)' \
+  '(-x)-m+[character mapping file]:mapping file:_files' \
+  '(-i -L -a -p -x)-w+[width in characters of text output]:line width:' \
+  '(-w -f -t -x)-i+[image level (PostScript only)]:image level:((0\:use\ non\ standard\ extensions\ from\ Ghostscript 1\:show\ no\ images 2\:PostScript\ level\ 2\ compatible 3\:PostScript\ level\ 3\ compatible))' \
+  '(-w -f -t -x)-L[use landscape mode (PostScript only)]' \
   '-s[show hidden (by Word) text]' \
-  '(* -)-h[give a help message]' \
+  '(- *)-h[display help information]' \
   '*:MS Word file:_files -g "*.doc(-.)"' && return
 
 return 1
