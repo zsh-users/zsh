@@ -1,5 +1,9 @@
 2005-06-11  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
+	* 21320: Completion/Unix/Command/_screen: complete -D and -R with the
+	appropriate session types; fix incorrect completion of -c and -dmS
+	options
+
 	* 21321: Completion/Unix/Command/_antiword: update antiword completion
 	for version 0.36
 
