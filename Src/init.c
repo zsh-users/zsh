@@ -112,7 +112,7 @@ loop(int toplevel, int justonce)
 	hbegin(1);		/* init history mech        */
 	if (isset(SHINSTDIN)) {
 	    setblock_stdin();
-	    if (interact) {
+	    if (interact && toplevel) {
 	        int hstop = stophist;
 		stophist = 3;
 		preprompt();

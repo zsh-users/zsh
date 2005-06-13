@@ -1,3 +1,8 @@
+2005-06-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21328: Src/init.c: in loop(), avoid preprompt() when not looping at
+	the top level (prevents double precmd call during "fc -e -").
+
 2005-06-11  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* 21316 (modified): Completion/Unix/Command/_less,
