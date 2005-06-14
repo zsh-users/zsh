@@ -92,7 +92,7 @@ _svn_subcommand () {
   _svn_subcmd_usage=${${(M)${(f)"$(LC_MESSAGES=C _call_program options svn help $1)"}:#usage:*}#usage: $1 }
 
   _svn_subcmds=(
-    ${${=${${${(M)${(f)"$(LC_MESSAGES=C _call_program options svn help $1)"##*Valid options:}:#* :*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}[2,-1]}
+    ${=${${${(M)${(f)"$(LC_MESSAGES=C _call_program options svn help $1)"##*Valid options:}:#* :*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
   )
 
   case $1 in;
@@ -174,7 +174,7 @@ _svnadmin_subcommand () {
   _svnadmin_subcmd_usage=${${(M)${(f)"$(LC_MESSAGES=C _call_program options svnadmin help $1)"}:#$1: usage:*}#$1: usage: svnadmin $1 }
 
   _svnadmin_subcmds=(
-    ${${=${${${(M)${(f)"$(LC_MESSAGES=C _call_program options svnadmin help $1)"##*Valid options:}:#*:*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}[2,-1]}
+    ${=${${${(M)${(f)"$(LC_MESSAGES=C _call_program options svnadmin help $1)"##*Valid options:}:#*:*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
   )
 
   [[ "$_svnadmin_subcmd_usage" == *REPOS_PATH* ]] &&

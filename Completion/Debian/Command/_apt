@@ -419,6 +419,7 @@ _apt-get () {
     --diff-only:bool \
     --tar-only:bool \
     --arch-only:bool \
+    --allow-unauthenticated:bool \
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
@@ -481,6 +482,7 @@ _apt-cache () {
     /$'dotty\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'xvcg\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'policy\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'madison\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg showsrc stats dump dumpavail unmet search show depends rdepends pkgnames dotty policy xvcg'
 
   _apt-cache () {

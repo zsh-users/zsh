@@ -1,3 +1,8 @@
+2005-06-14  Clint Adams  <clint@zsh.org>
+
+	* 21243: Kazuhiro NISHIYAMA: Completion/Unix/Command/_subversion:
+	complete first option of svn subcmds.
+
 2005-06-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21328: Src/init.c: in loop(), avoid preprompt() when not looping at
