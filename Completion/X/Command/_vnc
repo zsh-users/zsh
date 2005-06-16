@@ -1,4 +1,4 @@
-#compdef vncserver vncviewer xvncviewer
+#compdef vncserver vncviewer xvncviewer xtightvncviewer xvnc4viewer
 
 local displays args
 displays=( ~/.vnc/$HOST:<->.pid(N:r:t:s/$HOST//) )

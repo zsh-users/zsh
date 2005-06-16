@@ -1,3 +1,8 @@
+2005-06-16  Clint Adams  <clint@zsh.org>
+
+	* 21351: Completion/X/Command/_vnc: complete for xvnc4viewer and
+	xtightvncviewer.
+
 2005-06-14  Clint Adams  <clint@zsh.org>
 
 	* 21243: Kazuhiro NISHIYAMA: Completion/Unix/Command/_subversion:
