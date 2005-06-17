@@ -3653,7 +3653,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    
 	    /* copy only one of each flag as spec has finite size */
 	    memset(flags, 0, sizeof(flags));
-	    while ((flag = strchr(flagch, *c))) {
+	    while (*c && (flag = strchr(flagch, *c))) {
 	    	if (!flags[flag - flagch]) {
 	    	    flags[flag - flagch] = 1;
 		    *d++ = *c;
