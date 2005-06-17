@@ -1,3 +1,8 @@
+2005-06-17  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_darcs: tidy up command
+	descriptions
+
 2005-06-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 21352: Harald van Dijk: Src/builtin.c: handle null after % in

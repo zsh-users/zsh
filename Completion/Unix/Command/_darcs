@@ -104,7 +104,7 @@ else
 	[[ $hline[1] == darcs ]] && continue
  	[[ $hline[1] == Usage: ]] && continue
  	[[ $hline[1] == Use ]] && continue
- 	cmdlist=( $cmdlist "${hline[1]}:${hline[2,-1]}" )
+ 	cmdlist=( $cmdlist "${hline[1]}:${hline[2,-1]/(#b)([A-Z])(*)./${match[1]:l}$match[2]}" )
      done
     arguments=(':commands:(($cmdlist))')
 fi
