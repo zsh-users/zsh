@@ -1,3 +1,10 @@
+2005-06-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 21352: Harald van Dijk: Src/builtin.c: handle null after % in
+	printf format specifier
+
+	* unposted: Test/B03print.ztst: add test for 21352
+
 2005-06-16  Clint Adams  <clint@zsh.org>
 
 	* 21351: Completion/X/Command/_vnc: complete for xvnc4viewer and

@@ -203,3 +203,11 @@
  printf -- '%s\n' str
 0:initial `--' ignored to satisfy POSIX
 >str
+
+ printf '%'
+1:nothing after % in format specifier
+?(eval):printf:1: %: invalid directive
+
+ printf $'%\0'
+1:explicit null after % in format specifier
+?(eval):printf:1: %: invalid directive
