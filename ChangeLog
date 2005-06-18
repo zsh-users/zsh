@@ -1,3 +1,8 @@
+2005-06-18  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 21343: Completion/Unix/Command/_php: update php completion for
+	version 5.0; continue supporting version 4.x via _pick_variant
+
 2005-06-17  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_darcs: tidy up command
