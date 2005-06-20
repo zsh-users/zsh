@@ -1,3 +1,9 @@
+2005-06-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Functions/Misc/zargs: support -I and -L as synonyms
+	for -i and -l, except that the former require their arguments.
+	Document several differences from POSIX xargs behavior.  V 1.4.
+
 2005-06-18  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* 21343: Completion/Unix/Command/_php: update php completion for

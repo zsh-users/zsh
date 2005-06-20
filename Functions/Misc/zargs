@@ -46,11 +46,28 @@
 # Also because of "wait" limitations, --max-procs spawns max-procs jobs,
 # then waits for all of those, then spawns another batch, etc.
 #
+# Differences from POSIX xargs:
+#
+# * POSIX requires a space between -I/-L/-n/-s and their numeric argument;
+#   zargs uses zparseopts, which does not require the space.
+#
+# * POSIX -L and -n are mutually exclusive and effectively synonymous;
+#   zargs accepts both and considers -n to be a limit on the total number
+#   of arguments per command line, that is, including the initial-args.
+#   Thus the following fails with "argument list too long":
+#     zargs -n 3 -- echo Here are four words
+#   The smallest limit implied by the combination of -L and -n is used.
+#
+# * POSIX implies the last of -n/-i/-I/-l/-L on the command line is meant
+#   to cancel any of those that precede it.  (This is unspecified for
+#   -I/-L and implementations reportedly differ.)  In zargs, -i/-I have
+#   this behavior, as do -l/-L, but when -i/-I appear anywhere then -l/-L
+#   are ignored (forced to 1).
 
 emulate -L zsh || return 1
 local -a opts eof n s l P i
 
-local ZARGS_VERSION="1.3"
+local ZARGS_VERSION="1.4"
 
 if zparseopts -a opts -D -- \
 	-eof::=eof e::=eof \
@@ -59,11 +76,11 @@ if zparseopts -a opts -D -- \
 	-interactive p \
 	-max-args:=n n:=n \
 	-max-chars:=s s:=s \
-	-max-lines::=l l::=l \
+	-max-lines::=l l::=l L:=l \
 	-max-procs:=P P:=P \
 	-no-run-if-empty r \
 	-null 0 \
-	-replace::=i i::=i \
+	-replace::=i i::=i I:=i \
 	-verbose t \
 	-version
 then
@@ -119,7 +136,7 @@ HELP
     if (( $#i ))
     then
 	l=1
-	i=${${i##-(i|-replace(=|))}:-\{\}}
+	i=${${${i##-(i|I|-replace(=|))}[-1]}:-\{\}}
 	opts[(r)-x]=-x
 	# The following is not how xargs is documented,
 	# but GNU xargs does behave as if -i implies -r.
@@ -214,7 +231,7 @@ then
 fi
 
 s=${${s##-(s|-max-chars(=|))}:-20480}
-l=${${l##-(l|-max-lines(=|))}:-${${l[1]:+1}:-$ARGC}}
+l=${${${l##*-(l|L|-max-lines(=|))}[-1]}:-${${l[1]:+1}:-$ARGC}}
 
 # Everything has to be in a subshell just in case of backgrounding jobs,
 # so that we don't unintentionally "wait" for jobs of the parent shell.
