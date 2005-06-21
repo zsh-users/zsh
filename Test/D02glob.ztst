@@ -280,6 +280,10 @@
 0:Globbing used recursively (inside e glob qualifier)
 >a a b b c c
 
+ print glob.tmp/*/*(e:'reply=( glob.tmp/**/*([1]) )'::t)
+0:Recursive globbing used recursively (inside e glob qualifier)
+>a a a a a a a
+
  print glob.tmp/**/(:h) 
 0:Head modifier
 >. glob.tmp glob.tmp glob.tmp glob.tmp glob.tmp/dir3

@@ -1,3 +1,8 @@
+2005-06-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 21317: Src/glob.c, Test/D02glob.ztst: fix bug where recursive
+	glob within e qualifier would hang the shell
+
 2005-06-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Misc/zargs: support -I and -L as synonyms
