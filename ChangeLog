@@ -1,3 +1,8 @@
+2005-06-21  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 21334: Completion/Linux/Command/_pkgtool: fix typo in -target_dir
+	completion
+
 2005-06-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 21317: Src/glob.c, Test/D02glob.ztst: fix bug where recursive

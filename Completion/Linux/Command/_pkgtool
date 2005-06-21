@@ -49,7 +49,7 @@ case "$service" in
       '-ignore_tagfile[install every package encountered regardless of tagfiles]' \
       '-tagfile[specify tagfile to be used for the installation]:tagfile:_files -/' \
       '-source_dir[specify directory containing each disk subdirectory]:source directory:_path_files -/' \
-      '-target_dir[specify directory where the target root directory is located]:target directory:_path_files -W -/' \
+      '-target_dir[specify directory where the target root directory is located]:target directory:_path_files -/' \
       '(-source_mounted)-source_device[specify source device to install from]:source device:{compadd "$expl[@]" /dev/*}'
   ;;
 esac
