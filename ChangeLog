@@ -1,3 +1,10 @@
+2005-06-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 21380: Completion/Linux/Command/_iwconfig,
+	Completion/Linux/Command/_tune2fs, Completion/Unix/Command/_wget,
+	Completion/Linux/Command/_mii-tool: update for wget 1.10, add
+	missing descriptions and other minor improvements
+
 2005-06-24  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Debian/Command/_apt-move: prevent function from
