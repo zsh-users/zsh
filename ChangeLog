@@ -1,3 +1,8 @@
+2005-06-24  Clint Adams  <clint@zsh.org>
+
+	* 21382: Completion/Unix/Command/_kvno: completion for MIT
+	krb5's kvno.
+
 2005-06-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 21380: Completion/Linux/Command/_iwconfig,

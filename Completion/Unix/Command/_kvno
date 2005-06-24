@@ -1,0 +1,22 @@
+#compdef kvno
+
+_arguments \
+	'-c[credentials cache]:cache:_files' \
+	'-e[enctype]:enctype:' \
+	'-q[suppress printing]' \
+	'-h[help]' \
+	'-4[kerberos 4 tickets]' \
+	':principal:->principal' && return 0
+
+case "$state" in
+	(principal)
+	if [[ -prefix host/ ]]; then
+	  compset -P host/
+	  _hosts
+	else
+	  _alternative \
+	    'users:user:_users' \
+	    'services:service:compadd -S/ host'
+	fi
+	;;
+esac
