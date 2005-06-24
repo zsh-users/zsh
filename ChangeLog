@@ -1,5 +1,9 @@
 2005-06-24  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
+	* unposted: Completion/Debian/Command/_apt-move: prevent function from
+	returning early and preventing prefix-needed style from working when
+	set to false
+
 	* 21379: Completion/Unix/Command/_wget: improve --restrict-file-names
 	completion by allowing 'nocontrol' as an argument
 

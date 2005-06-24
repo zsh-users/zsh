@@ -1,18 +1,20 @@
 #compdef apt-move
 
-local state line
+local curcontext="$curcontext" state line ret=1
+typeset -A opt_args
 
-_arguments \
+_arguments -C \
   '-c[specify an alternative configuration file]' \
   '-d[override the DIST setting]' \
   '-f[override the MAXDELETE setting]' \
   '-q[be quiet; suppress normal output]' \
   '-t[show what apt-move would do, but do not actually do anything]' \
   '1: :->cmds' \
-  '*: :->args' && return 0
+  '*: :->args' && ret=0
 
 case $state in
   cmds)
+    local -a cmds
     cmds=('get:update your master files from local apt' \
           'getlocal:alias of get' \
           'fsck:fix broken repositories' \
@@ -30,20 +32,20 @@ case $state in
           'listsrc:same as listbin, but lists source packages' \
           'mirrorbin:same as mirror, but gets the packages specified on stdin' \
           'mirrorsrc:same as mirrorbin, but gets source packages')
-      _describe -t commands 'apt-move command' cmds && return 0
+      _describe -t commands 'apt-move command' cmds && ret=0
   ;;
   args)
     case $line[1] in
 	  get|getlocal)
 	    # A directory or nothing
-		_files -/
+		_files -/ && ret=0
 	  ;;
 	  movefile)
 	    # A .dsc or a .deb
-		_files -g "*.d(sc|eb)"
+		_files -g "*.d(sc|eb)" && ret=0
 	  ;;
 	esac
   ;;
 esac
 
-return 1
+return ret
