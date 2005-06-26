@@ -1,3 +1,8 @@
+2005-06-26  Clint Adams  <clint@zsh.org>
+
+	* 21383: nuno alexandre: Completion/X/Command/_urxvt:
+	completion for rxvt-unicode.
+
 2005-06-24  Clint Adams  <clint@zsh.org>
 
 	* 21382: Completion/Unix/Command/_kvno: completion for MIT
