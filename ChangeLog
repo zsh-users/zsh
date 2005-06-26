@@ -1,5 +1,8 @@
 2005-06-26  Clint Adams  <clint@zsh.org>
 
+	* 21384: Completion/X/Command/_urxvt: small fixes
+	to urxvt completion.
+
 	* 21383: nuno alexandre: Completion/X/Command/_urxvt:
 	completion for rxvt-unicode.
 

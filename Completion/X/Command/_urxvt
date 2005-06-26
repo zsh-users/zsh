@@ -1,37 +1,30 @@
 #compdef urxvt
 _xt_arguments \
-  -+{rv,ls,j,ptab,sb,sr,st,si,sk,sw,ip,ipf,ut,vb,tcw,insecure,uc,bc,pb,b,scc,ssr} \
-  -{help} \
-  '-tn:	string:' \
-  '-geometry: geometry:' \
-  '-C: intercept console messages:' \
-  '-iconic: start iconic:' \
-  '-sbt: scrollbar thickness:' \
-  '-tint: tint color:' \
-  '-fade: fade percent:' \
-  '-sh:	shade percent:' \
-  '-bg:	background color:' \
-  '-cr:	cursor color:' \
-  '-pr:	pointer color:' \
-  '-pr2: pointer bg color:'\
-  '-bd:	border color:' \
-  '-pixmap: pixmap:' \
-  '-fn: normal text font:' \
-  '-fb: bold font:' \
-  '-fi: italic font:' \
-  '-fbi: bold italic font:' \
-  '-im: name of input method:' \
-  '-pt: input style style = OverTheSpot|OffTheSpot|Root:'\
-  '-imlocale: locale to use for input method:' \
-  '-imfont: fontset for styles OverTheSpot and OffTheSpot:' \
-  '-name: client instance, icon, and title strings:' \
-  '-title: title name for window:' \
-  '-n: con name for window:' \
-  '-sl: number of scrolled lines to save:' \
-  '-embed: window id to embed terminal in:' \
-  '-pty-fd: file descriptor of pty to use:' \
+  -+{ls,j,ptab,sb,sr,st,si,sk,sw,ip,ipf,ut,vb,tcw,insecure,uc,bc,pb,b,scc,ssr} \
+  -help \
+  '-tn:string:' \
+  '-C:intercept console messages:' \
+  '-sbt:scrollbar thickness:' \
+  '-tint:tint color:_x_color' \
+  '-fade:fade percent:' \
+  '-sh:shade percent:' \
+  '-cr:cursor color:_x_color' \
+  '-pr:pointer color:_x_color' \
+  '-pr2:pointer bg color:_x_color'\
+  '-pixmap:pixmap:' \
+  '-fb:bold font:' \
+  '-fi:italic font:' \
+  '-fbi:bold italic font:' \
+  '-im:name of input method:' \
+  '-pt:input style style = OverTheSpot|OffTheSpot|Root:'\
+  '-imlocale:locale to use for input method:' \
+  '-imfont:fontset for styles OverTheSpot and OffTheSpot:' \
+  '-n:con name for window:' \
+  '-sl:number of scrolled lines to save:' \
+  '-embed:window id to embed terminal in:' \
+  '-pty-fd:file descriptor of pty to use:' \
   '-w:external border in pixels:' \
-  '-b: internal border in pixels:' \
-  '-lsp: number of extra pixels between rows:' \
-  '-mod: meta modifier = alt|meta|hyper|super|mod1|...|mod5:' \
-  '-e: command to execute: _command_names -e:*::program arguments: _normal'
+  '-b:internal border in pixels:' \
+  '-lsp:number of extra pixels between rows:' \
+  '-mod:meta modifier = alt|meta|hyper|super|mod1|...|mod5:' \
+  '-e:command to execute: _command_names -e:*::program arguments: _normal'
