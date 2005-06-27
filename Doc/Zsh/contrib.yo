@@ -1381,7 +1381,9 @@ An extra facility is provided for changing the default output base.  Use,
 for example, `tt([#16])' to display hexadecimal output preceded by an
 indication of the base, or `tt([##16])' just to display the raw number in
 the given base.  Bases themselves are always specified in decimal.
-`tt([#])' restores the normal output format.
+`tt([#])' restores the normal output format.  Note that setting an output
+base suppresses floating point output; use `tt([#])' to return to normal
+operation.
 
 The output base can be initialised by passing the option `tt(-#)var(base)',
 for example `tt(zcalc -#16)' (the `tt(#)' may have to be quoted, depending
@@ -1392,6 +1394,28 @@ undergoes standard prompt expansion.  The index of the current entry is
 stored locally in the first element of the array tt(psvar), which can be
 referred to in tt(ZCALCPROMPT) as `tt(%1v)'.  The default prompt is
 `tt(%1v> )'.
+
+The output precision may be specified within zcalc by special commands
+familiar from many calculators:
+startitem()
+item(tt(norm))(
+The default output format.  It corresponds to the printf tt(%g)
+specification.  Typically this shows six decimal digits.
+)
+item(tt(sci) var(digits))(
+Scientific notation, corresponding to the printf tt(%g) output format with
+the precision given by var(digits).  This produces either fixed point or
+exponential notation depending on the value output.
+)
+item(tt(fix) var(digits))(
+Fixed point notation, corresponding to the printf tt(%f) output format with
+the precision given by var(digits).
+)
+item(tt(eng) var(digits))(
+Exponential notation, corresponding to the printf tt(%E) output format with
+the precision given by var(digits).
+)
+enditem()
 
 See the comments in the function for a few extra tips.
 )
