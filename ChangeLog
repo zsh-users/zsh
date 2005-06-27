@@ -1,3 +1,8 @@
+2005-06-27  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* unposted: Completion/Unix/Type/_urls: complete WWW_HOME, ftp_proxy
+	and https_proxy with URLs
+
 2005-06-27  Peter Stephenson  <pws@csr.com>
 
 	* 21387: Doc/Zsh/contrib.yo: document the precision features
