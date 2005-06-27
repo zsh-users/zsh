@@ -1,3 +1,8 @@
+2005-06-27  Peter Stephenson  <pws@csr.com>
+
+	* 21387: Doc/Zsh/contrib.yo: document the precision features
+	in zcalc.
+
 2005-06-26  Clint Adams  <clint@zsh.org>
 
 	* 21384: Completion/X/Command/_urxvt: small fixes
