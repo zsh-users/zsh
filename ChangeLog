@@ -1,3 +1,9 @@
+2005-06-28  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 21392: Completion/Unix/Command/_w3m: update w3m completion for
+	version 0.5.x; add completion for URLs from the bookmarks file,
+	options, charsets, and proxy authentication
+
 2005-06-28  Peter Stephenson  <pws@csr.com>
 
 	* 21391: Src/jobs.c: Restrict passing of signals from foreground
