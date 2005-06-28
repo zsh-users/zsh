@@ -1,3 +1,10 @@
+2005-06-28  Peter Stephenson  <pws@csr.com>
+
+	* 21391: Src/jobs.c: Restrict passing of signals from foreground
+	processes to the shell to SIGINT and SIGQUIT (i.e. those
+	generated from the keyboard).  This removes some unexpected
+	behaviour with SIGPIPE being passed to the shell.
+
 2005-06-27  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Type/_urls: complete WWW_HOME, ftp_proxy
