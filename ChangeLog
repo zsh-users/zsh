@@ -1,3 +1,8 @@
+2005-06-30  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_links: declare parameter vals
+	local 
+
 2005-06-28  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* 21392: Completion/Unix/Command/_w3m: update w3m completion for
