@@ -1,5 +1,8 @@
 2005-07-03  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
+	* unposted: Completion/Unix/Command/_w3m: add missing compset -S calls
+	when completing option names and proxy usernames
+
 	* 21400: Completion/Unix/Command/_ruby: add completion for RUBYOPT,
 	RUBYLIB and RUBYPATH env variables
 

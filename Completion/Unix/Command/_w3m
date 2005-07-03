@@ -55,6 +55,8 @@ _arguments -C \
   '-debug' \
   '(-B -v)*:URL:->html' && ret=0
 
+local -a suf
+
 case "$state" in
   charset)
     local -a charsets
@@ -91,14 +93,16 @@ case "$state" in
     if compset -P '*='; then
       _message -e values 'value'
     else
-      _describe -t options 'option' options -S '=' && ret=0
+      compset -S '=*' || suf=( -S '=' )
+      _describe -t options 'option' options "$suf[@]" && ret=0
     fi
   ;;
   pauth)
     if compset -P '*:'; then
       _message -e passwords 'password'
     else
-      _users -S ':' && ret=0
+      compset -S ':*' || suf=( -S ':' )
+      _users "$suf[@]" && ret=0
     fi
   ;;
 esac
