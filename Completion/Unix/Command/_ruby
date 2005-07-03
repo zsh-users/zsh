@@ -1,13 +1,30 @@
-#compdef ruby
+#compdef ruby -P -value-,RUBY(LIB|OPT|PATH),-default-
 
 # ruby 1.8.0 (2003-08-14) [i686-linux]
 
-local expl curcontext="$curcontext" line state ret=1
+local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
-local dirs
+
+local -a args
+args=(
+  '(-)1:script file:->script'
+  '*::script argument: _normal'
+)
+
+case "$service" in
+  *RUBY(LIB|PATH)*)
+    _dir_list && return 0
+  ;;
+  *RUBYOPT*)
+    compset -q
+    words=( fake "$words[@]" )
+    (( CURRENT++ ))
+    args=()
+  ;;
+esac
 
 _arguments -C -s -S \
-  '-0-[specify record separator]:input record separator in octal (default\: \0):' \
+  '-0-[specify record separator]:input record separator in octal (default \0):' \
   '-a[autosplit mode with -n or -p (splits $_ into $F)]' \
   '-c[check syntax only]' \
   '-C+[cd to directory, before executing your script]:directory:_files -/' \
@@ -23,20 +40,20 @@ _arguments -C -s -S \
   '*-r+[require the library, before executing your script]:library name:->library' \
   '-s[enable some switch parsing for switches after script name]' \
   '-S[look for the script using PATH environment variable]' \
-  '-T-[turn on tainting checks]:taint level (default\: 0):((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))' \
+  '-T-[turn on tainting checks]:taint level (default 0):((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))' \
   '(-v --verbose)'{-v,--verbose}'[print version number, then turn on verbose mode]' \
   '-w[turn warnings on for your script]' \
-  '-W-[set warning level]:warning level (default\: 2):((0\:silent 1\:medium 2\:verbose))' \
+  '-W-[set warning level]:warning level (default 2):((0\:silent 1\:medium 2\:verbose))' \
   '(-y --yydebug)'{-y,--yydebug}'[enable yacc debugging in the parser]' \
   '-x-[strip off text before #!ruby line and perhaps cd to directory]:directory:_files -/' \
   '(1 * -)--copyright[print the copyright]' \
   '(1 * -)'{-h,--help}'[print help message]' \
   '(1 * -)--version[print the version]' \
-  '(-)1:script file:_files -g "*.rb(-.)"' \
-  '*:script argument:_files' && ret=0
+  "$args[@]" && ret=0
 
 case $state in
   library)
+    local -a dirs
     dirs=($(_call_program directories $words[1] -e 'puts\ \$:'))
     _wanted directories expl library _path_files -W dirs && ret=0
   ;;
