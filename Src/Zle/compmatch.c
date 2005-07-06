@@ -57,11 +57,9 @@ cmp_cmatchers(Cmatcher a, Cmatcher b)
 	     a->llen == b->llen && a->wlen == b->wlen &&
 	     (!a->llen || cmp_cpatterns(a->line, b->line)) &&
 	     (a->wlen <= 0 || cmp_cpatterns(a->word, b->word)) &&
-	     (!(a->flags & CMF_LEFT) ||
-	      (a->lalen == b->lalen &&
-	       (!a->lalen || cmp_cpatterns(a->left, b->left)))) &&
-	     (!(a->flags & CMF_RIGHT) ||
-	      (a->ralen == b->ralen &&
+	     (!(a->flags & (CMF_LEFT | CMF_RIGHT)) ||
+	      (a->lalen == b->lalen && a->ralen == b->ralen &&
+	       (!a->lalen || cmp_cpatterns(a->left, b->left)) &&
 	       (!a->ralen || cmp_cpatterns(a->right, b->right))))));
 }
 
@@ -134,6 +132,7 @@ get_cline(char *l, int ll, char *w, int wl, char *o, int ol, int fl)
     r->slen = 0;
     r->flags = fl;
     r->prefix = r->suffix = NULL;
+    r->min = r->max = 0;
     return r;
 }
 
@@ -212,9 +211,9 @@ void
 cline_setlens(Cline l, int both)
 {
     while (l) {
-	l->max = cline_sublen(l);
+	l->min = cline_sublen(l);
 	if (both)
-	    l->min = l->max;
+	    l->max = l->min;
 	l = l->next;
     }
 }
@@ -342,7 +341,7 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
 
     /* If the anchors are equal, we keep only one. */
 
-    if (!strncmp(l, w, wl))
+    if (l && !strncmp(l, w, wl))
 	l = NULL;
 
     /* Split the new part into parts and turn the last one into a
@@ -350,7 +349,6 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
 
     p = bld_parts(s, sl, osl, &lp);
 
-    p->flags &= ~CLF_NEW;
     if (m && (m->flags & CMF_LEFT)) {
 	lp->flags |= CLF_SUF;
 	lp->suffix = lp->prefix;
@@ -380,10 +378,16 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
 	matchsubs = matchlastsub = NULL;
     }
     /* Store the arguments in the last part-cline. */
-    lp->line = l; lp->llen = wl;
-    lp->word = w; lp->wlen = wl;
-    lp->orig = o; lp->olen = ol;
-    lp->flags &= ~CLF_NEW;
+    if (lp->llen || lp->wlen) {
+	lp->next = get_cline(l, wl, w, wl, o, ol, CLF_NEW);
+	lp = lp->next;
+    } else {
+	lp->line = l; lp->llen = wl;
+	lp->word = w; lp->wlen = wl;
+	lp->orig = o; lp->olen = ol;
+    }
+    if (o || ol)
+	lp->flags &= ~CLF_NEW;
 
     /* Finally, put the new parts on the list. */
     if (matchlastpart)
@@ -412,12 +416,32 @@ add_match_sub(Cmatcher m, char *l, int ll, char *w, int wl)
 
     /* And add the cline. */
     if (wl || ll) {
-	n = get_cline(l, ll, w, wl, NULL, 0, flags);
-	if (matchlastsub)
-	    matchlastsub->next = n;
-	else
-	    matchsubs = n;
-	matchlastsub = n;
+	Cline p, lp;
+
+	if ((p = n = bld_parts(w, wl, ll, &lp)) && n != lp) {
+	    for (; p->next != lp; p = p->next);
+
+	    if (matchsubs) {
+		matchlastsub->next = n->prefix;
+		n->prefix = matchsubs;
+	    }
+	    matchsubs = matchlastsub = lp;
+
+	    if (matchlastpart)
+		matchlastpart->next = n;
+	    else
+		matchparts = n;
+	    p->next = 0;
+	    matchlastpart = p;
+	} else {
+	    n = get_cline(l, ll, w, wl, NULL, 0,
+			  flags | ((m && m->wlen == -2) ? CLF_SKIP : 0));
+	    if (matchlastsub)
+		matchlastsub->next = n;
+	    else
+		matchsubs = n;
+	    matchlastsub = n;
+	}
     }
 }
 
@@ -435,9 +459,9 @@ int
 match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	  int sfx, int test, int part)
 {
-    int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw;
+    int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw, exact = 0, wexact = 0;
     int il = 0, iw = 0, t, ind, add, he = 0, bpc, obc = bc, bslash;
-    VARARR(unsigned char, ea, ll + 1);
+    VARARR(unsigned char, ea, (ll > lw ? ll : lw) + 1);
     char *ow;
     Cmlist ms;
     Cmatcher mp, lm = NULL;
@@ -467,8 +491,56 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	bp->curpos = bc;
 	bp = bp->next;
     }
-    while (ll && lw) {
-	/* First try the matchers. */
+    /*** This once was: `while (ll && lw)', but then ignored characters at
+     *   the end were not, well, ignored. */
+    while (ll) {
+
+	/* Hm, we unconditionally first tried the matchers for the cases
+	 * where the beginnings of the line and word patterns match the
+	 * same character(s).
+	 * But first testing if the characters are the same is sooo
+	 * much faster...
+	 * Maybe it's OK to make same-character matching be preferred in
+	 * recursive calls. At least, it /seems/ to work.
+	 *
+	 * Let's try.
+	 *
+	 * Update: this once tested `test && ...' to check for exact
+	 * character matches only in recursive calls.  But then one
+	 * can't complete `nom<TAB>' to `nomatch' with a match spec
+	 * of `B:[nN][oO]=' because that will eat the `no'.
+	 * But that would break completion of strings like `nonomatch'
+	 * because the `B:[nN][oO]=' doesn't match the second `no'.
+	 * For this we added the code below that can remove already
+	 * accepted exact characters and try again, preferring match
+	 * specs.
+	 */
+
+	bslash = 0;
+	if (!sfx && lw && (!part || test) &&
+	    (l[ind] == w[ind] ||
+	     (bslash = (lw > 1 && w[ind] == '\\' &&
+			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
+	    /* No matcher could be used, but the strings have the same
+	     * character here, skip over it. */
+	    l += add; w += (bslash ? (add + add) : add);
+	    il++; iw += 1 + bslash;
+	    ll--; lw -= 1 + bslash;
+	    bc++;
+	    exact++;
+	    wexact += 1 + bslash;
+	    if (!test)
+		while (bp && bc >= (useqbr ? bp->qpos : bp->pos)) {
+		    bp->curpos = matchbufadded + (sfx ? (ow - w) : (w - ow)) + obc;
+		    bp = bp->next;
+		}
+	    lm = NULL;
+	    he = 0;
+
+	    continue;
+	}
+    retry:
+	/* First try the matchers. Err... see above. */
 	for (mp = NULL, ms = mstack; !mp && ms; ms = ms->next) {
 	    for (mp = ms->matcher; mp; mp = mp->next) {
 		t = 1;
@@ -481,29 +553,32 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    continue;
 
 		if (mp->wlen < 0) {
-		    int both, loff, aoff, llen, alen, zoff, moff, ct, ict;
+		    int both, loff, aoff, llen, alen, zoff, moff, ct, ict, aol;
 		    char *tp, savl = '\0', savw;
-		    Cpattern ap;
+		    Cpattern ap, aop;
 
 		    /* This is for `*' patterns, first initialise some
 		     * local variables. */
 		    llen = mp->llen;
-		    alen = (mp->flags & CMF_LEFT ? mp->lalen : mp->ralen);
-
+		    if (mp->flags & CMF_LEFT) {
+			alen = mp->lalen; aol = mp->ralen;
+		    } else {
+			alen = mp->ralen; aol = mp->lalen;
+		    }
 		    /* Give up if we don't have enough characters for the
 		     * line-string and the anchor. */
 		    if (ll < llen + alen || lw < alen)
 			continue;
 
 		    if (mp->flags & CMF_LEFT) {
-			ap = mp->left; zoff = 0; moff = alen;
+			ap = mp->left; zoff = 0; moff = alen; aop = mp->right;
 			if (sfx) {
 			    both = 0; loff = -llen; aoff = -(llen + alen);
 			} else {
 			    both = 1; loff = alen; aoff = 0;
 			}
 		    } else {
-			ap = mp->right; zoff = alen; moff = 0;
+			ap = mp->right; zoff = alen; moff = 0; aop = mp->left;
 			if (sfx) {
 			    both = 1; loff = -(llen + alen); aoff = -alen;
 			} else {
@@ -515,34 +590,49 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			continue;
 		    if (ap) {
 			if (!pattern_match(ap, l + aoff, NULL, NULL) ||
-			    (both && (!pattern_match(ap, w + aoff, NULL, NULL) ||
-				      !match_parts(l + aoff, w + aoff, alen,
-						   part))))
+			    (both &&
+			     (!pattern_match(ap, w + aoff, NULL, NULL) ||
+			      (aol && aol <= aoff + iw &&
+			       !pattern_match(aop, w + aoff - aol,
+					      NULL, NULL)) ||
+			      !match_parts(l + aoff, w + aoff, alen, part))))
 				continue;
-		    } else if (!both || il || iw)
+		    } else if (!both || ((mp->flags & CMF_INTER) ?
+					 ((mp->flags & CMF_LINE) ? iw : il) :
+					 (il || iw)))
 			continue;
 
 		    /* Fine, now we call ourselves recursively to find the
 		     * string matched by the `*'. */
-		    if (sfx) {
-			savl = l[-(llen + zoff)];
+		    if (sfx && (savl = l[-(llen + zoff)]))
 			l[-(llen + zoff)] = '\0';
-		    }
 		    for (t = 0, tp = w, ct = 0, ict = lw - alen + 1;
 			 ict;
 			 tp += add, ct++, ict--) {
 			if ((both &&
 			     (!ap || !test ||
-			      !pattern_match(ap, tp + aoff, NULL, NULL))) ||
+			      !pattern_match(ap, tp + aoff, NULL, NULL) ||
+			      (aol && aol <= aoff + ct + iw &&
+			       !pattern_match(aop, tp + aoff - aol,
+					      NULL, NULL)))) ||
 			    (!both &&
 			     pattern_match(ap, tp - moff, NULL, NULL) &&
-			     match_parts(l + aoff , tp - moff, alen, part))) {
+			     (!aol || (aol <= iw + ct - moff &&
+				       pattern_match(aop, tp - moff - aol,
+						     NULL, NULL))) &&
+			     (mp->wlen == -1 ||
+			      match_parts(l + aoff , tp - moff,
+						      alen, part)))) {
+			    if (!both && mp->wlen == -1 &&
+				!match_parts(l + aoff , tp - moff, alen, part))
+				break;
 			    if (sfx) {
-				savw = tp[-zoff];
-				tp[-zoff] = '\0';
+				if ((savw = tp[-zoff]))
+				    tp[-zoff] = '\0';
 				t = match_str(l - ll, w - lw,
 					      NULL, 0, NULL, 1, 2, part);
-				tp[-zoff] = savw;
+				if (savw)
+				    tp[-zoff] = savw;
 			    } else
 				t = match_str(l + llen + moff, tp + moff,
 					      NULL, 0, NULL, 0, 1, part);
@@ -551,7 +641,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			}
 		    }
 		    ict = ct;
-		    if (sfx)
+		    if (sfx && savl)
 			l[-(llen + zoff)] = savl;
 
 		    /* Have we found a position in w where the rest of l
@@ -620,6 +710,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    ll -= llen; il += llen;
 		    lw -= alen; iw += alen;
 		    bc += llen;
+		    exact = 0;
 
 		    if (!test)
 			while (bp &&
@@ -666,30 +757,42 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    }
 		    if (mp->flags & CMF_LEFT) {
 			/* Try to match the left anchor, if any. */
-			if (til < mp->lalen || tiw < mp->lalen)
+			if (til < mp->lalen || tiw < mp->lalen + mp->ralen)
 			    continue;
 			else if (mp->left)
 			    t = pattern_match(mp->left, tl - mp->lalen,
 					      NULL, NULL) &&
 				pattern_match(mp->left, tw - mp->lalen,
-					      NULL, NULL);
+					      NULL, NULL) &&
+				(!mp->ralen ||
+				 pattern_match(mp->right,
+					       tw - mp->lalen - mp->ralen,
+					       NULL, NULL));
 			else
-			    t = (!sfx && !il && !iw);
+			    t = (!sfx && !((mp->flags & CMF_INTER) ?
+					   ((mp->flags & CMF_LINE) ? iw : il) :
+					   (il || iw)));
 		    }
 		    if (mp->flags & CMF_RIGHT) {
 			/* Try to match the right anchor, if any. */
 			if (tll < mp->llen + mp->ralen ||
-			    tlw < mp->wlen + mp->ralen)
+			    tlw < mp->wlen + mp->ralen + mp->lalen)
 			    continue;
-			else if (mp->left)
+			else if (mp->right)
 			    t = pattern_match(mp->right,
 					      tl + mp->llen - mp->ralen,
 					      NULL, NULL) &&
 				pattern_match(mp->right,
 					      tw + mp->wlen - mp->ralen,
-					      NULL, NULL);
+					      NULL, NULL) &&
+				(!mp->lalen ||
+				 pattern_match(mp->left, tw + mp->wlen -
+					       mp->ralen - mp->lalen,
+					       NULL, NULL));
 			else
-			    t = (sfx && !il && !iw);
+			    t = (sfx && !((mp->flags & CMF_INTER) ?
+					  ((mp->flags & CMF_LINE) ? iw : il) :
+					  (il || iw)));
 		    }
 		    /* Now try to match the line and word patterns. */
 		    if (!t ||
@@ -700,15 +803,26 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    /* Probably add the matched strings. */
 		    if (!test) {
 			if (sfx)
-			    add_match_str(NULL, NULL, w, ow - w, 0);
+			{
+			    if (ow >= w)
+				add_match_str(NULL, NULL, w, ow - w, sfx);
+			}
 			else
-			    add_match_str(NULL, NULL, ow, w - ow, 0);
-			add_match_str(mp, tl, tw, mp->wlen, 0);
+			{
+			    if (w >= ow)
+				add_match_str(NULL, NULL, ow, w - ow, sfx);
+			}
+			add_match_str(mp, tl, tw, mp->wlen, sfx);
 			if (sfx)
-			    add_match_sub(NULL, NULL, 0, w, ow - w);
+			{
+			    if (ow >= w)
+				add_match_sub(NULL, NULL, 0, w, ow - w);
+			}
 			else
-			    add_match_sub(NULL, NULL, 0, ow, w - ow);
-
+			{
+			    if (w >= ow)
+				add_match_sub(NULL, NULL, 0, ow, w - ow);
+			}
 			add_match_sub(mp, tl, mp->llen, tw, mp->wlen);
 		    }
 		    if (sfx) {
@@ -719,6 +833,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    il += mp->llen; iw += mp->wlen;
 		    ll -= mp->llen; lw -= mp->wlen;
 		    bc += mp->llen;
+		    exact = 0;
 
 		    if (!test)
 			while (bp &&
@@ -736,10 +851,13 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	if (mp)
 	    continue;
 
+	/* Same code as at the beginning, used in top-level calls. */
+
 	bslash = 0;
-	if (l[ind] == w[ind] ||
-	    (bslash = (lw > 1 && w[ind] == '\\' &&
-		       (ind ? (w[0] == l[0]) : (w[1] == l[0]))))) {
+	if ((!test || sfx) && lw &&
+	    (l[ind] == w[ind] ||
+	     (bslash = (lw > 1 && w[ind] == '\\' &&
+			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
 	    /* No matcher could be used, but the strings have the same
 	     * character here, skip over it. */
 	    l += add; w += (bslash ? (add + add ) : add);
@@ -754,6 +872,25 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	    lm = NULL;
 	    he = 0;
 	} else {
+
+	    if (!lw)
+		break;
+
+	    if (exact && !part) {
+		/* If we just accepted some characters directly (at the
+		 * beginning of the loop) and now can't match any further,
+		 * we go back to before those characters and try again,
+		 * preferring match specs this time. */
+
+		il -= exact; iw -= wexact;
+		ll += exact; lw += wexact;
+		bc -= exact;
+		l -= add * exact; w -= add * wexact;
+
+		exact = wexact = 0;
+
+		goto retry;
+	    }
 	    /* No matcher and different characters: l does not match w. */
 	    if (test)
 		return 0;
@@ -816,10 +953,15 @@ match_parts(char *l, char *w, int n, int part)
     char lsav = l[n], wsav = w[n];
     int ret;
 
-    l[n] = w[n] = '\0';
+    if (lsav)
+	l[n] = '\0';
+    if (wsav)
+	w[n] = '\0';
     ret = match_str(l, w, NULL, 0, NULL, 0, 1, part);
-    l[n] = lsav;
-    w[n] = wsav;
+    if (lsav)
+	l[n] = lsav;
+    if (wsav)
+	w[n] = wsav;
 
     return ret;
 }
@@ -955,7 +1097,7 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
  * corresponding character. */
 
 /**/
-static int
+mod_export int
 pattern_match(Cpattern p, char *s, unsigned char *in, unsigned char *out)
 {
     unsigned char c;
@@ -999,25 +1141,28 @@ pattern_match(Cpattern p, char *s, unsigned char *in, unsigned char *out)
 Cline
 bld_parts(char *str, int len, int plen, Cline *lp)
 {
-    Cline ret = NULL, *q = &ret, n;
+    Cline ret = NULL, *q = &ret, n = NULL;
     Cmlist ms;
     Cmatcher mp;
     int t, op = plen;
-    char *p = str;
+    char *p = str, *os = str;
 
     while (len) {
 	for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
 	    mp = ms->matcher;
-	    if (mp && mp->flags == CMF_RIGHT && mp->wlen < 0 &&
-		!mp->llen && len >= mp->ralen && mp->ralen &&
-		pattern_match(mp->right, str, NULL, NULL)) {
+	    if (mp && mp->flags == CMF_RIGHT && mp->wlen < 0 && mp->ralen &&
+		!mp->llen && len >= mp->ralen && (str - os) >= mp->lalen &&
+		pattern_match(mp->right, str, NULL, NULL) &&
+		(!mp->lalen ||
+		 ((str - os) >= mp->lalen &&
+		  pattern_match(mp->left, str - mp->lalen, NULL, NULL)))) {
 		int olen = str - p, llen;
 
 		/* We found an anchor, create a new cline. The NEW flag
 		 * is set if the characters before the anchor were not
 		 * on the line. */
 		*q = n = get_cline(NULL, mp->ralen, str, mp->ralen, NULL, 0,
-				   ((plen < 0) ? CLF_NEW : 0));
+				   ((plen <= 0) ? CLF_NEW : 0));
 
 		/* If there were any characters before the anchor, add
 		 * them as a cline struct. */
@@ -1045,14 +1190,18 @@ bld_parts(char *str, int len, int plen, Cline *lp)
     }
     /* This is the cline struct for the remaining string at the end. */
 
-    *q = n = get_cline(NULL, 0, NULL, 0, NULL, 0, (plen < 0 ? CLF_NEW : 0));
     if (p != str) {
 	int olen = str - p, llen = (op < 0 ? 0 : op);
+
+        *q = n = get_cline(NULL, 0, NULL, 0, NULL, 0, (plen <= 0 ? CLF_NEW : 0));
 
 	if (llen > olen)
 	    llen = olen;
 	n->prefix = get_cline(NULL, llen, p, olen, NULL, 0, 0);
     }
+    else if (!ret)
+        *q = n = get_cline(NULL, 0, NULL, 0, NULL, 0, (plen <= 0 ? CLF_NEW : 0));
+
     n->next = NULL;
 
     if (lp)
@@ -1261,7 +1410,7 @@ cmp_anchors(Cline o, Cline n, int join)
 	if (line) {
 	    o->flags |= CLF_LINE;
 	    o->word = NULL;
-	    n->wlen = 0;
+	    o->wlen = 0;
 	}
 	return 1;
     }
@@ -1447,10 +1596,24 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 	if (check_cmdata(md, sfx))
 	    return ret;
 
+	/*
+	 * Look for a common prefix.  If we do include metafied
+	 * characters, at this stage we still need the overall length
+	 * including Meta's as separate characters.
+	 */
 	for (l = 0, p = str, q = md->str;
 	     l < len && l < md->len && p[ind] == q[ind];
-	     l++, p += add, q += add);
+	     l++, p += add, q += add) {}
 
+	/* Make sure we don't end in the middle of a Meta sequence. */
+	if (add == 1) {
+	    if (l && p[-1] == Meta)
+		l--;
+	} else {
+	    if (l && ((l < len && p[-1] == Meta)
+		   || (l < md->len && q[-1] == Meta)))
+		l--;
+	}
 	if (l) {
 	    /* There was a common prefix, use it. */
 	    md->len -= l; len -= l;
@@ -1494,6 +1657,8 @@ join_psfx(Cline ot, Cline nt, Cline *orest, Cline *nrest, int sfx)
 	    *orest = NULL;
 	if (nrest)
 	    *nrest = n;
+	if (n && n->wlen)
+	    ot->flags |= CLF_MISS;
 
 	return;
     }
@@ -1531,6 +1696,7 @@ join_psfx(Cline ot, Cline nt, Cline *orest, Cline *nrest, int sfx)
 
 		continue;
 	    }
+	    o->llen = o->llen - ot->slen;
 	    join = 1; line = 0; slen = &(o->wlen); sstr = &(o->word);
 	}
 	if (join) {
@@ -1676,7 +1842,7 @@ join_mid(Cline o, Cline n)
  * didn't. */
 
 /**/
-static void
+static int
 sub_join(Cline a, Cline b, Cline e, int anew)
 {
     if (!e->suffix && a->prefix) {
@@ -1699,31 +1865,34 @@ sub_join(Cline a, Cline b, Cline e, int anew)
 	*p = e->prefix;
 	ca = a->prefix;
 
-	while (n != op) {
+	while (n) {
 	    e->prefix = cp_cline(n, 0);
 	    a->prefix = cp_cline(ca, 0);
 
 	    if (anew) {
+		int f = e->flags;
+
 		join_psfx(e, a, NULL, NULL, 0);
-		if (e->prefix) {
-		    e->min += min;
-		    e->max += max;
-		    break;
-		}
+		e->flags = f;
+		if (e->prefix)
+		    return max - min;
 	    } else {
-		join_psfx(e, a, NULL, NULL, 0);
-		if (a->prefix) {
-		    a->min += min;
-		    a->max += max;
-		    break;
-		}
+		int f = e->flags;
+
+		join_psfx(a, e, NULL, NULL, 0);
+		e->flags = f;
+		if (a->prefix)
+		    return max - min;
 	    }
 	    min -= n->min;
-	    max -= n->max;
 
+	    if (n == op)
+		break;
 	    n = n->next;
 	}
+	return max - min;
     }
+    return 0;
 }
 
 /* This simplifies the cline list given as the first argument so that
@@ -1740,7 +1909,8 @@ join_clines(Cline o, Cline n)
     if (!o)
 	return n;
     else {
-	Cline oo = o, nn = n, po = NULL, pn = NULL;
+	Cline oo = o, nn = n, po = NULL, pn = NULL, x;
+	int diff;
 
 	/* Walk through the lists. */
 	while (o && n) {
@@ -1750,30 +1920,52 @@ join_clines(Cline o, Cline n)
 	    if ((o->flags & CLF_NEW) && !(n->flags & CLF_NEW)) {
 		Cline t, tn;
 
-		for (t = o; (tn = t->next) && (tn->flags & CLF_NEW); t = tn);
-		if (tn && cmp_anchors(tn, n, 0)) {
-		    sub_join(n, o, tn, 1);
+		for (t = o; (tn = t->next) &&
+			 ((tn->flags & CLF_NEW) || !cmp_anchors(tn, n, 0));
+		     t = tn);
+		if (tn) {
+		    diff = sub_join(n, o, tn, 1);
 
 		    if (po)
 			po->next = tn;
 		    else
 			oo = tn;
+
 		    t->next = NULL;
 		    free_cline(o);
+		    x = o;
 		    o = tn;
-		    o->flags |= CLF_MISS;
+
+		    if (po && po->prefix && cmp_anchors(x, po, 0)) {
+			po->flags |= CLF_MISS;
+			po->max += diff;
+		    } else {
+			o->flags |= CLF_MISS;
+			o->max += diff;
+		    }
 		    continue;
 		}
 	    }
 	    if (!(o->flags & CLF_NEW) && (n->flags & CLF_NEW)) {
 		Cline t, tn;
 
-		for (t = n; (tn = t->next) && (tn->flags & CLF_NEW); t = tn);
-		if (tn && cmp_anchors(o, tn, 0)) {
-		    sub_join(o, n, tn, 0);
+		for (t = n; (tn = t->next) &&
+			 ((tn->flags & CLF_NEW) || !cmp_anchors(o, tn, 0));
+		     t = tn);
+		if (tn) {
+		    int of = o->flags & CLF_MISS;
 
+		    diff = sub_join(o, n, tn, 0);
+		    o->flags = (o->flags & ~CLF_MISS) | of;
+
+		    if (po && po->prefix && cmp_anchors(n, pn, 0)) {
+			po->flags |= CLF_MISS;
+			po->max += diff;
+		    } else {
+			o->flags |= CLF_MISS;
+			o->max += diff;
+		    }
 		    n = tn;
-		    o->flags |= CLF_MISS;
 		    continue;
 		}
 	    }
@@ -1801,6 +1993,7 @@ join_clines(Cline o, Cline n)
 		     t = tn);
 		if (tn && cmp_anchors(tn, n, 1)) {
 		    sub_join(n, o, tn, 1);
+
 		    if (po)
 			po->next = tn;
 		    else
@@ -1824,39 +2017,120 @@ join_clines(Cline o, Cline n)
 	    }
 	    /* Now see if they have matching anchors. If not, cut the list. */
 	    if (!(o->flags & CLF_MID) && !cmp_anchors(o, n, 1)) {
-		Cline t, tn;
+		Cline t, tn, tt, to = NULL;
 
-		for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
-
+		for (t = n; (tn = t->next); t = tn)
+		    if (!(tn->flags & CLF_NEW) && (tn->flags & CLF_SKIP)) {
+			for (tt = o; (to = tt->next); tt = to)
+			    if (!(to->flags & CLF_NEW) && (to->flags & CLF_SKIP) &&
+				cmp_anchors(tn, to, 1))
+				break;
+			if (to)
+			    break;
+		    }
 		if (tn) {
-		    sub_join(o, n, tn, 0);
+		    if (po)
+			po->next = to;
+		    else
+			oo = to;
+		    o = to;
+
+		    diff = sub_join(o, n, tn, 0);
+
+		    o->flags |= CLF_MISS;
+		    o->max += diff;
 
 		    n = tn;
-		    o->flags |= CLF_MISS;
+		    po = o;
+		    o = o->next;
+		    pn = n;
+		    n = n->next;
 		    continue;
 		} else {
-		    for (t = o; (tn = t->next) && !cmp_anchors(n, tn, 1);
-			 t = tn);
-
-		    if (tn) {
-			sub_join(n, o, tn, 1);
-
-			if (po)
-			    po->next = tn;
-			else
-			    oo = tn;
-			o = tn;
-			o->flags |= CLF_MISS;
-			continue;
-		    } else {
-			if (o->flags & CLF_SUF)
+		    for (t = o; (to = t->next); t = to)
+			if ((to->flags & CLF_SKIP) && cmp_anchors(n, to, 1))
 			    break;
 
-			o->word = o->line = o->orig = NULL;
-			o->wlen = 0;
-			free_cline(o->next);
-			o->next = NULL;
-			o->flags |= CLF_MISS;
+		    if (to) {
+			diff = sub_join(n, o, to, 1);
+
+			if (po)
+			    po->next = to;
+			else
+			    oo = to;
+			x = o;
+			o = to;
+			if (po && po->prefix && cmp_anchors(x, po, 0)) {
+			    po->flags |= CLF_MISS;
+			    po->max += diff;
+			} else {
+			    o->flags |= CLF_MISS;
+			    o->max += diff;
+			}
+			continue;
+		    } else {
+			for (tt = NULL, t = n; (tn = t->next); t = tn) {
+			    if (tn->flags & CLF_SKIP)
+				for (tt = o; (to = tt->next); tt = to)
+				    if ((to->flags & CLF_SKIP) &&
+					cmp_anchors(tn, to, 1))
+					break;
+			    if (to)
+				break;
+			}
+			if (to) {
+			    diff = sub_join(n, o, to, 1);
+
+			    if (po)
+				po->next = to;
+			    else
+				oo = to;
+			    x = o;
+			    o = to;
+			    if (po && po->prefix && cmp_anchors(x, po, 0)) {
+				po->flags |= CLF_MISS;
+				po->max += diff;
+			    } else {
+				o->flags |= CLF_MISS;
+				o->max += diff;
+			    }
+			    continue;
+			} else {
+			    for (tn = n; tn; tn = tn->next)
+				if ((tn->flags & CLF_NEW) ==
+				    (o->flags & CLF_NEW) &&
+				    cmp_anchors(tn, o, 1)) break;
+
+			    if (tn) {
+				int of = o->flags & CLF_MISS;
+
+				if ((diff = sub_join(o, n, tn, 0))) {
+				    o->flags = (o->flags & ~CLF_MISS) | of;
+				    if (po && po->prefix) {
+					po->flags |= CLF_MISS;
+					po->max += diff;
+				    }
+				    else {
+					o->flags |= CLF_MISS;
+					o->max += diff;
+				    }
+				}
+				n = tn;
+				po = o;
+				o = o->next;
+				pn = n;
+				n = n->next;
+				continue;
+			    }
+			    if (o->flags & CLF_SUF)
+				break;
+
+			    o->word = o->line = o->orig = NULL;
+			    o->wlen = 0;
+			    free_cline(o->next);
+			    o->next = NULL;
+			    o->flags |= CLF_MISS;
+			}
 		    }
 		}
 	    }
@@ -1895,4 +2169,3 @@ join_clines(Cline o, Cline n)
 	return oo;
     }
 }
-
