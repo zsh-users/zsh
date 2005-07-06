@@ -1,3 +1,10 @@
+2005-07-06  Peter Stephenson  <pws@csr.com>
+
+	* 21402: Src/Zle/compmatch.c: Fix crash completing the set
+	of files AIWebKitMessageViewController.m,
+	AIWebKitMessageViewPlugin.m, AIWebkitMessageViewStyle.m
+	with case-insensitive matching.
+
 2005-07-03  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_w3m: add missing compset -S calls

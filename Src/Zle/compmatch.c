@@ -803,14 +803,26 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    /* Probably add the matched strings. */
 		    if (!test) {
 			if (sfx)
-			    add_match_str(NULL, NULL, w, ow - w, sfx);
+			{
+			    if (ow >= w)
+				add_match_str(NULL, NULL, w, ow - w, sfx);
+			}
 			else
-			    add_match_str(NULL, NULL, ow, w - ow, sfx);
+			{
+			    if (w >= ow)
+				add_match_str(NULL, NULL, ow, w - ow, sfx);
+			}
 			add_match_str(mp, tl, tw, mp->wlen, sfx);
 			if (sfx)
-			    add_match_sub(NULL, NULL, 0, w, ow - w);
+			{
+			    if (ow >= w)
+				add_match_sub(NULL, NULL, 0, w, ow - w);
+			}
 			else
-			    add_match_sub(NULL, NULL, 0, ow, w - ow);
+			{
+			    if (w >= ow)
+				add_match_sub(NULL, NULL, 0, ow, w - ow);
+			}
 			add_match_sub(mp, tl, mp->llen, tw, mp->wlen);
 		    }
 		    if (sfx) {
