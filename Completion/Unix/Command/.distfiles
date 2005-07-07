@@ -1,39 +1,40 @@
 DISTFILES_SRC='
 .distfiles
-_a2ps           _aap            _ant            _antiword       _apachectl      
-_apm            _arp            _arping         _attr           
+_a2ps           _aap            _ant            _antiword       _apachectl
+_apm            _arp            _arping         _attr
 _baz	        _bison          _bittorrent     _bogofilter     _bzip2
 _cal            _ccal           _cdcd           _cdrecord       _chkconfig
 _chmod          _chown          _compress       _configure      _cpio
 _cvs
-_darcs          _dd             _dict           _diff           _du             
-_dvi            _ecasound       _elinks         _elm            _enscript       
-_fakeroot       _fetchmail      _figlet         _find           _finger         
+_darcs          _dd             _dict           _diff           _du
+_dvi            _ecasound       _elinks         _elm            _enscript
+_fakeroot       _fetchmail      _figlet         _find           _finger
 _flex           _fortune        _fsh            _fuser
-_gcc            _gdb            _getconf        _getent         _global         
-_gnu_generic    _gpg            _gphoto2        _gprof          _grep           
-_groff          _gs             _gzip           
-_iconv          _ifconfig       _imagemagick    _init_d         _irssi          
-_ispell         _java           _joe            _killall        _knock 
-_last           _less           _links          _loadkeys       _look           
-_lp             _ls             _lsof           _lynx           _lzop           
-_mail           _make           _man            _mencal         _mh             
+_gcc            _gdb            _getconf        _getent         _global
+_gnu_generic    _gpg            _gphoto2        _gprof          _grep
+_groff          _gs             _gzip
+_iconv          _ifconfig       _imagemagick    _init_d         _irssi
+_ispell         _java           _joe            _killall        _knock
+_last           _less           _links          _loadkeys       _look
+_lp             _ls             _lsof           _lynx           _lzop
+_mail           _make           _man            _mencal         _mh
 _mount          _mpc            _mt             _mtools         _mtr
-_mutt           _mysql_utils    _mysqldiff      
-_ncftp          _netcat         _nice           _nmap           _nslookup       
-_pack           _patch          _pbm            _perforce       _perl           
-_perldoc        _php            _pine           _postfix        _prcs           
-_printenv       _psutils        _python         
-_raggle         _rar            _rcs            _renice         _rlogin         
-_rsync          _ruby           
-_sablotron      _samba          _sccs           _screen         _sed            
+_mutt           _mysql_utils    _mysqldiff
+_ncftp          _netcat         _nice           _nmap           _nslookup
+_pack           _patch          _pbm            _perforce       _perl
+_perldoc        _php            _pine           _postfix        _prcs
+_printenv       _psutils        _python
+_raggle         _rar            _rcs            _renice         _rlogin
+_rsync          _ruby
+_sablotron      _samba          _sccs           _screen         _sed
 _sh             _showmount      _slrn           _socket         _spamassassin
 _ssh            _strip          _stty           _su             _subversion
-_sudo           _surfraw        _sysctl         
-_tar            _telnet         _texinfo        _tidy           _tiff           
-_tin            _tla            
-_unace          _uniq           _user_admin     _vorbis         _vux            
-_w3m            _webbrowser     _wget           _whereis        _whois          
-_wiggle         _xargs          _xmlsoft        
-_yodl           _yp             _zcat           _zdump          _zip            
+_sudo           _surfraw        _sysctl
+_tar            _telnet         _texinfo        _tidy           _tiff
+_tin            _tla
+_unace          _uniq           _user_admin
+_vim            _vorbis         _vux
+_w3m            _webbrowser     _wget           _whereis        _whois
+_wiggle         _xargs          _xmlsoft
+_yodl           _yp             _zcat           _zdump          _zip
 '
