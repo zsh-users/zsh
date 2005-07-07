@@ -1,4 +1,4 @@
-#compdef vim
+#compdef vim exim gvim gex gview rvim rview rgvim rgview evim eview vimdiff gvimdiff
 
 _vim_files () {
   if [[ $(echo $PREFIX*(N)) == '' ]]; then

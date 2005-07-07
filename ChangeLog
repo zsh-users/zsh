@@ -1,5 +1,8 @@
 2005-07-07  Peter Stephenson  <pws@csr.com>
 
+	* users/9049: Completion/Unix/Command/_vim: add variant names
+	of vim, but not yet vi, ex, view.
+
 	* users/9045: Nikolai Weibull
 	<mailing-lists.zsh-users@rawuncut.elitemail.org>:
 	Completion/Unix/Command/_vim: new completion function.
