@@ -1,15 +1,14 @@
 #compdef vim exim gvim gex gview rvim rview rgvim rgview evim eview vimdiff gvimdiff
 
+(( $+functions[_vim_files] )) ||
 _vim_files () {
-  if [[ $(echo $PREFIX*(N)) == '' ]]; then
-    case $PREFIX in
-      (+) _message -e 'start at a given line (default: end of file)' ;;
-      (+<1->) _message -e 'line number' ;;
-    esac
-  fi
   case $PREFIX in
-    (+*) _files -P './' $* ;;
+    (+*) _files -P './' $* && return 0 ;;
     (*) _files $* ;;
+  esac
+  case $PREFIX in
+    (+) _message -e 'start at a given line (default: end of file)' ;;
+    (+<1->) _message -e 'line number' ;;
   esac
 }
 

@@ -1,3 +1,8 @@
+2005-07-08  Peter Stephenson  <pws@csr.com>
+
+	* users/9059: Nikolai Weibull: Completion/Unix/Command/_vim:
+	improved _vim_files.
+
 2005-07-07  Peter Stephenson  <pws@csr.com>
 
 	* users/9049: Completion/Unix/Command/_vim: add variant names
