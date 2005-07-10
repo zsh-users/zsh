@@ -6,6 +6,9 @@
 	* 21417: Completion/Unix/Command/_xscreensaver: completion
 	for xscreensaver-command.
 
+	* 21418: Completion/Debian/Command/_madison: completion
+	for madison.
+
 2005-07-08  Peter Stephenson  <pws@csr.com>
 
 	* users/9059: Nikolai Weibull: Completion/Unix/Command/_vim:
