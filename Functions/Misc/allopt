@@ -8,11 +8,8 @@
 # Written by Sweth Chandramouli with hacks by Bart Schaefer.
 
 listalloptions () {
-   builtin setopt localoptions kshoptionprint
-   local OPT_NAME OPT_PAIR OPT_VALUE
-   for OPT_PAIR in "${(f)$(builtin setopt)}" ; do
-      OPT_VALUE=${OPT_PAIR##* }
-      OPT_NAME=${OPT_PAIR%% *}
+   local OPT_NAME OPT_VALUE
+   builtin set -o | while read OPT_NAME OPT_VALUE ; do
       if [[ ${OPT_NAME#no} != ${OPT_NAME} ]] ; then
 	 OPT_VALUE=${(L)${${OPT_VALUE:s/on/OFF}:s/off/on}}
 	 OPT_NAME=${OPT_NAME#no}
