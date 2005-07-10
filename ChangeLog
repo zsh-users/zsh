@@ -3,6 +3,9 @@
 	* 21416: Completion/Unix/Command/_gpg: cope with an equals
 	sign after --keyring.
 
+	* 21417: Completion/Unix/Command/_xscreensaver: completion
+	for xscreensaver-command.
+
 2005-07-08  Peter Stephenson  <pws@csr.com>
 
 	* users/9059: Nikolai Weibull: Completion/Unix/Command/_vim:
