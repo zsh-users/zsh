@@ -86,7 +86,7 @@ _arguments -C -s -S -A "-*" \
   --show-photos --no-show-photos '--photo-viewer:command:_command_names -e'\
   --exec-path:path:_dir_list' \
   --show-keyring[display keyring name when listing keys]' \
-  '--keyring[add specified file to list of keyrings]:file:_files' \
+  '--keyring=[add specified file to list of keyrings]:file:_files' \
   '--secret-keyring[add specified file to list of secret keyrings]:file:_files' \
   --homedir:directory:_directories \
   '--charset:character set:(iso-8859-1 iso-8859-2 koi8-r utf-8)' \
