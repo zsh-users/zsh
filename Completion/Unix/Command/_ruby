@@ -7,7 +7,7 @@ typeset -A opt_args
 
 local -a args
 args=(
-  '(-)1:script file:->script'
+  '(-)1:script file:_files -g "*.rb(-.)"'
   '*::script argument: _normal'
 )
 
