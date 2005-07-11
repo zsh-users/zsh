@@ -1,6 +1,9 @@
 2005-07-11  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
-	* unposted: fix typo in first normal arg action
+	* 21443: Completion/Unix/Command/_rake: new completion for rake
+
+	* unposted: Completion/Unix/Command/_ruby: fix typo in first normal arg
+	action
 
 2005-07-10  Bart Schaefer  <schaefer@zsh.org>
 

@@ -24,8 +24,8 @@ _ncftp          _netcat         _nice           _nmap           _nslookup
 _pack           _patch          _pbm            _perforce       _perl
 _perldoc        _php            _pine           _postfix        _prcs
 _printenv       _psutils        _python
-_raggle         _rar            _rcs            _renice         _rlogin
-_rsync          _ruby
+_raggle         _rake           _rar            _rcs            _renice
+_rlogin         _rsync          _ruby
 _sablotron      _samba          _sccs           _screen         _sed
 _sh             _showmount      _slrn           _socket         _spamassassin
 _ssh            _strip          _stty           _su             _subversion
