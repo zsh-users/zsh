@@ -1,0 +1,42 @@
+#compdef unexpand
+#
+# $Id: _unexpand,v 1.1 2005/07/11 03:34:35 barts Exp $
+#
+# Copyright (C) 2005 Travis L. Spencer
+# ALL RIGHTS RESERVED
+#
+# See the file LICENCE in the root of the zsh distribution for
+# licensing information.
+#
+
+local all tabs ret=1
+local -a args
+
+all="convert all whitespace, instead of just initial whitespace"
+tabs="use comma separated list of tab positions"
+args=( 
+    "(--all)-a[$all]"
+    "(--tabs)-t[$tabs]:tablist"
+    "*:file:_files"
+)
+
+if _pick_variant gnu="Free Soft" unix --version; then
+    args+=(
+        "(-a)--all[$all]"
+        "--first-only[convert only leading sequences of whitespace]"
+        "(-t)--tabs=[$tabs]:tablist"
+        "(* -)--help[display help message and exit]"
+        "(* -)--version[output version information and exit]"
+    )
+fi
+
+_arguments "$args[@]" && ret=0
+
+return ret
+
+: <<EMACS_LOCAL_VARIABLES
+Local Variables:
+mode: shell-script
+mode: flyspell-prog
+End:
+EMACS_LOCAL_VARIABLES

@@ -1,5 +1,8 @@
 2005-07-10  Bart Schaefer  <schaefer@zsh.org>
 
+	* 21423: Travis Spencer: Completion/Unix/Command/_unexpand:
+	completion for both GNU and Sun/BSD unexpand variants.
+
 	* unposted: Functions/Misc/allopt: use "set -o" to avoid twaddling
 	the setting of kshoptionprint.
 
