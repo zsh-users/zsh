@@ -2660,7 +2660,8 @@ parse_cvdef(char *nam, char **args)
     char **oargs = args, sep = '\0', asep = '=', *name, *descr, *p, *q, **xor, c;
     int xnum, multi, vtype, hassep = 0, words = 0;
 
-    while (args[0][0] == '-' &&
+    while (args && args[0] && args[1] &&
+           args[0][0] == '-' &&
            (args[0][1] == 's' || args[0][1] == 'S' || args[0][1] == 'w') &&
            !args[0][2]) {
 

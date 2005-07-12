@@ -5,6 +5,11 @@
 	* unposted: Completion/Unix/Command/_ruby: fix typo in first normal arg
 	action
 
+2005-07-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21428: Travis Spencer: Src/Zle/computil.c: fix null pointer deref
+	on wrong number of arguments to compvalues.
+
 2005-07-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21423: Travis Spencer: Completion/Unix/Command/_unexpand:
