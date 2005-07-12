@@ -1,5 +1,9 @@
 2005-07-12  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
+	* 21449: Completion/Unix/Command/_ruby: limit options available to
+	RUBYOPT env variable to -[IdvwrK]; include directories specified with
+	-I in the search path used to generate library matches
+
 	* 21446 (modified): Completion/Unix/Command/_rake: generate targets for
 	rakefiles in parent directories and those specified with -f; include
 	directories specified with -I in the search path used to generate
