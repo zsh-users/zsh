@@ -1,3 +1,9 @@
+2005-07-12  Clint Adams  <clint@zsh.org>
+
+	* 21447: Completion/Unix/Command/_rubber: completion for
+	rubber, contributed by Emmanuel Hainry and Emmanuel
+	Beffara.
+
 2005-07-11  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* 21443: Completion/Unix/Command/_rake: new completion for rake
