@@ -127,7 +127,7 @@ domkdir(char *nam, char *path, mode_t mode, int p)
     if(p) {
 	struct stat st;
 
-	if(!lstat(rpath, &st) && S_ISDIR(st.st_mode))
+	if(!stat(rpath, &st) && S_ISDIR(st.st_mode))
 	    return 0;
     }
     oumask = umask(0);
