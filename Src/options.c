@@ -181,6 +181,7 @@ static struct optname optns[] = {
 {NULL, "promptbang",	      OPT_KSH,			 PROMPTBANG},
 {NULL, "promptcr",	      OPT_ALL,			 PROMPTCR},
 {NULL, "promptpercent",	      OPT_NONBOURNE,		 PROMPTPERCENT},
+{NULL, "promptsp",	      OPT_ALL,			 PROMPTSP},
 {NULL, "promptsubst",	      OPT_KSH,			 PROMPTSUBST},
 {NULL, "pushdignoredups",     OPT_EMULATE,		 PUSHDIGNOREDUPS},
 {NULL, "pushdminus",	      OPT_EMULATE,		 PUSHDMINUS},
