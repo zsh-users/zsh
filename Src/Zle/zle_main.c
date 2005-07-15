@@ -962,8 +962,30 @@ zleread(char **lp, char **rp, int flags, int context)
 	}
     }
     initundo();
-    if (isset(PROMPTCR))
+    if (isset(PROMPTCR)) {
+	/* The PROMPT_SP heuristic will move the prompt down to a new line
+	 * if there was any dangling output on the line (assuming the terminal
+	 * has automatic margins, but we try even if hasam isn't set). */
+	if (isset(PROMPTSP)) {
+	    if (hasxn) /* w/o this, a delayed wrap might be lost by TCRIGHT */
+		putc(' ', shout);
+	    if (tccan(TCSAVECURSOR)
+	     && tcmultout(TCRIGHT, TCMULTRIGHT, columns - 3)) {
+		putc(' ', shout);
+		putc(' ', shout);
+		tcout(TCSAVECURSOR);
+		tcout(TCBACKSPACE);
+		tcout(TCBACKSPACE);
+		if (tccan(TCCLEAREOL))
+		    tcout(TCCLEAREOL);
+		else
+		    tcmultout(TCDEL, TCMULTDEL, 1);
+		tcout(TCRESTRCURSOR);
+	    } else
+		fprintf(shout, "%*s", (int)columns - 1, "");
+	}
 	putc('\r', shout);
+    }
     if (tmout)
 	alarm(tmout);
     zleactive = 1;
