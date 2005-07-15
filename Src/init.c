@@ -77,7 +77,7 @@ mod_export int tclen[TC_COUNT];
 /**/
 int tclines, tccolumns;
 /**/
-mod_export int hasam;
+mod_export int hasam, hasxn;
 
 /* Pointer to read-key function from zle */
 
@@ -518,7 +518,7 @@ static char *tccapnams[TC_COUNT] = {
     "cl", "le", "LE", "nd", "RI", "up", "UP", "do",
     "DO", "dc", "DC", "ic", "IC", "cd", "ce", "al", "dl", "ta",
     "md", "so", "us", "me", "se", "ue", "ch",
-    "ku", "kd", "kl", "kr"
+    "ku", "kd", "kl", "kr", "sc", "rc", "bc"
 };
 
 /* Initialise termcap */
@@ -573,6 +573,7 @@ init_term(void)
 
 	/* check whether terminal has automargin (wraparound) capability */
 	hasam = tgetflag("am");
+	hasxn = tgetflag("xn"); /* also check for newline wraparound glitch */
 
 	tclines = tgetnum("li");
 	tccolumns = tgetnum("co");
@@ -587,10 +588,22 @@ init_term(void)
 	    termflags |= TERM_NOUP;
 	}
 
-	/* if there's no termcap entry for cursor left, use \b. */
+	/* most termcaps don't define "bc" because they use \b. */
+	if (!tccan(TCBACKSPACE)) {
+	    tcstr[TCBACKSPACE] = ztrdup("\b");
+	    tclen[TCBACKSPACE] = 1;
+	}
+
+	/* if there's no termcap entry for cursor left, use backspace. */
 	if (!tccan(TCLEFT)) {
-	    tcstr[TCLEFT] = ztrdup("\b");
-	    tclen[TCLEFT] = 1;
+	    tcstr[TCLEFT] = tcstr[TCBACKSPACE];
+	    tclen[TCLEFT] = tclen[TCBACKSPACE];
+	}
+
+	if (tccan(TCSAVECURSOR) && !tccan(TCRESTRCURSOR)) {
+	    tclen[TCSAVECURSOR] = 0;
+	    zsfree(tcstr[TCSAVECURSOR]);
+	    tcstr[TCSAVECURSOR] = NULL;
 	}
 
 	/* if the termcap entry for down is \n, don't use it. */
