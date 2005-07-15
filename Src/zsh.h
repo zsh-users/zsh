@@ -1594,6 +1594,7 @@ enum {
     PROMPTBANG,
     PROMPTCR,
     PROMPTPERCENT,
+    PROMPTSP,
     PROMPTSUBST,
     PUSHDIGNOREDUPS,
     PUSHDMINUS,
@@ -1716,7 +1717,10 @@ struct ttyinfo {
 #define TCDOWNCURSOR   26
 #define TCLEFTCURSOR   27
 #define TCRIGHTCURSOR  28
-#define TC_COUNT       29
+#define TCSAVECURSOR   29
+#define TCRESTRCURSOR  30
+#define TCBACKSPACE    31
+#define TC_COUNT       32
 
 #define tccan(X) (tclen[X])
 
