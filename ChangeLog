@@ -1,3 +1,9 @@
+2005-07-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21464: Doc/Zsh/options.yo, Src/zsh.h, Src/options.c, Src/init.c,
+	Src/Zle/zle_main.c: added a new option, PROMPT_SP, designed to save
+	a partial line before the prompt can cover it up (due to PROMPT_CR).
+
 2005-07-15  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_python: add missing -C option to
