@@ -5,7 +5,7 @@
 local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
-_arguments -s -S \
+_arguments -C -s -S \
   '(1 -)-c+[program passed in as string (terminates option list)]:python command:' \
   '-d[debug output from parser]' \
   '-E[ignore environment variables (such as PYTHONPATH)]' \
@@ -24,7 +24,7 @@ _arguments -s -S \
   '-W+[warning control]:warning filter (action:message:category:module:lineno):(default always ignore module once error)' \
   '-x[skip first line of source, allowing use of non-Unix forms of #!cmd]' \
   '(-)1:script file:_files -g "*.py(|c|o)(-.)"' \
-  '*:script argument:_files' && return
+  '*::script argument: _normal' && return
 
 if [[ "$state" = modules ]]; then
   local -a modules
