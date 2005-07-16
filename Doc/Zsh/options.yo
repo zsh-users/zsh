@@ -908,7 +908,7 @@ is only possible if the editor knows where the start of the line appears.
 )
 pindex(PROMPT_SP)
 cindex(prompt, save partial lines)
-item(tt(PROMPT_SP) (tt(PLUS()V)) <D>)(
+item(tt(PROMPT_SP) <D>)(
 Attempt to preserve a partial line (i.e. a line that did not end with a
 newline) that would otherwise be covered up by the command prompt due to
 the PROMPT_CR option.  This works by outputting some cursor-control
