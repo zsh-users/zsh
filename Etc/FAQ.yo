@@ -43,11 +43,11 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2005/01/11)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2005/07/18)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2005/01/11
+mydit(Last-Modified:) 2005/07/18
 mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--2005 (see end of document)
@@ -1670,6 +1670,11 @@ sect(How do I prevent the prompt overwriting output when there is no newline?)
 
   One final alternative is to put a newline in your prompt -- see question
   link(3.13)(313) for that.
+
+  Version 3.0 of zsh includes a workaround: if the tt(PROMPT_SP) option
+  is set, as it is by default, the shell will try to move the cursor to the
+  start of the next screen line.  This requires some support from the
+  terminal which is available in most recent terminal emulators.
 
 
 sect(What's wrong with cut and paste on my xterm?)
