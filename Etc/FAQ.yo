@@ -261,7 +261,7 @@ sect(What is it good at?)
 
 sect(On what machines will it run?)
 
-  From version 3.0, zsh uses GNU autoconf as the installation
+  From version 4.3.0, zsh uses GNU autoconf as the installation
   mechanism.  This considerably increases flexibility over the old
   `buildzsh' mechanism.  Consequently, zsh should compile and run on
   any modern version of UNIX, and a great many not-so-modern versions

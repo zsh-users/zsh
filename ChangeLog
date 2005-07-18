@@ -1,5 +1,7 @@
 2005-07-18  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Etc/FAQ.yo: version in 21490 should be 4.3.0.
+
 	* 21490: Etc/FAQ.yo: update FAQ to reflect 21464.
 
 2005-07-16  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
