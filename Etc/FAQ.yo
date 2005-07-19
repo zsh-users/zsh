@@ -1640,42 +1640,48 @@ sect(How do I get a variable's value to be evaluated as another variable?)
 
 sect(How do I prevent the prompt overwriting output when there is no newline?)
 
-  The problem is, for example,
+  The problem is normally limited to zsh versions prior to 4.3.0 due to the
+  advent of the PROMPT_SP option (which is enabled by default, and eliminates
+  this problem for most terminals).  An example of the overwriting is:
   verb(
     % echo -n foo
     % 
   )
-  and the tt(foo) has been overwritten by the prompt tt(%).  The reason this
-  happens is that the option tt(PROMPT_CR) is enabled by default, and it
-  outputs a carriage return before the prompt in order to ensure that the
-  line editor knows what column it is in (this is needed to position the
-  right-side prompt correctly (mytt($RPROMPT), mytt($RPS1)) and to avoid screen
-  corruption when performing line editing).  If you add tt(unsetopt promptcr)
-  to your tt(.zshrc), you will see any partial output, but your screen may
-  look weird until you press return or refresh the screen.
+  This shows a case where the word tt(foo) was output without a newline, and
+  then overwritten by the prompt line tt(%).  The reason this happens is that
+  the option tt(PROMPT_CR) is enabled by default, and it outputs a carriage
+  return before the prompt in order to ensure that the line editor knows what
+  column it is in (this is needed to position the right-side prompt correctly
+  (mytt($RPROMPT), mytt($RPS1)) and to avoid screen corruption when performing
+  line editing).  If you add tt(unsetopt promptcr) to your tt(.zshrc), you
+  will see any partial output, but your screen may look weird until you press
+  return or refresh the screen.
 
-  Another solution for many terminals is to define a precmd function that
-  outputs a screen-width of spaces, like this:
+  A better solution than disabling PROMPT_CR (for most terminals) is adding
+  a simpler version of the PROMPT_SP functionality to an older zsh using a
+  custom precmd function, like this one:
   verb(
-    function precmd {
-      echo -n ${(l:$COLUMNS:::):-}
-    }
+    # Skip defining precmd if the PROMPT_SP option is available.
+    if ! eval '[[ -o promptsp ]] 2>/dev/null'; then
+      function precmd {
+        # An efficient version using termcap multi-right:
+        echo -n ' '       # Output 1 space
+        echotc RI $((COLUMNS - 3))
+        echo -n '  '      # Output 2 spaces
+        # Alternately, try replacing the above 3 lines with this echo
+        # that outputs a screen-column-width of spaces:
+        #echo -n ${(l:$COLUMNS:::):-}
+      }
+    fi
   )
-  (Explanation: an empty parameter expansion is padded out to the number of
-  columns on the screen.)  That precmd function will only bump the screen
-  down to a new line if there was output on the prompt line, otherwise the
-  extra spaces get removed by the tt(PROMPT_CR) action.  Although this
-  typically looks fine it may result in the preceding spaces being included
-  when you select a line of text with the mouse.
+  That precmd function will only bump the screen down to a new line if there
+  was output on the prompt line, otherwise the extra spaces get removed by
+  the tt(PROMPT_CR) action.  Although this typically looks fine it may result
+  in the preceding spaces being included when you select a line of text with
+  the mouse.
 
   One final alternative is to put a newline in your prompt -- see question
   link(3.13)(313) for that.
-
-  Version 3.0 of zsh includes a workaround: if the tt(PROMPT_SP) option
-  is set, as it is by default, the shell will try to move the cursor to the
-  start of the next screen line.  This requires some support from the
-  terminal which is available in most recent terminal emulators.
-
 
 sect(What's wrong with cut and paste on my xterm?)
 
