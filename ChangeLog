@@ -1,3 +1,7 @@
+2005-07-20  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_rake: add -s option to _arguments
+
 2005-07-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Etc/FAQ.yo: revert erroneous 3.0 -> 4.3.0 change.

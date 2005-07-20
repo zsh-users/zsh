@@ -5,7 +5,7 @@
 local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
-_arguments -C -S \
+_arguments -C -s -S \
   '(--dry-run -n)'{--dry-run,-n}'[do a dry run without executing actions]' \
   '(- *)'{--help,-H}'[display help information]' \
   \*{--libdir,-I}'[include specified directory in the search path for required modules]:library directory:_files -/' \
