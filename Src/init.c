@@ -948,8 +948,20 @@ run_init_scripts(void)
 #ifdef GLOBAL_ZSHENV
 	source(GLOBAL_ZSHENV);
 #endif
+
 	if (isset(RCS) && unset(PRIVILEGED))
+	{
+	    /*
+	     * Always attempt to load the newuser module to perform
+	     * checks for new zsh users.  Don't care if we can't load it.
+	     */
+	    if (load_module_silence("zsh/newuser", 1)) {
+		/* Unload it immediately. */
+		unload_named_module("zsh/newuser", "zsh", 1);
+	    }
+
 	    sourcehome(".zshenv");
+	}
 	if (islogin) {
 #ifdef GLOBAL_ZPROFILE
 	    if (isset(RCS) && isset(GLOBALRCS))

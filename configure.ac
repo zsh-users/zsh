@@ -286,6 +286,30 @@ AC_SUBST(fndir)dnl
 AC_SUBST(sitefndir)dnl
 AC_SUBST(FUNCTIONS_SUBDIRS)dnl
 
+dnl Directories for scripts such as newuser.
+
+ifdef([scriptdir],[undefine([scriptdir])])dnl
+AC_ARG_ENABLE(scriptdir,
+[  --enable-scriptdir=DIR     the directory in which to install scripts],
+dnl ${VERSION} to be determined at compile time.
+[if test $enableval = yes; then
+  scriptdir=${datadir}/${tzsh_name}/'${VERSION}'
+else
+  scriptdir="$enableval"
+fi], [scriptdir=${datadir}/${tzsh_name}/'${VERSION}'])
+
+ifdef([sitescriptdir],[undefine([sitescriptdir])])dnl
+AC_ARG_ENABLE(site-scriptdir,
+[  --enable-site-scriptdir=DIR  same for site scripts (not version specific)],
+[if test $enableval = yes; then
+  sitescriptdir=${datadir}/${tzsh_name}
+else
+  sitescriptdir="$enableval"
+fi], [sitescriptdir=${datadir}/${tzsh_name}])
+
+AC_SUBST(scriptdir)dnl
+AC_SUBST(sitescriptdir)dnl
+
 dnl Do you want maildir support?
 ifdef([maildir_support],[undefine([maildir_support])])dnl
 AH_TEMPLATE([MAILDIR_SUPPORT],

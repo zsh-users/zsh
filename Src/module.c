@@ -434,12 +434,12 @@ try_load_module(char const *name)
 
 /**/
 static void *
-do_load_module(char const *name)
+do_load_module(char const *name, int silent)
 {
     void *ret;
 
     ret = try_load_module(name);
-    if (!ret) {
+    if (!ret && !silent) {
 	int waserr = errflag;
 	zerr("failed to load module: %s", name, 0);
 	errflag = waserr;
@@ -452,11 +452,12 @@ do_load_module(char const *name)
 
 /**/
 static void *
-do_load_module(char const *name)
+do_load_module(char const *name, int silent)
 {
     int waserr = errflag;
 
-    zerr("failed to load module: %s", name, 0);
+    if (!silent)
+	zerr("failed to load module: %s", name, 0);
     errflag = waserr;
 
     return NULL;
@@ -748,6 +749,13 @@ modname_ok(char const *p)
 mod_export int
 load_module(char const *name)
 {
+    return load_module_silence(name, 0);
+}
+
+/**/
+mod_export int
+load_module_silence(char const *name, int silent)
+{
     Module m;
     void *handle = NULL;
     Linkedmod linked;
@@ -755,7 +763,8 @@ load_module(char const *name)
     int set;
 
     if (!modname_ok(name)) {
-	zerr("invalid module name `%s'", name, 0);
+	if (!silent)
+	    zerr("invalid module name `%s'", name, 0);
 	return 0;
     }
     /*
@@ -766,7 +775,7 @@ load_module(char const *name)
     queue_signals();
     if (!(node = find_module(name, 1, &name))) {
 	if (!(linked = module_linked(name)) &&
-	    !(handle = do_load_module(name))) {
+	    !(handle = do_load_module(name, silent))) {
 	    unqueue_signals();
 	    return 0;
 	}
@@ -811,7 +820,7 @@ load_module(char const *name)
     m->flags |= MOD_BUSY;
     if (m->deps)
 	for (n = firstnode(m->deps); n; incnode(n))
-	    if (!load_module((char *) getdata(n))) {
+	    if (!load_module_silence((char *) getdata(n), silent)) {
 		m->flags &= ~MOD_BUSY;
 		unqueue_signals();
 		return 0;
@@ -820,7 +829,7 @@ load_module(char const *name)
     if (!m->u.handle) {
 	handle = NULL;
 	if (!(linked = module_linked(name)) &&
-	    !(handle = do_load_module(name))) {
+	    !(handle = do_load_module(name, silent))) {
 	    unqueue_signals();
 	    return 0;
 	}
@@ -886,7 +895,7 @@ require_module(char *nam, const char *module, UNUSED(int res), int test)
 	    return 0;
 	}
     } else
-	ret = load_module(module);
+	ret = load_module_silence(module, 0);
     unqueue_signals();
 
     return ret;
@@ -1549,6 +1558,50 @@ unload_module(Module m, LinkNode node)
     return 0;
 }
 
+
+/**/
+int
+unload_named_module(char *modname, char *nam, int silent)
+{
+    const char *mname;
+    LinkNode node;
+    Module m;
+    int ret = 0;
+
+    node = find_module(modname, 1, &mname);
+    if (node) {
+	LinkNode mn, dn;
+	int del = 0;
+
+	for (mn = firstnode(modules); mn; incnode(mn)) {
+	    m = (Module) getdata(mn);
+	    if (m->deps && m->u.handle)
+		for (dn = firstnode(m->deps); dn; incnode(dn))
+		    if (!strcmp((char *) getdata(dn), mname)) {
+			if (m->flags & MOD_UNLOAD)
+			    del = 1;
+			else {
+			    zwarnnam(nam, "module %s is in use by another module and cannot be unloaded", mname, 0);
+			    return 1;
+			}
+		    }
+	}
+	m = (Module) getdata(node);
+	if (del)
+	    m->wrapper++;
+	if (unload_module(m, node))
+	    ret = 1;
+	if (del)
+	    m->wrapper--;
+    } else if (!silent) {
+	zwarnnam(nam, "no such module %s", modname, 0);
+	ret = 1;
+    }
+
+    return ret;
+}
+
+
 /**/
 static int
 bin_zmodload_load(char *nam, char **args, Options ops)
@@ -1558,39 +1611,9 @@ bin_zmodload_load(char *nam, char **args, Options ops)
     int ret = 0;
     if(OPT_ISSET(ops,'u')) {
 	/* unload modules */
-	const char *mname = *args;
 	for(; *args; args++) {
-	    node = find_module(*args, 1, &mname);
-	    if (node) {
-		LinkNode mn, dn;
-		int del = 0;
-
-		for (mn = firstnode(modules); mn; incnode(mn)) {
-		    m = (Module) getdata(mn);
-		    if (m->deps && m->u.handle)
-			for (dn = firstnode(m->deps); dn; incnode(dn))
-			    if (!strcmp((char *) getdata(dn), mname)) {
-				if (m->flags & MOD_UNLOAD)
-				    del = 1;
-				else {
-				    zwarnnam(nam, "module %s is in use by another module and cannot be unloaded", mname, 0);
-				    ret = 1;
-				    goto cont;
-				}
-			    }
-		}
-		m = (Module) getdata(node);
-		if (del)
-		    m->wrapper++;
-		if (unload_module(m, node))
-		    ret = 1;
-		if (del)
-		    m->wrapper--;
-	    } else if (!OPT_ISSET(ops,'i')) {
-		zwarnnam(nam, "no such module %s", *args, 0);
+	    if (unload_named_module(*args, nam, OPT_ISSET(ops,'i')))
 		ret = 1;
-	    }
-	    cont: ;
 	}
 	return ret;
     } else if(!*args) {
@@ -1645,7 +1668,7 @@ getconddef(int inf, char *name, int autol)
 	    /* This is a definition for an autoloaded condition, load the *
 	     * module if we haven't tried that already. */
 	    if (f) {
-		load_module(p->module);
+		load_module_silence(p->module, 0);
 		f = 0;
 		p = NULL;
 	    } else {
@@ -2086,7 +2109,7 @@ getmathfunc(char *name, int autol)
 
 		removemathfunc(q, p);
 
-		load_module(n);
+		load_module_silence(n, 0);
 
 		return getmathfunc(name, 0);
 	    }

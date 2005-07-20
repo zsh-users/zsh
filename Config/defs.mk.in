@@ -43,6 +43,8 @@ mandir          = @mandir@
 datadir         = @datadir@
 fndir           = @fndir@
 sitefndir       = @sitefndir@
+scriptdir       = @scriptdir@
+sitescriptdir   = @sitescriptdir@
 htmldir         = $(datadir)/$(tzsh)/htmldoc
 
 # compilation

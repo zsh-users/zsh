@@ -1,3 +1,10 @@
+2005-07-20  Peter Stephenson  <pws@csr.com>
+
+	* 21498: configure.ac, Configs/defs.mk.in, Doc/Makefile.in,
+	Doc/Zsh/mod_newuser.yo, Src/init.c, Src/module.c, Src/zsh.mdd,
+	Src/Modules/newuser.c, Src/Modules/newuser.mdd: Add zsh/newuser
+	module, currently with no associated shell code.
+
 2005-07-20  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_rake: add -s option to _arguments

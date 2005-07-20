@@ -1,0 +1,12 @@
+name=zsh/newuser
+link=dynamic
+# We will always try to load newuser, but there is
+# no error if it fails.
+load=no
+
+objects="newuser.o"
+
+:<<\Make
+newuser.o:  ../zshpaths.h
+
+Make

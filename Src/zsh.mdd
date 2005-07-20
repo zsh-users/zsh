@@ -38,6 +38,12 @@ version.h: $(sdir_top)/Config/version.mk
 
 zshpaths.h: Makemod $(CONFIG_INCS)
 	@echo '#define MODULE_DIR "'$(MODDIR)'"' > zshpaths.h.tmp
+	@if test x$(sitescriptdir) != xno; then \
+	  echo '#define SITESCRIPT_DIR "'$(sitescriptdir)'"' >> zshpaths.h.tmp; \
+	fi
+	@if test x$(scriptdir) != xno; then \
+	  echo '#define SCRIPT_DIR "'$(scriptdir)'"' >> zshpaths.h.tmp; \
+	fi
 	@if test x$(sitefndir) != xno; then \
 	  echo '#define SITEFPATH_DIR "'$(sitefndir)'"' >> zshpaths.h.tmp; \
 	fi
