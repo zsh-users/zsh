@@ -1,8 +1,9 @@
 name=zsh/newuser
 link=dynamic
-# We will always try to load newuser, but there is
-# no error if it fails.
+# We will always try to load newuser, but there should
+# be no error if it fails, so don't use the standard mechanism.
 load=no
+functions='Scripts/newuser Functions/Newuser/*'
 
 objects="newuser.o"
 

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 fndir=$DESTDIR$fndir
+scriptdir=$DESTDIR$scriptdir
 
 /bin/sh $sdir_top/mkinstalldirs $fndir || exit 1;
 
@@ -25,13 +26,23 @@ for file in $allfuncs; do
       Completion/*)
         instdir="$fndir/Completion"
         ;;
+      Scripts/*)
+        instdir="$scriptdir"
+	;;
       *)
         subdir="`echo $file | sed -e 's%/[^/]*$%%' -e 's%^Functions/%%'`"
         instdir="$fndir/$subdir"
         ;;
       esac
     else
-      instdir="$fndir"
+      case "$file" in
+      Scripts/*)
+        instdir="$scriptdir"
+	;;
+      *)
+        instdir="$fndir"
+        ;;
+      esac
     fi
     test -d $instdir || /bin/sh $sdir_top/mkinstalldirs $instdir || exit 1
     $INSTALL_DATA $sdir_top/$file $instdir || exit 1
