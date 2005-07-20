@@ -1,3 +1,7 @@
+2005-07-20  Clint Adams  <clint@zsh.org>
+
+	* 21499: Doc/Makefile.in: use newer texi2html syntax.
+
 2005-07-20  Peter Stephenson  <pws@csr.com>
 
 	* 21498: configure.ac, Configs/defs.mk.in, Doc/Makefile.in,
