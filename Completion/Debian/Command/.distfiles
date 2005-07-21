@@ -5,4 +5,5 @@ _aptitude          _bug _dpkg_source  _update-rc.d
 _apt-move          _debchange   _dput
 _apt-show-versions  _debfoster  _dupload
 _auto-apt          _debsign     _lintian _make-kpkg _wajig
+_madison           _module-assistant  _uscan
 '

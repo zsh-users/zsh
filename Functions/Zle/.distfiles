@@ -15,4 +15,5 @@ up-case-word-match
 delete-whole-word-match quote-and-complete-word url-quote-magic
 zed-set-file-name history-pattern-search
 keeper
+which-command
 '

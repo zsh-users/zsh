@@ -15,6 +15,7 @@ _gnu_generic    _gpg            _gphoto2        _gprof          _grep
 _groff          _gs             _gzip
 _iconv          _ifconfig       _imagemagick    _init_d         _irssi
 _ispell         _java           _joe            _killall        _knock
+_kvno
 _last           _less           _links          _loadkeys       _look
 _lp             _ls             _lsof           _lynx           _lzop
 _mail           _make           _man            _mencal         _mh
@@ -25,16 +26,16 @@ _pack           _patch          _pbm            _perforce       _perl
 _perldoc        _php            _pine           _postfix        _prcs
 _printenv       _psutils        _python
 _raggle         _rake           _rar            _rcs            _renice
-_rlogin         _rsync          _ruby
+_rlogin         _rsync          _rubber         _ruby
 _sablotron      _samba          _sccs           _screen         _sed
 _sh             _showmount      _slrn           _socket         _spamassassin
 _ssh            _strip          _stty           _su             _subversion
 _sudo           _surfraw        _sysctl
 _tar            _telnet         _texinfo        _tidy           _tiff
 _tin            _tla
-_unace          _uniq           _user_admin
+_unace          _unexpand       _uniq           _user_admin
 _vim            _vorbis         _vux
 _w3m            _webbrowser     _wget           _whereis        _whois
-_wiggle         _xargs          _xmlsoft
+_wiggle         _xargs          _xmlsoft        _xscreensaver
 _yodl           _yp             _zcat           _zdump          _zip
 '

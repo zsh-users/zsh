@@ -1,3 +1,13 @@
+2005-07-21  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Debian/Command/.distfiles,
+	Completion/Unix/Command/.distfiles,
+	Completion/Unix/Type/.distfiles, Completion/X/Command/.distfiles,
+	Doc/Zsh/.distfiles, Functions/MIME/.distfiles,
+	Functions/Newuser/.distfiles, Functions/TCP/.distfiles,
+	Functions/Zle/.distfiles, Scripts/.distfiles,
+	Src/Modules/.distfiles:  Bring .distfiles up to date.
+
 2005-07-20  Peter Stephenson  <pws@csr.com>
 
 	* 21500: Makefile.in, Config/installfns.sh,

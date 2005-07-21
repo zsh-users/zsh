@@ -8,6 +8,7 @@ DISTFILES_SRC='
     langinfo.mdd langinfo.c
     mapfile.mdd mapfile.c
     mathfunc.mdd mathfunc.c
+    newuser.mdd newuser.c
     parameter.mdd parameter.c
     pcre.mdd pcre.c
     socket.mdd socket.c
