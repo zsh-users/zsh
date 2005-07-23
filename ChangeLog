@@ -1,7 +1,8 @@
 2005-07-23  Clint Adams  <clint@zsh.org>
 
-	* 21505: Completion/Unix/Command/_rubber: use an array for common
-	arguments rather than an additional function.
+	* 21505, 21506: Completion/Unix/Command/_rubber: use an array for
+	common arguments rather than an additional function, and use
+	globbing instead of ls and sed.
 
 	* 21504: Completion/Unix/Command/_xscreensaver,
 	Completion/X/Command/_xscreensaver: move xscreensaver-command
