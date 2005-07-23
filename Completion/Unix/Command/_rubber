@@ -1,6 +1,6 @@
 #compdef rubber rubber-pipe rubber-info
 
-local _rubber_version _rubber_path _rubber_modules
+local _rubber_version _rubber_path _rubber_modules _rubber_args
 
 eval $(rubber --version | sed 's/^.* \([^ ]*\): */_rubber_\1=/')
 if [[ ${_rubber_version#0} != $_rubber_version ]]; then
@@ -14,31 +14,31 @@ else
   )
 fi
 
-_rubber_arguments () {
-    _arguments -s \
-      \*{-c,--command}'=[run the directive CMD before parsing]:command' \
-      \*{-e,--epilogue}'=[run the directive CMD after parsing]:command' \
-      {-z,--gzip}'[compress the final document]' \
-      '(- *)'{-h,--help}'[show help]' \
-      '--into=[go to directory DIR before compiling]:directory:_files -/' \
-      {-l,--landscape}'[change paper orientation (if relevant)]' \
-      {-n,--maxerr}'=[display at most NUM errors]:num' \
-      \*{-m,--module}'=[use module]:module:($_rubber_modules)' \
-      '--only=[only include the specified SOURCES]:sources' \
-      \*{-o,--post}'=[postprocess with module]:postprocessor:($_rubber_modules)' \
-      {-d,--pdf}'[produce PDF output instead of DVI]' \
-      {-p,--ps}'[produce a PostScript document]' \
-      {-q,--quiet}'[suppress messages]' \
-      \*{-r,--read}'[read additional directives from a file]:directives files:_files' \
-      {-s,--short}'[display errors in a compact form]' \
-      \*{-I,--texpath}'=[add DIR to the search path for LaTeX]:tex path:_files -/' \
-      \*{-v,--verbose}'[increase verbosity]' \
-      '--version[print version information and exit]' "$@"
-}
+_rubber_args=(
+      \*{-c,--command}'=[run the directive CMD before parsing]:command'
+      \*{-e,--epilogue}'=[run the directive CMD after parsing]:command'
+      {-z,--gzip}'[compress the final document]'
+      '(- *)'{-h,--help}'[show help]'
+      '--into=[go to directory DIR before compiling]:directory:_files -/'
+      {-l,--landscape}'[change paper orientation (if relevant)]'
+      {-n,--maxerr}'=[display at most NUM errors]:num'
+      \*{-m,--module}'=[use module]:module:($_rubber_modules)'
+      '--only=[only include the specified SOURCES]:sources'
+      \*{-o,--post}'=[postprocess with module]:postprocessor:($_rubber_modules)'
+      {-d,--pdf}'[produce PDF output instead of DVI]'
+      {-p,--ps}'[produce a PostScript document]'
+      {-q,--quiet}'[suppress messages]'
+      \*{-r,--read}'[read additional directives from a file]:directives files:_files'
+      {-s,--short}'[display errors in a compact form]'
+      \*{-I,--texpath}'=[add DIR to the search path for LaTeX]:tex path:_files -/'
+      \*{-v,--verbose}'[increase verbosity]'
+      '--version[print version information and exit]'
+)
 
 case "$service" in
   rubber)
-    _rubber_arguments \
+    _arguments -s \
+      "$_rubber_args[@]" \
       '--clean[remove produced files instead of compiling]' \
       {-f,--force}'[force at least one compilation]' \
       '--inplace[compile the documents from their source directory]' \
@@ -48,14 +48,16 @@ case "$service" in
 	;;
 	
   rubber-pipe)
-    _rubber_arguments \
+    _arguments -s \
+      "$_rubber_args[@]" \
       {-k,--keep}'[keep the temporary files after compiling]' \
       \*{-W,--warn}'=[report warnings of the given TYPE]:warnings:(all boxes misc refs)'
       return 0
 	;;
 	
   rubber-info)
-    _rubber_arguments \
+    _arguments -s \
+      "$_rubber_args[@]" \
       '--boxes[report overfull and underfull boxes]' \
       '--check[report errors or warnings default action]' \
       '--deps[show the target file s dependencies]' \

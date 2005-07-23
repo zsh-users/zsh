@@ -1,6 +1,9 @@
 2005-07-23  Clint Adams  <clint@zsh.org>
 
-	* 215??: Completion/Unix/Command/_xscreensaver,
+	* 21505: Completion/Unix/Command/_rubber: use an array for common
+	arguments rather than an additional function.
+
+	* 21504: Completion/Unix/Command/_xscreensaver,
 	Completion/X/Command/_xscreensaver: move xscreensaver-command
 	completion to the X dir.
 
