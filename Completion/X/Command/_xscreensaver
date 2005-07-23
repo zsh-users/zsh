@@ -1,10 +1,10 @@
 #compdef xscreensaver-command
 
 _arguments \
-  '-demo[Ask the xscreensaver process to enter interactive demo mode]' \
-  '-prefs[Ask the xscreensaver process to bring up the preferences panel]' \
-  '-activate[Turn on the screensaver]' \
-  '-deactivate[Turns off the screensaver]' \
+  '-demo[ask the xscreensaver process to enter interactive demo mode]' \
+  '-prefs[ask the xscreensaver process to bring up the preferences panel]' \
+  '-activate[turn on the screensaver]' \
+  '-deactivate[turn off the screensaver]' \
   '-cycle[stop the current graphics demo and run a new one]' \
   '-next' \
   '-prev' \

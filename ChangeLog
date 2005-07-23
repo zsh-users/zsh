@@ -1,3 +1,9 @@
+2005-07-23  Clint Adams  <clint@zsh.org>
+
+	* 215??: Completion/Unix/Command/_xscreensaver,
+	Completion/X/Command/_xscreensaver: move xscreensaver-command
+	completion to the X dir.
+
 2005-07-21  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Debian/Command/.distfiles,
