@@ -3578,6 +3578,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    *t++ = '\\', s--;
 		    continue;
 		}
+		/* FALL THROUGH */
 	    case 'e':
 		*t++ = '\033';
 		break;
@@ -3611,6 +3612,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    *misc = 1;
 		    break;
 		}
+		goto def;
 	    case 'u':
 	    case 'U':
 	    	wval = 0;
