@@ -304,7 +304,7 @@ cmd_import=('::version:_baz_versions')
 cmd_imprev=($cmd_import)
 
 local cmd_commit cmd_cmtrev
-cmd_commit=('::version:_baz_versions' ':separator:(--)' '*:files:_files')
+cmd_commit=('*:files:_files')
 cmd_cmtrev=($cmd_commit)
 
 local cmd_get cmd_getrev

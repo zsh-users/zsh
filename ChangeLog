@@ -1,5 +1,8 @@
 2005-07-24  Clint Adams  <clint@zsh.org>
 
+	* 21519: Completion/Unix/Command/_baz: only complete files
+	after baz commit, not archive/version.
+
 	* 21517: Completion/Unix/Command/_baz: complete files after
 	build-config if there's a configs subdir, even if one is not in a
 	project tree.
