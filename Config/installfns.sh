@@ -17,7 +17,7 @@ for file in $allfuncs; do
     case "$file" in
       */CVS/*) continue;;
     esac
-    if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
+    if test x$FUNCTIONS_SUBDIRS != x && test x$FUNCTIONS_SUBDIRS != xno; then
       case "$file" in
       Completion/*/*)
         subdir="`echo $file | sed -e 's%/[^/]*/[^/]*$%%'`"

@@ -1,3 +1,8 @@
+2005-07-24  Clint Adams  <clint@zsh.org>
+
+	* 21510: Config/installfns.sh: use && rather than -a binary
+	test operator.
+
 2005-07-23  Clint Adams  <clint@zsh.org>
 
 	* 21505, 21506: Completion/Unix/Command/_rubber: use an array for
