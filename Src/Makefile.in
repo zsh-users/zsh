@@ -163,6 +163,7 @@ install.bin-L: $(LIBZSH)
 	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(libdir)/$(tzsh)
 	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(libdir)/$(tzsh)/$(LIBZSH)
 install.cygwin-lib: $(LIBZSH)
+	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(bindir)/$(LIBZSH)
 .PHONY: install.bin-N install.bin-L install.cygwin-lib
 
