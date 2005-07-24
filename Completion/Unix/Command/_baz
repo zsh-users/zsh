@@ -54,8 +54,12 @@ _baz_config () {
   [[ -n "$n" ]] && configdir=$opt_args[$n]
   root="$(_call_program baz $BAZ tree-root ${configdir} 2>&1)"
   if (( $? )); then
-    _message -e messages "Error: $root"
-    return $ret
+    if [[ -d "configs" ]]; then
+      root=.
+    else
+      _message -e messages "Error: $root"
+      return $ret
+    fi
   fi
 
   if [[ -d "$root/configs" ]]; then
