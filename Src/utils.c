@@ -3498,21 +3498,22 @@ ucs4toutf8(char *dest, unsigned int wval)
 
 /*
  * Decode a key string, turning it into the literal characters.
- * The length is returned in len.
- * fromwhere determines how the processing works.
+ * The length is (usually) returned in *len.
+ * fromwhere determines how the processing works:
  *   0:  Don't handle keystring, just print-like escapes.
- *       Expects misc to be present.
- *   1:  Handle Emacs-like \C-X arguments etc., but not ^X
- *       Expects misc to be present.
+ *       If a \c escape is seen, *misc is set to 1.
+ *   1:  Handle Emacs-like \C-X arguments etc., but not ^X.
+ *       If a \c escape is seen, *misc is set to 1.
  *   2:  Handle ^X as well as emacs-like keys; don't handle \c
- *       for no newlines.
- *   3:  As 1, but don't handle \c.
+ *       (the misc arg is not used).
+ *   3:  As 1, but don't handle \c (the misc arg is not used).
  *   4:  Do $'...' quoting.  Overwrites the existing string instead of
  *       zhalloc'ing. If \uNNNN ever generates multi-byte chars longer
  *       than 6 bytes, will need to adjust this to re-allocate memory.
- *   5:  As 2, but \- is special.  Expects misc to be defined.
- *   6:  As 2, but parses only one character and returns end-pointer
- *       and parsed character in *misc
+ *   5:  As 2, but \- is special. If \- is seen, *misc is set to 1.
+ *   6:  As 2, but parses only one character: returns a pointer to the
+ *       next character and puts the parsed character into *misc (the
+ *       len arg is not used).
  */
 
 /**/
