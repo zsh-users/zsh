@@ -44,13 +44,14 @@ _arguments -C -s -S -A "-*" "$args[@]" && return 0
 
 case $state in
   directive)
-    local -a directives
+    local -a directives suf
     local code='foreach (ini_get_all() as $k => $v) { echo "$k\n"; }'
     directives=( $(_call_program directives $words[1] -r ${(q)code} 2>/dev/null) )
     if compset -P '*='; then
       _default && return 0
     else
-      _wanted directives expl 'configuration directive' compadd -qS= -a directives && return 0
+      compset -S '=*' || suf=( -qS '=' )
+      _wanted directives expl 'configuration directive' compadd "$suf[@]" -a directives && return 0
     fi
   ;;
   extension)
