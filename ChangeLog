@@ -1,3 +1,14 @@
+2005-07-24  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/utils.c: improved the function comment for
+	getkeystring().
+
+	* 21509: Thorsten Dahlheimer: Src/utils.c, Src/params.c: fixed
+	some issues with \c parsing.
+
+	* 21501: Thorsten Dahlheimer: Src/Makefile.in: fixed a cygwin
+	install target to make sure the bindir exists.
+
 2005-07-24  Clint Adams  <clint@zsh.org>
 
 	* 21519: Completion/Unix/Command/_baz: only complete files
