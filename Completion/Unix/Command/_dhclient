@@ -1,0 +1,7 @@
+#compdef dhclient
+
+_arguments \
+      '-p[Port to transmit to / listen on]' \
+      '-e[Exit if configuration failed after a certain time]' \
+      '-d[Force to run in foreground]' \
+      ':Interface:_net_interfaces'

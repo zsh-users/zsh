@@ -1,0 +1,24 @@
+#compdef pump
+
+_arguments \
+      '(-c --config-file=)'{-c,--config-file=}'[Configuratio file to use]:Configuratio file to use:_files' \
+      '(-h --hostname=)'{-h,--hostname=}'[Hostname to request]:Hostname:_hosts' \
+      '(-i --interface=)'{-i,--interface=}'[Interface to configure]:Interface:_net_interfaces' \
+      '(-k --kill)'{-k,--kill}'[Kill daemon (and disable all interfaces)]' \
+      '(-l --lease=)'{-l,--lease=}'[Lease time to request (in hours)]' \
+      '(-L --leasesecs=)'{-L,--leasesecs=}'[Lease time to request (in seconds)]' \
+      '(-r --release)'{-r,--release}'[Release interface]:Interface:_net_interfaces' \
+      '(-R --renew)'{-R,--renew}'[Force immediate lease renewal]:Interface:_net_interfaces' \
+      '(-v --verbose)'{-v,--verbose}'[Log verbose debug info]' \
+      '(-s --status)'{-s,--status}'[Display interface status]:Interface:_net_interfaces' \
+      '(-d --no-dns)'{-d,--no-dns}"[Don't update resolv.conf]" \
+      '(-? --help)'{-?,--help}'[Display help message]' \
+      "--no-gateway[Don't set a gateway for this interface]" \
+      "--no-setup[Don't set up anything]" \
+      "--no-resolvconf[Don't set up resolvconf]" \
+      '--no-bootp[Ignore non-DHCP BOOTP responses]' \
+      '--lookup-hostname[Force lookup of hostname]' \
+      '--script=[Script to use]:Script to use:_files' \
+      "--win-client-ident[Set the client identifier to match Window's]" \
+      '--usage[Display brief usage message]' \
+      ':Interface:_net_interfaces'

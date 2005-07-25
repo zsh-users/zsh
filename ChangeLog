@@ -1,3 +1,8 @@
+2005-07-25  Clint Adams  <clint@zsh.org>
+
+	* 21523, 21524: Julius Plenz: Completion/Unix/Command/_dhclient,
+	Completion/Unix/Command/_pump: completions for pump and dhclient.
+
 2005-07-25  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_php: add missing compset -S call
