@@ -1,3 +1,11 @@
+2005-07-26  Peter Stephenson  <pws@csr.com>
+
+	* 21527: Functions/Newuser/.distfiles,
+	Functions/Newuser/zsh-install-newuser,
+	Functions/Newuser/zsh-newuser-install, Scripts/newuser: don't
+	use function if it failed to load; rename to zsh-newuser-install
+	in case there are more zsh-newuser-* functions in future.
+
 2005-07-25  Clint Adams  <clint@zsh.org>
 
 	* 21526: Completion/Unix/Command/_dhclient: handle dhclient V3 as

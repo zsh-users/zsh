@@ -1,4 +1,4 @@
 DISTFILES_SRC='
 .distfiles
-zsh-install-newuser
+zsh-newuser-install
 '

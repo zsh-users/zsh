@@ -1,0 +1,23 @@
+# Function to install startup files for a new user.
+# This dummy version simply creates a new .zshrc with a comment.
+# FIXME: we don't want to distribute a file that does that, it
+# would be preferable to do nothing at all.
+
+# Sanitize environment.
+emulate -L zsh
+
+local zd=${ZDOTDIR:-$HOME}
+
+# The zsh/newuser module already tests for the following, so this test only
+# triggers if zsh-newuser-install is run by hand.
+#
+# In future we may want to use this mechanism to update startup files.
+if [[ -e $zd/.zshenv || -e $zd/.zprofile || -e $zd/.zshrc || -e $zs/.zlogin ]]
+then
+  print "zsh-newuser-install:  startup files exist, aborting" >&2
+  return 1
+fi
+
+echo "# Created by newuser for $ZSH_VERSION" >$zd/.zshrc
+
+unfunction zsh-newuser-install
