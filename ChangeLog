@@ -3,6 +3,12 @@
 	* 21523, 21524: Julius Plenz: Completion/Unix/Command/_dhclient,
 	Completion/Unix/Command/_pump: completions for pump and dhclient.
 
+2005-07-25  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21518 (modified): Src/builtin.c, Src/utils.c, Test/B03print.ztst:
+	more collaboration with Thorsten Dahlheimer to change the handling
+	of \c in echo and printf to make it comply with POSIX.
+
 2005-07-25  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_php: add missing compset -S call
