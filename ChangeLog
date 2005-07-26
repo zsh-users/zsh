@@ -1,5 +1,8 @@
 2005-07-25  Clint Adams  <clint@zsh.org>
 
+	* 21526: Completion/Unix/Command/_dhclient: handle dhclient V3 as
+	well as V2.
+
 	* 21523, 21524: Julius Plenz: Completion/Unix/Command/_dhclient,
 	Completion/Unix/Command/_pump: completions for pump and dhclient.
 
