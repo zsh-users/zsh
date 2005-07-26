@@ -1664,13 +1664,10 @@ sect(How do I prevent the prompt overwriting output when there is no newline?)
     # Skip defining precmd if the PROMPT_SP option is available.
     if ! eval '[[ -o promptsp ]] 2>/dev/null'; then
       function precmd {
-        # An efficient version using termcap multi-right:
-        echo -n ' '       # Output 1 space
-        echotc RI $((COLUMNS - 3))
-        echo -n '  '      # Output 2 spaces
-        # Alternately, try replacing the above 3 lines with this echo
-        # that outputs a screen-column-width of spaces:
-        #echo -n ${(l:$COLUMNS:::):-}
+        # Output an inverse hash and a bunch spaces.  We include
+        # a CR at the end so that any user-input that gets echoed
+        # between this output and the prompt doesn't cause a wrap.
+        print -nP "%B%S#%s%b${(l:$((COLUMNS-1)):::):-}\r"
       }
     fi
   )
