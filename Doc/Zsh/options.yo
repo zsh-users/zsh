@@ -916,10 +916,8 @@ characters, including a series of spaces, that should make the terminal
 wrap to the next line when a partial line is present (note that this is
 only successful if your terminal has automatic margins, which is typical).
 
-One potential side-effect can affect the selection of text from a partial
-line using the mouse:  triple-clicking may select more text than you
-expected, or the spaces following a partial line may be selectable where
-they would not be if the line had actually ended with a newline.
+When a partial line is preserved, you will see an inverse hash (#) at
+the end of the partial line.
 
 NOTE: if the PROMPT_CR option is not set, enabling this option will have no
 effect.  This option is on by default.
