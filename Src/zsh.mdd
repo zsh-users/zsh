@@ -49,14 +49,14 @@ zshpaths.h: Makemod $(CONFIG_INCS)
 	fi
 	@if test x$(fndir) != xno; then \
 	  echo '#define FPATH_DIR "'$(fndir)'"' >> zshpaths.h.tmp; \
-	  if test x$(FUNCTIONS_SUBDIRS) != x -a \
-	  x$(FUNCTIONS_SUBDIRS) != xno; then \
+	  if test x$(FUNCTIONS_SUBDIRS) != x && \
+	     test x$(FUNCTIONS_SUBDIRS) != xno; then \
 	    fpath_tmp="`grep ' functions=.' \
 	    $(dir_top)/config.modules | sed -e '/^#/d' -e '/ link=no/d' \
 	    -e 's/^.* functions=//'`"; \
 	    fpath_tmp=`for f in $$fpath_tmp; do \
 	      echo $$f | sed -e 's%^Functions/%%' -e 's%/[^/]*$$%%' -e 's%/\*%%'; \
-	    done | sort | uniq`; \
+	    done | grep -v Scripts | sort | uniq`; \
 	    fpath_tmp=`echo $$fpath_tmp | sed 's/ /\", \"/g'`; \
 	    echo "#define FPATH_SUBDIRS { \"$$fpath_tmp\" }" \
 	    >>zshpaths.h.tmp; \

@@ -1,3 +1,8 @@
+2005-07-26  Clint Adams  <clint@zsh.org>
+
+	* 21529: configure.ac, Src/zsh.mdd: move scriptdir to a scripts
+	subdir, and don't include Scripts in fpath.
+
 2005-07-26  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_rake: declare expl local
