@@ -3611,7 +3611,9 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	    case 'c':
 		if (fromwhere < 2) {
 		    *misc = 1;
-		    break;
+		    *t = '\0';
+		    *len = t - buf;
+		    return buf;
 		}
 		goto def;
 	    case 'u':
