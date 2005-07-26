@@ -1,3 +1,7 @@
+2005-07-26  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_rake: declare expl local
+
 2005-07-26  Peter Stephenson  <pws@csr.com>
 
 	* 21527: Functions/Newuser/.distfiles,
