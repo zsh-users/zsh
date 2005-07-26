@@ -1,3 +1,11 @@
+2005-07-26  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21532: Etc/FAQ.yo: updated the precmd in the prompt-
+	overwriting section to output an inverse hash when we preserve a
+	partial line, to simplify the output (it's all one "print" now),
+	and include a \r at the end (so that the echoing of user-input
+	will be less likely to cause an unintended wrap).
+
 2005-07-26  Clint Adams  <clint@zsh.org>
 
 	* 21529: configure.ac, Src/zsh.mdd: move scriptdir to a scripts
