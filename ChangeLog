@@ -1,5 +1,11 @@
 2005-07-26  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* unposted: Src/utils.c, Src/Zle/zle_main.c, Doc/Zsh/options.yo:
+	Moved the PROMPT_SP output into preprompt() so that it takes
+	effect prior to things like precmd, the mail-check output, etc.
+	Also added an inverse hash (#) that helps to distinguish when a
+	partial line was preserved.
+
 	* 21532: Etc/FAQ.yo: updated the precmd in the prompt-
 	overwriting section to output an inverse hash when we preserve a
 	partial line, to simplify the output (it's all one "print" now),
