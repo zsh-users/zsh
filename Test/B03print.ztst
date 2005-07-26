@@ -183,6 +183,34 @@
 0:flags mixed with specified argument
 >+003
 
+# Test the parsing of the \c escape.
+
+ echo '1 2!\c3 4' a b c d; echo
+0:Truncating first echo arg using backslash-c
+>1 2!
+
+ echo a b '1 2?\c5 6' c d; echo
+0:Truncating third echo arg using backslash-c
+>a b 1 2?
+
+ printf '1 2!\n\c3 4'
+0:Truncating printf literal using backslash-c
+>1 2!
+
+ printf '%s %b!\n\c%s %s' 1 2 3 4 5 6 7 8 9
+0:Truncating printf format using backslash-c
+>1 2!
+
+ printf '%s %b!\c%s %s' '1\c' '2\n\c' 3 4 5 6 7 8 9
+0:Truncating printf early %b arg using backslash-c
+>1\c 2
+
+ printf '%s %b\n' '1\c' 2 3 4 5 '6\n\c' 7 8 9
+0:Truncating printf late %b arg using backslash-c
+>1\c 2
+>3 4
+>5 6
+
 # The following usage, as stated in the manual, is not recommended and the
 # results are undefined. Tests are here anyway to ensure some form of
 # half-sane behaviour.
