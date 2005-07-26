@@ -3284,7 +3284,7 @@ int
 bin_print(char *name, char **args, Options ops, int func)
 {
     int flen, width, prec, type, argc, n, narg;
-    int nnl = 0, ret = 0, maxarg = 0;
+    int nnl = 0, fmttrunc = 0, ret = 0, maxarg = 0;
     int flags[5], *len;
     char *start, *endptr, *c, *d, *flag, *buf, spec[13], *fmt = NULL;
     char **first, *curarg, *flagch = "0+- #", save = '\0', nullstr = '\0';
@@ -3313,7 +3313,7 @@ bin_print(char *name, char **args, Options ops, int func)
     else if (OPT_HASARG(ops,'f'))
 	fmt = OPT_ARG(ops,'f');
     if (fmt)
-	fmt = getkeystring(fmt, &flen, OPT_ISSET(ops,'b') ? 2 : 0, &nnl);
+	fmt = getkeystring(fmt, &flen, OPT_ISSET(ops,'b') ? 2 : 0, &fmttrunc);
 
     first = args;
     
@@ -3349,10 +3349,16 @@ bin_print(char *name, char **args, Options ops, int func)
 	    (!OPT_ISSET(ops,'e') && 
 	     (OPT_ISSET(ops,'R') || OPT_ISSET(ops,'r') || OPT_ISSET(ops,'E'))))
 	    unmetafy(args[n], &len[n]);
-	else
+	else {
 	    args[n] = getkeystring(args[n], &len[n], OPT_ISSET(ops,'b') ? 2 :
 				   (func != BIN_ECHO && !OPT_ISSET(ops,'e')),
 				   &nnl);
+	    if (nnl) {
+		/* If there was a \c escape, make this the last arg. */
+		argc = n + 1;
+		args[argc] = NULL;
+	    }
+	}
 	/* -P option -- interpret as a prompt sequence */
 	if(OPT_ISSET(ops,'P')) {
 	    /*
@@ -3754,6 +3760,11 @@ bin_print(char *name, char **args, Options ops, int func)
 		    if (width < 0 && l < -width)
 		    	printf("%*c", -width - l, ' ');
 		    count += l;
+		    if (nnl) {
+			/* If the %b arg had a \c escape, truncate the fmt. */
+			flen = c - fmt + 1;
+			fmttrunc = 1;
+		    }
 		}
 		break;
 	    case 'q':
@@ -3845,7 +3856,7 @@ bin_print(char *name, char **args, Options ops, int func)
 			    ret = 1;
 			}
 			print_val(zulongval)
-			    }
+		    }
 		}
 	    }
 	    if (maxarg && (args - first > maxarg))
@@ -3854,7 +3865,7 @@ bin_print(char *name, char **args, Options ops, int func)
 
     	if (maxarg) args = first + maxarg;
 	/* if there are remaining args, reuse format string */
-    } while (*args && args != first && !OPT_ISSET(ops,'r'));
+    } while (*args && args != first && !fmttrunc && !OPT_ISSET(ops,'r'));
 
     if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s')) {
 #ifdef HAVE_OPEN_MEMSTREAM
