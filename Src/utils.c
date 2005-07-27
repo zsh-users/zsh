@@ -686,13 +686,6 @@ preprompt(void)
     int period = getiparam("PERIOD");
     int mailcheck = getiparam("MAILCHECK");
 
-    /* If NOTIFY is not set, then check for completed *
-     * jobs before we print the prompt.               */
-    if (unset(NOTIFY))
-	scanjobs();
-    if (errflag)
-	return;
-
     if (isset(PROMPTSP) && isset(PROMPTCR)) {
 	/* The PROMPT_SP heuristic will move the prompt down to a new line
 	 * if there was any dangling output on the line (assuming the terminal
@@ -701,6 +694,13 @@ preprompt(void)
 	fprintf(shout, "%s%*s\r", str, (int)columns - 1 - !hasxn, "");
 	free(str);
     }
+
+    /* If NOTIFY is not set, then check for completed *
+     * jobs before we print the prompt.               */
+    if (unset(NOTIFY))
+	scanjobs();
+    if (errflag)
+	return;
 
     /* If a shell function named "precmd" exists, *
      * then execute it.                           */
