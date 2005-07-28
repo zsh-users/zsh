@@ -1,3 +1,8 @@
+2005-07-28  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: updated for
+	features of Perforce 2005.1 release.
+
 2005-07-28  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* 21540: Completion/Unix/Command/_aap: update aap completion for version

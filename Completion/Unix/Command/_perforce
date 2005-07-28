@@ -1423,17 +1423,30 @@ _perforce_cmd_change() {
 }
 
 
+(( $+functions[_perforce_cmd_changelist] )) ||
+_perforce_cmd_changelist() {
+  _perforce_cmd_change "$@"
+}
+
+
 (( $+functions[_perforce_cmd_changes] )) ||
 _perforce_cmd_changes() {
   _arguments -s : \
     '-i[include integrated changes]' \
     '-t[output time as well as date]' \
-    '-l[long output]' \
+    '-l[long output, full change text]' \
+    '-l[long output, truncated change text]' \
     '-c+[select by client]:client:_perforce_clients' \
     '-m+[most recent N changes]:max changes: ' \
     '-s+[select by status]:status:(pending submitted)' \
     '-u+[select by user]:user:_perforce_users' \
     '*::file:_perforce_files -tR'
+}
+
+
+(( $+functions[_perforce_cmd_changelists] )) ||
+_perforce_cmd_changelists() {
+  _perforce_cmd_changes "$@"
 }
 
 
@@ -1560,6 +1573,7 @@ _perforce_cmd_filelog() {
   _arguments -s : \
     '-i[follow branches]' \
     '-l[long output, full change text]' \
+    '-L[long output, truncated change text]' \
     '-m[set maximum number of revisions to show]:max revisions: ' \
     '-t[include time with date]' \
     '*::file:_perforce_files'
@@ -1613,7 +1627,7 @@ _perforce_cmd_fstat() {
     '-H[select synced files (-Rh)]' \
     '-W[select opened files (-Ro)]' \
     '-l[include fileSize, possibly slow (-Ol)]' \
-    '-O-[select output type]:output type:((l\:fileSize p\:client\ path\ format r\:pending\ integrations s\:exclude\ local\ path))' \
+    '-O-[select output type]:output type:((f\:all\ revisions l\:fileSize p\:client\ path\ format r\:pending\ integrations s\:exclude\ local\ path))' \
     '-P[output clientFile in full Perforce syntax (-Op)]' \
     '-R-[restrict selected files]:restriction:((c\:mapped\ in\ client h\:synced\ to\ client n\:not\ synced\ to\ head o\:opened r\:resolved u\:unresolved))' \
     '-s[shorten, no client-related data (-Os)]' \
@@ -1846,6 +1860,7 @@ _perforce_cmd_opened() {
   _arguments -s : \
     '-a[list for all clients]' \
     '-c+[select by change]:change:_perforce_changes -tc' \
+    '-C[select by client]:client:_perforce_clients' \
     '*::file:_perforce_files -to'
 }
 
@@ -2027,6 +2042,7 @@ _perforce_cmd_users() {
 (( $+functions[_perforce_cmd_verify] )) ||
 _perforce_cmd_verify() {
   _arguments -s : \
+    '-m[limit revisions]:max revisions: ' \
     '-q[operate quietly]' \
     '-u[compute and save digest if missing]' \
     '-v[compute and save all digets]' \
@@ -2037,6 +2053,18 @@ _perforce_cmd_verify() {
 (( $+functions[_perforce_cmd_where] )) ||
 _perforce_cmd_where() {
   _perforce_files
+}
+
+
+(( $+functions[_perforce_cmd_workspace] )) ||
+_perforce_cmd_workspace() {
+  _perforce_cmd_client "$@"
+}
+
+
+(( $+functions[_perforce_cmd_workspaces] )) ||
+_perforce_cmd_workspaces() {
+  _perforce_cmd_clients "$@"
 }
 
 
