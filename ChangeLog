@@ -1,3 +1,9 @@
+2005-07-28  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 21540: Completion/Unix/Command/_aap: update aap completion for version
+	1.076; add target descriptions; search up directory tree for main.aap
+	recipe file if --up is specified
+
 2005-07-26  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/utils.c, Src/Zle/zle_main.c, Doc/Zsh/options.yo:
