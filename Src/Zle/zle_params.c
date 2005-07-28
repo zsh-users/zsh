@@ -187,7 +187,7 @@ set_buffer(UNUSED(Param pm), char *x)
 static char *
 get_buffer(UNUSED(Param pm))
 {
-    return (char *)zlelineasstring((char *)zleline, zlell, 0, NULL, NULL, 1);
+    return (char *)zlelineasstring(zleline, zlell, 0, NULL, NULL, 1);
 }
 
 /**/
@@ -264,7 +264,7 @@ get_lbuffer(UNUSED(Param pm))
 static void
 set_rbuffer(UNUSED(Param pm), char *x)
 {
-    char *y;
+    ZLE_STRING_T y;
     int len;
 
     if (x && *x != ZWC('\0'))
@@ -610,7 +610,8 @@ static char *
 get_lsearch(UNUSED(Param pm))
 {
     if (previous_search_len)
-	return metafy(previous_search, previous_search_len, META_HEAPDUP);
+	return zlelineasstring(previous_search, previous_search_len, 0,
+			       NULL, NULL, 1);
     else
 	return "";
 }

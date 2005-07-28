@@ -1,5 +1,10 @@
 2005-07-28  Peter Stephenson  <pws@csr.com>
 
+	* 21541: Src/Zle/zle_hist.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c, Src/Zle/zle_params.c, Src/Zle/zle_tricky.c,
+	Src/Zle/zle_utils.c: remove some warnings from
+	ZLE_UNICODE_SUPPORT.
+
 	* unposted: Completion/Unix/Command/_perforce: updated for
 	features of Perforce 2005.1 release.
 

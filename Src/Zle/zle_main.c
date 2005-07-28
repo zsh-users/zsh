@@ -938,7 +938,7 @@ zleread(char **lp, char **rp, int flags, int context)
     zlecontext = context;
     histline = curhist;
     undoing = 1;
-    zleline = (unsigned char *)zalloc(((linesz = 256) + 2) * ZLE_CHAR_SIZE);
+    zleline = (ZLE_STRING_T)zalloc(((linesz = 256) + 2) * ZLE_CHAR_SIZE);
     *zleline = ZWC('\0');
     virangeflag = lastcmd = done = zlecs = zlell = mark = 0;
     vichgflag = 0;
@@ -1518,7 +1518,8 @@ wordcharstrigger(void)
 {
 #ifdef ZLE_UNICODE_SUPPORT
     zrealloc(zle_wordchars, strlen(wordchars)*MB_CUR_MAX);
-    mbsrtowcs(zle_wordchars, &wordchars, strlen(wordchars), NULL);
+    mbsrtowcs(zle_wordchars, (const char **)&wordchars,
+	      strlen(wordchars), NULL);
     /* TODO: error handling here */
 #endif
 }

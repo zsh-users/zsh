@@ -1068,7 +1068,8 @@ doisearch(char **args, int dir)
 	rpt:
 	    if (!sbptr && previous_search_len) {
 		if (previous_search_len > sibuf - FIRST_SEARCH_CHAR - 2) {
-		    ibuf = hrealloc(ibuf, sibuf, (sibuf + previous_search_len)
+		    ibuf = hrealloc((char *)ibuf, sibuf * ZLE_CHAR_SIZE,
+				    (sibuf + previous_search_len)
 				    * ZLE_CHAR_SIZE);
 		    sbuf = ibuf + FIRST_SEARCH_CHAR;
 		    sibuf += previous_search_len;
@@ -1096,7 +1097,7 @@ doisearch(char **args, int dir)
 	    } else if (cmd == Th(z_selfinsert)) {
 #ifdef ZLE_UNICODE_SUPPORT
 		if (!lastchar_wide_valid)
-		    getfullcharrest(lastchar);
+		    getrestchar(lastchar);
 #else
 		;
 #endif
@@ -1113,7 +1114,8 @@ doisearch(char **args, int dir)
 	    }
 	    set_isrch_spot(top_spot++, hl, pos, zlecs, sbptr, dir, nomatch);
 	    if (sbptr >= sibuf - FIRST_SEARCH_CHAR - 2) {
-		ibuf = hrealloc(ibuf, sibuf, sibuf * 2 * ZLE_CHAR_SIZE);
+		ibuf = hrealloc((char *)ibuf, sibuf * ZLE_CHAR_SIZE,
+				sibuf * 2 * ZLE_CHAR_SIZE);
 		sbuf = ibuf + FIRST_SEARCH_CHAR;
 		sibuf *= 2;
 	    }
@@ -1298,9 +1300,10 @@ getvisrchstr(void)
 #endif
 	    }
 	  ins:
-	    if(sptr == ssbuf - 1) {
-		char *newbuf = zhalloc(ssbuf *= 2);
-		strcpy(newbuf, sbuf);
+	    if (sptr == ssbuf - 1) {
+		ZLE_STRING_T newbuf =
+		    (ZLE_STRING_T) zhalloc((ssbuf *= 2) * ZLE_CHAR_SIZE);
+		ZS_strcpy(newbuf, sbuf);
 		statusline = sbuf = newbuf;
 	    }
 	    sbuf[sptr++] = LASTFULLCHAR;

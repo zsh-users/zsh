@@ -724,7 +724,7 @@ makequote(ZLE_STRING_T str, size_t *len)
 	if (*l == ZWC('\''))
 	    qtct++;
     *len += 2 + qtct*3;
-    l = ol = (char *)zhalloc(*len * ZLE_CHAR_SIZE);
+    l = ol = (ZLE_STRING_T)zhalloc(*len * ZLE_CHAR_SIZE);
     *l++ = ZWC('\'');
     for (; str < end; str++)
 	if (*str == ZWC('\'')) {

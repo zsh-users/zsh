@@ -85,10 +85,23 @@ sizeline(int sz)
 
 /**/
 mod_export void
-zleaddtoline(ZLE_CHAR_T chr)
+zleaddtoline(int chr)
 {
     spaceinline(1);
+#ifdef ZLE_UNICODE_SUPPORT
+    /*
+     * TODO: the main shell has as yet very little notion of multibyte
+     * characters.  Until this gets fixed we just have to assume
+     * this is a complete character.
+     *
+     * Possibly we could get away with attempting to build up a
+     * multibyte character here, storing partial characters between
+     * calls.
+     */
+    zleline[zlecs++] = (ZLE_CHAR_T)chr;
+#else
     zleline[zlecs++] = chr;
+#endif
 }
 
 /*
@@ -188,7 +201,6 @@ stringaszleline(unsigned char *instr, int *outll, int *outsz)
     ZLE_STRING_T outstr;
     int ll, sz;
 #ifdef ZLE_UNICODE_SUPPORT
-    int cll;
     mbstate_t ps;
 #endif
 

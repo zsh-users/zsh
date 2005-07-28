@@ -2332,9 +2332,19 @@ magicspace(char **args)
 	 bangq += 2)
 	if (bangq[1] == '"' && (bangq == (char *)zleline || bangq[-1] != '\\'))
 	    break;
+#ifdef ZLE_UNICODE_SUPPORT
+    /*
+     * TODO: expansion and completion with Unicode are currently
+     * fundamentally broken.  Most of the code for this hasn't been
+     * commented out, but crashing the shell just because you entered
+     * a space seems to be worth guarding against.
+     */
+    ret = selfinsert(args);
+#else
     if (!(ret = selfinsert(args)) &&
 	(!bangq || bangq + 2 > (char *)zleline + zlecs))
 	doexpandhist();
+#endif
     return ret;
 }
 
