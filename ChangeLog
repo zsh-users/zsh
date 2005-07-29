@@ -1,3 +1,8 @@
+2005-07-29  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21548: Completion/Unix/Command/_rsync:  Made file completion
+	work after --include-from= and --exclude-from=.
+
 2005-07-28  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Exceptions/.distfiles: added to archive.
