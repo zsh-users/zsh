@@ -166,10 +166,10 @@ _arguments -s \
   '(-C --cvs-exclude)'{-C,--cvs-exclude}'[auto-ignore files the same way CVS does]' \
   '*'{-f,--filter=}'[add a file-filtering rule]:rule:' \
   '*-F[same as --filter="dir-merge /.rsync-filter", repeated: --filter="- .rsync-filter"]' \
-  '*--exclude=[exclude files matching pattern]:pattern:' \
   '--exclude-from=[read exclude patterns from specified file]:file:_files' \
-  '*--include=[do not exclude files matching pattern]:pattern:' \
+  '*--exclude=[exclude files matching pattern]:pattern:' \
   '--include-from=[read include patterns from specified file]:file:_files' \
+  '*--include=[do not exclude files matching pattern]:pattern:' \
   '--files-from=[read list of source-file names from specified file]:file:_files' \
   '(-0 --from0)'{-0,--from0}'[all *-from file lists are delimited by nulls]' \
   '--version[print version number]' \
