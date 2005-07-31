@@ -82,7 +82,7 @@ Zsh/seealso.yo Zsh/tcpsys.yo Zsh/zftpsys.yo Zsh/zle.yo
 all: man texi ../META-FAQ
 .PHONY: all
 
-everything: all dvi ps html pdf
+everything: all dvi html pdf
 .PHONY: everything
 
 dvi: zsh.dvi
@@ -95,7 +95,7 @@ pdf: zsh.pdf
 .PHONY: pdf
 
 zsh.pdf: $(sdir)/zsh.texi
-	$(PDFETEX) $(sdir)/zsh.texi
+	PDFTEX=$(PDFETEX) $(TEXI2DVI) --pdf $(sdir)/zsh.texi
 
 texi: $(sdir)/zsh.texi
 .PHONY: texi
@@ -120,6 +120,9 @@ zsh.info: $(sdir)/zsh.texi
 	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
 	;; esac; \
 
+# These targets are no longer made by default, nor
+# distributed with the -doc.tar.gz, since the PDF
+# output is generally better.  However, they still work.
 ps: us_ps a4_ps
 .PHONY: ps
 
@@ -322,7 +325,7 @@ uninstall.html:
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
 clean-here:
-	rm -f *.html *.info* *.dvi *.ps
+	rm -f *.html *.info* *.dvi *.ps *.pdf
 	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.log
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
 	rm -rf infodir

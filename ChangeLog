@@ -1,3 +1,10 @@
+2005-07-31  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 21553: Doc/Makefile.in, Doc/.distfiles: Create zsh.pdf
+	using texi2dvi to ensure cross-references and indexes are OK;
+	don't distribute PostScript files any more, though they can
+	still be made.
+
 2005-07-29  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21548: Completion/Unix/Command/_rsync:  Made file completion
