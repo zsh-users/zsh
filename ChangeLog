@@ -1,3 +1,7 @@
+2005-08-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 21393: Completion/Unix/Command/_kvno: add missing local declarations
+
 2005-08-01  Peter Stephenson  <pws@csr.com>
 
 	* 21552: Thorsten Dahlheimer: Src/builtin.c: various fixes to the
