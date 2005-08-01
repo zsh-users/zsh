@@ -1,3 +1,17 @@
+2005-08-01  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: add the as yet
+	undocumented "attribute" command.
+
+	* 21551: Matthias Kopfermann: FEATURES: file<20-> globbing
+	example is confusing.
+
+	* 21546: Doc/Zsh/params.yo: document the oddities of subscripts
+	when searching arrays.
+
+	* 21544: Thorsten Dahlheimer: configure.ac, Src/system.h: ioctl()
+	prototyping was substandard and missing on Cygwin.
+
 2005-07-31  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21553: Doc/Makefile.in, Doc/.distfiles: Create zsh.pdf

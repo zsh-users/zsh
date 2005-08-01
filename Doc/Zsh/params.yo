@@ -201,11 +201,30 @@ is the number of the matching element, so that pairs of subscripts such as
 possible if the parameter is not an associative array.  If the
 parameter is an associative array, only the value part of each pair is
 compared to the pattern, and the result is that value.
+
+If a search through an ordinary array failed, the search sets the
+subscript to one past the end of the array, and hence
+tt(${array[(r)pattern]}) will substitute the empty string.  Thus the
+success of a search can be tested by using the tt((i)) flag, for
+example (assuming the option tt(KSH_ARRAYS) is not in effect):
+
+example([[ ${array[(i)pattern]} -le ${#array} ]])
+
+If tt(KSH_ARRAYS) is in effect, the tt(-le) should be replaced by tt(-lt).
 )
 item(tt(R))(
 Like `tt(r)', but gives the last match.  For associative arrays, gives
 all possible matches. May be used for assigning to ordinary array
 elements, but not for assigning to associative arrays.
+
+Note that this flag can give odd results on failure.  For an ordinary array
+the item substituted is that corresponding to subscript 0.  If the option
+tt(KSH_ARRAYS) is not in effect, this is the same as the element
+corresponding to subscript 1, although the form tt(${array[(I)pattern]})
+will evaluate to 0 for a failed match.  If the option tt(KSH_ARRAYS) is in
+effect, the subscript is still 0 for a failed match; this cannot be
+distinguished from a successful match without testing tt(${array[0]})
+against the pattern.
 )
 item(tt(i))(
 Like `tt(r)', but gives the index of the match instead; this may not be
@@ -213,10 +232,14 @@ combined with a second argument.  On the left side of an assignment,
 behaves like `tt(r)'.  For associative arrays, the key part of each pair
 is compared to the pattern, and the first matching key found is the
 result.
+
+See `tt(r)' for discussion of subscripts of failed matches.
 )
 item(tt(I))(
 Like `tt(i)', but gives the index of the last match, or all possible
 matching keys in an associative array.
+
+See `tt(R)' for discussion of subscripts of failed matches.
 )
 item(tt(k))(
 If used in a subscript on an associative array, this flag causes the keys

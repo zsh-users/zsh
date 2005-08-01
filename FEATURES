@@ -19,7 +19,7 @@ generalized pipes (ls foo >>(cmd1) 2>>(cmd2) pipes stdout to cmd1
 arithmetic expressions
 advanced globbing:
   ls **/file  searches recursively for "file" in subdirectories
-  ls file<20->  matches file20, file30, file100, etc.
+  ls file<20->  matches file20, file21, file22, etc.
   ls *.(c|pro)  matches *.c and *.pro
   ls *(R)  matches only world-readable files
   ls *.c~lex.c  matches all .c files except lex.c
