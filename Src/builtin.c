@@ -3283,7 +3283,7 @@ mod_export LinkList bufstack;
 int
 bin_print(char *name, char **args, Options ops, int func)
 {
-    int flen, width, prec, type, argc, n, narg, curlen;
+    int flen, width, prec, type, argc, n, narg, curlen = 0;
     int nnl = 0, fmttrunc = 0, ret = 0, maxarg = 0;
     int flags[5], *len;
     char *start, *endptr, *c, *d, *flag, *buf, spec[13], *fmt = NULL;
