@@ -175,9 +175,13 @@
 >21
 >43
 
- printf '%1$*2$d' 1 2 3 4 5 6 7 8 9 10;echo
+ printf '%1$*2$d' 1 2 3 4 5 6 7 8 9 10; echo .EoL.
 0:reuse of specified arguments 
-> 1   3     5       7         9
+> 1   3     5       7         9.EoL.
+
+ echo -n 'Now is the time'; echo .EoL.
+0:testing -n with echo
+>Now is the time.EoL.
 
  printf '%1$0+.3d\n' 3
 0:flags mixed with specified argument
@@ -185,31 +189,31 @@
 
 # Test the parsing of the \c escape.
 
- echo '1 2!\c3 4' a b c d; echo
+ echo '1 2!\c3 4' a b c d; echo .EoL.
 0:Truncating first echo arg using backslash-c
->1 2!
+>1 2!.EoL.
 
- echo a b '1 2?\c5 6' c d; echo
+ echo a b '1 2?\c5 6' c d; echo .EoL.
 0:Truncating third echo arg using backslash-c
->a b 1 2?
+>a b 1 2?.EoL.
 
- printf '1 2!\n\c3 4'
+ printf '1 2!\c3 4'; echo .EoL.
 0:Truncating printf literal using backslash-c
->1 2!
+>1 2!.EoL.
 
- printf '%s %b!\n\c%s %s' 1 2 3 4 5 6 7 8 9
+ printf '%s %b!\c%s %s' 1 2 3 4 5 6 7 8 9; echo .EoL.
 0:Truncating printf format using backslash-c
->1 2!
+>1 2!.EoL.
 
  printf '%s %b!\c%s %s' '1\c' '2\n\c' 3 4 5 6 7 8 9
 0:Truncating printf early %b arg using backslash-c
 >1\c 2
 
- printf '%s %b\n' '1\c' 2 3 4 5 '6\n\c' 7 8 9
+ printf '%b %b\n' 1 2 3 4 '5\c' 6 7 8 9; echo .EoL.
 0:Truncating printf late %b arg using backslash-c
->1\c 2
+>1 2
 >3 4
->5 6
+>5.EoL.
 
 # The following usage, as stated in the manual, is not recommended and the
 # results are undefined. Tests are here anyway to ensure some form of
