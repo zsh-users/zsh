@@ -1,5 +1,8 @@
 2005-08-01  Peter Stephenson  <pws@csr.com>
 
+	* 21552: Thorsten Dahlheimer: Src/builtin.c: various fixes to the
+	print builtin.
+
 	* unposted: Completion/Unix/Command/_perforce: add the as yet
 	undocumented "attribute" command.
 

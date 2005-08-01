@@ -57,7 +57,7 @@ static struct builtin builtins[] =
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmrs", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
-    BUILTIN("echo", BINF_PRINTOPTS | BINF_SKIPINVALID, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
+    BUILTIN("echo", BINF_SKIPINVALID, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
     BUILTIN("emulate", 0, bin_emulate, 1, 1, 0, "LR", NULL),
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmrs", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
@@ -102,7 +102,7 @@ static struct builtin builtins[] =
     BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsu:z-", NULL),
     BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, NULL, NULL),
     BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "sPL", NULL),
-    BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
+    BUILTIN("pushln", 0, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "nrl", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "cd:ek:%lnpqrst:%zu:AE", NULL),
@@ -3283,11 +3283,11 @@ mod_export LinkList bufstack;
 int
 bin_print(char *name, char **args, Options ops, int func)
 {
-    int flen, width, prec, type, argc, n, narg;
+    int flen, width, prec, type, argc, n, narg, curlen;
     int nnl = 0, fmttrunc = 0, ret = 0, maxarg = 0;
     int flags[5], *len;
     char *start, *endptr, *c, *d, *flag, *buf, spec[13], *fmt = NULL;
-    char **first, *curarg, *flagch = "0+- #", save = '\0', nullstr = '\0';
+    char **first, **argp, *curarg, *flagch = "0+- #", save = '\0', nullstr = '\0';
     size_t rcount, count = 0;
 #ifdef HAVE_OPEN_MEMSTREAM
     size_t mcount;
@@ -3330,7 +3330,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	tokenize(*args);
 	if (!(pprog = patcompile(*args, PAT_STATIC, NULL))) {
 	    untokenize(*args);
-	    zwarnnam(name, "bad pattern : %s", *args, 0);
+	    zwarnnam(name, "bad pattern: %s", *args, 0);
 	    return 1;
 	}
 	for (t = p = ++args; *p; p++)
@@ -3440,7 +3440,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    len[n] = strlen(args[n]);
 
     /* -c -- output in columns */
-    if (OPT_ISSET(ops,'c') || OPT_ISSET(ops,'C')) {
+    if (!fmt && (OPT_ISSET(ops,'c') || OPT_ISSET(ops,'C'))) {
 	int l, nc, nr, sc, n, t, i;
 	char **ap;
 
@@ -3528,7 +3528,7 @@ bin_print(char *name, char **args, Options ops, int func)
 		    l = strlen(*ap);
 		    fprintf(fout, "%s", *ap);
 		    for (t = nr; t && *ap; t--, ap++);
-		    if(*ap)
+		    if (*ap)
 			for (; l < sc; l++)
 			    fputc(' ', fout);
 		} while (*ap);
@@ -3613,7 +3613,8 @@ bin_print(char *name, char **args, Options ops, int func)
     } 
     
     /* printf style output */
-    *spec='%';
+    *spec = '%';
+    argp = args;
     do {
     	rcount = count;
     	if (maxarg) {
@@ -3621,7 +3622,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    argc -= maxarg;
     	    maxarg = 0;
 	}
-	for (c = fmt;c-fmt < flen;c++) {
+	for (c = fmt; c-fmt < flen; c++) {
 	    if (*c != '%') {
 		putc(*c, fout);
 		++count;
@@ -3630,7 +3631,7 @@ bin_print(char *name, char **args, Options ops, int func)
 
 	    start = c++;
 	    if (*c == '%') {
-		putchar('%');
+		putc('%', fout);
 		++count;
 		continue;
 	    }
@@ -3648,14 +3649,16 @@ bin_print(char *name, char **args, Options ops, int func)
 		    if (narg > argc) {
 		    	zwarnnam(name, "%d: argument specifier out of range",
 				 0, narg);
+			if (fout != stdout)
+			    fclose(fout);
 			return 1;
 		    } else {
 		    	if (narg > maxarg) maxarg = narg;
 		    	curarg = *(first + narg - 1);
+			curlen = len[first - args + narg - 1];
 		    }
 		}
 	    }
-		    
 	    
 	    /* copy only one of each flag as spec has finite size */
 	    memset(flags, 0, sizeof(flags));
@@ -3679,15 +3682,17 @@ bin_print(char *name, char **args, Options ops, int func)
 		    	    zwarnnam(name,
 				     "%d: argument specifier out of range",
 				     0, narg);
+			    if (fout != stdout)
+				fclose(fout);
 			    return 1;
 			} else {
 		    	    if (narg > maxarg) maxarg = narg;
-		    	    args = first + narg - 1;
+		    	    argp = first + narg - 1;
 			}
 		    }
 		}
-		if (*args) {
-		    width = (int)mathevali(*args++);
+		if (*argp) {
+		    width = (int)mathevali(*argp++);
 		    if (errflag) {
 			errflag = 0;
 			ret = 1;
@@ -3706,16 +3711,18 @@ bin_print(char *name, char **args, Options ops, int func)
 		    		zwarnnam(name,
 					 "%d: argument specifier out of range",
 					 0, narg);
+				if (fout != stdout)
+				    fclose(fout);
 				return 1;
 			    } else {
 		    		if (narg > maxarg) maxarg = narg;
-		    		args = first + narg - 1;
+		    		argp = first + narg - 1;
 			    }
 			}
 		    }
 		    
-		    if (*args) {
-			prec = (int)mathevali(*args++);
+		    if (*argp) {
+			prec = (int)mathevali(*argp++);
 			if (errflag) {
 			    errflag = 0;
 			    ret = 1;
@@ -3731,7 +3738,10 @@ bin_print(char *name, char **args, Options ops, int func)
 	    /* ignore any size modifier */
 	    if (*c == 'l' || *c == 'L' || *c == 'h') c++;
 
-	    if (!curarg && *args) curarg = *args++;
+	    if (!curarg && *argp) {
+		curarg = *argp;
+		curlen = len[argp++ - args];
+	    }
 	    d[1] = '\0';
 	    switch (*d = *c) {
 	    case 'c':
@@ -3748,24 +3758,24 @@ bin_print(char *name, char **args, Options ops, int func)
 	    case 'b':
 		if (curarg) {
 		    int l;
-		    char *b = getkeystring(curarg, &l, 
+		    char *b = getkeystring(metafy(curarg, curlen, META_USEHEAP), &l,
 					   OPT_ISSET(ops,'b') ? 2 : 0, &nnl);
 		    /* handle width/precision here and use fwrite so that
 		     * nul characters can be output */
 		    if (prec >= 0 && prec < l) l = prec;
 		    if (width > 0 && flags[2]) width = -width;
 		    if (width > 0 && l < width)
-		    	printf("%*c", width - l, ' ');
-		    fwrite(b, l, 1, fout);
+		    	count += fprintf(fout, "%*c", width - l, ' ');
+		    count += fwrite(b, 1, l, fout);
 		    if (width < 0 && l < -width)
-		    	printf("%*c", -width - l, ' ');
-		    count += l;
+		    	count += fprintf(fout, "%*c", -width - l, ' ');
 		    if (nnl) {
 			/* If the %b arg had a \c escape, truncate the fmt. */
 			flen = c - fmt + 1;
 			fmttrunc = 1;
 		    }
-		}
+		} else
+		    count += fprintf(fout, "%*c", width, ' ');
 		break;
 	    case 'q':
 		stringval = curarg ? bslashquote(curarg, NULL, 0) : &nullstr;
@@ -3810,10 +3820,10 @@ bin_print(char *name, char **args, Options ops, int func)
 	    if (type > 0) {
 		if (curarg && (*curarg == '\'' || *curarg == '"' )) {
 		    if (type == 2) {
-			doubleval = (unsigned char)curarg[1];
+			doubleval = STOUC(curarg[1]);
 			print_val(doubleval);
 		    } else {
-			intval = (unsigned char)curarg[1];
+			intval = STOUC(curarg[1]);
 			print_val(intval);
 		    }
 		} else {
@@ -3859,19 +3869,18 @@ bin_print(char *name, char **args, Options ops, int func)
 		    }
 		}
 	    }
-	    if (maxarg && (args - first > maxarg))
-	    	maxarg = args - first;
+	    if (maxarg && (argp - first > maxarg))
+	    	maxarg = argp - first;
 	}
 
-    	if (maxarg) args = first + maxarg;
+    	if (maxarg) argp = first + maxarg;
 	/* if there are remaining args, reuse format string */
-    } while (*args && args != first && !fmttrunc && !OPT_ISSET(ops,'r'));
+    } while (*argp && argp != first && !fmttrunc && !OPT_ISSET(ops,'r'));
 
     if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s')) {
 #ifdef HAVE_OPEN_MEMSTREAM
 	putc(0, fout);
 	fflush(fout);
-	count = mcount;
 #else
 	rewind(fout);
 	buf = (char *)zalloc(count + 1);
