@@ -63,6 +63,14 @@
 0:test n format specifier
 >16
 
+ printf '%5b%n\n' abc count >/dev/null; echo $count
+0:check count of width-specified %b
+>5
+
+ printf '%s!%5b!\n' abc
+0:ensure width is applied to empty param
+>abc!     !
+
  printf '%d\n' 123
 0:test d format specifier
 >123
@@ -70,6 +78,12 @@
  printf '%g\n' 123.45
 0:test g format specifier
 >123.45
+
+ print -f 'arg: %b\n' -C2 '\x41' '\x42' '\x43'
+0:override -C when -f was given
+>arg: A
+>arg: B
+>arg: C
 
 # Is anyone not using ASCII
  printf '%d\n' \'A
