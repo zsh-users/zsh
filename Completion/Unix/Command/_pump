@@ -1,24 +1,24 @@
 #compdef pump
 
 _arguments \
-      '(-c --config-file=)'{-c,--config-file=}'[Configuratio file to use]:Configuratio file to use:_files' \
-      '(-h --hostname=)'{-h,--hostname=}'[Hostname to request]:Hostname:_hosts' \
-      '(-i --interface=)'{-i,--interface=}'[Interface to configure]:Interface:_net_interfaces' \
-      '(-k --kill)'{-k,--kill}'[Kill daemon (and disable all interfaces)]' \
-      '(-l --lease=)'{-l,--lease=}'[Lease time to request (in hours)]' \
-      '(-L --leasesecs=)'{-L,--leasesecs=}'[Lease time to request (in seconds)]' \
-      '(-r --release)'{-r,--release}'[Release interface]:Interface:_net_interfaces' \
-      '(-R --renew)'{-R,--renew}'[Force immediate lease renewal]:Interface:_net_interfaces' \
-      '(-v --verbose)'{-v,--verbose}'[Log verbose debug info]' \
-      '(-s --status)'{-s,--status}'[Display interface status]:Interface:_net_interfaces' \
-      '(-d --no-dns)'{-d,--no-dns}"[Don't update resolv.conf]" \
-      '(-? --help)'{-?,--help}'[Display help message]' \
-      "--no-gateway[Don't set a gateway for this interface]" \
-      "--no-setup[Don't set up anything]" \
-      "--no-resolvconf[Don't set up resolvconf]" \
-      '--no-bootp[Ignore non-DHCP BOOTP responses]' \
-      '--lookup-hostname[Force lookup of hostname]' \
-      '--script=[Script to use]:Script to use:_files' \
-      "--win-client-ident[Set the client identifier to match Window's]" \
-      '--usage[Display brief usage message]' \
-      ':Interface:_net_interfaces'
+  '(-c --config-file=)'{-c,--config-file=}'[specify configuration file to use]:configuration file:_files' \
+  '(-h --hostname=)'{-h,--hostname=}'[specify hostname to request]:hostname:_hosts' \
+  '(-i --interface=)'{-i,--interface=}'[specify interface to configure]:interface:_net_interfaces' \
+  '(-k --kill)'{-k,--kill}'[kill daemon (and disable all interfaces)]' \
+  '(-l --lease=)'{-l,--lease=}'[specify lease time to request]:time (hours)' \
+  '(-L --leasesecs=)'{-L,--leasesecs=}'[specify seconds to request for]:time (seconds)]' \
+  '(-r --release)'{-r,--release}'[release interface]:interface:_net_interfaces' \
+  '(-R --renew)'{-R,--renew}'[force immediate lease renewal]:interface:_net_interfaces' \
+  '(-v --verbose)'{-v,--verbose}'[log verbose debug info]' \
+  '(-s --status)'{-s,--status}'[display interface status]:interface:_net_interfaces' \
+  '(-d --no-dns)'{-d,--no-dns}"[don't update resolv.conf]" \
+  '(- *)'{-?,--help}'[display help information]' \
+  "--no-gateway[don't set a gateway for this interface]" \
+  "--no-setup[don't set up anything]" \
+  "--no-resolvconf[don't set up resolvconf]" \
+  '--no-bootp[ignore non-DHCP BOOTP responses]' \
+  '--lookup-hostname[force lookup of hostname]' \
+  '--script=[specify script to use]:script:_files' \
+  "--win-client-ident[set the client identifier to match window's]" \
+  '--usage[display brief usage message]' \
+  ':interface:_net_interfaces'

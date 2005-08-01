@@ -1,5 +1,14 @@
 2005-08-01  Oliver Kiddle  <opk@zsh.org>
 
+        * unposted: Completion/Debian/Command/_apt-move,
+	Completion/Debian/Command/_module-assistant,
+	Completion/Debian/Command/_uscan, Completion/Debian/Command/_wajig,
+	Completion/Unix/Command/_cal, Completion/Unix/Command/_ccal,
+	Completion/Unix/Command/_dhclient, Completion/Unix/Command/_fortune,
+	Completion/Unix/Command/_mencal, Completion/Unix/Command/_perforce,
+	Completion/Unix/Command/_pump, Completion/Unix/Command/_surfraw:
+	various cleanups: fix indentation and capitalisation of descriptions
+
 	* 21393: Completion/Unix/Command/_kvno: add missing local declarations
 
 2005-08-01  Peter Stephenson  <pws@csr.com>

@@ -1410,10 +1410,10 @@ _perforce_cmd_attribute() {
   # If -f is present, search unopened files, else don't
   [[ ${words[(I)-f]} -eq 0 ]] && limit=" -to"
   _arguments -s : \
-    '-e[Value is in hex]' \
-    '-f[Set the attribute on a submitted file]' \
-    '-n[Set name of attribute]:attribute: ' \
-    '-v[Set value of attribute]:value: ' \
+    '-e[value is in hex]' \
+    '-f[set the attribute on a submitted file]' \
+    '-n[set name of attribute]:attribute: ' \
+    '-v[set value of attribute]:value: ' \
     "*::file:_perforce_files$limit"
 }
 
@@ -1653,7 +1653,7 @@ _perforce_cmd_fstat() {
   if [[ ${_perforce_cmd_list[(r)attribute:*]} != '' ]]; then
     # Unsupported feature, try not to show if not present
     Oattr=' a\:show\ attributes d\:attributes\ digest e\:attributes\ in\ hex'
-    Aattr='-A[Restrict attributes by pattern]:attribute pattern: '
+    Aattr='-A[restrict attributes by pattern]:attribute pattern: '
   fi
   _arguments -s : \
     '-c+[affected since change]:change:_perforce_changes -ts' \

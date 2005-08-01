@@ -1,248 +1,77 @@
 #compdef wajig
 
-# $Id: _wajig,v 1.1 2005/01/09 06:23:58 clint Exp $
+local curcontext="$curcontext" state line cmds argno ret=1
 
-# quarl 2005-01-08 initial version
+_arguments -C -s \
+  '(- 1 *)'{-h,--help}'[print usage message]' \
+  '(- 1 *)--version[display version information]' \
+  '(-q --quiet)'{-q,--quiet}'[do everything quietly]' \
+  '(-s --simulate)'{-s,--simulate}"[trace but don't execute]" \
+  '(-t --teaching)'{-t,--teaching}'[trace the sequence of commands performed]' \
+  '(-v --verbose)'{-v,--verbose}'[increase (or set) the level of verbosity]' \
+  '1: :->cmds' \
+  '*: :->args' && ret=0
 
-# local curcontext="$curcontext" state line cmds ret=1
+case $state in
+  cmds)
+    cmds=( ${${(M)${(f)"$(wajig commands 2>/dev/null)"}:# [^-]*}/(#b) ([^ ]#) #(*)/$match[1]:$match[2]:l} )
 
-_wajig_commands=(
-    'addcdrom:add a CD-ROM to the list of available sources of packages'
-    'autoalts:mark the alternative to be auto set (using set priorities)'
-    'autoclean:remove superseded deb files from the download cache'
-    'autodownload:do an update followed by a download of all updated packages'
-    'autoinstall:perform an install without asking questions (non-interactive)'
-    'available:list versions of packages available for installation'
-    'bug:check reported bugs in package using the Debian Bug Tacker'
-    'build:retrieve/unpack sources and build .deb for the named packages'
-    'builddepend:retrieve packages required to build listed packages'
-    'changelog:retrieve latest changelog for the package'
-    'clean:remove all deb files from the download cache'
-    'commands:list all the JIG commands and one line descriptions for each'
-    'dailyupgrade:perform an update then a dist-upgrade'
-    'dependents:list of packages which depend/recommend/suggest the package'
-    'describe:one line description of packages (-v and -vv for more detail)'
-    'describenew:one line description of new packages'
-    'detail:provide a detailed description of package (describe -vv)'
-    'detailnew:provide a detailed description of new packages (describe -vv)'
-    'distupgrade:upgrade to new distribution (installed and new rqd packages)'
-    'docs:equivalent to help with -verbose=2'
-    'download:download package files ready for an install'
-    'filedownload:download packages listed in file ready for an install'
-    'fileinstall:install packages listed in a file'
-    'fileremove:remove packages listed in a file'
-    'findfile:search for a file within installed packages'
-    'findpkg:search for an unofficial Debian package at apt-get.org'
-    'fixconfigure:perform dpkg --configure -a (to fix interrupted configure)'
-    'fixinstall:perform apt-get -f install (to fix broken dependencies)'
-    'fixmissing:perform apt-get --fix-missing upgrade'
-    'force:install packages and ignore file overwrites and depends'
-    'help:print documentation (detail depends on --verbose)'
-    'hold:place listed packages on hold so they are not upgraded'
-    'init:initialise or reset the JIG archive files'
-    'install:install (or upgrade) one or more packages or .deb files'
-    'installr:install package and associated recommended packages'
-    'installrs:install package and recommended and suggested packages'
-    'installs:install package and associated suggested packages'
-    'install/dist:install packages from specified distribution'
-    'integrity:check the integrity of installed packages (through checksums)'
-    'large:list size of all large (>10MB) installed packages'
-    'lastupdate:identify when an update was last performed'
-    'list:list the status and description of installed packages'
-    'listall:list a one line description of every known package'
-    'listalts:list the objects that can have alternatives configured'
-    'listcache:list the contents of the download cache'
-    'listcommands:list all the JIG commands and one line descriptions for each'
-    'listdaemons:list the daemons that JIG can start/stop/restart'
-    'listfiles:list the files that are supplied by the named package'
-    'listhold:list those packages on hold'
-    'listinstalled:List packages (with optional argument substring) installed'
-    'listnames:list all known packages or those containing supplied string'
-    'listorphans:list libraries not required by any installed package'
-    'liststatus:same as list but only prints first two columns, not truncated'
-    'listwide:same as list but avoids truncating package names'
-    'localdist-upgrade:dist-upgrade using packages already downloaded'
-    'localupgrade:upgrade using packages already downloaded, but not any others'
-    'move:move packages in the download cache to a local Debian mirror'
-    'new:list packages that became available since last update'
-    'news:obtain the latest news about the package'
-    'newupgrades:list packages newly available for upgrading'
-    'nonfree:list installed packages that do not meet the DFSG'
-    'orphans:list libraries not required by any installed package'
-    'package:generate a .deb file for an installed package'
-    'policy:from preferences file show priorities/policy (available)'
-    'purge:remove one or more packages and configuration files'
-    'purgedepend:purge package and those it depend on and not required by others'
-    'purgeorphans:purge orphaned libraries (not required by installed packages)'
-    "readme:display the package's README file from /usr/share/doc"
-    'recdownload:download package and any it depends on'
-    'recommended:install package and associated recommended packages'
-    'reconfigure:reconfigure the named installed packages or run gkdebconf'
-    'reinstall:reinstall each of the named packages'
-    'reload:reload daemon configs, e.g., gdm, apache (see list-daemons)'
-    'remove:remove one or more packages (see also purge)'
-    'removedepend:remove package and its dependees not required by others'
-    'removeorphans Remove orphaned libraries (not required by installed packages)'
-    'repackage:generate a .deb file for an installed package'
-    'reset:initialise or reset the JIG archive files'
-    'restart:stop then start a daemon, e.g., gdm, apache (see list-daemons)'
-    'rpm2deb:convert a RedHat .rpm file to a Debian .deb file'
-    'rpminstall:install a RedHat .rpm package'
-    'rpmtodeb:convert a RedHat .rpm file to a Debian .deb file'
-    'search:search for packages containing listed words'
-    'searchapt:find local Debian archives suitable for sources.list'
-    'setup:configure the sources.list file which locates Debian archives'
-    'show:provide a detailed description of package [same as detail]'
-    'showdistupgrade:trace the steps that a dist-upgrade would perform'
-    'showinstall:trace the steps that an install would perform'
-    'showremove:trace the steps that a remove would perform'
-    'showupgrade:trace the steps that an upgrade would perform'
-    'sizes:print out the size (in K) of all, or listed, installed packages'
-    'snapshot:generates list of package=version for all installed packages'
-    'source:retrieve and unpack sources for the named packages'
-    'start:start a daemon, e.g., gdm, apache (see list-daemons)'
-    'status:show the version and available version of packages'
-    'statusmatch:show the version and available version of matching packages'
-    'statussearch:show the version and available version of matching packages'
-    'stop:stop a daemon, e.g., gdm, apache (see list-daemons)'
-    'suggested:install package and associated suggested packages'
-    'tasksel:run the Gnome task selector to install groups of packages'
-    'toupgrade:list packages with newer versions available for upgrading'
-    'unhold:remove listed packages from hold so they are again upgraded'
-    'unofficial:search for an unofficial Debian package at apt-get.org'
-    'update:update the list of down-loadable packages'
-    'updatealts:update default alternative for things like x-window-manager'
-    'upgrade:upgrade all of the installed packages or just those listed'
-    'whatis:a synonym for describe'
-    'whichpkg:find the package that supplies the given command or file'
-)
-
-_wajig_command() {
-    _describe -t commands 'aptitude command' _wajig_commands
-}
-
-_wajig_alternatives() {
-    _files -W /var/lib/dpkg/alternatives
-}
-
-_wajig_services() {
-    _files -W /etc/init.d
-}
-
-_wajig_subcommand() {
-    ((argno = CURRENT-2))
-    case ${words[2]:gs/-/} in
-        addcdrom) ;;
-        autoalts | autoalternatives) ((argno==1)) && _wajig_alternatives ;;
-        autoclean) ;;
-        autodownload) ;;
-        autoinstall) _deb_packages uninstalled ;;
-        available) _deb_packages available ;;
-        bug | bugs) ((argno==1)) && _deb_packages available ;;
-        build) _deb_packages available ;;
-        builddepend) _deb_packages available ;;
-        changelog) _deb_packages available ;;
-        clean) ;;
-        dailyupgrade) ;;
-        dependents) ((argno==1)) && _deb_packages available ;;
-        describe | whatis) _deb_packages available ;;
-        describenew) ;;
-        detail | details | show) _deb_packages available ;;
-        detailnew | newdetail) ;;
-        distupgrade) ;;
-        doc | docs) ;;
-        download) _deb_packages available ;;
-        filedownload | downloadfile) ((argno==1)) && _files ;;
-        fileinstall | installfile) ((argno==1)) && _files ;;
-        fileremove | removefile) ((argno==1)) && _files ;;
-        findfile) ((argno==1)) && _files ;;
-        findpkg | unofficial) ;; # no completion available
-        fixconfigure) ;;
-        fixinstall) ;;
-        fixmissing) ;;
-        force) _deb_packages uninstalled ;;
-        geturl) ((argno==1)) && _deb_packages available ;;
-        help) ;;
-        hold) _deb_packages installed ;;
-        init) ;;
-        install) _deb_packages uninstalled ; _files -g '*.deb' ;;
-        installr | recommended) _deb_packages uninstalled ;;
-        installrs) _deb_packages uninstalled ;;
-        installs | suggested) _deb_packages uninstalled ;;
-        install/*) _deb_packages uninstalled ;;
-        integrity) ;;
-        large) _deb_packages installed ;;
-        lastupdate) ;;
-        list | listwide) ;; # no completion available
-        listall) ;;
-        listalts | listalternatives) ;;
-        listcache) ;; # no completion available
-        listcommands | commands) ;;
-        listdaemons) ;;
-        listfiles) ((argno==1)) && _deb_packages installed ;;
-        listhold) ;;
-        listinstalled) ;; # no completion available
-        listnames) ;; # no completion available
-        listorphans | orphans) ;;
-        liststatus) ;; # no completion available
-        localdistupgrade) ;;
-        localupgrade) ;;
-        move) ;;
-        new) ;;
-        news) _deb_packages available ;;
-        newupgrades) ;;
-        nonfree) ;;
-        policy) _deb_packages available ;;
-        purge) _deb_packages xinstalled ;;
-        purgedepend) ((argno==1)) && _deb_packages xinstalled ;;
-        purgeorphans) ;;
-        readme) _deb_packages installed ;;
-        recdownload) _deb_packages available ;;
-        reconfigure) _deb_packages installed ;;
-        reinstall) _deb_packages installed ;;
-        reload) ((argno==1)) && _wajig_services ;;
-        remove) _deb_packages installed ;;
-        removedepend) _deb_packages installed ;;
-        removeorphans) ;;
-        repackage | package) ((argno==1)) && _deb_packages installed ;;
-        reset) ;;
-        restart)  ((argno==1)) && _wajig_services ;;
-        rpminstall) ((argno==1)) && _files -g '*.rpm' ;;
-        rpmtodeb | rpm2deb) ((argno==1)) && _files -g '*.rpm' ;;
-        search) ;; # no completions available
-        searchapt) compadd stable testing unstable ;;
-        setup | editsources) ;;
-        showdistupgrade) ;;
-        showinstall) _deb_packages uninstalled ;;
-        showremove) _deb_packages installed ;;
-        showupgrade) ;;
-        size | sizes) _deb_packages installed ;;
-        snapshot) ;;
-        source)  _deb_packages available ;;
-        start) ((argno==1)) && _wajig_services ;;
-        status) _deb_packages available ;;
-        statusmatch | satussearch) ;; # no completion available
-        stop) ((argno==1)) && _wajig_services ;;
-        tasksel) ;;
-        toupgrade) ;;
-        unhold) _deb_packages held ;;
-        update) ;;
-        updatealts) ((argno==1)) && _wajig_alternatives ;;
-        upgrade) _deb_packages installed ;;
-        whichpkg) _files ;;
+    _describe -t commands 'wajig command' cmds && ret=0
+  ;;
+  args)
+    (( argno = $#line-1 ))
+    case ${line[1]:gs/-/} in
+      autoalts|autoalternatives|updatealts)
+	((argno==1)) && _wanted alternatives expl alternative \
+	    _files -W /var/lib/dpkg/alternatives && ret=0
+      ;;
+      listfiles|repackage|package)
+	((argno==1)) || break
+      ;&
+      hold|large|readme|reconfigure|reinstall|remove|removedepend|showremove|size?|upgrade)
+	_wanted package expl 'package' _deb_packages installed && ret=0
+      ;;
+      purgedepend)
+	((argno==1)) && _wanted package expl 'package' _deb_packages xinstalled && ret=0
+      ;;
+      purge)
+	_wanted package expl 'package' _deb_packages xinstalled && ret=0
+      ;;
+      autoinstall|force|showinstall|installr|recommended|installrs|installs|suggested|install/*)
+	_wanted package expl 'package' _deb_packages uninstalled && ret=0
+      ;;
+      install)
+	_alternative \
+	  'packages:package:_deb_packages uninstalled' \
+	  'files:package file:_files -g "*.deb(-.)"' && ret=0
+      ;;
+      bug|bugs|dependents|geturl)
+	((argno==1)) || break
+      ;&
+      available|build|builddepend|changelog|describe|whatis|detail|details|show|news|policy|download|source|status|recdownload)
+	_wanted package expl 'package' _deb_packages available && ret=0
+      ;;
+      unhold)
+	_wanted package expl 'package' _deb_packages held && ret=0
+      ;;
+      filedownload|downloadfile|fileinstall|installfile|fileremove|removefile|indfile)
+	((argno==1)) && _files && ret=0
+      ;;
+      whichpkg)
+	_files
+      ;;
+      rpminstall|rpmtodeb|rpm2deb)
+	((argno==1)) && _files -g '*.rpm(-.)' && ret=0
+      ;;
+      searchapt)
+	_wanted distributions expl distribution \
+	    compadd stable testing unstable && ret=0
+      ;;
+      reload|restart|start|stop)
+	((argno==1)) && _services && ret=0
+      ;;
     esac
-}
+  ;;
+esac
 
-_wajig() {
-    _arguments -s \
-        '(- 1 *)'{-h,--help}'[print usage message]' \
-        '(- 1 *)--version[display version information]' \
-        '(-q --quiet)'{-q,--quiet}'[do everything quietly]' \
-        '(-s --simulate)'{-s,--simulate}"[trace but don't execute]" \
-        '(-t --teaching)'{-t,--teaching}'[trace the sequence of commands performed]' \
-        '(-v --verbose)'{-v,--verbose}'[increase (or set) the level of verbosity]' \
-        '1: :_wajig_command' \
-        '*: :_wajig_subcommand'
-}
-
-_wajig $@
+return ret
