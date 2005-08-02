@@ -5,6 +5,8 @@
 
 2005-08-01  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* unposted: Src/builtin.c: silenced a compiler warning.
+
 	* unposted: Test/B03print.ztst: some slight improvements to
 	the existing no-newline test cases, plus a few more tests.
 
