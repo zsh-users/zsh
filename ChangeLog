@@ -1,3 +1,8 @@
+2005-08-02  Peter Stephenson  <pws@csr.com>
+
+	* 21557: Thorsten Dahlheimer: Src/glob.c: BRACE_CCL was broken
+	for character 255.
+
 2005-08-01  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Test/B03print.ztst: some slight improvements to

@@ -1919,7 +1919,7 @@ xpandbraces(LinkList list, LinkNode *np)
 	}
 	pl = str - str3;
 	len = pl + strlen(++str2) + 2;
-	for (p = ccl + 255; p-- > ccl;)
+	for (p = ccl + 256; p-- > ccl;)
 	    if (*p) {
 		c1 = p - ccl;
 		if (imeta(c1)) {
