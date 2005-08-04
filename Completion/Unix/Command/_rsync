@@ -1,11 +1,32 @@
 #compdef rsync
 
+_rsync_user_or_host() {
+  local suf=$1 rsync
+  shift
+
+  if compset -P 1 '*@'; then
+    local user=${PREFIX%%@*}
+
+    _wanted -C user-at hosts expl "host for $user" \
+	_combination -s '[:@]' "${tag}" users-hosts users="$user" hosts -S "$suf" "$@" -
+  elif compset -S '@*'; then
+      _wanted users expl "user" \
+	  _combination -s '[:@]' "${tag}" users-hosts users -q "$@" -
+  else
+    [[ $words[CURRENT] = rsync://* ]] || rsync='rsync:rsync: compadd -S "" rsync://'
+    _alternative \
+      'users:user:_users -S @' \
+      "hosts:host:_hosts -S '$suf'" \
+      $rsync
+  fi
+}
+
 _rsync_remote_files() {
 local expl remfiles remdispf remdispd remmodules suf ret=1 tag=accounts
 
-if compset -P '*::*/'; then
+if compset -P '*::*/' || compset -P 'rsync://*/*/'; then
 
-  remfiles=(${(f)"$(_call_program files rsync ${words[CURRENT]%/*}/)"})
+  remfiles=(${${(f)"$(_call_program files rsync ${words[CURRENT]%/*}/ 2>/dev/null)"}:#([ 	]|MOTD:)*})
 
   remdispf=(${remfiles:#d*})
   remdispd=(${(M)remfiles:#d*})
@@ -16,14 +37,24 @@ if compset -P '*::*/'; then
   _wanted files expl 'remote file or directory' \
       compadd -S/ -d remdispd ${remdispd##* }
 
-elif compset -P 1 '*::'; then
+elif compset -P 1 '*::' || compset -P 1 'rsync://*/'; then
 
-  remfiles=(${(f)"$(_call_program files rsync ${words[CURRENT]%::*}::)"})
+  local pat=${words[CURRENT]}
 
-  remmodules=(${remfiles/[ 	]#/:})
+  if [[ $pat = *::* ]]; then
+    pat=${pat%::*}::
+  else
+    pat=${pat%/*}/
+  fi
+
+  remfiles=(${${(f)"$(_call_program files rsync $pat 2>/dev/null)"}:#([ 	]|MOTD:)*})
+
+  remmodules=(${remfiles/[ 	]##/:})
 
   _describe "remote modules" remmodules -S/
 
+elif compset -P 'rsync://'; then
+  _rsync_user_or_host / "$@"
 elif compset -P 1 '*:'; then
 
   if zstyle -T ":completion:${curcontext}:files" remote-access; then
@@ -48,20 +79,8 @@ elif compset -P 1 '*:'; then
     _message -e remote-files 'remote file'
   fi
 
-elif compset -P 1 '*@'; then
-  local user=${PREFIX%%@*}
-
-  compset -S ':*' || suf=":"
-
-  _wanted -C user-at hosts expl "host for $user" \
-      _combination -s '[:@]' "${tag}" users-hosts users="$user" hosts -S "$suf" "$@" -
 else
-  if compset -S '@*'; then
-    _wanted users expl "user" \
-	_combination -s '[:@]' "${tag}" users-hosts users -q "$@" -
-  else
-    _alternative 'users:user:_users -S @' 'hosts:host:_hosts -S:'
-  fi
+  _rsync_user_or_host : "$@"
 fi
 
 }
