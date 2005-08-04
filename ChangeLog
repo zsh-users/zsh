@@ -1,6 +1,12 @@
+2005-08-04  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: brought over the
+	version from the trunk, which has improvements in completing
+	hostnames, users, and remote files.
+
 2005-08-04  Peter Stephenson  <pws@csr.com>
 
-	* unposted: Completion/Unix/Command/_subversion changes from
+	* unposted: Completion/Unix/Command/_subversion: changes from
 	current head revision.
 
 2005-07-29  Wayne Davison  <wayned@users.sourceforge.net>
