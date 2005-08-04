@@ -71,13 +71,15 @@
 0:ensure width is applied to empty param
 >abc!     !
 
- printf '%d\n' 123
+ printf '%d %d\n' 123.45 678 90.1
 0:test d format specifier
->123
+>123 678
+>90 0
 
- printf '%g\n' 123.45
+ printf '%g %g\n' 123.45 678 90.1
 0:test g format specifier
->123.45
+>123.45 678
+>90.1 0
 
  print -f 'arg: %b\n' -C2 '\x41' '\x42' '\x43'
 0:override -C when -f was given
