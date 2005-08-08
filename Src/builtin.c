@@ -3774,7 +3774,7 @@ bin_print(char *name, char **args, Options ops, int func)
 			flen = c - fmt + 1;
 			fmttrunc = 1;
 		    }
-		} else
+		} else if (width)
 		    count += fprintf(fout, "%*c", width, ' ');
 		break;
 	    case 'q':
