@@ -1054,7 +1054,7 @@ adjustwinsize(int from)
 	winchanged =
 #endif /* TIOCGWINSZ */
 	    resetneeded = 1;
-	zrefresh();
+	trashzle();
     }
 }
 

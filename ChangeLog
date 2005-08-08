@@ -1,3 +1,8 @@
+2005-08-08  Peter Stephenson  <pws@csr.com>
+
+	* 21567: Dan Bullok: Src/utils.c: trash zle when updating window
+	size since otherwise multiline prompts get screwed up.
+
 2005-08-04  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync: brought over the
