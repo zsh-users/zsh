@@ -1,3 +1,8 @@
+2005-08-07  Clint Adams  <clint@zsh.org>
+
+	unposted: Completion/Unix/Command/_mencal: fix syntax error
+	introduced by recent cleanup.
+
 2005-08-02  Peter Stephenson  <pws@csr.com>
 
 	* 21557: Thorsten Dahlheimer: Src/glob.c: BRACE_CCL was broken

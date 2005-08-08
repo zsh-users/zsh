@@ -14,7 +14,7 @@ _arguments -C \
   '(-)'{-V,--version}'[print version information]' \
   \*{-c,--config}'[config]:options:->option' && ret=0
 
-if [[ $state = option ]]; do
+if [[ $state = option ]]; then
   _values -s , 'config option' \
     '(s start)'{s,start}'[start day]:day' \
     '(l length)'{l,length}'[period length]:length' \
