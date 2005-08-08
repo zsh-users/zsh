@@ -1,5 +1,8 @@
 2005-08-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 21570: Completion/Unix/Command/_subversion: complete for the
+	help sub-command
+
 	* unposted: Completion/Linux/Command/_brctl: new brctl completion
 
 	* 21566: Tobias Gruetzmacher: Completion/Unix/Command/_darcs:
