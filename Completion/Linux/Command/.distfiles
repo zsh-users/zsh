@@ -1,5 +1,5 @@
 DISTFILES_SRC='
 .distfiles
-_acpi _iptables _iwconfig _losetup _mii-tool _modutils _mondo _pkgtool
+_acpi _brctl _iptables _iwconfig _losetup _mii-tool _modutils _mondo _pkgtool
 _tune2fs _uml _valgrind _yast
 '

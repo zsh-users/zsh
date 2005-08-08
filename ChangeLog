@@ -1,5 +1,7 @@
 2005-08-08  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Linux/Command/_brctl: new brctl completion
+
 	* 21566: Tobias Gruetzmacher: Completion/Unix/Command/_darcs:
 	fix to list all repositories
 
