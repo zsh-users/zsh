@@ -200,7 +200,7 @@ done
 
 if [[ -z $TCP_SESS ]]; then
     [[ -z $quiet ]] && print "Setting default TCP session $sessnames[1]"
-    TCP_SESS=$sessnames[1]
+    typeset -g TCP_SESS=$sessnames[1]
 fi
 
 return $stat

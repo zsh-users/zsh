@@ -1361,6 +1361,14 @@ struct paramdef {
 #define setsparam(S,V) assignsparam(S,V,0)
 #define setaparam(S,V) assignaparam(S,V,0)
 
+/*
+ * Flags for assignsparam and assignaparam.
+ */
+enum {
+    ASSPM_AUGMENT = 1 << 0,
+    ASSPM_WARN_CREATE = 1 << 1
+};
+
 /* node for named directory hash table (nameddirtab) */
 
 struct nameddir {
@@ -1624,6 +1632,7 @@ enum {
     UNSET,
     VERBOSE,
     VIMODE,
+    WARNCREATEGLOBAL,
     XTRACE,
     USEZLE,
     DVORAK,

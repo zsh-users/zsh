@@ -135,7 +135,9 @@ elif (( ! $#read_fds )); then
   read_fds[$tcp_by_name[$TCP_SESS]]=1
 fi
 
+typeset -ga tcp_lines
 tcp_lines=()
+
 local helper_stat=2 skip tpat reply REPLY
 float newtimeout
 
@@ -217,7 +219,7 @@ while (( ${#read_fds} )); do
         $noprint "$line"
     # REPLY is now set to the line with an appropriate prompt.
     tcp_lines+=($REPLY)
-    TCP_LINE=$REPLY TCP_LINE_FD=$read_fd
+    typeset -g TCP_LINE="$REPLY" TCP_LINE_FD="$read_fd"
 
     # Only handle one line from one device at a time unless draining.
     [[ -z $drain ]] && return $stat

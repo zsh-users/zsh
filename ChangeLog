@@ -1,5 +1,12 @@
 2005-08-08  Peter Stephenson  <pws@csr.com>
 
+	* 21575 plus unposted changes to Functions/TCP/*:
+	Completion/compinit, Doc/Zsh/options.yo, Functions/TCP/tcp_expect,
+	Functions/TCP/tcp_open, Functions/TCP/tcp_read, Src/exec.c,
+	Src/options.c, Src/params.c, Src/zsh.h: Add WARN_CREATE_GLOBAL
+	option to warn when an assignment in a function creates a globa
+	parameter.
+
 	* 21567: Dan Bullok: Src/utils.c: trash zle when updating window
 	size since otherwise multiline prompts get screwed up.
 

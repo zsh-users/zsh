@@ -84,6 +84,7 @@ while getopts "al:p:qs:t:T:" _expect_opt; do
 done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
+typeset -ga tcp_expect_lines
 tcp_expect_lines=()
 while true; do
   if (( _expect_to_all || _expect_to1 )); then

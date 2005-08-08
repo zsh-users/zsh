@@ -1990,7 +1990,7 @@ gethkparam(char *s)
 
 /**/
 mod_export Param
-assignsparam(char *s, char *val, int augment)
+assignsparam(char *s, char *val, int flags)
 {
     struct value vbuf;
     Value v;
@@ -2011,12 +2011,14 @@ assignsparam(char *s, char *val, int augment)
 	*ss = '\0';
 	if (!(v = getvalue(&vbuf, &s, 1)))
 	    createparam(t, PM_ARRAY);
+	else
+	    flags &= ~ASSPM_WARN_CREATE;
 	*ss = '[';
 	v = NULL;
     } else {
 	if (!(v = getvalue(&vbuf, &s, 1)))
 	    createparam(t, PM_SCALAR);
-	else if ((((v->pm->flags & PM_ARRAY) && !augment) ||
+	else if ((((v->pm->flags & PM_ARRAY) && !(flags & ASSPM_AUGMENT)) ||
 	    	 (v->pm->flags & PM_HASHED)) &&
 		 !(v->pm->flags & (PM_SPECIAL|PM_TIED)) && 
 		 unset(KSHARRAYS)) {
@@ -2024,13 +2026,18 @@ assignsparam(char *s, char *val, int augment)
 	    createparam(t, PM_SCALAR);
 	    v = NULL;
 	}
+	else
+	    flags &= ~ASSPM_WARN_CREATE;
     }
     if (!v && !(v = getvalue(&vbuf, &t, 1))) {
 	unqueue_signals();
 	zsfree(val);
 	return NULL;
     }
-    if (augment) {
+    if ((flags & ASSPM_WARN_CREATE) && v->pm->level == 0)
+	zwarn("scalar parameter %s created globally in function",
+	      v->pm->nam, 0);
+    if (flags & ASSPM_AUGMENT) {
 	if (v->start == 0 && v->end == -1) {
 	    switch (PM_TYPE(v->pm->flags)) {
 	    case PM_SCALAR:
@@ -2109,7 +2116,7 @@ assignsparam(char *s, char *val, int augment)
 
 /**/
 mod_export Param
-assignaparam(char *s, char **val, int augment)
+assignaparam(char *s, char **val, int flags)
 {
     struct value vbuf;
     Value v;
@@ -2127,6 +2134,8 @@ assignaparam(char *s, char **val, int augment)
 	*ss = '\0';
 	if (!(v = getvalue(&vbuf, &s, 1)))
 	    createparam(t, PM_ARRAY);
+	else
+	    flags &= ~ASSPM_WARN_CREATE;
 	*ss = '[';
 	if (v && PM_TYPE(v->pm->flags) == PM_HASHED) {
 	    unqueue_signals();
@@ -2143,7 +2152,7 @@ assignaparam(char *s, char **val, int augment)
 	else if (!(PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
 		 !(v->pm->flags & (PM_SPECIAL|PM_TIED))) {
 	    int uniq = v->pm->flags & PM_UNIQUE;
-	    if (augment) {
+	    if (flags & ASSPM_AUGMENT) {
 	    	/* insert old value at the beginning of the val array */
 		char **new;
 		int lv = arrlen(val);
@@ -2153,12 +2162,13 @@ assignaparam(char *s, char **val, int augment)
 		memcpy(new+1, val, sizeof(char *) * (lv + 1));
 		free(val);
 		val = new;
-		
 	    }
 	    unsetparam(t);
 	    createparam(t, PM_ARRAY | uniq);
 	    v = NULL;
 	}
+	else
+	    flags &= ~ASSPM_WARN_CREATE;
     }
     if (!v)
 	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING))) {
@@ -2167,7 +2177,10 @@ assignaparam(char *s, char **val, int augment)
 	    return NULL;
 	}
 
-    if (augment) {
+    if ((flags & ASSPM_WARN_CREATE) && v->pm->level == 0)
+	zwarn("array parameter %s created globally in function",
+	      v->pm->nam, 0);
+    if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->flags) & PM_ARRAY) {
 	    	v->start = arrlen(v->pm->gsu.a->getfn(v->pm));

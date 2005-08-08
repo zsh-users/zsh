@@ -1649,10 +1649,14 @@ addvars(Estate state, Wordcode pc, int export)
     LinkList vl;
     int xtr, isstr, htok = 0;
     char **arr, **ptr, *name;
+    int flags, augment;
+
     Wordcode opc = state->pc;
     wordcode ac;
     local_list1(svl);
 
+    flags = (locallevel > 0 && isset(WARNCREATEGLOBAL)) ?
+	ASSPM_WARN_CREATE : 0;
     xtr = isset(XTRACE);
     if (xtr) {
 	printprompt4();
@@ -1660,12 +1664,15 @@ addvars(Estate state, Wordcode pc, int export)
     }
     state->pc = pc;
     while (wc_code(ac = *state->pc++) == WC_ASSIGN) {
+	int myflags = flags;
 	name = ecgetstr(state, EC_DUPTOK, &htok);
 	if (htok)
 	    untokenize(name);
+	if (WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC)
+	    myflags |= ASSPM_AUGMENT;
 	if (xtr)
 	    fprintf(xtrerr,
-	    	WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC ? "%s+=" : "%s=", name);
+		WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC ? "%s+=" : "%s=", name);
 	if ((isstr = (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR))) {
 	    init_list1(svl, ecgetstr(state, EC_DUPTOK, &htok));
 	    vl = &svl;
@@ -1716,12 +1723,10 @@ addvars(Estate state, Wordcode pc, int export)
 		}
 		allexp = opts[ALLEXPORT];
 		opts[ALLEXPORT] = 1;
-	    	pm = assignsparam(name, val,
-		    WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
+	    	pm = assignsparam(name, val, myflags);
 		opts[ALLEXPORT] = allexp;
 	    } else
-	    	pm = assignsparam(name, val,
-		    WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
+	    	pm = assignsparam(name, val, myflags);
 	    if (errflag) {
 		state->pc = opc;
 		return;
@@ -1746,7 +1751,7 @@ addvars(Estate state, Wordcode pc, int export)
 	    }
 	    fprintf(xtrerr, ") ");
 	}
-	assignaparam(name, arr, WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
+	assignaparam(name, arr, myflags);
 	if (errflag) {
 	    state->pc = opc;
 	    return;

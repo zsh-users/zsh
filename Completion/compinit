@@ -146,6 +146,7 @@ _comp_options=(
     NO_aliases
     NO_errexit
     NO_octalzeroes
+    NO_warncreateglobal
 )
 
 # And this one should be `eval'ed at the beginning of every entry point
