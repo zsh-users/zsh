@@ -1649,7 +1649,7 @@ addvars(Estate state, Wordcode pc, int export)
     LinkList vl;
     int xtr, isstr, htok = 0;
     char **arr, **ptr, *name;
-    int flags, augment;
+    int flags;
 
     Wordcode opc = state->pc;
     wordcode ac;
