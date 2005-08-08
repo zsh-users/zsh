@@ -1,3 +1,8 @@
+2005-08-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 21566: Tobias Gruetzmacher: Completion/Unix/Command/_darcs:
+	fix to list all repositories
+
 2005-08-07  Clint Adams  <clint@zsh.org>
 
 	unposted: Completion/Unix/Command/_mencal: fix syntax error

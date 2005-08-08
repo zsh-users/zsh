@@ -69,6 +69,8 @@ if (( CURRENT > 2 )); then
 	  action[i]='_users' ;;
 	EMAIL|FROM)
 	  action[i]='_email_addresses' ;;
+	URL)
+	  action[i]='_darcs_repository_or_tree' ;;
 	*)
  	  action[i]='' ;;
  	esac
@@ -249,17 +251,14 @@ _darcs_controlled_files() {
 
 (( $+functions[_darcs_repositories] )) ||
 _darcs_repositories() {
-    local local_repos_path="$(_darcs_absolute_tree_root)/_darcs/prefs/repos"
-    local global_repos_path="$HOME/.darcs/repos"
-    local -a local_repos global_repos
-    local -a global_repos
-    [[ -e $local_repos_path ]] && cat $local_repos_path | read -A local_repos
-    [[ -e $global_repos_path ]] && cat $global_repos_path | read -A global_repos
-    local_repos=${local_repos:# #}
-    global_repos=${global_repos:# #}
-    _description repositories expl "repositories"
-    (( ${#local_repos} )) && compadd "$expl[@]" -- "$local_repos[@]"
-    (( ${#global_repos} )) && compadd "$expl[@]" -- "$global_repos[@]"
+  local local_repos_path="$(_darcs_absolute_tree_root)/_darcs/prefs/repos"
+  local global_repos_path="$HOME/.darcs/repos"
+  local -a local_repos global_repos
+  [[ -e $local_repos_path ]] && local_repos=( $(<$local_repos_path) )
+  [[ -e $global_repos_path ]] && global_repos=( $(<$global_repos_path) )
+  _description repositories expl "repositories"
+  (( ${#local_repos} )) && compadd "$expl[@]" -- "$local_repos[@]"
+  (( ${#global_repos} )) && compadd "$expl[@]" -- "$global_repos[@]"
 }
 
 
