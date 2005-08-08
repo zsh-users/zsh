@@ -1,5 +1,7 @@
 2005-08-08  Peter Stephenson  <pws@csr.com>
 
+	* 21576: Test/E01options.ztst: test for 21575.
+
 	* unposted: Src/exec.c: removed unnecessary augment variable from
 	21575
 
