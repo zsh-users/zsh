@@ -142,7 +142,7 @@
  print -m -f 'format - %s.\n' 'z' a b c
 0:format not printed if no arguments left after -m removal
 
- print -f 'format - %s.\n'
+ print -f 'format - %s%b.\n'
 0:format printed despite lack of arguments
 >format - .
 
