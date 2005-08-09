@@ -65,6 +65,7 @@
 >Exited.
 
   fn1() {
+    trap -
     trap
     trap 'print INT1' INT
     fn2() { trap 'print INT2' INT; trap; }
@@ -79,6 +80,7 @@
 >trap -- 'print INT1' INT
 
    fn1() {
+    trap -
     trap
     TRAPINT() { print INT1; }
     fn2() { TRAPINT() { print INT2; }; trap; }
@@ -87,7 +89,7 @@
     trap
   }
   fn1
-0: Nested `trap ... INT', not triggered
+0: Nested TRAPINT, not triggered
 >TRAPINT () {
 >	print INT1
 >}
@@ -99,6 +101,7 @@
 >}
 
   fn1() {
+    trap -
     trap 'print INT1' INT
     fn2() { trap - INT; trap; }
     trap
