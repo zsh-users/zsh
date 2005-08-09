@@ -1356,6 +1356,17 @@ resetprompt(UNUSED(char **args))
     return redisplay(NULL);
 }
 
+/* Same but called from outside zle */
+
+/**/
+mod_export void
+zle_resetprompt(void)
+{
+    reexpandprompt();
+    if (zleactive)
+	redisplay(NULL);
+}
+
 /**/
 mod_export void
 trashzle(void)

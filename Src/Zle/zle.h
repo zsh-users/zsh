@@ -28,9 +28,9 @@
  */
 
 #undef trashzle
+#undef zle_resetprompt
 #undef zleread
 #undef spaceinline
-#undef gotword
 #undef zrefresh
 
 typedef struct widget *Widget;
@@ -143,7 +143,7 @@ typedef struct cutbuffer *Cutbuffer;
 
 #define CUTBUFFER_LINE 1   /* for vi: buffer contains whole lines of data */
 
-#define KRINGCT 8   /* number of buffers in the kill ring */
+#define KRINGCTDEF 8   /* default number of buffers in the kill ring */
 
 /* Types of completion. */
 

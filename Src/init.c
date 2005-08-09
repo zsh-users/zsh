@@ -1125,6 +1125,8 @@ noop_function_int(UNUSED(int nothing))
 /**/
 mod_export ZleVoidFn trashzleptr = noop_function;
 /**/
+mod_export ZleVoidFn zle_resetpromptptr = noop_function;
+/**/
 mod_export ZleVoidFn refreshptr = noop_function;
 /**/
 mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
@@ -1136,6 +1138,7 @@ mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 #else /* !LINKED_XMOD_zshQszle */
 
 mod_export ZleVoidFn trashzleptr = noop_function;
+mod_export ZleVoidFn zle_resetpromptptr = noop_function;
 mod_export ZleVoidFn refreshptr = noop_function;
 mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
 # ifdef UNLINKED_XMOD_zshQszle
