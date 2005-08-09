@@ -1,3 +1,9 @@
+2005-08-08  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21584: Src/builtin.c, Test/B03print.ztst: fixed a bug in printf
+	%b (introduced in the 21552 changes) where a missing arg could not
+	be printed with a zero width.
+
 2005-08-08  Peter Stephenson  <pws@csr.com>
 
 	* 21576: Test/E01options.ztst: test for 21575.
