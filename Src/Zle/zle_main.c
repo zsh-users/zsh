@@ -1481,6 +1481,17 @@ resetprompt(UNUSED(char **args))
     return redisplay(NULL);
 }
 
+/* same bug called from outside zle */
+
+/**/
+mod_export void
+zle_resetprompt(void)
+{   reexpandprompt();
+    if (zleactive)
+        redisplay(NULL);
+}
+
+
 /**/
 mod_export void
 trashzle(void)
@@ -1572,6 +1583,7 @@ setup_(UNUSED(Module m))
 {
     /* Set up editor entry points */
     trashzleptr = trashzle;
+    zle_resetpromptptr = zle_resetprompt;
     zrefreshptr = zrefresh;
     zleaddtolineptr = zleaddtoline;
     zlegetlineptr = zlegetline;
@@ -1659,6 +1671,7 @@ finish_(UNUSED(Module m))
 
     /* editor entry points */
     trashzleptr = noop_function;
+    zle_resetpromptptr = noop_function;
     zrefreshptr = noop_function;
     zleaddtolineptr = noop_function_int;
     zlegetlineptr = NULL;

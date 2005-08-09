@@ -37,7 +37,7 @@
 # `:<<\Make' and `Make' -- this will be copied into Makemod.in.
 #
 # The resulting Makemod.in knows how to build each module that is defined.
-# For each module in also knows how to build a .mdh file.  Each source file
+# For each module it also knows how to build a .mdh file.  Each source file
 # should #include the .mdh file for the module it is a part of.  The .mdh
 # file #includes the .mdh files for any module dependencies, then each of
 # $headers, and then each .epro (for global declarations).  It will
@@ -92,7 +92,7 @@ if $first_stage; then
 
     dir_top=`echo $the_subdir | sed 's,[^/][^/]*,..,g'`
 
-    trap "rm -f $the_subdir/${the_makefile}.in" 1 2 15
+    trap "rm -f $the_subdir/${the_makefile}.in; exit 1" 1 2 15
     echo "creating $the_subdir/${the_makefile}.in"
     exec 3>&1 >$the_subdir/${the_makefile}.in
     echo "##### ${the_makefile}.in generated automatically by mkmakemod.sh"
@@ -466,11 +466,11 @@ if $first_stage; then
 fi
 
 if $second_stage ; then
-    trap "rm -f $the_subdir/${the_makefile}" 1 2 15
+    trap "rm -f $the_subdir/${the_makefile}; exit 1" 1 2 15
 
     ${CONFIG_SHELL-/bin/sh} ./config.status \
 	--file=$the_subdir/${the_makefile}:$the_subdir/${the_makefile}.in ||
-    return 1
+    exit 1
 fi
 
 exit 0

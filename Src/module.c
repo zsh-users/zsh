@@ -1043,7 +1043,6 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
      */
     LinkNode node;
     Module m;
-    int ret = 0;
 
     if (!*args) {
 	if (OPT_ISSET(ops,'R')) {
@@ -1058,7 +1057,7 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
 	return 0;
     }
 
-    for (; !ret && *args; args++) {
+    for (; *args; args++) {
 	char *eqpos = strchr(*args, '=');
 	char *aliasname = eqpos ? eqpos+1 : NULL;
 	if (eqpos)
@@ -1078,8 +1077,7 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
 		m = (Module) getdata(node);
 		if (!(m->flags & MOD_ALIAS)) {
 		    zwarnnam(nam, "module is not an alias: %s", *args, 0);
-		    ret = 1;
-		    break;
+		    return 1;
 		}
 		delete_module(node);
 	    } else {
@@ -1093,12 +1091,15 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
 		    zwarnnam(nam, "invalid module name `%s'", aliasname, 0);
 		    return 1;
 		}
-		find_module(aliasname, 1, &mname);
-		if (!strcmp(mname, *args)) {
-		    zwarnnam(nam, "module alias would refer to itself: %s",
-			     *args, 0);
-		    return 1;
-		}
+		do {
+		    if (!strcmp(mname, *args)) {
+			zwarnnam(nam, "module alias would refer to itself: %s",
+				 *args, 0);
+			return 1;
+		    }
+		} while ((node = find_module(mname, 0, NULL))
+			 && ((m = (Module) getdata(node))->flags & MOD_ALIAS)
+			 && (mname = m->u.alias));
 		node = find_module(*args, 0, NULL);
 		if (node) {
 		    m = (Module) getdata(node);

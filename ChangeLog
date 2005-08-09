@@ -1,5 +1,14 @@
 2005-08-09  Peter Stephenson  <pws@csr.com>
 
+	* 21583: Thorsten Dahlheimer: Src/module.c: extend circularity
+	test of zmodload -A.
+
+	* 21582: Thorsten Dahlheimer: Src/module.c: failure status of
+	zmodload -R was wrong.
+
+	* 21578: Thorsten Dahlheimer: Src/mkmakemod.sh: script used not
+	to exit after cleaning up.
+
 	* 21577 (adapted): Dan Bullok: Src/Zle/zle_main.c, Src/init.c,
 	Src/utils.c: improved 21567 which reexpands the prompt and
 	refreshes but doesn't trash the line editor.
