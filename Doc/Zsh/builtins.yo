@@ -1154,15 +1154,24 @@ and for processes run from the shell.
 findex(trap)
 cindex(signals, trapping)
 cindex(trapping signals)
-item(tt(trap) [ var(arg) [ var(sig) ... ] ])(
+item(tt(trap) [ var(arg) ] [ var(sig) ... ])(
 var(arg) is a series of commands (usually quoted to protect it from
 immediate evaluation by the shell) to be read and executed when the shell
-receives var(sig).  Each var(sig) can be given as a number,
+receives any of the signals var(sig).
+Each var(sig) can be given as a number,
 or as the name of a signal either with or without the string tt(SIG)
 in front.
-If var(arg) is `tt(-)', then all traps var(sig) are reset to their
-default values.  If var(arg) is the empty string, then this signal
-is ignored by the shell and by the commands it invokes.
+If var(arg) is `tt(-)', then the specified signals are reset to their
+defaults, or, if no var(sig) args are present, all traps are reset.
+If var(arg) is an empty string, then the specified signals
+are ignored by the shell (and by the commands it invokes).
+
+If var(arg) is omitted but one or more var(sig) args are provided (i.e.
+the first argument is a valid signal number or name), the effect is the
+same as if var(arg) had been specified as `tt(-)'.
+
+The tt(trap) command with no arguments prints a list of commands
+associated with each signal.
 
 If var(sig) is tt(ZERR) then var(arg) will be executed
 after each command with a nonzero exit status.  tt(ERR) is an alias
@@ -1177,10 +1186,7 @@ If var(sig) is tt(0) or tt(EXIT)
 and the tt(trap) statement is not executed inside the body of a function,
 then the command var(arg) is executed when the shell terminates.
 
-tt(ZERR), tt(DEBUG) and tt(EXIT) traps are not executed inside other traps.
-
-The tt(trap) command with no arguments prints a list of commands
-associated with each signal.
+tt(ZERR), tt(DEBUG), and tt(EXIT) traps are not executed inside other traps.
 
 Note that traps defined with the tt(trap) builtin are slightly different
 from those defined as `tt(TRAP)var(NAL) () { ... }', as the latter have
