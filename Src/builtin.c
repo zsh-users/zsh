@@ -5017,13 +5017,20 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     /* If we have a signal number, unset the specified *
      * signals.  With only -, remove all traps.        */
     if ((getsignum(*argv) != -1) || (!strcmp(*argv, "-") && argv++)) {
-	if (!*argv)
+	if (!*argv) {
 	    for (sig = 0; sig < VSIGCOUNT; sig++)
 		unsettrap(sig);
-	else
-	    while (*argv)
-		unsettrap(getsignum(*argv++));
-	return 0;
+	} else {
+	    for (; *argv; argv++) {
+		sig = getsignum(*argv);
+		if (sig == -1) {
+		    zwarnnam(name, "undefined signal: %s", *argv, 0);
+		    break;
+		}
+		unsettrap(sig);
+	    }
+	}
+	return *argv != NULL;
     }
 
     /* Sort out the command to execute on trap */
