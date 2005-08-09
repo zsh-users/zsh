@@ -117,8 +117,8 @@ ZTST_cleanup() {
 # This cleanup always gets performed, even if we abort.  Later,
 # we should try and arrange that any test-specific cleanup
 # always gets called as well.
-trap - 'print cleaning up...
-ZTST_cleanup' INT QUIT TERM
+##trap 'print cleaning up...
+##ZTST_cleanup' INT QUIT TERM
 # Make sure it's clean now.
 rm -rf dummy.tmp *.tmp
 
