@@ -1,3 +1,9 @@
+2005-08-09  Peter Stephenson  <pws@csr.com>
+
+	* 21577 (adapted): Dan Bullok: Src/Zle/zle_main.c, Src/init.c,
+	Src/utils.c: improved 21567 which reexpands the prompt and
+	refreshes but doesn't trash the line editor.
+
 2005-08-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21580: Thorsten Dahlheimer: Test/C03traps.ztst: disable any

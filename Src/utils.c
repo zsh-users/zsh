@@ -1064,7 +1064,8 @@ adjustwinsize(int from)
 	winchanged =
 #endif /* TIOCGWINSZ */
 	    resetneeded = 1;
-	trashzleptr();
+	zrefreshptr();
+	zle_resetpromptptr();
     }
 }
 
