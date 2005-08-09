@@ -1,5 +1,8 @@
 2005-08-08  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* 21580: Thorsten Dahlheimer: Test/C03traps.ztst: disable any
+	pre-existing traps that could interfere with the tests.
+
 	* 21581: Thorsten Dahlheimer: Src/builtin.c: fixed error output
 	for unknown signal names when using "trap -".
 
