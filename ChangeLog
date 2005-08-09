@@ -1,5 +1,10 @@
 2005-08-08  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* 21581: Thorsten Dahlheimer: Src/builtin.c: fixed error output
+	for unknown signal names when using "trap -".
+
+	* 21581 (modified): Doc/Zsh/builtins.yo: improved "trap" docs.
+
 	* 21584: Src/builtin.c, Test/B03print.ztst: fixed a bug in printf
 	%b (introduced in the 21552 changes) where a missing arg could not
 	be printed with a zero width.
