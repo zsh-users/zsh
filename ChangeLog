@@ -1,3 +1,8 @@
+2005-08-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21579: Thorsten Dahlheimer: Src/builtin.c: Made printf %s
+	handle embedded nulls in its arg.
+
 2005-08-09  Peter Stephenson  <pws@csr.com>
 
 	* 21583: Thorsten Dahlheimer: Src/module.c: extend circularity
