@@ -3745,21 +3745,24 @@ bin_print(char *name, char **args, Options ops, int func)
 	    d[1] = '\0';
 	    switch (*d = *c) {
 	    case 'c':
-		if (curarg) {
+		if (curarg)
 		    intval = *curarg;
-		} else
+		else
 		    intval = 0;
 		print_val(intval);
 		break;
 	    case 's':
-		stringval = curarg ? curarg : &nullstr;
-		print_val(stringval);
-		break;
 	    case 'b':
 		if (curarg) {
+		    char *b;
 		    int l;
-		    char *b = getkeystring(metafy(curarg, curlen, META_USEHEAP), &l,
-					   OPT_ISSET(ops,'b') ? 2 : 0, &nnl);
+		    if (*c == 'b') {
+			b = getkeystring(metafy(curarg, curlen, META_USEHEAP), &l,
+					 OPT_ISSET(ops,'b') ? 2 : 0, &nnl);
+		    } else {
+			b = curarg;
+			l = curlen;
+		    }
 		    /* handle width/precision here and use fwrite so that
 		     * nul characters can be output */
 		    if (prec >= 0 && prec < l) l = prec;
