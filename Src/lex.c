@@ -72,11 +72,12 @@ int inalmore;
 int nocorrect;
 
 /*
- * Cursor position and line length in zle
+ * Cursor position and line length in zle when the line is
+ * metafied for access from the main shell.
  */
 
 /**/
-mod_export int zlecs, zlell;
+mod_export int zlemetacs, zlemetall;
 
 /* inwhat says what exactly we are in     *
  * (its value is one of the IN_* things). */
@@ -521,10 +522,10 @@ add(int c)
     }
 }
 
-#define SETPARBEGIN {if (zleparse && !(inbufflags & INP_ALIAS) && zlecs >= zlell+1-inbufct) parbegin = inbufct;}
+#define SETPARBEGIN {if (zleparse && !(inbufflags & INP_ALIAS) && zlemetacs >= zlemetall+1-inbufct) parbegin = inbufct;}
 #define SETPAREND {\
 	    if (zleparse && !(inbufflags & INP_ALIAS) && parbegin != -1 && parend == -1) {\
-		if (zlecs >= zlell + 1 - inbufct)\
+		if (zlemetacs >= zlemetall + 1 - inbufct)\
 		    parbegin = -1;\
 		else\
 		    parend = inbufct;} }
@@ -1293,7 +1294,7 @@ dquote_parse(char endchar, int sub)
     int pct = 0, brct = 0, bct = 0, intick = 0, err = 0;
     int c;
     int math = endchar == ')' || endchar == ']';
-    int zlemath = math && zlecs > zlell + addedx - inbufct;
+    int zlemath = math && zlemetacs > zlemetall + addedx - inbufct;
 
     while (((c = hgetc()) != endchar || bct ||
 	    (math && ((pct > 0) || (brct > 0))) ||
@@ -1420,7 +1421,7 @@ dquote_parse(char endchar, int sub)
 	err = intick || endchar || err;
     else if (err == 1)
 	err = c;
-    if (zlemath && zlecs <= zlell + 1 - inbufct)
+    if (zlemath && zlemetacs <= zlemetall + 1 - inbufct)
 	inwhat = IN_MATH;
     return err;
 }
@@ -1549,9 +1550,9 @@ parse_subst_string(char *s)
 mod_export void
 gotword(void)
 {
-    we = zlell + 1 - inbufct + (addedx == 2 ? 1 : 0);
-    if (zlecs <= we) {
-	wb = zlell - wordbeg + addedx;
+    we = zlemetall + 1 - inbufct + (addedx == 2 ? 1 : 0);
+    if (zlemetacs <= we) {
+	wb = zlemetall - wordbeg + addedx;
 	zleparse = 0;
     }
 }

@@ -1,3 +1,15 @@
+2005-08-10  Peter Stephenson  <pws@csr.com>
+
+	* c.f. 21590: Src/hist.c, Src/lex.c, Src/utils.c,
+	Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complist.c,
+	Src/Zle/compresult.c, Src/Zle/zle.h, Src/Zle/zle_hist.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_params.c,
+	Src/Zle/zle_refresh.c, Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c,
+	Src/Zle/zle_utils.c: upgrade metafy_line()/unmetafy_line() to
+	take account of wide characters.  Add extra conversion where
+	necessary.  Also attempt fix for singlerefresh() prompt with
+	ZLE_UNICODE_SUPPORT (untested).
+
 2005-08-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21579: Thorsten Dahlheimer: Src/builtin.c: Made printf %s

@@ -42,6 +42,11 @@
 /**/
 mod_export ZLE_STRING_T zleline;
 
+/* Cursor position and line length in zle */
+
+/**/
+mod_export int zlecs, zlell;
+
 /* != 0 if in a shell function called from completion, such that read -[cl]  *
  * will work (i.e., the line is metafied, and the above word arrays are OK). */
 

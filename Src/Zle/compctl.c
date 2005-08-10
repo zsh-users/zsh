@@ -198,16 +198,21 @@ compctlread(char *name, char **args, Options ops, char *reply)
 	return 1;
     }
 
+    METACHECK();
+
     if (OPT_ISSET(ops,'l')) {
-	/* -ln gives the index of the word the cursor is currently on, which is
-	available in zlecs (but remember that Zsh counts from one, not zero!) */
+	/*
+	 * -ln gives the index of the word the cursor is currently on, which
+	 * is available in zlemetacs (but remember that Zsh counts from one,
+	 * not zero!)
+	 */
 	if (OPT_ISSET(ops,'n')) {
 	    char nbuf[14];
 
 	    if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E'))
-		printf("%d\n", zlecs + 1);
+		printf("%d\n", zlemetacs + 1);
 	    if (!OPT_ISSET(ops,'e')) {
-		sprintf(nbuf, "%d", zlecs + 1);
+		sprintf(nbuf, "%d", zlemetacs + 1);
 		setsparam(reply, ztrdup(nbuf));
 	    }
 	    return 0;
@@ -215,11 +220,11 @@ compctlread(char *name, char **args, Options ops, char *reply)
 	/* without -n, the current line is assigned to the given parameter as a
 	scalar */
 	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
-	    zputs((char *) zleline, stdout);
+	    zputs((char *) zlemetaline, stdout);
 	    putchar('\n');
 	}
 	if (!OPT_ISSET(ops,'e'))
-	    setsparam(reply, ztrdup((char *) zleline));
+	    setsparam(reply, ztrdup((char *) zlemetaline));
     } else {
 	int i;
 
@@ -2560,7 +2565,9 @@ makecomplistor(Compctl cc, char *s, int incmd, int compadd, int sub)
 static void
 makecomplistlist(Compctl cc, char *s, int incmd, int compadd)
 {
-    int oloffs = offs, owe = we, owb = wb, ocs = zlecs;
+    int oloffs = offs, owe = we, owb = wb, ocs = zlemetacs;
+
+    METACHECK();
 
     if (cc->ext)
 	/* Handle extended completion. */
@@ -2574,7 +2581,7 @@ makecomplistlist(Compctl cc, char *s, int incmd, int compadd)
     offs = oloffs;
     wb = owb;
     we = owe;
-    zlecs = ocs;
+    zlemetacs = ocs;
 }
 
 /* This add matches for extended completion patterns */
@@ -2751,14 +2758,16 @@ sep_comp_string(char *ss, char *s, int noffs)
 {
     LinkList foo = newlinklist();
     LinkNode n;
-    int owe = we, owb = wb, ocs = zlecs, swb, swe, scs, soffs, ne = noerrs;
-    int sl = strlen(ss), tl, got = 0, i = 0, cur = -1, oll = zlell, remq;
+    int owe = we, owb = wb, ocs = zlemetacs, swb, swe, scs, soffs, ne = noerrs;
+    int sl = strlen(ss), tl, got = 0, i = 0, cur = -1, oll = zlemetall, remq;
     int ois = instring, oib = inbackt, ona = noaliases;
-    char *tmp, *p, *ns, *ol = (char *) zleline, sav, *oaq = autoq, *qp, *qs;
-    char *ts, qc = '\0';
+    char *tmp, *p, *ns, *ol = (char *) zlemetaline, sav, *oaq = autoq;
+    char *qp, *qs, *ts, qc = '\0';
 
     swb = swe = soffs = 0;
     ns = NULL;
+
+    METACHECK();
 
     /* Put the string in the lexer buffer and call the lexer to *
      * get the words we have to expand.                        */
@@ -2770,13 +2779,13 @@ sep_comp_string(char *ss, char *s, int noffs)
     strcpy(tmp, ss);
     tmp[sl] = ' ';
     memcpy(tmp + sl + 1, s, noffs);
-    tmp[(scs = zlecs = sl + 1 + noffs)] = 'x';
+    tmp[(scs = zlemetacs = sl + 1 + noffs)] = 'x';
     strcpy(tmp + sl + 2 + noffs, s + noffs);
     if ((remq = (*compqstack == '\\')))
 	tmp = rembslash(tmp);
     inpush(dupstrspace(tmp), 0, NULL);
-    zleline = (unsigned char *) tmp;
-    zlell = tl - 1;
+    zlemetaline = (unsigned char *) tmp;
+    zlemetall = tl - 1;
     strinbeg(0);
     noaliases = 1;
     do {
@@ -2807,7 +2816,7 @@ sep_comp_string(char *ss, char *s, int noffs)
 	    cur = i;
 	    swb = wb - 1;
 	    swe = we - 1;
-	    soffs = zlecs - swb;
+	    soffs = zlemetacs - swb;
 	    chuck(p + soffs);
 	    ns = dupstring(p);
 	}
@@ -2821,9 +2830,9 @@ sep_comp_string(char *ss, char *s, int noffs)
     lexrestore();
     wb = owb;
     we = owe;
-    zlecs = ocs;
-    zleline = (unsigned char *) ol;
-    zlell = oll;
+    zlemetacs = ocs;
+    zlemetaline = (unsigned char *) ol;
+    zlemetall = oll;
     if (cur < 0 || i < 1)
 	return 1;
     owb = offs;
@@ -2979,8 +2988,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	addlinknode(allccs, cc);
     }
     /* Go to the end of the word if complete_in_word is not set. */
-    if (unset(COMPLETEINWORD) && zlecs != we)
-	zlecs = we, offs = strlen(s);
+    if (unset(COMPLETEINWORD) && zlemetacs != we)
+	zlemetacs = we, offs = strlen(s);
 
     s = dupstring(s);
     delit = ispattern = 0;
@@ -3200,15 +3209,15 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    ppre = dupstrpfx(rpre, s1 - rpre + 1);
 	psuf = dupstring(s2);
 
-	if (zlecs != wb) {
-	    char save = zleline[zlecs];
+	if (zlemetacs != wb) {
+	    char save = zlemetaline[zlemetacs];
 
-	    zleline[zlecs] = 0;
-	    lppre = dupstring((char *) zleline + wb +
+	    zlemetaline[zlemetacs] = 0;
+	    lppre = dupstring((char *) zlemetaline + wb +
 			      (qipre && *qipre ?
 			       (strlen(qipre) -
 				(*qipre == '\'' || *qipre == '\"')) : 0));
-	    zleline[zlecs] = save;
+	    zlemetaline[zlemetacs] = save;
 	    if (brbeg) {
 		Brinfo bp;
 
@@ -3230,25 +3239,26 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    lppre = NULL;
 	    lppl = 0;
 	}
-	if (zlecs != we) {
+	if (zlemetacs != we) {
 	    int end = we;
-	    char save = zleline[end];
+	    char save = zlemetaline[end];
 
 	    if (qisuf && *qisuf) {
 		int ql = strlen(qisuf);
 
 		end -= ql - (qisuf[ql-1] == '\'' || qisuf[ql-1] == '"');
 	    }
-	    zleline[end] = 0;
-	    lpsuf = dupstring((char *) (zleline + zlecs));
-	    zleline[end] = save;
+	    zlemetaline[end] = 0;
+	    lpsuf = dupstring((char *) (zlemetaline + zlemetacs));
+	    zlemetaline[end] = save;
 	    if (brend) {
 		Brinfo bp;
 		char *p;
 		int bl;
 
 		for (bp = brend; bp; bp = bp->next) {
-		    p = lpsuf + (we - zlecs) - bp->qpos - (bl = strlen(bp->str));
+		    p = lpsuf + (we - zlemetacs) - bp->qpos -
+			(bl = strlen(bp->str));
 		    strcpy(p, p + bl);
 		}
 	    }
@@ -3262,7 +3272,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 	/* And get the file prefix. */
 	fpre = dupstring(((s1 == s || s1 == rpre || ic) &&
-			  (*s != '/' || zlecs == wb)) ? s1 : s1 + 1);
+			  (*s != '/' || zlemetacs == wb)) ? s1 : s1 + 1);
 	qfpre = quotename(fpre, NULL);
 	/* And the suffix. */
 	fsuf = dupstrpfx(rsuf, s2 - rsuf);

@@ -169,10 +169,12 @@ static char *
 cline_str(Cline l, int ins, int *csp, LinkList posl)
 {
     Cline s;
-    int ocs = zlecs, ncs, pcs, scs, opos = -1, npos;
+    int ocs = zlemetacs, ncs, pcs, scs, opos = -1, npos;
     int pm, pmax, pmm, pma, sm, smax, smm, sma, d, dm, mid;
     int i, j, li = 0, cbr, padd = (ins ? wb - ocs : -ocs);
     Brinfo brp, brs;
+
+    METACHECK();
 
     l = cut_cline(l);
 
@@ -205,7 +207,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	}
 	while (brs && !brs->curpos) {
 	    if (cbr < 0)
-		cbr = zlecs;
+		cbr = zlemetacs;
 	    inststrlen(brs->str, 1, -1);
 	    brs = brs->prev;
 	}
@@ -214,21 +216,21 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
     while (l) {
 	/* Insert the original string if no prefix. */
 	if (l->olen && !(l->flags & CLF_SUF) && !l->prefix) {
-	    pcs = zlecs + l->olen;
+	    pcs = zlemetacs + l->olen;
 	    inststrlen(l->orig, 1, l->olen);
 	} else {
 	    /* Otherwise insert the prefix. */
 	    for (s = l->prefix; s; s = s->next) {
-		pcs = zlecs + s->llen;
+		pcs = zlemetacs + s->llen;
 		if (s->flags & CLF_LINE)
 		    inststrlen(s->line, 1, s->llen);
 		else
 		    inststrlen(s->word, 1, s->wlen);
-		scs = zlecs;
+		scs = zlemetacs;
 
 		if ((s->flags & CLF_DIFF) && (!dm || (s->flags & CLF_MATCHED))) {
-		    d = zlecs; dm = s->flags & CLF_MATCHED;
-		    if (posl && (npos = zlecs + padd) != opos) {
+		    d = zlemetacs; dm = s->flags & CLF_MATCHED;
+		    if (posl && (npos = zlemetacs + padd) != opos) {
 			opos = npos;
 			addlinknode(posl, (void *) ((long) npos));
 		    }
@@ -240,11 +242,11 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	    int ocs, bl;
 
 	    while (brp && li >= brp->curpos) {
-		ocs = zlecs;
+		ocs = zlemetacs;
 		bl = strlen(brp->str);
-		zlecs = pcs - (li - brp->curpos);
+		zlemetacs = pcs - (li - brp->curpos);
 		inststrlen(brp->str, 1, bl);
-		zlecs = ocs + bl;
+		zlemetacs = ocs + bl;
 		pcs += bl;
 		scs += bl;
 		brp = brp->next;
@@ -253,14 +255,14 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	/* Remember the position if this is the first prefix with
 	 * missing characters. */
 	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF)) {
-	    if (posl && (npos = zlecs + padd) != opos) {
+	    if (posl && (npos = zlemetacs + padd) != opos) {
 		opos = npos;
 		addlinknode(posl, (void *) ((long) npos));
 	    }
 	    if (((pmax <= (l->max - l->min) || (pma && l->max != l->min)) &&
 		 (!pmm || (l->flags & CLF_MATCHED))) ||
 		((l->flags & CLF_MATCHED) && !pmm)) {
-		pm = zlecs; pmax = l->max - l->min; pmm = l->flags & CLF_MATCHED;
+		pm = zlemetacs; pmax = l->max - l->min; pmm = l->flags & CLF_MATCHED;
 		pma = ((l->prefix || l->suffix) && l->min == cline_sublen(l));
 	    }
 	}
@@ -268,35 +270,35 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	    int ocs, bl;
 
 	    while (brs && li >= brs->curpos) {
-		ocs = zlecs;
+		ocs = zlemetacs;
 		bl = strlen(brs->str);
-		zlecs = scs - (li - brs->curpos);
+		zlemetacs = scs - (li - brs->curpos);
 		if (cbr < 0)
-		    cbr = zlecs;
+		    cbr = zlemetacs;
 		inststrlen(brs->str, 1, bl);
-		zlecs = ocs + bl;
+		zlemetacs = ocs + bl;
 		pcs += bl;
 		brs = brs->prev;
 	    }
 	}
-	pcs = zlecs;
+	pcs = zlemetacs;
 	/* Insert the anchor. */
 	if (l->flags & CLF_LINE)
 	    inststrlen(l->line, 1, l->llen);
 	else
 	    inststrlen(l->word, 1, l->wlen);
-	scs = zlecs;
+	scs = zlemetacs;
 	if (ins) {
 	    int ocs, bl;
 
 	    li += l->llen;
 
 	    while (brp && li >= brp->curpos) {
-		ocs = zlecs;
+		ocs = zlemetacs;
 		bl = strlen(brp->str);
-		zlecs = pcs + l->llen - (li - brp->curpos);
+		zlemetacs = pcs + l->llen - (li - brp->curpos);
 		inststrlen(brp->str, 1, bl);
-		zlecs = ocs + bl;
+		zlemetacs = ocs + bl;
 		pcs += bl;
 		scs += bl;
 		brp = brp->next;
@@ -305,16 +307,16 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	/* Remember the cursor position for suffixes and mids. */
 	if (l->flags & CLF_MISS) {
 	    if (l->flags & CLF_MID)
-		mid = zlecs;
+		mid = zlemetacs;
 	    else if (l->flags & CLF_SUF) {
-		if (posl && (npos = zlecs + padd) != opos) {
+		if (posl && (npos = zlemetacs + padd) != opos) {
 		    opos = npos;
 		    addlinknode(posl, (void *) ((long) npos));
 		}
 		if (((smax <= (l->min - l->max) || (sma && l->max != l->min)) &&
 		     (!smm || (l->flags & CLF_MATCHED))) ||
 		    ((l->flags & CLF_MATCHED) && !smm)) {
-		    sm = zlecs; smax = l->min - l->max; smm = l->flags & CLF_MATCHED;
+		    sm = zlemetacs; smax = l->min - l->max; smm = l->flags & CLF_MATCHED;
 		    sma = ((l->prefix || l->suffix) && l->min == cline_sublen(l));
 		}
 	    }
@@ -323,20 +325,20 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	    int ocs, bl;
 
 	    while (brs && li >= brs->curpos) {
-		ocs = zlecs;
+		ocs = zlemetacs;
 		bl = strlen(brs->str);
-		zlecs = scs - (li - brs->curpos);
+		zlemetacs = scs - (li - brs->curpos);
 		if (cbr < 0)
-		    cbr = zlecs;
+		    cbr = zlemetacs;
 		inststrlen(brs->str, 1, bl);
-		zlecs = ocs + bl;
+		zlemetacs = ocs + bl;
 		pcs += bl;
 		brs = brs->prev;
 	    }
 	}
 	/* And now insert the suffix or the original string. */
 	if (l->olen && (l->flags & CLF_SUF) && !l->suffix) {
-	    pcs = zlecs;
+	    pcs = zlemetacs;
 	    inststrlen(l->orig, 1, l->olen);
 	    if (ins) {
 		int ocs, bl;
@@ -344,22 +346,22 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 		li += l->olen;
 
 		while (brp && li >= brp->curpos) {
-		    ocs = zlecs;
+		    ocs = zlemetacs;
 		    bl = strlen(brp->str);
-		    zlecs = pcs + l->olen - (li - brp->curpos);
+		    zlemetacs = pcs + l->olen - (li - brp->curpos);
 		    inststrlen(brp->str, 1, bl);
-		    zlecs = ocs + bl;
+		    zlemetacs = ocs + bl;
 		    pcs += bl;
 		    brp = brp->next;
 		}
 		while (brs && li >= brs->curpos) {
-		    ocs = zlecs;
+		    ocs = zlemetacs;
 		    bl = strlen(brs->str);
-		    zlecs = pcs + l->olen - (li - brs->curpos);
+		    zlemetacs = pcs + l->olen - (li - brs->curpos);
 		    if (cbr < 0)
-			cbr = zlecs;
+			cbr = zlemetacs;
 		    inststrlen(brs->str, 1, bl);
-		    zlecs = ocs + bl;
+		    zlemetacs = ocs + bl;
 		    pcs += bl;
 		    brs = brs->prev;
 		}
@@ -370,13 +372,13 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	    for (j = -1, i = 0, s = l->suffix; s; s = s->next) {
 		if (j < 0 && (s->flags & CLF_DIFF))
 		    j = i, js = s;
-		pcs = zlecs;
+		pcs = zlemetacs;
 		if (s->flags & CLF_LINE) {
 		    inststrlen(s->line, 0, s->llen);
-		    i += s->llen; scs = zlecs + s->llen;
+		    i += s->llen; scs = zlemetacs + s->llen;
 		} else {
 		    inststrlen(s->word, 0, s->wlen);
-		    i += s->wlen; scs = zlecs + s->wlen;
+		    i += s->wlen; scs = zlemetacs + s->wlen;
 		}
 		if (ins) {
 		    int ocs, bl;
@@ -384,32 +386,32 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 		    li += s->llen;
 
 		    while (brp && li >= brp->curpos) {
-			ocs = zlecs;
+			ocs = zlemetacs;
 			bl = strlen(brp->str);
-			zlecs = pcs + (li - brp->curpos);
+			zlemetacs = pcs + (li - brp->curpos);
 			inststrlen(brp->str, 1, bl);
-			zlecs = ocs + bl;
+			zlemetacs = ocs + bl;
 			pcs += bl;
 			scs += bl;
 			brp = brp->next;
 		    }
 		    while (brs && li >= brs->curpos) {
-			ocs = zlecs;
+			ocs = zlemetacs;
 			bl = strlen(brs->str);
-			zlecs = scs - (li - brs->curpos);
+			zlemetacs = scs - (li - brs->curpos);
 			if (cbr < 0)
-			    cbr = zlecs;
+			    cbr = zlemetacs;
 			inststrlen(brs->str, 1, bl);
-			zlecs = ocs + bl;
+			zlemetacs = ocs + bl;
 			pcs += bl;
 			brs = brs->prev;
 		    }
 		}
 	    }
-	    zlecs += i;
+	    zlemetacs += i;
 	    if (j >= 0 && (!dm || (js->flags & CLF_MATCHED))) {
-		d = zlecs - j; dm = js->flags & CLF_MATCHED;
-		if (posl && (npos = zlecs - j + padd) != opos) {
+		d = zlemetacs - j; dm = js->flags & CLF_MATCHED;
+		if (posl && (npos = zlemetacs - j + padd) != opos) {
 		    opos = npos;
 		    addlinknode(posl, (void *) ((long) npos));
 		}
@@ -417,7 +419,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	}
 	l = l->next;
     }
-    if (posl && (npos = zlecs + padd) != opos)
+    if (posl && (npos = zlemetacs + padd) != opos)
 #if 0
 	/* This could be used to put an extra colon before the end-of-word
 	 * position if there is nothing missing. */
@@ -426,23 +428,23 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	addlinknode(posl, (void *) ((long) npos));
 
     if (ins) {
-	int ocs = zlecs;
+	int ocs = zlemetacs;
 
 	for (; brp; brp = brp->next)
 	    inststrlen(brp->str, 1, -1);
 	for (; brs; brs = brs->prev) {
 	    if (cbr < 0)
-		cbr = zlecs;
+		cbr = zlemetacs;
 	    inststrlen(brs->str, 1, -1);
 	}
 	if (mid >= ocs)
-	    mid += zlecs - ocs;
+	    mid += zlemetacs - ocs;
 	if (pm >= ocs)
-	    pm += zlecs - ocs;
+	    pm += zlemetacs - ocs;
 	if (sm >= ocs)
-	    sm += zlecs - ocs;
+	    sm += zlemetacs - ocs;
 	if (d >= ocs)
-	    d += zlecs - ocs;
+	    d += zlemetacs - ocs;
 
 	if (posl) {
 	    LinkNode node;
@@ -451,7 +453,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	    for (node = firstnode(posl); node; incnode(node)) {
 		p = (long) getdata(node);
 		if (p >= ocs)
-		    setdata(node, (void *) (p + zlecs - ocs));
+		    setdata(node, (void *) (p + zlemetacs - ocs));
 	    }
 	}
     }
@@ -461,16 +463,16 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
      * suffix, and finally a place where the matches differ. */
     ncs = (mid >= 0 ? mid :
 	   (cbr >= 0 ? cbr :
-	    (pm >= 0 ? pm : (sm >= 0 ? sm : (d >= 0 ? d : zlecs)))));
+	    (pm >= 0 ? pm : (sm >= 0 ? sm : (d >= 0 ? d : zlemetacs)))));
 
     if (ins != 1) {
 	/* We always inserted the string in the line. If that was not
 	 * requested, we copy it and remove from the line. */
-	char *r = zalloc((i = zlecs - ocs) + 1);
+	char *r = zalloc((i = zlemetacs - ocs) + 1);
 
-	memcpy(r, (char *) (zleline + ocs), i);
+	memcpy(r, (char *) (zlemetaline + ocs), i);
 	r[i] = '\0';
-	zlecs = ocs;
+	zlemetacs = ocs;
 	foredel(i);
 
 	if (csp)
@@ -478,8 +480,8 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 
 	return r;
     }
-    lastend = zlecs;
-    zlecs = ncs;
+    lastend = zlemetacs;
+    zlemetacs = ncs;
 
     return NULL;
 }
@@ -579,8 +581,10 @@ unambig_data(int *cp, char **pp, char **ip)
 static int
 instmatch(Cmatch m, int *scs)
 {
-    int l, r = 0, ocs, a = zlecs, brb = 0, bradd, *brpos;
+    int l, r = 0, ocs, a = zlemetacs, brb = 0, bradd, *brpos;
     Brinfo bp;
+
+    METACHECK();
 
     zsfree(lastprebr);
     zsfree(lastpostbr);
@@ -606,28 +610,28 @@ instmatch(Cmatch m, int *scs)
     /* The string itself. */
     inststrlen(m->str, 1, (l = strlen(m->str)));
     r += l;
-    ocs = zlecs;
+    ocs = zlemetacs;
     /* Re-insert the brace beginnings, if any. */
     if (brbeg) {
-	int pcs = zlecs;
+	int pcs = zlemetacs;
 
 	l = 0;
 	for (bp = brbeg, brpos = m->brpl,
 		 bradd = (m->pre ? strlen(m->pre) : 0);
 	     bp; bp = bp->next, brpos++) {
-	    zlecs = a + *brpos + bradd;
-	    pcs = zlecs;
+	    zlemetacs = a + *brpos + bradd;
+	    pcs = zlemetacs;
 	    l = strlen(bp->str);
 	    bradd += l;
-	    brpcs = zlecs;
+	    brpcs = zlemetacs;
 	    inststrlen(bp->str, 1, l);
 	    r += l;
 	    ocs += l;
 	}
 	lastprebr = (char *) zalloc(pcs - a + 1);
-	memcpy(lastprebr, (char *) zleline + a, pcs - a);
+	memcpy(lastprebr, (char *) zlemetaline + a, pcs - a);
 	lastprebr[pcs - a] = '\0';
-	zlecs = ocs;
+	zlemetacs = ocs;
     }
     /* Path suffix. */
     if (m->psuf) {
@@ -636,24 +640,24 @@ instmatch(Cmatch m, int *scs)
     }
     /* Re-insert the brace end. */
     if (brend) {
-	a = zlecs;
+	a = zlemetacs;
 	for (bp = brend, brpos = m->brsl, bradd = 0; bp; bp = bp->next, brpos++) {
-	    zlecs = a - *brpos;
-	    ocs = brscs = zlecs;
+	    zlemetacs = a - *brpos;
+	    ocs = brscs = zlemetacs;
 	    l = strlen(bp->str);
 	    bradd += l;
 	    inststrlen(bp->str, 1, l);
-	    brb = zlecs;
+	    brb = zlemetacs;
 	    r += l;
 	}
-	zlecs = a + bradd;
+	zlemetacs = a + bradd;
 	if (scs)
 	    *scs = ocs;
     } else {
 	brscs = -1;
 
 	if (scs)
-	    *scs = zlecs;
+	    *scs = zlemetacs;
     }
     /* -S suffix */
     if (m->suf) {
@@ -666,12 +670,12 @@ instmatch(Cmatch m, int *scs)
 	r += l;
     }
     if (brend) {
-	lastpostbr = (char *) zalloc(zlecs - brb + 1);
-	memcpy(lastpostbr, (char *) zleline + brb, zlecs - brb);
-	lastpostbr[zlecs - brb] = '\0';
+	lastpostbr = (char *) zalloc(zlemetacs - brb + 1);
+	memcpy(lastpostbr, (char *) zlemetaline + brb, zlemetacs - brb);
+	lastpostbr[zlemetacs - brb] = '\0';
     }
-    lastend = zlecs;
-    zlecs = ocs;
+    lastend = zlemetacs;
+    zlemetacs = ocs;
 
     return r;
 }
@@ -687,20 +691,20 @@ hasbrpsfx(Cmatch m, char *pre, char *suf)
 	return 1;
     else {
 	char *op = lastprebr, *os = lastpostbr;
-	VARARR(char, oline, zlell);
-	int oll = zlell, ocs = zlecs, ole = lastend, opcs = brpcs, oscs = brscs, ret;
+	VARARR(char, oline, zlemetall);
+	int oll = zlemetall, ocs = zlemetacs, ole = lastend, opcs = brpcs, oscs = brscs, ret;
 
-	memcpy(oline, zleline, zlell);
+	memcpy(oline, zlemetaline, zlemetall);
 
 	lastprebr = lastpostbr = NULL;
 
 	instmatch(m, NULL);
 
-	zlecs = 0;
-	foredel(zlell);
+	zlemetacs = 0;
+	foredel(zlemetall);
 	spaceinline(oll);
-	memcpy(zleline, oline, oll);
-	zlecs = ocs;
+	memcpy(zlemetaline, oline, oll);
+	zlemetacs = ocs;
 	lastend = ole;
 	brpcs = opcs;
 	brscs = oscs;
@@ -754,7 +758,7 @@ do_ambiguous(void)
 	 * completion options.                                             */
 	do_ambig_menu();
     } else if (ainfo) {
-	int atend = (zlecs == we), la, eq, tcs;
+	int atend = (zlemetacs == we), la, eq, tcs;
 	VARARR(char, old, we - wb);
 
 	minfo.cur = NULL;
@@ -763,9 +767,9 @@ do_ambiguous(void)
 	fixsuffix();
 
 	/* First remove the old string from the line. */
-	tcs = zlecs;
-	zlecs = wb;
-	memcpy(old, (char *) zleline + wb, we - wb);
+	tcs = zlemetacs;
+	zlemetacs = wb;
+	memcpy(old, (char *) zlemetaline + wb, we - wb);
 	foredel(we - wb);
 
 	/* Now get the unambiguous string and insert it into the line. */
@@ -776,23 +780,23 @@ do_ambiguous(void)
          * old string. Unless there were matches added with -U, that is. */
 
 	if (lastend < we && !lenchanged && !hasunmatched) {
-	    zlecs = wb;
+	    zlemetacs = wb;
 	    foredel(lastend - wb);
 	    inststrlen(old, 0, we - wb);
 	    lastend = we;
-	    zlecs = tcs;
+	    zlemetacs = tcs;
 	}
 	if (eparq) {
-	    tcs = zlecs;
-	    zlecs = lastend;
+	    tcs = zlemetacs;
+	    zlemetacs = lastend;
 	    for (eq = eparq; eq; eq--)
 		inststrlen("\"", 0, 1);
-	    zlecs = tcs;
+	    zlemetacs = tcs;
 	}
 	/* la is non-zero if listambiguous may be used. Copying and
 	 * comparing the line looks like BFI but it is the easiest
 	 * solution. Really. */
-	la = (zlell != origll || strncmp(origline, (char *) zleline, zlell));
+	la = (zlemetall != origll || strncmp(origline, (char *) zlemetaline, zlemetall));
 
 	/* If REC_EXACT and AUTO_MENU are set and what we inserted is an  *
 	 * exact match, we want menu completion the next time round       *
@@ -800,11 +804,11 @@ do_ambiguous(void)
 	 * taken as an exact match. Also we remember if we just moved the *
 	 * cursor into the word.                                          */
 	fromcomp = ((isset(AUTOMENU) ? FC_LINE : 0) |
-		    ((atend && zlecs != lastend) ? FC_INWORD : 0));
+		    ((atend && zlemetacs != lastend) ? FC_INWORD : 0));
 
 	/* Probably move the cursor to the end. */
 	if (movetoend == 3)
-	    zlecs = lastend;
+	    zlemetacs = lastend;
 
 	/* If the LIST_AMBIGUOUS option (meaning roughly `show a list only *
 	 * if the completion is completely ambiguous') is set, and some    *
@@ -947,7 +951,7 @@ do_single(Cmatch m)
 	 * so set the position variables.             */
 	minfo.pos = wb;
 	minfo.we = (movetoend >= 2 || (movetoend == 1 && !menucmp) ||
-		    (!movetoend && zlecs == we));
+		    (!movetoend && zlemetacs == we));
 	minfo.end = we;
     }
     /* If we are already in a menu-completion or if we have done a *
@@ -959,7 +963,7 @@ do_single(Cmatch m)
 	l = we - wb;
 
     minfo.insc = 0;
-    zlecs = minfo.pos;
+    zlemetacs = minfo.pos;
     foredel(l);
 
     if (m->flags & CMF_ALL) {
@@ -969,8 +973,8 @@ do_single(Cmatch m)
 
     /* And then we insert the new string. */
     minfo.len = instmatch(m, &scs);
-    minfo.end = zlecs;
-    zlecs = minfo.pos + minfo.len;
+    minfo.end = zlemetacs;
+    zlemetacs = minfo.pos + minfo.len;
 
     if (m->suf) {
 	havesuff = 1;
@@ -987,13 +991,13 @@ do_single(Cmatch m)
     } else {
 	/* There is no user-specified suffix, *
 	 * so generate one automagically.     */
-	zlecs = scs;
+	zlemetacs = scs;
 	if (partest && (m->flags & CMF_PARBR)) {
 	    int pq;
 
 	    /*{{*/
 	    /* Completing a parameter in braces.  Add a removable `}' suffix. */
-	    zlecs += eparq;
+	    zlemetacs += eparq;
 	    for (pq = parq; pq; pq--)
 		inststrlen("\"", 1, 1);
 	    minfo.insc += parq;
@@ -1005,7 +1009,7 @@ do_single(Cmatch m)
 		havesuff = 1;
 	}
 	if (((m->flags & CMF_FILE) || (partest && isset(AUTOPARAMSLASH))) &&
-	    zlecs > 0 && zleline[zlecs - 1] != '/') {
+	    zlemetacs > 0 && zlemetaline[zlemetacs - 1] != '/') {
 	    /* If we have a filename or we completed a parameter name      *
 	     * and AUTO_PARAM_SLASH is set, lets see if it is a directory. *
 	     * If it is, we append a slash.                                */
@@ -1079,7 +1083,7 @@ do_single(Cmatch m)
 	    }
 	}
 	if (!minfo.insc)
-	    zlecs = minfo.pos + minfo.len - m->qisl;
+	    zlemetacs = minfo.pos + minfo.len - m->qisl;
     }
     /* If completing in a brace expansion... */
     if (brbeg) {
@@ -1092,7 +1096,7 @@ do_single(Cmatch m)
 	} else if (!menucmp) {
 	    /*{{*/
 	    /* Otherwise, add a `,' suffix, and let `}' remove it. */
-	    zlecs = scs;
+	    zlemetacs = scs;
 	    havesuff = 1;
 	    inststrlen(",", 1, 1);
 	    minfo.insc++;
@@ -1121,9 +1125,9 @@ do_single(Cmatch m)
 	makeparamsuffix(((m->flags & CMF_PARBR) ? 1 : 0), minfo.insc - parq);
 
     if ((menucmp && !minfo.we) || !movetoend) {
-	zlecs = minfo.end;
-	if (zlecs + m->qisl == lastend)
-	    zlecs += minfo.insc;
+	zlemetacs = minfo.end;
+	if (zlemetacs + m->qisl == lastend)
+	    zlemetacs += minfo.insc;
     }
     {
 	Cmatch *om = minfo.cur;
@@ -1169,9 +1173,13 @@ do_menucmp(int lst)
 	     (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
 	      (!(*minfo.cur)->str || !*(*minfo.cur)->str)));
     /* ... and insert it into the command line. */
-    metafy_line();
-    do_single(*(minfo.cur));
-    unmetafy_line();
+    /* Already metafied when called from domenuselect already */
+    if (zlemetaline == NULL) {
+	metafy_line();
+	do_single(*minfo.cur);
+	unmetafy_line();
+    } else
+	do_single(*minfo.cur);
 }
 
 /**/
@@ -1207,6 +1215,15 @@ reverse_menu(UNUSED(Hookdef dummy), UNUSED(void *dummy2))
 mod_export int
 accept_last(void)
 {
+    /* give up trying to work out what state it should be in */
+    int wasmeta;
+    if (zlemetaline != NULL) {
+	wasmeta = 1;
+    } else {
+	wasmeta = 0;
+	metafy_line();
+    }
+
     if (!menuacc) {
 	zsfree(minfo.prebr);
 	minfo.prebr = ztrdup(lastprebr);
@@ -1232,29 +1249,32 @@ accept_last(void)
 
 	iremovesuffix(',', 1);
 
-	l = (brscs >= 0 ? brscs : zlecs) - brpcs;
+	l = (brscs >= 0 ? brscs : zlemetacs) - brpcs;
 
 	zsfree(lastbrbeg->str);
 	lastbrbeg->str = (char *) zalloc(l + 2);
-	memcpy(lastbrbeg->str, zleline + brpcs, l);
+	memcpy(lastbrbeg->str, zlemetaline + brpcs, l);
 	lastbrbeg->str[l] = ',';
 	lastbrbeg->str[l + 1] = '\0';
     } else {
 	int l;
 
-	zlecs = minfo.pos + minfo.len + minfo.insc;
+	zlemetacs = minfo.pos + minfo.len + minfo.insc;
 	iremovesuffix(' ', 1);
-	l = zlecs;
-	zlecs = minfo.pos + minfo.len + minfo.insc - (*(minfo.cur))->qisl;
-	if (zlecs < l)
-	    foredel(l - zlecs);
-	else if (zlecs > zlell)
-	    zlecs = zlell;
+	l = zlemetacs;
+	zlemetacs = minfo.pos + minfo.len + minfo.insc - (*(minfo.cur))->qisl;
+	if (zlemetacs < l)
+	    foredel(l - zlemetacs);
+	else if (zlemetacs > zlemetall)
+	    zlemetacs = zlemetall;
 	inststrlen(" ", 1, 1);
 	minfo.insc = minfo.len = 0;
-	minfo.pos = zlecs;
+	minfo.pos = zlemetacs;
 	minfo.we = 1;
     }
+
+    if (!wasmeta)
+	unmetafy_line();
     return 0;
 }
 
@@ -2182,8 +2202,9 @@ invalidate_list(void)
 {
     invcount++;
     if (validlist) {
-	if (showinglist == -2)
+	if (showinglist == -2) {
 	    zrefresh();
+	}
 	freematches(lastmatches, 1);
 	lastmatches = NULL;
 	hasoldlist = 0;

@@ -279,3 +279,16 @@ enum {
     ZSL_COPY = 1,		/* Copy the argument, don't modify it */
     ZSL_TOEND = 2,		/* Go to the end of the new line */
 };
+
+#ifdef DEBUG
+#define STRINGIFY_LITERAL(x)	# x
+#define STRINGIFY(x)		STRINGIFY_LITERAL(x)
+#define ERRMSG(x)		(__FILE__ ":" STRINGIFY(__LINE__) ": " x)
+#define METACHECK()		\
+	DPUTS(zlemetaline == NULL, ERRMSG("line not metafied"))
+#define UNMETACHECK()		\
+	DPUTS(zlemetaline != NULL, ERRMSG("line metafied"))
+#else
+#define METACHECK()
+#define UNMETACHECK()
+#endif

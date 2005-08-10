@@ -33,18 +33,39 @@
 /*
  * The main part of ZLE maintains the line being edited as binary data,
  * but here, where we interface with the lexer and other bits of zsh, we
- * need the line metafied.  The technique used is quite simple: on entry
- * to the expansion/completion system, we metafy the line in place,
- * adjusting zlell and zlecs to match.  All completion and expansion is
- * done on the metafied line.  Immediately before returning, the line is
- * unmetafied again, changing zlell and zlecs back.  (zlell and zlecs
- * might have changed during completion, so they can't be merely saved
- * and restored.)  The various indexes into the line that are used in
- * this file only are not translated: they remain indexes into the
- * metafied line.
+ * need the line metafied and, if necessary, converted from wide
+ * characters into multibyte strings.  On entry to the
+ * expansion/completion system, we metafy the line from zleline into
+ * zlemetaline, with zlell and zlecs adjusted into zlemetall zlemetacs
+ * to match.  zlemetall and zlemetacs refer to raw character positions,
+ * in other words a metafied character contributes 2 to each.  All
+ * completion and expansion is done on the metafied line.  Immediately
+ * before returning, the line is unmetafied again, so that zleline,
+ * zlell and zlecs are once again valid.  (zlell and zlecs might have
+ * changed during completion, so they can't be merely saved and
+ * restored.)  The various indexes into the line that are used in this
+ * file only are not translated: they remain indexes into the metafied
+ * line.
+ *
+ * zlemetaline is always NULL when not in use and non-NULL when in use.
+ * This can be used to test if the line is metafied.  It would be
+ * possible to use zlecs and zlell directly, updated as appropriate when
+ * metafying and unmetafying, instead of zlemetacs and zlemetall,
+ * however the current system seems clearer.
  */
 
 #define inststr(X) inststrlen((X),1,-1)
+
+/*
+ * The state of the line being edited between metafy_line()
+ * unmetafy_line().
+ *
+ * zlemetacs and zlemetall are defined in lex.c.
+ */
+/**/
+mod_export unsigned char *zlemetaline;
+/**/
+mod_export int metalinesz;
 
 /* The line before completion was tried. */
 
@@ -153,7 +174,10 @@ mod_export int comprecursive;
 /**/
 int hascompwidgets;
 
-/* Find out if we have to insert a tab (instead of trying to complete). */
+/*
+ * Find out if we have to insert a tab (instead of trying to complete).
+ * The line is not metafied here.
+ */
 
 /**/
 static int
@@ -250,6 +274,7 @@ deletecharorlist(char **args)
     useglob = isset(GLOBCOMPLETE);
     wouldinstab = 0;
 
+    /* Line not yet metafied */
     if (zlecs != zlell) {
 	fixsuffix();
 	invalidatelist();
@@ -583,32 +608,24 @@ docomplete(int lst)
 	return 0;
     }
 
-    /*
-     * TODO: metafy_line() currently tries to metafy in place.
-     * For ZLE_UNICODE_SUPPORT we need to metafy into a separate
-     * string, replacing all use of zleline, zlecs and zlell here
-     * with those values, then restoring at the end.
-     *
-     * The alternative is probably too horrendous to contemplate.
-     */
     metafy_line();
 
-    ocs = zlecs;
-    origline = dupstring((char *) zleline);
-    origcs = zlecs;
-    origll = zlell;
+    ocs = zlemetacs;
+    origline = dupstring((char *) zlemetaline);
+    origcs = zlemetacs;
+    origll = zlemetall;
     if (!isfirstln && chline != NULL) {
 	/* If we are completing in a multi-line buffer (which was not  *
 	 * taken from the history), we have to prepend the stuff saved *
 	 * in chline to the contents of line.                          */
 
-	ol = dupstring((char *)zleline);
+	ol = dupstring((char *)zlemetaline);
 	/* Make sure that chline is zero-terminated. */
 	*hptr = '\0';
-	zlecs = 0;
+	zlemetacs = 0;
 	inststr(chline);
-	chl = zlecs;
-	zlecs += ocs;
+	chl = zlemetacs;
+	zlemetacs += ocs;
     } else
 	ol = NULL;
     inwhat = IN_NOTHING;
@@ -622,35 +639,35 @@ docomplete(int lst)
      * NOTE: get_comp_string() calls pushheap(), but not popheap(). */
     noerrs = 1;
     s = get_comp_string();
-    DPUTS(wb < 0 || zlecs < wb || zlecs > we,
-	  "BUG: 0 <= wb <= zlecs <= we is not true!");
+    DPUTS(wb < 0 || zlemetacs < wb || zlemetacs > we,
+	  "BUG: 0 <= wb <= zlemetacs <= we is not true!");
     noerrs = ne;
     /* For vi mode, reset the start-of-insertion pointer to the beginning *
      * of the word being completed, if it is currently later.  Vi itself  *
      * would never change the pointer in the middle of an insertion, but  *
      * then vi doesn't have completion.  More to the point, this is only  *
      * an emulation.                                                      */
-    if (viinsbegin > ztrsub((char *) zleline + wb, (char *) zleline))
-	viinsbegin = ztrsub((char *) zleline + wb, (char *) zleline);
+    if (viinsbegin > ztrsub((char *) zlemetaline + wb, (char *) zlemetaline))
+	viinsbegin = ztrsub((char *) zlemetaline + wb, (char *) zlemetaline);
     /* If we added chline to the line buffer, reset the original contents. */
     if (ol) {
-	zlecs -= chl;
+	zlemetacs -= chl;
 	wb -= chl;
 	we -= chl;
 	if (wb < 0) {
-	    strcpy((char *) zleline, ol);
-	    zlell = strlen((char *) zleline);
-	    zlecs = ocs;
+	    strcpy((char *) zlemetaline, ol);
+	    zlemetall = strlen((char *) zlemetaline);
+	    zlemetacs = ocs;
 	    popheap();
 	    unmetafy_line();
 	    zsfree(s);
 	    active = 0;
 	    return 1;
 	}
-	ocs = zlecs;
-	zlecs = 0;
+	ocs = zlemetacs;
+	zlemetacs = 0;
 	foredel(chl);
-	zlecs = ocs;
+	zlemetacs = ocs;
     }
     freeheap();
     /* Save the lexer state, in case the completion code uses the lexer *
@@ -694,7 +711,7 @@ docomplete(int lst)
 		    if (*q == String && q[1] != Inpar && q[1] != Inbrack) {
 			if (*++q == Inbrace) {
 			    if (! skipparens(Inbrace, Outbrace, &q) &&
-				q == s + zlecs - wb)
+				q == s + zlemetacs - wb)
 				lst = COMP_EXPAND;
 			} else {
 			    char *t, sav, sav2;
@@ -725,7 +742,7 @@ docomplete(int lst)
 				    q++;
 			    sav = *q;
 			    *q = '\0';
-			    if (zlecs - wb == q - s &&
+			    if (zlemetacs - wb == q - s &&
 				(idigit(sav2) || checkparams(t)))
 				lst = COMP_EXPAND;
 			    *q = sav;
@@ -735,7 +752,7 @@ docomplete(int lst)
 			    lst = COMP_COMPLETE;
 		    } else
 			break;
-		} while (q < s + zlecs - wb);
+		} while (q < s + zlemetacs - wb);
 	    if (lst == COMP_EXPAND_COMPLETE) {
 		/* If it is still not clear if we should use expansion or   *
 		 * completion and there is a `$' or a backtick in the word, *
@@ -760,7 +777,7 @@ docomplete(int lst)
 	    for (q = w; *q; q++)
 		if (INULL(*q))
 		    *q = Nularg;
-	    zlecs = wb;
+	    zlemetacs = wb;
 	    foredel(we - wb);
 
 	    untokenize(x = ox = dupstring(w));
@@ -775,8 +792,8 @@ docomplete(int lst)
 	    /* Do expansion. */
 	    char *ol = (olst == COMP_EXPAND ||
                         olst == COMP_EXPAND_COMPLETE) ?
-		dupstring((char *)zleline) : (char *)zleline;
-	    int ocs = zlecs, ne = noerrs;
+		dupstring((char *)zlemetaline) : (char *)zlemetaline;
+	    int ocs = zlemetacs, ne = noerrs;
 
 	    noerrs = 1;
 	    ret = doexpansion(origword, lst, olst, lincmd);
@@ -786,8 +803,8 @@ docomplete(int lst)
 	    /* If expandorcomplete was invoked and the expansion didn't *
 	     * change the command line, do completion.                  */
 	    if (olst == COMP_EXPAND_COMPLETE &&
-		!strcmp(ol, (char *)zleline)) {
-		zlecs = ocs;
+		!strcmp(ol, (char *)zlemetaline)) {
+		zlemetacs = ocs;
 		errflag = 0;
 
 		if (!compfunc) {
@@ -808,15 +825,15 @@ docomplete(int lst)
             } else {
                 if (ret)
                     clearlist = 1;
-                if (!strcmp(ol, (char *)zleline)) {
+                if (!strcmp(ol, (char *)zlemetaline)) {
                     /* We may have removed some quotes. For completion, other
                      * parts of the code re-install them, but for expansion
                      * we have to do it here. */
-                    zlecs = 0;
-                    foredel(zlell);
+                    zlemetacs = 0;
+                    foredel(zlemetall);
                     spaceinline(origll);
-                    memcpy(zleline, origline, origll);
-                    zlecs = origcs;
+                    memcpy(zlemetaline, origline, origll);
+                    zlemetacs = origcs;
                 }
             }
 	} else
@@ -828,11 +845,11 @@ docomplete(int lst)
     /* Reset the lexer state, pop the heap. */
     lexrestore();
     popheap();
-    unmetafy_line();
 
     dat[0] = lst;
     dat[1] = ret;
     runhookdef(AFTERCOMPLETEHOOK, (void *) dat);
+    unmetafy_line();
 
     active = 0;
     return dat[1];
@@ -865,23 +882,26 @@ addx(char **ptmp)
 {
     int addspace = 0;
 
-    if (!zleline[zlecs] || zleline[zlecs] == '\n' ||
-	(iblank(zleline[zlecs]) && (!zlecs || zleline[zlecs-1] != '\\')) ||
-	zleline[zlecs] == ')' || zleline[zlecs] == '`' ||
-	zleline[zlecs] == '}' ||
-	zleline[zlecs] == ';' || zleline[zlecs] == '|' ||
-	zleline[zlecs] == '&' ||
-	zleline[zlecs] == '>' || zleline[zlecs] == '<' ||
-	(instring && (zleline[zlecs] == '"' || zleline[zlecs] == '\'')) ||
-	(addspace = (comppref && !iblank(zleline[zlecs])))) {
-	*ptmp = (char *)zleline;
-	zleline = (ZLE_STRING_T)zhalloc(strlen((char *)zleline) + 3 +
-					   addspace);
-	memcpy(zleline, *ptmp, zlecs);
-	zleline[zlecs] = 'x';
+    if (!zlemetaline[zlemetacs] || zlemetaline[zlemetacs] == '\n' ||
+	(iblank(zlemetaline[zlemetacs]) &&
+	 (!zlemetacs || zlemetaline[zlemetacs-1] != '\\')) ||
+	zlemetaline[zlemetacs] == ')' || zlemetaline[zlemetacs] == '`' ||
+	zlemetaline[zlemetacs] == '}' ||
+	zlemetaline[zlemetacs] == ';' || zlemetaline[zlemetacs] == '|' ||
+	zlemetaline[zlemetacs] == '&' ||
+	zlemetaline[zlemetacs] == '>' || zlemetaline[zlemetacs] == '<' ||
+	(instring && (zlemetaline[zlemetacs] == '"' ||
+		      zlemetaline[zlemetacs] == '\'')) ||
+	(addspace = (comppref && !iblank(zlemetaline[zlemetacs])))) {
+	*ptmp = (char *)zlemetaline;
+	zlemetaline = (unsigned char *)zhalloc(strlen((char *)zlemetaline)
+					       + 3 + addspace);
+	memcpy(zlemetaline, *ptmp, zlemetacs);
+	zlemetaline[zlemetacs] = 'x';
 	if (addspace)
-	    zleline[zlecs+1] = ' ';
-	strcpy((char *)zleline + zlecs + 1 + addspace, (*ptmp) + zlecs);
+	    zlemetaline[zlemetacs+1] = ' ';
+	strcpy((char *)zlemetaline + zlemetacs + 1 + addspace,
+	       (*ptmp) + zlemetacs);
 	addedx = 1 + addspace;
     } else {
 	addedx = 0;
@@ -902,35 +922,47 @@ dupstrspace(const char *str)
     return t;
 }
 
-/* These functions metafy and unmetafy the ZLE buffer, as described at the *
- * top of this file.  Note that zlell and zlecs are translated.  They *must* be  *
- * called in matching pairs, around all the expansion/completion code.     *
- * Currently, there are four pairs: in history expansion, in the main      *
- * completion function, and one in each of the middle-of-menu-completion   *
- * functions (there's one for each direction).                             */
+/*
+ * These functions metafy and unmetafy the ZLE buffer, as described at
+ * the top of this file.  They *must* be called in matching pairs,
+ * around all the expansion/completion code.
+ *
+ * The variables zleline, zlell and zlecs are metafied into
+ * zlemetaline, zlemetall and zlemetacs.  Only the latter variables
+ * should be referred to from above zle (i.e. in the main shell),
+ * or when using the completion API (if that's not too strong a
+ * way of referring to it).
+ */
 
 /**/
 mod_export void
 metafy_line(void)
 {
-    int len = zlell;
-    char *s;
+    UNMETACHECK();
 
-    for (s = (char *) zleline; s < (char *) zleline + zlell;)
-	if (imeta(*s++))
-	    len++;
-    sizeline(len);
-    (void) metafy((char *) zleline, zlell, META_NOALLOC);
-    zlell = len;
-    zlecs = metalen((char *) zleline, zlecs);
+    zlemetaline = zlelineasstring(zleline, zlell, zlecs,
+				  &zlemetall, &zlemetacs, 0);
+    metalinesz = zlemetall;
+
+    /*
+     * We will always allocate a new zleline based on zlemetaline.
+     */
+    free(zleline);
+    zleline = NULL;
 }
 
 /**/
 mod_export void
 unmetafy_line(void)
 {
-    zlecs = ztrsub((char *) zleline + zlecs, (char *) zleline);
-    (void) unmetafy((char *) zleline, &zlell);
+    METACHECK();
+
+    /* paranoia */
+    zlemetaline[zlemetall] = '\0';
+    zleline = stringaszleline(zlemetaline, zlemetacs, &zlell, &linesz, &zlecs);
+
+    free(zlemetaline);
+    zlemetaline = NULL;
 }
 
 /* Free a brinfo list. */
@@ -1004,6 +1036,8 @@ get_comp_string(void)
     int ona = noaliases, qsub;
     char *s = NULL, *linptr, *tmp, *p, *tt = NULL, rdop[20];
 
+    METACHECK();
+
     freebrinfo(brbeg);
     freebrinfo(brend);
     brbeg = lastbrbeg = brend = lastbrend = NULL;
@@ -1025,7 +1059,8 @@ get_comp_string(void)
      * "...", `...`, or ((...)). Nowadays this is only used to find   *
      * out if we are inside `...`.                                    */
 
-    for (i = j = k = 0, p = (char *)zleline; p < (char *)zleline + zlecs; p++)
+    for (i = j = k = 0, p = (char *)zlemetaline;
+	 p < (char *)zlemetaline + zlemetacs; p++)
 	if (*p == '`' && !(k & 1))
 	    i++;
 	else if (*p == '\"' && !(k & 1) && !(i & 1))
@@ -1037,7 +1072,7 @@ get_comp_string(void)
     inbackt = (i & 1);
     instring = 0;
     addx(&tmp);
-    linptr = (char *)zleline;
+    linptr = (char *)zlemetaline;
     pushheap();
 
  start:
@@ -1146,14 +1181,14 @@ get_comp_string(void)
 	    tt = tokstr ? dupstring(tokstr) : NULL;
 
             if (isset(RCQUOTES) && *tt == Snull) {
-                char *p, *e = tt + zlecs - wb;
+                char *p, *e = tt + zlemetacs - wb;
                 for (p = tt; *p && p < e; p++)
                     if (*p == '\'')
                         qsub++;
             }
 	    /* If we added a `x', remove it. */
 	    if (addedx && tt)
-		chuck(tt + zlecs - wb - qsub);
+		chuck(tt + zlemetacs - wb - qsub);
 	    tt0 = tok;
 	    /* Store the number of this word. */
 	    clwpos = i;
@@ -1201,8 +1236,8 @@ get_comp_string(void)
 	/* If this is the word the cursor is in and we added a `x', *
 	 * remove it.                                               */
 	if (clwpos == i++ && addedx)
-	    chuck(&clwords[i - 1][((zlecs - wb - qsub) >= sl) ?
-				 (sl - 1) : (zlecs - wb - qsub)]);
+	    chuck(&clwords[i - 1][((zlemetacs - wb - qsub) >= sl) ?
+				 (sl - 1) : (zlemetacs - wb - qsub)]);
     } while (tok != LEXERR && tok != ENDINPUT &&
 	     (tok != SEPER || (zleparse && !tt0)));
     /* Calculate the number of words stored in the clwords array. */
@@ -1224,13 +1259,14 @@ get_comp_string(void)
 	/* We are in command or process substitution if we are not in
 	 * a $((...)). */
 	if (parend >= 0 && !tmp)
-	    zleline = (unsigned char *) dupstring(tmp = (char *)zleline);
-	linptr = (char *) zleline + zlell + addedx - parbegin + 1;
-	if ((linptr - (char *) zleline) < 3 || *linptr != '(' ||
+	    zlemetaline = (unsigned char *)
+		dupstring(tmp = (char *)zlemetaline);
+	linptr = (char *) zlemetaline + zlemetall + addedx - parbegin + 1;
+	if ((linptr - (char *) zlemetaline) < 3 || *linptr != '(' ||
 	    linptr[-1] != '(' || linptr[-2] != '$') {
 	    if (parend >= 0) {
-		zlell -= parend;
-		zleline[zlell + addedx] = '\0';
+		zlemetall -= parend;
+		zlemetaline[zlemetall + addedx] = '\0';
 	    }
 	    lexrestore();
 	    tt = NULL;
@@ -1243,7 +1279,7 @@ get_comp_string(void)
     else if (!t0 || t0 == ENDINPUT) {
 	/* There was no word (empty line). */
 	s = ztrdup("");
-	we = wb = zlecs;
+	we = wb = zlemetacs;
 	clwpos = clwnum;
 	t0 = STRING;
     } else if (t0 == STRING) {
@@ -1264,7 +1300,7 @@ get_comp_string(void)
 	*s = sav;
         if (*s == '+')
             s++;
-	if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt + zlecs - wb) {
+	if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt + zlemetacs - wb) {
 	    s = NULL;
 	    inwhat = IN_MATH;
 	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
@@ -1273,7 +1309,7 @@ get_comp_string(void)
 	    else
 		insubscr = 1;
 	} else if (*s == '=') {
-            if (zlecs > wb + (s - tt)) {
+            if (zlemetacs > wb + (s - tt)) {
                 s++;
                 wb += s - tt;
                 s = ztrdup(s);
@@ -1294,17 +1330,17 @@ get_comp_string(void)
 	}
 	lincmd = 1;
     }
-    if (we > zlell)
-	we = zlell;
-    tt = (char *)zleline;
+    if (we > zlemetall)
+	we = zlemetall;
+    tt = (char *)zlemetaline;
     if (tmp) {
-	zleline = (unsigned char *)tmp;
-	zlell = strlen((char *)zleline);
+	zlemetaline = (unsigned char *)tmp;
+	zlemetall = strlen((char *)zlemetaline);
     }
     if (t0 != STRING && inwhat != IN_MATH) {
 	if (tmp) {
 	    tmp = NULL;
-	    linptr = (char *)zleline;
+	    linptr = (char *)zlemetaline;
 	    lexrestore();
 	    addedx = 0;
 	    goto start;
@@ -1325,7 +1361,7 @@ get_comp_string(void)
 	int i = 0;
 	char *nnb = (iident(*s) ? s : s + 1), *nb = NULL, *ne = NULL;
 	
-	for (tt = s; ++tt < s + zlecs - wb;)
+	for (tt = s; ++tt < s + zlemetacs - wb;)
 	    if (*tt == Inbrack) {
 		i++;
 		nb = nnb;
@@ -1354,23 +1390,23 @@ get_comp_string(void)
 	    int lev;
 	    char *p;
 
-	    for (wb = zlecs - 1, lev = 0; wb > 0; wb--)
-		if (zleline[wb] == ']' || zleline[wb] == ')')
+	    for (wb = zlemetacs - 1, lev = 0; wb > 0; wb--)
+		if (zlemetaline[wb] == ']' || zlemetaline[wb] == ')')
 		    lev++;
-		else if (zleline[wb] == '[') {
+		else if (zlemetaline[wb] == '[') {
 		    if (!lev--)
 			break;
-		} else if (zleline[wb] == '(') {
-		    if (!lev && zleline[wb - 1] == '(')
+		} else if (zlemetaline[wb] == '(') {
+		    if (!lev && zlemetaline[wb - 1] == '(')
 			break;
 		    if (lev)
 			lev--;
 		}
-	    p = (char *) zleline + wb;
+	    p = (char *) zlemetaline + wb;
 	    wb++;
 	    if (wb && (*p == '[' || *p == '(') &&
 		!skipparens(*p, (*p == '[' ? ']' : ')'), &p)) {
-		we = (p - (char *) zleline) - 1;
+		we = (p - (char *) zlemetaline) - 1;
 		if (insubscr == 2)
 		    insubscr = 3;
 	    }
@@ -1378,25 +1414,26 @@ get_comp_string(void)
 	    /* In mathematical expression, we complete parameter names  *
 	     * (even if they don't have a `$' in front of them).  So we *
 	     * have to find that name.                                  */
-	    for (we = zlecs; iident(zleline[we]); we++);
-	    for (wb = zlecs; --wb >= 0 && iident(zleline[wb]););
+	    for (we = zlemetacs; iident(zlemetaline[we]); we++);
+	    for (wb = zlemetacs; --wb >= 0 && iident(zlemetaline[wb]););
 	    wb++;
 	}
 	zsfree(s);
 	s = zalloc(we - wb + 1);
-	strncpy(s, (char *) zleline + wb, we - wb);
+	strncpy(s, (char *) zlemetaline + wb, we - wb);
 	s[we - wb] = '\0';
-	if (wb > 2 && zleline[wb - 1] == '[' && iident(zleline[wb - 2])) {
+	if (wb > 2 && zlemetaline[wb - 1] == '[' &&
+	    iident(zlemetaline[wb - 2])) {
 	    int i = wb - 3;
-	    unsigned char sav = zleline[wb - 1];
+	    unsigned char sav = zlemetaline[wb - 1];
 
-	    while (i >= 0 && iident(zleline[i]))
+	    while (i >= 0 && iident(zlemetaline[i]))
 		i--;
 
-	    zleline[wb - 1] = '\0';
+	    zlemetaline[wb - 1] = '\0';
 	    zsfree(varname);
-	    varname = ztrdup((char *) zleline + i + 1);
-	    zleline[wb - 1] = sav;
+	    varname = ztrdup((char *) zlemetaline + i + 1);
+	    zlemetaline[wb - 1] = sav;
 	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
 		(keypm->flags & PM_HASHED)) {
 		if (insubscr != 3)
@@ -1407,7 +1444,7 @@ get_comp_string(void)
 	parse_subst_string(s);
     }
     /* This variable will hold the current word in quoted form. */
-    offs = zlecs - wb;
+    offs = zlemetacs - wb;
     if ((p = parambeg(s))) {
 	for (p = s; *p; p++)
 	    if (*p == Dnull)
@@ -1451,34 +1488,34 @@ get_comp_string(void)
     /* While building the quoted form, we also clean up the command line. */
     for (p = s, i = wb, j = 0; *p; p++, i++)
 	if (INULL(*p)) {
-	    if (i < zlecs)
+	    if (i < zlemetacs)
 		offs--;
 	    if (*p == Snull && isset(RCQUOTES))
 		j = 1-j;
 	    if (p[1] || *p != Bnull) {
 		if (*p == Bnull) {
-		    if (zlecs == i + 1)
-			zlecs++, offs++;
+		    if (zlemetacs == i + 1)
+			zlemetacs++, offs++;
 		} else {
-		    ocs = zlecs;
-		    zlecs = i;
+		    ocs = zlemetacs;
+		    zlemetacs = i;
 		    foredel(1);
-		    if ((zlecs = ocs) > i--)
-			zlecs--;
+		    if ((zlemetacs = ocs) > i--)
+			zlemetacs--;
 		    we--;
 		}
 	    } else {
-		ocs = zlecs;
-		zlecs = we;
+		ocs = zlemetacs;
+		zlemetacs = we;
 		backdel(1);
 		if (ocs == we)
-		    zlecs = we - 1;
+		    zlemetacs = we - 1;
 		else
-		    zlecs = ocs;
+		    zlemetacs = ocs;
 		we--;
 	    }
 	    chuck(p--);
-	} else if (j && *p == '\'' && i < zlecs)
+	} else if (j && *p == '\'' && i < zlemetacs)
 	    offs--;
 
     zsfree(origword);
@@ -1746,9 +1783,24 @@ inststrlen(char *str, int move, int len)
     if (len == -1)
 	len = strlen(str);
     spaceinline(len);
-    strncpy((char *)(zleline + zlecs), str, len);
-    if (move)
-	zlecs += len;
+    if (zlemetaline != NULL)
+    {
+	strncpy((char *)(zlemetaline + zlemetacs), str, len);
+	if (move)
+	    zlemetacs += len;
+    }
+    else
+    {
+	unsigned char *instr;
+	ZLE_STRING_T zlestr;
+	int zlelen;
+
+	instr = (unsigned char *)ztrduppfx((char *)str, len);
+	zlestr = stringaszleline(instr, 0, &zlelen, NULL, NULL);
+	ZS_strncpy(zleline + zlecs, zlestr, zlelen);
+	free(zlestr);
+	zsfree((char *)instr);
+    }
     return len;
 }
 
@@ -1801,17 +1853,17 @@ doexpansion(char *s, int lst, int olst, int explincmd)
     if (lst == COMP_LIST_EXPAND) {
 	/* Only the list of expansions was requested. Restore the 
          * command line. */
-        zlecs = 0;
-        foredel(zlell);
+        zlemetacs = 0;
+        foredel(zlemetall);
         spaceinline(origll);
-        memcpy(zleline, origline, origll);
-        zlecs = origcs;
+        memcpy(zlemetaline, origline, origll);
+        zlemetacs = origcs;
         ret = listlist(vl);
         showinglist = 0;
 	goto end;
     }
     /* Remove the current word and put the expansions there. */
-    zlecs = wb;
+    zlemetacs = wb;
     foredel(we - wb);
     while ((ss = (char *)ugetnode(vl))) {
 	ret = 0;
@@ -1820,11 +1872,11 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	inststr(ss);
 #if 0
 	if (olst != COMP_EXPAND_COMPLETE || nonempty(vl) ||
-	    (zlecs && zleline[zlecs-1] != '/')) {
+	    (zlemetacs && zlemetaline[zlemetacs-1] != '/')) {
 #endif
 	if (nonempty(vl) || !first) {
 	    spaceinline(1);
-	    zleline[zlecs++] = ' ';
+	    zlemetaline[zlemetacs++] = ' ';
 	}
 	first = 0;
     }
@@ -2250,14 +2302,16 @@ doexpandhist(void)
     unsigned char *ol;
     int oll, ocs, ne = noerrs, err, ona = noaliases;
 
+    UNMETACHECK();
+
     pushheap();
     metafy_line();
-    oll = zlell;
-    ocs = zlecs;
-    ol = (unsigned char *)dupstring((char *)zleline);
+    oll = zlemetall;
+    ocs = zlemetacs;
+    ol = (unsigned char *)dupstring((char *)zlemetaline);
     expanding = 1;
-    excs = zlecs;
-    zlell = zlecs = 0;
+    excs = zlemetacs;
+    zlemetall = zlemetacs = 0;
     lexsave();
     /* We push ol as it will remain unchanged */
     inpush((char *) ol, 0, NULL);
@@ -2283,8 +2337,8 @@ doexpandhist(void)
     expanding = 0;
 
     if (!err) {
-	zlecs = excs;
-	if (strcmp((char *)zleline, (char *)ol)) {
+	zlemetacs = excs;
+	if (strcmp((char *)zlemetaline, (char *)ol)) {
 	    unmetafy_line();
 	    /* For vi mode -- reset the beginning-of-insertion pointer   *
 	     * to the beginning of the line.  This seems a little silly, *
@@ -2296,9 +2350,9 @@ doexpandhist(void)
 	}
     }
 
-    strcpy((char *)zleline, (char *)ol);
-    zlell = oll;
-    zlecs = ocs;
+    strcpy((char *)zlemetaline, (char *)ol);
+    zlemetall = oll;
+    zlemetacs = ocs;
     unmetafy_line();
 
     popheap();
@@ -2325,26 +2379,35 @@ fixmagicspace(void)
 int
 magicspace(char **args)
 {
-    char *bangq;
+    ZLE_STRING_T bangq;
+    ZLE_CHAR_T zlebangchar[1];
     int ret;
     fixmagicspace();
-    for (bangq = (char *)zleline; (bangq = strchr(bangq, bangchar));
-	 bangq += 2)
-	if (bangq[1] == '"' && (bangq == (char *)zleline || bangq[-1] != '\\'))
-	    break;
+
 #ifdef ZLE_UNICODE_SUPPORT
     /*
-     * TODO: expansion and completion with Unicode are currently
-     * fundamentally broken.  Most of the code for this hasn't been
-     * commented out, but crashing the shell just because you entered
-     * a space seems to be worth guarding against.
+     * TODO: bangchar should really be a multibyte string representing
+     * a single character, since there's no fundamental reason why
+     * it shouldn't be a Unicode character.  In practice this is
+     * very minor, however.
      */
-    ret = selfinsert(args);
+    if (mbtowc(zlebangchar, (char *)&bangchar, 1) < 0)
+	return selfinsert(args);
 #else
-    if (!(ret = selfinsert(args)) &&
-	(!bangq || bangq + 2 > (char *)zleline + zlecs))
-	doexpandhist();
+    zlebangchar[0] = bangchar;
 #endif
+    for (bangq = zleline; bangq < zleline + zlell; bangq++)
+    {
+	if (*bangq != zlebangchar[0])
+	    continue;
+	if (bangq[1] == ZWC('"') &&
+	    (bangq == zleline || bangq[-1] == ZWC('\\')))
+	    break;
+    }
+
+    if (!(ret = selfinsert(args)) &&
+	(!bangq || bangq + 2 > zleline + zlecs))
+	doexpandhist();
     return ret;
 }
 
@@ -2369,8 +2432,7 @@ getcurcmd(void)
     zleparse = 2;
     lexsave();
     metafy_line();
-    inpush(dupstrspace((char *) zleline), 0, NULL);
-    unmetafy_line();
+    inpush(dupstrspace((char *) zlemetaline), 0, NULL);
     strinbeg(1);
     pushheap();
     do {
@@ -2381,8 +2443,8 @@ getcurcmd(void)
 	if (tok == STRING && curlincmd) {
 	    zsfree(s);
 	    s = ztrdup(tokstr);
-	    cmdwb = zlell - wordbeg;
-	    cmdwe = zlell + 1 - inbufct;
+	    cmdwb = zlemetall - wordbeg;
+	    cmdwe = zlemetall + 1 - inbufct;
 	}
     }
     while (tok != ENDINPUT && tok != LEXERR && zleparse);
@@ -2390,6 +2452,7 @@ getcurcmd(void)
     strinend();
     inpop();
     errflag = zleparse = 0;
+    unmetafy_line();
     lexrestore();
 
     return s;
@@ -2426,8 +2489,13 @@ processcmd(UNUSED(char **args))
 int
 expandcmdpath(UNUSED(char **args))
 {
-    int oldcs = zlecs, na = noaliases;
+    /*
+     * zleline is not metafied for most of this function
+     * (that happens within getcurcmd()).
+     */
+    int oldcs = zlecs, na = noaliases, strll;
     char *s, *str;
+    ZLE_STRING_T zlestr;
 
     noaliases = 1;
     s = getcurcmd();
@@ -2440,8 +2508,11 @@ expandcmdpath(UNUSED(char **args))
 	return 1;
     zlecs = cmdwb;
     foredel(cmdwe - cmdwb);
-    spaceinline(strlen(str));
-    strncpy((char *)zleline + zlecs, str, strlen(str));
+    zlestr = stringaszleline((unsigned char *)str, 0,
+			     &strll, NULL, NULL);
+    spaceinline(strll);
+    ZS_strncpy(zleline + zlecs, zlestr, strll);
+    free(zlestr);
     zlecs = oldcs;
     if (zlecs >= cmdwe - 1)
 	zlecs += cmdwe - cmdwb + strlen(str);
@@ -2461,7 +2532,7 @@ expandorcompleteprefix(char **args)
 
     comppref = 1;
     ret = expandorcomplete(args);
-    if (zlecs && zleline[zlecs - 1] == ' ')
+    if (zlecs && zleline[zlecs - 1] == ZWC(' '))
         makesuffixstr(NULL, "\\-", 0);
     comppref = 0;
     return ret;

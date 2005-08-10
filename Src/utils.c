@@ -2812,7 +2812,7 @@ getbaudrate(struct ttyinfo *shttyinfo)
  *   META_NOALLOC:  buf points to a memory area which is long enough to hold *
  *                  the quoted form, just quote it and return buf.           *
  *   META_STATIC:   store the quoted string in a static area.  The original  *
- *                  string should be at most PATH_MAX long.                   *
+ *                  string should be at most PATH_MAX long.                  *
  *   META_ALLOC:    allocate memory for the new string with zalloc().        *
  *   META_DUP:      leave buf unchanged and allocate space for the return    *
  *                  value even if buf does not contains special characters   *

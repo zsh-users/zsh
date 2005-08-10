@@ -281,7 +281,10 @@ mod_export int lastend;
 
 #define inststr(X) inststrlen((X),1,-1)
 
-/* Main completion entry point, called from zle. */
+/*
+ * Main completion entry point, called from zle. 
+ * At this point the line is already metafied.
+ */
 
 /**/
 int
@@ -291,6 +294,8 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     char *s = dat->s;
     char *opm;
     LinkNode n;
+
+    METACHECK();
 
     pushheap();
 
@@ -329,7 +334,7 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 		      (isset(LISTPACKED) ? "packed rows" : "rows") :
 		      (isset(LISTPACKED) ? "packed" : ""));
     startauto = isset(AUTOMENU);
-    movetoend = ((zlecs == we || isset(ALWAYSTOEND)) ? 2 : 1);
+    movetoend = ((zlemetacs == we || isset(ALWAYSTOEND)) ? 2 : 1);
     showinglist = 0;
     hasmatched = hasunmatched = 0;
     minmlen = 1000000;
@@ -341,10 +346,10 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     /* Make sure we have the completion list and compctl. */
     if (makecomplist(s, incmd, lst)) {
 	/* Error condition: feeeeeeeeeeeeep(). */
-	zlecs = 0;
-	foredel(zlell);
+	zlemetacs = 0;
+	foredel(zlemetall);
 	inststr(origline);
-	zlecs = origcs;
+	zlemetacs = origcs;
 	clearlist = 1;
 	ret = 1;
 	minfo.cur = NULL;
@@ -366,10 +371,10 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	ret = selfinsert(zlenoargs);
     else if (!useline && uselist) {
 	/* All this and the guy only wants to see the list, sigh. */
-	zlecs = 0;
-	foredel(zlell);
+	zlemetacs = 0;
+	foredel(zlemetall);
 	inststr(origline);
-	zlecs = origcs;
+	zlemetacs = origcs;
 	showinglist = -2;
     } else if (useline == 2 && nmatches > 1) {
 	do_allmatches(1);
@@ -414,10 +419,10 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	invalidatelist();
 	if (forcelist)
 	    clearlist = 1;
-	zlecs = 0;
-	foredel(zlell);
+	zlemetacs = 0;
+	foredel(zlemetall);
 	inststr(origline);
-	zlecs = origcs;
+	zlemetacs = origcs;
     }
     /* Print the explanation strings if needed. */
     if (!showinglist && validlist && usemenu != 2 && uselist &&
@@ -430,9 +435,9 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     for (n = firstnode(matchers); n; incnode(n))
 	freecmatcher((Cmatcher) getdata(n));
 
-    zlell = strlen((char *)zleline);
-    if (zlecs > zlell)
-	zlecs = zlell;
+    zlemetall = strlen((char *)zlemetaline);
+    if (zlemetacs > zlemetall)
+	zlemetacs = zlemetall;
     popheap();
 
     return ret;
@@ -469,6 +474,11 @@ before_complete(UNUSED(Hookdef dummy), int *lst)
     /* We may have to reset the cursor to its position after the   *
      * string inserted by the last completion. */
 
+    /*
+     * Currently this hook runs before metafication.
+     * This is the only hook of the three defined here of
+     * which that is true.
+     */
     if ((fromcomp & FC_INWORD) && (zlecs = lastend) > zlell)
 	zlecs = zlell;
 
@@ -499,10 +509,10 @@ after_complete(UNUSED(Hookdef dummy), int *dat)
 	    minfo.cur = NULL;
 	    if (ret >= 2) {
 		fixsuffix();
-		zlecs = 0;
-		foredel(zlell);
+		zlemetacs = 0;
+		foredel(zlemetall);
 		inststr(origline);
-		zlecs = origcs;
+		zlemetacs = origcs;
 		if (ret == 2) {
 		    clearlist = 1;
 		    invalidatelist();
@@ -524,6 +534,8 @@ callcompfunc(char *s, char *fn)
     Eprog prog;
     int lv = lastval;
     char buf[20];
+
+    METACHECK();
 
     if ((prog = getshfunc(fn)) != &dummy_eprog) {
 	char **p, *tmp;
@@ -683,10 +695,10 @@ callcompfunc(char *s, char *fn)
 	    int l;
 
 	    compiprefix = (char *) zalloc((l = wb - parwb) + 1);
-	    memcpy(compiprefix, zleline + parwb, l);
+	    memcpy(compiprefix, zlemetaline + parwb, l);
 	    compiprefix[l] = '\0';
 	    compisuffix = (char *) zalloc((l = parwe - we) + 1);
-	    memcpy(compisuffix, zleline + we, l);
+	    memcpy(compisuffix, zlemetaline + we, l);
 	    compisuffix[l] = '\0';
 
 	    wb = parwb;
@@ -1152,7 +1164,7 @@ check_param(char *s, int set, int test)
 	    }
 	    /* And adjust wb, we, and offs again. */
 	    offs -= b - s;
-	    wb = zlecs - offs;
+	    wb = zlemetacs - offs;
 	    we = wb + e - b;
 	    ispar = (br >= 2 ? 2 : 1);
 	    b[we-wb] = '\0';
@@ -1265,6 +1277,11 @@ comp_str(int *ipl, int *pl, int untok)
     return str;
 }
 
+/*
+ * This is the code behind compset -q, which splits the
+ * the current word as if it were a command line.
+ */
+
 /**/
 int
 set_comp_sep(void)
@@ -1273,11 +1290,13 @@ set_comp_sep(void)
     char *s = comp_str(&lip, &lp, 1);
     LinkList foo = newlinklist();
     LinkNode n;
-    int owe = we, owb = wb, ocs = zlecs, swb, swe, scs, soffs, ne = noerrs;
-    int tl, got = 0, i = 0, j, cur = -1, oll = zlell, sl, css = 0;
+    int owe = we, owb = wb, ocs, swb, swe, scs, soffs, ne = noerrs;
+    int tl, got = 0, i = 0, j, cur = -1, oll, sl, css = 0;
     int remq = 0, dq = 0, odq, sq = 0, osq, issq = 0, sqq = 0, lsq = 0, qa = 0;
     int ois = instring, oib = inbackt, noffs = lp, ona = noaliases;
-    char *tmp, *p, *ns, *ol = (char *) zleline, sav, *qp, *qs, *ts, qc = '\0';
+    char *tmp, *p, *ns, *ol, sav, *qp, *qs, *ts, qc = '\0';
+
+    METACHECK();
 
     s += lip;
     wb += lip;
@@ -1289,13 +1308,16 @@ set_comp_sep(void)
     /* Put the string in the lexer buffer and call the lexer to *
      * get the words we have to expand.                        */
     zleparse = 1;
+    ocs = zlemetacs;
+    oll = zlemetall;
+    ol = (char *)zlemetaline;
     addedx = 1;
     noerrs = 1;
     lexsave();
     tmp = (char *) zhalloc(tl = 3 + strlen(s));
     tmp[0] = ' ';
     memcpy(tmp + 1, s, noffs);
-    tmp[(scs = zlecs = 1 + noffs)] = 'x';
+    tmp[(scs = zlemetacs = 1 + noffs)] = 'x';
     strcpy(tmp + 2 + noffs, s + noffs);
 
     switch (*compqstack) {
@@ -1318,8 +1340,8 @@ set_comp_sep(void)
             if (*p == '\\' && p[1] == '\\') {
                 dq++;
                 chuck(p);
-                if (j > zlecs) {
-                    zlecs++;
+                if (j > zlemetacs) {
+                    zlemetacs++;
                     css++;
                 }
                 if (!*p)
@@ -1329,8 +1351,8 @@ set_comp_sep(void)
     odq = dq;
     osq = sq;
     inpush(dupstrspace(tmp), 0, NULL);
-    zleline = (unsigned char *) tmp;
-    zlell = tl - 1;
+    zlemetaline = (unsigned char *) tmp;
+    zlemetall = tl - 1;
     strinbeg(0);
     noaliases = 1;
     do {
@@ -1383,7 +1405,7 @@ set_comp_sep(void)
 	    swb = wb - 1 - dq - sq;
 	    swe = we - 1 - dq - sq;
             sqq = lsq;
-	    soffs = zlecs - swb - css;
+	    soffs = zlemetacs - swb - css;
 	    chuck(p + soffs);
 	    ns = dupstring(p);
 	}
@@ -1397,9 +1419,9 @@ set_comp_sep(void)
     lexrestore();
     wb = owb;
     we = owe;
-    zlecs = ocs;
-    zleline = (unsigned char *) ol;
-    zlell = oll;
+    zlemetacs = ocs;
+    zlemetaline = (unsigned char *) ol;
+    zlemetall = oll;
     if (cur < 0 || i < 1)
 	return 1;
     owb = offs;

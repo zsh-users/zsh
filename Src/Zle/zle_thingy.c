@@ -416,8 +416,8 @@ bin_zle_refresh(UNUSED(char *name), char **args, Options ops, UNUSED(char func))
     statusll = 0;
     if (*args) {
 	if (**args) {
-	    statusline = stringaszleline((unsigned char *)*args, &statusll,
-					 NULL);
+	    statusline = stringaszleline((unsigned char *)*args, 0, &statusll,
+					 NULL, NULL);
 	}
 	if (*++args) {
 	    LinkList l = newlinklist();

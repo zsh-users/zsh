@@ -1771,28 +1771,30 @@ setmstatus(char *status, char *sline, int sll, int scs,
     char *p, *s, *ret = NULL;
     int pl, sl, max;
 
+    METACHECK();
+
     if (csp) {
-        *csp = zlecs;
-        *llp = zlell;
+        *csp = zlemetacs;
+        *llp = zlemetall;
         *lenp = lastend - wb;
 
-        ret = dupstring((char *) zleline);
+        ret = dupstring((char *) zlemetaline);
 
-        p = (char *) zhalloc(zlecs - wb + 1);
-        strncpy(p, (char *) zleline + wb, zlecs - wb);
-        p[zlecs - wb] = '\0';
-        if (lastend < zlecs)
+        p = (char *) zhalloc(zlemetacs - wb + 1);
+        strncpy(p, (char *) zlemetaline + wb, zlemetacs - wb);
+        p[zlemetacs - wb] = '\0';
+        if (lastend < zlemetacs)
             s = "";
         else {
-            s = (char *) zhalloc(lastend - zlecs + 1);
-            strncpy(s, (char *) zleline + zlecs, lastend - zlecs);
-            s[lastend - zlecs] = '\0';
+            s = (char *) zhalloc(lastend - zlemetacs + 1);
+            strncpy(s, (char *) zlemetaline + zlemetacs, lastend - zlemetacs);
+            s[lastend - zlemetacs] = '\0';
         }
-        zlecs = 0;
-        foredel(zlell);
+        zlemetacs = 0;
+        foredel(zlemetall);
         spaceinline(sll);
-        memcpy(zleline, sline, sll);
-        zlecs = scs;
+        memcpy(zlemetaline, sline, sll);
+        zlemetacs = scs;
     } else {
         p = complastprefix;
         s = complastsuffix;
@@ -1970,7 +1972,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     Menustack u = NULL;
     int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
     int space, lbeg = 0, step = 1, wrap, pl = nlnct, broken = 0, first = 1;
-    int nolist = 0, mode = 0, modecs, modell, modelen;
+    int nolist = 0, mode = 0, modecs, modell, modelen, wasmeta;
     char *s;
     char status[MAX_STATUS], *modeline = NULL;
 
@@ -1990,6 +1992,23 @@ domenuselect(Hookdef dummy, Chdata dat)
 	unqueue_signals();
 	return 0;
     }
+    /*
+     * Lots of the logic here doesn't really make sense if the
+     * line isn't metafied, but the evidence was that only used
+     * to be metafied locally in a couple of places.
+     * It's horrifically difficult to work out where the line
+     * is metafied, so I've resorted to the following.
+     * Unfortunately we need to unmetatfy in zrefresh() when
+     * we want to display something.  Maybe this function can
+     * be done better.
+     */
+    if (zlemetaline != NULL)
+	wasmeta = 1;
+    else {
+	wasmeta = 0;
+	metafy_line();
+    }
+    
     if ((s = getsparam("MENUSCROLL"))) {
 	if (!(step = mathevali(s)))
 	    step = (lines - nlnct) >> 1;
@@ -2010,11 +2029,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 	     * was before completion started.
 	     */
             mode = MM_INTER;
-            zlecs = 0;
-            foredel(zlell);
+            zlemetacs = 0;
+            foredel(zlemetall);
             spaceinline(l);
-            strncpy((char *) zleline, origline, l);
-            zlecs = origcs;
+            strncpy((char *) zlemetaline, origline, l);
+            zlemetacs = origcs;
             setmstatus(status, NULL, 0 , 0, NULL, NULL, NULL);
         } else if (strpfx("search", s)) {
             mode = (strstr(s, "back") ? MM_BSEARCH : MM_FSEARCH);
@@ -2108,15 +2127,15 @@ domenuselect(Hookdef dummy, Chdata dat)
 	     * completion we don't want that, we always want to
 	     * be able to type the next character.
 	     */
-	    modeline = dupstring(zleline);
-            modecs = zlecs;
-            modell = zlell;
+	    modeline = dupstring((char *)zlemetaline);
+            modecs = zlemetacs;
+            modell = zlemetall;
             modelen = minfo.len;
         }
         first = 0;
         if (mode == MM_INTER) {
-	    statusline = stringaszleline((unsigned char *)status,
-					 &statusll, NULL);
+	    statusline = stringaszleline((unsigned char *)status, 0,
+					 &statusll, NULL, NULL);
         } else if (mode) {
             int l = sprintf(status, "%s%sisearch%s: ",
                             ((msearchstate & MS_FAILED) ? "failed " : ""),
@@ -2125,8 +2144,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 
             strncat(status, msearchstr, MAX_STATUS - l - 1);
 
-            statusline = stringaszleline((unsigned char *)status,
-					 &statusll, NULL);
+            statusline = stringaszleline((unsigned char *)status, 0,
+					 &statusll, NULL, NULL);
         } else {
             statusline = NULL;
             statusll = 0;
@@ -2207,11 +2226,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 		 * start.
 		 */
                 mode = MM_INTER;
-                zlecs = 0;
-                foredel(zlell);
+                zlemetacs = 0;
+                foredel(zlemetall);
                 spaceinline(l);
-                strncpy((char *) zleline, origline, l);
-                zlecs = origcs;
+                strncpy((char *) zlemetaline, origline, l);
+                zlemetacs = origcs;
                 setmstatus(status, NULL, 0, 0, NULL, NULL, NULL);
 
                 continue;
@@ -2226,8 +2245,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 
 	    s->prev = u;
 	    u = s;
-	    s->line = dupstring((char *) zleline);
-	    s->cs = zlecs;
+	    s->line = dupstring((char *) zlemetaline);
+	    s->cs = zlemetacs;
 	    s->mline = mline;
 	    s->mlbeg = mlbeg;
 	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
@@ -2266,21 +2285,21 @@ domenuselect(Hookdef dummy, Chdata dat)
 		 * the command line as it is with just the
 		 * characters typed by the user.
 		 */
-                zlecs = 0;
-                foredel(zlell);
+                zlemetacs = 0;
+                foredel(zlemetall);
                 spaceinline(l);
-                strncpy((char *) zleline, origline, l);
-                zlecs = origcs;
+                strncpy((char *) zlemetaline, origline, l);
+                zlemetacs = origcs;
 
                 if (cmd == Th(z_selfinsert))
                     selfinsert(zlenoargs);
                 else
                     selfinsertunmeta(zlenoargs);
 
-                saveline = (char *) zhalloc(zlell);
-                memcpy(saveline, zleline, zlell);
-                savell = zlell;
-                savecs = zlecs;
+                saveline = (char *) zhalloc(zlemetall);
+                memcpy(saveline, zlemetaline, zlemetall);
+                savell = zlemetall;
+                savecs = zlemetacs;
                 iforcemenu = -1;
             } else
                 mode = 0;
@@ -2294,8 +2313,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if (nmatches < 1 || !minfo.cur || !*(minfo.cur)) {
 		nolist = 1;
                 if (mode == MM_INTER) {
-                    statusline = stringaszleline((unsigned char *)status,
-						 &statusll, NULL);
+                    statusline = stringaszleline((unsigned char *)status, 0,
+						 &statusll, NULL, NULL);
                 } else {
 		    /* paranoia */
 		    statusline = NULL;
@@ -2339,8 +2358,8 @@ domenuselect(Hookdef dummy, Chdata dat)
             mode = 0;
 	    s->prev = u;
 	    u = s;
-	    s->line = dupstring((char *) zleline);
-	    s->cs = zlecs;
+	    s->line = dupstring((char *) zlemetaline);
+	    s->cs = zlemetacs;
 	    s->mline = mline;
 	    s->mlbeg = mlbeg;
 	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
@@ -2394,11 +2413,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 		break;
 
 	    handleundo();
-	    zlecs = 0;
-	    foredel(zlell);
+	    zlemetacs = 0;
+	    foredel(zlemetall);
 	    spaceinline(l = strlen(u->line));
-	    strncpy((char *) zleline, u->line, l);
-	    zlecs = u->cs;
+	    strncpy((char *) zlemetaline, u->line, l);
+	    zlemetacs = u->cs;
 	    menuacc = u->acc;
 	    memcpy(&minfo, &(u->info), sizeof(struct menuinfo));
 	    p = &(minfo.cur);
@@ -2435,8 +2454,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 
             if (nolist) {
                 if (mode == MM_INTER) {
-                    statusline = stringaszleline((unsigned char *)status,
-						 &statusll, NULL);
+                    statusline = stringaszleline((unsigned char *)status, 0,
+						 &statusll, NULL, NULL);
                 } else {
 		    /* paranoia */
 		    statusline = NULL;
@@ -2783,11 +2802,11 @@ domenuselect(Hookdef dummy, Chdata dat)
                 origline = modeline;
                 origcs = modecs;
                 origll = modell;
-                zlecs = 0;
-                foredel(zlell);
+                zlemetacs = 0;
+                foredel(zlemetall);
                 spaceinline(origll);
-                strncpy((char *) zleline, origline, origll);
-                zlecs = origcs;
+                strncpy((char *) zlemetaline, origline, origll);
+                zlemetacs = origcs;
                 minfo.len = modelen;
             } else {
                 mode = 0;
@@ -2880,9 +2899,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		acc = 1;
 	    break;
 	}
-	metafy_line();
 	do_single(**p);
-	unmetafy_line();
 	mselect = (**p)->gnum;
     }
     if (u)
@@ -2898,9 +2915,7 @@ domenuselect(Hookdef dummy, Chdata dat)
         clearlist = listshown = 1;
     if (acc && validlist && minfo.cur) {
 	menucmp = lastambig = hasoldlist = 0;
-	metafy_line();
 	do_single(*(minfo.cur));
-	unmetafy_line();
     }
     if (wasnext || broken) {
 	menucmp = 2;
@@ -2922,6 +2937,9 @@ domenuselect(Hookdef dummy, Chdata dat)
     }
     mlbeg = -1;
     fdat = NULL;
+
+    if (!wasmeta)
+	unmetafy_line();
 
     return (broken == 2 ? 3 :
 	    ((dat && !broken) ? (acc ? 1 : 2) : (!noselect ^ acc)));

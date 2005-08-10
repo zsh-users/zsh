@@ -126,6 +126,8 @@ static struct zleparam {
     { NULL, 0, NULL, NULL }
 };
 
+/* ro means parameters are readonly, used from completion */
+
 /**/
 mod_export void
 makezleparams(int ro)
@@ -187,7 +189,10 @@ set_buffer(UNUSED(Param pm), char *x)
 static char *
 get_buffer(UNUSED(Param pm))
 {
-    return (char *)zlelineasstring(zleline, zlell, 0, NULL, NULL, 1);
+    if (zlemetaline != 0)
+	return dupstring((char *)zlemetaline);
+    else
+	return (char *)zlelineasstring(zleline, zlell, 0, NULL, NULL, 1);
 }
 
 /**/
@@ -208,7 +213,17 @@ set_cursor(UNUSED(Param pm), zlong x)
 static zlong
 get_cursor(UNUSED(Param pm))
 {
-    return zlecs;
+    if (zlemetaline != NULL) {
+	/* A lot of work for one number, but still... */
+	ZLE_STRING_T tmpline;
+	int tmpcs, tmpll, tmpsz;
+	tmpline = stringaszleline(zlemetaline, zlemetacs,
+				  &tmpll, &tmpsz, &tmpcs);
+	free(tmpline);
+	return tmpcs;
+    }
+    else
+	return zlecs;
 }
 
 /**/
@@ -238,9 +253,9 @@ set_lbuffer(UNUSED(Param pm), char *x)
     int len;
 
     if (x && *x != ZWC('\0'))
-	y = stringaszleline((unsigned char *)x, &len, NULL);
+	y = stringaszleline((unsigned char *)x, 0, &len, NULL, NULL);
     else
-	y = ZWC(""), len = 0;
+	y = ZWS(""), len = 0;
     sizeline(zlell - zlecs + len);
     ZS_memmove(zleline + len, zleline + zlecs, zlell - zlecs);
     ZS_memcpy(zleline, y, len);
@@ -257,7 +272,10 @@ set_lbuffer(UNUSED(Param pm), char *x)
 static char *
 get_lbuffer(UNUSED(Param pm))
 {
-    return (char *)zlelineasstring(zleline, zlecs, 0, NULL, NULL, 1);
+    if (zlemetaline != NULL)
+	return dupstrpfx((char *)zlemetaline, zlemetacs);
+    else
+	return (char *)zlelineasstring(zleline, zlecs, 0, NULL, NULL, 1);
 }
 
 /**/
@@ -268,9 +286,9 @@ set_rbuffer(UNUSED(Param pm), char *x)
     int len;
 
     if (x && *x != ZWC('\0'))
-	y = stringaszleline((unsigned char *)x, &len, NULL);
+	y = stringaszleline((unsigned char *)x, 0, &len, NULL, NULL);
     else
-	y = ZWC(""), len = 0;
+	y = ZWS(""), len = 0;
     sizeline(zlell = zlecs + len);
     ZS_memcpy(zleline + zlecs, y, len);
     zsfree(x);
@@ -284,8 +302,11 @@ set_rbuffer(UNUSED(Param pm), char *x)
 static char *
 get_rbuffer(UNUSED(Param pm))
 {
-    return (char *)zlelineasstring(zleline + zlecs, zlell - zlecs,
-				   0, NULL, NULL, 1);
+    if (zlemetaline != NULL)
+	return dupstrpfx((char *)zleline + zlemetacs, zlemetall - zlemetacs);
+    else
+	return (char *)zlelineasstring(zleline + zlecs, zlell - zlecs,
+				       0, NULL, NULL, 1);
 }
 
 /**/
@@ -435,7 +456,7 @@ set_cutbuffer(UNUSED(Param pm), char *x)
     cutbuf.flags = 0;
     if (x) {
 	int n;
-	cutbuf.buf = stringaszleline((unsigned char *)x, &n, NULL);
+	cutbuf.buf = stringaszleline((unsigned char *)x, 0, &n, NULL, NULL);
 	cutbuf.len = n;
 	free(x);
     } else {
@@ -490,7 +511,8 @@ set_killring(UNUSED(Param pm), char **x)
 	    int n, len = strlen(*p);
 	    kptr = kring + kpos;
 
-	    kptr->buf = stringaszleline((unsigned char *)*p, &n, NULL);
+	    kptr->buf = stringaszleline((unsigned char *)*p, 0, &n,
+					NULL, NULL);
 	    kptr->len = n;
 
 	    zfree(*p, len+1);
@@ -556,7 +578,7 @@ set_prepost(ZLE_STRING_T *textvar, int *lenvar, char *x)
 	*lenvar = 0;
     }
     if (x) {
-	*textvar = stringaszleline((unsigned char *)x, lenvar, NULL);
+	*textvar = stringaszleline((unsigned char *)x, 0, lenvar, NULL, NULL);
 	free(x);
     }
 }
@@ -610,8 +632,8 @@ static char *
 get_lsearch(UNUSED(Param pm))
 {
     if (previous_search_len)
-	return zlelineasstring(previous_search, previous_search_len, 0,
-			       NULL, NULL, 1);
+	return (char *)zlelineasstring(previous_search, previous_search_len, 0,
+				       NULL, NULL, 1);
     else
 	return "";
 }

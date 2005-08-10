@@ -222,12 +222,12 @@ iaddtoline(int c)
 	exlast--;
 	zleaddtolineptr('\\');
     }
-    if (excs > zlecs) {
+    if (excs > zlemetacs) {
 	excs += 1 + inbufct - exlast;
-	if (excs < zlecs)
+	if (excs < zlemetacs)
 	    /* this case could be handled better but it is    *
 	     * so rare that it does not worth it              */
-	    excs = zlecs;
+	    excs = zlemetacs;
     }
     exlast = inbufct;
     zleaddtolineptr(itok(c) ? ztokens[c - Pound] : c);
@@ -662,8 +662,8 @@ ihungetc(int c)
 	    hungetc('\n'), hungetc('\\');
 
 	if (expanding) {
-	    zlecs--;
-	    zlell--;
+	    zlemetacs--;
+	    zlemetall--;
 	    exlast++;
 	}
 	DPUTS(hptr <= chline, "BUG: hungetc attempted at buffer start");
@@ -2241,15 +2241,27 @@ histfileIsLocked(void)
     return lockhistct > 0;
 }
 
-/* Get the words in the current buffer. Using the lexer. */
+/*
+ * Get the words in the current buffer. Using the lexer. 
+ *
+ * As far as I can make out, this is a gross hack based on a gross hack.
+ * When analysing lines from within zle, we tweak the metafied line
+ * positions (zlemetall and zlemetacs) directly in the lexer.  That's
+ * bad enough, but this function appears to be designed to be called
+ * from outside zle, pretending to be in zle and calling out, so
+ * we set zlemetall and zlemetacs locally and copy the current zle line,
+ * which may not even be valid at this point.
+ *
+ * However, I'm so confused it could simply be baking Bakewell tarts.
+ */
 
 /**/
 mod_export LinkList
 bufferwords(LinkList list, char *buf, int *index)
 {
-    int num = 0, cur = -1, got = 0, ne = noerrs, ocs = zlecs, oll = zlell;
+    int num = 0, cur = -1, got = 0, ne = noerrs;
     int owb = wb, owe = we, oadx = addedx, ozp = zleparse, onc = nocomments;
-    int ona = noaliases;
+    int ona = noaliases, ocs = zlemetacs, oll = zlemetall;
     char *p;
 
     if (!list)
@@ -2267,47 +2279,47 @@ bufferwords(LinkList list, char *buf, int *index)
 	p[l] = ' ';
 	p[l + 1] = '\0';
 	inpush(p, 0, NULL);
-	zlell = strlen(p) ;
-	zlecs = zlell + 1;
+	zlemetall = strlen(p) ;
+	zlemetacs = zlemetall + 1;
 	nocomments = 1;
     } else {
 	int ll, cs;
 	char *linein;
 
 	if (zlegetlineptr) {
-	    linein = zlegetlineptr(&ll, &cs);
+	    linein = (char *)zlegetlineptr(&ll, &cs);
 	} else {
 	    linein = ztrdup("");
 	    ll = cs = 0;
 	}
-	zlell = ll + 1; /* length of line plus space added below */
-	zlecs = cs;
+	zlemetall = ll + 1; /* length of line plus space added below */
+	zlemetacs = cs;
 
 	if (!isfirstln && chline) {
 	    p = (char *) zhalloc(hptr - chline + ll + 2);
 	    memcpy(p, chline, hptr - chline);
 	    memcpy(p + (hptr - chline), linein, ll);
 	    p[(hptr - chline) + ll] = ' ';
-	    p[(hptr - chline) + zlell] = '\0';
+	    p[(hptr - chline) + zlemetall] = '\0';
 	    inpush(p, 0, NULL);
 
 	    /*
 	     * advance line length and character position over
 	     * prepended string.
 	     */
-	    zlell += hptr - chline;
-	    zlecs += hptr - chline;
+	    zlemetall += hptr - chline;
+	    zlemetacs += hptr - chline;
 	} else {
 	    p = (char *) zhalloc(ll + 2);
 	    memcpy(p, linein, ll);
 	    p[ll] = ' ';
-	    p[zlell] = '\0';
+	    p[zlemetall] = '\0';
 	    inpush(p, 0, NULL);
 	}
-    zsfree(linein);
+	zsfree(linein);
     }
-    if (zlecs)
-	zlecs--;
+    if (zlemetacs)
+	zlemetacs--;
     strinbeg(0);
     noaliases = 1;
     do {
@@ -2363,8 +2375,8 @@ bufferwords(LinkList list, char *buf, int *index)
     nocomments = onc;
     noerrs = ne;
     lexrestore();
-    zlecs = ocs;
-    zlell = oll;
+    zlemetacs = ocs;
+    zlemetall = oll;
     wb = owb;
     we = owe;
     addedx = oadx;

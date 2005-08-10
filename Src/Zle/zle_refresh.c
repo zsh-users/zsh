@@ -333,7 +333,8 @@ zrefresh(void)
 	*qbuf;			/* tmp					     */
     int tmpcs, tmpll;		/* ditto cursor position and line length */
     int tmpalloced;		/* flag to free tmpline when finished */
-
+    int remetafy;		/* flag that zle line is metafied */
+    
     if (trashedzle)
 	reexpandprompt();
 
@@ -343,6 +344,17 @@ zrefresh(void)
      * improves speed a little in a common case.                             */
     if (inlist)
 	return;
+
+    /*
+     * zrefresh() is called from all over the place, so we can't
+     * be sure if the line is metafied for completion or not.
+     */
+    if (zlemetaline != NULL) {
+	remetafy = 1;
+	unmetafy_line();
+    }
+    else
+	remetafy = 0;
 
     if (predisplaylen || postdisplaylen) {
 	/* There is extra text to display at the start or end of the line */
@@ -743,6 +755,9 @@ singlelineout:
     }
     if (showinglist == -1)
 	showinglist = nlnct;
+
+    if (remetafy)
+	metafy_line();
 }
 
 #define tcinscost(X)   (tccan(TCMULTINS) ? tclen[TCMULTINS] : (X)*tclen[TCINS])
@@ -1189,6 +1204,12 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     int t0,			/* tmp			       */
 	vsiz,			/* size of new video buffer    */
 	nvcs = 0;		/* new video cursor column     */
+#ifdef ZLE_UNICODE_SUPPORT
+    ZLE_STRING_T lpwbuf, lpwp;	/* converted lprompt and pointer */
+    char *lpptr,		/* pointer into multibyte lprompt */
+	lpend;			/* end of multibyte lprompt */
+    mbstate_t ps;		/* shift state */
+#endif
 
     nlnct = 1;
 /* generate the new line buffer completely */
@@ -1208,14 +1229,44 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     }
 
     /* only use last part of prompt */
-    /* TODO convert prompt to wide char */
 #ifdef ZLE_UNICODE_SUPPORT
-    t0 = mbtowc(vbuf, strchr(lpromptbuf, 0) - lpromptw, lpromptw);
-    if (t0 >= 0) {
-	vbuf[t0] = ZWC('\0');
-	vp = vbuf + t0;
-    } else
-	/* FIXME What to do? */ ;
+    /*
+     * Convert the entire lprompt so that we know how to count
+     * characters.
+     *
+     * TODO screen widths are still not correct, indeed lpromptw knows
+     * nothing about multibyte characters so may be too long.
+     */
+    lpend = strchr(lpromptbuf, 0);
+    /* Worst case number of characters, not null-terminated */
+    lpwp = lpwbuf = (ZLE_STRING_T)zalloc((lpend - lpromptbuf)
+					 * sizeof(*lpwbuf));
+    /* Reset shift state, maybe. */
+    memset(&ps, '\0', sizeof(ps));
+    for (lpptr = lpromptbuf; lpptr < lpend; ) {
+	t0 = mbrtowc(lpwp, lpptr, lpend - lpptr, &ps);
+	if (t0 > 0) {
+	    /* successfully converted */
+	    lpptr += t0;
+	    lpwp++;
+	} else {
+	    /* dunno, try to recover */
+	    lpptr++;
+	    *lpwp++ = ZWC('?');
+	}
+    }
+    if (lpwp - lpwbuf < lpromptw) {
+	/* Not enough characters for lpromptw. */
+	ZS_memcpy(vbuf, lpwbuf, lpwp - lpwbuf);
+	vp = vbuf + (lpwp - lpwbuf);
+	while (vp < vbuf + lpromptw)
+	    *vp++ = ZWC(' ');
+    } else {
+	ZS_memcpy(vbuf, lpwp - lpromptw, lpromptw);
+	vp = vbuf + lpromptw;
+    }
+    *vp = ZWC('\0');
+    zfree(lpwbuf, lpromptw * sizeof(*lpwbuf));
 #else
     memcpy(vbuf, strchr(lpromptbuf, 0) - lpromptw, lpromptw);
     vbuf[lpromptw] = '\0';
@@ -1223,10 +1274,10 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 #endif
 
     for (t0 = 0; t0 < tmpll; t0++) {
-	if (tmpline[t0] == ZWC('\t'))
+	if (tmpline[t0] == ZWC('\t')) {
 	    for (*vp++ = ZWC(' '); (vp - vbuf) & 7; )
 		*vp++ = ZWC(' ');
-	else if (tmpline[t0] == ZWC('\n')) {
+	} else if (tmpline[t0] == ZWC('\n')) {
 	    *vp++ = ZWC('\\');
 	    *vp++ = ZWC('n');
 	} else if (ZC_icntrl(tmpline[t0])) {
