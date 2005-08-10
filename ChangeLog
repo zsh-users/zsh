@@ -1,5 +1,8 @@
 2005-08-10  Peter Stephenson  <pws@csr.com>
 
+	* 21592: Src/Zle/complist.c: attempt to browse a new directory
+	in menu selection caused crash.
+
 	* c.f. 21590: Src/hist.c, Src/lex.c, Src/utils.c,
 	Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complist.c,
 	Src/Zle/compresult.c, Src/Zle/zle.h, Src/Zle/zle_hist.c,

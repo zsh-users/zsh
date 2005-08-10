@@ -2303,7 +2303,10 @@ domenuselect(Hookdef dummy, Chdata dat)
                 iforcemenu = -1;
             } else
                 mode = 0;
+	    /* Nested completion assumes line is unmetafied */
+	    unmetafy_line();
 	    menucomplete(zlenoargs);
+	    metafy_line();
 	    iforcemenu = 0;
 
             if (cmd != Th(z_acceptandinfernexthistory))
