@@ -23,7 +23,7 @@
 
 %prep
 
-  setopt noglob
+  setopt localoptions noglob
 
   scalar=scalar
   array=(a r r a y)
@@ -342,7 +342,7 @@
 >scalar a r y
 
  # The first declare works around the "not an identifier" bug with -h
- (declare \! \# \$ \* - \? @ 0
+ declare \! \# \$ \* - \? @ 0
  typeset -h +g -m \*
  unset -m \*
  integer i=9
@@ -350,7 +350,7 @@
  declare -t scalar
  declare -H -a array
  typeset
- typeset +)
+ typeset +
 0:Parameter hiding and tagging, printing types and values
 >array local array
 >float local f
