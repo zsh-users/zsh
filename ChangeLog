@@ -1,5 +1,8 @@
 2005-08-10  Peter Stephenson  <pws@csr.com>
 
+	* 21593: Src/Zle/complist.c, Src/Zle/zle_refresh.c: character
+	arrays wrongly declared with ZLE_UNICODE_SUPPORT.
+
 	* 21592: Src/Zle/complist.c: attempt to browse a new directory
 	in menu selection caused crash.
 

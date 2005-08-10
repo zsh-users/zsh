@@ -1207,7 +1207,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 #ifdef ZLE_UNICODE_SUPPORT
     ZLE_STRING_T lpwbuf, lpwp;	/* converted lprompt and pointer */
     char *lpptr,		/* pointer into multibyte lprompt */
-	lpend;			/* end of multibyte lprompt */
+	*lpend;			/* end of multibyte lprompt */
     mbstate_t ps;		/* shift state */
 #endif
 
