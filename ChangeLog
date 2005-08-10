@@ -1,3 +1,9 @@
+2005-08-10  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 21596: Src/Zle/compresult.c, Src/Zle/zle_tricky.c: more fall out
+	from 21590: run-help, which-command and accept-and-menu-complete
+	were broken.
+
 2005-08-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Test/B02typeset.ztst: added "setopt localoptions"

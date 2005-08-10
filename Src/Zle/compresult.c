@@ -687,6 +687,8 @@ instmatch(Cmatch m, int *scs)
 mod_export int
 hasbrpsfx(Cmatch m, char *pre, char *suf)
 {
+    METACHECK();
+
     if (m->flags & CMF_ALL)
 	return 1;
     else {
@@ -1153,6 +1155,15 @@ do_single(Cmatch m)
 mod_export void
 do_menucmp(int lst)
 {
+    int was_meta;
+
+    /* Already metafied when called from domenuselect already */
+    if (zlemetaline == NULL) {
+	was_meta = 0;
+	metafy_line();
+    } else
+	was_meta = 1;
+
     /* Just list the matches if the list was requested. */
     if (lst == COMP_LIST_COMPLETE) {
 	showinglist = -2;
@@ -1173,13 +1184,10 @@ do_menucmp(int lst)
 	     (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
 	      (!(*minfo.cur)->str || !*(*minfo.cur)->str)));
     /* ... and insert it into the command line. */
-    /* Already metafied when called from domenuselect already */
-    if (zlemetaline == NULL) {
-	metafy_line();
-	do_single(*minfo.cur);
+    do_single(*minfo.cur);
+
+    if (!was_meta)
 	unmetafy_line();
-    } else
-	do_single(*minfo.cur);
 }
 
 /**/

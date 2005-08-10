@@ -1800,6 +1800,8 @@ inststrlen(char *str, int move, int len)
 	ZS_strncpy(zleline + zlecs, zlestr, zlelen);
 	free(zlestr);
 	zsfree((char *)instr);
+	if (move)
+	    zlecs += len;
     }
     return len;
 }
