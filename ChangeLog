@@ -1,3 +1,9 @@
+2005-08-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Test/B02typeset.ztst: added "setopt localoptions"
+	to avoid a problem where "setopt noglob" got carried over to
+	the calling process and interfered with the cleanup code.
+
 2005-08-10  Peter Stephenson  <pws@csr.com>
 
 	* 21593: Src/Zle/complist.c, Src/Zle/zle_refresh.c: character
