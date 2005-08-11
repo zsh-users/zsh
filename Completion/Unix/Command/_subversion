@@ -12,7 +12,7 @@ _svn () {
   if [[ -n $state ]] && (( ! $+_svn_cmds )); then
     typeset -gHA _svn_cmds
     _svn_cmds=(
-      ${=${(f)${${"$(LC_MESSAGES=C _call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
+      ${=${(f)${${"$(LC_ALL=C _call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
     )
   fi
 
@@ -28,9 +28,9 @@ _svn () {
       if (( $#cmd )); then
         curcontext="${curcontext%:*:*}:svn-${cmd}:"
 
-        usage=${${(M)${(f)"$(LC_MESSAGES=C _call_program options svn help $cmd)"}:#usage:*}#usage: $cmd] }
+        usage=${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"}:#usage:*}#usage: $cmd] }
         args=(
-          ${=${${${(M)${(f)"$(LC_MESSAGES=C _call_program options svn help $cmd)"##*Valid options:}:#* :*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
+          ${=${${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"##*Valid options:}:#* :*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
         )
 
         case $cmd in;
@@ -40,7 +40,7 @@ _svn () {
             )
           ;;
           commit)
-            args-+=(
+            args+=(
               '*:file:_files -g "*(e:_svn_status:)"'
             )
           ;;
@@ -101,7 +101,7 @@ _svnadmin () {
   if [[ -n $state ]] && (( ! $+_svnadmin_cmds )); then
     typeset -gHA _svnadmin_cmds
     _svnadmin_cmds=(
-      ${=${(f)${${"$(LC_MESSAGES=C _call_program commands svnadmin help)"#l#*Available subcommands:}}}/(#s)[[:space:]]#(#b)([-a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
+      ${=${(f)${${"$(LC_ALL=C _call_program commands svnadmin help)"#l#*Available subcommands:}}}/(#s)[[:space:]]#(#b)([-a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
     )
   fi
 
@@ -116,9 +116,9 @@ _svnadmin () {
       if (( $#cmd )); then
         curcontext="${curcontext%:*:*}:svnadmin-${cmd}:"
 
-        usage=${${(M)${(f)"$(LC_MESSAGES=C _call_program options svnadmin help $cmd)"}:#$cmd: usage:*}#$cmd: usage: svnadmin $cmd }
+        usage=${${(M)${(f)"$(LC_ALL=C _call_program options svnadmin help $cmd)"}:#$cmd: usage:*}#$cmd: usage: svnadmin $cmd }
         args=(
-          ${=${${${(M)${(f)"$(LC_MESSAGES=C _call_program options svnadmin help $cmd)"##*Valid options:}:#*:*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
+          ${=${${${(M)${(f)"$(LC_ALL=C _call_program options svnadmin help $cmd)"##*Valid options:}:#*:*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
         )
         if [[ $_svnadmin_subcmd_usage == *REPOS_PATH* ]]; then
           args+=( ":path:_files -/" )

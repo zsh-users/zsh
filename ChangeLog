@@ -1,3 +1,11 @@
+2005-08-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 21598: Completion/Unix/Command/_subversion: fix typo that broke
+	svn ci completion and avoid problem if LC_ALL overrides LC_MESSAGES
+
+	* 21571: Completion/Debian/Command/_aptitude: avoid localised
+	translations that break parsing
+
 2005-08-10  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21596: Src/Zle/compresult.c, Src/Zle/zle_tricky.c: more fall out
