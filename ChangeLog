@@ -1,3 +1,10 @@
+2005-08-11  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Test/B02typeset.ztst: improved the final test to ensure
+	that all the locally-unset environment variables get restored after
+	a function call. This also fixed an interaction with the cleanup
+	code that caused the ztst.* temporary files to not be removed.
+
 2005-08-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 21598: Completion/Unix/Command/_subversion: fix typo that broke
@@ -11,12 +18,6 @@
 	* 21596: Src/Zle/compresult.c, Src/Zle/zle_tricky.c: more fall out
 	from 21590: run-help, which-command and accept-and-menu-complete
 	were broken.
-
-2005-08-10  Wayne Davison  <wayned@users.sourceforge.net>
-
-	* unposted: Test/B02typeset.ztst: added "setopt localoptions"
-	to avoid a problem where "setopt noglob" got carried over to
-	the caller and interfered with the cleanup of the temp files.
 
 2005-08-10  Peter Stephenson  <pws@csr.com>
 
