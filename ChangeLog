@@ -8,7 +8,7 @@
 
 	* unposted: Test/B02typeset.ztst: added "setopt localoptions"
 	to avoid a problem where "setopt noglob" got carried over to
-	the calling process and interfered with the cleanup code.
+	the caller and interfered with the cleanup of the temp files.
 
 2005-08-10  Peter Stephenson  <pws@csr.com>
 
