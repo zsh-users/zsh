@@ -864,7 +864,7 @@ get_isrch_spot(int num, int *hlp, int *posp, int *csp, int *lenp, int *dirp, int
     *nomatch = (isrch_spots[num].flags & ISS_FAILING);
 }
 
-#define ISEARCH_PROMPT		ZWC("failing XXX-i-search: ")
+#define ISEARCH_PROMPT		ZWS("failing XXX-i-search: ")
 #define NORM_PROMPT_POS		8
 #define FIRST_SEARCH_CHAR	(NORM_PROMPT_POS + 14)
 
@@ -898,7 +898,7 @@ doisearch(char **args, int dir)
     }
 
     ZS_strcpy(ibuf, ISEARCH_PROMPT);
-    ZS_memcpy(ibuf + NORM_PROMPT_POS, (dir == 1) ? ZWC("fwd") : ZWC("bck"), 3);
+    ZS_memcpy(ibuf + NORM_PROMPT_POS, (dir == 1) ? ZWS("fwd") : ZWS("bck"), 3);
     remember_edits();
     okeymap = ztrdup(curkeymapname);
     zletext(he, &zt);

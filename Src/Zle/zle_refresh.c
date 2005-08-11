@@ -594,7 +594,7 @@ zrefresh(void)
 		break;
 	    }
 	}
-	ZS_strncpy(sen, ZWC(" <.... "), 7);
+	ZS_strncpy(sen, ZWS(" <.... "), 7);
 	nbuf[tosln - 1][winw] = nbuf[tosln - 1][winw + 1] = ZWC('\0');
     }
 
@@ -609,7 +609,7 @@ zrefresh(void)
 		break;
 	    }
 	}
-	ZS_strncpy(sen, ZWC(" <....> "), 8);
+	ZS_strncpy(sen, ZWS(" <....> "), 8);
 	nbuf[tosln][winw] = nbuf[tosln][winw + 1] = ZWC('\0');
     }
 
@@ -631,7 +631,7 @@ zrefresh(void)
 	memset(nbuf[0], ZWC(' '), lpromptw);
 	t0 = winw - lpromptw;
 	t0 = t0 > 5 ? 5 : t0;
-	ZS_strncpy(nbuf[0] + lpromptw, ZWC(">...."), t0);
+	ZS_strncpy(nbuf[0] + lpromptw, ZWS(">...."), t0);
 	ZS_memset(nbuf[0] + lpromptw + t0, ZWC(' '), winw - t0 - lpromptw);
 	nbuf[0][winw] = nbuf[0][winw + 1] = ZWC('\0');
     }
