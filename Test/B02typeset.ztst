@@ -23,7 +23,7 @@
 
 %prep
 
-  setopt localoptions noglob
+  setopt noglob
 
   scalar=scalar
   array=(a r r a y)
@@ -341,16 +341,21 @@
 0q:Stress test: all parameters are local and unset, using -m
 >scalar a r y
 
- # The first declare works around the "not an identifier" bug with -h
- declare \! \# \$ \* - \? @ 0
- typeset -h +g -m \*
- unset -m \*
- integer i=9
- float -H f=9
- declare -t scalar
- declare -H -a array
- typeset
- typeset +
+ local parentenv=preserved
+ fn() {
+  # The first declare works around the "not an identifier" bug with -h
+  declare \! \# \$ \* - \? @ 0
+  typeset -h +g -m \*
+  unset -m \*
+  integer i=9
+  float -H f=9
+  declare -t scalar
+  declare -H -a array
+  typeset
+  typeset +
+ }
+ fn
+ echo $parentenv
 0:Parameter hiding and tagging, printing types and values
 >array local array
 >float local f
@@ -360,3 +365,4 @@
 >float local f
 >integer local i
 >local tagged scalar
+>preserved
