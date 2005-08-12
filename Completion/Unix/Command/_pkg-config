@@ -1,0 +1,57 @@
+#compdef pkg-config
+#
+# $Id: _pkg-config,v 1.1 2005/08/12 10:03:58 pws Exp $
+#
+# Copyright (C) 2005 Travis L. Spencer
+# ALL RIGHTS RESERVED
+#
+# See the file LICENCE in the root of the zsh distribution for
+# licensing information.
+#
+
+local arguments packages curcontext="$curcontext" stat line
+declare -A opt_args
+
+arguments=(
+      "--modversion[print the version information of a given package]"
+      "--atleast-pkgconfig-version=[require given version of pkg-config]:minimum version"
+      "(- *)"{--help,-\?}"[display a help message]"
+      "(- *)--usage[display brief usage message]"
+      "--print-errors[cause errors to be printed]"
+      "--silence-errors[prevent the printing of errors]"
+      "--errors-to-stdout[print errors to stdout rather than stderr]"
+      "--cflags[prints the preprocessor and compile flags]"
+      "--cflags-only-I[output -I flags only]"
+      "--cflags-only-other[output cflags not covered by the cflags-only-I option]"
+      "--debug[show verbose debug information]"
+      "--libs[prints the link flags]"
+      "--libs-only-L[prints the -L and -R parts of \"--libs\"]"
+      "--libs-only-l[prints the -l part of \"--libs\"]"
+      "--libs-only-other[output other libs]"
+      "--list-all[list all known packages]"
+      "--variable=[return the value of the specified variable]:variable"
+      "--define-variable=[set the global value for a variable]:name value pair"
+      "--uninstalled[return successfully if any \"-uninstalled\" packages are being used and fails otherwise]"
+      "--exists[tests whether the package exists or not]"
+      "--atleast-version=[test whether the version is at least that of the specified value]:least value"
+      "--exact-version=[test whether the version is exactly that of the specified value]:exact value"
+      "--max-version=[test whether the version is no greater than some specific value]:max version"
+#      "--msvc-syntax[output linker flags in a form compatible with MSVC++ (Windows only)]"
+#      "--dont-define-prefix[disables automatic overiding of the variable \"prefix\" (Windows only)]"
+#      "--prefix-variable=[set the name of the variable \"prefix\" (Windows only)]:prefix value"
+      "*:package name:->package"
+)
+
+_arguments -C $arguments
+
+if [[ -n $state ]] ; then
+    packages=( ${(f)"$((pkg-config --list-all | cut -d' ' -f1) 2>/dev/null)"} )
+    compadd -a - packages
+fi
+
+: <<EMACS_LOCAL_VARIABLES
+Local Variables:
+mode: shell-script
+mode: flyspell-prog
+End:
+EMACS_LOCAL_VARIABLES

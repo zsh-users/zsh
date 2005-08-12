@@ -24,7 +24,8 @@ _mount          _mpc            _mt             _mtools         _mtr
 _mutt           _mysql_utils    _mysqldiff
 _ncftp          _netcat         _nice           _nmap           _nslookup
 _pack           _patch          _pbm            _perforce       _perl
-_perldoc        _php            _pine           _postfix        _prcs
+_perldoc        _php            _pine           _pkg-config
+_postfix        _prcs
 _printenv       _psutils        _pump           _python
 _raggle         _rake           _rar            _rcs            _renice
 _rlogin         _rsync          _rubber         _ruby

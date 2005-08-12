@@ -1,3 +1,8 @@
+2005-08-12  Peter Stephenson  <pws@csr.com>
+
+	* 21412: Travis Spencer: Completion/Unix/Command/_pkg-config:
+	new completion.
+
 2005-08-11  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Zle/zle_hist.c, Src/Zle/zle_refresh.c: changed some
