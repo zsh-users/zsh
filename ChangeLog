@@ -1,5 +1,9 @@
 2005-08-12  Peter Stephenson  <pws@csr.com>
 
+	* 21603: Src/Zle/zle_utils.c: conversions from wide character
+	to multibyte didn't convert the cursor position properly if it
+	was at the end of the line.
+
 	* 21412: Travis Spencer: Completion/Unix/Command/_pkg-config:
 	new completion.
 
