@@ -89,10 +89,22 @@ typedef int ZLE_INT_T;
 #define ZS_memmove memmove
 #define ZS_memset memset
 #define ZS_memcmp memcmp
-#define ZS_strlen strlen
-#define ZS_strcpy strcpy
-#define ZS_strncpy strncpy
-#define ZS_strncmp strncmp
+
+#ifdef __GNUC__
+static inline size_t ZS_strlen(ZLE_STRING_T s)
+{ return strlen((char*)s); }
+static inline ZLE_STRING_T ZS_strcpy(ZLE_STRING_T t, ZLE_STRING_T f)
+{ return (ZLE_STRING_T)strcpy((char*)t, (char*)f); }
+static inline ZLE_STRING_T ZS_strncpy(ZLE_STRING_T t, ZLE_STRING_T f, size_t l)
+{ return (ZLE_STRING_T)strncpy((char*)t, (char*)f, l); }
+static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
+{ return strncmp((char*)s1, (char*)s2, l); }
+#else
+#define ZS_strlen(s) strlen((char*)(s))
+#define ZS_strcpy(t,f) strcpy((char*)(t),(char*)(f))
+#define ZS_strncpy(t,f,l) strncpy((char*)(t),(char*)(f),(l))
+#define ZS_strncmp(s1,s2,l) strncmp((char*)(s1),(char*)(s2),(l))
+#endif
 
 #define ZC_iblank iblank
 #define ZC_icntrl icntrl
