@@ -1,3 +1,11 @@
+2005-08-12  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21606: Src/Zle/zle.h: When compiled with gcc, the ZS_str* macros
+	get replaced by inline functions that give us complete compile-time
+	type-checking.  For other compilers, the ZS_str* macros now cast
+	the string pointers to char*, which will avoid any warnings about
+	pointer signedness.
+
 2005-08-12  Peter Stephenson  <pws@csr.com>
 
 	* 21603: Src/Zle/zle_utils.c: conversions from wide character
