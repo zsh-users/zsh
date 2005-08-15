@@ -1,3 +1,8 @@
+2005-08-15  Clint Adams  <clint@zsh.org>
+
+	* 21565: Completion/Unix/Command/_man: better handle uncompresed
+	manpages with .[0-9] in their names.
+
 2005-08-15  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21609: Src/glob.c: fixed the readlink() call in statfullpath().

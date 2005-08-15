@@ -82,7 +82,7 @@ _man_pages() {
 
   pages=( ${(M)dirs:#*$sect/} )
   compfiles -p pages '' '' "$matcher" '' dummy '*'
-  pages=( ${^~pages}(N:t:r) )
+  pages=( ${^~pages}(N:t) )
 
   (($#mrd)) && pages[$#pages+1]=($(awk $awk $mrd))
 
@@ -90,7 +90,7 @@ _man_pages() {
   # beginning with .<->: that handles problem cases like files called
   # `POSIX.1.5'.
 
-  compadd "$@" - ${pages%.(?|<->*)}
+  compadd "$@" - ${pages%.(?|<->*(|.gz|.bz2|.Z))}
 }
 
 _man "$@"
