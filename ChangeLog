@@ -1,3 +1,14 @@
+2005-08-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21369: Completion/Unix/Command/_cvs: assign to array with
+	builtin stat rather than parsing stdout.
+
+	* unposted: Functions/Prompts/prompt_bart_setup: more adjustments
+	for the PROMPT_SP option.
+
+	* 21366: Src/jobs.c: LONG_LIST_JOBS applies to more places where
+	job listing are printed.
+
 2005-08-12  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21606: Src/Zle/zle.h: When compiled with gcc, the ZS_str* macros
@@ -60,7 +71,7 @@
 2005-08-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21579: Thorsten Dahlheimer: Src/builtin.c: Made printf %s
-	handle embedded nulls in its arg.
+	handle embedded nuls in its arg.
 
 2005-08-09  Peter Stephenson  <pws@csr.com>
 
@@ -102,7 +113,7 @@
 	Completion/compinit, Doc/Zsh/options.yo, Functions/TCP/tcp_expect,
 	Functions/TCP/tcp_open, Functions/TCP/tcp_read, Src/exec.c,
 	Src/options.c, Src/params.c, Src/zsh.h: Add WARN_CREATE_GLOBAL
-	option to warn when an assignment in a function creates a globa
+	option to warn when an assignment in a function creates a global
 	parameter.
 
 	* 21567: Dan Bullok: Src/utils.c: trash zle when updating window
