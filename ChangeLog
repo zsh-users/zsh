@@ -1,3 +1,8 @@
+2005-08-15  Andrey Borzenkov  <bor@zsh.org>
+
+	* 21622: Src/Zle/zle_refresh.c: metafy line back before calling
+	completion code in zrefresh()
+
 2005-08-15  Clint Adams  <clint@zsh.org>
 
 	* 21619: Src/string.c, Src/utils.c, Src/Zle/zle.h: define wide

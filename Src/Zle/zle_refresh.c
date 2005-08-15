@@ -746,8 +746,13 @@ singlelineout:
 	zfree(tmpline, tmpll);
 
     /* if we have a new list showing, note it; if part of the list has been
-    overwritten, redisplay it. */
+    overwritten, redisplay it. We have to metafy line back before calling
+    completion code */
     if (showinglist == -2 || (showinglist > 0 && showinglist < nlnct)) {
+	if (remetafy) {
+	    metafy_line();
+	    remetafy = 0;
+	}
 	inlist = 1;
 	listmatches();
 	inlist = 0;
