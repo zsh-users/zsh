@@ -705,7 +705,7 @@ extern short ospeed;
  * between wide characters and multibyte strings.
  */
 #if defined(HAVE_MBRTOWC) && defined(HAVE_WCRTOMB)
-/*#define ZLE_UNICODE_SUPPORT	1*/
+#define ZLE_UNICODE_SUPPORT	1
 #endif
 #else
 # ifdef HAVE_LANGINFO_H

@@ -30,7 +30,7 @@
 #include "zle.mdh"
 #include "zle_misc.pro"
 
-/* insert a metafied string, with repetition and suffix removal */
+/* insert a zle string, with repetition and suffix removal */
 
 /**/
 void
@@ -1107,6 +1107,18 @@ iremovesuffix(ZLE_CHAR_T c, int keep)
 	    LinkList args = newlinklist();
 	    char buf[20];
 	    int osc = sfcontext;
+	    int wasmeta = (zlemetaline != 0);
+
+	    if (wasmeta) {
+		/*
+		 * The suffix removal function runs as a normal
+		 * ZLE function, not a completion function, so
+		 * the line should be unmetafied if this was
+		 * called from completion.  (It may not be since
+		 * we may decide to remove the suffix later.)
+		 */
+		umetafy_line();
+	    }
 
 	    sprintf(buf, "%d", suffixlen[0]);
 	    addlinknode(args, suffixfunc);
@@ -1118,13 +1130,16 @@ iremovesuffix(ZLE_CHAR_T c, int keep)
 	    doshfunc(suffixfunc, prog, args, 0, 1);
 	    sfcontext = osc;
 	    endparamscope();
+
+	    if (wasmeta)
+		metafy_line();
 	}
 	zsfree(suffixfunc);
 	suffixfunc = NULL;
     } else {
 #ifdef ZLE_UNICODE_SUPPORT
 	/* TODO: best I can think of for now... */
-	int sl = (unsigned int)c < 256 ? suffixlen[c] : 0;
+	int sl = (unsigned int)c <= 256 ? suffixlen[c] : 0;
 #else
 	int sl = suffixlen[c];
 #endif

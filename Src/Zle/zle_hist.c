@@ -531,10 +531,11 @@ insertlastword(char **args)
 	}
     }
 
+    metafy_line();
     if (lastinsert && lastlen &&
-	lastpos <= zlecs &&
-	lastlen == zlecs - lastpos &&
-	memcmp(lastinsert, (char *)&zleline[lastpos], lastlen) == 0)
+	lastpos <= zlemetacs &&
+	lastlen == zlemetacs - lastpos &&
+	memcmp(lastinsert, (char *)&zlemetaline[lastpos], lastlen) == 0)
 	deleteword = 1;
     else
 	lasthist = curhist;
@@ -548,9 +549,9 @@ insertlastword(char **args)
 	 * confusion.
 	 */
 	if (deleteword) {
-	    int pos = zlecs;
-	    zlecs = lastpos;
-	    foredel(pos - zlecs);
+	    int pos = zlemetacs;
+	    zlemetacs = lastpos;
+	    foredel(pos - zlemetacs);
 	    /*
 	     * Mark that this has been deleted.
 	     * For consistency with history lines, we really ought to
@@ -604,9 +605,9 @@ insertlastword(char **args)
      * successfully found a new one to insert.
      */
     if (deleteword > 0) {
-	int pos = zlecs;
-	zlecs = lastpos;
-	foredel(pos - zlecs);
+	int pos = zlemetacs;
+	zlemetacs = lastpos;
+	foredel(pos - zlemetacs);
     }
     if (lastinsert) {
 	zfree(lastinsert, lastlen);
@@ -625,12 +626,14 @@ insertlastword(char **args)
     save = *t;
     *t = '\0';			/* ignore trailing whitespace */
     lasthist = evhist;
-    lastpos = zlecs;
+    lastpos = zlemetacs;
     lastlen = t - s;
     lastinsert = zalloc(t - s);
     memcpy(lastinsert, s, lastlen);
     n = zmult;
     zmult = 1;
+
+    unmetafy_line();
 
     zs = stringaszleline((unsigned char *)s, 0, &len, NULL, NULL);
     doinsert(zs, len);

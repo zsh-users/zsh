@@ -818,6 +818,10 @@ bin_bindkey_meta(char *name, char *kmname, Keymap km, UNUSED(char **argv), UNUSE
 	zwarnnam(name, "keymap `%s' is protected", kmname, 0);
 	return 1;
     }
+#ifdef ZLE_UNICODE_SUPPORT
+    zwarnnam(name, "warning: `bindkey -m' disables multibyte support",
+	     NULL, 0);
+#endif
     for(i = 128; i < 256; i++)
 	if(metabind[i - 128] != z_undefinedkey) {
 	    m[0] = i;
