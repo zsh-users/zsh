@@ -353,8 +353,18 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	clearlist = 1;
 	ret = 1;
 	minfo.cur = NULL;
-	if (useline < 0)
+	if (useline < 0) {
+	    /* unmetafy line before calling ZLE */
+	    int remetafy = 0;
+
+	    if (zlemetaline != NULL) {
+		unmetafy_line();
+		remetafy = 1;
+	    }
 	    ret = selfinsert(zlenoargs);
+	    if (remetafy)
+		metafy_line();
+	}
 	goto compend;
     }
     zsfree(lastprebr);
@@ -367,9 +377,18 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	if (nmatches)
             do_ambig_menu();
 	ret = !nmatches;
-    } else if (useline < 0)
+    } else if (useline < 0) {
+	/* unmetafy line before calling ZLE */
+	int remetafy = 0;
+
+	if (zlemetaline != NULL) {
+	    unmetafy_line();
+	    remetafy = 1;
+	}
 	ret = selfinsert(zlenoargs);
-    else if (!useline && uselist) {
+	if (remetafy)
+	    metafy_line();
+    } else if (!useline && uselist) {
 	/* All this and the guy only wants to see the list, sigh. */
 	zlemetacs = 0;
 	foredel(zlemetall);

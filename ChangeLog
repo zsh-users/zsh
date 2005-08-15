@@ -3,6 +3,9 @@
 	* 21622: Src/Zle/zle_refresh.c: metafy line back before calling
 	completion code in zrefresh()
 
+	* 21627: Src/Zle/compcore.c: unmetafy line back before calling
+	ZLE from within complection code in do_completion()
+
 2005-08-15  Clint Adams  <clint@zsh.org>
 
 	* 21619: Src/string.c, Src/utils.c, Src/Zle/zle.h: define wide
