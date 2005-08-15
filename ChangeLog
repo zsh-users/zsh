@@ -4,7 +4,7 @@
 	completion code in zrefresh()
 
 	* 21627: Src/Zle/compcore.c: unmetafy line back before calling
-	ZLE from within complection code in do_completion()
+	ZLE from within completion code in do_completion()
 
 2005-08-15  Clint Adams  <clint@zsh.org>
 
