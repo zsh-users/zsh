@@ -54,6 +54,22 @@ ztrdup(const char *s)
     return t;
 }
 
+#ifdef ZLE_UNICODE_SUPPORT
+/**/
+mod_export wchar_t *
+wcs_ztrdup(const wchar_t *s)
+{
+    wchar_t *t;
+
+    if (!s)
+	return NULL;
+    t = (wchar_t *)zalloc(wcslen((wchar_t *)s) + 1);
+    wcscpy(t, s);
+    return t;
+}
+#endif /* ZLE_UNICODE_SUPPORT */
+
+
 /* concatenate s1, s2, and s3 in dynamically allocated buffer */
 
 /**/

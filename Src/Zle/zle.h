@@ -58,6 +58,11 @@ typedef wint_t   ZLE_INT_T;
 #define ZS_strcpy wcscpy
 #define ZS_strncpy wcsncpy
 #define ZS_strncmp wcsncmp
+#define ZS_zarrdup wcs_zarrdup
+#define ZS_width wcslen
+#define ZS_strchr wcschr
+#define ZS_zputs wcs_zputs
+#define ZS_nicewidth wcs_niceztrlen
 
 #define ZC_iblank iswspace
 #define ZC_icntrl iswcntrl
@@ -89,6 +94,11 @@ typedef int ZLE_INT_T;
 #define ZS_memmove memmove
 #define ZS_memset memset
 #define ZS_memcmp memcmp
+#define ZS_zarrdup zarrdup
+#define ZS_width ztrlen
+#define ZS_strchr strchr
+#define ZS_zputs zputs
+#define ZS_nicewidth niceztrlen
 
 #ifdef __GNUC__
 static inline size_t ZS_strlen(ZLE_STRING_T s)

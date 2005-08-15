@@ -243,6 +243,46 @@ nicechar(int c)
     return buf;
 }
 
+#ifdef ZLE_UNICODE_SUPPORT
+/**/
+mod_export wchar_t *
+wcs_nicechar(wint_t c)
+{
+    static wchar_t buf[6];
+    wchar_t *s = buf;
+    if (iswprint(c))
+	goto done;
+    if (c > 0x80) {
+	if (isset(PRINTEIGHTBIT))
+	    goto done;
+	*s++ = '\\';
+	*s++ = 'M';
+	*s++ = '-';
+	c &= 0x7f;
+	if(iswprint(c))
+	    goto done;
+    }
+    if (c == 0x7f) {
+	*s++ = '^';
+	c = '?';
+    } else if (c == '\n') {
+	*s++ = '\\';
+	c = 'n';
+    } else if (c == '\t') {
+	*s++ = '\\';
+	c = 't';
+    } else if (c < 0x20) {
+	*s++ = '^';
+	c += 0x40;
+    }
+    done:
+    *s++ = c;
+    *s = 0;
+    return buf;
+}
+#endif /* ZLE_UNICODE_SUPPORT */
+
+
 /* Output a string's visible representation. */
 
 #if 0 /**/
@@ -2453,6 +2493,21 @@ zarrdup(char **s)
     return y;
 }
 
+#ifdef ZLE_UNICODE_SUPPORT
+/**/
+mod_export wchar_t **
+wcs_zarrdup(wchar_t **s)
+{
+    wchar_t **x, **y;
+
+    y = x = (wchar_t **) zalloc(sizeof(wchar_t *) * (arrlen((char **)s) + 1));
+
+    while ((*x++ = wcs_ztrdup(*s++)));
+
+    return y;
+}
+#endif /* ZLE_UNICODE_SUPPORT */
+
 /**/
 static char *
 spname(char *oldname)
@@ -3051,6 +3106,29 @@ zputs(char const *s, FILE *stream)
     return 0;
 }
 
+#ifdef ZLE_UNICODE_SUPPORT
+/**/
+mod_export int
+wcs_zputs(wchar_t const *s, FILE *stream)
+{
+    wint_t c;
+
+    while (*s) {
+	if (*s == Meta)
+	    c = *++s ^ 32;
+	else if(itok(*s)) {
+	    s++;
+	    continue;
+	} else
+	    c = *s;
+	s++;
+	if (fputwc(c, stream) == WEOF)
+	    return EOF;
+    }
+    return 0;
+}
+#endif /* ZLE_UNICODE_SUPPORT */
+
 /* Create a visibly-represented duplicate of a string. */
 
 /**/
@@ -3136,6 +3214,29 @@ niceztrlen(char const *s)
     }
     return l;
 }
+
+#ifdef ZLE_UNICODE_SUPPORT
+/**/
+mod_export size_t
+wcs_nicewidth(wchar_t const *s)
+{
+    size_t l = 0;
+    wint_t c;
+
+    while ((c = *s++)) {
+	if (itok(c)) {
+	    if (c <= (wint_t)Comma)
+		c = ztokens[c - Pound];
+	    else 
+		continue;
+	}
+	if (c == Meta)
+	    c = *s++ ^ 32;
+	l += wcswidth(wcs_nicechar(c), 6);
+    }
+    return l;
+}
+#endif /* ZLE_UNICODE_SUPPORT */
 
 /* check for special characters in the string */
 

@@ -1,5 +1,8 @@
 2005-08-15  Clint Adams  <clint@zsh.org>
 
+	* 21619: Src/string.c, Src/utils.c, Src/Zle/zle.h: define wide
+	versions of zarrdup, zputs, niceztrlen.
+
 	* 21565: Completion/Unix/Command/_man: better handle uncompresed
 	manpages with .[0-9] in their names.
 
