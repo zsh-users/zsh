@@ -1,37 +1,42 @@
-#compdef mozilla mozilla-firefox mozilla-xremote-client
+#compdef mozilla mozilla-firefox mozilla-xremote-client firefox
 
 local curcontext="$curcontext" state line expl ret=1 suf
 typeset -A opt_args
 
 local popts="-installer -CreateProfile -P -ProfileWizard -ProfileManager -SelectProfile"
+local -a mozopts
 
 if [[ $service = *remote* ]]; then
   state=remote
 else
-  _x_arguments -C \
+  if [[ $service != *firefox* ]]; then
+    mozopts=(
+      "($popts)-installer[start with 4.x migration window]"
+      "($popts)-CreateProfile:profile"
+      "($popts)-ProfileWizard[start with profile wizard]"
+      "($popts)-SelectProfile[start with profile selection dialog]"
+      '-splash[enable splash screen]'
+      '-chat[start with IRC client]'
+      '-news[start with news]'
+      '-venkman[start with JavaScript debugger]'
+      '-terminal[start with command line terminal]'
+      '-mail[start with mail]'
+      '-compose[start with messenger compose]:URL:_urls' 
+    )
+  fi
+  _x_arguments -C  $mozopts \
     '-height[height of startup window]:height' \
     '(-)'{-h,-help}'[show usage message]' \
-    "($popts)-installer[start with 4.x migration window]" \
     '-width[width of startup window]:width' \
     '(-)'{-v,-version}'[show the version number and build date]' \
-    "($popts)-CreateProfile:profile" \
-    "($popts)-P[start with profile]:profile:compadd ~/.mozilla/*/*.slt(\:h\:t)" \
-    "($popts)-ProfileWizard[start with profile wizard]" \
+    "($popts)-P[start with profile]:profile:->profile" \
     "($popts)-ProfileManager[start with profile manager]" \
-    "($popts)-SelectProfile[start with profile selection dialog]" \
     '-UILocale:locale' \
     '-contentLocale:locale' \
     '-remote[execute a command in an existing Mozilla]:remote command:->remote' \
-    '-splash[enable splash screen]' \
-    '-chat[start with IRC client]' \
-    '-news[start with news]' \
     '-jsconsole[start with JavaScript Console]' \
-    '-venkman[start with JavaScript debugger]' \
-    '-terminal[start with command line terminal]' \
     '-edit[start with editor]:URL:_urls' \
     '-chrome[load the specified chrome]:URL:_urls' \
-    '-mail[start with mail]' \
-    '-compose[start with messenger compose]:URL:_urls' \
     '*:location:->urls' && ret=0
 fi
 
@@ -101,6 +106,28 @@ if [[ "$state" = "urls" ]]; then
       done
       (( ret )) || return 0
     done
+  fi
+fi
+
+if [[ $state == "profile" ]]; then
+  if [[ $service == *firefox* ]]; then
+    local -a profiles text profiledir
+    case "$OSTYPE" in
+    darwin*) profiledir=~/"Library/Application Support/Firefox" ;;
+    *)       profiledir=~/.mozilla/firefox/ ;;
+    esac
+    profiles=(${(f)"$(< ${profiledir}/profiles.ini)"})
+    profiles=(${(M)${profiles}:#(\[Profile|(Path|Name)=)*})
+    text=${(F)profiles}
+    profiles=(${(f)text//(#b)\[Profile([0-9]##)\]
+Name=([^
+]##|)
+Path=([^
+]##|)/$match[2]})
+    profiles=(${profiles%:})
+    compadd $profiles
+  else
+    compadd ~/.mozilla/*/*.slt(\:h\:t)
   fi
 fi
 
