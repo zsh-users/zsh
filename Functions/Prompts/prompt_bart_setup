@@ -31,8 +31,8 @@ prompt_bart_help () {
 	nonzero, or underlined if the job was stopped.
 
 	If the last command is too wide to fit without truncating the
-	current directory, it is put on a line by itself.  The current
-	directory uses %~, so namedir abbreviation applies.
+	current directory, it is put on a middle line by itself.  The
+	current	directory uses %~, so namedir abbreviation applies.
 
 	The "upper right prompt" looks like:
 	    date time
@@ -81,8 +81,11 @@ prompt_bart_precmd () {
     # Reset the truncation widths for upcoming computations
     ((PSCOL == 1)) || { PSCOL=1 ; prompt_bart_ps1 }
     if [[ -o promptcr ]]
-    then print -nPu 2 "${(l.COLUMNS.. .)}\e[s${(pl.COLUMNS..\b.)}%E\e[u"
-    else IFS='[;' read -s -d R escape\?$'\e[6n' lineno PSCOL
+    then
+        # Emulate the 4.3.x promptsp option if it isn't available
+        eval '[[ -o promptsp ]] 2>/dev/null' ||
+            print -nP "${(l.COLUMNS.. .)}\e[s${(pl.COLUMNS..\b.)}%E\e[u" >$TTY
+    else IFS='[;' read -s -d R escape\?$'\e[6n' lineno PSCOL <$TTY
     fi
     ((PSCOL == 1)) || prompt_bart_ps1
     ((colno = COLUMNS-PSCOL))
