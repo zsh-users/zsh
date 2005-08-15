@@ -4,6 +4,8 @@
 
 2005-08-15  Peter Stephenson  <pws@csr.com>
 
+	* c.f. 21616: Src/zle_misc.c: "unmetafy_line" typo.
+
 	* 21610: Src/system.h, Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c,
 	Src/Zle/zle_misc.c: Turn on ZLE_UNICODE_SUPPORT by default where
 	allowed; fix suffix removal; fix metafication when removing

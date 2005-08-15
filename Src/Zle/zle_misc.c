@@ -1117,7 +1117,7 @@ iremovesuffix(ZLE_CHAR_T c, int keep)
 		 * called from completion.  (It may not be since
 		 * we may decide to remove the suffix later.)
 		 */
-		umetafy_line();
+		unmetafy_line();
 	    }
 
 	    sprintf(buf, "%d", suffixlen[0]);
