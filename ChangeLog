@@ -1,5 +1,9 @@
 2005-08-16  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* 21629: configure.ac, Src/system.h: moved the optional definition
+	of ZLE_UNICODE_SUPPORT into configure, and added support for the
+	new --enable-multibyte and --disable-multibyte configure options.
+
 	* 1/2 of 21644: Src/Zle/complete.c: fixed bug in do_comp_vars()
 	when the first char in compprefix is metified.
 
