@@ -692,21 +692,17 @@ extern short ospeed;
 #endif
 
 /*
- * This is a subset of ZLE_UNICODE_SUPPORT.  It is not all that likely
- * that only the subset is supported, however it's easy to make the
- * \u and \U escape sequences work with just the following.
+ * The ZLE_UNICODE_SUPPORT configure-define specifies that we want to enable
+ * complete Unicode conversion between wide characters and multibyte strings.
  */
-#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined (__STDC_ISO_10646__)
+#if defined ZLE_UNICODE_SUPPORT \
+ || (defined HAVE_WCHAR_H && defined HAVE_WCTOMB && defined __STDC_ISO_10646__)
+/*
+ * If ZLE_UNICODE_SUPPORT is not defined, these includes provide a subset of
+ * Unicode support that makes the \u and \U printf escape sequences work.
+ */
 # include <wchar.h>
 # include <wctype.h>
-
-/*
- * More stringent requirements to enable complete Unicode conversion
- * between wide characters and multibyte strings.
- */
-#if defined(HAVE_MBRTOWC) && defined(HAVE_WCRTOMB)
-#define ZLE_UNICODE_SUPPORT	1
-#endif
 #else
 # ifdef HAVE_LANGINFO_H
 #   include <langinfo.h>
