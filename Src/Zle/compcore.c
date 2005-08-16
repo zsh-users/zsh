@@ -355,15 +355,9 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	minfo.cur = NULL;
 	if (useline < 0) {
 	    /* unmetafy line before calling ZLE */
-	    int remetafy = 0;
-
-	    if (zlemetaline != NULL) {
-		unmetafy_line();
-		remetafy = 1;
-	    }
+	    unmetafy_line();
 	    ret = selfinsert(zlenoargs);
-	    if (remetafy)
-		metafy_line();
+	    metafy_line();
 	}
 	goto compend;
     }
@@ -379,15 +373,9 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	ret = !nmatches;
     } else if (useline < 0) {
 	/* unmetafy line before calling ZLE */
-	int remetafy = 0;
-
-	if (zlemetaline != NULL) {
-	    unmetafy_line();
-	    remetafy = 1;
-	}
+	unmetafy_line();
 	ret = selfinsert(zlenoargs);
-	if (remetafy)
-	    metafy_line();
+	metafy_line();
     } else if (!useline && uselist) {
 	/* All this and the guy only wants to see the list, sigh. */
 	zlemetacs = 0;
