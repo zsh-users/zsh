@@ -820,9 +820,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		    na = -na;
 		    add = -1;
 		} else {
-		    p = compprefix + 1;
-		    if (*p == Meta)
-			p++;
+		    p = compprefix + 1 + (*compprefix == Meta);
 		    add = 1;
 		}
 		for (;;) {
