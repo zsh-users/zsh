@@ -2063,6 +2063,37 @@ int ptsname();], ,
    fi
 fi
 
+dnl ---------------------
+dnl multibyte ZLE support
+dnl ---------------------
+AC_ARG_ENABLE(multibyte,
+[  --enable-multibyte         support multibyte chars in the zsh line editor],
+[zsh_cv_c_zle_unicode_support=$enableval],
+[AC_CACHE_CHECK(if the system adequately supports multibyte chars,
+ zsh_cv_c_zle_unicode_support,
+  [AC_TRY_COMPILE([
+#ifdef HAVE_LOCALE_H
+# include <locale.h>
+#endif
+   ], [
+int main() {
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) \
+ && defined(HAVE_MBRTOWC) && defined(HAVE_WCRTOMB) \
+ && defined (__STDC_ISO_10646__)
+    return 0;
+#else
+# error Not supported.
+#endif
+}
+  ],
+    zsh_cv_c_zle_unicode_support=yes,
+    zsh_cv_c_zle_unicode_support=no)])
+])
+AH_TEMPLATE([ZLE_UNICODE_SUPPORT],
+[Define to 1 if you want unicode support in the line editor.])
+if test $zsh_cv_c_zle_unicode_support = yes; then
+  AC_DEFINE(ZLE_UNICODE_SUPPORT)
+fi
 
 dnl ---------------
 dnl dynamic loading
