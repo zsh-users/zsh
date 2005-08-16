@@ -1,3 +1,8 @@
+2005-08-16  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 1/2 of 21644: Src/Zle/complete.c: fixed bug in do_comp_vars()
+	when the first char in compprefix is metified.
+
 2005-08-16  Andrey Borzenkov  <bor@zsh.org>
 
 	* 21642: Src/Zle/compcore.c: cleanup for 21627, remove redundant
