@@ -666,25 +666,25 @@ AC_SUBST(tzsh)dnl
 
 AC_DEFUN(zsh_COMPILE_FLAGS,
     [AC_ARG_ENABLE(cppflags,
-	[  --enable-cppflags=...      specify C preprocessor flags],
+	AC_HELP_STRING([--enable-cppflags=...], [specify C preprocessor flags]),
 	if test "$enableval" = "yes"
 	then CPPFLAGS="$1"
 	else CPPFLAGS="$enable_cppflags"
 	fi)
     AC_ARG_ENABLE(cflags,
-	[  --enable-cflags=...        specify C compiler flags],
+	AC_HELP_STRING([--enable-cflags=...], [specify C compiler flags]),
 	if test "$enableval" = "yes"
 	then CFLAGS="$2"
 	else CFLAGS="$enable_cflags"
 	fi)
     AC_ARG_ENABLE(ldflags,
-	[  --enable-ldflags=...       specify linker flags],
+	AC_HELP_STRING([--enable-ldflags=...], [specify linker flags]),
 	if test "$enableval" = "yes"
 	then LDFLAGS="$3"
 	else LDFLAGS="$enable_ldflags"
 	fi)
     AC_ARG_ENABLE(libs,
-	[  --enable-libs=...          specify link libraries],
+	AC_HELP_STRING([--enable-libs=...], [specify link libraries]),
 	if test "$enableval" = "yes"
 	then LIBS="$4"
 	else LIBS="$enable_libs"

@@ -60,7 +60,7 @@ ifdef([zsh-debug],[undefine([zsh-debug])])dnl
 AH_TEMPLATE([DEBUG],
 [Define to 1 if you want to debug zsh.])
 AC_ARG_ENABLE(zsh-debug,
-[  --enable-zsh-debug         compile with debug code and debugger symbols],
+AC_HELP_STRING([--enable-zsh-debug], [compile with debug code and debugger symbols]),
 [if test x$enableval = xyes; then
   AC_DEFINE(DEBUG)
 fi])
@@ -70,7 +70,7 @@ ifdef([zsh-mem],[undefine([zsh-mem])])dnl
 AH_TEMPLATE([ZSH_MEM],
 [Define to 1 if you want to use zsh's own memory allocation routines])
 AC_ARG_ENABLE(zsh-mem,
-[  --enable-zsh-mem           compile with zsh memory allocation routines],
+AC_HELP_STRING([--enable-zsh-mem], [compile with zsh memory allocation routines]),
 [if test x$enableval = xyes; then
   AC_DEFINE(ZSH_MEM)
 fi])
@@ -80,7 +80,7 @@ ifdef([zsh-mem-debug],[undefine([zsh-mem-debug])])dnl
 AH_TEMPLATE([ZSH_MEM_DEBUG],
 [Define to 1 if you want to debug zsh memory allocation routines.])
 AC_ARG_ENABLE(zsh-mem-debug,
-[  --enable-zsh-mem-debug     debug zsh memory allocation routines],
+AC_HELP_STRING([--enable-zsh-mem-debug], [debug zsh memory allocation routines]),
 [if test x$enableval = xyes; then
   AC_DEFINE(ZSH_MEM_DEBUG)
 fi])
@@ -90,7 +90,7 @@ AH_TEMPLATE([ZSH_MEM_WARNING],
 [Define to 1 if you want to turn on warnings of memory allocation errors])
 ifdef([zsh-mem-warning],[undefine([zsh-mem-warning])])dnl
 AC_ARG_ENABLE(zsh-mem-warning,
-[  --enable-zsh-mem-warning   print warnings for errors in memory allocation],
+AC_HELP_STRING([--enable-zsh-mem-warning], [print warnings for errors in memory allocation]),
 [if test x$enableval = xyes; then
   AC_DEFINE(ZSH_MEM_WARNING)
 fi])
@@ -100,7 +100,7 @@ ifdef([zsh-secure-free],[undefine([zsh-secure-free])])dnl
 AH_TEMPLATE([ZSH_SECURE_FREE],
 [Define to 1 if you want to turn on memory checking for free().])
 AC_ARG_ENABLE(zsh-secure-free,
-[  --enable-zsh-secure-free   turn on error checking for free()],
+AC_HELP_STRING([--enable-zsh-secure-free], [turn on error checking for free()]),
 [if test x$enableval = xyes; then
   AC_DEFINE(ZSH_SECURE_FREE)
 fi])
@@ -112,7 +112,7 @@ AH_TEMPLATE([ZSH_HASH_DEBUG],
 [Define to 1 if you want to get debugging information on internal
  hash tables.  This turns on the `hashinfo' builtin.])
 AC_ARG_ENABLE(zsh-hash-debug,
-[  --enable-zsh-hash-debug    turn on debugging of internal hash tables],
+AC_HELP_STRING([--enable-zsh-hash-debug], [turn on debugging of internal hash tables]),
 [if test x$enableval = xyes; then
   AC_DEFINE(ZSH_HASH_DEBUG)
 fi])
@@ -120,12 +120,12 @@ fi])
 dnl Pathnames for global zsh scripts
 ifdef([etcdir],[undefine([etcdir])])dnl
 AC_ARG_ENABLE(etcdir,
-[  --enable-etcdir=DIR        the default directory for global zsh scripts],
+AC_HELP_STRING([--enable-etcdir=DIR], [the default directory for global zsh scripts]),
 [etcdir="$enableval"], [etcdir=/etc])
 
 ifdef([zshenv],[undefine([zshenv])])dnl
 AC_ARG_ENABLE(zshenv,
-[  --enable-zshenv=FILE       the full pathname of the global zshenv script],
+AC_HELP_STRING([--enable-zshenv=FILE], [the full pathname of the global zshenv script]),
 [zshenv="$enableval"],
 [if test "x$etcdir" = xno; then
   zshenv=no
@@ -141,7 +141,7 @@ fi
 
 ifdef([zshrc],[undefine([zshrc])])dnl
 AC_ARG_ENABLE(zshrc,
-[  --enable-zshrc=FILE        the full pathname of the global zshrc script],
+AC_HELP_STRING([--enable-zshrc=FILE], [the full pathname of the global zshrc script]),
 [zshrc="$enableval"],
 [if test "x$etcdir" = xno; then
   zshrc=no
@@ -157,7 +157,7 @@ fi
 
 ifdef([zprofile],[undefine([zprofile])])dnl
 AC_ARG_ENABLE(zprofile,
-[  --enable-zprofile=FILE     the full pathname of the global zprofile script],
+AC_HELP_STRING([--enable-zprofile=FILE], [the full pathname of the global zprofile script]),
 [zprofile="$enableval"],
 [if test "x$etcdir" = xno; then
   zprofile=no
@@ -173,7 +173,7 @@ fi
 
 ifdef([zlogin],[undefine([zlogin])])dnl
 AC_ARG_ENABLE(zlogin,
-[  --enable-zlogin=FILE       the full pathname of the global zlogin script],
+AC_HELP_STRING([--enable-zlogin=FILE], [the full pathname of the global zlogin script]),
 [zlogin="$enableval"],
 [if test "x$etcdir" = xno; then
   zlogin=no
@@ -189,7 +189,7 @@ fi
 
 ifdef([zlogout],[undefine([zlogout])])dnl
 AC_ARG_ENABLE(zlogout,
-[  --enable-zlogout=FILE      the full pathname of the global zlogout script],
+AC_HELP_STRING([--enable-zlogout=FILE], [the full pathname of the global zlogout script]),
 [zlogout="$enableval"],
 [if test "x$etcdir" = xno; then
   zlogout=no
@@ -213,13 +213,13 @@ AC_SUBST(zlogout)dnl
 dnl Do you want large file support, if available?
 ifdef([lfs],[undefine([lfs])])dnl
 AC_ARG_ENABLE(lfs,
-[  --disable-lfs              turn off support for large files],
+AC_HELP_STRING([--disable-lfs], [turn off support for large files]),
 [lfs="$enableval"], [lfs=yes])
 
 dnl Do you want dynamically loaded binary modules.
 ifdef([dynamic],[undefine([dynamic])])dnl
 AC_ARG_ENABLE(dynamic,
-[  --disable-dynamic          turn off dynamically loaded binary modules],
+AC_HELP_STRING([--disable-dynamic], [turn off dynamically loaded binary modules]),
 [dynamic="$enableval"], [dynamic=yes])
 
 dnl Do you want to disable restricted on r* commands
@@ -229,7 +229,7 @@ AH_TEMPLATE([RESTRICTED_R],
  when zsh is exec'd with basename that starts with r.
  By default this is defined.])
 AC_ARG_ENABLE(restricted-r,
-[  --disable-restricted-r     turn off r* invocation for restricted shell],
+AC_HELP_STRING([--disable-restricted-r], [turn off r* invocation for restricted shell]),
 [if test x$enableval = xyes; then
   AC_DEFINE(RESTRICTED_R)
 fi],
@@ -240,7 +240,7 @@ dnl Do you want to disable use of locale functions
 AH_TEMPLATE([CONFIG_LOCALE],
 [Undefine if you don't want local features.  By default this is defined.])
 AC_ARG_ENABLE([locale],
-[  --disable-locale           turn off locale features],
+AC_HELP_STRING([--disable-locale], [turn off locale features]),
 [if test x$enableval = xyes; then
   AC_DEFINE(CONFIG_LOCALE)
 fi],
@@ -249,12 +249,12 @@ AC_DEFINE(CONFIG_LOCALE)
 
 dnl Do you want to compile as K&R C.
 AC_ARG_ENABLE(ansi2knr,
-[  --enable-ansi2knr          translate source to K&R C before compiling],
+AC_HELP_STRING([--enable-ansi2knr], [translate source to K&R C before compiling]),
 [ansi2knr="$enableval"], [ansi2knr=default])
 
 ifdef([fndir],[undefine([fndir])])dnl
 AC_ARG_ENABLE(fndir,
-[  --enable-fndir=DIR         the directory in which to install functions],
+AC_HELP_STRING([--enable-fndir=DIR], [the directory in which to install functions]),
 dnl ${VERSION} to be determined at compile time.
 [if test $enableval = yes; then
   fndir=${datadir}/${tzsh_name}/'${VERSION}'/functions
@@ -264,7 +264,7 @@ fi], [fndir=${datadir}/${tzsh_name}/'${VERSION}'/functions])
 
 ifdef([sitefndir],[undefine([sitefndir])])dnl
 AC_ARG_ENABLE(site-fndir,
-[  --enable-site-fndir=DIR    same for site functions (not version specific)],
+AC_HELP_STRING([--enable-site-fndir=DIR], [same for site functions (not version specific)]),
 [if test $enableval = yes; then
   sitefndir=${datadir}/${tzsh_name}/site-functions
 else
@@ -273,7 +273,7 @@ fi], [sitefndir=${datadir}/${tzsh_name}/site-functions])
 
 ifdef([function_subdirs],[undefine([function_subdirs])])
 AC_ARG_ENABLE(function-subdirs,
-[  --enable-function-subdirs  install functions in subdirectories])
+AC_HELP_STRING([--enable-function-subdirs], [install functions in subdirectories]))
 
 if test "x${enable_function_subdirs}" != x &&
   test "x${enable_function_subdirs}" != xno; then
@@ -290,7 +290,7 @@ dnl Directories for scripts such as newuser.
 
 ifdef([scriptdir],[undefine([scriptdir])])dnl
 AC_ARG_ENABLE(scriptdir,
-[  --enable-scriptdir=DIR     the directory in which to install scripts],
+AC_HELP_STRING([--enable-scriptdir=DIR], [the directory in which to install scripts]),
 dnl ${VERSION} to be determined at compile time.
 [if test $enableval = yes; then
   scriptdir=${datadir}/${tzsh_name}/'${VERSION}'/scripts
@@ -300,7 +300,7 @@ fi], [scriptdir=${datadir}/${tzsh_name}/'${VERSION}'/scripts])
 
 ifdef([sitescriptdir],[undefine([sitescriptdir])])dnl
 AC_ARG_ENABLE(site-scriptdir,
-[  --enable-site-scriptdir=DIR  same for site scripts (not version specific)],
+AC_HELP_STRING([--enable-site-scriptdir=DIR], [same for site scripts (not version specific)]),
 [if test $enableval = yes; then
   sitescriptdir=${datadir}/${tzsh_name}/scripts
 else
@@ -315,7 +315,7 @@ ifdef([maildir_support],[undefine([maildir_support])])dnl
 AH_TEMPLATE([MAILDIR_SUPPORT],
 [Define for Maildir support])
 AC_ARG_ENABLE(maildir-support,
-[  --enable-maildir-support   enable maildir support in MAIL and MAILPATH],
+AC_HELP_STRING([--enable-maildir-support], [enable maildir support in MAIL and MAILPATH]),
 [if test x$enableval = xyes; then
   AC_DEFINE(MAILDIR_SUPPORT)
 fi])
@@ -325,7 +325,7 @@ ifdef([max_function_depth],[undefine([max_function_depth])])dnl
 AH_TEMPLATE([MAX_FUNCTION_DEPTH],
 [Define for function depth limits])
 AC_ARG_ENABLE(max-function-depth,
-[  --enable-max-function-depth=MAX   limit function depth to MAX, default 4096],
+AC_HELP_STRING([--enable-max-function-depth=MAX], [limit function depth to MAX, default 4096]),
 [if test x$enableval = xyes; then
   AC_DEFINE(MAX_FUNCTION_DEPTH, 4096)
 elif test x$enableval != xno; then
@@ -637,7 +637,7 @@ dnl Prefer BSD termcap library to SysV curses library, except on certain
 dnl SYSV-derived systems.
 dnl On HPUX, Hcurses is reported to work better than curses.
 AC_ARG_WITH(curses-terminfo,
-[  --with-curses-terminfo     use terminfo support from curses library],
+AC_HELP_STRING([--with-curses-terminfo], [use terminfo support from curses library]),
 [if test x$withval = xyes; then
   termcap_curses_order="tinfo curses ncurses termcap"
   AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
@@ -1934,7 +1934,7 @@ dnl -----------
 AH_TEMPLATE([BROKEN_TCSETPGRP],
 [Define to 1 if tcsetpgrp() doesn't work, ie BeOS R4.51.])
 AC_ARG_WITH(tcsetpgrp,
-[  --with-tcsetpgrp        assumes that tcsetpgrp() exists and works correctly],[
+AC_HELP_STRING([--with-tcsetpgrp], [assumes that tcsetpgrp() exists and works correctly]),[
 case "x$withval" in
     xyes) zsh_working_tcsetpgrp=yes;;
     xno)  zsh_working_tcsetpgrp=no;;
@@ -2067,7 +2067,7 @@ dnl ---------------------
 dnl multibyte ZLE support
 dnl ---------------------
 AC_ARG_ENABLE(multibyte,
-[  --enable-multibyte         support multibyte chars in the zsh line editor],
+AC_HELP_STRING([--enable-multibyte], [support multibyte chars in the zsh line editor]),
 [zsh_cv_c_zle_unicode_support=$enableval],
 [AC_CACHE_CHECK(if the system adequately supports multibyte chars,
  zsh_cv_c_zle_unicode_support,
