@@ -1,3 +1,9 @@
+2005-08-18  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 21655: Src/glob.c, Test/D04parameter.ztst: replacing multiple
+	matches where the replacement string itself came from a match
+	could get confused.
+
 2005-08-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21654: Src/string.c, Src/utils.c: Marked some ifdef/endif lines

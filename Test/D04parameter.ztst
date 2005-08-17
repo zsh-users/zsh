@@ -604,3 +604,11 @@
   print "${${foo}/?*/replacement}"
 0:Quoted zero-length strings are handled properly
 >
+
+  file=aleftkept
+  print ${file//(#b)(*)left/${match/a/andsome}}
+  print ${file//(#b)(*)left/${match//a/andsome}}
+0:Substitutions where $match is itself substituted in the replacement
+>andsomekept
+>andsomekept
+
