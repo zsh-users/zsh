@@ -243,6 +243,7 @@ nicechar(int c)
     return buf;
 }
 
+/**/
 #ifdef ZLE_UNICODE_SUPPORT
 /**/
 mod_export wchar_t *
@@ -280,6 +281,7 @@ wcs_nicechar(wint_t c)
     *s = 0;
     return buf;
 }
+/**/
 #endif /* ZLE_UNICODE_SUPPORT */
 
 
@@ -2493,6 +2495,7 @@ zarrdup(char **s)
     return y;
 }
 
+/**/
 #ifdef ZLE_UNICODE_SUPPORT
 /**/
 mod_export wchar_t **
@@ -2506,6 +2509,7 @@ wcs_zarrdup(wchar_t **s)
 
     return y;
 }
+/**/
 #endif /* ZLE_UNICODE_SUPPORT */
 
 /**/
@@ -3106,6 +3110,7 @@ zputs(char const *s, FILE *stream)
     return 0;
 }
 
+/**/
 #ifdef ZLE_UNICODE_SUPPORT
 /**/
 mod_export int
@@ -3127,6 +3132,7 @@ wcs_zputs(wchar_t const *s, FILE *stream)
     }
     return 0;
 }
+/**/
 #endif /* ZLE_UNICODE_SUPPORT */
 
 /* Create a visibly-represented duplicate of a string. */
@@ -3215,6 +3221,7 @@ niceztrlen(char const *s)
     return l;
 }
 
+/**/
 #ifdef ZLE_UNICODE_SUPPORT
 /**/
 mod_export size_t
@@ -3236,6 +3243,7 @@ wcs_nicewidth(wchar_t const *s)
     }
     return l;
 }
+/**/
 #endif /* ZLE_UNICODE_SUPPORT */
 
 /* check for special characters in the string */

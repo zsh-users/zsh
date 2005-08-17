@@ -54,6 +54,7 @@ ztrdup(const char *s)
     return t;
 }
 
+/**/
 #ifdef ZLE_UNICODE_SUPPORT
 /**/
 mod_export wchar_t *
@@ -67,6 +68,7 @@ wcs_ztrdup(const wchar_t *s)
     wcscpy(t, s);
     return t;
 }
+/**/
 #endif /* ZLE_UNICODE_SUPPORT */
 
 
