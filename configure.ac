@@ -2076,15 +2076,13 @@ AC_ARG_ENABLE(multibyte,
 # include <locale.h>
 #endif
    ], [
-int main() {
 #if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) \
  && defined(HAVE_MBRTOWC) && defined(HAVE_WCRTOMB) \
  && defined (__STDC_ISO_10646__)
-    return 0;
+    /* All is well */
 #else
 # error Not supported.
 #endif
-}
   ],
     zsh_cv_c_zle_unicode_support=yes,
     zsh_cv_c_zle_unicode_support=no)])
