@@ -1,3 +1,8 @@
+2005-08-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* (unposted): configure.ac, aczsh.m4: Use AC_HELP_STRING macro in
+	all AC_ARG_ENABLE and AC_ARG_WITH macros.
+
 2005-08-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21629: configure.ac, Src/system.h: moved the optional definition
@@ -5,7 +10,7 @@
 	new --enable-multibyte and --disable-multibyte configure options.
 
 	* 1/2 of 21644: Src/Zle/complete.c: fixed bug in do_comp_vars()
-	when the first char in compprefix is metified.
+	when the first char in compprefix is metafied.
 
 2005-08-16  Andrey Borzenkov  <bor@zsh.org>
 
