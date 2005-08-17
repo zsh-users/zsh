@@ -839,10 +839,6 @@ vicapslockpanic(UNUSED(char **args))
     return 0;
 }
 
-#ifdef ZLE_UNICODE_SUPPORT
-#else
-#endif
-
 /**/
 int
 visetbuffer(UNUSED(char **args))
