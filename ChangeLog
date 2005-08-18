@@ -1,5 +1,8 @@
 2005-08-18  Peter Stephenson  <pws@csr.com>
 
+	* 21662: Doc/Zsh/contrib.yo, Functions/Zle/insert-unicode-char:
+	compose and insert a Unicode character using two-key codes.
+
 	* 21661: Src/glob.c: variable in 21655 shouldn't be static.
 
 2005-08-18  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>

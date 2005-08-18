@@ -1,0 +1,214 @@
+# Accented characters.  Inputs two keys: first the code for the accent, then
+# the base character being accented.  Note that all input characters are
+# ASCII.  For best results zsh should have been built with support for
+# multibyte characters (--enable-multibyte).
+#
+# Outputs the character converted from Unicode into the local representation.
+# (The conversion is done within the shell, using whatever facilities
+# the C library provides.)
+#
+# When used as a zle widget, the character is inserted at the cursor
+# position.  With a numeric argument, preview in status line; outside zle,
+# print character (and newline) to standard output.
+#
+# The set of accented characters is reasonably complete up to U+0180, the
+# set of special characters less so.  However, it mostly gives up at that
+# point.  Adding new Unicode characters is easy, however.  Please send any
+# additions to zsh-workers@sunsite.dk .
+#
+# Some of the accent codes are a little more obscure than others.
+# Only the base character changes for upper case: A with circle is "o A".
+#  `   Grave
+#  '   Acute
+#  d   Double acute
+#  ^   Circumflex
+#  ~   Tilde
+#  "   Diaeresis (Umlaut)
+#  o   Circle
+#  e   Ligatures ending in e or E: e A gives AE, e o gives oe, etc.
+#  j   Ligatures ending in j or J: ij or IJ
+#  c   Cedilla
+#  /   Stroke through character
+#  -   Macron.  (A horizonal bar over the letter.)
+#  u   Breve.  (A shallow dish shape over the letter.)
+#  .   Dot above
+#  :   Middle dot
+#  g   Ogonek.  (A little forward facing hook at the bottom right
+#      of the character.  The "g" stands for "Ogonek" but another
+#      mnemonic is that g has a squiggle below the line.)
+#  v   Caron.  (A little v over the letter.)
+#  s   s s = Eszett (lower case only)
+#  h   Icelandic (or Runic) edh (h d) or thorn (h t)
+#  m   Mathematical: not (m \), multiply (m *), divide (m /), degree (m o),
+#      +/- (m +), superscripts 1, 2, 3 (m 1 etc.), micro (m u), quarter (m q),
+#      half (m h), three quarters (m t)
+#  p   Punctuation (and currency etc.): soft space (p _), inverted ! (p !),
+#      cent (p C), pound sign (p l) (think lira, librum), currency (p $),
+#      yen (p y), broken bar (p |), section (p s), lonely diaeresis (p "),
+#      copyright (p C), Spanish feminine marker (p f), left guillemet (p
+#      <), soft hyphen (p h), registered trade mark (p R), lonely macron (p
+#      -), lonely acute (p '), Pilcrow (paragraph) (p p), middle dot (p :),
+#      lonely cedilla (p c), Spanish masculine marker (p m), right
+#      guillemet (p >), inverted ? (p ?), Euro sign (p e).
+#
+
+emulate -LR zsh
+setopt cbases extendedglob printeightbit
+
+local accent basechar ochar error
+
+if [[ -n $WIDGET ]]; then
+  error=(zle -M)
+else
+  error=print
+fi
+
+if (( ${+zsh_accented_chars} == 0 )); then
+  # The associative array zsh_accent_chars is indexed by the
+  # accent.  The values are sets of character / Unicode pairs for
+  # the character with the given accent.  The Unicode value is
+  # a hex index with no base discriminator; essentially a UCS-4 index
+  # with the leading zeroes suppressed.
+  typeset -gA zsh_accented_chars
+
+  # grave
+  accent=\`
+  zsh_accented_chars[$accent]="\
+A C0 E C8 I CC O D2 U D9 a E0 e E8 i EC o F2 u F9 N 1F8 n 1F9 \
+"
+  # acute
+  accent=\'
+  zsh_accented_chars[$accent]="\
+A C1 E C9 I CD O D3 U DA Y DD a E1 e E9 i EC o F3 u FA y FD C 106 c 107 \
+L 139 l 13A N 143 n 144 R 154 r 155 S 15A s 15B Z 179 z 17A \
+"
+  # double acute
+  accent=d
+  zsh_accented_chars[$accent]="\
+O 150 o 151 U 170 u 171\
+"
+  # circumflex
+  accent=\^
+  zsh_accented_chars[$accent]="\
+A C2 E CA I CE O D4 U DB a E2 e EA i EE o F4 u FB C 108 c 109 G 11C g 11d \
+H 124 h 125 J 134 j 135 S 15C s 15D W 174 w 175 Y 176 y 177 \
+"
+  # tilde
+  accent=\~
+  zsh_accented_chars[$accent]="\
+A C3 E CB N D1 O D5 a E3 n F1 o F5 I 128 i 129 U 168 u 169 \
+"
+  # diaeresis / Umlaut
+  accent=\"
+  zsh_accented_chars[$accent]="\
+A C4 I CF O D6 U DC a E4 e EB i EF o F6 u FC y FF Y 178 \
+"
+  # ring above
+  accent=o
+  zsh_accented_chars[$accent]="\
+A C5 a E5 U 16E u 16F \
+"
+  # ligature with e or E
+  accent=e
+  zsh_accented_chars[$accent]="\
+A C6 a E6 O 152 o 153 \
+"
+  # ligature with j or J
+  accent=j
+  zsh_accented_chars[$accent]="\
+I 132 i 133\
+"
+  # cedilla
+  accent=c
+  zsh_accented_chars[$accent]="\
+C C7 c E7 G 122 g 123 K 136 k 137 L 13B l 13C N 145 n 146 R 156 r 157 \
+S 15E s 15F T 162 t 163 \
+"
+  # stroke through
+  accent=/
+  zsh_accented_chars[$accent]="\
+O D8 o F8 D 110 d 111 H 126 h 127 L 141 l 142 T 166 t 167 b 180 \
+"
+  # macron
+  accent=-
+  zsh_accented_chars[$accent]="\
+A 100 a 101 E 112 e 113 I 12a i 12b O 14C o 14D U 16A u 16B \
+"
+  # breve
+  accent=u
+  zsh_accented_chars[$accent]="\
+A 102 a 103 E 114 e 115 G 11E g 11F I 12C i 12D O 14E o 14F U 16C u 16D \
+"
+  # dot above
+  accent=.
+  zsh_accented_chars[$accent]="\
+C 10A c 10b E 116 e 117 G 120 g 121 I 130 i 131 Z 17B z 17C \
+"
+  # middle dot
+  accent=:
+  zsh_accented_chars[$accent]="\
+L 13F l 140 \
+"
+  # ogonek
+  accent=g
+  zsh_accented_chars[$accent]="\
+A 104 a 105 E 118 e 119 I 12E i 12F U 172 u 173 \
+"
+  # caron
+  accent=v
+  zsh_accented_chars[$accent]="\
+C 10C c 10D D 10E d 10F E 11A e 11B L 13D l 13E N 147 n 148 R 158 r 159 \
+S 160 s 161 T 164 t 165 Z 17D z 17E \
+"
+  # eszett
+  accent=s
+  zsh_accented_chars[$accent]="\
+s DF \
+"
+  # edh or thorn
+  accent=h
+  zsh_accented_chars[$accent]="\
+D D0 d F0 t FE \
+"
+  # mathematical
+  accent=m
+  zsh_accented_chars[$accent]="\
+\\ AC o B0 * D7 / F7 + B1 2 B2 3 B3 u B5 1 B9 q BC h BD t BE\
+"
+  # punctuation and currency
+  accent=p
+  zsh_accented_chars[$accent]="\
+_ A0 ! A1 C A2 l A3 $ A4 y A5 | A6 s A7 \" A8 C A9 f AA < AB \
+h AD R AE - AF ' B4 p B6 : B7 c B8 m BA > BB ? BF e 20AC \
+"
+fi
+
+read -k accent || return 1
+
+if [[ -z $zsh_accented_chars[$accent] ]]; then
+  $error "No accented characters with accent: $accent"
+  return 1
+fi
+
+local -A charmap
+charmap=(${=zsh_accented_chars[$accent]})
+
+read -k basechar
+
+if [[ -z $charmap[$basechar] ]]; then
+  $error "Accent $accent not available with character $basechar"
+  return 1
+fi
+
+if [[ -z $WIDGET ]]; then
+  [[ -t 1 ]] && print
+  print "\U${(l.8..0.)charmap[$basechar]}"
+else
+  ochar="$(print -n "\U${(l.8..0.)charmap[$basechar]}")"
+
+  if (( ${+NUMERIC} )); then
+    $error "Character ${(l.8..0.)charmap[$basechar]}: $ochar"
+  else
+    LBUFFER+=$ochar
+  fi
+fi

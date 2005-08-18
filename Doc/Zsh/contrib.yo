@@ -668,6 +668,112 @@ into the command line.
 
 example(bindkey '^Xf' insert-files)
 )
+tindex(insert-unicode-char)
+item(tt(insert-unicode-char))(
+This function allows you to compose Unicode characters to be inserted
+into the command line.  The command is followed by two keys (there is
+no prompt), of which the first indicates the type of accent or special
+character, and the second indicates the base character.  Both input
+characters are always from the ASCII character set.  For best results
+zsh should have been built with support for multibyte characters
+(configured with tt(--enable-multibyte)).
+
+The character is converted from Unicode into the local representation and
+inserted into the command line at the cursor position.
+(The conversion is done within the shell, using whatever facilities
+the C library provides.)  With a numeric argument, the character and its
+code are previewed in the status line
+
+The function may be run outside zle in which case it prints the character
+(together with a newline) to standard output.  Input is still read from
+keystrokes.
+
+The set of accented characters is reasonably complete up to U+0180, the
+set of special characters less so.  However, it mostly gives up at that
+point.  Adding new Unicode characters is easy, however.  Please send any
+additions to tt(zsh-workers@sunsite.dk).
+
+The codes for the first character are as follows:
+startsitem()
+sitem(tt(`))(
+Grave accent.
+)
+sitem(tt('))(
+Acute accent.
+)
+sitem(tt(d))(
+Double acute accent (only supported on a few letters).
+)
+sitem(tt(^))(
+Circumflex.
+)
+sitem(tt(~))(
+Tilde.
+)
+sitem(tt("))(
+Diaeresis (Umlaut).
+)
+sitem(tt(o))(
+Circle over the base character.
+)
+sitem(tt(e))(
+Ligatures ending in e or E: tt(e A) gives AE, tt(e o) gives oe, etc.
+)
+sitem(tt(j))(
+Ligatures ending in j or J: ij or IJ.
+)
+sitem(tt(c))(
+Cedilla.
+)
+sitem(tt(/))(
+Stroke through the base character.
+)
+sitem(tt(-))(
+Macron.  (A horizonal bar over the base character.)
+)
+sitem(tt(u))(
+Breve.  (A shallow dish shape over the base character.)
+)
+sitem(tt(.))(
+Dot above the base character
+)
+sitem(tt(:))(
+A dot in the middle plane of the base character
+)
+sitem(tt(g))(
+Ogonek.  (A little forward facing hook at the bottom right
+of the character.  The "g" stands for "Ogonek" but another
+mnemonic is that g has a squiggle below the line.)
+)
+sitem(tt(v))(
+Caron.  (A little v over the letter.)
+)
+sitem(tt(s))(
+Used only as tt(s s), a german Eszett or "scharfes S" ligature.
+)
+sitem(tt(h))(
+Icelandic (or Runic) edh (tt(h d)) or thorn (tt(h t)).
+)
+sitem(tt(m))(
+Various mathematical characters: not (tt(m \)), multiply (tt(m *)), divide
+(tt(m /)), degree (tt(m o)), +/- (tt(m +)), superscripts 1, 2, 3 (tt(m 1),
+etc.), micro (tt(m u)), quarter (tt(m q)), half (tt(m h)), three quarters
+(tt(m t)).
+)
+sitem(tt(p))(
+Various punctuation and currency characters (any non-mathematical symbol
+that is not part of a word):  soft space (tt(p _)), inverted ! (tt(p !)),
+cent (tt(p C)), pound sign (tt(p l)) (think lira, librum), currency (tt(p
+$)), yen (tt(p y)), broken bar (tt(p |)), section sign (tt(p s)), lonely
+diaeresis (tt(p ")), copyright sign (tt(p C)), Spanish feminine marker
+(tt(p f)), left guillemet (tt(p <)), soft hyphen (tt(p h)), registered
+trade mark (tt(p R)), lonely macron (tt(p -)), lonely acute (tt(p ')),
+Pilcrow (paragraph) sign (tt(p p)), middle dot (tt(p :)),
+lonely cedilla (tt(p c)), Spanish masculine marker (tt(p m)), right
+guillemet (tt(p >)), inverted ? (tt(p ?)), Euro sign (tt(p e)).
+)
+endsitem()
+)
 tindex(narrow-to-region)
 tindex(narrow-to-region-invisible)
 xitem(tt(narrow-to-region [ -p) var(pre) tt(] [ -P) var(post) tt(]))
