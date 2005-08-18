@@ -1,5 +1,8 @@
 2005-08-18  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/contrib.yo, Functions/Zle/insert-unicode-char:
+	cent is now p % to avoid duplication.
+
 	* 21662: Doc/Zsh/contrib.yo, Functions/Zle/insert-unicode-char:
 	compose and insert a Unicode character using two-key codes.
 

@@ -763,7 +763,7 @@ etc.), micro (tt(m u)), quarter (tt(m q)), half (tt(m h)), three quarters
 sitem(tt(p))(
 Various punctuation and currency characters (any non-mathematical symbol
 that is not part of a word):  soft space (tt(p _)), inverted ! (tt(p !)),
-cent (tt(p C)), pound sign (tt(p l)) (think lira, librum), currency (tt(p
+cent (tt(p %)), pound sign (tt(p l)) (think lira, librum), currency (tt(p
 $)), yen (tt(p y)), broken bar (tt(p |)), section sign (tt(p s)), lonely
 diaeresis (tt(p ")), copyright sign (tt(p C)), Spanish feminine marker
 (tt(p f)), left guillemet (tt(p <)), soft hyphen (tt(p h)), registered
