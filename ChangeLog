@@ -3,6 +3,9 @@
 	* 21663: Src/Zle/complete.c: check for string overflow
 	in do_comp_vars()
 
+	* 21664: Src/Zle/compcore.c, Src/Zle/compresult.c: unmetafy
+	argument in ztat() before calling (l)stat
+
 2005-08-18  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/contrib.yo, Functions/Zle/insert-unicode-char:

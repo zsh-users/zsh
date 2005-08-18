@@ -849,27 +849,33 @@ do_ambiguous(void)
  * parameter says if we have to do lstat() or stat().  I think this   *
  * should instead be done by use of a general function to expand a    *
  * filename (stripping backslashes), combined with the actual         *
- * (l)stat().                                                         */
+ * (l)stat().                                                         *
+ * Make sure input is unmetafied                                      */
 
 /**/
 mod_export int
 ztat(char *nam, struct stat *buf, int ls)
 {
-    if (!(ls ? lstat(nam, buf) : stat(nam, buf)))
-	return 0;
-    else {
-	char *p;
-	VARARR(char, b, strlen(nam) + 1);
+    int ret;
 
-	for (p = b; *nam; nam++)
-	    if (*nam == '\\' && nam[1])
-		*p++ = *++nam;
+    nam = unmeta(nam);
+    if (!nam)
+	return -1;
+
+    if ((ret = ls ? lstat(nam, buf) : stat(nam, buf))) {
+	char *p, *q;
+
+	for (p = q = nam; *q; q++)
+	    if (*q == '\\' && q[1])
+		*p++ = *++q;
 	    else
-		*p++ = *nam;
+		*p++ = *q;
 	*p = '\0';
 	
-	return ls ? lstat(b, buf) : stat(b, buf);
+	ret = ls ? lstat(nam, buf) : stat(nam, buf);
     }
+
+    return ret;
 }
 
 /* Insert all matches in the command line. */

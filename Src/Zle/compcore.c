@@ -2471,24 +2471,17 @@ add_match_data(int alt, char *str, char *orig, Cline line,
     cm->modec = '\0';
     if ((flags & CMF_FILE) && orig[0] && orig[strlen(orig) - 1] != '/') {
         struct stat buf;
-	char *pb, *blah;
-	int blahl;
+	char *pb;
 
         pb = (char *) zhalloc((cm->prpre ? strlen(cm->prpre) : 0) +
                               3 + strlen(orig));
         sprintf(pb, "%s%s", (cm->prpre ? cm->prpre : "./"), orig);
 
-	blah = ztrdup(pb);
-
-	unmetafy(blah, &blahl);
-
-        if (!ztat(blah, &buf, 1)) {
+        if (!ztat(pb, &buf, 1)) {
             cm->mode = buf.st_mode;
             if ((cm->modec = file_type(buf.st_mode)) == ' ')
                 cm->modec = '\0';
         }
-
-	free(blah);
     }
     if ((*compqstack == '\\' && compqstack[1]) ||
 	(autoq && *compqstack && compqstack[1] == '\\'))
