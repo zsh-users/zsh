@@ -2228,7 +2228,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
      * ${...//#foo/bar} even though SUB_GLOBAL is set, since the match
      * is anchored.  It goes on the heap.
      */
-    static LinkList repllist = NULL;
+    LinkList repllist = NULL;
 
     /* perform must-match test for complex closures */
     if (p->mustoff)

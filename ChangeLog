@@ -1,3 +1,7 @@
+2005-08-18  Peter Stephenson  <pws@csr.com>
+
+	* 21661: Src/glob.c: variable in 21655 shouldn't be static.
+
 2005-08-18  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21655: Src/glob.c, Test/D04parameter.ztst: replacing multiple
