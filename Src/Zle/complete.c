@@ -821,6 +821,8 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		    add = -1;
 		} else {
 		    p = compprefix + 1 + (*compprefix == Meta);
+		    if (p > compprefix + l)
+			p = compprefix + l;
 		    add = 1;
 		}
 		for (;;) {
@@ -833,10 +835,9 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		    if (add > 0) {
 			if (p == compprefix + l)
 			    return 0;
-			if (*p == Meta)
-			    p += 2;
-			else
-			    p++;
+			p = p + 1 + (*p == Meta);
+			if (p > compprefix + l)
+			    p = compprefix + l;
 		    } else {
 			if (p == compprefix)
 			    return 0;

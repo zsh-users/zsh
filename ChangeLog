@@ -1,3 +1,8 @@
+2005-08-18  Andrey Borzenkov  <bor@zsh.org>
+
+	* 21663: Src/Zle/complete.c: check for string overflow
+	in do_comp_vars()
+
 2005-08-18  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/contrib.yo, Functions/Zle/insert-unicode-char:
