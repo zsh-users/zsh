@@ -1,3 +1,9 @@
+2005-08-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21677: Doc/Makefile.in: Filter apostrophes in the \fB...\fP
+	headers of the nroff output since it appears that yodl is not
+	properly escaping them.
+
 2005-08-18  Andrey Borzenkov  <bor@zsh.org>
 
 	* 21663: Src/Zle/complete.c: check for string overflow
@@ -28,7 +34,7 @@
 	as exportable to fix a compile bug when ZLE_UNICODE_SUPPORT is not
 	defined.
 
-	* (unposted): configure.ac, aczsh.m4: Use AC_HELP_STRING macro in
+	* unposted: configure.ac, aczsh.m4: Use AC_HELP_STRING macro in
 	all AC_ARG_ENABLE and AC_ARG_WITH macros.
 
 2005-08-16  Wayne Davison  <wayned@users.sourceforge.net>
