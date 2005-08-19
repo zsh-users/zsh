@@ -117,7 +117,8 @@ zsh.info: $(sdir)/zsh.texi
 	esac; \
 	case '$(YODL)' in :*) touch $$target ;; *) \
 	    echo $(YODL) -o $$target -I$(sdir) -w zman.yo version.yo $< ; \
-	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
+	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | \
+	      sed -e '1s/\\-/-/g' -e '/^\.'\''/d' -e 's/\\fB'\''\\fP/\\fB\\\&'\''\\fP/' > $$target \
 	;; esac; \
 
 # These targets are no longer made by default, nor
