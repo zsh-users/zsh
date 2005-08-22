@@ -568,6 +568,40 @@
 >0
 >/elsewhere /somewhere
 
+  local STRING=a:b
+  typeset -T STRING string
+  print $STRING $string
+  unset STRING
+  set -A string x y z
+  print $STRING $string
+  STRING=a:b
+  typeset -T STRING string
+  print $STRING $string
+  unset STRING
+  set -A string x y z
+  print $STRING $string
+  STRING=a:b
+  typeset -T STRING string
+  print $STRING $string
+  unset string
+  STRING=x:y:z
+  print $STRING $string
+  STRING=a:b
+  typeset -T STRING string
+  print $STRING $string
+  unset string
+  STRING=x:y:z
+  print $STRING $string
+0:Unsetting and recreation of tied normal parameters
+>a:b a b
+>x y z
+>a:b a b
+>x y z
+>a:b a b
+>x:y:z
+>a:b a b
+>x:y:z
+
   string='look for a match in here'
   if [[ ${string%%(#b)(match)*} = "look for a " ]]; then
     print $match[1] $mbegin[1] $mend[1] $string[$mbegin[1],$mend[1]]

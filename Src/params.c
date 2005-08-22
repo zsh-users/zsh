@@ -2329,6 +2329,7 @@ mod_export int
 unsetparam_pm(Param pm, int altflag, int exp)
 {
     Param oldpm, altpm;
+    char *altremove;
 
     if ((pm->flags & PM_READONLY) && pm->level <= locallevel) {
 	zerr("read-only variable: %s", pm->nam, 0);
@@ -2338,13 +2339,20 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	zerr("%s: restricted", pm->nam, 0);
 	return 1;
     }
-    pm->gsu.s->unsetfn(pm, exp);
+
+    if (pm->ename && !altflag)
+	altremove = ztrdup(pm->ename);
+    else
+	altremove = NULL;
+
+    if (!(pm->flags & PM_UNSET))
+	pm->gsu.s->unsetfn(pm, exp);
     if (pm->env)
 	delenv(pm);
 
     /* remove it under its alternate name if necessary */
-    if (pm->ename && !altflag) {
-	altpm = (Param) paramtab->getnode(paramtab, pm->ename);
+    if (altremove) {
+	altpm = (Param) paramtab->getnode(paramtab, altremove);
 	/* tied parameters are at the same local level as each other */
 	oldpm = NULL;
 	while (altpm && altpm->level > pm->level) {
@@ -2360,6 +2368,8 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	    }
 	    unsetparam_pm(altpm, 1, exp);
 	}
+
+	zsfree(altremove);
     }
 
     /*
@@ -2425,6 +2435,8 @@ stdunsetfn(Param pm, UNUSED(int exp))
 	    	pm->u.str = NULL;
 	    break;
     }
+    if (!(pm->flags & PM_SPECIAL))
+	pm->flags &= ~PM_TIED;
     pm->flags |= PM_UNSET;
 }
 
@@ -2802,6 +2814,7 @@ tiedarrunsetfn(Param pm, UNUSED(int exp))
     zsfree(pm->ename);
     pm->ename = NULL;
     pm->flags &= ~PM_TIED;
+    pm->flags |= PM_UNSET;
 }
 
 /**/
