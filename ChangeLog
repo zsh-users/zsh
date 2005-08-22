@@ -1,3 +1,8 @@
+2005-08-22  Geoff Wing  <gcw@zsh.org>
+
+	* unposted: Doc/Zsh/metafaq.yo, Etc/FAQ.yo: update some
+	mirror site information
+
 2005-08-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21677: Doc/Makefile.in: Filter apostrophes in the \fB...\fP
