@@ -1,5 +1,8 @@
 2005-08-22  Peter Stephenson  <pws@csr.com>
 
+	* 21678: Src/params.c, Test/D04parameter.ztst: unsetting
+	tied parameters was fraught with crashes.
+
 	* 21676: Doc/zmacros.yo, Doc/Zsh/contrib.yo,
 	Functions/Zle/.distfiles, Functions/Zle/insert-composed-char,
 	Functions/Zle/insert-unicode-char: insert-unicode-char is now
