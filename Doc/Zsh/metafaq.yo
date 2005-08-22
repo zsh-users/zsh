@@ -55,8 +55,7 @@ nofill(tt(ftp://ftp.math.technion.ac.il/pub/zsh/)
 tt(http://www.math.technion.ac.il/pub/zsh/))
 )
 item(Japan)(
-nofill(tt(ftp://ftp.win.ne.jp/pub/shell/zsh/)
-tt(ftp://ftp.ayamura.org/pub/zsh/))
+nofill(tt(ftp://ftp.win.ne.jp/pub/shell/zsh/))
 )
 item(Korea)(
 nofill(tt(ftp://linux.sarang.net/mirror/system/shell/zsh/))
@@ -85,9 +84,9 @@ nofill(tt(ftp://ftp.net.lut.ac.uk/zsh/)
 tt(ftp://sunsite.org.uk/packages/zsh/))
 )
 item(USA)(
-nofill(tt(ftp://uiarchive.uiuc.edu/mirrors/ftp/ftp.zsh.org/pub/)
-tt(http://zsh.disillusion.org/)
-tt(http://foad.org/zsh/))
+nofill(tt(ftp://archive.progeny.com/zsh/)
+tt(http://archive.progeny.com/zsh/)
+tt(http://zsh.open-mirror.com/))
 )
 enditem()
 
