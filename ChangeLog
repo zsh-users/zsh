@@ -1,3 +1,10 @@
+2005-08-22  Peter Stephenson  <pws@csr.com>
+
+	* 21676: Doc/zmacros.yo, Doc/Zsh/contrib.yo,
+	Functions/Zle/.distfiles, Functions/Zle/insert-composed-char,
+	Functions/Zle/insert-unicode-char: insert-unicode-char is now
+	insert-composed-char and uses RFC 1345 for composing characters.
+
 2005-08-22  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: Doc/Zsh/metafaq.yo, Etc/FAQ.yo: update some

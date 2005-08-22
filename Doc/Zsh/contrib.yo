@@ -660,25 +660,23 @@ This works only with the new function based completion system.
 
 example(bindkey '^Xi' incremental-complete-word)
 )
-tindex(insert-files)
-item(tt(insert-files))(
-This function allows you type a file pattern, and see the results of the
-expansion at each step.  When you hit return, all expansions are inserted
-into the command line.
+tindex(insert-composed-char)
+item(tt(insert-composed-char))(
+This function allows you to compose characters that don't appear on the
+keyboard to be inserted into the command line.  The command is followed by
+two keys corresponding to ASCII characters (there is no prompt).  For
+accented characters, the two keys are a base character followed by a code
+for the accent, while for other special characters the two characters
+together form a mnemonic for the character to be inserted.  The
+two-character codes are a subset of those given by RFC 1345 (see for
+example tt(http://www.faqs.org/rfcs/rfc1345.html)).
 
-example(bindkey '^Xf' insert-files)
-)
-tindex(insert-unicode-char)
-item(tt(insert-unicode-char))(
-This function allows you to compose Unicode characters to be inserted
-into the command line.  The command is followed by two keys (there is
-no prompt), of which the first indicates the type of accent or special
-character, and the second indicates the base character.  Both input
-characters are always from the ASCII character set.  For best results
-zsh should have been built with support for multibyte characters
-(configured with tt(--enable-multibyte)).
+For best results zsh should have been built with support for multibyte
+characters (configured with tt(--enable-multibyte)); however, the function
+works for the limited range of characters available in single-byte
+character sets such as ISO-8859-1.
 
-The character is converted from Unicode into the local representation and
+The character is converted into the local representation and
 inserted into the command line at the cursor position.
 (The conversion is done within the shell, using whatever facilities
 the C library provides.)  With a numeric argument, the character and its
@@ -688,91 +686,139 @@ The function may be run outside zle in which case it prints the character
 (together with a newline) to standard output.  Input is still read from
 keystrokes.
 
-The set of accented characters is reasonably complete up to U+0180, the
-set of special characters less so.  However, it mostly gives up at that
-point.  Adding new Unicode characters is easy, however.  Please send any
-additions to tt(zsh-workers@sunsite.dk).
+The set of accented characters is reasonably complete up to Unicode
+character U+0180, the set of special characters less so.  However, it
+mostly gives up at that point.  Adding new characters is easy, however.
+Please send any additions to tt(zsh-workers@sunsite.dk).
 
-The codes for the first character are as follows:
+The codes for the second character when used to accent the first are as
+follows.  Note that not every character can take every accent.
 startsitem()
-sitem(tt(`))(
-Grave accent.
-)
-sitem(tt('))(
-Acute accent.
-)
-sitem(tt(d))(
-Double acute accent (only supported on a few letters).
-)
-sitem(tt(^))(
-Circumflex.
-)
-sitem(tt(~))(
-Tilde.
-)
-sitem(tt("))(
-Diaeresis (Umlaut).
-)
-sitem(tt(o))(
-Circle over the base character.
-)
-sitem(tt(e))(
-Ligatures ending in e or E: tt(e A) gives AE, tt(e o) gives oe, etc.
-)
-sitem(tt(j))(
-Ligatures ending in j or J: ij or IJ.
-)
-sitem(tt(c))(
-Cedilla.
-)
-sitem(tt(/))(
-Stroke through the base character.
-)
-sitem(tt(-))(
-Macron.  (A horizonal bar over the base character.)
-)
-sitem(tt(u))(
-Breve.  (A shallow dish shape over the base character.)
-)
-sitem(tt(.))(
-Dot above the base character
-)
-sitem(tt(:))(
-A dot in the middle plane of the base character
-)
-sitem(tt(g))(
-Ogonek.  (A little forward facing hook at the bottom right
+sitem(tt(!))(Grave.)
+sitem(tt(RQUOTE()))(Acute.)
+sitem(tt(>))(Circumflex.)
+sitem(tt(?))(Tilde.  (This is not tt(~) as RFC 1345 does not assume that
+character is present on the keyboard.))
+sitem(tt(-))(Macron.  (A horizonal bar over the base character.))
+sitem(tt(LPAR()))(Breve.  (A shallow dish shape over the base character.))
+sitem(tt(.))(Dot above the base character, or in the case of tt(i) no dot,
+or in the case of tt(L) and tt(l) a centered dot.)
+sitem(tt(:))(Diaeresis (Umlaut).)
+sitem(tt(c))(Cedilla.)
+sitem(tt(_))(Underline, however there are currently no underlined characters.)
+sitem(tt(/))(Stroke through the base character.)
+sitem(tt("))(Double acute (only supported on a few letters).)
+sitem(tt(;))(Ogonek.  (A little forward facing hook at the bottom right
 of the character.  The "g" stands for "Ogonek" but another
-mnemonic is that g has a squiggle below the line.)
-)
-sitem(tt(v))(
-Caron.  (A little v over the letter.)
-)
-sitem(tt(s))(
-Used only as tt(s s), a german Eszett or "scharfes S" ligature.
-)
-sitem(tt(h))(
-Icelandic (or Runic) edh (tt(h d)) or thorn (tt(h t)).
-)
-sitem(tt(m))(
-Various mathematical characters: not (tt(m \)), multiply (tt(m *)), divide
-(tt(m /)), degree (tt(m o)), +/- (tt(m +)), superscripts 1, 2, 3 (tt(m 1),
-etc.), micro (tt(m u)), quarter (tt(m q)), half (tt(m h)), three quarters
-(tt(m t)).
-)
-sitem(tt(p))(
-Various punctuation and currency characters (any non-mathematical symbol
-that is not part of a word):  soft space (tt(p _)), inverted ! (tt(p !)),
-cent (tt(p %)), pound sign (tt(p l)) (think lira, librum), currency (tt(p
-$)), yen (tt(p y)), broken bar (tt(p |)), section sign (tt(p s)), lonely
-diaeresis (tt(p ")), copyright sign (tt(p C)), Spanish feminine marker
-(tt(p f)), left guillemet (tt(p <)), soft hyphen (tt(p h)), registered
-trade mark (tt(p R)), lonely macron (tt(p -)), lonely acute (tt(p ')),
-Pilcrow (paragraph) sign (tt(p p)), middle dot (tt(p :)),
-lonely cedilla (tt(p c)), Spanish masculine marker (tt(p m)), right
-guillemet (tt(p >)), inverted ? (tt(p ?)), Euro sign (tt(p e)).
-)
+mnemonic is that g has a squiggle below the line.))
+sitem(tt(<))(Caron.  (A little v over the letter.))
+sitem(tt(0))(Circle over the base character.)
+sitem(tt(2))(Hook over the base character.)
+sitem(tt(9))(Horn over the base character.)
 endsitem()
+
+The following other two-character sequences are understood.
+
+startitem()
+item(ASCII characters)(
+These are already present on most keyboards:
+startsitem()
+sitem(tt(<LPAR()))(Left square bracket)
+sitem(tt(//))(Backslash (solidus))
+sitem(tt(RPAR()>))(Right square bracket)
+sitem(tt(LPAR()!))(Left brace (curly bracket))
+sitem(tt(!!))(Vertical bar (pipe symbol))
+sitem(tt(!RPAR()))(Right brace (curly bracket))
+sitem(tt(RQUOTE()?))(Tilde)
+endsitem()
+)
+item(Special letters)(
+Characters found in various variants of the Latin alphabet:
+startsitem()
+sitem(tt(ss))(Eszett (scafes S))
+sitem(tt(D-), tt(d-))(Eth)
+sitem(tt(TH), tt(th))(Thorn)
+sitem(tt(kk))(Kra)
+sitem(tt(RQUOTE()n))(RQUOTE()n)
+sitem(tt(NG), tt(ng))(Ng)
+sitem(tt(OI), tt(oi))(Oi)
+sitem(tt(yr))(yr)
+sitem(tt(ED))(ezh)
+endsitem()
+)
+item(Currency symbols)(
+startsitem()
+sitem(tt(Ct))(Cent)
+sitem(tt(Pd))(Pound sterling (also lira and others))
+sitem(tt(Cu))(Currency)
+sitem(tt(Ye))(Yen)
+sitem(tt(Eu))(Euro (N.B. not in RFC 1345))
+endsitem()
+)
+item(Punctuation characters)(
+References to "right" quotes indicate the shape (like a 9 rather than 6)
+rather than their grammatical use.  (For example, a "right" low double
+quote is used to open quotations in German.)
+startsitem()
+sitem(tt(!I))(Inverted exclamation mark)
+sitem(tt(BB))(Broken vertical bar)
+sitem(tt(SE))(Section)
+sitem(tt(Co))(Copyright)
+sitem(tt(-a))(Spanish feminine ordinal indicator)
+sitem(tt(<<))(Left guillemet)
+sitem(tt(--))(Soft hyphen)
+sitem(tt(Rg))(Registered trade mark)
+sitem(tt(PI))(Pilcrow (paragraph))
+sitem(tt(-o))(Spanish masculine ordinal indicator)
+sitem(tt(>>))(Right guillemet)
+sitem(tt(?I))(Inverted question mark)
+sitem(tt(RQUOTE()6))(Left single quote)
+sitem(tt(RQUOTE()9))(Right single quote)
+sitem(tt(.9))("Right" low quote)
+sitem(tt(9+RQUOTE()))(Reversed "right" quote)
+sitem(tt("6))(Left double quote)
+sitem(tt("9))(Right double quote)
+sitem(tt(:9))("Right" low double quote)
+sitem(tt(9"))(Reversed "right" double quote)
+sitem(tt(/-))(Dagger)
+sitem(tt(/=))(Double dagger)
+endsitem()
+)
+item(Mathematical symbols)(
+startsitem()
+sitem(tt(DG))(Degree)
+sitem(tt(+-))(+/- sign)
+sitem(tt(2S))(Superscript 2)
+sitem(tt(3S))(Superscript 3)
+sitem(tt(1S))(Superscript 1)
+sitem(tt(My))(Micro)
+sitem(tt(.M))(Middle dot)
+sitem(tt(14))(Quarter)
+sitem(tt(12))(Half)
+sitem(tt(34))(Three quarters)
+sitem(tt(*X))(Multiplication)
+sitem(tt(-:))(Division)
+endsitem()
+)
+item(Accents on their own)(
+startsitem()
+sitem(tt(RQUOTE()>))(Circumflex (same as caret, tt(^)))
+sitem(tt(RQUOTE()!))(Grave (same as backtick, tt(`)))
+sitem(tt(RQUOTE(),))(Cedilla)
+sitem(tt(RQUOTE():))(Diaeresis (Umlaut))
+sitem(tt(RQUOTE()m))(Macron)
+sitem(tt(RQUOTE()RQUOTE()))(Acute)
+endsitem()
+)
+enditem()
+)
+tindex(insert-files)
+item(tt(insert-files))(
+This function allows you type a file pattern, and see the results of the
+expansion at each step.  When you hit return, all expansions are inserted
+into the command line.
+
+example(bindkey '^Xf' insert-files)
 )
 tindex(narrow-to-region)
 tindex(narrow-to-region-invisible)
