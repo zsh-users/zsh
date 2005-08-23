@@ -1,3 +1,9 @@
+2005-08-22  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Doc/Makefile.in: An even better fix than the one
+	from 21677:  we now avoid more cases of lost characters due
+	to yodl not escaping start-of-line apostrophes.
+
 2005-08-22  Peter Stephenson  <pws@csr.com>
 
 	* 21678: Src/params.c, Test/D04parameter.ztst: unsetting
