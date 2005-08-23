@@ -28,7 +28,7 @@ _svn () {
       if (( $#cmd )); then
         curcontext="${curcontext%:*:*}:svn-${cmd}:"
 
-        usage=${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"}:#usage:*}#usage: $cmd] }
+        usage=${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"}:#usage:*}#usage:*$cmd] }
         args=(
           ${=${${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"##*Valid options:}:#* :*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
         )
@@ -66,7 +66,7 @@ _svn () {
             )
           ;;
           *)
-            case $_svn_subcmd_usage in
+            case $usage in
               *(SRC|DST|TARGET|URL*PATH)*)
                 args+=(
 	          '*: : _alternative "files:file:_files" "urls:URL:_svn_urls"'
