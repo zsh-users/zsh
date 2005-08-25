@@ -1,3 +1,8 @@
+2005-08-25  Clint Adams  <clint@zsh.org>
+
+	* 21683: Completion/X/Command/_urxvt: more fixes
+	to urxvt completion.
+
 2005-08-23  Clint Adams  <clint@zsh.org>
 
 	* 21682: Completion/Unix/Command/_subversion: handle usage output
