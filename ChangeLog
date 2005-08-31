@@ -1,3 +1,8 @@
+2005-08-31  Peter Stephenson  <pws@csr.com>
+
+	* users/9359: Francisco Borges: Completion/X/Command/_gv:
+	completion of ps and PDF files was broken for gv.
+
 2005-08-25  Clint Adams  <clint@zsh.org>
 
 	* 21683: Completion/X/Command/_urxvt: more fixes

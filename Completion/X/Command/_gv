@@ -39,4 +39,4 @@ _arguments \
   '--scalebase=:scale base:' \
   '--ad=:resource file:_files' \
   '--style=:resource file:_files' \
-  '*:file: _pspdf --z'
+  '*:file: _pspdf -z'
