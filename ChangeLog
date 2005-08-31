@@ -1,3 +1,8 @@
+2005-08-31  Clint Adams  <clint@zsh.org>
+
+	* 21686: Completion/Debian/Command/_make-kpkg: modernize
+	make-kpkg completion.
+
 2005-08-31  Peter Stephenson  <pws@csr.com>
 
 	* users/9359: Francisco Borges: Completion/X/Command/_gv:

@@ -19,6 +19,7 @@ _arguments \
    '(--bzimage)--zimage[make zImage instead of bzImage]' \
    '(--zimage)--bzimage[make bzImage instead of zImage]' \
    '--rootcmd[specify command for gaining root access]:root command:(sudo fakeroot)' \
+   '--stem:package name stem:(kernel linux)' \
    '--us[unsigned source]' \
    '--uc[unsigned changelog]' \
-   '*:target:(clean buildpackage binary kernel-source kernel-headers kernel-doc kernel-image build modules modules_config modules_image modules_clean configure debian libc-kheaders)'
+   '*:target:(clean buildpackage binary binary-indep binary-arch kernel-source kernel-headers kernel-doc kernel-image kernel_manual build modules modules_config modules_image modules_clean configure debian libc-kheaders)'
