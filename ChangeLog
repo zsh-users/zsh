@@ -3,6 +3,9 @@
 	* 21686: Completion/Debian/Command/_make-kpkg: modernize
 	make-kpkg completion.
 
+	* 21692: Completion/Unix/Command/_baz: remove set-tree-version, fix
+	tree-version, add tree-id.
+
 2005-08-31  Peter Stephenson  <pws@csr.com>
 
 	* users/9359: Francisco Borges: Completion/X/Command/_gv:

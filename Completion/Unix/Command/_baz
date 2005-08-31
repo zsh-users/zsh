@@ -188,14 +188,14 @@ cmd_whereis_archive=(':archive:_baz_archives')
 local cmd_init_tree
 cmd_init_tree=('::version:_baz_versions')
 
+local cmd_tree_id
+cmd_tree_id=('::directory:_files -/')
+
 local cmd_tree_root
 cmd_tree_root=('::directory:_files -/')
 
 local cmd_tree_version
-cmd_tree_version=('::directory:_files -/')
-
-local cmd_set_tree_version
-cmd_set_tree_version=(':version:_baz_versions')
+cmd_tree_version=(':version:_baz_versions')
 
 local cmd_build_config cmd_buildcfg
 cmd_build_config=(':config:_baz_config')
