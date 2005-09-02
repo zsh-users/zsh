@@ -1864,14 +1864,15 @@ item(tt(G))(
 files owned by the effective group ID
 )
 item(tt(u)var(id))(
-files owned by user ID var(id) if it is a number, if not, than the
-character after the `tt(u)' will be used as a separator and the string
-between it and the next matching separator
-(`tt([)', `tt({)', and `tt(<)'
-match `tt(])', `tt(})', and `tt(>)' respectively,
-any other character matches
-itself) will be taken as a user name, and the user ID of this user will
-be taken (e.g. `tt(u:foo:)' or `tt(u[foo])' for user `tt(foo)')
+files owned by user ID var(id) if that is a number.  Otherwise,
+var(id) specifies a user name: the
+character after the `tt(u)' will be taken as a separator and the string
+between it and the next matching separator will be taken as a user name.
+The starting separators `tt([)', `tt({)', and `tt(<)'
+match the final separators `tt(])', `tt(})', and `tt(>)', respectively;
+any other character matches itself.  The selected files are those
+owned by this user.  For example, `tt(u:foo:)' or `tt(u[foo])' selects
+files owned by user `tt(foo)'.
 )
 item(tt(g)var(id))(
 like tt(u)var(id) but with group IDs or names

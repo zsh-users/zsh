@@ -1,5 +1,7 @@
 2005-09-02  Peter Stephenson  <pws@csr.com>
 
+	* 21695: Doc/Zsh/expn.yo: rewrite entry for u globbing flag.
+
 	* 21693: Jean-Baptiste Quenot: Completion/Unix/Command/_ant:
 	recursively find targets.
 
