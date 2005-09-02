@@ -6,6 +6,18 @@ local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 local buildfile classpath cp userjars importedfiles target='*:target:->target' targets tmp
 
+find_targets() {
+    importedfiles=( $(sed -n "s/ *<import[^>]* file=[\"']\([^\"']*\)[\"'].*/\1/p" < $1) )
+    targets=( $(sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" $1) )
+    if (( $#importedfiles )) ; then
+	cd $1:h
+    	for file in $importedfiles ; do
+	    find_targets $file
+	done
+    fi
+    _wanted targets expl target compadd -a targets && ret=0
+}
+
 if [[ $service = *ANT_ARGS* ]]; then
   compset -q
   words=( fake "$words[@]" )
@@ -114,11 +126,7 @@ case $state in
         )//$'\015'}"
         _describe 'target' tmp && ret=0
       else
-        importedfiles=( $(sed -n "s/ *<import[^>]* file=[\"']\([^\"']*\)[\"'].*/\1/p" < $buildfile) )
-        targets=( $(sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" $buildfile) )
-        (( $#importedfiles )) && targets+=( $(cd $buildfile:h;
-            sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" $importedfiles) )
-        _wanted targets expl target compadd -a targets && ret=0
+        find_targets $buildfile
       fi
     else
       _message -e targets target
