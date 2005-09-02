@@ -1,3 +1,8 @@
+2005-09-02  Peter Stephenson  <pws@csr.com>
+
+	* 21693: Jean-Baptiste Quenot: Completion/Unix/Command/_ant:
+	recursively find targets.
+
 2005-08-31  Clint Adams  <clint@zsh.org>
 
 	* 21686: Completion/Debian/Command/_make-kpkg: modernize
