@@ -1,0 +1,14 @@
+#compdef date
+
+_arguments \
+    '-d[date]:time string:' \
+    '-f[file]:date file:_files' \
+    '-I[iso-8601]:time spec:' \
+    '-r[reference]:file:_files' \
+    '-R[rfc-2822]' \
+    '-s[set]:time string:' \
+    '-u[utc]' \
+    -- \
+    '*=FILE*:file:_files' \
+    '*=DATEFILE*:date file:_files' \
+    ':format or date:'

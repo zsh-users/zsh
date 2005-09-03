@@ -1,3 +1,8 @@
+2005-09-02  Clint Adams  <clint@zsh.org>
+
+	* 21696: Completion/Unix/Command/_date: completion for
+	GNU date.
+
 2005-09-02  Peter Stephenson  <pws@csr.com>
 
 	* 21695: Doc/Zsh/expn.yo: rewrite entry for u globbing flag.
