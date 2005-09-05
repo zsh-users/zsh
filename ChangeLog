@@ -1,3 +1,8 @@
+2005-09-05  Peter Stephenson  <pws@csr.com>
+
+	* 21698: Jean-Baptiste Quenot: Completion/Unix/Command/_ant:
+	recursive completion could change directory.
+
 2005-09-02  Clint Adams  <clint@zsh.org>
 
 	* 21696: Completion/Unix/Command/_date: completion for

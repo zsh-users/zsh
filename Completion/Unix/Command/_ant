@@ -8,14 +8,13 @@ local buildfile classpath cp userjars importedfiles target='*:target:->target' t
 
 find_targets() {
     importedfiles=( $(sed -n "s/ *<import[^>]* file=[\"']\([^\"']*\)[\"'].*/\1/p" < $1) )
-    targets=( $(sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" $1) )
+    sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" $1
     if (( $#importedfiles )) ; then
-	cd $1:h
+	( cd $1:h
     	for file in $importedfiles ; do
 	    find_targets $file
-	done
+	done )
     fi
-    _wanted targets expl target compadd -a targets && ret=0
 }
 
 if [[ $service = *ANT_ARGS* ]]; then
@@ -126,7 +125,8 @@ case $state in
         )//$'\015'}"
         _describe 'target' tmp && ret=0
       else
-        find_targets $buildfile
+        targets=( $(find_targets $buildfile) )
+        _wanted targets expl target compadd -a targets && ret=0
       fi
     else
       _message -e targets target
