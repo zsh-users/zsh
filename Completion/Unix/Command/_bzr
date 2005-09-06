@@ -1,0 +1,11 @@
+#compdef bzr
+
+local _bzr_subcommands expl curcontext="$curcontext"
+
+_bzr_subcommands=(${(f)"$(_call_program bzr bzr shell-complete)"})
+
+if (( CURRENT == 2 )); then
+  _describe -t subcommand 'subcommand' _bzr_subcommands
+else
+# this part missing
+fi
