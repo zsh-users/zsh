@@ -178,3 +178,8 @@
 0:Keys with double quotes and the (P) expansion flag
 >lower
 >upper
+
+  typeset -a empty_array
+  echo X${${l##*}[-1]}X
+0:Negative index applied to substition result from empty array
+>XX
