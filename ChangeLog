@@ -1,3 +1,8 @@
+2005-09-06  Peter Stephenson  <pws@csr.com>
+
+	* 21701: Src/params.c, Test/D06subscript.ztst: negative offsets
+	that indexed before the start of a scalar weren't handled properly.
+
 2005-08-22  Peter Stephenson  <pws@csr.com>
 
 	* 21678: Src/params.c, Test/D04parameter.ztst: unsetting

@@ -1565,8 +1565,11 @@ getstrvalue(Value v)
     if (v->start == 0 && v->end == -1)
 	return s;
 
-    if (v->start < 0)
+    if (v->start < 0) {
 	v->start += strlen(s);
+	if (v->start < 0)
+	    v->start = 0;
+    }
     if (v->end < 0)
 	v->end += strlen(s) + 1;
     s = (v->start > (int)strlen(s)) ? dupstring("") : dupstring(s + v->start);
