@@ -24,13 +24,23 @@ else
 	  (freebsd*)
 	  _arguments \
 	    '-u[utc]' \
-	    '-j[do not try to set date]' \
 	    '-n[only set time on current machine]' \
 	    '-d:daylight savingg time value:' \
+	    '-j[do not try to set date]' \
 	    '-f:parsing format:' \
 	    '-r:seconds since epoch:' \
 	    '-t:minutes west of GMT:' \
 	    '-v:adjustment value:' \
+            ':format or date:'
+	  ;;
+	  (openbsd*)
+	  _arguments \
+	    '-u[utc]' \
+	    '-n[only set time on current machine]' \
+	    '-d:daylight savingg time value:' \
+	    '-a[gradually skew]' \
+	    '-r:seconds since epoch:' \
+	    '-t:minutes west of GMT:' \
             ':format or date:'
 	  ;;
   esac

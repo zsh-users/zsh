@@ -1,7 +1,7 @@
 2005-09-07  Clint Adams  <clint@zsh.org>
 
-	* 21704: Completion/Unix/Command/_date: completion for Solaris,
-	and FreeBSD.
+	* 21704, 21705: Completion/Unix/Command/_date: completion for
+	Solaris, FreeBSD, and OpenBSD.
 
 2005-09-06  Clint Adams  <clint@zsh.org>
 
