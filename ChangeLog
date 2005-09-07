@@ -1,3 +1,8 @@
+2005-09-07  Clint Adams  <clint@zsh.org>
+
+	* 21704: Completion/Unix/Command/_date: completion for Solaris,
+	and FreeBSD.
+
 2005-09-06  Clint Adams  <clint@zsh.org>
 
 	* 21703: Completion/Unix/Command/_bzr: completion for bzr 0.0.7.

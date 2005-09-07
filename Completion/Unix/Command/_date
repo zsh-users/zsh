@@ -1,6 +1,7 @@
 #compdef date
 
-_arguments \
+if _pick_variant -r is_gnu gnu="Free Software Foundation" unix --version; then
+  _arguments \
     '-d[date]:time string:' \
     '-f[file]:date file:_files' \
     '-I[iso-8601]:time spec:' \
@@ -12,3 +13,26 @@ _arguments \
     '*=FILE*:file:_files' \
     '*=DATEFILE*:date file:_files' \
     ':format or date:'
+else
+  case "$OSTYPE" in
+	  (solaris*)
+	  _arguments \
+	    '-u[utc]' \
+	    '-a:adjustment:' \
+            ':format or date:'
+	  ;;
+	  (freebsd*)
+	  _arguments \
+	    '-u[utc]' \
+	    '-j[do not try to set date]' \
+	    '-n[only set time on current machine]' \
+	    '-d:daylight savingg time value:' \
+	    '-f:parsing format:' \
+	    '-r:seconds since epoch:' \
+	    '-t:minutes west of GMT:' \
+	    '-v:adjustment value:' \
+            ':format or date:'
+	  ;;
+  esac
+fi
+
