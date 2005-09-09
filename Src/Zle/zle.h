@@ -69,11 +69,13 @@ typedef wint_t   ZLE_INT_T;
 /*
  * TODO: doesn't work on arguments with side effects.
  * Also YUK.  Not even sure this is guaranteed to work.
+ * Should be easy to do along the lines of wcsiword.
  */
 #define ZC_iident(x)	(x < 256 && iident((int)x))
 
 #define ZC_tolower towlower
 #define ZC_toupper towupper
+#define ZC_iword  wcsiword
 
 #define LASTFULLCHAR	lastchar_wide
 
@@ -122,6 +124,7 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 
 #define ZC_tolower tulower
 #define ZC_toupper tuupper
+#define ZC_iword   iword
 
 #define LASTFULLCHAR	lastchar
 

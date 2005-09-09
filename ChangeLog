@@ -1,3 +1,10 @@
+2005-09-09  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 21722: Src/utils.c, Src/Zle/zle.h, Src/Zle/zle_misc.c,
+	Src/Zle/zle_word.c: fix broken transpose-words and improve
+	word character detection by assuming non-ASCII characters are word
+	characters if and only if alphanumeric.
+
 2005-09-09  Peter Stephenson  <pws@csr.com>
 
 	* 21720: Src/Zle/zle_main.c: getrestchar() from 21709 didn't

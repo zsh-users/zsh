@@ -30,11 +30,6 @@
 #include "zle.mdh"
 #include "zle_word.pro"
 
-/*
- * TODO: use of iword needs completely rethinking for Unicode
- * since we can't base it on a table lookup.
- */
-
 /**/
 int
 forwardword(char **args)
@@ -49,11 +44,11 @@ forwardword(char **args)
 	return ret;
     }
     while (n--) {
-	while (zlecs != zlell && iword(zleline[zlecs]))
+	while (zlecs != zlell && ZC_iword(zleline[zlecs]))
 	    zlecs++;
 	if (wordflag && !n)
 	    return 0;
-	while (zlecs != zlell && !iword(zleline[zlecs]))
+	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
 	    zlecs++;
     }
     return 0;
@@ -125,11 +120,11 @@ emacsforwardword(char **args)
 	return ret;
     }
     while (n--) {
-	while (zlecs != zlell && !iword(zleline[zlecs]))
+	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
 	    zlecs++;
 	if (wordflag && !n)
 	    return 0;
-	while (zlecs != zlell && iword(zleline[zlecs]))
+	while (zlecs != zlell && ZC_iword(zleline[zlecs]))
 	    zlecs++;
     }
     return 0;
@@ -197,9 +192,9 @@ backwardword(char **args)
 	return ret;
     }
     while (n--) {
-	while (zlecs && !iword(zleline[zlecs - 1]))
+	while (zlecs && !ZC_iword(zleline[zlecs - 1]))
 	    zlecs--;
-	while (zlecs && iword(zleline[zlecs - 1]))
+	while (zlecs && ZC_iword(zleline[zlecs - 1]))
 	    zlecs--;
     }
     return 0;
@@ -267,9 +262,9 @@ emacsbackwardword(char **args)
 	return ret;
     }
     while (n--) {
-	while (zlecs && !iword(zleline[zlecs - 1]))
+	while (zlecs && !ZC_iword(zleline[zlecs - 1]))
 	    zlecs--;
-	while (zlecs && iword(zleline[zlecs - 1]))
+	while (zlecs && ZC_iword(zleline[zlecs - 1]))
 	    zlecs--;
     }
     return 0;
@@ -289,9 +284,9 @@ backwarddeleteword(char **args)
 	return ret;
     }
     while (n--) {
-	while (x && !iword(zleline[x - 1]))
+	while (x && !ZC_iword(zleline[x - 1]))
 	    x--;
-	while (x && iword(zleline[x - 1]))
+	while (x && ZC_iword(zleline[x - 1]))
 	    x--;
     }
     backdel(zlecs - x);
@@ -337,9 +332,9 @@ backwardkillword(char **args)
 	return ret;
     }
     while (n--) {
-	while (x && !iword(zleline[x - 1]))
+	while (x && !ZC_iword(zleline[x - 1]))
 	    x--;
-	while (x && iword(zleline[x - 1]))
+	while (x && ZC_iword(zleline[x - 1]))
 	    x--;
     }
     backkill(zlecs - x, 1);
@@ -356,9 +351,9 @@ upcaseword(UNUSED(char **args))
     if (neg)
 	n = -n;
     while (n--) {
-	while (zlecs != zlell && !iword(zleline[zlecs]))
+	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
 	    zlecs++;
-	while (zlecs != zlell && iword(zleline[zlecs])) {
+	while (zlecs != zlell && ZC_iword(zleline[zlecs])) {
 	    zleline[zlecs] = ZC_toupper(zleline[zlecs]);
 	    zlecs++;
 	}
@@ -378,9 +373,9 @@ downcaseword(UNUSED(char **args))
     if (neg)
 	n = -n;
     while (n--) {
-	while (zlecs != zlell && !iword(zleline[zlecs]))
+	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
 	    zlecs++;
-	while (zlecs != zlell && iword(zleline[zlecs])) {
+	while (zlecs != zlell && ZC_iword(zleline[zlecs])) {
 	    zleline[zlecs] = ZC_tolower(zleline[zlecs]);
 	    zlecs++;
 	}
@@ -401,11 +396,11 @@ capitalizeword(UNUSED(char **args))
 	n = -n;
     while (n--) {
 	first = 1;
-	while (zlecs != zlell && !iword(zleline[zlecs]))
+	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
 	    zlecs++;
-	while (zlecs != zlell && iword(zleline[zlecs]) && !isalpha(zleline[zlecs]))
+	while (zlecs != zlell && ZC_iword(zleline[zlecs]) && !isalpha(zleline[zlecs]))
 	    zlecs++;
-	while (zlecs != zlell && iword(zleline[zlecs])) {
+	while (zlecs != zlell && ZC_iword(zleline[zlecs])) {
 	    zleline[zlecs] = (first) ? ZC_toupper(zleline[zlecs]) :
 		ZC_tolower(zleline[zlecs]);
 	    first = 0;
@@ -432,9 +427,9 @@ deleteword(char **args)
 	return ret;
     }
     while (n--) {
-	while (x != zlell && !iword(zleline[x]))
+	while (x != zlell && !ZC_iword(zleline[x]))
 	    x++;
-	while (x != zlell && iword(zleline[x]))
+	while (x != zlell && ZC_iword(zleline[x]))
 	    x++;
     }
     foredel(x - zlecs);
@@ -456,9 +451,9 @@ killword(char **args)
 	return ret;
     }
     while (n--) {
-	while (x != zlell && !iword(zleline[x]))
+	while (x != zlell && !ZC_iword(zleline[x]))
 	    x++;
-	while (x != zlell && iword(zleline[x]))
+	while (x != zlell && ZC_iword(zleline[x]))
 	    x++;
     }
     forekill(x - zlecs, 0);
@@ -469,36 +464,43 @@ killword(char **args)
 int
 transposewords(UNUSED(char **args))
 {
-    int p1, p2, p3, p4, x = zlecs;
-    char *temp, *pp;
+    int p1, p2, p3, p4, len, x = zlecs;
+    ZLE_STRING_T temp, pp;
     int n = zmult;
     int neg = n < 0, ocs = zlecs;
 
     if (neg)
 	n = -n;
     while (n--) {
-	while (x != zlell && zleline[x] != '\n' && !iword(zleline[x]))
+	while (x != zlell && zleline[x] != ZWC('\n') && !ZC_iword(zleline[x]))
 	    x++;
-	if (x == zlell || zleline[x] == '\n') {
+	if (x == zlell || zleline[x] == ZWC('\n')) {
 	    x = zlecs;
-	    while (x && zleline[x - 1] != '\n' && !iword(zleline[x]))
+	    while (x && zleline[x - 1] != ZWC('\n') && !ZC_iword(zleline[x]))
 		x--;
-	    if (!x || zleline[x - 1] == '\n')
+	    if (!x || zleline[x - 1] == ZWC('\n'))
 		return 1;
 	}
-	for (p4 = x; p4 != zlell && iword(zleline[p4]); p4++);
-	for (p3 = p4; p3 && iword(zleline[p3 - 1]); p3--);
+	for (p4 = x; p4 != zlell && ZC_iword(zleline[p4]); p4++);
+	for (p3 = p4; p3 && ZC_iword(zleline[p3 - 1]); p3--);
 	if (!p3)
 	    return 1;
-	for (p2 = p3; p2 && !iword(zleline[p2 - 1]); p2--);
+	for (p2 = p3; p2 && !ZC_iword(zleline[p2 - 1]); p2--);
 	if (!p2)
 	    return 1;
-	for (p1 = p2; p1 && iword(zleline[p1 - 1]); p1--);
-	pp = temp = (char *)zhalloc(p4 - p1 + 1);
-	struncpy(&pp, (char *) zleline + p3, p4 - p3);
-	struncpy(&pp, (char *) zleline + p2, p3 - p2);
-	struncpy(&pp, (char *) zleline + p1, p2 - p1);
-	strncpy((char *)zleline + p1, temp, p4 - p1);
+	for (p1 = p2; p1 && ZC_iword(zleline[p1 - 1]); p1--);
+
+	pp = temp = (ZLE_STRING_T)zhalloc((p4 - p1)*ZLE_CHAR_SIZE);
+	len = p4 - p3;
+	ZS_memcpy(pp, zleline + p3, len);
+	pp += len;
+	len = p3 - p2;
+	ZS_memcpy(pp, zleline + p2, len);
+	pp += len;
+	ZS_memcpy(pp, zleline + p1, p2 - p1);
+
+	ZS_memcpy(zleline + p1, temp, p4 - p1);
+
 	zlecs = p4;
     }
     if (neg)

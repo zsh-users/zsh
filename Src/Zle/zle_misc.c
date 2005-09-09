@@ -623,10 +623,10 @@ copyprevword(UNUSED(char **args))
     int len, t0;
 
     for (t0 = zlecs - 1; t0 >= 0; t0--)
-	if (iword(zleline[t0]))
+	if (ZC_iword(zleline[t0]))
 	    break;
     for (; t0 >= 0; t0--)
-	if (!iword(zleline[t0]))
+	if (!ZC_iword(zleline[t0]))
 	    break;
     if (t0)
 	t0++;

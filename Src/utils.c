@@ -2469,6 +2469,42 @@ inittyptab(void)
 	typtab[bangchar] |= ISPECIAL;
 }
 
+
+#ifdef ZLE_UNICODE_SUPPORT
+/*
+ * iword() macro extended to support wide characters.
+ */
+
+/**/
+mod_export int
+wcsiword(wchar_t c)
+{
+    int len;
+    VARARR(char, outstr, MB_CUR_MAX);
+    /*
+     * Strategy:  the shell requires that the multibyte representation
+     * be an extension of ASCII.  So see if converting the character
+     * produces an ASCII character.  If it does, use iword on that.
+     * If it doesn't, use iswalnum on the original character.  This
+     * is pretty good most of the time.
+     *
+     * TODO: extend WORDCHARS to handle multibyte chars by some kind
+     * of hierarchical list or hash table.
+     */
+    len = wctomb(outstr, c);
+
+    if (len == 0) {
+	/* NULL is special */
+	return iword(0);
+    } else if (len == 1 && isascii(*outstr)) {
+	return iword(*outstr);
+    } else {
+	return iswalnum(c);
+    }
+}
+#endif
+
+
 /**/
 mod_export char **
 arrdup(char **s)
