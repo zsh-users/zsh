@@ -1341,7 +1341,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 static int
 getkeybuf(int w)
 {
-    int c = getbyte(w);
+    int c = getbyte(w, NULL);
 
     if(c < 0)
 	return EOF;

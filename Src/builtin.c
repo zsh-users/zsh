@@ -4539,7 +4539,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 
 	do {
 	    if (izle) {
-		if ((val = getkeyptr(0)) < 0)
+		if ((val = getkeyptr(0, NULL)) < 0)
 		    break;
 		*bptr++ = (char) val;
 		nchars--;
@@ -4595,7 +4595,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 
 	/* get, and store, reply */
 	if (izle) {
-	    int key = getkeyptr(0);
+	    int key = getkeyptr(0, NULL);
 
 	    readbuf[0] = (key == 'y' ? 'y' : 'n');
 	} else {
@@ -4818,7 +4818,7 @@ zread(int izle, int *readchar)
     int ret;
 
     if (izle) {
-	int c = getkeyptr(0);
+	int c = getkeyptr(0, NULL);
 
 	return (c < 0 ? EOF : c);
     }

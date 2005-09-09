@@ -87,6 +87,14 @@ execute the binding.  This timeout is defined by the tt(KEYTIMEOUT) parameter;
 its default is 0.4 sec.  There is no timeout if the prefix string is not
 itself bound to a command.
 
+The key timeout is also applied when ZLE is reading the bytes from a
+multibyte character string when it is in the appropriate mode.  (This
+requires that the shell was compiled with multibyte mode enabled; typically
+also the locale has characters with the UTF-8 encoding, although any
+multibyte encoding known to the operating system is supported.)  If the
+second or a subsequent byte is not read within the timeout period, the
+shell acts as if tt(?) were typed and resets the input state.
+
 As well as ZLE commands, key sequences can be bound to other strings, by using
 `tt(bindkey -s)'.
 When such a sequence is read, the replacement string is pushed back as input,

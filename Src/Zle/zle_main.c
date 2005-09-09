@@ -628,12 +628,15 @@ raw_getbyte(int keytmout, char *cptr)
 
 /**/
 mod_export int
-getbyte(int keytmout)
+getbyte(int keytmout, int *timeout)
 {
     char cc;
     unsigned int ret;
     int die = 0, r, icnt = 0;
     int old_errno = errno, obreaks = breaks;
+
+    if (timeout)
+	*timeout = 0;
 
 #ifdef ZLE_UNICODE_SUPPORT
     /*
@@ -660,8 +663,12 @@ getbyte(int keytmout)
 	    dont_queue_signals();
 	    r = raw_getbyte(keytmout, &cc);
 	    restore_queue_signals(q);
-	    if (r == -2)	/* timeout */
+	    if (r == -2) {
+		/* timeout */
+		if (timeout)
+		    *timeout = 1;
 		return lastchar = EOF;
+	    }
 	    if (r == 1)
 		break;
 	    if (r == 0) {
@@ -733,7 +740,7 @@ getbyte(int keytmout)
 mod_export ZLE_INT_T
 getfullchar(int keytmout)
 {
-    int inchar = getbyte(keytmout);
+    int inchar = getbyte(keytmout, NULL);
 
 #ifdef ZLE_UNICODE_SUPPORT
     return getrestchar(inchar);
@@ -759,7 +766,7 @@ getrestchar(int inchar)
     /* char cnull = '\0'; */
     char c = inchar;
     wchar_t outchar;
-    int ret;
+    int ret, timeout;
     static mbstate_t ps;
 
     /*
@@ -769,8 +776,11 @@ getrestchar(int inchar)
      */
     lastchar_wide_valid = 1;
 
-    if (inchar == EOF)
+    if (inchar == EOF) {
+	/* End of input, so reset the shift state. */
+	memset(&ps, 0, sizeof(ps));
 	return lastchar_wide = WEOF;
+    }
 
     /*
      * Return may be zero if we have a NULL; handle this like
@@ -781,15 +791,34 @@ getrestchar(int inchar)
 	    /*
 	     * Invalid input.  Hmm, what's the right thing to do here?
 	     */
+	    memset(&ps, 0, sizeof(ps));
 	    return lastchar_wide = WEOF;
 	}
 
-	/* No timeout here as we really need the character. */
-	inchar = getbyte(0);
+	/*
+	 * Always apply KEYTIMEOUT to the remains of the input
+	 * character.  The parts of a multibyte character should
+	 * arrive together.  If we don't do this the input can
+	 * get stuck if an invalid byte sequence arrives.
+	 */
+	inchar = getbyte(1, &timeout);
 	/* getbyte deliberately resets lastchar_wide_valid */
 	lastchar_wide_valid = 1;
-	if (inchar == EOF)
-	    return lastchar_wide = WEOF;
+	if (inchar == EOF) {
+	    memset(&ps, 0, sizeof(ps));
+	    if (timeout)
+	    {
+		/*
+		 * This case means that we got a valid initial byte
+		 * (since we tested for EOF above), but the followup
+		 * timed out.  This probably indicates a duff character.
+		 * Return a '?'.
+		 */
+		lastchar_wide = L'?';
+	    }
+	    else
+		return lastchar_wide = WEOF;
+	}
 	c = inchar;
     }
     return lastchar_wide = (ZLE_INT_T)outchar;
