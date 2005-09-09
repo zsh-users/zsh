@@ -955,7 +955,7 @@ executenamedcommand(char *prmt)
 		else {
 #ifdef ZLE_UNICODE_SUPPORT
 		    if (!lastchar_wide_valid)
-			getrestchar(0);
+			getrestchar(lastchar);
 		    if (iswcntrl(lastchar_wide))
 #else
 		    if (icntrl(lastchar))

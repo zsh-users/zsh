@@ -1,5 +1,9 @@
 2005-09-09  Peter Stephenson  <pws@csr.com>
 
+	* 21717: Src/Zle/zle_misc.c: where-is and execute-named-command
+	didn't work with multibyte support because the remainder of
+	the character wasn't read properly.
+
 	* 21709 plus tweaks: Doc/Zsh/zle.yo, Src/builtin.c, Src/init.c,
 	Src/Zle/zle_keymap.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
 	Src/Zle/zle_vi.c: Use $KEYTIMOUT for bytes after the first
