@@ -1,6 +1,6 @@
 2005-09-09  Peter Stephenson  <pws@csr.com>
 
-	* 21719: Src/builtin.c, Src/params.c: Add somemod_exports.
+	* 21719: Src/builtin.c, Src/params.c: Add some mod_exports.
 
 2005-09-06  Peter Stephenson  <pws@csr.com>
 
