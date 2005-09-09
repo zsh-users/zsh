@@ -2608,7 +2608,7 @@ arrhashsetfn(Param pm, char **val, int augment)
  */
 
 /**/
-void
+mod_export void
 nullstrsetfn(UNUSED(Param pm), char *x)
 {
     zsfree(x);
