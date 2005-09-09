@@ -814,7 +814,8 @@ getrestchar(int inchar)
 		 * timed out.  This probably indicates a duff character.
 		 * Return a '?'.
 		 */
-		lastchar_wide = L'?';
+		lastchar = '?';
+		return lastchar_wide = L'?';
 	    }
 	    else
 		return lastchar_wide = WEOF;

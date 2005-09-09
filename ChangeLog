@@ -1,5 +1,8 @@
 2005-09-09  Peter Stephenson  <pws@csr.com>
 
+	* 21720: Src/Zle/zle_main.c: getrestchar() from 21709 didn't
+	return properly.
+
 	* d'après 21719: Src/builtin.c, Src/init.c, Src/params.c: Add some
 	mod_exports.
 
