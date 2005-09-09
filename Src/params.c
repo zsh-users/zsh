@@ -54,6 +54,7 @@ char **path,		/* $path        */
      **fignore;		/* $fignore     */
  
 /**/
+mod_export
 char *argzero,		/* $0           */
      *home,		/* $HOME        */
      *nullcmd,		/* $NULLCMD     */
@@ -2621,14 +2622,14 @@ arrhashsetfn(Param pm, char **val, int augment)
  */
 
 /**/
-void
+mod_export void
 nullstrsetfn(UNUSED(Param pm), char *x)
 {
     zsfree(x);
 }
 
 /**/
-void
+mod_export void
 nullintsetfn(UNUSED(Param pm), UNUSED(zlong x))
 {}
 

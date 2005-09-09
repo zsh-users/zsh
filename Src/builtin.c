@@ -4066,7 +4066,7 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
 
 /* Flag that we should exit the shell as soon as all functions return. */
 /**/
-int
+mod_export int
 exit_pending;
 
 /* break, bye, continue, exit, logout, return -- most of these take   *
