@@ -7,5 +7,7 @@ _bzr_subcommands=(${(f)"$(_call_program bzr bzr shell-complete)"})
 if (( CURRENT == 2 )); then
   _describe -t subcommand 'subcommand' _bzr_subcommands
 else
-# this part missing
+# this part should call bzr shell-complete <subcmd> when
+# it has been tweaked properly
+  _files
 fi

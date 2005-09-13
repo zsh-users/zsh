@@ -1,3 +1,9 @@
+2005-09-13  Clint Adams  <clint@zsh.org>
+
+	* 21718: Completion/Unix/Command/_bzr: complete files
+	after bzr's first argument until the bzr shell-complete
+	stuff is improved.
+
 2005-09-09  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21722: Src/utils.c, Src/Zle/zle.h, Src/Zle/zle_misc.c,
