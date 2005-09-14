@@ -1,11 +1,12 @@
 #compdef rake
 
-# rake, version 0.5.4
+# rake, version 0.6.0
 
 local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 
 _arguments -C -s -S \
+  '(--classic-namespace -C)'{--classic-namespace,-C}'[put Task and FileTask in the top level namespace]' \
   '(--dry-run -n)'{--dry-run,-n}'[do a dry run without executing actions]' \
   '(- *)'{--help,-H}'[display help information]' \
   \*{--libdir,-I}'[include specified directory in the search path for required modules]:library directory:_files -/' \
