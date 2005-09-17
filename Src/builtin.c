@@ -699,7 +699,7 @@ bin_dirs(UNUSED(char *name), char **argv, Options ops, UNUSED(int func))
 	else
 	    fmt = " ";
 	if (OPT_ISSET(ops,'l'))
-	    fputs(pwd, stdout);
+	    zputs(pwd, stdout);
 	else
 	    fprintdir(pwd, stdout);
 	for (node = firstnode(dirstack); node; incnode(node)) {

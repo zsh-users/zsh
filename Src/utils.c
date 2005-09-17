@@ -146,7 +146,7 @@ zerrmsg(const char *fmt, const char *str, int num)
 		putc('%', stderr);
 		break;
 	    case 'c':
-		fputs(nicechar(num), stderr);
+		zputs(nicechar(num), stderr);
 		break;
 	    case 'e':
 		/* print the corresponding message for this errno */
@@ -195,15 +195,21 @@ putshout(int c)
     return 0;
 }
 
-/* Turn a character into a visible representation thereof.  The visible *
- * string is put together in a static buffer, and this function returns *
- * a pointer to it.  Printable characters stand for themselves, DEL is  *
- * represented as "^?", newline and tab are represented as "\n" and     *
- * "\t", and normal control characters are represented in "^C" form.    *
- * Characters with bit 7 set, if unprintable, are represented as "\M-"  *
- * followed by the visible representation of the character with bit 7   *
- * stripped off.  Tokens are interpreted, rather than being treated as  *
- * literal characters.                                                  */
+/*
+ * Turn a character into a visible representation thereof.  The visible
+ * string is put together in a static buffer, and this function returns
+ * a pointer to it.  Printable characters stand for themselves, DEL is
+ * represented as "^?", newline and tab are represented as "\n" and
+ * "\t", and normal control characters are represented in "^C" form.
+ * Characters with bit 7 set, if unprintable, are represented as "\M-"
+ * followed by the visible representation of the character with bit 7
+ * stripped off.  Tokens are interpreted, rather than being treated as
+ * literal characters.
+ *
+ * Note that the returned string is metafied, so that it must be
+ * treated like any other zsh internal string (and not, for example,
+ * output directly).
+ */
 
 /**/
 mod_export char *
@@ -238,7 +244,17 @@ nicechar(int c)
 	c += 0x40;
     }
     done:
-    *s++ = c;
+    /*
+     * The resulting string is still metafied, so check if
+     * we are returning a character in the range that needs metafication.
+     * This can't happen if the character is printed "nicely", so
+     * this results in a maximum of two bytes total (plus the null).
+     */
+    if (itok(c)) {
+	*s++ = Meta;
+	*s++ = c ^ 32;
+    } else
+	*s++ = c;
     *s = 0;
     return buf;
 }
@@ -292,7 +308,7 @@ void
 nicefputs(char *s, FILE *f)
 {
     for (; *s; s++)
-	fputs(nicechar(STOUC(*s)), f);
+	zputs(nicechar(STOUC(*s)), f);
 }
 #endif
 
@@ -3177,7 +3193,7 @@ wcs_zputs(wchar_t const *s, FILE *stream)
 static char *
 nicedup(char const *s, int heap)
 {
-    int c, len = strlen(s) * 5;
+    int c, len = strlen(s) * 5 + 1;
     VARARR(char, buf, len);
     char *p = buf, *n;
 
@@ -3190,11 +3206,13 @@ nicedup(char const *s, int heap)
 	}
 	if (c == Meta)
 	    c = *s++ ^ 32;
+	/* The result here is metafied */
 	n = nicechar(c);
 	while(*n)
 	    *p++ = *n++;
     }
-    return metafy(buf, p - buf, (heap ? META_HEAPDUP : META_DUP));
+    *p = '\0';
+    return heap ? dupstring(buf) : ztrdup(buf);
 }
 
 /**/
@@ -3228,7 +3246,7 @@ nicezputs(char const *s, FILE *stream)
 	}
 	if (c == Meta)
 	    c = *s++ ^ 32;
-	if(fputs(nicechar(c), stream) < 0)
+	if(zputs(nicechar(c), stream) < 0)
 	    return EOF;
     }
     return 0;

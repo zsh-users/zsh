@@ -1,3 +1,10 @@
+2005-09-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 21730: Src/builtin.c, Src/utils.c: nicechar(), used in
+	prompts and other forms of formatted output, didn't return
+	a metafied string with confusing results.  Also outputting
+	pwd didn't unmetafy it in one place.
+
 2005-09-14  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_rake: update for version 0.6.0
