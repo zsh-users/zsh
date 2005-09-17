@@ -1,5 +1,8 @@
 2005-09-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 21731: Src/prompt.c, Src/Zle/zle_refresh.c: count multibyte
+	characters and their widths properly in prompts.
+
 	* 21730: Src/builtin.c, Src/utils.c: nicechar(), used in
 	prompts and other forms of formatted output, didn't return
 	a metafied string with confusing results.  Also outputting

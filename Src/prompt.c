@@ -804,10 +804,15 @@ putstr(int d)
     return 0;
 }
 
-/* Count height etc. of a prompt string returned by promptexpand(). *
- * This depends on the current terminal width, and tabs and         *
- * newlines require nontrivial processing.                          *
- * Passing `overf' as -1 means to ignore columns (absolute width).  */
+/*
+ * Count height etc. of a prompt string returned by promptexpand().
+ * This depends on the current terminal width, and tabs and
+ * newlines require nontrivial processing.
+ * Passing `overf' as -1 means to ignore columns (absolute width).
+ *
+ * If multibyte is enabled, take account of multibyte characters
+ * by locating them and finding out their screen width.
+ */
 
 /**/
 mod_export void
@@ -815,29 +820,92 @@ countprompt(char *str, int *wp, int *hp, int overf)
 {
     int w = 0, h = 1;
     int s = 1;
-    for(; *str; str++) {
-	if(w >= columns && overf >= 0) {
+#ifdef ZLE_UNICODE_SUPPORT
+    int mbret, wcw, multi = 0;
+    char inchar;
+    mbstate_t mbs;
+    wchar_t wc;
+
+    memset(&mbs, 0, sizeof(mbs));
+#endif
+
+    for (; *str; str++) {
+	if (w >= columns && overf >= 0) {
 	    w = 0;
 	    h++;
 	}
-	if(*str == Meta)
-	    str++;
-	if(*str == Inpar)
+	/*
+	 * Input string should be metafied, so tokens in it should
+	 * be real tokens, even if there are multibyte characters.
+	 */
+	if (*str == Inpar)
 	    s = 0;
-	else if(*str == Outpar)
+	else if (*str == Outpar)
 	    s = 1;
-	else if(*str == Nularg)
+	else if (*str == Nularg)
 	    w++;
-	else if(s) {
-	    if(*str == '\t')
-		w = (w | 7) + 1;
-	    else if(*str == '\n') {
-		w = 0;
-		h++;
-	    } else
-		w++;
+	else if (s) {
+	    if (*str == Meta) {
+#ifdef ZLE_UNICODE_SUPPORT
+		inchar = *++str ^ 32;
+#else
+		str++;
+#endif
+	    } else {
+#ifdef ZLE_UNICODE_SUPPORT
+		/*
+		 * Don't look for tab or newline in the middle
+		 * of a multibyte character.  Otherwise, we are
+		 * relying on the character set being an extension
+		 * of ASCII so it's safe to test a single byte.
+		 */
+		if (multi) {
+#endif
+		    if (*str == '\t') {
+			w = (w | 7) + 1;
+			continue;
+		    } else if (*str == '\n') {
+			w = 0;
+			h++;
+			continue;
+		    }
+#ifdef ZLE_UNICODE_SUPPORT
+		}
+
+		inchar = *str;
+#endif
+	    }
+
+#ifdef ZLE_UNICODE_SUPPORT
+	    mbret = mbrtowc(&wc, &inchar, 1, &mbs);
+	    if (mbret >= -1) {
+		if (mbret > 0) {
+		    /*
+		     * If the character isn't printable, this returns -1.
+		     */
+		    wcw = wcwidth(wc);
+		    if (wcw > 0)
+			w += wcw;
+		}
+		/*
+		 * else invalid character or possibly null: assume no
+		 * output
+		 */
+		multi = 0;
+	    } else {
+		/* else character is incomplete, keep looking. */
+		multi = 1;
+	    }
+#else
+	    w++;
+#endif
 	}
     }
+    /*
+     * multi may still be set if we were in the middle of the character.
+     * This isn't easy to handle generally; just assume there's no
+     * output.
+     */
     if(w >= columns && overf >= 0) {
 	if (!overf || w > columns) {
 	    w = 0;
@@ -901,12 +969,15 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	countprompt(ptr, &w, 0, -1);
 	if (w > trunclen) {
 	    /*
-	     * We need to truncate.  t points to the truncation string -- *
-	     * which is inserted literally, without nice representation.  *
-	     * tlen is its length, and maxlen is the amount of the main	  *
-	     * string that we want to keep.  Note that if the truncation  *
-	     * string is longer than the truncation length (tlen >	  *
-	     * trunclen), the truncation string is used in full.	  *
+	     * We need to truncate.  t points to the truncation string --
+	     * which is inserted literally, without nice representation.
+	     * tlen is its length, and maxlen is the amount of the main
+	     * string that we want to keep.  Note that if the truncation
+	     * string is longer than the truncation length (tlen >
+	     * trunclen), the truncation string is used in full.
+	     *
+	     * TODO: we don't take account of multibyte characters
+	     * in the string we're truncating.
 	     */
 	    char *t = truncstr;
 	    int fullen = bp - ptr;

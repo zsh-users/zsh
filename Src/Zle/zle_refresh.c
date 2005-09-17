@@ -30,7 +30,13 @@
 #include "zle.mdh"
 #include "zle_refresh.pro"
 
-/* Expanded prompts */
+/*
+ * Expanded prompts.
+ *
+ * These are always output from the start, except in the special
+ * case where we are sure each character in the prompt corresponds
+ * to a character on screen.
+ */
 
 /**/
 char *lpromptbuf, *rpromptbuf;
@@ -202,7 +208,9 @@ resetvideo(void)
 	}
     }
 
-    /* TODO currently zsh core is not using widechars */
+    /*
+     * countprompt() now correctly handles multibyte input.
+     */
     countprompt(lpromptbuf, &lpromptwof, &lprompth, 1);
     countprompt(rpromptbuf, &rpromptw, &rprompth, 0);
     if (lpromptwof != winw)
@@ -312,7 +320,11 @@ static int cleareol,		/* clear to end-of-line (if can't cleareod) */
     oxtabs,			/* oxtabs - tabs expand to spaces if set    */
     numscrolls, onumscrolls;
 
-/* TODO currently it assumes sceenwidth 1 for every character */
+/*
+ * TODO currently it assumes sceenwidth 1 for every character
+ * (except for characters in the prompt which are correctly handled
+ * by wcwidth()).
+ */
 /**/
 mod_export void
 zrefresh(void)
@@ -449,7 +461,7 @@ zrefresh(void)
         if (termflags & TERM_SHORT)
             vcs = 0;
         else if (!clearflag && lpromptbuf[0]) {
-            zputs(lpromptbuf, shout);	/* TODO convert to wide characters */
+            zputs(lpromptbuf, shout);
 	    if (lpromptwof == winw)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
 	} else {
@@ -622,7 +634,6 @@ zrefresh(void)
 	if (trashedzle && opts[TRANSIENTRPROMPT])
 	    put_rpmpt = 0;
 	else
-	    /* TODO (r)promptbuf will be widechar */
 	    put_rpmpt = rprompth == 1 && rpromptbuf[0] &&
 		!strchr(rpromptbuf, '\t') &&
 		(int)ZS_strlen(nbuf[0]) + rpromptw < winw - 1;
@@ -677,7 +688,6 @@ zrefresh(void)
     /* output the right-prompt if appropriate */
 	if (put_rpmpt && !ln && !oput_rpmpt) {
 	    moveto(0, winw - 1 - rpromptw);
-	    /* TODO it will be wide char at some point */
 	    zputs(rpromptbuf, shout);
 	    vcs = winw - 1;
 	/* reset character attributes to that set by the main prompt */
@@ -1114,11 +1124,28 @@ tc_rightcurs(int ct)
 
 /* otherwise _carefully_ write the contents of the video buffer.
    if we're anywhere in the prompt, goto the left column and write the whole
-   prompt out unless ztrlen(lpromptbuf) == lpromptw : we can cheat then */
+   prompt out.
+
+   If strlen(lpromptbuf) == lpromptw, we can cheat and output
+   the appropriate chunk of the string.  This test relies on the
+   fact that any funny business will always make the length of
+   the string larger than the printing width, so if they're the same
+   we have only ASCII characters or a single-byte extension of ASCII.
+   Unfortunately this trick won't work if there are potentially
+   characters occupying more than one column.  We could flag that
+   this has happened (since it's not that common to have characters
+   wider than one column), but for now it's easier not to use the
+   trick if we are using wcwidth() on the prompt.  It's not that
+   common to be editing in the middle of the prompt anyway, I would
+   think.
+   */
     if (vln == 0 && i < lpromptw && !(termflags & TERM_SHORT)) {
+#ifndef ZLE_UNICODE_SUPPORT
 	if ((int)strlen(lpromptbuf) == lpromptw)
 	    fputs(lpromptbuf + i, shout);
-	else if (tccan(TCRIGHT) && (tclen[TCRIGHT] * ct <= ztrlen(lpromptbuf)))
+	else 
+#endif
+	if (tccan(TCRIGHT) && (tclen[TCRIGHT] * ct <= ztrlen(lpromptbuf)))
 	    /* it is cheaper to send TCRIGHT than reprint the whole prompt */
 	    for (ct = lpromptw - i; ct--; )
 		tcout(TCRIGHT);
@@ -1126,7 +1153,7 @@ tc_rightcurs(int ct)
 	    if (i != 0)
 		zputc('\r');
 	    tc_upcurs(lprompth - 1);
-	    zputs(lpromptbuf, shout); /* TODO wide character */
+	    zputs(lpromptbuf, shout);
 	    if (lpromptwof == winw)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
 	}
@@ -1238,9 +1265,6 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     /*
      * Convert the entire lprompt so that we know how to count
      * characters.
-     *
-     * TODO screen widths are still not correct, indeed lpromptw knows
-     * nothing about multibyte characters so may be too long.
      */
     lpend = strchr(lpromptbuf, 0);
     /* Worst case number of characters, not null-terminated */
@@ -1258,6 +1282,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	    /* dunno, try to recover */
 	    lpptr++;
 	    *lpwp++ = ZWC('?');
+	    memset(&ps, '\0', sizeof(ps));
 	}
     }
     if (lpwp - lpwbuf < lpromptw) {
