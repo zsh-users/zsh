@@ -287,8 +287,9 @@ example({
 }
 # The error condition has been reset.)
 
-An tt(exit) command encountered in tt(try-list) does em(not) cause the
-execution of var(always-list).  Instead, the shell exits immediately
+An tt(exit) command (or a tt(return) command executed at the outermost
+function level of a script) encountered in tt(try-list) does em(not) cause
+the execution of var(always-list).  Instead, the shell exits immediately
 after any tt(EXIT) trap has been executed.
 )
 findex(function)

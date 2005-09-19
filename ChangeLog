@@ -1,3 +1,9 @@
+2005-09-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted, c.f. 21735: Doc/Zsh/grammar.yo: document
+	that return at the top level of a script behaves like exit
+	in a try-block.
+
 2005-09-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21731: Src/prompt.c, Src/Zle/zle_refresh.c: count multibyte
