@@ -1,5 +1,7 @@
 2005-09-20  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/utils.c: screwed up iident() test in wcsiident().
+
 	* 21737: Src/utils.c: unmetafy wordchars before looking for
 	mulitbyte characters.
 

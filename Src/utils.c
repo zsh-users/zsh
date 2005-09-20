@@ -2601,7 +2601,7 @@ wcsiident(wchar_t c)
 	/* NULL is special */
 	return 0;
     } else if (len == 1 && isascii(*outstr)) {
-	return iword(*outstr);
+	return iident(*outstr);
     } else {
 	/* not currently allowed, see above */
 	return 0;
