@@ -1,0 +1,22 @@
+#compdef quilt
+
+local _quilt_subcommands expl curcontext="$curcontext"
+
+_arguments \
+  '--trace' \
+  '--quiltrc:config file:_files' \
+  '--version' \
+  '*::quilt command:->subcmd' && return 0
+
+
+ _quilt_subcommands=(add files import previous setup annotate fold mail
+ push snapshot applied fork new refresh top delete graph next remove
+ unapplied diff grep patches rename upgrade edit header pop series)
+
+
+if (( CURRENT == 1 )); then
+  _describe -t subcommand 'subcommand' _quilt_subcommands
+else
+  # this part should be tailored for subcmds
+  _files
+fi

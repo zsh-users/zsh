@@ -1,3 +1,8 @@
+2005-09-20  Clint Adams  <clint@zsh.org>
+
+	* 21740: Completion/Unix/Command/_quilt: completion for
+	quilt.
+
 2005-09-20  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21739: Src/utils.c: made PROMPT_SP work properly even when
