@@ -2499,15 +2499,18 @@ inittyptab(void)
     }
 #ifdef ZLE_UNICODE_SUPPORT
     if (wordchars) {
-	const char *wordchars_ptr = wordchars;
+	char *wordchars_unmeta;
+	const char *wordchars_ptr;
 	mbstate_t mbs;
-	int nchars;
+	int nchars, unmetalen;
+
+	wordchars_unmeta = dupstring(wordchars);
+	wordchars_ptr = unmetafy(wordchars_unmeta, &unmetalen);
 
 	memset(&mbs, 0, sizeof(mbs));
 	wordchars_wide = (wchar_t *)
-	    zrealloc(wordchars_wide, (strlen(wordchars)+1)*sizeof(wchar_t));
-	nchars = mbsrtowcs(wordchars_wide, &wordchars_ptr, strlen(wordchars),
-			   &mbs);
+	    zrealloc(wordchars_wide, (unmetalen+1)*sizeof(wchar_t));
+	nchars = mbsrtowcs(wordchars_wide, &wordchars_ptr, unmetalen, &mbs);
 	if (nchars == -1) {
 	    /* Conversion state is undefined: better just set to null */
 	    *wordchars_wide = L'\0';
