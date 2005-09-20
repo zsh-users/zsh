@@ -3346,7 +3346,6 @@ wordcharssetfn(UNUSED(Param pm), char *x)
     zsfree(wordchars);
     wordchars = x;
     inittyptab();
-    wordcharstriggerptr();
 }
 
 /* Function to get value for special parameter `_' */

@@ -1180,9 +1180,6 @@ mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 #endif /* !LINKED_XMOD_zshQszle */
 
 /**/
-mod_export ZleVoidFn wordcharstriggerptr = noop_function;
-
-/**/
 unsigned char *
 autoload_zleread(char **lp, char **rp, int ha, int con)
 {

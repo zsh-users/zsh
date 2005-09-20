@@ -66,12 +66,7 @@ typedef wint_t   ZLE_INT_T;
 
 #define ZC_iblank iswspace
 #define ZC_icntrl iswcntrl
-/*
- * TODO: doesn't work on arguments with side effects.
- * Also YUK.  Not even sure this is guaranteed to work.
- * Should be easy to do along the lines of wcsiword.
- */
-#define ZC_iident(x)	(x < 256 && iident((int)x))
+#define ZC_iident wcsiident
 
 #define ZC_tolower towlower
 #define ZC_toupper towupper

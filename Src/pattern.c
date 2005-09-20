@@ -2749,6 +2749,10 @@ patmatchrange(char *range, int ch)
 		    return 1;
 		break;
 	    case PP_WORD:
+		/*
+		 * HERE: when we support multibyte characters,
+		 * this test needs to be wcsiword().
+		 */
 		if (iword(ch))
 		    return 1;
 		break;

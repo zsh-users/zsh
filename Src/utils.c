@@ -35,6 +35,16 @@
 /**/
 char *scriptname;
 
+#ifdef ZLE_UNICODE_SUPPORT
+/*
+ * The wordchars variable turned into a wide character array.
+ * This is much more convenient for testing.
+ */
+
+/**/
+mod_export wchar_t *wordchars_wide;
+#endif
+
 /* Print an error */
  
 /**/
@@ -2456,8 +2466,18 @@ inittyptab(void)
 	typtab[t0] = IDIGIT | IALNUM | IWORD | IIDENT | IUSER;
     for (t0 = 'a'; t0 <= 'z'; t0++)
 	typtab[t0] = typtab[t0 - 'a' + 'A'] = IALPHA | IALNUM | IIDENT | IUSER | IWORD;
+#ifndef ZLE_UNICODE_SUPPORT
+    /*
+     * This really doesn't seem to me the right thing to do when
+     * we have multibyte character support...  it was a hack to assume
+     * eight bit characters `worked' for some values of work before
+     * we could test for them properly.  I'm not 100% convinced
+     * having IIDENT here is a good idea at all, but this code
+     * should disappear into history...
+     */
     for (t0 = 0240; t0 != 0400; t0++)
 	typtab[t0] = IALPHA | IALNUM | IIDENT | IUSER | IWORD;
+#endif
     typtab['_'] = IIDENT | IUSER;
     typtab['-'] = IUSER;
     typtab[' '] |= IBLANK | INBLANK;
@@ -2477,8 +2497,44 @@ inittyptab(void)
 	}
 	typtab[STOUC(*s == Meta ? *++s ^ 32 : *s)] |= ISEP;
     }
-    for (s = wordchars ? wordchars : DEFAULT_WORDCHARS; *s; s++)
-	typtab[STOUC(*s == Meta ? *++s ^ 32 : *s)] |= IWORD;
+#ifdef ZLE_UNICODE_SUPPORT
+    if (wordchars) {
+	const char *wordchars_ptr = wordchars;
+	mbstate_t mbs;
+	int nchars;
+
+	memset(&mbs, 0, sizeof(mbs));
+	wordchars_wide = (wchar_t *)
+	    zrealloc(wordchars_wide, (strlen(wordchars)+1)*sizeof(wchar_t));
+	nchars = mbsrtowcs(wordchars_wide, &wordchars_ptr, strlen(wordchars),
+			   &mbs);
+	if (nchars == -1) {
+	    /* Conversion state is undefined: better just set to null */
+	    *wordchars_wide = L'\0';
+	} else {
+	    wordchars_wide[nchars] = L'\0';
+	}
+    } else {
+	wordchars_wide = zrealloc(wordchars_wide, sizeof(wchar_t));
+	*wordchars_wide = L'\0';
+    }
+#endif
+    for (s = wordchars ? wordchars : DEFAULT_WORDCHARS; *s; s++) {
+	int c = STOUC(*s == Meta ? *++s ^ 32 : *s);
+#ifdef ZLE_UNICODE_SUPPORT
+	if (!isascii(c)) {
+	    /*
+	     * If we have support for multibyte characters, we don't
+	     * handle non-ASCII characters here; instead, we turn
+	     * wordchars into a wide character array.
+	     * (We may actually have a single-byte 8-bit character set,
+	     * but it works the same way.)
+	     */
+	    continue;
+	}
+#endif
+	typtab[c] |= IWORD;
+    }
     for (s = SPECCHARS; *s; s++)
 	typtab[STOUC(*s)] |= ISPECIAL;
     if (isset(BANGHIST) && bangchar && interact && isset(SHINSTDIN))
@@ -2503,9 +2559,6 @@ wcsiword(wchar_t c)
      * produces an ASCII character.  If it does, use iword on that.
      * If it doesn't, use iswalnum on the original character.  This
      * is pretty good most of the time.
-     *
-     * TODO: extend WORDCHARS to handle multibyte chars by some kind
-     * of hierarchical list or hash table.
      */
     len = wctomb(outstr, c);
 
@@ -2515,7 +2568,40 @@ wcsiword(wchar_t c)
     } else if (len == 1 && isascii(*outstr)) {
 	return iword(*outstr);
     } else {
-	return iswalnum(c);
+	return iswalnum(c) || wcschr(wordchars_wide, c);
+    }
+}
+
+/*
+ * iident() macro extended to support wide characters.
+ *
+ * The macro is intended to test if a character is allowed in an
+ * internal zsh identifier.  Until the main shell handles multibyte
+ * characters it's not a good idea to allow characters other than
+ * ASCII characters; it would cause zle to allow characters that
+ * the main shell would reject.  Eventually we should be able
+ * to allow all alphanumerics.
+ *
+ * Otherwise similar to wcsiword.
+ */
+
+/**/
+mod_export int
+wcsiident(wchar_t c)
+{
+    int len;
+    VARARR(char, outstr, MB_CUR_MAX);
+
+    len = wctomb(outstr, c);
+
+    if (len == 0) {
+	/* NULL is special */
+	return 0;
+    } else if (len == 1 && isascii(*outstr)) {
+	return iword(*outstr);
+    } else {
+	/* not currently allowed, see above */
+	return 0;
     }
 }
 #endif
