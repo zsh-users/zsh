@@ -859,7 +859,7 @@ countprompt(char *str, int *wp, int *hp, int overf)
 		 * relying on the character set being an extension
 		 * of ASCII so it's safe to test a single byte.
 		 */
-		if (multi) {
+		if (!multi) {
 #endif
 		    if (*str == '\t') {
 			w = (w | 7) + 1;
