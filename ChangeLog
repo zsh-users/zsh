@@ -7,8 +7,8 @@
 
 2005-09-22  Clint Adams  <clint@zsh.org>
 
-	* Stephen Rueger: 21744: unconditionally assume that
-	\t or \n are not part of multi-byte characters.
+	* Stephen Rueger: 21744: Src/prompt.c: unconditionally assume
+	that \t or \n are not part of multi-byte characters.
 
 2005-09-20  Clint Adams  <clint@zsh.org>
 
