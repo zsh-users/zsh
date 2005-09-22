@@ -687,9 +687,10 @@ The function may be run outside zle in which case it prints the character
 keystrokes.
 
 The set of accented characters is reasonably complete up to Unicode
-character U+0180, the set of special characters less so.  However, it
-mostly gives up at that point.  Adding new characters is easy, however.
-Please send any additions to tt(zsh-workers@sunsite.dk).
+character U+0180, the set of special characters less so.  However, it it
+is very sporadic from that point.  Adding new characters is easy,
+however; see the function tt(define-composed-chars).  Please send any
+additions to tt(zsh-workers@sunsite.dk).
 
 The codes for the second character when used to accent the first are as
 follows.  Note that not every character can take every accent.
@@ -709,14 +710,15 @@ sitem(tt(_))(Underline, however there are currently no underlined characters.)
 sitem(tt(/))(Stroke through the base character.)
 sitem(tt("))(Double acute (only supported on a few letters).)
 sitem(tt(;))(Ogonek.  (A little forward facing hook at the bottom right
-of the character.  The "g" stands for "Ogonek" but another
-mnemonic is that g has a squiggle below the line.))
+of the character.))
 sitem(tt(<))(Caron.  (A little v over the letter.))
 sitem(tt(0))(Circle over the base character.)
 sitem(tt(2))(Hook over the base character.)
 sitem(tt(9))(Horn over the base character.)
 endsitem()
 
+The most common characters from the Arabic, Cyrillic, Greek and Hebrew
+alphabets are available; consult RFC 1345 for the appropriate sequences.
 The following other two-character sequences are understood.
 
 startitem()
@@ -772,6 +774,14 @@ sitem(tt(PI))(Pilcrow (paragraph))
 sitem(tt(-o))(Spanish masculine ordinal indicator)
 sitem(tt(>>))(Right guillemet)
 sitem(tt(?I))(Inverted question mark)
+sitem(tt(-1))(Hyphen)
+sitem(tt(-N))(En dash)
+sitem(tt(-M))(Em dash)
+sitem(tt(-3))(Horizontal bar)
+sitem(tt(:3))(Vertical ellipsis)
+sitem(tt(.3))(Horizontal midline ellipsis)
+sitem(tt(!2))(Double vertical line)
+sitem(tt(=2))(Double low line)
 sitem(tt(RQUOTE()6))(Left single quote)
 sitem(tt(RQUOTE()9))(Right single quote)
 sitem(tt(.9))("Right" low quote)
@@ -798,6 +808,7 @@ sitem(tt(12))(Half)
 sitem(tt(34))(Three quarters)
 sitem(tt(*X))(Multiplication)
 sitem(tt(-:))(Division)
+sitem(tt(%0))(Per mille)
 endsitem()
 )
 item(Accents on their own)(

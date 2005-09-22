@@ -2,7 +2,8 @@ DISTFILES_SRC='
 .distfiles
 backward-kill-word-match       backward-word-match
 capitalize-word-match          copy-earlier-word
-cycle-completion-positions     delete-whole-word-match
+cycle-completion-positions     
+define-composed-chars          delete-whole-word-match
 down-case-word-match           down-line-or-beginning-search
 edit-command-line              forward-word-match
 history-pattern-search         history-search-end

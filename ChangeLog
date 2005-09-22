@@ -1,3 +1,10 @@
+2005-09-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* unposted, c.f. 21752: Doc/Zsh/contrib.yo,
+	Functions/Zle/.distfiles, Functions/Zle/defined-composed-chars,
+	Functions/Zle/insert-composed-char: add some alphabets to
+	insert-composed-chars.
+
 2005-09-22  Clint Adams  <clint@zsh.org>
 
 	* Stephen Rueger: 21744: unconditionally assume that
