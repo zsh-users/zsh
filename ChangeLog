@@ -1,3 +1,9 @@
+2005-09-23  Peter Stephenson  <pws@csr.com>
+
+	* 21758: Doc/Zsh/expn.yo, Src/exec.c: optimise =(<<<...) to
+	replace an argument by a filename containing it within the
+	shell.
+
 2005-09-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* unposted, c.f. 21752: Doc/Zsh/contrib.yo,

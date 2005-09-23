@@ -2941,6 +2941,33 @@ getherestr(struct redir *fn)
     return fd;
 }
 
+/*
+ * Test if some wordcode starts with a simple redirection of type
+ * redir_type.  If it does, return the name of the file, copied onto
+ * the heap.  If it doesn't, return NULL.
+ */
+
+static char *
+simple_redir_name(Eprog prog, int redir_type)
+{
+    Wordcode pc;
+
+    pc = prog->prog;
+    if (prog != &dummy_eprog &&
+	wc_code(pc[0]) == WC_LIST && (WC_LIST_TYPE(pc[0]) & Z_END) &&
+	wc_code(pc[1]) == WC_SUBLIST && !WC_SUBLIST_FLAGS(pc[1]) &&
+	WC_SUBLIST_TYPE(pc[1]) == WC_SUBLIST_END &&
+	wc_code(pc[2]) == WC_PIPE && WC_PIPE_TYPE(pc[2]) == WC_PIPE_END &&
+	wc_code(pc[3]) == WC_REDIR && WC_REDIR_TYPE(pc[3]) == redir_type &&
+	!WC_REDIR_VARID(pc[3]) &&
+	!pc[4] &&
+	wc_code(pc[6]) == WC_SIMPLE && !WC_SIMPLE_ARGC(pc[6])) {
+	return dupstring(ecrawstr(prog, pc + 5, NULL));
+    }
+
+    return NULL;
+}
+
 /* $(...) */
 
 /**/
@@ -2950,24 +2977,14 @@ getoutput(char *cmd, int qt)
     Eprog prog;
     int pipes[2];
     pid_t pid;
-    Wordcode pc;
+    char *s;
 
     if (!(prog = parse_string(cmd)))
 	return NULL;
 
-    pc = prog->prog;
-    if (prog != &dummy_eprog &&
-	wc_code(pc[0]) == WC_LIST && (WC_LIST_TYPE(pc[0]) & Z_END) &&
-	wc_code(pc[1]) == WC_SUBLIST && !WC_SUBLIST_FLAGS(pc[1]) &&
-	WC_SUBLIST_TYPE(pc[1]) == WC_SUBLIST_END &&
-	wc_code(pc[2]) == WC_PIPE && WC_PIPE_TYPE(pc[2]) == WC_PIPE_END &&
-	wc_code(pc[3]) == WC_REDIR && WC_REDIR_TYPE(pc[3]) == REDIR_READ && 
-	!WC_REDIR_VARID(pc[3]) &&
-	!pc[4] &&
-	wc_code(pc[6]) == WC_SIMPLE && !WC_SIMPLE_ARGC(pc[6])) {
+    if ((s = simple_redir_name(prog, REDIR_READ))) {
 	/* $(< word) */
 	int stream;
-	char *s = dupstring(ecrawstr(prog, pc + 5, NULL));
 
 	singsub(&s);
 	if (errflag)
@@ -3101,6 +3118,7 @@ getoutputfile(char *cmd)
     char *nam;
     Eprog prog;
     int fd;
+    char *s;
 
     if (thisjob == -1)
 	return NULL;
@@ -3109,12 +3127,35 @@ getoutputfile(char *cmd)
     if (!(nam = gettempname(NULL, 0)))
 	return NULL;
 
+    if ((s = simple_redir_name(prog, REDIR_HERESTR))) {
+	/*
+	 * =(<<<stuff).  Optimise a la $(<file).  It's
+	 * effectively the reverse, converting a string into a file name
+	 * rather than vice versa.
+	 */
+	singsub(&s);
+	if (errflag)
+	    s = NULL;
+	else
+	    untokenize(s);
+    }
+
     if (!jobtab[thisjob].filelist)
 	jobtab[thisjob].filelist = znewlinklist();
     zaddlinknode(jobtab[thisjob].filelist, nam);
 
-    child_block();
+    if (!s)
+	child_block();
     fd = open(nam, O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0600);
+
+    if (s) {
+	/* optimised here-string */
+	int len;
+	unmetafy(s, &len);
+	write(fd, s, len);
+	close(fd);
+	return nam;
+    }
 
     if (fd < 0 || (cmdoutpid = pid = zfork(NULL)) == -1) {
 	/* fork or open error */
