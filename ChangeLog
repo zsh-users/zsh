@@ -1,3 +1,8 @@
+2005-09-24  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* unposted: Functions/Misc/zargs: add range-checking of numeric
+	options.
+
 2005-09-23  Peter Stephenson  <pws@csr.com>
 
 	* 21758: Doc/Zsh/expn.yo, Src/exec.c: optimise =(<<<...) to

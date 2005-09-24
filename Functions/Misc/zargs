@@ -31,6 +31,12 @@
 #
 # BUGS:
 #
+# In the interests of expediency, numeric options (max-procs, max-lines,
+# etc.) are range-checked only when their values make a difference to the
+# end result.  Because of the way zsh handles variables in math context,
+# it's possible to pass the name of a variable as the value of a numeric
+# option, and the value of that variable becomes the value of the option.
+#
 # "Killed by a signal" is determined by the usual shell rule that $? is
 # the signal number plus 128, so zargs can be fooled by a command that
 # explicitly exits with 129+.  Also, zsh prior to 4.1.x returns 1 rather
@@ -207,6 +213,11 @@ then
 fi
 
 n=${${n##-(n|-max-args(=|))}:-$[ARGC+c]}
+if (( n <= 0 ))
+then
+    print -u2 'zargs: value for max-args must be >= 1'
+    return 1
+fi
 
 if (( n > c ))
 then (( n -= c ))
@@ -215,7 +226,26 @@ else
     return 1
 fi
 
+s=${${s##-(s|-max-chars(=|))}:-20480}
+if (( s <= 0 ))
+then
+    print -u2 'zargs: value for max-chars must be >= 1'
+    return 1
+fi
+
+l=${${${l##*-(l|L|-max-lines(=|))}[-1]}:-${${l[1]:+1}:-$ARGC}}
+if (( l <= 0 ))
+then
+    print -u2 'zargs: value for max-lines must be >= 1'
+    return 1
+fi
+
 P=${${P##-(P|-max-procs(=|))}:-1}
+if (( P < 0 ))
+then
+    print -u2 'zargs: value for max-procs must be >= 0'
+    return 1
+fi
 
 if (( P != 1 && ARGC > 1 ))
 then
@@ -229,9 +259,6 @@ then
 	wait='wait'
     fi
 fi
-
-s=${${s##-(s|-max-chars(=|))}:-20480}
-l=${${${l##*-(l|L|-max-lines(=|))}[-1]}:-${${l[1]:+1}:-$ARGC}}
 
 # Everything has to be in a subshell just in case of backgrounding jobs,
 # so that we don't unintentionally "wait" for jobs of the parent shell.
