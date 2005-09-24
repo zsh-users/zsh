@@ -1,4 +1,7 @@
-2005-09-24  Bart Schaefer  <schaefer@brasslantern.com>
+2005-09-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21760: Src/Zle/zle_keymap.c: fix test for sequence prefixes
+	in the local keymap in getkeymapcmd().
 
 	* unposted: Functions/Misc/zargs: add range-checking of numeric
 	options.
