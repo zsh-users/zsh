@@ -221,7 +221,7 @@ cmd_inventory=('::separator:(--)' '*:directory:_files -/')
 cmd_srcfind=($cmd_inventory)
 
 local cmd_lint
-cmd__lint=('::directory:_files -/')
+cmd_lint=('::directory:_files -/')
 
 local cmd_id cmd_invtag
 cmd_id=('*:file:_files')

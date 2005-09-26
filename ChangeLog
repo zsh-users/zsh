@@ -1,3 +1,8 @@
+2005-09-26  Clint Adams  <clint@zsh.org>
+
+	* 21763: Completion/Unix/Command/_baz: remove stray
+	underscore.
+
 2005-09-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21760: Src/Zle/zle_keymap.c: fix test for sequence prefixes
