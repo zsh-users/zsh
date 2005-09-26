@@ -1,5 +1,8 @@
 2005-09-26  Peter Stephenson  <pws@csr.com>
 
+	* 21764: Src/Zle/zle_hist.c: unmetafication mangled history lines
+	in zle.
+
 	* unposted: Doc/Zsh/redirect.yo: alter text referring to process
 	substitutions slightly.
 

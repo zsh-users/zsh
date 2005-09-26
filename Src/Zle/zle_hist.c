@@ -75,6 +75,8 @@ struct zle_text {
 static void
 zletext(Histent ent, struct zle_text *zt)
 {
+    char *duptext;
+
     if (ent->zle_text) {
 	zt->text = ent->zle_text;
 	zt->len = ent->zle_len;
@@ -82,8 +84,10 @@ zletext(Histent ent, struct zle_text *zt)
 	return;
     }
 
-    zt->text = stringaszleline((unsigned char *)ent->text, 0,
+    duptext = ztrdup(ent->text);
+    zt->text = stringaszleline((unsigned char *)duptext, 0,
 			       &zt->len, NULL, NULL);
+    zsfree(duptext);
     zt->alloced = 1;
 }
 
