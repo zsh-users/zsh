@@ -200,9 +200,12 @@ ifzman(em(Simple Commands & Pipelines) in zmanref(zshmisc))\
 ifnzman(noderef(Simple Commands & Pipelines))
 is a shorthand for `tt(2>&1 |)'.
 
-For output redirections only, if var(word) is of the form
-`tt(>LPAR())var(list)tt(RPAR())' then the output is piped to the command
-represented by var(list).  See
+The various forms of process substitution, `tt(<LPAR())var(list)tt(RPAR())',
+and `tt(=LPAR())var(list)(RPAR())' for input and
+`tt(>LPAR())var(list)tt(RPAR())' for output, are often used together with
+redirection.  For example, if var(word) in an output redirection is of the
+form `tt(>LPAR())var(list)tt(RPAR())' then the output is piped to the
+command represented by var(list).  See
 ifzman(\
 em(Process Substitution) in zmanref(zshexpn))\
 ifnzman(\
