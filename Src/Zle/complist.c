@@ -570,11 +570,12 @@ clnicezputs(Listcols c, char *s, int ml)
 	    cc = *s++ ^ 32;
 
 	for (t = nicechar(cc); *t; t++) {
+	    int nc = (*t == Meta) ? STOUC(*++t ^ 32) : STOUC(*t);
 	    if (ml == mlend - 1 && col == columns - 1) {
 		mlprinted = ml - oml;
 		return 0;
 	    }
-	    putc(*t, shout);
+	    putc(nc, shout);
 	    if (++col == columns) {
 		ml++;
 		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
@@ -978,11 +979,12 @@ compnicezputs(char *s, int ml)
 	    c = *s++ ^ 32;
 
 	for (t = nicechar(c); *t; t++) {
+	    int nc = (*t == Meta) ? STOUC(*++t ^ 32) : STOUC(*t);
 	    if (ml == mlend - 1 && col == columns - 1) {
 		mlprinted = ml - oml;
 		return 0;
 	    }
-	    putc(*t, shout);
+	    putc(nc, shout);
 	    if (++col == columns) {
 		ml++;
 		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {

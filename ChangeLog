@@ -1,3 +1,8 @@
+2005-09-27  Peter Stephenson  <pws@csr.com>
+
+	* 21769: Src/utils.c, Src/Zle/complist.c: fix some consequences of
+	21730 in completion lists.
+
 2005-09-27  Clint Adams  <clint@zsh.org>
 
 	* Vincent Lefevre: 21767: Completion/Unix/Command/_subversion:

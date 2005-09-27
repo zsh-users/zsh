@@ -260,7 +260,7 @@ nicechar(int c)
      * This can't happen if the character is printed "nicely", so
      * this results in a maximum of two bytes total (plus the null).
      */
-    if (itok(c)) {
+    if (imeta(c)) {
 	*s++ = Meta;
 	*s++ = c ^ 32;
     } else
