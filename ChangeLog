@@ -1,3 +1,8 @@
+2005-09-27  Clint Adams  <clint@zsh.org>
+
+	* Vincent Lefevre: 21767: Completion/Unix/Command/_subversion:
+	add ~ to the default svn status pattern.
+
 2005-09-26  Peter Stephenson  <pws@csr.com>
 
 	* 21764: Src/Zle/zle_hist.c: unmetafication mangled history lines

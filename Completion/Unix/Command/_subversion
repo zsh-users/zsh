@@ -156,7 +156,7 @@ _svn_deletedfiles() {
 (( $+functions[_svn_status] )) ||
 _svn_status() {
   local dir=$REPLY:h
-  local pat="${1:-([ADMR]|?M)}"
+  local pat="${1:-([ADMR~]|?M)}"
 
   if (( ! $+_cache_svn_status[$dir] )); then
     _cache_svn_status[$dir]="$(_call_program files svn status -N $dir)"
