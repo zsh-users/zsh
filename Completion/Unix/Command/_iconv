@@ -26,7 +26,7 @@ if _pick_variant gnu=GNU unix --version; then
     else
       _wanted codesets expl 'code set' compadd "$@" \
 	  -M 'm:{a-zA-Z}={A-Za-z} r:|-=* r:|=*' \
-	  ${${${(f)"$(_call_program codesets iconv --list|sed -n '/^$/,$ p')"}## #}%//} && ret=0
+	  ${${${(f)"$(_call_program codesets iconv --list)"}## #}%//} && ret=0
     fi
   fi
 

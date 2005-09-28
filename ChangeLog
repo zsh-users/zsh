@@ -1,5 +1,8 @@
 2005-09-28  Clint Adams  <clint@zsh.org>
 
+	* 21781: Completion/Unix/Command/_iconv: cope with
+	`iconv --list` output from glibc 2.3.5.
+
 	* 21780: Completion/Debian/Command/_dlocate: completion for
 	dlocate.
 
