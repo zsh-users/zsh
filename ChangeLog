@@ -1,3 +1,9 @@
+2005-09-28  Peter Stephenson  <pws@csr.com>
+
+	* 21779: Doc/Zsh/contrib.yo, Functions/Exceptions/throw, plus
+	unposted Functions/Exceptions/catch: improvements from Bart in
+	users/9452 plus clarifications to documentation.
+
 2005-09-28  Clint Adams  <clint@zsh.org>
 
 	* 21778: Completion/Debian/Command/_piuparts: completion for

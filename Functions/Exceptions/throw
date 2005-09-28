@@ -19,11 +19,12 @@
 # script.
 
 # The following must not be local.
-EXCEPTION="$1"
+typeset -g EXCEPTION="$1"
+readonly THROW
 if (( TRY_BLOCK_ERROR == 0 )); then
   # We are throwing an exception from the middle of an always-block.
   # We can do this by restoring the error status from the try-block.
   (( TRY_BLOCK_ERROR = 1 ))
 fi
 # Raise an error, but don't show an error message.
-{ ${:?THROW} } 2>/dev/null
+THROW= 2>/dev/null

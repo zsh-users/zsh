@@ -28,7 +28,7 @@
 function catch {
   if [[ $TRY_BLOCK_ERROR -gt 0 && $EXCEPTION = ${~1} ]]; then
     (( TRY_BLOCK_ERROR = 0 ))
-    CAUGHT="$EXCEPTION"
+    typeset -g CAUGHT="$EXCEPTION"
     unset EXCEPTION
     return 0
   fi
