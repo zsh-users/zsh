@@ -1,3 +1,8 @@
+2005-09-28  Clint Adams  <clint@zsh.org>
+
+	* 21778: Completion/Debian/Command/_piuparts: completion for
+	piuparts.
+ 
 2005-09-27  Peter Stephenson  <pws@csr.com>
 
 	* 21769: Src/utils.c, Src/Zle/complist.c: fix some consequences of
