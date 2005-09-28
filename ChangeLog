@@ -1,3 +1,8 @@
+2005-09-28  Clint Adams  <clint@zsh.org>
+
+	* 21780: Completion/Debian/Command/_dlocate: completion for
+	dlocate.
+
 2005-09-28  Peter Stephenson  <pws@csr.com>
 
 	* 21779: Doc/Zsh/contrib.yo, Functions/Exceptions/throw, plus
