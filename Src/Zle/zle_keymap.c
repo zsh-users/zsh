@@ -1300,10 +1300,9 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	    loc = ((f = keybind(localkeymap, keybuf, &s)) != t_undefinedkey);
 	    ispfx = keyisprefix(localkeymap, keybuf);
 	}
-	if (!loc && !ispfx) {
+	if (!loc)
 	    f = keybind(km, keybuf, &s);
-	    ispfx = keyisprefix(km, keybuf);
-	}
+	ispfx |= keyisprefix(km, keybuf);
 
 	if (f != t_undefinedkey) {
 	    lastlen = keybuflen;

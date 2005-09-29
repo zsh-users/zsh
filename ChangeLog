@@ -17,6 +17,12 @@
 	* 21778: Completion/Debian/Command/_piuparts: completion for
 	piuparts.
  
+2005-09-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21770: Src/Zle/zle_keymap.c: tweak 21760 so binding XYA in a
+	local keymap does not prevent bindings X or XY in the global
+	keymap from being chosen (upon key timeout).
+
 2005-09-27  Peter Stephenson  <pws@csr.com>
 
 	* 21769: Src/utils.c, Src/Zle/complist.c: fix some consequences of
