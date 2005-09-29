@@ -548,22 +548,136 @@ clprintfmt(Listcols c, char *p, int ml)
     return 0;
 }
 
-/* Local version of nicezputs() with in-string colouring. */
+/*
+ * Local version of nicezputs() with in-string colouring
+ * and scrolling.
+ */
 
 static int
-clnicezputs(Listcols c, char *s, int ml)
+clnicezputs(Listcols colors, char *s, int ml)
 {
-    int cc, i = 0, col = 0, ask, oml = ml;
+    int i = 0, col = 0, ask, oml = ml;
     char *t;
+    ZLE_CHAR_T cc;
+#ifdef ZLE_UNICODE_SUPPORT
+    /*
+     * ums is the untokenized, unmetafied string (length umlen)
+     * uptr is a pointer into it
+     * sptr is the start of the nice character representation
+     * wptr is the point at which the wide character itself starts
+     *  (but may be the end of the string if the character was fully
+     *  prettified).
+     * ret is the return status from the conversion to a wide character
+     * umleft is the remaining length of the unmetafied string to output
+     * umlen is the full length of the unmetafied string
+     * width is the full printing width of a prettified character,
+     *  including both ASCII prettification and the wide character itself.
+     * ps is the shift state of the conversion to wide characters.
+     */
+    char *ums, *uptr, *sptr, *wptr;
+    int ret, umleft, umlen, width;
+    mbstate_t ps;
 
-    initiscol(c);
+    memset(&ps, 0, sizeof(ps));
+    ums = ztrdup(s);
+    untokenize(ums);
+    uptr = unmetafy(ums, &umlen);
+    umleft = umlen;
 
-    while ((cc = *s++)) {
-	doiscol(c, i++);
+    if (colors)
+	initiscol(colors);
+
+    while (umleft > 0) {
+	ret = mbrtowc(&cc, uptr, umleft, &ps);
+
+	if (ret <= 0)
+	{
+	    /*
+	     * Eek!  Now we're stuffed.  I'm just going to
+	     * make this up...  Note that this may also handle
+	     * an input NULL, which we want to be a real character
+	     * rather than terminator.
+	     */
+	    sptr = nicechar(*s);
+	    /* everything here is ASCII... */
+	    width = strlen(sptr);
+	    wptr = sptr + width;
+	    ret = 1;
+	}
+	else
+	{
+	    sptr = wcs_nicechar(cc, &width, &wptr);
+	}
+
+	umleft -= ret;
+	uptr += ret;
+	if (colors) {
+	    /*
+	     * The code for the colo[u]ri[s/z]ation is obscure (surprised?)
+	     * but if we do it for every input character, as we do in
+	     * the simple case, we shouldn't go too far wrong.
+	     */
+	    while (ret--)
+		doiscol(colors, i++);
+	}
+
+	/*
+	 * Loop over characters in the output of the nice
+	 * representation.  This will often correspond to one input
+	 * (possibly multibyte) character.
+	 */
+	for (t = sptr; *t; t++) {
+	    /* Input is metafied... */
+	    int nc = (*t == Meta) ? STOUC(*++t ^ 32) : STOUC(*t);
+	    /* Is the screen full? */
+	    if (ml == mlend - 1 && col == columns - 1) {
+		mlprinted = ml - oml;
+		return 0;
+	    }
+	    if (t < wptr) {
+		/* outputting ASCII, so single-width */
+		putc(nc, shout);
+		col++;
+		width--;
+	    } else {
+		/* outputting a single wide character, do the lot */
+		putc(nc, shout);
+		/* don't check column until finished */
+		if (t[1])
+		    continue;
+		/* now we've done the entire rest of the representation */
+		col += width;
+	    }
+	    /*
+	     * There might be problems with characters of printing width
+	     * greater than one here.
+	     */
+	    if (col >= columns) {
+		ml++;
+		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
+		    mlprinted = ml - oml;
+		    return ask;
+		}
+		col -= columns;
+		if (colors)
+		    fputs(" \010", shout);
+	    }
+	}
+    }
+
+    free(ums);
+#else
+
+    if (colors)
+	initiscol(colors);
+
+    while ((cc = *s)) {
+	if (colors)
+	    doiscol(colors, i++);
 	if (itok(cc)) {
 	    if (cc <= Comma)
 		cc = ztokens[cc - Pound];
-	    else 
+	    else
 		continue;
 	}
 	if (cc == Meta)
@@ -583,10 +697,12 @@ clnicezputs(Listcols c, char *s, int ml)
 		    return ask;
 		}
 		col = 0;
-                fputs(" \010", shout);
+		if (colors)
+		    fputs(" \010", shout);
 	    }
 	}
     }
+#endif
     mlprinted = ml - oml;
     return 0;
 }
@@ -956,46 +1072,6 @@ compzputs(char const *s, int ml)
 	    col = 0;
 	}
     }
-    return 0;
-}
-
-/* This is like nicezputs(), but allows scrolling. */
-
-/**/
-static int
-compnicezputs(char *s, int ml)
-{
-    int c, col = 0, ask, oml = ml;
-    char *t;
-
-    while ((c = *s++)) {
-	if (itok(c)) {
-	    if (c <= Comma)
-		c = ztokens[c - Pound];
-	    else 
-		continue;
-	}
-	if (c == Meta)
-	    c = *s++ ^ 32;
-
-	for (t = nicechar(c); *t; t++) {
-	    int nc = (*t == Meta) ? STOUC(*++t ^ 32) : STOUC(*t);
-	    if (ml == mlend - 1 && col == columns - 1) {
-		mlprinted = ml - oml;
-		return 0;
-	    }
-	    putc(nc, shout);
-	    if (++col == columns) {
-		ml++;
-		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
-		    mlprinted = ml - oml;
-		    return ask;
-		}
-		col = 0;
-	    }
-	}
-    }
-    mlprinted = ml - oml;
     return 0;
 }
 
@@ -1458,7 +1534,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
             }
 	}
 	if (!dolist(ml)) {
-	    mlprinted = niceztrlen(m->disp ? m->disp : m->str) / columns;
+	    mlprinted = ZMB_nicewidth(m->disp ? m->disp : m->str) / columns;
 	    return 0;
 	}
 	if (m->gnum == mselect) {
@@ -1479,15 +1555,13 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	else
 	    subcols = putmatchcol(&mcolors, g->name, (m->disp ? m->disp : m->str));
 
-	if (subcols)
-	    ret = clnicezputs(&mcolors, (m->disp ? m->disp : m->str), ml);
-	else
-	    ret = compnicezputs((m->disp ? m->disp : m->str), ml);
+	ret = clnicezputs(subcols ? &mcolors : NULL,
+			  (m->disp ? m->disp : m->str), ml);
 	if (ret) {
 	    zcoff();
 	    return 1;
 	}
-	len = niceztrlen(m->disp ? m->disp : m->str);
+	len = ZMB_nicewidth(m->disp ? m->disp : m->str);
 	mlprinted = len / columns;
 
 	if ((g->flags & CGF_FILES) && m->modec) {

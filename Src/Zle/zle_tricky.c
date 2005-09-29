@@ -2120,7 +2120,7 @@ listlist(LinkList l)
 	  (int (*) _((const void *, const void *))) strbpcmp);
 
     for (p = data, lenp = lens; *p; p++, lenp++) {
-	len = *lenp = niceztrlen(*p) + 2;
+	len = *lenp = ZMB_nicewidth(*p) + 2;
 	if (len > longest)
 	    longest = len;
 	if (len < shortest)
@@ -2244,7 +2244,7 @@ listlist(LinkList l)
 	if (isset(LISTROWSFIRST)) {
 	    for (col = 1, p = data, lenp = lens; *p;
 		 p++, lenp++, col++) {
-		nicezputs(*p, shout);
+		ZMB_niceputs(*p, shout);
 		if (col == ncols) {
 		    col = 0;
 		    if (p[1])
@@ -2262,7 +2262,7 @@ listlist(LinkList l)
 	    for (f = data, fl = lens, line = 0; line < nlines;
 		 f++, fl++, line++) {
 		for (col = 1, p = f, lenp = fl; *p; col++) {
-		    nicezputs(*p, shout);
+		    ZMB_niceputs(*p, shout);
 		    if (col == ncols)
 			break;
 		    if ((i = (pack ? widths[col - 1] : longest) - *lenp + 2) > 0)
@@ -2276,7 +2276,7 @@ listlist(LinkList l)
 	}
     } else {
 	for (p = data; *p; p++) {
-	    nicezputs(*p, shout);
+	    ZMB_niceputs(*p, shout);
 	    putc('\n', shout);
 	}
     }

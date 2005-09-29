@@ -1049,7 +1049,7 @@ execzlefunc(Thingy func, char **args)
 
     if(func->flags & DISABLED) {
 	/* this thingy is not the name of a widget */
-	char *nm = niceztrdup(func->nam);
+	char *nm = ZMB_niceztrdup(func->nam);
 	char *msg = tricat("No such widget `", nm, "'");
 
 	zsfree(nm);
@@ -1105,7 +1105,7 @@ execzlefunc(Thingy func, char **args)
 
 	if(prog == &dummy_eprog) {
 	    /* the shell function doesn't exist */
-	    char *nm = niceztrdup(w->u.fnnam);
+	    char *nm = ZMB_niceztrdup(w->u.fnnam);
 	    char *msg = tricat("No such shell function `", nm, "'");
 
 	    zsfree(nm);
@@ -1423,7 +1423,7 @@ describekeybriefly(UNUSED(char **args))
     if (!func)
 	is = bindztrdup(str);
     else
-	is = niceztrdup(func->nam);
+	is = ZMB_niceztrdup(func->nam);
     msg = appstr(msg, is);
     zsfree(is);
     showmsg(msg);
@@ -1467,7 +1467,7 @@ whereis(UNUSED(char **args))
     if (!(ff.func = executenamedcommand("Where is: ")))
 	return 1;
     ff.found = 0;
-    ff.msg = niceztrdup(ff.func->nam);
+    ff.msg = ZMB_niceztrdup(ff.func->nam);
     scankeymap(curkeymap, 1, scanfindfunc, &ff);
     if (!ff.found)
 	ff.msg = appstr(ff.msg, " is not bound to any key");

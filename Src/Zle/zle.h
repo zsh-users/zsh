@@ -50,6 +50,7 @@ typedef wint_t   ZLE_INT_T;
 
 #define ZLEEOF	WEOF
 
+/* Functions that operate on a ZLE_STRING_T. */
 #define ZS_memcpy wmemcpy
 #define ZS_memmove wmemmove
 #define ZS_memset wmemset
@@ -61,9 +62,16 @@ typedef wint_t   ZLE_INT_T;
 #define ZS_zarrdup wcs_zarrdup
 #define ZS_width wcslen
 #define ZS_strchr wcschr
-#define ZS_zputs wcs_zputs
-#define ZS_nicewidth wcs_niceztrlen
 
+/*
+ * Functions that operate on a metafied string.
+ * These versions handle multibyte characters.
+ */
+#define ZMB_nicewidth(s)	mb_niceformat(s, NULL, NULL)
+#define ZMB_niceputs(s, stream)	(void)mb_niceformat(s, stream, NULL)
+#define ZMB_niceztrdup(s)	mb_niceztrdup(s)
+
+/* Functions that operate on ZLE_CHAR_T. */
 #define ZC_iblank iswspace
 #define ZC_icntrl iswcntrl
 #define ZC_iident wcsiident
@@ -71,6 +79,8 @@ typedef wint_t   ZLE_INT_T;
 #define ZC_tolower towlower
 #define ZC_toupper towupper
 #define ZC_iword  wcsiword
+
+#define ZC_nicechar(c) wcs_nicechar(c, NULL, NULL)
 
 #define LASTFULLCHAR	lastchar_wide
 
@@ -87,6 +97,7 @@ typedef int ZLE_INT_T;
 
 #define ZLEEOF	EOF
 
+/* Functions that operate on a ZLE_STRING_T. */
 #define ZS_memcpy memcpy
 #define ZS_memmove memmove
 #define ZS_memset memset
@@ -94,8 +105,16 @@ typedef int ZLE_INT_T;
 #define ZS_zarrdup zarrdup
 #define ZS_width ztrlen
 #define ZS_strchr strchr
-#define ZS_zputs zputs
-#define ZS_nicewidth niceztrlen
+
+/*
+ * Functions that operate on a metafied string.
+ * These versions don't handle multibyte characters.
+ */
+#define ZMB_nicewidth	niceztrlen
+#define ZMB_niceputs	nicezputs
+#define ZMB_niceztrdup(s)	nicedup(s, 0)
+
+#define ZC_nicechar nicechar
 
 #ifdef __GNUC__
 static inline size_t ZS_strlen(ZLE_STRING_T s)
@@ -113,6 +132,7 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 #define ZS_strncmp(s1,s2,l) strncmp((char*)(s1),(char*)(s2),(l))
 #endif
 
+/* Functions that operate on ZLE_CHAR_T. */
 #define ZC_iblank iblank
 #define ZC_icntrl icntrl
 #define ZC_iident iident

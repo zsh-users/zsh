@@ -519,15 +519,15 @@ scanlistwidgets(HashNode hn, int list)
 	    quotedzputs(w->u.fnnam, stdout);
 	}
     } else {
-	nicezputs(t->nam, stdout);
+	ZMB_niceputs(t->nam, stdout);
 	if (w->flags & WIDGET_NCOMP) {
 	    fputs(" -C ", stdout);
-	    nicezputs(w->u.comp.wid, stdout);
+	    ZMB_niceputs(w->u.comp.wid, stdout);
 	    fputc(' ', stdout);
-	    nicezputs(w->u.comp.func, stdout);
+	    ZMB_niceputs(w->u.comp.func, stdout);
 	} else if(strcmp(t->nam, w->u.fnnam)) {
 	    fputs(" (", stdout);
-	    nicezputs(w->u.fnnam, stdout);
+	    ZMB_niceputs(w->u.fnnam, stdout);
 	    fputc(')', stdout);
 	}
     }

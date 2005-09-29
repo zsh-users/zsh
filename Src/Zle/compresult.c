@@ -1509,7 +1509,7 @@ calclist(int showall)
                             nlines += 1 + printfmt(m->disp, 0, 0, 0);
                             g->flags |= CGF_HASDL;
                         } else {
-                            l = niceztrlen(m->disp);
+                            l = ZMB_nicewidth(m->disp);
                             ndisp++;
                             if (l > glong)
                                 glong = l;
@@ -1524,7 +1524,7 @@ calclist(int showall)
                         if (!(m->flags & CMF_ROWS))
                             g->flags &= ~CGF_ROWS;
                     } else {
-                        l = niceztrlen(m->str) + !!m->modec;
+                        l = ZMB_nicewidth(m->str) + !!m->modec;
                         ndisp++;
                         if (l > glong)
                             glong = l;
@@ -2146,11 +2146,19 @@ iprintm(Cmgroup g, Cmatch *mp, UNUSED(int mc), UNUSED(int ml), int lastc, int wi
 	    printfmt(m->disp, 0, 1, 0);
 	    return;
 	}
+#ifdef ZLE_UNICODE_SUPPORT
+	len = mb_niceformat(m->disp, shout, NULL);
+#else
 	nicezputs(m->disp, shout);
 	len = niceztrlen(m->disp);
+#endif
     } else {
+#ifdef ZLE_UNICODE_SUPPORT
+	len = mb_niceformat(m->str, shout, NULL);
+#else
 	nicezputs(m->str, shout);
 	len = niceztrlen(m->str);
+#endif
 
 	if ((g->flags & CGF_FILES) && m->modec) {
 	    putc(m->modec, shout);

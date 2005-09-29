@@ -769,19 +769,75 @@ printbind(char *str, FILE *stream)
     return ret;
 }
 
-/* Display a message where the completion list normally goes. *
- * The message must be metafied.                              */
+/*
+ * Display a message where the completion list normally goes.
+ * The message must be metafied.
+ *
+ * TODO: there's some advantage in using a ZLE_STRING_T array here,
+ * together with improvements in other places, but messages don't
+ * need to be particularly efficient.
+ */
 
 /**/
 mod_export void
 showmsg(char const *msg)
 {
     char const *p;
-    int up = 0, cc = 0, c;
+    int up = 0, cc = 0;
+    ZLE_CHAR_T c;
+#ifdef ZLE_UNICODE_SUPPORT
+    char *umsg;
+    int ulen, ret, width;
+    mbstate_t ps;
+#endif
 
     trashzle();
     clearflag = isset(USEZLE) && !termflags && isset(ALWAYSLASTPROMPT);
 
+#ifdef ZLE_UNICODE_SUPPORT
+    umsg = ztrdup(msg);
+    p = unmetafy(umsg, &ulen);
+    memset(&ps, 0, sizeof(ps));
+
+    while (ulen > 0) {
+	char const *n;
+	if (*p == '\n') {
+	    ulen--;
+	    p++;
+
+	    putc('\n', shout);
+	    up += 1 + cc / columns;
+	    cc = 0;
+	} else {
+	    /*
+	     * Extract the next wide character from the multibyte string.
+	     */
+	    ret = mbrtowc(&c, p, ulen, &ps);
+
+	    if (ret <= 0) {
+		/*
+		 * This really shouldn't be happening here, but...
+		 * Treat it as a single byte character; it may get
+		 * prettified.
+		 */
+		n = nicechar(*p);
+		ret = 1;
+		width = strlen(n);
+	    }
+	    else
+	    {
+		n = wcs_nicechar(c, &width, NULL);
+	    }
+	    ulen -= ret;
+	    p += ret;
+
+	    zputs(n, shout);
+	    cc += width;
+	}
+    }
+
+    free(umsg);
+#else
     for(p = msg; (c = *p); p++) {
 	if(c == Meta)
 	    c = *++p ^ 32;
@@ -791,10 +847,11 @@ showmsg(char const *msg)
 	    cc = 0;
 	} else {
 	    char const *n = nicechar(c);
-	    fputs(n, shout);
+	    zputs(n, shout);
 	    cc += strlen(n);
 	}
     }
+#endif
     up += cc / columns;
 
     if (clearflag) {

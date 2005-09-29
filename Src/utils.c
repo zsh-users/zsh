@@ -271,39 +271,111 @@ nicechar(int c)
 
 /**/
 #ifdef ZLE_UNICODE_SUPPORT
+/*
+ * The number of bytes we need to allocate for a "nice" representation
+ * of a multibyte character.
+ *
+ * We double MB_CUR_MAX to take account of the fact that
+ * we may need to metafy.  In fact the representation probably
+ * doesn't allow every character to be in the meta range, but
+ * we don't need to be too pedantic.
+ *
+ * The 12 is for the output of a UCS-4 code; we don't actually
+ * need this at the same time as MB_CUR_MAX, but again it's
+ * not worth calculating more exactly.
+ */
+#define NICECHAR_MAX (12 + 2*MB_CUR_MAX)
+/*
+ * Input a wide character.  Output a printable representation,
+ * which is a metafied multibyte string.   With widthp return
+ * the printing width.
+ *
+ * swide, if non-NULL, is used to help the completion code, which needs
+ * to know the printing width of the each part of the representation.
+ * *swide is set to the part of the returned string where the wide
+ * character starts.  Any string up to that point is ASCII characters,
+ * so the width of it is (*swide - <return_value>).  Anything left is
+ * a single wide character corresponding to the remaining width.
+ * Either the initial ASCII part or the wide character part may be empty
+ * (but not both).  (Note the complication that the wide character
+ * part may contain metafied characters.)
+ */
+
 /**/
-mod_export wchar_t *
-wcs_nicechar(wint_t c)
+mod_export char *
+wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 {
-    static wchar_t buf[6];
-    wchar_t *s = buf;
-    if (iswprint(c))
-	goto done;
-    if (c > 0x80) {
-	if (isset(PRINTEIGHTBIT))
-	    goto done;
-	*s++ = '\\';
-	*s++ = 'M';
-	*s++ = '-';
-	c &= 0x7f;
-	if(iswprint(c))
-	    goto done;
+    static char *buf;
+    static int bufalloc = 0, newalloc;
+    char *s, *mbptr;
+    int ret = 0;
+    VARARR(char, mbstr, MB_CUR_MAX);
+
+    /*
+     * We want buf to persist beyond the return.  MB_CUR_MAX and hence
+     * NICECHAR_MAX may not be constant, so we have to allocate this at
+     * run time.  (We could probably get away with just allocating a
+     * large buffer, in practice.)  For efficiency, only reallocate if
+     * we really need to, since this function will be called frequently.
+     */
+    newalloc = NICECHAR_MAX;
+    if (bufalloc != newalloc)
+    {
+	bufalloc = newalloc;
+	buf = (char *)zrealloc(buf, bufalloc);
     }
-    if (c == 0x7f) {
-	*s++ = '^';
-	c = '?';
-    } else if (c == '\n') {
-	*s++ = '\\';
-	c = 'n';
-    } else if (c == '\t') {
-	*s++ = '\\';
-	c = 't';
-    } else if (c < 0x20) {
-	*s++ = '^';
-	c += 0x40;
+
+    s = buf;
+    if (!iswprint(c) && (c < 0x80 || !isset(PRINTEIGHTBIT))) {
+	if (c == 0x7f) {
+	    *s++ = '^';
+	    c = '?';
+	} else if (c == L'\n') {
+	    *s++ = '\\';
+	    c = 'n';
+	} else if (c == L'\t') {
+	    *s++ = '\\';
+	    c = 't';
+	} else if (c < 0x20) {
+	    *s++ = '^';
+	    c += 0x40;
+	} else if (c >= 0x80) {
+	    ret = -1;
+	}
     }
-    done:
-    *s++ = c;
+
+    if (ret == -1 ||
+	(ret = wctomb(mbstr, c)) == -1) {
+	/*
+	 * Can't or don't want to convert character: use UCS-2 or
+	 * UCS-4 code in print escape format.
+	 */
+	if (c >=  0x10000) {
+	    sprintf(buf, "\\U%.8x", (unsigned int)c);
+	    if (widthp)
+		*widthp = 10;
+	} else {
+	    sprintf(buf, "\\u%.4x", (unsigned int)c);
+	    if (widthp)
+		*widthp = 6;
+	}
+	if (swidep)
+	    *swidep = buf + *widthp;
+	return buf;
+    }
+
+    if (widthp)
+	*widthp = (s - buf) + wcswidth(&c, 1);
+    if (swidep)
+	*swidep = s;
+    for (mbptr = mbstr; ret; s++, mbptr++, ret--) {
+	if (imeta(*mbptr)) {
+	    *s++ = Meta;
+	    *s = *mbptr ^ 32;
+	} else {
+	    *s = *mbptr;
+	}
+    }
     *s = 0;
     return buf;
 }
@@ -1228,7 +1300,7 @@ gettempname(const char *prefix, int use_heap)
 	ret = dyncat(unmeta(prefix), suffix);
     else
 	ret = bicat(unmeta(prefix), suffix);
- 
+
 #ifdef HAVE__MKTEMP
     /* Zsh uses mktemp() safely, so silence the warnings */
     ret = (char *) _mktemp(ret);
@@ -3255,31 +3327,6 @@ zputs(char const *s, FILE *stream)
     return 0;
 }
 
-/**/
-#ifdef ZLE_UNICODE_SUPPORT
-/**/
-mod_export int
-wcs_zputs(wchar_t const *s, FILE *stream)
-{
-    wint_t c;
-
-    while (*s) {
-	if (*s == Meta)
-	    c = *++s ^ 32;
-	else if(itok(*s)) {
-	    s++;
-	    continue;
-	} else
-	    c = *s;
-	s++;
-	if (fputwc(c, stream) == WEOF)
-	    return EOF;
-    }
-    return 0;
-}
-/**/
-#endif /* ZLE_UNICODE_SUPPORT */
-
 /* Create a visibly-represented duplicate of a string. */
 
 /**/
@@ -3294,7 +3341,7 @@ nicedup(char const *s, int heap)
 	if (itok(c)) {
 	    if (c <= Comma)
 		c = ztokens[c - Pound];
-	    else 
+	    else
 		continue;
 	}
 	if (c == Meta)
@@ -3306,13 +3353,6 @@ nicedup(char const *s, int heap)
     }
     *p = '\0';
     return heap ? dupstring(buf) : ztrdup(buf);
-}
-
-/**/
-mod_export char *
-niceztrdup(char const *s)
-{
-    return nicedup(s, 0);
 }
 
 /**/
@@ -3370,26 +3410,114 @@ niceztrlen(char const *s)
 
 /**/
 #ifdef ZLE_UNICODE_SUPPORT
+/*
+ * Version of both nicezputs() and niceztrlen() for use with multibyte
+ * characters.  Input is a metafied string; output is the screen width of
+ * the string.
+ *
+ * If the FILE * is not NULL, output to that, too.
+ *
+ * If outstrp is not NULL, set *outstrp to a zalloc'd version of
+ * the output (still metafied).
+ */
+
 /**/
 mod_export size_t
-wcs_nicewidth(wchar_t const *s)
+mb_niceformat(const char *s, FILE *stream, char **outstrp)
 {
-    size_t l = 0;
-    wint_t c;
+    size_t l = 0, newl, ret;
+    int umlen, outalloc, outleft;
+    wchar_t c;
+    char *ums, *ptr, *fmt, *outstr, *outptr;
+    mbstate_t ps;
 
-    while ((c = *s++)) {
-	if (itok(c)) {
-	    if (c <= (wint_t)Comma)
-		c = ztokens[c - Pound];
-	    else 
-		continue;
-	}
-	if (c == Meta)
-	    c = *s++ ^ 32;
-	l += wcswidth(wcs_nicechar(c), 6);
+    if (outstrp) {
+	outleft = outalloc = 5 * strlen(s);
+	outptr = outstr = zalloc(outalloc);
+    } else {
+	outleft = outalloc = 0;
+	outptr = outstr = NULL;
     }
+
+    ums = ztrdup(s);
+    /*
+     * is this necessary at this point? niceztrlen does this
+     * but it's used in lots of places.  however, one day this may
+     * be, too.
+     */
+    untokenize(ums);
+    ptr = unmetafy(ums, &umlen);
+
+    memset(&ps, 0, sizeof(ps));
+    while (umlen > 0) {
+	ret = mbrtowc(&c, ptr, umlen, &ps);
+
+	if (ret == (size_t)-1 || ret == (size_t)-2)
+	{
+	    /*
+	     * We're a bit stuck here.  I suppose we could
+	     * just stick with \M-... for the individual bytes.
+	     */
+	    break;
+	}
+	/*
+	 * careful in case converting NULL returned 0: NULLs are real
+	 * characters for us.
+	 */
+	if (c == L'\0' && ret == 0)
+	    ret = 1;
+	umlen -= ret;
+	ptr += ret;
+
+	fmt = wcs_nicechar(c, &newl, NULL);
+	l += newl;
+
+	if (stream)
+	    zputs(fmt, stream);
+	if (outstr) {
+	    /* Append to output string */
+	    int outlen = strlen(fmt);
+	    if (outlen >= outleft) {
+		/* Reallocate to twice the length */
+		int outoffset = outptr - outstr;
+
+		outleft += outalloc;
+		outalloc *= 2;
+		outstr = zrealloc(outstr, outalloc);
+		outptr = outstr + outoffset;
+	    }
+	    memcpy(outptr, fmt, outlen);
+	    /* Update start position */
+	    outptr += outlen;
+	    /* Update available bytes */
+	    outleft -= outlen;
+	}
+    }
+
+    free(ums);
+    if (outstrp) {
+	*outptr = '\0';
+	/* Use more efficient storage for returned string */
+	*outstrp = ztrdup(outstr);
+	free(outstr);
+    }
+
     return l;
 }
+
+/* ztrdup multibyte string with nice formatting */
+
+/**/
+mod_export char *
+mb_niceztrdup(const char *s)
+{
+    char *retstr;
+
+    (void)mb_niceformat(s, NULL, &retstr);
+
+    return retstr;
+}
+
 /**/
 #endif /* ZLE_UNICODE_SUPPORT */
 

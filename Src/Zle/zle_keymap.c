@@ -389,7 +389,7 @@ selectkeymap(char *name, int fb)
     Keymap km = openkeymap(name);
 
     if(!km) {
-	char *nm = niceztrdup(name);
+	char *nm = ZMB_niceztrdup(name);
 	char *msg = tricat("No such keymap `", nm, "'");
 
 	zsfree(nm);
@@ -725,7 +725,7 @@ scanlistmaps(HashNode hn, int list)
 	    fputs("-- ", stdout);
 	quotedzputs(n->nam, stdout);
     } else
-	nicezputs(n->nam, stdout);
+	ZMB_niceputs(n->nam, stdout);
     putchar('\n');
 }
 
@@ -1048,8 +1048,10 @@ bindlistout(struct bindstate *bs)
     }
     putchar(' ');
     if(bs->bind) {
-	((bs->flags & BS_LIST) ? quotedzputs : nicezputs)
-	    (bs->bind->nam, stdout);
+	if (bs->flags & BS_LIST)
+	    quotedzputs(bs->bind->nam, stdout);
+	else
+	    ZMB_niceputs(bs->bind->nam, stdout);
     } else
 	printbind(bs->str, stdout);
     putchar('\n');
