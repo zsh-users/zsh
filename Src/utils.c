@@ -831,9 +831,9 @@ preprompt(void)
 	 * if there was any dangling output on the line (assuming the terminal
 	 * has automatic margins, but we try even if hasam isn't set). */
 	char *str;
-	int percents = isset(PROMPTPERCENT);
+	int percents = opts[PROMPTPERCENT];
 	opts[PROMPTPERCENT] = 1;
-	str = promptexpand("%B%S#%s%b", 0, NULL, NULL);
+	str = promptexpand("%B%S%#%s%b", 0, NULL, NULL);
 	opts[PROMPTPERCENT] = percents;
 	fprintf(shout, "%s%*s\r", str, (int)columns - 1 - !hasxn, "");
 	free(str);
