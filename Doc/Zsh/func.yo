@@ -196,9 +196,8 @@ the shell and processes spawned by it will ignore tt(SIG)var(NAL).
 
 The return status from the function is handled specially.  If it is
 zero, the signal is assumed to have been handled, and execution continues
-normally.  Otherwise, the normal effect of the signal is produced;
-if this causes execution to terminate, the status returned to the shell is
-the status returned from the function.
+normally.  Otherwise, the shell will behave as interrupted except that
+the return status of the trap is retained.
 
 Programs terminated by uncaught signals typically return the status 128
 plus the signal number.  Hence the following causes the handler for
