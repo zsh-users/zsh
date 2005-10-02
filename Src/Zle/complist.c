@@ -575,7 +575,8 @@ clnicezputs(Listcols colors, char *s, int ml)
      * ps is the shift state of the conversion to wide characters.
      */
     char *ums, *uptr, *sptr, *wptr;
-    int ret, umleft, umlen, width;
+    int ret, umleft, umlen;
+    size_t width;
     mbstate_t ps;
 
     memset(&ps, 0, sizeof(ps));

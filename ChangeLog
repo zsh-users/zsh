@@ -1,5 +1,9 @@
 2005-10-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 21802: Src/Zle/complist.c, Src/Zle/compmatch.c,
+	Src/Zle/zle_main.c: attempt to prevent matches ending in
+	the middle of multibyte characters, also some minor tidy-ups.
+
 	* unposted, c.f. 21799: Doc/Zsh/func.yo: documentation for
 	returns from TRAPNAL functions was wayward.
 

@@ -1584,6 +1584,11 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 {
     int ret = 0, l, ind, add;
     char *p, *q;
+#ifdef ZLE_UNICODE_SUPPORT
+    int fulllen = len;
+    char *fullstr = str;
+    mbstate_t ps;
+#endif
 
     if (sfx) {
 	str += len;
@@ -1614,6 +1619,85 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 		   || (l < md->len && q[-1] == Meta)))
 		l--;
 	}
+#ifdef ZLE_UNICODE_SUPPORT
+	/*
+	 * Make sure we don't end in the middle of a multibyte character.
+	 * Don't need to do this if the match ended at the start
+	 * of the original string.
+	 *
+	 * Let q be the match point we've found.
+	 */
+	q = sfx ? str - l : str + l;
+	if (q != fullstr) {
+	    memset(&ps, 0, sizeof(ps));
+	    /*
+	     * Otherwise read characters from the start of the original
+	     * string until we reach or pass the match point.  This
+	     * is rather inefficient, but in general only reading
+	     * the full string can keep track of where we are in
+	     * a character.  With a prefix we could be more efficient,
+	     * but it's difficult with a suffix where the match point
+	     * moves backwards.
+	     */
+	    for (p = fullstr; p < fullstr + fulllen; ) {
+		wchar_t wc;
+		/*
+		 * ret must, in fact, be set by the current logic,
+		 * but gcc doesn't realise (at least some versions don't).
+		 */
+		int ret = -1, diff;
+		char *p2;
+
+		/*
+		 * Because the string is metafied, we need to
+		 * assembled wide characters a byte at a time.
+		 */
+		for (p2 = p; p2 < fullstr + fulllen; p2++) {
+		  char curchar = (*p2 == Meta) ? (*++p2 ^ 32) : *p2;
+		  ret = mbrtowc(&wc, &curchar, 1, &ps);
+		  /*
+		   * Continue while character is incomplete.
+		   */
+		  if (ret != -2)
+		    break;
+		}
+		if (ret < 0) {
+		    /* not a valid character, give up test */
+		    break;
+		}
+		/* increment p2 for last byte read */
+		diff = ++p2 - q;
+		if (diff == 0) {
+		    /*
+		     * Prefix or suffix matches at end of multbyte character,
+		     * so OK.
+		     */
+		    break;
+		} else if (diff > 0) {
+		    /*
+		     * The prefix or suffix finishes in the middle
+		     * of a character.  Shorten it until it doesn't.
+		     */
+		    if (sfx) {
+			/*
+			 * We need to remove the trailing part of
+			 * the character from the suffix.
+			 */
+			l -= diff;
+		    } else {
+			/*
+			 * We need to remove the initial part of
+			 * the character from the prefix.
+			 */
+			l -= (q - p);
+		    }
+		    break;
+		}
+		/* Advance over full character */
+		p += ret;
+	    }
+	}
+#endif
 	if (l) {
 	    /* There was a common prefix, use it. */
 	    md->len -= l; len -= l;

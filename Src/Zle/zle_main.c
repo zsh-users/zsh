@@ -758,7 +758,6 @@ getfullchar(int keytmout)
 mod_export ZLE_INT_T
 getrestchar(int inchar)
 {
-    /* char cnull = '\0'; */
     char c = inchar;
     wchar_t outchar;
     int ret, timeout;
