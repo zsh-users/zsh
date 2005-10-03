@@ -2,8 +2,35 @@
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
 
-Changes since zsh version 4.2.0
--------------------------------
+Major changes between versions 4.2 and 4.3
+------------------------------------------
+
+- There is support for multibyte character sets in the line editor,
+  though not the main shell.  See Multibyte Character Support in INSTALL.
+
+- New option PROMPT_SP, on by default, to work around the problem that the
+  line editor can overwrite output with no newline at the end.
+
+- New option HIST_SAVE_BY_COPY (on by default): history is saved by
+  copying and renaming instead of directly overwriting.
+
+- New redirection syntax e.g. {myfd}>file opens a new file descriptor
+  and stores the number in $myfd, so that >&$myfd will work.  Chosen
+  not to break existing code.
+
+- New Posix-style zsh-specific tests [[:IDENT:]], [[:IFS:]],
+  [[:IFSSPACE:]], [[:WORD:]] test if character can appear in identifier,
+  is an IFS character, is an IFS whitespace character, or is considered
+  as part of a word (is alphanumeric or appears in $WORDCHARS).  Note
+  the pattern code doesn't yet handle multibyte characters.
+
+- The idiom =(<<<...) is optimised so that the shell internally turns
+  the ... into the contents of a file whose name is then substituted.
+
+- As always, many enhancements to completion functions.
+
+Changes in 4.2 since version 4.2.0
+----------------------------------
 
 - The autoload and related builtins take options -k and -z to indicate
   ksh or zsh autoloading style for given functions, making it possible

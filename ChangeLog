@@ -1,3 +1,8 @@
+2005-10-03  Peter Stephenson  <pws@csr.com>
+
+	* 21790: INSTALL, NEWS, README: add some documentation about
+	the 4.3 release.
+
 2005-10-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21802: Src/Zle/complist.c, Src/Zle/compmatch.c,

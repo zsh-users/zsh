@@ -235,6 +235,27 @@ as make can become confused by build files created in the source directories.
 CONFIGURATION OPTIONS
 =====================
 
+Multibyte Character Support
+---------------------------
+
+Support for multibyte character sets that extend ASCII, such as UTF-8, is
+under development but the code in the line editor is sufficiently stable to
+be turned on by default in environments that provide full ISO 10646 support
+including the preprocessor definition __STDC_ISO_10646__.
+
+The support can be explicitly enabled or disable with --enable-multibyte or
+--disable-multibyte.  Reports of systems where multibyte support was not
+enabled by default but --enable-multibyte resulted in a usable shell would
+be appreciated.  The developers are not aware of any need to use
+--disable-multibyte and this should be reported as a bug.
+
+The main shell is not yet aware of multibyte characters, so for example the
+length of a scalar parameter will return the number of bytes, not
+characters, and pattern tests likewise treat single bytes as if they were
+characters.  This means that pattern tests such as ? and [[:alpha:]] do not
+work correctly with characters in multibyte character sets beyond the ASCII
+subset.
+
 Memory Routines
 ---------------
 
