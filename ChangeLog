@@ -1,5 +1,8 @@
 2005-10-03  Peter Stephenson  <pws@csr.com>
 
+	* 21809: Src/utils.c: need to export nicedup() for
+	--disable-multibyte in zle.
+
 	* 21790: INSTALL, NEWS, README: add some documentation about
 	the 4.3 release.
 

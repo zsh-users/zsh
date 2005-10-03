@@ -3330,7 +3330,7 @@ zputs(char const *s, FILE *stream)
 /* Create a visibly-represented duplicate of a string. */
 
 /**/
-static char *
+mod_export char *
 nicedup(char const *s, int heap)
 {
     int c, len = strlen(s) * 5 + 1;
