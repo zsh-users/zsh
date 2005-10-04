@@ -926,8 +926,8 @@ characters, including a series of spaces, that should make the terminal
 wrap to the next line when a partial line is present (note that this is
 only successful if your terminal has automatic margins, which is typical).
 
-When a partial line is preserved, you will see an inverse hash (#) at
-the end of the partial line.
+When a partial line is preserved, you will see an inverse+bold character at
+the end of the partial line:  a "%" for a normal user or a "#" for root.
 
 NOTE: if the PROMPT_CR option is not set, enabling this option will have no
 effect.  This option is on by default.
