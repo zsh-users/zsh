@@ -1,3 +1,12 @@
+2005-10-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21822 (annotated): Src/Zle/complist.c: prevent a long-standing
+	infinite loop when redrawing the listing during menu-selection
+	with a very narrow window.
+
+	* 21821: Src/Zle/complist.c: fix infinite loop when multibyte
+	support is disabled, introduced by 21784.
+
 2005-10-03  Peter Stephenson  <pws@csr.com>
 
 	* 21809: Src/utils.c: need to export nicedup() for
