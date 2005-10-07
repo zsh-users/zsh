@@ -67,7 +67,7 @@ case "$state" in
       local spec who op priv
       local -a specs
       for spec in ${(s:,:)words[2]}; do
-	if [[ ${spec#*[+-=]} != [rwxst]* ]]; then
+	if [[ ${spec#*[+-=]} != [rwxst]## ]]; then
 	  _files && ret=0
 	  return ret
 	fi
