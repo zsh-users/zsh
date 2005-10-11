@@ -33,7 +33,7 @@
 /* tokens */
 
 /**/
-mod_export char ztokens[] = "#$^*()$=|{}[]`<>?~`,'\"\\";
+mod_export char ztokens[] = "#$^*()$=|{}[]`<>?~`,'\"\\\\";
 
 /* parts of the current token */
 

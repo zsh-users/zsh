@@ -280,7 +280,7 @@ ZTST_diff() {
   diff_out=$(diff "$@")
   diff_ret="$?"
   if [[ "$diff_ret" != "0" ]]; then
-    echo "$diff_out"
+    print -r "$diff_out"
   fi
 
   return "$diff_ret"

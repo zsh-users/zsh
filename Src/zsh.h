@@ -120,7 +120,10 @@ struct mathfunc {
 
 #define DEFAULT_IFS	" \t\n\203 "
 
-/* Character tokens */
+/*
+ * Character tokens.
+ * These should match the characters in ztokens, defined in lex.c
+ */
 #define Pound		((char) 0x84)
 #define String		((char) 0x85)
 #define Hat		((char) 0x86)
@@ -141,15 +144,33 @@ struct mathfunc {
 #define Tilde		((char) 0x95)
 #define Qtick		((char) 0x96)
 #define Comma		((char) 0x97)
+/*
+ * Null arguments: placeholders for single and double quotes
+ * and backslashes.
+ */
 #define Snull		((char) 0x98)
 #define Dnull		((char) 0x99)
 #define Bnull		((char) 0x9a)
-#define Nularg		((char) 0x9b)
+/*
+ * Backslash which will be returned to "\" instead of being stripped
+ * when we turn the string into a printable format.
+ */
+#define Bnullkeep       ((char) 0x9b)
+/*
+ * Null argument that does not correspond to any character.
+ * This should be last as it does not appear in ztokens and
+ * is used to initialise the IMETA type in inittyptab().
+ */
+#define Nularg		((char) 0x9c)
 
-#define INULL(x)	(((x) & 0xfc) == 0x98)
+#define INULL(x)	(((x) & 0xf8) == 0x98)
 
+/*
+ * Take care to update the use of IMETA appropriately when adding
+ * tokens here.
+ */
 /* Marker used in paramsubst for rc_expand_param */
-#define Marker		((char) 0x9c)
+#define Marker		((char) 0xa0)
 
 /* chars that need to be quoted if meant literally */
 
