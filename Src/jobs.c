@@ -1213,9 +1213,14 @@ clearjobtab(int monitor)
 	int sz = oldmaxjob * sizeof(struct job);
 	oldjobtab = (struct job *)zalloc(sz);
 	memcpy(oldjobtab, jobtab, sz);
+
+	/* Don't report any job we're part of */
+	if (thisjob != -1 && thisjob < oldmaxjob)
+	    memset(oldjobtab+thisjob, 0, sizeof(struct job));
     }
 
-    memset(jobtab, 0, sizeof(jobtab)); /* zero out table */
+    memset(jobtab, 0, jobtabsize * sizeof(struct job)); /* zero out table */
+    maxjob = 0;
 }
 
 static int initnewjob(int i)
@@ -1241,9 +1246,11 @@ initjob(void)
 {
     int i;
 
-    for (i = 1; i < jobtabsize; i++)
+    for (i = 1; i <= maxjob; i++)
 	if (!jobtab[i].stat)
 	    return initnewjob(i);
+    if (maxjob + 1 < jobtabsize)
+	return initnewjob(maxjob+1);
 
     if (expandjobtab())
 	return initnewjob(i);

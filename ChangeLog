@@ -1,5 +1,10 @@
 2005-10-13  Peter Stephenson  <pws@csr.com>
 
+	* 21872: Src/jobs.c: job table wasn't cleared properly in
+	subshells, possibly causing shell to hang; more efficient
+	search for free job entry; don't record current job for
+	use in saved job table.
+
 	* 21871: Src/exec.c, Src/glob.c, Src/params.c, Src/subst.c,
 	Src/utils.c, Src/zsh.h, Src/ztype.h, Src/Zle/compcore.c,
 	Src/Zle/compctl.c, Src/Zle/zle_tricky.c: replace INULL() with
