@@ -1043,8 +1043,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
     for (t = s, i = 0;
 	 (c = *t) && ((c != Outbrack &&
 		       (ishash || c != ',')) || i); t++) {
-	/* Untokenize INULL() except before brackets and double-quotes */
-	if (INULL(c)) {
+	/* Untokenize inull() except before brackets and double-quotes */
+	if (inull(c)) {
 	    c = t[1];
 	    if (c == '[' || c == ']' ||
 		c == '(' || c == ')' ||
@@ -1070,7 +1070,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	return 0;
     s = dupstrpfx(s, t - s);
     *str = tt = t;
-    /* If we're NOT reverse subscripting, strip the INULL()s so brackets *
+    /* If we're NOT reverse subscripting, strip the inull()s so brackets *
      * are not backslashed after parsestr().  Otherwise leave them alone *
      * so that the brackets will be escaped when we patcompile() or when *
      * subscript arithmetic is performed (for nested subscripts).        */
@@ -1305,11 +1305,11 @@ getindex(char **pptr, Value v, int dq)
 
     *s++ = '[';
     s = parse_subscript(s, dq);	/* Error handled after untokenizing */
-    /* Now we untokenize everything except INULL() markers so we can check *
-     * for the '*' and '@' special subscripts.  The INULL()s are removed  *
+    /* Now we untokenize everything except inull() markers so we can check *
+     * for the '*' and '@' special subscripts.  The inull()s are removed  *
      * in getarg() after we know whether we're doing reverse indexing.    */
     for (tbrack = *pptr + 1; *tbrack && tbrack != s; tbrack++) {
-	if (INULL(*tbrack) && !*++tbrack)
+	if (inull(*tbrack) && !*++tbrack)
 	    break;
 	if (itok(*tbrack))	/* Need to check for Nularg here? */
 	    *tbrack = ztokens[*tbrack - Pound];

@@ -1,6 +1,11 @@
 2005-10-13  Peter Stephenson  <pws@csr.com>
 
-	* Src/prompt.c, Src/complist.c: 21869: fix multibyte characters
+	* 21871: Src/exec.c, Src/glob.c, Src/params.c, Src/subst.c,
+	Src/utils.c, Src/zsh.h, Src/ztype.h, Src/Zle/compcore.c,
+	Src/Zle/compctl.c, Src/Zle/zle_tricky.c: replace INULL() with
+	more sensible inull() macro.
+
+	* 21869: Src/prompt.c, Src/complist.c: fix multibyte characters
 	in %-substitutions and output of invalid multibyte characters
 	in completion listings.
 

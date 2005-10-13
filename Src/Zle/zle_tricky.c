@@ -775,7 +775,7 @@ docomplete(int lst)
 	    char *w = dupstring(origword), *x, *q, *ox;
 
 	    for (q = w; *q; q++)
-		if (INULL(*q))
+		if (inull(*q))
 		    *q = Nularg;
 	    zlemetacs = wb;
 	    foredel(we - wb);
@@ -1015,7 +1015,7 @@ static int
 has_real_token(const char *s)
 {
     while (*s) {
-	if (itok(*s) && !INULL(*s))
+	if (itok(*s) && !inull(*s))
 	    return 1;
 	s++;
     }
@@ -1487,7 +1487,7 @@ get_comp_string(void)
     }
     /* While building the quoted form, we also clean up the command line. */
     for (p = s, i = wb, j = 0; *p; p++, i++)
-	if (INULL(*p)) {
+	if (inull(*p)) {
 	    if (i < zlemetacs)
 		offs--;
 	    if (*p == Snull && isset(RCQUOTES))

@@ -41,6 +41,7 @@
 #define ISPECIAL (1 << 11)
 #define IMETA    (1 << 12)
 #define IWSEP    (1 << 13)
+#define INULL    (1 << 14)
 #define _icom(X,Y) (typtab[STOUC(X)] & Y)
 #define idigit(X) _icom(X,IDIGIT)
 #define ialnum(X) _icom(X,IALNUM)
@@ -56,3 +57,4 @@
 #define ispecial(X) _icom(X,ISPECIAL)
 #define imeta(X) _icom(X,IMETA)
 #define iwsep(X) _icom(X,IWSEP)
+#define inull(X) _icom(X,INULL)

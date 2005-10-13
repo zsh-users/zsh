@@ -1406,7 +1406,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		zerr("bad substitution", NULL, 0);
 		return NULL;
 	    }
-	} else if (inbrace && INULL(*s)) {
+	} else if (inbrace && inull(*s)) {
 	    /*
 	     * Handles things like ${(f)"$(<file)"} by skipping 
 	     * the double quotes.  We don't need to know what was
@@ -1460,7 +1460,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	 * This tests for the second double quote in an expression
 	 * like ${(f)"$(<file)"}, compare above.
 	 */
-	while (INULL(*s))
+	while (inull(*s))
 	    s++;
 	v = (Value) NULL;
     } else if (aspar) {
@@ -1850,7 +1850,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	 * we didn't have a subexpression, e.g. ${"foo"}.
 	 * This form is pointless, but logically it ought to work.
 	 */
-	while (INULL(*s))
+	while (inull(*s))
 	    s++;
     }
     /*
@@ -2846,11 +2846,11 @@ modify(char **str, char **ptr)
 		}
 		zsfree(hsubr);
 		for (tt = hsubl; *tt; tt++)
-		    if (INULL(*tt) && *tt != Bnullkeep)
+		    if (inull(*tt) && *tt != Bnullkeep)
 			chuck(tt--);
 		untokenize(hsubl);
 		for (tt = hsubr = ztrdup(ptr2); *tt; tt++)
-		    if (INULL(*tt) && *tt != Bnullkeep)
+		    if (inull(*tt) && *tt != Bnullkeep)
 			chuck(tt--);
 		ptr2[-1] = del;
 		if (sav)

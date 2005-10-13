@@ -163,8 +163,6 @@ struct mathfunc {
  */
 #define Nularg		((char) 0x9c)
 
-#define INULL(x)	((x) >= Snull && (x) <= Nularg)
-
 /*
  * Take care to update the use of IMETA appropriately when adding
  * tokens here.

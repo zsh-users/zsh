@@ -1461,7 +1461,7 @@ set_comp_sep(void)
 	autoq = NULL;
     }
     for (p = ns, i = swb; *p; p++, i++) {
-	if (INULL(*p)) {
+	if (inull(*p)) {
 	    if (i < scs) {
 		if (*p == Bnull) {
                     if (p[1] && remq)

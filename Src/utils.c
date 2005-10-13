@@ -2562,8 +2562,10 @@ inittyptab(void)
     typtab['\0'] |= IMETA;
     typtab[STOUC(Meta)  ] |= IMETA;
     typtab[STOUC(Marker)] |= IMETA;
-    for (t0 = (int)STOUC(Pound); t0 <= (int)STOUC(Nularg); t0++)
+    for (t0 = (int)STOUC(Pound); t0 <= (int)STOUC(Comma); t0++)
 	typtab[t0] |= ITOK | IMETA;
+    for (t0 = (int)STOUC(Snull); t0 <= (int)STOUC(Nularg); t0++)
+	typtab[t0] |= ITOK | IMETA | INULL;
     for (s = ifs ? ifs : DEFAULT_IFS; *s; s++) {
 	if (inblank(*s)) {
 	    if (s[1] == *s)

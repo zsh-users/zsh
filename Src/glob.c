@@ -2588,13 +2588,13 @@ remnulargs(char *s)
 		 * pattern matching.
 		 */
 		continue;
-	    } else if (INULL(c)) {
+	    } else if (inull(c)) {
 		char *t = s - 1;
 
 		while ((c = *s++)) {
 		    if (c == Bnullkeep)
 			*t++ = '\\';
-		    else if (!INULL(c))
+		    else if (!inull(c))
 			*t++ = c;
 		}
 		*t = '\0';

@@ -2864,7 +2864,7 @@ gethere(char *str, int typ)
     char *s, *t, *bptr, c;
 
     for (s = str; *s; s++)
-	if (INULL(*s)) {
+	if (inull(*s)) {
 	    qt = 1;
 	    break;
 	}

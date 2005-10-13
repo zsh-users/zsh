@@ -2862,7 +2862,7 @@ sep_comp_string(char *ss, char *s, int noffs)
 	autoq = "";
     }
     for (p = ns, i = swb; *p; p++, i++) {
-	if (INULL(*p)) {
+	if (inull(*p)) {
 	    if (i < scs) {
 		soffs--;
 		if (remq && *p == Bnull && p[1])
