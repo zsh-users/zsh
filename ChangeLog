@@ -1,3 +1,13 @@
+2005-10-13  Peter Stephenson  <pws@csr.com>
+
+	* Src/prompt.c, Src/complist.c: 21869: fix multibyte characters
+	in %-substitutions and output of invalid multibyte characters
+	in completion listings.
+
+	* 21870: Src/zsh.h: definition of INULL() in 21862/21863 was too
+	liberal, causing problems with output of certain characters
+	e.g. Cyrillic UTF-8.
+
 2005-10-11  Peter Stephenson  <pws@csr.com>
 
 	* 21862/21863: Src/glob.c, Src/lex.c, Src/pattern.c, Src/subst.c,

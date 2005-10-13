@@ -599,7 +599,7 @@ clnicezputs(Listcols colors, char *s, int ml)
 	     * an input NULL, which we want to be a real character
 	     * rather than terminator.
 	     */
-	    sptr = nicechar(*s);
+	    sptr = nicechar(*uptr);
 	    /* everything here is ASCII... */
 	    width = strlen(sptr);
 	    wptr = sptr + width;

@@ -736,6 +736,46 @@ addbufspc(int need)
 void
 stradd(char *d)
 {
+#ifdef ZLE_UNICODE_SUPPORT
+    char *ums, *ups;
+    int upslen;
+    mbstate_t ps;
+
+    memset(&ps, 0, sizeof(ps));
+    ums = ztrdup(d);
+    ups = unmetafy(ums, &upslen);
+
+    /*
+     * We now have a raw string of possibly multibyte characters.
+     * Read each character one by one.
+     */
+    while (upslen > 0) {
+	wchar_t cc;
+	char *pc;
+	int ret = mbrtowc(&cc, ups, upslen, &ps);
+
+	if (ret <= 0)
+	{
+	    /* Bad character.  Take the next byte on its own. */
+	    pc = nicechar(*ups);
+	    ret = 1;
+	} else {
+	    /* Take full wide character in one go */
+	    pc = wcs_nicechar(cc, NULL, NULL);
+	}
+	/* Keep output as metafied string. */
+	addbufspc(strlen(pc));
+
+	upslen -= ret;
+	ups += ret;
+
+	/* Put printed representation into the buffer */
+	while (*pc)
+	    *bp++ = *pc++;
+    }
+
+    free(ums);
+#else
     char *ps, *pc;
     addbufspc(niceztrlen(d));
     /* This loop puts the nice representation of the string into the prompt *
@@ -743,6 +783,7 @@ stradd(char *d)
     for(ps=d; *ps; ps++)
 	for(pc=nicechar(*ps == Meta ? STOUC(*++ps)^32 : STOUC(*ps)); *pc; pc++)
 	    *bp++ = *pc;
+#endif
 }
 
 /* tsetcap(), among other things, can write a termcap string into the buffer. */
