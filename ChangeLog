@@ -1,5 +1,10 @@
 2005-09-09  Peter Stephenson  <pws@csr.com>
 
+	* 21872: Src/jobs.c: job table wasn't cleared properly in
+	subshells, possibly causing shell to hang; more efficient
+	search for free job entry; don't record current job for
+	use in saved job table.
+
 	* 21719: Src/builtin.c, Src/params.c: Add some mod_exports.
 
 2005-09-06  Peter Stephenson  <pws@csr.com>
