@@ -1670,10 +1670,10 @@ sect(How do I prevent the prompt overwriting output when there is no newline?)
     fi
   )
   That precmd function will only bump the screen down to a new line if there
-  was output on the prompt line, otherwise the extra spaces get removed by
-  the tt(PROMPT_CR) action.  Although this typically looks fine it may result
-  in the preceding spaces being included when you select a line of text with
-  the mouse.
+  was output on the prompt line, otherwise the extra chars get removed by
+  the PROMPT_CR action.  Although this typically looks fine, it may result
+  in the spaces preceding the prompt being included when you select a line
+  of preserved text with the mouse.
 
   One final alternative is to put a newline in your prompt -- see question
   link(3.13)(313) for that.
