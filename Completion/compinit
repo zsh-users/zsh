@@ -156,6 +156,7 @@ _comp_options=(
 # and don't get confused by user's ZERR trap handlers.
 
 _comp_setup='setopt localoptions localtraps ${_comp_options[@]};
+             local IFS=$'\'\ \\t\\r\\n\\0\''
              exec </dev/null;
              trap - ZERR'
 

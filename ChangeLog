@@ -1,3 +1,10 @@
+2005-10-17  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 21880: Completion/compinit: explicitly set IFS to the usual
+	default string, plus carriage return, in case the surrounding
+	environment has messed with it or a file with CRLF line breaks
+	needs to be parsed.
+
 2005-10-17  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Zle/define-composed-chars,
