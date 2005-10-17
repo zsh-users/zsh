@@ -797,7 +797,7 @@ endsitem()
 item(Mathematical symbols)(
 startsitem()
 sitem(tt(DG))(Degree)
-sitem(tt(+-))(+/- sign)
+sitem(tt(-2), tt(+-), tt(-+))(- sign, +/- sign, -/+ sign)
 sitem(tt(2S))(Superscript 2)
 sitem(tt(3S))(Superscript 3)
 sitem(tt(1S))(Superscript 1)
@@ -809,6 +809,23 @@ sitem(tt(34))(Three quarters)
 sitem(tt(*X))(Multiplication)
 sitem(tt(-:))(Division)
 sitem(tt(%0))(Per mille)
+sitem(tt(FA), tt(TE), tt(/0))(For all, there exists, empty set)
+sitem(tt(dP), tt(DE), tt(NB))(Partial derivative, delta (increment), del
+(nabla))
+sitem(tt(LPAR()-), tt(-RPAR()))(Element of, contains)
+sitem(tt(*P), tt(+Z))(Product, sum)
+sitem(tt(*-), tt(Ob), tt(Sb))(Asterisk, ring, bullet)
+sitem(tt(RT), tt(0+LPAR()), tt(00))(Root sign, proportional to, infinity)
+endsitem()
+)
+item(Other symbols)(
+startsitem()
+sitem(tt(cS), tt(cH), tt(cD), tt(cC))(Card suits: spades, hearts, diamonds,
+clubs)
+sitem(tt(Md), tt(M8), tt(M2), tt(Mb), tt(Mx), tt(MX))(Musical notation:
+crotchet (quarter note), quaver (eighth note), semiquavers (sixteenth
+notes), flag sign, natural signa, sharp sign)
+sitem(tt(Fm), tt(Ml))(Female, male)
 endsitem()
 )
 item(Accents on their own)(

@@ -1,3 +1,8 @@
+2005-10-17  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Zle/define-composed-chars,
+	Doc/Zsh/contrib.yo: a few more miscellaneous composable symbols.
+
 2005-10-14  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Etc/FAQ.yo: Tweaked the precmd that works like

@@ -10,7 +10,7 @@ typeset -gA zsh_accented_chars
 
 # Save quite a lot of space by using short names internally.
 local -A z
-local a
+local a b
 
 # grave
 a=\!
@@ -249,6 +249,16 @@ z[$a]+=" Z 5e6"
 a=h
 z[$a]+=" S 5e9"
 
+# Card suits: here first character is the interesting one
+for a b in S 2660 H 2661 D 2662 C 2663; do
+  z[$a]+=" c $b"
+done
+
+# Music: ditto
+for a b in d 2669 8 266a 2 266b b 266d x 266e X 266f; do
+  z[$a]+=" M $b"
+done
+
 # Remaining characters are handled as separate pairs.
 # We need to remember that the assoc array is keyed by the second character.
 # Left square bracket
@@ -367,5 +377,31 @@ z[-]+=" / 2020"
 z[=]+=" / 2021"
 # per mille
 z[0]+=" % 2030"
+# For all, partial derivative, there exists, empty set
+z[A]+=" F 2200"
+z[P]+=" d 2202"
+z[E]+=" T 2203"
+z[0]+=" / 2205"
+# Increment, del (nabla), element of, contains, product, sum
+z[E]+=" D 2206"
+z[B]+=" N 2207"
+z[-]+=" ( 2208"
+a=\)
+z[$a]+=" - 220b"
+z[P]+=" * 220F"
+z[Z]+=" + 2211"
+# Minus, minus or plus, asterisk, ring, bullet
+z[2]+=" - 2212"
+z[+]+=" - 2213"
+z[-]+=" * 2217"
+z[b]+=" O 2218 S 2219"
+# square root, proportional to, infinity
+z[T]+=" R 221A"
+a=\(
+z[$a]+=" 0 221D"
+z[0]+=" 0 221E"
+# Female and male
+z[m]+=" F 2640"
+z[l]+=" M 2642"
 
 zsh_accented_chars=("${(kv)z[@]}")
