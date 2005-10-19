@@ -3368,7 +3368,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	     */
 	    char *str = unmetafy(promptexpand(metafy(args[n], len[n],
 						     META_NOALLOC), 0, NULL, NULL), &len[n]);
-	    args[n] = dupstring(str);
+	    args[n] = dupstrpfx(str, len[n]);
 	    free(str);
 	}
 	/* -D option -- interpret as a directory, and use ~ */
@@ -3378,9 +3378,9 @@ bin_print(char *name, char **args, Options ops, int func)
 	    queue_signals();
 	    d = finddir(args[n]);
 	    if(d) {
-		char *arg = zhalloc(strlen(args[n]) + 1);
-		sprintf(arg, "~%s%s", d->nam,
-			args[n] + strlen(d->dir));
+		int dirlen = strlen(d->dir);
+		char *arg = zhalloc(len[n] - dirlen + strlen(d->nam) + 2);
+		sprintf(arg, "~%s%s", d->nam, args[n] + dirlen);
 		args[n] = arg;
 		len[n] = strlen(args[n]);
 	    }

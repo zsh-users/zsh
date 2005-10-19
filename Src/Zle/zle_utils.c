@@ -787,7 +787,8 @@ showmsg(char const *msg)
     ZLE_CHAR_T c;
 #ifdef ZLE_UNICODE_SUPPORT
     char *umsg;
-    int ulen, ret, width;
+    int ulen, ret;
+    size_t width;
     mbstate_t ps;
 #endif
 

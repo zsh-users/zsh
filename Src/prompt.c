@@ -1078,7 +1078,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		    int remw;
 		    mbstate_t mbs;
 
-		    fulltextptr = fulltext = bp;
+		    fulltextptr = fulltext = ptr + ntrunc;
 		    memmove(fulltext, ptr, fullen);
 		    fulltext[fullen] = '\0';
 

@@ -1,5 +1,10 @@
 2005-10-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 21890: Src/builtin.c, Src/prompt.c, Src/zle_utils.c: allocation
+	inconsistencies in print builtin, segmentation error with
+	left prompt truncation from 21882, warning about variable
+	signedness in zle_utils.c.
+
 	* 21887: Src/Zle/zle_refresh.c: attempt to display wide characters
 	wider than one screen cell properly.
 
