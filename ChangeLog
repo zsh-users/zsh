@@ -1,3 +1,8 @@
+2005-10-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 21887: Src/Zle/zle_refresh.c: attempt to display wide characters
+	wider than one screen cell properly.
+
 2005-10-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21885: Src/Zle/zle_refresh.c: Convert some large macros
