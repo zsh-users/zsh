@@ -35,6 +35,7 @@
  * placeholder and wint_t guarantees that we can use WEOF to do this.
  */
 typedef wint_t *REFRESH_STRING;
+typedef wint_t REFRESH_CHAR;
 
 /*
  * Unfortunately, that means the pointer is the wrong type for
@@ -81,6 +82,7 @@ ZR_strncmp(wint_t *wstr1, wint_t *wstr2, int len)
 }
 #else
 typedef char *REFRESH_STRING;
+typedef char REFRESH_CHAR;
 
 #define ZR_memset	memset
 #define ZR_memcpy	memcpy
@@ -971,7 +973,7 @@ refreshline(int ln)
 	ollen = ZR_strlen(ol);
     }
     else {
-	static ZLE_INT_T nullchr = ZWC('\0');
+	static REFRESH_CHAR nullchr = ZWC('\0');
 	ol = &nullchr;
 	ollen = 0;
     }
