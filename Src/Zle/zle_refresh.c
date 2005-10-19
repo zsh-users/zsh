@@ -253,65 +253,20 @@ scrollwindow(int tline)
     return;
 }
 
-/* this is the messy part. */
-/* this define belongs where it's used!!! */
-
-#define nextline					\
-{							\
-    *s = ZWC('\0');					\
-    if (ln != winh - 1)					\
-	ln++;						\
-    else {						\
-	if (!canscroll)	{				\
-	    if (nvln != -1 && nvln != winh - 1		\
-		&& (numscrolls != onumscrolls - 1	\
-		    || nvln <= winh / 2))		\
-	        break;					\
-	    numscrolls++;				\
-	    canscroll = winh / 2;			\
-	}						\
-	canscroll--;					\
-	scrollwindow(0);				\
-	if (nvln != -1)					\
-	    nvln--;					\
-    }							\
-    if (!nbuf[ln])					\
-	nbuf[ln] = (ZLE_STRING_T)zalloc((winw + 2) * sizeof(**nbuf));		\
-    s = nbuf[ln];			\
-    sen = s + winw;					\
-}
-
-#define snextline					\
-{							\
-    *s = ZWC('\0');						\
-    if (ln != winh - 1)					\
-	ln++;						\
-    else						\
-	if (tosln > ln) {				\
-	    tosln--;					\
-	    if (nvln > 1) {				\
-		scrollwindow(0);			\
-		nvln--;					\
-	    } else					\
-		more_end = 1;				\
-	} else if (tosln > 2 && nvln > 1) {		\
-	    tosln--;					\
-	    if (tosln <= nvln) {			\
-		scrollwindow(0);			\
-		nvln--;					\
-	    } else {					\
-		scrollwindow(tosln);			\
-		more_end = 1;				\
-	    }						\
-	} else {					\
-	    more_status = 1;				\
-	    scrollwindow(tosln + 1);			\
-	}						\
-    if (!nbuf[ln])					\
-	nbuf[ln] = (ZLE_STRING_T)zalloc((winw + 2) * sizeof(**nbuf));		\
-    s = nbuf[ln];			\
-    sen = s + winw;					\
-}
+/*
+ * Parameters in zrefresh used for communicating with next-line functions.
+ */
+struct rparams {
+    int canscroll;		/* number of lines we are allowed to scroll */
+    int ln;			/* current line we're working on */
+    int more_status;		/* more stuff in status line */
+    int nvcs;			/* video cursor column */
+    int nvln;			/* video cursor line */
+    int tosln;			/* tmp in statusline stuff */
+    ZLE_STRING_T s;		/* pointer into the video buffer */
+    ZLE_STRING_T sen;		/* pointer to end of the video buffer (eol) */
+};
+typedef struct rparams *Rparams;
 
 static int cleareol,		/* clear to end-of-line (if can't cleareod) */
     clearf,			/* alwayslastprompt used immediately before */
@@ -319,6 +274,75 @@ static int cleareol,		/* clear to end-of-line (if can't cleareod) */
     oput_rpmpt,			/* whether displayed right-prompt last time */
     oxtabs,			/* oxtabs - tabs expand to spaces if set    */
     numscrolls, onumscrolls;
+
+/*
+ * Go to the next line in the main display area.  Return 1 if we should abort
+ * processing the line loop at this point, else 0.
+ */
+static int
+nextline(Rparams rpms)
+{
+    *rpms->s = ZWC('\0');
+    if (rpms->ln != winh - 1)
+	rpms->ln++;
+    else {
+	if (!rpms->canscroll)	{
+	    if (rpms->nvln != -1 && rpms->nvln != winh - 1
+		&& (numscrolls != onumscrolls - 1
+		    || rpms->nvln <= winh / 2))
+	        return 1;
+	    numscrolls++;
+	    rpms->canscroll = winh / 2;
+	}
+	rpms->canscroll--;
+	scrollwindow(0);
+	if (rpms->nvln != -1)
+	    rpms->nvln--;
+    }
+    if (!nbuf[rpms->ln])
+	nbuf[rpms->ln] = (ZLE_STRING_T)zalloc((winw + 2) * sizeof(**nbuf));
+    rpms->s = nbuf[rpms->ln];
+    rpms->sen = rpms->s + winw;
+
+    return 0;
+}
+
+
+/*
+ * Go to the next line in the status area.
+ */
+static void
+snextline(Rparams rpms)
+{
+    *rpms->s = ZWC('\0');
+    if (rpms->ln != winh - 1)
+	rpms->ln++;
+    else
+	if (rpms->tosln > rpms->ln) {
+	    rpms->tosln--;
+	    if (rpms->nvln > 1) {
+		scrollwindow(0);
+		rpms->nvln--;
+	    } else
+		more_end = 1;
+	} else if (rpms->tosln > 2 && rpms->nvln > 1) {
+	    rpms->tosln--;
+	    if (rpms->tosln <= rpms->nvln) {
+		scrollwindow(0);
+		rpms->nvln--;
+	    } else {
+		scrollwindow(rpms->tosln);
+		more_end = 1;
+	    }
+	} else {
+	    rpms->more_status = 1;
+	    scrollwindow(rpms->tosln + 1);
+	}
+    if (!nbuf[rpms->ln])
+	nbuf[rpms->ln] = (ZLE_STRING_T)zalloc((winw + 2) * sizeof(**nbuf));
+    rpms->s = nbuf[rpms->ln];
+    rpms->sen = rpms->s + winw;
+}
 
 /*
  * TODO currently it assumes sceenwidth 1 for every character
@@ -330,15 +354,9 @@ mod_export void
 zrefresh(void)
 {
     static int inlist;		/* avoiding recursion                        */
-    int canscroll = 0,		/* number of lines we are allowed to scroll  */
-	ln = 0,			/* current line we're working on	     */
-	more_status = 0,	/* more stuff in status line		     */
-	nvcs = 0, nvln = -1,	/* video cursor column and line		     */
-	t0 = -1,		/* tmp					     */
-	tosln = 0;		/* tmp in statusline stuff		     */
-    ZLE_STRING_T s,		/* pointer into the video buffer	     */
-	sen,			/* pointer to end of the video buffer (eol)  */
-	t,			/* pointer into the real buffer		     */
+    int iln;			/* current line as index in loops            */
+    int t0 = -1;		/* tmp					     */
+    ZLE_STRING_T t,		/* pointer into the real buffer		     */
 	scs,			/* pointer to cursor position in real buffer */
 	u;			/* pointer for status line stuff */
     ZLE_STRING_T tmpline,	/* line with added pre/post text */
@@ -346,6 +364,7 @@ zrefresh(void)
     int tmpcs, tmpll;		/* ditto cursor position and line length */
     int tmpalloced;		/* flag to free tmpline when finished */
     int remetafy;		/* flag that zle line is metafied */
+    struct rparams rpms;
     
     if (trashedzle)
 	reexpandprompt();
@@ -514,120 +533,129 @@ zrefresh(void)
     if (!*nbuf)
 	*nbuf = (ZLE_STRING_T)zalloc((winw + 2) * sizeof(**nbuf));
 
-    s = nbuf[ln = 0] + lpromptw;
+    memset(&rpms, 0, sizeof(rpms));
+    rpms.nvln = -1;
+
+    rpms.s = nbuf[rpms.ln = 0] + lpromptw;
     t = tmpline;
-    sen = *nbuf + winw;
+    rpms.sen = *nbuf + winw;
     for (; t < tmpline+tmpll; t++) {
 	if (t == scs)			/* if cursor is here, remember it */
-	    nvcs = s - (nbuf[nvln = ln]);
+	    rpms.nvcs = rpms.s - (nbuf[rpms.nvln = rpms.ln]);
 
 	if (*t == ZWC('\n')){		/* newline */
-	    nbuf[ln][winw + 1] = ZWC('\0');	/* text not wrapped */
-	    nextline
+	    nbuf[rpms.ln][winw + 1] = ZWC('\0');	/* text not wrapped */
+	    if (nextline(&rpms))
+		break;
 	} else if (*t == ZWC('\t')) {		/* tab */
-	    t0 = s - nbuf[ln];
+	    t0 = rpms.s - nbuf[rpms.ln];
 	    if ((t0 | 7) + 1 >= winw) {
-		nbuf[ln][winw + 1] = ZWC('\n');	/* text wrapped */
-		nextline
+		nbuf[rpms.ln][winw + 1] = ZWC('\n');	/* text wrapped */
+		if (nextline(&rpms))
+		    break;
 	    } else
 		do
-		    *s++ = ZWC(' ');
+		    *rpms.s++ = ZWC(' ');
 		while ((++t0) & 7);
 	} else if (ZC_icntrl(*t)) {	/* other control character */
-	    *s++ = ZWC('^');
-	    if (s == sen) {
-		nbuf[ln][winw + 1] = ZWC('\n');	/* text wrapped */
-		nextline
+	    *rpms.s++ = ZWC('^');
+	    if (rpms.s == rpms.sen) {
+		nbuf[rpms.ln][winw + 1] = ZWC('\n');	/* text wrapped */
+		if (nextline(&rpms))
+		    break;
 	    }
 #ifdef ZLE_UNICODE_SUPPORT
-	    *s++ = ((*t == 127) || (*t > 255)) ? ZWC('?') : (*t | ZWC('@'));
+	    *rpms.s++ = ((*t == 127) || (*t > 255)) ? ZWC('?') :
+		(*t | ZWC('@'));
 #else
-	    *s++ = (*t == 127) ? ZWC('?') : (*t | ZWC('@'));
+	    *rpms.s++ = (*t == 127) ? ZWC('?') : (*t | ZWC('@'));
 #endif
 	} else {			/* normal character */
-	    *s++ = *t;
+	    *rpms.s++ = *t;
 	}
-	if (s == sen) {
-	    nbuf[ln][winw + 1] = ZWC('\n');	/* text wrapped */
-	    nextline
+	if (rpms.s == rpms.sen) {
+	    nbuf[rpms.ln][winw + 1] = ZWC('\n');	/* text wrapped */
+	    if (nextline(&rpms))
+		break;
 	}
     }
 
 /* if we're really on the next line, don't fake it; do everything properly */
-    if (t == scs && (nvcs = s - (nbuf[nvln = ln])) == winw) {
-	nbuf[ln][winw + 1] = ZWC('\n');	/* text wrapped */
-	switch ('\0') { 	/* a sad hack to make the break */
-	case '\0':		/* in nextline work */
-	    nextline
-	}
-	*s = ZWC('\0');
-	nvcs = 0;
-	nvln++;
+    if (t == scs && (rpms.nvcs = rpms.s - (nbuf[rpms.nvln = rpms.ln]))
+	== winw) {
+	nbuf[rpms.ln][winw + 1] = ZWC('\n');	/* text wrapped */
+	(void)nextline(&rpms);
+	*rpms.s = ZWC('\0');
+	rpms.nvcs = 0;
+	rpms.nvln++;
     }
 
     if (t != tmpline + tmpll)
 	more_end = 1;
 
     if (statusline) {
-	tosln = ln + 1;
-	nbuf[ln][winw + 1] = ZWC('\0');	/* text not wrapped */
-	snextline
+	rpms.tosln = rpms.ln + 1;
+	nbuf[rpms.ln][winw + 1] = ZWC('\0');	/* text not wrapped */
+	snextline(&rpms);
 	u = statusline;
 	for (; u < statusline + statusll; u++) {
 	    if (ZC_icntrl(*u)) { /* simplified processing in the status line */
-		*s++ = ZWC('^');
-		if (s == sen) {
-		    nbuf[ln][winw + 1] = ZWC('\n');	/* text wrapped */
-		    snextline
+		*rpms.s++ = ZWC('^');
+		if (rpms.s == rpms.sen) {
+		    nbuf[rpms.ln][winw + 1] = ZWC('\n');/* text wrapped */
+		    snextline(&rpms);
 		}
-		*s++ = (*u == 127) ? ZWC('?') : (*u | ZWC('@'));
+		*rpms.s++ = (*u == 127) ? ZWC('?') : (*u | ZWC('@'));
 	    } else
-		*s++ = *u;
-	    if (s == sen) {
-		nbuf[ln][winw + 1] = ZWC('\n');	/* text wrapped */
-		snextline
+		*rpms.s++ = *u;
+	    if (rpms.s == rpms.sen) {
+		nbuf[rpms.ln][winw + 1] = ZWC('\n');	/* text wrapped */
+		snextline(&rpms);
 	    }
 	}
-	if (s == sen)
-	    snextline
+	if (rpms.s == rpms.sen)
+	    snextline(&rpms);
     }
-    *s = ZWC('\0');
+    *rpms.s = ZWC('\0');
 
 /* insert <.... at end of last line if there is more text past end of screen */
     if (more_end) {
 	if (!statusline)
-	    tosln = winh;
-	s = nbuf[tosln - 1];
-	sen = s + winw - 7;
-	for (; s < sen; s++) {
-	    if (*s == ZWC('\0')) {
-		for (; s < sen; )
-		    *s++ = ZWC(' ');
+	    rpms.tosln = winh;
+	rpms.s = nbuf[rpms.tosln - 1];
+	rpms.sen = rpms.s + winw - 7;
+	for (; rpms.s < rpms.sen; rpms.s++) {
+	    if (*rpms.s == ZWC('\0')) {
+		for (; rpms.s < rpms.sen; )
+		    *rpms.s++ = ZWC(' ');
 		break;
 	    }
 	}
-	ZS_strncpy(sen, ZWS(" <.... "), 7);
-	nbuf[tosln - 1][winw] = nbuf[tosln - 1][winw + 1] = ZWC('\0');
+	ZS_strncpy(rpms.sen, ZWS(" <.... "), 7);
+	nbuf[rpms.tosln - 1][winw] = nbuf[rpms.tosln - 1][winw + 1]
+	    = ZWC('\0');
     }
 
 /* insert <....> at end of first status line if status is too big */
-    if (more_status) {
-	s = nbuf[tosln];
-	sen = s + winw - 8;
-	for (; s < sen; s++) {
-	    if (*s == ZWC('\0')) {
-		for (; s < sen; )
-		    *s++ = ZWC(' ');
+    if (rpms.more_status) {
+	rpms.s = nbuf[rpms.tosln];
+	rpms.sen = rpms.s + winw - 8;
+	for (; rpms.s < rpms.sen; rpms.s++) {
+	    if (*rpms.s == ZWC('\0')) {
+		for (; rpms.s < rpms.sen; )
+		    *rpms.s++ = ZWC(' ');
 		break;
 	    }
 	}
-	ZS_strncpy(sen, ZWS(" <....> "), 8);
-	nbuf[tosln][winw] = nbuf[tosln][winw + 1] = ZWC('\0');
+	ZS_strncpy(rpms.sen, ZWS(" <....> "), 8);
+	nbuf[rpms.tosln][winw] = nbuf[rpms.tosln][winw + 1] = ZWC('\0');
     }
 
-    nlnct = ln + 1;
-    for (ln = nlnct; ln < winh; ln++)
-	zfree(nbuf[ln], (winw + 2) * sizeof(**nbuf)), nbuf[ln] = NULL;
+    nlnct = rpms.ln + 1;
+    for (iln = nlnct; iln < winh; iln++) {
+	zfree(nbuf[iln], (winw + 2) * sizeof(**nbuf));
+	nbuf[iln] = NULL;
+    }
 
 /* determine whether the right-prompt exists and can fit on the screen */
     if (!more_start) {
@@ -647,23 +675,25 @@ zrefresh(void)
 	nbuf[0][winw] = nbuf[0][winw + 1] = ZWC('\0');
     }
 
-    for (ln = 0; ln < nlnct; ln++) {
+    for (iln = 0; iln < nlnct; iln++) {
 	/* if we have more lines than last time, clear the newly-used lines */
-	if (ln >= olnct)
+	if (iln >= olnct)
 	    cleareol = 1;
 
     /* if old line and new line are different,
        see if we can insert/delete a line to speed up update */
 
-	if (!clearf && ln > 0 && ln < olnct - 1 && !(hasam && vcs == winw) &&
-	    nbuf[ln] && obuf[ln] &&
-	    ZS_strncmp(nbuf[ln], obuf[ln], 16)) {
-	    if (tccan(TCDELLINE) && obuf[ln + 1] && obuf[ln + 1][0] &&
-		nbuf[ln] && !ZS_strncmp(nbuf[ln], obuf[ln + 1], 16)) {
-		moveto(ln, 0);
+	if (!clearf && iln > 0 && iln < olnct - 1 &&
+	    !(hasam && vcs == winw) &&
+	    nbuf[iln] && obuf[iln] &&
+	    ZS_strncmp(nbuf[iln], obuf[iln], 16)) {
+	    if (tccan(TCDELLINE) && obuf[iln + 1] &&
+		obuf[iln + 1][0] && nbuf[iln] &&
+		!ZS_strncmp(nbuf[iln], obuf[iln + 1], 16)) {
+		moveto(iln, 0);
 		tcout(TCDELLINE);
-		zfree(obuf[ln], (winw + 2) * sizeof(**obuf));
-		for (t0 = ln; t0 != olnct; t0++)
+		zfree(obuf[iln], (winw + 2) * sizeof(**obuf));
+		for (t0 = iln; t0 != olnct; t0++)
 		    obuf[t0] = obuf[t0 + 1];
 		obuf[--olnct] = NULL;
 	    }
@@ -671,22 +701,23 @@ zrefresh(void)
 	   of lines that have been displayed by this routine) so that we don't
 	   go off the end of the screen. */
 
-	    else if (tccan(TCINSLINE) && olnct < vmaxln && nbuf[ln + 1] &&
-		     obuf[ln] && !ZS_strncmp(nbuf[ln + 1], obuf[ln], 16)) {
-		moveto(ln, 0);
+	    else if (tccan(TCINSLINE) && olnct < vmaxln && nbuf[iln + 1] &&
+		     obuf[iln] && !ZS_strncmp(nbuf[iln + 1], 
+						  obuf[iln], 16)) {
+		moveto(iln, 0);
 		tcout(TCINSLINE);
-		for (t0 = olnct; t0 != ln; t0--)
+		for (t0 = olnct; t0 != iln; t0--)
 		    obuf[t0] = obuf[t0 - 1];
-		obuf[ln] = NULL;
+		obuf[iln] = NULL;
 		olnct++;
 	    }
 	}
 
     /* update the single line */
-	refreshline(ln);
+	refreshline(iln);
 
     /* output the right-prompt if appropriate */
-	if (put_rpmpt && !ln && !oput_rpmpt) {
+	if (put_rpmpt && !iln && !oput_rpmpt) {
 	    moveto(0, winw - 1 - rpromptw);
 	    zputs(rpromptbuf, shout);
 	    vcs = winw - 1;
@@ -712,8 +743,8 @@ individually */
 
     if (olnct > nlnct) {
 	cleareol = 1;
-	for (ln = nlnct; ln < olnct; ln++)
-	    refreshline(ln);
+	for (iln = nlnct; iln < olnct; iln++)
+	    refreshline(iln);
     }
 
 /* reset character attributes */
@@ -737,14 +768,14 @@ individually */
     oput_rpmpt = put_rpmpt;
 
 /* move to the new cursor position */
-    moveto(nvln, nvcs);
+    moveto(rpms.nvln, rpms.nvcs);
 
 /* swap old and new buffers - better than freeing/allocating every time */
     qbuf = nbuf;
     nbuf = obuf;
     obuf = qbuf;
 /* store current values so we can use them next time */
-    ovln = nvln;
+    ovln = rpms.nvln;
     olnct = nlnct;
     onumscrolls = numscrolls;
     if (nlnct > vmaxln)
