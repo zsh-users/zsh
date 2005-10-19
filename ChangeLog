@@ -1,5 +1,8 @@
 2005-10-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 21891: Functions/Zle/define-composed-chars, Doc/Zsh/contrib.yo:
+	double width characters can be composed with ^A etc.
+
 	* 21890: Src/builtin.c, Src/prompt.c, Src/zle_utils.c: allocation
 	inconsistencies in print builtin, segmentation error with
 	left prompt truncation from 21882, warning about variable

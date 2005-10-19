@@ -1,6 +1,9 @@
 # This is not a widget function, it is only a helper for insert-composed-char
 # to cut down on resident memory use.
 
+emulate -L zsh
+setopt cbases
+
 # The associative array zsh_accent_chars is indexed by the
 # accent.  The values are sets of character / Unicode pairs for
 # the character with the given accent.  The Unicode value is
@@ -248,6 +251,15 @@ a=J
 z[$a]+=" Z 5e6"
 a=h
 z[$a]+=" S 5e9"
+
+typeset -i 16 -Z 4 ia
+typeset -i 16 -Z 6 iuni
+# Extended width characters ^A, ^B, ... (not RFC1345)
+for (( ia = 0x21; ia < 0x7f; ia++ )); do
+  (( iuni = ia + 0xff00 - 0x20 ))
+  eval a="\$'\\x${ia##0x}'"
+  z[$a]+=" ^ ${iuni##0x}"
+done
 
 # Card suits: here first character is the interesting one
 for a b in S 2660 H 2661 D 2662 C 2663; do

@@ -719,6 +719,11 @@ endsitem()
 
 The most common characters from the Arabic, Cyrillic, Greek and Hebrew
 alphabets are available; consult RFC 1345 for the appropriate sequences.
+In addition, a set of two letter codes not in RFC 1345 are available for
+the double-width characters corresponding to ASCII characters from tt(!)
+to tt(~) (0x21 to 0x7e) by preceeding the character with tt(^), for
+example tt(^A) for a double-width tt(A).
+
 The following other two-character sequences are understood.
 
 startitem()
