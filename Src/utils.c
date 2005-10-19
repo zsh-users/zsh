@@ -3520,6 +3520,49 @@ mb_niceztrdup(const char *s)
     return retstr;
 }
 
+/*
+ * Return the screen width of a multibyte string.  The input
+ * string is metafied.
+ */
+/**/
+mod_export int
+mb_width(const char *s)
+{
+    char *ums = ztrdup(s), *umptr;
+    int umlen;
+    int width = 0;
+    mbstate_t mbs;
+
+    memset(&mbs, 0, sizeof(mbs));
+    umptr = unmetafy(ums, &umlen);
+    /*
+     * Convert one wide character at a time.  We could convet
+     * the entire string using mbsrtowcs(), but that terminates on
+     * a NUL and we might have embedded NULs.
+     */
+    while (umlen > 0) {
+	wchar_t cc;
+	int ret = mbrtowc(&cc, umptr, umlen, &mbs);
+
+	if (ret <= 0) {
+	    /* Assume a single-width character. */
+	    width++;
+	    ret = 1;
+	} else {
+	    int wret = wcwidth(cc);
+	    if (wret > 0)
+		width += wret;
+	}
+
+	umlen -= ret;
+	umptr += ret;
+    }
+
+    free(ums);
+
+    return width;
+}
+
 /**/
 #endif /* ZLE_UNICODE_SUPPORT */
 

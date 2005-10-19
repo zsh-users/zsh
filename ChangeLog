@@ -1,3 +1,8 @@
+2005-10-19  Peter Stephenson  <pws@csr.com>
+
+	* 21882: Src/prompt.c, Src/utils.c, Test/D01prompt.ztst: extend
+	prompt truncation to handle multibyte characters.
+
 2005-10-17  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* 21880: Completion/compinit: explicitly set IFS to the usual

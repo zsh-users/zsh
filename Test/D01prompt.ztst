@@ -68,11 +68,11 @@
 >true
 >false
 
-  print -P '%10<...<truncated at 10%<< Not truncated'
-  print -P '%10>...>truncated at 10%>> Not truncated'
+  print -P 'start %10<...<truncated at 10%<< Not truncated%3< ...<Not shown'
+  print -P 'start %10>...>truncated at 10%>> Not truncated%3> ...>Not shown'
 0:prompt truncation
->...d at 10 Not truncated
->truncat... Not truncated
+>start ...d at 10 Not truncated ...
+>start truncat... Not truncated ...
 
 # It's hard to check the time and date as they are moving targets.
 # We therefore just check that various forms of the date are consistent.

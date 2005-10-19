@@ -87,7 +87,7 @@ static char *fm;
 
 /* Non-zero if truncating the current segment of the buffer. */
 
-static int trunclen;
+static int truncwidth;
 
 /* Current level of nesting of %{ / %} sequences. */
 
@@ -179,7 +179,7 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     fm = s;
     bp = bufline = buf = zshcalloc(bufspc = 256);
     bp1 = NULL;
-    trunclen = 0;
+    truncwidth = 0;
     putpromptchar(1, '\0');
     addbufspc(1);
     if(dontcount)
@@ -229,7 +229,7 @@ putpromptchar(int doprint, int endchar)
 	    } else if (minus)
 		arg = -1;
 	    if (*fm == '(') {
-		int tc, otrunclen;
+		int tc, otruncwidth;
 
 		if (idigit(*++fm)) {
 		    arg = zstrtol(fm, &fm, 10);
@@ -334,14 +334,14 @@ putpromptchar(int doprint, int endchar)
 		    return 0;
 		fm++;
 		/* Don't do the current truncation until we get back */
-		otrunclen = trunclen;
-		trunclen = 0;
+		otruncwidth = truncwidth;
+		truncwidth = 0;
 		if (!putpromptchar(test == 1 && doprint, sep) || !*++fm ||
 		    !putpromptchar(test == 0 && doprint, ')')) {
-		    trunclen = otrunclen;
+		    truncwidth = otruncwidth;
 		    return 0;
 		}
-		trunclen = otrunclen;
+		truncwidth = otruncwidth;
 		continue;
 	    }
 	    if (!doprint)
@@ -973,14 +973,14 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	 * can be finished, backing up so that the new truncation
 	 * can be started afterwards.
 	 */
-	if (trunclen) {
+	if (truncwidth) {
 	    while (*--fm != '%')
 		;
 	    fm--;
 	    return 0;
 	}
 
-	trunclen = arg;
+	truncwidth = arg;
 	if (*fm != ']')
 	    fm++;
 	while (*fm && *fm != truncchar) {
@@ -996,6 +996,12 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	    *bp++ = '<';
 	}
 	ptr = buf + w;		/* addbufspc() may have realloc()'d buf */
+	/*
+	 * Now:
+	 *   buf is the start of the output prompt buffer
+	 *   ptr is the start of the truncation string
+	 *   bp is the end of the truncation string
+	 */
 	truncstr = ztrduppfx(ptr, bp - ptr);
 
 	bp = ptr;
@@ -1006,24 +1012,237 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	trunccount = 0;
 	ptr = buf + w;		/* putpromptchar() may have realloc()'d */
 	*bp = '\0';
+	/*
+	 * Now:
+	 *   ptr is the start of the truncation string and also
+	 *     where we need to start putting any truncated output
+	 *   bp is the end of the string we have just added, which
+	 *     may need truncating.
+	 */
 
+	/*
+	 * w below is screen width if multibyte support is enabled
+	 * (note that above it was a raw string pointer difference).
+	 * It's the full width of the string we may need to truncate.
+	 *
+	 * truncwidth has come from the user, so we interpret this
+	 * as a screen width, too.
+	 */
 	countprompt(ptr, &w, 0, -1);
-	if (w > trunclen) {
+	if (w > truncwidth) {
 	    /*
-	     * We need to truncate.  t points to the truncation string --
-	     * which is inserted literally, without nice representation.
-	     * tlen is its length, and maxlen is the amount of the main
-	     * string that we want to keep.  Note that if the truncation
-	     * string is longer than the truncation length (tlen >
-	     * trunclen), the truncation string is used in full.
+	     * We need to truncate.  t points to the truncation string
+	     * -- which is inserted literally, without nice
+	     * representation.  twidth is its printing width, and maxwidth
+	     * is the amount of the main string that we want to keep.
+	     * Note that if the truncation string is longer than the
+	     * truncation length (twidth > truncwidth), the truncation
+	     * string is used in full.
 	     *
 	     * TODO: we don't take account of multibyte characters
 	     * in the string we're truncating.
 	     */
 	    char *t = truncstr;
 	    int fullen = bp - ptr;
-	    int tlen = ztrlen(t), maxlen;
-	    maxlen = tlen < trunclen ? trunclen - tlen : 0;
+	    int twidth, maxwidth;
+#ifdef ZLE_UNICODE_SUPPORT
+	    int ntrunc = strlen(t);
+
+	    /* Use screen width of string */
+	    twidth = mb_width(t);
+	    if (twidth < truncwidth) {
+		maxwidth = truncwidth - twidth;
+		/*
+		 * It's not safe to assume there are no invisible substrings
+		 * just because the width is less than the full string
+		 * length since there may be multibyte characters.
+		 */
+		addbufspc(ntrunc+1);
+		/* may have realloc'd */
+		ptr = bp - fullen;
+
+		if (truncatleft) {
+		    /*
+		     * To truncate at the left, selectively copy
+		     * maxwidth bytes from the main prompt, preceeded
+		     * by the truncation string in full.
+		     *
+		     * We're overwriting the string containing the
+		     * text to be truncated, so copy it.  We've
+		     * just ensured there's sufficient space at the
+		     * end of the prompt string.
+		     *
+		     * Pointer into text to be truncated.
+		     */
+		    char *fulltextptr, *fulltext;
+		    int remw;
+		    mbstate_t mbs;
+
+		    fulltextptr = fulltext = bp;
+		    memmove(fulltext, ptr, fullen);
+		    fulltext[fullen] = '\0';
+
+		    /* Copy the truncstr into place. */
+		    while (*t)
+			*ptr++ = *t++;
+
+		    memset(&mbs, 0, sizeof(mbstate_t));
+
+		    /*
+		     * Find the point in the text at which we should
+		     * start copying, i.e. when the remaining width
+		     * is less than or equal to the maximum width.
+		     */
+		    remw = w;
+		    while (remw > maxwidth && *fulltextptr) {
+			if (*fulltextptr == Inpar) {
+			    /*
+			     * Text marked as invisible: copy
+			     * regardless, since we don't know what
+			     * this does but it shouldn't affect
+			     * the width.
+			     */
+			    for (;;) {
+				*ptr++ = *fulltextptr;
+				if (*fulltextptr == Outpar ||
+				    *fulltextptr == '\0')
+				    break;
+				fulltextptr++;
+			    }
+			} else {
+			    /*
+			     * Normal text: build up a multibyte character.
+			     */
+			    char inchar;
+			    wchar_t cc;
+			    int ret;
+
+			    /*
+			     * careful: string is still metafied (we
+			     * need that because we don't know a
+			     * priori when to stop and the resulting
+			     * string must be metafied).
+			     */
+			    if (*fulltextptr == Meta)
+				inchar = *++fulltextptr ^ 32;
+			    else
+				inchar = *fulltextptr;
+			    fulltextptr++;
+			    ret = mbrtowc(&cc, &inchar, 1, &mbs);
+
+			    if (ret != -2) {
+				/* complete */
+				if (ret <= 0) {
+				    /* assume a single-byte character */
+				    remw--;
+				    if (ret < 0) {
+					/* need to reset invalid state */
+					memset(&mbs, 0, sizeof(mbstate_t));
+				    }
+				} else {
+				    remw -= wcwidth(cc);
+				}
+			    }
+			}
+		    }
+
+		    /*
+		     * Now simply copy the rest of the text.  Still
+		     * metafied, so this is easy.
+		     */
+		    while (*fulltextptr)
+			*ptr++ = *fulltextptr++;
+		    /* Mark the end of copying */
+		    bp = ptr;
+		} else {
+		    /*
+		     * Truncating at the right is easier: just leave
+		     * enough characters until we have reached the
+		     * maximum width.
+		     */
+		    char *skiptext = ptr;
+		    mbstate_t mbs;
+
+		    memset(&mbs, 0, sizeof(mbstate_t));
+
+		    while (maxwidth > 0 && *skiptext) {
+			if (*skiptext == Inpar) {
+			    for (; *skiptext != Outpar && *skiptext;
+				 skiptext++);
+			} else {
+			    char inchar;
+			    wchar_t cc;
+			    int ret;
+
+			    if (*skiptext == Meta)
+				inchar = *++skiptext ^ 32;
+			    else
+				inchar = *skiptext;
+			    skiptext++;
+			    ret = mbrtowc(&cc, &inchar, 1, &mbs);
+
+			    if (ret != -2) {
+				/* complete or invalid character */
+				if (ret <= 0) {
+				    /* assume single byte */
+				    maxwidth--;
+				    if (ret < 0) {
+					/* need to reset invalid state */
+					memset(&mbs, 0, sizeof(mbstate_t));
+				    }
+				} else {
+				    maxwidth -= wcwidth(cc);
+				}
+			    }
+			}
+		    }
+		    /*
+		     * We don't need the visible text from now on,
+		     * but we'd better copy any invisible bits.
+		     * History dictates that these go after the
+		     * truncation string.  This is sensible since
+		     * they may, for example, turn off an effect which
+		     * should apply to all text at this point.
+		     *
+		     * Copy the truncstr.
+		     */
+		    ptr = skiptext;
+		    while (*t)
+			*ptr++ = *t++;
+		    bp = ptr;
+		    if (*skiptext) {
+			/* Move remaining text so we don't overwrite it */
+			memmove(bp, skiptext, strlen(skiptext)+1);
+			skiptext = bp;
+
+			/*
+			 * Copy anything we want, updating bp
+			 */
+			while (*skiptext) {
+			    if (*skiptext == Inpar) {
+				for (;;) {
+				    *bp++ = *skiptext;
+				    if (*skiptext == Outpar ||
+					*skiptext == '\0')
+					break;
+				    skiptext++;
+				}
+			    }
+			    else
+				skiptext++;
+			}
+		    }
+		}
+	    } else {
+		/* Just copy truncstr; no other text appears. */
+		while (*t)
+		    *ptr++ = *t++;
+		bp = ptr;
+	    }
+	    *bp = '\0';
+#else
+	    twidth = ztrlen(t);
+	    maxwidth = twidth < truncwidth ? truncwidth - twidth : 0;
 	    if (w < fullen) {
 		/* Invisible substrings, lots of shuffling. */
 		int n = strlen(t);
@@ -1035,6 +1254,13 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		    p = ptr + n;
 		    q = p;
 
+		    /*
+		     * I don't think we need n and the test below since
+		     * we must have enough space (we are using a subset
+		     * of the existing text with no repetition) and the
+		     * string is null-terminated, so I haven't copied it
+		     * to the ZLE_UNICODE_SUPPORT section.
+		     */
 		    n = fullen - w;
 
 		    /* Shift the whole string right, then *
@@ -1047,7 +1273,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 				--n;
 			    } while (*p++ != Outpar && *p && n);
 			else if (w) {
-			    if (--w < maxlen)
+			    if (--w < maxwidth)
 				*q++ = *p;
 			    ++p;
 			}
@@ -1058,11 +1284,11 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		    q = ptr + fullen;
 
 		    /* First skip over as much as will "fit". */
-		    while (w > 0 && maxlen > 0) {
+		    while (w > 0 && maxwidth > 0) {
 			if (*ptr == Inpar)
 			    while (*ptr++ != Outpar && *ptr) {;}
 			else
-			    ++ptr, --w, --maxlen;
+			    ++ptr, --w, --maxwidth;
 		    }
 		    if (ptr < q) {
 			/* We didn't reach the end of the string. *
@@ -1087,25 +1313,26 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		}
 	    } else {
 		/* No invisible substrings. */
-		if (tlen > fullen) {
-		    addbufspc(tlen - fullen);
+		if (twidth > fullen) {
+		    addbufspc(twidth - fullen);
 		    ptr = bp;	/* addbufspc() may have realloc()'d buf */
-		    bp += tlen - fullen;
+		    bp += twidth - fullen;
 		} else
-		    bp -= fullen - trunclen;
+		    bp -= fullen - truncwidth;
 		if (truncatleft) {
-		    if (maxlen)
-			memmove(ptr + strlen(t), ptr + fullen - maxlen,
-				maxlen);
+		    if (maxwidth)
+			memmove(ptr + strlen(t), ptr + fullen - maxwidth,
+				maxwidth);
 		} else
-		    ptr += maxlen;
+		    ptr += maxwidth;
 	    }
 	    /* Finally, copy the truncstr into place. */
 	    while (*t)
 		*ptr++ = *t++;
+#endif
 	}
 	zsfree(truncstr);
-	trunclen = 0;
+	truncwidth = 0;
 	/*
 	 * We may have returned early from the previous putpromptchar *
 	 * because we found another truncation following this one.    *
@@ -1116,7 +1343,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	if (*fm != endchar) {
 	    fm++;
 	    /*
-	     * With trunclen set to zero, we always reach endchar *
+	     * With truncwidth set to zero, we always reach endchar *
 	     * (or the terminating NULL) this time round.         *
 	     */
 	    if (!putpromptchar(doprint, endchar))
@@ -1132,7 +1359,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		fm++;
 	    fm++;
 	}
-	if (trunclen || !*fm)
+	if (truncwidth || !*fm)
 	    return 0;
     }
     return 1;
