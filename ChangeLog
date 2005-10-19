@@ -1,3 +1,7 @@
+2005-10-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Zle/zle_refresh.c: fixed a compiler warning.
+
 2005-10-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 21891: Functions/Zle/define-composed-chars, Doc/Zsh/contrib.yo:
