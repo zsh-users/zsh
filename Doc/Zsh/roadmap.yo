@@ -5,7 +5,7 @@ cindex(roadmap)
 The Zsh Manual, like the shell itself, is large and often complicated.
 This section of the manual provides some pointers to areas of the shell
 that are likely to be of particular interest to new users, and indicates
-where in the rest of the manual the documentation is to found.
+where in the rest of the manual the documentation is to be found.
 
 sect(When the shell starts)
 
@@ -38,7 +38,7 @@ is supplied for completions with many commonly used commands.  Note
 that the new completion system referred to as tt(compsys) is preferred
 over the older tt(compctl) system.  The completion system must be enabled
 explicitly when the shell starts.  For more information see
-ifzman(zmanref(zshcompssy))\
+ifzman(zmanref(zshcompsys))\
 ifnzman(noderef(Completion System)).
 
 Apart from completion, the line editor is highly extensible by means of

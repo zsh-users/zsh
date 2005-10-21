@@ -1,3 +1,7 @@
+2005-10-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Spotted by Mikael Magnusson, 21905: Doc/Zsh/roadmap.yo: typos.
+
 2005-10-21  Clint Adams  <clint@zsh.org>
 
 	* 21902: Completion/Unix/Command/_xmlsoft: update for
