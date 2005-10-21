@@ -1038,18 +1038,18 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	     * Note that if the truncation string is longer than the
 	     * truncation length (twidth > truncwidth), the truncation
 	     * string is used in full.
-	     *
-	     * TODO: we don't take account of multibyte characters
-	     * in the string we're truncating.
 	     */
 	    char *t = truncstr;
 	    int fullen = bp - ptr;
 	    int twidth, maxwidth;
-#ifdef ZLE_UNICODE_SUPPORT
 	    int ntrunc = strlen(t);
 
+#ifdef ZLE_UNICODE_SUPPORT
 	    /* Use screen width of string */
 	    twidth = mb_width(t);
+#else
+	    twidth = ztrlen(t);
+#endif
 	    if (twidth < truncwidth) {
 		maxwidth = truncwidth - twidth;
 		/*
@@ -1110,6 +1110,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 				fulltextptr++;
 			    }
 			} else {
+#ifdef ZLE_UNICODE_SUPPORT
 			    /*
 			     * Normal text: build up a multibyte character.
 			     */
@@ -1143,6 +1144,13 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 				    remw -= wcwidth(cc);
 				}
 			    }
+#else
+			    /* Single byte character */
+			    if (*fulltextptr == Meta)
+				fulltextptr++;
+			    fulltextptr++;
+			    remw--;
+#endif
 			}
 		    }
 
@@ -1170,6 +1178,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 			    for (; *skiptext != Outpar && *skiptext;
 				 skiptext++);
 			} else {
+#ifdef ZLE_UNICODE_SUPPORT
 			    char inchar;
 			    wchar_t cc;
 			    int ret;
@@ -1194,6 +1203,12 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 				    maxwidth -= wcwidth(cc);
 				}
 			    }
+#else
+			    if (*skiptext == Meta)
+				skiptext++;
+			    skiptext++;
+			    maxwidth--;
+#endif
 			}
 		    }
 		    /*
@@ -1240,96 +1255,6 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		bp = ptr;
 	    }
 	    *bp = '\0';
-#else
-	    twidth = ztrlen(t);
-	    maxwidth = twidth < truncwidth ? truncwidth - twidth : 0;
-	    if (w < fullen) {
-		/* Invisible substrings, lots of shuffling. */
-		int n = strlen(t);
-		char *p = ptr, *q = buf;
-		addbufspc(n);
-		ptr = buf + (p - q); /* addbufspc() may have realloc()'d */
-
-		if (truncatleft) {
-		    p = ptr + n;
-		    q = p;
-
-		    /*
-		     * I don't think we need n and the test below since
-		     * we must have enough space (we are using a subset
-		     * of the existing text with no repetition) and the
-		     * string is null-terminated, so I haven't copied it
-		     * to the ZLE_UNICODE_SUPPORT section.
-		     */
-		    n = fullen - w;
-
-		    /* Shift the whole string right, then *
-		     * selectively copy to the left.      */
-		    memmove(p, ptr, fullen);
-		    while (w > 0 || n > 0) {
-			if (*p == Inpar)
-			    do {
-				*q++ = *p;
-				--n;
-			    } while (*p++ != Outpar && *p && n);
-			else if (w) {
-			    if (--w < maxwidth)
-				*q++ = *p;
-			    ++p;
-			}
-		    }
-		    bp = q;
-		} else {
-		    /* Truncate on the right, selectively */
-		    q = ptr + fullen;
-
-		    /* First skip over as much as will "fit". */
-		    while (w > 0 && maxwidth > 0) {
-			if (*ptr == Inpar)
-			    while (*ptr++ != Outpar && *ptr) {;}
-			else
-			    ++ptr, --w, --maxwidth;
-		    }
-		    if (ptr < q) {
-			/* We didn't reach the end of the string. *
-			 * In case there are more invisible bits, *
-			 * insert the truncstr and keep looking.  */
-			memmove(ptr + n, ptr, q - ptr);
-			q = ptr + n;
-			while (*t)
-			    *ptr++ = *t++;
-			while (*q) {
-			    if (*q == Inpar)
-				do {
-				    *ptr++ = *q;
-				} while (*q++ != Outpar && *q);
-			    else
-				++q;
-			}
-			bp = ptr;
-			*bp = 0;
-		    } else
-			bp = ptr + n;
-		}
-	    } else {
-		/* No invisible substrings. */
-		if (twidth > fullen) {
-		    addbufspc(twidth - fullen);
-		    ptr = bp;	/* addbufspc() may have realloc()'d buf */
-		    bp += twidth - fullen;
-		} else
-		    bp -= fullen - truncwidth;
-		if (truncatleft) {
-		    if (maxwidth)
-			memmove(ptr + strlen(t), ptr + fullen - maxwidth,
-				maxwidth);
-		} else
-		    ptr += maxwidth;
-	    }
-	    /* Finally, copy the truncstr into place. */
-	    while (*t)
-		*ptr++ = *t++;
-#endif
 	}
 	zsfree(truncstr);
 	truncwidth = 0;

@@ -413,11 +413,7 @@ snextline(Rparams rpms)
     rpms->sen = rpms->s + winw;
 }
 
-/*
- * TODO currently it assumes sceenwidth 1 for every character
- * (except for characters in the prompt which are correctly handled
- * by wcwidth()).
- */
+
 /**/
 mod_export void
 zrefresh(void)

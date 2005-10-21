@@ -1,5 +1,10 @@
 2005-10-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 21906: Src/prompt.c, Src/zle_refresh.c: use modified
+	multibyte truncation code for single byte truncation, fixing
+	a bug with long truncation indicators; remove a couple of
+	outmoded TODOs.
+
 	* Spotted by Mikael Magnusson, 21905: Doc/Zsh/roadmap.yo: typos.
 
 2005-10-21  Clint Adams  <clint@zsh.org>
