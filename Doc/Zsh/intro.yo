@@ -1,4 +1,4 @@
-texinode(Introduction)(Invocation)(The Z Shell Manual)(Top)
+texinode(Introduction)(Roadmap)(The Z Shell Manual)(Top)
 chapter(Introduction)
 cindex(introduction)
 ifzman(\
@@ -15,6 +15,7 @@ startlist()
 ifzshone(\
 list(em(zsh)          Zsh overview (this section))
 )\
+list(em(zshroadmap)   Informal introduction to the manual)
 list(em(zshmisc)      Anything not fitting into the other sections)
 list(em(zshexpn)      Zsh command and parameter expansion)
 list(em(zshparam)     Zsh parameters)

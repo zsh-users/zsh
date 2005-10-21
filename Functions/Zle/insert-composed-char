@@ -147,8 +147,22 @@ if (( ${+zsh_accented_chars} == 0 )); then
   unfunction define-composed-chars
 fi
 
-read -k basechar || return 1
-read -k accent || return 1
+if (( $# )); then
+  basechar=${1[1]}
+  if [[ $1 = ? ]]; then
+    shift
+  else
+    1=${1[2,-1]}
+  fi
+else
+  read -k basechar || return 1
+fi
+
+if (( $# )); then
+  accent=${1[1]}
+else
+  read -k accent || return 1
+fi
 
 local -A charmap
 charmap=(${=zsh_accented_chars[$accent]})

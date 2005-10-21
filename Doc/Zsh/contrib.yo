@@ -671,6 +671,13 @@ together form a mnemonic for the character to be inserted.  The
 two-character codes are a subset of those given by RFC 1345 (see for
 example tt(http://www.faqs.org/rfcs/rfc1345.html)).
 
+The function may optionally be followed by up to two characters which
+replace one or both of the characters read from the keyboard; if both
+characters are supplied, no input is read.  For example,
+tt(insert-composed-char a:) can be used within a widget to insert an a with
+umlaut into the command line.  This has the advantages over use of a
+literal character that it is more portable.
+
 For best results zsh should have been built with support for multibyte
 characters (configured with tt(--enable-multibyte)); however, the function
 works for the limited range of characters available in single-byte

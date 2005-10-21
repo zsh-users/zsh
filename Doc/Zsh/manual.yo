@@ -14,6 +14,7 @@ Version version(), last updated date().
 startmenu()
 menu(The Z Shell Manual)
 menu(Introduction)
+menu(Roadmap)
 menu(Invocation)
 menu(Files)
 menu(Shell Grammar)

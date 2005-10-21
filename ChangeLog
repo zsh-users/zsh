@@ -1,3 +1,14 @@
+2005-10-21  Peter Stephenson  <pws@csr.com>
+
+	* 21899: Doc/.distfiles, Doc/Makefile.in, Doc/zsh.yo,
+	Doc/zshroadmap.yo, Doc/Zsh/.distfiles, Doc/Zsh/intro.yo,
+	Doc/Zsh/invoke.yo, Doc/Zsh/manual.yo, Doc/Zsh/roadmap.yo:
+	Add "roadmap" section to manual for new users to get
+	acquainted.
+
+	* 21898: Functions/Zle/insert-composed-char, Doc/Zsh/contrib.yo:
+	insert-composed-char can take a command line argument.
+
 2005-10-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Zle/zle_refresh.c: fixed a compiler warning.

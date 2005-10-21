@@ -44,6 +44,7 @@ texiendtitlepage()
 )\
 ifnzman(includefile(Zsh/manual.yo))
 includefile(Zsh/intro.yo)
+ifnzman(includefile(Zsh/roadmap.yo))
 includefile(Zsh/invoke.yo)
 includefile(Zsh/files.yo)
 ifnzman(includefile(Zsh/grammar.yo))
@@ -69,6 +70,7 @@ ifnzman(includefile(Zsh/contrib.yo))
 ifzshall(\
 def(source)(1)(NOTRANS(.so )man1/ARG1NOTRANS(.)1)\
 CMT()
+source(zshroadmap)
 source(zshmisc)
 source(zshexpn)
 source(zshparam)

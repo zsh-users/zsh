@@ -47,7 +47,8 @@ TEXI2HTML = texi2html --output . --ifinfo --split=chapter
 # man pages to install
 MAN = zsh.1 zshbuiltins.1 zshcompctl.1 zshcompwid.1 zshcompsys.1 \
 zshcontrib.1 zshexpn.1 zshmisc.1 zshmodules.1 \
-zshoptions.1 zshparam.1 zshtcpsys.1 zshzftpsys.1 zshzle.1 zshall.1
+zshoptions.1 zshparam.1 zshroadmap.1 zshtcpsys.1 zshzftpsys.1 zshzle.1 \
+zshall.1
 
 # yodl documentation
 
@@ -193,6 +194,8 @@ zshmodules.1: Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo $(MODDOCSRC)
 zshoptions.1: Zsh/options.yo
 
 zshparam.1: Zsh/params.yo
+
+zshroadmap.1: Zsh/roadmap.yo
 
 zshtcpsys.1: Zsh/tcpsys.yo
 
