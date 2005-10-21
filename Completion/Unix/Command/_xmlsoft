@@ -1,6 +1,6 @@
 #compdef xsltproc xmllint -value-,XML_CATALOG_FILES,-default-
 
-# xmllint: using libxml version 20602
+# xmllint: using libxml version 20622
 # xsltproc: using libxslt version 10100
 
 case $service in
@@ -63,8 +63,12 @@ case $service in
       '--recover[output what was parsable on broken XML documents]' \
       '--noent[substitute entity references by their value]' \
       "(--output -o)--noout[don't output the result tree]" \
+      '--path[provide a set of paths for resources]:paths:_files -/' \
+      '--load-trace[print trace of all external entites loaded]' \
+      '--nonet[refuse to fetch DTDs or entities over network]' \
       '--htmlout[output results as HTML]' \
       '--nowrap[do not put HTML doc wrapper]' \
+      '--nocompact[do not generate compact text nodes]' \
       '--valid[validate the document in addition to std well-formed check]' \
       '(--dtdvalid --relaxng --schema)--postvalid[do a posteriori validation, i.e after parsing]' \
       '(--postvalid --relaxng --schema --dtdvalidfpi)--dtdvalid[do a posteriori validation against a given DTD]:DTD:_webbrowser' \
@@ -78,25 +82,33 @@ case $service in
       '--xmlout[use the XML serializer when using --html]' \
       '--push[use the push mode of the parser]' \
       '--memory[parse from memory]' \
+      '--maxmem[imits memory allocation]:bytes' \
       '--nowarning[do not emit warnings from parser/validator]' \
       '--noblanks[drop (ignorable?) blanks spaces]' \
       '--nocdata[replace cdata section with text nodes]' \
       '--format[reformat/reindent the input]' \
       '--encode[output in the given encoding]:encoding:(${encoding[@]})' \
       '--dropdtd[remove the DOCTYPE of the input docs]' \
+      '--c14n[save in W3C canonical format]' \
+      '--exc-c14n[save in W3C exclusive canonical format]' \
       '--nsclean[remove redundant namespace declarations]' \
       '--testIO[test user I/O support]' \
       '(--nocatalogs)--catalogs[use SGML catalogs]' \
       '(--catalogs)--nocatalogs[deactivate all catalogs]' \
       '--auto[generate a small doc on the fly]' \
-      '--xinclude[do XInclude processing]' \
+      '(--noxincludenode)--xinclude[do XInclude processing]' \
+      '(--xinclude)--noxincludenode[do XInclude processing but do not generate XInclude nodes]' \
       '--loaddtd[fetch external DTD]' \
       '--dtdattr[loaddtd + populate the tree with inherited attributes]' \
       '--stream[use the streaming interface to process very large files]' \
       '--walker[create a reader and walk though the resulting doc]' \
+      '--pattern[test the pattern support]:pattern value' \
       '--chkregister[verify the node registration code]' \
       '(--dtdvalid --postvalid --schema)--relaxng[do RelaxNG validation against specified schema]:schema:_webbrowser' \
       '(--dtdvalid --postvalid --relaxng)--schema[do validation against specified WXS schema]:schema:_webbrowser' \
+      '(--dtdvalid --postvalid --relaxng)--schematron[do validation against specified schematron]:schema:_webbrowser' \
+      '--sax1[use the old SAX1 interfaces for processing]' \
+      '--sax[do not build a tree but work just at the SAX level]' \
       '*:XML file:_webbrowser' && return
   ;;
   *XML_CATALOG_FILES*)
