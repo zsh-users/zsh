@@ -5,10 +5,9 @@
 
 2005-10-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* unposted, yet, owing to email outage, but c.f. 21907:
-	abnormal return from insertlastword() didn't unmetafy the line;
-	add extra UNMETACHECK() to pick up problems early from zle
-	within widget.
+	* 21910:  abnormal return from insertlastword() didn't unmetafy
+	the line; add extra UNMETACHECK() to pick up problems early from
+	zle within widget.
 
 2005-10-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
