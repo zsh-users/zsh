@@ -1076,7 +1076,10 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		     */
 		    char *fulltextptr, *fulltext;
 		    int remw;
+#ifdef ZLE_UNICODE_SUPPORT
 		    mbstate_t mbs;
+		    memset(&mbs, 0, sizeof(mbstate_t));
+#endif
 
 		    fulltextptr = fulltext = ptr + ntrunc;
 		    memmove(fulltext, ptr, fullen);
@@ -1085,8 +1088,6 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		    /* Copy the truncstr into place. */
 		    while (*t)
 			*ptr++ = *t++;
-
-		    memset(&mbs, 0, sizeof(mbstate_t));
 
 		    /*
 		     * Find the point in the text at which we should
@@ -1169,9 +1170,10 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		     * maximum width.
 		     */
 		    char *skiptext = ptr;
+#ifdef ZLE_UNICODE_SUPPORT
 		    mbstate_t mbs;
-
 		    memset(&mbs, 0, sizeof(mbstate_t));
+#endif
 
 		    while (maxwidth > 0 && *skiptext) {
 			if (*skiptext == Inpar) {

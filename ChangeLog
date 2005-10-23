@@ -1,3 +1,8 @@
+2005-10-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Src/prompt.c: fix --disable-multibyte compile error
+	introduced by 21906.
+
 2005-10-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted, yet, owing to email outage, but c.f. 21907:
@@ -57,7 +62,7 @@
 	* 21882: Src/prompt.c, Src/utils.c, Test/D01prompt.ztst: extend
 	prompt truncation to handle multibyte characters.
 
-2005-10-17  Bart Schaefer  <schaefer@brasslantern.com>
+2005-10-17  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21880: Completion/compinit: explicitly set IFS to the usual
 	default string, plus carriage return, in case the surrounding
