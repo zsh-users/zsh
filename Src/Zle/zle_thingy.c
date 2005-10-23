@@ -358,6 +358,8 @@ bin_zle(char *name, char **args, Options ops, UNUSED(int func))
     struct opn const *op, *opp;
     int n;
 
+    UNMETACHECK();
+
     /* select operation and ensure no clashing arguments */
     for(op = opns; op->o && !OPT_ISSET(ops,STOUC(op->o)); op++) ;
     if(op->o)

@@ -577,13 +577,17 @@ insertlastword(char **args)
 	 * a deleted word, because that can only have come
 	 * from a non-empty line.  I think.
 	 */
-	if (!(l = bufferwords(NULL, NULL, NULL)))
+	if (!(l = bufferwords(NULL, NULL, NULL))) {
+	    unmetafy_line();
 	    return 1;
+	}
 	nwords = countlinknodes(l);
     } else {
 	/* Some stored line. */
-	if (!(he = quietgethist(evhist)) || !he->nwords)
+	if (!(he = quietgethist(evhist)) || !he->nwords) {
+	    unmetafy_line();
 	    return 1;
+	}
 	nwords = he->nwords;
     }
     if (wordpos) {
@@ -602,6 +606,7 @@ insertlastword(char **args)
 	 * has not changed, and lastinsert is still valid.
 	 */
 	lasthist = evhist;
+	unmetafy_line();
 	return 1;
     }
     /*
