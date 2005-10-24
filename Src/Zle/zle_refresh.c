@@ -608,7 +608,7 @@ zrefresh(void)
     rpms.sen = *nbuf + winw;
     for (; t < tmpline+tmpll; t++) {
 	if (t == scs)			/* if cursor is here, remember it */
-	    rpms.nvcs = rpms.s - (nbuf[rpms.nvln = rpms.ln]);
+	    rpms.nvcs = rpms.s - nbuf[rpms.nvln = rpms.ln];
 
 	if (*t == ZWC('\n')){		/* newline */
 	    /* text not wrapped */
@@ -627,33 +627,33 @@ zrefresh(void)
 	}
 #ifdef ZLE_UNICODE_SUPPORT
 	else if (iswprint(*t)) {
-	    int width = wcwidth(*t), break2 = 0;
-	    *rpms.s++ = *t;
-	    while (--width > 0) {
+	    int width = wcwidth(*t);
+	    if (width > rpms.sen - rpms.s) {
 		/*
-		 * Character is wider than a single position.
-		 * Put WEOF into the positions above 1 as placeholders.
-		 * This keeps the indexing into the video buffer correct.
+		 * Too wide to fit.  Insert spaces to end of current line.
 		 */
-		if (rpms.s == rpms.sen) {
-		    /*
-		     * Text wrapped.
-		     *
-		     * TODO: hmm, what is the terminal emulator going to
-		     * do?  Let's assume some kind of automatic margin
-		     * behaviour, implying we continue the procedure on the
-		     * next line.  Wrapping behaviour has always been
-		     * problematic.  I foresee interesting times...
-		     */
-		    if (nextline(&rpms, 1)) {
-			break2 = 1;
-			break;
-		    }
+		do {
+		    *rpms.s++ = ZWC(' ');
+		} while (rpms.s < rpms.sen);
+		if (nextline(&rpms, 1))
+		    break;
+		if (t == scs) {
+		    /* Update cursor to this point */
+		    rpms.nvcs = rpms.s - nbuf[rpms.nvln = rpms.ln];
 		}
-		*rpms.s++ = WEOF;
 	    }
-	    if (break2)
-		break;
+	    if (width > rpms.sen - rpms.s) {
+		/*
+		 * The screen width is too small to fit even one
+		 * occurrence.
+		 */
+		*rpms.s++ = ZWC('?');
+	    } else {
+		/* We can fit it without reaching the end of the line. */
+		*rpms.s++ = *t;
+		while (--width > 0)
+		    *rpms.s++ = WEOF;
+	    }
 	}
 #endif
 	else if (ZC_icntrl(*t)) {	/* other control character */
@@ -701,14 +701,20 @@ zrefresh(void)
 #ifdef ZLE_UNICODE_SUPPORT
 	    if (iswprint(*u)) {
 		int width = wcwidth(*u);
-		*rpms.s++ = *u;
-		while (--width > 0) {
-		    /* Wide character, handled as above */
-		    if (rpms.s == rpms.sen) {
-			nbuf[rpms.ln][winw + 1] = ZWC('\n');
-			snextline(&rpms);
-		    }
-		    *rpms.s++ = WEOF;
+		/* Handle wide characters as above */
+		if (width > rpms.sen - rpms.s) {
+		    do {
+			*rpms.s++ = ZWC(' ');
+		    } while (rpms.s < rpms.sen);
+		    nbuf[rpms.ln][winw + 1] = ZWC('\n');
+		    snextline(&rpms);
+		}
+		if (width > rpms.sen - rpms.s) {
+		    *rpms.s++ = ZWC('?');
+		} else {
+		    *rpms.s++ = *u;
+		    while (--width > 0)
+			*rpms.s++ = WEOF;
 		}
 	    }
 	    else

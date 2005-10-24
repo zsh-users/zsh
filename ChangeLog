@@ -1,3 +1,8 @@
+2005-10-24  Peter Stephenson  <pws@csr.com>
+
+	* 21930: Src/Zle/zle_refresh.c: handle extra-wide characters at
+	end of line by adding spaces.
+
 2005-10-24  Clint Adams  <clint@zsh.org>
 
 	* 21912: Src/Modules/cap.c: silence unused parameter
