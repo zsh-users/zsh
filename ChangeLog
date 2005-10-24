@@ -1,5 +1,7 @@
 2005-10-24  Peter Stephenson  <pws@csr.com>
 
+	* 21931: 21913 means _hosts shouldn't complete for ping.
+
 	* 21930: Src/Zle/zle_refresh.c: handle extra-wide characters at
 	end of line by adding spaces.
 
