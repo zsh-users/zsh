@@ -1,3 +1,8 @@
+2005-10-24  Clint Adams  <clint@zsh.org>
+
+	* 21912: Src/Modules/cap.c: silence unused parameter
+	compile warnings.
+
 2005-10-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/prompt.c: fix --disable-multibyte compile error
