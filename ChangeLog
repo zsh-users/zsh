@@ -3,6 +3,9 @@
 	* 21912: Src/Modules/cap.c: silence unused parameter
 	compile warnings.
 
+	* 21913: Completion/Unix/Command/_ping: completion
+	for ping.
+
 2005-10-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/prompt.c: fix --disable-multibyte compile error

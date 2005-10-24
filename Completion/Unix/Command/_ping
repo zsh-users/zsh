@@ -1,0 +1,63 @@
+#compdef ping
+
+if _pick_variant iputils=iputils unix -V; then
+              
+  _arguments \
+    '-a[audible]' \
+    '-A[adaptive]' \
+    '-b[allow pinging a broadcast address]' \
+    '-B[do not allow ping to change source address]' \
+    '-c:count' \
+    '-d[set SO_DEBUG on the socket]' \
+    '-f[flood ping]' \
+    '-i:interval in seconds' \
+    '-I:iface:_net_interfaces' \
+    '-l:preload number' \
+    '-L[suppress loopback of multicast packets]' \
+    '-n[numeric output only]' \
+    '-p:padding pattern' \
+    '-Q:QoS TOS bits' \
+    '-q[quiet]' \
+    '-r[bypass normal routing tables]' \
+    '-R[record route]' \
+    '-s:packet size in bytes' \
+    '-S:sndbuf' \
+    '-t:timeout in seconds' \
+    '-T:timestamp option:(tsonly tsandaddr tsprespec)' \
+    '-M:Path MTU Discovery strategy:((do\:prohibit\ fragmentation want\:fragment\ locally dont\:do\ not\ set\ DF\ flag))' \
+    '-U[print full user-to-user latency]' \
+    '-v[verbose]' \
+    '-w:deadline in seconds' \
+    '-W:seconds to wait for a response' \
+    ':host:_hosts'
+
+else
+
+# FreeBSD 4.11
+
+  _arguments \
+    '-A[audible for no packet]' \
+    '-Q[somewhat quiet]' \
+    '-R[record route]' \
+    '-a[audible for each packet]' \
+    '-d[set SO_DEBUG on the socket]' \
+    '-f[flood ping]' \
+    '-n[numeric output only]' \
+    '-q[quiet]' \
+    '-r[bypass normal routing tables]' \
+    '-v[verbose]' \
+    '-c:count' \
+    '-i:wait seconds' \
+    '-l:preload number' \
+    '-m:ttl' \
+    '-p:padding pattern' \
+    '-P:IPsec policy' \
+    '-s:packet size in bytes' \
+    '-S:src addr' \
+    '-t:timeout in seconds' \
+    '-L[suppress loopback of multicast packets]' \
+    '-I:iface:_net_interfaces' \
+    '-T:ttl for multicasted packets' \
+    ':host:_hosts'
+
+fi
