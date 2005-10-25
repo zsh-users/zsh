@@ -1138,6 +1138,12 @@ refreshline(int ln)
 			tc_delchars(i);
 			ol += i;
 			char_ins -= i;
+#ifdef ZLE_UNICODE_SUPPORT
+			while (*ol == WEOF) {
+			    ol++;
+			    char_ins--;
+			}
+#endif
 			i = 0;
 			break;
 		    }
