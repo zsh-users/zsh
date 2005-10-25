@@ -44,12 +44,21 @@ local -a match mbegin mend
 suffix=$match[1]
 context=":mime:.${suffix}:"
 
-local handler flags
+local handler flags no_sh no_bg
 
 zstyle -s $context handler handler ||
   handler="${zsh_mime_handlers[$suffix]}"
 zstyle -s $context flags flags ||
   flags="${zsh_mime_flags[$suffix]}"
+
+# Set to yes if we use eval instead of sh -c for complicated mailcap lines
+# Can possibly break some mailcap entries which expect sh compatibility,
+# is faster, as a new process is not spawned.
+zstyle -T $context current-shell && no_sh=yes
+
+# Set to yes if the process shouldn't be backgrounded even if it doesn't need a
+# terminal and display is set.
+zstyle -T $context never-background && no_bg=yes
 
 local -a files
 local hasmeta stdin
@@ -82,7 +91,11 @@ if [[ $handler = *%s* ]]; then
       files=(${(q)argv})
       zformat -f command $handler s:"$files"
     fi
-    execargs=(sh -c $command)
+    if [[ $no_sh = yes ]]; then
+      execargs=(eval $command)
+    else
+      execargs=(sh -c $command)
+    fi
   else
     # Simple command, one filename.
     # Split and add the file without extra quoting,
@@ -95,7 +108,7 @@ if [[ $handler = *%s* ]]; then
 else
   # If there's no %s, the input is supposed to come from stdin.
   stdin=1
-  if [[ -n $hasmeta ]]; then
+  if [[ -n $hasmeta && $no_sh != yes ]]; then
     execargs=(sh -c "$handler")
   else
     execargs=(${=handler})
@@ -113,7 +126,7 @@ if [[ $flags = *copiousoutput* ]]; then
   else
     $execargs | eval ${PAGER:-more}
   fi
-elif [[ $flags = *needsterminal* || -z $DISPLAY ]]; then
+elif [[ $no_bg = yes || $flags = *needsterminal* || -z $DISPLAY ]]; then
   # Needs a terminal, so run synchronously.
   # Obviously, if $DISPLAY is empty but the handler needs a
   # GUI we are in trouble anyway.  However, it's possible for

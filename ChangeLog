@@ -1,3 +1,11 @@
+2005-10-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 21935: Documentation for 21933.
+
+	* 21933: R. Ramkumar <ramk@cse.iitm.ernet.in>:
+	Functions/MIME/zsh-mime-handler, Functions/MIME/zsh-mime-setup:
+	add three styles to the MIME system.
+
 2005-10-24  Peter Stephenson  <pws@csr.com>
 
 	* 21931: 21913 means _hosts shouldn't complete for ping.
