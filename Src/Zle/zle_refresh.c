@@ -1138,8 +1138,10 @@ refreshline(int ln)
 
     /* inserting & deleting chars: we can if there's no right-prompt */
 	if ((ln || !put_rpmpt || !oput_rpmpt) 
-	    && (nl[1] && ol[1] && nl[1] != ol[1])
-	    && *ol != WEOF && *nl != WEOF) { 
+#ifdef MULTIBYTE_SUPPORT
+	    && *ol != WEOF && *nl != WEOF
+#endif
+	    && nl[1] && ol[1] && nl[1] != ol[1]) { 
 
 	/* deleting characters - see if we can find a match series that
 	   makes it cheaper to delete intermediate characters
