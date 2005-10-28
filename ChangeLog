@@ -1,7 +1,7 @@
 2005-10-28  Clint Adams  <clint@zsh.org>
 
-	* 21946: Completion/Unix/Command/_gcc: update options
-	for ia32, amd64.
+	* 21946, 21947: Completion/Unix/Command/_gcc: update
+	options for ia32, amd64, and sparc.
 
 2005-10-28  Peter Stephenson  <pws@csr.com>
 

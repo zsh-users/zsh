@@ -166,14 +166,30 @@ i960)
   ;;
 sparc)
   args=(
-    -mapp-regs -mcypress -mepilogue -mflat -mfpu -mhard-float
-    -mhard-quad-float -mno-app-regs -mno-flat -mno-fpu
-    -mno-epilogue -mno-unaligned-doubles
-    -msoft-float -msoft-quad-float
-    -msparclite -msupersparc -munaligned-doubles -mv8
+    -mapp-regs -mno-app-regs
+    -mfpu -mhard-float
+    -mno-fpu -msoft-float
+    -mhard-quad-float
+    -msoft-quad-float
+    -mno-unaligned-doubles
+    -munaligned-doubles
+    -mfaster-structs -mno-faster-structs
+    -mimpure-text
+    '-mcpu=:CPU type:(v7 cypress v8 supersparc sparclite f930 f934 hypersparc sparclite86x sparclet tsc701 v9 ultrasparc ultrasparc3)'
+    '-mtune=:CPU type:(cypress supersparc hypersparc f930 f934 sparclite86x tsc701 ultrasparc ultrasparc3)'
+    -mv8plus -mno-v8plus
+    -mvis -mno-vis
+    -mlittle-endian
+    -m32 -m64
+    '-mcmodel=:memory model:(medlow medmid medany embmedany)'
+    -mstack-bias -mno-stack-bias
+    -mv8
+    -mcypress -mepilogue -mflat
+    -mno-flat
+    -mno-epilogue
+    -msparclite -msupersparc
     -mmedlow -mmedany
     -mint32 -mint64 -mlong32 -mlong64
-    -mno-stack-bias -mstack-bias
   )
   ;;
 alpha*)
