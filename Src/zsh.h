@@ -1432,7 +1432,7 @@ struct histent {
 
     Histent up;			/* previous line (moving upward)    */
     Histent down;		/* next line (moving downward)      */
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     wchar_t *zle_text;		/* the edited history line          */
 #else
     unsigned char *zle_text;	/* the edited history line          */
@@ -1928,3 +1928,7 @@ typedef unsigned char *(*ZleGetLineFn) _((int *, int *));
 #define EXITHOOK       (zshhooks + 0)
 #define BEFORETRAPHOOK (zshhooks + 1)
 #define AFTERTRAPHOOK  (zshhooks + 2)
+
+#ifdef MULTIBYTE_SUPPORT
+#define nicezputs(str, outs)	(void)mb_niceformat((str), (outs), NULL, 0)
+#endif

@@ -35,7 +35,7 @@
 /**/
 char *scriptname;
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 /*
  * The wordchars variable turned into a wide character array.
  * This is much more convenient for testing.
@@ -156,7 +156,11 @@ zerrmsg(const char *fmt, const char *str, int num)
 		putc('%', stderr);
 		break;
 	    case 'c':
+#ifdef MULTIBYTE_SUPPORT
+		zputs(wcs_nicechar(num, NULL, NULL), stderr);
+#else
 		zputs(nicechar(num), stderr);
+#endif
 		break;
 	    case 'e':
 		/* print the corresponding message for this errno */
@@ -219,6 +223,10 @@ putshout(int c)
  * Note that the returned string is metafied, so that it must be
  * treated like any other zsh internal string (and not, for example,
  * output directly).
+ *
+ * This function is used even if MULTIBYTE_SUPPORT is defined: we
+ * use it as a fallback in case we couldn't identify a wide character
+ * in a multibyte string.
  */
 
 /**/
@@ -270,7 +278,7 @@ nicechar(int c)
 }
 
 /**/
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 /*
  * The number of bytes we need to allocate for a "nice" representation
  * of a multibyte character.
@@ -380,7 +388,7 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     return buf;
 }
 /**/
-#endif /* ZLE_UNICODE_SUPPORT */
+#endif /* MULTIBYTE_SUPPORT */
 
 
 /* Output a string's visible representation. */
@@ -393,19 +401,6 @@ nicefputs(char *s, FILE *f)
 	zputs(nicechar(STOUC(*s)), f);
 }
 #endif
-
-/* Return the length of the visible representation of a string. */
-
-/**/
-size_t
-nicestrlen(char *s)
-{
-    size_t l = 0;
-
-    for (; *s; s++)
-	l += strlen(nicechar(STOUC(*s)));
-    return l;
-}
 
 /* get a symlink-free pathname for s relative to PWD */
 
@@ -2542,7 +2537,7 @@ inittyptab(void)
 	typtab[t0] = IDIGIT | IALNUM | IWORD | IIDENT | IUSER;
     for (t0 = 'a'; t0 <= 'z'; t0++)
 	typtab[t0] = typtab[t0 - 'a' + 'A'] = IALPHA | IALNUM | IIDENT | IUSER | IWORD;
-#ifndef ZLE_UNICODE_SUPPORT
+#ifndef MULTIBYTE_SUPPORT
     /*
      * This really doesn't seem to me the right thing to do when
      * we have multibyte character support...  it was a hack to assume
@@ -2575,7 +2570,7 @@ inittyptab(void)
 	}
 	typtab[STOUC(*s == Meta ? *++s ^ 32 : *s)] |= ISEP;
     }
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     if (wordchars) {
 	char *wordchars_unmeta;
 	const char *wordchars_ptr;
@@ -2602,7 +2597,7 @@ inittyptab(void)
 #endif
     for (s = wordchars ? wordchars : DEFAULT_WORDCHARS; *s; s++) {
 	int c = STOUC(*s == Meta ? *++s ^ 32 : *s);
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	if (!isascii(c)) {
 	    /*
 	     * If we have support for multibyte characters, we don't
@@ -2623,7 +2618,7 @@ inittyptab(void)
 }
 
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 /*
  * iword() macro extended to support wide characters.
  */
@@ -2715,7 +2710,7 @@ zarrdup(char **s)
 }
 
 /**/
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 /**/
 mod_export wchar_t **
 wcs_zarrdup(wchar_t **s)
@@ -2729,7 +2724,7 @@ wcs_zarrdup(wchar_t **s)
     return y;
 }
 /**/
-#endif /* ZLE_UNICODE_SUPPORT */
+#endif /* MULTIBYTE_SUPPORT */
 
 /**/
 static char *
@@ -3329,6 +3324,7 @@ zputs(char const *s, FILE *stream)
     return 0;
 }
 
+#ifndef MULTIBYTE_SUPPORT
 /* Create a visibly-represented duplicate of a string. */
 
 /**/
@@ -3356,6 +3352,7 @@ nicedup(char const *s, int heap)
     *p = '\0';
     return heap ? dupstring(buf) : ztrdup(buf);
 }
+#endif
 
 /**/
 mod_export char *
@@ -3364,6 +3361,8 @@ nicedupstring(char const *s)
     return nicedup(s, 1);
 }
 
+
+#ifndef MULTIBYTE_SUPPORT
 /* Unmetafy and output a string, displaying special characters readably. */
 
 /**/
@@ -3387,6 +3386,7 @@ nicezputs(char const *s, FILE *stream)
     return 0;
 }
 
+
 /* Return the length of the visible representation of a metafied string. */
 
 /**/
@@ -3409,9 +3409,11 @@ niceztrlen(char const *s)
     }
     return l;
 }
+#endif
+
 
 /**/
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 /*
  * Version of both nicezputs() and niceztrlen() for use with multibyte
  * characters.  Input is a metafied string; output is the screen width of
@@ -3421,11 +3423,13 @@ niceztrlen(char const *s)
  *
  * If outstrp is not NULL, set *outstrp to a zalloc'd version of
  * the output (still metafied).
+ *
+ * If "heap" is non-zero, use the heap for *outstrp, else zalloc.
  */
 
 /**/
 mod_export size_t
-mb_niceformat(const char *s, FILE *stream, char **outstrp)
+mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
 {
     size_t l = 0, newl, ret;
     int umlen, outalloc, outleft;
@@ -3500,7 +3504,7 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp)
     if (outstrp) {
 	*outptr = '\0';
 	/* Use more efficient storage for returned string */
-	*outstrp = ztrdup(outstr);
+	*outstrp = heap ? dupstring(outstr) : ztrdup(outstr);
 	free(outstr);
     }
 
@@ -3511,11 +3515,11 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp)
 
 /**/
 mod_export char *
-mb_niceztrdup(const char *s)
+nicedup(const char *s, int heap)
 {
     char *retstr;
 
-    (void)mb_niceformat(s, NULL, &retstr);
+    (void)mb_niceformat(s, NULL, &retstr, heap);
 
     return retstr;
 }
@@ -3564,7 +3568,7 @@ mb_width(const char *s)
 }
 
 /**/
-#endif /* ZLE_UNICODE_SUPPORT */
+#endif /* MULTIBYTE_SUPPORT */
 
 /* check for special characters in the string */
 

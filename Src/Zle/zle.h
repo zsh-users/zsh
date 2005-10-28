@@ -27,7 +27,7 @@
  *
  */
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 typedef wchar_t ZLE_CHAR_T;
 typedef wchar_t *ZLE_STRING_T;
 typedef wint_t   ZLE_INT_T;
@@ -67,9 +67,7 @@ typedef wint_t   ZLE_INT_T;
  * Functions that operate on a metafied string.
  * These versions handle multibyte characters.
  */
-#define ZMB_nicewidth(s)	mb_niceformat(s, NULL, NULL)
-#define ZMB_niceputs(s, stream)	(void)mb_niceformat(s, stream, NULL)
-#define ZMB_niceztrdup(s)	mb_niceztrdup(s)
+#define ZMB_nicewidth(s)	mb_niceformat(s, NULL, NULL, 0)
 
 /* Functions that operate on ZLE_CHAR_T. */
 #define ZC_iblank iswspace
@@ -84,7 +82,7 @@ typedef wint_t   ZLE_INT_T;
 
 #define LASTFULLCHAR	lastchar_wide
 
-#else  /* Not ZLE_UNICODE_SUPPORT: old single-byte code */
+#else  /* Not MULTIBYTE_SUPPORT: old single-byte code */
 
 typedef int ZLE_CHAR_T;
 typedef unsigned char *ZLE_STRING_T;
@@ -111,8 +109,6 @@ typedef int ZLE_INT_T;
  * These versions don't handle multibyte characters.
  */
 #define ZMB_nicewidth	niceztrlen
-#define ZMB_niceputs	nicezputs
-#define ZMB_niceztrdup(s)	nicedup(s, 0)
 
 #define ZC_nicechar nicechar
 

@@ -29,7 +29,7 @@
 
 #include "zle.mdh"
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 /*
  * We use a wint_t here, since we need an invalid character as a
  * placeholder and wint_t guarantees that we can use WEOF to do this.
@@ -178,7 +178,7 @@ int cost;
 void
 zwcputc(ZLE_INT_T c)
 {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     char mbtmp[MB_CUR_MAX + 1];
     mbstate_t mbstate;
     int i;
@@ -197,7 +197,7 @@ zwcputc(ZLE_INT_T c)
 static int
 zwcwrite(REFRESH_STRING s, size_t i)
 {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     size_t j;
 
     for (j = 0; j < i; j++)
@@ -625,7 +625,7 @@ zrefresh(void)
 		    *rpms.s++ = ZWC(' ');
 		while ((++t0) & 7);
 	}
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	else if (iswprint(*t)) {
 	    int width = wcwidth(*t);
 	    if (width > rpms.sen - rpms.s) {
@@ -663,7 +663,7 @@ zrefresh(void)
 		if (nextline(&rpms, 1))
 		    break;
 	    }
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	    *rpms.s++ = ((*t == 127) || (*t > 255)) ? ZWC('?') :
 		(*t | ZWC('@'));
 #else
@@ -698,7 +698,7 @@ zrefresh(void)
 	snextline(&rpms);
 	u = statusline;
 	for (; u < statusline + statusll; u++) {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	    if (iswprint(*u)) {
 		int width = wcwidth(*u);
 		/* Handle wide characters as above */
@@ -1071,12 +1071,12 @@ refreshline(int ln)
     for (;;) {
 	if (*nl && *ol && nl[1] == ol[1]) {
 	    /* skip only if second chars match */
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	    int ccs_was = ccs;
 #endif
 	/* skip past all matching characters */
 	    for (; *nl && (*nl == *ol); nl++, ol++, ccs++) ;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	    /* Make sure ol and nl are pointing to real characters */
 	    while ((*nl == WEOF || *ol == WEOF) && ccs > ccs_was) {
 		nl--;
@@ -1152,7 +1152,7 @@ refreshline(int ln)
 			tc_delchars(i);
 			ol += i;
 			char_ins -= i;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 			while (*ol == WEOF) {
 			    ol++;
 			    char_ins--;
@@ -1191,13 +1191,13 @@ refreshline(int ln)
 	}
     /* we can't do any fancy tricks, so just dump the single character
        and keep on trying */
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	do {
 #endif
 	    zputc(*nl);
 	    nl++, ol++;
 	    ccs++, vcs++;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	    /*
 	     * Make sure we always overwrite the complete width of
 	     * a character that was there before.
@@ -1336,7 +1336,7 @@ tc_rightcurs(int ct)
    think.
    */
     if (vln == 0 && i < lpromptw && !(termflags & TERM_SHORT)) {
-#ifndef ZLE_UNICODE_SUPPORT
+#ifndef MULTIBYTE_SUPPORT
 	if ((int)strlen(lpromptbuf) == lpromptw)
 	    fputs(lpromptbuf + i, shout);
 	else 
@@ -1432,7 +1432,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     int t0,			/* tmp			       */
 	vsiz,			/* size of new video buffer    */
 	nvcs = 0;		/* new video cursor column     */
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /*
      * converted lprompt and pointer: no WEOF hack here since
      * we always output the full prompt and count its width.
@@ -1448,7 +1448,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     for (vsiz = 1 + lpromptw, t0 = 0; t0 != tmpll; t0++, vsiz++)
 	if (tmpline[t0] == ZWC('\t'))
 	    vsiz = (vsiz | 7) + 1;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	else if (iswprint(tmpline[t0]))
 	    vsiz += wcwidth(tmpline[t0]);
 #endif
@@ -1465,7 +1465,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     }
 
     /* only use last part of prompt */
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /*
      * Convert the entire lprompt so that we know how to count
      * characters.
@@ -1514,7 +1514,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	} else if (tmpline[t0] == ZWC('\n')) {
 	    *vp++ = ZWC('\\');
 	    *vp++ = ZWC('n');
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	} else if (iswprint(tmpline[t0])) {
 	    int width;
 	    *vp++ = tmpline[t0];

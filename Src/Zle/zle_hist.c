@@ -1108,7 +1108,7 @@ doisearch(char **args, int dir)
 	    } else if (cmd == Th(z_magicspace)) {
 		fixmagicspace();
 	    } else if (cmd == Th(z_selfinsert)) {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 		if (!lastchar_wide_valid)
 		    getrestchar(lastchar);
 #else
@@ -1305,7 +1305,7 @@ getvisrchstr(void)
 	    if(cmd == Th(z_selfinsertunmeta)) {
 		fixunmeta();
 	    } else {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 		if (!lastchar_wide_valid)
 		    getrestchar(lastchar);
 #else

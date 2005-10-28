@@ -725,7 +725,7 @@ scanlistmaps(HashNode hn, int list)
 	    fputs("-- ", stdout);
 	quotedzputs(n->nam, stdout);
     } else
-	ZMB_niceputs(n->nam, stdout);
+	nicezputs(n->nam, stdout);
     putchar('\n');
 }
 
@@ -818,7 +818,7 @@ bin_bindkey_meta(char *name, char *kmname, Keymap km, UNUSED(char **argv), UNUSE
 	zwarnnam(name, "keymap `%s' is protected", kmname, 0);
 	return 1;
     }
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     zwarnnam(name, "warning: `bindkey -m' disables multibyte support",
 	     NULL, 0);
 #endif
@@ -1051,7 +1051,7 @@ bindlistout(struct bindstate *bs)
 	if (bs->flags & BS_LIST)
 	    quotedzputs(bs->bind->nam, stdout);
 	else
-	    ZMB_niceputs(bs->bind->nam, stdout);
+	    nicezputs(bs->bind->nam, stdout);
     } else
 	printbind(bs->str, stdout);
     putchar('\n');

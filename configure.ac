@@ -2087,10 +2087,10 @@ AC_HELP_STRING([--enable-multibyte], [support multibyte chars in the zsh line ed
     zsh_cv_c_zle_unicode_support=yes,
     zsh_cv_c_zle_unicode_support=no)])
 ])
-AH_TEMPLATE([ZLE_UNICODE_SUPPORT],
-[Define to 1 if you want unicode support in the line editor.])
+AH_TEMPLATE([MULTIBYTE_SUPPORT],
+[Define to 1 if you want support for multibyte character sets.])
 if test $zsh_cv_c_zle_unicode_support = yes; then
-  AC_DEFINE(ZLE_UNICODE_SUPPORT)
+  AC_DEFINE(MULTIBYTE_SUPPORT)
 fi
 
 dnl ---------------

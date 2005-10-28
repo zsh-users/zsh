@@ -692,13 +692,13 @@ extern short ospeed;
 #endif
 
 /*
- * The ZLE_UNICODE_SUPPORT configure-define specifies that we want to enable
+ * The MULTIBYTE_SUPPORT configure-define specifies that we want to enable
  * complete Unicode conversion between wide characters and multibyte strings.
  */
-#if defined ZLE_UNICODE_SUPPORT \
+#if defined MULTIBYTE_SUPPORT \
  || (defined HAVE_WCHAR_H && defined HAVE_WCTOMB && defined __STDC_ISO_10646__)
 /*
- * If ZLE_UNICODE_SUPPORT is not defined, these includes provide a subset of
+ * If MULTIBYTE_SUPPORT is not defined, these includes provide a subset of
  * Unicode support that makes the \u and \U printf escape sequences work.
  */
 # include <wchar.h>

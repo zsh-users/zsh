@@ -60,7 +60,7 @@ doinsert(ZLE_STRING_T zstr, int len)
 mod_export int
 selfinsert(UNUSED(char **args))
 {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /* wint_t and wchar_t not neccessarily the same size */
     wchar_t tmp;
 
@@ -82,7 +82,7 @@ fixunmeta(void)
     lastchar &= 0x7f;
     if (lastchar == '\r')
 	lastchar = '\n';
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /*
      * TODO: can we do this better?
      * We need a wide character to insert.
@@ -529,7 +529,7 @@ digitargument(UNUSED(char **args))
 {
     int sign = (zmult < 0) ? -1 : 1;
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /*
      * It's too dangerous to allow metafied input.  See
      * universalargument for comments on (possibly suboptimal) handling
@@ -953,7 +953,7 @@ executenamedcommand(char *prmt)
 		if (len == NAMLEN || cmd != Th(z_selfinsert))
 		    feep = 1;
 		else {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 		    if (!lastchar_wide_valid)
 			getrestchar(lastchar);
 		    if (iswcntrl(lastchar_wide))
@@ -1137,7 +1137,7 @@ iremovesuffix(ZLE_CHAR_T c, int keep)
 	zsfree(suffixfunc);
 	suffixfunc = NULL;
     } else {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	/* TODO: best I can think of for now... */
 	int sl = (unsigned int)c <= 256 ? suffixlen[c] : 0;
 #else

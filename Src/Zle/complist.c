@@ -559,7 +559,7 @@ clnicezputs(Listcols colors, char *s, int ml)
     int i = 0, col = 0, ask, oml = ml;
     char *t;
     ZLE_CHAR_T cc;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /*
      * ums is the untokenized, unmetafied string (length umlen)
      * uptr is a pointer into it
@@ -1940,7 +1940,7 @@ msearchpop(int *backp)
 static Cmatch **
 msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
 {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /* MB_CUR_MAX may not be constant */
     VARARR(char, s, MB_CUR_MAX+1);
 #else
@@ -1953,7 +1953,7 @@ msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
     msearchpush(ptr, back);
 
     if (ins) {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	if (lastchar_wide_valid)
 	{
 	    int len = wctomb(s, lastchar_wide);

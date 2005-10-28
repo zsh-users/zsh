@@ -135,7 +135,7 @@ vigetkey(void)
     } else if (cmd == Th(z_vicmdmode)) {
 	return ZLEEOF;
     }
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     if (!lastchar_wide_valid)
     {
 	getrestchar(lastchar);
@@ -830,7 +830,7 @@ vicapslockpanic(UNUSED(char **args))
     statusline = ZWS("press a lowercase key to continue");
     statusll = ZS_strlen(statusline);
     zrefresh();
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     while (!iswlower(getfullchar(0)));
 #else
     while (!islower(getfullchar(0)));

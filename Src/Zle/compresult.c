@@ -2146,15 +2146,15 @@ iprintm(Cmgroup g, Cmatch *mp, UNUSED(int mc), UNUSED(int ml), int lastc, int wi
 	    printfmt(m->disp, 0, 1, 0);
 	    return;
 	}
-#ifdef ZLE_UNICODE_SUPPORT
-	len = mb_niceformat(m->disp, shout, NULL);
+#ifdef MULTIBYTE_SUPPORT
+	len = mb_niceformat(m->disp, shout, NULL, 0);
 #else
 	nicezputs(m->disp, shout);
 	len = niceztrlen(m->disp);
 #endif
     } else {
-#ifdef ZLE_UNICODE_SUPPORT
-	len = mb_niceformat(m->str, shout, NULL);
+#ifdef MULTIBYTE_SUPPORT
+	len = mb_niceformat(m->str, shout, NULL, 0);
 #else
 	nicezputs(m->str, shout);
 	len = niceztrlen(m->str);

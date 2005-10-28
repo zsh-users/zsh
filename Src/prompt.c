@@ -736,7 +736,7 @@ addbufspc(int need)
 void
 stradd(char *d)
 {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     char *ums, *ups;
     int upslen;
     mbstate_t ps;
@@ -861,7 +861,7 @@ countprompt(char *str, int *wp, int *hp, int overf)
 {
     int w = 0, h = 1;
     int s = 1;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     int mbret, wcw, multi = 0;
     char inchar;
     mbstate_t mbs;
@@ -887,13 +887,13 @@ countprompt(char *str, int *wp, int *hp, int overf)
 	    w++;
 	else if (s) {
 	    if (*str == Meta) {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 		inchar = *++str ^ 32;
 #else
 		str++;
 #endif
 	    } else {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 		/*
 		 * Don't look for tab or newline in the middle
 		 * of a multibyte character.  Otherwise, we are
@@ -910,14 +910,14 @@ countprompt(char *str, int *wp, int *hp, int overf)
 			h++;
 			continue;
 		    }
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 		}
 
 		inchar = *str;
 #endif
 	    }
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	    mbret = mbrtowc(&wc, &inchar, 1, &mbs);
 	    if (mbret >= -1) {
 		if (mbret > 0) {
@@ -1044,7 +1044,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	    int twidth, maxwidth;
 	    int ntrunc = strlen(t);
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	    /* Use screen width of string */
 	    twidth = mb_width(t);
 #else
@@ -1076,7 +1076,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		     */
 		    char *fulltextptr, *fulltext;
 		    int remw;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 		    mbstate_t mbs;
 		    memset(&mbs, 0, sizeof(mbstate_t));
 #endif
@@ -1111,7 +1111,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 				fulltextptr++;
 			    }
 			} else {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 			    /*
 			     * Normal text: build up a multibyte character.
 			     */
@@ -1170,7 +1170,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		     * maximum width.
 		     */
 		    char *skiptext = ptr;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 		    mbstate_t mbs;
 		    memset(&mbs, 0, sizeof(mbstate_t));
 #endif
@@ -1180,7 +1180,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 			    for (; *skiptext != Outpar && *skiptext;
 				 skiptext++);
 			} else {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 			    char inchar;
 			    wchar_t cc;
 			    int ret;

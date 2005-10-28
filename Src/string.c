@@ -55,7 +55,7 @@ ztrdup(const char *s)
 }
 
 /**/
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 /**/
 mod_export wchar_t *
 wcs_ztrdup(const wchar_t *s)
@@ -69,7 +69,7 @@ wcs_ztrdup(const wchar_t *s)
     return t;
 }
 /**/
-#endif /* ZLE_UNICODE_SUPPORT */
+#endif /* MULTIBYTE_SUPPORT */
 
 
 /* concatenate s1, s2, and s3 in dynamically allocated buffer */

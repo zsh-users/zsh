@@ -1584,7 +1584,7 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 {
     int ret = 0, l, ind, add;
     char *p, *q;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     int fulllen = len;
     char *fullstr = str;
     mbstate_t ps;
@@ -1619,7 +1619,7 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 		   || (l < md->len && q[-1] == Meta)))
 		l--;
 	}
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	/*
 	 * Make sure we don't end in the middle of a multibyte character.
 	 * Don't need to do this if the match ended at the start

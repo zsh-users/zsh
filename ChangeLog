@@ -1,6 +1,16 @@
 2005-10-28  Peter Stephenson  <pws@csr.com>
 
-	* 21942: Src/Zle/zle_fresh.c: another bug found when deleting
+	* 21943, 21945: configure.ac, Src/prompt.c, Src/string.c,
+	Src/system.h, Src/utils.c, Src/zsh.h, Src/Zle/complist.c,
+	Src/Zle/compmatch.c, Src/Zle/compresult.c, Src/Zle/zle.h,
+	Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c, Src/Zle/zle_refresh.c, Src/Zle/zle_thingy.c,
+	Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c:
+	Replace ZLE_UNICODE_SUPPORT by MULTIBYTE_SUPPORT throughout.
+	Use multibyte versions of "nicechar" functions wherever
+	possible.
+
+	* 21942: Src/Zle/zle_refresh.c: another bug found when deleting
 	an extra-wide character.
 
 2005-10-26  Peter Stephenson  <pws@csr.com>

@@ -132,7 +132,7 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 {
     int outcs, outll;
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     char *s;
     int i, j;
     size_t mb_len = 0;
@@ -167,7 +167,7 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
      * metafiable characters.
      */
     if (outcsp != NULL || outllp != NULL) {
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 	unsigned char *strp = (unsigned char *)s;
 #else
 	unsigned char *strp = instr;
@@ -189,7 +189,7 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 	    *outllp = outll;
     }
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     if (useheap)
     {
 	unsigned char *ret =
@@ -242,7 +242,7 @@ stringaszleline(unsigned char *instr, int incs,
 {
     ZLE_STRING_T outstr;
     int ll, sz;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     mbstate_t ps;
 #endif
 
@@ -274,7 +274,7 @@ stringaszleline(unsigned char *instr, int incs,
 	*outsz = ll;
     outstr = (ZLE_STRING_T)zalloc(sz);
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     if (ll) {
 	char *inptr = (char *)instr;
 	wchar_t *outptr = outstr;
@@ -785,7 +785,7 @@ showmsg(char const *msg)
     char const *p;
     int up = 0, cc = 0;
     ZLE_CHAR_T c;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     char *umsg;
     int ulen, ret;
     size_t width;
@@ -795,7 +795,7 @@ showmsg(char const *msg)
     trashzle();
     clearflag = isset(USEZLE) && !termflags && isset(ALWAYSLASTPROMPT);
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     umsg = ztrdup(msg);
     p = unmetafy(umsg, &ulen);
     memset(&ps, 0, sizeof(ps));

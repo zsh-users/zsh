@@ -100,7 +100,7 @@ int mark;
 /**/
 mod_export int
 lastchar;
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 /**/
 mod_export ZLE_INT_T lastchar_wide;
 /**/
@@ -633,7 +633,7 @@ getbyte(int keytmout, int *timeout)
     if (timeout)
 	*timeout = 0;
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /*
      * Reading a single byte always invalidates the status
      * of lastchar_wide.  We may fix this up in getrestchar
@@ -737,7 +737,7 @@ getfullchar(int keytmout)
 {
     int inchar = getbyte(keytmout, NULL);
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     return getrestchar(inchar);
 #else
     return inchar;
@@ -746,7 +746,7 @@ getfullchar(int keytmout)
 
 
 /**/
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
 /*
  * Get the remainder of a character if we support multibyte
  * input strings.  It may not require any more input, but
@@ -1048,7 +1048,7 @@ execzlefunc(Thingy func, char **args)
 
     if(func->flags & DISABLED) {
 	/* this thingy is not the name of a widget */
-	char *nm = ZMB_niceztrdup(func->nam);
+	char *nm = nicedup(func->nam, 0);
 	char *msg = tricat("No such widget `", nm, "'");
 
 	zsfree(nm);
@@ -1104,7 +1104,7 @@ execzlefunc(Thingy func, char **args)
 
 	if(prog == &dummy_eprog) {
 	    /* the shell function doesn't exist */
-	    char *nm = ZMB_niceztrdup(w->u.fnnam);
+	    char *nm = nicedup(w->u.fnnam, 0);
 	    char *msg = tricat("No such shell function `", nm, "'");
 
 	    zsfree(nm);
@@ -1422,7 +1422,7 @@ describekeybriefly(UNUSED(char **args))
     if (!func)
 	is = bindztrdup(str);
     else
-	is = ZMB_niceztrdup(func->nam);
+	is = nicedup(func->nam, 0);
     msg = appstr(msg, is);
     zsfree(is);
     showmsg(msg);
@@ -1466,7 +1466,7 @@ whereis(UNUSED(char **args))
     if (!(ff.func = executenamedcommand("Where is: ")))
 	return 1;
     ff.found = 0;
-    ff.msg = ZMB_niceztrdup(ff.func->nam);
+    ff.msg = nicedup(ff.func->nam, 0);
     scankeymap(curkeymap, 1, scanfindfunc, &ff);
     if (!ff.found)
 	ff.msg = appstr(ff.msg, " is not bound to any key");

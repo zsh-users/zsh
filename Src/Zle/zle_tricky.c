@@ -2244,7 +2244,7 @@ listlist(LinkList l)
 	if (isset(LISTROWSFIRST)) {
 	    for (col = 1, p = data, lenp = lens; *p;
 		 p++, lenp++, col++) {
-		ZMB_niceputs(*p, shout);
+		nicezputs(*p, shout);
 		if (col == ncols) {
 		    col = 0;
 		    if (p[1])
@@ -2262,7 +2262,7 @@ listlist(LinkList l)
 	    for (f = data, fl = lens, line = 0; line < nlines;
 		 f++, fl++, line++) {
 		for (col = 1, p = f, lenp = fl; *p; col++) {
-		    ZMB_niceputs(*p, shout);
+		    nicezputs(*p, shout);
 		    if (col == ncols)
 			break;
 		    if ((i = (pack ? widths[col - 1] : longest) - *lenp + 2) > 0)
@@ -2276,7 +2276,7 @@ listlist(LinkList l)
 	}
     } else {
 	for (p = data; *p; p++) {
-	    ZMB_niceputs(*p, shout);
+	    nicezputs(*p, shout);
 	    putc('\n', shout);
 	}
     }
@@ -2367,7 +2367,7 @@ void
 fixmagicspace(void)
 {
     lastchar = ' ';
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /*
      * This is redundant if the multibyte encoding extends ASCII,
      * since lastchar is a full character, but it's safer anyway...
@@ -2386,7 +2386,7 @@ magicspace(char **args)
     int ret;
     fixmagicspace();
 
-#ifdef ZLE_UNICODE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT
     /*
      * TODO: bangchar should really be a multibyte string representing
      * a single character, since there's no fundamental reason why
