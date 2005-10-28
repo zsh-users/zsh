@@ -1,3 +1,10 @@
+2005-10-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21948: Src/zsh.h, Src/Zle/zle_refresh.c: fixed a couple
+	compiler warnings about comparing signed & unsigned values.
+	The latter change should also remove a potential problem of
+	using WEOF without multibyte support being enabled.
+
 2005-10-28  Clint Adams  <clint@zsh.org>
 
 	* 21946, 21947: Completion/Unix/Command/_gcc: update
