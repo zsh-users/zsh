@@ -389,7 +389,7 @@ selectkeymap(char *name, int fb)
     Keymap km = openkeymap(name);
 
     if(!km) {
-	char *nm = ZMB_niceztrdup(name);
+	char *nm = nicedup(name, 0);
 	char *msg = tricat("No such keymap `", nm, "'");
 
 	zsfree(nm);

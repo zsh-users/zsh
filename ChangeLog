@@ -1,5 +1,7 @@
 2005-10-28  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/Zle/zle_keymap.c: missed this out.
+
 	* 21943, 21945: configure.ac, Src/prompt.c, Src/string.c,
 	Src/system.h, Src/utils.c, Src/zsh.h, Src/Zle/complist.c,
 	Src/Zle/compmatch.c, Src/Zle/compresult.c, Src/Zle/zle.h,
