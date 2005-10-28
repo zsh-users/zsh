@@ -656,8 +656,8 @@ struct eccstr {
 #define WC_PIPE_LINENO(C)   (wc_data(C) >> 1)
 #define WCB_PIPE(T,L)       wc_bld(WC_PIPE, ((T) | ((L) << 1)))
 
-#define WC_REDIR_TYPE(C)    (wc_data(C) & REDIR_TYPE_MASK)
-#define WC_REDIR_VARID(C)   (wc_data(C) & REDIR_VARID_MASK)
+#define WC_REDIR_TYPE(C)    ((int)(wc_data(C) & REDIR_TYPE_MASK))
+#define WC_REDIR_VARID(C)   ((int)(wc_data(C) & REDIR_VARID_MASK))
 #define WCB_REDIR(T)        wc_bld(WC_REDIR, (T))
 /* Size of redir is 4 words if REDIR_VARID_MASK is set, else 3 */
 #define WC_REDIR_WORDS(C)   (WC_REDIR_VARID(C) ? 4 : 3)
