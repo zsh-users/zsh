@@ -109,13 +109,32 @@ mips*)
     '-G:maximum size for small section objects:'
   )
   ;;
-i[345]86)
+i[3456]86|x86_64)
   args=(
-    -m486 -m386 -mieee-fp -mno-fancy-math-387
-    -mno-fp-ret-in-387 -msoft-float -msvr3-shlib
-    -mno-wide-multiply -mrtd -malign-double
-    '-mreg-alloc=:default register allocation order:' 
+    '-mtune=:CPU type:(i386 i486 i586 pentium pentium-mmx i686 pentiumpro pentium2 pentium3 pentium3m pentium-m pentium4 pentium4m prescott nocona k6 k6-2 k6-3 athlon athlon-tbird athlon-4 athlon-xp athlon-mp k8 opteron athlon64 athlon-fx winchip-c6 winchip2 c3 c3-2)'
+    '-march=:CPU type:(i386 i486 i586 pentium pentium-mmx i686 pentiumpro pentium2 pentium3 pentium3m pentium-m pentium4 pentium4m prescott nocona k6 k6-2 k6-3 athlon athlon-tbird athlon-4 athlon-xp athlon-mp k8 opteron athlon64 athlon-fx winchip-c6 winchip2 c3 c3-2)'
+    '-mfpmath=:FPU type:(387 sse sse,387)'
+    '-masm=:asm dialect:(att intel)'
+    -mieee-fp -mno-ieee-fp -msoft-float
+    -mno-fp-ret-in-387 -mno-fancy-math-387
+    -malign-double -mno-align-double
+    -m128bit-long-double -m96bit-long-double
+    -msvr3-shlib -mno-svr3-shlib
+    -mrtd
     '-mregparm=:number of integer argument registers:'
+    '-mpreferred-stack-boundary=:size of boundary:'
+    -mmmx  -msse  -msse2 -msse3 -m3dnow
+    -mno-mmx  -mno-sse  -mno-sse2 -mno-sse3 -mno-3dnow
+    -mpush-args -mno-push-args -maccumulate-outgoing-args
+    -mthreads
+    -mno-align-stringops -minline-all-stringops
+    -momit-leaf-frame-pointer
+    -mtls-direct-seg-refs -mno-tls-direct-seg-refs
+    -m32 -m64
+    -mno-red-zone
+    '-mcmodel=:memory model:(small kernel medium large)'
+    -mno-wide-multiply
+    '-mreg-alloc=:default register allocation order:' 
     '-malign-jumps=: **2 base for jump goal alignment:'
     '-malign-loops=: **2 base for loop alignment:'
     '-malign-functions=: **2 base for function alignment:'
