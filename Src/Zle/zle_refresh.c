@@ -1069,9 +1069,22 @@ refreshline(int ln)
 /* 3: main display loop - write out the buffer using whatever tricks we can */
 
     for (;;) {
-	if (*nl && *ol && nl[1] == ol[1]) /* skip only if second chars match */
+	if (*nl && *ol && nl[1] == ol[1]) {
+	    /* skip only if second chars match */
+#ifdef ZLE_UNICODE_SUPPORT
+	    int ccs_was = ccs;
+#endif
 	/* skip past all matching characters */
 	    for (; *nl && (*nl == *ol); nl++, ol++, ccs++) ;
+#ifdef ZLE_UNICODE_SUPPORT
+	    /* Make sure ol and nl are pointing to real characters */
+	    while ((*nl == WEOF || *ol == WEOF) && ccs > ccs_was) {
+		nl--;
+		ol--;
+		ccs--;
+	    }
+#endif
+	}
 
 	if (!*nl) {
 	    if (ccs == winw && hasam && char_ins > 0 && ins_last
@@ -1125,7 +1138,8 @@ refreshline(int ln)
 
     /* inserting & deleting chars: we can if there's no right-prompt */
 	if ((ln || !put_rpmpt || !oput_rpmpt) 
-	    && (nl[1] && ol[1] && nl[1] != ol[1])) { 
+	    && (nl[1] && ol[1] && nl[1] != ol[1])
+	    && *ol != WEOF && *nl != WEOF) { 
 
 	/* deleting characters - see if we can find a match series that
 	   makes it cheaper to delete intermediate characters
@@ -1177,9 +1191,19 @@ refreshline(int ln)
 	}
     /* we can't do any fancy tricks, so just dump the single character
        and keep on trying */
-	zputc(*nl);
-	nl++, ol++;
-	ccs++, vcs++;
+#ifdef ZLE_UNICODE_SUPPORT
+	do {
+#endif
+	    zputc(*nl);
+	    nl++, ol++;
+	    ccs++, vcs++;
+#ifdef ZLE_UNICODE_SUPPORT
+	    /*
+	     * Make sure we always overwrite the complete width of
+	     * a character that was there before.
+	     */
+	} while (*ol == WEOF && *nl);
+#endif
     }
 }
 

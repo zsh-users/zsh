@@ -1,3 +1,8 @@
+2005-10-28  Peter Stephenson  <pws@csr.com>
+
+	* 21942: Src/Zle/zle_fresh.c: another bug found when deleting
+	an extra-wide character.
+
 2005-10-26  Peter Stephenson  <pws@csr.com>
 
 	* 21939: Src/Zle/zle_thingy.c: new UNMETACHECK() was too ruthless.
