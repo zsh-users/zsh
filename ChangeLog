@@ -1,5 +1,8 @@
 2005-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Doc/Zsh/roadmap.yo: capitalize section headings to
+	be consistent and add note on default history size.
+
 	* 21957: Src/Zle/zle_refresh.c: more wide character stuff.
 
 	* 21954 (plus comment): configure.ac: use /dev/fd/3 to check

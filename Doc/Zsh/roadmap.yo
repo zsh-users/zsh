@@ -14,7 +14,7 @@ be created or edited to customize the shell.  See ifzman(the section
 Startup/Shutdown Files in zmanref(zsh))\
 ifnzman(noderef(Files)).
 
-sect(Interactive use)
+sect(Interactive Use)
 
 Interaction with the shell uses the builtin Zsh Line Editor, ZLE.  This is
 described in detail in ifzman(zmanref(zshzle))\
@@ -25,12 +25,13 @@ editing mode as the keys for editing are substantially different.  Emacs
 editing mode is probably more natural for beginners and can be selected
 explicitly with the command tt(bindkey -e).
 
-A history mechanism for retrieving previously typed lines (most simply with
-the Up or Down arrow keys) is available; note that, unlike other shells,
-zsh will not save these lines when the shell exits unless you set
-appropriate variables.  See the description of the shell variables
-(referred to in the documentation as parameters) tt(HISTFILE), tt(HISTSIZE)
-and tt(SAVEHIST) in ifzman(zmanref(zshparams))\
+A history mechanism for retrieving previously typed lines (most simply
+with the Up or Down arrow keys) is available; note that, unlike other
+shells, zsh will not save these lines when the shell exits unless you
+set appropriate variables, and the number of history lines retained by
+default is quite small (30 lines).  See the description of the shell
+variables (referred to in the documentation as parameters) tt(HISTFILE),
+tt(HISTSIZE) and tt(SAVEHIST) in ifzman(zmanref(zshparams))\
 ifnzman(noderef(Parameters Used By The Shell)).
 
 The line editor provides an extensive completion system and the shell
@@ -72,7 +73,7 @@ the only good way to become acquainted with the many possibilities.  See
 ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Options)).
 
-sect(Pattern matching)
+sect(Pattern Matching)
 
 The shell has a rich set of patterns which are available for file matching
 (described in the documentation as `filename generation' and also known for
