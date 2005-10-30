@@ -1,3 +1,11 @@
+2005-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 21957: Src/Zle/zle_refresh.c: more wide character stuff.
+
+	* 21954 (plus comment): configure.ac: use /dev/fd/3 to check
+	for availability of feature (works around FreeBSD 5
+	configuration).
+
 2005-10-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 21948: Src/zsh.h, Src/Zle/zle_refresh.c: fixed a couple

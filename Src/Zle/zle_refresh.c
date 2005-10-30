@@ -1069,128 +1069,144 @@ refreshline(int ln)
 /* 3: main display loop - write out the buffer using whatever tricks we can */
 
     for (;;) {
-	if (*nl && *ol && nl[1] == ol[1]) {
-	    /* skip only if second chars match */
 #ifdef MULTIBYTE_SUPPORT
-	    int ccs_was = ccs;
+	if ((!*nl || *nl != WEOF) && (!*ol || *ol != WEOF)) {
 #endif
-	/* skip past all matching characters */
-	    for (; *nl && (*nl == *ol); nl++, ol++, ccs++) ;
+	    if (*nl && *ol && nl[1] == ol[1]) {
+		/* skip only if second chars match */
 #ifdef MULTIBYTE_SUPPORT
-	    /* Make sure ol and nl are pointing to real characters */
-	    while ((*nl == WEOF || *ol == WEOF) && ccs > ccs_was) {
-		nl--;
-		ol--;
-		ccs--;
-	    }
+		int ccs_was = ccs;
 #endif
-	}
-
-	if (!*nl) {
-	    if (ccs == winw && hasam && char_ins > 0 && ins_last
-		&& vcs != winw) {
-		nl--;           /* we can assume we can go back here */
-		moveto(ln, winw - 1);
-		zputc(*nl);
-		vcs++;
-		return;         /* write last character in line */
+		/* skip past all matching characters */
+		for (; *nl && (*nl == *ol); nl++, ol++, ccs++) ;
+#ifdef MULTIBYTE_SUPPORT
+		/* Make sure ol and nl are pointing to real characters */
+		while ((*nl == WEOF || *ol == WEOF) && ccs > ccs_was) {
+		    nl--;
+		    ol--;
+		    ccs--;
+		}
+#endif
 	    }
-	    if ((char_ins <= 0) || (ccs >= winw))    /* written everything */
-		return;
-	    if (tccan(TCCLEAREOL) && (char_ins >= tclen[TCCLEAREOL])
-	    	&& col_cleareol != -2)
-	    /* we've got junk on the right yet to clear */
-		col_cleareol = 0;	/* force a clear to end of line */
-	}
 
-	moveto(ln, ccs);	/* move to where we do all output from */
-
-    /* if we can finish quickly, do so */
-	if ((col_cleareol >= 0) && (ccs >= col_cleareol)) {
-	    tcout(TCCLEAREOL);
-	    return;
-	}
-
-    /* we've written out the new but yet to clear rubbish due to inserts */
-	if (!*nl) {
-	    i = (winw - ccs < char_ins) ? (winw - ccs) : char_ins;
-	    if (tccan(TCDEL) && (tcdelcost(i) <= i + 1))
-		tc_delchars(i);
-	    else {
-		vcs += i;
-		while (i-- > 0)
-		    zputc(ZWC(' '));
+	    if (!*nl) {
+		if (ccs == winw && hasam && char_ins > 0 && ins_last
+		    && vcs != winw) {
+		    nl--;           /* we can assume we can go back here */
+		    moveto(ln, winw - 1);
+		    zputc(*nl);
+		    vcs++;
+		    return;         /* write last character in line */
+		}
+		if ((char_ins <= 0) || (ccs >= winw))    /* written everything */
+		    return;
+		if (tccan(TCCLEAREOL) && (char_ins >= tclen[TCCLEAREOL])
+		    && col_cleareol != -2)
+		    /* we've got junk on the right yet to clear */
+		    col_cleareol = 0;	/* force a clear to end of line */
 	    }
-	    return;
-	}
 
-    /* if we've reached the end of the old buffer, then there are few tricks
-       we can do, so we just dump out what we must and clear if we can */
-	if (!*ol) {
-	    i = (col_cleareol >= 0) ? col_cleareol : nllen;
-	    i -= vcs;
-	    zwrite(nl, i);
-	    vcs += i;
-	    if (col_cleareol >= 0)
+	    moveto(ln, ccs);	/* move to where we do all output from */
+
+	    /* if we can finish quickly, do so */
+	    if ((col_cleareol >= 0) && (ccs >= col_cleareol)) {
 		tcout(TCCLEAREOL);
-	    return;
-	}
-
-    /* inserting & deleting chars: we can if there's no right-prompt */
-	if ((ln || !put_rpmpt || !oput_rpmpt) 
-#ifdef MULTIBYTE_SUPPORT
-	    && *ol != WEOF && *nl != WEOF
-#endif
-	    && nl[1] && ol[1] && nl[1] != ol[1]) { 
-
-	/* deleting characters - see if we can find a match series that
-	   makes it cheaper to delete intermediate characters
-	   eg. oldline: hifoobar \ hopefully cheaper here to delete two
-	       newline: foobar	 / characters, then we have six matches */
-	    /* TODO replace wpfxlen back with pfxlen when the latter is fixed */
-	    if (tccan(TCDEL)) {
-		for (i = 1; *(ol + i); i++)
-		    if (tcdelcost(i) < wpfxlen(ol + i, nl)) {
-			tc_delchars(i);
-			ol += i;
-			char_ins -= i;
-#ifdef MULTIBYTE_SUPPORT
-			while (*ol == WEOF) {
-			    ol++;
-			    char_ins--;
-			}
-#endif
-			i = 0;
-			break;
-		    }
-		if (!i)
-		    continue;
+		return;
 	    }
-	/* inserting characters - characters pushed off the right should be
-	   annihilated, but we don't do this if we're on the last line lest
-	   undesired scrolling occurs due to `illegal' characters on screen */
 
-	    if (tccan(TCINS) && (vln != lines - 1)) {	/* not on last line */
-		for (i = 1; *(nl + i); i++)
-		    if (tcinscost(i) < wpfxlen(nl + i, ol)) {
-			tc_inschars(i);
-			zwrite(nl, i);
-			nl += i;
-			char_ins += i;
-			ccs = (vcs += i);
-		    /* if we've pushed off the right, truncate oldline */
-			for (i = 0; *(ol + i) && i < winw - ccs; i++);
-			if (i == winw - ccs) {
-			    *(ol + i) = ZWC('\0');
-			    ins_last = 1;
-			}
-			i = 0;
-			break;
-		    }
-		if (!i)
-		    continue;
+	    /* we've written out the new but yet to clear rubbish due to inserts */
+	    if (!*nl) {
+		i = (winw - ccs < char_ins) ? (winw - ccs) : char_ins;
+		if (tccan(TCDEL) && (tcdelcost(i) <= i + 1))
+		    tc_delchars(i);
+		else {
+		    vcs += i;
+		    while (i-- > 0)
+			zputc(ZWC(' '));
+		}
+		return;
 	    }
+
+	    /* if we've reached the end of the old buffer, then there are few tricks
+	       we can do, so we just dump out what we must and clear if we can */
+	    if (!*ol) {
+		i = (col_cleareol >= 0) ? col_cleareol : nllen;
+		i -= vcs;
+		zwrite(nl, i);
+		vcs += i;
+		if (col_cleareol >= 0)
+		    tcout(TCCLEAREOL);
+		return;
+	    }
+
+	    /* inserting & deleting chars: we can if there's no right-prompt */
+	    if ((ln || !put_rpmpt || !oput_rpmpt) 
+#ifdef MULTIBYTE_SUPPORT
+		&& *ol != WEOF && *nl != WEOF
+#endif
+		&& nl[1] && ol[1] && nl[1] != ol[1]) { 
+
+		/* deleting characters - see if we can find a match series that
+		   makes it cheaper to delete intermediate characters
+		   eg. oldline: hifoobar \ hopefully cheaper here to delete two
+		   newline: foobar	 / characters, then we have six matches */
+		/* TODO replace wpfxlen back with pfxlen when the latter is fixed */
+		if (tccan(TCDEL)) {
+		    for (i = 1; *(ol + i); i++)
+			if (tcdelcost(i) < wpfxlen(ol + i, nl)) {
+			    tc_delchars(i);
+			    ol += i;
+			    char_ins -= i;
+#ifdef MULTIBYTE_SUPPORT
+			    while (*ol == WEOF) {
+				ol++;
+				char_ins--;
+			    }
+#endif
+			    i = 0;
+			    break;
+			}
+		    if (!i)
+			continue;
+		}
+		/* inserting characters - characters pushed off the right should be
+		   annihilated, but we don't do this if we're on the last line lest
+		   undesired scrolling occurs due to `illegal' characters on screen */
+
+		if (tccan(TCINS) && (vln != lines - 1)) {	/* not on last line */
+		    for (i = 1; *(nl + i); i++)
+			if (tcinscost(i) < wpfxlen(nl + i, ol)) {
+			    tc_inschars(i);
+			    zwrite(nl, i);
+			    nl += i;
+#ifdef MULTIBYTE_SUPPORT
+			    while (*nl == WEOF) {
+				nl++;
+				i++;
+			    }
+#endif
+			    char_ins += i;
+			    ccs = (vcs += i);
+			    /* if we've pushed off the right, truncate oldline */
+			    for (i = 0; *(ol + i) && i < winw - ccs; i++);
+#ifdef MULTIBYTE_SUPPORT
+			    while (ol[i] == WEOF)
+				i++;
+#endif
+			    if (i >= winw - ccs) {
+				*(ol + i) = ZWC('\0');
+				ins_last = 1;
+			    }
+			    i = 0;
+			    break;
+			}
+		    if (!i)
+			continue;
+		}
+	    }
+#ifdef MULTIBYTE_SUPPORT
 	}
+#endif
     /* we can't do any fancy tricks, so just dump the single character
        and keep on trying */
 #ifdef MULTIBYTE_SUPPORT
@@ -1204,7 +1220,7 @@ refreshline(int ln)
 	     * Make sure we always overwrite the complete width of
 	     * a character that was there before.
 	     */
-	} while (*ol == WEOF && *nl);
+	} while ((*ol == WEOF && *nl) || (*nl == WEOF && *ol));
 #endif
     }
 }
