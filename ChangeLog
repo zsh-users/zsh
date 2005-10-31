@@ -1,5 +1,9 @@
 2005-10-31  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* unposted: Src/Zle/deltochar.c, Src/Zle/zle_move.c,
+	Src/Zle/zle_utils.c: Fixed some compiler warnings about
+	signed/unsigned comparisons.
+
 	* unposted: Src/Modules/files.c, Src/Modules/mathfunc.c,
 	Src/Modules/zutil.c, Src/Zle/computil.c: use idigit() instead
 	of range-checking '0' - '9'.
