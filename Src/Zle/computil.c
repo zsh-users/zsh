@@ -1055,7 +1055,7 @@ parse_cadef(char *nam, char **args)
 {
     Cadef all, ret;
     Caopt *optp;
-    char **oargs = args, *p, *q, *match = "r:|[_-]=* r:|=*", **xor, **sargs;
+    char **orig_args = args, *p, *q, *match = "r:|[_-]=* r:|=*", **xor, **sargs;
     char *adpre, *adsuf, *axor = NULL, *doset = NULL, **setp = NULL;
     char *nonarg = NULL;
     int single = 0, anum = 1, xnum, nopts, ndopts, nodopts, flags = 0;
@@ -1127,7 +1127,7 @@ parse_cadef(char *nam, char **args)
 
     /* Looks good. Optimistically allocate the cadef structure. */
 
-    all = ret = alloc_cadef(oargs, single, match, nonarg, flags);
+    all = ret = alloc_cadef(orig_args, single, match, nonarg, flags);
     optp = &(ret->opts);
     anum = 1;
 
