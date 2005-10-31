@@ -306,7 +306,7 @@ stringaszleline(unsigned char *instr, int incs,
 
 	    if (outcs) {
 		int offs = inptr - (char *)instr;
-		if (offs <= incs && incs < offs + ret)
+		if (offs <= incs && incs < offs + (int)ret)
 		    *outcs = outptr - outstr;
 	    }
 
@@ -617,7 +617,7 @@ zlinecmp(ZLE_STRING_T histp, int histl, ZLE_STRING_T inputp, int inputl)
     }
 
     for (cnt = inputl; cnt; cnt--) {
-	if (*inputp++ != ZC_tolower(*histp++))
+	if ((ZLE_INT_T)*inputp++ != ZC_tolower(*histp++))
 	    return 3;
     }
     /* Is second string is lowercase version of first? */

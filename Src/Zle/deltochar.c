@@ -43,7 +43,7 @@ deltochar(UNUSED(char **args))
 
     if (n > 0) {
 	while (n-- && dest != zlell) {
-	    while (dest != zlell && zleline[dest] != c)
+	    while (dest != zlell && (ZLE_INT_T)zleline[dest] != c)
 		dest++;
 	    if (dest != zlell) {
 		if (!zap || n > 0)
@@ -59,9 +59,9 @@ deltochar(UNUSED(char **args))
 	if (dest)
 	    dest--;
 	while (n++ && dest != 0) {
-	    while (dest != 0 && zleline[dest] != c)
+	    while (dest != 0 && (ZLE_INT_T)zleline[dest] != c)
 		dest--;
-	    if (zleline[dest] == c) {
+	    if ((ZLE_INT_T)zleline[dest] == c) {
 		if (!n) {
 		    backkill(zlecs - dest - zap, 1);
 		    ok++;
