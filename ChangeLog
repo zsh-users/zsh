@@ -1,3 +1,8 @@
+2005-10-31  Clint Adams  <clint@zsh.org>
+
+	* 21960: R. Ramkumar: Functions/Misc/zcalc:
+	  put zcalc history file in ZDOTDIR if set.
+
 2005-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/roadmap.yo: capitalize section headings to

@@ -91,7 +91,7 @@ local compcontext="-math-"
 integer num outdigits outform=1
 
 # We use our own history file with an automatic pop on exit.
-history -ap ~/.zcalc_history
+history -ap "${ZDOTDIR:-$HOME}/.zcalc_history"
 
 forms=( '%2$g' '%.*g' '%.*f' '%.*E' )
 
