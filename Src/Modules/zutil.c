@@ -573,8 +573,8 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 	    if ((right = (*++s == '-')))
 		s++;
 
-	    if (*s >= '0' && *s <= '9') {
-		for (min = 0; *s >= '0' && *s <= '9'; s++)
+	    if (idigit(*s)) {
+		for (min = 0; idigit(*s); s++)
 		    min = (min * 10) + (int) STOUC(*s) - '0';
 	    }
 
@@ -586,8 +586,8 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 		right = 1;
 		s++;
 	    }
-	    if ((*s == '.' || testit) && s[1] >= '0' && s[1] <= '9') {
-		for (max = 0, s++; *s >= '0' && *s <= '9'; s++)
+	    if ((*s == '.' || testit) && idigit(s[1])) {
+		for (max = 0, s++; idigit(*s); s++)
 		    max = (max * 10) + (int) STOUC(*s) - '0';
 	    }
 	    else if (testit)
@@ -714,8 +714,7 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    specs[')'] = ")";
 	    for (ap = args + 2; *ap; ap++) {
 		if (!ap[0][0] || ap[0][0] == '-' || ap[0][0] == '.' ||
-		    (ap[0][0] >= '0' && ap[0][0] <= '9') ||
-		    ap[0][1] != ':') {
+		    idigit(ap[0][0]) || ap[0][1] != ':') {
 		    zwarnnam(nam, "invalid argument: %s", *ap, 0);
 		    return 1;
 		}

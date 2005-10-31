@@ -503,7 +503,7 @@ math_string(UNUSED(char *name), char *arg, int id)
 			unsigned short *seedptr = seedbufptr + i;
 			*seedptr = 0;
 			for (j = 0; j < 4; j++) {
-			    if (*seedstr >= '0' && *seedstr <= '9')
+			    if (idigit(*seedstr))
 				*seedptr += *seedstr - '0';
 			    else if (tolower(*seedstr) >= 'a' &&
 				     tolower(*seedstr) <= 'f')

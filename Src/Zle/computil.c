@@ -1683,7 +1683,7 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 	    } else if (x[0] == '*' && !x[1]) {
 		if (d->rest && (!set || d->rest->set))
 		    d->rest->active = 0;
-	    } else if (x[0] >= '0' && x[0] <= '9') {
+	    } else if (idigit(x[0])) {
 		int n = atoi(x);
 		Caarg a = d->args;
 

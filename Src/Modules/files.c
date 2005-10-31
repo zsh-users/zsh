@@ -605,7 +605,7 @@ static unsigned long getnumeric(char *p, int *errp)
 {
     unsigned long ret;
 
-    if(*p < '0' || *p > '9') {
+    if (!idigit(*p)) {
 	*errp = 1;
 	return 0;
     }
