@@ -1,3 +1,9 @@
+2005-10-31  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Modules/files.c, Src/Modules/mathfunc.c,
+	Src/Modules/zutil.c, Src/Zle/computil.c: use idigit() instead
+	of range-checking '0' - '9'.
+
 2005-10-31  Clint Adams  <clint@zsh.org>
 
 	* 21960: R. Ramkumar: Functions/Misc/zcalc:
