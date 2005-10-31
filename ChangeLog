@@ -1,3 +1,8 @@
+2005-10-31  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 21960: R. Ramkumar: Functions/Misc/zcalc:
+	put zcalc history file in ZDOTDIR, if set.
+
 2005-09-09  Peter Stephenson  <pws@csr.com>
 
 	* 21872: Src/jobs.c: job table wasn't cleared properly in
