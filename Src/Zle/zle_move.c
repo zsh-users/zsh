@@ -420,10 +420,12 @@ virepeatfind(char **args)
 	return ret;
     }
     while (n--) {
-	do
+	do {
 	    zlecs += vfinddir;
-	while (zlecs >= 0 && zlecs < zlell && zleline[zlecs] != vfindchar && zleline[zlecs] != '\n');
-	if (zlecs < 0 || zlecs >= zlell || zleline[zlecs] == '\n') {
+	} while (zlecs >= 0 && zlecs < zlell
+	    && (ZLE_INT_T)zleline[zlecs] != vfindchar
+	    && zleline[zlecs] != ZWC('\n'));
+	if (zlecs < 0 || zlecs >= zlell || zleline[zlecs] == ZWC('\n')) {
 	    zlecs = ocs;
 	    return 1;
 	}
