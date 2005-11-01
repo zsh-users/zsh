@@ -42,7 +42,7 @@ handle_digits(char *nam, char *argptr, fd_set *fdset, int *fdmax)
     int fd;
     char *endptr;
 
-    if (!isdigit(STOUC(*argptr))) {
+    if (!idigit(*argptr)) {
 	zwarnnam(nam, "expecting file descriptor: %s", argptr, 0);
 	return 1;
     }
