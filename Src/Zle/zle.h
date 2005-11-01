@@ -89,14 +89,14 @@ typedef wint_t   ZLE_INT_T;
 
 #else  /* Not MULTIBYTE_SUPPORT: old single-byte code */
 
-typedef int ZLE_CHAR_T;
-typedef unsigned char *ZLE_STRING_T;
+typedef char ZLE_CHAR_T;
+typedef char *ZLE_STRING_T;
 typedef int ZLE_INT_T;
-#define ZLE_CHAR_SIZE	sizeof(unsigned char)
+#define ZLE_CHAR_SIZE	sizeof(ZLE_CHAR_T)
 
 /* Leave character or string as is, but string must be unsigned char * */
 #define ZWC(c)	c
-#define ZWS(s)	(unsigned char *)s
+#define ZWS(s)	(ZLE_STRING_T)s
 
 #define ZLEEOF	EOF
 
