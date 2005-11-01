@@ -487,7 +487,8 @@ vireplace(UNUSED(char **args))
 int
 vireplacechars(UNUSED(char **args))
 {
-    int ch, n = zmult;
+    ZLE_INT_T ch;
+    int n = zmult;
 
     startvichange(1);
     /* check argument range */
@@ -507,7 +508,7 @@ vireplacechars(UNUSED(char **args))
 	return 1;
     }
     /* do change */
-    if (ch == '\r' || ch == '\n') {
+    if (ch == ZWC('\r') || ch == ZWC('\n')) {
 	/* <return> handled specially */
 	zlecs += n - 1;
 	backkill(n - 1, 0);
@@ -570,9 +571,9 @@ vioperswapcase(UNUSED(char **args))
 	oldcs = zlecs;
 	/* swap the case of all letters within range */
 	while (zlecs < c2) {
-	    if (islower(zleline[zlecs]))
+	    if (ZC_ilower(zleline[zlecs]))
 		zleline[zlecs] = ZC_toupper(zleline[zlecs]);
-	    else if (isupper(zleline[zlecs]))
+	    else if (ZC_iupper(zleline[zlecs]))
 		zleline[zlecs] = ZC_tolower(zleline[zlecs]);
 	    zlecs++;
 	}
@@ -788,9 +789,9 @@ vijoin(UNUSED(char **args))
     if ((x = findeol()) == zlell)
 	return 1;
     zlecs = x + 1;
-    for (x = 1; zlecs != zlell && iblank(zleline[zlecs]); zlecs++, x++);
+    for (x = 1; zlecs != zlell && ZC_iblank(zleline[zlecs]); zlecs++, x++);
     backdel(x);
-    if (zlecs && iblank(zleline[zlecs-1]))
+    if (zlecs && ZC_iblank(zleline[zlecs-1]))
 	zlecs--;
     else {
 	spaceinline(1);
@@ -810,9 +811,9 @@ viswapcase(UNUSED(char **args))
 	return 1;
     eol = findeol();
     while (zlecs < eol && n--) {
-	if (islower(zleline[zlecs]))
+	if (ZC_ilower(zleline[zlecs]))
 	    zleline[zlecs] = ZC_toupper(zleline[zlecs]);
-	else if (isupper(zleline[zlecs]))
+	else if (ZC_iupper(zleline[zlecs]))
 	    zleline[zlecs] = ZC_tolower(zleline[zlecs]);
 	zlecs++;
     }
@@ -830,11 +831,7 @@ vicapslockpanic(UNUSED(char **args))
     statusline = ZWS("press a lowercase key to continue");
     statusll = ZS_strlen(statusline);
     zrefresh();
-#ifdef MULTIBYTE_SUPPORT
-    while (!iswlower(getfullchar(0)));
-#else
-    while (!islower(getfullchar(0)));
-#endif
+    while (!ZC_ilower(getfullchar(0)));
     statusline = NULL;
     return 0;
 }
