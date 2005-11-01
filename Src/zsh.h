@@ -1432,10 +1432,10 @@ struct histent {
 
     Histent up;			/* previous line (moving upward)    */
     Histent down;		/* next line (moving downward)      */
-#ifdef MULTIBYTE_SUPPORT
+#ifdef MULTIBYTE_SUPPORT	/* (Note: must match ZLE_STRING_T!) */
     wchar_t *zle_text;		/* the edited history line          */
 #else
-    unsigned char *zle_text;	/* the edited history line          */
+    char *zle_text;		/* the edited history line          */
 #endif
     int zle_len;		/* length of zle_text */
     time_t stim;		/* command started time (datestamp) */
