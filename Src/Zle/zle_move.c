@@ -459,7 +459,7 @@ int
 vifirstnonblank(UNUSED(char **args))
 {
     zlecs = findbol();
-    while (zlecs != zlell && iblank(zleline[zlecs]))
+    while (zlecs != zlell && ZC_iblank(zleline[zlecs]))
 	zlecs++;
     return 0;
 }
