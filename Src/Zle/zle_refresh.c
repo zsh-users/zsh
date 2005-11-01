@@ -934,7 +934,6 @@ singlelineout:
 #define tc_upcurs(X)	(void) tcmultout(TCUP, TCMULTUP, (X))
 #define tc_leftcurs(X)	(void) tcmultout(TCLEFT, TCMULTLEFT, (X))
 
-/* TODO remove it when pfxlen is fixed */
 static int
 wpfxlen(REFRESH_STRING s, REFRESH_STRING t)
 {
@@ -1143,7 +1142,6 @@ refreshline(int ln)
 		   makes it cheaper to delete intermediate characters
 		   eg. oldline: hifoobar \ hopefully cheaper here to delete two
 		   newline: foobar	 / characters, then we have six matches */
-		/* TODO replace wpfxlen back with pfxlen when the latter is fixed */
 		if (tccan(TCDEL)) {
 		    for (i = 1; *(ol + i); i++)
 			if (tcdelcost(i) < wpfxlen(ol + i, nl)) {

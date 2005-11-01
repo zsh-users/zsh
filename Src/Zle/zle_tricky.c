@@ -1899,7 +1899,12 @@ docompletion(char *s, int lst, int incmd)
     return runhookdef(COMPLETEHOOK, (void *) &dat);
 }
 
-/* Return the length of the common prefix of s and t. */
+/*
+ * Return the length of the common prefix of s and t.
+ * s and t are both metafied; the length returned is a raw byte count
+ * into both strings, excluding any common bytes that form less than
+ * a complete wide character.
+ */
 
 /**/
 mod_export int
@@ -1907,9 +1912,46 @@ pfxlen(char *s, char *t)
 {
     int i = 0;
 
+#ifdef MULTIBYTE_SUPPORT
+    wchar_t wc;
+    mbstate_t ps;
+    int ret, lasti = 0;
+    char inc;
+
+    memset(&ps, 0, sizeof(mbstate_t));
+    while (*s) {
+	if (*s == Meta) {
+	    if (*t != Meta || t[1] != s[1])
+		break;
+	    inc = s[1] ^ 32;
+	    i += 2;
+	    s += 2;
+	    t += 2;
+	} else {
+	    if (*s != *t)
+		break;
+	    inc = *s;
+	    i++;
+	    s++;
+	    t++;
+	}
+
+	ret = mbrtowc(&wc, &inc, 1, &ps);
+	if (ret == -1) {
+	    /* error */
+	    break;
+	} else if (ret >= 0) {
+	    /* successfully found complete character, record position */
+	    lasti = i;
+	}
+	/* Otherwise, not found a complete character: keep trying. */
+    }
+    return lasti;
+#else
     while (*s && *s == *t)
 	s++, t++, i++;
     return i;
+#endif
 }
 
 /* Return the length of the common suffix of s and t. */

@@ -1,3 +1,8 @@
+2005-11-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 21971: Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c: rewrite
+	pfxlen() for multibyte characters.
+
 2005-11-01  Peter Stephenson  <pws@csr.com>
 
 	* users/9604: Functions/Misc/run-help: enhanced to strip quotes
