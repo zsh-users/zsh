@@ -2619,6 +2619,16 @@ inittyptab(void)
 
 
 #ifdef MULTIBYTE_SUPPORT
+/* A wide-character version of the iblank() macro. */
+/**/
+mod_export int
+wcsiblank(wint_t wc)
+{
+    if (iswspace(wc) && wc != L'\n')
+	return 1;
+    return 0;
+}
+
 /*
  * iword() macro extended to support wide characters.
  */
@@ -2641,7 +2651,7 @@ wcsiword(wchar_t c)
     if (len == 0) {
 	/* NULL is special */
 	return iword(0);
-    } else if (len == 1 && isascii(*outstr)) {
+    } else if (len == 1 && iascii(*outstr)) {
 	return iword(*outstr);
     } else {
 	return iswalnum(c) || wcschr(wordchars_wide, c);
@@ -2673,7 +2683,7 @@ wcsiident(wchar_t c)
     if (len == 0) {
 	/* NULL is special */
 	return 0;
-    } else if (len == 1 && isascii(*outstr)) {
+    } else if (len == 1 && iascii(*outstr)) {
 	return iident(*outstr);
     } else {
 	/* not currently allowed, see above */
