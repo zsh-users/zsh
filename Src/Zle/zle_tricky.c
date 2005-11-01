@@ -1034,7 +1034,8 @@ get_comp_string(void)
 {
     int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
     int ona = noaliases, qsub;
-    char *s = NULL, *linptr, *tmp, *p, *tt = NULL, rdop[20];
+    char *s = NULL, *tmp, *p, *tt = NULL, rdop[20];
+    unsigned char *linptr, *u;
 
     METACHECK();
 
@@ -1059,20 +1060,20 @@ get_comp_string(void)
      * "...", `...`, or ((...)). Nowadays this is only used to find   *
      * out if we are inside `...`.                                    */
 
-    for (i = j = k = 0, p = (char *)zlemetaline;
-	 p < (char *)zlemetaline + zlemetacs; p++)
-	if (*p == '`' && !(k & 1))
+    for (i = j = k = 0, u = zlemetaline; u < zlemetaline + zlemetacs; u++) {
+	if (*u == '`' && !(k & 1))
 	    i++;
-	else if (*p == '\"' && !(k & 1) && !(i & 1))
+	else if (*u == '\"' && !(k & 1) && !(i & 1))
 	    j++;
-	else if (*p == '\'' && !(j & 1))
+	else if (*u == '\'' && !(j & 1))
 	    k++;
-	else if (*p == '\\' && p[1] && !(k & 1))
-	    p++;
+	else if (*u == '\\' && u[1] && !(k & 1))
+	    u++;
+    }
     inbackt = (i & 1);
     instring = 0;
     addx(&tmp);
-    linptr = (char *)zlemetaline;
+    linptr = zlemetaline;
     pushheap();
 
  start:
@@ -1261,8 +1262,8 @@ get_comp_string(void)
 	if (parend >= 0 && !tmp)
 	    zlemetaline = (unsigned char *)
 		dupstring(tmp = (char *)zlemetaline);
-	linptr = (char *) zlemetaline + zlemetall + addedx - parbegin + 1;
-	if ((linptr - (char *) zlemetaline) < 3 || *linptr != '(' ||
+	linptr = zlemetaline + zlemetall + addedx - parbegin + 1;
+	if ((linptr - zlemetaline) < 3 || *linptr != '(' ||
 	    linptr[-1] != '(' || linptr[-2] != '$') {
 	    if (parend >= 0) {
 		zlemetall -= parend;
@@ -1340,7 +1341,7 @@ get_comp_string(void)
     if (t0 != STRING && inwhat != IN_MATH) {
 	if (tmp) {
 	    tmp = NULL;
-	    linptr = (char *)zlemetaline;
+	    linptr = zlemetaline;
 	    lexrestore();
 	    addedx = 0;
 	    goto start;
@@ -1783,14 +1784,11 @@ inststrlen(char *str, int move, int len)
     if (len == -1)
 	len = strlen(str);
     spaceinline(len);
-    if (zlemetaline != NULL)
-    {
+    if (zlemetaline != NULL) {
 	strncpy((char *)(zlemetaline + zlemetacs), str, len);
 	if (move)
 	    zlemetacs += len;
-    }
-    else
-    {
+    } else {
 	unsigned char *instr;
 	ZLE_STRING_T zlestr;
 	int zlelen;
@@ -2398,8 +2396,7 @@ magicspace(char **args)
 #else
     zlebangchar[0] = bangchar;
 #endif
-    for (bangq = zleline; bangq < zleline + zlell; bangq++)
-    {
+    for (bangq = zleline; bangq < zleline + zlell; bangq++) {
 	if (*bangq != zlebangchar[0])
 	    continue;
 	if (bangq[1] == ZWC('"') &&
