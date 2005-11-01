@@ -68,8 +68,7 @@ sizeline(int sz)
 {
     int cursz = (zlemetaline != NULL) ? metalinesz : linesz;
 
-    while (sz > cursz)
-    {
+    while (sz > cursz) {
 	if (cursz < 256)
 	    cursz = 256;
 	else
@@ -170,7 +169,7 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 #ifdef MULTIBYTE_SUPPORT
 	unsigned char *strp = (unsigned char *)s;
 #else
-	unsigned char *strp = instr;
+	unsigned char *strp = (unsigned char *)instr;
 #endif
 	unsigned char *stopcs = strp + outcs;
 	unsigned char *stopll = strp + outll;
@@ -190,8 +189,7 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
     }
 
 #ifdef MULTIBYTE_SUPPORT
-    if (useheap)
-    {
+    if (useheap) {
 	unsigned char *ret =
 	    (unsigned char *) metafy((char *) s, mb_len, META_HEAPDUP);
 
@@ -199,10 +197,7 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 
 	return ret;
     }
-    else
-    {
-	return (unsigned char *) metafy((char *) s, mb_len, META_REALLOC);
-    }
+    return (unsigned char *) metafy((char *) s, mb_len, META_REALLOC);
 #else
     return (unsigned char *) metafy((char *) instr, inll,
 				    useheap ? META_HEAPDUP : META_DUP);
@@ -824,11 +819,8 @@ showmsg(char const *msg)
 		n = nicechar(*p);
 		ret = 1;
 		width = strlen(n);
-	    }
-	    else
-	    {
+	    } else
 		n = wcs_nicechar(c, &width, NULL);
-	    }
 	    ulen -= ret;
 	    p += ret;
 
