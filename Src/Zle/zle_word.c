@@ -72,11 +72,11 @@ viforwardword(char **args)
 	    while (zlecs != zlell && iident(zleline[zlecs]))
 		zlecs++;
 	else
-	    while (zlecs != zlell && !iident(zleline[zlecs]) && !iblank(zleline[zlecs]))
+	    while (zlecs != zlell && !iident(zleline[zlecs]) && !ZC_iblank(zleline[zlecs]))
 		zlecs++;
 	if (wordflag && !n)
 	    return 0;
-	while (zlecs != zlell && (iblank(zleline[zlecs]) || zleline[zlecs] == '\n'))
+	while (zlecs != zlell && ZC_inblank(zleline[zlecs]))
 	    zlecs++;
     }
     return 0;
@@ -96,11 +96,11 @@ viforwardblankword(char **args)
 	return ret;
     }
     while (n--) {
-	while (zlecs != zlell && !iblank(zleline[zlecs]))
+	while (zlecs != zlell && !ZC_iblank(zleline[zlecs]))
 	    zlecs++;
 	if (wordflag && !n)
 	    return 0;
-	while (zlecs != zlell && iblank(zleline[zlecs]))
+	while (zlecs != zlell && ZC_iblank(zleline[zlecs]))
 	    zlecs++;
     }
     return 0;
@@ -139,9 +139,9 @@ viforwardblankwordend(UNUSED(char **args))
     if (n < 0)
 	return 1;
     while (n--) {
-	while (zlecs != zlell && iblank(zleline[zlecs + 1]))
+	while (zlecs != zlell && ZC_iblank(zleline[zlecs + 1]))
 	    zlecs++;
-	while (zlecs != zlell && !iblank(zleline[zlecs + 1]))
+	while (zlecs != zlell && !ZC_iblank(zleline[zlecs + 1]))
 	    zlecs++;
     }
     if (zlecs != zlell && virangeflag)
@@ -163,14 +163,14 @@ viforwardwordend(char **args)
 	return ret;
     }
     while (n--) {
-	if (iblank(zleline[zlecs + 1]))
-	    while (zlecs != zlell && iblank(zleline[zlecs + 1]))
+	if (ZC_iblank(zleline[zlecs + 1]))
+	    while (zlecs != zlell && ZC_iblank(zleline[zlecs + 1]))
 		zlecs++;
 	if (iident(zleline[zlecs + 1]))
 	    while (zlecs != zlell && iident(zleline[zlecs + 1]))
 		zlecs++;
 	else
-	    while (zlecs != zlell && !iident(zleline[zlecs + 1]) && !iblank(zleline[zlecs + 1]))
+	    while (zlecs != zlell && !iident(zleline[zlecs + 1]) && !ZC_iblank(zleline[zlecs + 1]))
 		zlecs++;
     }
     if (zlecs != zlell && virangeflag)
@@ -214,13 +214,13 @@ vibackwardword(char **args)
 	return ret;
     }
     while (n--) {
-	while (zlecs && iblank(zleline[zlecs - 1]))
+	while (zlecs && ZC_iblank(zleline[zlecs - 1]))
 	    zlecs--;
 	if (iident(zleline[zlecs - 1]))
 	    while (zlecs && iident(zleline[zlecs - 1]))
 		zlecs--;
 	else
-	    while (zlecs && !iident(zleline[zlecs - 1]) && !iblank(zleline[zlecs - 1]))
+	    while (zlecs && !iident(zleline[zlecs - 1]) && !ZC_iblank(zleline[zlecs - 1]))
 		zlecs--;
     }
     return 0;
@@ -240,9 +240,9 @@ vibackwardblankword(char **args)
 	return ret;
     }
     while (n--) {
-	while (zlecs && iblank(zleline[zlecs - 1]))
+	while (zlecs && ZC_iblank(zleline[zlecs - 1]))
 	    zlecs--;
-	while (zlecs && !iblank(zleline[zlecs - 1]))
+	while (zlecs && !ZC_iblank(zleline[zlecs - 1]))
 	    zlecs--;
     }
     return 0;
@@ -304,13 +304,13 @@ vibackwardkillword(UNUSED(char **args))
 	return 1;
 /* this taken from "vibackwardword" */
     while (n--) {
-	while ((x > lim) && iblank(zleline[x - 1]))
+	while ((x > lim) && ZC_iblank(zleline[x - 1]))
 	    x--;
 	if (iident(zleline[x - 1]))
 	    while ((x > lim) && iident(zleline[x - 1]))
 		x--;
 	else
-	    while ((x > lim) && !iident(zleline[x - 1]) && !iblank(zleline[x - 1]))
+	    while ((x > lim) && !iident(zleline[x - 1]) && !ZC_iblank(zleline[x - 1]))
 		x--;
     }
     backkill(zlecs - x, 1);
@@ -398,7 +398,7 @@ capitalizeword(UNUSED(char **args))
 	first = 1;
 	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
 	    zlecs++;
-	while (zlecs != zlell && ZC_iword(zleline[zlecs]) && !isalpha(zleline[zlecs]))
+	while (zlecs != zlell && ZC_iword(zleline[zlecs]) && !ZC_ialpha(zleline[zlecs]))
 	    zlecs++;
 	while (zlecs != zlell && ZC_iword(zleline[zlecs])) {
 	    zleline[zlecs] = (first) ? ZC_toupper(zleline[zlecs]) :
