@@ -261,13 +261,11 @@ resetvideo(void)
 	lwinh = winh;
     }
     for (ln = 0; ln != winh + 1; ln++) {
-	if (nbuf[ln])
-	{
+	if (nbuf[ln]) {
 	    nbuf[ln][0] = ZWC('\n');
 	    nbuf[ln][1] = ZWC('\0');
 	}
-	if (obuf[ln])
-	{
+	if (obuf[ln]) {
 	    obuf[ln][0] = ZWC('\n');
 	    obuf[ln][1] = ZWC('\0');
 	}
@@ -663,12 +661,7 @@ zrefresh(void)
 		if (nextline(&rpms, 1))
 		    break;
 	    }
-#ifdef MULTIBYTE_SUPPORT
-	    *rpms.s++ = ((*t == 127) || (*t > 255)) ? ZWC('?') :
-		(*t | ZWC('@'));
-#else
-	    *rpms.s++ = (*t == 127) ? ZWC('?') : (*t | ZWC('@'));
-#endif
+	    *rpms.s++ = ((unsigned int)*t > 31) ? ZWC('?') : (*t | ZWC('@'));
 	} else {			/* normal character */
 	    *rpms.s++ = *t;
 	}
@@ -725,7 +718,7 @@ zrefresh(void)
 		    nbuf[rpms.ln][winw + 1] = ZWC('\n');/* text wrapped */
 		    snextline(&rpms);
 		}
-		*rpms.s++ = (*u == 127) ? ZWC('?') : (*u | ZWC('@'));
+		*rpms.s++ = ((unsigned int)*u > 31) ? ZWC('?') : (*u | ZWC('@'));
 	    } else
 		*rpms.s++ = *u;
 	    if (rpms.s == rpms.sen) {
@@ -1544,8 +1537,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	    ZLE_INT_T t = tmpline[++t0];
 
 	    *vp++ = ZWC('^');
-	    /* FIXME is it portable? */
-	    *vp++ = ((t == 127) || (t > 255)) ? ZWC('?') : (t | ZWC('@'));
+	    *vp++ = ((unsigned int)t > 31) ? ZWC('?') : (t | ZWC('@'));
 	} else
 	    *vp++ = tmpline[t0];
 	if (t0 == tmpcs)
