@@ -58,3 +58,8 @@
 #define imeta(X) _icom(X,IMETA)
 #define iwsep(X) _icom(X,IWSEP)
 #define inull(X) _icom(X,INULL)
+
+#define iascii(X) isascii(STOUC(X))
+#define ilower(X) islower(STOUC(X))
+#define iprint(X) isprint(STOUC(X))
+#define iupper(X) isupper(STOUC(X))
