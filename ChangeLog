@@ -1,5 +1,12 @@
 2005-10-31  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* 21962: Src/utils.c, Src/ztype.h, Src/Modules/zftp.c,
+	Src/Modules/zselect.c, Src/Zle/zle.h, Src/Zle/zle_move.c,
+	Src/Zle/zle_vi.c, Src/Zle/zle_word.c: a bunch of fixes for
+	iTYPE()/isTYPE() problems, e.g. avoiding using isTYPE() on
+	a char value (which is undefined) and avoiding using normal
+	isTYPE() functions on wide-character values.
+
 	* unposted: Src/Zle/deltochar.c, Src/Zle/zle_move.c,
 	Src/Zle/zle_utils.c: Fixed some compiler warnings about
 	signed/unsigned comparisons.
