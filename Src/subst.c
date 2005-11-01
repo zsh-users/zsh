@@ -915,6 +915,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      */
     int globsubst = isset(GLOBSUBST);
     /*
+     * Indicates ${(#)...}.
+     */
+    int evalchar = 0;
+    /*
      * Indicates ${#pm}, massaged by whichlen which is set by
      * the (c), (w), and (W) flags to indicate how we take the length.
      */
@@ -1318,6 +1322,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case 'u':
 		    unique = 1;
+		    break;
+
+		case '#':
+		case Pound:
+		    evalchar = 1;
 		    break;
 
 		default:
@@ -2233,6 +2242,40 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     }
     if (errflag)
 	return NULL;
+    if (evalchar) {
+	/*
+	 * Evaluate the value numerically and output the result as
+	 * a character.
+	 *
+	 * Note this doesn't yet handle Unicode or multibyte characters:
+	 * that will need handling more generally probably by
+	 * an additional flag of some sort.
+	 */
+	zlong ires;
+
+	if (isarr) {
+	    char **aval2, **avptr, **av2ptr;
+
+	    aval2 = (char **)zhalloc((arrlen(aval)+1)*sizeof(char *));
+
+	    for (avptr = aval, av2ptr = aval2; *avptr; avptr++, av2ptr++)
+	    {
+		ires = mathevali(*avptr);
+		if (errflag)
+		    return NULL;
+		*av2ptr = zhalloc(2);
+		sprintf(*av2ptr, "%c", (int)ires);
+	    }
+	    *av2ptr = NULL;
+	    aval = aval2;
+	} else {
+	    ires = mathevali(val);
+	    if (errflag)
+		return NULL;
+	    val = zhalloc(2);
+	    sprintf(val, "%c", (int)ires);
+	}
+    }
     /*
      * This handles taking a length with ${#foo} and variations.
      * TODO: again. one might naively have thought this had the
