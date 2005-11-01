@@ -1,5 +1,11 @@
 2005-10-31  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* 21949 (modified): Src/zsh.h, Src/Zle/zle.h, Src/Zle/zle_misc.c,
+	Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c:
+	Changed (in non-multibyte mode) ZLE_CHAR_T to be "char" (not int)
+	and ZLE_STRING_T to be "char *" (not "unsigned char *"), including
+	some related type changes (e.g. zle_text) and code improvments.
+
 	* 21962: Src/utils.c, Src/ztype.h, Src/Modules/zftp.c,
 	Src/Modules/zselect.c, Src/Zle/zle.h, Src/Zle/zle_move.c,
 	Src/Zle/zle_vi.c, Src/Zle/zle_word.c: a bunch of fixes for
