@@ -70,13 +70,18 @@ typedef wint_t   ZLE_INT_T;
 #define ZMB_nicewidth(s)	mb_niceformat(s, NULL, NULL, 0)
 
 /* Functions that operate on ZLE_CHAR_T. */
-#define ZC_iblank iswspace
+#define ZC_ialpha iswalpha
+#define ZC_iblank wcsiblank
 #define ZC_icntrl iswcntrl
+#define ZC_idigit iswdigit
 #define ZC_iident wcsiident
+#define ZC_ilower iswlower
+#define ZC_inblank iswspace
+#define ZC_iupper iswupper
+#define ZC_iword wcsiword
 
 #define ZC_tolower towlower
 #define ZC_toupper towupper
-#define ZC_iword  wcsiword
 
 #define ZC_nicechar(c) wcs_nicechar(c, NULL, NULL)
 
@@ -129,13 +134,18 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 #endif
 
 /* Functions that operate on ZLE_CHAR_T. */
+#define ZC_ialpha ialpha
 #define ZC_iblank iblank
 #define ZC_icntrl icntrl
+#define ZC_idigit idigit
 #define ZC_iident iident
+#define ZC_ilower ilower
+#define ZC_inblank inblank
+#define ZC_iupper iupper
+#define ZC_iword iword
 
 #define ZC_tolower tulower
 #define ZC_toupper tuupper
-#define ZC_iword   iword
 
 #define LASTFULLCHAR	lastchar
 
