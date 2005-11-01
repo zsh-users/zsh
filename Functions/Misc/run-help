@@ -33,15 +33,22 @@ then
 fi
 
 # No zsh help; use "whence" to figure out where else we might look
-local what places newline='
+local what places noalias newline='
 '
 integer i=0 didman=0
 
 places=( "${(@f)$(builtin whence -va $1)}" )
+if [[ $places = *"not found"* && $1 != ${(Q)1} ]]; then
+  # Different when unquoted, so try stripping quotes.
+  places=( "${(@f)$(builtin whence -va ${(Q)1})}" )
+  # Quotation is significant to aliases, so suppress lookup.
+  noalias=1
+fi
 
 while ((i++ < $#places))
 do
     what=$places[$i]
+    [[ -n $noalias && $what = *" is an alias "* ]] && continue
     builtin print -r $what
     case $what in
     (*( is an alias)*)

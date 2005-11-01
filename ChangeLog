@@ -1,5 +1,8 @@
 2005-11-01  Peter Stephenson  <pws@csr.com>
 
+	* users/9604: Functions/Misc/run-help: enhanced to strip quotes
+	from argument if necessary.
+
 	* 21967 (docmentation tweaked): Doc/Zsh/expn.yo, Src/subst.c:
 	${(#)foo} uses matheval to produce characters.
 
