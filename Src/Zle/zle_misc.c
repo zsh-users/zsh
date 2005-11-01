@@ -60,18 +60,14 @@ doinsert(ZLE_STRING_T zstr, int len)
 mod_export int
 selfinsert(UNUSED(char **args))
 {
-#ifdef MULTIBYTE_SUPPORT
-    /* wint_t and wchar_t not neccessarily the same size */
-    wchar_t tmp;
+    ZLE_CHAR_T tmp;
 
+#ifdef MULTIBYTE_SUPPORT
     if (!lastchar_wide_valid)
 	getrestchar(lastchar);
-    tmp = lastchar_wide;
-    doinsert(&tmp, 1);
-#else
-    unsigned char s = lastchar;
-    doinsert(&s, 1);
 #endif
+    tmp = LASTFULLCHAR;
+    doinsert(&tmp, 1);
     return 0;
 }
 
@@ -89,7 +85,7 @@ fixunmeta(void)
      * selfinsertunmeta is intrinsically problematic
      * with multibyte input.
      */
-    lastchar_wide = (ZLE_CHAR_T)lastchar;
+    lastchar_wide = (ZLE_INT_T)lastchar;
     lastchar_wide_valid = 1;
 #endif
 }
@@ -536,11 +532,11 @@ digitargument(UNUSED(char **args))
      * of digits.  We are assuming ASCII is a subset of the multibyte
      * encoding.
      */
-    if (lastchar < '0' || lastchar > '9')
+    if (idigit(lastchar))
 	return 1;
 #else
     /* allow metafied as well as ordinary digits */
-    if ((lastchar & 0x7f) < '0' || (lastchar & 0x7f) > '9')
+    if (idigit(lastchar & 0x7f))
 	return 1;
 #endif
 
@@ -599,7 +595,7 @@ universalargument(char **args)
 	if (gotk == '-' && !digcnt) {
 	    minus = -1;
 	    digcnt++;
-	} else if (gotk >= '0' && gotk <= '9') {
+	} else if (idigit(gotk)) {
 	    pref = pref * 10 + (gotk & 0xf);
 	    digcnt++;
 	} else {
@@ -956,16 +952,11 @@ executenamedcommand(char *prmt)
 #ifdef MULTIBYTE_SUPPORT
 		    if (!lastchar_wide_valid)
 			getrestchar(lastchar);
-		    if (iswcntrl(lastchar_wide))
-#else
-		    if (icntrl(lastchar))
 #endif
-		    {
+		    if (ZC_icntrl(LASTFULLCHAR))
 			feep = 1;
-		    }
-		    else {
+		    else
 			*ptr++ = LASTFULLCHAR, len++, curlist = 0;
-		    }
 		}
 	    }
 	}
@@ -1098,7 +1089,7 @@ makesuffixstr(char *f, char *s, int n)
 
 /**/
 mod_export void
-iremovesuffix(ZLE_CHAR_T c, int keep)
+iremovesuffix(ZLE_INT_T c, int keep)
 {
     if (suffixfunc) {
 	Eprog prog = getshfunc(suffixfunc);
