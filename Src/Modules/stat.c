@@ -532,8 +532,8 @@ bin_stat(char *name, char **args, Options ops, UNUSED(int func))
     for (; OPT_ISSET(ops,'f') || *args; args++) {
 	char outbuf[PATH_MAX + 9]; /* "link   " + link name + NULL */
 	int rval = OPT_ISSET(ops,'f') ? fstat(fd, &statbuf) :
-	    OPT_ISSET(ops,'L') ? lstat(*args, &statbuf) :
-	    stat(*args, &statbuf);
+	    OPT_ISSET(ops,'L') ? lstat(unmeta(*args), &statbuf) :
+	    stat(unmeta(*args), &statbuf);
 	if (rval) {
 	    if (OPT_ISSET(ops,'f'))
 		sprintf(outbuf, "%d", fd);

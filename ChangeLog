@@ -1,3 +1,8 @@
+2005-11-02  Andrey Borzenkov  <bor@zsh.org>
+
+	* 21978: Src/Modules/stat.c: unmetafy file name before calling
+	sysem (l)stat
+
 2005-11-02  Peter Stephenson  <pws@csr.com>
 
 	* 21974: Src/params.c: memory leak with tied parameters.
