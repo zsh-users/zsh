@@ -1,5 +1,7 @@
 2005-11-02  Peter Stephenson  <pws@csr.com>
 
+	* 21974: Src/params.c: memory leak with tied parameters.
+
 	* users/9610: Src/Zle/zle_misc.c: Handle digit argument
 	in copy-prev-word and copy-prev-shell-word.
 

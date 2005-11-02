@@ -2452,8 +2452,13 @@ stdunsetfn(Param pm, UNUSED(int exp))
 	    	pm->u.str = NULL;
 	    break;
     }
-    if (!(pm->flags & PM_SPECIAL))
+    if ((pm->flags & (PM_SPECIAL|PM_TIED)) == PM_TIED) {
+	if (pm->ename) {
+	    zsfree(pm->ename);
+	    pm->ename = NULL;
+	}
 	pm->flags &= ~PM_TIED;
+    }
     pm->flags |= PM_UNSET;
 }
 
