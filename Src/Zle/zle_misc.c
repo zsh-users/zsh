@@ -532,11 +532,11 @@ digitargument(UNUSED(char **args))
      * of digits.  We are assuming ASCII is a subset of the multibyte
      * encoding.
      */
-    if (idigit(lastchar))
+    if (!idigit(lastchar))
 	return 1;
 #else
     /* allow metafied as well as ordinary digits */
-    if (idigit(lastchar & 0x7f))
+    if (!idigit(lastchar & 0x7f))
 	return 1;
 #endif
 
