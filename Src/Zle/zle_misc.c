@@ -616,17 +616,28 @@ universalargument(char **args)
 int
 copyprevword(UNUSED(char **args))
 {
-    int len, t0;
+    int len, t0 = zlecs, t1;
 
-    for (t0 = zlecs - 1; t0 >= 0; t0--)
-	if (ZC_iword(zleline[t0]))
-	    break;
-    for (; t0 >= 0; t0--)
-	if (!ZC_iword(zleline[t0]))
-	    break;
-    if (t0)
-	t0++;
-    len = zlecs - t0;
+    if (zmult > 0) {
+	int count = zmult;
+
+	for (;;) {
+	    t1 = t0;
+
+	    while (t0 && !ZC_iword(zleline[t0-1]))
+		t0--;
+	    while (t0 && ZC_iword(zleline[t0-1]))
+		t0--;
+
+	    if (!--count)
+		break;
+	    if (t0 == 0)
+		return 1;
+	}
+    }
+    else
+	return 1;
+    len = t1 - t0;
     spaceinline(len);
     ZS_memcpy(zleline + zlecs, zleline + t0, len);
     zlecs += len;
@@ -642,12 +653,19 @@ copyprevshellword(UNUSED(char **args))
     int i;
     unsigned char *p = NULL;
 
-    if ((l = bufferwords(NULL, NULL, &i)))
+    if (zmult <= 0)
+	return 1;
+
+    if ((l = bufferwords(NULL, NULL, &i))) {
+	i -= (zmult-1);
+	if (i < 0)
+	    return 1;
         for (n = firstnode(l); n; incnode(n))
             if (!i--) {
                 p = (unsigned char *)getdata(n);
                 break;
             }
+    }
 
     if (p) {
 	int len;
