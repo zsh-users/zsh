@@ -1,13 +1,13 @@
 2005-11-04  Peter Stephenson  <pws@csr.com>
 
 	* users/9618 modified as suggested in users/9621: Doc/Zsh/expn.yo,
-	Src/hist.c: extend history subsitution to allow trailing :G for
+	Src/hist.c: extend history substitution to allow trailing :G for
 	global.
 
 2005-11-02  Andrey Borzenkov  <bor@zsh.org>
 
 	* 21978: Src/Modules/stat.c: unmetafy file name before calling
-	sysem (l)stat
+	system (l)stat
 
 2005-11-02  Peter Stephenson  <pws@csr.com>
 
@@ -29,7 +29,7 @@
 	* users/9604: Functions/Misc/run-help: enhanced to strip quotes
 	from argument if necessary.
 
-	* 21967 (docmentation tweaked): Doc/Zsh/expn.yo, Src/subst.c:
+	* 21967 (documentation tweaked): Doc/Zsh/expn.yo, Src/subst.c:
 	${(#)foo} uses matheval to produce characters.
 
 2005-10-31  Wayne Davison  <wayned@users.sourceforge.net>
@@ -38,7 +38,7 @@
 	Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c:
 	Changed (in non-multibyte mode) ZLE_CHAR_T to be "char" (not int)
 	and ZLE_STRING_T to be "char *" (not "unsigned char *"), including
-	some related type changes (e.g. zle_text) and code improvments.
+	some related type changes (e.g. zle_text) and code improvements.
 
 	* 21962: Src/utils.c, Src/ztype.h, Src/Modules/zftp.c,
 	Src/Modules/zselect.c, Src/Zle/zle.h, Src/Zle/zle_move.c,
@@ -372,7 +372,7 @@
 	* unposted: Src/utils.c: screwed up iident() test in wcsiident().
 
 	* 21737: Src/utils.c: unmetafy wordchars before looking for
-	mulitbyte characters.
+	multibyte characters.
 
 	* 21736: Src/init.c, Src/params.c, Src/pattern.c, Src/utils.c,
 	Src/Zle/zle.h, Src/Zle/zle_main.c: Fix WORDCHARS to use multibyte
@@ -577,7 +577,7 @@
 	* 21619: Src/string.c, Src/utils.c, Src/Zle/zle.h: define wide
 	versions of zarrdup, zputs, niceztrlen.
 
-	* 21565: Completion/Unix/Command/_man: better handle uncompresed
+	* 21565: Completion/Unix/Command/_man: better handle uncompressed
 	manpages with .[0-9] in their names.
 
 2005-08-15  Wayne Davison  <wayned@users.sourceforge.net>
@@ -684,7 +684,7 @@
 	to exit after cleaning up.
 
 	* 21577 (adapted): Dan Bullok: Src/Zle/zle_main.c, Src/init.c,
-	Src/utils.c: improved 21567 which reexpands the prompt and
+	Src/utils.c: improved 21567 which re-expands the prompt and
 	refreshes but doesn't trash the line editor.
 
 2005-08-08  Wayne Davison  <wayned@users.sourceforge.net>
@@ -1190,8 +1190,8 @@
 	Completion/Zsh/Type/_jobs_fg, Completion/Zsh/Type/_limits,
 	Completion/Zsh/Type/_options, Completion/Zsh/Type/_options_set,
 	Completion/Zsh/Type/_options_unset: make completion functions
-	give precendence to descriptions passed as parameters and
-	cleanup	descriptons in calling functions
+	give precedence to descriptions passed as parameters and
+	cleanup	descriptions in calling functions
 
 	* 21314: Doc/Zsh/compsys.yo: declare expl local in example use
 	of _wanted 
@@ -1443,7 +1443,7 @@
 2005-04-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21170: Src/glob.c, Src/pattern.c: optimise length calculations
-	which were causing inefficieny in ${...//.../...} on large
+	which were causing inefficiency in ${...//.../...} on large
 	string.
 
 2005-04-22  Geoff Wing  <gcw@zsh.org>
@@ -1656,7 +1656,7 @@
 
 2005-03-22  Andrey Borzenkov  <bor@zsh.org>
 
-	* 21051 (modifed as suugested by Oliver in 21052):
+	* 21051 (modified as suggested by Oliver in 21052):
 	Completion/Unix/Command/_fuser: for SVR4 complete signals only after
 	-k; fix file name as first argument.
 
@@ -1678,7 +1678,7 @@
 2005-03-21  Peter Stephenson  <pws@csr.com>
 
 	* 21042: Src/Zle/zle_main.c, Doc/Zsh/zle.yo: test for and
-	document limitation that execute-named-comand and
+	document limitation that execute-named-command and
 	execute-last-named-command can't be redefined or called by name.
 
 2005-03-18  Wayne Davison  <wayned@users.sourceforge.net>
@@ -2135,7 +2135,7 @@
 2005-01-21  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: remove Completion/Unix/Command/_larch: larch has
-	been superceded by tla and is no longer available
+	been superseded by tla and is no longer available
 
 	* 20734: Completion/Linux/Command/_valgrind: rewrite to handle
 	version 2.2.0 of valgrind
