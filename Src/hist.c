@@ -295,13 +295,24 @@ herrflush(void)
 	hwaddc(ingetc());
 }
 
-/* extract :s/foo/bar/ delimiters and arguments */
+/*
+ * Extract :s/foo/bar/ delimiters and arguments
+ *
+ * The first character expected is the first delimiter.
+ * The arguments are stored in the hsubl and hsubr variables.
+ *
+ * subline is the part of the command line to be matched.
+ *
+ * If a ':' was found but was not followed by a 'G',
+ * *cflagp is set to 1 and the input is backed up to the
+ * character following the colon.
+ */
 
 /**/
 static int
-getsubsargs(char *subline)
+getsubsargs(char *subline, int *gbalp, int *cflagp)
 {
-    int del;
+    int del, follow;
     char *ptr1, *ptr2;
 
     del = ingetc();
@@ -315,6 +326,17 @@ getsubsargs(char *subline)
     }
     zsfree(hsubr);
     hsubr = ptr2;
+    follow = ingetc();
+    if (follow == ':') {
+	follow = ingetc();
+	if (follow == 'G')
+	    *gbalp = 1;
+	else {
+	    inungetc(follow);
+	    *cflagp = 1;
+	}
+    } else
+	inungetc(follow);
     if (hsubl && !strstr(subline, hsubl)) {
 	herrflush();
 	zerr("substitution failed", NULL, 0);
@@ -348,14 +370,16 @@ histsubchar(int c)
 
     /* look, no goto's */
     if (isfirstch && c == hatchar) {
+	int gbal = 0;
+
 	/* Line begins ^foo^bar */
 	isfirstch = 0;
 	inungetc(hatchar);
 	if (!(ehist = gethist(defev))
 	    || !(sline = getargs(ehist, 0, getargc(ehist)))
-	    || getsubsargs(sline) || !hsubl)
+	    || getsubsargs(sline, &gbal, &cflag) || !hsubl)
 	    return -1;
-	subst(&sline, hsubl, hsubr, 0);
+	subst(&sline, hsubl, hsubr, gbal);
     } else {
 	/* Line doesn't begin ^foo^bar */
 	if (c != ' ')
@@ -543,6 +567,10 @@ histsubchar(int c)
 	    if ((c = ingetc()) == 'g') {
 		gbal = 1;
 		c = ingetc();
+		if (c != 's' && c != '&') {
+		    zerr("'s' or '&' modifier expected after 'g'", NULL, 0);
+		    return -1;
+		}
 	    }
 	    switch (c) {
 	    case 'p':
@@ -577,7 +605,7 @@ histsubchar(int c)
 		}
 		break;
 	    case 's':
-		if (getsubsargs(sline))
+		if (getsubsargs(sline, &gbal, &cflag))
 		    return -1; /* fall through */
 	    case '&':
 		if (hsubl && hsubr)

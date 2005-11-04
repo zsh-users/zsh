@@ -117,6 +117,8 @@ repeats the last command, replacing the string var(foo) with var(bar).
 More precisely, the sequence `tt(^)var(foo)tt(^)var(bar)tt(^)' is
 synonymous with `tt(!!:s)tt(^)var(foo)tt(^)var(bar)tt(^)', hence other
 modifiers (see noderef(Modifiers)) may follow the final `tt(^)'.
+In particular, `tt(^)var(foo)tt(^)var(bar)tt(:G)' performs a global
+substitution.
 
 If the shell encounters the character sequence `tt(!")'
 in the input, the history mechanism is temporarily disabled until
@@ -254,10 +256,14 @@ Convert the words to all uppercase.
 )
 item(tt(s/)var(l)tt(/)var(r)[tt(/)])(
 Substitute var(r) for var(l) as described below.
-Unless preceded immediately by a tt(g), with no colon between,
-the substitution is done only for the
+The substitution is done only for the
 first string that matches var(l).  For arrays and for filename
 generation, this applies to each word of the expanded text.
+
+The forms `tt(gs/)var(l)tt(/)var(r)' and `tt(s/)var(l)tt(/)var(r)tt(/:G)'
+perform global substitution, i.e. substitute every occurrence of var(r)
+for var(l).  Note that the tt(g) or tt(:G) must appear in exactly the
+position shown.
 )
 item(tt(&))(
 Repeat the previous tt(s) substitution.  Like tt(s), may be preceded

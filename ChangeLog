@@ -1,3 +1,9 @@
+2005-11-04  Peter Stephenson  <pws@csr.com>
+
+	* users/9618 modified as suggested in users/9621: Doc/Zsh/expn.yo,
+	Src/hist.c: extend history subsitution to allow trailing :G for
+	global.
+
 2005-11-02  Andrey Borzenkov  <bor@zsh.org>
 
 	* 21978: Src/Modules/stat.c: unmetafy file name before calling
