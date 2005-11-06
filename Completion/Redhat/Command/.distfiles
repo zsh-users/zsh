@@ -2,4 +2,5 @@ DISTFILES_SRC='
 .distfiles
 _rpm
 _service
+_yum
 '
