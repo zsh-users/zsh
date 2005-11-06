@@ -3,6 +3,9 @@
 	* 21987: Completion/Unix/Command/_cplay: completion for
 	cplay.
 
+	* 21988: Completion/Debian/Command/_dput: fix "simulare"
+	typo.
+
 2005-11-04  Peter Stephenson  <pws@csr.com>
 
 	* users/9618 modified as suggested in users/9621: Doc/Zsh/expn.yo,

@@ -8,7 +8,7 @@ _arguments \
   '(-l --lintian)'{-l,--lintian}'[run lintian before upload]' \
   '(-o --check-only)'{-o,--check-only}'[check the package, do not upload]' \
   '(-p --print)'{-p,--print}'[print configuration]' \
-  '(-s --simulate)'{-s,--simulare}'[simulate an upload only]' \
+  '(-s --simulate)'{-s,--simulate}'[simulate an upload only]' \
   '(-u --unchecked)'{-u,--unchecked}'[do not check GPG signature on the changes file]' \
   '(-v --version)'{-v,--version}'[show version information]' \
   '*:changes file:_files -g "*.changes(-.)"'
