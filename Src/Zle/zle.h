@@ -248,7 +248,12 @@ typedef void (*KeyScanFunc) _((char *, Thingy, char *, void *));
 
 /* Standard type of suffix removal. */
 
-#define removesuffix() iremovesuffix(256, 0)
+#ifdef MULTIBYTE_SUPPORT
+#define NO_INSERT_CHAR	WEOF
+#else
+#define NO_INSERT_CHAR  256
+#endif
+#define removesuffix() iremovesuffix(NO_INSERT_CHAR, 0)
 
 /*
  * Cut/kill buffer type.  The buffer itself is purely binary data, not
@@ -324,6 +329,15 @@ struct compldat {
 enum {
     ZSL_COPY = 1,		/* Copy the argument, don't modify it */
     ZSL_TOEND = 2,		/* Go to the end of the new line */
+};
+
+
+/* Type arguments to addsuffix() */
+enum suffixtype {
+    SUFTYP_POSSTR,		/* String of characters to match */
+    SUFTYP_NEGSTR,		/* String of characters not to match */
+    SUFTYP_POSRNG,		/* Range of characters to match */
+    SUFTYP_NEGRNG		/* Range of characters not to match */
 };
 
 #ifdef DEBUG

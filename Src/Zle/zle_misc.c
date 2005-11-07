@@ -1012,19 +1012,50 @@ executenamedcommand(char *prmt)
  * indicate that it is being permanently fixed.
  */
 
-/* Length of suffix to remove when inserting each possible character value.  *
- * suffixlen[256] is the length to remove for non-insertion editing actions. */
+struct suffixset;
 
-/*
- * TODO: Aargh, this is completely broken with wide characters.
- */
-/**/
-mod_export int suffixlen[257];
+/* An element of a suffix specification */
+struct suffixset {
+    struct suffixset *next;	/* Next in the list */
+    int tp;			/* The SUFTYP_* from enum suffixtype */
+    ZLE_STRING_T chars;		/* Set of characters to match (or not) */
+    int lenstr;			/* Length of chars */
+    int lensuf;			/* Length of suffix */
+};
+
+/* The list of suffix structures */
+struct suffixset *suffixlist;
 
 /* Shell function to call to remove the suffix. */
 
 /**/
 static char *suffixfunc;
+
+/* Length associated with the suffix function */
+static int suffixfunclen;
+
+/* Length associated with uninsertable characters */
+/**/
+mod_export int
+suffixnoinslen;
+
+/**/
+mod_export void
+addsuffix(int tp, ZLE_STRING_T chars, int lenstr, int lensuf)
+{
+    struct suffixset *newsuf = zalloc(sizeof(struct suffixset));
+    newsuf->next = suffixlist;
+    suffixlist = newsuf;
+
+    newsuf->tp = tp;
+    if (lenstr) {
+	newsuf->chars = zalloc(lenstr*sizeof(ZLE_CHAR_T));
+	ZS_memcpy(newsuf->chars, chars, lenstr);
+    } else
+	newsuf->chars = NULL;
+    newsuf->lenstr = lenstr;
+    newsuf->lensuf = lensuf;
+}
 
 /* Set up suffix: the last n characters are a suffix that should be *
  * removed in the usual word end conditions.                        */
@@ -1033,8 +1064,8 @@ static char *suffixfunc;
 mod_export void
 makesuffix(int n)
 {
-    suffixlen[256] = suffixlen[' '] = suffixlen['\t'] = suffixlen['\n'] = 
-	suffixlen[';'] = suffixlen['&'] = suffixlen['|'] = n;
+    addsuffix(SUFTYP_POSSTR, ZWS(" \t\n;&|"), 6, n);
+    suffixnoinslen = n;
 }
 
 /* Set up suffix for parameter names: the last n characters are a suffix *
@@ -1047,13 +1078,16 @@ makesuffix(int n)
 mod_export void
 makeparamsuffix(int br, int n)
 {
-    if(br || unset(KSHARRAYS))
-	suffixlen[':'] = suffixlen['['] = n;
-    if(br) {
-	suffixlen['#'] = suffixlen['%'] = suffixlen['?'] = n;
-	suffixlen['-'] = suffixlen['+'] = suffixlen['='] = n;
-	/*{*/ suffixlen['}'] = suffixlen['/'] = n;
+    ZLE_STRING_T charstr = ZWS(":[#%?-+=");
+    int lenstr = 0;
+
+    if (br || unset(KSHARRAYS)) {
+	lenstr = 2;
+	if (br)
+	    lenstr += 6;
     }
+    if (lenstr)
+	addsuffix(SUFTYP_POSSTR, charstr, lenstr, n);
 }
 
 /* Set up suffix given a string containing the characters on which to   *
@@ -1066,9 +1100,10 @@ makesuffixstr(char *f, char *s, int n)
     if (f) {
 	zsfree(suffixfunc);
 	suffixfunc = ztrdup(f);
-	suffixlen[0] = n;
+	suffixfunclen = n;
     } else if (s) {
-	int inv, i, v, z = 0;
+	int inv, i, z = 0;
+	ZLE_STRING_T ws, lasts, wptr;
 
 	if (*s == '^' || *s == '!') {
 	    inv = 1;
@@ -1077,28 +1112,43 @@ makesuffixstr(char *f, char *s, int n)
 	    inv = 0;
 	s = getkeystring(s, &i, 5, &z);
 	s = metafy(s, i, META_USEHEAP);
-
-	if (inv) {
-	    v = 0;
-	    for (i = 0; i < 257; i++)
-		 suffixlen[i] = n;
-	} else
-	    v = n;
+	ws = stringaszleline(s, 0, &i, NULL, NULL);
 
 	if (z)
-	    suffixlen[256] = v;
-
-	while (*s) {
-	    if (s[1] == '-' && s[2]) {
-		int b = (int) *s, e = (int) s[2];
-
-		while (b <= e)
-		    suffixlen[b++] = v;
-		s += 2;
-	    } else
-		suffixlen[STOUC(*s)] = v;
-	    s++;
+	    suffixnoinslen = inv ? 0 : n;
+	else if (inv) {
+	    /*
+	     * negative match, \- wasn't present, so it *should*
+	     * have this suffix length
+	     */
+	    suffixnoinslen = n;
 	}
+
+	lasts = wptr = ws;
+	while (i) {
+	    if (i >= 3 && wptr[1] == ZWC('-')) {
+		ZLE_CHAR_T str[2];
+
+		if (wptr > lasts)
+		    addsuffix(inv ? SUFTYP_NEGSTR : SUFTYP_POSSTR,
+			      lasts, wptr - lasts, n);
+		str[0] = *wptr;
+		str[1] = wptr[2];
+		addsuffix(inv ? SUFTYP_NEGRNG : SUFTYP_POSRNG,
+			  str, 2, n);
+
+		wptr += 3;
+		i -= 3;
+		lasts = wptr;
+	    } else {
+		wptr++;
+		i--;
+	    }
+	}
+	if (wptr > lasts)
+	    addsuffix(inv ? SUFTYP_NEGSTR : SUFTYP_POSSTR,
+		      lasts, wptr - lasts, n);
+	free(ws);
     } else
 	makesuffix(n);
 }
@@ -1129,7 +1179,7 @@ iremovesuffix(ZLE_INT_T c, int keep)
 		unmetafy_line();
 	    }
 
-	    sprintf(buf, "%d", suffixlen[0]);
+	    sprintf(buf, "%d", suffixfunclen);
 	    addlinknode(args, suffixfunc);
 	    addlinknode(args, buf);
 
@@ -1146,14 +1196,73 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	zsfree(suffixfunc);
 	suffixfunc = NULL;
     } else {
-#ifdef MULTIBYTE_SUPPORT
-	/* TODO: best I can think of for now... */
-	int sl = (unsigned int)c <= 256 ? suffixlen[c] : 0;
-#else
-	int sl = suffixlen[c];
-#endif
-	if(sl) {
-	    backdel(sl);
+	int sl = 0;
+	struct suffixset *ss;
+
+	if (c == NO_INSERT_CHAR) {
+	    sl = suffixnoinslen;
+	} else {
+	    /*
+	     * Search for a match for c in the suffix list.
+	     * We stop if we encounter a match in a positive or negative
+	     * list, using the suffix length specified or zero respectively.
+	     * If we reached the end and passed through a negative
+	     * list, we use the suffix length for that, else zero.
+	     * This would break if it were possible to have negative
+	     * sets with different suffix length:  that's not supposed
+	     * to happen.
+	     */
+	    int negsuflen = 0, found = 0;
+
+	    for (ss = suffixlist; ss; ss = ss->next) {
+		switch (ss->tp) {
+		case SUFTYP_POSSTR:
+		    if (memchr(ss->chars, c, ss->lenstr)) {
+			sl = ss->lensuf;
+			found = 1;
+		    }
+		    break;
+
+		case SUFTYP_NEGSTR:
+		    if (memchr(ss->chars, c, ss->lenstr)) {
+			sl = 0;
+			found = 1;
+		    } else {
+			negsuflen = ss->lensuf;
+		    }
+		    break;
+
+		case SUFTYP_POSRNG:
+		    if (ss->chars[0] <= c && c <= ss->chars[1]) {
+			sl = ss->lensuf;
+			found = 1;
+		    }
+		    break;
+
+		case SUFTYP_NEGRNG:
+		    if (ss->chars[0] <= c && c <= ss->chars[1]) {
+			sl = 0;
+			found = 1;
+		    } else {
+			negsuflen = ss->lensuf;
+		    }
+		    break;
+		}
+		if (found)
+		    break;
+	    }
+
+	    if (!found)
+		sl = negsuflen;
+	}
+	if (sl) {
+	    /* must be shifting wide character lengths */
+	    if (zlemetaline != NULL) {
+		unmetafy_line();
+		backdel(sl);
+		metafy_line();
+	    } else
+		backdel(sl);
 	    if (!keep)
 		invalidatelist();
 	}
@@ -1167,5 +1276,15 @@ iremovesuffix(ZLE_INT_T c, int keep)
 mod_export void
 fixsuffix(void)
 {
-    memset(suffixlen, 0, sizeof(suffixlen));
+    while (suffixlist) {
+	struct suffixset *next = suffixlist->next;
+
+	if (suffixlist->lenstr)
+	    zfree(suffixlist->chars, suffixlist->lenstr * sizeof(ZLE_CHAR_T));
+	zfree(suffixlist, sizeof(struct suffixset));
+
+	suffixlist = next;
+    }
+
+    suffixfunclen = suffixnoinslen = 0;
 }

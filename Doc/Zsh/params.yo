@@ -758,7 +758,9 @@ tt(ENV) is em(not) used unless zsh is emulating bf(sh) or bf(ksh).
 )
 vindex(FCEDIT)
 item(tt(FCEDIT))(
-The default editor for the tt(fc) builtin.
+The default editor for the tt(fc) builtin.  If tt(FCEDIT) is not set,
+the parameter tt(EDITOR) is used; if that is not set either, a builtin
+default, usually tt(vi), is used.
 )
 vindex(fignore)
 vindex(FIGNORE)

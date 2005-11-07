@@ -1,3 +1,16 @@
+2005-11-07  Peter Stephenson  <pws@csr.com>
+
+	* 21986: Src/Zle/compresult.c, Src/Zle/iwidgets.list,
+	Src/Zle/zle.h, Src/Zle/zle_misc.c: make completion suffix
+	system work with wide characters; also make magic-space
+	behave like a normal space when it follows a suffix.
+
+	* users/9638: Src/builtin.c, Doc/Zsh/builtins.yo,
+	Doc/Zsh/roadmap.yo: allow FCEDIT to default to EDITOR before
+	defaulting to the builtin default; mention edit-command-line in
+	menu in roadmap.  Also (unposted) indicate roadmap in detailed
+	texinfo node listing even though it doesn't have subentries.
+
 2005-11-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Scott Murray <semurray@ntlworld.com>: users/9648:

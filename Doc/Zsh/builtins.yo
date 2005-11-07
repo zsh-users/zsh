@@ -410,7 +410,9 @@ pattern (should be quoted) and only the history events matching this
 pattern will be shown.
 Otherwise the editor program var(ename) is invoked on a file containing
 these history events.  If var(ename) is not given, the value
-of the parameter tt(FCEDIT) is used.  If var(ename) is `tt(-)',
+of the parameter tt(FCEDIT) is used; if that is not set the value of the
+parameter tt(EDITOR) is used; if that is not set a builtin default, usually
+`tt(vi)' is used.  If var(ename) is `tt(-)',
 no editor is invoked.  When editing is complete, the edited
 command is executed.
 

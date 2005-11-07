@@ -643,7 +643,6 @@ createparamtable(void)
 #ifdef HAVE_SELECT
     setiparam("BAUD", getbaudrate(&shttyinfo));  /* get the output baudrate */
 #endif
-    setsparam("FCEDIT", ztrdup(DEFAULT_FCEDIT));
     setsparam("TMPPREFIX", ztrdup(DEFAULT_TMPPREFIX));
     setsparam("TIMEFMT", ztrdup(DEFAULT_TIMEFMT));
     setsparam("WATCHFMT", ztrdup(default_watchfmt));

@@ -991,9 +991,17 @@ do_single(Cmatch m)
 	if (minfo.we) {
 	    minfo.end += minfo.insc;
 	    if (m->flags & CMF_REMOVE) {
-		makesuffixstr(m->remf, m->rems, minfo.insc);
-		if (minfo.insc == 1)
-		    suffixlen[STOUC(m->suf[0])] = 1;
+		/*
+		 * Here we need the number of characters, not
+		 * bytes in the string.
+		 */
+		int len;
+		ZLE_STRING_T wsuf =
+		    stringaszleline(m->suf, 0, &len, NULL, NULL);
+		makesuffixstr(m->remf, m->rems, len);
+		if (len == 1)
+		    addsuffix(SUFTYP_POSSTR, wsuf, 1, 1);
+		free(wsuf);
 	    }
 	}
     } else {
@@ -1085,7 +1093,7 @@ do_single(Cmatch m)
 			makesuffixstr(m->remf, m->rems, 1);
 		    else if (isset(AUTOREMOVESLASH)) {
 			makesuffix(1);
-			suffixlen['/'] = 1;
+			addsuffix(SUFTYP_POSSTR, ZWS("/"), 1, 1);
 		    }
 		}
 	    }
@@ -1100,7 +1108,7 @@ do_single(Cmatch m)
 	    /* If a suffix was added, and is removable, let *
 	     * `,' and `}' remove it.                       */
 	    if (isset(AUTOPARAMKEYS))
-		suffixlen[','] = suffixlen['}'] = suffixlen[256];
+		addsuffix(SUFTYP_POSSTR, ZWS(",}"), 2, suffixnoinslen);
 	} else if (!menucmp) {
 	    /*{{*/
 	    /* Otherwise, add a `,' suffix, and let `}' remove it. */
@@ -1110,7 +1118,7 @@ do_single(Cmatch m)
 	    minfo.insc++;
 	    makesuffix(1);
 	    if ((!menucmp || minfo.we) && isset(AUTOPARAMKEYS))
-		suffixlen[','] = suffixlen['}'] = 1;
+		addsuffix(SUFTYP_POSSTR, ZWS(",}"), 2, 1);
 	}
     } else if (!havesuff && (!(m->flags & CMF_FILE) || !sr)) {
 	/* If we didn't add a suffix, add a space, unless we are *
@@ -1129,8 +1137,14 @@ do_single(Cmatch m)
 		makesuffixstr(m->remf, m->rems, 1);
 	}
     }
-    if (minfo.we && partest && isset(AUTOPARAMKEYS))
-	makeparamsuffix(((m->flags & CMF_PARBR) ? 1 : 0), minfo.insc - parq);
+    if (minfo.we && partest && isset(AUTOPARAMKEYS)) {
+	/* the suffix code needs numbers of characters, not octets */
+	int outlen;
+	char *tmpstr = dupstrpfx(zlemetaline + parq, minfo.insc - parq);
+	ZLE_STRING_T subline = stringaszleline(tmpstr, 0, &outlen, NULL, NULL);
+	makeparamsuffix(((m->flags & CMF_PARBR) ? 1 : 0), outlen);
+	free(subline);
+    }
 
     if ((menucmp && !minfo.we) || !movetoend) {
 	zlemetacs = minfo.end;

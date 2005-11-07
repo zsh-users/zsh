@@ -58,7 +58,10 @@ item(tt(history-beginning-search-backward-end), etc.)(
 alternative ways of searching the shell history
 )
 item(tt(replace-string), tt(replace-pattern))(
-functions for replacing strings or patterns globally in the command line.
+functions for replacing strings or patterns globally in the command line
+)
+item(tt(edit-command-line))(
+edit the command line with an external editor.
 )
 enditem()
 

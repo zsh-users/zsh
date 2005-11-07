@@ -1461,6 +1461,8 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 		else
 		    editor = getsparam("FCEDIT");
 		if (!editor)
+		    editor = getsparam("EDITOR");
+		if (!editor)
 		    editor = DEFAULT_FCEDIT;
 
 		unqueue_signals();
