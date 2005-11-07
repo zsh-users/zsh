@@ -1,3 +1,8 @@
+2005-11-07  Clint Adams  <clint@zsh.org>
+
+	* 21989: Completion/Debian/Command/_dpkg-cross:
+	completion for dpkg-cross.
+
 2005-11-07  Peter Stephenson  <pws@csr.com>
 
 	* unposted: NEWS: note roadmap.
