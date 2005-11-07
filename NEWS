@@ -18,6 +18,10 @@ Major changes between versions 4.2 and 4.3
   and stores the number in $myfd, so that >&$myfd will work.  Chosen
   not to break existing code.
 
+- The manual now has a Roadmap section (manual page zshroadmap) to
+  give new users an indication of the most interesting parts of the
+  manual.
+
 - New Posix-style zsh-specific tests [[:IDENT:]], [[:IFS:]],
   [[:IFSSPACE:]], [[:WORD:]] test if character can appear in identifier,
   is an IFS character, is an IFS whitespace character, or is considered

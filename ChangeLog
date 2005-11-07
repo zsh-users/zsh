@@ -1,5 +1,7 @@
 2005-11-07  Peter Stephenson  <pws@csr.com>
 
+	* unposted: NEWS: note roadmap.
+
 	* 21986: Src/Zle/compresult.c, Src/Zle/iwidgets.list,
 	Src/Zle/zle.h, Src/Zle/zle_misc.c: make completion suffix
 	system work with wide characters; also make magic-space
