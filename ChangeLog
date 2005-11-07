@@ -3,6 +3,10 @@
 	* 21989: Completion/Debian/Command/_dpkg-cross:
 	completion for dpkg-cross.
 
+	* 21990: Completion/Debian/Command/_toolchain-source:
+	completion for tpkg-debarch, tpkg-install, tpkg-install-libc,
+	tpkg-make, and tpkg-update.
+
 2005-11-07  Peter Stephenson  <pws@csr.com>
 
 	* unposted: NEWS: note roadmap.
