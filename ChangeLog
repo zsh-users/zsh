@@ -3,6 +3,9 @@
 	* 21999: Completion/Unix/Command/_gnutls:
 	completion for certtool and srptool.
 
+	* 22000: Completion/Unix/Command/_totd:
+	completion for totdconfig.
+
 2005-11-10  Clint Adams  <clint@zsh.org>
 
 	* 21998: Completion/Unix/Command/_gnutls:
