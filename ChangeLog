@@ -1,3 +1,8 @@
+2005-11-10  Clint Adams  <clint@zsh.org>
+
+	* 21998: Completion/Unix/Command/_gnutls:
+	completion for gnutls-cli and gnutls-cli-debug.
+
 2005-11-07  Clint Adams  <clint@zsh.org>
 
 	* 21989: Completion/Debian/Command/_dpkg-cross:

@@ -1,0 +1,67 @@
+#compdef gnutls-cli gnutls-cli-debug
+
+local _gnutls_supported _gnutls_supported_certtypes
+local _gnutls_supported_protocols _gnutls_supported_macs
+local _gnutls_supported_kx _gnutls_supported_comp
+local _gnutls_cli_common_args
+
+_gnutls_cli_common_args=(
+     '(-d --debug)'{-d,--debug}':debug level'
+     '(-p --port)'{-p,--port}':port'
+     '(-h --help)'{-h,--help}'[help]' \
+)
+
+case "$service" in
+	(gnutls-cli)
+
+_gnutls_supported="$(gnutls-cli --list)"
+_gnutls_supported_certtypes=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Certificate types:*}#Certificate types: }})
+_gnutls_supported_protocols=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Protocols:*}#Protocols: }})
+_gnutls_supported_ciphers=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Ciphers:*}#Ciphers: }})
+_gnutls_supported_macs=(${(s:, :)${${(M)${(f)_gnutls_supported}:#MACs:*}#MACs: }})
+_gnutls_supported_kx=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Key exchange algorithms:*}#Key exchange algorithms: }})
+_gnutls_supported_comp=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Compression methods:*}#Compression methods: }})
+
+_arguments \
+     "$_gnutls_cli_common_args[@]" \
+     '(-r --resume)'{-r,--resume}'[resume session]' \
+     '(-s --starttls)'{-s,--starttls}'[start TLS on EOF or SIGALRM]' \
+     '--crlf[Send CR LF instead of LF]' \
+     '--x509fmtder[Use DER format for certificates to read from]' \
+     '(-f --fingerprint)'{-f,--fingerprint}'[send the openpgp fingerprint instead of the key]' \
+     '--disable-extensions[disable all the TLS extensions]' \
+     '--xml[print the certificate information in XML format]' \
+     '--print-cert[print the certificate in PEM format]' \
+     '--recordsize:maximum record size to advertise:' \
+     '(-V --verbose)'{-V,--verbose}'[more verbose output]' \
+     '--ciphers:ciphers to enable:('"$_gnutls_supported_ciphers"')' \
+     '--protocols:protocols to enable:('"$_gnutls_supported_protocols"')' \
+     '--comp:compression methods to enable:('"$_gnutls_supported_comp"')' \
+     '--macs:MACs to enable:('"$_gnutls_supported_macs"')' \
+     '--kx:key exchange methods to enable:('"$_gnutls_supported_kx"')' \
+     '--ctypes:certificate types to enable:('"$_gnutls_supported_certtypes"')' \
+     '--x509cafile:certificate file to use:_files' \
+     '--x509crlfile:CRL file to use:_files' \
+     '--pgpkeyfile:PGP key file to use:_files' \
+     '--pgpkeyring:PGP key ring file to use:_files' \
+     '--pgptrustdb:PGP trustdb file to use:_files' \
+     '--pgpcertfile:PGP public key (certificate) file to use:_files' \
+     '--x509keyfile:X.509 key file to use:_files' \
+     '--x509certfile:X.509 certificate file to use:_files' \
+     '--srpusername:SRP username to use' \
+     '--srppasswd:SRP password to use' \
+     '--insecure[do not require server cert validation]' \
+     '(-l --list)'{-l,--list}'[print list of the supported algorithms/modes]' \
+     '(-v --version)'{-v,--version}'[print version number]' \
+     '--copyright[print license]' \
+     ':hostname:_hosts'
+
+     ;;
+	(gnutls-cli-debug)
+
+_arguments \
+     "$_gnutls_cli_common_args[@]" \
+     '(-v --verbose)'{-v,--verbose}'[more verbose output]' \
+     ':hostname:_hosts'
+
+esac
