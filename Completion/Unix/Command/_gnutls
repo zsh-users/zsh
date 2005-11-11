@@ -1,4 +1,4 @@
-#compdef gnutls-cli gnutls-cli-debug
+#compdef gnutls-cli gnutls-cli-debug certtool srptool
 
 local _gnutls_supported _gnutls_supported_certtypes
 local _gnutls_supported_protocols _gnutls_supported_macs
@@ -64,4 +64,63 @@ _arguments \
      '(-v --verbose)'{-v,--verbose}'[more verbose output]' \
      ':hostname:_hosts'
 
+     ;;
+
+	(certtool)
+_arguments \
+     '(-s --generate-self-signed)'{-s,--generate-self-signed}'[generate a self-signed certificate]' \
+     '(-c --generate-certificate)'{-c,--generate-certificate}'[generate a signed certificate]' \
+     '--generate-crl[generate a CRL]' \
+     '(-u --update-certificate)'{-u,--update-certificate}'[update a signed certificate]' \
+     '(-p --generate-privkey)'{-p,--generate-privkey}'[generate a private key]' \
+     '(-q --generate-request)'{-q,--generate-request}'[generate a PKCS #10 certificate request]' \
+     '(-e --verify-chain)'{-e,--verify-chain}'[verify a PEM encoded certificate chain]' \
+     '--verify-crl[verify a CRL]' \
+     '--generate-dh-params[generate PKCS #3 encoded Diffie Hellman parameters]' \
+     '--get-dh-params[get the included PKCS #3 encoded Diffie Hellman parameters]' \
+     '--load-privkey:private key file:_files' \
+     '--load-request:certificate request file:_files' \
+     '--load-certificate:certificate file:_files' \
+     '--load-ca-privkey:certificate authority private key file:_files' \
+     '--load-ca-certificate:certificate authority certificate file:_files' \
+     '--password:password' \
+     '(-i --certificate-info)'{-i,--certificate-info}'[print information on a certificate]' \
+     '(-l --crl-info)'{-l,--crl-info}'[print information on a CRL]' \
+     '--p12-info[print information on a PKCS #12 structure]' \
+     '--p7-info[print information on a PKCS #7 structure]' \
+     '--smime-to-p7[convert S/MIME to PKCS #7 structure]' \
+     '(-k --key-info)'{-k,--key-info}'[print information on a private key]' \
+     '--fix-key[regenerate the parameters in a private key]' \
+     '--to-p12[generate a PKCS #12 structure]' \
+     '(-8 --pkcs8)'{-8,--pkcs8}'[use PKCS #8 format for private keys]' \
+     '--dsa[use DSA keys]' \
+     '--hash:hash algorithm for signing:(MD5 SHA1 RMD160)' \
+     '--export-ciphers[use weak encryption algorithms]' \
+     '--inder[use DER format for input certificates and private keys]' \
+     '--xml[use XML format for output certificates]' \
+     '--outder[use DER format for output certificates and private keys]' \
+     '--bits:number of bits for key generation' \
+     '--outfile:output file:_files ' \
+     '--infile:input file:_files ' \
+     '--template:template file to use for non-interactive operation:_files' \
+     '(-d --debug)'{-d,--debug}':debug level' \
+     '(-h --help)'{-h,--help}'[show help]' \
+     '(-v --version)'{-v,--version}'[show version]' \
+     '--copyright[shows license]'
+
+     ;;
+	(srptool)
+
+_arguments \
+     '(-u --username)'{-u,--username}':username:_users' \
+     '(-p --passwd)'{-p,--passwd}':password file:_files' \
+     '(-i --index)'{-i,--index}':index of params in tpasswd.conf' \
+     '(-s --salt)'{-s,--salt}':salt size for crypt algorithm' \
+     '--verify[just verify password]' \
+     '(-c --passwd-conf)'{-c,--passwd-conf}':password conf file:_files' \
+     '--create-conf:generate a tpasswd.conf file:_files' \
+     '(-v --version)'{-v,--version}'[show version]' \
+     '(-h --help)'{-h,--help}'[show help]'
+
+     ;;
 esac
