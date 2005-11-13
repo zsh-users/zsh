@@ -4,7 +4,7 @@ _arguments -s \
   '(- *)'{-h,--help}'[display help information]' \
   '(- *)'{-v,--version}'[display version information]' \
   '--display:display:_x_display' \
-  \*{-f,--file}'[read file names from file]:_files' \
+  \*{-F,--file}'[read file names from file]:file:_files' \
   '(-e --center)'{-e,--center}'[disable window centering]' \
   '(-w --fixed_width -W --fixed_zoom)'{-w,--fixed_width}'[use window with specified width]:width' \
   '(-w --fixed_width -W --fixed_zoom)'{-W,--fixed_zoom}'[use window with specified zoom factor]:zoom (percentage)' \
