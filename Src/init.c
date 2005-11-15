@@ -1180,7 +1180,7 @@ mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 #endif /* !LINKED_XMOD_zshQszle */
 
 /**/
-unsigned char *
+char *
 autoload_zleread(char **lp, char **rp, int ha, int con)
 {
     zlereadptr = fallback_zleread;
@@ -1190,7 +1190,7 @@ autoload_zleread(char **lp, char **rp, int ha, int con)
 }
 
 /**/
-mod_export unsigned char *
+mod_export char *
 fallback_zleread(char **lp, UNUSED(char **rp), UNUSED(int ha), UNUSED(int con))
 {
     char *pptbuf;
@@ -1200,7 +1200,7 @@ fallback_zleread(char **lp, UNUSED(char **rp), UNUSED(int ha), UNUSED(int con))
     write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
     free(pptbuf);
 
-    return (unsigned char *)shingetline();
+    return shingetline();
 }
 
 /**/

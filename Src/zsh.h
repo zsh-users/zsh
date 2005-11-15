@@ -1918,8 +1918,8 @@ typedef int (*CompctlReadFn) _((char *, char **, Options, char *));
 
 typedef void (*ZleVoidFn) _((void));
 typedef void (*ZleVoidIntFn) _((int));
-typedef unsigned char *(*ZleReadFn) _((char **, char **, int, int));
-typedef unsigned char *(*ZleGetLineFn) _((int *, int *));
+typedef char *(*ZleReadFn) _((char **, char **, int, int));
+typedef char *(*ZleGetLineFn) _((int *, int *));
 
 /***************************************/
 /* Hooks in core.                      */
