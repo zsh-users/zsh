@@ -63,7 +63,7 @@
  * zlemetacs and zlemetall are defined in lex.c.
  */
 /**/
-mod_export unsigned char *zlemetaline;
+mod_export char *zlemetaline;
 /**/
 mod_export int metalinesz;
 
@@ -611,7 +611,7 @@ docomplete(int lst)
     metafy_line();
 
     ocs = zlemetacs;
-    origline = dupstring((char *) zlemetaline);
+    origline = dupstring(zlemetaline);
     origcs = zlemetacs;
     origll = zlemetall;
     if (!isfirstln && chline != NULL) {
@@ -619,7 +619,7 @@ docomplete(int lst)
 	 * taken from the history), we have to prepend the stuff saved *
 	 * in chline to the contents of line.                          */
 
-	ol = dupstring((char *)zlemetaline);
+	ol = dupstring(zlemetaline);
 	/* Make sure that chline is zero-terminated. */
 	*hptr = '\0';
 	zlemetacs = 0;
@@ -647,16 +647,16 @@ docomplete(int lst)
      * would never change the pointer in the middle of an insertion, but  *
      * then vi doesn't have completion.  More to the point, this is only  *
      * an emulation.                                                      */
-    if (viinsbegin > ztrsub((char *) zlemetaline + wb, (char *) zlemetaline))
-	viinsbegin = ztrsub((char *) zlemetaline + wb, (char *) zlemetaline);
+    if (viinsbegin > ztrsub(zlemetaline + wb, zlemetaline))
+	viinsbegin = ztrsub(zlemetaline + wb, zlemetaline);
     /* If we added chline to the line buffer, reset the original contents. */
     if (ol) {
 	zlemetacs -= chl;
 	wb -= chl;
 	we -= chl;
 	if (wb < 0) {
-	    strcpy((char *) zlemetaline, ol);
-	    zlemetall = strlen((char *) zlemetaline);
+	    strcpy(zlemetaline, ol);
+	    zlemetall = strlen(zlemetaline);
 	    zlemetacs = ocs;
 	    popheap();
 	    unmetafy_line();
@@ -792,7 +792,7 @@ docomplete(int lst)
 	    /* Do expansion. */
 	    char *ol = (olst == COMP_EXPAND ||
                         olst == COMP_EXPAND_COMPLETE) ?
-		dupstring((char *)zlemetaline) : (char *)zlemetaline;
+		dupstring(zlemetaline) : zlemetaline;
 	    int ocs = zlemetacs, ne = noerrs;
 
 	    noerrs = 1;
@@ -803,7 +803,7 @@ docomplete(int lst)
 	    /* If expandorcomplete was invoked and the expansion didn't *
 	     * change the command line, do completion.                  */
 	    if (olst == COMP_EXPAND_COMPLETE &&
-		!strcmp(ol, (char *)zlemetaline)) {
+		!strcmp(ol, zlemetaline)) {
 		zlemetacs = ocs;
 		errflag = 0;
 
@@ -825,7 +825,7 @@ docomplete(int lst)
             } else {
                 if (ret)
                     clearlist = 1;
-                if (!strcmp(ol, (char *)zlemetaline)) {
+                if (!strcmp(ol, zlemetaline)) {
                     /* We may have removed some quotes. For completion, other
                      * parts of the code re-install them, but for expansion
                      * we have to do it here. */
@@ -893,15 +893,13 @@ addx(char **ptmp)
 	(instring && (zlemetaline[zlemetacs] == '"' ||
 		      zlemetaline[zlemetacs] == '\'')) ||
 	(addspace = (comppref && !iblank(zlemetaline[zlemetacs])))) {
-	*ptmp = (char *)zlemetaline;
-	zlemetaline = (unsigned char *)zhalloc(strlen((char *)zlemetaline)
-					       + 3 + addspace);
+	*ptmp = zlemetaline;
+	zlemetaline = zhalloc(strlen(zlemetaline) + 3 + addspace);
 	memcpy(zlemetaline, *ptmp, zlemetacs);
 	zlemetaline[zlemetacs] = 'x';
 	if (addspace)
 	    zlemetaline[zlemetacs+1] = ' ';
-	strcpy((char *)zlemetaline + zlemetacs + 1 + addspace,
-	       (*ptmp) + zlemetacs);
+	strcpy(zlemetaline + zlemetacs + 1 + addspace, (*ptmp) + zlemetacs);
 	addedx = 1 + addspace;
     } else {
 	addedx = 0;
@@ -1035,7 +1033,7 @@ get_comp_string(void)
     int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
     int ona = noaliases, qsub;
     char *s = NULL, *tmp, *p, *tt = NULL, rdop[20];
-    unsigned char *linptr, *u;
+    char *linptr, *u;
 
     METACHECK();
 
@@ -1090,7 +1088,7 @@ get_comp_string(void)
     zleparse = 1;
     clwpos = -1;
     lexsave();
-    inpush(dupstrspace((char *) linptr), 0, NULL);
+    inpush(dupstrspace(linptr), 0, NULL);
     strinbeg(0);
     i = tt0 = cp = rd = ins = oins = linarr = parct = ia = 0;
 
@@ -1260,8 +1258,7 @@ get_comp_string(void)
 	/* We are in command or process substitution if we are not in
 	 * a $((...)). */
 	if (parend >= 0 && !tmp)
-	    zlemetaline = (unsigned char *)
-		dupstring(tmp = (char *)zlemetaline);
+	    zlemetaline = dupstring(tmp = zlemetaline);
 	linptr = zlemetaline + zlemetall + addedx - parbegin + 1;
 	if ((linptr - zlemetaline) < 3 || *linptr != '(' ||
 	    linptr[-1] != '(' || linptr[-2] != '$') {
@@ -1333,10 +1330,10 @@ get_comp_string(void)
     }
     if (we > zlemetall)
 	we = zlemetall;
-    tt = (char *)zlemetaline;
+    tt = zlemetaline;
     if (tmp) {
-	zlemetaline = (unsigned char *)tmp;
-	zlemetall = strlen((char *)zlemetaline);
+	zlemetaline = tmp;
+	zlemetall = strlen(zlemetaline);
     }
     if (t0 != STRING && inwhat != IN_MATH) {
 	if (tmp) {
@@ -1403,11 +1400,11 @@ get_comp_string(void)
 		    if (lev)
 			lev--;
 		}
-	    p = (char *) zlemetaline + wb;
+	    p = zlemetaline + wb;
 	    wb++;
 	    if (wb && (*p == '[' || *p == '(') &&
 		!skipparens(*p, (*p == '[' ? ']' : ')'), &p)) {
-		we = (p - (char *) zlemetaline) - 1;
+		we = (p - zlemetaline) - 1;
 		if (insubscr == 2)
 		    insubscr = 3;
 	    }
@@ -1421,19 +1418,19 @@ get_comp_string(void)
 	}
 	zsfree(s);
 	s = zalloc(we - wb + 1);
-	strncpy(s, (char *) zlemetaline + wb, we - wb);
+	strncpy(s, zlemetaline + wb, we - wb);
 	s[we - wb] = '\0';
 	if (wb > 2 && zlemetaline[wb - 1] == '[' &&
 	    iident(zlemetaline[wb - 2])) {
 	    int i = wb - 3;
-	    unsigned char sav = zlemetaline[wb - 1];
+	    char sav = zlemetaline[wb - 1];
 
 	    while (i >= 0 && iident(zlemetaline[i]))
 		i--;
 
 	    zlemetaline[wb - 1] = '\0';
 	    zsfree(varname);
-	    varname = ztrdup((char *) zlemetaline + i + 1);
+	    varname = ztrdup(zlemetaline + i + 1);
 	    zlemetaline[wb - 1] = sav;
 	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
 		(keypm->flags & PM_HASHED)) {
@@ -1785,19 +1782,19 @@ inststrlen(char *str, int move, int len)
 	len = strlen(str);
     spaceinline(len);
     if (zlemetaline != NULL) {
-	strncpy((char *)(zlemetaline + zlemetacs), str, len);
+	strncpy(zlemetaline + zlemetacs, str, len);
 	if (move)
 	    zlemetacs += len;
     } else {
-	unsigned char *instr;
+	char *instr;
 	ZLE_STRING_T zlestr;
 	int zlelen;
 
-	instr = (unsigned char *)ztrduppfx((char *)str, len);
+	instr = ztrduppfx((char *)str, len);
 	zlestr = stringaszleline(instr, 0, &zlelen, NULL, NULL);
 	ZS_strncpy(zleline + zlecs, zlestr, zlelen);
 	free(zlestr);
-	zsfree((char *)instr);
+	zsfree(instr);
 	if (move)
 	    zlecs += len;
     }
@@ -2341,7 +2338,7 @@ listlist(LinkList l)
 int
 doexpandhist(void)
 {
-    unsigned char *ol;
+    char *ol;
     int oll, ocs, ne = noerrs, err, ona = noaliases;
 
     UNMETACHECK();
@@ -2350,13 +2347,13 @@ doexpandhist(void)
     metafy_line();
     oll = zlemetall;
     ocs = zlemetacs;
-    ol = (unsigned char *)dupstring((char *)zlemetaline);
+    ol = dupstring(zlemetaline);
     expanding = 1;
     excs = zlemetacs;
     zlemetall = zlemetacs = 0;
     lexsave();
     /* We push ol as it will remain unchanged */
-    inpush((char *) ol, 0, NULL);
+    inpush(ol, 0, NULL);
     strinbeg(1);
     noaliases = 1;
     noerrs = 1;
@@ -2380,7 +2377,7 @@ doexpandhist(void)
 
     if (!err) {
 	zlemetacs = excs;
-	if (strcmp((char *)zlemetaline, (char *)ol)) {
+	if (strcmp(zlemetaline, ol)) {
 	    unmetafy_line();
 	    /* For vi mode -- reset the beginning-of-insertion pointer   *
 	     * to the beginning of the line.  This seems a little silly, *
@@ -2392,7 +2389,7 @@ doexpandhist(void)
 	}
     }
 
-    strcpy((char *)zlemetaline, (char *)ol);
+    strcpy(zlemetaline, ol);
     zlemetall = oll;
     zlemetacs = ocs;
     unmetafy_line();
@@ -2473,7 +2470,7 @@ getcurcmd(void)
     zleparse = 2;
     lexsave();
     metafy_line();
-    inpush(dupstrspace((char *) zlemetaline), 0, NULL);
+    inpush(dupstrspace(zlemetaline), 0, NULL);
     strinbeg(1);
     pushheap();
     do {
@@ -2549,8 +2546,7 @@ expandcmdpath(UNUSED(char **args))
 	return 1;
     zlecs = cmdwb;
     foredel(cmdwe - cmdwb);
-    zlestr = stringaszleline((unsigned char *)str, 0,
-			     &strll, NULL, NULL);
+    zlestr = stringaszleline(str, 0, &strll, NULL, NULL);
     spaceinline(strll);
     ZS_strncpy(zleline + zlecs, zlestr, strll);
     free(zlestr);
