@@ -94,9 +94,9 @@ typedef char *ZLE_STRING_T;
 typedef int ZLE_INT_T;
 #define ZLE_CHAR_SIZE	sizeof(ZLE_CHAR_T)
 
-/* Leave character or string as is, but string must be unsigned char * */
+/* Leave character or string as is. */
 #define ZWC(c)	c
-#define ZWS(s)	(ZLE_STRING_T)s
+#define ZWS(s)	s
 
 #define ZLEEOF	EOF
 
