@@ -908,10 +908,10 @@ zlecore(void)
 /* Read a line.  It is returned metafied. */
 
 /**/
-unsigned char *
+char *
 zleread(char **lp, char **rp, int flags, int context)
 {
-    unsigned char *s;
+    char *s;
     int old_errno = errno;
     int tmout = getiparam("TMOUT");
     Thingy initthingy;
@@ -932,7 +932,7 @@ zleread(char **lp, char **rp, int flags, int context)
 			  &pptlen);
 	write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
 	free(pptbuf);
-	return (unsigned char *)shingetline();
+	return shingetline();
     }
 
     keytimeout = getiparam("KEYTIMEOUT");
@@ -976,9 +976,9 @@ zleread(char **lp, char **rp, int flags, int context)
     selectkeymap("main", 1);
     selectlocalmap(NULL);
     fixsuffix();
-    if ((s = (unsigned char *)getlinknode(bufstack))) {
-	setline((char *)s, ZSL_TOEND);
-	zsfree((char *)s);
+    if ((s = getlinknode(bufstack))) {
+	setline(s, ZSL_TOEND);
+	zsfree(s);
 	if (stackcs != -1) {
 	    zlecs = stackcs;
 	    stackcs = -1;
@@ -1350,8 +1350,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops,'h'))
 	hbegin(2);
     isfirstln = OPT_ISSET(ops,'e');
-    t = (char *) zleread(&p1, &p2, OPT_ISSET(ops,'h') ? ZLRF_HISTORY : 0,
-			 ZLCON_VARED);
+    t = zleread(&p1, &p2, OPT_ISSET(ops,'h') ? ZLRF_HISTORY : 0, ZLCON_VARED);
     if (OPT_ISSET(ops,'h'))
 	hend(NULL);
     isfirstln = ifl;
