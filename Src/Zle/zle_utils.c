@@ -76,7 +76,7 @@ sizeline(int sz)
 
 	if (zlemetaline != NULL) {
 	    /* One spare character for the NULL */
-	    zlemetaline = (unsigned char *)realloc(zlemetaline, cursz + 1);
+	    zlemetaline = realloc(zlemetaline, cursz + 1);
 	} else {
 	    /* One spare character for the NULL, one for the newline */
 	    zleline =
@@ -125,7 +125,7 @@ zleaddtoline(int chr)
  */
 
 /**/
-mod_export unsigned char *
+mod_export char *
 zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 		int *outcsp, int useheap)
 {
@@ -167,12 +167,12 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
      */
     if (outcsp != NULL || outllp != NULL) {
 #ifdef MULTIBYTE_SUPPORT
-	unsigned char *strp = (unsigned char *)s;
+	char *strp = s;
 #else
-	unsigned char *strp = (unsigned char *)instr;
+	char *strp = instr;
 #endif
-	unsigned char *stopcs = strp + outcs;
-	unsigned char *stopll = strp + outll;
+	char *stopcs = strp + outcs;
+	char *stopll = strp + outll;
 
 	while (strp < stopll) {
 	    if (imeta(*strp)) {
@@ -190,17 +190,15 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 
 #ifdef MULTIBYTE_SUPPORT
     if (useheap) {
-	unsigned char *ret =
-	    (unsigned char *) metafy((char *) s, mb_len, META_HEAPDUP);
+	char *ret = metafy(s, mb_len, META_HEAPDUP);
 
-	zfree((char *)s, inll * MB_CUR_MAX + 1);
+	zfree(s, inll * MB_CUR_MAX + 1);
 
 	return ret;
     }
-    return (unsigned char *) metafy((char *) s, mb_len, META_REALLOC);
+    return metafy(s, mb_len, META_REALLOC);
 #else
-    return (unsigned char *) metafy((char *) instr, inll,
-				    useheap ? META_HEAPDUP : META_DUP);
+    return metafy(instr, inll, useheap ? META_HEAPDUP : META_DUP);
 #endif
 }
 
@@ -232,8 +230,7 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 
 /**/
 mod_export ZLE_STRING_T
-stringaszleline(unsigned char *instr, int incs,
-		int *outll, int *outsz, int *outcs)
+stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 {
     ZLE_STRING_T outstr;
     int ll, sz;
@@ -248,16 +245,16 @@ stringaszleline(unsigned char *instr, int incs,
 	 * of multibyte characters.  If there are none, this
 	 * is all the processing required to calculate outcs.
 	 */
-	unsigned char *inptr = instr, *cspos = instr + incs;
+	char *inptr = instr, *cspos = instr + incs;
 	while (*inptr && inptr < cspos) {
-	    if (*inptr == STOUC(Meta)) {
+	    if (*inptr == Meta) {
 		inptr++;
 		incs--;
 	    }
 	    inptr++;
 	}
     }
-    unmetafy((char *)instr, &ll);
+    unmetafy(instr, &ll);
 
     /*
      * ll is the maximum number of characters there can be in
@@ -271,7 +268,7 @@ stringaszleline(unsigned char *instr, int incs,
 
 #ifdef MULTIBYTE_SUPPORT
     if (ll) {
-	char *inptr = (char *)instr;
+	char *inptr = instr;
 	wchar_t *outptr = outstr;
 
 	/* Reset shift state to input complete string */
@@ -300,7 +297,7 @@ stringaszleline(unsigned char *instr, int incs,
 		ret = 1;
 
 	    if (outcs) {
-		int offs = inptr - (char *)instr;
+		int offs = inptr - instr;
 		if (offs <= incs && incs < offs + (int)ret)
 		    *outcs = outptr - outstr;
 	    }
@@ -309,7 +306,7 @@ stringaszleline(unsigned char *instr, int incs,
 	    outptr++;
 	    ll -= ret;
 	}
-	if (outcs && inptr <= (char *)instr + incs)
+	if (outcs && inptr <= instr + incs)
 	    *outcs = outptr - outstr;
 	*outll = outptr - outstr;
     } else {
@@ -318,7 +315,7 @@ stringaszleline(unsigned char *instr, int incs,
 	    *outcs = 0;
     }
 #else
-    memcpy((char *)outstr, (char *)instr, ll);
+    memcpy(outstr, instr, ll);
     *outll = ll;
     if (outcs)
 	*outcs = incs;
@@ -335,19 +332,18 @@ stringaszleline(unsigned char *instr, int incs,
  */
 
 /**/
-mod_export unsigned char *
+mod_export char *
 zlegetline(int *ll, int *cs)
 {
     if (zlemetaline != NULL) {
 	*ll = zlemetall;
 	*cs = zlemetacs;
-	return (unsigned char *)ztrdup((char *)zlemetaline);
-    } else if (zleline) {
-	return zlelineasstring(zleline, zlell, zlecs, ll, cs, 0);
-    } else {
-	*ll = *cs = 0;
-	return (unsigned char *)ztrdup("");
+	return ztrdup(zlemetaline);
     }
+    if (zleline)
+	return zlelineasstring(zleline, zlell, zlecs, ll, cs, 0);
+    *ll = *cs = 0;
+    return ztrdup("");
 }
 
 
@@ -542,7 +538,7 @@ setline(char *s, int flags)
      */
     free(zleline);
 
-    zleline = stringaszleline((unsigned char *)scp, 0, &zlell, &linesz, NULL);
+    zleline = stringaszleline(scp, 0, &zlell, &linesz, NULL);
 
     if ((flags & ZSL_TOEND) && (zlecs = zlell) && invicmdmode())
 	zlecs--;
