@@ -1197,8 +1197,9 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	if (c == NO_INSERT_CHAR) {
 	    sl = suffixnoinslen;
 	} else {
+	    ZLE_CHAR_T ch = c;
 	    /*
-	     * Search for a match for c in the suffix list.
+	     * Search for a match for ch in the suffix list.
 	     * We stop if we encounter a match in a positive or negative
 	     * list, using the suffix length specified or zero respectively.
 	     * If we reached the end and passed through a negative
@@ -1212,14 +1213,14 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	    for (ss = suffixlist; ss; ss = ss->next) {
 		switch (ss->tp) {
 		case SUFTYP_POSSTR:
-		    if (memchr(ss->chars, c, ss->lenstr)) {
+		    if (memchr(ss->chars, ch, ss->lenstr)) {
 			sl = ss->lensuf;
 			found = 1;
 		    }
 		    break;
 
 		case SUFTYP_NEGSTR:
-		    if (memchr(ss->chars, c, ss->lenstr)) {
+		    if (memchr(ss->chars, ch, ss->lenstr)) {
 			sl = 0;
 			found = 1;
 		    } else {
@@ -1228,14 +1229,14 @@ iremovesuffix(ZLE_INT_T c, int keep)
 		    break;
 
 		case SUFTYP_POSRNG:
-		    if (ss->chars[0] <= c && c <= ss->chars[1]) {
+		    if (ss->chars[0] <= ch && ch <= ss->chars[1]) {
 			sl = ss->lensuf;
 			found = 1;
 		    }
 		    break;
 
 		case SUFTYP_NEGRNG:
-		    if (ss->chars[0] <= c && c <= ss->chars[1]) {
+		    if (ss->chars[0] <= ch && ch <= ss->chars[1]) {
 			sl = 0;
 			found = 1;
 		    } else {

@@ -1,5 +1,8 @@
 2005-11-15  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* unposted: Src/Zle/zle_misc.c: Got rid of some compiler warnings
+	about comparisons between signed and unsigned variables.
+
 	* 22001: Src/hashtable.c, Src/input.c, Src/loop.c, Src/Zle/compcore.c,
 	Src/Zle/compctl.c, Src/Zle/complist.c, Src/Zle/compresult.c,
 	Src/Zle/zle_hist.c, Src/Zle/zle_misc.c, Src/Zle/zle_params.c,
