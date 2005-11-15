@@ -3223,35 +3223,34 @@ unmeta(const char *file_name)
     return fn;
 }
 
-/* Unmetafy and compare two strings, with unsigned characters. *
- * "a\0" sorts after "a".                                      */
+/* Unmetafy and compare two strings, comparing unsigned character values.
+ * "a\0" sorts after "a".  */
 
 /**/
 int
-ztrcmp(unsigned char const *s1, unsigned char const *s2)
+ztrcmp(char const *s1, char const *s2)
 {
     int c1, c2;
 
-    while(*s1 && *s1 == *s2) {
+    while (*s1 && *s1 == *s2) {
 	s1++;
 	s2++;
     }
 
-    if(!(c1 = *s1))
+    if (!(c1 = STOUC(*s1)))
 	c1 = -1;
-    else if(c1 == STOUC(Meta))
-	c1 = *++s1 ^ 32;
-    if(!(c2 = *s2))
+    else if (c1 == STOUC(Meta))
+	c1 = STOUC(*++s1) ^ 32;
+    if (!(c2 = STOUC(*s2)))
 	c2 = -1;
-    else if(c2 == STOUC(Meta))
-	c2 = *++s2 ^ 32;
+    else if (c2 == STOUC(Meta))
+	c2 = STOUC(*++s2) ^ 32;
 
-    if(c1 == c2)
+    if (c1 == c2)
 	return 0;
-    else if(c1 < c2)
+    if (c1 < c2)
 	return -1;
-    else
-	return 1;
+    return 1;
 }
 
 /* Return the unmetafied length of a metafied string. */
@@ -3262,7 +3261,7 @@ ztrlen(char const *s)
 {
     int l;
 
-    for (l = 0; *s; l++)
+    for (l = 0; *s; l++) {
 	if (*s++ == Meta) {
 #ifdef DEBUG
 	    if (! *s)
@@ -3271,6 +3270,7 @@ ztrlen(char const *s)
 #endif
 	    s++;
 	}
+    }
     return l;
 }
 
@@ -3282,7 +3282,7 @@ ztrsub(char const *t, char const *s)
 {
     int l = t - s;
 
-    while (s != t)
+    while (s != t) {
 	if (*s++ == Meta) {
 #ifdef DEBUG
 	    if (! *s || s == t)
@@ -3292,6 +3292,7 @@ ztrsub(char const *t, char const *s)
 	    s++;
 	    l--;
 	}
+    }
     return l;
 }
 
@@ -3586,9 +3587,10 @@ mb_width(const char *s)
 mod_export int
 hasspecial(char const *s)
 {
-    for (; *s; s++)
+    for (; *s; s++) {
 	if (ispecial(*s == Meta ? *++s ^ 32 : *s))
 	    return 1;
+    }
     return 0;
 }
 
