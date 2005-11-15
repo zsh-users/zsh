@@ -442,7 +442,7 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     for (n = firstnode(matchers); n; incnode(n))
 	freecmatcher((Cmatcher) getdata(n));
 
-    zlemetall = strlen((char *)zlemetaline);
+    zlemetall = strlen(zlemetaline);
     if (zlemetacs > zlemetall)
 	zlemetacs = zlemetall;
     popheap();
@@ -1317,7 +1317,7 @@ set_comp_sep(void)
     zleparse = 1;
     ocs = zlemetacs;
     oll = zlemetall;
-    ol = (char *)zlemetaline;
+    ol = zlemetaline;
     addedx = 1;
     noerrs = 1;
     lexsave();
@@ -1358,7 +1358,7 @@ set_comp_sep(void)
     odq = dq;
     osq = sq;
     inpush(dupstrspace(tmp), 0, NULL);
-    zlemetaline = (unsigned char *) tmp;
+    zlemetaline = tmp;
     zlemetall = tl - 1;
     strinbeg(0);
     noaliases = 1;
@@ -1427,7 +1427,7 @@ set_comp_sep(void)
     wb = owb;
     we = owe;
     zlemetacs = ocs;
-    zlemetaline = (unsigned char *) ol;
+    zlemetaline = ol;
     zlemetall = oll;
     if (cur < 0 || i < 1)
 	return 1;

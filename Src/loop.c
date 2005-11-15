@@ -245,7 +245,7 @@ execselect(Estate state, UNUSED(int do_exec))
 		    int oef = errflag;
 
 		    isfirstln = 1;
-		    str = (char *)zlereadptr(&prompt3, NULL, 0, ZLCON_SELECT);
+		    str = zlereadptr(&prompt3, NULL, 0, ZLCON_SELECT);
 		    if (errflag)
 			str = NULL;
 		    errflag = oef;

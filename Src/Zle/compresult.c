@@ -470,7 +470,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	 * requested, we copy it and remove from the line. */
 	char *r = zalloc((i = zlemetacs - ocs) + 1);
 
-	memcpy(r, (char *) (zlemetaline + ocs), i);
+	memcpy(r, zlemetaline + ocs, i);
 	r[i] = '\0';
 	zlemetacs = ocs;
 	foredel(i);
@@ -629,7 +629,7 @@ instmatch(Cmatch m, int *scs)
 	    ocs += l;
 	}
 	lastprebr = (char *) zalloc(pcs - a + 1);
-	memcpy(lastprebr, (char *) zlemetaline + a, pcs - a);
+	memcpy(lastprebr, zlemetaline + a, pcs - a);
 	lastprebr[pcs - a] = '\0';
 	zlemetacs = ocs;
     }
@@ -671,7 +671,7 @@ instmatch(Cmatch m, int *scs)
     }
     if (brend) {
 	lastpostbr = (char *) zalloc(zlemetacs - brb + 1);
-	memcpy(lastpostbr, (char *) zlemetaline + brb, zlemetacs - brb);
+	memcpy(lastpostbr, zlemetaline + brb, zlemetacs - brb);
 	lastpostbr[zlemetacs - brb] = '\0';
     }
     lastend = zlemetacs;
@@ -771,7 +771,7 @@ do_ambiguous(void)
 	/* First remove the old string from the line. */
 	tcs = zlemetacs;
 	zlemetacs = wb;
-	memcpy(old, (char *) zlemetaline + wb, we - wb);
+	memcpy(old, zlemetaline + wb, we - wb);
 	foredel(we - wb);
 
 	/* Now get the unambiguous string and insert it into the line. */
@@ -798,7 +798,7 @@ do_ambiguous(void)
 	/* la is non-zero if listambiguous may be used. Copying and
 	 * comparing the line looks like BFI but it is the easiest
 	 * solution. Really. */
-	la = (zlemetall != origll || strncmp(origline, (char *) zlemetaline, zlemetall));
+	la = (zlemetall != origll || strncmp(origline, zlemetaline, zlemetall));
 
 	/* If REC_EXACT and AUTO_MENU are set and what we inserted is an  *
 	 * exact match, we want menu completion the next time round       *

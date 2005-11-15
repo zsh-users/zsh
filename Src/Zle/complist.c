@@ -1855,16 +1855,16 @@ setmstatus(char *status, char *sline, int sll, int scs,
         *llp = zlemetall;
         *lenp = lastend - wb;
 
-        ret = dupstring((char *) zlemetaline);
+        ret = dupstring(zlemetaline);
 
         p = (char *) zhalloc(zlemetacs - wb + 1);
-        strncpy(p, (char *) zlemetaline + wb, zlemetacs - wb);
+        strncpy(p, zlemetaline + wb, zlemetacs - wb);
         p[zlemetacs - wb] = '\0';
         if (lastend < zlemetacs)
             s = "";
         else {
             s = (char *) zhalloc(lastend - zlemetacs + 1);
-            strncpy(s, (char *) zlemetaline + zlemetacs, lastend - zlemetacs);
+            strncpy(s, zlemetaline + zlemetacs, lastend - zlemetacs);
             s[lastend - zlemetacs] = '\0';
         }
         zlemetacs = 0;
@@ -2109,7 +2109,7 @@ domenuselect(Hookdef dummy, Chdata dat)
             zlemetacs = 0;
             foredel(zlemetall);
             spaceinline(l);
-            strncpy((char *) zlemetaline, origline, l);
+            strncpy(zlemetaline, origline, l);
             zlemetacs = origcs;
             setmstatus(status, NULL, 0 , 0, NULL, NULL, NULL);
         } else if (strpfx("search", s)) {
@@ -2210,16 +2210,15 @@ domenuselect(Hookdef dummy, Chdata dat)
 	     * completion we don't want that, we always want to
 	     * be able to type the next character.
 	     */
-	    modeline = dupstring((char *)zlemetaline);
+	    modeline = dupstring(zlemetaline);
             modecs = zlemetacs;
             modell = zlemetall;
             modelen = minfo.len;
         }
         first = 0;
-        if (mode == MM_INTER) {
-	    statusline = stringaszleline((unsigned char *)status, 0,
-					 &statusll, NULL, NULL);
-        } else if (mode) {
+        if (mode == MM_INTER)
+	    statusline = stringaszleline(status, 0, &statusll, NULL, NULL);
+        else if (mode) {
             int l = sprintf(status, "%s%sisearch%s: ",
                             ((msearchstate & MS_FAILED) ? "failed " : ""),
                             ((msearchstate & MS_WRAPPED) ? "wrapped " : ""),
@@ -2227,8 +2226,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 
             strncat(status, msearchstr, MAX_STATUS - l - 1);
 
-            statusline = stringaszleline((unsigned char *)status, 0,
-					 &statusll, NULL, NULL);
+            statusline = stringaszleline(status, 0, &statusll, NULL, NULL);
         } else {
             statusline = NULL;
             statusll = 0;
@@ -2312,7 +2310,7 @@ domenuselect(Hookdef dummy, Chdata dat)
                 zlemetacs = 0;
                 foredel(zlemetall);
                 spaceinline(l);
-                strncpy((char *) zlemetaline, origline, l);
+                strncpy(zlemetaline, origline, l);
                 zlemetacs = origcs;
                 setmstatus(status, NULL, 0, 0, NULL, NULL, NULL);
 
@@ -2328,7 +2326,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 
 	    s->prev = u;
 	    u = s;
-	    s->line = dupstring((char *) zlemetaline);
+	    s->line = dupstring(zlemetaline);
 	    s->cs = zlemetacs;
 	    s->mline = mline;
 	    s->mlbeg = mlbeg;
@@ -2371,7 +2369,7 @@ domenuselect(Hookdef dummy, Chdata dat)
                 zlemetacs = 0;
                 foredel(zlemetall);
                 spaceinline(l);
-                strncpy((char *) zlemetaline, origline, l);
+                strncpy(zlemetaline, origline, l);
                 zlemetacs = origcs;
 
                 if (cmd == Th(z_selfinsert))
@@ -2399,7 +2397,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if (nmatches < 1 || !minfo.cur || !*(minfo.cur)) {
 		nolist = 1;
                 if (mode == MM_INTER) {
-                    statusline = stringaszleline((unsigned char *)status, 0,
+                    statusline = stringaszleline(status, 0,
 						 &statusll, NULL, NULL);
                 } else {
 		    /* paranoia */
@@ -2444,7 +2442,7 @@ domenuselect(Hookdef dummy, Chdata dat)
             mode = 0;
 	    s->prev = u;
 	    u = s;
-	    s->line = dupstring((char *) zlemetaline);
+	    s->line = dupstring(zlemetaline);
 	    s->cs = zlemetacs;
 	    s->mline = mline;
 	    s->mlbeg = mlbeg;
@@ -2502,7 +2500,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    zlemetacs = 0;
 	    foredel(zlemetall);
 	    spaceinline(l = strlen(u->line));
-	    strncpy((char *) zlemetaline, u->line, l);
+	    strncpy(zlemetaline, u->line, l);
 	    zlemetacs = u->cs;
 	    menuacc = u->acc;
 	    memcpy(&minfo, &(u->info), sizeof(struct menuinfo));
@@ -2540,7 +2538,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 
             if (nolist) {
                 if (mode == MM_INTER) {
-                    statusline = stringaszleline((unsigned char *)status, 0,
+                    statusline = stringaszleline(status, 0,
 						 &statusll, NULL, NULL);
                 } else {
 		    /* paranoia */
@@ -2891,7 +2889,7 @@ domenuselect(Hookdef dummy, Chdata dat)
                 zlemetacs = 0;
                 foredel(zlemetall);
                 spaceinline(origll);
-                strncpy((char *) zlemetaline, origline, origll);
+                strncpy(zlemetaline, origline, origll);
                 zlemetacs = origcs;
                 minfo.len = modelen;
             } else {

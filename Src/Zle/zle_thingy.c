@@ -415,10 +415,8 @@ bin_zle_refresh(UNUSED(char *name), char **args, Options ops, UNUSED(char func))
     statusline = NULL;
     statusll = 0;
     if (*args) {
-	if (**args) {
-	    statusline = stringaszleline((unsigned char *)*args, 0, &statusll,
-					 NULL, NULL);
-	}
+	if (**args)
+	    statusline = stringaszleline(*args, 0, &statusll, NULL, NULL);
 	if (*++args) {
 	    LinkList l = newlinklist();
 	    int zmultsav = zmult;

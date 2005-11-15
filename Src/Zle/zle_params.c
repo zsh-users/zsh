@@ -190,9 +190,8 @@ static char *
 get_buffer(UNUSED(Param pm))
 {
     if (zlemetaline != 0)
-	return dupstring((char *)zlemetaline);
-    else
-	return (char *)zlelineasstring(zleline, zlell, 0, NULL, NULL, 1);
+	return dupstring(zlemetaline);
+    return zlelineasstring(zleline, zlell, 0, NULL, NULL, 1);
 }
 
 /**/
@@ -222,8 +221,7 @@ get_cursor(UNUSED(Param pm))
 	free(tmpline);
 	return tmpcs;
     }
-    else
-	return zlecs;
+    return zlecs;
 }
 
 /**/
@@ -253,7 +251,7 @@ set_lbuffer(UNUSED(Param pm), char *x)
     int len;
 
     if (x && *x != ZWC('\0'))
-	y = stringaszleline((unsigned char *)x, 0, &len, NULL, NULL);
+	y = stringaszleline(x, 0, &len, NULL, NULL);
     else
 	y = ZWS(""), len = 0;
     sizeline(zlell - zlecs + len);
@@ -273,9 +271,8 @@ static char *
 get_lbuffer(UNUSED(Param pm))
 {
     if (zlemetaline != NULL)
-	return dupstrpfx((char *)zlemetaline, zlemetacs);
-    else
-	return (char *)zlelineasstring(zleline, zlecs, 0, NULL, NULL, 1);
+	return dupstrpfx(zlemetaline, zlemetacs);
+    return zlelineasstring(zleline, zlecs, 0, NULL, NULL, 1);
 }
 
 /**/
@@ -286,7 +283,7 @@ set_rbuffer(UNUSED(Param pm), char *x)
     int len;
 
     if (x && *x != ZWC('\0'))
-	y = stringaszleline((unsigned char *)x, 0, &len, NULL, NULL);
+	y = stringaszleline(x, 0, &len, NULL, NULL);
     else
 	y = ZWS(""), len = 0;
     sizeline(zlell = zlecs + len);
@@ -304,9 +301,7 @@ get_rbuffer(UNUSED(Param pm))
 {
     if (zlemetaline != NULL)
 	return dupstrpfx((char *)zleline + zlemetacs, zlemetall - zlemetacs);
-    else
-	return (char *)zlelineasstring(zleline + zlecs, zlell - zlecs,
-				       0, NULL, NULL, 1);
+    return zlelineasstring(zleline + zlecs, zlell - zlecs, 0, NULL, NULL, 1);
 }
 
 /**/
@@ -315,8 +310,7 @@ get_prebuffer(UNUSED(Param pm))
 {
     if (chline)
 	return dupstrpfx(chline, hptr - chline);
-    else
-	return dupstring("");
+    return dupstring("");
 }
 
 /**/
@@ -335,10 +329,9 @@ get_widgetfunc(UNUSED(Param pm))
 
     if (flags & WIDGET_INT)
 	return ".internal";	/* Don't see how this can ever be returned... */
-    else if (flags & WIDGET_NCOMP)
+    if (flags & WIDGET_NCOMP)
 	return widget->u.comp.func;
-    else
-	return widget->u.fnnam;
+    return widget->u.fnnam;
 }
 
 /**/
@@ -350,10 +343,9 @@ get_widgetstyle(UNUSED(Param pm))
 
     if (flags & WIDGET_INT)
 	return ".internal";	/* Don't see how this can ever be returned... */
-    else if (flags & WIDGET_NCOMP)
+    if (flags & WIDGET_NCOMP)
 	return widget->u.comp.wid;
-    else
-	return "";
+    return "";
 }
 
 /**/
@@ -440,10 +432,8 @@ static char *
 get_cutbuffer(UNUSED(Param pm))
 {
     if (cutbuf.buf)
-	return (char *)
-	    zlelineasstring(cutbuf.buf, cutbuf.len, 0, NULL, NULL, 1);
-    else
-	return "";
+	return zlelineasstring(cutbuf.buf, cutbuf.len, 0, NULL, NULL, 1);
+    return "";
 }
 
 
@@ -456,7 +446,7 @@ set_cutbuffer(UNUSED(Param pm), char *x)
     cutbuf.flags = 0;
     if (x) {
 	int n;
-	cutbuf.buf = stringaszleline((unsigned char *)x, 0, &n, NULL, NULL);
+	cutbuf.buf = stringaszleline(x, 0, &n, NULL, NULL);
 	cutbuf.len = n;
 	free(x);
     } else {
@@ -511,8 +501,7 @@ set_killring(UNUSED(Param pm), char **x)
 	    int n, len = strlen(*p);
 	    kptr = kring + kpos;
 
-	    kptr->buf = stringaszleline((unsigned char *)*p, 0, &n,
-					NULL, NULL);
+	    kptr->buf = stringaszleline(*p, 0, &n, NULL, NULL);
 	    kptr->len = n;
 
 	    zfree(*p, len+1);
@@ -547,8 +536,7 @@ get_killring(UNUSED(Param pm))
 	if (kptr->buf)
 	{
 	    /* Allocate on heap. */
-	    *p++ = (char *)zlelineasstring(kptr->buf, kptr->len,
-					   0, NULL, NULL, 1);
+	    *p++ = zlelineasstring(kptr->buf, kptr->len, 0, NULL, NULL, 1);
 	}
 	else
 	    *p++ = dupstring("");
@@ -578,7 +566,7 @@ set_prepost(ZLE_STRING_T *textvar, int *lenvar, char *x)
 	*lenvar = 0;
     }
     if (x) {
-	*textvar = stringaszleline((unsigned char *)x, 0, lenvar, NULL, NULL);
+	*textvar = stringaszleline(x, 0, lenvar, NULL, NULL);
 	free(x);
     }
 }
@@ -586,7 +574,7 @@ set_prepost(ZLE_STRING_T *textvar, int *lenvar, char *x)
 static char *
 get_prepost(ZLE_STRING_T text, int len)
 {
-    return (char *)zlelineasstring(text, len, 0, NULL, NULL, 1);
+    return zlelineasstring(text, len, 0, NULL, NULL, 1);
 }
 
 /**/
@@ -631,11 +619,11 @@ free_prepostdisplay(void)
 static char *
 get_lsearch(UNUSED(Param pm))
 {
-    if (previous_search_len)
-	return (char *)zlelineasstring(previous_search, previous_search_len, 0,
-				       NULL, NULL, 1);
-    else
-	return "";
+    if (previous_search_len) {
+	return zlelineasstring(previous_search, previous_search_len, 0,
+			       NULL, NULL, 1);
+    }
+    return "";
 }
 
 /**/

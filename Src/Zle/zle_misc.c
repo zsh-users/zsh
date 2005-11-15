@@ -476,8 +476,7 @@ whatcursorposition(UNUSED(char **args))
 	     * convert a single character, remembering it may
 	     * turn into a multibyte string or be metafied.
 	     */
-	    mbstr = (char *)zlelineasstring(zleline+zlecs, 1, 0,
-					    &len, NULL, 1);
+	    mbstr = zlelineasstring(zleline+zlecs, 1, 0, &len, NULL, 1);
 	    strcpy(s, mbstr);
 	    s += len;
 	}
@@ -651,7 +650,7 @@ copyprevshellword(UNUSED(char **args))
     LinkList l;
     LinkNode n;
     int i;
-    unsigned char *p = NULL;
+    char *p = NULL;
 
     if (zmult <= 0)
 	return 1;
@@ -662,7 +661,7 @@ copyprevshellword(UNUSED(char **args))
 	    return 1;
         for (n = firstnode(l); n; incnode(n))
             if (!i--) {
-                p = (unsigned char *)getdata(n);
+                p = getdata(n);
                 break;
             }
     }
@@ -792,7 +791,7 @@ executenamedcommand(char *prmt)
     clearlist = 1;
     /* prmt may be constant */
     prmt = ztrdup(prmt);
-    zprmt = stringaszleline((unsigned char *)prmt, 0, &l, NULL, NULL);
+    zprmt = stringaszleline(prmt, 0, &l, NULL, NULL);
     cmdbuf = zhalloc((l + NAMLEN + 2) * ZLE_CHAR_SIZE);
     ZS_memcpy(cmdbuf, zprmt, l);
     free(zprmt);
@@ -875,8 +874,7 @@ executenamedcommand(char *prmt)
 		Thingy r;
 		unambiguous:
 		*ptr = 0;
-		namedcmdstr = (char *)zlelineasstring(cmdbuf, len, 0,
-						      NULL, NULL, 0);
+		namedcmdstr = zlelineasstring(cmdbuf, len, 0, NULL, NULL, 0);
 		r = rthingy(namedcmdstr);
 		free(namedcmdstr);
 		namedcmdstr = NULL;
@@ -906,8 +904,7 @@ executenamedcommand(char *prmt)
 
 		namedcmdll = newlinklist();
 
-		namedcmdstr = (char *)zlelineasstring(cmdbuf, len, 0,
-						      NULL, NULL, 0);
+		namedcmdstr = zlelineasstring(cmdbuf, len, 0, NULL, NULL, 0);
 		scanhashtable(thingytab, 1, 0, DISABLED, scancompcmd, 0);
 		free(namedcmdstr);
 		namedcmdstr = NULL;
@@ -929,9 +926,8 @@ executenamedcommand(char *prmt)
 		    zmult = zmultsav;
 		} else if (!nextnode(firstnode(namedcmdll))) {
 		    char *peekstr = ztrdup(peekfirst(namedcmdll));
-		    ZLE_STRING_T ztmp = 
-			stringaszleline((unsigned char *)peekstr, 0, &len,
-					NULL, NULL);
+		    ZLE_STRING_T ztmp = stringaszleline(peekstr, 0, &len,
+							NULL, NULL);
 		    zsfree(peekstr);
 		    ZS_memcpy(ptr = cmdbuf, ztmp, len);
 		    ptr += len;
@@ -941,9 +937,8 @@ executenamedcommand(char *prmt)
 		} else {
 		    int ltmp;
 		    char *peekstr = ztrdup(peekfirst(namedcmdll));
-		    ZLE_STRING_T ztmp =
-			stringaszleline((unsigned char *)peekstr, 0, &ltmp,
-					NULL, NULL);
+		    ZLE_STRING_T ztmp = stringaszleline(peekstr, 0, &ltmp,
+							NULL, NULL);
 		    zsfree(peekstr);
 		    ZS_memcpy(cmdbuf, ztmp, ltmp);
 		    free(ztmp);

@@ -220,11 +220,11 @@ compctlread(char *name, char **args, Options ops, char *reply)
 	/* without -n, the current line is assigned to the given parameter as a
 	scalar */
 	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
-	    zputs((char *) zlemetaline, stdout);
+	    zputs(zlemetaline, stdout);
 	    putchar('\n');
 	}
 	if (!OPT_ISSET(ops,'e'))
-	    setsparam(reply, ztrdup((char *) zlemetaline));
+	    setsparam(reply, ztrdup(zlemetaline));
     } else {
 	int i;
 
@@ -2761,7 +2761,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     int owe = we, owb = wb, ocs = zlemetacs, swb, swe, scs, soffs, ne = noerrs;
     int sl = strlen(ss), tl, got = 0, i = 0, cur = -1, oll = zlemetall, remq;
     int ois = instring, oib = inbackt, ona = noaliases;
-    char *tmp, *p, *ns, *ol = (char *) zlemetaline, sav, *oaq = autoq;
+    char *tmp, *p, *ns, *ol = zlemetaline, sav, *oaq = autoq;
     char *qp, *qs, *ts, qc = '\0';
 
     swb = swe = soffs = 0;
@@ -2784,7 +2784,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     if ((remq = (*compqstack == '\\')))
 	tmp = rembslash(tmp);
     inpush(dupstrspace(tmp), 0, NULL);
-    zlemetaline = (unsigned char *) tmp;
+    zlemetaline = tmp;
     zlemetall = tl - 1;
     strinbeg(0);
     noaliases = 1;
@@ -2831,7 +2831,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     wb = owb;
     we = owe;
     zlemetacs = ocs;
-    zlemetaline = (unsigned char *) ol;
+    zlemetaline = ol;
     zlemetall = oll;
     if (cur < 0 || i < 1)
 	return 1;
@@ -3213,7 +3213,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    char save = zlemetaline[zlemetacs];
 
 	    zlemetaline[zlemetacs] = 0;
-	    lppre = dupstring((char *) zlemetaline + wb +
+	    lppre = dupstring(zlemetaline + wb +
 			      (qipre && *qipre ?
 			       (strlen(qipre) -
 				(*qipre == '\'' || *qipre == '\"')) : 0));
@@ -3249,7 +3249,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		end -= ql - (qisuf[ql-1] == '\'' || qisuf[ql-1] == '"');
 	    }
 	    zlemetaline[end] = 0;
-	    lpsuf = dupstring((char *) (zlemetaline + zlemetacs));
+	    lpsuf = dupstring(zlemetaline + zlemetacs);
 	    zlemetaline[end] = save;
 	    if (brend) {
 		Brinfo bp;

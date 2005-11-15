@@ -85,8 +85,7 @@ zletext(Histent ent, struct zle_text *zt)
     }
 
     duptext = ztrdup(ent->text);
-    zt->text = stringaszleline((unsigned char *)duptext, 0,
-			       &zt->len, NULL, NULL);
+    zt->text = stringaszleline(duptext, 0, &zt->len, NULL, NULL);
     zsfree(duptext);
     zt->alloced = 1;
 }
@@ -355,9 +354,9 @@ historysearchbackward(char **args)
 	zmult = n;
 	return ret;
     }
-    if (*args) {
-	str = stringaszleline((unsigned char *)*args, 0, &hp, NULL, NULL);
-    } else {
+    if (*args)
+	str = stringaszleline(*args, 0, &hp, NULL, NULL);
+    else {
 	if (histline == curhist || histline != srch_hl || zlecs != srch_cs ||
 	    mark != 0 || ZS_memcmp(srch_str, zleline, histpos) != 0) {
 	    zfree(srch_str, histpos);
@@ -414,9 +413,9 @@ historysearchforward(char **args)
 	zmult = n;
 	return ret;
     }
-    if (*args) {
-	str = stringaszleline((unsigned char *)*args, 0, &hp, NULL, NULL);
-    } else {
+    if (*args)
+	str = stringaszleline(*args, 0, &hp, NULL, NULL);
+    else {
 	if (histline == curhist || histline != srch_hl || zlecs != srch_cs ||
 	    mark != 0 || ZS_memcmp(srch_str, zleline, histpos) != 0) {
 	    zfree(srch_str, histpos * ZLE_CHAR_SIZE);
@@ -539,7 +538,7 @@ insertlastword(char **args)
     if (lastinsert && lastlen &&
 	lastpos <= zlemetacs &&
 	lastlen == zlemetacs - lastpos &&
-	memcmp(lastinsert, (char *)&zlemetaline[lastpos], lastlen) == 0)
+	memcmp(lastinsert, &zlemetaline[lastpos], lastlen) == 0)
 	deleteword = 1;
     else
 	lasthist = curhist;
@@ -644,7 +643,7 @@ insertlastword(char **args)
 
     unmetafy_line();
 
-    zs = stringaszleline((unsigned char *)s, 0, &len, NULL, NULL);
+    zs = stringaszleline(s, 0, &len, NULL, NULL);
     doinsert(zs, len);
     free(zs);
     zmult = n;
@@ -749,8 +748,7 @@ pushlineoredit(char **args)
     if (zmult < 0)
 	return 1;
     if (hline && *hline) {
-	ZLE_STRING_T zhline = stringaszleline((unsigned char *)hline, 0,
-					      &ics, NULL, NULL);
+	ZLE_STRING_T zhline = stringaszleline(hline, 0, &ics, NULL, NULL);
 
 	sizeline(ics + zlell + 1);
 	/* careful of overlapping copy */
@@ -787,7 +785,7 @@ pushinput(char **args)
 int
 zgetline(UNUSED(char **args))
 {
-    unsigned char *s = (unsigned char *)getlinknode(bufstack);
+    char *s = getlinknode(bufstack);
 
     if (!s) {
 	return 1;
@@ -1270,8 +1268,7 @@ getvisrchstr(void)
 	    	cmd == Th(z_vicmdmode)) {
 	    int newlen;
 	    sbuf[sptr] = ZWC('\0');
-	    visrchstr = (char *)zlelineasstring(sbuf + 1, sptr - 1, 0, &newlen,
-						NULL, 0);
+	    visrchstr = zlelineasstring(sbuf+1, sptr-1, 0, &newlen, NULL, 0);
 	    if (!newlen) {
 	        zsfree(visrchstr);
 		visrchstr = ztrdup(vipenultsrchstr);
@@ -1391,8 +1388,7 @@ virepeatsearch(UNUSED(char **args))
 	n = -n;
 	visrchsense = -visrchsense;
     }
-    srcstr = stringaszleline((unsigned char *)visrchstr, 0,
-			     &srclen, NULL, NULL);
+    srcstr = stringaszleline(visrchstr, 0, &srclen, NULL, NULL);
     if (!(he = quietgethist(histline)))
 	return 1;
     while ((he = movehistent(he, visrchsense, hist_skip_flags))) {

@@ -337,7 +337,7 @@ hnamcmp(const void *ap, const void *bp)
 {
     HashNode a = *(HashNode *)ap;
     HashNode b = *(HashNode *)bp;
-    return ztrcmp((unsigned char *) a->nam, (unsigned char *) b->nam);
+    return ztrcmp(a->nam, b->nam);
 }
 
 /* Scan the nodes in a hash table and execute scanfunc on nodes based on
