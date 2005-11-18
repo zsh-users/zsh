@@ -913,7 +913,7 @@ addx(char **ptmp)
 mod_export char *
 dupstrspace(const char *str)
 {
-    int len = strlen((char *)str);
+    int len = strlen(str);
     char *t = (char *) hcalloc(len + 2);
     strcpy(t, str);
     strcpy(t+len, " ");
@@ -1790,7 +1790,7 @@ inststrlen(char *str, int move, int len)
 	ZLE_STRING_T zlestr;
 	int zlelen;
 
-	instr = ztrduppfx((char *)str, len);
+	instr = ztrduppfx(str, len);
 	zlestr = stringaszleline(instr, 0, &zlelen, NULL, NULL);
 	ZS_strncpy(zleline + zlecs, zlestr, zlelen);
 	free(zlestr);
