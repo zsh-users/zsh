@@ -1,5 +1,9 @@
 2005-11-18  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* users/9690: Completion/Unix/Command/_ssh: improved Hannu's
+	completion code to handle multiple hostnames per "Host" directive
+	and to skip wildcard-containing names.
+
 	* unposted: Src/Zle/zle_tricky.c: got rid of two unneeded casts.
 
 2005-11-18  Peter Stephenson  <pws@csr.com>
