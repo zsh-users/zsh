@@ -1,3 +1,7 @@
+2005-11-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Zle/zle_tricky.c: got rid of two unneeded casts.
+
 2005-11-18  Peter Stephenson  <pws@csr.com>
 
 	* users/9688: Completion/Unix/Command/_ssh: improved
