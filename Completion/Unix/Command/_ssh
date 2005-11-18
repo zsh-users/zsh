@@ -320,10 +320,15 @@ _ssh_hosts () {
       ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
   fi
   if [[ -r "$HOME/.ssh/config" ]]; then
-    local IFS=$'\t ' key host
-    while read key host; do
+    local IFS=$'\t ' key hosts host
+    while read key hosts; do
       if [[ "$key" == (#i)host ]]; then
-	 config_hosts+=("$host")
+	 for host in ${(z)hosts}; do
+	    case $host in
+	    (*[*?]*) ;;
+	    (*) config_hosts+=("$host") ;;
+	    esac
+	 done
       fi
     done < "$HOME/.ssh/config"
     if (( ${#config_hosts} )); then
