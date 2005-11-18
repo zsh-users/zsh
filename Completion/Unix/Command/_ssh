@@ -283,11 +283,11 @@ _ssh () {
       elif compset -P '*@'; then
         suf=( -S '' )
         compset -S ':*' || suf=( -S : )
-        _wanted hosts expl host _ssh_hosts $suf && ret=0
+        _wanted hosts expl 'remote host name' _ssh_hosts $suf && ret=0
       else
         _alternative \
 	    'files:: _files' \
-	    'hosts:host:_ssh_hosts -S:' \
+	    'hosts:remote host name:_ssh_hosts -S:' \
 	    'users:user:_ssh_users -qS@' && ret=0
       fi
       ;;
@@ -298,7 +298,7 @@ _ssh () {
         _wanted hosts expl host _ssh_hosts -S: && ret=0
       else
         _alternative \
-	    'hosts:host:_ssh_hosts -S:' \
+	    'hosts:remote host name:_ssh_hosts -S:' \
 	    'users:user:_ssh_users -qS@' && ret=0
       fi
       ;;
@@ -311,11 +311,25 @@ _ssh_users () {
 }
 
 _ssh_hosts () {
+  local -a config_hosts
+
   if [[ "$IPREFIX" == *@ ]]; then
     _combination -s '[:@]' my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@"
   else
     _combination -s '[:@]' my-accounts users-hosts \
       ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
+  fi
+  if [[ -r "$HOME/.ssh/config" ]]; then
+    local IFS=$'\t ' key host
+    while read key host; do
+      if [[ "$key" == (#i)host ]]; then
+	 config_hosts+=("$host")
+      fi
+    done < "$HOME/.ssh/config"
+    if (( ${#config_hosts} )); then
+      _wanted hosts expl 'remote host name' \
+	compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" $config_hosts
+    fi
   fi
 }
 

@@ -1,3 +1,9 @@
+2005-11-18  Peter Stephenson  <pws@csr.com>
+
+	* users/9688: Completion/Unix/Command/_ssh: improved
+	_ssh_hosts from Hannu Koivisto <azure@iki.fi>; also
+	rationalise reference to hosts to "remote host name".
+
 2005-11-17  Clint Adams  <clint@zsh.org>
 
 	* 22005: Completion/Unix/Command/_flasher: completion
