@@ -4,16 +4,16 @@ local args
 
 args=(
   '(-n --quiet --silent)'{-n,--quiet,--silent}'[suppress automatic printing of pattern space]'
-  '(1)*'{-e,--expresssion=}'[add sed commands to run]:sed script'
-  '(1)*'{-f,--file=}'[add contents of file to commands to run]:file:_files'
+  '(1)*'{-e,--expression=-}'[add sed commands to run]:sed script'
+  '(1)*'{-f,--file=-}'[add contents of file to commands to run]:file:_files'
   '(-e)1: :_guard "^-*" sed script'
   ':input file:_files'
 )
 
 if _pick_variant gnu=GNU unix --version; then
   args+=(
-    '(-i --in-place)'{-i,--in-place=}'[edit files in place]::suffix for backup'
-    '(-l --line-length)'{-l,--line-length=}'[specify line-wrap length for the l command]'
+    '(-i --in-place)'{-i-,--in-place=-}'[edit files in place]::suffix for backup'
+    '(-l --line-length)'{-l,--line-length=-}'[specify line-wrap length for the l command]'
     '(-r --regexp-extended)'{-r,--regexp-extended}'[use extended regular expressions]'
     '(-s --separate)'{-s,--separate}'[consider files separately instead of as a combined stream]'
     '(-u --unbuffered)'{-u,--unbuffered}'[disable data buffering]'

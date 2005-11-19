@@ -47,6 +47,12 @@
 	* 21998: Completion/Unix/Command/_gnutls:
 	completion for gnutls-cli and gnutls-cli-debug.
 
+2005-11-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21994: Completion/Unix/Command/_sed: use correct semantics for
+	arguments of the -e -f -i and -l options.  May need further tweaks
+	for non-GNU seds.
+
 2005-11-07  Clint Adams  <clint@zsh.org>
 
 	* 21989: Completion/Debian/Command/_dpkg-cross:
