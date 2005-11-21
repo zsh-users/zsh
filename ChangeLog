@@ -1,3 +1,8 @@
+2005-11-21  Peter Stephenson  <pws@csr.com>
+
+	* 22009: Src/Zle/zle_refresh.c: fix for double-width characters:
+	stop when we reach the NULL at the end of the new line.
+
 2005-11-18  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/9690: Completion/Unix/Command/_ssh: improved Hannu's

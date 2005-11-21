@@ -1201,6 +1201,12 @@ refreshline(int ln)
     /* we can't do any fancy tricks, so just dump the single character
        and keep on trying */
 #ifdef MULTIBYTE_SUPPORT
+	/*
+	 * in case we were tidying up a funny-width character when we
+	 * reached the end of the new line...
+	 */
+	if (!*nl)
+	    break;
 	do {
 #endif
 	    zputc(*nl);
