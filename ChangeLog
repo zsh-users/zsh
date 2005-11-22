@@ -1,3 +1,9 @@
+2005-11-22  Peter Stephenson  <pws@csr.com>
+
+	* Mårten Svantesson <msv@kth.se>: 22011:
+	Completion/Unix/Command/_cvs: the -R options is more generally
+	available.
+
 2005-11-21  Peter Stephenson  <pws@csr.com>
 
 	* 22009: Src/Zle/zle_refresh.c: fix for double-width characters:
