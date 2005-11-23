@@ -1,3 +1,5 @@
+# Configure the completion system.
+
 emulate -L zsh
 setopt extendedglob
 
@@ -25,10 +27,24 @@ __ci_newline() {
 
 typeset startline='# The following lines were added by compinstall'
 typeset endline='# End of lines added by compinstall'
-typeset ifile line fpath_line compinit_args
+typeset ifile line fpath_line compinit_args opt detect basic line2
 typeset -A styles
-typeset match mbegin mend warn_unknown warn_old warn_comment
+typeset match mbegin mend warn_unknown warn_old warn_comment output
 integer lines_found
+
+while getopts "do" opt; do
+  case $opt in
+    (d)
+    # Detect an existing compinstall setup.
+    detect=1
+    ;;
+
+    (o)
+    # Output basic setup information only.
+    basic=1
+    ;;
+  esac
+done
 
 #
 # Check the user's .zshrc, if any.
@@ -59,6 +75,40 @@ else
     foundold=true
   fi
 fi
+
+
+if [[ -n $detect ]]; then
+  __ci_tidyup
+  [[ $foundold = true ]]
+  return
+fi
+
+
+__ci_output() {
+  print -r "$startline"
+  [[ -n $output ]] && print -r "$output"
+  if [[ -n $ifile ]]; then
+    line="zstyle :compinstall filename ${(qq)ifile}"
+    print -r "$line"
+    eval "$line"
+  fi
+
+  [[ -n $fpath_line ]] && print -r "$fpath_line"
+
+  print -r "
+autoload -Uz compinit
+compinit${compinit_args:+ $compinit_args}"
+
+  print -r "$endline"
+}
+
+
+if [[ -n $basic ]]; then
+  __ci_output
+  __ci_tidyup
+  return
+fi
+
 
 local newifile=$ifile
 if [[ $foundold = true ]]; then
@@ -92,8 +142,19 @@ ifile=$newifile
 
 if [[ $foundold = true ]]; then
   sed -n "/^[ 	]*$startline/,/^[ 	]*$endline/p" $ifile |
-  # Use the default read behaviour to handle any continuation lines.
-  while read line; do
+  # We can't use the default read behaviour to handle continuation lines
+  # since it messes up internal backslashes.
+  while read -r line; do
+    # detect real continuation backslashes by checking there are an
+    # odd number together.  i think this is reliable since the only
+    # other way of quoting a backslash involves following it with
+    # a closing quote.
+    while [[ $line = *\\ ]]; do
+      line2=${(M)line%%\\##}
+      (( ${#line2} & 1 )) || break
+      read -r line2 || break
+      line="${line[1,-2]}$line2"
+    done
     (( lines_found++ ))
     if [[ $line = *'$fpath'* ]]; then
       fpath_line=$line
@@ -119,7 +180,7 @@ ${match[3]}"
     then
       compinit_args=$match[1]
     elif [[ $line != [[:blank:]]# &&
-      $line != [[:blank:]]#'autoload -Uz compinit' &&
+      $line != [[:blank:]]#'autoload '*' compinit' &&
       $line != [[:blank:]]#compinit &&
       $line != [[:blank:]]#zstyle[[:blank:]]#:compinstall* ]]; then
       warn_unknown="${warn_unknown:+$warn_unknown
@@ -379,7 +440,7 @@ o.     Set options for _oldlist: when to keep old list.
 m.     Set options for _match: whether to assume a \`*' at the cursor.
 p.     Set options for _prefix: whether to add a space before the suffix.
 
-q.     Return to the without saving.
+q.     Return to the previous menu without saving.
 0.     Done setting completer options.
 "
 
@@ -1848,15 +1909,13 @@ q.  Return without saving.
 done
 
 
-local output
-
 if (( $#styles )); then
   typeset style stylevals context values
   for style in ${(ko)styles}; do
     stylevals=(${(f)styles[$style]})
     while (( $#stylevals )); do
       output="$output
-zstyle ${(qq)stylevals[1]} $style $stylevals[2]"
+zstyle ${(qq)stylevals[1]} $style ${stylevals[2]}"
       shift 2 stylevals
     done
   done
@@ -1875,22 +1934,7 @@ local tmpout=${TMPPREFIX:-/tmp/zsh}compinstall$$
 # Assemble the complete set of lines to
 # insert.
 #
-{ print -r "$startline
-$output"
-  if [[ -n $ifile ]]; then
-    line="zstyle :compinstall filename ${(qq)ifile}"
-    print -r "$line"
-    eval "$line"
-  fi
-
-  [[ -n $fpath_line ]] && print -r "$fpath_line"
-
-  print -r "
-autoload -Uz compinit
-compinit${compinit_args:+ $compinit_args}"
-
-  print -r "$endline"
-} >$tmpout
+__ci_output >$tmpout
 
 if [[ -n $ifile ]]; then
   if [[ $ifile != *(zshrc|zlogin|zshenv) ]]; then 

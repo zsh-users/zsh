@@ -231,6 +231,31 @@ Note that this is mutually exclusive with using the source directories
 as make can become confused by build files created in the source directories.
 
 
+================================
+AUTOMATIC NEW USER CONFIGURATION
+================================
+
+In the default configuration, the shell comes with a system based around
+the zsh/newuser add-on module that detects when a user first starts the
+shell interactively and has no initialisation files (.zshenv, .zshrc,
+.zprofile or .zlogin).  The shell then executes code in the file
+scripts/newuser in the shared library area (by default
+/usr/local/share/zsh/<VERSION>/scripts/newuser).  This feature can be
+turned off simply by removing this script.  The module can be removed
+entirely from the configured shell by editing the line starting
+"name=zsh/newuser" int the config.modules file, which is generated in the
+top level distribution directory during configuration: change the line to
+include "link=no auto=no".
+
+The supplied script executes the function supplied as
+Functions/Newuser/zsh-newuser-install.  This function is currently under
+development.  It is probably preferable for administrators who wish to
+customize the system their own way to edit the newuser script in
+scripts/newuser.  Also, as there is currently no internationalization
+support, administrators of sites with users who mostly do not speak English
+may wish not to install the zsh/newuser module.
+
+
 =====================
 CONFIGURATION OPTIONS
 =====================

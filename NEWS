@@ -8,6 +8,10 @@ Major changes between versions 4.2 and 4.3
 - There is support for multibyte character sets in the line editor,
   though not the main shell.  See Multibyte Character Support in INSTALL.
 
+- The shell can now run an installation function for a new user
+  (one with no .zshrc, .zshenv, .zprofile or .zlogin file) without
+  any additional setting up by the administrator.
+
 - New option PROMPT_SP, on by default, to work around the problem that the
   line editor can overwrite output with no newline at the end.
 
