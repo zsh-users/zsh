@@ -1,5 +1,8 @@
 2005-11-24  Peter Stephenson  <pws@csr.com>
 
+	* 22021: Functions/Zle/insert-unicode-char: back-to-back
+	insertions didn't work.
+
 	* 22018: INSTALL, Functions/Newuser/zsh-newuser-install: tweak
 	following suggestions from Bart.
 

@@ -1,7 +1,10 @@
 # Make hex integers appear as 0x...
 setopt localoptions cbases
 
-if [[ $LASTWIDGET = insert-unicode-char ]]; then
+integer -g _insert_unicode_ready
+
+if [[ $LASTWIDGET = insert-unicode-char && $_insert_unicode_ready -eq 1 ]]
+then
   # Second call; we should have a usable prefix.
   # If we don't, give up.
   (( ${+NUMERIC} )) || return 1
@@ -9,9 +12,11 @@ if [[ $LASTWIDGET = insert-unicode-char ]]; then
   local -i 16 -Z 10 arg=$NUMERIC
   # ...and use print to turn this into a Unicode character.
   LBUFFER+="$(print -n "\U${arg##0x}")"
+  _insert_unicode_ready=0
 else
   # Set the base to 16...
   zle argument-base 16
   # ...wait for user to type hex keys then call this widget again.
   zle universal-argument
+  _insert_unicode_ready=1
 fi
