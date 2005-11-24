@@ -243,7 +243,7 @@ scripts/newuser in the shared library area (by default
 /usr/local/share/zsh/<VERSION>/scripts/newuser).  This feature can be
 turned off simply by removing this script.  The module can be removed
 entirely from the configured shell by editing the line starting
-"name=zsh/newuser" int the config.modules file, which is generated in the
+"name=zsh/newuser" in the config.modules file, which is generated in the
 top level distribution directory during configuration: change the line to
 include "link=no auto=no".
 

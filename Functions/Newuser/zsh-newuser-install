@@ -61,8 +61,8 @@ install_state[completion]=Recommended
 trap 'save=0' HUP INT QUIT
 
 # Substitute an initial ~ for human consumption.
-if [[ $zd = $HOME ]]; then
-  zdmsg="~"
+if [[ $zd = $HOME(#b)(|/*) ]]; then
+  zdmsg="~$match[1]"
 else
   zdmsg=$zd
 fi

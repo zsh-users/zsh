@@ -1,5 +1,8 @@
 2005-11-24  Peter Stephenson  <pws@csr.com>
 
+	* 22018: INSTALL, Functions/Newuser/zsh-newuser-install: tweak
+	following suggestions from Bart.
+
 	* 22014: Doc/Zsh/Contrib.yo, Doc/Zsh/zle.yo,
 	Functions/Zle/.distfiles, Functions/Zle/insert-unicode-char,
 	Src/Zle/iwidgets.list, Src/Zle/zle.h, Src/Zle/zle_main.c,
