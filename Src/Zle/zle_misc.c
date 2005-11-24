@@ -518,12 +518,9 @@ quotedinsert(char **args)
 	return selfinsert(args);
 }
 
-/**/
-int
-digitargument(UNUSED(char **args))
+static int
+parsedigit(int inkey)
 {
-    int sign = (zmult < 0) ? -1 : 1;
-
 #ifdef MULTIBYTE_SUPPORT
     /*
      * It's too dangerous to allow metafied input.  See
@@ -531,23 +528,48 @@ digitargument(UNUSED(char **args))
      * of digits.  We are assuming ASCII is a subset of the multibyte
      * encoding.
      */
-    if (!idigit(lastchar))
-	return 1;
 #else
     /* allow metafied as well as ordinary digits */
-    if (!idigit(lastchar & 0x7f))
-	return 1;
+    inkey &= 0x7f;
 #endif
+
+    /* remember lastchar is not a wide character */
+    if (zmod.base > 10)
+    {
+	if (lastchar >= 'a' && lastchar < 'a' + zmod.base - 10)
+	    return lastchar - 'a' + 10;
+	else if (lastchar >= 'A' && lastchar < 'A' + zmod.base - 10)
+	    return lastchar - 'A' + 10;
+	else if (idigit(lastchar))
+	    return lastchar - '0';
+	else
+	    return -1;
+    }
+    else if (lastchar >= '0' && lastchar < '0' + zmod.base)
+	return lastchar - '0';
+    else
+	return -1;
+}
+
+/**/
+int
+digitargument(UNUSED(char **args))
+{
+    int sign = (zmult < 0) ? -1 : 1;
+    int newdigit = parsedigit(lastchar);
+
+    if (newdigit < 0)
+	return 1;
 
     if (!(zmod.flags & MOD_TMULT))
 	zmod.tmult = 0;
     if (zmod.flags & MOD_NEG) {
 	/* If we just had a negative argument, this is the digit, *
 	 * rather than the -1 assumed by negargument()            */
-	zmod.tmult = sign * (lastchar & 0xf);
+	zmod.tmult = sign * newdigit;
 	zmod.flags &= ~MOD_NEG;
     } else
-	zmod.tmult = zmod.tmult * 10 + sign * (lastchar & 0xf);
+	zmod.tmult = zmod.tmult * zmod.base + sign * newdigit;
     zmod.flags |= MOD_TMULT;
     prefixflag = 1;
     return 0;
@@ -594,12 +616,16 @@ universalargument(char **args)
 	if (gotk == '-' && !digcnt) {
 	    minus = -1;
 	    digcnt++;
-	} else if (idigit(gotk)) {
-	    pref = pref * 10 + (gotk & 0xf);
-	    digcnt++;
 	} else {
-	    ungetbyte(gotk);
-	    break;
+	    int newdigit = parsedigit(gotk);
+
+	    if (newdigit >= 0) {
+		pref = pref * zmod.base + newdigit;
+		digcnt++;
+	    } else {
+		ungetbyte(gotk);
+		break;
+	    }
 	}
     }
     if (digcnt)
@@ -608,6 +634,36 @@ universalargument(char **args)
 	zmod.tmult *= 4;
     zmod.flags |= MOD_TMULT;
     prefixflag = 1;
+    return 0;
+}
+
+/* Set the base for a digit argument. */
+
+/**/
+int
+argumentbase(char **args)
+{
+    int multbase;
+
+    if (*args)
+	multbase = (int)zstrtol(*args, NULL, 0);
+    else
+	multbase = zmod.mult;
+
+    if (multbase < 2 || multbase > ('9' - '0' + 1) + ('z' - 'a' + 1))
+	return 1;
+
+    zmod.base = multbase;
+
+    /* reset modifier, apart from base... */
+    zmod.flags = 0;
+    zmod.mult = 1;
+    zmod.tmult = 1;
+    zmod.vibuf = 0;
+
+    /* ...but indicate we are still operating on a prefix argument. */
+    prefixflag = 1;
+
     return 0;
 }
 

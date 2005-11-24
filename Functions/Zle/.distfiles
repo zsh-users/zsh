@@ -9,6 +9,7 @@ edit-command-line              forward-word-match
 history-pattern-search         history-search-end
 incarg                         incremental-complete-word
 insert-composed-char           insert-files
+insert-unicode-char
 keeper                         kill-word-match
 match-words-by-style           narrow-to-region
 narrow-to-region-invisible     predict-on

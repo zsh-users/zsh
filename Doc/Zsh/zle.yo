@@ -1519,6 +1519,23 @@ Inside a widget function, if passed an argument, i.e. `tt(zle
 universal-argument) var(num)', the numerical argument will be set to
 var(num); this is equivalent to `tt(NUMERIC=)var(num)'.
 )
+tindex(argument-base)
+item(tt(argument-base))(
+Use the existing numeric argument as a numeric base, which must be in the
+range 2 to 36 inclusive.  Subsequent use of tt(digit-argument) and
+tt(universal-argument) will input a new prefix in the given base.
+The usual hexadecimal convention is used: the letter tt(a) or tt(A)
+corresponds to 10, and so on.  Arguments in bases requiring digits from 10
+upwards are more conveniently input with tt(universal-argument), since
+tt(ESC-a) etc. are not usually bound to tt(digit-argument).
+
+The function can be used with a command argument inside a user-defined
+widget.  The following code sets the base to 16 and lets the user input a
+hexadecimal argument until a key out of the digit range is typed:
+
+example(zle argument-base 16
+zle universal-argument)
+)
 enditem()
 texinode(Completion)(Miscellaneous)(Arguments)(Zle Widgets)
 subsect(Completion)

@@ -205,6 +205,7 @@ struct modifier {
     int mult;		/* repeat count */
     int tmult;		/* repeat count actually being edited */
     int vibuf;		/* vi cut buffer */
+    int base;		/* numeric base for digit arguments (usually 10) */
 };
 
 #define MOD_MULT  (1<<0)   /* a repeat count has been selected */

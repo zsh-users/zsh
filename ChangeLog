@@ -1,3 +1,12 @@
+2005-11-24  Peter Stephenson  <pws@csr.com>
+
+	* 22014: Doc/Zsh/Contrib.yo, Doc/Zsh/zle.yo,
+	Functions/Zle/.distfiles, Functions/Zle/insert-unicode-char,
+	Src/Zle/iwidgets.list, Src/Zle/zle.h, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c: internal widget argument-base sets
+	numeric base for next prefix argument, widget insert-unicode-char
+	uses this to insert Unicode character by \U........
+
 2005-11-23  Peter Stephenson  <pws@csr.com>
 
 	* 22013: INSTALL, NEWS, Completion/compinstall,

@@ -13,6 +13,7 @@
 "accept-and-menu-complete", acceptandmenucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "accept-line", acceptline, 0
 "accept-line-and-down-history", acceptlineanddownhistory, 0
+"argument-base", argumentbase, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "backward-char", backwardchar, 0
 "backward-delete-char", backwarddeletechar, ZLE_KEEPSUFFIX
 "backward-delete-word", backwarddeleteword, ZLE_KEEPSUFFIX

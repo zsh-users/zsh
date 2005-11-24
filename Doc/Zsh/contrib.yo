@@ -693,6 +693,9 @@ The function may be run outside zle in which case it prints the character
 (together with a newline) to standard output.  Input is still read from
 keystrokes.
 
+See tt(insert-unicode-char) for an alternative way of inserting Unicode
+characters using their hexadecimal character number.
+
 The set of accented characters is reasonably complete up to Unicode
 character U+0180, the set of special characters less so.  However, it it
 is very sporadic from that point.  Adding new characters is easy,
@@ -916,6 +919,17 @@ narrow-to-region -p $'Editing restricted region\n' \
   -P '' -S state
 zle recursive-edit
 narrow-to-region -R state)
+)
+tindex(insert-unicode-char)
+item(tt(insert-unicode-char))(
+When first executed, the user inputs a set of hexadecimal digits.
+This is terminated with another call to tt(insert-unicode-char).
+The digits are then turned into the corresponding Unicode character.
+For example, if the widget is bound to tt(^XU), the character sequence
+`tt(^XU 4 c ^XU)' inserts tt(L) (Unicode U+004c).
+
+See tt(insert-composed-char) for a way of inserting characters
+using a two-character mnemonic.
 )
 tindex(predict-on)
 tindex(predict-off)

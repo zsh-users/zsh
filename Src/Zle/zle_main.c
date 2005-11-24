@@ -1153,6 +1153,7 @@ initmodifier(struct modifier *mp)
     mp->mult = 1;
     mp->tmult = 1;
     mp->vibuf = 0;
+    mp->base = 10;
 }
 
 /* Reset command modifiers, unless the command just executed was a prefix. *
