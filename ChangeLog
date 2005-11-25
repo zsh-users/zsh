@@ -1,3 +1,8 @@
+2005-11-25  Peter Stephenson  <pws@csr.com>
+
+	* 22031: Nikolai Weibull: Completion/Unix/Command/_git: new
+	completion function.
+
 2005-11-10  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_subversion: patch latest
@@ -168,6 +173,10 @@
 
 	* unposted: config.guess, config.sub: update to 2005-03-24 and
 	2005-02-10, respectively.
+
+2005-04-06  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: release 4.2.5.
 
 2005-04-05  Wayne Davison  <wayned@users.sourceforge.net>
 
