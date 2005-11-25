@@ -1,5 +1,8 @@
 2005-11-25  Peter Stephenson  <pws@csr.com>
 
+	* 22031: Nikolai Weibull: Completion/Unix/Command/_git: new
+	completion function.
+
 	* 22028: Src/exec.c: WARN_GLOBAL_CREATE warned when temporarily
 	altering a global in the environment of a builtin or shell
 	function.
