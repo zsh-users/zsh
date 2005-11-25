@@ -1,3 +1,7 @@
+2005-11-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 22022: Completion/Debian/Command/_dchroot: completion for dchroot
+
 2005-11-24  Peter Stephenson  <pws@csr.com>
 
 	* 22021: Functions/Zle/insert-unicode-char: back-to-back

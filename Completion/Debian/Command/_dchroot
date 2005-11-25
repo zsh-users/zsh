@@ -1,0 +1,18 @@
+#compdef dchroot
+
+local curcontext="$curcontext" state line expl ret=1
+
+_arguments -C \
+  '(-c -l -h -V)-a[execute in all known chroots]' \
+  '(-a -l -h -V)-c[execute in specified chroot]:chroot:->chroots' \
+  '(- *)-l[list available chroots]' \
+  '(-l)-d[preserve environment in chroot]' \
+  '(-h -l -V)-q[be quiet]' \
+  '(- *)-h[display help information]' \
+  '(- *)-V[display version information]' \
+  '*::args: _normal' && ret=0
+
+[[ -n $state ]] && _wanted chroots expl chroot \
+    compadd ${${$(dchroot -l)[3,-1]%,}:#\[*\]} && ret=0
+
+return ret
