@@ -17,6 +17,9 @@
 	Completion/Unix/Command/_ssh, Completion/Unix/Command/_xmlsoft,
 	Completion/X/Command/_gv: patch latest versions from main branch.
 
+        * 20847: Completion/compaudit: stop adding gratuitous
+        elements to fpath when MARK_DIRS is set.
+
 2005-11-25  Peter Stephenson  <pws@csr.com>
 
 	* 22031: Nikolai Weibull: Completion/Unix/Command/_git: new
