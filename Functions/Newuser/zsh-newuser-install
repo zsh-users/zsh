@@ -56,6 +56,7 @@ integer save lines_found
 
 install_state[history]=Recommended
 install_state[completion]=Recommended
+install_state[bindkey]=Recommended
 
 # Don't save anything if interrupted.
 trap 'save=0' HUP INT QUIT
@@ -344,6 +345,11 @@ __zni_display_and_edit() {
   displays=("${display_lines[@]}")
   outputs=("${output_lines[@]}")
 
+  if [[ -n ${states[(r)not yet saved]} ]]; then
+    # default should be installed, unless user says otherwise
+    (( changes++ ))
+  fi
+
   while true; do
     clear
     print -r $1
@@ -531,7 +537,8 @@ Type:
       # Also save any lines suitably marked to parsed_* and state_*
       # by rerunning __zni_parse_lines on each such line.
       for (( i = 1; i <= ${#output_lines}; i++ )); do
-	if [[ $state_lines[$i] = ("set but not saved"|"not to be saved") ]]
+	if [[ $state_lines[$i] = \
+	  ("set but not saved"|"not to be saved"|"not yet saved") ]]
 	then
 	  __zni_parse_lines $state_lines[$i] $output_lines[$i]
 	fi
@@ -659,6 +666,15 @@ __zni_save() {
       (vi)
       lines+=("bindkey -v")
       ;;
+
+      (none)
+      ;;
+
+      (*)
+      print -r "\
+*** Internal error: bad type $parsed_keymaps[main] for keymap ***" >&2
+      read -k key'?--- Type a key in forlorn hope --- '
+      ;;
     esac
   fi
   # Now bindings.
@@ -753,8 +769,12 @@ You can:
 	;;
 
 	(2)
-	compinstall
-	install_state[completion]="Configured"
+	if compinstall; then
+	  install_state[completion]="Configured"
+	  # compinstall has done it's thing, so we don't need
+	  # to write anything.
+	  completion_lines=()
+	fi
 	;;
 
 	(0)
@@ -772,7 +792,7 @@ You can:
 }
 
 __zni_bindkey_config() {
-  __zni_apply_defaults -B none "Change default editing configuration"
+  __zni_apply_defaults -B emacs "Change default editing configuration"
 
   if __zni_display_and_edit "Default editing configuration" \
     "The keys in the shell's line editor can be made to behave either" \
@@ -838,53 +858,54 @@ if compinstall -d; then
 fi
 
 
-clear
-print -r "This is the Z Shell configuration function for new users, $myname."
+# skip initial screen if the function was deliberately run by the user.
 if [[ $1 != -f ]]; then
-  print -r "You are seeing this message because you have no zsh startup files
+  clear
+  print -r "This is the Z Shell configuration function for new users, $myname.
+You are seeing this message because you have no zsh startup files
 (the files .zshenv, .zprofile, .zshrc, .zlogin in the directory
 $zdmsg).  This function can help you with a few settings that should
-make your use of the shell easier."
-fi
+make your use of the shell easier.
 
-print -r "
 You can:
 
 (q)  Quit and do nothing.  The function will be run again next time."
-if [[ ! -f $zd/.zshrc ]]; then
-  print -r "
+  if [[ ! -f $zd/.zshrc ]]; then
+    print -r "
 (0)  Exit, creating the file $zdmsg/.zshrc containing just a comment.
      That will prevent this function being run again."
-fi
-print -r "
+  fi
+  print -r "
 (1)  Continue to main menu.
 "
 
-read -k key$longprompt
-print
+  read -k key$longprompt
+  print
 
-case $key in
-  ([qQ])
-  return 0
-  ;;
+  case $key in
+    ([qQ])
+    return 0
+    ;;
 
-  (0)
-  print -r $msg >$zd/.zshrc
-  return 0
-  ;;
+    (0)
+    print -r $msg >$zd/.zshrc
+    return 0
+    ;;
 
-  (1)
-  ;;
+    (1)
+    ;;
 
-  (*)
-  print -r "Aborting."
-  if [[ $1 != -f ]]; then
-    print "The function will be run again next time.  To prevent this, execute:
+    (*)
+    print -r "Aborting."
+    if [[ $1 != -f ]]; then
+      print "\
+The function will be run again next time.  To prevent this, execute:
   touch $zdmsg/.zshrc"
-  fi
-  return 1
-  ;;
-esac
+    fi
+    return 1
+    ;;
+  esac
+fi
 
 while true; do
   clear
@@ -903,7 +924,8 @@ ${install_state[history]:+  ($install_state[history].)}
   print -r " the new completion system.\
 ${install_state[completion]:+  ($install_state[completion].)}
 
-(3)  Configure how keys behave when editing command lines.
+(3)  Configure how keys behave when editing command lines.\
+${install_state[bindkey]:+  ($install_state[bindkey].)}
 
 (4)  Pick some of the more common shell options.  These are simple on
      or off switches controlling the shell's features.  \
@@ -954,7 +976,7 @@ ${install_state[options]:+  ($install_state[options].)}
     if (( save )); then
       if [[ -f $zd/.zshrc ]]; then
 	cp $zd/.zshrc $zd/.zshrc.zni &&
-	print -r "Copied old '$zdd/.zshrc' to '$zdd/.zshrc.zni'.
+	print -r "Copied old '$zdmsg/.zshrc' to '$zdmsg/.zshrc.zni'.
 "
       fi
 

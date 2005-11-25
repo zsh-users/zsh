@@ -1,3 +1,16 @@
+2005-11-25  Peter Stephenson  <pws@csr.com>
+
+	* 22028: Src/exec.c: WARN_GLOBAL_CREATE warned when temporarily
+	altering a global in the environment of a builtin or shell
+	function.
+
+	* 22027: Functions/Newuser/zsh-newuser-install: fix multiple
+	compinstall lines; suggest selecting emacs keymap slightly
+	more forcefully; ensure recommended selections are saved
+	if not edited; trap bad keymap names; don't show initial
+	explanatory screen if rerun explicitly by user; fix message
+	about copying old .zshrc.
+
 2005-11-25  Oliver Kiddle  <opk@zsh.org>
 
 	* 22022: Completion/Debian/Command/_dchroot: completion for dchroot

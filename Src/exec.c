@@ -30,6 +30,17 @@
 #include "zsh.mdh"
 #include "exec.pro"
 
+/* Flags for last argument of addvars */
+
+enum {
+    /* Export the variable for "VAR=val cmd ..." */
+    ADDVAR_EXPORT =   1 << 0,
+    /* Apply restrictions for variable */
+    ADDVAR_RESTRICT = 1 << 1,
+    /* Variable list is being restored later */
+    ADDVAR_RESTORE =  1 << 2
+};
+
 /* used to suppress ERREXIT and trapping of SIGZERR, SIGEXIT. */
 
 /**/
@@ -1644,7 +1655,7 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
 
 /**/
 static void
-addvars(Estate state, Wordcode pc, int export)
+addvars(Estate state, Wordcode pc, int addflags)
 {
     LinkList vl;
     int xtr, isstr, htok = 0;
@@ -1655,7 +1666,14 @@ addvars(Estate state, Wordcode pc, int export)
     wordcode ac;
     local_list1(svl);
 
-    flags = (locallevel > 0 && isset(WARNCREATEGLOBAL)) ?
+    /*
+     * Warn when creating a global without using typeset -g in a
+     * function.  Don't do this if there is a list of variables marked
+     * to be restored after the command, since then the assignment
+     * is implicitly scoped.
+     */
+    flags = (!(addflags & ADDVAR_RESTORE) &&
+	     locallevel > 0 && isset(WARNCREATEGLOBAL)) ?
 	ASSPM_WARN_CREATE : 0;
     xtr = isset(XTRACE);
     if (xtr) {
@@ -1708,8 +1726,8 @@ addvars(Estate state, Wordcode pc, int export)
 		quotedzputs(val, xtrerr);
 		fputc(' ', xtrerr);
 	    }
-	    if (export && !strchr(name, '[')) {
-		if (export < 0 && isset(RESTRICTED) &&
+	    if ((addflags & ADDVAR_EXPORT) && !strchr(name, '[')) {
+		if ((addflags & ADDVAR_RESTRICT) && isset(RESTRICTED) &&
 		    (pm = (Param) paramtab->removenode(paramtab, name)) &&
 		    (pm->flags & PM_RESTRICTED)) {
 		    zerr("%s: restricted", pm->nam, 0);
@@ -2520,7 +2538,13 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		/* Export this if the command is a shell function,
 		 * but not if it's a builtin.
 		 */
-		addvars(state, varspc, is_shfunc);
+		int flags = 0;
+		if (is_shfunc)
+		    flags |= ADDVAR_EXPORT;
+		if (restorelist)
+		    flags |= ADDVAR_RESTORE;
+
+		addvars(state, varspc, flags);
 		if (errflag) {
 		    if (restorelist)
 			restore_params(restorelist, removelist);
@@ -2597,7 +2621,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    if (type == WC_SIMPLE) {
 		if (varspc) {
-		    addvars(state, varspc, -1);
+		    addvars(state, varspc, ADDVAR_EXPORT|ADDVAR_RESTRICT);
 		    if (errflag)
 			_exit(1);
 		}
