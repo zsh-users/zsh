@@ -11,6 +11,12 @@
 	Completion/X/Command/_urxvt: import various completion functions
 	from main branch.
 
+	* unposted: Completion/Debian/Command/_dput,
+	Completion/Unix/Command/_baz, Completion/Unix/Command/_gpg,
+	Completion/Unix/Command/_iconv, Completion/Unix/Command/_man,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_xmlsoft,
+	Completion/X/Command/_gv: patch latest versions from main branch.
+
 2005-11-25  Peter Stephenson  <pws@csr.com>
 
 	* 22031: Nikolai Weibull: Completion/Unix/Command/_git: new
