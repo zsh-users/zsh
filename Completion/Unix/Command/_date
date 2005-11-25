@@ -1,0 +1,48 @@
+#compdef date
+
+if _pick_variant -r is_gnu gnu="Free Software Foundation" unix --version; then
+  _arguments \
+    '-d[date]:time string:' \
+    '-f[file]:date file:_files' \
+    '-I[iso-8601]:time spec:' \
+    '-r[reference]:file:_files' \
+    '-R[rfc-2822]' \
+    '-s[set]:time string:' \
+    '-u[utc]' \
+    -- \
+    '*=FILE*:file:_files' \
+    '*=DATEFILE*:date file:_files' \
+    ':format or date:'
+else
+  case "$OSTYPE" in
+	  (solaris*)
+	  _arguments \
+	    '-u[utc]' \
+	    '-a:adjustment:' \
+            ':format or date:'
+	  ;;
+	  (freebsd*)
+	  _arguments \
+	    '-u[utc]' \
+	    '-n[only set time on current machine]' \
+	    '-d:daylight savingg time value:' \
+	    '-j[do not try to set date]' \
+	    '-f:parsing format:' \
+	    '-r:seconds since epoch:' \
+	    '-t:minutes west of GMT:' \
+	    '-v:adjustment value:' \
+            ':format or date:'
+	  ;;
+	  (openbsd*)
+	  _arguments \
+	    '-u[utc]' \
+	    '-n[only set time on current machine]' \
+	    '-d:daylight savingg time value:' \
+	    '-a[gradually skew]' \
+	    '-r:seconds since epoch:' \
+	    '-t:minutes west of GMT:' \
+            ':format or date:'
+	  ;;
+  esac
+fi
+

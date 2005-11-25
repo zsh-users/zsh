@@ -1,0 +1,14 @@
+#compdef madison
+
+_arguments \
+  '(-a --architecture)'{-a,--architecture=}':arch:_values -s , "architecture list" source all alpha arm hppa hurd-i386 i386 ia64 mips mipsel' \
+  '(-b --binary)'{-b,--binary-type=}':type:(deb udeb)' \
+  '(-c --component)'{-c,--component=}':component:_values -s , "component list" main contrib non-free' \
+  '(-g --greaterorequal)'{-g,--greaterorequal} \
+  '(-G --greaterthan)'{-G,--greaterthan} \
+  '(-h --help)'{-h,--help} \
+  '(-r --regex)'{-r,--regex} \
+  '(-s --suite)'{-s,--suite=}':suite:_values -s , "suite list" oldstable stable testing unstable' \
+  '(-S, --source-and-binary)'{-S,--source-and-binary} \
+  '*:package:_deb_packages avail'
+

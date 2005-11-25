@@ -1,3 +1,16 @@
+2005-11-25  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Debian/Command/_dchroot,
+	Completion/Debian/Command/_dlocate,
+	Completion/Debian/Command/_dpkg-cross,
+	Completion/Debian/Command/_madison,
+	Completion/Debian/Command/_piuparts,
+	Completion/Debian/Command/_toolchain-source,
+	Completion/Unix/Command/_bzr, Completion/Unix/Command/_cplay,
+	Completion/Unix/Command/_date, Completion/Unix/Command/_quilt,
+	Completion/X/Command/_urxvt: import various completion functions
+	from main branch.
+
 2005-11-25  Peter Stephenson  <pws@csr.com>
 
 	* 22031: Nikolai Weibull: Completion/Unix/Command/_git: new

@@ -1,0 +1,39 @@
+#compdef urxvt
+
+_x_arguments \
+  -+{rv,ls,j,ptab,sb,sr,st,si,sk,sw,ip,ipf,ut,vb,tcw,insecure,uc,bc,pb,bl,ssc,ssr} \
+  '-tn:terminal type:' \
+  '-C[intercept console messages]' \
+  '-iconic[start iconic]' \
+  '-sbt[scroll bar thickness]:pixels:' \
+  '-tint[tint color]:color:_x_color' \
+  '-fade[make colors darker when losing focus]:percentage:' \
+  '-sh[shade background when tinting]:percentage:' \
+  '-bg:background color:_x_color' \
+  '-fg:foreground color:_x_color' \
+  '-cr:cursor color:_x_color' \
+  '-pr:pointer color:_x_color' \
+  '-pr2:pointer background color:_x_color' \
+  '-bd:border color:_x_color' \
+  '-pixmap:pixmap:_files' \
+  '-fn:normal font:_x_font' \
+  '-fb:bold font:_x_font' \
+  '-fi:italic font:_x_font' \
+  '-fbi:bold italic font:_x_font' \
+  '-im:input method:(SCIM)' \
+  '-pt:input style:(OverTheSpot OffTheSpot Root)' \
+  '-imlocale:locale input method:_locales' \
+  '-imfont:fontset for styles OverTheSpot and OffTheSpot:_x_font' \
+  '-name:client instance, icon, and title strings:' \
+  '-title:title name for window:' \
+  '-n:icon name for window:' \
+  '-sl:save lines:' \
+  '-embed:window id to embed terminal in:_x_window' \
+  '-pty-fd:file descriptor of pty to use:' \
+  '-w:external border in pixels:' \
+  '-b:internal border in pixels:' \
+  '-lsp:number of extra pixels between rows:' \
+  '-mod:meta modifier:_x_modifier' \
+  '-e:program: _command_names -e:*::program arguments: _normal' \
+  '-help[print help]' \
+  '--help[list long options]'
