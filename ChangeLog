@@ -1,3 +1,8 @@
+2005-11-29  Geoff Wing  <gcw@zsh.org>
+
+	* unposted: Src/utils.c: fix prototype generation for non
+	multibyte compilation
+
 2005-11-25  Peter Stephenson  <pws@csr.com>
 
 	* 22031: Nikolai Weibull: Completion/Unix/Command/_git: new

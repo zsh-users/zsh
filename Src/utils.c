@@ -2618,6 +2618,7 @@ inittyptab(void)
 }
 
 
+/**/
 #ifdef MULTIBYTE_SUPPORT
 /* A wide-character version of the iblank() macro. */
 /**/
@@ -2690,6 +2691,7 @@ wcsiident(wchar_t c)
 	return 0;
     }
 }
+/**/
 #endif
 
 
