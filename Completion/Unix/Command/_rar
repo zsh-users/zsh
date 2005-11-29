@@ -20,6 +20,7 @@ common=(
   '-o\+[overwrite existing files]'
   '-o\-[do not overwrite existing files]'
   '-ow[save or restore file owner and group]'
+  '-p+:password'
   '-p\-[do not query password]'
   '-r[recurse subdirectorie]'
   '-ta+[process files modified after a date]:date (YYYYMMDDHHMMSS)'
@@ -37,9 +38,27 @@ common=(
 case $service in
   unrar)
     if (( CURRENT == 2 )); then
-      _wanted commands expl 'rar command' compadd e l lt p t v vt x && return
+       _values 'rar command' \
+	'e[extract files to current directory]' \
+	'l[list archive]' \
+	'lt[list archive (technical format)]' \
+	'lb[list archive (bare format)]' \
+	'p[print file to stdout]' \
+	't[test archive files]' \
+	'v[verbosely list archive]' \
+	'vt[verbosely list archive (technical format)]' \
+	'vb[verbosely list archive (bare format)]' \
+	'x[extract files with full path]' && return
     else
-      _arguments "$common[@]" '*:RAR files:_files -g \*.rar\(-.\)' && return
+      _arguments -S \
+	'-ep3[expand paths to full including the drive letter]' \
+        '-idc[disable ___ display]' \
+        '-idd[disable ___ display]' \
+        '-idq[disable ___ display]' \
+	'-n+:file to include:_files' \
+	'-n@+:file of files to include:_files' \
+        "$common[@]" \
+        '*:RAR files:_files -g \*.rar\(-.\)' && return
     fi
   ;;
   rar)
@@ -56,6 +75,7 @@ case $service in
 	'k[lock archive]' \
 	'l[list archive]' \
 	'lt[list archive (technical format)]' \
+	'lb[list archive (bare format)]' \
 	'm[move to archive]' \
 	'mf[move to archive (files only)]' \
 	'p[print file to stdout]' \
@@ -68,6 +88,7 @@ case $service in
 	'u[update files in archive]' \
 	'v[verbosely list archive]' \
 	'vt[verbosely list archive (technical format)]' \
+	'vb[verbosely list archive (bare format)]' \
 	'x[extract files with full path]' && return
     else
       _arguments -S \
