@@ -1316,7 +1316,7 @@ do
   dnl Try to make sure it doesn't get confused by files that don't
   dnl have real error definitions in.  Count definitions to make sure.
   nerrs=`test -f $ERRNO_H && \
-  grep '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*[0-9][0-9]*' $ERRNO_H | \
+  grep -E '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*(_HURD_ERRNO \()?[0-9]+\)?' $ERRNO_H | \
   wc -l | sed 's/[ 	]//g'`
   test "x$nerrs" != x && test "$nerrs" -ge 7 && break
 done
