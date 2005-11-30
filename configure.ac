@@ -513,6 +513,7 @@ AC_PROG_MAKE_SET            dnl Does make define $MAKE
 AC_PROG_INSTALL             dnl Check for BSD compatible `install'
 AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
 AC_PROG_LN                  dnl Check for working ln, for "make install"
+AC_PROG_EGREP               dnl sets $EGREP to grep -E or egrep
 AC_CHECK_PROGS([YODL], [yodl], [: yodl])
 AC_CHECK_PROGS([PDFETEX], [pdfetex], [: pdfetex])
 AC_CHECK_PROGS([ANSI2KNR], [ansi2knr], [: ansi2knr])
@@ -1316,7 +1317,7 @@ do
   dnl Try to make sure it doesn't get confused by files that don't
   dnl have real error definitions in.  Count definitions to make sure.
   nerrs=`test -f $ERRNO_H && \
-  grep -E '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*(_HURD_ERRNO \()?[0-9]+\)?' $ERRNO_H | \
+  $EGREP '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*(_HURD_ERRNO \()?[0-9]+\)?' $ERRNO_H | \
   wc -l | sed 's/[ 	]//g'`
   test "x$nerrs" != x && test "$nerrs" -ge 7 && break
 done
