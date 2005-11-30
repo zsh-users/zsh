@@ -1,5 +1,8 @@
 2005-11-30  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* unposted: Src/Zle/zle_misc.c: fixed parsedigit() to have
+	it use its arg instead of "lastchar".
+
 	* unposted: configure.ac: changed the hard-wired "grep -E"
 	into $EGREP (which is defined by AC_PROG_EGREP).
 
