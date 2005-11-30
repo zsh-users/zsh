@@ -1,0 +1,15 @@
+DISTFILES_SRC='
+.distfiles
+_arch_archives       _arch_namespace
+_dict_words          _mailboxes           _perl_modules        _tex
+_diff_options        _my_accounts         _pids                _texi
+_dir_list            _newsgroups          _ports               _tilde_files
+_directories         _other_accounts      _printers            _urls
+_domains             _path_files          _ps                  _user_at_host
+_files               _pdf                 _pspdf               _users
+_groups              _perl_basepods       _signals             _users_on
+_hosts               _tar_archive         _time_zone
+_file_systems        _net_interfaces      _terminals           _locales
+_java_class          _services		  _email_addresses     _global_tags
+_mime_types
+'

@@ -1,0 +1,4 @@
+DISTFILES_SRC='
+.distfiles
+zsh-mime-setup zsh-mime-handler pick-web-browser
+'
