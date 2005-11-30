@@ -533,22 +533,19 @@ parsedigit(int inkey)
     inkey &= 0x7f;
 #endif
 
-    /* remember lastchar is not a wide character */
-    if (zmod.base > 10)
-    {
-	if (lastchar >= 'a' && lastchar < 'a' + zmod.base - 10)
-	    return lastchar - 'a' + 10;
-	else if (lastchar >= 'A' && lastchar < 'A' + zmod.base - 10)
-	    return lastchar - 'A' + 10;
-	else if (idigit(lastchar))
-	    return lastchar - '0';
-	else
-	    return -1;
-    }
-    else if (lastchar >= '0' && lastchar < '0' + zmod.base)
-	return lastchar - '0';
-    else
+    /* remember inkey is not a wide character */
+    if (zmod.base > 10) {
+	if (inkey >= 'a' && inkey < 'a' + zmod.base - 10)
+	    return inkey - 'a' + 10;
+	if (inkey >= 'A' && inkey < 'A' + zmod.base - 10)
+	    return inkey - 'A' + 10;
+	if (idigit(inkey))
+	    return inkey - '0';
 	return -1;
+    }
+    if (inkey >= '0' && inkey < '0' + zmod.base)
+	return inkey - '0';
+    return -1;
 }
 
 /**/
