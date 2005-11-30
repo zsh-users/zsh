@@ -8,6 +8,8 @@
 	* 22046: Completion/Unix/Command/_rar: descriptions for
 	unrar commands, some additional switches.
 
+	* 22042: configure.ac: handle the Hurd's errno.h.
+
 2005-11-29  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: Src/utils.c: fix prototype generation for non
