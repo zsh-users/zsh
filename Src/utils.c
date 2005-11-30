@@ -35,6 +35,7 @@
 /**/
 char *scriptname;
 
+/**/
 #ifdef MULTIBYTE_SUPPORT
 /*
  * The wordchars variable turned into a wide character array.
@@ -43,6 +44,7 @@ char *scriptname;
 
 /**/
 mod_export wchar_t *wordchars_wide;
+/**/
 #endif
 
 /* Print an error */
