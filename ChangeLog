@@ -1,3 +1,9 @@
+2005-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22049: Src/init.c: "exit" within sourced file within shell
+	function caused return from sourced file but execution of function
+	continued.
+
 2005-11-30  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Etc/FAQ.yo: release 4.2.6.
