@@ -1085,7 +1085,8 @@ source(char *s)
     loops = oloops;                  /* the # of nested loops we are in      */
     dosetopt(SHINSTDIN, oldshst, 1); /* SHINSTDIN option                     */
     errflag = 0;
-    retflag = 0;
+    if (!exit_pending)
+	retflag = 0;
     scriptname = old_scriptname;
     free(cmdstack);
     cmdstack = ocs;

@@ -1,3 +1,9 @@
+2005-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22049: Src/init.c: "exit" within sourced file within shell
+	function caused return from sourced file but execution of function
+	continued.
+
 2005-11-30  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Zle/zle_misc.c: fixed parsedigit() to have
