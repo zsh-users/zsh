@@ -1,3 +1,8 @@
+2005-12-03  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Unix/Command/_surfraw:
+	surfraw completion from HEAD.
+
 2005-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22049: Src/init.c: "exit" within sourced file within shell

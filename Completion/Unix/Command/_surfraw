@@ -1,0 +1,15 @@
+#compdef surfraw sr
+
+_arguments \
+  '-browser=[set browser]:browser:_command_names' \
+  '-elvi[list Surfraw mechanisms for conquering evil]' \
+  '-escape-url-args=[apply url escaping to arguments]:bool:(yes no)' \
+  '(-g -graphical)'{-g,-graphical}'[get some windowed sin]' \
+  '-p0rn=[yes, yes, harder, deeper, faster, oh baybe]:bool:(yes no)' \
+  '-help' \
+  '-quiet:bool:(yes no)' \
+  '-new[start in a new window]' \
+  '(-t -text)'{-t,-text}'[back to the yellow brick road]' \
+  '(-q -quote)'{-q,-quote}'[quote arguments with quote characters]' \
+  '-version[display Surfraw version]' \
+  ':elvi: compadd ${${(f)"$(surfraw -elvi)"}%%[[:space:]]##--*}'
