@@ -4,7 +4,7 @@ local expl locales
 
 if (( $+commands[locale] )); then
   locales=( $(_call_program locales locale -a) )
-  [[ $OSTYPE = linux-gnu ]] && locales=( ${locales/utf8/UTF-8} )
+  [[ $OSTYPE = *-gnu ]] && locales=( ${locales/utf8/UTF-8} )
 else
   locales=( /usr/lib/locale/*(:t) )
 fi

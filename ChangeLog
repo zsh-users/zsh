@@ -1,5 +1,9 @@
 2005-12-05  Oliver Kiddle  <opk@zsh.org>
 
+	* 22050: configure.ac, Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_sysctl, Completion/Unix/Type/_locales:
+	fixes for Debian GNU/kfreebsd
+
 	* 21712: Completion/Unix/Command/_date: include fallback for
 	where $OSTYPE is not matched
 
