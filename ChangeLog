@@ -1,3 +1,8 @@
+2005-12-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 21712: Completion/Unix/Command/_date: include fallback for
+	where $OSTYPE is not matched
+
 2005-12-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. users/9744): Functions/Zle/keeper: call
