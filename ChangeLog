@@ -1,3 +1,8 @@
+2005-12-05  Clint Adams  <clint@zsh.org>
+
+	* Micah Anderson: 22052: Completion/Unix/Command/_surfraw:
+	improvements to surfraw completion.
+
 2005-12-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 22050: configure.ac, Completion/Unix/Command/_mount,
