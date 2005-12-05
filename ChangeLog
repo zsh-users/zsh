@@ -1,3 +1,10 @@
+2005-12-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. users/9744): Functions/Zle/keeper: call
+	_expand_word from _expand_word_and_keep so that completion context
+	is not changed; add most-specific zstyle necessary to identify the
+	all-expansions group within _expand_word_and_keep.
+
 2005-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22049: Src/init.c: "exit" within sourced file within shell

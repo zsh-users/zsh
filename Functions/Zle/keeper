@@ -79,7 +79,11 @@ _expand_word_and_keep() {
         fi
         builtin compadd "$@"
     }
-    { _main_complete _expand } always { unfunction compadd }
+    { _expand_word } always { unfunction compadd }
 }
 
 zle -C _expand_word complete-word _expand_word_and_keep
+
+# This style is required to segregate the all-expansions group for
+# purposes of _expand_word_and_keep.
+zstyle ':completion:expand-word:expand:::all-expansions' group-name ''
