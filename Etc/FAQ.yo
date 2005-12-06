@@ -289,7 +289,10 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 4.2.3 is the latest production version.
+  Zsh 4.2.6 is the latest production version.  A release on the
+  4.3 development branch is imminent; this will contain support
+  for multibyte character strings (such as UTF-8 locales) in the
+  line editor.
 
   There will not be any further 4.0 releases now that 4.2 has become
   the stable version.

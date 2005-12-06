@@ -1,3 +1,9 @@
+2005-12-06  Peter Stephenson  <pws@csr.com>
+
+	* 22053: Etc/FAQ.yo, Functions/Newuser/zsh-newuser-install:
+	minor FAQ addition plus improved documentation for options
+	and parameters in zsh-newuser-install.
+
 2005-12-05  Clint Adams  <clint@zsh.org>
 
 	* Micah Anderson: 22052: Completion/Unix/Command/_surfraw:

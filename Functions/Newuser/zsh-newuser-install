@@ -9,6 +9,16 @@ setopt extendedglob nonomatch warncreateglobal
 
 # How the function will be referred to.
 local myname=zsh-newuser-install
+
+# Quick test not requiring any setting up.
+# Don't run if we're root.  (These variables are provided by the shell.)
+if (( EUID == 0 || UID == 0 )); then
+  if [[ $1 = -f ]]; then
+    print -r "$myname: won't run as root.  Read the manual." >&2
+  fi
+  return 1
+fi
+
 # The directory in which to look for and save .zshrc.
 local zd=${ZDOTDIR:-$HOME}
 # The same directory in a user friendly form, i.e. with ~ replacement.
@@ -32,6 +42,8 @@ local -A install_state
 local -A parsed_parameters parsed_options parsed_bindings parsed_keymaps
 # Corresponding state in a user-readable form.
 local -A state_parameters state_options state_bindings state_keymaps
+# Indicate whether an option defaults on or off.
+local -A default_options
 # Lines read in from between $startline and $endline which were
 # not understood.  These are retained but moved out of that section
 # with a message.
@@ -52,6 +64,8 @@ local -a completion_lines
 local -a reply match mbegin mend
 # Key read from user, used all over the place.
 local key
+# For default replies from read
+local REPLY
 integer save lines_found
 
 install_state[history]=Recommended
@@ -66,6 +80,17 @@ if [[ $zd = $HOME(#b)(|/*) ]]; then
   zdmsg="~$match[1]"
 else
   zdmsg=$zd
+fi
+
+# Don't run if we can't write to $zd.
+# Assume this is a temporary condition and exit silently---
+# if this really is a new user this probably isn't the right
+# time for screeds of explanation.
+if [[ ! -w $zd ]]; then
+  if [[ $1 = -f ]]; then
+    print -r "$myname: can't write to $zdmsg." >&2
+  fi
+  return 1
 fi
 
 # Don't run unless we can talk to the user.
@@ -92,7 +117,6 @@ Use the argument -f if you want to force the function to be run again." >&2
     return 1
   fi
 fi
-
 
 # start of try block for tidy-up in always block
 {
@@ -204,6 +228,9 @@ which will be retained but not edited."
 #      ...
 #   -o option_name default=on|off description
 #      ...
+# Options on by default should begin !, e.g. !nomatch.  They
+# will still appear under the base option but with an indication that
+# the default is on.  The default applies to the base option.  Hack, sorry.
 #   -b bindkey_string default_value description
 #      ...
 #   -B default_keymap=emacs|vi|none description
@@ -223,7 +250,7 @@ which will be retained but not edited."
 # This operation transfers some subset of settings from the parsed_*
 # and state_* variables to the *_lines variables for editing.
 __zni_apply_defaults() {
-  local un
+  local un suf
 
   # Reset the lines to be edited.
   state_lines=()
@@ -258,6 +285,12 @@ __zni_apply_defaults() {
     shift
     while [[ $# -gt 0 && $1 != -* ]]; do
       # skip default if there was a setting
+      if [[ $1 != ${1##!} ]]; then
+	argv[1]=${1##!}
+	default_options[$1]=on
+      else
+	default_options[$1]=off
+      fi
       if [[ -z $state_options[$1] ]]; then
 	parsed_options[$1]=$2
 	if [[ -n $2 ]]; then
@@ -265,16 +298,22 @@ __zni_apply_defaults() {
 	else
 	  state_options[$1]="no value set"
 	fi
-      elif [[ $state_parameters[$1] = saved ]]; then
+      elif [[ $state_options[$1] = saved ]]; then
 	(( lines_read++ ))
       fi
       if [[ $parsed_options[$1] = on ]]; then
 	un=
+	suf=
+      elif [[ -z $parsed_options[$1] && $default_options[$1] = on ]]
+      then
+	un=
+	suf=", default on"
       else
 	# display as unsetopt even if no value to save yet
 	un=un
+	suf=
       fi
-      state_lines+=($state_options[$1])
+      state_lines+=("$state_options[$1]$suf")
       display_lines+=("$3")
       output_lines+=("${un}setopt $1")
 
@@ -363,8 +402,8 @@ __zni_display_and_edit() {
 
     # Output each setting with a description and state.
     for (( i = 1; i <= ${#output_lines}; i++ )); do
-      default=$states[$i]
-      if [[ $default = ("no value set"|"not to be saved") ]]; then
+      default=${states[$i]%%,*}
+      if [[ $default = ("no value set"|"not to be saved"*) ]]; then
 	ldisp="# $outputs[$i]"
       else
 	ldisp=$outputs[$i]
@@ -391,15 +430,31 @@ $ldisp${(l.$COLUMNS-${#ldisp}-${#rdisp}-1.):-}$rdisp"
       (( i = key ))
       case $outputs[$i] in
 	((#b)(|un)setopt' '(*))
+	# Try to locate the appropriate section in the manual.
+	# I personally have no wish whatsoever to make this
+	# use sed or awk.  Suggestions welcome.
+	if [[ -s $tmpfile-man-options ]]; then
+	  perl -ne 's/^(\s*)([A-Z]+)_?([A-Z]*)_?([A-Z]*)(\s*\(.+\)|\s*\<.+\>)*\s*$/\L$1$2$3$4\n/ and "'$match[2]'" =~ /^(|no)\L$2$3$4$/ and $print = 1 and next; next unless $print; exit if /^\s*$/; print; ' <$tmpfile-man-options >$tmpfile-man 2>/dev/null
+	else
+	  rm -f $tmpfile-man
+	fi
 	while true; do
 	  clear
-	  print "Option $match[2]:  $displays[$i]
-The option is currently ${match[1]:+un}set.
+	  if [[ -s $tmpfile-man ]]; then
+	    read <$tmpfile-man
+	    print "Option $match[2]:"
+	    cat $tmpfile-man
+	    print
+	  else
+	    print "Option $match[2]:  $displays[$i]"
+	  fi
+	  print "The option $match[2] is currently ${match[1]:+un}set.
 Type:
-  (s) to set it
-  (u) to unset it
-  (n) not to set or unset it (use shell default)
-  (k) to keep the current setting:"
+  (s) to set it (turn it on)
+  (u) to unset it (turn it off)
+  (n) neither to set or unset it (use shell default: \
+$default_options[$match[2]])
+  (k) or (q) to keep the current setting:"
 	  read -k key$shortprompt
 	  print
 
@@ -410,7 +465,7 @@ Type:
 	    states[$i]="set but not saved"
 	    ;;
 
-	    (s)
+	    (u)
 	    (( changes++ ))
 	    outputs[$i]="unsetopt $match[2]"
 	    states[$i]="set but not saved"
@@ -422,7 +477,7 @@ Type:
 	    states[$i]="no value set"
 	    ;;
 
-	    (k)
+	    ([kq])
 	    ;;
 
 	    (*)
@@ -434,8 +489,19 @@ Type:
 	;;
 
 	((#b)([^=]##)=(*))
-	print -r "Variable ${match[1]}:  $displays[$i]
-Edit a value.  If it is left blank, nothing will be saved:"
+	if [[ -s $tmpfile-man-param ]]; then
+	  perl -ne 's/^(\s*)([A-Z]+)(\s*\<.+\>)*\s*$/$1$2\n/ and "$2" eq "'$match[1]'" and $print = 1; next unless $print; exit if /^\s*$/; print;' <$tmpfile-man-param >$tmpfile-man 2>/dev/null
+	else
+	  rm -f $tmpfile-man
+        fi
+	if [[ -s $tmpfile-man ]]; then
+	  print -n Variable
+	  cat $tmpfile-man
+	  print
+	else
+	  print -r "Variable ${match[1]}:  $displays[$i]"
+	fi
+	print -r "Edit a value.  If it is left blank, nothing will be saved:"
 	edval=$match[2]
 	if vared -p "$match[1]> " -h edval; then
 	  # check this assignment doesn't produce multiple words
@@ -478,7 +544,7 @@ Type:
   (v) for Vi keymap
   (n) not to set a keymap (allow shell to choose)
   (k) to keep the current setting, "
-	  if [[ $state_lines[$i] = ("no value set"|"not to be saved") ]]
+	  if [[ ${state_lines[$i]%%,*} = ("no value set"|"not to be saved") ]]
 	  then
 	    print -r "(n):"
 	  elif [[ $output_lines[$i] = *-v ]]; then
@@ -537,10 +603,10 @@ Type:
       # Also save any lines suitably marked to parsed_* and state_*
       # by rerunning __zni_parse_lines on each such line.
       for (( i = 1; i <= ${#output_lines}; i++ )); do
-	if [[ $state_lines[$i] = \
+	if [[ ${state_lines[$i]%%,*} = \
 	  ("set but not saved"|"not to be saved"|"not yet saved") ]]
 	then
-	  __zni_parse_lines $state_lines[$i] $output_lines[$i]
+	  __zni_parse_lines ${state_lines[$i]%%,*} $output_lines[$i]
 	fi
       done
 
@@ -642,7 +708,7 @@ __zni_save() {
   done
 
   # Construct lines of options to turn off, keeping them short.
-  optline="unsetopt "
+  optline="unsetopt"
   for (( i = 1; i <= ${#off_opts}; i++ )); do
     newline="$optline $off_opts[$i]"
     if [[ ${#newline} -ge 72 ]]; then
@@ -715,9 +781,9 @@ ${(F)unparsed}
 
 __zni_history_config() {
   __zni_apply_defaults -p \
-    HISTORY 1000 "Number of lines of history kept within shell" \
-    HISTFILE $zdmsg/.histfile "File where history is saved" \
-    SAVEHIST 1000 "Number of lines of history to save to \$HISTFILE"
+    HISTSIZE 1000 "Number of lines of history kept within the shell." \
+    HISTFILE $zdmsg/.histfile "File where history is saved." \
+    SAVEHIST 1000 "Number of lines of history to save to \$HISTFILE."
 
   if __zni_display_and_edit "History configuration"; then
     install_state[history]="Unsaved changes"
@@ -822,12 +888,12 @@ __zni_options_config() {
   # This is deliberately just a tiny selection.
   # Feel free to extend it, but if you do, consider using __zni_submenu.
   # The "no" prefix is used to indicate options on by default.
-  __zni_apply_defaults -o autocd '' "Change directory given just path" \
-    extendedglob '' "Use additional pattern matching features" \
-    appendhistory '' "Append new history lines instead of overwriting" \
-    nonomatch '' "Pass unmatched patterns to command instead of error" \
-    nobeep '' "Don't beep on errors" \
-    notify '' "Immediately report changes in background job status"
+  __zni_apply_defaults -o autocd '' "Change directory given just path." \
+    extendedglob '' "Use additional pattern matching features." \
+    appendhistory '' "Append new history lines instead of overwriting." \
+    '!nomatch' '' "Unmatched patterns cause an error." \
+    '!beep' '' "Beep on errors." \
+    notify '' "Immediately report changes in background job status."
 
   if __zni_display_and_edit "Common shell options" \
   "The following are some of the shell options that are most often used." \
@@ -876,7 +942,7 @@ You can:
      That will prevent this function being run again."
   fi
   print -r "
-(1)  Continue to main menu.
+(1)  Continue to the main menu.
 "
 
   read -k key$longprompt
@@ -907,6 +973,11 @@ The function will be run again next time.  To prevent this, execute:
   esac
 fi
 
+
+print -r "Attempting to extract information from manual pages..."
+(man zshoptions | col -b > $tmpfile-man-options;
+  man zshparam | col -b > $tmpfile-man-param) 2>/dev/null
+
 while true; do
   clear
   print -nr "Please pick one of the following options:
@@ -927,8 +998,8 @@ ${install_state[completion]:+  ($install_state[completion].)}
 (3)  Configure how keys behave when editing command lines.\
 ${install_state[bindkey]:+  ($install_state[bindkey].)}
 
-(4)  Pick some of the more common shell options.  These are simple on
-     or off switches controlling the shell's features.  \
+(4)  Pick some of the more common shell options.  These are simple \"on\"
+     or \"off\" switches controlling the shell's features.  \
 ${install_state[options]:+  ($install_state[options].)}
 "
   print -nr "(0)  Exit, "
