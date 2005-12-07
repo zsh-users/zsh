@@ -53,12 +53,12 @@ zstyle -s $context flags flags ||
 
 # Set to yes if we use eval instead of sh -c for complicated mailcap lines
 # Can possibly break some mailcap entries which expect sh compatibility,
-# is faster, as a new process is not spawned.
-zstyle -T $context current-shell && no_sh=yes
+# but is faster, as a new process is not spawned.
+zstyle -t $context current-shell && no_sh=yes
 
 # Set to yes if the process shouldn't be backgrounded even if it doesn't need a
 # terminal and display is set.
-zstyle -T $context never-background && no_bg=yes
+zstyle -t $context never-background && no_bg=yes
 
 local -a files
 local hasmeta stdin
