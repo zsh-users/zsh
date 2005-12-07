@@ -38,7 +38,6 @@
 	is not changed; add most-specific zstyle necessary to identify the
 	all-expansions group within _expand_word_and_keep.
 
->>>>>>> 1.2956
 2005-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22049: Src/init.c: "exit" within sourced file within shell
