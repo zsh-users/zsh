@@ -1,3 +1,8 @@
+2005-12-07  Clint Adams  <clint@zsh.org>
+
+	* 22054: Completion/Linux/Command/_fusermount:
+	completion for fusermount.
+
 2005-12-06  Peter Stephenson  <pws@csr.com>
 
 	* 22053: Etc/FAQ.yo, Functions/Newuser/zsh-newuser-install:
