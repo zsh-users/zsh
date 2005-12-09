@@ -26,7 +26,7 @@ dnl  support, updates, enhancements, or modifications.
 dnl
 
 AC_INIT(Src/zsh.h)
-AC_PREREQ(2.50)
+AC_PREREQ(2.53b)
 AC_CONFIG_HEADER(config.h)
 
 dnl What version of zsh are we building ?

@@ -1,3 +1,7 @@
+2005-12-09  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: configure.ac: require autoconf 2.53b
+
 2005-12-09  Clint Adams  <clint@zsh.org>
 
 	* 22065: Functions/TCP/tcp_read: cope with TCP output that
