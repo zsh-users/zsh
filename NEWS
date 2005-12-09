@@ -12,6 +12,10 @@ Major changes between versions 4.2 and 4.3
   (one with no .zshrc, .zshenv, .zprofile or .zlogin file) without
   any additional setting up by the administrator.
 
+- The manual now has a Roadmap section (manual page zshroadmap) to
+  give new users an indication of the most interesting parts of the
+  manual.
+
 - New option PROMPT_SP, on by default, to work around the problem that the
   line editor can overwrite output with no newline at the end.
 
@@ -20,11 +24,8 @@ Major changes between versions 4.2 and 4.3
 
 - New redirection syntax e.g. {myfd}>file opens a new file descriptor
   and stores the number in $myfd, so that >&$myfd will work.  Chosen
-  not to break existing code.
-
-- The manual now has a Roadmap section (manual page zshroadmap) to
-  give new users an indication of the most interesting parts of the
-  manual.
+  not to break existing code (and to be compatible with proposals for the
+  Korn shell).
 
 - New Posix-style zsh-specific tests [[:IDENT:]], [[:IFS:]],
   [[:IFSSPACE:]], [[:WORD:]] test if character can appear in identifier,
@@ -35,7 +36,16 @@ Major changes between versions 4.2 and 4.3
 - The idiom =(<<<...) is optimised so that the shell internally turns
   the ... into the contents of a file whose name is then substituted.
 
-- As always, many enhancements to completion functions.
+- Supplied functions catch and throw provide limited support for
+  exception handling using the `{ ... } always { ... }' syntax.
+
+- Signals now accept the SIG as part of the name for compatibility with
+  other shells.
+
+- Editor function argument-base allows non-decimal arguments for
+  editor widgets.
+
+- As always, there are many enhancements to completion functions.
 
 Changes in 4.2 since version 4.2.0
 ----------------------------------
@@ -67,7 +77,7 @@ Changes in 4.2 since version 4.2.0
   in the event of an error.  It also runs after a break, continue, or
   return, including a return forced by the ERR_RETURN option
   (but not an exit, which is immediate).  The syntax is:
-    `{'  try-block-list `}' `always' `{' always-block-list `}'
+    `{' try-block-list `}' `always' `{' always-block-list `}'
   where no newline or semicolon may appear between `}' and `always'.
   This is compatible with all previous valid zsh syntax as an `always'
   at that point used to be a syntax error.  For example,
@@ -101,8 +111,8 @@ Changes in 4.2 since version 4.2.0
 
 - New WIDGETSTYLE, WIDGETFUNC parameters in ZLE.
 
-- Glob qualifiers (+func) is shorthand for (e:func:) (calls command,
-  typically shell function, with no argument).
+- Glob qualifier (+func) is shorthand for (e:func:) (calls a command,
+  typically a shell function, with no argument).
 
 New features between zsh versions 4.0 and 4.2
 ---------------------------------------------

@@ -64,6 +64,9 @@ boot_(UNUSED(Module m))
 	0 };
     const char **sp;
 
+    if (emulation != EMULATE_ZSH)
+	return;
+
     if (!dotdir)
 	dotdir = home;
 

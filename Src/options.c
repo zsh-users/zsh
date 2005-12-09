@@ -33,7 +33,7 @@
 /* current emulation (used to decide which set of option letters is used) */
 
 /**/
-int emulation;
+mod_export int emulation;
  
 /* the options; e.g. if opts[SHGLOB] != 0, SH_GLOB is turned on */
  
