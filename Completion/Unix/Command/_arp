@@ -3,11 +3,11 @@
 local state line expl curcontext="$curcontext"
 
 _arguments -C \
- '(-d -s -f 1)-a[show entries for all or specified hosts]:host:->hostintable' \
- '(-a -s -f 1)-d[delete entry from table]:host:->hostintable' \
- '(-a -d -f 1)-s[create an arp entry]:host:_hosts:ethernet address::*:option:(temp trail pub)' \
- '(-a -d -s 1)-f[read multiple entries from file]:file:_files' \
- '(-a)1:host:->hostintable'
+  '(-d -s -f 1)-a[show entries for all or specified hosts]:host:->hostintable' \
+  '(-a -s -f 1)-d[delete entry from table]:host:->hostintable' \
+  '(-a -d -f 1)-s[create an arp entry]:host:_hosts:ethernet address::*:option:(temp trail pub)' \
+  '(-a -d -s 1)-f[read multiple entries from file]:file:_files' \
+  '(-a)1:host:->hostintable'
 
 [[ "$state" = hostintable ]] &&
   _wanted hosts expl 'host' compadd ${${${(f)"$(${words[1]} -a)"}##[ ?(]#}%%[ )]*}

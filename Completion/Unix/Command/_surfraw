@@ -1,487 +1,396 @@
 #compdef surfraw sr
 
-local expl
+local curcontext="$curcontext" expl state line args ret=1
 
-_arguments -A \
+_arguments -C -A \
   '-browser=[set browser]:browser:_command_names' \
-  '-elvi[list Surfraw mechanisms for conquering evil]' \
+  '-elvi[list web sites that can be searched]' \
   '-escape-url-args=[apply url escaping to arguments]:bool:(yes no)' \
   '(-g -graphical)'{-g,-graphical}'[get some windowed sin]' \
-  '-help' \
+  '-help[display help information]' \
   '-quiet:bool:(yes no)' \
   '-new[start in a new window]' \
   '(-t -text)'{-t,-text}'[back to the yellow brick road]' \
   '(-q -quote)'{-q,-quote}'[quote arguments with quote characters]' \
-  '-version[display Surfraw version]' \
-  ':elvi: compadd ${${(f)"$(surfraw -elvi)"}%%[[:space:]]##--*}' \
-  '*::arg:->subcmd' && return 0
+  '-version[display version information]' \
+  ':elvi:->elvi' \
+  '*::arg:->subcmd' && ret=0
 
-case "$state" in
-	(subcmd)
-	case "$line[1]" in
-		(alioth)
-		  _arguments \
-			'-type=-:Search type:(soft skill people)' \
-		  '*:Search String:->string'
-		;;
-		(altavista)
-		  _arguments \
-			'-results=-:[Number of results to return]:' \
-		  '*:Search String:->string'
-		;;
-		(amazon)
-		  _arguments \
-			'-country=-:Two letter domain-style country code:(uk de fr jp us)' \
-			'-search=-:Specialized search on topic:(all auctions books cars classical \
-								dvd electronics garden kitchen music \
-								outlet photo software toys tools \
-							       	vhs videogames zshops wireless)' \
-		  '*:Search String:->string'
-		;;
-		(ask)
-		  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(austlii)
-		  _arguments \
-			'-method=-:Search method:(any all phrase title boolean)' \
-  			'-results=-:[Number of results to return]:' \
-		  '*:Search String:->string'
-		;;
-		(bbcnews)
-		  _arguments \
-			'scope=-:Search scope:(world uk)' \
-		  '*:Search String:->string'
-		;;
-		(cddb)
-		  _arguments \
-			'-artists[Search artists]' \
-			'-albulms[Search albulms]' \
-			'-songs[Search songs]' \
-			'-all[Search all artists, albulms and songs]' \
-		  '*:Search String:->string'
-		;;
-		(cia)
-		  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(cite)
-		  _arguments \
-			'-results=-:[Number of results to return]:' \
-		  '*:Search String:->string'
-		;;
-		(cnn)
-		  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(currency)
-	 	  _arguments \
-			'-l[List all known currency symbols]' \
-			'-from=-:Symbol for currency to convert from:(EUR USD GBP CAD AUD JPY INR NZD CHF ZAR)' \
-			'-to=-:Symbol for currency to convert to:(EUR USD GBP CAD AUD JPY INR NZD CHF ZAR)' \
-			'*:Currency Amount:->string'
-		;;
-		(cve)
-		  _message 'CVE Number' \
-		  '*:CVE Number:->string'
-		;;
-		(debbugs)
-		  _arguments \
-			'-search=:Search Type:(pkg src bug maint tag submitter)' \
-			'-arc[Show archived bugs]' \
-  			'-raw[Do not sort by status or severity]' \
-	  		'-rb[Reverse order of bugs shown]' \
-	  		'-rst[Reverse order of statuses shown]' \
- 	 		'-rse[Reverse order of severities shown]' \
-  			'-merge[Display merged bugs only once]' \
-	  		'-nohead[Do not show table of contents header]' \
-  			'-nofoot[Do not show statistics in the footer]' \
-          		'-mbox[View results in mbox format]' \
-			'-incstat=:Include statuses:_values -s , open forwarded pending fixed done' \
-  			'-exstat=-:Exclude statuses:_values -s , open forwarded pending fixed done' \
-	  		'-incsev=-:Include severities:_values -s , critical grave serious important \
-								   normal minor wishlist fixed' \
- 			'-exsev=-:Exclude severities:_values -s , critical grave serious important \
-								  normal minor wishlist fixed' \
-  			'-inctag=-:Include tags:_values -s , potato woody sarge sarge-ignore sid \
-							     experimental confirmed d-i fixed \
-                	                 		     fixed-in-experimental fixed-upstream \
-							     help moreinfo patch pending security \ 
-							     unreproducible upstream wontfix' \
-	  		'-extag=-:Exclude tags:_values -s , potato woody sarge sarge-ignore sid \
-							    experimental confirmed d-i fixed \
-        	                         		    fixed-in-experimental fixed-upstream \
-							    help moreinfo patch pending security \ 
-							    unreproducible upstream wontfix' 
-			_deb_packages avail
-		;;
-		(debcontents)
-		  _arguments \
-			'-arch=-:Seach specific architecture:(i386 m68k alpha sparc powerpc arm)' \
-			'-distro=-:Search specific distribution:(stable testing unstable)'
-			_deb_packages avail
-		;;
-		(deblists)
-		  _arguments \
-			'-shelp[Go to search help page]' \
-			'-results=-[Number of results to return]' \
-			'-dates=-[Quarters to search]' \
-			'-case=-:Case sensitivity:(no yes)' \
-			'-errors=-:Allowed errors:(0 1 2 best)' \
-			'-partial:Partial matches:(no yes)' \
-			'-sameline:Semicolon separated words must appear on same line:(no yes)' \
-			'-lines=-:Maximum lines per message:(0 5 10 50 100)' \
-			'-list=-:Search list:(68k accessibility admintool alpha amd64 announce apache arm \
-						autobuild beowulf books boot bsd cd cd-vendors cdwrite \
- 						changes chinese chinese-big5 chinese-gb commercial \
-						consultants ctte curiosa custom dak debbugs deity \
-						desktop devel devel-announce devel-changes devel-french \
-						devel-games devel-italian devel-m68k-changes devel-portuguese \
-     						devel-powerpc-changes devel-s390-changes devel-spanish \
-						devel-sparc-changes doc dpkg edu emacsen embedded esperanto \
-						events-eu events-na faq firewall french gcc glibc \
-						gtk-gnome hams handheld hppa hurd i18n ia64 ipv6 isp \
-						italian japanese java jr kde kernel l10n-arabic \
-						l10n-catalan l10n-czech l10n-danish l10n-dutch \
-        					l10n-english l10n-finnish l10n-french l10n-german l10n-greek \
-        					l10n-hungarian l10n-italian l10n-korean l10n-polish \
-						l10n-portuguese l10n-romanian l10n-russian l10n-spanish \
-						l10n-turkish laespiral laptop lcs-eng legal lex \
-						lint-maint lsb lsb-confcall lsb-discuss lsb-impl \
-        					lsb-spec lsb-test med mentors mips mirrors multimedia newmaint \
-        					newmaint-admin newmaint-discuss news news-french news-german \
-        					news-portuguese nonprofit ocaml-maint openoffice parisc \
-						perl pilot policy pool powerpc project publicity python \
-						qa qa-packages qa-private qt-kde release ruby russian \
-						s390 s390-changes security security-announce sgml \
-						simplified-chinese snapshots sparc sparc-changes \
-						spi-announce spi-general ssh superh testing tetex-maint \
-     						toolchain ultralinux user user-catalan user-danish \
-						user-de user-french user-german user-icelandic \
-						user-indonesian user-polish user-portuguese user-spanish \
-						user-swedish user-turkish user-ukrainian vgui-discuss \
-        					vote win32 wnpp women www x)'
-		  '*:Search String:->string'
-		;;
-		(deblogs)
-		  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(debpackages)
-		  _arguments \
-			'-release=-:Search release:(all main non-US contrib non-free)' \
-  			'-distro=-:Search distribution:(all stable testing unstable)' 
-		  _deb_packages avail
-		;;
-		(debpts)
-		  _arguments \
-			'-doc[Display documentation]'
-		;;
-		(deja)
-		  _arguments \
-			'-results=-:[Number of results to return]:' \
-			'-m[Search for Message-ID]' \
-		  '*:Search String:->string'
-		;;
-		(dmoz)
-		  _arguments \
-			'-cat=-:Search category:(All Arts Business Computers Games Health Home \
-						Kids_and_Teens News Recreation Reference Regional \
-						Science Shopping Society Sports World Adult)' \
-		  	'-type=-:Search type:(c s b)' \
-  			'-kids[Sites for kids]' \
-  			'-teens[Sites for teens]' \
-  			'-mteens[Sites for mature teens]' \
-		  '*:Search String:->string'
-		;;
-		(ebay)
-		  _arguments \
-			'-country=-:Country:(com de uk fr)' \	
-			'-results=-:[Number of results to return]:' \ 
-		  '*:Search String:->string'
-		;;
-		(etym)
-		  _wanted dictword expl 'dictionary word' \
-		    	compadd $(look "${PREFIX}")
-		;;
-		(excite)
-		  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(fast)
-		  _arguments \
-			'-type=-:Search type:(all any phrase)' \
-		  '*:Search String:->string'
-		;;
-		(filesearching)
-		  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(foldoc)
-		  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(freebsd)
-		  _arguments \
-		  	'-mail=-:Search mailinglists:(yes no)' \
-			'-gg=-:Search mailinglists at Google Groups:(yes no)' \
-			'-pr=-:Query problem reports:(yes no)' \
-  			'-cvs=-:Query cvsweb:(yes no)' \
- 			'-mid=-:Query mailing lists by Message-ID:(yes no)' \
-			'-ps=-:Teleport to the Port Survey Page:(yes no)' \
-  			'-prs=-:Teleport to the Problem Report Survey Page:(yes no)' \
-  			'-elogs=-:Teleport to the Build Error Logs Page:(yes no)' \
-		  '*:Search String:->string'
-		;;
-		(freedb)
-		  _arguments \
-			'-artists[Search artists]' \
-			'-albulms[Search albulms]' \
-			'-songs[Search songs]' \
-			'-rest[Search the rest of the data]' \
-			'-all[Search all fields]' \
-			'-bycat[Sort results by category]' \
-			'*-cat=-:Category to search:(all blues classical country data folk \
-							jazz misc newage reggae rock soundtrack)' \
-		  '*:Search String:->string'
-		;;
-		(freshmeat)
-		  _deb_packages avail
-		;;
-		(google)
-		  _arguments \
-			'(-l --lucky)'{-l,--lucky}'[Feeling lucky?]' \
-			'-results=-:[Number of results to return]:' \
-			'-search=-:Search on topic:(bsd linux mac unclesam)' \
-		  '*:Search String:->string'
-		;;			 
-		(happypenguin)
-		  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(imdb)
-		  _arguments \
-  			'-category=-:Category:(All Titles MyMovies People Characters Quotes Bios Plots)' \
-		  '*:Search String:->string'
-		;;
-		(jake)
-		  _arguments \
-			'-method=-:Search type:(title issn)' \
- 			'-volume=-:[Volume]:' \
- 			'-issue=-:[Issue]:' \
-			'-spage=-:[Start page]:' \
- 			'-epage=-:[End page]:' \
- 			'-year=-:[Year]:' \
-		  '*:Search String:->string'
-		;;
-		(leodict)
-		  _arguments \
-			'-tol=:Special character tolerance:(off standard high)' \
-                  	'-to=:To language:(de en either)' \
-  			'-lang=:Webpage is in this language:(en de)' \
-  			'-link=:Link results:(on off)' \
-  			'-head=:Display headlines:(on off)' \
-  			'-grid=:Show results in grid:(on off)' \
-  			'-spell=:Spelling tolerance:(off standard force)' \
-			'*:dictionary word:->dictword' && return 0
+case $state in
+  subcmd)
+    args=(
+      '-help[display help information]'
+      '*:string:_guard "^-*" "search string"'
+    )
+    case "$words[1]" in
+      ask|cia|cnn|deblogs|excite|filesearching|foldoc|happypenguin|slashdot|slinuxdoc|sundocs|sunsolve|xxx)
+        _message -e string 'search string'
+      ;;
+      alioth)
+        _arguments $args \
+          '-type=-:search type:(soft skill people)' && ret=0
+      ;;
+      altavista)
+        _arguments $args \
+        '-results=-:[number of results to return]' && ret=0
+      ;;
+      amazon)
+        _arguments $args \
+          '-country=-:country code:(uk de fr jp us)' \
+          '-search=-:topic:(all auctions books cars classical \
+            dvd electronics garden kitchen music \
+            outlet photo software toys tools \
+            vhs videogames zshops wireless)' && ret=0
+      ;;
+      austlii)
+        _arguments $args \
+          '-method=-:search method:(any all phrase title boolean)' \
+          '-results=-:[number of results to return]:number' && ret=0
+      ;;
+      bbcnews)
+        _arguments $args \
+          '-scope=-:search scope:(world uk)' && ret=0
+      ;;
+      cddb)
+        _arguments $args \
+          '-artists[search artists]' \
+          '-albums[search albulms]' \
+          '-songs[search songs]' \
+          '-all[search all artists, albums and songs]' && ret=0
+      ;;
+      cite)
+        _arguments \
+          '-results=-:[number of results to return]' \
+          '*:search string' && ret=0
+      ;;
+      currency)
+        _arguments \
+          '-l[List all known currency symbols]' \
+          '-from=-:currency symbol:(EUR USD GBP CAD AUD JPY INR NZD CHF ZAR)' \
+          '-to=-:currency symbol:(EUR USD GBP CAD AUD JPY INR NZD CHF ZAR)' \
+          '*:currency amount' && ret=0
+      ;;
+      cve)
+        _message -e numbers 'CVE Number'
+      ;;
+      debbugs)
+        _arguments \
+          '-search=:search type:(pkg src bug maint tag submitter)' \
+          '-arc[show archived bugs]' \
+          '-raw[do not sort by status or severity]' \
+          '-rb[reverse order of bugs shown]' \
+          '-rst[reverse order of statuses shown]' \
+          '-rse[reverse order of severities shown]' \
+          '-merge[sisplay merged bugs only once]' \
+          '-nohead[so not show table of contents header]' \
+          '-nofoot[so not show statistics in the footer]' \
+          '-mbox[view results in mbox format]' \
+          '-incstat=-[include given status list]:status:_values -s , status open
+              forwarded pending fixed done' \
+          '-exstat=-[exclude given status list]:status:_values -s , status open
+              forwarded pending fixed done' \
+          '-incsev=-[include given severities]:severity:_values -s , severity
+              critical grave serious important normal minor wishlist fixed' \
+          '-exsev=-[exclude given severities]:severity:_values -s , severity
+              critical grave serious important normal minor wishlist fixed' \
+          '-inctag=-[include given tags]:tag:_values -s , tag potato woody sarge
+              sarge-ignore sid experimental confirmed d-i fixed
+              fixed-in-experimental fixed-upstream help moreinfo patch pending
+              security unreproducible upstream wontfix' \
+          '-extag=-[exclude given tags]:tag:_values -s , tag potato woody sarge
+              sarge-ignore sid experimental confirmed d-i fixed
+              fixed-in-experimental fixed-upstream help moreinfo patch pending
+              security unreproducible upstream wontfix' \
+          '*:package:_deb_packages avail' && ret=0
+        ;;
+      debcontents)
+        _arguments \
+          '-arch=-[search specific architecture]:architecture:(i386 m68k alpha sparc powerpc arm)' \
+          '-distro=-[search specific distribution]:distribution:(stable testing unstable)' \
+          '*:package:_deb_packages avail' && ret=0
+      ;;
+      deblists)
+        _arguments $args \
+          '-shelp[go to search help page]' \
+          '-results=-[specifiy number of results to return]:number' \
+          '-dates=-[quarters to search]:date' \
+          '-case[use case sensitive search]' \
+          '-errors=-[specify errors allowed]:errors:(0 1 2 best)' \
+          '-partial[allow partial matches]' \
+          '-sameline[semi-colon separated words must appear on same line]' \
+          '-lines=-[specify maximum lines per message]:lines:(0 5 10 50 100)' \
+          '-list=-[specify list to search]:list:(68k accessibility admintool
+              alpha amd64 announce apache arm autobuild beowulf books boot bsd
+              cd cd-vendors cdwrite changes chinese chinese-big5 chinese-gb
+              commercial consultants ctte curiosa custom dak debbugs deity
+              desktop devel devel-announce devel-changes devel-french
+              devel-games devel-italian devel-m68k-changes devel-portuguese
+              devel-powerpc-changes devel-s390-changes devel-spanish
+              devel-sparc-changes doc dpkg edu emacsen embedded esperanto
+              events-eu events-na faq firewall french gcc glibc gtk-gnome hams
+              handheld hppa hurd i18n ia64 ipv6 isp italian japanese java jr kde
+              kernel l10n-arabic l10n-catalan l10n-czech l10n-danish l10n-dutch
+              l10n-english l10n-finnish l10n-french l10n-german l10n-greek
+              l10n-hungarian l10n-italian l10n-korean l10n-polish
+              l10n-portuguese l10n-romanian l10n-russian l10n-spanish
+              l10n-turkish laespiral laptop lcs-eng legal lex lint-maint lsb
+              lsb-confcall lsb-discuss lsb-impl lsb-spec lsb-test med mentors
+              mips mirrors multimedia newmaint newmaint-admin newmaint-discuss
+              news news-french news-german news-portuguese nonprofit ocaml-maint
+              openoffice parisc perl pilot policy pool powerpc project publicity
+              python qa qa-packages qa-private qt-kde release ruby russian s390
+              s390-changes security security-announce sgml simplified-chinese
+              snapshots sparc sparc-changes spi-announce spi-general ssh superh
+              testing tetex-maint toolchain ultralinux user user-catalan
+              user-danish user-de user-french user-german user-icelandic
+              user-indonesian user-polish user-portuguese user-spanish
+              user-swedish user-turkish user-ukrainian vgui-discuss vote win32
+              wnpp women www x)' && ret=0
+      ;;
+      debpackages)
+        _arguments \
+          '-release=-:Search release:(all main non-US contrib non-free)' \
+          '-distro=-:Search distribution:(all stable testing unstable)' \
+          '*:package:_deb_packages avail' && ret=0
+      ;;
+      debpts)
+        _arguments $args \
+          '-doc[view PTS documentation]' && ret=0
+      ;;
+      deja)
+        _arguments $args \
+          '-results=-:[number of results to return]' \
+          '-m[search for Message-ID]' && ret=0
+      ;;
+      dmoz)
+        _arguments $args \
+          '-cat=-[specify category]:category:(All Arts Business Computers Games
+              Health Home Kids_and_Teens News Recreation Reference Regional
+              Science Shopping Society Sports World Adult)' \
+          '-type=-:type:((c\:categories\ only s\:sites\ only b\:both))' \
+          '-kids[sites for kids]' \
+          '-teens[sites for teens]' \
+          '-mteens[sites for mature teens]' && ret=0
+      ;;
+      ebay)
+        _arguments $args \
+          '-country=-:country:(com de uk fr)' \ 
+          '-results=-:[number of results to return]:number' && ret=0
+      ;;
+      etym)
+        _wanted dictword expl 'dictionary word' \
+           compadd $(look "${PREFIX}") && ret=0
+      ;;
+      fast)
+        _arguments $args \
+          '-type=-:search type:(all any phrase)' && ret=0
+      ;;
+      freebsd)
+        _arguments $args \
+          '-mail=-[search mailing lists]:enable:(yes no)' \
+          '-gg=-[search [Google Groups]:enable:(yes no)' \
+          '-pr=-[query problem reports]:enable:(yes no)' \
+          '-cvs=-[query cvsweb]:enable:(yes no)' \
+          '-mid=-[query mailing lists by Message-ID]:enable:(yes no)' \
+          '-ps=-[go to the port survey page]:enable:(yes no)' \
+          '-prs=-[go to the problem report survey page]:enable:(yes no)' \
+          '-elogs=-[go to the build error logs page]:enable:(yes no)' && ret=0
+      ;;
+      freedb)
+        _arguments $args \
+          '-artists[search artists]' \
+          '-albums[search albums]' \
+          '-songs[search songs]' \
+          '-rest[search the rest of the data]' \
+          '-all[search all fields]' \
+          '-bycat[sort results by category]' \
+          '*-cat=-:category:(all blues classical country data folk
+              jazz misc newage reggae rock soundtrack)' && ret=0
+      ;;
+      freshmeat)
+        _deb_packages avail && ret=0
+      ;;
+      google)
+        _arguments $args \
+          '(-l --lucky)'{-l,--lucky}'[feeling lucky?]' \
+          '-results=-:[number of results to return]:' \
+          '-search=-:topic:(bsd linux mac unclesam)' && ret=0
+      ;;       
+      imdb)
+        _arguments $args \
+          '-category=-:category:(All Titles MyMovies People Characters Quotes Bios Plots)' && ret=0
+        ;;
+      jake)
+        _arguments $args \
+          '-method=-:search type:(title issn)' \
+          '-volume=-:volume' \
+          '-issue=-:issue' \
+          '-spage=-:start page' \
+          '-epage=-:end page' \
+          '-year=-:year' && ret=0
+      ;;
+      leodict)
+        _arguments \
+          '-tol=:special character tolerance:(off standard high)' \
+          '-to=:language:(de en either)' \
+          '-lang=:Webpage is in this language:(en de)' \
+          '-link=:Link results:(on off)' \
+          '-head=:Display headlines:(on off)' \
+          '-grid=:Show results in grid:(on off)' \
+          '-spell=:Spelling tolerance:(off standard force)' \
+          '*:dictionary word:->dictword' && ret=0
 
-		  case "$state" in
-			(dictword)
-		  		_wanted dictword expl 'dictionary word' \
-		  			compadd $(look "${PREFIX}")
-			;;
-		  esac
-		;;
-		(netbsd)
-		  _arguments \
-			'-mail=-:Search netbsd mailinglists:(no yes)' \
-			'-pr=-:Query problem reports:(no yes)' \
-		  '*:Search String:->string'
-		;;
-		(openbsd)
-		  _arguments \
-			'-mail=-:Search netbsd mailinglists:(no yes)' \
-			'-pr=-:Query problem reports:(no yes)' \
-		  '*:Search String:->string'
-		;;
-		(pgpkeys)
-		  _arguments \
-			'-s[Display key signatures]' \
-		  '*:KeyID or Email:->string'
-		;;
-		(pubmed)
-		  _arguments \
-			'-db=-:Search Database:(PubMed Nucleotide Protein Genome Structure Popset)' \
-		  '*:Search String:->string'
-		;;
-		(rfc)
-		  _arguments \
-                        '-results=-:[Number of results to return]:' \
-  			'-pdf[Return files as PDFs]' \
-  			'-rev[Reverse order of results]' \
-  			'-exact[Match exact words (instead of prefixes)]' \
-  			'-abs[Show abstracts]' \
-  			'-keywords[Show keywords]' \
-  			'-nodirect[Do not try and go direct to RFC]' \
-  			'-ftp[Retrieve RFCs via FTP instead of HTTP]' \
-  			'-field=-:Search fields:(all number title author keyword)' \
-  			'-search=-:Collection to search(all rfc std bcp fyi)' \
-		  '*:Search String:->string'
-		;;
-		(scaleplus)
-		  _arguments \
-                        '-results=-:[Number of results to return]:' \
-		  '*:Search String:->string'
-		;;
-		(slashdot)
-	 	  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(slinuxdoc)
-		  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(sourceforge)
-		  _arguments \
-			'-exact=-:Require all words:(yes no)' \
-			'-type=:Type of search:(soft people freshmeat)'
-		  _deb_packages avail
-		;;
-		(stockquote)
-		  _arguments \
-			'-provider=-:Quote provider(yahoo nasdaq quote)' \
-		  '*:Search String:->string'
-		;;
-		(sundocs)
-	 	  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(sunsolve)
-	 	  _message 'Search String' \
-		  '*:Search String:->string'
-		;;
-		(thesaurus)
-		  _wanted dictword expl 'thesaurus word' \
-		    	compadd $(look "${PREFIX}")
-		;;
-		(webster)
-		  _wanted dictword expl 'dictionary word' \
-		    	compadd $(look "${PREFIX}")
-		;;
-		(rae)
-		  _wanted dictionary expl 'palabra diccionario' \
-		    	compadd $(look "${PREFIX}")
-		;;
-		(translate)
-		  _arguments \
-                  	'-from=-:From language:(de en es fr it ja ko pt ru zh)' \
-                  	'-to=-:To language:(de en es fr it ja ko pt ru zh)' \
-                  	'-provider=-:Translation service provider:(raging bablefish)' \
-                  	'*:dictionary word:->dictword' && return 0
+        [[ "$state" = dictword ]] && _wanted words expl 'dictionary word' \
+            compadd $(look "${PREFIX}") && ret=0
+      ;;
+      netbsd|openbsd)
+        _arguments $args \
+          '-mail=-[search mailinglists]:enable:(no yes)' \
+          '-pr=-[query problem reports]:enable:(no yes)' && ret=0
+      ;;
+      pgpkeys)
+        _arguments \
+          '-s[display key signatures]' \
+          '*:KeyID or email' && ret=0
+      ;;
+      pubmed)
+        _arguments $args \
+          '-db=-:[specify database]:database:(PubMed Nucleotide Protein Genome
+              Structure Popset)' && ret=0
+      ;;
+      rfc)
+        _arguments $args \
+          '-results=-:[specify number of results to return]:number' \
+          '-pdf[return files as PDFs]' \
+          '-rev[reverse order of results]' \
+          '-exact[match exact words (instead of prefixes)]' \
+          '-abs[show abstracts]' \
+          '-keywords[show keywords]' \
+          "-nodirect[don't try and go direct to RFC]" \
+          '-ftp[retrieve RFCs via FTP instead of HTTP]' \
+          '-field=-:search field:(all number title author keyword)' \
+          '-search=-:collection:(all rfc std bcp fyi)' && ret=0
+      ;;
+      scaleplus)
+        _arguments $args \
+          '-results=-:[number of results to return]' && ret=0
+      ;;
+      sourceforge)
+        _arguments \
+          '-exact=-[require all words}:enable:(yes no)' \
+          '-type=:search type:(soft people freshmeat)' \
+          '*:project:_deb_packages avail' && ret=0
+      ;;
+      stockquote)
+          _arguments $args \
+          '-provider=-[select quote provider]:provider:(yahoo nasdaq quote)' && ret=0
+      ;;
+      thesaurus|webster)
+        _wanted words expl 'word' compadd $(look "${PREFIX}") && ret=0
+      ;;
+      rae)
+        _wanted dictionary expl 'palabra diccionario' \
+            compadd $(look "${PREFIX}") && ret=0
+      ;;
+      translate)
+        _arguments \
+          '-from=-:language:(de en es fr it ja ko pt ru zh)' \
+          '-to=-:language:(de en es fr it ja ko pt ru zh)' \
+          '-provider=-[select translation service provider]:provider:(raging bablefish)' \
+          '*:dictionary word:->dictword' && ret=0
 
-		  case "$state" in
-			(dictword)
-				_wanted dictword expl 'dictionary word' \
-			    		compadd $(look "${PREFIX}")
-		  	;;
-		  esac	
-		;;
-		(rhyme)
-		  _arguments \
-			'-method=-:Type of word correlation:(perfect syn hom cons rel sub spell pic shake def)' \
-		  '*:dictionary word:->dictword' && return 0
+        [[ "$state" = dictword ]] && _wanted words expl 'dictionary word' \
+            compadd $(look "${PREFIX}") && ret=0
+      ;;
+      rhyme)
+        _arguments \
+          '-method=-:type of word correlation:(perfect syn hom cons rel sub spell pic shake def)' \
+          '*:dictionary word:->dictword' && ret=0
 
-		  case "$state" in
-			(dictword)
-				_wanted dictword expl 'dictionary word' \
-					compadd $(look "${PREFIX}")
-			;;
-		  esac
-		;;
-		(w3css)
-		  _arguments \
-			'-warnings=-:Level of warnings displayed:(all normal important none)' \
-			'-profile=-:CSS profile:(none css1 css2 css3 svg svgbasic svgtiny mobile atsv-tv tv)' \
-			'-medium=-:User medium:(all aural braille embossed handheld print projection \
-						screen tty tv presentation)' \
-		  :URL:_urls
-		;;
-		(w3html)
-		  _arguments \
-			'-usage[Go to validator help page]' \
-			'-encoding=-[Set page encoding]' \
-			'-encfb[Fall back to encoding rather than override]' \
-			'-doctype=-":[Set page doctype]:' \
-			'-docfb[Fall back to doctype rather than override]' \
-			'-nv[Be less verbose]' \
-			'-showsource[Show page source]' \
- 			'-showoutline[Show page outline (headings)]' \
-			'-showparsetree[Show parse tree]' \
-	 		'-excludeatt[Exclude attributes from parse tree]' \
-  			'-err[Validate Error (404) pages]' \
-		  :URL:_urls
-		;;
-		(w3link)
-		  _arguments \
-			'-r[Check linked documents recursively]' \
-	 	 	'-d=-:[Recursion depth]:' \
-		  	'-s[Summary only]' \
-			'-hiderd[Hide redirects]' \
-  			'-dhiderd[Hide redirects for directories only]' \
-  			'-nolang[Dont send the Accept-Language: header]' \
-  			'-cookie[Save options in a cookie]' \
-		  :URL:_urls
-		;;
-		(w3rdf)
-		  _arguments \
-  			'-output=-:Type of output displayed:(Triples Graphs Both)' \
-  			'-format=-:Graph format:(PNG_EMBED PNG_LINK SVG_LINK SVG_EMBED GIF_EMBED \
-						GIF_LINK PS_LINK HP_PCL_LINK HP_GL_LINK ISV_ZVTM)' \
-			'-savedot[Save GraphViz DOT file]' \
-  			'-ntriples[Display triples in N-Triples format]' \
-  			'-embedded[RDF is NOT enclosed in <RDF> tags]' \
-  			'-useme[I grant w3c permission to save the RDF for developing test cases]' \
-  			'-anon[Make anonymous nodes unlabelled]' \
-  			'-fontsize=-:Font Size:(10 12 14 16 20)' \
-  			'-orient=-:Orientation:(TB LR)' \
-  			'-node=-:Node Colour:(Black Blue Darkgreen Red)' \
-  			'-nodetext=-:Node Text Colour:(Black Blue Darkgreen Red)' \
-  			'-arc=-:Arc Colour:(Black Blue Darkgreen Red)' \
-  			'-arctext=-:Arc Text Colour:(Black Blue Darkgreen Red)' \
-		  :URL:_urls
-		;;
-		(wetandwild)
-		  _arguments \
-			'-city=-:[Town or City or (US only) zipcode]:' \
-			'-country=-:[Two letter domain-style country code]:' \
-			'-provider=-yahoo[Weather provision service (Yahoo only right now)]' \
-			'-state=-:[State, province or region]:'
-		;;
-		(wikipedia)
-		  _arguments \
-			'-language=-:[Two letter language code]:' \
-		  '*:Search String:->string'
-		;;
-		(woffle)
-		  _arguments \
-			'-method=-:Search method:(and or bool)' \
-  			'-format=-:Result format:(short long)' \
-  			'-sort=-:Sort method:(score revscore time revtime title revtitle)' \
-		  '*:Search String:->string'
-		;;
-		(xxx)
-  		  _message 'Search String' \
-		  '*:Search String:->string'		
-		;;
-		(yahoo)
-		  _arguments \
-			'-results=-:[Number of results to return]:' \
-		  '*:Search String:->string'
-		;;
-		(yubnub)
-  		  _message 'Yubnub Command' \
-		  '*:Yubnub Command:->string'
-		;;
-	esac
-	;;
-esac
+        [[ "$state" = dictword ]] && _wanted words expl 'dictionary word' \
+            compadd $(look "${PREFIX}") && ret=0
+      ;;
+      w3css)
+        _arguments \
+          '-warnings=-[specify level of warnings displayed]:warning level:(all normal important none)' \
+          '-profile=-:CSS profile:(none css1 css2 css3 svg svgbasic svgtiny mobile atsv-tv tv)' \
+          '-medium=-:user medium:(all aural braille embossed handheld print projection
+              screen tty tv presentation)' \
+          :URL:_urls && ret=0
+      ;;
+      w3html)
+        _arguments \
+          '-usage[go to validator help page]' \
+          '-encoding=-[set page encoding]' \
+          '-encfb[fall back to encoding rather than override]' \
+          '-doctype=-":[set page doctype]:' \
+          '-docfb[fall back to doctype rather than override]' \
+          '-nv[be less verbose]' \
+          '-showsource[show page source]' \
+          '-showoutline[show page outline (headings)]' \
+          '-showparsetree[show parse tree]' \
+          '-excludeatt[exclude attributes from parse tree]' \
+          '-err[validate Error (404) pages]' \
+          :URL:_urls && ret=0
+        ;;
+      w3link)
+        _arguments \
+          '-r[check linked documents recursively]' \
+          '-d=-[recursion depth]:depth' \
+          '-s[summary only]' \
+          '-hiderd[hide redirects]' \
+          '-dhiderd[hide redirects for directories only]' \
+          "-nolang[don't send the Accept-Language: header]" \
+          '-cookie[save options in a cookie]' \
+          :URL:_urls && ret=0
+      ;;
+      w3rdf)
+        _arguments \
+          '-output=-:output type:(Triples Graphs Both)' \
+          '-format=-:graph format:(PNG_EMBED PNG_LINK SVG_LINK SVG_EMBED
+              GIF_EMBED \ GIF_LINK PS_LINK HP_PCL_LINK HP_GL_LINK ISV_ZVTM)' \
+          '-savedot[save GraphViz DOT file]' \
+          '-ntriples[display triples in N-Triples format]' \
+          '-embedded[RDF is not enclosed in <RDF> tags]' \
+          '-useme[grant w3c permission to save the RDF for developing test cases]' \
+          '-anon[make anonymous nodes unlabelled]' \
+          '-fontsize=-:font Size:(10 12 14 16 20)' \
+          '-orient=-:orientation:(TB LR)' \
+          '-node=-:node Colour:(Black Blue Darkgreen Red)' \
+          '-nodetext=-[node text color]:color:(Black Blue Darkgreen Red)' \
+          '-arc=-[arc color]:color:(Black Blue Darkgreen Red)' \
+          '-arctext=-:[arc text color]:color:(Black Blue Darkgreen Red)' \
+          :URL:_urls && ret=0
+      ;;
+      wetandwild)
+        _arguments \
+          '-city=-[town or City or (US only) zipcode]:' \
+          '-country=-[two letter domain-style country code]:' \
+          '-state=-[specify state, province or region]:state' && ret=0
+      ;;
+      wikipedia)
+        _arguments $args \
+          '-language=-:[two letter language code]:' && ret=0
+        ;;
+      woffle)
+        _arguments $args \
+          '-method=-:search method:(and or bool)' \
+          '-format=-:result format:(short long)' \
+          '-sort=-:sort method:(score revscore time revtime title revtitle)' && ret=0
+      ;;
+      yahoo)
+          _arguments $args \
+          '-results=-[specify number of results to return]:number' && ret=0
+      ;;
+      yubnub)
+        _message -e command 'Yubnub Command'
+      ;;
+    esac
+  ;;
+  elvi)
+    _wanted elvi expl elvi compadd \
+      ${${${(f)"$(_call_program elvi surfraw -elvi)"}%%[[:space:]]##--*}%:*} && ret=0
+  ;;
+esac  
+
+return ret

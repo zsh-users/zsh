@@ -1,5 +1,5 @@
 #compdef mergechanges
 
 _arguments \
-      '-f[output to file]' \
-      '*:changes file:_files -g "*.changes"'
+  '-f[output to file]' \
+  '*:changes file:_files -g "*.changes(-.)"'
