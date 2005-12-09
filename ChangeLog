@@ -1,3 +1,8 @@
+2005-12-09  Clint Adams  <clint@zsh.org>
+
+	* 22065: Functions/TCP/tcp_read: cope with TCP output that
+	starts with "--".
+
 2005-12-09  Peter Stephenson  <pws@csr.com>
 
 	* 22058: NEWS, Doc/Zsh/roadmap.yo: tweak docs for release.

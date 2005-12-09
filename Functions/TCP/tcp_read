@@ -216,7 +216,7 @@ while (( ${#read_fds} )); do
     fi
 
     tcp_output -P "${TCP_PROMPT=<-[%s] }" -S $sess -F $read_fd \
-        $noprint "$line"
+        $noprint -- "$line"
     # REPLY is now set to the line with an appropriate prompt.
     tcp_lines+=($REPLY)
     typeset -g TCP_LINE="$REPLY" TCP_LINE_FD="$read_fd"
