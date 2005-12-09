@@ -56,6 +56,12 @@ elif [[ "$prev" = -(no|)cc ]]; then
   _wanted -C "$prev" values expl 'CC address' compadd all to cc me
 elif [[ "$prev" = -[rw]cache ]]; then
   _wanted -C "$prev" values expl cache compadd public private never ask
+elif [[ "$prev" = -textfield ]]; then
+  _wanted -C "$prev" -x headers expl header compadd -M 'm:{a-zA-Z}={A-Za-z}' \
+      Subject From To cc
+elif [[ "$prev" = -datefield ]]; then
+  _wanted -C "$prev" -x headers expl header compadd -M 'm:{a-zA-Z}={A-Za-z}' \
+      Delivery-Date
 elif [[ $service = mhparam ]]; then
   _wanted parameters expl 'MH parameter' compadd - \
     ${${(f)"$(mhparam -all)"}%%:*}

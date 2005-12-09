@@ -1,5 +1,7 @@
 2005-12-09  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_mh: better completion for sortm
+
 	* unposted: configure.ac: require autoconf 2.53b
 
 2005-12-09  Clint Adams  <clint@zsh.org>
