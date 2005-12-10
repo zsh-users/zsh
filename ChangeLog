@@ -1,3 +1,8 @@
+2005-12-10  Clint Adams  <clint@zsh.org>
+
+	* 22068: Completion/Debian/Command/_debdiff: completion
+	for debdiff.
+
 2005-12-09  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Modules/newuser.c: fixed return-without-value
