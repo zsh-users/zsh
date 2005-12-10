@@ -1,9 +1,14 @@
+2005-12-09  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Modules/newuser.c: fixed return-without-value
+	compiler warning.
+
 2005-12-09  Oliver Kiddle  <opk@zsh.org>
 
 	* Completion/Unix/Command/_surfraw, Completion/Unix/Command/_arp,
-        Completion/Unix/Command/_joe, Completion/Unix/Command/_quilt,
-        Completion/Debian/Command/_mergechanges: reindent and use lowercase
-        letters for descriptions
+	Completion/Unix/Command/_joe, Completion/Unix/Command/_quilt,
+	Completion/Debian/Command/_mergechanges: reindent and use lowercase
+	letters for descriptions
 
 	* unposted: Completion/Unix/Command/_mh: better completion for sortm
 
