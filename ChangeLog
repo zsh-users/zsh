@@ -1,3 +1,8 @@
+2005-12-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22069: Src/Zle/complist.c: completion listings didn't get
+	unmetafied.
+
 2005-12-10  Clint Adams  <clint@zsh.org>
 
 	* 22068: Completion/Debian/Command/_debdiff: completion

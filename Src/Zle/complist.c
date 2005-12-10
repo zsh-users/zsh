@@ -879,10 +879,12 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    fmt = mlistp;
     }
     for (p = fmt; *p; p++) {
-	if (doesc && *p == '%') {
-	    if (*++p) {
+	int chr = (*p == Meta) ? *++p ^ 32 : *p;
+	if (doesc && chr == '%') {
+	    chr = (*++p == Meta) ? *++p ^ 32 : *p;
+	    if (chr) {
 		m = 0;
-		switch (*p) {
+		switch (chr) {
 		case '%':
 		    if (dopr == 1)
 			putc('%', shout);
@@ -929,7 +931,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		case '{':
 		    for (p++; *p && (*p != '%' || p[1] != '}'); p++)
 			if (dopr)
-			    putc(*p, shout);
+			    putc(*p == Meta ? *++p ^ 32 : *p, shout);
 		    if (*p)
 			p++;
 		    else
@@ -1006,9 +1008,9 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    } else
 		break;
 	} else {
-	    if ((++cc == columns - 2 || *p == '\n') && stat)
+	    if ((++cc == columns - 2 || chr == '\n') && stat)
 		dopr = 2;
-	    if (*p == '\n') {
+	    if (chr == '\n') {
 		if (dopr == 1 && mlbeg >= 0 && tccan(TCCLEAREOL))
 		    tcout(TCCLEAREOL);
 		l += 1 + ((cc - 1) / columns);
@@ -1019,7 +1021,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    dopr = 0;
 		    continue;
 		}
-		putc(*p, shout);
+		putc(chr, shout);
 		if ((beg = !(cc % columns)) && !stat) {
 		    ml++;
                     fputs(" \010", shout);
