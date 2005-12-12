@@ -670,7 +670,7 @@ zle_setline(Histent he)
 	ZS_memcpy(zleline, he->zle_text, zlell);
 
 	zlecs = zlell;
-	if (invicmdmode())
+	if (zlecs > findbol() && invicmdmode())
 	    zlecs--;
     } else {
 	setline(he->text, ZSL_COPY|ZSL_TOEND);
