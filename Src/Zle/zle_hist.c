@@ -669,8 +669,7 @@ zle_setline(Histent he)
 	zleline = zalloc((zlell + 2) * ZLE_CHAR_SIZE);
 	ZS_memcpy(zleline, he->zle_text, zlell);
 
-	zlecs = zlell;
-	if (zlecs > findbol() && invicmdmode())
+	if ((zlecs = zlell) && invicmdmode())
 	    zlecs--;
     } else {
 	setline(he->text, ZSL_COPY|ZSL_TOEND);
