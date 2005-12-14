@@ -3921,8 +3921,7 @@ dquotedzputs(char const *s, FILE *stream)
 # if defined(HAVE_NL_LANGINFO) && defined(CODESET) && !defined(__STDC_ISO_10646__) && !defined(MULTIBYTE_SUPPORT)
 /* Convert a character from UCS4 encoding to UTF-8 */
 
-/**/
-size_t
+static size_t
 ucs4toutf8(char *dest, unsigned int wval)
 {
     size_t len;
