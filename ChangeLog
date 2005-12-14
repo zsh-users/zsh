@@ -1,3 +1,8 @@
+2005-12-14  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22078: Src/utils.c: made ucs4toutf8() a static function (when
+	it's even defined).
+
 2005-12-14  Peter Stephenson  <pws@csr.com>
 
 	* 22075: Src/utils.c: assume the effect of __STDC_ISO_10646__ for
