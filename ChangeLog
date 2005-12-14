@@ -1,3 +1,9 @@
+2005-12-14  Peter Stephenson  <pws@csr.com>
+
+	* 22075: Src/utils.c: assume the effect of __STDC_ISO_10646__ for
+	character conversion when --enable-multibyte is in effect (since
+	we do everywhere else).
+
 2005-12-12  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: aargh, didn't commit this for
