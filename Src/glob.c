@@ -56,11 +56,14 @@ struct gmatch {
 
 #define GS_NAME   1
 #define GS_DEPTH  2
-#define GS_SIZE   4
-#define GS_ATIME  8
-#define GS_MTIME 16
-#define GS_CTIME 32
-#define GS_LINKS 64
+
+#define GS_SHIFT_BASE	4
+
+#define GS_SIZE  (GS_SHIFT_BASE)
+#define GS_ATIME (GS_SHIFT_BASE << 1)
+#define GS_MTIME (GS_SHIFT_BASE << 2)
+#define GS_CTIME (GS_SHIFT_BASE << 3)
+#define GS_LINKS (GS_SHIFT_BASE << 4)
 
 #define GS_SHIFT  5
 #define GS__SIZE  (GS_SIZE << GS_SHIFT)
@@ -69,7 +72,8 @@ struct gmatch {
 #define GS__CTIME (GS_CTIME << GS_SHIFT)
 #define GS__LINKS (GS_LINKS << GS_SHIFT)
 
-#define GS_DESC  4096
+#define GS_DESC  (GS_SHIFT_BASE << (2*GS_SHIFT))
+#define GS_NONE  (GS_SHIFT_BASE << (2*GS_SHIFT+1))
 
 #define GS_NORMAL (GS_SIZE | GS_ATIME | GS_MTIME | GS_CTIME | GS_LINKS)
 #define GS_LINKED (GS_NORMAL << GS_SHIFT)
@@ -1414,6 +1418,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    case 'm': t = GS_MTIME; break;
 		    case 'c': t = GS_CTIME; break;
 		    case 'd': t = GS_DEPTH; break;
+		    case 'N': t = GS_NONE; break;
 		    default:
 			zerr("unknown sort specifier", NULL, 0);
 			restore_globstate(saved);
@@ -1622,10 +1627,13 @@ zglob(LinkList list, LinkNode np, int nountok)
 	    matchct = 1;
 	}
     }
-    /* Sort arguments in to lexical (and possibly numeric) order. *
-     * This is reversed to facilitate insertion into the list.    */
-    qsort((void *) & matchbuf[0], matchct, sizeof(struct gmatch),
-	       (int (*) _((const void *, const void *)))gmatchcmp);
+
+    if (!(gf_sortlist[0] & GS_NONE)) {
+	/* Sort arguments in to lexical (and possibly numeric) order. *
+	 * This is reversed to facilitate insertion into the list.    */
+	qsort((void *) & matchbuf[0], matchct, sizeof(struct gmatch),
+	      (int (*) _((const void *, const void *)))gmatchcmp);
+    }
 
     if (first < 0) {
 	first += matchct;
@@ -1637,10 +1645,21 @@ zglob(LinkList list, LinkNode np, int nountok)
     else if (end > matchct)
 	end = matchct;
     if ((end -= first) > 0) {
-	matchptr = matchbuf + matchct - first - end;
-	while (end-- > 0) {		/* insert matches in the arg list */
-	    insertlinknode(list, node, matchptr->name);
-	    matchptr++;
+	if (gf_sortlist[0] & GS_NONE) {
+	    /* Match list was never reversed, so insert back to front. */
+	    matchptr = matchbuf + matchct - first - 1;
+	    while (end-- > 0) {
+		/* insert matches in the arg list */
+		insertlinknode(list, node, matchptr->name);
+		matchptr--;
+	    }
+	} else {
+	    matchptr = matchbuf + matchct - first - end;
+	    while (end-- > 0) {
+		/* insert matches in the arg list */
+		insertlinknode(list, node, matchptr->name);
+		matchptr++;
+	    }
 	}
     }
     free(matchbuf);

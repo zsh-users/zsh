@@ -43,11 +43,11 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2005/07/18)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2005/12/14)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2005/07/18
+mydit(Last-Modified:) 2005/12/14
 mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--2005 (see end of document)
@@ -126,11 +126,18 @@ Chapter 4:  The mysteries of completion
 4.5. How do I get started with programmable completion?
 4.6. Suppose I want to complete all files during a special completion?
 
-Chapter 5:  The future of zsh
-5.1. What bugs are currently known and unfixed? (Plus recent important changes)
-5.2. Where do I report bugs, get more info / who's working on zsh?
-5.3. What's on the wish-list?
-5.4. Did zsh have problems in the year 2000?
+Chapter 5:  Multibyte input
+
+5.1. What is multibyte input?
+5.2. How does zsh handle multibyte input?
+5.3. How do I ensure multibyte input works on my system?
+5.4. How can I input characters that aren't on my keyboard?
+
+Chapter 6:  The future of zsh
+6.1. What bugs are currently known and unfixed? (Plus recent important changes)
+6.2. Where do I report bugs, get more info / who's working on zsh?
+6.3. What's on the wish-list?
+6.4. Did zsh have problems in the year 2000?
 
 Acknowledgments
 
@@ -1943,6 +1950,175 @@ sect(Suppose I want to complete all files during a special completion?)
   This adds filename completion to the end of the default types of
   completion.  Your actual completer style may include other actions,
   such as expansion or approximate completion.
+
+
+chapter(Multibyte input)
+
+sect(What is multibyte input?)
+
+  For a long time computers had a simple idea of a character: each octet
+  (8-bit byte) of text contained one character.  This meant an application
+  could only use 256 characters at once.  The first 128 characters (0 to
+  127) on Unix and similar systems usually corresponded to the ASCII
+  character set, as they still do.  So all other possibilities had to be
+  crammed into the remaining 128.  This was done by picking the appropriate
+  character set for the use you were making.  For example, ISO 8859
+  specified a set of extensions to ASCII for various alphabets.
+
+  This was fine for simple extensions and certain short enough relatives of
+  the Latin alphabet (with no more than a few dozen alphabetic characters),
+  but useless for complex alphabets.  Also, having a different character
+  set for each language is inconvenient: you have to start a new terminal
+  to run the shell with each character set.  So the character set had to be
+  extended.  To cut a long story short, the world has mostly standardised
+  on a character set called Unicode, related to the international standard
+  ISO 10646.  The intention is that this will contain every single
+  character used in all the languages of the world.
+
+  This has far too many characters to fit into a single octet.  What's
+  more, UNIX utilities such as zsh are so used to dealing with ASCII that
+  removing it would cause no end of trouble.  So what happens is this: the
+  128 ASCII characters are kept exactly the same (and they're the same as
+  the first 128 characters of Unicode), but the remaining 128 characters
+  are used to build up any other Unicode character by combining multiple
+  octets together.  The shell doesn't need to interpret these directly; it
+  just needs to ask the system library how many octets form the next
+  character, and if there's a valid character there at all.  (It can also
+  ask the system what width the character takes up on the screen, so that
+  characters no longer need to be exacxtly one position wide.)
+
+  The way this is done is called UTF-8.  Multibyte encodings of other
+  character sets exist (you might encounter them for Asian character sets);
+  zsh will be able to use any such encoding as long as it contains ASCII as
+  a single-octet subset and the system can provide information about other
+  characters.  However, in the case of Unicode, UTF-8 is the only one you
+  are likely to enounter.
+
+  (In case you're confused: Unicode is the characters set, while UTF-8 is
+  an encoding of it.  You might hear about other encodings, such as UCS-2
+  and UCS-4 which are basically the character's index in the character set
+  as a two-octet or four-octet integer.  You might see files encoded this
+  way, for example on Windows, but the shell can't deal directly with text
+  in those formats.)
+
+
+sect(How does zsh handle multibyte input?)
+
+  Until version 4.3, zsh didn't handle multibyte input properly at all.
+  Each octet in a multibyte character would look to the shell like a
+  separate character.  If your terminal handled the character set,
+  characters might appear correct on screen, but trying to edit them would
+  cause all sorts of odd effects.  (It was possible to edit in zsh using
+  single-byte extensions of ASCII such as the ISO 8859 family, however.)
+
+  From version 4.3, multibyte input is handled in the line editor if zsh
+  has been compiled with the appropriate definitions.  This will happen
+  automatically if the compiler defines __STDC_ISO_10646__, which is true
+  for many recent GNU-based systems.  On other systems you must configure
+  zsh with the argument --enable-multibyte to configure.  (The reason for
+  this is that the presence of __STDC_ISO_10646__ ensures all the required
+  library support is present, short-circuiting a large number of
+  configuration tests.)  Explicit use of --enable-multibyte should work on
+  many other recent UNIX systems; if it works on yours, and that's not
+  mentioned in the shell documentation, please report this to
+  zsh-workers@sunsite.dk, and if it doesn't but you can work out why not
+  we'd also be interested in hearing.
+
+  You can test if multibyte handling is compiled into your version of the
+  shell by running:
+  verb(
+    (bindkey -m)
+  )
+  which should output a warning:
+  verb(
+    bindkey: warning: `bindkey -m' disables multibyte support
+  )
+  If it doesn't, you don't have multibyte support in your shell.  The
+  parentheses are there to run the command in a subshell, which protects
+  your interactive shell from the effects being warned about.
+
+  Multibyte strings are not yet handled anywhere else in the shell.  This
+  means, for example, patterns treat multibyte characters as a set of single
+  octets and the ${#var} syntax counts octets, not characters.  There will
+  probably be new syntax to ensure that zsh can work both in its traditional
+  way as well as when interpreting multibyte characters.
+
+
+sect(How do I ensure multibyte input works on my system?)
+
+  Once you have a version of zsh with multibyte support, you need to
+  ensure the envivronment is correct.  We'll assume you're using UTF-8.
+  Many modern systems may come set up correctly already.  Try one of
+  the editing widgets described in the next section to see.
+
+  There are basically three components.
+
+  itemize(
+   it() The locale.  This describes a whole series of features specific
+      to countries or regions of which the character set is one.  Usually
+      it is controlled by the environment variable tt(LANG) (there are
+      others but this is the one to start with).  You need to find a
+      locale whose name contains mytt(UTF-8).  This will be a variant on
+      your usual locale, which typically indicates the language and
+      country; for example, mine is mytt(en_GB.UTF-8).  Luckily, zsh can
+      complete locale names, so if you have the new completion system
+      loaded you can type mytt(export LANG=) and attempt to complete a
+      suitable locale.  It's the locale that tells the shell to expect the
+      right form of multibyte input.  (However, there's no guarantee that
+      the shell is actually going to get this input: for example, if you
+      edit file names that have been created using a different character
+      set it won't work properly.)
+   it() The terminal emulator.  Those that are supplied with a recent
+      desktop environment, such as gnome-terminal, are likely to have
+      extensive support for localization and may work correctly as soon
+      as they know the locale.
+   it() The font.  If you selected this from a menu in your terminal
+      emulator, there's a good chance it already selected the right
+      character set to go with it.  If you hand-picked an old fashioned
+      X font with a lot of dashes, you need to make sure it ends with
+      the right character encoding, mytt(iso10646-1) (and not, for
+      example, mytt(iso8859-1)).  Not all characters will be available
+      in any font, and some fonts may have a more restricted range of
+      Unicode characters than others.
+  )
+
+
+sect(How can I input characters that aren't on my keyboard?)
+
+  Two functions are provided with zsh that help you input characters.
+  As with all editing widgets implemented by functions, you need to
+  mark the function for autoload, create the widget, and, if you are
+  going to use it frequently, bind it to a key sequence.  The
+  following binds tt(insert-composed-char) to F5 on my keyboard:
+  verb(
+    autoload -Uz insert-composed-char
+    zle -N insert-composed-char
+    bindkey '\e[15~' insert-composed-char
+  )
+
+  The two widgets are described in the tt(zshcontrib(1)) manual
+  page, but here is a brief summary:
+
+  tt(insert-composed-char) is followed by two characters that
+  are a mnemonic for a multibyte character.  For example mytt(a:)
+  is a with an umlaut; mytt(cH) is the symbol for hearts on a playing
+  card.  Various accented characters, European and related alphabets,
+  and punctuation and mathematical symbols are available.  The
+  mnemonics are mostly those given by RFC 1345, see
+  url(http://www.faqs.org/rfcs/rfc1345.html)\
+(http://www.faqs.org/rfcs/rfc1345.html).
+
+  tt(insert-unicode-char) is used to input a Unicode character by
+  its hexadecimal number.  This is the number given in the Unicode
+  character charts, see for example \
+url(http://www.unicode.org/charts/)(http://www.unicode.org/charts/).
+  You need to execute the function, then type the hexadecimal number
+  (you can omit any leading zeroes), then execute the function again.
+
+  Both functions can be used without multibyte mode, provided the locale is
+  correct and the character selected exists in the current character set;
+  however, using UTF-8 massively extends the number of valid characters
+  that can be produced.
 
 
 chapter(The future of zsh)

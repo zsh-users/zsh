@@ -272,7 +272,16 @@ The support can be explicitly enabled or disable with --enable-multibyte or
 --disable-multibyte.  Reports of systems where multibyte support was not
 enabled by default but --enable-multibyte resulted in a usable shell would
 be appreciated.  The developers are not aware of any need to use
---disable-multibyte and this should be reported as a bug.
+--disable-multibyte and this should be reported as a bug.  Currently
+multibyte mode is believed to work automatically on:
+
+  - All(?) current GNU/Linux distributions
+  - All(?) current BSD variants
+  - OS X 10.4.3
+
+and to work when configured with --enable-multibyte on:
+
+  - Solaris 8 and later
 
 The main shell is not yet aware of multibyte characters, so for example the
 length of a scalar parameter will return the number of bytes, not
@@ -280,6 +289,8 @@ characters, and pattern tests likewise treat single bytes as if they were
 characters.  This means that pattern tests such as ? and [[:alpha:]] do not
 work correctly with characters in multibyte character sets beyond the ASCII
 subset.
+
+See chapter 5 in the FAQ for some notes on multibyte input.
 
 Memory Routines
 ---------------

@@ -1,3 +1,11 @@
+2005-12-15  Peter Stephenson  <pws@csr.com>
+
+	* 22076: INSTALL, Etc/FAQ.yo: more information on multibyte
+	handling.
+
+	* users/9788: Doc/Zsh/expn.yo, Src/glob.c: add (oN) qualifier
+	for no sorting.
+
 2005-12-14  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21814: Src/loop.c, Src/signals.c: if an error occurs in an
