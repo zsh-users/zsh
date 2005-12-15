@@ -627,13 +627,17 @@ zlong
 try_errflag = -1;
 
 /**/
+zlong
+try_tryflag = 0;
+
+/**/
 int
 exectry(Estate state, int do_exec)
 {
     Wordcode end, always;
     int endval;
     int save_retflag, save_breaks, save_loops, save_contflag;
-    zlong save_try_errflag;
+    zlong save_try_errflag, save_try_tryflag;
 
     end = state->pc + WC_TRY_SKIP(state->pc[-1]);
     always = state->pc + 1 + WC_TRY_SKIP(*state->pc);
@@ -642,7 +646,12 @@ exectry(Estate state, int do_exec)
     cmdpush(CS_CURSH);
 
     /* The :try clause */
+    save_try_tryflag = try_tryflag;
+    try_tryflag = 1;
+
     execlist(state, 1, do_exec);
+
+    try_tryflag = save_try_tryflag;
 
     /* Don't record errflag here, may be reset. */
     endval = lastval;

@@ -1,3 +1,11 @@
+2005-12-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 21814: Src/loop.c, Src/signals.c: if an error occurs in an
+	inline trap, set $? to 1, to match the behavior of pre-4.2
+	versions of zsh.  If and only if the trap is executed within the
+	"try" part of an "always" construct, also propagate the error
+	condition so that the "try" section is aborted.  (Belated commit.)
+
 2005-12-14  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22078: Src/utils.c: made ucs4toutf8() a static function (when

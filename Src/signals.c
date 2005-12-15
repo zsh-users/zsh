@@ -1003,6 +1003,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     int trapret = 0;
     int obreaks = breaks;
     int isfunc;
+    int traperr;
 
     /* if signal is being ignored or the trap function		      *
      * is NULL, then return					      *
@@ -1097,8 +1098,8 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	 * execrestore.
 	 */
 	trapret = trapreturn + 1;
-    } else if (errflag)
-	trapret = 1;
+    }
+    traperr = errflag;
     execrestore();
     lexrestore();
 
@@ -1110,6 +1111,10 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	    lastval = trapret-1;
 	}
     } else {
+	if (traperr && emulation != EMULATE_SH)
+	    lastval = 1;
+	if (try_tryflag)
+	    errflag = traperr;
 	breaks += obreaks;
 	if (breaks > loops)
 	    breaks = loops;
