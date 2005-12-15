@@ -1,5 +1,8 @@
 2005-12-15  Peter Stephenson  <pws@csr.com>
 
+	* 22085 and back off 22075: Src/system.h, Src/utils.c: we
+	may need <langinfo.h> even with MULTIBYTE_SUPPORT to get iconv.
+
 	* 22076: INSTALL, Etc/FAQ.yo: more information on multibyte
 	handling.
 

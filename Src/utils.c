@@ -3918,7 +3918,7 @@ dquotedzputs(char const *s, FILE *stream)
 }
 #endif
 
-# if defined(HAVE_NL_LANGINFO) && defined(CODESET) && !defined(__STDC_ISO_10646__) && !defined(MULTIBYTE_SUPPORT)
+# if defined(HAVE_NL_LANGINFO) && defined(CODESET) && !defined(__STDC_ISO_10646__)
 /* Convert a character from UCS4 encoding to UTF-8 */
 
 static size_t
@@ -3983,7 +3983,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     char svchar = '\0';
     int meta = 0, control = 0;
     int i;
-#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && (defined(__STDC_ISO_10646__) || defined(MULTIBYTE_SUPPORT))
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
     wint_t wval;
     size_t count;
 #else
@@ -4092,7 +4092,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    *misc = wval;
 		    return s+1;
 		}
-#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && (defined(__STDC_ISO_10646__) || defined(MULTIBYTE_SUPPORT))
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
 		count = wctomb(t, (wchar_t)wval);
 		if (count == (size_t)-1) {
 		    zerr("character not in range", NULL, 0);

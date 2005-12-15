@@ -703,11 +703,10 @@ extern short ospeed;
  */
 # include <wchar.h>
 # include <wctype.h>
-#else
-# ifdef HAVE_LANGINFO_H
-#   include <langinfo.h>
-#   ifdef HAVE_ICONV
-#     include <iconv.h>
-#   endif
-# endif
+#endif
+#ifdef HAVE_LANGINFO_H
+#  include <langinfo.h>
+#  ifdef HAVE_ICONV
+#    include <iconv.h>
+#  endif
 #endif
