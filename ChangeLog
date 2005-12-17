@@ -1,3 +1,10 @@
+2005-12-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22091: Src/hist.c: improved HIST_SAVE_BY_COPY to have it (1)
+	preserve the group and permissions on the history file, and (2)
+	refuse to re-copy the history file if zsh's euid differs from
+	the file's uid (to avoid changing the file's owner).
+
 2005-12-15  Peter Stephenson  <pws@csr.com>
 
 	* 22085 and back off 22075: Src/system.h, Src/utils.c: we
