@@ -2080,8 +2080,26 @@ savehistfile(char *fn, int err, int writeflags)
 	tmpfile = bicat(unmeta(fn), ".new");
 	if (unlink(tmpfile) < 0 && errno != ENOENT)
 	    out = NULL;
-	else
-	    out = fdopen(open(tmpfile, O_CREAT | O_WRONLY | O_EXCL, 0600), "w");
+	else {
+	    struct stat sb;
+	    int old_exists = stat(unmeta(fn), &sb) == 0;
+
+	    if (old_exists && sb.st_uid != geteuid()) {
+		free(tmpfile);
+		tmpfile = NULL; /* Avoid an error about HISTFILE.new */
+		out = NULL;
+	    } else
+		out = fdopen(open(tmpfile, O_CREAT | O_WRONLY | O_EXCL, 0600), "w");
+
+#ifdef HAVE_FCHMOD
+	    if (old_exists && out) {
+#ifdef HAVE_FCHOWN
+		fchown(fileno(out), sb.st_uid, sb.st_gid);
+#endif
+		fchmod(fileno(out), sb.st_mode);
+	    }
+#endif
+	}
     }
     if (out) {
 	for (; he && he->histnum <= xcurhist; he = down_histent(he)) {
