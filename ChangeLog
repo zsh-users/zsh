@@ -1,3 +1,7 @@
+2005-12-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22095: INSTALL, Etc/FAQ.yo: more multibyte notes.
+
 2005-12-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22091: Src/hist.c: improved HIST_SAVE_BY_COPY to have it (1)

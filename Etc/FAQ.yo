@@ -2071,7 +2071,25 @@ sect(How do I ensure multibyte input works on my system?)
    it() The terminal emulator.  Those that are supplied with a recent
       desktop environment, such as gnome-terminal, are likely to have
       extensive support for localization and may work correctly as soon
-      as they know the locale.
+      as they know the locale.  You can enable UTF-8 support for
+      tt(xterm) in its application defaults file.  The following are
+      the relevant resources; you donʼt actually need all of them, as
+      described below.  If you use a mytt(~/.Xdefaults) or
+      mytt(~/.Xresources) file for setting resources, prefix all the lines
+      with mytt(xterm):
+      verb(
+        *wideChars: true
+        *locale: true
+        *utf8: 1
+        *vt100Graphics: true
+      )
+      This turns on support for wide characters (this is enabled by the
+      tt(utf8) resource, too); enables conversions to UTF-8 from other
+      locales (this is the key resource and actually overrides
+      mytt(utf8)); turns on UTF-8 mode (this resource is mostly used to
+      force use of UTF-8 characters if your locale system isnʼt up to it);
+      and allows certain graphic characters to work even with UTF-8
+      enabled.  (Thanks to Phil Pennock for suggestions.)
    it() The font.  If you selected this from a menu in your terminal
       emulator, there's a good chance it already selected the right
       character set to go with it.  If you hand-picked an old fashioned
