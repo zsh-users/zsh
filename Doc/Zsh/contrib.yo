@@ -1457,7 +1457,7 @@ A tt(PLUS()) in the list will be replaced by the default files.
 item(tt(never-background))(
 If this boolean style is set, the handler for the given context is
 always run in the foreground, even if the flags provided in the mailcap
-entry suggest it need not be (for example, it doesnʼt require a
+entry suggest it need not be (for example, it doesn't require a
 terminal).
 )
 item(tt(pager))(
