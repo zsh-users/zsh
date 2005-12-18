@@ -1,3 +1,8 @@
+2005-12-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Etc/FAQ.yo, Zsh/contrib.yo: Changed some UTF-8
+	apostrophes to normal apostrophes.
+
 2005-12-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22095: INSTALL, Etc/FAQ.yo: more multibyte notes.
