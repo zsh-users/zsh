@@ -5,8 +5,6 @@ _yum()
 {
 	local curcontext="$curcontext" state lstate line
 
-	local comp_num='compadd "$expl[@]" -S0 -r "0-9" - ""'
-												  
 	_arguments -s \
 	   {-h,--help}'[show the help message]' \
 	   {-t,--tolerant}'[be tolerant of errors]' \
@@ -17,9 +15,9 @@ _yum()
 	   '-e[Error level (0-10)]:Error level' \
 	   '-y[Answer yes for all questions]' \
 	   '--installroot=[Set install root]:Install Root:_files -/' \
-	   '--enablerepo=[Enable or or more repositories]:Repos to enable' \
-	   '--disablerepo=[Disable one or more repositories]:Disable Repos' \
-	   '--exclude=[Exclude package(s) by name or glob]:Exclude Repos' \
+	   '*--enablerepo=[Enable or or more repositories]:Repos to enable:_yum_disabled_repos_list' \
+	   '*--disablerepo=[Disable one or more repositories]:Disable Repos:_yum_enabled_repos_list' \
+	   '--exclude=[Exclude package(s) by name or glob]:Exclude Packages' \
 	   '--version[Show yum version]' \
 	   '--obseletes[Enable obsoletes processing during updates]' \
 	   '--noplugins[Disable yum plugins]' \
@@ -92,7 +90,7 @@ _yum_all_pkgs()
 		! _retrieve_cache ALL;
 	then
 		local prog="yum -C list all | sed 's/\s.*//' | grep '\.'"
-		_all_pkgs=( $(_call_program allpackages $prog 2>/dev/null) )
+		_all_pkgs=( $(kages $prog 2>/dev/null) )
 		_store_cache ALL _all_pkg
 	fi
 }
@@ -103,8 +101,7 @@ _yum_installed_pkgs()
 	if ( [[ ${+_installed_pkgs} -eq 0 ]] || _cache_invalid INSTALLED ) &&
 		! _retrieve_cache INSTALLED;
 	then
-		local prog="yum -C list installed | sed 's/\s.*//' | grep '\.'"
-		_installed_pkgs=( $(_call_program ipackages $prog 2>/dev/null) )
+		_installed_pkgs=( $(yum -C list installed | sed 's/\s.*//' | grep '\.' 2>/dev/null) )
 		_store_cache INSTALLED _installed_pkgs
 	fi
 }
@@ -115,8 +112,7 @@ _yum_available_pkgs()
 	if ( [[ ${+_available_pkgs} -eq 0 ]] || _cache_invalid AVAILABLE ) &&
 		! _retrieve_cache AVAILABLE;
 	then
-		local prog="yum -C list available | sed 's/\s.*//' | grep '\.'"
-		_available_pkgs=( $(_call_program apackages $prog 2>/dev/null) )
+		_available_pkgs=( $(yum -C list available | sed 's/\s.*//' | grep '\.' 2>/dev/null) )
 		_store_cache AVAILABLE _available_pkgs
 	fi
 }
@@ -127,10 +123,39 @@ _yum_upgrade_pkgs()
 	if ( [[ ${+_upgrade_pkgs} -eq 0 ]] || _cache_invalid UPGRADE ) &&
 		! _retrieve_cache UPGRADE;
 	then
-		local prog="yum -C list upgrade | sed 's/\s.*//' | grep '\.'"
-		_upgrade_pkgs=( $(_call_program upackages $prog 2>/dev/null) )
+		_upgrade_pkgs=( $(yum -C list upgrade | sed 's/\s.*//' | grep '\.' 2>/dev/null) )
 		_store_cache UPGRADE _upgrade_pkgs
 	fi
+}
+
+# Gets the list of defined repos
+yum_repos() {
+    local trepo
+    local -a tarray
+    tarray=( $(egrep -h '(^\[.*\]|^enabled.*=)' /etc/yum.repos.d/*.repo /etc/yum.conf | sed -e 's/ //g' | sed -e 's/\[//g' | sed -e 's/\].*$//g' 2>/dev/null) )
+    local -i eindex=0
+    local -i dindex=0
+    for line in $tarray; do
+        if [[ "$line" = "enabled=1" ]]; then
+            enabled_yum_repos=($enabled_yum_repos $trepo)
+        elif [[ "$line" = "enabled=0" ]]; then
+            disabled_yum_repos=($disabled_yum_repos $trepo)
+        elif [[ "$line" != "main" ]]; then
+            trepo=$line
+        fi
+    done
+}
+
+(( $+functions[_yum_disabled_repos_list] )) || _yum_disabled_repos_list()
+{
+	yum_repos			
+	compadd "$@" -a -- disabled_yum_repos
+}
+
+(( $+functions[_yum_enabled_repos_list] )) || _yum_enabled_repos_list()
+{
+	yum_repos			
+	compadd "$@" -a -- enabled_yum_repos
 }
 
 # Completion function for erase|remove
@@ -257,7 +282,7 @@ _yum_caching_policy()
 
   	_yumrepomds=( /var/cache/yum/**/repomd.xml )
 
-  	if (( $#__yumrepomds )); then
+  	if (( $#_yumrepomds )); then
     	for repo in $_yumrepomds; do
       		[[ "$repo" -nt "$1" ]] && return 0
     	done

@@ -1,3 +1,8 @@
+2005-12-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Scott Murray <semurray@ntlworld.com>:
+	Completion/Redhat/Command/_yum: update.
+
 2005-12-19  Peter Stephenson  <pws@csr.com>
 
 	* 22082: Src/Modules/stat.c: print out UID or GID instead
