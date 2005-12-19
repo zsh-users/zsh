@@ -140,10 +140,16 @@ statuidprint(uid_t uid, char *outbuf, int flags)
 #ifdef HAVE_GETPWUID
 	struct passwd *pwd;
 	pwd = getpwuid(uid);
-	strcat(outbuf, pwd ? pwd->pw_name : "???");
-#else /* !HAVE_GETPWUID */
-	strcat(outbuf, "???");
+	if (pwd)
+	    strcat(outbuf, pwd->pw_name);
+	else
 #endif /* !HAVE_GETPWUID */
+	{
+	    char *optr;
+	    for (optr = outbuf; *optr; optr++)
+		;
+	    sprintf(optr, "%lu", (unsigned long)uid);
+	}
 	if (flags & STF_RAW)
 	    strcat(outbuf, ")");
     }
@@ -163,10 +169,16 @@ statgidprint(gid_t gid, char *outbuf, int flags)
 #ifdef HAVE_GETGRGID
 	struct group *gr;
 	gr = getgrgid(gid);
-	strcat(outbuf, gr ? gr->gr_name : "???");
-#else /* !HAVE_GETGRGID */
-	strcat(outbuf, "???");
+	if (gr)
+	    strcat(outbuf, gr->gr_name);
+	else
 #endif /* !HAVE_GETGRGID */
+	{
+	    char *optr;
+	    for (optr = outbuf; *optr; optr++)
+		;
+	    sprintf(optr, "%lu", (unsigned long)gid);
+	}
 	if (flags & STF_RAW)
 	    strcat(outbuf, ")");
     }
