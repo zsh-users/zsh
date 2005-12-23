@@ -11,7 +11,7 @@
 2005-12-18  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Etc/FAQ.yo, Zsh/contrib.yo: Changed some UTF-8
-	apostrophes to normal apostrophes.
+	closing-single-quotes into ASCII apostrophes.
 
 2005-12-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -61,7 +61,7 @@
 
 2005-12-12  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* 22071: Zrc/Zle/zle_hist.c: fixed a bug in zle_setline() where
+	* 22071: Src/Zle/zle_hist.c: fixed a bug in zle_setline() where
 	it would set zlecs to -1 for an empty line. (Reported by Jun T.)
 
 2005-12-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
