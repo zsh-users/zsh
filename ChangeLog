@@ -10,7 +10,7 @@
 
 2005-12-18  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* unposted: Etc/FAQ.yo, Zsh/contrib.yo: Changed some UTF-8
+	* unposted: Etc/FAQ.yo, Doc/Zsh/contrib.yo: Changed some UTF-8
 	closing-single-quotes into ASCII apostrophes.
 
 2005-12-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
