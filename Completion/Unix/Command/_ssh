@@ -75,6 +75,9 @@ _ssh () {
       '-V[show version number]' \
       '(-X)-x[disable X11 forwarding]' \
       '(-x)-X[enable X11 forwarding]' \
+      '-M[master mode for connection sharing]' \
+      '-S:path to control socket:_files' \
+      '-O:multiplex control command:(check exit)' \
       '*-L[specify local port forwarding]:local port forwarding:->forward' \
       '*-R[specify remote port forwarding]:remote port forwarding:->forward' \
       ':remote host name:->userhost' \
