@@ -214,6 +214,13 @@ _ssh () {
           _description files expl 'xauth program'
           _files "$expl[@]" -g '*(-*)' && ret=0
           ;;
+	*(#i)controlmaster*)
+	  _wanted values expl 'truthish value' compadd yes no auto autoask && ret=0
+	  ;;
+	*(#i)controlpath*)
+          _description files expl 'path to control socket'
+          _files "$expl[@]" && ret=0
+	  ;;
         esac
       else
         _wanted values expl 'configure file option' \
@@ -223,13 +230,14 @@ _ssh () {
 		ChallengeResponseAuthentication CheckHostIP \
 		Cipher Ciphers ClearAllForwardings Compression \
                 CompressionLevel ConnectionAttempts ConnectTimeout \
+		ControlMaster ControlPath \
 		DynamicForward EnableSSHKeysign \
 		EscapeChar FallBackToRsh ForwardAgent ForwardX11 \
 		ForwardX11Trusted \
                 GatewayPorts GlobalKnownHostsFile GSSAPIAuthentication \
 		GSSAPIDelegateCredentials HostbasedAuthentication \
 		HostKeyAlgorithms HostKeyAlias HostName IdentityFile \
-		IdentitiesOnly \
+		IdentitiesOnly KbdInteractiveDevices \
 		KeepAlive KerberosAuthentication KerberosTgtPassing \
 		LocalForward LogLevel MACs NoHostAuthenticationForLocalhost \
 		NumberOfPasswordPrompts PreferredAuthentications \

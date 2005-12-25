@@ -1,3 +1,8 @@
+2005-12-25  Clint Adams  <clint@zsh.org>
+
+	* 22104: Completion/Unix/Command/_ssh: add support
+	for new options such as ControlMaster and ControlPath.
+
 2005-12-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Scott Murray <semurray@ntlworld.com>:
