@@ -583,9 +583,13 @@ However, if this option is unset, we instead truncate the old
 history file and write out the new version in-place.  If one of the
 history-appending options is enabled, this option only has an affect
 when the enlarged history file needs to be re-written to trim it
-down to size.  Disable this only if you have special needs, as this
-makes it possible to lose history entries if zsh gets interrupted
+down to size.  Disable this only if you have special needs, as doing
+so makes it possible to lose history entries if zsh gets interrupted
 during the save.
+
+When writing out a copy of the history file, zsh preserves the old
+file's permissions and group information, but will refuse to write
+out a new file if it would change the history file's owner.
 )
 pindex(HIST_SAVE_NO_DUPS)
 item(tt(HIST_SAVE_NO_DUPS))(

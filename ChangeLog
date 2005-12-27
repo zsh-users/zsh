@@ -1,3 +1,8 @@
+2005-12-26  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Doc/Zsh/options.yo: A couple more improvements to the
+	HIST_SAVE_BY_COPY section.
+
 2005-12-25  Clint Adams  <clint@zsh.org>
 
 	* 22104, 22105: Completion/Unix/Command/_ssh: add
