@@ -1,6 +1,6 @@
 #compdef last lastb
 
-_arguments \
+_arguments -s \
   '-a[display hostname in last column]' \
   '-n[number]:number' \
   '-[number]:number' \

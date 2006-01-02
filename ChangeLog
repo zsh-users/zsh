@@ -1,3 +1,8 @@
+2006-01-02  Clint Adams  <clint@zsh.org>
+
+	* 22113: Completion/Unix/Command/_last: allow single option
+	characters to be combined.
+
 2005-12-26  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Doc/Zsh/options.yo: A couple more improvements to the
