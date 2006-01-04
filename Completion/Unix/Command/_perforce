@@ -1134,12 +1134,21 @@ _perforce_hosts_ports() {
 
 (( $+functions[_perforce_jobs] )) ||
 _perforce_jobs() {
+  # Optional argument is jobview for limiting jobs.
   local jline match mbegin mend max jobview
   local -a jl amax ajobview
 
   zstyle -s ":completion:${curcontext}:jobs" max max || max=20
-  zstyle -s ":completion:${curcontext}:jobs" jobview jobview &&
-  ajobview=(-e $jobview)
+  # Hack: if there is a job view, it is at the end.
+  # This is nasty, it's really unnecessarily difficult to
+  # pass arguments within completion functions...
+  if [[ $argv[-2] = -e ]]; then
+    ajobview=(-e "$argv[-1]")
+    argv=("${(@)argv[1,-3]}")
+  else
+    zstyle -s ":completion:${curcontext}:jobs" jobview jobview &&
+    ajobview=(-e $jobview)
+  fi
   if [[ ${NUMERIC:-0} -lt 0 && -z $compstate[insert] ]]; then
   # Not inserting (i.e. just listing) and given a negative
   # prefix argument.  Instead of listing possible completions,
@@ -1441,7 +1450,14 @@ _perforce_cmd_change() {
   local ctype
   # Unless forcing or outputting, we don't
   # complete committed changes since they can't be altered.
-  [[ ${words[(I)-*(f|o)*]} -eq 0 ]] && ctype=" -tp"
+  # If deleting and not forcing, the change must be on the current client.
+  if [[ ${words[(I)-*(f|o)*]} -eq 0 ]]; then
+    if [[ ${words[(I)-d]} -gt 0 ]]; then
+      ctype=" -tc"
+    else
+      ctype=" -tp"
+    fi
+  fi
   _arguments -s : \
     '(-o)-f[allow force by superuser]' \
     '-s[joblist includes the fix status]' \
@@ -1619,12 +1635,27 @@ _perforce_cmd_files() {
 
 (( $+functions[_perforce_cmd_fix] )) ||
 _perforce_cmd_fix() {
+  local job
+  local -a jobs
+
+  if [[ -n $words[(R)-d] && -n $words[(R)-c] && -n $words[$words[(i)-c]+1] ]]
+  then
+    # Deleting a fix from a change.  We can find out which fixes
+    # are present.
+    local -a jobs
+    jobs=(${${(f)"$(_perforce_call_p4 fixes fixes -c $words[$words[(i)-c]+1])"}%" fixed by change "*})
+    if (( ${#jobs} )); then
+      jobs=("Job="${^jobs})
+      job=" -e ${(j.|.)jobs}"
+    fi
+  fi
+
   _arguments -s : \
     '-d[delete the fix]' \
     '-s[set job status]:status:_perforce_statuses' \
     '1::-c required:(-c)' \
     '2::change:_perforce_changes' \
-    '3::job:_perforce_jobs'
+    "3::job:_perforce_jobs$job"
 }
 
 

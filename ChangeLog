@@ -1,3 +1,10 @@
+2006-01-04  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: when deleting
+	 a fix, complete only jobs for the changelist given; when
+	 deleting changes, unless -f is given complete only changes
+	 on the current client.
+
 2006-01-02  Clint Adams  <clint@zsh.org>
 
 	* 22113: Completion/Unix/Command/_last: allow single option
