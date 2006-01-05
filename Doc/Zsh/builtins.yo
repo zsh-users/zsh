@@ -160,12 +160,22 @@ Change the current directory.  In the first form, change the
 current directory to var(arg), or to the value of tt($HOME) if
 var(arg) is not specified.  If var(arg) is `tt(-)', change to the
 value of tt($OLDPWD), the previous directory.
-Otherwise, if a directory named var(arg) is not found in the current
-directory and var(arg) does not begin with a slash, search each
-component of the shell parameter tt(cdpath).  If no directory is found
-and the option tt(CDABLE_VARS) is set, and a parameter named var(arg)
-exists whose value begins with a slash, treat its value as the
-directory.  In that case, the parameter is added to the named
+
+Otherwise, if var(arg) begins with a slash, attempt to change to the
+director given by var(arg).
+
+If var(arg) does not begin with a slash, the behaviour depends on whether
+the current directory `tt(.)' occurs in the list of directories contained
+in the shell parameter tt(cdpath).  If it does not, first attempt to change
+to the directory var(arg) under the current directory, and if that fails
+but tt(cdpath) is set and contains at least one element attempt to change
+to the directory var(arg) under each component of tt(cdpath) in turn until
+successful.  If `tt(.)' occurs in tt(cdpath), then tt(cdpath) is searched
+strictly in order so that `tt(.)' is only tried at the appropriate point.
+
+If no directory is found, the option tt(CDABLE_VARS) is set, and a
+parameter named var(arg) exists whose value begins with a slash, treat its
+value as the directory.  In that case, the parameter is added to the named
 directory hash table.
 
 The second form of tt(cd) substitutes the string var(new)

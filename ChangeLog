@@ -1,3 +1,8 @@
+2006-01-05  Peter Stephenson  <pws@csr.com>
+
+	* 22118: Doc/Zsh/builtins.yo: fix documentation for what
+	happens when . does or does not appear in $cdpath.
+
 2006-01-04  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: when deleting
