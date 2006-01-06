@@ -64,7 +64,8 @@ selfinsert(UNUSED(char **args))
 
 #ifdef MULTIBYTE_SUPPORT
     if (!lastchar_wide_valid)
-	getrestchar(lastchar);
+	if (getrestchar(lastchar) == WEOF)
+	    return 1;
 #endif
     tmp = LASTFULLCHAR;
     doinsert(&tmp, 1);
@@ -1018,6 +1019,9 @@ executenamedcommand(char *prmt)
 #ifdef MULTIBYTE_SUPPORT
 		    if (!lastchar_wide_valid)
 			getrestchar(lastchar);
+		    if (lastchar_wide == WEOF)
+			feep = 1;
+		    else
 #endif
 		    if (ZC_icntrl(LASTFULLCHAR))
 			feep = 1;

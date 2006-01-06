@@ -1107,7 +1107,10 @@ doisearch(char **args, int dir)
 	    } else if (cmd == Th(z_selfinsert)) {
 #ifdef MULTIBYTE_SUPPORT
 		if (!lastchar_wide_valid)
-		    getrestchar(lastchar);
+		    if (getrestchar(lastchar) == WEOF) {
+			handlefeep(zlenoargs);
+			continue;
+		    }
 #else
 		;
 #endif
@@ -1303,7 +1306,10 @@ getvisrchstr(void)
 	    } else {
 #ifdef MULTIBYTE_SUPPORT
 		if (!lastchar_wide_valid)
-		    getrestchar(lastchar);
+		    if (getrestchar(lastchar) == WEOF) {
+			handlefeep(zlenoargs);
+			continue;
+		    }
 #else
 		;
 #endif
