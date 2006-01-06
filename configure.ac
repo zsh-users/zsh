@@ -1121,7 +1121,7 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
 	       erand48 open_memstream \
-	       wctomb mbrtowc wcrtomb iconv \
+	       wctomb mbrtowc wcrtomb wcswidth iconv \
 	       grantpt unlockpt ptsname \
 	       htons ntohs)
 AC_FUNC_STRCOLL
