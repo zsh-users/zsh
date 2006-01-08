@@ -3473,24 +3473,23 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
     while (umlen > 0) {
 	ret = mbrtowc(&c, ptr, umlen, &ps);
 
-	if (ret == (size_t)-1 || ret == (size_t)-2)
-	{
-	    /*
-	     * We're a bit stuck here.  I suppose we could
-	     * just stick with \M-... for the individual bytes.
-	     */
-	    break;
-	}
-	/*
-	 * careful in case converting NULL returned 0: NULLs are real
-	 * characters for us.
-	 */
-	if (c == L'\0' && ret == 0)
+	if (ret != (size_t)-1 && ret != (size_t)-2) {
+	    /* Careful:  converting '\0' returns 0, but a '\0' is a
+	     * real character for us, so we should consume 1 byte. */
+	    if (c == L'\0')
+		ret = 1;
+	    fmt = wcs_nicechar(c, &newl, NULL);
+	} else {
+	    /* The byte didn't convert, so output it as a \M-... sequence. */
+	    fmt = nicechar(STOUC(*ptr));
+	    newl = strlen(fmt);
 	    ret = 1;
+	    /* Get ps out of its undefined state. */
+	    memset(&ps, 0, sizeof ps);
+	}
+
 	umlen -= ret;
 	ptr += ret;
-
-	fmt = wcs_nicechar(c, &newl, NULL);
 	l += newl;
 
 	if (stream)
