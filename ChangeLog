@@ -1,3 +1,9 @@
+2006-01-08  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/utils.c, Src/system.h: Changed the single spot
+	that used wcswidth() over to use wcwidth() and got rid of the
+	work-around for OpenBSD (which lacks wcswidth()).
+
 2006-01-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22146: Functions/Zle/define-composed-chars: typo in AE and OE
