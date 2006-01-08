@@ -1098,7 +1098,7 @@ dnl AC_FUNC_STRFTIME
 AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       select poll \
 	       readlink faccessx fchdir ftruncate \
-	       fstat lstat lchown \
+	       fstat lstat lchown fchown fchmod \
 	       fseeko ftello \
 	       mkfifo _mktemp mkstemp \
 	       waitpid wait3 \
@@ -1121,7 +1121,7 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
 	       erand48 open_memstream \
-	       wctomb mbrtowc wcrtomb wcswidth iconv \
+	       wctomb mbrtowc wcrtomb iconv \
 	       grantpt unlockpt ptsname \
 	       htons ntohs)
 AC_FUNC_STRCOLL
