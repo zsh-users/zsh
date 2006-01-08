@@ -375,7 +375,7 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     }
 
     if (widthp)
-	*widthp = (s - buf) + wcswidth(&c, 1);
+	*widthp = (s - buf) + wcwidth(c);
     if (swidep)
 	*swidep = s;
     for (mbptr = mbstr; ret; s++, mbptr++, ret--) {
