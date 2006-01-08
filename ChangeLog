@@ -1,5 +1,9 @@
 2006-01-08  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* 22140 (modified): Src/utils.c: Changed mb_niceformat() so that it
+	does not truncate a name that has an invalid character sequence in
+	the current character set (affected chars display as \M-... chars).
+
 	* unposted: Src/utils.c, Src/system.h: Changed the single spot
 	that used wcswidth() over to use wcwidth() and got rid of the
 	work-around for OpenBSD (which lacks wcswidth()).
