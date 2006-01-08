@@ -116,7 +116,7 @@ z[$a]+=" \
 "
 
 # ligature with E
-a=e
+a=E
 z[$a]="\
 A C6 O 152 \
 "

@@ -1,3 +1,8 @@
+2006-01-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22146: Functions/Zle/define-composed-chars: typo in AE and OE
+	ligatures.
+
 2006-01-06  Peter Stephenson  <pws@csr.com>
 
 	* 22124: Src/Zle/zle_hist.c, Src/Zle/zle_misc.c: feep()
