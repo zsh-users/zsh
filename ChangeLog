@@ -4,6 +4,10 @@
 	does not truncate a name that has an invalid character sequence in
 	the current character set (affected chars display as \M-... chars).
 
+	* unposted: configure.ac: got rid of probe for wcswidth() and added
+	probes for fchown() and fchmod() (the latter changes were accidentally
+	left out of my 22091 patch).
+
 	* unposted: Src/utils.c, Src/system.h: Changed the single spot
 	that used wcswidth() over to use wcwidth() and got rid of the
 	work-around for OpenBSD (which lacks wcswidth()).
