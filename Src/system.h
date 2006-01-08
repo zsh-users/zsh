@@ -703,10 +703,6 @@ extern short ospeed;
  */
 # include <wchar.h>
 # include <wctype.h>
-#ifndef HAVE_WCSWIDTH
-/* wcswidth is missing on OpenBSD: assume single-width characters */
-#define wcswidth(x, y)	(1)
-#endif
 #endif
 #ifdef HAVE_LANGINFO_H
 #  include <langinfo.h>
