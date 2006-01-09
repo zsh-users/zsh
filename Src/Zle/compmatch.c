@@ -1645,7 +1645,8 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 		 * ret must, in fact, be set by the current logic,
 		 * but gcc doesn't realise (at least some versions don't).
 		 */
-		int ret = -1, diff;
+		size_t cnt = (size_t)-1;
+		int diff;
 		char *p2;
 
 		/*
@@ -1653,15 +1654,13 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 		 * assembled wide characters a byte at a time.
 		 */
 		for (p2 = p; p2 < fullstr + fulllen; p2++) {
-		  char curchar = (*p2 == Meta) ? (*++p2 ^ 32) : *p2;
-		  ret = mbrtowc(&wc, &curchar, 1, &ps);
-		  /*
-		   * Continue while character is incomplete.
-		   */
-		  if (ret != -2)
-		    break;
+		    char curchar = (*p2 == Meta) ? (*++p2 ^ 32) : *p2;
+		    cnt = mbrtowc(&wc, &curchar, 1, &ps);
+		    /* Continue while character is incomplete. */
+		    if (cnt != (size_t)-2)
+			break;
 		}
-		if (ret < 0) {
+		if (cnt == (size_t)-1) {
 		    /* not a valid character, give up test */
 		    break;
 		}
@@ -1694,7 +1693,7 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 		    break;
 		}
 		/* Advance over full character */
-		p += ret;
+		p = p2;
 	    }
 	}
 #endif
