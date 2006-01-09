@@ -778,7 +778,7 @@ showmsg(char const *msg)
     ZLE_CHAR_T c;
 #ifdef MULTIBYTE_SUPPORT
     char *umsg;
-    int ulen, ret;
+    int ulen;
     size_t width;
     mbstate_t ps;
 #endif
@@ -804,15 +804,15 @@ showmsg(char const *msg)
 	    /*
 	     * Extract the next wide character from the multibyte string.
 	     */
-	    ret = mbrtowc(&c, p, ulen, &ps);
+	    size_t ret = mbrtowc(&c, p, ulen, &ps);
 
-	    if (ret <= 0) {
+	    if (ret == 0 || ret == (size_t)-1 || ret == (size_t)-2) {
 		/*
 		 * This really shouldn't be happening here, but...
 		 * Treat it as a single byte character; it may get
 		 * prettified.
 		 */
-		n = nicechar(*p);
+		n = nicechar(STOUC(*p));
 		ret = 1;
 		width = strlen(n);
 	    } else
