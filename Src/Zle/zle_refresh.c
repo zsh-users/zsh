@@ -1492,10 +1492,10 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     /* Reset shift state, maybe. */
     memset(&ps, '\0', sizeof(ps));
     for (lpptr = lpromptbuf; lpptr < lpend; ) {
-	t0 = mbrtowc(lpwp, lpptr, lpend - lpptr, &ps);
-	if (t0 > 0) {
+	size_t cnt = mbrtowc(lpwp, lpptr, lpend - lpptr, &ps);
+	if (cnt != 0 && cnt != (size_t)-1 && cnt != (size_t)-2) {
 	    /* successfully converted */
-	    lpptr += t0;
+	    lpptr += cnt;
 	    lpwp++;
 	} else {
 	    /* dunno, try to recover */
