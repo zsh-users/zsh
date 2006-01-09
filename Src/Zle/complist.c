@@ -575,7 +575,7 @@ clnicezputs(Listcols colors, char *s, int ml)
      * ps is the shift state of the conversion to wide characters.
      */
     char *ums, *uptr, *sptr, *wptr;
-    int ret, umleft, umlen;
+    int umleft, umlen;
     size_t width;
     mbstate_t ps;
 
@@ -589,26 +589,21 @@ clnicezputs(Listcols colors, char *s, int ml)
 	initiscol(colors);
 
     while (umleft > 0) {
-	ret = mbrtowc(&cc, uptr, umleft, &ps);
+	size_t ret = mbrtowc(&cc, uptr, umleft, &ps);
 
-	if (ret <= 0)
-	{
-	    /*
-	     * Eek!  Now we're stuffed.  I'm just going to
-	     * make this up...  Note that this may also handle
-	     * an input NULL, which we want to be a real character
-	     * rather than terminator.
-	     */
-	    sptr = nicechar(*uptr);
+	if (ret == 0 || ret == (size_t)-1 || ret == (size_t)-2) {
+	    /* This handles a '\0' in the input (which is a real char
+	     * to us, not a terminator) and byte values that aren't
+	     * valid wide-character sequences. */
+	    sptr = nicechar(STOUC(*uptr));
 	    /* everything here is ASCII... */
 	    width = strlen(sptr);
 	    wptr = sptr + width;
 	    ret = 1;
-	}
-	else
-	{
+	    /* Get ps out of its undefined state when ret < 0. */
+	    memset(&ps, 0, sizeof ps);
+	} else
 	    sptr = wcs_nicechar(cc, &width, &wptr);
-	}
 
 	umleft -= ret;
 	uptr += ret;
