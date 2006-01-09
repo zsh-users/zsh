@@ -275,36 +275,35 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 	memset(&ps, '\0', sizeof(ps));
 
 	while (ll > 0) {
-	    size_t ret = mbrtowc(outptr, inptr, ll, &ps);
+	    size_t cnt = mbrtowc(outptr, inptr, ll, &ps);
 
 	    /*
 	     * At this point we don't handle either incomplete (-2) or
 	     * invalid (-1) multibyte sequences.  Use the current length
 	     * and return.
 	     */
-	    if (ret == (size_t)-1 || ret == (size_t)-2)
+	    if (cnt == (size_t)-1 || cnt == (size_t)-2)
 		break;
 
 	    /*
 	     * Careful: converting a wide NUL returns zero, but we
 	     * want to treat NULs as regular characters.
-	     * The NUL does get converted, however, so test that.
 	     * Assume it was represented by a single ASCII NUL;
 	     * certainly true for Unicode and unlikely to be false
 	     * in any non-pathological multibyte representation.
 	     */
-	    if (*outptr == L'\0' && ret == 0)
-		ret = 1;
+	    if (cnt == 0)
+		cnt = 1;
 
 	    if (outcs) {
 		int offs = inptr - instr;
-		if (offs <= incs && incs < offs + (int)ret)
+		if (offs <= incs && incs < offs + (int)cnt)
 		    *outcs = outptr - outstr;
 	    }
 
-	    inptr += ret;
+	    inptr += cnt;
 	    outptr++;
-	    ll -= ret;
+	    ll -= cnt;
 	}
 	if (outcs && inptr <= instr + incs)
 	    *outcs = outptr - outstr;
