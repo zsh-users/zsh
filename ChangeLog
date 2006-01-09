@@ -1,10 +1,18 @@
+2006-01-09  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/utils.c, Src/Zle/compmatch.c, Src/Zle/zle_utils.c:
+	a little more cleanup of the mbrtowc() code, including a bugfix
+	for my new code in sub_match() that needed to check for -2.
+
 2006-01-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Zle/zle_refresh.c, Src/Zle/zle_utils.c,
-	Src/Zle/complist.c: changed the code that calls mbrtowc() to deal with
-	its size_t return value as a size_t.  Also, use STOUC() on char values
-	passed to nicechar(), and make sure that the mbstate_t object never
-	gets left in an undefined state.
+	Src/Zle/complist.c, Src/Zle/compmatch.c: changed the code that
+	calls mbrtowc() to deal with its size_t return value as a size_t.
+	Also, use STOUC() on char values passed to nicechar(), make sure
+	that the mbstate_t object never gets left in an undefined state,
+	and fixed a problem in sub_match() when dealing with a character
+	that was assembled from multiple bytes.
 
 	* 22140 (modified): Src/utils.c: Changed mb_niceformat() so that it
 	does not truncate a name that has an invalid character sequence in
