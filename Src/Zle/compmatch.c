@@ -1660,7 +1660,7 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 		    if (cnt != (size_t)-2)
 			break;
 		}
-		if (cnt == (size_t)-1) {
+		if (cnt == (size_t)-1 || cnt == (size_t)-2) {
 		    /* not a valid character, give up test */
 		    break;
 		}
