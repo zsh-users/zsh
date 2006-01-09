@@ -3446,7 +3446,7 @@ niceztrlen(char const *s)
 mod_export size_t
 mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
 {
-    size_t l = 0, newl, ret;
+    size_t l = 0, newl;
     int umlen, outalloc, outleft;
     wchar_t c;
     char *ums, *ptr, *fmt, *outstr, *outptr;
@@ -3471,25 +3471,25 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
 
     memset(&ps, 0, sizeof(ps));
     while (umlen > 0) {
-	ret = mbrtowc(&c, ptr, umlen, &ps);
+	size_t cnt = mbrtowc(&c, ptr, umlen, &ps);
 
-	if (ret != (size_t)-1 && ret != (size_t)-2) {
+	if (cnt != (size_t)-1 && cnt != (size_t)-2) {
 	    /* Careful:  converting '\0' returns 0, but a '\0' is a
 	     * real character for us, so we should consume 1 byte. */
-	    if (c == L'\0')
-		ret = 1;
+	    if (cnt == 0)
+		cnt = 1;
 	    fmt = wcs_nicechar(c, &newl, NULL);
 	} else {
 	    /* The byte didn't convert, so output it as a \M-... sequence. */
 	    fmt = nicechar(STOUC(*ptr));
 	    newl = strlen(fmt);
-	    ret = 1;
+	    cnt = 1;
 	    /* Get ps out of its undefined state. */
 	    memset(&ps, 0, sizeof ps);
 	}
 
-	umlen -= ret;
-	ptr += ret;
+	umlen -= cnt;
+	ptr += cnt;
 	l += newl;
 
 	if (stream)
