@@ -798,16 +798,17 @@ getredirs(LinkList redirs)
 	    taddstr(fstr[f->type]);
 	    if (f->type != REDIR_MERGEIN && f->type != REDIR_MERGEOUT)
 		taddchr(' ');
-	    if (f->type == REDIR_HERESTR) {
-                if (has_token(f->name)) {
-                    taddchr('\"');
-                    taddstr(bslashquote(f->name, NULL, 2));
-                    taddchr('\"');
-                } else {
-                    taddchr('\'');
-                    taddstr(bslashquote(f->name, NULL, 1));
-                    taddchr('\'');
-                }
+	    if (f->type == REDIR_HERESTR && !has_token(f->name)) {
+		/*
+		 * Strings that came from here-documents are converted
+		 * to here strings without quotation, so add that
+		 * now.  If tokens are already present taddstr()
+		 * will do the right thing (anyway, adding more
+		 * quotes certainly isn't right in that case).
+		 */
+		taddchr('\'');
+		taddstr(bslashquote(f->name, NULL, 1));
+		taddchr('\'');
 	    } else
 		taddstr(f->name);
 	    taddchr(' ');

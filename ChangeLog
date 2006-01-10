@@ -1,3 +1,8 @@
+2006-01-10  Peter Stephenson  <pws@csr.com>
+
+	* 22151: Src/text.c: a here-string got too many quotes when
+	output by which etc.
+
 2006-01-09  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/utils.c, Src/Zle/compmatch.c, Src/Zle/zle_utils.c:
