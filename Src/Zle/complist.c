@@ -589,31 +589,40 @@ clnicezputs(Listcols colors, char *s, int ml)
 	initiscol(colors);
 
     while (umleft > 0) {
-	size_t ret = mbrtowc(&cc, uptr, umleft, &ps);
+	size_t cnt = mbrtowc(&cc, uptr, umleft, &ps);
 
-	if (ret == 0 || ret == (size_t)-1 || ret == (size_t)-2) {
-	    /* This handles a '\0' in the input (which is a real char
-	     * to us, not a terminator) and byte values that aren't
-	     * valid wide-character sequences. */
+	switch (cnt) {
+	case (size_t)-2:
+	case (size_t)-1:
+	    /* This handles byte values that aren't valid wide-character
+	     * sequences. */
 	    sptr = nicechar(STOUC(*uptr));
 	    /* everything here is ASCII... */
 	    width = strlen(sptr);
 	    wptr = sptr + width;
-	    ret = 1;
-	    /* Get ps out of its undefined state when ret < 0. */
+	    cnt = 1;
+	    /* Get ps out of its undefined state. */
 	    memset(&ps, 0, sizeof ps);
-	} else
+	    break;
+	case 0:
+	    /* This handles a '\0' in the input (which is a real char
+	     * to us, not a terminator). */
+	    cnt = 1;
+	    /* FALL THROUGH */
+	default:
 	    sptr = wcs_nicechar(cc, &width, &wptr);
+	    break;
+	}
 
-	umleft -= ret;
-	uptr += ret;
+	umleft -= cnt;
+	uptr += cnt;
 	if (colors) {
 	    /*
 	     * The code for the colo[u]ri[s/z]ation is obscure (surprised?)
 	     * but if we do it for every input character, as we do in
 	     * the simple case, we shouldn't go too far wrong.
 	     */
-	    while (ret--)
+	    while (cnt--)
 		doiscol(colors, i++);
 	}
 
