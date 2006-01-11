@@ -760,7 +760,7 @@ getrestchar(int inchar)
 {
     char c = inchar;
     wchar_t outchar;
-    int ret, timeout;
+    int timeout;
     static mbstate_t ps;
 
     /*
@@ -780,14 +780,17 @@ getrestchar(int inchar)
      * Return may be zero if we have a NULL; handle this like
      * any other character.
      */
-    while ((ret = mbrtowc(&outchar, &c, 1, &ps)) < 0) {
-	if (ret == -1) {
+    while (1) {
+	size_t cnt = mbrtowc(&outchar, &c, 1, &ps);
+	if (cnt == (size_t)-1) {
 	    /*
 	     * Invalid input.  Hmm, what's the right thing to do here?
 	     */
 	    memset(&ps, 0, sizeof(ps));
 	    return lastchar_wide = WEOF;
 	}
+	if (cnt != (size_t)-2)
+	    break;
 
 	/*
 	 * Always apply KEYTIMEOUT to the remains of the input
