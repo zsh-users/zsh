@@ -3560,20 +3560,20 @@ mb_width(const char *s)
      */
     while (umlen > 0) {
 	wchar_t cc;
-	int ret = mbrtowc(&cc, umptr, umlen, &mbs);
+	size_t cnt = mbrtowc(&cc, umptr, umlen, &mbs);
 
-	if (ret <= 0) {
+	if (cnt == 0 || cnt == (size_t)-1 || cnt == (size_t)-2) {
 	    /* Assume a single-width character. */
 	    width++;
-	    ret = 1;
+	    cnt = 1;
 	} else {
 	    int wret = wcwidth(cc);
 	    if (wret > 0)
 		width += wret;
 	}
 
-	umlen -= ret;
-	umptr += ret;
+	umlen -= cnt;
+	umptr += cnt;
     }
 
     free(ums);
@@ -3887,7 +3887,7 @@ dquotedztrdup(char const *s)
 		    if(pending)
 			*p++ = '\\';
 		    *p++ = '\\';
-		    /* fall through */
+		    /* FALL THROUGH */
 		default:
 		    *p++ = c;
 		    pending = 0;
