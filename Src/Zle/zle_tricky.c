@@ -1912,10 +1912,11 @@ pfxlen(char *s, char *t)
 #ifdef MULTIBYTE_SUPPORT
     wchar_t wc;
     mbstate_t ps;
-    int ret, lasti = 0;
+    size_t cnt;
+    int lasti = 0;
     char inc;
 
-    memset(&ps, 0, sizeof(mbstate_t));
+    memset(&ps, 0, sizeof ps);
     while (*s) {
 	if (*s == Meta) {
 	    if (*t != Meta || t[1] != s[1])
@@ -1933,11 +1934,12 @@ pfxlen(char *s, char *t)
 	    t++;
 	}
 
-	ret = mbrtowc(&wc, &inc, 1, &ps);
-	if (ret == -1) {
+	cnt = mbrtowc(&wc, &inc, 1, &ps);
+	if (cnt == (size_t)-1) {
 	    /* error */
 	    break;
-	} else if (ret >= 0) {
+	}
+	if (cnt != (size_t)-2) {
 	    /* successfully found complete character, record position */
 	    lasti = i;
 	}
