@@ -3473,19 +3473,24 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
     while (umlen > 0) {
 	size_t cnt = mbrtowc(&c, ptr, umlen, &ps);
 
-	if (cnt != (size_t)-1 && cnt != (size_t)-2) {
-	    /* Careful:  converting '\0' returns 0, but a '\0' is a
-	     * real character for us, so we should consume 1 byte. */
-	    if (cnt == 0)
-		cnt = 1;
-	    fmt = wcs_nicechar(c, &newl, NULL);
-	} else {
+	switch (cnt) {
+	case (size_t)-1:
+	case (size_t)-2:
 	    /* The byte didn't convert, so output it as a \M-... sequence. */
 	    fmt = nicechar(STOUC(*ptr));
 	    newl = strlen(fmt);
 	    cnt = 1;
 	    /* Get ps out of its undefined state. */
 	    memset(&ps, 0, sizeof ps);
+	    break;
+	case 0:
+	    /* Careful:  converting '\0' returns 0, but a '\0' is a
+	     * real character for us, so we should consume 1 byte. */
+	    cnt = 1;
+	    /* FALL THROUGH */
+	default:
+	    fmt = wcs_nicechar(c, &newl, NULL);
+	    break;
 	}
 
 	umlen -= cnt;
