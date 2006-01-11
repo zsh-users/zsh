@@ -58,6 +58,7 @@ static void
 taddstr(char *s)
 {
     int sl = strlen(s);
+    char c;
 
     while (tptr + sl >= tlim) {
 	int x = tptr - tbuf;
@@ -68,8 +69,12 @@ taddstr(char *s)
 	tlim = tbuf + tsiz;
 	tptr = tbuf + x;
     }
-    strcpy(tptr, s);
-    tptr += sl;
+    if (tnewlins) {
+	memcpy(tptr, s, sl);
+	tptr += sl;
+    } else
+	while ((c = *s++))
+	    *tptr++ = (c == '\n' ? ' ' : c);
 }
 
 /**/
@@ -112,6 +117,8 @@ getpermtext(Eprog prog, Wordcode c)
     if (!c)
 	c = prog->prog;
 
+    useeprog(prog);		/* mark as used */
+
     s.prog = prog;
     s.pc = c;
     s.strs = prog->strs;
@@ -125,6 +132,7 @@ getpermtext(Eprog prog, Wordcode c)
     if (prog->len)
 	gettext2(&s);
     *tptr = '\0';
+    freeeprog(prog);		/* mark as unused */
     untokenize(tbuf);
     return tbuf;
 }
@@ -142,6 +150,7 @@ getjobtext(Eprog prog, Wordcode c)
     if (!c)
 	c = prog->prog;
 
+    useeprog(prog);		/* mark as used */
     s.prog = prog;
     s.pc = c;
     s.strs = prog->strs;
@@ -154,6 +163,7 @@ getjobtext(Eprog prog, Wordcode c)
     tjob = 1;
     gettext2(&s);
     *tptr = '\0';
+    freeeprog(prog);		/* mark as unused */
     untokenize(jbuf);
     return jbuf;
 }
@@ -195,6 +205,9 @@ struct tstack {
 	struct {
 	    int par;
 	} _cond;
+	struct {
+	    Wordcode end;
+	} _subsh;
     } u;
 };
 
@@ -266,10 +279,13 @@ gettext2(Estate state)
 	    break;
 	case WC_SUBLIST:
 	    if (!s) {
+                if (!(WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) &&
+                    wc_code(*state->pc) != WC_PIPE)
+                    stack = -1;
 		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT)
-		    taddstr("! ");
+		    taddstr(stack ? "!" : "! ");
 		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_COPROC)
-		    taddstr("coproc ");
+		    taddstr(stack ? "coproc" : "coproc ");
 		s = tpush(code, (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END));
 	    } else {
 		if (!(stack = (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END))) {
@@ -283,7 +299,7 @@ gettext2(Estate state)
 			taddstr("coproc ");
 		}
 	    }
-	    if (!stack && (WC_SUBLIST_FLAGS(s->code) & WC_SUBLIST_SIMPLE))
+	    if (stack < 1 && (WC_SUBLIST_FLAGS(s->code) & WC_SUBLIST_SIMPLE))
 		state->pc++;
 	    break;
 	case WC_PIPE:
@@ -312,6 +328,7 @@ gettext2(Estate state)
 	    break;
 	case WC_ASSIGN:
 	    taddstr(ecgetstr(state, EC_NODUP, NULL));
+	    if (WC_ASSIGN_TYPE2(code) == WC_ASSIGN_INC) taddchr('+');
 	    taddchr('=');
 	    if (WC_ASSIGN_TYPE(code) == WC_ASSIGN_ARRAY) {
 		taddchr('(');
@@ -328,23 +345,35 @@ gettext2(Estate state)
 	    break;
 	case WC_SUBSH:
 	    if (!s) {
-		taddstr("( ");
+		taddstr("(");
 		tindent++;
-		tpush(code, 1);
+		taddnl();
+		n = tpush(code, 1);
+		n->u._subsh.end = state->pc + WC_SUBSH_SKIP(code);
+		/* skip word only use for try/always */
+		state->pc++;
 	    } else {
+		state->pc = s->u._subsh.end;
 		tindent--;
-		taddstr(" )");
+		taddnl();
+		taddstr(")");
 		stack = 1;
 	    }
 	    break;
 	case WC_CURSH:
 	    if (!s) {
-		taddstr("{ ");
+		taddstr("{");
 		tindent++;
-		tpush(code, 1);
+		taddnl();
+		n = tpush(code, 1);
+		n->u._subsh.end = state->pc + WC_CURSH_SKIP(code);
+		/* skip word only use for try/always */
+		state->pc++;
 	    } else {
+		state->pc = s->u._subsh.end;
 		tindent--;
-		taddstr(" }");
+		taddnl();
+		taddstr("}");
 		stack = 1;
 	    }
 	    break;
@@ -403,7 +432,7 @@ gettext2(Estate state)
 		    taddstr(ecgetstr(state, EC_NODUP, NULL));
 		    taddstr(")) do");
 		} else {
-		    taddstr(ecgetstr(state, EC_NODUP, NULL));
+		    taddlist(state, *state->pc++);
 		    if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
 			taddstr(" in ");
 			taddlist(state, *state->pc++);
@@ -496,6 +525,7 @@ gettext2(Estate state)
 			taddnl();
 		    else
 			taddchr(' ');
+		    taddstr("(");
 		    code = *state->pc++;
 		    taddstr(ecgetstr(state, EC_NODUP, NULL));
 		    state->pc++;
@@ -512,6 +542,7 @@ gettext2(Estate state)
 		    taddnl();
 		else
 		    taddchr(' ');
+		taddstr("(");
 		code = *state->pc++;
 		taddstr(ecgetstr(state, EC_NODUP, NULL));
 		state->pc++;
@@ -694,6 +725,30 @@ gettext2(Estate state)
 	    taddstr("))");
 	    stack = 1;
 	    break;
+	case WC_TRY:
+	    if (!s) {
+		taddstr("{");
+		tindent++;
+		taddnl();
+		n = tpush(code, 0);
+		state->pc++;
+		/* this is the end of the try block alone */
+		n->u._subsh.end = state->pc + WC_CURSH_SKIP(state->pc[-1]);
+	    } else if (!s->pop) {
+		state->pc = s->u._subsh.end;
+		tindent--;
+		taddnl();
+		taddstr("} always {");
+		tindent++;
+		taddnl();
+		s->pop = 1;
+	    } else {
+		tindent--;
+		taddnl();
+		taddstr("}");
+		stack = 1;
+	    }
+	    break;
 	case WC_END:
 	    stack = 1;
 	    break;
@@ -719,35 +774,42 @@ getredirs(LinkList redirs)
 	Redir f = (Redir) getdata(n);
 
 	switch (f->type) {
-	case WRITE:
-	case WRITENOW:
-	case APP:
-	case APPNOW:
-	case ERRWRITE:
-	case ERRWRITENOW:
-	case ERRAPP:
-	case ERRAPPNOW:
-	case READ:
-	case READWRITE:
-	case HERESTR:
-	case MERGEIN:
-	case MERGEOUT:
-	case INPIPE:
-	case OUTPIPE:
+	case REDIR_WRITE:
+	case REDIR_WRITENOW:
+	case REDIR_APP:
+	case REDIR_APPNOW:
+	case REDIR_ERRWRITE:
+	case REDIR_ERRWRITENOW:
+	case REDIR_ERRAPP:
+	case REDIR_ERRAPPNOW:
+	case REDIR_READ:
+	case REDIR_READWRITE:
+	case REDIR_HERESTR:
+	case REDIR_MERGEIN:
+	case REDIR_MERGEOUT:
+	case REDIR_INPIPE:
+	case REDIR_OUTPIPE:
 	    if (f->fd1 != (IS_READFD(f->type) ? 0 : 1))
 		taddchr('0' + f->fd1);
 	    taddstr(fstr[f->type]);
 	    taddchr(' ');
-	    if (f->type == HERESTR) {
-		taddchr('\'');
-		taddstr(bslashquote(f->name, NULL, 1));
-		taddchr('\'');
+ 	    if (f->type == REDIR_HERESTR && !has_token(f->name)) {
+ 		/*
+ 		 * Strings that came from here-documents are converted
+ 		 * to here strings without quotation, so add that
+ 		 * now.  If tokens are already present taddstr()
+ 		 * will do the right thing (anyway, adding more
+ 		 * quotes certainly isn't right in that case).
+ 		 */
+ 		taddchr('\'');
+ 		taddstr(bslashquote(f->name, NULL, 1));
+ 		taddchr('\'');
 	    } else
 		taddstr(f->name);
 	    taddchr(' ');
 	    break;
 #ifdef DEBUG
-	case CLOSE:
+	case REDIR_CLOSE:
 	    DPUTS(1, "BUG: CLOSE in getredirs()");
 	    taddchr(f->fd1 + '0');
 	    taddstr(">&- ");
