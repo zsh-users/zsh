@@ -5,8 +5,9 @@
 
 2006-01-11  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* unposted: zsh.h, prompt.c, utils.c, Zle/complist.c, Zle/compmatch.c,
-	Zle/zle_main.c, Zle/zle_refresh.c, Zle/zle_tricky.c, Zle/zle_utils.c:
+	* unposted: Src/zsh.h, Src/prompt.c, Src/utils.c,
+	Src/Zle/complist.c, Src/Zle/compmatch.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c:
 	more multibyte cleanup, including the MB_INVALID and MB_INCOMPLETE
 	defines to make the mbrtowc() and mbsrtowcs() return values clearer.
 
