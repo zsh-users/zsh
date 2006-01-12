@@ -1587,7 +1587,7 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 #ifdef MULTIBYTE_SUPPORT
     int fulllen = len;
     char *fullstr = str;
-    mbstate_t ps;
+    mbstate_t mbs;
 #endif
 
     if (sfx) {
@@ -1629,7 +1629,7 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 	 */
 	q = sfx ? str - l : str + l;
 	if (q != fullstr) {
-	    memset(&ps, 0, sizeof(ps));
+	    memset(&mbs, 0, sizeof mbs);
 	    /*
 	     * Otherwise read characters from the start of the original
 	     * string until we reach or pass the match point.  This
@@ -1645,7 +1645,7 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 		 * ret must, in fact, be set by the current logic,
 		 * but gcc doesn't realise (at least some versions don't).
 		 */
-		size_t cnt = (size_t)-1;
+		size_t cnt = MB_INVALID;
 		int diff;
 		char *p2;
 
@@ -1655,12 +1655,12 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 		 */
 		for (p2 = p; p2 < fullstr + fulllen; p2++) {
 		    char curchar = (*p2 == Meta) ? (*++p2 ^ 32) : *p2;
-		    cnt = mbrtowc(&wc, &curchar, 1, &ps);
+		    cnt = mbrtowc(&wc, &curchar, 1, &mbs);
 		    /* Continue while character is incomplete. */
-		    if (cnt != (size_t)-2)
+		    if (cnt != MB_INCOMPLETE)
 			break;
 		}
-		if (cnt == (size_t)-1 || cnt == (size_t)-2) {
+		if (cnt == MB_INVALID || cnt == MB_INCOMPLETE) {
 		    /* not a valid character, give up test */
 		    break;
 		}

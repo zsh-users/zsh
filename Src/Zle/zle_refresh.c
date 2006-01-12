@@ -1446,6 +1446,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	refreshop = *obuf;	/* pointer to old video buffer */
     int t0,			/* tmp			       */
 	vsiz,			/* size of new video buffer    */
+	eol = 0,		/* has mbrtowc() returned -2?  */
 	nvcs = 0;		/* new video cursor column     */
 #ifdef MULTIBYTE_SUPPORT
     /*
@@ -1455,7 +1456,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     ZLE_STRING_T lpwbuf, lpwp;
     char *lpptr,		/* pointer into multibyte lprompt */
 	*lpend;			/* end of multibyte lprompt */
-    mbstate_t ps;		/* shift state */
+    mbstate_t mbs;		/* shift state */
 #endif
 
     nlnct = 1;
@@ -1490,18 +1491,26 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     lpwp = lpwbuf = (ZLE_STRING_T)zalloc((lpend - lpromptbuf)
 					 * sizeof(*lpwbuf));
     /* Reset shift state, maybe. */
-    memset(&ps, '\0', sizeof(ps));
+    memset(&mbs, '\0', sizeof mbs);
     for (lpptr = lpromptbuf; lpptr < lpend; ) {
-	size_t cnt = mbrtowc(lpwp, lpptr, lpend - lpptr, &ps);
-	if (cnt != 0 && cnt != (size_t)-1 && cnt != (size_t)-2) {
-	    /* successfully converted */
-	    lpptr += cnt;
-	    lpwp++;
-	} else {
+	size_t cnt = mbrtowc(lpwp, lpptr, lpend - lpptr, &mbs);
+	switch (cnt) {
+	case MB_INCOMPLETE:
+	    eol = 1;
+	    /* FALL THROUGH */
+	case MB_INVALID:
+	    memset(&mbs, '\0', sizeof mbs);
+	    /* FALL THROUGH */
+	case 0:
 	    /* dunno, try to recover */
 	    lpptr++;
 	    *lpwp++ = ZWC('?');
-	    memset(&ps, '\0', sizeof(ps));
+	    break;
+	default:
+	    /* successfully converted */
+	    lpptr += cnt;
+	    lpwp++;
+	    break;
 	}
     }
     if (lpwp - lpwbuf < lpromptw) {

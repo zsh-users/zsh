@@ -761,7 +761,7 @@ getrestchar(int inchar)
     char c = inchar;
     wchar_t outchar;
     int timeout;
-    static mbstate_t ps;
+    static mbstate_t mbs;
 
     /*
      * We are guaranteed to set a valid wide last character,
@@ -772,7 +772,7 @@ getrestchar(int inchar)
 
     if (inchar == EOF) {
 	/* End of input, so reset the shift state. */
-	memset(&ps, 0, sizeof(ps));
+	memset(&mbs, 0, sizeof mbs);
 	return lastchar_wide = WEOF;
     }
 
@@ -781,15 +781,15 @@ getrestchar(int inchar)
      * any other character.
      */
     while (1) {
-	size_t cnt = mbrtowc(&outchar, &c, 1, &ps);
-	if (cnt == (size_t)-1) {
+	size_t cnt = mbrtowc(&outchar, &c, 1, &mbs);
+	if (cnt == MB_INVALID) {
 	    /*
 	     * Invalid input.  Hmm, what's the right thing to do here?
 	     */
-	    memset(&ps, 0, sizeof(ps));
+	    memset(&mbs, 0, sizeof mbs);
 	    return lastchar_wide = WEOF;
 	}
-	if (cnt != (size_t)-2)
+	if (cnt != MB_INCOMPLETE)
 	    break;
 
 	/*
@@ -802,7 +802,7 @@ getrestchar(int inchar)
 	/* getbyte deliberately resets lastchar_wide_valid */
 	lastchar_wide_valid = 1;
 	if (inchar == EOF) {
-	    memset(&ps, 0, sizeof(ps));
+	    memset(&mbs, 0, sizeof mbs);
 	    if (timeout)
 	    {
 		/*

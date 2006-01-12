@@ -572,14 +572,14 @@ clnicezputs(Listcols colors, char *s, int ml)
      * umlen is the full length of the unmetafied string
      * width is the full printing width of a prettified character,
      *  including both ASCII prettification and the wide character itself.
-     * ps is the shift state of the conversion to wide characters.
+     * mbs is the shift state of the conversion to wide characters.
      */
     char *ums, *uptr, *sptr, *wptr;
-    int umleft, umlen;
+    int umleft, umlen, eol = 0;
     size_t width;
-    mbstate_t ps;
+    mbstate_t mbs;
 
-    memset(&ps, 0, sizeof(ps));
+    memset(&mbs, 0, sizeof mbs);
     ums = ztrdup(s);
     untokenize(ums);
     uptr = unmetafy(ums, &umlen);
@@ -589,11 +589,13 @@ clnicezputs(Listcols colors, char *s, int ml)
 	initiscol(colors);
 
     while (umleft > 0) {
-	size_t cnt = mbrtowc(&cc, uptr, umleft, &ps);
+	size_t cnt = eol ? MB_INVALID : mbrtowc(&cc, uptr, umleft, &mbs);
 
 	switch (cnt) {
-	case (size_t)-2:
-	case (size_t)-1:
+	case MB_INCOMPLETE:
+	    eol = 1;
+	    /* FALL THROUGH */
+	case MB_INVALID:
 	    /* This handles byte values that aren't valid wide-character
 	     * sequences. */
 	    sptr = nicechar(STOUC(*uptr));
@@ -601,8 +603,8 @@ clnicezputs(Listcols colors, char *s, int ml)
 	    width = strlen(sptr);
 	    wptr = sptr + width;
 	    cnt = 1;
-	    /* Get ps out of its undefined state. */
-	    memset(&ps, 0, sizeof ps);
+	    /* Get mbs out of its undefined state. */
+	    memset(&mbs, 0, sizeof mbs);
 	    break;
 	case 0:
 	    /* This handles a '\0' in the input (which is a real char
