@@ -235,7 +235,7 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
     ZLE_STRING_T outstr;
     int ll, sz;
 #ifdef MULTIBYTE_SUPPORT
-    mbstate_t ps;
+    mbstate_t mbs;
 #endif
 
     if (outcs) {
@@ -272,28 +272,26 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 	wchar_t *outptr = outstr;
 
 	/* Reset shift state to input complete string */
-	memset(&ps, '\0', sizeof(ps));
+	memset(&mbs, '\0', sizeof mbs);
 
 	while (ll > 0) {
-	    size_t cnt = mbrtowc(outptr, inptr, ll, &ps);
+	    size_t cnt = mbrtowc(outptr, inptr, ll, &mbs);
 
 	    /*
 	     * At this point we don't handle either incomplete (-2) or
 	     * invalid (-1) multibyte sequences.  Use the current length
 	     * and return.
 	     */
-	    if (cnt == (size_t)-1 || cnt == (size_t)-2)
+	    if (cnt == MB_INCOMPLETE || cnt == MB_INVALID)
 		break;
 
-	    /*
-	     * Careful: converting a wide NUL returns zero, but we
-	     * want to treat NULs as regular characters.
-	     * Assume it was represented by a single ASCII NUL;
-	     * certainly true for Unicode and unlikely to be false
-	     * in any non-pathological multibyte representation.
-	     */
-	    if (cnt == 0)
+	    if (cnt == 0) {
+		/* Converting '\0' returns 0, but a '\0' is a real
+		 * character for us, so we should consume 1 byte
+		 * (certainly true for Unicode and unlikely to be false
+		 * in any non-pathological multibyte representation). */
 		cnt = 1;
+	    }
 
 	    if (outcs) {
 		int offs = inptr - instr;
@@ -777,9 +775,9 @@ showmsg(char const *msg)
     ZLE_CHAR_T c;
 #ifdef MULTIBYTE_SUPPORT
     char *umsg;
-    int ulen;
+    int ulen, eol = 0;
     size_t width;
-    mbstate_t ps;
+    mbstate_t mbs;
 #endif
 
     trashzle();
@@ -788,7 +786,7 @@ showmsg(char const *msg)
 #ifdef MULTIBYTE_SUPPORT
     umsg = ztrdup(msg);
     p = unmetafy(umsg, &ulen);
-    memset(&ps, 0, sizeof(ps));
+    memset(&mbs, 0, sizeof mbs);
 
     while (ulen > 0) {
 	char const *n;
@@ -803,21 +801,32 @@ showmsg(char const *msg)
 	    /*
 	     * Extract the next wide character from the multibyte string.
 	     */
-	    size_t ret = mbrtowc(&c, p, ulen, &ps);
+	    size_t cnt = eol ? MB_INVALID : mbrtowc(&c, p, ulen, &mbs);
 
-	    if (ret == 0 || ret == (size_t)-1 || ret == (size_t)-2) {
+	    switch (cnt) {
+	    case MB_INCOMPLETE:
+		eol = 1;
+		/* FALL THROUGH */
+	    case MB_INVALID:
 		/*
 		 * This really shouldn't be happening here, but...
 		 * Treat it as a single byte character; it may get
 		 * prettified.
 		 */
+		memset(&mbs, 0, sizeof mbs);
 		n = nicechar(STOUC(*p));
-		ret = 1;
+		cnt = 1;
 		width = strlen(n);
-	    } else
+		break;
+	    case 0:
+		cnt = 1;
+		/* FALL THROUGH */
+	    default:
 		n = wcs_nicechar(c, &width, NULL);
-	    ulen -= ret;
-	    p += ret;
+		break;
+	    }
+	    ulen -= cnt;
+	    p += cnt;
 
 	    zputs(n, shout);
 	    cc += width;
