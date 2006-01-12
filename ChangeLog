@@ -1,3 +1,8 @@
+2006-01-12  Clint Adams  <clint@zsh.org>
+
+	* 22153: Completion/Linux/Command/_tpconfig: completion
+	for tpconfig.
+
 2006-01-11  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: zsh.h, prompt.c, utils.c, Zle/complist.c, Zle/compmatch.c,
