@@ -1931,4 +1931,7 @@ typedef char *(*ZleGetLineFn) _((int *, int *));
 
 #ifdef MULTIBYTE_SUPPORT
 #define nicezputs(str, outs)	(void)mb_niceformat((str), (outs), NULL, 0)
+
+#define MB_INCOMPLETE	((size_t)-2)
+#define MB_INVALID	((size_t)-1)
 #endif
