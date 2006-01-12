@@ -1,11 +1,9 @@
 2006-01-11  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* unposted: Src/utils.c, Src/Zle/zle_main.c, Src/Zle/zle_tricky.c:
-	changed the code that calls mbrtowc() to deal with the size_t return
-	value as a size_t.
-
-	* unposted: Src/Zle/complist.c: tweaked the code to handle mbrtowc()
-	converting '\0' the same way as the other callers do.
+	* unposted: zsh.h, prompt.c, utils.c, Zle/complist.c, Zle/compmatch.c,
+	Zle/zle_main.c, Zle/zle_refresh.c, Zle/zle_tricky.c, Zle/zle_utils.c:
+	more multibyte cleanup, including the MB_INVALID and MB_INCOMPLETE
+	defines to make the mbrtowc() and mbsrtowcs() return values clearer.
 
 2006-01-10  Peter Stephenson  <pws@csr.com>
 
