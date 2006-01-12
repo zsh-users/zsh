@@ -738,10 +738,10 @@ stradd(char *d)
 {
 #ifdef MULTIBYTE_SUPPORT
     char *ums, *ups;
-    int upslen;
-    mbstate_t ps;
+    int upslen, eol = 0;
+    mbstate_t mbs;
 
-    memset(&ps, 0, sizeof(ps));
+    memset(&mbs, 0, sizeof mbs);
     ums = ztrdup(d);
     ups = unmetafy(ums, &upslen);
 
@@ -752,22 +752,31 @@ stradd(char *d)
     while (upslen > 0) {
 	wchar_t cc;
 	char *pc;
-	int ret = mbrtowc(&cc, ups, upslen, &ps);
+	size_t cnt = eol ? MB_INVALID : mbrtowc(&cc, ups, upslen, &mbs);
 
-	if (ret <= 0)
-	{
+	switch (cnt) {
+	case MB_INCOMPLETE:
+	    eol = 1;
+	    /* FALL THROUGH */
+	case MB_INVALID:
 	    /* Bad character.  Take the next byte on its own. */
-	    pc = nicechar(*ups);
-	    ret = 1;
-	} else {
+	    pc = nicechar(STOUC(*ups));
+	    cnt = 1;
+	    memset(&mbs, 0, sizeof mbs);
+	    break;
+	case 0:
+	    cnt = 1;
+	    /* FALL THROUGH */
+	default:
 	    /* Take full wide character in one go */
 	    pc = wcs_nicechar(cc, NULL, NULL);
+	    break;
 	}
 	/* Keep output as metafied string. */
 	addbufspc(strlen(pc));
 
-	upslen -= ret;
-	ups += ret;
+	upslen -= cnt;
+	ups += cnt;
 
 	/* Put printed representation into the buffer */
 	while (*pc)
@@ -862,7 +871,7 @@ countprompt(char *str, int *wp, int *hp, int overf)
     int w = 0, h = 1;
     int s = 1;
 #ifdef MULTIBYTE_SUPPORT
-    int mbret, wcw, multi = 0;
+    int wcw, multi = 0;
     char inchar;
     mbstate_t mbs;
     wchar_t wc;
@@ -918,24 +927,25 @@ countprompt(char *str, int *wp, int *hp, int overf)
 	    }
 
 #ifdef MULTIBYTE_SUPPORT
-	    mbret = mbrtowc(&wc, &inchar, 1, &mbs);
-	    if (mbret >= -1) {
-		if (mbret > 0) {
-		    /*
-		     * If the character isn't printable, this returns -1.
-		     */
-		    wcw = wcwidth(wc);
-		    if (wcw > 0)
-			w += wcw;
-		}
-		/*
-		 * else invalid character or possibly null: assume no
-		 * output
-		 */
-		multi = 0;
-	    } else {
-		/* else character is incomplete, keep looking. */
+	    switch (mbrtowc(&wc, &inchar, 1, &mbs)) {
+	    case MB_INCOMPLETE:
+		/* Character is incomplete -- keep looking. */
 		multi = 1;
+		break;
+	    case MB_INVALID:
+		memset(&mbs, 0, sizeof mbs);
+		/* FALL THROUGH */
+	    case 0:
+		/* Invalid character or null: assume no output. */
+		multi = 0;
+		break;
+	    default:
+		/* If the character isn't printable, wcwidth() returns -1. */
+		wcw = wcwidth(wc);
+		if (wcw > 0)
+		    w += wcw;
+		multi = 0;
+		break;
 	    }
 #else
 	    w++;
@@ -1078,7 +1088,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		    int remw;
 #ifdef MULTIBYTE_SUPPORT
 		    mbstate_t mbs;
-		    memset(&mbs, 0, sizeof(mbstate_t));
+		    memset(&mbs, 0, sizeof mbs);
 #endif
 
 		    fulltextptr = fulltext = ptr + ntrunc;
@@ -1117,7 +1127,6 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 			     */
 			    char inchar;
 			    wchar_t cc;
-			    int ret;
 
 			    /*
 			     * careful: string is still metafied (we
@@ -1130,20 +1139,21 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 			    else
 				inchar = *fulltextptr;
 			    fulltextptr++;
-			    ret = mbrtowc(&cc, &inchar, 1, &mbs);
-
-			    if (ret != -2) {
-				/* complete */
-				if (ret <= 0) {
-				    /* assume a single-byte character */
-				    remw--;
-				    if (ret < 0) {
-					/* need to reset invalid state */
-					memset(&mbs, 0, sizeof(mbstate_t));
-				    }
-				} else {
-				    remw -= wcwidth(cc);
-				}
+			    switch (mbrtowc(&cc, &inchar, 1, &mbs)) {
+			    case MB_INCOMPLETE:
+				/* Incomplete multibyte character. */
+				break;
+			    case MB_INVALID:
+				/* Reset invalid state. */
+				memset(&mbs, 0, sizeof mbs);
+				/* FALL THROUGH */
+			    case 0:
+				/* Assume a single-byte character. */
+				remw--;
+				break;
+			    default:
+				remw -= wcwidth(cc);
+				break;
 			    }
 #else
 			    /* Single byte character */
@@ -1172,7 +1182,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		    char *skiptext = ptr;
 #ifdef MULTIBYTE_SUPPORT
 		    mbstate_t mbs;
-		    memset(&mbs, 0, sizeof(mbstate_t));
+		    memset(&mbs, 0, sizeof mbs);
 #endif
 
 		    while (maxwidth > 0 && *skiptext) {
@@ -1183,27 +1193,27 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 #ifdef MULTIBYTE_SUPPORT
 			    char inchar;
 			    wchar_t cc;
-			    int ret;
 
 			    if (*skiptext == Meta)
 				inchar = *++skiptext ^ 32;
 			    else
 				inchar = *skiptext;
 			    skiptext++;
-			    ret = mbrtowc(&cc, &inchar, 1, &mbs);
-
-			    if (ret != -2) {
-				/* complete or invalid character */
-				if (ret <= 0) {
-				    /* assume single byte */
-				    maxwidth--;
-				    if (ret < 0) {
-					/* need to reset invalid state */
-					memset(&mbs, 0, sizeof(mbstate_t));
-				    }
-				} else {
-				    maxwidth -= wcwidth(cc);
-				}
+			    switch (mbrtowc(&cc, &inchar, 1, &mbs)) {
+			    case MB_INCOMPLETE:
+				/* Incomplete character. */
+				break;
+			    case MB_INVALID:
+				/* Reset invalid state. */
+				memset(&mbs, 0, sizeof mbs);
+				/* FALL THROUGH */
+			    case 0:
+				/* Assume a single-byte character. */
+				maxwidth--;
+				break;
+			    default:
+				maxwidth -= wcwidth(cc);
+				break;
 			    }
 #else
 			    if (*skiptext == Meta)
