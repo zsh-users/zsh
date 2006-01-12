@@ -2577,7 +2577,8 @@ inittyptab(void)
 	char *wordchars_unmeta;
 	const char *wordchars_ptr;
 	mbstate_t mbs;
-	int nchars, unmetalen;
+	size_t nchars;
+	int unmetalen;
 
 	wordchars_unmeta = dupstring(wordchars);
 	wordchars_ptr = unmetafy(wordchars_unmeta, &unmetalen);
@@ -2586,12 +2587,11 @@ inittyptab(void)
 	wordchars_wide = (wchar_t *)
 	    zrealloc(wordchars_wide, (unmetalen+1)*sizeof(wchar_t));
 	nchars = mbsrtowcs(wordchars_wide, &wordchars_ptr, unmetalen, &mbs);
-	if (nchars == -1) {
+	if (nchars == MB_INVALID || nchars == MB_INCOMPLETE) {
 	    /* Conversion state is undefined: better just set to null */
-	    *wordchars_wide = L'\0';
-	} else {
-	    wordchars_wide[nchars] = L'\0';
+	    nchars = 0;
 	}
+	wordchars_wide[nchars] = L'\0';
     } else {
 	wordchars_wide = zrealloc(wordchars_wide, sizeof(wchar_t));
 	*wordchars_wide = L'\0';
@@ -3447,10 +3447,10 @@ mod_export size_t
 mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
 {
     size_t l = 0, newl;
-    int umlen, outalloc, outleft;
+    int umlen, outalloc, outleft, eol = 0;
     wchar_t c;
     char *ums, *ptr, *fmt, *outstr, *outptr;
-    mbstate_t ps;
+    mbstate_t mbs;
 
     if (outstrp) {
 	outleft = outalloc = 5 * strlen(s);
@@ -3469,19 +3469,21 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
     untokenize(ums);
     ptr = unmetafy(ums, &umlen);
 
-    memset(&ps, 0, sizeof(ps));
+    memset(&mbs, 0, sizeof mbs);
     while (umlen > 0) {
-	size_t cnt = mbrtowc(&c, ptr, umlen, &ps);
+	size_t cnt = eol ? MB_INVALID : mbrtowc(&c, ptr, umlen, &mbs);
 
 	switch (cnt) {
-	case (size_t)-1:
-	case (size_t)-2:
+	case MB_INCOMPLETE:
+	    eol = 1;
+	    /* FALL THROUGH */
+	case MB_INVALID:
 	    /* The byte didn't convert, so output it as a \M-... sequence. */
 	    fmt = nicechar(STOUC(*ptr));
 	    newl = strlen(fmt);
 	    cnt = 1;
-	    /* Get ps out of its undefined state. */
-	    memset(&ps, 0, sizeof ps);
+	    /* Get mbs out of its undefined state. */
+	    memset(&mbs, 0, sizeof mbs);
 	    break;
 	case 0:
 	    /* Careful:  converting '\0' returns 0, but a '\0' is a
@@ -3552,11 +3554,11 @@ mod_export int
 mb_width(const char *s)
 {
     char *ums = ztrdup(s), *umptr;
-    int umlen;
+    int umlen, eol = 0;
     int width = 0;
     mbstate_t mbs;
 
-    memset(&mbs, 0, sizeof(mbs));
+    memset(&mbs, 0, sizeof mbs);
     umptr = unmetafy(ums, &umlen);
     /*
      * Convert one wide character at a time.  We could convet
@@ -3564,17 +3566,27 @@ mb_width(const char *s)
      * a NUL and we might have embedded NULs.
      */
     while (umlen > 0) {
+	int wret;
 	wchar_t cc;
-	size_t cnt = mbrtowc(&cc, umptr, umlen, &mbs);
+	size_t cnt = eol ? MB_INVALID : mbrtowc(&cc, umptr, umlen, &mbs);
 
-	if (cnt == 0 || cnt == (size_t)-1 || cnt == (size_t)-2) {
+	switch (cnt) {
+	case MB_INCOMPLETE:
+	    eol = 1;
+	    /* FALL THROUGH */
+	case MB_INVALID:
+	    memset(&mbs, 0, sizeof mbs);
+	    /* FALL THROUGH */
+	case 0:
 	    /* Assume a single-width character. */
 	    width++;
 	    cnt = 1;
-	} else {
-	    int wret = wcwidth(cc);
+	    break;
+	default:
+	    wret = wcwidth(cc);
 	    if (wret > 0)
 		width += wret;
+	    break;
 	}
 
 	umlen -= cnt;
@@ -3989,7 +4001,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     int i;
 #if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
     wint_t wval;
-    size_t count;
+    int count;
 #else
     unsigned int wval;
 # if defined(HAVE_NL_LANGINFO) && defined(CODESET) && defined(HAVE_ICONV)
@@ -4098,7 +4110,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		}
 #if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
 		count = wctomb(t, (wchar_t)wval);
-		if (count == (size_t)-1) {
+		if (count == -1) {
 		    zerr("character not in range", NULL, 0);
 		    if (fromwhere == 4) {
 			for (u = t; (*u++ = *++s););
