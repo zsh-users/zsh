@@ -1493,7 +1493,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     /* Reset shift state, maybe. */
     memset(&mbs, '\0', sizeof mbs);
     for (lpptr = lpromptbuf; lpptr < lpend; ) {
-	size_t cnt = mbrtowc(lpwp, lpptr, lpend - lpptr, &mbs);
+	size_t cnt = eol ? MB_INVALID : mbrtowc(lpwp, lpptr, lpend-lpptr, &mbs);
 	switch (cnt) {
 	case MB_INCOMPLETE:
 	    eol = 1;
