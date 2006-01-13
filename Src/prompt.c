@@ -543,7 +543,18 @@ putpromptchar(int doprint, int endchar)
 			if (ztrftime(bp, t0, tmfmt, tm) >= 0)
 			    break;
 		    }
-		    bp += strlen(bp);
+		    /* Check if there are any chars to metafy while
+		     * advancing bp to the end of the string. */
+		    for (ss = bp, t0 = 0; *bp; bp++ ) {
+			if (imeta(*bp))
+			    t0++; /* count of Meta chars needed */
+		    }
+		    if (t0) {
+			j = bp - ss; /* unmetafied string length */
+			addbufspc(t0);
+			metafy(bp - j, j, META_NOALLOC);
+			bp += t0;
+		    }
 		    free(tmbuf);
 		    tmbuf = NULL;
 		    break;
