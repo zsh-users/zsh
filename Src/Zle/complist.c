@@ -598,7 +598,7 @@ clnicezputs(Listcols colors, char *s, int ml)
 	case MB_INVALID:
 	    /* This handles byte values that aren't valid wide-character
 	     * sequences. */
-	    sptr = nicechar(STOUC(*uptr));
+	    sptr = nicechar(*uptr);
 	    /* everything here is ASCII... */
 	    width = strlen(sptr);
 	    wptr = sptr + width;

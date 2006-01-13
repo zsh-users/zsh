@@ -400,7 +400,7 @@ void
 nicefputs(char *s, FILE *f)
 {
     for (; *s; s++)
-	zputs(nicechar(STOUC(*s)), f);
+	zputs(nicechar(*s), f);
 }
 #endif
 
@@ -1667,7 +1667,7 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
 	 * Praise Bill, this works under Cygwin (nothing else seems to).
 	 */
 	if ((polltty || setblock_fd(0, fd, &mode)) && read(fd, &c, 1) > 0) {
-	    *readchar = STOUC(c);
+	    *readchar = c;
 	    ret = 1;
 	}
 	if (mode != -1)
@@ -1963,7 +1963,6 @@ spckword(char **s, int hist, int cmd, int ask)
  * NUL and return 1 if that doesn't fit.
  */
 
-/**/
 static int
 ztrftimebuf(int *bufsizeptr, int decr)
 {
@@ -3420,7 +3419,7 @@ niceztrlen(char const *s)
 	}
 	if (c == Meta)
 	    c = *s++ ^ 32;
-	l += strlen(nicechar(STOUC(c)));
+	l += strlen(nicechar(c));
     }
     return l;
 }
@@ -3479,7 +3478,7 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
 	    /* FALL THROUGH */
 	case MB_INVALID:
 	    /* The byte didn't convert, so output it as a \M-... sequence. */
-	    fmt = nicechar(STOUC(*ptr));
+	    fmt = nicechar(*ptr);
 	    newl = strlen(fmt);
 	    cnt = 1;
 	    /* Get mbs out of its undefined state. */

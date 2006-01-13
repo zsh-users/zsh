@@ -703,7 +703,7 @@ putpromptchar(int doprint, int endchar)
 static void
 pputc(char c)
 {
-    if(imeta(STOUC(c))) {
+    if (imeta(c)) {
 	*bp++ = Meta;
 	c ^= 32;
     }
@@ -763,7 +763,7 @@ stradd(char *d)
 	    /* FALL THROUGH */
 	case MB_INVALID:
 	    /* Bad character.  Take the next byte on its own. */
-	    pc = nicechar(STOUC(*ups));
+	    pc = nicechar(*ups);
 	    cnt = 1;
 	    memset(&mbs, 0, sizeof mbs);
 	    break;
@@ -790,11 +790,12 @@ stradd(char *d)
 #else
     char *ps, *pc;
     addbufspc(niceztrlen(d));
-    /* This loop puts the nice representation of the string into the prompt *
-     * buffer.                                                              */
-    for(ps=d; *ps; ps++)
-	for(pc=nicechar(*ps == Meta ? STOUC(*++ps)^32 : STOUC(*ps)); *pc; pc++)
+    /* This loop puts the nice representation of the string into the
+     * prompt buffer. */
+    for (ps = d; *ps; ps++) {
+	for (pc = nicechar(*ps == Meta ? *++ps^32 : *ps); *pc; pc++)
 	    *bp++ = *pc;
+    }
 #endif
 }
 

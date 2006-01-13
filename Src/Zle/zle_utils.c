@@ -814,7 +814,7 @@ showmsg(char const *msg)
 		 * prettified.
 		 */
 		memset(&mbs, 0, sizeof mbs);
-		n = nicechar(STOUC(*p));
+		n = nicechar(*p);
 		cnt = 1;
 		width = strlen(n);
 		break;
