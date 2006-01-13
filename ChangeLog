@@ -1,5 +1,7 @@
 2006-01-12  Clint Adams  <clint@zsh.org>
 
+	* 22159: Completion/Linux/Command/_tpb: completion for tpb.
+
 	* 22153: Completion/Linux/Command/_tpconfig: completion
 	for tpconfig.
 
