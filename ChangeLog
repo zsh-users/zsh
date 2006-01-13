@@ -1,3 +1,10 @@
+2006-01-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22162: Src/prompt.c, Src/Modules/datetime.c, Src/Modules/stat.c:
+	some strings needed to be metafied:  strftime values going into the
+	expansion of the prompt, and strftime/username/groupname values
+	that were assigned to a variable.
+
 2006-01-12  Clint Adams  <clint@zsh.org>
 
 	* 22159: Completion/Linux/Command/_tpb: completion for tpb.
