@@ -1446,9 +1446,9 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	refreshop = *obuf;	/* pointer to old video buffer */
     int t0,			/* tmp			       */
 	vsiz,			/* size of new video buffer    */
-	eol = 0,		/* has mbrtowc() returned -2?  */
 	nvcs = 0;		/* new video cursor column     */
 #ifdef MULTIBYTE_SUPPORT
+    int eol = 0;		/* has mbrtowc() returned -2?  */
     /*
      * converted lprompt and pointer: no WEOF hack here since
      * we always output the full prompt and count its width.
