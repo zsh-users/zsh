@@ -10,6 +10,9 @@
 	as the onces I recently added for the arg of nicechar() (which can
 	handle the int being a negative or positive value).
 
+	* unposted: Src/Zle/zle_refresh.c: fixed an unused-variable
+	compiler warning when compiling the non-multibyte version of zsh.
+
 2006-01-12  Clint Adams  <clint@zsh.org>
 
 	* 22159: Completion/Linux/Command/_tpb: completion for tpb.
