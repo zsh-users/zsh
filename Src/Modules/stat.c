@@ -200,7 +200,7 @@ stattimeprint(time_t tim, char *outbuf, int flags)
 	ztrftime(oend, 40, timefmt, (flags & STF_GMT) ? gmtime(&tim) :
 		 localtime(&tim));
 	if (flags & STF_RAW)
-	    strcat(outbuf, ")");
+	    strcat(oend, ")");
     }
 }
 
@@ -570,11 +570,11 @@ bin_stat(char *name, char **args, Options ops, UNUSED(int func))
 	if (iwhich > -1) {
 	    statprint(&statbuf, outbuf, *args, iwhich, flags);
 	    if (arrnam)
-		*arrptr++ = ztrdup(outbuf);
+		*arrptr++ = metafy(outbuf, -1, META_DUP);
 	    else if (hashnam) {
 		/* STF_NAME explicitly turned off for ops.ind['H'] above */
 	    	*hashptr++ = ztrdup(statelts[iwhich]);
-		*hashptr++ = ztrdup(outbuf);
+		*hashptr++ = metafy(outbuf, -1, META_DUP);
 	    } else
 		printf("%s\n", outbuf);
 	} else {
@@ -582,11 +582,11 @@ bin_stat(char *name, char **args, Options ops, UNUSED(int func))
 	    for (i = 0; i < ST_COUNT; i++) {
 		statprint(&statbuf, outbuf, *args, i, flags);
 		if (arrnam)
-		    *arrptr++= ztrdup(outbuf);
+		    *arrptr++= metafy(outbuf, -1, META_DUP);
 		else if (hashnam) {
 		    /* STF_NAME explicitly turned off for ops.ind['H'] above */
 		    *hashptr++ = ztrdup(statelts[i]);
-		    *hashptr++ = ztrdup(outbuf);
+		    *hashptr++ = metafy(outbuf, -1, META_DUP);
 		} else
 		    printf("%s\n", outbuf);
 	    }
