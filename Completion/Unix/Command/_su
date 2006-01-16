@@ -1,20 +1,69 @@
 #compdef su
 
-local shell comp name usr base
+local -A opt_args
+local -a args state context
+local shell=${words[(i)(-s|--shell=*)]} first='1:user name:_users'
+local usr=root line
 
-[[ $words[2] != - ]]
-(( base=$?+2 ))
-
-if [[ CURRENT -eq base ]]; then
-  _users && return
-  usr=root
-elif [[ CURRENT -ge base+1 ]]; then
-  usr=$words[base]
+if _pick_variant gnu="Free Software Foundation" unix --version; then
+  args=(
+    '(--command)-c[pass command to shell]:command string:->command'
+    '(-c)--command=-[pass command to shell]:command string:->command'
+    '-f[pass -f to shell (csh)]'
+    '(--login)-l[use a login shell]'
+    '(-l)--login[use a login shell]'
+    '(-p --preserve-environment)-m[do not reset environment]'
+    '(-m --preserve-environment)-p[do not reset environment]'
+    '(-m -p)--preserve-environment[do not reset environment]'
+    '(--shell)-s[run the specified shell]:shell:->shell'
+    '(-s)--shell=-[run the specified shell]:shell:->shell'
+  )
 else
-  return
+  args=(
+    '-c[pass command to shell]:command string:->command'
+    '-l[use a login shell]'
+    '-s[run the specified shell]:shell:->shell'
+  )
 fi
 
-shell="${${(M@)${(@f)$(</etc/passwd)}:#$usr*}##*:}"
-compset -n $base
+if [[ $#words -ge 2 && $words[2] != -* && CURRENT -ne 2 ]]; then
+    usr=$words[2]
+    first=
+fi
 
-_dispatch $shell:t $shell $shell:t -default-
+[[ $words[shell] == -s ]] && ((shell++))
+
+if [[ CURRENT -ne shell && -n ${words[shell]} ]]; then
+    shell=${words[shell]#*=}
+else
+    shell="${${(M@)${(@f)$(</etc/passwd)}:#$usr*}##*:}"
+fi
+
+[[ -z $first ]] && compset -n 2
+
+_arguments : $args[@] $first "*:${shell:t} arguments:->rest" && return
+
+case $state in
+    (command)
+        compset -q
+        _normal
+        return
+        ;;
+    (shell)
+        compadd ${(f)^"$(</etc/shells)"}(N)
+        return
+        ;;
+    (rest)
+        if [[ -z $shell || $shell = */nologin ]]; then
+            _arguments "-s[run the specified shell, $usr has no shell]" ||
+                _message "-s option required, $usr has no shell"
+            compstate[insert]=
+        else
+            # Something wrong here: doubles the file listing sometimes
+            _dispatch ${service}:${context} $shell $shell:t -default-
+            return
+        fi
+        ;;
+esac
+
+return 1

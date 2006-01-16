@@ -1,3 +1,9 @@
+2006-01-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* 22110 (slightly tweaked): Completion/Unix/Command/_su: complete
+	options, be more clever about determining the shell being used,
+	and treat the argument of the -c option as a command (cf. _sh).
+
 2006-01-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22162: Src/prompt.c, Src/Modules/datetime.c, Src/Modules/stat.c:
