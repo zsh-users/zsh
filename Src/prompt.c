@@ -207,7 +207,7 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
 static int
 putpromptchar(int doprint, int endchar)
 {
-    char *ss, *tmbuf = NULL, *hostnam;
+    char *ss, *hostnam;
     int t0, arg, test, sep, j, numjobs;
     struct tm *tm;
     time_t timet;
@@ -489,7 +489,7 @@ putpromptchar(int doprint, int endchar)
 	    case 'W':
 	    case 'D':
 		{
-		    char *tmfmt, *dd;
+		    char *tmfmt, *dd, *tmbuf = NULL;
 
 		    switch (*fm) {
 		    case 'T':
@@ -547,8 +547,7 @@ putpromptchar(int doprint, int endchar)
 		     * allocates room for t0 * 2 bytes. */
 		    metafy(bp, -1, META_NOALLOC);
 		    bp += strlen(bp);
-		    free(tmbuf);
-		    tmbuf = NULL;
+		    zsfree(tmbuf);
 		    break;
 		}
 	    case 'n':
