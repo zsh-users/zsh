@@ -1,3 +1,8 @@
+2006-01-18  Clint Adams  <clint@zsh.org>
+
+	* 22165: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/roadmap.yo: change "zshparams" to "zshparam".
+
 2006-01-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/prompt.c:  Fixed 2 free()-related bugs in the

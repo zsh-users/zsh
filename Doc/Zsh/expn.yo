@@ -1309,7 +1309,7 @@ tt(IFS) parameter
 item(tt([:IFSSPACE:]))(
 The character is an IFS white space character; see the documentation
 for tt(IFS) in
-ifzman(the zmanref(zshparams) manual page)\
+ifzman(the zmanref(zshparam) manual page)\
 ifnzman(noderef(Parameters Used By The Shell))\
 .
 )

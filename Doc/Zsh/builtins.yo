@@ -1393,7 +1393,7 @@ determines how the function is loaded.
 )
 item(tt(-h))(
 Hide: only useful for special parameters (those marked `<S>' in the table in
-ifzman(zmanref(zshparams))\
+ifzman(zmanref(zshparam))\
 ifnzman(noderef(Parameters Set By The Shell))\
 ), and for local parameters with the same name as a special parameter,
 though harmless for others.  A special parameter with this attribute will
