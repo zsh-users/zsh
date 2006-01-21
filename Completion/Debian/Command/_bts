@@ -1,19 +1,36 @@
 #compdef bts
 
-local expl
+local expl first=1
 
-compset -N '[,.]' || compset -n 2
+_arguments -A "-*" \
+  '(-o --offline)'{-o,--offline}'[use cached bugs]' \
+  '(--online --no-offline)'{--online,--no-offline}'[do not use cached bugs]' \
+  '(--cache --no-cache)--cache[cache new versions of pages]' \
+  '(--cache --no-cache)--no-cache[do not cache new versions of pages]' \
+  '--cache-mode=:cache mode:(min mbox full)' \
+  '--cache-delay=:seconds:' \
+  '--mbox[open a mail reader to read the corresponding mbox]' \
+  '--mailreader=:reader:' \
+  '(-f --force-refresh)'{-f,--force-refresh}'[download bug report even if unchanged]' \
+  '-no-force-refresh[do not force refresh]' \
+  '(-q --quiet)*'{-q,--quiet}'[only display info about newly cached pages]' \
+  '(--no-conf --noconf)*'{--no-conf,--noconf}'[do not read any config files]' \
+  '*:subcommand and args:->subcmds' && return 0
+
+compset -N '-[^0-9]#' && first=0
+compset -N '[,.]' && first=0
+[[ $first -eq 0 ]] || compset -n 2
 
 if [[ CURRENT -eq 1 ]]; then
   _wanted cmd expl 'bts command' compadd show bugs close reopen retitle \
       reassign merge unmerge tag severity forwarded notforwarded help \
-      clone submitter found notfound block unblock user usertag \
+      clone submitter found notfound block unblock user usertag usertags \
       package owner noowner reportspam cache cleancache
   return
 fi
 
 case "$words[1]" in
-  show|close|unmerge|notforwarded)
+  (show|close|unmerge|notforwarded|noowner|reportspam)
     if [[ CURRENT -eq 2 ]]; then
       _message -e bugnum 'bug number'
     else
@@ -95,6 +112,71 @@ case "$words[1]" in
       _message -e bugnum 'bug number'
     elif [[ CURRENT -eq 3 ]]; then
      _wanted upstream expl 'upstream email' _email_addresses -c
+    else
+     _wanted sep expl 'separator' compadd -S ' ' , .
+    fi
+  ;;
+  (clone)
+    if [[ CURRENT -eq 2 ]]; then
+      _message -e bugnum 'bug number'
+    elif [[ CURRENT -eq 3 || -prefix [-] ]]; then
+     _wanted newid expl 'new ID' compadd -- -{1..9}
+    else
+     _wanted sep expl 'separator' compadd -S ' ' , .
+    fi
+  ;;
+  (submitter|owner)
+    if [[ CURRENT -eq 2 ]]; then
+      _message -e bugnum 'bug number'
+    else
+     _alternative \
+       'bugnum:bug number:' \
+       'email:email address:_email_addresses -c' \
+       'bang:bang:compadd \!'
+    fi
+  ;;
+  (found|notfound)
+    if [[ CURRENT -eq 2 ]]; then
+      _message -e bugnum 'bug number'
+    elif [[ CURRENT -eq 3 ]]; then
+      _message -e version 'version'
+    else
+      _wanted sep expl 'separator' compadd -S ' ' , .
+    fi
+  ;;
+  (block|unblock)
+    if [[ CURRENT -eq 2 ]]; then
+      _message -e bugnum 'bug number'
+    elif [[ CURRENT -eq 3 ]]; then
+      _wanted prep expl 'preposition' compadd by with
+    else
+     _alternative \
+       'bugnum:bug number:' \
+       'separator:separator:compadd -S " " , .'
+    fi
+  ;;
+  (user)
+    if [[ CURRENT -eq 2 ]]; then
+      _wanted upstream expl 'user email for usertags' _email_addresses -c
+    else
+      _wanted sep expl 'separator' compadd -S ' ' , .
+    fi
+  ;;
+  (usertags#)
+    if [[ CURRENT -eq 2 ]]; then
+      _message -e bugnum 'bug number'
+    elif [[ CURRENT -eq 3 ]]; then
+      _wanted operator expl 'operator' compadd - '+' '-' '='
+    elif [[ CURRENT -eq 4 ]]; then
+      _message -e usertag 'user tag'
+    else
+      _message -e usertag 'user tag'
+      _wanted sep expl 'separator' compadd -S ' ' , .
+    fi
+  ;;
+  (package)
+    if [[ CURRENT -eq 2 ]]; then
+     _wanted package expl 'package' _deb_packages avail
     else
      _wanted sep expl 'separator' compadd -S ' ' , .
     fi

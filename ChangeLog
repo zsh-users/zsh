@@ -1,5 +1,9 @@
 2006-01-21  Clint Adams  <clint@zsh.org>
 
+	* 22168: Completion/Debian/Command/_bts: add options and
+	handling for new subcommands added in 22166 except for
+	cache and cleancache.
+
 	* 22167: Completion/Unix/Command/_cp: completion for
 	GNU cp.
 
