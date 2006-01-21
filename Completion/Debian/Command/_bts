@@ -6,7 +6,9 @@ compset -N '[,.]' || compset -n 2
 
 if [[ CURRENT -eq 1 ]]; then
   _wanted cmd expl 'bts command' compadd show bugs close reopen retitle \
-      reassign merge unmerge tag severity forwarded notforwarded help
+      reassign merge unmerge tag severity forwarded notforwarded help \
+      clone submitter found notfound block unblock user usertag \
+      package owner noowner reportspam cache cleancache
   return
 fi
 

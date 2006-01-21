@@ -1,3 +1,10 @@
+2006-01-21  Clint Adams  <clint@zsh.org>
+
+	* 22166: Completion/Debian/Command/_bts: add new
+	subcommands (clone, submitter, found, notfound, block, unblock,
+	user, usertag, package, owner, noowner, reportspam, cache,
+	cleancache).
+
 2006-01-18  Clint Adams  <clint@zsh.org>
 
 	* 22165: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
