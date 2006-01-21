@@ -1,0 +1,32 @@
+#compdef cp
+
+_arguments -s \
+  '(-a --archive)'{-a,--archive}'[same as -dpR]' \
+  '(-b --backup)-b[backup]' \
+  '(-b --backup)--backup=:method:(none off numbered t existing nil simple never)' \
+  '--copy-contents[copy contents of special files when recursive]' \
+  '-d[same as --no-dereference --preserve=link]' \
+  '(-f --force)'{-f,--force}'[remove and retry for destinations that cannot be opened]' \
+  '(-i --interactive)'{-i,--interactive}'[prompt before overwrite]' \
+  '-H[follow command-line symbolic links]' \
+  '(-l --link)'{-l,--link}'[link files instead of copying]' \
+  '(-L --dereference)'{-L,--dereference}'[always follow symbolic links]' \
+  '-p[same as --preserve=mode,ownership,timestamps]' \
+  '--preserve=:attributes to preserve:_values -s , mode ownership timestamps links all' \
+  '--no-preserve=:attributes not to preserve:_values -s , mode ownership timestamps links all' \
+  '--parents[append source path to target directory]' \
+  '-P[same as --no-dereference]' \
+  '(-R -r --recursive)'{-R,-r,--recursive}'[copy directories recursively]' \
+  '--remove-destination[remove each existing destination file before attempting to open it]' \
+  '--reply=:how to handle the prompt about an existing destination file:(yes no query)' \
+  '--sparse=:when to create sparse files:(auto always never)' \
+  '--strip-trailing-slashes[remove any trailing slashes from each source argument]' \
+  '(-s --symbolic-link)'{-s,--symbolic-link}'[make symbolic links instead of copies of non-directories]' \
+  '(-S --suffix)'{-S,--suffix=}':backup suffix:' \
+  '--target-directory=:target directory:_files -/' \
+  '(-u --update)'{-u,--update}'[copy only when source is newer than destination or destination is missing]' \
+  '(-v --verbose)'{-v,--verbose}'[explain what is being done]' \
+  '(-x --one-file-system)'{-x,--one-file-system}'[stay on this file system]' \
+  '--help' \
+  '--version' \
+  '*:file or directory:_files'

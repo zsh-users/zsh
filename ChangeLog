@@ -1,5 +1,8 @@
 2006-01-21  Clint Adams  <clint@zsh.org>
 
+	* 22167: Completion/Unix/Command/_cp: completion for
+	GNU cp.
+
 	* 22166: Completion/Debian/Command/_bts: add new
 	subcommands (clone, submitter, found, notfound, block, unblock,
 	user, usertag, package, owner, noowner, reportspam, cache,
