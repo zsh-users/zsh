@@ -763,8 +763,8 @@ enditem()
 
 subsect(Special Widget)
 
-There is one user-defined widget which is special to the shell.
-If it does not exist, no special action is taken.  The environment
+There are a few user-defined widgets which are special to the shell.
+If they do not exist, no special action is taken.  The environment
 provided is identical to that for any other editing widget.
 
 startitem()
@@ -779,6 +779,19 @@ zle -N zle-line-init)
 
 (The command inside the function sets the keymap directly; it is
 equivalent to tt(zle vi-cmd-mode).)
+)
+tindex(zle-keymap-select)
+item(tt(zle-keymap-select))(
+Executed every time the keymap changes, i.e. the special parameter
+tt(KEYMAP) is set to a different value, while the line editor is active.
+Initialising the keymap when the line editor starts does not cause the
+widget to be called.
+
+The value tt($KEYMAP) within the function reflects the new keymap.  The
+old keymap is passed as the sole argument.
+
+This can been used for detecting switches between the vi command
+(tt(vicmd)) and insert (usually tt(main)) keymaps.
 )
 enditem()
 

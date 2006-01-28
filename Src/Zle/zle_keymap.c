@@ -400,8 +400,24 @@ selectkeymap(char *name, int fb)
 	km = openkeymap(name = ".safe");
     }
     if(name != curkeymapname) {
-	zsfree(curkeymapname);
+	char *oname = curkeymapname;
+	Thingy chgthingy;
+
 	curkeymapname = ztrdup(name);
+
+	if (oname && zleactive && strcmp(oname, curkeymapname) &&
+	    (chgthingy = rthingy_nocreate("zle-keymap-select"))) {
+	    char *args[2];
+	    int saverrflag = errflag, savretflag = retflag;
+	    args[0] = oname;
+	    args[1] = NULL;
+	    errflag = retflag = 0;
+	    execzlefunc(chgthingy, args);
+	    unrefthingy(chgthingy);
+	    errflag = saverrflag;
+	    retflag = savretflag;
+	}
+	zsfree(oname);
     }
     curkeymap = km;
     return 0;
