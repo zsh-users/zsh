@@ -1,3 +1,9 @@
+2006-01-29  Clint Adams  <clint@zsh.org>
+
+	* 22179: Completion/Unix/Command/_cplay: complete audio files
+	and playlists based on a list of file extensions provided
+	by Joe Wreschnig.
+
 2006-01-28  Clint Adams  <clint@zsh.org>
 
 	* 22174: Completion/Unix/Command/_vorbis: fix misspelling
