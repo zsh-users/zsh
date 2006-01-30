@@ -1,3 +1,8 @@
+2006-01-29  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync:  Added new options
+	for the upcoming 2.6.7 release of rsync.
+
 2006-01-29  Clint Adams  <clint@zsh.org>
 
 	* 22179: Completion/Unix/Command/_cplay: complete audio files
