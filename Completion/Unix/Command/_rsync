@@ -91,15 +91,19 @@ _rsync_files() {
 
 _arguments -s \
   '*'{-v,--verbose}'[increase verbosity]' \
+  {--no-v,--no-verbose}'[turn off --verbose]' \
   '--bwlimit=[limit I/O bandwidth]:KBytes per second:' \
   '--port=[specify alternate port number]:port:' \
   '--address=[bind to the specified address]:address:_hosts' \
+  '(-T --temp-dir)'{-T,--temp-dir=}'[create temporary files in specified directory]:directory:_files -/' \
+  '--sockopts=[specify custom TCP options]' \
   '(-4 -6 --ipv4 --ipv6)'{-4,--ipv4}'[prefer IPv4]' \
   '(-4 -6 --ipv4 --ipv6)'{-6,--ipv6}'[prefer IPv6]' \
-  '(-)'{-h,--help}'[display help information]' \
+  '(-)--help[display help information]' \
  - daemon \
   '--config=[specify alternate rsyncd.conf file]:file:_files' \
   '--daemon[run as an rsync daemon]' \
+  '--detach[detach from the parent]' \
   '--no-detach[do not detach from the parent]' \
  - client \
   '*: :_rsync_files' \
@@ -107,37 +111,51 @@ _arguments -s \
   '(-c --checksum)'{-c,--checksum}'[skip based on checksums, not mod-time & size]' \
   '(-a --archive)'{-a,--archive}'[archive mode; same as -rlptgoD (no -H)]' \
   '(-r --recursive)'{-r,--recursive}'[recurse into directories]' \
-  '(-R --relative --no-relative)'{-R,--relative}'[use relative path names]' \
-  '(-R --relative)--no-relative[turn off --relative]' \
+  {--no-r,--no-recursive}'[turn off --recursive]' \
+  '(-R --relative)'{-R,--relative}'[use relative path names]' \
+  {--no-R,--no-relative}'[turn off --relative]' \
   '--no-implied-dirs[do not send implied dirs with --relative]' \
   '(-b --backup)'{-b,--backup}'[make backups into hierarchy at indicated directory]' \
   '--backup-dir=[make backups into specified directory]:backup directory:_directories' \
   '--suffix=[set backup suffix]:suffix' \
   '(-u --update)'{-u,--update}'[skip files that are newer on the receiving side]' \
   '--inplace[update destination files in-place]' \
+  '--append[append data onto shorter files]' \
   '(-d --dirs)'{-d,--dirs}'[transfer directories without recursing]' \
+  {--no-d,--no-dirs}'[turn off --dirs]' \
   '(-l --links)'{-l,--links}'[copy symlinks as symlinks]' \
+  {--no-l,--no-links}'[turn off --links]' \
   '(-L --copy-links)'{-L,--copy-links}'[transform symlinks into referent file/dir]' \
   '--copy-unsafe-links[only "unsafe" symlinks are transformed]' \
   '--safe-links[ignore symlinks that point outside the source tree]' \
   '(-H --hard-links)'{-H,--hard-links}'[preserve hard links]' \
   '(-K --keep-dirlinks)'{-K,--keep-dirlinks}'[treat symlinked dir on receiver as dir]' \
   '(-p --perms)'{-p,--perms}'[preserve permissions]' \
+  {--no-p,--no-perms}'[turn off --perms]' \
   '(-o --owner)'{-o,--owner}'[preserve owner]' \
+  {--no-o,--no-owner}'[turn off --owner]' \
   '(-g --group)'{-g,--group}'[preserve group]' \
-  '(-D --devices)'{-D,--devices}'[preserve devices]' \
+  {--no-g,--no-group}'[turn off --group]' \
+  '(--devices --specials)-D[same as --devices --specials]' \
+  '(-D)--devices[preserve devices]' \
+  '--no-devices[turn off --devices]' \
+  '(-D)--specials[preserve special files]' \
+  '--no-specials[turn off --specials]' \
+  '--no-D[turn off --devices and --specials]' \
   '(-t --times)'{-t,--times}'[preserve times]' \
+  {--no-t,--no-times}'[turn off --times]' \
   '(-O --omit-dir-times)'{-O,--omit-dir-times}'[omit directories when preserving times]' \
+  '--chmod[change destination permissions]:mods' \
   '(-S --sparse)'{-S,--sparse}'[handle sparse files efficiently]' \
   '(-n --dry-run)'{-n,--dry-run}'[show what would have been transferred]' \
-  '(-W --whole-file --no-whole-file)'{-W,--whole-file}'[copy files whole (without rsync algorithm)]' \
-  '(-W --whole-file)--no-whole-file[always use incremental rsync algorithm]' \
+  '(-W --whole-file)'{-W,--whole-file}'[copy files whole (without rsync algorithm)]' \
+  {--no-W,--no-whole-file}'[turn off --whole-file]' \
   '(-x --one-file-system)'{-x,--one-file-system}'[do not cross filesystem boundaries]' \
   '(-B --block-size)'{-B,--block-size=}'[force a fixed checksum block-size]:block size' \
   '(-e --rsh)'{-e,--rsh=}'[specify the remote shell to use]:remote-shell command:(rsh ssh)' \
   '--rsync-path=[specify path to rsync on the remote machine]:remote command:' \
-  '--existing[only update files that already exist on receiving side]' \
   '--ignore-existing[ignore files that already exist on receiving side]' \
+  {--existing,--ignore-non-existing}'[ignore files that do not exist on receiving side]' \
   '--remove-sent-files[transferred files/symlinks are removed from sending side]' \
   '(--delete-before --delete-during --delete-after)--del[an alias for --delete-during]' \
   '--delete[delete files that do not exist on the sending side]' \
@@ -149,20 +167,26 @@ _arguments -s \
   '--force[force deletion of directories even if not empty]' \
   '--max-delete=[do not delete more than NUM files]:number:' \
   '--max-size=[do not transfer any file larger than specified size]:number:' \
+  '--min-size=[do not transfer any file smaller than specified size]:number:' \
   '(-P)--partial[keep partially transferred files]' \
+  '--no-partial[turn off --partial]' \
   '--partial-dir=[put a partially transferred file into specified directory]:directory:_files -/' \
+  '--super[receiver attempts super-user activities]' \
+  '--no-super[receiver performs normal-user activities]' \
   '--delay-updates[put all updated files into place at end of transfer]' \
+  '(-m --prune-empty-dirs)'{-m,--prune-empty-dirs}'[prune empty directory chains from file-list]' \
   '--numeric-ids[do not map uid/gid values by user/group name]' \
   '--timeout=[set I/O timeout in seconds]:seconds:' \
   '(-I --ignore-times)'{-I,--ignore-times}'[do not skip files that match in size and mod-time]' \
   '--size-only[skip files that match in size]' \
   '--modify-window=[compare mod-times with reduced accuracy]:seconds:' \
-  '(-T --temp-dir)'{-T,--temp-dir=}'[create temporary files in specified directory]:directory:_files -/' \
   '(-y --fuzzy)'{-y,--fuzzy}'[find similar file for basis if no destination file]' \
+  '--iconv=[request charset conversion of filenames]:string:' \
   '(--copy-dest --link-dest)*--compare-dest=[also compare destination files relative to specified directory]:directory:_files -/' \
   '(--compare-dest --link-dest)*--copy-dest=[like --compare-dest, but also includes copies of unchanged files]:directory:_files -/' \
   '(--compare-dest --copy-dest)*--link-dest=[hardlink to files in specified directory hierarchy when unchanged]:directory:_files -/' \
   '(-z --compress)'{-z,--compress}'[compress file data during the transfer]' \
+  '--compress-level=[explicitly set compression level]:number:' \
   '(-C --cvs-exclude)'{-C,--cvs-exclude}'[auto-ignore files the same way CVS does]' \
   '*'{-f,--filter=}'[add a file-filtering rule]:rule:' \
   '*-F[same as --filter="dir-merge /.rsync-filter", repeated: --filter="- .rsync-filter"]' \
@@ -173,16 +197,19 @@ _arguments -s \
   '--files-from=[read list of source-file names from specified file]:file:_files' \
   '(-0 --from0)'{-0,--from0}'[all *-from file lists are delimited by nulls]' \
   '--version[print version number]' \
+  '(-h --human-readable --si)'{-h,--human-readable}'[output numbers in a human-readable format]' \
+  '(-h --human-readable)--si[like --human-readable, but use powers of 1000]' \
   '--blocking-io[use blocking I/O for the remote shell]' \
-  '--no-blocking-io[turn off blocking I/O when it is the default]' \
+  '--no-blocking-io[turn off --blocking-io]' \
   '--stats[give some file-transfer stats]' \
   '(-P)--progress[show progress during transfer]' \
+  '--no-progress[turn off --progress]' \
   '(--partial --progress)-P[same as --partial --progress]' \
   '(-i --itemize-changes)'{-i,--itemize-changes}'[output a change-summary for all updates]' \
   '--log-format=[log file-transfers using specified format]:format:' \
   '--password-file=[read password from file]:file:_files' \
   '--list-only[list the files instead of copying them]' \
-  '--write-batch=[write a batched update to the specified file]:file:' \
-  '--only-write-batch=[like --write-batch but w/o updating destination]:file:' \
+  '(--only-write-batch)--write-batch=[write a batched update to the specified file]:file:' \
+  '(--write-batch)--only-write-batch=[like --write-batch but w/o updating destination]:file:' \
   '--protocol=[force an older protocol version to be used]:number:' \
   '--read-batch=[read a batched update from the specified file]:file:'
