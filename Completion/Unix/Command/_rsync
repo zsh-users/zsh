@@ -130,8 +130,9 @@ _arguments -s \
   '--safe-links[ignore symlinks that point outside the source tree]' \
   '(-H --hard-links)'{-H,--hard-links}'[preserve hard links]' \
   '(-K --keep-dirlinks)'{-K,--keep-dirlinks}'[treat symlinked dir on receiver as dir]' \
-  '(-p --perms)'{-p,--perms}'[preserve permissions]' \
+  '(-p --perms -E --executability)'{-p,--perms}'[preserve permissions]' \
   {--no-p,--no-perms}'[turn off --perms]' \
+  '(-E --executability -p --perms)'{-E,--executability}'[preserve executability]' \
   '(-o --owner)'{-o,--owner}'[preserve owner]' \
   {--no-o,--no-owner}'[turn off --owner]' \
   '(-g --group)'{-g,--group}'[preserve group]' \
@@ -155,7 +156,7 @@ _arguments -s \
   '(-e --rsh)'{-e,--rsh=}'[specify the remote shell to use]:remote-shell command:(rsh ssh)' \
   '--rsync-path=[specify path to rsync on the remote machine]:remote command:' \
   '--ignore-existing[ignore files that already exist on receiving side]' \
-  {--existing,--ignore-non-existing}'[ignore files that do not exist on receiving side]' \
+  '(--existing --ignore-non-existing)'{--existing,--ignore-non-existing}'[ignore files that do not exist on receiving side]' \
   '--remove-sent-files[transferred files/symlinks are removed from sending side]' \
   '(--delete-before --delete-during --delete-after)--del[an alias for --delete-during]' \
   '--delete[delete files that do not exist on the sending side]' \
