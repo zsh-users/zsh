@@ -1,21 +1,34 @@
 #compdef ftp rwho rup xping traceroute host aaaa zone mx ns soa txt
 
-local expl hosts tmp
+# avoid calling variable "hosts", it's an obvious candidate for use in
+#  zstyle -e '*' hosts 'reply=($hosts)'
+local expl _hosts tmp
 
-if ! zstyle -a ":completion:${curcontext}:hosts" hosts hosts; then
-  (( $+_cache_hosts )) ||
-      if (( ${+commands[getent]} )); then
-	: ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${(f)~~"$(_call_program hosts getent hosts 2>/dev/null)"}##[:blank:]#[^[:blank:]]#}}}
-      else
-        : ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
-	if (( ${+commands[ypcat]} )) &&
-	    tmp=$(_call_program hosts ypcat hosts.byname 2>/dev/null); then
-          _cache_hosts+=( ${=${(f)tmp}##[:blank:]#[^[:blank:]]#} ) # If you use YP
-	fi
+if ! zstyle -a ":completion:${curcontext}:hosts" hosts _hosts; then
+  if (( $+_cache_hosts == 0 )); then
+    # uniquify
+    typeset -gUa _cache_hosts
+    if (( ${+commands[getent]} )); then
+      # pws: we were using the horrible ": ${(A)...:=}" syntax to assign
+      # to _cache_hosts, overriding the typeset as well as being unreadable
+      # and having obscure splitting behaviour.  Why?  We've just
+      # tested _cache_hosts doesn't exist.
+      _cache_hosts=(${(s: :)${(ps:\t:)${(f)~~"$(_call_program hosts getent hosts 2>/dev/null)"}##[:blank:]#[^[:blank:]]#}})
+    else
+      _cache_hosts=(${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}})
+      if (( ${+commands[ypcat]} )) &&
+    	tmp=$(_call_program hosts ypcat hosts.byname 2>/dev/null); then
+        _cache_hosts+=( ${=${(f)tmp}##[:blank:]#[^[:blank:]]#} ) # If you use YP
       fi
+    fi
 
-  hosts=( "$_cache_hosts[@]" )
+    if [[ -r ~/.ssh/known_hosts ]]; then
+      _cache_hosts+=( $(sed -e '/^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]/d' -e 's/[ ,].*//p' ~/.ssh/known_hosts) )
+    fi
+  fi
+
+  _hosts=( "$_cache_hosts[@]" )
 fi
 
 _wanted hosts expl host \
-    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' -a "$@" - hosts
+    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' -a "$@" - _hosts

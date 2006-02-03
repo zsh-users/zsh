@@ -1,3 +1,9 @@
+2006-02-03  Peter Stephenson  <pws@csr.com>
+
+	* 22187: Completion/Unix/Type/_hosts: don't trounce any global
+	$hosts; don't use hacky array assignment; do examine
+	~/.ssh/known_hosts for default set of hosts to complete.
+
 2006-01-29  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync:  Added new options
