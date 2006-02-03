@@ -1,3 +1,9 @@
+2006-02-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22191: from Danek Duvall: Completion/Unix/Type/_hosts,
+	Completion/Unix/Type/_users: neaten _hosts and make _users
+	more consistent.
+
 2006-02-03  Peter Stephenson  <pws@csr.com>
 
 	* 22187: Completion/Unix/Type/_hosts: don't trounce any global

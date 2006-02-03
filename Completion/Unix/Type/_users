@@ -2,7 +2,9 @@
 
 local expl users
 
-zstyle -a ":completion:${curcontext}:" users users &&
-    _wanted users expl user compadd "$@" -a - users && return 0
+if zstyle -a ":completion:${curcontext}:users" users users; then
+    _wanted users expl user compadd "$@" -a - users
+    return 0
+fi
 
 _wanted users expl user compadd "$@" -k - userdirs
