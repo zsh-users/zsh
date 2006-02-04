@@ -1,3 +1,8 @@
+2006-02-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22192: Danek Duvall: Completion/Unix/Type/_users: also remove
+	comments from .ssh/known_hosts.
+
 2006-02-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22191: from Danek Duvall: Completion/Unix/Type/_hosts,
