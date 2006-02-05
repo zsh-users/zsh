@@ -1,3 +1,8 @@
+2006-02-05  Clint Adams  <clint@zsh.org>
+
+	* 22193: Completion/Debian/Command/_wanna-build: completion
+	for wanna-build.
+
 2006-02-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22192: Danek Duvall: Completion/Unix/Type/_users: also remove
