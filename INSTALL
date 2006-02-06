@@ -282,8 +282,8 @@ and to work when configured with --enable-multibyte on:
   - OS X 10.4.3 (problems have been reported with multibyte characters
     in HFS file names)
   - NetBSD 2.0.2
-
-Any help with Solaris 8 or 9 would be appreciated.
+  - Solaris 8+ (inputting multibyte characters from the keyboard doesn't
+    work in some installations).
 
 The main shell is not yet aware of multibyte characters, so for example the
 length of a scalar parameter will return the number of bytes, not

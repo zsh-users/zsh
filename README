@@ -34,6 +34,13 @@ behaviour.
 The variable HOME is no longer set by the shell; it must be present
 in the environment.  It is valid for the variable to be unset.
 
+Zsh has previously been lax about whether it allows octets with the
+top bit set to be part of a shell identifier.  With --enable-multibyte set,
+this is now completely disabled.  This is a temporary fix until the main
+shell handles multibyte characters properly and the appropriate library
+tests can be used.  This change may be reviewed if no such permanent fix
+is forthcoming.
+
 Documentation
 -------------
 
