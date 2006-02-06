@@ -1,3 +1,9 @@
+2006-02-06  Peter Stephenson  <pws@csr.com>
+
+	* 22195: README, Src/init.c, Src/params.c, Src/subst.c,
+	Src/utils.c, Src/Modules/newuser.c: don't set HOME in the shell,
+	only if passed by the environment; handle the fallout.
+
 2006-02-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync:  A few more fixes
