@@ -31,6 +31,9 @@ variables as an error, so can still return status 0 (depending on the
 handling of other arguments).  This appears to be the standard shell
 behaviour.
 
+The variable HOME is no longer set by the shell; it must be present
+in the environment.  It is valid for the variable to be unset.
+
 Documentation
 -------------
 

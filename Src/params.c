@@ -257,7 +257,7 @@ IPDEF1("TTYIDLE", ttyidle_gsu, PM_READONLY),
 IPDEF2("USERNAME", username_gsu, PM_DONTIMPORT|PM_RESTRICTED),
 IPDEF2("-", dash_gsu, PM_READONLY),
 IPDEF2("histchars", histchars_gsu, PM_DONTIMPORT),
-IPDEF2("HOME", home_gsu, 0),
+IPDEF2("HOME", home_gsu, PM_UNSET),
 IPDEF2("TERM", term_gsu, 0),
 IPDEF2("WORDCHARS", wordchars_gsu, 0),
 IPDEF2("IFS", ifs_gsu, PM_DONTIMPORT),
@@ -690,9 +690,6 @@ createparamtable(void)
     *envp = '\0';
     opts[ALLEXPORT] = oae;
 
-    pm = (Param) paramtab->getnode(paramtab, "HOME");
-    if (!(pm->flags & PM_EXPORTED))
-	addenv(pm, home);
     pm = (Param) paramtab->getnode(paramtab, "LOGNAME");
     if (!(pm->flags & PM_EXPORTED))
 	addenv(pm, pm->u.str);

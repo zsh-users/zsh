@@ -630,8 +630,8 @@ finddir(char *s)
      * whenever a node is added to or removed from the hash table, and *
      * whenever the value of $HOME changes.  (On startup, too.)        */
     if (!s) {
-	homenode.dir = home;
-	homenode.diff = strlen(home);
+	homenode.dir = home ? home : "";
+	homenode.diff = home ? strlen(home) : 0;
 	if(homenode.diff==1)
 	    homenode.diff = 0;
 	if(!finddir_full)

@@ -417,7 +417,7 @@ filesubstr(char **namptr, int assign)
 
 	val = zstrtol(str + 1, &ptr, 10);
 	if (isend(str[1])) {   /* ~ */
-	    *namptr = dyncat(home, str + 1);
+	    *namptr = dyncat(home ? home : "", str + 1);
 	    return 1;
 	} else if (str[1] == '+' && isend(str[2])) {   /* ~+ */
 	    *namptr = dyncat(pwd, str + 2);

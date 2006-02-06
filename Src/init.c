@@ -795,22 +795,23 @@ setupvals(void)
      * recheck the info for `USERNAME'     */
     cached_uid = getuid();
 
-    /* Get password entry and set info for `HOME' and `USERNAME' */
+    /* Get password entry and set info for `USERNAME' */
 #ifdef HAVE_GETPWUID
     if ((pswd = getpwuid(cached_uid))) {
-	home = metafy(pswd->pw_dir, -1, META_DUP);
 	cached_username = ztrdup(pswd->pw_name);
     } else
 #endif /* HAVE_GETPWUID */
 	   {
-	home = ztrdup("/");
 	cached_username = ztrdup("");
     }
 
-    /* Try a cheap test to see if we can *
-     * initialize `PWD' from `HOME'      */
-    if (ispwd(home))
-	pwd = ztrdup(home);
+    /*
+     * Try a cheap test to see if we can initialize `PWD' from `HOME'.
+     * HOME must come from the environment; we're not allowed to
+     * set it locally.
+     */
+    if ((ptr = getenv("HOME")) && ispwd(ptr))
+	pwd = ztrdup(ptr);
     else if ((ptr = zgetenv("PWD")) && (strlen(ptr) < PATH_MAX) &&
 	     (ptr = metafy(ptr, -1, META_STATIC), ispwd(ptr)))
 	pwd = ztrdup(ptr);
@@ -1105,8 +1106,11 @@ sourcehome(char *s)
 
     queue_signals();
     if (emulation == EMULATE_SH || emulation == EMULATE_KSH ||
-	!(h = getsparam("ZDOTDIR")))
+	!(h = getsparam("ZDOTDIR"))) {
 	h = home;
+	if (!h)
+	    return;
+    }
 
     {
 	/* Let source() complain if path is too long */

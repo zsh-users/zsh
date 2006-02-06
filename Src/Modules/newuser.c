@@ -67,8 +67,11 @@ boot_(UNUSED(Module m))
     if (emulation != EMULATE_ZSH)
 	return 0;
 
-    if (!dotdir)
+    if (!dotdir) {
 	dotdir = home;
+	if (!dotdir)
+	    return;
+    }
 
     if (check_dotfile(dotdir, ".zshenv") == 0 ||
 	check_dotfile(dotdir, ".zprofile") == 0 ||
