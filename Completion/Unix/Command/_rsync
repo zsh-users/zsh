@@ -202,6 +202,7 @@ _arguments -s \
   '--blocking-io[use blocking I/O for the remote shell]' \
   '--no-blocking-io[turn off --blocking-io]' \
   '--stats[give some file-transfer stats]' \
+  '(-8 --8-bit-output)'{-8,--8-bit-output}'[leave high-bit chars unescaped in output]' \
   '(-P)--progress[show progress during transfer]' \
   '--no-progress[turn off --progress]' \
   '(--partial --progress)-P[same as --partial --progress]' \
