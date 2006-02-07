@@ -70,7 +70,7 @@ boot_(UNUSED(Module m))
     if (!dotdir) {
 	dotdir = home;
 	if (!dotdir)
-	    return;
+	    return 0;
     }
 
     if (check_dotfile(dotdir, ".zshenv") == 0 ||
