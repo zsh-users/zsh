@@ -1,3 +1,8 @@
+2006-02-07  Peter Stephenson  <pws@csr.com>
+
+	* 22198: README, Src/init.c, Src/params.c, Doc/Zsh/params.yo:
+	modify 22195 so that HOME gets set as before in native emulation.
+
 2006-02-06  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Modules/newuser.c: fixed return-without-value
@@ -5,7 +10,7 @@
 
 2006-02-06  Peter Stephenson  <pws@csr.com>
 
-	* 22196: INSTALL, README, Config/version.mk: developement
+	* 22196: INSTALL, README, Config/version.mk: development
 	version 4.3.0-dev-3
 
 	* 22195: README, Src/init.c, Src/params.c, Src/subst.c,

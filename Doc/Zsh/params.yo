@@ -805,7 +805,10 @@ cushion for saving duplicated history events.
 )
 vindex(HOME)
 item(tt(HOME) <S>)(
-The default argument for the tt(cd) command.
+The default argument for the tt(cd) command.  This is not set automatically
+by the shell in tt(sh), tt(ksh) or tt(csh) emulation, but it is typically
+present in the environment anyway, and if it becomes set it has its usual
+special behaviour.
 )
 vindex(IFS)
 item(tt(IFS) <S>)(

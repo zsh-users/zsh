@@ -690,6 +690,17 @@ createparamtable(void)
     *envp = '\0';
     opts[ALLEXPORT] = oae;
 
+    if (emulation == EMULATE_ZSH)
+    {
+	/*
+	 * For native emulation we always set the variable home
+	 * (see setupvals()).
+	 */
+	pm = (Param) paramtab->getnode(paramtab, "HOME");
+	pm->flags &= ~PM_UNSET;
+	if (!(pm->flags & PM_EXPORTED))
+	    addenv(pm, home);
+    }
     pm = (Param) paramtab->getnode(paramtab, "LOGNAME");
     if (!(pm->flags & PM_EXPORTED))
 	addenv(pm, pm->u.str);

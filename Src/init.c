@@ -798,19 +798,28 @@ setupvals(void)
     /* Get password entry and set info for `USERNAME' */
 #ifdef HAVE_GETPWUID
     if ((pswd = getpwuid(cached_uid))) {
+	if (emulation == EMULATE_ZSH)
+	    home = metafy(pswd->pw_dir, -1, META_DUP);
 	cached_username = ztrdup(pswd->pw_name);
-    } else
+    }
+    else
 #endif /* HAVE_GETPWUID */
-	   {
+    {
+	if (emulation == EMULATE_ZSH)
+	    home = ztrdup("/");
 	cached_username = ztrdup("");
     }
 
     /*
      * Try a cheap test to see if we can initialize `PWD' from `HOME'.
-     * HOME must come from the environment; we're not allowed to
-     * set it locally.
+     * In non-native emulations HOME must come from the environment;
+     * we're not allowed to set it locally.
      */
-    if ((ptr = getenv("HOME")) && ispwd(ptr))
+    if (emulation == EMULATE_ZSH)
+	ptr = home;
+    else
+	ptr = getenv("HOME");
+    if (ptr && ispwd(ptr))
 	pwd = ztrdup(ptr);
     else if ((ptr = zgetenv("PWD")) && (strlen(ptr) < PATH_MAX) &&
 	     (ptr = metafy(ptr, -1, META_STATIC), ispwd(ptr)))
