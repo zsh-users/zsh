@@ -556,10 +556,18 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 #ifdef HAVE_GETRUSAGE
     double total_time;
 #endif
-    int percent;
+    int percent, desclen;
 
     if (!desc)
+    {
 	desc = "";
+	desclen = 0;
+    }
+    else
+    {
+	desc = dupstring(desc);
+	unmetafy(desc, &desclen);
+    }
 
     /* go ahead and compute these, since almost every TIMEFMT will have them */
     elapsed_time = real->tv_sec + real->tv_usec / 1000000.0;
@@ -706,7 +714,7 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 		break;
 #endif
 	    case 'J':
-		fprintf(stderr, "%s", desc);
+		fwrite(desc, sizeof(char), desclen, stderr);
 		break;
 	    case '%':
 		putc('%', stderr);
@@ -914,8 +922,14 @@ printjob(Job jn, int lng, int synch)
 			(int)(len - 14 + 2 - strlen(sigmsg(WTERMSIG(pn->status)))), "");
 	    else
 		fprintf(fout, "%-*s", len + 2, sigmsg(WTERMSIG(pn->status)));
-	    for (; pn != qn; pn = pn->next)
-		fprintf(fout, (pn->next) ? "%s | " : "%s", pn->text);
+	    for (; pn != qn; pn = pn->next) {
+		char *txt = dupstring(pn->text);
+		int txtlen;
+		unmetafy(txt, &txtlen);
+		fwrite(txt, sizeof(char), txtlen, fout);
+		if (pn->next)
+		    fputs(" | ", fout);
+	    }
 	    putc('\n', fout);
 	    fline = 0;
 	}

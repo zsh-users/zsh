@@ -1,5 +1,7 @@
 2006-02-07  Peter Stephenson  <pws@csr.com>
 
+	* 22200: Src/jobs.c: process text wasn't unmetafied for output.
+
 	* 22198: README, Src/init.c, Src/params.c, Doc/Zsh/params.yo:
 	modify 22195 so that HOME gets set as before in native emulation.
 
