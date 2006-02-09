@@ -1,5 +1,10 @@
 2006-02-09  Clint Adams  <clint@zsh.org>
 
+	* unposted: Completion/Debian/Command/.distfiles,
+	Completion/Linux/Command/.distfiles,
+	Completion/Unix/Command/.distfiles: update
+	some .distfiles.
+
 	* 22205: Completion/Unix/Command/_make: patch from
 	R.Ramkumar to use the argument to -C in make
 	completion.
