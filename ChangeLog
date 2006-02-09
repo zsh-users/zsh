@@ -1,3 +1,9 @@
+2006-02-09  Clint Adams  <clint@zsh.org>
+
+	* 22205: Completion/Unix/Command/_make: patch from
+	R.Ramkumar to use the argument to -C in make
+	completion.
+
 2006-02-07  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync:  One last new option
