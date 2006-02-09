@@ -62,6 +62,7 @@ typedef wint_t   ZLE_INT_T;
 #define ZS_zarrdup wcs_zarrdup
 #define ZS_width wcslen
 #define ZS_strchr wcschr
+#define ZS_memchr wmemchr
 
 /*
  * Functions that operate on a metafied string.
@@ -108,6 +109,7 @@ typedef int ZLE_INT_T;
 #define ZS_zarrdup zarrdup
 #define ZS_width ztrlen
 #define ZS_strchr strchr
+#define ZS_memchr memchr
 
 /*
  * Functions that operate on a metafied string.
