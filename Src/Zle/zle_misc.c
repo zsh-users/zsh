@@ -1270,14 +1270,14 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	    for (ss = suffixlist; ss; ss = ss->next) {
 		switch (ss->tp) {
 		case SUFTYP_POSSTR:
-		    if (memchr(ss->chars, ch, ss->lenstr)) {
+		    if (ZS_memchr(ss->chars, ch, ss->lenstr)) {
 			sl = ss->lensuf;
 			found = 1;
 		    }
 		    break;
 
 		case SUFTYP_NEGSTR:
-		    if (memchr(ss->chars, ch, ss->lenstr)) {
+		    if (ZS_memchr(ss->chars, ch, ss->lenstr)) {
 			sl = 0;
 			found = 1;
 		    } else {
