@@ -1,3 +1,8 @@
+2006-02-09  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22206: Src/Zle/zle.h, Src/Zle/zle_misc.c: fixed broken
+	suffix-removal in an --enable-multibyte configured zsh.
+
 2006-02-09  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Debian/Command/.distfiles,
