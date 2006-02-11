@@ -7,4 +7,24 @@ _arguments \
   ':quilt command:(add files import previous setup annotate fold mail push
     snapshot applied fork new refresh top delete graph next remove unapplied
     diff grep patches rename upgrade edit header pop series)' \
-  '*::file:_files'
+  '*::subcmd:->subcmd' && return 0
+
+case "$state" in
+    (subcmd)
+
+  case "$words[1]" in
+      (applied|delete|files|graph|header|next|previous|refresh|unapplied)
+      	_wanted -V 'patches' expl 'patch' compadd ${(f)"$(quilt series)"}
+	;;
+      (push)
+    	_wanted -V 'unapplied patches' expl 'patch' compadd ${(f)"$(quilt unapplied)"}
+    	;;
+      (pop)
+    	_wanted -V 'applied patches' expl 'patch' compadd ${(f)"$(quilt applied)"}
+    	;;
+      (*)
+    	_files
+    	;;
+  esac
+  ;;
+esac
