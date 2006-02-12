@@ -1,5 +1,8 @@
 2006-02-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 22235: Eric Mangold: Completion/Unix/Command/_twisted: new
+	completion.
+
 	* 22237: Vincent Steman: Completion/Unix/Command/_man: location of
 	packaged manual pages on NetBSD.
 
