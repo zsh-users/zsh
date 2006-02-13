@@ -586,6 +586,7 @@ docomplete(int lst)
     }
     active = 1;
     comprecursive = 0;
+    makecommaspecial(0);
     if (undoing)
 	setlastline();
 
@@ -662,6 +663,7 @@ docomplete(int lst)
 	    unmetafy_line();
 	    zsfree(s);
 	    active = 0;
+	    makecommaspecial(0);
 	    return 1;
 	}
 	ocs = zlemetacs;
@@ -852,6 +854,7 @@ docomplete(int lst)
     unmetafy_line();
 
     active = 0;
+    makecommaspecial(0);
     return dat[1];
 }
 
@@ -1593,6 +1596,7 @@ get_comp_string(void)
 			p = tp - 1;
 			continue;
 		    }
+		    makecommaspecial(1);
 		    if (bbeg) {
 			Brinfo new;
 			int len = bend - bbeg;
@@ -1639,6 +1643,7 @@ get_comp_string(void)
 			continue;
 		    }
 		    cant = 1;
+		    makecommaspecial(1);
 		    break;
 		}
 		if (p == curs) {
