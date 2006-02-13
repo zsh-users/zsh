@@ -3671,14 +3671,14 @@ bin_comptry(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 			qqq = qq = dupstring(q);
 			while (*qqq) {
-			    if (qqq == qq || qqq[-1] != '\\') {
-				if (*qqq == '{')
-				    *qqq = Inbrace;
-				else if (*qqq == '}')
-				    *qqq = Outbrace;
-				else if (*qqq == ',')
-				    *qqq = Comma;
-			    }
+			    if (*qqq == '\\' && qqq[1])
+				qqq++;
+			    else if (*qqq == '{')
+				*qqq = Inbrace;
+			    else if (*qqq == '}')
+				*qqq = Outbrace;
+			    else if (*qqq == ',')
+				*qqq = Comma;
 			    qqq++;
 			}
 			tokenize(qq);
