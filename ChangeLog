@@ -1,3 +1,16 @@
+2006-02-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22217: Src/Zle/compcore.c: allow the insertion of invalid
+	multibyte characters using the $'\123' idiom.
+
+	* 22215: Src/utils.c, Src/Zle/zle_tricky.c: fixed the completion of
+	filenames containing commas inside an open bracelist, including the
+	ability for the user to manually backslash escape commas.
+
+	* unposted: Src/Zle/computil.c: replaced an algorithm that was
+	looking backward for a backslash because that can accidentally
+	quote a character after a "\\" sequence.
+
 2006-02-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22235: Eric Mangold: Completion/Unix/Command/_twisted: new
