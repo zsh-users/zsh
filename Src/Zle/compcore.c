@@ -2227,10 +2227,15 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	       char *psuf, Cline sline,
 	       char *suf, int flags, int exact)
 {
+#ifdef MULTIBYTE_SUPPORT
+    mbstate_t mbs;
+    char *t, *f, *new_str = NULL;
+    int fl, eol = 0;
+#endif
     Cmatch cm;
     Aminfo ai = (alt ? fainfo : ainfo);
     int palen, salen, qipl, ipl, pl, ppl, qisl, isl, psl;
-    int sl, lpl, lsl, ml;
+    int stl, lpl, lsl, ml;
 
     palen = salen = qipl = ipl = pl = ppl = qisl = isl = psl = 0;
 
@@ -2445,6 +2450,59 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	    line = p;
 	}
     }
+
+    stl = strlen(str);
+#ifdef MULTIBYTE_SUPPORT
+    /* If "str" contains a character that won't convert into a wide
+     * character, change it into a $'\123' sequence. */
+    memset(&mbs, '\0', sizeof mbs);
+    for (t = f = str, fl = stl; fl > 0; ) {
+	wchar_t wc;
+	size_t cnt = eol ? MB_INVALID : mbrtowc(&wc, f, fl, &mbs);
+	switch (cnt) {
+	case MB_INCOMPLETE:
+	    eol = 1;
+	    /* FALL THROUGH */
+	case MB_INVALID:
+	    /* Get mbs out of its undefined state. */
+	    memset(&mbs, '\0', sizeof mbs);
+	    if (!new_str) {
+		/* Be very pessimistic about how much space we'll need. */
+		new_str = zhalloc(stl*7 + 1);
+		memcpy(new_str, str, t - str);
+		t = new_str + (t - str);
+	    }
+	    *t++ = '$';
+	    *t++ = '\'';
+	    *t++ = '\\';
+	    *t++ = '0' + ((STOUC(*f) >> 6) & 7);
+	    *t++ = '0' + ((STOUC(*f) >> 3) & 7);
+	    *t++ = '0' + (STOUC(*f) & 7);
+	    *t++ = '\'';
+	    f++;
+	    fl--;
+	    break;
+	case 0:
+	    /* Converting '\0' returns 0, but a '\0' is a real
+	     * character for us, so we should consume 1 byte
+	     * (certainly true for Unicode and unlikely to be false
+	     * in any non-pathological multibyte representation). */
+	    cnt = 1;
+	    /* FALL THROUGH */
+	default:
+	    fl -= cnt;
+	    while (cnt--)
+		*t++ = *f++;
+	    break;
+	}
+    }
+    if (new_str) {
+	*t = '\0';
+	str = new_str;
+	stl = strlen(str);
+    }
+#endif
+
     /* Allocate and fill the match structure. */
     cm = (Cmatch) zhalloc(sizeof(struct cmatch));
     cm->str = str;
@@ -2539,10 +2597,9 @@ add_match_data(int alt, char *str, char *orig, Cline line,
     if (!ai->firstm)
 	ai->firstm = cm;
 
-    sl = strlen(str);
     lpl = (cm->ppre ? strlen(cm->ppre) : 0);
     lsl = (cm->psuf ? strlen(cm->psuf) : 0);
-    ml = sl + lpl + lsl;
+    ml = stl + lpl + lsl;
 
     if (ml < minmlen)
 	minmlen = ml;
@@ -2566,7 +2623,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 		    e += lpl;
 		}
 		strcpy(e, str);
-		e += sl;
+		e += stl;
 		if (cm->psuf)
 		    strcpy(e, cm->psuf);
 		comp_setunset(0, 0, CP_EXACTSTR, 0);
