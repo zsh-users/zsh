@@ -2515,6 +2515,8 @@ equalsplit(char *s, char **t)
     return 0;
 }
 
+static int specialcomma;
+
 /* the ztypes table */
 
 /**/
@@ -2614,8 +2616,20 @@ inittyptab(void)
     }
     for (s = SPECCHARS; *s; s++)
 	typtab[STOUC(*s)] |= ISPECIAL;
+    if (specialcomma)
+	typtab[STOUC(',')] |= ISPECIAL;
     if (isset(BANGHIST) && bangchar && interact && isset(SHINSTDIN))
 	typtab[bangchar] |= ISPECIAL;
+}
+
+/**/
+void
+makecommaspecial(int yesno)
+{
+    if ((specialcomma = yesno) != 0)
+	typtab[STOUC(',')] |= ISPECIAL;
+    else
+	typtab[STOUC(',')] &= ~ISPECIAL;
 }
 
 
