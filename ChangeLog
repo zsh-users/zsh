@@ -1,3 +1,10 @@
+2006-02-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22268: Src/subst.c, Test/D04parameter.ztst, Doc/Zsh/expn.yo,
+	Doc/Zsh/roadmap.yo: some fixes to variable expansion allows
+	${1+"$@"} to work when shwordsplit is set (e.g. when emulating
+	sh).  Fixed a couple other minor bugs too.
+
 2006-02-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22217: Src/Zle/compcore.c: allow the insertion of invalid
