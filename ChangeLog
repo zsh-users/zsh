@@ -1,3 +1,10 @@
+2006-02-15  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: use zsh to
+	match files within directories generated from p4 output, so
+	as to get matching control working; style "glob" provides
+	backward compatibility.
+
 2006-02-15  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22268: Src/subst.c, Test/D04parameter.ztst, Doc/Zsh/expn.yo,

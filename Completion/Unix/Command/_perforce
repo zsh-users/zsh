@@ -1,5 +1,7 @@
 #compdef p4 -value-,P4CLIENT,-default- -value-,P4PORT,-default- -value-,P4MERGE,-default- -value-,P4USER,-default-
 
+# Maintainer: Peter Stephenson <pws@csr.com>.
+
 # Increasingly loosely based on _cvs version 1.17.
 # Completions currently based on Perforce release 2004.2.
 
@@ -75,6 +77,28 @@
 # The tag subdirs is used to complete the special `...' which tells
 # Perforce to search all subdirectories.  Hence you can turn this
 # feature off by suitably manipulating your tags.
+#
+# The function will usually try to limit the files it lists by
+# context; for example, to just opened files.  By default it does
+# this by retrieving the complete list from Perforce and then
+# relying on the completion system to do the matching.  If this is
+# slow, it is possible to set the style "glob", in which case the
+# matching is done within Perforce, potentially reducing the amount of
+# searching of Perforce's internal database.  The tag used for
+# this is the same as the command used to retrieve the file name:
+# integrated, opened, resolved, dirs, files.  The disadvantage
+# of doing the matching within Perforce is that no matcher specification
+# is applied; for example, it's not possible to match a_u.c against
+# admin_utils.c.
+#
+# Actually, a hybrid strategy is used when the glob style is not set: the
+# directory is passed literally to Perforce, but the file or directory
+# being matched is passed as "*", so that matching on the contents of the
+# directory is performed by the completion system.
+#
+# Experiment suggests that the glob style isn't usually needed: only
+# "p4 integrated" is likely to be significantly slowed if no limiting
+# pattern is applied, and completing only integrated files is uncommon.
 #
 # Completion of files and their revisions
 # =======================================
@@ -735,6 +759,43 @@ _perforce_file_suffix() {
 
 
 #
+# Helper function for the helper functions for the helper function
+# _perforce_files.  This is common code to retrieve a list of files
+# from Perforce.
+#
+# First argument is the p4 subcommand used to list the files.
+# This is also used as a tag for the style to decide whether
+# to limit the list within Perforce.
+# Remaining arguments are additional arguments to compadd.
+#
+(( $+functions[_perforce_retrieve_files] )) ||
+_perforce_retrieve_files() {
+  local pfx
+  local -a files
+
+  if zstyle -t ":completion:${curcontext}:$1" glob; then
+    # Limit the list by using Perforce to glob the pattern.
+    # This may be faster, but won't use matcher specs etc.
+    pfx=${(Q)PREFIX}
+    compset -P '*/'
+    files=(${${${(f)"$(_perforce_call_p4 $1 $1 \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+  else
+    # We need to limit the list to a directory.
+    if [[ $PREFIX = */* ]]; then
+      pfx="${(Q)${PREFIX%/*}}/*"
+    else
+      pfx="*"
+    fi
+    compset -P '*/'
+    files=(${${${(f)"$(_perforce_call_p4 $1 $1 \$pfx 2>/dev/null)"}%\#*}##*/})
+  fi
+  [[ $#files -eq 1 && $files[1] = '' ]] && files=()
+  shift
+  compadd "$@" -a files
+}
+
+
+#
 # Helper functions for the helper function _perforce_files.  These files
 # are low-level enough that they don't handle tags; this is done
 # by the _alternative handler in _perforce_files.
@@ -745,35 +806,24 @@ _perforce_integrated_files() {
   local pfx=${(Q)PREFIX} type
   local -a files
 
-  compset -P '*/'
-  files=(${${${(f)"$(_perforce_call_p4 integrated integrated \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
-  [[ $#files -eq 1 && $files[1] = '' ]] && files=()
-  compadd "$@" -a files
+  _perforce_retrieve_files integrated "$@"
 }
 
 
 (( $+functions[_perforce_opened_files] )) ||
 _perforce_opened_files() {
-  local pfx=${(Q)PREFIX} type
+  local type
   local -a files
 
-  compset -P '*/'
-  files=(${${${(f)"$(_perforce_call_p4 opened opened \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
-  [[ $#files -eq 1 && $files[1] = '' ]] && files=()
-  compadd "$@" -a files
+  _perforce_retrieve_files opened "$@"
 }
 
 
 (( $+functions[_perforce_resolved_files] )) ||
 _perforce_resolved_files() {
-  local pfx=${(Q)PREFIX} type
-  local -a files
-
-  compset -P '*/'
-  files=(${${${(f)"$(_perfroce_call_p4 resolved resolved \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
-  [[ $#files -eq 1 && $files[1] = '' ]] && files=()
-  compadd "$@" -a files
+  _perforce_retrieve_files resolved "$@"
 }
+
 
 (( $+functions[_perforce_subdirs] )) ||
 _perforce_subdirs() {
@@ -784,29 +834,22 @@ _perforce_subdirs() {
   compadd "$@" '...'
 }
 
+
 (( $+functions[_perforce_depot_dirs] )) ||
 _perforce_depot_dirs() {
   # Normal completion of directories in depots
-  local pfx=${(Q)PREFIX} expl
-  local -a files
 
-  compset -P '*/'
-  files=(${"${(f)$(_perforce_call_p4 dirs dirs \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)}"##*/})
-  [[ $#files -eq 1 && $files[1] = '' ]] && files=()
-  compadd "$@" -S / -q -a files
+  _perforce_retrieve_files dirs "$@" -S / -q
 }
+
 
 (( $+functions[_perforce_depot_files] )) ||
 _perforce_depot_files() {
   # Normal completion of files in depots
-  local pfx=${(Q)PREFIX} expl
-  local -a files
 
-  compset -P '*/'
-  files=(${${${(f)"$(_perforce_call_p4 files files \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
-  [[ $#files -eq 1 && $files[1] = '' ]] && files=()
-  compadd "$@" -R _perforce_file_suffix -a files
+  _perforce_retrieve_files files "$@" -R _perforce_file_suffix
 }
+
 
 (( $+functions[_perforce_client_dirs] )) ||
 _perforce_client_dirs() {
