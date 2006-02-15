@@ -300,16 +300,15 @@ singsub(char **s)
  * first word-split using IFS, but only for non-quoted "whitespace" (as
  * indicated by Dnull, Snull, Tick, Bnull, Inpar, and Outpar).
  *
- * If arg "a" was non-NULL _and_ the parsing set mult_isarr, the resulting
- * strings are stored in *a (even for a 1-element array) and *isarr is set
- * to 1.  Otherwise, *isarr is set to 0, and the result is stored in *s,
+ * If arg "a" was non-NULL and we got an array as a result of the parsing,
+ * the strings are stored in *a (even for a 1-element array) and *isarr is
+ * set to 1.  Otherwise, *isarr is set to 0, and the result is put into *s,
  * with any necessary joining of multiple elements using sep (which can be
  * NULL to use IFS).  The return value is true iff the expansion resulted
  * in an empty list.
  *
- * The mult_isarr variable is used by paramsubst() to tell us if the
- * substitutions yielded an array, but we will also set it if we split *s
- * into multiple items (since that also yields an array). */
+ * The mult_isarr variable is used by paramsubst() to tell us if a single-
+ * item result was an array.  We always restore its value on exit. */
 
 /**/
 static int mult_isarr;
@@ -337,7 +336,6 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
     if (split) {
 	LinkNode n = firstnode(&foo);
 	int inq = 0, inp = 0;
-	split = 0; /* use this to flag if we really split anything */
 	for ( ; *x; x += l+1) {
 	    char c = (l = *x == Meta) ? x[1] ^ 32 : *x;
 	    if (!inq && !inp && isep(c)) {
@@ -350,7 +348,6 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
 		if (!*x)
 		    break;
 		insertlinknode(&foo, n, (void *)x), incnode(n);
-		split = 1;
 	    }
 	    switch (c) {
 	    case Dnull:  /* " */
@@ -382,33 +379,28 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
 	mult_isarr = omi;
 	return 0;
     }
-    if (split)
-	mult_isarr = 1;
 
     if ((l = countlinknodes(&foo)) > 1 || (a && mult_isarr)) {
 	p = r = hcalloc((l + 1) * sizeof(char*));
 	while (nonempty(&foo))
 	    *p++ = (char *)ugetnode(&foo);
 	*p = NULL;
-	/*
-	 * This is the most obscure way of deciding whether a value is
-	 * an array it would be possible to imagine.  It seems to result
-	 * partly because we don't pass down the qt and ssub flags from
-	 * paramsubst() through prefork() properly, partly because we
-	 * don't tidy up to get back the return type from multsub we
-	 * need properly.  The crux of neatening this up is to get rid
-	 * of the following test.
-	 */
-	if (a && mult_isarr) {
+	/* We need a way to figure out if a one-item result was a scalar
+	 * or a single-item array.  The parser will have set mult_isarr
+	 * in the latter case, allowing us to return it as an array to
+	 * our caller (if they provided for that result).  It would be
+	 * better if this information were encoded in the list itself
+	 * (e.g. by adding a flag to the LinkList structure). */
+	if (a && (l > 1 || mult_isarr)) {
 	    *a = r;
 	    *isarr = SCANPM_MATCHMANY;
 	    mult_isarr = omi;
 	    return 0;
 	}
 	*s = sepjoin(r, sep, 1);
-	mult_isarr = omi;
 	if (isarr)
 	    *isarr = 0;
+	mult_isarr = omi;
 	return 0;
     }
     if (l)
@@ -2395,14 +2387,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	val = aval[0];
 	isarr = 0;
     }
-    /* ssub is true when we are called from singsub (via prefork).
-     * It means that we must join arrays and should not split words. */
-    /*
-     * TODO: this is what is screwing up the use of SH_WORD_SPLIT
-     * after `:-' etc.  If we fix multsub(), we might get away
-     * with simply unsetting the appropriate flags when they
-     * get handled.
-     */
+    /* This is where we may join arrays together, e.g. (j:,:) sets "sep", and
+     * (afterward) may split the joined value (e.g. (s:-:) sets "spsep").  One
+     * exception is that ${name:-word} and ${name:+word} will have already
+     * done any requested splitting of the word value with quoting preserved.
+     * "ssub" is true when we are called from singsub (via prefork):
+     * it means that we must join arrays and should not split words. */
     if (ssub || spbreak || spsep || sep) {
 	if (isarr)
 	    val = sepjoin(aval, sep, 1), isarr = 0;
