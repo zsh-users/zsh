@@ -295,29 +295,86 @@ singsub(char **s)
     DPUTS(nonempty(&foo), "BUG: singsub() produced more than one word!");
 }
 
-/* Perform substitution on a single word. Unlike with singsub, the      *
- * result can have more than one word. A single word result is stored   *
- * in *s and *isarr is set to zero; otherwise *isarr is set to 1 and    *
- * the result is stored in *a. If `a' is zero a multiple word result is *
- * joined using sep or the IFS parameter if sep is zero and the result  *
- * is returned in *s.  The return value is true iff the expansion       *
- * resulted in an empty list.                                           *
- * The mult_isarr variable is used by paramsubst() to tell if it yields *
- * an array.                                                            */
+/* Perform substitution on a single word, *s. Unlike with singsub(), the
+ * result can be more than one word. If split is non-zero, the string is
+ * first word-split using IFS, but only for non-quoted "whitespace" (as
+ * indicated by Dnull, Snull, Tick, Bnull, Inpar, and Outpar).
+ *
+ * If arg "a" was non-NULL _and_ the parsing set mult_isarr, the resulting
+ * strings are stored in *a (even for a 1-element array) and *isarr is set
+ * to 1.  Otherwise, *isarr is set to 0, and the result is stored in *s,
+ * with any necessary joining of multiple elements using sep (which can be
+ * NULL to use IFS).  The return value is true iff the expansion resulted
+ * in an empty list.
+ *
+ * The mult_isarr variable is used by paramsubst() to tell us if the
+ * substitutions yielded an array, but we will also set it if we split *s
+ * into multiple items (since that also yields an array). */
 
 /**/
 static int mult_isarr;
 
 /**/
 static int
-multsub(char **s, char ***a, int *isarr, UNUSED(char *sep))
+multsub(char **s, int split, char ***a, int *isarr, char *sep)
 {
     int l, omi = mult_isarr;
-    char **r, **p;
+    char **r, **p, *x = *s;
     local_list1(foo);
 
     mult_isarr = 0;
-    init_list1(foo, *s);
+
+    if (split) {
+	for ( ; *x; x += l+1) {
+	    char c = (l = *x == Meta) ? x[1] ^ 32 : *x;
+	    if (!iwsep(c))
+		break;
+	}
+    }
+
+    init_list1(foo, x);
+
+    if (split) {
+	LinkNode n = firstnode(&foo);
+	int inq = 0, inp = 0;
+	split = 0; /* use this to flag if we really split anything */
+	for ( ; *x; x += l+1) {
+	    char c = (l = *x == Meta) ? x[1] ^ 32 : *x;
+	    if (!inq && !inp && isep(c)) {
+		*x = '\0';
+		for (x += l+1; *x; x += l+1) {
+		    c = (l = *x == Meta) ? x[1] ^ 32 : *x;
+		    if (!isep(c))
+			break;
+		}
+		if (!*x)
+		    break;
+		insertlinknode(&foo, n, (void *)x), incnode(n);
+		split = 1;
+	    }
+	    switch (c) {
+	    case Dnull:  /* " */
+	    case Snull:  /* ' */
+	    case Tick:   /* ` (note: no Qtick!) */
+		/* These always occur in unnested pairs. */
+		inq = !inq;
+		break;
+	    case Inpar:  /* ( */
+		inp++;
+		break;
+	    case Outpar: /* ) */
+		inp--;
+		break;
+	    case Bnull:  /* \ */
+	    case Bnullkeep:
+		/* The parser verified the following char's existence. */
+		x += l+1;
+		l = *x == Meta;
+		break;
+	    }
+	}
+    }
+
     prefork(&foo, 0);
     if (errflag) {
 	if (isarr)
@@ -325,7 +382,10 @@ multsub(char **s, char ***a, int *isarr, UNUSED(char *sep))
 	mult_isarr = omi;
 	return 0;
     }
-    if ((l = countlinknodes(&foo))) {
+    if (split)
+	mult_isarr = 1;
+
+    if ((l = countlinknodes(&foo)) > 1 || (a && mult_isarr)) {
 	p = r = hcalloc((l + 1) * sizeof(char*));
 	while (nonempty(&foo))
 	    *p++ = (char *)ugetnode(&foo);
@@ -345,7 +405,7 @@ multsub(char **s, char ***a, int *isarr, UNUSED(char *sep))
 	    mult_isarr = omi;
 	    return 0;
 	}
-	*s = sepjoin(r, NULL, 1);
+	*s = sepjoin(r, sep, 1);
 	mult_isarr = omi;
 	if (isarr)
 	    *isarr = 0;
@@ -1457,7 +1517,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	 * remove the aspar test and extract a value from an array, if
 	 * necessary, when we handle (P) lower down.
 	 */
-	if (multsub(&val, (aspar ? NULL : &aval), &isarr, NULL) && quoted) {
+	if (multsub(&val, 0, (aspar ? NULL : &aval), &isarr, NULL) && quoted) {
 	    /* Empty quoted string --- treat as null string, not elided */
 	    isarr = -1;
 	    aval = (char **) hcalloc(sizeof(char *));
@@ -1992,26 +2052,20 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	/* Fall Through! */
 	case '-':
 	    if (vunset) {
+		int ws = opts[SHWORDSPLIT];
 		val = dupstring(s);
-		/*
-		 * This is not good enough for sh emulation!  Sh would
-		 * split unquoted substrings, yet not split quoted ones
-		 * (except according to $@ rules); but this leaves the
-		 * unquoted substrings unsplit, and other code below
-		 * for spbreak splits even within the quoted substrings.
-		 *
-		 * TODO: I think multsub needs to be told enough to
-		 * decide about splitting with spbreak at this point
-		 * (and equally in the `=' handler below).  Then
-		 * we can turn off spbreak to avoid the join & split
-		 * nastiness later.
-		 *
-		 * What we really want to do is make this look as
-		 * if it were the result of an assignment from
-		 * the same value, taking account of quoting.
-		 */
-		multsub(&val, (aspar ? NULL : &aval), &isarr, NULL);
+		/* If word-splitting is enabled, we ask multsub() to split
+		 * the substituted string at unquoted whitespace.  Then, we
+		 * turn off spbreak so that no further splitting occurs.
+		 * This allows a construct such as ${1+"$@"} to correctly
+		 * keep its array splits, and weird constructs such as
+		 * ${str+"one two" "3 2 1" foo "$str"} to only be split
+		 * at the unquoted spaces. */
+		opts[SHWORDSPLIT] = spbreak;
+		multsub(&val, spbreak && !aspar, (aspar ? NULL : &aval), &isarr, NULL);
+		opts[SHWORDSPLIT] = ws;
 		copied = 1;
+		spbreak = 0;
 	    }
 	    break;
 	case ':':
@@ -2029,7 +2083,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		*idend = '\0';
 		val = dupstring(s);
-		isarr = 0;
 		/*
 		 * TODO: this is one of those places where I don't
 		 * think we want to do the joining until later on.
@@ -2037,9 +2090,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		 * point and unset them.
 		 */
 		if (spsep || spbreak || !arrasg)
-		    multsub(&val, NULL, NULL, sep);
+		    multsub(&val, 0, NULL, &isarr, NULL);
 		else
-		    multsub(&val, &aval, &isarr, NULL);
+		    multsub(&val, 0, &aval, &isarr, NULL);
 		if (arrasg) {
 		    /*
 		     * This is an array assignment in a context
