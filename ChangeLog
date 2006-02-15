@@ -1,3 +1,8 @@
+2006-02-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22270; Src/subst.c, Test/D04parameter.ztst: fixed a long-standing
+	problem with ${name+$array$scalar}.
+
 2006-02-15  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: use zsh to
