@@ -453,6 +453,8 @@ item(tt(${)var(name)tt(:-)var(word)tt(}))(
 If var(name) is set and is non-null then substitute its
 value; otherwise substitute var(word). If var(name) is
 missing, substitute var(word).
+Note that you can use standard shell quoting in the var(word) value to
+selectively override any field splitting that may be active.
 )
 xitem(tt(${)var(name)tt(:=)var(word)tt(}))
 item(tt(${)var(name)tt(::=)var(word)tt(}))(
@@ -470,6 +472,8 @@ If var(word) is omitted, then a standard message is printed.
 item(tt(${)var(name)tt(:PLUS())var(word)tt(}))(
 If var(name) is set and is non-null then substitute
 var(word); otherwise substitute nothing.
+Note that you can use standard shell quoting in the var(word) value to
+selectively override any field splitting that may be active.
 )
 enditem()
 
@@ -853,7 +857,7 @@ on the right.
 item(tt(s:)var(string)tt(:))(
 Force field splitting (see the option tt(SH_WORD_SPLIT)) at the
 separator var(string).  Note that a var(string) of two or more
-characters means all must all match in sequence; this differs from
+characters means that all of them must match in sequence; this differs from
 the treatment of two or more characters in the tt(IFS) parameter.
 )
 enditem()
