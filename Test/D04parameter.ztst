@@ -37,6 +37,7 @@
 
   setopt shwordsplit
   print -l $foo ${bar}
+  print -l ${==bar}
   unsetopt shwordsplit
 0:Basic shwordsplit option handling
 >the
@@ -45,6 +46,7 @@
 >the
 >second
 >parameter
+>the second parameter
 
   print $+foo ${+foo} $+notappearinginthistest ${+notappearinginthistest}
 0:$+...
@@ -547,20 +549,154 @@
 >shell
 >again
 
-  set If "this test fails" maybe "we have finally fixed" the shell
+  local sure_that='sure that' varieties_of='varieties of' one=1 two=2
+  set Make $sure_that "this test keeps" on 'preserving all' "$varieties_of" quoted whitespace
   print -l ${=1+"$@"}
-0:Regression test of unfixed ${=1+"$@"} bug
->If
->this
->test
->fails
->maybe
->we
->have
->finally
->fixed
->the
->shell
+  print -l ${=1+Make $sure_that "this test keeps" on 'preserving all' "$varieties_of" quoted whitespace}
+  print -l ${=1+$one $two}
+0:Regression test of ${=1+"$@"} bug and some related expansions
+>Make
+>sure that
+>this test keeps
+>on
+>preserving all
+>varieties of
+>quoted
+>whitespace
+>Make
+>sure
+>that
+>this test keeps
+>on
+>preserving all
+>varieties of
+>quoted
+>whitespace
+>1
+>2
+
+  splitfn() {
+    emulate -L sh
+    local HOME="/differs from/bash" foo='1 2' bar='3 4'
+    print -l ${1:-~}
+    touch has\ space
+    print -l ${1:-*[ ]*}
+    print -l ${1:-*[\ ]*}
+    print -l ${1:-*}
+    print -l ${1:-"$foo" $bar}
+    print -l ${==1:-$foo $bar}
+    rm has\ space
+  }
+  splitfn
+0:More bourne-shell-compatible nested word-splitting with wildcards and ~
+>/differs from/bash
+>*[
+>]*
+>has space
+>boringfile
+>evenmoreboringfile
+>has space
+>1 2
+>3
+>4
+>1 2 3 4
+
+  splitfn() {
+    local IFS=.-
+    local foo=1-2.3-4
+    #
+    print "Called with argument '$1'"
+    print "No quotes"
+    print -l ${=1:-1-2.3-4} ${=1:-$foo}
+    print "With quotes on default argument only"
+    print -l ${=1:-"1-2.3-4"} ${=1:-"$foo"}
+  }
+  print 'Using "="'
+  splitfn
+  splitfn 5.6-7.8
+  #
+  splitfn() {
+    emulate -L zsh
+    setopt shwordsplit
+    local IFS=.-
+    local foo=1-2.3-4
+    #
+    print "Called with argument '$1'"
+    print "No quotes"
+    print -l ${1:-1-2.3-4} ${1:-$foo}
+    print "With quotes on default argument only"
+    print -l ${1:-"1-2.3-4"} ${1:-"$foo"}
+  }
+  print Using shwordsplit
+  splitfn
+  splitfn 5.6-7.8
+0:Test of nested word splitting with and without quotes
+>Using "="
+>Called with argument ''
+>No quotes
+>1
+>2
+>3
+>4
+>1
+>2
+>3
+>4
+>With quotes on default argument only
+>1-2.3-4
+>1-2.3-4
+>Called with argument '5.6-7.8'
+>No quotes
+>5
+>6
+>7
+>8
+>5
+>6
+>7
+>8
+>With quotes on default argument only
+>5
+>6
+>7
+>8
+>5
+>6
+>7
+>8
+>Using shwordsplit
+>Called with argument ''
+>No quotes
+>1
+>2
+>3
+>4
+>1
+>2
+>3
+>4
+>With quotes on default argument only
+>1-2.3-4
+>1-2.3-4
+>Called with argument '5.6-7.8'
+>No quotes
+>5
+>6
+>7
+>8
+>5
+>6
+>7
+>8
+>With quotes on default argument only
+>5
+>6
+>7
+>8
+>5
+>6
+>7
+>8
 
   unset SHLVL
   (( SHLVL++ ))
