@@ -122,8 +122,8 @@ command line are not split into words.  See the description of the shell option
 tt(SH_WORD_SPLIT) in
 ifzman(the section `Parameter Expansion' in zmanref(zshexpn))\
 ifnzman(noderef(Parameter Expansion)).
-In zsh, you should use arrays when you want variables to expand to more
-than one word.  See
+In zsh, you can either explicitly request the splitting (e.g. tt(${=foo}))
+or use an array when you want a variable to expand to more than one word.  See
 ifzman(the section `Array Parameters' in zmanref(zshparam))\
 ifnzman(noderef(Array Parameters)).
 
