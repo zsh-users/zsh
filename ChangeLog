@@ -1,3 +1,8 @@
+2006-02-16  Peter Stephenson  <pws@csr.com>
+
+	* 22272: INSTALL, README, Config/version.mk, Etc/CONTRIBUTORS,
+	Etc/FAQ.yo: 4.3.0-dev-4.
+
 2006-02-15  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22270; Src/subst.c, Test/D04parameter.ztst: fixed a long-standing

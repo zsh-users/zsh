@@ -266,7 +266,11 @@ Multibyte Character Support
 Support for multibyte character sets that extend ASCII, such as UTF-8, is
 under development but the code in the line editor is sufficiently stable to
 be turned on by default in environments that provide full ISO 10646 support
-including the preprocessor definition __STDC_ISO_10646__.
+including the preprocessor definition __STDC_ISO_10646__.  In principle
+this definition does not guarantee the full environment, but in practice
+systems with this defined also provide suitable library support.  The shell
+does not probe for all the features, so on other systems use of multibyte
+support must be explicitly enabled when it is available.
 
 The support can be explicitly enabled or disable with --enable-multibyte or
 --disable-multibyte.  Reports of systems where multibyte support was not

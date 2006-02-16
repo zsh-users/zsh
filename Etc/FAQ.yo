@@ -95,7 +95,7 @@ Chapter 3:  How to get various things to work
 3.2. In which startup file do I put...?
 3.3. What is the difference between `export' and the ALL_EXPORT option?
 3.4. How do I turn off spelling correction/globbing for a single command?
-3.5. How do I get the meta key to work on my xterm?
+3.5. How do I get the Meta key to work on my xterm?
 3.6. How do I automatically display the directory in my xterm title bar?
 3.7. How do I make the completion list use eight bit characters?
 3.8. Why do the cursor (arrow) keys not work?
@@ -1163,13 +1163,20 @@ sect(How do I turn off spelling correction/globbing for a single command?)
   be expanded before the rest of the command line is parsed.
 
 
-sect(How do I get the meta key to work on my xterm?)
+sect(How do I get the Meta key to work on my xterm?)
 label(35)
 
-  As stated in the manual, zsh needs to be told about the meta key by
+  The Meta key isn't present on a lot of keyboards, but on some
+  the Alt key has the same effect.  If a character is typed on the
+  keyboard while the Meta key is held down, the characters is sent
+  as terminal input with its eighth bit set.  For example, ASCII
+  mytt(A), hex 65, becomes hex E5.  This is sometimes used to provide
+  extra editing commands.
+
+  As stated in the manual, zsh needs to be told about the Meta key by
   using mytt(bindkey -me) or mytt(bindkey -mv) in your .zshrc or on the
   command line.  You probably also need to tell the terminal driver to
-  allow the `meta' bit of the character through; mytt(stty pass8) is the
+  allow the `Meta' bit of the character through; mytt(stty pass8) is the
   usual incantation.  Sample .zshrc entry:
   verb(
     [[ $TERM = "xterm" ]] && stty pass8 && bindkey -me
@@ -1186,7 +1193,12 @@ label(35)
   have tinkered with it.
 
   You don't need the mytt(bindkey) to be able to define your own sequences
-  with the meta key, though you still need the mytt(stty).
+  with the Meta key, though you still need the mytt(stty).
+
+  If you are using multibyte input directly from the keyboard you
+  probably don't want to use this feature since the eighth bit in
+  each byte is used to indicate a part of a multibyte character.  See
+  link(chapter 5)(c5).
 
 
 sect(How do I automatically display the directory in my xterm title bar?)
@@ -1953,6 +1965,7 @@ sect(Suppose I want to complete all files during a special completion?)
 
 
 chapter(Multibyte input)
+label(c5)
 
 sect(What is multibyte input?)
 
@@ -1994,7 +2007,7 @@ sect(What is multibyte input?)
   characters.  However, in the case of Unicode, UTF-8 is the only one you
   are likely to enounter.
 
-  (In case you're confused: Unicode is the characters set, while UTF-8 is
+  (In case you're confused: Unicode is the character set, while UTF-8 is
   an encoding of it.  You might hear about other encodings, such as UCS-2
   and UCS-4 which are basically the character's index in the character set
   as a two-octet or four-octet integer.  You might see files encoded this
@@ -2015,14 +2028,21 @@ sect(How does zsh handle multibyte input?)
   has been compiled with the appropriate definitions.  This will happen
   automatically if the compiler defines __STDC_ISO_10646__, which is true
   for many recent GNU-based systems.  On other systems you must configure
-  zsh with the argument --enable-multibyte to configure.  (The reason for
-  this is that the presence of __STDC_ISO_10646__ ensures all the required
-  library support is present, short-circuiting a large number of
-  configuration tests.)  Explicit use of --enable-multibyte should work on
-  many other recent UNIX systems; if it works on yours, and that's not
-  mentioned in the shell documentation, please report this to
-  zsh-workers@sunsite.dk, and if it doesn't but you can work out why not
-  we'd also be interested in hearing.
+  zsh with the argument --enable-multibyte to configure.  Explicit use of
+  --enable-multibyte should work on many other recent UNIX systems; if it
+  works on yours, and that's not mentioned in the shell documentation,
+  please report this to zsh-workers@sunsite.dk, and if it doesn't but you
+  can work out why not we'd also be interested in hearing.
+
+  (The reason for the test for __STDC_ISO_10646__ is that its presence
+  happens to indicate that the required library support is likely to be
+  present, short-circuiting a large number of configuration tests.  This
+  isn't strictly guaranteed, since the definition indicates the rather more
+  limited fact that the wide character representation used internally by
+  the shell is Unicode.  However, in practice such systems provide the
+  right level of support for zsh to use.  It would be better to test
+  individually for the library features the shell needs; unfortunately
+  there are a lot of them.)
 
   You can test if multibyte handling is compiled into your version of the
   shell by running:
@@ -2100,6 +2120,14 @@ sect(How do I ensure multibyte input works on my system?)
       Unicode characters than others.
   )
 
+  As mentioned in the previous section, mytt(bindkey -m) now outputs
+  a warning message telling you that multibyte input from the terminal
+  is likely not to work.  (See link(3.5)(35) if you don't know what
+  this feature does.)  If your terminal doesn't have characters
+  that need to be input as multibyte, however, you can still use
+  the meta bindings and can ignore the warning message.  Use
+  mytt(bindkey -m 2>/dev/null) to suprress it.
+
 
 sect(How can I input characters that aren't on my keyboard?)
 
@@ -2119,7 +2147,7 @@ sect(How can I input characters that aren't on my keyboard?)
 
   tt(insert-composed-char) is followed by two characters that
   are a mnemonic for a multibyte character.  For example mytt(a:)
-  is a with an umlaut; mytt(cH) is the symbol for hearts on a playing
+  is a with an Umlaut; mytt(cH) is the symbol for hearts on a playing
   card.  Various accented characters, European and related alphabets,
   and punctuation and mathematical symbols are available.  The
   mnemonics are mostly those given by RFC 1345, see

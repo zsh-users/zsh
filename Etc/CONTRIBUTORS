@@ -12,8 +12,22 @@ See the ChangeLog files for a complete list of people who have submitted
 patches.  Note that email addresses below and in the ChangeLog file
 are included for disambiguation purposes only, and are not guaranteed
 to be currently accurate.  If you feel that you or someone else have
-been unfairly omitted from this list please mail the current maintainer
-at <coordinator@zsh.org>.
+been unfairly omitted from this list please mail the list
+<zsh-workers@sunsite.dk>.
+
+Version 4.3
+-----------
+
+Contributors to the main shell include Clint Adams, Andrey Borzenkov, Dan
+Bullok, Thorsten Dahlheimer, Wayne Davison, Oliver Kiddle, Matthias
+Kopferman, Dan Nelson, Toby Peterson, R. Ramkumar, Bart Schaefer, Joerg
+Sonnenberger, Peter Stephenson, Philippe Troin, Geoff Wing.
+
+Contributors to completion functions include those above plus Zack Cerza,
+Danek Duvall, Tobias Gruetzmacher, Dough Kearns, Hannu Koivisto, Henryk
+Konsek, Scott Murray, Carlos Phillips, Haakon Riiser, Felix Rosencrantz,
+Stephen Rüger, Kris Shannon, Travis Spencer, Mårten Svantesson, Motoi
+Washida, Jess Weinstein.
 
 Version 4.2
 -----------
