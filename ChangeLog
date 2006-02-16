@@ -1,5 +1,8 @@
 2006-02-16  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* 22275: Doc/Zsh/expn.yo: a few more improvements in the
+	discussion of field splitting, the = flag, and SH_WORD_SPLIT.
+
 	* 22273: Src/subst.c, Test/D04parameter.ztst, README: made
 	${(A)=name:=word} not split on quoted whitespace and fixed
 	a typo in the README.
