@@ -551,9 +551,10 @@
 
   local sure_that='sure that' varieties_of='varieties of' one=1 two=2
   extra=(5 4 3)
+  unset foo
   set Make $sure_that "this test keeps" on 'preserving all' "$varieties_of" quoted whitespace
   print -l ${=1+"$@"}
-  print -l ${=1+Make $sure_that "this test keeps" on 'preserving all' "$varieties_of" quoted whitespace}
+  print -l ${(A)=foo=Make $sure_that "this test keeps" on 'preserving all' "$varieties_of" quoted whitespace}
   print -l ${=1+$one $two}
   print -l ${1+$extra$two$one}
 0:Regression test of ${=1+"$@"} bug and some related expansions
