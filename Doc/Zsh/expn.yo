@@ -444,6 +444,7 @@ element of var(name) is substituted, one element per word.  Otherwise, the
 expansion results in one word only; with tt(KSH_ARRAYS), this is the first
 element of an array.  No field splitting is done on the result unless the
 tt(SH_WORD_SPLIT) option is set.
+See also the flags tt(=) and tt(s:)var(string)tt(:).
 )
 item(tt(${PLUS())var(name)tt(}))(
 If var(name) is the name of a set parameter `tt(1)' is substituted,
@@ -454,7 +455,8 @@ If var(name) is set and is non-null then substitute its
 value; otherwise substitute var(word). If var(name) is
 missing, substitute var(word).
 Note that you can use standard shell quoting in the var(word) value to
-selectively override any field splitting that may be active.
+selectively override the splitting done by the tt(SH_WORD_SPLIT) option
+and the tt(=) flag, but not the tt(s:)var(string)tt(:) flag.
 )
 xitem(tt(${)var(name)tt(:=)var(word)tt(}))
 item(tt(${)var(name)tt(::=)var(word)tt(}))(
@@ -473,7 +475,8 @@ item(tt(${)var(name)tt(:PLUS())var(word)tt(}))(
 If var(name) is set and is non-null then substitute
 var(word); otherwise substitute nothing.
 Note that you can use standard shell quoting in the var(word) value to
-selectively override any field splitting that may be active.
+selectively override the splitting done by the tt(SH_WORD_SPLIT) option
+and the tt(=) flag, but not the tt(s:)var(string)tt(:) flag.
 )
 enditem()
 
@@ -839,8 +842,8 @@ in string arguments to any of the flags described below.
 item(tt(j:)var(string)tt(:))(
 Join the words of arrays together using var(string) as a separator.
 pindex(SH_WORD_SPLIT, use of)
-Note that this occurs before field splitting by the tt(SH_WORD_SPLIT)
-option.
+Note that this occurs before field splitting by the tt(s:)var(string)tt(:)
+flag or the tt(SH_WORD_SPLIT) option.
 )
 item(tt(l:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
 Pad the resulting words on the left.  Each word will be truncated if
@@ -855,10 +858,11 @@ As tt(l), but pad the words on the right and insert var(string2)
 on the right.
 )
 item(tt(s:)var(string)tt(:))(
-Force field splitting (see the option tt(SH_WORD_SPLIT)) at the
+Force field splitting at the
 separator var(string).  Note that a var(string) of two or more
 characters means that all of them must match in sequence; this differs from
 the treatment of two or more characters in the tt(IFS) parameter.
+See also the tt(=) flag and the tt(SH_WORD_SPLIT) option.
 )
 enditem()
 
