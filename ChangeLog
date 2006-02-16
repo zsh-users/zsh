@@ -1,5 +1,8 @@
 2006-02-16  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* unposted: Completion/Unix/Type/_hosts: weed out hashed-entry
+	lines from the known_hosts file (these lines start with a '|').
+
 	* 22275: Doc/Zsh/expn.yo: a few more improvements in the
 	discussion of field splitting, the = flag, and SH_WORD_SPLIT.
 
