@@ -2070,27 +2070,23 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '=':
 	case Equals:
 	    if (vunset) {
+		int ws = opts[SHWORDSPLIT];
 		char sav = *idend;
 		int l;
 
 		*idend = '\0';
 		val = dupstring(s);
-		/*
-		 * TODO: this is one of those places where I don't
-		 * think we want to do the joining until later on.
-		 * We also need to handle spbreak and spsep at this
-		 * point and unset them.
-		 */
-		if (spsep || spbreak || !arrasg)
+		if (spsep || !arrasg) {
+		    opts[SHWORDSPLIT] = 0;
 		    multsub(&val, 0, NULL, &isarr, NULL);
-		else
-		    multsub(&val, 0, &aval, &isarr, NULL);
+		} else {
+		    opts[SHWORDSPLIT] = spbreak;
+		    multsub(&val, spbreak, &aval, &isarr, NULL);
+		    spbreak = 0;
+		}
+		opts[SHWORDSPLIT] = ws;
 		if (arrasg) {
-		    /*
-		     * This is an array assignment in a context
-		     * where we have no syntactic way of finding
-		     * out what an array element is.  So we just guess.
-		     */
+		    /* This is an array assignment. */
 		    char *arr[2], **t, **a, **p;
 		    if (spsep || spbreak) {
 			aval = sepsplit(val, spsep, 0, 1);
