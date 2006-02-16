@@ -30,7 +30,7 @@ The option SH_WORD_SPLIT, used in Bourne/Korn/Posix shell compatibility
 mode, has been made more like other shells in the case of substitutions of
 the form ${1+"$@"} (a common trick used to work around problems in older
 Bourne shells) or any of the related forms with the + replaced by - or =
-with an optional colon following.  Previously, with SH_WORD_SPLIT in
+with an optional colon preceding.  Previously, with SH_WORD_SPLIT in
 effect, this expression would cause splitting on all white space in the
 shell arguments.  (This was always regarded as a bug but was long-standing
 behaviour.)  Now it is treated identically to "$@".  The same change
