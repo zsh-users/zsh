@@ -1,3 +1,7 @@
+2006-02-16  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22273 (1st hunk): README: fixed a typo.
+
 2006-02-16  Peter Stephenson  <pws@csr.com>
 
 	* 22272: INSTALL, README, Config/version.mk, Etc/CONTRIBUTORS,
