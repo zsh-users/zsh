@@ -23,7 +23,7 @@ if ! zstyle -a ":completion:${curcontext}:hosts" hosts _hosts; then
     fi
 
     if [[ -r ~/.ssh/known_hosts ]]; then
-      _cache_hosts+=(${${${(u)${(f)"$(<~/.ssh/known_hosts)"}%%[ ,#]*}:#(#s)[0-9]##.[0-9]##.[0-9]##.[0-9]##(#e)}:#(#s)[0-9a-f:]##(#e)})
+      _cache_hosts+=(${${${(u)${(f)"$(<~/.ssh/known_hosts)"}%%[ ,|#]*}:#(#s)[0-9]##.[0-9]##.[0-9]##.[0-9]##(#e)}:#(#s)[0-9a-f:]##(#e)})
     fi
   fi
 
