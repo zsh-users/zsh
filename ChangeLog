@@ -1,3 +1,7 @@
+2006-02-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Test/D04parameter.ztst: a few minor additions.
+
 2006-02-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Type/_hosts: weed out hashed-entry
