@@ -224,14 +224,31 @@
 >second line
 >third line
 
+  array1=( uno )
   print -l ${(A)newarray=splitting by numbers}
+  print -l ${(t)newarray}
   print -l ${(A)=newarray::=splitting by spaces, actually}
-0:${(A)...=...}, ${(A)...::=...}
+  print -l ${(t)newarray}
+  print -l ${(A)newarray::=$array1}
+  print -l ${(t)newarray}
+  print -l ${newarray::=$array1}
+  print -l ${(t)newarray}
+  print -l ${newarray::=$array2}
+  print -l ${(t)newarray}
+0:${(A)...=...}, ${(A)...::=...}, ${scalar=$array}
 >splitting by numbers
+>array
 >splitting
 >by
 >spaces,
 >actually
+>array
+>uno
+>array
+>uno
+>scalar
+>the second array
+>scalar
 
   newarray=("split me" "split me" "I\'m yours")
   print -l "${(@)newarray}"
@@ -539,9 +556,11 @@
 
   set If "this test fails" "we have broken" the shell again
   print -l "${(A)foo::=$@}"
+  print -l ${(t)foo}
   print -l $foo
 0:Regression test of "${(A)foo=$@}" bug
 >If this test fails we have broken the shell again
+>array
 >If
 >this test fails
 >we have broken
@@ -555,6 +574,7 @@
   set Make $sure_that "this test keeps" on 'preserving all' "$varieties_of" quoted whitespace
   print -l ${=1+"$@"}
   print -l ${(A)=foo=Make $sure_that "this test keeps" on 'preserving all' "$varieties_of" quoted whitespace}
+  print ${(t)foo}
   print -l ${=1+$one $two}
   print -l ${1+$extra$two$one}
 0:Regression test of ${=1+"$@"} bug and some related expansions
@@ -575,6 +595,7 @@
 >varieties of
 >quoted
 >whitespace
+>array
 >1
 >2
 >5
