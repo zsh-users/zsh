@@ -2229,8 +2229,9 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 {
 #ifdef MULTIBYTE_SUPPORT
     mbstate_t mbs;
-    char *t, *f, *new_str = NULL;
-    int fl, eol = 0;
+    char curchar, *t, *f, *fs, *fe, *new_str = NULL;
+    size_t cnt;
+    wchar_t wc;
 #endif
     Cmatch cm;
     Aminfo ai = (alt ? fainfo : ainfo);
@@ -2456,12 +2457,14 @@ add_match_data(int alt, char *str, char *orig, Cline line,
     /* If "str" contains a character that won't convert into a wide
      * character, change it into a $'\123' sequence. */
     memset(&mbs, '\0', sizeof mbs);
-    for (t = f = str, fl = stl; fl > 0; ) {
-	wchar_t wc;
-	size_t cnt = eol ? MB_INVALID : mbrtowc(&wc, f, fl, &mbs);
+    for (t = f = fs = str, fe = f + stl; fs < fe; ) {
+	if ((curchar = *f++) == Meta)
+	    curchar = *f++ ^ 32;
+	cnt = mbrtowc(&wc, &curchar, 1, &mbs);
 	switch (cnt) {
 	case MB_INCOMPLETE:
-	    eol = 1;
+	    if (f < fe)
+		continue;
 	    /* FALL THROUGH */
 	case MB_INVALID:
 	    /* Get mbs out of its undefined state. */
@@ -2472,27 +2475,25 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 		memcpy(new_str, str, t - str);
 		t = new_str + (t - str);
 	    }
-	    *t++ = '$';
-	    *t++ = '\'';
-	    *t++ = '\\';
-	    *t++ = '0' + ((STOUC(*f) >> 6) & 7);
-	    *t++ = '0' + ((STOUC(*f) >> 3) & 7);
-	    *t++ = '0' + (STOUC(*f) & 7);
-	    *t++ = '\'';
-	    f++;
-	    fl--;
+	    /* Backup and output just the first bad char unless we
+	     * got an MB_INCOMPLETE at the end of the string. */
+	    f = fs;
+	    do {
+		if ((curchar = *f++) == Meta)
+		    curchar = *f++ ^ 32;
+		*t++ = '$';
+		*t++ = '\'';
+		*t++ = '\\';
+		*t++ = '0' + ((STOUC(curchar) >> 6) & 7);
+		*t++ = '0' + ((STOUC(curchar) >> 3) & 7);
+		*t++ = '0' + (STOUC(curchar) & 7);
+		*t++ = '\'';
+	    } while (cnt == MB_INCOMPLETE && f < fe);
+	    fs = f;
 	    break;
-	case 0:
-	    /* Converting '\0' returns 0, but a '\0' is a real
-	     * character for us, so we should consume 1 byte
-	     * (certainly true for Unicode and unlikely to be false
-	     * in any non-pathological multibyte representation). */
-	    cnt = 1;
-	    /* FALL THROUGH */
 	default:
-	    fl -= cnt;
-	    while (cnt--)
-		*t++ = *f++;
+	    while (fs < f)
+		*t++ = *fs++;
 	    break;
 	}
     }
