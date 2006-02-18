@@ -1,3 +1,8 @@
+2006-02-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* users/9936: Src/Zle/compcore.c: fixed the newest check for
+	invalid characters to parse the string as metafied.
+
 2006-02-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Test/D04parameter.ztst: a few minor additions.
