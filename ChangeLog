@@ -1,3 +1,14 @@
+2006-02-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22285:
+	Completion/Unix/Command/_imagemagick: handling of file arguments
+	didn't work.
+	Doc/Zsh/intro.yo: zshtcpsys and zshcontrib manual pages weren't
+	listed.
+	Functions/MIME/pick-web-browser: add Firefox.
+	Functions/MIME/zsh-mime-setup: take account of handler and flags
+	styles when listing.
+	
 2006-02-19  Clint Adams  <clint@zsh.org>
 
 	* 22284: configure.ac, Src/glob.c, Src/hashtable.c, Src/init.c,

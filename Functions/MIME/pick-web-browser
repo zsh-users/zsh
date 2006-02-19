@@ -28,7 +28,7 @@ local -a xbrowsers ttybrowsers
 # a remote URL.  You can change the order of preference.
 # If none is already running, starts the first in the array.
 zstyle -a :mime: x-browsers xbrowsers ||
-  xbrowsers=(mozilla netscape opera konqueror)
+  xbrowsers=(firefox mozilla netscape opera konqueror)
 # Preferred command line browser.  Used if there is on $DISPLAY set.
 zstyle -a :mime: tty-browsers ttybrowsers ||
   ttybrowsers=(links lynx)
@@ -89,6 +89,9 @@ if [[ -n $DISPLAY ]]; then
 	# MIME handling, not just web pages.
 	kfmclient openURL $url ||
 	  dcop $(dcop|grep konqueror) default openBrowserWindow $url
+      elif [[ $browser = firefox ]]; then
+	  # open in new tab: should make this customizable
+	  $browser -new-tab $url
       else
 	# Mozilla bells and whistles are described at:
 	# http://www.mozilla.org/unix/remote.html

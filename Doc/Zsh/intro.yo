@@ -26,7 +26,9 @@ list(em(zshcompwid)   Zsh completion widgets)
 list(em(zshcompsys)   Zsh completion system)
 list(em(zshcompctl)   Zsh completion control)
 list(em(zshmodules)   Zsh loadable modules)
+list(em(zshtcpsys)    Zsh built-in TCP functions)
 list(em(zshzftpsys)   Zsh built-in FTP client)
+list(em(zshcontrib)   Additional zsh functions and utilities)
 ifzshone(\
 list(em(zshall)       Meta-man page containing all of the above)
 )\

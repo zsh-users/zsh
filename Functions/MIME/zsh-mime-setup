@@ -32,11 +32,19 @@ done
 
 
 if [[ -n $o_list ]]; then
-  # List and return.
+  # List and return.  Remember that suffixes may be overridden by styles.
+  # However, we require some sort of standard handler to be present,
+  # so we don't need to search styles for suffixes that aren't
+  # handled.  Yet.
+  local list_word
   for suffix in ${(ko)zsh_mime_handlers}; do
-      print ${(r.10.)suffix}${zsh_mime_handlers[$suffix]}
-      if [[ -n ${zsh_mime_flags[$suffix]} ]]; then
-	print "  flags: ${zsh_mime_flags[$suffix]}"
+      zstyle -s ":mime:.$suffix:" handler list_word ||
+        list_word=${zsh_mime_handlers[$suffix]}
+      print ${(r.10.)suffix}$list_word
+      zstyle -s ":mime:.$suffix:" flags list_word ||
+        list_word=${zsh_mime_flags[$suffix]}
+      if [[ -n $list_word ]]; then
+	print "  flags: $list_word"
       fi
   done
   return 0
