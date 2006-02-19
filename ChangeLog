@@ -1,7 +1,12 @@
+2006-02-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: added the missing
+	-h option for daemon mode.
+
 2006-02-18  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/9936: Src/Zle/compcore.c: fixed the newest check for
-	invalid characters to parse the string as metafied.
+	invalid characters (it now parses the string as metafied).
 
 2006-02-17  Wayne Davison  <wayned@users.sourceforge.net>
 
