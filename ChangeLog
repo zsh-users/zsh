@@ -1,3 +1,10 @@
+2006-02-19  Clint Adams  <clint@zsh.org>
+
+	* 22284: configure.ac, Src/glob.c, Src/hashtable.c, Src/init.c,
+	Src/params.c, Src/system.h, Src/Modules/stat.c: add
+	--disable-dynamic-nss configure switch to disable use of
+	getpw*(), getgr*(), initgroups() functions.
+
 2006-02-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync: added the missing

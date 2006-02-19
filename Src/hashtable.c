@@ -1340,7 +1340,7 @@ fillnameddirtable(UNUSED(HashTable ht))
 	    }
 	}
 #else  /* no NIS or NIS_PLUS */
-#ifdef HAVE_GETPWENT
+#ifdef USE_GETPWENT
 	struct passwd *pw;
  
 	setpwent();

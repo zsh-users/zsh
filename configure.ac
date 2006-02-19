@@ -2099,6 +2099,23 @@ if test $zsh_cv_c_zle_unicode_support = yes; then
   AC_DEFINE(MULTIBYTE_SUPPORT)
 fi
 
+dnl
+dnl static user lookup
+dnl
+AC_ARG_ENABLE(dynamic-nss,
+	      AC_HELP_STRING([--disable-dynamic-nss], [do not call
+			      functions that will require dynamic NSS
+			      modules]),
+[zsh_cv_c_dynamic_nss=$enableval],
+[])
+
+AH_TEMPLATE([DISABLE_DYNAMIC_NSS],
+[Define to 1 if you want to avoid calling functions that will require
+ dynamic NSS modules.])
+if test $zsh_cv_c_dynamic_nss = no; then
+  AC_DEFINE(DISABLE_DYNAMIC_NSS)
+fi
+
 dnl ---------------
 dnl dynamic loading
 dnl ---------------

@@ -166,13 +166,13 @@ statgidprint(gid_t gid, char *outbuf, int flags)
 	    strcat(outbuf, " (");
     }
     if (flags & STF_STRING) {
-#ifdef HAVE_GETGRGID
+#ifdef USE_GETGRGID
 	struct group *gr;
 	gr = getgrgid(gid);
 	if (gr)
 	    strcat(outbuf, gr->gr_name);
 	else
-#endif /* !HAVE_GETGRGID */
+#endif /* !USE_GETGRGID */
 	{
 	    char *optr;
 	    for (optr = outbuf; *optr; optr++)

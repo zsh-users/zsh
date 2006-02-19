@@ -710,3 +710,28 @@ extern short ospeed;
 #    include <iconv.h>
 #  endif
 #endif
+
+#if defined(HAVE_INITGROUPS) && !defined(DISABLE_DYNAMIC_NSS)
+# define USE_INITGROUPS
+#endif
+
+#if defined(HAVE_GETGRGID) && !defined(DISABLE_DYNAMIC_NSS)
+# define USE_GETGRGID
+#endif
+
+#if defined(HAVE_GETGRNAM) && !defined(DISABLE_DYNAMIC_NSS)
+# define USE_GETGRNAM
+#endif
+
+#if defined(HAVE_GETPWENT) && !defined(DISABLE_DYNAMIC_NSS)
+# define USE_GETPWENT
+#endif
+
+#if defined(HAVE_GETPWNAM) && !defined(DISABLE_DYNAMIC_NSS)
+# define USE_GETPWNAM
+#endif
+
+#if defined(HAVE_GETPWUID) && !defined(DISABLE_DYNAMIC_NSS)
+# define USE_GETPWUID
+#endif
+

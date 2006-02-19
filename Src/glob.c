@@ -1263,7 +1263,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 				 NULL, 0);
 			    data = 0;
 			} else {
-#ifdef HAVE_GETPWNAM
+#ifdef USE_GETPWNAM
 			    struct passwd *pw;
 			    sav = *tt;
 			    *tt = '\0';
@@ -1275,11 +1275,11 @@ zglob(LinkList list, LinkNode np, int nountok)
 				data = 0;
 			    }
 			    *tt = sav;
-#else /* !HAVE_GETPWNAM */
+#else /* !USE_GETPWNAM */
 			    sav = *tt;
 			    zerr("unknown user", NULL, 0);
 			    data = 0;
-#endif /* !HAVE_GETPWNAM */
+#endif /* !USE_GETPWNAM */
 			    if (sav)
 				s = tt + 1;
 			    else
@@ -1303,7 +1303,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 				 NULL, 0);
 			    data = 0;
 			} else {
-#ifdef HAVE_GETGRNAM
+#ifdef USE_GETGRNAM
 			    struct group *gr;
 			    sav = *tt;
 			    *tt = '\0';
@@ -1315,11 +1315,11 @@ zglob(LinkList list, LinkNode np, int nountok)
 				data = 0;
 			    }
 			    *tt = sav;
-#else /* !HAVE_GETGRNAM */
+#else /* !USE_GETGRNAM */
 			    sav = *tt;
 			    zerr("unknown group", NULL, 0);
 			    data = 0;
-#endif /* !HAVE_GETGRNAM */
+#endif /* !USE_GETGRNAM */
 			    if (sav)
 				s = tt + 1;
 			    else

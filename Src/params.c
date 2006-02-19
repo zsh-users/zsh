@@ -3019,7 +3019,7 @@ usernamesetfn(UNUSED(Param pm), char *x)
     struct passwd *pswd;
 
     if (x && (pswd = getpwnam(x)) && (pswd->pw_uid != cached_uid)) {
-# ifdef HAVE_INITGROUPS
+# ifdef USE_INITGROUPS
 	initgroups(x, pswd->pw_gid);
 # endif
 	if(!setgid(pswd->pw_gid) && !setuid(pswd->pw_uid)) {

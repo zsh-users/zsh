@@ -628,7 +628,7 @@ init_term(void)
 void
 setupvals(void)
 {
-#ifdef HAVE_GETPWUID
+#ifdef USE_GETPWUID
     struct passwd *pswd;
 #endif
     struct timezone dummy_tz;
@@ -796,14 +796,14 @@ setupvals(void)
     cached_uid = getuid();
 
     /* Get password entry and set info for `USERNAME' */
-#ifdef HAVE_GETPWUID
+#ifdef USE_GETPWUID
     if ((pswd = getpwuid(cached_uid))) {
 	if (emulation == EMULATE_ZSH)
 	    home = metafy(pswd->pw_dir, -1, META_DUP);
 	cached_username = ztrdup(pswd->pw_name);
     }
     else
-#endif /* HAVE_GETPWUID */
+#endif /* USE_GETPWUID */
     {
 	if (emulation == EMULATE_ZSH)
 	    home = ztrdup("/");
