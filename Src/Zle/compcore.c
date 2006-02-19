@@ -2471,16 +2471,16 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	    memset(&mbs, '\0', sizeof mbs);
 	    if (!new_str) {
 		/* Be very pessimistic about how much space we'll need. */
-		new_str = zhalloc(stl*7 + 1);
+		new_str = zhalloc((t - str) + (fe - fs)*7 + 1);
 		memcpy(new_str, str, t - str);
 		t = new_str + (t - str);
 	    }
-	    /* Backup and output just the first bad char unless we
-	     * got an MB_INCOMPLETE at the end of the string. */
-	    f = fs;
+	    /* Output one byte from the start of this invalid multibyte
+	     * sequence unless we got MB_INCOMPLETE at the end of the
+	     * string, in which case we output all the incomplete bytes. */
 	    do {
-		if ((curchar = *f++) == Meta)
-		    curchar = *f++ ^ 32;
+		if ((curchar = *fs++) == Meta)
+		    curchar = *fs++ ^ 32;
 		*t++ = '$';
 		*t++ = '\'';
 		*t++ = '\\';
@@ -2488,8 +2488,9 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 		*t++ = '0' + ((STOUC(curchar) >> 3) & 7);
 		*t++ = '0' + (STOUC(curchar) & 7);
 		*t++ = '\'';
-	    } while (cnt == MB_INCOMPLETE && f < fe);
-	    fs = f;
+	    } while (cnt == MB_INCOMPLETE && fs < fe);
+	    /* Scanning restarts from the spot after the char we skipped. */
+	    f = fs;
 	    break;
 	default:
 	    while (fs < f)
