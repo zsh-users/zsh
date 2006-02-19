@@ -99,13 +99,14 @@ _arguments -s \
   '--sockopts=[specify custom TCP options]' \
   '(-4 -6 --ipv4 --ipv6)'{-4,--ipv4}'[prefer IPv4]' \
   '(-4 -6 --ipv4 --ipv6)'{-6,--ipv6}'[prefer IPv6]' \
-  '(-)--help[display help information]' \
  - daemon \
+  '(-)'{-h,--help}'[display help information]' \
   '--config=[specify alternate rsyncd.conf file]:file:_files' \
   '--daemon[run as an rsync daemon]' \
   '--detach[detach from the parent]' \
   '--no-detach[do not detach from the parent]' \
  - client \
+  '(-)--help[display help information]' \
   '*: :_rsync_files' \
   '(-q --quiet)'{-q,--quiet}'[suppress non-error messages]' \
   '(-c --checksum)'{-c,--checksum}'[skip based on checksums, not mod-time & size]' \
