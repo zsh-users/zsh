@@ -18,6 +18,9 @@
 
 2006-02-19  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* unposted: Src/Zle/compcore.c: made the allocation of a larger
+	string in add_match_data() choose a more efficient size.
+
 	* unposted: Completion/Unix/Command/_rsync: added the missing
 	-h option for daemon mode.
 
