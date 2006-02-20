@@ -6,6 +6,9 @@
 	* unposted: Completion/Debian/Command/.distfiles: add
 	_linda.
 
+	* 22294: Completion/Unix/Command/_getconf: add GNU libc
+	confstrings to getconf completion.
+
 2006-02-20  Peter Stephenson  <pws@csr.com>
 
 	* unposted: 4.3.0-dev-5.

@@ -30,6 +30,13 @@ if [[ CURRENT -eq 2 ]]; then
 	  LFS64_CFLAGS LFS64_LDFLAGS LFS64_LIBS LFS64_LINTFLAGS \
 	  && ret=0
 
+    _requested -V confstring \
+        expl 'configuration-dependent string variables' \
+      compadd -S '' PATH GNU_LIBC_VERSION GNU_LIBPTHREAD_VERSION \
+          LFS_CFLAGS LFS_LDFLAGS LFS_LIBS LFS_LINTFLAGS \
+	  LFS64_CFLAGS LFS64_LDFLAGS LFS64_LIBS LFS64_LINTFLAGS \
+	  && ret=0
+
     _requested pathconfig &&
         while _next_label -V pathconfig expl 'system path configuration variables'; do
           compadd "$expl[@]" -S '' PIPE_BUF _POSIX_CHOWN_RESTRICTED \
