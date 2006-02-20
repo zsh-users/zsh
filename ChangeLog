@@ -1,3 +1,7 @@
+2006-02-20  Peter Stephenson  <pws@csr.com>
+
+	* unposted: 4.3.0-dev-5.
+
 2006-02-20  Clint Adams  <clint@zsh.org>
 
 	* 22289: Completion/Debian/Command/_linda: completion for
@@ -13,7 +17,7 @@
 	Functions/MIME/pick-web-browser: add Firefox.
 	Functions/MIME/zsh-mime-setup: take account of handler and flags
 	styles when listing.
-	
+
 2006-02-19  Clint Adams  <clint@zsh.org>
 
 	* 22284: configure.ac, Src/glob.c, Src/hashtable.c, Src/init.c,
