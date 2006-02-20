@@ -2501,7 +2501,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
     if (new_str) {
 	*t = '\0';
 	str = new_str;
-	stl = strlen(str);
+	stl = t - str;
     }
 #endif
 
