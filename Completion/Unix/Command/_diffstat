@@ -1,0 +1,19 @@
+#compdef diffstat
+
+_arguments \
+  '-c[prefix each line with hash mark]' \
+  '-e:error file:_files' \
+  '-f:histogram format:((0\:concise 1\:normal 2\:dots 3\:dots+normal 4\:value 5\:value+normal 6\:value+dots 7\:value+dots+normal))' \
+  '-h[help]' \
+  '-k[suppress merging of filenames in report]' \
+  '-l[list only the filenames]' \
+  '-n:minimum width for filenames:' \
+  '-o:output file:_files' \
+  '-p:number of path components:' \
+  '-f:rounding code:((0\:none 1\:round 2\:round+adjustment))' \
+  '-t[overrides histogram, generates csv output]' \
+  '-u[suppress sorting of filenames in report]' \
+  '-v[show progress]' \
+  '-V[print version number]' \
+  '-w:maximum width of histogram:' \
+  '*:file specifications:_files'
