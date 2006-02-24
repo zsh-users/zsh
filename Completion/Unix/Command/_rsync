@@ -127,6 +127,7 @@ _arguments -s \
   '(-l --links)'{-l,--links}'[copy symlinks as symlinks]' \
   {--no-l,--no-links}'[turn off --links]' \
   '(-L --copy-links)'{-L,--copy-links}'[transform symlinks into referent file/dir]' \
+  '(-k --copy-dirlinks)'{-k,--copy-dirlinks}'[transform a symlink to a dir into referent dir]' \
   '--copy-unsafe-links[only "unsafe" symlinks are transformed]' \
   '--safe-links[ignore symlinks that point outside the source tree]' \
   '(-H --hard-links)'{-H,--hard-links}'[preserve hard links]' \
