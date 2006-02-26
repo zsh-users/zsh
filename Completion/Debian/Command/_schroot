@@ -1,0 +1,34 @@
+#compdef schroot
+
+local expl context state line
+typeset -A opt_args
+
+_arguments \
+       '(-h --help)'{-h,--help}'[help]' \
+       '(-a --all)'{-a,--all}'[all chroots and active sessions]' \
+       '--all-chroots' \
+       '--all-sessions' \
+       '*'{-c,--chroot=}':chroot:->chroot' \
+       '(-u --user)'{-u,--user=}':user:_users' \
+       '(-l --list)'{-l,--list}'[list available chroots]' \
+       '(-i --info)'{-i,--info}'[print detailed information about specified chroots]' \
+       '--location[print location of specified  chroots]' \
+       '--config[print configuration of specified  chroots]' \
+       '(-p --preserve-environment)'{-p,--preserve-environment}'[preserve user environment within chroot]' \
+       '(-q --quiet)'{-q,--quiet}'[quiet]' \
+       '(-v --verbose)'{-v,--verbose}'[verbose]' \
+       '(-V --version)'{-V,--version}'[version]' \
+       '(-b --begin-session)'{-b,--begin-session}'[begin a session]' \
+       '--recover-session}[recover an existing session]' \
+       '(-e --end-session)'{-e,--end-session=}':session UUID:' \
+       '(-f --force)'{-f,--force}'[force a session operation]' \
+       '(-):command name: _command_names -e' \
+       '*::arguments: _normal' && return 0
+
+case "$state" in
+	(chroot)
+	_wanted tag expl 'chroot' \
+	  compadd $(schroot -l)
+	;;
+
+esac
