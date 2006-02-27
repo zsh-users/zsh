@@ -3,7 +3,7 @@
 local expl context state line
 typeset -A opt_args
 
-_arguments \
+_arguments -S \
        '(-h --help)'{-h,--help}'[help]' \
        '(-a --all)'{-a,--all}'[all chroots and active sessions]' \
        '--all-chroots' \

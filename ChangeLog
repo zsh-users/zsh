@@ -1,7 +1,7 @@
 2006-02-26  Clint Adams  <clint@zsh.org>
 
-	* 22302: Completion/Debian/Command/_schroot: completion
-	for schroot.
+	* 22302, 22303: Completion/Debian/Command/_schroot:
+	completion for schroot.
 
 2006-02-24  Wayne Davison  <wayned@users.sourceforge.net>
 
