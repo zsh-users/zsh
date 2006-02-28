@@ -1,5 +1,8 @@
 2006-02-28  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/.distfiles: a couple
+	of files missing.
+
 	* unposted: Functions/MIME/zsh-mime-handler: typo.
 
 	* unposted: README: doc formats were out of date.
