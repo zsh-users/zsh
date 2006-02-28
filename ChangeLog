@@ -1,3 +1,8 @@
+2006-02-28  Clint Adams  <clint@zsh.org>
+
+	* 22309: Completion/Unix/Command/_surfraw: update for
+	new surfraw debsec elvi.
+
 2006-02-28  Peter Stephenson  <pws@csr.com>
 
 	* unposted: zsh-4.3.1, finally.

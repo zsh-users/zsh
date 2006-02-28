@@ -157,6 +157,9 @@ case $state in
         _arguments $args \
           '-doc[view PTS documentation]' && ret=0
       ;;
+      debsec)
+        _message -e string 'package name, bug number or CVE ID'
+      ;; 
       deja)
         _arguments $args \
           '-results=-:[number of results to return]' \
