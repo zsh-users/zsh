@@ -6,9 +6,9 @@
 # those, it tries to be a bit cunning about quoting, which
 # can be a nightmare in MIME handling.  If it sees something like
 #   netscape %s
-# and it only has one file to handle (the usual case then it will handle it
-# internally just by appending a file.)
-# 
+# and it only has one file to handle (the usual case) then it will handle it
+# internally just by appending a file.
+#
 # Anything else is handled by passing to sh -c, which is the only think
 # with a high probability of working.  If it sees something with
 # quotes, e.g.

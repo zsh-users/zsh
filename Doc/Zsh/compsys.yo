@@ -2039,8 +2039,9 @@ locations it will be used as the default.
 )
 kindex(pine-directory, completion style)
 item(tt(pine-directory))(
-If set, specifies the directory containing PINE mailbox files.  It
-defaults to `tt(~/mail)'.
+If set, specifies the directory containing PINE mailbox files.  There
+is no default, since recursively searching this directory is inconvenient
+for anyone who doesn't use PINE.
 )
 kindex(ports, completion style)
 item(tt(ports))(

@@ -53,6 +53,13 @@ shell handles multibyte characters properly and the appropriate library
 tests can be used.  This change may be reviewed if no such permanent fix
 is forthcoming.
 
+The completion style pine-directory must now be set to use completion
+for PINE mailbox folders; previously it had the default ~/mail.  This
+change was necessary because otherwise recursive directories under
+~/mail were searched by default, which could be a considerable unnecessary
+hit for anyone not using PINE.  The previous default can be restored with:
+  zstyle ':completion:*' pine-directory ~/mail
+
 Documentation
 -------------
 
@@ -91,9 +98,9 @@ Doc/intro.ms	An introduction to zsh in troff format using the ms
 
 For more information, see the website, as described in the META-FAQ.
 
-If you do not have the necessary tools to process these documents,
-PostScript, ASCII, Info and DVI versions are available in the separate
-file zsh-doc.tar.gz at the archive sites listed in the META-FAQ.
+If you do not have the necessary tools to process these documents, PDF,
+Info and DVI versions are available in the separate file zsh-doc.tar.gz at
+the archive sites listed in the META-FAQ.
 
 The distribution also contains a Perl script in Utils/helpfiles which
 can be used to extract the descriptions of builtin commands from the

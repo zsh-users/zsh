@@ -5,7 +5,7 @@ _mailboxes() {
   local expl ret=1
   local maildirectory pinedirectory
   zstyle -s ":completion:${curcontext}:" mail-directory maildirectory || maildirectory="~/Mail"
-  zstyle -s ":completion:${curcontext}:" pine-directory pinedirectory || pinedirectory="~/mail"
+  zstyle -s ":completion:${curcontext}:" pine-directory pinedirectory
 
   if (( ! $+_mailbox_cache )) then
     _mailbox_cache "$@"
@@ -68,7 +68,7 @@ _mailbox_cache () {
   typeset -aU -g _maildir_cache _mbox_cache _mh_cache _mutt_cache _pine_cache
 
   zstyle -s ":completion:${curcontext}:" mail-directory maildirectory || maildirectory="~/Mail"
-  zstyle -s ":completion:${curcontext}:" pine-directory pinedirectory || pinedirectory="~/mail"
+  zstyle -s ":completion:${curcontext}:" pine-directory pinedirectory
   zstyle -s ":completion:${curcontext}:" muttrc muttrc || muttrc="~/.muttrc"
 
   [[ -f ${~muttrc:-.} ]] &&
@@ -76,7 +76,11 @@ _mailbox_cache () {
     _mutt_cache=( ${=${(Xe)_mc_tmp}} )
 
   _mbox_cache=( ${~maildirectory}/*(^/) )
-  _pine_cache=( ${~pinedirectory}/**/*(.) )
+  if [[ -n $pinedirectory ]]; then
+    _pine_cache=( ${~pinedirectory}/**/*(.) )
+  else
+    _pine_cache=()
+  fi
 
   dirboxes=( ${~maildirectory}/*(/) )
 
@@ -107,7 +111,7 @@ _mua_mailboxes() {
 
   local maildirectory pinedirectory
   zstyle -s ":completion:${curcontext}:" mail-directory maildirectory || maildirectory="~/Mail"
-  zstyle -s ":completion:${curcontext}:" pine-directory pinedirectory || pinedirectory="~/mail"
+  zstyle -s ":completion:${curcontext}:" pine-directory pinedirectory
 
   case "${curcontext}:" in
     (*:elm:*) # I've probably got this wrong, or at least incomplete
@@ -157,10 +161,13 @@ _mua_mailboxes() {
       fi
       ;;
     (*:pine:*)
+      mbox_names=( "${_mbox_cache[@]}"
+		   "${_mailbox_cache[@]}" "${_mh_cache[@]}" )
       # Pine is like mail but with no leading `+' to disambiguate;
       # any files not in $pinedirectory must be absolute paths.
-      mbox_names=( "${(@)_pine_cache#$~pinedirectory/}" "${_mbox_cache[@]}"
-		   "${_mailbox_cache[@]}" "${_mh_cache[@]}" )
+      if [[ -n $pinedirectory ]]; then
+	mbox_names+=( "${(@)_pine_cache#$~pinedirectory/}" )
+      fi
       ;;
     (*:tkrat:*) # Has a couple of custom formats I haven't programmed for.
       mbox_names=( "${_mbox_cache[@]}"

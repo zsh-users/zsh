@@ -1,3 +1,13 @@
+2006-02-28  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/MIME/zsh-mime-handler: typo.
+
+	* unposted: README: doc formats were out of date.
+
+	* 22305 (slightly tweaked): README,
+	Completion/Unix/Type/_mailboxes,  Doc/Zsh/compsys.yo:  no default
+	for pine-directory since that could cause recursive search mayhem.
+
 2006-02-26  Clint Adams  <clint@zsh.org>
 
 	* 22302, 22303: Completion/Debian/Command/_schroot:
