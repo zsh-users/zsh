@@ -6,7 +6,7 @@
 2006-02-24  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync: added the
-	option --copy-dirlinks.
+	options --copy-dirlinks, --no-H, and --no-hard-links.
 
 2006-02-21  Clint Adams  <clint@zsh.org>
 
