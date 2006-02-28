@@ -131,6 +131,7 @@ _arguments -s \
   '--copy-unsafe-links[only "unsafe" symlinks are transformed]' \
   '--safe-links[ignore symlinks that point outside the source tree]' \
   '(-H --hard-links)'{-H,--hard-links}'[preserve hard links]' \
+  {--no-H,--no-hard-links}'[turn off --hard-links]' \
   '(-K --keep-dirlinks)'{-K,--keep-dirlinks}'[treat symlinked dir on receiver as dir]' \
   '(-p --perms -E --executability)'{-p,--perms}'[preserve permissions]' \
   {--no-p,--no-perms}'[turn off --perms]' \
