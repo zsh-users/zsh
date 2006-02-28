@@ -296,10 +296,10 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 4.2.6 is the latest production version.  A release on the
-  4.3 development branch is imminent; this will contain support
-  for multibyte character strings (such as UTF-8 locales) in the
-  line editor.
+  Zsh 4.2.6 is the latest production version.  The latest development
+  version is 4.3.1; this contains support for multibyte character strings
+  (such as UTF-8 locales) in the line editor, although the rest of the
+  shell does not yet have full multibyte support.
 
   There will not be any further 4.0 releases now that 4.2 has become
   the stable version.
@@ -2257,8 +2257,9 @@ sect(What's on the wish-list?)
   Some future possibilities which have been suggested:
   itemize(
   it() The shell, in particular the line editor, should support Unicode
-     characters.  Initial support for this should appear in version 4.3,
-     but this is a large job.
+     characters.  Initial support for this appeared in version 4.3;
+     it is reasonably complete in the line editor but patchy elsewhere
+     (note this may require the configuration option --enable-multibyte).
   it() The parameter code could do with tidying up, maybe with more of the
      features made available in ksh93.
   it() Configuration files to enable zsh startup files to be created

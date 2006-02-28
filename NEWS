@@ -27,6 +27,12 @@ Major changes between versions 4.2 and 4.3
   not to break existing code (and to be compatible with proposals for the
   Korn shell).
 
+- Substitutions of the form ${var:-"$@"}, ${var:+"$@"} and similar where
+  word-splitting is applied to the text after the :- or :+ (in particular,
+  where the SH_WORD_SPLIT option is in effect for compatibility) now
+  behave as in other Bourne- and POSIX-compatible shells when in the
+  appropriate emulation mode.
+
 - New Posix-style zsh-specific tests [[:IDENT:]], [[:IFS:]],
   [[:IFSSPACE:]], [[:WORD:]] test if character can appear in identifier,
   is an IFS character, is an IFS whitespace character, or is considered
