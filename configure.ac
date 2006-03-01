@@ -2112,7 +2112,7 @@ AC_ARG_ENABLE(dynamic-nss,
 AH_TEMPLATE([DISABLE_DYNAMIC_NSS],
 [Define to 1 if you want to avoid calling functions that will require
  dynamic NSS modules.])
-if test $zsh_cv_c_dynamic_nss = no; then
+if test x$zsh_cv_c_dynamic_nss = xno; then
   AC_DEFINE(DISABLE_DYNAMIC_NSS)
 fi
 
