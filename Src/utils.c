@@ -2623,7 +2623,7 @@ inittyptab(void)
 }
 
 /**/
-void
+mod_export void
 makecommaspecial(int yesno)
 {
     if ((specialcomma = yesno) != 0)
