@@ -1,3 +1,8 @@
+2006-03-01  Peter Stephenson  <pws@csr.com>
+
+	* unposted: MACHINES, README, Config/version.mk: information
+	and version number for 4.3.2.
+
 2006-03-01  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22313: Src/utils.c: added the missing "mod_export" to

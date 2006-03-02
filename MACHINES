@@ -33,6 +33,8 @@ Apple: MacOS X/Darwin 10.x
 	10.3.  This causes the tests starting `Y' in the Test directory to
 	fail, even though the features to be tested are working.
 
+	Reported to compile with no problems on 10.4.
+
 Red Hat Inc.: Cygwin
 	Should build `out-of-the-box'.  The compilation directory should
 	be on a file system mounted as binary (the mount command shows
@@ -170,10 +172,14 @@ SIEMENS: SINIX
 	Note, that this version is obsolete and users are expected to 
 	update to Reliant UNIX.
 
-SGI: IRIX 6.2, 6.3, 6.5
-	[Out of date.]
+SGI: IRIX 6.2, 6.3
+        [Out of date.]
 
 	Should build `out-of-the-box'.
+
+SGI: IRIX 6.5
+	Should build `out-of-the-box'.
+	Use of gcc for compilation is recommended.
 
 	On 6.5.2, zsh malloc routines are reported not to work; also
 	full optimization (cc -O3 -OPT:Olimit=0) causes problems.
