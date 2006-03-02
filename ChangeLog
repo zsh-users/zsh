@@ -1,3 +1,8 @@
+2006-03-02  Peter Stephenson  <pws@csr.com>
+
+	* unposted, but see 22307: configure.ac: turn all
+	"test $foo = bar" into "test x$foo = xbar" for safety.
+
 2006-03-01  Peter Stephenson  <pws@csr.com>
 
 	* unposted: MACHINES, README, Config/version.mk: information
