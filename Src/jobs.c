@@ -1116,11 +1116,16 @@ havefiles(void)
 
 }
 
-/* wait for a particular process */
+/*
+ * Wait for a particular process.
+ * wait_cmd indicates this is from the interactive wait command,
+ * in which case the behaviour is a little different:  the command
+ * itself can be interrupted by a trapped signal.
+ */
 
 /**/
-void
-waitforpid(pid_t pid)
+int
+waitforpid(pid_t pid, int wait_cmd)
 {
     int first = 1, q = queue_signal_level();
 
@@ -1133,18 +1138,30 @@ waitforpid(pid_t pid)
 	else
 	    kill(pid, SIGCONT);
 
-	signal_suspend(SIGCHLD, SIGINT);
+	last_signal = -1;
+	signal_suspend(SIGCHLD, wait_cmd);
+	if (last_signal != SIGCHLD && wait_cmd) {
+	    /* wait command interrupted, but no error: return */
+	    restore_queue_signals(q);
+	    return 128 + last_signal;
+	}
 	child_block();
     }
     child_unblock();
     restore_queue_signals(q);
+
+    return 0;
 }
 
-/* wait for a job to finish */
+/*
+ * Wait for a job to finish.
+ * wait_cmd indicates this is from the wait builtin; see
+ * wait_cmd in waitforpid().
+ */
 
 /**/
-static void
-zwaitjob(int job, int sig)
+static int
+zwaitjob(int job, int wait_cmd)
 {
     int q = queue_signal_level();
     Job jn = jobtab + job;
@@ -1158,7 +1175,13 @@ zwaitjob(int job, int sig)
 	while (!errflag && jn->stat &&
 	       !(jn->stat & STAT_DONE) &&
 	       !(interact && (jn->stat & STAT_STOPPED))) {
-	    signal_suspend(SIGCHLD, sig);
+	    signal_suspend(SIGCHLD, wait_cmd);
+	    if (last_signal != SIGCHLD && wait_cmd)
+	    {
+		/* builtin wait interrupted by trapped signal */
+		restore_queue_signals(q);
+		return 128 + last_signal;
+	    }
 	    /* Commenting this out makes ^C-ing a job started by a function
 	       stop the whole function again.  But I guess it will stop
 	       something else from working properly, we have to find out
@@ -1181,6 +1204,8 @@ zwaitjob(int job, int sig)
     }
     child_unblock();
     restore_queue_signals(q);
+
+    return 0;
 }
 
 /* wait for running job to finish */
@@ -1692,9 +1717,9 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	} else {   /* Must be BIN_WAIT, so wait for all jobs */
 	    for (job = 0; job <= maxjob; job++)
 		if (job != thisjob && jobtab[job].stat)
-		    zwaitjob(job, SIGINT);
+		    retval = zwaitjob(job, 1);
 	    unqueue_signals();
-	    return 0;
+	    return retval;
 	}
     }
 
@@ -1712,11 +1737,19 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    Job j;
 	    Process p;
 
-	    if (findproc(pid, &j, &p, 0))
-		waitforpid(pid);
-	    else
+	    if (findproc(pid, &j, &p, 0)) {
+		/*
+		 * returns 0 for normal exit, else signal+128
+		 * in which case we should return that status.
+		 */
+		retval = waitforpid(pid, 1);
+		if (!retval)
+		    retval = lastval2;
+	    } else {
 		zwarnnam(name, "pid %d is not a child of this shell", 0, pid);
-	    retval = lastval2;
+		/* presumably lastval2 doesn't tell us a heck of a lot? */
+		retval = 1;
+	    }
 	    thisjob = ocj;
 	    continue;
 	}
@@ -1796,8 +1829,18 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		killjb(jobtab + job, SIGCONT);
 	    }
 	    if (func == BIN_WAIT)
-		zwaitjob(job, SIGINT);
-	    if (func != BIN_BG) {
+	    {
+		retval = zwaitjob(job, 1);
+		if (!retval)
+		    retval = lastval2;
+	    }
+	    else if (func != BIN_BG) {
+		/*
+		 * HERE: there used not to be an "else" above.  How
+		 * could it be right to wait for the foreground job
+		 * when we've just been told to wait for another
+		 * job (and done it)?
+		 */
 		waitjobs();
 		retval = lastval2;
 	    } else if (ofunc == BIN_DISOWN)

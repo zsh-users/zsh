@@ -3037,7 +3037,7 @@ getoutput(char *cmd, int qt)
 	zclose(pipes[1]);
 	retval = readoutput(pipes[0], qt);
 	fdtable[pipes[0]] = FDT_UNUSED;
-	waitforpid(pid);		/* unblocks */
+	waitforpid(pid, 0);		/* unblocks */
 	lastval = cmdoutval;
 	return retval;
     }
@@ -3190,7 +3190,7 @@ getoutputfile(char *cmd)
 
 	close(fd);
 	os = jobtab[thisjob].stat;
-	waitforpid(pid);
+	waitforpid(pid, 0);
 	cmdoutval = 0;
 	jobtab[thisjob].stat = os;
 	return nam;
@@ -3852,7 +3852,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     popheap();
 
     if (exit_pending) {
-	if (locallevel) {
+	if (locallevel > forklevel) {
 	    /* Still functions to return: force them to do so. */
 	    retflag = 1;
 	    breaks = loops;
