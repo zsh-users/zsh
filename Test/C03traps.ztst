@@ -253,6 +253,40 @@
 >Exiting, attempt 2
 >Running exit trap
 
+  print Another test that takes three seconds >&8
+  gotsig=0
+  signal_handler() {
+   echo "parent received signal"
+   gotsig=1
+  }
+  child() {
+   sleep 1
+   echo "child sending signal"
+   kill -15 $parentpid
+   sleep 2
+   echo "child exiting" 
+   exit 33
+  } 
+  parentpid=$$
+  child &
+  childpid=$!
+  trap signal_handler 15
+  echo "parent waiting"
+  wait $childpid
+  cstatus=$?
+  echo "wait #1 finished, gotsig=$gotsig, status=$cstatus"
+  gotsig=0
+  wait $childpid
+  cstatus=$?
+  echo "wait #2 finished, gotsig=$gotsig, status=$cstatus"
+0:waiting for trapped signal
+>parent waiting
+>child sending signal
+>parent received signal
+>wait #1 finished, gotsig=1, status=143
+>child exiting
+>wait #2 finished, gotsig=0, status=33
+
 %clean
 
   rm -f TRAPEXIT
