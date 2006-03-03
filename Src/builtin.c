@@ -1924,8 +1924,9 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    Param apm;
 	    char **x;
 	    if (PM_TYPE(pm->flags) == PM_ARRAY) {
-		x = (*pm->gsu.a->getfn)(pm);
+		x = zarrdup((*pm->gsu.a->getfn)(pm));
 		uniqarray(x);
+		pm->gsu.a->setfn(pm, x);
 		if (pm->ename && x)
 		    arrfixenv(pm->ename, x);
 	    } else if (PM_TYPE(pm->flags) == PM_SCALAR && pm->ename &&

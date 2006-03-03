@@ -1,3 +1,9 @@
+2006-03-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22318: Src/builtin.c: uniquifying special arrays was broken.
+
+	* 22277: Test/C03traps.ztst: missed this.
+
 2006-03-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22317: Src/builtins.c, Src/exec.c: exiting the shell from
