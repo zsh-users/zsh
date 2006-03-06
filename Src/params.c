@@ -2820,11 +2820,11 @@ tiedarrsetfn(Param pm, char *x)
 	*dptr->arrptr = sepsplit(x, sepbuf, 0, 0);
 	if (pm->flags & PM_UNIQUE)
 	    uniqarray(*dptr->arrptr);
+	zsfree(x);
     } else
 	*dptr->arrptr = NULL;
     if (pm->ename)
 	arrfixenv(pm->nam, *dptr->arrptr);
-    zsfree(x);
 }
 
 /**/
@@ -2847,17 +2847,16 @@ tiedarrunsetfn(Param pm, UNUSED(int exp))
 }
 
 /**/
-void
-uniqarray(char **x)
+static void
+arrayuniq(char **x, int freeok)
 {
     char **t, **p = x;
 
-    if (!x || !*x)
-	return;
     while (*++p)
 	for (t = x; t < p; t++)
 	    if (!strcmp(*p, *t)) {
-		zsfree(*p);
+		if (freeok)
+		    zsfree(*p);
 		for (t = p--; (*t = t[1]) != NULL; t++);
 		break;
 	    }
@@ -2865,18 +2864,20 @@ uniqarray(char **x)
 
 /**/
 void
-zhuniqarray(char **x)
+uniqarray(char **x)
 {
-    char **t, **p = x;
-
     if (!x || !*x)
 	return;
-    while (*++p)
-	for (t = x; t < p; t++)
-	    if (!strcmp(*p, *t)) {
-		for (t = p--; (*t = t[1]) != NULL; t++);
-		break;
-	    }
+    arrayuniq(x, !zheapptr(*x));
+}
+
+/**/
+void
+zhuniqarray(char **x)
+{
+    if (!x || !*x)
+	return;
+    arrayuniq(x, 0);
 }
 
 /* Function to get value of special parameter `#' and `ARGC' */

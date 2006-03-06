@@ -329,6 +329,21 @@ mmap_heap_alloc(size_t *n)
 }
 #endif
 
+/* check whether a pointer is within a memory pool */
+
+/**/
+mod_export void *
+zheapptr(void *p)
+{
+    Heap h;
+    queue_signals();
+    for (h = heaps; h; h = h->next)
+	if ((char *)p >= arena(h) &&
+	    (char *)p + H_ISIZE < arena(h) + ARENA_SIZEOF(h))
+	    break;
+    unqueue_signals();
+    return (h ? p : 0);
+}
 
 /* allocate memory from the current memory pool */
 
