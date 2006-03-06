@@ -2101,6 +2101,14 @@ expanded but only in command position.  If it is set to `tt(false)',
 regular aliases will never be expanded.   If it is set to `tt(always)',
 regular aliases will be expanded even if not in command position.
 )
+kindex(rehash, completion style)
+item(tt(rehash))(
+If this is set when completing external commands, the internal
+list (hash) of commands will be updated for each search by issuing
+the tt(rehash) command.  There is a speed penalty for this which
+is only likely to be noticeable when directories in the path have
+slow file access.
+)
 kindex(remote-access, completion style)
 item(tt(remote-access))(
 If set to tt(false), certain commands will be prevented from making

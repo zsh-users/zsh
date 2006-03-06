@@ -1,3 +1,8 @@
+2006-03-06  Peter Stephenson  <pws@csr.com>
+
+	* users/1097: Completion/Zsh/Type/_command_names,
+	Doc/Zsh/compsys.yo: rehash style for external commands.
+
 2006-03-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22318: Src/builtin.c: uniquifying special arrays was broken.
@@ -9,7 +14,7 @@
 	* 22317: Src/builtins.c, Src/exec.c: exiting the shell from
 	code forked from within a function doesn't maintain the
 	exit status.
-	
+
 	* 22277, 22281 plus tweaks: Src/exec.c, Src/jobs.c, Src/signals.c,
 	Test/C03traps.ztst: standardize behaviour of using wait builtin
 	with trapped signals.

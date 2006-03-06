@@ -6,6 +6,8 @@
 
 local args defs
 
+zstyle -t ":completion:${curcontext}:commands" rehash && rehash
+
 defs=(
   'commands:external command:compadd -k commands'
 )
