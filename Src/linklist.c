@@ -41,6 +41,7 @@ newlinklist(void)
     list = (LinkList) zhalloc(sizeof *list);
     list->list.first = NULL;
     list->list.last = &list->node;
+    list->list.flags = 0;
     return list;
 }
 
@@ -53,6 +54,7 @@ znewlinklist(void)
     list = (LinkList) zalloc(sizeof *list);
     list->list.first = NULL;
     list->list.last = &list->node;
+    list->list.flags = 0;
     return list;
 }
 

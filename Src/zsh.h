@@ -415,12 +415,14 @@ union linkroot {
     do { \
         (N).list.first = NULL; \
         (N).list.last = &(N).node; \
+        (N).list.flags = 0; \
     } while (0)
 #define local_list1(N) union linkroot N; struct linknode __n0
 #define init_list1(N,V0) \
     do { \
         (N).list.first = &__n0; \
         (N).list.last = &__n0; \
+        (N).list.flags = 0; \
         __n0.next = NULL; \
         __n0.prev = &(N).node; \
         __n0.dat = (void *) (V0); \
