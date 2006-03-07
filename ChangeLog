@@ -1,3 +1,8 @@
+2006-03-07  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: belatedly update version
+	to 4.3.2-dev-1 to avoid clash with released version.
+
 2006-03-06  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 22321 plus tweak: Src/builtin.c, Src/mem.c, Src/params.c:
