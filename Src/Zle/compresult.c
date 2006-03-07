@@ -1062,7 +1062,7 @@ do_single(Cmatch m)
 			    n = p + 1;
 
 			if ((pm = (Param) paramtab->getnode(paramtab, n)) &&
-			    PM_TYPE(pm->flags) != PM_SCALAR)
+			    PM_TYPE(pm->node.flags) != PM_SCALAR)
 			    tryit = 0;
 		    }
 		    if (tryit) {

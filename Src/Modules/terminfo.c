@@ -200,33 +200,28 @@ getterminfo(UNUSED(HashTable ht), char *name)
     unmetafy(name, &len);
 
     pm = (Param) hcalloc(sizeof(struct param));
-    pm->nam = dupstring(name);
-    pm->flags = PM_READONLY;
+    pm->node.nam = dupstring(name);
+    pm->node.flags = PM_READONLY;
 
     if (((num = tigetnum(name)) != -1) && (num != -2)) {
 	pm->u.val = num;
-	pm->flags |= PM_INTEGER;
+	pm->node.flags |= PM_INTEGER;
 	pm->gsu.i = &nullsetinteger_gsu;
-    }
-    else if ((num = tigetflag(name)) != -1) {
+    } else if ((num = tigetflag(name)) != -1) {
 	pm->u.str = num ? dupstring("yes") : dupstring("no");
-	pm->flags |= PM_SCALAR;
+	pm->node.flags |= PM_SCALAR;
 	pm->gsu.s = &nullsetscalar_gsu;
-    }
-    else if ((tistr = (char *)tigetstr(name)) != NULL && tistr != (char *)-1)
-    {
+    } else if ((tistr = (char *)tigetstr(name)) != NULL && tistr != (char *)-1) {
 	pm->u.str = dupstring(tistr);
-	pm->flags |= PM_SCALAR;
+	pm->node.flags |= PM_SCALAR;
 	pm->gsu.s = &nullsetscalar_gsu;
-    }
-    else
-    {
+    } else {
 	/* zwarn("no such capability: %s", name, 0); */
 	pm->u.str = dupstring("");
-	pm->flags |= PM_UNSET;
+	pm->node.flags |= PM_UNSET;
 	pm->gsu.s = &nullsetscalar_gsu;
     }
-    return (HashNode) pm;
+    return &pm->node;
 }
 
 /**/
@@ -309,37 +304,37 @@ scanterminfo(UNUSED(HashTable ht), ScanFunc func, int flags)
 
     pm = (Param) hcalloc(sizeof(struct param));
 
-    pm->flags = PM_READONLY | PM_SCALAR;
+    pm->node.flags = PM_READONLY | PM_SCALAR;
     pm->gsu.s = &nullsetscalar_gsu;
 
     for (capname = (char **)boolnames; *capname; capname++) {
 	if ((num = tigetflag(*capname)) != -1) {
 	    pm->u.str = num ? dupstring("yes") : dupstring("no");
-	    pm->nam = dupstring(*capname);
-	    func((HashNode) pm, flags);
+	    pm->node.nam = dupstring(*capname);
+	    func(&pm->node, flags);
 	}
     }
 
-    pm->flags = PM_READONLY | PM_INTEGER;
+    pm->node.flags = PM_READONLY | PM_INTEGER;
     pm->gsu.i = &nullsetinteger_gsu;
 
     for (capname = (char **)numnames; *capname; capname++) {
 	if (((num = tigetnum(*capname)) != -1) && (num != -2)) {
 	    pm->u.val = num;
-	    pm->nam = dupstring(*capname);
-	    func((HashNode) pm, flags);
+	    pm->node.nam = dupstring(*capname);
+	    func(&pm->node, flags);
 	}
     }
 
-    pm->flags = PM_READONLY | PM_SCALAR;
+    pm->node.flags = PM_READONLY | PM_SCALAR;
     pm->gsu.s = &nullsetscalar_gsu;
 
     for (capname = (char **)strnames; *capname; capname++) {
 	if ((tistr = (char *)tigetstr(*capname)) != NULL &&
 	    tistr != (char *)-1) {
 	    pm->u.str = dupstring(tistr);
-	    pm->nam = dupstring(*capname);
-	    func((HashNode) pm, flags);
+	    pm->node.nam = dupstring(*capname);
+	    func(&pm->node, flags);
 	}
     }
 }
@@ -383,7 +378,7 @@ cleanup_(Module m)
 
     if ((pm = (Param) paramtab->getnode(paramtab, terminfo_nam)) &&
 	pm == terminfo_pm) {
-	pm->flags &= ~PM_READONLY;
+	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
 #endif

@@ -84,7 +84,7 @@ zletext(Histent ent, struct zle_text *zt)
 	return;
     }
 
-    duptext = ztrdup(ent->text);
+    duptext = ztrdup(ent->node.nam);
     zt->text = stringaszleline(duptext, 0, &zt->len, NULL, NULL);
     zsfree(duptext);
     zt->alloced = 1;
@@ -318,7 +318,7 @@ acceptlineanddownhistory(UNUSED(char **args))
     Histent he = quietgethist(histline);
 
     if (he && (he = movehistent(he, 1, HIST_FOREIGN))) {
-	zpushnode(bufstack, ztrdup(he->text));
+	zpushnode(bufstack, ztrdup(he->node.nam));
 	stackhist = he->histnum;
     }
     done = 1;
@@ -375,7 +375,7 @@ historysearchbackward(char **args)
 	return 1;
     }
     while ((he = movehistent(he, -1, hist_skip_flags))) {
-	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	if (isset(HISTFINDNODUPS) && he->node.flags & HIST_DUP)
 	    continue;
 	zletext(he, &zt);
 	if (zlinecmp(zt.text, zt.len, str, hp) < 0 &&
@@ -434,7 +434,7 @@ historysearchforward(char **args)
 	return 1;
     }
     while ((he = movehistent(he, 1, hist_skip_flags))) {
-	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	if (isset(HISTFINDNODUPS) && he->node.flags & HIST_DUP)
 	    continue;
 	zletext(he, &zt);
 	if (zlinecmp(zt.text, zt.len, str, hp) < (he->histnum == curhist) &&
@@ -627,8 +627,8 @@ insertlastword(char **args)
 	s = (char *)getdata(node);
 	t = s + strlen(s);
     } else {
-	s = he->text + he->words[2*n-2];
-	t = he->text + he->words[2*n-1];
+	s = he->node.nam + he->words[2*n-2];
+	t = he->node.nam + he->words[2*n-1];
     }
 
     save = *t;
@@ -672,7 +672,7 @@ zle_setline(Histent he)
 	if ((zlecs = zlell) && invicmdmode())
 	    zlecs--;
     } else {
-	setline(he->text, ZSL_COPY|ZSL_TOEND);
+	setline(he->node.nam, ZSL_COPY|ZSL_TOEND);
     }
     setlastline();
     clearlist = 1;
@@ -985,7 +985,7 @@ doisearch(char **args, int dir)
 		zletextfree(&zt);
 		zletext(he, &zt);
 		pos = (dir == 1) ? 0 : zt.len;
-		skip_line = isset(HISTFINDNODUPS) ? !!(he->flags & HIST_DUP)
+		skip_line = isset(HISTFINDNODUPS) ? !!(he->node.flags & HIST_DUP)
 		    : (zt.len == last_len &&
 		       !ZS_memcmp(zt.text, last_line, zt.len));
 	    }
@@ -1186,7 +1186,7 @@ acceptandinfernexthistory(char **args)
 
     if (!(he = infernexthist(hist_ring, args)))
 	return 1;
-    zpushnode(bufstack, ztrdup(he->text));
+    zpushnode(bufstack, ztrdup(he->node.nam));
     done = 1;
     stackhist = he->histnum;
     return 0;
@@ -1397,7 +1397,7 @@ virepeatsearch(UNUSED(char **args))
     if (!(he = quietgethist(histline)))
 	return 1;
     while ((he = movehistent(he, visrchsense, hist_skip_flags))) {
-	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	if (isset(HISTFINDNODUPS) && he->node.flags & HIST_DUP)
 	    continue;
 	zletext(he, &zt);
 	if (zlinecmp(zt.text, zt.len, zleline, zlell) &&
@@ -1452,7 +1452,7 @@ historybeginningsearchbackward(char **args)
     if (!(he = quietgethist(histline)))
 	return 1;
     while ((he = movehistent(he, -1, hist_skip_flags))) {
-	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	if (isset(HISTFINDNODUPS) && he->node.flags & HIST_DUP)
 	    continue;
 	zletext(he, &zt);
 	if (zlinecmp(zt.text, zt.len, zleline, zlecs) < 0 &&
@@ -1491,7 +1491,7 @@ historybeginningsearchforward(char **args)
     if (!(he = quietgethist(histline)))
 	return 1;
     while ((he = movehistent(he, 1, hist_skip_flags))) {
-	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
+	if (isset(HISTFINDNODUPS) && he->node.flags & HIST_DUP)
 	    continue;
 	zletext(he, &zt);
 	if (zlinecmp(zt.text, zt.len, zleline, zlecs) <

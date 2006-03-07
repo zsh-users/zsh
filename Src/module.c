@@ -133,12 +133,12 @@ module_linked(char const *name)
 int
 addbuiltin(Builtin b)
 {
-    Builtin bn = (Builtin) builtintab->getnode2(builtintab, b->nam);
-    if (bn && (bn->flags & BINF_ADDED))
+    Builtin bn = (Builtin) builtintab->getnode2(builtintab, b->node.nam);
+    if (bn && (bn->node.flags & BINF_ADDED))
 	return 1;
     if (bn)
-	builtintab->freenode(builtintab->removenode(builtintab, b->nam));
-    builtintab->addnode(builtintab, b->nam, b);
+	builtintab->freenode(builtintab->removenode(builtintab, b->node.nam));
+    builtintab->addnode(builtintab, b->node.nam, b);
     return 0;
 }
 
@@ -158,13 +158,13 @@ addbuiltins(char const *nam, Builtin binl, int size)
 
     for(n = 0; n < size; n++) {
 	Builtin b = &binl[n];
-	if(b->flags & BINF_ADDED)
+	if(b->node.flags & BINF_ADDED)
 	    continue;
 	if(addbuiltin(b)) {
-	    zwarnnam(nam, "name clash when adding builtin `%s'", b->nam, 0);
+	    zwarnnam(nam, "name clash when adding builtin `%s'", b->node.nam, 0);
 	    hadf = 1;
 	} else {
-	    b->flags |= BINF_ADDED;
+	    b->node.flags |= BINF_ADDED;
 	    hads = 2;
 	}
     }
@@ -227,7 +227,7 @@ int
 add_autobin(char *nam, char *module)
 {
     Builtin bn = zshcalloc(sizeof(*bn));
-    bn->nam = ztrdup(nam);
+    bn->node.nam = ztrdup(nam);
     bn->optstr = ztrdup(module);
     return addbuiltin(bn);
 }
@@ -244,7 +244,7 @@ deletebuiltin(char *nam)
     bn = (Builtin) builtintab->removenode(builtintab, nam);
     if (!bn)
 	return -1;
-    builtintab->freenode((HashNode)bn);
+    builtintab->freenode(&bn->node);
     return 0;
 }
 
@@ -265,14 +265,14 @@ deletebuiltins(char const *nam, Builtin binl, int size)
 
     for(n = 0; n < size; n++) {
 	Builtin b = &binl[n];
-	if(!(b->flags & BINF_ADDED))
+	if(!(b->node.flags & BINF_ADDED))
 	    continue;
-	if(deletebuiltin(b->nam)) {
-	    zwarnnam(nam, "builtin `%s' already deleted", b->nam, 0);
+	if(deletebuiltin(b->node.nam)) {
+	    zwarnnam(nam, "builtin `%s' already deleted", b->node.nam, 0);
 	    hadf = 1;
 	} else
 	    hads = 2;
-	b->flags &= ~BINF_ADDED;
+	b->node.flags &= ~BINF_ADDED;
     }
     return hadf ? hads : 1;
 }
@@ -941,20 +941,20 @@ autoloadscan(HashNode hn, int printflags)
 {
     Builtin bn = (Builtin) hn;
 
-    if(bn->flags & BINF_ADDED)
+    if(bn->node.flags & BINF_ADDED)
 	return;
     if(printflags & PRINT_LIST) {
 	fputs("zmodload -ab ", stdout);
 	if(bn->optstr[0] == '-')
 	    fputs("-- ", stdout);
 	quotedzputs(bn->optstr, stdout);
-	if(strcmp(bn->nam, bn->optstr)) {
+	if(strcmp(bn->node.nam, bn->optstr)) {
 	    putchar(' ');
-	    quotedzputs(bn->nam, stdout);
+	    quotedzputs(bn->node.nam, stdout);
 	}
     } else {
-	nicezputs(bn->nam, stdout);
-	if(strcmp(bn->nam, bn->optstr)) {
+	nicezputs(bn->node.nam, stdout);
+	if(strcmp(bn->node.nam, bn->optstr)) {
 	    fputs(" (", stdout);
 	    nicezputs(bn->optstr, stdout);
 	    putchar(')');
@@ -1262,7 +1262,7 @@ bin_zmodload_auto(char *nam, char **args, Options ops)
 		    zwarnnam(nam, "%s: no such builtin", *args, 0);
 		    ret = 1;
 		}
-	    } else if (bn->flags & BINF_ADDED) {
+	    } else if (bn->node.flags & BINF_ADDED) {
 		zwarnnam(nam, "%s: builtin is already defined", *args, 0);
 		ret = 1;
 	    } else
@@ -1418,11 +1418,11 @@ printautoparams(HashNode hn, int lon)
 {
     Param pm = (Param) hn;
 
-    if (pm->flags & PM_AUTOLOAD) {
+    if (pm->node.flags & PM_AUTOLOAD) {
 	if (lon)
-	    printf("zmodload -ap %s %s\n", pm->u.str, pm->nam);
+	    printf("zmodload -ap %s %s\n", pm->u.str, pm->node.nam);
 	else
-	    printf("%s (%s)\n", pm->nam, pm->u.str);
+	    printf("%s (%s)\n", pm->node.nam, pm->u.str);
     }
 }
 
@@ -1442,7 +1442,7 @@ bin_zmodload_param(char *nam, char **args, Options ops)
 		    zwarnnam(nam, "%s: no such parameter", *args, 0);
 		    ret = 1;
 		}
-	    } else if (!(pm->flags & PM_AUTOLOAD)) {
+	    } else if (!(pm->node.flags & PM_AUTOLOAD)) {
 		zwarnnam(nam, "%s: parameter is already defined", *args, 0);
 		ret = 1;
 	    } else
@@ -1925,7 +1925,7 @@ addparamdef(Paramdef d)
 	 * If no get/set/unset class, use the appropriate
 	 * variable type.
 	 */
-	switch (PM_TYPE(pm->flags)) {
+	switch (PM_TYPE(pm->node.flags)) {
 	case PM_SCALAR:
 	    pm->gsu.s = &varscalar_gsu;
 	    break;
@@ -2075,7 +2075,7 @@ add_autoparam(char *nam, char *module)
 
     pm = setsparam(nam, ztrdup(module));
 
-    pm->flags |= PM_AUTOLOAD;
+    pm->node.flags |= PM_AUTOLOAD;
     unqueue_signals();
 }
 

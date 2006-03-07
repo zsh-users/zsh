@@ -862,8 +862,8 @@ histremovedups(void)
     Histent he, next;
     for (he = hist_ring; he; he = next) {
 	next = up_histent(he);
-	if (he->flags & HIST_DUP)
-	    freehistnode((HashNode)he);
+	if (he->node.flags & HIST_DUP)
+	    freehistnode(&he->node);
     }
 }
 
@@ -892,13 +892,13 @@ movehistent(Histent he, int n, int xflags)
     while (n < 0) {
 	if (!(he = up_histent(he)))
 	    return NULL;
-	if (!(he->flags & xflags))
+	if (!(he->node.flags & xflags))
 	    n++;
     }
     while (n > 0) {
 	if (!(he = down_histent(he)))
 	    return NULL;
-	if (!(he->flags & xflags))
+	if (!(he->node.flags & xflags))
 	    n--;
     }
     checkcurline(he);
@@ -955,7 +955,7 @@ putoldhistentryontop(short keep_going)
     static Histent next = NULL;
     Histent he = keep_going? next : hist_ring->down;
     next = he->down;
-    if (isset(HISTEXPIREDUPSFIRST) && !(he->flags & HIST_DUP)) {
+    if (isset(HISTEXPIREDUPSFIRST) && !(he->node.flags & HIST_DUP)) {
 	static zlong max_unique_ct = 0;
 	if (!keep_going)
 	    max_unique_ct = savehistsiz;
@@ -968,7 +968,7 @@ putoldhistentryontop(short keep_going)
 	    }
 	    he = next;
 	    next = he->down;
-	} while (!(he->flags & HIST_DUP));
+	} while (!(he->node.flags & HIST_DUP));
     }
     if (he != hist_ring->down) {
 	he->up->down = he->down;
@@ -989,9 +989,9 @@ prepnexthistent(void)
 
     if (curline_in_ring)
 	unlinkcurline();
-    if (hist_ring && hist_ring->flags & HIST_TMPSTORE) {
+    if (hist_ring && hist_ring->node.flags & HIST_TMPSTORE) {
 	curhist--;
-	freehistnode((HashNode)hist_ring);
+	freehistnode(&hist_ring->node);
     }
 
     if (histlinect < histsiz) {
@@ -1132,12 +1132,12 @@ hend(Eprog prog)
     }
     if (save || *chline == ' ') {
 	Histent he;
-	for (he = hist_ring; he && he->flags & HIST_FOREIGN;
+	for (he = hist_ring; he && he->node.flags & HIST_FOREIGN;
 	     he = up_histent(he)) ;
-	if (he && he->flags & HIST_TMPSTORE) {
+	if (he && he->node.flags & HIST_TMPSTORE) {
 	    if (he == hist_ring)
 		curline.histnum = curhist--;
-	    freehistnode((HashNode)he);
+	    freehistnode(&he->node);
 	}
     }
     if (save) {
@@ -1160,30 +1160,30 @@ hend(Eprog prog)
 	}
 	newflags = save > 0? 0 : HIST_TMPSTORE;
 	if ((isset(HISTIGNOREDUPS) || isset(HISTIGNOREALLDUPS)) && save > 0
-	 && hist_ring && histstrcmp(chline, hist_ring->text) == 0) {
+	 && hist_ring && histstrcmp(chline, hist_ring->node.nam) == 0) {
 	    /* This history entry compares the same as the previous.
 	     * In case minor changes were made, we overwrite the
 	     * previous one with the current one.  This also gets the
 	     * timestamp right.  Perhaps, preserve the HIST_OLD flag.
 	     */
 	    he = hist_ring;
-	    newflags |= he->flags & HIST_OLD; /* Avoid re-saving */
+	    newflags |= he->node.flags & HIST_OLD; /* Avoid re-saving */
 	    freehistdata(he, 0);
 	    curline.histnum = curhist;
 	} else
 	    he = prepnexthistent();
 
-	he->text = ztrdup(chline);
+	he->node.nam = ztrdup(chline);
 	he->stim = time(NULL);
 	he->ftim = 0L;
-	he->flags = newflags;
+	he->node.flags = newflags;
 
 	if ((he->nwords = chwordpos/2)) {
 	    he->words = (short *)zalloc(chwordpos * sizeof(short));
 	    memcpy(he->words, chwords, chwordpos * sizeof(short));
 	}
 	if (!(newflags & HIST_TMPSTORE))
-	    addhistnode(histtab, he->text, he);
+	    addhistnode(histtab, he->node.nam, he);
     }
     zfree(chline, hlinesz);
     zfree(chwords, chwordlen*sizeof(short));
@@ -1383,10 +1383,10 @@ hconsearch(char *str, int *marg)
     Histent he;
 
     for (he = up_histent(hist_ring); he; he = up_histent(he)) {
-	if (he->flags & HIST_FOREIGN)
+	if (he->node.flags & HIST_FOREIGN)
 	    continue;
-	if ((s = strstr(he->text, str))) {
-	    int pos = s - he->text;
+	if ((s = strstr(he->node.nam, str))) {
+	    int pos = s - he->node.nam;
 	    while (t1 < he->nwords && he->words[2*t1] <= pos)
 		t1++;
 	    *marg = t1 - 1;
@@ -1406,9 +1406,9 @@ hcomsearch(char *str)
     int len = strlen(str);
 
     for (he = up_histent(hist_ring); he; he = up_histent(he)) {
-	if (he->flags & HIST_FOREIGN)
+	if (he->node.flags & HIST_FOREIGN)
 	    continue;
-	if (strncmp(he->text, str, len) == 0)
+	if (strncmp(he->node.nam, str, len) == 0)
 	    return he->histnum;
     }
     return -1;
@@ -1599,7 +1599,7 @@ mod_export void
 checkcurline(Histent he)
 {
     if (he->histnum == curhist && (histactive & HA_ACTIVE)) {
-	curline.text = chline;
+	curline.node.nam = chline;
 	curline.nwords = chwordpos/2;
 	curline.words = chwords;
     }
@@ -1641,7 +1641,7 @@ getargs(Histent elist, int arg1, int arg2)
     }
 
     pos1 = words[2*arg1];
-    return dupstrpfx(elist->text + pos1, words[2*arg2+1] - pos1);
+    return dupstrpfx(elist->node.nam + pos1, words[2*arg2+1] - pos1);
 }
 
 /**/
@@ -1811,10 +1811,10 @@ resizehistents(void)
 	/* The reason we don't just call freehistnode(hist_ring->down) is
 	 * so that we can honor the HISTEXPIREDUPSFIRST setting. */
 	putoldhistentryontop(0);
-	freehistnode((HashNode)hist_ring);
+	freehistnode(&hist_ring->node);
 	while (histlinect > histsiz) {
 	    putoldhistentryontop(1);
-	    freehistnode((HashNode)hist_ring);
+	    freehistnode(&hist_ring->node);
 	}
     }
 }
@@ -1974,8 +1974,8 @@ readhistfile(char *fn, int err, int readflags)
 	    }
 
 	    he = prepnexthistent();
-	    he->text = ztrdup(pt);
-	    he->flags = newflags;
+	    he->node.nam = ztrdup(pt);
+	    he->node.flags = newflags;
 	    if ((he->stim = stim) == 0)
 		he->stim = he->ftim = tim;
 	    else if (ftim < stim)
@@ -2008,9 +2008,9 @@ readhistfile(char *fn, int err, int readflags)
 		memcpy(he->words, wordlist, nwordpos*sizeof(short));
 	    } else
 		he->words = (short *)NULL;
-	    addhistnode(histtab, he->text, he);
-	    if (he->flags & HIST_DUP) {
-		freehistnode((HashNode)he);
+	    addhistnode(histtab, he->node.nam, he);
+	    if (he->node.flags & HIST_DUP) {
+		freehistnode(&he->node);
 		curhist--;
 	    }
 	}
@@ -2043,7 +2043,7 @@ savehistfile(char *fn, int err, int writeflags)
 	return;
     if (writeflags & HFILE_FAST) {
 	he = gethistent(lasthist.next_write_ev, GETHIST_DOWNWARD);
-	while (he && he->flags & HIST_OLD) {
+	while (he && he->node.flags & HIST_OLD) {
 	    lasthist.next_write_ev = he->histnum + 1;
 	    he = down_histent(he);
 	}
@@ -2103,14 +2103,14 @@ savehistfile(char *fn, int err, int writeflags)
     }
     if (out) {
 	for (; he && he->histnum <= xcurhist; he = down_histent(he)) {
-	    if ((writeflags & HFILE_SKIPDUPS && he->flags & HIST_DUP)
-	     || (writeflags & HFILE_SKIPFOREIGN && he->flags & HIST_FOREIGN)
-	     || he->flags & HIST_TMPSTORE)
+	    if ((writeflags & HFILE_SKIPDUPS && he->node.flags & HIST_DUP)
+	     || (writeflags & HFILE_SKIPFOREIGN && he->node.flags & HIST_FOREIGN)
+	     || he->node.flags & HIST_TMPSTORE)
 		continue;
 	    if (writeflags & HFILE_SKIPOLD) {
-		if (he->flags & HIST_OLD)
+		if (he->node.flags & HIST_OLD)
 		    continue;
-		he->flags |= HIST_OLD;
+		he->node.flags |= HIST_OLD;
 		if (writeflags & HFILE_USE_OPTIONS)
 		    lasthist.next_write_ev = he->histnum + 1;
 	    }
@@ -2119,7 +2119,7 @@ savehistfile(char *fn, int err, int writeflags)
 		lasthist.stim = he->stim;
 		histfile_linect++;
 	    }
-	    t = start = he->text;
+	    t = start = he->node.nam;
 	    if (extended_history) {
 		fprintf(out, ": %ld:%ld;", (long)he->stim,
 			he->ftim? (long)(he->ftim - he->stim) : 0L);

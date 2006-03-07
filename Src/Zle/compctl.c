@@ -93,7 +93,7 @@ freecompctlp(HashNode hn)
 {
     Compctlp ccp = (Compctlp) hn;
 
-    zsfree(ccp->nam);
+    zsfree(ccp->node.nam);
     freecompctl(ccp->cc);
     zfree(ccp, sizeof(struct compctlp));
 }
@@ -1342,7 +1342,7 @@ compctl_process_cc(char **s, Compctl cc)
 	    if (compctl_name_pat(&n))
 		delpatcomp(n);
 	    else if ((ccp = (Compctlp) compctltab->removenode(compctltab, n)))
-		compctltab->freenode((HashNode) ccp);
+		compctltab->freenode(&ccp->node);
 	}
     } else {
 	/* Add the compctl just read to the hash table */
@@ -1570,7 +1570,7 @@ printcompctlp(HashNode hn, int printflags)
     Compctlp ccp = (Compctlp) hn;
 
     /* Function needed for use by scanhashtable() */
-    printcompctl(ccp->nam, ccp->cc, printflags, 0);
+    printcompctl(ccp->node.nam, ccp->cc, printflags, 0);
 }
 
 /* Main entry point for the `compctl' builtin */
@@ -1979,7 +1979,7 @@ addmatch(char *s, char *t)
 	isfile = CMF_FILE;
     } else if (addwhat == CC_QUOTEFLAG || addwhat == -2  ||
 	      (addwhat == -3 && !(hn->flags & DISABLED)) ||
-	      (addwhat == -4 && (PM_TYPE(pm->flags) == PM_SCALAR) &&
+	      (addwhat == -4 && (PM_TYPE(pm->node.flags) == PM_SCALAR) &&
 	       !pm->level && (tt = pm->gsu.s->getfn(pm)) && *tt == '/') ||
 	      (addwhat == -9 && !(hn->flags & PM_UNSET) && !pm->level) ||
 	      (addwhat > 0 &&
@@ -2255,9 +2255,9 @@ gen_matches_files(int dirs, int execs, int all)
 static LinkNode
 findnode(LinkList list, void *dat)
 {
-    LinkNode tmp = list->first;
+    LinkNode tmp = firstnode(list);
 
-    while (tmp && tmp->dat != dat) tmp = tmp->next;
+    while (tmp && getdata(tmp) != dat) incnode(tmp);
 
     return tmp;
 }
@@ -3692,7 +3692,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    if (!errflag)
 		/* And add the resulting words as matches. */
 		for (n = firstnode(foo); n; incnode(n))
-		    addmatch((char *)n->dat, NULL);
+		    addmatch(getdata(n), NULL);
 	}
 	opts[NULLGLOB] = ng;
 	we = oowe;
@@ -3720,8 +3720,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	while (n-- && he) {
 	    int iwords;
 	    for (iwords = he->nwords - 1; iwords >= 0; iwords--) {
-		h = he->text + he->words[iwords*2];
-		e = he->text + he->words[iwords*2+1];
+		h = he->node.nam + he->words[iwords*2];
+		e = he->node.nam + he->words[iwords*2+1];
 		hpatsav = *e;
 		*e = '\0';
 		/* We now have a word from the history, ignore it *

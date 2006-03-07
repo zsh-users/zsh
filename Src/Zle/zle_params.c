@@ -156,7 +156,7 @@ makezleparams(int ro)
 		break;
 	}
 	if ((zp->type & PM_UNSET) && (zmod.flags & MOD_MULT))
-	    pm->flags &= ~PM_UNSET;
+	    pm->node.flags &= ~PM_UNSET;
     }
 }
 

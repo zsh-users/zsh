@@ -557,7 +557,7 @@ fprintdir(char *s, FILE *f)
 	fputs(unmeta(s), f);
     else {
 	putc('~', f);
-	fputs(unmeta(d->nam), f);
+	fputs(unmeta(d->node.nam), f);
 	fputs(unmeta(s + strlen(d->dir)), f);
     }
 }
@@ -609,7 +609,7 @@ finddir_scan(HashNode hn, UNUSED(int flags))
     Nameddir nd = (Nameddir) hn;
 
     if(nd->diff > finddir_best && !dircmp(nd->dir, finddir_full)
-       && !(nd->flags & ND_NOABBREV)) {
+       && !(nd->node.flags & ND_NOABBREV)) {
 	finddir_last=nd;
 	finddir_best=nd->diff;
     }
@@ -623,7 +623,7 @@ finddir_scan(HashNode hn, UNUSED(int flags))
 Nameddir
 finddir(char *s)
 {
-    static struct nameddir homenode = { NULL, "", 0, NULL, 0 };
+    static struct nameddir homenode = { {NULL, "", 0}, NULL, 0 };
     static int ffsz;
 
     /* Invalidate directory cache if argument is NULL.  This is called *
@@ -650,7 +650,7 @@ finddir(char *s)
     strcpy(finddir_full, s);
     finddir_best=0;
     finddir_last=NULL;
-    finddir_scan((HashNode)&homenode, 0);
+    finddir_scan(&homenode.node, 0);
     scanhashtable(nameddirtab, 0, 0, 0, finddir_scan, 0);
     return finddir_last;
 }
@@ -695,7 +695,7 @@ adduserdir(char *s, char *t, int flags, int always)
 
     /* add the name */
     nd = (Nameddir) zshcalloc(sizeof *nd);
-    nd->flags = flags;
+    nd->node.flags = flags;
     eptr = t + strlen(t);
     while (eptr > t && eptr[-1] == '/')
 	eptr--;
@@ -710,7 +710,7 @@ adduserdir(char *s, char *t, int flags, int always)
 	nd->dir = ztrduppfx(t, eptr - t);
     /* The variables PWD and OLDPWD are not to be displayed as ~PWD etc. */
     if (!strcmp(s, "PWD") || !strcmp(s, "OLDPWD"))
-	nd->flags |= ND_NOABBREV;
+	nd->node.flags |= ND_NOABBREV;
     nameddirtab->addnode(nameddirtab, ztrdup(s), nd);
 }
 
@@ -733,9 +733,9 @@ getnameddir(char *name)
      * begins with a `/'.  If there is, add it to the hash table and   *
      * return the new value.                                           */
     if ((pm = (Param) paramtab->getnode(paramtab, name)) &&
-	    (PM_TYPE(pm->flags) == PM_SCALAR) &&
+	    (PM_TYPE(pm->node.flags) == PM_SCALAR) &&
 	    (str = getsparam(name)) && *str == '/') {
-	pm->flags |= PM_NAMEDDIR;
+	pm->node.flags |= PM_NAMEDDIR;
 	adduserdir(name, str, 0, 1);
 	return str;
     }

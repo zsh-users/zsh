@@ -1606,7 +1606,7 @@ exalias(void)
 		
 		an = (Alias) aliastab->getnode(aliastab, yytext);
 		if (an && !an->inuse &&
-		    ((an->flags & ALIAS_GLOBAL) || incmdpos || inalmore)) {
+		    ((an->node.flags & ALIAS_GLOBAL) || incmdpos || inalmore)) {
 		    inpush(an->text, INP_ALIAS, an);
 		    if (an->text[0] == ' ')
 			aliasspaceflag = 1;

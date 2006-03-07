@@ -1148,7 +1148,7 @@ set_compstate(UNUSED(Param pm), HashTable ht)
 			zsfree(*((char **) cp->var));
 			*((char **) cp->var) = ztrdup(str);
 		    }
-		    (*pp)->flags &= ~PM_UNSET;
+		    (*pp)->node.flags &= ~PM_UNSET;
 
 		    break;
 		}
@@ -1229,18 +1229,18 @@ compunsetfn(Param pm, int exp)
 {
     if (exp) {
 	if (pm->u.data) {
-	    if (PM_TYPE(pm->flags) == PM_SCALAR) {
+	    if (PM_TYPE(pm->node.flags) == PM_SCALAR) {
 		zsfree(*((char **) pm->u.data));
 		*((char **) pm->u.data) = ztrdup("");
-	    } else if (PM_TYPE(pm->flags) == PM_ARRAY) {
+	    } else if (PM_TYPE(pm->node.flags) == PM_ARRAY) {
 		freearray(*((char ***) pm->u.data));
 		*((char ***) pm->u.data) = zshcalloc(sizeof(char *));
-	    } else if (PM_TYPE(pm->flags) == PM_HASHED) {
+	    } else if (PM_TYPE(pm->node.flags) == PM_HASHED) {
 		deleteparamtable(pm->u.hash);
 		pm->u.hash = NULL;
 	    }
 	}
-    } else if (PM_TYPE(pm->flags) == PM_HASHED) {
+    } else if (PM_TYPE(pm->node.flags) == PM_HASHED) {
 	Param *p;
 	int i;
 
@@ -1272,9 +1272,9 @@ comp_setunset(int rset, int runset, int kset, int kunset)
 	for (p = comprpms; rset || runset; rset >>= 1, runset >>= 1, p++) {
 	    if (*p) {
 		if (rset & 1)
-		    (*p)->flags &= ~PM_UNSET;
+		    (*p)->node.flags &= ~PM_UNSET;
 		if (runset & 1)
-		    (*p)->flags |= PM_UNSET;
+		    (*p)->node.flags |= PM_UNSET;
 	    }
 	}
     }
@@ -1282,9 +1282,9 @@ comp_setunset(int rset, int runset, int kset, int kunset)
 	for (p = compkpms; kset || kunset; kset >>= 1, kunset >>= 1, p++) {
 	    if (*p) {
 		if (kset & 1)
-		    (*p)->flags &= ~PM_UNSET;
+		    (*p)->node.flags &= ~PM_UNSET;
 		if (kunset & 1)
-		    (*p)->flags |= PM_UNSET;
+		    (*p)->node.flags |= PM_UNSET;
 	    }
 	}
     }
@@ -1306,10 +1306,10 @@ comp_wrapper(Eprog prog, FuncWrap w, char *name)
 	m = CP_WORDS | CP_REDIRS | CP_CURRENT | CP_PREFIX | CP_SUFFIX | 
 	    CP_IPREFIX | CP_ISUFFIX | CP_QIPREFIX | CP_QISUFFIX;
 	for (pp = comprpms, sm = 1; m; pp++, m >>= 1, sm <<= 1) {
-	    if ((m & 1) && ((*pp)->flags & PM_UNSET))
+	    if ((m & 1) && ((*pp)->node.flags & PM_UNSET))
 		runset |= sm;
 	}
-	if (compkpms[CPN_RESTORE]->flags & PM_UNSET)
+	if (compkpms[CPN_RESTORE]->node.flags & PM_UNSET)
 	    kunset = CP_RESTORE;
 	orest = comprestore;
 	comprestore = ztrdup("auto");

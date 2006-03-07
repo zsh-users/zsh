@@ -446,8 +446,8 @@ getlanginfo(UNUSED(HashTable ht), char *name)
     unmetafy(name, &len);
 
     pm = (Param) hcalloc(sizeof(struct param));
-    pm->nam = dupstring(name);
-    pm->flags = PM_READONLY | PM_SCALAR;
+    pm->node.nam = dupstring(name);
+    pm->node.flags = PM_READONLY | PM_SCALAR;
     pm->gsu.s = &nullsetscalar_gsu;
 
     if(name)
@@ -462,9 +462,9 @@ getlanginfo(UNUSED(HashTable ht), char *name)
     {
 	/* zwarn("no such lang info: %s", name, 0); */
 	pm->u.str = dupstring("");
-	pm->flags |= PM_UNSET;
+	pm->node.flags |= PM_UNSET;
     }
-    return (HashNode) pm;
+    return &pm->node;
 }
 
 /**/
@@ -477,14 +477,14 @@ scanlanginfo(UNUSED(HashTable ht), ScanFunc func, int flags)
 
     pm = (Param) hcalloc(sizeof(struct param));
     pm->gsu.s = &nullsetscalar_gsu;
-    pm->flags = PM_READONLY | PM_SCALAR;
+    pm->node.flags = PM_READONLY | PM_SCALAR;
 
     nlcode = &nl_vals[0];
     for (element = (char **)nl_names; *element; element++, nlcode++) {
 	if ((langstr = nl_langinfo(*nlcode)) != NULL) {
 	    pm->u.str = dupstring(langstr);
-	    pm->nam = dupstring(*element);
-	    func((HashNode) pm, flags);
+	    pm->node.nam = dupstring(*element);
+	    func(&pm->node, flags);
 	}
     }
     
@@ -522,7 +522,7 @@ cleanup_(UNUSED(Module m))
 
     if ((pm = (Param) paramtab->getnode(paramtab, langinfo_nam)) &&
 	pm == langinfo_pm) {
-	pm->flags &= ~PM_READONLY;
+	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
 #endif

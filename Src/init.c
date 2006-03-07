@@ -149,7 +149,7 @@ loop(int toplevel, int justonce)
 		/* If curline got dumped from the history, we don't know
 		 * what the user typed. */
 		if (hist_ring && curline.histnum == curhist)
-		    zaddlinknode(args, hist_ring->text);
+		    zaddlinknode(args, hist_ring->node.nam);
 		else
 		    zaddlinknode(args, "");
 		zaddlinknode(args, getjobtext(prog, NULL));

@@ -330,7 +330,7 @@ enum {
 /**************************/
 
 typedef struct linknode  *LinkNode;
-typedef struct linklist  *LinkList;
+typedef union  linkroot  *LinkList;
 typedef struct hashnode  *HashNode;
 typedef struct hashtable *HashTable;
 
@@ -379,44 +379,50 @@ struct linknode {
 struct linklist {
     LinkNode first;
     LinkNode last;
+    int flags;
+};
+
+union linkroot {
+    struct linklist list;
+    struct linknode node;
 };
 
 /* Macros for manipulating link lists */
 
-#define addlinknode(X,Y)    insertlinknode(X,(X)->last,Y)
-#define zaddlinknode(X,Y)   zinsertlinknode(X,(X)->last,Y)
-#define uaddlinknode(X,Y)   uinsertlinknode(X,(X)->last,Y)
-#define empty(X)            ((X)->first == NULL)
-#define nonempty(X)         ((X)->first != NULL)
-#define firstnode(X)        ((X)->first)
+#define firstnode(X)        ((X)->list.first)
+#define lastnode(X)         ((X)->list.last)
+#define peekfirst(X)        (firstnode(X)->dat)
+#define addlinknode(X,Y)    insertlinknode(X,lastnode(X),Y)
+#define zaddlinknode(X,Y)   zinsertlinknode(X,lastnode(X),Y)
+#define uaddlinknode(X,Y)   uinsertlinknode(X,lastnode(X),Y)
+#define empty(X)            (firstnode(X) == NULL)
+#define nonempty(X)         (firstnode(X) != NULL)
 #define getaddrdata(X)      (&((X)->dat))
 #define getdata(X)          ((X)->dat)
 #define setdata(X,Y)        ((X)->dat = (Y))
-#define lastnode(X)         ((X)->last)
 #define nextnode(X)         ((X)->next)
 #define prevnode(X)         ((X)->last)
-#define peekfirst(X)        ((X)->first->dat)
-#define pushnode(X,Y)       insertlinknode(X,(LinkNode) X,Y)
-#define zpushnode(X,Y)      zinsertlinknode(X,(LinkNode) X,Y)
+#define pushnode(X,Y)       insertlinknode(X,&(X)->node,Y)
+#define zpushnode(X,Y)      zinsertlinknode(X,&(X)->node,Y)
 #define incnode(X)          (X = nextnode(X))
 #define firsthist()         (hist_ring? hist_ring->down->histnum : curhist)
-#define setsizednode(X,Y,Z) ((X)->first[(Y)].dat = (void *) (Z))
+#define setsizednode(X,Y,Z) (firstnode(X)[(Y)].dat = (void *) (Z))
 
 /* stack allocated linked lists */
 
-#define local_list0(N) struct linklist N
+#define local_list0(N) union linkroot N
 #define init_list0(N) \
     do { \
-        (N).first = NULL; \
-        (N).last = (LinkNode) &(N); \
+        (N).list.first = NULL; \
+        (N).list.last = &(N).node; \
     } while (0)
-#define local_list1(N) struct linklist N; struct linknode __n0
+#define local_list1(N) union linkroot N; struct linknode __n0
 #define init_list1(N,V0) \
     do { \
-        (N).first = &__n0; \
-        (N).last = &__n0; \
+        (N).list.first = &__n0; \
+        (N).list.last = &__n0; \
         __n0.next = NULL; \
-        __n0.last = (LinkNode) &(N); \
+        __n0.last = &(N).node; \
         __n0.dat = (void *) (V0); \
     } while (0)
 
@@ -908,27 +914,21 @@ struct hashnode {
 /* node in shell option table */
 
 struct optname {
-    HashNode next;		/* next in hash chain */
-    char *nam;			/* hash data */
-    int flags;
+    struct hashnode node;
     int optno;			/* option number */
 };
 
 /* node in shell reserved word hash table (reswdtab) */
 
 struct reswd {
-    HashNode next;		/* next in hash chain        */
-    char *nam;			/* name of reserved word     */
-    int flags;			/* flags                     */
+    struct hashnode node;
     int token;			/* corresponding lexer token */
 };
 
 /* node in alias hash table (aliastab) */
 
 struct alias {
-    HashNode next;		/* next in hash chain       */
-    char *nam;			/* hash data                */
-    int flags;			/* flags for alias types    */
+    struct hashnode node;
     char *text;			/* expansion of alias       */
     int inuse;			/* alias is being expanded  */
 };
@@ -942,9 +942,7 @@ struct alias {
 /* node in command path hash table (cmdnamtab) */
 
 struct cmdnam {
-    HashNode next;		/* next in hash chain */
-    char *nam;			/* hash data          */
-    int flags;
+    struct hashnode node;
     union {
 	char **name;		/* full pathname for external commands */
 	char *cmd;		/* file name for hashed commands       */
@@ -959,9 +957,7 @@ struct cmdnam {
 /* node in shell function hash table (shfunctab) */
 
 struct shfunc {
-    HashNode next;		/* next in hash chain     */
-    char *nam;			/* name of shell function */
-    int flags;			/* various flags          */
+    struct hashnode node;
     Eprog funcdef;		/* function definition    */
 };
 
@@ -1047,9 +1043,7 @@ typedef int (*HandlerFunc) _((char *, char **, Options, int));
 #define NULLBINCMD ((HandlerFunc) 0)
 
 struct builtin {
-    HashNode next;		/* next in hash chain                                 */
-    char *nam;			/* name of builtin                                    */
-    int flags;			/* various flags                                      */
+    struct hashnode node;
     HandlerFunc handlerfunc;	/* pointer to function that executes this builtin     */
     int minargs;		/* minimum number of arguments                        */
     int maxargs;		/* maximum number of arguments, or -1 for no limit    */
@@ -1059,7 +1053,7 @@ struct builtin {
 };
 
 #define BUILTIN(name, flags, handler, min, max, funcid, optstr, defopts) \
-    { NULL, name, flags, handler, min, max, funcid, optstr, defopts }
+    { { NULL, name, flags }, handler, min, max, funcid, optstr, defopts }
 #define BIN_PREFIX(name, flags) \
     BUILTIN(name, flags | BINF_PREFIX, NULLBINCMD, 0, 0, 0, NULL, NULL)
 
@@ -1218,9 +1212,7 @@ struct gsu_hash {
 /* node used in parameter hash table (paramtab) */
 
 struct param {
-    HashNode next;		/* next in hash chain */
-    char *nam;			/* hash data          */
-    int flags;			/* PM_* flags         */
+    struct hashnode node;
 
     /* the value of this parameter */
     union {
@@ -1391,9 +1383,7 @@ enum {
 /* node for named directory hash table (nameddirtab) */
 
 struct nameddir {
-    HashNode next;		/* next in hash chain               */
-    char *nam;			/* directory name                   */
-    int flags;			/* see below                        */
+    struct hashnode node;
     char *dir;			/* the directory in full            */
     int diff;			/* strlen(.dir) - strlen(.nam)      */
 };
@@ -1426,9 +1416,7 @@ struct nameddir {
 /* history entry */
 
 struct histent {
-    HashNode hash_next;		/* next in hash chain               */
-    char *text;			/* the history line itself          */
-    int flags;			/* Misc flags                       */
+    struct hashnode node;
 
     Histent up;			/* previous line (moving upward)    */
     Histent down;		/* next line (moving downward)      */

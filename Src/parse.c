@@ -2826,17 +2826,17 @@ cur_add_func(char *nam, Shfunc shf, LinkList names, LinkList progs,
     Eprog prog;
     WCFunc wcf;
 
-    if (shf->flags & PM_UNDEFINED) {
+    if (shf->node.flags & PM_UNDEFINED) {
 	int ona = noaliases;
 
 	if (!(what & 2)) {
-	    zwarnnam(nam, "function is not loaded: %s", shf->nam, 0);
+	    zwarnnam(nam, "function is not loaded: %s", shf->node.nam, 0);
 	    return 1;
 	}
-	noaliases = (shf->flags & PM_UNALIASED);
-	if (!(prog = getfpfunc(shf->nam, NULL)) || prog == &dummy_eprog) {
+	noaliases = (shf->node.flags & PM_UNALIASED);
+	if (!(prog = getfpfunc(shf->node.nam, NULL)) || prog == &dummy_eprog) {
 	    noaliases = ona;
-	    zwarnnam(nam, "can't load function: %s", shf->nam, 0);
+	    zwarnnam(nam, "can't load function: %s", shf->node.nam, 0);
 	    return 1;
 	}
 	if (prog->dump)
@@ -2844,20 +2844,20 @@ cur_add_func(char *nam, Shfunc shf, LinkList names, LinkList progs,
 	noaliases = ona;
     } else {
 	if (!(what & 1)) {
-	    zwarnnam(nam, "function is already loaded: %s", shf->nam, 0);
+	    zwarnnam(nam, "function is already loaded: %s", shf->node.nam, 0);
 	    return 1;
 	}
 	prog = dupeprog(shf->funcdef, 1);
     }
     wcf = (WCFunc) zhalloc(sizeof(*wcf));
-    wcf->name = shf->nam;
+    wcf->name = shf->node.nam;
     wcf->prog = prog;
     wcf->flags = ((prog->flags & EF_RUN) ? FDHF_KSHLOAD : FDHF_ZSHLOAD);
     addlinknode(progs, wcf);
-    addlinknode(names, shf->nam);
+    addlinknode(names, shf->node.nam);
 
     *hlen += ((sizeof(struct fdhead) / sizeof(wordcode)) +
-	      ((strlen(shf->nam) + sizeof(wordcode)) / sizeof(wordcode)));
+	      ((strlen(shf->node.nam) + sizeof(wordcode)) / sizeof(wordcode)));
     *tlen += (prog->len - (prog->npats * sizeof(Patprog)) +
 	      sizeof(wordcode) - 1) / sizeof(wordcode);
 
@@ -3358,10 +3358,10 @@ dump_autoload(char *nam, char *file, int on, Options ops, int func)
     for (n = firstfdhead(h), e = (FDHead) (h + fdheaderlen(h)); n < e;
 	 n = nextfdhead(n)) {
 	shf = (Shfunc) zshcalloc(sizeof *shf);
-	shf->flags = on;
+	shf->node.flags = on;
 	shf->funcdef = mkautofn(shf);
 	shfunctab->addnode(shfunctab, ztrdup(fdname(n) + fdhtail(n)), shf);
-	if (OPT_ISSET(ops,'X') && eval_autoload(shf, shf->nam, ops, func))
+	if (OPT_ISSET(ops,'X') && eval_autoload(shf, shf->node.nam, ops, func))
 	    ret = 1;
     }
     return ret;

@@ -39,8 +39,8 @@ newlinklist(void)
     LinkList list;
 
     list = (LinkList) zhalloc(sizeof *list);
-    list->first = NULL;
-    list->last = (LinkNode) list;
+    list->list.first = NULL;
+    list->list.last = &list->node;
     return list;
 }
 
@@ -51,8 +51,8 @@ znewlinklist(void)
     LinkList list;
 
     list = (LinkList) zalloc(sizeof *list);
-    list->first = NULL;
-    list->last = (LinkNode) list;
+    list->list.first = NULL;
+    list->list.last = &list->node;
     return list;
 }
 
@@ -72,7 +72,7 @@ insertlinknode(LinkList list, LinkNode node, void *dat)
     if (tmp)
 	tmp->last = new;
     else
-	list->last = new;
+	list->list.last = new;
     return new;
 }
 
@@ -90,7 +90,7 @@ zinsertlinknode(LinkList list, LinkNode node, void *dat)
     if (tmp)
 	tmp->last = new;
     else
-	list->last = new;
+	list->list.last = new;
     return new;
 }
 
@@ -107,7 +107,7 @@ uinsertlinknode(LinkList list, LinkNode node, LinkNode new)
     if (tmp)
 	tmp->last = new;
     else
-	list->last = new;
+	list->list.last = new;
     return new;
 }
 
@@ -120,15 +120,15 @@ insertlinklist(LinkList l, LinkNode where, LinkList x)
     LinkNode nx;
 
     nx = where->next;
-    if (!l->first)
+    if (!firstnode(l))
 	return;
-    where->next = l->first;
-    l->last->next = nx;
-    l->first->last = where;
+    where->next = firstnode(l);
+    l->list.last->next = nx;
+    l->list.first->last = where;
     if (nx)
-	nx->last = l->last;
+	nx->last = lastnode(l);
     else
-	x->last = l->last;
+	x->list.last = lastnode(l);
 }
 
 /* Pop the top node off a linked list and free it. */
@@ -140,15 +140,15 @@ getlinknode(LinkList list)
     void *dat;
     LinkNode node;
 
-    if (!(node = list->first))
+    if (!(node = firstnode(list)))
 	return NULL;
     dat = node->dat;
-    list->first = node->next;
+    list->list.first = node->next;
     if (node->next)
-	node->next->last = (LinkNode) list;
+	node->next->last = &list->node;
     else
-	list->last = (LinkNode) list;
-    zfree(node, sizeof(struct linknode));
+	list->list.last = &list->node;
+    zfree(node, sizeof *node);
     return dat;
 }
 
@@ -161,14 +161,14 @@ ugetnode(LinkList list)
     void *dat;
     LinkNode node;
 
-    if (!(node = list->first))
+    if (!(node = firstnode(list)))
 	return NULL;
     dat = node->dat;
-    list->first = node->next;
+    list->list.first = node->next;
     if (node->next)
-	node->next->last = (LinkNode) list;
+	node->next->last = &list->node;
     else
-	list->last = (LinkNode) list;
+	list->list.last = &list->node;
     return dat;
 }
 
@@ -184,9 +184,9 @@ remnode(LinkList list, LinkNode nd)
     if (nd->next)
 	nd->next->last = nd->last;
     else
-	list->last = nd->last;
+	list->list.last = nd->last;
     dat = nd->dat;
-    zfree(nd, sizeof(struct linknode));
+    zfree(nd, sizeof *nd);
 
     return dat;
 }
@@ -203,7 +203,7 @@ uremnode(LinkList list, LinkNode nd)
     if (nd->next)
 	nd->next->last = nd->last;
     else
-	list->last = nd->last;
+	list->list.last = nd->last;
     dat = nd->dat;
     return dat;
 }
@@ -216,13 +216,13 @@ freelinklist(LinkList list, FreeFunc freefunc)
 {
     LinkNode node, next;
 
-    for (node = list->first; node; node = next) {
+    for (node = firstnode(list); node; node = next) {
 	next = node->next;
 	if (freefunc)
 	    freefunc(node->dat);
-	zfree(node, sizeof(struct linknode));
+	zfree(node, sizeof *node);
     }
-    zfree(list, sizeof(struct linklist));
+    zfree(list, sizeof *list);
 }
 
 /* Count the number of nodes in a linked list */
@@ -242,12 +242,12 @@ countlinknodes(LinkList list)
 mod_export void
 rolllist(LinkList l, LinkNode nd)
 {
-    l->last->next = l->first;
-    l->first->last = l->last;
-    l->first = nd;
-    l->last = nd->last;
-    nd->last = (LinkNode) l;
-    l->last->next = 0;
+    l->list.last->next = firstnode(l);
+    l->list.first->last = lastnode(l);
+    l->list.first = nd;
+    l->list.last = nd->last;
+    nd->last = &l->node;
+    l->list.last->next = 0;
 }
 
 /**/
@@ -257,16 +257,15 @@ newsizedlist(int size)
     LinkList list;
     LinkNode node;
 
-    list = (LinkList) zhalloc(sizeof(struct linklist) +
-			      (size * sizeof(struct linknode)));
+    list = (LinkList) zhalloc(sizeof *list + (size * sizeof *node));
 
-    list->first = (LinkNode) (list + 1);
-    for (node = list->first; size; size--, node++) {
+    list->list.first = &list[1].node;
+    for (node = firstnode(list); size; size--, node++) {
 	node->last = node - 1;
 	node->next = node + 1;
     }
-    list->last = node - 1;
-    list->first->last = (LinkNode) list;
+    list->list.last = node - 1;
+    list->list.first->last = &list->node;
     node[-1].next = NULL;
 
     return list;

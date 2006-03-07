@@ -570,7 +570,7 @@ execute(UNUSED(Cmdnam cmdname), int dash, int defpath)
 	if ((cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0))) {
 	    char nn[PATH_MAX], *dptr;
 
-	    if (cn->flags & HASHED)
+	    if (cn->node.flags & HASHED)
 		strcpy(nn, cn->u.cmd);
 	    else {
 		for (pp = path; pp < cn->u.name; pp++)
@@ -589,7 +589,7 @@ execute(UNUSED(Cmdnam cmdname), int dash, int defpath)
 		    }
 		strcpy(nn, cn->u.name ? *(cn->u.name) : "");
 		strcat(nn, "/");
-		strcat(nn, cn->nam);
+		strcat(nn, cn->node.nam);
 	    }
 	    ee = zexecve(nn, argv);
 
@@ -653,7 +653,7 @@ findcmd(char *arg0, int docopy)
     if (cn) {
 	char nn[PATH_MAX];
 
-	if (cn->flags & HASHED)
+	if (cn->node.flags & HASHED)
 	    strcpy(nn, cn->u.cmd);
 	else {
 	    for (pp = path; pp < cn->u.name; pp++)
@@ -668,7 +668,7 @@ findcmd(char *arg0, int docopy)
 		}
 	    strcpy(nn, cn->u.name ? *(cn->u.name) : "");
 	    strcat(nn, "/");
-	    strcat(nn, cn->nam);
+	    strcat(nn, cn->node.nam);
 	}
 	RET_IF_COM(nn);
     }
@@ -701,14 +701,14 @@ isreallycom(Cmdnam cn)
 {
     char fullnam[MAXCMDLEN];
 
-    if (cn->flags & HASHED)
+    if (cn->node.flags & HASHED)
 	strcpy(fullnam, cn->u.cmd);
     else if (!cn->u.name)
 	return 0;
     else {
 	strcpy(fullnam, *(cn->u.name));
 	strcat(fullnam, "/");
-	strcat(fullnam, cn->nam);
+	strcat(fullnam, cn->node.nam);
     }
     return iscom(fullnam);
 }
@@ -751,7 +751,7 @@ hashcmd(char *arg0, char **pp)
 	return NULL;
 
     cn = (Cmdnam) zshcalloc(sizeof *cn);
-    cn->flags = 0;
+    cn->node.flags = 0;
     cn->u.name = pp;
     cmdnamtab->addnode(cmdnamtab, ztrdup(arg0), cn);
 
@@ -1432,7 +1432,7 @@ checkclobberparam(struct redir *f)
     if (!(v = getvalue(&vbuf, &s, 0)))
 	return 1;
 
-    if (v->pm->flags & PM_READONLY) {
+    if (v->pm->node.flags & PM_READONLY) {
 	zwarn("can't allocate file descriptor to readonly parameter %s",
 	      f->varid, 0);
 	/* don't flag a system error for this */
@@ -1729,8 +1729,8 @@ addvars(Estate state, Wordcode pc, int addflags)
 	    if ((addflags & ADDVAR_EXPORT) && !strchr(name, '[')) {
 		if ((addflags & ADDVAR_RESTRICT) && isset(RESTRICTED) &&
 		    (pm = (Param) paramtab->removenode(paramtab, name)) &&
-		    (pm->flags & PM_RESTRICTED)) {
-		    zerr("%s: restricted", pm->nam, 0);
+		    (pm->node.flags & PM_RESTRICTED)) {
+		    zerr("%s: restricted", pm->node.nam, 0);
 		    zsfree(val);
 		    state->pc = opc;
 		    return;
@@ -1938,7 +1938,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			if (nextnode(firstnode(args)))
 			    next = (char *) getdata(nextnode(firstnode(args)));
 		    } else {
-			hn = (HashNode)&commandbn;
+			hn = &commandbn.node;
 			is_builtin = 1;
 			break;
 		    }
@@ -2145,7 +2145,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
 	    hn = cmdnamtab->getnode(cmdnamtab, cmdarg);
 	    if (hn && trycd && !isreallycom((Cmdnam)hn)) {
-		if (!(((Cmdnam)hn)->flags & HASHED)) {
+		if (!(((Cmdnam)hn)->node.flags & HASHED)) {
 		    checkpath = path;
 		    dohashcmd = 1;
 		}
@@ -2379,7 +2379,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
 		    if (!(v = getvalue(&vbuf, &s, 0))) {
 			bad = 1;
-		    } else if (v->pm->flags & PM_READONLY) {
+		    } else if (v->pm->node.flags & PM_READONLY) {
 			bad = 2;
 		    } else {
 			fn->fd1 = (int)getintvalue(v);
@@ -2692,12 +2692,12 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
 	    if (pm->env)
 		delenv(pm);
-	    if (!(pm->flags & PM_SPECIAL)) {
+	    if (!(pm->node.flags & PM_SPECIAL)) {
 		paramtab->removenode(paramtab, s);
-	    } else if (!(pm->flags & PM_READONLY) &&
-		       (unset(RESTRICTED) || !(pm->flags & PM_RESTRICTED))) {
+	    } else if (!(pm->node.flags & PM_READONLY) &&
+		       (unset(RESTRICTED) || !(pm->node.flags & PM_RESTRICTED))) {
 		Param tpm = (Param) hcalloc(sizeof *tpm);
-		tpm->nam = pm->nam;
+		tpm->node.nam = pm->node.nam;
 		copyparam(tpm, pm, 1);
 		pm = tpm;
 	    }
@@ -2723,8 +2723,8 @@ restore_params(LinkList restorelist, LinkList removelist)
     /* remove temporary parameters */
     while ((s = (char *) ugetnode(removelist))) {
 	if ((pm = (Param) paramtab->getnode(paramtab, s)) &&
-	    !(pm->flags & PM_SPECIAL)) {
-	    pm->flags &= ~PM_READONLY;
+	    !(pm->node.flags & PM_SPECIAL)) {
+	    pm->node.flags &= ~PM_READONLY;
 	    unsetparam_pm(pm, 0, 0);
 	}
     }
@@ -2732,14 +2732,14 @@ restore_params(LinkList restorelist, LinkList removelist)
     if (restorelist) {
 	/* restore saved parameters */
 	while ((pm = (Param) ugetnode(restorelist))) {
-	    if (pm->flags & PM_SPECIAL) {
-		Param tpm = (Param) paramtab->getnode(paramtab, pm->nam);
+	    if (pm->node.flags & PM_SPECIAL) {
+		Param tpm = (Param) paramtab->getnode(paramtab, pm->node.nam);
 
-		DPUTS(!tpm || PM_TYPE(pm->flags) != PM_TYPE(tpm->flags) ||
-		      !(pm->flags & PM_SPECIAL),
+		DPUTS(!tpm || PM_TYPE(pm->node.flags) != PM_TYPE(tpm->node.flags) ||
+		      !(pm->node.flags & PM_SPECIAL),
 		      "BUG: in restoring special parameters");
-		tpm->flags = pm->flags;
-		switch (PM_TYPE(pm->flags)) {
+		tpm->node.flags = pm->node.flags;
+		switch (PM_TYPE(pm->node.flags)) {
 		case PM_SCALAR:
 		    tpm->gsu.s->setfn(tpm, pm->u.str);
 		    break;
@@ -2759,8 +2759,8 @@ restore_params(LinkList restorelist, LinkList removelist)
 		}
 		pm = tpm;
 	    } else
-		paramtab->addnode(paramtab, pm->nam, pm);
-	    if ((pm->flags & PM_EXPORTED) && ((s = getsparam(pm->nam))))
+		paramtab->addnode(paramtab, pm->node.nam, pm);
+	    if ((pm->node.flags & PM_EXPORTED) && ((s = getsparam(pm->node.nam))))
 		addenv(pm, s);
 	}
     }
@@ -3533,7 +3533,7 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 
 	shf = (Shfunc) zalloc(sizeof(*shf));
 	shf->funcdef = prog;
-	shf->flags = 0;
+	shf->node.flags = 0;
 
 	/* is this shell function a signal trap? */
 	if (!strncmp(s, "TRAP", 4) &&
@@ -3596,7 +3596,7 @@ execshfunc(Shfunc shf, LinkList args)
     cmdsp = 0;
     if ((osfc = sfcontext) == SFC_NONE)
 	sfcontext = SFC_DIRECT;
-    doshfunc(shf->nam, shf->funcdef, args, shf->flags, 0);
+    doshfunc(shf->node.nam, shf->funcdef, args, shf->node.flags, 0);
     sfcontext = osfc;
     free(cmdstack);
     cmdstack = ocs;
@@ -3623,7 +3623,7 @@ execautofn(Estate state, UNUSED(int do_exec))
 	return 1;
 
     oldscriptname = scriptname;
-    scriptname = dupstring(shf->nam);
+    scriptname = dupstring(shf->node.nam);
     execode(shf->funcdef, 1, 0);
     scriptname = oldscriptname;
 
@@ -3639,21 +3639,21 @@ loadautofn(Shfunc shf, int fksh, int autol)
 
     pushheap();
 
-    noaliases = (shf->flags & PM_UNALIASED);
-    prog = getfpfunc(shf->nam, &ksh);
+    noaliases = (shf->node.flags & PM_UNALIASED);
+    prog = getfpfunc(shf->node.nam, &ksh);
     noaliases = noalias;
 
     if (ksh == 1) {
 	ksh = fksh;
 	if (ksh == 1)
-	    ksh = (shf->flags & PM_KSHSTORED) ? 2 :
-		  (shf->flags & PM_ZSHSTORED) ? 0 : 1;
+	    ksh = (shf->node.flags & PM_KSHSTORED) ? 2 :
+		  (shf->node.flags & PM_ZSHSTORED) ? 0 : 1;
     }
 
     if (prog == &dummy_eprog) {
 	/* We're not actually in the function; decrement locallevel */
 	locallevel--;
-	zwarn("%s: function definition file not found", shf->nam, 0);
+	zwarn("%s: function definition file not found", shf->node.nam, 0);
 	locallevel++;
 	popheap();
 	return NULL;
@@ -3669,13 +3669,13 @@ loadautofn(Shfunc shf, int fksh, int autol)
 		shf->funcdef = prog;
 	    else
 		shf->funcdef = dupeprog(prog, 0);
-	    shf->flags &= ~PM_UNDEFINED;
+	    shf->node.flags &= ~PM_UNDEFINED;
 	} else {
-	    VARARR(char, n, strlen(shf->nam) + 1);
-	    strcpy(n, shf->nam);
+	    VARARR(char, n, strlen(shf->node.nam) + 1);
+	    strcpy(n, shf->node.nam);
 	    execode(prog, 1, 0);
 	    shf = (Shfunc) shfunctab->getnode(shfunctab, n);
-	    if (!shf || (shf->flags & PM_UNDEFINED)) {
+	    if (!shf || (shf->node.flags & PM_UNDEFINED)) {
 		/* We're not actually in the function; decrement locallevel */
 		locallevel--;
 		zwarn("%s: function not defined by file", n, 0);
@@ -3687,10 +3687,10 @@ loadautofn(Shfunc shf, int fksh, int autol)
     } else {
 	freeeprog(shf->funcdef);
 	if (prog->flags & EF_MAP)
-	    shf->funcdef = stripkshdef(prog, shf->nam);
+	    shf->funcdef = stripkshdef(prog, shf->node.nam);
 	else
-	    shf->funcdef = dupeprog(stripkshdef(prog, shf->nam), 0);
-	shf->flags &= ~PM_UNDEFINED;
+	    shf->funcdef = dupeprog(stripkshdef(prog, shf->node.nam), 0);
+	shf->node.flags &= ~PM_UNDEFINED;
     }
     popheap();
 
@@ -3760,16 +3760,16 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     if (doshargs) {
 	LinkNode node;
 
-	node = doshargs->first;
+	node = firstnode(doshargs);
 	pparams = x = (char **) zshcalloc(((sizeof *x) *
 					 (1 + countlinknodes(doshargs))));
 	if (isset(FUNCTIONARGZERO)) {
 	    oargv0 = argzero;
-	    argzero = ztrdup((char *) node->dat);
+	    argzero = ztrdup(getdata(node));
 	}
 	node = node->next;
 	for (; node; node = node->next, x++)
-	    *x = ztrdup((char *) node->dat);
+	    *x = ztrdup(getdata(node));
     } else {
 	pparams = (char **) zshcalloc(sizeof *pparams);
 	if (isset(FUNCTIONARGZERO)) {

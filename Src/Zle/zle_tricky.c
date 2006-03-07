@@ -1305,7 +1305,7 @@ get_comp_string(void)
 	    s = NULL;
 	    inwhat = IN_MATH;
 	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
-		(keypm->flags & PM_HASHED))
+		(keypm->node.flags & PM_HASHED))
 		insubscr = 2;
 	    else
 		insubscr = 1;
@@ -1381,7 +1381,7 @@ get_comp_string(void)
 		varname = ztrdup(nb);
 		*ne = sav;
 		if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
-		    (keypm->flags & PM_HASHED))
+		    (keypm->node.flags & PM_HASHED))
 		    insubscr = 2;
 	    }
 	}
@@ -1436,7 +1436,7 @@ get_comp_string(void)
 	    varname = ztrdup(zlemetaline + i + 1);
 	    zlemetaline[wb - 1] = sav;
 	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
-		(keypm->flags & PM_HASHED)) {
+		(keypm->node.flags & PM_HASHED)) {
 		if (insubscr != 3)
 		    insubscr = 2;
 	    } else

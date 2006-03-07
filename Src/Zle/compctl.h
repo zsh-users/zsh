@@ -1,5 +1,5 @@
 /*
- * comp.h - header file for completion
+ * compctl.h - header file for completion
  *
  * This file is part of zsh, the Z shell.
  *
@@ -37,9 +37,7 @@ typedef struct patcomp   *Patcomp;
 /* node for compctl hash table (compctltab) */
 
 struct compctlp {
-    HashNode next;		/* next in hash chain               */
-    char *nam;			/* command name                     */
-    int flags;			/* CURRENTLY UNUSED                 */
+    struct hashnode node;
     Compctl cc;			/* pointer to the compctl desc.     */
 };
 

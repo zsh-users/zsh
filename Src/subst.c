@@ -1580,7 +1580,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			     hkeys|hvals|
 			     (arrasg ? SCANPM_ASSIGNING : 0)|
 			     (qt ? SCANPM_DQUOTED : 0))) ||
-	    (v->pm && (v->pm->flags & PM_UNSET)))
+	    (v->pm && (v->pm->node.flags & PM_UNSET)))
 	    vunset = 1;
 
 	if (wantt) {
@@ -1588,8 +1588,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	     * Handle the (t) flag: value now becomes the type
 	     * information for the parameter.
 	     */
-	    if (v && v->pm && !(v->pm->flags & PM_UNSET)) {
-		int f = v->pm->flags;
+	    if (v && v->pm && !(v->pm->node.flags & PM_UNSET)) {
+		int f = v->pm->node.flags;
 
 		switch (PM_TYPE(f)) {
 		case PM_SCALAR:  val = "scalar"; break;
@@ -1694,12 +1694,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	     * is called by getarrvalue(); needn't test PM_HASHED.   */
 	    if (v->isarr == SCANPM_WANTINDEX) {
 		isarr = v->isarr = 0;
-		val = dupstring(v->pm->nam);
+		val = dupstring(v->pm->node.nam);
 	    } else
 		aval = getarrvalue(v);
 	} else {
 	    /* Value retrieved from parameter/subexpression is scalar */
-	    if (v->pm->flags & PM_ARRAY) {
+	    if (v->pm->node.flags & PM_ARRAY) {
 		/*
 		 * Although the value is a scalar, the parameter
 		 * itself is an array.  Presumably this is due to
@@ -1729,14 +1729,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		 */
 		val = getstrvalue(v);
 		fwidth = v->pm->width ? v->pm->width : (int)strlen(val);
-		switch (v->pm->flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
+		switch (v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 		    char *t;
 		    unsigned int t0;
 
 		case PM_LEFT:
 		case PM_LEFT | PM_RIGHT_Z:
 		    t = val;
-		    if (v->pm->flags & PM_RIGHT_Z)
+		    if (v->pm->node.flags & PM_RIGHT_Z)
 			while (*t == '0')
 			    t++;
 		    else
@@ -1757,7 +1757,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 			if (strlen(val) < fwidth) {
 			    char *valprefend = val;
-			    if (v->pm->flags & PM_RIGHT_Z) {
+			    if (v->pm->node.flags & PM_RIGHT_Z) {
 				/*
 				 * This is a documented feature: when deciding
 				 * whether to pad with zeroes, ignore
@@ -1772,7 +1772,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 				 * Allow padding after initial minus
 				 * for numeric variables.
 				 */
-				if ((v->pm->flags &
+				if ((v->pm->node.flags &
 				     (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) &&
 				    *t == '-')
 				    t++;
@@ -1780,7 +1780,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 				 * Allow padding after initial 0x or
 				 * base# for integer variables.
 				 */
-				if (v->pm->flags & PM_INTEGER) {
+				if (v->pm->node.flags & PM_INTEGER) {
 				    if (isset(CBASES) &&
 					t[0] == '0' && t[1] == 'x')
 					t += 2;
@@ -1790,14 +1790,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 				valprefend = t;
 				if (!*t)
 				    zero = 0;
-				else if (v->pm->flags &
+				else if (v->pm->node.flags &
 					 (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) {
 				    /* zero always OK */
 				} else if (!idigit(*t))
 				    zero = 0;
 			    }
 			    t = (char *) hcalloc(fwidth + 1);
-			    memset(t, (((v->pm->flags & PM_RIGHT_B) || !zero) ?
+			    memset(t, (((v->pm->node.flags & PM_RIGHT_B) || !zero) ?
 				       ' ' : '0'), fwidth);
 			    /*
 			     * How can the following trigger?  We
@@ -1827,7 +1827,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    }
 		    break;
 		}
-		switch (v->pm->flags & (PM_LOWER | PM_UPPER)) {
+		switch (v->pm->node.flags & (PM_LOWER | PM_UPPER)) {
 		    char *t;
 
 		case PM_LOWER:

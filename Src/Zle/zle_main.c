@@ -1129,7 +1129,7 @@ execzlefunc(Thingy func, char **args)
 	    makezleparams(0);
 	    sfcontext = SFC_WIDGET;
 	    opts[XTRACE] = 0;
-	    ret = doshfunc(w->u.fnnam, prog, largs, shf->flags, 1);
+	    ret = doshfunc(w->u.fnnam, prog, largs, shf->node.flags, 1);
 	    opts[XTRACE] = oxt;
 	    sfcontext = osc;
 	    endparamscope();
@@ -1384,7 +1384,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     }
     queue_signals();
     pm = (Param) paramtab->getnode(paramtab, args[0]);
-    if (pm && (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED))) {
+    if (pm && (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED))) {
 	char **a;
 
 	/*
@@ -1393,7 +1393,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	 */
 	a = spacesplit(t, 1, 0, 1);
 	zsfree(t);
-	if (PM_TYPE(pm->flags) == PM_ARRAY)
+	if (PM_TYPE(pm->node.flags) == PM_ARRAY)
 	    setaparam(args[0], a);
 	else
 	    sethparam(args[0], a);

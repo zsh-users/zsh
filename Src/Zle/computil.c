@@ -3371,7 +3371,7 @@ bin_compquote(char *nam, char **args, Options ops, UNUSED(int func))
 	name = dupstring(name);
 	queue_signals();
 	if ((v = getvalue(&vbuf, &name, 0))) {
-	    switch (PM_TYPE(v->pm->flags)) {
+	    switch (PM_TYPE(v->pm->node.flags)) {
 	    case PM_SCALAR:
 		setstrvalue(v, ztrdup(comp_quote(getstrvalue(v), 
 						 OPT_ISSET(ops,'p'))));

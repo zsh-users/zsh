@@ -175,22 +175,22 @@ printbuiltinnode(HashNode hn, int printflags)
     Builtin bn = (Builtin) hn;
 
     if (printflags & PRINT_WHENCE_WORD) {
-	printf("%s: builtin\n", bn->nam);
+	printf("%s: builtin\n", bn->node.nam);
 	return;
     }
 
     if (printflags & PRINT_WHENCE_CSH) {
-	printf("%s: shell built-in command\n", bn->nam);
+	printf("%s: shell built-in command\n", bn->node.nam);
 	return;
     }
 
     if (printflags & PRINT_WHENCE_VERBOSE) {
-	printf("%s is a shell builtin\n", bn->nam);
+	printf("%s is a shell builtin\n", bn->node.nam);
 	return;
     }
 
     /* default is name only */
-    printf("%s\n", bn->nam);
+    printf("%s\n", bn->node.nam);
 }
 
 /**/
@@ -199,8 +199,8 @@ freebuiltinnode(HashNode hn)
 {
     Builtin bn = (Builtin) hn;
  
-    if(!(bn->flags & BINF_ADDED)) {
-	zsfree(bn->nam);
+    if(!(bn->node.flags & BINF_ADDED)) {
+	zsfree(bn->node.nam);
 	zsfree(bn->optstr);
 	zfree(bn, sizeof(struct builtin));
     }
@@ -251,11 +251,11 @@ execbuiltin(LinkList args, Builtin bn)
 
     if (!bn->handlerfunc) {
 	zwarnnam(name, "autoload failed", NULL, 0);
-	deletebuiltin(bn->nam);
+	deletebuiltin(bn->node.nam);
 	return 1;
     }
     /* get some information about the command */
-    flags = bn->flags;
+    flags = bn->node.flags;
     optstr = bn->optstr;
 
     /* Set up the argument list. */
@@ -735,14 +735,14 @@ set_pwd_env(void)
     /* update the PWD and OLDPWD shell parameters */
 
     pm = (Param) paramtab->getnode(paramtab, "PWD");
-    if (pm && PM_TYPE(pm->flags) != PM_SCALAR) {
-	pm->flags &= ~PM_READONLY;
+    if (pm && PM_TYPE(pm->node.flags) != PM_SCALAR) {
+	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
 
     pm = (Param) paramtab->getnode(paramtab, "OLDPWD");
-    if (pm && PM_TYPE(pm->flags) != PM_SCALAR) {
-	pm->flags &= ~PM_READONLY;
+    if (pm && PM_TYPE(pm->node.flags) != PM_SCALAR) {
+	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
 
@@ -750,10 +750,10 @@ set_pwd_env(void)
     setsparam("OLDPWD", ztrdup(oldpwd));
 
     pm = (Param) paramtab->getnode(paramtab, "PWD");
-    if (!(pm->flags & PM_EXPORTED))
+    if (!(pm->node.flags & PM_EXPORTED))
 	addenv(pm, pwd);
     pm = (Param) paramtab->getnode(paramtab, "OLDPWD");
-    if (!(pm->flags & PM_EXPORTED))
+    if (!(pm->node.flags & PM_EXPORTED))
 	addenv(pm, oldpwd);
 }
 
@@ -1589,7 +1589,7 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
     }
 
     for (;;) {
-	s = dupstring(ent->text);
+	s = dupstring(ent->node.nam);
 	/* this if does the pattern matching, if required */
 	if (!pprog || pattry(pprog, s)) {
 	    /* perform substitution */
@@ -1600,7 +1600,7 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 		char buf[DIGBUFSIZE];
 		convbase(buf, ent->histnum, 10);
 		fprintf(f, "%5s%c ", buf,
-			ent->flags & HIST_FOREIGN? '*' : ' ');
+			ent->node.flags & HIST_FOREIGN ? '*' : ' ');
 	    }
 	    /* output actual time (and possibly date) of execution of the
 	       command, if required */
@@ -1799,13 +1799,13 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      * handled in createparam().  Here we just avoid using it for the
      * present tests if it's unset.
      */
-    usepm = pm && !(pm->flags & PM_UNSET);
+    usepm = pm && !(pm->node.flags & PM_UNSET);
 
     /*
      * We need to compare types with an existing pm if special,
      * even if that's unset
      */
-    if (pm && (pm->flags & PM_SPECIAL))
+    if (pm && (pm->node.flags & PM_SPECIAL))
 	usepm = 1;
 
     /*
@@ -1822,8 +1822,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 * local.  It can be applied either to the special or in the
 	 * typeset/local statement for the local variable.
 	 */
-	if ((pm->flags & PM_SPECIAL)
-	    && !(on & PM_HIDE) && !(pm->flags & PM_HIDE & ~off))
+	if ((pm->node.flags & PM_SPECIAL)
+	    && !(on & PM_HIDE) && !(pm->node.flags & PM_HIDE & ~off))
 	    newspecial = NS_NORMAL;
 	usepm = 0;
     }
@@ -1831,7 +1831,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
     /* attempting a type conversion, or making a tied colonarray? */
     tc = 0;
     if (usepm || newspecial != NS_NONE) {
-	int chflags = ((off & pm->flags) | (on & ~pm->flags)) &
+	int chflags = ((off & pm->node.flags) | (on & ~pm->node.flags)) &
 	    (PM_INTEGER|PM_EFLOAT|PM_FFLOAT|PM_HASHED|
 	     PM_ARRAY|PM_TIED|PM_AUTOLOAD);
 	/* keep the parameter if just switching between floating types */
@@ -1847,9 +1847,9 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      */
     if ((readonly =
 	 ((usepm || newspecial != NS_NONE) && 
-	  (off & pm->flags & PM_READONLY))) ||
+	  (off & pm->node.flags & PM_READONLY))) ||
 	tc) {
-	if (pm->flags & PM_SPECIAL) {
+	if (pm->node.flags & PM_SPECIAL) {
 	    int err = 1;
 	    if (!readonly && !strcmp(pname, "SECONDS"))
 	    {
@@ -1889,7 +1889,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 			pname, 0);
 		return NULL;
 	    }
-	} else if (pm->flags & PM_AUTOLOAD) {
+	} else if (pm->node.flags & PM_AUTOLOAD) {
 	    zerrnam(cname, "%s: can't change type of autoloaded parameter",
 		    pname, 0);
 	    return NULL;
@@ -1911,37 +1911,37 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	on &= ~PM_LOCAL;
 	if (!on && !roff && !value) {
 	    if (OPT_ISSET(ops,'p'))
-		paramtab->printnode((HashNode)pm, PRINT_TYPESET);
+		paramtab->printnode(&pm->node, PRINT_TYPESET);
 	    else if (unset(TYPESETSILENT) || OPT_ISSET(ops,'m'))
-		paramtab->printnode((HashNode)pm, PRINT_INCLUDEVALUE);
+		paramtab->printnode(&pm->node, PRINT_INCLUDEVALUE);
 	    return pm;
 	}
-	if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
+	if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
 	    zerrnam(cname, "%s: restricted", pname, 0);
 	    return pm;
 	}
-	if ((on & PM_UNIQUE) && !(pm->flags & PM_READONLY & ~off)) {
+	if ((on & PM_UNIQUE) && !(pm->node.flags & PM_READONLY & ~off)) {
 	    Param apm;
 	    char **x;
-	    if (PM_TYPE(pm->flags) == PM_ARRAY) {
+	    if (PM_TYPE(pm->node.flags) == PM_ARRAY) {
 		x = (*pm->gsu.a->getfn)(pm);
 		uniqarray(x);
-		if (pm->flags & PM_SPECIAL) {
+		if (pm->node.flags & PM_SPECIAL) {
 		    if (zheapptr(x))
 			x = zarrdup(x);
 		    (*pm->gsu.a->setfn)(pm, x);
 		} else if (pm->ename && x)
 		    arrfixenv(pm->ename, x);
-	    } else if (PM_TYPE(pm->flags) == PM_SCALAR && pm->ename &&
+	    } else if (PM_TYPE(pm->node.flags) == PM_SCALAR && pm->ename &&
 		       (apm =
 			(Param) paramtab->getnode(paramtab, pm->ename))) {
 		x = (*apm->gsu.a->getfn)(apm);
 		uniqarray(x);
 		if (x)
-		    arrfixenv(pm->nam, x);
+		    arrfixenv(pm->node.nam, x);
 	    }
 	}
-	pm->flags = (pm->flags | (on & ~PM_READONLY)) & ~(off | PM_UNSET);
+	pm->node.flags = (pm->node.flags | (on & ~PM_READONLY)) & ~(off | PM_UNSET);
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 	    if (typeset_setwidth(cname, pm, ops, on, 0))
 		return NULL;
@@ -1950,11 +1950,11 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    if (typeset_setbase(cname, pm, ops, on, 0))
 		return NULL;
 	}
-	if (!(pm->flags & (PM_ARRAY|PM_HASHED))) {
-	    if (pm->flags & PM_EXPORTED) {
-		if (!(pm->flags & PM_UNSET) && !pm->env && !value)
+	if (!(pm->node.flags & (PM_ARRAY|PM_HASHED))) {
+	    if (pm->node.flags & PM_EXPORTED) {
+		if (!(pm->node.flags & PM_UNSET) && !pm->env && !value)
 		    addenv(pm, getsparam(pname));
-	    } else if (pm->env && !(pm->flags & PM_HASHELEM))
+	    } else if (pm->env && !(pm->node.flags & PM_HASHELEM))
 		delenv(pm);
 	    if (value && !(pm = setsparam(pname, ztrdup(value))))
 		return NULL;
@@ -1962,9 +1962,9 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    zwarnnam(cname, "can't assign new value for array %s", pname, 0);
 	    return NULL;
 	}
-	pm->flags |= (on & PM_READONLY);
+	pm->node.flags |= (on & PM_READONLY);
 	if (OPT_ISSET(ops,'p'))
-	    paramtab->printnode((HashNode)pm, PRINT_TYPESET);
+	    paramtab->printnode(&pm->node, PRINT_TYPESET);
 	return pm;
     }
 
@@ -1976,9 +1976,9 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      */
     if (tc) {
 	/* Maintain existing readonly/exported status... */
-	on |= ~off & (PM_READONLY|PM_EXPORTED) & pm->flags;
+	on |= ~off & (PM_READONLY|PM_EXPORTED) & pm->node.flags;
 	/* ...but turn off existing readonly so we can delete it */
-	pm->flags &= ~PM_READONLY;
+	pm->node.flags &= ~PM_READONLY;
 	/*
 	 * If we're just changing the type, we should keep the
 	 * variable at the current level of localness.
@@ -1988,7 +1988,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 * Try to carry over a value, but not when changing from,
 	 * to, or between non-scalar types.
 	 */
-	if (!value && !((pm->flags|on) & (PM_ARRAY|PM_HASHED)))
+	if (!value && !((pm->node.flags|on) & (PM_ARRAY|PM_HASHED)))
 	    value = dupstring(getsparam(pname));
 	/* pname may point to pm->nam which is about to disappear */
 	pname = dupstring(pname);
@@ -1997,7 +1997,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 
     if (newspecial != NS_NONE) {
 	Param tpm, pm2;
-	if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
+	if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
 	    zerrnam(cname, "%s: restricted", pname, 0);
 	    return pm;
 	}
@@ -2008,7 +2008,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 */
 	tpm = (Param) zshcalloc(sizeof *tpm);
 
-	tpm->nam = pm->nam;
+	tpm->node.nam = pm->node.nam;
 	if (pm->ename &&
 	    (pm2 = (Param) paramtab->getnode(paramtab, pm->ename)) &&
 	    pm2->level == locallevel) {
@@ -2023,7 +2023,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	     * of the environment entry in tpm->env, rather than relying
 	     * on the restored value to provide it.
 	     */
-	    tpm->flags = pm->flags | PM_NORESTORE;
+	    tpm->node.flags = pm->node.flags | PM_NORESTORE;
 	} else {
 	    copyparam(tpm, pm, 1);
 	}
@@ -2040,7 +2040,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 * The remaining on/off flags should be harmless to use,
 	 * because we've checked for unpleasant surprises above.
 	 */
-	pm->flags = (PM_TYPE(pm->flags) | on | PM_SPECIAL) & ~off;
+	pm->node.flags = (PM_TYPE(pm->node.flags) | on | PM_SPECIAL) & ~off;
 	if (newspecial == NS_SECONDS) {
 	    /* We save off the raw internal value of the SECONDS var */
 	    tpm->u.dval = getrawseconds();
@@ -2087,7 +2087,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		return NULL;
 	    value = NULL;
 	    keeplocal = 0;
-	    on = pm->flags;
+	    on = pm->node.flags;
 	} else {
 	    zerrnam(cname,
 		    "%s: array elements must be scalar", pname, 0);
@@ -2116,7 +2116,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	return NULL;
     }
 
-    if (altpm && PM_TYPE(pm->flags) == PM_SCALAR) {
+    if (altpm && PM_TYPE(pm->node.flags) == PM_SCALAR) {
 	/*
 	 * It seems safer to set this here than in createparam(),
 	 * to make sure we only ever use the colonarr functions
@@ -2137,7 +2137,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	pm->level = keeplocal;
     else if (on & PM_LOCAL)
 	pm->level = locallevel;
-    if (value && !(pm->flags & (PM_ARRAY|PM_HASHED))) {
+    if (value && !(pm->node.flags & (PM_ARRAY|PM_HASHED))) {
 	Param ipm = pm;
 	if (!(pm = setsparam(pname, ztrdup(value))))
 	    return NULL;
@@ -2146,12 +2146,12 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		  "BUG: parameter recreated with wrong flags");
 	    unsetparam_pm(ipm, 0, 1);
 	}
-    } else if (newspecial != NS_NONE && !(pm->old->flags & PM_NORESTORE)) {
+    } else if (newspecial != NS_NONE && !(pm->old->node.flags & PM_NORESTORE)) {
 	/*
 	 * We need to use the special setting function to re-initialise
 	 * the special parameter to empty.
 	 */
-	switch (PM_TYPE(pm->flags)) {
+	switch (PM_TYPE(pm->node.flags)) {
 	case PM_SCALAR:
 	    pm->gsu.s->setfn(pm, ztrdup(""));
 	    break;
@@ -2166,12 +2166,12 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    pm->gsu.a->setfn(pm, mkarray(NULL));
 	    break;
 	case PM_HASHED:
-	    pm->gsu.h->setfn(pm, newparamtable(17, pm->nam));
+	    pm->gsu.h->setfn(pm, newparamtable(17, pm->node.nam));
 	    break;
 	}
     }
-    pm->flags |= (on & PM_READONLY);
-    if (value && (pm->flags & (PM_ARRAY|PM_HASHED))) {
+    pm->node.flags |= (on & PM_READONLY);
+    if (value && (pm->node.flags & (PM_ARRAY|PM_HASHED))) {
 	zerrnam(cname, "%s: can't assign initial value for array", pname, 0);
 	/* the only safe thing to do here seems to be unset the param */
 	unsetparam_pm(pm, 0, 1);
@@ -2179,7 +2179,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
     }
 
     if (OPT_ISSET(ops,'p'))
-	paramtab->printnode((HashNode)pm, PRINT_TYPESET);
+	paramtab->printnode(&pm->node, PRINT_TYPESET);
 
     return pm;
 }
@@ -2326,11 +2326,11 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	 * exported and pass that along.  Isn't the world complicated?
 	 */
 	if ((pm = (Param) paramtab->getnode(paramtab, asg0.name))
-	    && !(pm->flags & PM_UNSET)
+	    && !(pm->node.flags & PM_UNSET)
 	    && (locallevel == pm->level || !(on & PM_LOCAL))) {
-	    if (!asg0.value && !(PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED)))
+	    if (!asg0.value && !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)))
 		oldval = ztrdup(getsparam(asg0.name));
-	    on |= (pm->flags & PM_EXPORTED);
+	    on |= (pm->node.flags & PM_EXPORTED);
 	}
 	/*
 	 * Create the tied array; this is normal except that
@@ -2417,17 +2417,17 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	     */
 	    for (i = 0; i < paramtab->hsize; i++) {
 		for (pm = (Param) paramtab->nodes[i]; pm;
-		     pm = (Param) pm->next) {
-		    if (((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) ||
-			(pm->flags & PM_UNSET))
+		     pm = (Param) pm->node.next) {
+		    if (((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) ||
+			(pm->node.flags & PM_UNSET))
 			continue;
-		    if (pattry(pprog, pm->nam))
+		    if (pattry(pprog, pm->node.nam))
 			addlinknode(pmlist, pm);
 		}
 	    }
 	    for (pmnode = firstnode(pmlist); pmnode; incnode(pmnode)) {
 		pm = (Param) getdata(pmnode);
-		if (!typeset_single(name, pm->nam, pm, func, on, off, roff,
+		if (!typeset_single(name, pm->node.nam, pm, func, on, off, roff,
 				    asg->value, NULL, ops, 0))
 		    returnval = 1;
 	    }
@@ -2456,7 +2456,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 int
 eval_autoload(Shfunc shf, char *name, Options ops, int func)
 {
-    if (!(shf->flags & PM_UNDEFINED))
+    if (!(shf->node.flags & PM_UNDEFINED))
 	return 1;
 
     if (shf->funcdef) {
@@ -2537,7 +2537,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		shf = (Shfunc) zshcalloc(sizeof *shf);
 		shfunctab->addnode(shfunctab, ztrdup(scriptname), shf);
 	    }
-	    shf->flags = on;
+	    shf->node.flags = on;
 	    ret = eval_autoload(shf, scriptname, ops, func);
 	} else {
 	    if (OPT_ISSET(ops,'U') && !OPT_ISSET(ops,'u'))
@@ -2565,13 +2565,13 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		    /* apply the options to all functions matching the glob pattern */
 		    for (i = 0; i < shfunctab->hsize; i++) {
 			for (shf = (Shfunc) shfunctab->nodes[i]; shf;
-			     shf = (Shfunc) shf->next)
-			    if (pattry(pprog, shf->nam) &&
-				!(shf->flags & DISABLED)) {
-				shf->flags = (shf->flags |
+			     shf = (Shfunc) shf->node.next)
+			    if (pattry(pprog, shf->node.nam) &&
+				!(shf->node.flags & DISABLED)) {
+				shf->node.flags = (shf->node.flags |
 					      (on & ~PM_UNDEFINED)) & ~off;
 				if (OPT_ISSET(ops,'X') &&
-				    eval_autoload(shf, shf->nam, ops, func)) {
+				    eval_autoload(shf, shf->node.nam, ops, func)) {
 				    returnval = 1;
 				}
 			    }
@@ -2596,13 +2596,13 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    /* if any flag was given */
 	    if (on|off) {
 		/* turn on/off the given flags */
-		shf->flags = (shf->flags | (on & ~PM_UNDEFINED)) & ~off;
+		shf->node.flags = (shf->node.flags | (on & ~PM_UNDEFINED)) & ~off;
 		if (OPT_ISSET(ops,'X') && 
-		    eval_autoload(shf, shf->nam, ops, func))
+		    eval_autoload(shf, shf->node.nam, ops, func))
 		    returnval = 1;
 	    } else
 		/* no flags, so just print */
-		shfunctab->printnode((HashNode) shf, pflags);
+		shfunctab->printnode(&shf->node, pflags);
 	} else if (on & PM_UNDEFINED) {
 	    int signum = -1, ok = 1;
 
@@ -2618,21 +2618,21 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    /* Add a new undefined (autoloaded) function to the *
 	     * hash table with the corresponding flags set.     */
 	    shf = (Shfunc) zshcalloc(sizeof *shf);
-	    shf->flags = on;
+	    shf->node.flags = on;
 	    shf->funcdef = mkautofn(shf);
 	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
 
 	    if (signum != -1) {
 		if (settrap(signum, NULL, ZSIG_FUNC)) {
 		    shfunctab->removenode(shfunctab, *argv);
-		    shfunctab->freenode((HashNode)shf);
+		    shfunctab->freenode(&shf->node);
 		    returnval = 1;
 		    ok = 0;
 		}
 	    }
 
 	    if (ok && OPT_ISSET(ops,'X') &&
-		eval_autoload(shf, shf->nam, ops, func))
+		eval_autoload(shf, shf->node.nam, ops, func))
 		returnval = 1;
 	} else
 	    returnval = 1;
@@ -2694,10 +2694,10 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		for (i = 0; i < paramtab->hsize; i++) {
 		    for (pm = (Param) paramtab->nodes[i]; pm; pm = next) {
 			/* record pointer to next, since we may free this one */
-			next = (Param) pm->next;
-			if ((!(pm->flags & PM_RESTRICTED) ||
+			next = (Param) pm->node.next;
+			if ((!(pm->node.flags & PM_RESTRICTED) ||
 			     unset(RESTRICTED)) &&
-			    pattry(pprog, pm->nam)) {
+			    pattry(pprog, pm->node.nam)) {
 			    unsetparam_pm(pm, 0, 1);
 			    match++;
 			}
@@ -2738,11 +2738,11 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	 */
 	if (!pm)
 	    continue;
-	else if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	    zerrnam(name, "%s: restricted", pm->nam, 0);
+	else if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
+	    zerrnam(name, "%s: restricted", pm->node.nam, 0);
 	    returnval = 1;
 	} else if (ss) {
-	    if (PM_TYPE(pm->flags) == PM_HASHED) {
+	    if (PM_TYPE(pm->node.flags) == PM_HASHED) {
 		HashTable tht = paramtab;
 		if ((paramtab = pm->gsu.h->getfn(pm))) {
 		    *--sse = 0;
@@ -3047,11 +3047,11 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 		 * so define an entry for the table.    */
 		if(OPT_ISSET(ops,'d')) {
 		    Nameddir nd = hn = zshcalloc(sizeof *nd);
-		    nd->flags = 0;
+		    nd->node.flags = 0;
 		    nd->dir = ztrdup(asg->value);
 		} else {
 		    Cmdnam cn = hn = zshcalloc(sizeof *cn);
-		    cn->flags = HASHED;
+		    cn->node.flags = HASHED;
 		    cn->u.cmd = ztrdup(asg->value);
 		}
 		ht->addnode(ht, ztrdup(asg->name), hn);
@@ -3241,9 +3241,9 @@ bin_alias(char *name, char **argv, Options ops, UNUSED(int func))
 	    /* display alias if appropriate */
 	    if (!type_opts || ht == sufaliastab ||
 		(OPT_ISSET(ops,'r') && 
-		 !(a->flags & (ALIAS_GLOBAL|ALIAS_SUFFIX))) ||
-		(OPT_ISSET(ops,'g') && (a->flags & ALIAS_GLOBAL)))
-		ht->printnode((HashNode) a, printflags);
+		 !(a->node.flags & (ALIAS_GLOBAL|ALIAS_SUFFIX))) ||
+		(OPT_ISSET(ops,'g') && (a->node.flags & ALIAS_GLOBAL)))
+		ht->printnode(&a->node, printflags);
 	} else
 	    returnval = 1;
     }
@@ -3385,8 +3385,8 @@ bin_print(char *name, char **args, Options ops, int func)
 	    d = finddir(args[n]);
 	    if(d) {
 		int dirlen = strlen(d->dir);
-		char *arg = zhalloc(len[n] - dirlen + strlen(d->nam) + 2);
-		sprintf(arg, "~%s%s", d->nam, args[n] + dirlen);
+		char *arg = zhalloc(len[n] - dirlen + strlen(d->node.nam) + 2);
+		sprintf(arg, "~%s%s", d->node.nam, args[n] + dirlen);
 		args[n] = arg;
 		len[n] = strlen(args[n]);
 	    }
@@ -3579,10 +3579,10 @@ bin_print(char *name, char **args, Options ops, int func)
 		}
 	    } else
 		ent->words = (short *)NULL;
-	    ent->text = zjoin(args, ' ', 0);
+	    ent->node.nam = zjoin(args, ' ', 0);
 	    ent->stim = ent->ftim = time(NULL);
-	    ent->flags = 0;
-	    addhistnode(histtab, ent->text, ent);
+	    ent->node.flags = 0;
+	    addhistnode(histtab, ent->node.nam, ent);
 	    unqueue_signals();
 	    return 0;
 	}
@@ -3901,11 +3901,11 @@ bin_print(char *name, char **args, Options ops, int func)
 	    zpushnode(bufstack, buf);
 	} else {
 	    ent = prepnexthistent();
-	    ent->text = buf;
+	    ent->node.nam = buf;
 	    ent->stim = ent->ftim = time(NULL);
-	    ent->flags = 0;
+	    ent->node.flags = 0;
 	    ent->words = (short *)NULL;
-	    addhistnode(histtab, ent->text, ent);
+	    addhistnode(histtab, ent->node.nam, ent);
 	}
 	unqueue_signals();
     }

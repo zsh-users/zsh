@@ -497,17 +497,17 @@ zfsetparam(char *name, void *val, int flags)
     int type = (flags & ZFPM_INTEGER) ? PM_INTEGER : PM_SCALAR;
 
     if (!(pm = (Param) paramtab->getnode(paramtab, name))
-	|| (pm->flags & PM_UNSET)) {
+	|| (pm->node.flags & PM_UNSET)) {
 	/*
 	 * just make it readonly when creating, in case user
 	 * *really* knows what they're doing
 	 */
 	if ((pm = createparam(name, type)) && (flags & ZFPM_READONLY))
-	    pm->flags |= PM_READONLY;
+	    pm->node.flags |= PM_READONLY;
     } else if (flags & ZFPM_IFUNSET) {
 	pm = NULL;
     }
-    if (!pm || PM_TYPE(pm->flags) != type) {
+    if (!pm || PM_TYPE(pm->node.flags) != type) {
 	/* parameters are funny, you just never know */
 	if (type == PM_SCALAR)
 	    zsfree((char *)val);
@@ -531,7 +531,7 @@ zfunsetparam(char *name)
     Param pm;
 
     if ((pm = (Param) paramtab->getnode(paramtab, name))) {
-	pm->flags &= ~PM_READONLY;
+	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
 }

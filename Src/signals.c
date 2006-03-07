@@ -729,10 +729,10 @@ dosavetrap(int sig, int level)
 	if ((shf = (Shfunc)gettrapnode(sig, 1))) {
 	    /* Copy the node for saving */
 	    newshf = (Shfunc) zalloc(sizeof(*newshf));
-	    newshf->nam = ztrdup(shf->nam);
-	    newshf->flags = shf->flags;
+	    newshf->node.nam = ztrdup(shf->node.nam);
+	    newshf->node.flags = shf->node.flags;
 	    newshf->funcdef = dupeprog(shf->funcdef, 0);
-	    if (shf->flags & PM_UNDEFINED)
+	    if (shf->node.flags & PM_UNDEFINED)
 		newshf->funcdef->shf = newshf;
 	}
 #ifdef DEBUG
@@ -979,7 +979,7 @@ endtrapscope(void)
 		DPUTS((sigtrapped[sig] ^ st->flags) & ZSIG_TRAPPED,
 		      "BUG: settrap didn't restore correct ZSIG_TRAPPED");
 		if ((sigtrapped[sig] = st->flags) & ZSIG_FUNC)
-		    shfunctab->addnode(shfunctab, ((Shfunc)st->list)->nam,
+		    shfunctab->addnode(shfunctab, ((Shfunc)st->list)->node.nam,
 				       (Shfunc) st->list);
 	    } else if (sigtrapped[sig])
 		unsettrap(sig);

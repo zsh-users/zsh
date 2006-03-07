@@ -99,8 +99,8 @@ getpmwidgets(UNUSED(HashTable ht), char *name)
     Thingy th;
 
     pm = (Param) hcalloc(sizeof(struct param));
-    pm->nam = dupstring(name);
-    pm->flags = PM_SCALAR | PM_READONLY;
+    pm->node.nam = dupstring(name);
+    pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
 
     if ((th = (Thingy) thingytab->getnode(thingytab, name)) &&
@@ -108,9 +108,9 @@ getpmwidgets(UNUSED(HashTable ht), char *name)
 	pm->u.str = widgetstr(th->widget);
     else {
 	pm->u.str = dupstring("");
-	pm->flags |= PM_UNSET;
+	pm->node.flags |= PM_UNSET;
     }
-    return (HashNode) pm;
+    return &pm->node;
 }
 
 /**/
@@ -122,17 +122,17 @@ scanpmwidgets(UNUSED(HashTable ht), ScanFunc func, int flags)
     HashNode hn;
 
     memset((void *)&pm, 0, sizeof(struct param));
-    pm.flags = PM_SCALAR | PM_READONLY;
+    pm.node.flags = PM_SCALAR | PM_READONLY;
     pm.gsu.s = &nullsetscalar_gsu;
 
     for (i = 0; i < thingytab->hsize; i++)
 	for (hn = thingytab->nodes[i]; hn; hn = hn->next) {
-	    pm.nam = hn->nam;
+	    pm.node.nam = hn->nam;
 	    if (func != scancountparams &&
 		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
 		 !(flags & SCANPM_WANTKEYS)))
 		pm.u.str = widgetstr(((Thingy) hn)->widget);
-	    func((HashNode) &pm, flags);
+	    func(&pm.node, flags);
 	}
 }
 
@@ -207,7 +207,7 @@ boot_(UNUSED(Module m))
 	    if (!(def->pm = createspecialhash(def->name, def->getnfn,
 					      def->scantfn)))
 		return 1;
-	    def->pm->flags |= def->flags;
+	    def->pm->node.flags |= def->flags;
 	    if (def->hash_gsu)
 		def->pm->gsu.h = def->hash_gsu;
 	} else {
@@ -229,7 +229,7 @@ cleanup_(UNUSED(Module m))
     for (def = partab; def->name; def++) {
 	if ((pm = (Param) paramtab->getnode(paramtab, def->name)) &&
 	    pm == def->pm) {
-	    pm->flags &= ~PM_READONLY;
+	    pm->node.flags &= ~PM_READONLY;
 	    unsetparam_pm(pm, 0, 1);
 	}
     }

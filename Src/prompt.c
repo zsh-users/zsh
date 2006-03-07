@@ -113,7 +113,7 @@ promptpath(char *p, int npath, int tilde)
     Nameddir nd;
 
     if (tilde && ((nd = finddir(p))))
-	modp = tricat("~", nd->nam, p + strlen(nd->dir));
+	modp = tricat("~", nd->node.nam, p + strlen(nd->dir));
 
     if (npath) {
 	char *sptr;

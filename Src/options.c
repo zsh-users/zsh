@@ -62,172 +62,172 @@ mod_export HashTable optiontab;
 #define OPT_SPECIAL	(1<<6)	/* option should never be set by emulate() */
 #define OPT_ALIAS	(1<<7)	/* option is an alias to an other option */
 
-#define defset(X) (!!((X)->flags & emulation))
+#define defset(X) (!!((X)->node.flags & emulation))
 
 /*
  * Note that option names should usually be fewer than 20 characters long
  * to avoid formatting problems.
  */
 static struct optname optns[] = {
-{NULL, "aliases",	      OPT_EMULATE|OPT_ALL,	 ALIASESOPT},
-{NULL, "allexport",	      OPT_EMULATE,		 ALLEXPORT},
-{NULL, "alwayslastprompt",    OPT_ALL,			 ALWAYSLASTPROMPT},
-{NULL, "alwaystoend",	      0,			 ALWAYSTOEND},
-{NULL, "appendhistory",	      OPT_ALL,			 APPENDHISTORY},
-{NULL, "autocd",	      OPT_EMULATE,		 AUTOCD},
-{NULL, "autocontinue",	      0,			 AUTOCONTINUE},
-{NULL, "autolist",	      OPT_ALL,			 AUTOLIST},
-{NULL, "automenu",	      OPT_ALL,			 AUTOMENU},
-{NULL, "autonamedirs",	      0,			 AUTONAMEDIRS},
-{NULL, "autoparamkeys",	      OPT_ALL,			 AUTOPARAMKEYS},
-{NULL, "autoparamslash",      OPT_ALL,			 AUTOPARAMSLASH},
-{NULL, "autopushd",	      0,			 AUTOPUSHD},
-{NULL, "autoremoveslash",     OPT_ALL,			 AUTOREMOVESLASH},
-{NULL, "autoresume",	      0,			 AUTORESUME},
-{NULL, "badpattern",	      OPT_EMULATE|OPT_NONBOURNE, BADPATTERN},
-{NULL, "banghist",	      OPT_NONBOURNE,		 BANGHIST},
-{NULL, "bareglobqual",        OPT_EMULATE|OPT_ZSH,       BAREGLOBQUAL},
-{NULL, "bashautolist",	      0,                         BASHAUTOLIST},
-{NULL, "beep",		      OPT_ALL,			 BEEP},
-{NULL, "bgnice",	      OPT_EMULATE|OPT_NONBOURNE, BGNICE},
-{NULL, "braceccl",	      OPT_EMULATE,		 BRACECCL},
-{NULL, "bsdecho",	      OPT_EMULATE|OPT_SH,	 BSDECHO},
-{NULL, "caseglob",	      OPT_ALL,			 CASEGLOB},
-{NULL, "cbases",	      0,			 CBASES},
-{NULL, "cdablevars",	      OPT_EMULATE,		 CDABLEVARS},
-{NULL, "chasedots",	      OPT_EMULATE,		 CHASEDOTS},
-{NULL, "chaselinks",	      OPT_EMULATE,		 CHASELINKS},
-{NULL, "checkjobs",	      OPT_EMULATE|OPT_ZSH,	 CHECKJOBS},
-{NULL, "clobber",	      OPT_EMULATE|OPT_ALL,	 CLOBBER},
-{NULL, "completealiases",     0,			 COMPLETEALIASES},
-{NULL, "completeinword",      0,			 COMPLETEINWORD},
-{NULL, "correct",	      0,			 CORRECT},
-{NULL, "correctall",	      0,			 CORRECTALL},
-{NULL, "cshjunkiehistory",    OPT_EMULATE|OPT_CSH,	 CSHJUNKIEHISTORY},
-{NULL, "cshjunkieloops",      OPT_EMULATE|OPT_CSH,	 CSHJUNKIELOOPS},
-{NULL, "cshjunkiequotes",     OPT_EMULATE|OPT_CSH,	 CSHJUNKIEQUOTES},
-{NULL, "cshnullcmd",	      OPT_EMULATE|OPT_CSH,	 CSHNULLCMD},
-{NULL, "cshnullglob",	      OPT_EMULATE|OPT_CSH,	 CSHNULLGLOB},
-{NULL, "emacs",		      0,			 EMACSMODE},
-{NULL, "equals",	      OPT_EMULATE|OPT_ZSH,	 EQUALS},
-{NULL, "errexit",	      OPT_EMULATE,		 ERREXIT},
-{NULL, "errreturn",	      OPT_EMULATE,		 ERRRETURN},
-{NULL, "exec",		      OPT_ALL,			 EXECOPT},
-{NULL, "extendedglob",	      OPT_EMULATE,		 EXTENDEDGLOB},
-{NULL, "extendedhistory",     OPT_CSH,			 EXTENDEDHISTORY},
-{NULL, "evallineno",	      OPT_EMULATE|OPT_ZSH,	 EVALLINENO},
-{NULL, "flowcontrol",	      OPT_ALL,			 FLOWCONTROL},
-{NULL, "functionargzero",     OPT_EMULATE|OPT_NONBOURNE, FUNCTIONARGZERO},
-{NULL, "glob",		      OPT_EMULATE|OPT_ALL,	 GLOBOPT},
-{NULL, "globalexport",        OPT_EMULATE|OPT_ZSH,	 GLOBALEXPORT},
-{NULL, "globalrcs",           OPT_ALL,			 GLOBALRCS},
-{NULL, "globassign",	      OPT_EMULATE|OPT_CSH,	 GLOBASSIGN},
-{NULL, "globcomplete",	      0,			 GLOBCOMPLETE},
-{NULL, "globdots",	      OPT_EMULATE,		 GLOBDOTS},
-{NULL, "globsubst",	      OPT_EMULATE|OPT_NONZSH,	 GLOBSUBST},
-{NULL, "hashcmds",	      OPT_ALL,			 HASHCMDS},
-{NULL, "hashdirs",	      OPT_ALL,			 HASHDIRS},
-{NULL, "hashlistall",	      OPT_ALL,			 HASHLISTALL},
-{NULL, "histallowclobber",    0,			 HISTALLOWCLOBBER},
-{NULL, "histbeep",	      OPT_ALL,			 HISTBEEP},
-{NULL, "histexpiredupsfirst", 0,			 HISTEXPIREDUPSFIRST},
-{NULL, "histfindnodups",      0,			 HISTFINDNODUPS},
-{NULL, "histignorealldups",   0,			 HISTIGNOREALLDUPS},
-{NULL, "histignoredups",      0,			 HISTIGNOREDUPS},
-{NULL, "histignorespace",     0,			 HISTIGNORESPACE},
-{NULL, "histnofunctions",     0,			 HISTNOFUNCTIONS},
-{NULL, "histnostore",	      0,			 HISTNOSTORE},
-{NULL, "histreduceblanks",    0,			 HISTREDUCEBLANKS},
-{NULL, "histsavebycopy",      OPT_ALL,			 HISTSAVEBYCOPY},
-{NULL, "histsavenodups",      0,			 HISTSAVENODUPS},
-{NULL, "histverify",	      0,			 HISTVERIFY},
-{NULL, "hup",		      OPT_EMULATE|OPT_ZSH,	 HUP},
-{NULL, "ignorebraces",	      OPT_EMULATE|OPT_SH,	 IGNOREBRACES},
-{NULL, "ignoreeof",	      0,			 IGNOREEOF},
-{NULL, "incappendhistory",    0,			 INCAPPENDHISTORY},
-{NULL, "interactive",	      OPT_SPECIAL,		 INTERACTIVE},
-{NULL, "interactivecomments", OPT_BOURNE,		 INTERACTIVECOMMENTS},
-{NULL, "ksharrays",	      OPT_EMULATE|OPT_BOURNE,	 KSHARRAYS},
-{NULL, "kshautoload",	      OPT_EMULATE|OPT_BOURNE,	 KSHAUTOLOAD},
-{NULL, "kshglob",             OPT_EMULATE|OPT_KSH,       KSHGLOB},
-{NULL, "kshoptionprint",      OPT_EMULATE|OPT_KSH,	 KSHOPTIONPRINT},
-{NULL, "kshtypeset",          OPT_EMULATE|OPT_KSH,	 KSHTYPESET},
-{NULL, "listambiguous",	      OPT_ALL,			 LISTAMBIGUOUS},
-{NULL, "listbeep",	      OPT_ALL,			 LISTBEEP},
-{NULL, "listpacked",	      0,			 LISTPACKED},
-{NULL, "listrowsfirst",	      0,			 LISTROWSFIRST},
-{NULL, "listtypes",	      OPT_ALL,			 LISTTYPES},
-{NULL, "localoptions",	      OPT_EMULATE|OPT_KSH,	 LOCALOPTIONS},
-{NULL, "localtraps",	      OPT_EMULATE|OPT_KSH,	 LOCALTRAPS},
-{NULL, "login",		      OPT_SPECIAL,		 LOGINSHELL},
-{NULL, "longlistjobs",	      0,			 LONGLISTJOBS},
-{NULL, "magicequalsubst",     OPT_EMULATE,		 MAGICEQUALSUBST},
-{NULL, "mailwarning",	      0,			 MAILWARNING},
-{NULL, "markdirs",	      0,			 MARKDIRS},
-{NULL, "menucomplete",	      0,			 MENUCOMPLETE},
-{NULL, "monitor",	      OPT_SPECIAL,		 MONITOR},
-{NULL, "multios",	      OPT_EMULATE|OPT_ZSH,	 MULTIOS},
-{NULL, "nomatch",	      OPT_EMULATE|OPT_NONBOURNE, NOMATCH},
-{NULL, "notify",	      OPT_ZSH,			 NOTIFY},
-{NULL, "nullglob",	      OPT_EMULATE,		 NULLGLOB},
-{NULL, "numericglobsort",     OPT_EMULATE,		 NUMERICGLOBSORT},
-{NULL, "octalzeroes",         OPT_EMULATE|OPT_SH,	 OCTALZEROES},
-{NULL, "overstrike",	      0,			 OVERSTRIKE},
-{NULL, "pathdirs",	      OPT_EMULATE,		 PATHDIRS},
-{NULL, "posixbuiltins",	      OPT_EMULATE|OPT_BOURNE,	 POSIXBUILTINS},
-{NULL, "printeightbit",       0,                         PRINTEIGHTBIT},
-{NULL, "printexitvalue",      0,			 PRINTEXITVALUE},
-{NULL, "privileged",	      OPT_SPECIAL,		 PRIVILEGED},
-{NULL, "promptbang",	      OPT_KSH,			 PROMPTBANG},
-{NULL, "promptcr",	      OPT_ALL,			 PROMPTCR},
-{NULL, "promptpercent",	      OPT_NONBOURNE,		 PROMPTPERCENT},
-{NULL, "promptsp",	      OPT_ALL,			 PROMPTSP},
-{NULL, "promptsubst",	      OPT_KSH,			 PROMPTSUBST},
-{NULL, "pushdignoredups",     OPT_EMULATE,		 PUSHDIGNOREDUPS},
-{NULL, "pushdminus",	      OPT_EMULATE,		 PUSHDMINUS},
-{NULL, "pushdsilent",	      0,			 PUSHDSILENT},
-{NULL, "pushdtohome",	      OPT_EMULATE,		 PUSHDTOHOME},
-{NULL, "rcexpandparam",	      OPT_EMULATE,		 RCEXPANDPARAM},
-{NULL, "rcquotes",	      OPT_EMULATE,		 RCQUOTES},
-{NULL, "rcs",		      OPT_ALL,			 RCS},
-{NULL, "recexact",	      0,			 RECEXACT},
-{NULL, "restricted",	      OPT_SPECIAL,		 RESTRICTED},
-{NULL, "rmstarsilent",	      OPT_BOURNE,		 RMSTARSILENT},
-{NULL, "rmstarwait",	      0,			 RMSTARWAIT},
-{NULL, "sharehistory",	      OPT_KSH,			 SHAREHISTORY},
-{NULL, "shfileexpansion",     OPT_EMULATE|OPT_BOURNE,	 SHFILEEXPANSION},
-{NULL, "shglob",	      OPT_EMULATE|OPT_BOURNE,	 SHGLOB},
-{NULL, "shinstdin",	      OPT_SPECIAL,		 SHINSTDIN},
-{NULL, "shnullcmd",           OPT_EMULATE|OPT_BOURNE,	 SHNULLCMD},
-{NULL, "shoptionletters",     OPT_EMULATE|OPT_BOURNE,	 SHOPTIONLETTERS},
-{NULL, "shortloops",	      OPT_EMULATE|OPT_NONBOURNE, SHORTLOOPS},
-{NULL, "shwordsplit",	      OPT_EMULATE|OPT_BOURNE,	 SHWORDSPLIT},
-{NULL, "singlecommand",	      OPT_SPECIAL,		 SINGLECOMMAND},
-{NULL, "singlelinezle",	      OPT_KSH,			 SINGLELINEZLE},
-{NULL, "sunkeyboardhack",     0,			 SUNKEYBOARDHACK},
-{NULL, "transientrprompt",    0,			 TRANSIENTRPROMPT},
-{NULL, "trapsasync",	      0,			 TRAPSASYNC},
-{NULL, "typesetsilent",	      OPT_EMULATE|OPT_BOURNE,	 TYPESETSILENT},
-{NULL, "unset",		      OPT_EMULATE|OPT_BSHELL,	 UNSET},
-{NULL, "verbose",	      0,			 VERBOSE},
-{NULL, "vi",		      0,			 VIMODE},
-{NULL, "warncreateglobal",    0,			 WARNCREATEGLOBAL},
-{NULL, "xtrace",	      0,			 XTRACE},
-{NULL, "zle",		      OPT_SPECIAL,		 USEZLE},
-{NULL, "braceexpand",	      OPT_ALIAS, /* ksh/bash */	 -IGNOREBRACES},
-{NULL, "dotglob",	      OPT_ALIAS, /* bash */	 GLOBDOTS},
-{NULL, "hashall",	      OPT_ALIAS, /* bash */	 HASHCMDS},
-{NULL, "histappend",	      OPT_ALIAS, /* bash */	 APPENDHISTORY},
-{NULL, "histexpand",	      OPT_ALIAS, /* bash */	 BANGHIST},
-{NULL, "log",		      OPT_ALIAS, /* ksh */	 -HISTNOFUNCTIONS},
-{NULL, "mailwarn",	      OPT_ALIAS, /* bash */	 MAILWARNING},
-{NULL, "onecmd",	      OPT_ALIAS, /* bash */	 SINGLECOMMAND},
-{NULL, "physical",	      OPT_ALIAS, /* ksh/bash */	 CHASELINKS},
-{NULL, "promptvars",	      OPT_ALIAS, /* bash */	 PROMPTSUBST},
-{NULL, "stdin",		      OPT_ALIAS, /* ksh */	 SHINSTDIN},
-{NULL, "trackall",	      OPT_ALIAS, /* ksh */	 HASHCMDS},
-{NULL, "dvorak",	      0,			 DVORAK},
-{NULL, NULL, 0, 0}
+{{NULL, "aliases",	      OPT_EMULATE|OPT_ALL},	 ALIASESOPT},
+{{NULL, "allexport",	      OPT_EMULATE},		 ALLEXPORT},
+{{NULL, "alwayslastprompt",   OPT_ALL},			 ALWAYSLASTPROMPT},
+{{NULL, "alwaystoend",	      0},			 ALWAYSTOEND},
+{{NULL, "appendhistory",      OPT_ALL},			 APPENDHISTORY},
+{{NULL, "autocd",	      OPT_EMULATE},		 AUTOCD},
+{{NULL, "autocontinue",	      0},			 AUTOCONTINUE},
+{{NULL, "autolist",	      OPT_ALL},			 AUTOLIST},
+{{NULL, "automenu",	      OPT_ALL},			 AUTOMENU},
+{{NULL, "autonamedirs",	      0},			 AUTONAMEDIRS},
+{{NULL, "autoparamkeys",      OPT_ALL},			 AUTOPARAMKEYS},
+{{NULL, "autoparamslash",     OPT_ALL},			 AUTOPARAMSLASH},
+{{NULL, "autopushd",	      0},			 AUTOPUSHD},
+{{NULL, "autoremoveslash",    OPT_ALL},			 AUTOREMOVESLASH},
+{{NULL, "autoresume",	      0},			 AUTORESUME},
+{{NULL, "badpattern",	      OPT_EMULATE|OPT_NONBOURNE},BADPATTERN},
+{{NULL, "banghist",	      OPT_NONBOURNE},		 BANGHIST},
+{{NULL, "bareglobqual",       OPT_EMULATE|OPT_ZSH},      BAREGLOBQUAL},
+{{NULL, "bashautolist",	      0},                        BASHAUTOLIST},
+{{NULL, "beep",		      OPT_ALL},			 BEEP},
+{{NULL, "bgnice",	      OPT_EMULATE|OPT_NONBOURNE},BGNICE},
+{{NULL, "braceccl",	      OPT_EMULATE},		 BRACECCL},
+{{NULL, "bsdecho",	      OPT_EMULATE|OPT_SH},	 BSDECHO},
+{{NULL, "caseglob",	      OPT_ALL},			 CASEGLOB},
+{{NULL, "cbases",	      0},			 CBASES},
+{{NULL, "cdablevars",	      OPT_EMULATE},		 CDABLEVARS},
+{{NULL, "chasedots",	      OPT_EMULATE},		 CHASEDOTS},
+{{NULL, "chaselinks",	      OPT_EMULATE},		 CHASELINKS},
+{{NULL, "checkjobs",	      OPT_EMULATE|OPT_ZSH},	 CHECKJOBS},
+{{NULL, "clobber",	      OPT_EMULATE|OPT_ALL},	 CLOBBER},
+{{NULL, "completealiases",    0},			 COMPLETEALIASES},
+{{NULL, "completeinword",     0},			 COMPLETEINWORD},
+{{NULL, "correct",	      0},			 CORRECT},
+{{NULL, "correctall",	      0},			 CORRECTALL},
+{{NULL, "cshjunkiehistory",   OPT_EMULATE|OPT_CSH},	 CSHJUNKIEHISTORY},
+{{NULL, "cshjunkieloops",     OPT_EMULATE|OPT_CSH},	 CSHJUNKIELOOPS},
+{{NULL, "cshjunkiequotes",    OPT_EMULATE|OPT_CSH},	 CSHJUNKIEQUOTES},
+{{NULL, "cshnullcmd",	      OPT_EMULATE|OPT_CSH},	 CSHNULLCMD},
+{{NULL, "cshnullglob",	      OPT_EMULATE|OPT_CSH},	 CSHNULLGLOB},
+{{NULL, "emacs",	      0},			 EMACSMODE},
+{{NULL, "equals",	      OPT_EMULATE|OPT_ZSH},	 EQUALS},
+{{NULL, "errexit",	      OPT_EMULATE},		 ERREXIT},
+{{NULL, "errreturn",	      OPT_EMULATE},		 ERRRETURN},
+{{NULL, "exec",		      OPT_ALL},			 EXECOPT},
+{{NULL, "extendedglob",	      OPT_EMULATE},		 EXTENDEDGLOB},
+{{NULL, "extendedhistory",    OPT_CSH},			 EXTENDEDHISTORY},
+{{NULL, "evallineno",	      OPT_EMULATE|OPT_ZSH},	 EVALLINENO},
+{{NULL, "flowcontrol",	      OPT_ALL},			 FLOWCONTROL},
+{{NULL, "functionargzero",    OPT_EMULATE|OPT_NONBOURNE},FUNCTIONARGZERO},
+{{NULL, "glob",		      OPT_EMULATE|OPT_ALL},	 GLOBOPT},
+{{NULL, "globalexport",       OPT_EMULATE|OPT_ZSH},	 GLOBALEXPORT},
+{{NULL, "globalrcs",          OPT_ALL},			 GLOBALRCS},
+{{NULL, "globassign",	      OPT_EMULATE|OPT_CSH},	 GLOBASSIGN},
+{{NULL, "globcomplete",	      0},			 GLOBCOMPLETE},
+{{NULL, "globdots",	      OPT_EMULATE},		 GLOBDOTS},
+{{NULL, "globsubst",	      OPT_EMULATE|OPT_NONZSH},	 GLOBSUBST},
+{{NULL, "hashcmds",	      OPT_ALL},			 HASHCMDS},
+{{NULL, "hashdirs",	      OPT_ALL},			 HASHDIRS},
+{{NULL, "hashlistall",	      OPT_ALL},			 HASHLISTALL},
+{{NULL, "histallowclobber",   0},			 HISTALLOWCLOBBER},
+{{NULL, "histbeep",	      OPT_ALL},			 HISTBEEP},
+{{NULL, "histexpiredupsfirst",0},			 HISTEXPIREDUPSFIRST},
+{{NULL, "histfindnodups",     0},			 HISTFINDNODUPS},
+{{NULL, "histignorealldups",  0},			 HISTIGNOREALLDUPS},
+{{NULL, "histignoredups",     0},			 HISTIGNOREDUPS},
+{{NULL, "histignorespace",    0},			 HISTIGNORESPACE},
+{{NULL, "histnofunctions",    0},			 HISTNOFUNCTIONS},
+{{NULL, "histnostore",	      0},			 HISTNOSTORE},
+{{NULL, "histreduceblanks",   0},			 HISTREDUCEBLANKS},
+{{NULL, "histsavebycopy",     OPT_ALL},			 HISTSAVEBYCOPY},
+{{NULL, "histsavenodups",     0},			 HISTSAVENODUPS},
+{{NULL, "histverify",	      0},			 HISTVERIFY},
+{{NULL, "hup",		      OPT_EMULATE|OPT_ZSH},	 HUP},
+{{NULL, "ignorebraces",	      OPT_EMULATE|OPT_SH},	 IGNOREBRACES},
+{{NULL, "ignoreeof",	      0},			 IGNOREEOF},
+{{NULL, "incappendhistory",   0},			 INCAPPENDHISTORY},
+{{NULL, "interactive",	      OPT_SPECIAL},		 INTERACTIVE},
+{{NULL, "interactivecomments",OPT_BOURNE},		 INTERACTIVECOMMENTS},
+{{NULL, "ksharrays",	      OPT_EMULATE|OPT_BOURNE},	 KSHARRAYS},
+{{NULL, "kshautoload",	      OPT_EMULATE|OPT_BOURNE},	 KSHAUTOLOAD},
+{{NULL, "kshglob",            OPT_EMULATE|OPT_KSH},      KSHGLOB},
+{{NULL, "kshoptionprint",     OPT_EMULATE|OPT_KSH},	 KSHOPTIONPRINT},
+{{NULL, "kshtypeset",         OPT_EMULATE|OPT_KSH},	 KSHTYPESET},
+{{NULL, "listambiguous",      OPT_ALL},			 LISTAMBIGUOUS},
+{{NULL, "listbeep",	      OPT_ALL},			 LISTBEEP},
+{{NULL, "listpacked",	      0},			 LISTPACKED},
+{{NULL, "listrowsfirst",      0},			 LISTROWSFIRST},
+{{NULL, "listtypes",	      OPT_ALL},			 LISTTYPES},
+{{NULL, "localoptions",	      OPT_EMULATE|OPT_KSH},	 LOCALOPTIONS},
+{{NULL, "localtraps",	      OPT_EMULATE|OPT_KSH},	 LOCALTRAPS},
+{{NULL, "login",	      OPT_SPECIAL},		 LOGINSHELL},
+{{NULL, "longlistjobs",	      0},			 LONGLISTJOBS},
+{{NULL, "magicequalsubst",    OPT_EMULATE},		 MAGICEQUALSUBST},
+{{NULL, "mailwarning",	      0},			 MAILWARNING},
+{{NULL, "markdirs",	      0},			 MARKDIRS},
+{{NULL, "menucomplete",	      0},			 MENUCOMPLETE},
+{{NULL, "monitor",	      OPT_SPECIAL},		 MONITOR},
+{{NULL, "multios",	      OPT_EMULATE|OPT_ZSH},	 MULTIOS},
+{{NULL, "nomatch",	      OPT_EMULATE|OPT_NONBOURNE},NOMATCH},
+{{NULL, "notify",	      OPT_ZSH},			 NOTIFY},
+{{NULL, "nullglob",	      OPT_EMULATE},		 NULLGLOB},
+{{NULL, "numericglobsort",    OPT_EMULATE},		 NUMERICGLOBSORT},
+{{NULL, "octalzeroes",        OPT_EMULATE|OPT_SH},	 OCTALZEROES},
+{{NULL, "overstrike",	      0},			 OVERSTRIKE},
+{{NULL, "pathdirs",	      OPT_EMULATE},		 PATHDIRS},
+{{NULL, "posixbuiltins",      OPT_EMULATE|OPT_BOURNE},	 POSIXBUILTINS},
+{{NULL, "printeightbit",      0},                        PRINTEIGHTBIT},
+{{NULL, "printexitvalue",     0},			 PRINTEXITVALUE},
+{{NULL, "privileged",	      OPT_SPECIAL},		 PRIVILEGED},
+{{NULL, "promptbang",	      OPT_KSH},			 PROMPTBANG},
+{{NULL, "promptcr",	      OPT_ALL},			 PROMPTCR},
+{{NULL, "promptpercent",      OPT_NONBOURNE},		 PROMPTPERCENT},
+{{NULL, "promptsp",	      OPT_ALL},			 PROMPTSP},
+{{NULL, "promptsubst",	      OPT_KSH},			 PROMPTSUBST},
+{{NULL, "pushdignoredups",    OPT_EMULATE},		 PUSHDIGNOREDUPS},
+{{NULL, "pushdminus",	      OPT_EMULATE},		 PUSHDMINUS},
+{{NULL, "pushdsilent",	      0},			 PUSHDSILENT},
+{{NULL, "pushdtohome",	      OPT_EMULATE},		 PUSHDTOHOME},
+{{NULL, "rcexpandparam",      OPT_EMULATE},		 RCEXPANDPARAM},
+{{NULL, "rcquotes",	      OPT_EMULATE},		 RCQUOTES},
+{{NULL, "rcs",		      OPT_ALL},			 RCS},
+{{NULL, "recexact",	      0},			 RECEXACT},
+{{NULL, "restricted",	      OPT_SPECIAL},		 RESTRICTED},
+{{NULL, "rmstarsilent",	      OPT_BOURNE},		 RMSTARSILENT},
+{{NULL, "rmstarwait",	      0},			 RMSTARWAIT},
+{{NULL, "sharehistory",	      OPT_KSH},			 SHAREHISTORY},
+{{NULL, "shfileexpansion",    OPT_EMULATE|OPT_BOURNE},	 SHFILEEXPANSION},
+{{NULL, "shglob",	      OPT_EMULATE|OPT_BOURNE},	 SHGLOB},
+{{NULL, "shinstdin",	      OPT_SPECIAL},		 SHINSTDIN},
+{{NULL, "shnullcmd",          OPT_EMULATE|OPT_BOURNE},	 SHNULLCMD},
+{{NULL, "shoptionletters",    OPT_EMULATE|OPT_BOURNE},	 SHOPTIONLETTERS},
+{{NULL, "shortloops",	      OPT_EMULATE|OPT_NONBOURNE},SHORTLOOPS},
+{{NULL, "shwordsplit",	      OPT_EMULATE|OPT_BOURNE},	 SHWORDSPLIT},
+{{NULL, "singlecommand",      OPT_SPECIAL},		 SINGLECOMMAND},
+{{NULL, "singlelinezle",      OPT_KSH},			 SINGLELINEZLE},
+{{NULL, "sunkeyboardhack",    0},			 SUNKEYBOARDHACK},
+{{NULL, "transientrprompt",   0},			 TRANSIENTRPROMPT},
+{{NULL, "trapsasync",	      0},			 TRAPSASYNC},
+{{NULL, "typesetsilent",      OPT_EMULATE|OPT_BOURNE},	 TYPESETSILENT},
+{{NULL, "unset",	      OPT_EMULATE|OPT_BSHELL},	 UNSET},
+{{NULL, "verbose",	      0},			 VERBOSE},
+{{NULL, "vi",		      0},			 VIMODE},
+{{NULL, "warncreateglobal",   0},			 WARNCREATEGLOBAL},
+{{NULL, "xtrace",	      0},			 XTRACE},
+{{NULL, "zle",		      OPT_SPECIAL},		 USEZLE},
+{{NULL, "braceexpand",	      OPT_ALIAS}, /* ksh/bash */ -IGNOREBRACES},
+{{NULL, "dotglob",	      OPT_ALIAS}, /* bash */	 GLOBDOTS},
+{{NULL, "hashall",	      OPT_ALIAS}, /* bash */	 HASHCMDS},
+{{NULL, "histappend",	      OPT_ALIAS}, /* bash */	 APPENDHISTORY},
+{{NULL, "histexpand",	      OPT_ALIAS}, /* bash */	 BANGHIST},
+{{NULL, "log",		      OPT_ALIAS}, /* ksh */	 -HISTNOFUNCTIONS},
+{{NULL, "mailwarn",	      OPT_ALIAS}, /* bash */	 MAILWARNING},
+{{NULL, "onecmd",	      OPT_ALIAS}, /* bash */	 SINGLECOMMAND},
+{{NULL, "physical",	      OPT_ALIAS}, /* ksh/bash */ CHASELINKS},
+{{NULL, "promptvars",	      OPT_ALIAS}, /* bash */	 PROMPTSUBST},
+{{NULL, "stdin",	      OPT_ALIAS}, /* ksh */	 SHINSTDIN},
+{{NULL, "trackall",	      OPT_ALIAS}, /* ksh */	 HASHCMDS},
+{{NULL, "dvorak",	      0},			 DVORAK},
+{{NULL, NULL, 0}, 0}
 };
 
 /* Option letters */
@@ -404,13 +404,13 @@ printoptionnode(HashNode hn, int set)
 	optno = -optno;
     if (isset(KSHOPTIONPRINT)) {
 	if (defset(on))
-	    printf("no%-19s %s\n", on->nam, isset(optno) ? "off" : "on");
+	    printf("no%-19s %s\n", on->node.nam, isset(optno) ? "off" : "on");
 	else
-	    printf("%-21s %s\n", on->nam, isset(optno) ? "on" : "off");
+	    printf("%-21s %s\n", on->node.nam, isset(optno) ? "on" : "off");
     } else if (set == (isset(optno) ^ defset(on))) {
 	if (set ^ isset(optno))
 	    fputs("no", stdout);
-	puts(on->nam);
+	puts(on->node.nam);
     }
 }
 
@@ -435,8 +435,8 @@ createoptiontable(void)
     optiontab->freenode    = NULL;
     optiontab->printnode   = printoptionnode;
 
-    for (on = optns; on->nam; on++)
-	optiontab->addnode(optiontab, on->nam, on);
+    for (on = optns; on->node.nam; on++)
+	optiontab->addnode(optiontab, on->node.nam, on);
 }
 
 /* Setting of default options */
@@ -451,9 +451,9 @@ setemulate(HashNode hn, int fully)
      * current emulation mode if either it is considered relevant   *
      * to emulation or we are doing a full emulation (as indicated  *
      * by the `fully' parameter).                                   */
-    if (!(on->flags & OPT_ALIAS) &&
-	((fully && !(on->flags & OPT_SPECIAL)) ||
-	 (on->flags & OPT_EMULATE)))
+    if (!(on->node.flags & OPT_ALIAS) &&
+	((fully && !(on->node.flags & OPT_SPECIAL)) ||
+	 (on->node.flags & OPT_EMULATE)))
 	opts[on->optno] = defset(on);
 }
 
@@ -625,7 +625,7 @@ restrictparam(char *nam)
     Param pm = (Param) paramtab->getnode(paramtab, nam);
 
     if (pm) {
-	pm->flags |= PM_SPECIAL | PM_RESTRICTED;
+	pm->node.flags |= PM_SPECIAL | PM_RESTRICTED;
 	return;
     }
     createparam(nam, PM_SCALAR | PM_UNSET | PM_SPECIAL | PM_RESTRICTED);
@@ -734,12 +734,12 @@ printoptionnodestate(HashNode hn, int hadplus)
 
     if (hadplus) {
         if (defset(on) != isset(optno))
-	    printf("set -o %s%s\n", defset(on) ? "no" : "", on->nam);
+	    printf("set -o %s%s\n", defset(on) ? "no" : "", on->node.nam);
     } else {
 	if (defset(on))
-	    printf("no%-19s %s\n", on->nam, isset(optno) ? "off" : "on");
+	    printf("no%-19s %s\n", on->node.nam, isset(optno) ? "off" : "on");
 	else
-	    printf("%-21s %s\n", on->nam, isset(optno) ? "on" : "off");
+	    printf("%-21s %s\n", on->node.nam, isset(optno) ? "on" : "off");
     }
 }
 
@@ -771,11 +771,11 @@ printoptionlist_printoption(HashNode hn, UNUSED(int ignored))
 {
     Optname on = (Optname) hn;
 
-    if(on->flags & OPT_ALIAS) {
-	printf("  --%-19s  ", on->nam);
+    if(on->node.flags & OPT_ALIAS) {
+	printf("  --%-19s  ", on->node.nam);
 	printoptionlist_printequiv(on->optno);
     } else
-	printf("  --%s\n", on->nam);
+	printf("  --%s\n", on->node.nam);
 }
 
 /**/
@@ -785,5 +785,5 @@ printoptionlist_printequiv(int optno)
     int isneg = optno < 0;
 
     optno *= (isneg ? -1 : 1);
-    printf("  equivalent to --%s%s\n", isneg ? "no-" : "", optns[optno-1].nam);
+    printf("  equivalent to --%s%s\n", isneg ? "no-" : "", optns[optno-1].node.nam);
 }

@@ -376,7 +376,7 @@ tidyparam(Param pm)
 {
     if (!pm)
 	return;
-    pm->flags &= ~PM_READONLY;
+    pm->node.flags &= ~PM_READONLY;
     unsetparam_pm(pm, 0, 1);
 }
 

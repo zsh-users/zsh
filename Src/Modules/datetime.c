@@ -118,8 +118,8 @@ cleanup_(Module m)
 
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     pm = (Param) paramtab->getnode(paramtab, "EPOCHSECONDS");
-    if (pm && (pm->flags & PM_SPECIAL)) {
-	pm->flags &= ~PM_READONLY;
+    if (pm && (pm->node.flags & PM_SPECIAL)) {
+	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
     return 0;
