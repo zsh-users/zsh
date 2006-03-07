@@ -1,4 +1,8 @@
 2006-03-07  Wayne Davison  <wayned@users.sourceforge.net>
+	
+	* 22271 (updated): Src/subst.c, Src/linklist.c, Src/zsh.h: got rid
+	of the mult_isarr global from subst.c by using the LinkList's new
+	flag integer.
 
 	* unposted: Src/linklist.c, Src/zsh.h: changed the previous-node
 	pointer in a "struct linknode" from "last" to "prev".
