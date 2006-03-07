@@ -30,6 +30,8 @@
 #include "zsh.mdh"
 #include "subst.pro"
 
+#define LF_ARRAY	1
+
 /**/
 char nulstring[] = {Nularg, '\0'};
 
@@ -115,7 +117,7 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 	if ((qt = c == Qstring) || c == String) {
 	    if ((c = str[1]) == Inpar) {
 		if (!qt)
-		    mult_isarr = 1;
+		    list->list.flags |= LF_ARRAY;
 		str++;
 		goto comsub;
 	    } else if (c == Inbrack) {
@@ -140,7 +142,7 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		str3 = (char *)getdata(node);
 		continue;
 	    }
-	} else if ((qt = c == Qtick) || (c == Tick ? (mult_isarr = 1) : 0))
+	} else if ((qt = c == Qtick) || (c == Tick ? (list->list.flags |= LF_ARRAY) : 0))
 	  comsub: {
 	    LinkList pl;
 	    char *s, *str2 = str;
@@ -282,13 +284,11 @@ globlist(LinkList list, int nountok)
 mod_export void
 singsub(char **s)
 {
-    int omi = mult_isarr;
     local_list1(foo);
 
     init_list1(foo, *s);
 
     prefork(&foo, PF_SINGLE);
-    mult_isarr = omi;
     if (errflag)
 	return;
     *s = (char *) ugetnode(&foo);
@@ -305,23 +305,15 @@ singsub(char **s)
  * set to 1.  Otherwise, *isarr is set to 0, and the result is put into *s,
  * with any necessary joining of multiple elements using sep (which can be
  * NULL to use IFS).  The return value is true iff the expansion resulted
- * in an empty list.
- *
- * The mult_isarr variable is used by paramsubst() to tell us if a single-
- * item result was an array.  We always restore its value on exit. */
-
-/**/
-static int mult_isarr;
+ * in an empty list. */
 
 /**/
 static int
 multsub(char **s, int split, char ***a, int *isarr, char *sep)
 {
-    int l, omi = mult_isarr;
+    int l;
     char **r, **p, *x = *s;
     local_list1(foo);
-
-    mult_isarr = 0;
 
     if (split) {
 	for ( ; *x; x += l+1) {
@@ -376,31 +368,26 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
     if (errflag) {
 	if (isarr)
 	    *isarr = 0;
-	mult_isarr = omi;
 	return 0;
     }
 
-    if ((l = countlinknodes(&foo)) > 1 || (a && mult_isarr)) {
+    if ((l = countlinknodes(&foo)) > 1 || (foo.list.flags & LF_ARRAY && a)) {
 	p = r = hcalloc((l + 1) * sizeof(char*));
 	while (nonempty(&foo))
 	    *p++ = (char *)ugetnode(&foo);
 	*p = NULL;
 	/* We need a way to figure out if a one-item result was a scalar
-	 * or a single-item array.  The parser will have set mult_isarr
+	 * or a single-item array.  The parser will have set LF_ARRAY
 	 * in the latter case, allowing us to return it as an array to
-	 * our caller (if they provided for that result).  It would be
-	 * better if this information were encoded in the list itself
-	 * (e.g. by adding a flag to the LinkList structure). */
-	if (a && (l > 1 || mult_isarr)) {
+	 * our caller (if they provided for that result). */
+	if (a && (l > 1 || foo.list.flags & LF_ARRAY)) {
 	    *a = r;
 	    *isarr = SCANPM_MATCHMANY;
-	    mult_isarr = omi;
 	    return 0;
 	}
 	*s = sepjoin(r, sep, 1);
 	if (isarr)
 	    *isarr = 0;
-	mult_isarr = omi;
 	return 0;
     }
     if (l)
@@ -409,7 +396,6 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
 	*s = dupstring("");
     if (isarr)
 	*isarr = 0;
-    mult_isarr = omi;
     return !l;
 }
 
@@ -926,7 +912,7 @@ subst_parse_str(char **sp, int single, int err)
  */
 
 /**/
-LinkNode
+static LinkNode
 paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 {
     char *aptr = *str, c, cc;
@@ -951,7 +937,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * some kind of an internal flag to do with whether the array's been
      * copied, in which case I don't know why we don't use the copied
      * flag, but they do both occur close together so they presumably
-     * have different effects.  The value -1 is isued to force us to
+     * have different effects.  The value -1 is used to force us to
      * keep an empty array.  It's tested in the YUK chunk (I mean the
      * one explicitly marked as such).
      */
@@ -1680,10 +1666,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	 * array (aval) value.  TODO: move val and aval into
 	 * a structure with a discriminator.  Hope we can make
 	 * more things array values at this point and dearrayify later.
-	 * v->isarr tells us whether the stuff form down below looks
-	 * like an array.  Unlike multsub() this is probably clean
-	 * enough to keep, although possibly the parameter passing
-	 * needs reorganising.
+	 * v->isarr tells us whether the stuff from down below looks
+	 * like an array.
 	 *
 	 * I think we get to discard the existing value of isarr
 	 * here because it's already been taken account of, either
@@ -2354,31 +2338,21 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	val = dupstring(buf);
 	isarr = 0;
     }
-    /*
-     * I think this mult_isarr stuff here is used to pass back
-     * the setting of whether we are an array to multsub, and
-     * thence to the top-level paramsubst().  The way the
-     * setting is passed back is completely obscure, however.
-     * It's presumably at this point because we try to remember
-     * whether the value was `really' an array before massaging
-     * some special cases.
-     *
-     * TODO: YUK.  This is not the right place to turn arrays into
-     * scalars; we should pass back as an array, and let the calling
-     * code decide how to deal with it.  This is almost certainly
-     * a lot harder than it sounds.  Do we really need to handle
-     * one-element arrays as scalars at this point?  Couldn't
-     * we just test for it later rather than having a multiple-valued
-     * wave-function for isarr?
-     */
-    mult_isarr = isarr;
+    /* At this point we make sure that our arrayness has affected the
+     * arrayness of the linked list.  Then, we can turn our value into
+     * a scalar for convenience sake without affecting the arrayness
+     * of the resulting value. */
+    if (isarr)
+	l->list.flags |= LF_ARRAY;
+    else
+	l->list.flags &= ~LF_ARRAY;
     if (isarr > 0 && !plan9 && (!aval || !aval[0])) {
 	val = dupstring("");
 	isarr = 0;
     } else if (isarr && aval && aval[0] && !aval[1]) {
 	/* treat a one-element array as a scalar for purposes of   *
 	 * concatenation with surrounding text (some${param}thing) *
-	 * and rc_expand_param handling.  Note: mult_isarr (above) *
+	 * and rc_expand_param handling.  Note: LF_ARRAY (above)   *
 	 * propagates the true array type from nested expansions.  */
 	val = aval[0];
 	isarr = 0;
@@ -2390,8 +2364,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * "ssub" is true when we are called from singsub (via prefork):
      * it means that we must join arrays and should not split words. */
     if (ssub || spbreak || spsep || sep) {
-	if (isarr)
-	    val = sepjoin(aval, sep, 1), isarr = 0;
+	if (isarr) {
+	    val = sepjoin(aval, sep, 1);
+	    isarr = 0;
+	}
 	if (!ssub && (spbreak || spsep)) {
 	    aval = sepsplit(val, spsep, 0, 1);
 	    if (!aval || !aval[0])
@@ -2401,7 +2377,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    else
 		isarr = 2;
 	}
-	mult_isarr = isarr;
+	if (isarr)
+	    l->list.flags |= LF_ARRAY;
+	else
+	    l->list.flags &= ~LF_ARRAY;
     }
     /*
      * Perform case modififications.
@@ -2617,15 +2596,15 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    for (node = firstnode(list); node; incnode(node))
 		*ap++ = (char *) getdata(node);
 	    *ap = NULL;
-	    mult_isarr = isarr = 2;
+	    isarr = 2;
+	    l->list.flags |= LF_ARRAY;
 	}
 	copied = 1;
     }
     /*
      * TODO: hmm.  At this point we have to be on our toes about
      * whether we're putting stuff into a line or not, i.e.
-     * we don't want to do this from a recursive call; this is
-     * probably part of the point of the mult_isarr monkey business.
+     * we don't want to do this from a recursive call.
      * Rather than passing back flags in a non-trivial way, maybe
      * we could decide on the basis of flags passed down to us.
      *
