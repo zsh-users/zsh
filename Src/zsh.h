@@ -372,7 +372,7 @@ typedef struct asgment   *Asgment;
 
 struct linknode {
     LinkNode next;
-    LinkNode last;
+    LinkNode prev;
     void *dat;
 };
 
@@ -401,7 +401,7 @@ union linkroot {
 #define getdata(X)          ((X)->dat)
 #define setdata(X,Y)        ((X)->dat = (Y))
 #define nextnode(X)         ((X)->next)
-#define prevnode(X)         ((X)->last)
+#define prevnode(X)         ((X)->prev)
 #define pushnode(X,Y)       insertlinknode(X,&(X)->node,Y)
 #define zpushnode(X,Y)      zinsertlinknode(X,&(X)->node,Y)
 #define incnode(X)          (X = nextnode(X))
@@ -422,7 +422,7 @@ union linkroot {
         (N).list.first = &__n0; \
         (N).list.last = &__n0; \
         __n0.next = NULL; \
-        __n0.last = &(N).node; \
+        __n0.prev = &(N).node; \
         __n0.dat = (void *) (V0); \
     } while (0)
 

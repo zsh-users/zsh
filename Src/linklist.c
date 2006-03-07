@@ -66,11 +66,11 @@ insertlinknode(LinkList list, LinkNode node, void *dat)
 
     tmp = node->next;
     node->next = new = (LinkNode) zhalloc(sizeof *tmp);
-    new->last = node;
+    new->prev = node;
     new->dat = dat;
     new->next = tmp;
     if (tmp)
-	tmp->last = new;
+	tmp->prev = new;
     else
 	list->list.last = new;
     return new;
@@ -84,11 +84,11 @@ zinsertlinknode(LinkList list, LinkNode node, void *dat)
 
     tmp = node->next;
     node->next = new = (LinkNode) zalloc(sizeof *tmp);
-    new->last = node;
+    new->prev = node;
     new->dat = dat;
     new->next = tmp;
     if (tmp)
-	tmp->last = new;
+	tmp->prev = new;
     else
 	list->list.last = new;
     return new;
@@ -102,10 +102,10 @@ uinsertlinknode(LinkList list, LinkNode node, LinkNode new)
 {
     LinkNode tmp = node->next;
     node->next = new;
-    new->last = node;
+    new->prev = node;
     new->next = tmp;
     if (tmp)
-	tmp->last = new;
+	tmp->prev = new;
     else
 	list->list.last = new;
     return new;
@@ -124,9 +124,9 @@ insertlinklist(LinkList l, LinkNode where, LinkList x)
 	return;
     where->next = firstnode(l);
     l->list.last->next = nx;
-    l->list.first->last = where;
+    l->list.first->prev = where;
     if (nx)
-	nx->last = lastnode(l);
+	nx->prev = lastnode(l);
     else
 	x->list.last = lastnode(l);
 }
@@ -145,7 +145,7 @@ getlinknode(LinkList list)
     dat = node->dat;
     list->list.first = node->next;
     if (node->next)
-	node->next->last = &list->node;
+	node->next->prev = &list->node;
     else
 	list->list.last = &list->node;
     zfree(node, sizeof *node);
@@ -166,7 +166,7 @@ ugetnode(LinkList list)
     dat = node->dat;
     list->list.first = node->next;
     if (node->next)
-	node->next->last = &list->node;
+	node->next->prev = &list->node;
     else
 	list->list.last = &list->node;
     return dat;
@@ -180,11 +180,11 @@ remnode(LinkList list, LinkNode nd)
 {
     void *dat;
 
-    nd->last->next = nd->next;
+    nd->prev->next = nd->next;
     if (nd->next)
-	nd->next->last = nd->last;
+	nd->next->prev = nd->prev;
     else
-	list->list.last = nd->last;
+	list->list.last = nd->prev;
     dat = nd->dat;
     zfree(nd, sizeof *nd);
 
@@ -199,11 +199,11 @@ uremnode(LinkList list, LinkNode nd)
 {
     void *dat;
 
-    nd->last->next = nd->next;
+    nd->prev->next = nd->next;
     if (nd->next)
-	nd->next->last = nd->last;
+	nd->next->prev = nd->prev;
     else
-	list->list.last = nd->last;
+	list->list.last = nd->prev;
     dat = nd->dat;
     return dat;
 }
@@ -243,10 +243,10 @@ mod_export void
 rolllist(LinkList l, LinkNode nd)
 {
     l->list.last->next = firstnode(l);
-    l->list.first->last = lastnode(l);
+    l->list.first->prev = lastnode(l);
     l->list.first = nd;
-    l->list.last = nd->last;
-    nd->last = &l->node;
+    l->list.last = nd->prev;
+    nd->prev = &l->node;
     l->list.last->next = 0;
 }
 
@@ -261,11 +261,11 @@ newsizedlist(int size)
 
     list->list.first = &list[1].node;
     for (node = firstnode(list); size; size--, node++) {
-	node->last = node - 1;
+	node->prev = node - 1;
 	node->next = node + 1;
     }
     list->list.last = node - 1;
-    list->list.first->last = &list->node;
+    list->list.first->prev = &list->node;
     node[-1].next = NULL;
 
     return list;
