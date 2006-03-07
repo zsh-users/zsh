@@ -131,7 +131,7 @@ insertlinklist(LinkList l, LinkNode where, LinkList x)
 	x->last = l->last;
 }
 
-/* Get top node in a linked list */
+/* Pop the top node off a linked list and free it. */
 
 /**/
 mod_export void *
@@ -152,7 +152,7 @@ getlinknode(LinkList list)
     return dat;
 }
 
-/* Get top node in a linked list without freeing */
+/* Pop the top node off a linked list without freeing it. */
 
 /**/
 mod_export void *
