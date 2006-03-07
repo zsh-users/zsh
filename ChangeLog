@@ -1,3 +1,20 @@
+2006-03-07  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/linklist.c, Src/zsh.h: changed the previous-node
+	pointer in a "struct linknode" from "last" to "prev".
+
+	* 22331: Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/hist.c,
+	Src/init.c, Src/lex.c, Src/linklist.c, Src/module.c, Src/options.c,
+	Src/params.c, Src/parse.c, Src/prompt.c, Src/signals.c, Src/subst.c,
+	Src/utils.c, Src/zsh.h, Src/Modules/datetime.c,
+	Src/Modules/langinfo.c, Src/Modules/mapfile.c,
+	Src/Modules/parameter.c, Src/Modules/system.c, Src/Modules/termcap.c,
+	Src/Modules/terminfo.c, Src/Modules/zftp.c, Src/Zle/compctl.c,
+	Src/Zle/compctl.h, Src/Zle/complete.c, Src/Zle/compresult.c,
+	Src/Zle/computil.c, Src/Zle/zle_hist.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_params.c, Src/Zle/zle_tricky.c, Src/Zle/zleparameter.c:
+	Changed some structures to avoid gcc's type-punned warnings.
+
 2006-03-07  Peter Stephenson  <pws@csr.com>
 
 	* 22328, modified: Completion/Unix/Type/_list_files,
