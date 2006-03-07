@@ -131,6 +131,7 @@ struct cmatch {
 #define CMF_FMULT    (1<<12)	/* first of multiple equal strings */
 #define CMF_ALL      (1<<13)	/* a match representing all other matches */
 #define CMF_DUMMY    (1<<14)	/* unselectable dummy match */
+#define CMF_MORDER   (1<<15)    /* order by matches, not display strings */
 
 /* Stuff for completion matcher control. */
 

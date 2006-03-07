@@ -7,6 +7,7 @@ local linepath realpath donepath prepath testpath exppath skips skipped
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
 local pats haspats ignore pfx pfxsfx sopt gopt opt sdirs ignpar cfopt listsfx
 local nm=$compstate[nmatches] menu matcher mopts sort match mid accex fake
+local listfiles listopts tmpdisp
 
 typeset -U prepaths exppaths
 
@@ -539,46 +540,65 @@ for prepath in "$prepaths[@]"; do
               ( -n "$_comp_correct" ||
                 -z "$compstate[pattern_match]" || "$SUFFIX" != */* ||
                 "${SUFFIX#*/}" = (|*[^\\])[][*?#~^\|\<\>]* ) ]] }; then
+	# We have not been told to insert the match, so we are
+	# listing, or something.
         (( tmp4 )) && zstyle -t ":completion:${curcontext}:paths" ambiguous &&
             compstate[to_end]=
         if [[ "$tmp3" = */* ]]; then
 	  if [[ -z "$listsfx" || "$tmp3" != */?* ]]; then
+	    # I think this means we are expanding some directory
+	    # back up the path.
+	    tmp1=("${(@)tmp1%%/*}")
+	    _list_files tmp1 "$prepath$realpath$testpath"
 	    compadd -Qf "$mopts[@]" -p "$linepath$tmp2" -s "/${tmp3#*/}" \
 	            -W "$prepath$realpath$testpath" \
 		    "$pfxsfx[@]" -M "r:|/=* r:|=*" \
-		    - "${(@)tmp1%%/*}"
+		    $listopts \
+	            -a tmp1
           else
+	    # Same with a non-empty suffix
+	    tmp1=("${(@)^tmp1%%/*}/${tmp3#*/}")
+	    _list_files tmp1 "$prepath$realpath$testpath"
 	    compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
 	            -W "$prepath$realpath$testpath" \
 		    "$pfxsfx[@]" -M "r:|/=* r:|=*" \
-		    - "${(@)^tmp1%%/*}/${tmp3#*/}"
+	            $listopts \
+		    -a tmp1
           fi
 	else
+	  _list_files tmp1 "$prepath$realpath$testpath"
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
 	          -W "$prepath$realpath$testpath" \
 		   "$pfxsfx[@]" -M "r:|/=* r:|=*" \
+	           $listopts \
 		   -a tmp1
 	fi
       else
+	# We are inserting the match into the command line.
         if [[ "$tmp3" = */* ]]; then
 	  tmp4=( -Qf "$mopts[@]" -p "$linepath$tmp2"
 	         -W "$prepath$realpath$testpath"
 	         "$pfxsfx[@]" -M "r:|/=* r:|=*" )
 	  if [[ -z "$listsfx" ]]; then
             for i in "$tmp1[@]"; do
-	      compadd "$tmp4[@]" -s "/${i#*/}" - "${i%%/*}"
+	      tmpdisp=("${i%%/*}")
+	      _list_files tmpdisp "$prepath$realpath$testpath"
+	      compadd "$tmp4[@]" -s "/${i#*/}" $listopts - "$tmpdisp"
 	    done
           else
             [[ -n "$compstate[pattern_match]" ]] && SUFFIX="${SUFFIX:s./.*/}*"
 
             for i in "$tmp1[@]"; do
-	      compadd "$tmp4[@]" - "$i"
+	      _list_files i "$prepath$realpath$testpath"
+	      compadd "$tmp4[@]" $listopts - "$i"
 	    done
           fi
         else
+	  _list_files tmp1 "$prepath$realpath$testpath"
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
                   -W "$prepath$realpath$testpath" \
 		  "$pfxsfx[@]" -M "r:|/=* r:|=*" \
+                  $listopts \
 		  -a tmp1
         fi
       fi
@@ -642,9 +662,10 @@ for prepath in "$prepaths[@]"; do
       fi
       compquote tmp4 tmp2 tmp1
       for i in "$tmp1[@]"; do
+	_list_files tmp2 "$prepath$realpath${mid%/*/}"
         compadd -Qf "$mopts[@]" -p "$linepath$tmp3/" -s "/$tmp4$i" \
                 -W "$prepath$realpath${mid%/*/}/" \
-	        "$pfxsfx[@]" -M "r:|/=* r:|=*" - "$tmp2"
+	        "$pfxsfx[@]" -M "r:|/=* r:|=*" $listopts - "$tmp2"
       done
     else
       if [[ "$osuf" = */* ]]; then
@@ -665,11 +686,15 @@ for prepath in "$prepaths[@]"; do
       fi
       if [[ -z "$_comp_correct" && -n "$compstate[pattern_match]" &&
             "${PREFIX#\~}$SUFFIX" = (|*[^\\])[][*?#~^\|\<\>]* ]]; then
+	tmp1=("$linepath$tmp4${(@)^tmp1}")
+	_list_files tmp1 "$prepath$realpath"
         compadd -Qf -W "$prepath$realpath" "$pfxsfx[@]" "$mopts[@]" \
-                -M "r:|/=* r:|=*" - "$linepath$tmp4${(@)^tmp1}"
+                -M "r:|/=* r:|=*" $listopts -a tmp1
       else
+	# Not a pattern match
+	_list_files tmp1 "$prepath$realpath$testpath"
         compadd -Qf -p "$linepath$tmp4" -W "$prepath$realpath$testpath" \
-	        "$pfxsfx[@]" "$mopts[@]" -M "r:|/=* r:|=*" -a tmp1
+	        "$pfxsfx[@]" "$mopts[@]" -M "r:|/=* r:|=*" $listopts -a tmp1
       fi
     fi
   fi

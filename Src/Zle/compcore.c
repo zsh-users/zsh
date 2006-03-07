@@ -2735,7 +2735,7 @@ addexpl(int always)
 static int
 matchcmp(Cmatch *a, Cmatch *b)
 {
-    if ((*a)->disp) {
+    if ((*a)->disp && !((*a)->flags & CMF_MORDER)) {
 	if ((*b)->disp) {
 	    if ((*a)->flags & CMF_DISPLINE) {
 		if ((*b)->flags & CMF_DISPLINE)
@@ -2751,7 +2751,7 @@ matchcmp(Cmatch *a, Cmatch *b)
 	}
 	return -1;
     }
-    if ((*b)->disp)
+    if ((*b)->disp && !((*b)->flags & CMF_MORDER))
 	return 1;
 
     return strbpcmp(&((*a)->str), &((*b)->str));

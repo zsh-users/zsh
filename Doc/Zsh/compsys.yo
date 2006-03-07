@@ -1263,6 +1263,36 @@ given, the name will only be completed if parameters of that type are
 required in the particular context.  Names for which no type is
 specified will always be completed.
 )
+kindex(file-list, completion style)
+item(tt(file-list))(
+This style controls whether files completed using the standard builtin
+mechanism are to be listed with a long list similar to tt(ls -l)
+(although note that this feature actually uses the shell module
+tt(zsh/stat) for file information).
+
+The style may either be set to a true value (or `tt(all)'), or
+one of the values `tt(insert)' or `tt(list)', indicating that files
+are to be listed in long format in all circumstances, or when
+attempting to insert a file name, or when listing file names
+without attempting to insert one.
+
+More generally, the value may be an array of any of the above values,
+optionally followed by tt(=)var(num).  If var(num) is present it
+gives the maximum number of matches for which long listing style
+will be used.  For example,
+
+example(zstyle ':completion:*' file-list list=20 insert=10)
+
+specifies that long format will be used when listing up to 20 files
+or inserting a file with up to 10 matches (assuming a listing
+is to be shown at all, for example on an ambiguous completion), else short
+format will be used.
+
+example(zstyle -e ':completion:*' file-list '(( ${+NUMERIC} )) && reply=(true)')
+
+specifies that long format will be used any time a numeric argument is
+supplied, else short format.
+)
 kindex(file-patterns, completion style)
 item(tt(file-patterns))(
 This is used by the standard function for completing filenames,

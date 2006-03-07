@@ -436,7 +436,7 @@ sect(Builtin Commands)
 startitem()
 findex(compadd)
 cindex(completion widgets, adding specified matches)
-xitem(tt(compadd) [ tt(-akqQfenUl12C) ] [ tt(-F) var(array) ])
+xitem(tt(compadd) [ tt(-akqQfenUld12C) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
@@ -529,6 +529,12 @@ item(tt(-l))(
 This option only has an effect if used together with the tt(-d)
 option. If it is given, the display strings are listed one per line,
 not arrayed in columns.
+)
+item(tt(-o))(
+This option only has an effect if used together with the tt(-d)
+option.  If it is given, the order of the output is determined by the
+match strings;  otherwise it is determined by the display strings
+(i.e. the strings given by the tt(-d) option).
 )
 item(tt(-J) var(name))(
 Gives the name of the group of matches the words should be stored in.

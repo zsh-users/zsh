@@ -569,6 +569,9 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    case 'l':
 		dat.flags |= CMF_DISPLINE;
 		break;
+	    case 'o':
+		dat.flags |= CMF_MORDER;
+		break;
 	    case 'E':
                 if (p[1]) {
                     dat.dummies = atoi(p + 1);

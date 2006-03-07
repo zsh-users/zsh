@@ -1,5 +1,13 @@
 2006-03-07  Peter Stephenson  <pws@csr.com>
 
+	* 22328, modified: Completion/Unix/Type/_list_files,
+	Completion/Unix/Type/_path_files, Doc/Zsh/compsys.yo,
+	Doc/Zsh/compwid.yo, Src/Zle/comp.h, Src/Zle/compcore.c,
+	Src/Zle/complete.c:  Option -o to compadd uses match
+	strings rather than display strings from -d for sorting;
+	_path_files uses _list_files to handle file-list style
+	which allows long format file lists.
+
 	* unposted: Config/version.mk: belatedly update version
 	to 4.3.2-dev-1 to avoid clash with released version.
 
