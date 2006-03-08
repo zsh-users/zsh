@@ -1,4 +1,7 @@
 2006-03-07  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22301: Completion/Base/Completer/_expand: enable alises for the
+	expansion of $(...) and `...`.
 	
 	* 22271 (updated): Src/subst.c, Src/linklist.c, Src/zsh.h: got rid
 	of the mult_isarr global from subst.c by using the LinkList's new
