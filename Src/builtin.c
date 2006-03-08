@@ -2142,7 +2142,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	if (!(pm = setsparam(pname, ztrdup(value))))
 	    return NULL;
 	if (pm != ipm) {
-	    DPUTS(ipm->flags != pm->flags,
+	    DPUTS(ipm->node.flags != pm->node.flags,
 		  "BUG: parameter recreated with wrong flags");
 	    unsetparam_pm(ipm, 0, 1);
 	}

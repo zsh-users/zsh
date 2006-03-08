@@ -1,3 +1,7 @@
+2006-03-08  Peter Stephenson  <pws@csr.com>
+
+	* 22337: Src/builtin.c: debugging code omitted from 22331.
+
 2006-03-07  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22301: Completion/Base/Completer/_expand: enable alises for the
