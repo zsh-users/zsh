@@ -1,5 +1,8 @@
 2006-03-09  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* users/10007: Francisco Borges: Doc/Zsh/options.yo: Added
+	missing <D> for HIST_SAVE_BY_COPY.
+
 	* 22335: Src/Zle/zle_thingy.c: fix some compiler warnings and
 	ensure that zmod gets restored properly in bin_zle_call().
 
