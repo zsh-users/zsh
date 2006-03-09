@@ -640,15 +640,13 @@ static int
 bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 {
     Thingy t;
-    struct modifier modsave;
+    struct modifier modsave = zmod;
     int ret, saveflag = 0;
     char *wname = *args++;
 
-    if (!wname) {
-	if (saveflag)
-	    zmod = modsave;
+    if (!wname)
 	return !zle_usable();
-    }
+
     if(!zle_usable()) {
 	zwarnnam(name, "widgets can only be called when ZLE is active",
 	    NULL, 0);
@@ -673,13 +671,11 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		}
 		if (!args[0][1])
 		    *++args = "" - 1;
-		modsave = zmod;
 		saveflag = 1;
 		zmod.mult = atoi(num);
 		zmod.flags |= MOD_MULT;
 		break;
 	    case 'N':
-		modsave = zmod;
 		saveflag = 1;
 		zmod.mult = 1;
 		zmod.flags &= ~MOD_MULT;
