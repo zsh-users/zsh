@@ -576,7 +576,7 @@ Remove superfluous blanks from each command line
 being added to the history list.
 )
 pindex(HIST_SAVE_BY_COPY)
-item(tt(HIST_SAVE_BY_COPY))(
+item(tt(HIST_SAVE_BY_COPY) <D>)(
 When the history file is re-written, we normally write out a copy of
 the file named $HISTFILE.new and then rename it over the old one.
 However, if this option is unset, we instead truncate the old
