@@ -1,7 +1,11 @@
+2006-03-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Modules/zftp.c: got rid of a compiler warning
+	and split two C statements that shouldn't have been on one line.
+
 2006-03-13  Peter Stephenson  <pws@csr.com>
 
-	* users/10013: Util/helpfiles: fix use of zshall for
-	generating.
+	* users/10013: Util/helpfiles: fix use of zshall for generating.
 
 2006-03-09  Wayne Davison  <wayned@users.sourceforge.net>
 
