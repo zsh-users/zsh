@@ -107,7 +107,12 @@ BUILTINS: while (<>) {
     undef($undented);
     if (/^\s*$/ || ($undented = (/^(\s*)/  && length($1) < $indent))) {
 	$undented && &doprint($_);
-	while (defined($_ = <>) && /(^\w)|(^\s*$)/) { 
+	while (defined($_ = <>) && /(^\w)|(^\s*$)/) {
+	    # NAME is the start of the next section when in zshall.
+	    # (Historical note: we used to exit on the page header,
+	    # but text from the old section can continue to the
+	    # new page).
+	    last BUILTINS if /^\s*NAME\s*$/;
 	    last BUILTINS if /^STARTUP\/SHUTDOWN FILES/;
 	    last if /^zsh.*\s\d$/; # GNU nroff -man end-of-page marker
 	}
@@ -120,11 +125,6 @@ BUILTINS: while (<>) {
 		    $_ = <>;
 		} while (defined($_) && /^\s*$/);
 	    }
-	}
-	# In zshall, the zshcompctl manual page comes after the
-	# builtins for 3.0, and zshzle comes after it for 3.1.
-	if (/ZSH(COMPCTL|ZLE)\(1\).*ZSH(COMPCTL|ZLE)\(1\)/) {
-	    last BUILTINS;
 	}
 	if (/^(\s*)/ && length($1) < $indent) {
 	    # This may be just a bug on the SGI, or maybe something

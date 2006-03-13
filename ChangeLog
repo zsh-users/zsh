@@ -1,3 +1,8 @@
+2006-03-13  Peter Stephenson  <pws@csr.com>
+
+	* users/10013: Util/helpfiles: fix use of zshall for
+	generating.
+
 2006-03-09  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/10007: Francisco Borges: Doc/Zsh/options.yo: Added
