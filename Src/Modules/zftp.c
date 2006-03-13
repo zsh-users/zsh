@@ -1698,7 +1698,7 @@ zftp_open(char *name, char **args, int flags)
 {
     struct protoent *zprotop;
     struct servent *zservp;
-    struct hostent *zhostp = NULL;
+    struct hostent *zhostp;
     char **addrp, *fname, *tmpptr, *portnam = "ftp";
     char *hostnam, *hostsuffix;
     int err, tmout, port = -1;
@@ -1870,7 +1870,8 @@ zftp_open(char *name, char **args, int flags)
 	    if(hlen != zhostp->h_length)
 		zwarnnam(name, "address length mismatch", NULL, 0);
 	    do {
-		err = tcp_connect(zfsess->control, *addrp, zhostp, zservp->s_port);	    } while (err && errno == EINTR && !errflag);
+		err = tcp_connect(zfsess->control, *addrp, zhostp, zservp->s_port);
+	    } while (err && errno == EINTR && !errflag);
 	    /* you can check whether it's worth retrying here */
 	}
 
