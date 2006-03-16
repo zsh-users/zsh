@@ -1,3 +1,8 @@
+2006-03-16  Clint Adams  <clint@zsh.org>
+
+	* 22349: Completion/X/Command/_nautilus: completion for
+	nautilus.
+
 2006-03-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Modules/zftp.c: got rid of a compiler warning
