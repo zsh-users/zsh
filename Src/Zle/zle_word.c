@@ -54,6 +54,8 @@ forwardword(char **args)
     return 0;
 }
 
+#define Z_vident(X) (ZC_iword(X) || (ZWC('_') == X))
+
 /**/
 int
 viforwardword(char **args)
@@ -68,11 +70,11 @@ viforwardword(char **args)
 	return ret;
     }
     while (n--) {
-	if (iident(zleline[zlecs]))
-	    while (zlecs != zlell && iident(zleline[zlecs]))
+	if (Z_vident(zleline[zlecs]))
+	    while (zlecs != zlell && Z_vident(zleline[zlecs]))
 		zlecs++;
 	else
-	    while (zlecs != zlell && !iident(zleline[zlecs]) && !ZC_iblank(zleline[zlecs]))
+	    while (zlecs != zlell && !Z_vident(zleline[zlecs]) && !ZC_iblank(zleline[zlecs]))
 		zlecs++;
 	if (wordflag && !n)
 	    return 0;
@@ -166,11 +168,11 @@ viforwardwordend(char **args)
 	if (ZC_iblank(zleline[zlecs + 1]))
 	    while (zlecs != zlell && ZC_iblank(zleline[zlecs + 1]))
 		zlecs++;
-	if (iident(zleline[zlecs + 1]))
-	    while (zlecs != zlell && iident(zleline[zlecs + 1]))
+	if (Z_vident(zleline[zlecs + 1]))
+	    while (zlecs != zlell && Z_vident(zleline[zlecs + 1]))
 		zlecs++;
 	else
-	    while (zlecs != zlell && !iident(zleline[zlecs + 1]) && !ZC_iblank(zleline[zlecs + 1]))
+	    while (zlecs != zlell && !Z_vident(zleline[zlecs + 1]) && !ZC_iblank(zleline[zlecs + 1]))
 		zlecs++;
     }
     if (zlecs != zlell && virangeflag)
@@ -216,11 +218,11 @@ vibackwardword(char **args)
     while (n--) {
 	while (zlecs && ZC_iblank(zleline[zlecs - 1]))
 	    zlecs--;
-	if (iident(zleline[zlecs - 1]))
-	    while (zlecs && iident(zleline[zlecs - 1]))
+	if (Z_vident(zleline[zlecs - 1]))
+	    while (zlecs && Z_vident(zleline[zlecs - 1]))
 		zlecs--;
 	else
-	    while (zlecs && !iident(zleline[zlecs - 1]) && !ZC_iblank(zleline[zlecs - 1]))
+	    while (zlecs && !Z_vident(zleline[zlecs - 1]) && !ZC_iblank(zleline[zlecs - 1]))
 		zlecs--;
     }
     return 0;
@@ -306,11 +308,11 @@ vibackwardkillword(UNUSED(char **args))
     while (n--) {
 	while ((x > lim) && ZC_iblank(zleline[x - 1]))
 	    x--;
-	if (iident(zleline[x - 1]))
-	    while ((x > lim) && iident(zleline[x - 1]))
+	if (Z_vident(zleline[x - 1]))
+	    while ((x > lim) && Z_vident(zleline[x - 1]))
 		x--;
 	else
-	    while ((x > lim) && !iident(zleline[x - 1]) && !ZC_iblank(zleline[x - 1]))
+	    while ((x > lim) && !Z_vident(zleline[x - 1]) && !ZC_iblank(zleline[x - 1]))
 		x--;
     }
     backkill(zlecs - x, 1);

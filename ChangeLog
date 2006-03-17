@@ -3,6 +3,9 @@
 	* 22364: Src/Builtins/rlimits.awk: add 'nice' and
 	'rt_priority' rlimits (NICE and RTPRIO).
 
+	* 22366: Src/Zle/zle_word.c: better handling for
+	multibyte-character-containing words in vi widgets.
+
 2006-03-16  Clint Adams  <clint@zsh.org>
 
 	* 22349: Completion/X/Command/_nautilus: completion for
