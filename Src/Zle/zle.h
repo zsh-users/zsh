@@ -72,6 +72,7 @@ typedef wint_t   ZLE_INT_T;
 
 /* Functions that operate on ZLE_CHAR_T. */
 #define ZC_ialpha iswalpha
+#define ZC_ialnum iswalnum
 #define ZC_iblank wcsiblank
 #define ZC_icntrl iswcntrl
 #define ZC_idigit iswdigit
@@ -137,6 +138,7 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 
 /* Functions that operate on ZLE_CHAR_T. */
 #define ZC_ialpha ialpha
+#define ZC_ialpha ialnum
 #define ZC_iblank iblank
 #define ZC_icntrl icntrl
 #define ZC_idigit idigit
