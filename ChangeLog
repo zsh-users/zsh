@@ -1,6 +1,6 @@
 2006-03-20  Clint Adams  <clint@zsh.org>
 
-	* 22371: Src/Zle/zle.h, Src/Zle/zle_word.c: use
+	* 22371, 22372: Src/Zle/zle.h, Src/Zle/zle_word.c: use
 	only alphanumerics and underscores as word characters
 	with vi bindings.
 

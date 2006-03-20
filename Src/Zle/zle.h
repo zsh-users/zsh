@@ -138,7 +138,7 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 
 /* Functions that operate on ZLE_CHAR_T. */
 #define ZC_ialpha ialpha
-#define ZC_ialpha ialnum
+#define ZC_ialnum ialnum
 #define ZC_iblank iblank
 #define ZC_icntrl icntrl
 #define ZC_idigit idigit
