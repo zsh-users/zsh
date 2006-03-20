@@ -205,10 +205,10 @@ zshzle.1: Zsh/zle.yo
 
 version.yo: $(sdir_top)/Config/version.mk
 	( \
-	  echo 'STARTDEF()'; \
+	  echo 'IFDEF(INCWSLEVEL)(INCWSLEVEL())(STARTDEF())'; \
 	  echo 'def(version)(0)('$(VERSION)')'; \
 	  echo 'def(date)(0)('$(VERSION_DATE)')'; \
-	  echo 'ENDDEF()#' | tr '#' '\\'; \
+	  echo 'IFDEF(DECWSLEVEL)(DECWSLEVEL())(ENDDEF())#' | tr '#' '\\'; \
 	) > $(sdir)/version.yo
 
 Zsh/modlist.yo: $(MODDOCSRC)

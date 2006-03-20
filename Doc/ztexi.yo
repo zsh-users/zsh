@@ -1,7 +1,12 @@
+IFDEF(INCWSLEVEL)(\
+INCWSLEVEL()\
+DEFINESYMBOL(ztexi)()\
+)(\
 STARTDEF()
+DEFINESYMBOL(ztexi)
+)
 
 TYPEOUT(Zsh Yodl-to-TeXinfo converter)
-DEFINESYMBOL(ztexi)
 
 INCLUDEFILE(zmacros)
 redef(ifztexi)(1)(ARG1)
@@ -11,7 +16,7 @@ def(CMT)(0)(NOTRANS(@c))
 
 ATEXIT(\
   NL()\
-  NOTRANS(@contents)NL()\
+  NOTRANS(@contents)+NL()\
   NOTRANS(@bye)NL()\
 )
 
@@ -24,17 +29,17 @@ DEFINECHARTABLE(standard)(
   '}' = "@}"
 )
 USECHARTABLE(standard)
-SUBST('')(NOTRANS(@value{dsq}))
-SUBST(``)(NOTRANS(@value{dsbq}))
+SUBST('')(+NOTRANS(@value{dsq}))
+SUBST(``)(+NOTRANS(@value{dsbq}))
 
-def(STDPAR)(0)(redef(PARAGRAPH)(0)(NL()NL()NOTRANS(@noindent)NL()))
+def(STDPAR)(0)(redef(PARAGRAPH)(0)(NL()NL()NOTRANS(@noindent)+NL()))
 
 COMMENT(--- emphasised text ---)
 
-def(em)(1)(NOTRANS(@emph{)ARG1NOTRANS(}))
-def(bf)(1)(NOTRANS(@cite{)ARG1NOTRANS(}))
-def(tt)(1)(NOTRANS(@t{)ARG1NOTRANS(}))
-def(var)(1)(NOTRANS(@var{)ARG1NOTRANS(}))
+def(em)(1)(+NOTRANS(@emph{)ARG1+NOTRANS(}))
+def(bf)(1)(+NOTRANS(@cite{)ARG1+NOTRANS(}))
+def(tt)(1)(+NOTRANS(@t{)ARG1+NOTRANS(}))
+def(var)(1)(+NOTRANS(@var{)ARG1+NOTRANS(}))
 
 COMMENT(--- man page headers ---)
 
@@ -45,46 +50,46 @@ COMMENT(--- TeXinfo headers and conditionals ---)
 
 def(texinfo)(2)(\
   STDPAR()\
-  NOTRANS(\input texinfo.tex)NL()\
-  NOTRANS(@c %**start of header)NL()\
-  NOTRANS(@iftex)NL()\
-  NOTRANS(@afourpaper)NL()\
-  NOTRANS(@setchapternewpage off)NL()\
-  NOTRANS(@end iftex)NL()\
-  NOTRANS(@setfilename )ARG1NL()\
-  NOTRANS(@settitle )ARG2NL()\
-  NOTRANS(@c %**end of header)NL()\
-  NL()\
-  NOTRANS(@ifinfo)NL()\
-  NOTRANS(@set dsq '@:')NL()\
-  NOTRANS(@set dsbq `@:`)NL()\
-  NOTRANS(@end ifinfo)NL()\
-  NOTRANS(@iftex)NL()\
-  NOTRANS(@set dsq '{}')NL()\
-  NOTRANS(@set dsbq `{}`)NL()\
-  NOTRANS(@end iftex)NL()\
-  NOTRANS(@ifinfo)NL()\
-  NOTRANS(@dircategory Utilities)NL()\
-  NOTRANS(@direntry)NL()\
-  NOTRANS(     * ZSH: (zsh).                     The Z Shell Manual.)NL()\
-  NOTRANS(@end direntry)NL()\
-  NOTRANS(@end ifinfo)NL()\
+  NOTRANS(\input texinfo.tex)+NL()\
+  NOTRANS(@c %**start of header)+NL()\
+  NOTRANS(@iftex)+NL()\
+  NOTRANS(@afourpaper)+NL()\
+  NOTRANS(@setchapternewpage off)+NL()\
+  NOTRANS(@end iftex)+NL()\
+  NOTRANS(@setfilename )ARG1+NL()\
+  NOTRANS(@settitle )ARG2+NL()\
+  NOTRANS(@c %**end of header)+NL()\
+  +NL()\
+  NOTRANS(@ifinfo)+NL()\
+  NOTRANS(@set dsq '@:')+NL()\
+  NOTRANS(@set dsbq `@:`)+NL()\
+  NOTRANS(@end ifinfo)+NL()\
+  NOTRANS(@iftex)+NL()\
+  NOTRANS(@set dsq '{}')+NL()\
+  NOTRANS(@set dsbq `{}`)+NL()\
+  NOTRANS(@end iftex)+NL()\
+  NOTRANS(@ifinfo)+NL()\
+  NOTRANS(@dircategory Utilities)+NL()\
+  NOTRANS(@direntry)+NL()\
+  NOTRANS(     * ZSH: (zsh).                     The Z Shell Manual.)+NL()\
+  NOTRANS(@end direntry)+NL()\
+  NOTRANS(@end ifinfo)+NL()\
 )
 
 def(texiifinfo)(1)(\
-  NOTRANS(@ifinfo)NL()\
+  NOTRANS(@ifinfo)+NL()\
   ARG1\
-  NOTRANS(@end ifinfo)NL()\
+  +NOTRANS(@end ifinfo)+NL()\
 )
 def(texiiftex)(1)(\
-  NOTRANS(@iftex)NL()\
+  NOTRANS(@iftex)+NL()\
   ARG1\
-  NOTRANS(@end iftex)NL()\
+  +NOTRANS(@end iftex)+NL()\
 )
 def(texiifnottex)(1)(\
-  NOTRANS(@ifnottex)NL()\
+  NOTRANS(@ifnottex)+NL()\
   ARG1\
-  NOTRANS(@end ifnottex)NL()\
+  +NOTRANS(@end ifnottex)+NL()\
 )
 
 def(texipage)(0)(\
@@ -117,19 +122,19 @@ COMMENT(--- section divisions ---)
 
 def(chapter)(1)(\
   NL()\
-  NOTRANS(@chapter )ARG1NL()\
+  NOTRANS(@chapter )ARG1+NL()\
   NOTRANS(@noindent)\
 )
 
 def(sect)(1)(\
   NL()\
-  NOTRANS(@section )ARG1NL()\
+  NOTRANS(@section )ARG1+NL()\
   NOTRANS(@noindent)\
 )
 
 def(subsect)(1)(\
   NL()\
-  NOTRANS(@subsection )ARG1NL()\
+  NOTRANS(@subsection )ARG1+NL()\
   NOTRANS(@noindent)\
 )
 
@@ -141,22 +146,22 @@ DEFINECHARTABLE(texicomment)(
 def(comment)(1)(\
   USECHARTABLE(texicomment)\
   NOTRANS(@c )ARG1\
-  USECHARTABLE(standard)\
+  +USECHARTABLE(standard)\
 )
 
 COMMENT(--- cross-references ---)
 
-def(manref)(2)(man page ARG1LPAR()ARG2RPAR())
+def(manref)(2)(man page ARG1+LPAR()ARG2+RPAR())
 def(zmanref)(1)(manref(ARG1)(1))
 def(noderef)(1)(\
-  NOTRANS(@ref{)ARG1NOTRANS(})\
+  NOTRANS(@ref{)ARG1+NOTRANS(})\
 )
 
 COMMENT(--- lists ---)
 
 def(startitem)(0)(\
   NOTRANS(@table @asis)\
-  redef(ITEMX)(0)()\
+  +redef(ITEMX)(0)()\
 )
 def(enditem)(0)(\
   NOTRANS(@end table)\
@@ -164,11 +169,11 @@ def(enditem)(0)(\
 def(item)(2)(\
   NOTRANS(@item)ITEMX() ARG1\
   ARG2\
-  redef(ITEMX)(0)()\
+  +redef(ITEMX)(0)()\
 )
 def(xitem)(1)(\
   NOTRANS(@item)ITEMX() ARG1\
-  redef(ITEMX)(0)(x)\
+  +redef(ITEMX)(0)(x)\
 )
 
 def(startsitem)(0)(\
@@ -188,7 +193,7 @@ def(startlist)(0)(\
   startitem()\
 )
 def(endlist)(0)(\
-  NOTRANS(@item)NL()\
+  NOTRANS(@item)+NL()\
   enditem()\
 )
 def(list)(1)(\
@@ -196,7 +201,7 @@ def(list)(1)(\
 )
 
 def(startitemize)(0)(\
-  NOTRANS(@itemize @bullet)NL()\
+  NOTRANS(@itemize @bullet)+NL()\
 )
 def(enditemize)(0)(\
   NOTRANS(@end itemize)\
@@ -216,19 +221,19 @@ DEFINECHARTABLE(nofillchars)(
 def(nofill)(1)(\
   USECHARTABLE(nofillchars)\
   ARG1\
-  USECHARTABLE(standard)\
+  +USECHARTABLE(standard)\
 )
 
 def(example)(1)(\
-  NOTRANS(@example)NL()\
+  NOTRANS(@example)+NL()\
   ARG1\
-  NL()NOTRANS(@end example)\
+  +NL()NOTRANS(@end example)\
 )
 
 def(indent)(1)(\
-  NOTRANS(@quotation)NL()\
+  NOTRANS(@quotation)+NL()\
   ARG1\
-  NL()NOTRANS(@end quotation)\
+  +NL()NOTRANS(@end quotation)\
 )
 
 COMMENT(--- hyperlink menus ---)
@@ -240,7 +245,7 @@ def(endmenu)(0)(\
   NOTRANS(@end menu)\
 )
 def(menu)(1)(\
-  * ARG1NOTRANS(::)\
+  * ARG1+NOTRANS(::)\
 )
 
 COMMENT(--- indices ---)
@@ -269,4 +274,8 @@ def(vindex)(1)(\
   NOTRANS(@vindex )ARG1\
 )
 
+IFDEF(DECWSLEVEL)(\
+DECWSLEVEL()\
+)(\
 ENDDEF()\
+)\

@@ -15,7 +15,8 @@ Commands are first read from tt(/etc/zshenv); this cannot be overridden.
 Subsequent behaviour is modified by the tt(RCS) and
 tt(GLOBAL_RCS) options; the former affects all startup files, while the
 second only affects those in the tt(/etc) directory.  If one of the options
-is unset at any point, any subsequent startup file(s) of the corresponding
+is unset at any point, any subsequent startup file+LPAR()s+RPAR()
+of the corresponding
 type will not be read.  It is also possible for a file in tt($ZDOTDIR) to
 re-enable tt(GLOBAL_RCS). Both tt(RCS) and tt(GLOBAL_RCS) are set by
 default.

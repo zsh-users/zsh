@@ -87,6 +87,7 @@ install.fns:
 	  scriptdir="$(scriptdir)" \
 	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
 	  INSTALL_DATA="$(INSTALL_DATA)" \
+	  INSTALL_PROGRAM="$(INSTALL_PROGRAM)" \
 	  DESTDIR="$(DESTDIR)" VERSION="$(VERSION)" \
 	  $(SHELL) $(sdir_top)/Config/installfns.sh || exit 1; \
 	fi; \

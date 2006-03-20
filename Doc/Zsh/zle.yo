@@ -482,7 +482,7 @@ if the remote side has closed the connection; we handle that by testing
 for a failed read.
 example(if ztcp pwspc 2811; then
   tcpfd=$REPLY
-  handler() {
+  handler+LPAR()RPAR() {
     zle -I
     local line
     if ! read -r line <&$1; then
@@ -774,7 +774,7 @@ Executed every time the line editor is started to read a new line
 of input.  The following example puts the line editor into vi command
 mode when it starts up.
 
-example(zle-line-init() { zle -K vicmd; }
+example(zle-line-init+LPAR()RPAR() { zle -K vicmd; }
 zle -N zle-line-init)
 
 (The command inside the function sets the keymap directly; it is
@@ -1776,7 +1776,7 @@ the command line or key bindings temporarily.
 
 
 The following widget, tt(caps-lock), serves as an example.
-example(self-insert-ucase() {
+example(self-insert-ucase+LPAR()RPAR() {
   LBUFFER+=${(U)KEYS[-1]}
 }
 

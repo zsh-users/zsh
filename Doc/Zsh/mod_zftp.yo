@@ -112,8 +112,9 @@ silent, apart from messages printed by the tt($ZFTP_VERBOSE)
 mechanism, or error messages if the connection closes.  There is no
 network overhead for this test.
 
-The test is only supported on systems with either the tt(select(2)) or
-tt(poll(2)) system calls; otherwise the message `tt(not
+The test is only supported on systems with either the
+tt(select+LPAR()2+RPAR()) or
+tt(poll+LPAR()2+RPAR()) system calls; otherwise the message `tt(not
 supported on this system)' is printed instead.
 
 The tt(test) subcommand will automatically be called at the start of any
@@ -496,6 +497,6 @@ all connections, and deleting a session changes the ordering of that
 information.
 
 On some operating systems, the control connection is not valid after a
-fork(), so that operations in subshells, on the left hand side of a
-pipeline, or in the background are not possible, as they should be.  This
-is presumably a bug in the operating system.
+fork+LPAR()RPAR(), so that operations in subshells, on the left hand side
+of a pipeline, or in the background are not possible, as they should be.
+This is presumably a bug in the operating system.

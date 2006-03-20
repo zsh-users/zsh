@@ -1308,7 +1308,8 @@ which are not used.  Its value consists of elements of the form
 such specifications separated by spaces.
 
 The var(pattern) is a pattern that is to be used to generate filenames.
-Any occurrence of the sequence `tt(%p)' is replaced by any pattern(s)
+Any occurrence of the sequence `tt(%p)' is replaced by any
+pattern+LPAR()s+RPAR()
 passed by the function calling tt(_files).  Colons in the pattern must
 be preceded by a backslash to make them distinguishable from the colon
 before the var(tag).  If more than one pattern is needed, the patterns
@@ -2467,7 +2468,7 @@ files are completed separately, so if the tt(hosts) style is set hosts
 can be completed without reference to the tt(urls) style.
 
 See the description in the function tt(_urls) itself
-for more information (e.g. `tt(more $^fpath/_urls(N))').
+for more information (e.g. `tt(more $^fpath/_urls+LPAR()N+RPAR())').
 )
 kindex(use-cache, completion style)
 item(tt(use-cache))(
@@ -3195,7 +3196,7 @@ combined in a single word even if one or more of the options take
 arguments.  For example, if tt(-a) takes an argument, with no
 tt(-s) `tt(-ab)' is considered as a single (unhandled) option; with
 tt(-s) tt(-ab) is an option with the argument `tt(b)'; with both tt(-s)
-and tt(-w), tt(-ab) may be the option tt(-a) and the option(-b) with
+and tt(-w), tt(-ab) may be the option tt(-a) and the option tt(-b) with
 arguments still to come.
 
 The option tt(-W) takes this a stage further:  it is possible to

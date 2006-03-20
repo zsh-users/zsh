@@ -68,7 +68,7 @@ ifnzman(includefile(Zsh/tcpsys.yo))
 ifnzman(includefile(Zsh/zftpsys.yo))
 ifnzman(includefile(Zsh/contrib.yo))
 ifzshall(\
-def(source)(1)(NOTRANS(.so )man1/ARG1NOTRANS(.)1)\
+def(source)(1)(NOTRANS(.so )man1/ARG1+NOTRANS(.)1)\
 CMT()
 source(zshroadmap)
 source(zshmisc)

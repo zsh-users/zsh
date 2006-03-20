@@ -45,6 +45,10 @@ for file in $allfuncs; do
       esac
     fi
     test -d $instdir || /bin/sh $sdir_top/mkinstalldirs $instdir || exit 1
-    $INSTALL_DATA $sdir_top/$file $instdir || exit 1
+    if test -x $sdir_top/$file; then
+	$INSTALL_PROGRAM $sdir_top/$file $instdir || exit 1
+    else
+	$INSTALL_DATA $sdir_top/$file $instdir || exit 1
+    fi
   fi
 done

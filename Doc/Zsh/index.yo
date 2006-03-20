@@ -1,7 +1,7 @@
 ifztexi(\
 def(printindex)(2)(\
   texipage()NL()\
-  NOTRANS(@unnumbered) ARG1NL()\
+  NOTRANS(@unnumbered) ARG1+NL()\
   NL()\
   NOTRANS(@printindex) ARG2\
 )\

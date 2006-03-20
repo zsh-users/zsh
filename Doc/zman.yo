@@ -1,7 +1,11 @@
+IFDEF(INCWSLEVEL)(\
+INCWSLEVEL()\
+DEFINESYMBOL(zman)()\
+)(\
 STARTDEF()
-
-TYPEOUT(Zsh Yodl-to-man converter)
 DEFINESYMBOL(zman)
+)
+TYPEOUT(Zsh Yodl-to-man converter)
 
 INCLUDEFILE(zmacros)
 redef(ifzman)(1)(ARG1)
@@ -25,10 +29,10 @@ def(STDPAR)(0)(\
 
 COMMENT(--- emphasised text ---)
 
-def(em)(1)(NOTRANS(\fI)ARG1NOTRANS(\fP))
-def(bf)(1)(NOTRANS(\fB)ARG1NOTRANS(\fP))
-def(tt)(1)(NOTRANS(\fB)ARG1NOTRANS(\fP))
-def(var)(1)(NOTRANS(\fI)ARG1NOTRANS(\fP))
+def(em)(1)(NOTRANS(\fI)ARG1+NOTRANS(\fP))
+def(bf)(1)(NOTRANS(\fB)ARG1+NOTRANS(\fP))
+def(tt)(1)(NOTRANS(\fB)ARG1+NOTRANS(\fP))
+def(var)(1)(NOTRANS(\fI)ARG1+NOTRANS(\fP))
 
 COMMENT(--- man page headers ---)
 
@@ -36,7 +40,7 @@ def(manpage)(4)(\
   NOTRANS(.TH ")ARG1" "ARG2" "ARG3" "ARG4"\
 )
 def(manpagename)(2)(\
-  sect(NAME)NL()\
+  sect(NAME)+NL()\
   ARG1 - ARG2\
 )
 
@@ -62,15 +66,19 @@ COMMENT(--- section divisions ---)
 
 def(chapter)(1)(CMT())
 
-COMMENT(--- the "" works around a yodl bug ---)
+COMMENT(--- the "" works around a yodl bug in versions before 2 ---)
 def(sect)(1)(\
-  NOTRANS(.SH )UPPERCASE(ARG1)(0)""NL()\
+  IFDEF(INCWSLEVEL)(\
+  NOTRANS(.SH )"UPPERCASE(ARG1)(0)"+NL()\
+  )(\
+  NOTRANS(.SH )UPPERCASE(ARG1)(0)""+NL()\
+  )\
   STDPAR()\
   CMT()\
 )
 
 def(subsect)(1)(\
-  NOTRANS(.SS ")ARG1"NL()\
+  NOTRANS(.SS ")ARG1"+NL()\
   CMT()\
 )
 
@@ -82,13 +90,13 @@ DEFINECHARTABLE(roffcomment)(
 def(comment)(1)(\
   USECHARTABLE(roffcomment)\
   NOTRANS(.\" )ARG1\
-  USECHARTABLE(standard)\
+  +USECHARTABLE(standard)\
 )
 
 COMMENT(--- cross-references ---)
 
 def(manref)(2)(\
-  NOTRANS(\fI)ARG1NOTRANS(\fP)(ARG2)\
+  NOTRANS(\fI)ARG1+NOTRANS(\fP)(ARG2)\
 )
 def(zmanref)(1)(manref(ARG1)(1))
 def(noderef)(1)(the section `ARG1')
@@ -97,31 +105,31 @@ COMMENT(--- lists ---)
 
 def(startitem)(0)(\
   NOTRANS(.PD 0)\
-  redef(ITEM)(0)(NOTRANS(.PD)NL())\
+  +redef(ITEM)(0)(NOTRANS(.PD)+NL())\
 )
 def(enditem)(0)(\
   ENDITEM()\
   STDPAR()\
-  redef(ENDITEM)(0)(NOTRANS(.RE)STDPAR())\
+  +redef(ENDITEM)(0)(NOTRANS(.RE)STDPAR())\
 )
 def(item)(2)(\
-  NOTRANS(.TP)NL()\
+  NOTRANS(.TP)+NL()\
   ITEM()\
-  redef(ITEM)(0)()\
+  +redef(ITEM)(0)()\
   ARG1\
-  redef(ENDITEM)(0)(CMT())\
-  redef(PARAGRAPH)(0)(\
-    NL()NOTRANS(.RS)NL()NOTRANS(.PP)NL()\
+  +redef(ENDITEM)(0)(CMT())\
+  +redef(PARAGRAPH)(0)(\
+    NL()NOTRANS(.RS)+NL()NOTRANS(.PP)+NL()\
     STDPAR()\
-    redef(ENDITEM)(0)(NOTRANS(.RE)STDPAR())\
+    +redef(ENDITEM)(0)(NOTRANS(.RE)STDPAR())\
   )\
   ARG2\
-  ENDITEM()\
+  +ENDITEM()\
 )
 def(xitem)(1)(\
-  NOTRANS(.TP)NL()\
-  NOTRANS(.PD 0)NL()\
-  redef(ITEM)(0)(NOTRANS(.PD)NL())\
+  NOTRANS(.TP)+NL()\
+  NOTRANS(.PD 0)+NL()\
+  +redef(ITEM)(0)(NOTRANS(.PD)+NL())\
   ARG1\
 )
 
@@ -132,12 +140,12 @@ def(endsitem)(0)(\
   NOTRANS(.PD)\
 )
 def(sitem)(2)(\
-  NOTRANS(.TP)NL()\
-  ARG1NL()\
+  NOTRANS(.TP)+NL()\
+  ARG1+NL()\
   ARG2\
 )
 def(sxitem)(1)(\
-  NOTRANS(.TP)NL()\
+  NOTRANS(.TP)+NL()\
   ARG1\
 )
 
@@ -148,7 +156,7 @@ def(endlist)(0)(\
   NOTRANS(.PD)\
 )
 def(list)(1)(\
-  NOTRANS(.TP)NL()\
+  NOTRANS(.TP)+NL()\
   ARG1\
 )
 
@@ -159,27 +167,27 @@ def(enditemize)(0)(\
   enditem()\
 )
 def(itemiz)(1)(\
-  item(NOTRANS(\)LPAR()NOTRANS(bu))(NL()ARG1NL())\
+  item(NOTRANS(\)+LPAR()+NOTRANS(bu))(NL()ARG1+NL())\
 )
 
 COMMENT(--- special effects ---)
 
 def(example)(1)(\
-  NOTRANS(.RS)NL()NOTRANS(.nf)NL()\
-  NOTRANS(\fB)ARG1NOTRANS(\fP)\
-  NL()NOTRANS(.fi)NL()NOTRANS(.RE)\
+  NOTRANS(.RS)+NL()NOTRANS(.nf)+NL()\
+  NOTRANS(\fB)ARG1+NOTRANS(\fP)\
+  +NL()NOTRANS(.fi)+NL()NOTRANS(.RE)\
 )
 
 def(nofill)(1)(\
-  NOTRANS(.nf)NL()\
+  NOTRANS(.nf)+NL()\
   ARG1\
-  NL()NOTRANS(.fi)\
+  +NL()NOTRANS(.fi)\
 )
 
 def(indent)(1)(\
-  NOTRANS(.RS)NL()NOTRANS(.nf)NL()\
+  NOTRANS(.RS)+NL()NOTRANS(.nf)+NL()\
   ARG1\
-  NL()NOTRANS(.fi)NL()NOTRANS(.RE)\
+  +NL()NOTRANS(.fi)+NL()NOTRANS(.RE)\
 )
 
 COMMENT(--- hyperlink menus ---)
@@ -197,4 +205,8 @@ def(pindex)(1)(CMT())
 def(tindex)(1)(CMT())
 def(vindex)(1)(CMT())
 
+IFDEF(DECWSLEVEL)(\
+DECWSLEVEL()\
+)(\
 ENDDEF()\
+)\

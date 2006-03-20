@@ -1032,7 +1032,8 @@ For example, starting from the line:
 
 example(print This line contains fan and fond)
 
-and invoking tt(replace-pattern) with the source string `tt(f(?)n)' and
+and invoking tt(replace-pattern) with the source string
+`tt(f+LPAR()?+RPAR()n)' and
 the replacment string `tt(c\1r)' produces the not very useful line:
 
 example(print This line contains car and cord)

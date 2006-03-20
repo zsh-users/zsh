@@ -1,3 +1,14 @@
+2006-03-20  Peter Stephenson  <pws@csr.com>
+
+	* 22360, 22365: Makefile.in, README, Config/installfns.sh,
+	Doc/Makefile.in, Doc/META-FAQ.yo, Doc/zmacros.yo, Doc/zman.yo,
+	Doc/zsh.yo, Doc/ztexi.yo, Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo,
+	Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo, Doc/Zsh/files.yo,
+	Doc/Zsh/func.yo, Doc/Zsh/index.yo, Doc/Zsh/mod_mathfunc.yo,
+	Doc/Zsh/mod_zftp.yo, Doc/Zsh/mod_zselect.yo, Doc/Zsh/options.yo,
+	Doc/Zsh/tcpsys.yo, Doc/Zsh/zftpsys.yo, Doc/Zsh/zle.yo: support
+	version 2 of Yodl.
+
 2006-03-17  Clint Adams  <clint@zsh.org>
 
 	* 22364: Src/Builtins/rlimits.awk: add 'nice' and

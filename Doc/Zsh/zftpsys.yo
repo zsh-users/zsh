@@ -477,7 +477,7 @@ local and remote hostnames and current directories.  It works best when
 combined with the function tt(chpwd).  In particular, a function of 
 the form
 
-example(chpwd() {
+example(chpwd+LPAR()RPAR() {
   if [[ -n $ZFTP_USER ]]; then
     zftp_chpwd
   else

@@ -1212,7 +1212,7 @@ example(trap 'print $LINENO' DEBUG)
 
 will print the line number of a command executed after it has run, while
 
-example(TRAPDEBUG() { print $LINENO; })
+example(TRAPDEBUG+LPAR()RPAR() { print $LINENO; })
 
 will always print the number zero.
 

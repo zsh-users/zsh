@@ -315,8 +315,8 @@ item(tt(CASE_GLOB) <D>)(
 Make globbing (filename generation) sensitive to case.  Note that other
 uses of patterns are always sensitive to case.  If the option is unset,
 the presence of any character which is special to filename generation
-will cause case-insensitive matching.  For example, tt(cvs(/)) can
-match the directory tt(CVS) owing to the presence of the globbing flag
+will cause case-insensitive matching.  For example, tt(cvs+LPAR()/+RPAR())
+can match the directory tt(CVS) owing to the presence of the globbing flag
 (unless the option tt(BARE_GLOB_QUAL) is unset).
 )
 pindex(CSH_NULL_GLOB)
@@ -1039,7 +1039,7 @@ For example,
 
 example(unsetopt localtraps
 trap - INT
-fn() { setopt localtraps; trap '' INT; sleep 3; })
+fn+LPAR()RPAR() { setopt localtraps; trap '' INT; sleep 3; })
 
 will restore normally handling of tt(SIGINT) after the function exits.
 )

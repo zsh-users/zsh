@@ -1507,7 +1507,8 @@ parentheses may be nested.  There are special rules for parentheses followed
 by `tt(#)' or `tt(##)'.  Only the last match of the parenthesis is
 remembered: for example, in `tt([[ abab = (#b)([ab])# ]])', only the final
 `tt(b)' is stored in tt(match[1]).  Thus extra parentheses may be necessary
-to match the complete segment: for example, use `tt(X((ab|cd)#)Y)' to match
+to match the complete segment: for example, use
+`tt(X+LPAR()(ab|cd)#+RPAR()Y)' to match
 a whole string of either `tt(ab)' or `tt(cd)' between `tt(X)' and `tt(Y)',
 using the value of tt($match[1]) rather than tt($match[2]).
 
@@ -1561,12 +1562,13 @@ The `tt((#s))' flag succeeds only at the start of the test string, and the
 correspond to `tt(^)' and `tt($)' in standard regular expressions.  They
 are useful for matching path segments in patterns other than those in
 filename generation (where path segments are in any case treated
-separately).  For example, `tt(*((#s)|/)test((#e)|/)*)' matches a path
-segment `tt(test)' in any of the following strings: tt(test),
+separately).  For example, `tt(*((#s)|/)test+LPAR()(#e)|/+RPAR()*)' matches
+a path segment `tt(test)' in any of the following strings: tt(test),
 tt(test/at/start), tt(at/end/test), tt(in/test/middle).
 
 Another use is in parameter substitution; for example
-`tt(${array/(#s)A*Z(#e)})' will remove only elements of an array which
+`tt(${array/(#s)A*Z+LPAR()#e+RPAR()})' will remove only elements of an
+array which
 match the complete pattern `tt(A*Z)'.  There are other ways of performing
 many operations of this type, however the combination of the substitution
 operations `tt(/)' and `tt(//)' with the `tt((#s))' and `tt((#e))' flags
@@ -1582,7 +1584,8 @@ item(tt(q))(
 A `tt(q)' and everything up to the closing parenthesis of the globbing
 flags are ignored by the pattern matching code.  This is intended to
 support the use of glob qualifiers, see below.  The result is that
-the pattern `tt((#b)(*).c(#q.))' can be used both for globbing and for
+the pattern `tt((#b)(*).c+LPAR()#q.+RPAR())' can be used both for globbing
+and for
 matching against a string.  In the former case, the `tt((#q.))' will be
 treated as a glob qualifier and the `tt((#b))' will not be useful, while in
 the latter case the `tt((#b))' is useful for backreferences and the
@@ -1662,8 +1665,8 @@ the pattern
 tt(LPAR()#a1)tt(RPAR()cat)tt(LPAR()#a0)tt(RPAR()dog)tt(LPAR()#a1)tt(RPAR()fox)
 is equivalent.  Note that the point at which an error is first found is the
 crucial one for establishing whether to use approximation; for example,
-tt((#a1)abc(#a0)xyz) will not match tt(abcdxyz), because the error occurs
-at the `tt(x)', where approximation is turned off.
+tt((#a1)abc+LPAR()#a0+RPAR()xyz) will not match tt(abcdxyz), because the
+error occurs at the `tt(x)', where approximation is turned off.
 
 Entire path segments may be matched approximately, so that
 `tt((#a1)/foo/d/is/available/at/the/bar)' allows one error in any path
@@ -1871,7 +1874,7 @@ characters following the tt(PLUS()) that are alphanumeric or underscore.
 Typically var(cmd) will be the name of a shell function that contains the
 appropriate test.  For example,
 
-example(nt() { [[ $REPLY -nt $NTREF ]] }
+example(nt+LPAR()RPAR() { [[ $REPLY -nt $NTREF ]] }
 NTREF=reffile
 ls -l *(+nt))
 
@@ -2032,7 +2035,7 @@ lists all files having a link count of one whose names contain a dot
 (but not those starting with a dot, since tt(GLOB_DOTS) is explicitly
 switched off) except for tt(lex.c), tt(lex.h), tt(parse.c) and tt(parse.h).
 
-example(print b*.pro(#q:s/pro/shmo/)(#q.:s/builtin/shmiltin/))
+example(print b*.pro+LPAR()#q:s/pro/shmo/+RPAR()(#q.:s/builtin/shmiltin/))
 
 demonstrates how colon modifiers and other qualifiers may be chained
 together.  The ordinary qualifier `tt(.)' is applied first, then the colon

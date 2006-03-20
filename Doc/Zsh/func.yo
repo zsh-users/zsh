@@ -110,7 +110,7 @@ arguments, at the end.
 
 For example, suppose the autoload file tt(func) contains
 
-example(func() { print This is func; }
+example(func+LPAR()RPAR() { print This is func; }
 print func is initialized
 )
 
@@ -125,7 +125,7 @@ but which loads its own definition by searching tt(fpath), by using
 `tt(autoload -X)' within a shell function.  For example, the following are
 equivalent:
 
-example(myfunc() {
+example(myfunc+LPAR()RPAR() {
   autoload -X
 }
 myfunc args...)
@@ -203,7 +203,7 @@ Programs terminated by uncaught signals typically return the status 128
 plus the signal number.  Hence the following causes the handler for
 tt(SIGINT) to print a message, then mimic the usual effect of the signal.
 
-example(TRAPINT() {
+example(TRAPINT+LPAR()RPAR() {
   print "Caught SIGINT, aborting."
   return $(( 128 + $1 ))
 })
@@ -239,7 +239,7 @@ run in the environment of the calling process, rather than in their own
 function environment.  Apart from the difference in calling procedure and
 the fact that the function form appears in lists of functions, the forms
 
-example(TRAPNAL() { 
+example(TRAPNAL+LPAR()RPAR() { 
  # code
 })
 

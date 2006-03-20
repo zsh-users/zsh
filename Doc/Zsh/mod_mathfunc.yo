@@ -8,7 +8,7 @@ mathematical functions for use when
 evaluating mathematical formulae.  The syntax agrees with normal C and
 FORTRAN conventions, for example,
 
-example((( f = sin(0.3) )))
+example((( f = sin+LPAR()0.3+RPAR() )))
 
 assigns the sine of 0.3 to the parameter f.
 
@@ -33,8 +33,8 @@ returns an integer.
 The function tt(signgam) takes no arguments, and returns an integer, which
 is the C variable of the same name, as described in manref(gamma)(3).  Note
 that it is therefore only useful immediately after a call to tt(gamma) or
-tt(lgamma).  Note also that `tt(signgam())' and `tt(signgam)' are distinct
-expressions.
+tt(lgamma).  Note also that `tt(signgam+LPAR()RPAR)' and `tt(signgam)' are
+distinct expressions.
 
 The following functions take two floating point arguments: tt(copysign),
 tt(fmod), tt(hypot), tt(nextafter).
@@ -58,7 +58,8 @@ has the function tt(erand48(3)).  It returns a pseudo-random floating point
 number between 0 and 1.  It takes a single string optional argument.
 
 If the argument is not present, the random number seed is initialised by
-three calls to the tt(rand(3)) function --- this produces the same random
+three calls to the tt(rand+LPAR()3+RPAR()) function --- this produces the
+same random
 numbers as the next three values of tt($RANDOM).
 
 If the argument is present, it gives the name of a scalar parameter where
@@ -80,7 +81,8 @@ print $(( rand48(seed) )))
 
 Assuming tt($seed) does not exist, it will be initialised by the first
 call.  In the second call, the default seed is initialised; note, however,
-that because of the properties of tt(rand()) there is a correlation between
+that because of the properties of tt(rand+LPAR()RPAR()) there is a
+correlation between
 the seeds used for the two initialisations, so for more secure uses, you
 should generate your own 12-byte seed.  The third call returns to the same
 sequence of random numbers used in the first call, unaffected by the

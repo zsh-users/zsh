@@ -202,8 +202,8 @@ tt(tcp_send); they are simply passed down to tt(print -r).
 
 If the parameter tt($TCP_OUTPUT) is a non-empty string and logging is
 enabled then the data sent to each session will be echoed to the log
-file(s) with tt($TCP_OUTPUT) in front where appropriate, much in the manner
-of tt($TCP_PROMPT).
+file+LPAR()s+RPAR() with tt($TCP_OUTPUT) in front where appropriate, much
+in the manner of tt($TCP_PROMPT).
 )
 enditem()
 
