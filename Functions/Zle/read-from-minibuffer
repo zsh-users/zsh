@@ -33,7 +33,7 @@ if [[ -n $keys ]]; then
   read -k $keys
   stat=$?
 else
-  zle recursive-edit
+  zle recursive-edit -K main
   stat=$?
   (( stat )) || REPLY=$BUFFER
 fi

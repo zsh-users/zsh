@@ -1,3 +1,13 @@
+2006-03-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* zsh-users/10047 : Doc/Zsh/zle.yo, Src/Zle/zle_thingy.c,
+	Functions/Zle/read_from_minibuffer: add and use -K option
+	to select keymap for use with widget.
+
+2006-03-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22638: MACHINES: compilation with cc on Irix 6.5.
+
 2006-03-20  Clint Adams  <clint@zsh.org>
 
 	* 22371, 22372: Src/Zle/zle.h, Src/Zle/zle_word.c: use

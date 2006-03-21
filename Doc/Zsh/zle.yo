@@ -332,7 +332,7 @@ xitem(tt(zle) tt(-U) var(string))
 xitem(tt(zle) tt(-K) var(keymap))
 xitem(tt(zle) tt(-F) [ tt(-L) ] [ var(fd) [ var(handler) ] ])
 xitem(tt(zle) tt(-I))
-item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
+item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ] [ -K) var(keymap) tt(]) var(args) ...)(
 The tt(zle) builtin performs a number of different actions concerning
 ZLE.
 
@@ -529,7 +529,7 @@ this may have been by a previous call to `tt(zle -I)' or by a system
 notification.  To test if a zle widget may be called at this point, execute
 tt(zle) with no arguments and examine the return status.
 )
-item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
+item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ] [ -K) var(keymap) tt(]) var(args) ...)(
 Invoke the specified widget.  This can only be done when ZLE is
 active; normally this will be within a user-defined widget.
 
@@ -537,6 +537,10 @@ With the options tt(-n) and tt(-N), the current numerical argument will be
 saved and then restored after the call to tt(widget); `tt(-n) var(num)'
 sets the numerical argument temporarily to var(num), while `tt(-N)' sets it
 to the default, i.e. as if there were none.
+
+With the option tt(-K), var(keymap) will be used as the current keymap
+during the execution of the widget.  The previous keymap will be
+restored when the widget exits.
 
 Any further arguments will be passed to the widget.  If it is a shell
 function, these are passed down as positional parameters; for builtin

@@ -642,7 +642,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     Thingy t;
     struct modifier modsave = zmod;
     int ret, saveflag = 0;
-    char *wname = *args++;
+    char *wname = *args++, *keymap_restore = NULL, *keymap_tmp;
 
     if (!wname)
 	return !zle_usable();
@@ -680,6 +680,18 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		zmod.mult = 1;
 		zmod.flags &= ~MOD_MULT;
 		break;
+	    case 'K':
+		keymap_tmp = args[0][1] ? args[0]+1 : args[1];
+		if (!keymap_tmp) {
+		    zwarnname(name, "keymap expected after -%c", NULL, **args);
+		    return 1;
+		}
+		if (!args[0][1])
+		    *++args = "" - 1;
+		keymap_restore = dupstring(curkeymapname);
+		if (selectkeymap(keymap_tmp, 0))
+		    return 1;
+		break;
 	    default:
 		zwarnnam(name, "unknown option: %s", *args, 0);
 		return 1;
@@ -693,6 +705,8 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     unrefthingy(t);
     if (saveflag)
 	zmod = modsave;
+    if (keymap_restore)
+	selectkeymap(keymap_restore, 0);
     return ret;
 }
 
