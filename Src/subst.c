@@ -1274,6 +1274,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    sep = "\n";
 		    break;
 
+		case '0':
+		    spsep = zhalloc(3);
+		    spsep[0] = Meta;
+		    spsep[1] = '\0' ^ 32;
+		    spsep[2] = '\0';
+		    break;
+
 		case 's':
 		    tt = 1;
 		/* fall through */
