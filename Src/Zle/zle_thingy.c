@@ -683,7 +683,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 	    case 'K':
 		keymap_tmp = args[0][1] ? args[0]+1 : args[1];
 		if (!keymap_tmp) {
-		    zwarnname(name, "keymap expected after -%c", NULL, **args);
+		    zwarnnam(name, "keymap expected after -%c", NULL, **args);
 		    return 1;
 		}
 		if (!args[0][1])
