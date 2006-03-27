@@ -1,3 +1,8 @@
+2006-03-27  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* SF bug #1262954: Src/jobs.c: fixed a compilation problem
+	when HAVE_GETRUSAGE is defined but HAVE_WAIT3 is not.
+
 2006-03-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/10087: Src/parse.c: "case foo in" didn't turn off
