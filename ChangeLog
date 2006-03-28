@@ -1,3 +1,8 @@
+2006-03-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22390: Completion/Unix/Command/_bzr: an improved version
+	that completes options and context-sensitive filenames.
+
 2006-03-27  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* SF bug #1262954: Src/jobs.c: fixed a compilation problem
