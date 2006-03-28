@@ -9,7 +9,7 @@ _arguments -C \
     '1: :->cmd' \
     '*:: :->args' && ret=0
 
-if (( ! $+_svn_cmds )); then
+if (( ! $+_bzr_cmds )); then
     typeset -gH _bzr_cmds
     _bzr_cmds=(${(f)"$(_call_program bzr bzr shell-complete)"})
 fi
