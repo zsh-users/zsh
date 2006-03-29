@@ -1,3 +1,7 @@
+2006-03-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/10107: Doc/Zsh/jobs.yo: SIGQUIT is ignored by the shell.
+
 2006-03-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22390: Completion/Unix/Command/_bzr: an improved version

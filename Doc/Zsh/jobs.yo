@@ -95,6 +95,7 @@ sect(Signals)
 The tt(INT) and tt(QUIT) signals for an invoked
 command are ignored if the command is followed by
 `tt(&)' and the tt(MONITOR) option is not active.
+The shell itself always ignores the tt(QUIT) signal.
 Otherwise, signals have the values
 inherited by the shell from its parent
 (but see the tt(TRAP)var(NAL) special functions in noderef(Functions)).
