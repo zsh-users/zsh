@@ -1,3 +1,7 @@
+2006-04-05  Peter Stephenson  <pws@csr.com>
+
+	* 22375: Doc/Zsh/expn.yo: somehow the doc got missed out.
+
 2006-04-04  Clint Adams  <clint@zsh.org>
 
 	* 22392: Completion/Linux/Command/_analyseplugin:

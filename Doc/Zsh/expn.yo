@@ -826,6 +826,10 @@ access single words in the result, one has to use nested expansions as
 in `tt(${${(z)foo}[2]})'. Likewise, to remove the quotes in the
 resulting words one would do: `tt(${(Q)${(z)foo}})'.
 )
+item(tt(0))(
+Split the result of the expansion on null bytes.  This is a shorthand
+for `tt(ps:\0:)'.
+)
 enditem()
 
 The following flags (except tt(p)) are followed by one or more arguments
