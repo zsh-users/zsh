@@ -1,5 +1,9 @@
 2006-04-05  Peter Stephenson  <pws@csr.com>
 
+	* 22394, R. Ramkumar, plus doc as 22043:
+	Functions/MIME/zsh-mime-handler, Doc/Zsh/contrib.yo:
+	execute-as-is style for MIME suffixes.
+
 	* 22393, R. Ramkumar, plus doc, 22402:
 	Completion/Unix/Type/_hosts, Doc/Zsh/compsys.yo: use-ip and
 	known-hosts-files styles.

@@ -1391,6 +1391,15 @@ question is run using the tt(eval) builtin instead of by starting a new
 tt(sh) process.  This is more efficient, but may not work in the occasional
 cases where the mailcap handler uses strict POSIX syntax.
 )
+item(tt(execute-as-is))(
+This style gives a list of patterns to be matched against files
+passed for execution with a handler program.  If the file matches
+the pattern, the entire command line is executed in its current form,
+with no handler.  This is useful for files which might have suffixes
+but nonetheless be executable in their own right.  If the style
+is not set, the pattern tt(*+LPAR()*+RPAR()) is used; hence executable
+files are executed directly and not passed to a handler.
+)
 item(tt(flags))(
 Defines flags to go with a handler; the context is as for the
 tt(handler) style, and the format is as for the flags in tt(mailcap).

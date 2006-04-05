@@ -45,6 +45,22 @@ suffix=$match[1]
 context=":mime:.${suffix}:"
 
 local handler flags no_sh no_bg
+local -a exec_asis
+
+# Set to a list of patterns which are ignored and executed as they are,
+# despite being called for interpretation by the mime handler.
+# Defaults to executable files, which ensures that they are executed as
+# they are, even if they have a suffix.
+zstyle -a $context execute-as-is exec_asis || exec_asis=('*(*)')
+
+local pattern
+
+for pattern in $exec_asis; do
+    if [[ $1 = ${~pattern} ]]; then
+	"$@"
+	return 0
+    fi
+done
 
 zstyle -s $context handler handler ||
   handler="${zsh_mime_handlers[$suffix]}"
