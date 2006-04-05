@@ -1,3 +1,8 @@
+2006-04-04  Clint Adams  <clint@zsh.org>
+
+	* 22392: Completion/Linux/Command/_analyseplugin:
+	completion for ladspa's analyseplugin.
+
 2006-03-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/10107: Doc/Zsh/jobs.yo: SIGQUIT is ignored by the shell.
