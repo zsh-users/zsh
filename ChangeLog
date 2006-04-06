@@ -1,3 +1,8 @@
+2006-04-06  Peter Stephenson  <pws@csr.com>
+
+	* 22405: Functions/MIME/zsh-mime-handler: pattern matching
+	in 22394 needed tweaking.
+
 2006-04-05  Clint Adams  <clint@zsh.org>
 
 	* 22404: Completion/Unix/Command/_cowsay:

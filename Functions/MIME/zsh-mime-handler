@@ -54,12 +54,25 @@ local -a exec_asis
 zstyle -a $context execute-as-is exec_asis || exec_asis=('*(*)')
 
 local pattern
+local -a files
+
+# In case the pattern contains glob qualifiers, as it does by default,
+# we need to do real globbing, not just pattern matching.
+# The strategy is to glob the files in the directory using the
+# pattern and see if the one we've been passed is in the list.
+local dirpref=${1%/*}
+if [[ $dirpref = $1 ]]; then
+  dirpref=
+else
+  dirpref+=/
+fi
 
 for pattern in $exec_asis; do
-    if [[ $1 = ${~pattern} ]]; then
-	"$@"
-	return 0
-    fi
+  files=(${dirpref}${~pattern})
+  if [[ -n ${files[(r)$1]} ]]; then
+    "$@"
+    return 0
+  fi
 done
 
 zstyle -s $context handler handler ||
