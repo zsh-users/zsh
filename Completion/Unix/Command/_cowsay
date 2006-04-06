@@ -1,0 +1,28 @@
+#compdef cowsay cowthink
+
+local context state line
+typeset -A opt_args
+
+_arguments \
+  '-e:eye string:' \
+  '-f:cowfile:->cowfile' \
+  '-T:tongue string:' \
+  '-W:wrap column:' \
+  '-b[borg mode]' \
+  '-d[dead mode]' \
+  '-g[greedy mode]' \
+  '-h[help]' \
+  '-l[list]' \
+  '-n[no wordwrap]' \
+  '-p[paranoia mode]' \
+  '-s[stoned mode]' \
+  '-t[tired mode]' \
+  '-w[wired mode]' \
+  '-y[youthful mode]' \
+  ':message:' && return 0
+
+case "$state" in
+  (cowfile)
+  compadd ${=${(f)"$($service -l 2>/dev/null)"}:#*\:} || _files
+  ;;
+esac
