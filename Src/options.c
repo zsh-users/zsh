@@ -166,6 +166,7 @@ static struct optname optns[] = {
 {{NULL, "markdirs",	      0},			 MARKDIRS},
 {{NULL, "menucomplete",	      0},			 MENUCOMPLETE},
 {{NULL, "monitor",	      OPT_SPECIAL},		 MONITOR},
+{{NULL, "multibyte",	      0/*TBD*/},		 MULTIBYTE},
 {{NULL, "multios",	      OPT_EMULATE|OPT_ZSH},	 MULTIOS},
 {{NULL, "nomatch",	      OPT_EMULATE|OPT_NONBOURNE},NOMATCH},
 {{NULL, "notify",	      OPT_ZSH},			 NOTIFY},

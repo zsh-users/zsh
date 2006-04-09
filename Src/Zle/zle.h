@@ -33,20 +33,6 @@ typedef wchar_t *ZLE_STRING_T;
 typedef wint_t   ZLE_INT_T;
 #define ZLE_CHAR_SIZE	sizeof(wchar_t)
 
-/*
- * MB_CUR_MAX is the maximum number of bytes that a single wide
- * character will convert into.  We use it to keep strings
- * sufficiently long.  It should always be defined, but if it isn't
- * just assume we are using Unicode which requires 6 characters.
- * (Note that it's not necessarily defined to a constant.)
- */
-#ifndef MB_CUR_MAX
-#define MB_CUR_MAX 6
-#endif
-
-/* Convert character or string to wide character or string */
-#define ZWC(c)	L ## c
-#define ZWS(s)	L ## s
 
 #define ZLEEOF	WEOF
 
@@ -95,10 +81,6 @@ typedef char ZLE_CHAR_T;
 typedef char *ZLE_STRING_T;
 typedef int ZLE_INT_T;
 #define ZLE_CHAR_SIZE	sizeof(ZLE_CHAR_T)
-
-/* Leave character or string as is. */
-#define ZWC(c)	c
-#define ZWS(s)	s
 
 #define ZLEEOF	EOF
 

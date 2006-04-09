@@ -1461,20 +1461,20 @@ tt(LPAR()#)var(X)tt(RPAR()) where var(X) may have one of the following
 forms:
 
 startitem()
-item(i)(
+item(tt(i))(
 Case insensitive:  upper or lower case characters in the pattern match
 upper or lower case characters.
 )
-item(l)(
+item(tt(l))(
 Lower case characters in the pattern match upper or lower case
 characters; upper case characters in the pattern still only match
 upper case characters.
 )
-item(I)(
+item(tt(I))(
 Case sensitive:  locally negates the effect of tt(i) or tt(l) from
 that point on.
 )
-item(b)(
+item(tt(b))(
 Activate backreferences for parenthesised groups in the pattern;
 this does not work in filename generation.  When a pattern with a set of
 active parentheses is matched, the strings matched by the groups are
@@ -1525,11 +1525,11 @@ start and end indices are set to -1.
 
 Pattern matching with backreferences is slightly slower than without.
 )
-item(B)(
+item(tt(B))(
 Deactivate backreferences, negating the effect of the tt(b) flag from that
 point on.
 )
-item(m)(
+item(tt(m))(
 Set references to the match data for the entire string matched; this is
 similar to backreferencing and does not work in filename generation.  The
 flag must be in effect at the end of the pattern, i.e. not local to a
@@ -1550,7 +1550,7 @@ Unlike backreferences, there is no speed penalty for using match
 references, other than the extra substitutions required for the
 replacement strings in cases such as the example shown.
 )
-item(M)(
+item(tt(M))(
 Deactivate the tt(m) flag, hence no references to match data will be
 created.
 )
@@ -1595,6 +1595,19 @@ treated as a glob qualifier and the `tt((#b))' will not be useful, while in
 the latter case the `tt((#b))' is useful for backreferences and the
 `tt((#q.))' will be ignored.  Note that colon modifiers in the glob
 qualifiers are also not applied in ordinary pattern matching.
+)
+item(tt(u))(
+Respect the current locale in determining the presence of multibyte
+characters in a pattern, provided the shell was compiled with 
+tt(MULTIBYTE_SUPPORT).  This overrides the tt(MULTIBYTE)
+option; the default behaviour is taken from the option.  Compare tt(U).
+(Mnemonic: typically multibyte characters are from Unicode in the UTF-8
+encoding, although any extension of ASCII supported by the system
+library may be used.)
+)
+item(tt(U))(
+All characters are considered to be a single byte long.  The opposite
+of tt(u).  This overrides the tt(MULTIBYTE) option.
 )
 enditem()
 

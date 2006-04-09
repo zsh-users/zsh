@@ -1161,6 +1161,7 @@ struct patprog {
 #define GF_IGNCASE	0x0200
 #define GF_BACKREF	0x0400
 #define GF_MATCHREF	0x0800
+#define GF_MULTIBYTE	0x1000	/* Use multibyte if supported by build */
 
 /* Dummy Patprog pointers. Used mainly in executable code, but the
  * pattern code needs to know about it, too. */
@@ -1596,6 +1597,7 @@ enum {
     MARKDIRS,
     MENUCOMPLETE,
     MONITOR,
+    MULTIBYTE,
     MULTIOS,
     NOMATCH,
     NOTIFY,
@@ -1924,4 +1926,26 @@ typedef char *(*ZleGetLineFn) _((int *, int *));
 
 #define MB_INCOMPLETE	((size_t)-2)
 #define MB_INVALID	((size_t)-1)
+
+/*
+ * MB_CUR_MAX is the maximum number of bytes that a single wide
+ * character will convert into.  We use it to keep strings
+ * sufficiently long.  It should always be defined, but if it isn't
+ * just assume we are using Unicode which requires 6 characters.
+ * (Note that it's not necessarily defined to a constant.)
+ */
+#ifndef MB_CUR_MAX
+#define MB_CUR_MAX 6
+#endif
+
+/* Convert character or string to wide character or string */
+#define ZWC(c)	L ## c
+#define ZWS(s)	L ## s
+
+#else
+
+/* Leave character or string as is. */
+#define ZWC(c)	c
+#define ZWS(s)	s
+
 #endif

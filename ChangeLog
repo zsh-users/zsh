@@ -1,6 +1,11 @@
 2006-04-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 11407: Functions/MIME/zsh-mime-handler: and it needs NULL_GLOB,
+	* 22408: Doc/Zsh/expn.yo, Doc/Zsh/options.yo, Src/options.c,
+	Src/pattern.c, Src/utils.c, Src/zsh.h, Src/Zle/zle.h: add
+	MULTIBYTE option, (#u) and (#U) globbing flags, and support
+	for multibyte characters in patterns.
+
+	* 22407: Functions/MIME/zsh-mime-handler: and it needs NULL_GLOB,
 	too.
 
 2006-04-06  Peter Stephenson  <pws@csr.com>

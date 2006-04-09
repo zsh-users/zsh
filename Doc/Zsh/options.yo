@@ -411,6 +411,20 @@ item(tt(MARK_DIRS) (tt(-8), ksh: tt(-X)))(
 Append a trailing `tt(/)' to all directory
 names resulting from filename generation (globbing).
 )
+pindex(MULTIBYTE)
+cindex(characters, multibyte, in expansion and globbing)
+cindex(multibyte characters, in expansion and globbing)
+item(tt(MULTIBYTE))(
+Respect multibyte characters when found during pattern matching.
+When this option is set, characters strings are examined using the
+system library to determine how many bytes form a character, depending
+on the current locale.  If the option is unset
+(or the shell was not compiled with the configuration option
+tt(MULTIBYTE_SUPPORT)) a single byte is always treated as a single
+character.  The option will eventually be extended to cover expansion.
+Note, however, that it does not affect the shellʼs editor, which always
+uses the locale to determine multibyte characters.
+)
 pindex(NOMATCH)
 cindex(globbing, no matches)
 item(tt(NOMATCH) (tt(PLUS()3)) <C> <Z>)(

@@ -2702,7 +2702,7 @@ wcsiident(wchar_t c)
     } else if (len == 1 && iascii(*outstr)) {
 	return iident(*outstr);
     } else {
-	/* not currently allowed, see above */
+	/* TODO: not currently allowed, see above */
 	return 0;
     }
 }
