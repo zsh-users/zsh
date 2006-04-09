@@ -1,3 +1,8 @@
+2006-04-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 11407: Functions/MIME/zsh-mime-handler: and it needs NULL_GLOB,
+	too.
+
 2006-04-06  Peter Stephenson  <pws@csr.com>
 
 	* 22405: Functions/MIME/zsh-mime-handler: pattern matching

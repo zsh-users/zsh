@@ -26,7 +26,7 @@
 # it goes horribly wrong.
 
 emulate -L zsh
-setopt extendedglob cbases
+setopt extendedglob cbases nullglob
 
 # We need zformat from zsh/zutil for %s replacement.
 zmodload -i zsh/zutil
