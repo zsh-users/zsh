@@ -1043,11 +1043,7 @@ patcomppiece(int *flagp)
     union upat up;
     char *nptr, *str0, *ptr, *patprev;
     zrange_t from, to;
-#ifdef MULTIBYTE_SUPPORT
     char *charstart;
-#else
-    char cbuf[2];
-#endif
 
     flags = 0;
     str0 = patprev = patparse;
@@ -2133,7 +2129,7 @@ patmatchlen(void)
 #else
 #define ISUPPER(x)	isupper(x)
 #define ISLOWER(x)	islower(x)
-#define TOUPPER(x)	toupperr(x)
+#define TOUPPER(x)	toupper(x)
 #define TOLOWER(x)	tolower(x)
 #define ISDIGIT(x)	idigit(x)
 #endif
@@ -2722,7 +2718,10 @@ patmatch(Upat prog)
 		if (P_OP(next) == P_EXACTLY && P_LS_LEN(next) &&
 		    !(patglobflags & 0xff)) {
 		    char *nextop = P_LS_STR(next);
+#ifdef MULTIBYTE_SUPPORT
+		    /* else second argument of CHARREF isn't used */
 		    int nextlen = P_LS_LEN(next);
+#endif
 		    /*
 		     * If that P_EXACTLY is last (common in simple patterns,
 		     * such as *.c), then it can be only be matched at one
