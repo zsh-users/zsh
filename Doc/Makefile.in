@@ -289,7 +289,7 @@ install.info: texi
 	    done \
 	); then \
 	    if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
-	      install-info --dir-file=$(DESTDIR)$(infodir)/dir \
+	      install-info --info-dir=$(DESTDIR)$(infodir) \
 	        $(DESTDIR)$(infodir)/$(tzsh).info; \
 	    else true; fi; \
 	    rm -rf infodir; \
