@@ -25,8 +25,11 @@
 # This note is mostly here so you can work out what I tried to do when
 # it goes horribly wrong.
 
+local autocd
+[[ -o autocd ]] && autocd=autocd
+
 emulate -L zsh
-setopt extendedglob cbases nullglob
+setopt extendedglob cbases nullglob $autocd
 
 # We need zformat from zsh/zutil for %s replacement.
 zmodload -i zsh/zutil
@@ -51,7 +54,7 @@ local -a exec_asis
 # despite being called for interpretation by the mime handler.
 # Defaults to executable files, which ensures that they are executed as
 # they are, even if they have a suffix.
-zstyle -a $context execute-as-is exec_asis || exec_asis=('*(*)')
+zstyle -a $context execute-as-is exec_asis || exec_asis=('*(*)' '*(/)')
 
 local pattern
 local -a files

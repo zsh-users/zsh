@@ -1,3 +1,9 @@
+2006-04-11  Peter Stephenson  <pws@csr.com>
+
+	* 22417: Functions/MIME/zsh-mime-handler: also
+	allow autocd to work and add *(/) to the default
+	execute-as-is.
+
 2006-04-11  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22415: Doc/Makefile.in: changed how we call install-info so that
