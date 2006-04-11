@@ -1,3 +1,8 @@
+2006-04-11  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22415: Doc/Makefile.in: changed how we call install-info so that
+	we work with Debian's (broken) version as well as GNU's version.
+
 2006-04-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22409: Src/pattern.c: fix compilation with --disable-multibyte.
