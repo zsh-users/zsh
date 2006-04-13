@@ -1,4 +1,4 @@
-#compdef - nohup env eval time rusage noglob nocorrect exec catchsegv
+#compdef - nohup eval time rusage noglob nocorrect exec catchsegv
 
 shift words
 (( CURRENT-- ))

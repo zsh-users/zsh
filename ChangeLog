@@ -1,3 +1,9 @@
+2006-04-13  Clint Adams  <clint@zsh.org>
+
+	* 22418: Completion/Unix/Command/_env,
+	Completion/Zsh/Command/_precommand: completion for
+	GNU env.
+
 2006-04-11  Peter Stephenson  <pws@csr.com>
 
 	* 22417: Functions/MIME/zsh-mime-handler: also
