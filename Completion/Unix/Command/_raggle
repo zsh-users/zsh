@@ -31,6 +31,7 @@ _arguments -C -s \
   '(-t --title)'{-t,--title}"[title attribute of feed (for '--add' and '--edit')]:feed title:" \
   "--unlock-title[unlock Title attribute of feed (for '--add' and '--edit')]" \
   "--unsave-items[don't save old items of feed (for '--add' and '--edit')]" \
+  "--update[update feed (or all feeds, if unspecified)]::feed ID:->feed" \
   '(-u --url)'{-u,--url}"[URL attribute of feed (for '--add' and '--edit')]:URL:_urls" \
   '--verbose[turn on verbose output]' \
   '(-)'{-v,--version}'[display version information]' && return 0

@@ -1,3 +1,8 @@
+2006-04-14  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_raggle: update for version
+	0.4.4
+
 2006-04-13  Clint Adams  <clint@zsh.org>
 
 	* 22418: Completion/Unix/Command/_env,
