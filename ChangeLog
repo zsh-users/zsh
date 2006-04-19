@@ -1,9 +1,11 @@
 2006-04-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Doc/Zsh/contrib.yo: documentation for 22417.
+
 	* unposted: Doc/Zsh/contrib.yo, Functions/MIME/pick-web-browser:
 	add some styles for commands.
 
-	* 22416: Doc/Zsh/builtins.yo, Doc/Zsh/contrib.yo,
+	* 22416, tweaked: Doc/Zsh/builtins.yo, Doc/Zsh/contrib.yo,
 	Functions/Misc/.distfiles, Functions/Misc/zcalc,
 	Functions/Misc/zmathfuncdef, Src/builtin.c, Src/exec.c,
 	Src/module,c, Src/math.c, Src/module.c, Src/zsh.h,
