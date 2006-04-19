@@ -42,6 +42,13 @@
 # use the variables listed in the `local' and `integer' lines below
 # (translation: I can't be bothered to provide a sandbox).
 #
+# You can declare or delete math functions (implemented via zmathfuncdef):
+#   1> function cube $1 * $1 * $1
+# This has a single compulsory argument.  Note the function takes care of
+# the punctuation.  To delete the function, put nothing (at all) after
+# the function name:
+#   1> function cube
+#
 # Some constants are already available: (case sensitive as always):
 #   PI     pi, i.e. 3.1415926545897931
 #   E      e, i.e. 2.7182818284590455
@@ -86,6 +93,8 @@
 emulate -L zsh
 setopt extendedglob
 
+# TODO: make local variables that shouldn't be visible in expressions
+# begin with _.
 local line ans base defbase forms match mbegin mend psvar optlist opt arg
 local compcontext="-math-"
 integer num outdigits outform=1
@@ -96,6 +105,7 @@ history -ap "${ZDOTDIR:-$HOME}/.zcalc_history"
 forms=( '%2$g' '%.*g' '%.*f' '%.*E' )
 
 zmodload -i zsh/mathfunc 2>/dev/null
+autoload zmathfuncdef
 
 : ${ZCALCPROMPT="%1v> "}
 
@@ -167,34 +177,39 @@ while vared -cehp "${(%)ZCALCPROMPT}" line; do
   print -s -- $line
 
   case ${${line##[[:blank:]]#}%%[[:blank:]]#} in
-    q) # Exit if `q' on its own.
+    (q) # Exit if `q' on its own.
       return 0
     ;;
-    norm) # restore output format to default
+    (norm) # restore output format to default
       outform=1
     ;;
-    sci[[:blank:]]#(#b)(<->)(#B))
+    (sci[[:blank:]]#(#b)(<->)(#B))
       outdigits=$match[1]
       outform=2
     ;;
-    fix[[:blank:]]#(#b)(<->)(#B))
+    (fix[[:blank:]]#(#b)(<->)(#B))
       outdigits=$match[1]
       outform=3
     ;;
-    eng[[:blank:]]#(#b)(<->)(#B))
+    (eng[[:blank:]]#(#b)(<->)(#B))
       outdigits=$match[1]
       outform=4
     ;;
-    local([[:blank:]]##*|))
+    (local([[:blank:]]##*|))
       eval $line
       line=
       continue
     ;;
-    *)
+    (function[[:blank:]]##(#b)([^[:blank:]]##)(|[[:blank:]]##([^[:blank:]]*)))
+      zmathfuncdef $match[1] $match[3]
+      line=
+      continue
+    ;;
+    (*)
       # Latest value is stored as a string, because it might be floating
       # point or integer --- we don't know till after the evaluation, and
       # arrays always store scalars anyway.
-      # 
+      #
       # Since it's a string, we'd better make sure we know which
       # base it's in, so don't change that until we actually print it.
       eval "ans=\$(( $line ))"

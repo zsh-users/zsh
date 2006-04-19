@@ -11,3 +11,62 @@
   foo
 0:Function definition without braces
 >bar
+
+  functions -M m1
+  m1() { (( $# )) }
+  print $(( m1() ))
+  print $(( m1(1) ))
+  print $(( m1(1,2) ))
+0:User-defined math functions, argument handling
+>0
+>1
+>2
+
+  functions -M m2
+  m2() {
+    integer sum
+    local val
+    for val in $*; do
+      (( sum += $val ))
+    done
+  }
+  print $(( m2(1) ))
+  print $(( m2(1,3+3,4**2) ))
+0:User-defined math functions, complex argument handling
+>1
+>23
+
+  functions -M m3 1 2
+  m3() { (( 1 )) }
+  print zero
+  (print $(( m3() )))
+  print one
+  print $(( m3(1) ))
+  print two
+  print $(( m3(1,2) ))
+  print three
+  (print $(( m3(1,2,3) )))
+1:User-defined math functions, argument checking
+>zero
+>one
+>1
+>two
+>1
+>three
+?(eval):4: wrong number of arguments: m3()
+?(eval):10: wrong number of arguments: m3(1,2,3)
+
+  functions -M m4 0 0 testmathfunc
+  functions -M m5 0 0 testmathfunc
+  testmathfunc() {
+    if [[ $0 = m4 ]]; then
+      (( 4 ))
+    else
+      (( 5 ))
+    fi
+  }
+  print $(( m4() ))
+  print $(( m5() ))
+0:User-defined math functions, multiple interfaces
+>4
+>5

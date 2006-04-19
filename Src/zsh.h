@@ -86,8 +86,12 @@ struct mathfunc {
     int funcid;
 };
 
+/* Math function takes a string argument */
 #define MFF_STR      1
+/* Math function has been loaded from library */
 #define MFF_ADDED    2
+/* Math function is implemented by a shell function */
+#define MFF_USERFUNC 4
 
 #define NUMMATHFUNC(name, func, min, max, id) \
     { NULL, name, 0, func, NULL, NULL, min, max, id }
@@ -815,7 +819,6 @@ struct process {
 struct execstack {
     struct execstack *next;
 
-    LinkList args;
     pid_t list_pipe_pid;
     int nowait;
     int pline_level;

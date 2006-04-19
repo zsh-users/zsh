@@ -22,6 +22,8 @@
 emulate -L zsh
 setopt extendedglob cbases nonomatch
 
+zmodload -i zsh/zutil
+
 local -a xbrowsers ttybrowsers
 
 # X Windows browsers which might be running and can accept
@@ -38,7 +40,7 @@ zstyle -a :mime: tty-browsers ttybrowsers ||
 litc="-_./"
 
 local -a windows remoteargs match mbegin mend
-local url browser
+local url browser command
 
 url=$1
 if [[ -f $url ]]; then
@@ -80,22 +82,31 @@ if [[ -n $DISPLAY ]]; then
 
   # Is any browser we've heard of running?
   for browser in $xbrowsers; do
-    if [[ $windows[(I)(#i)$browser] -ne 0 ]]; then
-      if [[ $browser = konqueror ]]; then
-	# kfmclient is less hairy and better supported than direct
-	# use of dcop.  Run kfmclient --commands
-	# for more information.  Note that as konqueror is a fully
-	# featured file manager, this will actually do complete
-	# MIME handling, not just web pages.
-	kfmclient openURL $url ||
-	  dcop $(dcop|grep konqueror) default openBrowserWindow $url
-      elif [[ $browser = firefox ]]; then
-	  # open in new tab: should make this customizable
-	  $browser -new-tab $url
+    # Some browser executables call themselves <browser>-bin
+    if [[ $windows[(I)(#i)$browser(|[.-]bin)] -ne 0 ]]; then
+      if zstyle -s ":mime:browser:running:${browser}:" command command; then
+	# The (q)'s here and below are pure paranoia:  no browser
+	# name is going to include metacharacters, and we already
+	# converted difficult characters in the URL to hex.
+	zformat -f command $command b:${(q)browser} u:${(q)url}
+	eval $command
       else
-	# Mozilla bells and whistles are described at:
-	# http://www.mozilla.org/unix/remote.html
-	$browser -remote "openURL($url)"
+	if [[ $browser = konqueror ]]; then
+	  # kfmclient is less hairy and better supported than direct
+	  # use of dcop.  Run kfmclient --commands
+	  # for more information.  Note that as konqueror is a fully
+	  # featured file manager, this will actually do complete
+	  # MIME handling, not just web pages.
+	  kfmclient openURL $url ||
+	    dcop $(dcop|grep konqueror) default openBrowserWindow $url
+        elif [[ $browser = firefox ]]; then
+	  # open in new tab
+	  $browser -new-tab $url
+        else
+	  # Mozilla bells and whistles are described at:
+	  # http://www.mozilla.org/unix/remote.html
+	  $browser -remote "openURL($url)"
+        fi
       fi
       return
     fi
@@ -104,8 +115,13 @@ if [[ -n $DISPLAY ]]; then
   # Start our preferred X Windows browser in the background.
   for browser in $xbrowsers; do
       if eval "[[ =$browser != \\=$browser ]]"; then
-	# The following is to make the job text more readable.
-	eval ${(q)browser} ${(q)url} "&"
+	if zstyle -s ":mime:browser:new:${browser}:" command command; then
+	  zformat -f command $command b:${(q)browser} u:${(q)url}
+	  eval $command "&"
+	else
+	  # The following is to make the job text more readable.
+	  eval ${(q)browser} ${(q)url} "&"
+	fi
 	break
       fi
   done
@@ -113,7 +129,12 @@ else
   # Start up dumb terminal browser.
   for browser in $ttybrowsers; do
     if eval "[[ =$browser != \\=$browser ]]"; then
-      $browser $url
+      if zstyle -s ":mime:browser:new:${browser}" command command; then
+	zformat -f command $command b:${(q)browser} u:${(q)url}
+	eval $command
+      else
+	$browser $url
+      fi
       break
     fi
   done

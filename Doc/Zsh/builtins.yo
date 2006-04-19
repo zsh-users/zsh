@@ -501,8 +501,52 @@ Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
 findex(functions)
-item(tt(functions) [ {tt(PLUS())|tt(-)}tt(UXkmtuz) ] [ var(name) ... ])(
-Equivalent to tt(typeset -f).
+xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UXkmtuz) ] [ var(name) ... ])
+xitem(tt(functions -M) var(mathfn) [ var(min) [ var(max) [ var(shellfn) ] ] ])
+xitem(tt(functions -M) [ tt(-m) var(pattern) ... ])
+item(tt(functions +M) [ tt(-m) ] var(mathfn))(
+Equivalent to tt(typeset -f), with the exception of the tt(-M) option.
+Use of the tt(-M) option may not be combined with any of the options
+handled by tt(typeset -f).
+
+tt(functions -M) var(mathfn) defines var(mathfn) as the name of
+a mathematical function recognised in all forms of arithmetical expressions;
+see
+ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
+ifnzman(noderef(Arithmetic Evaluation))\
+.  By default var(mathfn) may take
+any number of comma-separated arguments.  If var(min) is given,
+it must have exactly var(min) args; if var(min) and var(max) are
+both given, it must have at least var(min) and and at most var(max)
+args.  var(max) may be -1 to indicate that there is no upper limit.
+
+By default the function is implemented by a shell function of the same
+name; if var(shellfn) is specified it gives the name of the corresponding
+shell function while var(mathfn) remains the name used in arithmetical
+expressions.  The name of the function in tt($0) is var(mathfn) (not
+var(shellfn) as would usually be the case), provided the option
+tt(FUNCTION_ARGZERO) is in effect.  The positional parameters in the shell
+function correspond to the arguments of the mathematical function call.
+The result of the last arithmetical expression evaluated
+inside the shell function (even if it is a form that normally only returns
+a status) gives the result of the mathematical function.
+
+tt(functions -M) with no arguments lists all such user-defined functions in
+the same form as a definition.  With the additional option tt(-m) and
+a list of arguments, all functions whose var(mathfn) matches one of
+the pattern arguments are listed.
+
+tt(function +M) removes the list of mathematical functions; with the
+additional option tt(-m) the arguments are treated as patterns and
+all functions whose tt(mathfn) matches the pattern are removed.  Note
+that the shell function implementing the behaviour is not removed
+(regardless of whether its name coincides with tt(mathfn)).
+
+For example, the following prints the cube of 3:
+
+example(zmath_cube+LPAR()RPAR() { (( $1 * $1 * $1 )) }
+functions -M cube 1 1 zmath_cube
+print $(( cube+LPAR()3+RPAR() )))
 )
 module(getcap)(zsh/cap)
 findex(getln)
@@ -652,8 +696,10 @@ tt(kill -IO) and tt(kill -POLL) have the same effect.
 findex(let)
 item(tt(let) var(arg) ...)(
 Evaluate each var(arg) as an arithmetic expression.
-See noderef(Arithmetic Evaluation) for a description
-of arithmetic expressions.  The exit status is 0 if the
+See
+ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
+ifnzman(noderef(Arithmetic Evaluation))
+for a description of arithmetic expressions.  The exit status is 0 if the
 value of the last expression is nonzero, and 1 otherwise.
 )
 findex(limit)
@@ -856,7 +902,9 @@ that allows it to be reused as shell input. With the numeric format
 specifiers, if the corresponding argument starts with a quote character,
 the numeric value of the following character is used as the number to
 print otherwise the argument is evaluated as an arithmetic expression. See
-noderef(Arithmetic Evaluation) for a description of arithmetic
+ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
+ifnzman(noderef(Arithmetic Evaluation))
+for a description of arithmetic
 expressions. With `tt(%n)', the corresponding argument is taken as an
 identifier which is created as an integer parameter.
 

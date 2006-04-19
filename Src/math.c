@@ -42,6 +42,14 @@ int noeval;
 /**/
 mod_export mnumber zero_mnumber;
 
+/*
+ * The last value we computed:  note this isn't cleared
+ * until the next computation, unlike unlike yyval.
+ * Everything else is saved and returned to allow recursive calls.
+ */
+/**/
+mnumber lastmathval;
+
 /* last input base we used */
 
 /**/
@@ -582,22 +590,42 @@ callmathfunc(char *o)
     a[strlen(a) - 1] = '\0';
 
     if ((f = getmathfunc(n, 1))) {
-	if (f->flags & MFF_STR)
+	if (f->flags & MFF_STR) {
 	    return f->sfunc(n, a, f->funcid);
-	else {
+	} else {
 	    int argc = 0;
-	    mnumber *argv = NULL, *q;
+	    mnumber *argv = NULL, *q, marg;
 	    LinkList l = newlinklist();
 	    LinkNode node;
+
+	    if (f->flags & MFF_USERFUNC) {
+		/* first argument is function name: always use mathfunc */
+		addlinknode(l, n);
+	    }
 
 	    while (iblank(*a))
 		a++;
 	    while (*a) {
 		if (*a) {
 		    argc++;
- 		    q = (mnumber *) zhalloc(sizeof(mnumber));
-		    *q = mathevall(a, ARGPREC, &a);
-		    addlinknode(l, q);
+		    if (f->flags & MFF_USERFUNC) {
+			/* need to pass strings */
+			char *str;
+			marg = mathevall(a, ARGPREC, &a);
+			if (marg.type & MN_FLOAT) {
+			    /* convfloat is off the heap */
+			    str = convfloat(marg.u.d, 0, 0, NULL);
+			} else {
+			    char buf[BDIGBUFSIZE];
+			    convbase(buf, marg.u.l, 10);
+			    str = dupstring(buf);
+			}
+			addlinknode(l, str);
+		    } else {
+			q = (mnumber *) zhalloc(sizeof(mnumber));
+			*q = mathevall(a, ARGPREC, &a);
+			addlinknode(l, q);
+		    }
 		    if (errflag || mtok != COMMA)
 			break;
 		}
@@ -608,12 +636,24 @@ callmathfunc(char *o)
 	    if (!errflag) {
 		if (argc >= f->minargs && (f->maxargs < 0 ||
 					   argc <= f->maxargs)) {
-		    if (argc) {
-			q = argv = (mnumber *)zhalloc(argc * sizeof(mnumber));
-			for (node = firstnode(l); node; incnode(node))
-			    *q++ = *(mnumber *)getdata(node);
+		    if (f->flags & MFF_USERFUNC) {
+			char *shfnam = f->module ? f->module : n;
+			Eprog prog = getshfunc(shfnam);
+			if (prog == &dummy_eprog)
+			    zerr("no such function: %s", shfnam, 0);
+			else {
+			    doshfunc(n, prog, l, 0, 1);
+			    return lastmathval;
+			}
+		    } else {
+			if (argc) {
+			    q = argv =
+				(mnumber *)zhalloc(argc * sizeof(mnumber));
+			    for (node = firstnode(l); node; incnode(node))
+				*q++ = *(mnumber *)getdata(node);
+			}
+			return f->nfunc(n, argc, argv, f->funcid);
 		    }
-		    return f->nfunc(n, argc, argv, f->funcid);
 		} else
 		    zerr("wrong number of arguments: %s", o, 0);
 	    }
@@ -1013,7 +1053,7 @@ mathevall(char *s, int prek, char **ep)
 	sp = xsp;
 	stack = xstack;
     }
-    return ret;
+    return lastmathval = ret;
 }
 
 

@@ -142,7 +142,6 @@ mod_export Funcstack funcstack;
 
 #define execerr() if (!forked) { lastval = 1; goto done; } else _exit(1)
 
-static LinkList args;
 static int doneps4;
 static char *STTYval;
 
@@ -464,7 +463,7 @@ isgooderr(int e, char *dir)
 
 /**/
 void
-execute(UNUSED(Cmdnam cmdname), int dash, int defpath)
+execute(LinkList args, int dash, int defpath)
 {
     Cmdnam cn;
     char buf[MAXCMDLEN], buf2[MAXCMDLEN];
@@ -482,15 +481,12 @@ execute(UNUSED(Cmdnam cmdname), int dash, int defpath)
      * we first run the stty command with the value of this       *
      * parameter as it arguments.                                 */
     if ((s = STTYval) && isatty(0) && (GETPGRP() == getpid())) {
-	LinkList exargs = args;
 	char *t = tricat("stty", " ", s);
 
 	STTYval = 0;	/* this prevents infinite recursion */
 	zsfree(s);
-	args = NULL;
 	execstring(t, 1, 0);
 	zsfree(t);
-	args = exargs;
     } else if (s) {
 	STTYval = 0;
 	zsfree(s);
@@ -1827,6 +1823,7 @@ static void
 execcmd(Estate state, int input, int output, int how, int last1)
 {
     HashNode hn = NULL;
+    LinkList args;
     LinkNode node;
     Redir fn;
     struct multio *mfds[10];
@@ -2638,7 +2635,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    zsfree(STTYval);
 		    STTYval = 0;
 		}
-		execute((Cmdnam) hn, cflags & BINF_DASH, use_defpath);
+		execute(args, cflags & BINF_DASH, use_defpath);
 	    } else {		/* ( ... ) */
 		DPUTS(varspc,
 		      "BUG: assignment before complex command");
@@ -4094,7 +4091,6 @@ execsave(void)
     struct execstack *es;
 
     es = (struct execstack *) malloc(sizeof(struct execstack));
-    es->args = args;
     es->list_pipe_pid = list_pipe_pid;
     es->nowait = nowait;
     es->pline_level = pline_level;
@@ -4122,7 +4118,6 @@ execrestore(void)
     struct execstack *en;
 
     DPUTS(!exstack, "BUG: execrestore() without execsave()");
-    args = exstack->args;
     list_pipe_pid = exstack->list_pipe_pid;
     nowait = exstack->nowait;
     pline_level = exstack->pline_level;

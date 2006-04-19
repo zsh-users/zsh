@@ -15,6 +15,7 @@ menu(Prompt Themes)
 menu(ZLE Functions)
 menu(Exception Handling)
 menu(MIME Functions)
+menu(Mathematical Functions)
 menu(Other Functions)
 endmenu()
 
@@ -1339,7 +1340,7 @@ if a shell error subsequently occurs.  Adding tt(unset EXCEPTION) at the
 start of the outermost layer of any code that uses exception handling will
 eliminate this problem.
 
-texinode(MIME Functions)(Other Functions)(Exception Handling)(User Contributions)
+texinode(MIME Functions)(Mathematical Functions)(Exception Handling)(User Contributions)
 sect(MIME Functions)
 
 Three functions are available to provide handling of files recognised by
@@ -1347,6 +1348,8 @@ extension, for example to dispatch a file tt(text.ps) when executed as a
 command to an appropriate viewer.
 
 startitem()
+findex(zsh-mime-setup)
+findex(zsh-mime-handler)
 xitem(tt(zsh-mime-setup [-flv]))
 item(tt(zsh-mime-handler))(
 These two functions use the files tt(~/.mime.types) and tt(/etc/mime.types),
@@ -1520,6 +1523,7 @@ example(text/html; /usr/bin/lynx '%s'; needsterminal)
 )
 enditem()
 )
+findex(pick-web-browser)
 item(tt(pick-web-browser))(
 This function is separate from the two MIME functions described above
 and can be assigned directly to a suffix:
@@ -1528,19 +1532,19 @@ example(autoload -U pick-web-browser
 alias -s html=pick-web-browser)
 
 It is provided as an intelligent front end to dispatch a web browser.
-It will check if an X Windows display is available, and if so
-if there is already a browser running which can accept a remote
+It will check if an X Windows display is available, and if so if there
+is already a browser running on the display which can accept a remote
 connection.  In that case, the file will be displayed in that browser;
 you should check explicitly if it has appeared in the running browser's
-window.  Otherwise, it will start a new browser according to a builtin
+window.  Otherwise, it will start a new browser according to a built-in
 set of preferences.
 
 Alternatively, tt(pick-web-browser) can be run as a zsh script.
 
 Two styles are available to customize the choice of browsers:
-tt(x-browsers) when running under the X Windows System, and
+tt(x-browsers) when running under the X Window System, and
 tt(tty-browsers) otherwise.  These are arrays in decreasing order
-of preference consiting of the command name under which to start the
+of preference consisting of the command name under which to start the
 browser.  They are looked up in the context tt(:mime:) (which may
 be extended in future, so appending `tt(*)' is recommended).  For
 example,
@@ -1550,10 +1554,140 @@ example(zstyle ':mime:*' x-browsers opera konqueror netscape)
 specifies that tt(pick-web-browser) should first look for a runing
 instance of Opera, Konqueror or Netscape, in that order, and if it
 fails to find any should attempt to start Opera.
+
+In addition, the style tt(command), if set, is used to pick the command
+used to open a page for a browser.  The context is
+tt(:mime:browser:new:$browser:) to start a new browser or
+tt(:mime:browser:running:$browser:) to open a URL in a browser already
+runing on the current X display.  The escape sequence tt(%b) in the
+style's value will be replaced by the browser, while tt(%u) will be
+replaced by the URL.  If the style is not set, the default for all new
+instances is equivalent to tt(%b %u) and the defaults for using running
+browsers are equivalent to the values tt(kfmclient openURL %u) for
+Konqueror, tt(firefox -new-tab %u) for Firefox and tt(%b -remote
+"openUrl+LPAR()%u+RPAR()") for all others.
 )
 enditem()
 
-texinode(Other Functions)()(MIME Functions)(User Contributions)
+texinode(Mathematical Functions)(Other Functions)(MIME Functions)(User Contributions)
+sect(Mathematical Functions)
+
+startitem()
+findex(zcalc)
+item(tt(zcalc) [ var(expression) ... ])(
+A reasonably powerful calculator based on zsh's arithmetic evaluation
+facility.  The syntax is similar to that of formulae in most programming
+languages; see
+ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
+ifnzman(noderef(Arithmetic Evaluation)) for details.  The mathematical
+library tt(zsh/mathfunc) will be loaded if it is available; see
+ifzman(the section `The zsh/mathfunc Module' in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/mathfunc Module)).  The mathematical functions
+correspond to the raw system libraries, so trigonometric functions are
+evaluated using radians, and so on.
+
+Each line typed is evaluated as an expression.  The prompt shows a number,
+which corresponds to a positional parameter where the result of that
+calculation is stored.  For example, the result of the calculation on the
+line preceded by `tt(4> )' is available as tt($4).  The last value
+calculated is available as tt(ans).  Full command line editing, including
+the history of previous calculations, is available; the history is saved in
+the file tt(~/.zcalc_history).  To exit, enter a blank line or type `tt(q)'
+on its own.
+
+If arguments are given to tt(zcalc) on start up, they are used to prime the
+first few positional parameters.  A visual indication of this is given when
+the calculator starts.
+
+The constants tt(PI) (3.14159...) and tt(E) (2.71828...) are provided.
+Parameter assignment is possible, but note that all parameters will be put
+into the global namespace.
+
+The output base can be initialised by passing the option `tt(-#)var(base)',
+for example `tt(zcalc -#16)' (the `tt(#)' may have to be quoted, depending
+on the globbing options set).
+
+The prompt is configurable via the parameter tt(ZCALCPROMPT), which
+undergoes standard prompt expansion.  The index of the current entry is
+stored locally in the first element of the array tt(psvar), which can be
+referred to in tt(ZCALCPROMPT) as `tt(%1v)'.  The default prompt is
+`tt(%1v> )'.
+
+The output precision may be specified within zcalc by special commands
+familiar from many calculators:
+startitem()
+item(tt(norm))(
+The default output format.  It corresponds to the printf tt(%g)
+specification.  Typically this shows six decimal digits.
+)
+item(tt(sci) var(digits))(
+Scientific notation, corresponding to the printf tt(%g) output format with
+the precision given by var(digits).  This produces either fixed point or
+exponential notation depending on the value output.
+)
+item(tt(fix) var(digits))(
+Fixed point notation, corresponding to the printf tt(%f) output format with
+the precision given by var(digits).
+)
+item(tt(eng) var(digits))(
+Exponential notation, corresponding to the printf tt(%E) output format with
+the precision given by var(digits).
+)
+enditem()
+
+Other special commands:
+startitem()
+item(tt(local) var(arg) ...)(
+Declare variables local to the function.  Note that certain variables
+are used by the function for its own purposes.  Other variables
+may be used, too, but they will be taken from or put into the global
+scope.
+)
+item(tt(function) var(name) [ var(body) ])(
+Define a mathematical function or (with no var(body)) delete it.
+The function is defined using tt(zmathfuncdef), see below.
+
+Note that tt(zcalc) takes care of all quoting.  Hence for example:
+
+example(function cube $1 * $1 * $1)
+
+defines a function to cube the sole argument.
+)
+item(tt([#)var(base)tt(]))(
+When this syntax appears on a line by itself, the default output radix
+is set to var(base).  Use, for example, `tt([#16])' to display hexadecimal
+output preceded by an indication of the base, or `tt([##16])' just to
+display the raw number in the given base.  Bases themselves are always
+specified in decimal. `tt([#])' restores the normal output format.  Note
+that setting an output base suppresses floating point output; use `tt([#])'
+to return to normal operation.
+
+)
+enditem()
+
+See the comments in the function for a few extra tips.
+)
+findex(zmathfuncdef)
+item(tt(zmathfuncdef) var(mathfunc) [ var(body) ])(
+A convenient front end to tt(functions -M).
+
+With two arguments, define a mathematical function named var(mathfunc)
+which can be used in any form of arithmetic evaluation.  var(body)
+is a mathematical expression to implement the function.  It may
+contain references to position parameters tt($1), tt($2), ...
+to refer to mandatory parameters and tt(${1:-)var(defvalue)tt(}) ...
+to refer to optional parameters.  Note that the forms must be
+strictly adhered to for the function to calculate the correct number
+of arguments.  The implementation is held in a shell function named
+tt(zsh_math_func_)var(mathfunc); usually the user will not need
+to refer to the shell function directly.
+
+With one argument, remove the mathematical function var(mathfunc)
+as well as the shell function implementation.
+)
+enditem()
+
+texinode(Other Functions)()(Mathematical Functions)(User Contributions)
 sect(Other Functions)
 
 There are a large number of helpful functions in the tt(Functions/Misc)
@@ -1719,77 +1853,6 @@ This is a good choice in that example because no plain file can be named
 
 For details of the other tt(zargs) options, see zmanref(xargs) or run
 tt(zargs) with the tt(-)tt(-help) option.
-)
-findex(zcalc)
-item(tt(zcalc) [ var(expression) ... ])(
-A reasonably powerful calculator based on zsh's arithmetic evaluation
-facility.  The syntax is similar to that of formulae in most programming
-languages; see
-ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
-ifnzman(noderef(Arithmetic Evaluation)) for details.  The mathematical
-library tt(zsh/mathfunc) will be loaded if it is available; see
-ifzman(the section `The zsh/mathfunc Module' in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/mathfunc Module)).  The mathematical functions
-correspond to the raw system libraries, so trigonometric functions are
-evaluated using radians, and so on.
-
-Each line typed is evaluated as an expression.  The prompt shows a number,
-which corresponds to a positional parameter where the result of that
-calculation is stored.  For example, the result of the calculation on the
-line preceded by `tt(4> )' is available as tt($4).  Full command line
-editing, including the history of previous calculations, is available; the
-history is saved in the file tt(~/.zcalc_history).  To exit, enter a blank
-line or type `tt(q)' on its own.
-
-If arguments are given to tt(zcalc) on start up, they are used to prime the
-first few positional parameters.  A visual indication of this is given when
-the calculator starts.
-
-The constants tt(PI) (3.14159...) and tt(E) (2.71828...) are provided.
-Parameter assignment is possible, but note that all parameters will be put
-into the global namespace.
-
-An extra facility is provided for changing the default output base.  Use,
-for example, `tt([#16])' to display hexadecimal output preceded by an
-indication of the base, or `tt([##16])' just to display the raw number in
-the given base.  Bases themselves are always specified in decimal.
-`tt([#])' restores the normal output format.  Note that setting an output
-base suppresses floating point output; use `tt([#])' to return to normal
-operation.
-
-The output base can be initialised by passing the option `tt(-#)var(base)',
-for example `tt(zcalc -#16)' (the `tt(#)' may have to be quoted, depending
-on the globbing options set).
-
-The prompt is configurable via the parameter tt(ZCALCPROMPT), which
-undergoes standard prompt expansion.  The index of the current entry is
-stored locally in the first element of the array tt(psvar), which can be
-referred to in tt(ZCALCPROMPT) as `tt(%1v)'.  The default prompt is
-`tt(%1v> )'.
-
-The output precision may be specified within zcalc by special commands
-familiar from many calculators:
-startitem()
-item(tt(norm))(
-The default output format.  It corresponds to the printf tt(%g)
-specification.  Typically this shows six decimal digits.
-)
-item(tt(sci) var(digits))(
-Scientific notation, corresponding to the printf tt(%g) output format with
-the precision given by var(digits).  This produces either fixed point or
-exponential notation depending on the value output.
-)
-item(tt(fix) var(digits))(
-Fixed point notation, corresponding to the printf tt(%f) output format with
-the precision given by var(digits).
-)
-item(tt(eng) var(digits))(
-Exponential notation, corresponding to the printf tt(%E) output format with
-the precision given by var(digits).
-)
-enditem()
-
-See the comments in the function for a few extra tips.
 )
 findex(zed)
 xitem(tt(zed) [ tt(-f) ] var(name))

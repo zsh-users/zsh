@@ -46,7 +46,7 @@ static struct builtin builtins[] =
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmrs", NULL),
-    BUILTIN("autoload", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "tUXwkz", "u"),
+    BUILTIN("autoload", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "ktUwXz", "u"),
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
     BUILTIN("bye", 0, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
@@ -72,7 +72,7 @@ static struct builtin builtins[] =
     BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "nlre:IRWAdDfEimpPa", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
     BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlprtux", "E"),
-    BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmtuUz", NULL),
+    BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMtuUz", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
     BUILTIN("hash", BINF_MAGICEQUALS, bin_hash, 0, -1, 0, "Ldfmrv", NULL),
@@ -2476,6 +2476,43 @@ eval_autoload(Shfunc shf, char *name, Options ops, int func)
 			     (OPT_ISSET(ops,'z') ? 0 : 1)), 1);
 }
 
+
+/* List a user-defined math function. */
+static void
+listusermathfunc(MathFunc p)
+{
+    int showargs;
+
+    if (p->module)
+	showargs = 3;
+    else if (p->maxargs != (p->minargs ? p->minargs : -1))
+	showargs = 2;
+    else if (p->minargs)
+	showargs = 1;
+    else
+	showargs = 0;
+
+    printf("functions -M %s", p->name);
+    if (showargs) {
+	printf(" %d", p->minargs);
+	showargs--;
+    }
+    if (showargs) {
+	printf(" %d", p->maxargs);
+	showargs--;
+    }
+    if (showargs) {
+	/*
+	 * function names are not required to consist of ident characters
+	 */
+	putchar(' ');
+	quotedzputs(p->module, stdout);
+	showargs--;
+    }
+    putchar('\n');
+}
+
+
 /* Display or change the attributes of shell functions.   *
  * If called as autoload, it will define a new autoloaded *
  * (undefined) shell function.                            */
@@ -2521,6 +2558,141 @@ bin_functions(char *name, char **argv, Options ops, int func)
 
     if (OPT_PLUS(ops,'f') || OPT_ISSET(ops,'+'))
 	pflags |= PRINT_NAMEONLY;
+
+    if (OPT_MINUS(ops,'M') || OPT_PLUS(ops,'M')) {
+	MathFunc p, q;
+	/*
+	 * Add/remove/list function as mathematical.
+	 */
+	if (on || off || pflags || OPT_ISSET(ops,'X') || OPT_ISSET(ops,'u')
+	    || OPT_ISSET(ops,'U') || OPT_ISSET(ops,'w')) {
+	    zwarnnam(name, "invalid option(s)", NULL, 0);
+	    return 1;
+	}
+	if (!*argv) {
+	    /* List functions. */
+	    queue_signals();
+	    for (p = mathfuncs; p; p = p->next)
+		if (p->flags & MFF_USERFUNC)
+		    listusermathfunc(p);
+	    unqueue_signals();
+	} else if (OPT_ISSET(ops,'m')) {
+	    /* List matching functions. */
+	    for (; *argv; argv++) {
+		tokenize(*argv);
+		if ((pprog = patcompile(*argv, PAT_STATIC, 0))) {
+		    queue_signals();
+		    for (p = mathfuncs, q = NULL; p; q = p, p = p->next) {
+			MathFunc next;
+			do {
+			    next = NULL;
+			    if ((p->flags & MFF_USERFUNC) &&
+				pattry(pprog, p->name)) {
+				if (OPT_PLUS(ops,'M')) {
+				    next = p->next;
+				    removemathfunc(q, p);
+				    p = next;
+				} else
+				    listusermathfunc(p);
+			    }
+			    /* if we deleted one, retry with the new p */
+			} while (next);
+		    }
+		    unqueue_signals();
+		} else {
+		    untokenize(*argv);
+		    zwarnnam(name, "bad pattern : %s", *argv, 0);
+		    returnval = 1;
+		}
+	    }
+	} else if (OPT_PLUS(ops,'M')) {
+	    /* Delete functions. -m is allowed but is handled above. */
+	    for (; *argv; argv++) {
+		queue_signals();
+		for (p = mathfuncs, q = NULL; p; q = p, p = p->next) {
+		    if (!strcmp(p->name, *argv)) {
+			if (!(p->flags & MFF_USERFUNC)) {
+			    zwarnnam(name, "+M %s: is a library function",
+				     *argv, 0);
+			    returnval = 1;
+			    break;
+			}
+			removemathfunc(q, p);
+			break;
+		    }
+		}
+		unqueue_signals();
+	    }
+	} else {
+	    /* Add a function */
+	    int minargs = 0, maxargs = -1;
+	    char *funcname = *argv++;
+	    char *modname = NULL;
+	    char *ptr;
+
+	    for (ptr = funcname; *ptr; ptr++)
+		if (!iident(*ptr))
+		    break;
+	    if (idigit(*funcname) || funcname == ptr || *ptr) {
+		zwarnnam(name, "-M %s: bad math function name", funcname, 0);
+		return 1;
+	    }
+
+	    if (*argv) {
+		minargs = (int)zstrtol(*argv, &ptr, 0);
+		if (minargs < 0 || *ptr) {
+		    zwarnnam(name, "-M: invalid min number of arguments: %s",
+			     *argv, 0);
+		    return 1;
+		}
+		maxargs = minargs;
+		argv++;
+	    }
+	    if (*argv) {
+		maxargs = (int)zstrtol(*argv, &ptr, 0);
+		if (maxargs < -1 ||
+		    (maxargs != -1 && maxargs < minargs) ||
+		    *ptr) {
+		    zwarnnam(name,
+			     "-M: invalid max number of arguments: %s",
+			     *argv, 0);
+		    return 1;
+		}
+		argv++;
+	    }
+	    if (*argv)
+		modname = *argv++;
+	    if (*argv) {
+		zwarnnam(name, "-M: too many arguments", NULL, 0);
+		return 1;
+	    }
+
+	    p = (MathFunc)zshcalloc(sizeof(struct mathfunc));
+	    p->name = ztrdup(funcname);
+	    p->flags = MFF_USERFUNC;
+	    p->module = modname ? ztrdup(modname) : NULL;
+	    p->minargs = minargs;
+	    p->maxargs = maxargs;
+
+	    queue_signals();
+	    for (q = mathfuncs; q; q = q->next) {
+		if (!strcmp(q->name, funcname)) {
+		    zwarnnam(name, "-M %s: function already exists",
+			     funcname, 0);
+		    zsfree(p->name);
+		    zsfree(p->module);
+		    zfree(p, sizeof(struct mathfunc));
+		    return 1;
+		}
+	    }
+
+	    p->next = mathfuncs;
+	    mathfuncs = p;
+	    unqueue_signals();
+	}
+
+	return returnval;
+    }
 
     /* If no arguments given, we will print functions.  If flags *
      * are given, we will print only functions containing these  *

@@ -1384,7 +1384,7 @@ bin_zmodload_math(char *nam, char **args, Options ops)
 	MathFunc p;
 
 	for (p = mathfuncs; p; p = p->next) {
-	    if (p->module) {
+	    if (!(p->flags & MFF_USERFUNC) && p->module) {
 		if (OPT_ISSET(ops,'L')) {
 		    fputs("zmodload -af", stdout);
 		    printf(" %s %s\n", p->module, p->name);
@@ -2085,7 +2085,8 @@ add_autoparam(char *nam, char *module)
 MathFunc mathfuncs;
 
 /**/
-static void removemathfunc(MathFunc previous, MathFunc current)
+void
+removemathfunc(MathFunc previous, MathFunc current)
 {
     if (previous)
 	previous->next = current->next;
@@ -2105,7 +2106,7 @@ getmathfunc(char *name, int autol)
 
     for (p = mathfuncs; p; q = p, p = p->next)
 	if (!strcmp(name, p->name)) {
-	    if (autol && p->module) {
+	    if (autol && p->module && !(p->flags & MFF_USERFUNC)) {
 		char *n = dupstring(p->module);
 
 		removemathfunc(q, p);
@@ -2131,7 +2132,7 @@ addmathfunc(MathFunc f)
 
     for (p = mathfuncs; p; q = p, p = p->next)
 	if (!strcmp(f->name, p->name)) {
-	    if (p->module) {
+	    if (p->module && !(p->flags & MFF_USERFUNC)) {
 		/*
 		 * Autoloadable, replace.
 		 */
@@ -2206,6 +2207,7 @@ deletemathfunc(MathFunc f)
 	else
 	    mathfuncs = f->next;
 
+	/* the following applies to both unloaded and user-defined functions */
 	if (f->module) {
 	    zsfree(f->name);
 	    zsfree(f->module);
