@@ -1,0 +1,45 @@
+# Define a mathematical function with its definition and smart(ish)
+# guessing of the number of arguments.  Doesn't overload for different
+# numbers of arguments, but that could be done.  Type overloading would be
+# more fraught.
+
+emulate -L zsh
+setopt extendedglob
+
+if (( $# < 1 || $# > 2 )); then
+  print "Usage: $0 name [body]" >&2
+  return 1
+fi
+
+local mname=$1
+local fname="zsh_math_func_$1"
+
+if (( $# == 1 )); then
+  functions +M $mname && unfunction $fname
+  return 0
+fi
+
+integer iarg=0 ioptarg
+local body=$2
+
+# count compulsory arguments
+while [[ $body = *'$'$((iarg+1))(|[^[:digit:]]*) ]]; do
+  (( iarg++ ))
+done
+
+# count optional arguments
+(( ioptarg = iarg ))
+while [[ $body = *'${'$((ioptarg+1))':-'* ]]; do
+  (( ioptarg++ ))
+done
+
+functions -M $mname $iarg $ioptarg $fname || return 1
+
+{
+  eval "$fname() { (( $body )) }"
+} always {
+  # Remove math function if shell function definition failed.
+  if (( TRY_BLOCK_ERROR )); then
+    functions +M $mname
+  fi
+}
