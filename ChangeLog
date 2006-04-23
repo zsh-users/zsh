@@ -1,5 +1,7 @@
 2006-04-23  Clint Adams  <clint@zsh.org>
 
+	* Francisco Borges: users/10162: updated _aptitude.
+
 	* 22425: Completion/Unix/Command/_surfraw: update for
 	new surfraw debsec elvi from Micah Anderson.
 

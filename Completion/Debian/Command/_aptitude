@@ -35,13 +35,13 @@ case $state in
       search)
         _message -e patterns pattern
       ;;
-      download)
+      download|show|changelog)
         _deb_packages avail && ret=0
       ;;
-      remove|purge|hold)
+      remove|purge|hold|reinstall|forbid-version|markauto|unmarkauto)
         _deb_packages installed && ret=0
       ;;
-      install|markauto|unmarkauto)
+      install)
         _deb_packages uninstalled && ret=0
       ;;
       *)
