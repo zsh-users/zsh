@@ -86,6 +86,7 @@
 "quoted-insert", quotedinsert, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "quote-line", quoteline, 0
 "quote-region", quoteregion, 0
+"read-command", readcommand, 0
 "recursive-edit", recursiveedit, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "redisplay", redisplay, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "redo", redo, ZLE_KEEPSUFFIX

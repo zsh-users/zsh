@@ -1441,3 +1441,16 @@ zlesetkeymap(int mode)
 	return;
     linkkeymap(km, "main", 0);
 }
+
+/**/
+mod_export int
+readcommand(UNUSED(char **args))
+{
+    Thingy thingy = getkeycmd();
+
+    if (!thingy)
+	return 1;
+
+    setsparam("REPLY", ztrdup(thingy->nam));
+    return 0;
+}

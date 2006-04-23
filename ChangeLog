@@ -1,3 +1,10 @@
+2006-04-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* zsh-users/10172: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list,
+	Src/Zle/zle_keymap.c: read-command reads a key sequence as
+	in normal zle operation but sets REPLY to the result instead
+	of executing it.
+
 2006-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Functions/Misc/zmathfuncdef: improve recognition
