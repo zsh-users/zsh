@@ -23,7 +23,7 @@ integer iarg=0 ioptarg
 local body=$2
 
 # count compulsory arguments
-while [[ $body = *'$'$((iarg+1))(|[^[:digit:]]*) ]]; do
+while [[ $body = *'$'(\{|)$((iarg+1))(|[^:[:digit:]]*) ]]; do
   (( iarg++ ))
 done
 
