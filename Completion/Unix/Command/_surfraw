@@ -63,6 +63,12 @@ case $state in
           '-results=-:[number of results to return]' \
           '*:search string' && ret=0
       ;;
+      ctan)
+	_arguments $args \
+	'-name[Search by filename]' \
+	'-desc[Search descriptions (default)]'\
+	'-doc[Search documentation]'
+      ;;
       currency)
         _arguments \
           '-l[List all known currency symbols]' \
@@ -75,7 +81,7 @@ case $state in
       ;;
       debbugs)
         _arguments \
-          '-search=:search type:(pkg src bug maint tag submitter)' \
+          '-search=:search type:(pkg src bug maint tag submitter severity tag)' \
           '-arc[show archived bugs]' \
           '-raw[do not sort by status or severity]' \
           '-rb[reverse order of bugs shown]' \
@@ -213,16 +219,30 @@ case $state in
       freshmeat)
         _deb_packages avail && ret=0
       ;;
+      fsfdir)
+	_arguments $args
+      ;;
       google)
         _arguments $args \
           '(-l --lucky)'{-l,--lucky}'[feeling lucky?]' \
           '-results=-:[number of results to return]:' \
           '-search=-:topic:(bsd linux mac unclesam)' && ret=0
+      ;;
+      gutenberg)
+	_arguments $args \
+	  '-title[Search titles (default)]'
+	  '-author[Search authors]'
+	  '-num[Search etext numbers]'
       ;;       
       imdb)
         _arguments $args \
           '-category=-:category:(All Titles MyMovies People Characters Quotes Bios Plots)' && ret=0
-        ;;
+      ;;
+      ixquick)
+	_arguments $args \
+	  '-search=-:search type:(web pics)' \
+	  '-lang=-:language:(english dansk deutsch espanol francais italiano nederlands norsk polski portugues suomi svenska turkce jiantizhongwen nihongo fantizhengwen hangul)'
+      ;;
       jake)
         _arguments $args \
           '-method=-:search type:(title issn)' \
@@ -364,6 +384,22 @@ case $state in
           '-arc=-[arc color]:color:(Black Blue Darkgreen Red)' \
           '-arctext=-:[arc text color]:color:(Black Blue Darkgreen Red)' \
           :URL:_urls && ret=0
+      ;;
+      wayback)
+	_arguments $args \
+	  '-syear=-[Start search from this year]:year' \
+	  '-smonth=-:[Start search from this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
+	  '-sday=-[Start search from this day]:number' \
+	  '-eyear=-[End search in this year]:year' \
+	  '-emonth=-[End search in this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
+	  '-eday=-[End search in this day]:number' \
+	  '-list[List all pages that match search criteria]' \
+	  '-dups[Show dups]' \
+	  '-compare[Compare pages]' \
+	  '-pdf[Show as PDF]' \
+	  '-alias=-[How to handle site aliases]:alias:(merge show hide)' \
+	  '-redir=-[How to handle redirections]:redir:(hide flag show)' \
+	  '-type=-[File type to search for]:type:(image audio video binary text pdf)'
       ;;
       wetandwild)
         _arguments \

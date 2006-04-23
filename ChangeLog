@@ -1,3 +1,8 @@
+2006-04-23  Clint Adams  <clint@zsh.org>
+
+	* 22425: Completion/Unix/Command/_surfraw: update for
+	new surfraw debsec elvi from Micah Anderson.
+
 2006-04-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/contrib.yo: documentation for 22417.
