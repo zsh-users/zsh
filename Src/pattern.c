@@ -1137,7 +1137,7 @@ patcomppiece(int *flagp)
 	 * ..(#a1).. (i.e. the (#a1) has no effect), but if you're
 	 * going to write funny patterns, you get no sympathy from me.
 	 */
-	if (patglobflags) {
+	if (patglobflags & (0xFF|GF_LCMATCHUC|GF_IGNCASE)) {
 	    if (!(patflags & PAT_FILE))
 		flags &= ~P_PURESTR;
 	    else if (!(nptr[0] == '.' &&
