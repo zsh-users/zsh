@@ -1,3 +1,8 @@
+2006-04-25  Peter Stephenson  <pws@csr.com>
+
+	* 22427: Doc/Zsh/zle.yo, Src/Zle/zle_thingy.c: zle <widget> -w
+	sets WIDGET etc. to reflect <widget>.
+
 2006-04-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* zsh-users/10172: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list,

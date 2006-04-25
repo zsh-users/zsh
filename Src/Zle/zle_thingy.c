@@ -639,9 +639,9 @@ zle_usable()
 static int
 bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 {
-    Thingy t;
+    Thingy t, savbindk = bindk;
     struct modifier modsave = zmod;
-    int ret, saveflag = 0;
+    int ret, saveflag = 0, setbindk = 0;
     char *wname = *args++, *keymap_restore = NULL, *keymap_tmp;
 
     if (!wname)
@@ -692,6 +692,9 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		if (selectkeymap(keymap_tmp, 0))
 		    return 1;
 		break;
+	    case 'w':
+		setbindk = 1;
+		break;
 	    default:
 		zwarnnam(name, "unknown option: %s", *args, 0);
 		return 1;
@@ -701,7 +704,10 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     }
 
     t = rthingy(wname);
+    if (setbindk)
+	bindk = t;
     ret = execzlefunc(t, args);
+    bindk = savbindk;
     unrefthingy(t);
     if (saveflag)
 	zmod = modsave;

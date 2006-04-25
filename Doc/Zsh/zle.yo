@@ -338,7 +338,7 @@ xitem(tt(zle) tt(-U) var(string))
 xitem(tt(zle) tt(-K) var(keymap))
 xitem(tt(zle) tt(-F) [ tt(-L) ] [ var(fd) [ var(handler) ] ])
 xitem(tt(zle) tt(-I))
-item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ] [ -K) var(keymap) tt(]) var(args) ...)(
+item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -Nw ] [ -K) var(keymap) tt(]) var(args) ...)(
 The tt(zle) builtin performs a number of different actions concerning
 ZLE.
 
@@ -535,7 +535,7 @@ this may have been by a previous call to `tt(zle -I)' or by a system
 notification.  To test if a zle widget may be called at this point, execute
 tt(zle) with no arguments and examine the return status.
 )
-item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ] [ -K) var(keymap) tt(]) var(args) ...)(
+item(var(widget) tt([ -n) var(num) tt(]) tt([ -Nw ] [ -K) var(keymap) tt(]) var(args) ...)(
 Invoke the specified widget.  This can only be done when ZLE is
 active; normally this will be within a user-defined widget.
 
@@ -548,6 +548,12 @@ With the option tt(-K), var(keymap) will be used as the current keymap
 during the execution of the widget.  The previous keymap will be
 restored when the widget exits.
 
+Normally, calling a widget in this way does not set the special
+parameter tt(WIDGET) and related parameters, so that the environment
+appears as if the top-level widget called by the user were still
+active.  With the option tt(-w), tt(WIDGET) and related parameters are set
+to reflect the widget being executed by the tt(zle) call.
+
 Any further arguments will be passed to the widget.  If it is a shell
 function, these are passed down as positional parameters; for builtin
 widgets it is up to the widget in question what it does with them.
@@ -559,7 +565,7 @@ them.
 
 The return status reflects the success or failure of the operation carried
 out by the widget, or if it is a user-defined widget the return status of
-the shell function.  
+the shell function.
 
 A non-zero return status causes the shell to beep when the widget exits,
 unless the tt(BEEP) options was unset or the widget was called via the
