@@ -639,7 +639,7 @@ zle_usable()
 static int
 bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 {
-    Thingy t, savbindk = bindk;
+    Thingy t;
     struct modifier modsave = zmod;
     int ret, saveflag = 0, setbindk = 0;
     char *wname = *args++, *keymap_restore = NULL, *keymap_tmp;
@@ -704,10 +704,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     }
 
     t = rthingy(wname);
-    if (setbindk)
-	bindk = t;
-    ret = execzlefunc(t, args);
-    bindk = savbindk;
+    ret = execzlefunc(t, args, setbindk);
     unrefthingy(t);
     if (saveflag)
 	zmod = modsave;

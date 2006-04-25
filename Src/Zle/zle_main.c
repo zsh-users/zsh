@@ -862,7 +862,7 @@ zlecore(void)
 		eofsent = 1;
 		break;
 	    }
-	    if (execzlefunc(bindk, zlenoargs)) {
+	    if (execzlefunc(bindk, zlenoargs, 0)) {
 		handlefeep(zlenoargs);
 		if (eofsent)
 		    break;
@@ -1011,7 +1011,7 @@ zleread(char **lp, char **rp, int flags, int context)
 	char *args[2];
 	args[0] = initthingy->nam;
 	args[1] = NULL;
-	execzlefunc(initthingy, args);
+	execzlefunc(initthingy, args, 1);
 	unrefthingy(initthingy);
 	errflag = retflag = 0;
     }
@@ -1040,14 +1040,22 @@ zleread(char **lp, char **rp, int flags, int context)
     return s;
 }
 
-/* execute a widget */
+/*
+ * Execute a widget.  The third argument indicates that the global
+ * variable bindk should be set temporarily so that WIDGET etc.
+ * reflect the command being executed.
+ */
 
 /**/
 int
-execzlefunc(Thingy func, char **args)
+execzlefunc(Thingy func, char **args, int set_bindk)
 {
     int r = 0, ret = 0;
     Widget w;
+    Thingy save_bindk = bindk;
+
+    if (set_bindk)
+	bindk = func;
 
     if(func->flags & DISABLED) {
 	/* this thingy is not the name of a widget */
@@ -1143,6 +1151,8 @@ execzlefunc(Thingy func, char **args)
 	refthingy(func);
 	lbindk = func;
     }
+    if (set_bindk)
+	bindk = save_bindk;
     return ret;
 }
 

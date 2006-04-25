@@ -1,5 +1,9 @@
 2006-04-25  Peter Stephenson  <pws@csr.com>
 
+	* 22431: Src/Zle/zle_main.c, Src/Zle/zle_thingy.c,
+	Src/Zle/zle_vi.c: expand 22427 to set WIDGET etc. more
+	consistently when executing functions.
+
 	* 22429: Src/pattern.c: bug with pure string matching
 	introduced by 22408.
 
