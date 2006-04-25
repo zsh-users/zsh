@@ -412,7 +412,7 @@ selectkeymap(char *name, int fb)
 	    args[0] = oname;
 	    args[1] = NULL;
 	    errflag = retflag = 0;
-	    execzlefunc(chgthingy, args);
+	    execzlefunc(chgthingy, args, 1);
 	    unrefthingy(chgthingy);
 	    errflag = saverrflag;
 	    retflag = savretflag;
