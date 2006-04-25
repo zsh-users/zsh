@@ -2751,22 +2751,26 @@ patmatch(Upat prog)
 		savglobflags = patglobflags;
 		saverrsfound = errsfound;
 		lastcharstart = charstart + (patinput - start);
-		while (no >= min) {
-		    int charmatch_cache;
-		    if (nextch < 0 ||
-			(patinput < patinend &&
-			 CHARMATCH_EXPR(CHARREF(patinput, patinend),
-					nextch))) {
-			if (patmatch(next))
-			    return 1;
+		if (no >= min) {
+		    for (;;) {
+			int charmatch_cache;
+			if (nextch < 0 ||
+			    (patinput < patinend &&
+			     CHARMATCH_EXPR(CHARREF(patinput, patinend),
+					    nextch))) {
+			    if (patmatch(next))
+				return 1;
+			}
+			if (--no < min)
+			    break;
+			/* find start of previous full character */
+			while (!*--lastcharstart)
+			    DPUTS(lastcharstart < charstart,
+				  "lastcharstart invalid");
+			patinput = start + (lastcharstart-charstart);
+			patglobflags = savglobflags;
+			errsfound = saverrsfound;
 		    }
-		    no--;
-		    /* find start of previous full character */
-		    while (!*--lastcharstart)
-			;
-		    patinput = start + (lastcharstart-charstart);
-		    patglobflags = savglobflags;
-		    errsfound = saverrsfound;
 		}
 	    }
 	    /*
