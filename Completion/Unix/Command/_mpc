@@ -228,5 +228,6 @@ _mpc_update() {
 }
 
 _arguments \
-  '--format:format string' \
+  '--format[specify the format of song display]:format string' \
+  '--no-status[prevent printing song status on completion]' \
   '*::mpc command:_mpc_command'

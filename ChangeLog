@@ -1,3 +1,8 @@
+2006-04-26  Clint Adams  <clint@zsh.org>
+
+	* 22433, R. Ramkumar: Completion/Unix/Command/_mpc:
+	add completion for --no-status option.
+
 2006-04-25  Peter Stephenson  <pws@csr.com>
 
 	* 22432: Src/pattern.c: bug with backtracking over repeated
