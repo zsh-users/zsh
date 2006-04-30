@@ -1,0 +1,10 @@
+#compdef comm
+
+_arguments \
+  '-1[suppress lines unique to FILE1]' \
+  '-2[suppress lines unique to FILE2]' \
+  '-3[suppress lines that appear in both files]' \
+  '--help' \
+  '--version' \
+  '1:file1 to compare:_files' \
+  '2:file2 to compare:_files'
