@@ -48,7 +48,7 @@ _bzr_versionedFiles() {
 
 (( $+functions[_bzr_completeParents] )) ||
 _bzr_completeParents() {
-    local parentFile=$(bzr root 2>/dev/null)/.bzr/parent
+    local parentFile=$(bzr root 2>/dev/null)/.bzr/branch/parent
     [[ -r $parentFile ]] && compadd -X "Completing parents" $(cat $parentFile)
 }
 
@@ -134,8 +134,15 @@ case $cmd in
 	)
     ;;
 
-(mkdir|upgrade|renames)
+(mkdir|renames)
     args+=( '*:DIR:_files -/' )
+    ;;
+
+(upgrade)
+    args+=(
+	'--format=[new format for repository]:format:(default knit metaweave weave)'
+	'*:DIR:_files -/'
+	)
     ;;
 
 (remove|rm)
@@ -323,4 +330,4 @@ case $cmd in
 esac
 
 _arguments -s "$args[@]" && ret=0
-return ret
+return $ret
