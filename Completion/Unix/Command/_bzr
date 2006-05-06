@@ -69,7 +69,7 @@ case $cmd in
 
 (clone|branch|get)
     args+=(
-	'(-r --revision)'{--revision,-r}'[revision]:rev:'
+	'(-r --revision)'{--revision,-r}'[the revision to get]:rev:'
 	'--basis[specify basis branch]:basis:'
 	)
     if (( CURRENT == 2 )); then
@@ -77,6 +77,14 @@ case $cmd in
     elif (( CURRENT == 3 )); then
 	args+=( '*:TO_LOCATION:_files -/' )
     fi
+    ;;
+
+(checkout)
+    args+=(
+	'--lightweight[perform a lightweight checkout]'
+	'(-r --revision)'{--revision,-r}'[the revision to get]:rev:'
+	)
+    _bzr_completeParents
     ;;
 
 (rename|mv)
@@ -134,7 +142,7 @@ case $cmd in
 	)
     ;;
 
-(mkdir|renames)
+(mkdir|renames|update)
     args+=( '*:DIR:_files -/' )
     ;;
 
