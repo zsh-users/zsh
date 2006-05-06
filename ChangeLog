@@ -2,7 +2,7 @@
 
 	* unposted: Completion/Unix/Command/_bzr: fixed the completion
 	of "bzr upgrade" and the subcommands that lookup the parent
-	URL.
+	URL.  Also added subcommands "checkout" and "update".
 
 2006-05-01  Clint Adams  <clint@zsh.org>
 
