@@ -87,11 +87,11 @@ case $cmd in
     _bzr_completeParents
     ;;
 
-(rename|mv)
+(rename|move|mv)
     if (( CURRENT == 2 )); then
-	args+=( '*:old name:_bzr_versionedFiles' )
+	args+=( '*:files:_bzr_versionedFiles' )
     else
-	args+=( '*:new name:' )
+	args=( '*:destination dir:_files -/' )
     fi
     ;;
 
@@ -120,7 +120,7 @@ case $cmd in
 	)
     ;;
 
-(resolve)
+(resolve|resolved)
     args+=(
 	'--all[resolve all conflicts in this tree]'
 	'*:file:_bzr_versionedFiles'
@@ -196,10 +196,14 @@ case $cmd in
 	)
     ;;
 
-(conflicts|added|deleted|modified|unknowns|directories|ignored)
+(bind|break-lock|reconcile)
+    _bzr_completeParents
     ;;
 
-(revno|init|version)
+(conflicts|added|deleted|modified|unknowns|directories|ignored|unbind|nick)
+    ;;
+
+(revno|init|init-repo|init-repository|version)
     ;;
 
 (whoami)
@@ -279,18 +283,6 @@ case $cmd in
 	)
     ;;
 
-(move)
-    if (( CURRENT == 2 )); then
-	args+=(
-	   '*:files:_bzr_versionedFiles'
-	   )
-    else
-	args=(
-	    '*:destination dir:_files -/'
-	    )
-    fi
-    ;;
-
 (help)
     args=(
 	'(-l --long)'{--long,-l}'[use long format]'
@@ -329,6 +321,19 @@ case $cmd in
 	'--ignored[delete all ignored files]'
 	'--detritus[delete conflict files, merge backups, failed self-tests, *~, *.tmp, etc]'
 	)
+    ;;
+
+(uncommit)
+    args+=(
+	'--dry-run[do not make any changes]'
+	'--force[say "yes" to all questions]'
+	'(-r --revision)'{--revision,-r}'[the earliest revision to delete]:rev:'
+	'(-v --verbose)'{--verbose,-v}'[display more information]'
+	)
+    ;;
+
+(sign-my-commits)
+    args+=( '--dry-run[do not actually sign anything]' )
     ;;
 
 (*)
