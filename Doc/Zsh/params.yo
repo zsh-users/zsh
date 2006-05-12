@@ -473,7 +473,10 @@ Same as tt(#).
 )
 vindex($)
 item(tt($) <S>)(
-The process ID of this shell.
+The process ID of this shell.  Note that this indicates the original
+shell started by invoking tt(zsh); all processes forked from the shells
+without executing a new program, such as subshells started by
+tt(LPAR())var(...)tt(RPAR()), substitute the same value.
 )
 vindex(-)
 item(tt(-) <S>)(
@@ -609,7 +612,9 @@ The operating system, as determined at compile time.
 )
 vindex(PPID)
 item(tt(PPID) <S>)(
-The process ID of the parent of the shell.
+The process ID of the parent of the shell.  As for tt($$), the
+value indicates the parent of the original shell and does not
+change in subshells.
 )
 vindex(PWD)
 item(tt(PWD))(

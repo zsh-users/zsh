@@ -15,8 +15,6 @@ integer ok
 listfiles=()
 listopts=()
 
-zmodload -i zsh/stat 2>/dev/null || return 1
-
 zstyle -a ":completion:${curcontext}:" file-list stylevals || return 1
 
 # TODO: more flexible way of handling the following?  e.g. use $compstate?
@@ -47,6 +45,8 @@ for elt in $stylevals; do
 done
 
 (( ok )) || return 1
+
+zmodload -i zsh/stat 2>/dev/null || return 1
 
 for f in ${(P)1}; do
   if [[ ! -e "${2:+$2/}$f" ]]; then

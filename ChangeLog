@@ -1,3 +1,14 @@
+2006-05-12  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/params.yo: improve documentation for $$
+	and $PPID.
+
+	* unposted: Doc/Zsh/compsys.yo: document that _list_files
+	uses the builtin state, c.f. 22440.
+
+	* 22440: Completion/Unix/Type/_list_files: loaded zsh/stat
+	if not needed, which screwed up external stat programmes.
+
 2006-05-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_bzr: fixed the completion
