@@ -9,7 +9,7 @@
 	and $PPID.
 
 	* unposted: Doc/Zsh/compsys.yo: document that _list_files
-	uses the builtin state, c.f. 22440.
+	uses the builtin stat, c.f. 22440.
 
 	* 22440: Completion/Unix/Type/_list_files: loaded zsh/stat
 	if not needed, which screwed up external stat programmes.
