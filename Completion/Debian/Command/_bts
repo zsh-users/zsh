@@ -23,7 +23,7 @@ compset -N '[,.]' && first=0
 
 if [[ CURRENT -eq 1 ]]; then
   _wanted cmd expl 'bts command' compadd show bugs close reopen retitle \
-      reassign merge unmerge tag severity forwarded notforwarded help \
+      reassign merge unmerge tag tags severity forwarded notforwarded help \
       clone submitter found notfound block unblock user usertag usertags \
       package owner noowner reportspam cache cleancache
   return
@@ -77,7 +77,7 @@ case "$words[1]" in
      _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
-  tag)
+  tags#)
     if [[ CURRENT -eq 2 ]]; then
       _message -e bugnum 'bug number'
     elif [[ CURRENT -eq 3 ]]; then

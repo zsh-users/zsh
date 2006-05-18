@@ -1,3 +1,8 @@
+2006-05-18  Clint Adams  <clint@zsh.org>
+
+	* 22446: Completion/Debian/Command/_bts: acknowledge that
+	tags is an alias of tag.
+
 2006-05-12  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_bzr: added a bunch of
