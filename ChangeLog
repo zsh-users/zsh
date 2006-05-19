@@ -1,3 +1,8 @@
+2006-05-19  Peter Stephenson  <pws@csr.com>
+
+	* 22448: Src/Zle/zle_params.c: fix typo in get_rbuffer() that
+	could cause crash examining $RBUFFER in completion code.
+
 2006-05-18  Clint Adams  <clint@zsh.org>
 
 	* 22446: Completion/Debian/Command/_bts: acknowledge that

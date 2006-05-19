@@ -300,7 +300,8 @@ static char *
 get_rbuffer(UNUSED(Param pm))
 {
     if (zlemetaline != NULL)
-	return dupstrpfx((char *)zleline + zlemetacs, zlemetall - zlemetacs);
+	return dupstrpfx((char *)zlemetaline + zlemetacs,
+			 zlemetall - zlemetacs);
     return zlelineasstring(zleline + zlecs, zlell - zlecs, 0, NULL, NULL, 1);
 }
 
