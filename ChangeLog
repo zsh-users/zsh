@@ -1,5 +1,8 @@
 2006-05-20  Clint Adams  <clint@zsh.org>
 
+	* 22450: Completion/Unix/Command/_tcptraceroute: completion for
+	tcptraceroute.
+
 	* 22449: Completion/Unix/Command/_tracepath: completion for
 	tracepath and tracepath6.
 
