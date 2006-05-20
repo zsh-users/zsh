@@ -1,3 +1,10 @@
+2006-05-20  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_bzr: added a bunch of missing
+	options and a couple more missing subcommands.  Also made all the
+	long-name options that take args allow a '=' to be used to specify
+	the value.
+
 2006-05-20  Clint Adams  <clint@zsh.org>
 
 	* 22450: Completion/Unix/Command/_tcptraceroute: completion for
