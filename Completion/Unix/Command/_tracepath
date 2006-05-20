@@ -1,0 +1,5 @@
+#compdef tracepath tracepath6
+
+_arguments \
+  ':destination:_hosts' \
+  ':port:_ports'
