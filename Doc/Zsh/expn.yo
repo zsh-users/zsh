@@ -1140,6 +1140,13 @@ particular, note that this is liable to produce a `no match' error if
 em(either) of the two expressions does not match; this is to be contrasted
 with tt(*/(foo|bar)), which is treated as a single pattern but otherwise
 has similar effects.
+
+To combine brace expansion with array expansion, see the
+tt(${^)var(spec)tt(}) form described
+ifzman(in the section Parameter Expansion)\
+ifnzman(in noderef(Parameter Expansion))
+above.
+
 texinode(Filename Expansion)(Filename Generation)(Brace Expansion)(Expansion)
 sect(Filename Expansion)
 cindex(filename expansion)

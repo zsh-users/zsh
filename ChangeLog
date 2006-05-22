@@ -1,3 +1,8 @@
+2006-05-22  Peter Stephenson  <pws@csr.com>
+
+	* 22451: Doc/Zsh/expn.yo: cross-reference ${^spec} in brace
+	expansion.
+
 2006-05-20  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_bzr: added a bunch of missing
