@@ -1,3 +1,8 @@
+2006-05-25  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22454, Hideki ONO: Completion/Unix/Command/_ls: added support
+	for *BSD's version of ls.
+
 2006-05-25  Clint Adams  <clint@zsh.org>
 
 	* 22457, R. Ramkumar: Completion/Unix/Command/_mpc:
