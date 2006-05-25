@@ -1,3 +1,8 @@
+2006-05-25  Clint Adams  <clint@zsh.org>
+
+	* 22455, R. Ramkumar: Completion/Linux/Command/_valgrind:
+	update for valgrind 3.1.1.
+
 2006-05-22  Peter Stephenson  <pws@csr.com>
 
 	* 22451: Doc/Zsh/expn.yo: cross-reference ${^spec} in brace
