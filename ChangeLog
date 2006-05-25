@@ -1,5 +1,8 @@
 2006-05-25  Clint Adams  <clint@zsh.org>
 
+	* 22457, R. Ramkumar: Completion/Unix/Command/_mpc:
+	fix buggy quoting of zstyle contexts.
+
 	* 22456, R. Ramkumar: Completion/Unix/Command/_mpc:
 	update for mpc 0.11.2.
 

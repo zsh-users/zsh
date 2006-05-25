@@ -4,15 +4,15 @@ local OUT foo MPD_MUSIC_DIR MPC_PLAYLIST_MATCHER MPC_FORMAT_STRING
 
 # set this style to whatever --format string you want to use when
 # constructing the list of playlist entries
-zstyle -s ':completion:${curcontext}:*' mpc-format-string MPC_FORMAT_STRING
+zstyle -s ":completion:${curcontext}:*" mpc-format-string MPC_FORMAT_STRING
 foo=(--format "${(q)MPC_FORMAT_STRING:-%file%}")
 
 # set this style to the music_directory of mpd to get _files based completion
 # for commands like "add"
-zstyle -s ':completion:${curcontext}:' mpd-music-directory MPD_MUSIC_DIR
+zstyle -s ":completion:${curcontext}:" mpd-music-directory MPD_MUSIC_DIR
 
 # matcher used for playlist completion
-zstyle -s ':completion:${curcontext}:' mpd-playlist-matcher \
+zstyle -s ":completion:${curcontext}:" mpd-playlist-matcher \
   MPC_PLAYLIST_MATCHER
 : ${MPC_PLAYLIST_MATCHER:='m:{a-z}={A-Z} l:|=**'}
 
