@@ -26,14 +26,19 @@ _mpc_command() {
 
   mpc_cmds=(
     add:"add a song to the current playlist"
+    crop:"remove all songs except for the currently playing song"
     del:"remove a song from the current playlist"
     play:"start playing"
     next:"play the next song in the current playlist"
     prev:"play the previous song in the current playlist"
     pause:"pause the currently playing song"
+    toggle:"toggles Play/Pause, plays if stopped"
     stop:"stop the currently playing playlists"
     seek:"seek to the position specified in percent"
     clear:"clear the current playlist"
+    outputs:"show the current outputs"
+    enable:"enable a output"
+    disable:"disable a output"
     shuffle:"shuffle the current playlist"
     move:"move song in playlist"
     playlist:"print the current playlist"
@@ -49,7 +54,9 @@ _mpc_command() {
     search:"search for a song"
     crossfade:"set and display crossfade settings"
     update:"scan music directory for updates"
+    stats:"display statistics about MPD"
     version:"report version of MPD"
+    status:"display MPD status"
   )
 
   if (( CURRENT == 1 )); then
@@ -154,6 +161,13 @@ _mpc_helper_directories() {
   fi
 }
 
+(( $+functions[_mpc_helper_outputs] )) ||
+_mpc_helper_outputs() {
+  local vals outline
+  vals=(${${${${(M)${(f)"$(mpc outputs 2> /dev/null)"}:#Output * \(*\) is (en|dis)abled}##Output }%%\) is (en|dis)abled}/ \(/:})
+  _describe -t outputs output vals
+}
+
 _mpc_add() {
   _mpc_helper_files
 }
@@ -168,6 +182,14 @@ _mpc_play() {
 
 _mpc_seek() {
   _message "floating point percent value"
+}
+
+_mpc_enable() {
+  _mpc_helper_outputs
+}
+
+_mpc_disable() {
+  _mpc_helper_outputs
 }
 
 _mpc_move() {
