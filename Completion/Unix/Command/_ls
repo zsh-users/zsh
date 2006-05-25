@@ -1,80 +1,133 @@
 #compdef ls gls
 # Ulrik Haugen 2001
 
-local arguments
+local arguments is_gnu
 
-arguments=(
-  '(--all -a -A --almost-all)'{--all,-a}'[list entries starting with .]'
-  '(--almost-all -A -a --all)'{--almost-all,-A}'[list all except . and ..]'
-  '--author[print the author of each file]'
-  '(--ignore-backups -B)'{--ignore-backups,-B}"[don't list entries ending with ~]"
-  '(--directory -d)'{--directory,-d}'[list directory entries instead of contents]'
-  '(--dired -D)'{--dired,-D}"[generate output designed for Emacs' dired mode]"
-  '(--ignore,-I)'{--ignore,-I}"[don't list entire matching pattern]:pattern:"
-  '(--dereference -L --dereference-command-line --dereference-command-line-symlink-to-dir)'{--dereference,-L}'[list referenced file for sym link]'
-  '(--dereference -L --dereference-command-line --dereference-command-line-symlink-to-dir)'{--dereference-command-line,--dereference-command-line-symlink-to-dir}
-  '(--recursive -R)'{--recursive,-R}'[list subdirectories recursively]'
- 
-  '(--no-group -G)'{--no-group,-G}'[inhibit display of group information]'
-  '(--human-readable -h -H --si)'{--human-readable,-h}'[print sizes in human readable form]'
-  '(--si -H -h --human-readable)'{--si,-H}'[sizes in human readable form; powers of 1000]'
-  '(--inode -i)'{--inode,-i}'[print file inode numbers]'
- 
-  '(--format -l -g -o -1 -C -m -x)-l[long listing]'
-  '(--format -l -1 -C -m -x)-g[long listing but without owner information]' 
-  '(--format -l --no-group -G -1 -C -m -x)-o[no group, long]'
-  '(--format -l -g -o -C -m -x)-1[single column output]'
-  '(--format -l -g -o -1 -m -x)-C[list entries in columns sorted vertically]'
-  '(--format -l -g -o -1 -C -x)-m[comma separated]'
-  '(--format -l -g -o -1 -C -m)-x[sort horizontally]'
-  '(-l -g -o -1 -C -m -x)--format=:format:(verbose long commas horizontal across vertical single-column)'
- 
-  '(--size -s -f)'{--size,-s}'[display size of each file in blocks]'
- 
-  '(--time -u)-c[status change time]'
-  '(--time -c)-u[access time]'
-  '(-c -u)--time=[specify time to show]:time:(ctime status use atime access)'
-  '--time-style=[show times using specified style]:time style:(full-iso long-iso iso locale)'
- 
-  '(-a --all -U -l --format -s --size -t --sort --full-time)-f[unsorted, all, short list]'
-  '(--reverse)'{--reverse,-r}'[reverse sort order]'
- 
-  '(--sort -t -U -v -X)-S[sort by size]'
-  '(--sort -S -U -v -X)-t[sort by modification time]'
-  '(--sort -S -t -v -X)-U[unsorted]'
-  '(--sort -S -t -U -X)-v[sort by version (filename treated numerically)]'
-  '(--sort -S -t -U -v)-X[sort by extension]'
-  '(-S -t -U -v -X)--sort=:sort:(size time none version extension)'
- 
-  '--color=-[control use of color]:color:(never always auto)'
- 
-  '(--classify -F --indicator-style -p --file-type)'{--classify,-F}'[append file type indicators]' 
-  '(--file-type -p --indicator-style -F --classify)'{--file-type,-p}'[append file type indicators except *]'
-  '(-F --classify -p --file-type)--indicator-style=:indicator style:(none file-type classify)'
- 
-  '(-f)--full-time[list both full date and full time]'
- 
-  '(--kilobytes -k --block-size)'{--kilobytes,-k}'[use block size of 1k]'
-  '(-k --kilobytes)--block-size=[specify block size]:block size (bytes):(1024)'
- 
-  '(--numeric-uid-gid -n)'{--numeric-uid-gid,-n}'[numeric uid, gid]'
-  '(--tabsize -T)'{--tabsize=,-T+}'[specify tab size]:tab size'
-  '(--width -w)'{--width=,-w+}'[specify screen width]:screen width'
- 
-  '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--escape,-b}'[print octal escapes for control characters]'
-  '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--literal,-N}'[print raw characters]'
-  '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--quote-name,-Q}'[quote names]'
-  '(-b --escape -N --literal -Q --quote-name)--quoting-style=:quoting style:(literal shell shell-always c escape clocale locale)'
- 
-  '(--hide-control-chars -q --show-control-chars)'{--hide-control-chars,-q}'[hide control chars]'
-  '(-q --hide-control-chars)--show-control-chars'
-  '(- :)--help[display help information]'
-  '(- :)--version[display version information]'
-  '*:files:_files'
-)
+_pick_variant -r is_gnu gnu=gnu unix --help
 
-# remove long options?
-_pick_variant gnu=gnu unix --help ||
+if [[ "$OSTYPE" = (netbsd*|freebsd*|openbsd*) && "$is_gnu" != gnu ]]; then
+  arguments=(
+    '(-A)-a[list entries starting with .]'
+    '(-a)-A[list all except . and ..]'
+    '-d[list directory entries instead of contents]'
+    '-L[list referenced file for sym link]'
+    '-R[list subdirectories recursively]'
+
+    '(-k)-h[print sizes in human readable form]'
+    '(-h)-k[print sizes of 1k]'
+
+    '-i[print file inode numbers]'
+
+    '(-l -g -1 -C -m -x)-l[long listing]'
+    '(-l -1 -C -m -x)-g[long listing but without owner information]'
+    '(-l -g -C -m -x)-1[single column output]'
+    '(-l -g -1 -m -x)-C[list entries in columns sorted vertically]'
+    '(-l -g -1 -C -x)-m[comma separated]'
+    '(-l -g -1 -C -m)-x[sort horizontally]'
+
+    '-o[display file flags]'
+
+    '-s[display size of each file in blocks]'
+
+    '(-u)-c[status change time]'
+    '(-c)-u[access time]'
+
+    '-f[unsorted, all, short list]'
+    '-r[reverse sort order]'
+
+    '(-t)-S[sort by size]'
+    '(-S)-t[sort by modification time]'
+
+    '(-p)-F[append file type indicators]'
+    '(-F)-p[append file type indicators for directory]'
+
+    '-f[output is not sorted]'
+
+    '-n[numeric uid, gid]'
+
+    '-T[show complete time information]'
+
+    '(-B -b -w -q)-B[print octal escapes for control characters]'
+    '(-B -b -w -q)-b[as -B, but use C escape codes whenever possible]'
+    '(-B -b -w -q)-q[hide control chars]'
+    '(-B -b -w -q)-w[print raw characters]'
+
+    '*:files:_files'
+  )
+else
+  arguments=(
+    '(--all -a -A --almost-all)'{--all,-a}'[list entries starting with .]'
+    '(--almost-all -A -a --all)'{--almost-all,-A}'[list all except . and ..]'
+    '--author[print the author of each file]'
+    '(--ignore-backups -B)'{--ignore-backups,-B}"[don't list entries ending with ~]"
+    '(--directory -d)'{--directory,-d}'[list directory entries instead of contents]'
+    '(--dired -D)'{--dired,-D}"[generate output designed for Emacs' dired mode]"
+    '(--ignore,-I)'{--ignore,-I}"[don't list entire matching pattern]:pattern:"
+    '(--dereference -L --dereference-command-line --dereference-command-line-symlink-to-dir)'{--dereference,-L}'[list referenced file for sym link]'
+    '(--dereference -L --dereference-command-line --dereference-command-line-symlink-to-dir)'{--dereference-command-line,--dereference-command-line-symlink-to-dir}
+    '(--recursive -R)'{--recursive,-R}'[list subdirectories recursively]'
+
+    '(--no-group -G)'{--no-group,-G}'[inhibit display of group information]'
+    '(--human-readable -h -H --si)'{--human-readable,-h}'[print sizes in human readable form]'
+    '(--si -H -h --human-readable)'{--si,-H}'[sizes in human readable form; powers of 1000]'
+    '(--inode -i)'{--inode,-i}'[print file inode numbers]'
+
+    '(--format -l -g -o -1 -C -m -x)-l[long listing]'
+    '(--format -l -1 -C -m -x)-g[long listing but without owner information]'
+    '(--format -l --no-group -G -1 -C -m -x)-o[no group, long]'
+    '(--format -l -g -o -C -m -x)-1[single column output]'
+    '(--format -l -g -o -1 -m -x)-C[list entries in columns sorted vertically]'
+    '(--format -l -g -o -1 -C -x)-m[comma separated]'
+    '(--format -l -g -o -1 -C -m)-x[sort horizontally]'
+    '(-l -g -o -1 -C -m -x)--format=:format:(verbose long commas horizontal across vertical single-column)'
+
+    '(--size -s -f)'{--size,-s}'[display size of each file in blocks]'
+
+    '(--time -u)-c[status change time]'
+    '(--time -c)-u[access time]'
+    '(-c -u)--time=[specify time to show]:time:(ctime status use atime access)'
+    '--time-style=[show times using specified style]:time style:(full-iso long-iso iso locale)'
+
+    '(-a --all -U -l --format -s --size -t --sort --full-time)-f[unsorted, all, short list]'
+    '(--reverse)'{--reverse,-r}'[reverse sort order]'
+
+    '(--sort -t -U -v -X)-S[sort by size]'
+    '(--sort -S -U -v -X)-t[sort by modification time]'
+    '(--sort -S -t -v -X)-U[unsorted]'
+    '(--sort -S -t -U -X)-v[sort by version (filename treated numerically)]'
+    '(--sort -S -t -U -v)-X[sort by extension]'
+    '(-S -t -U -v -X)--sort=:sort:(size time none version extension)'
+
+    '--color=-[control use of color]:color:(never always auto)'
+
+    '(--classify -F --indicator-style -p --file-type)'{--classify,-F}'[append file type indicators]'
+    '(--file-type -p --indicator-style -F --classify)'{--file-type,-p}'[append file type indicators except *]'
+    '(-F --classify -p --file-type)--indicator-style=:indicator style:(none file-type classify)'
+
+    '(-f)--full-time[list both full date and full time]'
+
+    '(--kilobytes -k --block-size)'{--kilobytes,-k}'[use block size of 1k]'
+    '(-k --kilobytes)--block-size=[specify block size]:block size (bytes):(1024)'
+
+    '(--numeric-uid-gid -n)'{--numeric-uid-gid,-n}'[numeric uid, gid]'
+    '(--tabsize -T)'{--tabsize=,-T+}'[specify tab size]:tab size'
+    '(--width -w)'{--width=,-w+}'[specify screen width]:screen width'
+
+    '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--escape,-b}'[print octal escapes for control characters]'
+    '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--literal,-N}'[print raw characters]'
+    '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--quote-name,-Q}'[quote names]'
+    '(-b --escape -N --literal -Q --quote-name)--quoting-style=:quoting style:(literal shell shell-always c escape clocale locale)'
+
+    '(--hide-control-chars -q --show-control-chars)'{--hide-control-chars,-q}'[hide control chars]'
+    '(-q --hide-control-chars)--show-control-chars'
+    '(- :)--help[display help information]'
+    '(- :)--version[display version information]'
+    '*:files:_files'
+  )
+  # remove long options?
+  if [[ $is_gnu != gnu ]]; then
     arguments=( ${${${arguments:#(|*\))--*}//--[^ )]#/}/\( #\)/} )
+  fi
+fi
 
 _arguments -s $arguments
