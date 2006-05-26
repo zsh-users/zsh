@@ -1342,10 +1342,15 @@ recursiveedit(UNUSED(char **args))
 void
 reexpandprompt(void)
 {
-    free(lpromptbuf);
-    lpromptbuf = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL);
-    free(rpromptbuf);
-    rpromptbuf = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL);
+    static reexpanding;
+
+    if (!reexpanding++) {
+	free(lpromptbuf);
+	lpromptbuf = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL);
+	free(rpromptbuf);
+	rpromptbuf = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL);
+    }
+    reexpanding--;
 }
 
 /**/
