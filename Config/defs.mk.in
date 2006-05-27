@@ -40,6 +40,7 @@ libdir          = @libdir@
 MODDIR          = $(libdir)/$(tzsh)/$(VERSION)
 infodir         = @infodir@
 mandir          = @mandir@
+datarootdir     = @datarootdir@
 datadir         = @datadir@
 fndir           = @fndir@
 sitefndir       = @sitefndir@
