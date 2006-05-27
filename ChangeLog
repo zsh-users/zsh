@@ -1,5 +1,8 @@
 2006-05-26  Clint Adams  <clint@zsh.org>
 
+	* 22466: Src/mkmakemod.sh: cope with autoconf 2.60 config.status
+	syntax.
+
 	* 22465: Config/defs.mk.in: add datarootdir for substitution
 	in order to cope with change in autoconf CVS.
 
