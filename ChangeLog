@@ -1,3 +1,10 @@
+2006-05-28  Clint Adams  <clint@zsh.org>
+
+	* 22467: R. Ramkumar: Completion/Unix/Command/_canonical_paths:
+	utility function which completes all paths given to it, and also
+	tries to offer completions which point to the same file as one of
+	the paths given.
+
 2006-05-26  Clint Adams  <clint@zsh.org>
 
 	* 22466: Src/mkmakemod.sh: cope with autoconf 2.60 config.status
