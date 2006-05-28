@@ -1,5 +1,8 @@
 2006-05-28  Clint Adams  <clint@zsh.org>
 
+	* 22469: R. Ramkumar: Completion/Unix/Command/_mount: use
+	_canonical_paths.
+
 	* 22468: R. Ramkumar: Completion/Unix/Command/_mount: fixes and
 	updates.
 

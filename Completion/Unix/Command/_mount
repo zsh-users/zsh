@@ -870,7 +870,8 @@ udevordir)
 
   _alternative \
     'device-labels:device label:compadd -a dev_tmp' \
-    'directories:mount point:compadd -a mp_tmp' && ret=0
+    'device-paths: device path:_canonical_paths -A dpath_tmp -N device-paths device\ path' \
+    'directories:mount point:_canonical_paths -A mp_tmp -N directories mount\ point' && ret=0
   ;;
 esac
 
