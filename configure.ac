@@ -1312,16 +1312,25 @@ sed 's/\\\\\\\\/\//g' |
 $AWK '{ if ($1 ~ /err/) files[[$1]] = $1 }
   END { for (var in files) print var }'`"
 rm -f nametmp.c
-for ERRNO_H in $errfile_list /dev/null
+lnerrs=0
+for ERRNO_TRY_H in $errfile_list /dev/null
 do
   dnl Try to make sure it doesn't get confused by files that don't
   dnl have real error definitions in.  Count definitions to make sure.
-  nerrs=`test -f $ERRNO_H && \
-  $EGREP '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*(_HURD_ERRNO \()?[0-9]+\)?' $ERRNO_H | \
+  dnl Definitions of error numbers have become more and more general, so
+  dnl pick the file with the most matches, which must be at least 7.
+  dnl Careful with cut and paste in the pattern: the square brackets
+  dnl must contain a space and a tab.
+  nerrs=`test -f $ERRNO_TRY_H && \
+  $EGREP '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*(_HURD_ERRNO )?\(?[_A-Z0-9]' $ERRNO_TRY_H | \
   wc -l | sed 's/[ 	]//g'`
-  test "x$nerrs" != x && test "$nerrs" -ge 7 && break
+  if test "x$nerrs" != x && test "$nerrs" -ge 7 && test "$nerrs" -gt "$lnerrs"
+  then
+    lnerrs=$nerrs
+    ERRNO_H=$ERRNO_TRY_H
+  fi
 done
-if test x$ERRNO_H = x"/dev/null"; then
+if test x$ERRNO_H = x; then
   AC_MSG_ERROR(ERROR MACROS NOT FOUND:  please report to developers)
 fi
 zsh_cv_path_errno_h=$ERRNO_H

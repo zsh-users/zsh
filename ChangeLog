@@ -1,7 +1,11 @@
 2006-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 10343: Src/exec.c: make bad #! interpreters print a more
-	informative message.
+	* 22470: configure.ac: incorporate extensions to errno.h
+	searching found by <johann@myrkraverk.com> trying to maximise
+	matches and minimise the risk of finding the wrong file.
+
+	* zsh-users/10343: Src/exec.c: make bad #! interpreters print a
+	more informative message.
 
 2006-05-28  Clint Adams  <clint@zsh.org>
 
