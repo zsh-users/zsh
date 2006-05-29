@@ -385,7 +385,7 @@ zexecve(char *pth, char **argv)
      * then check for an errno equal to ENOEXEC.  This errno is set *
      * if the process file has the appropriate access permission,   *
      * but has an invalid magic number in its header.               */
-    if ((eno = errno) == ENOEXEC) {
+    if ((eno = errno) == ENOEXEC || eno == ENOENT) {
 	char execvebuf[POUNDBANGLIMIT + 1], *ptr, *ptr2, *argv0;
 	int fd, ct, t0;
 
@@ -405,7 +405,14 @@ zexecve(char *pth, char **argv)
 			execvebuf[POUNDBANGLIMIT] = '\0';
 			for (ptr = execvebuf + 2; *ptr && *ptr == ' '; ptr++);
 			for (ptr2 = ptr; *ptr && *ptr != ' '; ptr++);
-			if (*ptr) {
+			if (eno == ENOENT) {
+			    char *buf;
+			    if (*ptr)
+				*ptr = '\0';
+			    buf = tricat("%s: bad interpreter: ", ptr2,
+					 ": %e");
+			    zerr(buf, pth, eno);
+			} else if (*ptr) {
 			    *ptr = '\0';
 			    argv[-2] = ptr2;
 			    argv[-1] = ptr + 1;
@@ -414,11 +421,11 @@ zexecve(char *pth, char **argv)
 			    argv[-1] = ptr2;
 			    execve(ptr2, argv - 1, environ);
 			}
-		    } else {
+		    } else if (eno == ENOEXEC) {
 			argv[-1] = "sh";
 			execve("/bin/sh", argv - 1, environ);
 		    }
-		} else {
+		} else if (eno == ENOEXEC) {
 		    for (t0 = 0; t0 != ct; t0++)
 			if (!execvebuf[t0])
 			    break;
