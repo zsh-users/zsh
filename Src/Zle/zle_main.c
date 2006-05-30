@@ -1509,7 +1509,7 @@ recursiveedit(UNUSED(char **args))
 void
 reexpandprompt(void)
 {
-    static reexpanding;
+    static int reexpanding;
 
     if (!reexpanding++) {
 	free(lpromptbuf);
