@@ -1,3 +1,8 @@
+2006-05-30  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: some option changes
+	for the upcoming 2.6.9 release.
+
 2006-05-30  Peter Stephenson  <pws@csr.com>
 
 	* 22473: Src/exec.c: modify zsh-users/10343 to print interpreter
