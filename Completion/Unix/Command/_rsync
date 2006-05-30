@@ -210,7 +210,9 @@ _arguments -s \
   '--no-progress[turn off --progress]' \
   '(--partial --progress)-P[same as --partial --progress]' \
   '(-i --itemize-changes)'{-i,--itemize-changes}'[output a change-summary for all updates]' \
-  '--log-format=[log file-transfers using specified format]:format' \
+  '--out-format=[output updates using specified format]:format' \
+  '--log-file-format=[log updates using specified format]:format' \
+  '--log-file=[log what rsync is doing to the specified file]:file:_files' \
   '--password-file=[read password from file]:file:_files' \
   '--list-only[list the files instead of copying them]' \
   '(--only-write-batch)--write-batch=[write a batched update to the specified file]:file:_files' \
