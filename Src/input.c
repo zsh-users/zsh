@@ -419,7 +419,7 @@ stuff(char *fn)
     off_t len;
 
     if (!(in = fopen(unmeta(fn), "r"))) {
-	zerr("can't open %s", fn, 0);
+	zerr("can't open %s", fn);
 	return 1;
     }
     fseek(in, 0, 2);
@@ -427,7 +427,7 @@ stuff(char *fn)
     fseek(in, 0, 0);
     buf = (char *)zalloc(len + 1);
     if (!(fread(buf, len, 1, in))) {
-	zerr("read error on %s", fn, 0);
+	zerr("read error on %s", fn);
 	fclose(in);
 	zfree(buf, len + 1);
 	return 1;

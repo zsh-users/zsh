@@ -193,8 +193,7 @@ compctlread(char *name, char **args, Options ops, char *reply)
 
     /* only allowed to be called for completion */
     if (!incompctlfunc) {
-	zwarnnam(name, "option valid only in functions called for completion",
-		NULL, 0);
+	zwarnnam(name, "option valid only in functions called for completion");
 	return 1;
     }
 
@@ -513,14 +512,14 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    char *p;
 
 		    if (cl) {
-			zwarnnam(name, "illegal option -%c", NULL, **argv);
+			zwarnnam(name, "illegal option -%c", **argv);
 			return 1;
 		    }
 		    if ((*argv)[1]) {
 			p = (*argv) + 1;
 			*argv = "" - 1;
 		    } else if (!argv[1]) {
-			zwarnnam(name, "retry specification expected after -%c", NULL,
+			zwarnnam(name, "retry specification expected after -%c",
 				 **argv);
 			return 1;
 		    } else {
@@ -542,12 +541,12 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 			break;
 		    default:
 			zwarnnam(name, "invalid retry specification character `%c'",
-				 NULL, *p);
+				 *p);
 			return 1;
 		    }
 		    if (p[1]) {
 			zwarnnam(name, "too many retry specification characters: `%s'",
-				 p + 1, 0);
+				 p + 1);
 			return 1;
 		    }
 		}
@@ -557,8 +556,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.keyvar = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "variable name expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "variable name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.keyvar = *++argv;
@@ -570,8 +568,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.func = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "function name expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "function name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.func = *++argv;
@@ -588,7 +585,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.explain = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "string expected after -%c", NULL, **argv);
+		    zwarnnam(name, "string expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.explain = *++argv;
@@ -601,7 +598,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "function/variable expected after -%c",
-			     NULL, **argv);
+			     **argv);
 		} else {
 		    cct.ylist = *++argv;
 		    *argv = "" - 1;
@@ -612,7 +609,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.prefix = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "string expected after -%c", NULL, **argv);
+		    zwarnnam(name, "string expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.prefix = *++argv;
@@ -624,7 +621,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.suffix = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "string expected after -%c", NULL, **argv);
+		    zwarnnam(name, "string expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.suffix = *++argv;
@@ -636,8 +633,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.glob = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "glob pattern expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "glob pattern expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.glob = *++argv;
@@ -649,8 +645,8 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.str = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "command string expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "command string expected after -%c",
+			     **argv);
 		    return 1;
 		} else {
 		    cct.str = *++argv;
@@ -659,14 +655,13 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'l':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", **argv);
 		    return 1;
 		} else if ((*argv)[1]) {
 		    cct.subcmd = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "command name expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "command name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.subcmd = *++argv;
@@ -675,14 +670,13 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'h':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", **argv);
 		    return 1;
 		} else if ((*argv)[1]) {
 		    cct.substr = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "command name expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "command name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.substr = *++argv;
@@ -694,8 +688,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.withd = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "path expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "path expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.withd = *++argv;
@@ -707,8 +700,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.gname = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "group name expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "group name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.gname = *++argv;
@@ -720,8 +712,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.gname = (*argv) + 1;
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "group name expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "group name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.gname = *++argv;
@@ -750,8 +741,8 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    }
 		    *argv = "" - 1;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "matching specification expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "matching specification expected after -%c",
+			     **argv);
 		    return 1;
 		} else {
 		    if ((cct.matcher =
@@ -770,13 +761,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		else if (argv[1])
 		    cct.hnum = atoi(*++argv);
 		else {
-		    zwarnnam(name, "number expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "number expected after -%c", **argv);
 		    return 1;
 		}
 		if (!argv[1]) {
-		    zwarnnam(name, "missing pattern after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "missing pattern after -%c", **argv);
 		    return 1;
 		}
 		cct.hpat = *++argv;
@@ -788,63 +777,59 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'C':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", **argv);
 		    return 1;
 		}
 		if (first && !hx) {
 		    cclist |= COMP_COMMAND;
 		} else {
-		    zwarnnam(name, "misplaced command completion (-C) flag",
-			    NULL, 0);
+		    zwarnnam(name, "misplaced command completion (-C) flag");
 		    return 1;
 		}
 		break;
 	    case 'D':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", **argv);
 		    return 1;
 		}
 		if (first && !hx) {
 		    isdef = 1;
 		    cclist |= COMP_DEFAULT;
 		} else {
-		    zwarnnam(name, "misplaced default completion (-D) flag",
-			    NULL, 0);
+		    zwarnnam(name, "misplaced default completion (-D) flag");
 		    return 1;
 		}
 		break;
  	    case 'T':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", **argv);
 		    return 1;
 		}
 		if (first && !hx) {
  		    cclist |= COMP_FIRST;
  		} else {
- 		    zwarnnam(name, "misplaced first completion (-T) flag",
- 			    NULL, 0);
+ 		    zwarnnam(name, "misplaced first completion (-T) flag");
  		    return 1;
  		}
  		break;
 	    case 'L':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", NULL, **argv);
+		    zwarnnam(name, "illegal option -%c", **argv);
 		    return 1;
 		}
 		if (!first || hx) {
-		    zwarnnam(name, "illegal use of -L flag", NULL, 0);
+		    zwarnnam(name, "illegal use of -L flag");
 		    return 1;
 		}
 		cclist |= COMP_LIST;
 		break;
 	    case 'x':
 		if (cl) {
-		    zwarnnam(name, "extended completion not allowed", NULL, 0);
+		    zwarnnam(name, "extended completion not allowed");
 		    return 1;
 		}
 		if (!argv[1]) {
-		    zwarnnam(name, "condition expected after -%c", NULL,
-			    **argv);
+		    zwarnnam(name, "condition expected after -%c", **argv);
 		    return 1;
 		}
 		if (first) {
@@ -856,8 +841,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    }
 		    ready = 2;
 		} else {
-		    zwarnnam(name, "recursive extended completion not allowed",
-			    NULL, 0);
+		    zwarnnam(name, "recursive extended completion not allowed");
 		    return 1;
 		}
 		break;
@@ -865,7 +849,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		if (!first && (**argv == '-' || **argv == '+') && !argv[0][1])
 		    (*argv)--, argv--, ready = 1;
 		else {
-		    zwarnnam(name, "bad option: -%c", NULL, **argv);
+		    zwarnnam(name, "bad option: -%c", **argv);
 		    return 1;
 		}
 	    }
@@ -874,7 +858,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 	if (*++argv && (!ready || ready == 2) &&
 	    **argv == '+' && !argv[0][1]) {
 	    if (cl) {
-		zwarnnam(name, "xor'ed completion illegal", NULL, 0);
+		zwarnnam(name, "xor'ed completion illegal");
 		return 1;
 	    }
 	    /* There's an alternative (+) completion:  assign
@@ -892,8 +876,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		/* No argument to +, which means do default completion */
 		if (isdef)
 		    zwarnnam(name,
-			    "recursive xor'd default completions not allowed",
-			    NULL, 0);
+			    "recursive xor'd default completions not allowed");
 		else
 		    cc->xor = &cc_default;
 	    } else {
@@ -983,7 +966,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 		break;
 	    default:
 		t[1] = '\0';
-		zwarnnam(name, "unknown condition code: %s", t, 0);
+		zwarnnam(name, "unknown condition code: %s", t);
 		zfree(m, sizeof(struct compcond));
 
 		return 1;
@@ -991,7 +974,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 	    /* Now get the arguments in square brackets */
 	    if (t[1] != '[') {
 		t[1] = '\0';
-		zwarnnam(name, "expected condition after condition code: %s", t, 0);
+		zwarnnam(name, "expected condition after condition code: %s", t);
 		zfree(m, sizeof(struct compcond));
 
 		return 1;
@@ -1016,7 +999,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 
 	    if (l) {
 		t[1] = '\0';
-		zwarnnam(name, "error after condition code: %s", t, 0);
+		zwarnnam(name, "error after condition code: %s", t);
 		zfree(m, sizeof(struct compcond));
 
 		return 1;
@@ -1050,7 +1033,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 		    /* p[...] or m[...]:  one or two numbers expected */
 		    for (; *t && *t != '\201' && *t != '\200'; t++);
 		    if (!(sav = *t)) {
-			zwarnnam(name, "error in condition", NULL, 0);
+			zwarnnam(name, "error in condition");
 			freecompcond(m);
 			return 1;
 		    }
@@ -1064,7 +1047,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 			tt = ++t;
 			for (; *t && *t != '\200'; t++);
 			if (!*t) {
-			    zwarnnam(name, "error in condition", NULL, 0);
+			    zwarnnam(name, "error in condition");
 			    freecompcond(m);
 			    return 1;
 			}
@@ -1079,7 +1062,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 			if (*t == '\201')
 			    *t = ',';
 		    if (!*t) {
-			zwarnnam(name, "error in condition", NULL, 0);
+			zwarnnam(name, "error in condition");
 			freecompcond(m);
 			return 1;
 		    }
@@ -1092,7 +1075,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 		    /* -r[..,..] or -R[..,..]:  two strings expected */
 		    for (; *t && *t != '\201' && *t != '\200'; t++);
 		    if (!*t) {
-			zwarnnam(name, "error in condition", NULL, 0);
+			zwarnnam(name, "error in condition");
 			freecompcond(m);
 			return 1;
 		    }
@@ -1106,7 +1089,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 			    if (*t == '\201')
 				*t = ',';
 			if (!*t) {
-			    zwarnnam(name, "error in condition", NULL, 0);
+			    zwarnnam(name, "error in condition");
 			    freecompcond(m);
 			    return 1;
 			}
@@ -1119,7 +1102,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 		    /* remaining patterns are number followed by string */
 		    for (; *t && *t != '\200' && *t != '\201'; t++);
 		    if (!*t || *t == '\200') {
-			zwarnnam(name, "error in condition", NULL, 0);
+			zwarnnam(name, "error in condition");
 			freecompcond(m);
 			return 1;
 		    }
@@ -1130,7 +1113,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 			if (*t == '\201')
 			    *t = ',';
 		    if (!*t) {
-			zwarnnam(name, "error in condition", NULL, 0);
+			zwarnnam(name, "error in condition");
 			freecompcond(m);
 			return 1;
 		    }
@@ -1167,7 +1150,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 	     */
 	    if (!argv || !*argv || **argv != '-' ||
 		((!argv[0][1] || argv[0][1] == '+') && !argv[1])) {
-		zwarnnam(name, "missing command names", NULL, 0);
+		zwarnnam(name, "missing command names");
 		return 1;
 	    }
 	    if (!strcmp(*argv, "--"))
@@ -1201,7 +1184,7 @@ cc_assign(char *name, Compctl *ccptr, Compctl cct, int reass)
 	    || cclist == (COMP_COMMAND|COMP_FIRST)
 	    || cclist == (COMP_DEFAULT|COMP_FIRST)
 	    || cclist == COMP_SPECIAL) {
- 	    zwarnnam(name, "can't set -D, -T, and -C simultaneously", NULL, 0);
+ 	    zwarnnam(name, "can't set -D, -T, and -C simultaneously");
 	    /* ... because the following code wouldn't work. */
 	    return 1;
 	}
@@ -1648,7 +1631,7 @@ bin_compctl(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		n = NULL;
 	    }
 	    if (n) {
-		zwarnnam(name, "no compctl defined for %s", n, 0);
+		zwarnnam(name, "no compctl defined for %s", n);
 		ret = 1;
 	    }
 	}
@@ -1669,7 +1652,7 @@ bin_compctl(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    /* Ideally we'd handle this properly, setting both the *
 	     * special and normal completions.  For the moment,    *
 	     * this is better than silently failing.               */
-	    zwarnnam(name, "extraneous commands ignored", NULL, 0);
+	    zwarnnam(name, "extraneous commands ignored");
 	else
 	    compctl_process_cc(argv, cc);
     }
@@ -1686,7 +1669,7 @@ static int
 bin_compcall(char *name, UNUSED(char **argv), Options ops, UNUSED(int func))
 {
     if (incompfunc != 1) {
-	zwarnnam(name, "can only be called from completion function", NULL, 0);
+	zwarnnam(name, "can only be called from completion function");
 	return 1;
     }
     return makecomplistctl((OPT_ISSET(ops,'T') ? 0 : CFN_FIRST) |

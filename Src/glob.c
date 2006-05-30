@@ -486,7 +486,7 @@ scanner(Complist q)
 	    if (err == -1)
 		return;
 	    if (err) {
-		zerr("current directory lost during glob", NULL, 0);
+		zerr("current directory lost during glob");
 		return;
 	    }
 	    pathbufcwd = pathpos;
@@ -550,7 +550,7 @@ scanner(Complist q)
 		    if (err == -1)
 			break;
 		    if (err) {
-			zerr("current directory lost during glob", NULL, 0);
+			zerr("current directory lost during glob");
 			break;
 		    }
 		    pathbufcwd = pathpos;
@@ -591,7 +591,7 @@ scanner(Complist q)
 			if (statfullpath(fn, &buf, !q->follow)) {
 			    if (errno != ENOENT && errno != EINTR &&
 				errno != ENOTDIR && !errflag) {
-				zwarn("%e: %s", fn, errno);
+				zwarn("%e: %s", errno, fn);
 			    }
 			    continue;
 			}
@@ -630,7 +630,7 @@ scanner(Complist q)
     }
     if (pbcwdsav < pathbufcwd) {
 	if (restoredir(&ds))
-	    zerr("current directory lost during glob", NULL, 0);
+	    zerr("current directory lost during glob");
 	zsfree(ds.dirname);
 	if (ds.dirfd >= 0)
 	    close(ds.dirfd);
@@ -755,7 +755,7 @@ qgetnum(char **s)
     off_t v = 0;
 
     if (!idigit(**s)) {
-	zerr("number expected", NULL, 0);
+	zerr("number expected");
 	return 0;
     }
     while (idigit(**s))
@@ -814,7 +814,7 @@ qgetmodespec(char **s)
 		    val |= t | (t << 3) | (t << 6);
 		    break;
 		default:
-		    zerr("invalid mode specification", NULL, 0);
+		    zerr("invalid mode specification");
 		    return 0;
 		}
 	    }
@@ -838,7 +838,7 @@ qgetmodespec(char **s)
 		p++;
 	    }
 	    if (end && c != end && c != ',') {
-		zerr("invalid mode specification", NULL, 0);
+		zerr("invalid mode specification");
 		return 0;
 	    }
 	    if (how == '=') {
@@ -849,7 +849,7 @@ qgetmodespec(char **s)
 	    else
 		no |= val;
 	} else {
-	    zerr("invalid mode specification", NULL, 0);
+	    zerr("invalid mode specification");
 	    return 0;
         }
     } while (end && c != end);
@@ -1259,8 +1259,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			/* Find matching delimiters */
 			tt = get_strarg(s);
 			if (!*tt) {
-			    zerr("missing end of name",
-				 NULL, 0);
+			    zerr("missing end of name");
 			    data = 0;
 			} else {
 #ifdef USE_GETPWNAM
@@ -1271,13 +1270,13 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    if ((pw = getpwnam(s + 1)))
 				data = pw->pw_uid;
 			    else {
-				zerr("unknown user", NULL, 0);
+				zerr("unknown user");
 				data = 0;
 			    }
 			    *tt = sav;
 #else /* !USE_GETPWNAM */
 			    sav = *tt;
-			    zerr("unknown user", NULL, 0);
+			    zerr("unknown user");
 			    data = 0;
 #endif /* !USE_GETPWNAM */
 			    if (sav)
@@ -1299,8 +1298,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 
 			tt = get_strarg(s);
 			if (!*tt) {
-			    zerr("missing end of name",
-				 NULL, 0);
+			    zerr("missing end of name");
 			    data = 0;
 			} else {
 #ifdef USE_GETGRNAM
@@ -1311,13 +1309,13 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    if ((gr = getgrnam(s + 1)))
 				data = gr->gr_gid;
 			    else {
-				zerr("unknown group", NULL, 0);
+				zerr("unknown group");
 				data = 0;
 			    }
 			    *tt = sav;
 #else /* !USE_GETGRNAM */
 			    sav = *tt;
-			    zerr("unknown group", NULL, 0);
+			    zerr("unknown group");
 			    data = 0;
 #endif /* !USE_GETGRNAM */
 			    if (sav)
@@ -1420,14 +1418,14 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    case 'd': t = GS_DEPTH; break;
 		    case 'N': t = GS_NONE; break;
 		    default:
-			zerr("unknown sort specifier", NULL, 0);
+			zerr("unknown sort specifier");
 			restore_globstate(saved);
 			return;
 		    }
 		    if ((sense & 2) && !(t & (GS_NAME|GS_DEPTH)))
 			t <<= GS_SHIFT;
 		    if (gf_sorts & t) {
-			zerr("doubled sort specifier", NULL, 0);
+			zerr("doubled sort specifier");
 			restore_globstate(saved);
 			return;
 		    }
@@ -1450,7 +1448,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    tt++;
 			if (tt == s)
 			{
-			    zerr("missing identifier after `+'", NULL, 0);
+			    zerr("missing identifier after `+'");
 			    tt = NULL;
 			}
 		    } else {
@@ -1458,7 +1456,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			tt = get_strarg(s);
 			if (!*tt)
 			{
-			    zerr("missing end of string", NULL, 0);
+			    zerr("missing end of string");
 			    tt = NULL;
 			}
 		    }
@@ -1490,7 +1488,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    v.end = -1;
 		    v.inv = 0;
 		    if (getindex(&s, &v, 0) || s == os) {
-			zerr("invalid subscript", NULL, 0);
+			zerr("invalid subscript");
 			restore_globstate(saved);
 			return;
 		    }
@@ -1499,7 +1497,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    break;
 		}
 		default:
-		    zerr("unknown file attribute", NULL, 0);
+		    zerr("unknown file attribute");
 		    restore_globstate(saved);
 		    return;
 		}
@@ -1591,7 +1589,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	    return;
 	}
 	errflag = 0;
-	zerr("bad pattern: %s", ostr, 0);
+	zerr("bad pattern: %s", ostr);
 	return;
     }
     if (!gf_nsorts) {
@@ -1616,7 +1614,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	if (isset(CSHNULLGLOB)) {
 	    badcshglob |= 1;	/* at least one cmd. line expansion failed */
 	} else if (isset(NOMATCH)) {
-	    zerr("no matches found: %s", ostr, 0);
+	    zerr("no matches found: %s", ostr);
 	    free(matchbuf);
 	    restore_globstate(saved);
 	    return;
@@ -1818,13 +1816,13 @@ xpandredir(struct redir *fn, LinkList tab)
 		if (!*s && s > fn->name)
 		    fn->fd2 = zstrtol(fn->name, NULL, 10);
 		else if (fn->type == REDIR_MERGEIN)
-		    zerr("file number expected", NULL, 0);
+		    zerr("file number expected");
 		else
 		    fn->type = REDIR_ERRWRITE;
 	    }
 	}
     } else if (fn->type == REDIR_MERGEIN)
-	zerr("file number expected", NULL, 0);
+	zerr("file number expected");
     else {
 	if (fn->type == REDIR_MERGEOUT)
 	    fn->type = REDIR_ERRWRITE;
@@ -2004,7 +2002,7 @@ matchpat(char *a, char *b)
     Patprog p = patcompile(b, PAT_STATIC, NULL);
 
     if (!p) {
-	zerr("bad pattern: %s", b, 0);
+	zerr("bad pattern: %s", b);
 	return 0;
     }
     return pattry(p, a);
@@ -2136,7 +2134,7 @@ compgetmatch(char *pat, int *flp, char **replstrp)
 	patflags &= ~PAT_NOANCH;
     p = patcompile(pat, patflags, NULL);
     if (!p) {
-	zerr("bad pattern: %s", pat, 0);
+	zerr("bad pattern: %s", pat);
 	return NULL;
     }
     if (*replstrp) {

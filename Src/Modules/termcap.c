@@ -134,7 +134,7 @@ bin_echotc(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     t = tgetstr(s, &u);
     if (t == (char *)-1 || !t || !*t) {
 	/* capability doesn't exist, or (if boolean) is off */
-	zwarnnam(name, "no such capability: %s", s, 0);
+	zwarnnam(name, "no such capability: %s", s);
 	return 1;
     }
     /* count the number of arguments required */
@@ -147,7 +147,7 @@ bin_echotc(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     /* check that the number of arguments provided is correct */
     if (arrlen(argv) != argct) {
 	zwarnnam(name, (arrlen(argv) < argct) ? "not enough arguments" :
-		 "too many arguments", NULL, 0);
+		 "too many arguments");
 	return 1;
     }
     /* output string, through the proper termcap functions */
@@ -263,7 +263,7 @@ gettermcap(UNUSED(HashTable ht), char *name)
 	pm->u.str = dupstring(tcstr);
 	pm->node.flags |= PM_SCALAR;
     } else {
-	/* zwarn("no such capability: %s", name, 0); */
+	/* zwarn("no such capability: %s", name); */
 	pm->u.str = dupstring("");
 	pm->node.flags |= PM_UNSET;
     }

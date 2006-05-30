@@ -125,7 +125,7 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		char *str2 = str;
 		str2++;
 		if (skipparens(Inbrack, Outbrack, &str2)) {
-		    zerr("closing bracket missing", NULL, 0);
+		    zerr("closing bracket missing");
 		    return NULL;
 		}
 		str2[-1] = *str = '\0';
@@ -189,7 +189,7 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		    *str = ztokens[c - Pound];
 	    str++;
 	    if (!(pl = getoutput(str2 + 1, qt || ssub))) {
-		zerr("parse error in command substitution", NULL, 0);
+		zerr("parse error in command substitution");
 		return NULL;
 	    }
 	    if (endchar == Outpar)
@@ -275,7 +275,7 @@ globlist(LinkList list, int nountok)
 	zglob(list, node, nountok);
     }
     if (badcshglob == 1)
-	zerr("no match", NULL, 0);
+	zerr("no match");
 }
 
 /* perform substitution on a single word */
@@ -485,7 +485,7 @@ filesubstr(char **namptr, int assign)
 	    *ptr = 0;
 	    if (!(hom = getnameddir(str))) {
 		if (isset(NOMATCH))
-		    zerr("no such user or named directory: %s", str, 0);
+		    zerr("no such user or named directory: %s", str);
 		*ptr = save;
 		return 0;
 	    }
@@ -501,7 +501,7 @@ filesubstr(char **namptr, int assign)
 	*pp = 0;
 	if (!(cnam = findcmd(str + 1, 1))) {
 	    if (isset(NOMATCH))
-		zerr("%s not found", str + 1, 0);
+		zerr("%s not found", str + 1);
 	    return 0;
 	}
 	*namptr = dupstring(cnam);
@@ -1376,7 +1376,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		default:
 		  flagerr:
-		    zerr("error in flags", NULL, 0);
+		    zerr("error in flags");
 		    return NULL;
 		}
 	    }
@@ -1457,7 +1457,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		*str = aptr + 1;
 		return n;
 	    } else {
-		zerr("bad substitution", NULL, 0);
+		zerr("bad substitution");
 		return NULL;
 	    }
 	} else if (inbrace && inull(*s)) {
@@ -1859,7 +1859,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	c != '#' && c != Pound &&
 	c != '?' && c != Quest &&
 	c != '}' && c != Outbrace) {
-	zerr("bad substitution", NULL, 0);
+	zerr("bad substitution");
 	return NULL;
     }
     /*
@@ -1928,7 +1928,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 	if (bct) {
 	noclosebrace:
-	    zerr("closing brace expected", NULL, 0);
+	    zerr("closing brace expected");
 	    return NULL;
 	}
 	if (c)
@@ -2134,12 +2134,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '?':
 	case Quest:
 	    if (vunset) {
-		char *msg;
-
 		*idend = '\0';
-		msg = tricat(idbeg, ": ", *s ? s : "parameter not set");
-		zerr("%s", msg, 0);
-		zsfree(msg);
+		zerr("%s: %s", idbeg, *s ? s : "parameter not set");
 		if (!interact)
 		    exit(1);
 		return NULL;
@@ -2168,8 +2164,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    if (haserr)
 			shtokenize(s);
 		} else if (haserr || errflag) {
-		    zerr("parse error in ${...%c...} substitution",
-			 NULL, s[-1]);
+		    zerr("parse error in ${...%c...} substitution", s[-1]);
 		    return NULL;
 		}
 	    }
@@ -2228,7 +2223,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	} else if (vunset) {
 	    if (unset(UNSET)) {
 		*idend = '\0';
-		zerr("%s: parameter not set", idbeg, 0);
+		zerr("%s: parameter not set", idbeg);
 		return NULL;
 	    }
 	    val = dupstring("");
@@ -2262,9 +2257,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		copied = 1;
 		if (inbrace && *s) {
 		    if (*s == ':' && !imeta(s[1]))
-			zerr("unrecognized modifier `%c'", NULL, s[1]);
+			zerr("unrecognized modifier `%c'", s[1]);
 		    else
-			zerr("unrecognized modifier", NULL, 0);
+			zerr("unrecognized modifier");
 		    return NULL;
 		}
 	    }
@@ -2517,7 +2512,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (!quoteerr)
 		    errflag = oef;
 		else if (haserr || errflag) {
-		    zerr("parse error in parameter value", NULL, 0);
+		    zerr("parse error in parameter value");
 		    return NULL;
 		}
 	    }
@@ -2549,7 +2544,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (!quoteerr)
 		    errflag = oef;
 		else if (haserr || errflag) {
-		    zerr("parse error in parameter value", NULL, 0);
+		    zerr("parse error in parameter value");
 		    return NULL;
 		}
 		remnulargs(val);
@@ -2897,7 +2892,7 @@ modify(char **str, char **ptr)
 		del = *ptr1++;
 		for (ptr2 = ptr1; *ptr2 != del && *ptr2; ptr2++);
 		if (!*ptr2) {
-		    zerr("bad substitution", NULL, 0);
+		    zerr("bad substitution");
 		    return;
 		}
 		*ptr2++ = '\0';
@@ -2909,7 +2904,7 @@ modify(char **str, char **ptr)
 		    hsubl = ztrdup(ptr1);
  		}
 		if (!hsubl) {
-		    zerr("no previous substitution", NULL, 0);
+		    zerr("no previous substitution");
 		    return;
 		}
 		zsfree(hsubr);
@@ -3118,7 +3113,7 @@ dstackent(char ch, int val)
 	if (backwards && !val)
 	    return pwd;
 	if (isset(NOMATCH))
-	    zerr("not enough directory stack entries.", NULL, 0);
+	    zerr("not enough directory stack entries.");
 	return NULL;
     }
     return (char *)getdata(n);

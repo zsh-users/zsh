@@ -72,7 +72,7 @@ struct heredocs *hdocs;
 #define YYERROR(O)  { tok = LEXERR; ecused = (O); return 0; }
 #define YYERRORV(O) { tok = LEXERR; ecused = (O); return; }
 #define COND_ERROR(X,Y) do { \
-  zwarn(X,Y,0); \
+  zwarn(X,Y); \
   herrflush(); \
   if (noerrs != 2) \
     errflag = 1; \
@@ -2180,7 +2180,7 @@ yyerror(int noerr)
     else if (t0)
 	zwarn("parse error near `%l'", t, t0);
     else
-	zwarn("parse error", NULL, 0);
+	zwarn("parse error");
     if (!noerr && noerrs != 2)
 	errflag = 1;
 }
@@ -2538,11 +2538,11 @@ bin_zcompile(char *nam, char **args, Options ops, UNUSED(int func))
 	(OPT_ISSET(ops,'c') &&
 	 (OPT_ISSET(ops,'U') || OPT_ISSET(ops,'k') || OPT_ISSET(ops,'z'))) ||
 	(!(OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a')) && OPT_ISSET(ops,'m'))) {
-	zwarnnam(nam, "illegal combination of options", NULL, 0);
+	zwarnnam(nam, "illegal combination of options");
 	return 1;
     }
     if ((OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a')) && isset(KSHAUTOLOAD))
-	zwarnnam(nam, "functions will use zsh style autoloading", NULL, 0);
+	zwarnnam(nam, "functions will use zsh style autoloading");
 
     flags = (OPT_ISSET(ops,'k') ? FDHF_KSHLOAD :
 	     (OPT_ISSET(ops,'z') ? FDHF_ZSHLOAD : 0));
@@ -2551,7 +2551,7 @@ bin_zcompile(char *nam, char **args, Options ops, UNUSED(int func))
 	Wordcode f;
 
 	if (!*args) {
-	    zwarnnam(nam, "too few arguments", NULL, 0);
+	    zwarnnam(nam, "too few arguments");
 	    return 1;
 	}
 	if (!(f = load_dump_header(nam, (strsfx(FD_EXT, *args) ? *args :
@@ -2574,7 +2574,7 @@ bin_zcompile(char *nam, char **args, Options ops, UNUSED(int func))
 	}
     }
     if (!*args) {
-	zwarnnam(nam, "too few arguments", NULL, 0);
+	zwarnnam(nam, "too few arguments");
 	return 1;
     }
     map = (OPT_ISSET(ops,'M') ? 2 : (OPT_ISSET(ops,'R') ? 0 : 1));
@@ -2611,7 +2611,7 @@ load_dump_header(char *nam, char *name, int err)
 
     if ((fd = open(name, O_RDONLY)) < 0) {
 	if (err)
-	    zwarnnam(nam, "can't open zwc file: %s", name, 0);
+	    zwarnnam(nam, "can't open zwc file: %s", name);
 	return NULL;
     }
     if (read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
@@ -2619,13 +2619,10 @@ load_dump_header(char *nam, char *name, int err)
 	(v = (fdmagic(buf) != FD_MAGIC && fdmagic(buf) != FD_OMAGIC))) {
 	if (err) {
 	    if (v) {
-		char msg[80];
-
-		sprintf(msg, "zwc file has wrong version (zsh-%s): %%s",
-			fdversion(buf));
-		zwarnnam(nam, msg , name, 0);
+		zwarnnam(nam, "zwc file has wrong version (zsh-%s): %s",
+			 fdversion(buf), name);
 	    } else
-		zwarnnam(nam, "invalid zwc file: %s" , name, 0);
+		zwarnnam(nam, "invalid zwc file: %s" , name);
 	}
 	close(fd);
 	return NULL;
@@ -2643,7 +2640,7 @@ load_dump_header(char *nam, char *name, int err)
 	    if (lseek(fd, o, 0) == -1 ||
 		read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
 		((FD_PRELEN + 1) * sizeof(wordcode))) {
-		zwarnnam(nam, "invalid zwc file: %s" , name, 0);
+		zwarnnam(nam, "invalid zwc file: %s" , name);
 		close(fd);
 		return NULL;
 	    }
@@ -2655,7 +2652,7 @@ load_dump_header(char *nam, char *name, int err)
 	len -= (FD_PRELEN + 1) * sizeof(wordcode);
 	if (read(fd, head + (FD_PRELEN + 1), len) != len) {
 	    close(fd);
-	    zwarnnam(nam, "invalid zwc file: %s" , name, 0);
+	    zwarnnam(nam, "invalid zwc file: %s" , name);
 	    return NULL;
 	}
 	close(fd);
@@ -2756,7 +2753,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 
     unlink(dump);
     if ((dfd = open(dump, O_WRONLY|O_CREAT, 0444)) < 0) {
-	zwarnnam(nam, "can't write zwc file: %s", dump, 0);
+	zwarnnam(nam, "can't write zwc file: %s", dump);
 	return 1;
     }
     progs = newlinklist();
@@ -2775,7 +2772,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	    if (fd >= 0)
 		close(fd);
 	    close(dfd);
-	    zwarnnam(nam, "can't open file: %s", *files, 0);
+	    zwarnnam(nam, "can't open file: %s", *files);
 	    noaliases = ona;
 	    unlink(dump);
 	    return 1;
@@ -2787,7 +2784,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	    close(fd);
 	    close(dfd);
 	    zfree(file, flen);
-	    zwarnnam(nam, "can't read file: %s", *files, 0);
+	    zwarnnam(nam, "can't read file: %s", *files);
 	    noaliases = ona;
 	    unlink(dump);
 	    return 1;
@@ -2799,7 +2796,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	    errflag = 0;
 	    close(dfd);
 	    zfree(file, flen);
-	    zwarnnam(nam, "can't read file: %s", *files, 0);
+	    zwarnnam(nam, "can't read file: %s", *files);
 	    noaliases = ona;
 	    unlink(dump);
 	    return 1;
@@ -2840,13 +2837,13 @@ cur_add_func(char *nam, Shfunc shf, LinkList names, LinkList progs,
 	int ona = noaliases;
 
 	if (!(what & 2)) {
-	    zwarnnam(nam, "function is not loaded: %s", shf->node.nam, 0);
+	    zwarnnam(nam, "function is not loaded: %s", shf->node.nam);
 	    return 1;
 	}
 	noaliases = (shf->node.flags & PM_UNALIASED);
 	if (!(prog = getfpfunc(shf->node.nam, NULL)) || prog == &dummy_eprog) {
 	    noaliases = ona;
-	    zwarnnam(nam, "can't load function: %s", shf->node.nam, 0);
+	    zwarnnam(nam, "can't load function: %s", shf->node.nam);
 	    return 1;
 	}
 	if (prog->dump)
@@ -2854,7 +2851,7 @@ cur_add_func(char *nam, Shfunc shf, LinkList names, LinkList progs,
 	noaliases = ona;
     } else {
 	if (!(what & 1)) {
-	    zwarnnam(nam, "function is already loaded: %s", shf->node.nam, 0);
+	    zwarnnam(nam, "function is already loaded: %s", shf->node.nam);
 	    return 1;
 	}
 	prog = dupeprog(shf->funcdef, 1);
@@ -2888,7 +2885,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 
     unlink(dump);
     if ((dfd = open(dump, O_WRONLY|O_CREAT, 0444)) < 0) {
-	zwarnnam(nam, "can't write zwc file: %s", dump, 0);
+	zwarnnam(nam, "can't write zwc file: %s", dump);
 	return 1;
     }
     progs = newlinklist();
@@ -2919,7 +2916,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 	for (; *names; names++) {
 	    tokenize(pat = dupstring(*names));
 	    if (!(pprog = patcompile(pat, PAT_STATIC, NULL))) {
-		zwarnnam(nam, "bad pattern: %s", *names, 0);
+		zwarnnam(nam, "bad pattern: %s", *names);
 		close(dfd);
 		unlink(dump);
 		return 1;
@@ -2940,7 +2937,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 	for (; *names; names++) {
 	    if (errflag ||
 		!(shf = (Shfunc) shfunctab->getnode(shfunctab, *names))) {
-		zwarnnam(nam, "unknown function: %s", *names, 0);
+		zwarnnam(nam, "unknown function: %s", *names);
 		errflag = 0;
 		close(dfd);
 		unlink(dump);
@@ -2955,7 +2952,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 	}
     }
     if (empty(progs)) {
-	zwarnnam(nam, "no functions", NULL, 0);
+	zwarnnam(nam, "no functions");
 	errflag = 0;
 	close(dfd);
 	unlink(dump);

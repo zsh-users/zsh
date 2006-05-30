@@ -48,7 +48,7 @@ getposint(char *instr, char *nam)
 
     ret = (int)zstrtol(instr, &eptr, 10);
     if (*eptr || ret < 0) {
-	zwarnnam(nam, "integer expected: %s", instr, 0);
+	zwarnnam(nam, "integer expected: %s", instr);
 	return -1;
     }
 
@@ -83,7 +83,7 @@ bin_sysread(char *nam, char **args, Options ops, UNUSED(int func))
     /* -o: output file descriptor, else store in REPLY */
     if (OPT_ISSET(ops, 'o')) {
 	if (*args) {
-	    zwarnnam(nam, "no argument allowed with -o", NULL, 0);
+	    zwarnnam(nam, "no argument allowed with -o");
 	    return 1;
 	}
 	outfd = getposint(OPT_ARG(ops, 'o'), nam);
@@ -102,7 +102,7 @@ bin_sysread(char *nam, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops, 'c')) {
 	countvar = OPT_ARG(ops, 'c');
 	if (!isident(countvar)) {
-	    zwarnnam(nam, "not an identifier: %s", countvar, 0);
+	    zwarnnam(nam, "not an identifier: %s", countvar);
 	    return 1;
 	}
     }
@@ -116,7 +116,7 @@ bin_sysread(char *nam, char **args, Options ops, UNUSED(int func))
 	 */
 	outvar = *args;
 	if (!isident(outvar)) {
-	    zwarnnam(nam, "not an identifier: %s", outvar, 0);
+	    zwarnnam(nam, "not an identifier: %s", outvar);
 	    return 1;
 	}
     }
@@ -252,7 +252,7 @@ bin_syswrite(char *nam, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops, 'c')) {
 	countvar = OPT_ARG(ops, 'c');
 	if (!isident(countvar)) {
-	    zwarnnam(nam, "not an identifier: %s", countvar, 0);
+	    zwarnnam(nam, "not an identifier: %s", countvar);
 	    return 1;
 	}
     }
@@ -299,7 +299,7 @@ bin_syserror(char *nam, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops, 'e')) {
 	errvar = OPT_ARG(ops, 'e');
 	if (!isident(errvar)) {
-	    zwarnnam(nam, "not an identifier: %s", errvar, 0);
+	    zwarnnam(nam, "not an identifier: %s", errvar);
 	    return 1;
 	}
     }

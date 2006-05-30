@@ -249,7 +249,7 @@ math_func(char *name, int argc, mnumber *argv, int id)
       }
 
       if (rtst) {
-	  zerr("math: argument to %s out of range", name, 0);
+	  zerr("math: argument to %s out of range", name);
 	  return ret;
       }
   }

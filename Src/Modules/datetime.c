@@ -42,7 +42,7 @@ bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops,'s')) {
 	scalar = OPT_ARG(ops, 's');
 	if (!isident(scalar)) {
-	    zwarnnam(nam, "not an identifier: %s", scalar, 0);
+	    zwarnnam(nam, "not an identifier: %s", scalar);
 	    return 1;
 	}
     }
@@ -52,7 +52,7 @@ bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 	zwarnnam(nam, "%s: %e", argv[1], errno);
 	return 1;
     } else if (*endptr != '\0') {
-	zwarnnam(nam, "%s: invalid decimal number", argv[1], 0);
+	zwarnnam(nam, "%s: invalid decimal number", argv[1]);
 	return 1;
     }
 

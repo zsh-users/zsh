@@ -153,6 +153,10 @@ char *alloca _((size_t));
 # include <stdlib.h>
 #endif
 
+#ifdef HAVE_STDARG_H
+# include <stdarg.h>
+#endif
+
 #ifdef HAVE_ERRNO_H
 # include <errno.h>
 #endif

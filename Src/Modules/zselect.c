@@ -43,12 +43,12 @@ handle_digits(char *nam, char *argptr, fd_set *fdset, int *fdmax)
     char *endptr;
 
     if (!idigit(*argptr)) {
-	zwarnnam(nam, "expecting file descriptor: %s", argptr, 0);
+	zwarnnam(nam, "expecting file descriptor: %s", argptr);
 	return 1;
     }
     fd = (int)zstrtol(argptr, &endptr, 10);
     if (*endptr) {
-	zwarnnam(nam, "garbage after file descriptor: %s", endptr, 0);
+	zwarnnam(nam, "garbage after file descriptor: %s", endptr);
 	return 1;
     }
 
@@ -95,12 +95,11 @@ bin_zselect(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    else if (args[1]) {
 			argptr = *++args;
 		    } else {
-			zwarnnam(nam, "argument expected after -%c", NULL,
-				 *argptr);
+			zwarnnam(nam, "argument expected after -%c", *argptr);
 			return 1;
 		    }
 		    if (idigit(*argptr) || !isident(argptr)) {
-			zwarnnam(nam, "invalid array name: %s", argptr, 0);
+			zwarnnam(nam, "invalid array name: %s", argptr);
 			return 1;
 		    }
 		    if (i == 'a')
@@ -138,18 +137,17 @@ bin_zselect(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    else if (args[1]) {
 			argptr = *++args;
 		    } else {
-			zwarnnam(nam, "argument expected after -%c", NULL, 
-				 *argptr);
+			zwarnnam(nam, "argument expected after -%c", *argptr);
 			return 1;
 		    }
 		    if (!idigit(*argptr)) {
-			zwarnnam(nam, "number expected after -t", NULL, 0);
+			zwarnnam(nam, "number expected after -t");
 			return 1;
 		    }
 		    tempnum = zstrtol(argptr, &endptr, 10);
 		    if (*endptr) {
 			zwarnnam(nam, "garbage after -t argument: %s",
-				 endptr, 0);
+				 endptr);
 			return 1;
 		    }
 		    /* timevalue now active */
@@ -180,7 +178,7 @@ bin_zselect(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
     if (i <= 0) {
 	if (i < 0)
-	    zwarnnam(nam, "error on select: %e", NULL, errno);
+	    zwarnnam(nam, "error on select: %e", errno);
 	/* else no fd's set.  Presumably a timeout. */
 	return 1;
     }
@@ -264,8 +262,7 @@ bin_zselect(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     return 0;
 #else
     /* TODO: use poll */
-    zerrnam(nam, "your system does not implement the select system call.",
-	    NULL, 0);
+    zerrnam(nam, "your system does not implement the select system call.");
     return 2;
 #endif
 }

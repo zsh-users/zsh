@@ -460,7 +460,7 @@ getlanginfo(UNUSED(HashTable ht), char *name)
     }
     else
     {
-	/* zwarn("no such lang info: %s", name, 0); */
+	/* zwarn("no such lang info: %s", name); */
 	pm->u.str = dupstring("");
 	pm->node.flags |= PM_UNSET;
     }

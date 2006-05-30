@@ -196,7 +196,7 @@ zsetlimit(int limnum, char *nam)
 	limits[limnum].rlim_cur != current_limits[limnum].rlim_cur) {
 	if (setrlimit(limnum, limits + limnum)) {
 	    if (nam)
-		zwarnnam(nam, "setrlimit failed: %e", NULL, errno);
+		zwarnnam(nam, "setrlimit failed: %e", errno);
 	    return -1;
 	}
 	current_limits[limnum] = limits[limnum];
@@ -233,14 +233,14 @@ zfork(struct timeval *tv)
      * Is anybody willing to explain this test?
      */
     if (thisjob != -1 && thisjob >= jobtabsize - 1 && !expandjobtab()) {
-	zerr("job table full", NULL, 0);
+	zerr("job table full");
 	return -1;
     }
     if (tv)
 	gettimeofday(tv, &dummy_tz);
     pid = fork();
     if (pid == -1) {
-	zerr("fork failed: %e", NULL, errno);
+	zerr("fork failed: %e", errno);
 	return -1;
     }
 #ifdef HAVE_GETRLIMIT
@@ -406,15 +406,14 @@ zexecve(char *pth, char **argv)
 			for (ptr = execvebuf + 2; *ptr && *ptr == ' '; ptr++);
 			for (ptr2 = ptr; *ptr && *ptr != ' '; ptr++);
 			if (eno == ENOENT) {
-			    char *buf;
 			    if (*ptr)
 				*ptr = '\0';
 			    /*
 			     * TODO: needs variable argument handling
 			     * in zerrmsg() etc. to do this properly.
 			     */
-			    buf = dyncat(pth, ": bad interpreter: %s: %e");
-			    zerr(buf, ptr2, eno);
+			    zerr("%s: bad interpreter: %s: %e", pth, ptr2,
+				 eno);
 			} else if (*ptr) {
 			    *ptr = '\0';
 			    argv[-2] = ptr2;
@@ -483,7 +482,7 @@ execute(LinkList args, int dash, int defpath)
 
     arg0 = (char *) peekfirst(args);
     if (isset(RESTRICTED) && (strchr(arg0, '/') || defpath)) {
-	zerr("%s: restricted", arg0, 0);
+	zerr("%s: restricted", arg0);
 	_exit(1);
     }
 
@@ -522,7 +521,7 @@ execute(LinkList args, int dash, int defpath)
     closem(FDT_XTRACE);
     child_unblock();
     if ((int) strlen(arg0) >= PATH_MAX) {
-	zerr("command too long: %s", arg0, 0);
+	zerr("command too long: %s", arg0);
 	_exit(1);
     }
     for (s = arg0; *s; s++)
@@ -531,7 +530,7 @@ execute(LinkList args, int dash, int defpath)
 	    if (arg0 == s || unset(PATHDIRS) ||
 		(arg0[0] == '.' && (arg0 + 1 == s ||
 				    (arg0[1] == '.' && arg0 + 2 == s)))) {
-		zerr("%e: %s", arg0, errno);
+		zerr("%e: %s", errno, arg0);
 		_exit((errno == EACCES || errno == ENOEXEC) ? 126 : 127);
 	    }
 	    break;
@@ -560,7 +559,7 @@ execute(LinkList args, int dash, int defpath)
 	}
 
 	if (!ps) {
-	    zerr("command not found: %s", arg0, 0);
+	    zerr("command not found: %s", arg0);
 	    _exit(127);
 	}
 
@@ -621,9 +620,9 @@ execute(LinkList args, int dash, int defpath)
     }
 
     if (eno)
-	zerr("%e: %s", arg0, eno);
+	zerr("%e: %s", eno, arg0);
     else
-	zerr("command not found: %s", arg0, 0);
+	zerr("command not found: %s", arg0);
     _exit((eno == EACCES || eno == ENOEXEC) ? 126 : 127);
 }
 
@@ -1440,7 +1439,7 @@ checkclobberparam(struct redir *f)
 
     if (v->pm->node.flags & PM_READONLY) {
 	zwarn("can't allocate file descriptor to readonly parameter %s",
-	      f->varid, 0);
+	      f->varid);
 	/* don't flag a system error for this */
 	errno = 0;
 	return 0;
@@ -1636,7 +1635,7 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
 	mfds[fd1]->rflag = rflag;
     } else {
 	if (mfds[fd1]->rflag != rflag) {
-	    zerr("file mode mismatch on fd %d", NULL, fd1);
+	    zerr("file mode mismatch on fd %d", fd1);
 	    return;
 	}
 	if (mfds[fd1]->ct == 1) {	/* split the stream */
@@ -1736,7 +1735,7 @@ addvars(Estate state, Wordcode pc, int addflags)
 		if ((addflags & ADDVAR_RESTRICT) && isset(RESTRICTED) &&
 		    (pm = (Param) paramtab->removenode(paramtab, name)) &&
 		    (pm->node.flags & PM_RESTRICTED)) {
-		    zerr("%s: restricted", pm->node.nam, 0);
+		    zerr("%s: restricted", pm->node.nam);
 		    zsfree(val);
 		    state->pc = opc;
 		    return;
@@ -1998,7 +1997,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			break;
 		    } else if (!nullcmd || !*nullcmd || opts[CSHNULLCMD] ||
 			       (cflags & BINF_PREFIX)) {
-			zerr("redirection with no command", NULL, 0);
+			zerr("redirection with no command");
 			errflag = lastval = 1;
 			return;
 		    } else if (!nullcmd || !*nullcmd || opts[SHNULLCMD]) {
@@ -2035,7 +2034,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		}
 	    } else if (isset(RESTRICTED) && (cflags & BINF_EXEC) && do_exec) {
 		zerrnam("exec", "%s: restricted",
-			(char *) getdata(firstnode(args)), 0);
+			(char *) getdata(firstnode(args)));
 		lastval = 1;
 		return;
 	    }
@@ -2063,7 +2062,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    if (!(hn = builtintab->getnode(builtintab, cmdarg))) {
 		if (cflags & BINF_BUILTIN) {
-		    zwarn("no such builtin: %s", cmdarg, 0);
+		    zwarn("no such builtin: %s", cmdarg);
 		    lastval = 1;
                     opts[AUTOCONTINUE] = oautocont;
 		    return;
@@ -2334,7 +2333,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		execerr();
 	    }
 	    if (isset(RESTRICTED) && IS_WRITE_FILE(fn->type)) {
-		zwarn("writing redirection not allowed in restricted mode", NULL, 0);
+		zwarn("writing redirection not allowed in restricted mode");
 		execerr();
 	    }
 	    if (unset(EXECOPT))
@@ -2349,7 +2348,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    closemnodes(mfds);
 		    fixfds(save);
 		    if (errno && errno != EINTR)
-			zwarn("%e", NULL, errno);
+			zwarn("%e", errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 0, fn->varid);
@@ -2367,7 +2366,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    closemnodes(mfds);
 		    fixfds(save);
 		    if (errno != EINTR)
-			zwarn("%e: %s", fn->name, errno);
+			zwarn("%e: %s", errno, fn->name);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 0, fn->varid);
@@ -2405,7 +2404,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			    "file descriptor %d out of range, not closed",
 			    "file descriptor %d used by shell, not closed"
 			};
-			zwarn(bad_msg[bad-1], fn->varid, fn->fd1);
+			if (bad > 2)
+			    zwarn(bad_msg[bad-1], fn->fd1);
+			else
+			    zwarn(bad_msg[bad-1], fn->varid);
 			execerr();
 		    }
 		}
@@ -2469,7 +2471,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    closemnodes(mfds);
 		    fixfds(save);
 		    if (errno && errno != EINTR)
-			zwarn("%e: %s", fn->name, errno);
+			zwarn("%e: %s", errno, fn->name);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 1, fn->varid);
@@ -2593,7 +2595,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		fflush(stdout);
 		if (save[1] == -2) {
 		    if (ferror(stdout)) {
-			zwarn("write error: %e", NULL, errno);
+			zwarn("write error: %e", errno);
 			clearerr(stdout);
 		    }
 		} else
@@ -2809,7 +2811,7 @@ entersubsh(int how, int cl, int fake, int revertpgrp)
 	    if (isatty(0)) {
 		close(0);
 		if (open("/dev/null", O_RDWR | O_NOCTTY)) {
-		    zerr("can't open /dev/null: %e", NULL, errno);
+		    zerr("can't open /dev/null: %e", errno);
 		    _exit(1);
 		}
 	    }
@@ -3022,7 +3024,7 @@ getoutput(char *cmd, int qt)
 	    return NULL;
 	untokenize(s);
 	if ((stream = open(unmeta(s), O_RDONLY | O_NOCTTY)) == -1) {
-	    zerr("%e: %s", s, errno);
+	    zerr("%e: %s", errno, s);
 	    return NULL;
 	}
 	return readoutput(stream, qt);
@@ -3059,7 +3061,7 @@ getoutput(char *cmd, int qt)
     cmdpop();
     close(1);
     _exit(lastval);
-    zerr("exit returned in child!!", NULL, 0);
+    zerr("exit returned in child!!");
     kill(getpid(), SIGKILL);
     return NULL;
 }
@@ -3128,12 +3130,12 @@ parsecmd(char *cmd)
 
     for (str = cmd + 2; *str && *str != Outpar; str++);
     if (!*str || cmd[1] != Inpar) {
-	zerr("oops.", NULL, 0);
+	zerr("oops.");
 	return NULL;
     }
     *str = '\0';
     if (str[1] || !(prog = parse_string(cmd + 2))) {
-	zerr("parse error in process substitution", NULL, 0);
+	zerr("parse error in process substitution");
 	return NULL;
     }
     return prog;
@@ -3212,7 +3214,7 @@ getoutputfile(char *cmd)
     cmdpop();
     close(1);
     _exit(lastval);
-    zerr("exit returned in child!!", NULL, 0);
+    zerr("exit returned in child!!");
     kill(getpid(), SIGKILL);
     return NULL;
 }
@@ -3242,7 +3244,7 @@ char *
 getproc(char *cmd)
 {
 #if !defined(HAVE_FIFOS) && !defined(PATH_DEV_FD)
-    zerr("doesn't look like your system supports FIFOs.", NULL, 0);
+    zerr("doesn't look like your system supports FIFOs.");
     return NULL;
 #else
     Eprog prog;
@@ -3660,7 +3662,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
     if (prog == &dummy_eprog) {
 	/* We're not actually in the function; decrement locallevel */
 	locallevel--;
-	zwarn("%s: function definition file not found", shf->node.nam, 0);
+	zwarn("%s: function definition file not found", shf->node.nam);
 	locallevel++;
 	popheap();
 	return NULL;
@@ -3685,7 +3687,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	    if (!shf || (shf->node.flags & PM_UNDEFINED)) {
 		/* We're not actually in the function; decrement locallevel */
 		locallevel--;
-		zwarn("%s: function not defined by file", n, 0);
+		zwarn("%s: function not defined by file", n);
 		locallevel++;
 		popheap();
 		return NULL;
@@ -3787,7 +3789,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 #ifdef MAX_FUNCTION_DEPTH
     if(++funcdepth > MAX_FUNCTION_DEPTH)
     {
-        zerr("maximum nested function level reached", NULL, 0);
+        zerr("maximum nested function level reached");
 	goto undoshfunc;
     }
 #endif
@@ -3804,7 +3806,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 
 	if (!(shf = (Shfunc) shfunctab->getnode(shfunctab,
 						(name = fname)))) {
-	    zwarn("%s: function not defined by file", name, 0);
+	    zwarn("%s: function not defined by file", name);
 	    if (noreturnval)
 		errflag = 1;
 	    else

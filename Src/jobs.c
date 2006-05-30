@@ -1303,7 +1303,7 @@ initjob(void)
     if (expandjobtab())
 	return initnewjob(i);
 
-    zerr("job table full or recursion limit exceeded", NULL, 0);
+    zerr("job table full or recursion limit exceeded");
     return -1;
 }
 
@@ -1446,7 +1446,7 @@ getjob(char *s, char *prog)
     /* "%%", "%+" and "%" all represent the current job */
     if (*s == '%' || *s == '+' || !*s) {
 	if (curjob == -1) {
-	    zwarnnam(prog, "no current job", NULL, 0);
+	    zwarnnam(prog, "no current job");
 	    returnval = -1;
 	    goto done;
 	}
@@ -1456,7 +1456,7 @@ getjob(char *s, char *prog)
     /* "%-" represents the previous job */
     if (*s == '-') {
 	if (prevjob == -1) {
-	    zwarnnam(prog, "no previous job", NULL, 0);
+	    zwarnnam(prog, "no previous job");
 	    returnval = -1;
 	    goto done;
 	}
@@ -1471,7 +1471,7 @@ getjob(char *s, char *prog)
 	    returnval = jobnum;
 	    goto done;
 	}
-	zwarnnam(prog, "%%%s: no such job", s, 0);
+	zwarnnam(prog, "%%%s: no such job", s);
 	returnval = -1;
 	goto done;
     }
@@ -1487,7 +1487,7 @@ getjob(char *s, char *prog)
 			returnval = jobnum;
 			goto done;
 		    }
-	zwarnnam(prog, "job not found: %s", s, 0);
+	zwarnnam(prog, "job not found: %s", s);
 	returnval = -1;
 	goto done;
     }
@@ -1500,7 +1500,7 @@ getjob(char *s, char *prog)
     }
     /* if we get here, it is because none of the above succeeded and went
     to done */
-    zwarnnam(prog, "job not found: %s", s, 0);
+    zwarnnam(prog, "job not found: %s", s);
     returnval = -1;
   done:
     return returnval;
@@ -1528,7 +1528,7 @@ init_jobs(char **argv, char **envp)
      */
     jobtab = (struct job *)zalloc(init_bytes);
     if (!jobtab) {
-	zerr("failed to allocate job table, aborting.", NULL, 0);
+	zerr("failed to allocate job table, aborting.");
 	exit(1);
     }
     jobtabsize = MAXJOBS_ALLOC;
@@ -1643,11 +1643,11 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	int len;
 
 	if(isset(RESTRICTED)) {
-	    zwarnnam(name, "-Z is restricted", NULL, 0);
+	    zwarnnam(name, "-Z is restricted");
 	    return 1;
 	}
 	if(!argv[0] || argv[1]) {
-	    zwarnnam(name, "-Z requires one argument", NULL, 0);
+	    zwarnnam(name, "-Z requires one argument");
 	    return 1;
 	}
 	queue_signals();
@@ -1670,7 +1670,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 
     if ((func == BIN_FG || func == BIN_BG) && !jobbing) {
 	/* oops... maybe bg and fg should have been disabled? */
-	zwarnnam(name, "no job control in this shell.", NULL, 0);
+	zwarnnam(name, "no job control in this shell.");
 	return 1;
     }
 
@@ -1694,7 +1694,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    /* W.r.t. the above comment, we'd better have a current job at this
 	    point or else. */
 	    if (curjob == -1 || (jobtab[curjob].stat & STAT_NOPRINT)) {
-		zwarnnam(name, "no current job", NULL, 0);
+		zwarnnam(name, "no current job");
 		unqueue_signals();
 		return 1;
 	    }
@@ -1755,7 +1755,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		if (!retval)
 		    retval = lastval2;
 	    } else {
-		zwarnnam(name, "pid %d is not a child of this shell", 0, pid);
+		zwarnnam(name, "pid %d is not a child of this shell", pid);
 		/* presumably lastval2 doesn't tell us a heck of a lot? */
 		retval = 1;
 	    }
@@ -1771,7 +1771,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	}
 	if (!(jobtab[job].stat & STAT_INUSE) ||
 	    (jobtab[job].stat & STAT_NOPRINT)) {
-	    zwarnnam(name, "no such job: %d", 0, job);
+	    zwarnnam(name, "no such job: %d", job);
 	    unqueue_signals();
 	    return 1;
 	}
@@ -1793,7 +1793,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		makerunning(jobtab + job);
 	    else if (func == BIN_BG) {
 		/* Silly to bg a job already running. */
-		zwarnnam(name, "job already in background", NULL, 0);
+		zwarnnam(name, "job already in background");
 		thisjob = ocj;
 		unqueue_signals();
 		return 1;
@@ -1887,7 +1887,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 #else
                          "warning: job is stopped, use `kill -CONT%s' to resume",
 #endif
-                         pids, 0);
+                         pids);
 	    }
 	    deletejob(jobtab + job);
 	    break;
@@ -1964,14 +1964,14 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 			    }
 			    if (sig > SIGCOUNT) {
 				zwarnnam(nam, "unknown signal: SIG%s",
-					 signame, 0);
+					 signame);
 				returnval++;
 			    } else
 				printf("%d\n", sig);
 			} else {
 			    if (*signame) {
 				zwarnnam(nam, "unknown signal: SIG%s",
-					 signame, 0);
+					 signame);
 				returnval++;
 			    } else {
 				if (WIFSIGNALED(sig))
@@ -1998,19 +1998,19 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    	char *endp;
 
 	    	if (!*++argv) {
-		    zwarnnam(nam, "-n: argument expected", NULL, 0);
+		    zwarnnam(nam, "-n: argument expected");
 		    return 1;
 		}
 		sig = zstrtol(*argv, &endp, 10);
 		if (*endp) {
-		    zwarnnam(nam, "invalid signal number", signame, 0);
+		    zwarnnam(nam, "invalid signal number: %s", signame);
 		    return 1;
 		}
 	    } else {
 		if (!((*argv)[1] == 's' && (*argv)[2] == '\0'))
 		    signame = *argv + 1;
 		else if (!(*++argv)) {
-		    zwarnnam(nam, "-s: argument expected", NULL, 0);
+		    zwarnnam(nam, "-s: argument expected");
 		    return 1;
 		} else
 		    signame = *argv;
@@ -2035,8 +2035,8 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 			}
 		}
 		if (sig > SIGCOUNT) {
-		    zwarnnam(nam, "unknown signal: SIG%s", signame, 0);
-		    zwarnnam(nam, "type kill -l for a List of signals", NULL, 0);
+		    zwarnnam(nam, "unknown signal: SIG%s", signame);
+		    zwarnnam(nam, "type kill -l for a List of signals");
 		    return 1;
 		}
 	    }
@@ -2045,7 +2045,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     }
 
     if (!*argv) {
-    	zwarnnam(nam, "not enough arguments", NULL, 0);
+    	zwarnnam(nam, "not enough arguments");
 	return 1;
     }
 
@@ -2079,7 +2079,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    killjb(jobtab + p, SIGCONT);
 	    }
 	} else if (!isanum(*argv)) {
-	    zwarnnam("kill", "illegal pid: %s", *argv, 0);
+	    zwarnnam("kill", "illegal pid: %s", *argv);
 	    returnval++;
 	} else if (kill(atoi(*argv), sig) == -1) {
 	    zwarnnam("kill", "kill %s failed: %e", *argv, errno);
@@ -2195,7 +2195,7 @@ bin_suspend(char *name, UNUSED(char **argv), Options ops, UNUSED(int func))
 {
     /* won't suspend a login shell, unless forced */
     if (islogin && !OPT_ISSET(ops,'f')) {
-	zwarnnam(name, "can't suspend login shell", NULL, 0);
+	zwarnnam(name, "can't suspend login shell");
 	return 1;
     }
     if (jobbing) {

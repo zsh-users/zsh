@@ -240,7 +240,7 @@ lexconstant(void)
 	if (prev_locale) setlocale(LC_NUMERIC, prev_locale);
 #endif
 	if (ptr == nptr || *nptr == '.') {
-	    zerr("bad floating point constant", NULL, 0);
+	    zerr("bad floating point constant");
 	    return EOI;
 	}
 	ptr = nptr;
@@ -421,7 +421,7 @@ zzlex(void)
 		if (idigit(*ptr)) {
 		    n = zstrtol(ptr, &ptr, 10);
 		    if (*ptr != ']' || !idigit(*++ptr)) {
-			zerr("bad base syntax", NULL, 0);
+			zerr("bad base syntax");
 			return EOI;
 		    }
 		    yyval.u.l = zstrtol(ptr, &ptr, lastbase = n);
@@ -438,7 +438,7 @@ zzlex(void)
 		    outputradix = n * zstrtol(ptr, &ptr, 10);
 		} else {
 		    bofs:
-		    zerr("bad output format specification", NULL, 0);
+		    zerr("bad output format specification");
 		    return EOI;
 		}
 		if(*ptr != ']')
@@ -460,7 +460,7 @@ zzlex(void)
 
 		    ptr++;
 		    if (!*ptr) {
-			zerr("character missing after ##", NULL, 0);
+			zerr("character missing after ##");
 			return EOI;
 		    }
 		    ptr = getkeystring(ptr, NULL, 6, &v);
@@ -517,7 +517,7 @@ static void
 push(mnumber val, char *lval, int getme)
 {
     if (sp == STACKSZ - 1)
-	zerr("stack overflow", NULL, 0);
+	zerr("stack overflow");
     else
 	sp++;
     stack[sp].val = val;
@@ -561,7 +561,7 @@ static mnumber
 setvar(char *s, mnumber v)
 {
     if (!s) {
-	zerr("lvalue required", NULL, 0);
+	zerr("lvalue required");
 	v.type = MN_INTEGER;
 	v.u.l = 0;
 	return v;
@@ -631,8 +631,7 @@ callmathfunc(char *o)
 		}
 	    }
 	    if (*a && !errflag)
-		zerr("bad math expression: illegal character: %c",
-		     NULL, *a);
+		zerr("bad math expression: illegal character: %c", *a);
 	    if (!errflag) {
 		if (argc >= f->minargs && (f->maxargs < 0 ||
 					   argc <= f->maxargs)) {
@@ -640,7 +639,7 @@ callmathfunc(char *o)
 			char *shfnam = f->module ? f->module : n;
 			Eprog prog = getshfunc(shfnam);
 			if (prog == &dummy_eprog)
-			    zerr("no such function: %s", shfnam, 0);
+			    zerr("no such function: %s", shfnam);
 			else {
 			    doshfunc(n, prog, l, 0, 1);
 			    return lastmathval;
@@ -655,11 +654,11 @@ callmathfunc(char *o)
 			return f->nfunc(n, argc, argv, f->funcid);
 		    }
 		} else
-		    zerr("wrong number of arguments: %s", o, 0);
+		    zerr("wrong number of arguments: %s", o);
 	    }
 	}
     } else
-	zerr("unknown function: %s", n, 0);
+	zerr("unknown function: %s", n);
 
     dummy.type = MN_INTEGER;
     dummy.u.l = 0;
@@ -672,7 +671,7 @@ static int
 notzero(mnumber a)
 {
     if ((a.type & MN_INTEGER) ? a.u.l == 0 : a.u.d == 0.0) {
-	zerr("division by zero", NULL, 0);
+	zerr("division by zero");
 	return 0;
     }
     return 1;
@@ -691,7 +690,7 @@ op(int what)
     if (errflag)
 	return;
     if (sp < 0) {
-	zerr("bad math expression: stack empty", NULL, 0);
+	zerr("bad math expression: stack empty");
 	return;
     }
 
@@ -857,7 +856,7 @@ op(int what)
 			/* Error if (-num ** b) and b is not an integer */
 			double tst = (double)(zlong)b.u.d;
 			if (tst != b.u.d) {
-			    zerr("imaginary power", NULL, 0);
+			    zerr("imaginary power");
 			    return;
 			}
 		    }
@@ -934,7 +933,7 @@ op(int what)
 	push(((a.type & MN_FLOAT) ? a.u.d : a.u.l) ? b : c, NULL, 0);
 	break;
     case COLON:
-	zerr("':' without '?'", NULL, 0);
+	zerr("':' without '?'");
 	break;
     case PREPLUS:
 	if (spval->type & MN_FLOAT)
@@ -951,7 +950,7 @@ op(int what)
 	setvar(stack[sp].lval, *spval);
 	break;
     default:
-	zerr("out of integers", NULL, 0);
+	zerr("out of integers");
 	return;
     }
 }
@@ -999,7 +998,7 @@ mathevall(char *s, int prek, char **ep)
 	xyyval.type = MN_INTEGER;
 	xyyval.u.l = 0;
 
-	zerr("math recursion limit exceeded", NULL, 0);
+	zerr("math recursion limit exceeded");
 
 	return xyyval;
     }
@@ -1076,7 +1075,7 @@ matheval(char *s)
     x = mathevall(s, TOPPREC, &junk);
     mtok = xmtok;
     if (*junk)
-	zerr("bad math expression: illegal character: %c", NULL, *junk);
+	zerr("bad math expression: illegal character: %c", *junk);
     return x;
 }
 
@@ -1122,7 +1121,6 @@ checkunary(int mtokc, char *mptr)
 	    errmsg = 2;
     }
     if (errmsg) {
-	char errbuf[80];
 	int len, over = 0;
 	while (inblank(*mptr))
 	    mptr++;
@@ -1131,10 +1129,9 @@ checkunary(int mtokc, char *mptr)
 	    len = 10;
 	    over = 1;
 	}
-	sprintf(errbuf, "bad math expression: %s expected at `%%l%s'",
-		errmsg == 2 ? "operator" : "operand",
-		over ? "..." : ""); 
-	zerr(errbuf, mptr, len);
+	zerr("bad math expression: %s expected at `%l%s'",
+	     errmsg == 2 ? "operator" : "operand",
+	     mptr, len, over ? "..." : "");
     }
     unary = !(tp & OP_OPF);
 }
@@ -1176,7 +1173,7 @@ mathparse(int pc)
 	    mathparse(TOPPREC);
 	    if (mtok != M_OUTPAR) {
 		if (!errflag)
-		    zerr("')' expected", NULL, 0);
+		    zerr("')' expected");
 		return;
 	    }
 	    break;
@@ -1193,7 +1190,7 @@ mathparse(int pc)
 		noeval--;
 	    if (mtok != COLON) {
 		if (!errflag)
-		    zerr("':' expected", NULL, 0);
+		    zerr("':' expected");
 		return;
 	    }
 	    if (q)

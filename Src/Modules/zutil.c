@@ -265,7 +265,7 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 	if ((oc = args[0][1]) && oc != '-') {
 	    if (args[0][2]) {
-		zwarnnam(nam, "invalid argument: %s", args[0], 0);
+		zwarnnam(nam, "invalid argument: %s", args[0]);
 		return 1;
 	    }
 	    if (oc == 'L')
@@ -287,14 +287,14 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	char *pat;
 
 	if (arrlen(args) < 2) {
-	    zwarnnam(nam, "not enough arguments", NULL, 0);
+	    zwarnnam(nam, "not enough arguments");
 	    return 1;
 	}
 	pat = dupstring(args[0]);
 	tokenize(pat);
 
 	if (!(prog = patcompile(pat, PAT_ZDUP, NULL))) {
-	    zwarnnam(nam, "invalid pattern: %s", args[0], 0);
+	    zwarnnam(nam, "invalid pattern: %s", args[0]);
 	    return 1;
 	}
 	if (!(s = getstyle(args[1])))
@@ -338,15 +338,15 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'm': min = 3; max =  3; break;
     case 'g': min = 1; max =  3; break;
     default:
-	zwarnnam(nam, "invalid option: %s", args[0], 0);
+	zwarnnam(nam, "invalid option: %s", args[0]);
 	return 1;
     }
     n = arrlen(args) - 1;
     if (n < min) {
-	zwarnnam(nam, "not enough arguments", NULL, 0);
+	zwarnnam(nam, "not enough arguments");
 	return 1;
     } else if (max >= 0 && n > max) {
-	zwarnnam(nam, "too many arguments", NULL, 0);
+	zwarnnam(nam, "too many arguments");
 	return 1;
     }
     switch (args[0][1]) {
@@ -697,7 +697,7 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     char opt;
 
     if (args[0][0] != '-' || !(opt = args[0][1]) || args[0][2]) {
-	zwarnnam(nam, "invalid argument: %s", args[0], 0);
+	zwarnnam(nam, "invalid argument: %s", args[0]);
 	return 1;
     }
     args++;
@@ -715,7 +715,7 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    for (ap = args + 2; *ap; ap++) {
 		if (!ap[0][0] || ap[0][0] == '-' || ap[0][0] == '.' ||
 		    idigit(ap[0][0]) || ap[0][1] != ':') {
-		    zwarnnam(nam, "invalid argument: %s", *ap, 0);
+		    zwarnnam(nam, "invalid argument: %s", *ap);
 		    return 1;
 		}
 		specs[STOUC(ap[0][0])] = ap[0] + 2;
@@ -784,7 +784,7 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
 	break;
     }
-    zwarnnam(nam, "invalid option: -%c", 0, opt);
+    zwarnnam(nam, "invalid option: -%c", opt);
     return 1;
 }
 
@@ -1249,9 +1249,9 @@ bin_zregexparse(char *nam, char **args, Options ops, UNUSED(int func))
     rparsestates = newlinklist();
     if (setjmp(rparseerr) || rparsealt(&result, &rparseerr) || *rparseargs) {
 	if (*rparseargs)
-	    zwarnnam(nam, "invalid regex : %s", *rparseargs, 0);
+	    zwarnnam(nam, "invalid regex : %s", *rparseargs);
 	else
-	    zwarnnam(nam, "not enough regex arguments", NULL, 0);
+	    zwarnnam(nam, "not enough regex arguments");
 	ret = 3;
     } else
 	ret = 0;
@@ -1434,7 +1434,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		break;
 	    case 'a':
 		if (defarr) {
-		    zwarnnam(nam, "default array given more than once", NULL, 0);
+		    zwarnnam(nam, "default array given more than once");
 		    return 1;
 		}
 		if (o[2])
@@ -1442,7 +1442,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		else if (*args)
 		    n = *args++;
 		else {
-		    zwarnnam(nam, "missing array name", NULL, 0);
+		    zwarnnam(nam, "missing array name");
 		    return 1;
 		}
 		defarr = (Zoptarr) zhalloc(sizeof(*defarr));
@@ -1458,7 +1458,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		else if (*args)
 		    assoc = *args++;
 		else {
-		    zwarnnam(nam, "missing array name", NULL, 0);
+		    zwarnnam(nam, "missing array name");
 		    return 1;
 		}
 		break;
@@ -1473,12 +1473,12 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
     }
     if (!o) {
-	zwarnnam(nam, "missing option descriptions", NULL, 0);
+	zwarnnam(nam, "missing option descriptions");
 	return 1;
     }
     while ((o = dupstring(*args++))) {
 	if (!*o) {
-	    zwarnnam(nam, "invalid option description: %s", o, 0);
+	    zwarnnam(nam, "invalid option description: %s", o);
 	    return 1;
 	}
 	f = 0;
@@ -1517,10 +1517,10 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		opt_arrs = a;
 	    }
 	} else if (*p) {
-	    zwarnnam(nam, "invalid option description: %s", args[-1], 0);
+	    zwarnnam(nam, "invalid option description: %s", args[-1]);
 	    return 1;
 	} else if (!(a = defarr) && !assoc) {
-	    zwarnnam(nam, "no default array defined: %s", args[-1], 0);
+	    zwarnnam(nam, "no default array defined: %s", args[-1]);
 	    return 1;
 	}
 	for (p = n = o; *p; p++) {
@@ -1529,7 +1529,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    *n++ = *p;
 	}
 	if (get_opt_desc(o)) {
-	    zwarnnam(nam, "option defined more than once: %s", o, 0);
+	    zwarnnam(nam, "option defined more than once: %s", o);
 	    return 1;
 	}
 	d = (Zoptdesc) zhalloc(sizeof(*d));
@@ -1571,7 +1571,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    } else if (!(d->flags & ZOF_OPT)) {
 			if (!pp[1]) {
 			    zwarnnam(nam, "missing argument for option: %s",
-				    d->name, 0);
+				    d->name);
 			    return 1;
 			}
 			add_opt_val(d, *++pp);
@@ -1597,7 +1597,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		else if (!(d->flags & ZOF_OPT)) {
 		    if (!pp[1]) {
 			zwarnnam(nam, "missing argument for option: %s",
-				d->name, 0);
+				d->name);
 			return 1;
 		    }
 		    add_opt_val(d, *++pp);

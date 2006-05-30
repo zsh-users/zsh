@@ -659,18 +659,17 @@ bin_bindkey(char *name, char **argv, Options ops, UNUSED(int func))
     if(op->o)
 	for(opp = op; (++opp)->o; )
 	    if(OPT_ISSET(ops,STOUC(opp->o))) {
-		zwarnnam(name, "incompatible operation selection options",
-		    NULL, 0);
+		zwarnnam(name, "incompatible operation selection options");
 		return 1;
 	    }
     n = OPT_ISSET(ops,'e') + OPT_ISSET(ops,'v') + 
 	OPT_ISSET(ops,'a') + OPT_ISSET(ops,'M');
     if(!op->selp && n) {
-	zwarnnam(name, "keymap cannot be selected with -%c", NULL, op->o);
+	zwarnnam(name, "keymap cannot be selected with -%c", op->o);
 	return 1;
     }
     if(n > 1) {
-	zwarnnam(name, "incompatible keymap selection options", NULL, 0);
+	zwarnnam(name, "incompatible keymap selection options");
 	return 1;
     }
 
@@ -688,7 +687,7 @@ bin_bindkey(char *name, char **argv, Options ops, UNUSED(int func))
 	    kmname = "main";
 	km = openkeymap(kmname);
 	if(!km) {
-	    zwarnnam(name, "no such keymap `%s'", kmname, 0);
+	    zwarnnam(name, "no such keymap `%s'", kmname);
 	    return 1;
 	}
 	if(OPT_ISSET(ops,'e') || OPT_ISSET(ops,'v'))
@@ -708,10 +707,10 @@ bin_bindkey(char *name, char **argv, Options ops, UNUSED(int func))
     /* check number of arguments */
     for(n = 0; argv[n]; n++) ;
     if(n < op->min) {
-	zwarnnam(name, "not enough arguments for -%c", NULL, op->o);
+	zwarnnam(name, "not enough arguments for -%c", op->o);
 	return 1;
     } else if(op->max != -1 && n > op->max) {
-	zwarnnam(name, "too many arguments for -%c", NULL, op->o);
+	zwarnnam(name, "too many arguments for -%c", op->o);
 	return 1;
     }
 
@@ -767,9 +766,9 @@ bin_bindkey_del(char *name, UNUSED(char *kmname), UNUSED(Keymap km), char **argv
     do {
 	int r = unlinkkeymap(*argv, 0);
 	if(r == 1)
-	    zwarnnam(name, "keymap name `%s' is protected", *argv, 0);
+	    zwarnnam(name, "keymap name `%s' is protected", *argv);
 	else if(r == 2)
-	    zwarnnam(name, "no such keymap `%s'", *argv, 0);
+	    zwarnnam(name, "no such keymap `%s'", *argv);
 	ret |= !!r;
     } while(*++argv);
     return ret;
@@ -783,10 +782,10 @@ bin_bindkey_link(char *name, UNUSED(char *kmname), Keymap km, char **argv, UNUSE
 {
     km = openkeymap(argv[0]);
     if(!km) {
-	zwarnnam(name, "no such keymap `%s'", argv[0], 0);
+	zwarnnam(name, "no such keymap `%s'", argv[0]);
 	return 1;
     } else if(linkkeymap(km, argv[1], 0)) {
-	zwarnnam(name, "keymap name `%s' is protected", argv[1], 0);
+	zwarnnam(name, "keymap name `%s' is protected", argv[1]);
 	return 1;
     }
     return 0;
@@ -801,13 +800,13 @@ bin_bindkey_new(char *name, UNUSED(char *kmname), Keymap km, char **argv, UNUSED
     KeymapName kmn = (KeymapName) keymapnamtab->getnode(keymapnamtab, argv[0]);
 
     if(kmn && (kmn -> flags & KMN_IMMORTAL)) {
-	zwarnnam(name, "keymap name `%s' is protected", argv[0], 0);
+	zwarnnam(name, "keymap name `%s' is protected", argv[0]);
 	return 1;
     }
     if(argv[1]) {
 	km = openkeymap(argv[1]);
 	if(!km) {
-	    zwarnnam(name, "no such keymap `%s'", argv[0], 0);
+	    zwarnnam(name, "no such keymap `%s'", argv[0]);
 	    return 1;
 	}
     } else
@@ -831,12 +830,11 @@ bin_bindkey_meta(char *name, char *kmname, Keymap km, UNUSED(char **argv), UNUSE
     Thingy fn;
 
     if(km->flags & KM_IMMUTABLE) {
-	zwarnnam(name, "keymap `%s' is protected", kmname, 0);
+	zwarnnam(name, "keymap `%s' is protected", kmname);
 	return 1;
     }
 #ifdef MULTIBYTE_SUPPORT
-    zwarnnam(name, "warning: `bindkey -m' disables multibyte support",
-	     NULL, 0);
+    zwarnnam(name, "warning: `bindkey -m' disables multibyte support");
 #endif
     for(i = 128; i < 256; i++)
 	if(metabind[i - 128] != z_undefinedkey) {
@@ -867,12 +865,12 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 
 	for(a = argv+2; *a; a++)
 	    if(!*++a) {
-		zwarnnam(name, "even number of arguments required", NULL, 0);
+		zwarnnam(name, "even number of arguments required");
 		return 1;
 	    }
     }
     if(km->flags & KM_IMMUTABLE) {
-	zwarnnam(name, "keymap `%s' is protected", kmname, 0);
+	zwarnnam(name, "keymap `%s' is protected", kmname);
 	return 1;
     }
     if (func == 'r' && OPT_ISSET(ops,'p')) {
@@ -912,7 +910,7 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 
 	    if(len < 2 || len > 2 + (bseq[1] == '-') ||
 	       (first = STOUC(bseq[0])) > (last = STOUC(bseq[len - 1]))) {
-		zwarnnam(name, "malformed key range `%s'", useq, 0);
+		zwarnnam(name, "malformed key range `%s'", useq);
 		ret = 1;
 	    } else {
 		for(; first <= last; first++) {
@@ -924,7 +922,7 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 	    }
 	} else {
 	    if(bindkey(km, seq, fn, str)) {
-		zwarnnam(name, "cannot bind to an empty key sequence", NULL, 0);
+		zwarnnam(name, "cannot bind to an empty key sequence");
 		ret = 1;
 	    }
 	}
@@ -974,7 +972,7 @@ bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 	/* empty prefix is equivalent to no prefix */
 	if (OPT_ISSET(ops,'p') && (!argv[0] || argv[0][0])) {
 	    if (!argv[0]) {
-		zwarnnam(name, "option -p requires a prefix string", NULL, 0);
+		zwarnnam(name, "option -p requires a prefix string");
 		return 1;
 	    }
 	    bs.prefix = getkeystring(argv[0], &bs.prefixlen, 2, NULL);
@@ -1408,7 +1406,7 @@ getkeycmd(void)
 	char *pb;
 
 	if (++hops == 20) {
-	    zerr("string inserting another one too many times", NULL, 0);
+	    zerr("string inserting another one too many times");
 	    hops = 0;
 	    return NULL;
 	}

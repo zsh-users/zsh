@@ -590,7 +590,7 @@ execcase(Estate state, int do_exec)
 	    }
 	    if (!(pprog = patcompile(pat, (save ? PAT_ZDUP : PAT_STATIC),
 				     NULL)))
-		zerr("bad pattern: %s", pat, 0);
+		zerr("bad pattern: %s", pat);
 	    else if (save)
 		*spprog = pprog;
 	}

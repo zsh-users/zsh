@@ -300,7 +300,7 @@ tcp_close(Tcp_session sess)
 	{
 	    err = close(sess->fd);
 	    if (err)
-		zwarn("connection close failed: %e", NULL, errno);
+		zwarn("connection close failed: %e", errno);
 	}
 	zts_delete(sess);
 	return 0;
@@ -358,8 +358,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops,'d')) {
 	targetfd = atoi(OPT_ARG(ops,'d'));
 	if (!targetfd) {
-	    zwarnnam(nam, "%s is an invalid argument to -d",
-		     OPT_ARG(ops,'d'), 0);
+	    zwarnnam(nam, "%s is an invalid argument to -d", OPT_ARG(ops,'d'));
 	    return 1;
 	}
     }
@@ -373,7 +372,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    targetfd = atoi(args[0]);
 	    sess = zts_byfd(targetfd);
 	    if(!targetfd) {
-		zwarnnam(nam, "%s is an invalid argument to -c", args[0], 0);
+		zwarnnam(nam, "%s is an invalid argument to -c", args[0]);
 		return 1;
 	    }
 
@@ -381,7 +380,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    {
 		if ((sess->flags & ZTCP_ZFTP) && !force)
 		{
-		    zwarnnam(nam, "use -f to force closure of a zftp control connection", NULL, 0);
+		    zwarnnam(nam, "use -f to force closure of a zftp control connection");
 		    return 1;
 		}
 		tcp_close(sess);
@@ -389,7 +388,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    }
 	    else
 	    {
-		zwarnnam(nam, "fd %s not found in tcp table", args[0], 0);
+		zwarnnam(nam, "fd %s not found in tcp table", args[0]);
 		return 1;
 	    }
 	}
@@ -398,7 +397,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	int lport = 0;
 
 	if (!args[0]) {
-	    zwarnnam(nam, "-l requires an argument", NULL, 0);
+	    zwarnnam(nam, "-l requires an argument");
 	    return 1;
 	}
 
@@ -407,13 +406,13 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    lport = srv->s_port;
 	else
 	    lport = htons(atoi(args[0]));
-	if (!lport) { zwarnnam(nam, "bad service name or port number", NULL, 0);
+	if (!lport) { zwarnnam(nam, "bad service name or port number");
 	return 1;
 	}
 	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, ZTCP_LISTEN);
 
 	if (!sess) {
-	    zwarnnam(nam, "unable to allocate a TCP session slot", NULL, 0);
+	    zwarnnam(nam, "unable to allocate a TCP session slot");
 	    return 1;
 	}
 #ifdef SO_OOBINLINE
@@ -422,7 +421,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 #endif
 	if (!zsh_inet_aton("0.0.0.0", &(sess->sock.in.sin_addr)))
 	{
-	    zwarnnam(nam, "bad address: %s", "0.0.0.0", 0);
+	    zwarnnam(nam, "bad address: %s", "0.0.0.0");
 	    return 1;
 	}
 
@@ -441,7 +440,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 
 	if (listen(sess->fd, 1))
 	{
-	    zwarnnam(nam, "could not listen on socket: %e", NULL, errno);
+	    zwarnnam(nam, "could not listen on socket: %e", errno);
 	    tcp_close(sess);
 	    return 1;
 	}
@@ -468,26 +467,26 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	int lfd, rfd;
 
 	if (!args[0]) {
-	    zwarnnam(nam, "-a requires an argument", NULL, 0);
+	    zwarnnam(nam, "-a requires an argument");
 	    return 1;
 	}
 
 	lfd = atoi(args[0]);
 
 	if (!lfd) {
-	    zwarnnam(nam, "invalid numerical argument", NULL, 0);
+	    zwarnnam(nam, "invalid numerical argument");
 	    return 1;
 	}
 
 	sess = zts_byfd(lfd);
 	if (!sess) {
-	    zwarnnam(nam, "fd %s is not registered as a tcp connection", args[0], 0);
+	    zwarnnam(nam, "fd %s is not registered as a tcp connection", args[0]);
 	    return 1;
 	}
 
 	if (!(sess->flags & ZTCP_LISTEN))
 	{
-	    zwarnnam(nam, "tcp connection not a listener", NULL, 0);
+	    zwarnnam(nam, "tcp connection not a listener");
 	    return 1;
 	}
 
@@ -502,7 +501,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    if ((ret = poll(&pfd, 1, 0)) == 0) return 1;
 	    else if (ret == -1)
 	    {
-		zwarnnam(nam, "poll error: %e", NULL, errno);
+		zwarnnam(nam, "poll error: %e", errno);
 		return 1;
 	    }
 # else
@@ -518,14 +517,14 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    if ((ret = select(lfd+1, &rfds, NULL, NULL, &tv))) return 1;
 	    else if (ret == -1)
 	    {
-		zwarnnam(nam, "select error: %e", NULL, errno);
+		zwarnnam(nam, "select error: %e", errno);
 		return 1;
 	    }
 	    
 # endif
 	    
 #else
-	    zwarnnam(nam, "not currently supported", NULL, 0);
+	    zwarnnam(nam, "not currently supported");
 	    return 1;
 #endif
 	}
@@ -534,7 +533,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	len = sizeof(sess->peer.in);
 	if ((rfd = accept(lfd, (struct sockaddr *)&sess->peer.in, &len)) == -1)
 	{
-	    zwarnnam(nam, "could not accept connection: %e", NULL, errno);
+	    zwarnnam(nam, "could not accept connection: %e", errno);
 	    tcp_close(sess);
 	    return 1;
 	}
@@ -615,14 +614,14 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	
 	zthost = zsh_getipnodebyname(desthost, AF_INET, 0, &herrno);
 	if (!zthost || errflag) {
-	    zwarnnam(nam, "host resolution failure: %s", desthost, 0);
+	    zwarnnam(nam, "host resolution failure: %s", desthost);
 	    return 1;
 	}
 	
 	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, 0);
 
 	if (!sess) {
-	    zwarnnam(nam, "unable to allocate a TCP session slot", NULL, 0);
+	    zwarnnam(nam, "unable to allocate a TCP session slot");
 	    return 1;
 	}
 
@@ -632,7 +631,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 #endif
 
 	if (sess->fd < 0) {
-	    zwarnnam(nam, "socket creation failed: %e", NULL, errno);
+	    zwarnnam(nam, "socket creation failed: %e", errno);
 	    zsfree(desthost);
 	    zts_delete(sess);
 	    return 1;
@@ -640,14 +639,14 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	
 	for (addrp = zthost->h_addr_list; err && *addrp; addrp++) {
 	    if (zthost->h_length != 4)
-		zwarnnam(nam, "address length mismatch", NULL, 0);
+		zwarnnam(nam, "address length mismatch");
 	    do {
 		err = tcp_connect(sess, *addrp, zthost, destport);
 	    } while (err && errno == EINTR && !errflag);
 	}
 	
 	if (err) {
-	    zwarnnam(nam, "connection failed: %e", NULL, errno);
+	    zwarnnam(nam, "connection failed: %e", errno);
 	    tcp_close(sess);
 	    zsfree(desthost);
 	    return 1;

@@ -531,7 +531,7 @@ zhandler(int sig)
 	    /* check for WAIT error */
             if (pid == -1) {
                 if (errno != ECHILD)
-                    zerr("wait failed: %e", NULL, errno);
+                    zerr("wait failed: %e", errno);
                 errno = old_errno;    /* WAIT changed errno, so restore the original */
                 break;
             }
@@ -606,7 +606,7 @@ zhandler(int sig)
 		alarm(tmout - idle);
 	    else {
 		errflag = noerrs = 0;
-		zwarn("timeout", NULL, 0);
+		zwarn("timeout");
 		stopmsg = 1;
 		zexit(SIGALRM, 1);
 	    }
@@ -648,7 +648,7 @@ killrunjobs(int from_signal)
                 killed++;
         }
     if (killed)
-        zwarn("warning: %d jobs SIGHUPed", NULL, killed);
+        zwarn("warning: %d jobs SIGHUPed", killed);
 }
 
 
@@ -776,7 +776,7 @@ settrap(int sig, Eprog l, int flags)
     if (sig == -1)
         return 1;
     if (jobbing && (sig == SIGTTOU || sig == SIGTSTP || sig == SIGTTIN)) {
-        zerr("can't trap SIG%s in interactive shells", sigs[sig], 0);
+        zerr("can't trap SIG%s in interactive shells", sigs[sig]);
         return 1;
     }
 

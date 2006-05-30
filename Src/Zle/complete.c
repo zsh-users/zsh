@@ -213,18 +213,18 @@ parse_cmatcher(char *name, char *s)
 	default:
 	    if (name)
 		zwarnnam(name, "unknown match specification character `%c'",
-			 NULL, *s);
+			 *s);
 	    return pcm_err;
 	}
 	if (s[1] != ':') {
 	    if (name)
-		zwarnnam(name, "missing `:'", NULL, 0);
+		zwarnnam(name, "missing `:'");
 	    return pcm_err;
 	}
 	s += 2;
 	if (!*s) {
 	    if (name)
-		zwarnnam(name, "missing patterns", NULL, 0);
+		zwarnnam(name, "missing patterns");
 	    return pcm_err;
 	}
 	if ((fl & CMF_LEFT) && !fl2) {
@@ -237,7 +237,7 @@ parse_cmatcher(char *name, char *s)
 
 	    if (!*s || !*++s) {
 		if (name)
-		    zwarnnam(name, "missing line pattern", NULL, 0);
+		    zwarnnam(name, "missing line pattern");
 		return pcm_err;
 	    }
 	} else
@@ -256,11 +256,11 @@ parse_cmatcher(char *name, char *s)
 	}
 	if ((fl & CMF_RIGHT) && !fl2 && (!*s || !*++s)) {
 	    if (name)
-		zwarnnam(name, "missing right anchor", NULL, 0);
+		zwarnnam(name, "missing right anchor");
 	} else if (!(fl & CMF_RIGHT) || fl2) {
 	    if (!*s) {
 		if (name)
-		    zwarnnam(name, "missing word pattern", NULL, 0);
+		    zwarnnam(name, "missing word pattern");
 		return pcm_err;
 	    }
 	    s++;
@@ -278,7 +278,7 @@ parse_cmatcher(char *name, char *s)
 		return pcm_err;
 	    if (!*s) {
 		if (name)
-		    zwarnnam(name, "missing word pattern", NULL, 0);
+		    zwarnnam(name, "missing word pattern");
 		return pcm_err;
 	    }
 	    s++;
@@ -288,7 +288,7 @@ parse_cmatcher(char *name, char *s)
 	if (*s == '*') {
 	    if (!(fl & (CMF_LEFT | CMF_RIGHT))) {
 		if (name)
-		    zwarnnam(name, "need anchor for `*'", NULL, 0);
+		    zwarnnam(name, "need anchor for `*'");
 		return pcm_err;
 	    }
 	    word = NULL;
@@ -302,8 +302,7 @@ parse_cmatcher(char *name, char *s)
 
 	    if (!word && !line) {
 		if (name)
-		    zwarnnam(name, "need non-empty word or line pattern",
-			     NULL, 0);
+		    zwarnnam(name, "need non-empty word or line pattern");
 		return pcm_err;
 	    }
 	}
@@ -353,7 +352,7 @@ parse_pattern(char *name, char **sp, int *lp, char e, int *err)
 	    s = parse_class(n, s + 1, ']');
 	    if (!*s) {
 		*err = 1;
-		zwarnnam(name, "unterminated character class", NULL, 0);
+		zwarnnam(name, "unterminated character class");
 		return NULL;
 	    }
 	} else if (*s == '{') {
@@ -361,14 +360,14 @@ parse_pattern(char *name, char **sp, int *lp, char e, int *err)
 	    s = parse_class(n, s + 1, '}');
 	    if (!*s) {
 		*err = 1;
-		zwarnnam(name, "unterminated character class", NULL, 0);
+		zwarnnam(name, "unterminated character class");
 		return NULL;
 	    }
 	} else if (*s == '?') {
 	    memset(n->tab, 1, 256);
 	} else if (*s == '*' || *s == '(' || *s == ')' || *s == '=') {
 	    *err = 1;
-	    zwarnnam(name, "invalid pattern character `%c'", NULL, *s);
+	    zwarnnam(name, "invalid pattern character `%c'", *s);
 	    return NULL;
 	} else {
 	    if (*s == '\\' && s[1])
@@ -429,7 +428,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     Cmatcher match = NULL;
 
     if (incompfunc != 1) {
-	zwarnnam(name, "can only be called from completion function", NULL, 0);
+	zwarnnam(name, "can only be called from completion function");
 	return 1;
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre = dat.mesg =
@@ -581,11 +580,11 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
                     dat.dummies = atoi(*argv);
                     p = "" - 1;
                 } else {
-                    zwarnnam(name, "number expected after -%c", NULL, *p);
+                    zwarnnam(name, "number expected after -%c", *p);
                     return 1;
                 }
                 if (dat.dummies < 0) {
-                    zwarnnam(name, "invalid number: %d", NULL, dat.dummies);
+                    zwarnnam(name, "invalid number: %d", dat.dummies);
                     return 1;
                 }
 		break;
@@ -593,7 +592,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		argv++;
 		goto ca_args;
 	    default:
-		zwarnnam(name, "bad option: -%c", NULL, *p);
+		zwarnnam(name, "bad option: -%c", *p);
 		return 1;
 	    }
 	    if (sp) {
@@ -607,7 +606,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 			*sp = *argv;
 		    p = "" - 1;
 		} else {
-		    zwarnnam(name, e, NULL, *p);
+		    zwarnnam(name, e, *p);
 		    return 1;
 		}
 		if (dm) {
@@ -904,11 +903,11 @@ bin_compset(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     char *sa = NULL, *sb = NULL;
 
     if (incompfunc != 1) {
-	zwarnnam(name, "can only be called from completion function", NULL, 0);
+	zwarnnam(name, "can only be called from completion function");
 	return 1;
     }
     if (argv[0][0] != '-') {
-	zwarnnam(name, "missing option", NULL, 0);
+	zwarnnam(name, "missing option");
 	return 1;
     }
     switch (argv[0][1]) {
@@ -920,7 +919,7 @@ bin_compset(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     case 'S': test = CVT_SUFPAT; break;
     case 'q': return set_comp_sep();
     default:
-	zwarnnam(name, "bad option -%c", NULL, argv[0][1]);
+	zwarnnam(name, "bad option -%c", argv[0][1]);
 	return 1;
     }
     if (argv[0][2]) {
@@ -929,7 +928,7 @@ bin_compset(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	na = 2;
     } else {
 	if (!(sa = argv[1])) {
-	    zwarnnam(name, "missing string for option -%c", NULL, argv[0][1]);
+	    zwarnnam(name, "missing string for option -%c", argv[0][1]);
 	    return 1;
 	}
 	sb = argv[2];
@@ -937,7 +936,7 @@ bin_compset(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     }
     if (((test == CVT_PRENUM || test == CVT_SUFNUM) ? !!sb :
 	 (sb && argv[na]))) {
-	zwarnnam(name, "too many arguments", NULL, 0);
+	zwarnnam(name, "too many arguments");
 	return 1;
     }
     switch (test) {
@@ -1390,7 +1389,7 @@ static int
 comp_check(void)
 {
     if (incompfunc != 1) {
-	zerr("condition can only be used in completion function", NULL, 0);
+	zerr("condition can only be used in completion function");
 	return 0;
     }
     return 1;

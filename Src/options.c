@@ -517,22 +517,22 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 		if (!*++*args)
 		    args++;
 		if (!*args) {
-		    zwarnnam(nam, "string expected after -o", NULL, 0);
+		    zwarnnam(nam, "string expected after -o");
 		    inittyptab();
 		    return 1;
 		}
 		if(!(optno = optlookup(*args)))
-		    zwarnnam(nam, "no such option: %s", *args, 0);
+		    zwarnnam(nam, "no such option: %s", *args);
 		else if(dosetopt(optno, action, 0))
-		    zwarnnam(nam, "can't change option: %s", *args, 0);
+		    zwarnnam(nam, "can't change option: %s", *args);
 		break;
 	    } else if(**args == 'm') {
 		match = 1;
 	    } else {
 	    	if (!(optno = optlookupc(**args)))
-		    zwarnnam(nam, "bad option: -%c", NULL, **args);
+		    zwarnnam(nam, "bad option: -%c", **args);
 		else if(dosetopt(optno, action, 0))
-		    zwarnnam(nam, "can't change option: -%c", NULL, **args);
+		    zwarnnam(nam, "can't change option: -%c", **args);
 	    }
 	}
 	args++;
@@ -543,9 +543,9 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 	/* Not globbing the arguments -- arguments are simply option names. */
 	while (*args) {
 	    if(!(optno = optlookup(*args++)))
-		zwarnnam(nam, "no such option: %s", args[-1], 0);
+		zwarnnam(nam, "no such option: %s", args[-1]);
 	    else if(dosetopt(optno, !isun, 0))
-		zwarnnam(nam, "can't change option: %s", args[-1], 0);
+		zwarnnam(nam, "can't change option: %s", args[-1]);
 	}
     } else {
 	/* Globbing option (-m) set. */
@@ -565,7 +565,7 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 	    /* Expand the current arg. */
 	    tokenize(s);
 	    if (!(pprog = patcompile(s, PAT_STATIC, NULL))) {
-		zwarnnam(nam, "bad pattern: %s", *args, 0);
+		zwarnnam(nam, "bad pattern: %s", *args);
 		continue;
 	    }
 	    /* Loop over expansions. */

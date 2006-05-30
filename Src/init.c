@@ -170,7 +170,7 @@ loop(int toplevel, int justonce)
 		noexitct = 0;
 	}
 	if (ferror(stderr)) {
-	    zerr("write error", NULL, 0);
+	    zerr("write error");
 	    clearerr(stderr);
 	}
 	if (subsh)		/* how'd we get this far in a subshell? */
@@ -264,12 +264,12 @@ parseargs(char **argv)
 		if (!*++*argv)
 		    argv++;
 		if (!*argv) {
-		    zerr("string expected after -o", NULL, 0);
+		    zerr("string expected after -o");
 		    exit(1);
 		}
 	    longoptions:
 		if (!(optno = optlookup(*argv))) {
-		    zerr("no such option: %s", *argv, 0);
+		    zerr("no such option: %s", *argv);
 		    exit(1);
 		} else if (optno == RESTRICTED)
 		    restricted = action;
@@ -281,13 +281,13 @@ parseargs(char **argv)
 		while (*++*argv)
 		    if (!isspace(STOUC(**argv))) {
 		    badoptionstring:
-			zerr("bad option string: `%s'", args, 0);
+			zerr("bad option string: `%s'", args);
 			exit(1);
 		    }
 		break;
 	    } else {
 	    	if (!(optno = optlookupc(**argv))) {
-		    zerr("bad option: -%c", NULL, **argv);
+		    zerr("bad option: -%c", **argv);
 		    exit(1);
 		} else if (optno == RESTRICTED)
 		    restricted = action;
@@ -301,7 +301,7 @@ parseargs(char **argv)
     paramlist = znewlinklist();
     if (cmd) {
 	if (!*argv) {
-	    zerr("string expected after -%s", cmd, 0);
+	    zerr("string expected after -%s", cmd);
 	    exit(1);
 	}
 	cmd = *argv++;
@@ -311,7 +311,7 @@ parseargs(char **argv)
 	    if (!cmd)
 		SHIN = movefd(open(unmeta(*argv), O_RDONLY | O_NOCTTY));
 	    if (SHIN == -1) {
-		zerr("can't open input file: %s", *argv, 0);
+		zerr("can't open input file: %s", *argv);
 		exit(127);
 	    }
 	    opts[INTERACTIVE] &= 1;
@@ -548,7 +548,7 @@ init_term(void)
 #endif
     {
 	if (isset(INTERACTIVE))
-	    zerr("can't find terminal definition for %s", term, 0);
+	    zerr("can't find terminal definition for %s", term);
 	errflag = 0;
 	termflags |= TERM_BAD;
 	return 0;
@@ -1241,8 +1241,7 @@ mod_export CompctlReadFn compctlreadptr = fallback_compctlread;
 mod_export int
 fallback_compctlread(char *name, UNUSED(char **args), UNUSED(Options ops), UNUSED(char *reply))
 {
-    zwarnnam(name, "option valid only in functions called from completion",
-	    NULL, 0);
+    zwarnnam(name, "option valid only in functions called from completion");
     return 1;
 }
 
@@ -1346,6 +1345,6 @@ zsh_main(UNUSED(int argc), char **argv)
 	    zexit(lastval, 0);
 	}
 	zerrnam("zsh", (!islogin) ? "use 'exit' to exit."
-		: "use 'logout' to logout.", NULL, 0);
+		: "use 'logout' to logout.");
     }
 }

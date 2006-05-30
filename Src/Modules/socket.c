@@ -75,12 +75,12 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	targetfd = atoi(OPT_ARG(ops,'d'));
 	if (!targetfd) {
 	    zwarnnam(nam, "%s is an invalid argument to -d",
-		     OPT_ARG(ops, 'd'), 0);
+		     OPT_ARG(ops, 'd'));
 	    return 1;
 	}
 	if (targetfd <= max_zsh_fd && fdtable[targetfd] != FDT_UNUSED) {
 	    zwarnnam(nam, "file descriptor %d is in use by the shell",
-		     NULL, targetfd);
+		     targetfd);
 	    return 1;
 	}
     }
@@ -89,7 +89,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	char *localfn;
 
 	if (!args[0]) {
-	    zwarnnam(nam, "-l requires an argument", NULL, 0);
+	    zwarnnam(nam, "-l requires an argument");
 	    return 1;
 	}
 
@@ -98,7 +98,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	sfd = socket(PF_UNIX, SOCK_STREAM, 0);
 
 	if (sfd == -1) {
-	    zwarnnam(nam, "socket error: %e ", NULL, errno);
+	    zwarnnam(nam, "socket error: %e ", errno);
 	    return 1;
 	}
 
@@ -114,7 +114,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 
 	if (listen(sfd, 1))
 	{
-	    zwarnnam(nam, "could not listen on socket: %e", NULL, errno);
+	    zwarnnam(nam, "could not listen on socket: %e", errno);
 	    close(sfd);
 	    return 1;
 	}
@@ -141,14 +141,14 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	int lfd, rfd;
 
 	if (!args[0]) {
-	    zwarnnam(nam, "-a requires an argument", NULL, 0);
+	    zwarnnam(nam, "-a requires an argument");
 	    return 1;
 	}
 
 	lfd = atoi(args[0]);
 
 	if (!lfd) {
-	    zwarnnam(nam, "invalid numerical argument", NULL, 0);
+	    zwarnnam(nam, "invalid numerical argument");
 	    return 1;
 	}
 
@@ -163,7 +163,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	    if ((ret = poll(&pfd, 1, 0)) == 0) return 1;
 	    else if (ret == -1)
 	    {
-		zwarnnam(nam, "poll error: %e", NULL, errno);
+		zwarnnam(nam, "poll error: %e", errno);
 		return 1;
 	    }
 # else
@@ -179,14 +179,14 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	    if ((ret = select(lfd+1, &rfds, NULL, NULL, &tv))) return 1;
 	    else if (ret == -1)
 	    {
-		zwarnnam(nam, "select error: %e", NULL, errno);
+		zwarnnam(nam, "select error: %e", errno);
 		return 1;
 	    }
 	    
 # endif
 	    
 #else
-	    zwarnnam(nam, "not currently supported", NULL, 0);
+	    zwarnnam(nam, "not currently supported");
 	    return 1;
 #endif
 	}
@@ -194,7 +194,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	len = sizeof(soun);
 	if ((rfd = accept(lfd, (struct sockaddr *)&soun, &len)) == -1)
 	{
-	    zwarnnam(nam, "could not accept connection: %e", NULL, errno);
+	    zwarnnam(nam, "could not accept connection: %e", errno);
 	    return 1;
 	}
 
@@ -214,14 +214,14 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
     else
     {
 	if (!args[0]) {
-	    zwarnnam(nam, "zsocket requires an argument", NULL, 0);
+	    zwarnnam(nam, "zsocket requires an argument");
 	    return 1;
 	}
 
 	sfd = socket(PF_UNIX, SOCK_STREAM, 0);
 
 	if (sfd == -1) {
-	    zwarnnam(nam, "socket creation failed: %e", NULL, errno);
+	    zwarnnam(nam, "socket creation failed: %e", errno);
 	    return 1;
 	}
 
@@ -229,7 +229,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	strncpy(soun.sun_path, args[0], UNIX_PATH_MAX);
 	
 	if ((err = connect(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un)))) {
-	    zwarnnam(nam, "connection failed: %e", NULL, errno);
+	    zwarnnam(nam, "connection failed: %e", errno);
 	    close(sfd);
 	    return 1;
 	}

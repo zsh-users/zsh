@@ -47,71 +47,98 @@ mod_export wchar_t *wordchars_wide;
 /**/
 #endif
 
+
 /* Print an error */
- 
+
+static void
+zwarning(const char *cmd, const char *fmt, va_list ap)
+{
+    if (isatty(2))
+	trashzleptr();
+
+    if (cmd) {
+	if (unset(SHINSTDIN) || locallevel) {
+	    nicezputs(scriptname ? scriptname : argzero, stderr);
+	    fputc((unsigned char)':', stderr);
+	}
+	nicezputs(cmd, stderr);
+	fputc((unsigned char)':', stderr);
+    } else {
+	/*
+	 * scriptname is set when sourcing scripts, so that we get the
+	 * correct name instead of the generic name of whatever
+	 * program/script is running.  It's also set in shell functions,
+	 * so test locallevel, too.
+	 */
+	nicezputs((isset(SHINSTDIN) && !locallevel) ? "zsh" :
+		  scriptname ? scriptname : argzero, stderr);
+	fputc((unsigned char)':', stderr);
+    }
+
+    zerrmsg(fmt, ap);
+}
+
 /**/
 mod_export void
-zerr(const char *fmt, const char *str, int num)
+zerr(const char *fmt, ...)
 {
+    va_list ap;
+
     if (errflag || noerrs) {
 	if (noerrs < 2)
 	    errflag = 1;
 	return;
     }
-    zwarn(fmt, str, num);
+
+    va_start(ap, fmt);
+    zwarning(NULL, fmt, ap);
+    va_end(ap);
     errflag = 1;
 }
 
 /**/
 mod_export void
-zerrnam(const char *cmd, const char *fmt, const char *str, int num)
+zerrnam(const char *cmd, const char *fmt, ...)
 {
+    va_list ap;
+
     if (errflag || noerrs)
 	return;
 
-    zwarnnam(cmd, fmt, str, num);
+    va_start(ap, fmt);
+    zwarning(cmd, fmt, ap);
+    va_end(ap);
     errflag = 1;
 }
 
 /**/
 mod_export void
-zwarn(const char *fmt, const char *str, int num)
+zwarn(const char *fmt, ...)
 {
+    va_list ap;
+
     if (errflag || noerrs)
 	return;
-    if (isatty(2))
-	trashzleptr();
-    /*
-     * scriptname is set when sourcing scripts, so that we get the
-     * correct name instead of the generic name of whatever
-     * program/script is running.  It's also set in shell functions,
-     * so test locallevel, too.
-     */
-    nicezputs((isset(SHINSTDIN) && !locallevel) ? "zsh" :
-	      scriptname ? scriptname : argzero, stderr);
-    fputc((unsigned char)':', stderr);
-    zerrmsg(fmt, str, num);
+
+    va_start(ap, fmt);
+    zwarning(NULL, fmt, ap);
+    va_end(ap);
 }
 
 /**/
 mod_export void
-zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
+zwarnnam(const char *cmd, const char *fmt, ...)
 {
-    if (!cmd) {
-	zwarn(fmt, str, num);
-	return;
-    }
+    va_list ap;
+
     if (errflag || noerrs)
 	return;
-    trashzleptr();
-    if (unset(SHINSTDIN) || locallevel) {
-	nicezputs(scriptname ? scriptname : argzero, stderr);
-	fputc((unsigned char)':', stderr);
-    }
-    nicezputs(cmd, stderr);
-    fputc((unsigned char)':', stderr);
-    zerrmsg(fmt, str, num);
+
+    va_start(ap, fmt);
+    zwarning(cmd, fmt, ap);
+    va_end(ap);
 }
+
 
 #ifdef __CYGWIN__
 /*
@@ -128,8 +155,11 @@ zz_plural_z_alpha(void)
 
 /**/
 void
-zerrmsg(const char *fmt, const char *str, int num)
+zerrmsg(const char *fmt, va_list ap)
 {
+    const char *str;
+    int num;
+
     if ((unset(SHINSTDIN) || locallevel) && lineno)
 	fprintf(stderr, "%ld: ", (long)lineno);
     else
@@ -140,10 +170,13 @@ zerrmsg(const char *fmt, const char *str, int num)
 	    fmt++;
 	    switch (*fmt++) {
 	    case 's':
+		str = va_arg(ap, const char *);
 		nicezputs(str, stderr);
 		break;
 	    case 'l': {
 		char *s;
+		str = va_arg(ap, const char *);
+		num = va_arg(ap, int);
 		num = metalen(str, num);
 		s = zhalloc(num + 1);
 		memcpy(s, str, num);
@@ -152,12 +185,14 @@ zerrmsg(const char *fmt, const char *str, int num)
 		break;
 	    }
 	    case 'd':
+		num = va_arg(ap, int);
 		fprintf(stderr, "%d", num);
 		break;
 	    case '%':
 		putc('%', stderr);
 		break;
 	    case 'c':
+		num = va_arg(ap, int);
 #ifdef MULTIBYTE_SUPPORT
 		zputs(wcs_nicechar(num, NULL, NULL), stderr);
 #else
@@ -166,6 +201,7 @@ zerrmsg(const char *fmt, const char *str, int num)
 		break;
 	    case 'e':
 		/* print the corresponding message for this errno */
+		num = va_arg(ap, int);
 		if (num == EINTR) {
 		    fputs("interrupt\n", stderr);
 		    errflag = 1;
@@ -912,10 +948,10 @@ checkmailpath(char **s)
 	    u = v + 1;
 	if (**s == 0) {
 	    *v = c;
-	    zerr("empty MAILPATH component: %s", *s, 0);
+	    zerr("empty MAILPATH component: %s", *s);
 	} else if (mailstat(unmeta(*s), &st) == -1) {
 	    if (errno != ENOENT)
-		zerr("%e: %s", *s, errno);
+		zerr("%e: %s", errno, *s);
 	} else if (S_ISDIR(st.st_mode)) {
 	    LinkList l;
 	    DIR *lock = opendir(unmeta(*s));
@@ -1019,7 +1055,7 @@ gettyinfo(struct ttyinfo *ti)
 # else
 	if (ioctl(SHTTY, TCGETS, &ti->tio) == -1)
 # endif
-	    zerr("bad tcgets: %e", NULL, errno);
+	    zerr("bad tcgets: %e", errno);
 #else
 # ifdef HAVE_TERMIO_H
 	ioctl(SHTTY, TCGETA, &ti->tio);
@@ -1049,7 +1085,7 @@ settyinfo(struct ttyinfo *ti)
 	ioctl(SHTTY, TCSETS, &ti->tio);
     /* if (ioctl(SHTTY, TCSETS, &ti->tio) == -1) */
 # endif
-	/*	zerr("settyinfo: %e",NULL,errno)*/ ;
+	/*	zerr("settyinfo: %e",errno)*/ ;
 #else
 # ifdef HAVE_TERMIO_H
 	ioctl(SHTTY, TCSETA, &ti->tio);
@@ -1527,7 +1563,7 @@ zstrtol(const char *s, char **t, int base)
     }
 
     if (trunc)
-	zwarn("number truncated after %d digits: %s", inp, trunc - inp);
+	zwarn("number truncated after %d digits: %s", (int)(trunc - inp), inp);
 
     if (t)
 	*t = (char *)s;
@@ -2963,7 +2999,7 @@ attachtty(pid_t pgrp)
 	    else {
 		if (errno != ENOTTY)
 		{
-		    zwarn("can't set tty pgrp: %e", NULL, errno);
+		    zwarn("can't set tty pgrp: %e", errno);
 		    fflush(stderr);
 		}
 		opts[MONITOR] = 0;
@@ -4124,7 +4160,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 #if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
 		count = wctomb(t, (wchar_t)wval);
 		if (count == -1) {
-		    zerr("character not in range", NULL, 0);
+		    zerr("character not in range");
 		    if (fromwhere == 4) {
 			for (u = t; (*u++ = *++s););
 			return t;
@@ -4153,7 +4189,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 
     	    	    cd = iconv_open(nl_langinfo(CODESET), "UCS-4BE");
 		    if (cd == (iconv_t)-1) {
-			zerr("cannot do charset conversion", NULL, 0);
+			zerr("cannot do charset conversion");
 			if (fromwhere == 4) {
 			    for (u = t; (*u++ = *++s););
 			    return t;
@@ -4165,21 +4201,21 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
                     count = iconv(cd, &inptr, &inbytes, &t, &outbytes);
 		    iconv_close(cd);
 		    if (count == (size_t)-1) {
-                        zerr("character not in range", NULL, 0);
+                        zerr("character not in range");
 		        *t = '\0';
 			*len = t - buf;
 			return buf;
 		    }
 		    continue;
 #   else
-                    zerr("cannot do charset conversion", NULL, 0);
+                    zerr("cannot do charset conversion");
 		    *t = '\0';
 		    *len = t - buf;
 		    return buf;
 #   endif
 		}
 #  else
-                zerr("cannot do charset conversion", NULL, 0);
+                zerr("cannot do charset conversion");
 		*t = '\0';
 		*len = t - buf;
 		return buf;

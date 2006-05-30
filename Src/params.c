@@ -424,7 +424,7 @@ getparamnode(HashTable ht, char *nam)
 	hn = gethashnode2(ht, nam);
 	if (((Param) hn) == pm && (pm->node.flags & PM_AUTOLOAD)) {
 	    pm->node.flags &= ~PM_AUTOLOAD;
-	    zwarnnam(nam, "autoload failed", NULL, 0);
+	    zwarnnam(nam, "autoload failed");
 	}
     }
     return hn;
@@ -799,7 +799,7 @@ createparam(char *name, int flags)
 		return NULL;
 	    }
 	    if ((oldpm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-		zerr("%s: restricted", name, 0);
+		zerr("%s: restricted", name);
 		return NULL;
 	    }
 
@@ -1325,7 +1325,7 @@ getindex(char **pptr, Value v, int dq)
     if (*tbrack)
 	*tbrack = Outbrack;
     else {
-	zerr("invalid subscript", NULL, 0);
+	zerr("invalid subscript");
 	*pptr = tbrack;
 	return 1;
     }
@@ -1361,7 +1361,7 @@ getindex(char **pptr, Value v, int dq)
 		v->end = start + 1;
 	    }
 	    if (*s == ',') {
-		zerr("invalid subscript", NULL, 0);
+		zerr("invalid subscript");
 		*tbrack = ']';
 		*pptr = tbrack+1;
 		return 1;
@@ -1697,17 +1697,17 @@ mod_export void
 setstrvalue(Value v, char *val)
 {
     if (v->pm->node.flags & PM_READONLY) {
-	zerr("read-only variable: %s", v->pm->node.nam, 0);
+	zerr("read-only variable: %s", v->pm->node.nam);
 	zsfree(val);
 	return;
     }
     if ((v->pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	zerr("%s: restricted", v->pm->node.nam, 0);
+	zerr("%s: restricted", v->pm->node.nam);
 	zsfree(val);
 	return;
     }
     if ((v->pm->node.flags & PM_HASHED) && (v->isarr & SCANPM_MATCHMANY)) {
-	zerr("%s: attempt to set slice of associative array", v->pm->node.nam, 0);
+	zerr("%s: attempt to set slice of associative array", v->pm->node.nam);
 	zsfree(val);
 	return;
     }
@@ -1798,11 +1798,11 @@ setnumvalue(Value v, mnumber val)
     char buf[BDIGBUFSIZE], *p;
 
     if (v->pm->node.flags & PM_READONLY) {
-	zerr("read-only variable: %s", v->pm->node.nam, 0);
+	zerr("read-only variable: %s", v->pm->node.nam);
 	return;
     }
     if ((v->pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	zerr("%s: restricted", v->pm->node.nam, 0);
+	zerr("%s: restricted", v->pm->node.nam);
 	return;
     }
     switch (PM_TYPE(v->pm->node.flags)) {
@@ -1835,19 +1835,19 @@ mod_export void
 setarrvalue(Value v, char **val)
 {
     if (v->pm->node.flags & PM_READONLY) {
-	zerr("read-only variable: %s", v->pm->node.nam, 0);
+	zerr("read-only variable: %s", v->pm->node.nam);
 	freearray(val);
 	return;
     }
     if ((v->pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	zerr("%s: restricted", v->pm->node.nam, 0);
+	zerr("%s: restricted", v->pm->node.nam);
 	freearray(val);
 	return;
     }
     if (!(PM_TYPE(v->pm->node.flags) & (PM_ARRAY|PM_HASHED))) {
 	freearray(val);
 	zerr("%s: attempt to assign array value to non-array",
-	     v->pm->node.nam, 0);
+	     v->pm->node.nam);
 	return;
     }
     if (v->start == 0 && v->end == -1) {
@@ -1865,7 +1865,7 @@ setarrvalue(Value v, char **val)
 	if ((PM_TYPE(v->pm->node.flags) == PM_HASHED)) {
 	    freearray(val);
 	    zerr("%s: attempt to set slice of associative array",
-		 v->pm->node.nam, 0);
+		 v->pm->node.nam);
 	    return;
 	}
 	if (v->inv && unset(KSHARRAYS)) {
@@ -2012,7 +2012,7 @@ assignsparam(char *s, char *val, int flags)
     int sstart;
 
     if (!isident(s)) {
-	zerr("not an identifier: %s", s, 0);
+	zerr("not an identifier: %s", s);
 	zsfree(val);
 	errflag = 1;
 	return NULL;
@@ -2047,7 +2047,7 @@ assignsparam(char *s, char *val, int flags)
     }
     if ((flags & ASSPM_WARN_CREATE) && v->pm->level == 0)
 	zwarn("scalar parameter %s created globally in function",
-	      v->pm->node.nam, 0);
+	      v->pm->node.nam);
     if (flags & ASSPM_AUGMENT) {
 	if (v->start == 0 && v->end == -1) {
 	    switch (PM_TYPE(v->pm->node.flags)) {
@@ -2098,8 +2098,7 @@ assignsparam(char *s, char *val, int flags)
 	    case PM_EFLOAT:
 	    case PM_FFLOAT:
 		unqueue_signals();
-		zerr("attempt to add to slice of a numeric variable",
-		    NULL, 0);
+		zerr("attempt to add to slice of a numeric variable");
 		zsfree(val);
 		return NULL;
 	    case PM_ARRAY:
@@ -2135,7 +2134,7 @@ assignaparam(char *s, char **val, int flags)
     char *ss;
 
     if (!isident(s)) {
-	zerr("not an identifier: %s", s, 0);
+	zerr("not an identifier: %s", s);
 	freearray(val);
 	errflag = 1;
 	return NULL;
@@ -2151,7 +2150,7 @@ assignaparam(char *s, char **val, int flags)
 	if (v && PM_TYPE(v->pm->node.flags) == PM_HASHED) {
 	    unqueue_signals();
 	    zerr("%s: attempt to set slice of associative array",
-		 v->pm->node.nam, 0);
+		 v->pm->node.nam);
 	    freearray(val);
 	    errflag = 1;
 	    return NULL;
@@ -2190,7 +2189,7 @@ assignaparam(char *s, char **val, int flags)
 
     if ((flags & ASSPM_WARN_CREATE) && v->pm->level == 0)
 	zwarn("array parameter %s created globally in function",
-	      v->pm->node.nam, 0);
+	      v->pm->node.nam);
     if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
@@ -2222,14 +2221,14 @@ sethparam(char *s, char **val)
     char *t = s;
 
     if (!isident(s)) {
-	zerr("not an identifier: %s", s, 0);
+	zerr("not an identifier: %s", s);
 	freearray(val);
 	errflag = 1;
 	return NULL;
     }
     if (strchr(s, '[')) {
 	freearray(val);
-	zerr("nested associative arrays not yet supported", NULL, 0);
+	zerr("nested associative arrays not yet supported");
 	errflag = 1;
 	return NULL;
     }
@@ -2263,7 +2262,7 @@ setiparam(char *s, zlong val)
     mnumber mnval;
 
     if (!isident(s)) {
-	zerr("not an identifier: %s", s, 0);
+	zerr("not an identifier: %s", s);
 	errflag = 1;
 	return NULL;
     }
@@ -2304,7 +2303,7 @@ setnparam(char *s, mnumber val)
     Param pm;
 
     if (!isident(s)) {
-	zerr("not an identifier: %s", s, 0);
+	zerr("not an identifier: %s", s);
 	errflag = 1;
 	return NULL;
     }
@@ -2356,11 +2355,11 @@ unsetparam_pm(Param pm, int altflag, int exp)
     char *altremove;
 
     if ((pm->node.flags & PM_READONLY) && pm->level <= locallevel) {
-	zerr("read-only variable: %s", pm->node.nam, 0);
+	zerr("read-only variable: %s", pm->node.nam);
 	return 1;
     }
     if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	zerr("%s: restricted", pm->node.nam, 0);
+	zerr("%s: restricted", pm->node.nam);
 	return 1;
     }
 
@@ -2602,8 +2601,7 @@ arrhashsetfn(Param pm, char **val, int augment)
 
     if (alen % 2) {
 	freearray(val);
-	zerr("bad set of key/value pairs for associative array",
-	     NULL, 0);
+	zerr("bad set of key/value pairs for associative array");
 	return;
     }
     if (alen)
@@ -2936,7 +2934,7 @@ intsecondssetfn(UNUSED(Param pm), zlong x)
     diff = (zlong)now.tv_sec - x;
     shtimer.tv_sec = diff;
     if ((zlong)shtimer.tv_sec != diff)
-	zwarn("SECONDS truncated on assignment", NULL, 0);
+	zwarn("SECONDS truncated on assignment");
     shtimer.tv_usec = 0;
 }
 
@@ -3272,7 +3270,7 @@ errnosetfn(UNUSED(Param pm), zlong x)
 {
     errno = (int)x;
     if ((zlong)errno != x)
-	zwarn("errno truncated on assignment", NULL, 0);
+	zwarn("errno truncated on assignment");
 }
 
 /* Function to get value for special parameter `ERRNO' */

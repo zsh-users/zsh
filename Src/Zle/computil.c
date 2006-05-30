@@ -465,7 +465,7 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
         set->strs = NULL;
 
 	if (!(ap = get_user_var(*args))) {
-	    zwarnnam(nam, "invalid argument: %s", *args, 0);
+	    zwarnnam(nam, "invalid argument: %s", *args);
             zsfree(cd_state.sep);
             freecdsets(cd_state.sets);
 	    return 1;
@@ -495,7 +495,7 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
 
 	if (*++args && **args != '-') {
 	    if (!(ap = get_user_var(*args))) {
-		zwarnnam(nam, "invalid argument: %s", *args, 0);
+		zwarnnam(nam, "invalid argument: %s", *args);
                 zsfree(cd_state.sep);
                 freecdsets(cd_state.sets);
 		return 1;
@@ -722,31 +722,31 @@ bin_compdescribe(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     int n = arrlen(args);
 
     if (incompfunc != 1) {
-	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	zwarnnam(nam, "can only be called from completion function");
 	return 1;
     }
     if (!args[0][0] || !args[0][1] || args[0][2]) {
-	zwarnnam(nam, "invalid argument: %s", args[0], 0);
+	zwarnnam(nam, "invalid argument: %s", args[0]);
 	return 1;
     }
     switch (args[0][1]) {
     case 'i':
         if (n < 3) {
-            zwarnnam(nam, "not enough arguments", NULL, 0);
+            zwarnnam(nam, "not enough arguments");
 
             return 1;
         }
 	return cd_init(nam, args[1], args[2], "", NULL, args + 3, 0);
     case 'I':
         if (n < 6) {
-            zwarnnam(nam, "not enough arguments", NULL, 0);
+            zwarnnam(nam, "not enough arguments");
 
             return 1;
         } else {
             char **opts;
 
             if (!(opts = getaparam(args[4]))) {
-		zwarnnam(nam, "unknown parameter: %s", args[4], 0);
+		zwarnnam(nam, "unknown parameter: %s", args[4]);
 		return 1;
             }
             return cd_init(nam, args[1], args[2], args[3], opts, args + 5, 1);
@@ -755,16 +755,16 @@ bin_compdescribe(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	if (cd_parsed) {
 	    if (n != 5) {
 		zwarnnam(nam, (n < 5 ? "not enough arguments" :
-			      "too many arguments"), NULL, 0);
+			      "too many arguments"));
 		return 1;
 	    }
 	    return cd_get(args + 1);
 	} else {
-	    zwarnnam(nam, "no parsed state", NULL, 0);
+	    zwarnnam(nam, "no parsed state");
 	    return 1;
 	}
     }
-    zwarnnam(nam, "invalid option: %s", args[0], 0);
+    zwarnnam(nam, "invalid option: %s", args[0]);
     return 1;
 }
 
@@ -1199,7 +1199,7 @@ parse_cadef(char *nam, char **args)
 	    /* Oops, end-of-string. */
 	    if (*p != ')') {
 		freecadef(all);
-		zwarnnam(nam, "invalid argument: %s", *args, 0);
+		zwarnnam(nam, "invalid argument: %s", *args);
 		return NULL;
 	    }
 	    if (doset && axor)
@@ -1252,7 +1252,7 @@ parse_cadef(char *nam, char **args)
 	    }
 	    if (!p[1]) {
 		freecadef(all);
-		zwarnnam(nam, "invalid argument: %s", *args, 0);
+		zwarnnam(nam, "invalid argument: %s", *args);
 		return NULL;
 	    }
 
@@ -1289,7 +1289,7 @@ parse_cadef(char *nam, char **args)
 
 		if (!*p) {
 		    freecadef(all);
-		    zwarnnam(nam, "invalid option definition: %s", *args, 0);
+		    zwarnnam(nam, "invalid option definition: %s", *args);
 		    return NULL;
 		}
 		*p++ = '\0';
@@ -1299,7 +1299,7 @@ parse_cadef(char *nam, char **args)
 
 	    if (c && c != ':') {
 		freecadef(all);
-		zwarnnam(nam, "invalid option definition: %s", *args, 0);
+		zwarnnam(nam, "invalid option definition: %s", *args);
 		return NULL;
 	    }
 	    /* Add the option name to the xor list if not `*-...'. */
@@ -1345,7 +1345,7 @@ parse_cadef(char *nam, char **args)
 			    freecadef(all);
 			    freecaargs(oargs);
 			    zwarnnam(nam, "invalid option definition: %s",
-				    *args, 0);
+				    *args);
 			    return NULL;
 			}
 			if (*++p == ':') {
@@ -1429,12 +1429,12 @@ parse_cadef(char *nam, char **args)
 
 	    if (*++p != ':') {
 		freecadef(all);
-		zwarnnam(nam, "invalid rest argument definition: %s", *args, 0);
+		zwarnnam(nam, "invalid rest argument definition: %s", *args);
 		return NULL;
 	    }
 	    if (ret->rest) {
 		freecadef(all);
-		zwarnnam(nam, "doubled rest argument definition: %s", *args, 0);
+		zwarnnam(nam, "doubled rest argument definition: %s", *args);
 		return NULL;
 	    }
 	    if (*++p == ':') {
@@ -1469,7 +1469,7 @@ parse_cadef(char *nam, char **args)
 
 	    if (*p != ':') {
 		freecadef(all);
-		zwarnnam(nam, "invalid argument: %s", *args, 0);
+		zwarnnam(nam, "invalid argument: %s", *args);
 		return NULL;
 	    }
 	    if (*++p == ':') {
@@ -1490,7 +1490,7 @@ parse_cadef(char *nam, char **args)
 	    if (tmp && tmp->num == anum - 1) {
 		freecadef(all);
 		freecaargs(arg);
-		zwarnnam(nam, "doubled argument definition: %s", *args, 0);
+		zwarnnam(nam, "doubled argument definition: %s", *args);
 		return NULL;
 	    }
 	    arg->next = tmp;
@@ -2265,15 +2265,15 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     Castate lstate = &ca_laststate;
 
     if (incompfunc != 1) {
-	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	zwarnnam(nam, "can only be called from completion function");
 	return 1;
     }
     if (args[0][0] != '-' || !args[0][1] || args[0][2]) {
-	zwarnnam(nam, "invalid argument: %s", args[0], 0);
+	zwarnnam(nam, "invalid argument: %s", args[0]);
 	return 1;
     }
     if (args[0][1] != 'i' && args[0][1] != 'I' && !ca_parsed) {
-	zwarnnam(nam, "no parsed state", NULL, 0);
+	zwarnnam(nam, "no parsed state");
 	return 1;
     }
     switch (args[0][1]) {
@@ -2286,15 +2286,15 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'a': min = 0; max =  0; break;
     case 'W': min = 2; max =  2; break;
     default:
-	zwarnnam(nam, "invalid option: %s", args[0], 0);
+	zwarnnam(nam, "invalid option: %s", args[0]);
 	return 1;
     }
     n = arrlen(args) - 1;
     if (n < min) {
-	zwarnnam(nam, "not enough arguments", NULL, 0);
+	zwarnnam(nam, "not enough arguments");
 	return 1;
     } else if (max >= 0 && n > max) {
-	zwarnnam(nam, "too many arguments", NULL, 0);
+	zwarnnam(nam, "too many arguments");
 	return 1;
     }
     switch (args[0][1]) {
@@ -2678,7 +2678,7 @@ parse_cvdef(char *nam, char **args)
         }
     }
     if (!args[0] || !args[1]) {
-	zwarnnam(nam, "not enough arguments", NULL, 0);
+	zwarnnam(nam, "not enough arguments");
 	return NULL;
     }
     descr = *args++;
@@ -2724,7 +2724,7 @@ parse_cvdef(char *nam, char **args)
 	    }
 	    if (*p != ')') {
 		freecvdef(ret);
-		zwarnnam(nam, "invalid argument: %s", *args, 0);
+		zwarnnam(nam, "invalid argument: %s", *args);
 		return NULL;
 	    }
 	    xor = (char **) zalloc((xnum + 2) * sizeof(char *));
@@ -2748,7 +2748,7 @@ parse_cvdef(char *nam, char **args)
 
 	if (hassep && !sep && name + bs + 1 < p) {
 	    freecvdef(ret);
-	    zwarnnam(nam, "no multi-letter values with empty separator allowed", NULL, 0);
+	    zwarnnam(nam, "no multi-letter values with empty separator allowed");
 	    return NULL;
 	}
 	/* Optional description? */
@@ -2761,7 +2761,7 @@ parse_cvdef(char *nam, char **args)
 
 	    if (!*p) {
 		freecvdef(ret);
-		zwarnnam(nam, "invalid value definition: %s", *args, 0);
+		zwarnnam(nam, "invalid value definition: %s", *args);
 		return NULL;
 	    }
 	    *p++ = '\0';
@@ -2772,7 +2772,7 @@ parse_cvdef(char *nam, char **args)
 	}
 	if (c && c != ':') {
 	    freecvdef(ret);
-	    zwarnnam(nam, "invalid value definition: %s", *args, 0);
+	    zwarnnam(nam, "invalid value definition: %s", *args);
 	    return NULL;
 	}
 	if (!multi) {
@@ -2787,7 +2787,7 @@ parse_cvdef(char *nam, char **args)
 	if (c == ':') {
 	    if (hassep && !sep) {
 		freecvdef(ret);
-		zwarnnam(nam, "no value with argument with empty separator allowed", NULL, 0);
+		zwarnnam(nam, "no value with argument with empty separator allowed");
 		return NULL;
 	    }
 	    if (*++p == ':') {
@@ -3142,15 +3142,15 @@ bin_compvalues(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     int min, max, n;
 
     if (incompfunc != 1) {
-	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	zwarnnam(nam, "can only be called from completion function");
 	return 1;
     }
     if (args[0][0] != '-' || !args[0][1] || args[0][2]) {
-	zwarnnam(nam, "invalid argument: %s", args[0], 0);
+	zwarnnam(nam, "invalid argument: %s", args[0]);
 	return 1;
     }
     if (args[0][1] != 'i' && !cv_parsed) {
-	zwarnnam(nam, "no parsed state", NULL, 0);
+	zwarnnam(nam, "no parsed state");
 	return 1;
     }
     switch (args[0][1]) {
@@ -3164,15 +3164,15 @@ bin_compvalues(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'L': min = 3; max =  4; break;
     case 'v': min = 1; max =  1; break;
     default:
-	zwarnnam(nam, "invalid option: %s", args[0], 0);
+	zwarnnam(nam, "invalid option: %s", args[0]);
 	return 1;
     }
     n = arrlen(args) - 1;
     if (n < min) {
-	zwarnnam(nam, "not enough arguments", NULL, 0);
+	zwarnnam(nam, "not enough arguments");
 	return 1;
     } else if (max >= 0 && n > max) {
-	zwarnnam(nam, "too many arguments", NULL, 0);
+	zwarnnam(nam, "too many arguments");
 	return 1;
     }
     switch (args[0][1]) {
@@ -3357,7 +3357,7 @@ bin_compquote(char *nam, char **args, Options ops, UNUSED(int func))
     Value v;
 
     if (incompfunc != 1) {
-	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	zwarnnam(nam, "can only be called from completion function");
 	return 1;
     }
     /* Anything to do? */
@@ -3391,10 +3391,10 @@ bin_compquote(char *nam, char **args, Options ops, UNUSED(int func))
 		}
 		break;
 	    default:
-		zwarnnam(nam, "invalid parameter type: %s", args[-1], 0);
+		zwarnnam(nam, "invalid parameter type: %s", args[-1]);
 	    }
 	} else
-	    zwarnnam(nam, "unknown parameter: %s", args[-1], 0);
+	    zwarnnam(nam, "unknown parameter: %s", args[-1]);
 	unqueue_signals();
     }
     return 0;
@@ -3506,21 +3506,21 @@ bin_comptags(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     int min, max, n, level;
 
     if (incompfunc != 1) {
-	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	zwarnnam(nam, "can only be called from completion function");
 	return 1;
     }
     if (args[0][0] != '-' || !args[0][1] ||
 	(args[0][2] && (args[0][2] != '-' || args[0][3]))) {
-	zwarnnam(nam, "invalid argument: %s", args[0], 0);
+	zwarnnam(nam, "invalid argument: %s", args[0]);
 	return 1;
     }
     level = locallevel - (args[0][2] ? 1 : 0);
     if (level >= MAX_TAGS) {
-	zwarnnam(nam, "nesting level too deep", NULL, 0);
+	zwarnnam(nam, "nesting level too deep");
 	return 1;
     }
     if (args[0][1] != 'i' && args[0][1] != 'I' && !comptags[level]) {
-	zwarnnam(nam, "no tags registered", NULL, 0);
+	zwarnnam(nam, "no tags registered");
 	return 1;
     }
     switch (args[0][1]) {
@@ -3532,15 +3532,15 @@ bin_comptags(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'S': min = 1; max =  1; break;
     case 'A': min = 2; max =  3; break;
     default:
-	zwarnnam(nam, "invalid option: %s", args[0], 0);
+	zwarnnam(nam, "invalid option: %s", args[0]);
 	return 1;
     }
     n = arrlen(args) - 1;
     if (n < min) {
-	zwarnnam(nam, "not enough arguments", NULL, 0);
+	zwarnnam(nam, "not enough arguments");
 	return 1;
     } else if (max >= 0 && n > max) {
-	zwarnnam(nam, "too many arguments", NULL, 0);
+	zwarnnam(nam, "too many arguments");
 	return 1;
     }
     switch (args[0][1]) {
@@ -3634,11 +3634,11 @@ static int
 bin_comptry(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     if (incompfunc != 1) {
-	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	zwarnnam(nam, "can only be called from completion function");
 	return 1;
     }
     if (!lasttaglevel || !comptags[lasttaglevel]) {
-	zwarnnam(nam, "no tags registered", NULL, 0);
+	zwarnnam(nam, "no tags registered");
 	return 1;
     }
     if (*args) {
@@ -4326,18 +4326,18 @@ static int
 bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     if (incompfunc != 1) {
-	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	zwarnnam(nam, "can only be called from completion function");
 	return 1;
     }
     if (**args != '-') {
-	zwarnnam(nam, "missing option: %s", *args, 0);
+	zwarnnam(nam, "missing option: %s", *args);
 	return 1;
     }
     switch (args[0][1]) {
     case 'p':
     case 'P':
 	if (args[0][2] && (args[0][2] != '-' || args[0][3])) {
-	    zwarnnam(nam, "invalid option: %s", *args, 0);
+	    zwarnnam(nam, "invalid option: %s", *args);
 	    return 1;
 	} else {
 	    char **tmp;
@@ -4345,12 +4345,12 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 	    if (!args[1] || !args[2] || !args[3] || !args[4] || !args[5] ||
 		!args[6] || (args[0][1] == 'p' && !args[7])) {
-		zwarnnam(nam, "too few arguments", NULL, 0);
+		zwarnnam(nam, "too few arguments");
 		return 1;
 	    }
 	    queue_signals();
 	    if (!(tmp = getaparam(args[1]))) {
-		zwarnnam(nam, "unknown parameter: %s", args[1], 0);
+		zwarnnam(nam, "unknown parameter: %s", args[1]);
 		return 0;
 	    }
 	    for (l = newlinklist(); *tmp; tmp++)
@@ -4364,18 +4364,18 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
     case 'i':
 	if (args[0][2]) {
-	    zwarnnam(nam, "invalid option: %s", *args, 0);
+	    zwarnnam(nam, "invalid option: %s", *args);
 	    return 1;
 	} else {
 	    char **tmp;
 	    LinkList l;
 
 	    if (!args[1] || !args[2] || !args[3] || !args[4]) {
-		zwarnnam(nam, "too few arguments", NULL, 0);
+		zwarnnam(nam, "too few arguments");
 		return 1;
 	    }
 	    if (args[5]) {
-		zwarnnam(nam, "too many arguments", NULL, 0);
+		zwarnnam(nam, "too many arguments");
 		return 1;
 	    }
 	    queue_signals();
@@ -4386,7 +4386,7 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    addlinknode(l, *tmp);
 	    if (!(tmp = getaparam(args[1]))) {
 		unqueue_signals();
-		zwarnnam(nam, "unknown parameter: %s", args[1], 0);
+		zwarnnam(nam, "unknown parameter: %s", args[1]);
 		return 0;
 	    }
 	    cf_ignore(tmp, l, args[3], args[4]);
@@ -4401,17 +4401,17 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    int ret = 0;
 
 	    if (!args[1] || !args[2]) {
-		zwarnnam(nam, "too few arguments", NULL, 0);
+		zwarnnam(nam, "too few arguments");
 		return 1;
 	    }
 	    if (args[3]) {
-		zwarnnam(nam, "too many arguments", NULL, 0);
+		zwarnnam(nam, "too many arguments");
 		return 1;
 	    }
 	    queue_signals();
 	    if (!(tmp = getaparam(args[1]))) {
 		unqueue_signals();
-		zwarnnam(nam, "unknown parameter: %s", args[1], 0);
+		zwarnnam(nam, "unknown parameter: %s", args[1]);
 		return 0;
 	    }
 	    if ((l = cf_remove_other(tmp, args[2], &ret)))
@@ -4420,7 +4420,7 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    return ret;
 	}
     }
-    zwarnnam(nam, "invalid option: %s", *args, 0);
+    zwarnnam(nam, "invalid option: %s", *args);
     return 1;
 }
 
@@ -4431,7 +4431,7 @@ bin_compgroups(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     char *n;
 
     if (incompfunc != 1) {
-	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	zwarnnam(nam, "can only be called from completion function");
 	return 1;
     }
     SWITCHHEAPS(oldheap, compheap) {

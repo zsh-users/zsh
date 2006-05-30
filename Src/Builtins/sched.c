@@ -61,13 +61,13 @@ bin_sched(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
 	sn = atoi(s + 1);
 
 	if (!sn) {
-	    zwarnnam("sched", "usage for delete: sched -<item#>.", NULL, 0);
+	    zwarnnam("sched", "usage for delete: sched -<item#>.");
 	    return 1;
 	}
 	for (schl = (struct schedcmd *)&schedcmds, sch = schedcmds, sn--;
 	     sch && sn; sch = (schl = sch)->next, sn--);
 	if (!sch) {
-	    zwarnnam("sched", "not that many entries", NULL, 0);
+	    zwarnnam("sched", "not that many entries");
 	    return 1;
 	}
 	schl->next = sch->next;
@@ -91,7 +91,7 @@ bin_sched(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
     } else if (!*argv) {
 	/* other than the two cases above, sched *
 	 *requires at least two arguments        */
-	zwarnnam("sched", "not enough arguments", NULL, 0);
+	zwarnnam("sched", "not enough arguments");
 	return 1;
     }
 
@@ -104,12 +104,12 @@ bin_sched(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
 	offset is simply added to the current time. */
 	h = zstrtol(s + 1, &s, 10);
 	if (*s != ':') {
-	    zwarnnam("sched", "bad time specifier", NULL, 0);
+	    zwarnnam("sched", "bad time specifier");
 	    return 1;
 	}
 	m = zstrtol(s + 1, &s, 10);
 	if (*s) {
-	    zwarnnam("sched", "bad time specifier", NULL, 0);
+	    zwarnnam("sched", "bad time specifier");
 	    return 1;
 	}
 	t = time(NULL) + h * 3600 + m * 60;
@@ -120,12 +120,12 @@ bin_sched(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
 	are ignored. */
 	h = zstrtol(s, &s, 10);
 	if (*s != ':') {
-	    zwarnnam("sched", "bad time specifier", NULL, 0);
+	    zwarnnam("sched", "bad time specifier");
 	    return 1;
 	}
 	m = zstrtol(s + 1, &s, 10);
 	if (*s && *s != 'a' && *s != 'A' && *s != 'p' && *s != 'P') {
-	    zwarnnam("sched", "bad time specifier", NULL, 0);
+	    zwarnnam("sched", "bad time specifier");
 	    return 1;
 	}
 	t = time(NULL);

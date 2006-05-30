@@ -78,7 +78,7 @@ bin_mkdir(char *nam, char **args, Options ops, UNUSED(int func))
 
 	mode = zstrtol(str, &ptr, 8);
 	if(!*str || *ptr) {
-	    zwarnnam(nam, "invalid mode `%s'", str, 0);
+	    zwarnnam(nam, "invalid mode `%s'", str);
 	    return 1;
 	}
     }
@@ -214,7 +214,7 @@ bin_ln(char *nam, char **args, Options ops, int func)
 	    goto havedir;
     }
     if(a > args+1) {
-	zwarnnam(nam, "last of many arguments must be a directory", NULL, 0);
+	zwarnnam(nam, "last of many arguments must be a directory");
 	return 1;
     }
     if(!args[1]) {
@@ -266,7 +266,7 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
     if(!lstat(qbuf, &st)) {
 	int doit = flags & MV_FORCE;
 	if(S_ISDIR(st.st_mode)) {
-	    zwarnnam(nam, "%s: cannot overwrite directory", q, 0);
+	    zwarnnam(nam, "%s: cannot overwrite directory", q);
 	    zsfree(pbuf);
 	    return 1;
 	} else if(flags & MV_INTER) {
@@ -469,7 +469,7 @@ recursivecmd_dorec(struct recursivecmd const *reccmd,
     if (restoredir(ds)) {
 	if(!reccmd->opt_noerr)
 	    zwarnnam(reccmd->nam, "failed to return to previous directory: %e",
-		     NULL, errno);
+		     errno);
 	return 2;
     }
     return err | reccmd->dirpost_func(arg, rp, sp, reccmd->magic);
@@ -647,7 +647,7 @@ bin_chown(char *nam, char **args, Options ops, int func)
 	    int err;
 	    chm.uid = getnumeric(p, &err);
 	    if(err) {
-		zwarnnam(nam, "%s: no such user", p, 0);
+		zwarnnam(nam, "%s: no such user", p);
 		free(uspec);
 		return 1;
 	    }
@@ -656,7 +656,7 @@ bin_chown(char *nam, char **args, Options ops, int func)
 	    p = end+1;
 	    if(!*p) {
 		if(!pwd && !(pwd = getpwuid(chm.uid))) {
-		    zwarnnam(nam, "%s: no such user", uspec, 0);
+		    zwarnnam(nam, "%s: no such user", uspec);
 		    free(uspec);
 		    return 1;
 		}
@@ -673,7 +673,7 @@ bin_chown(char *nam, char **args, Options ops, int func)
 		    int err;
 		    chm.gid = getnumeric(p, &err);
 		    if(err) {
-			zwarnnam(nam, "%s: no such group", p, 0);
+			zwarnnam(nam, "%s: no such group", p);
 			free(uspec);
 			return 1;
 		    }

@@ -95,12 +95,12 @@ bin_echoti(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     t = (char *)tigetstr(s);
     if (!t || t == (char *)-1 || !*t) {
 	/* capability doesn't exist, or (if boolean) is off */
-	zwarnnam(name, "no such terminfo capability: %s", s, 0);
+	zwarnnam(name, "no such terminfo capability: %s", s);
 	return 1;
     }
     /* check that the number of arguments provided is not too high */
     if (arrlen(argv) > 9) {
-        zwarnnam(name, "too many arguments", NULL, 0);
+        zwarnnam(name, "too many arguments");
         return 1;
     }
 
@@ -216,7 +216,7 @@ getterminfo(UNUSED(HashTable ht), char *name)
 	pm->node.flags |= PM_SCALAR;
 	pm->gsu.s = &nullsetscalar_gsu;
     } else {
-	/* zwarn("no such capability: %s", name, 0); */
+	/* zwarn("no such capability: %s", name); */
 	pm->u.str = dupstring("");
 	pm->node.flags |= PM_UNSET;
 	pm->gsu.s = &nullsetscalar_gsu;

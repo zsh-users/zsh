@@ -183,7 +183,7 @@ static void
 setpmcommand(Param pm, char *value)
 {
     if (isset(RESTRICTED)) {
-	zwarn("restricted: %s", value, 0);
+	zwarn("restricted: %s", value);
 	zsfree(value);
     } else {
 	Cmdnam cn = zshcalloc(sizeof(*cn));
@@ -322,7 +322,7 @@ setfunction(char *name, char *val, int dis)
     prog = parse_string(val);
 
     if (!prog || prog == &dummy_eprog) {
-	zwarn("invalid function definition", value, 0);
+	zwarn("invalid function definition", value);
 	zsfree(val);
 	return;
     }
@@ -679,11 +679,11 @@ setpmoption(Param pm, char *value)
     int n;
 
     if (!value || (strcmp(value, "on") && strcmp(value, "off")))
-	zwarn("invalid value: %s", value, 0);
+	zwarn("invalid value: %s", value);
     else if (!(n = optlookup(pm->node.nam)))
-	zwarn("no such option: %s", pm->node.nam, 0);
+	zwarn("no such option: %s", pm->node.nam);
     else if (dosetopt(n, (value && strcmp(value, "off")), 0))
-	zwarn("can't change option: %s", pm->node.nam, 0);
+	zwarn("can't change option: %s", pm->node.nam);
     zsfree(value);
 }
 
@@ -694,9 +694,9 @@ unsetpmoption(Param pm, UNUSED(int exp))
     int n;
 
     if (!(n = optlookup(pm->node.nam)))
-	zwarn("no such option: %s", pm->node.nam, 0);
+	zwarn("no such option: %s", pm->node.nam);
     else if (dosetopt(n, 0, 0))
-	zwarn("can't change option: %s", pm->node.nam, 0);
+	zwarn("can't change option: %s", pm->node.nam);
 }
 
 /**/
@@ -721,10 +721,10 @@ setpmoptions(UNUSED(Param pm), HashTable ht)
 
 	    val = getstrvalue(&v);
 	    if (!val || (strcmp(val, "on") && strcmp(val, "off")))
-		zwarn("invalid value: %s", val, 0);
+		zwarn("invalid value: %s", val);
 	    else if (dosetopt(optlookup(hn->nam),
 			      (val && strcmp(val, "off")), 0))
-		zwarn("can't change option: %s", hn->nam, 0);
+		zwarn("can't change option: %s", hn->nam);
 	}
     deleteparamtable(ht);
 }
@@ -1295,7 +1295,7 @@ static void
 setpmnameddir(Param pm, char *value)
 {
     if (!value)
-	zwarn("invalid value: ''", NULL, 0);
+	zwarn("invalid value: ''");
     else {
 	Nameddir nd = (Nameddir) zshcalloc(sizeof(*nd));
 
@@ -1344,7 +1344,7 @@ setpmnameddirs(UNUSED(Param pm), HashTable ht)
 	    v.pm = (Param) hn;
 
 	    if (!(val = getstrvalue(&v)))
-		zwarn("invalid value: ''", NULL, 0);
+		zwarn("invalid value: ''");
 	    else {
 		Nameddir nd = (Nameddir) zshcalloc(sizeof(*nd));
 

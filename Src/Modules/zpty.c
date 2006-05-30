@@ -128,7 +128,7 @@ ptysettyinfo(int fd, struct ttyinfo *ti)
 	ioctl(fd, TCSETS, &ti->tio);
     /* if (ioctl(SHTTY, TCSETS, &ti->tio) == -1) */
 # endif
-	/*	zerr("settyinfo: %e",NULL,errno)*/ ;
+	/*	zerr("settyinfo: %e",errno)*/ ;
 #else
 # ifdef HAVE_TERMIO_H
 	ioctl(fd, TCSETA, &ti->tio);
@@ -300,7 +300,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
     }
 
     if (get_pty(1, &master)) {
-	zwarnnam(nam, "can't open pseudo terminal: %e", NULL, errno);
+	zwarnnam(nam, "can't open pseudo terminal: %e", errno);
 	return 1;
     }
     if ((pid = fork()) == -1) {
@@ -316,11 +316,11 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	mypid = getpid();
 #ifdef HAVE_SETSID
 	if (setsid() != mypid) {
-	    zwarnnam(nam, "failed to create new session: %e", NULL, errno);
+	    zwarnnam(nam, "failed to create new session: %e", errno);
 #endif
 #ifdef TIOCNOTTY
 	    if (ioctl(SHTTY, TIOCNOTTY, 0))
-		zwarnnam(nam, "%e", NULL, errno);
+		zwarnnam(nam, "%e", errno);
 	    setpgrp(0L, mypid);
 #endif
 #ifdef HAVE_SETSID
@@ -478,14 +478,14 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	char *p;
 
 	if (args[2]) {
-	    zwarnnam(nam, "too many arguments", NULL, 0);
+	    zwarnnam(nam, "too many arguments");
 	    return 1;
 	}
 	p = dupstring(args[1]);
 	tokenize(p);
 	remnulargs(p);
 	if (!(prog = patcompile(p, PAT_STATIC, NULL))) {
-	    zwarnnam(nam, "bad pattern: %s", args[1], 0);
+	    zwarnnam(nam, "bad pattern: %s", args[1]);
 	    return 1;
 	}
     } else
@@ -633,17 +633,17 @@ bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 	(OPT_ISSET(ops,'d') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e') ||
 				OPT_ISSET(ops,'L') || OPT_ISSET(ops,'t'))) ||
 	(OPT_ISSET(ops,'L') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e')))) {
-	zwarnnam(nam, "illegal option combination", NULL, 0);
+	zwarnnam(nam, "illegal option combination");
 	return 1;
     }
     if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'w')) {
 	Ptycmd p;
 
 	if (!*args) {
-	    zwarnnam(nam, "missing pty command name", NULL, 0);
+	    zwarnnam(nam, "missing pty command name");
 	    return 1;
 	} else if (!(p = getptycmd(*args))) {
-	    zwarnnam(nam, "no such pty command: %s", *args, 0);
+	    zwarnnam(nam, "no such pty command: %s", *args);
 	    return 1;
 	}
 	if (p->fin)
@@ -664,7 +664,7 @@ bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 		if ((p = getptycmd(*args++)))
 		    deleteptycmd(p);
 		else {
-		    zwarnnam(nam, "no such pty command: %s", args[-1], 0);
+		    zwarnnam(nam, "no such pty command: %s", args[-1]);
 		    ret = 1;
 		}
 	} else
@@ -675,21 +675,21 @@ bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 	Ptycmd p;
 
 	if (!*args) {
-	    zwarnnam(nam, "missing pty command name", NULL, 0);
+	    zwarnnam(nam, "missing pty command name");
 	    return 1;
 	} else if (!(p = getptycmd(*args))) {
-	    zwarnnam(nam, "no such pty command: %s", *args, 0);
+	    zwarnnam(nam, "no such pty command: %s", *args);
 	    return 1;
 	}
 	checkptycmd(p);
 	return p->fin;
     } else if (*args) {
 	if (!args[1]) {
-	    zwarnnam(nam, "missing command", NULL, 0);
+	    zwarnnam(nam, "missing command");
 	    return 1;
 	}
 	if (getptycmd(*args)) {
-	    zwarnnam(nam, "pty command name already used: %s", *args, 0);
+	    zwarnnam(nam, "pty command name already used: %s", *args);
 	    return 1;
 	}
 	return newptycmd(nam, *args, args + 1, OPT_ISSET(ops,'e'), 

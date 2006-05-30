@@ -701,7 +701,7 @@ getbyte(int keytmout, int *timeout)
 		opts[MONITOR] = ret;
 		die = 1;
 	    } else if (errno != 0) {
-		zerr("error on TTY read: %e", NULL, errno);
+		zerr("error on TTY read: %e", errno);
 		stopmsg = 1;
 		zexit(1, 0);
 	    }
@@ -1205,7 +1205,7 @@ savekeymap(char *cmdname, char *oldname, char *newname, Keymap *savemapptr)
 	}
 	return 0;
     } else {
-	zwarnnam(cmdname, "no such keymap: %s", newname, 0);
+	zwarnnam(cmdname, "no such keymap: %s", newname);
 	return 1;
     }
 }
@@ -1221,7 +1221,7 @@ restorekeymap(char *cmdname, char *oldname, char *newname, Keymap savemap)
     } else if (newname) {
 	/* urr... can this happen? */
 	zwarnnam(cmdname,
-		 "keymap %s was not defined, not restored", oldname, 0);
+		 "keymap %s was not defined, not restored", oldname);
     }
 }
 
@@ -1247,11 +1247,11 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     FILE *oshout = NULL;
 
     if ((interact && unset(USEZLE)) || !strcmp(term, "emacs")) {
-	zwarnnam(name, "ZLE not enabled", NULL, 0);
+	zwarnnam(name, "ZLE not enabled");
 	return 1;
     }
     if (zleactive) {
-	zwarnnam(name, "ZLE cannot be used recursively (yet)", NULL, 0);
+	zwarnnam(name, "ZLE cannot be used recursively (yet)");
 	return 1;
     }
 
@@ -1259,7 +1259,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     {
 	if (OPT_ISSET(ops, 'a'))
 	{
-	    zwarnnam(name, "specify only one of -a and -A", NULL, 0);
+	    zwarnnam(name, "specify only one of -a and -A");
 	    return 1;
 	}
 	type = PM_HASHED;
@@ -1272,7 +1272,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     vicmd_keymapname = OPT_ARG_SAFE(ops,'m');
 
     if (type != PM_SCALAR && !OPT_ISSET(ops,'c')) {
-	zwarnnam(name, "-%s ignored", type == PM_ARRAY ? "a" : "A", 0);
+	zwarnnam(name, "-%s ignored", type == PM_ARRAY ? "a" : "A");
     }
 
     /* handle non-existent parameter */
@@ -1282,7 +1282,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 		   SCANPM_WANTKEYS|SCANPM_WANTVALS|SCANPM_MATCHMANY);
     if (!v && !OPT_ISSET(ops,'c')) {
 	unqueue_signals();
-	zwarnnam(name, "no such variable: %s", args[0], 0);
+	zwarnnam(name, "no such variable: %s", args[0]);
 	return 1;
     } else if (v) {
 	if (v->isarr) {
@@ -1331,7 +1331,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	unqueue_signals();
     } else if (*s) {
 	unqueue_signals();
-	zwarnnam(name, "invalid parameter name: %s", args[0], 0);
+	zwarnnam(name, "invalid parameter name: %s", args[0]);
 	return 1;
     } else {
 	unqueue_signals();
@@ -1341,7 +1341,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     if (SHTTY == -1) {
 	/* need to open /dev/tty specially */
 	if ((SHTTY = open("/dev/tty", O_RDWR|O_NOCTTY)) == -1) {
-	    zwarnnam(name, "can't access terminal", NULL, 0);
+	    zwarnnam(name, "can't access terminal");
 	    return 1;
 	}
 	oshout = shout;
@@ -1667,8 +1667,7 @@ int
 cleanup_(Module m)
 {
     if(zleactive) {
-	zerrnam(m->nam, "can't unload the zle module while zle is active",
-	    NULL, 0);
+	zerrnam(m->nam, "can't unload the zle module while zle is active");
 	return 1;
     }
     deletehookfunc("before_trap", (Hookfn) zlebeforetrap);

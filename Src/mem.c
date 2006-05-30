@@ -321,7 +321,7 @@ mmap_heap_alloc(size_t *n)
     h = (Heap) mmap(NULL, *n, PROT_READ | PROT_WRITE,
 		    MMAP_FLAGS, -1, 0);
     if (h == ((Heap) -1)) {
-	zerr("fatal error: out of heap memory", NULL, 0);
+	zerr("fatal error: out of heap memory");
 	exit(1);
     }
 
@@ -581,7 +581,7 @@ zalloc(size_t size)
 	size = 1;
     queue_signals();
     if (!(ptr = (void *) malloc(size))) {
-	zerr("fatal error: out of memory", NULL, 0);
+	zerr("fatal error: out of memory");
 	exit(1);
     }
     unqueue_signals();
@@ -599,7 +599,7 @@ zshcalloc(size_t size)
 	size = 1;
     queue_signals();
     if (!(ptr = (void *) malloc(size))) {
-	zerr("fatal error: out of memory", NULL, 0);
+	zerr("fatal error: out of memory");
 	exit(1);
     }
     unqueue_signals();
@@ -623,7 +623,7 @@ zrealloc(void *ptr, size_t size)
 	if (size) {
 	    /* Do normal realloc */
 	    if (!(ptr = (void *) realloc(ptr, size))) {
-		zerr("fatal error: out of memory", NULL, 0);
+		zerr("fatal error: out of memory");
 		exit(1);
 	    }
 	    unqueue_signals();

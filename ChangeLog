@@ -1,3 +1,8 @@
+2006-05-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22474: most source files touched: use stdarg.h to implement
+	escape handling in error messages properly.
+
 2006-05-30  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync: some option changes

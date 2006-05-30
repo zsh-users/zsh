@@ -1269,11 +1269,11 @@ gettokstr(int c, int sub)
   brk:
     hungetc(c);
     if (unmatched)
-	zerr("unmatched %c", NULL, unmatched);
+	zerr("unmatched %c", unmatched);
     if (in_brace_param) {
 	while(bct-- >= in_brace_param)
 	    cmdpop();
-	zerr("closing brace expected", NULL, 0);
+	zerr("closing brace expected");
     } else if (unset(IGNOREBRACES) && !sub && len > 1 &&
 	       peek == STRING && bptr[-1] == '}' && bptr[-2] != Bnull) {
 	/* hack to get {foo} command syntax work */
@@ -1438,9 +1438,9 @@ parsestr(char *s)
     if ((err = parsestrnoerr(s))) {
 	untokenize(s);
 	if (err > 32 && err < 127)
-	    zerr("parse error near `%c'", NULL, err);
+	    zerr("parse error near `%c'", err);
 	else
-	    zerr("parse error", NULL, 0);
+	    zerr("parse error");
     }
     return err;
 }

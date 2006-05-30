@@ -339,7 +339,7 @@ getsubsargs(char *subline, int *gbalp, int *cflagp)
 	inungetc(follow);
     if (hsubl && !strstr(subline, hsubl)) {
 	herrflush();
-	zerr("substitution failed", NULL, 0);
+	zerr("substitution failed");
 	return 1;
     }
     return 0;
@@ -431,7 +431,7 @@ histsubchar(int c)
 	    if (ev == -1) {
 		herrflush();
 		unqueue_signals();
-		zerr("no such event: %s", buf, 0);
+		zerr("no such event: %s", buf);
 		return -1;
 	    }
 	} else {
@@ -485,7 +485,7 @@ histsubchar(int c)
 	    } else if ((ev = hcomsearch(buf)) == -1) {
 		herrflush();
 		unqueue_signals();
-		zerr("event not found: %s", buf, 0);
+		zerr("event not found: %s", buf);
 		return -1;
 	    } else
 		evset = 1;
@@ -510,7 +510,7 @@ histsubchar(int c)
 		} else {
 		    herrflush();
 		    unqueue_signals();
-		    zerr("Ambiguous history reference", NULL, 0);
+		    zerr("Ambiguous history reference");
 		    return -1;
 		}
 
@@ -568,7 +568,7 @@ histsubchar(int c)
 		gbal = 1;
 		c = ingetc();
 		if (c != 's' && c != '&') {
-		    zerr("'s' or '&' modifier expected after 'g'", NULL, 0);
+		    zerr("'s' or '&' modifier expected after 'g'");
 		    return -1;
 		}
 	    }
@@ -579,28 +579,28 @@ histsubchar(int c)
 	    case 'h':
 		if (!remtpath(&sline)) {
 		    herrflush();
-		    zerr("modifier failed: h", NULL, 0);
+		    zerr("modifier failed: h");
 		    return -1;
 		}
 		break;
 	    case 'e':
 		if (!rembutext(&sline)) {
 		    herrflush();
-		    zerr("modifier failed: e", NULL, 0);
+		    zerr("modifier failed: e");
 		    return -1;
 		}
 		break;
 	    case 'r':
 		if (!remtext(&sline)) {
 		    herrflush();
-		    zerr("modifier failed: r", NULL, 0);
+		    zerr("modifier failed: r");
 		    return -1;
 		}
 		break;
 	    case 't':
 		if (!remlpaths(&sline)) {
 		    herrflush();
-		    zerr("modifier failed: t", NULL, 0);
+		    zerr("modifier failed: t");
 		    return -1;
 		}
 		break;
@@ -612,7 +612,7 @@ histsubchar(int c)
 		    subst(&sline, hsubl, hsubr, gbal);
 		else {
 		    herrflush();
-		    zerr("no previous substitution", NULL, 0);
+		    zerr("no previous substitution");
 		    return -1;
 		}
 		break;
@@ -642,14 +642,14 @@ histsubchar(int c)
 		break;
 	    default:
 		herrflush();
-		zerr("illegal modifier: %c", NULL, c);
+		zerr("illegal modifier: %c", c);
 		return -1;
 	    }
 	} else {
 	    if (c != '}' || !bflag)
 		inungetc(c);
 	    if (c != '}' && bflag) {
-		zerr("'}' expected", NULL, 0);
+		zerr("'}' expected");
 		return -1;
 	    }
 	    break;
@@ -1358,12 +1358,12 @@ getargspec(int argc, int marg, int evset)
     else if (c == '%') {
 	if (evset) {
 	    herrflush();
-	    zerr("Ambiguous history reference", NULL, 0);
+	    zerr("Ambiguous history reference");
 	    return -2;
 	}
 	if (marg == -1) {
 	    herrflush();
-	    zerr("%% with no previous word matched", NULL, 0);
+	    zerr("%% with no previous word matched");
 	    return -2;
 	}
 	ret = marg;
@@ -1621,7 +1621,7 @@ gethist(int ev)
     ret = quietgethist(ev);
     if (!ret) {
 	herrflush();
-	zerr("no such event: %d", NULL, ev);
+	zerr("no such event: %d", ev);
     }
     return ret;
 }
@@ -1636,7 +1636,7 @@ getargs(Histent elist, int arg1, int arg2)
     if (arg2 < arg1 || arg1 >= nwords || arg2 >= nwords) {
 	/* remember, argN is indexed from 0, nwords is total no. of words */
 	herrflush();
-	zerr("no such word in event", NULL, 0);
+	zerr("no such word in event");
 	return NULL;
     }
 
@@ -1761,7 +1761,7 @@ hdynread(int stop)
     *ptr = 0;
     if (c == '\n') {
 	inungetc('\n');
-	zerr("delimiter expected", NULL, 0);
+	zerr("delimiter expected");
 	zfree(buf, bsiz);
 	return NULL;
     }
@@ -1927,7 +1927,7 @@ readhistfile(char *fn, int err, int readflags)
 	    char *pt = buf;
 
 	    if (l < 0) {
-		zerr("corrupt history file %s", fn, 0);
+		zerr("corrupt history file %s", fn);
 		break;
 	    }
 	    if (*pt == ':') {
@@ -2023,7 +2023,7 @@ readhistfile(char *fn, int err, int readflags)
 
 	fclose(in);
     } else if (err)
-	zerr("can't read history file %s", fn, 0);
+	zerr("can't read history file %s", fn);
 
     unlockhistfile(fn);
 }
@@ -2146,7 +2146,7 @@ savehistfile(char *fn, int err, int writeflags)
 	fclose(out);
 	if (tmpfile) {
 	    if (rename(tmpfile, unmeta(fn)) < 0)
-		zerr("can't rename %s.new to $HISTFILE", fn, 0);
+		zerr("can't rename %s.new to $HISTFILE", fn);
 	    free(tmpfile);
 	}
 
@@ -2170,10 +2170,10 @@ savehistfile(char *fn, int err, int writeflags)
 	}
     } else if (err) {
 	if (tmpfile) {
-	    zerr("can't write history file %s.new", fn, 0);
+	    zerr("can't write history file %s.new", fn);
 	    free(tmpfile);
 	} else
-	    zerr("can't write history file %s", fn, 0);
+	    zerr("can't write history file %s", fn);
     }
 
     unlockhistfile(fn);

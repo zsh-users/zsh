@@ -58,7 +58,7 @@ bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
     
     if (pcre_pattern == NULL)
     {
-	zwarnnam(nam, "error in regex: %s", pcre_error, 0);
+	zwarnnam(nam, "error in regex: %s", pcre_error);
 	return 1;
     }
     
@@ -76,15 +76,14 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 
     if (pcre_pattern == NULL)
     {
-	zwarnnam(nam, "no pattern has been compiled for study",
-		 NULL, 0);
+	zwarnnam(nam, "no pattern has been compiled for study");
 	return 1;
     }
     
     pcre_hints = pcre_study(pcre_pattern, 0, &pcre_error);
     if (pcre_error != NULL)
     {
-	zwarnnam(nam, "error while studying regex: %s", pcre_error, 0);
+	zwarnnam(nam, "error while studying regex: %s", pcre_error);
 	return 1;
     }
     
@@ -129,14 +128,14 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     if(OPT_ISSET(ops,'a')) {
 	receptacle = *args++;
 	if(!*args) {
-	    zwarnnam(nam, "not enough arguments", NULL, 0);
+	    zwarnnam(nam, "not enough arguments");
 	    return 1;
 	}
     }
     
     if ((ret = pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount)))
     {
-	zwarnnam(nam, "error %d in fullinfo", NULL, ret);
+	zwarnnam(nam, "error %d in fullinfo", ret);
 	return 1;
     }
     
@@ -152,7 +151,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 	return 0;
     }
     else {
-	zwarnnam(nam, "error in pcre_exec", NULL, 0);
+	zwarnnam(nam, "error in pcre_exec");
 	return 1;
     }
     

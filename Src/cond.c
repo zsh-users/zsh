@@ -114,8 +114,7 @@ evalcond(Estate state, char *fromtest)
 	    if ((cd = getconddef((ctype == COND_MODI), name + 1, 1))) {
 		if (ctype == COND_MOD &&
 		    (l < cd->min || (cd->max >= 0 && l > cd->max))) {
-		    zwarnnam(fromtest, "unrecognized condition: `%s'",
-			     name, 0);
+		    zwarnnam(fromtest, "unrecognized condition: `%s'", name);
 		    return 2;
 		}
 		if (tracingcond)
@@ -132,7 +131,7 @@ evalcond(Estate state, char *fromtest)
 		    (cd = getconddef(0, name + 1, 1))) {
 		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
 			zwarnnam(fromtest, "unrecognized condition: `%s'",
-				 name, 0);
+				 name);
 			return 2;
 		    }
 		    if (tracingcond)
@@ -140,7 +139,7 @@ evalcond(Estate state, char *fromtest)
 		    return !cd->handler(strs, cd->condid);
 		} else {
 		    zwarnnam(fromtest,
-			     "unrecognized condition: `%s'", name, 0);
+			     "unrecognized condition: `%s'", name);
 		}
 	    }
 	    /* module not found, error */
@@ -197,8 +196,7 @@ evalcond(Estate state, char *fromtest)
 
 	    if (*eptr)
 	    {
-		zwarnnam(fromtest, "integer expression expected: %s",
-			 err, 0);
+		zwarnnam(fromtest, "integer expression expected: %s", err);
 		return 2;
 	    }
 
@@ -262,7 +260,7 @@ evalcond(Estate state, char *fromtest)
 
 		if (!(pprog = patcompile(right, (save ? PAT_ZDUP : PAT_STATIC),
 					 NULL))) {
-		    zwarnnam(fromtest, "bad pattern: %s", right, 0);
+		    zwarnnam(fromtest, "bad pattern: %s", right);
 		    return 2;
 		}
 		else if (save)
@@ -353,7 +351,7 @@ evalcond(Estate state, char *fromtest)
 	    return !(d == st->st_dev && i == st->st_ino);
 	}
     default:
-	zwarnnam(fromtest, "bad cond code", NULL, 0);
+	zwarnnam(fromtest, "bad cond code");
 	return 2;
     }
     return 1;
@@ -435,7 +433,7 @@ optison(char *name, char *s)
     else
 	i = optlookup(s);
     if (!i) {
-	zwarnnam(name, "no such option: %s", s, 0);
+	zwarnnam(name, "no such option: %s", s);
 	return 2;
     } else if(i < 0)
 	return !unset(-i);

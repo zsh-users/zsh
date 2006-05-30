@@ -94,8 +94,7 @@ boot_(Module m)
 	    return 0;
 	deletezlefunction(w_deletetochar);
     }
-    zwarnnam(m->nam, "deltochar: name clash when adding ZLE functions",
-	     NULL, 0);
+    zwarnnam(m->nam, "deltochar: name clash when adding ZLE functions");
     return -1;
 }
 

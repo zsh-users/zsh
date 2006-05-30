@@ -581,7 +581,7 @@ docomplete(int lst)
     int olst = lst, chl = 0, ne = noerrs, ocs, ret = 0, dat[2];
 
     if (active && !comprecursive) {
-	zwarn("completion cannot be used recursively (yet)", NULL, 0);
+	zwarn("completion cannot be used recursively (yet)");
 	return 1;
     }
     active = 1;

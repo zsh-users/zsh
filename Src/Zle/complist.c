@@ -3076,8 +3076,7 @@ boot_(Module m)
     w_menuselect = addzlefunction("menu-select", menuselect,
                                     ZLE_MENUCMP|ZLE_KEEPSUFFIX|ZLE_ISCOMP);
     if (!w_menuselect) {
-	zwarnnam(m->nam, "name clash when adding ZLE function `menu-select'",
-		 NULL, 0);
+	zwarnnam(m->nam, "name clash when adding ZLE function `menu-select'");
 	return -1;
     }
     addhookfunc("comp_list_matches", (Hookfn) complistmatches);
