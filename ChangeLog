@@ -1,3 +1,8 @@
+2006-05-30  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 22476: Src/pattern.c: silenced some compiler warnings and
+	improved the multibyte code a little.
+
 2006-05-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22474: most source files touched: use stdarg.h to implement
