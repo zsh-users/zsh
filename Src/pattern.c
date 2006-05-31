@@ -276,7 +276,9 @@ static int patglobflags;  /* globbing flags & approx */
  * Increment pointer to metafied multibyte string.
  */
 #ifdef MULTIBYTE_SUPPORT
-typedef wchar_t patchar_t;
+typedef wint_t patint_t;
+
+#define PEOF WEOF
 
 #define METACHARINC(x) ((void)metacharinc(&x))
 
@@ -345,7 +347,9 @@ metacharinc(char **x)
 }
 
 #else
-typedef int patchar_t;
+typedef int patint_t;
+
+#define PEOF EOF
 
 #define METACHARINC(x)	((void)((x) += (*(x) == Meta) ? 2 : 1))
 /*
@@ -1689,7 +1693,7 @@ charsub(char *x, char *y)
 /* Get a character and increment */
 #define CHARREFINC(x, y)	(STOUC(*(x)++))
 /* Counter the number of characters between two pointers, smaller first */
-#define CHARSUB(x,y)	(y-x)
+#define CHARSUB(x,y)	((y) - (x))
 
 #endif /* MULTIBYTE_SUPPORT */
 
@@ -2171,8 +2175,9 @@ patmatch(Upat prog)
     /* Current and next nodes */
     Upat scan = prog, next, opnd;
     char *start, *save, *chrop, *chrend, *compend;
-    int savglobflags, op, no, min, nextch, fail = 0, saverrsfound;
+    int savglobflags, op, no, min, fail = 0, saverrsfound;
     zrange_t from, to, comp;
+    patint_t nextch;
 
     while  (scan) {
 	next = PATNEXT(scan);
@@ -2204,8 +2209,8 @@ patmatch(Upat prog)
 	    while (chrop < chrend && patinput < patinend) {
 		char *savpatinput = patinput;
 		char *savchrop = chrop;
-		patchar_t chin = CHARREFINC(patinput, patinend);
-		patchar_t chpa = CHARREFINC(chrop, chrend);
+		patint_t chin = CHARREFINC(patinput, patinend);
+		patint_t chpa = CHARREFINC(chrop, chrend);
 		if (!CHARMATCH(chin, chpa)) {
 		    fail = 1;
 		    patinput = savpatinput;
@@ -2747,14 +2752,14 @@ patmatch(Upat prog)
 		    }
 		    nextch = CHARREF(nextop, nextop + nextlen);
 		} else
-		    nextch = -1;
+		    nextch = PEOF;
 		savglobflags = patglobflags;
 		saverrsfound = errsfound;
 		lastcharstart = charstart + (patinput - start);
 		if (no >= min) {
 		    for (;;) {
-			int charmatch_cache;
-			if (nextch < 0 ||
+			patint_t charmatch_cache;
+			if (nextch == PEOF ||
 			    (patinput < patinend &&
 			     CHARMATCH_EXPR(CHARREF(patinput, patinend),
 					    nextch))) {
@@ -2862,10 +2867,10 @@ patmatch(Upat prog)
 			 */
 			if (save < patinend && nextin < patinend &&
 			    nextexact < exactend) {
-			    patchar_t cin0 = CHARREF(save, patinend);
-			    patchar_t cpa0 = CHARREF(exactpos, exactend);
-			    patchar_t cin1 = CHARREF(nextin, patinend);
-			    patchar_t cpa1 = CHARREF(nextexact, exactend);
+			    patint_t cin0 = CHARREF(save, patinend);
+			    patint_t cpa0 = CHARREF(exactpos, exactend);
+			    patint_t cin1 = CHARREF(nextin, patinend);
+			    patint_t cpa1 = CHARREF(nextexact, exactend);
 
 			    if (CHARMATCH(cin0, cpa1) &&
 				CHARMATCH(cin1, cpa0)) {
@@ -3154,7 +3159,7 @@ patmatchrange(char *range, int ch)
 static int patrepeat(Upat p, char *charstart)
 {
     int count = 0;
-    patchar_t tch, charmatch_cache;
+    patint_t tch, charmatch_cache;
     char *scan, *opnd;
 
     scan = patinput;
