@@ -1,3 +1,7 @@
+2006-05-31  Clint Adams  <clint@zsh.org>
+
+	* 22479: Completion/Debian/Command/_lintian: _arguments -s.
+
 2006-05-30  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22476: Src/pattern.c: silenced some compiler warnings and

@@ -1,6 +1,6 @@
 #compdef lintian
 
-_arguments \
+_arguments -s \
 '(-c -r -u -C -R -S -X --check --check-part --dont-check-part --remove --remove-lab --setup-lab --unpack)'{-S,--setup-lab}'[setup or update the laboratory]' \
 '(-c -r -u -C -R -S -X --check --check-part --dont-check-part --remove --remove-lab --setup-lab --unpack)'{-R,--remove-lab}'[remove the laboratory directory]' \
 '(-c -r -u -C -R -S -X --check --check-part --dont-check-part --remove --remove-lab --setup-lab --unpack)'{-c,--check}'[run all checks over the specified packages]' \
