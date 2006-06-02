@@ -35,6 +35,32 @@ done
 
 functions -M $mname $iarg $ioptarg $fname || return 1
 
+# See if we need to autoload a math function from the standard
+# library.
+if ! zmodload -e zsh/mathfunc; then
+  local -a mathfuncs match mbegin mend loads
+  local mathfuncpat bodysearch
+
+  # generate pattern to match all known math functions
+  mathfuncs=(abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc
+    exp expm1 fabs float floor gamma int j0 j1 lgamma log log10 log1p logb
+    sin sinh sqrt tan tanh y0 y1 signgam copysign fmod hypot nextafter jn yn
+    ldexp scalb rand48)
+  mathfuncpat="(${(j.|.)mathfuncs})"
+  bodysearch=$body
+  while [[ $bodysearch = (#b)(*[^[:alnum]]|)([[:alnum:]]##)\((*) ]]; do
+    # save worrying about search order...
+    bodysearch=$match[1]$match[3]
+    if [[ $match[2] = ${~mathfuncpat} ]]; then
+      # Uses function from math library.
+      loads+=($match[2])
+    fi
+  done
+  if (( ${#loads} )); then
+    zmodload -af zsh/mathfunc $loads
+  fi
+fi
+
 {
   eval "$fname() { (( $body )) }"
 } always {

@@ -1,3 +1,8 @@
+2006-06-02  Peter Stephenson  <pws@csr.com>
+
+	* 22480: Functions/Misc/zmathfuncdef: autoload functions from
+	zsh/mathfunc as needed.
+
 2006-05-31  Clint Adams  <clint@zsh.org>
 
 	* 22479: Completion/Debian/Command/_lintian: _arguments -s.
