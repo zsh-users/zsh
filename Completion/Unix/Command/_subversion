@@ -49,6 +49,11 @@ _svn () {
               '*:file:_files -g ".svn(/e:_svn_deletedfiles:)"'
             )
           ;;
+          diff)
+            args+=(
+	      '*: : _alternative "files:file:_files -g \*\(e:_svn_status:\)" "urls:URL:_svn_urls"'
+	    )
+          ;;
           help)
             args+=(
               '*::sub command:_svn_commands'
@@ -58,6 +63,11 @@ _svn () {
             args+=(
               '1: : _alternative "files:file:_files -g \*\(e:_svn_controlled:\)" "urls:URL:_svn_urls"'
 	      '*:file:_files -g "*(e:_svn_controlled:)"'
+            )
+          ;;
+          resolved)
+            args+=(
+              '*:file:_files -g "*(e:_svn_conflicts:)"'
             )
           ;;
           revert)
@@ -141,6 +151,11 @@ _svn_controlled() {
   [[ -f ${(M)REPLY##*/}.svn/text-base/${REPLY##*/}.svn-base ]]
 }
 
+(( $+functions[_svn_conflicts] )) ||
+_svn_conflicts() {
+  [ -n $REPLY.(mine|r<->)(N[1]) ]
+}
+
 (( $+functions[_svn_deletedfiles] )) ||
 _svn_deletedfiles() {
   # Typical usage would be _files -g '.svn(/e:_svn_deletedfiles:)'
@@ -167,15 +182,32 @@ _svn_status() {
 
 (( $+functions[_svn_urls] )) ||
 _svn_urls() {
-  local expl
+  local expl remfiles remdispf remdispd suf ret=1
 
-  if [[ -prefix *: ]]; then
-    _urls
+  if [[ -prefix *: ]] && ! _urls &&
+      zstyle -T ":completion:${curcontext}:" remote-access
+  then
+    remfiles=( ${(f)"$(svn list $IPRFIX${PREFIX%%[^./][^/]#} 2>/dev/null)"} )
+    compset -P '*/'
+    compset -S '/*' || suf=file
+    remdispf=(${remfiles:#*/})
+    remdispd=(${(M)remfiles:#*/})
+    _tags files
+    while _tags; do
+      while _next_label files expl ${suf:-directory}; do
+        [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf $remdispf && ret=0
+        compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
+            ${remdispd%/} && ret=0
+      done
+      (( ret )) || return 0
+    done
   else
     compset -S '[^:]*'
     _wanted url-schemas expl 'URL schema' compadd -S '' - \
-        file:// http:// https:// svn:// svn+ssh://
+        file:// http:// https:// svn:// svn+ssh:// && ret=0
   fi
+  
+  return ret
 }
 
 (( $+functions[_svn_commands] )) ||

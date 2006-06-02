@@ -1,3 +1,8 @@
+2006-06-02  Clint Adams  <clint@zsh.org>
+
+	* 22481: Oliver Kiddle: Completion/Unix/Command/_subversion:
+	complete svn diff and resolved subcommands.
+
 2006-06-02  Peter Stephenson  <pws@csr.com>
 
 	* 22480: Functions/Misc/zmathfuncdef: autoload functions from
