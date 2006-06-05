@@ -552,7 +552,7 @@ fi
 AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 termios.h sys/param.h sys/filio.h string.h memory.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
-		 locale.h errno.h stdio.h stdarg.h stdlib.h \
+		 locale.h errno.h stdio.h stdarg.h varargs.h stdlib.h \
 		 unistd.h sys/capability.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
 		 netinet/in_systm.h pcre.h langinfo.h wchar.h stddef.h \

@@ -49,15 +49,17 @@ BEGIN {
 	if(line ~ /\/\*/)
 	    continue
 	# If it is a function definition, note so.
-	if(line ~ /\) *[{].*$/) #}
+	if(line ~ /\) *(VA_DCL )*[{].*$/) #}
 	    isfunc = 1
 	if(sub(/ *[{;].*$/, "", line)) #}
 	    break
     }
-    # Put spaces around each identifier.
-    while(match(line, /[^_0-9A-Za-z ][_0-9A-Za-z]/) ||
-	    match(line, /[_0-9A-Za-z][^_0-9A-Za-z ]/))
-	line = substr(line, 1, RSTART) " " substr(line, RSTART+1)
+    if (!match(line, /VA_ALIST/)) {
+	# Put spaces around each identifier.
+	while(match(line, /[^_0-9A-Za-z ][_0-9A-Za-z]/) ||
+	      match(line, /[_0-9A-Za-z][^_0-9A-Za-z ]/))
+	    line = substr(line, 1, RSTART) " " substr(line, RSTART+1)
+    }
     # Separate declarations into a type and a list of declarators.
     # In each declarator, "@{" and "@}" are used in place of parens to
     # mark function parameter lists, and "@!" is used in place of commas
@@ -87,45 +89,64 @@ BEGIN {
     exported = " " dtype " " ~ / mod_export /
     line = substr(line, RLENGTH+1) ","
     # Handle each declarator.
-    while(match(line, /^[^,]*,/)) {
-	# Separate out the name from the declarator.  Use "@+" and "@-"
-	# to bracket the name within the declarator.  Strip off any
-	# initialiser.
-	dcltor = substr(line, 1, RLENGTH-1)
-	line = substr(line, RLENGTH+1)
-	sub(/\=.*$/, "", dcltor)
-	match(dcltor, /^([^_0-9A-Za-z]| const )*/)
-	dcltor = substr(dcltor, 1, RLENGTH) "@+" substr(dcltor, RLENGTH+1)
-	match(dcltor, /^.*@\+[_0-9A-Za-z]+/)
-	dcltor = substr(dcltor, 1, RLENGTH) "@-" substr(dcltor, RLENGTH+1)
-	dnam = dcltor
-	sub(/^.*@\+/, "", dnam)
-	sub(/@-.*$/, "", dnam)
-
+    if (match(line, /VA_ALIST/)) {
+	# Already has VARARGS handling.
 	# Put parens etc. back
-	gsub(/@[{]/, " _((", dcltor)
-	gsub(/@}/, "))", dcltor)
-	gsub(/@</, "(", dcltor)
-	gsub(/@>/, ")", dcltor)
-	gsub(/@!/, ",", dcltor)
+	gsub(/@[{]/, "((", line)
+	gsub(/@}/, "))", line)
+	gsub(/@</, "(", line)
+	gsub(/@>/, ")", line)
+	gsub(/@!/, ",", line)
+	sub(/,$/, ";", line)
+	gsub(/mod_export/, "mod_import_function", dtype)
+	gsub(/VA_ALIST/, "VA_ALIST_PROTO", line)
+	sub(/ VA_DCL/, "", line)
 
-	# If this is exported, add it to the exported symbol list.
-	if(exported)
-	    printf "X%s\n", dnam
-
-	# Format the declaration for output
-	dcl = dtype " " dcltor ";"
 	if(locality ~ /E/)
-	    dcl = "extern " dcl
-	if(isfunc)
-	    gsub(/ mod_export /, " mod_import_function ", dcl)
-	else
-	    gsub(/ mod_export /, " mod_import_variable ", dcl)
-	gsub(/@[+-]/, "", dcl)
-	gsub(/ +/, " ", dcl)
-	while(match(dcl, /[^_0-9A-Za-z] ./) || match(dcl, /. [^_0-9A-Za-z]/))
-	    dcl = substr(dcl, 1, RSTART) substr(dcl, RSTART+2)
-	printf "%s%s\n", locality, dcl
+	    dtype = "extern " dtype
+
+	printf "%s%s %s\n", locality, dtype, line
+    } else {
+	while(match(line, /^[^,]*,/)) {
+		# Separate out the name from the declarator.  Use "@+" and "@-"
+		# to bracket the name within the declarator.  Strip off any
+		# initialiser.
+		dcltor = substr(line, 1, RLENGTH-1)
+		line = substr(line, RLENGTH+1)
+		sub(/\=.*$/, "", dcltor)
+		match(dcltor, /^([^_0-9A-Za-z]| const )*/)
+		dcltor = substr(dcltor, 1, RLENGTH) "@+" substr(dcltor, RLENGTH+1)
+		match(dcltor, /^.*@\+[_0-9A-Za-z]+/)
+		dcltor = substr(dcltor, 1, RLENGTH) "@-" substr(dcltor, RLENGTH+1)
+		dnam = dcltor
+		sub(/^.*@\+/, "", dnam)
+		sub(/@-.*$/, "", dnam)
+
+		# Put parens etc. back
+		gsub(/@[{]/, " _((", dcltor)
+		gsub(/@}/, "))", dcltor)
+		gsub(/@</, "(", dcltor)
+		gsub(/@>/, ")", dcltor)
+		gsub(/@!/, ",", dcltor)
+
+		# If this is exported, add it to the exported symbol list.
+		if(exported)
+		    printf "X%s\n", dnam
+
+		# Format the declaration for output
+		dcl = dtype " " dcltor ";"
+		if(locality ~ /E/)
+		    dcl = "extern " dcl
+		if(isfunc)
+		    gsub(/ mod_export /, " mod_import_function ", dcl)
+		else
+		    gsub(/ mod_export /, " mod_import_variable ", dcl)
+		gsub(/@[+-]/, "", dcl)
+		gsub(/ +/, " ", dcl)
+		while(match(dcl, /[^_0-9A-Za-z] ./) || match(dcl, /. [^_0-9A-Za-z]/))
+		    dcl = substr(dcl, 1, RSTART) substr(dcl, RSTART+2)
+		printf "%s%s\n", locality, dcl
+	}
     }
 }
 

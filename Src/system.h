@@ -153,8 +153,48 @@ char *alloca _((size_t));
 # include <stdlib.h>
 #endif
 
+/*
+ * Stuff with variable arguments.  We use definitions to make the
+ * same code work with varargs (the original K&R-style, just to
+ * be maximally compatible) and stdarg (which all modern systems
+ * should have).
+ *
+ * Ideally this should somehow be merged with the tricks performed
+ * with "_" in makepro.awk, but I don't understand makepro.awk.
+ * Currently we simply rely on the fact that makepro.awk has been
+ * hacked to leave alone argument lists that already contains VA_ALIST
+ * except for removing the VA_DCL and turning VA_ALIST into VA_ALIST_PROTO.
+ */
 #ifdef HAVE_STDARG_H
 # include <stdarg.h>
+# define VA_ALIST1(x)		x, ...
+# define VA_ALIST2(x,y)		x, y, ...
+# define VA_ALIST_PROTO1(x)	VA_ALIST1(x)
+# define VA_ALIST_PROTO2(x,y)	VA_ALIST2(x,y)
+# define VA_DCL
+# define VA_DEF_ARG(x)
+# define VA_START(ap,x)		va_start(ap, x)
+# define VA_GET_ARG(ap,x,t)
+#else
+# if HAVE_VARARGS_H
+#  include <varargs.h>
+#  define VA_ALIST1(x)		va_alist
+#  define VA_ALIST2(x,y)	va_alist
+/*
+ * In prototypes, assume K&R form and remove the variable list.
+ * This is about the best we can do without second-guessing the way
+ * varargs works on this system.  The _ trick should be able to
+ * do this for us but we've turned it off here.
+ */
+#  define VA_ALIST_PROTO1(x)
+#  define VA_ALIST_PROTO2(x,y)
+#  define VA_DCL		va_dcl
+#  define VA_DEF_ARG(x)		x
+#  define VA_START(ap,x)	va_start(ap);
+#  define VA_GET_ARG(ap,x,t)	(x = va_arg(ap, t))
+# else
+#  error "Your system has neither stdarg.h or varargs.h."
+# endif
 #endif
 
 #ifdef HAVE_ERRNO_H

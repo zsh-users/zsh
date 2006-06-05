@@ -78,11 +78,14 @@ zwarning(const char *cmd, const char *fmt, va_list ap)
     zerrmsg(fmt, ap);
 }
 
+
 /**/
 mod_export void
-zerr(const char *fmt, ...)
+zerr(VA_ALIST1(const char *fmt))
+VA_DCL
 {
     va_list ap;
+    VA_DEF_ARG(const char *fmt);
 
     if (errflag || noerrs) {
 	if (noerrs < 2)
@@ -90,7 +93,8 @@ zerr(const char *fmt, ...)
 	return;
     }
 
-    va_start(ap, fmt);
+    VA_START(ap, fmt);
+    VA_GET_ARG(ap, fmt, const char *);
     zwarning(NULL, fmt, ap);
     va_end(ap);
     errflag = 1;
@@ -98,14 +102,19 @@ zerr(const char *fmt, ...)
 
 /**/
 mod_export void
-zerrnam(const char *cmd, const char *fmt, ...)
+zerrnam(VA_ALIST2(const char *cmd, const char *fmt))
+VA_DCL
 {
     va_list ap;
+    VA_DEF_ARG(const char *cmd);
+    VA_DEF_ARG(const char *fmt);
 
     if (errflag || noerrs)
 	return;
 
-    va_start(ap, fmt);
+    VA_START(ap, fmt);
+    VA_GET_ARG(ap, cmd, const char *);
+    VA_GET_ARG(ap, fmt, const char *);
     zwarning(cmd, fmt, ap);
     va_end(ap);
     errflag = 1;
@@ -113,32 +122,59 @@ zerrnam(const char *cmd, const char *fmt, ...)
 
 /**/
 mod_export void
-zwarn(const char *fmt, ...)
+zwarn(VA_ALIST1(const char *fmt))
+VA_DCL
 {
     va_list ap;
+    VA_DEF_ARG(const char *fmt);
 
     if (errflag || noerrs)
 	return;
 
-    va_start(ap, fmt);
+    VA_START(ap, fmt);
+    VA_GET_ARG(ap, fmt, const char *);
     zwarning(NULL, fmt, ap);
     va_end(ap);
 }
 
 /**/
 mod_export void
-zwarnnam(const char *cmd, const char *fmt, ...)
+zwarnnam(VA_ALIST2(const char *cmd, const char *fmt))
+VA_DCL
 {
     va_list ap;
+    VA_DEF_ARG(const char *cmd);
+    VA_DEF_ARG(const char *fmt);
 
     if (errflag || noerrs)
 	return;
 
-    va_start(ap, fmt);
+    VA_START(ap, fmt);
+    VA_GET_ARG(ap, cmd, const char *);
+    VA_GET_ARG(ap, fmt, const char *);
     zwarning(cmd, fmt, ap);
     va_end(ap);
 }
 
+
+#ifdef DEBUG
+
+/**/
+mod_export void
+dputs(VA_ALIST1(const char *message))
+VA_DCL
+{
+    va_list ap;
+    VA_DEF_ARG(const char *message);
+
+    VA_START(ap, message);
+    VA_GET_ARG(ap, message, const char *);
+    zerrmsg(message, ap);
+    va_end(ap);
+    fflush(stderr);
+}
+
+#endif /* DEBUG */
 
 #ifdef __CYGWIN__
 /*
@@ -4535,18 +4571,6 @@ privasserted(void)
 #endif /* HAVE_CAP_GET_PROC */
     return 0;
 }
-
-#ifdef DEBUG
-
-/**/
-mod_export void
-dputs(char *message)
-{
-    fprintf(stderr, "%s\n", message);
-    fflush(stderr);
-}
-
-#endif /* DEBUG */
 
 /**/
 mod_export int

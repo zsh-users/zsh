@@ -1,5 +1,8 @@
 2006-06-05  Peter Stephenson  <pws@csr.com>
 
+	* 22484: configure.ac, Src/makepro.awk, Src/system.h, Src/utils.c:
+	support varargs.h in addition to stdarg.h.
+
 	* 22483: Src/params.c, Src/Modules/system.c,
 	Doc/Zsh/mod_system.yo: add $sysparams to zsh/system.
 
