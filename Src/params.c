@@ -2516,7 +2516,7 @@ strgetfn(Param pm)
 /* Function to set value of a scalar (string) parameter */
 
 /**/
-static void
+mod_export void
 strsetfn(Param pm, char *x)
 {
     zsfree(pm->u.str);
@@ -2587,7 +2587,7 @@ nullsethashfn(UNUSED(Param pm), HashTable x)
 /* Function to set value of an association parameter using key/value pairs */
 
 /**/
-static void
+mod_export void
 arrhashsetfn(Param pm, char **val, int augment)
 {
     /* Best not to shortcut this by using the existing hash table,   *

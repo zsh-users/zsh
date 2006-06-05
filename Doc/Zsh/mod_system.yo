@@ -2,7 +2,7 @@ COMMENT(!MOD!zsh/system
 A builtin interface to various low-level system features.
 !MOD!)
 The tt(zsh/system) module makes available three builtin commands and
-a parameter.
+two parameters.
 
 sect(Builtins)
 
@@ -114,6 +114,7 @@ enditem()
 sect(Parameters)
 
 startitem()
+vindex(errnos)
 item(tt(errnos))(
 A readonly array of the names of errors defined on the system.  These
 are typically macros defined in C by including the system header file
@@ -124,5 +125,20 @@ tt(E)var(num) in the array.
 
 Note that aliases for errors are not handled; only the canonical name is
 used.
+)
+vindex(sysparams)
+item(tt(sysparams))(
+A readonly associative array.  The keys are:
+startitem()
+item(tt(pid))(
+Returns the process ID of the current process, even in subshells.  Compare
+tt($$), which returns the process ID of the main shell process.
+)
+item(tt(ppid))(
+Returns the process ID of the parent of the current process, even in
+subshells.  Compare tt($PPID), which returns the process ID of the parent
+of the main shell process.
+)
+enditem()
 )
 enditem()
