@@ -1,4 +1,4 @@
-#compdef madison
+#compdef madison rmadison
 
 _arguments \
   '(-a --architecture)'{-a,--architecture=}':arch:_values -s , "architecture list" source all alpha arm hppa hurd-i386 i386 ia64 mips mipsel' \

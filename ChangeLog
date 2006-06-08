@@ -1,3 +1,8 @@
+2006-06-08  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Debian/Command/_madison: complete the
+	same way for rmadison.
+
 2006-06-05  Peter Stephenson  <pws@csr.com>
 
 	* 22484: configure.ac, Src/makepro.awk, Src/system.h, Src/utils.c:
