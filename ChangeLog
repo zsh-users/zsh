@@ -1,3 +1,8 @@
+2006-06-11  Clint Adams  <clint@zsh.org>
+
+	* 22486: Completion/Debian/Command/_dak: completion for
+	dak (the debian-archive-kit).
+
 2006-06-09  Clint Adams  <clint@zsh.org>
 
 	* users/10282: Oliver Kiddle: Completion/Unix/Command/_man: 
