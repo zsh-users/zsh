@@ -408,10 +408,6 @@ zexecve(char *pth, char **argv)
 			if (eno == ENOENT) {
 			    if (*ptr)
 				*ptr = '\0';
-			    /*
-			     * TODO: needs variable argument handling
-			     * in zerrmsg() etc. to do this properly.
-			     */
 			    zerr("%s: bad interpreter: %s: %e", pth, ptr2,
 				 eno);
 			} else if (*ptr) {

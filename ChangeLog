@@ -1,3 +1,8 @@
+2006-06-16  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/exec.c: remove TODO in exec.c redundant
+	since 22474.
+
 2006-06-11  Clint Adams  <clint@zsh.org>
 
 	* 22486: Completion/Debian/Command/_dak: completion for
