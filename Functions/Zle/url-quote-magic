@@ -114,7 +114,7 @@ function url-quote-magic {
 	if [[ "${(Q)LBUFFER}$KEYS" == "${(Q)lbuf}" ]]
 	then
 	    local -a words
-	    words=("${(@Q)${(q)=LBUFFER}}")
+	    words=("${(@Q)${(z)lbuf}}")
 	    local urlseps urlmetas urlglobbers localschema otherschema
 	    if [[ "$words[-1]" == (#b)([^:]##):* ]]
 	    then

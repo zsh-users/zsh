@@ -1,3 +1,10 @@
+2006-06-17  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 22492: Functions/Zle/url-quote-magic: properly detect when a new
+	word (in the zsh syntax sense) has been started, and thus avoid
+	improperly quoting a metacharacter that is the first character of
+	a new word.
+
 2006-06-16  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/exec.c: remove TODO in exec.c redundant
