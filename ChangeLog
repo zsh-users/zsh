@@ -1,3 +1,8 @@
+2006-06-19  Peter Stephenson  <pws@csr.com>
+
+	* 22501: configure.ac: reduce default maximum function depth
+	to 1000.
+
 2006-06-17  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* 22492: Functions/Zle/url-quote-magic: properly detect when a new
