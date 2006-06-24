@@ -1,5 +1,8 @@
 2006-06-24  Clint Adams  <clint@zsh.org>
 
+	* 22513: Completion/Unix/Command/_tar: only do that for
+	GNU tar >= 1.14.91.
+
 	* 22511: Completion/Unix/Command/_tar,
 	Completion/Unix/Type/_tar_archive: complete compressed archive
 	filenames for GNU tar even when a compression option is not
