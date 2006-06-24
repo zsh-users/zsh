@@ -21,6 +21,8 @@ local _tar_cmd tf tmp tmpb del index
 # from some of the possible long options, and from the second word if
 # that does not start with a hyphen.
 
+_pick_variant gnu=GNU unix --version
+
 tmp=("${(@M)words:#-[^-]*}")
 _tar_cmd="${(j::)tmp#-}"
 

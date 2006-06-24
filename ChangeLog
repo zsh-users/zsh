@@ -1,3 +1,10 @@
+2006-06-24  Clint Adams  <clint@zsh.org>
+
+	* 22511: Completion/Unix/Command/_tar,
+	Completion/Unix/Type/_tar_archive: complete compressed archive
+	filenames for GNU tar even when a compression option is not
+	specified.
+
 2006-06-19  Peter Stephenson  <pws@csr.com>
 
 	* 22501: configure.ac: reduce default maximum function depth
