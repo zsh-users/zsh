@@ -24,7 +24,8 @@ local _tar_cmd tf tmp tmpb del index
 if _pick_variant gnu=GNU unix --version; then
   case "$($service --version)" in
     (tar \(GNU tar\) (#b)([0-9.-]##)*)
-    is_at_least 1.14.91 "$match[1]" || _cmd_variant[$service]="gnu-old"
+    autoload is-at-least
+    is-at-least 1.14.91 "$match[1]" || _cmd_variant[$service]="gnu-old"
     ;;
   esac
 fi
