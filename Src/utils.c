@@ -3683,6 +3683,112 @@ mb_width(const char *s)
     return width;
 }
 
+static mbstate_t mb_shiftstate;
+
+/*
+ * Initialise multibyte state: called before a sequence of
+ * mb_metacharlen().
+ */
+
+/**/
+void
+mb_metacharinit(void)
+{
+    memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
+}
+
+/*
+ * Length of metafied string s which contains the next multibyte
+ * character; single (possibly metafied) character if string is not null
+ * but character is not valid (e.g. possibly incomplete at end of string).
+ * Returned value is guaranteed not to reach beyond the end of the
+ * string (assuming correct metafication).
+ */
+
+/**/
+int
+mb_metacharlen(char *s)
+{
+    char inchar, *ptr;
+    size_t ret;
+    wchar_t wc;
+
+    if (!isset(MULTIBYTE))
+	return 1 + (*s == Meta);
+
+    ret = MB_INVALID;
+    for (ptr = s; *ptr; ) {
+	if (*ptr == Meta)
+	    inchar = *++ptr ^ 32;
+	else
+	    inchar = *ptr;
+	ptr++;
+	ret = mbrtowc(&wc, &inchar, 1, &mb_shiftstate);
+
+	if (ret == MB_INVALID)
+	    break;
+	if (ret == MB_INCOMPLETE)
+	    continue;
+	return ptr - s;
+    }
+
+    /* No valid multibyte sequence */
+    memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
+    if (ptr > s)
+	return 1 + (*s == Meta);	/* Treat as single byte character */
+    else
+	return 0;		/* Probably shouldn't happen */
+}
+
+/*
+ * Total number of multibyte characters in metafied string s.
+ * Same answer as iterating mb_metacharlen() and counting calls
+ * until end of string.
+ */
+
+/**/
+int
+mb_metastrlen(char *ptr)
+{
+    char inchar, *laststart;
+    size_t ret;
+    wchar_t wc;
+    int num, num_in_char;
+
+    if (!isset(MULTIBYTE))
+	return ztrlen(ptr);
+
+    laststart = ptr;
+    ret = MB_INVALID;
+    num = num_in_char = 0;
+
+    memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
+    while (*ptr) {
+	if (*ptr == Meta)
+	    inchar = *++ptr ^ 32;
+	else
+	    inchar = *ptr;
+	ptr++;
+	ret = mbrtowc(&wc, &inchar, 1, &mb_shiftstate);
+
+	if (ret == MB_INCOMPLETE) {
+	    num_in_char++;
+	} else {
+	    if (ret == MB_INVALID) {
+		/* Reset, treat as single character */
+		memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
+		ptr = laststart + (*laststart == Meta) + 1;
+	    } else
+		laststart = ptr;
+	    num++;
+	    num_in_char = 0;
+	}
+    }
+
+    /* If incomplete, treat remainder as trailing single bytes */
+    return num + num_in_char;
+}
+
 /**/
 #endif /* MULTIBYTE_SUPPORT */
 

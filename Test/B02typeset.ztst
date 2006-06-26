@@ -182,13 +182,26 @@
 >l o c a l
 >l:o:c:a l o c a
 
+ (setopt NO_multibyte cbases
+ LC_ALL=C 2>/dev/null
  typeset -T SCALAR=$'l\x83o\x83c\x83a\x83l' array $'\x83'
  print $array
  typeset -U SCALAR
- print $SCALAR $array
+ for (( i = 1; i <= ${#SCALAR}; i++ )); do
+   char=$SCALAR[i]
+   print $(( [#16] #char ))
+ done
+ print $array)
 0:Tied parameters and uniquified arrays with meta-character as separator
 >l o c a l
->lƒoƒcƒa l o c a
+>0x6C
+>0x83
+>0x6F
+>0x83
+>0x63
+>0x83
+>0x61
+>l o c a
 
  typeset -T SCALAR=$'l\000o\000c\000a\000l' array $'\000'
  typeset -U SCALAR

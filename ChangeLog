@@ -1,5 +1,9 @@
 2006-06-26  Peter Stephenson  <pws@csr.com>
 
+	* 22518: Src/params.c, Src/utils,c, Src/zsh.h,
+	Test/B02typeset.ztst: Initial go at making parameter subscripts
+	use multibyte characters.
+
 	* 22516: Src/parse.c: error evaluating "func()" didn't pop
 	the command stack.
 

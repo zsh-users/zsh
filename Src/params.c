@@ -918,9 +918,33 @@ isident(char *s)
     return !ss[1];
 }
 
+/*
+ * Parse a single argument to a parameter subscript.
+ * The subscripts starts at *str; *str is updated (input/output)
+ *
+ * *inv is set to indicate if the subscript is reversed (output)
+ * v is the Value for the parameter being accessed (input; note
+ *  v->isarr may be modified, and if v is a hash the parameter will
+ *  be updated to the element of the hash)
+ * a2 is 1 if this is the second subscript of a range (input)
+ * *w is only set if we need to find the end of a word (input; should
+ *  be set to 0 by the caller).
+ *
+ * The final two arguments are to support multibyte characters.
+ * If supplied they are set to the length of the character before
+ * the index position and the one at the index position.  If
+ * multibyte characters are not in use they are set to 1 for
+ * consistency.
+ *
+ * Returns a raw offset into the value from the start or end (i.e.
+ * after the arithmetic for Meta and possible multibyte characters has
+ * been taken into account).
+ */
+
 /**/
 static zlong
-getarg(char **str, int *inv, Value v, int a2, zlong *w)
+getarg(char **str, int *inv, Value v, int a2, zlong *w,
+       int *prevcharlen, int *nextcharlen)
 {
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
     int keymatch = 0, needtok = 0;
@@ -929,6 +953,10 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
     Patprog pprog = NULL;
 
     ishash = (v->pm && PM_TYPE(v->pm->node.flags) == PM_HASHED);
+    if (prevcharlen)
+	*prevcharlen = 1;
+    if (nextcharlen)
+	*nextcharlen = 1;
 
     /* first parse any subscription flags */
     if (v->pm && (*s == '(' || *s == Inpar)) {
@@ -1133,17 +1161,43 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 
 	    return (a2 ? s : d + 1) - t;
 	} else if (!v->isarr && !word) {
+	    int lastcharlen = 1;
 	    s = getstrvalue(v);
+	    /*
+	     * Note for the confused (= pws):  the index r we
+	     * have so far is that specified by the user.  The value
+	     * passed back is an offset from the start or end of
+	     * the string.  Hence it needs correcting at least
+	     * for Meta characters and maybe for multibyte characters.
+	     */
 	    if (r > 0) {
-		for (t = s + r - 1; *s && s < t;)
-		    if (*s++ == Meta)
-			s++, t++, r++;
+		zlong nchars = r;
+
+		MB_METACHARINIT();
+		for (t = s; nchars && *t; nchars--)
+		    t += (lastcharlen = MB_METACHARLEN(t));
+		/* for consistency, keep any remainder off the end */
+		r = (zlong)(t - s) + nchars;
+		if (prevcharlen)
+		    *prevcharlen = lastcharlen;
+		if (nextcharlen && *t)
+		    *nextcharlen = MB_METACHARLEN(t);
 	    } else {
-		r += ztrlen(s);
-		for (t = s + r; *s && s < t; r--)
-		    if (*s++ == Meta)
-			t++, r++;
-		r -= strlen(s);
+		zlong nchars = (zlong)MB_METASTRLEN(s) + r;
+
+		if (nchars < 0) {
+		    /* invalid but keep index anyway */
+		    r = nchars;
+		} else {
+		    MB_METACHARINIT();
+		    for (t = s; nchars && *t; nchars--)
+			t += (lastcharlen = MB_METACHARLEN(t));
+		    r = - (zlong)strlen(t); /* keep negative */
+		    if (prevcharlen)
+			*prevcharlen = lastcharlen;
+		    if (nextcharlen && *t)
+			*nextcharlen = MB_METACHARLEN(t);
+		}
 	    }
 	}
     } else {
@@ -1338,19 +1392,57 @@ getindex(char **pptr, Value v, int dq)
 	s += 2;
     } else {
 	zlong we = 0, dummy;
+	int startprevlen, startnextlen;
 
-	start = getarg(&s, &inv, v, 0, &we);
+	start = getarg(&s, &inv, v, 0, &we, &startprevlen, &startnextlen);
 
 	if (inv) {
 	    if (!v->isarr && start != 0) {
 		char *t, *p;
 		t = getstrvalue(v);
+		/*
+		 * Note for the confused (= pws): this is an inverse
+		 * offset so at this stage we need to convert from
+		 * the immediate offset into the value that we have
+		 * into a logical character position.
+		 */
 		if (start > 0) {
-		    for (p = t + start - 1; p-- > t; )
-			if (*p == Meta)
-			    start--;
-		} else
-		    start = -ztrlen(t + start + strlen(t));
+		    int nstart = 0;
+		    char *target = t + start - startprevlen;
+
+		    p = t;
+		    MB_METACHARINIT();
+		    while (*p) {
+			/*
+			 * move up characters, counting how many we
+			 * found
+			 */
+			p += MB_METACHARLEN(p);
+			if (p < target)
+			    nstart++;
+			else {
+			    if (p == target)
+				nstart++;
+			    else
+				p = target; /* pretend we hit exactly */
+			    break;
+			}
+		    }
+		    /* if start was too big, keep the difference */
+		    start = nstart + (target - p) + startprevlen;
+		} else {
+		    zlong startoff = start + strlen(t);
+		    if (startoff < 0) {
+			/* invalid: keep index but don't dereference */
+			start = startoff;
+		    } else {
+			/* find start in full characters */
+			MB_METACHARINIT();
+			for (p = t; p < t + startoff;)
+			    p += MB_METACHARLEN(p);
+			start = - MB_METASTRLEN(p);
+		    }
+		}
 	    }
 	    if (start > 0 && (isset(KSHARRAYS) || (v->pm->node.flags & PM_HASHED)))
 		start--;
@@ -1373,15 +1465,21 @@ getindex(char **pptr, Value v, int dq)
 
 	    if ((com = (*s == ','))) {
 		s++;
-		end = getarg(&s, &inv, v, 1, &dummy);
+		end = getarg(&s, &inv, v, 1, &dummy, NULL, NULL);
 	    } else {
 		end = we ? we : start;
 	    }
-	    if (start != end) com = 1;
+	    if (start != end)
+		com = 1;
+	    /*
+	     * Somehow the logic sometimes forces us to use the previous
+	     * or next character to what we would expect, which is
+	     * why we had to calculate them in getarg().
+	     */
 	    if (start > 0)
-		start--;
+		start -= startprevlen;
 	    else if (start == 0 && end == 0)
-		end++;
+		end = startnextlen;
 	    if (s == tbrack) {
 		s++;
 		if (v->isarr && !com &&
@@ -1578,13 +1676,19 @@ getstrvalue(Value v)
 	if (v->start < 0)
 	    v->start = 0;
     }
-    if (v->end < 0)
-	v->end += strlen(s) + 1;
+    if (v->end < 0) {
+	v->end += strlen(s);
+	if (v->end >= 0) {
+	    char *eptr = s + v->end;
+	    if (*eptr)
+		v->end += MB_METACHARLEN(eptr);
+	}
+    }
     s = (v->start > (int)strlen(s)) ? dupstring("") : dupstring(s + v->start);
     if (v->end <= v->start)
 	s[0] = '\0';
     else if (v->end - v->start <= (int)strlen(s))
-	s[v->end - v->start + (s[v->end - v->start - 1] == Meta)] = '\0';
+	s[v->end - v->start] = '\0';
 
     return s;
 }
@@ -2791,7 +2895,7 @@ char *
 tiedarrgetfn(Param pm)
 {
     struct tieddata *dptr = (struct tieddata *)pm->u.data;
-    return *dptr->arrptr ? zjoin(*dptr->arrptr, dptr->joinchar, 1) : "";
+    return *dptr->arrptr ? zjoin(*dptr->arrptr, STOUC(dptr->joinchar), 1) : "";
 }
 
 /**/
@@ -3463,7 +3567,7 @@ arrfixenv(char *s, char **t)
 	return;
 
     if (pm->node.flags & PM_TIED)
-	joinchar = ((struct tieddata *)pm->u.data)->joinchar;
+	joinchar = STOUC(((struct tieddata *)pm->u.data)->joinchar);
     else
 	joinchar = ':';
 
