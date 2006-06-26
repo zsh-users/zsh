@@ -3,6 +3,12 @@
 	* 22464: Src/Zle/zle_main.c: an error in prompt substitution could
 	cause bad recursion karma.
 
+2006-03-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22317: Src/builtins.c, Src/exec.c: exiting the shell from
+	code forked from within a function doesn't maintain the
+	exit status.
+
 2006-01-10  Peter Stephenson  <pws@csr.com>
 
 	* 22151: Src/text.c: a here-string got too many quotes when

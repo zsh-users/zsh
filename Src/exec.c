@@ -3657,7 +3657,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     popheap();
 
     if (exit_pending) {
-	if (locallevel) {
+	if (locallevel > forklevel) {
 	    /* Still functions to return: force them to do so. */
 	    retflag = 1;
 	    breaks = loops;
