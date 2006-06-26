@@ -1,3 +1,7 @@
+2006-06-26  Peter Stephenson  <pws@csr.com>
+
+	* 22501: README: missed this bit.
+
 2006-06-24  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Unix/Command/_tar: autoload

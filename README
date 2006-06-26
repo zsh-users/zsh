@@ -63,6 +63,12 @@ change was necessary because otherwise recursive directories under
 hit for anyone not using PINE.  The previous default can be restored with:
   zstyle ':completion:*' pine-directory ~/mail
 
+The default maximum function depth (configurable with
+--enable-max-function-depth) has been decreased to 1000 from 4096.  The
+previous value was observed to be large enough that crashes still occurred
+on some fairly common PC configurations.  This change is only likely to
+affect some highly specialised uses of the shell.
+
 Documentation
 -------------
 
