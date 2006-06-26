@@ -1,0 +1,87 @@
+%prep
+
+# Find a UTF-8 locale.
+  setopt multibyte
+  mb_ok=
+  langs=(en_US.UTF-8 en_GB.UTF-8 en.UTF-8
+	 $(locale -a 2>/dev/null | sed -e 's/utf8/UTF-8/' | grep UTF-8))
+  for LANG in $langs; do
+    if [[ é = ? ]]; then
+      mb_ok=1
+      break;
+    fi
+  done
+  if [[ -z $mb_ok ]]; then
+    ZTST_unimplemented="no UTF-8 locale or multibyte mode is not implemnted"
+  else
+    print Testing multibyte with locale $LANG >&8
+  fi
+
+%test
+
+  a=ténébreux
+  for i in {1..9}; do
+      print ${a[i]}
+      for j in {$i..9}; do
+	  print $i $j ${a[i,j]} ${a[-j,-i]}
+      done
+  done
+0:Basic indexing with multibyte characters
+>t
+>1 1 t x
+>1 2 té ux
+>1 3 tén eux
+>1 4 téné reux
+>1 5 ténéb breux
+>1 6 ténébr ébreux
+>1 7 ténébre nébreux
+>1 8 ténébreu énébreux
+>1 9 ténébreux ténébreux
+>é
+>2 2 é u
+>2 3 én eu
+>2 4 éné reu
+>2 5 énéb breu
+>2 6 énébr ébreu
+>2 7 énébre nébreu
+>2 8 énébreu énébreu
+>2 9 énébreux ténébreu
+>n
+>3 3 n e
+>3 4 né re
+>3 5 néb bre
+>3 6 nébr ébre
+>3 7 nébre nébre
+>3 8 nébreu énébre
+>3 9 nébreux ténébre
+>é
+>4 4 é r
+>4 5 éb br
+>4 6 ébr ébr
+>4 7 ébre nébr
+>4 8 ébreu énébr
+>4 9 ébreux ténébr
+>b
+>5 5 b b
+>5 6 br éb
+>5 7 bre néb
+>5 8 breu énéb
+>5 9 breux ténéb
+>r
+>6 6 r é
+>6 7 re né
+>6 8 reu éné
+>6 9 reux téné
+>e
+>7 7 e n
+>7 8 eu én
+>7 9 eux tén
+>u
+>8 8 u é
+>8 9 ux té
+>x
+>9 9 x t
+
+  print ${a[(i)é]} ${a[(I)é]} ${a[${a[(i)é]},${a[(I)é]}]}
+0:Reverse indexing with multibyte characters
+>2 4 éné
