@@ -1,5 +1,8 @@
 2006-06-26  Peter Stephenson  <pws@csr.com>
 
+	* 22516: Src/parse.c: error evaluating "func()" didn't pop
+	the command stack.
+
 	* 22501: README: missed this bit.
 
 2006-06-24  Clint Adams  <clint@zsh.org>

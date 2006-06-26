@@ -1672,6 +1672,7 @@ par_simple(int *complex, int nr)
 		    lineno += oldlineno;
 		    ecnpats = onp;
 		    ecssub = oecssub;
+		    cmdpop();
 		    YYERROR(oecused);
 		}
 		yylex();
@@ -1683,8 +1684,10 @@ par_simple(int *complex, int nr)
 		pl = ecadd(WCB_PIPE(WC_PIPE_END, 0));
 
 		par_cmd(&c);
-		if (!c)
+		if (!c) {
+		    cmdpop();
 		    YYERROR(oecused);
+		}
 
 		set_sublist_code(sl, WC_SUBLIST_END, 0, ecused - 1 - sl, c);
 		set_list_code(ll, (Z_SYNC | Z_END), c);
