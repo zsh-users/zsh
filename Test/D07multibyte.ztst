@@ -82,6 +82,42 @@
 >x
 >9 9 x t
 
+  s=é
+  print A${s[-2]}A B${s[-1]}B C${s[0]}C D${s[1]}D E${s[2]}E
+0:Out of range subscripts with multibyte characters
+>AA BéB CéC DéD EE
+
   print ${a[(i)é]} ${a[(I)é]} ${a[${a[(i)é]},${a[(I)é]}]}
 0:Reverse indexing with multibyte characters
 >2 4 éné
+
+  print ${a[(r)én,(r)éb]}
+0:Subscript searching with multibyte characters
+>énéb
+
+  print ${a[(rb:1:)é,-1]}
+  print ${a[(rb:2:)é,-1]}
+  print ${a[(rb:3:)é,-1]}
+  print ${a[(rb:4:)é,-1]}
+  print ${a[(rb:5:)é,-1]}
+0:Subscript searching with initial offset
+>énébreux
+>énébreux
+>ébreux
+>ébreux
+>
+
+  print ${a[(rn:1:)é,-1]}
+  print ${a[(rn:2:)é,-1]}
+  print ${a[(rn:3:)é,-1]}
+0:Subscript searching with count
+>énébreux
+>ébreux
+>
+
+  print ${a[(R)én,(R)éb]}
+0:Backward subscript searching with multibyte characters
+>énéb
+
+# Starting offsets with (R) seem to be so strange as to be hardly
+# worth testing.

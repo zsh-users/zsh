@@ -1,5 +1,8 @@
 2006-06-27  Peter Stephenson  <pws@csr.com>
 
+	* 22524: Src/params.c, Test/D07multibyte.ztst: searchable
+	subscripts with multibyte characters.
+
 	* 22522: Src/utils.c: infinite loop with invalid character
 	in mb_metastrlen().
 

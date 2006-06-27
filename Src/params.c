@@ -934,11 +934,13 @@ isident(char *s)
  * If supplied they are set to the length of the character before
  * the index position and the one at the index position.  If
  * multibyte characters are not in use they are set to 1 for
- * consistency.
+ * consistency.  Note they aren't fully handled if a2 is non-zero,
+ * since they aren't needed.
  *
  * Returns a raw offset into the value from the start or end (i.e.
  * after the arithmetic for Meta and possible multibyte characters has
- * been taken into account).
+ * been taken into account).  This actually gives the offset *after*
+ * the character in question; subtract *prevcharlen if necessary.
  */
 
 /**/
@@ -1178,16 +1180,23 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		    t += (lastcharlen = MB_METACHARLEN(t));
 		/* for consistency, keep any remainder off the end */
 		r = (zlong)(t - s) + nchars;
-		if (prevcharlen)
+		if (prevcharlen && !nchars /* ignore if off the end */)
 		    *prevcharlen = lastcharlen;
 		if (nextcharlen && *t)
 		    *nextcharlen = MB_METACHARLEN(t);
+	    } else if (r == 0) {
+		if (prevcharlen)
+		    *prevcharlen = 0;
+		if (nextcharlen && *s) {
+		    MB_METACHARINIT();
+		    *nextcharlen = MB_METACHARLEN(s);
+		}
 	    } else {
 		zlong nchars = (zlong)MB_METASTRLEN(s) + r;
 
 		if (nchars < 0) {
-		    /* invalid but keep index anyway */
-		    r = nchars;
+		    /* make sure this isn't valid as a raw pointer */
+		    r -= (zlong)strlen(s);
 		} else {
 		    MB_METACHARINIT();
 		    for (t = s; nchars && *t; nchars--)
@@ -1300,57 +1309,188 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		    }
 		return a2 ? -1 : 0;
 	    } else {
+		/* Searching characters */
+		int slen;
 		d = getstrvalue(v);
 		if (!d || !*d)
 		    return 0;
-		len = strlen(d);
+		/*
+		 * beg and len are character counts, not raw offsets.
+		 * Remember we need to return a raw offset.
+		 */
+		len = MB_METASTRLEN(d);
+		slen = strlen(d);
 		if (beg < 0)
 		    beg += len;
+		MB_METACHARINIT();
 		if (beg >= 0 && beg < len) {
-                    char *de = d + len;
+                    char *de = d + slen;
 
 		    if (a2) {
+			/*
+			 * Second argument: we don't need to
+			 * handle prevcharlen or nextcharlen, but
+			 * we do need to handle characters appropriately.
+			 */
 			if (down) {
+			    int nmatches = 0;
+			    char *lastpos = NULL;
+
 			    if (!hasbeg)
 				beg = len;
-			    for (r = beg, t = d + beg; t >= d; r--, t--) {
+
+			    /*
+			     * See below: we have to move forward,
+			     * but need to count from the end.
+			     */
+			    for (t = d, r = 0; r <= beg; r++) {
 				sav = *t;
 				*t = '\0';
-				if (pattry(pprog, d)
-				    && !--num) {
-				    *t = sav;
-				    return r;
+				if (pattry(pprog, d)) {
+				    nmatches++;
+				    lastpos = t;
 				}
 				*t = sav;
+				if (t == de)
+				    break;
+				t += MB_METACHARLEN(t);
 			    }
-			} else
-			    for (r = beg, t = d + beg; t <= de; r++, t++) {
+
+			    if (nmatches >= num) {
+				if (num > 1) {
+				    nmatches -= num;
+				    MB_METACHARINIT();
+				    for (t = d, r = 0; ; r++) {
+					sav = *t;
+					*t = '\0';
+					if (pattry(pprog, d) &&
+					    nmatches-- == 0) {
+					    lastpos = t;
+					    *t = sav;
+					    break;
+					}
+					*t = sav;
+					t += MB_METACHARLEN(t);
+				    }
+				}
+				/* else lastpos is already OK */
+
+				return lastpos - d;
+			    }
+			} else {
+			    /*
+			     * This handling of the b flag
+			     * gives odd results, but this is the
+			     * way it's always worked.
+			     */
+			    for (t = d; beg && t <= de; beg--)
+				t += MB_METACHARLEN(t);
+			    for (;;) {
 				sav = *t;
 				*t = '\0';
-				if (pattry(pprog, d) &&
-				    !--num) {
+				if (pattry(pprog, d) && !--num) {
 				    *t = sav;
-				    return r;
+				    /*
+				     * This time, don't increment
+				     * pointer, since it's already
+				     * after everything we matched.
+				     */
+				    return t - d;
 				}
 				*t = sav;
+				if (t == de)
+				    break;
+				t += MB_METACHARLEN(t);
 			    }
+			}
 		    } else {
+			/*
+			 * First argument: this is the only case
+			 * where we need prevcharlen and nextcharlen.
+			 */
+			int lastcharlen;
+
 			if (down) {
+			    int nmatches = 0;
+			    char *lastpos = NULL;
+
 			    if (!hasbeg)
 				beg = len;
+
+			    /*
+			     * We can only move forward through
+			     * multibyte strings, so record the
+			     * matches.
+			     * Unfortunately the count num works
+			     * from the end, so it's easy to get the
+			     * last one but we need to repeat if
+			     * we want another one.
+			     */
+			    for (t = d, r = 0; r <= beg; r++) {
+				if (pattry(pprog, t)) {
+				    nmatches++;
+				    lastpos = t;
+				}
+				if (t == de)
+				    break;
+				t += MB_METACHARLEN(t);
+			    }
+
+			    if (nmatches >= num) {
+				if (num > 1) {
+				    /*
+				     * Need to start again and repeat
+				     * to get the right match.
+				     */
+				    nmatches -= num;
+				    MB_METACHARINIT();
+				    for (t = d, r = 0; ; r++) {
+					if (pattry(pprog, t) &&
+					    nmatches-- == 0) {
+					    lastpos = t;
+					    break;
+					}
+					t += MB_METACHARLEN(t);
+				    }
+				}
+				/* else lastpos is already OK */
+
+				/* return pointer after matched char */
+				lastpos +=
+				    (lastcharlen = MB_METACHARLEN(lastpos));
+				if (prevcharlen)
+				    *prevcharlen = lastcharlen;
+				if (nextcharlen)
+				    *nextcharlen = MB_METACHARLEN(lastpos);
+				return lastpos - d;
+			    }
+
 			    for (r = beg + 1, t = d + beg; t >= d; r--, t--) {
 				if (pattry(pprog, t) &&
 				    !--num)
 				    return r;
 			    }
-			} else
-			    for (r = beg + 1, t = d + beg; t <= de; r++, t++)
-				if (pattry(pprog, t) &&
-				    !--num)
-				    return r;
+			} else {
+			    for (t = d; beg && t <= de; beg--)
+				t += MB_METACHARLEN(t);
+			    for (;;) {
+				if (pattry(pprog, t) && !--num) {
+				    /* return pointer after matched char */
+				    t += (lastcharlen = MB_METACHARLEN(t));
+				    if (prevcharlen)
+					*prevcharlen = lastcharlen;
+				    if (nextcharlen)
+					*nextcharlen = MB_METACHARLEN(t);
+				    return t - d;
+				}
+				if (t == de)
+				    break;
+				t += MB_METACHARLEN(t);
+			    }
+			}
 		    }
 		}
-		return down ? 0 : len + 1;
+		return down ? 0 : slen + 1;
 	    }
 	}
     }
@@ -1429,9 +1569,12 @@ getindex(char **pptr, Value v, int dq)
 			}
 		    }
 		    /* if start was too big, keep the difference */
-		    start = nstart + (target - p) + startprevlen;
+		    start = nstart + (target - p) + 1;
 		} else {
 		    zlong startoff = start + strlen(t);
+#ifdef DEBUG
+		    dputs("BUG: can't have negative inverse offsets???");
+#endif
 		    if (startoff < 0) {
 			/* invalid: keep index but don't dereference */
 			start = startoff;
