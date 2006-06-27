@@ -3778,8 +3778,8 @@ mb_metastrlen(char *ptr)
 		/* Reset, treat as single character */
 		memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
 		ptr = laststart + (*laststart == Meta) + 1;
-	    } else
-		laststart = ptr;
+	    }
+	    laststart = ptr;
 	    num++;
 	    num_in_char = 0;
 	}
