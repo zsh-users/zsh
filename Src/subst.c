@@ -889,6 +889,29 @@ subst_parse_str(char **sp, int single, int err)
     return 1;
 }
 
+/* Evaluation for (#) flag */
+
+static char *
+substevalchar(char *ptr)
+{
+    zlong ires = mathevali(ptr);
+
+    if (errflag)
+	return NULL;
+    if (isset(MULTIBYTE) && ires > 127) {
+	char buf[10];
+	int dummy;
+
+	/* inefficient: should separate out \U handling from getkeystring */
+	sprintf(buf, "\\U%.8x", (unsigned int)ires);
+	return getkeystring(buf, &dummy, 2, NULL);
+    } else {
+	ptr = zhalloc(2);
+	sprintf(ptr, "%c", (int)ires);
+	return ptr;
+    }
+}
+
 /* parameter substitution */
 
 #define	isstring(c) ((c) == '$' || (char)(c) == String || (char)(c) == Qstring)
@@ -2269,13 +2292,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	/*
 	 * Evaluate the value numerically and output the result as
 	 * a character.
-	 *
-	 * Note this doesn't yet handle Unicode or multibyte characters:
-	 * that will need handling more generally probably by
-	 * an additional flag of some sort.
 	 */
-	zlong ires;
-
 	if (isarr) {
 	    char **aval2, **avptr, **av2ptr;
 
@@ -2283,20 +2300,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 	    for (avptr = aval, av2ptr = aval2; *avptr; avptr++, av2ptr++)
 	    {
-		ires = mathevali(*avptr);
-		if (errflag)
+		if (!(*av2ptr = substevalchar(*avptr)))
 		    return NULL;
-		*av2ptr = zhalloc(2);
-		sprintf(*av2ptr, "%c", (int)ires);
 	    }
 	    *av2ptr = NULL;
 	    aval = aval2;
 	} else {
-	    ires = mathevali(val);
-	    if (errflag)
+	    if (!(val = substevalchar(val)))
 		return NULL;
-	    val = zhalloc(2);
-	    sprintf(val, "%c", (int)ires);
 	}
     }
     /*

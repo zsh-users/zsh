@@ -1,5 +1,8 @@
 2006-06-28  Peter Stephenson  <pws@csr.com>
 
+	* 22526: Doc/Zsh/expn.yo, Src/subst.c: enhance${(#)...} to output
+	Unicode.
+
 	* 22525: Completion/compinit, Src/hist.c, Src/jobs.c,
 	Src/pattern.c, Src/subst.c, Src/utils.c, Src/zsh.h,
 	Test/D07multibyte.ztst: lengths and cases of multibyte strings
