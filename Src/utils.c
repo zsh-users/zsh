@@ -3687,7 +3687,7 @@ static mbstate_t mb_shiftstate;
 
 /*
  * Initialise multibyte state: called before a sequence of
- * mb_metacharlen().
+ * mb_metacharlenconv().
  */
 
 /**/
@@ -3703,18 +3703,24 @@ mb_metacharinit(void)
  * but character is not valid (e.g. possibly incomplete at end of string).
  * Returned value is guaranteed not to reach beyond the end of the
  * string (assuming correct metafication).
+ *
+ * If wcp is not NULL, the converted wide character is stored there.
+ * If no conversion could be done WEOF is used.
  */
 
 /**/
 int
-mb_metacharlen(char *s)
+mb_metacharlenconv(char *s, wint_t *wcp)
 {
     char inchar, *ptr;
     size_t ret;
     wchar_t wc;
 
-    if (!isset(MULTIBYTE))
+    if (!isset(MULTIBYTE)) {
+	if (wcp)
+	    *wcp = WEOF;
 	return 1 + (*s == Meta);
+    }
 
     ret = MB_INVALID;
     for (ptr = s; *ptr; ) {
@@ -3729,14 +3735,18 @@ mb_metacharlen(char *s)
 	    break;
 	if (ret == MB_INCOMPLETE)
 	    continue;
+	if (wcp)
+	    *wcp = wc;
 	return ptr - s;
     }
 
+    if (wcp)
+	*wcp = WEOF;
     /* No valid multibyte sequence */
     memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
-    if (ptr > s)
+    if (ptr > s) {
 	return 1 + (*s == Meta);	/* Treat as single byte character */
-    else
+    } else
 	return 0;		/* Probably shouldn't happen */
 }
 

@@ -1644,17 +1644,12 @@ charrefinc(char **x, char *y)
 }
 
 
-#ifndef PARAMETER_CODE_HANDLES_MULTIBYTE
 /*
- * TODO: We should use the other branch, but currently
- * the parameter code doesn't handle multibyte input,
- * so this would produce the wrong subscripts,
- * so just use a raw byte difference for now.
+ * Counter the number of characters between two pointers, smaller first
+ *
+ * This is used when setting values in parameters, so we obey
+ * the MULTIBYTE option (even if it's been overridden locally).
  */
-/* Counter the number of characters between two pointers, smaller first */
-# define CHARSUB(x,y)	((y) - (x))
-#else
-/* Counter the number of characters between two pointers, smaller first */
 #define CHARSUB(x,y)	charsub(x, y)
 static ptrdiff_t
 charsub(char *x, char *y)
@@ -1662,6 +1657,9 @@ charsub(char *x, char *y)
     ptrdiff_t res = 0;
     size_t ret;
     wchar_t wc;
+
+    if (!isset(MULTIBYTE))
+	return y - x;
 
     while (x < y) {
 	ret = mbrtowc(&wc, x, y-x, &shiftstate);
@@ -1674,13 +1672,12 @@ charsub(char *x, char *y)
 	/* Treat nulls as normal characters */
 	if (!ret)
 	    ret = 1;
-	res += ret;
+	res++;
 	x += ret;
     }
 
     return res;
 }
-#endif
 
 #else /* no MULTIBYTE_SUPPORT */
 

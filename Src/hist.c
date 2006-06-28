@@ -635,10 +635,10 @@ histsubchar(int c)
 		quotebreak(&sline);
 		break;
 	    case 'l':
-		downcase(&sline);
+		sline = casemodify(sline, CASMOD_LOWER);
 		break;
 	    case 'u':
-		upcase(&sline);
+		sline = casemodify(sline, CASMOD_UPPER);
 		break;
 	    default:
 		herrflush();
@@ -1503,42 +1503,130 @@ remlpaths(char **junkptr)
     return 0;
 }
 
-/**/
-int
-makeuppercase(char **junkptr)
-{
-    char *str = *junkptr;
-
-    for (; *str; str++)
-	*str = tuupper(*str);
-    return 1;
-}
+/*
+ * Return modified version of str from the heap with modification
+ * according to one of the CASMOD_* types defined in zsh.h; CASMOD_NONE
+ * is not handled, for obvious reasons.
+ */
 
 /**/
-int
-makelowercase(char **junkptr)
+char *
+casemodify(char *str, int how)
 {
-    char *str = *junkptr;
+    char *str2 = zhalloc(2 * strlen(str) + 1);
+    char *ptr2 = str2;
+    int nextupper = 1;
 
-    for (; *str; str++)
-	*str = tulower(*str);
-    return 1;
-}
+#ifdef MULTIBYTE_SUPPORT
+    if (isset(MULTIBYTE)) {
+	VARARR(char, mbstr, MB_CUR_MAX);
+	mbstate_t ps;
 
-/**/
-int
-makecapitals(char **junkptr)
-{
-    char *str = *junkptr;
+	mb_metacharinit();
+	memset(&ps, 0, sizeof(ps));
+	while (*str) {
+	    wint_t wc;
+	    int len = mb_metacharlenconv(str, &wc), mod = 0, len2;
+	    /*
+	     * wc is set to WEOF if the start of str couldn't be
+	     * converted.  Presumably WEOF doesn't match iswlower(), but
+	     * better be safe.
+	     */
+	    if (wc == WEOF) {
+		while (len--)
+		    *ptr2++ = *str++;
+		/* not alphanumeric */
+		nextupper = 1;
+		continue;
+	    }
+	    switch (how) {
+	    case CASMOD_LOWER:
+		if (iswupper(wc)) {
+		    wc = towlower(wc);
+		    mod = 1;
+		}
+		break;
 
-    for (; *str;) {
-	for (; *str && !ialnum(*str); str++);
-	if (*str)
-	    *str = tuupper(*str), str++;
-	for (; *str && ialnum(*str); str++)
-	    *str = tulower(*str);
+	    case CASMOD_UPPER:
+		if (iswlower(wc)) {
+		    wc = towupper(wc);
+		    mod = 1;
+		}
+		break;
+
+	    case CASMOD_CAPS:
+	    default:		/* shuts up compiler */
+		if (!iswalnum(wc))
+		    nextupper = 1;
+		else if (nextupper) {
+		    if (iswlower(wc)) {
+			wc = towupper(wc);
+			mod = 1;
+		    }
+		    nextupper = 0;
+		} else if (iswupper(wc)) {
+		    wc = towlower(wc);
+		    mod = 1;
+		}
+		break;
+	    }
+	    if (mod && (len2 = wcrtomb(mbstr, wc, &ps)) > 0) {
+		char *mbptr;
+
+		for (mbptr = mbstr; mbptr < mbstr + len2; mbptr++) {
+		    if (imeta(STOUC(*mbptr))) {
+			*ptr2++ = Meta;
+			*ptr2++ = *mbptr ^ 32;
+		    } else
+			*ptr2++ = *mbptr;
+		}
+		str += len;
+	    } else {
+		while (len--)
+		    *ptr2++ = *str++;
+	    }
+	}
     }
-    return 1;
+    else
+#endif
+	while (*str) {
+	    int c;
+	    if (*str == Meta) {
+		c = str[1] ^ 32;
+		str += 2;
+	    } else
+		c = *str++;
+	    switch (how) {
+	    case CASMOD_LOWER:
+		if (isupper(c))
+		    c = tolower(c);
+		break;
+
+	    case CASMOD_UPPER:
+		if (islower(c))
+		    c = toupper(c);
+		break;
+
+	    case CASMOD_CAPS:
+	    default:		/* shuts up compiler */
+		if (!ialnum(c))
+		    nextupper = 1;
+		else if (nextupper) {
+		    if (islower(c))
+			c = toupper(c);
+		    nextupper = 0;
+		} else if (isupper(c))
+		    c = tolower(c);
+		break;
+	    }
+	    if (imeta(c)) {
+		*ptr2++ = Meta;
+		*ptr2++ = c ^ 32;
+	    } else
+		*ptr2++ = c;
+	}
+    *ptr2 = '\0';
+    return str2;
 }
 
 /**/
@@ -1642,26 +1730,6 @@ getargs(Histent elist, int arg1, int arg2)
 
     pos1 = words[2*arg1];
     return dupstrpfx(elist->node.nam + pos1, words[2*arg2+1] - pos1);
-}
-
-/**/
-void
-upcase(char **x)
-{
-    char *pp = *(char **)x;
-
-    for (; *pp; pp++)
-	*pp = tuupper(*pp);
-}
-
-/**/
-void
-downcase(char **x)
-{
-    char *pp = *(char **)x;
-
-    for (; *pp; pp++)
-	*pp = tulower(*pp);
 }
 
 /**/

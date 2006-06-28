@@ -2014,7 +2014,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    return 1;
 		} else
 		    signame = *argv;
-		makeuppercase(&signame);
+		signame = casemodify(signame, CASMOD_UPPER);
 		if (!strncmp(signame, "SIG", 3))
 		    signame+=3;
 

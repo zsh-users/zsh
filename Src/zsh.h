@@ -1882,6 +1882,17 @@ struct heap {
 #define ZSIG_ALIAS	(1<<3)  /* Trap is stored under an alias */
 #define ZSIG_SHIFT	4
 
+/************************/
+/* Flags to casemodifiy */
+/************************/
+
+enum {
+    CASMOD_NONE,		/* dummy for tests */
+    CASMOD_UPPER,
+    CASMOD_LOWER,
+    CASMOD_CAPS
+};
+
 /**********************************/
 /* Flags to third argument of zle */
 /**********************************/
@@ -1927,7 +1938,7 @@ typedef char *(*ZleGetLineFn) _((int *, int *));
 #ifdef MULTIBYTE_SUPPORT
 #define nicezputs(str, outs)	(void)mb_niceformat((str), (outs), NULL, 0)
 #define MB_METACHARINIT()	mb_metacharinit()
-#define MB_METACHARLEN(str)	mb_metacharlen(str)
+#define MB_METACHARLEN(str)	mb_metacharlenconv(str, NULL)
 #define MB_METASTRLEN(str)	mb_metastrlen(str)
 
 #define MB_INCOMPLETE	((size_t)-2)

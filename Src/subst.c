@@ -1019,7 +1019,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     /* (u): straightforward. */
     int unique = 0;
     /* combination of (L), (U) and (C) flags. */
-    int casmod = 0;
+    int casmod = CASMOD_NONE;
     /*
      * quotemod says we are doing either (q) (positive), (Q) (negative)
      * or not (0).  quotetype counts the q's for the first case.
@@ -1211,13 +1211,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 
 		case 'L':
-		    casmod = 2;
+		    casmod = CASMOD_LOWER;
 		    break;
 		case 'U':
-		    casmod = 1;
+		    casmod = CASMOD_UPPER;
 		    break;
 		case 'C':
-		    casmod = 3;
+		    casmod = CASMOD_CAPS;
 		    break;
 
 		case 'o':
@@ -1819,17 +1819,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 		}
 		switch (v->pm->node.flags & (PM_LOWER | PM_UPPER)) {
-		    char *t;
-
 		case PM_LOWER:
-		    t = val;
-		    for (; (c = *t); t++)
-			*t = tulower(c);
+		    val = casemodify(val, CASMOD_LOWER);
+		    copied = 1;
 		    break;
 		case PM_UPPER:
-		    t = val;
-		    for (; (c = *t); t++)
-			*t = tuupper(c);
+		    val = casemodify(val, CASMOD_UPPER);
+		    copied = 1;
 		    break;
 		}
 	    }
@@ -2316,14 +2312,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 	if (isarr) {
 	    char **ctr;
-	    int sl = sep ? ztrlen(sep) : 1;
+	    int sl = sep ? MB_METASTRLEN(sep) : 1;
 
 	    if (getlen == 1)
 		for (ctr = aval; *ctr; ctr++, len++);
 	    else if (getlen == 2) {
 		if (*aval)
 		    for (len = -sl, ctr = aval;
-			 len += sl + ztrlen(*ctr), *++ctr;);
+			 len += sl + MB_METASTRLEN(*ctr), *++ctr;);
 	    }
 	    else
 		for (ctr = aval;
@@ -2331,7 +2327,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		     len += wordcount(*ctr, spsep, getlen > 3), ctr++);
 	} else {
 	    if (getlen < 3)
-		len = ztrlen(val);
+		len = MB_METASTRLEN(val);
 	    else
 		len = wordcount(val, spsep, getlen > 3);
 	}
@@ -2387,33 +2383,19 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     /*
      * Perform case modififications.
      */
-    if (casmod) {
+    if (casmod != CASMOD_NONE) {
+	copied = 1;		/* string is always modified by copy */
 	if (isarr) {
-	    char **ap;
+	    char **ap, **ap2;
 
-	    if (!copied)
-		aval = arrdup(aval), copied = 1;
 	    ap = aval;
+	    ap2 = aval = (char **) zhalloc(sizeof(char *) * (arrlen(aval)+1));
 
-	    if (casmod == 1)
-		for (; *ap; ap++)
-		    makeuppercase(ap);
-	    else if (casmod == 2)
-		for (; *ap; ap++)
-		    makelowercase(ap);
-	    else
-		for (; *ap; ap++)
-		    makecapitals(ap);
-
+	    while (*ap)
+		*ap2++ = casemodify(*ap++, casmod);
+	    *ap2++ = NULL;
 	} else {
-	    if (!copied)
-		val = dupstring(val), copied = 1;
-	    if (casmod == 1)
-		makeuppercase(&val);
-	    else if (casmod == 2)
-		makelowercase(&val);
-	    else
-		makecapitals(&val);
+	    val = casemodify(val, casmod);
 	}
     }
     /*
@@ -2975,7 +2957,8 @@ modify(char **str, char **ptr)
 		for (t = e = *str; (tt = findword(&e, sep));) {
 		    tc = *e;
 		    *e = '\0';
-		    copy = dupstring(tt);
+		    if (c != 'l' && c != 'u')
+			copy = dupstring(tt);
 		    *e = tc;
 		    switch (c) {
 		    case 'h':
@@ -2991,10 +2974,10 @@ modify(char **str, char **ptr)
 			remlpaths(&copy);
 			break;
 		    case 'l':
-			downcase(&copy);
+			copy = casemodify(tt, CASMOD_LOWER);
 			break;
 		    case 'u':
-			upcase(&copy);
+			copy = casemodify(tt, CASMOD_UPPER);
 			break;
 		    case 's':
 			if (hsubl && hsubr)
@@ -3050,10 +3033,10 @@ modify(char **str, char **ptr)
 		    remlpaths(str);
 		    break;
 		case 'l':
-		    downcase(str);
+		    *str = casemodify(*str, CASMOD_LOWER);
 		    break;
 		case 'u':
-		    upcase(str);
+		    *str = casemodify(*str, CASMOD_UPPER);
 		    break;
 		case 's':
 		    if (hsubl && hsubr) {

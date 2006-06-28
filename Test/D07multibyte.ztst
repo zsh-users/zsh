@@ -121,3 +121,37 @@
 
 # Starting offsets with (R) seem to be so strange as to be hardly
 # worth testing.
+
+  setopt extendedglob
+  [[ $a = (#b)t(én)(éb)reux ]] || print "Failed to match." >&2
+  for i in {1..${#match}}; do
+    print $match[i] $mbegin[i] $mend[i] ${a[$mbegin[i],$mend[i]]}
+  done
+0:Multibyte offsets in pattern tests
+>én 2 3 én
+>éb 4 5 éb
+
+  b=${(U)a}
+  print $b
+  print ${(L)b}
+  desdichado="Je suis le $a, le veuf, l'inconsolé"
+  print ${(C)desdichado}
+  lxiv="l'état c'est moi"
+  print ${(C)lxiv}
+0:Case modification of multibyte strings
+>TÉNÉBREUX
+>ténébreux
+>Je Suis Le Ténébreux, Le Veuf, L'Inconsolé
+>L'État C'Est Moi
+
+  array=(ølaf ødd øpened án encyclopædia)
+  barray=(${(U)array})
+  print $barray
+  print ${(L)barray}
+  print ${(C)array}
+  print ${(C)barray}
+0:Case modification of arrays with multibyte strings
+>ØLAF ØDD ØPENED ÁN ENCYCLOPÆDIA
+>ølaf ødd øpened án encyclopædia
+>Ølaf Ødd Øpened Án Encyclopædia
+>Ølaf Ødd Øpened Án Encyclopædia

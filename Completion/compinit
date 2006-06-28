@@ -128,11 +128,12 @@ fi
 # The standard options set in completion functions.
 
 _comp_options=(
-       glob
+       extendedglob
        bareglobqual
+       glob
+       multibyte
        nullglob
        rcexpandparam
-       extendedglob
        unset
     NO_markdirs
     NO_globsubst
