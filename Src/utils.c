@@ -4410,6 +4410,17 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		   (fromwhere == 2 || fromwhere == 5 || fromwhere == 6)) {
 	    control = 1;
 	    continue;
+#ifdef MULTIBYTE_SUPPORT
+	} else if (fromwhere == 6 && isset(MULTIBYTE) && STOUC(*s) > 127) {
+	    wint_t wc;
+	    int len;
+	    len = mb_metacharlenconv(s, &wc);
+	    if (wc != WEOF) {
+		*misc = (int)wc;
+		return s + len;
+	    }
+#endif
+
 	} else if (*s == Meta)
 	    *t++ = *++s ^ 32;
 	else

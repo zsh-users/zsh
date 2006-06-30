@@ -155,3 +155,13 @@
 >ølaf ødd øpened án encyclopædia
 >Ølaf Ødd Øpened Án Encyclopædia
 >Ølaf Ødd Øpened Án Encyclopædia
+
+  print $(( ##¥ ))
+  pound=£
+  print $(( #pound ))
+  alpha=α
+  print $(( ##α )) $(( #alpha ))
+0:Conversion to Unicode in mathematical expressions
+>165
+>163
+>945 945

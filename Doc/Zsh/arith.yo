@@ -129,13 +129,14 @@ the tt(zmodload) builtin to provide standard floating point mathematical
 functions.
 
 An expression of the form `tt(##)var(x)' where var(x) is any character
-sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the ASCII
-value of this character and an expression of the form `tt(#)var(foo)'
-gives the ASCII value of the first character of the value of the
-parameter var(foo).  Note that this is different from the expression
-`tt($#)var(foo)', a standard parameter substitution which gives the
-length of the parameter var(foo).  `tt(#\)' is accepted instead of
-`tt(##)', but its use is deprecated.
+sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the value of
+this character and an expression of the form `tt(#)var(foo)' gives the
+value of the first character of the contents of the parameter var(foo).
+Character values are according to the character set used in the current
+locale; for multibyte character handling the option tt(MULTIBYTE) must be
+set.  Note that this form is different from `tt($#)var(foo)', a standard
+parameter substitution which gives the length of the parameter var(foo).
+`tt(#\)' is accepted instead of `tt(##)', but its use is deprecated.
 
 Named parameters and subscripted arrays can be referenced by name within an
 arithmetic expression without using the parameter expansion syntax.  For

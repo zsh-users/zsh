@@ -549,8 +549,20 @@ getcvar(char *s)
     queue_signals();
     if (!(t = getsparam(s)))
 	mn.u.l = 0;
-    else
-        mn.u.l = STOUC(*t == Meta ? t[1] ^ 32 : *t);
+    else {
+#ifdef MULTIBYTE_SUPPORT
+	if (isset(MULTIBYTE)) {
+	    wint_t wc;
+	    (void)mb_metacharlenconv(t, &wc);
+	    if (wc != WEOF) {
+		mn.u.l = (zlong)wc;
+		unqueue_signals();
+		return mn;
+	    }
+	}
+#endif
+	mn.u.l = STOUC(*t == Meta ? t[1] ^ 32 : *t);
+    }
     unqueue_signals();
     return mn;
 }
