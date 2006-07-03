@@ -121,6 +121,7 @@ check test:
 
 distclean-here:
 	rm -f Makefile config.h config.status config.log config.cache config.modules config.modules.sh stamp-h Config/defs.mk
+	rm -rf autom4te.cache
 
 realclean-here:
 	cd $(sdir) && rm -f config.h.in stamp-h.in configure
