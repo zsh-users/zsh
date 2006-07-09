@@ -31,7 +31,7 @@
 #include "prompt.pro"
 
 /* text attribute mask */
- 
+
 /**/
 unsigned txtattrmask;
 
@@ -41,7 +41,7 @@ unsigned txtattrmask;
 mod_export unsigned txtchange;
 
 /* the command stack for use with %_ in prompts */
- 
+
 /**/
 unsigned char *cmdstack;
 /**/
@@ -59,7 +59,7 @@ static char *cmdnames[CS_COUNT] = {
     "cmdsubst", "mathsubst", "elif-then", "heredoc",
     "heredocd", "brace",     "braceparam", "always",
 };
- 
+
 /* The buffer into which an expanded and metafied prompt is being written, *
  * and its size.                                                           */
 
@@ -1303,4 +1303,23 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	    return 0;
     }
     return 1;
+}
+
+/**/
+void
+cmdpush(int cmdtok)
+{
+    if (cmdsp >= 0 && cmdsp < CMDSTACKSZ)
+	cmdstack[cmdsp++] = (unsigned char)cmdtok;
+}
+
+/**/
+void
+cmdpop(void)
+{
+    if (cmdsp <= 0) {
+	DPUTS(1, "BUG: cmdstack empty");
+	fflush(stderr);
+    } else
+	cmdsp--;
 }

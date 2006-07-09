@@ -1,3 +1,9 @@
+2006-07-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22542: Src/parse.c, Src/prompt.c, Src/zsh.h: 22516 was
+	overentusiastic about popping the command stack; turn cmdpop()
+	and cmdpush() into functions for better maintainability.
+
 2006-07-03  Peter Stephenson  <pws@csr.com>
 
 	* 22537: Makefile.in: rm -rf autom4te.cache on distclean.

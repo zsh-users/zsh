@@ -1768,20 +1768,6 @@ struct ttyinfo {
 /****************************************/
 
 #define CMDSTACKSZ 256
-#define cmdpush(X) do { \
-                       if (cmdsp >= 0 && cmdsp < CMDSTACKSZ) \
-                           cmdstack[cmdsp++]=(X); \
-                   } while (0)
-#ifdef DEBUG
-# define cmdpop()  do { \
-                       if (cmdsp <= 0) { \
-			   fputs("BUG: cmdstack empty\n", stderr); \
-			   fflush(stderr); \
-		       } else cmdsp--; \
-                   } while (0)
-#else
-# define cmdpop()   do { if (cmdsp > 0) cmdsp--; } while (0)
-#endif
 
 #define CS_FOR          0
 #define CS_WHILE        1
