@@ -1,3 +1,8 @@
+2006-07-09  Clint Adams  <clint@zsh.org>
+
+	* 22543: Completion/Unix/Command/_cssh: completion for
+	clusterssh.
+
 2006-07-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22542: Src/parse.c, Src/prompt.c, Src/zsh.h: 22516 was
