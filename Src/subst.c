@@ -475,15 +475,14 @@ filesubstr(char **namptr, int assign)
 		return 0;
 	    *namptr = dyncat(ds, ptr);
 	    return 1;
-	} else if (iuser(str[1])) {   /* ~foo */
-	    char *ptr, *hom, save;
+	} else if ((ptr = itype_end(str+1, IUSER, 0)) != str+1) {   /* ~foo */
+	    char *hom, save;
 
-	    for (ptr = ++str; *ptr && iuser(*ptr); ptr++);
 	    save = *ptr;
 	    if (!isend(save))
 		return 0;
 	    *ptr = 0;
-	    if (!(hom = getnameddir(str))) {
+	    if (!(hom = getnameddir(++str))) {
 		if (isset(NOMATCH))
 		    zerr("no such user or named directory: %s", str);
 		*ptr = save;
@@ -1146,9 +1145,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * Shouldn't this be a table or something?  We test for all
      * these later on, too.
      */
-    if (!ialnum(c = *s) && c != '#' && c != Pound && c != '-' &&
-	c != '!' && c != '$' && c != String && c != Qstring &&
-	c != '?' && c != Quest && c != '_' &&
+    c = *s;
+    if (itype_end(s, IIDENT, 1) == s && *s != '#' && c != Pound &&
+	c != '-' && c != '!' && c != '$' && c != String && c != Qstring &&
+	c != '?' && c != Quest &&
 	c != '*' && c != Star && c != '@' && c != '{' &&
 	c != Inbrace && c != '=' && c != Equals && c != Hat &&
 	c != '^' && c != '~' && c != Tilde && c != '+') {
@@ -1446,8 +1446,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    } else
 		spbreak = 2;
 	} else if ((c == '#' || c == Pound) &&
-		   (iident(cc = s[1])
-		    || cc == '*' || cc == Star || cc == '@'
+		   (itype_end(s+1, IIDENT, 0) != s + 1
+		    || (cc = s[1]) == '*' || cc == Star || cc == '@'
 		    || cc == '-' || (cc == ':' && s[2] == '-')
 		    || (isstring(cc) && (s[2] == Inbrace || s[2] == Inpar)))) {
 	    getlen = 1 + whichlen, s++;
@@ -1471,7 +1471,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	     * Try to handle this when parameter is named
 	     * by (P) (second part of test).
 	     */
-	    if (iident(s[1]) || (aspar && isstring(s[1]) &&
+	    if (itype_end(s+1, IIDENT, 0) != s+1 || (aspar && isstring(s[1]) &&
 				 (s[2] == Inbrace || s[2] == Inpar)))
 		chkset = 1, s++;
 	    else if (!inbrace) {

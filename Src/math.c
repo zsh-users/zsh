@@ -265,11 +265,12 @@ zzlex(void)
 {
     int cct = 0;
     yyval.type = MN_INTEGER;
+    char *ie;
 
     for (;; cct = 0)
 	switch (*ptr++) {
 	case '+':
-	    if (*ptr == '+' && (unary || !ialnum(*ptr))) {
+	    if (*ptr == '+') {
 		ptr++;
 		return (unary) ? PREPLUS : POSTPLUS;
 	    }
@@ -279,7 +280,7 @@ zzlex(void)
 	    }
 	    return (unary) ? UPLUS : PLUS;
 	case '-':
-	    if (*ptr == '-' && (unary || !ialnum(*ptr))) {
+	    if (*ptr == '-') {
 		ptr++;
 		return (unary) ? PREMINUS : POSTMINUS;
 	    }
@@ -469,12 +470,12 @@ zzlex(void)
 		}
 		cct = 1;
 	    }
-	    if (iident(*ptr)) {
+	    if ((ie = itype_end(ptr, IIDENT, 0)) != ptr) {
 		int func = 0;
 		char *p;
 
 		p = ptr;
-		while (iident(*++ptr));
+		ptr = ie;
 		if (*ptr == '[' || (!cct && *ptr == '(')) {
 		    char op = *ptr, cp = ((*ptr == '[') ? ']' : ')');
 		    int l;

@@ -165,3 +165,12 @@
 >165
 >163
 >945 945
+
+  unsetopt posix_identifiers
+  expr='hähä=3 || exit 1; print $hähä'
+  eval $expr
+  setopt posix_identifiers
+  (eval $expr)
+1:POSIX_IDENTIFIERS option
+>3
+?(eval):1: command not found: hähä=3

@@ -1603,10 +1603,7 @@ par_simple(int *complex, int nr)
 
 		if (*ptr == Outbrace && ptr > tokstr + 1)
 		{
-		    while (--ptr > tokstr)
-			if (!iident(*ptr))
-			    break;
-		    if (ptr == tokstr)
+		    if (itype_end(tokstr, IIDENT, 0) >= ptr - 1)
 		    {
 			char *toksave = tokstr;
 			char *idstring = dupstrpfx(tokstr+1, eptr-tokstr-1);

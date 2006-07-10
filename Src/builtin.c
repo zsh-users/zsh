@@ -2629,9 +2629,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    char *modname = NULL;
 	    char *ptr;
 
-	    for (ptr = funcname; *ptr; ptr++)
-		if (!iident(*ptr))
-		    break;
+	    ptr = itype_end(funcname, IIDENT, 0);
 	    if (idigit(*funcname) || funcname == ptr || *ptr) {
 		zwarnnam(name, "-M %s: bad math function name", funcname);
 		return 1;

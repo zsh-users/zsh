@@ -1443,9 +1443,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 
 		    if (s[-1] == '+') {
 			plus = 0;
-			tt = s;
-			while (iident(*tt))
-			    tt++;
+			tt = itype_end(s, IIDENT, 0);
 			if (tt == s)
 			{
 			    zerr("missing identifier after `+'");

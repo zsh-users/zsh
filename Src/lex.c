@@ -1135,10 +1135,13 @@ gettokstr(int c, int sub)
 		if (idigit(*t))
 		    while (++t < bptr && idigit(*t));
 		else {
-		    while (iident(*t) && ++t < bptr);
+		    int sav = *bptr;
+		    *bptr = '\0';
+		    t = itype_end(t, IIDENT, 0);
 		    if (t < bptr) {
-			*bptr = '\0';
 			skipparens(Inbrack, Outbrack, &t);
+		    } else {
+			*bptr = sav;
 		    }
 		}
 		if (*t == '+')

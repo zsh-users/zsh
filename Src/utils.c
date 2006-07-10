@@ -1921,7 +1921,7 @@ spckword(char **s, int hist, int cmd, int ask)
 	return;
     if (**s == String && !*t) {
 	guess = *s + 1;
-	if (*t || !ialpha(*guess))
+	if (itype_end(guess, IIDENT, 1) == guess)
 	    return;
 	ic = String;
 	d = 100;
@@ -2750,11 +2750,8 @@ wcsiword(wchar_t c)
  * iident() macro extended to support wide characters.
  *
  * The macro is intended to test if a character is allowed in an
- * internal zsh identifier.  Until the main shell handles multibyte
- * characters it's not a good idea to allow characters other than
- * ASCII characters; it would cause zle to allow characters that
- * the main shell would reject.  Eventually we should be able
- * to allow all alphanumerics.
+ * internal zsh identifier.  We allow all alphanumerics outside
+ * the ASCII range unless POSIXIDENTIFIERS is set.
  *
  * Otherwise similar to wcsiword.
  */
@@ -2774,13 +2771,89 @@ wcsiident(wchar_t c)
     } else if (len == 1 && iascii(*outstr)) {
 	return iident(*outstr);
     } else {
-	/* TODO: not currently allowed, see above */
-	return 0;
+	return !isset(POSIXIDENTIFIERS) && iswalnum(c);
     }
 }
 /**/
 #endif
 
+
+/*
+ * Find the end of a set of characters in the set specified by itype;
+ * one of IALNUM, IIDENT, IWORD or IUSER.  For non-ASCII characters, we assume
+ * alphanumerics are part of the set, with the exception that
+ * identifiers are not treated that way if POSIXIDENTIFIERS is set.
+ *
+ * See notes above for identifiers.
+ * Returns the same pointer as passed if not on an identifier character.
+ * If "once" is set, just test the first character, i.e. (outptr !=
+ * inptr) tests whether the first character is valid in an identifier.
+ *
+ * Currently this is only called with itype IIDENT or IUSER.
+ */
+
+/**/
+mod_export char *
+itype_end(const char *ptr, int itype, int once)
+{
+#ifdef MULTIBYTE_SUPPORT
+    if (isset(MULTIBYTE) &&
+	(itype != IIDENT || !isset(POSIXIDENTIFIERS))) {
+	mb_metacharinit();
+	while (*ptr) {
+	    wint_t wc;
+	    int len = mb_metacharlenconv(ptr, &wc);
+
+	    if (!len)
+		break;
+
+	    if (wc == WEOF) {
+		/* invalid, treat as single character */
+		int chr = STOUC(*ptr == Meta ? ptr[1] ^ 32 : *ptr);
+		/* in this case non-ASCII characters can't match */
+		if (chr > 127 || !zistype(chr,itype))
+		    break;
+	    } else if (len == 1 && iascii(*ptr)) {
+		/* ASCII: can't be metafied, use standard test */
+		if (!zistype(*ptr,itype))
+		    break;
+	    } else {
+		/*
+		 * Valid non-ASCII character.  Allow all alphanumerics;
+		 * if testing for words, allow all wordchars.
+		 */
+		if (!(iswalnum(wc) ||
+		      (itype == IWORD && wcschr(wordchars_wide, wc))))
+		    break;
+	    }
+	    ptr += len;
+
+	    if (once)
+		break;
+	}
+    } else
+#endif
+	for (;;) {
+	    int chr = STOUC(*ptr == Meta ? ptr[1] ^ 32 : *ptr);
+	    if (!zistype(chr,itype))
+		break;
+	    ptr += (*ptr == Meta) ? 2 : 1;
+
+	    if (once)
+		break;
+	}
+
+    /*
+     * Nasty.  The first argument is const char * because we
+     * don't modify it here.  However, we really want to pass
+     * back the same type as was passed down, to allow idioms like
+     *   p = itype_end(p, IIDENT, 0);
+     * So returning a const char * isn't really the right thing to do.
+     * Without having two different functions the following seems
+     * to be the best we can do.
+     */
+    return (char *)ptr;
+}
 
 /**/
 mod_export char **
@@ -3710,9 +3783,10 @@ mb_metacharinit(void)
 
 /**/
 int
-mb_metacharlenconv(char *s, wint_t *wcp)
+mb_metacharlenconv(const char *s, wint_t *wcp)
 {
-    char inchar, *ptr;
+    char inchar;
+    const char *ptr;
     size_t ret;
     wchar_t wc;
 

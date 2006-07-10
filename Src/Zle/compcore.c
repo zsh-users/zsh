@@ -1081,7 +1081,7 @@ check_param(char *s, int set, int test)
     }
     if ((*p == String || *p == Qstring) && p[1] != Inpar && p[1] != Inbrack) {
 	/* This is really a parameter expression (not $(...) or $[...]). */
-	char *b = p + 1, *e = b;
+	char *b = p + 1, *e = b, *ie;
 	int n = 0, br = 1, nest = 0;
 
 	if (*b == Inbrace) {
@@ -1124,10 +1124,16 @@ check_param(char *s, int set, int test)
 	else if (idigit(*e))
 	    while (idigit(*e))
 		e++;
-	else if (iident(*e))
-	    while (iident(*e) ||
-		   (comppatmatch && *comppatmatch && (*e == Star || *e == Quest)))
-		e++;
+	else if ((ie = itype_end(e, IIDENT, 0)) != e) {
+	    do {
+		e = ie;
+		if (comppatmatch && *comppatmatch &&
+		    (*e == Star || *e == Quest))
+		    ie = e + 1;
+		else
+		    ie = itype_end(e, IIDENT, 0);
+	    } while (ie != e);
+	}
 
 	/* Now make sure that the cursor is inside the name. */
 	if (offs <= e - s && offs >= b - s && n <= 0) {

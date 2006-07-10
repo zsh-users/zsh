@@ -1,3 +1,13 @@
+2006-07-10  Peter Stephenson  <pws@csr.com>
+
+	* 22544: README, Doc/Zsh/options.yo, Src/builtin.c, Src/glob.c,
+	Src/lex.c, Src/math.c, Src/module.c, Src/options.c, Src/params.c,
+	Src/parse.c, Src/subst.c, Src/utils.c, Src/zsh.h, Src/ztype.h,
+	Src/Zle/compcore.c, Src/Zle/zle_tricky.c, Test/D07multibyte.ztst:
+	Improve use of ztype tests for multibyte characters.  Add
+	POSIX_IDENTIFIERS option to control allowability of multibyte
+	alphanumeric characters in parameter and module names.
+
 2006-07-09  Clint Adams  <clint@zsh.org>
 
 	* 22543: Completion/Unix/Command/_cssh: completion for

@@ -899,9 +899,7 @@ isident(char *s)
 		break;
     } else {
 	/* Find the first character in `s' not in the iident type table */
-	for (ss = s; *ss; ss++)
-	    if (!iident(*ss))
-		break;
+	ss = itype_end(s, IIDENT, 0);
     }
 
     /* If the next character is not [, then it is *
@@ -1653,7 +1651,7 @@ getvalue(Value v, char **pptr, int bracks)
 mod_export Value
 fetchvalue(Value v, char **pptr, int bracks, int flags)
 {
-    char *s, *t;
+    char *s, *t, *ie;
     char sav, c;
     int ppar = 0;
 
@@ -1665,9 +1663,8 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	else
 	    ppar = *s++ - '0';
     }
-    else if (iident(c))
-	while (iident(*s))
-	    s++;
+    else if ((ie = itype_end(s, IIDENT, 0)) != s)
+	s = ie;
     else if (c == Quest)
 	*s++ = '?';
     else if (c == Pound)
@@ -1732,7 +1729,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		return v;
 	    }
 	} else if (!(flags & SCANPM_ASSIGNING) && v->isarr &&
-		   iident(*t) && isset(KSHARRAYS))
+		   itype_end(t, IIDENT, 1) != t && isset(KSHARRAYS))
 	    v->end = 1, v->isarr = 0;
     }
     if (!bracks && *s)

@@ -551,9 +551,8 @@ parambeg(char *s)
 	else if (idigit(*e))
 	    while (idigit(*e))
 		e++;
-	else if (iident(*e))
-	    while (iident(*e))
-		e++;
+	else
+	    e = itype_end(e, IIDENT, 0);
 
 	/* Now make sure that the cursor is inside the name. */
 	if (offs <= e - s && offs >= b - s && n <= 0) {
@@ -740,8 +739,7 @@ docomplete(int lst)
 			    else if (idigit(*q))
 				do q++; while (idigit(*q));
 			    else
-				while (iident(*q))
-				    q++;
+				q = itype_end(q, IIDENT, 0);
 			    sav = *q;
 			    *q = '\0';
 			    if (zlemetacs - wb == q - s &&
@@ -1293,7 +1291,7 @@ get_comp_string(void)
 	if (varq)
 	    tt = clwords[clwpos];
 
-	for (s = tt; iident(*s); s++);
+	s = itype_end(tt, IIDENT, 0);
 	sav = *s;
 	*s = '\0';
 	zsfree(varname);
@@ -1360,17 +1358,29 @@ get_comp_string(void)
      * as being in math.                                              */
     if (inwhat != IN_MATH) {
 	int i = 0;
-	char *nnb = (iident(*s) ? s : s + 1), *nb = NULL, *ne = NULL;
-	
-	for (tt = s; ++tt < s + zlemetacs - wb;)
+	char *nnb, *nb = NULL, *ne = NULL;
+
+	MB_METACHARINIT();
+	if (itype_end(s, IIDENT, 1) == s)
+	    nnb = s + MB_METACHARLEN(s);
+	else
+	    nnb = s;
+	for (tt = s; tt < s + zlemetacs - wb;) {
 	    if (*tt == Inbrack) {
 		i++;
 		nb = nnb;
 		ne = tt;
-	    } else if (i && *tt == Outbrack)
+		tt++;
+	    } else if (i && *tt == Outbrack) {
 		i--;
-	    else if (!iident(*tt))
-		nnb = tt + 1;
+		tt++;
+	    } else {
+		int nclen = MB_METACHARLEN(tt);
+		if (itype_end(tt, IIDENT, 1) == tt)
+		    nnb = tt + nclen;
+		tt += nclen;
+	    }
+	}
 	if (i) {
 	    inwhat = IN_MATH;
 	    insubscr = 1;
@@ -1415,33 +1425,59 @@ get_comp_string(void)
 	    /* In mathematical expression, we complete parameter names  *
 	     * (even if they don't have a `$' in front of them).  So we *
 	     * have to find that name.                                  */
-	    for (we = zlemetacs; iident(zlemetaline[we]); we++);
-	    for (wb = zlemetacs; --wb >= 0 && iident(zlemetaline[wb]););
-	    wb++;
+	    char *cspos = zlemetaline + zlemetacs, *wptr, *cptr;
+	    we = itype_end(cspos, IIDENT, 0) - cspos;
+
+	    /*
+	     * With multibyte characters we need to go forwards,
+	     * so start at the beginning of the line and continue
+	     * until cspos.
+	     */
+	    wptr = cptr = zlemetaline;
+	    for (;;) {
+		cptr = itype_end(wptr, IIDENT, 0);
+		if (cptr == wptr) {
+		    /* not an ident character */
+		    wptr = (cptr += MB_METACHARLEN(cptr));
+		}
+		if (cptr >= cspos) {
+		    wb = wptr - zlemetaline;
+		    break;
+		}
+	    }
 	}
 	zsfree(s);
 	s = zalloc(we - wb + 1);
 	strncpy(s, zlemetaline + wb, we - wb);
 	s[we - wb] = '\0';
-	if (wb > 2 && zlemetaline[wb - 1] == '[' &&
-	    iident(zlemetaline[wb - 2])) {
-	    int i = wb - 3;
-	    char sav = zlemetaline[wb - 1];
 
-	    while (i >= 0 && iident(zlemetaline[i]))
-		i--;
+	if (wb > 2 && zlemetaline[wb - 1] == '[') {
+	    char *sqbr = zlemetaline + wb - 1, *cptr, *wptr;
 
-	    zlemetaline[wb - 1] = '\0';
-	    zsfree(varname);
-	    varname = ztrdup(zlemetaline + i + 1);
-	    zlemetaline[wb - 1] = sav;
-	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
-		(keypm->node.flags & PM_HASHED)) {
-		if (insubscr != 3)
-		    insubscr = 2;
-	    } else
-		insubscr = 1;
+	    /* Need to search forward for word characters */
+	    cptr = wptr = zlemetaline;
+	    for (;;) {
+		cptr = itype_end(wptr, IIDENT, 0);
+		if (cptr == wptr) {
+		    /* not an ident character */
+		    wptr = (cptr += MB_METACHARLEN(cptr));
+		}
+		if (cptr >= sqbr)
+		    break;
+	    }
+
+	    if (wptr < sqbr) {
+		zsfree(varname);
+		varname = ztrduppfx(wptr, sqbr - wptr);
+		if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
+		    (keypm->node.flags & PM_HASHED)) {
+		    if (insubscr != 3)
+			insubscr = 2;
+		} else
+		    insubscr = 1;
+	    }
 	}
+
 	parse_subst_string(s);
     }
     /* This variable will hold the current word in quoted form. */
@@ -1562,12 +1598,12 @@ get_comp_string(void)
 			*tp == '@')
 			p++, i++;
 		    else {
+			char *ie;
 			if (idigit(*tp))
 			    while (idigit(*tp))
 				tp++;
-			else if (iident(*tp))
-			    while (iident(*tp))
-				tp++;
+			else if ((ie = itype_end(tp, IIDENT, 0)) != tp)
+			    tp = ie;
 			else {
 			    tt = NULL;
 			    break;

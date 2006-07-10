@@ -1204,6 +1204,27 @@ tt(times),
 tt(trap) and
 tt(unset).
 )
+pindex(POSIX_IDENTIFIERS)
+cindex(identifiers, non-portable characters in)
+cindex(parameter names, non-portable characters in)
+item(tt(POSIX_IDENTIFIERS) <K> <S>)(
+When this option is set, only the ASCII characters tt(a) to tt(z), tt(A) to
+tt(Z), tt(0) to tt(9) and tt(_) may be used in identifiers (names
+of shell parameters and modules).
+
+When the option is unset and multibyte character support is enabled (i.e. it
+is compiled in and the option tt(MULTIBYTE) is set), then additionally any
+alphanumeric characters in the local character set may be used in
+identifiers.  Note that scripts and functions written with this feature are
+not portable, and also that both options must be set before the script
+or function is parsed; setting them during execution is not sufficient
+as the syntax var(variable)tt(=)var(value) has already been parsed as
+a command rather than an assignment.
+
+If multibyte character support is not compiled into the shell this option is
+ignored; all octets with the top bit set may be used in identifiers.
+This is non-standard but is the traditional zsh behaviour.
+)
 pindex(SH_FILE_EXPANSION)
 cindex(sh, expansion style)
 cindex(expansion style, sh)

@@ -734,12 +734,8 @@ static int
 modname_ok(char const *p)
 {
     do {
-	if(*p != '_' && !ialnum(*p))
-	    return 0;
-	do {
-	    p++;
-	} while(*p == '_' || ialnum(*p));
-	if(!*p)
+	p = itype_end(p, IIDENT, 0);
+	if (!*p)
 	    return 1;
     } while(*p++ == '/');
     return 0;

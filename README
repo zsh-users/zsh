@@ -50,11 +50,23 @@ other shell at startup; it must be present in the environment or set
 subsequently by the user.  It is valid for the variable to be unset.
 
 Zsh has previously been lax about whether it allows octets with the
-top bit set to be part of a shell identifier.  With --enable-multibyte set,
-this is now completely disabled.  This is a temporary fix until the main
-shell handles multibyte characters properly and the appropriate library
-tests can be used.  This change may be reviewed if no such permanent fix
-is forthcoming.
+top bit set to be part of a shell identifier.  Older versions of the shell
+assumed all such octets were allowed in identifiers, however the POSIX
+standard does not allow such characters in identifiers.  The older
+behaviour is still obtained with --disable-multibyte in effect.
+With --enable-multibyte set there are three possible cases:
+  MULTIBYTE option unset:  only ASCII characters are allowed; the
+    shell does not attempt to identify non-ASCII characters at all.
+  MULTIBYTE option set, POSIX_IDENTIFIERS option unset: in addition
+    to the POSIX characters, any alphanumeric characters in the
+    local character set are allowed.  Note that scripts and functions that
+    take advantage of this are non-portable; however, this is in the spirit
+    of previous versions of the shell.  Note also that the options must
+    be set before the shell parses the script or function; setting
+    them during execution is not sufficient.
+  MULITBYTE option set, POSIX_IDENTIFIERS set:  only ASCII characters
+    are allowed in identifiers even though the shell will recognise
+    alphanumeric multibyte characters.
 
 The completion style pine-directory must now be set to use completion
 for PINE mailbox folders; previously it had the default ~/mail.  This
