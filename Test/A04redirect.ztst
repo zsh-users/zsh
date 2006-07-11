@@ -240,10 +240,15 @@
 <input
 >input
 
+  myfd=
   exec {myfd}>logfile
-  print This is my logfile. >&$myfd
-  print Examining contents of logfile...
-  cat logfile
+  if [[ -z $myfd ]]; then
+    print "Ooops, failed to set myfd to a file descriptor." >&2
+  else
+    print This is my logfile. >&$myfd
+    print Examining contents of logfile...
+    cat logfile
+  fi
 0:Using {fdvar}> syntax to open a new file descriptor
 >Examining contents of logfile...
 >This is my logfile.

@@ -12,7 +12,7 @@
     fi
   done
   if [[ -z $mb_ok ]]; then
-    ZTST_unimplemented="no UTF-8 locale or multibyte mode is not implemnted"
+    ZTST_unimplemented="no UTF-8 locale or multibyte mode is not implemented"
   else
     print Testing multibyte with locale $LANG >&8
   fi
