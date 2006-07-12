@@ -1,3 +1,9 @@
+2006-07-12  Peter Stephenson  <pws@csr.com>
+
+	* 22550: Test/A04redirect.ztst, Test/ztst.zsh: put "exec" tests
+	in subshells and allow substitution on test output to occur
+	after the test.
+
 2006-07-12  Clint Adams  <clint@zsh.org>
 
 	* 22549: Completion/Unix/Command/_subversion:

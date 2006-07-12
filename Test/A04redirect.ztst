@@ -82,18 +82,22 @@
 >b
 >c
 
-  exec 3>redir  &&  print hello >&3  &&  print goodbye >&3  && cat redir
+  #
+  # exec tests: perform these in subshells so if they fail the
+  # shell won't exit.
+  #
+  (exec 3>redir  &&  print hello >&3  &&  print goodbye >&3  && cat redir)
 0:'>&' redirection
 >hello
 >goodbye
 
-  exec 3<redir && read foo <&3 && print $foo && read foo <&3 && print $foo
+  (exec 3<redir && read foo <&3 && print $foo && read foo <&3 && print $foo)
 0:'<&' redirection
 >hello
 >goodbye
 
-  exec 3<&-
-  read foo <&-
+  (exec 3<&-
+  read foo <&-)
 1:'<&-' redirection
 
   print foo >&-
@@ -240,7 +244,7 @@
 <input
 >input
 
-  myfd=
+  (myfd=
   exec {myfd}>logfile
   if [[ -z $myfd ]]; then
     print "Ooops, failed to set myfd to a file descriptor." >&2
@@ -248,30 +252,36 @@
     print This is my logfile. >&$myfd
     print Examining contents of logfile...
     cat logfile
-  fi
+  fi)
 0:Using {fdvar}> syntax to open a new file descriptor
 >Examining contents of logfile...
 >This is my logfile.
 
-  setopt noclobber
-  exec {myfd}>logfile2
+  (setopt noclobber
+   exec {myfd}>logfile2
+   echo $myfd
+   exec {myfd}>logfile3) | read myfd
+  (( ! ${pipestatus[1]} ))
 1q:NO_CLOBBER prevents overwriting parameter with allocated fd
-?(eval):2: can't clobber parameter myfd containing file descriptor $myfd
+?(eval):4: can't clobber parameter myfd containing file descriptor $myfd
 
+  (exec {myfd}>logfile4
+  echo $myfd
   exec {myfd}>&-
-  print This message should disappear >&$myfd
+  print This message should disappear >&$myfd) | read myfd
+  (( ! ${pipestatus[1]} ))
 1q:Closing file descriptor using brace syntax
-?(eval):2: $myfd:$bad_fd_msg
+?(eval):4: $myfd:$bad_fd_msg
 
   typeset -r myfd
   echo This should not appear {myfd}>nologfile
 1:Error opening file descriptor using readonly variable
 ?(eval):2: can't allocate file descriptor to readonly parameter myfd
 
-  typeset +r myfd
+  (typeset +r myfd
   exec {myfd}>newlogfile
   typeset -r myfd
-  exec {myfd}>&-
+  exec {myfd}>&-)
 1:Error closing file descriptor using readonly variable
 ?(eval):4: can't close file descriptor from readonly parameter myfd
 
