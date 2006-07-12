@@ -65,6 +65,13 @@ _svn () {
 	      '*:file:_files -g "*(e:_svn_controlled:)"'
             )
           ;;
+	  (propset)
+	    args=(
+	    ':propname:(svn:ignore svn:keywords svn:executable svn:eol-style svn:mime-type svn:externals svn:needs-lock)'
+	    ${args/(#b)(*--file*):arg:/$match[1]:file:_files}
+	    '*:path or url: _alternative "files:file:_files" "urls:URL:_svn_urls"'
+	    )
+	  ;;
           resolved)
             args+=(
               '*:file:_files -g "*(e:_svn_conflicts:)"'

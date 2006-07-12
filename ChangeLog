@@ -1,3 +1,8 @@
+2006-07-12  Clint Adams  <clint@zsh.org>
+
+	* 22549: Completion/Unix/Command/_subversion:
+	improve svn propset completion slightly.
+
 2006-07-11  Peter Stephenson  <pws@csr.com>
 
 	* 22546: Src/parse.c, Test/A04redirect.ztst,
