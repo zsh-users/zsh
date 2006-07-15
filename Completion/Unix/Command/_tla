@@ -8,8 +8,13 @@ local hide_short
 # ask the user which version of tla this is
 if ! zstyle -s ":completion:${curcontext}" tla-version tla_version; then
   # ask tla instead
-  tla_version="${${$($TLA --version)#tla tla-}%% from regexps.com*}"
-  [[ $tla_version == *[a-zA-Z]* ]] && tla_version=1.3 # tla doesn't know
+  tla_version="$($TLA --version)"
+  if [[ "${${(f)tla_version}[1]}" == The\ GNU\ Arch\ Revision\ Control\ System\ \(tla\)\ (#b)([0-9.]##) ]]; then
+    tla_version="$match[1]"
+  else
+    tla_version="${${$($TLA --version)#tla tla-}%% from regexps.com*}"
+    [[ $tla_version == *[a-zA-Z]* ]] && tla_version=1.3 # tla doesn't know
+  fi
 fi
 
 # test whether to hide short options from completion
@@ -252,8 +257,9 @@ local cmd_inventory cmd_srcfind
 cmd_inventory=('::separator:(--)' '*:directory:_files -/')
 cmd_srcfind=($cmd_inventory)
 
-local cmd_tree_lint
+local cmd_tree_lint cmd_lint
 cmd_tree_lint=('::directory:_files -/')
+cmd_lint=($cmd_tree_lint)
 
 local cmd_id cmd_invtag
 cmd_id=('*:file:_files')
@@ -417,9 +423,10 @@ cmd_merges=(':INTO:_tla_revisions' '::FROM:_tla_revisions')
 local cmd_new_merges
 cmd_new_merges=('::version:_tla_versions')
 
-local cmd_tag cmd_tagrev
+local cmd_tag cmd_tagrev cmd_branch
 cmd_tag=(':SOURCE-REVISION:_tla_revisions' ':TAG-VERSION:_tla_versions')
 cmd_tagrev=($cmd_tag)
+cmd_branch=($cmd_tag)
 
 local cmd_star_merge
 cmd_star_merge=(':FROM:_tla_revisions')
@@ -482,6 +489,12 @@ cmd_rm=('*:file:_files')
 
 local cmd_escape
 cmd_escape=(':string:')
+
+local cmd_diff
+cmd_diff=('::revision:_tla_revisions')
+
+local cmd_export
+cmd_export=(':revision:_tla_revisions' ':dir:_files -/')
 
 #mutually exclusive options
 
