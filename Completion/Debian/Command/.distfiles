@@ -1,14 +1,15 @@
 DISTFILES_SRC='
 .distfiles
-_apt                  _aptitude             _apt-move             
-_apt-show-versions    _auto-apt             _bts                  
-_bug                  _dchroot              _debchange            
-_debdiff              _debfoster            _debsign              
-_dlocate              _dpkg                 _dpkg-cross           
-_dpkg_source          _dput                 _dupload              
-_linda                _lintian              _madison              
-_make-kpkg            _mergechanges         _module-assistant     
+_apt                  _aptitude             _apt-move
+_apt-show-versions    _auto-apt             _bts
+_bug                  _dak
+_dchroot              _debchange
+_debdiff              _debfoster            _debsign
+_dlocate              _dpkg                 _dpkg-cross
+_dpkg_source          _dput                 _dupload
+_linda                _lintian              _madison
+_make-kpkg            _mergechanges         _module-assistant
 _piuparts             _schroot              _toolchain-source
 _update-alternatives  _update-rc.d          _uscan
-_wajig                _wanna-build          
+_wajig                _wanna-build
 '

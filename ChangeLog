@@ -1,3 +1,7 @@
+2006-07-18  Peter Stephenson  <pws@csr.com>
+
+	* unposted: **/.distfiles: update distributed files.
+
 2006-07-18  Clint Adams  <clint@zsh.org>
 
 	* 22553: Jesse Weinstein: Completion/Unix/Command/_metaflac:
