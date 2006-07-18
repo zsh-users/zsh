@@ -1,3 +1,8 @@
+2006-07-18  Clint Adams  <clint@zsh.org>
+
+	* 22553: Jesse Weinstein: Completion/Unix/Command/_metaflac:
+	completion for metaflac.
+
 2006-07-15  Clint Adams  <clint@zsh.org>
 
 	* 22552: Completion/Unix/Command/_tla: update for tla 1.3.4.

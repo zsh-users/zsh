@@ -1,0 +1,57 @@
+#compdef metaflac
+
+local _metaflac_opts _metaflac_shorts _metaflac_opers
+typeset -A opt_args
+function _metaflac_tags () {
+    echo "\n\nBEEP - $line - BEEP\n\n"
+}
+_metaflac_opts=( 
+    '--preserve-modtime' 
+    '--with-filename[prefix output with filename]' 
+    '--no-filename' 
+    '--dont-use-padding[always rewrite the file]' 
+)
+_metaflac_shorts=(
+    '--show-md5sum'
+    '--show-min-blocksize'
+    '--show-max-blocksize'
+    '--show-min-framesize'
+    '--show-max-framesize'
+    '--show-sample-rate'
+    '--show-channels'
+    '--show-bps'
+    '--show-total-samples'
+    '--show-vendor-tag'
+    '--show-tag=:FLAC tags:_metaflac_tags'
+    '--remove-tag=:FLAC tags: '
+    '--remove-first-tag=:FLAC tags: '
+    '--remove-all-tags'
+    '--set-tag=:FLAC tag and value: '
+    '--import-tags-from=:flat file:_files'
+    '--export-tags-to=:new file: '
+    '--import-cuesheet-from=:file:_files'
+    '--export-cuesheet-to=:new file: '
+    '--add-replay-gain'
+    '--add-seekpoint=:: '
+    '--add-padding=length'
+
+)
+_metaflac_opers=(
+    '--block-number=:: '
+    '--block-type=:: '
+    '--except-block-type=:: '
+    '--application-data-format=:: '
+    '--remove'
+    '--remove-all'
+    '--merge-padding'
+    '--sort-padding'
+)
+
+_arguments "$_metaflac_opts[@]" \
+    "*:FLAC file:_files -g \*.flac" \
+    - "shortcuts" \
+    "$_metaflac_shorts[@]" \
+    - "(operations)" \
+    "$_metaflac_opers[@]" \
+    && return 0
+
