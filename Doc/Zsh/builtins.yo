@@ -1003,6 +1003,10 @@ Read only one (or var(num)) characters.  All are assigned to the first
 var(name), without word splitting.  This flag is ignored when tt(-q) is
 present.  Input is read from the terminal unless one of tt(-u) or tt(-p)
 is present.  This option may also be used within zle widgets.
+
+Note that despite the mnemonic `key' this option does read full
+characters, which may consist of multiple bytes if the option
+tt(MULTIBYTE) is set.
 )
 item(tt(-z))(
 Read one entry from the editor buffer stack and assign it to the first

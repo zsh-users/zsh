@@ -1290,32 +1290,40 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	    char **arr = getarrvalue(v), **aptr, **tmparr, **tptr;
 	    tptr = tmparr = (char **)zhalloc(sizeof(char *)*(arrlen(arr)+1));
 	    for (aptr = arr; *aptr; aptr++) {
-		int sepcount = 0;
+		int sepcount = 0, clen;
+		convchar_t c;
 		/*
 		 * See if this word contains a separator character
 		 * or backslash
 		 */
-		for (t = *aptr; *t; t++) {
-		    if (*t == Meta) {
-			if (isep(t[1] ^ 32))
-			    sepcount++;
+		MB_METACHARINIT();
+		for (t = *aptr; *t; ) {
+		    if (*t == '\\') {
 			t++;
-		    } else if (isep(*t) || *t == '\\')
 			sepcount++;
+		    } else {
+			t += MB_METACHARLENCONV(t, &c);
+			if (MB_ZISTYPE(c, ISEP))
+			    sepcount++;
+		    }
 		}
 		if (sepcount) {
 		    /* Yes, so allocate enough space to quote it. */
 		    char *newstr, *nptr;
 		    newstr = zhalloc(strlen(*aptr)+sepcount+1);
 		    /* Go through string quoting separators */
+		    MB_METACHARINIT();
 		    for (t = *aptr, nptr = newstr; *t; ) {
-			if (*t == Meta) {
-			    if (isep(t[1] ^ 32))
-				*nptr++ = '\\';
-			    *nptr++ = *t++;
-			} else if (isep(*t) || *t == '\\')
+			if (*t == '\\') {
 			    *nptr++ = '\\';
-			*nptr++ = *t++;
+			    *nptr++ = *t++;
+			} else {
+			    clen = MB_METACHARLENCONV(t, &c);
+			    if (MB_ZISTYPE(c, ISEP))
+				*nptr++ = '\\';
+			    while (clen--)
+				*nptr++ = *t++;
+			}
 		    }
 		    *nptr = '\0';
 		    /* Stick this into the array of words to join up */

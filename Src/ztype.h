@@ -59,6 +59,12 @@
 #define iwsep(X) zistype(X,IWSEP)
 #define inull(X) zistype(X,INULL)
 
+#ifdef MULTIBYTE_SUPPORT
+#define MB_ZISTYPE(X,Y) wcsitype((X),(Y))
+#else
+#define MB_ZISTYPE(X,Y)	zistype((X),(Y))
+#endif
+
 #define iascii(X) isascii(STOUC(X))
 #define ilower(X) islower(STOUC(X))
 #define iprint(X) isprint(STOUC(X))

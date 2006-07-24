@@ -174,3 +174,57 @@
 1:POSIX_IDENTIFIERS option
 >3
 ?(eval):1: command not found: hähä=3
+
+  foo="Ølaf«Ødd«øpénëd«ån«àpple"
+  print -l ${(s.«.)foo}         
+  ioh="Ἐν ἀρχῇ ἦν ὁ λόγος, καὶ ὁ λόγος ἦν πρὸς τὸν θεόν, καὶ θεὸς ἦν ὁ λόγος."
+  print -l ${=ioh}
+  print ${(w)#ioh}
+0:Splitting with multibyte characters
+>Ølaf
+>Ødd
+>øpénëd
+>ån
+>àpple
+>Ἐν
+>ἀρχῇ
+>ἦν
+>ὁ
+>λόγος,
+>καὶ
+>ὁ
+>λόγος
+>ἦν
+>πρὸς
+>τὸν
+>θεόν,
+>καὶ
+>θεὸς
+>ἦν
+>ὁ
+>λόγος.
+>17
+
+  read -d £ one
+  read -d £ two
+  print $one
+  print $two
+0:read with multibyte delimiter
+<first£second£
+>first
+>second
+
+  (IFS=«
+  read -d » -A array
+  print -l $array)
+0:read -A with multibyte IFS
+<dominus«illuminatio«mea»ignored
+>dominus
+>illuminatio
+>mea
+
+  read -k2 -u0 twochars
+  print $twochars
+0:read multibyte characters
+<«»ignored
+>«»

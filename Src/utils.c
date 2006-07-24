@@ -35,16 +35,65 @@
 /**/
 char *scriptname;
 
-/**/
 #ifdef MULTIBYTE_SUPPORT
+struct widechar_array {
+    wchar_t *chars;
+    size_t len;
+};
+typedef struct widechar_array *Widechar_array;
+
 /*
  * The wordchars variable turned into a wide character array.
  * This is much more convenient for testing.
  */
+struct widechar_array wordchars_wide;
 
-/**/
-mod_export wchar_t *wordchars_wide;
-/**/
+/*
+ * The same for the separators (IFS) array.
+ */
+struct widechar_array ifs_wide;
+
+/* Function to set one of the above from the multibyte array */
+
+static void
+set_widearray(char *mb_array, Widechar_array wca)
+{
+    if (wca->chars) {
+	free(wca->chars);
+	wca->chars = NULL;
+    }
+    wca->len = 0;
+
+    if (!isset(MULTIBYTE))
+	return;
+
+    if (mb_array) {
+	VARARR(wchar_t, tmpwcs, strlen(mb_array));
+	wchar_t *wcptr = tmpwcs;
+	wint_t wci;
+
+	mb_metacharinit();
+	while (*mb_array) {
+	    int mblen = mb_metacharlenconv(mb_array, &wci);
+
+	    if (!mblen)
+		break;
+	    /* No good unless all characters are convertible */
+	    if (*wcptr == WEOF)
+		return;
+	    *wcptr++ = (wchar_t)wci;
+#ifdef DEBUG
+	    if (wcptr[-1] < 0)
+		fprintf(stderr, "BUG: Bad cast to wchar_t\n");
+#endif
+	    mb_array += mblen;
+	}
+
+	wca->len = wcptr - tmpwcs;
+	wca->chars = (wchar_t *)zalloc(wca->len * sizeof(wchar_t));
+	wmemcpy(wca->chars, tmpwcs, wca->len);
+    }
+}
 #endif
 
 
@@ -1853,9 +1902,34 @@ getquery(char *valid_chars, int purge)
 	if (c != '\n')
 	    while ((d = read1char()) >= 0 && d != '\n');
     } else {
-	settyinfo(&shttyinfo);
-	if (c != '\n' && !valid_chars)
+	if (c != '\n' && !valid_chars) {
+#ifdef MULTIBYTE_SUPPORT
+	    if (isset(MULTIBYTE) && c >= 0) {
+		/*
+		 * No waiting for a valid character, and no draining;
+		 * we should ensure we haven't stopped in the middle
+		 * of a multibyte character.
+		 */
+		mbstate_t mbs;
+		char cc = (char)c;
+		memset(&mbs, 0, sizeof(mbs));
+		for (;;) {
+		    size_t ret = mbrlen(&cc, 1, &mbs);
+
+		    if (ret != MB_INCOMPLETE)
+			break;
+		    c = read1char();
+		    if (c < 0)
+			break;
+		    cc = (char)c;
+		}
+	    }
+#endif
+	    settyinfo(&shttyinfo);
 	    write(SHTTY, "\n", 1);
+	}
+	else
+	    settyinfo(&shttyinfo);
     }
     return c;
 }
@@ -2253,6 +2327,10 @@ skipwsep(char **s)
     char *t = *s;
     int i = 0;
 
+    /*
+     * Don't need to handle mutlibyte characters, they can't
+     * be IWSEP.  Do need to check for metafication.
+     */
     while (*t && iwsep(*t == Meta ? t[1] ^ 32 : *t)) {
 	if (*t == Meta)
 	    t++;
@@ -2293,19 +2371,23 @@ spacesplit(char *s, int allownull, int heap, int quote)
 
     t = s;
     skipwsep(&s);
-    if (*s && isep(*s == Meta ? s[1] ^ 32 : *s))
+    MB_METACHARINIT();
+    if (*s && itype_end(s, ISEP, 1) != s)
 	*ptr++ = dup(allownull ? "" : nulstring);
     else if (!allownull && t != s)
 	*ptr++ = dup("");
     while (*s) {
-	if (isep(*s == Meta ? s[1] ^ 32 : *s) || (quote && *s == '\\')) {
-	    if (*s == Meta)
-		s++;
+	char *iend = itype_end(s, ISEP, 1);
+	if (iend != s) {
+	    s = iend;
+	    skipwsep(&s);
+	}
+	else if (quote && *s == '\\') {
 	    s++;
 	    skipwsep(&s);
 	}
 	t = s;
-	findsep(&s, NULL, quote);
+	(void)findsep(&s, NULL, quote);
 	if (s > t || allownull) {
 	    *ptr = (heap ? (char *) hcalloc((s - t) + 1) :
 		    (char *) zshcalloc((s - t) + 1));
@@ -2321,68 +2403,87 @@ spacesplit(char *s, int allownull, int heap, int quote)
     return ret;
 }
 
+/*
+ * Find a separator.  Return 0 if already at separator, 1 if separator
+ * found later, else -1.  (Historical note: used to return length into
+ * string but this is all that is necessary and is less ambiguous with
+ * multibyte characters around.)
+ *
+ * *s is the string we are looking along, which will be updated
+ * to the point we have got to.
+ *
+ * sep is a possibly multicharacter separator to look for.  If NULL,
+ * use normal separator characters.  If *sep is NULL, split on individual
+ * characters.
+ *
+ * quote is a flag that '\<sep>' should not be treated as a separator.
+ * in this case we need to be able to strip the backslash directly
+ * in the string, so the calling function must have sent us something
+ * modifiable.  currently this only works for sep == NULL.  also in
+ * in this case only, we need to turn \\ into \.
+ */
+
 /**/
 static int
 findsep(char **s, char *sep, int quote)
 {
     /*
-     * *s is the string we are looking along, which will be updated
-     * to the point we have got to.
-     *
-     * sep is a possibly multicharacter separator to look for.  If NULL,
-     * use normal separator characters.
-     *
-     * quote is a flag that '\<sep>' should not be treated as a separator.
-     * in this case we need to be able to strip the backslash directly
-     * in the string, so the calling function must have sent us something
-     * modifiable.  currently this only works for sep == NULL.  also in
-     * in this case only, we need to turn \\ into \.
      */
-    int i;
+    int i, ilen;
     char *t, *tt;
+    convchar_t c;
 
+    MB_METACHARINIT();
     if (!sep) {
-	for (t = *s; *t; t++) {
-	    if (quote && *t == '\\' &&
-		(isep(t[1] == Meta ? (t[2] ^ 32) : t[1]) || t[1] == '\\')) {
-		chuck(t);
-		if (*t == Meta)
-		    t++;
-		continue;
-	    }
-	    if (*t == Meta) {
-		if (isep(t[1] ^ 32))
+	for (t = *s; *t; t += ilen) {
+	    if (quote && *t == '\\') {
+		if (t[1] == '\\') {
+		    chuck(t);
+		    ilen = 1;
+		    continue;
+		} else {
+		    ilen = MB_METACHARLENCONV(t+1, &c);
+		    if (MB_ZISTYPE(c, ISEP)) {
+			chuck(t);
+			/* then advance over new character, length ilen */
+		    } else {
+			/* treat *t (backslash) as normal byte */
+			if (isep(*t))
+			    break;
+			ilen = 1;
+		    }
+		}
+	    } else {
+		ilen = MB_METACHARLENCONV(t, &c);
+		if (MB_ZISTYPE(c, ISEP))
 		    break;
-		t++;
-	    } else if (isep(*t))
-		break;
+	    }
 	}
-	i = t - *s;
+	i = (t > *s);
 	*s = t;
 	return i;
     }
     if (!sep[0]) {
+	/*
+	 * NULL separator just means advance past first character,
+	 * if any.
+	 */
 	if (**s) {
-	    if (**s == Meta)
-		*s += 2;
-	    else
-		++*s;
+	    *s += MB_METACHARLEN(*s);
 	    return 1;
 	}
 	return -1;
     }
     for (i = 0; **s; i++) {
+	/*
+	 * The following works for multibyte characters by virtue of
+	 * the fact that sep may be a string (and we don't care how
+	 * it divides up, we need to match all of it).
+	 */
 	for (t = sep, tt = *s; *t && *tt && *t == *tt; t++, tt++);
 	if (!*t)
-	    return i;
-	if (*(*s)++ == Meta) {
-#ifdef DEBUG
-	    if (! *(*s)++)
-		fprintf(stderr, "BUG: unexpected end of string in findsep()\n");
-#else
-	    (*s)++;
-#endif
-	}
+	    return (i > 0);
+	*s += MB_METACHARLEN(*s);
     }
     return -1;
 }
@@ -2405,16 +2506,15 @@ findword(char **s, char *sep)
 	}
 	return r;
     }
-    for (t = *s; *t; t++) {
-	if (*t == Meta) {
-	    if (! isep(t[1] ^ 32))
-		break;
-	    t++;
-	} else if (! isep(*t))
+    MB_METACHARINIT();
+    for (t = *s; *t; t += sl) {
+	convchar_t c;
+	sl = MB_METACHARLENCONV(t, &c);
+	if (!MB_ZISTYPE(c, ISEP))
 	    break;
     }
     *s = t;
-    findsep(s, sep, 0);
+    (void)findsep(s, sep, 0);
     return t;
 }
 
@@ -2436,18 +2536,17 @@ wordcount(char *s, char *sep, int mul)
 	r = 0;
 	if (mul <= 0)
 	    skipwsep(&s);
-	if ((*s && isep(*s == Meta ? s[1] ^ 32 : *s)) ||
+	if ((*s && itype_end(s, ISEP, 1) != s) ||
 	    (mul < 0 && t != s))
 	    r++;
 	for (; *s; r++) {
-	    if (isep(*s == Meta ? s[1] ^ 32 : *s)) {
-		if (*s == Meta)
-		    s++;
-		s++;
+	    char *ie = itype_end(s, ISEP, 1);
+	    if (ie != s) {
+		s = ie;
 		if (mul <= 0)
 		    skipwsep(&s);
 	    }
-	    findsep(&s, NULL, 0);
+	    (void)findsep(&s, NULL, 0);
 	    t = s;
 	    if (mul <= 0)
 		skipwsep(&s);
@@ -2464,19 +2563,20 @@ sepjoin(char **s, char *sep, int heap)
 {
     char *r, *p, **t;
     int l, sl;
-    char sepbuf[3];
+    char sepbuf[2];
 
     if (!*s)
 	return heap ? "" : ztrdup("");
     if (!sep) {
-	p = sep = sepbuf;
-	if (ifs) {
-	    *p++ = *ifs;
-	    *p++ = *ifs == Meta ? ifs[1] ^ 32 : '\0';
+	/* optimise common case that ifs[0] is space */
+	if (ifs && *ifs != ' ') {
+	    MB_METACHARINIT();
+	    sep = dupstrpfx(ifs, MB_METACHARLEN(ifs));
 	} else {
+	    p = sep = sepbuf;
 	    *p++ = ' ';
+	    *p = '\0';
 	}
-	*p = '\0';
     }
     sl = strlen(sep);
     for (t = s, l = 1 - sl; *t; l += strlen(*t) + sl, t++);
@@ -2508,7 +2608,7 @@ sepsplit(char *s, char *sep, int allownull, int heap)
 
     for (t = s; n--;) {
 	tt = t;
-	findsep(&t, sep, 0);
+	(void)findsep(&t, sep, 0);
 	*p = (heap ? (char *) hcalloc(t - tt + 1) :
 	      (char *) zshcalloc(t - tt + 1));
 	strncpy(*p, tt, t - tt);
@@ -2637,39 +2737,21 @@ inittyptab(void)
     for (t0 = (int)STOUC(Snull); t0 <= (int)STOUC(Nularg); t0++)
 	typtab[t0] |= ITOK | IMETA | INULL;
     for (s = ifs ? ifs : DEFAULT_IFS; *s; s++) {
-	if (inblank(*s)) {
-	    if (s[1] == *s)
+	int c = STOUC(*s == Meta ? *++s ^ 32 : *s);
+#ifdef MULTIBYTE_SUPPORT
+	if (!isascii(c)) {
+	    /* see comment for wordchars below */
+	    continue;
+	}
+#endif
+	if (inblank(c)) {
+	    if (s[1] == c)
 		s++;
 	    else
-		typtab[STOUC(*s)] |= IWSEP;
+		typtab[c] |= IWSEP;
 	}
-	typtab[STOUC(*s == Meta ? *++s ^ 32 : *s)] |= ISEP;
+	typtab[c] |= ISEP;
     }
-#ifdef MULTIBYTE_SUPPORT
-    if (wordchars) {
-	char *wordchars_unmeta;
-	const char *wordchars_ptr;
-	mbstate_t mbs;
-	size_t nchars;
-	int unmetalen;
-
-	wordchars_unmeta = dupstring(wordchars);
-	wordchars_ptr = unmetafy(wordchars_unmeta, &unmetalen);
-
-	memset(&mbs, 0, sizeof(mbs));
-	wordchars_wide = (wchar_t *)
-	    zrealloc(wordchars_wide, (unmetalen+1)*sizeof(wchar_t));
-	nchars = mbsrtowcs(wordchars_wide, &wordchars_ptr, unmetalen, &mbs);
-	if (nchars == MB_INVALID || nchars == MB_INCOMPLETE) {
-	    /* Conversion state is undefined: better just set to null */
-	    nchars = 0;
-	}
-	wordchars_wide[nchars] = L'\0';
-    } else {
-	wordchars_wide = zrealloc(wordchars_wide, sizeof(wchar_t));
-	*wordchars_wide = L'\0';
-    }
-#endif
     for (s = wordchars ? wordchars : DEFAULT_WORDCHARS; *s; s++) {
 	int c = STOUC(*s == Meta ? *++s ^ 32 : *s);
 #ifdef MULTIBYTE_SUPPORT
@@ -2686,6 +2768,10 @@ inittyptab(void)
 #endif
 	typtab[c] |= IWORD;
     }
+#ifdef MULTIBYTE_SUPPORT
+    set_widearray(wordchars, &wordchars_wide);
+    set_widearray(ifs, &ifs_wide);
+#endif
     for (s = SPECCHARS; *s; s++)
 	typtab[STOUC(*s)] |= ISPECIAL;
     if (specialcomma)
@@ -2718,62 +2804,60 @@ wcsiblank(wint_t wc)
 }
 
 /*
- * iword() macro extended to support wide characters.
+ * zistype macro extended to support wide characters.
+ * Works for IIDENT, IWORD, IALNUM, ISEP.
+ * We don't need this for IWSEP because that only applies to
+ * a fixed set of ASCII characters.
+ * Note here that use of multibyte mode is not tested:
+ * that's because for ZLE this is unconditional,
+ * not dependent on the option.  The caller must decide.
  */
 
 /**/
 mod_export int
-wcsiword(wchar_t c)
+wcsitype(wchar_t c, int itype)
 {
     int len;
     VARARR(char, outstr, MB_CUR_MAX);
+
+    if (!isset(MULTIBYTE))
+	return zistype(c, itype);
+
     /*
      * Strategy:  the shell requires that the multibyte representation
      * be an extension of ASCII.  So see if converting the character
-     * produces an ASCII character.  If it does, use iword on that.
-     * If it doesn't, use iswalnum on the original character.  This
-     * is pretty good most of the time.
+     * produces an ASCII character.  If it does, use zistype on that.
+     * If it doesn't, use iswalnum on the original character.
+     * If that fails, resort to the appropriate wide character array.
      */
     len = wctomb(outstr, c);
 
     if (len == 0) {
 	/* NULL is special */
-	return iword(0);
+	return zistype(0, itype);
     } else if (len == 1 && iascii(*outstr)) {
-	return iword(*outstr);
+	return zistype(*outstr, itype);
     } else {
-	return iswalnum(c) || wcschr(wordchars_wide, c);
+	switch (itype) {
+	case IIDENT:
+	    if (!isset(POSIXIDENTIFIERS))
+		return 0;
+	    return iswalnum(c);
+
+	case IWORD:
+	    if (iswalnum(c))
+		return 1;
+	    return !!wmemchr(wordchars_wide.chars, c, wordchars_wide.len);
+
+	case ISEP:
+	    return !!wmemchr(ifs_wide.chars, c, ifs_wide.len);
+
+	default:
+	    return iswalnum(c);
+	}
     }
 }
 
-/*
- * iident() macro extended to support wide characters.
- *
- * The macro is intended to test if a character is allowed in an
- * internal zsh identifier.  We allow all alphanumerics outside
- * the ASCII range unless POSIXIDENTIFIERS is set.
- *
- * Otherwise similar to wcsiword.
- */
-
-/**/
-mod_export int
-wcsiident(wchar_t c)
-{
-    int len;
-    VARARR(char, outstr, MB_CUR_MAX);
-
-    len = wctomb(outstr, c);
-
-    if (len == 0) {
-	/* NULL is special */
-	return 0;
-    } else if (len == 1 && iascii(*outstr)) {
-	return iident(*outstr);
-    } else {
-	return !isset(POSIXIDENTIFIERS) && iswalnum(c);
-    }
-}
 /**/
 #endif
 
@@ -2789,7 +2873,7 @@ wcsiident(wchar_t c)
  * If "once" is set, just test the first character, i.e. (outptr !=
  * inptr) tests whether the first character is valid in an identifier.
  *
- * Currently this is only called with itype IIDENT or IUSER.
+ * Currently this is only called with itype IIDENT, IUSER or ISEP.
  */
 
 /**/
@@ -2819,12 +2903,25 @@ itype_end(const char *ptr, int itype, int once)
 		    break;
 	    } else {
 		/*
-		 * Valid non-ASCII character.  Allow all alphanumerics;
-		 * if testing for words, allow all wordchars.
+		 * Valid non-ASCII character.
 		 */
-		if (!(iswalnum(wc) ||
-		      (itype == IWORD && wcschr(wordchars_wide, wc))))
+		switch (itype) {
+		case IWORD:
+		    if (!iswalnum(wc) && 
+			!wmemchr(wordchars_wide.chars, wc,
+				 wordchars_wide.len))
+			return (char *)ptr;
 		    break;
+
+		case ISEP:
+		    if (!wmemchr(ifs_wide.chars, wc, ifs_wide.len))
+			return (char *)ptr;
+		    break;
+
+		default:
+		    if (!iswalnum(wc))
+			return (char *)ptr;
+		}
 	    }
 	    ptr += len;
 
@@ -3791,16 +3888,22 @@ mb_metacharlenconv(const char *s, wint_t *wcp)
     wchar_t wc;
 
     if (!isset(MULTIBYTE)) {
+	/* treat as single byte, possibly metafied */
 	if (wcp)
-	    *wcp = WEOF;
+	    *wcp = (wint_t)(*s == Meta ? s[1] ^ 32 : *s);
 	return 1 + (*s == Meta);
     }
 
     ret = MB_INVALID;
     for (ptr = s; *ptr; ) {
-	if (*ptr == Meta)
+	if (*ptr == Meta) {
 	    inchar = *++ptr ^ 32;
-	else
+#ifdef DEBUG
+	    if (!*ptr)
+		fprintf(stderr,
+			"BUG: unexpected end of string in mb_metacharlen()\n");
+#endif
+	} else
 	    inchar = *ptr;
 	ptr++;
 	ret = mbrtowc(&wc, &inchar, 1, &mb_shiftstate);
@@ -3871,6 +3974,23 @@ mb_metastrlen(char *ptr)
 
     /* If incomplete, treat remainder as trailing single bytes */
     return num + num_in_char;
+}
+
+/**/
+#else
+
+/* Simple replacement for mb_metacharlenconv */
+int
+metacharlenconv(char *x, int *c)
+{
+    if (*x == Meta) {
+	if (c)
+	    *c == STOUC(x[1]);
+	return 2;
+    }
+    if (c)
+	*c = STOUC(*x);
+    return 1;
 }
 
 /**/

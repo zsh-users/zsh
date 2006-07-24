@@ -725,6 +725,29 @@
 >7
 >8
 
+# Tests a long-standing bug with joining on metafied characters in IFS
+  (array=(one two three)
+  IFS=$'\0'
+  foo="$array"
+  for (( i = 1; i <= ${#foo}; i++ )); do
+    char=${foo[i]}
+    print $(( #char ))
+  done)
+0:Joining with NULL character from IFS
+>111
+>110
+>101
+>0
+>116
+>119
+>111
+>0
+>116
+>104
+>114
+>101
+>101
+
   unset SHLVL
   (( SHLVL++ ))
   print $SHLVL

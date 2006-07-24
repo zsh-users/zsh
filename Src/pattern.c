@@ -318,7 +318,7 @@ metacharinc(char **x)
 	    inchar = *inptr++;
 	}
 	*x = inptr;
-	return (wchar_t)inchar;
+	return (wchar_t)STOUC(inchar);
     }
 
     while (*inptr) {
@@ -352,12 +352,14 @@ typedef int patint_t;
 #define PEOF EOF
 
 #define METACHARINC(x)	((void)((x) += (*(x) == Meta) ? 2 : 1))
-/*
- * Return unmetafied char from string (x is any char *)
- */
-#define UNMETA(x)	(*(x) == Meta ? (x)[1] ^ 32 : *(x))
 #endif
 
+/*
+ * Return unmetafied char from string (x is any char *).
+ * Used with MULTIBYTE_SUPPORT if the GF_MULTIBYTE is not
+ * in effect.
+ */
+#define UNMETA(x)	(*(x) == Meta ? (x)[1] ^ 32 : *(x))
 
 /* Add n more characters, ensuring there is enough space. */
 
@@ -1575,7 +1577,7 @@ charref(char *x, char *y)
     size_t ret;
 
     if (!(patglobflags & GF_MULTIBYTE) || !(STOUC(*x) & 0x80))
-	return (wchar_t) *x;
+	return (wchar_t) STOUC(*x);
 
     ret = mbrtowc(&wc, x, y-x, &shiftstate);
 
@@ -1583,7 +1585,7 @@ charref(char *x, char *y)
 	/* Error.  Treat as single byte. */
 	/* Reset the shift state for next time. */
 	memset(&shiftstate, 0, sizeof(shiftstate));
-	return (wchar_t) *x;
+	return (wchar_t) STOUC(*x);
     }
 
     return wc;
@@ -1626,7 +1628,7 @@ charrefinc(char **x, char *y)
     size_t ret;
 
     if (!(patglobflags & GF_MULTIBYTE) || !(STOUC(**x) & 0x80))
-	return (wchar_t) *(*x)++;
+	return (wchar_t) STOUC(*(*x)++);
 
     ret = mbrtowc(&wc, *x, y-*x, &shiftstate);
 
@@ -1634,7 +1636,7 @@ charrefinc(char **x, char *y)
 	/* Error.  Treat as single byte. */
 	/* Reset the shift state for next time. */
 	memset(&shiftstate, 0, sizeof(shiftstate));
-	return (wchar_t) *(*x)++;
+	return (wchar_t) STOUC(*(*x)++);
     }
 
     /* Nulls here are normal characters */
@@ -2222,20 +2224,33 @@ patmatch(Upat prog)
 	    }
 	    break;
 	case P_ANYOF:
-	    if (patinput == patinend ||
-		!patmatchrange((char *)P_OPERAND(scan),
-			       CHARREF(patinput, patinend)))
-		fail = 1;
-	    else
-		CHARINC(patinput, patinend);
-	    break;
 	case P_ANYBUT:
-	    if (patinput == patinend ||
-		patmatchrange((char *)P_OPERAND(scan),
-			      CHARREF(patinput, patinend)))
+	    if (patinput == patinend)
 		fail = 1;
-	    else
-		CHARINC(patinput, patinend);
+	    else {
+#ifdef MULTIBYTE_SUPPORT
+		wchar_t cr = CHARREF(patinput, patinend);
+		char *scanop = (char *)P_OPERAND(scan);
+		if (patglobflags & GF_MULTIBYTE) {
+		    if (mb_patmatchrange(scanop, cr) ^
+			(P_OP(scan) == P_ANYOF))
+			fail = 1;
+		    else
+			CHARINC(patinput, patinend);
+		} else if (patmatchrange(scanop, (int)cr) ^
+			   (P_OP(scan) == P_ANYOF))
+		    fail = 1;
+		else
+		    CHARINC(patinput, patinend);
+#else
+		if (patmatchrange((char *)P_OPERAND(scan),
+				   CHARREF(patinput, patinend)) ^
+		    (P_OP(scan) == P_ANYOF))
+		    fail = 1;
+		else
+		    CHARINC(patinput, patinend);
+#endif
+	    }
 	    break;
 	case P_NUMRNG:
 	case P_NUMFROM:
@@ -2923,7 +2938,7 @@ patmatch(Upat prog)
 
 /**/
 static int
-patmatchrange(char *range, wchar_t ch)
+mb_patmatchrange(char *range, wchar_t ch)
 {
     wchar_t r1, r2;
 
@@ -2994,21 +3009,20 @@ patmatchrange(char *range, wchar_t ch)
 		    return 1;
 		break;
 	    case PP_IDENT:
-		if (wcsiident(ch))
+		if (wcsitype(ch, IIDENT))
 		    return 1;
 		break;
 	    case PP_IFS:
-		/* TODO */
-		if (isep(ch))
+		if (wcsitype(ch, ISEP))
 		    return 1;
 		break;
 	    case PP_IFSSPACE:
-		/* TODO */
-		if (iwsep(ch))
+		/* must be ASCII space character */
+		if (ch < 128 && iwsep((int)ch))
 		    return 1;
 		break;
 	    case PP_WORD:
-		if (wcsiword(ch))
+		if (wcsitype(ch, IWORD))
 		    return 1;
 		break;
 	    case PP_RANGE:
@@ -3031,7 +3045,7 @@ patmatchrange(char *range, wchar_t ch)
 }
 
 /**/
-#else
+#endif
 
 /**/
 static int
@@ -3142,9 +3156,6 @@ patmatchrange(char *range, int ch)
     return 0;
 }
 
-/**/
-#endif
-
 /*
  * Repeatedly match something simple and say how many times.
  * charstart is an array parallel to that starting at patinput
@@ -3180,20 +3191,26 @@ static int patrepeat(Upat p, char *charstart)
 	}
 	break;
     case P_ANYOF:
-	while (scan < patinend &&
-	       patmatchrange(opnd, CHARREF(scan, patinend))) {
-	    charstart[scan-patinput] = 1;
-	    count++;
-	    CHARINC(scan, patinend);
-    	}
-	break;
     case P_ANYBUT:
-	while (scan < patinend &&
-	       !patmatchrange(opnd, CHARREF(scan, patinend))) {
+	while (scan < patinend) {
+#ifdef MULTIBYTE_SUPPORT
+	    wchar_t cr = CHARREF(scan, patinend);
+	    if (patglobflags & GF_MULTIBYTE) {
+		if (mb_patmatchrange(opnd, cr) ^
+		    (P_OP(p) == P_ANYOF))
+		    break;
+	    } else if (patmatchrange(opnd, (int)cr) ^
+		       (P_OP(p) == P_ANYOF))
+		break;
+#else
+	    if (patmatchrange(opnd, CHARREF(scan, patinend)) ^
+		P_OP(p) == P_ANYOF)
+		break;
+#endif
 	    charstart[scan-patinput] = 1;
 	    count++;
 	    CHARINC(scan, patinend);
-    	}
+	}
 	break;
 #ifdef DEBUG
     default:

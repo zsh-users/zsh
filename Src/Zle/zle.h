@@ -62,11 +62,11 @@ typedef wint_t   ZLE_INT_T;
 #define ZC_iblank wcsiblank
 #define ZC_icntrl iswcntrl
 #define ZC_idigit iswdigit
-#define ZC_iident wcsiident
+#define ZC_iident(x) wcsitype((x), IIDENT)
 #define ZC_ilower iswlower
 #define ZC_inblank iswspace
 #define ZC_iupper iswupper
-#define ZC_iword wcsiword
+#define ZC_iword(x) wcsitype((x), IWORD)
 
 #define ZC_tolower towlower
 #define ZC_toupper towupper

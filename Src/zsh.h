@@ -1925,6 +1925,8 @@ typedef char *(*ZleGetLineFn) _((int *, int *));
 #ifdef MULTIBYTE_SUPPORT
 #define nicezputs(str, outs)	(void)mb_niceformat((str), (outs), NULL, 0)
 #define MB_METACHARINIT()	mb_metacharinit()
+typedef wint_t convchar_t;
+#define MB_METACHARLENCONV(str, cp)	mb_metacharlenconv((str), (cp))
 #define MB_METACHARLEN(str)	mb_metacharlenconv(str, NULL)
 #define MB_METASTRLEN(str)	mb_metastrlen(str)
 
@@ -1948,6 +1950,8 @@ typedef char *(*ZleGetLineFn) _((int *, int *));
 
 #else
 #define MB_METACHARINIT()
+typedef int convchar_t;
+#define MB_METACHARLENCONV(str, cp)	metacharlenconv((str), (cp))
 #define MB_METACHARLEN(str)	(*(str) == Meta ? 2 : 1)
 #define MB_METASTRLEN(str)	ztrlen(str)
 

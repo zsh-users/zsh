@@ -4266,7 +4266,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	    zerrnam(name, "not in while, until, select, or repeat loop");
 	    return 1;
 	}
-	contflag = 1;   /* ARE WE SUPPOSED TO FALL THROUGH HERE? */
+	contflag = 1; /* FALLTHROUGH */
     case BIN_BREAK:
 	if (!loops) {   /* break is only permitted in loops */
 	    zerrnam(name, "not in while, until, select, or repeat loop");
@@ -4560,7 +4560,14 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     int readchar = -1, val, resettty = 0;
     struct ttyinfo saveti;
     char d;
+#ifdef MULTIBYTE_SUPPORT
+    wchar_t delim = L'\n', wc;
+    mbstate_t mbs;
+    char *laststart;
+    size_t ret;
+#else
     char delim = '\n';
+#endif
 
     if (OPT_HASARG(ops,c='k')) {
 	char *eptr, *optarg = OPT_ARG(ops,c);
@@ -4666,7 +4673,23 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     }
     if (OPT_ISSET(ops,'d')) {
 	char *delimstr = OPT_ARG(ops,'d');
+#ifdef MULTIBYTE_SUPPORT
+	wint_t wc;
+
+	if (isset(MULTIBYTE)) {
+	    mb_metacharinit();
+	    (void)mb_metacharlenconv(delimstr, &wc);
+	}
+	else
+	    wc = WEOF;
+	if (wc != WEOF)
+	    delim = (wchar_t)wc;
+	else
+	    delim = (wchar_t)((delimstr[0] == Meta) ?
+			      delimstr[1] ^ 32 : delimstr[0]);
+#else
         delim = (delimstr[0] == Meta) ? delimstr[1] ^ 32 : delimstr[0];
+#endif
 	if (SHTTY != -1) {
 	    struct ttyinfo ti;
 	    gettyinfo(&ti);
@@ -4710,26 +4733,74 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	}
     }
 
+#ifdef MULTIBYTE_SUPPORT
+    memset(&mbs, 0, sizeof(mbs));
+#endif
+
     /* option -k means read only a given number of characters (default 1) */
     if (OPT_ISSET(ops,'k')) {
+	int eof = 0;
 	/* allocate buffer space for result */
 	bptr = buf = (char *)zalloc(nchars+1);
 
 	do {
 	    if (izle) {
-		if ((val = getkeyptr(0, NULL)) < 0)
+		if ((val = getkeyptr(0, NULL)) < 0) {
+		    eof = 1;
 		    break;
-		*bptr++ = (char) val;
+		}
+		*bptr = (char) val;
+#ifdef MULTIBYTE_SUPPORT	
+		if (isset(MULTIBYTE)) {
+		    ret = mbrlen(bptr++, 1, &mbs);
+		    if (ret == MB_INVALID)
+			memset(&mbs, 0, sizeof(mbs));
+		    /* treat invalid as single character */
+		    if (ret != MB_INCOMPLETE)
+			nchars--;
+		    continue;
+		} else {
+		    bptr++;
+		    nchars--;
+		}
+#else
+		bptr++;
 		nchars--;
+#endif
 	    } else {
 		/* If read returns 0, is end of file */
 		if (readchar >= 0) {
 		    *bptr = readchar;
 		    val = 1;
 		    readchar = -1;
-		} else if ((val = read(readfd, bptr, nchars)) <= 0)
+		} else if ((val = read(readfd, bptr, nchars)) <= 0) {
+		    eof = 1;
 		    break;
+		}
 	    
+#ifdef MULTIBYTE_SUPPORT	
+		if (isset(MULTIBYTE)) {
+		    while (val > 0) {
+			ret = mbrlen(bptr, val, &mbs);
+			if (ret == MB_INCOMPLETE) {
+			    bptr += val;
+			    break;
+			} else {
+			    if (ret == MB_INVALID) {
+				memset(&mbs, 0, sizeof(mbs));
+				/* treat as single byte */
+				ret = 1;
+			    }
+			    else if (ret == 0) /* handle null as normal char */
+				ret = 1;
+			    nchars--;
+			    val -= ret;
+			    bptr += ret;
+			}
+		    }
+		    continue;
+		}
+#endif
 		/* decrement number of characters read from number required */
 		nchars -= val;
 
@@ -4761,7 +4832,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    zfree(buf, bptr - buf + 1);
 	if (resettty && SHTTY != -1)
 	    settyinfo(&saveti);
-	return val <= 0;
+	return eof;
     }
 
     /* option -q means get one character, and interpret it as a Y or N */
@@ -4770,10 +4841,25 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 
 	/* set up the buffer */
 	readbuf[1] = '\0';
-
+	
 	/* get, and store, reply */
 	if (izle) {
+#ifdef MULTIBYTE_SUPPORT
+	    int key;
+
+	    while ((key = getkeyptr(0, NULL)) >= 0) {
+		char c = (char)key;
+		/*
+		 * If multibyte, it can't be y, so we don't care
+		 * what key gets set to; just read to end of character.
+		 */
+		if (!isset(MULTIBYTE) ||
+		    mbrlen(&c, 1, &mbs) != MB_INCOMPLETE)
+		    break;
+	    }
+#else
 	    int key = getkeyptr(0, NULL);
+#endif
 
 	    readbuf[0] = (key == 'y' ? 'y' : 'n');
 	} else {
@@ -4786,6 +4872,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		SHTTY = -1;
 	    }
 	}
+
 	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E'))
 	    printf("%s\n", readbuf);
 	if (!OPT_ISSET(ops,'e'))
@@ -4808,16 +4895,79 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     while (*args || (OPT_ISSET(ops,'A') && !gotnl)) {
 	sigset_t s = child_unblock();
 	buf = bptr = (char *)zalloc(bsiz = 64);
+#ifdef MULTIBYTE_SUPPORT
+	laststart = buf;
+	ret = MB_INCOMPLETE;
+#endif
 	/* get input, a character at a time */
 	while (!gotnl) {
 	    c = zread(izle, &readchar);
 	    /* \ at the end of a line indicates a continuation *
 	     * line, except in raw mode (-r option)            */
+#ifdef MULTIBYTE_SUPPORT
+	    if (c == EOF) {
+		/* not waiting to be completed any more */
+		ret = 0;
+		break;
+	    } 
+	    *bptr = (char)c;
+	    if (isset(MULTIBYTE)) {
+		ret = mbrtowc(&wc, bptr, 1, &mbs);
+		if (!ret)	/* NULL */
+		    ret = 1;
+	    } else {
+		ret = 1;
+		wc = (wchar_t)c;
+	    }
+	    if (ret != MB_INCOMPLETE) {
+		if (ret == MB_INVALID)
+		    memset(&mbs, 0, sizeof(mbs));
+		if (bslash && wc == delim) {
+		    bslash = 0;
+		    continue;
+		}
+		if (wc == delim)
+		    break;
+		/*
+		 * `first' is non-zero if any separator we encounter is a
+		 * non-whitespace separator, which means that anything
+		 * (even an empty string) between, before or after separators
+		 * is significant.  If it is zero, we have a whitespace
+		 * separator, which shouldn't cause extra empty strings to
+		 * be emitted.  Hence the test for (*buf || first) when
+		 * we assign the result of reading a word.
+		 */
+		if (!bslash && wcsitype(wc, ISEP)) {
+		    if (bptr != buf ||
+			(!(c < 128 && iwsep(c)) && first)) {
+			first |= !(c < 128 && iwsep(c));
+			break;
+		    }
+		    first |= !(c < 128 && iwsep(c));
+		    continue;
+		}
+		bslash = (wc == L'\\' && !bslash && !OPT_ISSET(ops,'r'));
+		if (bslash)
+		    continue;
+		first = 0;
+	    }
+	    if (imeta(STOUC(*bptr))) {
+		bptr[1] = bptr[0] ^ 32;
+		bptr[0] = Meta;
+		bptr += 2;
+	    }
+	    else
+		bptr++;
+	    if (ret != MB_INCOMPLETE)
+		laststart = bptr;
+#else
+	    if (c == EOF)
+		break;
 	    if (bslash && c == delim) {
 		bslash = 0;
 		continue;
 	    }
-	    if (c == EOF || c == delim)
+	    if (c == delim)
 		break;
 	    /*
 	     * `first' is non-zero if any separator we encounter is a
@@ -4845,18 +4995,42 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		*bptr++ = c ^ 32;
 	    } else
 		*bptr++ = c;
+#endif
 	    /* increase the buffer size, if necessary */
 	    if (bptr >= buf + bsiz - 1) {
 		int blen = bptr - buf;
+#ifdef MULTIBYTE_SUPPORT
+		int llen = laststart - buf;
+#endif
 
 		buf = realloc(buf, bsiz *= 2);
 		bptr = buf + blen;
+#ifdef MULTIBYTE_SUPPORT
+		laststart = buf + llen;
+#endif
 	    }
 	}
 	signal_setmask(s);
+#ifdef MULTIBYTE_SUPPORT
+	if (c == EOF)
+	    gotnl = 1;
+	if (ret == MB_INCOMPLETE) {
+	    /*
+	     * We can only get here if there is an EOF in the
+	     * middle of a character... safest to keep the debris,
+	     * I suppose.
+	     */
+	    *bptr = '\0';
+	} else {
+	    if (wc == delim)
+		gotnl = 1;
+	    *laststart = '\0';
+	}
+#else
 	if (c == delim || c == EOF)
 	    gotnl = 1;
 	*bptr = '\0';
+#endif
 	/* dispose of word appropriately */
 	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
 	    zputs(buf, stdout);
@@ -4908,12 +5082,66 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	return c == EOF;
     }
     buf = bptr = (char *)zalloc(bsiz = 64);
+#ifdef MULTIBYTE_SUPPORT
+    laststart = buf;
+    ret = MB_INCOMPLETE;
+#endif
     /* any remaining part of the line goes into one parameter */
     bslash = 0;
     if (!gotnl) {
 	sigset_t s = child_unblock();
 	for (;;) {
 	    c = zread(izle, &readchar);
+#ifdef MULTIBYTE_SUPPORT
+	    if (c == EOF) {
+		/* not waiting to be completed any more */
+		ret = 0;
+		break;
+	    }
+	    *bptr = (char)c;
+	    if (isset(MULTIBYTE)) {
+		ret = mbrtowc(&wc, bptr, 1, &mbs);
+		if (!ret)	/* NULL */
+		    ret = 1;
+	    } else {
+		ret = 1;
+		wc = (wchar_t)c;
+	    }
+	    if (ret != MB_INCOMPLETE) {
+		if (ret == MB_INVALID)
+		    memset(&mbs, 0, sizeof(mbs));
+		/*
+		 * \ at the end of a line introduces a continuation line,
+		 * except in raw mode (-r option)
+		 */
+		if (bslash && wc == delim) {
+		    bslash = 0;
+		    continue;
+		}
+		if (wc == delim && !zbuf)
+		    break;
+		if (!bslash && bptr == buf && wcsitype(wc, ISEP)) {
+		    if (c < 128 && iwsep(c))
+			continue;
+		    else if (!first) {
+			first = 1;
+			continue;
+		    }
+		}
+		bslash = (wc == L'\\' && !bslash && !OPT_ISSET(ops,'r'));
+		if (bslash)
+		    continue;
+	    }
+	    if (imeta(STOUC(*bptr))) {
+		bptr[1] = bptr[0] ^ 32;
+		bptr[0] = Meta;
+		bptr += 2;
+	    }
+	    else
+		bptr++;
+	    if (ret != MB_INCOMPLETE)
+		laststart = bptr;
+#else
 	    /* \ at the end of a line introduces a continuation line, except in
 	       raw mode (-r option) */
 	    if (bslash && c == delim) {
@@ -4938,22 +5166,36 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		*bptr++ = c ^ 32;
 	    } else
 		*bptr++ = c;
+#endif
 	    /* increase the buffer size, if necessary */
 	    if (bptr >= buf + bsiz - 1) {
 		int blen = bptr - buf;
+#ifdef MULTIBYTE_SUPPORT
+		int llen = laststart - buf;
+#endif
 
 		buf = realloc(buf, bsiz *= 2);
 		bptr = buf + blen;
+#ifdef MULTIBYTE_SUPPORT
+		laststart = buf + llen;
+#endif
 	    }
 	}
 	signal_setmask(s);
     }
+#ifdef MULTIBYTE_SUPPORT
+    if (ret != MB_INCOMPLETE)
+	bptr = laststart;
+#endif
+    /*
+     * Strip trailing IFS whitespace.
+     * iwsep can only be certain single-byte ASCII bytes, but we
+     * must check the byte isn't metafied.
+     */
     while (bptr > buf) {
 	if (bptr > buf + 1 && bptr[-2] == Meta) {
-	    if (iwsep(bptr[-1] ^ 32))
-		bptr -= 2;
-	    else
-		break;
+	    /* non-ASCII, can't be IWSEP */
+	    break;
 	} else if (iwsep(bptr[-1]))
 	    bptr--;
 	else

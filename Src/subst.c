@@ -316,9 +316,14 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
     local_list1(foo);
 
     if (split) {
-	for ( ; *x; x += l+1) {
+	/*
+	 * This doesn't handle multibyte characters, but we're
+	 * looking for whitespace separators which must be ASCII.
+	 */
+	for ( ; *x; x += l) {
 	    char c = (l = *x == Meta) ? x[1] ^ 32 : *x;
-	    if (!iwsep(c))
+	    l++;
+	    if (!iwsep(STOUC(c)))
 		break;
 	}
     }
@@ -328,20 +333,35 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
     if (split) {
 	LinkNode n = firstnode(&foo);
 	int inq = 0, inp = 0;
-	for ( ; *x; x += l+1) {
-	    char c = (l = *x == Meta) ? x[1] ^ 32 : *x;
-	    if (!inq && !inp && isep(c)) {
-		*x = '\0';
-		for (x += l+1; *x; x += l+1) {
-		    c = (l = *x == Meta) ? x[1] ^ 32 : *x;
-		    if (!isep(c))
+	MB_METACHARINIT();
+	for ( ; *x; x += l) {
+	    int rawc = -1;
+	    convchar_t c;
+	    if (itok(STOUC(*x))) {
+		/* token, can't be separator, must be single byte */
+		rawc = *x;
+		l = 1;
+	    } else {
+		l = MB_METACHARLENCONV(x, &c);
+		if (!inq && !inp && MB_ZISTYPE(c, ISEP)) {
+		    *x = '\0';
+		    for (x += l; *x; x += l) {
+			if (itok(STOUC(*x))) {
+			    /* as above */
+			    rawc = *x;
+			    l = 1;
+			    break;
+			}
+			l = MB_METACHARLENCONV(x, &c);
+			if (!MB_ZISTYPE(c, ISEP))
+			    break;
+		    }
+		    if (!*x)
 			break;
+		    insertlinknode(&foo, n, (void *)x), incnode(n);
 		}
-		if (!*x)
-		    break;
-		insertlinknode(&foo, n, (void *)x), incnode(n);
 	    }
-	    switch (c) {
+	    switch (rawc) {
 	    case Dnull:  /* " */
 	    case Snull:  /* ' */
 	    case Tick:   /* ` (note: no Qtick!) */
@@ -357,8 +377,8 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
 	    case Bnull:  /* \ */
 	    case Bnullkeep:
 		/* The parser verified the following char's existence. */
-		x += l+1;
-		l = *x == Meta;
+		x += l;
+		l = MB_METACHARLEN(x);
 		break;
 	    }
 	}
@@ -685,12 +705,14 @@ invinstrpcmp(const void *a, const void *b)
 static char *
 dopadding(char *str, int prenum, int postnum, char *preone, char *postone, char *premul, char *postmul)
 {
-    char def[3], *ret, *t, *r;
+    char *def, *ret, *t, *r;
     int ls, ls2, lpreone, lpostone, lpremul, lpostmul, lr, f, m, c, cc;
 
-    def[0] = *ifs ? *ifs : ' ';
-    def[1] = *ifs == Meta ? ifs[1] ^ 32 : '\0';
-    def[2] = '\0';
+    MB_METACHARINIT();
+    if (*ifs)
+	def = dupstrpfx(ifs, MB_METACHARLEN(ifs));
+    else
+	def = "";
     if (preone && !*preone)
 	preone = def;
     if (postone && !*postone)

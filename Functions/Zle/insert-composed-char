@@ -128,7 +128,7 @@
 # 'm            Macron
 # ''            Acute
 
-emulate -LR zsh
+emulate -L zsh
 setopt cbases extendedglob printeightbit
 
 local accent basechar ochar error
@@ -165,7 +165,8 @@ else
 fi
 
 local -A charmap
-charmap=(${=zsh_accented_chars[$accent]})
+# just in case someone is monkeying with IFS...
+charmap=(${(s. .)zsh_accented_chars[$accent]})
 
 if [[ ${#charmap} -eq 0 || -z $charmap[$basechar] ]]; then
   $error "Combination ${basechar}${accent} is not available."
