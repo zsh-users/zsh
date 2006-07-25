@@ -6,7 +6,9 @@
   mkdir glob.tmp/dir3/subdir
   : >glob.tmp/{,{dir1,dir2}/}{a,b,c}
 
-  globtest () { $ZTST_testdir/../Src/zsh -f $ZTST_srcdir/../Misc/$1 }
+  globtest () {
+    $ZTST_testdir/../Src/zsh -f $ZTST_srcdir/../Misc/$1
+  }
 
   regress_absolute_path_and_core_dump() {
     local absolute_dir=$(cd glob.tmp && pwd -P)
@@ -175,7 +177,6 @@
 >1:  [[ path/testy = *((#s)|/)test((#e)|/)* ]]
 >1:  [[ path/testy/ohyes = *((#s)|/)test((#e)|/)* ]]
 >1:  [[ path/atest/ohyes = *((#s)|/)test((#e)|/)* ]]
->0:  [[ björn = *[åäöÅÄÖ]* ]]
 >0 tests failed.
 
   globtest globtests.ksh
@@ -262,6 +263,10 @@
 >0:  [[ FOO = @(bar|(#i)foo) ]]
 >0:  [[ Modules = (#i)*m* ]]
 >0 tests failed.
+
+ (unsetopt multibyte
+ [[ björn = *[åäöÅÄÖ]* ]])
+0:single byte match with top bit set
 
   ( regress_absolute_path_and_core_dump )
 0:exclusions regression test

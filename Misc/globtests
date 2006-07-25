@@ -182,6 +182,5 @@ f atest/path    *((#s)|/)test((#e)|/)*
 f path/testy    *((#s)|/)test((#e)|/)*
 f path/testy/ohyes *((#s)|/)test((#e)|/)*
 f path/atest/ohyes *((#s)|/)test((#e)|/)*
-t björn		*[åäöÅÄÖ]*
 EOT
 print "$failed tests failed."

@@ -176,7 +176,7 @@
 ?(eval):1: command not found: hähä=3
 
   foo="Ølaf«Ødd«øpénëd«ån«àpple"
-  print -l ${(s.«.)foo}         
+  print -l ${(s.«.)foo}
   ioh="Ἐν ἀρχῇ ἦν ὁ λόγος, καὶ ὁ λόγος ἦν πρὸς τὸν θεόν, καὶ θεὸς ἦν ὁ λόγος."
   print -l ${=ioh}
   print ${(w)#ioh}
@@ -228,3 +228,39 @@
 0:read multibyte characters
 <«»ignored
 >«»
+
+  # See if the system grokks first-century Greek...
+  ioh="Ἐν ἀρχῇ ἦν ὁ λόγος, καὶ ὁ λόγος ἦν πρὸς τὸν θεόν, καὶ θεὸς ἦν ὁ λόγος."
+  for (( i = 1; i <= ${#ioh}; i++ )); do
+    # FC3 doesn't recognise ῇ (U+1FC7: Greek small letter eta with
+    # perispomeni and ypogegrammeni, of course) as a lower case character.
+    if [[ $ioh[i] != [[:lower:]] && $i != 7 ]]; then
+      for tp in upper space punct invalid; do
+        if [[ $tp = invalid || $ioh[i] = [[:${tp}:]] ]]; then
+          print "$i: $tp"
+	  break
+	fi
+      done
+    fi
+  done
+0:isw* functions on non-ASCII wide characters
+>1: upper
+>3: space
+>8: space
+>11: space
+>13: space
+>19: punct
+>20: space
+>24: space
+>26: space
+>32: space
+>35: space
+>40: space
+>44: space
+>49: punct
+>50: space
+>54: space
+>59: space
+>62: space
+>64: space
+>70: punct

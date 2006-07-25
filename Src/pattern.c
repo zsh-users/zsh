@@ -343,7 +343,7 @@ metacharinc(char **x)
     /* Error.  Treat as single byte. */
     /* Reset the shift state for next time. */
     memset(&shiftstate, 0, sizeof(shiftstate));
-    return (wchar_t) *(*x)++;
+    return (wchar_t) STOUC(*(*x)++);
 }
 
 #else
@@ -595,7 +595,7 @@ patcompile(char *exp, int inflags, char **endexp)
 			while (oplen--) {
 			    if (imeta(*opnd)) {
 				*dst++ = Meta;
-				*dst++ = *opnd ^ 32;
+				*dst++ = *opnd++ ^ 32;
 			    } else {
 				*dst++ = *opnd++;
 			    }

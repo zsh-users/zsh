@@ -1,5 +1,10 @@
 2006-07-25  Peter Stephenson  <pws@csr.com>
 
+	* 22557: Doc/Zsh/options.yo, Misc/globtests, Src/options.c,
+	Src/pattern.c, Test/D02glob.ztst, Test/D07multibyte.ztst:
+	Turn on multibyte option by default for MULTIBYTE_SUPPORT and fix
+	tests and patterns.
+
 	* unposted: Src/pattern.c, Src/utils.c: minor typos in
 	22556 found when MULTIBYTE_SUPPORT is not defined.
 

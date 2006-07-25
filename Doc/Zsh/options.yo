@@ -411,19 +411,31 @@ item(tt(MARK_DIRS) (tt(-8), ksh: tt(-X)))(
 Append a trailing `tt(/)' to all directory
 names resulting from filename generation (globbing).
 )
-pindex(MULTIBYTE)
+pindex(MULTIBYTE <D>)
 cindex(characters, multibyte, in expansion and globbing)
 cindex(multibyte characters, in expansion and globbing)
 item(tt(MULTIBYTE))(
-Respect multibyte characters when found during pattern matching.
-When this option is set, characters strings are examined using the
+Respect multibyte characters when found in strings.
+When this option is set, strings are examined using the
 system library to determine how many bytes form a character, depending
-on the current locale.  If the option is unset
-(or the shell was not compiled with the configuration option
-tt(MULTIBYTE_SUPPORT)) a single byte is always treated as a single
-character.  The option will eventually be extended to cover expansion.
-Note, however, that it does not affect the shellʼs editor, which always
-uses the locale to determine multibyte characters.
+on the current locale.  This affects the way characters are counted in
+pattern matching, parameter values and various delimiters.
+
+The option is on by default if the shell was compiled with
+tt(MULTIBYTE_SUPPORT); otherwise it is off by default and has no effect if
+turned on.
+
+If the option is off a single byte is always treated as a single
+character.  This setting is designed purely for examining strings
+known to contain raw bytes or other values that may not be characters
+in the current locale.  It is not necessary to unset the option merely
+because the character set for the current locale does not contain multibyte
+characters.
+
+The option does not affect the shell's editor,  which always uses the
+locale to determine multibyte characters.  This is because
+the character set displayed by the terminal emulator is independent of
+shell settings.
 )
 pindex(NOMATCH)
 cindex(globbing, no matches)
