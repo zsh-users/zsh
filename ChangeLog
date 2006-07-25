@@ -1,3 +1,8 @@
+2006-07-25  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/pattern.c, Src/utils.c: minor typos in
+	22556 found when MULTIBYTE_SUPPORT is not defined.
+
 2006-07-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22556: Doc/Zsh/builtins.yo, Functions/Zle/insert-composed-char,

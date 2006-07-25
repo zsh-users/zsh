@@ -3980,12 +3980,14 @@ mb_metastrlen(char *ptr)
 #else
 
 /* Simple replacement for mb_metacharlenconv */
+
+/**/
 int
 metacharlenconv(char *x, int *c)
 {
     if (*x == Meta) {
 	if (c)
-	    *c == STOUC(x[1]);
+	    *c = STOUC(x[1]) ^ 32;
 	return 2;
     }
     if (c)

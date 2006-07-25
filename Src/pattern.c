@@ -3204,7 +3204,7 @@ static int patrepeat(Upat p, char *charstart)
 		break;
 #else
 	    if (patmatchrange(opnd, CHARREF(scan, patinend)) ^
-		P_OP(p) == P_ANYOF)
+		(P_OP(p) == P_ANYOF))
 		break;
 #endif
 	    charstart[scan-patinput] = 1;
