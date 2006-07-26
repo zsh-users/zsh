@@ -1,3 +1,7 @@
+2006-07-26  Peter Stephenson  <pws@csr.com>
+
+	* 22558: Src/math.c: declaration after statement.
+
 2006-07-25  Peter Stephenson  <pws@csr.com>
 
 	* 22557: Doc/Zsh/options.yo, Misc/globtests, Src/options.c,

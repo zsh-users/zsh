@@ -264,8 +264,8 @@ static int
 zzlex(void)
 {
     int cct = 0;
-    yyval.type = MN_INTEGER;
     char *ie;
+    yyval.type = MN_INTEGER;
 
     for (;; cct = 0)
 	switch (*ptr++) {
