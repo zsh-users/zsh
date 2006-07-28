@@ -1,5 +1,8 @@
 2006-07-28  Peter Stephenson  <pws@csr.com>
 
+	* 22560: Functions/Zle/history-beginning-search-menu:
+	tweak (= hack) to clear menu after use.
+
 	* 22559: Doc/Zsh/contrib.yo,
 	Functions/Zle/history-beginning-search-menu: new Zle function.
 
