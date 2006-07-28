@@ -605,6 +605,29 @@ zle -N history-beginning-search-forward-end \
 bindkey '\e^P' history-beginning-search-backward-end
 bindkey '\e^N' history-beginning-search-forward-end)
 )
+tindex(history-beginning-search-menu)
+item(tt(history-beginning-search-menu))(
+This function implements yet another form of history searching.  The
+text before the cursor is used to select lines from the history,
+as for tt(history-beginning-search-backward) except that all matches are
+shown in a numbered menu.  Typing the appropriate digits inserts the
+full history line.  Note that leading zeroes must be typed (they are only
+shown when necessary for removing ambiguity).  The entire history is
+searched; there is no distinction between forwards and backwards.
+
+With a prefix argument, the search is not anchored to the start of
+the line; the string typed by the use may appear anywhere in the line
+in the history.
+
+If the widget name contains `tt(-end)' the cursor is moved to the end of
+the line inserted.  If the widget name contains `tt(-space)' any space
+in the text typed is treated as a wildcard and can match anything (hence
+a leading space is equivalent to giving a prefix argument).  Both
+forms can be combined, for example:
+
+example(zle -N history-beginning-search-menu-space-end \ 
+       history-beginning-search-menu)
+)
 tindex(history-pattern-search)
 tindex(history-pattern-search-backward)
 tindex(history-pattern-search-forward)
