@@ -10,6 +10,15 @@
 #
 # This works only with the new function based completion system.
 
+# Recommended settings:
+#   zstyle ':completion:incremental:*' completer _complete _ignored
+#   zstyle :incremental stop-keys $'[\e\C-b\C-f\C-n\C-p\C-u-\C-x]'
+
+# BUGS:
+# The _oldlist completer breaks incremental completion.  Use a context-
+# specific completer zstyle as shown above to disable the _oldlist
+# completer in this function.
+
 # The main widget function.
 
 incremental-complete-word() {
@@ -52,7 +61,7 @@ incremental-complete-word() {
     state=''
   fi
   zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" \
-                          "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
+                          "l:$toolong" "c:${_lastcomp[completer]}"
   zle -R "$pstr"
   read -k key
 
@@ -95,7 +104,7 @@ incremental-complete-word() {
         state=''
       fi
       zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" \
-                              "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
+                              "l:$toolong" "c:${_lastcomp[completer]}"
       zle -R "$pstr"
     else
       zle -R

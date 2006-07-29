@@ -1,3 +1,10 @@
+2006-07-29  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 22561: Functions/Zle/incremental-complete-word: fix display bug
+	introduced roughly five years ago when _main_complete was changed
+	to remove the leading underscore from $_lastcomp[completer].  Add
+	some other commentary.
+
 2006-07-28  Peter Stephenson  <pws@csr.com>
 
 	* 22560: Functions/Zle/history-beginning-search-menu:
