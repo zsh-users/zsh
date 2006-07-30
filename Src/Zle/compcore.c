@@ -466,12 +466,12 @@ before_complete(UNUSED(Hookdef dummy), int *lst)
 
     /* If we are doing a menu-completion... */
 
-    if (menucmp && *lst != COMP_LIST_EXPAND && 
+    if (minfo.cur && menucmp && *lst != COMP_LIST_EXPAND && 
 	(menucmp != 1 || !compwidget || compwidget == lastcompwidget)) {
 	do_menucmp(*lst);
 	return 1;
     }
-    if (menucmp && validlist && *lst == COMP_LIST_COMPLETE) {
+    if (minfo.cur && menucmp && validlist && *lst == COMP_LIST_COMPLETE) {
 	showinglist = -2;
 	onlyexpl = listdat.valid = 0;
 	return 1;
