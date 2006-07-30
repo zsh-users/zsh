@@ -1,3 +1,8 @@
+2006-07-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22565: Src/compcore.c: Fix bug with menu completion after failed
+	accept-and-menu-complete, perhaps.
+
 2006-06-26  Peter Stephenson  <pws@csr.com>
 
 	* 22516: Src/parse.c: error evaluating "func()" didn't pop
