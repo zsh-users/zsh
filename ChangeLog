@@ -1,3 +1,8 @@
+2006-07-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22562: Src/glob.c, Test/D07multibyte.ztst: make ${...#...} etc.
+	understand multibyte characters.	
+
 2006-07-29  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* 22561: Functions/Zle/incremental-complete-word: fix display bug
