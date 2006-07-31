@@ -1,3 +1,9 @@
+2006-07-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (see users/10559): Functions/Zle/keymap+widget: a
+	technique for overriding ZLE widgets only within a selected
+	keymap.
+
 2006-07-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22565: Src/compcore.c: Fix bug with menu completion after failed
@@ -6,7 +12,7 @@
 	* 22562: Src/glob.c, Test/D07multibyte.ztst: make ${...#...} etc.
 	understand multibyte characters.	
 
-2006-07-29  Barton E. Schaefer  <schaefer@brasslantern.com>
+2006-07-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 22561: Functions/Zle/incremental-complete-word: fix display bug
 	introduced roughly five years ago when _main_complete was changed
@@ -159,7 +165,7 @@
 	* 22501: configure.ac: reduce default maximum function depth
 	to 1000.
 
-2006-06-17  Barton E. Schaefer  <schaefer@brasslantern.com>
+2006-06-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 22492: Functions/Zle/url-quote-magic: properly detect when a new
 	word (in the zsh syntax sense) has been started, and thus avoid
