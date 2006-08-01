@@ -1,3 +1,8 @@
+2006-08-01  Peter Stephenson  <pws@csr.com>
+
+	* users/10564: Completion/Unix/Command/_gpg: use appropriate
+	key ring arguments to search key rings.
+
 2006-07-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted (see users/10559): Functions/Zle/keymap+widget: a
