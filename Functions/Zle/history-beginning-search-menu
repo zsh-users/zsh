@@ -40,12 +40,12 @@ local -a display
 
 local search=$LBUFFER
 
+search=${search//(#m)[\][()\\*?#<>~]/\\$MATCH/}
 if [[ $WIDGET = *-space* ]]; then
   # We need to quote metacharacters in the search string
   # since they are otherwise active in the reverse subscript.
   # We need to avoid quoting other characters since they aren't
   # and just stay quoted, rather annoyingly.
-  search=${search//(#m)[\][()\\*?#<>]/\\$MATCH/}
   search=${search// /*}
 fi
 
@@ -112,7 +112,7 @@ fi
 # go to the last one.  This allows accept-line-and-down-history etc.
 # to work.
 local -a lines
-local matchq=${matches[$chars]//(#m)[\][()\\*?#<>]/\\$MATCH}
+local matchq=${matches[$chars]//(#m)[\][()\\*?#<>~]/\\$MATCH}
 lines=(${(kon)history[(R)$matchq]})
 HISTNO=$lines[-1]
 

@@ -1,3 +1,9 @@
+2006-08-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22574: Functions/Zle/history-beginning-search-menu,
+	Doc/Zsh/params.yo: ~ also needs quoting and we have to do
+	it even if space isn't active.
+
 2006-08-01  Peter Stephenson  <pws@csr.com>
 
 	* 22573: Functions/Zle/history-beginning-search-menu,
