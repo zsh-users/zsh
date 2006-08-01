@@ -45,7 +45,7 @@ if [[ $WIDGET = *-space* ]]; then
   # since they are otherwise active in the reverse subscript.
   # We need to avoid quoting other characters since they aren't
   # and just stay quoted, rather annoyingly.
-  search=${search//(#m)[*?#<>]/\\$MATCH/}
+  search=${search//(#m)[\][()\\*?#<>]/\\$MATCH/}
   search=${search// /*}
 fi
 
@@ -69,8 +69,19 @@ integer i
 display=(${matches/(#m)*/${(l.$width..0.):-$((++i))} $MATCH})
 zle -R "Enter digit${${width##1}:+s}:" $display
 
-local chars
-read -k$width chars
+integer i
+local char chars
+
+# Abort on first non-digit entry instead of requiring all
+# characters to be typed (as "read -k$width chars" would do).
+for (( i = 0; i < $width; i++ )); do
+  read -k char
+  if [[ $char != [[:digit:]] ]]; then
+    zle -R '' $display
+    return 1
+  fi
+  chars+=$char
+done
 
 # Hmmm... this isn't great.  The only way of clearing the display
 # appears to be to overwrite it completely.  I think that's because
@@ -78,25 +89,37 @@ read -k$width chars
 # properly.
 display=(${display//?/ })
 
-if [[ $chars != [[:digit:]]## || $chars -eq 0 || $chars -gt $n ]]; then
+if [[ $chars -eq 0 || $chars -gt $n ]]; then
   zle -R '' $display
   return 1
 fi
 
-if [[ $WIDGET = *-end* ]]; then
-  LBUFFER=${matches[$chars]} RBUFFER=
-else
-  integer newcursor
+integer newcursor
+if [[ $WIDGET != *-end* ]]; then
   if (( ${+NUMERIC} )); then
     # Advance cursor so that it's still after the string typed
     local -a match mbegin mend
     if [[ $matches[$chars] = (#b)(*${LBUFFER})* ]]; then
-      newcursor=${#match[1]}
+       newcursor=${#match[1]}
     fi
+  else
+    # Maintain cursor
+    newcursor=$CURSOR
   fi
+fi
 
-  BUFFER=${matches[$chars]}
-  (( newcursor )) && CURSOR=$newcursor
+# Find the history lines that contain the matched string and
+# go to the last one.  This allows accept-line-and-down-history etc.
+# to work.
+local -a lines
+local matchq=${matches[$chars]//(#m)[\][()\\*?#<>]/\\$MATCH}
+lines=(${(kon)history[(R)$matchq]})
+HISTNO=$lines[-1]
+
+if (( newcursor )); then
+  CURSOR=$newcursor
+elif [[ $WIDGET = *-end* ]]; then
+  CURSOR=${#BUFFER}
 fi
 
 zle -R '' $display

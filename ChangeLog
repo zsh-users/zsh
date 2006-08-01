@@ -1,5 +1,10 @@
 2006-08-01  Peter Stephenson  <pws@csr.com>
 
+	* 22573: Functions/Zle/history-beginning-search-menu,
+	Doc/Zsh/params.yo: smooth the interface to the widget and
+	document how to quote metacharacters for reverse array
+	subscripting.
+
 	* 22572: Src/pattern.c, Test/D04parameter.ztst: use of (#m)
 	was broken with pure strings.
 
