@@ -1,5 +1,8 @@
 2006-08-01  Peter Stephenson  <pws@csr.com>
 
+	* 22572: Src/pattern.c, Test/D04parameter.ztst: use of (#m)
+	was broken with pure strings.
+
 	* users/10564: Completion/Unix/Command/_gpg: use appropriate
 	key ring arguments to search key rings.
 
