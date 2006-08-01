@@ -2298,7 +2298,7 @@ listlist(LinkList l)
 	     fprintf(shout, "zsh: do you wish to see all %d lines? ", nlines));
 	qup = ((l + columns - 1) / columns) - 1;
 	fflush(shout);
-	if (getzlequery(1) != 'y') {
+	if (!getzlequery()) {
 	    if (clearflag) {
 		putc('\r', shout);
 		tcmultout(TCUP, TCMULTUP, qup);

@@ -61,11 +61,8 @@
 
 #ifdef MULTIBYTE_SUPPORT
 #define MB_ZISTYPE(X,Y) wcsitype((X),(Y))
+#define MB_ISPRINT(X)	iswprint(X)
 #else
 #define MB_ZISTYPE(X,Y)	zistype((X),(Y))
+#define MB_ISPRINT(X)	isprint(X)
 #endif
-
-#define iascii(X) isascii(STOUC(X))
-#define ilower(X) islower(STOUC(X))
-#define iprint(X) isprint(STOUC(X))
-#define iupper(X) isupper(STOUC(X))

@@ -125,9 +125,9 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 #define ZC_icntrl icntrl
 #define ZC_idigit idigit
 #define ZC_iident iident
-#define ZC_ilower ilower
+#define ZC_ilower islower
 #define ZC_inblank inblank
-#define ZC_iupper iupper
+#define ZC_iupper isupper
 #define ZC_iword iword
 
 #define ZC_tolower tulower

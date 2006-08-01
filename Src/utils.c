@@ -2835,7 +2835,7 @@ wcsitype(wchar_t c, int itype)
     if (len == 0) {
 	/* NULL is special */
 	return zistype(0, itype);
-    } else if (len == 1 && iascii(*outstr)) {
+    } else if (len == 1 && isascii(*outstr)) {
 	return zistype(*outstr, itype);
     } else {
 	switch (itype) {
@@ -2897,7 +2897,7 @@ itype_end(const char *ptr, int itype, int once)
 		/* in this case non-ASCII characters can't match */
 		if (chr > 127 || !zistype(chr,itype))
 		    break;
-	    } else if (len == 1 && iascii(*ptr)) {
+	    } else if (len == 1 && isascii(*ptr)) {
 		/* ASCII: can't be metafied, use standard test */
 		if (!zistype(*ptr,itype))
 		    break;
@@ -4017,7 +4017,7 @@ hasspecial(char const *s)
  * The last argument should be zero if this is to be used outside a string, *
  * one if it is to be quoted for the inside of a single quoted string,      *
  * two if it is for the inside of a double quoted string, and               *
- * three if it is for the inside of a posix quoted string.                  *
+ * three if it is for the inside of a $'...' quoted string.                 *
  * The string may be metafied and contain tokens.                           */
 
 /**/
@@ -4031,127 +4031,153 @@ bslashquote(const char *s, char **e, int instring)
 
     tt = v = buf;
     u = s;
-    for (; *u; u++) {
-	if (e && *e == u)
-	    *e = v, sf = 1;
-	if (instring == 3) {
-	  int c = *u;
-	  if (c == Meta) {
-	    c = *++u ^ 32;
-	  }
-	  c &= 0xff;
-	  if(isprint(c)) {
-	    switch (c) {
-	    case '\\':
-	    case '\'':
-	      *v++ = '\\';
-	      *v++ = c;
-	      break;
+    if (instring == 3) {
+	/*
+	 * As we test for printability here we need to be able
+	 * to look for multibyte characters.
+	 */
+	convchar_t cc;
+	MB_METACHARINIT();
+	while (*u) {
+	    const char *uend = u + MB_METACHARLENCONV(u, &cc);
 
-	    default:
-	      if(imeta(c)) {
-		*v++ = Meta;
-		*v++ = c ^ 32;
-	      }
-	      else {
-		if (isset(BANGHIST) && c == bangchar) {
-		  *v++ = '\\';
-		}
-		*v++ = c;
-	      }
-	      break;
+	    if (e && !sf && *e <= u) {
+		*e = v;
+		sf = 1;
 	    }
-	  }
-	  else {
-	    switch (c) {
-	    case '\0':
-	      *v++ = '\\';
-	      *v++ = '0';
-	      if ('0' <= u[1] && u[1] <= '7') {
-		*v++ = '0';
-		*v++ = '0';
-	      }
-	      break;
+	    if (
+#ifdef MULTIBYTE_SUPPORT
+		cc != WEOF && 
+#endif
+		MB_ISPRINT(cc)) {
+		switch (cc) {
+		case ZWC('\\'):
+		case ZWC('\''):
+		    *v++ = '\\';
+		    break;
 
-	    case '\007': *v++ = '\\'; *v++ = 'a'; break;
-	    case '\b': *v++ = '\\'; *v++ = 'b'; break;
-	    case '\f': *v++ = '\\'; *v++ = 'f'; break;
-	    case '\n': *v++ = '\\'; *v++ = 'n'; break;
-	    case '\r': *v++ = '\\'; *v++ = 'r'; break;
-	    case '\t': *v++ = '\\'; *v++ = 't'; break;
-	    case '\v': *v++ = '\\'; *v++ = 'v'; break;
-
-	    default:
-	      *v++ = '\\';
-	      *v++ = '0' + ((c >> 6) & 7);
-	      *v++ = '0' + ((c >> 3) & 7);
-	      *v++ = '0' + (c & 7);
-	      break;
-	    }
-	  }
-	  continue;
-	}
-	else if (*u == Tick || *u == Qtick) {
-	    char c = *u++;
-
-	    *v++ = c;
-	    while (*u && *u != c)
-		*v++ = *u++;
-	    *v++ = c;
-	    if (!*u)
-		u--;
-	    continue;
-	}
-	else if ((*u == String || *u == Qstring) &&
-		 (u[1] == Inpar || u[1] == Inbrack || u[1] == Inbrace)) {
-	    char c = (u[1] == Inpar ? Outpar : (u[1] == Inbrace ?
-						Outbrace : Outbrack));
-	    char beg = *u;
-	    int level = 0;
-
-	    *v++ = *u++;
-	    *v++ = *u++;
-	    while (*u && (*u != c || level)) {
-		if (*u == beg)
-		    level++;
-		else if (*u == c)
-		    level--;
-		*v++ = *u++;
-	    }
-	    if (*u)
-		*v++ = *u;
-	    else
-		u--;
-	    continue;
-	}
-	else if (ispecial(*u) &&
-		 ((*u != '=' && *u != '~') ||
-		  u == s ||
-		  (isset(MAGICEQUALSUBST) && (u[-1] == '=' || u[-1] == ':')) ||
-		  (*u == '~' && isset(EXTENDEDGLOB))) &&
-	    (!instring ||
-	     (isset(BANGHIST) && *u == (char)bangchar && instring != 1) ||
-	     (instring == 2 &&
-	      (*u == '$' || *u == '`' || *u == '\"' || *u == '\\')) ||
-	     (instring == 1 && *u == '\''))) {
-	    if (*u == '\n' || (instring == 1 && *u == '\'')) {
-		if (unset(RCQUOTES)) {
-		    *v++ = '\'';
-		    if (*u == '\'')
+		default:
+		    if (isset(BANGHIST) && cc == (wchar_t)bangchar)
 			*v++ = '\\';
-		    *v++ = *u;
-		    *v++ = '\'';
-		} else if (*u == '\n')
-		    *v++ = '"', *v++ = '\n', *v++ = '"';
-		else
-		    *v++ = '\'', *v++ = '\'';
-		continue;
-	    } else
-		*v++ = '\\';
+		    break;
+		}
+		while (u < uend)
+		    *v++ = *u++;
+	    } else {
+		/* Not printable */
+		for (; u < uend; u++) {
+		    /*
+		     * Just do this byte by byte; there's no great
+		     * advantage in being clever with multibyte
+		     * characters if we don't think they're printable.
+		     */
+		    int c;
+		    if (*u == Meta)
+			c = STOUC(*++u ^ 32);
+		    else
+			c = STOUC(*u);
+		    switch (c) {
+		    case '\0':
+			*v++ = '\\';
+			*v++ = '0';
+			if ('0' <= u[1] && u[1] <= '7') {
+			    *v++ = '0';
+			    *v++ = '0';
+			}
+			break;
+
+		    case '\007': *v++ = '\\'; *v++ = 'a'; break;
+		    case '\b': *v++ = '\\'; *v++ = 'b'; break;
+		    case '\f': *v++ = '\\'; *v++ = 'f'; break;
+		    case '\n': *v++ = '\\'; *v++ = 'n'; break;
+		    case '\r': *v++ = '\\'; *v++ = 'r'; break;
+		    case '\t': *v++ = '\\'; *v++ = 't'; break;
+		    case '\v': *v++ = '\\'; *v++ = 'v'; break;
+
+		    default:
+			*v++ = '\\';
+			*v++ = '0' + ((c >> 6) & 7);
+			*v++ = '0' + ((c >> 3) & 7);
+			*v++ = '0' + (c & 7);
+			break;
+		    }
+		}
+	    }
 	}
-	if(*u == Meta)
-	    *v++ = *u++;
-	*v++ = *u;
+    }
+    else
+    {
+	/*
+	 * Here the only special characters are syntactic, so
+	 * we can go through bytewise.
+	 */
+	for (; *u; u++) {
+	    if (e && *e == u)
+		*e = v, sf = 1;
+	    if (*u == Tick || *u == Qtick) {
+		char c = *u++;
+
+		*v++ = c;
+		while (*u && *u != c)
+		    *v++ = *u++;
+		*v++ = c;
+		if (!*u)
+		    u--;
+		continue;
+	    }
+	    else if ((*u == String || *u == Qstring) &&
+		     (u[1] == Inpar || u[1] == Inbrack || u[1] == Inbrace)) {
+		char c = (u[1] == Inpar ? Outpar : (u[1] == Inbrace ?
+						    Outbrace : Outbrack));
+		char beg = *u;
+		int level = 0;
+
+		*v++ = *u++;
+		*v++ = *u++;
+		while (*u && (*u != c || level)) {
+		    if (*u == beg)
+			level++;
+		    else if (*u == c)
+			level--;
+		    *v++ = *u++;
+		}
+		if (*u)
+		    *v++ = *u;
+		else
+		    u--;
+		continue;
+	    }
+	    else if (ispecial(*u) &&
+		     ((*u != '=' && *u != '~') ||
+		      u == s ||
+		      (isset(MAGICEQUALSUBST) &&
+		       (u[-1] == '=' || u[-1] == ':')) ||
+		      (*u == '~' && isset(EXTENDEDGLOB))) &&
+		     (!instring ||
+		      (isset(BANGHIST) && *u == (char)bangchar &&
+		       instring != 1) ||
+		      (instring == 2 &&
+		       (*u == '$' || *u == '`' || *u == '\"' || *u == '\\')) ||
+		      (instring == 1 && *u == '\''))) {
+		if (*u == '\n' || (instring == 1 && *u == '\'')) {
+		    if (unset(RCQUOTES)) {
+			*v++ = '\'';
+			if (*u == '\'')
+			    *v++ = '\\';
+			*v++ = *u;
+			*v++ = '\'';
+		    } else if (*u == '\n')
+			*v++ = '"', *v++ = '\n', *v++ = '"';
+		    else
+			*v++ = '\'', *v++ = '\'';
+		    continue;
+		} else
+		    *v++ = '\\';
+	    }
+	    if(*u == Meta)
+		*v++ = *u++;
+	    *v++ = *u;
+	}
     }
     *v = '\0';
 

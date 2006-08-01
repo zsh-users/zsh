@@ -653,50 +653,42 @@ zlinefind(ZLE_STRING_T haystack, int haylen, int pos,
 }
 
 /*
- * Query the user, and return a single character response.  The question
- * is assumed to have been printed already, and the cursor is left
- * immediately after the response echoed.  (Might cause a problem if
- * this takes it onto the next line.)  If yesno is non-zero: <Tab> is
- * interpreted as 'y'; any other control character is interpreted as
- * 'n'.  If there are any characters in the buffer, this is taken as a
- * negative response, and no characters are read.  Case is folded.
- *
- * TBD: this may need extending to return a wchar_t or possibly
- * a wint_t.
+ * Query the user, and return 1 for yes, 0 for no.  The question is assumed to
+ * have been printed already, and the cursor is left immediately after the
+ * response echoed.  (Might cause a problem if this takes it onto the next
+ * line.)  <Tab> is interpreted as 'y'; any other control character is
+ * interpreted as 'n'.  If there are any characters in the buffer, this is
+ * taken as a negative response, and no characters are read.  Case is folded.
  */
 
 /**/
 mod_export int
-getzlequery(int yesno)
+getzlequery(void)
 {
     ZLE_INT_T c;
 #ifdef FIONREAD
     int val;
 
-    if (yesno) {
-	/* check for typeahead, which is treated as a negative response */
-	ioctl(SHTTY, FIONREAD, (char *)&val);
-	if (val) {
-	    putc('n', shout);
-	    return 'n';
-	}
+    /* check for typeahead, which is treated as a negative response */
+    ioctl(SHTTY, FIONREAD, (char *)&val);
+    if (val) {
+	putc('n', shout);
+	return 0;
     }
 #endif
 
     /* get a character from the tty and interpret it */
     c = getfullchar(0);
-    if (yesno) {
-	if (c == ZWC('\t'))
-	    c = ZWC('y');
-	else if (ZC_icntrl(c) || c == ZLEEOF)
-	    c = ZWC('n');
-	else
-	    c = ZC_tolower(c);
-    }
+    if (c == ZWC('\t'))
+	c = ZWC('y');
+    else if (ZC_icntrl(c) || c == ZLEEOF)
+	c = ZWC('n');
+    else
+	c = ZC_tolower(c);
     /* echo response and return */
     if (c != ZWC('\n'))
 	zwcputc(c);
-    return c;
+    return c == ZWC('y');
 }
 
 /* Format a string, keybinding style. */
