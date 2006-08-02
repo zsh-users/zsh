@@ -803,6 +803,10 @@ mechanism.  The first character signals the start of a history
 expansion (default `tt(!)').  The second character signals the
 start of a quick history substitution (default `tt(^)').  The third
 character is the comment character (default `tt(#)').
+
+The characters must be in the ASCII character set; any attempt to set
+tt(histchars) to characters with a locale-dependent meaning will be
+rejected with an error message.
 )
 vindex(HISTCHARS)
 item(tt(HISTCHARS) <S> <Z>)(

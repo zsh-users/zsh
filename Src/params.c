@@ -3548,10 +3548,21 @@ void
 histcharssetfn(UNUSED(Param pm), char *x)
 {
     if (x) {
-	bangchar = x[0];
-	hatchar = (bangchar) ? x[1] : '\0';
-	hashchar = (hatchar) ? x[2] : '\0';
-	zsfree(x);
+	int len, i;
+
+	unmetafy(x, &len);
+	if (len > 3)
+	    len = 3;
+	for (i = 0; i < len; i++) {
+	    if (!isascii(STOUC(x[i]))) {
+		zwarn("HISTCHARS can only contain ASCII characters");
+		return;
+	    }
+	}
+	bangchar = len ? STOUC(x[0]) : '\0';
+	hatchar =  len > 1 ? STOUC(x[1]) : '\0';
+	hashchar = len > 2 ? STOUC(x[2]) : '\0';
+	free(x);
     } else {
 	bangchar = '!';
 	hashchar = '#';

@@ -81,6 +81,11 @@ previous value was observed to be large enough that crashes still occurred
 on some fairly common PC configurations.  This change is only likely to
 affect some highly specialised uses of the shell.
 
+The variables HISTCHARS and histchars now reject any attempt to
+set non-ASCII characters for history or comments.  Multibyte characters
+have never worked and the most consistent change was to restrict the
+set to portable characters only.
+
 Documentation
 -------------
 
