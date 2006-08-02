@@ -34,32 +34,38 @@ _svn () {
         )
 
         case $cmd in;
-          add)
+          (add)
             args+=(
               '*:file:_files -g "*(^e:_svn_controlled:)"'
             )
           ;;
-          commit)
+          (commit)
             args+=(
               '*:file:_files -g "*(e:_svn_status:)"'
             )
           ;;
-          delete)
+          (delete)
             args+=(
               '*:file:_files -g ".svn(/e:_svn_deletedfiles:)"'
             )
           ;;
-          diff)
+          (diff)
             args+=(
 	      '*: : _alternative "files:file:_files -g \*\(e:_svn_status:\)" "urls:URL:_svn_urls"'
 	    )
           ;;
-          help)
+          (help)
             args+=(
               '*::sub command:_svn_commands'
             )
+	  ;;
+	  (import)
+	    args+=(
+		'1:project directory:_files -/'
+		'2:import location: _alternative "files:file:_files" "urls:URL:_svn_urls"'
+	    )
           ;;
-          log)
+          (log)
             args+=(
               '1: : _alternative "files:file:_files -g \*\(e:_svn_controlled:\)" "urls:URL:_svn_urls"'
 	      '*:file:_files -g "*(e:_svn_controlled:)"'
@@ -72,17 +78,17 @@ _svn () {
 	    '*:path or url: _alternative "files:file:_files" "urls:URL:_svn_urls"'
 	    )
 	  ;;
-          resolved)
+          (resolved)
             args+=(
               '*:file:_files -g "*(e:_svn_conflicts:)"'
             )
           ;;
-          revert)
+          (revert)
             args+=(
               '*:file:_files -g "(.svn|*)(/e:_svn_deletedfiles:,e:_svn_status:)"'
             )
           ;;
-          *)
+          (*)
             case $usage in
               *(SRC|DST|TARGET|URL*PATH)*)
                 args+=(
