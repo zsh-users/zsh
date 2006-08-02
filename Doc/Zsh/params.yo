@@ -221,7 +221,7 @@ the tt(EXTENDED_GLOB) option is set, the following is sufficient to
 match an element of an array tt($array) containing exactly the value of
 tt($key):
 
-example(key2=${key//(#m)[\][+LPAR()+RPAR()\\*?#<>~]/\\$MATCH}
+example(key2=${key//(#m)[\][+LPAR()+RPAR()\\*?#<>~^]/\\$MATCH}
 print ${array[(R)$key2]})
 )
 item(tt(R))(

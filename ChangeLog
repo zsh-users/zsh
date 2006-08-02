@@ -1,3 +1,10 @@
+2006-08-02  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Zle/history-beginning-search-menu,
+	Doc/Zsh/params.yo: yet more tweaks I'm too embarrassed to post:
+	^ also needs quoting; clear display on first non-digit character;
+	stray / appeared in substitution.
+
 2006-08-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22574: Functions/Zle/history-beginning-search-menu,

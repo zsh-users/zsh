@@ -40,7 +40,7 @@ local -a display
 
 local search=$LBUFFER
 
-search=${search//(#m)[\][()\\*?#<>~]/\\$MATCH/}
+search=${search//(#m)[\][()\\*?#<>~^]/\\$MATCH}
 if [[ $WIDGET = *-space* ]]; then
   # We need to quote metacharacters in the search string
   # since they are otherwise active in the reverse subscript.
@@ -72,6 +72,12 @@ zle -R "Enter digit${${width##1}:+s}:" $display
 integer i
 local char chars
 
+# Hmmm... this isn't great.  The only way of clearing the display
+# appears to be to overwrite it completely.  I think that's because
+# displaying strings in this way doesn't set the completion list
+# properly.
+display=(${display//?/ })
+
 # Abort on first non-digit entry instead of requiring all
 # characters to be typed (as "read -k$width chars" would do).
 for (( i = 0; i < $width; i++ )); do
@@ -82,12 +88,6 @@ for (( i = 0; i < $width; i++ )); do
   fi
   chars+=$char
 done
-
-# Hmmm... this isn't great.  The only way of clearing the display
-# appears to be to overwrite it completely.  I think that's because
-# displaying strings in this way doesn't set the completion list
-# properly.
-display=(${display//?/ })
 
 if [[ $chars -eq 0 || $chars -gt $n ]]; then
   zle -R '' $display
@@ -112,7 +112,7 @@ fi
 # go to the last one.  This allows accept-line-and-down-history etc.
 # to work.
 local -a lines
-local matchq=${matches[$chars]//(#m)[\][()\\*?#<>~]/\\$MATCH}
+local matchq=${matches[$chars]//(#m)[\][()\\*?#<>~^]/\\$MATCH}
 lines=(${(kon)history[(R)$matchq]})
 HISTNO=$lines[-1]
 
