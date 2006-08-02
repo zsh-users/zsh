@@ -49,7 +49,7 @@ case  $state in
           _files -g "*.(pod|pm)(-.)" && ret=0
     else
       _alternative \
-	'modules:module: _perl_modules' \
+	'modules:module: _perl_modules -tP' \
 	'pods:base pod: _perl_basepods' \
 	'files:module or .pod file:_files -g "*.(pod|pm)(-.)"' && ret=0
     fi
