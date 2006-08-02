@@ -10,6 +10,11 @@
 
 2006-08-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 22575: Src/utils.c, Src/ztype.h, Src/Zle/compresult.c,
+	Src/Zle/zle.h, Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c:
+	multibyte fixes for blashquote() and getzlequery() and
+	remove some aliases.
+
 	* 22574: Functions/Zle/history-beginning-search-menu,
 	Doc/Zsh/params.yo: ~ also needs quoting and we have to do
 	it even if space isn't active.
