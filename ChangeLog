@@ -1,5 +1,10 @@
 2006-08-03  Peter Stephenson  <pws@csr.com>
 
+	* 22581: Src/prompt.c, Src/utils.c, Src/Zle/complist.c,
+	Src/Zle/zle.h, Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c:
+	rationalise multibyte conversions to and from wide characters
+	to use restartable form.
+
 	* unposted: Completion/Unix/Command/_subversion: import
 	directory is optional, so complete URLs also on first argument.
 
@@ -58,7 +63,7 @@
 	accept-and-menu-complete, perhaps.
 
 	* 22562: Src/glob.c, Test/D07multibyte.ztst: make ${...#...} etc.
-	understand multibyte characters.	
+	understand multibyte characters.
 
 2006-07-29  Barton E. Schaefer  <schaefer@zsh.org>
 

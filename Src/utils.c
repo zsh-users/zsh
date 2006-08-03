@@ -279,6 +279,7 @@ zerrmsg(const char *fmt, va_list ap)
 	    case 'c':
 		num = va_arg(ap, int);
 #ifdef MULTIBYTE_SUPPORT
+		mb_metacharinit();
 		zputs(wcs_nicechar(num, NULL, NULL), stderr);
 #else
 		zputs(nicechar(num), stderr);
@@ -402,6 +403,20 @@ nicechar(int c)
 
 /**/
 #ifdef MULTIBYTE_SUPPORT
+static mbstate_t mb_shiftstate;
+
+/*
+ * Initialise multibyte state: called before a sequence of
+ * wcs_nicechar() or mb_metacharlenconv().
+ */
+
+/**/
+mod_export void
+mb_metacharinit(void)
+{
+    memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
+}
+
 /*
  * The number of bytes we need to allocate for a "nice" representation
  * of a multibyte character.
@@ -430,6 +445,9 @@ nicechar(int c)
  * Either the initial ASCII part or the wide character part may be empty
  * (but not both).  (Note the complication that the wide character
  * part may contain metafied characters.)
+ *
+ * The caller needs to call mb_metacharinit() before the first call, to
+ * set up the multibyte shift state for a range of characters.
  */
 
 /**/
@@ -475,8 +493,11 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 	}
     }
 
-    if (ret == -1 ||
-	(ret = wctomb(mbstr, c)) == -1) {
+    if (ret != -1)
+	ret = wcrtomb(mbstr, c, &mb_shiftstate);
+
+    if (ret == -1) {
+	memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
 	/*
 	 * Can't or don't want to convert character: use UCS-2 or
 	 * UCS-4 code in print escape format.
@@ -512,18 +533,6 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 }
 /**/
 #endif /* MULTIBYTE_SUPPORT */
-
-
-/* Output a string's visible representation. */
-
-#if 0 /**/
-void
-nicefputs(char *s, FILE *f)
-{
-    for (; *s; s++)
-	zputs(nicechar(*s), f);
-}
-#endif
 
 /* get a symlink-free pathname for s relative to PWD */
 
@@ -699,7 +708,7 @@ get_username(void)
 #ifdef HAVE_GETPWUID
     struct passwd *pswd;
     uid_t current_uid;
- 
+
     current_uid = getuid();
     if (current_uid != cached_uid) {
 	cached_uid = current_uid;
@@ -900,12 +909,12 @@ dircmp(char *s, char *t)
 mod_export LinkList prepromptfns;
 
 /* the last time we checked mail */
- 
+
 /**/
 time_t lastmailcheck;
- 
+
 /* the last time we checked the people in the WATCH variable */
- 
+
 /**/
 time_t lastwatch;
 
@@ -2818,6 +2827,7 @@ mod_export int
 wcsitype(wchar_t c, int itype)
 {
     int len;
+    mbstate_t mbs;
     VARARR(char, outstr, MB_CUR_MAX);
 
     if (!isset(MULTIBYTE))
@@ -2830,7 +2840,8 @@ wcsitype(wchar_t c, int itype)
      * If it doesn't, use iswalnum on the original character.
      * If that fails, resort to the appropriate wide character array.
      */
-    len = wctomb(outstr, c);
+    memset(&mbs, 0, sizeof(mbs));
+    len = wcrtomb(outstr, c, &mbs);
 
     if (len == 0) {
 	/* NULL is special */
@@ -3725,6 +3736,7 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
     ptr = unmetafy(ums, &umlen);
 
     memset(&mbs, 0, sizeof mbs);
+    mb_metacharinit();
     while (umlen > 0) {
 	size_t cnt = eol ? MB_INVALID : mbrtowc(&c, ptr, umlen, &mbs);
 
@@ -3851,20 +3863,6 @@ mb_width(const char *s)
     free(ums);
 
     return width;
-}
-
-static mbstate_t mb_shiftstate;
-
-/*
- * Initialise multibyte state: called before a sequence of
- * mb_metacharlenconv().
- */
-
-/**/
-void
-mb_metacharinit(void)
-{
-    memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
 }
 
 /*

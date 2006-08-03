@@ -135,17 +135,20 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
     char *s;
     int i, j;
     size_t mb_len = 0;
+    mbstate_t mbs;
 
     s = zalloc(inll * MB_CUR_MAX + 1);
 
     outcs = 0;
+    memset(&mbs, 0, sizeof(mbs));
     for (i=0; i < inll; i++, incs--) {
 	if (incs == 0)
 	    outcs = mb_len;
-	j = wctomb(s + mb_len, instr[i]);
+	j = wcrtomb(s + mb_len, instr[i], &mbs);
 	if (j == -1) {
 	    /* invalid char; what to do? */
 	    s[mb_len++] = ZWC('?');
+	    memset(&mbs, 0, sizeof(mbs));
 	} else {
 	    mb_len += j;
 	}
@@ -780,6 +783,7 @@ showmsg(char const *msg)
     p = unmetafy(umsg, &ulen);
     memset(&mbs, 0, sizeof mbs);
 
+    mb_metacharinit();
     while (ulen > 0) {
 	char const *n;
 	if (*p == '\n') {

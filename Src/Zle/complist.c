@@ -588,6 +588,7 @@ clnicezputs(Listcols colors, char *s, int ml)
     if (colors)
 	initiscol(colors);
 
+    mb_metacharinit();
     while (umleft > 0) {
 	size_t cnt = eol ? MB_INVALID : mbrtowc(&cc, uptr, umleft, &mbs);
 
@@ -1964,7 +1965,9 @@ msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
 #ifdef MULTIBYTE_SUPPORT
 	if (lastchar_wide_valid)
 	{
-	    int len = wctomb(s, lastchar_wide);
+	    mbstate_t mbs;
+	    memset(&mbs, 0, sizeof(mbs));
+	    int len = wcrtomb(s, lastchar_wide, &mbs);
 	    if (len < 0)
 		len = 0;
 	    s[len] = '\0';

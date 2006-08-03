@@ -71,8 +71,6 @@ typedef wint_t   ZLE_INT_T;
 #define ZC_tolower towlower
 #define ZC_toupper towupper
 
-#define ZC_nicechar(c) wcs_nicechar(c, NULL, NULL)
-
 #define LASTFULLCHAR	lastchar_wide
 
 #else  /* Not MULTIBYTE_SUPPORT: old single-byte code */
@@ -99,8 +97,6 @@ typedef int ZLE_INT_T;
  * These versions don't handle multibyte characters.
  */
 #define ZMB_nicewidth	niceztrlen
-
-#define ZC_nicechar nicechar
 
 #ifdef __GNUC__
 static inline size_t ZS_strlen(ZLE_STRING_T s)

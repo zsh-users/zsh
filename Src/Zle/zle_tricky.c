@@ -2464,16 +2464,20 @@ magicspace(char **args)
     ZLE_STRING_T bangq;
     ZLE_CHAR_T zlebangchar[1];
     int ret;
+#ifdef MULTIBYTE_SUPPORT
+    mbstate_t mbs;
+#endif
+
     fixmagicspace();
 
 #ifdef MULTIBYTE_SUPPORT
     /*
-     * TODO: bangchar should really be a multibyte string representing
-     * a single character, since there's no fundamental reason why
-     * it shouldn't be a Unicode character.  In practice this is
-     * very minor, however.
+     * Use mbrtowc() here for consistency and to ensure the
+     * state is initialised properly.  bangchar is unsigned char,
+     * but must be ASCII, so we simply cast the pointer.
      */
-    if (mbtowc(zlebangchar, (char *)&bangchar, 1) < 0)
+    memset(&mbs, 0, sizeof(mbs));
+    if (mbrtowc(zlebangchar, (char *)&bangchar, 1, &mbs) < 0)
 	return selfinsert(args);
 #else
     zlebangchar[0] = bangchar;
