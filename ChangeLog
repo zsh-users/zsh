@@ -1,11 +1,16 @@
+2006-08-03  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_subversion: import
+	directory is optional, so complete URLs also on first argument.
+
 2006-08-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22579: Completion/Unix/Command/_perldoc,
 	Completion/Unix/Type/_perl_modules: find .pod files in perl
 	include path for documentation.
 
-	* 10570: Completion/Unix/Command/_subversion: handle "svn import"
-	better.
+	* users/10570: Completion/Unix/Command/_subversion: handle "svn
+	import" better.
 
 2006-08-02  Peter Stephenson  <pws@csr.com>
 

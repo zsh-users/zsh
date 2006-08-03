@@ -61,7 +61,7 @@ _svn () {
 	  ;;
 	  (import)
 	    args+=(
-		'1:project directory:_files -/'
+		'1:project directory or import location: _alternative "files:file:_files" "urls:URL:_svn_urls"'
 		'2:import location: _alternative "files:file:_files" "urls:URL:_svn_urls"'
 	    )
           ;;
