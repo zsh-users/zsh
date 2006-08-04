@@ -91,6 +91,7 @@ BEGIN {
     # Handle each declarator.
     if (match(line, /VA_ALIST/)) {
 	# Already has VARARGS handling.
+
 	# Put parens etc. back
 	gsub(/@[{]/, "((", line)
 	gsub(/@}/, "))", line)
@@ -104,6 +105,13 @@ BEGIN {
 
 	if(locality ~ /E/)
 	    dtype = "extern " dtype
+
+	if (match(line, /[_0-9A-Za-z]+\(VA_ALIST/))
+	  dnam = substr(line, RSTART, RLENGTH-9)
+
+	# If this is exported, add it to the exported symbol list.
+	if (exported)
+	    printf "X%s\n", dnam
 
 	printf "%s%s %s\n", locality, dtype, line
     } else {

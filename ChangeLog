@@ -1,5 +1,8 @@
 2006-08-04  Peter Stephenson  <pws@csr.com>
 
+	* 22585: makepro.awk, Src/utils.c: zsh.exports was missing
+	VA_ALIST declarations and some multibyte-related stuff.
+
 	* 22584: Frank Terbeck: Completion/Unix/Type/_tar_archive: even
 	GNU tar should complete uncompressed .tar files.
 

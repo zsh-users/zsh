@@ -3877,7 +3877,7 @@ mb_width(const char *s)
  */
 
 /**/
-int
+mod_export int
 mb_metacharlenconv(const char *s, wint_t *wcp)
 {
     char inchar;
@@ -3980,7 +3980,7 @@ mb_metastrlen(char *ptr)
 /* Simple replacement for mb_metacharlenconv */
 
 /**/
-int
+mod_export int
 metacharlenconv(char *x, int *c)
 {
     if (*x == Meta) {
