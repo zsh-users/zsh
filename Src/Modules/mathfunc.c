@@ -69,7 +69,9 @@ MF_LOGB,
 MF_NEXTAFTER,
 MF_RINT,
 MF_SCALB,
+#ifdef HAVE_SIGNGAM
 MF_SIGNGAM,
+#endif
 MF_SIN,
 MF_SINH,
 MF_SQRT,
@@ -78,6 +80,12 @@ MF_TANH,
 MF_Y0,
 MF_Y1,
 MF_YN
+};
+
+/* also functions taking a string argument */
+
+enum {
+MS_RAND48
 };
 
 /*
@@ -117,6 +125,12 @@ enum {
 
 
 static struct mathfunc mftab[] = {
+  /* Functions taking string arguments */
+#ifdef HAVE_ERAND48
+  /* here to avoid comma hassle */
+  STRMATHFUNC("rand48", math_string, MS_RAND48),
+#endif
+
   NUMMATHFUNC("abs", math_func, 1, 1, MF_ABS | BFLAG(BF_FRAC) |
 	      TFLAG(TF_NOCONV|TF_NOASS)),
   NUMMATHFUNC("acos", math_func, 1, 1, MF_ACOS | BFLAG(BF_FRAC)),
@@ -155,7 +169,9 @@ static struct mathfunc mftab[] = {
   NUMMATHFUNC("nextafter", math_func, 2, 2, MF_NEXTAFTER),
   NUMMATHFUNC("rint", math_func, 1, 1, MF_RINT),
   NUMMATHFUNC("scalb", math_func, 2, 2, MF_SCALB | TFLAG(TF_INT2)),
+#ifdef HAVE_SIGNGAM
   NUMMATHFUNC("signgam", math_func, 0, 0, MF_SIGNGAM | TFLAG(TF_NOASS)),
+#endif
   NUMMATHFUNC("sin", math_func, 1, 1, MF_SIN),
   NUMMATHFUNC("sinh", math_func, 1, 1, MF_SINH),
   NUMMATHFUNC("sqrt", math_func, 1, 1, MF_SQRT | BFLAG(BF_NONNEG)),
@@ -392,10 +408,12 @@ math_func(char *name, int argc, mnumber *argv, int id)
       retd = scalb(argd, argi);
       break;
 
+#ifdef HAVE_SIGNGAM
   case MF_SIGNGAM:
       ret.type = MN_INTEGER;
       ret.u.l = signgam;
       break;
+#endif
 
   case MF_SIN:
       retd = sin(argd);
@@ -443,8 +461,109 @@ math_func(char *name, int argc, mnumber *argv, int id)
 }
 
 /**/
+static mnumber
+math_string(UNUSED(char *name), char *arg, int id)
+{
+    mnumber ret = zero_mnumber;
+    char *send;
+    /*
+     * Post-process the string argument, which is just passed verbatim.
+     * Not clear if any other functions that use math_string() will
+     * want this, but assume so for now.
+     */
+    while (iblank(*arg))
+	arg++;
+    send = arg + strlen(arg);
+    while (send > arg && iblank(send[-1]))
+	send--;
+    *send = '\0';
+
+    switch (id)
+    {
+#ifdef HAVE_ERAND48
+    case MS_RAND48:
+	{
+	    static unsigned short seedbuf[3];
+	    static int seedbuf_init;
+	    unsigned short tmp_seedbuf[3], *seedbufptr;
+	    int do_init = 1;
+
+	    if (*arg) {
+		/* Seed is contained in parameter named by arg */
+		char *seedstr;
+		seedbufptr = tmp_seedbuf;
+		if ((seedstr = getsparam(arg)) && strlen(seedstr) >= 12) {
+		    int i, j;
+		    do_init = 0;
+		    /*
+		     * Decode three sets of four hex digits corresponding
+		     * to each unsigned short.
+		     */
+		    for (i = 0; i < 3 && !do_init; i++) {
+			unsigned short *seedptr = seedbufptr + i;
+			*seedptr = 0;
+			for (j = 0; j < 4; j++) {
+			    if (*seedstr >= '0' && *seedstr <= '9')
+				*seedptr += *seedstr - '0';
+			    else if (tolower(*seedstr) >= 'a' &&
+				     tolower(*seedstr) <= 'f')
+				*seedptr += tolower(*seedstr) - 'a' + 10;
+			    else {
+				do_init = 1;
+				break;
+			    }
+			    seedstr++;
+			    if (j < 3)
+				*seedptr *= 16;
+			}
+		    }
+		}
+		else if (errflag)
+		    break;
+	    }
+	    else
+	    {
+		/* Use default seed: must be initialised. */
+		seedbufptr = seedbuf;
+		if (!seedbuf_init)
+		    seedbuf_init = 1;
+		else
+		    do_init = 1;
+	    }
+	    if (do_init) {
+		seedbufptr[0] = (unsigned short)rand();
+		seedbufptr[1] = (unsigned short)rand();
+		seedbufptr[2] = (unsigned short)rand();
+		/*
+		 * Some implementations of rand48() need initialization.
+		 * This is likely to be harmless elsewhere, since
+		 * according to the documentation erand48() normally
+		 * doesn't look at the seed set in this way.
+		 */
+		(void)seed48(seedbufptr);
+	    }
+	    ret.type = MN_FLOAT;
+	    ret.u.d = erand48(seedbufptr);
+
+	    if (*arg)
+	    {
+		char outbuf[13];
+		sprintf(outbuf, "%04x%04x%04x", (int)seedbufptr[0],
+			(int)seedbufptr[1], (int)seedbufptr[2]);
+		setsparam(arg, ztrdup(outbuf));
+	    }
+	}
+	break;
+#endif
+    }
+
+    return ret;
+}
+
+
+/**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -466,7 +585,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }
