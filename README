@@ -54,7 +54,8 @@ top bit set to be part of a shell identifier.  Older versions of the shell
 assumed all such octets were allowed in identifiers, however the POSIX
 standard does not allow such characters in identifiers.  The older
 behaviour is still obtained with --disable-multibyte in effect.
-With --enable-multibyte set there are three possible cases:
+With --enable-multibyte in effect (this is now the default anywhere
+it is supported) there are three possible cases:
   MULTIBYTE option unset:  only ASCII characters are allowed; the
     shell does not attempt to identify non-ASCII characters at all.
   MULTIBYTE option set, POSIX_IDENTIFIERS option unset: in addition

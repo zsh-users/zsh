@@ -1,5 +1,8 @@
 2006-08-04  Peter Stephenson  <pws@csr.com>
 
+	* 22587: INSTALL, MACHINES, NEWS< README: update notes on
+	multibyte support and add references to news.
+
 	* 22586: Src/parse.c, Src/utils.c: minor warnings spotted
 	on Cygwin: unnecessary static declaration in parse.c, typo in
 	set_widearray, also comments on other warnings that are harder

@@ -180,9 +180,7 @@ SGI: IRIX 6.2, 6.3
 SGI: IRIX 6.5
 	Should build `out-of-the-box'; however, if using the native
 	compiler, "cc" rather than "c99" is recommended.  Compilation
-	with gcc is also reported to work.  Multibyte is supported,
-	for example:
-           CC=cc ./configure --enable-multibyte
+	with gcc is also reported to work.  Multibyte is supported.
 
 	On 6.5.2, zsh malloc routines are reported not to work; also
 	full optimization (cc -O3 -OPT:Olimit=0) causes problems.

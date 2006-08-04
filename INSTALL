@@ -264,37 +264,32 @@ Multibyte Character Support
 ---------------------------
 
 Support for multibyte character sets that extend ASCII, such as UTF-8, is
-under development but the code in the line editor is sufficiently stable to
-be turned on by default in environments that provide full ISO 10646 support
-including the preprocessor definition __STDC_ISO_10646__.  In principle
-this definition does not guarantee the full environment, but in practice
-systems with this defined also provide suitable library support.  The shell
-does not probe for all the features, so on other systems use of multibyte
-support must be explicitly enabled when it is available.
+now reasonably close to complete, except that combining characters are not
+handled properly (some assistance with this problem would be appreciated).
+The configuration script should turn on multibyte support on all systems
+where it can be compiled successfully.
 
 The support can be explicitly enabled or disable with --enable-multibyte or
---disable-multibyte.  Reports of systems where multibyte support was not
-enabled by default but --enable-multibyte resulted in a usable shell would
-be appreciated.  The developers are not aware of any need to use
+--disable-multibyte.  The developers are not aware of any need to use
 --disable-multibyte and this should be reported as a bug.  Currently
-multibyte mode is believed to work automatically on:
+multibyte mode is believed to work on at least the following:
 
   - All(?) current GNU/Linux distributions
-
-and to work when configured with --enable-multibyte on:
-
   - OS X 10.4.3 (problems have been reported with multibyte characters
     in HFS file names)
   - NetBSD 2.0.2
   - Solaris 8+ (inputting multibyte characters from the keyboard doesn't
     work in some installations).
+  - Cygwin (though use of multibyte characters is somewhat non-standard).
 
-The main shell is not yet aware of multibyte characters, so for example the
-length of a scalar parameter will return the number of bytes, not
-characters, and pattern tests likewise treat single bytes as if they were
-characters.  This means that pattern tests such as ? and [[:alpha:]] do not
-work correctly with characters in multibyte character sets beyond the ASCII
-subset.
+The corresponding shell option MULTIBYTE is now on by default in all
+emulation modes when multibyte support is enabled.  Turning it off is not
+recommended unless there is a particular need to examine single bytes
+regardless of the locale.  As the line editor bases its behaviour on the
+locale regardless of the option (in order to correspond to the displayed
+character set), the option should be left on during the execution of
+user-defined editor and completion widgets so that the behaviour
+corresponds to that of builtin widgets.
 
 See chapter 5 in the FAQ for some notes on multibyte input.
 

@@ -5,27 +5,31 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 Major changes between versions 4.2 and 4.3
 ------------------------------------------
 
-- There is support for multibyte character sets in the line editor,
-  though not the main shell.  See Multibyte Character Support in INSTALL.
+- There is support for multibyte character sets.  This is now reasonably
+  close to complete, although Unicode combining characters don't work
+  properly.  See Multibyte Character Support in INSTALL.
 
 - The shell can now run an installation function for a new user
-  (one with no .zshrc, .zshenv, .zprofile or .zlogin file) without
-  any additional setting up by the administrator.
+  (a user with no .zshrc, .zshenv, .zprofile or .zlogin file) without
+  any additional setting up by the administrator.  See "THE ZSH/NEWUSER
+  MODULE" in the zshmodules manual page.
 
 - The manual now has a Roadmap section (manual page zshroadmap) to
   give new users an indication of the most interesting parts of the
   manual.
 
-- New option PROMPT_SP, on by default, to work around the problem that the
-  line editor can overwrite output with no newline at the end.
+- New option PROMPT_SP (on by default): works around the problem that the
+  line editor can overwrite output with no newline at the end.  See the
+  zshoptions manual page.
 
 - New option HIST_SAVE_BY_COPY (on by default): history is saved by
-  copying and renaming instead of directly overwriting.
+  copying and renaming instead of directly overwriting.  See the
+  zshoptions manual page.
 
 - New redirection syntax e.g. {myfd}>file opens a new file descriptor
   and stores the number in $myfd, so that >&$myfd will work.  Chosen
   not to break existing code (and to be compatible with proposals for the
-  Korn shell).
+  Korn shell).  See the section REDIRECTION in the zshmisc manual page.
 
 - Substitutions of the form ${var:-"$@"}, ${var:+"$@"} and similar where
   word-splitting is applied to the text after the :- or :+ (in particular,
@@ -36,20 +40,28 @@ Major changes between versions 4.2 and 4.3
 - New Posix-style zsh-specific tests [[:IDENT:]], [[:IFS:]],
   [[:IFSSPACE:]], [[:WORD:]] test if character can appear in identifier,
   is an IFS character, is an IFS whitespace character, or is considered
-  as part of a word (is alphanumeric or appears in $WORDCHARS).  Note
-  the pattern code doesn't yet handle multibyte characters.
+  as part of a word (is alphanumeric or appears in $WORDCHARS).  These
+  works correctly on multibyte characters if the appropriate support
+  is present.  See the section FILENAME GENERATION in the zshexpn
+  manual page.
 
 - The idiom =(<<<...) is optimised so that the shell internally turns
   the ... into the contents of a file whose name is then substituted.
+  The syntax has always been usable by means of the NULLCMD feature,
+  but previously it generated an intermediate process; it has now
+  been rewritten along the same lines as the optimisation for $(<...)
+  that inserts a file into the command line without the use of an
+  external programme.
 
 - Supplied functions catch and throw provide limited support for
   exception handling using the `{ ... } always { ... }' syntax.
+  See the section EXCEPTION HANDLING in the zshcontrib manual page.
 
 - Signals now accept the SIG as part of the name for compatibility with
   other shells.
 
 - Editor function argument-base allows non-decimal arguments for
-  editor widgets.
+  editor widgets.  See the entry in the zshzle manual page.
 
 - As always, there are many enhancements to completion functions.
 
