@@ -1,5 +1,8 @@
 2006-08-04  Peter Stephenson  <pws@csr.com>
 
+	* 22584: Frank Terbeck: Completion/Unix/Type/_tar_archive: even
+	GNU tar should complete uncompressed .tar files.
+
 	* 22582: configure.ac: Test for functions needed for multibyte
 	mode instead of basing MULTIBYTE_SUPPORT on marginally relevant
 	preprocessor definition.  Installation docs still need changing.

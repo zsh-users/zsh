@@ -19,7 +19,7 @@ if [[ "$1" = *[urtx]* ]]; then
   elif [[ "$1" = *[Ijy]* ]]; then
     _files "$expl[@]" -g '*.(tar|TAR).bz2(-.)'
   elif [[ "$_cmd_variant[$service]" == gnu ]]; then
-    _files "$expl[@]" -g '*.((tar|TAR).(gz|GZ|Z|bz2)|tgz)(-.)'
+    _files "$expl[@]" -g '*.((tar|TAR)(.gz|.GZ|.Z|.bz2|)|tgz)(-.)'
   else
     _files "$expl[@]" -g '*.(tar|TAR)(-.)'
   fi
