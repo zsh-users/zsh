@@ -534,6 +534,13 @@ math_string(UNUSED(char *name), char *arg, int id)
 		seedbufptr[0] = (unsigned short)rand();
 		seedbufptr[1] = (unsigned short)rand();
 		seedbufptr[2] = (unsigned short)rand();
+		/*
+		 * Some implementations of rand48() need initialization.
+		 * This is likely to be harmless elsewhere, since
+		 * according to the documentation erand48() normally
+		 * doesn't look at the seed set in this way.
+		 */
+		(void)seed48(seedbufptr);
 	    }
 	    ret.type = MN_FLOAT;
 	    ret.u.d = erand48(seedbufptr);
