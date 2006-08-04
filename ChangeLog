@@ -1,5 +1,10 @@
 2006-08-04  Peter Stephenson  <pws@csr.com>
 
+	* 22586: Src/parse.c, Src/utils.c: minor warnings spotted
+	on Cygwin: unnecessary static declaration in parse.c, typo in
+	set_widearray, also comments on other warnings that are harder
+	to avoid.
+
 	* 22585: makepro.awk, Src/utils.c: zsh.exports was missing
 	VA_ALIST declarations and some multibyte-related stuff.
 

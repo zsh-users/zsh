@@ -79,10 +79,15 @@ set_widearray(char *mb_array, Widechar_array wca)
 	    if (!mblen)
 		break;
 	    /* No good unless all characters are convertible */
-	    if (*wcptr == WEOF)
+	    if (wci == WEOF)
 		return;
 	    *wcptr++ = (wchar_t)wci;
 #ifdef DEBUG
+	    /*
+	     * This generates a warning from the compiler (and is
+	     * indeed useless) if chars are unsigned.  It's
+	     * extreme paranoia anyway.
+	     */
 	    if (wcptr[-1] < 0)
 		fprintf(stderr, "BUG: Bad cast to wchar_t\n");
 #endif
@@ -501,6 +506,9 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 	/*
 	 * Can't or don't want to convert character: use UCS-2 or
 	 * UCS-4 code in print escape format.
+	 *
+	 * This comparison fails and generates a compiler warning
+	 * if wchar_t is 16 bits, but the code is still correct.
 	 */
 	if (c >=  0x10000) {
 	    sprintf(buf, "\\U%.8x", (unsigned int)c);
