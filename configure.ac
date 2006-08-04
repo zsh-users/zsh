@@ -1122,7 +1122,7 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
 	       erand48 open_memstream \
-	       wctomb mbrtowc wcrtomb iconv \
+	       wctomb iconv \
 	       grantpt unlockpt ptsname \
 	       htons ntohs)
 AC_FUNC_STRCOLL
@@ -2079,33 +2079,34 @@ int ptsname();], ,
    fi
 fi
 
-dnl ---------------------
-dnl multibyte ZLE support
-dnl ---------------------
+dnl -----------------
+dnl multibyte support
+dnl -----------------
 AC_ARG_ENABLE(multibyte,
-AC_HELP_STRING([--enable-multibyte], [support multibyte chars in the zsh line editor]),
-[zsh_cv_c_zle_unicode_support=$enableval],
-[AC_CACHE_CHECK(if the system adequately supports multibyte chars,
- zsh_cv_c_zle_unicode_support,
-  [AC_TRY_COMPILE([
-#ifdef HAVE_LOCALE_H
-# include <locale.h>
-#endif
-   ], [
-#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) \
- && defined(HAVE_MBRTOWC) && defined(HAVE_WCRTOMB) \
- && defined (__STDC_ISO_10646__)
-    /* All is well */
-#else
-# error Not supported.
-#endif
-  ],
-    zsh_cv_c_zle_unicode_support=yes,
-    zsh_cv_c_zle_unicode_support=no)])
+AC_HELP_STRING([--enable-multibyte], [support multibyte characters]),
+[zsh_cv_c_unicode_support=$enableval],
+[AC_CACHE_VAL(zsh_cv_c_unicode_support,
+  AC_MSG_NOTICE([checking for functions supporting multibyte characters])
+  [zfuncs_absent=
+   for zfunc in iswalnum iswcntrl iswdigit iswgraph iswlower iswprint \
+iswpunct iswspace iswupper iswxdigit mbrlen mbrtowc towupper towlower \
+wcschr wcscpy wcslen wcsncmp wcsncpy wcrtomb wcwidth wmemchr wmemcmp \
+wmemcpy wmemmove wmemset; do
+     AC_CHECK_FUNC($zfunc,
+     [:], [zfuncs_absent="$zfuncs_absent $zfunc"])
+    done
+    if test x"$zfuncs_absent" = x; then
+      AC_MSG_NOTICE([all functions found, multibyte support enabled])
+      zsh_cv_c_unicode_support=yes
+    else
+      AC_MSG_NOTICE([missing functions, multibyte support disabled])
+      zsh_cv_c_unicode_support=no
+    fi
+  ])
 ])
 AH_TEMPLATE([MULTIBYTE_SUPPORT],
 [Define to 1 if you want support for multibyte character sets.])
-if test x$zsh_cv_c_zle_unicode_support = xyes; then
+if test x$zsh_cv_c_unicode_support = xyes; then
   AC_DEFINE(MULTIBYTE_SUPPORT)
 fi
 

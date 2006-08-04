@@ -1,5 +1,9 @@
 2006-08-04  Peter Stephenson  <pws@csr.com>
 
+	* 22582: configure.ac: Test for functions needed for multibyte
+	mode instead of basing MULTIBYTE_SUPPORT on marginally relevant
+	preprocessor definition.  Installation docs still need changing.
+
 	* 22583: Peter A. Castro: Src/Modules/mathfunc.c: Cygwin erand48()
 	apparently needs initialisation.
 
