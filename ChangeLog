@@ -1,5 +1,7 @@
 2006-08-07  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/Zle/complist.c: another bad declaration.
+
 	* 22589: Src/Zle/complist.c: bug in menu selection when displaying
 	long lines.
 

@@ -1970,8 +1970,10 @@ msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
 	if (lastchar_wide_valid)
 	{
 	    mbstate_t mbs;
+	    int len;
+
 	    memset(&mbs, 0, sizeof(mbs));
-	    int len = wcrtomb(s, lastchar_wide, &mbs);
+	    len = wcrtomb(s, lastchar_wide, &mbs);
 	    if (len < 0)
 		len = 0;
 	    s[len] = '\0';
