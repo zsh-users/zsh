@@ -1,3 +1,8 @@
+2006-08-06  Clint Adams  <clint@zsh.org>
+
+	* 22588: Completion/Unix/Command/_rake: handle targets
+	with colons in their names.
+
 2006-08-04  Peter Stephenson  <pws@csr.com>
 
 	* 22587: INSTALL, MACHINES, NEWS< README: update notes on
