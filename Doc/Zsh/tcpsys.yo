@@ -185,12 +185,17 @@ non-zero return status indicates some error condition.
 See tt(tcp_log) for how to control where data is sent by tt(tcp_read).
 )
 findex(tcp_send)
-xitem(tt(tcp_send [-nq] [ -s) var(sess) tt(| -l) var(sess)tt(,... ]) var(data) tt(...))
-item(tt(tcp_send [-nq] -a) var(data) tt(...))(
+xitem(tt(tcp_send [-cnq] [ -s) var(sess) tt(| -l) var(sess)tt(,... ]) var(data) tt(...))
+item(tt(tcp_send [-cnq] -a) var(data) tt(...))(
 Send the supplied data strings to all the specified sessions in turn.  The
 underlying operation differs little from a `tt(print -r)' to the session's
 file descriptor, although it attempts to prevent the shell from dying owing
 to a tt(SIGPIPE) caused by an attempt to write to a defunct session.
+
+The option tt(-c) causes tt(tcp_send) to behave like tt(cat).  It reads
+lines from standard input until end of input and sends them in turn to the
+specified session+LPAR()s+RPAR() exactly as if they were given as var(data)
+arguments to individual tt(tcp_send) commands.
 
 The option tt(-n) prevents tt(tcp_send) from putting a newline at the end
 of the data strings.

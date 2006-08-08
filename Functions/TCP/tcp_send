@@ -1,13 +1,15 @@
 emulate -L zsh
 setopt extendedglob cbases
 
-local opt quiet all sess fd nonewline
+local opt quiet all sess fd nonewline cat line
 local -a sessions write_fds
 integer mystat
 
-while getopts "al:nqs:" opt; do
+while getopts "acl:nqs:" opt; do
     case $opt in
 	(a) all=1
+	    ;;
+        (c) cat=1
 	    ;;
 	(n) nonewline=-n
 	    ;;
@@ -55,21 +57,29 @@ trap 'TCP_FD_CLOSED=1' PIPE
 
 local TCP_SESS
 
-for TCP_SESS in $sessions; do
+while true; do
+  if [[ -n $cat ]]; then
+    read -r line || break
+  else
+    line="$*"
+  fi
+  for TCP_SESS in $sessions; do
     fd=${tcp_by_name[$TCP_SESS]}
     if [[ -z $fd ]]; then
-	print "No such session: $TCP_SESS" >&2
-	mystat=1
-	continue
+      print "No such session: $TCP_SESS" >&2
+      mystat=1
+      continue
     fi
-    print -u $fd $nonewline -r -- $*
+    print -u $fd $nonewline -r -- $line
     if [[ $? -ne 0 || -n $TCP_FD_CLOSED ]]; then
-	print "Session ${TCP_SESS}: fd $fd unusable." >&2
-	unset TCP_FD_CLOSED
+      print "Session ${TCP_SESS}: fd $fd unusable." >&2
+      unset TCP_FD_CLOSED
     fi
     if [[ -n $TCP_OUTPUT ]]; then
-	tcp_output -P "$TCP_OUTPUT" -S $TCP_SESS -F $fd -q "${(j. .)*}"
+      tcp_output -P "$TCP_OUTPUT" -S $TCP_SESS -F $fd -q "${(j. .)*}"
     fi
+  done
+  [[ -z $cat ]] && break
 done
 
 return $mystat
