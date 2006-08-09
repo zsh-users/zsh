@@ -1432,6 +1432,15 @@ item(tt(flags))(
 Defines flags to go with a handler; the context is as for the
 tt(handler) style, and the format is as for the flags in tt(mailcap).
 )
+item(tt(handle-nonexistent))(
+By default, arguments that don't correspond to files are not passed
+to the MIME handler in order to prevent it from intercepting commands found
+in the path that happen to have suffixes.  This style may be set to
+an array of extended glob patterns for arguments that will be passed to the
+handler even if they don't exist.  If it is not explicitly set it
+defaults to tt([[:alpha:]]:/*) which allows URLs to be passed to the MIME
+handler even though they don't exist in that format in the file system.
+)
 item(tt(handler))(
 Specifies a handler for a suffix; the suffix is given by the context as
 tt(:mime:.)var(suffix)tt(:), and the format of the handler is exactly

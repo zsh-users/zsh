@@ -1,3 +1,8 @@
+2006-08-09  Peter Stephenson  <pws@csr.com>
+
+	* 22593: Doc/Zsh/contrib.yo, Functions/MIME/zsh-mime-handler: add
+	handle-nonexistent style.
+
 2006-08-08  Peter Stephenson  <pws@csr.com>
 
 	* 22592: Functions/TCP/tcp_send, Doc/Zsh/tcpsys.yo: add tcp_send
