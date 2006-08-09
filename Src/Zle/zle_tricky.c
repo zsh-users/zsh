@@ -2074,6 +2074,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 
     for (; *p; p++) {
 	/* Handle the `%' stuff (%% == %, %n == <number of matches>). */
+	/* TODO: we need to use wcwidth() to count cc */
 	if (doesc && *p == '%') {
 	    if (*++p) {
 		m = 0;
@@ -2174,7 +2175,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		putc(' ', shout);
 	}
     }
-    return l + (cc / columns);
+    return l + ((cc-1) / columns);
 }
 
 /* This is used to print expansions. */

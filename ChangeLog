@@ -1,3 +1,14 @@
+2006-08-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Functions/Example/pushd: maintain pushdignoredups if it was
+	set on entry to the function.  I have a weird sense of deja vu
+	about this...
+
+	* 22594: Src/Zle/complist.c, Src/Zle/compresult.c,
+	Src/Zle/zle_tricky.c: Attempt to fix some off-by-one errors
+	counting lines when a completion list exactly fits the
+	display width.
+
 2006-08-09  Peter Stephenson  <pws@csr.com>
 
 	* 22593: Doc/Zsh/contrib.yo, Functions/MIME/zsh-mime-handler: add

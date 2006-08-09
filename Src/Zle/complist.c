@@ -398,6 +398,9 @@ static Cmatch **mtab, **mmtabp;
 static int mtab_been_reallocated;
 static Cmgroup *mgtab, *mgtabp;
 static struct listcols mcolors;
+#ifdef DEBUG
+int mgtabsize;
+#endif
 
 /* Used in mtab/mgtab, for explanations. */
 
@@ -660,7 +663,7 @@ clnicezputs(Listcols colors, char *s, int ml)
 	     * There might be problems with characters of printing width
 	     * greater than one here.
 	     */
-	    if (col >= columns) {
+	    if (col > columns) {
 		ml++;
 		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
 		    mlprinted = ml - oml;
@@ -698,7 +701,7 @@ clnicezputs(Listcols colors, char *s, int ml)
 		return 0;
 	    }
 	    putc(nc, shout);
-	    if (++col == columns) {
+	    if (++col > columns) {
 		ml++;
 		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
 		    mlprinted = ml - oml;
@@ -1037,7 +1040,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    *stop = 1;
 		    if (stat && n)
 			mfirstl = -1;
-		    return (mlprinted = l + (cc / columns));
+		    mlprinted = l + (cc ? ((cc-1) / columns) : 0);
+		    return mlprinted;
 		}
 	    }
 	}
@@ -1051,7 +1055,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
     if (stat && n)
 	mfirstl = -1;
 
-    return (mlprinted = l + (cc / columns));
+    mlprinted = l + (cc ? ((cc-1) / columns) : 0);
+    return mlprinted;	    
 }
 
 /* This is like zputs(), but allows scrolling. */
@@ -1158,6 +1163,7 @@ compprintlist(int showall)
 			int mm = (mcols * ml), i;
 
 			for (i = mcols; i--; ) {
+			    DPUTS(mm+i >= mgtabsize, "BUG: invalid position");
 			    mtab[mm + i] = mtmark(NULL);
 			    mgtab[mm + i] = mgmark(NULL);
 			}
@@ -1479,22 +1485,29 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 
             if (m->flags & CMF_DUMMY) {
                 for (i = mcols; i--; ) {
+		    DPUTS(mm+i >= mgtabsize, "BUG: invalid position");
                     mtab[mm + i] = mtmark(mp);
                     mgtab[mm + i] = mgmark(g);
                 }
             } else {
                 for (i = mcols; i--; ) {
+		    DPUTS(mm+i >= mgtabsize, "BUG: invalid position");
                     mtab[mm + i] = mp;
                     mgtab[mm + i] = g;
                 }
             }
 	}
 	if (!dolist(ml)) {
-	    mlprinted = printfmt(m->disp, 0, 0, 0) / columns;
+	    int nc = printfmt(m->disp, 0, 0, 0);
+	    if (nc)
+		mlprinted = (nc - 1) / columns;
+	    else
+		mlprinted = 0;
 	    return 0;
 	}
 	if (m->gnum == mselect) {
 	    int mm = (mcols * ml);
+	    DPUTS(mm >= mgtabsize, "BUG: invalid position");
 	    mline = ml;
 	    mcol = 0;
 	    mmtabp = mtab + mm;
@@ -1533,22 +1546,29 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 
             if (m->flags & CMF_DUMMY) {
                 for (i = (width ? width : mcols); i--; ) {
+		    DPUTS(mx+mm+i >= mgtabsize, "BUG: invalid position");
                     mtab[mx + mm + i] = mtmark(mp);
                     mgtab[mx + mm + i] = mgmark(g);
                 }
             } else {
                 for (i = (width ? width : mcols); i--; ) {
+		    DPUTS(mx+mm+i >= mgtabsize, "BUG: invalid position");
                     mtab[mx + mm + i] = mp;
                     mgtab[mx + mm + i] = g;
                 }
             }
 	}
 	if (!dolist(ml)) {
-	    mlprinted = ZMB_nicewidth(m->disp ? m->disp : m->str) / columns;
+	    int nc = ZMB_nicewidth(m->disp ? m->disp : m->str);
+	    if (nc)
+		mlprinted = (nc-1) / columns;
+	    else
+		mlprinted = 0;
 	    return 0;
 	}
 	if (m->gnum == mselect) {
 	    int mm = mcols * ml;
+	    DPUTS(mx+mm >= mgtabsize, "BUG: invalid position");
 
 	    mcol = mx;
 	    mline = ml;
@@ -1572,7 +1592,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	    return 1;
 	}
 	len = ZMB_nicewidth(m->disp ? m->disp : m->str);
-	mlprinted = len / columns;
+	mlprinted = len ? (len-1) / columns : 0;
 
 	if ((g->flags & CGF_FILES) && m->modec) {
 	    if (m->gnum != mselect) {
@@ -1646,6 +1666,7 @@ singledraw()
         tc_downcurs(md1);
     if (mc1)
         tcmultout(TCRIGHT, TCMULTRIGHT, mc1);
+    DPUTS(ml1 * columns + mc1 >= mgtabsize, "BUG: invalid position");
     g = mgtab[ml1 * columns + mc1];
     clprintm(g, mtab[ml1 * columns + mc1], mcc1, ml1, lc1,
              (g->widths ? g->widths[mcc1] : g->width));
@@ -1657,6 +1678,7 @@ singledraw()
         tc_downcurs(md2 - md1);
     if (mc2)
         tcmultout(TCRIGHT, TCMULTRIGHT, mc2);
+    DPUTS(ml2 * columns + mc2 >= mgtabsize, "BUG: invalid position");
     g = mgtab[ml2 * columns + mc2];
     clprintm(g, mtab[ml2 * columns + mc2], mcc2, ml2, lc2,
              (g->widths ? g->widths[mcc2] : g->width));
@@ -1756,6 +1778,9 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	memset(mtab, 0, i * sizeof(Cmatch **));
 	free(mgtab);
 	mgtab = (Cmgroup *) zalloc(i * sizeof(Cmgroup));
+#ifdef DEBUG
+	mgtabsize = i;
+#endif
 	memset(mgtab, 0, i * sizeof(Cmgroup));
 	mlastcols = mcols = columns;
 	mlastlines = mlines = listdat.nlines;

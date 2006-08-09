@@ -1480,6 +1480,7 @@ calclist(int showall)
 		hidden = 1;
 		while ((sptr = *pp)) {
 		    while (sptr && *sptr) {
+			/* TODO: we need to use wcwidth() here */
 			nlines += (nlptr = strchr(sptr, '\n'))
 			    ? 1 + (nlptr - sptr - 1) / columns
 			    : (ztrlen(sptr) - 1) / columns;
