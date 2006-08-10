@@ -1055,8 +1055,12 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
     if (stat && n)
 	mfirstl = -1;
 
-    mlprinted = l + (cc ? ((cc-1) / columns) : 0);
-    return mlprinted;	    
+    /*
+     * *Not* subtracting 1 from cc at this point appears to be
+     * correct.  C.f. printfmt in zle_tricky.c.
+     */
+    mlprinted = l + (cc / columns);
+    return mlprinted;
 }
 
 /* This is like zputs(), but allows scrolling. */

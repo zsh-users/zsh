@@ -2175,7 +2175,12 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		putc(' ', shout);
 	}
     }
-    return l + ((cc-1) / columns);
+    /*
+     * Experiments suggest that at this point not subtracting 1 from
+     * cc is correct, i.e. if just misses wrapping we still add 1.
+     * (Why?)
+     */
+    return l + (cc / columns);
 }
 
 /* This is used to print expansions. */
