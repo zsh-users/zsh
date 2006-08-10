@@ -841,7 +841,7 @@ asklistscroll(int ml)
     selectlocalmap(NULL);
     settyinfo(&shttyinfo);
     putc('\r', shout);
-    for (i = columns - 1; i--; )
+    for (i = columns - 1; i-- > 0; )
 	putc(' ', shout);
     putc('\r', shout);
 
@@ -1162,7 +1162,7 @@ compprintlist(int showall)
 		    if (mselect >= 0) {
 			int mm = (mcols * ml), i;
 
-			for (i = mcols; i--; ) {
+			for (i = mcols; i-- > 0; ) {
 			    DPUTS(mm+i >= mgtabsize, "BUG: invalid position");
 			    mtab[mm + i] = mtmark(NULL);
 			    mgtab[mm + i] = mgmark(NULL);
@@ -1484,13 +1484,13 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	    int mm = (mcols * ml), i;
 
             if (m->flags & CMF_DUMMY) {
-                for (i = mcols; i--; ) {
+                for (i = mcols; i-- > 0; ) {
 		    DPUTS(mm+i >= mgtabsize, "BUG: invalid position");
                     mtab[mm + i] = mtmark(mp);
                     mgtab[mm + i] = mgmark(g);
                 }
             } else {
-                for (i = mcols; i--; ) {
+                for (i = mcols; i-- > 0; ) {
 		    DPUTS(mm+i >= mgtabsize, "BUG: invalid position");
                     mtab[mm + i] = mp;
                     mgtab[mm + i] = g;
@@ -1545,13 +1545,13 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	    int mm = mcols * ml, i;
 
             if (m->flags & CMF_DUMMY) {
-                for (i = (width ? width : mcols); i--; ) {
+                for (i = (width ? width : mcols); i-- > 0; ) {
 		    DPUTS(mx+mm+i >= mgtabsize, "BUG: invalid position");
                     mtab[mx + mm + i] = mtmark(mp);
                     mgtab[mx + mm + i] = mgmark(g);
                 }
             } else {
-                for (i = (width ? width : mcols); i--; ) {
+                for (i = (width ? width : mcols); i-- > 0; ) {
 		    DPUTS(mx+mm+i >= mgtabsize, "BUG: invalid position");
                     mtab[mx + mm + i] = mp;
                     mgtab[mx + mm + i] = g;
@@ -2184,7 +2184,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    Cmatch **p = mtab;
 
 	    for (y = 0; y < mlines; y++) {
-		for (x = mcols; x; x--, p++)
+		for (x = mcols; x > 0; x--, p++)
 		    if (*p && !mmarked(*p) && **p && mselect == (**p)->gnum)
 			break;
 		if (x) {
@@ -2210,7 +2210,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    int c;
 
 	    while (mlbeg) {
-		for (q = p, c = columns; c; q++, c--)
+		for (q = p, c = columns; c > 0; q++, c--)
 		    if (*q && !mmarked(*q))
 			break;
 		if (c)
@@ -2228,7 +2228,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    int c;
 
 	    while (mlbeg < mlines) {
-		for (q = p, c = columns; c; q++, c--)
+		for (q = p, c = columns; c > 0; q++, c--)
 		    if (*q)
 			break;
 		if (c)
