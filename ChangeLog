@@ -1,5 +1,7 @@
 2006-08-10  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/compsys.yo: trivial typo.
+
 	* 22597: Src/Zle/complist.c, Src/Zle/zle_tricky.c: back off
 	two hunks of 22594 which appeared to both unnecessary and
 	incorrect.
