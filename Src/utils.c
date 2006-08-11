@@ -3937,11 +3937,13 @@ mb_metacharlenconv(const char *s, wint_t *wcp)
  * Total number of multibyte characters in metafied string s.
  * Same answer as iterating mb_metacharlen() and counting calls
  * until end of string.
+ *
+ * If width is 1, return total character width rather than number.
  */
 
 /**/
 int
-mb_metastrlen(char *ptr)
+mb_metastrlen(char *ptr, int width)
 {
     char inchar, *laststart;
     size_t ret;
@@ -3971,9 +3973,12 @@ mb_metastrlen(char *ptr)
 		/* Reset, treat as single character */
 		memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
 		ptr = laststart + (*laststart == Meta) + 1;
-	    }
+		num++;
+	    } else if (width)
+		num += wcwidth(wc);
+	    else
+		num++;
 	    laststart = ptr;
-	    num++;
 	    num_in_char = 0;
 	}
     }

@@ -2072,9 +2072,9 @@ printfmt(char *fmt, int n, int dopr, int doesc)
     char *p = fmt, nc[DIGBUFSIZE];
     int l = 0, cc = 0, b = 0, s = 0, u = 0, m;
 
-    for (; *p; p++) {
+    MB_METACHARINIT();
+    for (; *p; ) {
 	/* Handle the `%' stuff (%% == %, %n == <number of matches>). */
-	/* TODO: we need to use wcwidth() to count cc */
 	if (doesc && *p == '%') {
 	    if (*++p) {
 		m = 0;
@@ -2088,7 +2088,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		    sprintf(nc, "%d", n);
 		    if (dopr)
 			fprintf(shout, nc);
-		    cc += strlen(nc);
+		    cc += MB_METASTRWIDTH(nc);
 		    break;
 		case 'B':
 		    b = 1;
@@ -2140,9 +2140,10 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		}
 	    } else
 		break;
+	    p++;
 	} else {
-	    cc++;
 	    if (*p == '\n') {
+		cc++;
 		if (dopr) {
 		    if (tccan(TCCLEAREOL))
 			tcout(TCCLEAREOL);
@@ -2155,12 +2156,20 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		}
 		l += 1 + ((cc - 1) / columns);
 		cc = 0;
+		putc('\n', shout);
+		p++;
+	    } else {
+		convchar_t cchar;
+		int clen = MB_METACHARLENCONV(p, &cchar);
+		if (dopr) {
+		    while (clen--)
+			putc(*p++, shout);
+		} else
+		    p += clen;
+		cc += WCWIDTH(cchar);
+		if (dopr && !(cc % columns))
+			fputs(" \010", shout);
 	    }
-	    if (dopr) {
-		putc(*p, shout);
-                if (!(cc % columns))
-                    fputs(" \010", shout);
-            }
 	}
     }
     if (dopr) {

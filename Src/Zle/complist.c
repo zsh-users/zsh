@@ -888,57 +888,78 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	} else
 	    fmt = mlistp;
     }
-    for (p = fmt; *p; p++) {
-	int chr = (*p == Meta) ? *++p ^ 32 : *p;
-	if (doesc && chr == '%') {
-	    chr = (*++p == Meta) ? *++p ^ 32 : *p;
-	    if (chr) {
+    MB_METACHARINIT();
+    for (p = fmt; *p; ) {
+	convchar_t cchar;
+	int len, width;
+
+	len = MB_METACHARLENCONV(p, &cchar);
+#ifdef MULTIBYTE_SUPPORT
+	if (cchar == WEOF) {
+	    cchar = (wchar_t)p;
+	    width = 1;
+	}
+	else
+#endif
+	    width = WCWIDTH(cchar);
+
+	if (doesc && cchar == ZWC('%')) {
+	    p += len;
+	    if (*p) {
+		len = MB_METACHARLENCONV(p, &cchar);
+#ifdef MULTIBYTE_SUPPORT
+		if (cchar == WEOF)
+		    cchar = (wchar_t)p;
+#endif
+		p += len;
+
 		m = 0;
-		switch (chr) {
-		case '%':
+		switch (cchar) {
+		case ZWC('%'):
 		    if (dopr == 1)
 			putc('%', shout);
 		    cc++;
 		    break;
-		case 'n':
+		case ZWC('n'):
 		    if (!stat) {
 			sprintf(nc, "%d", n);
 			if (dopr == 1)
 			    fputs(nc, shout);
+			/* everything here is ASCII... */
 			cc += strlen(nc);
 		    }
 		    break;
-		case 'B':
+		case ZWC('B'):
 		    b = 1;
 		    if (dopr)
 			tcout(TCBOLDFACEBEG);
 		    break;
-		case 'b':
+		case ZWC('b'):
 		    b = 0; m = 1;
 		    if (dopr)
 			tcout(TCALLATTRSOFF);
 		    break;
-		case 'S':
+		case ZWC('S'):
 		    s = 1;
 		    if (dopr)
 			tcout(TCSTANDOUTBEG);
 		    break;
-		case 's':
+		case ZWC('s'):
 		    s = 0; m = 1;
 		    if (dopr)
 			tcout(TCSTANDOUTEND);
 		    break;
-		case 'U':
+		case ZWC('U'):
 		    u = 1;
 		    if (dopr)
 			tcout(TCUNDERLINEBEG);
 		    break;
-		case 'u':
+		case ZWC('u'):
 		    u = 0; m = 1;
 		    if (dopr)
 			tcout(TCUNDERLINEEND);
 		    break;
-		case '{':
+		case ZWC('{'):
 		    for (p++; *p && (*p != '%' || p[1] != '}'); p++)
 			if (dopr)
 			    putc(*p == Meta ? *++p ^ 32 : *p, shout);
@@ -947,14 +968,14 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    else
 			p--;
 		    break;
-		case 'm':
+		case ZWC('m'):
 		    if (stat) {
 			sprintf(nc, "%d/%d", (n ? mlastm : mselect),
 				listdat.nlist);
 			m = 2;
 		    }
 		    break;
-		case 'M':
+		case ZWC('M'):
 		    if (stat) {
 			sprintf(nbuf, "%d/%d", (n ? mlastm : mselect),
 				listdat.nlist);
@@ -962,20 +983,20 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 			m = 2;
 		    }
 		    break;
-		case 'l':
+		case ZWC('l'):
 		    if (stat) {
 			sprintf(nc, "%d/%d", ml + 1, listdat.nlines);
 			m = 2;
 		    }
 		    break;
-		case 'L':
+		case ZWC('L'):
 		    if (stat) {
 			sprintf(nbuf, "%d/%d", ml + 1, listdat.nlines);
 			sprintf(nc, "%-9s", nbuf);
 			m = 2;
 		    }
 		    break;
-		case 'p':
+		case ZWC('p'):
 		    if (stat) {
 			if (ml == listdat.nlines - 1)
 			    strcpy(nc, "Bottom");
@@ -987,7 +1008,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 			m = 2;
 		    }
 		    break;
-		case 'P':
+		case ZWC('P'):
 		    if (stat) {
 			if (ml == listdat.nlines - 1)
 			    strcpy(nc, "Bottom");
@@ -1001,6 +1022,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    break;
 		}
 		if (m == 2 && dopr == 1) {
+		    /* nc only contains ASCII text */
 		    int l = strlen(nc);
 
 		    if (l + cc > columns - 2)
@@ -1018,9 +1040,11 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    } else
 		break;
 	} else {
-	    if ((++cc == columns - 2 || chr == '\n') && stat)
+	    cc += width;
+
+	    if ((cc >= columns - 2 || cchar == ZWC('\n')) && stat)
 		dopr = 2;
-	    if (chr == '\n') {
+	    if (cchar == ZWC('\n')) {
 		if (dopr == 1 && mlbeg >= 0 && tccan(TCCLEAREOL))
 		    tcout(TCCLEAREOL);
 		l += 1 + ((cc - 1) / columns);
@@ -1031,7 +1055,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    dopr = 0;
 		    continue;
 		}
-		putc(chr, shout);
+		while (len--)
+		    putc(*p++, shout);
 		if ((beg = !(cc % columns)) && !stat) {
 		    ml++;
                     fputs(" \010", shout);

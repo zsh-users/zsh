@@ -1,3 +1,9 @@
+2006-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22599: Src/utils.c, Src/zsh.h, Src/Zle/complist.c,
+	Src/Zle/compresult.c, Src/Zle/zle_tricky.c: use wide character
+	widths in completion.
+
 2006-08-10  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/compsys.yo: trivial typo.

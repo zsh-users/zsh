@@ -573,7 +573,7 @@ unambig_data(int *cp, char **pp, char **ip)
     return scache;
 }
 
-/* Insert the given match. This returns the number of characters inserted.
+/* Insert the given match. This returns the number of bytes inserted.
  * scs is used to return the position where a automatically created suffix
  * has to be inserted. */
 
@@ -986,7 +986,12 @@ do_single(Cmatch m)
 
     if (m->suf) {
 	havesuff = 1;
-	minfo.insc = ztrlen(m->suf);
+	/*
+	 * This strlen(0 got converted to a ztrlen(), but I don't
+	 * think that's correct since it's dealing with raw bytes,
+	 * right?
+	 */
+	minfo.insc = strlen(m->suf);
 	minfo.len -= minfo.insc;
 	if (minfo.we) {
 	    minfo.end += minfo.insc;
@@ -1466,7 +1471,7 @@ calclist(int showall)
 	    /* We have an ylist, lets see, if it contains newlines. */
 	    hidden = 1;
 	    while (!nl && *pp) {
-                if (ztrlen(*pp) >= columns)
+                if (MB_METASTRWIDTH(*pp) >= columns)
                     nl = 1;
                 else
                     nl = !!strchr(*pp++, '\n');
@@ -1479,12 +1484,16 @@ calclist(int showall)
 		g->flags |= CGF_LINES;
 		hidden = 1;
 		while ((sptr = *pp)) {
-		    while (sptr && *sptr) {
-			/* TODO: we need to use wcwidth() here */
-			nlines += (nlptr = strchr(sptr, '\n'))
-			    ? 1 + (nlptr - sptr - 1) / columns
-			    : (ztrlen(sptr) - 1) / columns;
-			sptr = nlptr ? nlptr+1 : NULL;
+		    while (*sptr) {
+			if ((nlptr = strchr(sptr, '\n'))) {
+			    *nlptr = '\0';
+			    nlines += 1 + (MB_METASTRWIDTH(sptr)-1) / columns;
+			    *nlptr = '\n';
+			    sptr = nlptr + 1;
+			} else {
+			    nlines += (MB_METASTRWIDTH(sptr)-1) / columns;
+			    break;
+			}
 		    }
 		    nlines++;
 		    pp++;
@@ -1492,7 +1501,7 @@ calclist(int showall)
 		/*** nlines--; */
 	    } else {
 		while (*pp) {
-		    l = ztrlen(*pp);
+		    l = MB_METASTRWIDTH(*pp);
 		    ndisp++;
 		    if (l > glong)
 			glong = l;
@@ -1605,7 +1614,7 @@ calclist(int showall)
 			g->width = 1;
 			
 			while (*pp)
-			    glines += 1 + (ztrlen(*pp++) / columns);
+			    glines += 1 + (MB_METASTRWIDTH(*pp++) / columns);
 		    }
 		}
 	    } else {
@@ -1648,7 +1657,7 @@ calclist(int showall)
 		    VARARR(int, ylens, yl);
 
 		    for (i = 0; *pp; i++, pp++)
-			ylens[i] = ztrlen(*pp) + CM_SPACE;
+			ylens[i] = MB_METASTRWIDTH(*pp) + CM_SPACE;
 
 		    if (g->flags & CGF_ROWS) {
                         int nth, tcol, len;
@@ -1954,7 +1963,7 @@ printlist(int over, CLPrintFunc printm, int showall)
 		while ((p = *pp++)) {
 		    zputs(p, shout);
 		    if (*pp) {
-                        if (ztrlen(p) % columns)
+                        if (MB_METASTRWIDTH(p) % columns)
                             putc('\n', shout);
                         else
                             fputs(" \010", shout);
@@ -1976,7 +1985,7 @@ printlist(int over, CLPrintFunc printm, int showall)
 			zputs(*pq, shout);
 			if (i) {
 			    a = (g->widths ? g->widths[mc] : g->width) -
-				strlen(*pq);
+				MB_METASTRWIDTH(*pq);
 			    while (a--)
 				putc(' ', shout);
 			}

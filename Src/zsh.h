@@ -1928,7 +1928,15 @@ typedef char *(*ZleGetLineFn) _((int *, int *));
 typedef wint_t convchar_t;
 #define MB_METACHARLENCONV(str, cp)	mb_metacharlenconv((str), (cp))
 #define MB_METACHARLEN(str)	mb_metacharlenconv(str, NULL)
-#define MB_METASTRLEN(str)	mb_metastrlen(str)
+#define MB_METASTRLEN(str)	mb_metastrlen(str, 0)
+#define MB_METASTRWIDTH(str)	mb_metastrlen(str, 1)
+
+/*
+ * Note WCWIDTH() takes wint_t, typically as a convchar_t.
+ * It's written to use the wint_t from mb_metacharlenconv() without
+ * further tests.
+ */
+#define WCWIDTH(wc)	((wc == WEOF) ? 1 : wcwidth(wc))
 
 #define MB_INCOMPLETE	((size_t)-2)
 #define MB_INVALID	((size_t)-1)
@@ -1954,6 +1962,9 @@ typedef int convchar_t;
 #define MB_METACHARLENCONV(str, cp)	metacharlenconv((str), (cp))
 #define MB_METACHARLEN(str)	(*(str) == Meta ? 2 : 1)
 #define MB_METASTRLEN(str)	ztrlen(str)
+#define MB_METASTRWIDTH(str)	ztrlen(str)
+
+#define WCWIDTH(c)	(1)
 
 /* Leave character or string as is. */
 #define ZWC(c)	c
