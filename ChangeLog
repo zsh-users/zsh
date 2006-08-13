@@ -1,3 +1,8 @@
+2006-08-13  Clint Adams  <clint@zsh.org>
+
+	* unposted: Functions/Zle/.distfiles,
+	Completion/Unix/Command/.distfiles: update distributed files.
+
 2006-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22599: Src/utils.c, Src/zsh.h, Src/Zle/complist.c,
