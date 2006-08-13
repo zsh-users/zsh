@@ -12,7 +12,7 @@
 	two hunks of 22594 which appeared to both unnecessary and
 	incorrect.
 
-2006-08-10  Barton E. Schaefer  <schaefer@brasslantern.com>
+2006-08-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 22595: Src/Zle/complist.c: paranoid bounds-checking on some
 	loop indices.
