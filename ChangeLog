@@ -10,6 +10,11 @@
 	* 22605: Src/Zle/complist.c: bug in 22597 noticed by Bart
 	when not printing.
 
+2006-08-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22601: Completion/Unix/Type/_list_files: need to unquote
+	characters quoted by the completion mechanism.
+
 2006-08-13  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Zle/.distfiles,

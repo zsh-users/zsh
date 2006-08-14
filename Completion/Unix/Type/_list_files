@@ -8,7 +8,7 @@
 # Sets array listfiles to the display strings and the array
 # listopts appropriately to be added to the compadd command line.
 
-local stat f elt what
+local stat f elt what dir
 local -a stylevals
 integer ok
 
@@ -48,14 +48,17 @@ done
 
 zmodload -i zsh/stat 2>/dev/null || return 1
 
-for f in ${(P)1}; do
-  if [[ ! -e "${2:+$2/}$f" ]]; then
-    listfiles+=("${2:+$2/}$f")
+dir=${2:+$2/}
+dir=${(Q)dir}
+
+for f in ${(PQ)1}; do
+  if [[ ! -e "$dir$f" ]]; then
+    listfiles+=("$dir$f")
     continue
   fi
 
   # Borrowed from Functions/Example/zls
-  stat -s -H stat -F "%b %e %H:%M" - "${2:+$2/}$f" >/dev/null 2>&1
+  stat -s -H stat -F "%b %e %H:%M" - "$dir$f" >/dev/null 2>&1
 
   listfiles+=("$stat[mode] ${(l:3:)stat[nlink]} ${(r:8:)stat[uid]} \
  ${(r:8:)stat[gid]} ${(l:8:)stat[size]} $stat[mtime] $f")
