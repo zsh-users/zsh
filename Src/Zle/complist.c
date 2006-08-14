@@ -1069,6 +1069,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    return mlprinted;
 		}
 	    }
+	    else
+		p += len;
 	}
     }
     if (dopr) {

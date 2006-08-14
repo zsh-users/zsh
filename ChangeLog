@@ -1,3 +1,8 @@
+2006-08-14  Peter Stephenson  <pws@csr.com>
+
+	* 22605: Src/Zle/complist.c: bug in 22597 noticed by Bart
+	when not printing.
+
 2006-08-13  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Zle/.distfiles,
