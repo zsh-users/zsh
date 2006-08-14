@@ -71,9 +71,10 @@ local wordstyle spacepat wordpat1 wordpat2 opt charskip wordchars wordclass
 local match mbegin mend pat1 pat2 word1 word2 ws1 ws2 ws3 skip
 local nwords MATCH MBEGIN MEND
 
-if [[ -z $curcontext ]]; then
-    local curcontext=:zle:match-words-by-style
-fi
+local curcontext=${curcontext:-:zle:match-words-by-style}
+
+autoload -U match-word-context
+match-word-context
 
 while getopts "w:s:c:C:" opt; do
   case $opt in
@@ -108,27 +109,12 @@ case $wordstyle in
 	  # This splits the line into words as the shell understands them.
 	  bufwords=(${(z)LBUFFER})
 	  nwords=${#bufwords}
-	  # Work around bug: if stripping quotes failed, a bogus
-	  # space is appended.  Not a good test, since this may
-	  # be a quoted space, but it's hard to get right.
-	  wordpat1=${bufwords[-1]}
-	  if [[ ${wordpat1[-1]} = ' ' ]]; then
-	    wordpat1=${(q)wordpat1[1,-2]}
-	  else
-	    wordpat1="${(q)wordpat1}"
-	  fi
+	  wordpat1="${(q)bufwords[-1]}"
 
 	  # Take substring of RBUFFER to skip over $skip characters
 	  # from the cursor position.
 	  bufwords=(${(z)RBUFFER[1+$skip,-1]})
-	  # Work around bug again.
-	  wordpat2=${bufwords[1]}
-	  if [[ ${wordpat2[-1]} = ' ' ]]
-	  then
-	    wordpat2=${(q)wordpat2[1,-2]}
-	  else
-	    wordpat2="${(q)wordpat2}"
-	  fi
+	  wordpat2="${(q)bufwords[1]}"
 	  spacepat='[[:space:]]#'
 
 	  # Assume the words are at the top level, i.e. if we are inside

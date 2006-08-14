@@ -1,5 +1,10 @@
 2006-08-14  Peter Stephenson  <pws@csr.com>
 
+	* 22606: Doc/Zsh/contrib.yo, Functions/Zle/match-word-context,
+	Functions/Zle/match-words-by-style, Functions/Zle/.distfiles: new
+	word-context style for word matching, remove out-of-date handling
+	for bug.
+
 	* 22605: Src/Zle/complist.c: bug in 22597 noticed by Bart
 	when not printing.
 

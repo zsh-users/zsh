@@ -1,0 +1,48 @@
+# See if we can extend the word context to something more specific.
+# curcontext must be set to the base context by this point; it
+# will be appended to directly.
+
+emulate -L zsh
+setopt extendedglob
+
+local -a worcon bufwords
+local pat tag lastword word
+integer iword
+
+zstyle -a $curcontext word-context worcon || return 0
+
+if (( ${#worcon} % 2 )); then
+  zle -M "Bad word-context style in context $curcontext"
+  return
+fi
+
+bufwords=(${(z)LBUFFER})
+iword=${#bufwords}
+lastword=${bufwords[-1]}
+bufwords=(${(z)BUFFER})
+
+if [[ $lastword = ${bufwords[iword]} ]]; then
+  # If the word immediately left of the cursor is complete,
+  # we're not on it.  Either we're on unquoted whitespace, or
+  # the start of a new word.  Test the latter.
+  if [[ -z $RBUFFER ]]; then
+    # Nothing there, so not in a word.
+      word=''
+  elif [[ $RBUFFER[1] = [[:space:]] ]]; then
+    # Whitespace, so not in a word.
+    word=' '
+  else
+    # We want the next word along.
+    word=${bufwords[iword+1]}
+  fi
+else
+  # We're on a word.
+  word=${bufwords[iword]}
+fi
+
+for pat tag in "${worcon[@]}"; do
+  if [[ $word = ${~pat} ]]; then
+    curcontext+=":$tag"
+    return
+  fi
+done

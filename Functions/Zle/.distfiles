@@ -11,6 +11,7 @@ incarg                         incremental-complete-word
 insert-composed-char           insert-files                   
 insert-unicode-char            keeper                         
 keymap+widget                  kill-word-match                
+match-word-context
 match-words-by-style           narrow-to-region               
 narrow-to-region-invisible     predict-on                     
 quote-and-complete-word        read-from-minibuffer           
