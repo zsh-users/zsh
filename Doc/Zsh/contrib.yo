@@ -487,16 +487,15 @@ has been set, and tt(transpose-words-match) is called with the cursor on
 the var(X) of tt(foo)var(X)tt(bar), where var(X) can be any character, then
 the resulting expression is tt(bar)var(X)tt(foo).
 
-Finer grained control can be obtained by setting the style
-tt(word-context) to an array of pairs of entries.  Each pair of entries
-consists of a var(pattern) and a var(subcontext).  The word the cursor is on is
+Finer grained control can be obtained by setting the style tt(word-context)
+to an array of pairs of entries.  Each pair of entries consists of a
+var(pattern) and a var(subcontext).  The shell argument the cursor is on is
 matched against each var(pattern) in turn until one matches; if it does,
 the context is extended by a colon and the corresponding var(subcontext).
-Note that the test is made against the original word on the line, with
-no stripping of quotes.  If the cursor is at the end of the line
-the test is maded against an empty string; if it is on whitespace
-between words the test is made against a single space.  Some examples
-are given below.
+Note that the test is made against the original word on the line, with no
+stripping of quotes.  If the cursor is at the end of the line the test is
+performed against an empty string; if it is on whitespace between words the
+test is made against a single space.  Some examples are given below.
 
 Here are some examples of use of the styles, actually taken from the
 simplified interface in tt(select-word-style):
@@ -516,7 +515,7 @@ Neither of the styles tt(word-chars) nor tt(word-class) is used in this case.
 Here are some examples of use of the tt(word-context) style to extend
 the context.
 
-example(zstyle ':zle:*' word-context "[[:space:]]" whitespace "*/*" file
+example(zstyle ':zle:*' word-context "*/*" file "[[:space:]]" whitespace
 zstyle ':zle:transpose-words:whitespace' word-style shell
 zstyle ':zle:transpose-words:filename' word-style normal
 zstyle ':zle:transpose-words:filename' word-chars '')
