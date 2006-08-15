@@ -1,3 +1,8 @@
+2006-08-15  Clint Adams  <clint@zsh.org>
+
+	* 22609: Completion/Unix/Command/_baz: complete for
+	switch subcommand.
+
 2006-08-14  Peter Stephenson  <pws@csr.com>
 
 	* 22608: Doc/Zsh/contrib.yo: improvments on 22606.
