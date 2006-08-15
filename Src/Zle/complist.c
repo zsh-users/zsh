@@ -1529,11 +1529,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
             }
 	}
 	if (!dolist(ml)) {
-	    int nc = printfmt(m->disp, 0, 0, 0);
-	    if (nc)
-		mlprinted = (nc - 1) / columns;
-	    else
-		mlprinted = 0;
+	    mlprinted = printfmt(m->disp, 0, 0, 0);
 	    return 0;
 	}
 	if (m->gnum == mselect) {

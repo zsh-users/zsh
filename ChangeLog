@@ -1,3 +1,8 @@
+2006-08-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22611: Src/Zle/complist.c: bug when scrolling completion
+	list with line wider than screen.
+
 2006-08-15  Clint Adams  <clint@zsh.org>
 
 	* 22609: Completion/Unix/Command/_baz: complete for
