@@ -268,9 +268,10 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		zwarnnam(nam, "invalid argument: %s", args[0]);
 		return 1;
 	    }
-	    if (oc == 'L')
+	    if (oc == 'L') {
 		list = 2;
-	    else if (oc == 'e') {
+		args++;
+	    } else if (oc == 'e') {
 		eval = add = 1;
 		args++;
 	    }
@@ -305,13 +306,44 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	Style s;
 	Stypat p;
 	char **v;
+	char *context, *stylename;
+	Patprog contprog;
+
+	switch (arrlen(args)) {
+	case 2:
+	    context = args[0];
+	    stylename = args[1];
+	    break;
+
+	case 1:
+	    context = args[0];
+	    stylename = NULL;
+	    break;
+
+	case 0:
+	    context = stylename = NULL;
+	    break;
+
+	default:
+	    zwarnnam(nam, "too many arguments");
+	    return 1;
+	}
+	if (context) {
+	    tokenize(context);
+	    contprog = patcompile(context, PAT_STATIC, NULL);
+	} else
+	    contprog = NULL;
 
 	for (s = zstyles; s; s = s->next) {
 	    if (list == 1) {
 		quotedzputs(s->name, stdout);
 		putchar('\n');
 	    }
+	    if (stylename && strcmp(s->name, stylename) != 0)
+		continue;
 	    for (p = s->pats; p; p = p->next) {
+		if (contprog && !pattry(contprog, p->pat))
+		    continue;
 		if (list == 1)
 		    printf("%s  %s", (p->eval ? "(eval)" : "      "), p->pat);
 		else {
