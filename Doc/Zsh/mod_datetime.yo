@@ -6,12 +6,27 @@ The tt(zsh/datetime) module makes available one builtin command:
 startitem()
 findex(strftime)
 cindex(date string, printing)
-item(tt(strftime) [ tt(-s) var(scalar) ] var(format) var(epochtime) )(
+xitem(tt(strftime) [ tt(-s) var(scalar) ] var(format) var(epochtime) )
+item(tt(strftime) tt(-r) [ tt(-q) ] [ tt(-s) var(scalar) ] var(format) var(timestring) )(
 Output the date denoted by var(epochtime) in the var(format)
 specified.
 
-If tt(-s) var(scalar) is given, assign the date to var(scalar) instead
-of printing it.
+With the option tt(-r) (reverse), use the format var(format) to parse the
+input string var(timestring) and output the number of seconds since the
+epoch at which the time occurred.  If no timezone is parsed, the current
+timezone is used; other parameters are set to zero if not present.  If
+var(timestring) does not match var(format) the command returns status 1; it
+will additionally print an error message unless the option tt(-q) (quiet)
+is given.  If var(timestring) matches var(format) but not all characters in
+var(timestring) were used, the conversion succeeds; however, a warning is
+issued unless the option tt(-q) is given.  The matching is implemented by
+the system function tt(strptime); see manref(strptime)(3).  This means that
+zsh format extensions are not available, however for reverse lookup they
+are not required.  If the function is not implemented, the command returns
+status 2 and (unless tt(-q) is given) prints a message.
+
+If tt(-s) var(scalar) is given, assign the date string (or epoch time
+in seconds if tt(-r) is given) to var(scalar) instead of printing it.
 )
 enditem()
 

@@ -1096,7 +1096,8 @@ dnl ---------------
 dnl need to integrate this function
 dnl AC_FUNC_STRFTIME
 
-AC_CHECK_FUNCS(strftime difftime gettimeofday \
+AC_CHECK_FUNCS(strftime strptime mktime timelocal \
+	       difftime gettimeofday \
 	       select poll \
 	       readlink faccessx fchdir ftruncate \
 	       fstat lstat lchown fchown fchmod \

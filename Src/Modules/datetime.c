@@ -31,6 +31,68 @@
 #include "datetime.pro"
 #include <time.h>
 
+#ifndef HAVE_MKTIME
+#ifdef HAVE_TIMELOCAL
+#define	mktime(x)	timelocal(x)
+#define HAVE_MKTIME	1
+#endif
+#endif
+
+static int
+reverse_strftime(char *nam, char **argv, char *scalar, int quiet)
+{
+#if defined(HAVE_STRPTIME) && defined(HAVE_MKTIME)
+    struct tm tm;
+    zlong mytime;
+    char *endp;
+
+    /*
+     * Initialise all parameters to zero; there's no floating point
+     * so memset() will do the trick.  The exception is that tm_isdst
+     * is set to -1 which, if not overridden, will cause mktime()
+     * to use the current timezone.  This is probably the best guess;
+     * it's the one that will cause dates and times output by strftime
+     * without the -r option and without an explicit timezone to be
+     * converted back correctly.
+     */
+    (void)memset(&tm, 0, sizeof(tm));
+    tm.tm_isdst = -1;
+    endp = strptime(argv[1], argv[0], &tm);
+
+    if (!endp) {
+	/* Conversion failed completely. */
+	if (!quiet)
+	    zwarnnam(nam, "format not matched");
+	return 1;
+    }
+
+    mytime = (zlong)mktime(&tm);
+
+    if (scalar)
+	setiparam(scalar, mytime);
+    else {
+	char buf[DIGBUFSIZE];
+	convbase(buf, mytime, 10);
+	printf("%s\n", buf);
+    }
+
+    if (*endp && !quiet) {
+	/*
+	 * Not everything in the input string was converted.
+	 * This is probably benign, since the format has been satisfied,
+	 * but issue a warning unless the quiet flag is set.
+	 */
+	zwarnnam(nam, "warning: input string not completely matched");
+    }
+
+    return 0;
+#else
+    if (!quiet)
+	zwarnnam(nam, "not implemented on this system");
+    return 2;
+#endif
+}
+
 static int
 bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 {
@@ -46,6 +108,8 @@ bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 	    return 1;
 	}
     }
+    if (OPT_ISSET(ops, 'r'))
+	return reverse_strftime(nam, argv, scalar, OPT_ISSET(ops, 'q'));
 
     secs = (time_t)strtoul(argv[1], &endptr, 10);
     if (secs == (time_t)ULONG_MAX) {
@@ -83,7 +147,7 @@ getcurrentsecs()
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("strftime",    0, bin_strftime,    2,   2, 0, "s:", NULL),
+    BUILTIN("strftime",    0, bin_strftime,    2,   2, 0, "qrs:", NULL),
 };
 
 static const struct gsu_integer epochseconds_gsu =
