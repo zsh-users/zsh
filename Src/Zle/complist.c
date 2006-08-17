@@ -36,7 +36,13 @@
  * type. */
 
 
+/*
+ * menu-select widget: used to test if it's already loaded.
+ */
 static Widget w_menuselect;
+/*
+ * Similarly for the menuselect and listscroll keymaps.
+ */
 static Keymap mskeymap, lskeymap;
 
 /* Indixes into the terminal string arrays. */
@@ -389,16 +395,92 @@ getcols(Listcols c)
 
 /* Information about the list shown. */
 
-static int noselect, mselect, inselect, mcol, mline, mcols, mlines, mmlen;
+/*
+ * noselect: 1 if complistmatches indicated we shouldn't do selection.
+ *           Tested in domenuselect.
+ * mselect:  Local copy of the index of the currently selected match.
+ *           Initialised to the gnum entry of the current match for
+ *           each completion.
+ * inselect: 1 if we already selecting matches; tested in complistmatches()
+ * mcol:     The column for the selected completion.  As we never scroll
+ *           horizontally this applies both the screen and the logical array.
+ * mline:    The line for the selected completion in the logical array of
+ *           all matches, not all of which may be on screen at once.
+ * mcols:    Local copy of columns used in sizing arrays. 
+ * mlines:   The number of lines in the logical array of all matches,
+ *           initialised from listdat.nlines.
+ */
+static int noselect, mselect, inselect, mcol, mline, mcols, mlines;
+/*
+ * selected: Used to signal between domenucomplete() and menuselect()
+ *           that a selected entry has been found.  Or something.
+ * mlbeg:    The first line of the logical array of all matches that
+ *           fits on screen.
+ * mlend:    The line after the last that fits on screen.
+ * mscroll:  1 if the scrolling prompt is shown on screen.
+ * mrestlines: The number of screen lines remaining to be processed.
+ */
 static int selected, mlbeg = -1, mlend = 9999999, mscroll, mrestlines;
+/*
+ * mnew: 1 if a new selection menu is being displayed.
+ * mlastcols: stored value of mcols for use in calculating mnew.
+ * mlastlines: stored value of mlines for use in calculating mnew.
+ * mhasstat: Indicates if the status line is present (but maybe not
+ *           yet printed).
+ * mfirstl: The first line of the logical array of all matches to
+ *          be shown on screen, -1 if this has not yet been determined.
+ * mlastm: The index of the selected match in some circumstances; used
+ *         if an explicit number for a match is passed to compprintfmt();
+ *         initialised from the total number of matches.  I realise this
+ *         isn't very illuminating.
+ */
 static int mnew, mlastcols, mlastlines, mhasstat, mfirstl, mlastm;
+/*
+ * mlprinted: Used to signal the number of additional lines printed
+ *            when outputting matches (as argument passing is a bit
+ *            screwy within the completion system).
+ * molbeg:    The last value of mlbeg; -1 if invalid, -42 if, er, very
+ *            invalid.  Used in calculations of how much to draw.
+ * mocol:     The last value of mcol.
+ * moline:    The last value of mline.
+ * mstatprinted: Indicates that the status line has now been printed,
+ *               c.f. mhasstat.
+ */
 static int mlprinted, molbeg = -2, mocol = 0, moline = 0, mstatprinted;
+/*
+ * mstatus: The message printed when scrolling.
+ * mlistp: The message printed when merely listing.
+ */
 static char *mstatus, *mlistp;
+/*
+ * mtab is the logical array of all matches referred to above.  It
+ * contains mcols*mlines entries.  These entries contain a pointer to
+ * the match structure which is in use at a particular point.  Note
+ * that for multiple line entries lines after the first contain NULL.
+ *
+ * mmtabp is a pointer to the selected entry in mtab.
+ */
 static Cmatch **mtab, **mmtabp;
+/*
+ * Used to indicate that the list has changed and needs redisplaying.
+ */
 static int mtab_been_reallocated;
+/*
+ * Array and pointer for the match group in exactly the same layout
+ * as mtab and mmtabp.
+ */
 static Cmgroup *mgtab, *mgtabp;
+/*
+ * Contains information about the colours to be used for entries.
+ * Sometimes mcolors is passed as an argument even though it's
+ * availabel to all the functions.
+ */
 static struct listcols mcolors;
 #ifdef DEBUG
+/*
+ * Allow us to keep track of pointer arithmetic for mgtab; could
+ * just as well have been for mtab but wasn't.
+ */
 int mgtabsize;
 #endif
 
@@ -1539,7 +1621,6 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	    mcol = 0;
 	    mmtabp = mtab + mm;
 	    mgtabp = mgtab + mm;
-	    mmlen = mcols;
 	    zcputs(&mcolors, g->name, COL_MA);
 	} else if ((m->flags & CMF_NOLIST) &&
                    mcolors.files[COL_HI] && mcolors.files[COL_HI]->col)
@@ -1601,7 +1682,6 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	    mline = ml;
 	    mmtabp = mtab + mx + mm;
 	    mgtabp = mgtab + mx + mm;
-	    mmlen = width;
 	    zcputs(&mcolors, g->name, COL_MA);
 	} else if (m->flags & CMF_NOLIST)
 	    zcputs(&mcolors, g->name, COL_HI);
