@@ -1,5 +1,8 @@
 2006-08-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 22643: Src/Zle/zle_tricky.c: completion in math context was
+	broken by searching for multibyte word characters.
+
 	* 22638: Src/Modules/zutil.c: deleting styles in contexts didn't
 	remove the style itself if it was the last context.
 

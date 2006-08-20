@@ -1444,6 +1444,7 @@ get_comp_string(void)
 		    wb = wptr - zlemetaline;
 		    break;
 		}
+		wptr = cptr;
 	    }
 	}
 	zsfree(s);
@@ -1464,6 +1465,7 @@ get_comp_string(void)
 		}
 		if (cptr >= sqbr)
 		    break;
+		wptr = cptr;
 	    }
 
 	    if (wptr < sqbr) {
