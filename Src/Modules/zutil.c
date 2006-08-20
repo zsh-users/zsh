@@ -54,7 +54,7 @@ struct stypat {
     
 /* List of styles. */
 
-static Style zstyles, zlstyles;
+static Style zstyles;
 
 /* Memory stuff. */
 
@@ -117,7 +117,7 @@ freeallstyles(void)
 	zsfree(s->name);
 	zfree(s, sizeof(*s));
     }
-    zstyles = zlstyles = NULL;
+    zstyles = NULL;
 }
 
 /* Get the style struct for a name. */
@@ -233,11 +233,8 @@ addstyle(char *name)
     s->pats = NULL;
     s->name = ztrdup(name);
 
-    if (zlstyles)
-	zlstyles->next = s;
-    else
-	zstyles = s;
-    zlstyles = s;
+    s->next = zstyles;
+    zstyles = s;
 
     return s;
 }
@@ -1748,7 +1745,7 @@ static struct builtin bintab[] = {
 int
 setup_(UNUSED(Module m))
 {
-    zstyles = zlstyles = NULL;
+    zstyles = NULL;
 
     return 0;
 }

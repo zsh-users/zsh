@@ -1,5 +1,8 @@
 2006-08-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 22650: Src/Modules/zutil.c: when deleting styles, the pointer
+	to the last style can become invalid.
+
 	* 22643: Src/Zle/zle_tricky.c: completion in math context was
 	broken by searching for multibyte word characters.
 
