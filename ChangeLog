@@ -1,5 +1,8 @@
 2006-08-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 22651: Src/Zle/complist.c, Src/Zle/zle_tricky.c: failed to
+	unmetafy bytes for output.
+
 	* 22650: Src/Modules/zutil.c: when deleting styles, the pointer
 	to the last style can become invalid.
 

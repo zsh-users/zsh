@@ -621,7 +621,11 @@ clprintfmt(Listcols c, char *p, int ml)
 	if (ml == mlend - 1 && (cc % columns) == columns - 1)
 	    return 0;
 
-	putc(*p, shout);
+	if (*p == Meta) {
+	    p++;
+	    putc(*p ^ 32, shout);
+	} else
+	    putc(*p, shout);
 	if ((beg = !(cc % columns)))
 	    ml++;
 	if (mscroll && !(cc % columns) &&
@@ -1137,8 +1141,14 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    dopr = 0;
 		    continue;
 		}
-		while (len--)
-		    putc(*p++, shout);
+		while (len--) {
+		    if (*p == Meta) {
+			len--;
+			p++;
+			putc(*p++ ^ 32, shout);
+		    } else
+			putc(*p++, shout);
+		}
 		if ((beg = !(cc % columns)) && !stat) {
 		    ml++;
                     fputs(" \010", shout);

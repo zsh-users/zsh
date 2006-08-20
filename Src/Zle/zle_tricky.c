@@ -2123,9 +2123,15 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 			tcout(TCUNDERLINEEND);
 		    break;
 		case '{':
-		    for (p++; *p && (*p != '%' || p[1] != '}'); p++)
-			if (dopr)
+		    for (p++; *p && (*p != '%' || p[1] != '}'); p++) {
+			if (*p == Meta) {
+			    p++;
+			    if (dopr) 
+				putc(*p ^ 32, shout);
+			}
+			else if (dopr)
 			    putc(*p, shout);
+		    }
 		    if (*p)
 			p++;
 		    else
@@ -2164,8 +2170,14 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		convchar_t cchar;
 		int clen = MB_METACHARLENCONV(p, &cchar);
 		if (dopr) {
-		    while (clen--)
-			putc(*p++, shout);
+		    while (clen--) {
+			if (*p == Meta) {
+			    p++;
+			    clen--;
+			    putc(*p++ ^ 32, shout);
+			} else
+			    putc(*p++, shout);
+		    }
 		} else
 		    p += clen;
 		cc += WCWIDTH(cchar);
