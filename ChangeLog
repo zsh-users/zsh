@@ -1,3 +1,8 @@
+2006-08-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* zsh-users/10634: Completion/compinstall: attempt to fix up
+	relative paths of completion configuration file.
+
 2006-08-21  Clint Adams  <clint@zsh.org>
 
 	* 22655: Ralph Amissah: Completion/Unix/Command/_sisu:

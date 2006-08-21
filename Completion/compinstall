@@ -109,15 +109,23 @@ if [[ -n $basic ]]; then
   return
 fi
 
-
 local newifile=$ifile
 if [[ $foundold = true ]]; then
-  print "I have found completion definitions in $ifile.
+  if [[ $newifile != [~/]* ]]; then
+    newifile=${ZDOTDIR:-~}/$newifile
+    print "[Existing completion definition file is not absolute path:
+updating to $newifile]"
+  fi
+  print "I have found completion definitions in $newifile.
 If you want me to read these, just hit return.  Otherwise, edit the file
 name to look for definitions somewhere else, or delete the whole line
 in order not to use existing definitions."
   vared -ch -p 'file> ' newifile
-  [[ -z $newifile ]] && foundold=false
+  if [[ -n $newifile && $newifile != [/~]* ]]; then
+    newifile=$PWD/$newifile
+    print "[Not absolute path: updating to $newifile]"
+  fi
+  [[ -z $newifile || ! -f $newfile ]] && foundold=false
 else
   print "I haven't found any existing completion definitions.
 If you have some already defined by compinstall, edit the name of the
@@ -126,6 +134,10 @@ are exactly the form in which compinstall inserted them.  If you leave
 the line as it is, or empty, I won't search."
   while true;  do
     vared -ch -p 'file> ' newifile || break
+    if [[ -n $newifile && $newifile != [/~]* ]]; then
+      newifile=$PWD/$newifile
+      print "[Not absolute path: updating to $newifile]"
+    fi
     if [[ -n $newifile && $ifile != $newifile ]]; then
       if __ci_test_ifile $newifile; then
         foundold=true
@@ -138,7 +150,7 @@ leave the line blank to ignore it."
     fi
   done
 fi
-ifile=$newifile
+ifile=${~newifile}
 
 if [[ $foundold = true ]]; then
   sed -n "/^[ 	]*$startline/,/^[ 	]*$endline/p" $ifile |
@@ -1926,6 +1938,10 @@ if [[ -z $ifile || -d $ifile ]] ||
    print "Enter file to save in (~ will be expanded), or return to abort:"
    ifile=
    vared -ch -p 'file> ' ifile
+   if [[ $ifile != [/~]* ]]; then
+     ifile=$PWD/$ifile
+     print "[Not absolute path; updating to $ifile]"
+   fi
    ifile=${~ifile}
 fi
 
