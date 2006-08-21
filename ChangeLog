@@ -1,3 +1,8 @@
+2006-08-21  Clint Adams  <clint@zsh.org>
+
+	* 22655: Ralph Amissah: Completion/Unix/Command/_sisu:
+	completion for sisu.
+
 2006-08-21  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/compsys.yo: extra documentation arising out of
