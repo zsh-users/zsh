@@ -1751,6 +1751,9 @@ escape sequences `tt(%S)', `tt(%s)', `tt(%B)', `tt(%b)', `tt(%U)',
 standout, bold and underline are also available, as is the form
 `tt(%{)...tt(%})' for enclosing escape sequences which display with zero
 width.
+
+After deleting this prompt the variable tt(LISTPROMPT) should be unset for
+the the removal to take effect.
 )
 kindex(list-rows-first, completion style)
 item(tt(list-rows-first))(
@@ -2624,6 +2627,10 @@ example(zle -C all-matches complete-word _generic
 bindkey '^Xa' all-matches
 zstyle ':completion:all-matches:*' old-matches only
 zstyle ':completion:all-matches::::' completer _all_matches)
+
+Note that this does not generate completions by itself.  First use
+any of the standard ways of generating a list of completions,
+then use tt(^Xa) to show all matches.
 )
 findex(_approximate)
 item(tt(_approximate))(
