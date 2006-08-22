@@ -1,3 +1,8 @@
+2006-08-22  Peter Stephenson  <pws@csr.com>
+
+	* 22656: Src/options.c (slightly tweaked): improve handling of
+	monitor option a bit.
+
 2006-08-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* zsh-users/10634: Completion/compinstall: attempt to fix up

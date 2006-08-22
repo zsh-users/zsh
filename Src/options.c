@@ -687,7 +687,16 @@ dosetopt(int optno, int value, int force)
 	setuid(getuid());
 	setgid(getgid());
 #endif /* HAVE_SETUID */
-#ifndef JOB_CONTROL
+#ifdef JOB_CONTROL
+    } else if (!force && optno == MONITOR && value) {
+	if (opts[optno] == value)
+	    return 0;
+	if (interact && (SHTTY != -1)) {
+	    origpgrp = GETPGRP();
+	    acquire_pgrp();
+	} else
+	    return -1;
+#else
     } else if(optno == MONITOR && value) {
 	    return -1;
 #endif /* not JOB_CONTROL */
