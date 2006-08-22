@@ -1,3 +1,8 @@
+2006-08-22  Peter Stephenson  <pws@csr.com>
+
+	* 22656: Src/options.c (slightly tweaked): improve handling of
+	monitor option a bit.
+
 2006-08-04  Peter Stephenson  <pws@csr.com>
 
 	* 22583: Peter A. Castro: Src/Modules/mathfunc.c: Cygwin erand48()
