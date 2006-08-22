@@ -142,6 +142,7 @@ local cmd_log_ls cmd_update cmd_join_branch cmd_replay cmd_deltapatch
 local cmd_delta_patch cmd_apply_delta cmd_sync_tree cmd_make_sync_tree
 local cmd_delta cmd_revdelta cmd_library_categories cmd_library_branches
 local cmd_library_versions cmd_library_revisions
+local cmd_archive_register
 
 cmd_log_ls=('*:version:_tla_log_versions')
 cmd_log_versions=()
@@ -149,6 +150,7 @@ cmd_log_versions=()
 
 if is-at-least 1.1 $tla_version; then
   cmd_register_archive=('::archive:_tla_archives' ':location:_files -/')
+  cmd_archive_register=($cmd_register_archive)
   cmd_archives=('::regex:')
   cmd_redo=('::changeset:_files -/')
   cmd_changes=('::revision:_tla_revisions'
@@ -448,8 +450,9 @@ cmd_add_pristine=(':revision:_tla_revisions')
 local cmd_find_pristine
 cmd_find_pristine=(':revision:_tla_revisions')
 
-local cmd_my_revision_library
+local cmd_my_revision_library cmd_library_dir
 cmd_my_revision_library=(':library:_tla_my_revision_library')
+cmd_library_dir=($my_revision_library)
 
 local cmd_library_find
 cmd_library_find=(':revision:_tla_revisions --library')

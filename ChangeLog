@@ -1,3 +1,7 @@
+2006-08-22  Clint Adams  <clint@zsh.org>
+
+	* 2265x: Completion/Unix/Command/_tla: update for tla 1.3.5.
+
 2006-08-22  Peter Stephenson  <pws@csr.com>
 
 	* 22656: Src/options.c (slightly tweaked): improve handling of
