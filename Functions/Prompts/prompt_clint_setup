@@ -56,7 +56,7 @@ $p_shlvlhist$p_rc$p_apm$p_end"
 }
 
 prompt_clint_precmd () {
-  setopt noxtrace localoptions
+  setopt noxtrace noksharrays localoptions
   local exitstatus=$?
 
   [[ $exitstatus -ge 128 ]] && psvar[1]=" $signals[$exitstatus-127]" ||
@@ -67,7 +67,7 @@ prompt_clint_precmd () {
 }
 
 prompt_clint_apm_precmd () {
-  setopt noxtrace localoptions
+  setopt noxtrace noksharrays localoptions
   local bat ac
 
   bat=${${="$(</proc/apm)"}[7]/%/%%}
