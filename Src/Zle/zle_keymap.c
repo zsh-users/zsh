@@ -879,7 +879,7 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 	struct remprefstate rps;
 	rps.km = km;
 	while ((useq = *argv++)) {
-	    bseq = getkeystring(useq, &len, 2, NULL);
+	    bseq = getkeystring(useq, &len, GETKEYS_BINDKEY, NULL);
 	    rps.prefix = metafy(bseq, len, META_USEHEAP);
 	    rps.prefixlen = strlen(rps.prefix);
 	    scankeymap(km, 0, scanremoveprefix, &rps);
@@ -895,14 +895,14 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 	    fn = refthingy(t_undefinedkey);
 	    str = NULL;
 	} else if(func == 's') {
-	    str = getkeystring(*++argv, &len, 2, NULL);
+	    str = getkeystring(*++argv, &len, GETKEYS_BINDKEY, NULL);
 	    fn = NULL;
 	    str = metafy(str, len, META_HREALLOC);
 	} else {
 	    fn = rthingy(*++argv);
 	    str = NULL;
 	}
-	bseq = getkeystring(useq, &len, 2, NULL);
+	bseq = getkeystring(useq, &len, GETKEYS_BINDKEY, NULL);
 	seq = metafy(bseq, len, META_USEHEAP);
 	if(OPT_ISSET(ops,'R')) {
 	    int first, last;
@@ -960,7 +960,7 @@ bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 	int len;
 	char *seq;
 
-	seq = getkeystring(argv[0], &len, 2, NULL);
+	seq = getkeystring(argv[0], &len, GETKEYS_BINDKEY, NULL);
 	seq = metafy(seq, len, META_HREALLOC);
 	bs.flags |= BS_ALL;
 	bs.firstseq = bs.lastseq = seq;
@@ -975,7 +975,8 @@ bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 		zwarnnam(name, "option -p requires a prefix string");
 		return 1;
 	    }
-	    bs.prefix = getkeystring(argv[0], &bs.prefixlen, 2, NULL);
+	    bs.prefix = getkeystring(argv[0], &bs.prefixlen, GETKEYS_BINDKEY,
+				     NULL);
 	    bs.prefix = metafy(bs.prefix, bs.prefixlen, META_HREALLOC);
 	    bs.prefixlen = strlen(bs.prefix);
 	} else {

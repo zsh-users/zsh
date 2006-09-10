@@ -1162,7 +1162,7 @@ makesuffixstr(char *f, char *s, int n)
 	    s++;
 	} else
 	    inv = 0;
-	s = getkeystring(s, &i, 5, &z);
+	s = getkeystring(s, &i, GETKEYS_SUFFIX, &z);
 	s = metafy(s, i, META_USEHEAP);
 	ws = stringaszleline(s, 0, &i, NULL, NULL);
 

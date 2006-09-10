@@ -1900,6 +1900,62 @@ enum {
     CASMOD_CAPS
 };
 
+/*******************************************/
+/* Flags to third argument of getkeystring */
+/*******************************************/
+
+/*
+ * By default handles some subset of \-escapes.  The following bits
+ * turn on extra features.
+ */
+enum {
+    /*
+     * Handle octal where the first digit is non-zero e.g. \3, \33, \333
+     * \0333 etc. is always handled.
+     */
+    GETKEY_OCTAL_ESC = (1 << 0),
+    /*
+     * Handle Emacs-like key sequences \C-x etc.
+     * Also treat \E like \e and use backslashes to escape the
+     * next character if not special, i.e. do all the things we
+     * don't do with the echo builtin.
+     */
+    GETKEY_EMACS = (1 << 1),
+    /* Handle ^X etc. */
+    GETKEY_CTRL = (1 << 2),
+    /* Handle \c (uses misc arg to getkeystring()) */
+    GETKEY_BACKSLASH_C = (1 << 3),
+    /* Do $'...' quoting (len arg to getkeystring() not used) */
+    GETKEY_DOLLAR_QUOTE = (1 << 4),
+    /* Handle \- (uses misc arg to getkeystring()) */
+    GETKEY_BACKSLASH_MINUS = (1 << 5),
+    /* Parse only one character (len arg to getkeystring() not used) */
+    GETKEY_SINGLE_CHAR = (1 << 6)
+};
+
+/*
+ * Standard combinations used within the shell.
+ * Note GETKEYS_... instead of GETKEY_...: this is important in some cases.
+ */
+/* echo builtin */
+#define GETKEYS_ECHO	(GETKEY_BACKSLASH_C)
+/* printf format string */
+#define GETKEYS_PRINTF	(GETKEY_OCTAL_ESC|GETKEY_BACKSLASH_C)
+/* Full print without -e */
+#define GETKEYS_PRINT	(GETKEY_OCTAL_ESC|GETKEY_BACKSLASH_C|GETKEY_EMACS)
+/* bindkey */
+#define GETKEYS_BINDKEY	(GETKEY_OCTAL_ESC|GETKEY_EMACS|GETKEY_CTRL)
+/* $'...' */
+#define GETKEYS_DOLLARS_QUOTE (GETKEY_OCTAL_ESC|GETKEY_EMACS|GETKEY_DOLLAR_QUOTE)
+/* Single character for math processing */
+#define GETKEYS_MATH	\
+	(GETKEY_OCTAL_ESC|GETKEY_EMACS|GETKEY_CTRL|GETKEY_SINGLE_CHAR)
+/* Used to process separators etc. with print-style escapes */
+#define GETKEYS_SEP	(GETKEY_OCTAL_ESC|GETKEY_EMACS)
+/* Used for suffix removal */
+#define GETKEYS_SUFFIX		\
+	(GETKEY_OCTAL_ESC|GETKEY_EMACS|GETKEY_CTRL|GETKEY_BACKSLASH_MINUS)
+
 /**********************************/
 /* Flags to third argument of zle */
 /**********************************/

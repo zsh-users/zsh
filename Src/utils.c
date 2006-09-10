@@ -2804,7 +2804,7 @@ zbeep(void)
     queue_signals();
     if ((vb = getsparam("ZBEEP"))) {
 	int len;
-	vb = getkeystring(vb, &len, 2, NULL);
+	vb = getkeystring(vb, &len, GETKEYS_BINDKEY, NULL);
 	write(SHTTY, vb, len);
     } else if (isset(BEEP))
 	write(SHTTY, "\07", 1);
@@ -4540,26 +4540,14 @@ ucs4toutf8(char *dest, unsigned int wval)
 /*
  * Decode a key string, turning it into the literal characters.
  * The length is (usually) returned in *len.
- * fromwhere determines how the processing works:
- *   0:  Don't handle keystring, just print-like escapes.
- *       If a \c escape is seen, *misc is set to 1.
- *   1:  Handle Emacs-like \C-X arguments etc., but not ^X.
- *       If a \c escape is seen, *misc is set to 1.
- *   2:  Handle ^X as well as emacs-like keys; don't handle \c
- *       (the misc arg is not used).
- *   3:  As 1, but don't handle \c (the misc arg is not used).
- *   4:  Do $'...' quoting.  Overwrites the existing string instead of
- *       zhalloc'ing. If \uNNNN ever generates multi-byte chars longer
- *       than 6 bytes, will need to adjust this to re-allocate memory.
- *   5:  As 2, but \- is special. If \- is seen, *misc is set to 1.
- *   6:  As 2, but parses only one character: returns a pointer to the
- *       next character and puts the parsed character into *misc (the
- *       len arg is not used).
+ * how is a set of bits from the GETKEY_ values defined in zsh.h;
+ * not all combinations of bits are useful.  Callers will typically
+ * use one of the GETKEYS_ values which define sets of bits.
  */
 
 /**/
 mod_export char *
-getkeystring(char *s, int *len, int fromwhere, int *misc)
+getkeystring(char *s, int *len, int how, int *misc)
 {
     char *buf, tmp[1];
     char *t, *u = NULL;
@@ -4579,9 +4567,9 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 # endif
 #endif
 
-    if (fromwhere == 6)
+    if (how & GETKEY_SINGLE_CHAR)
 	t = buf = tmp;
-    else if (fromwhere != 4)
+    else if (!(how & GETKEY_DOLLAR_QUOTE))
 	t = buf = zhalloc(strlen(s) + 1);
     else {
 	t = buf = s;
@@ -4616,7 +4604,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		*t++ = '\r';
 		break;
 	    case 'E':
-		if (!fromwhere) {
+		if (!(how & GETKEY_EMACS)) {
 		    *t++ = '\\', s--;
 		    continue;
 		}
@@ -4625,7 +4613,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		*t++ = '\033';
 		break;
 	    case 'M':
-		if (fromwhere) {
+		if (how & GETKEY_EMACS) {
 		    if (s[1] == '-')
 			s++;
 		    meta = 1 + control;	/* preserve the order of ^ and meta */
@@ -4633,7 +4621,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    *t++ = '\\', s--;
 		continue;
 	    case 'C':
-		if (fromwhere) {
+		if (how & GETKEY_EMACS) {
 		    if (s[1] == '-')
 			s++;
 		    control = 1;
@@ -4644,13 +4632,13 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		*t++ = '\\', s--;
 		break;
 	    case '-':
-		if (fromwhere == 5) {
+		if (how & GETKEY_BACKSLASH_MINUS) {
 		    *misc  = 1;
 		    break;
 		}
 		goto def;
 	    case 'c':
-		if (fromwhere < 2) {
+		if (how & GETKEY_BACKSLASH_C) {
 		    *misc = 1;
 		    *t = '\0';
 		    *len = t - buf;
@@ -4671,7 +4659,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		        break;
 		    }
 		}
-    	    	if (fromwhere == 6) {
+    	    	if (how & GETKEY_SINGLE_CHAR) {
 		    *misc = wval;
 		    return s+1;
 		}
@@ -4679,7 +4667,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		count = wctomb(t, (wchar_t)wval);
 		if (count == -1) {
 		    zerr("character not in range");
-		    if (fromwhere == 4) {
+		    if (how & GETKEY_DOLLAR_QUOTE) {
 			for (u = t; (*u++ = *++s););
 			return t;
 		    }
@@ -4708,7 +4696,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     	    	    cd = iconv_open(nl_langinfo(CODESET), "UCS-4BE");
 		    if (cd == (iconv_t)-1) {
 			zerr("cannot do charset conversion");
-			if (fromwhere == 4) {
+			if (how & GETKEY_DOLLAR_QUOTE) {
 			    for (u = t; (*u++ = *++s););
 			    return t;
 			}
@@ -4742,7 +4730,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	    default:
 	    def:
 		if ((idigit(*s) && *s < '8') || *s == 'x') {
-		    if (!fromwhere) {
+		    if (!(how & GETKEY_OCTAL_ESC)) {
 			if (*s == '0')
 			    s++;
 			else if (*s != 'x') {
@@ -4763,21 +4751,21 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    }
 		    s--;
 		} else {
-		    if (!fromwhere && *s != '\\')
+		    if (!(how & GETKEY_EMACS) && *s != '\\')
 			*t++ = '\\';
 		    *t++ = *s;
 		}
 		break;
 	    }
-	} else if (fromwhere == 4 && *s == Snull) {
+	} else if ((how & GETKEY_DOLLAR_QUOTE) && *s == Snull) {
 	    for (u = t; (*u++ = *s++););
 	    return t + 1;
-	} else if (*s == '^' && !control &&
-		   (fromwhere == 2 || fromwhere == 5 || fromwhere == 6)) {
+	} else if (*s == '^' && !control && (how & GETKEY_CTRL)) {
 	    control = 1;
 	    continue;
 #ifdef MULTIBYTE_SUPPORT
-	} else if (fromwhere == 6 && isset(MULTIBYTE) && STOUC(*s) > 127) {
+	} else if ((how & GETKEY_SINGLE_CHAR) &&
+		   isset(MULTIBYTE) && STOUC(*s) > 127) {
 	    wint_t wc;
 	    int len;
 	    len = mb_metacharlenconv(s, &wc);
@@ -4806,19 +4794,19 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	    t[-1] |= 0x80;
 	    meta = 0;
 	}
-	if (fromwhere == 4 && imeta(t[-1])) {
+	if ((how & GETKEY_DOLLAR_QUOTE) && imeta(t[-1])) {
 	    *t = t[-1] ^ 32;
 	    t[-1] = Meta;
 	    t++;
 	}
-	if (fromwhere == 6 && t != tmp) {
+	if ((how & GETKEY_SINGLE_CHAR) && t != tmp) {
 	    *misc = STOUC(tmp[0]);
 	    return s + 1;
 	}
     }
-    DPUTS(fromwhere == 4, "BUG: unterminated $' substitution");
+    DPUTS(how & GETKEY_DOLLAR_QUOTE, "BUG: unterminated $' substitution");
     *t = '\0';
-    if (fromwhere == 6)
+    if (how & GETKEY_SINGLE_CHAR)
       *misc = 0;
     else
       *len = t - buf;

@@ -1038,8 +1038,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		    goto flagerr;
 		sav = *t;
 		*t = '\0';
-		sep = escapes ? getkeystring(s + 1, &waste, 3, NULL) :
-				dupstring(s + 1);
+		sep = escapes ? getkeystring(s + 1, &waste, GETKEYS_SEP, NULL)
+		    : dupstring(s + 1);
 		*t = sav;
 		s = t;
 		break;

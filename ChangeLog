@@ -1,5 +1,11 @@
 2006-09-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 22684: Src/builtin.c, Src/math.c, Src/params.c, Src/subst.c,
+	Src/utils.c, Src/zsh.h, Src/Zle/zle_hist.c, Src/Zle/zle_hist.c,
+	Src/Zle/zle_misc.c: rewrite getkeystring() to have something
+	approaching an API; printf strings expand octal escapes even
+	without a leading zero.
+
 	* 22676, adapted as in 22678: README, Doc/Zsh/mod_sched.yo,
 	Src/init.c, Src/subst.c, Src/utils.c, Src/zsh.h,
 	Src/Builtins/sched.c, Src/Zle/zle_main.c, Src/Zle/zle_thingy.c:

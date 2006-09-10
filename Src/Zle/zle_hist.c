@@ -902,7 +902,7 @@ doisearch(char **args, int dir)
 	int len;
 	char *arg;
 	savekeys = kungetct;
-	arg = getkeystring(*args, &len, 2, NULL);
+	arg = getkeystring(*args, &len, GETKEYS_BINDKEY, NULL);
 	ungetbytes(arg, len);
     }
 

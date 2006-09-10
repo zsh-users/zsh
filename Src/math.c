@@ -464,7 +464,7 @@ zzlex(void)
 			zerr("character missing after ##");
 			return EOI;
 		    }
-		    ptr = getkeystring(ptr, NULL, 6, &v);
+		    ptr = getkeystring(ptr, NULL, GETKEYS_MATH, &v);
 		    yyval.u.l = v;
 		    return NUM;
 		}

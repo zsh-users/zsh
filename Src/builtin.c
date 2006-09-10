@@ -3488,7 +3488,8 @@ bin_print(char *name, char **args, Options ops, int func)
     else if (OPT_HASARG(ops,'f'))
 	fmt = OPT_ARG(ops,'f');
     if (fmt)
-	fmt = getkeystring(fmt, &flen, OPT_ISSET(ops,'b') ? 2 : 0, &fmttrunc);
+	fmt = getkeystring(fmt, &flen, OPT_ISSET(ops,'b') ? GETKEYS_BINDKEY :
+			   GETKEYS_PRINTF, &fmttrunc);
 
     first = args;
     
@@ -3525,9 +3526,14 @@ bin_print(char *name, char **args, Options ops, int func)
 	     (OPT_ISSET(ops,'R') || OPT_ISSET(ops,'r') || OPT_ISSET(ops,'E'))))
 	    unmetafy(args[n], &len[n]);
 	else {
-	    args[n] = getkeystring(args[n], &len[n], OPT_ISSET(ops,'b') ? 2 :
-				   (func != BIN_ECHO && !OPT_ISSET(ops,'e')),
-				   &nnl);
+	    int escape_how;
+	    if (OPT_ISSET(ops,'b'))
+		escape_how = GETKEYS_BINDKEY;
+	    else if (func != BIN_ECHO && !OPT_ISSET(ops,'e'))
+		escape_how = GETKEYS_PRINT;
+	    else
+		escape_how = GETKEYS_ECHO;
+	    args[n] = getkeystring(args[n], &len[n], escape_how, &nnl);
 	    if (nnl) {
 		/* If there was a \c escape, make this the last arg. */
 		argc = n + 1;
@@ -3933,7 +3939,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		    int l;
 		    if (*c == 'b') {
 			b = getkeystring(metafy(curarg, curlen, META_USEHEAP), &l,
-					 OPT_ISSET(ops,'b') ? 2 : 0, &nnl);
+					 OPT_ISSET(ops,'b') ? GETKEYS_BINDKEY :
+					 GETKEYS_PRINTF, &nnl);
 		    } else {
 			b = curarg;
 			l = curlen;

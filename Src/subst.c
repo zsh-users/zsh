@@ -150,7 +150,7 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		setdata(node, (void *) str3);
 		continue;
 	    } else if (c == Snull) {
-		str = getkeystring(str, NULL, 4, NULL);
+		str = getkeystring(str, NULL, GETKEYS_DOLLARS_QUOTE, NULL);
 		continue;
 	    } else {
 		node = paramsubst(list, node, &str, qt, ssub);
@@ -272,7 +272,7 @@ quotesubst(char *str)
 
     while (*s) {
 	if (*s == String && s[1] == Snull) {
-	    s = getkeystring(s, NULL, 4, NULL);
+	    s = getkeystring(s, NULL, GETKEYS_DOLLARS_QUOTE, NULL);
 	} else {
 	    s++;
 	}
@@ -942,7 +942,7 @@ substevalchar(char *ptr)
 
 	/* inefficient: should separate out \U handling from getkeystring */
 	sprintf(buf, "\\U%.8x", (unsigned int)ires);
-	return getkeystring(buf, &dummy, 2, NULL);
+	return getkeystring(buf, &dummy, GETKEYS_BINDKEY, NULL);
     } else {
 	ptr = zhalloc(2);
 	sprintf(ptr, "%c", (int)ires);
@@ -1232,7 +1232,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 #define UNTOK_AND_ESCAPE(X) {\
 		untokenize(X = dupstring(s + 1));\
 		if (escapes) {\
-		    X = getkeystring(X, &klen, 3, NULL);\
+		    X = getkeystring(X, &klen, GETKEYS_SEP, NULL);\
 		    X = metafy(X, klen, META_HREALLOC);\
 		}\
 	    }
