@@ -911,10 +911,141 @@ dircmp(char *s, char *t)
     return 1;
 }
 
-/* extra functions to call before displaying the prompt */
+/*
+ * Extra functions to call before displaying the prompt.
+ * The data is a Prepromptfn.
+ */
+
+static LinkList prepromptfns;
+
+/* Add a function to the list of pre-prompt functions. */
 
 /**/
-mod_export LinkList prepromptfns;
+mod_export void
+addprepromptfn(voidvoidfnptr_t func)
+{
+    Prepromptfn ppdat = (Prepromptfn)zalloc(sizeof(struct prepromptfn));
+    ppdat->func = func;
+    if (!prepromptfns)
+	prepromptfns = znewlinklist();
+    zaddlinknode(prepromptfns, ppdat);
+}
+
+/* Remove a function from the list of pre-prompt functions. */
+
+/**/
+mod_export void
+delprepromptfn(voidvoidfnptr_t func)
+{
+    LinkNode ln;
+
+    for (ln = firstnode(prepromptfns); ln; ln = nextnode(ln)) {
+	Prepromptfn ppdat = (Prepromptfn)getdata(ln);
+	if (ppdat->func == func) {
+	    (void)remnode(prepromptfns, ln);
+	    zfree(ppdat, sizeof(struct prepromptfn));
+	    return;
+	}
+    }
+#ifdef DEBUG
+    dputs("BUG: failed to delete node from prepromptfns");
+#endif
+}
+
+/*
+ * Functions to call at a particular time even if not at
+ * the prompt.  This is handled by zle.  The data is a
+ * Timedfn.  The functions must be in time order, but this
+ * is enforced by addtimedfn().
+ *
+ * Note on debugging:  the code in sched.c currently assumes it's
+ * the only user of timedfns for the purposes of checking whether
+ * there's a function on the list.  If this becomes no longer the case,
+ * the DPUTS() tests in sched.c need rewriting.
+ */
+
+/**/
+mod_export LinkList timedfns;
+
+/* Add a function to the list of timed functions. */
+
+/**/
+mod_export void
+addtimedfn(voidvoidfnptr_t func, time_t when)
+{
+    Timedfn tfdat = (Timedfn)zalloc(sizeof(struct timedfn));
+    tfdat->func = func;
+    tfdat->when = when;
+
+    if (!timedfns) {
+	timedfns = znewlinklist();
+	zaddlinknode(timedfns, tfdat);
+    } else {
+	LinkNode ln = firstnode(timedfns);
+
+	/*
+	 * Insert the new element in the linked list.  We do
+	 * rather too much work here since the standard
+	 * functions insert after a given node, whereas we
+	 * want to insert the new data before the first element
+	 * with a greater time.
+	 *
+	 * In practice, the only use of timed functions is
+	 * sched, which only adds the one function; so this
+	 * whole branch isn't used beyond the following block.
+	 */
+	if (!ln) {
+	    zaddlinknode(timedfns, tfdat);
+	    return;
+	}
+	for (;;) {
+	    Timedfn tfdat2;
+	    LinkNode next = nextnode(ln);
+	    if (!next) {
+		zaddlinknode(timedfns, tfdat);
+		return;
+	    }
+	    tfdat2 = (Timedfn)getdata(next);
+	    if (when < tfdat2->when) {
+		zinsertlinknode(timedfns, ln, tfdat);
+		return;
+	    }
+	    ln = next;
+	}
+    }
+}
+
+/*
+ * Delete a function from the list of timed functions.
+ * Note that if the function apperas multiple times only
+ * the first occurrence will be removed.
+ *
+ * Note also that when zle calls the function it does *not*
+ * automatically delete the entry from the list.  That must
+ * be done by the function called.  This is recommended as otherwise
+ * the function will keep being called immediately.  (It just so
+ * happens this "feature" fits in well with the only current use
+ * of timed functions.)
+ */
+
+/**/
+mod_export void
+deltimedfn(voidvoidfnptr_t func)
+{
+    LinkNode ln;
+
+    for (ln = firstnode(timedfns); ln; ln = nextnode(ln)) {
+	Timedfn ppdat = (Timedfn)getdata(ln);
+	if (ppdat->func == func) {
+	    (void)remnode(timedfns, ln);
+	    zfree(ppdat, sizeof(struct timedfn));
+	    return;
+	}
+    }
+#ifdef DEBUG
+    dputs("BUG: failed to delete node from timedfns");
+#endif
+}
 
 /* the last time we checked mail */
 
@@ -1027,10 +1158,12 @@ preprompt(void)
 	lastmailcheck = time(NULL);
     }
 
-    /* Some people have claimed that C performs type    *
-     * checking, but they were later found to be lying. */
-    for(ln = firstnode(prepromptfns); ln; ln = nextnode(ln))
-	(**(void (**) _((void)))getdata(ln))();
+    if (prepromptfns) {
+	for(ln = firstnode(prepromptfns); ln; ln = nextnode(ln)) {
+	    Prepromptfn ppnode = (Prepromptfn)getdata(ln);
+	    ppnode->func();
+	}
+    }
 }
 
 /**/

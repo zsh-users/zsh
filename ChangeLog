@@ -1,5 +1,12 @@
 2006-09-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 22676, adapted as in 22678: README, Doc/Zsh/mod_sched.yo,
+	Src/init.c, Src/subst.c, Src/utils.c, Src/zsh.h,
+	Src/Builtins/sched.c, Src/Zle/zle_main.c, Src/Zle/zle_thingy.c:
+	make sched events work when waiting for input in zle; allow sched
+	to handle the trashzle(); improve the interface to sched both
+	internally and externally.
+
 	* 22681: configure.ac, Src/Modules/system.mdd: pass all
 	files defining errnos to awk so that it finds them all on
 	systems where the list of definitions is fragmented.

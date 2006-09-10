@@ -1,17 +1,42 @@
-texinode(The sched Module)(The stat Module)(The files Module)(Zsh Modules)
-sect(The sched Module)
-The tt(sched) module makes available one builtin command:
+COMMENT(!MOD!zsh/sched
+A builtin that provides a timed execution facility within the shell.
+!MOD!)
+The tt(zsh/sched) module makes available one builtin command:
 
 startitem()
 findex(sched)
 cindex(timed execution)
 cindex(execution, timed)
-xitem(tt(sched) [tt(PLUS())]var(hh)tt(:)var(mm) var(command) ...)
+xitem(tt(sched) [tt(-o)] [tt(PLUS())]var(hh)tt(:)var(mm)[:var(ss)] var(command) ...)
+xitem(tt(sched) [tt(-o)] [tt(PLUS())]var(seconds) var(command) ...)
 item(tt(sched) [ tt(-)var(item) ])(
 Make an entry in the scheduled list of commands to execute.
-The time may be specified in either absolute or relative time.
-With no arguments, prints the list of scheduled commands.
+The time may be specified in either absolute or relative time,
+and either as hours, minutes and (optionally) seconds separated by a
+colon, or seconds alone.
+An absolute number of seconds indicates the time since the epoch
+(1970/01/01 00:00); this is useful in combination with the features in
+the tt(zsh/datetime) module, see
+ifzman(the zsh/datetime module entry in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/datetime Module))\
+.
+
+With no arguments, prints the list of scheduled commands.  If the
+scheduled command has the tt(-o) flag set, this is shown at the
+start of the command.
+
 With the argument `tt(-)var(item)', removes the given item
-from the list.
+from the list.  The numbering of the list is continguous and entries are
+in time order, so the numbering can change when entries are added or
+deleted.
+
+Commands are executed either immediately before a prompt, or while
+the shell's line editor is waiting for input.  In the latter case
+it is useful to be able to produce output that does not interfere
+with the line being edited.  Providing the option tt(-o) causes
+the shell to clear the command line before the event and redraw it
+afterwards.  This should be used with any scheduled event that produces
+visible output to the terminal; it is not needed, for example, with
+output that updates a terminal emulatorʼs title bar.
 )
 enditem()

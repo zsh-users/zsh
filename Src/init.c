@@ -869,7 +869,6 @@ setupvals(void)
     nohistsave = 1;
     dirstack = znewlinklist();
     bufstack = znewlinklist();
-    prepromptfns = znewlinklist();
     hsubl = hsubr = NULL;
     lastpid = 0;
     bshin = SHIN ? fdopen(SHIN, "r") : stdin;

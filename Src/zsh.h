@@ -333,40 +333,38 @@ enum {
 /* Abstract types for zsh */
 /**************************/
 
-typedef struct linknode  *LinkNode;
-typedef union  linkroot  *LinkList;
-typedef struct hashnode  *HashNode;
-typedef struct hashtable *HashTable;
-
-typedef struct optname   *Optname;
-typedef struct reswd     *Reswd;
 typedef struct alias     *Alias;
-typedef struct param     *Param;
-typedef struct paramdef  *Paramdef;
+typedef struct asgment   *Asgment;
+typedef struct builtin   *Builtin;
 typedef struct cmdnam    *Cmdnam;
-typedef struct shfunc    *Shfunc;
+typedef struct complist  *Complist;
+typedef struct conddef   *Conddef;
 typedef struct funcstack *Funcstack;
 typedef struct funcwrap  *FuncWrap;
-typedef struct options	 *Options;
-typedef struct builtin   *Builtin;
-typedef struct nameddir  *Nameddir;
-typedef struct module    *Module;
-typedef struct linkedmod *Linkedmod;
-
-typedef struct patprog   *Patprog;
-typedef struct process   *Process;
-typedef struct job       *Job;
-typedef struct value     *Value;
-typedef struct conddef   *Conddef;
-typedef struct redir     *Redir;
-typedef struct complist  *Complist;
+typedef struct hashnode  *HashNode;
+typedef struct hashtable *HashTable;
 typedef struct heap      *Heap;
 typedef struct heapstack *Heapstack;
 typedef struct histent   *Histent;
 typedef struct hookdef   *Hookdef;
-
-typedef struct asgment   *Asgment;
-
+typedef struct job       *Job;
+typedef struct linkedmod *Linkedmod;
+typedef struct linknode  *LinkNode;
+typedef union  linkroot  *LinkList;
+typedef struct module    *Module;
+typedef struct nameddir  *Nameddir;
+typedef struct options	 *Options;
+typedef struct optname   *Optname;
+typedef struct param     *Param;
+typedef struct paramdef  *Paramdef;
+typedef struct patprog   *Patprog;
+typedef struct prepromptfn *Prepromptfn;
+typedef struct process   *Process;
+typedef struct redir     *Redir;
+typedef struct reswd     *Reswd;
+typedef struct shfunc    *Shfunc;
+typedef struct timedfn   *Timedfn;
+typedef struct value     *Value;
 
 /********************************/
 /* Definitions for linked lists */
@@ -431,6 +429,28 @@ union linkroot {
         __n0.prev = &(N).node; \
         __n0.dat = (void *) (V0); \
     } while (0)
+
+/*************************************/
+/* Specific elements of linked lists */
+/*************************************/
+
+typedef void (*voidvoidfnptr_t) _((void));
+
+/*
+ * Element of the prepromptfns list.
+ */
+struct prepromptfn {
+    voidvoidfnptr_t func;
+};
+
+
+/*
+ * Element of the timedfns list.
+ */
+struct timedfn {
+    voidvoidfnptr_t func;
+    time_t when;
+};
 
 /********************************/
 /* Definitions for syntax trees */

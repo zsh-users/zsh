@@ -122,7 +122,11 @@ int insmode;
 mod_export int eofchar;
 
 static int eofsent;
-static long keytimeout;
+/*
+ * Key timeout in hundredths of a second:  we use time_t so
+ * that we only have the limits on one integer type to worry about.
+ */
+static time_t keytimeout;
 
 #if defined(HAVE_SELECT) || defined(HAVE_POLL)
 /* Terminal baud rate */
@@ -387,11 +391,110 @@ breakread(int fd, char *buf, int n)
 # define read    breakread
 #endif
 
-static int
-raw_getbyte(int keytmout, char *cptr)
+/*
+ * Possible forms of timeout.
+ */
+enum ztmouttp {
+    /* No timeout in use. */
+    ZTM_NONE,
+    /*
+     * Key timeout in use (do_keytmout flag set).  If this goes off
+     * we return without anything being read.
+     */
+    ZTM_KEY,
+    /*
+     * Function timeout in use (from timedfns list).
+     * If this goes off we call any functions which have reached
+     * the time and then continue processing.
+     */
+    ZTM_FUNC,
+    /*
+     * Timeout hit the maximum allowed; if it fires we
+     * need to recalculate.  As we may use poll() for the timeout,
+     * which takes an int value in milliseconds, we might need this
+     * for times long in the future.  (We make no attempt to extend
+     * the range of time beyond that of time_t, however; that seems
+     * like a losing battle.)
+     *
+     * For key timeouts we just limit the value to
+     * ZMAXTIMEOUT; that's already absurdly large.
+     *
+     * The following is the maximum signed range over 1024 (2^10), which
+     * is a little more convenient than 1000, but done differently
+     * to avoid problems with unsigned integers.  We assume 8-bit bytes;
+     * there's no general way to fix up if that's wrong.
+     */
+    ZTM_MAX
+#define	ZMAXTIMEOUT	((time_t)(1 << (sizeof(time_t)*8-11)))
+};
+
+struct ztmout {
+    /* Type of timeout setting, see enum above */
+    enum ztmouttp tp;
+    /*
+     * Value for timeout in 100ths of a second if type is not ZTM_NONE.
+     */
+    time_t exp100ths;
+};
+
+/*
+ * See if we need a timeout either for a key press or for a
+ * timed function.
+ */
+
+static void
+calc_timeout(struct ztmout *tmoutp, int do_keytmout)
 {
-    long exp100ths;
+    if (do_keytmout && keytimeout > 0) {
+	if (keytimeout > ZMAXTIMEOUT * 100 /* 24 days for a keypress???? */)
+	    tmoutp->exp100ths = ZMAXTIMEOUT * 100;
+	else
+	    tmoutp->exp100ths = keytimeout;
+	tmoutp->tp = ZTM_KEY;
+    } else
+	tmoutp->tp = ZTM_NONE;
+
+    if (timedfns) {
+	for (;;) {
+	    LinkNode tfnode = firstnode(timedfns);
+	    Timedfn tfdat;
+	    time_t diff, exp100ths;
+
+	    if (!tfnode)
+		break;
+
+	    tfdat = (Timedfn)getdata(tfnode);
+	    diff = tfdat->when - time(NULL);
+	    if (diff < 0) {
+		/* Already due; call it and rescan. */
+		tfdat->func();
+		continue;
+	    }
+
+	    if (diff > ZMAXTIMEOUT) {
+		tmoutp->exp100ths = ZMAXTIMEOUT * 100;
+		tmoutp->tp = ZTM_MAX;
+	    } else if (diff > 0) {
+		exp100ths = diff * 100;
+		if (tmoutp->tp != ZTM_KEY ||
+		    exp100ths < tmoutp->exp100ths) {
+		    tmoutp->exp100ths = exp100ths;
+		    tmoutp->tp = ZTM_FUNC;
+		}
+	    }
+	    break;
+	}
+	/* In case we called a function which messed up the display... */
+	if (resetneeded)
+	    zrefresh();
+    }
+}
+
+static int
+raw_getbyte(int do_keytmout, char *cptr)
+{
     int ret;
+    struct ztmout tmout;
 #if defined(HAS_TIO) && \
   (defined(sun) || (!defined(HAVE_POLL) && !defined(HAVE_SELECT)))
     struct ttyinfo ti;
@@ -402,204 +505,254 @@ raw_getbyte(int keytmout, char *cptr)
 # endif
 #endif
 
+    calc_timeout(&tmout, do_keytmout);
+
     /*
-     * Handle timeouts and watched fd's.  We only do one at once;
-     * key timeouts take precedence.  This saves tricky timing
-     * problems with the key timeout.
+     * Handle timeouts and watched fd's.  If a watched fd or a function
+     * timeout triggers we restart any key timeout.  This is likely to
+     * be harmless: the combination is extremely rare and a function
+     * is likely to occupy the user for a little while anyway.  We used
+     * to make timeouts take precedence, but we can't now that the
+     * timeouts may be external, so we may have both a permanent watched
+     * fd and a long-term timeout.
      */
-    if ((nwatch || keytmout)
+    if ((nwatch || tmout.tp != ZTM_NONE)
 #ifdef FIONREAD
 	&& ! delayzsetterm
 #endif
 	) {
-	if (!keytmout || keytimeout <= 0)
-	    exp100ths = 0;
-	else if (keytimeout > 500)
-	    exp100ths = 500;
-	else
-	    exp100ths = keytimeout;
 #if defined(HAVE_SELECT) || defined(HAVE_POLL)
-	if (!keytmout || exp100ths) {
-	    int i, errtry = 0, selret;
+	int i, errtry = 0, selret;
 # ifdef HAVE_POLL
-	    int poll_timeout;
-	    int nfds;
-	    struct pollfd *fds;
-# else
-	    int fdmax;
-	    struct timeval *tvptr;
-	    struct timeval expire_tv;
+	int nfds;
+	struct pollfd *fds;
 # endif
 # if defined(HAS_TIO) && defined(sun)
-	    /*
-	     * Yes, I know this is complicated.  Yes, I know we
-	     * already have three bits of code to poll the terminal
-	     * down below.  No, I don't want to do this either.
-	     * However, it turns out on certain OSes, specifically
-	     * Solaris, that you can't poll typeahead for love nor
-	     * money without actually trying to read it.  But
-	     * if we are trying to select (and we need to if we
-	     * are watching other fd's) we won't pick that up.
-	     * So we just try and read it without blocking in
-	     * the time-honoured (i.e. absurdly baroque) termios
-	     * fashion.
-	     */
-	    gettyinfo(&ti);
-	    ti.tio.c_cc[VMIN] = 0;
-	    settyinfo(&ti);
-	    ret = read(SHTTY, cptr, 1);
-	    ti.tio.c_cc[VMIN] = 1;
-	    settyinfo(&ti);
-	    if (ret > 0)
-		return 1;
+	/*
+	 * Yes, I know this is complicated.  Yes, I know we
+	 * already have three bits of code to poll the terminal
+	 * down below.  No, I don't want to do this either.
+	 * However, it turns out on certain OSes, specifically
+	 * Solaris, that you can't poll typeahead for love nor
+	 * money without actually trying to read it.  But
+	 * if we are trying to select (and we need to if we
+	 * are watching other fd's) we won't pick that up.
+	 * So we just try and read it without blocking in
+	 * the time-honoured (i.e. absurdly baroque) termios
+	 * fashion.
+	 */
+	gettyinfo(&ti);
+	ti.tio.c_cc[VMIN] = 0;
+	settyinfo(&ti);
+	ret = read(SHTTY, cptr, 1);
+	ti.tio.c_cc[VMIN] = 1;
+	settyinfo(&ti);
+	if (ret > 0)
+	    return 1;
 # endif
 # ifdef HAVE_POLL
-	    nfds = keytmout ? 1 : 1 + nwatch;
-	    /* First pollfd is SHTTY, following are the nwatch fds */
-	    fds = zalloc(sizeof(struct pollfd) * nfds);
-	    if (exp100ths)
-		poll_timeout = exp100ths * 10;
+	nfds = 1 + nwatch;
+	/* First pollfd is SHTTY, following are the nwatch fds */
+	fds = zalloc(sizeof(struct pollfd) * nfds);
+	fds[0].fd = SHTTY;
+	/*
+	 * POLLIN, POLLIN, POLLIN,
+	 * Keep those fd's POLLIN...
+	 */
+	fds[0].events = POLLIN;
+	for (i = 0; i < nwatch; i++) {
+	    fds[i+1].fd = watch_fds[i];
+	    fds[i+1].events = POLLIN;
+	}
+# endif
+	do {
+# ifdef HAVE_POLL
+	    int poll_timeout;
+
+	    if (tmout.tp != ZTM_NONE)
+		poll_timeout = tmout.exp100ths * 10;
 	    else
 		poll_timeout = -1;
 
-	    fds[0].fd = SHTTY;
-	    /*
-	     * POLLIN, POLLIN, POLLIN,
-	     * Keep those fd's POLLIN...
-	     */
-	    fds[0].events = POLLIN;
-	    if (!keytmout) {
+	    selret = poll(fds, errtry ? 1 : nfds, poll_timeout);
+# else
+	    int fdmax = SHTTY;
+	    struct timeval *tvptr;
+	    struct timeval expire_tv;
+
+	    FD_ZERO(&foofd);
+	    FD_SET(SHTTY, &foofd);
+	    if (!errtry) {
 		for (i = 0; i < nwatch; i++) {
-		    fds[i+1].fd = watch_fds[i];
-		    fds[i+1].events = POLLIN;
+		    int fd = watch_fds[i];
+		    FD_SET(fd, &foofd);
+		    if (fd > fdmax)
+			fdmax = fd;
 		}
 	    }
-# else
-	    fdmax = SHTTY;
-	    tvptr = NULL;
-	    if (exp100ths) {
-		expire_tv.tv_sec = exp100ths / 100;
-		expire_tv.tv_usec = (exp100ths % 100) * 10000L;
+
+	    if (tmout.tp != ZTM_NONE) {
+		expire_tv.tv_sec = tmout.exp100ths / 100;
+		expire_tv.tv_usec = (tmout.exp100ths % 100) * 10000L;
 		tvptr = &expire_tv;
 	    }
+	    else
+		tvptr = NULL;
+
+	    selret = select(fdmax+1, (SELECT_ARG_2_T) & foofd,
+			    NULL, NULL, tvptr);
 # endif
-	    do {
-# ifdef HAVE_POLL
-		selret = poll(fds, errtry ? 1 : nfds, poll_timeout);
-# else
-		FD_ZERO(&foofd);
-		FD_SET(SHTTY, &foofd);
-		if (!keytmout && !errtry) {
-		    for (i = 0; i < nwatch; i++) {
-			int fd = watch_fds[i];
-			FD_SET(fd, &foofd);
-			if (fd > fdmax)
-			    fdmax = fd;
-		    }
-		}
-		selret = select(fdmax+1, (SELECT_ARG_2_T) & foofd,
-				NULL, NULL, tvptr);
-# endif
+	    /*
+	     * Make sure a user interrupt gets passed on straight away.
+	     */
+	    if (selret < 0 && errflag)
+		break;
+	    /*
+	     * Try to avoid errors on our special fd's from
+	     * messing up reads from the terminal.  Try first
+	     * with all fds, then try unsetting the special ones.
+	     */
+	    if (selret < 0 && !errtry) {
+		errtry = 1;
+		continue;
+	    }
+	    if (selret == 0) {
 		/*
-		 * Make sure a user interrupt gets passed on straight away.
+		 * Nothing ready and no error, so we timed out.
 		 */
-		if (selret < 0 && errflag)
-		    break;
-		/*
-		 * Try to avoid errors on our special fd's from
-		 * messing up reads from the terminal.  Try first
-		 * with all fds, then try unsetting the special ones.
-		 */
-		if (selret < 0 && !keytmout && !errtry) {
-		    errtry = 1;
-		    continue;
-		}
-		if (selret == 0) {
+		switch (tmout.tp) {
+		case ZTM_NONE:
+		    /* keeps compiler happy if not debugging */
+#ifdef DEBUG
+		    dputs("BUG: timeout fired with no timeout set.");
+#endif
+		    /* treat as if a key timeout triggered */
+		    /*FALLTHROUGH*/
+		case ZTM_KEY:
 		    /* Special value -2 signals nothing ready */
 		    selret = -2;
-		}
-		if (selret < 0)
 		    break;
-		if (!keytmout && nwatch) {
-		    /*
-		     * Copy the details of the watch fds in case the
-		     * user decides to delete one from inside the
-		     * handler function.
-		     */
-		    int lnwatch = nwatch;
-		    int *lwatch_fds = zalloc(lnwatch*sizeof(int));
-		    char **lwatch_funcs = zarrdup(watch_funcs);
-		    memcpy(lwatch_fds, watch_fds, lnwatch*sizeof(int));
-		    for (i = 0; i < lnwatch; i++) {
-			if (
-# ifdef HAVE_POLL
-			    (fds[i+1].revents & POLLIN)
-# else
-			    FD_ISSET(lwatch_fds[i], &foofd)
-# endif
-			    ) {
-			    /* Handle the fd. */
-			    LinkList funcargs = znewlinklist();
-			    zaddlinknode(funcargs, ztrdup(lwatch_funcs[i]));
-			    {
-				char buf[BDIGBUFSIZE];
-				convbase(buf, lwatch_fds[i], 10);
-				zaddlinknode(funcargs, ztrdup(buf));
-			    }
-# ifdef HAVE_POLL
-#  ifdef POLLERR
-			    if (fds[i+1].revents & POLLERR)
-				zaddlinknode(funcargs, ztrdup("err"));
-#  endif
-#  ifdef POLLHUP
-			    if (fds[i+1].revents & POLLHUP)
-				zaddlinknode(funcargs, ztrdup("hup"));
-#  endif
-#  ifdef POLLNVAL
-			    if (fds[i+1].revents & POLLNVAL)
-				zaddlinknode(funcargs, ztrdup("nval"));
-#  endif
-# endif
 
-
-			    callhookfunc(lwatch_funcs[i], funcargs);
-			    if (errflag) {
-				/* No sensible way of handling errors here */
-				errflag = 0;
-				/*
-				 * Paranoia: don't run the hooks again this
-				 * time.
-				 */
-				errtry = 1;
-			    }
-			    freelinklist(funcargs, freestr);
-			}
+		case ZTM_FUNC:
+		    while (firstnode(timedfns)) {
+			Timedfn tfdat = (Timedfn)getdata(firstnode(timedfns));
+			/*
+			 * It's possible a previous function took
+			 * a long time to run (though it can't
+			 * call zle recursively), so recalculate
+			 * the time on each iteration.
+			 */
+			time_t now = time(NULL);
+			if (tfdat->when > now)
+			    break;
+			tfdat->func();
 		    }
-		    /* Function may have invalidated the display. */
+		    /* Function may have messed up the display */
 		    if (resetneeded)
 			zrefresh();
-		    zfree(lwatch_fds, lnwatch*sizeof(int));
-		    freearray(lwatch_funcs);
+		    /* We need to recalculate the timeout */
+		    /*FALLTHROUGH*/
+		case ZTM_MAX:
+		    /*
+		     * Reached the limit of our range, but not the
+		     * actual timeout; recalculate the timeout.
+		     * We're cheating with the key timeout here:
+		     * if one clashed with a function timeout we
+		     * reconsider the key timeout from scratch.
+		     * The effect of this is microscopic.
+		     */
+		    calc_timeout(&tmout, do_keytmout);
+		    break;
 		}
-	    } while (!
-# ifdef HAVE_POLL
-		     (fds[0].revents & POLLIN)
-# else
-		     FD_ISSET(SHTTY, &foofd)
-# endif
-		);
-# ifdef HAVE_POLL
-	    zfree(fds, sizeof(struct pollfd) * nfds);
-# endif
+		/*
+		 * If we handled the timeout successfully,
+		 * carry on.
+		 */
+		if (selret == 0)
+		    continue;
+	    }
+	    /* If error or unhandled timeout, give up. */
 	    if (selret < 0)
-		return selret;
-	}
+		break;
+	    if (nwatch && !errtry) {
+		/*
+		 * Copy the details of the watch fds in case the
+		 * user decides to delete one from inside the
+		 * handler function.
+		 */
+		int lnwatch = nwatch;
+		int *lwatch_fds = zalloc(lnwatch*sizeof(int));
+		char **lwatch_funcs = zarrdup(watch_funcs);
+		memcpy(lwatch_fds, watch_fds, lnwatch*sizeof(int));
+		for (i = 0; i < lnwatch; i++) {
+		    if (
+# ifdef HAVE_POLL
+			(fds[i+1].revents & POLLIN)
+# else
+			FD_ISSET(lwatch_fds[i], &foofd)
+# endif
+			) {
+			/* Handle the fd. */
+			LinkList funcargs = znewlinklist();
+			zaddlinknode(funcargs, ztrdup(lwatch_funcs[i]));
+			{
+			    char buf[BDIGBUFSIZE];
+			    convbase(buf, lwatch_fds[i], 10);
+			    zaddlinknode(funcargs, ztrdup(buf));
+			}
+# ifdef HAVE_POLL
+#  ifdef POLLERR
+			if (fds[i+1].revents & POLLERR)
+			    zaddlinknode(funcargs, ztrdup("err"));
+#  endif
+#  ifdef POLLHUP
+			if (fds[i+1].revents & POLLHUP)
+			    zaddlinknode(funcargs, ztrdup("hup"));
+#  endif
+#  ifdef POLLNVAL
+			if (fds[i+1].revents & POLLNVAL)
+			    zaddlinknode(funcargs, ztrdup("nval"));
+#  endif
+# endif
+
+
+			callhookfunc(lwatch_funcs[i], funcargs);
+			if (errflag) {
+			    /* No sensible way of handling errors here */
+			    errflag = 0;
+			    /*
+			     * Paranoia: don't run the hooks again this
+			     * time.
+			     */
+			    errtry = 1;
+			}
+			freelinklist(funcargs, freestr);
+		    }
+		}
+		/* Function may have invalidated the display. */
+		if (resetneeded)
+		    zrefresh();
+		zfree(lwatch_fds, lnwatch*sizeof(int));
+		freearray(lwatch_funcs);
+	    }
+	} while (!
+# ifdef HAVE_POLL
+		 (fds[0].revents & POLLIN)
+# else
+		 FD_ISSET(SHTTY, &foofd)
+# endif
+		 );
+# ifdef HAVE_POLL
+	zfree(fds, sizeof(struct pollfd) * nfds);
+# endif
+	if (selret < 0)
+	    return selret;
 #else
 # ifdef HAS_TIO
 	ti = shttyinfo;
 	ti.tio.c_lflag &= ~ICANON;
 	ti.tio.c_cc[VMIN] = 0;
-	ti.tio.c_cc[VTIME] = exp100ths / 10;
+	ti.tio.c_cc[VTIME] = tmout.exp100ths / 10;
 #  ifdef HAVE_TERMIOS_H
 	tcsetattr(SHTTY, TCSANOW, &ti.tio);
 #  else
@@ -623,7 +776,7 @@ raw_getbyte(int keytmout, char *cptr)
 
 /**/
 mod_export int
-getbyte(int keytmout, int *timeout)
+getbyte(int do_keytmout, int *timeout)
 {
     char cc;
     unsigned int ret;
@@ -656,7 +809,7 @@ getbyte(int keytmout, int *timeout)
 	for (;;) {
 	    int q = queue_signal_level();
 	    dont_queue_signals();
-	    r = raw_getbyte(keytmout, &cc);
+	    r = raw_getbyte(do_keytmout, &cc);
 	    restore_queue_signals(q);
 	    if (r == -2) {
 		/* timeout */
@@ -733,9 +886,9 @@ getbyte(int keytmout, int *timeout)
 
 /**/
 mod_export ZLE_INT_T
-getfullchar(int keytmout)
+getfullchar(int do_keytmout)
 {
-    int inchar = getbyte(keytmout, NULL);
+    int inchar = getbyte(do_keytmout, NULL);
 
 #ifdef MULTIBYTE_SUPPORT
     return getrestchar(inchar);
@@ -938,7 +1091,7 @@ zleread(char **lp, char **rp, int flags, int context)
 	return shingetline();
     }
 
-    keytimeout = getiparam("KEYTIMEOUT");
+    keytimeout = (time_t)getiparam("KEYTIMEOUT");
     if (!shout) {
 	if (SHTTY != -1)
 	    init_shout();
@@ -1551,7 +1704,7 @@ zle_resetprompt(void)
 mod_export void
 trashzle(void)
 {
-    if (zleactive) {
+    if (zleactive && !trashedzle) {
 	/* This zrefresh() is just to get the main editor display right and *
 	 * get the cursor in the right place.  For that reason, we disable  *
 	 * list display (which would otherwise result in infinite           *

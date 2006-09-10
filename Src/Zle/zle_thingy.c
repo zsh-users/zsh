@@ -721,8 +721,7 @@ bin_zle_invalidate(UNUSED(char *name), UNUSED(char **args), UNUSED(Options ops),
      * true if a completion widget is active.
      */
     if (zleactive) {
-	if (!trashedzle)
-	    trashzle();
+	trashzle();
 	return 0;
     } else
 	return 1;

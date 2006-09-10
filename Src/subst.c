@@ -70,9 +70,24 @@ prefork(LinkList list, int flags)
 		return;
 	    }
 	} else {
-	    if (isset(SHFILEEXPANSION))
-		filesub((char **)getaddrdata(node),
-			flags & (PF_TYPESET|PF_ASSIGN));
+	    if (isset(SHFILEEXPANSION)) {
+		/*
+		 * Here and below we avoid taking the address
+		 * of a void * and then pretending it's a char **
+		 * instead of a void ** by a little inefficiency.
+		 * This could be avoided with some extra linked list
+		 * machinery, but that would need quite a lot of work
+		 * to ensure consistency.  What we really need is
+		 * templates...
+		 */
+		char *cptr = (char *)getdata(node);
+		filesub(&cptr, flags & (PF_TYPESET|PF_ASSIGN));
+		/*
+		 * The assignment is so simple it's not worth
+		 * testing if cptr changed...
+		 */
+		setdata(node, cptr);
+	    }
 	    if (!(node = stringsubst(list, node, flags & PF_SINGLE, asssub))) {
 		unqueue_signals();
 		return;
@@ -92,9 +107,11 @@ prefork(LinkList list, int flags)
 		    xpandbraces(list, &node);
 		}
 	    }
-	    if (unset(SHFILEEXPANSION))
-		filesub((char **)getaddrdata(node),
-			flags & (PF_TYPESET|PF_ASSIGN));
+	    if (unset(SHFILEEXPANSION)) {
+		char *cptr = (char *)getdata(node);
+		filesub(&cptr, flags & (PF_TYPESET|PF_ASSIGN));
+		setdata(node, cptr);
+	    }
 	} else if (!(flags & PF_SINGLE) && !keep)
 	    uremnode(list, node);
 	if (errflag) {

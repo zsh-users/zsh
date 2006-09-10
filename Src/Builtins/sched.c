@@ -34,121 +34,22 @@
 
 typedef struct schedcmd  *Schedcmd;
 
+/* Flags for each scheduled event */
+enum schedflags {
+    /* Trash zle if necessary when event is activated */
+    SCHEDFLAG_TRASH_ZLE = 1
+};
+
 struct schedcmd {
     struct schedcmd *next;
     char *cmd;			/* command to run */
     time_t time;		/* when to run it */
+    int flags;			/* flags as above */
 };
 
 /* the list of sched jobs pending */
  
 static struct schedcmd *schedcmds;
-
-/**/
-static int
-bin_sched(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
-{
-    char *s = *argv++;
-    time_t t;
-    long h, m;
-    struct tm *tm;
-    struct schedcmd *sch, *sch2, *schl;
-    int sn;
-
-    /* If the argument begins with a -, remove the specified item from the
-    schedule. */
-    if (s && *s == '-') {
-	sn = atoi(s + 1);
-
-	if (!sn) {
-	    zwarnnam("sched", "usage for delete: sched -<item#>.");
-	    return 1;
-	}
-	for (schl = (struct schedcmd *)&schedcmds, sch = schedcmds, sn--;
-	     sch && sn; sch = (schl = sch)->next, sn--);
-	if (!sch) {
-	    zwarnnam("sched", "not that many entries");
-	    return 1;
-	}
-	schl->next = sch->next;
-	zsfree(sch->cmd);
-	zfree(sch, sizeof(struct schedcmd));
-
-	return 0;
-    }
-
-    /* given no arguments, display the schedule list */
-    if (!s) {
-	char tbuf[40];
-
-	for (sn = 1, sch = schedcmds; sch; sch = sch->next, sn++) {
-	    t = sch->time;
-	    tm = localtime(&t);
-	    ztrftime(tbuf, 20, "%a %b %e %k:%M:%S", tm);
-	    printf("%3d %s %s\n", sn, tbuf, sch->cmd);
-	}
-	return 0;
-    } else if (!*argv) {
-	/* other than the two cases above, sched *
-	 *requires at least two arguments        */
-	zwarnnam("sched", "not enough arguments");
-	return 1;
-    }
-
-    /* The first argument specifies the time to schedule the command for.  The
-    remaining arguments form the command. */
-    if (*s == '+') {
-	/* + introduces a relative time.  The rest of the argument is an
-	hour:minute offset from the current time.  Once the hour and minute
-	numbers have been extracted, and the format verified, the resulting
-	offset is simply added to the current time. */
-	h = zstrtol(s + 1, &s, 10);
-	if (*s != ':') {
-	    zwarnnam("sched", "bad time specifier");
-	    return 1;
-	}
-	m = zstrtol(s + 1, &s, 10);
-	if (*s) {
-	    zwarnnam("sched", "bad time specifier");
-	    return 1;
-	}
-	t = time(NULL) + h * 3600 + m * 60;
-    } else {
-	/* If there is no +, an absolute time of day must have been given.
-	This is in hour:minute format, optionally followed by a string starting
-	with `a' or `p' (for a.m. or p.m.).  Characters after the `a' or `p'
-	are ignored. */
-	h = zstrtol(s, &s, 10);
-	if (*s != ':') {
-	    zwarnnam("sched", "bad time specifier");
-	    return 1;
-	}
-	m = zstrtol(s + 1, &s, 10);
-	if (*s && *s != 'a' && *s != 'A' && *s != 'p' && *s != 'P') {
-	    zwarnnam("sched", "bad time specifier");
-	    return 1;
-	}
-	t = time(NULL);
-	tm = localtime(&t);
-	t -= tm->tm_sec + tm->tm_min * 60 + tm->tm_hour * 3600;
-	if (*s == 'p' || *s == 'P')
-	    h += 12;
-	t += h * 3600 + m * 60;
-	/* If the specified time is before the current time, it must refer to
-	tomorrow. */
-	if (t < time(NULL))
-	    t += 3600 * 24;
-    }
-    /* The time has been calculated; now add the new entry to the linked list
-    of scheduled commands. */
-    sch = (struct schedcmd *) zshcalloc(sizeof *sch);
-    sch->time = t;
-    sch->cmd = zjoin(argv, ' ', 0);
-    sch->next = NULL;
-    for (sch2 = (struct schedcmd *)&schedcmds; sch2->next; sch2 = sch2->next);
-    sch2->next = sch;
-    return 0;
-}
 
 /* Check scheduled commands; call this function from time to time. */
 
@@ -157,25 +58,241 @@ static void
 checksched(void)
 {
     time_t t;
-    struct schedcmd *sch, *schl;
+    struct schedcmd *sch;
 
     if(!schedcmds)
 	return;
     t = time(NULL);
-    for (schl = (struct schedcmd *)&schedcmds, sch = schedcmds; sch;
-	 sch = (schl = sch)->next) {
-	if (sch->time <= t) {
-	    execstring(sch->cmd, 0, 0);
-	    schl->next = sch->next;
-	    zsfree(sch->cmd);
-	    zfree(sch, sizeof(struct schedcmd));
-	    sch = schl;
+    /*
+     * List is ordered, so we only need to consider the
+     * head element.
+     */
+    while (schedcmds && schedcmds->time <= t) {
+	/*
+	 * Remove the entry to be executed from the list
+	 * before execution:  this makes quite sure that
+	 * the entry hasn't been monkeyed with when we
+	 * free it.
+	 */
+	sch = schedcmds;
+	schedcmds = sch->next;
+	/*
+	 * Delete from the timed function list now in case
+	 * the called code reschedules.
+	 */
+	deltimedfn(checksched);
+
+	if ((sch->flags & SCHEDFLAG_TRASH_ZLE) && zleactive)
+	    trashzleptr();
+	execstring(sch->cmd, 0, 0);
+	zsfree(sch->cmd);
+	zfree(sch, sizeof(struct schedcmd));
+
+	/*
+	 * Fix time for future events.
+	 * I had this outside the loop, for a little extra efficiency.
+	 * However, it then occurred to me that having the list of
+	 * forthcoming entries up to date could be regarded as
+	 * a feature, and the inefficiency is negligible.
+	 */
+	if (schedcmds) {
+	    /*
+	     * We need to delete the function from the list again,
+	     * in case called code rescheduled.  This is almost
+	     * as cheap as checking if it's in the list already.
+	     */
+	    deltimedfn(checksched);
+	    DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (1)");	    addtimedfn(checksched, schedcmds->time);
 	}
     }
 }
 
-static void (*p_checksched) _((void)) = checksched;
-static struct linknode n_checksched = { NULL, NULL, &p_checksched };
+/**/
+static int
+bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
+{
+    char *s, **argptr;
+    time_t t;
+    long h, m, sec;
+    struct tm *tm;
+    struct schedcmd *sch, *sch2, *schl;
+    int sn, flags = 0;
+
+    /* If the argument begins with a -, remove the specified item from the
+    schedule. */
+    for (argptr = argv; *argptr && **argptr == '-'; argptr++) {
+	char *arg = *argptr + 1;
+	if (idigit(*arg)) {
+	    sn = atoi(arg);
+
+	    if (!sn) {
+		zwarnnam("sched", "usage for delete: sched -<item#>.");
+		return 1;
+	    }
+	    for (schl = NULL, sch = schedcmds, sn--;
+		 sch && sn; sch = (schl = sch)->next, sn--);
+	    if (!sch) {
+		zwarnnam("sched", "not that many entries");
+		return 1;
+	    }
+	    if (schl)
+		schl->next = sch->next;
+	    else {
+		deltimedfn(checksched);
+		schedcmds = sch->next;
+		if (schedcmds) {
+		    DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (2)");
+		    addtimedfn(checksched, schedcmds->time);
+		}
+	    }
+	    zsfree(sch->cmd);
+	    zfree(sch, sizeof(struct schedcmd));
+
+	    return 0;
+	} else if (*arg == '-') {
+	    /* end of options */
+	    argptr++;
+	    break;
+	} else if (!strcmp(arg, "o")) {
+	    flags |= SCHEDFLAG_TRASH_ZLE;
+	} else {
+	    if (*arg)
+		zwarnnam(nam, "bad option: -%c", *arg);
+	    else
+		zwarnnam(nam, "option expected");
+	    return 1;
+	}
+    }
+
+    /* given no arguments, display the schedule list */
+    if (!*argptr) {
+	char tbuf[40], *flagstr, *endstr;
+
+	for (sn = 1, sch = schedcmds; sch; sch = sch->next, sn++) {
+	    t = sch->time;
+	    tm = localtime(&t);
+	    ztrftime(tbuf, 20, "%a %b %e %k:%M:%S", tm);
+	    if (sch->flags & SCHEDFLAG_TRASH_ZLE)
+		flagstr = "-o ";
+	    else
+		flagstr = "";
+	    if (*sch->cmd == '-')
+		endstr = "-- ";
+	    else
+		endstr = "";
+	    printf("%3d %s %s%s%s\n", sn, tbuf, flagstr, endstr, sch->cmd);
+	}
+	return 0;
+    } else if (!argptr[1]) {
+	/* other than the two cases above, sched *
+	 *requires at least two arguments        */
+	zwarnnam("sched", "not enough arguments");
+	return 1;
+    }
+
+    /* The first argument specifies the time to schedule the command for.  The
+    remaining arguments form the command. */
+    s = *argptr++;
+    if (*s == '+') {
+	/*
+	 * + introduces a relative time.  The rest of the argument may be an
+	 * hour:minute offset from the current time.  Once the hour and minute
+	 * numbers have been extracted, and the format verified, the resulting
+	 * offset is simply added to the current time.
+	 */
+	zlong zl = zstrtol(s + 1, &s, 10);
+	if (*s == ':') {
+	    m = (long)zstrtol(s + 1, &s, 10);
+	    if (*s == ':')
+		sec = (long)zstrtol(s + 1, &s, 10);
+	    else
+		sec = 0;
+	    if (*s) {
+		zwarnnam("sched", "bad time specifier");
+		return 1;
+	    }
+	    t = time(NULL) + (long)zl * 3600 + m * 60 + sec;
+	} else if (!*s) {
+	    /*
+	     * Alternatively, it may simply be a number of seconds.
+	     * This is here for consistency with absolute times.
+	     */
+	    t = time(NULL) + (time_t)zl;
+	} else {
+	    zwarnnam("sched", "bad time specifier");
+	    return 1;
+	}
+    } else {
+	/*
+	 * If there is no +, an absolute time must have been given.
+	 * This may be in hour:minute format, optionally followed by a string
+	 * starting with `a' or `p' (for a.m. or p.m.).  Characters after the
+	 * `a' or `p' are ignored.
+	 */
+	zlong zl = zstrtol(s, &s, 10);
+	if (*s == ':') {
+	    h = (long)zl;
+	    m = (long)zstrtol(s + 1, &s, 10);
+	    if (*s == ':')
+		sec = (long)zstrtol(s + 1, &s, 10);
+	    else
+		sec = 0;
+	    if (*s && *s != 'a' && *s != 'A' && *s != 'p' && *s != 'P') {
+		zwarnnam("sched", "bad time specifier");
+		return 1;
+	    }
+	    t = time(NULL);
+	    tm = localtime(&t);
+	    t -= tm->tm_sec + tm->tm_min * 60 + tm->tm_hour * 3600;
+	    if (*s == 'p' || *s == 'P')
+		h += 12;
+	    t += h * 3600 + m * 60 + sec;
+	    /*
+	     * If the specified time is before the current time, it must refer
+	     * to tomorrow.
+	     */
+	    if (t < time(NULL))
+		t += 3600 * 24;
+	} else if (!*s) {
+	    /*
+	     * Otherwise, it must be a raw time specifier.
+	     */
+	    t = (long)zl;
+	} else {
+	    zwarnnam("sched", "bad time specifier");
+	    return 1;
+	}
+    }
+    /* The time has been calculated; now add the new entry to the linked list
+    of scheduled commands. */
+    sch = (struct schedcmd *) zalloc(sizeof *sch);
+    sch->time = t;
+    sch->cmd = zjoin(argptr, ' ', 0);
+    sch->flags = flags;
+    /* Insert into list in time order */
+    if (schedcmds) {
+	if (sch->time < schedcmds->time) {
+	    deltimedfn(checksched);
+	    sch->next = schedcmds;
+	    schedcmds = sch;
+	    DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (3)");
+	    addtimedfn(checksched, t);
+	} else {
+	    for (sch2 = schedcmds;
+		 sch2->next && sch2->next->time < sch->time;
+		 sch2 = sch2->next)
+		;
+	    sch->next = sch2->next;
+	    sch2->next = sch;
+	}
+    } else {
+	sch->next = NULL;
+	schedcmds = sch;
+	DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (4)");
+	addtimedfn(checksched, t);
+    }
+    return 0;
+}
 
 static struct builtin bintab[] = {
     BUILTIN("sched", 0, bin_sched, 0, -1, 0, NULL, NULL),
@@ -194,7 +311,7 @@ boot_(Module m)
 {
     if(!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)))
 	return 1;
-    uaddlinknode(prepromptfns, &n_checksched);
+    addprepromptfn(&checksched);
     return 0;
 }
 
@@ -209,7 +326,7 @@ cleanup_(Module m)
 	zsfree(sch->cmd);
 	zfree(sch, sizeof(*sch));
     }
-    uremnode(prepromptfns, &n_checksched);
+    delprepromptfn(&checksched);
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }

@@ -69,6 +69,12 @@ it is supported) there are three possible cases:
     are allowed in identifiers even though the shell will recognise
     alphanumeric multibyte characters.
 
+The sched builtin now keeps entries in time order.  This means that
+after adding an entry the index of an existing entry used for deletion
+may change, if that entry had a later time than the new entry.  However,
+deleting a entry with a later time will now never change the index of an
+entry with an earlier time, which could happen with the previous method.
+
 The completion style pine-directory must now be set to use completion
 for PINE mailbox folders; previously it had the default ~/mail.  This
 change was necessary because otherwise recursive directories under
