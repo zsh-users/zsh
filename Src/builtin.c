@@ -3938,7 +3938,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		    char *b;
 		    int l;
 		    if (*c == 'b') {
-			b = getkeystring(metafy(curarg, curlen, META_USEHEAP), &l,
+			b = getkeystring(metafy(curarg, curlen, META_USEHEAP),
+					 &l,
 					 OPT_ISSET(ops,'b') ? GETKEYS_BINDKEY :
 					 GETKEYS_PRINTF, &nnl);
 		    } else {
@@ -4004,11 +4005,25 @@ bin_print(char *name, char **args, Options ops, int func)
 
 	    if (type > 0) {
 		if (curarg && (*curarg == '\'' || *curarg == '"' )) {
+		    convchar_t cc;
+#ifdef MULTIBYTE_SUPPORT
+		    if (isset(MULTIBYTE)) {
+			mb_metacharinit();
+			(void)mb_metacharlenconv(metafy(curarg+1, curlen-1,
+							META_USEHEAP), &cc);
+		    }
+		    else
+			cc = WEOF;
+		    if (cc == WEOF)
+			cc = (curlen > 1) ? STOUC(curarg[1]) : 0;
+#else
+		    cc = (curlen > 1) ? STOUC(curarg[1]) : 0;
+#endif
 		    if (type == 2) {
-			doubleval = STOUC(curarg[1]);
+			doubleval = cc;
 			print_val(doubleval);
 		    } else {
-			intval = STOUC(curarg[1]);
+			intval = cc;
 			print_val(intval);
 		    }
 		} else {
