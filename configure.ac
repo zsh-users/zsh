@@ -1320,24 +1320,24 @@ do
   dnl Try to make sure it doesn't get confused by files that don't
   dnl have real error definitions in.  Count definitions to make sure.
   dnl Definitions of error numbers have become more and more general, so
-  dnl pick the file with the most matches, which must be at least 7.
+  dnl make a list of files containing any definitions in and keep them all.
   dnl Careful with cut and paste in the pattern: the square brackets
   dnl must contain a space and a tab.
   nerrs=`test -f $ERRNO_TRY_H && \
   $EGREP '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*(_HURD_ERRNO )?\(?[_A-Z0-9]' $ERRNO_TRY_H | \
   wc -l | sed 's/[ 	]//g'`
-  if test "x$nerrs" != x && test "$nerrs" -ge 7 && test "$nerrs" -gt "$lnerrs"
+  if test "x$nerrs" != x && test "$nerrs" -ge 1 && test "$nerrs" -gt "$lnerrs"
   then
     lnerrs=$nerrs
-    ERRNO_H=$ERRNO_TRY_H
+    ERRNO_H="$ERRNO_H $ERRNO_TRY_H"
   fi
 done
-if test x$ERRNO_H = x; then
+if test x"$ERRNO_H" = x; then
   AC_MSG_ERROR(ERROR MACROS NOT FOUND:  please report to developers)
 fi
-zsh_cv_path_errno_h=$ERRNO_H
+zsh_cv_path_errno_h="$ERRNO_H"
 ])
-ERRNO_H=$zsh_cv_path_errno_h
+ERRNO_H="$zsh_cv_path_errno_h"
 AC_SUBST(ERRNO_H)dnl
 
 dnl -----------------------------------------------------

@@ -11,8 +11,9 @@ objects="system.o errnames.o"
 headers="errcount.h"
 
 :<<\Make
+# careful: ERRNO_H may contain a list
 errnames.c: errnames1.awk errnames2.awk $(dir_top)/config.h @ERRNO_H@
-	   if [ x@ERRNO_H@ = x ]; then \
+	   if [ x"@ERRNO_H@" = x ]; then \
 		touch errtmp.out; \
 	   else \
 		$(AWK) -f $(sdir)/errnames1.awk @ERRNO_H@ >errtmp.c; \
