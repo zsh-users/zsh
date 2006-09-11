@@ -1,3 +1,7 @@
+2006-09-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Mikael Magnusson: Doc/Zsh/mod_sched.yo: typos.
+
 2006-09-11  Peter Stephenson  <pws@csr.com>
 
 	* 22686: Src/params.c: unset array if assigning numeric
