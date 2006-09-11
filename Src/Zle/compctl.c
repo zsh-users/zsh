@@ -2127,9 +2127,9 @@ gen_matches_files(int dirs, int execs, int all)
 {
     DIR *d;
     struct stat buf;
-    char *n, p[PATH_MAX], *q = NULL, *e;
+    char *n, p[PATH_MAX], *q = NULL, *e, *pathpref;
     LinkList l = NULL;
-    int ns = 0, ng = opts[NULLGLOB], test, aw = addwhat;
+    int ns = 0, ng = opts[NULLGLOB], test, aw = addwhat, pathpreflen;
 
     opts[NULLGLOB] = 1;
 
@@ -2145,12 +2145,22 @@ gen_matches_files(int dirs, int execs, int all)
 	all = execs = 0;
     }
     /* Open directory. */
-    if ((d = opendir((prpre && *prpre) ? prpre : "."))) {
+    if (prpre && *prpre) {
+	pathpref = dupstring(prpre);
+	unmetafy(pathpref, &pathpreflen);
+	/* system needs NULL termination, not provided by unmetafy */
+	pathpref[pathpreflen] = '\0';
+    } else {
+	pathpref = NULL;
+	pathpreflen = 0;
+    }
+    if ((d = opendir(pathpref ? pathpref : "."))) {
 	/* If we search only special files, prepare a path buffer for stat. */
-	if (!all && prpre) {
-	    strcpy(p, prpre);
-	    q = p + strlen(prpre);
+	if (!all && pathpreflen) {
+	    /* include null byte we carefully added */
+	    memcpy(p, pathpref, pathpreflen+1);
 	}
+	q = p + pathpreflen;
 	/* Fine, now read the directory. */
 	while ((n = zreaddir(d, 1)) && !errflag) {
 	    /* Ignore files beginning with `.' unless the thing we found on *

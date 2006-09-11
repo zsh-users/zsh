@@ -26,6 +26,11 @@
 	Functions/Prompts/prompt_zefram_setup: broken when KSH_ARRAYS
 	is on.
 
+2006-08-30  Peter Stephenson  <pws@csr.com>
+
+	* 22660 [slightly tweaked]: Src/Zle/compctl.c: unmetafy
+	directory prefix for passing to opendir() and stat().
+
 2006-08-22  Clint Adams  <clint@zsh.org>
 
 	* 22657: Completion/Unix/Command/_tla: update for tla 1.3.5.
