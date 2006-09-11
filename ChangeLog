@@ -1,3 +1,8 @@
+2006-09-11  Peter Stephenson  <pws@csr.com>
+
+	* 22686: Src/params.c: unset array if assigning numeric
+	parameter to it.
+
 2006-09-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22685: Src/builtin.c: printf "%d" \'X should handle multibyte

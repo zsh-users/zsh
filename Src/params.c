@@ -2495,46 +2495,9 @@ sethparam(char *s, char **val)
     return v->pm;
 }
 
-/**/
-mod_export Param
-setiparam(char *s, zlong val)
-{
-    struct value vbuf;
-    Value v;
-    char *t = s, *ss;
-    Param pm;
-    mnumber mnval;
-
-    if (!isident(s)) {
-	zerr("not an identifier: %s", s);
-	errflag = 1;
-	return NULL;
-    }
-    queue_signals();
-    if (!(v = getvalue(&vbuf, &s, 1))) {
-	if ((ss = strchr(s, '[')))
-	    *ss = '\0';
-	if (!(pm = createparam(t, ss ? PM_ARRAY : PM_INTEGER)))
-	    pm = (Param) paramtab->getnode(paramtab, t);
-	DPUTS(!pm, "BUG: parameter not created");
-	if (ss) {
-	    *ss = '[';
-	} else {
-	    pm->base = outputradix;
-	}
-	v = getvalue(&vbuf, &t, 1);
-	DPUTS(!v, "BUG: value not found for new parameter");
-    }
-    mnval.type = MN_INTEGER;
-    mnval.u.l = val;
-    setnumvalue(v, mnval);
-    unqueue_signals();
-    return v->pm;
-}
 
 /*
- * Like setiparam(), but can take an mnumber which can be integer or
- * floating.
+ * Set a generic shell number, floating point or integer.
  */
 
 /**/
@@ -2543,7 +2506,7 @@ setnparam(char *s, mnumber val)
 {
     struct value vbuf;
     Value v;
-    char *t = s, *ss = NULL;
+    char *t = s, *ss;
     Param pm;
 
     if (!isident(s)) {
@@ -2552,8 +2515,23 @@ setnparam(char *s, mnumber val)
 	return NULL;
     }
     queue_signals();
-    if (!(v = getvalue(&vbuf, &s, 1))) {
-	if ((ss = strchr(s, '[')))
+    ss = strchr(s, '[');
+    v = getvalue(&vbuf, &s, 1);
+    if (v && (v->pm->node.flags & (PM_ARRAY|PM_HASHED)) &&
+	!(v->pm->node.flags & (PM_SPECIAL|PM_TIED)) &&
+	/*
+	 * not sure what KSHARRAYS has got to do with this...
+	 * copied this from assignsparam().
+	 */
+	unset(KSHARRAYS) && !ss) {
+	unsetparam_pm(v->pm, 0, 1);
+	s = t;
+	v = NULL;
+    }
+    if (!v) {
+	/* s has been updated by getvalue, so check again */
+	ss = strchr(s, '[');
+	if (ss)
 	    *ss = '\0';
 	pm = createparam(t, ss ? PM_ARRAY :
 			 (val.type & MN_INTEGER) ? PM_INTEGER : PM_FFLOAT);
@@ -2572,6 +2550,19 @@ setnparam(char *s, mnumber val)
     unqueue_signals();
     return v->pm;
 }
+
+/* Simplified interface to setnparam */
+
+/**/
+mod_export Param
+setiparam(char *s, zlong val)
+{
+    mnumber mnval;
+    mnval.type = MN_INTEGER;
+    mnval.u.l = val;
+    return setnparam(s, mnval);
+}
+
 
 /* Unset a parameter */
 
