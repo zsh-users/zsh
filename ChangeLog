@@ -1,3 +1,10 @@
+2006-09-12  Peter Stephenson  <pws@csr.com>
+
+	* 22689: Src/subst.c, Test/D04parameter.ztst: untokenize
+	strings for substitution in cases like
+	${${~:-*}//(#m)*/$MATCH=$MATCH}.  The pattern code tried
+	to metafy the tokens, which caused chaos.
+
 2006-09-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Mikael Magnusson: Doc/Zsh/mod_sched.yo: typos.

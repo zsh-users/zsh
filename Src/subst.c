@@ -2257,15 +2257,28 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    /*
 	     * Either loop over an array doing replacements or
 	     * do the replacment on a string.
+	     *
+	     * We need an untokenized value for matching.
 	     */
 	    if (!vunset && isarr) {
+		char **ap;
+		if (!copied) {
+		    aval = arrdup(aval);
+		    copied = 1;
+		}
+		for (ap = aval; *ap; ap++) {
+		    untokenize(*ap);
+		}
 		getmatcharr(&aval, s, flags, flnum, replstr);
-		copied = 1;
 	    } else {
 		if (vunset)
 		    val = dupstring("");
+		if (!copied) {
+		    val = dupstring(val);
+		    copied = 1;
+		    untokenize(val);
+		}
 		getmatch(&val, s, flags, flnum, replstr);
-		copied = 1;
 	    }
 	    break;
 	}

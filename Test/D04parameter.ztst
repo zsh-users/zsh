@@ -829,6 +829,10 @@
 0:(#m) flag with pure string
 >this 4 4 is 7 7 a s 11 11tring
 
+  print ${${~:-*}//(#m)*/$MATCH=$MATCH}
+0:(#m) flag with tokenized input
+>*=*
+
   print -l JAMES${(u)${=:-$(echo yes yes)}}JOYCE
   print -l JAMES${(u)${=:-$(echo yes yes she said yes i will yes)}}JOYCE
 0:Bug with (u) flag reducing arrays to one element
