@@ -1,3 +1,10 @@
+2006-09-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22705: Doc/Zsh/expn.yo, Src/prompt.c, Src/subst.c, Src/utils.c,
+	Src/zsh.h, Test/D04parameter.ztst, Test/D07multibyte.ztst:
+	make ${(l...)...} and ${(r...)...} padding handle multibyte
+	characters including those wider than 1 unit.
+
 2006-09-13  Peter Stephenson  <pws@csr.com>
 
 	* 22704: Completion/Unix/Command/_todo.sh: new completion.

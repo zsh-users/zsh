@@ -366,6 +366,18 @@
 0:${(pl...)...}
 >Xresulting """"Xwords roariously """Xpadded
 
+  print ${(l.5..X.r.5..Y.)foo}
+  print ${(l.6..X.r.4..Y.)foo}
+  print ${(l.7..X.r.3..Y.)foo}
+  print ${(l.6..X..A.r.6..Y..B.)foo}
+  print ${(l.6..X..AROOGA.r.6..Y..BARSOOM.)foo}
+0:simultaneous left and right padding
+>Xresulting XXXwordsYY proariousl XXpaddedYY
+>XXresultin XXXXwordsY uproarious XXXpaddedY
+>XXXresulti XXXXXwords Xuproariou XXXXpadded
+>XAresultingB XXXAwordsBYY uproariously XXApaddedBYY
+>GAresultingB OOGAwordsBAR uproariously OGApaddedBAR
+
   foo=(why in goodness name am I doing this)
   print ${(r.5..!..?.)foo}
 0:${(r...)...}

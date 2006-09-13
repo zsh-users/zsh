@@ -857,12 +857,22 @@ Pad the resulting words on the left.  Each word will be truncated if
 required and placed in a field var(expr) characters wide.  The space
 to the left will be filled with var(string1) (concatenated as often
 as needed) or spaces if var(string1) is not given.  If both
-var(string1) and var(string2) are given, this string is inserted
-once directly to the left of each word, before padding.
+var(string1) and var(string2) are given, tt(string2) is inserted
+once directly to the left of each word, truncated if necessary, before
+var(string1) is used to produce any remaining padding.
+
+If the tt(MULTIBYTE) option is in effect, screen character widths will
+be used for the calculation of padding; otherwise individual bytes are
+treat as occupying one unit of width.
 )
 item(tt(r:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
 As tt(l), but pad the words on the right and insert var(string2)
-on the right.
+immediately to the right of the string to be padded.
+
+Left and right padding may be used together.  In this case the strategy
+is to apply left padding to the first half width of each of the resulting
+words, and right padding to the second half.  If the string to be
+padded has odd width the extra padding is applied on the left.
 )
 item(tt(s:)var(string)tt(:))(
 Force field splitting at the

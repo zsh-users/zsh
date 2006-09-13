@@ -524,8 +524,12 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 	return buf;
     }
 
-    if (widthp)
-	*widthp = (s - buf) + wcwidth(c);
+    if (widthp) {
+	int wcw = wcwidth(c);
+	*widthp = (s - buf);
+	if (wcw > 0)
+	    *widthp += wcw;
+    }
     if (swidep)
 	*swidep = s;
     for (mbptr = mbstr; ret; s++, mbptr++, ret--) {
@@ -539,6 +543,22 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     *s = 0;
     return buf;
 }
+
+/**/
+mod_export int
+zwcwidth(wint_t wc)
+{
+    int wcw;
+    /* assume a single-byte character if not valid */
+    if (wc == WEOF)
+	return 1;
+    wcw = wcwidth(wc);
+    /* if not printable, assume zero width */
+    if (wcw <= 0)
+	return 0;
+    return wcw;
+}
+
 /**/
 #endif /* MULTIBYTE_SUPPORT */
 
@@ -3953,58 +3973,6 @@ nicedup(const char *s, int heap)
     return retstr;
 }
 
-/*
- * Return the screen width of a multibyte string.  The input
- * string is metafied.
- */
-/**/
-mod_export int
-mb_width(const char *s)
-{
-    char *ums = ztrdup(s), *umptr;
-    int umlen, eol = 0;
-    int width = 0;
-    mbstate_t mbs;
-
-    memset(&mbs, 0, sizeof mbs);
-    umptr = unmetafy(ums, &umlen);
-    /*
-     * Convert one wide character at a time.  We could convet
-     * the entire string using mbsrtowcs(), but that terminates on
-     * a NUL and we might have embedded NULs.
-     */
-    while (umlen > 0) {
-	int wret;
-	wchar_t cc;
-	size_t cnt = eol ? MB_INVALID : mbrtowc(&cc, umptr, umlen, &mbs);
-
-	switch (cnt) {
-	case MB_INCOMPLETE:
-	    eol = 1;
-	    /* FALL THROUGH */
-	case MB_INVALID:
-	    memset(&mbs, 0, sizeof mbs);
-	    /* FALL THROUGH */
-	case 0:
-	    /* Assume a single-width character. */
-	    width++;
-	    cnt = 1;
-	    break;
-	default:
-	    wret = wcwidth(cc);
-	    if (wret > 0)
-		width += wret;
-	    break;
-	}
-
-	umlen -= cnt;
-	umptr += cnt;
-    }
-
-    free(ums);
-
-    return width;
-}
 
 /*
  * Length of metafied string s which contains the next multibyte
@@ -4107,9 +4075,15 @@ mb_metastrlen(char *ptr, int width)
 		memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
 		ptr = laststart + (*laststart == Meta) + 1;
 		num++;
-	    } else if (width)
-		num += wcwidth(wc);
-	    else
+	    } else if (width) {
+		/*
+		 * Returns -1 if not a printable character; best
+		 * just to ignore these.
+		 */
+		int wcw = wcwidth(wc);
+		if (wcw > 0)
+		    num += wcw;
+	    } else
 		num++;
 	    laststart = ptr;
 	    num_in_char = 0;

@@ -2012,7 +2012,7 @@ typedef wint_t convchar_t;
  * It's written to use the wint_t from mb_metacharlenconv() without
  * further tests.
  */
-#define WCWIDTH(wc)	((wc == WEOF) ? 1 : wcwidth(wc))
+#define WCWIDTH(wc)	zwcwidth(wc)
 
 #define MB_INCOMPLETE	((size_t)-2)
 #define MB_INVALID	((size_t)-1)

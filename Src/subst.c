@@ -718,12 +718,34 @@ invinstrpcmp(const void *a, const void *b)
     return -instrpcmp(a, b);
 }
 
+/*
+ * Pad the string str, returning a result from the heap (or str itself,
+ * if it didn't need padding).  If str is too large, it will be truncated.
+ * Calculations are in terms of width if MULTIBYTE is in effect, else
+ * characters.
+ *
+ * prenum and postnum are the width to which the string needs padding
+ * on the left and right.
+ *
+ * preone and postone are string to insert once only before and after
+ * str.  They will be truncated on the left or right, respectively,
+ * if necessary to fit the width.  Either or both may be NULL in which
+ * case they will not be used.
+ *
+ * premul and postmul are the padding strings to be repeated before
+ * on the left (if prenum is non-zero) and right (if postnum is non-zero).  If
+ * NULL the first character of IFS (typically but not necessarily a space)
+ * will be used.
+ */
+
 /**/
 static char *
-dopadding(char *str, int prenum, int postnum, char *preone, char *postone, char *premul, char *postmul)
+dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
+	  char *premul, char *postmul)
 {
     char *def, *ret, *t, *r;
-    int ls, ls2, lpreone, lpostone, lpremul, lpostmul, lr, f, m, c, cc;
+    int ls, ls2, lpreone, lpostone, lpremul, lpostmul, lr, f, m, c, cc, cl;
+    convchar_t cchar;
 
     MB_METACHARINIT();
     if (*ifs)
@@ -739,89 +761,357 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone, char 
     if (!postmul || !*postmul)
 	postmul = def;
 
-    ls = strlen(str);
-    lpreone = preone ? strlen(preone) : 0;
-    lpostone = postone ? strlen(postone) : 0;
-    lpremul = strlen(premul);
-    lpostmul = strlen(postmul);
+    ls = MB_METASTRWIDTH(str);
+    lpreone = preone ? MB_METASTRWIDTH(preone) : 0;
+    lpostone = postone ? MB_METASTRWIDTH(postone) : 0;
+    lpremul = MB_METASTRWIDTH(premul);
+    lpostmul = MB_METASTRWIDTH(postmul);
 
-    lr = prenum + postnum;
-
-    if (lr == ls)
+    if (prenum + postnum == ls)
 	return str;
 
+    /*
+     * Try to be careful with allocated lengths.  The following
+     * is a maximum, in case we need the entire repeated string
+     * for each repetition.  We probably don't, but in case the user
+     * has given us something pathological which doesn't convert
+     * easily into a width we'd better be safe.
+     */
+    lr = strlen(str) + strlen(premul) * prenum + strlen(postmul) * postnum;
+    /*
+     * Same logic for preone and postone, except those may be NULL.
+     */
+    if (preone)
+	lr += strlen(preone);
+    if (postone)
+	lr += strlen(postone);
     r = ret = (char *)zhalloc(lr + 1);
 
     if (prenum) {
+	/*
+	 * Pad on the left.
+	 */
 	if (postnum) {
+	    /*
+	     * Pad on both right and left.
+	     * The strategy is to divide the string into two halves.
+	     * The first half is dealt with by the left hand padding
+	     * code, the second by the right hand.
+	     */
 	    ls2 = ls / 2;
 
+	    /* The width left to pad for the first half. */
 	    f = prenum - ls2;
-	    if (f <= 0)
-		for (str -= f, c = prenum; c--; *r++ = *str++);
-	    else {
-		if (f <= lpreone)
-		    for (c = f, t = preone + lpreone - f; c--; *r++ = *t++);
-		else {
-		    f -= lpreone;
-		    if ((m = f % lpremul))
-			for (c = m, t = premul + lpremul - m; c--; *r++ = *t++);
-		    for (cc = f / lpremul; cc--;)
-			for (c = lpremul, t = premul; c--; *r++ = *t++);
-		    for (c = lpreone; c--; *r++ = *preone++);
+	    if (f <= 0) {
+		/* First half doesn't fit.  Skip the first -f width. */
+		f = -f;
+		MB_METACHARINIT();
+		while (f > 0) {
+		    str += MB_METACHARLENCONV(str, &cchar);
+		    f -= WCWIDTH(cchar);
 		}
-		for (c = ls2; c--; *r++ = *str++);
+		/* Now finish the first half. */
+		for (c = prenum; c > 0; ) {
+		    cl = MB_METACHARLENCONV(str, &cchar);
+		    while (cl--)
+			*r++ = *str++;
+		    c -= WCWIDTH(cchar);
+		}
+	    } else {
+		if (f <= lpreone) {
+		    if (preone) {
+			/*
+			 * The unrepeated string doesn't fit.
+			 */
+			MB_METACHARINIT();
+			/* The width we need to skip */
+			f = lpreone - f;
+			/* So skip. */
+			for (t = preone; f > 0; ) {
+			    t += MB_METACHARLENCONV(t, &cchar);
+			    f -= WCWIDTH(cchar);
+			}
+			/* Then copy the entire remainder. */
+			while (*t)
+			    *r++ = *t++;
+		    }
+		} else {
+		    f -= lpreone;
+		    if ((m = f % lpremul)) {
+			/*
+			 * Left over fraction of repeated string.
+			 */
+			MB_METACHARINIT();
+			/* Skip this much. */
+			m = lpremul - m;
+			for (t = premul; m > 0; ) {
+			    t += MB_METACHARLENCONV(t, &cchar);
+			    m -= WCWIDTH(cchar);
+			}
+			/* Output the rest. */
+			while (*t)
+			    *r++ = *t++;
+		    }
+		    for (cc = f / lpremul; cc--;) {
+			/* Repeat the repeated string */
+			MB_METACHARINIT();
+			for (c = lpremul, t = premul; c > 0; ) {
+			    cl = MB_METACHARLENCONV(t, &cchar);
+			    while (cl--)
+				*r++ = *t++;
+			    c -= WCWIDTH(cchar);
+			}
+		    }
+		    if (preone) {
+			/* Output the full unrepeated string */
+			while (*preone)
+			    *r++ = *preone++;
+		    }
+		}
+		/* Output the first half width of the original string. */
+		for (c = ls2; c > 0; ) {
+		    cl = MB_METACHARLENCONV(str, &cchar);
+		    c -= WCWIDTH(cchar);
+		    while (cl--)
+			*r++ = *str++;
+		}
 	    }
+	    /* Other half.  In case the string had an odd length... */
 	    ls2 = ls - ls2;
+	    /* Width that needs padding... */
 	    f = postnum - ls2;
-	    if (f <= 0)
-		for (c = postnum; c--; *r++ = *str++);
-	    else {
-		for (c = ls2; c--; *r++ = *str++);
-		if (f <= lpostone)
-		    for (c = f; c--; *r++ = *postone++);
-		else {
-		    f -= lpostone;
-		    for (c = lpostone; c--; *r++ = *postone++);
-		    for (cc = f / lpostmul; cc--;)
-			for (c = lpostmul, t = postmul; c--; *r++ = *t++);
-		    if ((m = f % lpostmul))
-			for (; m--; *r++ = *postmul++);
+	    if (f <= 0) {
+		/* ...is negative, truncate original string */
+		MB_METACHARINIT();
+		for (c = postnum; c > 0; ) {
+		    cl = MB_METACHARLENCONV(str, &cchar);
+		    c -= WCWIDTH(cchar);
+		    while (cl--)
+			*r++ = *str++;
+		}
+	    } else {
+		/* Rest of original string fits, output it complete */
+		while (*str)
+		    *r++ = *str++;
+		if (f <= lpostone) {
+		    if (postone) {
+			/* Can't fit unrepeated string, truncate it */
+			for (c = f; c > 0; ) {
+			    cl = MB_METACHARLENCONV(postone, &cchar);
+			    c -= WCWIDTH(cchar);
+			    while (cl--)
+				*r++ = *postone++;
+			}
+		    }
+		} else {
+		    if (postone) {
+			f -= lpostone;
+			/* Output entire unrepeated string */
+			while (*postone)
+			    *r++ = *postone++;
+		    }
+		    for (cc = f / lpostmul; cc--;) {
+			/* Begin the beguine */
+			for (t = postmul; *t; )
+			    *r++ = *t++;
+		    }
+		    if ((m = f % lpostmul)) {
+			/* Fill leftovers with chunk of repeated string */
+			MB_METACHARINIT();
+			while (m > 0) {
+			    cl = MB_METACHARLENCONV(postmul, &cchar);
+			    m -= WCWIDTH(cchar);
+			    while (cl--)
+				*r++ = *postmul++;
+			}
+		    }
 		}
 	    }
 	} else {
+	    /*
+	     * Pad only on the left.
+	     */
 	    f = prenum - ls;
-	    if (f <= 0)
-		for (c = prenum, str -= f; c--; *r++ = *str++);
-	    else {
-		if (f <= lpreone)
-		    for (c = f, t = preone + lpreone - f; c--; *r++ = *t++);
-		else {
-		    f -= lpreone;
-		    if ((m = f % lpremul))
-			for (c = m, t = premul + lpremul - m; c--; *r++ = *t++);
-		    for (cc = f / lpremul; cc--;)
-			for (c = lpremul, t = premul; c--; *r++ = *t++);
-		    for (c = lpreone; c--; *r++ = *preone++);
+	    if (f <= 0) {
+		/*
+		 * Original string is at least as wide as padding.
+		 * Truncate original string to width.
+		 * Truncate on left, so skip the characters we
+		 * don't need.
+		 */
+		f = -f;
+		MB_METACHARINIT();
+		while (f > 0) {
+		    str += MB_METACHARLENCONV(str, &cchar);
+		    f -= WCWIDTH(cchar);
 		}
-		for (c = ls; c--; *r++ = *str++);
+		/* Copy the rest of the original string */
+		for (c = prenum; c > 0; ) {
+		    cl = MB_METACHARLENCONV(str, &cchar);
+		    while (cl--)
+			*r++ = *str++;
+		    c -= WCWIDTH(cchar);
+		}
+	    } else {
+		/*
+		 * We can fit the entire string...
+		 */
+		if (f <= lpreone) {
+		    if (preone) {
+			/*
+			 * ...with some fraction of the unrepeated string.
+			 */
+			/* We need this width of characters. */
+			c = f;
+			/*
+			 * We therefore need to skip this width of
+			 * characters.
+			 */
+			f = lpreone - f;
+			MB_METACHARINIT();
+			for (t = preone; f > 0; ) {
+			    t += MB_METACHARLENCONV(t, &cchar);
+			    f -= WCWIDTH(cchar);
+			}
+			/* Copy the rest of preone */
+			while (*t)
+			    *r++ = *t++;
+		    }
+		} else {
+		    /*
+		     * We can fit the whole of preone, needing this width
+		     * first
+		     */
+		    f -= lpreone;
+		    if ((m = f % lpremul)) {
+			/*
+			 * Some fraction of the repeated string needed.
+			 */
+			/* Need this much... */
+			c = m;
+			/* ...skipping this much first. */
+			m = lpremul - m;
+			MB_METACHARINIT();
+			for (t = premul; m > 0; ) {
+			    t += MB_METACHARLENCONV(t, &cchar);
+			    m -= WCWIDTH(cchar);
+			}
+			/* Now the rest of the repeated string. */
+			while (c > 0) {
+			    cl = MB_METACHARLENCONV(t, &cchar);
+			    while (cl--)
+				*r++ = *t++;
+			    c -= WCWIDTH(cchar);
+			}
+		    }
+		    for (cc = f / lpremul; cc--;) {
+			/*
+			 * Repeat the repeated string.
+			 */
+			MB_METACHARINIT();
+			for (c = lpremul, t = premul; c > 0; ) {
+			    cl = MB_METACHARLENCONV(t, &cchar);
+			    while (cl--)
+				*r++ = *t++;
+			    c -= WCWIDTH(cchar);
+			}
+		    }
+		    if (preone) {
+			/*
+			 * Now the entire unrepeated string.  Don't
+			 * count the width, just dump it.  This is
+			 * significant if there are special characters
+			 * in this string.  It's sort of a historical
+			 * accident that this worked, but there's nothing
+			 * to stop us just dumping the thing out and assuming
+			 * the user knows what they're doing.
+			 */
+			while (*preone)
+			    *r++ = *preone++;
+		    }
+		}
+		/* Now the string being padded */
+		while (*str)
+		    *r++ = *str++;
 	    }
 	}
     } else if (postnum) {
+	/*
+	 * Pad on the right.
+	 */
 	f = postnum - ls;
-	if (f <= 0)
-	    for (c = postnum; c--; *r++ = *str++);
-	else {
-	    for (c = ls; c--; *r++ = *str++);
-	    if (f <= lpostone)
-		for (c = f; c--; *r++ = *postone++);
-	    else {
-		f -= lpostone;
-		for (c = lpostone; c--; *r++ = *postone++);
-		for (cc = f / lpostmul; cc--;)
-		    for (c = lpostmul, t = postmul; c--; *r++ = *t++);
-		if ((m = f % lpostmul))
-		    for (; m--; *r++ = *postmul++);
+	MB_METACHARINIT();
+	if (f <= 0) {
+	    /*
+	     * Original string is at least as wide as padding.
+	     * Truncate original string to width.
+	     */
+	    for (c = postnum; c > 0; ) {
+		cl = MB_METACHARLENCONV(str, &cchar);
+		while (cl--)
+		    *r++ = *str++;
+		c -= WCWIDTH(cchar);
+	    }
+	} else {
+	    /*
+	     * There's some space to fill.  First copy the original
+	     * string, counting the width.  Make sure we copy the
+	     * entire string.
+	     */
+	    for (c = ls; *str; ) {
+		cl = MB_METACHARLENCONV(str, &cchar);
+		while (cl--)
+		    *r++ = *str++;
+		c -= WCWIDTH(cchar);
+	    }
+	    MB_METACHARINIT();
+	    if (f <= lpostone) {
+		if (postone) {
+		    /*
+		     * Not enough or only just enough space to fit
+		     * the unrepeated string.  Truncate as necessary.
+		     */
+		    for (c = f; c > 0; ) {
+			cl = MB_METACHARLENCONV(postone, &cchar);
+			while (cl--)
+			    *r++ = *postone++;
+			c -= WCWIDTH(cchar);
+		    }
+		}
+	    } else {
+		if (postone) {
+		    f -= lpostone;
+		    /* Copy the entire unrepeated string */
+		    for (c = lpostone; *postone; ) {
+			cl = MB_METACHARLENCONV(postone, &cchar);
+			while (cl--)
+			    *r++ = *postone++;
+			c -= WCWIDTH(cchar);
+		    }
+		}
+		/* Repeat the repeated string */
+		for (cc = f / lpostmul; cc--;) {
+		    MB_METACHARINIT();
+		    for (c = lpostmul, t = postmul; *t; ) {
+			cl = MB_METACHARLENCONV(t, &cchar);
+			while (cl--)
+			    *r++ = *t++;
+			c -= WCWIDTH(cchar);
+		    }
+		}
+		/*
+		 * See if there's any fraction of the repeated
+		 * string needed to fill up the remaining space.
+		 */
+		if ((m = f % lpostmul)) {
+		    MB_METACHARINIT();
+		    while (m > 0) {
+			cl = MB_METACHARLENCONV(postmul, &cchar);
+			while (cl--)
+			    *r++ = *postmul++;
+			m -= WCWIDTH(cchar);
+		    }
+		}
 	    }
 	}
     }
@@ -1779,6 +2069,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		 * by flags.  TODO: maybe therefore this would
 		 * be more consistent if moved into getstrvalue()?
 		 * Bet that's easier said than done.
+		 *
+		 * TODO: use string widths.  In fact, shouldn't the
+		 * strlen()s be ztrlen()s anyway?
 		 */
 		val = getstrvalue(v);
 		fwidth = v->pm->width ? v->pm->width : (int)strlen(val);

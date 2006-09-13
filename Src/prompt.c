@@ -1058,12 +1058,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	    int twidth, maxwidth;
 	    int ntrunc = strlen(t);
 
-#ifdef MULTIBYTE_SUPPORT
-	    /* Use screen width of string */
-	    twidth = mb_width(t);
-#else
-	    twidth = ztrlen(t);
-#endif
+	    twidth = MB_METASTRWIDTH(t);
 	    if (twidth < truncwidth) {
 		maxwidth = truncwidth - twidth;
 		/*
@@ -1130,7 +1125,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 			     * Normal text: build up a multibyte character.
 			     */
 			    char inchar;
-			    wchar_t cc;
+			    wchar_t cc, wcw;
 
 			    /*
 			     * careful: string is still metafied (we
@@ -1156,7 +1151,9 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 				remw--;
 				break;
 			    default:
-				remw -= wcwidth(cc);
+				wcw = wcwidth(cc);
+				if (wcw > 0)
+				    remw -= wcw;
 				break;
 			    }
 #else
@@ -1197,6 +1194,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 #ifdef MULTIBYTE_SUPPORT
 			    char inchar;
 			    wchar_t cc;
+			    int wcw;
 
 			    if (*skiptext == Meta)
 				inchar = *++skiptext ^ 32;
@@ -1216,7 +1214,9 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 				maxwidth--;
 				break;
 			    default:
-				maxwidth -= wcwidth(cc);
+				wcw = wcwidth(cc);
+				if (wcw > 0)
+				    maxwidth -= wcw;
 				break;
 			    }
 #else
