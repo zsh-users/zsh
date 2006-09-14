@@ -608,6 +608,14 @@ set, the string resulting from the expansion will be interpreted as a
 pattern anywhere that is possible, such as in filename expansion and
 filename generation and pattern-matching contexts like the right
 hand side of the `tt(=)' and `tt(!=)' operators in conditions.
+
+In nested substitutions, note that the effect of the tt(~) applies to the
+result of the current level of substitution.  A surrounding pattern
+operation on the result may cancel it.  Hence, for example, if the
+parameter tt(foo) is set to tt(*), tt(${~foo//\*/*.c}) is substituted by
+the pattern tt(*.c), which may be expanded by filename generation, but
+tt(${${~foo}//\*/*.c}) substitutes to the string tt(*.c), which will not
+be further expanded.
 )
 enditem()
 
@@ -960,6 +968,16 @@ following steps take place where applicable at all levels of substitution.
 Note that, unless the `tt((P))' flag is present, the flags and any subscripts
 apply directly to the value of the nested substitution; for example, the
 expansion tt(${${foo}}) behaves exactly the same as tt(${foo}).
+
+At each nested level of substitution, the substituted words undergo all
+forms of single-word substitution (i.e. not filename generation), including
+command substitution, arithmetic expansion and filename expansion
+(i.e. leading tt(~) and tt(=)).  Thus, for example, tt(${${:-=cat}:h})
+expands to the directory where the tt(cat) program resides.  (Explanation:
+the internal substitution has no parameter but a default value tt(=cat),
+which is expanded by filename expansion to a full path; the outer
+substitution then applies the modifier tt(:h) and takes the directory part
+of the path.)
 )
 item(tt(2.) em(Parameter Subscripting))(
 If the value is a raw parameter reference with a subscript, such as
