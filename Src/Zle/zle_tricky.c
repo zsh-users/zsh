@@ -1426,7 +1426,7 @@ get_comp_string(void)
 	     * (even if they don't have a `$' in front of them).  So we *
 	     * have to find that name.                                  */
 	    char *cspos = zlemetaline + zlemetacs, *wptr, *cptr;
-	    we = itype_end(cspos, IIDENT, 0) - cspos;
+	    we = itype_end(cspos, IIDENT, 0) - zlemetaline;
 
 	    /*
 	     * With multibyte characters we need to go forwards,

@@ -1,5 +1,8 @@
 2006-09-15  Peter Stephenson  <pws@csr.com>
 
+	* 22713: Src/Zle/zle_tricky.c: word end in math completion context
+	was screwy.
+
 	* 22710: README, Doc/Zsh/expn.yo, Src/prompt.c, Src/subst.c,
 	Src/utils.c: assume width 1 for control characters; don't
 	crash if width of repeated padding string is 0.
