@@ -349,7 +349,7 @@ printulimit(char *nam, int lim, int hard, int head)
 	break;
 # endif /* HAVE_RLIMIT_NICE */
 # ifdef HAVE_RLIMIT_RTPRIO
-    case RLIMIT_RTPRIO
+    case RLIMIT_RTPRIO:
 	if (head)
 	    printf("-r: max rt priority             ");
 	break;
