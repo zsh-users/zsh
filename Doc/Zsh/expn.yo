@@ -871,7 +871,9 @@ var(string1) is used to produce any remaining padding.
 
 If the tt(MULTIBYTE) option is in effect, screen character widths will
 be used for the calculation of padding; otherwise individual bytes are
-treat as occupying one unit of width.
+treat as occupying one unit of width.  Control characters are always
+assumed to be one unit wide; this allows the mechanism to be used
+for generating repetitions of control characters.
 )
 item(tt(r:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
 As tt(l), but pad the words on the right and insert var(string2)

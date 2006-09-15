@@ -527,8 +527,10 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     if (widthp) {
 	int wcw = wcwidth(c);
 	*widthp = (s - buf);
-	if (wcw > 0)
+	if (wcw >= 0)
 	    *widthp += wcw;
+	else
+	    (*widthp)++;
     }
     if (swidep)
 	*swidep = s;
@@ -550,12 +552,12 @@ zwcwidth(wint_t wc)
 {
     int wcw;
     /* assume a single-byte character if not valid */
-    if (wc == WEOF)
+    if (wc == WEOF || unset(MULTIBYTE))
 	return 1;
     wcw = wcwidth(wc);
-    /* if not printable, assume zero width */
-    if (wcw <= 0)
-	return 0;
+    /* if not printable, assume width 1 */
+    if (wcw < 0)
+	return 1;
     return wcw;
 }
 
@@ -4077,12 +4079,14 @@ mb_metastrlen(char *ptr, int width)
 		num++;
 	    } else if (width) {
 		/*
-		 * Returns -1 if not a printable character; best
-		 * just to ignore these.
+		 * Returns -1 if not a printable character.  We
+		 * turn this into 1 for backward compatibility.
 		 */
 		int wcw = wcwidth(wc);
-		if (wcw > 0)
+		if (wcw >= 0)
 		    num += wcw;
+		else
+		    num++;
 	    } else
 		num++;
 	    laststart = ptr;

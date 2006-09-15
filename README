@@ -49,6 +49,13 @@ The variable HOME is no longer set by the shell if zsh is emulating any
 other shell at startup; it must be present in the environment or set
 subsequently by the user.  It is valid for the variable to be unset.
 
+The MULTIBYTE option is on by default where it is available; this
+causes many operations to recognise characters as in the current locale.
+Older versions of the shell always assumed a character was one byte.
+In some places the width of the character will be used; this is transparent
+when used for calculations of screen position, but also occurs, for
+example, in calculations of padding width.
+
 Zsh has previously been lax about whether it allows octets with the
 top bit set to be part of a shell identifier.  Older versions of the shell
 assumed all such octets were allowed in identifiers, however the POSIX

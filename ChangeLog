@@ -1,3 +1,9 @@
+2006-09-15  Peter Stephenson  <pws@csr.com>
+
+	* 22710: README, Doc/Zsh/expn.yo, Src/prompt.c, Src/subst.c,
+	Src/utils.c: assume width 1 for control characters; don't
+	crash if width of repeated padding string is 0.
+
 2006-09-14  Peter Stephenson  <pws@csr.com>
 
 	* 22692: Doc/Zsh/expn.yo: additional notes on a couple of

@@ -837,29 +837,31 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 		    }
 		} else {
 		    f -= lpreone;
-		    if ((m = f % lpremul)) {
-			/*
-			 * Left over fraction of repeated string.
-			 */
-			MB_METACHARINIT();
-			/* Skip this much. */
-			m = lpremul - m;
-			for (t = premul; m > 0; ) {
-			    t += MB_METACHARLENCONV(t, &cchar);
-			    m -= WCWIDTH(cchar);
-			}
-			/* Output the rest. */
-			while (*t)
-			    *r++ = *t++;
-		    }
-		    for (cc = f / lpremul; cc--;) {
-			/* Repeat the repeated string */
-			MB_METACHARINIT();
-			for (c = lpremul, t = premul; c > 0; ) {
-			    cl = MB_METACHARLENCONV(t, &cchar);
-			    while (cl--)
+		    if (lpremul) {
+			if ((m = f % lpremul)) {
+			    /*
+			     * Left over fraction of repeated string.
+			     */
+			    MB_METACHARINIT();
+			    /* Skip this much. */
+			    m = lpremul - m;
+			    for (t = premul; m > 0; ) {
+				t += MB_METACHARLENCONV(t, &cchar);
+				m -= WCWIDTH(cchar);
+			    }
+			    /* Output the rest. */
+			    while (*t)
 				*r++ = *t++;
-			    c -= WCWIDTH(cchar);
+			}
+			for (cc = f / lpremul; cc--;) {
+			    /* Repeat the repeated string */
+			    MB_METACHARINIT();
+			    for (c = lpremul, t = premul; c > 0; ) {
+				cl = MB_METACHARLENCONV(t, &cchar);
+				while (cl--)
+				    *r++ = *t++;
+				c -= WCWIDTH(cchar);
+			    }
 			}
 		    }
 		    if (preone) {
@@ -910,19 +912,21 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			while (*postone)
 			    *r++ = *postone++;
 		    }
-		    for (cc = f / lpostmul; cc--;) {
-			/* Begin the beguine */
-			for (t = postmul; *t; )
-			    *r++ = *t++;
-		    }
-		    if ((m = f % lpostmul)) {
-			/* Fill leftovers with chunk of repeated string */
-			MB_METACHARINIT();
-			while (m > 0) {
-			    cl = MB_METACHARLENCONV(postmul, &cchar);
-			    m -= WCWIDTH(cchar);
-			    while (cl--)
-				*r++ = *postmul++;
+		    if (lpostmul) {
+			for (cc = f / lpostmul; cc--;) {
+			    /* Begin the beguine */
+			    for (t = postmul; *t; )
+				*r++ = *t++;
+			}
+			if ((m = f % lpostmul)) {
+			    /* Fill leftovers with chunk of repeated string */
+			    MB_METACHARINIT();
+			    while (m > 0) {
+				cl = MB_METACHARLENCONV(postmul, &cchar);
+				m -= WCWIDTH(cchar);
+				while (cl--)
+				    *r++ = *postmul++;
+			    }
 			}
 		    }
 		}
@@ -983,37 +987,39 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 		     * first
 		     */
 		    f -= lpreone;
-		    if ((m = f % lpremul)) {
-			/*
-			 * Some fraction of the repeated string needed.
-			 */
-			/* Need this much... */
-			c = m;
-			/* ...skipping this much first. */
-			m = lpremul - m;
-			MB_METACHARINIT();
-			for (t = premul; m > 0; ) {
-			    t += MB_METACHARLENCONV(t, &cchar);
-			    m -= WCWIDTH(cchar);
+		    if (lpremul) {
+			if ((m = f % lpremul)) {
+			    /*
+			     * Some fraction of the repeated string needed.
+			     */
+			    /* Need this much... */
+			    c = m;
+			    /* ...skipping this much first. */
+			    m = lpremul - m;
+			    MB_METACHARINIT();
+			    for (t = premul; m > 0; ) {
+				t += MB_METACHARLENCONV(t, &cchar);
+				m -= WCWIDTH(cchar);
+			    }
+			    /* Now the rest of the repeated string. */
+			    while (c > 0) {
+				cl = MB_METACHARLENCONV(t, &cchar);
+				while (cl--)
+				    *r++ = *t++;
+				c -= WCWIDTH(cchar);
+			    }
 			}
-			/* Now the rest of the repeated string. */
-			while (c > 0) {
-			    cl = MB_METACHARLENCONV(t, &cchar);
-			    while (cl--)
-				*r++ = *t++;
-			    c -= WCWIDTH(cchar);
-			}
-		    }
-		    for (cc = f / lpremul; cc--;) {
-			/*
-			 * Repeat the repeated string.
-			 */
-			MB_METACHARINIT();
-			for (c = lpremul, t = premul; c > 0; ) {
-			    cl = MB_METACHARLENCONV(t, &cchar);
-			    while (cl--)
-				*r++ = *t++;
-			    c -= WCWIDTH(cchar);
+			for (cc = f / lpremul; cc--;) {
+			    /*
+			     * Repeat the repeated string.
+			     */
+			    MB_METACHARINIT();
+			    for (c = lpremul, t = premul; c > 0; ) {
+				cl = MB_METACHARLENCONV(t, &cchar);
+				while (cl--)
+				    *r++ = *t++;
+				c -= WCWIDTH(cchar);
+			    }
 			}
 		    }
 		    if (preone) {
@@ -1089,27 +1095,29 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			c -= WCWIDTH(cchar);
 		    }
 		}
-		/* Repeat the repeated string */
-		for (cc = f / lpostmul; cc--;) {
-		    MB_METACHARINIT();
-		    for (c = lpostmul, t = postmul; *t; ) {
-			cl = MB_METACHARLENCONV(t, &cchar);
-			while (cl--)
-			    *r++ = *t++;
-			c -= WCWIDTH(cchar);
+		if (lpostmul) {
+		    /* Repeat the repeated string */
+		    for (cc = f / lpostmul; cc--;) {
+			MB_METACHARINIT();
+			for (c = lpostmul, t = postmul; *t; ) {
+			    cl = MB_METACHARLENCONV(t, &cchar);
+			    while (cl--)
+				*r++ = *t++;
+			    c -= WCWIDTH(cchar);
+			}
 		    }
-		}
-		/*
-		 * See if there's any fraction of the repeated
-		 * string needed to fill up the remaining space.
-		 */
-		if ((m = f % lpostmul)) {
-		    MB_METACHARINIT();
-		    while (m > 0) {
-			cl = MB_METACHARLENCONV(postmul, &cchar);
-			while (cl--)
-			    *r++ = *postmul++;
-			m -= WCWIDTH(cchar);
+		    /*
+		     * See if there's any fraction of the repeated
+		     * string needed to fill up the remaining space.
+		     */
+		    if ((m = f % lpostmul)) {
+			MB_METACHARINIT();
+			while (m > 0) {
+			    cl = MB_METACHARLENCONV(postmul, &cchar);
+			    while (cl--)
+				*r++ = *postmul++;
+			    m -= WCWIDTH(cchar);
+			}
 		    }
 		}
 	    }
