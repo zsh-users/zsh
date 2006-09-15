@@ -1,3 +1,7 @@
+2006-09-15  Peter Stephenson  <pws@csr.com>
+
+	* 22715: Src/exec.c: AUTOCONTINUE option never worked.
+
 2006-08-22  Peter Stephenson  <pws@csr.com>
 
 	* 22656: Src/options.c (slightly tweaked): improve handling of

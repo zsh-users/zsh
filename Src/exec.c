@@ -1753,7 +1753,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     int nullexec = 0, assign = 0, forked = 0;
     int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
     /* Various flags to the command. */
-    int cflags = 0, checked = 0, oautocont = opts[AUTOCONTINUE];
+    int cflags = 0, checked = 0, oautocont = -1;
     LinkList redir;
     wordcode code;
     Wordcode beg = state->pc, varspc;
@@ -1788,8 +1788,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
      * reference to a job in the job table.                */
     if (type == WC_SIMPLE && args && nonempty(args) &&
 	*(char *)peekfirst(args) == '%') {
-        if (how & Z_DISOWN)
+        if (how & Z_DISOWN) {
+	    oautocont = opts[AUTOCONTINUE];
             opts[AUTOCONTINUE] = 1;
+	}
 	pushnode(args, dupstring((how & Z_DISOWN)
 				 ? "disown" : (how & Z_ASYNC) ? "bg" : "fg"));
 	how = Z_SYNC;
@@ -1975,7 +1977,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (cflags & BINF_BUILTIN) {
 		    zwarn("no such builtin: %s", cmdarg, 0);
 		    lastval = 1;
-                    opts[AUTOCONTINUE] = oautocont;
+		    if (oautocont >= 0)
+			opts[AUTOCONTINUE] = oautocont;
 		    return;
 		}
 		break;
@@ -1999,7 +2002,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     if (errflag) {
 	lastval = 1;
-        opts[AUTOCONTINUE] = oautocont;
+	if (oautocont >= 0)
+	    opts[AUTOCONTINUE] = oautocont;
 	return;
     }
 
@@ -2043,7 +2047,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     if (errflag) {
 	lastval = 1;
-        opts[AUTOCONTINUE] = oautocont;
+	if (oautocont >= 0)
+	    opts[AUTOCONTINUE] = oautocont;
 	return;
     }
 
@@ -2127,7 +2132,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	if ((pid = zfork(&bgtime)) == -1) {
 	    close(synch[0]);
 	    close(synch[1]);
-            opts[AUTOCONTINUE] = oautocont;
+	    if (oautocont >= 0)
+		opts[AUTOCONTINUE] = oautocont;
 	    return;
 	} if (pid) {
 	    close(synch[1]);
@@ -2153,7 +2159,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		}
 	    }
 	    addproc(pid, text, 0, &bgtime);
-            opts[AUTOCONTINUE] = oautocont;
+	    if (oautocont >= 0)
+		opts[AUTOCONTINUE] = oautocont;
 	    return;
 	}
 	/* pid == 0 */
@@ -2526,7 +2533,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     zsfree(STTYval);
     STTYval = 0;
-    opts[AUTOCONTINUE] = oautocont;
+    if (oautocont >= 0)
+	opts[AUTOCONTINUE] = oautocont;
 }
 
 /* Arrange to have variables restored. */
