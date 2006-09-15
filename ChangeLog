@@ -1,5 +1,8 @@
 2006-09-15  Clint Adams  <clint@zsh.org>
 
+	* 22719: configure.ac: check for RLIMIT_NICE and
+	RTLIMIT_RTPRIO so 22718 will work.
+
 	* 22718: Src/Builtins/rlimits.c: use ulimit -e and -r
 	for RLIMIT_NICE and RLIMIT_RTPRIO respectively.
 
