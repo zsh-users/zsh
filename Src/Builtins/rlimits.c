@@ -342,6 +342,18 @@ printulimit(char *nam, int lim, int hard, int head)
 	    printf("-N %2d: threads per process     ", RLIMIT_PTHREAD);
 	break;
 # endif /* HAVE_RLIMIT_PTHREAD */
+# ifdef HAVE_RLIMIT_NICE
+    case RLIMIT_NICE:
+	if (head)
+	    printf("-e: max nice                    ");
+	break;
+# endif /* HAVE_RLIMIT_NICE */
+# ifdef HAVE_RLIMIT_RTPRIO
+    case RLIMIT_RTPRIO
+	if (head)
+	    printf("-r: max rt priority             ");
+	break;
+# endif /* HAVE_RLIMIT_RTPRIO */
     default:
 	if (head)
 	    printf("-N %2d:                         ", lim);
@@ -771,6 +783,16 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 # ifdef HAVE_RLIMIT_MSGQUEUE
 		case 'q':
 		    res = RLIMIT_MSGQUEUE;
+		    break;
+# endif
+# ifdef HAVE_RLIMIT_NICE
+		case 'e':
+		    res = RLIMIT_NICE;
+		    break;
+# endif
+# ifdef HAVE_RLIMIT_RTPRIO
+		case 'r':
+		    res = RLIMIT_RTPRIO;
 		    break;
 # endif
 		default:

@@ -1,3 +1,8 @@
+2006-09-15  Clint Adams  <clint@zsh.org>
+
+	* 22718: Src/Builtins/rlimits.c: use ulimit -e and -r
+	for RLIMIT_NICE and RLIMIT_RTPRIO respectively.
+
 2006-09-15  Peter Stephenson  <pws@csr.com>
 
 	* 22715: Src/exec.c: AUTOCONTINUE option never worked.
