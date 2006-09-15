@@ -1,5 +1,7 @@
 2006-09-15  Peter Stephenson  <pws@csr.com>
 
+	* 22715: Src/exec.c: AUTOCONTINUE option never worked.
+
 	* 22713: Src/Zle/zle_tricky.c: word end in math completion context
 	was screwy.
 
