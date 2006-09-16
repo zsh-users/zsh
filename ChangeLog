@@ -1,3 +1,7 @@
+2006-09-16  Andrey Borzenkov <bor@zsh.org>
+
+	* 22721: Makefile.in: add pdf target
+
 2006-09-15  Clint Adams  <clint@zsh.org>
 
 	* 22719: configure.ac: check for RLIMIT_NICE and
