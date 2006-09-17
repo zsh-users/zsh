@@ -1,5 +1,8 @@
 2006-09-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 22729: Src/Zle/computil.c: truncation of description didn't
+	handle multibyte characters.
+
 	* 22727: Src/init.c, Src/Zle/zle_main.c: "use 'exit' to exit"
 	was suboptimal.
 

@@ -616,8 +616,22 @@ cd_get(char **params)
                     memset(buf, ' ', cd_state.pre);
                     memcpy(buf, str->str, str->len);
                     strcpy(sufp, str->desc);
-                    if (strlen(buf) >= columns - 1)
-                        buf[columns - 1] = '\0';
+                    if (MB_METASTRWIDTH(buf) >= columns - 1) {
+			char *termptr = buf;
+			int w;
+			MB_METACHARINIT();
+			for (w = columns - 1; *termptr && w > 0; ) {
+			    convchar_t cchar;
+			    int cw;
+			    termptr += MB_METACHARLENCONV(termptr, &cchar);
+			    cw = WCWIDTH(cchar);
+			    if (cw >= 0)
+				w -= cw;
+			    else
+				w--;
+			}
+                        *termptr = '\0';
+		    }
                     *dp++ = ztrdup(buf);
                 }
                 *mp = *dp = NULL;
