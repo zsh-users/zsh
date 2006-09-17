@@ -1245,6 +1245,13 @@ fallback_compctlread(char *name, UNUSED(char **args), UNUSED(Options ops), UNUSE
 }
 
 /*
+ * Used by zle to indicate it has already printed a "use 'exit' to exit"
+ * message.
+ */
+/**/
+mod_export int use_exit_printed;
+
+/*
  * This is real main entry point. This has to be mod_export'ed
  * so zsh.exe can found it on Cygwin
  */
@@ -1313,6 +1320,7 @@ zsh_main(UNUSED(int argc), char **argv)
     init_misc();
 
     for (;;) {
+	use_exit_printed = 0;
 	/*
 	 * See if we can free up some of jobtab.
 	 * We only do this at top level, because if we are
@@ -1343,7 +1351,13 @@ zsh_main(UNUSED(int argc), char **argv)
 	    stopmsg = 1;
 	    zexit(lastval, 0);
 	}
-	zerrnam("zsh", (!islogin) ? "use 'exit' to exit."
-		: "use 'logout' to logout.");
+	/*
+	 * Don't print the message if it was already handled by
+	 * zle, since that makes special arrangements to keep
+	 * the display tidy.
+	 */
+	if (!use_exit_printed)
+	    zerrnam("zsh", (!islogin) ? "use 'exit' to exit."
+		    : "use 'logout' to logout.");
     }
 }

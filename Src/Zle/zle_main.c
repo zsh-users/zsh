@@ -1232,6 +1232,7 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    !zlell && isfirstln && (zlereadflags & ZLRF_IGNOREEOF)) {
 	    showmsg((!islogin) ? "zsh: use 'exit' to exit." :
 		    "zsh: use 'logout' to logout.");
+	    use_exit_printed = 1;
 	    eofsent = 1;
 	    ret = 1;
 	} else {
