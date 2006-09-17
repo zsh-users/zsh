@@ -551,6 +551,33 @@ funcstackgetfn(UNUSED(Param pm))
     return ret;
 }
 
+/* Functions for the functrace special parameter. */
+
+/**/
+static char **
+functracegetfn(UNUSED(Param pm))
+{
+    Funcstack f;
+    int num;
+    char **ret, **p;
+
+    for (f = funcstack, num = 0; f; f = f->prev, num++);
+
+    ret = (char **) zhalloc((num + 1) * sizeof(char *));
+
+    for (f = funcstack, p = ret; f; f = f->prev, p++) {
+	char *colonpair;
+
+	colonpair = zhalloc(strlen(f->caller) + f->lineno > 9999 ? 24 : 6);
+	sprintf(colonpair, "%s:%d", f->caller, f->lineno);
+
+	*p = colonpair;
+    }
+    *p = NULL;
+
+    return ret;
+}
+
 /* Functions for the builtins special parameter. */
 
 /**/
@@ -1843,6 +1870,8 @@ static const struct gsu_hash pmdissaliases_gsu =
 
 static const struct gsu_array funcstack_gsu =
 { funcstackgetfn, arrsetfn, stdunsetfn };
+static const struct gsu_array functrace_gsu =
+{ functracegetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array reswords_gsu =
 { reswordsgetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array disreswords_gsu =
@@ -1868,6 +1897,9 @@ static struct pardef partab[] = {
     { "funcstack", PM_ARRAY|PM_SPECIAL|PM_READONLY,
       NULL, NULL, NULL,
       &funcstack_gsu, NULL },
+    { "functrace", PM_ARRAY|PM_SPECIAL|PM_READONLY,
+      NULL, NULL, NULL,
+      &functrace_gsu, NULL },
     { "builtins", PM_READONLY,
       getpmbuiltin, scanpmbuiltins, NULL,
       NULL, NULL },

@@ -1001,6 +1001,8 @@ struct shfunc {
 struct funcstack {
     Funcstack prev;		/* previous in stack */
     char *name;			/* name of function called */
+    char *caller;		/* name of caller */
+    int lineno;			/* line number in file */
 };
 
 /* node in list of function call wrappers */

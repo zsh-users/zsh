@@ -3798,6 +3798,8 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     }
 #endif
     fstack.name = dupstring(name);
+    fstack.caller = dupstring(oargv0 ? oargv0 : argzero);
+    fstack.lineno = lineno;
     fstack.prev = funcstack;
     funcstack = &fstack;
 

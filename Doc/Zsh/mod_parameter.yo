@@ -159,4 +159,10 @@ This array contains the names of the functions currently being
 executed. The first element is the name of the function using the
 parameter.
 )
+vindex(functrace)
+item(tt(functrace))(
+This array contains the names and line numbers of the callers
+corresponding to the functions currently being executed.
+The format of each element is name:lineno.
+)
 enditem()
