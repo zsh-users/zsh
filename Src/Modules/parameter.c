@@ -568,7 +568,7 @@ functracegetfn(UNUSED(Param pm))
     for (f = funcstack, p = ret; f; f = f->prev, p++) {
 	char *colonpair;
 
-	colonpair = zhalloc(strlen(f->caller) + f->lineno > 9999 ? 24 : 6);
+	colonpair = zhalloc(strlen(f->caller) + (f->lineno > 9999 ? 24 : 6));
 	sprintf(colonpair, "%s:%d", f->caller, f->lineno);
 
 	*p = colonpair;

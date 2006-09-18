@@ -1,6 +1,6 @@
 2006-09-17  Clint Adams  <clint@zsh.org>
 
-	* 22728: Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c,
+	* 22728, 22734: Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c,
 	Src/Modules/parameter.mdd, Src/exec.c, Src/zsh.h: $functrace
 	parameter for function backtraces.
 
