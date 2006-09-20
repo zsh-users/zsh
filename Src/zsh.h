@@ -2008,6 +2008,7 @@ typedef wint_t convchar_t;
 #define MB_METACHARLEN(str)	mb_metacharlenconv(str, NULL)
 #define MB_METASTRLEN(str)	mb_metastrlen(str, 0)
 #define MB_METASTRWIDTH(str)	mb_metastrlen(str, 1)
+#define MB_METASTRLEN2(str, widthp)	mb_metastrlen(str, widthp)
 
 /*
  * Note WCWIDTH() takes wint_t, typically as a convchar_t.
@@ -2041,6 +2042,7 @@ typedef int convchar_t;
 #define MB_METACHARLEN(str)	(*(str) == Meta ? 2 : 1)
 #define MB_METASTRLEN(str)	ztrlen(str)
 #define MB_METASTRWIDTH(str)	ztrlen(str)
+#define MB_METASTRLEN2(str, widthp)	ztrlen(str)
 
 #define WCWIDTH(c)	(1)
 

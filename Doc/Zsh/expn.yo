@@ -869,11 +869,23 @@ var(string1) and var(string2) are given, tt(string2) is inserted
 once directly to the left of each word, truncated if necessary, before
 var(string1) is used to produce any remaining padding.
 
-If the tt(MULTIBYTE) option is in effect, screen character widths will
-be used for the calculation of padding; otherwise individual bytes are
-treat as occupying one unit of width.  Control characters are always
-assumed to be one unit wide; this allows the mechanism to be used
-for generating repetitions of control characters.
+If the tt(MULTIBYTE) option is in effect, the flag tt(m) may also
+be given, in which case widths will be used for the calculation of
+padding; otherwise individual multibyte characters are treated as occupying
+one unit of width.
+
+IF the tt(MULTIBYTE) option is not in effect, each byte in the string is
+treated as occupying one unit of width.
+
+Control characters are always assumed to be one unit wide; this allows the
+mechanism to be used for generating repetitions of control characters.
+)
+item(tt(m))(
+Only useful together with tt(l) and tt(r) when the tt(MULTIBYTE) option
+is in effect.  Use the character width reported by the system in
+calculating the how much of the string it occupies.  Most printable
+characters have a width of one unit, however certain Asian character sets
+and certain special effects use wider characters.
 )
 item(tt(r:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
 As tt(l), but pad the words on the right and insert var(string2)

@@ -1,3 +1,13 @@
+2006-09-20  Peter Stephenson  <pws@csr.com>
+
+	* 22743: Doc/Zsh/builtis.yo, Src/builtin.c: document the sh
+	"set - [args]" -> "set -xv [-- args]" hack and limit it to
+	non-native emulation.
+
+	* 22742: Doc/Zsh/expn.yo, Src/subst.c, Src/zsh.h: padding once
+	again defaults to character lengths, but (m) flag turns on
+	character widths for multibyte characters.
+
 2006-09-17  Clint Adams  <clint@zsh.org>
 
 	* 22728, 22734: Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c,
@@ -25,6 +35,10 @@
 	for RLIMIT_NICE and RLIMIT_RTPRIO respectively.
 
 2006-09-15  Peter Stephenson  <pws@csr.com>
+
+	* zsh-users/10720: arno + pws: Functions/Misc/checkmail:
+	bad recursive argument handling and need to be safer about
+	options.
 
 	* 22715: Src/exec.c: AUTOCONTINUE option never worked.
 

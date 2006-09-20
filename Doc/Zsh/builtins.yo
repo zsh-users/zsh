@@ -1160,6 +1160,10 @@ positional parameters will be unset.
 If no arguments and no `tt(-)tt(-)' are given, then the names and values of
 all parameters are printed on the standard output.  If the only argument is
 `tt(PLUS())', the names of all parameters are printed.
+
+For historical reasons, `tt(set -)' is treated as `tt(set +xv)'
+and `tt(set -) var(args)' as `tt(set +xv --) var(args)' when in
+any other emulation mode than zsh's native mode.
 )
 module(setcap)(zsh/cap)
 findex(setopt)
