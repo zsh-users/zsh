@@ -1,5 +1,8 @@
 2006-09-20  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/_perforce: add some
+	handling for unsupported commands; add p4d completion.
+
 	* 22743: Doc/Zsh/builtis.yo, Src/builtin.c: document the sh
 	"set - [args]" -> "set -xv [-- args]" hack and limit it to
 	non-native emulation.

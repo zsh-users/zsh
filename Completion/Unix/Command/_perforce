@@ -1,4 +1,4 @@
-#compdef p4 -value-,P4CLIENT,-default- -value-,P4PORT,-default- -value-,P4MERGE,-default- -value-,P4USER,-default-
+#compdef p4 p4d -value-,P4CLIENT,-default- -value-,P4PORT,-default- -value-,P4MERGE,-default- -value-,P4USER,-default-
 
 # Maintainer: Peter Stephenson <pws@csr.com>.
 
@@ -385,7 +385,31 @@ _perforce() {
     fi
   fi
 
-  if _perforce_global_options; then
+  if [[ $service = p4d ]]; then
+    _arguments -s : \
+      '-d[run as daemon]' \
+      '-f[run as single threaded server]' \
+      '-i[run for inetd using sockets]' \
+      '-q[suppress startup message]' \
+      '-s[run as NT service]' \
+      '-xi[switch server database to unicode mode and quit]' \
+      '-xu[run database upgrade and quit]' \
+      '-c[run command and exit]:command of some sort: ' \
+      '-jc[checkpoint, save and truncate journal]::optional prefix: ' \
+      '-jd[checkpoint, not saving journal]::optional file:_files' \
+      '-jj[save and truncate journal]::optional prefix: ' \
+      '-jr[incremental restore from checkpoint/journal]:'\
+'file:_files:file:_files' \
+      '-z[gzip checkpoint and journal files]' \
+      '-h[show help]' \
+      '-V[print server version]' \
+      '-A[set audit log ($P4AUDIT)]:audit file:_files' \
+      '-J[set journal file ($P4JOURNAL) or "off"]:journal file:_files' \
+      '-L[set error log ($P4LOG or stderr)]:error log:_files' \
+      '-p[set port ($P4PORT o perforce:1666)]:port:_perforce_hosts_ports' \
+      '-r[set root directory ($P4ROOT)]:root directory:_path_files -g "*(/)"' \
+      '-v[debug level]:level: '
+  elif _perforce_global_options; then
     _arguments -s : $_perforce_option_dispatch \
     '1:perforce command:_perforce_commands'
   else
@@ -433,16 +457,25 @@ _perforce_gen_cmd_list() {
   done
   # Also cache the server version for nefarious purposes.
   _perforce_call_p4 info info | while read line; do
-    if [[ $line = (#b)"Server version: "*/*/(<->.<->)/*" "(*) ]]; then
+    if [[ $line = (#b)"Server version: "*/*/(<->.<->)(.[^/]|)/*" "* ]]; then
       _perforce_server_version=$match[1]
     fi
   done
-  if [[ -n ${_perforce_server_version} && \
-        ${_perforce_server_version%%.*} -ge 2004 && \
-        ${_perforce_cmd_list[(r)attribute:*]} = '' ]]; then
-    # As yet unsupported attribute command
-    _perforce_cmd_list+=("attribute:Set attributes for open file (EXPERIMENTAL)")
-  fi
+
+  # Unsupported commands: we could look through p4 help undoc, I suppose.
+  # I can't be bothered to check the date when they appeared any more,
+  # but let's at least check they're not already there.
+  local -a unsup
+  unsup=(
+    "attribute:Set attributes for open file (EXPERIMENTAL)"
+    "interchanges:Report changes not yet integrated between branches"
+    "spec:Allows limited changes to form specifications (admin)"
+  )
+  for line in $unsup; do
+    if [[ ${_perforce_cmd_list[(r)${line%%:*}:*]} = '' ]]; then
+      _perforce_cmd_list+=($line)
+    fi
+  done
 }
 
 
@@ -1781,6 +1814,9 @@ _perforce_cmd_help() {
 	_perforce_help_list+=("$hline[3]:${hline[4,-1]}")
       fi
     done
+    if [[ -z ${_perforce_help_list[(r)undoc:*]} ]]; then
+      _perforce_help_list+=("undoc:Help for otherwise undocumented features")
+    fi
   fi
   _describe -t help-options 'Perforce help option' _perforce_help_list
 }
@@ -1828,6 +1864,35 @@ _perforce_cmd_integrated() {
     '-r[reverse mapping in branch view with -b]' \
     '-b[select files integrated via branch]:branch:_perforce_branches' \
     '*::file:_perforce_files -ti'
+}
+
+
+# interchanges is an unsupported but useful command that reports
+# changes that haven't been integrated between source and target;
+# see "p4 help undoc".
+(( $+functions[_perforce_cmd_interchanges] )) ||
+_perforce_cmd_interchanges() {
+  local -a fileargs
+  if [[ ${words[(I)-b*]} -ne 0 ]]; then
+    if [[ ${words[(I)-*s*]} -eq 0 ]]; then
+      # with -b and no -s, all files are to-files
+      fileargs=('*::to file:_perforce_files -tR')
+    else
+      # with -b and -s we have one from-file and any number of to-files
+      fileargs=('1::from file:_perforce_files -tR'
+	        '*::to file:_perforce_files')
+    fi
+  else
+    # with no -b we have one from-file and one to-file
+    fileargs=('1::from file:_perforce_files -tR'
+              '2::to file:_perforce_files')
+  fi
+  _arguments -s : \
+    '-f[show individual files]' \
+    '-l[long changelist description]' \
+    '-b[select files integrated via branch]:branch:_perforce_branches' \
+    '-r[reverse branch mapping]' \
+    $fileargs
 }
 
 
@@ -2066,6 +2131,17 @@ _perforce_cmd_set() {
     '-s[set for whole system]' \
     '-S[set for specified service]:service: ' \
     "*::environment variable:_perforce_variables"
+}
+
+
+(( $+functions[_perforce_cmd_spec] )) ||
+_perforce_cmd_spec() {
+  _arguments -s : \
+    '-d[delete a custom spec]' \
+    '-i[read spec from stdin]' \
+    '-o[write spec to stdout]' \
+    "*::spec type:(branch change client depot group job
+label spec trigger typemap user)"
 }
 
 
