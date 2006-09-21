@@ -1,3 +1,9 @@
+2006-09-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22752: + Roman Neuhauser: Doc/Zsh/compsys.yo,
+	Doc/Zsh/compwid.yo, Doc/Zsh/roadmap.yo: improved introduction
+	to completion.
+
 2006-09-21  Peter Stephenson  <pws@csr.com>
 
 	* 22739: arno: Functions/Prompt/promptinit: change test

@@ -40,13 +40,32 @@ variables (referred to in the documentation as parameters) tt(HISTFILE),
 tt(HISTSIZE) and tt(SAVEHIST) in ifzman(zmanref(zshparam))\
 ifnzman(noderef(Parameters Used By The Shell)).
 
-The line editor provides an extensive completion system and the shell
-is supplied with completions for many commonly used commands.  Note
-that the new completion system referred to as tt(compsys) is preferred
-over the older tt(compctl) system.  The completion system must be enabled
-explicitly when the shell starts.  For more information see
+subsect(Completion)
+
+Completion is a feature present in many shells. It allows the user to
+type only a part (usually the prefix) of a word and have the shell fill
+in the rest.  The completion system in zsh is programmable.  For
+example, the shell can be set to complete email addresses in
+arguments to the mail command from your tt(~/.abook/addressbook);
+usernames, hostnames, and even remote paths in arguments to scp, and so
+on.  Anything that can be written in or glued together with zsh can be
+the source of what the line editor offers as possible completions.
+
+Zsh has two completion systems, an old, so called tt(compctl) completion
+(named after the builtin command that serves as its complete and only
+user interface), and a new one, referred to as tt(compsys),
+organized as library of builtin and user-defined functions.
+The two systems differ in their interface for specifying the completion
+behavior.  The new system is more customizable and is supplied with
+completions for many commonly used commands; it is therefore to be
+preferred.
+
+The completion system must be enabled explicitly when the shell starts.
+For more information see
 ifzman(zmanref(zshcompsys))\
 ifnzman(noderef(Completion System)).
+
+subsect(Extending the line editor)
 
 Apart from completion, the line editor is highly extensible by means of
 shell functions.  Some useful functions are provided with the shell; they
