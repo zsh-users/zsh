@@ -1,3 +1,9 @@
+2006-09-21  Peter Stephenson  <pws@csr.com>
+
+	* 22753: Src/prompt.c, Src/utils.c, Src/Zle/complist.c:
+	minor bugs with using characters spotted from warnings on
+	Cygwin.
+
 2006-09-20  Peter Stephenson  <pws@csr.com>
 
 	* users/10748: Doc/Zsh/compsys.yo: improve example, make one

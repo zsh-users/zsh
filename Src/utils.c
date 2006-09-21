@@ -2019,9 +2019,10 @@ mod_export int
 noquery(int purge)
 {
     int val = 0;
-    char c;
 
 #ifdef FIONREAD
+    char c;
+
     ioctl(SHTTY, FIONREAD, (char *)&val);
     if (purge) {
 	for (; val; val--)

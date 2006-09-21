@@ -1130,7 +1130,8 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 			     * Normal text: build up a multibyte character.
 			     */
 			    char inchar;
-			    wchar_t cc, wcw;
+			    wchar_t cc;
+			    int wcw;
 
 			    /*
 			     * careful: string is still metafied (we

@@ -982,7 +982,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	len = MB_METACHARLENCONV(p, &cchar);
 #ifdef MULTIBYTE_SUPPORT
 	if (cchar == WEOF) {
-	    cchar = (wchar_t)p;
+	    cchar = (wchar_t)(*p == Meta ? p[1] ^ 32 : *p);
 	    width = 1;
 	}
 	else
@@ -995,7 +995,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		len = MB_METACHARLENCONV(p, &cchar);
 #ifdef MULTIBYTE_SUPPORT
 		if (cchar == WEOF)
-		    cchar = (wchar_t)p;
+		    cchar = (wchar_t)(*p == Meta ? p[1] ^ 32 : *p);
 #endif
 		p += len;
 
