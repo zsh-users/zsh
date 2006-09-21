@@ -1,5 +1,8 @@
 2006-09-21  Peter Stephenson  <pws@csr.com>
 
+	* 22739: arno: Functions/Prompt/promptinit: change test
+	for prompt -c to test for theme.
+
 	* 22753: Src/prompt.c, Src/utils.c, Src/Zle/complist.c:
 	minor bugs with using characters spotted from warnings on
 	Cygwin.

@@ -91,7 +91,7 @@ Use prompt -h <theme> for help on specific themes.'
       ;;
   esac
   case "$opt" in
-    c) if (( $+prompt_theme )); then
+    c) if [[ -n $prompt_theme ]]; then
          print -n "Current prompt theme"
          (( $#prompt_theme > 1 )) && print -n " with parameters"
          print " is:\n  $prompt_theme"
