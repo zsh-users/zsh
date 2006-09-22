@@ -195,6 +195,8 @@
 >8#21
 >023
 
+  # now-a-days cd can easily be localized. Force default (POSIX) locale
+  LC_ALL=C LC_MESSAGES=C
   setopt cdablevars
   # only absolute paths are eligible for ~-expansion
   cdablevar1=tmpcd
@@ -207,8 +209,8 @@
   cd cdablevar2
 1q:CDABLE_VARS option
 >back in options.tmp
-?(eval):cd:4: no such file or directory: cdablevar1
-?(eval):cd:10: no such file or directory: cdablevar2
+?(eval):cd:6: no such file or directory: cdablevar1
+?(eval):cd:12: no such file or directory: cdablevar2
 
 # CHASE_DOTS should go with CHASE_LINKS in B01cd.ztst
 # which saves me having to write it here.

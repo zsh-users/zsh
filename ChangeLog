@@ -1,3 +1,9 @@
+2006-09-22  Andrey Borzenkov <bor@zsh.org>
+
+	* 22758: Test/A06assign.ztst, Test/B03print.ztst,
+	Test/E01options.ztst: force locale to C to avoid test failures
+	due to localized output
+
 2006-09-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22752: + Roman Neuhauser: Doc/Zsh/compsys.yo,
