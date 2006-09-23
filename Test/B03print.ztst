@@ -76,8 +76,6 @@
 >123 678
 >90 0
 
-# See A06assign for full explanation
- LC_ALL=C LC_NUMERIC=C
  printf '%g %g\n' 123.45 678 90.1
 0:test g format specifier
 >123.45 678

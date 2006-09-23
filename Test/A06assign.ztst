@@ -55,13 +55,6 @@
  (( i == 30 ))
 0:add to integer
 
-# According to official printf info page:
-#    A floating-point argument must use a period before any fractional
-#    digits, but is printed according to the `LC_NUMERIC' category of the
-#    current locale.
-# So, force LC_ALL to be C (otherwise it overrides LC_NUMERIC)
-
- LC_ALL=C LC_NUMERIC=C
  float f=3.4
  f+=2.3
  printf "%g\n" f
