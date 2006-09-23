@@ -5,6 +5,10 @@
 	locale is already taken care of in test harness; revert 22758
 	and add LC_NUMERIC and LC_MESSAGES to list of locale variables to set.
 
+	* 22761: Src/subst.c, Src/Zle/computil.c: make compdescribe
+	to consistently use character width when laying out matches.
+	This supercedes fix in 22729.
+
 2006-09-22  Andrey Borzenkov <bor@zsh.org>
 
 	* 22758: Test/A06assign.ztst, Test/B03print.ztst,

@@ -581,7 +581,7 @@ strcatsub(char **d, char *pb, char *pe, char *src, int l, char *s, int glbsub,
 typedef int (*CompareFn) _((const void *, const void *));
 
 /**/
-int
+mod_export int
 strpcmp(const void *a, const void *b)
 {
 #ifdef HAVE_STRCOLL

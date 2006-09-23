@@ -33,6 +33,13 @@
 
 /* Help for `_describe'. */
 
+/*
+ * FIXME this should be defined globally. I have to find other places
+ * where it is used
+ * */
+
+#define INTERMATCH_GAP 2
+
 typedef struct cdset *Cdset;
 typedef struct cdstr *Cdstr;
 typedef struct cdrun *Cdrun;
@@ -40,16 +47,18 @@ typedef struct cdrun *Cdrun;
 struct cdstate {
     int showd;			/* != 0 if descriptions should be shown */
     char *sep;			/* the separator string */
-    int slen;			/* its length */
+    int slen;			/* its metafied length */
+    int swidth;			/* its screen width */
     int maxmlen;                /* maximum length to allow for the matches */
     Cdset sets;			/* the sets of matches */
-    int pre;                    /* longest prefix (before description) */
+    int pre;                    /* longest prefix length (before description) */
+    int premaxw;		/* ... and its screen width */
     int suf;                    /* longest suffix (description) */
     int maxg;                   /* size of largest group */
     int maxglen;                /* columns for matches of largest group */
     int groups;                 /* number of groups */
     int descs;                  /* number of non-group matches with desc */
-    int gpre;                   /* prefix length for group display */
+    int gprew;                   /* prefix screen width for group display */
     Cdrun runs;                 /* runs to report to shell code */
 };
 
@@ -58,7 +67,9 @@ struct cdstr {
     char *str;                  /* the string to display */
     char *desc;                 /* the description or NULL */
     char *match;                /* the match to add */
+    char *sortstr;		/* unmetafied string used to sort matches */
     int len;                    /* length of str or match */
+    int width;			/* ... and its screen width */
     Cdstr other;                /* next string with the same description */
     int kind;                   /* 0: not in a group, 1: the first, 2: other */
     Cdset set;                  /* the set this string is in */
@@ -102,6 +113,7 @@ freecdsets(Cdset p)
 	    freearray(p->opts);
         for (s = p->strs; s; s = sn) {
             sn = s->next;
+	    zfree(s->sortstr, strlen(s->str) + 1);
             zsfree(s->str);
             zsfree(s->desc);
             if (s->match != s->str)
@@ -123,7 +135,7 @@ cd_group(int maxg)
 {
     Cdset set1, set2;
     Cdstr str1, str2, *strp;
-    int num, len;
+    int num, width;
 
     cd_state.groups = cd_state.descs = cd_state.maxglen = 0;
     cd_state.maxg = 0;
@@ -140,20 +152,20 @@ cd_group(int maxg)
                 continue;
 
             num = 1;
-            len = str1->len + cd_state.slen;
-            if (len > cd_state.maxglen)
-                cd_state.maxglen = len;
+            width = str1->width + cd_state.swidth;
+            if (width > cd_state.maxglen)
+                cd_state.maxglen = width;
             strp = &(str1->other);
 
             for (set2 = set1; set2; set2 = set2->next) {
                 for (str2 = (set2 == set1 ? str1->next : set2->strs);
                      str2; str2 = str2->next)
                     if (str2->desc && !strcmp(str1->desc, str2->desc)) {
-                        len += 2 + str2->len;
-                        if (len > cd_state.maxmlen || num == maxg)
+                        width += INTERMATCH_GAP + str2->width;
+                        if (width > cd_state.maxmlen || num == maxg)
                             break;
-                        if (len > cd_state.maxglen)
-                            cd_state.maxglen = len;
+                        if (width > cd_state.maxglen)
+                            cd_state.maxglen = width;
                         str1->kind = 1;
                         str2->kind = 2;
                         num++;
@@ -194,6 +206,8 @@ cd_calc()
             set->count++;
             if ((l = strlen(str->str)) > cd_state.pre)
                 cd_state.pre = l;
+            if ((l = MB_METASTRWIDTH(str->str)) > cd_state.premaxw)
+                cd_state.premaxw = l;
             if (str->desc) {
                 set->desc++;
                 if ((l = strlen(str->desc)) > cd_state.suf)
@@ -206,7 +220,7 @@ cd_calc()
 static int
 cd_sort(const void *a, const void *b)
 {
-    return strcmp((*((Cdstr *) a))->str, (*((Cdstr *) b))->str);
+    return strpcmp(&(*((Cdstr *) a))->sortstr, &(*((Cdstr *) b))->sortstr);
 }
 
 static int
@@ -234,8 +248,8 @@ cd_prep()
             for (str = set->strs; str; str = str->next) {
                 if (str->kind != 1) {
                     if (!str->kind && str->desc) {
-                        if (str->len > wids[0])
-                            wids[0] = str->len;
+                        if (str->width > wids[0])
+                            wids[0] = str->width;
                         str->other = NULL;
                         *strp++ = str;
                     }
@@ -248,24 +262,33 @@ cd_prep()
                 for (; gp; gp = gn) {
                     gn = gp->other;
                     gp->other = NULL;
-                    for (gpp = &gs; *gpp && (*gpp)->len > gp->len;
+                    for (gpp = &gs; *gpp && (*gpp)->width > gp->width;
                          gpp = &((*gpp)->other));
                     gp->other = *gpp;
                     *gpp = gp;
                 }
                 for (gp = gs, i = 0; gp; gp = gp->other, i++)
-                    if (gp->len > wids[i])
-                        wids[i] = gp->len;
+                    if (gp->width > wids[i])
+                        wids[i] = gp->width;
 
                 *strp++ = gs;
             }
 
-        cd_state.gpre = 0;
-        for (i = 0; i < cd_state.maxg; i++)
-            cd_state.gpre += wids[i] + 2;
+        cd_state.gprew = 0;
+        for (i = 0; i < cd_state.maxg; i++) {
+            cd_state.gprew += wids[i] + INTERMATCH_GAP;
+	}
 
-        if (cd_state.gpre > cd_state.maxmlen && cd_state.maxglen > 1)
+        if (cd_state.gprew > cd_state.maxmlen && cd_state.maxglen > 1)
             return 1;
+
+	for (i = 0; i < lines; i++) {
+	    Cdstr s = grps[i];
+	    int dummy;
+
+	    s->sortstr = ztrdup(s->str);
+	    unmetafy(s->sortstr, &dummy);
+	}
 
         qsort(grps, lines, sizeof(Cdstr), cd_sort);
 
@@ -443,12 +466,13 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
     }
     setp = &(cd_state.sets);
     cd_state.sep = ztrdup(sep);
-    cd_state.slen = ztrlen(sep);
+    cd_state.slen = strlen(sep);
+    cd_state.swidth = MB_METASTRWIDTH(sep);
     cd_state.sets = NULL;
     cd_state.showd = disp;
     cd_state.maxg = cd_state.groups = cd_state.descs = 0;
     cd_state.maxmlen = atoi(mlen);
-    itmp = columns - cd_state.slen - 4;
+    itmp = columns - cd_state.swidth - 4;
     if (cd_state.maxmlen > itmp)
         cd_state.maxmlen = itmp;
     if (cd_state.maxmlen < 4)
@@ -489,6 +513,8 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
             *tmp = '\0';
             str->str = str->match = ztrdup(rembslash(*ap));
             str->len = strlen(str->str);
+            str->width = MB_METASTRWIDTH(str->str);
+	    str->sortstr = NULL;
         }
         if (str)
             str->next = NULL;
@@ -600,38 +626,61 @@ cd_get(char **params)
 
         case CRT_DESC:
             {
+		/*
+		 * The buffer size:
+		 *     max prefix length (cd_state.pre) +
+		 *     max padding (cd_state.premaxw generously :) +
+		 *     separator length (cd_state.slen) +
+		 *     inter matches gap (INTERMATCH_GAP) +
+		 *     max description length (cd_state.suf) +
+		 *     trailing \0
+		 */
                 VARARR(char, buf,
-                       cd_state.pre + cd_state.suf + cd_state.slen + 3);
-                char *sufp = NULL;
-
-                memcpy(buf + cd_state.pre + 2, cd_state.sep, cd_state.slen);
-                buf[cd_state.pre] = buf[cd_state.pre + 1] = ' ';
-                sufp = buf + cd_state.pre + cd_state.slen + 2;
-
+                       cd_state.pre + cd_state.suf +
+		       cd_state.premaxw + cd_state.slen + 3);
                 mats = mp = (char **) zalloc((run->count + 1) * sizeof(char *));
                 dpys = dp = (char **) zalloc((run->count + 1) * sizeof(char *));
 
                 for (str = run->strs; str; str = str->run) {
+		    char *p = buf, *pp, *d;
+		    int l, remw, w;
+
                     *mp++ = ztrdup(str->match);
-                    memset(buf, ' ', cd_state.pre);
-                    memcpy(buf, str->str, str->len);
-                    strcpy(sufp, str->desc);
-                    if (MB_METASTRWIDTH(buf) >= columns - 1) {
-			char *termptr = buf;
-			int w;
-			MB_METACHARINIT();
-			for (w = columns - 1; *termptr && w > 0; ) {
-			    convchar_t cchar;
-			    int cw;
-			    termptr += MB_METACHARLENCONV(termptr, &cchar);
-			    cw = WCWIDTH(cchar);
-			    if (cw >= 0)
-				w -= cw;
-			    else
-				w--;
+		    strcpy(p, str->str);
+		    p += str->len;
+                    memset(p, ' ', (l = (cd_state.premaxw - str->width + INTERMATCH_GAP)));
+		    p += l;
+		    strcpy(p, cd_state.sep);
+		    p += cd_state.slen;
+
+		    /*
+		     * copy a character at once until no more screen width
+		     * is available. Leave 1 character at the end of screen
+		     * as safety margin
+		     */
+		    remw = columns - cd_state.premaxw - cd_state.swidth - 3;
+		    d = str->desc;
+		    w = MB_METASTRWIDTH(d);
+		    if (w <= remw)
+			strcpy(p, d);
+		    else {
+			pp = p;
+			while (remw > 0 && *d) {
+			    l = MB_METACHARLEN(d);
+			    memcpy(pp, d, l);
+			    pp[l] = '\0';
+			    w = MB_METASTRWIDTH(pp);
+			    if (w > remw) {
+				*pp = '\0';
+				break;
+			    }
+
+			    pp += l;
+			    d += l;
+			    remw -= w;
 			}
-                        *termptr = '\0';
 		    }
+
                     *dp++ = ztrdup(buf);
                 }
                 *mp = *dp = NULL;
@@ -684,10 +733,10 @@ cd_get(char **params)
 	default: /* This silences the "might be used uninitialized" warnings */
         case CRT_EXPL:
             {
-                int dlen = columns - cd_state.gpre - cd_state.slen;
-                VARARR(char, dbuf, dlen + cd_state.slen);
-                char buf[20];
-                int i = run->count;
+		/* add columns as safety margin */
+                VARARR(char, dbuf, cd_state.suf + cd_state.slen + columns);
+                char buf[20], *p, *pp, *d;
+                int i = run->count, remw, w, l;
 
                 sprintf(buf, "-E%d", i);
 
@@ -699,13 +748,36 @@ cd_get(char **params)
                         *dp++ = ztrdup("");
                         continue;
                     }
-                    memset(dbuf + cd_state.slen, ' ', dlen - 1);
-                    dbuf[dlen + cd_state.slen - 1] = '\0';
+
                     strcpy(dbuf, cd_state.sep);
-                    memcpy(dbuf + cd_state.slen,
-                           str->desc,
-                           ((int)strlen(str->desc) >= dlen ? dlen - 1 :
-                            (int)strlen(str->desc)));
+		    remw = columns - cd_state.gprew - cd_state.swidth - INTERMATCH_GAP;
+		    p = pp = dbuf + cd_state.slen;
+		    d = str->desc;
+		    w = MB_METASTRWIDTH(d);
+		    if (w <= remw) {
+			strcpy(p, d);
+			remw -= w;
+			pp += strlen(d);
+		    } else
+			while (remw > 0 && *d) {
+			    l = MB_METACHARLEN(d);
+			    memcpy(pp, d, l);
+			    pp[l] = '\0';
+			    w = MB_METASTRWIDTH(pp);
+			    if (w > remw) {
+				*pp = '\0';
+				break;
+			    }
+
+			    pp += l;
+			    d += l;
+			    remw -= w;
+			}
+
+		    while (remw-- > 0)
+			*pp++ = ' ';
+		    *pp = '\0';
+
                     *dp++ = ztrdup(dbuf);
                 }
                 mats[0] = *dp = NULL;
