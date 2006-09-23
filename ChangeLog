@@ -1,7 +1,7 @@
 2006-09-23  Andrey Borzenkov <bor@zsh.org>
 
 	* unposted: Test/A06assign.ztst, Test/B03print.ztst,
-	Test/E01options.ztst, Test/ztst.zsh: as pointed by Bart in 22758,
+	Test/E01options.ztst, Test/ztst.zsh: as pointed by Bart in 22759,
 	locale is already taken care of in test harness; revert 22758
 	and add LC_NUMERIC and LC_MESSAGES to list of locale variables to set.
 
