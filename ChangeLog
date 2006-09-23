@@ -1,3 +1,9 @@
+2006-09-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22765: Src/subst.c, Src/utils.c, Src/ztype.h,
+	Src/Zle/zle_main.c: rename some MB_ macros to WC_ since they
+	act on wchar_t's.
+
 2006-09-23  Andrey Borzenkov <bor@zsh.org>
 
 	* unposted: Test/A06assign.ztst, Test/B03print.ztst,

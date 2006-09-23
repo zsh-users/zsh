@@ -60,9 +60,9 @@
 #define inull(X) zistype(X,INULL)
 
 #ifdef MULTIBYTE_SUPPORT
-#define MB_ZISTYPE(X,Y) wcsitype((X),(Y))
-#define MB_ISPRINT(X)	iswprint(X)
+#define WC_ZISTYPE(X,Y) wcsitype((X),(Y))
+#define WC_ISPRINT(X)	iswprint(X)
 #else
-#define MB_ZISTYPE(X,Y)	zistype((X),(Y))
-#define MB_ISPRINT(X)	isprint(X)
+#define WC_ZISTYPE(X,Y)	zistype((X),(Y))
+#define WC_ISPRINT(X)	isprint(X)
 #endif

@@ -2616,7 +2616,7 @@ findsep(char **s, char *sep, int quote)
 		    continue;
 		} else {
 		    ilen = MB_METACHARLENCONV(t+1, &c);
-		    if (MB_ZISTYPE(c, ISEP)) {
+		    if (WC_ZISTYPE(c, ISEP)) {
 			chuck(t);
 			/* then advance over new character, length ilen */
 		    } else {
@@ -2628,7 +2628,7 @@ findsep(char **s, char *sep, int quote)
 		}
 	    } else {
 		ilen = MB_METACHARLENCONV(t, &c);
-		if (MB_ZISTYPE(c, ISEP))
+		if (WC_ZISTYPE(c, ISEP))
 		    break;
 	    }
 	}
@@ -2683,7 +2683,7 @@ findword(char **s, char *sep)
     for (t = *s; *t; t += sl) {
 	convchar_t c;
 	sl = MB_METACHARLENCONV(t, &c);
-	if (!MB_ZISTYPE(c, ISEP))
+	if (!WC_ZISTYPE(c, ISEP))
 	    break;
     }
     *s = t;
@@ -4172,7 +4172,7 @@ bslashquote(const char *s, char **e, int instring)
 #ifdef MULTIBYTE_SUPPORT
 		cc != WEOF && 
 #endif
-		MB_ISPRINT(cc)) {
+		WC_ISPRINT(cc)) {
 		switch (cc) {
 		case ZWC('\\'):
 		case ZWC('\''):

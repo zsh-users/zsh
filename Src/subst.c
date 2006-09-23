@@ -360,7 +360,7 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
 		l = 1;
 	    } else {
 		l = MB_METACHARLENCONV(x, &c);
-		if (!inq && !inp && MB_ZISTYPE(c, ISEP)) {
+		if (!inq && !inp && WC_ZISTYPE(c, ISEP)) {
 		    *x = '\0';
 		    for (x += l; *x; x += l) {
 			if (itok(STOUC(*x))) {
@@ -370,7 +370,7 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
 			    break;
 			}
 			l = MB_METACHARLENCONV(x, &c);
-			if (!MB_ZISTYPE(c, ISEP))
+			if (!WC_ZISTYPE(c, ISEP))
 			    break;
 		    }
 		    if (!*x)

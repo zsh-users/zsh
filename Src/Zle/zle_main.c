@@ -1457,7 +1457,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 			sepcount++;
 		    } else {
 			t += MB_METACHARLENCONV(t, &c);
-			if (MB_ZISTYPE(c, ISEP))
+			if (WC_ZISTYPE(c, ISEP))
 			    sepcount++;
 		    }
 		}
@@ -1473,7 +1473,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 			    *nptr++ = *t++;
 			} else {
 			    clen = MB_METACHARLENCONV(t, &c);
-			    if (MB_ZISTYPE(c, ISEP))
+			    if (WC_ZISTYPE(c, ISEP))
 				*nptr++ = '\\';
 			    while (clen--)
 				*nptr++ = *t++;
