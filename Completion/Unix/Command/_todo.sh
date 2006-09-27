@@ -11,8 +11,9 @@ setopt localoptions braceccl
 
 local expl curcontext="$curcontext" state line pri nextstate
 local -a cmdlist itemlist
+integer NORMARG
 
-_arguments -s \
+_arguments -s -n : \
   '-d[alternate config file]:config file:_files' \
   '-f[force, no confirmation]' \
   '-h[display help]' \
@@ -20,8 +21,7 @@ _arguments -s \
   '-v[verbose mode, confirmation messages]' \
   '-V[display version etc.]' \
   '1:command:->commands' \
-  '2:first argument:->firstarg' \
-  '3:second argument:->secondarg' && return 0
+  '*:arguments:->arguments' && return 0
 
 local txtmsg="text, can include p:<project> and @<where>"
 
@@ -45,11 +45,25 @@ case $state in
   _describe -t todo-commands 'todo.sh command' cmdlist
   ;;
 
-  (firstarg)
-  case $words[CURRENT-1] in
+  (arguments)
+  case $words[NORMARG] in
     (append|del|do|prepend|pri|replace)
-    itemlist=(${${(M)${(f)"$(todo.sh list)"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
-    _describe -t todo-items 'todo item' itemlist
+    if (( NORMARG == CURRENT - 1 )); then
+      itemlist=(${${(M)${(f)"$(todo.sh list)"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
+      _describe -t todo-items 'todo item' itemlist
+    else
+      case $words[NORMARG] in
+	(pri)
+	nextstate=pri
+	;;
+	(append|prepend)
+	_message $txtmsg
+	;;
+	(replace)
+	compadd -Q -- "${(qq)$(todo.sh list "^0*${words[CURRENT-1]} ")##<-> }"
+	;;
+      esac
+    fi
     ;;
 
     (add)
@@ -59,9 +73,6 @@ case $state in
     (list|listall)
     # This completes stuff beginning with p: (projects) or @ (contexts);
     # these are todo.sh conventions.
-    # We should do it for any argument after list or listall, but
-    # _arguments doesn't make that easy.  We need it to tell us
-    # the position of the first non-option argument.
     _wanted search expl 'context or project' \
       compadd ${${=${${(M)${(f)"$(todo.sh list)"}##<-> *}##<-> }}:#^(p:*|@*)}
     ;;
@@ -70,23 +81,6 @@ case $state in
     nextstate=pri
     ;;
 
-    (*)
-    return 1
-    ;;
-  esac
-  ;;
-
-  (secondarg)
-  case $words[CURRENT-2] in
-    (append|prepend)
-    _message $txtmsg
-    ;;
-    (pri)
-    nextstate=pri
-    ;;
-    (replace)
-    compadd -Q -- "${(qq)$(todo.sh list "^0*${words[CURRENT-1]} ")##<-> }"
-    ;;
     (*)
     return 1
     ;;

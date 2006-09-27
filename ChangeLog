@@ -1,5 +1,10 @@
 2006-09-27  Peter Stephenson  <pws@csr.com>
 
+	* 22780: Completion/Base/Utility/_arguments:
+	Completion/Unix/Command/_todo.sh, Doc/Zsh/compsys.yo,
+	Src/Zle/computil.c: _arguments -n sets NORMARG to index of first
+	non-option argument (via comparguments -n); use this in _todo.sh.
+
 	* unposted: Completion/Unix/Command/_todo.sh: replace buggy
 	search message by completion of projects and contexts.
 

@@ -3237,12 +3237,21 @@ Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.
 )
 findex(_arguments)
-item(tt(_arguments) [ tt(-swWACRS) ] [ tt(-O) var(name) ] [ tt(-M) var(matchspec) ] [ tt(:) ] var(spec) ...)(
+item(tt(_arguments) [ tt(-nswWACRS) ] [ tt(-O) var(name) ] [ tt(-M) var(matchspec) ] [ tt(:) ] var(spec) ...)(
 This function can be used to give a complete specification for
 completion for a command whose arguments follow standard UNIX option and
 argument conventions.  The following forms specify individual sets of
 options and arguments; to avoid ambiguity, these may be separated from the
-options to tt(_arguments) itself by a single colon.
+options to tt(_arguments) itself by a single colon.  Options to
+tt(_arguments) itself must be in separate words, i.e. tt(-s -w), not
+tt(-sw).
+
+With the option tt(-n), tt(_arguments) sets the parameter tt(NORMARG)
+to the position of the first normal argument in the tt($words) array,
+i.e. the position after the end of the options.  If that argument
+has not been reached, tt(NORMARG) is set to tt(-1).  The caller
+should declare `tt(integer NORMARG)' if the tt(-n) option is passed;
+otherwise the parameter is not used.
 
 startitem()
 xitem(var(n)tt(:)var(message)tt(:)var(action))
