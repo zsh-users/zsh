@@ -811,7 +811,7 @@ _perforce_retrieve_files() {
     # This may be faster, but won't use matcher specs etc.
     pfx=${(Q)PREFIX}
     compset -P '*/'
-    files=(${${${(f)"$(_perforce_call_p4 $1 $1 \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+    files=(${${${(f)"$(_perforce_call_p4 $1 $1 \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%%\#*}##*/})
   else
     # We need to limit the list to a directory.
     if [[ $PREFIX = */* ]]; then
@@ -820,7 +820,7 @@ _perforce_retrieve_files() {
       pfx="*"
     fi
     compset -P '*/'
-    files=(${${${(f)"$(_perforce_call_p4 $1 $1 \$pfx 2>/dev/null)"}%\#*}##*/})
+    files=(${${${(f)"$(_perforce_call_p4 $1 $1 \$pfx 2>/dev/null)"}%%\#*}##*/})
   fi
   [[ $#files -eq 1 && $files[1] = '' ]] && files=()
   shift

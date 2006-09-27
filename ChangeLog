@@ -1,3 +1,11 @@
+2006-09-27  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_todo.sh: replace buggy
+	search message by completion of projects and contexts.
+
+	* 22778: Completion/Unix/Command/_locate: completion for
+	various versions of the locate command.
+
 2006-09-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22765: Src/subst.c, Src/utils.c, Src/ztype.h,

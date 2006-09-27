@@ -1,0 +1,111 @@
+#compdef locate mlocate slocate
+
+# Decide if we are using mlocate or slocate.
+local ltype basename=${words[0]:t} input
+# If we can't, use this guess.
+local best_guess=mlocate
+
+case $basename in
+  ([ms]locate)
+  ltype=$basename
+  ;;
+
+  (locate)
+  input="$(_call_program locate $words[0] -V)"
+  case $input in
+    (*mlocate*)
+    ltype=mlocate
+    ;;
+
+    (*(#i)secure locate*)
+    ltype=slocate
+    ;;
+
+    (*(#i)gnu locate*)
+    ltype=gnu
+    ;;
+
+    # guess
+    (*)
+    ltype=$best_guess
+    ;;
+  esac
+  ;;
+
+  (*)
+  # too dangerous to run: guess
+  ltype=$best_guess
+esac
+
+case $ltype in
+  (mlocate)
+  # actually, -d can take a colon-separate list
+  # -r/--regexp mean no normal arguments, so shouldn't complete
+  # -m and --mmap are ignored, so don't bother
+  # -s and --stdio likewise
+  _arguments -s : \
+    {-b,--basename}'[Match only the basename of files in the database]' \
+    {-c,--count}'[Output the number of matching entries]' \
+    {-d,--database=}'[Use alternative database]:database:_files' \
+    {-e,--existing}'[Restrict display to existing files]' \
+    {-L,--follow}'[Follow symbolic links to find existing files (default)]' \
+    {-h,--help}'[Show help]' \
+    {-i,--ignore-case}'[Ignore case distinctions in patterns]' \
+    {-l,-n,--limit=}'[Limit search results]:file limit: ' \
+    {-P,-H,--nofollow}'[Don'\''t follow symbolic links]' \
+    {-0,--null}'[Output separated by NUL characters]' \
+    {-S,--statistics}'[Show database statistics]' \
+    {-q,--quiet}'[Don'\''t report errors]' \
+    {-r,--regexp=}'[Search for given basic regexp]:basic regexp: ' \
+    --regex'[Patterns are extended regexps]' \
+    {-V,--version}'[Show version]' \
+    {-w,--wholename}'[Match entire file path (default)]' \
+    '*:pattern: '
+  ;;
+
+  (slocate)
+  # -d can take path
+  # -e can take a comma-separated list of directories.
+  # -f should complete list of file system types like mount
+  _arguments -s : \
+    -u'[Create slocate database starting at path /]' \
+    -U'[Create slocate database starting at given path]:directory:_files -/' \
+    -c'[Parse GNU locate updatedb with -u, -U]' \
+    -e'[Exclude directories with -u, -U]:directories:_files -/' \
+    -f'[Exclude file system types from db with -u, -U]:file system:_file_systems' \
+    -l'[Security level]:level:(0 1)' \
+    -q'[Quiet mode]' \
+    -n'[Limit search results]:file limit: ' \
+    -i'[Case insensitive search]' \
+    {-r,--regexp=}'[Use basic regular expression]:regexp: ' \
+    {-o,--output=}'[Specify database to create]:database:_files' \
+    {-d,--database=}'[Specify database to search]:database:_files' \
+    {-h,--help}'[Display help]' \
+    {-v,--verbose}'[Display files when creating database]' \
+    {-V,--version}'[Display version]' \
+    '*:pattern: '
+  ;;
+
+  (gnu)
+  _arguments -s : \
+    {-d,--database=}'[Use alternative database]:database:_files' \
+    {-e,--existing}'[Restrict display to existing files]' \
+    {-E,--non-existing}'[Allow display of nonexistent files (default)]' \
+    {-i,--ignore-case}'[Ignore case distinctions in patterns]' \
+    {-w,--wholename}'[Match entire file path (default)]' \
+    {-b,--basename}'[Match only the basename of files in the database]' \
+    {-l,-n,--limit=}'[Limit search results]:file limit: ' \
+    {-S,--statistics}'[Show database statistics]' \
+    {-0,--null}'[Output separated by NUL characters]' \
+    {-c,--count}'[Output the number of matching entries]' \
+    {-P,-H,--nofollow}'[Don'\''t follow symbolic links]' \
+    {-L,--follow}'[Follow symbolic links to find existing files (default)]' \
+    {-A,-all}'[Match all arguments instead of at least one]' \
+    {-p,--print}'[Include search results with statistics or count]' \
+    {-r,--regex=}'[Patterns are regular expressions]:basic regexp: ' \
+    --regextype='[Select type of regular expression]' \
+    {-V,--version}'[Show version]' \
+    --help'[Show help]' \
+    '*:pattern: '
+  ;;
+esac

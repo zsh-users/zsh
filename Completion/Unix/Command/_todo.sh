@@ -57,7 +57,13 @@ case $state in
     ;;
 
     (list|listall)
-    _message search term...
+    # This completes stuff beginning with p: (projects) or @ (contexts);
+    # these are todo.sh conventions.
+    # We should do it for any argument after list or listall, but
+    # _arguments doesn't make that easy.  We need it to tell us
+    # the position of the first non-option argument.
+    _wanted search expl 'context or project' \
+      compadd ${${=${${(M)${(f)"$(todo.sh list)"}##<-> *}##<-> }}:#^(p:*|@*)}
     ;;
 
     (listpri)
