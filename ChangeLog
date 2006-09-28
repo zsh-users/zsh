@@ -1,3 +1,8 @@
+2006-09-28  Peter Stephenson  <pws@csr.com>
+
+	* 22783: Frank Terbeck: Src/init.c: don't load zsh/newuser
+	unless interactive.
+
 2006-09-27  Peter Stephenson  <pws@csr.com>
 
 	* 22780: Completion/Base/Utility/_arguments:

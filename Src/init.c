@@ -958,7 +958,7 @@ run_init_scripts(void)
 	source(GLOBAL_ZSHENV);
 #endif
 
-	if (isset(RCS) && unset(PRIVILEGED))
+	if (isset(RCS) && isset(INTERACTIVE) && unset(PRIVILEGED))
 	{
 	    /*
 	     * Always attempt to load the newuser module to perform
