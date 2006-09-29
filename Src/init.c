@@ -958,15 +958,17 @@ run_init_scripts(void)
 	source(GLOBAL_ZSHENV);
 #endif
 
-	if (isset(RCS) && isset(INTERACTIVE) && unset(PRIVILEGED))
+	if (isset(RCS) && unset(PRIVILEGED))
 	{
-	    /*
-	     * Always attempt to load the newuser module to perform
-	     * checks for new zsh users.  Don't care if we can't load it.
-	     */
-	    if (load_module_silence("zsh/newuser", 1)) {
-		/* Unload it immediately. */
-		unload_named_module("zsh/newuser", "zsh", 1);
+	    if (isset(INTERACTIVE)) {
+		/*
+		 * Always attempt to load the newuser module to perform
+		 * checks for new zsh users.  Don't care if we can't load it.
+		 */
+		if (load_module_silence("zsh/newuser", 1)) {
+		    /* Unload it immediately. */
+		    unload_named_module("zsh/newuser", "zsh", 1);
+		}
 	    }
 
 	    sourcehome(".zshenv");

@@ -1,3 +1,7 @@
+2006-09-29  Vin Shelton  <acs@xemacs.org>
+
+       * 22789: Src/init.c: Source zshenv even if non-interactive.
+
 2006-09-29  Andrey Borzenkov <bor@zsh.org>
 
 	* 22787: Srz/Zsh/compmatch.c: change calling convention of
