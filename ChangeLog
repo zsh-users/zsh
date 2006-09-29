@@ -1,3 +1,10 @@
+2006-09-29  Andrey Borzenkov <bor@zsh.org>
+
+	* 22787: Srz/Zsh/compmatch.c: change calling convention of
+	pattern match to not depend on current implementation that works
+	for single byte characters only, thus making it more easy to
+	change it later.
+
 2006-09-28  Peter Stephenson  <pws@csr.com>
 
 	* 22783: Frank Terbeck: Src/init.c: don't load zsh/newuser

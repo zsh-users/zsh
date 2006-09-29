@@ -461,7 +461,6 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 {
     int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw, exact = 0, wexact = 0;
     int il = 0, iw = 0, t, ind, add, he = 0, bpc, obc = bc, bslash;
-    VARARR(unsigned char, ea, (ll > lw ? ll : lw) + 1);
     char *ow;
     Cmlist ms;
     Cmatcher mp, lm = NULL;
@@ -795,9 +794,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 					  (il || iw)));
 		    }
 		    /* Now try to match the line and word patterns. */
-		    if (!t ||
-			!pattern_match(mp->line, tl, NULL, ea) ||
-			!pattern_match(mp->word, tw, ea, NULL))
+		    if (!t || !pattern_match(mp->line, tl, mp->word, tw))
 			continue;
 
 		    /* Probably add the matched strings. */
@@ -1091,44 +1088,51 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 }
 
 /* Check if the given pattern matches the given string.             *
- * `in' and `out' are used for {...} classes. In `out' we store the *
- * character number that was matched. In the word pattern this is   *
- * given in `in' so that we can easily test if we found the         *
- * corresponding character. */
+ *  p and  s are either anchor or line pattern and string;
+ * wp and ws are word (candidate) pattern and string
+ *
+ * If only one pattern is given, we just check if characters match
+ * If both line and word are given, we check that characters match
+ * for {...} classes by comparing relative numbers in sequence.
+ *
+ * Patterns and strings are always passed in pairs, so it is enough
+ * to check for non-NULL wp. p should always be present.
+ */
 
 /**/
 mod_export int
-pattern_match(Cpattern p, char *s, unsigned char *in, unsigned char *out)
+pattern_match(Cpattern p, char *s, Cpattern wp, char *ws)
 {
     unsigned char c;
+    unsigned char wc;
 
-    while (p) {
-	c = *((unsigned char *) s);
+    while (p && wp && *s && *ws) {
+	c = p->tab[*((unsigned char *) s)];
+	wc = wp->tab[*((unsigned char *) ws)];
 
-	if (out)
-	    *out = 0;
-
-	if (p->equiv) {
-	    if (in) {
-		c = p->tab[c];
-		if ((*in && *in != c) || (!*in && !c))
-		    return 0;
-	    } else if (out) {
-		if (!(*out = p->tab[c]))
-		    return 0;
-	    } else if (!p->tab[c])
-		return 0;
-
-	    if (in && *in)
-		in++;
-	    if (out)
-		out++;
-	} else if (!p->tab[c])
+	if (!c || !wc || c != wc)
 	    return 0;
 
 	s++;
+	ws++;
 	p = p->next;
+	wp = wp->next;
     }
+
+    while (p && *s) {
+	if (!p->tab[*((unsigned char *) s)])
+	    return 0;
+	p = p->next;
+	s++;
+    }
+
+    while (wp && *ws) {
+	if (!wp->tab[*((unsigned char *) ws)])
+	    return 0;
+	wp = wp->next;
+	ws++;
+    }
+
     return 1;
 }
 
@@ -1214,38 +1218,48 @@ bld_parts(char *str, int len, int plen, Cline *lp)
  * buffer line. Initially line is the same as lp, but during recursive
  * calls lp is incremented for storing successive characters. Whenever
  * a full possible string is build, we test if this line matches the
- * string given by wlen and word. The in argument contains the characters
- * to use for the correspondence classes, it was filled by a call to 
- * pattern_match() in the calling function.
+ * string given by wlen and word.
+ *
+ * wpat contains pattern that matched previously
+ * lpat contains the pattern for line we build
+ * mword is a string that matched wpat before
+ * word is string that we try to match now
+ *
  * The return value is the length of the string matched in the word, it
- * is zero if we couldn't build a line that matches the word. */
+ * is zero if we couldn't build a line that matches the word.
+ */
+
 
 /**/
 static int
-bld_line(Cpattern pat, char *line, char *lp,
-	 char *word, int wlen, unsigned char *in, int sfx)
+bld_line(Cpattern wpat, Cpattern lpat, char *line, char *lp,
+	 char *mword, char *word, int wlen, int sfx)
 {
-    if (pat) {
+    if (lpat) {
 	/* Still working on the pattern. */
 
 	int i, l;
 	unsigned char c = 0;
 
 	/* Get the number of the character for a correspondence class
-	 * if it has a correxponding class. */
-	if (pat->equiv)
-	    if ((c = *in))
-		in++;
+	 * if it has a corresponding class. */
+	if (lpat->equiv)
+	    if (wpat && *mword) {
+		c = wpat->tab[STOUC(*mword)];
+		wpat = wpat->next;
+		mword++;
+	    }
+
 
 	/* Walk through the table in the pattern and try the characters
 	 * that may appear in the current position. */
 	for (i = 0; i < 256; i++)
-	    if ((pat->equiv && c) ? (c == pat->tab[i]) : pat->tab[i]) {
+	    if ((lpat->equiv && c) ? (c == lpat->tab[i]) : lpat->tab[i]) {
 		*lp = i;
 		/* We stored the character, now call ourselves to build
 		 * the rest. */
-		if ((l = bld_line(pat->next, line, lp + 1, word, wlen,
-				  in, sfx)))
+		if ((l = bld_line(wpat, lpat->next, line, lp + 1,
+				  mword, word, wlen, sfx)))
 		    return l;
 	    }
     } else {
@@ -1255,7 +1269,6 @@ bld_line(Cpattern pat, char *line, char *lp,
 	Cmlist ms;
 	Cmatcher mp;
 	int l = lp - line, t, rl = 0, ind, add;
-	VARARR(unsigned char, ea, l + 1);
 
 	/* Quick test if the strings are exactly the same. */
 	if (l == wlen && !strncmp(line, word, l))
@@ -1279,9 +1292,7 @@ bld_line(Cpattern pat, char *line, char *lp,
 		    mp = ms->matcher;
 		    if (mp && !mp->flags && mp->wlen <= wlen && mp->llen <= l &&
 			pattern_match(mp->line, (sfx ? line - mp->llen : line),
-				      NULL, ea) &&
-			pattern_match(mp->word, (sfx ? word - mp->wlen : word),
-				      ea, NULL)) {
+				      mp->word, (sfx ? word - mp->wlen : word))) {
 			/* Both the line and the word pattern matched,
 			 * now skip over the matched portions. */
 			if (sfx) {
@@ -1316,7 +1327,6 @@ join_strs(int la, char *sa, int lb, char *sb)
     static char *rs = NULL;
     static int rl = 0;
 
-    VARARR(unsigned char, ea, (la > lb ? la : lb) + 1);
     Cmlist ms;
     Cmatcher mp;
     int t, bl, rr = rl;
@@ -1331,8 +1341,7 @@ join_strs(int la, char *sa, int lb, char *sb)
 		    mp->wlen <= la && mp->wlen <= lb) {
 		    /* The pattern has no anchors and the word
 		     * pattern fits, try it. */
-		    if ((t = pattern_match(mp->word, sa, NULL, ea)) ||
-			pattern_match(mp->word, sb, NULL, ea)) {
+		    if ((t = pattern_match(mp->word, sa, mp->word, sb))) {
 			/* It matched one of the strings, t says which one. */
 			VARARR(char, line, mp->llen + 1);
 			char **ap, **bp;
@@ -1347,8 +1356,8 @@ join_strs(int la, char *sa, int lb, char *sb)
 			}
 			/* Now try to build a string that matches the other
 			 * string. */
-			if ((bl = bld_line(mp->line, line, line,
-					   *bp, *blp, ea, 0))) {
+			if ((bl = bld_line(mp->word, mp->line, line, line,
+					   *ap, *bp, *blp, 0))) {
 			    /* Found one, put it into the return string. */
 			    line[mp->llen] = '\0';
 			    if (rr <= mp->llen) {
@@ -1503,7 +1512,6 @@ join_sub(Cmdata md, char *str, int len, int *mlen, int sfx, int join)
 	int ol = len, nl = md->len;
 	Cmlist ms;
 	Cmatcher mp;
-	VARARR(unsigned char, ea, (ol > nl ? ol : nl) + 1);
 	int t;
 
 	if (sfx) {
@@ -1519,9 +1527,7 @@ join_sub(Cmdata md, char *str, int len, int *mlen, int sfx, int join)
 		 * new one. */
 		if (mp->llen <= ol && mp->wlen <= nl &&
 		    pattern_match(mp->line, ow - (sfx ? mp->llen : 0),
-				  NULL, ea) &&
-		    pattern_match(mp->word, nw - (sfx ? mp->wlen : 0),
-				  ea, NULL)) {
+				  mp->word, nw - (sfx ? mp->wlen : 0))) {
 		    /* It did, update the contents of the cmdata struct
 		     * and return a cline for the matched part. */
 		    if (sfx)
@@ -1539,17 +1545,22 @@ join_sub(Cmdata md, char *str, int len, int *mlen, int sfx, int join)
 		 * pattern matches one of the strings. */
 		if (join && mp->wlen <= ol && mp->wlen <= nl &&
 		    ((t = pattern_match(mp->word, ow - (sfx ? mp->wlen : 0),
-				       NULL, ea)) ||
+				       NULL, NULL)) ||
 		     pattern_match(mp->word, nw - (sfx ? mp->wlen : 0),
-				   NULL, ea))) {
+				   NULL, NULL))) {
 		    VARARR(char, line, mp->llen + 1);
 		    int bl;
+		    char *mw;
 
 		    /* Then build all the possible lines and see
 		     * if one of them matches the other string. */
-		    if ((bl = bld_line(mp->line, line, line,
-				       (t ? nw : ow), (t ? nl : ol),
-				       ea, sfx))) {
+		    if (t)
+			mw = ow - (sfx ? mp->wlen : 0);
+		    else
+			mw = nw - (sfx ? mp->wlen : 0);
+
+		    if ((bl = bld_line(mp->word, mp->line, line, line,
+				       mw, (t ? nw : ow), (t ? nl : ol), sfx)))  {
 			/* Yep, one of the lines matched the other
 			 * string. */
 			line[mp->llen] = '\0';
