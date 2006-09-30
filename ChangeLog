@@ -1,3 +1,9 @@
+2006-09-30  Clint Adams  <clint@zsh.org>
+
+	* 22794: R. Ramkumar: Completion/Linux/Command/_acpitool,
+	Completion/Linux/Type/_wakeup_capable_devices: completion for
+	acpitool.
+
 2006-09-30  Andrey Borzenkov <bor@zsh.org>
 
 	* unposted: Src/Zle/compmatch.c: fix thinko in 22787 that changed
