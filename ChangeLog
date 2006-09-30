@@ -1,5 +1,9 @@
 2006-09-30  Clint Adams  <clint@zsh.org>
 
+	* 22797: R. Ramkumar: Completion/Linux/Type/_fuse_arguments,
+	Completion/Linux/Type/_fuse_values: generic FUSE completion
+	support functions.
+
 	* 22796: R. Ramkumar: Completion/Unix/Command/_subversion:
 	fix misspelling of IPREFIX.
 
