@@ -1,5 +1,10 @@
 2006-09-30  Clint Adams  <clint@zsh.org>
 
+	* 22800: Completion/Linux/Type/_fuse_arguments,
+	Completion/Linux/Type/_fuse_values,
+	Completion/Linux/Type/_wakeup_capable_devices:
+	put quotes around "$@".
+
 	* 22799: R. Ramkumar: Completion/Linux/Command/_fusermount:
 	change _fusermount to use _fuse_values and _canonical_paths.
 

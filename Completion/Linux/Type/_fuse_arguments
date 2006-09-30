@@ -18,7 +18,7 @@ long=$argv[(I)--]
 if (( long )); then
   argv[long]=($fargs --)
 else
-  set -- $@ $fargs
+  set -- "$@" $fargs
 fi
 
 while [[ $1 == -(O*|F*|[CRWsw]) ]]; do
@@ -38,10 +38,10 @@ if [[ $cvalsvar != - ]]; then
   fsopt='*-o[specify mount options]:mount option:_fuse_values'
   [[ -n $cvalsvar ]] && fsopt+=" -A $cvalsvar"
   fsopt+=' mount\ option'
-  set -- $@ $fsopt
+  set -- "$@" $fsopt
 fi
 
-_arguments -R $opts $@
+_arguments -R $opts "$@"
 
 ret=$?
 

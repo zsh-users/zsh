@@ -44,12 +44,12 @@ fvals=(
   'attr_timeout[cache timeout for attributes]:timeout (s)'
 )
 
-[[ -n $cvalsvar ]] && set -- $@ ${(P)cvalsvar}
+[[ -n $cvalsvar ]] && set -- "$@" ${(P)cvalsvar}
 
 if [[ $# -eq 0 ]]; then
   set -- 'mount options' $fvals
 else
-  set -- $@ $fvals
+  set -- "$@" $fvals
 fi
 
 if [[ -n $state ]]; then
@@ -57,7 +57,7 @@ if [[ -n $state ]]; then
   state=
 fi
 
-_values $opts $@ && ret=0
+_values $opts "$@" && ret=0
 
 if [[ -n $state ]]; then
   compstate[restore]=
