@@ -1341,7 +1341,8 @@ join_strs(int la, char *sa, int lb, char *sb)
 		    mp->wlen <= la && mp->wlen <= lb) {
 		    /* The pattern has no anchors and the word
 		     * pattern fits, try it. */
-		    if ((t = pattern_match(mp->word, sa, mp->word, sb))) {
+		    if ((t = pattern_match(mp->word, sa, NULL, NULL)) ||
+			pattern_match(mp->word, sb, NULL, NULL)) {
 			/* It matched one of the strings, t says which one. */
 			VARARR(char, line, mp->llen + 1);
 			char **ap, **bp;

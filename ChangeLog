@@ -1,3 +1,8 @@
+2006-09-30  Andrey Borzenkov <bor@zsh.org>
+
+	* unposted: Src/Zle/compmatch.c: fix thinko in 22787 that changed
+	semantic of pattern matching in join_strs
+
 2006-09-29  Vin Shelton  <acs@xemacs.org>
 
        * 22789: Src/init.c: Source zshenv even if non-interactive.
@@ -5,7 +10,7 @@
 2006-09-29  Andrey Borzenkov <bor@zsh.org>
 
 	* 22787: Srz/Zsh/compmatch.c: change calling convention of
-	pattern match to not depend on current implementation that works
+	pattern_match to not depend on current implementation that works
 	for single byte characters only, thus making it more easy to
 	change it later.
 
