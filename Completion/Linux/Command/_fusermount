@@ -4,21 +4,23 @@ local expl context state line
 typeset -A opt_args
 
 _arguments \
-	'-h[help]' \
-	'-v[version]' \
-	'-o[options]:mount options:_values -s , "mount options" default_permissions allow_other allow_root kernel_cache large_read direct_io max_read=:size: hard_remove debug fsname=:name: use_ino readdir_ino nonempty umask=:umask: uid=:uid: gid=:gid:' \
-	'-u[unmount]' \
-	'-q[quiet]' \
-	'-z[lazy unmount]' \
-	':mountpoint:->mountpoint' && return 0
+  '-h[display help information]' \
+  '-V[display version information]' \
+  '-o[specify mount options]:mount options:_fuse_values "mount options"' \
+  '-u[unmount a fuse mount]' \
+  '-z[unmount lazily (work even when if the resource is still busy)]' \
+  '-q[suppress nonessential output]' \
+  ':mount point:->mountpoint' && return 0
+
+typeset -a mtpts
 
 case "$state" in
-	(mountpoint)
-	if [[ $+opt_args[-u] -eq 0 ]]; then
-	  _files -/
-        else
-	  _wanted mounted expl 'mounted filesystem' \
-	  compadd ${${${"${(f)$(< /etc/mtab)}"}#* }%% *}
-        fi
-	;;
+  (mountpoint)
+  if [[ $+opt_args[-u] -eq 0 ]]; then
+    _files -/
+  else
+    mtpts=(${${${"${(f)$(< /etc/mtab)}"}#* }%% *})
+    _canonical_paths mounted 'mounted filesystem' $mtpts
+  fi
+  ;;
 esac
