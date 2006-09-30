@@ -1,5 +1,8 @@
 2006-09-30  Clint Adams  <clint@zsh.org>
 
+	* 22796: R. Ramkumar: Completion/Unix/Command/_subversion:
+	fix misspelling of IPREFIX.
+
 	* 22795: R. Ramkumar: Completion/Unix/Type/_urls:
 	handle https urls.
 
