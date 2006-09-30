@@ -1,5 +1,8 @@
 2006-09-30  Clint Adams  <clint@zsh.org>
 
+	* 22795: R. Ramkumar: Completion/Unix/Type/_urls:
+	handle https urls.
+
 	* 22794: R. Ramkumar: Completion/Linux/Command/_acpitool,
 	Completion/Linux/Type/_wakeup_capable_devices: completion for
 	acpitool.

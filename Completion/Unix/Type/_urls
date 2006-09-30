@@ -66,7 +66,7 @@ if ! compset -P '(#b)([-+.a-z0-9]#):'; then
       compset -S '[^:/]*' && compstate[to_end]=''
       [[ -d $urls/bookmark ]] &&
         compadd "$expl[@]" bookmark: && ret=0
-      compadd "$expl[@]" file: ftp:// gopher:// http:// && ret=0
+      compadd "$expl[@]" file: ftp:// gopher:// http:// https:// && ret=0
     done
     (( ret )) || return 0
   done
@@ -75,7 +75,7 @@ fi
 scheme="$match[1]"
 
 case "$scheme" in
-  http|ftp|gopher)
+  http(|s)|ftp|gopher)
     if ! compset -P //; then
       _wanted -C "$scheme" prefixes expl 'end of prefix' compadd -S '' "$@" //
       return
