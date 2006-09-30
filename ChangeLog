@@ -1,5 +1,8 @@
 2006-09-30  Clint Adams  <clint@zsh.org>
 
+	* 22798: R. Ramkumar: Completion/Unix/Command/_bittorrent:
+	cleanup and fixes.
+
 	* 22797: R. Ramkumar: Completion/Linux/Type/_fuse_arguments,
 	Completion/Linux/Type/_fuse_values: generic FUSE completion
 	support functions.
