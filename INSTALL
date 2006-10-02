@@ -2,9 +2,10 @@
                         INSTALLING ZSH
                         ++++++++++++++
 
-This file is divided into two parts:  making and installing the shell, and
+This file is divided into two parts:  making and installing the shell, a
+note on the script run to set up the environment for new users, and
 a description of various additional configuration options.  You should
-have a look at the items in the second part before following the
+have a look at the items in the second and third parts before following the
 instructions in the first.
 
 

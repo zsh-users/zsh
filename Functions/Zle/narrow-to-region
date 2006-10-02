@@ -68,9 +68,7 @@ if [[ -n $_ntr_save || -z $_ntr_restore ]]; then
     _ntr_end=$CURSOR
   fi
 
-  if (( _ntr_start == _ntr_end )); then
-    return 1
-  elif (( _ntr_start > _ntr_end )); then
+  if (( _ntr_start > _ntr_end )); then
     _ntr_swap=_ntr_start
     _ntr_start=_ntr_end
     _ntr_end=_ntr_swap

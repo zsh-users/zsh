@@ -1,3 +1,10 @@
+2006-10-02  Peter Stephenson  <pws@csr.com>
+
+	* unposted: INSTALL: correct opening remarks.
+
+	* 22804: Mikael Magnusson: Functions/Zle/narrow-to-region:
+	allow zero-length ranges.
+
 2006-10-01  Clint Adams  <clint@zsh.org>
 
 	* 22803: Roger Leigh: Completion/Debian/Command/_dchroot,
