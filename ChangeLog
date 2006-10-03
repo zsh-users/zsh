@@ -1,3 +1,9 @@
+2006-10-03
+
+	* 2280x: Completion/Debian/Command/_dchroot,
+	Completion/Debian/Command/_dchroot-dsa: handle internationalized
+	output and choices within brackets.
+
 2006-10-02  Peter Stephenson  <pws@csr.com>
 
 	* unposted: INSTALL: correct opening remarks.
