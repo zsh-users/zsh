@@ -1,6 +1,6 @@
-2006-10-03
+2006-10-03  Clint Adams  <clint@zsh.org>
 
-	* 2280x: Completion/Debian/Command/_dchroot,
+	* 22808: Completion/Debian/Command/_dchroot,
 	Completion/Debian/Command/_dchroot-dsa: handle internationalized
 	output and choices within brackets.
 
