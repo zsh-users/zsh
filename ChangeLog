@@ -1,5 +1,9 @@
 2006-10-03  Clint Adams  <clint@zsh.org>
 
+	* 22811: R. Ramkumar: Completion/Unix/Type/_bind_addresses:
+	helper function to give local IP addresses to which a program
+	might bind a socket.
+
 	* 22810: Completion/Unix/Command/_gpg: fix malformed
 	--encrypt-to line.
 
