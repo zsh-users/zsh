@@ -35,7 +35,7 @@ _arguments -C -s \
   '(--proxy -Y --no-proxy)'{--proxy=,-Y+}'[explicitly turn on proxy]' \
   '(--proxy -Y --no-proxy)--no-proxy[explicitly turn off proxy]' \
   '(--quota -Q)'{--quota=,-Q+}'[set retrieval quota]:number' \
-  '--bind-address=:address to bind to (hostname or IP):_hosts' \
+  '--bind-address=[specify address to bind to (hostname or IP)]:bind address:_bind_addresses' \
   '--limit-rate=[specify limit to download rate]:download rate limit' \
   '--no-dns-cache[disable caching DNS lookups]' \
   '--restrict-file-names=[restrict chars in file names to ones OS allows]:OS:->restrict' \

@@ -94,7 +94,7 @@ _arguments -s \
   {--no-v,--no-verbose}'[turn off --verbose]' \
   '--bwlimit=[limit I/O bandwidth]:KBytes per second' \
   '--port=[specify alternate port number]:port:(873)' \
-  '--address=[bind to the specified address]:address:_hosts' \
+  '--address=[bind to the specified address]:bind address:_bind_addresses' \
   '(-T --temp-dir)'{-T,--temp-dir=}'[create temporary files in specified directory]:directory:_directories' \
   '--sockopts=[specify custom TCP options]' \
   '(-4 -6 --ipv4 --ipv6)'{-4,--ipv4}'[prefer IPv4]' \

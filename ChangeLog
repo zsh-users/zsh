@@ -1,5 +1,10 @@
 2006-10-03  Clint Adams  <clint@zsh.org>
 
+	* 22812: R. Ramkumar: Completion/Unix/Command/_bittorrent,
+	Completion/Unix/Command/_rsync, Completion/Unix/Command/_ssh,
+	Completion/Unix/Command/_wget: utilize _bind_addresses in
+	existing completion functions.
+
 	* 22811: R. Ramkumar: Completion/Unix/Type/_bind_addresses:
 	helper function to give local IP addresses to which a program
 	might bind a socket.

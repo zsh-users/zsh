@@ -54,7 +54,7 @@ _ssh () {
     _arguments -C -s \
       '(-A)-a[disable forwarding of authentication agent connection]' \
       '(-a)-A[enables forwarding of the authentication agent connection]' \
-      '(-P)-b+[specify interface to transmit on]:bind address' \
+      '(-P)-b+[specify interface to transmit on]:bind address:_bind_addresses' \
       '-D+[specify a dynamic port forwarding]:port' \
       '-e+[set escape character]:escape character (or `none'"'"'):' \
       '(-n)-f[go to background]' \

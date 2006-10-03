@@ -24,7 +24,7 @@ case $service in
       '(--responsefile)--responsefile+[specify file for server response]:file:_files -g "*"'\
       "--url+[specify URL of torrent file]:URL:_urls"\
       '(-i --ip)'{-i+,--ip+}'[specify ip address to report as]:ip address'\
-      "--bind+[specify ip to bind to instead of default]:ip:"\
+      "--bind+[specify ip to bind to instead of default]:ip:_bind_addresses"\
       "--minport+[specify minimum port to listen to]:port:"\
       "--maxport+[specify maximum port to listen to]:port:"\
       "--saveas+[specify file to save to]:file:_files -/"\
@@ -83,7 +83,7 @@ case $service in
     _arguments -s -S \
       "--port+[specify port to listen on]:port number:" \
       "--dfile+[specify file to store recent downloader info]:file:_files" \
-      "--bind+[specify ip to bind to]:bind address:" \
+      "--bind+[specify ip to bind to]:bind address:_bind_addresses" \
       "--socket_timeout+[specify timeout for closing connections]:timeout (s):"\
       "--save_dfile_interval+[specify interval between saving dfile]:time (s):"\
       "--timeout_downloaders_interval+[timeout for expiring downloaders]:time (s):" \
