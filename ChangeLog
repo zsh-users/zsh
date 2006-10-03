@@ -1,5 +1,8 @@
 2006-10-03  Clint Adams  <clint@zsh.org>
 
+	* 22814: Completion/X/Command/_mplayer: add .mp4 and .flv
+	to media file extension list.
+
 	* 22812: R. Ramkumar: Completion/Unix/Command/_bittorrent,
 	Completion/Unix/Command/_rsync, Completion/Unix/Command/_ssh,
 	Completion/Unix/Command/_wget: utilize _bind_addresses in
