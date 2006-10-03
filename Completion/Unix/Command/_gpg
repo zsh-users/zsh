@@ -63,7 +63,7 @@ _arguments -C -s -S -A "-*" \
   '--default-recipient[specify default recipient]:recipient:->public-keys' \
   '--default-recipient-self[use default key as default recipient]' \
   '--no-default-recipient[reset default recipient]' \
-  '*--encrypt-to[specify recipient]:->public-keys' \
+  '*--encrypt-to[specify recipient]:key:->public-keys' \
   '(--encrypt-to)--no-encrypt-to[disable the use of all --encrypt-to keys]' \
   '(-q --quiet)*'{-v,--verbose}'[increase amount of output]' \
   '(-q --quiet -v --verbose)'{-q,--quiet}'[reduce amount of output]' \

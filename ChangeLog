@@ -1,5 +1,8 @@
 2006-10-03  Clint Adams  <clint@zsh.org>
 
+	* 22810: Completion/Unix/Command/_gpg: fix malformed
+	--encrypt-to line.
+
 	* 22808: Completion/Debian/Command/_dchroot,
 	Completion/Debian/Command/_dchroot-dsa: handle internationalized
 	output and choices within brackets.
