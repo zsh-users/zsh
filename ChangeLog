@@ -1,5 +1,10 @@
 2006-10-03  Clint Adams  <clint@zsh.org>
 
+	* 22815: Joerg Sommer: Completion/Debian/Command/_invoke-rc.d:
+	completion for invoke-rc.d
+
+2006-10-03  Clint Adams  <clint@zsh.org>
+
 	* 22814: Completion/X/Command/_mplayer: add .mp4 and .flv
 	to media file extension list.
 
