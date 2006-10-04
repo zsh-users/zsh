@@ -1,7 +1,10 @@
 2006-10-03  Clint Adams  <clint@zsh.org>
 
+	* 22816: Joerg Sommer: Completion/Unix/Command/_pon:
+	completion for pon.
+
 	* 22815: Joerg Sommer: Completion/Debian/Command/_invoke-rc.d:
-	completion for invoke-rc.d
+	completion for invoke-rc.d.
 
 2006-10-03  Clint Adams  <clint@zsh.org>
 

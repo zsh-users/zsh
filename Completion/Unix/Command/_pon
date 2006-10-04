@@ -1,0 +1,7 @@
+#compdef pon
+
+provider=(/etc/ppp/peers/*(:t))
+
+_arguments \
+  '(-q --quick)'{-q,--quick}'[hangs up after all ip-up scripts are run]' \
+  '1:provider to call:(${provider[@]})'
