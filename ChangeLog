@@ -1,3 +1,11 @@
+2006-10-05  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: improved
+	message when not completing after "p4 clients".
+
+	* 22818: Doc/Zsh/params.yo: delimiters in subscript flags
+	are like those in parameter substitution.
+
 2006-10-03  Clint Adams  <clint@zsh.org>
 
 	* 22816: Joerg Sommer: Completion/Unix/Command/_pon:

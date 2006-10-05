@@ -1586,7 +1586,7 @@ _perforce_cmd_client() {
 (( $+functions[_perforce_cmd_clients] )) ||
 _perforce_cmd_clients() {
   # No arguments.
-  _arguments -s :
+  _message "no arguments"
 }
 
 
