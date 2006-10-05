@@ -303,11 +303,13 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     matchers = newlinklist();
 
     zsfree(compqstack);
-    compqstack = ztrdup("\\");
-    if (instring == 2)
-	compqstack[0] = '"';
-    else if (instring)
-	compqstack[0] = '\'';
+    compqstack = zalloc(2);
+    /*
+     * It looks like we may need to do stuff with backslashes even
+     * if instring is QT_NONE.
+     */
+    *compqstack = (instring == QT_NONE) ? QT_BACKSLASH : (char)instring;
+    compqstack[1] = '\0';
 
     hasunqu = 0;
     useline = (wouldinstab ? -1 : (lst != COMP_LIST_COMPLETE));
@@ -650,13 +652,22 @@ callcompfunc(char *s, char *fn)
 	compredirect = ztrdup(compredirect);
 	zsfree(compquote);
 	zsfree(compquoting);
-	if (instring) {
-	    if (instring == 1) {
+	if (instring > QT_BACKSLASH) {
+	    switch (instring) {
+	    case QT_SINGLE:
 		compquote = ztrdup("\'");
 		compquoting = ztrdup("single");
-	    } else {
+		break;
+
+	    case QT_DOUBLE:
 		compquote = ztrdup("\"");
 		compquoting = ztrdup("double");
+		break;
+
+	    case QT_DOLLARS:
+		compquote = ztrdup("$'");
+		compquoting = ztrdup("dollars");
+		break;
 	    }
 	    kset |= CP_QUOTE | CP_QUOTING;
 	} else if (inbackt) {
@@ -1026,8 +1037,7 @@ multiquote(char *s, int ign)
 		p += ign;
 	    while (*p) {
 		if (ign >= 0 || p[1])
-		    s = bslashquote(s, NULL,
-				    (*p == '\'' ? 1 : (*p == '"' ? 2 : 0)));
+		    s = quotestring(s, NULL, *p);
 		p++;
 	    }
 	}
@@ -1290,9 +1300,29 @@ comp_str(int *ipl, int *pl, int untok)
     return str;
 }
 
+/**/
+mod_export char *
+comp_quoting_string(int stype)
+{
+    switch (stype)
+    {
+    case QT_SINGLE:
+	return "'";
+    case QT_DOUBLE:
+	return "\"";
+    case QT_DOLLARS:
+	return "$'";
+    default:			/* shuts up compiler */
+	return "\\";
+    }
+}
+
 /*
  * This is the code behind compset -q, which splits the
  * the current word as if it were a command line.
+ *
+ * This is one of those completion functions that merits the
+ * coveted title "not just ordinarily horrific".
  */
 
 /**/
@@ -1307,7 +1337,7 @@ set_comp_sep(void)
     int tl, got = 0, i = 0, j, cur = -1, oll, sl, css = 0;
     int remq = 0, dq = 0, odq, sq = 0, osq, issq = 0, sqq = 0, lsq = 0, qa = 0;
     int ois = instring, oib = inbackt, noffs = lp, ona = noaliases;
-    char *tmp, *p, *ns, *ol, sav, *qp, *qs, *ts, qc = '\0';
+    char *tmp, *p, *ns, *ol, sav, *qp, *qs, *ts;
 
     METACHECK();
 
@@ -1334,21 +1364,27 @@ set_comp_sep(void)
     strcpy(tmp + 2 + noffs, s + noffs);
 
     switch (*compqstack) {
-    case '\\':
+    case QT_NONE:
+#ifdef DEBUG
+	dputs("BUG: head of compstack is NULL");
+#endif
+	break;
+
+    case QT_BACKSLASH:
         remq = 1;
 	tmp = rembslash(tmp);
         break;
-    case '\'':
+
+    case QT_SINGLE:
         issq = 1;
         if (isset(RCQUOTES))
             qa = 1;
         else
             qa = 3;
-
         sq = remsquote(tmp);
-
         break;
-    case '"':
+
+    case QT_DOUBLE:
         for (j = 0, p = tmp; *p; p++, j++)
             if (*p == '\\' && p[1] == '\\') {
                 dq++;
@@ -1360,6 +1396,11 @@ set_comp_sep(void)
                 if (!*p)
                     break;
             }
+	break;
+
+    case QT_DOLLARS:
+	/* TODO */
+	break;
     }
     odq = dq;
     osq = sq;
@@ -1450,19 +1491,36 @@ set_comp_sep(void)
 
     untokenize(ts = dupstring(ns));
 
-    if (*ns == Snull || *ns == Dnull) {
-	instring = (*ns == Snull ? 1 : 2);
+    if (*ns == Snull || *ns == Dnull ||
+	((*ns == String || *ns == Qstring) && ns[1] == Snull)) {
+	char *tsptr = ts, *nsptr = ns, sav;
+	switch (*ns) {
+	case Snull:
+	    instring = QT_SINGLE;
+	    break;
+
+	case Dnull:
+	    instring = QT_DOUBLE;
+	    break;
+
+	default:
+	    instring = QT_DOLLARS;
+	    nsptr++;
+	    tsptr++;
+	    break;
+	}
+
 	inbackt = 0;
 	swb++;
-	if (ns[strlen(ns) - 1] == *ns && ns[1])
+	if (nsptr[strlen(nsptr) - 1] == *nsptr && nsptr[1])
 	    swe--;
 	zsfree(autoq);
-	autoq = ztrdup(compqstack[1] ? "" :
-		       multiquote(*ns == Snull ? "'" : "\"", 1));
-	qc = (*ns == Snull ? '\'' : '"');
-	ts++;
+	sav = *++tsptr;
+	*tsptr = '\0';
+	autoq = ztrdup(compqstack[1] ? "" : multiquote(ts, 1));
+	*(ts = tsptr) = sav;
     } else {
-	instring = 0;
+	instring = QT_NONE;
 	zsfree(autoq);
 	autoq = NULL;
     }
@@ -1496,7 +1554,7 @@ set_comp_sep(void)
     }
     ns = ts;
 
-    if (instring && strchr(compqstack, '\\')) {
+    if (instring && strchr(compqstack, QT_BACKSLASH)) {
 	int rl = strlen(ns), ql = strlen(multiquote(ns, !!compqstack[1]));
 
 	if (ql > rl)
@@ -1525,24 +1583,38 @@ set_comp_sep(void)
     }
     {
 	int set = CP_QUOTE | CP_QUOTING, unset = 0;
+	char compnewchars[2];
 
-	p = tricat((instring ? (instring == 1 ? "'" : "\"") : "\\"),
-		   compqstack, "");
+	compnewchars[0] =
+	    (char)(instring == QT_NONE ? QT_BACKSLASH : instring);
+	compnewchars[1] = '\0';
+	p = tricat(compnewchars, compqstack, "");
 	zsfree(compqstack);
 	compqstack = p;
 
 	zsfree(compquote);
 	zsfree(compquoting);
-	if (instring == 2) {
+	switch (instring) {
+	case QT_DOUBLE:
 	    compquote = "\"";
 	    compquoting = "double";
-	} else if (instring == 1) {
+	    break;
+
+	case QT_SINGLE:
 	    compquote = "'";
 	    compquoting = "single";
-	} else {
+	    break;
+
+	case QT_DOLLARS:
+	    compquote = "$'";
+	    compquoting = "dollars";
+	    break;
+
+	default:
 	    compquote = compquoting = "";
 	    unset = set;
 	    set = 0;
+	    break;
 	}
 	compquote = ztrdup(compquote);
 	compquoting = ztrdup(compquoting);
@@ -1804,20 +1876,33 @@ addmatches(Cadata dat, char **argv)
 	dat->flags |= parflags;
     if (compquote && (qc = *compquote)) {
 	if (qc == '`') {
-	    instring = 0;
+	    instring = QT_NONE;
+	    /*
+	     * Yes, inbackt has always been set to zero here.  I'm
+	     * sure there's a simple explanation.
+	     */
 	    inbackt = 0;
 	    autoq = "";
 	} else {
-	    char buf[2];
+	    switch (qc) {
+	    case '\'':
+		instring = QT_SINGLE;
+		break;
 
-	    instring = (qc == '\'' ? 1 : 2);
+	    case '"':
+		instring = QT_DOUBLE;
+		break;
+
+	    case '$':
+		instring = QT_DOLLARS;
+		break;
+	    }
 	    inbackt = 0;
-	    buf[0] = qc;
-	    buf[1] = '\0';
-	    autoq = multiquote(buf, 1);
+	    autoq = multiquote(compquote, 1);
 	}
     } else {
-	instring = inbackt = 0;
+	instring = QT_NONE;
+	inbackt = 0;
 	autoq = NULL;
     }
     qipre = ztrdup(compqiprefix ? compqiprefix : "");
@@ -2549,8 +2634,8 @@ add_match_data(int alt, char *str, char *orig, Cline line,
                 cm->modec = '\0';
         }
     }
-    if ((*compqstack == '\\' && compqstack[1]) ||
-	(autoq && *compqstack && compqstack[1] == '\\'))
+    if ((*compqstack == QT_BACKSLASH && compqstack[1]) ||
+	(autoq && *compqstack && compqstack[1] == QT_BACKSLASH))
 	cm->flags |= CMF_NOSPACE;
     if (nbrbeg) {
 	int *p;

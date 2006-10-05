@@ -1401,7 +1401,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 	    untokenize(p);
 	    quotedzputs(p, stdout);
 	} else
-	    quotedzputs(bslashquote(s, NULL, 0), stdout);
+	    quotedzputs(quotestring(s, NULL, QT_BACKSLASH), stdout);
     }
 
     /* loop through flags w/o args that are set, printing them if so */
@@ -1537,7 +1537,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 		char *p = dupstring(s);
 
 		untokenize(p);
-		quotedzputs(bslashquote(p, NULL, 0), stdout);
+		quotedzputs(quotestring(p, NULL, QT_BACKSLASH), stdout);
 	    }
 	}
 	putchar('\n');
@@ -1735,10 +1735,13 @@ static char ic;
 
 static int addwhat;
 
-/* Convenience macro for calling bslashquote() (formerly quotename()). *
- * This uses the instring variable above.                              */
+/*
+ * Convenience macro for calling quotestring (formerly bslashquote()
+ * (formerly quotename())).
+ * This uses the instring variable exported from zle_tricky.c.
+ */
 
-#define quotename(s, e) bslashquote(s, e, instring)
+#define quotename(s, e) quotestring(s, e, instring)
 
 /* Hook functions */
 
@@ -2279,22 +2282,38 @@ makecomplistctl(int flags)
 	char *os = cmdstr, **ow = clwords, **p, **q, qc;
 	int on = clwnum, op = clwpos, ois =  instring, oib = inbackt;
 	char *oisuf = isuf, *oqp = qipre, *oqs = qisuf, *oaq = autoq;
-	char buf[2];
+	char buf[3];
 
 	if (compquote && (qc = *compquote)) {
 	    if (qc == '`') {
-		instring = 0;
+		instring = QT_NONE;
+		/*
+		 * Yes, inbackt has always been set to zero here.  I'm
+		 * sure there's a simple explanation.
+		 */
 		inbackt = 0;
 		autoq = "";
 	    } else {
-		buf[0] = qc;
-		buf[1] = '\0';
-		instring = (qc == '\'' ? 1 : 2);
+		switch (qc) {
+		case '\'':
+		    instring = QT_SINGLE;
+		    break;
+
+		case '"':
+		    instring = QT_DOUBLE;
+		    break;
+
+		case '$':
+		    instring = QT_DOLLARS;
+		    break;
+		}
 		inbackt = 0;
+		strcpy(buf, compquote);
 		autoq = buf;
 	    }
 	} else {
-	    instring = inbackt = 0;
+	    instring = QT_NONE;
+	    inbackt = 0;
 	    autoq = "";
 	}
 	qipre = ztrdup(compqiprefix ? compqiprefix : "");
@@ -2589,7 +2608,7 @@ makecomplistext(Compctl occ, char *os, int incmd)
     int compadd, m = 0, d = 0, t, tt, i, j, a, b, ins;
     char *sc = NULL, *s, *ss;
 
-    ins = (instring ? instring : (inbackt ? 3 : 0));
+    ins = (instring != QT_NONE ? instring : (inbackt ? QT_BACKTICK : 0));
 
     /* This loops over the patterns separated by `-'s. */
     for (compc = occ->ext; compc; compc = compc->next) {
@@ -2607,9 +2626,9 @@ makecomplistext(Compctl occ, char *os, int incmd)
 		    erange = clwnum - 1;
 		    switch (cc->type) {
 		    case CCT_QUOTE:
-			t = ((cc->u.s.s[i][0] == 's' && ins == 1) ||
-			     (cc->u.s.s[i][0] == 'd' && ins == 2) ||
-			     (cc->u.s.s[i][0] == 'b' && ins == 3));
+			t = ((cc->u.s.s[i][0] == 's' && ins == QT_SINGLE) ||
+			     (cc->u.s.s[i][0] == 'd' && ins == QT_DOUBLE) ||
+			     (cc->u.s.s[i][0] == 'b' && ins == QT_BACKTICK));
 			break;
 		    case CCT_POS:
 			tt = clwpos;
@@ -2755,7 +2774,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     int sl = strlen(ss), tl, got = 0, i = 0, cur = -1, oll = zlemetall, remq;
     int ois = instring, oib = inbackt, ona = noaliases;
     char *tmp, *p, *ns, *ol = zlemetaline, sav, *oaq = autoq;
-    char *qp, *qs, *ts, qc = '\0';
+    char *qp, *qs, *ts;
 
     swb = swe = soffs = 0;
     ns = NULL;
@@ -2774,7 +2793,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     memcpy(tmp + sl + 1, s, noffs);
     tmp[(scs = zlemetacs = sl + 1 + noffs)] = 'x';
     strcpy(tmp + sl + 2 + noffs, s + noffs);
-    if ((remq = (*compqstack == '\\')))
+    if ((remq = (*compqstack == QT_BACKSLASH)))
 	tmp = rembslash(tmp);
     inpush(dupstrspace(tmp), 0, NULL);
     zlemetaline = tmp;
@@ -2841,17 +2860,35 @@ sep_comp_string(char *ss, char *s, int noffs)
 
     untokenize(ts = dupstring(ns));
 
-    if (*ns == Snull || *ns == Dnull) {
-	instring = (*ns == Snull ? 1 : 2);
+    if (*ns == Snull || *ns == Dnull ||
+	((*ns == String || *ns == Qstring) && ns[1] == Snull)) {
+	char *tsptr = ts, *nsptr = ns, sav;
+	switch (*ns) {
+	case Snull:
+	    instring = QT_SINGLE;
+	    break;
+
+	case Dnull:
+	    instring = QT_DOUBLE;
+	    break;
+
+	default:
+	    instring = QT_DOLLARS;
+	    nsptr++;
+	    tsptr++;
+	    break;
+	}
+
 	inbackt = 0;
 	swb++;
-	if (ns[strlen(ns) - 1] == *ns && ns[1])
+	if (nsptr[strlen(nsptr) - 1] == *nsptr && nsptr[1])
 	    swe--;
-	autoq = compqstack[1] ? "" : multiquote(*ns == Snull ? "'" : "\"", 1);
-	qc = (*ns == Snull ? '\'' : '"');
-	ts++;
+	sav = *++tsptr;
+	*tsptr = '\0';
+	autoq = compqstack[1] ? "" : multiquote(ts, 1);
+	*(ts = tsptr) = sav;
     } else {
-	instring = 0;
+	instring = QT_NONE;
 	autoq = "";
     }
     for (p = ns, i = swb; *p; p++, i++) {
@@ -2878,7 +2915,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     }
     ns = ts;
 
-    if (instring && strchr(compqstack, '\\')) {
+    if (instring != QT_NONE && strchr(compqstack, QT_BACKSLASH)) {
 	int rl = strlen(ns), ql = strlen(multiquote(ns, !!compqstack[1]));
 
 	if (ql > rl)
@@ -2904,13 +2941,15 @@ sep_comp_string(char *ss, char *s, int noffs)
 
     {
 	char **ow = clwords, *os = cmdstr, *oqp = qipre, *oqs = qisuf;
-	char *oqst = compqstack;
+	char *oqst = compqstack, compnewchar[2];
 	int olws = clwsize, olwn = clwnum, olwp = clwpos;
 	int obr = brange, oer = erange, oof = offs;
 	unsigned long occ = ccont;
 
-	compqstack = tricat((instring ? (instring == 1 ? "'" : "\"") : "\\"),
-			    compqstack, "");
+	compnewchar[0] = (char)(instring != QT_NONE ? (char)instring :
+				QT_BACKSLASH);
+	compnewchar[1] = '\0';
+	compqstack = tricat(compnewchar, compqstack, "");
 
 	clwsize = clwnum = countlinknodes(foo);
 	clwords = (char **) zalloc((clwnum + 1) * sizeof(char *));

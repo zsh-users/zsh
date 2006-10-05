@@ -3441,8 +3441,7 @@ comp_quote(char *str, int prefix)
     if ((x = (prefix && *str == '=')))
 	*str = 'x';
 
-    ret = bslashquote(str, NULL, (*compqstack == '\'' ? 1 :
-				  (*compqstack == '"' ? 2 : 0)));
+    ret = quotestring(str, NULL, *compqstack);
 
     if (x)
 	*str = *ret = '=';
@@ -4344,7 +4343,7 @@ cf_ignore(char **names, LinkList ign, char *style, char *path)
     for (; (n = *names); names++) {
 	if (!ztat(n, &nst, 0) && S_ISDIR(nst.st_mode)) {
 	    if (tpwd && nst.st_dev == est.st_dev && nst.st_ino == est.st_ino) {
-		addlinknode(ign, bslashquote(n, NULL, 0));
+		addlinknode(ign, quotestring(n, NULL, QT_BACKSLASH));
 		continue;
 	    }
 	    if (tpar && !strncmp((c = dupstring(n)), path, pl)) {
@@ -4360,7 +4359,7 @@ cf_ignore(char **names, LinkList ign, char *style, char *path)
 		if (found || ((e = strrchr(c, '/')) && e > c + pl &&
 			      !ztat(c, &st, 0) && st.st_dev == nst.st_dev &&
 			      st.st_ino == nst.st_ino))
-		    addlinknode(ign, bslashquote(n, NULL, 0));
+		    addlinknode(ign, quotestring(n, NULL, QT_BACKSLASH));
 	    }
 	}
     }

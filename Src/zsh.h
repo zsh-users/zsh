@@ -178,6 +178,41 @@ struct mathfunc {
 
 #define SPECCHARS "#$^*()=|{}[]`<>?~;&\n\t \\\'\""
 
+/*
+ * Types of quote.  This is used in various places, so care needs
+ * to be taken when changing them.  (Oooh, don't you look surprised.)
+ * - Passed to quotestring() to indicate style.  This is the ultimate
+ *   destiny of most of the other uses of members of the enum.
+ * - In paramsubst(), to count q's in parameter substitution.
+ * - In the completion code, where we maintain a stack of quotation types.
+ */
+enum {
+    /*
+     * No quote.  Not a valid quote, but useful in the substitution
+     * and completion code to indicate we're not doing any quoting.
+     */
+    QT_NONE,
+    /* Backslash: \ */
+    QT_BACKSLASH,
+    /* Single quote: ' */
+    QT_SINGLE,
+    /* Double quote: " */
+    QT_DOUBLE,
+    /* Print-style quote: $' */
+    QT_DOLLARS,
+    /*
+     * Backtick: `
+     * Not understood by many parts of the code; here for a convenience
+     * in those cases where we need to represent a complete set.
+     */
+    QT_BACKTICK,
+};
+
+/*
+ * Lexical tokens: unlike the character tokens above, these never
+ * appear in strings and don't necessarily represent a single character.
+ */
+
 enum {
     NULLTOK,		/* 0  */
     SEPER,

@@ -992,6 +992,8 @@ static const struct gsu_scalar unambig_pos_gsu =
 { get_unambig_pos, nullstrsetfn, compunsetfn };
 static const struct gsu_scalar insert_pos_gsu =
 { get_insert_pos, nullstrsetfn, compunsetfn };
+static const struct gsu_scalar compqstack_gsu =
+{ get_compqstack, nullstrsetfn, compunsetfn };
 
 static const struct gsu_integer compvarinteger_gsu =
 { intvargetfn, intvarsetfn, compunsetfn };
@@ -1047,7 +1049,7 @@ static struct compparam compkparams[] = {
     { "old_insert", PM_SCALAR, VAL(compoldins), NULL },
     { "vared", PM_SCALAR, VAL(compvared), NULL },
     { "list_lines", PM_INTEGER | PM_READONLY, NULL, GSU(listlines_gsu) },
-    { "all_quotes", PM_SCALAR | PM_READONLY, VAL(compqstack), NULL },
+    { "all_quotes", PM_SCALAR | PM_READONLY, NULL, GSU(compqstack_gsu) },
     { "ignored", PM_INTEGER | PM_READONLY, VAL(compignored), NULL },
     { NULL, 0, NULL, NULL }
 };
@@ -1218,6 +1220,26 @@ get_insert_pos(UNUSED(Param pm))
     char *p;
 
     unambig_data(NULL, NULL, &p);
+
+    return p;
+}
+
+/**/
+static char *
+get_compqstack(UNUSED(Param pm))
+{
+    char *p, *ptr, *cqp;
+
+    if (!compqstack)		/* TODO: don't think this can happen... */
+	return "";
+
+    ptr = p = zhalloc(2*strlen(compqstack)+1);
+
+    for (cqp = compqstack; *cqp; cqp++) {
+	char *str = comp_quoting_string(*cqp);
+	*ptr++ = *str;
+    }
+    *ptr = '\0';
 
     return p;
 }

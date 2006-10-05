@@ -3964,7 +3964,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		    count += fprintf(fout, "%*c", width, ' ');
 		break;
 	    case 'q':
-		stringval = curarg ? bslashquote(curarg, NULL, 0) : &nullstr;
+		stringval = curarg ?
+		    quotestring(curarg, NULL, QT_BACKSLASH) : &nullstr;
 		*d = 's';
 		print_val(stringval);
 		break;

@@ -1357,7 +1357,7 @@ settyinfo(struct ttyinfo *ti)
 }
 
 /* the default tty state */
- 
+
 /**/
 mod_export struct ttyinfo shttyinfo;
 
@@ -1576,13 +1576,13 @@ extern char *_mktemp(char *);
  * NULL, the name is relative to $TMPPREFIX; If it is non-NULL, the
  * unique suffix includes a prefixed '.' for improved readability.  If
  * "use_heap" is true, we allocate the returned name on the heap. */
- 
+
 /**/
 mod_export char *
 gettempname(const char *prefix, int use_heap)
 {
     char *ret, *suffix = prefix ? ".XXXXXX" : "XXXXXX";
- 
+
     queue_signals();
     if (!prefix && !(prefix = getsparam("TMPPREFIX")))
 	prefix = DEFAULT_TMPPREFIX;
@@ -1642,7 +1642,7 @@ gettempfile(const char *prefix, int use_heap, char **tempname)
     *tempname = fn;
     return fd;
 }
- 
+
 /* Check if a string contains a token */
 
 /**/
@@ -1656,7 +1656,7 @@ has_token(const char *s)
 }
 
 /* Delete a character in a string */
- 
+
 /**/
 mod_export void
 chuck(char *str)
@@ -3082,7 +3082,7 @@ itype_end(const char *ptr, int itype, int once)
 		 */
 		switch (itype) {
 		case IWORD:
-		    if (!iswalnum(wc) && 
+		    if (!iswalnum(wc) &&
 			!wmemchr(wordchars_wide.chars, wc,
 				 wordchars_wide.len))
 			return (char *)ptr;
@@ -3820,7 +3820,7 @@ nicezputs(char const *s, FILE *stream)
 	if (itok(c)) {
 	    if (c <= Comma)
 		c = ztokens[c - Pound];
-	    else 
+	    else
 		continue;
 	}
 	if (c == Meta)
@@ -3845,7 +3845,7 @@ niceztrlen(char const *s)
 	if (itok(c)) {
 	    if (c <= Comma)
 		c = ztokens[c - Pound];
-	    else 
+	    else
 		continue;
 	}
 	if (c == Meta)
@@ -4134,27 +4134,32 @@ hasspecial(char const *s)
     return 0;
 }
 
-/* Quote the string s and return the result.  If e is non-zero, the         *
- * pointer it points to may point to a position in s and in e the position  *
- * of the corresponding character in the quoted string is returned.         *
- * The last argument should be zero if this is to be used outside a string, *
- * one if it is to be quoted for the inside of a single quoted string,      *
- * two if it is for the inside of a double quoted string, and               *
- * three if it is for the inside of a $'...' quoted string.                 *
- * The string may be metafied and contain tokens.                           */
+/*
+ * Quote the string s and return the result.
+ *
+ * If e is non-zero, the
+ * pointer it points to may point to a position in s and in e the position
+ * of the corresponding character in the quoted string is returned.
+ * 
+ * The last argument is a QT_ value defined in zsh.h other than QT_NONE.
+ *
+ * The string may be metafied and contain tokens.
+ */
 
 /**/
 mod_export char *
-bslashquote(const char *s, char **e, int instring)
+quotestring(const char *s, char **e, int instring)
 {
     const char *u, *tt;
     char *v;
     char *buf = hcalloc(4 * strlen(s) + 1);
     int sf = 0;
 
+    DPUTS(instring < QT_BACKSLASH || instring > QT_DOLLARS,
+	  "BUG: bad quote type in quotestring");
     tt = v = buf;
     u = s;
-    if (instring == 3) {
+    if (instring == QT_DOLLARS) {
 	/*
 	 * As we test for printability here we need to be able
 	 * to look for multibyte characters.
@@ -4170,7 +4175,7 @@ bslashquote(const char *s, char **e, int instring)
 	    }
 	    if (
 #ifdef MULTIBYTE_SUPPORT
-		cc != WEOF && 
+		cc != WEOF &&
 #endif
 		WC_ISPRINT(cc)) {
 		switch (cc) {
@@ -4276,13 +4281,13 @@ bslashquote(const char *s, char **e, int instring)
 		      (isset(MAGICEQUALSUBST) &&
 		       (u[-1] == '=' || u[-1] == ':')) ||
 		      (*u == '~' && isset(EXTENDEDGLOB))) &&
-		     (!instring ||
+		     (instring == QT_BACKSLASH ||
 		      (isset(BANGHIST) && *u == (char)bangchar &&
-		       instring != 1) ||
-		      (instring == 2 &&
+		       instring != QT_SINGLE) ||
+		      (instring == QT_DOUBLE &&
 		       (*u == '$' || *u == '`' || *u == '\"' || *u == '\\')) ||
-		      (instring == 1 && *u == '\''))) {
-		if (*u == '\n' || (instring == 1 && *u == '\'')) {
+		      (instring == QT_SINGLE && *u == '\''))) {
+		if (*u == '\n' || (instring == QT_SINGLE && *u == '\'')) {
 		    if (unset(RCQUOTES)) {
 			*v++ = '\'';
 			if (*u == '\'')
@@ -4306,7 +4311,7 @@ bslashquote(const char *s, char **e, int instring)
 
     if (e && *e == u)
 	*e = v, sf = 1;
-    DPUTS(e && !sf, "BUG: Wild pointer *e in bslashquote()");
+    DPUTS(e && !sf, "BUG: Wild pointer *e in quotestring()");
 
     return buf;
 }
@@ -4654,7 +4659,7 @@ getkeystring(char *s, int *len, int how, int *misc)
 		    *len = t - buf;
 		    return buf;
 		}
-		t += count;  
+		t += count;
 		continue;
 # else
 #  if defined(HAVE_NL_LANGINFO) && defined(CODESET)

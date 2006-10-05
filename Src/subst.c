@@ -1394,7 +1394,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * quoterr is simply (X) but gets passed around a lot because the
      * combination (eX) needs it.
      */
-    int quotemod = 0, quotetype = 0, quoteerr = 0;
+    int quotemod = 0, quotetype = QT_NONE, quoteerr = 0;
     /*
      * (V) flag: fairly straightforward, except that as with so
      * many flags it's not easy to decide where to put it in the order.
@@ -2835,8 +2835,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * the repetitions of the (q) flag.
      */
     if (quotemod) {
-	if (--quotetype > 3)
-	    quotetype = 3;
+	if (quotetype > QT_DOLLARS)
+	    quotetype = QT_DOLLARS;
 	if (isarr) {
 	    char **ap;
 
@@ -2845,24 +2845,25 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    ap = aval;
 
 	    if (quotemod > 0) {
-		if (quotetype) {
+		if (quotetype > QT_BACKSLASH) {
 		    int sl;
 		    char *tmp;
 
 		    for (; *ap; ap++) {
-			int pre = quotetype != 3 ? 1 : 2;
-			tmp = bslashquote(*ap, NULL, quotetype);
+			int pre = quotetype != QT_DOLLARS ? 1 : 2;
+			tmp = quotestring(*ap, NULL, quotetype);
 			sl = strlen(tmp);
 			*ap = (char *) zhalloc(pre + sl + 2);
 			strcpy((*ap) + pre, tmp);
-			ap[0][pre - 1] = ap[0][pre + sl] = (quotetype != 2 ? '\'' : '"');
+			ap[0][pre - 1] = ap[0][pre + sl] =
+			    (quotetype != QT_DOUBLE ? '\'' : '"');
 			ap[0][pre + sl + 1] = '\0';
-			if (quotetype == 3)
+			if (quotetype == QT_DOLLARS)
 			  ap[0][0] = '$';
 		    }
 		} else
 		    for (; *ap; ap++)
-			*ap = bslashquote(*ap, NULL, 0);
+			*ap = quotestring(*ap, NULL, QT_BACKSLASH);
 	    } else {
 		int one = noerrs, oef = errflag, haserr = 0;
 
@@ -2885,20 +2886,21 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (!copied)
 		val = dupstring(val), copied = 1;
 	    if (quotemod > 0) {
-		if (quotetype) {
-		    int pre = quotetype != 3 ? 1 : 2;
+		if (quotetype > QT_BACKSLASH) {
+		    int pre = quotetype != QT_DOLLARS ? 1 : 2;
 		    int sl;
 		    char *tmp;
-		    tmp = bslashquote(val, NULL, quotetype);
+		    tmp = quotestring(val, NULL, quotetype);
 		    sl = strlen(tmp);
 		    val = (char *) zhalloc(pre + sl + 2);
 		    strcpy(val + pre, tmp);
-		    val[pre - 1] = val[pre + sl] = (quotetype != 2 ? '\'' : '"');
+		    val[pre - 1] = val[pre + sl] =
+			(quotetype != QT_DOUBLE ? '\'' : '"');
 		    val[pre + sl + 1] = '\0';
-		    if (quotetype == 3)
+		    if (quotetype == QT_DOLLARS)
 		      val[0] = '$';
 		} else
-		    val = bslashquote(val, NULL, 0);
+		    val = quotestring(val, NULL, QT_BACKSLASH);
 	    } else {
 		int one = noerrs, oef = errflag, haserr;
 
@@ -3387,7 +3389,7 @@ modify(char **str, char **ptr)
 			    subst(&copy, hsubl, hsubr, gbal);
 			break;
 		    case 'q':
-			copy = bslashquote(copy, NULL, 0);
+			copy = quotestring(copy, NULL, QT_BACKSLASH);
 			break;
 		    case 'Q':
 			{
@@ -3453,7 +3455,7 @@ modify(char **str, char **ptr)
 		    }
 		    break;
 		case 'q':
-		    *str = bslashquote(*str, NULL, 0);
+		    *str = quotestring(*str, NULL, QT_BACKSLASH);
 		    break;
 		case 'Q':
 		    {

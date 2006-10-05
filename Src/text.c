@@ -807,7 +807,7 @@ getredirs(LinkList redirs)
 		 * quotes certainly isn't right in that case).
 		 */
 		taddchr('\'');
-		taddstr(bslashquote(f->name, NULL, 1));
+		taddstr(quotestring(f->name, NULL, QT_SINGLE));
 		taddchr('\'');
 	    } else
 		taddstr(f->name);

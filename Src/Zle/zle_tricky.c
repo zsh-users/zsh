@@ -402,15 +402,22 @@ mod_export int insubscr;
 /**/
 mod_export Param keypm;
 
-/* 1 if we are completing in a quoted string (or inside `...`) */
+/*
+ * instring takes one of the QT_* values defined in zsh.h.
+ * It's never QT_TICK, instead we use inbackt.
+ * TODO: can we combine the two?
+ */
 
 /**/
 mod_export int instring, inbackt;
 
-/* Convenience macro for calling bslashquote() (formerly quotename()). *
- * This uses the instring variable above.                              */
+/*
+ * Convenience macro for calling quotestring (formerly bslashquote() (formerly
+ * quotename())).
+ * This uses the instring variable above.
+ */
 
-#define quotename(s, e) bslashquote(s, e, instring)
+#define quotename(s, e) quotestring(s, e, instring)
 
 /* Check if the given string is the name of a parameter and if this *
  * parameter is one worth expanding.                                */
@@ -891,7 +898,7 @@ addx(char **ptmp)
 	zlemetaline[zlemetacs] == ';' || zlemetaline[zlemetacs] == '|' ||
 	zlemetaline[zlemetacs] == '&' ||
 	zlemetaline[zlemetacs] == '>' || zlemetaline[zlemetacs] == '<' ||
-	(instring && (zlemetaline[zlemetacs] == '"' ||
+	(instring != QT_NONE && (zlemetaline[zlemetacs] == '"' ||
 		      zlemetaline[zlemetacs] == '\'')) ||
 	(addspace = (comppref && !iblank(zlemetaline[zlemetacs])))) {
 	*ptmp = zlemetaline;
@@ -1032,7 +1039,18 @@ static char *
 get_comp_string(void)
 {
     int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
-    int ona = noaliases, qsub;
+    int ona = noaliases;
+    /*
+     * qsub fixes up the offset into the current completion word
+     * for changes made by the lexer.  That currently means the
+     * effect of RCQUOTES on embedded pairs of single quotes.
+     * zlemetacs_qsub takes account of the effect of this offset
+     * on the cursor position; it's only needed when using the
+     * word we got from the lexer, which we only do sometimes because
+     * otherwise it would be too easy.  If looking at zlemetaline we
+     * still use zlemetacs.
+     */
+    int qsub, zlemetacs_qsub = 0;
     char *s = NULL, *tmp, *p, *tt = NULL, rdop[20];
     char *linptr, *u;
 
@@ -1070,7 +1088,7 @@ get_comp_string(void)
 	    u++;
     }
     inbackt = (i & 1);
-    instring = 0;
+    instring = QT_NONE;
     addx(&tmp);
     linptr = zlemetaline;
     pushheap();
@@ -1235,9 +1253,11 @@ get_comp_string(void)
 	    clwords[i][--sl] = '\0';
 	/* If this is the word the cursor is in and we added a `x', *
 	 * remove it.                                               */
-	if (clwpos == i++ && addedx)
-	    chuck(&clwords[i - 1][((zlemetacs - wb - qsub) >= sl) ?
-				 (sl - 1) : (zlemetacs - wb - qsub)]);
+	if (clwpos == i++ && addedx) {
+	    zlemetacs_qsub = zlemetacs - qsub;
+	    chuck(&clwords[i - 1][((zlemetacs_qsub - wb) >= sl) ?
+				 (sl - 1) : (zlemetacs_qsub - wb)]);
+	}
     } while (tok != LEXERR && tok != ENDINPUT &&
 	     (tok != SEPER || (zleparse && !tt0)));
     /* Calculate the number of words stored in the clwords array. */
@@ -1299,7 +1319,8 @@ get_comp_string(void)
 	*s = sav;
         if (*s == '+')
             s++;
-	if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt + zlemetacs - wb) {
+	if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt +
+	    zlemetacs_qsub - wb) {
 	    s = NULL;
 	    inwhat = IN_MATH;
 	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
@@ -1308,7 +1329,7 @@ get_comp_string(void)
 	    else
 		insubscr = 1;
 	} else if (*s == '=') {
-            if (zlemetacs > wb + (s - tt)) {
+            if (zlemetacs_qsub > wb + (s - tt)) {
                 s++;
                 wb += s - tt;
                 s = ztrdup(s);
@@ -1365,7 +1386,7 @@ get_comp_string(void)
 	    nnb = s + MB_METACHARLEN(s);
 	else
 	    nnb = s;
-	for (tt = s; tt < s + zlemetacs - wb;) {
+	for (tt = s; tt < s + zlemetacs_qsub - wb;) {
 	    if (*tt == Inbrack) {
 		i++;
 		nb = nnb;
@@ -1504,21 +1525,46 @@ get_comp_string(void)
                 level--;
         }
     }
-    if ((*s == Snull || *s == Dnull) && !has_real_token(s + 1)) {
-	char *q = (*s == Snull ? "'" : "\""), *n = tricat(qipre, q, "");
+    if ((*s == Snull || *s == Dnull ||
+	((*s == String || *s == Qstring) && s[1] == Snull))
+	&& !has_real_token(s + 1)) {
 	int sl = strlen(s);
+	char *q, *qtptr = s, *n;
 
-	instring = (*s == Snull ? 1 : 2);
+	switch (*s) {
+	case Snull:
+	    q = "'";
+	    instring = QT_SINGLE;
+	    break;
+
+	case Dnull:
+	    q = "\"";
+	    instring = QT_DOUBLE;
+	    break;
+
+	default:
+	    q = "$'";
+	    instring = QT_DOLLARS;
+	    qtptr++;
+	    sl--;
+	    break;
+	}
+
+	n = tricat(qipre, q, "");
 	zsfree(qipre);
 	qipre = n;
-	if (sl > 1 && s[sl - 1] == *s) {
+	if (sl > 1 && qtptr[sl - 1] == *qtptr) {
 	    n = tricat(q, qisuf, "");
 	    zsfree(qisuf);
 	    qisuf = n;
 	}
 	autoq = ztrdup(q);
 
-        if (instring == 2) {
+	/*
+	 * \! in double quotes is extracted by the history code before normal
+	 * parsing, so sanitize it here, too.
+	 */
+        if (instring == QT_DOUBLE) {
             for (q = s; *q; q++)
                 if (*q == '\\' && q[1] == '!')
                     *q = Bnull;
@@ -1651,11 +1697,11 @@ get_comp_string(void)
 
 			new->next = NULL;
 			new->str = dupstrpfx(bbeg, len);
-			new->str = ztrdup(bslashquote(new->str, NULL, instring));
+			new->str = ztrdup(quotename(new->str, NULL));
 			untokenize(new->str);
 			new->pos = begi;
 			*dbeg = '\0';
-			new->qpos = strlen(bslashquote(predup, NULL, instring));
+			new->qpos = strlen(quotename(predup, NULL));
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
@@ -1700,11 +1746,11 @@ get_comp_string(void)
 			lastbrbeg = new;
 
 			new->str = dupstrpfx(bbeg, len);
-			new->str = ztrdup(bslashquote(new->str, NULL, instring));
+			new->str = ztrdup(quotename(new->str, NULL));
 			untokenize(new->str);
 			new->pos = begi;
 			*dbeg = '\0';
-			new->qpos = strlen(bslashquote(predup, NULL, instring));
+			new->qpos = strlen(quotename(predup, NULL));
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
@@ -1737,7 +1783,7 @@ get_comp_string(void)
 		    brend = new;
 
 		    new->str = dupstrpfx(bbeg, len);
-		    new->str = ztrdup(bslashquote(new->str, NULL, instring));
+		    new->str = ztrdup(quotename(new->str, NULL));
 		    untokenize(new->str);
 		    new->pos = dp - predup - len + 1;
 		    new->qpos = len;
@@ -1766,11 +1812,11 @@ get_comp_string(void)
 		lastbrbeg = new;
 
 		new->str = dupstrpfx(bbeg, len);
-		new->str = ztrdup(bslashquote(new->str, NULL, instring));
+		new->str = ztrdup(quotename(new->str, NULL));
 		untokenize(new->str);
 		new->pos = begi;
 		*dbeg = '\0';
-		new->qpos = strlen(bslashquote(predup, NULL, instring));
+		new->qpos = strlen(quotename(predup, NULL));
 		*dbeg = '{';
 		boffs -= len;
 		strcpy(dbeg, dbeg + len);
@@ -1785,7 +1831,7 @@ get_comp_string(void)
 		    p = bp->pos;
 		    l = bp->qpos;
 		    bp->pos = strlen(predup + p + l);
-		    bp->qpos = strlen(bslashquote(predup + p + l, NULL, instring));
+		    bp->qpos = strlen(quotename(predup + p + l, NULL));
 		    strcpy(predup + p, predup + p + l);
 		}
 	    }
