@@ -1,3 +1,9 @@
+2006-10-06  Peter Stephenson  <pws@csr.com>
+
+	* 10791: Src/Zle/compresult.c: accumulated completions
+	on single line could cause border disputes resulting in
+	skirmishes with cursor position.
+
 2006-10-05  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: improved

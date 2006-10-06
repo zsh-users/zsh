@@ -2126,7 +2126,7 @@ bld_all_str(Cmatch all)
 		if (add)
 		    strcat(buf, " ");
 		strcat(buf, m->str);
-		len -= t;
+		len -= t + add;
 		add = 1;
 	    } else {
 		if (len > add + 2) {
