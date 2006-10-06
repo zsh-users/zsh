@@ -2126,7 +2126,7 @@ bld_all_str(Cmatch all)
 		if (add)
 		    strcat(buf, " ");
 		strcat(buf, m->str);
-		len -= t + add;
+		len -= t;
 		add = 1;
 	    } else {
 		if (len > add + 2) {
@@ -2134,7 +2134,7 @@ bld_all_str(Cmatch all)
 			strcat(buf, " ");
 		    strncat(buf, m->str, len);
 		}
-		strcat(buf, " ...");
+		strcat(buf, "...");
 		break;
 	    }
 	}
