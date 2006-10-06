@@ -1,5 +1,8 @@
 2006-10-06  Peter Stephenson  <pws@csr.com>
 
+	* 22820: Src/Zle/compresult.c: no, users/10791 wasn't right
+	and now I'm bored so this will have to do.
+
 	* 10791: Src/Zle/compresult.c: accumulated completions
 	on single line could cause border disputes resulting in
 	skirmishes with cursor position.
