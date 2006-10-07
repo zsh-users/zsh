@@ -9,6 +9,9 @@
 	make CM_SPACE definition global and use it consistently in
 	compresults and compdescribe to lay out matches
 
+	* 22839: Completion/Unix/Command/_texinfo: as pointed by
+	Vincent Lefevre, info accepts file names as first argument
+
 2006-10-06  Peter Stephenson  <pws@csr.com>
 
 	* 10791: Src/Zle/compresult.c: accumulated completions

@@ -21,7 +21,7 @@ case $service in
       '--subnodes[recursively output menu items]' \
       '--vi-keys[use Vi-like key bindings]' \
       '(: -)--version[display version information]' \
-      '(--apropos -h --help -O --output --version)*::menu items:->item' && ret=0
+      '(--apropos -h --help -O --output --version)*::menu item:->item' && ret=0
 
     info=( $info {(kv)opt_args[(I)(-d|--directory|-f|--file)]} )
   ;;
@@ -146,11 +146,25 @@ esac
 
 case $state in
   item )
-    local -a items
+    local -a items tags expl infopath
+    (( $#INFOPATH )) && infopath=( -W ${s/:/INFOPATH} )
 
-    items=(${${(M)${${(f)"$(${info} --output - ${words[1,CURRENT-1]} 2>/dev/null)"}[1,(r)[[:space:]]#--- The Detailed Node Listing ---[[:space:]]#]}:#\* *~\* Menu:*}:/(#b)\*[[:space:]]##([^:]##):(#B)( \(?##\)[^.]#.|(:|))[[:space:]]#(#b)(*)[[:space:]]#/$match[1]${match[2]:+:}$match[2]})
+    tags=(items)
+    if [[ $CURRENT -eq 1 ]]; then
+	tags+=files
+    fi
 
-    _describe -t items "menu items" items && ret=0
+    _tags $tags
+    while _tags; do
+	if _requested files expl 'info file'; then
+	    _files "$expl[@]" $infopath -g '*.info' && ret=0
+	fi
+	if _requested items; then
+	    items=(${${(M)${${(f)"$(${info} --output - ${words[1,CURRENT-1]} 2>/dev/null)"}[1,(r)[[:space:]]#--- The Detailed Node Listing ---[[:space:]]#]}:#\* *~\* Menu:*}:/(#b)\*[[:space:]]##([^:]##):(#B)( \(?##\)[^.]#.|(:|))[[:space:]]#(#b)(*)[[:space:]]#/$match[1]${match[2]:+:}$match[2]})
+
+	    _describe -t items "menu item" items && ret=0
+	fi
+    done
   ;;
 esac
 
