@@ -15,6 +15,16 @@
 	on single line could cause border disputes resulting in
 	skirmishes with cursor position.
 
+2006-10-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22819: Doc/Zsh/compwid.yo, Src/builtin.c, Src/subst.c,
+	Src/text.c, Src/utils.c, Src/zsh.h, Src/Zle/compcore.c,
+	Src/Zle/compctl.c, rc/Zle/complete.c, Src/Zle/computil.c,
+	Src/Zle/zle_tricky.c: rationalise internal quotation,
+	upgrade completion use of quotation to start handling $'...'
+	(still incomplete), fix bug on completion with active
+	RCQUOTES.
+
 2006-10-05  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: improved

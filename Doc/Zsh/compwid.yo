@@ -140,8 +140,9 @@ on one of those words, that word will be completed, possibly invoking
 types of quoted strings which are currently broken into parts in this
 fashion.  Its value contains one character for each quoting level.  The
 characters are a single quote or a double quote for strings quoted with
-these characters and a backslash for strings not starting with a quote
-character.  The first character in the value always corresponds to the
+these characters, a dollars sign for strings quoted with
+tt($')var(...)tt(') and a backslash for strings not starting with a
+quote character.  The first character in the value always corresponds to the
 innermost quoting level.
 )
 vindex(context, compstate)
