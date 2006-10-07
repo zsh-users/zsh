@@ -33,13 +33,6 @@
 
 /* Help for `_describe'. */
 
-/*
- * FIXME this should be defined globally. I have to find other places
- * where it is used
- * */
-
-#define INTERMATCH_GAP 2
-
 typedef struct cdset *Cdset;
 typedef struct cdstr *Cdstr;
 typedef struct cdrun *Cdrun;
@@ -161,7 +154,7 @@ cd_group(int maxg)
                 for (str2 = (set2 == set1 ? str1->next : set2->strs);
                      str2; str2 = str2->next)
                     if (str2->desc && !strcmp(str1->desc, str2->desc)) {
-                        width += INTERMATCH_GAP + str2->width;
+                        width += CM_SPACE + str2->width;
                         if (width > cd_state.maxmlen || num == maxg)
                             break;
                         if (width > cd_state.maxglen)
@@ -276,7 +269,7 @@ cd_prep()
 
         cd_state.gprew = 0;
         for (i = 0; i < cd_state.maxg; i++) {
-            cd_state.gprew += wids[i] + INTERMATCH_GAP;
+            cd_state.gprew += wids[i] + CM_SPACE;
 	}
 
         if (cd_state.gprew > cd_state.maxmlen && cd_state.maxglen > 1)
@@ -631,7 +624,7 @@ cd_get(char **params)
 		 *     max prefix length (cd_state.pre) +
 		 *     max padding (cd_state.premaxw generously :) +
 		 *     separator length (cd_state.slen) +
-		 *     inter matches gap (INTERMATCH_GAP) +
+		 *     inter matches gap (CM_SPACE) +
 		 *     max description length (cd_state.suf) +
 		 *     trailing \0
 		 */
@@ -648,7 +641,7 @@ cd_get(char **params)
                     *mp++ = ztrdup(str->match);
 		    strcpy(p, str->str);
 		    p += str->len;
-                    memset(p, ' ', (l = (cd_state.premaxw - str->width + INTERMATCH_GAP)));
+                    memset(p, ' ', (l = (cd_state.premaxw - str->width + CM_SPACE)));
 		    p += l;
 		    strcpy(p, cd_state.sep);
 		    p += cd_state.slen;
@@ -750,7 +743,7 @@ cd_get(char **params)
                     }
 
                     strcpy(dbuf, cd_state.sep);
-		    remw = columns - cd_state.gprew - cd_state.swidth - INTERMATCH_GAP;
+		    remw = columns - cd_state.gprew - cd_state.swidth - CM_SPACE;
 		    p = pp = dbuf + cd_state.slen;
 		    d = str->desc;
 		    w = MB_METASTRWIDTH(d);

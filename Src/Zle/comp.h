@@ -407,3 +407,7 @@ struct chdata {
     Cmatch cur;			/* current match or NULL */
 };
 
+/* The number of columns to leave empty between rows of matches. */
+
+#define CM_SPACE  2
+

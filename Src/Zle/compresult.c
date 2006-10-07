@@ -30,10 +30,6 @@
 #include "complete.mdh"
 #include "compresult.pro"
 
-/* The number of columns to leave empty between rows of matches. */
-
-#define CM_SPACE  2
-
 /* This counts how often the list of completions was invalidated.
  * Can be used to detect if we have a new list.  */
 
