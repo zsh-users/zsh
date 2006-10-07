@@ -1,3 +1,8 @@
+2006-10-07  Clint Adams  <clint@zsh.org>
+
+	* 22835: Completion/Unix/Command/_pon: tidy up pon bit
+	and add poff completion.
+
 2006-10-07  Andrey Borzenkov <bor@zsh.org>
 
 	* 22831: Src/Zle/comp.h, Src/Zle/compresult.c, Src/Zle/computil.c:
