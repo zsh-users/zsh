@@ -1,5 +1,8 @@
 2006-10-10  Peter Stephenson  <pws@csr.com>
 
+	* 22851: arno: Completion/Unix/Command/_init_d: "-" can occur
+	in script names.
+
 	* 22854: Doc/Zsh/contrib.yo, Functions/Zle/replace-string,
 	Functions/Zle/replace-string-again: separate out back end
 	as separate widget to repeat replacement.
