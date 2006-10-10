@@ -3,7 +3,7 @@
 # Complete the arguments of the current command according to the
 # descriptions given as arguments to this function.
 
-local long cmd="$words[1]" descr mesg subopts opt usecc autod
+local long cmd="$words[1]" descr odescr mesg subopts opt opt2 usecc autod
 local oldcontext="$curcontext" hasopts rawret optarg singopt alwopt
 local setnormarg
 local -a match mbegin mend
@@ -51,9 +51,9 @@ if (( long )); then
 	tmp=( "${(@P)tmp}" )
       fi
       if [[ "$1" = -i* ]]; then
-        iopts=( "$iopts[@]" "$tmp[@]" )
+        iopts+=( "$tmp[@]" )
       else
-        sopts=( "$sopts[@]" "$tmp[@]" )
+        sopts+=( "$tmp[@]" )
       fi
       shift cur
     done
@@ -69,8 +69,28 @@ if (( long )); then
     # those hyphens and anything from the space or tab after the
     # option up to the end.
 
-   _call_program options ${~words[1]} --help 2>&1 | while read opt; do
-     tmp=()
+   tmp=()
+   _call_program options ${~words[1]} --help 2>&1 | while IFS= read -r opt; do
+     if (( ${#tmp} )); then
+       # Previous line had no comment.  Is the current one suitable?
+       # It's hard to be sure, but if it there was nothing on the
+       # previous line and the current one is indented more than
+       # a couple of spaces (and isn't completely whitespace or punctuation)
+       # there's a pretty good chance.
+       if [[ $opt = [[:space:]][[:space:]][[:space:]]*[[:alpha:]]* ]]; then
+	 # Assume so.
+	 opt=${opt##[[:space:]]##}
+	 # Same substitution as below.
+	 lopts+=("${^tmp[@]}":${${${opt//:/-}//\[/(}//\]/)})
+	 tmp=()
+	 # Finished with this line.
+	 continue
+       else
+	 # Still no comment, add the previous options anyway.
+	 lopts+=("${tmp[@]}")
+	 tmp=()
+       fi
+     fi
      while [[ $opt = [,[:space:]]#(#b)(-[^,[:space:]]#)(*) ]]; do
        # We used to remove the brackets from "[=STUFF]",
        # but later the code appears to handle it with the brackets
@@ -89,10 +109,19 @@ if (( long )); then
      # and we need to remove fooarg.  Use whitespace for hints.
      opt=${opt## [^[:space:]]##  }
      opt=${opt##[[:space:]]##}
-     # Add description after a ":", converting any : in the description
-     # to a -.  Use RCQUOTES to append this to all versions of the option.
-     lopts+=("${^tmp[@]}"${opt:+:${opt//:/-}})
+     if [[ -n $opt ]]; then
+       # Add description after a ":", converting any : in the description
+       # to a -.  Use RCQUOTES to append this to all versions of the option.
+       lopts+=("${^tmp[@]}":${${${opt//:/-}//\[/(}//\]/)})
+       tmp=()
+       # If there's no comment, we'll see if there's one on the
+       # next line.
+     fi
    done
+   # Tidy up any remaining uncommented options.
+   if (( ${#tmp} )); then
+     lopts+=("${tmp[@]}")
+   fi
 
     # Remove options also described by user-defined specs.
 
@@ -104,7 +133,7 @@ if (( long )); then
       # Using (( ... )) gives a parse error.
 
       let "$tmpargv[(I)(|\([^\)]#\))(|\*)${opt}(|[-+]|=(|-))(|\[*\])(|:*)]" ||
-          tmp=( "$tmp[@]" "$lopts[(r)$opt(|[\[:=]*)]" )
+          tmp+=( "$lopts[(r)$opt(|[\[:=]*)]" )
     done
     lopts=( "$tmp[@]" )
 
@@ -122,7 +151,7 @@ if (( long )); then
       # on the existence of --enable-*.
       # TODO: there's no anchoring here, is that correct?
       # If it's not, careful with the [\[:=]* stuff.
-      lopts=( $lopts ${lopts/$~sopts[1]/$sopts[2]} )
+      lopts+=( ${lopts/$~sopts[1]/$sopts[2]} )
       shift 2 sopts
     done
 
@@ -130,8 +159,12 @@ if (( long )); then
     # The last one matches all options; the `special' description and action
     # makes those options be completed without an argument description.
 
-    set -- "$@" '*=FILE*:file:_files' \
-           '*=(DIR|PATH)*:directory:_files -/' '*=*:=: ' '*: :  '
+    argv+=(
+      '*=FILE*:file:_files'
+      '*=(DIR|PATH)*:directory:_files -/'
+      '*=*:=: '
+      '*: :  '
+    )
 
     while (( $# )); do
 
@@ -174,36 +207,25 @@ if (( long )); then
       if (( $#tmpo )); then
         tmp=("${(@)tmp:#*\[\=*}")
 
-        if [[ "$descr" = :\=* ]]; then
-          for opt in "$tmpo[@]"; do
-	    # Look for --option:description and turn it into
-	    # --option[description].  We didn't do that above
-	    # since it could get confused with the [=ARG] stuff.
-	    if [[ $opt = (#b)(*):([^:]#) ]]; then
-	      opt=$match[1]
-	      descr="[${match[2]}]"
-	    else
-	      descr=
-	    fi
-            cache=(
-	      "$cache[@]"
-	      "${${opt%%\=*}//[^a-zA-Z0-9-]}=${descr}::${(L)${opt%\]}#*\=}: "
-	    )
-          done
-        else
-	  # We don't handle the [description] form here.
-	  # TODO: we could with a bit of rewriting.
-	  #
-	  # The "[" didn't get removed here until I added it.
-	  # This may be why we used to try to remove the square brackets
-	  # higher up.
-          tmpo=("${(@)${(@)tmpo%%\[\=*}//[^a-zA-Z0-9-]}")
-          if [[ "$descr" = ::* ]]; then
-	    cache=( "$cache[@]" "${(@)^tmpo}=${dir}${descr}" )
-          else
-	    cache=( "$cache[@]" "${(@)^tmpo}=${dir}:${descr}" )
-          fi
-        fi
+	for opt in "$tmpo[@]"; do
+	  # Look for --option:description and turn it into
+	  # --option[description].  We didn't do that above
+	  # since it could get confused with the [=ARG] stuff.
+	  if [[ $opt = (#b)(*):([^:]#) ]]; then
+	    opt=$match[1]
+	    odescr="[${match[2]}]"
+	  else
+	    odescr=
+	  fi
+	  opt2=${${opt%%\[\=*}//[^a-zA-Z0-9-]}=${dir}${odescr}
+	  if [[ "$descr" = :\=* ]]; then
+	    cache+=( "${opt2}::${(L)${opt%\]}#*\=}: " )
+	  elif [[ "$descr" = ::* ]]; then
+	    cache+=( "${opt2}${descr}" )
+	  else
+	    cache+=( "${opt2}:${descr}" )
+	  fi
+	done
       fi
 
       # Descriptions with `=': mandatory argument.
@@ -214,24 +236,20 @@ if (( long )); then
       if (( $#tmpo )); then
         tmp=("${(@)tmp:#*\=*}")
 
-        if [[ "$descr" = :\=* ]]; then
-          for opt in "$tmpo[@]"; do
-	    if [[ $opt = (#b)(*):([^:]#) ]]; then
-	      opt=$match[1]
-	      descr="[${match[2]}]"
-	    else
-	      descr=
-	    fi
-            cache=(
-	      "$cache[@]"
-	      "${${opt%%\=*}//[^a-zA-Z0-9-]}=${descr}:${(L)${opt%\]}#*\=}: "
-	    )
-          done
-        else
-          tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
-
-	  cache=( "$cache[@]" "${(@)^tmpo}=${dir}${descr}" )
-        fi
+	for opt in "$tmpo[@]"; do
+	  if [[ $opt = (#b)(*):([^:]#) ]]; then
+	    opt=$match[1]
+	    odescr="[${match[2]}]"
+	  else
+	    odescr=
+	  fi
+	  opt2="${${opt%%\=*}//[^a-zA-Z0-9-]}=${dir}${odescr}"
+	  if [[ "$descr" = :\=* ]]; then
+	    cache+=( "${opt2}:${(L)${opt%\]}#*\=}: " )
+	  else
+	    cache+=( "${opt2}${descr}" )
+	  fi
+	done
       fi
 
       # Everything else is just added as an option without arguments or
@@ -248,9 +266,9 @@ if (( long )); then
 	  # commands with no description
 	  "${(@)${(@)tmp:#*:*}//[^a-zA-Z0-9-]}")
         if [[ -n "$descr" && "$descr" != ': :  ' ]]; then
-	  cache=( "$cache[@]" "${(@)^tmp}${descr}" )
+	  cache+=( "${(@)^tmp}${descr}" )
         else
-	  cache=( "$cache[@]" "$tmp[@]" )
+	  cache+=( "$tmp[@]" )
         fi
       fi
     done
@@ -344,11 +362,11 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 	      action="${${action[3,-1]##[ 	]#}%%[ 	]#}"
 	      if (( ! $state[(I)$action] )); then
                 comparguments -W line opt_args
-                state=( "$state[@]" "$action" )
+                state+=( "$action" )
 	        if [[ -n "$usecc" ]]; then
 	          curcontext="${oldcontext%:*}:$subc"
 	        else
-	          context=( "$context[@]" "$subc" )
+	          context+=( "$subc" )
 	        fi
                 compstate[restore]=''
                 aret=yes
@@ -475,7 +493,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
           fi
           single=yes
         else
-          next=( "$next[@]" "$odirect[@]" )
+          next+=( "$odirect[@]" )
           _describe -O option \
                     next -Q -M "$matcher" -- \
                     direct -QS '' -M "$matcher" -- \
