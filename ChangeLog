@@ -1,5 +1,8 @@
 2006-10-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 22860: Completion/Unix/Command/_tar: allow - before first
+	argument of tar.
+
 	* 22859: Completion/Base/Utility/_arguments: improved to
 	handle all descriptions for zsh configure and GNU tar.
 
