@@ -4744,7 +4744,7 @@ getkeystring(char *s, int *len, int how, int *misc)
 	} else if ((how & GETKEY_DOLLAR_QUOTE) && *s == Snull) {
 	    for (u = t; (*u++ = *s++););
 	    return t + 1;
-	} else if (*s == '^' && !control && (how & GETKEY_CTRL)) {
+	} else if (*s == '^' && !control && (how & GETKEY_CTRL) && s[1]) {
 	    control = 1;
 	    continue;
 #ifdef MULTIBYTE_SUPPORT

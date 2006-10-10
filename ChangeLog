@@ -1,3 +1,11 @@
+2006-10-10  Peter Stephenson  <pws@csr.com>
+
+	* 22853: Src/utils.c: unquoted ^ at end of bindkey string
+	treated literally.
+
+	* 22852: Doc/Zsh/compsys.yo: finally document effect of 22191
+	(users style overrides use of userdirs).
+
 2006-10-07  Clint Adams  <clint@zsh.org>
 
 	* 22835: Completion/Unix/Command/_pon: tidy up pon bit

@@ -2603,9 +2603,10 @@ extended depending on authorial frustration.
 kindex(users, completion style)
 item(tt(users))(
 This may be set to a list of usernames to be completed.
-If it is not set or the string on the line
-doesn't match any of the strings in this list, all usernames will be
-completed.
+If it is not set all usernames will be completed.
+Note that if it is set only that list of users will be completed;
+this is because on some systems querying all users can take
+a prohibitive amount of time.
 )
 kindex(users-hosts, completion style)
 item(tt(users-hosts))(
