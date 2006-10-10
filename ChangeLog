@@ -1,5 +1,9 @@
 2006-10-10  Peter Stephenson  <pws@csr.com>
 
+	* 22854: Doc/Zsh/contrib.yo, Functions/Zle/replace-string,
+	Functions/Zle/replace-string-again: separate out back end
+	as separate widget to repeat replacement.
+
 	* 22853: Src/utils.c: unquoted ^ at end of bindkey string
 	treated literally.
 

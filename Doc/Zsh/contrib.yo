@@ -1055,8 +1055,10 @@ not used.  Hence it is still possible to call tt(executed-named-cmd) and
 similar functions while reading a value.
 )
 tindex(replace-string)
+tindex(replace-string-again)
 tindex(replace-pattern)
-item(tt(replace-string), tt(replace-pattern))(
+xitem(tt(replace-string), tt(replace-pattern))
+item(tt(replace-string-again), tt(replace-pattern-again))(
 The function tt(replace-string) implements two widgets.
 If defined under the same name as the function, it prompts for two
 strings; the first (source) string will be replaced by the second
@@ -1081,6 +1083,13 @@ tt(edit-previous) in the context tt(:zle:)var(widget) (for example,
 tt(:zle:replace-string)) to tt(true).  In addition, a positive
 numeric argument forces the previous values to be offered, a negative or
 zero argument forces them not to be.
+
+The function tt(replace-string-again) can be used to repeat the
+previous replacement; no prompting is done.  As with tt(replace-string), if
+the name of the widget contains the word `tt(pattern)', pattern matching
+is performed, else a literal string replacement.  Note that the
+previous source and replacement text are the same whether pattern or string
+matching is used.
 
 For example, starting from the line:
 

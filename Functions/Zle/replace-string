@@ -1,11 +1,11 @@
 emulate -L zsh
 setopt extendedglob
 
-autoload read-from-minibuffer
+autoload -U read-from-minibuffer replace-string-again
 
 local p1="Replace: " p2="   with: "
-local REPLY MATCH MBEGIN MEND curwidget=$WIDGET previous
-local -a match mbegin mend
+# Saving curwidget is necessary to avoid the widget name being overwritten.
+local REPLY previous curwidget=$WIDGET
 
 if (( ${+NUMERIC} )); then
   (( $NUMERIC > 0 )) && previous=1
@@ -20,34 +20,4 @@ read-from-minibuffer "$p1$_replace_string_src$p2" \
   ${previous:+$_replace_string_rep} || return 1
 _replace_string_rep=$REPLY
 
-if [[ $curwidget = *pattern* ]]; then
-    local rep2
-    # The following horror is so that an & preceded by an even
-    # number of backslashes is active, without stripping backslashes,
-    # while preceded by an odd number of backslashes is inactive,
-    # with one backslash being stripped.  A similar logic applies
-    # to \digit.
-    local rep=$_replace_string_rep
-    while [[ $rep = (#b)([^\\]#)(\\\\)#(\\|)(\&|\\<->|\\\{<->\})(*) ]]; do
-	if [[ -n $match[3] ]]; then
-	    # Expression is quoted, strip quotes
-	    rep2="${match[1]}${match[2]}${match[4]}"
-	else
-	    rep2+="${match[1]}${match[2]}"
-	    if [[ $match[4] = \& ]]; then
-		rep2+='${MATCH}'
-	    elif [[ $match[4] = \\\{* ]]; then
-		rep2+='${match['${match[4][3,-2]}']}'
-	    else
-		rep2+='${match['${match[4][2,-1]}']}'
-	    fi
-	fi
-	rep=${match[5]}
-    done
-    rep2+=$rep
-    LBUFFER=${LBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}
-    RBUFFER=${RBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}
-else
-    LBUFFER=${LBUFFER//$_replace_string_src/$_replace_string_rep}
-    RBUFFER=${RBUFFER//$_replace_string_src/$_replace_string_rep}
-fi
+replace-string-again $curwidget
