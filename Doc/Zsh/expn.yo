@@ -662,7 +662,7 @@ If the tt(MULTIBYTE) option is set and the number is greater than 127
 (i.e. not an ASCII character) it is treated as a Unicode character.
 )
 item(tt(%))(
-Expand all tt(%) escapes in the resulting words in the same way as in in
+Expand all tt(%) escapes in the resulting words in the same way as in
 prompts (see noderef(Prompt Expansion)). If this flag is given twice,
 full prompt expansion is done on the resulting words, depending on the
 setting of the tt(PROMPT_PERCENT), tt(PROMPT_SUBST) and tt(PROMPT_BANG)
