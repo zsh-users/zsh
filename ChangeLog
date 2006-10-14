@@ -1,3 +1,8 @@
+2006-10-14  Clint Adams  <clint@zsh.org>
+
+	* 22875: Completion/Debian/Command/_a2utils: Emmanuel Bouthenot,
+	tweaked: completion for a2ensite, a2dissite, a2enmod, a2dismod.
+
 2006-10-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22873: Larry P. Shrof: Doc/Zsh/expn.yo: typo.
