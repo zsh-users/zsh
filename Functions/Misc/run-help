@@ -41,6 +41,9 @@ places=( "${(@f)$(builtin whence -va $1)}" )
 if [[ $places = *"not found"* && $1 != ${(Q)1} ]]; then
   # Different when unquoted, so try stripping quotes.
   places=( "${(@f)$(builtin whence -va ${(Q)1})}" )
+  if (( ${#places} )); then
+      set -- "${(Q)@}"
+  fi
   # Quotation is significant to aliases, so suppress lookup.
   noalias=1
 fi
