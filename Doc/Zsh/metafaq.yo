@@ -84,9 +84,7 @@ nofill(tt(ftp://ftp.net.lut.ac.uk/zsh/)
 tt(ftp://sunsite.org.uk/packages/zsh/))
 )
 item(USA)(
-nofill(tt(ftp://archive.progeny.com/zsh/)
-tt(http://archive.progeny.com/zsh/)
-tt(http://zsh.open-mirror.com/))
+nofill(tt(http://zsh.open-mirror.com/))
 )
 enditem()
 
