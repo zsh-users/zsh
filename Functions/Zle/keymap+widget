@@ -74,3 +74,22 @@ return 0
 # bind the caps-lock widget to it:
 #
 #   bindkey -M main '^XL' caps-lock
+
+# Another example of using a continuation widget to propagate accept-line
+# (or any other binding from the original keymap) through the caller:
+#
+#  bindkey -N newkeymap $KEYMAP
+#  recursive-edit-and-accept() {
+#    local -a __accepted
+#    zle -N newkeymap+accept-line end-recursive-edit
+#    zle recursive-edit -K newkeymap || zle send-break
+#    if [[ ${__accepted[0]} != end-recursive-edit ]]
+#    then zle "${__accepted[@]}"; return
+#    else return 0
+#    fi
+#  }
+#  end-recursive-edit() {
+#    __accepted=($WIDGET ${=NUMERIC:+-n $NUMERIC} "$@")
+#    zle .accept-line
+#    return 0
+#  }
