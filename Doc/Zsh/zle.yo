@@ -1665,6 +1665,24 @@ item(tt(accept-line-and-down-history) (^O) (unbound) (unbound))(
 Execute the current line, and push the next history
 event on the the buffer stack.
 )
+tindex(auto-suffix-remove)
+item(tt(auto-suffix-remove))(
+If the previous action added a suffix (space, slash, etc.) to the word on
+the command line, remove it.  Otherwise do nothing.  Removing the suffix
+ends any active menu completion or menu selection.
+
+This widget is intended to be called from user-defined widgets to enforce
+a desired suffix-removal behavior.
+)
+tindex(auto-suffix-retain)
+item(tt(auto-suffix-retain))(
+If the previous action added a suffix (space, slash, etc.) to the word on
+the command line, force it to be preserved.  Otherwise do nothing.
+Retaining the suffix ends any active menu completion or menu selection.
+
+This widget is intended to be called from user-defined widgets to enforce
+a desired suffix-preservation behavior.
+)
 tindex(beep)
 item(tt(beep))(
 Beep, unless the tt(BEEP) option is unset.
