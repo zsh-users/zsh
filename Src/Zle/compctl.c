@@ -1741,7 +1741,8 @@ static int addwhat;
  * This uses the instring variable exported from zle_tricky.c.
  */
 
-#define quotename(s, e) quotestring(s, e, instring)
+#define quotename(s, e) \
+quotestring(s, e, instring == QT_NONE ? QT_BACKSLASH : instring)
 
 /* Hook functions */
 
