@@ -1,3 +1,14 @@
+2006-10-15  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* unposted: Functions/Misc/colors: add several comments about
+	other ANSI terminal attributes, cribbed from ECMA-48.
+
+	* unposted: Functions/Zle/keymap+widget: another example.
+
+	* users/10885: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list,
+	Src/Zle/zle_utils.c: add widgets auto-suffix-remove and
+	auto-suffix-retain for user-defined suffix control.
+
 2006-10-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22874: Functions/Misc/run-help: unquoting wasn't consistent.
