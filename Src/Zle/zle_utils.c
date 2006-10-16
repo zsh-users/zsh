@@ -865,6 +865,15 @@ handlefeep(UNUSED(char **args))
     return 0;
 }
 
+/* user control of auto-suffixes -- see iwidgets.list */
+
+/**/
+int
+handlesuffix(UNUSED(char **args))
+{
+  return 0;
+}
+
 /***************/
 /* undo system */
 /***************/
