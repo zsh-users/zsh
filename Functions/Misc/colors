@@ -4,15 +4,33 @@
 typeset -Ag color colour
 
 color=(
+# Codes listed in this array are from ECMA-48, Section 8.3.117, p. 61.
+# Those that are commented out are not widely supported or aren't closely
+# enough related to color manipulation, but are included for completeness.
+
 # Attribute codes:
-  00 none
-  01 bold
+  00 none                 # 20 gothic
+  01 bold                 # 21 double-underline
   02 faint                  22 normal
   03 standout               23 no-standout
   04 underline              24 no-underline
   05 blink                  25 no-blink
+# 06 fast-blink           # 26 proportional
   07 reverse                27 no-reverse
-  08 conceal
+  08 conceal                28 no-conceal
+# 09 strikethrough        # 29 no-strikethrough
+
+# Font selection:
+# 10 font-default
+# 11 font-first
+# 12 font-second
+# 13 font-third
+# 14 font-fourth
+# 15 font-fifth
+# 16 font-sixth
+# 17 font-seventh
+# 18 font-eighth
+# 19 font-ninth
 
 # Text color codes:
   30 black                  40 bg-black
@@ -23,7 +41,25 @@ color=(
   35 magenta                45 bg-magenta
   36 cyan                   46 bg-cyan
   37 white                  47 bg-white
+# 38 iso-8316-6           # 48 bg-iso-8316-6
   39 default                49 bg-default
+
+# Other codes:
+# 50 no-proportional
+# 51 border-rectangle
+# 52 border-circle
+# 53 overline
+# 54 no-border
+# 55 no-overline
+# 56 through 59 reserved
+
+# Ideogram markings:
+# 60 underline-or-right
+# 61 double-underline-or-right
+# 62 overline-or-left
+# 63 double-overline-or-left
+# 64 stress
+# 65 no-ideogram-marking
 )
 
 # A word about black and white:  The "normal" shade of white is really a
