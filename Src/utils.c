@@ -4015,7 +4015,7 @@ mb_metacharlenconv(const char *s, wint_t *wcp)
      */
     if (itok(*s)) {
 	if (wcp)
-	    *wcp = EOF;
+	    *wcp = WEOF;
 	return 1;
     }
 

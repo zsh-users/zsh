@@ -1,5 +1,7 @@
 2006-10-19  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/utils.c: EOF in ur-22885 should be WEOF.
+
 	* unposted: Completion/Unix/Command/_todo.sh: more places
 	where we complete priorities and contexts.
 
