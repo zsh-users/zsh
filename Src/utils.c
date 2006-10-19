@@ -4003,6 +4003,21 @@ mb_metacharlenconv(const char *s, wint_t *wcp)
 	    *wcp = (wint_t)(*s == Meta ? s[1] ^ 32 : *s);
 	return 1 + (*s == Meta);
     }
+    /*
+     * We have to handle tokens here, since we may be looking
+     * through a tokenized input.  Obviously this isn't
+     * a valid multibyte character, so just return WEOF
+     * and let the caller handle it as a single character.
+     *
+     * TODO: I've a sneaking suspicion we could do more here
+     * to prevent the caller always needing to handle invalid
+     * characters specially, but sometimes it may need to know.
+     */
+    if (itok(*s)) {
+	if (wcp)
+	    *wcp = EOF;
+	return 1;
+    }
 
     ret = MB_INVALID;
     for (ptr = s; *ptr; ) {

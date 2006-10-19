@@ -3,9 +3,12 @@
 # See http://todotxt.com for todo.sh.
 #
 # Featurettes:
-#  - "replace" will complete the original text for editing.
+#  - "replace" will complete the original text for editing
 #  - completing priorities will cycle through A to Z (even without
-#    menu completion).
+#    menu completion)
+#  - list and listall will complete p:<project> and @<where> from
+#    values in existing entries
+#  - will complete after p: and @ if typed in message text
 
 setopt localoptions braceccl
 
@@ -57,7 +60,11 @@ case $state in
 	nextstate=pri
 	;;
 	(append|prepend)
-	_message $txtmsg
+	if [[ -prefix p: || -prefix @ ]]; then
+	  nextstate=proj
+	else
+	  _message $txtmsg
+	fi
 	;;
 	(replace)
 	compadd -Q -- "${(qq)$(todo.sh list "^0*${words[CURRENT-1]} ")##<-> }"
@@ -67,14 +74,15 @@ case $state in
     ;;
 
     (add)
-    _message $txtmsg
+    if [[ -prefix p: || -prefix @ ]]; then
+      nextstate=proj
+    else
+      _message $txtmsg
+    fi
     ;;
 
     (list|listall)
-    # This completes stuff beginning with p: (projects) or @ (contexts);
-    # these are todo.sh conventions.
-    _wanted search expl 'context or project' \
-      compadd ${${=${${(M)${(f)"$(todo.sh list)"}##<-> *}##<-> }}:#^(p:*|@*)}
+    nextstate=proj
     ;;
 
     (listpri)
@@ -103,4 +111,12 @@ case $nextstate in
     _wanted priority expl 'priority' compadd {A-Z}
   fi
   ;;
+
+  (proj)
+  # This completes stuff beginning with p: (projects) or @ (contexts);
+  # these are todo.sh conventions.
+  _wanted search expl 'context or project' \
+    compadd ${${=${${(M)${(f)"$(todo.sh list)"}##<-> *}##<-> }}:#^(p:*|@*)}
+  ;;
 esac
+
