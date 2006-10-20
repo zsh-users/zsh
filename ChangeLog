@@ -1,3 +1,8 @@
+2006-10-20  Clint Adams  <clint@zsh.org>
+
+	* 22888: Completion/Unix/Command/_tardy: completion for
+	tardy.
+
 2006-10-19  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/utils.c: EOF in ur-22885 should be WEOF.
