@@ -1,3 +1,8 @@
+2006-10-23  Clint Adams  <clint@zsh.org>
+
+	* 22896: Src/Zle/complete.mdd: rename Mandrake to
+	Mandriva.
+
 2006-10-20  Clint Adams  <clint@zsh.org>
 
 	* 22888: Completion/Unix/Command/_tardy: completion for
