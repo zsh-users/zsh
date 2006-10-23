@@ -52,7 +52,7 @@ case $state in
   case $words[NORMARG] in
     (append|del|do|prepend|pri|replace)
     if (( NORMARG == CURRENT - 1 )); then
-      itemlist=(${${(M)${(f)"$(todo.sh list)"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
+      itemlist=(${${(M)${(f)"$(todo.sh -p list)"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
       _describe -t todo-items 'todo item' itemlist
     else
       case $words[NORMARG] in
@@ -67,7 +67,7 @@ case $state in
 	fi
 	;;
 	(replace)
-	compadd -Q -- "${(qq)$(todo.sh list "^0*${words[CURRENT-1]} ")##<-> }"
+	compadd -Q -- "${(qq)$(todo.sh -p list "^0*${words[CURRENT-1]} ")##<-> }"
 	;;
       esac
     fi
@@ -116,7 +116,7 @@ case $nextstate in
   # This completes stuff beginning with p: (projects) or @ (contexts);
   # these are todo.sh conventions.
   _wanted search expl 'context or project' \
-    compadd ${${=${${(M)${(f)"$(todo.sh list)"}##<-> *}##<-> }}:#^(p:*|@*)}
+    compadd ${${=${${(M)${(f)"$(todo.sh -p list)"}##<-> *}##<-> }}:#^(p:*|@*)}
   ;;
 esac
 
