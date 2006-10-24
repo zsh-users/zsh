@@ -109,6 +109,7 @@ _arguments -s \
   '(-)--help[display help information]' \
   '*: :_rsync_files' \
   '(-q --quiet)'{-q,--quiet}'[suppress non-error messages]' \
+  '--no-motd[suppress the daemon message-of-the-day output]' \
   '(-c --checksum)'{-c,--checksum}'[skip based on checksums, not mod-time & size]' \
   '(-a --archive)'{-a,--archive}'[archive mode; same as -rlptgoD (no -H)]' \
   '(-r --recursive)'{-r,--recursive}'[recurse into directories]' \
@@ -160,6 +161,7 @@ _arguments -s \
   '--rsync-path=[specify path to rsync on the remote machine]:remote command' \
   '--ignore-existing[ignore files that already exist on receiving side]' \
   '(--existing --ignore-non-existing)'{--existing,--ignore-non-existing}'[ignore files that do not exist on receiving side]' \
+  '--remove-source-files[synchronized files are removed from sending side]' \
   '--remove-sent-files[transferred files/symlinks are removed from sending side]' \
   '(--delete-before --delete-during --delete-after)--del[an alias for --delete-during]' \
   '--delete[delete files that do not exist on the sending side]' \
@@ -210,6 +212,7 @@ _arguments -s \
   '--no-progress[turn off --progress]' \
   '(--partial --progress)-P[same as --partial --progress]' \
   '(-i --itemize-changes)'{-i,--itemize-changes}'[output a change-summary for all updates]' \
+  '--log-format=[deprecated version of --out-format]' \
   '--out-format=[output updates using specified format]:format' \
   '--log-file-format=[log updates using specified format]:format' \
   '--log-file=[log what rsync is doing to the specified file]:file:_files' \
