@@ -1,5 +1,7 @@
 2006-10-25  Peter Stephenson  <pws@csr.com>
 
+	* 22911: Src/Zle/zle_tricky.c: need fix from 22877 here, too.
+
 	* arno: Completion/Unix/Command/{_getmail,_yafc,.distfiles}:
 	two new completions.
 

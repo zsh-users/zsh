@@ -417,7 +417,8 @@ mod_export int instring, inbackt;
  * This uses the instring variable above.
  */
 
-#define quotename(s, e) quotestring(s, e, instring)
+#define quotename(s, e) \
+quotestring(s, e, instring == QT_NONE ? QT_BACKSLASH : instring)
 
 /* Check if the given string is the name of a parameter and if this *
  * parameter is one worth expanding.                                */
