@@ -1,5 +1,8 @@
 2006-10-25  Peter Stephenson  <pws@csr.com>
 
+	* arno: Completion/Unix/Command/{_getmail,_yafc,.distfiles}:
+	two new completions.
+
 	* unposted: Completion/Debian/Command/.distfiles,
 	Completion/Linux/Command/.distfiles,
 	Completion/Linux/Type/.distfiles,

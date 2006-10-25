@@ -12,6 +12,7 @@ _ecasound       _elinks         _elm            _enscript       _env
 _fakeroot       _fetchmail      _figlet         _find           _finger
 _flasher        _flex           _fortune        _fsh            _fuser
 _gcc            _gdb            _getconf        _getent         _git
+_getmail
 _global         _gnu_generic    _gnutls         _gpg            _gphoto2
 _gprof          _grep           _groff          _gs             _gzip
 _iconv          _ifconfig       _imagemagick    _init_d         _irssi
@@ -41,5 +42,6 @@ _twisted        _unace          _unexpand       _uniq           _user_admin
 _vim            _vorbis         _vorbiscomment  _vux            _w3m
 _webbrowser     _wget           _whereis        _whois          _wiggle
 _xargs          _xmlsoft        _yodl           _yp             _zcat
+_yafc
 _zdump          _zip            _sisu
 '
