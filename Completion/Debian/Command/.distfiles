@@ -1,12 +1,15 @@
 DISTFILES_SRC='
 .distfiles
+_a2utils
 _apt                  _aptitude             _apt-move
 _apt-show-versions    _auto-apt             _bts
 _bug                  _dak
 _dchroot              _debchange
+_dchroot-dsa
 _debdiff              _debfoster            _debsign
 _dlocate              _dpkg                 _dpkg-cross
 _dpkg_source          _dput                 _dupload
+_invoke-rc.d
 _linda                _lintian              _madison
 _make-kpkg            _mergechanges         _module-assistant
 _piuparts             _schroot              _toolchain-source

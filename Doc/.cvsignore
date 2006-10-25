@@ -12,6 +12,7 @@ zsh.pg zsh.pgs
 zsh.vr zsh.vrs
 zsh.log zsh.dvi
 zsh.tp zsh.tps
+zsh.idx
 zsh_*.ps
 infodir
 *.swp

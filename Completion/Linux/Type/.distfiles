@@ -1,0 +1,6 @@
+DISTFILES_SRC='
+.distfiles
+_fuse_arguments
+_fuse_values
+_wakeup_capable_devices
+'

@@ -1,3 +1,13 @@
+2006-10-25  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Debian/Command/.distfiles,
+	Completion/Linux/Command/.distfiles,
+	Completion/Linux/Type/.distfiles,
+	Completion/Unix/Command/.distfiles,
+	Completion/Unix/Type/.distfiles, Doc/.cvsignore,
+	Functions/Zle/.distfiles: various files missing from
+	the distribution.
+
 2006-10-23  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync: the final option

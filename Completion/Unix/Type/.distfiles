@@ -1,6 +1,7 @@
 DISTFILES_SRC='
 .distfiles
 _arch_archives       _arch_namespace      _canonical_paths
+_bind_addresses
 _dict_words          _list_files
 _mailboxes           _perl_modules        _tex
 _diff_options        _my_accounts         _pids                _texi
