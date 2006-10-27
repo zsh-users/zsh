@@ -1,4 +1,4 @@
-#compdef cdrecord
+#compdef cdrecord wodim
 
 local curcontext="$curcontext" state line expl ret=1
 local devices btypes

@@ -1,3 +1,8 @@
+2006-10-27  Clint Adams  <clint@zsh.org>
+
+	* 22914: Completion/Unix/Command/_cdrecord: add wodim to compdef
+	line.
+
 2006-10-25  Peter Stephenson  <pws@csr.com>
 
 	* 22911: Src/Zle/zle_tricky.c: need fix from 22877 here, too.
