@@ -1,3 +1,9 @@
+2006-10-27  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: completion
+	of jobs selected from a jobview (e.g. after p4 fix -d -c <change>)
+	was broken.
+
 2006-10-27  Clint Adams  <clint@zsh.org>
 
 	* 22914: Completion/Unix/Command/_cdrecord: add wodim to compdef

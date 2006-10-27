@@ -1219,7 +1219,7 @@ _perforce_jobs() {
   # This is nasty, it's really unnecessarily difficult to
   # pass arguments within completion functions...
   if [[ $argv[-2] = -e ]]; then
-    ajobview=(-e "$argv[-1]")
+    ajobview=(-e "${(q)argv[-1]}")
     argv=("${(@)argv[1,-3]}")
   else
     zstyle -s ":completion:${curcontext}:jobs" jobview jobview &&
@@ -1722,7 +1722,7 @@ _perforce_cmd_fix() {
     jobs=(${${(f)"$(_perforce_call_p4 fixes fixes -c $words[$words[(i)-c]+1])"}%" fixed by change "*})
     if (( ${#jobs} )); then
       jobs=("Job="${^jobs})
-      job=" -e ${(j.|.)jobs}"
+      job=" -e \"${(j.|.)jobs}\""
     fi
   fi
 
