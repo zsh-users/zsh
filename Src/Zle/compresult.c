@@ -683,11 +683,19 @@ instmatch(Cmatch m, int *scs)
 mod_export int
 hasbrpsfx(Cmatch m, char *pre, char *suf)
 {
-    METACHECK();
+    int was_meta;
 
     if (m->flags & CMF_ALL)
 	return 1;
-    else {
+
+    /* May not be metafied if calculating whether to show a list. */
+    if (zlemetaline == NULL) {
+	was_meta = 0;
+	metafy_line();
+    } else
+	was_meta = 1;
+
+    {
 	char *op = lastprebr, *os = lastpostbr;
 	VARARR(char, oline, zlemetall);
 	int oll = zlemetall, ocs = zlemetacs, ole = lastend, opcs = brpcs, oscs = brscs, ret;
@@ -717,6 +725,8 @@ hasbrpsfx(Cmatch m, char *pre, char *suf)
 	lastprebr = op;
 	lastpostbr = os;
 
+	if (!was_meta)
+	    unmetafy_line();
 	return ret;
     }
 }
