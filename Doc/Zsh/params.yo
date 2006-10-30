@@ -477,7 +477,8 @@ The following parameters are automatically set by the shell:
 startitem()
 vindex(!)
 item(tt(!) <S>)(
-The process ID of the last background command invoked.
+The process ID of the last command started in the background with tt(&),
+or put into the background with the tt(bg) builtin.
 )
 vindex(#)
 item(tt(#) <S>)(
