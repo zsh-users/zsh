@@ -2295,6 +2295,8 @@ domenuselect(Hookdef dummy, Chdata dat)
     mlbeg = 0;
     molbeg = -42;
     for (;;) {
+	METACHECK();
+
     	mtab_been_reallocated = 0;
 	if (mline < 0) {
 	    int x, y;

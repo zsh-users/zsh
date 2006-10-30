@@ -1,5 +1,9 @@
 2006-10-27  Peter Stephenson  <pws@csr.com>
 
+	* 22924: Src/Zle/complist.c, Src/Zle/compresult.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_utils.c: fix a couple more
+	metafy_line()/unmetafy_line() problems.
+
 	* 22921: Src/compresult.c: obscure crash reveals
 	hasbrpsfx() can be called with line unmetafied.
 

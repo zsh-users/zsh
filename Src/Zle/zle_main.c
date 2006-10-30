@@ -996,6 +996,7 @@ zlecore(void)
      * that explicitly.
      */
     while (!done && !errflag && !exit_pending) {
+	UNMETACHECK();
 
 	statusline = NULL;
 	vilinerange = 0;

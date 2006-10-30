@@ -943,25 +943,25 @@ handleundo(void)
 	remetafy = 0;
 
     mkundoent();
-    if(!nextchanges)
-	return;
-    setlastline();
-    if(curchange->next) {
-	freechanges(curchange->next);
-	curchange->next = NULL;
-	free(curchange->del);
-	free(curchange->ins);
-	curchange->del = curchange->ins = NULL;
-	curchange->dell = curchange->insl = 0;
+    if(nextchanges) {
+	setlastline();
+	if(curchange->next) {
+	    freechanges(curchange->next);
+	    curchange->next = NULL;
+	    free(curchange->del);
+	    free(curchange->ins);
+	    curchange->del = curchange->ins = NULL;
+	    curchange->dell = curchange->insl = 0;
+	}
+	nextchanges->prev = curchange->prev;
+	if(curchange->prev)
+	    curchange->prev->next = nextchanges;
+	else
+	    changes = nextchanges;
+	curchange->prev = endnextchanges;
+	endnextchanges->next = curchange;
+	nextchanges = endnextchanges = NULL;
     }
-    nextchanges->prev = curchange->prev;
-    if(curchange->prev)
-	curchange->prev->next = nextchanges;
-    else
-	changes = nextchanges;
-    curchange->prev = endnextchanges;
-    endnextchanges->next = curchange;
-    nextchanges = endnextchanges = NULL;
 
     if (remetafy)
 	metafy_line();

@@ -1225,6 +1225,8 @@ do_menucmp(int lst)
 int
 reverse_menu(UNUSED(Hookdef dummy), UNUSED(void *dummy2))
 {
+    int was_meta;
+
     do {
 	if (minfo.cur == (minfo.group)->matches) {
 	    do {
@@ -1239,9 +1241,16 @@ reverse_menu(UNUSED(Hookdef dummy), UNUSED(void *dummy2))
 	     ((*minfo.cur)->flags & CMF_DUMMY) ||
 	     (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
 	      (!(*minfo.cur)->str || !*(*minfo.cur)->str)));
-    metafy_line();
+    /* May already be metafied if called from within a selection */
+    if (zlemetaline == NULL) {
+	metafy_line();
+	was_meta = 0;
+    }
+    else
+	was_meta = 1;
     do_single(*(minfo.cur));
-    unmetafy_line();
+    if (!was_meta)
+	unmetafy_line();
 
     return 0;
 }
