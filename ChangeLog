@@ -1,3 +1,8 @@
+2006-11-01  Clint Adams  <clint@zsh.org>
+
+	* users/9483: Sir Raorn(?): Completion/Unix/Command/_ri:
+	completion for ri (ruby documentation viewer).
+
 2006-10-27  Peter Stephenson  <pws@csr.com>
 
 	* 22924: Src/Zle/complist.c, Src/Zle/compresult.c,

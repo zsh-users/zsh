@@ -1,0 +1,24 @@
+#compdef ri
+
+local curcontext="$curcontext" state line ret=1
+typeset -A opt_args
+
+_arguments \
+  '(- *)'{-h,--help}'[print help information and exit]' \
+  '(- *)'{-v,--version}'[display the version of ri]' \
+  '(-c --classes)'{-c,--classes}'[display the names of classes and modules we know about]' \
+  '(-d --doc-dir)'{-d,--doc-dir}'[directory to search for documentation]:ri doc directory:_files -/' \
+  '(-f --format)'{-f,--format}'[format to use when displaying output]:output format:(ansi bs html plain simple)' \
+  '(-l --list-names)'{-l,--list-names}'[list all the names known to RDoc]' \
+  '(-T --no-pager)'{-T,--no-pager}'[send output directly to stdout]' \
+  '(-w --width)'{-w,--width}'[set the width of the output]:output width:' \
+  '*:ri name:->ri-name' && ret=0
+
+if [[ "$state" = ri-name ]]; then
+    local ri_names expl
+
+    ri_names=( ${(f)"$( _call_program ri-names "$words[1]" ${(v)opt_args[(I)(-d|--doc-dir)]:+-d "${(v)opt_args[(I)(-d|--doc-dir)]}"} -l -T )"} )
+    _wanted ri-names expl "ri name" compadd -a ri_names && ret=0
+fi
+
+return $ret
