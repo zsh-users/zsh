@@ -2294,6 +2294,21 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	return 1;
     }
     if (matched) {
+	/*
+	 * The default behaviour is to match at the start; this
+	 * is modified by SUB_END and SUB_SUBSTR.  SUB_END matches
+	 * at the end of the string instead of the start.  SUB_SUBSTR
+	 * without SUB_END matches substrings searching from the start;
+	 * with SUB_END it matches substrings searching from the end.
+	 *
+	 * The possibilities are further modified by whether we want the
+	 * longest (SUB_LONG) or shortest possible match.
+	 *
+	 * SUB_START is only used in the case where we are also
+	 * forcing a match at the end (SUB_END with no SUB_SUBSTR,
+	 * with or without SUB_LONG), to indicate we should match
+	 * the entire string.
+	 */
 	switch (fl & (SUB_END|SUB_LONG|SUB_SUBSTR)) {
 	case 0:
 	case SUB_LONG:
@@ -2341,13 +2356,15 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, s + l - t, umlen, ioff))
 		    tmatch = t;
+		if (fl & SUB_START)
+		    break;
 		umlen -= iincchar(&t);
 	    }
 	    if (tmatch) {
 		*sp = get_match_ret(*sp, tmatch - s, l, fl, replstr, repllist);
 		return 1;
 	    }
-	    if (pattrylen(p, s + l, 0, 0, ioff)) {
+	    if (!(fl & SUB_START) && pattrylen(p, s + l, 0, 0, ioff)) {
 		*sp = get_match_ret(*sp, l, l, fl, replstr, repllist);
 		return 1;
 	    }
@@ -2364,7 +2381,13 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		    *sp = get_match_ret(*sp, t-s, l, fl, replstr, repllist);
 		    return 1;
 		}
+		if (fl & SUB_START)
+		    break;
 		umlen -= iincchar(&t);
+	    }
+	    if (!(fl & SUB_START) && pattrylen(p, s + l, 0, 0, ioff)) {
+		*sp = get_match_ret(*sp, l, l, fl, replstr, repllist);
+		return 1;
 	    }
 	    break;
 
@@ -2566,7 +2589,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 
     /* munge the whole string: no match, so no replstr */
     *sp = get_match_ret(*sp, 0, 0, fl, 0, 0);
-    return 1;
+    return (fl & SUB_RETFAIL) ? 0 : 1;
 }
 
 /**/

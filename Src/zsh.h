@@ -1405,6 +1405,9 @@ struct tieddata {
 #define SUB_ALL		0x0100	/* match complete string */
 #define SUB_GLOBAL	0x0200	/* global substitution ${..//all/these} */
 #define SUB_DOSUBST	0x0400	/* replacement string needs substituting */
+#define SUB_RETFAIL	0x0800  /* return status 0 if no match */
+#define SUB_START	0x1000  /* force match at start with SUB_END
+				 * and no SUB_SUBSTR */
 
 /* Flags as the second argument to prefork */
 #define PF_TYPESET	0x01	/* argument handled like typeset foo=bar */
@@ -1631,6 +1634,7 @@ enum {
     HISTREDUCEBLANKS,
     HISTSAVEBYCOPY,
     HISTSAVENODUPS,
+    HISTSUBSTPATTERN,
     HISTVERIFY,
     HUP,
     IGNOREBRACES,

@@ -2355,15 +2355,24 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		c = *++s;
 	    }
 	    /* Check for anchored substitution */
-	    if (c == '%') {
+	    if (c == '#' || c == Pound) {
+		/*
+		 * anchor at head: this is the `normal' case in
+		 * getmatch and we only require the flag if SUB_END
+		 * is also present.
+		 */
+		flags |= SUB_START;
+		s++;
+	    }
+	    if (*s == '%') {
 		/* anchor at tail */
 		flags |= SUB_END;
 		s++;
-	    } else if (c == '#' || c == Pound) {
-		/* anchor at head: this is the `normal' case in getmatch */
-		s++;
-	    } else
+	    }
+	    if (!(flags & (SUB_START|SUB_END))) {
+		/* No anchor, so substring */
 		flags |= SUB_SUBSTR;
+	    }
 	    /*
 	     * Find the / marking the end of the search pattern.
 	     * If there isn't one, we're just going to delete that,
@@ -2526,7 +2535,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
             /* This once was executed only `if (qt) ...'. But with that
              * patterns in a expansion resulting from a ${(e)...} aren't
              * tokenized even though this function thinks they are (it thinks
-             * they are because subst_parse_str() turns Qstring tokens
+             * they are because parse_subst_str() turns Qstring tokens
              * into String tokens and for unquoted parameter expansions the
              * lexer normally does tokenize patterns inside parameter
              * expansions). */
@@ -3273,6 +3282,7 @@ modify(char **str, char **ptr)
 		break;
 
 	    case 's':
+		/* TODO: multibyte delimiter */
 		c = **ptr;
 		(*ptr)++;
 		ptr1 = *ptr;
@@ -3298,7 +3308,8 @@ modify(char **str, char **ptr)
 		for (tt = hsubl; *tt; tt++)
 		    if (inull(*tt) && *tt != Bnullkeep)
 			chuck(tt--);
-		untokenize(hsubl);
+		if (!isset(HISTSUBSTPATTERN))
+		    untokenize(hsubl);
 		for (tt = hsubr = ztrdup(ptr2); *tt; tt++)
 		    if (inull(*tt) && *tt != Bnullkeep)
 			chuck(tt--);
@@ -3444,15 +3455,8 @@ modify(char **str, char **ptr)
 		    *str = casemodify(*str, CASMOD_UPPER);
 		    break;
 		case 's':
-		    if (hsubl && hsubr) {
-			char *oldstr = *str;
-
+		    if (hsubl && hsubr)
 			subst(str, hsubl, hsubr, gbal);
-			if (*str != oldstr) {
-			    *str = dupstring(oldstr = *str);
-			    zsfree(oldstr);
-			}
-		    }
 		    break;
 		case 'q':
 		    *str = quotestring(*str, NULL, QT_BACKSLASH);

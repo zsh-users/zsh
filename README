@@ -49,6 +49,13 @@ The variable HOME is no longer set by the shell if zsh is emulating any
 other shell at startup; it must be present in the environment or set
 subsequently by the user.  It is valid for the variable to be unset.
 
+Parameter substitutions in the form ${param//#%search/replace} match
+against "search" anchored at both ends of the parameter value.  Previously
+this syntax would have matched against "%search", anchored only at the head
+of the value.  The form ${param//#$search/replace} where the value
+$search starts with "%" considers the "%" to be part of the search
+string as before.
+
 The MULTIBYTE option is on by default where it is available; this
 causes many operations to recognise characters as in the current locale.
 Older versions of the shell always assumed a character was one byte.

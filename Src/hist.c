@@ -323,7 +323,8 @@ getsubsargs(char *subline, int *gbalp, int *cflagp)
     if (strlen(ptr1)) {
 	zsfree(hsubl);
 	hsubl = ptr1;
-    }
+    } else if (!hsubl)		/* fail silently on this */
+	return 0;
     zsfree(hsubr);
     hsubr = ptr2;
     follow = ingetc();
@@ -337,11 +338,6 @@ getsubsargs(char *subline, int *gbalp, int *cflagp)
 	}
     } else
 	inungetc(follow);
-    if (hsubl && !strstr(subline, hsubl)) {
-	herrflush();
-	zerr("substitution failed");
-	return 1;
-    }
     return 0;
 }
 
@@ -352,6 +348,15 @@ static int
 getargc(Histent ehist)
 {
     return ehist->nwords ? ehist->nwords-1 : 0;
+}
+
+/**/
+static int
+substfailed(void)
+{
+    herrflush();
+    zerr("substitution failed");
+    return -1;
 }
 
 /* Perform history substitution, returning the next character afterwards. */
@@ -376,10 +381,15 @@ histsubchar(int c)
 	isfirstch = 0;
 	inungetc(hatchar);
 	if (!(ehist = gethist(defev))
-	    || !(sline = getargs(ehist, 0, getargc(ehist)))
-	    || getsubsargs(sline, &gbal, &cflag) || !hsubl)
+	    || !(sline = getargs(ehist, 0, getargc(ehist))))
 	    return -1;
-	subst(&sline, hsubl, hsubr, gbal);
+
+	if (getsubsargs(sline, &gbal, &cflag))
+	    return substfailed();
+	if (!hsubl)
+	    return -1;
+	if (subst(&sline, hsubl, hsubr, gbal))
+	    return substfailed();
     } else {
 	/* Line doesn't begin ^foo^bar */
 	if (c != ' ')
@@ -608,9 +618,10 @@ histsubchar(int c)
 		if (getsubsargs(sline, &gbal, &cflag))
 		    return -1; /* fall through */
 	    case '&':
-		if (hsubl && hsubr)
-		    subst(&sline, hsubl, hsubr, gbal);
-		else {
+		if (hsubl && hsubr) {
+		    if (subst(&sline, hsubl, hsubr, gbal))
+			return substfailed();
+		} else {
 		    herrflush();
 		    zerr("no previous substitution");
 		    return -1;
@@ -1629,30 +1640,72 @@ casemodify(char *str, int how)
     return str2;
 }
 
+
+/*
+ * Substitute "in" for "out" in "*strptr" and update "*strptr".
+ * If "gbal", do global substitution.
+ *
+ * This returns a result from the heap.  There seems to have
+ * been some confusion on this point.
+ */
+
 /**/
-void
+int
 subst(char **strptr, char *in, char *out, int gbal)
 {
-    char *str = *strptr, *instr = *strptr, *substcut, *sptr, *oldstr;
+    char *str = *strptr, *substcut, *sptr;
     int off, inlen, outlen;
 
     if (!*in)
 	in = str, gbal = 0;
-    if (!(substcut = (char *)strstr(str, in)))
-	return;
-    inlen = strlen(in);
-    sptr = convamps(out, in, inlen);
-    outlen = strlen(sptr);
 
-    do {
-	*substcut = '\0';
-	off = substcut - *strptr + outlen;
-	substcut += inlen;
-	*strptr = tricat(oldstr = *strptr, sptr, substcut);
-	if (oldstr != instr)
-	    zsfree(oldstr);
-	str = (char *)*strptr + off;
-    } while (gbal && (substcut = (char *)strstr(str, in)));
+    if (isset(HISTSUBSTPATTERN)) {
+	int fl = SUB_LONG|SUB_REST|SUB_RETFAIL;
+	char *oldin = in;
+	if (gbal)
+	    fl |= SUB_GLOBAL;
+	if (*in == '#' || *in == Pound) {
+	    /* anchor at head, flag needed if SUB_END is also set */
+	    fl |= SUB_START;
+	    in++;
+	}
+	if (*in == '%') {
+	    /* anchor at tail */
+	    in++;
+	    fl |= SUB_END;
+	}
+	if (in == oldin) {
+	    /* no anchor, substring match */
+	    fl |= SUB_SUBSTR;
+	}
+	if (in == str)
+	    in = dupstring(in);
+	if (parse_subst_string(in) || errflag)
+	    return 1;
+	if (parse_subst_string(out) || errflag)
+	    return 1;
+	singsub(&in);
+	if (getmatch(strptr, in, fl, 1, out))
+	    return 0;
+    } else {
+	if ((substcut = (char *)strstr(str, in))) {
+	    inlen = strlen(in);
+	    sptr = convamps(out, in, inlen);
+	    outlen = strlen(sptr);
+
+	    do {
+		*substcut = '\0';
+		off = substcut - *strptr + outlen;
+		substcut += inlen;
+		*strptr = zhtricat(*strptr, sptr, substcut);
+		str = (char *)*strptr + off;
+	    } while (gbal && (substcut = (char *)strstr(str, in)));
+
+	    return 0;
+	}
+    }
+
+    return 1;
 }
 
 /**/

@@ -270,7 +270,7 @@ handled properly (some assistance with this problem would be appreciated).
 The configuration script should turn on multibyte support on all systems
 where it can be compiled successfully.
 
-The support can be explicitly enabled or disable with --enable-multibyte or
+The support can be explicitly enabled or disabled with --enable-multibyte or
 --disable-multibyte.  The developers are not aware of any need to use
 --disable-multibyte and this should be reported as a bug.  Currently
 multibyte mode is believed to work on at least the following:

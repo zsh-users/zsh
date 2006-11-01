@@ -258,7 +258,8 @@ item(tt(s/)var(l)tt(/)var(r)[tt(/)])(
 Substitute var(r) for var(l) as described below.
 The substitution is done only for the
 first string that matches var(l).  For arrays and for filename
-generation, this applies to each word of the expanded text.
+generation, this applies to each word of the expanded text.  See
+below for further notes on substitutions.
 
 The forms `tt(gs/)var(l)tt(/)var(r)' and `tt(s/)var(l)tt(/)var(r)tt(/:G)'
 perform global substitution, i.e. substitute every occurrence of var(r)
@@ -273,8 +274,8 @@ backslash.
 )
 enditem()
 
-The tt(s/l/r/) substitution works as follows.  The left-hand side of
-substitutions are not regular expressions, but character strings.  Any
+The tt(s/l/r/) substitution works as follows.  By default the left-hand
+side of substitutions are not patterns, but character strings.  Any
 character can be used as the delimiter in place of `tt(/)'.  A
 backslash quotes the delimiter character.  The character `tt(&)', in
 the right-hand-side var(r), is replaced by the text from the
@@ -285,6 +286,41 @@ omit the rightmost delimiter if a newline immediately follows var(r);
 the rightmost `tt(?)' in a context scan can similarly be omitted.
 Note the same record of the last var(l) and var(r) is maintained
 across all forms of expansion.
+
+If the option tt(HIST_SUBST_PATTERN) is set, var(l) is treated as
+a pattern of the usual form desribed in
+ifzman(the section FILENAME GENERATION below)\
+ifnzman(noderef(Filename Generation)).  This can be used in
+all the places where modifiers are available; note, however, that
+in globbing qualifiers parameter substitution has already taken place,
+so parameters in the replacement string should be quoted to ensure
+they are replaced at the correct time.
+Note also that complicated patterns used in globbing qualifiers may
+need the extended glob qualifier notation
+tt(LPAR()#q:s/)var(...)tt(/)var(...)tt(/RPAR()) in order for the
+shell to recognize the expression as a glob qualifer.  Further,
+note that bad patterns in the substitution are not subject to
+the tt(NO_BAD_PATTERN) option so will cause an error.
+
+When tt(HIST_SUBST_PATTERN) is set, var(l) may start with a tt(#)
+to indicate that the pattern must match at the start of the string
+to be substituted, and a tt(%) may appear at the start or after an tt(#)
+to indicate that the pattern must match at the end of the string
+to be substituted.  The tt(%) or tt(#) may be quoted with two
+backslashes.
+
+For example, the following piece of filename generation code
+with the tt(EXTENDED_GLOB) option:
+
+example(print *.c+LPAR()#q:s/#%+LPAR()#b+RPAR()s+LPAR()*+RPAR().c/'S${match[1]}.C'/+RPAR())
+
+takes the expansion of tt(*.c) and applies the glob qualifiers in the
+tt(LPAR()#q)var(...)tt(RPAR()) expression, which consists of a substitution
+modifier anchored to the start and end of each word (tt(#%)).  This
+turns on backreferences (tt(LPAR()#b+RPAR())), so that the parenthesised
+subexpression is available in the replacement string as tt(${match[1]}).
+The replacement string is quoted so that the parameter is not substituted
+before the start of filename generation.
 
 The following tt(f), tt(F), tt(w) and tt(W) modifiers work only with
 parameter expansion and filename generation.  They are listed here to
@@ -530,13 +566,14 @@ substituted as tt(${~opat}).
 
 The var(pattern) may begin with a `tt(#)', in which case the
 var(pattern) must match at the start of the string, or `tt(%)', in
-which case it must match at the end of the string.  The var(repl) may
+which case it must match at the end of the string, or `tt(#%)' in which
+case the var(pattern) must match the entire string.  The var(repl) may
 be an empty string, in which case the final `tt(/)' may also be omitted.
 To quote the final `tt(/)' in other cases it should be preceded by a
 single backslash; this is not necessary if the
-`tt(/)' occurs inside a substituted parameter.  Note also that the `tt(#)'
-and `tt(%)' are not active if they occur inside a substituted parameter,
-even at the start.
+`tt(/)' occurs inside a substituted parameter.  Note also that the `tt(#)',
+`tt(%)' and `tt(#%) are not active if they occur inside a substituted
+parameter, even at the start.
 
 The first `tt(/)' may be preceded by a `tt(:)', in which case the match
 will only succeed if it matches the entire word.  Note also the
