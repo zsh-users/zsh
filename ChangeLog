@@ -1,5 +1,8 @@
 2006-11-01  Clint Adams  <clint@zsh.org>
 
+	* 22940: R. Ramkumar: Completion/Unix/Command/_mkdir:
+	completion for mkdir.
+
 	* users/9483: Sir Raorn(?): Completion/Unix/Command/_ri:
 	completion for ri (ruby documentation viewer).
 
