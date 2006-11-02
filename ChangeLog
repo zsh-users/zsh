@@ -1,3 +1,9 @@
+2006-11-02  Peter Stephenson  <pws@csr.com>
+
+	* 22950: Src/Zle/zle_tricky.c: starting menu completion
+	with reverse-menu-complete used the first match instead
+	of the last.
+
 2006-11-02  Clint Adams  <clint@zsh.org>
 
 	* 22947: R. Ramkumar: Completion/Unix/Command/_mkdir:
