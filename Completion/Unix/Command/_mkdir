@@ -5,23 +5,23 @@ local curcontext="$curcontext" line state \
 typeset -a opt_args
 
 args=(
-  '(-m --mode=)'{-m,--mode=}'[set permission mode]:numeric mode'
+  '(-m --mode)'{-m,--mode=}'[set permission mode]:numeric mode'
   '(-p --parents)'{-p,--parents}'[make parent directories as needed]'
   )
 
-args_zsh=('(-)*: :->dir')
+args_zsh=('(-)*: :->directories')
 
 args_cmd=(
   '(-v --verbose)'{-v,--verbose}'[print message for each created directory]'
   '(- :)--help[display help information]'
   '(- :)--version[display version information]'
-  '*: :->dir'
+  '*: :->directories'
   )
 
 case "$OSTYPE" in
   linux*)
     args_cmd=(
-      '(-Z --context=)'{-Z,--context=}'[set SELinux context]:SELinux context'
+      '(-Z --context)'{-Z,--context=}'[set SELinux context]:SELinux context'
       $args_cmd)
     ;;
 esac
@@ -56,10 +56,10 @@ fi
 _arguments -C -s $args && ret=0
 
 case "$state" in
-  dir)
+  directories)
     if (( $ret )) && [[ ! -prefix - ]] || \
       [[ $variant == zsh && ${#${${words[2,-1]}:#-*}} -gt 0 ]]; then
-      _wanted parent-directory expl \
+      _wanted directories expl \
 	'parent directory (alternatively specify name of directory)' \
 	_path_files -/ || _message 'name of directory'
       ret=0
