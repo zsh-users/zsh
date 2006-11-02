@@ -1243,9 +1243,10 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    else {
 			/* ... or a user name */
 			char sav, *tt;
+			int arglen;
 
 			/* Find matching delimiters */
-			tt = get_strarg(s);
+			tt = get_strarg(s, &arglen);
 			if (!*tt) {
 			    zerr("missing end of name");
 			    data = 0;
@@ -1255,7 +1256,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    sav = *tt;
 			    *tt = '\0';
 
-			    if ((pw = getpwnam(s + 1)))
+			    if ((pw = getpwnam(s + arglen)))
 				data = pw->pw_uid;
 			    else {
 				zerr("unknown user");
@@ -1268,7 +1269,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    data = 0;
 #endif /* !USE_GETPWNAM */
 			    if (sav)
-				s = tt + 1;
+				s = tt + arglen;
 			    else
 				s = tt;
 			}
@@ -1283,8 +1284,9 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    else {
 			/* ...or a delimited group name. */
 			char sav, *tt;
+			int arglen;
 
-			tt = get_strarg(s);
+			tt = get_strarg(s, &arglen);
 			if (!*tt) {
 			    zerr("missing end of name");
 			    data = 0;
@@ -1294,7 +1296,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    sav = *tt;
 			    *tt = '\0';
 
-			    if ((gr = getgrnam(s + 1)))
+			    if ((gr = getgrnam(s + arglen)))
 				data = gr->gr_gid;
 			    else {
 				zerr("unknown group");
@@ -1307,7 +1309,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    data = 0;
 #endif /* !USE_GETGRNAM */
 			    if (sav)
-				s = tt + 1;
+				s = tt + arglen;
 			    else
 				s = tt;
 			}
@@ -1438,8 +1440,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    tt = NULL;
 			}
 		    } else {
-			plus = 1;
-			tt = get_strarg(s);
+			tt = get_strarg(s, &plus);
 			if (!*tt)
 			{
 			    zerr("missing end of string");

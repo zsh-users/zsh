@@ -947,7 +947,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
        int *prevcharlen, int *nextcharlen)
 {
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
-    int keymatch = 0, needtok = 0;
+    int keymatch = 0, needtok = 0, arglen;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt, c;
     zlong num = 1, beg = 0, r = 0;
     Patprog pprog = NULL;
@@ -1004,28 +1004,28 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		 * special interpretation by getindex() of `*' or `@'. */
 		break;
 	    case 'n':
-		t = get_strarg(++s);
+		t = get_strarg(++s, &arglen);
 		if (!*t)
 		    goto flagerr;
 		sav = *t;
 		*t = '\0';
-		num = mathevalarg(s + 1, &d);
+		num = mathevalarg(s + arglen, &d);
 		if (!num)
 		    num = 1;
 		*t = sav;
-		s = t;
+		s = t + arglen - 1;
 		break;
 	    case 'b':
 		hasbeg = 1;
-		t = get_strarg(++s);
+		t = get_strarg(++s, &arglen);
 		if (!*t)
 		    goto flagerr;
 		sav = *t;
 		*t = '\0';
-		if ((beg = mathevalarg(s + 1, &d)) > 0)
+		if ((beg = mathevalarg(s + arglen, &d)) > 0)
 		    beg--;
 		*t = sav;
-		s = t;
+		s = t + arglen - 1;
 		break;
 	    case 'p':
 		escapes = 1;
@@ -1033,15 +1033,16 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    case 's':
 		/* This gives the string that separates words *
 		 * (for use with the `w' flag).               */
-		t = get_strarg(++s);
+		t = get_strarg(++s, &arglen);
 		if (!*t)
 		    goto flagerr;
 		sav = *t;
 		*t = '\0';
-		sep = escapes ? getkeystring(s + 1, &waste, GETKEYS_SEP, NULL)
-		    : dupstring(s + 1);
+		s += arglen;
+		sep = escapes ? getkeystring(s, &waste, GETKEYS_SEP, NULL)
+		    : dupstring(s);
 		*t = sav;
-		s = t;
+		s = t + arglen - 1;
 		break;
 	    default:
 	      flagerr:

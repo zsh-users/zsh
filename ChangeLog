@@ -1,5 +1,11 @@
 2006-11-02  Peter Stephenson  <pws@csr.com>
 
+	* 22952: Src/glob.c, Src/params.c, Src/subst.c,
+	Test/D04parameter.ztst: fix multibyte delimiters for
+	arguments to parameter flags and substitution modifiers
+	in parameters and glob qualifiers (but not yet substitution
+	modifiers in history).
+
 	* 22950: Src/Zle/zle_tricky.c: starting menu completion
 	with reverse-menu-complete used the first match instead
 	of the last.

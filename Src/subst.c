@@ -1137,62 +1137,113 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
     return ret;
 }
 
+
+/*
+ * Look for a delimited portion of a string.  The first (possibly
+ * multibyte) character at s is the delimiter.  Various forms
+ * of brackets are treated separately, as documented.
+ *
+ * Returns a pointer to the final delimiter.  Sets *len to the
+ * length of the final delimiter; a NULL causes *len to be set
+ * to zero since we shouldn't advance past it.  (The string is
+ * tokenized, so a NULL is a real end of string.)
+ */
+
 /**/
 char *
-get_strarg(char *s)
+get_strarg(char *s, int *lenp)
 {
-    char t = *s++;
+    convchar_t del;
+    int len;
+    char tok = 0;
 
-    if (!t)
-	return s - 1;
+    MB_METACHARINIT();
+    len = MB_METACHARLENCONV(s, &del);
+    if (!len) {
+	*lenp = 0;
+	return s;
+    }
 
-    switch (t) {
-    case '(':
-	t = ')';
+#ifdef MULTIBYTE_SUPPORT
+    if (del == WEOF)
+	del = (wint_t)((*s == Meta) ? s[1] ^ 32 : *s);
+#endif
+    s += len;
+    switch (del) {
+    case ZWC('('):
+	del = ZWC(')');
 	break;
     case '[':
-	t = ']';
+	del = ZWC(']');
 	break;
     case '{':
-	t = '}';
+	del = ZWC('}');
 	break;
     case '<':
-	t = '>';
+	del = ZWC('>');
 	break;
     case Inpar:
-	t = Outpar;
+	tok = Outpar;
 	break;
     case Inang:
-	t = Outang;
+	tok = Outang;
 	break;
     case Inbrace:
-	t = Outbrace;
+	tok = Outbrace;
 	break;
     case Inbrack:
-	t = Outbrack;
+	tok = Outbrack;
 	break;
     }
 
-    while (*s && *s != t)
-	s++;
+    if (tok) {
+	/*
+	 * Looking for a matching token; we want the literal byte,
+	 * not a decoded multibyte character, so search specially.
+	 */
+	while (*s && *s != tok)
+	    s++;
+    } else {
+	convchar_t del2;
+	len = 0;
+	while (*s) {
+	    len = MB_METACHARLENCONV(s, &del2);
+#ifdef MULTIBYTE_SUPPORT
+	    if (del2 == WEOF)
+		del2 = (wint_t)((*s == Meta) ? s[1] ^ 32 : *s);
+#endif
+	    if (del == del2)
+		break;
+	    s += len;
+	}
+    }
 
+    *lenp = len;
     return s;
 }
 
+/*
+ * Get an integer argument; update *s to the end of the
+ * final delimiter.  *delmatchp is set to 1 if we have matching
+ * delimiters and there was no error in the evaluation, else 0.
+ */
+
 /**/
 static int
-get_intarg(char **s)
+get_intarg(char **s, int *delmatchp)
 {
-    char *t = get_strarg(*s + 1);
+    int arglen;
+    char *t = get_strarg(*s, &arglen);
     char *p, sav;
     zlong ret;
 
+    *delmatchp = 0;
     if (!*t)
 	return -1;
     sav = *t;
     *t = '\0';
-    p = dupstring(*s + 2);
-    *s = t;
+    p = dupstring(*s + arglen);
+    *s = t + arglen;
     *t = sav;
     if (parsestr(p))
 	return -1;
@@ -1204,6 +1255,7 @@ get_intarg(char **s)
 	return -1;
     if (ret < 0)
 	ret = -ret;
+    *delmatchp = 1;
     return ret < 0 ? -ret : ret;
 }
 
@@ -1540,8 +1592,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    int escapes = 0;
 	    int klen;
 #define UNTOK(C)  (itok(C) ? ztokens[(C) - Pound] : (C))
-#define UNTOK_AND_ESCAPE(X) {\
-		untokenize(X = dupstring(s + 1));\
+#define UNTOK_AND_ESCAPE(X, S) {\
+		untokenize(X = dupstring(S));\
 		if (escapes) {\
 		    X = getkeystring(X, &klen, GETKEYS_SEP, NULL);\
 		    X = metafy(X, klen, META_HREALLOC);\
@@ -1549,6 +1601,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    }
 
 	    for (s++; (c = *s) != ')' && c != Outpar; s++, tt = 0) {
+		int arglen;	/* length of modifier argument */
+		int delmatch;	/* integer delimiters matched OK */
+
 		switch (c) {
 		case ')':
 		case Outpar:
@@ -1578,9 +1633,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    flags |= SUB_SUBSTR;
 		    break;
 		case 'I':
-		    flnum = get_intarg(&s);
+		    s++;
+		    flnum = get_intarg(&s, &delmatch);
 		    if (flnum < 0)
 			goto flagerr;
+		    s--;
 		    break;
 
 		case 'L':
@@ -1658,16 +1715,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    tt = 1;
 		/* fall through */
 		case 'j':
-		    t = get_strarg(++s);
+		    t = get_strarg(++s, &arglen);
 		    if (*t) {
 			sav = *t;
 			*t = '\0';
 			if (tt)
-			    UNTOK_AND_ESCAPE(spsep)
+			    UNTOK_AND_ESCAPE(spsep, s + arglen)
 			else
-			    UNTOK_AND_ESCAPE(sep)
+			    UNTOK_AND_ESCAPE(sep, s + arglen)
 			*t = sav;
-			s = t;
+			s = t + arglen - 1;
 		    } else
 			goto flagerr;
 		    break;
@@ -1676,43 +1733,43 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    tt = 1;
 		/* fall through */
 		case 'r':
-		    sav = s[1];
-		    num = get_intarg(&s);
+		    s++;
+		    num = get_intarg(&s, &delmatch);
 		    if (num < 0)
 			goto flagerr;
 		    if (tt)
 			prenum = num;
 		    else
 			postnum = num;
-		    if (UNTOK(s[1]) != UNTOK(sav))
+		    if (!delmatch)
 			break;
-		    t = get_strarg(++s);
+		    t = get_strarg(s, &arglen);
 		    if (!*t)
 			goto flagerr;
 		    sav = *t;
 		    *t = '\0';
 		    if (tt)
-			UNTOK_AND_ESCAPE(premul)
+			UNTOK_AND_ESCAPE(premul, s + arglen)
 		    else
-			UNTOK_AND_ESCAPE(postmul)
+			UNTOK_AND_ESCAPE(postmul, s + arglen)
 		    *t = sav;
 		    sav = *s;
-		    s = t + 1;
+		    s = t + arglen;
 		    if (UNTOK(*s) != UNTOK(sav)) {
 			s--;
 			break;
 		    }
-		    t = get_strarg(s);
+		    t = get_strarg(s, &arglen);
 		    if (!*t)
 			goto flagerr;
 		    sav = *t;
 		    *t = '\0';
 		    if (tt)
-			UNTOK_AND_ESCAPE(preone)
+			UNTOK_AND_ESCAPE(preone, s + arglen)
 		    else
-			UNTOK_AND_ESCAPE(postone)
+			UNTOK_AND_ESCAPE(postone, s + arglen)
 		    *t = sav;
-		    s = t;
+		    s = t + arglen - 1;
 		    break;
 
 		case 'm':
@@ -3251,9 +3308,10 @@ arithsubst(char *a, char **bptr, char *rest)
 void
 modify(char **str, char **ptr)
 {
-    char *ptr1, *ptr2, *ptr3, del, *lptr, c, *test, *sep, *t, *tt, tc, *e;
-    char *copy, *all, *tmp, sav;
-    int gbal, wall, rec, al, nl;
+    char *ptr1, *ptr2, *ptr3, *lptr, c, *test, *sep, *t, *tt, tc, *e;
+    char *copy, *all, *tmp, sav, sav1, *ptr1end;
+    int gbal, wall, rec, al, nl, charlen, delmatch;
+    convchar_t del;
 
     test = NULL;
 
@@ -3282,20 +3340,48 @@ modify(char **str, char **ptr)
 		break;
 
 	    case 's':
-		/* TODO: multibyte delimiter */
 		c = **ptr;
 		(*ptr)++;
 		ptr1 = *ptr;
-		del = *ptr1++;
-		for (ptr2 = ptr1; *ptr2 != del && *ptr2; ptr2++);
+		MB_METACHARINIT();
+		charlen = MB_METACHARLENCONV(ptr1, &del);
+#ifdef MULTIBYTE_SUPPORT
+		if (del == WEOF)
+		    del = (wint_t)((*ptr1 == Meta) ? ptr1[1] ^ 32 : *ptr1);
+#endif
+		ptr1 += charlen;
+		for (ptr2 = ptr1, charlen = 0; *ptr2; ptr2 += charlen) {
+		    convchar_t del2;
+		    charlen = MB_METACHARLENCONV(ptr2, &del2);
+#ifdef MULTIBYTE_SUPPORT
+		    if (del2 == WEOF)
+			del2 = (wint_t)((*ptr2 == Meta) ?
+					ptr2[1] ^ 32 : *ptr2);
+#endif
+		    if (del2 == del)
+			break;
+		}
 		if (!*ptr2) {
 		    zerr("bad substitution");
 		    return;
 		}
-		*ptr2++ = '\0';
-		for (ptr3 = ptr2; *ptr3 != del && *ptr3; ptr3++);
-		if ((sav = *ptr3))
-		    *ptr3++ = '\0';
+		ptr1end = ptr2;
+		ptr2 += charlen;
+		sav1 = *ptr1end;
+		*ptr1end = '\0';
+		for (ptr3 = ptr2, charlen = 0; *ptr3; ptr3 += charlen) {
+		    convchar_t del3;
+		    charlen = MB_METACHARLENCONV(ptr3, &del3);
+#ifdef MULTIBYTE_SUPPORT
+		    if (del3 == WEOF)
+			del3 = (wint_t)((*ptr3 == Meta) ?
+					ptr3[1] ^ 32 : *ptr3);
+#endif
+		    if (del3 == del)
+			break;
+		}
+		sav = *ptr3;
+		*ptr3 = '\0';
 		if (*ptr1) {
 		    zsfree(hsubl);
 		    hsubl = ztrdup(ptr1);
@@ -3313,10 +3399,9 @@ modify(char **str, char **ptr)
 		for (tt = hsubr = ztrdup(ptr2); *tt; tt++)
 		    if (inull(*tt) && *tt != Bnullkeep)
 			chuck(tt--);
-		ptr2[-1] = del;
-		if (sav)
-		    ptr3[-1] = sav;
-		*ptr = ptr3 - 1;
+		*ptr1end = sav1;
+		*ptr3 = sav;
+		*ptr = ptr3 + charlen - 1;
 		break;
 
 	    case '&':
@@ -3335,13 +3420,13 @@ modify(char **str, char **ptr)
 	    case 'W':
 		wall = 1;
 		(*ptr)++;
-		ptr1 = get_strarg(ptr2 = *ptr);
+		ptr1 = get_strarg(ptr2 = *ptr, &charlen);
 		if ((sav = *ptr1))
 		    *ptr1 = '\0';
-		sep = dupstring(ptr2 + 1);
+		sep = dupstring(ptr2 + charlen);
 		if (sav)
 		    *ptr1 = sav;
-		*ptr = ptr1 + 1;
+		*ptr = ptr1 + charlen;
 		c = '\0';
 		break;
 
@@ -3350,8 +3435,8 @@ modify(char **str, char **ptr)
 		(*ptr)++;
 		break;
 	    case 'F':
-		rec = get_intarg(ptr);
 		(*ptr)++;
+		rec = get_intarg(ptr, &delmatch);
 		break;
 	    default:
 		*ptr = lptr;

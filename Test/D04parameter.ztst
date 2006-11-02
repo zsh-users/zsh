@@ -867,3 +867,17 @@
 >andsomekept
 >andsomekept
 
+  file=/one/two/three/four
+  print ${file:fh}
+  print ${file:F.1.h}
+  print ${file:F+2+h}
+  print ${file:F(3)h}
+  print ${file:F<4>h}
+  print ${file:F{5}h}
+0:Modifiers with repetition
+>/
+>/one/two/three
+>/one/two
+>/one
+>/
+>/
