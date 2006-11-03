@@ -954,10 +954,10 @@ printjob(Job jn, int lng, int synch)
 
     if ((lng & 4) || (interact && job == thisjob &&
 		      jn->pwd && strcmp(jn->pwd, pwd))) {
-	fprintf(shout, "(pwd %s: ", (lng & 4) ? "" : "now");
-	fprintdir(((lng & 4) && jn->pwd) ? jn->pwd : pwd, shout);
-	fprintf(shout, ")\n");
-	fflush(shout);
+	fprintf(fout, "(pwd %s: ", (lng & 4) ? "" : "now");
+	fprintdir(((lng & 4) && jn->pwd) ? jn->pwd : pwd, fout);
+	fprintf(fout, ")\n");
+	fflush(fout);
     }
 /* delete job if done */
 
@@ -1827,11 +1827,12 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		printjob(jobtab + job, (stopped) ? -1 : lng, 1);
 	    if (func != BIN_BG) {		/* fg or wait */
 		if (jobtab[job].pwd && strcmp(jobtab[job].pwd, pwd)) {
-		    fprintf(shout, "(pwd : ");
-		    fprintdir(jobtab[job].pwd, shout);
-		    fprintf(shout, ")\n");
+		    FILE *fout = (func == BIN_JOBS) ? stdout : shout;
+		    fprintf(fout, "(pwd : ");
+		    fprintdir(jobtab[job].pwd, fout);
+		    fprintf(fout, ")\n");
+		    fflush(fout);
 		}
-		fflush(shout);
 		if (func != BIN_WAIT) {		/* fg */
 		    thisjob = job;
 		    if ((jobtab[job].stat & STAT_SUPERJOB) &&

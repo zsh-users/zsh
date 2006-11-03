@@ -21,4 +21,4 @@ else
   eval "file=($PREFIX*$SUFFIX(om[${NUMERIC:-1}]N))"
   file=(${(q)file})
 fi
-(( $#file )) && compadd -U -i "$IPREFIX" -I "$ISUFFIX" -f -Q $file
+(( $#file )) && compadd -U -i "$IPREFIX" -I "$ISUFFIX" -f -Q -- $file
