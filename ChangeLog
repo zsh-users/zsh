@@ -1,3 +1,8 @@
+2006-11-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22968: Src/builtins.c: print -z and print -s didn't cope
+	with the fact that the arguments were unmetafied.
+
 2006-11-03  Peter Stephenson  <pws@csr.com>
 
 	* users/10928: send all "jobs" output to stdout, not shout.

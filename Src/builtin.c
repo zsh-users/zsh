@@ -3454,6 +3454,14 @@ mod_export LinkList bufstack;
     else \
 	count += fprintf(fout, spec, width, VAL);
 
+/*
+ * Because of the use of getkeystring() to interpret the arguments,
+ * the elements of args spend a large part of the function unmetafied
+ * with the lengths in len.  This may have seemed a good idea once.
+ * As we are stuck with this for now, we need to be very careful
+ * deciding what state args is in.
+ */
+
 /**/
 int
 bin_print(char *name, char **args, Options ops, int func)
@@ -3727,6 +3735,14 @@ bin_print(char *name, char **args, Options ops, int func)
     
     /* normal output */
     if (!fmt) {
+	if (OPT_ISSET(ops, 'z') || OPT_ISSET(ops, 's')) {
+	    /*
+	     * We don't want the arguments unmetafied after all.
+	     */
+	    for (n = 0; n < argc; n++)
+		metafy(args[n], len[n], META_NOALLOC);
+	}
+
 	/* -z option -- push the arguments onto the editing buffer stack */
 	if (OPT_ISSET(ops,'z')) {
 	    queue_signals();
