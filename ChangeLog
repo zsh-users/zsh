@@ -1,5 +1,8 @@
 2006-11-06  Peter Stephenson  <pws@csr.com>
 
+	* 22972: Completion/Zsh/Command/_typeset: autoload completion
+	is limited to functions not yet registered.
+
 	* 22971: Src/exec.c, Src/jobs.c: don't allow job control
 	on jobs in current shell and sanitize error message used.
 

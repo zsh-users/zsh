@@ -63,7 +63,7 @@ esac
 
 [[ -z "${words[(r)-*[aA]*]}" ]] || func=p
 [[ -z "${words[(r)-*f*]}" ]] || func=f
-   
+
 for ((i=1;i<=$#use;++i)); do
   args+=( ${allargs[${use[$i]}${${(s::)use[$i]}[(r)[Uut]]:+$func}]} )
 done
@@ -75,7 +75,10 @@ if [[ "$state" = vars_eq ]]; then
     if (( $+opt_args[-w] ));then
       _wanted files expl 'zwc file' _files -g '*.zwc(-.)'
     elif [[ $service = autoload || -n $opt_args[(i)-[uU]] ]]; then
-      _wanted functions expl 'shell function' compadd - ${^fpath}/*(:t)
+      args=(${^fpath}/*(:t))
+      # Filter out functions already loaded or marked for autoload.
+      args=(${args:#(${(kj.|.)~functions})})
+      _wanted functions expl 'shell function' compadd -a args
     else
       _functions
     fi
