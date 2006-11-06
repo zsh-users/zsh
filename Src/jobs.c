@@ -1771,7 +1771,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	}
 	if (!(jobtab[job].stat & STAT_INUSE) ||
 	    (jobtab[job].stat & STAT_NOPRINT)) {
-	    zwarnnam(name, "no such job: %d", job);
+	    zwarnnam(name, "%%%d: no such job", job);
 	    unqueue_signals();
 	    return 1;
 	}
