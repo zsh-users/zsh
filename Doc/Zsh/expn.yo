@@ -899,11 +899,15 @@ flag or the tt(SH_WORD_SPLIT) option.
 )
 item(tt(l:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
 Pad the resulting words on the left.  Each word will be truncated if
-required and placed in a field var(expr) characters wide.  The space
-to the left will be filled with var(string1) (concatenated as often
-as needed) or spaces if var(string1) is not given.  If both
-var(string1) and var(string2) are given, tt(string2) is inserted
-once directly to the left of each word, truncated if necessary, before
+required and placed in a field var(expr) characters wide.
+
+The arguments tt(:)var(string1)tt(:) and tt(:)var(string2)tt(:) are
+optional; neither, the first, or both may be given.  Note that the same
+pairs of delimiters must be used for each of the three arguments.  The
+space to the left will be filled with var(string1) (concatenated as
+often as needed) or spaces if var(string1) is not given.  If both
+var(string1) and var(string2) are given, tt(string2) is inserted once
+directly to the left of each word, truncated if necessary, before
 var(string1) is used to produce any remaining padding.
 
 If the tt(MULTIBYTE) option is in effect, the flag tt(m) may also

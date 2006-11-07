@@ -361,6 +361,11 @@
 >val1 val2
 >key1 key2 val1 val2
 
+  word="obfuscatory"
+  print !${(l.16.)word}! +${(r.16.)word}+
+0:simple padding
+>!     obfuscatory! +obfuscatory     +
+
   foo=(resulting words uproariously padded)
   print ${(pl.10..\x22..X.)foo}
 0:${(pl...)...}

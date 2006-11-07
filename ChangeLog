@@ -1,3 +1,9 @@
+2006-11-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22980: Doc/Zsh/expn.yo, Src/subst.c, Test/D04paramater.ztst,
+	Test/D07multibyte.ztst: 22952 messed up optional arguments
+	to padding parameter flags.
+
 2006-11-07  Peter Stephenson  <pws@csr.com>
 
 	* 22973: arno: Completion/Unix/Command/_zip: .xpi files are

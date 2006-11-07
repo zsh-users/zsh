@@ -1224,8 +1224,9 @@ get_strarg(char *s, int *lenp)
 
 /*
  * Get an integer argument; update *s to the end of the
- * final delimiter.  *delmatchp is set to 1 if we have matching
- * delimiters and there was no error in the evaluation, else 0.
+ * final delimiter.  *delmatchp is set to the length of the
+ * matched delimiter if we have matching, delimiters and there was no error in
+ * the evaluation, else 0.
  */
 
 /**/
@@ -1255,7 +1256,7 @@ get_intarg(char **s, int *delmatchp)
 	return -1;
     if (ret < 0)
 	ret = -ret;
-    *delmatchp = 1;
+    *delmatchp = arglen;
     return ret < 0 ? -ret : ret;
 }
 
@@ -1602,7 +1603,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 	    for (s++; (c = *s) != ')' && c != Outpar; s++, tt = 0) {
 		int arglen;	/* length of modifier argument */
-		int delmatch;	/* integer delimiters matched OK */
+		int dellen;	/* length of matched delimiter, 0 if not */
+		char *del0;	/* pointer to initial delimiter */
 
 		switch (c) {
 		case ')':
@@ -1634,7 +1636,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 		case 'I':
 		    s++;
-		    flnum = get_intarg(&s, &delmatch);
+		    flnum = get_intarg(&s, &dellen);
 		    if (flnum < 0)
 			goto flagerr;
 		    s--;
@@ -1734,15 +1736,21 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		/* fall through */
 		case 'r':
 		    s++;
-		    num = get_intarg(&s, &delmatch);
+		    /* delimiter position */
+		    del0 = s;
+		    num = get_intarg(&s, &dellen);
 		    if (num < 0)
 			goto flagerr;
 		    if (tt)
 			prenum = num;
 		    else
 			postnum = num;
-		    if (!delmatch)
+		    /* must have same delimiter if more arguments */
+		    if (!dellen || memcmp(del0, s, dellen)) {
+			/* decrement since loop will increment */
+			s--;
 			break;
+		    }
 		    t = get_strarg(s, &arglen);
 		    if (!*t)
 			goto flagerr;
@@ -1755,7 +1763,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    *t = sav;
 		    sav = *s;
 		    s = t + arglen;
-		    if (UNTOK(*s) != UNTOK(sav)) {
+		    /* again, continue only if another start delimiter */
+		    if (memcmp(del0, s, dellen)) {
+			/* decrement since loop will increment */
 			s--;
 			break;
 		    }
@@ -1769,6 +1779,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    else
 			UNTOK_AND_ESCAPE(postone, s + arglen)
 		    *t = sav;
+		    /* -1 since loop will increment */
 		    s = t + arglen - 1;
 		    break;
 
@@ -3310,7 +3321,7 @@ modify(char **str, char **ptr)
 {
     char *ptr1, *ptr2, *ptr3, *lptr, c, *test, *sep, *t, *tt, tc, *e;
     char *copy, *all, *tmp, sav, sav1, *ptr1end;
-    int gbal, wall, rec, al, nl, charlen, delmatch;
+    int gbal, wall, rec, al, nl, charlen, dellen;
     convchar_t del;
 
     test = NULL;
@@ -3436,7 +3447,7 @@ modify(char **str, char **ptr)
 		break;
 	    case 'F':
 		(*ptr)++;
-		rec = get_intarg(ptr, &delmatch);
+		rec = get_intarg(ptr, &dellen);
 		break;
 	    default:
 		*ptr = lptr;

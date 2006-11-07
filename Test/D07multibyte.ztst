@@ -306,8 +306,8 @@
 # TODO: if we get paired multibyte bracket delimiters to work
 # (as Emacs does, the smug so-and-so), the following should change.
   foo=bar
-  print ${(r£5£¥X¥)foo}
-  print ${(l«10«»Y»£HI£)foo}
+  print ${(r£5££X£)foo}
+  print ${(l«10««Y««HI«)foo}
 0:Delimiters in parameter flags
 >barXX
 >YYYYYHIbar
