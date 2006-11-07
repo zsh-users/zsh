@@ -50,7 +50,7 @@ case $service in
       '(-0 -1 -2 -3 -4 -5 -6 -7 -8   )-9[compress better]' \
       '-x[exclude the following names]' \
       '-i[include only the following names]' \
-      "(-f -d -R -q -c -b -@ -F -FF -A -T -y -e -h -u -m -g -j -l -ll -L -v -z -t -tt -o -D -J -X -n -0 -1 -2 -3 -4 -5 -6 -7 -8 -9):zip file:_files -g '(#i)*.(zip|[ejw]ar)(-.)'" \
+      "(-f -d -R -q -c -b -@ -F -FF -A -T -y -e -h -u -m -g -j -l -ll -L -v -z -t -tt -o -D -J -X -n -0 -1 -2 -3 -4 -5 -6 -7 -8 -9):zip file:_files -g '(#i)*.(zip|xpi|[ejw]ar)(-.)'" \
       '*:file:->files' && ret=0
   ;;
   unzip)
@@ -75,7 +75,7 @@ case $service in
       '-M[page output]' \
       '-x[exclude the following names]' \
       '-Z[zipinfo mode]:zipinfomode:->zipinfo' \
-      "(-p -f -u -l -t -z -n -o -j -C -X -q -qq -a -aa -v -L -M)1:zip file:_files -g '(#i)*.(zip|[ejw]ar)(-.)'" \
+      "(-p -f -u -l -t -z -n -o -j -C -X -q -qq -a -aa -v -L -M)1:zip file:_files -g '(#i)*.(zip|xpi|[ejw]ar)(-.)'" \
       '*:file:->files' && ret=0
   ;;
 esac
@@ -98,7 +98,7 @@ if [[ $service == zipinfo ]] || [[ -n $uzi ]]; then
       '(-1 -2)-T[use sortable decimal format for file times]' \
       '-M[page output]' \
       '-x[exclude the following names]' \
-      "(-1 -2 -s -m -l -v -h -z -C -t -T -M)1:zip file:_files -g '(#i)*.(zip|[ejw]ar)(-.)'" \
+      "(-1 -2 -s -m -l -v -h -z -C -t -T -M)1:zip file:_files -g '(#i)*.(zip|xpi|[ejw]ar)(-.)'" \
       '*:file:->files' && ret=0
 fi
 
@@ -112,7 +112,7 @@ case $state in
   ;;
   files)
     if [[ $service = zip ]] && (( ! ${+opt_args[-d]} )); then
-      _wanted files expl zfile _files -g '^(#i)*.(zip|[ejw]ar)(-.)' && return
+      _wanted files expl zfile _files -g '^(#i)*.(zip|xpi|[ejw]ar)(-.)' && return
     else
       zipfile=( $~line[1](|.zip|.ZIP) )
       [[ -z $zipfile[1] ]] && return 1
