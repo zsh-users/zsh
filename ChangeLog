@@ -1,5 +1,8 @@
 2006-11-08  Peter Stephenson  <pws@csr.com>
 
+	* 22983: Src/builtin.c, Src/init.c: exit could loop for ever
+	in two different ways (but not at the same time).
+
 	* 22978 (tweaked): Doc/Zsh/func.yo, Doc/Zsh/options.yo,
 	Src/builtin.c, Src/init.c, Src/utils.c, Src/Zle/zle_main.c,
 	Test/A05execution.ztst: use <hook>_functions array variables for
