@@ -5,12 +5,12 @@
 	Test/A05execution.ztst: use <hook>_functions array variables for
 	hook functions.
 
-	* 22981: Zvi Har'El: Src/glob.c: 22952 also got a
-	get_strarg() wrong in glob.c.
+	* 22981: Zvi Har'El: Src/glob.c: 22980 got a get_strarg() wrong in
+	glob.c, somehow.
 
 2006-11-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 22980: Doc/Zsh/expn.yo, Src/subst.c, Test/D04paramater.ztst,
+	* 22980: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst,
 	Test/D07multibyte.ztst: 22952 messed up optional arguments
 	to padding parameter flags.
 
