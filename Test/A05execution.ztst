@@ -105,6 +105,18 @@
 0q:chpwd
 >Changed to $ZTST_testdir/command.tmp
 
+  chpwd() { print chpwd: changed to $PWD; }
+  chpwdfn1()  { print chpwdfn1: changed to $PWD; }
+  chpwdfn2()  { print chpwdfn2: changed to $PWD; }
+  chpwd_functions=(chpwdfn1 '' chpwdnonexistentfn chpwdfn2)
+  cd .
+  unfunction chpwd
+  unset chpwd_functions
+0q:chpwd_functions
+>chpwd: changed to $ZTST_testdir/command.tmp
+>chpwdfn1: changed to $ZTST_testdir/command.tmp
+>chpwdfn2: changed to $ZTST_testdir/command.tmp
+
 # Hard to test periodic, precmd and preexec non-interactively.
 
   fn() { TRAPEXIT() { print Exit; }; }

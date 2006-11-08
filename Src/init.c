@@ -137,29 +137,33 @@ loop(int toplevel, int justonce)
 	}
 	if (hend(prog)) {
 	    int toksav = tok;
-	    Eprog preprog;
 
-	    if (toplevel && (preprog = getshfunc("preexec")) != &dummy_eprog) {
+	    if (toplevel &&
+		(getshfunc("preexec") != &dummy_eprog ||
+		 paramtab->getnode(paramtab, "preexec_functions"))) {
 		LinkList args;
-		int osc = sfcontext;
 		char *cmdstr;
 
-		args = znewlinklist();
-		zaddlinknode(args, "preexec");
+		/*
+		 * As we're about to freeheap() or popheap()
+		 * anyway, there's no gain in using permanent
+		 * storage here.
+		 */
+		args = newlinklist();
+		addlinknode(args, "preexec");
 		/* If curline got dumped from the history, we don't know
 		 * what the user typed. */
 		if (hist_ring && curline.histnum == curhist)
-		    zaddlinknode(args, hist_ring->node.nam);
+		    addlinknode(args, hist_ring->node.nam);
 		else
-		    zaddlinknode(args, "");
-		zaddlinknode(args, getjobtext(prog, NULL));
-		zaddlinknode(args, cmdstr = getpermtext(prog, NULL));
+		    addlinknode(args, "");
+		addlinknode(args, dupstring(getjobtext(prog, NULL)));
+		addlinknode(args, cmdstr = getpermtext(prog, NULL));
 
-		sfcontext = SFC_HOOK;
-		doshfunc("preexec", preprog, args, 0, 1);
-		sfcontext = osc;
+		callhookfunc("preexec", args, 1);
+
+		/* The only permanent storage is from getpermtext() */
 		zsfree(cmdstr);
-		freelinklist(args, (FreeFunc) NULL);
 		errflag = 0;
 	    }
 	    if (stopmsg)	/* unset 'you have stopped jobs' flag */

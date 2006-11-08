@@ -151,26 +151,47 @@ executing tt(myfunc), use:
 example(autoload +X myfunc)
 
 sect(Special Functions)
-The following functions, if defined, have special meaning to
-the shell:
+Certain functions, if defined, have special meaning to the shell.
+
+In the case of tt(chpwd), tt(periodic), tt(precmd) and tt(preexec) it is
+possible to define an array that has the same name with `tt(_functions)'
+appended.  Any element in such an array is taken as the name of a function
+to execute; it is executed in the same context and with the same arguments
+as the basic function.  For example, if tt($chpwd_functions) is an array
+containing the values `tt(mychpwd)', `tt(chpwd_save_dirstack)', then the
+shell attempts to execute the functions `tt(chpwd)', `tt(mychpwd)' and
+`tt(chpwd_save_dirstack)', in that order.  Any function that does not exist
+is silently ignored.  A function found by this mechanism is referred to
+elsewhere as a `hook function'.  An error in any function causes
+subsequent functions not to be run.  Note further that an error
+in a tt(precmd) hook causes an immediately following tt(periodic)
+function not to run (thought it may run at the next opportunity).
 
 startitem()
 findex(chpwd)
+vindex(chpwd_functions)
 item(tt(chpwd))(
 Executed whenever the current working directory is changed.
 )
 findex(periodic)
+vindex(periodic_functions)
 item(tt(periodic))(
 vindex(PERIOD)
 If the parameter tt(PERIOD)
 is set, this function is executed every tt($PERIOD)
-seconds, just before a prompt.
+seconds, just before a prompt.  Note that if multiple functions
+are defined using the array tt(periodic_functions) only one
+period is applied to the complete set of functions, and the
+scheduled time is not reset if the list of functions is altered.
+Hence the set of functions is always called together.
 )
 findex(precmd)
+vindex(precmd_functions)
 item(tt(precmd))(
 Executed before each prompt.
 )
 findex(preexec)
+vindex(preexec_functions)
 item(tt(preexec))(
 Executed just after a command has been read and is about to be
 executed.  If the history mechanism is active (and the line was not

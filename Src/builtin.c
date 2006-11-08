@@ -1087,7 +1087,6 @@ cd_try_chdir(char *pfix, char *dest, int hard)
 static void
 cd_new_pwd(int func, LinkNode dir)
 {
-    Eprog prog;
     char *new_pwd, *s;
     int dirstacksize;
 
@@ -1134,15 +1133,9 @@ cd_new_pwd(int func, LinkNode dir)
     }
 
     /* execute the chpwd function */
-    if ((prog = getshfunc("chpwd")) != &dummy_eprog) {
-	int osc = sfcontext;
-
-	fflush(stdout);
-	fflush(stderr);
-	sfcontext = SFC_HOOK;
-	doshfunc("chpwd", prog, NULL, 0, 1);
-	sfcontext = osc;
-    }
+    fflush(stdout);
+    fflush(stderr);
+    callhookfunc("chpwd", NULL, 1);
 
     dirstacksize = getiparam("DIRSTACKSIZE");
     /* handle directory stack sizes out of range */

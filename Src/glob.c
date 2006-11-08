@@ -1246,7 +1246,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			int arglen;
 
 			/* Find matching delimiters */
-			tt = get_strarg(s, &arglen, NULL);
+			tt = get_strarg(s, &arglen);
 			if (!*tt) {
 			    zerr("missing end of name");
 			    data = 0;

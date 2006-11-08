@@ -716,7 +716,7 @@ raw_getbyte(int do_keytmout, char *cptr)
 # endif
 
 
-			callhookfunc(lwatch_funcs[i], funcargs);
+			callhookfunc(lwatch_funcs[i], funcargs, 0);
 			if (errflag) {
 			    /* No sensible way of handling errors here */
 			    errflag = 0;

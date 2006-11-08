@@ -1079,28 +1079,53 @@ time_t lastmailcheck;
 /**/
 time_t lastwatch;
 
+/*
+ * Call a function given by "name" with optional arguments
+ * "lnklist".  If "arrayp" is not zero, we also look through
+ * the array "name"_functions and execute functions found there.
+ */
+
 /**/
 mod_export int
-callhookfunc(char *name, LinkList lnklst)
+callhookfunc(char *name, LinkList lnklst, int arrayp)
 {
     Eprog prog;
-
-    if ((prog = getshfunc(name)) != &dummy_eprog) {
 	/*
 	 * Save stopmsg, since user doesn't get a chance to respond
 	 * to a list of jobs generated in a hook.
 	 */
-	int osc = sfcontext, osm = stopmsg;
+    int osc = sfcontext, osm = stopmsg, stat = 1;
 
-	sfcontext = SFC_HOOK;
+    sfcontext = SFC_HOOK;
+
+    if ((prog = getshfunc(name)) != &dummy_eprog) {
 	doshfunc(name, prog, lnklst, 0, 1);
-	sfcontext = osc;
-	stopmsg = osm;
-
-	return 0;
+	stat = 0;
     }
 
-    return 1;
+    if (arrayp) {
+	char **arrptr;
+	int namlen = strlen(name);
+#define HOOK_SUFFIX	"_functions"
+#define HOOK_SUFFIX_LEN	11	/* including NUL byte */
+	VARARR(char, arrnam, namlen + HOOK_SUFFIX_LEN);
+	memcpy(arrnam, name, namlen);
+	memcpy(arrnam + namlen, HOOK_SUFFIX, HOOK_SUFFIX_LEN);
+
+	if ((arrptr = getaparam(arrnam))) {
+	    for (; *arrptr; arrptr++) {
+		if ((prog = getshfunc(*arrptr)) != &dummy_eprog) {
+		    doshfunc(arrnam, prog, lnklst, 0, 1);
+		    stat = 0;
+		}
+	    }
+	}
+    }
+
+    sfcontext = osc;
+    stopmsg = osm;
+
+    return stat;
 }
 
 /* do pre-prompt stuff */
@@ -1136,15 +1161,15 @@ preprompt(void)
 
     /* If a shell function named "precmd" exists, *
      * then execute it.                           */
-    callhookfunc("precmd", NULL);
+    callhookfunc("precmd", NULL, 1);
     if (errflag)
 	return;
 
-    /* If 1) the parameter PERIOD exists, 2) the shell function     *
+    /* If 1) the parameter PERIOD exists, 2) a hook function for    *
      * "periodic" exists, 3) it's been greater than PERIOD since we *
-     * executed "periodic", then execute it now.                    */
+     * executed any such hook, then execute it now.                 */
     if (period && (time(NULL) > lastperiodic + period) &&
-	!callhookfunc("periodic", NULL))
+	!callhookfunc("periodic", NULL, 1))
 	lastperiodic = time(NULL);
     if (errflag)
 	return;
