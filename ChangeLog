@@ -1,3 +1,10 @@
+2006-11-09  Peter Stephenson  <pws@csr.com>
+
+	* 22988: arno: Completion/Unix/Command/_make: failed on
+	special variable names, so use local -h.  Probably not a
+	complete fix since the function can run recursivesly for
+	include directives which should use the same namespace.
+
 2006-11-08  Peter Stephenson  <pws@csr.com>
 
 	* 22983: Src/builtin.c, Src/init.c: exit could loop for ever

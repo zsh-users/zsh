@@ -60,6 +60,7 @@ parseMakefile() {
 	    var=${input%%[ $TAB]#=*}
 	    val=${input#*=}
 	    val=${val##[ $TAB]#}
+	    local -h $var
 	    eval $var=\$val
 	    ;;
 	([[:alnum:]][[:alnum:]_]#[ $TAB]#:=*)
@@ -67,6 +68,7 @@ parseMakefile() {
 	    val=${input#*=}
 	    val=${val##[ $TAB]#}
 	    val=$(expandVars 10 $val)
+	    local -h $var
 	    eval $var=\$val
 	    ;;
 	([[:alnum:]][^$TAB:=]#:[^=]*)
