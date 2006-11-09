@@ -203,6 +203,14 @@ size-limited version of the command (with things like function bodies
 elided); the third argument contains the full text that is being
 executed.
 )
+findex(zshexit)
+vindex(zshexit_functions)
+item(tt(zshexit))(
+Executed at the point where the main shell is about to exit normally.
+This is not called by exiting subshells, nor when the tt(exec)
+precommand modifier is used before an external command.  Also, unlike
+tt(TRAPEXIT), it is not called when functions exit.
+)
 item(tt(TRAP)var(NAL))(
 cindex(signals, trapping)
 cindex(trapping signals)

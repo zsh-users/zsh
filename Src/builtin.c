@@ -4436,6 +4436,7 @@ zexit(int val, int from_where)
     }
     if (sigtrapped[SIGEXIT])
 	dotrap(SIGEXIT);
+    callhookfunc("zshexit", NULL, 1);
     runhookdef(EXITHOOK, NULL);
     if (opts[MONITOR] && interact && (SHTTY != -1)) {
        release_pgrp();

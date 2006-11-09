@@ -1,5 +1,8 @@
 2006-11-09  Peter Stephenson  <pws@csr.com>
 
+	* 22984: Doc/Zsh/func.yo, Src/builtin.c: add zshexit hook
+	to 22978.
+
 	* 22988: arno: Completion/Unix/Command/_make: failed on
 	special variable names, so use local -h.  Probably not a
 	complete fix since the function can run recursivesly for
