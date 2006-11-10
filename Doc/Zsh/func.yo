@@ -248,6 +248,8 @@ findex(TRAPEXIT)
 item(tt(TRAPEXIT))(
 Executed when the shell exits,
 or when the current function exits if defined inside a function.
+The value of tt($?) at the start of execution is the exit status of the
+shell or the return status of the function exiting.
 )
 findex(TRAPZERR)
 findex(TRAPERR)

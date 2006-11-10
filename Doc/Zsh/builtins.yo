@@ -1252,6 +1252,8 @@ after each command.
 If var(sig) is tt(0) or tt(EXIT)
 and the tt(trap) statement is executed inside the body of a function,
 then the command var(arg) is executed after the function completes.
+The value of tt($?) at the start of execution is the exit status of the
+shell or the return status of the function exiting.
 If var(sig) is tt(0) or tt(EXIT)
 and the tt(trap) statement is not executed inside the body of a function,
 then the command var(arg) is executed when the shell terminates.

@@ -51,6 +51,12 @@ expandVars() {
     done
 }
 
+# parseMakefile only runs inside $(...), so it doesn't matter that
+# it pollutes the global namespace, setting zsh variables to
+# make variables.  The difficult case is where a make variable
+# is special in zsh; we use local -h to hide those.  This
+# isn't a complete solution since it means variables defined in
+# included Makefiles are undefined before returning to the parent.
 parseMakefile() {
     local input var val TAB=$'\t' dir=$1
 
@@ -60,7 +66,7 @@ parseMakefile() {
 	    var=${input%%[ $TAB]#=*}
 	    val=${input#*=}
 	    val=${val##[ $TAB]#}
-	    local -h $var
+	    [[ ${(tP)var} = *special ]] && local -h $var
 	    eval $var=\$val
 	    ;;
 	([[:alnum:]][[:alnum:]_]#[ $TAB]#:=*)
@@ -68,7 +74,7 @@ parseMakefile() {
 	    val=${input#*=}
 	    val=${val##[ $TAB]#}
 	    val=$(expandVars 10 $val)
-	    local -h $var
+	    [[ ${(tP)var} = *special ]] && local -h $var
 	    eval $var=\$val
 	    ;;
 	([[:alnum:]][^$TAB:=]#:[^=]*)

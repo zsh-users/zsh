@@ -4434,6 +4434,7 @@ zexit(int val, int from_where)
 #endif
 	}
     }
+    lastval = val;
     if (sigtrapped[SIGEXIT])
 	dotrap(SIGEXIT);
     callhookfunc("zshexit", NULL, 1);

@@ -1,3 +1,11 @@
+2006-11-10  Peter Stephenson  <pws@csr.com>
+
+	* 22993: Completion/Unix/Command/_make: slightly more
+	effective version of 22988.
+
+	* 22992: Doc/Zsh/func.yo, Doc/Zsh/builtins.yo, Src/builtin.c:
+	make $? available on trap or hook shell exit.
+
 2006-11-09  Peter Stephenson  <pws@csr.com>
 
 	* 22984: Doc/Zsh/func.yo, Src/builtin.c: add zshexit hook
