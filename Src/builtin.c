@@ -4413,6 +4413,11 @@ zexit(int val, int from_where)
      * indicate we shouldn't do any recursive processing.
      */
     in_exit = -1;
+    /*
+     * We want to do all remaining processing regardless of preceeding
+     * errors.
+     */
+    errflag = 0;
 
     if (isset(MONITOR)) {
 	/* send SIGHUP to any jobs left running  */

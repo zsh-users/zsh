@@ -1,3 +1,9 @@
+2006-11-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22997: Src/builtin.c, Src/subst.c: ${...?...} didn't go through
+	proper exit sequence and didn't take account of being in a
+	subshell and didn't call exit trap anyway because errflag was set.
+
 2006-11-10  Peter Stephenson  <pws@csr.com>
 
 	* 22993: Completion/Unix/Command/_make: slightly more
