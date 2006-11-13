@@ -1,3 +1,7 @@
+2006-11-13  Clint Adams  <clint@zsh.org>
+
+	* 22998: Completion/Linux/_acpi: add -s to _arguments.
+
 2006-11-11  Clint Adams  <clint@zsh.org>
 
 	* unposted: update config.guess and config.sub to

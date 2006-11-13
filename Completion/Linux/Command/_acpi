@@ -1,6 +1,6 @@
 #compdef acpi
 
-_arguments \
+_arguments -s \
     '(-b --battery)'{-b,--battery}'[battery information]' \
     '(-B --without-battery)'{-B,--without-battery}'[suppress battery information]' \
     '(-t --thermal)'{-t,--thermal}'[thermal information]' \
