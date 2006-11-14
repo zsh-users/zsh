@@ -1,5 +1,9 @@
 2006-11-14  Peter Stephenson  <pws@csr.com>
 
+	* users/10981: Jean-Rene David <jrdavid@magma.ca>:
+	Completion/Unix/Command/_ssh: needs glob_subst to expand
+	path for config file.
+
 	* users/10979: Completion/Unix/Command/_ssh: use config file
 	from -F option if present.
 
