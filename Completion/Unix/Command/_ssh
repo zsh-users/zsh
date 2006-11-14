@@ -323,6 +323,8 @@ _ssh_users () {
 
 _ssh_hosts () {
   local -a config_hosts
+  local config
+  integer ind
 
   if [[ "$IPREFIX" == *@ ]]; then
     _combination -s '[:@]' my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@"
@@ -330,7 +332,12 @@ _ssh_hosts () {
     _combination -s '[:@]' my-accounts users-hosts \
       ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
   fi
-  if [[ -r "$HOME/.ssh/config" ]]; then
+  if (( ind = ${words[(I)-F]} )); then
+    config=$words[ind+1]
+  else
+    config="$HOME/.ssh/config"
+  fi
+  if [[ -r $config ]]; then
     local IFS=$'\t ' key hosts host
     while read key hosts; do
       if [[ "$key" == (#i)host ]]; then
@@ -341,7 +348,7 @@ _ssh_hosts () {
 	    esac
 	 done
       fi
-    done < "$HOME/.ssh/config"
+    done < "$config"
     if (( ${#config_hosts} )); then
       _wanted hosts expl 'remote host name' \
 	compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" $config_hosts
