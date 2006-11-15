@@ -58,7 +58,9 @@ if [[ -z "$_comp_no_ignore" ]]; then
 				  "${(@)words[CURRENT+1,-1]}" );;
     esac
 
-  (( $#_comp_ignore )) && opts=( $opts -F _comp_ignore )
+  # Ensure the ignore option is first so we can override it
+  # for fake-always.
+  (( $#_comp_ignore )) && opts=( -F _comp_ignore $opts )
 else
   _comp_ignore=()
 fi
@@ -86,15 +88,21 @@ else
   fi
 fi
 
-if ! (( ${funcstack[2,-1][(I)_description]} )) &&
-   zstyle -a ":completion:${curcontext}:$tag" fake match; then
+if ! (( ${funcstack[2,-1][(I)_description]} )); then
+  local fakestyle descr
+  for fakestyle in fake fake-always; do
+    zstyle -a ":completion:${curcontext}:$tag" $fakestyle match ||
+    continue
 
-  local descr
+    descr=( "${(@M)match:#*[^\\]:*}" )
 
-  descr=( "${(@M)match:#*[^\\]:*}" )
-
-  compadd "${(@P)name}" - "${(@)${(@)match:#*[^\\]:*}:s/\\:/:/}"
-  (( $#descr )) && _describe -t "$tag" '' descr "${(@P)name}"
+    opts=("${(@P)name}")
+    if [[ $fakestyle = fake-always && $opts[1,2] = "-F _comp_ignore" ]]; then
+      shift 2 opts
+    fi
+    compadd "${(@)opts}" - "${(@)${(@)match:#*[^\\]:*}:s/\\:/:/}"
+    (( $#descr )) && _describe -t "$tag" '' descr "${(@)opts}"
+  done
 fi
 
 return 0
