@@ -522,12 +522,12 @@ execute(LinkList args, int dash, int defpath)
     }
     for (s = arg0; *s; s++)
 	if (*s == '/') {
-	    errno = zexecve(arg0, argv);
+	    int lerrno = zexecve(arg0, argv);
 	    if (arg0 == s || unset(PATHDIRS) ||
 		(arg0[0] == '.' && (arg0 + 1 == s ||
 				    (arg0[1] == '.' && arg0 + 2 == s)))) {
-		zerr("%e: %s", errno, arg0);
-		_exit((errno == EACCES || errno == ENOEXEC) ? 126 : 127);
+		zerr("%e: %s", lerrno, arg0);
+		_exit((lerrno == EACCES || lerrno == ENOEXEC) ? 126 : 127);
 	    }
 	    break;
 	}
