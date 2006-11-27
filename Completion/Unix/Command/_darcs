@@ -104,8 +104,7 @@ else
     _call_program help-commands darcs --help | while read -A hline; do
 	(( ${#hline} < 2 )) && continue
 	[[ $hline[1] == darcs ]] && continue
- 	[[ $hline[1] == Usage: ]] && continue
- 	[[ $hline[1] == Use ]] && continue
+ 	[[ $hline[1] == [A-Z]* ]] && continue
  	cmdlist=( $cmdlist "${hline[1]}:${hline[2,-1]/(#b)([A-Z])(*)./${match[1]:l}$match[2]}" )
      done
     arguments=(':commands:(($cmdlist))')
