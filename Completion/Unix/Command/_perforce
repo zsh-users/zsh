@@ -3,7 +3,7 @@
 # Maintainer: Peter Stephenson <pws@csr.com>.
 
 # Increasingly loosely based on _cvs version 1.17.
-# Completions currently based on Perforce release 2004.2.
+# Completions currently based on Perforce release 2006.2.
 
 # Styles, tags and contexts
 # =========================
@@ -1408,6 +1408,17 @@ _perforce_statuses() {
 }
 
 
+(( $+functions[_perforce_submit_options] )) ||
+_perforce_submit_options() {
+  local -a soptions
+  soptions=('submitunchanged:submit all open files (default)'
+	    'revertunchanged:revert unchanged files'
+	    'leaveunchanged:move unchanged files to default changelist')
+  soptions+=(${^${soptions//:/+reopen:}}", leave submitted open")
+  _describe -t submit-options 'submit option' soptions
+}
+
+
 (( $+functions[_perforce_pids] )) ||
 _perforce_pids() {
   local -a ul
@@ -1427,6 +1438,12 @@ _perforce_users() {
   _describe -t users 'Perforce user' ul
 }
 
+
+(( $+functions[_perforce_users_or_groups] )) ||
+_perforce_users_or_groups() {
+    _alternative 'groups:Perforce group:_perforce_groups' \
+      'users:Perforce user:_perforce_users'
+}
 
 (( $+functions[_perforce_variables] )) ||
 _perforce_variables() {
@@ -1451,6 +1468,8 @@ _perforce_variables() {
 _perforce_cmd_add() {
   _arguments -s : \
     '-c+[select by change]:change:_perforce_changes -tc' \
+    '-f[allow filenames with wild cards]' \
+    '-n[display operation without doing it]' \
     '-t+[set file type]:file type:_perforce_filetypes' \
     '*:file:_perforce_files -tu'
 }
@@ -1482,6 +1501,7 @@ _perforce_cmd_annotate() {
   _arguments -s : \
     '-a[all, show both added and deleted lines]' \
     '-c[output change numbers instead of revisions]' \
+    '-i[follow branches (integration records)]' \
     '-q[quiet, suppress one-line file header]' \
     '*::file:_perforce_files -tR'
 }
@@ -1498,6 +1518,7 @@ _perforce_cmd_attribute() {
     '-e[value is in hex]' \
     '-f[set the attribute on a submitted file]' \
     '-n[set name of attribute]:attribute: ' \
+    '-p[propagate attribute when opened for edit etc.]' \
     '-v[set value of attribute]:value: ' \
     "*::file:_perforce_files$limit"
 }
@@ -1516,8 +1537,9 @@ _perforce_cmd_branch() {
 
 (( $+functions[_perforce_cmd_branches] )) ||
 _perforce_cmd_branches() {
-  # No arguments.
-  _arguments -s :
+  _arguments -s : \
+    '-u+[select by user]:user:_perforce_users' \
+    '-m+[set maximum to show]:max branches: '
 }
 
 
@@ -1556,7 +1578,7 @@ _perforce_cmd_changes() {
     '-i[include integrated changes]' \
     '-t[output time as well as date]' \
     '-l[long output, full change text]' \
-    '-l[long output, truncated change text]' \
+    '-L[long output, truncated change text]' \
     '-c+[select by client]:client:_perforce_clients' \
     '-m+[most recent N changes]:max changes: ' \
     '-s+[select by status]:status:(pending submitted)' \
@@ -1585,8 +1607,9 @@ _perforce_cmd_client() {
 
 (( $+functions[_perforce_cmd_clients] )) ||
 _perforce_cmd_clients() {
-  # No arguments.
-  _message "no arguments"
+  _arguments -s : \
+    '-u+[select by user]:user:_perforce_users' \
+    '-m+[set maximum to show]:max clients: '
 }
 
 
@@ -1611,6 +1634,7 @@ _perforce_cmd_counters() {
 _perforce_cmd_delete() {
   _arguments -s : \
     '-c[select change for deletion]:change:_perforce_changes -tc' \
+    '-n[show deletions without doing them]' \
     '*::file:_perforce_files'
 }
 
@@ -1648,10 +1672,12 @@ _perforce_cmd_diff() {
   _arguments -s : \
     '-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context l\:ignore\ line\ endings n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
     '-f[diff every file]' \
-    '(-sd -se -sr)-sa[opened files, different or missing]' \
-    '(-sa -se -sr)-sd[unopened files, missing]' \
-    '(-sa -sd -sr)-se[unopened files, different]' \
-    '(-sa -sd -se)-sr[opened files, same as depot]' \
+    '-m+[set maximum files to show]:max files: ' \
+    '(-sd -se -sl -sr)-sa[opened files, different or missing]' \
+    '(-sa -se -sl -sr)-sd[unopened files, missing]' \
+    '(-sa -sd -sl -sr)-se[unopened files, different]' \
+    '(-sa -sd -se -sr)-sl[all unopened files with status]' \
+    '(-sa -sd -se -sl)-sr[opened files, same as depot]' \
     '-t[include non-text files]' \
     "*::file:_perforce_files$limit"
 }
@@ -1684,6 +1710,7 @@ _perforce_cmd_dirs() {
 _perforce_cmd_edit() {
   _arguments -s : \
     '-c[set change for edit]:change:_perforce_changes -tc' \
+    '-n[show files to edit without opening them]' \
     '-t[set filetype]:filetype:_perforce_filetypes' \
     '*::file:_perforce_files'
 }
@@ -1741,6 +1768,7 @@ _perforce_cmd_fixes() {
     '-i[include integrated changes]' \
     '-j[select by job]:job:_perforce_jobs' \
     '-c[select by change]:change:_perforce_changes' \
+    '-m[set max fixes to show]:max fixes: ' \
     '*::fixed file:_perforce_files -tR'
 }
 
@@ -1749,6 +1777,7 @@ _perforce_cmd_fixes() {
 _perforce_cmd_flush() {
   _arguments -s : \
     '-f[force resynchronisation]' \
+    '-k[bypass client file update]' \
     '-n[show operations but don'\''t perform them]' \
     '*::file:_perforce_files -tR'
 }
@@ -1769,10 +1798,11 @@ _perforce_cmd_fstat() {
     '-H[select synced files (-Rh)]' \
     '-W[select opened files (-Ro)]' \
     '-l[include fileSize, possibly slow (-Ol)]' \
+    '-m[set max files to show]:max files: ' \
     "-O-[select output type]:output type:((f\:all\ revisions l\:fileSize p\:client\ path\ format r\:pending\ integrations s\:exclude\ local\ path$Oattr))" \
-    '-P[output clientFile in full Perforce syntax (-Op)]' \
+    '-P[output clientFile in full Perforce syntax (deprecated: use -Op)]' \
     '-R-[restrict selected files]:restriction:((c\:mapped\ in\ client h\:synced\ to\ client n\:not\ synced\ to\ head o\:opened r\:resolved u\:unresolved))' \
-    '-s[shorten, no client-related data (-Os)]' \
+    '-s[shorten, no client-related data (deprecated: use -Os)]' \
     $Aattr \
     '*::file:_perforce_files'
 }
@@ -1791,7 +1821,9 @@ _perforce_cmd_group() {
 (( $+functions[_perforce_cmd_groups] )) ||
 _perforce_cmd_groups() {
   _arguments -s : \
-    '1::user name:_perforce_users'
+    '-i[show indirect membership by subgroups]' \
+    '-m[set max groups to show]:max groups: ' \
+    '1::user or group name:_perforce_users_or_groups'
 }
 
 
@@ -1875,8 +1907,9 @@ _perforce_cmd_interchanges() {
   local -a fileargs
   if [[ ${words[(I)-b*]} -ne 0 ]]; then
     if [[ ${words[(I)-*s*]} -eq 0 ]]; then
-      # with -b and no -s, all files are to-files
-      fileargs=('*::to file:_perforce_files -tR')
+      # with -b and no -s, all files are to-files (but -s may come later)
+      fileargs=('-s[specify source file]'
+	        '*::to file:_perforce_files -tR')
     else
       # with -b and -s we have one from-file and any number of to-files
       fileargs=('1::from file:_perforce_files -tR'
@@ -1943,6 +1976,8 @@ _perforce_cmd_label() {
 (( $+functions[_perforce_cmd_labels] )) ||
 _perforce_cmd_labels() {
   _arguments -s : \
+    '-m+[set maximum to show]:max labels: ' \
+    '-u+[select by user]:user:_perforce_users' \
     '1::file or revisions which must contain label:_perforce_files -tR'
 }
 
@@ -2005,8 +2040,12 @@ _perforce_cmd_monitor() {
         '-l[long output format]'
       ;;
 
-      (terminate|clear)
+      (terminate)
       _perforce_pids
+      ;;
+
+      (clear)
+      _alternative 'pids:pid:_perforce_pids' 'all:all processes:(all)'
       ;;
 
       (*)
@@ -2022,7 +2061,14 @@ _perforce_cmd_monitor() {
 
 (( $+functions[_perforce_cmd_obliterate] )) ||
 _perforce_cmd_obliterate() {
-  _message "obliterate is dangerous: you're on your own here."
+    if [[ ${words[(I)-y]} -gt 0 ]]; then
+	_message \
+": don't complete after -y; run obliterate without, then add the -y"
+    else
+	_arguments -s : \
+	    '-y[actually perform the operation]' \
+	    '*::file:_perforce_files -tR'
+    fi
 }
 
 
@@ -2036,6 +2082,7 @@ _perforce_cmd_opened() {
     '-a[list for all clients]' \
     '-c+[select by change]:change:_perforce_changes -tc' \
     '-C[select by client]:client:_perforce_clients' \
+    '-m[max files to show]:max files: ' \
     '*::file:_perforce_files -to'
 }
 
@@ -2103,6 +2150,7 @@ _perforce_cmd_revert() {
   _arguments -s : \
     '-a[revert unaltered files]' \
     '-c[limit reversions to change]:change:_perforce_changes -tc' \
+    '-k[bypass client refresh]' \
     '-n[no action, show effect only]' \
     '*::file:_perforce_files -to'
 }
@@ -2150,7 +2198,9 @@ _perforce_cmd_submit() {
   _arguments -s : \
     '-r[files open for add or edit remain open]' \
     '-s[include fix status in list]' \
+    '-f[override submit option]:submit option:_perforce_submit_options' \
     '(-s -i)-c[submit specific change]:change:_perforce_changes -tc' \
+    '(-s -c)-d[specify description on command line]:description: ' \
     '(-c)-i[read change spec from stdin]' \
     '*::file:_perforce_files -to -tr'
 }
@@ -2161,6 +2211,7 @@ _perforce_cmd_sync() {
   _arguments -s : \
     '-f[force resynchronisation]' \
     '-n[show operations but don'\''t perform them]' \
+    '-k[bypass client file update]' \
     '*::file:_perforce_files -tR'
 }
 
@@ -2221,6 +2272,7 @@ _perforce_cmd_user() {
 (( $+functions[_perforce_cmd_users] )) ||
 _perforce_cmd_users() {
   _arguments -s : \
+    '-m[set max users to show]:max users: ' \
     '*::username:_perforce_users'
 }
 

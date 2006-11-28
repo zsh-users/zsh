@@ -1,3 +1,7 @@
+2006-11-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Completion/Unix/Command/_perforce: updated to 2006.2.
+
 2006-11-27  Clint Adams  <clint@zsh.org>
 
 	* 23018: Completion/Unix/Command/_darcs: parse out
