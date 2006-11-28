@@ -1,5 +1,8 @@
 2006-11-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 23022: Test/ztst.zsh: don't allow WORDCHARS to be exported
+	to tests.
+
 	* unposted: Completion/Unix/Command/_perforce: updated to 2006.2.
 
 2006-11-27  Clint Adams  <clint@zsh.org>
