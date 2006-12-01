@@ -381,7 +381,7 @@ example(print *+LPAR()e:age 2006/10/04 2006/10/09:+RPAR())
 The example above matches all files modified between the start of those
 dates.
 
-example(print *+LPAR()e:age 2006/10/04+RPAR())
+example(print *+LPAR()e:age 2006/10/04:+RPAR())
 
 The example above matches all files modified on that date.  If the second
 argument is omitted it is taken to be exactly 24 hours after the first

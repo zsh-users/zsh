@@ -6,13 +6,13 @@
 #
 # Match all files modified between the start of those dates.
 #
-#   print *(e:age 2006/10/04)
+#   print *(e:age 2006/10/04:)
 #
 # Match all files modified on that date.  If the second argument is
 # omitted it is taken to be exactly 24 hours after the first argument
 # (even if the first argument contains a time).
 #
-#   print *(e:age 2006/10/04:10:15 2006/10/04:10:45)
+#   print *(e-age 2006/10/04:10:15 2006/10/04:10:45-)
 #
 # Supply times.  All the time and formats handled by calendar_scandate
 # are allowed, but whitespace must be quoted to ensure age receives
@@ -32,6 +32,8 @@ integer mystat disable_stat
 zmodload -i zsh/stat
 # Allow the builtin stat to be hidden.
 zmodload -i zsh/parameter
+
+{
 if [[ $builtins[stat] != defined ]]; then
   (( disable_stat = 1 ))
   enable stat
@@ -63,11 +65,14 @@ if calendar_scandate $AGEREF; then
   fi
 
   (( date1 <= mtime && mtime <= date2 ))
+  mystat=$?
 else
   mystat=1
 fi
 
+} always {
 # If the builtin stat was previously disabled, disable it again.
 (( disable_stat )) && disable stat
+}
 
 return $mystat

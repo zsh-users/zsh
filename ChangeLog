@@ -1,5 +1,10 @@
 2006-12-01  Peter Stephenson  <pws@csr.com>
 
+	* unposted fixes for previous commit:
+	Completion/Unix/Type/_list_files, Doc/Zsh/calsys.yo,
+	Functions/Calendar/age: age was broken; fix typos; use
+	"always" block to restore stat disability.
+
 	* c.f. 23023: Completion/Unix/Type/_list_files, Doc/.distfiles,
 	Doc/Makefile.in, Doc/zsh.yo, Doc/zshcalsys.yo, Doc/Zsh/.distfiles,
 	Doc/Zsh/calsys.yo, Doc/Zsh/compsys.yo, Doc/Zsh/intro.yo,
