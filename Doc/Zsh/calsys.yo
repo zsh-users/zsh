@@ -510,6 +510,7 @@ empty if the option tt(-A) was given.
 )
 enditem()
 )
+)
 findex(calendar_show)
 item(tt(calendar_show))(
 The function used by default to display events.  It accepts a start time
