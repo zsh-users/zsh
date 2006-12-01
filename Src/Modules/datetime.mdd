@@ -3,6 +3,7 @@ name=zsh/datetime
 link=either
 load=no
 
+functions='Functions/Calendar/*'
 autobins="strftime"
 
 objects="datetime.o"

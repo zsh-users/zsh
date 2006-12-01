@@ -1,3 +1,19 @@
+2006-12-01  Peter Stephenson  <pws@csr.com>
+
+	* c.f. 23023: Completion/Unix/Type/_list_files, Doc/.distfiles,
+	Doc/Makefile.in, Doc/zsh.yo, Doc/zshcalsys.yo, Doc/Zsh/.distfiles,
+	Doc/Zsh/calsys.yo, Doc/Zsh/compsys.yo, Doc/Zsh/intro.yo,
+	Doc/Zsh/manual.yo, Doc/Zsh/modules.yo, Doc/Zsh/tcpsys.yo,
+	Functions/Calendar/.distfiles, Functions/Calendar/age,
+	Functions/Calendar/calendar, Functions/Calendar/calendar_add,
+	Functions/Calendar/calendar_lockfiles,
+	Functions/Calendar/calendar_read,
+	Functions/Calendar/calendar_scandate,
+	Functions/Calendar/calendar_show,
+	Functions/Calendar/calendar_sort, Src/Modules/datetime.mdd: new
+	calendar system with age glob qualifier function; files
+	_list_files to be able not to trample over external stat.
+
 2006-11-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23022: Test/ztst.zsh: don't allow WORDCHARS to be exported

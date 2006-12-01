@@ -48,6 +48,13 @@ done
 
 zmodload -i zsh/stat 2>/dev/null || return 1
 
+# Enable stat temporarily if disabled to avoid clashes.
+integer disable_stat
+if [[ ${builtins[stat]} != defined ]]; then
+  (( disable_stat = 1 ))
+  enable stat
+fi
+
 dir=${2:+$2/}
 dir=${(Q)dir}
 
@@ -66,4 +73,5 @@ done
 
 (( ${#listfiles} )) && listopts=(-d listfiles -l -o)
 
+(( disable_stat )) && disable stat
 return 0

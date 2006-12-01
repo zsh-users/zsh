@@ -1,0 +1,519 @@
+# Scan a line for various common date and time formats.
+# Set REPLY to the number of seconds since the epoch at which that
+# time occurs.  The time does not need to be matched; this will
+# produce midnight at the start of the date.
+#
+# Absolute times
+#
+# The rules below are fairly complicated, to allow any natural (and
+# some highly unnatural but nonetheless common) combination of
+# time and date used by English speakers.  It is recommended that,
+# rather than exploring the intricacies of the system, users find
+# a date format that is natural to them and stick to it.  This
+# will avoid unexpected effects.  Various key facts should be noted,
+# explained in more detail below:
+#
+# - In particular, note the confusion between month/day/year and
+#   day/month/year when the month is numeric; this format should be
+#   avoided if at all possible.  Many alternatives are available.
+# - However, there is currently no localization support, so month
+#   names must be English (though only the first three letters are required).
+#   The same applies to days of the week if they occur (they are not useful).
+# - The year must be given in full to avoid confusion, and only years
+#   from 1900 to 2099 inclusive are matched.
+# - Although timezones are parsed (complicated formats may not be recognized),
+#   they are then ignored; no time adjustment is made.
+#
+# The following give some obvious examples; users finding here
+# a format they like and not subject to vagaries of style may skip
+# the full description.  As dates and times are matched separately
+# (even though the time may be embedded in the date), any date format
+# may be mixed with any format for the time of day provide the
+# separators are clear (whitespace, colons, commas).
+#   2007/04/03 13:13
+#   2007/04/03:13:13
+#   2007/04/03 1:13 pm
+#   3rd April 2007, 13:13
+#   April 3rd 2007 1:13 p.m.
+#   Apr 3, 2007 13:13
+#   Tue Apr 03 13:13:00 2007
+#   13:13 2007/apr/3
+#
+# Times are parsed and extracted before dates.  They must use colons
+# to separate hours and minutes, though a dot is allowed before seconds
+# if they are present.  This limits time formats to
+#   HH:MM[:SS[.FFFFF]] [am|pm|a.m.|p.m.]
+#   HH:MM.SS[.FFFFF] [am|pm|a.m.|p.m.]
+# in which square brackets indicate optional elements, possibly with
+# alternatives.  Fractions of a second are recognised but ignored.
+# Unless -r is given (see below), a date is mandatory but a time of day is
+# not; the time returned is at the start of the date.
+#
+# Time zones are not handled, though if one is matched following a time
+# specification it will be removed to allow a surrounding date to be
+# parsed.  This only happens if the format of the timezone is not too
+# wacky:
+#   +0100
+#   GMT
+#   GMT-7
+#   CET+1CDT
+# etc. are all understood, but any part of the timezone that is not numeric
+# must have exactly three capital letters in the name.
+#
+# Dates suffer from the ambiguity between DD/MM/YYYY and MM/DD/YYYY.  It is
+# recommended this form is avoided with purely numeric dates, but use of
+# ordinals, eg. 3rd/04/2007, will resolve the ambiguity as the ordinal is
+# always parsed as the day of the month.  Years must be four digits (and
+# the first two must be 19 or 20); 03/04/08 is not recognised.  Other
+# numbers may have leading zeroes, but they are not required.  The
+# following are handled:
+#   YYYY/MM/DD
+#   YYYY-MM-DD
+#   YYYY/MNM/DD
+#   YYYY-MNM-DD
+#   DD[th|st|rd] MNM[,] YYYY
+#   DD[th|st|rd] MNM[,]            current year assumed
+#   MNM DD[th|st|rd][,] YYYY
+#   MNM DD[th|st|rd][,]            current year assumed
+#   DD[th|st|rd]/MM[,] YYYY
+#   DD[th|st|rd]/MM/YYYY
+#   MM/DD[th|st|rd][,] YYYY
+#   MM/DD[th|st|rd]/YYYY
+# Here, MNM is at least the first three letters of a month name,
+# matched case-insensitively.  The remainder of the month name may appear but
+# its contents are irrelevant, so janissary, febrile, martial, apricot,
+# etc. are happily handled.
+#
+# Note there are only two cases that assume the current year, the
+# form "Jun 20" or "14 September" (the only two commonly occurring
+# forms, apart from a "the" in some forms of English, which isn't
+# currently supported).  Such dates will of course become ambiguous
+# in the future, so should ideally be avoided.
+#
+# Times may follow dates with a colon, e.g. 1965/07/12:09:45; this
+# is in order to provide a format with no whitespace.  A comma
+# and whitespace are allowed, e.g. "1965/07/12, 09:45".
+# Currently the order of these separators is not checked, so
+# illogical formats such as "1965/07/12, : ,09:45" will also
+# be matched.  Otherwise, a time is only recognised as being associated
+# with a date if there is only whitespace in between, or if the time
+# was embedded in the date.
+#
+# Days of the week are not scanned, but will be ignored if they occur
+# at the start of the date pattern only.
+#
+# For example, the standard date format:
+#   Fri Aug 18 17:00:48 BST 2006
+# is handled by matching HH:MM:SS and removing it together with the
+# matched (but unused) time zone.  This leaves the following:
+#   Fri Aug 18 2006
+# "Fri" is ignored and the rest is matched according to the sixth of
+# the standard rules.
+#
+# Relative times
+# ==============
+#
+# The option -r allows a relative time.  Years (or ys, yrs, or without s),
+# months (or mths, mons, mnths, months, or without s --- "m", "ms" and
+# "mns" are ambiguous and are not handled), weeks (or ws, wks, or without
+# s) and days (or ds, dys, days, or without s), hours (or hs, hrs, with or
+# without s), minutes (or mins, with or without s) and seconds (or ss,
+# secs, with or without s) are understood.  Spaces between the numbers
+# are optional, but are required between items, although a comma
+# may be used (with or without spaces).
+#
+# Note that a year here is 365.25 days and a month is 30 days.  TODO:
+# improve this by passing down base time and adjusting.  (This will
+# be crucial for events repeating monthly.)  TODO: it then makes
+# sense to make PERIODly = 1 PERIOD (also for PERIOD = dai!)
+#
+# This allows forms like:
+#   30 years 3 months 4 days 3:42:41
+#   14 days 5 hours
+#   4d,10hr
+# In this case absolute dates are ignored.
+
+emulate -L zsh
+setopt extendedglob
+
+zmodload -i zsh/datetime || return 1
+
+# separator characters before time or between time and date
+# allow , - or : before the time: this allows spaceless but still
+# relatively logical dates like 2006/09/19:14:27
+# don't allow / before time !  the above
+# is not 19 hours 14 mins and 27 seconds after anything.
+local tschars="[-,:[:space:]]"
+# start pattern for time when anchored
+local tspat_anchor="(${tschars}#)"
+# ... when not anchored
+local tspat_noanchor="(|*${tschars})"
+# separator characters between elements.  comma is fairly
+# natural punctuation; otherwise only allow whitespace.
+local schars="[.,[:space:]]"
+local daypat="${schars}#(sun|mon|tue|wed|thu|fri|sat)[a-z]#${schars}#"
+# Start pattern for date: treat , as space for simplicity.  This
+# is illogical at the start but saves lots of minor fiddling later.
+# Date start pattern when anchored at the start.
+# We need to be able to ignore the day here, although (for consistency
+# with the unanchored case) we don't remove it until later.
+# (The problem in the other case is that matching anything before
+# the day of the week is greedy, so the day of the week gets ignored
+# if it's optional.)
+local dspat_anchor="(|(#B)${daypat}(#b)${schars}#)"
+# Date start pattern when not anchored at the start.
+local dspat_noanchor="(|*${schars})"
+# end pattern for relative times: similar remark about use of $schars.
+local repat="(|s)(|${schars}*)"
+# not locale-dependent!  I don't know how to get the months out
+# of the system for the purpose of finding out where they occur.
+# We may need some completely different heuristic.
+local monthpat="(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]#"
+# days, not handled but we need to ignore them. also not localized.
+
+integer year month day hour minute second
+local opt line orig_line mname MATCH MBEGIN MEND tz
+local -a match mbegin mend
+# Flags that we found a date or a time (maybe a relative time)
+integer date_found time_found
+# Indices of positions of start and end of time and dates found.
+# These are actual character indices as zsh would normally use, i.e.
+# line[time_start,time_end] is the string for the time.
+integer time_start time_end date_start date_end
+integer anchor anchor_end debug relative reladd setvar
+
+while getopts "aAdrs" opt; do
+  case $opt in
+    (a)
+    # anchor
+    (( anchor = 1 ))
+    ;;
+
+    (A)
+    # anchor at end, too
+    (( anchor = 1, anchor_end = 1 ))
+    ;;
+
+    (d)
+    # enable debug output
+    (( debug = 1 ))
+    ;;
+
+    (r)
+    (( relative = 1 ))
+    ;;
+
+    (s)
+    (( setvar = 1 ))
+    ;;
+
+    (*)
+    return 1
+    ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+line=$1 orig_line=$1
+
+local dspat tspat
+if (( anchor )); then
+  # Anchored at the start.
+  dspat=$dspat_anchor
+  if (( relative )); then
+    tspat=$tspat_anchor
+  else
+    # We'll test later if the time is associated with the date.
+    tspat=$tspat_noanchor
+  fi
+else
+  dspat=$dspat_noanchor
+  tspat=$tspat_noanchor
+fi
+
+# Look for a time separately; we need colons for this.
+case $line in
+  # with seconds, am/pm: don't match / in front.
+  ((#ibm)${~tspat}(<0-12>):(<0-59>)[.:]((<0-59>)(.<->|))[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))(*))
+  hour=$match[2]
+  minute=$match[3]
+  second=$match[5]
+  [[ $match[7] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
+  time_found=1
+  ;;
+
+  # no seconds, am/pm
+  ((#ibm)${~tspat}(<0-12>):(<0-59>)[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))(*))
+  hour=$match[2]
+  minute=$match[3]
+  [[ $match[4] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
+  time_found=1
+  ;;
+
+  # no colon, even, but a.m./p.m. indicator
+  ((#ibm)${~tspat}(<0-12>)[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))(*))
+  hour=$match[2]
+  minute=0
+  [[ $match[3] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
+  time_found=1
+  ;;
+
+  # 24 hour clock, with seconds
+  ((#ibm)${~tspat}(<0-24>):(<0-59>)[.:]((<0-59>)(.<->|))(*))
+  hour=$match[2]
+  minute=$match[3]
+  second=$match[5]
+  time_found=1
+  ;;
+
+  # 24 hour clock, no seconds
+  ((#ibm)${~tspat}(<0-24>):(<0-59>)(*))
+  hour=$match[2]
+  minute=$match[3]
+  time_found=1
+  ;;
+esac
+
+(( hour == 24 )) && hour=0
+
+if (( time_found )); then
+  # time was found
+  time_start=$mbegin[2]
+  time_end=$mend[-2]
+  # Remove the timespec because it may be in the middle of
+  # the date (as in the output of "date".
+  # There may be a time zone, too, which we don't yet handle.
+  # (It's not in POSIX strptime() and libraries don't support it well.)
+  # This attempts to remove some of the weirder forms.
+  if [[ $line[$time_end+1,-1] = (#b)[[:space:]]#([A-Z][A-Z][A-Z]|[-+][0-9][0-9][0-9][0-9])([[:space:]]|(#e))* || \
+        $line[$time_end+1,-1] = (#b)[[:space:]]#([A-Z][A-Z][A-Z](|[-+])<0-12>)([[:space:]]|(#e))*  || \
+        $line[$time_end+1,-1] = (#b)[[:space:]]#([A-Z][A-Z][A-Z](|[-+])<0-12>[A-Z][A-Z][A-Z])([[:space:]]|(#e))* ]]; then
+     (( time_end += ${mend[-1]} ))
+     tz=$match[1]
+  fi
+  line=$line[1,time_start-1]$line[time_end+1,-1]
+  (( debug )) && print "line after time: $line"
+fi
+
+if (( relative == 0 )); then
+  # Date.
+  case $line in
+  # Look for YEAR[-/.]MONTH[-/.]DAY
+  ((#bi)${~dspat}((19|20)[0-9][0-9])[-/](<1-12>)[-/](<1-31>)*)
+  year=$match[2]
+  month=$match[4]
+  day=$match[5]
+  date_start=$mbegin[2] date_end=$mend[5]
+  date_found=1
+  ;;
+
+  # Same with month name
+  ((#bi)${~dspat}((19|20)[0-9][0-9])[-/]${~monthpat}[-/](<1-31>)*)
+  year=$match[2]
+  mname=$match[4]
+  day=$match[5]
+  date_start=$mbegin[2] date_end=$mend[5]
+  date_found=1
+  ;;
+
+  # Look for DAY[th/st/rd] MNAME[,] YEAR
+  ((#bi)${~dspat}(<1-31>)(|th|st|rd)[[:space:]]##${~monthpat}(|,)[[:space:]]##((19|20)[0-9][0-9])*)
+  day=$match[2]
+  mname=$match[4]
+  year=$match[6]
+  date_start=$mbegin[2] date_end=$mend[6]
+  date_found=1
+  ;;
+
+  # Look for MNAME DAY[th/st/rd][,] YEAR
+  ((#bi)${~dspat}${~monthpat}[[:space:]]##(<1-31>)(|th|st|rd)(|,)[[:space:]]##((19|20)[0-9][0-9])*)
+  mname=$match[2]
+  day=$match[3]
+  year=$match[6]
+  date_start=$mbegin[2] date_end=$mend[6]
+  date_found=1
+  ;;
+
+  # Look for DAY[th/st/rd] MNAME; assume current year
+  ((#bi)${~dspat}(<1-31>)(|th|st|rd)[[:space:]]##${~monthpat}(|,)([[:space:]]##*|))
+  day=$match[2]
+  mname=$match[4]
+  strftime -s year "%Y" $EPOCHSECONDS
+  date_start=$mbegin[2] date_end=$mend[5]
+  date_found=1
+  ;;
+
+  # Look for MNAME DAY[th/st/rd]; assume current year
+  ((#bi)${~dspat}${~monthpat}[[:space:]]##(<1-31>)(|th|st|rd)(|,)([[:space:]]##*|))
+  mname=$match[2]
+  day=$match[3]
+  strftime -s year "%Y" $EPOCHSECONDS
+  date_start=$mbegin[2] date_end=$mend[5]
+  date_found=1
+  ;;
+
+  # Now it gets a bit ambiguous.
+  # Look for DAY[th/st/rd][/]MONTH[/ ,]YEAR
+  ((#bi)${~dspat}(<1-31>)(|th|st|rd)/(<1-12>)((|,)[[:space:]]##|/)((19|20)[0-9][0-9])*)
+  day=$match[2]
+  month=$match[4]
+  year=$match[7]
+  date_start=$mbegin[2] date_end=$mend[7]
+  date_found=1
+  ;;
+
+  # Look for MONTH[/]DAY[th/st/rd][/ ,]YEAR
+  ((#bi)${~dspat}(<1-12>)/(<1-31>)(|th|st|rd)((|,)[[:space:]]##|/)((19|20)[0-9][0-9])*)
+  month=$match[2]
+  day=$match[3]
+  year=$match[7]
+  date_start=$mbegin[2] date_end=$mend[7]
+  date_found=1
+  ;;
+  esac
+fi
+
+if (( date_found )); then
+  # date found
+  # see if there's a day at the start
+  if [[ ${line[1,$date_start-1]} = (#bi)${~daypat} ]]; then
+    date_start=$mbegin[1]
+  fi
+  line=${line[1,$date_start-1]}${line[$date_end+1,-1]}
+  if (( time_found )); then
+    # If we found a time, it must be associated with the date,
+    # or we can't use it.  Since we removed the time from the
+    # string to find the date, however, it's complicated to
+    # know where both were found.  Reconstruct the date indices of
+    # the original string.
+    if (( time_start <= date_start )); then
+      # Time came before start of date; add length in.
+      (( date_start += time_end - time_start + 1 ))
+    fi
+    if (( time_start <= date_end )); then
+      (( date_end += time_end - time_start + 1 ))
+    fi
+
+    if (( time_end + 1 < date_start )); then
+      # If time wholly before date, OK if only separator characters
+      # in between.  (This allows some illogical stuff with commas
+      # but that's probably not important.)
+      if [[ ${orig_line[time_end+1,date_start-1]} != ${~schars}# ]]; then
+	# Clearly this can't work if anchor is set.  In principle,
+	# we could match the date and ignore the time if it wasn't.
+	# However, that seems dodgy.
+	return 1
+      else
+	# Form massaged line by removing the entire date/time chunk.
+	line="${orig_line[1,time_start-1]}${orig_line[date_end+1,-1]}"
+      fi
+    elif (( date_end + 1 < time_start )); then
+      # If date wholly before time, OK if only time separator characters
+      # in between.  This allows 2006/10/12:13:43 etc.
+      if [[ ${orig_line[date_end+1,time_start-1]} != ${~tschars}# ]]; then
+	# Here, we assume the time is associated with something later
+	# in the line.  This is pretty much inevitable for the sort
+	# of use we are expecting.  For example,
+	#   2006/10/24  Meeting from early, may go on till 12:00.
+	# or with some uses of the calendar system,
+	#   2006/10/24 MR 1 Another pointless meeting WARN 01:00
+	# The 01:00 says warn an hour before, not that the meeting starts
+	# at 1 am.  About the only safe way round would be to force
+	# a time to be present, but that's not how the traditional
+	# calendar programme works.
+	#
+	# Hence we need to reconstruct.
+	(( time_found = 0, hour = 0, minute = 0, second = 0 ))
+	line="${orig_line[1,date_start-1]}${orig_line[date_end+1,-1]}"
+      else
+	# As above.
+	line="${orig_line[1,date_start-1]}${orig_line[time_end+1,-1]}"
+      fi
+    fi
+    if (( debug )); then
+      print "Time string: $time_start,$time_end:" \
+	"'$orig_line[time_start,time_end]'"
+      print "Date string: $date_start,$date_end:" \
+	"'$orig_line[date_start,date_end]'"
+      print "Remaining line: '$line'"
+    fi
+  fi
+fi
+
+if (( relative )); then
+  if [[ $line = (#bi)${~dspat}(<->)[[:blank:]]#(y|yr|year)${~repat} ]]; then
+    (( reladd += ((365*4+1) * 24 * 60 * 60 * ${match[2]} + 1) / 4 ))
+    line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
+    time_found=1
+  fi
+  if [[ $line = (#bi)${~dspat}(<->)[[:blank:]]#(mth|mon|mnth|month)${~repat} ]]; then
+     (( reladd += 30 * 24 * 60 * 60 * ${match[2]} ))
+     line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
+     time_found=1
+  fi
+  if [[ $line = (#bi)${~dspat}(<->)[[:blank:]]#(w|wk|week)${~repat} ]]; then
+     (( reladd += 7 * 24 * 60 * 60 * ${match[2]} ))
+     line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
+     time_found=1
+  fi
+  if [[ $line = (#bi)${~dspat}(<->)[[:blank:]]#(d|dy|day)${~repat} ]]; then
+     (( reladd += 24 * 60 * 60 * ${match[2]} ))
+     line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
+     time_found=1
+  fi
+  if [[ $line = (#bi)${~dspat}(<->)[[:blank:]]#(h|hr|hour)${~repat} ]]; then
+     (( reladd += 60 * 60 * ${match[2]} ))
+     line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
+     time_found=1
+  fi
+  if [[ $line = (#bi)${~dspat}(<->)[[:blank:]]#(min|minute)${~repat} ]]; then
+     (( reladd += 60 * ${match[2]} ))
+     line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
+     time_found=1
+  fi
+  if [[ $line = (#bi)${~dspat}(<->)[[:blank:]]#(s|sec|second)${~repat} ]]; then
+     (( reladd += ${match[2]} ))
+     line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
+     time_found=1
+  fi
+fi
+
+if (( relative )); then
+  # If no date was found, we're in trouble unless we found a time.
+  if (( time_found )); then
+    if (( anchor_end )); then
+      # must be left with only separator characters
+      if [[ $line != ${~schars}# ]]; then
+	return 1
+      fi
+    fi
+    (( REPLY = reladd + (hour * 60 + minute) * 60 + second ))
+    [[ -n $setvar ]] && REPLY2=$line
+    return 0
+  fi
+  return 1
+elif (( ! date_found )); then
+  return 1
+fi
+
+if (( anchor_end )); then
+  # must be left with only separator characters
+  if [[ $line != ${~schars}# ]]; then
+    return 1
+  fi
+fi
+
+local fmt nums
+if [[ -n $mname ]]; then
+  fmt="%Y %b %d %H %M %S"
+  nums="$year $mname $day $hour $minute $second"
+else
+  fmt="%Y %m %d %H %M %S"
+  nums="$year $month $day $hour $minute $second"
+fi
+
+strftime -s REPLY -r $fmt $nums
+
+[[ -n $setvar ]] && REPLY2=$line
+
+return 0

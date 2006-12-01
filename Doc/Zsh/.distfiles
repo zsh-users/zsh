@@ -1,6 +1,6 @@
 DISTFILES_SRC='
     .cvsignore .distfiles
-    arith.yo builtins.yo compat.yo compctl.yo compsys.yo compwid.yo
+    arith.yo builtins.yo calsys.yo compat.yo compctl.yo compsys.yo compwid.yo
     cond.yo exec.yo expn.yo filelist.yo files.yo func.yo grammar.yo
     index.yo intro.yo invoke.yo jobs.yo manual.yo metafaq.yo mod_cap.yo
     mod_clone.yo mod_compctl.yo mod_complete.yo mod_complist.yo

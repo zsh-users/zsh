@@ -1,0 +1,73 @@
+# Match the age of a file, for use as a glob qualifer.  Can
+# take one or two arguments, which can be supplied by one of two
+# ways (always the same for both arguments):
+#
+#   print *(e:age 2006/10/04 2006/10/09:)
+#
+# Match all files modified between the start of those dates.
+#
+#   print *(e:age 2006/10/04)
+#
+# Match all files modified on that date.  If the second argument is
+# omitted it is taken to be exactly 24 hours after the first argument
+# (even if the first argument contains a time).
+#
+#   print *(e:age 2006/10/04:10:15 2006/10/04:10:45)
+#
+# Supply times.  All the time and formats handled by calendar_scandate
+# are allowed, but whitespace must be quoted to ensure age receives
+# the correct arguments.
+#
+#   AGEREF1=2006/10/04:10:15
+#   AGEREF2=2006/10/04:10:45
+#   print *(+age)
+#
+# The same example using the other form of argument passing.  The
+# dates stay in effect until unset, but will be overridden if
+# any argument is passed in the first format.
+
+emulate -L zsh
+integer mystat disable_stat
+
+zmodload -i zsh/stat
+# Allow the builtin stat to be hidden.
+zmodload -i zsh/parameter
+if [[ $builtins[stat] != defined ]]; then
+  (( disable_stat = 1 ))
+  enable stat
+fi
+
+autoload -U calendar_scandate
+
+local -a vals
+
+[[ -e $REPLY ]] || return 1
+stat -A vals +mtime $REPLY || return 1
+
+if (( $# >= 1 )); then
+  local AGEREF=$1
+  # if 1 argument given, never use globally defined AGEREF2
+  local AGEREF2=$2
+fi
+
+integer mtime=$vals[1] date1 date2
+local REPLY
+
+if calendar_scandate $AGEREF; then
+  date1=$REPLY
+
+  if [[ -n $AGEREF2 ]] && calendar_scandate $AGEREF2; then
+    date2=$REPLY
+  else
+    (( date2 = date1 + 24 * 60 * 60 ))
+  fi
+
+  (( date1 <= mtime && mtime <= date2 ))
+else
+  mystat=1
+fi
+
+# If the builtin stat was previously disabled, disable it again.
+(( disable_stat )) && disable stat
+
+return $mystat

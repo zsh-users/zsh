@@ -45,7 +45,7 @@ TEXI2HTML = texi2html --output . --ifinfo --split=chapter
 .SUFFIXES: .yo .1
 
 # man pages to install
-MAN = zsh.1 zshbuiltins.1 zshcompctl.1 zshcompwid.1 zshcompsys.1 \
+MAN = zsh.1 zshbuiltins.1 zshcalsys.1 zshcompctl.1 zshcompwid.1 zshcompsys.1 \
 zshcontrib.1 zshexpn.1 zshmisc.1 zshmodules.1 \
 zshoptions.1 zshparam.1 zshroadmap.1 zshtcpsys.1 zshzftpsys.1 zshzle.1 \
 zshall.1
@@ -70,6 +70,7 @@ Zsh/mod_zprof.yo Zsh/mod_zpty.yo Zsh/mod_zselect.yo \
 Zsh/mod_zutil.yo
 
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
+Zsh/calsys.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
 Zsh/contrib.yo Zsh/exec.yo Zsh/expn.yo \
 Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/manual.yo \
@@ -174,6 +175,8 @@ zsh.1 zshall.1: Zsh/intro.yo Zsh/metafaq.yo Zsh/invoke.yo Zsh/files.yo \
                 Zsh/filelist.yo Zsh/filelist.yo Zsh/seealso.yo
 
 zshbuiltins.1: Zsh/builtins.yo
+
+zshcalsys.1: Zsh/calsys.yo
 
 zshcompctl.1: Zsh/compctl.yo
 
