@@ -1,3 +1,10 @@
+2006-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22026: Src/exec.c,  Src/subst.c, Src/utils.c, Src/zsh.h,
+	Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/zle.h,
+	Src/Zle/zle_tricky.c: Incomplete fixes for using $'...'
+	quoting in completion.
+
 2006-12-01  Peter Stephenson  <pws@csr.com>
 
 	* unposted fixes for previous commit:

@@ -2309,7 +2309,7 @@ makecomplistctl(int flags)
 		    break;
 		}
 		inbackt = 0;
-		strcpy(buf, compquote);
+		strcpy(buf, *compquote == '$' ? compquote+1 : compquote);
 		autoq = buf;
 	    }
 	} else {

@@ -122,6 +122,42 @@ prefork(LinkList list, int flags)
     unqueue_signals();
 }
 
+/*
+ * Perform $'...' quoting.  The arguments are
+ *   strstart   The start of the string
+ *   pstrdpos   Initially, *pstrdpos is the position where the $ of the $'
+ *              occurs.  It will be updated to the next character after the
+ *              last ' of the $'...'.
+ * The return value is the entire allocated string from strstart on the heap.
+ * Note the original string may be modified in the process.
+ */
+/**/
+static char *
+stringsubstquote(char *strstart, char **pstrdpos)
+{
+    int len;
+    char *strdpos = *pstrdpos, *strsub, *strret;
+
+    strsub = getkeystring(strdpos+2, &len,
+			  GETKEYS_DOLLARS_QUOTE, NULL);
+    len += 2;			/* measured from strdpos */
+
+    if (strstart != strdpos) {
+	*strdpos = '\0';
+	if (strdpos[len])
+	    strret = zhtricat(strstart, strsub, strdpos + len);
+	else
+	    strret = dyncat(strstart, strsub);
+    } else if (strdpos[len])
+	strret = dyncat(strsub, strdpos + len);
+    else
+	strret = strsub;
+
+    *pstrdpos = strret + (strdpos - strstart) + strlen(strsub);
+
+    return strret;
+}
+
 /**/
 static LinkNode
 stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
@@ -150,7 +186,8 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		setdata(node, (void *) str3);
 		continue;
 	    } else if (c == Snull) {
-		str = getkeystring(str, NULL, GETKEYS_DOLLARS_QUOTE, NULL);
+		str3 = stringsubstquote(str3, &str);
+		setdata(node, (void *) str3);
 		continue;
 	    } else {
 		node = paramsubst(list, node, &str, qt, ssub);
@@ -262,22 +299,25 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
  * The remnulargs() makes this consistent with the other forms
  * of substitution, indicating that quotes have been fully
  * processed.
+ *
+ * The fully processed string is returned.
  */
 
 /**/
-void
+char *
 quotesubst(char *str)
 {
     char *s = str;
 
     while (*s) {
 	if (*s == String && s[1] == Snull) {
-	    s = getkeystring(s, NULL, GETKEYS_DOLLARS_QUOTE, NULL);
+	    str = stringsubstquote(str, &s);
 	} else {
 	    s++;
 	}
     }
     remnulargs(str);
+    return str;
 }
 
 /**/

@@ -4563,10 +4563,14 @@ ucs4toutf8(char *dest, unsigned int wval)
 
 /*
  * Decode a key string, turning it into the literal characters.
+ * The value returned is a newly allocated string from the heap.
  * The length is (usually) returned in *len.
  * how is a set of bits from the GETKEY_ values defined in zsh.h;
  * not all combinations of bits are useful.  Callers will typically
  * use one of the GETKEYS_ values which define sets of bits.
+ *
+ * The return value is unmetafied unless GETKEY_DOLLAR_QUOTE is
+ * in use.
  */
 
 /**/
@@ -4574,7 +4578,7 @@ mod_export char *
 getkeystring(char *s, int *len, int how, int *misc)
 {
     char *buf, tmp[1];
-    char *t, *u = NULL;
+    char *t, *tdest = NULL, *u = NULL, *sstart = s;
     char svchar = '\0';
     int meta = 0, control = 0;
     int i;
@@ -4591,16 +4595,42 @@ getkeystring(char *s, int *len, int how, int *misc)
 # endif
 #endif
 
+    DPUTS((how & GETKEY_UPDATE_OFFSET) &&
+	  (how & ~(GETKEY_DOLLAR_QUOTE|GETKEY_UPDATE_OFFSET)),
+	  "BUG: offset updating in getkeystring only supported with $'.");
+
     if (how & GETKEY_SINGLE_CHAR)
 	t = buf = tmp;
-    else if (!(how & GETKEY_DOLLAR_QUOTE))
+    else
 	t = buf = zhalloc(strlen(s) + 1);
-    else {
-	t = buf = s;
-	s += 2;
+    if (how & GETKEY_DOLLAR_QUOTE) {
+	/*
+	 * TODO: we're not necessarily guaranteed the output string will
+	 * be no longer than the input with \u and \U when output
+	 * characters need to be metafied: should check the maximum
+	 * length.
+	 *
+	 * We're going to unmetafy into the original string, but
+	 * to get a proper metafied input we're going to metafy
+	 * into an allocated buffer.  This is necessary if we have
+	 * \u and \U's with multiple metafied bytes.  We can't
+	 * simply remetafy the entire string because there may
+	 * be tokens (indeed, we know there are lexical nulls floating
+	 * around), so we have to be aware character by character
+	 * what we are converting.
+	 */
+	tdest = t;
+	t = s;
     }
     for (; *s; s++) {
+	char *torig = t;
 	if (*s == '\\' && s[1]) {
+	    int miscadded;
+	    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc) {
+		(*misc)++;
+		miscadded = 1;
+	    } else
+		miscadded = 0;
 	    switch (*++s) {
 	    case 'a':
 #ifdef __STDC__
@@ -4630,6 +4660,8 @@ getkeystring(char *s, int *len, int how, int *misc)
 	    case 'E':
 		if (!(how & GETKEY_EMACS)) {
 		    *t++ = '\\', s--;
+		    if (miscadded)
+			(*misc)--;
 		    continue;
 		}
 		/* FALL THROUGH */
@@ -4641,18 +4673,26 @@ getkeystring(char *s, int *len, int how, int *misc)
 		    if (s[1] == '-')
 			s++;
 		    meta = 1 + control;	/* preserve the order of ^ and meta */
-		} else
+		} else {
+		    if (miscadded)
+			(*misc)--;
 		    *t++ = '\\', s--;
+		}
 		continue;
 	    case 'C':
 		if (how & GETKEY_EMACS) {
 		    if (s[1] == '-')
 			s++;
 		    control = 1;
-		} else
+		} else {
+		    if (miscadded)
+			(*misc)--;
 		    *t++ = '\\', s--;
+		}
 		continue;
 	    case Meta:
+		if (miscadded)
+		    (*misc)--;
 		*t++ = '\\', s--;
 		break;
 	    case '-':
@@ -4670,7 +4710,17 @@ getkeystring(char *s, int *len, int how, int *misc)
 		}
 		goto def;
 	    case 'u':
+		if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc)
+		    (*misc) += 4;
 	    case 'U':
+		if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc) {
+		    (*misc) += 6;
+		    /*
+		     * We've now adjusted the offset for all the input
+		     * characters, so we need to subtract for each
+		     * byte of output below.
+		     */
+		}
 	    	wval = 0;
 		for (i=(*s == 'u' ? 4 : 8); i>0; i--) {
 		    if (*++s && idigit(*s))
@@ -4692,19 +4742,29 @@ getkeystring(char *s, int *len, int how, int *misc)
 		if (count == -1) {
 		    zerr("character not in range");
 		    if (how & GETKEY_DOLLAR_QUOTE) {
-			for (u = t; (*u++ = *++s););
+			/* HERE new convention */
+			for (u = t; (*u++ = *++s);) {
+			    if ((how & GETKEY_UPDATE_OFFSET) &&
+				s - sstart > *misc)
+				(*misc)++;
+			}
 			return t;
 		    }
 		    *t = '\0';
 		    *len = t - buf;
 		    return buf;
 		}
+		if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc)
+		    (*misc) += count;
 		t += count;
 		continue;
 # else
 #  if defined(HAVE_NL_LANGINFO) && defined(CODESET)
 		if (!strcmp(nl_langinfo(CODESET), "UTF-8")) {
-		    t += ucs4toutf8(t, wval);
+		    count = ucs4toutf8(t, wval);
+		    t += count;
+		    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc)
+			(*misc) += count;
 		    continue;
 		} else {
 #   ifdef HAVE_ICONV
@@ -4721,7 +4781,12 @@ getkeystring(char *s, int *len, int how, int *misc)
 		    if (cd == (iconv_t)-1) {
 			zerr("cannot do charset conversion");
 			if (how & GETKEY_DOLLAR_QUOTE) {
-			    for (u = t; (*u++ = *++s););
+			    /* HERE: new convention */
+			    for (u = t; (*u++ = *++s);) {
+				if ((how & GETKEY_UPDATE_OFFSET) &&
+				    s - sstart > *misc)
+				    (*misc)++;
+			    }
 			    return t;
 			}
 			*t = '\0';
@@ -4736,6 +4801,8 @@ getkeystring(char *s, int *len, int how, int *misc)
 			*len = t - buf;
 			return buf;
 		    }
+		    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc)
+			(*misc) += count;
 		    continue;
 #   else
                     zerr("cannot do charset conversion");
@@ -4775,15 +4842,20 @@ getkeystring(char *s, int *len, int how, int *misc)
 		    }
 		    s--;
 		} else {
-		    if (!(how & GETKEY_EMACS) && *s != '\\')
+		    if (!(how & GETKEY_EMACS) && *s != '\\') {
+			if (miscadded)
+			    (*misc)--;
 			*t++ = '\\';
+		    }
 		    *t++ = *s;
 		}
 		break;
 	    }
 	} else if ((how & GETKEY_DOLLAR_QUOTE) && *s == Snull) {
-	    for (u = t; (*u++ = *s++););
-	    return t + 1;
+	    /* return length to following character */
+	    *len = (s - sstart) + 1;
+	    *tdest = '\0';
+	    return buf;
 	} else if (*s == '^' && !control && (how & GETKEY_CTRL) && s[1]) {
 	    control = 1;
 	    continue;
@@ -4801,8 +4873,25 @@ getkeystring(char *s, int *len, int how, int *misc)
 
 	} else if (*s == Meta)
 	    *t++ = *++s ^ 32;
-	else
+	else {
 	    *t++ = *s;
+	    if (itok(*s)) {
+		if (meta || control) {
+		    /*
+		     * Presumably we should be using meta or control
+		     * on the character representing the token.
+		     */
+		    *s = ztokens[*s - Pound];
+		} else if (how & GETKEY_DOLLAR_QUOTE) {
+		    /*
+		     * We don't want to metafy this, it's a real
+		     * token.
+		     */
+		    *tdest++ = *s;
+		    continue;
+		}
+	    }
+	}
 	if (meta == 2) {
 	    t[-1] |= 0x80;
 	    meta = 0;
@@ -4818,18 +4907,31 @@ getkeystring(char *s, int *len, int how, int *misc)
 	    t[-1] |= 0x80;
 	    meta = 0;
 	}
-	if ((how & GETKEY_DOLLAR_QUOTE) && imeta(t[-1])) {
-	    *t = t[-1] ^ 32;
-	    t[-1] = Meta;
-	    t++;
+	if (how & GETKEY_DOLLAR_QUOTE) {
+	    char *t2;
+	    for (t2 = torig; t2 < t; t2++) {
+		if (imeta(*t2)) {
+		    *tdest++ = Meta;
+		    *tdest++ = *t2 ^ 32;
+		} else
+		    *tdest++ = *t2;
+	    }
 	}
 	if ((how & GETKEY_SINGLE_CHAR) && t != tmp) {
 	    *misc = STOUC(tmp[0]);
 	    return s + 1;
 	}
     }
-    DPUTS(how & GETKEY_DOLLAR_QUOTE, "BUG: unterminated $' substitution");
+    /*
+     * When called from completion, where we use GETKEY_UPDATE_OFFSET to
+     * update the index into the metafied editor line, we don't necessarily
+     * have the end of a $'...' quotation, else we should do.
+     */
+    DPUTS((how & (GETKEY_DOLLAR_QUOTE|GETKEY_UPDATE_OFFSET)) ==
+	  GETKEY_DOLLAR_QUOTE, "BUG: unterminated $' substitution");
     *t = '\0';
+    if (how & GETKEY_DOLLAR_QUOTE)
+	*tdest = '\0';
     if (how & GETKEY_SINGLE_CHAR)
       *misc = 0;
     else

@@ -324,13 +324,10 @@ enum suffixtype {
 };
 
 #ifdef DEBUG
-#define STRINGIFY_LITERAL(x)	# x
-#define STRINGIFY(x)		STRINGIFY_LITERAL(x)
-#define ERRMSG(x)		(__FILE__ ":" STRINGIFY(__LINE__) ": " x)
 #define METACHECK()		\
-	DPUTS(zlemetaline == NULL, ERRMSG("line not metafied"))
+	DPUTS(zlemetaline == NULL, "line not metafied")
 #define UNMETACHECK()		\
-	DPUTS(zlemetaline != NULL, ERRMSG("line metafied"))
+	DPUTS(zlemetaline != NULL, "line metafied")
 #else
 #define METACHECK()
 #define UNMETACHECK()

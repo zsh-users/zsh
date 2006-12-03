@@ -1910,7 +1910,10 @@ struct heap {
 /****************/
 
 #ifdef DEBUG
-# define DPUTS(X,Y) if (!(X)) {;} else dputs(Y)
+#define STRINGIFY_LITERAL(x)	# x
+#define STRINGIFY(x)		STRINGIFY_LITERAL(x)
+#define ERRMSG(x)		(__FILE__ ":" STRINGIFY(__LINE__) ": " x)
+# define DPUTS(X,Y) if (!(X)) {;} else dputs(ERRMSG(Y))
 #else
 # define DPUTS(X,Y)
 #endif
@@ -1971,7 +1974,13 @@ enum {
     /* Handle \- (uses misc arg to getkeystring()) */
     GETKEY_BACKSLASH_MINUS = (1 << 5),
     /* Parse only one character (len arg to getkeystring() not used) */
-    GETKEY_SINGLE_CHAR = (1 << 6)
+    GETKEY_SINGLE_CHAR = (1 << 6),
+    /*
+     * If beyond offset in misc arg, add 1 to it for each character removed.
+     * Yes, I know that doesn't seem to make much sense.
+     * It's for use in completion, comprenez?
+     */
+    GETKEY_UPDATE_OFFSET = (1 << 7)
 };
 
 /*

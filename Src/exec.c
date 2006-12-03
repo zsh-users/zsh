@@ -2905,7 +2905,7 @@ gethere(char *str, int typ)
 	    qt = 1;
 	    break;
 	}
-    quotesubst(str);
+    str = quotesubst(str);
     untokenize(str);
     if (typ == REDIR_HEREDOCDASH) {
 	strip = 1;

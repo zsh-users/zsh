@@ -522,8 +522,12 @@ parambeg(char *s)
 	       (p[2] == String || p[2] == Qstring))
 	    p += 2;
     }
-    if ((*p == String || *p == Qstring) && p[1] != Inpar && p[1] != Inbrack) {
-	/* This is really a parameter expression (not $(...) or $[...]). */
+    if ((*p == String || *p == Qstring) &&
+	p[1] != Inpar && p[1] != Inbrack && p[1] != '\'') {
+	/*
+	 * This is really a parameter expression (not $(...) or $[...]
+	 * or $'...').
+	 */
 	char *b = p + 1, *e = b;
 	int n = 0, br = 1, nest = 0;
 
@@ -1560,6 +1564,12 @@ get_comp_string(void)
 	n = tricat(qipre, q, "");
 	zsfree(qipre);
 	qipre = n;
+	/*
+	 * TODO: it's certainly the case that the suffix for
+	 * $' is ', but exactly what does that affect?
+	 */
+	if (*q == '$')
+	    q++;
 	if (sl > 1 && qtptr[sl - 1] == *qtptr) {
 	    n = tricat(q, qisuf, "");
 	    zsfree(qisuf);
@@ -1578,10 +1588,17 @@ get_comp_string(void)
         }
     }
     /* While building the quoted form, we also clean up the command line. */
-    for (p = s, i = wb, j = 0; *p; p++, i++)
-	if (inull(*p)) {
+    for (p = s, i = wb, j = 0; *p; p++, i++) {
+	int skipchars;
+	if ((*p == String || *p == Qstring) && p[1] == Snull)
+	    skipchars = 2;
+	else if (inull(*p))
+	    skipchars = 1;
+	else
+	    skipchars = 0;
+	if (skipchars) {
 	    if (i < zlemetacs)
-		offs--;
+		offs -= skipchars;
 	    if (*p == Snull && isset(RCQUOTES))
 		j = 1-j;
 	    if (p[1] || *p != Bnull) {
@@ -1591,24 +1608,29 @@ get_comp_string(void)
 		} else {
 		    ocs = zlemetacs;
 		    zlemetacs = i;
-		    foredel(1);
-		    if ((zlemetacs = ocs) > i--)
-			zlemetacs--;
-		    we--;
+		    foredel(skipchars);
+		    if ((zlemetacs = ocs) > (i -= skipchars))
+			zlemetacs -= skipchars;
+		    we -= skipchars;
 		}
 	    } else {
 		ocs = zlemetacs;
 		zlemetacs = we;
-		backdel(1);
+		backdel(skipchars);
 		if (ocs == we)
-		    zlemetacs = we - 1;
+		    zlemetacs = we - skipchars;
 		else
 		    zlemetacs = ocs;
-		we--;
+		we -= skipchars;
 	    }
-	    chuck(p--);
+	    /* we need to get rid of all the quotation bits... */
+	    while (skipchars--)
+		chuck(p);
+	    /* but we only decrement once to confuse the loop increment. */
+	    p--;
 	} else if (j && *p == '\'' && i < zlemetacs)
 	    offs--;
+    }
 
     zsfree(origword);
     origword = ztrdup(s);
@@ -1639,7 +1661,7 @@ get_comp_string(void)
 		    i += tp - p;
 		    dp += tp - p;
 		    p = tp;
-		} else {
+		} else if (p[1] != Snull /* paranoia: should be gone now */) {
 		    char *tp = p + 1;
 
 		    for (; *tp == '^' || *tp == Hat ||

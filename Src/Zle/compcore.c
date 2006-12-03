@@ -1073,24 +1073,56 @@ mod_export char *
 check_param(char *s, int set, int test)
 {
     char *p;
+    int found = 0;
 
     zsfree(parpre);
     parpre = NULL;
 
     if (!test)
 	ispar = parq = eparq = 0;
-    /* Try to find a `$'. */
-    for (p = s + offs; p > s && *p != String && *p != Qstring; p--);
-    if (*p == String || *p == Qstring) {
-	/* Handle $$'s */
+    /*
+     * Try to find a `$'.
+     *
+     * TODO: passing s as a parameter while we get some mysterious
+     * offset "offs" into it via a global sucks badly.
+     */ 
+    for (p = s + offs; ; p--) {
+	if (*p == String || *p == Qstring) {
+	    /*
+	     * String followed by Snull (unquoted) or
+	     * QString followed by ' (quoted) indicate a nested
+	     * $'...', not a substitution.
+	     *
+	     * TODO: the argument passing is obscure, no idea if
+	     * it's safe to test for the "'" at the end.
+	     */
+	    if (p < s + offs &&
+		!(*p == String && p[1] == Snull) &&
+		!(*p == Qstring && p[1] == '\'')) {
+		found = 1;
+		break;
+	    }
+	}
+	if (p == s)
+	    break;
+    }
+    if (found) {
+	/*
+	 * Handle $$'s
+	 *
+	 * TODO: this is already bad enough, so I haven't tried
+	 * testing for $'...' here.  If we parsed this forwards
+	 * it wouldn't be quite so bad.
+	 */
 	while (p > s && (p[-1] == String || p[-1] == Qstring))
 	    p--;
 	while ((p[1] == String || p[1] == Qstring) &&
 	       (p[2] == String || p[2] == Qstring))
 	    p += 2;
     }
-    if ((*p == String || *p == Qstring) && p[1] != Inpar && p[1] != Inbrack) {
-	/* This is really a parameter expression (not $(...) or $[...]). */
+    if (found &&
+	p[1] != Inpar && p[1] != Inbrack && p[1] != Snull) {
+	/* This is a parameter expression, not $(...), $[...], $'...'. */
 	char *b = p + 1, *e = b, *ie;
 	int n = 0, br = 1, nest = 0;
 
@@ -1268,6 +1300,17 @@ ctokenize(char *p)
     return r;
 }
 
+
+/*
+ * This function reconstructs the full completion argument in
+ * heap memory by concatenating and, if untok is non-zero, untokenizing
+ * the ignored prefix and the active prefix and suffix.
+ * (It appears from the function that the ignored prefix won't
+ * be tokenized but I haven't checked this.)
+ * ipl and/or pl may be passed and if so will be set to the ignored
+ * prefix length and active prefix length respectively.
+ */
+
 /**/
 mod_export char *
 comp_str(int *ipl, int *pl, int untok)
@@ -1329,15 +1372,94 @@ comp_quoting_string(int stype)
 int
 set_comp_sep(void)
 {
+    /*
+     * s: full (reconstructed) completion argument
+     * lip: ignored prefix length
+     * lp: active prefix length
+     * 1: the number "one" => untokenize
+     */
     int lip, lp;
     char *s = comp_str(&lip, &lp, 1);
     LinkList foo = newlinklist();
     LinkNode n;
-    int owe = we, owb = wb, ocs, swb, swe, scs, soffs, ne = noerrs;
-    int tl, got = 0, i = 0, j, cur = -1, oll, sl, css = 0;
-    int remq = 0, dq = 0, odq, sq = 0, osq, issq = 0, sqq = 0, lsq = 0, qa = 0;
+    /* Save word position */
+    int owe = we, owb = wb;
+    /* Save cursor position and line length */
+    int ocs, oll;
+    /*
+     * Values of word beginning and end and cursor after subtractions
+     * due to separators.   I think these are indexes into zlemetaline,
+     * but with some subtractions; they don't see to be indexes into
+     * s, which is the current argument before quote stripping.
+     */
+    int swb, swe, scs;
+    /* Offset into current word after subtractions. */
+    int soffs;
+    /* Current state of error suppression. */
+    int ne = noerrs;
+    /* Length of tmp string */
+    int tl;
+    /* flag that we've got the current completion word, perhaps? */
+    int got = 0;
+    /*
+     * i starts off as the number of the completion word we're looking at,
+     * which is why it's initialised, but is then recycled as a
+     * loop variable.  j is always a loop variable.
+     */
+    int i = 0, j;
+    /*
+     * cur: completion word currently being completed (0 offset).
+     * sl: length of string s, the string we're manipulating.
+     * css: modification of offset into current word beyond cursor
+     * position due to the effects of backslashing, counted during our first
+     * examination of compqstack for double quotes and dollar quotes.
+     * However, for some reason, when the current quoting scheme is
+     * backslashing we modify swb directly later rather than counting it at
+     * the point we remove the backquotes.
+     */
+    int cur = -1, sl, css = 0;
+    /*
+     * Flag that we're doing the thing with backslashes mentioned
+     * for css.
+     */
+    int remq = 0;
+    /*
+     * dq: backslash-removals for double quotes
+     * odq: value of dq before modification for active (Bnull'ed)
+     *      backslashes, or something.
+     * sq: quote-removals for single quotes; either RCQUOTES or '\'' which
+     *     are specially handled (but currently only if RCQUOTES is not
+     *     set, which isn't necessarily correct if the quotes were typed by
+     *     the user).
+     * osq: c.f. odq, taking account of Snull's and embeded "'"'s.
+     * issq: flag that current quoting is single quotes; I assume that
+     *       civilization would end if we used a consistent way of
+     *       flagging the different types of quotes, or something.
+     * lsq: when quoting is single quotes (issq), counts the offset
+     *      adjustment needed in the word being examined in the lexer loop.
+     * sqq: the value of lsq for the current completion word.
+     * qa:  not, unfortunately, a question and answer session with the
+     *      original author, but the number of characters being removed
+     *      when stripping single quotes: 1 for RCQUOTES, 3 otherwise
+     *      (because we leave a "'" in the final string).
+     */
+    int dq = 0, odq, sq = 0, osq, issq = 0, sqq = 0, lsq = 0, qa = 0;
+    /* dolq: like sq and dq but for dollars quoting. */
+    int dolq = 0;
+    /* remember some global variable values (except lp is local) */
     int ois = instring, oib = inbackt, noffs = lp, ona = noaliases;
-    char *tmp, *p, *ns, *ol, sav, *qp, *qs, *ts;
+    /*
+     * tmp: used for temporary processing of strings
+     * p: loop pointer for tmp etc.
+     * ns: holds yet another version of the current completion string,
+     *     goodness knows how it differs from s, tmp, ts, ...
+     * ts: untokenized ns
+     * ol: saves old metafied editing line
+     * sav: save character when NULLed; careful, there's a nested
+     *      definition of sav just to keep you on your toes
+     * qp, qs: prefix and suffix strings deduced from s.
+     */
+    char *tmp, *p, *ns, *ts, *ol, sav, *qp, *qs;
 
     METACHECK();
 
@@ -1366,7 +1488,7 @@ set_comp_sep(void)
     switch (*compqstack) {
     case QT_NONE:
 #ifdef DEBUG
-	dputs("BUG: head of compstack is NULL");
+	dputs("BUG: head of compqstack is NULL");
 #endif
 	break;
 
@@ -1386,10 +1508,20 @@ set_comp_sep(void)
 
     case QT_DOUBLE:
         for (j = 0, p = tmp; *p; p++, j++)
-            if (*p == '\\' && p[1] == '\\') {
-                dq++;
+	    /*
+	     * I added the handling for " here: before it just handled
+	     * backslashes.  This meant that a \" inside a " wasn't
+	     * handled properly.  I presume that was an oversight.
+	     * I don't know if this is the right place to fix this
+	     * particular problem because I'm utterly confused by
+	     * the structure of the code in this function.
+	     */
+            if (*p == '\\' && (p[1] == '\\' || p[1] == '"')) {
+		dq++;
                 chuck(p);
-                if (j > zlemetacs) {
+		if (*p == '"')
+		    zlemetacs--;
+		else if (j > zlemetacs) {
                     zlemetacs++;
                     css++;
                 }
@@ -1399,7 +1531,15 @@ set_comp_sep(void)
 	break;
 
     case QT_DOLLARS:
-	/* TODO */
+	sl = strlen(tmp);
+	j = zlemetacs;
+	tmp = getkeystring(tmp, &tl,
+			   GETKEY_DOLLAR_QUOTE|GETKEY_UPDATE_OFFSET,
+			   &zlemetacs);
+	/* The number of characters we removed because of $' quoting */
+	dolq = sl - tl;
+	/* Offset into the word is modified, too... */
+	css += zlemetacs - j;
 	break;
     }
     odq = dq;
@@ -1416,6 +1556,12 @@ set_comp_sep(void)
 
 	    if (!tokstr)
 		break;
+	    /*
+	     * If there was an error, it may be because we're in
+	     * an unterminated string.  Count the active quote
+	     * characters to see.  We need an odd number.
+	     * This works for $', too, since the ' there is an Snull.
+	     */
 	    for (j = 0, p = tokstr; *p; p++) {
 		if (*p == Snull || *p == Dnull)
 		    j++;
@@ -1456,8 +1602,8 @@ set_comp_sep(void)
 	    DPUTS(!p, "no current word in substr");
 	    got = 1;
 	    cur = i;
-	    swb = wb - 1 - dq - sq;
-	    swe = we - 1 - dq - sq;
+	    swb = wb - 1 - dq - sq - dolq;
+	    swe = we - 1 - dq - sq - dolq;
             sqq = lsq;
 	    soffs = zlemetacs - swb - css;
 	    chuck(p + soffs);
@@ -1524,6 +1670,18 @@ set_comp_sep(void)
 	zsfree(autoq);
 	autoq = NULL;
     }
+
+    /*
+     * In the following loop we look for parse quotes yet again.
+     * I don't really have the faintest idea why, but given that
+     * ns is immediately reassigned from ts afterwards (why? what's
+     * wrong with it being in ts?) and scs isn't used again, I
+     * presume it's in aid of getting the indexes for word beginning
+     * (swb) and start offset (soffs) into s correct.
+     *
+     * I think soffs is an index into s, while swb and scs are indexes
+     * into the full line but with some jiggery pokery for quote removal.
+     */
     for (p = ns, i = swb; *p; p++, i++) {
 	if (inull(*p)) {
 	    if (i < scs) {
@@ -1560,7 +1718,22 @@ set_comp_sep(void)
 	if (ql > rl)
 	    swb -= ql - rl;
     }
-    sav = s[(i = swb - 1 - sqq)];
+    /*
+     * Using the word beginning and end as an index into the reconstructed
+     * string s, swb and swe, we can get the strings before and after
+     * the word we're considering.
+     *
+     * Because it would be too easy otherwise, there are random
+     * additional subtractions to be made.  The 1 might be something
+     * to do with the space that appeared mysteriously at the start of the
+     * line when we passed it through the lexer.  The sqq is to do with
+     * the single quote quoting when we passed it through the lexer.
+     *
+     * TODO: I added the "+ dq" because it seemed to improve matters for
+     * double quoting but the fact it's arrived at in a rather different way
+     * from sqq may indicate this is wrong.  $'...' may need something, too.
+     */
+    sav = s[(i = swb - 1 - sqq + dq)];
     s[i] = '\0';
     qp = (issq ? dupstring(s) : rembslash(s));
     s[i] = sav;
@@ -1583,12 +1756,12 @@ set_comp_sep(void)
     }
     {
 	int set = CP_QUOTE | CP_QUOTING, unset = 0;
-	char compnewchars[2];
 
-	compnewchars[0] =
-	    (char)(instring == QT_NONE ? QT_BACKSLASH : instring);
-	compnewchars[1] = '\0';
-	p = tricat(compnewchars, compqstack, "");
+	tl = strlen(compqstack);
+	p = zalloc(tl + 2);
+	*p = (char)(instring == QT_NONE ? QT_BACKSLASH : instring);
+	memcpy(p+1, compqstack, tl);
+	p[tl+1] = '\0';
 	zsfree(compqstack);
 	compqstack = p;
 
@@ -1898,7 +2071,7 @@ addmatches(Cadata dat, char **argv)
 		break;
 	    }
 	    inbackt = 0;
-	    autoq = multiquote(compquote, 1);
+	    autoq = multiquote(*compquote == '$' ? compquote+1 : compquote, 1);
 	}
     } else {
 	instring = QT_NONE;
