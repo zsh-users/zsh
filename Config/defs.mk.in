@@ -73,6 +73,7 @@ YODL            = @YODL@
 YODL2TXT        = $(YODL)2txt
 YODL2HTML       = $(YODL)2html
 PDFETEX		= @PDFETEX@
+TEXI2PDF	= @TEXI2PDF@
 
 # install utility
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
