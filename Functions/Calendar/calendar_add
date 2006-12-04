@@ -14,7 +14,7 @@ local calendar newfile REPLY lastline
 local -a calendar_entries lockfiles
 integer newdate done rstat
 
-autoload -U calendar_{read,lockfiles}
+autoload -U calendar_{read,lockfiles,scandate}
 
 # Read the calendar file from the calendar-file style
 zstyle -s ':datetime:calendar_add:' calendar-file calendar ||

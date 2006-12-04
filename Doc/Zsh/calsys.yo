@@ -172,8 +172,17 @@ in the list above.  Otherwise, a time is only recognised as being
 associated with a date if there is only whitespace in between, or if the
 time was embedded in the date.
 
-Days of the week are not scanned, but will be ignored if they occur
-at the start of the date pattern only.
+Days of the week are not normally scanned, but will be ignored if they
+occur at the start of the date pattern only.  However, in contexts where it
+is useful to specify dates relative to today, days of the week with no
+other date specification may be given.  The day is assumed to be either
+today or within the past week.  Likewise, the words tt(yesterday),
+tt(today) and tt(tomorrow) are handled.  All matches are case-insensitive.
+Hence if today is Monday, then tt(Sunday) is equivalent to tt(yesterday),
+tt(Monday) is equivalent to tt(today), but tt(Tuesday) gives a date six
+days ago.  This is not generally useful within the calendar file.
+Dates in this format may be combined with a time specification; for
+example tt(Tomorrow, 8 p.m.).
 
 For example, the standard date format:
 
@@ -379,7 +388,20 @@ directly as command or arguments, or separately as shell parameters.
 example(print *+LPAR()e:age 2006/10/04 2006/10/09:+RPAR())
 
 The example above matches all files modified between the start of those
-dates.
+dates.  The second argument may alternatively be a relative time
+introduced by a tt(PLUS()):
+
+example(print *+LPAR()e:age 2006/10/04 +5d:+RPAR())
+
+The example above is equivalent to the previous example.
+
+In addition to the special use of days of the week, tt(today) and
+tt(yesterday), times with no date may be specified; these apply to today.
+Obviously such uses become problematic around midnight.
+
+example(print *+LPAR()e-age 12:00 13:30-+RPAR())
+
+The example above shows files modified between 12:00 and 13:00 today.
 
 example(print *+LPAR()e:age 2006/10/04:+RPAR())
 
@@ -508,6 +530,11 @@ In addition to setting tt(REPLY), set tt(REPLY2) to the remainder of
 the argument after the date and time have been stripped.  This is
 empty if the option tt(-A) was given.
 )
+item(tt(-t))(
+Allow a time with no date specification.  The date is assumed to be
+today.  The behaviour is unspecified if the iron tongue of midnight
+is tolling twelve.
+)
 enditem()
 )
 )
@@ -526,7 +553,7 @@ command tt(xmessage) to display a window with the event details.
 )
 enditem()
 
-texinode(Calendar Bugs)(Calendar Utility Functions)()(Calendar Function System)
+texinode(Calendar Bugs)()(Calendar Utility Functions)(Calendar Function System)
 sect(Bugs)
 
 There is no tt(calendar_delete) function.

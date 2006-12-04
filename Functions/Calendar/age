@@ -55,11 +55,18 @@ fi
 integer mtime=$vals[1] date1 date2
 local REPLY
 
-if calendar_scandate $AGEREF; then
+# allow a time only (meaning today)
+if calendar_scandate -t $AGEREF; then
   date1=$REPLY
 
-  if [[ -n $AGEREF2 ]] && calendar_scandate $AGEREF2; then
-    date2=$REPLY
+  if [[ -n $AGEREF2 ]]; then
+    if [[ $AGEREF2 = +* ]]; then
+      calendar_scandate -rt $AGEREF2[2,-1] || return 1
+      (( date2 = date1 + REPLY ))
+    else
+      calendar_scandate -t $AGEREF2 || return 1
+      date2=$REPLY
+    fi
   else
     (( date2 = date1 + 24 * 60 * 60 ))
   fi

@@ -1,3 +1,13 @@
+2006-12-04  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/calsys.yo, Functions/Calendar/age,
+	Functions/Calendar/calendar_add,
+	Functions/Calendar/calendar_scandate: autoload missing in
+	calendar_add; add some date shortcuts for the use of age.
+
+	* 23027: Vin Shelton: Doc/Zsh/calsys.yo: texinfo links were
+	reversed.
+
 2006-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 22026: Src/exec.c,  Src/subst.c, Src/utils.c, Src/zsh.h,

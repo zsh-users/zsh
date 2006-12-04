@@ -161,6 +161,7 @@ local daypat="${schars}#(sun|mon|tue|wed|thu|fri|sat)[a-z]#${schars}#"
 # the day of the week is greedy, so the day of the week gets ignored
 # if it's optional.)
 local dspat_anchor="(|(#B)${daypat}(#b)${schars}#)"
+local dspat_anchor_noday="(|${schars}#)"
 # Date start pattern when not anchored at the start.
 local dspat_noanchor="(|*${schars})"
 # end pattern for relative times: similar remark about use of $schars.
@@ -171,18 +172,20 @@ local repat="(|s)(|${schars}*)"
 local monthpat="(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]#"
 # days, not handled but we need to ignore them. also not localized.
 
-integer year month day hour minute second
+integer year month day hour minute second then
 local opt line orig_line mname MATCH MBEGIN MEND tz
 local -a match mbegin mend
 # Flags that we found a date or a time (maybe a relative time)
 integer date_found time_found
+# Flag that it's OK to have a time only
+integer time_ok
 # Indices of positions of start and end of time and dates found.
 # These are actual character indices as zsh would normally use, i.e.
 # line[time_start,time_end] is the string for the time.
 integer time_start time_end date_start date_end
 integer anchor anchor_end debug relative reladd setvar
 
-while getopts "aAdrs" opt; do
+while getopts "aAdrst" opt; do
   case $opt in
     (a)
     # anchor
@@ -207,6 +210,10 @@ while getopts "aAdrs" opt; do
     (( setvar = 1 ))
     ;;
 
+    (t)
+    (( time_ok = 1 ))
+    ;;
+
     (*)
     return 1
     ;;
@@ -216,10 +223,11 @@ shift $(( OPTIND - 1 ))
 
 line=$1 orig_line=$1
 
-local dspat tspat
+local dspat dspat_noday tspat
 if (( anchor )); then
   # Anchored at the start.
   dspat=$dspat_anchor
+  dspat_noday=$dspat_anchor_noday
   if (( relative )); then
     tspat=$tspat_anchor
   else
@@ -228,6 +236,7 @@ if (( anchor )); then
   fi
 else
   dspat=$dspat_noanchor
+  dspat_noday=$dspat_noanchor
   tspat=$tspat_noanchor
 fi
 
@@ -370,70 +379,132 @@ if (( relative == 0 )); then
   date_start=$mbegin[2] date_end=$mend[7]
   date_found=1
   ;;
+
+  # Look for WEEKDAY
+  ((#bi)${~dspat_noday}(${~daypat})*)
+  integer wday_now wday
+  local wdaystr=${(L)match[3]}
+  date_start=$mbegin[2] date_end=$mend[2]
+
+  # Find the day number.
+  local -a wdays
+  # This is the ordering of %w in strtfime (zero-offset).
+  wdays=(sun mon tue wed thu fri sat sun)
+  (( wday = ${wdays[(i)$wdaystr]} - 1 ))
+
+  # Find the date for that day.
+  (( then = EPOCHSECONDS ))
+  strftime -s wday_now "%w" $then
+  # Day is either today or in the past.
+  (( wday_now < wday )) && (( wday_now += 7 ))
+  (( then -= (wday_now - wday) * 24 * 60 * 60 ))
+  strftime -s year "%Y" $then
+  strftime -s month "%m" $then
+  strftime -s day "%d" $then
+  date_found=1
+  ;;
+
+  # Look for "today", "yesterday", "tomorrow"
+  ((#bi)${~dspat_noday}(yesterday|today|tomorrow)(|${schars})*)
+  (( then = EPOCHSECONDS ))
+  case ${(L)match[2]} in
+    (yesterday)
+    (( then -= 24 * 60 * 60 ))
+    ;;
+
+    (tomorrow)
+    (( then += 24 * 60 * 60 ))
+    ;;
+  esac
+  strftime -s year "%Y" $then
+  strftime -s month "%m" $then
+  strftime -s day "%d" $then
+  date_start=$mbegin[2] date_end=$mend[2]
+  date_found=1
+  ;;
   esac
 fi
 
-if (( date_found )); then
+if (( date_found || (time_ok && time_found) )); then
   # date found
   # see if there's a day at the start
-  if [[ ${line[1,$date_start-1]} = (#bi)${~daypat} ]]; then
-    date_start=$mbegin[1]
+  if (( date_found )); then
+    if [[ ${line[1,$date_start-1]} = (#bi)${~daypat} ]]; then
+	    date_start=$mbegin[1]
+    fi
+    line=${line[1,$date_start-1]}${line[$date_end+1,-1]}
   fi
-  line=${line[1,$date_start-1]}${line[$date_end+1,-1]}
   if (( time_found )); then
-    # If we found a time, it must be associated with the date,
-    # or we can't use it.  Since we removed the time from the
-    # string to find the date, however, it's complicated to
-    # know where both were found.  Reconstruct the date indices of
-    # the original string.
-    if (( time_start <= date_start )); then
-      # Time came before start of date; add length in.
-      (( date_start += time_end - time_start + 1 ))
-    fi
-    if (( time_start <= date_end )); then
-      (( date_end += time_end - time_start + 1 ))
-    fi
+    if (( date_found )); then
+      # If we found a time, it must be associated with the date,
+      # or we can't use it.  Since we removed the time from the
+      # string to find the date, however, it's complicated to
+      # know where both were found.  Reconstruct the date indices of
+      # the original string.
+      if (( time_start <= date_start )); then
+	# Time came before start of date; add length in.
+	(( date_start += time_end - time_start + 1 ))
+      fi
+      if (( time_start <= date_end )); then
+	(( date_end += time_end - time_start + 1 ))
+      fi
 
-    if (( time_end + 1 < date_start )); then
-      # If time wholly before date, OK if only separator characters
-      # in between.  (This allows some illogical stuff with commas
-      # but that's probably not important.)
-      if [[ ${orig_line[time_end+1,date_start-1]} != ${~schars}# ]]; then
-	# Clearly this can't work if anchor is set.  In principle,
-	# we could match the date and ignore the time if it wasn't.
-	# However, that seems dodgy.
+      if (( time_end + 1 < date_start )); then
+	# If time wholly before date, OK if only separator characters
+	# in between.  (This allows some illogical stuff with commas
+	# but that's probably not important.)
+	if [[ ${orig_line[time_end+1,date_start-1]} != ${~schars}# ]]; then
+	  # Clearly this can't work if anchor is set.  In principle,
+	  # we could match the date and ignore the time if it wasn't.
+	  # However, that seems dodgy.
+	  return 1
+	else
+	  # Form massaged line by removing the entire date/time chunk.
+	  line="${orig_line[1,time_start-1]}${orig_line[date_end+1,-1]}"
+	fi
+      elif (( date_end + 1 < time_start )); then
+	# If date wholly before time, OK if only time separator characters
+	# in between.  This allows 2006/10/12:13:43 etc.
+	if [[ ${orig_line[date_end+1,time_start-1]} != ${~tschars}# ]]; then
+	  # Here, we assume the time is associated with something later
+	  # in the line.  This is pretty much inevitable for the sort
+	  # of use we are expecting.  For example,
+	  #   2006/10/24  Meeting from early, may go on till 12:00.
+	  # or with some uses of the calendar system,
+	  #   2006/10/24 MR 1 Another pointless meeting WARN 01:00
+	  # The 01:00 says warn an hour before, not that the meeting starts
+	  # at 1 am.  About the only safe way round would be to force
+	  # a time to be present, but that's not how the traditional
+	  # calendar programme works.
+	  #
+	  # Hence we need to reconstruct.
+	  (( time_found = 0, hour = 0, minute = 0, second = 0 ))
+	  line="${orig_line[1,date_start-1]}${orig_line[date_end+1,-1]}"
+	else
+	  # As above.
+	  line="${orig_line[1,date_start-1]}${orig_line[time_end+1,-1]}"
+	fi
+      fi
+    else
+      # Time only.
+      # We didn't test anchors for time originally, since it
+      # might have been embedded in the date.  If there's no date,
+      # we need to test specially.
+      if (( anchor )) &&
+	[[ ${orig_line[1,time_start-1]} != ${~tschars}# ]]; then
+	# Anchor at start failed.
 	return 1
-      else
-	# Form massaged line by removing the entire date/time chunk.
-	line="${orig_line[1,time_start-1]}${orig_line[date_end+1,-1]}"
       fi
-    elif (( date_end + 1 < time_start )); then
-      # If date wholly before time, OK if only time separator characters
-      # in between.  This allows 2006/10/12:13:43 etc.
-      if [[ ${orig_line[date_end+1,time_start-1]} != ${~tschars}# ]]; then
-	# Here, we assume the time is associated with something later
-	# in the line.  This is pretty much inevitable for the sort
-	# of use we are expecting.  For example,
-	#   2006/10/24  Meeting from early, may go on till 12:00.
-	# or with some uses of the calendar system,
-	#   2006/10/24 MR 1 Another pointless meeting WARN 01:00
-	# The 01:00 says warn an hour before, not that the meeting starts
-	# at 1 am.  About the only safe way round would be to force
-	# a time to be present, but that's not how the traditional
-	# calendar programme works.
-	#
-	# Hence we need to reconstruct.
-	(( time_found = 0, hour = 0, minute = 0, second = 0 ))
-	line="${orig_line[1,date_start-1]}${orig_line[date_end+1,-1]}"
-      else
-	# As above.
-	line="${orig_line[1,date_start-1]}${orig_line[time_end+1,-1]}"
-      fi
+      strftime -s year "%Y" $EPOCHSECONDS
+      strftime -s month "%m" $EPOCHSECONDS
+      strftime -s day "%d" $EPOCHSECONDS
+      # Date now handled.
+      (( date_found = 1 ))
     fi
     if (( debug )); then
       print "Time string: $time_start,$time_end:" \
 	"'$orig_line[time_start,time_end]'"
-      print "Date string: $date_start,$date_end:" \
+      (( date_ok )) && print "Date string: $date_start,$date_end:" \
 	"'$orig_line[date_start,date_end]'"
       print "Remaining line: '$line'"
     fi
