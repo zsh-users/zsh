@@ -4292,9 +4292,17 @@ quotestring(const char *s, char **e, int instring)
 		if (!*u)
 		    u--;
 		continue;
-	    }
-	    else if ((*u == String || *u == Qstring) &&
-		     (u[1] == Inpar || u[1] == Inbrack || u[1] == Inbrace)) {
+	    } else if ((*u == Qstring || *u == '$') && u[1] == '\'' &&
+		       instring == QT_DOUBLE) {
+		/*
+		 * We don't need to quote $'...' inside a double-quoted
+		 * string.  This is largely cosmetic; it looks neater
+		 * if we don't but it doesn't do any harm since the
+		 * \ is stripped.
+		 */
+		*v++ = *u++;
+	    } else if ((*u == String || *u == Qstring) &&
+		       (u[1] == Inpar || u[1] == Inbrack || u[1] == Inbrace)) {
 		char c = (u[1] == Inpar ? Outpar : (u[1] == Inbrace ?
 						    Outbrace : Outbrack));
 		char beg = *u;

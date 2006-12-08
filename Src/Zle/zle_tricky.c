@@ -1032,6 +1032,16 @@ static int
 has_real_token(const char *s)
 {
     while (*s) {
+	/*
+	 * Special action required for $' strings, which
+	 * need to be treated like nulls.
+	 */
+	if ((*s == Qstring && s[1] == '\'') ||
+	    (*s == String && s[1] == Snull))
+	{
+	    s += 2;
+	    continue;
+	}
 	if (itok(*s) && !inull(*s))
 	    return 1;
 	s++;

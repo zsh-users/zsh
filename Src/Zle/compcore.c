@@ -1653,6 +1653,7 @@ set_comp_sep(void)
 	    instring = QT_DOLLARS;
 	    nsptr++;
 	    tsptr++;
+	    swb++;
 	    break;
 	}
 
