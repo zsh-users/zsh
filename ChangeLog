@@ -1,3 +1,10 @@
+2006-12-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* based on 23038: Completion/Unix/Command/_webbrowser,
+	Completion/X/Command/_mozilla: remove firefox from _webbrowser,
+	it's handled by Completion/X/Command/_mozilla; add some
+	firefox-specific options.
+
 2006-12-08  Clint Adams  <clint@zsh.org>
 
 	* 23039: Completion/X/Command/_mozilla: handle iceweasel as

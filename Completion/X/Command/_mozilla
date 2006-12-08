@@ -9,7 +9,22 @@ local -a mozopts
 if [[ $service = *remote* ]]; then
   state=remote
 else
-  if [[ $service != *firefox* ]]; then
+  if [[ $service = *firefox* ]]; then
+    mozopts=(
+    '-browser[open browser window]' \
+    '-console[start with debugging console]' \
+    '-h[output help message]' \
+    '-help[output help message]' \
+    '-inspector[start with DOM Inspector]:URL to inspect:->location' \
+    '-install-global-extension[install an extension]:extension to install:_files' \
+    '-new-window[load URL in new window]:URL to load:->location' \
+    '-new-tab[load URL in new tab]:URL to load:->location' \
+    '-no-remote[run with multiple profiles]' \
+    '-profile[specify profile file]:profile file:_files' \
+    '-v[show version]' \
+    '-version[show version]' \
+    )
+  else
     mozopts=(
       "($popts)-installer[start with 4.x migration window]"
       "($popts)-CreateProfile:profile"
