@@ -1,4 +1,4 @@
-#compdef mozilla mozilla-firefox mozilla-xremote-client firefox
+#compdef mozilla mozilla-firefox mozilla-xremote-client firefox iceweasel=firefox
 
 local curcontext="$curcontext" state line expl ret=1 suf
 typeset -A opt_args
