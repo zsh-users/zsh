@@ -1,3 +1,12 @@
+2006-12-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unpost: Doc/Zsh/zle.yo: documentation for CUTBUFFER and killring
+	ought to be more explicit about their connection.
+
+	* 23044: Src/builtin.c: print -c/-C is yet another version
+	of print no one bothered to fix up to handle unmetafication
+	properly.
+
 2006-12-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* based on 23038: Completion/Unix/Command/_webbrowser,

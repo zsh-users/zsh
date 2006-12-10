@@ -3603,6 +3603,13 @@ bin_print(char *name, char **args, Options ops, int func)
     }
 
     /* -o and -O -- sort the arguments */
+    /*
+     * TODO: this appears to be yet another of the endless
+     * chunks of code that didn't get fixed up properly
+     * to reflect the fact that args contains unmetafied
+     * strings that may contain NULs with the lengths in
+     * len.
+     */
     if (OPT_ISSET(ops,'o')) {
 	if (fmt && !*args) return 0;
 	if (OPT_ISSET(ops,'i'))
@@ -3624,7 +3631,6 @@ bin_print(char *name, char **args, Options ops, int func)
     /* -c -- output in columns */
     if (!fmt && (OPT_ISSET(ops,'c') || OPT_ISSET(ops,'C'))) {
 	int l, nc, nr, sc, n, t, i;
-	char **ap;
 
 	if (OPT_ISSET(ops,'C')) {
 	    char *eptr, *argptr = OPT_ARG(ops,'C');
@@ -3647,13 +3653,12 @@ bin_print(char *name, char **args, Options ops, int func)
 
 	    /*
 	     * i: loop counter
-	     * ap: array iterator
 	     * l: maximum length seen
 	     *
 	     * Ignore lengths in last column since they don't affect
 	     * the separation.
 	     */
-	    for (i = l = 0, ap = args; *ap; ap++, i++) {
+	    for (i = l = 0; i < argc; i++) {
 		if (OPT_ISSET(ops, 'a')) {
 		    if ((i % nc) == nc - 1)
 			continue;
@@ -3661,8 +3666,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		    if (i >= nr * (nc - 1))
 			break;
 		}
-		if (l < (t = strlen(*ap)))
-		    l = t;
+		if (l < len[i])
+		    l = len[i];
 	    }
 	    sc = l + 2;
 	}
@@ -3670,12 +3675,11 @@ bin_print(char *name, char **args, Options ops, int func)
 	{
 	    /*
 	     * n: loop counter
-	     * ap: array iterator
 	     * l: maximum length seen
 	     */
-	    for (n = l = 0, ap = args; *ap; ap++, n++)
-		if (l < (t = strlen(*ap)))
-		    l = t;
+	    for (n = l = 0; n < argc; n++)
+		if (l < len[n])
+		    l = len[n];
 
 	    /*
 	     * sc: column width
@@ -3689,31 +3693,31 @@ bin_print(char *name, char **args, Options ops, int func)
 	}
 
 	if (OPT_ISSET(ops,'a'))	/* print across, i.e. columns first */
-	    ap = args;
+	    n = 0;
 	for (i = 0; i < nr; i++) {
 	    if (OPT_ISSET(ops,'a'))
 	    {
 		int ic;
-		for (ic = 0; ic < nc && *ap; ic++, ap++)
+		for (ic = 0; ic < nc && n < argc; ic++, n++)
 		{
-		    l = strlen(*ap);
-		    fprintf(fout, "%s", *ap);
-		    if (*ap)
+		    l = len[n];
+		    fwrite(args[n], l, 1, fout);
+		    if (n < argc)
 			for (; l < sc; l++)
 			    fputc(' ', fout);
 		}
 	    }
 	    else
 	    {
-		ap = args + i;
+		n = i;
 		do {
-		    l = strlen(*ap);
-		    fprintf(fout, "%s", *ap);
-		    for (t = nr; t && *ap; t--, ap++);
-		    if (*ap)
+		    l = len[n];
+		    fwrite(args[n], l, 1, fout);
+		    for (t = nr; t && n < argc; t--, n++);
+		    if (n < argc)
 			for (; l < sc; l++)
 			    fputc(' ', fout);
-		} while (*ap);
+		} while (n < argc);
 	    }
 	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);
 	}

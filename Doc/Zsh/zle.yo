@@ -662,7 +662,8 @@ cursor being moved to the appropriate end of the buffer.
 vindex(CUTBUFFER)
 item(tt(CUTBUFFER) (scalar))(
 The last item to be cut using one of the `tt(kill-)' commands; the
-string which the next yank would insert in the line.
+string which the next yank would insert in the line.  Later entries in
+the kill ring are in the array tt(killring).
 )
 vindex(HISTNO)
 item(tt(HISTNO) (integer))(
@@ -686,7 +687,8 @@ vindex(killring)
 item(tt(killring) (array))(
 The array of previously killed items, with the most recently killed first.
 This gives the items that would be retrieved by a tt(yank-pop) in the
-same order.
+same order.  Note, however, that the most recently killed item is in
+tt($CUTBUFFER); tt($killring) shows the array of previous entries.
 
 The default size for the kill ring is eight, however the length may be
 changed by normal array operations.  Any empty string in the kill ring is
