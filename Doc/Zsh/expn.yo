@@ -1504,7 +1504,8 @@ item(var(x)tt(##))(
 Matches one or more occurrences of the pattern var(x).
 This operator has high precedence; `tt(12##)' is equivalent to `tt(1(2##))',
 rather than `tt((12)##)'.  No more than two active `tt(#)' characters may
-appear together.
+appear together.  (Note the potential clash with glob qualifiers in the
+form `tt(1(2##))' which should therefore be avoided.)
 )
 enditem()
 subsect(ksh-like Glob Operators)
