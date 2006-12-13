@@ -761,8 +761,8 @@ invinstrpcmp(const void *a, const void *b)
 /*
  * Pad the string str, returning a result from the heap (or str itself,
  * if it didn't need padding).  If str is too large, it will be truncated.
- * Calculations are in terms of width if MULTIBYTE is in effect, else
- * characters.
+ * Calculations are in terms of width if MULTIBYTE is in effect and
+ * multi_width is non-zero, else characters.
  *
  * prenum and postnum are the width to which the string needs padding
  * on the left and right.
@@ -2211,7 +2211,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		val = getstrvalue(v);
 		fwidth = v->pm->width ? v->pm->width : (int)strlen(val);
 		switch (v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
-		    char *t;
+		    char *t, *tend;
 		    unsigned int t0;
 
 		case PM_LEFT:
@@ -2223,21 +2223,39 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    else
 			while (iblank(*t))
 			    t++;
-		    val = (char *) hcalloc(fwidth + 1);
-		    val[fwidth] = '\0';
-		    if ((t0 = strlen(t)) > fwidth)
-			t0 = fwidth;
-		    memset(val, ' ', fwidth);
-		    strncpy(val, t, t0);
+		    MB_METACHARINIT();
+		    for (tend = t, t0 = 0; t0 < fwidth && *tend; t0++)
+			tend += MB_METACHARLEN(tend);
+		    /*
+		     * t0 is the number of characters from t used,
+		     * hence (fwidth - t0) is the number of padding
+		     * characters.  fwidth is a misnomer: we use
+		     * character counts, not character widths.
+		     *
+		     * (tend - t) is the number of bytes we need
+		     * to get fwidth characters or the entire string;
+		     * the characters may be multiple bytes.
+		     */
+		    fwidth -= t0; /* padding chars remaining */
+		    t0 = tend - t; /* bytes to copy from string */
+		    val = (char *) hcalloc(t0 + fwidth + 1);
+		    memcpy(val, t, t0);
+		    if (fwidth)
+			memset(val + t0, ' ', fwidth);
+		    val[t0 + fwidth] = '\0';
+		    copied = 1;
 		    break;
 		case PM_RIGHT_B:
 		case PM_RIGHT_Z:
 		case PM_RIGHT_Z | PM_RIGHT_B:
 		    {
 			int zero = 1;
+			/* Calculate length in possibly multibyte chars */
+			int charlen = MB_METASTRLEN(val);
 
-			if (strlen(val) < fwidth) {
+			if (charlen < fwidth) {
 			    char *valprefend = val;
+			    int preflen;
 			    if (v->pm->node.flags & PM_RIGHT_Z) {
 				/*
 				 * This is a documented feature: when deciding
@@ -2277,33 +2295,31 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 				} else if (!idigit(*t))
 				    zero = 0;
 			    }
-			    t = (char *) hcalloc(fwidth + 1);
-			    memset(t, (((v->pm->node.flags & PM_RIGHT_B) || !zero) ?
-				       ' ' : '0'), fwidth);
-			    /*
-			     * How can the following trigger?  We
-			     * haven't altered val or fwidth since
-			     * the last time we tested this.
-			     */
-			    if ((t0 = strlen(val)) > fwidth)
-				t0 = fwidth;
+			    /* number of characters needed for padding */
+			    fwidth -= charlen;
+			    /* bytes from original string */
+			    t0 = strlen(val);
+			    t = (char *) hcalloc(fwidth + t0 + 1);
+			    /* prefix guaranteed to be single byte chars */
+			    preflen = valprefend - val;
+			    memset(t + preflen, 
+				   (((v->pm->node.flags & PM_RIGHT_B)
+				     || !zero) ?       ' ' : '0'), fwidth);
 			    /*
 			     * Copy - or 0x or base# before any padding
 			     * zeroes.
 			     */
-			    if (zero && val != valprefend) {
-				int preflen = valprefend - val;
+			    if (preflen)
 				memcpy(t, val, preflen);
-				strcpy(t + (fwidth - t0) + preflen,
-				       valprefend);
-			    } else
-				strcpy(t + (fwidth - t0), val);
+			    memcpy(t + preflen + fwidth,
+				   valprefend, t0 - preflen);
+			    t[fwidth + t0] = '\0';
 			    val = t;
+			    copied = 1;
 			} else {
-			    t = (char *) hcalloc(fwidth + 1);
-			    t[fwidth] = '\0';
-			    strncpy(t, val + strlen(val) - fwidth, fwidth);
-			    val = t;
+			    /* Need to skip (charlen - fwidth) chars */
+			    for (t0 = charlen - fwidth; t0; t0--)
+				val += MB_METACHARLEN(val);
 			}
 		    }
 		    break;

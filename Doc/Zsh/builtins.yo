@@ -1405,6 +1405,15 @@ If var(n) is zero, the width is determined by the width of the value of
 the first assignment.  In the case of numeric parameters, the length of the
 complete value assigned to the parameter is used to determine the width,
 not the value that would be output.
+
+The width is the count of characters, which may be multibyte characters
+if the tt(MULTIBYTE) option is in effect.  Note that the screen
+width of the character is not taken into account; if this is required,
+use padding with parameter expansion flags
+tt(${+LPAR()ml)var(...)tt(RPAR())var(...)tt(}) as described in
+`Parameter Expansion Flags' in
+ifzman(zmanref(zshexpn))ifnzman(noderef(Parameter Expansion)).
+
 When the parameter is expanded, it is filled on the right with
 blanks or truncated if necessary to fit the field.
 Note truncation can lead to unexpected results with numeric parameters.
