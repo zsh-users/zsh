@@ -1,3 +1,10 @@
+2006-12-15  Peter Stephenson  <pws@csr.com>
+
+	* users/11083: Doc/Zsh/contrib.yo, Functions/Zle/.distfiles,
+	Functions/modify-current-argument,
+	Functions/split-shell-arguments: functions for handling spliting
+	of shell arguments in ZLE.
+
 2006-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23052: Doc/Zsh/builtins.yo, Src/subst.c: multibyte

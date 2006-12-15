@@ -1142,6 +1142,60 @@ investigate the command word found.  The default is tt(whence -c).
 )
 enditem()
 
+subsect(Utility Functions)
+
+These functions are useful in constructing widgets.  They
+should be loaded with `tt(autoload -U) var(function)' and called
+as indicated from user-defined widgets.
+
+startitem()
+tindex(split-shell-arguments)
+item(tt(split-shell-arguments))(
+This function splits the line currently being edited into shell arguments
+and whitespace.  The result is stored in the array tt(reply).  The array
+contains all the parts of the line in order, starting with any whitespace
+before the first argument, and finishing with any whitespace after the last
+argument.  Hence (so long as the option tt(KSH_ARRAYS) is not set)
+whitespace is given by odd indices in the array and arguments by
+even indices.  Note that no stripping of quotes is done; joining together
+all the elements of tt(reply) in order is guaranteed to produce the
+original line.
+
+The parameter tt(REPLY) is set to the index of the word in tt(reply) which
+contains the character after the cursor, where the first element has index
+1.  The parameter tt(REPLY2) is set to the index of the character under the
+cursor in that word, where the first character has index 1.
+
+Hence tt(reply), tt(REPLY) and tt(REPLY2) should all be made local to
+the enclosing function.
+
+See the function tt(modify-current-argument), described below, for
+an example of how to call this function.
+)
+tindex(modify-current-argument)
+item(tt(modify-current-argument) var(expr-using-)tt($ARG))(
+This function provides a simple method of allowing user-defined widgets
+to modify the command line argument under the cursor (or immediately to the
+left of the cursor if the cursor is between arguments).  The argument
+should be an expression which when evaluated operates on the shell
+parameter tt(ARG), which will have been set to the command line argument
+under the cursor.  The expression should be suitably quoted to prevent
+it being evaluated too early.
+
+For example, a user-defined widget containing the following code
+converts the characters in the argument under the cursor into all upper
+case:
+
+example(modify-current-word '${(U)ARG}')
+
+The following strips any quoting from the current word (whether backslashes
+or one of the styles of quotes), and replaces it with single quoting
+throughout:
+
+example(modify-current-word '${(qq)${(Q)ARG}}')
+)
+enditem()
+
 subsect(Styles)
 
 The behavior of several of the above widgets can be controlled by the use
