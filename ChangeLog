@@ -1,5 +1,7 @@
 2006-12-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 23060: Doc/Makefile.in: make everything makes info.
+
 	* 23059: arno: Completion/Debian/Command/_apt-file, also
 	.distfiles: new completion.
 
