@@ -4,7 +4,9 @@ _acroread       _dcop
 _gnome-gv       _gqview         _gv             _kfmclient
 _mozilla        _mplayer        _nautilus
 _nedit          _netscape
-_qiv            _urxvt          _vnc
+_qiv            
+_setxkbmap
+_urxvt          _vnc
 _x_utils        _xauth          _xdvi           _xfig           _xloadimage
 _xmodmap        _xpdf           _xscreensaver   _xset           _xterm
 _xv             _xwit

@@ -27,7 +27,6 @@ else
   else
     mozopts=(
       "($popts)-installer[start with 4.x migration window]"
-      "($popts)-CreateProfile:profile"
       "($popts)-ProfileWizard[start with profile wizard]"
       "($popts)-SelectProfile[start with profile selection dialog]"
       '-splash[enable splash screen]'
@@ -42,6 +41,7 @@ else
   _x_arguments -C  $mozopts \
     '-height[height of startup window]:height' \
     '(-)'{-h,-help}'[show usage message]' \
+      "($popts)-CreateProfile:profile" \
     '-width[width of startup window]:width' \
     '(-)'{-v,-version}'[show the version number and build date]' \
     "($popts)-P[start with profile]:profile:->profile" \

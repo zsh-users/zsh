@@ -1,7 +1,9 @@
 DISTFILES_SRC='
 .distfiles
 _a2utils
-_apt                  _aptitude             _apt-move
+_apt                  _aptitude             
+_apt-file
+_apt-move
 _apt-show-versions    _auto-apt             _bts
 _bug                  _dak
 _dchroot              _debchange

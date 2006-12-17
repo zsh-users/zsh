@@ -1,3 +1,13 @@
+2006-12-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23059: arno: Completion/Debian/Command/_apt-file, also
+	.distfiles: new completion.
+
+	* 23058: arno: Completion/X/Command/_mozilla: handle -CreateProfile.
+
+	* 23057: arno: Completion/X/Command/_setxkbmap, also .distfiles:
+	new completion.
+
 2006-12-15  Peter Stephenson  <pws@csr.com>
 
 	* users/11083: Doc/Zsh/contrib.yo, Functions/Zle/.distfiles,
