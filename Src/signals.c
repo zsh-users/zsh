@@ -346,39 +346,10 @@ signal_setmask(sigset_t set)
 static int suspend_longjmp = 0;
 static signal_jmp_buf suspend_jmp_buf;
 #endif
- 
-#if defined(POSIX_SIGNALS) || defined(BSD_SIGNALS)
-static void
-signal_suspend_setup(sigset_t *set, int sig, int wait_cmd)
-{
-    if (isset(TRAPSASYNC)) {
-	sigemptyset(set);
-    } else {
-	sigfillset(set);
-	sigdelset(set, sig);
-#ifdef POSIX_SIGNALS
-	sigdelset(set, SIGHUP);  /* still don't know why we add this? */
-#endif
-	if (wait_cmd)
-	{
-	    /*
-	     * Using "wait" builtin.  We should allow SIGINT and
-	     * execute traps delivered to the shell.
-	     */
-	    int sigtr;
-	    sigdelset(set, SIGINT);
-	    for (sigtr = 1; sigtr <= NSIG; sigtr++) {
-		if (sigtrapped[sigtr] & ~ZSIG_IGNORED)
-		    sigdelset(set, sigtr);
-	    }
-	}
-    }
-}
-#endif
 
 /**/
 int
-signal_suspend(int sig, int wait_cmd)
+signal_suspend(int sig)
 {
     int ret;
  
@@ -388,7 +359,7 @@ signal_suspend(int sig, int wait_cmd)
     sigset_t oset;
 #endif /* BROKEN_POSIX_SIGSUSPEND */
 
-    signal_suspend_setup(&set, sig, wait_cmd);
+    sigemptyset(&set);
 #ifdef BROKEN_POSIX_SIGSUSPEND
     sigprocmask(SIG_SETMASK, &set, &oset);
     pause();
@@ -400,7 +371,7 @@ signal_suspend(int sig, int wait_cmd)
 # ifdef BSD_SIGNALS
     sigset_t set;
 
-    signal_suspend_setup(&set, sig, wait_cmd);
+    sigemptyset(&set);
     ret = sigpause(set);
 # else
 #  ifdef SYSV_SIGNALS
@@ -419,7 +390,7 @@ signal_suspend(int sig, int wait_cmd)
 #  endif /* SYSV_SIGNALS  */
 # endif  /* BSD_SIGNALS   */
 #endif   /* POSIX_SIGNALS */
- 
+
     return ret;
 }
 
@@ -561,18 +532,14 @@ zhandler(int sig)
         break;
  
     case SIGHUP:
-        if (sigtrapped[SIGHUP])
-            dotrap(SIGHUP);
-        else {
+        if (!handletrap(SIGHUP)) {
             stopmsg = 1;
             zexit(SIGHUP, 1);
         }
         break;
  
     case SIGINT:
-        if (sigtrapped[SIGINT])
-            dotrap(SIGINT);
-        else {
+        if (!handletrap(SIGINT)) {
 	    if ((isset(PRIVILEGED) || isset(RESTRICTED)) &&
 		isset(INTERACTIVE) && noerrexit < 0)
 		zexit(SIGINT, 1);
@@ -587,19 +554,12 @@ zhandler(int sig)
 #ifdef SIGWINCH
     case SIGWINCH:
         adjustwinsize(1);  /* check window size and adjust */
-	if (sigtrapped[SIGWINCH])
-	    dotrap(SIGWINCH);
+	(void) handletrap(SIGWINCH);
         break;
 #endif
 
     case SIGALRM:
-        if (sigtrapped[SIGALRM]) {
-	    int tmout;
-            dotrap(SIGALRM);
-
-	    if ((tmout = getiparam("TMOUT")))
-		alarm(tmout);           /* reset the alarm */
-        } else {
+        if (!handletrap(SIGALRM)) {
 	    int idle = ttyidlegetfn(NULL);
 	    int tmout = getiparam("TMOUT");
 	    if (idle >= 0 && idle < tmout)
@@ -614,7 +574,7 @@ zhandler(int sig)
         break;
  
     default:
-        dotrap(sig);
+        (void) handletrap(sig);
         break;
     }   /* end of switch(sig) */
  
@@ -999,6 +959,96 @@ endtrapscope(void)
     DPUTS(!locallevel && savetraps && firstnode(savetraps),
 	  "BUG: still saved traps outside all function scope");
 }
+
+
+/*
+ * Decide whether a trap needs handling.
+ * If so, see if the trap should be run now or queued.
+ * Return 1 if the trap has been or will be handled.
+ * This only needs to be called in place of dotrap() in the
+ * signal handler, since it's only while waiting for children
+ * to exit that we queue traps.
+ */
+/**/
+static int
+handletrap(int sig)
+{
+    if (!sigtrapped[sig])
+	return 0;
+
+    if (trap_queueing_enabled)
+    {
+	/* Code borrowed from signal queueing */
+	int temp_rear = ++trap_queue_rear % MAX_QUEUE_SIZE;
+
+	DPUTS(temp_rear == trap_queue_front, "BUG: trap queue full");
+	/* If queue is not full... */
+	if (temp_rear != trap_queue_front) {
+	    trap_queue_rear = temp_rear;
+	    trap_queue[trap_queue_rear] = sig;
+	}
+	return 1;
+    }
+
+    dotrap(sig);
+
+    if (sig == SIGALRM)
+    {
+	int tmout;
+	/*
+	 * Reset the alarm.
+	 * It seems slightly more natural to do this when the
+	 * trap is run, rather than when it's queued, since
+	 * the user doesn't see the latter.
+	 */
+	if ((tmout = getiparam("TMOUT")))
+	    alarm(tmout);
+    }
+
+    return 1;
+}
+
+
+/*
+ * Queue traps if they shouldn't be run asynchronously, i.e.
+ * we're not in the wait builtin and TRAPSASYNC isn't set, when
+ * waiting for children to exit.
+ *
+ * Note that unlike signal queuing this should only be called
+ * in single matching pairs and can't be nested.  It is
+ * only needed when waiting for a job or process to finish.
+ *
+ * There is presumably a race setting this up: we shouldn't be running
+ * traps between forking a foreground process and this point, either.
+ */
+/**/
+void
+queue_traps(int wait_cmd)
+{
+    if (!isset(TRAPSASYNC) && !wait_cmd) {
+	/*
+	 * Traps need to be handled synchronously, so
+	 * enable queueing.
+	 */
+	trap_queueing_enabled = 1;
+    }
+}
+
+
+/*
+ * Disable trap queuing and run the traps.
+ */
+/**/
+void
+unqueue_traps(void)
+{
+    trap_queueing_enabled = 0;
+    while (trap_queue_front != trap_queue_rear) {
+	trap_queue_front = (trap_queue_front + 1) % MAX_QUEUE_SIZE;
+	(void) handletrap(trap_queue[trap_queue_front]);
+    }
+}
+
 
 /* Execute a trap function for a given signal, possibly
  * with non-standard sigtrapped & siglists values

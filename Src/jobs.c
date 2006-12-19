@@ -1141,6 +1141,7 @@ waitforpid(pid_t pid, int wait_cmd)
     /* child_block() around this loop in case #ifndef WNOHANG */
     dont_queue_signals();
     child_block();		/* unblocked in signal_suspend() */
+    queue_traps(wait_cmd);
     while (!errflag && (kill(pid, 0) >= 0 || errno != ESRCH)) {
 	if (first)
 	    first = 0;
@@ -1148,7 +1149,7 @@ waitforpid(pid_t pid, int wait_cmd)
 	    kill(pid, SIGCONT);
 
 	last_signal = -1;
-	signal_suspend(SIGCHLD, wait_cmd);
+	signal_suspend(SIGCHLD);
 	if (last_signal != SIGCHLD && wait_cmd) {
 	    /* wait command interrupted, but no error: return */
 	    restore_queue_signals(q);
@@ -1156,6 +1157,7 @@ waitforpid(pid_t pid, int wait_cmd)
 	}
 	child_block();
     }
+    unqueue_traps();
     child_unblock();
     restore_queue_signals(q);
 
@@ -1177,6 +1179,7 @@ zwaitjob(int job, int wait_cmd)
 
     dont_queue_signals();
     child_block();		 /* unblocked during signal_suspend() */
+    queue_traps(wait_cmd);
     if (jn->procs || jn->auxprocs) { /* if any forks were done         */
 	jn->stat |= STAT_LOCKED;
 	if (jn->stat & STAT_CHANGED)
@@ -1184,7 +1187,7 @@ zwaitjob(int job, int wait_cmd)
 	while (!errflag && jn->stat &&
 	       !(jn->stat & STAT_DONE) &&
 	       !(interact && (jn->stat & STAT_STOPPED))) {
-	    signal_suspend(SIGCHLD, wait_cmd);
+	    signal_suspend(SIGCHLD);
 	    if (last_signal != SIGCHLD && wait_cmd)
 	    {
 		/* builtin wait interrupted by trapped signal */
@@ -1211,6 +1214,7 @@ zwaitjob(int job, int wait_cmd)
 	pipestats[0] = lastval;
 	numpipestats = 1;
     }
+    unqueue_traps();
     child_unblock();
     restore_queue_signals(q);
 

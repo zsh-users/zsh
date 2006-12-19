@@ -692,6 +692,9 @@ tt(SIGIO), assuming they correspond to the same signal number.  tt(kill
 show if the alternative form corresponds to a signal number.  For example,
 under Linux tt(kill -l IO) and tt(kill -l POLL) both output 29, hence
 tt(kill -IO) and tt(kill -POLL) have the same effect.
+
+Many systems will allow process IDs to be negative to kill a process
+group or zero to kill the current process group.
 )
 findex(let)
 item(tt(let) var(arg) ...)(
