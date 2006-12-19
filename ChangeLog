@@ -1,5 +1,8 @@
 2006-12-19  Peter Stephenson  <pws@csr.com>
 
+	* 23070: Test/C02cond.ztst: Skip [[ -N file ]] test on NFS
+	file systems.
+
 	* 23067: Doc/Zsh/builtins.yo, Src/jobs.c, Src/signals.c:
 	queue traps but handle signals when waiting for jobs or processes,
 	unless TRAPSASYNC is set or the wait builtin is in use, so as
