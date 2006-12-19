@@ -4146,15 +4146,20 @@ mb_metastrlen(char *ptr, int width)
 
 /**/
 mod_export int
-metacharlenconv(char *x, int *c)
+metacharlenconv(const char *x, int *c)
 {
+    /*
+     * Here we don't use STOUC() on the chars since they
+     * may be compared against other chars and this will fail
+     * if chars are signed and the high bit is set.
+     */
     if (*x == Meta) {
 	if (c)
-	    *c = STOUC(x[1]) ^ 32;
+	    *c = x[1] ^ 32;
 	return 2;
     }
     if (c)
-	*c = STOUC(*x);
+	*c = (char)*x;
     return 1;
 }
 
