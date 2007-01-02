@@ -1,5 +1,8 @@
 2007-01-02  Clint Adams  <clint@zsh.org>
 
+	* 22817: Frank Terbeck: Completion/Debian/Command/_aptitude:
+	update for modern options, add completion of releases.
+
 	* 23080: arno: Completion/X/Command/_qiv: fix -c and -g
 	(both were mistakenly -b).
 

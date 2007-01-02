@@ -2,11 +2,22 @@
 
 local curcontext="$curcontext" state line cmds ret=1
 
+function _aptitude_release() {
+  #{{{
+  local expl releases
+  releases=(
+${${(M)${(f)"$(</etc/apt/sources.list)"}\
+:#[ $'\t']#deb(|-src)*}/(#b)[ $'\t']#[^ $'\t']##[ $'\t']##[^ $'\t']##[ $'\t']##([^ $'\t']##)*/$match[1]}
+  )
+  _wanted list expl release compadd ${expl} - ${(u)releases}
+  #}}}
+}
+
 _arguments -C \
   '(- 1 *)'{-h,--help}'[display help information]' \
   '(- 1 *)--version[display version information]' \
   '(-s --simulate)'{-s,--simulate}'[print actions without performing them]' \
-  '(-d --download-only)'{-d,--download-only}"[just download packages - don't install]" \
+  '(-d --download-only)'{-d,--download-only}"[just download packages - don\'t install]" \
   '(-P --prompt)'{-P,--prompt}'[always display a prompt]' \
   '(-y --assume-yes)'{-y,--assume-yes}'[assume yes answer to questions]' \
   '(-F --display-format)'{-F,--display-format}'[specify output format for search command]:format' \
@@ -17,10 +28,18 @@ _arguments -C \
   '(-D --show-deps)'{-D,--show-deps}'[show brief explanations of automatic installations and removals]' \
   '-Z[show disk space changes for each package]' \
   '(-v --verbose)'{-v,--verbose}'[causes some commands to display extra information]' \
-  '(--without-recommends)--with-recommends[install recommended packages when installing new packages]' \
+  '(-R --without-recommends)'{-R,--with-recommends}'[install recommended packages when installing new packages]' \
   '(--without-suggests)--with-suggests[install suggested packages when installing new packages]' \
-  '(--with-recommends)--without-recommends[ignore recommended packages when installing new packages]' \
+  '(-r --with-recommends)'{-r,--without-recommends}'[ignore recommended packages when installing new packages]' \
   '(--with-suggests)--without-suggests[ignore suggested packages when installing new packages]' \
+  '(-t --target-release)'{-t,--target-release}'[set the release from which packages should be installed]:release:_aptitude_release' \
+  '(-q --quiet)'{-q=,--quiet=}'[less Output]:level' \
+  '--schedule-only[schedule operations to be performed in the future]' \
+  '--purge-unused[purge unused packages instead of removing]' \
+  '--visual-preview[start up the visual interface and display its preview screen]' \
+  '-S[load the extended state information from non-standard state file]:state file:_files' \
+  '-u[begin updating the package lists as soon as the program starts]' \
+  '-i[displays a download preview when the program starts]' \
   '1: :->cmds' \
   '*: :->args' && ret=0
 
