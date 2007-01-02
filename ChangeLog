@@ -1,3 +1,8 @@
+2007-01-02  Clint Adams  <clint@zsh.org>
+
+	* 23080: arno: Completion/X/Command/_qiv: fix -c and -g
+	(both were mistakenly -b).
+
 2006-12-19  Peter Stephenson  <pws@csr.com>
 
 	* 23071: Src/utils.c: problem with signed characters with

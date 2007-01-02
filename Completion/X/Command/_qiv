@@ -14,8 +14,8 @@ _arguments -s \
   '(-m --maxpect)'{-m,--maxpect}'[expand image to fit screen size]' \
   '(-t --scale_down)'{-t,--scale_down}'[shrink images to fit screen size]' \
   '(-b --brightness)'{-b,--brightness}'[set brightness]:brightness (-32..32)' \
-  '(-c --contrast)'{-b,--contrast}'[set contrast]:contrast (-32..32)' \
-  '(-g --gamma)'{-b,--gamma}'[set gamma]:gamma (-32..32)' \
+  '(-c --contrast)'{-c,--contrast}'[set contrast]:contrast (-32..32)' \
+  '(-g --gamma)'{-g,--gamma}'[set gamma]:gamma (-32..32)' \
   '(-n --no_filter)'{-n,--no_filter}'[disable filtering of images by extension]' \
   '(-i --no_statusbar -I --statusbar)'{-i,--no_statusbar}'[disable statusbar]' \
   '(-i --no_statusbar -I --statusbar)'{-I,--statusbar}'[enable statusbar]' \
