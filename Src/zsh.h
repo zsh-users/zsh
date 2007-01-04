@@ -1955,7 +1955,8 @@ enum {
 enum {
     /*
      * Handle octal where the first digit is non-zero e.g. \3, \33, \333
-     * \0333 etc. is always handled.
+     * Otherwise \0333 etc. is handled, i.e. one of \0123 or \123 will
+     * work, but not both.
      */
     GETKEY_OCTAL_ESC = (1 << 0),
     /*
@@ -1990,7 +1991,7 @@ enum {
 /* echo builtin */
 #define GETKEYS_ECHO	(GETKEY_BACKSLASH_C)
 /* printf format string */
-#define GETKEYS_PRINTF	(GETKEY_OCTAL_ESC|GETKEY_BACKSLASH_C)
+#define GETKEYS_PRINTF	(GETKEY_BACKSLASH_C)
 /* Full print without -e */
 #define GETKEYS_PRINT	(GETKEY_OCTAL_ESC|GETKEY_BACKSLASH_C|GETKEY_EMACS)
 /* bindkey */

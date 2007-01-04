@@ -1,3 +1,8 @@
+2007-01-04  Peter Stephenson  <pws@csr.com>
+
+	* 20386: Src/zsh.h, Test/B03print.ztst: printf should handle
+	octal escapes in the '\0NNN' form.
+
 2007-01-02  Clint Adams  <clint@zsh.org>
 
 	* 22817: Frank Terbeck: Completion/Debian/Command/_aptitude:
