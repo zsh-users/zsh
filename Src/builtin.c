@@ -3490,7 +3490,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	fmt = OPT_ARG(ops,'f');
     if (fmt)
 	fmt = getkeystring(fmt, &flen, OPT_ISSET(ops,'b') ? GETKEYS_BINDKEY :
-			   GETKEYS_PRINTF, &fmttrunc);
+			   GETKEYS_PRINTF_FMT, &fmttrunc);
 
     first = args;
     
@@ -3954,7 +3954,7 @@ bin_print(char *name, char **args, Options ops, int func)
 			b = getkeystring(metafy(curarg, curlen, META_USEHEAP),
 					 &l,
 					 OPT_ISSET(ops,'b') ? GETKEYS_BINDKEY :
-					 GETKEYS_PRINTF, &nnl);
+					 GETKEYS_PRINTF_ARG, &nnl);
 		    } else {
 			b = curarg;
 			l = curlen;

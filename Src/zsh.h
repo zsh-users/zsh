@@ -1990,8 +1990,10 @@ enum {
  */
 /* echo builtin */
 #define GETKEYS_ECHO	(GETKEY_BACKSLASH_C)
-/* printf format string */
-#define GETKEYS_PRINTF	(GETKEY_BACKSLASH_C)
+/* printf format string:  \123 -> S, \0123 -> NL 3 */
+#define GETKEYS_PRINTF_FMT	(GETKEY_OCTAL_ESC|GETKEY_BACKSLASH_C)
+/* printf argument:  \123 -> \123, \0123 -> S */
+#define GETKEYS_PRINTF_ARG	(GETKEY_BACKSLASH_C)
 /* Full print without -e */
 #define GETKEYS_PRINT	(GETKEY_OCTAL_ESC|GETKEY_BACKSLASH_C|GETKEY_EMACS)
 /* bindkey */

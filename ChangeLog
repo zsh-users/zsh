@@ -1,5 +1,8 @@
 2007-01-04  Peter Stephenson  <pws@csr.com>
 
+	* 23088: Src/builtin.c, Src/zsh.h: Stephane says printf
+	formats and arguments should actually be escaped differently.
+
 	* 20386: Src/zsh.h, Test/B03print.ztst: printf should handle
 	octal escapes in the '\0NNN' form.
 
