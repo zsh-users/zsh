@@ -95,7 +95,7 @@ _mpc_helper_songnumbers() {
   out=("${(@f)$(_call_program song-numbers mpc $foo playlist 2>/dev/null)}")
   out=("${(@M)out[@]:#${~MATCH}}")
 
-  sn=("${(@)${(@M)out}//(#b)(#s)\#([0-9]#)*/$match[1]}")
+  sn=("${(@)${(@M)out}//(#b)(#s)(\#|[ >]#)([0-9]#)*/$match[2]}")
   list=("${(@Mr:COLUMNS-1:)out}")
 
   _wanted -V 'song numbers' expl 'song number' \

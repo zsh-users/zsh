@@ -1,3 +1,8 @@
+2007-01-04  Clint Adams  <clint@zsh.org>
+
+	* 23089: R.Ramkumar: Completion/Unix/Command/_mpc:
+	relax playlist glob pattern to work with newer versions.
+
 2007-01-04  Peter Stephenson  <pws@csr.com>
 
 	* 23088: Src/builtin.c, Src/zsh.h: Stephane says printf
