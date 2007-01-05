@@ -559,15 +559,19 @@ If the list of flags contains a tt(-t) with a tt(PLUS()) character, the next
 list of flags is used even if the current list produced matches.
 
 texinode(Extended Completion)(Example)(Alternative Completion)(Completion Using compctl)
+
+Additional options are available that restrict completion to some part
+of the command line; this is referred to as `extended completion'.
+
 sect(Extended Completion)
 startlist()
-list(nofill(tt(compctl) [ tt(-CDT) ] var(options) \
-tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-)
-  [ var(command) ... ]))
-list(nofill(tt(compctl) [ tt(-CDT) ] var(options) \
-[ tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-) ]
-  [ tt(PLUS()) var(options) [ tt(-x) ... tt(-)tt(-) ] ... [tt(PLUS())] ] \
-[ var(command) ... ]))
+list(tt(compctl) [ tt(-CDT) ] var(options) \
+tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-))
+list(         [ var(command) ... ])
+list(tt(compctl) [ tt(-CDT) ] var(options) \
+[ tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-) ])
+list(         [ tt(PLUS()) var(options) [ tt(-x) ... tt(-)tt(-) ] ... \
+[tt(PLUS())] ] [ var(command) ... ])
 endlist()
 
 The form with `tt(-x)' specifies extended completion for the

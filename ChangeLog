@@ -1,3 +1,8 @@
+2007-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23091: Doc/Zsh/compctl.yo, Doc/Zsh/contrib.yo: fixes
+	for some *roff problems noted by doclifter.
+
 2007-01-05  Peter Stephenson  <pws@csr.com>
 
 	* 23090: configure.ac: make ncurses preferred over curses
