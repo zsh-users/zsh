@@ -1,3 +1,9 @@
+2007-01-05  Peter Stephenson  <pws@csr.com>
+
+	* 23090: configure.ac: make ncurses preferred over curses
+	and try not to link to multiple display libraries if not
+	necessary.
+
 2007-01-04  Clint Adams  <clint@zsh.org>
 
 	* 23089: R.Ramkumar: Completion/Unix/Command/_mpc:
