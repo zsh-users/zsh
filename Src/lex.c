@@ -96,18 +96,18 @@ mod_export int addedx;
 mod_export int wb, we;
 
 /* 1 if aliases should not be expanded */
- 
+
 /**/
 mod_export int noaliases;
 
 /* we are parsing a line sent to use by the editor */
- 
+
 /**/
 mod_export int zleparse;
- 
+
 /**/
 mod_export int wordbeg;
- 
+
 /**/
 mod_export int parbegin;
 
@@ -115,7 +115,7 @@ mod_export int parbegin;
 mod_export int parend;
 
 /* don't recognize comments */
- 
+
 /**/
 mod_export int nocomments;
 
@@ -1181,10 +1181,20 @@ gettokstr(int c, int sub)
 		STOPHIST
 		while ((c = hgetc()) != '\'' && !lexstop) {
 		    if (strquote && c == '\\') {
-			add(c);
 			c = hgetc();
 			if (lexstop)
 			    break;
+			/*
+			 * Mostly we don't need to do anything special
+			 * with escape backslashes or closing quotes
+			 * inside $'...'; however in completion we
+			 * need to be able to strip multiple backslashes
+			 * neatly.
+			 */
+			if (c == '\\' || c == '\'')
+			    add(Bnull);
+			else
+			    add('\\');
 		    } else if (!sub && isset(CSHJUNKIEQUOTES) && c == '\n') {
 			if (bptr[-1] == '\\')
 			    bptr--, len--;

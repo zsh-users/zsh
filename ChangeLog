@@ -1,3 +1,8 @@
+2007-01-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23097: Src/lex.c, Src/utils.c, Src/zsh.h, Src/Zle/compcore.c:
+	splitting of $'...' strings in completion.
+
 2007-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23091: Doc/Zsh/compctl.yo, Doc/Zsh/contrib.yo: fixes

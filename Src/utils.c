@@ -3925,7 +3925,6 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
     ptr = unmetafy(ums, &umlen);
 
     memset(&mbs, 0, sizeof mbs);
-    mb_metacharinit();
     while (umlen > 0) {
 	size_t cnt = eol ? MB_INVALID : mbrtowc(&c, ptr, umlen, &mbs);
 
@@ -4577,10 +4576,27 @@ ucs4toutf8(char *dest, unsigned int wval)
 /*
  * Decode a key string, turning it into the literal characters.
  * The value returned is a newly allocated string from the heap.
- * The length is (usually) returned in *len.
+ *
+ * The length is returned in *len.  This is usually the length of
+ * the final unmetafied string.  The exception is the case of
+ * a complete GETKEY_DOLLAR_QUOTE conversion where *len is the
+ * length of the input string which has been used (up to and including
+ * the terminating single quote); as the final string is metafied and
+ * NULL-terminated its length is not required.  If both GETKEY_DOLLAR_QUOTE
+ * and GETKEY_UPDATE_OFFSET are present in "how", the string is not
+ * expected to be terminated (this is used in completion to parse
+ * a partial $'...'-quoted string) and the length passed back is
+ * that of the converted string.  Note in both cases that this is a length
+ * in bytes (i.e. the same as given by a raw pointer difference), not
+ * characters, which may occupy multiple bytes.
+ *
  * how is a set of bits from the GETKEY_ values defined in zsh.h;
  * not all combinations of bits are useful.  Callers will typically
  * use one of the GETKEYS_ values which define sets of bits.
+ * Note, for example that:
+ * - GETKEY_SINGLE_CHAR must not be combined with GETKEY_DOLLAR_QUOTE.
+ * - GETKEY_UPDATE_OFFSET is only allowed if GETKEY_DOLLAR_QUOTE is
+ *   also present.
  *
  * The return value is unmetafied unless GETKEY_DOLLAR_QUOTE is
  * in use.
@@ -4946,9 +4962,9 @@ getkeystring(char *s, int *len, int how, int *misc)
     if (how & GETKEY_DOLLAR_QUOTE)
 	*tdest = '\0';
     if (how & GETKEY_SINGLE_CHAR)
-      *misc = 0;
+	*misc = 0;
     else
-      *len = t - buf;
+	*len = ((how & GETKEY_DOLLAR_QUOTE) ? tdest : t) - buf;
     return buf;
 }
 

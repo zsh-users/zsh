@@ -1432,10 +1432,8 @@ set_comp_sep(void)
      *     set, which isn't necessarily correct if the quotes were typed by
      *     the user).
      * osq: c.f. odq, taking account of Snull's and embeded "'"'s.
-     * issq: flag that current quoting is single quotes; I assume that
-     *       civilization would end if we used a consistent way of
-     *       flagging the different types of quotes, or something.
-     * lsq: when quoting is single quotes (issq), counts the offset
+     * qttype: type of quotes using standard QT_* definitions.
+     * lsq: when quoting is single quotes (QT_SINGLE), counts the offset
      *      adjustment needed in the word being examined in the lexer loop.
      * sqq: the value of lsq for the current completion word.
      * qa:  not, unfortunately, a question and answer session with the
@@ -1443,7 +1441,7 @@ set_comp_sep(void)
      *      when stripping single quotes: 1 for RCQUOTES, 3 otherwise
      *      (because we leave a "'" in the final string).
      */
-    int dq = 0, odq, sq = 0, osq, issq = 0, sqq = 0, lsq = 0, qa = 0;
+    int dq = 0, odq, sq = 0, osq, qttype, sqq = 0, lsq = 0, qa = 0;
     /* dolq: like sq and dq but for dollars quoting. */
     int dolq = 0;
     /* remember some global variable values (except lp is local) */
@@ -1479,26 +1477,25 @@ set_comp_sep(void)
     addedx = 1;
     noerrs = 1;
     lexsave();
-    tmp = (char *) zhalloc(tl = 3 + strlen(s));
+    /*
+     * tl is the length of the temporary string including
+     * the space at the start and the x at the cursor position,
+     * but not the NULL byte.
+     */
+    tl = strlen(s) + 2;
+    tmp = (char *) zhalloc(tl + 1);
     tmp[0] = ' ';
     memcpy(tmp + 1, s, noffs);
     tmp[(scs = zlemetacs = 1 + noffs)] = 'x';
     strcpy(tmp + 2 + noffs, s + noffs);
 
-    switch (*compqstack) {
-    case QT_NONE:
-#ifdef DEBUG
-	dputs("BUG: head of compqstack is NULL");
-#endif
-	break;
-
+    switch ((qttype = *compqstack)) {
     case QT_BACKSLASH:
         remq = 1;
 	tmp = rembslash(tmp);
         break;
 
     case QT_SINGLE:
-        issq = 1;
         if (isset(RCQUOTES))
             qa = 1;
         else
@@ -1531,22 +1528,32 @@ set_comp_sep(void)
 	break;
 
     case QT_DOLLARS:
-	sl = strlen(tmp);
 	j = zlemetacs;
-	tmp = getkeystring(tmp, &tl,
+	tmp = getkeystring(tmp, &sl,
 			   GETKEY_DOLLAR_QUOTE|GETKEY_UPDATE_OFFSET,
 			   &zlemetacs);
-	/* The number of characters we removed because of $' quoting */
-	dolq = sl - tl;
+	/* The number of bytes we removed because of $' quoting */
+	dolq = tl - sl;
 	/* Offset into the word is modified, too... */
 	css += zlemetacs - j;
 	break;
+
+    case QT_NONE:
+    default: /* to silence compiler warnings */
+#ifdef DEBUG
+	dputs("BUG: head of compqstack is NULL");
+#endif
+	break;
+
     }
     odq = dq;
     osq = sq;
     inpush(dupstrspace(tmp), 0, NULL);
     zlemetaline = tmp;
-    zlemetall = tl - 1;
+    /*
+     * Length of temporary string, calculated above.
+     */
+    zlemetall = tl;
     strinbeg(0);
     noaliases = 1;
     do {
@@ -1582,7 +1589,7 @@ set_comp_sep(void)
                         dq--;
                 }
             }
-            if (issq) {
+            if (qttype == QT_SINGLE) {
                 for (p = tokstr, lsq = 0; *p; p++) {
                     if (sq && *p == Snull)
                         sq -= qa;
@@ -1606,6 +1613,8 @@ set_comp_sep(void)
 	    swe = we - 1 - dq - sq - dolq;
             sqq = lsq;
 	    soffs = zlemetacs - swb - css;
+	    DPUTS2(p[soffs] != 'x', "expecting 'x' at offset %d of \"%s\"",
+		   soffs, p);
 	    chuck(p + soffs);
 	    ns = dupstring(p);
 	}
@@ -1736,7 +1745,7 @@ set_comp_sep(void)
      */
     sav = s[(i = swb - 1 - sqq + dq)];
     s[i] = '\0';
-    qp = (issq ? dupstring(s) : rembslash(s));
+    qp = (qttype == QT_SINGLE) ? dupstring(s) : rembslash(s);
     s[i] = sav;
     if (swe < swb)
 	swe = swb;
@@ -1747,11 +1756,11 @@ set_comp_sep(void)
 	if ((int)strlen(ns) > swe - swb + 1)
 	    ns[swe - swb + 1] = '\0';
     }
-    qs = (issq ? dupstring(s + swe) : rembslash(s + swe));
+    qs = (qttype == QT_SINGLE) ? dupstring(s + swe) : rembslash(s + swe);
     sl = strlen(ns);
     if (soffs > sl)
 	soffs = sl;
-    if (issq) {
+    if (qttype == QT_SINGLE) {
         remsquote(qp);
         remsquote(qs);
     }

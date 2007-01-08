@@ -1914,8 +1914,12 @@ struct heap {
 #define STRINGIFY(x)		STRINGIFY_LITERAL(x)
 #define ERRMSG(x)		(__FILE__ ":" STRINGIFY(__LINE__) ": " x)
 # define DPUTS(X,Y) if (!(X)) {;} else dputs(ERRMSG(Y))
+# define DPUTS1(X,Y,Z1) if (!(X)) {;} else dputs(ERRMSG(Y), Z1)
+# define DPUTS2(X,Y,Z1,Z2) if (!(X)) {;} else dputs(ERRMSG(Y), Z1, Z2)
 #else
 # define DPUTS(X,Y)
+# define DPUTS1(X,Y,Z1)
+# define DPUTS2(X,Y,Z1,Z2)
 #endif
 
 /**************************/
