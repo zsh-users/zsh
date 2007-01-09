@@ -108,6 +108,7 @@ static struct optname optns[] = {
 {{NULL, "cshjunkiequotes",    OPT_EMULATE|OPT_CSH},	 CSHJUNKIEQUOTES},
 {{NULL, "cshnullcmd",	      OPT_EMULATE|OPT_CSH},	 CSHNULLCMD},
 {{NULL, "cshnullglob",	      OPT_EMULATE|OPT_CSH},	 CSHNULLGLOB},
+{{NULL, "debugbeforecmd",     OPT_EMULATE},		 DEBUGBEFORECMD},
 {{NULL, "emacs",	      0},			 EMACSMODE},
 {{NULL, "equals",	      OPT_EMULATE|OPT_ZSH},	 EQUALS},
 {{NULL, "errexit",	      OPT_EMULATE},		 ERREXIT},

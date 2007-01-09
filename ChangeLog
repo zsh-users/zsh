@@ -1,5 +1,9 @@
 2007-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/11111: Doc/Zsh/options.yo, Src/exec.c, Src/options.c,
+	Src/zsh.h: add DEBUG_BEFORE_CMD option to run DEBUG traps
+	before the command instead of after.
+
 	* 23098: Src/builtin.c, Test/D07multibyte.ztst: print widths
 	in printf take account of multibyte characters.
 

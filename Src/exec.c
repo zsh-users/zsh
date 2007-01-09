@@ -865,6 +865,22 @@ execlist(Estate state, int dont_change_job, int exiting)
      * semi-colon or ampersand (`sublists').               */
     code = *state->pc++;
     while (wc_code(code) == WC_LIST && !breaks && !retflag) {
+	int donedebug;
+	if (sigtrapped[SIGDEBUG] && isset(DEBUGBEFORECMD)) {
+	    exiting = donetrap;
+	    ret = lastval;
+	    dotrap(SIGDEBUG);
+	    lastval = ret;
+	    donetrap = exiting;
+	    noerrexit = oldnoerrexit;
+	    /*
+	     * Only execute the trap once per sublist, even
+	     * if the DEBUGBEFORECMD option changes.
+	     */
+	    donedebug = 1;
+	} else
+	    donedebug = 0;
+
 	ltype = WC_LIST_TYPE(code);
 	csp = cmdsp;
 
@@ -969,7 +985,7 @@ sublist_done:
 
 	noerrexit = oldnoerrexit;
 
-	if (sigtrapped[SIGDEBUG]) {
+	if (sigtrapped[SIGDEBUG] && !isset(DEBUGBEFORECMD) && !donedebug) {
 	    exiting = donetrap;
 	    ret = lastval;
 	    dotrap(SIGDEBUG);

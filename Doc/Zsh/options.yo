@@ -1009,6 +1009,14 @@ on the choice of the output base, nor on the output of bases other than
 hexadecimal and octal.  Note that these formats will be understood on input
 irrespective of the setting of tt(C_BASES).
 )
+pindex(DEBUG_BEFORE_CMD)
+cindex(traps, DEBUG, before or after command)
+cindex(DEBUG trap, before or after command)
+item(tt(DEBUG_BEFORE_CMD))(
+Run the tt(DEBUG) trap before each command; otherwise it is run after
+each command.  Setting this option mimics the behaviour of ksh 93; with
+the option unset the behaviour is that of ksh 88.
+)
 pindex(ERR_EXIT)
 cindex(exit status, trapping)
 item(tt(ERR_EXIT) (tt(-e), ksh: tt(-e)))(
