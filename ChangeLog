@@ -1,3 +1,8 @@
+2007-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23098: Src/builtin.c, Test/D07multibyte.ztst: print widths
+	in printf take account of multibyte characters.
+
 2007-01-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23097: Src/lex.c, Src/utils.c, Src/zsh.h, Src/Zle/compcore.c:

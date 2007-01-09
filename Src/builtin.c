@@ -3792,6 +3792,12 @@ bin_print(char *name, char **args, Options ops, int func)
 	return ret;
     }
     
+    /*
+     * All the remaining code in this function is for printf-style
+     * output (printf itself, or print -f).  We still have to handle
+     * special cases of printing to a ZLE buffer or the history, however.
+     */
+
     if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s')) {
 #ifdef HAVE_OPEN_MEMSTREAM
     	if ((fout = open_memstream(&buf, &mcount)) == NULL)
@@ -3948,26 +3954,74 @@ bin_print(char *name, char **args, Options ops, int func)
 	    case 's':
 	    case 'b':
 		if (curarg) {
-		    char *b;
-		    int l;
+		    char *b, *ptr;
+		    int lbytes, lchars, lleft;
+#ifdef MULTIBYTE_SUPPORT
+		    mbstate_t mbs;
+#endif
+
 		    if (*c == 'b') {
 			b = getkeystring(metafy(curarg, curlen, META_USEHEAP),
-					 &l,
+					 &lbytes,
 					 OPT_ISSET(ops,'b') ? GETKEYS_BINDKEY :
 					 GETKEYS_PRINTF_ARG, &nnl);
 		    } else {
 			b = curarg;
-			l = curlen;
+			lbytes = curlen;
 		    }
-		    /* handle width/precision here and use fwrite so that
-		     * nul characters can be output */
-		    if (prec >= 0 && prec < l) l = prec;
+		    /*
+		     * Handle width/precision here and use fwrite so that
+		     * nul characters can be output.
+		     *
+		     * First, examine width of string given that it
+		     * may contain multibyte characters.  The output
+		     * widths are for characters, so we need to count
+		     * (in lchars).  However, if we need to truncate
+		     * the string we need the width in bytes (in lbytes).
+		     */
+		    ptr = b;
+#ifdef MULTIBYTE_SUPPORT
+		    memset(&mbs, 0, sizeof(mbs));
+#endif
+
+		    for (lchars = 0, lleft = lbytes; lleft > 0; lchars++) {
+			int chars;
+
+			if (lchars == prec) {
+			    /* Truncate at this point. */
+			    lbytes = ptr - b;
+			    break;
+			}
+#ifdef MULTIBYTE_SUPPORT
+			if (isset(MULTIBYTE)) {
+			    chars = mbrlen(ptr, lleft, &mbs);
+			    if (chars < 0) {
+				/*
+				 * Invalid/incomplete character at this
+				 * point.  Assume all the rest are a
+				 * single byte.  That's about the best we
+				 * can do.
+				 */
+				lchars += lleft;
+				lbytes = (ptr - b) + lleft;
+				break;
+			    } else if (chars == 0) {
+				/* NUL, handle as real character */
+				chars = 1;
+			    }
+			}
+			else	/* use the non-multibyte code below */
+#endif
+			    chars = 1; /* compiler can optimise this...*/
+			lleft -= chars;
+			ptr += chars;
+		    }
 		    if (width > 0 && flags[2]) width = -width;
-		    if (width > 0 && l < width)
-		    	count += fprintf(fout, "%*c", width - l, ' ');
-		    count += fwrite(b, 1, l, fout);
-		    if (width < 0 && l < -width)
-		    	count += fprintf(fout, "%*c", -width - l, ' ');
+		    if (width > 0 && lchars < width)
+		    	count += fprintf(fout, "%*c", width - lchars, ' ');
+		    count += fwrite(b, 1, lbytes, fout);
+		    if (width < 0 && lchars < -width)
+		    	count += fprintf(fout, "%*c", -width - lchars, ' ');
 		    if (nnl) {
 			/* If the %b arg had a \c escape, truncate the fmt. */
 			flen = c - fmt + 1;

@@ -311,3 +311,7 @@
 0:Delimiters in parameter flags
 >barXX
 >YYYYYHIbar
+
+  printf "%4.3s\n" főobar
+0:Multibyte characters in printf widths
+> főo
