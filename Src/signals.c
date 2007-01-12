@@ -1071,6 +1071,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     char *name, num[4];
     int trapret = 0;
     int obreaks = breaks;
+    int oretflag = retflag;
     int isfunc;
     int traperr;
 
@@ -1109,7 +1110,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 
     lexsave();
     execsave();
-    breaks = 0;
+    breaks = retflag = 0;
     runhookdef(BEFORETRAPHOOK, NULL);
     if (*sigtr & ZSIG_FUNC) {
 	int osc = sfcontext;
@@ -1176,15 +1177,20 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	if (isfunc) {
 	    breaks = loops;
 	    errflag = 1;
+	    lastval = trapret;
 	} else {
 	    lastval = trapret-1;
 	}
+	/* return triggered */
+	retflag = 1;
     } else {
 	if (traperr && emulation != EMULATE_SH)
 	    lastval = 1;
 	if (try_tryflag)
 	    errflag = traperr;
 	breaks += obreaks;
+	/* return not triggered: restore old flag */
+	retflag = oretflag;
 	if (breaks > loops)
 	    breaks = loops;
     }

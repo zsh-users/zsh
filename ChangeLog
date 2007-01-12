@@ -1,3 +1,8 @@
+2007-01-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23101: Src/signals.c, Test/C03traps.ztst: ZERR traps
+	had various odd features when combined with function returns.
+
 2007-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/11111: Doc/Zsh/options.yo, Src/exec.c, Src/options.c,
