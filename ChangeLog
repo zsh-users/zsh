@@ -1,3 +1,8 @@
+2007-01-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23104: Src/exec.c, Src/zsh.h: fix line numbering in
+	users/11111 and tidy up wordcode definitions slightly.
+
 2007-01-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23101: Src/signals.c, Test/C03traps.ztst: ZERR traps

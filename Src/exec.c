@@ -866,6 +866,35 @@ execlist(Estate state, int dont_change_job, int exiting)
     code = *state->pc++;
     while (wc_code(code) == WC_LIST && !breaks && !retflag) {
 	int donedebug;
+
+	ltype = WC_LIST_TYPE(code);
+	csp = cmdsp;
+
+	if ((!intrap || trapisfunc) && !ineval) {
+	    /*
+	     * Ensure we have a valid line number for debugging,
+	     * unless we are in an evaluated trap in which case
+	     * we retain the line number from the context.
+	     * This was added for DEBUGBEFORECMD but I've made
+	     * it unconditional to keep dependencies to a minimum.
+	     *
+	     * The line number is updated for individual pipelines.
+	     * This isn't necessary for debug traps since they only
+	     * run once per sublist.
+	     */
+	    wordcode code2 = *state->pc, lnp1 = 0;
+	    if (ltype & Z_SIMPLE) {
+		lnp1 = code2;
+	    } else if (wc_code(code2) == WC_SUBLIST) {
+		if (WC_SUBLIST_FLAGS(code2) == WC_SUBLIST_SIMPLE)
+		    lnp1 = state->pc[2];
+		else
+		    lnp1 = WC_PIPE_LINENO(state->pc[1]);
+	    }
+	    if (lnp1)
+		lineno = lnp1 - 1;
+	}
+
 	if (sigtrapped[SIGDEBUG] && isset(DEBUGBEFORECMD)) {
 	    exiting = donetrap;
 	    ret = lastval;
@@ -880,9 +909,6 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    donedebug = 1;
 	} else
 	    donedebug = 0;
-
-	ltype = WC_LIST_TYPE(code);
-	csp = cmdsp;
 
 	if (ltype & Z_SIMPLE) {
 	    next = state->pc + WC_LIST_SKIP(code);

@@ -703,8 +703,9 @@ struct eccstr {
 #define WC_LIST_TYPE(C)     wc_data(C)
 #define Z_END               (1<<4) 
 #define Z_SIMPLE            (1<<5)
-#define WC_LIST_SKIP(C)     (wc_data(C) >> 6)
-#define WCB_LIST(T,O)       wc_bld(WC_LIST, ((T) | ((O) << 6)))
+#define WC_LIST_FREE        (6)	/* Next bit available in integer */
+#define WC_LIST_SKIP(C)     (wc_data(C) >> WC_LIST_FREE)
+#define WCB_LIST(T,O)       wc_bld(WC_LIST, ((T) | ((O) << WC_LIST_FREE)))
 
 #define WC_SUBLIST_TYPE(C)  (wc_data(C) & ((wordcode) 3))
 #define WC_SUBLIST_END      0
@@ -714,8 +715,10 @@ struct eccstr {
 #define WC_SUBLIST_COPROC   4
 #define WC_SUBLIST_NOT      8
 #define WC_SUBLIST_SIMPLE  16
-#define WC_SUBLIST_SKIP(C)  (wc_data(C) >> 5)
-#define WCB_SUBLIST(T,F,O)  wc_bld(WC_SUBLIST, ((T) | (F) | ((O) << 5)))
+#define WC_SUBLIST_FREE    (5)	/* Next bit available in integer */
+#define WC_SUBLIST_SKIP(C)  (wc_data(C) >> WC_SUBLIST_FREE)
+#define WCB_SUBLIST(T,F,O)  wc_bld(WC_SUBLIST, \
+				   ((T) | (F) | ((O) << WC_SUBLIST_FREE)))
 
 #define WC_PIPE_TYPE(C)     (wc_data(C) & ((wordcode) 1))
 #define WC_PIPE_END         0
