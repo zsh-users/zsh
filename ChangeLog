@@ -1,3 +1,7 @@
+2007-01-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 23107, 23109: Config/defs.mk.in: suppress parallel makes.
+
 2007-01-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23104: Src/exec.c, Src/zsh.h: fix line numbering in
@@ -407,7 +411,7 @@
 	* unposted: Doc/Zsh/metafaq.yo, Etc/FAQ.yo: archive.progeny.com
 	mirror site is being decommissioned.  Remove from lists
 
-2006-10-15  Barton E. Schaefer  <schaefer@brasslantern.com>
+2006-10-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Misc/colors: add several comments about
 	other ANSI terminal attributes, cribbed from ECMA-48.

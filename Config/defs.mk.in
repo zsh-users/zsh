@@ -98,3 +98,9 @@ FUNCTIONS_INSTALL='$(FUNCTIONS_INSTALL)' tzsh='$(tzsh)'
 
 # override built-in suffix list
 .SUFFIXES:
+
+# parallel build is not supported (pmake, gmake)
+.NOTPARALLEL:
+
+# parallel build is not supported (dmake)
+.NO_PARALLEL:
