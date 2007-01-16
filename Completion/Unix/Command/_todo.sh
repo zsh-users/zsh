@@ -13,7 +13,7 @@
 setopt localoptions braceccl
 
 local expl curcontext="$curcontext" state line pri nextstate
-local -a cmdlist itemlist
+local -a cmdlist itemlist match mbegin mend
 integer NORMARG
 
 _arguments -s -n : \
@@ -26,7 +26,8 @@ _arguments -s -n : \
   '1:command:->commands' \
   '*:arguments:->arguments' && return 0
 
-local txtmsg="text, can include p:<project> and @<where>"
+local projmsg="context or project"
+local txtmsg="text with contexts or projects"
 
 case $state in
   (commands)
@@ -60,11 +61,7 @@ case $state in
 	nextstate=pri
 	;;
 	(append|prepend)
-	if [[ -prefix p: || -prefix @ ]]; then
-	  nextstate=proj
-	else
-	  _message $txtmsg
-	fi
+	nextstate=proj
 	;;
 	(replace)
 	compadd -Q -- "${(qq)$(todo.sh -p list "^0*${words[CURRENT-1]} ")##<-> }"
@@ -73,15 +70,7 @@ case $state in
     fi
     ;;
 
-    (add)
-    if [[ -prefix p: || -prefix @ ]]; then
-      nextstate=proj
-    else
-      _message $txtmsg
-    fi
-    ;;
-
-    (list|listall)
+    (add|list|listall)
     nextstate=proj
     ;;
 
@@ -115,8 +104,13 @@ case $nextstate in
   (proj)
   # This completes stuff beginning with p: (projects) or @ (contexts);
   # these are todo.sh conventions.
-  _wanted search expl 'context or project' \
+  if [[ ! -prefix p: && ! -prefix @ ]]; then
+    projmsg=$txtmsg
+  fi
+  # In case there are quotes, ignore anything up to whitespace before
+  # the p: or @ (which may not even be there yet).
+  compset -P '*[[:space:]]'
+  _wanted search expl $projmsg \
     compadd ${${=${${(M)${(f)"$(todo.sh -p list)"}##<-> *}##<-> }}:#^(p:*|@*)}
   ;;
 esac
-

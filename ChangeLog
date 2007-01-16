@@ -1,3 +1,9 @@
+2007-01-16  Peter Stephenson  <pws@csr.com>
+
+	* users/11113: Completion/Unix/Command/_todo.sh: extend
+	project and context completion to ordinary text and complete
+	after whitespace in quotes.
+
 2007-01-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 23107, 23109: Config/defs.mk.in: suppress parallel makes.
