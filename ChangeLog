@@ -1,5 +1,7 @@
 2007-01-18  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/calsys.yo: typo with parentheses.
+
 	* 23114: Src/subst.c: ${foo:s/bar/rod} was broken (when final
 	delimiter is not present).
 

@@ -501,7 +501,7 @@ This is a generic function to parse dates and times that may be
 used separately from the calendar system.  The argument is a date
 or time specification as described in
 ifzman(the section FILE AND DATE FORMATS above)\
-ifnzman(noderef(Calendar File and Date Formats).  The parameter tt(REPLY)
+ifnzman(noderef(Calendar File and Date Formats)).  The parameter tt(REPLY)
 is set to the number of seconds since the epoch corresponding to that date
 or time.  By default, the date and time may occur anywhere within the given
 argument.
@@ -536,7 +536,6 @@ today.  The behaviour is unspecified if the iron tongue of midnight
 is tolling twelve.
 )
 enditem()
-)
 )
 findex(calendar_show)
 item(tt(calendar_show))(
