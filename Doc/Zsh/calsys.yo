@@ -523,7 +523,7 @@ item(tt(-d))(
 Enable additional debugging output.
 )
 item(tt(-r))(
-The arguments passed is to be parsed as a relative time.
+The argument passed is to be parsed as a relative time.
 )
 item(tt(-s))(
 In addition to setting tt(REPLY), set tt(REPLY2) to the remainder of
