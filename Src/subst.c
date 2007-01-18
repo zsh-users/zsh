@@ -3477,7 +3477,11 @@ modify(char **str, char **ptr)
 			chuck(tt--);
 		*ptr1end = sav1;
 		*ptr3 = sav;
-		*ptr = ptr3 + charlen - 1;
+		*ptr = ptr3 - 1;
+		if (*ptr3) {
+		    /* Final terminator is optional. */
+		    *ptr += charlen;
+		}
 		break;
 
 	    case '&':

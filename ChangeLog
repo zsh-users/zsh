@@ -1,3 +1,8 @@
+2007-01-18  Peter Stephenson  <pws@csr.com>
+
+	* 23114: Src/subst.c: ${foo:s/bar/rod} was broken (when final
+	delimiter is not present).
+
 2007-01-16  Peter Stephenson  <pws@csr.com>
 
 	* users/11113: Completion/Unix/Command/_todo.sh: extend
