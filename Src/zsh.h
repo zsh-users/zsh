@@ -246,37 +246,38 @@ enum {
     DOUTPAR,
     AMPERBANG,		/* 30 */
     SEMIAMP,
+    SEMIBAR,
     DOUTBRACK,
     STRING,
-    ENVSTRING,
-    ENVARRAY,		/* 35 */
+    ENVSTRING,		/* 35 */
+    ENVARRAY,
     ENDINPUT,
     LEXERR,
 
     /* Tokens for reserved words */
     BANG,	/* !         */
-    DINBRACK,	/* [[        */
-    INBRACE,    /* {         */	/* 40 */
+    DINBRACK,	/* [[        */	/* 40 */
+    INBRACE,    /* {         */
     OUTBRACE,   /* }         */
     CASE,	/* case      */
     COPROC,	/* coproc    */
-    DOLOOP,	/* do        */
-    DONE,	/* done      */ /* 45 */
+    DOLOOP,	/* do        */ /* 45 */
+    DONE,	/* done      */
     ELIF,	/* elif      */
     ELSE,	/* else      */
     ZEND,	/* end       */
-    ESAC,	/* esac      */
-    FI,		/* fi        */ /* 50 */
+    ESAC,	/* esac      */ /* 50 */
+    FI,		/* fi        */
     FOR,	/* for       */
     FOREACH,	/* foreach   */
     FUNC,	/* function  */
-    IF,		/* if        */
-    NOCORRECT,	/* nocorrect */ /* 55 */
+    IF,		/* if        */ /* 55 */
+    NOCORRECT,	/* nocorrect */
     REPEAT,	/* repeat    */
     SELECT,	/* select    */
     THEN,	/* then      */
-    TIME,	/* time      */
-    UNTIL,	/* until     */ /* 60 */
+    TIME,	/* time      */ /* 60 */
+    UNTIL,	/* until     */
     WHILE	/* while     */
 };
 
@@ -783,12 +784,14 @@ struct eccstr {
 #define WC_TRY_SKIP(C)	    wc_data(C)
 #define WCB_TRY(O)	    wc_bld(WC_TRY, (O))
 
-#define WC_CASE_TYPE(C)     (wc_data(C) & 3)
+#define WC_CASE_TYPE(C)     (wc_data(C) & 7)
 #define WC_CASE_HEAD        0
 #define WC_CASE_OR          1
 #define WC_CASE_AND         2
-#define WC_CASE_SKIP(C)     (wc_data(C) >> 2)
-#define WCB_CASE(T,O)       wc_bld(WC_CASE, ((T) | ((O) << 2)))
+#define WC_CASE_TESTAND     3
+#define WC_CASE_FREE	    (3) /* Next bit available in integer */
+#define WC_CASE_SKIP(C)     (wc_data(C) >> WC_CASE_FREE)
+#define WCB_CASE(T,O)       wc_bld(WC_CASE, ((T) | ((O) << WC_CASE_FREE)))
 
 #define WC_IF_TYPE(C)       (wc_data(C) & 3)
 #define WC_IF_HEAD          0

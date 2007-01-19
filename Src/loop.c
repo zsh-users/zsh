@@ -606,9 +606,10 @@ execcase(Estate state, int do_exec)
 		execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
 				    do_exec));
 	    }
-	    break;
-	} else
-	    state->pc = next;
+	    if (WC_CASE_TYPE(code) != WC_CASE_TESTAND)
+		break;
+	}
+	state->pc = next;
     }
     cmdpop();
 

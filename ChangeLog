@@ -1,3 +1,9 @@
+2007-01-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23115: Doc/Zsh/grammar.yo, Src/lex.c, Src/loop.c, Src/parse.c,
+	Src/text.c, Src/zsh.h, Test/A01grammar.ztst:  add ";|"
+	at end of case statement to cause testing of later patterns.
+
 2007-01-18  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/calsys.yo: typo with parentheses.
