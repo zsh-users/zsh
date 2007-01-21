@@ -1,3 +1,8 @@
+2007-01-21  Clint Adams  <clint@zsh.org>
+
+	* 23116: arno: Completion/Unix/Command/_getmail:
+	strip out erroneous commas.
+
 2007-01-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23115: Doc/Zsh/grammar.yo, Src/lex.c, Src/loop.c, Src/parse.c,
