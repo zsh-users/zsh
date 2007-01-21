@@ -855,10 +855,7 @@ gmatchcmp(Gmatch a, Gmatch b)
     for (i = gf_nsorts, s = gf_sortlist; i; i--, s++) {
 	switch (*s & ~GS_DESC) {
 	case GS_NAME:
-	    if (gf_numsort)
-	    	r = nstrpcmp(&b->name, &a->name);
-	    else
-	    	r = strpcmp(&b->name, &a->name);
+	    r = zstrcmp(b->name, a->name, gf_numsort ? SORTIT_NUMERICALLY : 0);
 	    break;
 	case GS_DEPTH:
 	    {

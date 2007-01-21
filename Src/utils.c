@@ -3625,6 +3625,17 @@ metafy(char *buf, int len, int heap)
     return buf;
 }
 
+
+/*
+ * Take a null-terminated, metafied string in s into a literal
+ * representation by converting in place.  The length is in *len
+ * len is non-NULL; if len is NULL, you don't know the length of
+ * the final string, but if it's to be supplied to some system
+ * routine that always uses NULL termination, such as a filename
+ * interpreter, that doesn't matter.  Note the NULL termination
+ * is always copied for purposes of that kind.
+ */
+
 /**/
 mod_export char *
 unmetafy(char *s, int *len)

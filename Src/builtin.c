@@ -617,8 +617,7 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
     }
     if (sort)
-	qsort(args, arrlen(args), sizeof(char *),
-	      sort > 0 ? strpcmp : invstrpcmp);
+	strmetasort(args, sort < 0 ? SORTIT_BACKWARDS : 0, NULL);
     if (array) {
 	/* create an array with the specified elements */
 	char **a = NULL, **y;
@@ -3603,30 +3602,16 @@ bin_print(char *name, char **args, Options ops, int func)
     }
 
     /* -o and -O -- sort the arguments */
-    /*
-     * TODO: this appears to be yet another of the endless
-     * chunks of code that didn't get fixed up properly
-     * to reflect the fact that args contains unmetafied
-     * strings that may contain NULs with the lengths in
-     * len.
-     */
-    if (OPT_ISSET(ops,'o')) {
-	if (fmt && !*args) return 0;
-	if (OPT_ISSET(ops,'i'))
-	    qsort(args, arrlen(args), sizeof(char *), cstrpcmp);
-	else
-	    qsort(args, arrlen(args), sizeof(char *), strpcmp);
-    } else if (OPT_ISSET(ops,'O')) {
-	if (fmt && !*args) return 0;
-	if (OPT_ISSET(ops,'i'))
-	    qsort(args, arrlen(args), sizeof(char *), invcstrpcmp);
-	else
-	    qsort(args, arrlen(args), sizeof(char *), invstrpcmp);
+    if (OPT_ISSET(ops,'o') || OPT_ISSET(ops,'O')) {
+	int flags;
+
+	if (fmt && !*args)
+	    return 0;
+	flags = OPT_ISSET(ops,'i') ? SORTIT_IGNORING_CASE : 0;
+	if (OPT_ISSET(ops,'O'))
+	    flags |= SORTIT_BACKWARDS;
+	strmetasort(args, flags, len);
     }
-    /* after sorting arguments, recalculate lengths */
-    if(OPT_ISSET(ops,'o') || OPT_ISSET(ops,'O'))
-	for(n = 0; n < argc; n++)
-	    len[n] = strlen(args[n]);
 
     /* -c -- output in columns */
     if (!fmt && (OPT_ISSET(ops,'c') || OPT_ISSET(ops,'C'))) {

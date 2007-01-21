@@ -886,3 +886,20 @@
 >/one
 >/
 >/
+
+  nully=($'a\0c' $'a\0b\0b' $'a\0b\0a' $'a\0b\0' $'a\0b' $'a\0' $'a')
+  for string in ${(o)nully}; do
+    for (( i = 1; i <= ${#string}; i++ )); do
+      foo=$string[i]
+      printf "%02x" $(( #foo ))
+    done
+    print
+  done
+0:Sorting arrays with embedded nulls
+>61
+>6100
+>610062
+>61006200
+>6100620061
+>6100620062
+>610063

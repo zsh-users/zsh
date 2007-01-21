@@ -3028,7 +3028,7 @@ matchcmp(Cmatch *a, Cmatch *b)
     if ((*b)->disp && !((*b)->flags & CMF_MORDER))
 	return 1;
 
-    return strbpcmp(&((*a)->str), &((*b)->str));
+    return zstrbcmp((*a)->str, (*b)->str);
 }
 
 /* This tests whether two matches are equal (would produce the same
@@ -3077,8 +3077,9 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 	    char **ap, **bp, **cp;
 
 	    /* Now sort the array (it contains strings). */
-	    qsort((void *) rp, n, sizeof(char *),
-		  (int (*) _((const void *, const void *)))strbpcmp);
+	    strmetasort((char **)rp, SORTIT_IGNORING_BACKSLASHES |
+			(isset(NUMERICGLOBSORT) ? SORTIT_NUMERICALLY : 0),
+			NULL);
 
 	    /* And delete the ones that occur more than once. */
 	    for (ap = cp = (char **) rp; *ap; ap++) {

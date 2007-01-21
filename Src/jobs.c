@@ -1967,13 +1967,13 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 			    if (!strncmp(signame, "SIG", 3))
 				signame += 3;
 			    for (sig = 1; sig <= SIGCOUNT; sig++)
-				if (!cstrpcmp(sigs + sig, &signame))
+				if (!strcasecmp(sigs[sig], signame))
 				    break;
 			    if (sig > SIGCOUNT) {
 				int i;
 
 				for (i = 0; alt_sigs[i].name; i++)
-				    if (!cstrpcmp(&alt_sigs[i].name, &signame))
+				    if (!strcasecmp(alt_sigs[i].name, signame))
 				    {
 					sig = alt_sigs[i].num;
 					break;

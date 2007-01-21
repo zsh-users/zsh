@@ -618,146 +618,6 @@ strcatsub(char **d, char *pb, char *pe, char *src, int l, char *s, int glbsub,
     return dest;
 }
 
-typedef int (*CompareFn) _((const void *, const void *));
-
-/**/
-mod_export int
-strpcmp(const void *a, const void *b)
-{
-#ifdef HAVE_STRCOLL
-    return strcoll(*(char **)a, *(char **)b);
-#else
-    return strcmp(*(char **)a, *(char **)b);
-#endif
-}
-
-/**/
-int
-invstrpcmp(const void *a, const void *b)
-{
-#ifdef HAVE_STRCOLL
-    return -strcoll(*(char **)a, *(char **)b);
-#else
-    return -strcmp(*(char **)a, *(char **)b);
-#endif
-}
-
-/**/
-int
-cstrpcmp(const void *a, const void *b)
-{
-#ifdef HAVE_STRCOLL
-    VARARR(char, c, strlen(*(char **) a) + 1);
-    VARARR(char, d, strlen(*(char **) b) + 1);
-    char *s, *t;
-    int   cmp;
-
-    for (s = *(char **) a, t = c; (*t++ = tulower(*s++)););
-    for (s = *(char **) b, t = d; (*t++ = tulower(*s++)););
-
-    cmp = strcoll(c, d);
-
-    return cmp;
-#else
-    char *c = *(char **)a, *d = *(char **)b;
-
-    for (; *c && tulower(*c) == tulower(*d); c++, d++);
-
-    return (int)STOUC(tulower(*c)) - (int)STOUC(tulower(*d));
-#endif
-}
-
-/**/
-int
-invcstrpcmp(const void *a, const void *b)
-{
-#ifdef HAVE_STRCOLL
-    VARARR(char, c, strlen(*(char **) a) + 1);
-    VARARR(char, d, strlen(*(char **) b) + 1);
-    char *s, *t;
-    int   cmp;
-
-    for (s = *(char **) a, t = c; (*t++ = tulower(*s++)););
-    for (s = *(char **) b, t = d; (*t++ = tulower(*s++)););
-
-    cmp = strcoll(c, d);
-
-    return -cmp;
-#else
-    char *c = *(char **)a, *d = *(char **)b;
-
-    for (; *c && tulower(*c) == tulower(*d); c++, d++);
-
-    return (int)STOUC(tulower(*d)) - (int)STOUC(tulower(*c));
-#endif
-}
-
-/**/
-int
-nstrpcmp(const void *a, const void *b)
-{
-    char *c = *(char **)a, *d = *(char **)b;
-    int cmp;
-
-#ifdef HAVE_STRCOLL
-    cmp = strcoll(c, d);
-#endif
-    for (; *c == *d && *c; c++, d++);
-#ifndef HAVE_STRCOLL
-    cmp = (int)STOUC(*c) - (int)STOUC(*d);
-#endif
-    if (idigit(*c) || idigit(*d)) {
-	for (; c > *(char **)a && idigit(c[-1]); c--, d--);
-	if (idigit(*c) && idigit(*d)) {
-	    while (*c == '0')
-		c++;
-	    while (*d == '0')
-		d++;
-	    for (; idigit(*c) && *c == *d; c++, d++);
-	    if (idigit(*c) || idigit(*d)) {
-		cmp = (int)STOUC(*c) - (int)STOUC(*d);
-		while (idigit(*c) && idigit(*d))
-		    c++, d++;
-		if (idigit(*c) && !idigit(*d))
-		    return 1;
-		if (idigit(*d) && !idigit(*c))
-		    return -1;
-	    }
-	}
-    }
-    return cmp;
-}
-
-/**/
-int
-invnstrpcmp(const void *a, const void *b)
-{
-    return -nstrpcmp(a, b);
-}
-
-/**/
-int
-instrpcmp(const void *a, const void *b)
-{
-    VARARR(char, c, strlen(*(char **) a) + 1);
-    VARARR(char, d, strlen(*(char **) b) + 1);
-    char **e = (char **)&c;
-    char **f = (char **)&d;
-    char *s, *t;
-
-    for (s = *(char **) a, t = c; (*t++ = tulower(*s++)););
-    for (s = *(char **) b, t = d; (*t++ = tulower(*s++)););
-
-    return nstrpcmp(&e, &f);
-}
-
-/**/
-int
-invinstrpcmp(const void *a, const void *b)
-{
-    return -instrpcmp(a, b);
-}
-
 /*
  * Pad the string str, returning a result from the heap (or str itself,
  * if it didn't need padding).  If str is too large, it will be truncated.
@@ -1470,13 +1330,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     /* Value from (I) flag, used for ditto. */
     int flnum = 0;
     /*
-     * sortit is an obscure combination of the settings for (o), (O),
-     * (i) and (n). casind is (i) and numord is (n); these are
-     * separate so we can have fun doing the obscure combinatorics later.
+     * sortit is to be passed to strmetasort().
      * indord is the (a) flag, which for consistency doesn't get
      * combined into sortit.
      */
-    int sortit = 0, casind = 0, numord = 0, indord = 0;
+    int sortit = SORTIT_ANYOLDHOW, indord = 0;
     /* (u): straightforward. */
     int unique = 0;
     /* combination of (L), (U) and (C) flags. */
@@ -1693,18 +1551,20 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 
 		case 'o':
-		    sortit = 1;
+		    if (!sortit)
+			sortit |= SORTIT_SOMEHOW; /* sort, no modifiers */
 		    break;
 		case 'O':
-		    sortit = 2;
+		    sortit |= SORTIT_BACKWARDS;
 		    break;
 		case 'i':
-		    casind = 1;
+		    sortit |= SORTIT_IGNORING_CASE;
 		    break;
 		case 'n':
-		    numord = 1;
+		    sortit |= SORTIT_NUMERICALLY;
 		    break;
 		case 'a':
+		    sortit |= SORTIT_SOMEHOW;
 		    indord = 1;
 		    break;
 
@@ -1870,15 +1730,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    s++;
 	}
     }
-    /* Sort is done by indexing on sortit-1:
-     *   bit 1: ascending (o)/descending (O)
-     *   bit 2: case sensitive/independent (i)
-     *   bit 3: strict order/numeric (n)
-     * unless indord (a) is set set, in which case only test for
-     * descending by assuming only (O) is possible (not verified).
-     */
-    if (sortit)
-	sortit += (casind << 1) + (numord << 2);
 
     /*
      * premul, postmul specify the padding character to be used
@@ -3171,11 +3022,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    return n;
 	}
 	/* Handle (o) and (O) and their variants */
-	if (sortit) {
+	if (sortit != SORTIT_ANYOLDHOW) {
 	    if (!copied)
 		aval = arrdup(aval);
 	    if (indord) {
-		if (sortit & 2) {
+		if (sortit & SORTIT_BACKWARDS) {
 		    char *copy;
 		    char **end = aval + arrlen(aval) - 1, **start = aval;
 
@@ -3187,14 +3038,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    }
 		}
 	    } else {
-		static CompareFn sortfn[] = {
-		    strpcmp, invstrpcmp, cstrpcmp, invcstrpcmp,
-		    nstrpcmp, invnstrpcmp, instrpcmp, invinstrpcmp
-		};
-
-		i = arrlen(aval);
-		if (i && (*aval[i-1] || --i))
-		    qsort(aval, i, sizeof(char *), sortfn[sortit-1]);
+		/*
+		 * HERE: we tested if the last element of the array
+		 * was not a NULL string.  Why the last element?
+		 * Why didn't we expect NULL strings to work?
+		 * Was it just a clumsy way of testing whether there
+		 * was enough in the array to sort?
+		 */
+		strmetasort(aval, sortit, NULL);
 	    }
 	}
 	if (plan9) {

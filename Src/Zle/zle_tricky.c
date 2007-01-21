@@ -2100,28 +2100,26 @@ sfxlen(char *s, char *t)
 }
 #endif
 
-/* This is strcmp with ignoring backslashes. */
+/* This is zstrcmp with ignoring backslashes. */
 
 /**/
 mod_export int
-strbpcmp(char **aa, char **bb)
+zstrbcmp(const char *a, const char *b)
 {
-    char *a = *aa, *b = *bb;
+    const char *astart = a;
 
     while (*a && *b) {
 	if (*a == '\\')
 	    a++;
 	if (*b == '\\')
 	    b++;
-	if (*a != *b)
+	if (*a != *b || !*a)
 	    break;
-	if (*a)
-	    a++;
-	if (*b)
-	    b++;
+	a++;
+	b++;
     }
     if (isset(NUMERICGLOBSORT) && (idigit(*a) || idigit(*b))) {
-	for (; a > *aa && idigit(a[-1]); a--, b--);
+	for (; a > astart && idigit(a[-1]); a--, b--);
 	if (idigit(*a) && idigit(*b)) {
 	    while (*a == '0')
 		a++;
@@ -2310,8 +2308,8 @@ listlist(LinkList l)
 	*p = (char *) getdata(node);
     *p = NULL;
 
-    qsort((void *) data, num, sizeof(char *),
-	  (int (*) _((const void *, const void *))) strbpcmp);
+    strmetasort((char **)data, SORTIT_IGNORING_BACKSLASHES |
+		(isset(NUMERICGLOBSORT) ? SORTIT_NUMERICALLY : 0), NULL);
 
     for (p = data, lenp = lens; *p; p++, lenp++) {
 	len = *lenp = ZMB_nicewidth(*p) + 2;

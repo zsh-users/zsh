@@ -1944,6 +1944,51 @@ struct heap {
 #define ZSIG_ALIAS	(1<<3)  /* Trap is stored under an alias */
 #define ZSIG_SHIFT	4
 
+/***********/
+/* Sorting */
+/***********/
+
+typedef int (*CompareFn) _((const void *, const void *));
+
+enum {
+    SORTIT_ANYOLDHOW = 0,	/* Defaults */
+    SORTIT_IGNORING_CASE = 1,
+    SORTIT_NUMERICALLY = 2,
+    SORTIT_BACKWARDS = 4,
+    /*
+     * Ignore backslashes that quote another character---which may
+     * be another backslash; the second backslash is active.
+     */
+    SORTIT_IGNORING_BACKSLASHES = 8,
+    /*
+     * Ignored by strmetasort(); used by paramsubst() to indicate
+     * there is some sorting to do.
+     */
+    SORTIT_SOMEHOW = 16,
+};
+
+/*
+ * Element of array passed to qsort().
+ */
+struct sortelt {
+    /* The original string. */
+    char *orig;
+    /* The string used for comparison. */
+    const char *cmp;
+    /*
+     * The length of the string if passed down to the sort algorithm.
+     * Used to sort the lengths together with the strings.
+     */
+    int origlen;
+    /*
+     * The length of the string, if needed, else -1.
+     * The length is only needed if there are embededded nulls.
+     */
+    int len;
+};
+
+typedef struct sortelt *SortElt;
+
 /************************/
 /* Flags to casemodifiy */
 /************************/
