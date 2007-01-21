@@ -213,7 +213,7 @@ cd_calc()
 static int
 cd_sort(const void *a, const void *b)
 {
-    return zstrpcmp((*((Cdstr *) a))->sortstr, (*((Cdstr *) b))->sortstr, 0);
+    return zstrcmp((*((Cdstr *) a))->sortstr, (*((Cdstr *) b))->sortstr, 0);
 }
 
 static int
