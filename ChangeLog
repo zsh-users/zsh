@@ -1,5 +1,8 @@
 2007-01-21  Clint Adams  <clint@zsh.org>
 
+	* 23117: arno: Completion/Unix/Command/_yafc:
+	strip out erroneous commas.
+
 	* 23116: arno: Completion/Unix/Command/_getmail:
 	strip out erroneous commas.
 
