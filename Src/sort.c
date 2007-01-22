@@ -68,15 +68,23 @@ eltpcmp(const void *a, const void *b)
 	else
 	    len = be->len;
 
-	for (cmpa = as, cmpb = bs; *cmpa == *cmpb && len--; cmpa++, cmpb++)
-	    if (!*cmpa)
+	for (cmpa = as, cmpb = bs; *cmpa == *cmpb && len--; cmpa++, cmpb++) {
+	    if (!*cmpa) {
+		/*
+		 * If either string doesn't have a length, we've reached
+		 * the end.  This is covered in the test below.
+		 */
+		if (ae->len == -1 || be->len == -1)
+		    break;
 		laststarta = cmpa + 1;
+	    }
+	}
 	if (*cmpa == *cmpb && ae->len != be->len) {
 	    /*
 	     * Special case: one of the strings has finished, but
 	     * another one continues after the NULL.  The string
 	     * that's finished sorts below the other.  We need
-	     * to handle this here since stroll() or strcmp()
+	     * to handle this here since strcoll() or strcmp()
 	     * will just compare the strings as equal.
 	     */
 	    if (ae->len != -1) {
@@ -136,7 +144,7 @@ eltpcmp(const void *a, const void *b)
 #ifndef HAVE_STRCOLL
     else
 	cmp = strcmp(as, bs);
-#endif	
+#endif
 
     return sortdir * cmp;
 }
@@ -351,8 +359,7 @@ strmetasort(char **array, int sortwhat, int *unmetalenp)
 	}
     }
     /*
-     * We need to restore sortdir so that calls to
-     * [n]strcmp work when 
+     * We probably don't need to restore the following, but it's pretty cheap.
      */
     oldsortdir = sortdir;
     oldsortnumeric = sortnumeric;
