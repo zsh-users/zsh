@@ -1,3 +1,8 @@
+2007-01-22  Peter Stephenson  <pws@csr.com>
+
+	* 23119: Src/sort.c, Test/B03print.ztst, Test/D07multibyte.ztst:
+	do lowering of multibyte character case in sorting properly.
+
 2007-01-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23118: Doc/Zsh/expn.yo, Src/builtin.c, Src/glob.c, Src/jobs.c,

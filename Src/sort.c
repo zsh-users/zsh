@@ -248,7 +248,8 @@ strmetasort(char **array, int sortwhat, int *unmetalenp)
 	    || *metaptr == Meta) {
 	    char *s, *t, *src = *arrptr, *dst;
 	    int len;
-	    sortarrptr->cmp = dst = (char *)zhalloc(strlen(src) + 1);
+	    sortarrptr->cmp = dst =
+		(char *)zhalloc(((sortwhat & SORTIT_IGNORING_CASE)?2:1)*strlen(src)+1);
 
 	    if (unmetalenp) {
 		/* Already unmetafied and we have the length. */
@@ -283,8 +284,49 @@ strmetasort(char **array, int sortwhat, int *unmetalenp)
 		len = metaptr - src;
 	    }
 	    if (sortwhat & SORTIT_IGNORING_CASE) {
-		for (s = src, t = dst; s - src != len; )
-		    *t++ = tulower(*s++);
+		char *send = src + len;
+#ifdef MULTIBYTE_SUPPORT
+		if (isset(MULTIBYTE)) {
+		    /*
+		     * Lower the case the hard way.  Convert to a wide
+		     * character, process that, and convert back.  We
+		     * don't assume the characters have the same
+		     * multibyte length.  We can't use casemodify()
+		     * because we have unmetafied data, which may have
+		     * been passed down to use.
+		     */
+		    mbstate_t mbsin, mbsout;
+		    int clen;
+		    wchar_t wc;
+		    memset(&mbsin, 0, sizeof(mbstate_t));
+		    memset(&mbsout, 0, sizeof(mbstate_t));
+
+		    for (s = src, t = dst; s < send; ) {
+			clen = mbrtowc(&wc, s, send-s, &mbsin);
+			if (clen < 0) {
+			    /* invalid or unfinished: treat as single bytes */
+			    while (s < send)
+				*t++ = tulower(*s++);
+			    break;
+			}
+			if (clen == 0) {
+			    /* embedded null */
+			    *t++ = '\0';
+			    s++;
+			    continue;
+			}
+			s += clen;
+			wc = towlower(wc);
+			clen = wcrtomb(t, wc, &mbsout);
+			t += clen;
+			DPUTS(clen < 0, "Bad conversion when lowering case");
+		    }
+		    *t = '\0';
+		    len = t - dst;
+		} else
+#endif
+		    for (s = src, t = dst; s < send; )
+			*t++ = tulower(*s++);
 		src = dst;
 	    }
 	    if (sortwhat & SORTIT_IGNORING_BACKSLASHES) {

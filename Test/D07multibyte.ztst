@@ -2,6 +2,8 @@
 
 # Find a UTF-8 locale.
   setopt multibyte
+# Don't let LC_* override our choice of locale.
+  unset -m LC_\*
   mb_ok=
   langs=(en_US.UTF-8 en_GB.UTF-8 en.UTF-8
 	 $(locale -a 2>/dev/null | sed -e 's/utf8/UTF-8/' | grep UTF-8))
@@ -315,3 +317,12 @@
   printf "%4.3s\n" főobar
 0:Multibyte characters in printf widths
 > főo
+
+# We ask for case-insensitive sorting here (and supply upper case
+# characters) so that we exercise the logic in the shell that lowers the
+# case of the string for case-insensitive sorting.
+  print -oi HAH HUH HEH HÉH HÈH
+  (LC_ALL=C; print -oi HAH HUH HEH HÉH HÈH)
+0:Multibyte characters in print sorting
+>HAH HEH HÉH HÈH HUH
+>HAH HEH HUH HÈH HÉH

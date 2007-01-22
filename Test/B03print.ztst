@@ -34,7 +34,12 @@
 >baz
 >bar
 
- print -io a B c
+# some locales force case-insensitive sorting
+ (LC_ALL=C; print -o a B c)
+0:case-sensitive argument sorting
+>B a c
+
+ (LC_ALL=C; print -io a B c)
 0:case-insensitive argument sorting
 >a B c
 
