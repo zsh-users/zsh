@@ -542,14 +542,14 @@ cmd_or_math(int cs_type)
     c = dquote_parse(')', 0);
     cmdpop();
     *bptr = '\0';
-    if (!c) {
-	c = hgetc();
-	if (c == ')')
-	    return 1;
-	hungetc(c);
-	lexstop = 0;
-	c = ')';
-    }
+    if (c)
+	return 1;
+    c = hgetc();
+    if (c == ')')
+	return 1;
+    hungetc(c);
+    lexstop = 0;
+    c = ')';
     hungetc(c);
     lexstop = 0;
     while (len > oldlen) {
@@ -1436,8 +1436,15 @@ dquote_parse(char endchar, int sub)
 	cmdpop();
     if (lexstop)
 	err = intick || endchar || err;
-    else if (err == 1)
+    else if (err == 1) {
+	/*
+	 * TODO: as far as I can see, this hack is used in gettokstr()
+	 * to hungetc() a character on an error.  However, I don't
+	 * understand what that actually gets us, and we can't guarantee
+	 * it's a character anyway, because of the previous test.
+	 */
 	err = c;
+    }
     if (zlemath && zlemetacs <= zlemetall + 1 - inbufct)
 	inwhat = IN_MATH;
     return err;

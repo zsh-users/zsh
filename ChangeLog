@@ -1,3 +1,10 @@
+2007-01-23  Peter Stephenson  <pws@csr.com>
+
+	* 23126, modified: Src/lex.c: errors when deciding between
+	$(( and $( were not handled properly and in particular caused
+	problems in history expansion in zle.  The code is a little
+	obscure; added a comment about this.
+
 2007-01-22  Peter Stephenson  <pws@csr.com>
 
 	* 23122: Src/sort.c: bug with some strings with embedded nulls and
