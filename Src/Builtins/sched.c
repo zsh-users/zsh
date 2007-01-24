@@ -97,11 +97,8 @@ checksched(void)
 	 */
 	if (schedcmds) {
 	    /*
-	     * We need to delete the function from the list again,
-	     * in case called code rescheduled.  This is almost
-	     * as cheap as checking if it's in the list already.
+	     * We've already delete the function from the list.
 	     */
-	    deltimedfn(checksched);
 	    DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (1)");	    addtimedfn(checksched, schedcmds->time);
 	}
     }

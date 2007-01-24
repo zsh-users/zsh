@@ -1,5 +1,9 @@
 2007-01-24  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/Builtins/sched.c: minor error in sched that no
+	one's spotted yet: we deleted a timed function twice if
+	there was anything left in the list after we ran an event.
+
 	* 23131: Test/.distfiles, Test/D08cmdsubst.ztst: new tests for
 	command substitution.
 
