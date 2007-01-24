@@ -1,3 +1,8 @@
+2007-01-24  Peter Stephenson  <pws@csr.com>
+
+	* 23131: Test/.distfiles, Test/D08cmdsubst.ztst: new tests for
+	command substitution.
+
 2007-01-23  Peter Stephenson  <pws@csr.com>
 
 	* 23126, modified: Src/lex.c: errors when deciding between

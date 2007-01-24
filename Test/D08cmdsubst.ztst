@@ -1,0 +1,83 @@
+# Tests for command substitution.
+
+%prep
+  mkdir cmdsubst.tmp
+  touch cmdsubst.tmp/file{1,2}.txt
+
+%test
+  foo="two words"
+  print -l `echo $foo bar`
+0:Basic `...` substitution
+>two
+>words
+>bar
+
+  foo="two words"
+  print -l $(echo $foo bar)
+0:Basic $(...) substitution
+>two
+>words
+>bar
+
+  foo='intricate buffoonery'
+  print -l "`echo $foo and licentiousness`"
+0:Quoted `...` substitution
+>intricate buffoonery and licentiousness
+
+  foo="more words"
+  print -l "$(echo $foo here)"
+0:Quoted $(...) substitution
+>more words here
+
+# we used never to get this one right, but I think it is now...
+  print -r "`print -r \\\\\\\\`"
+0:Stripping of backslasshes in quoted `...`
+>\\
+
+  print -r "$(print -r \\\\\\\\)"
+0:Stripping of backslashes in quoted $(...)
+>\\\\
+
+  fnify() { print \"$*\"; }
+  print `fnify \`fnify understatement\``
+0:Nested `...`
+>""understatement""
+
+  print $(fnify $(fnify overboard))
+0:Nested $(...)
+>""overboard""
+
+  fructify() { print \'$*\'; }
+  print "`fructify \`fructify indolence\``"
+0:Nested quoted `...`
+>''indolence''
+
+  print "$(fructify $(fructify obtuseness))"
+0:Nested quoted $(...)
+>''obtuseness''
+
+  gesticulate() { print \!$*\!; }
+  print $((gesticulate wildly); gesticulate calmly)
+0:$(( ... ) ... ) is not arithmetic
+>!wildly! !calmly!
+
+  commencify() { print +$*+; }
+  print "$((commencify output); commencify input)"
+0:quoted $(( ... ) .. ) is not arithmetic
+>+output+
+>+input+
+
+  (
+  cd cmdsubst.tmp
+  print first: ${$(print \*)}
+  print second: ${~$(print \*)}
+  print third: ${$(print *)}
+  print fourth: "${~$(print \*)}"
+  print fifth: ${~"$(print \*)"}
+  )
+0:mixing $(...) with parameter substitution and globbing
+>first: *
+>second: file1.txt file2.txt
+>third: file1.txt file2.txt
+>fourth: *
+>fifth: file1.txt file2.txt
