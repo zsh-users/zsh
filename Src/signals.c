@@ -349,7 +349,7 @@ static signal_jmp_buf suspend_jmp_buf;
 
 /**/
 int
-signal_suspend(int sig)
+signal_suspend(UNUSED(int sig))
 {
     int ret;
  
