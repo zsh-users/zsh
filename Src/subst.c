@@ -2102,7 +2102,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    {
 			int zero = 1;
 			/* Calculate length in possibly multibyte chars */
-			int charlen = MB_METASTRLEN(val);
+			unsigned int charlen = MB_METASTRLEN(val);
 
 			if (charlen < fwidth) {
 			    char *valprefend = val;
