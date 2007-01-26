@@ -1,3 +1,13 @@
+2007-01-26  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Zle/zle_tricky.c: fixed the error checking of
+	mbrtowc(), whose return value can never be < 0.
+
+	* unposted: Src/subst.c: silenced a compiler warning by making
+	an int unsigned.
+
+	* unposted: Src/signals.c: mark an arg as UNUSED().
+
 2007-01-24  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/Builtins/sched.c: minor error in sched that no
