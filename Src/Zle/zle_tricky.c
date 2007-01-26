@@ -2589,7 +2589,7 @@ magicspace(char **args)
      * but must be ASCII, so we simply cast the pointer.
      */
     memset(&mbs, 0, sizeof(mbs));
-    if (mbrtowc(zlebangchar, (char *)&bangchar, 1, &mbs) < 0)
+    if (mbrtowc(zlebangchar, (char *)&bangchar, 1, &mbs) == MB_INVALID)
 	return selfinsert(args);
 #else
     zlebangchar[0] = bangchar;
