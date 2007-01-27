@@ -1,7 +1,8 @@
 2007-01-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 23136: Src/utils.c, Test/A03quoting.ztst: 23097 added Bnulls
-	for backslashes in $'...' strings but then didn't handle them.
+	* 23136, 23138: Src/utils.c, Test/A03quoting.ztst: 23097 added
+	Bnulls for backslashes in $'...' strings but then didn't handle
+	them.
 
 2007-01-26  Wayne Davison  <wayned@users.sourceforge.net>
 

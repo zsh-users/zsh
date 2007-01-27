@@ -17,6 +17,20 @@
 0:$'-style quotes with backslashed backslashes
 >'a \' is 'a backslash' is 'a \'
 
+  chars=$(print -r $'BS\\MBS\M-\\')
+  for (( i = 1; i <= $#chars; i++ )); do
+    char=$chars[$i]
+    print $(( [#16] #char ))
+  done
+0:$'-style quote with metafied backslash
+>16#42
+>16#53
+>16#5C
+>16#4D
+>16#42
+>16#53
+>16#DC
+
   print -r ''''
   setopt rcquotes
 # We need to set rcquotes here for the next example since it is

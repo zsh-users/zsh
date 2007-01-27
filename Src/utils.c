@@ -4915,27 +4915,45 @@ getkeystring(char *s, int *len, int how, int *misc)
 	    *t++ = *++s ^ 32;
 	else {
 	    if (itok(*s)) {
+		/*
+		 * We need to be quite careful here.  We haven't
+		 * necessarily got an input stream with all tokens
+		 * removed, so the majority of tokens need passing
+		 * through untouched and without Meta handling.
+		 * However, me may need to handle tokenized
+		 * backslashes.
+		 */
 		if (meta || control) {
 		    /*
 		     * Presumably we should be using meta or control
 		     * on the character representing the token.
+		     *
+		     * Special case: $'\M-\\' where the token is a Bnull.
+		     * This time we dump the Bnull since we're
+		     * replacing the whole thing.  The lexer
+		     * doesn't know about the meta or control modifiers.
 		     */
-		    *t++ = ztokens[*s - Pound];
+		    if ((how & GETKEY_DOLLAR_QUOTE) && *s == Bnull)
+			*t++ = *++s;
+		    else
+			*t++ = ztokens[*s - Pound];
 		} else if (how & GETKEY_DOLLAR_QUOTE) {
+		    /*
+		     * We don't want to metafy this, it's a real
+		     * token.
+		     */
+		    *tdest++ = *s;
 		    if (*s == Bnull) {
 			/*
 			 * Bnull is a backslash which quotes a couple
 			 * of special characters that always appear
 			 * literally next.  See strquote handling
-			 * in gettokstr() in lex.c.
+			 * in gettokstr() in lex.c.  We need
+			 * to retain the Bnull (as above) so that quote
+			 * handling in completion can tell where the
+			 * backslash was.
 			 */
 			*tdest++ = *++s;
-		    } else {
-			/*
-			 * We don't want to metafy this, it's a real
-			 * token.
-			 */
-			*tdest++ = *s;
 		    }
 		    continue;
 		} else
