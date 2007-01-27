@@ -4914,23 +4914,34 @@ getkeystring(char *s, int *len, int how, int *misc)
 	} else if (*s == Meta)
 	    *t++ = *++s ^ 32;
 	else {
-	    *t++ = *s;
 	    if (itok(*s)) {
 		if (meta || control) {
 		    /*
 		     * Presumably we should be using meta or control
 		     * on the character representing the token.
 		     */
-		    *s = ztokens[*s - Pound];
+		    *t++ = ztokens[*s - Pound];
 		} else if (how & GETKEY_DOLLAR_QUOTE) {
-		    /*
-		     * We don't want to metafy this, it's a real
-		     * token.
-		     */
-		    *tdest++ = *s;
+		    if (*s == Bnull) {
+			/*
+			 * Bnull is a backslash which quotes a couple
+			 * of special characters that always appear
+			 * literally next.  See strquote handling
+			 * in gettokstr() in lex.c.
+			 */
+			*tdest++ = *++s;
+		    } else {
+			/*
+			 * We don't want to metafy this, it's a real
+			 * token.
+			 */
+			*tdest++ = *s;
+		    }
 		    continue;
-		}
-	    }
+		} else
+		    *t++ = *s;
+	    } else
+		*t++ = *s;
 	}
 	if (meta == 2) {
 	    t[-1] |= 0x80;

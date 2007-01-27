@@ -13,6 +13,10 @@
 >'ut queant laxis'
 >"resonare fibris"
 
+  print -r $'\'a \\\' is \'a backslash\' is \'a \\\''
+0:$'-style quotes with backslashed backslashes
+>'a \' is 'a backslash' is 'a \'
+
   print -r ''''
   setopt rcquotes
 # We need to set rcquotes here for the next example since it is
