@@ -1,3 +1,9 @@
+2007-01-29  Clint Adams  <clint@zsh.org>
+
+	* 23140: Completion/Unix/Command/_arping: handle syntax for
+	iputils variant as well as whichever arping for which we
+	had already been completing.
+
 2007-01-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23136, 23138: Src/utils.c, Test/A03quoting.ztst: 23097 added

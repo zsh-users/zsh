@@ -1,5 +1,23 @@
 #compdef arping
 
+if _pick_variant iputils=iputils unix -V; then
+
+_arguments -s \
+  '-f[quit on first reply]' \
+  '-q[be quiet]' \
+  '-b[keep broadcasting, do not go unicast]' \
+  '-D[duplicate address detection mode]'\
+  '-U[Unsolicited ARP mode, update your neighbours]' \
+  '-A[ARP answer mode, update your neighbours]' \
+  '-V[print version and exit]' \
+  '-c[how many packets to send]:count' \
+  '-w[how long to wait for a reply]:timeout' \
+  '-I[interface]:ethernet interface:_net_interfaces' \
+  '-s[source ip address]:source IP address:_hosts' \
+  ':destination:_hosts'
+
+else
+
 _arguments -s \
   '(-)-h[display help information]' \
   '-q[only display error messages]' \
@@ -17,6 +35,8 @@ _arguments -s \
   '-s[set source MAC address]:source MAC address' \
   '-t[set target MAC address]:target MAC address' \
   '-c[send this many requests]:count' \
-  '-i[interface]:interface' \
+  '-i[interface]:interface:_net_interfaces' \
   '-A[only count addresses matching requested address]' \
-  '(-B):address:_hosts' \
+  '(-B):address:_hosts'
+ 
+fi
