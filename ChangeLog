@@ -1,3 +1,8 @@
+2007-01-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23141: Src/jobs.c: don't refresh the display after
+	a printjob() that didn't print anything.
+
 2007-01-29  Clint Adams  <clint@zsh.org>
 
 	* 23140: Completion/Unix/Command/_arping: handle syntax for

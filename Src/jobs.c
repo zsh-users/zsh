@@ -448,8 +448,8 @@ update_job(Job jn)
 	curjob = job;
     }
     if ((isset(NOTIFY) || job == thisjob) && (jn->stat & STAT_LOCKED)) {
-	printjob(jn, !!isset(LONGLISTJOBS), 0);
-	if (zleactive)
+	if (printjob(jn, !!isset(LONGLISTJOBS), 0) &&
+	    zleactive)
 	    zrefreshptr();
     }
     if (sigtrapped[SIGCHLD] && job != thisjob)
@@ -804,19 +804,22 @@ should_report_time(Job j)
  * synch = 0 means asynchronous
  * synch = 1 means synchronous
  * synch = 2 means called synchronously from jobs
+ *
+ * Returns 1 if some output was done.
 */
 
 /**/
-void
+int
 printjob(Job jn, int lng, int synch)
 {
     Process pn;
     int job, len = 9, sig, sflag = 0, llen;
     int conted = 0, lineleng = columns, skip = 0, doputnl = 0;
+    int doneprint = 0;
     FILE *fout = (synch == 2) ? stdout : shout;
 
     if (jn->stat & STAT_NOPRINT)
-	return;
+	return 0;
 
     /*
      * Wow, what a hack.  Did I really write this? --- pws
@@ -874,8 +877,10 @@ printjob(Job jn, int lng, int synch)
 
 	if (!synch)
 	    trashzleptr();
-	if (doputnl && !synch)
+	if (doputnl && !synch) {
+	    doneprint = 1;
 	    putc('\n', fout);
+	}
 	for (pn = jn->procs; pn;) {
 	    len2 = (thisfmt ? 5 : 10) + len;	/* 2 spaces */
 	    if (lng & 3)
@@ -888,6 +893,7 @@ printjob(Job jn, int lng, int synch)
 			break;
 		    len2 += strlen(qn->text) + 2;
 		}
+	    doneprint = 1;
 	    if (!thisfmt || lng) {
 		if (fline)
 		    fprintf(fout, "[%ld]  %c ",
@@ -944,6 +950,7 @@ printjob(Job jn, int lng, int synch)
 	}
 	fflush(fout);
     } else if (doputnl && interact && !synch) {
+	doneprint = 1;
 	putc('\n', fout);
 	fflush(fout);
     }
@@ -954,6 +961,7 @@ printjob(Job jn, int lng, int synch)
 
     if ((lng & 4) || (interact && job == thisjob &&
 		      jn->pwd && strcmp(jn->pwd, pwd))) {
+	doneprint = 1;
 	fprintf(fout, "(pwd %s: ", (lng & 4) ? "" : "now");
 	fprintdir(((lng & 4) && jn->pwd) ? jn->pwd : pwd, fout);
 	fprintf(fout, ")\n");
@@ -973,6 +981,8 @@ printjob(Job jn, int lng, int synch)
 	    setprevjob();
     } else
 	jn->stat &= ~STAT_CHANGED;
+
+    return doneprint;
 }
 
 /**/
