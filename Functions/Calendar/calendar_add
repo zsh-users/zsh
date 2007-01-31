@@ -10,11 +10,28 @@
 emulate -L zsh
 setopt extendedglob
 
-local calendar newfile REPLY lastline
+local calendar newfile REPLY lastline opt
 local -a calendar_entries lockfiles
-integer newdate done rstat
+integer newdate done rstat nolock nobackup
 
 autoload -U calendar_{read,lockfiles,scandate}
+
+while getopts "BL" opt; do
+  case $opt in
+    (B)
+    nobackup=1
+    ;;
+
+    (L)
+    nolock=1
+    ;;
+
+    (*)
+    return 1
+    ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
 
 # Read the calendar file from the calendar-file style
 zstyle -s ':datetime:calendar_add:' calendar-file calendar ||
@@ -31,7 +48,7 @@ fi
 
 # start of block for following always to clear up lockfiles.
 {
-  calendar_lockfiles $calendar || return 1
+  (( nolock )) || calendar_lockfiles $calendar || return 1
 
   if [[ -f $calendar ]]; then
     calendar_read $calendar
@@ -48,10 +65,12 @@ fi
 	done
 	(( done )) || print -r -- "$*"
     } >$newfile
-    if ! mv $calendar $calendar.old; then
-      print "Couldn't back up $calendar to $calendar.old.
+    if (( ! nobackup )); then
+      if ! mv $calendar $calendar.old; then
+	print "Couldn't back up $calendar to $calendar.old.
 New calendar left in $newfile." >&2
-      (( rstat = 1 ))
+	(( rstat = 1 ))
+      fi
     fi
   else
     print -r -- $line >$newfile

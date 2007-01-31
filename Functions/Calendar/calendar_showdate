@@ -1,0 +1,48 @@
+emulate -L zsh
+setopt extendedglob
+
+local optm datefmt
+integer optr replyset
+
+zstyle -s ':datetime:calendar_showdate:' date-format datefmt ||
+  datefmt="%a %b %d %H:%M:%S %Z %Y"
+
+if [[ $1 = -r ]]; then
+  shift
+  REPLY=0
+  optr=1
+else
+  local REPLY
+fi
+
+if (( ! $# )); then
+  print "Usage: $0 datespec [ ... ]" >&2
+  return 1
+fi
+
+while (( $# )); do
+  optm=
+  if [[ $1 = [-+]* ]]; then
+    # relative
+    [[ $1 = -* ]] && optm=-m
+    1=${1[2,-1]}
+    # if this is the first argument, use current time
+    # don't make assumptions about type of reply in case global
+    if (( ! replyset )); then
+      REPLY=$EPOCHSECONDS
+      replyset=1
+    fi
+  fi
+
+  if (( replyset )); then
+    calendar_scandate $optm -R $REPLY -aA $1 || return 1
+    replyset=1
+  else
+    calendar_scandate -aA $1 || return 1
+  fi
+
+  shift
+done
+
+(( optr )) && return
+strftime $datefmt $REPLY

@@ -63,10 +63,14 @@ An example is shown below.
 subsect(Date Format)
 
 The format of the date and time is designed to allow flexibility without
-admitting ambiguity.  Note that there is no localization support; month and
-day names must be in English (though only the first three letters are
-significant) and separator characters are fixed.  Furthermore, time zones
-are not handled; all times are assumed to be local.
+admitting ambiguity.  (The words `date' and `time' are both used in the
+documentation below; except where specifically noted this implies a string
+that may include both a date and a time specification.)  Note that there is
+no localization support; month and day names must be in English and
+separator characters are fixed.  Matching is case insensitive, and only the
+first three letters of the names are significant, although as a special
+case a form beginning "month" does not match "Monday".  Furthermore, time
+zones are not handled; all times are assumed to be local.
 
 It is recommended that, rather than exploring the intricacies of the
 system, users find a date format that is natural to them and stick to it.
@@ -202,24 +206,43 @@ instead a combination of various supported periods are allowed, together
 with an optional time.  The periods must be in order from most to
 least significant.
 
+In some cases, a more accurate calculation is possible when there is an
+anchor date:  offsets of months or years pick the correct day, rather than
+being rounded, and it is possible to pick a particular day in a month as
+`(1st Friday)', etc., as described in more detail below.
+
+Anchors are available in the following cases.  If one or two times are
+passed to the function tt(calendar), the start time acts an anchor for the
+end time when the end time is relative (even if the start time is
+implicit).  When examining calendar files, the scheduled event being
+examined anchors the warning time when it is given explicitly by means of
+the tt(WARN) keyword; likewise, the scheduled event anchors a repitition
+period when given by the tt(RPT) keyword, so that specifications such as
+tt(RPT 2 months, 3rd Thursday) are handled properly.  Finally, the tt(-R)
+argument to tt(calendar_scandate) directly provides an anchor for relative
+calculations.
+
 The periods handled, with possible abbreviations are:
 
 startitem()
 item(Years)(
-tt(years), tt(yrs), tt(ys), tt(year), tt(yr), tt(y).
-Currently a year is 365.25 days, not a calendar year.
+tt(years), tt(yrs), tt(ys), tt(year), tt(yr), tt(y), tt(yearly).
+A year is 365.25 days unless there is an anchor.
 )
 item(Months)(
 tt(months), tt(mons), tt(mnths), tt(mths), tt(month), tt(mon),
-tt(mnth), tt(mth).  Note that tt(m), tt(ms), tt(mn), tt(mns)
-are ambiguous and are em(not) handled.  Currently a month is a period
-of 30 days rather than a calendar month.
+tt(mnth), tt(mth), tt(monthly).  Note that tt(m), tt(ms), tt(mn), tt(mns)
+are ambiguous and are em(not) handled.  A month is a period
+of 30 days rather than a calendar month unless there is an anchor.
 )
 item(Weeks)(
-tt(weeks), tt(wks), tt(ws), tt(week), tt(wk), tt(w)
+tt(weeks), tt(wks), tt(ws), tt(week), tt(wk), tt(w), tt(weekly)
 )
 item(Days)(
-tt(days), tt(dys), tt(ds), tt(day), tt(dy), tt(d)
+tt(days), tt(dys), tt(ds), tt(day), tt(dy), tt(d), tt(daily)
+)
+item(Hours)(
+tt(hours), tt(hrs), tt(hs), tt(hour), tt(hr), tt(h), tt(hourly)
 )
 item(Minutes)(
 tt(minutes), tt(mins), tt(minute), tt(min), but em(not) tt(m),
@@ -233,22 +256,46 @@ enditem()
 Spaces between the numbers are optional, but are required between items,
 although a comma may be used (with or without spaces).
 
+The forms tt(yearly) to tt(hourly) allow the number to be omitted; it is
+assumed to be 1.  For example, tt(1 d) and tt(daily) are equivalent.  Note
+that using those forms with plurals is confusing; tt(2 yearly) is the same
+as tt(2 years), em(not) twice yearly, so it is recommended they only
+be used without numbers.
+
+When an anchor time is present, there is an extension to handle regular
+events in the form of the var(n)th var(some)day of the month.  Such a
+specification must occur immediately after any year and month
+specification, but before any time of day, and must be in the form
+var(n)tt(LPAR()th|st|rd+RPAR()) var(day), for example tt(1st Tuesday) or
+tt(3rd Monday).  As in other places, days are matched case insensitively,
+must be in English, and only the first three letters are significant except
+that a form beginning `month' does not match `Monday'.  No attempt is made
+to sanitize the resulting date; attempts to squeeze too many occurrences
+into a month will push the day into the next month (but in the obvious
+fashion, retaining the correct day of the week).
+
 Here are some examples:
 
 example(30 years 3 months 4 days 3:42:41
 14 days 5 hours
+Monthly, 3rd Thursday
 4d,10hr)
 
 subsect(Example)
 
 Here is an example calendar file.  It uses a consistent date format,
-as recommended above.  The second entry has a continuation line.
+as recommended above.
 
 example(Feb 1, 2006 14:30 Pointless bureaucratic meeting
 Mar 27, 2006 11:00 Mutual recrimination and finger pointing
   Bring water pistol and waterproofs
-Apr 10, 2006 13:30 Even more pointless blame assignment exercise)
+Apr 10, 2006 13:30 Even more pointless blame assignment exercise WARN 30 mins
+May 18, 2006 16:00 Regular moaning session RPT monthly, 3rd Thursday)
 
+The second entry has a continuation line.  The third entry will produce
+a warning 30 minutes before the event (to allow you to equip yourself
+appropriately).  The fourth entry repeats after a month on the 3rd
+Thursday, i.e. June 15, 2006, at the same time.
 
 texinode(Calendar System User Functions)(Calendar Styles)(Calendar File and Date Formats)(Calendar Function System)
 sect(User Functions)
@@ -330,6 +377,14 @@ for a single calendar entry by including tt(WARN) var(reltime) in the first
 line of the entry, where var(reltime) is one of the usual relative time
 formats.
 
+A repeated event may be indicated by including tt(RPT) var(reldate) in the
+first line of the entry.  After the scheduled event has been displayed
+it will be re-entered into the calendar file at a time var(reldate)
+after the existing event.  Note that this is currently the only use
+made of the repeat count, so that it is not possible to query the schedule
+for a recurrence of an event in the calendar until the previous event
+has passed.
+
 It is safe to run tt(calendar -s) to reschedule an existing event
 (if the calendar file has changed, for example), and also to have it
 running in multiples instances of the shell since the calendar file
@@ -343,17 +398,37 @@ Explicitly specify a programme to be used for showing events instead
 of the value of the tt(show-prog) style or the default tt(calendar_show).
 )
 item(tt(-v))(
-Verbose:  show more information about stages of processing.
+Verbose:  show more information about stages of processing.  This
+is useful for confirming that the function has successfully parsed
+the dates in the calendar file.
 )
 enditem()
 )
 findex(calendar_add)
-item(tt(calendar_add) var(event ...))(
+item(tt(calendar_add) [ tt(-BL) ] var(event ...))(
 Adds a single event to the calendar in the appropriate location.
 Using this function ensures that the calendar file is sorted in date
 and time order.  It also makes special arrangments for locking
 the file will it is altered.  The old calendar is left in a file
 with the suffix tt(.old).
+
+The option tt(-B) indicates that backing up the calendar file will be
+handled by the caller and should not be performed by tt(calendar_add).  The
+option tt(-L) indicates that tt(calendar_add) does not need to lock the
+calendar file up the old one as it is already locked.  These options will
+not usually be needed by users.
+)
+findex(calendar_showdate)
+item(tt(calendar_showdate) [ tt(-r) ] var(date-spec ...))(
+The given var(date-spec) is interpreted and the corresponding date and
+time printed.  If the initial var(date-spec) begins with a tt(PLUS()) or
+tt(-) it is treated as relative to the current time; var(date-spec)s after
+the first are treated as relative to the date calculated so far and
+a leading tt(PLUS()) is optional in that case.  This allows one to
+use the system as a date calculator.  For example, tt(calendar_showdate '+1
+month, 1st Friday') shows the date of the first Friday of next month.
+With the option tt(-r) nothing is printed but the value of the date and
+timein seconds since the epoch is stored in the parameter tt(REPLY).
 )
 findex(calendar_sort)
 item(tt(calendar_sort))(
@@ -443,6 +518,21 @@ kindex(calendar-file)
 item(tt(calendar-file))(
 The location of the main calendar.  The default is tt(~/calendar).
 )
+kindex(date-format)
+item(tt(date-format))(
+A tt(strftime) format string (see manref(strftime)(3)) with the zsh
+extensions tt(%f) for a day of the month with no leading zero or space
+for single digits, and tt(%k) or tt(%l) for the hour of the day on the 24-
+or 12-hour clock, again with no leading zero or space for single digits.
+
+This is used for outputting dates in tt(calendar), both to support
+the tt(-v) option and when adding recurring events back to the calendar
+file, and in tt(calendar_showdate) as the final output format.
+
+If the style is not set, the default used is similar the standard system
+format as output by the tt(date) command (also known as `ctime format'):
+`tt(%a %b %d %H:%M:%S %Z %Y)'.
+)
 kindex(done-file)
 item(tt(done-file))(
 The location of the file to which events which have passed are appended.
@@ -522,8 +612,23 @@ they will not be matched if the is any other text in the argument.
 item(tt(-d))(
 Enable additional debugging output.
 )
+item(tt(-m))(
+Minus.  When tt(-R) var(anchor_time) is also given the relative time is
+calculated backwards from var(anchor_time).
+)
 item(tt(-r))(
 The argument passed is to be parsed as a relative time.
+)
+item(tt(-R) var(anchor_time))(
+The argument passed is to be parsed as a relative time.  The time is
+relative to var(anchor_time), a time in seconds since the epoch,
+and the returned value is the absolute time corresponding to advancing
+var(anchor_time) by the relative time given.
+This allows lengths of months to be correctly taken into account.  If
+the final day does not exist in the given month, the last day of the
+final month is given.  For example, if the anchor time is during 31st
+January 2007 and the relative time is 1 month, the final time is the
+same time of day during 28th February 2007.
 )
 item(tt(-s))(
 In addition to setting tt(REPLY), set tt(REPLY2) to the remainder of

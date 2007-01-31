@@ -1,3 +1,10 @@
+2007-01-31  Peter Stephenson  <pws@csr.com>
+
+	* 23142: Doc/Zsh/calsys.yo, Functions/Calendar/calendar,
+	Functions/Calendar/calendar_add, calendar_scandate,
+	calendar_show, calendar_showdate: enhancements for recurring
+	events and relative times and dates in calendar system.
+
 2007-01-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23141: Src/jobs.c: don't refresh the display after

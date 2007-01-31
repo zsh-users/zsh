@@ -22,3 +22,5 @@ if [[ -n $DISPLAY &&  $start -eq $stop ]]; then
     ($cmd "$*" &)
   fi
 fi
+
+return 0

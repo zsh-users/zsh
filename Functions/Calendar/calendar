@@ -1,21 +1,18 @@
 emulate -L zsh
 setopt extendedglob
 
-# standard ctime date/time format
-local ctime="%a %b %d %H:%M:%S %Z %Y"
-
-local line REPLY REPLY2 userange pruned
-local calendar donefile sched newfile warnstr mywarnstr
+local line restline REPLY REPLY2 userange pruned nobackup datefmt
+local calendar donefile sched newfile warnstr mywarnstr newdate
 integer time start stop today ndays y m d next=-1 shown done nodone
-integer verbose warntime mywarntime t tsched i rstat remaining
-integer showcount icount
-local -a calendar_entries
+integer verbose warntime mywarntime t tcalc tsched i rstat remaining
+integer showcount icount repeating repeattime resched
+local -a calendar_entries calendar_addlines
 local -a times calopts showprog lockfiles match mbegin mend
 
 zmodload -i zsh/datetime || return 1
 zmodload -i zsh/zutil || return 1
 
-autoload -U calendar_{read,scandate,show,lockfiles}
+autoload -U calendar_{add,read,scandate,show,lockfiles}
 
 # Read the calendar file from the calendar-file style
 zstyle -s ':datetime:calendar:' calendar-file calendar || calendar=~/calendar
@@ -27,6 +24,9 @@ zstyle -a ':datetime:calendar:' show-prog showprog ||
 # Amount of time before an event when it should be flagged.
 # May be overridden in individual entries
 zstyle -s ':datetime:calendar:' warn-time warnstr || warnstr="0:05"
+# default to standard ctime date/time format
+zstyle -s ':datetime:calendar:' date-format datefmt ||
+  datefmt="%a %b %d %H:%M:%S %Z %Y"
 
 if [[ -n $warnstr ]]; then
   if [[ $warnstr = <-> ]]; then
@@ -169,11 +169,11 @@ strftime -s wd "%u" $start
 
 if (( $# && !remaining )); then
   if [[ $1 = +* ]]; then
-    if ! calendar_scandate -ar ${1[2,-1]}; then
+    if ! calendar_scandate -a -R $start ${1[2,-1]}; then
       print "$0: failed to parse relative time: $1" >&2
       return 1
     fi
-    (( stop = start + REPLY ))
+    (( stop = REPLY ))
   elif [[ $1 = <-> ]]; then
     stop=$1
   else
@@ -184,8 +184,8 @@ if (( $# && !remaining )); then
     stop=$REPLY
   fi
   if (( stop < start )); then
-    strftime -s REPLY $ctime $start
-    strftime -s REPLY2 $ctime $stop
+    strftime -s REPLY $datefmt $start
+    strftime -s REPLY2 $datefmt $stop
     print "$0: requested end time is before start time:
   start: $REPLY
   end: $REPLY2" >&2
@@ -224,12 +224,12 @@ autoload -Uz matchdate
 
 if (( verbose )); then
   print -n "start: "
-  strftime $ctime $start
+  strftime $datefmt $start
   print -n "stop: "
   if (( remaining )); then
     print "none"
   else
-    strftime $ctime $stop
+    strftime $datefmt $stop
   fi
 fi
 
@@ -248,22 +248,32 @@ fi
     # REPLY2 to the line with the date and time removed.
     calendar_scandate -as $line || continue
     (( t = REPLY ))
+    restline=$REPLY2
 
     # Look for specific warn time.
-    pruned=${REPLY2#(|*[[:space:],])WARN[[:space:]]}
+    pruned=${restline#(|*[[:space:],])WARN[[:space:]]}
     (( mywarntime = warntime ))
     mywarnstr=$warnstr
-    if [[ $pruned != $REPLY2 ]]; then
-      if calendar_scandate -ars $pruned; then
-	(( mywarntime = REPLY ))
+    if [[ $pruned != $restline ]]; then
+      if calendar_scandate -asm -R $t $pruned; then
+	(( mywarntime = t - REPLY ))
 	mywarnstr=${pruned%%"$REPLY2"}
+      fi
+    fi
+
+    # Look for a repeat time.
+    (( repeating = 0 ))
+    pruned=${restline#(|*[[:space:],])RPT[[:space:]]}
+    if [[ $pruned != $restline ]]; then
+      if calendar_scandate -a -R $t $pruned; then
+	(( repeattime = REPLY, repeating = 1 ))
       fi
     fi
 
     if (( verbose )); then
       print "Examining: $line"
       print -n "  Date/time: "
-      strftime $ctime $t
+      strftime $datefmt $t
       if [[ -n $sched ]]; then
 	print "  Warning $mywarntime seconds ($mywarnstr) before"
       fi
@@ -272,7 +282,9 @@ fi
     if (( t >= start && (remaining || t <= stop || icount < showcount) ))
     then
       $showprog $start $stop "$line"
-      (( shown = 1, icount++ ))
+      (( icount++ ))
+      # Doesn't count as "shown" unless the event has now passed.
+      (( t <= EPOCHSECONDS )) && (( shown = 1 ))
     elif [[ -n $sched ]]; then
       (( tsched = t - mywarntime ))
       if (( tsched >= start && tsched <= stop)); then
@@ -280,22 +292,36 @@ fi
       fi
     fi
     if [[ -n $sched ]]; then
-      if (( t - mywarntime > EPOCHSECONDS )); then
+      if (( shown && repeating )); then
+	# Done and dusted, but a repeated event is due.
+	strftime -s newdate $datefmt $repeattime
+	calendar_addlines+=("$newdate$restline")
+
+	# We'll add this back in below, but we check in case the
+	# repeated event is the next one due.  It's not
+	# actually a disaster if there's an error and we fail
+	# to add the time.  Always try to reschedule this event.
+	(( tcalc = repeattime, resched = 1 ))
+      else
+	(( tcalc = t ))
+      fi
+
+      if (( tcalc - mywarntime > EPOCHSECONDS )); then
 	# schedule for a warning
-	(( tsched = t - mywarntime ))
+	(( tsched = tcalc - mywarntime, resched = 1 ))
       else
 	# schedule for event itself
-	(( tsched = t ))
+	(( tsched = tcalc ))
+	# but don't schedule unless the event has not yet been shown.
+	(( !shown )) && (( resched = 1 ))
       fi
-      if (( (tsched > EPOCHSECONDS || ! shown) &&
-	    (next < 0 || tsched < next) )); then
+      if (( resched && (next < 0 || tsched < next) )); then
 	(( next = tsched ))
       fi
     fi
     if [[ -n $donefile ]]; then
-      if (( t <= EPOCHSECONDS && shown )); then
+      if (( shown )); then
 	# Done and dusted.
-	# TODO: handle repeated times from REPLY2.
 	if ! print -r $line >>$donefile; then
 	  if (( done != 3 )); then
 	    (( done = 3 ))
@@ -346,9 +372,15 @@ New calendar left in $newfile." >&2
 Old calendar left in $calendar.old." >&2
       (( rstat = 1 ))
     fi
+    nobackup=-B
   elif [[ -n $donefile ]]; then
     rm -f $newfile
   fi
+
+  # Reschedule repeating events.
+  for line in $calendar_addlines; do
+    calendar_add -L $nobackup $line
+  done
 } always {
   (( ${#lockfiles} )) && rm -f $lockfiles
 }
