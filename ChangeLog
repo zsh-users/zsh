@@ -1,3 +1,8 @@
+2007-02-01  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/Sched.c: using 23142 turned up sched bug:
+	we could add checksched twice to the timed event list.
+
 2007-01-31  Peter Stephenson  <pws@csr.com>
 
 	* 23142: Doc/Zsh/calsys.yo, Functions/Calendar/calendar,

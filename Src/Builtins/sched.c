@@ -48,8 +48,40 @@ struct schedcmd {
 };
 
 /* the list of sched jobs pending */
- 
+
 static struct schedcmd *schedcmds;
+
+/* flag that timed event is running (via addtimedfn())*/
+static int schedcmdtimed;
+
+/* Use addtimedfn() to add a timed event for sched's use */
+
+/**/
+static void
+schedaddtimed(time_t t)
+{
+    /*
+     * The following code shouldn't be necessary and indicates
+     * a bug.  However, the DPUTS() in the caller should pick
+     * this up so we can detect and fix it, and the following
+     * Makes The World Safe For Timed Events in non-debugging shells.
+     */
+    if (schedcmdtimed)
+	scheddeltimed();
+    schedcmdtimed = 1;
+    addtimedfn(checksched, schedcmds->time);
+}
+
+/* Use deltimedfn() to remove the sched timed event */
+
+/**/
+static void
+scheddeltimed(void)
+{
+    deltimedfn(checksched);
+    schedcmdtimed = 0;
+}
+
 
 /* Check scheduled commands; call this function from time to time. */
 
@@ -80,7 +112,7 @@ checksched(void)
 	 * Delete from the timed function list now in case
 	 * the called code reschedules.
 	 */
-	deltimedfn(checksched);
+	scheddeltimed();
 
 	if ((sch->flags & SCHEDFLAG_TRASH_ZLE) && zleactive)
 	    trashzleptr();
@@ -94,12 +126,18 @@ checksched(void)
 	 * However, it then occurred to me that having the list of
 	 * forthcoming entries up to date could be regarded as
 	 * a feature, and the inefficiency is negligible.
+	 *
+	 * Careful in case the code we called has already set
+	 * up a timed event; if it has, that'll be up to date since
+	 * we haven't changed the list here.
 	 */
-	if (schedcmds) {
+	if (schedcmds && !schedcmdtimed) {
 	    /*
 	     * We've already delete the function from the list.
 	     */
-	    DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (1)");	    addtimedfn(checksched, schedcmds->time);
+	    DPUTS(timedfns && firstnode(timedfns),
+		  "BUG: already timed fn (1)");
+	    schedaddtimed(schedcmds->time);
 	}
     }
 }
@@ -135,11 +173,11 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    if (schl)
 		schl->next = sch->next;
 	    else {
-		deltimedfn(checksched);
+		scheddeltimed();
 		schedcmds = sch->next;
 		if (schedcmds) {
 		    DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (2)");
-		    addtimedfn(checksched, schedcmds->time);
+		    schedaddtimed(schedcmds->time);
 		}
 	    }
 	    zsfree(sch->cmd);
@@ -269,11 +307,11 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     /* Insert into list in time order */
     if (schedcmds) {
 	if (sch->time < schedcmds->time) {
-	    deltimedfn(checksched);
+	    scheddeltimed();
 	    sch->next = schedcmds;
 	    schedcmds = sch;
 	    DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (3)");
-	    addtimedfn(checksched, t);
+	    schedaddtimed(t);
 	} else {
 	    for (sch2 = schedcmds;
 		 sch2->next && sch2->next->time < sch->time;
@@ -286,7 +324,7 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	sch->next = NULL;
 	schedcmds = sch;
 	DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (4)");
-	addtimedfn(checksched, t);
+	schedaddtimed(t);
     }
     return 0;
 }
@@ -318,6 +356,8 @@ cleanup_(Module m)
 {
     struct schedcmd *sch, *schn;
 
+    if (schedcmds)
+	scheddeltimed();
     for (sch = schedcmds; sch; sch = schn) {
 	schn = sch->next;
 	zsfree(sch->cmd);
