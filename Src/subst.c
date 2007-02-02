@@ -570,21 +570,21 @@ filesubstr(char **namptr, int assign)
 	    return 1;
 	}
     } else if (*str == Equals && isset(EQUALS) && str[1]) {   /* =foo */
-	char sav, *pp, *cnam;
+	char *pp, *cnam, *cmdstr, *str1 = str+1;
 
-	for (pp = str + 1; !isend2(*pp); pp++);
-	sav = *pp;
-	*pp = 0;
-	if (!(cnam = findcmd(str + 1, 1))) {
+	for (pp = str1; !isend2(*pp); pp++)
+	    ;
+	cmdstr = dupstrpfx(str1, pp-str1);
+	untokenize(cmdstr);
+	remnulargs(cmdstr);
+	if (!(cnam = findcmd(cmdstr, 1))) {
 	    if (isset(NOMATCH))
-		zerr("%s not found", str + 1);
+		zerr("%s not found", cmdstr);
 	    return 0;
 	}
 	*namptr = dupstring(cnam);
-	if (sav) {
-	    *pp = sav;
+	if (*pp)
 	    *namptr = dyncat(*namptr, pp);
-	}
 	return 1;
     }
     return 0;

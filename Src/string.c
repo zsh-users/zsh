@@ -135,7 +135,7 @@ bicat(const char *s1, const char *s2)
     return ptr;
 }
 
-/* like strdup(), but with a specified length */
+/* like dupstring(), but with a specified length */
 
 /**/
 mod_export char *
