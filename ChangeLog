@@ -1,5 +1,8 @@
 2007-02-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 23144: Felix Eckhofer <felix@tribut.de>: Src/Zle/complist.c:
+	NULL pointer when ending interactive search in menu select.
+
 	* 23143: Src/string.c, Src/subst.c: =-expansion failed
 	when there were metacharacters in the following string,
 	but still tried to expand it.  It now succeeds.

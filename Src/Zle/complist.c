@@ -2079,6 +2079,9 @@ msearchpop(int *backp)
 {
     Menusearch s = msearchstack;
 
+    if (!s)
+        return NULL;
+
     if (s->prev)
         msearchstack = s->prev;
 
