@@ -22,6 +22,7 @@ _locate
 _look           _lp             _ls             _lsof           _lynx
 _lzop           _mail           _make           _man            _mencal
 _metaflac       _mh             _mount          _mpc            _mt
+_monotone
 _mtools         _mtr            _mutt           _mysqldiff      _mysql_utils
 _ncftp          _netcat         _nice           _nmap           _nslookup
 _pack           _patch          _pax            _pbm            _perforce

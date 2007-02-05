@@ -1,3 +1,9 @@
+2007-02-05  Clint Adams  <clint@zsh.org>
+
+	* 23151: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_monotone: partial completion
+	for mtn (monotone) command.
+
 2007-02-03  Clint Adams  <clint@zsh.org>
 
 	* 23150: Completion/Debian/Command/.distfiles,
