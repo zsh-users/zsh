@@ -3126,7 +3126,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 
         } else if ((mode == MM_FSEARCH || mode == MM_BSEARCH) &&
                    cmd == Th(z_backwarddeletechar)) {
-            int back;
+            int back = 1;
             Cmatch **np = msearchpop(&back);
 
             mode = (back ? MM_BSEARCH : MM_FSEARCH);

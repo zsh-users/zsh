@@ -1,3 +1,8 @@
+2007-02-06  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/Zle/complist.c: 23144 could leave an uninitialised
+	variable.
+
 2007-02-05  Clint Adams  <clint@zsh.org>
 
 	* 23151: Completion/Unix/Command/.distfiles,
