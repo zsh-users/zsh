@@ -1,3 +1,10 @@
+2007-02-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23152: Src/builtin.c, Src/hashtable.c, Src/module.c,
+	Src/options.c, Src/params.c, Src/utils.c: fix ztrcmp()
+	to respect MULTIBYTE option and make sorting of printed
+	out hash tables more consistent.
+
 2007-02-06  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/Zle/complist.c: 23144 could leave an uninitialised

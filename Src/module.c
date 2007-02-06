@@ -1265,7 +1265,7 @@ bin_zmodload_auto(char *nam, char **args, Options ops)
 	return ret;
     } else if(!*args) {
 	/* list autoloaded builtins */
-	scanhashtable(builtintab, 0, 0, 0,
+	scanhashtable(builtintab, 1, 0, 0,
 	    autoloadscan, OPT_ISSET(ops,'L') ? PRINT_LIST : 0);
 	return 0;
     } else {

@@ -4266,7 +4266,7 @@ printparamnode(HashNode hn, int printflags)
 	{
             HashTable ht = p->gsu.h->getfn(p);
             if (ht)
-		scanhashtable(ht, 0, 0, PM_UNSET,
+		scanhashtable(ht, 1, 0, PM_UNSET,
 			      ht->printnode, PRINT_KV_PAIR);
 	}
 	if (!(printflags & PRINT_KV_PAIR))

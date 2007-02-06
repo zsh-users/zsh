@@ -493,7 +493,7 @@ bin_enable(char *name, char **argv, Options ops, int func)
 	    tokenize(*argv);
 	    if ((pprog = patcompile(*argv, PAT_STATIC, 0))) {
 		queue_signals();
-		match += scanmatchtable(ht, pprog, 0, 0, scanfunc, 0);
+		match += scanmatchtable(ht, pprog, 0, 0, 0, scanfunc, 0);
 		unqueue_signals();
 	    }
 	    else {
@@ -2394,7 +2394,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 		continue;
 	    }
 	    if (OPT_PLUS(ops,'m') && !asg->value) {
-		scanmatchtable(paramtab, pprog, on|roff, 0,
+		scanmatchtable(paramtab, pprog, 1, on|roff, 0,
 			       paramtab->printnode, printflags);
 		continue;
 	    }
@@ -2720,7 +2720,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		/* with no options, just print all functions matching the glob pattern */
 		queue_signals();
 		if (!(on|off)) {
-		    scanmatchtable(shfunctab, pprog, 0, DISABLED,
+		    scanmatchtable(shfunctab, pprog, 1, 0, DISABLED,
 				   shfunctab->printnode, pflags);
 		} else {
 		    /* apply the options to all functions matching the glob pattern */
@@ -2987,25 +2987,25 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		 * We're not using it, so search for ... */
 
 		/* aliases ... */
-		scanmatchtable(aliastab, pprog, 0, DISABLED,
+		scanmatchtable(aliastab, pprog, 1, 0, DISABLED,
 			       aliastab->printnode, printflags);
 
 		/* and reserved words ... */
-		scanmatchtable(reswdtab, pprog, 0, DISABLED,
+		scanmatchtable(reswdtab, pprog, 1, 0, DISABLED,
 			       reswdtab->printnode, printflags);
 
 		/* and shell functions... */
-		scanmatchtable(shfunctab, pprog, 0, DISABLED,
+		scanmatchtable(shfunctab, pprog, 1, 0, DISABLED,
 			       shfunctab->printnode, printflags);
 
 		/* and builtins. */
-		scanmatchtable(builtintab, pprog, 0, DISABLED,
+		scanmatchtable(builtintab, pprog, 1, 0, DISABLED,
 			       builtintab->printnode, printflags);
 	    }
 	    /* Done search for `internal' commands, if the -p option *
 	     * was not used.  Now search the path.                   */
 	    cmdnamtab->filltable(cmdnamtab);
-	    scanmatchtable(cmdnamtab, pprog, 0, 0,
+	    scanmatchtable(cmdnamtab, pprog, 1, 0, 0,
 			   cmdnamtab->printnode, printflags);
 
 	    unqueue_signals();
@@ -3193,7 +3193,7 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 	    tokenize(*argv);  /* expand */
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* display matching hash table elements */
-		scanmatchtable(ht, pprog, 0, 0, ht->printnode, printflags);
+		scanmatchtable(ht, pprog, 1, 0, 0, ht->printnode, printflags);
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv);
@@ -3378,7 +3378,7 @@ bin_alias(char *name, char **argv, Options ops, UNUSED(int func))
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* display the matching aliases */
 		queue_signals();
-		scanmatchtable(ht, pprog, flags1, flags2,
+		scanmatchtable(ht, pprog, 1, flags1, flags2,
 			       ht->printnode, printflags);
 		unqueue_signals();
 	    } else {

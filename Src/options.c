@@ -578,7 +578,8 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 		continue;
 	    }
 	    /* Loop over expansions. */
-	    scanmatchtable(optiontab, pprog, 0, OPT_ALIAS, setoption, !isun);
+	    scanmatchtable(optiontab, pprog, 0, 0, OPT_ALIAS,
+			   setoption, !isun);
 	    args++;
 	}
     }

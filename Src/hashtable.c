@@ -355,23 +355,42 @@ hnamcmp(const void *ap, const void *bp)
  * the scanfunc.  Replaced elements will appear in the scan exactly once,
  * the new version if it was not scanned before the replacement was made.
  * Added elements might or might not appear in the scan.
+ *
+ * pprog, if non-NULL, is a pattern that must match the name
+ * of the node.
+ *
+ * The function returns the number of matches, as reduced by pprog, flags1
+ * and flags2.
  */
 
 /**/
-mod_export void
-scanhashtable(HashTable ht, int sorted, int flags1, int flags2, ScanFunc scanfunc, int scanflags)
+mod_export int
+scanmatchtable(HashTable ht, Patprog pprog, int sorted,
+	       int flags1, int flags2, ScanFunc scanfunc, int scanflags)
 {
+    int match = 0;
     struct scanstatus st;
 
-    if (ht->scantab) {
+    /*
+     * scantab is currently only used by modules to scan
+     * tables where the contents are generated on the fly from
+     * other objects.  Note the fact that in this case pprog,
+     * sorted, flags1 and flags2 are ignore.
+     */
+    if (!pprog && ht->scantab) {
 	ht->scantab(ht, scanfunc, scanflags);
-	return;
+	return ht->ct;
     }
     if (sorted) {
 	int i, ct = ht->ct;
 	VARARR(HashNode, hnsorttab, ct);
 	HashNode *htp, hn;
 
+	/*
+	 * Because the structure might change under our feet,
+	 * we can't apply the flags and the pattern before sorting,
+	 * tempting though that is.
+	 */
 	for (htp = hnsorttab, i = 0; i < ht->hsize; i++)
 	    for (hn = ht->nodes[i]; hn; hn = hn->next)
 		*htp++ = hn;
@@ -382,10 +401,14 @@ scanhashtable(HashTable ht, int sorted, int flags1, int flags2, ScanFunc scanfun
 	st.u.s.ct = ct;
 	ht->scan = &st;
 
-	for (htp = hnsorttab, i = 0; i < ct; i++, htp++)
-	    if (*htp && ((*htp)->flags & flags1) + !flags1 &&
-		!((*htp)->flags & flags2))
+	for (htp = hnsorttab, i = 0; i < ct; i++, htp++) {
+	    if ((!flags1 || ((*htp)->flags & flags1)) &&
+		!((*htp)->flags & flags2) &&
+		(!pprog || pattry(pprog, (*htp)->nam))) {
+		match++;
 		scanfunc(*htp, scanflags);
+	    }
+	}
 
 	ht->scan = NULL;
     } else {
@@ -399,49 +422,27 @@ scanhashtable(HashTable ht, int sorted, int flags1, int flags2, ScanFunc scanfun
 	    for (st.u.u = nodes[i]; st.u.u; ) {
 		HashNode hn = st.u.u;
 		st.u.u = st.u.u->next;
-		if ((hn->flags & flags1) + !flags1 && !(hn->flags & flags2))
+		if ((!flags1 || (hn->flags & flags1)) && !(hn->flags & flags2)
+		    && (!pprog || pattry(pprog, hn->nam))) {
+		    match++;
 		    scanfunc(hn, scanflags);
+		}
 	    }
 
 	ht->scan = NULL;
     }
-}
-
-/* Scan all nodes in a hash table and executes scanfunc on the *
- * nodes which meet all the following criteria:                *
- * The hash key must match the glob pattern given by `com'.    *
- * If (flags1 > 0), then any flag in flags1 must be set.       *
- * If (flags2 > 0), then all flags in flags2 must NOT be set.  *
- *                                                             *
- * scanflags is passed unchanged to scanfunc (if executed).    *
- * The return value is the number of matches.                  */
-
-/**/
-int
-scanmatchtable(HashTable ht, Patprog pprog, int flags1, int flags2, ScanFunc scanfunc, int scanflags)
-{
-    int i, hsize = ht->hsize;
-    HashNode *nodes = ht->nodes;
-    int match = 0;
-    struct scanstatus st;
-
-    st.sorted = 0;
-    ht->scan = &st;
-
-    for (i = 0; i < hsize; i++)
-	for (st.u.u = nodes[i]; st.u.u; ) {
-	    HashNode hn = st.u.u;
-	    st.u.u = st.u.u->next;
-	    if ((hn->flags & flags1) + !flags1 && !(hn->flags & flags2) &&
-		pattry(pprog, hn->nam)) {
-		scanfunc(hn, scanflags);
-		match++;
-	    }
-	}
-
-    ht->scan = NULL;
 
     return match;
+}
+
+
+/**/
+mod_export int
+scanhashtable(HashTable ht, int sorted, int flags1, int flags2,
+	      ScanFunc scanfunc, int scanflags)
+{
+    return scanmatchtable(ht, NULL, sorted, flags1, flags2,
+			  scanfunc, scanflags);
 }
 
 /* Expand hash tables when they get too many entries. *
