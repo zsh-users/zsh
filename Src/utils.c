@@ -3693,61 +3693,46 @@ unmeta(const char *file_name)
     return fn;
 }
 
-/* Unmetafy and compare two strings, comparing unsigned character values.
- * "a\0" sorts after "a".  */
+/*
+ * Unmetafy and compare two strings, comparing unsigned character values.
+ * "a\0" sorts after "a".
+ *
+ * Currently this is only used in hash table sorting, where the
+ * keys are names of hash nodes and where we don't use strcoll();
+ * it's not clear if that's right but it does guarantee the ordering
+ * of shell structures on output.
+ *
+ * As we don't use strcoll(), it seems overkill to convert multibyte
+ * characters to wide characters for comparison every time.  In the case
+ * of UTF-8, Unicode ordering is preserved when sorted raw, and for
+ * other character sets we rely on an extension of ASCII so the result,
+ * while it may not be correct, is at least rational.
+ */
 
 /**/
 int
 ztrcmp(char const *s1, char const *s2)
 {
-    convchar_t c1 = 0, c2;
+    int c1, c2;
 
-#ifdef MULTIBYTE_SUPPORT
-    if (isset(MULTIBYTE)) {
-	mb_metacharinit();
-	while (*s1) {
-	    int clen = mb_metacharlenconv(s1, &c1);
-
-	    if (strncmp(s1, s2, clen))
-		break;
-	    s1 += clen;
-	    s2 += clen;
-	}
-    } else
-#endif
-	while (*s1 && *s1 == *s2) {
-	    s1++;
-	    s2++;
-	}
-
-    if (!*s1) {
-	if (!*s2)
-	    return 0;
-	return -1;
-    }
-    if (!*s2)
-	return 1;
-#ifdef MULTIBYTE_SUPPORT
-    if (isset(MULTIBYTE)) {
-	/* TODO: shift state for s2 might be wrong? */
-	mb_metacharinit();
-	(void)mb_metacharlenconv(s2, &c2);
-	if (c1 == WEOF)
-	    c1 = STOUC(*s1 == Meta ? s1[1] ^ 32 : *s1);
-	if (c2 == WEOF)
-	    c2 = STOUC(*s2 == Meta ? s2[1] ^ 32 : *s2);
-    }
-    else
-#endif
-    {
-	c1 = STOUC(*s1 == Meta ? s1[1] ^ 32 : *s1);
-	c2 = STOUC(*s2 == Meta ? s2[1] ^ 32 : *s2);
+    while(*s1 && *s1 == *s2) {
+	s1++;
+	s2++;
     }
 
-    if (c1 < c2)
-	return -1;
-    else if (c1 == c2)
+    if(!(c1 = *s1))
+	c1 = -1;
+    else if(c1 == STOUC(Meta))
+	c1 = *++s1 ^ 32;
+    if(!(c2 = *s2))
+	c2 = -1;
+    else if(c2 == STOUC(Meta))
+	c2 = *++s2 ^ 32;
+
+    if(c1 == c2)
 	return 0;
+    else if(c1 < c2)
+	return -1;
     else
 	return 1;
 }
