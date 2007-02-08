@@ -45,6 +45,14 @@ variables as an error, so can still return status 0 (depending on the
 handling of other arguments).  This appears to be the standard shell
 behaviour.
 
+The variable BAUD is no longer set automatically by the shell.
+In previous versions it was set to the baud rate reported by
+the terminal driver in order to initialise the line editor's
+compensation mechanism for slow baud rates.  However, the baud
+rate so reported is very rarely related to the limiting speed of
+screen updates on modern systems.  Users who need the compensation
+mechanism should set BAUD to an appropriate rate by hand.
+
 The variable HOME is no longer set by the shell if zsh is emulating any
 other shell at startup; it must be present in the environment or set
 subsequently by the user.  It is valid for the variable to be unset.

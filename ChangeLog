@@ -1,5 +1,8 @@
 2007-02-08  Peter Stephenson  <pws@csr.com>
 
+	* unposted: README: add note on 23159 to incompatibilities
+	section.
+
 	* 23159 plus minor doc tweaks: Doc/Zsh/params.yo, Src/params.c,
 	Src/utils.c, Src/Zle/zle_main.c: leave BAUD parameter unset
 	by default.
