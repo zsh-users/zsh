@@ -640,9 +640,16 @@ createparamtable(void)
     setiparam("LOGCHECK", 60);
     setiparam("KEYTIMEOUT", 40);
     setiparam("LISTMAX", 100);
-#ifdef HAVE_SELECT
-    setiparam("BAUD", getbaudrate(&shttyinfo));  /* get the output baudrate */
-#endif
+    /*
+     * We used to get the output baud rate here.  However, that's
+     * pretty irrelevant to a terminal on an X display and can lead
+     * to unnecessary delays if it's wrong (which it probably is).
+     * Furthermore, even if the output is slow it's very likely
+     * to be because of WAN delays, not covered by the output
+     * baud rate.
+     * So allow the user to set it in the special cases where it's
+     * useful.
+     */
     setsparam("TMPPREFIX", ztrdup(DEFAULT_TMPPREFIX));
     setsparam("TIMEFMT", ztrdup(DEFAULT_TIMEFMT));
     setsparam("WATCHFMT", ztrdup(default_watchfmt));

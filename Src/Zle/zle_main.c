@@ -1074,6 +1074,7 @@ zleread(char **lp, char **rp, int flags, int context)
     Thingy initthingy;
 
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
+    /* may not be set, but that's OK since getiparam() returns 0 == off */
     baud = getiparam("BAUD");
     costmult = (baud) ? 3840000L / baud : 0;
 #endif

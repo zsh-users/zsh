@@ -1,3 +1,9 @@
+2007-02-08  Peter Stephenson  <pws@csr.com>
+
+	* 23159 plus minor doc tweaks: Doc/Zsh/params.yo, Src/params.c,
+	Src/utils.c, Src/Zle/zle_main.c: leave BAUD parameter unset
+	by default.
+
 2007-02-07  Peter Stephenson  <pws@csr.com>
 
 	* 23153: Src/utils.c: put back old ztrcmp(), with a comment:

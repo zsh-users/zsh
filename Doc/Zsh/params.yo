@@ -742,19 +742,20 @@ item(tt(ARGV0))(
 If exported, its value is used as the tt(argv[0]) of external commands.
 Usually used in constructs like `tt(ARGV0=emacs nethack)'.
 )
+cindex(editing over slow connection)
+cindex(slow connection, editing over)
 vindex(BAUD)
 item(tt(BAUD))(
-The baud rate of the current connection.  Used by the line editor
-update mechanism to compensate for a slow terminal by delaying
-updates until necessary.  This may be profitably set to a lower value
-in some circumstances, e.g.
-for slow modems dialing into a communications server which is connected
-to a host via a fast link; in this case, this variable
-would be set by default to the speed of the fast link, and not
-the modem.
-This parameter should be set to the baud
-rate of the slowest part of the link for best performance. The compensation
-mechanism can be turned off by setting the variable to zero.
+The rate in bits per second at which data reaches the terminal.
+The line editor will use this value in order to compensate for a slow
+terminal by delaying updates to the display until necessary.  If the
+parameter is unset or the value is zero the compensation mechanism is
+turned off.  The parameter is not set by default.
+
+This parameter may be profitably set in some circumstances, e.g.
+for slow modems dialing into a communications server, or on a slow wide
+area network.  It should be set to the baud
+rate of the slowest part of the link for best performance.
 )
 vindex(cdpath)
 vindex(CDPATH)
