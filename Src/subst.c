@@ -1193,21 +1193,25 @@ static char *
 substevalchar(char *ptr)
 {
     zlong ires = mathevali(ptr);
+    int len;
 
     if (errflag)
 	return NULL;
+#ifdef MULTIBYTE_SUPPORT
     if (isset(MULTIBYTE) && ires > 127) {
 	char buf[10];
-	int dummy;
 
 	/* inefficient: should separate out \U handling from getkeystring */
 	sprintf(buf, "\\U%.8x", (unsigned int)ires);
-	return getkeystring(buf, &dummy, GETKEYS_BINDKEY, NULL);
-    } else {
+	ptr = getkeystring(buf, &len, GETKEYS_BINDKEY, NULL);
+    } else
+#endif
+    {
 	ptr = zhalloc(2);
+	len = 1;
 	sprintf(ptr, "%c", (int)ires);
-	return ptr;
     }
+    return metafy(ptr, len, META_USEHEAP);
 }
 
 /* parameter substitution */

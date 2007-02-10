@@ -1,3 +1,9 @@
+2007-02-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23162: Src/subst.c, D07multibyte.ztst: ${(#)x} didn't
+	metafy the result, giving nonsense if x was somewhere between
+	128 and 160.
+
 2007-02-08  Peter Stephenson  <pws@csr.com>
 
 	* unposted: README: add note on 23159 to incompatibilities
