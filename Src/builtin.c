@@ -1123,9 +1123,10 @@ cd_new_pwd(int func, LinkNode dir)
     set_pwd_env();
 
     if (isset(INTERACTIVE)) {
-	if (unset(PUSHDSILENT) && func != BIN_CD)
-	    printdirstack();
-	else if (doprintdir) {
+	if (func != BIN_CD) {
+            if (unset(PUSHDSILENT))
+	        printdirstack();
+        } else if (doprintdir) {
 	    fprintdir(pwd, stdout);
 	    putchar('\n');
 	}
