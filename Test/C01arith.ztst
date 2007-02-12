@@ -136,3 +136,15 @@
   print $(( 5, (3 + 7, 4) ))
 0:commas and parentheses, part 1
 >4
+
+  (setopt octalzeroes; print $(( 08#77 )))
+0:octalzeroes doesn't affect bases
+>63
+
+  print $(( 36#z ))
+0:bases up to 36 work
+>35
+
+  print $(( 37#z ))
+1:bases beyond 36 don't work
+?(eval):1: invalid base: 37

@@ -1,3 +1,9 @@
+2007-02-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	23165: Src/math.c, Src/utils.c, Doc/Zsh/options.yo: don't
+	try to parse base indicators in octal and raise error for
+	bases above 36.
+
 2007-02-10  Felix Rosencrantz <f.rosencrantz@gmail.com>
 	* 23164: Src/builtin.c when PUSHD_SILENT is set, don't print anything
 	from popd/pushd.

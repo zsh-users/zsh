@@ -1803,7 +1803,10 @@ zstrtol(const char *s, char **t, int base)
 	    base = 8;
     }
     inp = s;
-    if (base <= 10)
+    if (base > 36) {
+	zerr("invalid base: %d", base);
+	return (zlong)0;
+    } else if (base <= 10)
 	for (; *s >= '0' && *s < ('0' + base); s++) {
 	    if (trunc)
 		continue;

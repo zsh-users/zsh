@@ -216,17 +216,33 @@ lexconstant(void)
 	    lastbase = 16;
 	    return NUM;
 	}
-	else if (isset(OCTALZEROES) &&
-		 (memchr(nptr, '.', strlen(nptr)) == NULL) &&
-		 idigit(*nptr)) {
-	    yyval.u.l = zstrtol(ptr, &ptr, 0);
-	    lastbase = 8;
-	    return NUM;
+	else if (isset(OCTALZEROES))
+	{
+	    char *ptr2;
+
+	    /*
+	     * Make sure this is a real octal constant;
+	     * it can't be a base indication (always decimal)
+	     * or a floating point number.
+	     */
+	    for (ptr2 = nptr; idigit(*ptr2); ptr2++)
+		;
+
+	    if (ptr2 > nptr && *ptr2 != '.' && *ptr2 != 'e' &&
+		*ptr2 != 'E' && *ptr2 != '#')
+	    {
+		yyval.u.l = zstrtol(ptr, &ptr, 0);
+		lastbase = 8;
+		return NUM;
+	    }
+	    nptr = ptr2;
 	}
     }
-
-    while (idigit(*nptr))
-	nptr++;
+    else
+    {
+	while (idigit(*nptr))
+	    nptr++;
+    }
 
     if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
 	/* it's a float */
