@@ -432,7 +432,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	if (bind(sess->fd, (struct sockaddr *)&sess->sock.in, sizeof(struct sockaddr_in)))
 	{
 	    char buf[DIGBUFSIZE];
-	    convbase(buf, (zlong)lport, 10);
+	    convbase(buf, (zlong)ntohs(lport), 10);
 	    zwarnnam(nam, "could not bind to port %s: %e", buf, errno);
 	    tcp_close(sess);
 	    return 1;
