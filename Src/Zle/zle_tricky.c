@@ -2247,7 +2247,8 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		}
 		l += 1 + ((cc - 1) / columns);
 		cc = 0;
-		putc('\n', shout);
+		if (dopr)
+		    putc('\n', shout);
 		p++;
 	    } else {
 		convchar_t cchar;
