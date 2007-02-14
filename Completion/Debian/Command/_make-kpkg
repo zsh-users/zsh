@@ -3,10 +3,9 @@
 _arguments \
    '--help[display help message]' \
    '--revision[change Debian revision number]:number:' \
-   '--append-to-version:suffix:' \
-   '--flavour[specify additional kernel sub-version]:flavour:' \
-   '--added-modules:module list:' \
-   '--added-patches:patches list' \
+   '--append-to-version[specify additional kernel sub-version]:suffix:' \
+   '--added-modules[specify add-on modules]:module list:' \
+   '--added-patches[specify additional patches]:patches list' \
    '--arch[specify architecture for cross-compilation]:architecture' \
    '--cross-compile[specify target string]:target' \
    '--subarch[specify subarchitecture]:subarchitecture:' \
@@ -15,11 +14,32 @@ _arguments \
    '--config[specify configuration target]:target:(oldconfig config menuconfig xconfig old menu x)' \
    '--targets[list known targets]' \
    '--noexec[pass -n option to make]' \
+   '--verbose[show top level make commands]' \
    '--initrd[create image suitable for initrd]' \
    '(--bzimage)--zimage[make zImage instead of bzImage]' \
    '(--zimage)--bzimage[make bzImage instead of zImage]' \
+   '--mkimage[command that produces an initrd image given a directory]:command:' \
    '--rootcmd[specify command for gaining root access]:root command:(sudo fakeroot)' \
    '--stem:package name stem:(kernel linux)' \
    '--us[unsigned source]' \
    '--uc[unsigned changelog]' \
-   '*:target:(clean buildpackage binary binary-indep binary-arch kernel-source kernel-headers kernel-doc kernel-image kernel_manual build modules modules_config modules_image modules_clean configure debian libc-kheaders)'
+   '*:target:(( \
+        clean\:"clean the kernel source directory" \
+        buildpackage\:"runs the targets clean and binary" \
+        binary\:"all kernel packages" \
+        binary-indep\:"arch independent packages" \
+        binary-arch\:"arch dependent packages" \
+        kernel-source\:"package of the kernel sources" \
+        kernel-headers\:"package of the header files included in the kernel" \
+        kernel_manual\:"package of the manual pages included in the kernel" \
+        kernel-doc\:"package of teh documentation included in the kernel" \
+        kernel-image\:"package of the kernel image" \
+        build\:"compiles the kernel" \
+        modules\:"build all add-on modules" \
+        modules_config\:"configure all add-on modules" \
+        modules_image\:"build all add-on modules, but wirhou source and diff files" \
+        modules_clean\:"clean add-on modules" \
+        configure\:"configure the kernel" \
+        debian\:"creates the debian/ directory" \
+        libc-kheaders\:"create the kernel headers package needed by libc" \
+        ))'
