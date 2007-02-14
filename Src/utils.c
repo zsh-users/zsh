@@ -514,10 +514,12 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 	    sprintf(buf, "\\U%.8x", (unsigned int)c);
 	    if (widthp)
 		*widthp = 10;
-	} else {
+	} else if (c >= 0x100) {
 	    sprintf(buf, "\\u%.4x", (unsigned int)c);
 	    if (widthp)
 		*widthp = 6;
+	} else {
+	    return nicechar((int)c);
 	}
 	if (swidep)
 	    *swidep = buf + *widthp;
