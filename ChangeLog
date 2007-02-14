@@ -1,3 +1,9 @@
+2007-02-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 23169 (tweaked): Src/exec.c: upon failure to duplicate file
+	descriptors when setting up multios, report error and unwind as
+	gracefully as possible.
+
 2007-02-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23172: Src/Zle/zle_tricky.c: typo fixing line wrapping

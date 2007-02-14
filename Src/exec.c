@@ -1663,8 +1663,23 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
     } else if (!mfds[fd1] || unset(MULTIOS)) {
 	if(!mfds[fd1]) {		/* starting a new multio */
 	    mfds[fd1] = (struct multio *) zhalloc(sizeof(struct multio));
-	    if (!forked && save[fd1] == -2)
-		save[fd1] = (fd1 == fd2) ? -1 : movefd(fd1);
+	    if (!forked && save[fd1] == -2) {
+		if (fd1 == fd2)
+		    save[fd1] = -1;
+		else {
+		    int fdN = movefd(fd1);
+		    /*
+		     * fd1 may already be closed here, so
+		     * ignore bad file descriptor error
+		     */
+		    if (fdN < 0 && errno != EBADF) {
+			zerr("cannot duplicate fd %d: %e", fd1, errno);
+			closemnodes(mfds);
+			return;
+		    }
+		    save[fd1] = fdN;
+		}
+	    }
 	}
 	if (!varid)
 	    redup(fd2, fd1);
@@ -1674,22 +1689,41 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
     } else {
 	if (mfds[fd1]->rflag != rflag) {
 	    zerr("file mode mismatch on fd %d", fd1);
+	    closemnodes(mfds);
 	    return;
 	}
 	if (mfds[fd1]->ct == 1) {	/* split the stream */
-	    mfds[fd1]->fds[0] = movefd(fd1);
-	    mfds[fd1]->fds[1] = movefd(fd2);
+	    int fdN = movefd(fd1);
+	    if (fdN < 0) {
+		zerr("multio failed for fd %d: %e", fd1, errno);
+		closemnodes(mfds);
+		return;
+	    }
+	    mfds[fd1]->fds[0] = fdN;
+	    fdN = movefd(fd2);
+	    if (fdN < 0) {
+		zerr("multio failed for fd %d: %e", fd2, errno);
+		closemnodes(mfds);
+		return;
+	    }
+	    mfds[fd1]->fds[1] = fdN;
 	    mpipe(pipes);
 	    mfds[fd1]->pipe = pipes[1 - rflag];
 	    redup(pipes[rflag], fd1);
 	    mfds[fd1]->ct = 2;
 	} else {		/* add another fd to an already split stream */
+	    int fdN;
 	    if(!(mfds[fd1]->ct % MULTIOUNIT)) {
 		int new = sizeof(struct multio) + sizeof(int) * mfds[fd1]->ct;
 		int old = new - sizeof(int) * MULTIOUNIT;
 		mfds[fd1] = hrealloc((char *)mfds[fd1], old, new);
 	    }
-	    mfds[fd1]->fds[mfds[fd1]->ct++] = movefd(fd2);
+	    if ((fdN = movefd(fd2)) < 0) {
+		zerr("multio failed for fd %d: %e", fd2, errno);
+		closemnodes(mfds);
+		return;
+	    }
+	    mfds[fd1]->fds[mfds[fd1]->ct++] = fdN;
 	}
     }
     if (subsh_close >= 0 && fdtable[subsh_close] == FDT_UNUSED)
