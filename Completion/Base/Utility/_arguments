@@ -217,7 +217,11 @@ if (( long )); then
 	  else
 	    odescr=
 	  fi
-	  opt2=${${opt%%\[\=*}//[^a-zA-Z0-9-]}=${dir}${odescr}
+	  if [[ $opt = (#b)(*)\[\=* ]]; then
+	    opt2=${${match[1]}//[^a-zA-Z0-9-]}=-${dir}${odescr}
+	  else
+	    opt2=${${opt}//[^a-zA-Z0-9-]}=${dir}${odescr}
+	  fi
 	  if [[ "$descr" = :\=* ]]; then
 	    cache+=( "${opt2}::${(L)${opt%\]}#*\=}: " )
 	  elif [[ "$descr" = ::* ]]; then
