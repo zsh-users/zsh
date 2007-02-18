@@ -1,3 +1,8 @@
+2007-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Src/utils.c: document some limitations of
+	getkeystring().
+
 2007-02-16  Peter Stephenson  <pws@csr.com>
 
 	* 23182: Completion/Base/Utility/_arguments: handle

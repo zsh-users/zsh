@@ -4526,6 +4526,16 @@ ucs4toutf8(char *dest, unsigned int wval)
  * - GETKEY_UPDATE_OFFSET is only allowed if GETKEY_DOLLAR_QUOTE is
  *   also present.
  *
+ * *misc is used for various purposes:
+ * - If GETKEY_BACKSLASH_MINUS is set, it indicates the presence
+ *   of \- in the input.
+ * - If GETKEY_BACKSLASH_C is set, it indicates the presence
+ *   of \c in the input.
+ * - If GETKEY_UPDATE_OFFSET is set, it is set on input to some
+ *   mystical completion offset and is updated to a new offset based
+ *   on the converted characters.  All Hail the Completion System
+ *   [makes the mystic completion system runic sign in the air].
+ *
  * The return value is unmetafied unless GETKEY_DOLLAR_QUOTE is
  * in use.
  */
