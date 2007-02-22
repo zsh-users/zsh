@@ -1,3 +1,9 @@
+2007-02-22  Clint Adams  <clint@zsh.org>
+
+	* 23183: Completion/Debian/Command/_make-kpkg:
+	complete comma-separated list of directories/modules
+	for --added-modules.
+
 2007-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/utils.c: document some limitations of
