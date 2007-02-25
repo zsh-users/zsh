@@ -1,3 +1,8 @@
+2007-02-25  Clint Adams  <clint@zsh.org>
+
+	* 23185: Tobias Gruetzmacher: Completion/Unix/Command/_qemu: qemu
+	completion improvements.
+
 2007-02-24  Clint Adams  <clint@zsh.org>
 
 	* 23184: Completion/Unix/Command/_qemu: completion for qemu.
