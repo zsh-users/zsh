@@ -4,6 +4,13 @@
 	Completion/Unix/Commands/_ip (tweaked), Doc/Zsh/compsys.yo: add to
 	regex completion handling and add new ip completion.
 
+2007-02-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 23176 (tweaked): Doc/Zsh/expn.yo, Src/subst.c: make the (X)
+	parameter expansion flag apply to the (#) flag as well, so that
+	"character not in range" is not normally a fatal error.  Also
+	fix a minor typo in a comment.
+
 2007-02-25  Clint Adams  <clint@zsh.org>
 
 	* 23185: Tobias Gruetzmacher: Completion/Unix/Command/_qemu: qemu

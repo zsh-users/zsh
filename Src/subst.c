@@ -1193,7 +1193,7 @@ static char *
 substevalchar(char *ptr)
 {
     zlong ires = mathevali(ptr);
-    int len;
+    int len = 0;
 
     if (errflag)
 	return NULL;
@@ -1204,7 +1204,8 @@ substevalchar(char *ptr)
 	/* inefficient: should separate out \U handling from getkeystring */
 	sprintf(buf, "\\U%.8x", (unsigned int)ires);
 	ptr = getkeystring(buf, &len, GETKEYS_BINDKEY, NULL);
-    } else
+    }
+    if (len == 0)
 #endif
     {
 	ptr = zhalloc(2);
@@ -2603,7 +2604,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	/*
 	 * Handler ${+...}.  TODO: strange, why do we handle this only
 	 * if there isn't a trailing modifier?  Why don't we do this
-	 * e.g. when we hanlder the ${(t)...} flag?
+	 * e.g. when we handle the ${(t)...} flag?
 	 */
 	if (chkset) {
 	    val = dupstring(vunset ? "0" : "1");
@@ -2658,6 +2659,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     if (errflag)
 	return NULL;
     if (evalchar) {
+	int one = noerrs, oef = errflag, haserr = 0;
+
+	if (!quoteerr)
+	    noerrs = 1;
 	/*
 	 * Evaluate the value numerically and output the result as
 	 * a character.
@@ -2669,15 +2674,24 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 	    for (avptr = aval, av2ptr = aval2; *avptr; avptr++, av2ptr++)
 	    {
-		if (!(*av2ptr = substevalchar(*avptr)))
-		    return NULL;
+		/* When noerrs = 1, the only error is out-of-memory */
+		if (!(*av2ptr = substevalchar(*avptr))) {
+		    haserr = 1;
+		    break;
+		}
 	    }
 	    *av2ptr = NULL;
 	    aval = aval2;
 	} else {
+	    /* When noerrs = 1, the only error is out-of-memory */
 	    if (!(val = substevalchar(val)))
-		return NULL;
+		haserr = 1;
 	}
+	noerrs = one;
+	if (!quoteerr)
+	    errflag = oef;
+	if (haserr || errflag)
+	    return NULL;
     }
     /*
      * This handles taking a length with ${#foo} and variations.

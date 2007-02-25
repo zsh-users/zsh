@@ -874,9 +874,10 @@ Similar to tt(w) with the difference that empty words between
 repeated delimiters are also counted.
 )
 item(tt(X))(
-With this flag parsing errors occurring with the tt(Q) and tt(e) flags or the
-pattern matching forms such as `tt(${)var(name)tt(#)var(pattern)tt(})' 
-are reported. Without the flag they are silently ignored.
+With this flag, parsing errors occurring with the tt(Q), tt(e) and tt(#)
+flags or the pattern matching forms such as
+`tt(${)var(name)tt(#)var(pattern)tt(})' are reported.  Without the flag,
+errors are silently ignored.
 )
 item(tt(z))(
 Split the result of the expansion into words using shell parsing to
