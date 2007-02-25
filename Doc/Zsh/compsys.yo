@@ -4233,7 +4233,7 @@ item(tt(_regex_arguments) var(name) var(spec) ...)(
 This function generates a completion function var(name) which matches
 the specifications var(spec) tt(...), a set of regular expressions as
 described below.  After running tt(_regex_arguments), the function
-var(name) should be called at the appropriate point.
+var(name) should be called as a normal completion function.
 The pattern to be matched is given by the contents of
 the tt(words) array up to the current cursor position joined together
 with null characters; no quotation is applied.
@@ -4274,6 +4274,16 @@ its return status is examined to determine if the test has succeeded.
 The var(pattern) string `tt([])' is guaranteed never to match.
 The var(lookahead) is not stripped from the command line before the next
 pattern is examined.
+
+The argument starting with tt(:) is used in the same manner as an argument to
+tt(_alternative).
+
+A component is used as follows: var(pattern) is tested to
+see if the component already exists on the command line.  If
+it does, any following specifications are examined to find something to
+complete.  If a component is reached but no such pattern exists yet on the
+command line, the string containing the var(action) is used to generate
+matches to insert at that point.
 )
 item(tt(/)var(pattern)tt(/+) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(tag)tt(:)var(descr)tt(:)var(action)])(
 This is similar to `tt(/)var(pattern)tt(/) ...' but the left part of the
@@ -4300,6 +4310,94 @@ item(var(spec) tt(|) var(spec))(
 Either of the two var(spec)s can be matched.
 )
 enditem()
+
+The function tt(_regex_words) can be used as a helper function to
+generate matches for a set of alternative words possibly with
+their own arguments as a command line argument.
+
+Examples:
+
+example(_regex_arguments _tst /$'[^\0]#\0'/ \ 
+/$'[^\0]#\0'/ :'compadd aaa')
+
+This generates a function tt(_tst) that completes tt(aaa) as its only
+argument.  The var(tag) and var(description) for the action have been
+omitted for brevity (this works but is not recommended in normal use).
+The first component matches the command word, which is arbitrary; the
+second matches  any argument.  As the argument is also arbitrary, any
+following component would not depend on tt(aaa) being present.
+
+example(_regex_arguments _tst /$'[^\0]#\0'/ \ 
+/$'aaa\0'/ :'compadd aaa')
+
+This is a more typical use; it is similar, but any following patterns
+would only match if tt(aaa) was present as the first argument.
+
+example(_regex_arguments _tst /$'[^\0]#\0'/ \( \ 
+/$'aaa\0'/ :'compadd aaa' \ 
+/$'bbb\0'/ :'compadd bbb' \) \#)
+
+In this example, an indefinite number of command arguments may be
+completed.  Odd arguments are completed as tt(aaa) and even arguments
+as tt(bbb).  Completion fails unless the set of tt(aaa) and tt(bbb)
+arguments before the current one is matched correctly.
+
+example(_regex_arguments _tst /$'[^\0]#\0'/ \ 
+\( /$'aaa\0'/ :'compadd aaa' \| \ 
+/$'bbb\0'/ :'compadd bbb' \) \#)
+
+This is similar, but either tt(aaa) or tt(bbb) may be completed for
+any argument.  In this case tt(_regex_words) could be used to generate
+a suitable expression for the arguments.
+
+)
+findex(_regex_words)
+item(tt(_regex_words) var(tag) var(description) var(spec) ...)(
+This function can be used to generate arguments for the
+tt(_regex_arguments) command which may be inserted at any point where
+a set of rules is expected.  The var(tag) and var(description) give a
+standard tag and description pertaining to the current context.  Each
+var(spec) contains two or three arguments separated by a colon: note
+that there is no leading colon in this case.
+
+Each var(spec) gives one of a set of words that may be completed at
+this point, together with arguments.  It is thus roughly equivalent to
+the tt(_arguments) function when used in normal (non-regex) completion.
+
+The part of the var(spec) before the first colon is the word to be
+completed.  This may contain a tt(*); the entire word, before and after
+the tt(*) is completed, but only the text before the tt(*) is required
+for the context to be matched, so that further arguments may be
+completed after the abbreviated form.
+
+The second part of var(spec) is a description for the word being
+completed.
+
+The optional third part of the var(spec) describes how words following
+the one being completed are themselves to be completed.  It will be
+evaluated in order to avoid problems with quoting.  This means that
+typically it contains a reference to an array containing previously
+generated regex arguments.
+
+The result of the processing by tt(_regex_words) is placed in the array
+tt(reply), which should be made local to the calling function.
+If the set of words and arguments may be matched repeatedly, a tt(#)
+should be appended to the generated array at that point.
+
+For example:
+
+example(local -a reply
+_regex_words mydb-commands 'mydb commands' \ 
+  'add:add an entry to mydb:$mydb_add_cmds' \ 
+  'show:show entries in mydb'
+_regex_arguments _mydb "$reply[@]"
+_mydb "$@")
+
+This shows a completion function for a command tt(mydb) which takes
+two command arguments, tt(add) and tt(show).  tt(show) takes no arguments,
+while the arguments for tt(add) have already been prepared in an
+array tt(mydb_add_cmds), quite possibly by a previous call to
+tt(_regex_words).
 )
 findex(_requested)
 item(tt(_requested) [ tt(-x) ] [ tt(-12VJ) ] var(tag) [ var(name) var(descr) [ var(command) var(args) ... ] ])(
