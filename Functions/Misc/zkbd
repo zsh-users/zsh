@@ -15,10 +15,10 @@ zkbd=${ZDOTDIR:-$HOME}/.zkbd
 [[ -d $zkbd ]] || mkdir $zkbd || return 1
 
 print 'typeset -g -A key\n' > $zkbd/$TERM.tmp || return 1
-trap "unfunction getkey getseq; command rm -f $zkbd/$TERM.tmp" 0
+trap "unfunction getmbkey getseq; command rm -f $zkbd/$TERM.tmp" 0
 trap "return 1" 1 2 15
 
-getkey () {
+getmbkey () {
     local k='' i
     for ((i=10; i>0; --i))
     do
@@ -27,7 +27,13 @@ getkey () {
     done
     [[ -n $k ]] || return 1
     [[ $k = $'\012' || $k = $'\015' || $k = ' ' ]] && return 0
-    print -Rn $k
+    # We might not be done yet, thanks to multibyte characters
+    local mbk=$k
+    while read -t -k 1 k
+    do
+       mbk=$mbk$k 
+    done
+    print -Rn $mbk
 }
 
 getseq () {
@@ -65,7 +71,7 @@ EOF
 local ctrl alt meta
 
 print -n "Hold down Ctrl and press X: "
-ctrl=$(getkey) || return 1
+ctrl=$(getmbkey) || return 1
 print
 
 if [[ $ctrl != $'\030' ]]
@@ -79,7 +85,7 @@ fi
 
 print "Your Meta key may have a Microsoft Windows logo on the cap."
 print -n "Hold down Meta and press X: "
-meta=$(getkey) || return 1
+meta=$(getmbkey) || return 1
 print
 
 if [[ $meta == x ]]
@@ -95,7 +101,7 @@ fi
 print
 
 print -n "Hold down Alt and press X: "
-alt=$(getkey) || return 1
+alt=$(getmbkey) || return 1
 print
 
 if [[ $alt == x ]]
