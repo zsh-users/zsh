@@ -1127,6 +1127,11 @@ different widgets to use different patterns:
 example(zle -N insert-last-assignment smart-insert-last-word
 zstyle :insert-last-assignment match '[[:alpha:]][][[:alnum:]]#=*'
 bindkey '\e=' insert-last-assignment)
+
+If no interesting word is found and the tt(auto-previous) style is set to
+a true value, the search continues upward through the history.  When
+tt(auto-previous) is unset or false (the default), the widget must be
+invoked repeatedly in order to search earlier history lines.
 )
 tindex(which-command)
 item(tt(which-command))(

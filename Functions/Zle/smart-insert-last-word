@@ -2,6 +2,7 @@
 # Inspired by Christoph Lange <langec@gmx.de> from zsh-users/3265;
 # rewritten to correct multiple-call behavior after zsh-users/3270;
 # modified to work with copy-earlier-word after zsh-users/5832.
+# Edited further per zsh-users/10881 and zsh-users/10884.
 #
 # This function as a ZLE widget can replace insert-last-word, like so:
 #
@@ -10,7 +11,7 @@
 # With a numeric prefix, behaves like insert-last-word, except that words
 # in comments are ignored when interactive_comments is set.
 #
-# Otherwise, the rightmost "interesting" word from the previous command is
+# Otherwise, the rightmost "interesting" word from any previous command is
 # found and inserted.  The default definition of "interesting" is that the
 # word contains at least one alphabetic character, slash, or backslash.
 # This definition can be overridden by use of a style like so:
@@ -33,9 +34,17 @@
 #   zle -N insert-last-assignment smart-insert-last-word
 #   zstyle :insert-last-assignment match '[[:alpha:]][][[:alnum:]]#=*'
 #   bindkey '\e=' insert-last-assignment
+#
+# The "auto-previous" style, if set to a true value, causes the search to
+# proceed upward through the history until an interesting word is found.
+# If auto-previous is unset or false and there is no interesting word, the
+# last word is returned.
 
 emulate -L zsh
-setopt extendedglob
+setopt extendedglob nohistignoredups
+
+# Begin by preserving completion suffix if any
+zle auto-suffix-retain
 
 # Not strictly necessary:
 # (($+_ilw_hist)) || integer -g _ilw_hist _ilw_count _ilw_cursor _ilw_lcursor
@@ -64,27 +73,47 @@ fi
 _ilw_hist=$HISTNO
 _ilw_count=$NUMERIC
 
-zle .up-history || return 1      # Retrieve previous command
-lastcmd=( ${${(z)BUFFER}:#\;} )  # Split into shell words
-zle .down-history                # Return to current command
-CURSOR=$cursor                   # Restore cursor position
-NUMERIC=${numeric:-1}            # In case of fall through
+if [[ -z "$numeric" ]]
+then
+    zstyle -s :$WIDGET match pattern ||	pattern='*[[:alpha:]/\\]*'
+fi
+
+# Note that we must use .up-history for navigation here because of
+# possible "holes" in the $history hash (the result of dup expiry).
+# We need $history because $BUFFER retains edits in progress as the
+# user moves around the history, but we search the unedited lines.
+
+{
+  zmodload -i zsh/parameter
+  zle .end-of-history              # Start from final command
+  zle .up-history || return 1      # Retrieve previous command
+  local buffer=$history[$HISTNO]   # Get unedited history line
+  lastcmd=( ${${(z)buffer}:#\;} )  # Split into shell words
+  if [[ -n "$pattern" ]]
+  then
+      # This is the "smart" part -- search right-to-left and
+      # latest-to-earliest through the history for a word.
+      integer n=0 found=$lastcmd[(I)$pattern]
+      if zstyle -t :$WIDGET auto-previous
+      then
+          while (( found == 0 && ++n ))
+          do
+              zle .up-history || return 1
+              buffer=$history[$HISTNO]
+              lastcmd=( ${${(z)buffer}:#\;} )
+              found=$lastcmd[(I)$pattern]
+          done
+      fi
+      (( found-- > 0 &&            # Account for 1-based index
+        (numeric = $#lastcmd - found) ))
+  fi
+} always {
+  HISTNO=$_ilw_hist                # Return to current command
+  CURSOR=$cursor                   # Restore cursor position
+  NUMERIC=${numeric:-1}            # In case of fall-through
+}
 
 (( NUMERIC > $#lastcmd )) && return 1
 
-if [[ -z "$numeric" ]]
-then
-    integer i=1
-    zstyle -s :$WIDGET match pattern ||
-	pattern='*[[:alpha:]/\\]*'
-    while ((i <= $#lastcmd)); do
-	if [[ $lastcmd[-i] == $~pattern ]]; then
-	    NUMERIC=$i
-	    break
-	else
-	    ((++i))
-	fi
-    done
-fi
 LBUFFER[lcursor+1,cursor+1]=$lastcmd[-NUMERIC]
 _ilw_cursor=$CURSOR
