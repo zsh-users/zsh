@@ -1,5 +1,9 @@
 2007-02-26  Peter Stephenson  <pws@csr.com>
 
+	* 23190: Completion/Unix/Type/_net_interfaces: use ifconfig
+	on Linux and fall back to old method in order to pick up
+	additional interface types.
+
 	* unposted: Completion/Unix/Commands/_ip: tweak ip route
 	show abbreviations.
 

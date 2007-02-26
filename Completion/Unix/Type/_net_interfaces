@@ -14,8 +14,19 @@ case $OSTYPE in
   ;;
   darwin*|freebsd*|dragonfly*) intf=( $(ifconfig -l) ) ;;
   irix*) intf=( ${${${(f)"$(/usr/etc/netstat -i)"}%% *}[2,-1]} ) ;;
-  linux*) intf=( /proc/sys/net/ipv4/conf/*~*(all|default)(N:t) ) ;;
-  *) intf=( $(ifconfig -a|sed -n 's/^\([^ 	:]*\).*/\1/p') ) ;;
+
+  *)
+  # Make sure ifconfig is in the path.
+  local PATH=$PATH
+  PATH=/sbin:$PATH
+  intf=( $(ifconfig -a 2>/dev/null | sed -n 's/^\([^ 	:]*\).*/\1/p') )
+  if [[${#intf} -eq 0 &&  -d /proc/sys/net/ipv4/conf ]]; then
+    # On linux we used to use the following as the default.
+    # However, we now use ifconfig since it finds additional devices such
+    # as tunnels.  So only do this if that didn't work.
+    intf=( /proc/sys/net/ipv4/conf/*~*(all|default)(N:t) )
+  fi
+  ;;
 esac
 
 _wanted interfaces expl 'network interface' \
