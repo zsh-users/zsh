@@ -519,7 +519,16 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 	    if (widthp)
 		*widthp = 6;
 	} else {
-	    return nicechar((int)c);
+	    strcpy(buf, nicechar((int)c));
+	    /*
+	     * There may be metafied characters from nicechar(),
+	     * so compute width and end position independently.
+	     */
+	    if (widthp)
+		*widthp = ztrlen(buf);
+	    if (swidep)
+	      *swidep = buf + strlen(buf);
+	    return buf;
 	}
 	if (swidep)
 	    *swidep = buf + *widthp;
