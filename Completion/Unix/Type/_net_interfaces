@@ -20,7 +20,7 @@ case $OSTYPE in
   local PATH=$PATH
   PATH=/sbin:$PATH
   intf=( $(ifconfig -a 2>/dev/null | sed -n 's/^\([^ 	:]*\).*/\1/p') )
-  if [[${#intf} -eq 0 &&  -d /proc/sys/net/ipv4/conf ]]; then
+  if [[ ${#intf} -eq 0 && -d /proc/sys/net/ipv4/conf ]]; then
     # On linux we used to use the following as the default.
     # However, we now use ifconfig since it finds additional devices such
     # as tunnels.  So only do this if that didn't work.
