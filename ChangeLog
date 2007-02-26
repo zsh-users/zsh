@@ -1,3 +1,16 @@
+2007-02-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 22894 (belated): Completion/Unix/Type/_email_addresses: fix
+	muttrc path expansion in search for aliases.
+
+	* unposted (based on users/10881,10884): Doc/Zsh/contrib.yo,
+	Functions/Zle/smart-insert-last-word: add auto-previous zstyle,
+	make use of auto-suffix-retain, add an always block for cleanup,
+	and search unedited text via parameter module $history.
+
+	* unposted: Functions/Misc/zkbd: account for the possibility that
+	meta- or alt- key combos could generate a multibyte character.
+
 2007-02-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23186: Completion/Base/Utility/_regex_words,
