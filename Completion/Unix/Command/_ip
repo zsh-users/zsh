@@ -307,11 +307,11 @@ _regex_words route-show-commands "route show command" \
   'ca*ched:list only dynamically forked routes' \
   'f*rom:select route via source address prefix:$subcmd_rtselector' \
   'p*rotocol:select routing protocol identifier:$subcmd_rtprotocol' \
-  's*cope:select scope of destinations:$subcmd_scope' \
+  'sc*ope:select scope of destinations:$subcmd_scope' \
   'ty*pe:route type:$subcmd_rttype' \
   'dev:select device:$subcmd_dev' \
   'v*ia:select nexthop router:$subcmd_ipaddr' \
-  's*rc:select route via source prefix:$subcmd_ipaddr' \
+  'sr*c:select route via source prefix:$subcmd_ipaddr' \
   'realm:select routing realm:$subcmd_rtrealm' \
   'realms:select from/to routing realms:$subcmd_rtrealms'
 # route selector can appear with no "to"
