@@ -434,7 +434,7 @@ _regex_words \
   'a*dd:add multicast address:$maddr_add_cmds' \
   'd*elete:delete multicast address:$maddr_add_cmds' \
   's*how:list multicast addresses:$maddr_show_cmds'
-_maddr_cmds=("$reply[@]")
+maddr_cmds=("$reply[@]")
 
 
 #
