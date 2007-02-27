@@ -4351,7 +4351,7 @@ any argument.  In this case tt(_regex_words) could be used to generate
 a suitable expression for the arguments.
 
 )
-findex(_regex_words)
+findex(_regex_words [ tt(-t) var(term) ])
 item(tt(_regex_words) var(tag) var(description) var(spec) ...)(
 This function can be used to generate arguments for the
 tt(_regex_arguments) command which may be inserted at any point where
@@ -4378,6 +4378,10 @@ the one being completed are themselves to be completed.  It will be
 evaluated in order to avoid problems with quoting.  This means that
 typically it contains a reference to an array containing previously
 generated regex arguments.
+
+The option tt(-t) var(term) specifies a terminator for the word
+instead of the usual space.  This is handled as an auto-removable suffix
+in the manner of the option tt(-s) var(sep) to tt(_values).
 
 The result of the processing by tt(_regex_words) is placed in the array
 tt(reply), which should be made local to the calling function.

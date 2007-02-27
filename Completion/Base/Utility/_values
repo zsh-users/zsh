@@ -50,7 +50,7 @@ if compvalues -i "$@"; then
       fi
     else
       compvalues -d descr
-      if [[ ${#noargs}+${#args}+${#opts} -ne 1 ]] && compvalues -s sep; then
+      if compvalues -s sep; then
         sep=( "-qS" "$sep" )
       else
         sep=()

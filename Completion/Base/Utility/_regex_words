@@ -31,9 +31,8 @@ for (( i = 1; i <= $#; i++ )); do
   if [[ $term = $'\0' ]]; then
     reply+=(":${tag}:${desc}:(( ${wds[1]//\*}:${wds[2]//(#m)[: \(\)]/\\$MATCH} ))")
   else
-    # HERE: we should add the terminator instead of a space, but
-    # there doesn't appear to be an easy way of doing that.
-    reply+=(":${tag}:${desc}:(( ${wds[1]//\*}${term//(#m)[: \(\)]/\\$MATCH}:${wds[2]//(#m)[: \(\)]/\\$MATCH} ))")
+    reply+=(":${tag}:${desc}:_values -s ${(q)term} ${(q)desc} \
+${(q)${${wds[1]//\*}//(#m)[:\[\]]/\\$MATCH}}\\[${(q)${wds[2]//(#m)[:\[\]]/\\$MATCH}}\\]")
   fi
   eval "reply+=($wds[3])"
   if (( $i == $# )); then
