@@ -59,7 +59,7 @@ _regex_words route-type "Route type" \
   'nat:Network Address Translation route' \
   'anycast:anycast addresses, not implemented' \
   'multicast:multicast routing, not present in normal tables'
-subcmd_rttype=("$reply[@]")  
+subcmd_rttype=("$reply[@]")
 
 local -a subcmd_route
 # Route type is optional in route.
@@ -190,7 +190,7 @@ link_cmds=("$reply[@]")
 #
 local -a addr_add_cmds
 # TODO: broadcast can take + or =
-_regex_words addr-add-commands "addr add commands" \
+_regex_words addr-add-commands "addr add/change/replace commands" \
   'dev:specify device:$subcmd_dev' \
   'lo*cal:specify local IP address:$subcmd_ipaddr' \
   'p*eer:specify peer IP address (point-to-point):$subcmd_ipaddr' \
@@ -221,6 +221,8 @@ _regex_words \
   addr-commands "addr command" \
   'h*elp:show help for command' \
   'a*dd:add new protocol address:$addr_add_cmds' \
+  'c*hange:change existing protocol address:$addr_add_cmds' \
+  'r*replace:add or update protocol address:$addr_add_cmds' \
   'd*elete:delete protocol address:$addr_add_cmds' \
   's*how:show protocol address:$addr_show_cmds' \
   'f*lush:flush protocol address:$addr_show_cmds'
@@ -356,7 +358,7 @@ _regex_words rule-add-commands 'ip rule add/delete commands' \
   'fw*mark:select fwmark:$subcmd_string' \
   'pr*iority:select unique priority for rule:$subcmd_number' \
   'ta*ble:select routing table by ID:$subcmd_rttable' \
-  'realms:select from/to routing realms:$subcmd_rtrealms' \
+  're*alms:select from/to routing realms:$subcmd_rtrealms' \
   'nat:select base of IP block to translate:$subcmd_ipaddr'
 
 rule_add_cmds=("(" $subcmd_ruletypes "|" ")" "$reply[@]" "#")
@@ -369,7 +371,7 @@ _regex_words \
   'd*elete:delete a routing rule:$rule_add_cmds' \
   'f*lush:flush rules and dump deleted rules' \
   's*how:list routing rules'
-_rule_cmds=("$reply[@]")
+rule_cmds=("$reply[@]")
 
 
 #
@@ -377,24 +379,24 @@ _rule_cmds=("$reply[@]")
 #
 local -a tunnel_add_cmds
 _regex_words tunnel-add-commands 'tunnel add/change/delete commands' \
-  'name:select tunnel device name:$subcmd_dev' \
-  'mode:select tunnel mode:$subcmd_tunnelmode' \
-  'remote:select remote endpoint address:$subcmd_ipaddr' \
-  'local:select local address:$subcmd_ipaddr' \
+  'na*me:select tunnel device name:$subcmd_dev' \
+  'm*ode:select tunnel mode:$subcmd_tunnelmode' \
+  'r*emote:select remote endpoint address:$subcmd_ipaddr' \
+  'l*ocal:select local address:$subcmd_ipaddr' \
   'ttl:set fixed time to live, 1 to 255 or 0 (inherit):$subcmd_number' \
   'tos:select type of service:$subcmd_tos' \
   'ds*field:select type of service:$subcmd_tos' \
   'dev:select device to bind tunnel to:$subcmd_dev' \
-  'nopmtudisc:disable path maximum transport unit discovery' \
-  'ikey:set input key for GRE tunnel:$subcmd_ipaddr' \
-  'okey:set output key for GRE tunnel:$subcmd_ipaddr' \
-  'key:set bidirectional key for GRE tunnel:$subcmd_ipaddr' \
-  'icsum:enable input checksums for GRE tunnel' \
-  'ocsum:enable output checksums for GRE tunnel' \
-  'csum:enable bidirectional checksums for GRE tunnel' \
-  'iseq:serialize input packets on GRE tunnel' \
-  'oseq:serialize output packets on GRE tunnel' \
-  'seq:serialize packets bidirectionally on GRE tunnel'
+  'no*pmtudisc:disable path maximum transport unit discovery' \
+  'ik*ey:set input key for GRE tunnel:$subcmd_ipaddr' \
+  'ok*ey:set output key for GRE tunnel:$subcmd_ipaddr' \
+  'k*ey:set bidirectional key for GRE tunnel:$subcmd_ipaddr' \
+  'ic*sum:enable input checksums for GRE tunnel' \
+  'oc*sum:enable output checksums for GRE tunnel' \
+  'c*sum:enable bidirectional checksums for GRE tunnel' \
+  'is*eq:serialize input packets on GRE tunnel' \
+  'os*eq:serialize output packets on GRE tunnel' \
+  's*eq:serialize packets bidirectionally on GRE tunnel'
 # name is default... we always complete it as an interface,
 # although that's not really right for "add".
 tunnel_add_cmds=("$reply[@]" "#")
