@@ -1,3 +1,8 @@
+2007-02-27  Clint Adams  <clint@zsh.org>
+
+	* 23196: Completion/Debian/Command/_apt: tweak apt-cache madison
+	and --installed.
+
 2007-02-27  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Commands/_ip: another typo

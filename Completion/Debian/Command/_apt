@@ -464,6 +464,7 @@ _apt-cache () {
     --recurse:bool \
     -c,--config-file:configfile \
     -o,--option:arbitem \
+    --installed:bool \
     -- \
     /$'help\0'/ \| \
     /$'add\0'/ /$'[^\0]#\0'/ ':files:index files:_files "$expl[@]"' \# \| \
@@ -483,7 +484,7 @@ _apt-cache () {
     /$'xvcg\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'policy\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'madison\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
-    /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg showsrc stats dump dumpavail unmet search show depends rdepends pkgnames dotty policy xvcg'
+    /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg showsrc stats dump dumpavail unmet search show depends rdepends pkgnames dotty policy xvcg madison'
 
   _apt-cache () {
     local expl_action expl_packages expl_pkg_cache expl_src_cache
