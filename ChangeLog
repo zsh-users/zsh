@@ -1,3 +1,9 @@
+2007-03-01  Peter Stephenson  <pws@csr.com>
+
+	* 23203: Completion/X/Command/_acroread: use -version
+	to get version (spotted by Zvi) and fix the other methods
+	as fallback.
+
 2007-02-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/compsys.yo: document now useful -t
