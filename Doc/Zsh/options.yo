@@ -616,7 +616,7 @@ When the history file is re-written, we normally write out a copy of
 the file named $HISTFILE.new and then rename it over the old one.
 However, if this option is unset, we instead truncate the old
 history file and write out the new version in-place.  If one of the
-history-appending options is enabled, this option only has an affect
+history-appending options is enabled, this option only has an effect
 when the enlarged history file needs to be re-written to trim it
 down to size.  Disable this only if you have special needs, as doing
 so makes it possible to lose history entries if zsh gets interrupted

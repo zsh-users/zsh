@@ -1,3 +1,7 @@
+2007-03-05  Clint Adams  <clint@zsh.org>
+
+	* 23205: Doc/Zsh/options.yo: fix misspelling of "effect".
+
 2007-03-01  Peter Stephenson  <pws@csr.com>
 
 	* 23203: Completion/X/Command/_acroread: use -version
