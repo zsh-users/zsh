@@ -1,3 +1,7 @@
+2007-03-08  Clint Adams  <clint@zsh.org>
+
+	* 23206: Completion/Unix/Commands/_mercurial: completion for hg.
+
 2007-03-05  Clint Adams  <clint@zsh.org>
 
 	* 23205: Doc/Zsh/options.yo: fix misspelling of "effect".
