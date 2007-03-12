@@ -1,3 +1,8 @@
+2007-02-10  Felix Rosencrantz <f.rosencrantz@gmail.com>
+
+	* unposted: Completion/Unix/Command/_comm: added -s flag to
+	_arguments so completion could deal with combined flags.
+
 2007-03-08  Clint Adams  <clint@zsh.org>
 
 	* 23206: Completion/Unix/Commands/_mercurial: completion for hg.
