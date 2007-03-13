@@ -1,3 +1,8 @@
+2007-03-13  Clint Adams  <clint@zsh.org>
+
+	* 23214: Completion/Unix/Commands/_subversion: complete files
+	after svn commit --file.
+
 2007-02-10  Felix Rosencrantz <f.rosencrantz@gmail.com>
 
 	* unposted: Completion/Unix/Command/_comm: added -s flag to

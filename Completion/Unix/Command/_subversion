@@ -40,7 +40,8 @@ _svn () {
             )
           ;;
           (commit)
-            args+=(
+            args=(
+	      ${args/(#b)(*--file*):arg:/$match[1]:file:_files}
               '*:file:_files -g "*(e:_svn_status:)"'
             )
           ;;
