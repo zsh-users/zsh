@@ -1,0 +1,29 @@
+#compdef module
+
+local context state line
+typeset -A opt_args
+
+_arguments \
+  '(-f --force)'{--force,-f}'[force active dependency resolution]' \
+  '(-t --terse)'{--terse,-t}'[display avail and list output in short format]' \
+  '(-l --long)'{--long,-l}'[display avail and list output in long format]' \
+  '(-h --human)'{--human,-h}'[display short output in human-readable format]' \
+  '(-v --verbose)'{--verbose,-v}'[verbose]' \
+  '(-s --silent)'{--silent,-s}'[disable verbose messages]' \
+  '(-c --create)'{--create,-c}'[create caches]' \
+  '(-i --icase)'{--icase,-i}'[case insensitive]' \
+  '(-i --icase)'{--icase,-i}'[case insensitive]' \
+  '(-u --userlvl)'{--userlvl,-u}'[set user level to value]:level:(novice expert advanced)' \
+  '*::command:->subcmds' && return 0
+
+case "$state" in
+  (subcmds)
+    if (( CURRENT == 1 )); then
+      compadd -- help load add unload rm switch swap display show list \
+                 avail use unuse update clear purge whatis apropos keyword \
+		 initadd initprepend initswitch initlist initclear
+    else
+      _files
+    fi
+  ;;
+esac
