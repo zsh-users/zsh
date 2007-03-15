@@ -1,3 +1,8 @@
+2007-03-15  Peter Stephenson  <pws@csr.com>
+
+	* 23219: Src/options.c: Ismail Dönmez reported that lower
+	casing of I to dotless i in tr_TR.UTF-8 broke option handling.
+
 2007-03-14  Clint Adams  <clint@zsh.org>
 
 	* 23215: Completion/Unix/Command/_module: completion for

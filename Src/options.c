@@ -603,7 +603,14 @@ optlookup(char const *name)
 	if (*t == '_')
 	    chuck(t);
 	else {
-	    *t = tulower(*t);
+	    /*
+	     * Some locales (in particular tr_TR.UTF-8) may
+	     * have non-standard mappings of ASCII characters,
+	     * so be careful.  Option names must be ASCII so
+	     * we don't need to be too clever.
+	     */
+	    if (*t >= 'A' && *t <= 'Z')
+		*t = (*t - 'A') + 'a';
 	    t++;
 	}
 
