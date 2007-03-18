@@ -40,7 +40,8 @@ _svn () {
             )
           ;;
           (commit)
-            args+=(
+            args=(
+	      ${args/(#b)(*--file*):arg:/$match[1]:file:_files}
               '*:file:_files -g "*(e:_svn_status:)"'
             )
           ;;
@@ -61,7 +62,7 @@ _svn () {
 	  ;;
 	  (import)
 	    args+=(
-		'1:project directory:_files -/'
+		'1:project directory or import location: _alternative "files:file:_files" "urls:URL:_svn_urls"'
 		'2:import location: _alternative "files:file:_files" "urls:URL:_svn_urls"'
 	    )
           ;;
@@ -200,7 +201,7 @@ _svn_urls() {
   if [[ -prefix *: ]] && ! _urls &&
       zstyle -T ":completion:${curcontext}:" remote-access
   then
-    remfiles=( ${(f)"$(svn list $IPRFIX${PREFIX%%[^./][^/]#} 2>/dev/null)"} )
+    remfiles=( ${(f)"$(svn list $IPREFIX${PREFIX%%[^./][^/]#} 2>/dev/null)"} )
     compset -P '*/'
     compset -S '/*' || suf=file
     remdispf=(${remfiles:#*/})
