@@ -227,7 +227,8 @@ static int more_start,		/* more text before start of screen?	    */
     vcs, vln,			/* video cursor position column & line	    */
     vmaxln,			/* video maximum number of lines	    */
     winw, winh, rwinh,		/* window width & height		    */
-    winpos;			/* singlelinezle: line's position in window */
+    winpos,			/* singlelinezle: line's position in window */
+    winprompt;			/* singlelinezle: part of lprompt showing   */
 
 /**/
 void
@@ -242,7 +243,8 @@ resetvideo(void)
     else
 	winh = (lines < 2) ? 24 : lines;
     rwinh = lines;		/* keep the real number of lines */
-    winpos = vln = vmaxln = 0;
+    vln = vmaxln = winprompt = 0;
+    winpos = -1;
     if (lwinw != winw || lwinh != winh) {
 	if (nbuf) {
 	    for (ln = 0; ln != lwinh; ln++) {
@@ -1443,21 +1445,12 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 {
     REFRESH_STRING vbuf, vp,	/* video buffer and pointer    */
 	*qbuf,			/* tmp			       */
-	refreshop = *obuf;	/* pointer to old video buffer */
+	refreshop;	        /* pointer to old video buffer */
     int t0,			/* tmp			       */
 	vsiz,			/* size of new video buffer    */
-	nvcs = 0;		/* new video cursor column     */
-#ifdef MULTIBYTE_SUPPORT
-    int eol = 0;		/* has mbrtowc() returned -2?  */
-    /*
-     * converted lprompt and pointer: no WEOF hack here since
-     * we always output the full prompt and count its width.
-     */
-    ZLE_STRING_T lpwbuf, lpwp;
-    char *lpptr,		/* pointer into multibyte lprompt */
-	*lpend;			/* end of multibyte lprompt */
-    mbstate_t mbs;		/* shift state */
-#endif
+	nvcs = 0,		/* new video cursor column     */
+	owinpos = winpos,	/* previous window position    */
+	owinprompt = winprompt;	/* previous winprompt          */
 
     nlnct = 1;
 /* generate the new line buffer completely */
@@ -1480,56 +1473,10 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	tmpcs = 0;
     }
 
-    /* only use last part of prompt */
-#ifdef MULTIBYTE_SUPPORT
-    /*
-     * Convert the entire lprompt so that we know how to count
-     * characters.
-     */
-    lpend = strchr(lpromptbuf, 0);
-    /* Worst case number of characters, not null-terminated */
-    lpwp = lpwbuf = (ZLE_STRING_T)zalloc((lpend - lpromptbuf)
-					 * sizeof(*lpwbuf));
-    /* Reset shift state, maybe. */
-    memset(&mbs, '\0', sizeof mbs);
-    for (lpptr = lpromptbuf; lpptr < lpend; ) {
-	size_t cnt = eol ? MB_INVALID : mbrtowc(lpwp, lpptr, lpend-lpptr, &mbs);
-	switch (cnt) {
-	case MB_INCOMPLETE:
-	    eol = 1;
-	    /* FALL THROUGH */
-	case MB_INVALID:
-	    memset(&mbs, '\0', sizeof mbs);
-	    /* FALL THROUGH */
-	case 0:
-	    /* dunno, try to recover */
-	    lpptr++;
-	    *lpwp++ = ZWC('?');
-	    break;
-	default:
-	    /* successfully converted */
-	    lpptr += cnt;
-	    lpwp++;
-	    break;
-	}
-    }
-    if (lpwp - lpwbuf < lpromptw) {
-	/* Not enough characters for lpromptw. */
-	ZR_memcpy(vbuf, lpwbuf, lpwp - lpwbuf);
-	vp = vbuf + (lpwp - lpwbuf);
-	while (vp < vbuf + lpromptw)
-	    *vp++ = ZWC(' ');
-    } else {
-	ZR_memcpy(vbuf, lpwp - lpromptw, lpromptw);
-	vp = vbuf + lpromptw;
-    }
-    *vp = ZWC('\0');
-    zfree(lpwbuf, lpromptw * sizeof(*lpwbuf));
-#else
-    memcpy(vbuf, strchr(lpromptbuf, 0) - lpromptw, lpromptw);
-    vbuf[lpromptw] = '\0';
+    /* prompt is not directly copied into the video buffer */
+    ZR_memset(vbuf, ZWC(' '), lpromptw);
     vp = vbuf + lpromptw;
-#endif
+    *vp = ZWC('\0');
 
     for (t0 = 0; t0 < tmpll; t0++) {
 	if (tmpline[t0] == ZWC('\t')) {
@@ -1561,6 +1508,8 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     *vp = ZWC('\0');
 
 /* determine which part of the new line buffer we want for the display */
+    if (winpos == -1)
+	winpos = 0;
     if ((winpos && nvcs < winpos + 1) || (nvcs > winpos + winw - 2)) {
 	if ((winpos = nvcs - ((winw - hasam) / 2)) < 0)
 	    winpos = 0;
@@ -1575,10 +1524,71 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     zfree(vbuf, vsiz * sizeof(*vbuf));
     nvcs -= winpos;
 
-/* display the `visable' portion of the line buffer */
-    for (t0 = 0, vp = *nbuf;;) {
-    /* skip past all matching characters */
-	for (; *vp && *vp == *refreshop; t0++, vp++, refreshop++) ;
+    if (winpos < lpromptw) {
+	/* skip start of buffer corresponding to prompt */
+	winprompt = lpromptw - winpos;
+    } else {
+	/* don't */
+	winprompt = 0;
+    }
+    if (winpos != owinpos && winprompt) {
+	char *pptr;
+	int skipping = 0, skipchars = winpos;
+	/*
+	 * Need to output such part of the left prompt as fits.
+	 * Skip the first winpos characters, outputting
+	 * any characters marked with %{...%}.
+	 */
+	singmoveto(0);
+	MB_METACHARINIT();
+	for (pptr = lpromptbuf; *pptr; ) {
+	    if (*pptr == Inpar) {
+		skipping = 1;
+		pptr++;
+	    } else if (*pptr == Outpar) {
+		skipping = 0;
+		pptr++;
+	    } else {
+		convchar_t cc;
+		int mblen = MB_METACHARLENCONV(pptr, &cc);
+		if (skipping || skipchars == 0)
+		{
+		    while (mblen) {
+#ifdef MULTIBYTE_SUPPORT
+			if (cc == WEOF)
+			    fputc('?', shout);
+			else
+#endif
+			    if (*pptr == Meta) {
+				mblen--;
+				fputc(*++pptr ^ 32, shout);
+			    } else {
+				fputc(*pptr, shout);
+			    }
+			pptr++;
+			mblen--;
+		    }
+		} else {
+		    skipchars--;
+		    pptr += mblen;
+		}
+	    }
+	}
+	vcs = winprompt;
+    }
+
+/* display the `visible' portion of the line buffer */
+    t0 = winprompt;
+    vp = *nbuf + winprompt;
+    refreshop = *obuf + winprompt;
+    for (;;) {
+	/*
+	 * Skip past all matching characters, but if there used
+	 * to be a prompt here be careful since all manner of
+	 * nastiness may be around.
+	 */
+	if (vp - *nbuf >= owinprompt)
+	    for (; *vp && *vp == *refreshop; t0++, vp++, refreshop++) ;
 
 	if (!*vp && !*refreshop)
 	    break;

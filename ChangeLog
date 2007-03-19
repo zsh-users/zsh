@@ -1,3 +1,8 @@
+2007-03-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23224: Src/Zle/zle_refresh.c: fix output of prompt in
+	single line ZLE.
+
 2007-03-19  Peter Stephenson  <pws@csr.com>
 
 	* 23221: Martin Koeppe: don't used XTABS if not available.
