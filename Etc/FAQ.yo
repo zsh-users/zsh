@@ -43,11 +43,11 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2005/01/11)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2005/07/18)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2005/01/11
+mydit(Last-Modified:) 2005/07/18
 mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--2005 (see end of document)
@@ -95,7 +95,7 @@ Chapter 3:  How to get various things to work
 3.2. In which startup file do I put...?
 3.3. What is the difference between `export' and the ALL_EXPORT option?
 3.4. How do I turn off spelling correction/globbing for a single command?
-3.5. How do I get the meta key to work on my xterm?
+3.5. How do I get the Meta key to work on my xterm?
 3.6. How do I automatically display the directory in my xterm title bar?
 3.7. How do I make the completion list use eight bit characters?
 3.8. Why do the cursor (arrow) keys not work?
@@ -289,10 +289,10 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 4.2.6 is the latest production version.  A release on the
-  4.3 development branch is imminent; this will contain support
-  for multibyte character strings (such as UTF-8 locales) in the
-  line editor.
+  Zsh 4.2.6 is the latest production version.  The latest development
+  version is 4.3.1; this contains support for multibyte character strings
+  (such as UTF-8 locales) in the line editor, although the rest of the
+  shell does not yet have full multibyte support.
 
   There will not be any further 4.0 releases now that 4.2 has become
   the stable version.
@@ -325,67 +325,44 @@ label(16)
   `testing' subdirectory: such up-to-the-minute development versions should
   only be retrieved if you actually plan to help test the latest version of
   the shell.  The following list also appears on the WWW at
-  url(http://www.zsh.org)(http://www.zsh.org) .
+  url(http://www.zsh.org/)(http://www.zsh.org/) .
 
   description(
-    mydit(Home site) url(ftp://ftp.zsh.org)(ftp://ftp.zsh.org)
-    mydit()          url(http://www.zsh.org/pub/zsh/)
-(http://www.zsh.org/pub/zsh/)
-    mydit(Australia) url(ftp://ftp.ips.gov.au/mirror/zsh/)
-(ftp://ftp.ips.gov.au/mirror/zsh/)
-    mydit(Denmark)   url(ftp://sunsite.dk/pub/unix/shells/zsh)
-(ftp://sunsite.dk/pub/unix/shells/zsh)
+    mydit(Home site) url(ftp://ftp.zsh.org/)(ftp://ftp.zsh.org/)
+    mydit()          (also url(http://www.zsh.org/pub/zsh/)
+(http://www.zsh.org/pub/zsh/))
+    mydit(Denmark)   url(ftp://mirrors.dotsrc.org/zsh/)
+(ftp://mirrors.dotsrc.org/zsh/)
+    mydit()          (also url(http://mirrors.dotsrc.org/zsh/)
+(http://mirrors.dotsrc.org/zsh/))
     mydit(Finland)   url(ftp://ftp.funet.fi/pub/unix/shells/zsh/)
 (ftp://ftp.funet.fi/pub/unix/shells/zsh/)
-    mydit(France)    url(ftp://ftp.cenatls.cena.dgac.fr/shells/zsh/)
-(ftp://ftp.cenatls.cena.dgac.fr/shells/zsh/)
+    mydit(France)    url(ftp://nephtys.lip6.fr/pub/unix/shells/zsh/)
+(ftp://nephtys.lip6.fr/pub/unix/shells/zsh/)
     mydit(Germany)   url(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
 (ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
-    mydit()          url(ftp://ftp.uni-trier.de/pub/unix/shell/zsh/)
-(ftp://ftp.uni-trier.de/pub/unix/shell/zsh/)
     mydit(Hungary)   url(ftp://ftp.cs.elte.hu/pub/zsh/)
 (ftp://ftp.cs.elte.hu/pub/zsh/)
     mydit()          (also url(http://www.cs.elte.hu/pub/zsh/)
-(http://www.cs.elte.hu/pub/zsh/) )
+(http://www.cs.elte.hu/pub/zsh/))
     mydit()          url(ftp://ftp.kfki.hu/pub/packages/zsh/)
 (ftp://ftp.kfki.hu/pub/packages/zsh/)
-    mydit(Israel)    \
-url(ftp://ftp.math.technion.ac.il/pub/zsh/)
+    mydit(Israel)    url(ftp://ftp.math.technion.ac.il/pub/zsh/)
 (ftp://ftp.math.technion.ac.il/pub/zsh/)
-    mydit()          \
-url(http://www.math.technion.ac.il/pub/zsh/)
-(http://www.math.technion.ac.il/pub/zsh/)
-    mydit(Italy)     url(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
-(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
-    mydit(Japan)     url(ftp://ftp.nisiq.net/pub/shells/zsh/)
-(ftp://ftp.nis.co.jp/pub/shells/zsh/)
-    mydit()          url(ftp://ftp.win.ne.jp/pub/shell/zsh/)
-(ftp://ftp.win.ne.jp/pub/shell/zsh/)
-    mydit(Norway)    url(ftp://ftp.uit.no/pub/unix/shells/zsh/)
-(ftp://ftp.uit.no/pub/unix/shells/zsh/)
+    mydit()          (also url(http://www.math.technion.ac.il/pub/zsh/)
+(http://www.math.technion.ac.il/pub/zsh/))
+    mydit(Netherlands) url(ftp://ftp.demon.nl/pub/mirrors/zsh/)
+(ftp://ftp.demon.nl/pub/mirrors/zsh/)
     mydit(Poland)    url(ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/)
 (ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/)
-    mydit(Romania)   url(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/)
-(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/)
-    mydit()          url(ftp://ftp.kappa.ro/pub/mirrors/ftp.zsh.org/pub/zsh/)
+    mydit(Romania)   url(ftp://ftp.kappa.ro/pub/mirrors/ftp.zsh.org/pub/zsh/)
 (ftp://ftp.kappa.ro/pub/mirrors/ftp.zsh.org/pub/zsh/)
-    mydit(Slovenia)  url(ftp://ftp.siol.net/mirrors/zsh/)
-(ftp://ftp.siol.net/mirrors/zsh/)
     mydit(Sweden)    url(ftp://ftp.lysator.liu.se/pub/unix/zsh/)
 (ftp://ftp.lysator.liu.se/pub/unix/zsh/)
-    mydit(UK)        url(ftp://ftp.net.lut.ac.uk/zsh/)
-(ftp://ftp.net.lut.ac.uk/zsh/)
-    mydit()          (also by FSP at port 21)
-    mydit()          url(ftp://sunsite.org.uk/packages/zsh/)
+    mydit(UK)        url(ftp://sunsite.org.uk/packages/zsh/)
 (ftp://sunsite.org.uk/packages/zsh/)
-    mydit(USA)       url(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
-(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
-    mydit()          url(ftp://ftp.rge.com/pub/shells/zsh/)
-(ftp://ftp.rge.com/pub/shells/zsh/)
-    mydit()          url(ftp://foad.org/pub/zsh/)
-(ftp://foad.org/pub/zsh/)
-    mydit()          url(http://foad.org/zsh/)
-(http://foad.org/zsh/)
+    mydit(USA)       url(http://zsh.open-mirror.com/)
+(http://zsh.open-mirror.com/)
   )
 
   The Windows port mentioned above is maintained separately by email(Amol
@@ -394,15 +371,15 @@ url(http://www.math.technion.ac.il/pub/zsh/)
   not be developed further.  You can get it from:
 
   description(
-    mydit()        url(ftp://ftp.blarg.net/users/amol/zsh)
-(ftp://ftp.blarg.net/users/amol/zsh)  
+    mydit()        url(ftp://ftp.blarg.net/users/amol/zsh/)
+(ftp://ftp.blarg.net/users/amol/zsh/)  
   )
 
   There is no port of version 4 for Windows, but newer releases compile under
   Cygwin, a freely available UNIX-style environment for the Win32 API.  You
   can find information about this at 
-  url(http://sourceware.cygnus.com/cygwin)\
-(http://sourceware.cygnus.com/cygwin).
+  url(http://www.cygwin.com/)\
+(http://www.cygwin.com/).
 
   Likewise the OS/2 port is available from email(TAMURA Kent
   <kent@tril.ibm.co.jp>) at
@@ -581,7 +558,7 @@ tt(SH_OPTION_LETTERS),
         tt(NO_NOMATCH)).
     it()* The results of parameter substitutions are treated as plain text:
         mytt(foo="*"; print $foo) prints all files in ksh but mytt(*) in zsh
-        (uset tt(GLOB_SUBST)).
+        (use tt(GLOB_SUBST)).
     it()* tt($PSn) do not do parameter substitution by default (use \
 PROMPT_SUBST).
     it()* Standard globbing does not allow ksh-style `pattern-lists'.
@@ -613,7 +590,6 @@ tt(EXTENDED_GLOB).
         the way to exclude some subdirectories from matching a mytt(**).
     it()  Unquoted assignments do file expansion after mytt(:)s (intended for
         PATHs). 
-    it()  mytt(integer) does not allow mytt(-i).
     it()  mytt(typeset) and mytt(integer) have special behaviour for
         assignments in ksh, but not in zsh.  For example, this doesn't
         work in zsh:
@@ -656,13 +632,14 @@ link(2.3)(23).
   )
   it() Editing:
   itemize(
-    it()  The options tt(emacs), tt(gmacs), tt(viraw) are not supported.
+    it()  The options tt(gmacs), tt(viraw) are not supported.
         Use bindkey to change the editing behaviour: mytt(set -o {emacs,vi})
-        becomes mytt(bindkey -{e,v}); for gmacs, go to emacs mode and use
-        mytt(bindkey \^t gosmacs-transpose-characters).
+        becomes `bindkey -{e,v}', although `set -o emacs' and `set -o vi'
+        are supported for compatibility; for gmacs, go to emacs mode and
+        use `bindkey \^t gosmacs-transpose-characters'.
     it()  The mytt(keyword) option does not exist and mytt(-k) is instead
-        interactivecomments.  (mytt(keyword) will not be in the next ksh
-        release either.)
+        interactivecomments.  (mytt(keyword) is not in recent versions
+        of ksh either.)
     it()* Management of histories in multiple shells is different:
         the history list is not saved and restored after each command.
         The option tt(SHARE_HISTORY) appeared in 3.1.6 and is set in ksh
@@ -679,7 +656,6 @@ link(2.3)(23).
     it()  There is no built-in command newgrp: use e.g. mytt(alias
         newgrp="exec newgrp")
     it()  mytt(jobs) has no mytt(-n) flag.
-    it()  mytt(read) has no mytt(-s) flag.
   )
   it() Other idiosyncrasies:
   itemize(
@@ -830,8 +806,7 @@ label(23)
   as an alias, defining mytt(/bin/ls) and mytt(-F) as functions which call
   mytt(/bin/ls), which gets a bit recursive.  This can be avoided if you use
   mytt(function) to define a function, which doesn't expand aliases.  It is
-  possible to argue for extra warnings somewhere in this mess.  Luckily,
-  it is not possible to define mytt(function) as an alias.
+  possible to argue for extra warnings somewhere in this mess.
 
   Bart Schaefer's rule is:  Define first those aliases you expect to
   use in the body of a function, but define the function first if the
@@ -1177,13 +1152,20 @@ sect(How do I turn off spelling correction/globbing for a single command?)
   be expanded before the rest of the command line is parsed.
 
 
-sect(How do I get the meta key to work on my xterm?)
+sect(How do I get the Meta key to work on my xterm?)
 label(35)
 
-  As stated in the manual, zsh needs to be told about the meta key by
+  The Meta key isn't present on a lot of keyboards, but on some
+  the Alt key has the same effect.  If a character is typed on the
+  keyboard while the Meta key is held down, the characters is sent
+  as terminal input with its eighth bit set.  For example, ASCII
+  mytt(A), hex 65, becomes hex E5.  This is sometimes used to provide
+  extra editing commands.
+
+  As stated in the manual, zsh needs to be told about the Meta key by
   using mytt(bindkey -me) or mytt(bindkey -mv) in your .zshrc or on the
   command line.  You probably also need to tell the terminal driver to
-  allow the `meta' bit of the character through; mytt(stty pass8) is the
+  allow the `Meta' bit of the character through; mytt(stty pass8) is the
   usual incantation.  Sample .zshrc entry:
   verb(
     [[ $TERM = "xterm" ]] && stty pass8 && bindkey -me
@@ -1200,7 +1182,12 @@ label(35)
   have tinkered with it.
 
   You don't need the mytt(bindkey) to be able to define your own sequences
-  with the meta key, though you still need the mytt(stty).
+  with the Meta key, though you still need the mytt(stty).
+
+  If you are using multibyte input directly from the keyboard you
+  probably don't want to use this feature since the eighth bit in
+  each byte is used to indicate a part of a multibyte character.  See
+  link(chapter 5)(c5).
 
 
 sect(How do I automatically display the directory in my xterm title bar?)
@@ -1662,21 +1649,45 @@ sect(How do I get a variable's value to be evaluated as another variable?)
 
 sect(How do I prevent the prompt overwriting output when there is no newline?)
 
-  The problem is, for example,
+  The problem is normally limited to zsh versions prior to 4.3.0 due to the
+  advent of the PROMPT_SP option (which is enabled by default, and eliminates
+  this problem for most terminals).  An example of the overwriting is:
   verb(
     % echo -n foo
     % 
   )
-  and the tt(foo) has been overwritten by the prompt tt(%).  The answer is
-  simple:  put tt(unsetopt promptcr) in your tt(.zshrc).  The option \
-  tt(PROMPT_CR),
-  to print a carriage return before a new prompt, is set by default because
-  a prompt at the right hand side (mytt($RPROMPT), mytt($RPS1)) will not appear
-  in the right place, and multi-line editing will be confused about the line
-  position, unless the line starts in the left hand column.  Apart from
-  tt(PROMPT_CR), you can force this to happen by putting a newline in the
-  prompt (see question link(3.13)(313) for that).
+  This shows a case where the word tt(foo) was output without a newline, and
+  then overwritten by the prompt line tt(%).  The reason this happens is that
+  the option tt(PROMPT_CR) is enabled by default, and it outputs a carriage
+  return before the prompt in order to ensure that the line editor knows what
+  column it is in (this is needed to position the right-side prompt correctly
+  (mytt($RPROMPT), mytt($RPS1)) and to avoid screen corruption when performing
+  line editing).  If you add tt(unsetopt promptcr) to your tt(.zshrc), you
+  will see any partial output, but your screen may look weird until you press
+  return or refresh the screen.
 
+  A better solution than disabling PROMPT_CR (for most terminals) is adding
+  a simpler version of the PROMPT_SP functionality to an older zsh using a
+  custom precmd function, like this one:
+  verb(
+    # Skip defining precmd if the PROMPT_SP option is available.
+    if ! eval '[[ -o promptsp ]] 2>/dev/null'; then
+      function precmd {
+        # Output an inverse char and a bunch spaces.  We include
+        # a CR at the end so that any user-input that gets echoed
+        # between this output and the prompt doesn't cause a wrap.
+        print -nP "%B%S%#%s%b${(l:$((COLUMNS-1)):::):-}\r"
+      }
+    fi
+  )
+  That precmd function will only bump the screen down to a new line if there
+  was output on the prompt line, otherwise the extra chars get removed by
+  the PROMPT_CR action.  Although this typically looks fine, it may result
+  in the spaces preceding the prompt being included when you select a line
+  of preserved text with the mouse.
+
+  One final alternative is to put a newline in your prompt -- see question
+  link(3.13)(313) for that.
 
 sect(What's wrong with cut and paste on my xterm?)
 
@@ -1931,6 +1942,16 @@ sect(Suppose I want to complete all files during a special completion?)
   function at that point.  Then change all occurrences of
   `tt(complete-file)' to a name of your own.
 
+  If you simply want to try filename completion as a default when other
+  completions fail, add it to the `tt(completer)' style for normal
+  completion, for example:
+  verb(
+    zstyle ':completion:*' completer _complete _ignored _files
+  )
+  This adds filename completion to the end of the default types of
+  completion.  Your actual completer style may include other actions,
+  such as expansion or approximate completion.
+
 
 chapter(The future of zsh)
 
@@ -2022,8 +2043,9 @@ sect(What's on the wish-list?)
   Some future possibilities which have been suggested:
   itemize(
   it() The shell, in particular the line editor, should support Unicode
-     characters.  Initial support for this should appear in version 4.3,
-     but this is a large job.
+     characters.  Initial support for this appeared in version 4.3;
+     it is reasonably complete in the line editor but patchy elsewhere
+     (note this may require the configuration option --enable-multibyte).
   it() The parameter code could do with tidying up, maybe with more of the
      features made available in ksh93.
   it() Configuration files to enable zsh startup files to be created
