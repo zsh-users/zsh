@@ -1,3 +1,7 @@
+2007-03-19  Peter Stephenson  <pws@csr.com>
+
+	* 23221: Martin Koeppe: don't used XTABS if not available.
+
 2007-03-15  Peter Stephenson  <pws@csr.com>
 
 	* 23219: Src/options.c: Ismail Dönmez reported that lower
