@@ -1,3 +1,8 @@
+2007-03-22  Peter Stephenson  <pws@csr.com>
+
+	* 23226: Completion/Unix/Command/_nice: "nice -n<->" wasn't
+	handled.
+
 2007-03-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23224: Src/Zle/zle_refresh.c: fix output of prompt in
