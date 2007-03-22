@@ -188,7 +188,7 @@ integer time_ok
 # line[time_start,time_end] is the string for the time.
 integer time_start time_end date_start date_end
 integer anchor anchor_end debug setvar
-integer relative relative_start reladd reldate relsign=1
+integer relative relative_start reladd reldate relsign=1 newadd h1 h2 hd
 
 while getopts "aAdmrR:st" opt; do
   case $opt in
@@ -583,8 +583,8 @@ if (( relative )); then
        if (( day > 28 )); then
 	 while true; do
 	   strftime -s day2 "%d" $reldate
-	   # There are only up to 3 days in it, so just wind back one at a time.
-	   # Saves counting.
+	   # There are only up to 3 days in it, so just wind back one at a
+           # time.  Saves counting.
 	   (( day2 >= 28 )) && break
 	   (( reldate -= daysecs ))
 	 done
@@ -623,13 +623,73 @@ if (( relative )); then
   fi
   if [[ $line = (#bi)${~dspat}(<->|)[[:space:]]#(w|wk|week|weekly)${~repat} ]]; then
      [[ -z $match[2] ]] && match[2]=1
-     (( reladd += relsign * 7 * daysecs * ${match[2]} ))
+     (( newadd = relsign * 7 * daysecs * ${match[2]} ))
+     if (( relative == 2 )); then
+       # See explanation of this correction under days, below.
+       strftime -s h1 "%H" $(( relative_start + reladd ))
+       strftime -s h2 "%H" $(( relative_start + reladd + newadd ))
+       (( hd = h2 - h1 ))
+       # and of course we might go past midnight...
+       if (( hd > 12 )); then
+	   (( hd -= 24 ))
+       elif (( hd < -12 )); then
+	   (( hd += 24 ))
+       fi
+       (( newadd -= hd * 3600 ))
+     fi
+     (( reladd += newadd ))
      line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
      time_found=1
   fi
   if [[ $line = (#bi)${~dspat}(<->|)[[:space:]]#(d|dy|day|daily)${~repat} ]]; then
      [[ -z $match[2] ]] && match[2]=1
-     (( reladd += relsign * daysecs * ${match[2]} ))
+     (( newadd = relsign * daysecs * ${match[2]} ))
+     if (( relative == 2 )); then
+       # You thought a day was always the same time?  Ho, ho, ho.
+       # If the clocks go forward or back, we can gain or lose
+       # an hour.  Check this by seeing what the hour is before
+       # and after adding the number of days.  If it changes,
+       # remove the difference.
+       # 
+       # We need this correction for weeks, too, as above.
+       # (We could apply corrections for weeks and days together,
+       # in fact, but I've left it a little more modular).
+       # We don't need it for years and months because we calculated
+       # those by actually looking at the calendar for a given
+       # time of day, so the adjustment came out in the wash.
+       # We don't need it for hours or smaller periods because
+       # presumably if a user asks for something in 3 hours time
+       # they don't mean 4 hours if the clocks went back and
+       # 2 hours if they went forward.  At least, I think so.
+       # Consider:
+       #   % calendar_showdate +2d,1hr
+       #   Sun Mar 25 00:37:00 GMT 2007
+       #   % calendar_showdate +2d,2hr
+       #   Sun Mar 25 02:37:09 BST 2007
+       # At first sight that looks wrong because the clock appears
+       # to jump two hours.  (Yes, it took me all of 9 seconds to
+       # edit the line.)  But actually it's only jumped the hour
+       # you asked for, because one is in GMT and the other in BST.
+       # In principle you could say the same thing about days:
+       # Sun Mar 25 00:00:00 GMT 2007  and  Mon Mar 26 01:00:00 BST 2007
+       # are a day apart.  But usually if you say "same time next Tuesday"
+       # you mean "when the clock says the same time, even if someone
+       # has nipped in and adjusted it in the mean time", although
+       # for some reason you don't usually bother saying that.
+       #
+       # Hope that's clear.
+       strftime -s h1 "%H" $(( relative_start + reladd ))
+       strftime -s h2 "%H" $(( relative_start + reladd + newadd ))
+       (( hd = h2 - h1 ))
+       # and of course we might go past midnight...
+       if (( hd > 12 )); then
+	   (( hd -= 24 ))
+       elif (( hd < -12 )); then
+	   (( hd += 24 ))
+       fi
+       (( newadd -= hd * 3600 ))
+     fi
+     (( reladd += newadd ))
      line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
      time_found=1
   fi
@@ -661,7 +721,8 @@ if (( relative )); then
       fi
     fi
     # relative_start is zero if we're not using it
-    (( REPLY = relative_start + reladd + (hour * 60 + minute) * 60 + second ))
+    (( reladd += (hour * 60 + minute) * 60 + second ))
+    (( REPLY = relative_start + reladd  ))
     [[ -n $setvar ]] && REPLY2=$line
     return 0
   fi

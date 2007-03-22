@@ -1,19 +1,24 @@
 emulate -L zsh
 setopt extendedglob
+zmodload -i zsh/datetime
 
-local optm datefmt
+local optm datefmt opt
 integer optr replyset
 
 zstyle -s ':datetime:calendar_showdate:' date-format datefmt ||
   datefmt="%a %b %d %H:%M:%S %Z %Y"
 
-if [[ $1 = -r ]]; then
-  shift
-  REPLY=0
-  optr=1
-else
-  local REPLY
-fi
+while [[ $argv[$OPTIND] != +* ]] && getopts "r" opt; do
+  case $opt in
+    (r)
+    REPLY=0
+    optr=1
+    ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+(( optr )) || local REPLY
 
 if (( ! $# )); then
   print "Usage: $0 datespec [ ... ]" >&2

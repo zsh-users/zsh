@@ -1,3 +1,9 @@
+2007-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23228: Functions/Calendar/calendar_{scan,show}date: fix
+	summer time adjustments for relative times, plus some minor
+	tweaks.
+
 2007-03-22  Peter Stephenson  <pws@csr.com>
 
 	* 23226: Completion/Unix/Command/_nice: "nice -n<->" wasn't
