@@ -1,5 +1,8 @@
 2007-03-23  Peter Stephenson  <pws@csr.com>
 
+	* unposted, see followups to 23232: Doc/Zsh/builtins.yo:
+	superduper nitpicked version.
+
 	* 23232: Src/module.c, Doc/Zsh/builtins.yo: improve
 	warning interface; record that zmodload doesn't flag an error
 	on failed loading.
