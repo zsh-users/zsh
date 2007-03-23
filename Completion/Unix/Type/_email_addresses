@@ -131,7 +131,7 @@ _email_addresses() {
   if ! zstyle -s ":completion:${curcontext}:email-addresses" muttrc muttrc; then
     [[ -e ~/mutt/muttrc ]] && muttrc="~/mutt/muttrc" || muttrc="~/.muttrc"
   fi
-  files=( MH ${MH:-~/.mh_profile} mutt $muttrc mush ~/.mushrc mail ${MAILRC:-~/.mailrc} pine ~/.addressbook )
+  files=( MH ${MH:-~/.mh_profile} mutt $~muttrc mush ~/.mushrc mail ${MAILRC:-~/.mailrc} pine ~/.addressbook )
   plugins=( 
     ${${(k)functions[(I)_email-*]#*-}:#(${(kj.|.)~files})}
     $files(Ne:'REPLY=( ${(k)files[(r)$REPLY]} ):')
