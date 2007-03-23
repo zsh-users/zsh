@@ -1864,7 +1864,13 @@ be in a file with a name consisting of the specified var(name) followed by
 a standard suffix, usually `tt(.so)' (`tt(.sl)' on HPUX).
 If the module to be loaded is
 already loaded and the tt(-i) option is given, the duplicate module is
-ignored.  Otherwise tt(zmodload) prints an error message.
+ignored.  Otherwise tt(zmodload) prints an error message and returns
+a non-zero status.  The current code block is not aborted unless
+tt(zmodload) detects an inconsistency, such as an invalid module name
+or circular dependency list.  Hence `tt(zmodload -i) var(module)
+tt(2>/dev/null)' is sufficient to test whether a module is available.
+If it is available, the module is loaded if necessary, while if it
+is not available, non-zero status is silently returned.
 
 The var(name)d module is searched for in the same way a command is, using
 tt($module_path) instead of tt($path).  However, the path search is

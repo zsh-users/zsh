@@ -439,11 +439,8 @@ do_load_module(char const *name, int silent)
     void *ret;
 
     ret = try_load_module(name);
-    if (!ret && !silent) {
-	int waserr = errflag;
-	zerr("failed to load module: %s", name);
-	errflag = waserr;
-    }
+    if (!ret && !silent)
+	zwarn("failed to load module: %s", name);
     return ret;
 }
 
@@ -454,11 +451,8 @@ do_load_module(char const *name, int silent)
 static void *
 do_load_module(char const *name, int silent)
 {
-    int waserr = errflag;
-
     if (!silent)
-	zerr("failed to load module: %s", name);
-    errflag = waserr;
+	zwarn("failed to load module: %s", name);
 
     return NULL;
 }
