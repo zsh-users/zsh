@@ -1,3 +1,8 @@
+2007-03-24  Clint Adams  <clint@zsh.org>
+
+	* 23236: Daniel Qarras: Completion/Unix/Command/_module:
+	enhancements for _module.
+
 2007-03-23  Peter Stephenson  <pws@csr.com>
 
 	* unposted, see followups to 23232: Doc/Zsh/builtins.yo:
