@@ -326,11 +326,12 @@ _ssh_hosts () {
   local config
   integer ind
 
+  # If users-hosts matches, we shouldn't complete anything else.
   if [[ "$IPREFIX" == *@ ]]; then
-    _combination -s '[:@]' my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@"
+    _combination -s '[:@]' my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@" && return
   else
     _combination -s '[:@]' my-accounts users-hosts \
-      ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
+      ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@" && return
   fi
   if (( ind = ${words[(I)-F]} )); then
     config=${~words[ind+1]}

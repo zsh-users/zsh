@@ -1,3 +1,9 @@
+2007-03-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* usres/11333: Completion/Unix/Command/_ssh: users-hosts
+	didn't limit the hosts properly when the user was matched
+	for ssh.
+
 2007-03-24  Clint Adams  <clint@zsh.org>
 
 	* 23236: Daniel Qarras: Completion/Unix/Command/_module:
