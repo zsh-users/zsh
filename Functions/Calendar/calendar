@@ -5,7 +5,7 @@ local line restline REPLY REPLY2 userange pruned nobackup datefmt
 local calendar donefile sched newfile warnstr mywarnstr newdate
 integer time start stop today ndays y m d next=-1 shown done nodone
 integer verbose warntime mywarntime t tcalc tsched i rstat remaining
-integer showcount icount repeating repeattime resched
+integer showcount icount repeating repeattime resched showall
 local -a calendar_entries calendar_addlines
 local -a times calopts showprog lockfiles match mbegin mend
 
@@ -96,6 +96,11 @@ while [[ ${argv[opti+1]} = -* ]]; do
       ###########################
       # Options without arguments
       ###########################
+      (a)
+      # Show all entries
+      (( showall = 1 ))
+      ;;
+
       (d)
       # Move out of date items to the done file.
       (( done = 1 ))
@@ -279,7 +284,7 @@ fi
       fi
     fi
     (( shown = 0 ))
-    if (( t >= start && (remaining || t <= stop || icount < showcount) ))
+    if (( showall || (t >= start && (remaining || t <= stop || icount < showcount)) ))
     then
       $showprog $start $stop "$line"
       (( icount++ ))

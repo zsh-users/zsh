@@ -309,8 +309,8 @@ subsect(Calendar system functions)
 
 startitem()
 findex(calendar)
-xitem(tt(calendar) [ tt(-dDsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ [ var(start) ] var(end) ])(
-item(tt(calendar -r) [ tt(-dDrsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ var(start) ])(
+xitem(tt(calendar) [ tt(-adDsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ [ var(start) ] var(end) ])(
+item(tt(calendar -r) [ tt(-adDrsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ var(start) ])(
 Show events in the calendar.
 
 With no arguments, show events from the start of today until the end of
@@ -338,6 +338,10 @@ tt(~/.zshrc) file.
 Options:
 
 startitem()
+item(tt(-a))(
+Show all items in the calendar, regardless of the tt(start) and
+tt(end).
+)
 item(tt(-C) var(calfile))(
 Explicitly specify a calendar file instead of the value of
 the tt(calendar-file) style or the the default tt(~/calendar).
@@ -418,8 +422,19 @@ option tt(-L) indicates that tt(calendar_add) does not need to lock the
 calendar file up the old one as it is already locked.  These options will
 not usually be needed by users.
 )
+findex(calendar_edit)
+item(tt(calendar_edit))(
+This calls the user's editor to edit the calendar file.  The editor
+is given by the variable tt(VISUAL), if set, else the variable tt(EDITOR).
+If the calendar scheduler was running, then after editing the file
+tt(calendar -s) is called to update it.
+
+This function locks out the calendar system during the edit.
+Hence it should be used to edit the calendar file if there is any
+possibility of a calendar event occurring meanwhile.
+)
 findex(calendar_showdate)
-item(tt(calendar_showdate) [ tt(-r) ] var(date-spec ...))(
+item(tt(calendar_showdate) [ tt(-r) ] [ tt(-f) var(fmt) ] var(date-spec ...))(
 The given var(date-spec) is interpreted and the corresponding date and
 time printed.  If the initial var(date-spec) begins with a tt(PLUS()) or
 tt(-) it is treated as relative to the current time; var(date-spec)s after
@@ -427,8 +442,16 @@ the first are treated as relative to the date calculated so far and
 a leading tt(PLUS()) is optional in that case.  This allows one to
 use the system as a date calculator.  For example, tt(calendar_showdate '+1
 month, 1st Friday') shows the date of the first Friday of next month.
+
 With the option tt(-r) nothing is printed but the value of the date and
 timein seconds since the epoch is stored in the parameter tt(REPLY).
+
+With the option tt(-f) var(fmt) the given date/time conversion format
+is passed to tt(strftime); see notes on the tt(date-format) style below.
+
+In order to avoid ambiguity with negative relative date specifications,
+options must occur in separate words; in other words, tt(-r) and tt(-f)
+should not be combined in the same word.
 )
 findex(calendar_sort)
 item(tt(calendar_sort))(
@@ -568,14 +591,24 @@ item(tt(calendar_lockfiles))(
 Attempt to lock the files given in the argument.  To prevent
 problems with network file locking this is done in an ad hoc fashion
 by attempting to create a symbolic link to the file with the name
-var(file)tt(.lockfile).  Otherwise, however, the function is not
-specific to the calendar system.  Three attempts are made to lock
-the file before giving up.
+var(file)tt(.lockfile).  No other system level functions are used
+for locking, i.e. the file can be accessed and modified by any
+utility that does not use this mechanism.  In particular, the user is not
+prevented from editing the calendar file at the same time unless
+tt(calendar_edit) is used.
+
+Three attempts are made to lock the file before giving up.  If the module
+tt(zsh/zselect) is available, the times of the attempts are jittered so that
+multiple instances of the calling function are unlikely to retry at the
+same time.
 
 The files locked are appended to the array tt(lockfiles), which should
 be local to the caller.
 
 If all files were successully, status zero is returned, else status one.
+
+This function may be used as a general file locking function, although
+this will only work if only this mechanism is used to lock files.
 )
 findex(calendar_read)
 item(tt(calendar_read))(
@@ -660,6 +693,11 @@ enditem()
 texinode(Calendar Bugs)()(Calendar Utility Functions)(Calendar Function System)
 sect(Bugs)
 
+As the system is based entirely on shell functions (with a little support
+from the tt(zsh/datetime) module) the mechanisms used are not as robust as
+those provided by a dedicated calendar utility.  Consequently the user
+should not rely on the shell for vital alerts.
+
 There is no tt(calendar_delete) function.
 
 There is no localization support for dates and times, nor any support
@@ -667,8 +705,6 @@ for the use of time zones.
 
 Relative periods of months and years do not take into account the variable
 number of days.
-
-Recurrent events are not yet supported.
 
 The tt(calendar_show) function is currently hardwired to use tt(xmessage)
 for displaying alerts on X Window System displays.  This should be

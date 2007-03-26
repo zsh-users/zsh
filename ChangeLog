@@ -1,3 +1,15 @@
+2007-03-26  Peter Stephenson  <pws@csr.com>
+
+	* unposted (follow-on from 23228): Doc/Zsh/calsys.yo,
+	Functions/Calendar/calendar{,_edit,lockfiles,scandate,showdate}:
+	New calendar_edit (looks up file to edit and locks it);
+	calendar -a option; calendar_showdate -f fmt option;
+	make calendar_lockfiles use zsh/select to get higher resolution
+	timer to jitter delay; apply the summer time fix to
+	"<month>, <nth> <frob>day" as well; allow "2nd" as an
+	ordinal (also 1nd and 3nd, 4nd, ... since we aren't interested
+	in checking good English).
+
 2007-03-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* usres/11333: Completion/Unix/Command/_ssh: users-hosts

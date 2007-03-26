@@ -1,0 +1,21 @@
+local editor=${VISUAL:-${EDITOR:-vi}}
+local line calendar
+local -a lockfiles
+
+integer cal_running
+
+sched | while read line; do
+  [[ $line = *" calendar -s "<->" "<-> ]] && (( cal_running = 1 ))
+done
+
+zstyle -s ':datetime:calendar:' calendar-file calendar || calendar=~/calendar
+
+{
+  calendar_lockfiles $calendar || return 1
+
+  eval $editor \$calendar
+} always {
+  (( ${#lockfiles} )) && rm -f $lockfiles
+}
+
+(( cal_running )) && calendar -s

@@ -341,8 +341,8 @@ if (( relative == 0 )); then
   date_found=1
   ;;
 
-  # Look for DAY[th/st/rd] MNAME[,] YEAR
-  ((#bi)${~dspat}(<1-31>)(|th|st|rd)[[:space:]]##${~monthpat}(|,)[[:space:]]##((19|20)[0-9][0-9])*)
+  # Look for DAY[th/st/nd/rd] MNAME[,] YEAR
+  ((#bi)${~dspat}(<1-31>)(|th|st|nd|rd)[[:space:]]##${~monthpat}(|,)[[:space:]]##((19|20)[0-9][0-9])*)
   day=$match[2]
   mname=$match[4]
   year=$match[6]
@@ -350,8 +350,8 @@ if (( relative == 0 )); then
   date_found=1
   ;;
 
-  # Look for MNAME DAY[th/st/rd][,] YEAR
-  ((#bi)${~dspat}${~monthpat}[[:space:]]##(<1-31>)(|th|st|rd)(|,)[[:space:]]##((19|20)[0-9][0-9])*)
+  # Look for MNAME DAY[th/st/nd/rd][,] YEAR
+  ((#bi)${~dspat}${~monthpat}[[:space:]]##(<1-31>)(|th|st|nd|rd)(|,)[[:space:]]##((19|20)[0-9][0-9])*)
   mname=$match[2]
   day=$match[3]
   year=$match[6]
@@ -359,8 +359,8 @@ if (( relative == 0 )); then
   date_found=1
   ;;
 
-  # Look for DAY[th/st/rd] MNAME; assume current year
-  ((#bi)${~dspat}(<1-31>)(|th|st|rd)[[:space:]]##${~monthpat}(|,)([[:space:]]##*|))
+  # Look for DAY[th/st/nd/rd] MNAME; assume current year
+  ((#bi)${~dspat}(<1-31>)(|th|st|nd|rd)[[:space:]]##${~monthpat}(|,)([[:space:]]##*|))
   day=$match[2]
   mname=$match[4]
   strftime -s year "%Y" $EPOCHSECONDS
@@ -368,8 +368,8 @@ if (( relative == 0 )); then
   date_found=1
   ;;
 
-  # Look for MNAME DAY[th/st/rd]; assume current year
-  ((#bi)${~dspat}${~monthpat}[[:space:]]##(<1-31>)(|th|st|rd)(|,)([[:space:]]##*|))
+  # Look for MNAME DAY[th/st/nd/rd]; assume current year
+  ((#bi)${~dspat}${~monthpat}[[:space:]]##(<1-31>)(|th|st|nd|rd)(|,)([[:space:]]##*|))
   mname=$match[2]
   day=$match[3]
   strftime -s year "%Y" $EPOCHSECONDS
@@ -378,8 +378,8 @@ if (( relative == 0 )); then
   ;;
 
   # Now it gets a bit ambiguous.
-  # Look for DAY[th/st/rd][/]MONTH[/ ,]YEAR
-  ((#bi)${~dspat}(<1-31>)(|th|st|rd)/(<1-12>)((|,)[[:space:]]##|/)((19|20)[0-9][0-9])*)
+  # Look for DAY[th/st/nd/rd][/]MONTH[/ ,]YEAR
+  ((#bi)${~dspat}(<1-31>)(|th|st|nd|rd)/(<1-12>)((|,)[[:space:]]##|/)((19|20)[0-9][0-9])*)
   day=$match[2]
   month=$match[4]
   year=$match[7]
@@ -387,8 +387,8 @@ if (( relative == 0 )); then
   date_found=1
   ;;
 
-  # Look for MONTH[/]DAY[th/st/rd][/ ,]YEAR
-  ((#bi)${~dspat}(<1-12>)/(<1-31>)(|th|st|rd)((|,)[[:space:]]##|/)((19|20)[0-9][0-9])*)
+  # Look for MONTH[/]DAY[th/st/nd/rd][/ ,]YEAR
+  ((#bi)${~dspat}(<1-12>)/(<1-31>)(|th|st|nd|rd)((|,)[[:space:]]##|/)((19|20)[0-9][0-9])*)
   month=$match[2]
   day=$match[3]
   year=$match[7]
@@ -597,7 +597,9 @@ if (( relative )); then
      line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
      time_found=1
   fi
-  if [[ $relative = 2 && $line = (#bi)${~dspat_noday}(<->)(th|rd|st)(${~daypat})(|${~schars}*) ]]; then
+  # For the next three items we accumulate adjustments in "newadd".
+  # See note below for why they are special.
+  if [[ $relative = 2 && $line = (#bi)${~dspat_noday}(<->)(th|rd|nd|st)(${~daypat})(|${~schars}*) ]]; then
      nth=$match[2]
      test=${(L)${${match[4]##${~schars}#}%%${~schars}#}[1,3]}
      wday=${dayarr[(I)$test]}
@@ -618,81 +620,66 @@ if (( relative )); then
        # whereas the day of the month calculated so far is...
        strftime -s day2 "%d" $reldate
        # so we need to compensate by...
-       (( reladd += (day - day2) * daysecs ))
+       (( newadd += (day - day2) * daysecs ))
      fi
   fi
   if [[ $line = (#bi)${~dspat}(<->|)[[:space:]]#(w|wk|week|weekly)${~repat} ]]; then
      [[ -z $match[2] ]] && match[2]=1
-     (( newadd = relsign * 7 * daysecs * ${match[2]} ))
-     if (( relative == 2 )); then
-       # See explanation of this correction under days, below.
-       strftime -s h1 "%H" $(( relative_start + reladd ))
-       strftime -s h2 "%H" $(( relative_start + reladd + newadd ))
-       (( hd = h2 - h1 ))
-       # and of course we might go past midnight...
-       if (( hd > 12 )); then
-	   (( hd -= 24 ))
-       elif (( hd < -12 )); then
-	   (( hd += 24 ))
-       fi
-       (( newadd -= hd * 3600 ))
-     fi
-     (( reladd += newadd ))
+     (( newadd += relsign * 7 * daysecs * ${match[2]} ))
      line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
      time_found=1
   fi
   if [[ $line = (#bi)${~dspat}(<->|)[[:space:]]#(d|dy|day|daily)${~repat} ]]; then
      [[ -z $match[2] ]] && match[2]=1
-     (( newadd = relsign * daysecs * ${match[2]} ))
-     if (( relative == 2 )); then
-       # You thought a day was always the same time?  Ho, ho, ho.
-       # If the clocks go forward or back, we can gain or lose
-       # an hour.  Check this by seeing what the hour is before
-       # and after adding the number of days.  If it changes,
-       # remove the difference.
-       # 
-       # We need this correction for weeks, too, as above.
-       # (We could apply corrections for weeks and days together,
-       # in fact, but I've left it a little more modular).
-       # We don't need it for years and months because we calculated
-       # those by actually looking at the calendar for a given
-       # time of day, so the adjustment came out in the wash.
-       # We don't need it for hours or smaller periods because
-       # presumably if a user asks for something in 3 hours time
-       # they don't mean 4 hours if the clocks went back and
-       # 2 hours if they went forward.  At least, I think so.
-       # Consider:
-       #   % calendar_showdate +2d,1hr
-       #   Sun Mar 25 00:37:00 GMT 2007
-       #   % calendar_showdate +2d,2hr
-       #   Sun Mar 25 02:37:09 BST 2007
-       # At first sight that looks wrong because the clock appears
-       # to jump two hours.  (Yes, it took me all of 9 seconds to
-       # edit the line.)  But actually it's only jumped the hour
-       # you asked for, because one is in GMT and the other in BST.
-       # In principle you could say the same thing about days:
-       # Sun Mar 25 00:00:00 GMT 2007  and  Mon Mar 26 01:00:00 BST 2007
-       # are a day apart.  But usually if you say "same time next Tuesday"
-       # you mean "when the clock says the same time, even if someone
-       # has nipped in and adjusted it in the mean time", although
-       # for some reason you don't usually bother saying that.
-       #
-       # Hope that's clear.
-       strftime -s h1 "%H" $(( relative_start + reladd ))
-       strftime -s h2 "%H" $(( relative_start + reladd + newadd ))
-       (( hd = h2 - h1 ))
-       # and of course we might go past midnight...
-       if (( hd > 12 )); then
-	   (( hd -= 24 ))
-       elif (( hd < -12 )); then
-	   (( hd += 24 ))
-       fi
-       (( newadd -= hd * 3600 ))
-     fi
-     (( reladd += newadd ))
+     (( newadd += relsign * daysecs * ${match[2]} ))
      line=${line[1,$mbegin[2]-1]}${line[$mend[4]+1,-1]}
      time_found=1
   fi
+  if (( relative == 2 && newadd )); then
+    # You thought a day was always the same time?  Ho, ho, ho.
+    # If the clocks go forward or back, we can gain or lose
+    # an hour.  Check this by seeing what the hour is before
+    # and after adding the number of days.  If it changes,
+    # remove the difference.
+    #
+    # We need this correction for days (including days of a given
+    # month) and weeks.
+    # We don't need it for years and months because we calculated
+    # those by actually looking at the calendar for a given
+    # time of day, so the adjustment came out in the wash.
+    # We don't need it for hours or smaller periods because
+    # presumably if a user asks for something in 3 hours time
+    # they don't mean 4 hours if the clocks went back and
+    # 2 hours if they went forward.  At least, I think so.
+    # Consider:
+    #   % calendar_showdate +2d,1hr
+    #   Sun Mar 25 00:37:00 GMT 2007
+    #   % calendar_showdate +2d,2hr
+    #   Sun Mar 25 02:37:09 BST 2007
+    # At first sight that looks wrong because the clock appears
+    # to jump two hours.  (Yes, it took me all of 9 seconds to
+    # edit the line.)  But actually it's only jumped the hour
+    # you asked for, because one is in GMT and the other in BST.
+    # In principle you could say the same thing about days:
+    # Sun Mar 25 00:00:00 GMT 2007  and  Mon Mar 26 01:00:00 BST 2007
+    # are a day apart.  But usually if you say "same time next Tuesday"
+    # you mean "when the clock says the same time, even if someone
+    # has nipped in and adjusted it in the mean time", although
+    # for some reason you don't usually bother saying that.
+    #
+    # Hope that's clear.
+    strftime -s h1 "%H" $(( relative_start + reladd ))
+    strftime -s h2 "%H" $(( relative_start + reladd + newadd ))
+    (( hd = h2 - h1 ))
+    # and of course we might go past midnight...
+    if (( hd > 12 )); then
+      (( hd -= 24 ))
+    elif (( hd < -12 )); then
+      (( hd += 24 ))
+    fi
+    (( newadd -= hd * 3600 ))
+  fi
+  (( reladd += newadd ))
   if [[ $line = (#bi)${~dspat}(<->|)[[:space:]]#(h|hr|hour|hourly)${~repat} ]]; then
      [[ -z $match[2] ]] && match[2]=1
      (( reladd += relsign * 60 * 60 * ${match[2]} ))

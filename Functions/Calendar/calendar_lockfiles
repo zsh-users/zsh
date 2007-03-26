@@ -3,7 +3,7 @@
 
 local file lockfile msgdone
 # Number of attempts to lock a file.  Probably not worth stylising.
-integer lockattempts=3
+integer lockattempts=3 loadtried
 
 # The lockfile name is not stylised: it has to be a fixed
 # derivative of the main fail.
@@ -18,7 +18,19 @@ for file; do
       msgdone="${lockfile}: waiting to acquire lock"
       zle -M $msgdone
     fi
-    sleep 1
+    if (( ! loadtried )); then
+      zmodload -i zsh/zselect 2>/dev/null
+      (( loadtried = 1 ))
+    fi
+    if zmodload -e zsh/zselect; then
+      # This gives us finer grained timing (100th second).
+      # Randomize the sleep between .1 and 1 second so that
+      # we are much less likely to have multiple instances
+      # retrying at once.
+      zselect -t $(( 10 + RANDOM * 90 / 32768 ))
+    else
+      sleep 1
+    fi
   done
   if [[ -n $msgdone ]]; then
     zle -M ${msgdone//?/ }
