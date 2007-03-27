@@ -1,3 +1,9 @@
+2007-03-27  Peter Stephenson  <pws@csr.com>
+
+	* 23238: Src/jobs.c: job didn't get deleted from table
+	if it wasn't printed, leading to obscure problems with current
+	jobs.
+
 2007-03-26  Peter Stephenson  <pws@csr.com>
 
 	* unposted (follow-on from 23228): Doc/Zsh/calsys.yo,

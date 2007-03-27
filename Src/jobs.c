@@ -806,7 +806,10 @@ should_report_time(Job j)
  * synch = 2 means called synchronously from jobs
  *
  * Returns 1 if some output was done.
-*/
+ *
+ * The function also deletes the job if it was done, even it
+ * is not printed.
+ */
 
 /**/
 int
@@ -818,8 +821,18 @@ printjob(Job jn, int lng, int synch)
     int doneprint = 0;
     FILE *fout = (synch == 2) ? stdout : shout;
 
-    if (jn->stat & STAT_NOPRINT)
+    if (jn->stat & STAT_NOPRINT) {
+	if (jn->stat & STAT_DONE) {
+	    deletejob(jn);
+	    if (job == curjob) {
+		curjob = prevjob;
+		prevjob = job;
+	    }
+	    if (job == prevjob)
+		setprevjob();
+	}
 	return 0;
+    }
 
     /*
      * Wow, what a hack.  Did I really write this? --- pws
