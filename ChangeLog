@@ -1,5 +1,7 @@
 2007-03-27  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/jobs.c: fix uninitialized variable in 23238.
+
 	* 23238: Src/jobs.c: job didn't get deleted from table
 	if it wasn't printed, leading to obscure problems with current
 	jobs.

@@ -821,6 +821,14 @@ printjob(Job jn, int lng, int synch)
     int doneprint = 0;
     FILE *fout = (synch == 2) ? stdout : shout;
 
+    /*
+     * Wow, what a hack.  Did I really write this? --- pws
+     */
+    if (jn < jobtab || jn >= jobtab + jobtabsize)
+	job = jn - oldjobtab;
+    else
+	job = jn - jobtab;
+
     if (jn->stat & STAT_NOPRINT) {
 	if (jn->stat & STAT_DONE) {
 	    deletejob(jn);
@@ -833,14 +841,6 @@ printjob(Job jn, int lng, int synch)
 	}
 	return 0;
     }
-
-    /*
-     * Wow, what a hack.  Did I really write this? --- pws
-     */
-    if (jn < jobtab || jn >= jobtab + jobtabsize)
-	job = jn - oldjobtab;
-    else
-	job = jn - jobtab;
 
     if (lng < 0) {
 	conted = 1;
