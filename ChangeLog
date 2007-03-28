@@ -1,3 +1,8 @@
+2007-03-28  Clint Adams  <clint@zsh.org>
+
+	* 23241: Daniel Qarras: Completion/Unix/Command/_module:
+	fix for _module.
+
 2007-03-27  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/jobs.c: fix uninitialized variable in 23238.
