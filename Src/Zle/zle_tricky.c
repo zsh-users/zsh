@@ -1072,6 +1072,12 @@ get_comp_string(void)
      * still use zlemetacs.
      */
     int qsub, zlemetacs_qsub = 0;
+    /*
+     * redirpos is used to record string arguments for redirection
+     * when they occur at the start of the line.  In this case
+     * the command word is not at index zero in the array.
+     */
+    int redirpos;
     char *s = NULL, *tmp, *p, *tt = NULL, rdop[20];
     char *linptr, *u;
 
@@ -1130,7 +1136,7 @@ get_comp_string(void)
     lexsave();
     inpush(dupstrspace(linptr), 0, NULL);
     strinbeg(0);
-    i = tt0 = cp = rd = ins = oins = linarr = parct = ia = 0;
+    i = tt0 = cp = rd = ins = oins = linarr = parct = ia = redirpos = 0;
 
     /* This loop is possibly the wrong way to do this.  It goes through *
      * the previously massaged command line using the lexer.  It stores *
@@ -1186,6 +1192,9 @@ get_comp_string(void)
             else
                 strcpy(rdop, tokstrings[tok]);
             strcpy(rdstr, rdop);
+	    /* Record if we haven't had the command word yet */
+	    if (i == redirpos)
+		redirpos++;
         }
 	if (tok == DINPAR)
 	    tokstr = NULL;
@@ -1204,7 +1213,7 @@ get_comp_string(void)
 	    if (tt)
 		break;
 	    /* Otherwise reset the variables we are collecting data in. */
-	    i = tt0 = cp = rd = ins = 0;
+	    i = tt0 = cp = rd = ins = redirpos = 0;
 	}
 	if (lincmd && (tok == STRING || tok == FOR || tok == FOREACH ||
 		       tok == SELECT || tok == REPEAT || tok == CASE)) {
@@ -1213,7 +1222,9 @@ get_comp_string(void)
 	    ins = (tok == REPEAT ? 2 : (tok != STRING));
 	    zsfree(cmdstr);
 	    cmdstr = ztrdup(tokstr);
-	    i = 0;
+	    /* If everything before is a redirection, don't reset the index */
+	    if (i != redirpos)
+		i = redirpos = 0;
 	}
 	if (!zleparse && !tt0) {
 	    /* This is done when the lexer reached the word the cursor is on. */
@@ -1399,9 +1410,9 @@ get_comp_string(void)
      * foo[_ wrong (note no $).  If we are in a subscript, treat it   *
      * as being in math.                                              */
     if (inwhat != IN_MATH) {
-	int i = 0;
 	char *nnb, *nb = NULL, *ne = NULL;
 
+	i = 0;
 	MB_METACHARINIT();
 	if (itype_end(s, IIDENT, 1) == s)
 	    nnb = s + MB_METACHARLEN(s);

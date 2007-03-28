@@ -1,3 +1,8 @@
+2007-03-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23246: Src/Zle/zle_tricky.c: fix completion of redirections that
+	occur before the command word.
+
 2007-03-28  Clint Adams  <clint@zsh.org>
 
 	* 23241: Daniel Qarras: Completion/Unix/Command/_module:
