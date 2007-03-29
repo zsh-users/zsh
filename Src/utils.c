@@ -129,7 +129,7 @@ zwarning(const char *cmd, const char *fmt, va_list ap)
 	fputc((unsigned char)':', stderr);
     }
 
-    zerrmsg(fmt, ap);
+    zerrmsg(stderr, fmt, ap);
 }
 
 
@@ -218,14 +218,20 @@ mod_export void
 dputs(VA_ALIST1(const char *message))
 VA_DCL
 {
+    char *filename;
+    FILE *file;
     va_list ap;
     VA_DEF_ARG(const char *message);
 
     VA_START(ap, message);
     VA_GET_ARG(ap, message, const char *);
-    zerrmsg(message, ap);
+    if ((filename = getsparam("ZSH_DEBUG_LOG")) != NULL &&
+	(file = fopen(filename, "a")) != NULL) {
+	zerrmsg(file, message, ap);
+	fclose(file);
+    } else
+	zerrmsg(stderr, message, ap);
     va_end(ap);
-    fflush(stderr);
 }
 
 #endif /* DEBUG */
@@ -245,15 +251,15 @@ zz_plural_z_alpha(void)
 
 /**/
 void
-zerrmsg(const char *fmt, va_list ap)
+zerrmsg(FILE *file, const char *fmt, va_list ap)
 {
     const char *str;
     int num;
 
     if ((unset(SHINSTDIN) || locallevel) && lineno)
-	fprintf(stderr, "%ld: ", (long)lineno);
+	fprintf(file, "%ld: ", (long)lineno);
     else
-	fputc((unsigned char)' ', stderr);
+	fputc((unsigned char)' ', file);
 
     while (*fmt)
 	if (*fmt == '%') {
@@ -261,7 +267,7 @@ zerrmsg(const char *fmt, va_list ap)
 	    switch (*fmt++) {
 	    case 's':
 		str = va_arg(ap, const char *);
-		nicezputs(str, stderr);
+		nicezputs(str, file);
 		break;
 	    case 'l': {
 		char *s;
@@ -271,50 +277,50 @@ zerrmsg(const char *fmt, va_list ap)
 		s = zhalloc(num + 1);
 		memcpy(s, str, num);
 		s[num] = '\0';
-		nicezputs(s, stderr);
+		nicezputs(s, file);
 		break;
 	    }
 	    case 'd':
 		num = va_arg(ap, int);
-		fprintf(stderr, "%d", num);
+		fprintf(file, "%d", num);
 		break;
 	    case '%':
-		putc('%', stderr);
+		putc('%', file);
 		break;
 	    case 'c':
 		num = va_arg(ap, int);
 #ifdef MULTIBYTE_SUPPORT
 		mb_metacharinit();
-		zputs(wcs_nicechar(num, NULL, NULL), stderr);
+		zputs(wcs_nicechar(num, NULL, NULL), file);
 #else
-		zputs(nicechar(num), stderr);
+		zputs(nicechar(num), file);
 #endif
 		break;
 	    case 'e':
 		/* print the corresponding message for this errno */
 		num = va_arg(ap, int);
 		if (num == EINTR) {
-		    fputs("interrupt\n", stderr);
+		    fputs("interrupt\n", file);
 		    errflag = 1;
 		    return;
 		}
 		/* If the message is not about I/O problems, it looks better *
 		 * if we uncapitalize the first letter of the message        */
 		if (num == EIO)
-		    fputs(strerror(num), stderr);
+		    fputs(strerror(num), file);
 		else {
 		    char *errmsg = strerror(num);
-		    fputc(tulower(errmsg[0]), stderr);
-		    fputs(errmsg + 1, stderr);
+		    fputc(tulower(errmsg[0]), file);
+		    fputs(errmsg + 1, file);
 		}
 		break;
 	    }
 	} else {
-	    putc(*fmt == Meta ? *++fmt ^ 32 : *fmt, stderr);
+	    putc(*fmt == Meta ? *++fmt ^ 32 : *fmt, file);
 	    fmt++;
 	}
-    putc('\n', stderr);
-    fflush(stderr);
+    putc('\n', file);
+    fflush(file);
 }
 
 /* Output a single character, for the termcap routines.     *

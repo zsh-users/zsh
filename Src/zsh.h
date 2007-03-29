@@ -1925,10 +1925,12 @@ struct heap {
 # define DPUTS(X,Y) if (!(X)) {;} else dputs(ERRMSG(Y))
 # define DPUTS1(X,Y,Z1) if (!(X)) {;} else dputs(ERRMSG(Y), Z1)
 # define DPUTS2(X,Y,Z1,Z2) if (!(X)) {;} else dputs(ERRMSG(Y), Z1, Z2)
+# define DPUTS3(X,Y,Z1,Z2,Z3) if (!(X)) {;} else dputs(ERRMSG(Y), Z1, Z2, Z3)
 #else
 # define DPUTS(X,Y)
 # define DPUTS1(X,Y,Z1)
 # define DPUTS2(X,Y,Z1,Z2)
+# define DPUTS3(X,Y,Z1,Z2,Z3)
 #endif
 
 /**************************/

@@ -326,6 +326,9 @@ This enables the builtin "hashinfo".
 To add some sanity checks and generate debugging information for debuggers
 you can use the following option.  This also disables optimization.
  --enable-zsh-debug            # use it if you want to debug zsh
+In this mode, zsh may output extra information about internal errors
+to stderr.  The shell variable ZSH_DEBUG_LOG may be set to another file
+to which errors will be appended.
 
 Startup/shutdown files
 ----------------------

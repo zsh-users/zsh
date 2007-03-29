@@ -1,3 +1,10 @@
+2007-03-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23248: INSTALL, Src/utils.c, Src/zsh.h, Src/Zle/complist.c:
+	bug with completion lists on last line of group just shorter than
+	the line length; if compiled with debugging, ZSH_DEBUG_LOG is used
+	for dputs() output.
+
 2007-03-29  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Unix/Command/.distfiles: update

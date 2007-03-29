@@ -1139,6 +1139,10 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    if (dopr == 1) {
 		if (ml == mlend - 1 && (cc % columns) == columns - 1) {
 		    dopr = 0;
+		    if (*p == Meta)
+			p += 2;
+		    else
+			p++;
 		    continue;
 		}
 		while (len--) {
@@ -1580,6 +1584,8 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
     Cmatch m;
     int len, subcols = 0, stop = 0, ret = 0;
 
+    DPUTS2(ml >= mlines, "clprintm called with ml too large (%d/%d)",
+	   ml, mlines);
     if (g != last_group)
         *last_cap = '\0';
 
