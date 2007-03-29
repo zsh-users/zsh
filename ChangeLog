@@ -1,3 +1,8 @@
+2007-03-29  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Unix/Command/.distfiles: update
+	.distfiles.
+
 2007-03-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23246: Src/Zle/zle_tricky.c: fix completion of redirections that
