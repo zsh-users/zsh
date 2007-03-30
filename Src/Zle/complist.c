@@ -1139,10 +1139,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    if (dopr == 1) {
 		if (ml == mlend - 1 && (cc % columns) == columns - 1) {
 		    dopr = 0;
-		    if (*p == Meta)
-			p += 2;
-		    else
-			p++;
+		    p += len;
 		    continue;
 		}
 		while (len--) {
@@ -1153,6 +1150,10 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    } else
 			putc(*p++, shout);
 		}
+		/*
+		 * TODO: the following doesn't allow for
+		 * character widths greater than 1.
+		 */
 		if ((beg = !(cc % columns)) && !stat) {
 		    ml++;
                     fputs(" \010", shout);

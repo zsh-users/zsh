@@ -1,3 +1,7 @@
+2007-03-30  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/Zle/complist.c: better fix for 23248.
+
 2007-03-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23248: INSTALL, Src/utils.c, Src/zsh.h, Src/Zle/complist.c:
