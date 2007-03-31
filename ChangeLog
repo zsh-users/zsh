@@ -1,3 +1,8 @@
+2007-03-31  Clint Adams  <clint@zsh.org>
+
+	* 23253: Erik Johansson: Completion/Unix/Command/_module:
+	remove double quotes causing zcompile to choke.
+
 2007-03-30  Clint Adams  <clint@zsh.org>
 
 	* 23252: Completion/Debian/Command/_aptitude: complete for
