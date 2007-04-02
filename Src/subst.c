@@ -1199,10 +1199,11 @@ substevalchar(char *ptr)
 	return NULL;
 #ifdef MULTIBYTE_SUPPORT
     if (isset(MULTIBYTE) && ires > 127) {
-	char buf[10];
+	/* '\\' + 'U' + 8 bytes of character + '\0' */
+	char buf[11];
 
 	/* inefficient: should separate out \U handling from getkeystring */
-	sprintf(buf, "\\U%.8x", (unsigned int)ires);
+	sprintf(buf, "\\U%.8x", (unsigned int)ires & 0xFFFFFFFFu);
 	ptr = getkeystring(buf, &len, GETKEYS_BINDKEY, NULL);
     }
     if (len == 0)

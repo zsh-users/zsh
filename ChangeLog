@@ -1,3 +1,8 @@
+2007-04-02  Peter Stephenson  <pws@csr.com>
+
+	* 23257: Src/subst.c: buffer too short for multibyte
+	${(#)...} evaluation.
+
 2007-03-31  Clint Adams  <clint@zsh.org>
 
 	* 23255: Completion/Unix/Command/_module: fix 23253 better.
