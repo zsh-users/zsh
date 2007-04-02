@@ -1585,7 +1585,8 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
     Cmatch m;
     int len, subcols = 0, stop = 0, ret = 0;
 
-    DPUTS2(ml >= mlines, "clprintm called with ml too large (%d/%d)",
+    DPUTS2(mselect >= 0 && ml >= mlines,
+	   "clprintm called with ml too large (%d/%d)",
 	   ml, mlines);
     if (g != last_group)
         *last_cap = '\0';
