@@ -1,3 +1,8 @@
+2007-04-05  Clint Adams  <clint@zsh.org>
+
+	* 23264: Src/Modules/pcre.c: don't add the -pcre-match
+	operator unless the pcre functions are available.
+
 2007-04-02  Peter Stephenson  <pws@csr.com>
 
 	* 23258: Src/Zle/complist.c: debugging added in 23248

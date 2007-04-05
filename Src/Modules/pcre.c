@@ -189,13 +189,16 @@ cond_pcre_match(char **a, int id)
     return 0;
 }
 
+static struct conddef cotab[] = {
+    CONDDEF("pcre-match", CONDF_INFIX, cond_pcre_match, 0, 0, CPCRE_PLAIN)
+};
+
 /**/
 #else /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
 
 # define bin_pcre_compile bin_notavail
 # define bin_pcre_study bin_notavail
 # define bin_pcre_match bin_notavail
-# define cond_pcre_match cond_match
 
 /**/
 #endif /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
@@ -204,10 +207,6 @@ static struct builtin bintab[] = {
     BUILTIN("pcre_compile", 0, bin_pcre_compile, 1, 1, 0, "aimx",  NULL),
     BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL),
     BUILTIN("pcre_match",   0, bin_pcre_match,   1, 2, 0, "a",    NULL)
-};
-
-static struct conddef cotab[] = {
-    CONDDEF("pcre-match", CONDF_INFIX, cond_pcre_match, 0, 0, CPCRE_PLAIN)
 };
 
 
@@ -222,8 +221,12 @@ setup_(UNUSED(Module m))
 int
 boot_(Module m)
 {
+#if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) ||
 	   !addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
+#else /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
+    return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+#endif /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
 }
 
 /**/
@@ -231,7 +234,9 @@ int
 cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+#if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
     deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
+#endif /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
     return 0;
 }
 
