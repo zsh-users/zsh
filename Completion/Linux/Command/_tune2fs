@@ -1,0 +1,23 @@
+#compdef tune2fs
+
+_arguments \
+  '-c[set max mounts between checks]:number of mounts' \
+  '-C[set mount count]:number of mounts' \
+  '-e[set error behavior]:error behavior:(continue remount-ro panic)' \
+  '-f[force tune2fs to complete even in the face of errors]' \
+  '-g[set the group which can use reserved filesystem blocks]:group:_groups' \
+  '-i[interval between checks]:duration' \
+  '-j[add an ext3 journal to the filesystem]' \
+  '-J[journal options]: :_values -s , option "size[specify journal size]\:size" "device[use external journal]\:block device\:_files"' \
+  '-l[list the contents of the filesystem superblock]' \
+  '-L[set the volume label of the filesystem]:label' \
+  '-m[set the percentage of reserved filesystem blocks]:percentage' \
+  '-M[set the last-mounted directory for the filesystem]:directory:_files -/' \
+  '-o[mount options]:options:_values -s , debug bsdgroups user_xattr acl uid16 journal_data journal_data_ordered journal_data_writeback' \
+  '-O[set or clear filesystem features]: :_values -s , feature dir_index filetype has_journal sparse_super' \
+  '-r[set the number of reserved filesystem blocks]:number' \
+  '-s[set sparse super feature]:state:((0\:off 1\:on))' \
+  '-T[set time last checked]:time specifier' \
+  '-u[set user who can use reserved filesystem blocks]:user:_users' \
+  '-U[set filesystem UUID]:UUID or special:(clear random time)' \
+  ':device:_files'

@@ -1,0 +1,67 @@
+#compdef fuser
+
+local -a args arg1
+typeset -A opt_args
+
+if _pick_variant -c $words[1] psmisc=psmisc unix -V; then
+
+  (( $+functions[_fuser_services] )) ||
+  _fuser_services() {
+    local expl suf ret=1
+
+    [[ $opt_args[-n] = ??p || $EUID = 0 ]] || return
+
+    if compset -P '*/'; then
+      _wanted protocols expl protocol compadd tcp udp
+    elif compset -P '*,*,'; then
+      compset -S '/*' || [[ -n $opt_args[-n] ]] || suf=( -qS / )
+      _ports $suf && ret=0
+    elif compset -P '*,'; then
+      compset -S ',*' || suf=( -S ,  -r "/ \t\n\-" )
+      _hosts $suf && ret=0
+    else
+      compset -S ',*' || suf=( -S ${${opt_args[-n]/?*/,}:-/} -r "/, \t\n\-" )
+      _ports $suf && ret=0
+    fi
+      
+    return ret
+  }
+
+  _arguments \
+    '(-s)-a[show all files specified on the command line]' \
+    {-c,-m}'[list all processes accessing files on the filesystem specified by name]' \
+    '-k[kill processes accessing the file]' \
+    '-i[ask for confirmation before killing]' \
+    '-l[list all known signal names]' \
+    '-n[select name space]:namespace:(file udp tcp)' \
+    '(-a)-s[silent operation]' \
+    '-signal[send alternate signal with -k]:signal:_signals' \
+    '-u[append the user name of the process owner to each PID]' \
+    '-v[verbose mode]' \
+    '-V[display version information]' \
+    '-4[search only for IPv4 sockets]' \
+    '-6[search only for IPv6 sockets]' \
+    '*:name: _alternative "files:file:_files" "services:service:_fuser_services"'
+
+else
+  case $OSTYPE in
+    solaris2.9 )
+      args=(
+	'-n[list only processes with non-blocking mandatory locks]' 
+	'-s[send alternate signal with -k]:signal:_signals' 
+      )
+    ;;
+    sysv4 )
+      (( $+words[(r)-k] )) && arg1=( ':name: _alternative signals\:signal\:_signals\ -p files:file:_files' )
+    ;;
+  esac
+
+  _arguments \
+    '(-f)-c[list all processes accessing files on the filesystem specified by name]' \
+    '(-c)-f[list all processes accessing named files]' \
+    '-k[kill processes accessing the file]' \
+    '-u[append the user name of the process owner to each PID]' \
+    $args \
+    $arg1 \
+    '*:file:_files'
+fi
