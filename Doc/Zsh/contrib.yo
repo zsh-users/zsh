@@ -13,6 +13,7 @@ startmenu()
 menu(Utilities)
 menu(Prompt Themes)
 menu(ZLE Functions)
+menu(Exception Handling)
 menu(MIME Functions)
 menu(Other Functions)
 endmenu()
@@ -345,7 +346,7 @@ normally call a theme's setup function directly.
 )
 enditem()
 
-texinode(ZLE Functions)(MIME Functions)(Prompt Themes)(User Contributions)
+texinode(ZLE Functions)(Exception Handling)(Prompt Themes)(User Contributions)
 sect(ZLE Functions)
 
 subsect(Widgets)
@@ -1042,7 +1043,93 @@ whether the tt(widget) style is used.
 )
 enditem()
 
-texinode(MIME Functions)(Other Functions)(ZLE Functions)(User Contributions)
+texinode(Exception Handling)(MIME Functions)(ZLE Functions)(User Contributions)
+sect(Exception Handling)
+
+Two functions are provided to enable zsh to provide exception handling in a
+form that should be familiar from other languages.
+
+startitem()
+findex(throw)
+item(tt(throw) var(exception))(
+The function tt(throw) throws the named var(exception).  The name is
+an arbitrary string and is only used by the tt(throw) and tt(catch)
+functions.  An exception is for the most part treated the same as a
+shell error, i.e. an unhandled exception will cause the shell to abort all
+processing in a function or script and to return to the top level in an
+interative shell.
+)
+item(tt(catch) var(exception-pattern))(
+The function tt(catch) returns status zero if an exception was thrown and
+the pattern var(exception-pattern) matches its name.  Otherwise it
+returns status 1.  var(exception-pattern) is a standard
+shell pattern, respecting the current setting of the tt(EXTENDED_GLOB)
+option.  An alias tt(catch) is also defined to prevent the argument to the
+function from matching filenames, so patterns may be used unquoted.  Note
+that as exceptions are not fundamentally different from other shell errors
+it is possible to catch shell errors by using an empty string as the
+exception name.  The shell variable tt(CAUGHT) is set by tt(catch) to the
+name of the exception caught.  It is possible to rethrow an exception by
+calling the tt(throw) function again once an exception has been caught.
+findex(catch)
+)
+enditem()
+
+The functions are designed to be used together with the tt(always) construct
+described in
+ifzman(zmanref(zshmisc))\
+ifnzman(noderef(Complex Commands)).  This is important as only this
+construct provides the required support for exceptions.  A typical example
+is as follows.
+
+example({
+  # "try" block
+  # ... nested code here calls "throw MyExcept"
+} always {
+  # "always" block
+  if catch MyExcept; then
+    print "Caught exception MyExcept"
+  elif catch ''; then
+    print "Caught a shell error.  Propagating..."
+    throw ''
+  fi
+  # Other exceptions are not handled but may be caught further
+  # up the call stack.
+})
+
+If all exceptions should be caught, the following idiom might be
+preferable.
+
+example({
+  # ... nested code here throws an exception
+} always {
+  if catch *; then
+    case $CAUGHT in
+      LPAR()MyExcept+RPAR()
+      print "Caught my own exception"
+      ;;
+      LPAR()*RPAR()
+      print "Caught some other exception"
+      ;;
+    esac
+  fi
+})
+
+In common with exception handling in other languages, the exception may be
+thrown by code deeply nested inside the `try' block.  However, note that it
+must be thrown inside the current shell, not in a subshell forked for a
+pipline, parenthesised current-shell construct, or some form of
+substitution.
+
+The system internally uses the shell variable tt(EXCEPTION) to record the
+name of the exception between throwing and catching.  One drawback of this
+scheme is that if the exception is not handled the variable tt(EXCEPTION)
+remains set and may be incorrectly recognised as the name of an exception
+if a shell error subsequently occurs.  Adding tt(unset EXCEPTION) at the
+start of the outermost layer of any code that uses exception handling will
+eliminate this problem.
+
+texinode(MIME Functions)(Other Functions)(Exception Handling)(User Contributions)
 sect(MIME Functions)
 
 Three functions are available to provide handling of files recognised by

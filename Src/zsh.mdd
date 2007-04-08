@@ -1,4 +1,8 @@
 name=zsh/main
+link=static
+load=yes
+# load=static should replace use of alwayslink
+functions='Functions/Exceptions/* Functions/Misc/* Functions/MIME/* Functions/Prompts/*'
 
 nozshdep=1
 alwayslink=1
@@ -8,7 +12,7 @@ alwayslink=1
 objects="builtin.o compat.o cond.o exec.o glob.o hashtable.o \
 hist.o init.o input.o jobs.o lex.o linklist.o loop.o math.o \
 mem.o module.o options.o params.o parse.o pattern.o prompt.o signals.o \
-signames.o subst.o text.o utils.o watch.o"
+signames.o string.o subst.o text.o utils.o watch.o"
 
 headers="../config.h system.h zsh.h sigcount.h signals.h \
 prototypes.h hashtable.h ztype.h"
@@ -27,7 +31,7 @@ sigcount.h: signames.c
 
 init.o: bltinmods.list zshpaths.h zshxmods.h
 
-params.o: version.h
+init.o params.o: version.h
 
 version.h: $(sdir_top)/Config/version.mk
 	echo '#define ZSH_VERSION "'$(VERSION)'"' > $@
@@ -41,10 +45,13 @@ zshpaths.h: Makemod $(CONFIG_INCS)
 	  echo '#define FPATH_DIR "'$(fndir)'"' >> zshpaths.h.tmp; \
 	  if test x$(FUNCTIONS_SUBDIRS) != x -a \
 	  x$(FUNCTIONS_SUBDIRS) != xno; then \
-	    fpath_tmp="`for f in $$FUNCTIONS_INSTALL; do \
-	      echo $$f | sed s%/.*%%; \
-	    done | sort | uniq`"; \
-	    fpath_tmp="`echo $$fpath_tmp | sed 's/ /\", \"/g'`"; \
+	    fpath_tmp="`grep ' functions=.' \
+	    $(dir_top)/config.modules | sed -e '/^#/d' -e '/ link=no/d' \
+	    -e 's/^.* functions=//'`"; \
+	    fpath_tmp=`for f in $$fpath_tmp; do \
+	      echo $$f | sed -e 's%^Functions/%%' -e 's%/[^/]*$$%%' -e 's%/\*%%'; \
+	    done | sort | uniq`; \
+	    fpath_tmp=`echo $$fpath_tmp | sed 's/ /\", \"/g'`; \
 	    echo "#define FPATH_SUBDIRS { \"$$fpath_tmp\" }" \
 	    >>zshpaths.h.tmp; \
 	  fi; \
@@ -57,24 +64,27 @@ zshpaths.h: Makemod $(CONFIG_INCS)
 	    echo "Updated \`zshpaths.h'." ; \
 	fi
 
-bltinmods.list: modules.stamp modules-bltin xmods.conf mkbltnmlst.sh
-	srcdir='$(sdir)' MODBINS='modules-bltin' \
-	XMODCF='$(sdir)/xmods.conf' $(SHELL) $(sdir)/mkbltnmlst.sh $@
+bltinmods.list: modules.stamp mkbltnmlst.sh $(dir_top)/config.modules
+	srcdir='$(sdir)' CFMOD='$(dir_top)/config.modules' \
+	  $(SHELL) $(sdir)/mkbltnmlst.sh $@
 
-zshxmods.h: modules-bltin xmods.conf
+zshxmods.h: $(dir_top)/config.modules
 	@echo "Creating \`$@'."
 	@( \
-	    binmods=`sed 's/^/ /;s/$$/ /' modules-bltin`; \
-	    for mod in `sed 's/^.* //' $(sdir_src)/xmods.conf`; do \
-		q_mod=`echo $$mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`; \
-		case $$binmods in \
-		    *" $$mod "*) \
-			echo "#define    LINKED_XMOD_$$q_mod 1" ;; \
-		    *)  echo "#ifdef DYNAMIC"; \
-			echo "# define UNLINKED_XMOD_$$q_mod 1"; \
-			echo "#endif" ;; \
-		esac; \
-	    done \
+	    for q_mod in `grep ' load=yes' $(dir_top)/config.modules | \
+	      grep ' link=static' | sed -e '/^#/d' -e 's/ .*//' \
+	        -e 's/^name=//' -e 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`; do \
+		test x$q_mod = xzshQsmain && continue; \
+	        echo "#define LINKED_XMOD_$$q_mod 1"; \
+	    done; \
+	    for q_mod in `grep ' load=yes' $(dir_top)/config.modules | \
+	      grep ' link=dynamic' | sed -e '/^#/d' -e 's/ .*//' \
+	        -e 's/^name=//' -e 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`; do \
+		test x$q_mod = x && continue; \
+	        echo "#ifdef DYNAMIC"; \
+		echo "# define UNLINKED_XMOD_$$q_mod 1"; \
+		echo "#endif"; \
+	    done; \
 	) > $@
 
 clean-here: clean.zsh
