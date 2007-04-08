@@ -450,6 +450,9 @@ cmd_rm=('*:file:_files')
 local cmd_escape
 cmd_escape=(':string:')
 
+local cmd_switch
+cmd_switch=(':revision:_baz_revisions')
+
 #mutually exclusive options
 
 local -A excludes
