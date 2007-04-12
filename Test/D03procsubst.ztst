@@ -1,0 +1,38 @@
+# Tests for process substitution: <(...), >(...) and =(...).
+
+%prep
+  if grep '#define PATH_DEV_FD' $ZTST_testdir/../config.h > /dev/null 2>&1 ||
+     grep '#define HAVE_FIFOS' $ZTST_testdir/../config.h > /dev/null 2>&1; then
+    mkdir procsubst.tmp
+    cd procsubst.tmp
+    print 'First\tSecond\tThird\tFourth' >FILE1
+    print 'Erste\tZweite\tDritte\tVierte' >FILE2
+  else
+    ZTST_unimplemented="process substitution is not supported"
+    true
+  fi
+
+  function copycat { cat "$@" }
+
+%test
+  paste <(cut -f1 FILE1) <(cut -f3 FILE2)
+0:<(...) substitution
+>First	Dritte
+
+# slightly desperate hack to force >(...) to be synchronous
+  { paste <(cut -f2 FILE1) <(cut -f4 FILE2) } > >(sed 's/e/E/g' >OUTFILE)
+  cat OUTFILE
+0:>(...) substitution
+>SEcond	ViErtE
+
+  diff =(cat FILE1) =(cat FILE2)
+1:=(...) substituion
+>1c1
+>< First	Second	Third	Fourth
+>---
+>> Erste	Zweite	Dritte	Vierte
+
+  copycat <(print First) <(print Zweite)
+0:FDs remain open for external commands called from functions
+>First
+>Zweite
