@@ -1,3 +1,8 @@
+2007-04-12  Peter Stephenson  <pws@csr.com>
+
+	* 23270: Src/system.h: #define _STRPTIME_DONTZERO to get Solaris
+	strptime() to work properly.
+
 2007-04-05  Clint Adams  <clint@zsh.org>
 
 	* 23264: Src/Modules/pcre.c: don't add the -pcre-match

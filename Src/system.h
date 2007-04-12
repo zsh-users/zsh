@@ -52,6 +52,18 @@
 # undef HAVE_SYS_UTSNAME_H
 #endif
 
+/*
+ * Solaris by default zeroes all elements of the tm structure in
+ * strptime().  Unfortunately that gives us no way of telling whether
+ * the tm_isdst element has been set from the input pattern.  If it
+ * hasn't we want it to be -1 (undetermined) on input to mktime().  So
+ * we stop strptime() zeroing the struct tm and instead set all the
+ * elements ourselves.
+ *
+ * This is likely to be harmless everywhere else.
+ */
+#define _STRPTIME_DONTZERO
+
 #ifdef PROTOTYPES
 # define _(Args) Args
 #else
