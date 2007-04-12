@@ -490,6 +490,7 @@ AC_PROG_INSTALL             dnl Check for BSD compatible `install'
 AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
 AC_PROG_LN                  dnl Check for working ln, for "make install"
 AC_CHECK_PROGS([YODL], [yodl], [: yodl])
+AC_CHECK_PROGS([PDFETEX], [pdfetex], [: pdfetex])
 AC_CHECK_PROGS([ANSI2KNR], [ansi2knr], [: ansi2knr])
 
 if test x"$ansi2knr" = xyes && test x"$ANSI2KNR" = x": ansi2knr"; then
@@ -742,6 +743,11 @@ if test "x$ac_cv_header_iconv_h" = "xyes"; then
     if test "x$ac_found_iconv" != "xno"; then
       LIBS="-liconv $LIBS"
     fi
+  else
+    dnl Handle case where there is a native iconv but iconv.h is from libiconv
+    AC_CHECK_DECL(_libiconv_version,
+      [ AC_CHECK_LIB(iconv, libiconv, LIBS="-liconv $LIBS") ],,
+      [ #include <iconv.h> ])
   fi
 fi
 if test "x$ac_found_iconv" = xyes; then
