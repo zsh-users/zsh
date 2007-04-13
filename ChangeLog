@@ -1,3 +1,8 @@
+2007-04-13  Peter Stephenson  <pws@csr.com>
+
+	* 23271: Pete Hollobon: Completion/Unix/Command/_sqsh,
+	Completion/Unix/Command/.distfiles: new completion.
+
 2007-04-12  Peter Stephenson  <pws@csr.com>
 
 	* 23270: Src/system.h: #define _STRPTIME_DONTZERO to get Solaris
