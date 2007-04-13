@@ -15,8 +15,7 @@ _sybase_server() {
 }
 
 _arguments : \
-    '-A[Adjust TDS packet size (512)]:packet size (bytes):(512 1024
-1536 2048)' \
+    '-A[Adjust TDS packet size (512)]:packet size (bytes):(512 1024 1536 2048)' \
     '-B[Turn off file buffering on startup]' \
     '-C[Send sql statment to server]:sql' \
     '-D[Change database context on startup]:database' \
@@ -39,8 +38,7 @@ _arguments : \
     '-i[Read input from file]:_files' \
     '-k[Specify alternate keywords file]:_files' \
     '-l[Set debugging level]' \
-    '-m[Set display mode (normal)]:display style:(horiz vert bcp html
-meta pretty none)' \
+    '-m[Set display mode (normal)]:display style:(horiz vert bcp html meta pretty none)' \
     '-n[Set chained transaction mode]:chained transaction mode:(on off)' \
     '-o[Direct all output to file]:_files' \
     '-p[Display performance stats]' \
@@ -50,4 +48,4 @@ meta pretty none)' \
     '-v[Display current version and exit]' \
     '-w[Adjust result display width]:number' \
     '-y[Override value of $SYBASE]:_directories' \
-    '-z[Alternate display language]:language' \
+    '-z[Alternate display language]:language'
