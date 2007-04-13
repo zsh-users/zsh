@@ -1,5 +1,9 @@
 2007-04-13  Peter Stephenson  <pws@csr.com>
 
+	* 23273: Src/params.c, Test/D04parameter.ztst: bad patterns
+	in ${var[(r)...]} returned the first element of an array instead
+	of the empty string.
+
 	* 23271: Pete Hollobon: Completion/Unix/Command/_sqsh,
 	Completion/Unix/Command/.distfiles: new completion.
 

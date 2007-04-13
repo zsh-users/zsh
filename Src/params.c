@@ -954,7 +954,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
        int *prevcharlen, int *nextcharlen)
 {
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
-    int keymatch = 0, needtok = 0, arglen;
+    int keymatch = 0, needtok = 0, arglen, len;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt, c;
     zlong num = 1, beg = 0, r = 0;
     Patprog pprog = NULL;
@@ -1237,267 +1237,265 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	if (!keymatch) {
 	    tokenize(s);
 	    remnulargs(s);
-	}
+	    pprog = patcompile(s, 0, NULL);
+	} else
+	    pprog = NULL;
 
-	if (keymatch || (pprog = patcompile(s, 0, NULL))) {
-	    int len;
-
-	    if (v->isarr) {
-		if (ishash) {
-		    scanprog = pprog;
-		    scanstr = s;
-		    if (keymatch)
-			v->isarr |= SCANPM_KEYMATCH;
-		    else if (ind)
-			v->isarr |= SCANPM_MATCHKEY;
-		    else
-			v->isarr |= SCANPM_MATCHVAL;
-		    if (down)
-			v->isarr |= SCANPM_MATCHMANY;
-		    if ((ta = getvaluearr(v)) &&
-			(*ta || ((v->isarr & SCANPM_MATCHMANY) &&
-				 (v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
-					      SCANPM_KEYMATCH))))) {
-			*inv = v->inv;
-			*w = v->end;
-			return 1;
+	if (v->isarr) {
+	    if (ishash) {
+		scanprog = pprog;
+		scanstr = s;
+		if (keymatch)
+		    v->isarr |= SCANPM_KEYMATCH;
+		else if (ind)
+		    v->isarr |= SCANPM_MATCHKEY;
+		else
+		    v->isarr |= SCANPM_MATCHVAL;
+		if (down)
+		    v->isarr |= SCANPM_MATCHMANY;
+		if ((ta = getvaluearr(v)) &&
+		    (*ta || ((v->isarr & SCANPM_MATCHMANY) &&
+			     (v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
+					  SCANPM_KEYMATCH))))) {
+		    *inv = v->inv;
+		    *w = v->end;
+		    return 1;
+		}
+	    } else
+		ta = getarrvalue(v);
+	    if (!ta || !*ta)
+		return 0;
+	    len = arrlen(ta);
+	    if (beg < 0)
+		beg += len;
+	    if (beg >= 0 && beg < len) {
+		if (down) {
+		    if (!hasbeg)
+			beg = len - 1;
+		    for (r = 1 + beg, p = ta + beg; p >= ta; r--, p--) {
+			if (pprog && pattry(pprog, *p) && !--num)
+			    return r;
 		    }
 		} else
-		    ta = getarrvalue(v);
-		if (!ta || !*ta)
-		    return 0;
-		len = arrlen(ta);
-		if (beg < 0)
-		    beg += len;
-		if (beg >= 0 && beg < len) {
-		    if (down) {
-			if (!hasbeg)
-			    beg = len - 1;
-			for (r = 1 + beg, p = ta + beg; p >= ta; r--, p--) {
-			    if (pattry(pprog, *p) && !--num)
-				return r;
-			}
-		    } else
-			for (r = 1 + beg, p = ta + beg; *p; r++, p++)
-			    if (pattry(pprog, *p) && !--num)
-				return r;
+		    for (r = 1 + beg, p = ta + beg; *p; r++, p++)
+			if (pprog && pattry(pprog, *p) && !--num)
+			    return r;
+	    }
+	} else if (word) {
+	    ta = sepsplit(d = s = getstrvalue(v), sep, 1, 1);
+	    len = arrlen(ta);
+	    if (beg < 0)
+		beg += len;
+	    if (beg >= 0 && beg < len) {
+		if (down) {
+		    if (!hasbeg)
+			beg = len - 1;
+		    for (r = 1 + beg, p = ta + beg; p >= ta; p--, r--)
+			if (pprog && pattry(pprog, *p) && !--num)
+			    break;
+		    if (p < ta)
+			return 0;
+		} else {
+		    for (r = 1 + beg, p = ta + beg; *p; r++, p++)
+			if (pprog && pattry(pprog, *p) && !--num)
+			    break;
+		    if (!*p)
+			return 0;
 		}
-	    } else if (word) {
-		ta = sepsplit(d = s = getstrvalue(v), sep, 1, 1);
-		len = arrlen(ta);
-		if (beg < 0)
-		    beg += len;
-		if (beg >= 0 && beg < len) {
-		    if (down) {
-			if (!hasbeg)
-			    beg = len - 1;
-			for (r = 1 + beg, p = ta + beg; p >= ta; p--, r--)
-			    if (pattry(pprog, *p) && !--num)
-				break;
-			if (p < ta)
-			    return 0;
-		    } else {
-			for (r = 1 + beg, p = ta + beg; *p; r++, p++)
-			    if (pattry(pprog, *p) && !--num)
-				break;
-			if (!*p)
-			    return 0;
-		    }
+	    }
+	    if (a2)
+		r++;
+	    for (i = 0; (t = findword(&d, sep)) && *t; i++)
+		if (!--r) {
+		    r = (zlong)(t - s + (a2 ? -1 : 1));
+		    if (!a2 && *tt != ',')
+			*w = r + strlen(ta[i]) - 1;
+		    return r;
 		}
-		if (a2)
-		    r++;
-		for (i = 0; (t = findword(&d, sep)) && *t; i++)
-		    if (!--r) {
-			r = (zlong)(t - s + (a2 ? -1 : 1));
-			if (!a2 && *tt != ',')
-			    *w = r + strlen(ta[i]) - 1;
-			return r;
-		    }
-		return a2 ? -1 : 0;
-	    } else {
-		/* Searching characters */
-		int slen;
-		d = getstrvalue(v);
-		if (!d || !*d)
-		    return 0;
-		/*
-		 * beg and len are character counts, not raw offsets.
-		 * Remember we need to return a raw offset.
-		 */
-		len = MB_METASTRLEN(d);
-		slen = strlen(d);
-		if (beg < 0)
-		    beg += len;
-		MB_METACHARINIT();
-		if (beg >= 0 && beg < len) {
-                    char *de = d + slen;
+	    return a2 ? -1 : 0;
+	} else {
+	    /* Searching characters */
+	    int slen;
+	    d = getstrvalue(v);
+	    if (!d || !*d)
+		return 0;
+	    /*
+	     * beg and len are character counts, not raw offsets.
+	     * Remember we need to return a raw offset.
+	     */
+	    len = MB_METASTRLEN(d);
+	    slen = strlen(d);
+	    if (beg < 0)
+		beg += len;
+	    MB_METACHARINIT();
+	    if (beg >= 0 && beg < len) {
+		char *de = d + slen;
 
-		    if (a2) {
+		if (a2) {
+		    /*
+		     * Second argument: we don't need to
+		     * handle prevcharlen or nextcharlen, but
+		     * we do need to handle characters appropriately.
+		     */
+		    if (down) {
+			int nmatches = 0;
+			char *lastpos = NULL;
+
+			if (!hasbeg)
+			    beg = len;
+
 			/*
-			 * Second argument: we don't need to
-			 * handle prevcharlen or nextcharlen, but
-			 * we do need to handle characters appropriately.
+			 * See below: we have to move forward,
+			 * but need to count from the end.
 			 */
-			if (down) {
-			    int nmatches = 0;
-			    char *lastpos = NULL;
-
-			    if (!hasbeg)
-				beg = len;
-
-			    /*
-			     * See below: we have to move forward,
-			     * but need to count from the end.
-			     */
-			    for (t = d, r = 0; r <= beg; r++) {
-				sav = *t;
-				*t = '\0';
-				if (pattry(pprog, d)) {
-				    nmatches++;
-				    lastpos = t;
-				}
-				*t = sav;
-				if (t == de)
-				    break;
-				t += MB_METACHARLEN(t);
+			for (t = d, r = 0; r <= beg; r++) {
+			    sav = *t;
+			    *t = '\0';
+			    if (pprog && pattry(pprog, d)) {
+				nmatches++;
+				lastpos = t;
 			    }
+			    *t = sav;
+			    if (t == de)
+				break;
+			    t += MB_METACHARLEN(t);
+			}
 
-			    if (nmatches >= num) {
-				if (num > 1) {
-				    nmatches -= num;
-				    MB_METACHARINIT();
-				    for (t = d, r = 0; ; r++) {
-					sav = *t;
-					*t = '\0';
-					if (pattry(pprog, d) &&
-					    nmatches-- == 0) {
-					    lastpos = t;
-					    *t = sav;
-					    break;
-					}
+			if (nmatches >= num) {
+			    if (num > 1) {
+				nmatches -= num;
+				MB_METACHARINIT();
+				for (t = d, r = 0; ; r++) {
+				    sav = *t;
+				    *t = '\0';
+				    if (pprog && pattry(pprog, d) &&
+					nmatches-- == 0) {
+					lastpos = t;
 					*t = sav;
-					t += MB_METACHARLEN(t);
+					break;
 				    }
-				}
-				/* else lastpos is already OK */
-
-				return lastpos - d;
-			    }
-			} else {
-			    /*
-			     * This handling of the b flag
-			     * gives odd results, but this is the
-			     * way it's always worked.
-			     */
-			    for (t = d; beg && t <= de; beg--)
-				t += MB_METACHARLEN(t);
-			    for (;;) {
-				sav = *t;
-				*t = '\0';
-				if (pattry(pprog, d) && !--num) {
 				    *t = sav;
-				    /*
-				     * This time, don't increment
-				     * pointer, since it's already
-				     * after everything we matched.
-				     */
-				    return t - d;
+				    t += MB_METACHARLEN(t);
 				}
-				*t = sav;
-				if (t == de)
-				    break;
-				t += MB_METACHARLEN(t);
 			    }
+			    /* else lastpos is already OK */
+
+			    return lastpos - d;
 			}
 		    } else {
 			/*
-			 * First argument: this is the only case
-			 * where we need prevcharlen and nextcharlen.
+			 * This handling of the b flag
+			 * gives odd results, but this is the
+			 * way it's always worked.
 			 */
-			int lastcharlen;
-
-			if (down) {
-			    int nmatches = 0;
-			    char *lastpos = NULL;
-
-			    if (!hasbeg)
-				beg = len;
-
-			    /*
-			     * We can only move forward through
-			     * multibyte strings, so record the
-			     * matches.
-			     * Unfortunately the count num works
-			     * from the end, so it's easy to get the
-			     * last one but we need to repeat if
-			     * we want another one.
-			     */
-			    for (t = d, r = 0; r <= beg; r++) {
-				if (pattry(pprog, t)) {
-				    nmatches++;
-				    lastpos = t;
-				}
-				if (t == de)
-				    break;
-				t += MB_METACHARLEN(t);
+			for (t = d; beg && t <= de; beg--)
+			    t += MB_METACHARLEN(t);
+			for (;;) {
+			    sav = *t;
+			    *t = '\0';
+			    if (pprog && pattry(pprog, d) && !--num) {
+				*t = sav;
+				/*
+				 * This time, don't increment
+				 * pointer, since it's already
+				 * after everything we matched.
+				 */
+				return t - d;
 			    }
+			    *t = sav;
+			    if (t == de)
+				break;
+			    t += MB_METACHARLEN(t);
+			}
+		    }
+		} else {
+		    /*
+		     * First argument: this is the only case
+		     * where we need prevcharlen and nextcharlen.
+		     */
+		    int lastcharlen;
 
-			    if (nmatches >= num) {
-				if (num > 1) {
-				    /*
-				     * Need to start again and repeat
-				     * to get the right match.
-				     */
-				    nmatches -= num;
-				    MB_METACHARINIT();
-				    for (t = d, r = 0; ; r++) {
-					if (pattry(pprog, t) &&
-					    nmatches-- == 0) {
-					    lastpos = t;
-					    break;
-					}
-					t += MB_METACHARLEN(t);
+		    if (down) {
+			int nmatches = 0;
+			char *lastpos = NULL;
+
+			if (!hasbeg)
+			    beg = len;
+
+			/*
+			 * We can only move forward through
+			 * multibyte strings, so record the
+			 * matches.
+			 * Unfortunately the count num works
+			 * from the end, so it's easy to get the
+			 * last one but we need to repeat if
+			 * we want another one.
+			 */
+			for (t = d, r = 0; r <= beg; r++) {
+			    if (pprog && pattry(pprog, t)) {
+				nmatches++;
+				lastpos = t;
+			    }
+			    if (t == de)
+				break;
+			    t += MB_METACHARLEN(t);
+			}
+
+			if (nmatches >= num) {
+			    if (num > 1) {
+				/*
+				 * Need to start again and repeat
+				 * to get the right match.
+				 */
+				nmatches -= num;
+				MB_METACHARINIT();
+				for (t = d, r = 0; ; r++) {
+				    if (pprog && pattry(pprog, t) &&
+					nmatches-- == 0) {
+					lastpos = t;
+					break;
 				    }
+				    t += MB_METACHARLEN(t);
 				}
-				/* else lastpos is already OK */
+			    }
+			    /* else lastpos is already OK */
 
+			    /* return pointer after matched char */
+			    lastpos +=
+				(lastcharlen = MB_METACHARLEN(lastpos));
+			    if (prevcharlen)
+				*prevcharlen = lastcharlen;
+			    if (nextcharlen)
+				*nextcharlen = MB_METACHARLEN(lastpos);
+			    return lastpos - d;
+			}
+
+			for (r = beg + 1, t = d + beg; t >= d; r--, t--) {
+			    if (pprog && pattry(pprog, t) &&
+				!--num)
+				return r;
+			}
+		    } else {
+			for (t = d; beg && t <= de; beg--)
+			    t += MB_METACHARLEN(t);
+			for (;;) {
+			    if (pprog && pattry(pprog, t) && !--num) {
 				/* return pointer after matched char */
-				lastpos +=
-				    (lastcharlen = MB_METACHARLEN(lastpos));
+				t += (lastcharlen = MB_METACHARLEN(t));
 				if (prevcharlen)
 				    *prevcharlen = lastcharlen;
 				if (nextcharlen)
-				    *nextcharlen = MB_METACHARLEN(lastpos);
-				return lastpos - d;
+				    *nextcharlen = MB_METACHARLEN(t);
+				return t - d;
 			    }
-
-			    for (r = beg + 1, t = d + beg; t >= d; r--, t--) {
-				if (pattry(pprog, t) &&
-				    !--num)
-				    return r;
-			    }
-			} else {
-			    for (t = d; beg && t <= de; beg--)
-				t += MB_METACHARLEN(t);
-			    for (;;) {
-				if (pattry(pprog, t) && !--num) {
-				    /* return pointer after matched char */
-				    t += (lastcharlen = MB_METACHARLEN(t));
-				    if (prevcharlen)
-					*prevcharlen = lastcharlen;
-				    if (nextcharlen)
-					*nextcharlen = MB_METACHARLEN(t);
-				    return t - d;
-				}
-				if (t == de)
-				    break;
-				t += MB_METACHARLEN(t);
-			    }
+			    if (t == de)
+				break;
+			    t += MB_METACHARLEN(t);
 			}
 		    }
 		}
-		return down ? 0 : slen + 1;
 	    }
+	    return down ? 0 : slen + 1;
 	}
     }
     return r;

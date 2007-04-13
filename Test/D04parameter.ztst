@@ -903,3 +903,13 @@
 >6100620061
 >6100620062
 >610063
+
+  array=(X)
+  patterns=("*X*" "spong" "a[b")
+  for pat in $patterns; do
+    print A${array[(r)$pat]}B C${array[(I)$pat]}D
+  done
+0:Bad patterns should never match array elements
+>AXB C1D
+>AB C0D
+>AB C0D
