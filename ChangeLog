@@ -1,3 +1,9 @@
+2007-04-14  Clint Adams  <schizo@debian.org>
+
+	* 23275: Completion/Unix/Command/_date: change order of
+	arguments to _arguments so that options will actually be
+	completed.
+
 2007-04-13  Peter Stephenson  <pws@csr.com>
 
 	* 23273: Src/params.c, Test/D04parameter.ztst: bad patterns
