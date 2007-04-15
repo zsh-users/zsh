@@ -72,6 +72,7 @@ typedef wint_t   ZLE_INT_T;
 #define ZC_toupper towupper
 
 #define LASTFULLCHAR	lastchar_wide
+#define LASTFULLCHAR_T  ZLE_INT_T
 
 #else  /* Not MULTIBYTE_SUPPORT: old single-byte code */
 
@@ -130,6 +131,7 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 #define ZC_toupper tuupper
 
 #define LASTFULLCHAR	lastchar
+#define LASTFULLCHAR_T	int
 
 #endif
 
