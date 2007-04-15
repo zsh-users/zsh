@@ -117,6 +117,8 @@ repeats the last command, replacing the string var(foo) with var(bar).
 More precisely, the sequence `tt(^)var(foo)tt(^)var(bar)tt(^)' is
 synonymous with `tt(!!:s)tt(^)var(foo)tt(^)var(bar)tt(^)', hence other
 modifiers (see noderef(Modifiers)) may follow the final `tt(^)'.
+In particular, `tt(^)var(foo)tt(^)var(bar)tt(:G)' performs a global
+substitution.
 
 If the shell encounters the character sequence `tt(!")'
 in the input, the history mechanism is temporarily disabled until
@@ -254,10 +256,14 @@ Convert the words to all uppercase.
 )
 item(tt(s/)var(l)tt(/)var(r)[tt(/)])(
 Substitute var(r) for var(l) as described below.
-Unless preceded immediately by a tt(g), with no colon between,
-the substitution is done only for the
+The substitution is done only for the
 first string that matches var(l).  For arrays and for filename
 generation, this applies to each word of the expanded text.
+
+The forms `tt(gs/)var(l)tt(/)var(r)' and `tt(s/)var(l)tt(/)var(r)tt(/:G)'
+perform global substitution, i.e. substitute every occurrence of var(r)
+for var(l).  Note that the tt(g) or tt(:G) must appear in exactly the
+position shown.
 )
 item(tt(&))(
 Repeat the previous tt(s) substitution.  Like tt(s), may be preceded
@@ -339,6 +345,15 @@ of a temporary file containing the output of the var(list)
 process.  This may be used instead of the tt(<)
 form for a program that expects to lseek (see manref(lseek)(2))
 on the input file.
+
+There is an optimisation for substitutions of the form
+tt(=LPAR()<<<)var(arg)tt(RPAR()), where var(arg) is a single-word argument
+to the here-string redirection tt(<<<).  This form produces a file name
+containing the value of var(arg) after any substitutions have been
+performed.  This is handled entirely within the current shell.  This is
+effectively the reverse of the special form tt($LPAR()<)var(arg)tt(RPAR())
+which treats var(arg) as a file name and replaces it with the file's
+contents.
 
 The tt(=) form is useful as both the tt(/dev/fd) and the named pipe
 implementation of tt(<LPAR())var(...)tt(RPAR()) have drawbacks.  In 
@@ -623,6 +638,11 @@ means the same thing as the more readable `(tt(%%qqq))'.  The
 following flags are supported:
 
 startitem()
+item(tt(#))(
+Evaluate the resulting words as numeric expressions and output the
+characters corresponding to the resulting integer.  Note that this form is
+entirely distinct from use of the tt(#) without parentheses.
+)
 item(tt(%))(
 Expand all tt(%) escapes in the resulting words in the same way as in in
 prompts (see noderef(Prompt Expansion)). If this flag is given twice,
@@ -1224,19 +1244,82 @@ A `tt(-)' or `tt(])' may be matched by including it as the
 first character in the list.
 cindex(character classes)
 There are also several named classes of characters, in the form
-`tt([:)var(name)tt(:])' with the following meanings:  `tt([:alnum:])'
-alphanumeric, `tt([:alpha:])' alphabetic,
-`tt([:ascii:])' 7-bit,
-`tt([:blank:])' space or tab,
-`tt([:cntrl:])' control character, `tt([:digit:])' decimal
-digit, `tt([:graph:])' printable character except whitespace,
-`tt([:lower:])' lowercase letter, `tt([:print:])' printable character,
-`tt([:punct:])' printable character neither alphanumeric nor whitespace,
-`tt([:space:])' whitespace character, `tt([:upper:])' uppercase letter, 
-`tt([:xdigit:])' hexadecimal digit.  These use the macros provided by
+`tt([:)var(name)tt(:])' with the following meanings.
+The first set use the macros provided by
 the operating system to test for the given character combinations,
-including any modifications due to local language settings:  see
-manref(ctype)(3).  Note that the square brackets are additional
+including any modifications due to local language settings, see
+manref(ctype)(3):
+
+startitem()
+item(tt([:alnum:]))(
+The character is alphanumeric
+)
+item(tt([:alpha:]))
+(
+The character is alphabetic
+)
+item(tt([:ascii:]))(
+The character is 7-bit, i.e. is a single-byte character without
+the top bit set.
+)
+item(tt([:blank:]))(
+The character is either space or tab
+)
+item(tt([:cntrl:]))(
+The character is a control character
+)
+item(tt([:digit:]))(
+The character is a decimal digit
+)
+item(tt([:graph:]))(
+The character is a printable character other than whitespace
+)
+item(tt([:lower:]))(l
+The character is a lowercase letter
+)
+item(tt([:print:]))(
+The character is printable
+)
+item(tt([:punct:]))(
+The character is printable but neither alphanumeric nor whitespace
+)
+item(tt([:space:]))(
+The character is whitespace
+)
+item(tt([:upper:]))(
+The character is an uppercase letter
+)
+item(tt([:xdigit:]))(
+The character is a hexadecimal digit
+)
+enditem()
+
+Another set of named classes is handled internally by the shell and
+is not sensitive to the locale:
+
+startitem()
+item(tt([:IDENT:]))(
+The character is allowed to form part of a shell identifier, such
+as a parameter name
+)
+item(tt([:IFS:]))(
+The character is used as an input field separator, i.e. is contained in the
+tt(IFS) parameter
+)
+item(tt([:IFSSPACE:]))(
+The character is an IFS white space character; see the documentation
+for tt(IFS) in
+ifzman(the zmanref(zshparams) manual page)\
+ifnzman(noderef(Parameters Used By The Shell))\
+.
+)
+item(tt([:WORD:]))(
+The character is treated as part of a word; this test is sensitive
+to the value of the tt(WORDCHARS) parameter
+)
+enditem()
+
+Note that the square brackets are additional
 to those enclosing the whole set of characters, so to test for a
 single alphanumeric character you need `tt([[:alnum:]])'.  Named
 character sets can be used alongside other types,
@@ -1422,9 +1505,9 @@ using the value of tt($match[1]) rather than tt($match[2]).
 
 If the match fails none of the parameters is altered, so in some cases it
 may be necessary to initialise them beforehand.  If some of the
-backreferences fail to match --- which happens if they are in an alternate
+backreferences fail to match DASH()- which happens if they are in an alternate
 branch which fails to match, or if they are followed by tt(#) and matched
-zero times --- then the matched string is set to the empty string, and the
+zero times DASH()- then the matched string is set to the empty string, and the
 start and end indices are set to -1.
 
 Pattern matching with backreferences is slightly slower than without.
@@ -1801,14 +1884,15 @@ item(tt(G))(
 files owned by the effective group ID
 )
 item(tt(u)var(id))(
-files owned by user ID var(id) if it is a number, if not, than the
-character after the `tt(u)' will be used as a separator and the string
-between it and the next matching separator
-(`tt([)', `tt({)', and `tt(<)'
-match `tt(])', `tt(})', and `tt(>)' respectively,
-any other character matches
-itself) will be taken as a user name, and the user ID of this user will
-be taken (e.g. `tt(u:foo:)' or `tt(u[foo])' for user `tt(foo)')
+files owned by user ID var(id) if that is a number.  Otherwise,
+var(id) specifies a user name: the
+character after the `tt(u)' will be taken as a separator and the string
+between it and the next matching separator will be taken as a user name.
+The starting separators `tt([)', `tt({)', and `tt(<)'
+match the final separators `tt(])', `tt(})', and `tt(>)', respectively;
+any other character matches itself.  The selected files are those
+owned by this user.  For example, `tt(u:foo:)' or `tt(u[foo])' selects
+files owned by user `tt(foo)'.
 )
 item(tt(g)var(id))(
 like tt(u)var(id) but with group IDs or names
@@ -1872,7 +1956,7 @@ are sorted depending on the size (length) of the files; if tt(l)
 they are sorted by the number of links; if tt(a), tt(m), or tt(c)
 they are sorted by the time of the last access, modification, or
 inode change respectively; if tt(d), files in subdirectories appear before
-those in the current directory at each level of the search --- this is best
+those in the current directory at each level of the search DASH()- this is best
 combined with other criteria, for example `tt(odon)' to sort on names for
 files within the same directory.  Note that tt(a), tt(m), and tt(c) compare
 the age against the current time, hence the first name in the list is the
