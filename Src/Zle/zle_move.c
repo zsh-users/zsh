@@ -484,9 +484,10 @@ int
 vigotomark(UNUSED(char **args))
 {
     ZLE_INT_T ch;
+    LASTFULLCHAR_T lfc = LASTFULLCHAR;
 
     ch = getfullchar(0);
-    if (ch == LASTFULLCHAR)
+    if (ch == lfc)
 	ch = 26;
     else {
 	if (ch < ZWC('a') || ch > ZWC('z'))

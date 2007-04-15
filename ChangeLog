@@ -1,3 +1,8 @@
+2007-04-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/11398: Src/zle_move.c: vi-goto-mark was broken
+	by multibyte characters.
+
 2007-04-14  Clint Adams  <schizo@debian.org>
 
 	* 23275: Completion/Unix/Command/_date: change order of
