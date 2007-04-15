@@ -81,7 +81,7 @@ Zsh/seealso.yo Zsh/tcpsys.yo Zsh/zftpsys.yo Zsh/zle.yo
 all: man texi ../META-FAQ
 .PHONY: all
 
-everything: all dvi ps html
+everything: all dvi ps html pdf
 .PHONY: everything
 
 dvi: zsh.dvi
@@ -89,6 +89,12 @@ dvi: zsh.dvi
 
 zsh.dvi: $(sdir)/zsh.texi
 	$(TEXI2DVI) $(sdir)/zsh.texi
+
+pdf: zsh.pdf
+.PHONY: pdf
+
+zsh.pdf: $(sdir)/zsh.texi
+	$(PDFETEX) $(sdir)/zsh.texi
 
 texi: $(sdir)/zsh.texi
 .PHONY: texi
