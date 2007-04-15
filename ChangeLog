@@ -1,5 +1,8 @@
 2007-04-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 23278: Src/sort.c, Test/D07multibyte.ztst: Fix
+	NUMERICGLOBSORT, broken by 23118.
+
 	* users/11398: Src/zle_move.c: vi-goto-mark was broken
 	by multibyte characters.
 

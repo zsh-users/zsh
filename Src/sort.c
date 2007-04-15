@@ -42,8 +42,8 @@ eltpcmp(const void *a, const void *b)
 {
     const SortElt ae = *(const SortElt *)a;
     const SortElt be = *(const SortElt *)b;
-    const char *as = ae->cmp;
-    const char *bs = be->cmp;
+    const char *as = ae->cmp, *bs = be->cmp;
+    const char *ao = as;
     int cmp;
 
     if (ae->len != -1 || be->len != -1) {
@@ -122,7 +122,7 @@ eltpcmp(const void *a, const void *b)
 	cmp = (int)STOUC(*as) - (int)STOUC(*bs);
 #endif
 	if (idigit(*as) || idigit(*bs)) {
-	    for (; as > *(char **)a && idigit(as[-1]); as--, bs--);
+	    for (; as > ao && idigit(as[-1]); as--, bs--);
 	    if (idigit(*as) && idigit(*bs)) {
 		while (*as == '0')
 		    as++;

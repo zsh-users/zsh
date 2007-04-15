@@ -358,3 +358,22 @@
 >1 148
 >1 149
 >1 150
+
+  touch ngs1.txt ngs2.txt ngs10.txt ngs20.txt ngs100.txt ngs200.txt
+  setopt numericglobsort
+  print -l ngs*
+  unsetopt numericglobsort
+  print -l ngs*
+0:NUMERIC_GLOB_SORT option in UTF-8 locale
+>ngs1.txt
+>ngs2.txt
+>ngs10.txt
+>ngs20.txt
+>ngs100.txt
+>ngs200.txt
+>ngs100.txt
+>ngs10.txt
+>ngs1.txt
+>ngs200.txt
+>ngs20.txt
+>ngs2.txt
