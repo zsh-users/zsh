@@ -28,9 +28,8 @@ prompt_fire_setup () {
   local date=${5:-'white'}
   local cwd=${6:-'yellow'}
 
-  for code in 333 262 261 260 260 261 262 333; do
-    local varname=char_$code
-    : ${(P)varname=$(echo -n "\\0$code")}
+  for code in 333 262 261 260; do
+    local char_$code=$(echo -n "\\0$code")
   done
 
   local GRAD1="%{$char_333$char_262$char_261$char_260%}"
@@ -43,7 +42,7 @@ prompt_fire_setup () {
   local COLOR6="%{$bold_color$fg[$date]$bg[grey]%}"
   local GRAD0="%{$reset_color%}"
 
-  PS1=$COLOR1$GRAD1$COLOR2'%n@%m'$COLOR3$GRAD2$COLOR4$GRAD1$COLOR6' %D{%a %b %d} %D{%I:%M:%S%P} '$NONE$prompt_newline$COLOR5'%~/'$GRAD0' '
+  PS1=$COLOR1$GRAD1$COLOR2'%n@%m'$COLOR3$GRAD2$COLOR4$GRAD1$COLOR6' %D{%a %b %d} %D{%I:%M:%S%P} '$prompt_newline$COLOR5'%~/'$GRAD0' '
   PS2=$COLOR1$GRAD1$COLOR3$GRAD2$COLOR4$GRAD1$COLOR5'>'$GRAD0' '
 
   precmd () { setopt promptsubst }

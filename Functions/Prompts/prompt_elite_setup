@@ -20,9 +20,8 @@ prompt_elite_setup () {
   local text=${1:-'red'}
   local punctuation=${2:-'blue'}
 
-  for code in 332 304 304 371 371 371 372 300 304 304 371 372; do
-    local varname=char_$code
-    : ${(P)varname=$(echo -n "\\0$code")}
+  for code in 332 304 371 372 300; do
+    local char_$code=$(echo -n "\\0$code")
   done
 
   PS1="%{$fg[$text]%}$char_332$char_304%{$fg[$punctuation]%}(%{$fg[$text]%}%n%{$fg[$punctuation]%}@%{$fg[$text]%}%m%{$fg[$punctuation]%})%{$fg[$text]%}-%{$fg[$punctuation]%}(%{$fg[$text]%}%D{%I:%M%P}%{$fg[$punctuation]%}-:-%{$fg[$text]%}%D{%m}%{$fg[$punctuation]$fg[$text]%}/%D{%d}%{$fg[$punctuation]%})%{$fg[$text]%}$char_304-%{$fg[$punctuation]]%}$char_371%{$fg[$text]%}-$char_371$char_371%{$fg[$punctuation]%}$char_372$prompt_newline%{$fg[$text]%}$char_300$char_304%{$fg[$punctuation]%}(%{$fg[$text]%}%1~%{$fg[$punctuation]%})%{$fg[$text]%}$char_304$char_371%{$fg[$punctuation]%}$char_372%{$reset_color%}"

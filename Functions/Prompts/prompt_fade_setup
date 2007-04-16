@@ -27,9 +27,8 @@ prompt_fade_setup () {
   local userhost=${2:-'white'}
   local date=${3:-'white'}
 
-  for code in 333 262 261 260 333 262 261 260 333 262 261 260; do
-    local varname=char_$code
-    : ${(P)varname=$(echo -n "\\0$code")}
+  for code in 333 262 261 260; do
+    local char_$code=$(echo -n "\\0$code")
   done
 
   PS1="%{$fg[$fadebar_cwd]$bg[$fadebar_cwd]$bold_color%}$char_333$char_262$char_261$char_260%{$fg[$userhost]$bg[$fadebar_cwd]$bold_color%}%n@%m%{$reset_color$fg[$fadebar_cwd]$bg[grey]%}$char_333$char_262$char_261$char_260%{$fg[$date]$bg[grey]$bold_color%} %D{%a %b %d} %D{%I:%M:%S%P} $prompt_newline%{$fg[$fadebar_cwd]$bg[grey]$bold_color%}%~/%{$reset_color%} "
