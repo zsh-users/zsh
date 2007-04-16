@@ -4028,7 +4028,7 @@ mb_metacharlenconv(const char *s, wint_t *wcp)
  */
 
 /**/
-int
+mod_export int
 mb_metastrlen(char *ptr, int width)
 {
     char inchar, *laststart;

@@ -7,7 +7,7 @@ DISTFILES_SRC='
     hist.c init.c input.c jobs.c lex.c linklist.c loop.c main.c makepro.awk
     math.c mem.c mkbltnmlst.sh mkmakemod.sh
     module.c options.c params.c parse.c pattern.c prompt.c prototypes.h
-    signals.c signals.h string.c subst.c system.h text.c utils.c
+    signals.c signals.h sort.c string.c subst.c system.h text.c utils.c
     watch.c zsh.h zsh.mdd ztype.h
     zsh.rc zsh.ico
 '

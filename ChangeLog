@@ -1,3 +1,10 @@
+2007-04-16  Peter Stephenson  <pws@csr.com>
+
+	* unposted: ChangeLog, README, Completion/Base/Utility/.distfiles,
+	Config/version.mk, Functions/Calendar/.distfiles,
+	Functions/Misc/.distfiles, Src/.distfiles, Src/sort.c,
+	Src/utils.c: prepare for release of 4.3.3.
+
 2007-04-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23278: Src/sort.c, Test/D07multibyte.ztst: Fix
@@ -1990,7 +1997,7 @@
 
 	* 22301: Completion/Base/Completer/_expand: enable alises for the
 	expansion of $(...) and `...`.
-	
+
 	* 22271 (updated): Src/subst.c, Src/linklist.c, Src/zsh.h: got rid
 	of the mult_isarr global from subst.c by using the LinkList's new
 	flag integer.

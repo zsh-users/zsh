@@ -195,7 +195,7 @@ zstrcmp(const char *as, const char *bs, int sortflags)
  */
 
 /**/
-void
+mod_export void
 strmetasort(char **array, int sortwhat, int *unmetalenp)
 {
     char **arrptr;
