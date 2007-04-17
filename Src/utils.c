@@ -3055,8 +3055,8 @@ wcsitype(wchar_t c, int itype)
     if (len == 0) {
 	/* NULL is special */
 	return zistype(0, itype);
-    } else if (len == 1 && isascii(*outstr)) {
-	return zistype(*outstr, itype);
+    } else if (len == 1 && isascii(outstr[0])) {
+	return zistype(outstr[0], itype);
     } else {
 	switch (itype) {
 	case IIDENT:
