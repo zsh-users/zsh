@@ -1046,13 +1046,11 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 			tcout(TCUNDERLINEEND);
 		    break;
 		case ZWC('{'):
-		    for (p++; *p && (*p != '%' || p[1] != '}'); p++)
+		    for (; *p && (*p != '%' || p[1] != '}'); p++)
 			if (dopr)
 			    putc(*p == Meta ? *++p ^ 32 : *p, shout);
 		    if (*p)
-			p++;
-		    else
-			p--;
+			p += 2;
 		    break;
 		case ZWC('m'):
 		    if (stat) {

@@ -1,5 +1,8 @@
 2007-04-17  Peter Stephenson  <pws@csr.com>
 
+	* users/11421: Src/Zle/complist.c: use of %{...%} in
+	completion list formatting was broken.
+
 	* Christoph Bauer: users/11416: Src/utils.c: bad use
 	of VARRAR confused some compilers.
 
