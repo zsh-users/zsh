@@ -1,7 +1,7 @@
 2007-04-17  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* users/11424: got rid of a parse error in the
-	smart-insert-last-word script.
+	* users/11424: Functions/Zle/smart-insert-last-word: fixed
+	parse error caused by a comment in a math expression.
 
 2007-04-17  Peter Stephenson  <pws@csr.com>
 
