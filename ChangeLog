@@ -1,3 +1,8 @@
+2007-04-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* users/11424: got rid of a parse error in the
+	smart-insert-last-word script.
+
 2007-04-17  Peter Stephenson  <pws@csr.com>
 
 	* users/11421: Src/Zle/complist.c: use of %{...%} in
