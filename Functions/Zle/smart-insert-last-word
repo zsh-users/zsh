@@ -104,8 +104,8 @@ fi
               found=$lastcmd[(I)$pattern]
           done
       fi
-      (( found-- > 0 &&            # Account for 1-based index
-        (numeric = $#lastcmd - found) ))
+      # The following accounts for 1-based index
+      (( found-- > 0 && (numeric = $#lastcmd - found) ))
   fi
 } always {
   HISTNO=$_ilw_hist                # Return to current command
