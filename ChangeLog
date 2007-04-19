@@ -1,5 +1,8 @@
 2007-04-19  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Misc/add-zsh-hook: should have been
+	added ages ago but wasn't.
+
 	* README, Config/version.mk, Etc/FAQ.yo: release 4.3.4.
 
 2007-04-17  Wayne Davison  <wayned@users.sourceforge.net>
