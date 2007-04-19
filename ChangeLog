@@ -1,6 +1,11 @@
+2007-04-19  Clint Adams  <clint@zsh.org>
+
+	* 23301: Paul Ackersviller: Functions/Misc/add-zsh-hook:
+	fix semicolon mistyped as a colon.
+
 2007-04-19  Peter Stephenson  <pws@csr.com>
 
-	* unposte: Config/version.mk: set release string to 4.3.4-dev-0.
+	* unposted: Config/version.mk: set release string to 4.3.4-dev-0.
 
 	* users/11419: Doc/Zsh/zle.yo,
 	Functions/Zle/backward-kill-word-match,

@@ -52,7 +52,7 @@ if (( del )); then
     (( ${(P)#hook} )) || unset $hook
   fi
 else
-  if (( ${(P)+hook} )): then
+  if (( ${(P)+hook} )); then
     if (( ${(P)hook[(I)$fn]} == 0 )); then
       set -A $hook ${(P)hook} $fn
     fi
