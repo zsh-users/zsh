@@ -1,3 +1,7 @@
+2007-04-19  Peter Stephenson  <pws@csr.com>
+
+	* README, Config/version.mk, Etc/FAQ.yo: release 4.3.4.
+
 2007-04-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/11424: Functions/Zle/smart-insert-last-word: fixed
