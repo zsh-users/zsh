@@ -3,6 +3,9 @@
 	* 23301: Paul Ackersviller: Functions/Misc/add-zsh-hook:
 	fix semicolon mistyped as a colon.
 
+	* 23302: Completion/Unix/Command/_subversion: complete properties
+	after svn propget and propedit.
+
 2007-04-19  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: set release string to 4.3.4-dev-0.
