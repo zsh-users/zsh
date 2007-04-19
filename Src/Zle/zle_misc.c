@@ -337,14 +337,21 @@ killregion(UNUSED(char **args))
 
 /**/
 int
-copyregionaskill(UNUSED(char **args))
+copyregionaskill(char **args)
 {
-    if (mark > zlell)
-	mark = zlell;
-    if (mark > zlecs)
-	cut(zlecs, mark - zlecs, 0);
-    else
-	cut(mark, zlecs - mark, 1);
+    if (*args) {
+        int len;
+        ZLE_STRING_T line = stringaszleline(*args, 0, &len, NULL, NULL);
+	cuttext(line, len, -1);
+	free(line);
+    } else {
+	if (mark > zlell)
+	    mark = zlell;
+	if (mark > zlecs)
+	    cut(zlecs, mark - zlecs, 0);
+	else
+	    cut(mark, zlecs - mark, 1);
+    }
     return 0;
 }
 

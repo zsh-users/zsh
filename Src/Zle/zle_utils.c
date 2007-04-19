@@ -420,9 +420,34 @@ forekill(int ct, int dir)
     shiftchars(i, ct);
 }
 
+
+/*
+ * Put the ct characters starting at zleline + i into the
+ * cutbuffer, circling the kill ring if necessary (it's
+ * not if we're dealing with vi buffers, which is detected
+ * internally).  The text is not removed from zleline.
+ *
+ * dir indicates how the text is to be added to the cutbuffer,
+ * if the cutbuffer wasn't zeroed (this depends on the last
+ * command being a kill).  If dir is 1, the new text goes
+ * to the front of the cut buffer.  If dir is -1, the cutbuffer
+ * is completely overwritten.
+ */
+
 /**/
 void
 cut(int i, int ct, int dir)
+{
+  cuttext(zleline + i, ct, dir);
+}
+
+/*
+ * As cut, but explicitly supply the text together with its length.
+ */
+
+/**/
+void
+cuttext(ZLE_STRING_T line, int ct, int dir)
 {
     if (!ct)
 	return;
@@ -434,7 +459,7 @@ cut(int i, int ct, int dir)
 	if (!(zmod.flags & MOD_VIAPP) || !b->buf) {
 	    free(b->buf);
 	    b->buf = (ZLE_STRING_T)zalloc(ct * ZLE_CHAR_SIZE);
-	    ZS_memcpy(b->buf, zleline + i, ct);
+	    ZS_memcpy(b->buf, line, ct);
 	    b->len = ct;
 	    b->flags = vilinerange ? CUTBUFFER_LINE : 0;
 	} else {
@@ -448,7 +473,7 @@ cut(int i, int ct, int dir)
 			* ZLE_CHAR_SIZE);
 	    if (b->flags & CUTBUFFER_LINE)
 		b->buf[len++] = ZWC('\n');
-	    ZS_memcpy(b->buf + len, zleline + i, ct);
+	    ZS_memcpy(b->buf + len, line, ct);
 	    b->len = len + ct;
 	}
 	return;
@@ -459,7 +484,7 @@ cut(int i, int ct, int dir)
 	for(n=34; n>26; n--)
 	    vibuf[n] = vibuf[n-1];
 	vibuf[26].buf = (ZLE_STRING_T)zalloc(ct * ZLE_CHAR_SIZE);
-	ZS_memcpy(vibuf[26].buf, zleline + i, ct);
+	ZS_memcpy(vibuf[26].buf, line, ct);
 	vibuf[26].len = ct;
 	vibuf[26].flags = vilinerange ? CUTBUFFER_LINE : 0;
     }
@@ -467,7 +492,7 @@ cut(int i, int ct, int dir)
 	cutbuf.buf = (ZLE_STRING_T)zalloc(ZLE_CHAR_SIZE);
 	cutbuf.buf[0] = ZWC('\0');
 	cutbuf.len = cutbuf.flags = 0;
-    } else if (!(lastcmd & ZLE_KILL)) {
+    } else if (!(lastcmd & ZLE_KILL) || dir < 0) {
 	Cutbuffer kptr;
 	if (!kring) {
 	    kringsize = KRINGCTDEF;
@@ -485,7 +510,7 @@ cut(int i, int ct, int dir)
     if (dir) {
 	ZLE_STRING_T s = (ZLE_STRING_T)zalloc((cutbuf.len + ct)*ZLE_CHAR_SIZE);
 
-	ZS_memcpy(s, zleline + i, ct);
+	ZS_memcpy(s, line, ct);
 	ZS_memcpy(s + ct, cutbuf.buf, cutbuf.len);
 	free(cutbuf.buf);
 	cutbuf.buf = s;
@@ -493,7 +518,7 @@ cut(int i, int ct, int dir)
     } else {
 	cutbuf.buf = realloc((char *)cutbuf.buf,
 			     (cutbuf.len + ct) * ZLE_CHAR_SIZE);
-	ZS_memcpy(cutbuf.buf + cutbuf.len, zleline + i, ct);
+	ZS_memcpy(cutbuf.buf + cutbuf.len, line, ct);
 	cutbuf.len += ct;
     }
     if(vilinerange)

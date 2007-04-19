@@ -1,5 +1,12 @@
 2007-04-19  Peter Stephenson  <pws@csr.com>
 
+	* users/11419: Doc/Zsh/zle.yo,
+	Functions/Zle/backward-kill-word-match,
+	Functions/Zle/delete-whole-word-match,
+	Functions/Zle/kill-word-match, Src/Zle/zle_misc.c,
+	Src/Zle/zle_utils.c: allow zle copy-region-as-kill with an
+	argument to add text to the kill ring from a widget function.
+
 	* unposted: Functions/Misc/add-zsh-hook: should have been
 	added ages ago but wasn't.
 

@@ -49,8 +49,7 @@ if [[ $WIDGET = *kill* ]]; then
   if [[ $LASTWIDGET = *kill* ]]; then
     CUTBUFFER="$CUTBUFFER$word"
   else
-    killring=("$CUTBUFFER" "${(@)killring[1,-2]}")
-    CUTBUFFER=$word
+    zle copy-region-as-kill "$word"
   fi
 fi
 BUFFER="${BUFFER[1,pos1]}${BUFFER[pos2,-1]}"

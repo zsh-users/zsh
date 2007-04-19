@@ -663,7 +663,10 @@ vindex(CUTBUFFER)
 item(tt(CUTBUFFER) (scalar))(
 The last item to be cut using one of the `tt(kill-)' commands; the
 string which the next yank would insert in the line.  Later entries in
-the kill ring are in the array tt(killring).
+the kill ring are in the array tt(killring).  Note that the
+command `tt(zle copy-region-as-kill) var(string)' can be used to
+set the text of the cut buffer from a shell function and cycle the kill
+ring in the same way as interactively killing text.
 )
 vindex(HISTNO)
 item(tt(HISTNO) (integer))(
@@ -1296,6 +1299,11 @@ Kill the current line and enter insert mode.
 tindex(copy-region-as-kill)
 item(tt(copy-region-as-kill) (ESC-W ESC-w) (unbound) (unbound))(
 Copy the area from the cursor to the mark to the kill buffer.
+
+If called from a ZLE widget function in the form `tt(zle
+copy-region-as-kill) var(string)' then var(string) will be taken as the
+text to copy to the kill buffer.  The cursor, the mark and the text on the
+command line are not used in this case.
 )
 tindex(copy-prev-word)
 item(tt(copy-prev-word) (ESC-^_) (unbound) (unbound))(
@@ -1498,8 +1506,8 @@ Insert the contents of the kill buffer at the cursor position.
 )
 tindex(yank-pop)
 item(tt(yank-pop) (ESC-y) (unbound) (unbound))(
-Remove the text just yanked, rotate the kill-ring,
-and yank the new top.  Only works following
+Remove the text just yanked, rotate the kill-ring (the history of
+previously killed text) and yank the new top.  Only works following
 tt(yank) or tt(yank-pop).
 )
 tindex(vi-yank)
