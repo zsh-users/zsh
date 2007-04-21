@@ -1,3 +1,7 @@
+2007-04-21  Clint Adams  <clint@zsh.org>
+
+	* 23303: Completion/Unix/Command/_date: use _guard.
+
 2007-04-19  Clint Adams  <clint@zsh.org>
 
 	* 23301: Paul Ackersviller: Functions/Misc/add-zsh-hook:

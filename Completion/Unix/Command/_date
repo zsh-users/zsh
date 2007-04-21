@@ -43,6 +43,6 @@ else
 fi
 
 _arguments \
-  "$args[@]" \
   '-u[display or set time in UTC]' \
-  ':format or date'
+  ': :_guard "^--*" "format or date"' \
+  "$args[@]"
