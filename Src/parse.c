@@ -2693,6 +2693,8 @@ write_dump(int dfd, LinkList progs, int map, int hlen, int tlen)
     if (map == 1)
 	map = (tlen >= FD_MINMAP);
 
+    memset(pre, 0, sizeof(wordcode) * FD_PRELEN)
+
     for (ohlen = hlen; ; hlen = ohlen) {
 	fdmagic(pre) = (other ? FD_OMAGIC : FD_MAGIC);
 	fdsetflags(pre, ((map ? FDF_MAP : 0) | other));

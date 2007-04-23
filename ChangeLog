@@ -1,5 +1,9 @@
 2007-04-23  Peter Stephenson  <pws@csr.com>
 
+	* 23312: Src/parse.c, Src/zsh.mdd: ensure parse.c is updated
+	when version.h changes in order to pick up changes to ZWC
+	files; memset() header of wordcode file to normalise unused words.
+
 	* 23308: Src/text.c: stop tindent becoming negative, which
 	causes infinite use of memory; add debug test to see where
 	it would become negative.

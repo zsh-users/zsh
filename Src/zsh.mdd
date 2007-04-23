@@ -31,7 +31,7 @@ sigcount.h: signames.c
 
 init.o: bltinmods.list zshpaths.h zshxmods.h
 
-init.o params.o: version.h
+init.o params.o parse.o: version.h
 
 version.h: $(sdir_top)/Config/version.mk
 	echo '#define ZSH_VERSION "'$(VERSION)'"' > $@
