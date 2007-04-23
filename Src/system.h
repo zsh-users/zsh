@@ -757,6 +757,11 @@ extern short ospeed;
  * If MULTIBYTE_SUPPORT is not defined, these includes provide a subset of
  * Unicode support that makes the \u and \U printf escape sequences work.
  */
+=20
+#if defined(__hpux) && !defined(_INCLUDE__STDC_A1_SOURCE)
+#define _INCLUDE__STDC_A1_SOURCE
+#endif
+=20
 # include <wchar.h>
 # include <wctype.h>
 #endif

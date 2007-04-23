@@ -1,3 +1,8 @@
+2007-04-23  Peter Stephenson  <pws@csr.com>
+
+	* Christoph Bauer: 23309ish: define _INCLUDE__STDC_A1_SOURCE
+	for HP/UX.
+
 2007-04-21  Clint Adams  <clint@zsh.org>
 
 	* 23303: Completion/Unix/Command/_date: use _guard.
@@ -37,7 +42,7 @@
 	completion list formatting was broken.
 
 	* Christoph Bauer: users/11416: Src/utils.c: bad use
-	of VARRAR confused some compilers.
+	of VARARR confused some compilers.
 
 2007-04-17  Geoff Wing  <gcw@zsh.org>
 
