@@ -1,5 +1,8 @@
 2007-04-23  Peter Stephenson  <pws@csr.com>
 
+	* 23313: Src/parse.c: the shell didn't actually check the version
+	of ZWC files anyway.
+
 	* 23312: Src/parse.c, Src/zsh.mdd: ensure parse.c is updated
 	when version.h changes in order to pick up changes to ZWC
 	files; memset() header of wordcode file to normalise unused words.

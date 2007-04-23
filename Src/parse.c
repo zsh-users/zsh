@@ -2617,9 +2617,10 @@ load_dump_header(char *nam, char *name, int err)
     }
     if (read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
 	((FD_PRELEN + 1) * sizeof(wordcode)) ||
-	(v = (fdmagic(buf) != FD_MAGIC && fdmagic(buf) != FD_OMAGIC))) {
+	(v = (fdmagic(buf) != FD_MAGIC && fdmagic(buf) != FD_OMAGIC)) ||
+	strcmp(fdversion(buf), ZSH_VERSION)) {
 	if (err) {
-	    if (v) {
+	    if (!v) {
 		zwarnnam(nam, "zwc file has wrong version (zsh-%s): %s",
 			 fdversion(buf), name);
 	    } else
