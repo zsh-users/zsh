@@ -1078,10 +1078,11 @@ movefd(int fd)
     if(fd != -1) {
 	if (fd > max_zsh_fd) {
 	    while (fd >= fdtable_size)
-		fdtable = zrealloc(fdtable, (fdtable_size *= 2));
+		fdtable = zrealloc(fdtable,
+				   (fdtable_size *= 2)*sizeof(*fdtable));
 	    max_zsh_fd = fd;
 	}
-	fdtable[fd] = 1;
+	fdtable[fd] = FDT_INTERNAL;
     }
     return fd;
 }
@@ -1096,7 +1097,7 @@ redup(int x, int y)
 	zclose(y);
     else if (x != y) {
 	while (y >= fdtable_size)
-	    fdtable = zrealloc(fdtable, (fdtable_size *= 2));
+	    fdtable = zrealloc(fdtable, (fdtable_size *= 2)*sizeof(*fdtable));
 	dup2(x, y);
 	if ((fdtable[y] = fdtable[x]) && y > max_zsh_fd)
 	    max_zsh_fd = y;
@@ -1111,8 +1112,8 @@ mod_export int
 zclose(int fd)
 {
     if (fd >= 0) {
-	fdtable[fd] = 0;
-	while (max_zsh_fd > 0 && !fdtable[max_zsh_fd])
+	fdtable[fd] = FDT_UNUSED;
+	while (max_zsh_fd > 0 && fdtable[max_zsh_fd] == FDT_UNUSED)
 	    max_zsh_fd--;
 	if (fd == coprocin)
 	    coprocin = -1;

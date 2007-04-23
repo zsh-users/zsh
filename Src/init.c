@@ -1050,7 +1050,7 @@ source(char *s)
 	freeeprog(prog);
     else {
 	fclose(bshin);
-	fdtable[SHIN] = 0;
+	fdtable[SHIN] = FDT_UNUSED;
 	SHIN = fd;		     /* the shell input fd                   */
 	bshin = obshin;		     /* file handle for buffered shell input */
     }
@@ -1250,7 +1250,7 @@ zsh_main(UNUSED(int argc), char **argv)
     } while (zsh_name);
 
     fdtable_size = zopenmax();
-    fdtable = zshcalloc(fdtable_size);
+    fdtable = zshcalloc(fdtable_size*sizeof(*fdtable));
 
     createoptiontable();
     emulate(zsh_name, 1);   /* initialises most options */
