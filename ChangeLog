@@ -1,5 +1,8 @@
 2007-04-23  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/parse.c: make sure we get "invalid zwc file"
+	for a short file (not "wrong version").
+
 	* 23313: Src/parse.c: the shell didn't actually check the version
 	of ZWC files anyway.
 

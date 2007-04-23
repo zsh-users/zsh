@@ -2607,7 +2607,7 @@ bin_zcompile(char *nam, char **args, Options ops, UNUSED(int func))
 static Wordcode
 load_dump_header(char *nam, char *name, int err)
 {
-    int fd, v = 0;
+    int fd, v = 1;
     wordcode buf[FD_PRELEN + 1];
 
     if ((fd = open(name, O_RDONLY)) < 0) {
