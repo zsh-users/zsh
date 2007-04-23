@@ -1,6 +1,10 @@
 2007-04-23  Peter Stephenson  <pws@csr.com>
 
-	* Christoph Bauer: 23309ish: define _INCLUDE__STDC_A1_SOURCE
+	* 23308: Src/text.c: stop tindent becoming negative, which
+	causes infinite use of memory; add debug test to see where
+	it would become negative.
+
+	* Christoph Bauer: 23310ish: define _INCLUDE__STDC_A1_SOURCE
 	for HP/UX.
 
 2007-04-21  Clint Adams  <clint@zsh.org>
