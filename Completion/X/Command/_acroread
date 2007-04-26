@@ -1,15 +1,29 @@
 #compdef acroread
 
 local curcontext="$curcontext" state line
+local cmdfile
 
-# Try extracting the version number directly from the executable.
-# (This will fail if the executable is a wrapper script for acroread.)
-local ver=${${${(f)"$(<$commands[$words[1]])"}:#^ver=*}##ver=}
-[[ -n $ver ]] && _acroread_version=$ver
+if [[ -z $_acroread_version ]]; then
+  _acroread_version="$($words[1] -version 2>/dev/null)"
+fi
 
-if (( ! $+_acroread_version )); then
-  local acropath=${${(s. .)${${(f)"$($words[1] -help 2>&1)"}[1]}}[2]}
-  _acroread_version=${${${(f)"$(<$acropath)"}:#^ver=*}##ver=}
+if [[ -z $_acroread_version ]]; then
+  if [[ $words[1] = */* && -x $words[1] ]]; then
+    cmdfile=$words[1]
+  elif [[ -x $commands[$words[1]] ]]; then
+    cmdfile=$commands[$words[1]]
+  fi
+
+  # Try extracting the version number directly from the executable.
+  # (This will fail if the executable is a wrapper script for acroread.)
+  _acroread_version=${${(M)${(f)"$(<$cmdfile)"}:#ver=*}##ver=}
+
+  if [[ -z $_acroread_version ]]; then
+    local acropath=${${(s. .)${${(f)"$($words[1] -help 2>&1)"}[1]}}[2]}
+    if [[ -r $acropath ]]; then
+      _acroread_version=${${(M)${(f)"$(<$acropath)"}:#ver=*}##ver=}
+    fi
+  fi
 fi
 
 if [[ $_acroread_version == 7.* ]]; then
