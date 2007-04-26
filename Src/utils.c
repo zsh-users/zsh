@@ -4569,10 +4569,12 @@ getkeystring(char *s, int *len, int how, int *misc)
     int count;
 #else
     unsigned int wval;
-# if defined(HAVE_NL_LANGINFO) && defined(CODESET) && defined(HAVE_ICONV)
+# if defined(HAVE_NL_LANGINFO) && defined(CODESET)
+#  if defined(HAVE_ICONV)
     iconv_t cd;
     char inbuf[4];
     size_t inbytes, outbytes;
+#  endif
     size_t count;
 # endif
 #endif

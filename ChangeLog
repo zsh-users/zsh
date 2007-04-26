@@ -1,3 +1,9 @@
+2007-04-26  Peter Stephenson  <pws@csr.com>
+
+	* Phil Pennock: 23326: Src/utils.c: with no __STDC_ISO_10646__
+	or HAVE_ICONV but with HAVE_NL_LANGINFO and CODESET the
+	code wouldn't compile.
+
 2007-04-23  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/parse.c: make sure we get "invalid zwc file"
