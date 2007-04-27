@@ -2188,9 +2188,14 @@ gen_matches_files(int dirs, int execs, int all)
 		if (!test)
 		    continue;
 		if (!all) {
+		    char *ums;
+		    int umlen;
 		    /* We still have to check the file type, so prepare *
 		     * the path buffer by appending the filename.       */
-		    strcpy(q, n);
+		    ums = dupstring(n);
+		    unmetafy(ums, &umlen);
+		    memcpy(q, ums, umlen);
+		    q[umlen] = '\0';
 		    /* And do the stat. */
 		    if (stat(p, &buf) < 0)
 			continue;
