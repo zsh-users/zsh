@@ -1,0 +1,48 @@
+#compdef raggle
+
+# Raggle v0.4.0
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+_arguments -C -s \
+  '(-a --add)'{-a,--add}"[add a new feed (requires '--url')]" \
+  '(-A --ascii)'{-A,--ascii}'[use ASCII characters instead of ANSI for window borders]' \
+  '(-c --config)'{-c,--config}'[specify an alternate config file]:config file:_files -g "*.rb(-.)"' \
+  '--default-config[print out the default configuration of Raggle in a format suitable for your config.rb file]' \
+  '(-d --delete)'{-d,--delete}'[delete an existing feed]:feed ID:->feed' \
+  '--diag[run raggle in diagnostics/debug mode]' \
+  '(-e --edit)'{-e,--edit}'[edit an existing feed]:feed ID:->feed' \
+  '(--import-opml)--export-opml[export feeds to OPML]:OPML file:_files -g "*.opml(-.)"' \
+  '(-f --find)'{-f,--find}'[find feeds containing a string, via Syndic8]:search string:' \
+  "--force[force behavior Raggle won't normally allow]" \
+  '(-)'{-h,--help,--usage}'[display help information]' \
+  '(--export-opml)--import-opml[import feeds from an OPML file]:OPML file:_files -g "*.opml(-.)"' \
+  '(-i --invalidate)'{-i,--invalidate}'[invalidate a feed (force an update)]:feed ID:->feed' \
+  '(-l --list)'{-l,--list}"[list existing feeds (use '--verbose' to show URLs as well)]" \
+  "--lock-title[lock Title attribute of feed (for '--add' and '--edit')]" \
+  "--max[set the maximum number of items for a feed (for '--add' and '--edit')]" \
+  '(-p --priority)'{-p,--priority}"[feed sorting priority: 0 by default, higher values will sort feeds to the top (for '--add' and '--edit')]:sorting priority:" \
+  '--purge[purge deleted feeds from feed cache]' \
+  '(-r --refresh)'{-r,--refresh}"[refresh attribute of feed (for '--add' and '--edit')]:refresh time (minutes):" \
+  "--save-items[save old items of feed (for '--add' and '--edit')]" \
+  '--server[run Raggle in HTTP server mode]:port:_ports' \
+  '(--sort --sort-feeds)'{--sort,--sort-feeds}'[sort feeds by priority then title (case-insensitive)]' \
+  '(-t --title)'{-t,--title}"[title attribute of feed (for '--add' and '--edit')]:feed title:" \
+  "--unlock-title[unlock Title attribute of feed (for '--add' and '--edit')]" \
+  "--unsave-items[don't save old items of feed (for '--add' and '--edit')]" \
+  "--update[update feed (or all feeds, if unspecified)]::feed ID:->feed" \
+  '(-u --url)'{-u,--url}"[URL attribute of feed (for '--add' and '--edit')]:URL:_urls" \
+  '--verbose[turn on verbose output]' \
+  '(-)'{-v,--version}'[display version information]' && return 0
+
+if [[ "$state" = feed ]]; then
+  local feeds
+  feeds=(
+    ${${(M)${${(f)"$(_call_program feeds $words[1] \
+        --list)"}/(#s)[[:blank:]]/}:#[0-9]##,*}/, /:}
+  )
+  _describe -t feeds "RSS feed" feeds && return 0
+fi
+
+return 1
