@@ -21,7 +21,10 @@ command which begins with a `tt(LPAR()LPAR())', all the characters until a
 matching `tt(RPAR()RPAR())' are treated as a quoted expression and
 arithmetic expansion performed as for an argument of tt(let).  More
 precisely, `tt(LPAR()LPAR())var(...)tt(RPAR()RPAR())' is equivalent to
-`tt(let ")var(...)tt(")'.  For example, the following statement
+`tt(let ")var(...)tt(")'.  The return status is 0 if the arithmetic value
+of the expression is non-zero, and 1 otherwise.
+
+For example, the following statement
 
 example((( val = 2 + 1 )))
 
@@ -29,9 +32,10 @@ is equivalent to
 
 example(let "val = 2 + 1")
 
-both assigning the value 3 to the shell variable tt(foo) and returning a
+both assigning the value 3 to the shell variable tt(val) and returning a
 zero status.
 
+cindex(arithmetic base)
 cindex(bases, in arithmetic)
 Integers can be in bases other than 10.
 A leading `tt(0x)' or `tt(0X)' denotes hexadecimal.
@@ -42,6 +46,42 @@ is a number in that base (for example, `tt(16#ff)' is 255 in hexadecimal).
 The var(base)tt(#) may also be omitted, in which case
 base 10 is used.  For backwards compatibility the form
 `tt([)var(base)tt(])var(n)' is also accepted.
+
+It is also possible to specify a base to be used for output in the form
+`tt([#)var(base)tt(])', for example `tt([#16])'.  This is used when
+outputting arithmetical substitutions or when assigning to scalar
+parameters, but an explicitly defined integer or floating point parameter
+will not be affected.  If an integer variable is implicitly defined by an
+arithmetic expression, any base specified in this way will be set as the
+variable's output arithmetic base as if the option `tt(-i) var(base)' to
+the tt(typeset) builtin had been used.  The expression has no precedence
+and if it occurs more than once in a mathematical expression, the last
+encountered is used.  For clarity it is recommended that it appear at the
+beginning of an expression.  As an example:
+
+example(typeset -i 16 y
+print $(( [#8] x = 32, y = 32 ))
+print $x $y)
+
+outputs first `tt(8#40)', the rightmost value in the given output base, and
+then `tt(8#40 16#20)', because tt(y) has been explicitly declared to
+have output base 16, while tt(x) (assuming it does not already exist) is
+implicitly typed by the arithmetic evaluation, where it acquires the output
+base 8.
+
+pindex(C_BASES, use of)
+pindex(OCTAL_ZEROES, use of)
+If the tt(C_BASES) option is set, hexadecimal numbers in the standard C
+format, for example tt(0xFF) instead of the usual `tt(16#FF)'.  If the
+option tt(OCTAL_ZEROES) is also set (it is not by default), octal numbers
+will be treated similarly and hence appear as `tt(077)' instead of
+`tt(8#77)'.  This option has no effect on the output of bases other than
+hexadecimal and octal, and these formats are always understood on input.
+
+When an output base is specified using the `tt([#)var(base)tt(])' syntax,
+an appropriate base prefix will be output if necessary, so that the value
+output is valid syntax for input.  If the tt(#) is doubled, for example
+`tt([##16])', then no base prefix is output.
 
 Floating point constants are recognized by the presence of a decimal point
 or an exponent.  The decimal point may be the first character of the
@@ -78,18 +118,20 @@ short-circuiting, and only one of the latter two expressions in a ternary
 operator is evaluated.  Note the precedence of the bitwise AND, OR,
 and XOR operators.
 
-cindex(math functions)
-cindex(functions, math)
+cindex(mathematical functions, use of)
+cindex(functions, math, use of)
 Mathematical functions can be called with the syntax
 `var(func)tt(LPAR())var(args)tt(RPAR())', where the function decides
 if the var(args) is used as a string or a comma-separated list of
 arithmetic expressions. The shell currently defines no mathematical
-functions, but modules may define some.
+functions by default, but the module tt(zsh/mathfunc) may be loaded with
+the tt(zmodload) builtin to provide standard floating point mathematical
+functions.
 
 An expression of the form `tt(##)var(x)' where var(x) is any character
-sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the ascii
+sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the ASCII
 value of this character and an expression of the form `tt(#)var(foo)'
-gives the ascii value of the first character of the value of the
+gives the ASCII value of the first character of the value of the
 parameter var(foo).  Note that this is different from the expression
 `tt($#)var(foo)', a standard parameter substitution which gives the
 length of the parameter var(foo).  `tt(#\)' is accepted instead of
@@ -139,7 +181,7 @@ retain that type either until the type is explicitly changed or until the
 end of the scope.  This can have unforeseen consequences.  For example, in
 the loop
 
-example(for (( f = 0; f < 1; f += 0.1 )); do;
+example(for (( f = 0; f < 1; f += 0.1 )); do
 # use $f
 done)
 
