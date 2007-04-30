@@ -1,0 +1,63 @@
+#compdef perl
+#
+# zsh completion code for the Perl interpreter
+# Adam Spiers <adam@spiers.net>
+#
+
+_perl () {
+  _arguments -s \
+    '-0-:input record separator in octal (\0, if no argument): ' \
+    '-a[autosplit mode with -n or -p (splits $_ into @F)]' \
+    "-c[check syntax only (runs BEGIN and END blocks)]" \
+    '-d[run scripts under debugger]' \
+    '-d\:-[run under control of a debugging/tracing module]:debugging/tracing module:_perl_modules' \
+    '-D-:set debugging flags (argument is a bit mask or flags): ' \
+    "*-e+:one line of script. Several -e's allowed. Omit [programfile]." \
+    "-F-:split() pattern for autosplit (-a). The //'s are optional.: " \
+    '-h[list help summary]' \
+    '-i-[edit <> files in place (make backup if extension supplied)]:backup file extension: ' \
+    '*-I-[specify @INC/#include directory (may be used more than once)]:include path:_files -/' \
+    '-l-[enable line ending processing, specifies line terminator]:output record separator in octal: ' \
+    \*{-m,-M}"-[module.. executes \`use/no module...' before executing your script]:module:_perl_m_opt" \
+    "-n[assume 'while (<>) { ... }' loop around your script]" \
+    "-p[assume loop like -n but print line also like sed]" \
+    "-P[run script through C preprocessor before compilation]" \
+    "-s[enable some switch parsing for switches after script name]" \
+    "-S[look for the script using PATH environment variable]" \
+    "-T[turn on tainted checks]" \
+    "-u[dump core after parsing script]" \
+    "-U[allow unsafe operations]" \
+    "-v[print version number, patchlevel plus VERY IMPORTANT perl info]" \
+    "-V-[print perl configuration information]:configuration keys:_perl_config_vars" \
+    '-w[turn warnings on for compilation of your script. Recommended]' \
+    '-x-[strip off text before #!perl line and perhaps cd to directory]:directory to cd to:_files -/' \
+    '1:Perl script:_files -/ -g "*.(p[ml]|PL)(-.)"' \
+    '*::args: _normal' 
+}
+
+_perl_m_opt () {
+  compset -P '-'
+
+  if compset -P '*='; then
+    _message -e module-arguments 'module arguments, comma separated'
+  else
+    _perl_modules -S= -q
+  fi
+}
+
+_perl_config_vars () {
+  if (( ! $+_perl_config_vars )); then
+    _perl_config_vars=( $(perl -MConfig -e 'print join("\n", keys %Config);') )
+  fi
+
+  local add_colon='-P:'
+  compset -P '*:' && add_colon=''
+
+  local delimiter='\ '
+  (( compstate[quoting] )) && delimiter=' '
+
+  compset -P '* ' && compset -q
+  compadd "$expl[@]" $add_colon -S$delimiter -q -a _perl_config_vars
+}
+
+_perl "$@"
