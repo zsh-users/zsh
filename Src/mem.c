@@ -830,10 +830,26 @@ malloc(MALLOC_ARG_T size)
 #endif
 
     /* some systems want malloc to return the highest valid address plus one
-       if it is called with an argument of zero */
+       if it is called with an argument of zero.
+    
+       TODO: really?  Suppose we allocate more memory, so
+       that this is now in bounds, then a more rational application
+       that thinks it can free() anything it malloc'ed, even
+       of zero length, calls free for it?  Aren't we in big
+       trouble?  Wouldn't it be safer just to allocate some
+       memory anyway?
+
+       If the above comment is really correct, then at least
+       we need to check in free() if we're freeing memory
+       at m_high.
+    */
 
     if (!size)
+#if 1
+	size = 1;
+#else
 	return (MALLOC_RET_T) m_high;
+#endif
 
     queue_signals();  /* just queue signals rather than handling them */
 

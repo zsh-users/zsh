@@ -1,3 +1,8 @@
+2007-04-30  Peter Stephenson  <pws@csr.com>
+
+	* 23339: Src/mem.c: make malloc(0) allocate a single byte
+	instead of returning invalid (and unfreeable) memory.
+
 2007-04-27  Peter Stephenson  <pws@csr.com>
 
 	* 23337: Src/Zle/compctl.c: argument to stat() wasn't
