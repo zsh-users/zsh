@@ -55,7 +55,7 @@ cindex(parameters, expanding)
 cindex(doing nothing)
 item(tt(:) [ var(arg) ... ])(
 This command does nothing, although normal argument expansions is performed
-which may have effects on shell parameters.  A zero exit code is returned.
+which may have effects on shell parameters.  A zero exit status is returned.
 )
 findex(alias)
 cindex(aliases, defining)
@@ -368,8 +368,8 @@ command in the current shell process.
 prefix(exec)
 findex(exit)
 item(tt(exit) [ var(n) ])(
-Exit the shell with the exit code specified by var(n); if none
-is specified, use the exit code from the last command executed.
+Exit the shell with the exit status specified by var(n); if none
+is specified, use the exit status from the last command executed.
 pindex(IGNORE_EOF, use of)
 An EOF condition will also cause the shell to exit, unless
 the tt(IGNORE_EOF) option is set.
@@ -385,7 +385,7 @@ already exist, it is created in the global scope.
 findex(false)
 cindex(doing nothing, unsuccessfully)
 item(tt(false) [ var(arg) ... ])(
-Do nothing and return an exit code of 1.
+Do nothing and return an exit status of 1.
 )
 findex(fc)
 cindex(history, editing)
@@ -507,7 +507,7 @@ item(tt(getopts) var(optstring) var(name) [ var(arg) ... ])(
 Checks the var(arg)s for legal options.  If the var(arg)s are omitted,
 use the positional parameters.  A valid option argument
 begins with a `tt(PLUS())' or a `tt(-)'.  An argument not beginning with
-a `tt(PLUS())' or a `tt(-)', or the argument `tt(--)', ends the options.
+a `tt(PLUS())' or a `tt(-)', or the argument `tt(-)tt(-)', ends the options.
 Note that a single `tt(-)' is not considered a valid option argument.
 var(optstring) contains the letters that tt(getopts)
 recognizes.  If a letter is followed by a `tt(:)', that option
@@ -933,7 +933,7 @@ not work with the tt(-q) option.
 item(tt(-q))(
 Read only one character from the terminal and set var(name) to
 `tt(y)' if this character was `tt(y)' or `tt(Y)' and to `tt(n)' otherwise.
-With this flag set the return value is zero only if the character was
+With this flag set the return status is zero only if the character was
 `tt(y)' or `tt(Y)'.  Note that this always reads from the terminal, even
 if used with the tt(-p) or tt(-u) or tt(-z) flags or with redirected input.
 This option may also be used within zle widgets.
@@ -1085,7 +1085,7 @@ the array.  This means that
 
 example(set -A array -x -- foo)
 
-sets tt(array) to `tt(-x -- foo)' if tt(KSH_ARRAYS) is not set, but sets
+sets tt(array) to `tt(-x -)tt(- foo)' if tt(KSH_ARRAYS) is not set, but sets
 the array to tt(foo) and turns on the option `tt(-x)' if it is set.
 
 If the tt(-A) flag is not present, but there are arguments beyond the
@@ -1154,17 +1154,31 @@ and for processes run from the shell.
 findex(trap)
 cindex(signals, trapping)
 cindex(trapping signals)
-item(tt(trap) [ var(arg) [ var(sig) ... ] ])(
+item(tt(trap) [ var(arg) ] [ var(sig) ... ])(
 var(arg) is a series of commands (usually quoted to protect it from
 immediate evaluation by the shell) to be read and executed when the shell
-receives var(sig).  Each var(sig) can be given as a number
-or as the name of a signal.
-If var(arg) is `tt(-)', then all traps var(sig) are reset to their
-default values.  If var(arg) is the empty string, then this signal
-is ignored by the shell and by the commands it invokes.
+receives any of the signals specified by one or more var(sig) args.
+Each var(sig) can be given as a number,
+or as the name of a signal either with or without the string tt(SIG)
+in front (e.g. 1, HUP, and SIGHUP are all the same signal).
+
+If var(arg) is `tt(-)', then the specified signals are reset to their
+defaults, or, if no var(sig) args are present, all traps are reset.
+
+If var(arg) is an empty string, then the specified signals
+are ignored by the shell (and by the commands it invokes).
+
+If var(arg) is omitted but one or more var(sig) args are provided (i.e.
+the first argument is a valid signal number or name), the effect is the
+same as if var(arg) had been specified as `tt(-)'.
+
+The tt(trap) command with no arguments prints a list of commands
+associated with each signal.
 
 If var(sig) is tt(ZERR) then var(arg) will be executed
-after each command with a nonzero exit status.
+after each command with a nonzero exit status.  tt(ERR) is an alias
+for tt(ZERR) on systems that have no tt(SIGERR) signal (this is the
+usual case).
 If var(sig) is tt(DEBUG) then var(arg) will be executed
 after each command.
 If var(sig) is tt(0) or tt(EXIT)
@@ -1174,10 +1188,7 @@ If var(sig) is tt(0) or tt(EXIT)
 and the tt(trap) statement is not executed inside the body of a function,
 then the command var(arg) is executed when the shell terminates.
 
-tt(ZERR), tt(DEBUG) and tt(EXIT) traps are not executed inside other traps.
-
-The tt(trap) command with no arguments prints a list of commands
-associated with each signal.
+tt(ZERR), tt(DEBUG), and tt(EXIT) traps are not executed inside other traps.
 
 Note that traps defined with the tt(trap) builtin are slightly different
 from those defined as `tt(TRAP)var(NAL) () { ... }', as the latter have
@@ -1201,7 +1212,7 @@ users stick exclusively to one name or another.
 findex(true)
 cindex(doing nothing, successfully)
 item(tt(true) [ var(arg) ... ])(
-Do nothing and return an exit code of 0.
+Do nothing and return an exit status of 0.
 )
 findex(ttyctl)
 cindex(tty, freezing)
@@ -1686,7 +1697,7 @@ compiled file.  Without further arguments, the names of the original
 files compiled into it are listed.  The first line of output shows
 the version of the shell which compiled the file and how the file
 will be used (i.e. by reading it directly or by mapping it into memory).
-With arguments, nothing is output and the return value is set to zero if
+With arguments, nothing is output and the return status is set to zero if
 definitions for em(all) var(name)s were found in the compiled
 file, and non-zero if the definition for at least one var(name) was not
 found.
