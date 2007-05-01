@@ -1191,13 +1191,13 @@ For example, a user-defined widget containing the following code
 converts the characters in the argument under the cursor into all upper
 case:
 
-example(modify-current-word '${(U)ARG}')
+example(modify-current-argument '${(U)ARG}')
 
 The following strips any quoting from the current word (whether backslashes
 or one of the styles of quotes), and replaces it with single quoting
 throughout:
 
-example(modify-current-word '${(qq)${(Q)ARG}}')
+example(modify-current-argument '${(qq)${(Q)ARG}}')
 )
 enditem()
 

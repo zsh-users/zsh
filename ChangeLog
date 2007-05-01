@@ -1,5 +1,7 @@
 2007-05-01  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/contrib.yo: typo in widget name.
+
 	* Guillaume Chazarain: 23364: Src/signals.c, Src/signals.h: fix
 	race in POSIX signal blocking - use local variables as other forms
 	already do.
