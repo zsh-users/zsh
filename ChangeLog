@@ -1,5 +1,9 @@
 2007-05-01  Peter Stephenson  <pws@csr.com>
 
+	* Guillaume Chazarain: 23364: Src/signals.c, Src/signals.h: fix
+	race in POSIX signal blocking - use local variables as other forms
+	already do.
+
 	* 23363: README (not posted), Doc/Zsh/compsys.yo,
 	Src/Zle/computil.c: fake-files style now takes pattern.
 

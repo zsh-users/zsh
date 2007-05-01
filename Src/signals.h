@@ -100,26 +100,10 @@
 
 #define restore_queue_signals(q) (queueing_enabled = (q))
 
-/* Make some signal functions faster. */
-
-#ifdef POSIX_SIGNALS
-#define signal_block(S) \
-    ((dummy_sigset1 = (S)), \
-     sigprocmask(SIG_BLOCK, &dummy_sigset1, &dummy_sigset2), \
-     dummy_sigset2)
-#else
-# ifdef BSD_SIGNALS
+#ifdef BSD_SIGNALS
 #define signal_block(S) sigblock(S)
-# else
-extern sigset_t signal_block _((sigset_t));
-# endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
-
-#ifdef POSIX_SIGNALS
-#define signal_unblock(S) \
-    ((dummy_sigset1 = (S)), \
-     sigprocmask(SIG_UNBLOCK, &dummy_sigset1, &dummy_sigset2), \
-     dummy_sigset2)
 #else
+extern sigset_t signal_block _((sigset_t));
+#endif  /* BSD_SIGNALS   */
+
 extern sigset_t signal_unblock _((sigset_t));
-#endif   /* POSIX_SIGNALS */
