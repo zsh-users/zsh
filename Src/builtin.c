@@ -4983,13 +4983,14 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    shfunctab->printnode(hn, 0);
 		DPUTS(!hn, "BUG: I did not find any trap functions!");
 	    } else if (sigtrapped[sig]) {
-		if (!sigfuncs[sig])
-		    printf("trap -- '' %s\n", sigs[sig]);
+		char *name = getsigname(sig);
+		if (!siglists[sig])
+		    printf("trap -- '' %s\n", name);
 		else {
 		    s = getpermtext(sigfuncs[sig], NULL);
 		    printf("trap -- ");
 		    quotedzputs(s, stdout);
-		    printf(" %s\n", sigs[sig]);
+		    printf(" %s\n", name);
 		    zsfree(s);
 		}
 	    }
@@ -5022,14 +5023,25 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     /* set traps */
     for (; *argv; argv++) {
 	Eprog t;
+	int flags;
 
 	sig = getsignum(*argv);
 	if (sig == -1) {
 	    zwarnnam(name, "undefined signal: %s", *argv, 0);
 	    break;
 	}
+	if (!strcmp(sigs[sig], *argv))
+	    flags = 0;
+	else {
+	    /*
+	     * Record that the signal is used under an assumed name.
+	     * If we ever have more than one alias per signal this
+	     * will need improving.
+	     */
+	    flags = ZSIG_ALIAS;
+	}
 	t = dupeprog(prog, 0);
-	if (settrap(sig, t))
+	if (settrap(sig, t, flags))
 	    freeeprog(t);
     }
     return *argv != NULL;
