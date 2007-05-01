@@ -319,6 +319,13 @@ will cause case-insensitive matching.  For example, tt(cvs+LPAR()/+RPAR())
 can match the directory tt(CVS) owing to the presence of the globbing flag
 (unless the option tt(BARE_GLOB_QUAL) is unset).
 )
+pindex(CASE_MATCH)
+cindex(case-insensitive regular expression matches, option)
+cindex(regular expressions, case-insensitive matching, option)
+item(tt(CASE_MATCH) <D>)(
+Make regular expressions using the tt(zsh/regex) module (including
+matches with tt(=~)) sensitive to case.
+)
 pindex(CSH_NULL_GLOB)
 cindex(csh, null globbing style)
 cindex(null globbing style, csh)
@@ -477,6 +484,15 @@ Array expansions of the form
 var(xx) is set to tt(LPAR())var(a b c)tt(RPAR()), are substituted with
 `var(fooabar foobbar foocbar)' instead of the default
 `var(fooa b cbar)'.
+)
+pindex(REMATCH_PCRE)
+cindex(regexp, PCRE)
+cindex(PCRE, regexp)
+item(tt(REMATCH_PCRE) <Z>)(
+If set, regular expression matching with the tt(=~) operator will use
+Perl-Compatible Regular Expressions from the PCRE library, if available.
+If not set, regular expressions will use the extended regexp syntax
+provided by the system libraries.
 )
 pindex(SH_GLOB)
 cindex(sh, globbing style)
@@ -1131,6 +1147,20 @@ enditem()
 
 subsect(Shell Emulation)
 startitem()
+pindex(BASH_REMATCH)
+cindex(bash, BASH_REMATCH variable)
+cindex(regexp, bash BASH_REMATCH variable)
+item(tt(BASH_REMATCH))(
+When set, matches performed with the tt(=~) operator will set the
+tt(BASH_REMATCH) array variable, instead of the default tt(MATCH) and
+tt(match) variables.  The first element of the tt(BASH_REMATCH) array
+will contain the entire matched text and subsequent elements will contain
+extracted substrings.  This option makes more sense when tt(KSH_ARRAYS) is
+also set, so that the entire matched portion is stored at index 0 and the
+first substring is at index 1.  Without this option, the tt(MATCH) variable
+contains the entire matched text and the tt(match) array variable contains
+substrings.
+)
 pindex(BSD_ECHO)
 cindex(echo, BSD compatible)
 item(tt(BSD_ECHO) <S>)(

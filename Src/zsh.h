@@ -519,8 +519,9 @@ struct timedfn {
 #define COND_GT    13
 #define COND_LE    14
 #define COND_GE    15
-#define COND_MOD   16
-#define COND_MODI  17
+#define COND_REGEX 16
+#define COND_MOD   17
+#define COND_MODI  18
 
 typedef int (*CondHandler) _((char **, int));
 
@@ -1588,11 +1589,13 @@ enum {
     BANGHIST,
     BAREGLOBQUAL,
     BASHAUTOLIST,
+    BASHREMATCH,
     BEEP,
     BGNICE,
     BRACECCL,
     BSDECHO,
     CASEGLOB,
+    CASEMATCH,
     CBASES,
     CDABLEVARS,
     CHASEDOTS,
@@ -1695,6 +1698,7 @@ enum {
     RCQUOTES,
     RCS,
     RECEXACT,
+    REMATCHPCRE,
     RESTRICTED,
     RMSTARSILENT,
     RMSTARWAIT,

@@ -109,6 +109,20 @@ backward compatibility and should be considered obsolete.
 item(var(string) tt(!=) var(pattern))(
 true if var(string) does not match var(pattern).
 )
+item(var(string) tt(=~) var(regexp))(
+true if var(string) matches the regular expression
+var(regexp).  If the option tt(RE_MATCH_PCRE) is set
+var(regexp) is tested as a PCRE regular expression using
+the tt(zsh/pcre) module, else it is tested as a POSIX
+regular expression using the tt(zsh/regex) module.
+If the option tt(BASH_REMATCH) is set the array
+tt(BASH_REMATCH) is set to the substring that matched the pattern
+followed by the substrings that matched parenthesised
+subexpressions within the pattern; otherwise, the scalar parameter
+tt(MATCH) is set to the substring that matched the pattern and
+and the array tt(match) to the substrings that matched parenthesised
+subexpressions.
+)
 item(var(string1) tt(<) var(string2))(
 true if var(string1) comes before var(string2)
 based on ASCII value of their characters.

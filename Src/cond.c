@@ -34,7 +34,7 @@ int tracingcond;
 
 static char *condstr[COND_MOD] = {
     "!", "&&", "||", "==", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
-    "-ne", "-lt", "-gt", "-le", "-ge"
+    "-ne", "-lt", "-gt", "-le", "-ge", "=~"
 };
 
 /*
@@ -53,14 +53,14 @@ int
 evalcond(Estate state, char *fromtest)
 {
     struct stat *st;
-    char *left, *right;
+    char *left, *right, *overridename, overridebuf[13];
     Wordcode pcode;
     wordcode code;
     int ctype, htok = 0, ret;
 
  rec:
 
-    left = right = NULL;
+    left = right = overridename = NULL;
     pcode = state->pc++;
     code = *pcode;
     ctype = WC_COND_TYPE(code);
@@ -92,13 +92,28 @@ evalcond(Estate state, char *fromtest)
 	    state->pc = pcode + (WC_COND_SKIP(code) + 1);
 	    return ret;
 	}
+    case COND_REGEX:
+	{
+	    char *modname = isset(REMATCHPCRE) ? "zsh/pcre" : "zsh/regex";
+	    if (!load_module_silence(modname, 1)) {
+		zwarnnam(fromtest, "%s not available for regex",
+			 modname);
+		return 2;
+	    }
+	    sprintf(overridename = overridebuf, "-%s-match", modname+4);
+	    ctype = COND_MODI;
+	}
+	/*FALLTHROUGH*/
     case COND_MOD:
     case COND_MODI:
 	{
 	    Conddef cd;
-	    char *name = ecgetstr(state, EC_NODUP, NULL), **strs;
+	    char *name = overridename;
+	    char **strs;
 	    int l = WC_COND_SKIP(code);
 
+	    if (name == NULL)
+		name = ecgetstr(state, EC_NODUP, NULL);
 	    if (ctype == COND_MOD)
 		strs = ecgetarr(state, l, EC_DUP, NULL);
 	    else {
@@ -139,7 +154,8 @@ evalcond(Estate state, char *fromtest)
 		    return !cd->handler(strs, cd->condid);
 		} else {
 		    zwarnnam(fromtest,
-			     "unrecognized condition: `%s'", name);
+			     "unrecognized condition: `%s'",
+			     name ? name : "<null>");
 		}
 	    }
 	    /* module not found, error */

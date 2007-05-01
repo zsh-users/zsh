@@ -22,14 +22,17 @@ Studies the previously-compiled PCRE which may result in faster
 matching.
 )
 findex(pcre_match)
-item(tt(pcre_match) [ tt(-a) var(arr) ] var(string))(
+item(tt(pcre_match) [ tt(-v) var(var) ] [ tt(-a) var(arr) ] var(string))(
 Returns successfully if tt(string) matches the previously-compiled
 PCRE.
 
 If the expression captures substrings within parentheses,
 tt(pcre_match) will set the array var($match) to those
 substrings, unless the tt(-a) option is given, in which
-case it will set the array var(arr).
+case it will set the array var(arr).  Similarly, the variable
+var(MATCH) will be set to the entire matched portion of the
+string, unless the tt(-v) option is given, in which case the variable
+var(var) will be set.
 )
 enditem()
 

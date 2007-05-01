@@ -1135,7 +1135,8 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       erand48 open_memstream \
 	       wctomb iconv \
 	       grantpt unlockpt ptsname \
-	       htons ntohs)
+	       htons ntohs \
+	       regcomp regexec regerror regfree)
 AC_FUNC_STRCOLL
 
 if test x$enable_cap = xyes; then

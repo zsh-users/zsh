@@ -1,3 +1,12 @@
+2007-05-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Phil Pennock + tweaks: 23375: configure.ac, Doc/Makefile.in,
+	Doc/Zsh/cond.yo, Doc/Zsh/mod_pcre.yo, Doc/Zsh/options.yo,
+	Src/cond.c, Src/options.c, Src/parse.c, Src/text.c, Src/zsh.h,
+	Src/Modules/pcre.c, Src/Modules/regex.c,  Src/Modules/regex.mdd:
+	Add zsh/regex option, =~ syntax and related options
+	BASH_REMATCH, NO_CASE_MATCH, RE_MATCH_PCRE.
+
 2007-05-01  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/contrib.yo: typo in widget name.

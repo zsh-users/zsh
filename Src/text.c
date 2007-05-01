@@ -640,7 +640,7 @@ gettext2(Estate state)
 	    {
 		static char *c1[] = {
 		    "=", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
-		    "-ne", "-lt", "-gt", "-le", "-ge"
+		    "-ne", "-lt", "-gt", "-le", "-ge", "=~"
 		};
 
 		int ctype;
@@ -724,7 +724,7 @@ gettext2(Estate state)
 			}
 			break;
 		    default:
-			if (ctype <= COND_GE) {
+			if (ctype < COND_MOD) {
 			    /* Binary test: `a = b' etc. */
 			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			    taddstr(" ");

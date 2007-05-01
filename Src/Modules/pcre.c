@@ -3,7 +3,7 @@
  *
  * This file is part of zsh, the Z shell.
  *
- * Copyright (c) 2001, 2002, 2003, 2004 Clint Adams
+ * Copyright (c) 2001, 2002, 2003, 2004, 2007 Clint Adams
  * All rights reserved.
  *
  * Permission is hereby granted, without written agreement and without
@@ -42,6 +42,37 @@ static pcre_extra *pcre_hints;
 
 /**/
 static int
+zpcre_utf8_enabled(void)
+{
+#if defined(MULTIBYTE_SUPPORT) && defined(HAVE_NL_LANGINFO) && defined(CODESET)
+    static int have_utf8_pcre = -1;
+
+    /* value can toggle based on MULTIBYTE, so don't
+     * be too eager with caching */
+    if (have_utf8_pcre < -1)
+	return 0;
+
+    if (!isset(MULTIBYTE))
+	return 0;
+
+    if ((have_utf8_pcre == -1) &&
+        (!strcmp(nl_langinfo(CODESET), "UTF-8"))) {
+
+	if (pcre_config(PCRE_CONFIG_UTF8, &have_utf8_pcre))
+	    have_utf8_pcre = -2; /* erk, failed to ask */
+    }
+
+    if (have_utf8_pcre < 0)
+	return 0;
+    return have_utf8_pcre;
+
+#else
+    return 0;
+#endif
+}
+
+/**/
+static int
 bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int pcre_opts = 0, pcre_errptr;
@@ -52,8 +83,14 @@ bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
     if(OPT_ISSET(ops,'m')) pcre_opts |= PCRE_MULTILINE;
     if(OPT_ISSET(ops,'x')) pcre_opts |= PCRE_EXTENDED;
     
+    if (zpcre_utf8_enabled())
+	pcre_opts |= PCRE_UTF8;
+
     pcre_hints = NULL;  /* Is this necessary? */
     
+    if (pcre_pattern)
+	pcre_free(pcre_pattern);
+
     pcre_pattern = pcre_compile(*args, pcre_opts, &pcre_error, &pcre_errptr, NULL);
     
     if (pcre_pattern == NULL)
@@ -100,37 +137,52 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 
 /**/
 static int
-zpcre_get_substrings(char *arg, int *ovec, int ret, char *receptacle)
+zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar, char *substravar, int matchedinarr)
 {
-    char **captures, **matches;
+    char **captures, **match_all, **matches;
+    int capture_start = 1;
 
-	if(!pcre_get_substring_list(arg, ovec, ret, (const char ***)&captures)) {
-	    
-	    matches = zarrdup(&captures[1]); /* first one would be entire string */
-	    if (receptacle == NULL)
-		setaparam("match", matches);
-	    else
-		setaparam(receptacle, matches);
-	    
-	    pcre_free_substring_list((const char **)captures);
-	}
+    if (matchedinarr)
+	capture_start = 0;
+    if (matchvar == NULL)
+	matchvar = "MATCH";
+    if (substravar == NULL)
+	substravar = "match";
 
-	return 0;
+    /* captures[0] will be entire matched string, [1] first substring */
+    if(!pcre_get_substring_list(arg, ovec, ret, (const char ***)&captures)) {
+	match_all = ztrdup(captures[0]);
+	setsparam(matchvar, match_all);
+	matches = zarrdup(&captures[capture_start]);
+	setaparam(substravar, matches);
+	pcre_free_substring_list((const char **)captures);
+    }
+
+    return 0;
 }
 
 /**/
 static int
 bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    int ret, capcount, *ovec, ovecsize;
+    int ret, capcount, *ovec, ovecsize, c;
+    char *matched_portion = NULL;
     char *receptacle = NULL;
+    int return_value = 1;
+
+    if (pcre_pattern == NULL) {
+	zwarnnam(nam, "no pattern has been compiled");
+	return 1;
+    }
     
-    if(OPT_ISSET(ops,'a')) {
-	receptacle = *args++;
-	if(!*args) {
-	    zwarnnam(nam, "not enough arguments");
-	    return 1;
-	}
+    if(OPT_HASARG(ops,c='a')) {
+	receptacle = OPT_ARG(ops,c);
+    }
+    if(OPT_HASARG(ops,c='v')) {
+	matched_portion = OPT_ARG(ops,c);
+    }
+    if(!*args) {
+	zwarnnam(nam, "not enough arguments");
     }
     
     if ((ret = pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount)))
@@ -144,18 +196,20 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     
     ret = pcre_exec(pcre_pattern, pcre_hints, *args, strlen(*args), 0, 0, ovec, ovecsize);
     
-    if (ret==0) return 0;
-    else if (ret==PCRE_ERROR_NOMATCH) return 1; /* no match */
+    if (ret==0) return_value = 0;
+    else if (ret==PCRE_ERROR_NOMATCH) /* no match */;
     else if (ret>0) {
-	zpcre_get_substrings(*args, ovec, ret, receptacle);
-	return 0;
+	zpcre_get_substrings(*args, ovec, ret, matched_portion, receptacle, 0);
+	return_value = 0;
     }
     else {
 	zwarnnam(nam, "error in pcre_exec");
-	return 1;
     }
     
-    return 1;
+    if (ovec)
+	zfree(ovec, ovecsize*sizeof(int));
+
+    return return_value;
 }
 
 /**/
@@ -164,33 +218,63 @@ cond_pcre_match(char **a, int id)
 {
     pcre *pcre_pat;
     const char *pcre_err;
-    char *lhstr, *rhre;
+    char *lhstr, *rhre, *avar=NULL;
     int r = 0, pcre_opts = 0, pcre_errptr, capcnt, *ov, ovsize;
+    int return_value = 0;
+
+    if (zpcre_utf8_enabled())
+	pcre_opts |= PCRE_UTF8;
 
     lhstr = cond_str(a,0,0);
     rhre = cond_str(a,1,0);
+    pcre_pat = ov = NULL;
+
+    if (isset(BASHREMATCH))
+	avar="BASH_REMATCH";
 
     switch(id) {
 	 case CPCRE_PLAIN:
-		 pcre_pat = pcre_compile(rhre, pcre_opts, &pcre_err, &pcre_errptr, NULL);
-                 pcre_fullinfo(pcre_pat, NULL, PCRE_INFO_CAPTURECOUNT, &capcnt);
-    		 ovsize = (capcnt+1)*3;
-		 ov = zalloc(ovsize*sizeof(int));
-    		 r = pcre_exec(pcre_pat, NULL, lhstr, strlen(lhstr), 0, 0, ov, ovsize);
-    		if (r==0) return 1;
+		pcre_pat = pcre_compile(rhre, pcre_opts, &pcre_err, &pcre_errptr, NULL);
+		if (pcre_pat == NULL) {
+		    zwarn("failed to compile regexp /%s/: %s", rhre, pcre_err);
+		    break;
+		}
+                pcre_fullinfo(pcre_pat, NULL, PCRE_INFO_CAPTURECOUNT, &capcnt);
+    		ovsize = (capcnt+1)*3;
+		ov = zalloc(ovsize*sizeof(int));
+    		r = pcre_exec(pcre_pat, NULL, lhstr, strlen(lhstr), 0, 0, ov, ovsize);
+		/* r < 0 => error; r==0 match but not enough size in ov
+		 * r > 0 => (r-1) substrings found; r==1 => no substrings
+		 */
+    		if (r==0) {
+		    zwarn("reportable zsh problem: pcre_exec() returned 0");
+		    return_value = 1;
+		    break;
+		}
 	        else if (r==PCRE_ERROR_NOMATCH) return 0; /* no match */
+		else if (r<0) {
+		    zwarn("pcre_exec() error: %d", r);
+		    break;
+		}
                 else if (r>0) {
-		    zpcre_get_substrings(lhstr, ov, r, NULL);
-		    return 1;
+		    zpcre_get_substrings(lhstr, ov, r, NULL, avar, isset(BASHREMATCH));
+		    return_value = 1;
+		    break;
 		}
 		break;
     }
 
-    return 0;
+    if (pcre_pat)
+	pcre_free(pcre_pat);
+    if (ov)
+	zfree(ov, ovsize*sizeof(int));
+
+    return return_value;
 }
 
 static struct conddef cotab[] = {
     CONDDEF("pcre-match", CONDF_INFIX, cond_pcre_match, 0, 0, CPCRE_PLAIN)
+    /* CONDDEF can register =~ but it won't be found */
 };
 
 /**/
@@ -206,7 +290,7 @@ static struct conddef cotab[] = {
 static struct builtin bintab[] = {
     BUILTIN("pcre_compile", 0, bin_pcre_compile, 1, 1, 0, "aimx",  NULL),
     BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL),
-    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 2, 0, "a",    NULL)
+    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, "a:v:",    NULL)
 };
 
 
