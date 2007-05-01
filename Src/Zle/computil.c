@@ -4247,14 +4247,20 @@ cfp_add_sdirs(LinkList final, LinkList orig, char *skipped,
 	char *m, *f, *p, *t, *a, c;
 	int sl = strlen(skipped) + 1;
 	struct stat st1, st2;
+	Patprog pprog;
 
 	for (; (f = *fake); fake++) {
 	    f = dupstring(f);
 	    for (p = t = f; *p; p++) {
 		if (*p == ':')
 		    break;
-		else if (*p == '\\' && p[1])
+		else if (*p == '\\' && p[1] == ':') {
+		    /*
+		     * strip quoted colons here; rely
+		     * on tokenization to strip other backslashes
+		     */
 		    p++;
+		}
 		*t++ = *p;
 	    }
 	    if (*p) {
@@ -4262,9 +4268,12 @@ cfp_add_sdirs(LinkList final, LinkList orig, char *skipped,
 		if (!*p)
 		    continue;
 
+		tokenize(f);
+		pprog = patcompile(f, PAT_STATIC, NULL);
+		untokenize(f);
 		for (node = firstnode(orig); node; incnode(node)) {
 		    if ((m = (char *) getdata(node)) &&
-			(!strcmp(f, m) ||
+			((pprog ? pattry(pprog, m) : !strcmp(f, m)) ||
 			 (!stat(f, &st1) && !stat((*m ? m : "."), &st2) &&
 			  st1.st_dev == st2.st_dev &&
 			  st1.st_ino == st2.st_ino))) {

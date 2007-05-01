@@ -104,6 +104,11 @@ change was necessary because otherwise recursive directories under
 hit for anyone not using PINE.  The previous default can be restored with:
   zstyle ':completion:*' pine-directory ~/mail
 
+The completion style fake-files now allows patterns as directories,
+for example the value '/home/*:.snapshot' is now valid.  This will
+only cause problems in the unlikely event that a directory in the style
+has a pattern character in it.
+
 The default maximum function depth (configurable with
 --enable-max-function-depth) has been decreased to 1000 from 4096.  The
 previous value was observed to be large enough that crashes still occurred
