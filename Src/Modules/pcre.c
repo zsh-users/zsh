@@ -139,7 +139,7 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 static int
 zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar, char *substravar, int matchedinarr)
 {
-    char **captures, **match_all, **matches;
+    char **captures, *match_all, **matches;
     int capture_start = 1;
 
     if (matchedinarr)
@@ -227,7 +227,8 @@ cond_pcre_match(char **a, int id)
 
     lhstr = cond_str(a,0,0);
     rhre = cond_str(a,1,0);
-    pcre_pat = ov = NULL;
+    pcre_pat = NULL;
+    ov = NULL;
 
     if (isset(BASHREMATCH))
 	avar="BASH_REMATCH";
