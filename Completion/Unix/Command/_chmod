@@ -1,0 +1,82 @@
+#compdef chmod
+
+local curcontext="$curcontext" state line expl ret=1
+local -a args privs
+
+args=( '*:file:->files' )
+(( $+words[(r)--reference*] )) || args+=( '1:mode:->mode' )
+
+if _pick_variant gnu=Free\ Soft unix --version; then
+  args+=(
+    '(-v --verbose -c --changes)'{-c,--changes}'[report changes made]'
+    '(-v --verbose -c --changes)'{-v,--verbose}'[output a diagnostic for every file processed]'
+    '(-f --silent --quiet)'{-f,--silent,--quiet}'[suppress most error messages]'
+    '--reference=[copy permissions of specified file]:file:_files'
+    '(-R --recursive)'{-R,--recursive}'[change files and directories recursively]'
+    '(- : *)--help[display help information]'
+    '(- : *)--version[display version information]'
+  )
+  privs=(
+    'X[execute only if executable to another]'
+    "u[owner's current permissions]"
+    "g[group's current permissions]"
+    "o[other's current permissions]"
+  )
+else
+  # based on $OSTYPE = solaris2.8
+  args+=(
+    '-f[suppress most error messages]'
+    '-R[change files and directories recursively]'
+  )
+  privs=( 'l[mandatory locking]' )
+fi
+
+_arguments -C -s "$args[@]" && ret=0
+
+case "$state" in
+  mode)
+    compset -P \*,
+    compset -S ,\*
+    if [[ -prefix [0-7] ]]; then
+      _message -e number 'numeric mode'
+    elif compset -P '[a-z]#[+-=]'; then
+      _values -S '' privilege \
+	'r[read]' 'w[write]' 'x[execute]' \
+	's[set uid/gid]' 't[sticky]' \
+	"$privs[@]" && ret=0
+    else
+      suf=( -S '' )
+      compset -P '*'
+      _alternative -O suf \
+	'who:who:((u\:user g\:group a\:all o\:others))' \
+	'operators:operator:(+ - =)'
+    fi
+  ;;
+  files)
+    if [[ -n $opt_args[--reference] ]]; then
+      if zstyle -t ":completion:${curcontext}:" disable-stat; then
+	_files && ret=0
+      else
+	zmodload -i zsh/stat 2>/dev/null
+	typeset -i8 ref=$(stat +mode $opt_args[--reference])
+	_wanted files expl file _files -g "*(-.^f${ref#??})" && ret=0
+      fi
+    elif [[ $words[2] = [0-7]## ]]; then
+      _wanted files expl file _files -g "*(-.^f$words[2])" && ret=0
+    else
+      local spec who op priv
+      local -a specs
+      for spec in ${(s:,:)words[2]}; do
+	if [[ ${spec#*[+-=]} != [rwxst]## ]]; then
+	  _files && ret=0
+	  return ret
+	fi
+
+	specs+=( ${${(M)spec##[+-=]*}:+a}$spec )
+      done
+      _wanted files expl file _files -g "*(-.^f:${(j.,.)specs}:)" && ret=0
+    fi
+  ;;
+esac
+
+return ret
