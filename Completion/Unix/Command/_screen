@@ -58,10 +58,10 @@ scr_cmds=(
 _arguments -C \
   "-a[force all capabilities into each window's termcap]" \
   '-A[adapt all windows to the new display width & height]' \
-  "-c[read configuration file instead of '.screenrc']:config file:_files -/" \
+  "-c[read configuration file instead of '.screenrc']:config file:_files" \
   '-d[detach the elsewhere running screen (with -r: reattach here)]: :->attached-sessions' \
-  '-dmS[start as daemon, screen session in detached mode]: :->detached-sessions' \
-  '-D[detach and logout remote (with -r: reattach here)]' \
+  '-dmS[start as daemon, screen session in detached mode]:session name' \
+  '-D[detach and logout remote (with -r: reattach here)]: :->attached-sessions' \
   '-e[change command characters]:command characters' \
   '-f-[set flow control]:flow control:((n\:flow\ control\ off a\:flow\ control\ auto \:flow\ control\ on))' \
   '-h[set the size of the scrollback history buffer]:buffer size' \
@@ -75,7 +75,7 @@ _arguments -C \
   '-p[preselect the named window]:window number or name:((\=\:windowlist -\:blank\ window \:window\ number))' \
   '-q[quiet startup, exit with non-zero return code if unsuccessful]' \
   '-r[reattach to a detached screen process]: :->detached-sessions' \
-  '-R[reattach if possible, otherwise start a new session]' \
+  '-R[reattach if possible, otherwise start a new session]: :->detached-sessions' \
   '-s[shell to execute rather than $SHELL]:shell name: _command_names -e' \
   '-S[name this session <pid>.sockname instead of <pid>.<tty>.<host>]:session name' \
   "-t[set title (window's name)]:title" \
