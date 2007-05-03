@@ -1,0 +1,44 @@
+#compdef lsof
+
+_arguments -s -S \
+  '(-)'{-\?,-h}'[list help]' \
+  '-a[AND selections]' \
+  '-b[avoid kernel blocks]' \
+  '-C[disable reporting of path name components]' \
+  '-c[list files for command beginning with specified char]:char' \
+  '+d[search for open instances for contents of specified dir]:search directory:_files -/' \
+  '-d[specify list of file descriptors to exclude/include]:file descriptors' \
+  '+D[recursively search from specified dir]:search directory:_files -/' \
+  '-D[direct use of device cache file]:function:((\?\:report\ device\ cache\ file\ paths b\:build\ the\ device\ cache\ file i\:ignore\ the\ device\ cache\ file r\:read\ the\ device\ cache\ file u\:read\ and\ update\ the\ device\ cache\ file))' \
+  '-f[inhibit listing of kernel file structure info]::info type or path' \
+  '+f[enable listing of kernel file structure info]::info type' \
+  '-F[select output fields]:fields' \
+  '-g[select by process group id]::process group id' \
+  '*-i[select internet files]:address' \
+  '-k[specify kernel name list file]:kernel file:_files' \
+  '-l[inhibit conversion of UIDs to user names]' \
+  '-L[list no link counts]' \
+  '+L[list all link counts]::max link count for listed files' \
+  '-m[specify kernel memory file]:kernel memory file:_files' \
+  '-M[disable reporting of portmapper registrations]' \
+  '+M[enable reporting of portmapper registrations]' \
+  '-n[inhibit conversion of network numbers to hostnames]' \
+  '-N[select listing of NFS files]' \
+  '(-s)-o[list file offset]' \
+  '-O[avoid overheads of bypassing potential blocking]' \
+  '-P[inhibit conversion of port numbers to port names]' \
+  '-p[list files for specified processes]:process ID:_pids' \
+  '-r[repeat listing endlessly]::delay (seconds)' \
+  '+r[repeat listing until no files listed]::delay (seconds)' \
+  '-R[list parent PID]' \
+  '(-o)-s[list file size]' \
+  '-S[specify timeout for kernel functions that might deadlock]:timeout (seconds)' \
+  '-T[select reporting of TCP/TPI info]::info type:((q\:queue\ length\ reporting s\:state\ reporting w\:window\ size\ reporting))' \
+  '(+w -w)-t[terse output]' \
+  '-u[list files owned by specified users]:user:_users -S,' \
+  '-U[list Unix domain socket files]' \
+  '(-)-v[list version info]' \
+  '-V[indicate unsuccessfully searched for items]' \
+  '(-t)+w[suppress warnings]' \
+  '(-t)-w[enable warnings]' \
+  '*:file:_files'

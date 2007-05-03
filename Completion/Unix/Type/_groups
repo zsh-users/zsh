@@ -1,0 +1,24 @@
+#compdef newgrp groupdel
+
+local expl groups tmp
+
+_tags groups || return 1
+
+if ! zstyle -a ":completion:${curcontext}:" groups groups; then
+  (( $+_cache_groups )) ||
+      if [[ $OSTYPE = darwin* ]]; then
+        : ${(A)_cache_groups:=${${(M)${(f)"$(_call_program groups lookupd -q group)"}:#name*}##*: }}
+      elif (( ${+commands[getent]} )); then
+        : ${(A)_cache_groups:=${${(s: :)$(_call_program groups getent group 2>/dev/null)}%%:*}}
+      else
+        : ${(A)_cache_groups:=${${${(s: :)$(</etc/group)}%%:*}:#+}}
+	if (( ${+commands[ypcat]} )) &&
+	    tmp=$(_call_program groups ypcat group.byname 2>/dev/null); then
+          _cache_groups+=( ${${(f)tmp}%%:*} ) # If you use YP
+	fi
+      fi
+
+  groups=( "$_cache_groups[@]" )
+fi
+
+_wanted groups expl group compadd -a "$@" - groups

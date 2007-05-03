@@ -1,0 +1,17 @@
+#compdef last lastb
+
+_arguments -s \
+  '-a[display hostname in last column]' \
+  '-n[number]:number' \
+  '-[number]:number' \
+  '-f[filename]:filename:_files' \
+  '-R[suppress display of hostname field]' \
+  '-d[translate IP to hostname]' \
+  '-i[display IP]' \
+  '-o[read old-format wtmp]' \
+  '-x[display shutdown/runlevel entries]' \
+  '-h[hostname]:host:_hosts' \
+  '-s[report duration in seconds]' \
+  '-t[tty]:tty' \
+  '-w[widen duration field]' \
+  '*:user:_users'

@@ -1,0 +1,72 @@
+#compdef -value-,PRINTER,-default- -value-,LPDEST,-default-
+
+local expl ret=1 list disp sep tmp
+
+if (( $+commands[lsallq] )); then
+  # Use AIX's command to list print queues
+  _wanted printers expl printer compadd "$@" - $(lsallq)
+  return
+fi
+
+zstyle -s ":completion:${curcontext}:printers" list-separator sep || sep=--
+
+if (( ! $+_lp_cache )); then
+  local file entry names i
+
+  file=( /etc/(printcap|printers.conf) )
+
+  _lp_cache=()
+  _lp_alias_cache=()
+
+  if (( $#file )); then
+    while read entry; do
+      if [[ "$entry" = [^[:blank:]\#\*_]*:* ]]; then
+        names=( "${(s:|:)entry%%:*}" )
+        if [[ "$entry" = *:description=* ]]; then
+          disp="${${entry##*:description=}%%:*}"
+        elif [[ $#names -gt 1 && "$names[-1]" = *\ * ]] ;then
+          disp="$names[-1]"
+        else
+          disp=''
+        fi
+        if [[ -n "$disp" ]]; then
+          _lp_cache+=( "${names[1]}:${disp}" )
+  	  _lp_alias_cache+=( "${(@)^names[2,-1]:#*\ *}:${disp}" )
+        else
+          _lp_cache+=( "${names[1]}" )
+  	  _lp_alias_cache+=( "${(@)names[2,-1]:#*\ *}" )
+        fi
+      fi
+    done < $file[1]
+  fi
+
+  if [[ $OSTYPE = solaris* ]] && (( ${+commands[ypcat]} )) &&
+      tmp=$(_call_program printers ypcat printers.conf.byname 2>/dev/null); then
+    _lp_cache+=( ${${${(S)${(f)tmp}/(#b):*((#e)|description=([^:]#):)*/:${match[2]}|}%%|*}:#_default*} ) # If you use YP
+  fi
+
+  (( $#_lp_cache )) || _lp_cache=( 'lp0:Guessed default printer' )
+  (( $#_lp_alias_cache )) || unset _lp_alias_cache
+fi
+
+if zstyle -T ":completion:${curcontext}:printers" verbose; then
+  zformat -a list " $sep " "$_lp_cache[@]"
+  disp=(-ld list)
+else
+  disp=()
+fi
+_wanted printers expl printer \
+    compadd "$@" "$disp[@]" - "${(@)_lp_cache%%:*}" && return 0
+
+(( $+_lp_alias_cache )) || return 1
+
+if zstyle -T ":completion:${curcontext}:printers" verbose; then
+  zformat -a list " $sep " "$_lp_alias_cache[@]"
+  disp=(-ld list)
+else
+  disp=()
+fi
+_wanted printers expl printer \
+    compadd "$@" "$disp[@]" - "${(@)_lp_alias_cache%%:*}" && return 0
+
+return 1

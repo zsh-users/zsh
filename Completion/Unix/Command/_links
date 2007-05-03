@@ -1,0 +1,50 @@
+#compdef links
+
+local curcontext="$curcontext" state line ret=1
+typeset -A opt_args
+
+_arguments -C \
+  '(-help)-anonymous[restrict links so that it can run on an anonymous account]' \
+  '(-help)-assume-codepage[specify default codepage to use]:codepage' \
+  '(-help)-async-dns[asynchronous DNS resolver]:bool:((0\:on 1\:off))' \
+  '(-help)-download-dir[default download directory]:_files -/' \
+  '(-help)-driver[graphics driver to use]:graphics driver:->graphics_drivers' \
+  '(-help)-dump[dump the page as pure text]' \
+  '(-help)-format-cache-size[number of formatted document pages cached]:pages' \
+  '(-help)-ftp-proxy[specify ftp proxy server]:proxy:->proxies' \
+  '(-help)-g[run in graphics mode rather than plain text mode]' \
+  '-help[prints the help screen]' \
+  '(-help)-http-proxy[specify web proxy server]:proxy:->proxies' \
+  '(-help)-image-cache-size[image cache memory]:memory (kilobytes)' \
+  '(-help)-max-connections[maximum number of concurrent connections]:connections' \
+  '(-help)-max-connections-to-host[maximum number of concurrent connection to a given host]:connections' \
+  '(-help)-memory-cache-size[cache memory]:kilobytes' \
+  '(-help)-no-connect[runs links as a separate instance]' \
+  '(-help)-receive-timeout[timeout on receive]:timeout (seconds)' \
+  '(-help)-retries[number of retries]:retries' \
+  '(-help)-source[dump the source page]' \
+  '(-help)-unrestartable-receive-timeout[timeout on non restartable connections]:timeout (seconds)' \
+  '(-help)-version[prints the links version number and exit]' \
+  ':URL:->html' && ret=0
+
+case $state in
+  html)
+    _alternative 'files:file:_files -g "*.x#html(-.)"' 'urls:URL:_urls' && ret=0
+  ;;
+  graphics_drivers)
+    local -a vals
+    vals=( ${=${${${(f)"$(_call_program links-graphics-drivers links -driver help 2>&1)"}[-1]}//','/''}} )
+    _describe -t links-graphics-drivers 'graphics driver' vals && ret=0
+  ;;
+  proxies)
+    local suf=-S:
+    if compset -P '*:'; then
+      _message -e ports 'port number'
+    else
+      compset -S ':*' && suf= 
+      _hosts $suf && ret=0
+    fi
+  ;;  
+esac
+
+return ret
