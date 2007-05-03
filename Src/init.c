@@ -112,7 +112,7 @@ loop(int toplevel, int justonce)
 	hbegin(1);		/* init history mech        */
 	if (isset(SHINSTDIN)) {
 	    setblock_stdin();
-	    if (interact) {
+	    if (interact && toplevel) {
 	        int hstop = stophist;
 		stophist = 3;
 		preprompt();
@@ -308,14 +308,14 @@ parseargs(char **argv)
     }
     if (*argv) {
 	if (unset(SHINSTDIN)) {
-	    argzero = *argv;
 	    if (!cmd)
-		SHIN = movefd(open(unmeta(argzero), O_RDONLY | O_NOCTTY));
+		SHIN = movefd(open(unmeta(*argv), O_RDONLY | O_NOCTTY));
 	    if (SHIN == -1) {
-		zerr("can't open input file: %s", argzero, 0);
-		exit(1);
+		zerr("can't open input file: %s", *argv, 0);
+		exit(127);
 	    }
 	    opts[INTERACTIVE] &= 1;
+	    argzero = *argv;
 	    argv++;
 	}
 	while (*argv)
