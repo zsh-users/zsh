@@ -1,0 +1,68 @@
+#compdef php
+
+# PHP 5.0.4  (cli)
+# PHP 4.3.11 (cli)
+
+local curcontext="$curcontext" line state expl
+typeset -A opt_args
+
+local -a args
+local exclusions php_files=':PHP file:_files -g "*.php(-.)"'
+
+if _pick_variant php5=PHP\ 5 php4 --version; then
+  exclusions="-B --process-begin -R --process-code -F --process-file -E --process-end"
+  args=(
+    '(-B --process-begin -f --file -r --run 1)'{-B,--process-begin}'[run specified PHP code before processing input lines]:PHP code:'
+    '(-R --process-code -F --process-file -f --file -r --run 1)'{-R,--process-code}'[run specified PHP code for every input line]:PHP code:'
+    '(-F --process-file -R --process-code -f --file -r --run 1)'{-F,--process-file}'[parse and execute specified file for every input line]'$php_files
+    '(-E --process-end -f --file -r --run 1)'{-E,--process-end}'[run specified PHP code after processing all input lines]:PHP code:'
+    '(-H --hide-args)'{-H,--hide-args}'[hide any passed arguments from external tools]'
+  )
+fi
+
+args+=(
+  '(-a --interactive)'{-a,--interactive}'[run interactively]'
+  '(-c --php-ini -n --no-php-ini)'{-c,--php-ini}'[look for php.ini file in the specified directory]:INI file or directory:_files -g "*.ini(-.)"'
+  '(-c --php-ini -n --no-php-ini)'{-n,--no-php-ini}'[no php.ini file will be used]'
+  '(-d --define)'{-d,--define}'[define INI entry]:configuration directive:->directive'
+  '(-e --profile-info)'{-e,--profile-info}'[generate extended information for debugger/profiler]'
+  "(-f --file -r --run $exclusions 1)"{-f,--file}'[parse specified file]'$php_files
+  '(- 1 *)'{-h,--help}'[display help information]'
+  '(- 1 *)'{-i,--info}'[PHP information]'
+  '(-   *)'{-l,--syntax-check}'[syntax check only (lint)]'
+  '(- 1 *)'{-m,--modules}'[show compiled in modules]'
+  "(-r --run -f --file $exclusions -l --syntax-check -s --syntax-highlight -w --strip 1)"{-r,--run}'[run the specified PHP code without using script tags <?..?>]:PHP code:'\
+  '(- 1 *)'{-s,--syntax-highlight}'[display colour syntax highlighted source]'
+  '(- 1 *)'{-v,--version}'[display version information]'
+  '(-   *)'{-w,--strip}'[display source with stripped comments and whitespace]'
+  '(-z --zend-extension)'{-z,--zend-extension}'[load specified Zend extension]:extension file:->extension'
+  '(-)1'$php_files
+  '(-)*::script argument: _normal'
+)
+
+_arguments -C -s -S -A "-*" "$args[@]" && return 0
+
+case $state in
+  directive)
+    local -a directives suf
+    local code='foreach (ini_get_all() as $k => $v) { echo "$k\n"; }'
+    directives=( $(_call_program directives $words[1] -r ${(q)code} 2>/dev/null) )
+    if compset -P '*='; then
+      _default && return 0
+    else
+      compset -S '=*' || suf=( -qS '=' )
+      _wanted directives expl 'configuration directive' compadd "$suf[@]" -a directives && return 0
+    fi
+  ;;
+  extension)
+    local -a paths
+    if [[ -r /etc/ld.so.conf ]]; then
+      paths=( ${(f)"$(</etc/ld.so.conf)"} )
+    else
+      paths=(.)
+    fi
+    _wanted extensions expl 'zend extension' _files -W paths -g "*.so(|.*)(-.)" && return 0
+  ;;
+esac
+
+return 1
