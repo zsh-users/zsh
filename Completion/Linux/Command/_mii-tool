@@ -1,0 +1,12 @@
+#compdef mii-tool
+
+_arguments -s \
+  '(-V --version)'{-V,--version}'[display version information]' \
+  '(-v --verbose)'{-v,--verbose}'[verbose output]' \
+  '(-R --reset)'{-R,--reset}'[reset MII to poweron state]' \
+  '(-r --restart)'{-r,--restart}'[restart autonegotiation]' \
+  '(-w --watch)'{-w,--watch}'[monitor for link status changes]' \
+  '(-l --log)'{-l,--log}'[write events to syslog]' \
+  '(-A --advertise)'{-A,--advertise=}'[advertise only specified media]:medium:_values -s , medium 100baseT4 100baseTx-FD 100baseTx-HD 10baseT-FD 10baseT-HD 100baseTx 10baseT' \
+  '(-F --force)'{-F,--force=}'[force specified medium]:medium:(100baseT4 100baseTx-FD 100baseTx-HD 10baseT-FD 10baseT-HD 100baseTx 10baseT)' \
+  '*:interface:_net_interfaces'
