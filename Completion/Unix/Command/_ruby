@@ -1,0 +1,72 @@
+#compdef ruby -P -value-,RUBY(LIB|OPT|PATH),-default-
+
+# ruby 1.8.2 (2004-12-25) [i686-linux]
+
+local curcontext="$curcontext" state line expl ret=1
+typeset -A opt_args
+
+local -a args opts
+
+args=(
+  '(-)1:script file:_files -g "*.rb(-.)"'
+  '*::script argument: _normal'
+)
+
+opts=(
+  '-0-[specify record separator]:input record separator in octal (default \0):'
+  '-a[autosplit mode with -n or -p (splits $_ into $F)]'
+  '-c[check syntax only]'
+  '-C+[cd to directory, before executing your script]:directory:_files -/'
+  '(-d --debug)'{-d,--debug}'[set debugging flags (set $DEBUG to true)]'
+  "(1)*-e+[one line of script (several -e's allowed, omit program file)]:one line of script:"
+  '-F-[split() pattern for autosplit (-a)]:input field separator:'
+  '-i-[edit ARGV files in place (make backup if extension supplied)]:suffix for in-place-edit mode:(.bak)'
+  '*-I+[specify $LOAD_PATH directory (may be used more than once)]:library directory:_files -/'
+  '-K-[specifies KANJI (Japanese) code-set]:KANJI encoding:((e\:EUC-JP s\:Shift_JIS u\:UTF-8 N\:None))'
+  "-l[assume 'while gets(); ... end' loop around your script]"
+  "(-p)-n[assume 'while gets(); ... end' loop around your script]"
+  '(-n)-p[assume loop like -n but print line also like sed]'
+  '*-r+[require the library, before executing your script]:library name:->library'
+  '-s[enable some switch parsing for switches after script name]'
+  '-S[look for the script using PATH environment variable]'
+  '-T-[turn on tainting checks]:taint level (default 0):((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))'
+  '(-v --verbose)'{-v,--verbose}'[print version number, then turn on verbose mode]'
+  '-w[turn warnings on for your script]'
+  '-W-[set warning level]:warning level (default 2):((0\:silent 1\:medium 2\:verbose))'
+  '(-y --yydebug)'{-y,--yydebug}'[enable yacc debugging in the parser]'
+  '-x-[strip off text before #!ruby line and perhaps cd to directory]:directory:_files -/'
+  '(1 * -)--copyright[print the copyright]'
+  '(1 * -)'{-h,--help}'[print help message]'
+  '(1 * -)--version[print the version]'
+)
+
+case "$service" in
+  *RUBY(LIB|PATH)*)
+    _dir_list && return 0
+  ;;
+  *RUBYOPT*)
+    compset -q
+    words=( fake "$words[@]" )
+    (( CURRENT++ ))
+    _arguments -C -s : "${(@M)opts:#*-[IdvwrK](|[-+])\[*}" && ret=0
+  ;;
+  ruby)
+    _arguments -C -s -S : "$opts[@]" "$args[@]" && ret=0
+  ;;
+esac
+
+case "$state" in
+  library)
+    local -a dirs
+    local cmd
+    if [[ "$service" = *RUBYOPT* ]]; then
+      cmd=ruby
+    else
+      cmd=$words[1]
+    fi
+    dirs=( $(_call_program directories $cmd -e 'puts\ \$:' 2>/dev/null) ${(s.:.)opt_args[-I]} )
+    _wanted libraries expl library _path_files -W dirs && ret=0
+  ;;
+esac
+
+return ret
