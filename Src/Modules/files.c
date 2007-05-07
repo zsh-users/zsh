@@ -56,7 +56,7 @@ ask(void)
 
 /**/
 static int
-bin_sync(char *nam, char **args, char *ops, int func)
+bin_sync(UNUSED(char *nam), UNUSED(char **args), UNUSED(Options ops), UNUSED(int func))
 {
     sync();
     return 0;
@@ -66,20 +66,16 @@ bin_sync(char *nam, char **args, char *ops, int func)
 
 /**/
 static int
-bin_mkdir(char *nam, char **args, char *ops, int func)
+bin_mkdir(char *nam, char **args, Options ops, UNUSED(int func))
 {
     mode_t oumask = umask(0);
     mode_t mode = 0777 & ~oumask;
     int err = 0;
 
     umask(oumask);
-    if(ops['m']) {
-	char *str = *args++, *ptr;
+    if(OPT_ISSET(ops,'m')) {
+	char *str = OPT_ARG(ops,'m'), *ptr;
 
-	if(!*args) {
-	    zwarnnam(nam, "not enough arguments", NULL, 0);
-	    return 1;
-	}
 	mode = zstrtol(str, &ptr, 8);
 	if(!*str || *ptr) {
 	    zwarnnam(nam, "invalid mode `%s'", str, 0);
@@ -91,12 +87,7 @@ bin_mkdir(char *nam, char **args, char *ops, int func)
 
 	while(ptr > *args + (**args == '/') && *--ptr == '/')
 	    *ptr = 0;
-	if(ztrlen(*args) > PATH_MAX - 1) {
-	    zwarnnam(nam, "%s: %e", *args, ENAMETOOLONG);
-	    err = 1;
-	    continue;
-	}
-	if(ops['p']) {
+	if(OPT_ISSET(ops,'p')) {
 	    char *ptr = *args;
 
 	    for(;;) {
@@ -136,7 +127,7 @@ domkdir(char *nam, char *path, mode_t mode, int p)
     if(p) {
 	struct stat st;
 
-	if(!lstat(rpath, &st) && S_ISDIR(st.st_mode))
+	if(!stat(rpath, &st) && S_ISDIR(st.st_mode))
 	    return 0;
     }
     oumask = umask(0);
@@ -152,7 +143,7 @@ domkdir(char *nam, char *path, mode_t mode, int p)
 
 /**/
 static int
-bin_rmdir(char *nam, char **args, char *ops, int func)
+bin_rmdir(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int err = 0;
 
@@ -188,33 +179,33 @@ bin_rmdir(char *nam, char **args, char *ops, int func)
 
 /**/
 static int
-bin_ln(char *nam, char **args, char *ops, int func)
+bin_ln(char *nam, char **args, Options ops, int func)
 {
     MoveFunc move;
-    int flags, space, err = 0;
-    char **a, *ptr, *rp;
+    int flags, err = 0;
+    char **a, *ptr, *rp, *buf;
     struct stat st;
-    char buf[PATH_MAX * 2 + 1];
+    size_t blen;
 
 
     if(func == BIN_MV) {
 	move = (MoveFunc) rename;
-	flags = ops['f'] ? 0 : MV_ASKNW;
+	flags = OPT_ISSET(ops,'f') ? 0 : MV_ASKNW;
 	flags |= MV_ATOMIC;
     } else {
-	flags = ops['f'] ? MV_FORCE : 0;
+	flags = OPT_ISSET(ops,'f') ? MV_FORCE : 0;
 #ifdef HAVE_LSTAT
-	if(ops['s'])
+	if(OPT_ISSET(ops,'s'))
 	    move = (MoveFunc) symlink;
 	else
 #endif
-	     {
+	{
 	    move = (MoveFunc) link;
-	    if(!ops['d'])
+	    if(!OPT_ISSET(ops,'d'))
 		flags |= MV_NODIRS;
 	}
     }
-    if(ops['i'] && !ops['f'])
+    if(OPT_ISSET(ops,'i') && !OPT_ISSET(ops,'f'))
 	flags |= MV_INTER;
     for(a = args; a[1]; a++) ;
     if(a != args) {
@@ -234,31 +225,24 @@ bin_ln(char *nam, char **args, char *ops, int func)
 	    args[1] = args[0];
     }
     return domove(nam, move, args[0], args[1], flags);
-    havedir:
-    strcpy(buf, *a);
+ havedir:
+    buf = ztrdup(*a);
     *a = NULL;
-    space = PATH_MAX - 1 - ztrlen(buf);
-    rp = strchr(buf, 0);
-    *rp++ = '/';
+    buf = appstr(buf, "/");
+    blen = strlen(buf);
     for(; *args; args++) {
-	if(ztrlen(*args) > PATH_MAX) {
-	    zwarnnam(nam, "%s: %e", *args, ENAMETOOLONG);
-	    err = 1;
-	    continue;
-	}
+
 	ptr = strrchr(*args, '/');
 	if(ptr)
 	    ptr++;
 	else
 	    ptr = *args;
-	if(ztrlen(ptr) > space) {
-	    zwarnnam(nam, "%s: %e", ptr, ENAMETOOLONG);
-	    err = 1;
-	    continue;
-	}
-	strcpy(rp, ptr);
+
+	buf[blen] = 0;
+	buf = appstr(buf, ptr);
 	err |= domove(nam, move, *args, buf, flags);
     }
+    zsfree(buf);
     return err;
 }
 
@@ -267,14 +251,15 @@ static int
 domove(char *nam, MoveFunc move, char *p, char *q, int flags)
 {
     struct stat st;
-    char *qbuf;
-    char pbuf[PATH_MAX + 1];
-    strcpy(pbuf, unmeta(p));
+    char *pbuf, *qbuf;
+
+    pbuf = ztrdup(unmeta(p));
     qbuf = unmeta(q);
     if(flags & MV_NODIRS) {
 	errno = EISDIR;
 	if(lstat(pbuf, &st) || S_ISDIR(st.st_mode)) {
 	    zwarnnam(nam, "%s: %e", p, errno);
+	    zsfree(pbuf);
 	    return 1;
 	}
     }
@@ -282,6 +267,7 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
 	int doit = flags & MV_FORCE;
 	if(S_ISDIR(st.st_mode)) {
 	    zwarnnam(nam, "%s: cannot overwrite directory", q, 0);
+	    zsfree(pbuf);
 	    return 1;
 	} else if(flags & MV_INTER) {
 	    nicezputs(nam, stderr);
@@ -289,8 +275,10 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
 	    nicezputs(q, stderr);
 	    fputs("'? ", stderr);
 	    fflush(stderr);
-	    if(!ask())
+	    if(!ask()) {
+		zsfree(pbuf);
 		return 0;
+	    }
 	    doit = 1;
 	} else if((flags & MV_ASKNW) &&
 		!S_ISLNK(st.st_mode) &&
@@ -301,8 +289,10 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
 	    fprintf(stderr, "', overriding mode %04o? ",
 		mode_to_octal(st.st_mode));
 	    fflush(stderr);
-	    if(!ask())
+	    if(!ask()) {
+		zsfree(pbuf);
 		return 0;
+	    }
 	    doit = 1;
 	}
 	if(doit && !(flags & MV_ATOMIC))
@@ -310,8 +300,10 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
     }
     if(move(pbuf, qbuf)) {
 	zwarnnam(nam, "%s: %e", p, errno);
+	zsfree(pbuf);
 	return 1;
     }
+    zsfree(pbuf);
     return 0;
 }
 
@@ -485,7 +477,7 @@ recursivecmd_dorec(struct recursivecmd const *reccmd,
 
 /**/
 static int
-recurse_donothing(char *arg, char *rp, struct stat const *sp, void *magic)
+recurse_donothing(UNUSED(char *arg), UNUSED(char *rp), UNUSED(struct stat const *sp), UNUSED(void *magic))
 {
     return 0;
 }
@@ -549,7 +541,7 @@ rm_leaf(char *arg, char *rp, struct stat const *sp, void *magic)
 
 /**/
 static int
-rm_dirpost(char *arg, char *rp, struct stat const *sp, void *magic)
+rm_dirpost(char *arg, char *rp, UNUSED(struct stat const *sp), void *magic)
 {
     struct rmmagic *rmm = magic;
 
@@ -571,18 +563,20 @@ rm_dirpost(char *arg, char *rp, struct stat const *sp, void *magic)
 
 /**/
 static int
-bin_rm(char *nam, char **args, char *ops, int func)
+bin_rm(char *nam, char **args, Options ops, UNUSED(int func))
 {
     struct rmmagic rmm;
     int err;
 
     rmm.nam = nam;
-    rmm.opt_force = ops['f'];
-    rmm.opt_interact = ops['i'] && !ops['f'];
-    rmm.opt_unlinkdir = ops['d'];
-    err = recursivecmd(nam, ops['f'], ops['r'] && !ops['d'], ops['s'],
+    rmm.opt_force = OPT_ISSET(ops,'f');
+    rmm.opt_interact = OPT_ISSET(ops,'i') && !OPT_ISSET(ops,'f');
+    rmm.opt_unlinkdir = OPT_ISSET(ops,'d');
+    err = recursivecmd(nam, OPT_ISSET(ops,'f'), 
+		       OPT_ISSET(ops,'r') && !OPT_ISSET(ops,'d'),
+		       OPT_ISSET(ops,'s'),
 	args, recurse_donothing, rm_dirpost, rm_leaf, &rmm);
-    return ops['f'] ? 0 : err;
+    return OPT_ISSET(ops,'f') ? 0 : err;
 }
 
 /* chown builtin */
@@ -595,7 +589,7 @@ struct chownmagic {
 
 /**/
 static int
-chown_dochown(char *arg, char *rp, struct stat const *sp, void *magic)
+chown_dochown(char *arg, char *rp, UNUSED(struct stat const *sp), void *magic)
 {
     struct chownmagic *chm = magic;
 
@@ -624,7 +618,7 @@ enum { BIN_CHOWN, BIN_CHGRP };
 
 /**/
 static int
-bin_chown(char *nam, char **args, char *ops, int func)
+bin_chown(char *nam, char **args, Options ops, int func)
 {
     struct chownmagic chm;
     char *uspec = ztrdup(*args), *p = uspec;
@@ -689,7 +683,7 @@ bin_chown(char *nam, char **args, char *ops, int func)
 	    chm.gid = -1;
     }
     free(uspec);
-    return recursivecmd(nam, 0, ops['R'], ops['s'],
+    return recursivecmd(nam, 0, OPT_ISSET(ops,'R'), OPT_ISSET(ops,'s'),
 	args + 1, chown_dochown, recurse_donothing, chown_dochown, &chm);
 }
 
@@ -705,7 +699,7 @@ static struct builtin bintab[] = {
     BUILTIN("chgrp", 0, bin_chown, 2, -1, BIN_CHGRP, "Rs",    NULL),
     BUILTIN("chown", 0, bin_chown, 2, -1, BIN_CHOWN, "Rs",    NULL),
     BUILTIN("ln",    0, bin_ln,    1, -1, BIN_LN,    LN_OPTS, NULL),
-    BUILTIN("mkdir", 0, bin_mkdir, 1, -1, 0,         "pm",    NULL),
+    BUILTIN("mkdir", 0, bin_mkdir, 1, -1, 0,         "pm:",   NULL),
     BUILTIN("mv",    0, bin_ln,    2, -1, BIN_MV,    "fi",    NULL),
     BUILTIN("rm",    0, bin_rm,    1, -1, 0,         "dfirs", NULL),
     BUILTIN("rmdir", 0, bin_rmdir, 1, -1, 0,         NULL,    NULL),
@@ -714,7 +708,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -736,7 +730,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }
