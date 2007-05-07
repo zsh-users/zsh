@@ -63,7 +63,7 @@ _arguments -C -s -S -A "-*" \
   '--default-recipient[specify default recipient]:recipient:->public-keys' \
   '--default-recipient-self[use default key as default recipient]' \
   '--no-default-recipient[reset default recipient]' \
-  '*--encrypt-to[specify recipient]:->public-keys' \
+  '*--encrypt-to[specify recipient]:key:->public-keys' \
   '(--encrypt-to)--no-encrypt-to[disable the use of all --encrypt-to keys]' \
   '(-q --quiet)*'{-v,--verbose}'[increase amount of output]' \
   '(-q --quiet -v --verbose)'{-q,--quiet}'[reduce amount of output]' \
@@ -139,18 +139,35 @@ if [[ $state = args ]]; then
   fi
 fi
 
+# We need to keep some arguments to get a consistent list of keys
+# etc.
+local -a needed
+integer krind=${words[(I)--keyring(|=*)]}
+needed=(${words[(r)--no-default-keyring]})
+if (( krind )); then
+  # We have a --keyring option.  We can't be completing its
+  # argument because that was handled above, so it must be complete.
+  if [[ $words[krind] = --keyring ]]; then
+    if [[ -n $words[krind+1] ]]; then
+      needed+=(--keyring=$words[krind+1])
+    fi
+  else
+    needed+=($words[krind])
+  fi
+fi
+
 case "$state" in
   public-keys)
     _wanted public-keys expl 'public key' \
-	compadd ${${(Mo)$(_call_program public-keys gpg --list-keys 2>/dev/null):%<*>}//(<|>)/} && return
+	compadd ${${(Mo)$(_call_program public-keys gpg $needed --list-keys 2>/dev/null):%<*>}//(<|>)/} && return
   ;;
   secret-keys)
     _wanted secret-keys expl 'secret key' compadd \
-	${${(Mo)$(_call_program secret-keys gpg --list-secret-keys 2>/dev/null):%<*>}//(<|>)/} && return
+	${${(Mo)$(_call_program secret-keys gpg $needed --list-secret-keys 2>/dev/null):%<*>}//(<|>)/} && return
   ;;
   ciphers)
     _wanted ciphers expl cipher compadd \
-        ${${(s.,.)${(M)${(f)"$(_call_program ciphers gpg --version)"}:#Cipher*}#*:}# } && return
+        ${${(s.,.)${(M)${(f)"$(_call_program ciphers gpg $needed --version)"}:#Cipher*}#*:}# } && return
   ;;
 esac
 
