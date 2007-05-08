@@ -1,0 +1,28 @@
+#compdef dhclient dhclient3
+
+local args
+
+if _pick_variant three=V3 two --help; then
+  args=(
+    '-q[quiet]'
+    '-1[only try once to get a lease]'
+    '-r[release the current lease]'
+    '-lf[lease file]:lease file:_files'
+    '-pf[pid file]:pid file:_files'
+    '-cf[config file]:config file:_files'
+    '-sf[script file]:script file:_files'
+    '-e[env vars to pass to child processes]:env var key value pairs:'
+    '-s[transmit to specific target instead of broadcast]:server:_hosts'
+    '-g[force giaddr field]:relay:_hosts'
+    '-n[do not configure any interfaces]'
+    '-nw[daemonize immediately rather than wait for IP acquisition]'
+    '-w[do not exit if there are no interfaces found to configure]'
+  )
+else
+  args=( '-e[exit if configuration failed after a certain time]' )
+fi
+
+_arguments $args \
+  '-p[port to transmit to / listen on]:_ports' \
+  '-d[force to run in foreground]' \
+  ':interface:_net_interfaces'
