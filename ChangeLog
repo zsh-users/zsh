@@ -1,3 +1,9 @@
+2007-05-08  Peter Stephenson  <pws@csr.com>
+
+	* Phil Pennock + tweaks: 23398 + more tweaks: README,
+	Doc/Zsh/builtins.yo, Doc/Zsh/grammar.yo, Src/exec.c, Src/zsh.h,
+	Test/A01grammar.ztst: add compatibility options for exec.
+
 2007-05-02  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/mod_pcre.yo, Src/pcre.c: missing

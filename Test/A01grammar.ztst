@@ -62,6 +62,22 @@
   (exec /bin/sh; echo bar)
 0:`exec' precommand modifier
 
+  (exec -l /bin/sh -c 'echo $0')
+0:`exec' with -l option
+>-/bin/sh
+
+  (exec -a /bin/SPLATTER /bin/sh -c 'echo $0')
+0:`exec' with -a option
+>/bin/SPLATTER
+
+  (exec -a/bin/SPLOOSH /bin/sh -c 'echo $0')
+0:`exec' with -a option, no space
+>/bin/SPLOOSH
+
+  (export FOO=bar; exec -c /bin/sh -c 'echo x${FOO}x')
+0:`exec' with -c option
+>xx
+
   cat() { echo Function cat executed; }
   command cat && unfunction cat
 0:`command' precommand modifier

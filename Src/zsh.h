@@ -1144,6 +1144,7 @@ struct builtin {
 #define BINF_KEEPNUM		(1<<13) /* `[-+]NUM' can be an option */
 #define BINF_SKIPDASH		(1<<14) /* Treat `-' as argument (maybe `+') */
 #define BINF_DASHDASHVALID	(1<<15) /* Handle `--' even if SKIPINVALD */
+#define BINF_CLEARENV		(1<<16) /* new process started with cleared env */
 
 struct module {
     char *nam;

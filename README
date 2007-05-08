@@ -40,6 +40,14 @@ behaviour.)  Now it is treated identically to "$@".  The same change
 applies to expressions with forced splitting such as ${=1+"$@"}, but
 otherwise the case where SH_WORD_SPLIT is not set is unaffected.
 
+The "exec" precommand modifier now takes various options for compatibility
+with other shells.  This means that whereas "exec -prog" previously
+tried to execute a command name "-prog", it will now report an error
+in option handling.  "exec -- -prog" will execute "-prog".  If
+the option EQUALS is set, as it is by default in zsh's native mode,
+"exec =-prog" behaves the same way in all versions of zsh provided
+the command can be found.
+
 The "unset" builtin now does not regard the unsetting of non-existent
 variables as an error, so can still return status 0 (depending on the
 handling of other arguments).  This appears to be the standard shell

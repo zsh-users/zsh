@@ -6,7 +6,6 @@ sect(Shell Builtin Commands)
 cindex(builtin commands)
 cindex(commands, builtin)
 def(prefix)(1)(\
-findex(ARG1)
 item(tt(ARG1) var(simple command))(
 See noderef(Precommand Modifiers).
 )\
@@ -375,7 +374,13 @@ item(tt(eval) [ var(arg) ... ])(
 Read the arguments as input to the shell and execute the resulting
 command in the current shell process.
 )
-prefix(exec)
+item(tt(exec) [ tt(-cl) ] [ tt(-a) var(argv0) ] var(simple command))(
+Replace the current shell with an external command rather than forking.
+With tt(-c) clear the environment; with tt(-l) prepend tt(-) to the
+tt(argv[0]) string of the command executed (to simulate a login shell);
+with tt(-a) var(argv0) set the tt(argv[0]) string of the command
+executed.  See noderef(Precommand Modifiers).
+)
 findex(exit)
 item(tt(exit) [ var(n) ])(
 Exit the shell with the exit status specified by var(n); if none

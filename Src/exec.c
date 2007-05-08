@@ -144,6 +144,7 @@ mod_export Funcstack funcstack;
 
 static int doneps4;
 static char *STTYval;
+static char *blank_env[] = { NULL };
 
 /* Execution functions. */
 
@@ -361,7 +362,7 @@ execcursh(Estate state, int do_exec)
 
 /**/
 static int
-zexecve(char *pth, char **argv)
+zexecve(char *pth, char **argv, char **newenvp)
 {
     int eno;
     static char buf[PATH_MAX * 2];
@@ -379,7 +380,10 @@ zexecve(char *pth, char **argv)
 	sprintf(buf + 2, "%s/%s", pwd, pth);
     zputenv(buf);
     closedumps();
-    execve(pth, argv, environ);
+
+    if (newenvp == NULL)
+	    newenvp = environ;
+    execve(pth, argv, newenvp);
 
     /* If the execve returns (which in general shouldn't happen),   *
      * then check for an errno equal to ENOEXEC.  This errno is set *
@@ -414,14 +418,14 @@ zexecve(char *pth, char **argv)
 			    *ptr = '\0';
 			    argv[-2] = ptr2;
 			    argv[-1] = ptr + 1;
-			    execve(ptr2, argv - 2, environ);
+			    execve(ptr2, argv - 2, newenvp);
 			} else {
 			    argv[-1] = ptr2;
-			    execve(ptr2, argv - 1, environ);
+			    execve(ptr2, argv - 1, newenvp);
 			}
 		    } else if (eno == ENOEXEC) {
 			argv[-1] = "sh";
-			execve("/bin/sh", argv - 1, environ);
+			execve("/bin/sh", argv - 1, newenvp);
 		    }
 		} else if (eno == ENOEXEC) {
 		    for (t0 = 0; t0 != ct; t0++)
@@ -429,7 +433,7 @@ zexecve(char *pth, char **argv)
 			    break;
 		    if (t0 == ct) {
 			argv[-1] = "sh";
-			execve("/bin/sh", argv - 1, environ);
+			execve("/bin/sh", argv - 1, newenvp);
 		    }
 		}
 	    } else
@@ -467,13 +471,13 @@ isgooderr(int e, char *dir)
 /* execute an external command */
 
 /**/
-void
-execute(LinkList args, int dash, int defpath)
+static void
+execute(LinkList args, int flags, int defpath)
 {
     Cmdnam cn;
     char buf[MAXCMDLEN], buf2[MAXCMDLEN];
     char *s, *z, *arg0;
-    char **argv, **pp;
+    char **argv, **pp, **newenvp = NULL;
     int eno = 0, ee;
 
     arg0 = (char *) peekfirst(args);
@@ -502,7 +506,7 @@ execute(LinkList args, int dash, int defpath)
     if (unset(RESTRICTED) && (z = zgetenv("ARGV0"))) {
 	setdata(firstnode(args), (void *) ztrdup(z));
 	delenvvalue(z - 6);
-    } else if (dash) {
+    } else if (flags & BINF_DASH) {
     /* Else if the pre-command `-' was given, we add `-' *
      * to the front of argv[0] for this command.         */
 	sprintf(buf2, "-%s", arg0);
@@ -510,6 +514,9 @@ execute(LinkList args, int dash, int defpath)
     }
 
     argv = makecline(args);
+    if (flags & BINF_CLEARENV)
+	newenvp = blank_env;
+
     /*
      * Note that we don't close fd's attached to process substitution
      * here, which should be visible to external processes.
@@ -522,7 +529,7 @@ execute(LinkList args, int dash, int defpath)
     }
     for (s = arg0; *s; s++)
 	if (*s == '/') {
-	    int lerrno = zexecve(arg0, argv);
+	    int lerrno = zexecve(arg0, argv, newenvp);
 	    if (arg0 == s || unset(PATHDIRS) ||
 		(arg0[0] == '.' && (arg0 + 1 == s ||
 				    (arg0[1] == '.' && arg0 + 2 == s)))) {
@@ -559,7 +566,7 @@ execute(LinkList args, int dash, int defpath)
 	    _exit(127);
 	}
 
-	ee = zexecve(pbuf, argv);
+	ee = zexecve(pbuf, argv, newenvp);
 
 	if ((dptr = strrchr(pbuf, '/')))
 	    *dptr = '\0';
@@ -576,7 +583,7 @@ execute(LinkList args, int dash, int defpath)
 	    else {
 		for (pp = path; pp < cn->u.name; pp++)
 		    if (!**pp || (**pp == '.' && (*pp)[1] == '\0')) {
-			ee = zexecve(arg0, argv);
+			ee = zexecve(arg0, argv, newenvp);
 			if (isgooderr(ee, *pp))
 			    eno = ee;
 		    } else if (**pp != '/') {
@@ -584,7 +591,7 @@ execute(LinkList args, int dash, int defpath)
 			strucpy(&z, *pp);
 			*z++ = '/';
 			strcpy(z, arg0);
-			ee = zexecve(buf, argv);
+			ee = zexecve(buf, argv, newenvp);
 			if (isgooderr(ee, *pp))
 			    eno = ee;
 		    }
@@ -592,7 +599,7 @@ execute(LinkList args, int dash, int defpath)
 		strcat(nn, "/");
 		strcat(nn, cn->node.nam);
 	    }
-	    ee = zexecve(nn, argv);
+	    ee = zexecve(nn, argv, newenvp);
 
 	    if ((dptr = strrchr(nn, '/')))
 		*dptr = '\0';
@@ -601,7 +608,7 @@ execute(LinkList args, int dash, int defpath)
 	}
 	for (pp = path; *pp; pp++)
 	    if (!(*pp)[0] || ((*pp)[0] == '.' && !(*pp)[1])) {
-		ee = zexecve(arg0, argv);
+		ee = zexecve(arg0, argv, newenvp);
 		if (isgooderr(ee, *pp))
 		    eno = ee;
 	    } else {
@@ -609,7 +616,7 @@ execute(LinkList args, int dash, int defpath)
 		strucpy(&z, *pp);
 		*z++ = '/';
 		strcpy(z, arg0);
-		ee = zexecve(buf, argv);
+		ee = zexecve(buf, argv, newenvp);
 		if (isgooderr(ee, *pp))
 		    eno = ee;
 	    }
@@ -2005,7 +2012,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
 	    cflags |= hn->flags;
 	    checked = 0;
-	    if (cflags & BINF_COMMAND && nextnode(firstnode(args))) {
+	    if ((cflags & BINF_COMMAND) && nextnode(firstnode(args))) {
 		/* check for options to command builtin */
 		char *next = (char *) getdata(nextnode(firstnode(args)));
 		char *cmdopt;
@@ -2024,7 +2031,71 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    }
 		}
 		if (!strcmp(next, "--"))
-		     uremnode(args, firstnode(args));   
+		     uremnode(args, firstnode(args));
+	    }
+	    if ((cflags & BINF_EXEC) && nextnode(firstnode(args))) {
+		/*
+		 * Check for compatibility options to exec builtin.
+		 * It would be nice to do these more generically,
+		 * but currently we don't have a mechanism for
+		 * precommand modifiers.
+		 */
+		char *next = (char *) getdata(nextnode(firstnode(args)));
+		char *cmdopt, *exec_argv0 = NULL;
+		/*
+		 * Careful here: we want to make sure a final dash
+		 * is passed through in order that it still behaves
+		 * as a precommand modifier (zsh equivalent of -l).
+		 * It has to be last, but I think that's OK since
+		 * people aren't likely to mix the option style
+		 * with the zsh style.
+		 */
+		while (next && *next == '-' && strlen(next) >= 2) {
+		    uremnode(args, firstnode(args));
+		    if (!strcmp(next, "--"))
+			break;
+		    for (cmdopt = &next[1]; *cmdopt; ++cmdopt) {
+			switch (*cmdopt) {
+			case 'a':
+			    /* argument is ARGV0 string */
+			    if (cmdopt[1]) {
+				exec_argv0 = cmdopt+1;
+				/* position on last non-NULL character */
+				cmdopt += strlen(cmdopt+1);
+			    } else {
+				if (!nextnode(firstnode(args))) {
+				    zerr("exec flag -a requires a parameter");
+				    errflag = lastval = 1;
+				    return;
+				}
+				exec_argv0 = (char *)
+				    getdata(nextnode(firstnode(args)));
+				uremnode(args, firstnode(args));
+			    }
+			    break;
+			case 'c':
+			    cflags |= BINF_CLEARENV;
+			    break;
+			case 'l':
+			    cflags |= BINF_DASH;
+			    break;
+			default:
+			    zerr("unknown exec flag -%c", *cmdopt);
+			    errflag = lastval = 1;
+			    return;
+			}
+		    }
+		    next = (char *) getdata(nextnode(firstnode(args)));
+		}
+		if (exec_argv0) {
+		    char *str, *s;
+		    size_t sz = strlen(exec_argv0);
+		    str = s = zalloc(5 + 1 + sz + 1);
+		    strcpy(s, "ARGV0=");
+		    s+=6;
+		    strcpy(s, exec_argv0);
+		    zputenv(str);
+		}
 	    }
 	    uremnode(args, firstnode(args));
 	    hn = NULL;
@@ -2726,7 +2797,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    zsfree(STTYval);
 		    STTYval = 0;
 		}
-		execute(args, cflags & BINF_DASH, use_defpath);
+		execute(args, cflags, use_defpath);
 	    } else {		/* ( ... ) */
 		DPUTS(varspc,
 		      "BUG: assignment before complex command");

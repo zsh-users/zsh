@@ -105,29 +105,56 @@ shell builtin commands with the exception of tt(nocorrect) which is
 a reserved word.
 
 startitem()
+findex(-)
 item(tt(-))(
 The command is executed with a `tt(-)' prepended to its
 tt(argv[0]) string.
 )
-item(tt(noglob))(
-Filename generation (globbing) is not performed on any of
-the words.
+findex(builtin)
+item(tt(builtin))(
+The command word is taken to be the name of a builtin command,
+rather than a shell function or external command.
 )
+findex(command)
+item(tt(command) [ tt(-pvV) ])(
+The command word is taken to be the name of an external command,
+rather than a shell function or builtin.   If the tt(POSIX_BUILTINS) option
+is set, builtins will also be executed but certain special properties
+of them are suppressed. The tt(-p) flag causes a default path to be
+searched instead of that in tt($path). With the tt(-v) flag, tt(command)
+is similar to tt(whence) and with tt(-V), it is equivalent to tt(whence
+-v).
+)
+findex(exec)
+item(tt(exec) [ tt(-cl) ] [ tt(-a) var(argv0) ])(
+The following command together with any arguments is run in place
+of the current process, rather than as a sub-process.  The shell does not
+fork and is replaced.  The shell does not invoke tt(TRAPEXIT), nor does it
+source tt(zlogout) files.
+The options are provided for compatibility with other shells.
+
+The tt(-c) option clears the environment.
+
+The tt(-l) option is equivalent to the tt(-) precommand modifier, to
+treat the replacement command as a login shell; the command is executed
+with a tt(-) prepended to its tt(argv[0]) string.  This flag has no effect
+if used together with the tt(-a) option.
+
+The tt(-a) option is used to specify explicitly the tt(argv[0]) string
+(the name of the command as seen by the process itself) to be used by the
+replacement command and is directly equivalent to setting a value
+for the tt(ARGV0) environment variable.
+)
+findex(nocorrect)
 item(tt(nocorrect))(
 Spelling correction is not done on any of the words.  This must appear
 before any other precommand modifier, as it is interpreted immediately,
 before any parsing is done.  It has no effect in non-interactive shells.
 )
-item(tt(exec))(
-The command is executed in the parent shell without forking.
-)
-item(tt(command))(
-The command word is taken to be the name of an external command,
-rather than a shell function or builtin.
-)
-item(tt(builtin))(
-The command word is taken to be the name of a builtin command,
-rather than a shell function or external command.
+findex(noglob)
+item(tt(noglob))(
+Filename generation (globbing) is not performed on any of
+the words.
 )
 enditem()
 texinode(Complex Commands)(Alternate Forms For Complex Commands)(Precommand Modifiers)(Shell Grammar)
