@@ -1156,10 +1156,13 @@ preprompt(void)
     int period = getiparam("PERIOD");
     int mailcheck = getiparam("MAILCHECK");
 
-    if (isset(PROMPTSP) && isset(PROMPTCR)) {
+    if (isset(PROMPTSP) && isset(PROMPTCR) && !use_exit_printed) {
 	/* The PROMPT_SP heuristic will move the prompt down to a new line
 	 * if there was any dangling output on the line (assuming the terminal
-	 * has automatic margins, but we try even if hasam isn't set). */
+	 * has automatic margins, but we try even if hasam isn't set).
+	 * Unfortunately it interacts badly with ZLE displaying message
+	 * when ^D has been pressed. So just disable PROMPT_SP logic in
+	 * this case */
 	char *str;
 	int percents = opts[PROMPTPERCENT];
 	opts[PROMPTPERCENT] = 1;

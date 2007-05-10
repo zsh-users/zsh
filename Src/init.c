@@ -123,6 +123,7 @@ loop(int toplevel, int justonce)
 		errflag = 0;
 	    }
 	}
+	use_exit_printed = 0;
 	intr();			/* interrupts on            */
 	lexinit();              /* initialize lexical state */
 	if (!(prog = parse_event())) {	/* if we couldn't parse a list */
@@ -1335,7 +1336,6 @@ zsh_main(UNUSED(int argc), char **argv)
     init_misc();
 
     for (;;) {
-	use_exit_printed = 0;
 	/*
 	 * See if we can free up some of jobtab.
 	 * We only do this at top level, because if we are
