@@ -1,5 +1,8 @@
 2007-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 23434: Completion/Unix/Command/_configure: use also
+	for config.status.
+
 	* 23433: Src/Zle/zle_main.c: cast for ZMAXTIMEOUT was wrong
 	where sizeof(long) > sizeof(int).
 
