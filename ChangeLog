@@ -1,5 +1,11 @@
 2007-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Phil Pennoc: unposted: Doc/Zsh/cond.yo: should document
+	POSIX regular expressions as extended, not basic.
+
+	* 23436: Src/params.c: handle empty strings for locale
+	variables more consistently.
+
 	* 23434: Completion/Unix/Command/_configure: use also
 	for config.status.
 

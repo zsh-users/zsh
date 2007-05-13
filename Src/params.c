@@ -3414,10 +3414,21 @@ setlang(char *x)
 {
     struct localename *ln;
 
+    /*
+     * Set the global locale to the value passed, but override
+     * this with any non-empty definitions for specific
+     * categories.
+     *
+     * We only use non-empty definitions because empty values aren't
+     * valid as locales; when passed to setlocale() they mean "use the
+     * environment variable", but if that's what we're setting the value
+     * from this is meaningless.  So just all $LANG to show through in
+     * that case.
+     */
     setlocale(LC_ALL, x ? x : "");
     queue_signals();
     for (ln = lc_names; ln->name; ln++)
-	if ((x = getsparam(ln->name)))
+	if ((x = getsparam(ln->name)) && *x)
 	    setlocale(ln->category, x);
     unqueue_signals();
 }
@@ -3427,10 +3438,18 @@ void
 lc_allsetfn(Param pm, char *x)
 {
     strsetfn(pm, x);
-    if (!x) {
-	queue_signals();
-	setlang(getsparam("LANG"));
-	unqueue_signals();
+    /*
+     * Treat an empty LC_ALL the same as an unset one,
+     * namely by using LANG as the default locale but overriding
+     * that with any LC_* that are set.
+     */
+    if (!x || !*x) {
+	x = getsparam("LANG");
+	if (x && *x) {
+	    queue_signals();
+	    setlang(x);
+	    unqueue_signals();
+	}
     }
     else
 	setlocale(LC_ALL, x);
@@ -3448,18 +3467,27 @@ langsetfn(Param pm, char *x)
 void
 lcsetfn(Param pm, char *x)
 {
+    char *x2;
     struct localename *ln;
 
     strsetfn(pm, x);
-    if (getsparam("LC_ALL"))
+    if ((x2 = getsparam("LC_ALL")) && *x)
 	return;
     queue_signals();
-    if (!x)
+    /* Treat empty LC_* the same as unset. */
+    if (!x || !*x)
 	x = getsparam("LANG");
 
-    for (ln = lc_names; ln->name; ln++)
-	if (!strcmp(ln->name, pm->node.nam))
-	    setlocale(ln->category, x ? x : "");
+    /*
+     * If we've got no non-empty string at this
+     * point (after checking $LANG, too),
+     * we shouldn't bother setting anything.
+     */
+    if (x && *x) {
+	for (ln = lc_names; ln->name; ln++)
+	    if (!strcmp(ln->name, pm->node.nam))
+		setlocale(ln->category, x);
+    }
     unqueue_signals();
 }
 #endif /* USE_LOCALE */
