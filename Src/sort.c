@@ -338,8 +338,9 @@ strmetasort(char **array, int sortwhat, int *unmetalenp)
 		src = dst;
 	    }
 	    if (sortwhat & SORTIT_IGNORING_BACKSLASHES) {
+                char *end = src + len + 1;
 		/* copy null byte, so increment length */
-		for (s = src, t = dst; s - src != len+1; ) {
+		for (s = src, t = dst; s < end; ) {
 		    if (*s == '\\') {
 			s++;
 			len--;

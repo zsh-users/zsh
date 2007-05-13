@@ -1,6 +1,9 @@
 2007-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* Phil Pennoc: unposted: Doc/Zsh/cond.yo: should document
+	* 23435: Nikolai Weibull: Src/sort.c: bug testing for end
+	of sort string when ignoring backslashes.
+
+	* Phil Pennock: unposted: Doc/Zsh/cond.yo: should document
 	POSIX regular expressions as extended, not basic.
 
 	* 23436: Src/params.c: handle empty strings for locale
