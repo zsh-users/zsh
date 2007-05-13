@@ -1,3 +1,8 @@
+2007-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23433: Src/Zle/zle_main.c: cast for ZMAXTIMEOUT was wrong
+	where sizeof(long) > sizeof(int).
+
 2007-05-10  Andrey Borzenkov <bor@zsh.org>
 
 	* 23409 with extra comment: Src/init.c, Src/utils.c: after ZLE
