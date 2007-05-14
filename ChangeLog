@@ -1,5 +1,8 @@
 2007-05-14  Peter Stephenson  <pws@csr.com>
 
+	* users/11484: Functions/Misc/zmv: allow renaming $f to $g
+	to work if the files are really the same.
+
 	* 23438 (slightly improved to use _call_program):
 	Completion/Unix/Type/_printers: improve finding of network
 	printers.
