@@ -1,3 +1,8 @@
+2007-05-14  Clint Adams  <clint@zsh.org>
+
+	* Alexander Myodov: 23439: Completion/Unix/Command/_screen:
+	complete sessions for -dr, -dR, -Dr, -DR, -dx, and -Dx.
+
 2007-05-14  Peter Stephenson  <pws@csr.com>
 
 	* users/11484: Functions/Misc/zmv: allow renaming $f to $g
