@@ -1,5 +1,7 @@
 2007-05-14  Peter Stephenson  <pws@csr.com>
 
+	* 23438 (slightly improved to use _call_program)
+
 	* Noted by Wayne: 23437; Src/params.c: typo in 23436.
 
 2007-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>

@@ -1,6 +1,7 @@
 #compdef -value-,PRINTER,-default- -value-,LPDEST,-default-
 
-local expl ret=1 list disp sep tmp
+local expl ret=1 list disp sep tmp servopt
+integer ind
 
 if (( $+commands[lsallq] )); then
   # Use AIX's command to list print queues
@@ -9,6 +10,32 @@ if (( $+commands[lsallq] )); then
 fi
 
 zstyle -s ":completion:${curcontext}:printers" list-separator sep || sep=--
+
+# If we've been given a different print server on the command line,
+# list printers on that.  This information shouldn't be cached.
+# (I) searches backwards---this is good, since some commands, such
+# as lpoptions, can take multiple -h arguments and we want the last
+# one before the current argument.  For lpr, -h might mean something
+# else and the option is -H.
+if [[ $service = lpr ]]; then
+  servopt=-H
+else
+  servopt=-h
+fi
+if (( $+commands[lpstat] )); then
+  ind=${words[1,CURRENT][(I)${servopt}*]}
+  if (( ind > 0 )); then
+    if [[ $words[ind] = $servopt ]]; then
+      tmp=-h$words[ind+1]
+    else
+      tmp=-h${words[ind][3,-1]}
+    fi
+    _wanted printers expl printer compadd "$@" - \
+      ${${(f)"$(_call_program printers lpstat $tmp -a 2>/dev/null)"}%% *} &&
+        return
+  fi
+fi
+
 
 if (( ! $+_lp_cache )); then
   local file entry names i
@@ -38,6 +65,17 @@ if (( ! $+_lp_cache )); then
         fi
       fi
     done < $file[1]
+  fi
+
+  if (( $+commands[lpstat] )); then
+    # If lpstat it exists, it's possible there are some other
+    # printers there, so add them.
+    _call_program printers lpstat -a 2>/dev/null | while read entry; do
+      entry=${entry%%[[:blank:]]*}
+      if (( ${_lp_cache[(I)$entry:*]} == 0 )); then
+	_lp_cache+=( $entry )
+      fi
+    done
   fi
 
   if [[ $OSTYPE = solaris* ]] && (( ${+commands[ypcat]} )) &&
