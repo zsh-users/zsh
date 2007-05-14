@@ -3471,7 +3471,7 @@ lcsetfn(Param pm, char *x)
     struct localename *ln;
 
     strsetfn(pm, x);
-    if ((x2 = getsparam("LC_ALL")) && *x)
+    if ((x2 = getsparam("LC_ALL")) && *x2)
 	return;
     queue_signals();
     /* Treat empty LC_* the same as unset. */
