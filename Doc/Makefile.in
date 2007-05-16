@@ -40,14 +40,15 @@ INSTALL         = @INSTALL@
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS = dvips
-TEXI2HTML = texi2html -expand info -split chapter
+TEXI2HTML = texi2html --output . --ifinfo --split=chapter
 
 .SUFFIXES: .yo .1
 
 # man pages to install
 MAN = zsh.1 zshbuiltins.1 zshcompctl.1 zshcompwid.1 zshcompsys.1 \
 zshcontrib.1 zshexpn.1 zshmisc.1 zshmodules.1 \
-zshoptions.1 zshparam.1 zshtcpsys.1 zshzftpsys.1 zshzle.1 zshall.1
+zshoptions.1 zshparam.1 zshroadmap.1 zshtcpsys.1 zshzftpsys.1 zshzle.1 \
+zshall.1
 
 # yodl documentation
 
@@ -81,7 +82,7 @@ Zsh/seealso.yo Zsh/tcpsys.yo Zsh/zftpsys.yo Zsh/zle.yo
 all: man texi ../META-FAQ
 .PHONY: all
 
-everything: all dvi ps html pdf
+everything: all dvi html pdf
 .PHONY: everything
 
 dvi: zsh.dvi
@@ -94,7 +95,7 @@ pdf: zsh.pdf
 .PHONY: pdf
 
 zsh.pdf: $(sdir)/zsh.texi
-	$(PDFETEX) $(sdir)/zsh.texi
+	PDFTEX=$(PDFETEX) $(TEXI2DVI) --pdf $(sdir)/zsh.texi
 
 texi: $(sdir)/zsh.texi
 .PHONY: texi
@@ -116,9 +117,13 @@ zsh.info: $(sdir)/zsh.texi
 	esac; \
 	case '$(YODL)' in :*) touch $$target ;; *) \
 	    echo $(YODL) -o $$target -I$(sdir) -w zman.yo version.yo $< ; \
-	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
+	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | \
+	      sed -e '1s/\\-/-/g' -e '/^\.'\''/d' -e 's/\(\\fB\)*'\''/\1\\\&'\''/' > $$target \
 	;; esac; \
 
+# These targets are no longer made by default, nor
+# distributed with the -doc.tar.gz, since the PDF
+# output is generally better.  However, they still work.
 ps: us_ps a4_ps
 .PHONY: ps
 
@@ -189,6 +194,8 @@ zshoptions.1: Zsh/options.yo
 
 zshparam.1: Zsh/params.yo
 
+zshroadmap.1: Zsh/roadmap.yo
+
 zshtcpsys.1: Zsh/tcpsys.yo
 
 zshzftpsys.1: Zsh/zftpsys.yo
@@ -197,10 +204,10 @@ zshzle.1: Zsh/zle.yo
 
 version.yo: $(sdir_top)/Config/version.mk
 	( \
-	  echo 'STARTDEF()'; \
+	  echo 'IFDEF(INCWSLEVEL)(INCWSLEVEL())(STARTDEF())'; \
 	  echo 'def(version)(0)('$(VERSION)')'; \
 	  echo 'def(date)(0)('$(VERSION_DATE)')'; \
-	  echo 'ENDDEF()#' | tr '#' '\\'; \
+	  echo 'IFDEF(DECWSLEVEL)(DECWSLEVEL())(ENDDEF())#' | tr '#' '\\'; \
 	) > $(sdir)/version.yo
 
 Zsh/modlist.yo: $(MODDOCSRC)
@@ -281,7 +288,7 @@ install.info: texi
 	    done \
 	); then \
 	    if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
-	      install-info --dir-file=$(DESTDIR)$(infodir)/dir \
+	      install-info --info-dir=$(DESTDIR)$(infodir) \
 	        $(DESTDIR)$(infodir)/$(tzsh).info; \
 	    else true; fi; \
 	    rm -rf infodir; \
@@ -321,7 +328,7 @@ uninstall.html:
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
 clean-here:
-	rm -f *.html *.info* *.dvi *.ps
+	rm -f *.html *.info* *.dvi *.ps *.pdf
 	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.log
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
 	rm -rf infodir
