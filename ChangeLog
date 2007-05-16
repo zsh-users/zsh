@@ -1,3 +1,8 @@
+2007-05-16  Clint Adams  <clint@zsh.org>
+
+	* Ag. D. Hatzimanikas: 23442: Completion/Unix/Command/_vim:
+	update for vim 7.1.
+
 2007-05-14  Clint Adams  <clint@zsh.org>
 
 	* Alexander Myodov: 23439: Completion/Unix/Command/_screen:
