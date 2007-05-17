@@ -27,7 +27,7 @@ arguments=(
   '-l[lisp mode]'
   '-C[make vim compatible with vi]'
   '-N[do not force compatibility with vi]'
-  {--nofork,-f}'[do not detach the GUI version from the shell]'
+  '(--nofork -f)'{--nofork,-f}'[do not detach the GUI version from the shell]'
   '-V-[verbosity level]::verbosity:((0\:"do not display any messages"
                                      1\:"display when viminfo file is read or written"
                                      2\:"display sourced files"
