@@ -1,3 +1,8 @@
+2007-05-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23444: Src/builtin.c: print -c/-C didn't take into
+	account multibyte characters.
+
 2007-05-17  Clint Adams  <clint@zsh.org>
 
 	* Nikolai Weibull: 23443: Completion/Unix/Command/_vim:

@@ -3617,12 +3617,58 @@ bin_print(char *name, char **args, Options ops, int func)
     /* -c -- output in columns */
     if (!fmt && (OPT_ISSET(ops,'c') || OPT_ISSET(ops,'C'))) {
 	int l, nc, nr, sc, n, t, i;
+#ifdef MULTIBYTE_SUPPORT
+	int *widths;
+
+	if (isset(MULTIBYTE)) {
+	    int *wptr;
+
+	    /*
+	     * We need the character widths to align output in
+	     * columns.
+	     */
+	    wptr = widths = (int *) zhalloc(argc * sizeof(int));
+	    for (i = 0; i < argc && args[i]; i++, wptr++) {
+		int l = len[i], width = 0;
+		char *aptr = args[i];
+		mbstate_t mbs;
+
+		memset(&mbs, 0, sizeof(mbstate_t));
+		while (l > 0) {
+		    wchar_t wc;
+		    size_t cnt = mbrtowc(&wc, aptr, l, &mbs);
+		    int wcw;
+
+		    if (cnt == MB_INCOMPLETE || cnt == MB_INVALID)
+		    {
+			/* treat as ordinary string */
+			width += l;
+			break;
+		    }
+		    wcw = wcwidth(wc);
+		    /* treat unprintable as 0 */
+		    if (wcw > 0)
+			width += wcw;
+		    /* skip over NUL normally */
+		    if (cnt == 0)
+			cnt = 1;
+		    aptr += cnt;
+		    l -= cnt;
+		}
+		widths[i] = width;
+	    }
+	}
+	else
+	    widths = len;
+#else
+	int *widths = len;
+#endif
 
 	if (OPT_ISSET(ops,'C')) {
 	    char *eptr, *argptr = OPT_ARG(ops,'C');
 	    nc = (int)zstrtol(argptr, &eptr, 10);
 	    if (*eptr) {
-		zwarnnam(name, "number expected after -%c: %s", 'C', argptr);
+		zwarnnam(name, "number expcted after -%c: %s", 'C', argptr);
 		return 1;
 	    }
 	    if (nc <= 0) {
@@ -3652,8 +3698,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		    if (i >= nr * (nc - 1))
 			break;
 		}
-		if (l < len[i])
-		    l = len[i];
+		if (l < widths[i])
+		    l = widths[i];
 	    }
 	    sc = l + 2;
 	}
@@ -3664,8 +3710,8 @@ bin_print(char *name, char **args, Options ops, int func)
 	     * l: maximum length seen
 	     */
 	    for (n = l = 0; n < argc; n++)
-		if (l < len[n])
-		    l = len[n];
+		if (l < widths[n])
+		    l = widths[n];
 
 	    /*
 	     * sc: column width
@@ -3686,8 +3732,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		int ic;
 		for (ic = 0; ic < nc && n < argc; ic++, n++)
 		{
-		    l = len[n];
-		    fwrite(args[n], l, 1, fout);
+		    fwrite(args[n], len[n], 1, fout);
+		    l = widths[n];
 		    if (n < argc)
 			for (; l < sc; l++)
 			    fputc(' ', fout);
@@ -3697,8 +3743,8 @@ bin_print(char *name, char **args, Options ops, int func)
 	    {
 		n = i;
 		do {
-		    l = len[n];
-		    fwrite(args[n], l, 1, fout);
+		    fwrite(args[n], len[n], 1, fout);
+		    l = widths[n];
 		    for (t = nr; t && n < argc; t--, n++);
 		    if (n < argc)
 			for (; l < sc; l++)
