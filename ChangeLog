@@ -1,5 +1,8 @@
 2007-05-21  Peter Stephenson  <pws@csr.com>
 
+	* Unposted, see discussion around 23431: MACHINES: mention
+	multibyte oddity on MacOS.
+
 	* 23440: README, Doc/Zsh/params.yo, Src/params.c,
 	Test/D06subscript.ztst: Reverse parameter subscripting
 	with (R) now returns the empty string on failure.  Other

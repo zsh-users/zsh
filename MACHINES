@@ -35,6 +35,11 @@ Apple: MacOS X/Darwin 10.x
 
 	Reported to compile with no problems on 10.4.
 
+	Multibyte support works, although (as on other architectures)
+	Unicode combining characters are not properly handled.
+	Problems have been noted when outputting multibyte characters
+	to the terminal from a "preexec" function.
+
 Red Hat Inc.: Cygwin
 	Should build `out-of-the-box'.  The compilation directory should
 	be on a file system mounted as binary (the mount command shows
