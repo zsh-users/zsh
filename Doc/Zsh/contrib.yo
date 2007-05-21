@@ -16,6 +16,7 @@ menu(ZLE Functions)
 menu(Exception Handling)
 menu(MIME Functions)
 menu(Mathematical Functions)
+menu(User Configuration Functions)
 menu(Other Functions)
 endmenu()
 
@@ -1696,7 +1697,7 @@ Konqueror, tt(firefox -new-tab %u) for Firefox and tt(%b -remote
 )
 enditem()
 
-texinode(Mathematical Functions)(Other Functions)(MIME Functions)(User Contributions)
+texinode(Mathematical Functions)(User Configuration Functions)(MIME Functions)(User Contributions)
 sect(Mathematical Functions)
 
 startitem()
@@ -1814,7 +1815,54 @@ as well as the shell function implementation.
 )
 enditem()
 
-texinode(Other Functions)()(Mathematical Functions)(User Contributions)
+texinode(User Configuration Functions)(Other Functions)(Mathematical Functions)(User Contributions)
+
+The tt(zsh/newuser) module comes with a function to aid in configuring
+shell options for new users.  If the module is installed, this function can
+also be run by hand.  It is available even if the module's default
+behaviour, namely running the function for a new user logging in without
+startup files, is inhibited.
+
+startitem()
+item(tt(zsh-newuser-install) [ tt(-f) ])(
+The function presents the user with various options for customizing
+their initialization scripts.  Currently only tt(~/.zshrc) is handled.
+tt($ZDOTDIR/.zshrc) is used instead if the parameter tt(ZDOTDIR) is
+set; this provides a way for the user to configure a file without
+altering an existing tt(.zshrc).
+
+By default the function exits immediately if it finds any of the files
+tt(.zshenv), tt(.zprofile), tt(.zshrc), or tt(.zlogin) in the appropriate
+directory.  The option tt(-f) is required in order to force the function
+to continue.  Note this may happen even if tt(.zshrc) itself does not
+exist.
+
+As currently configured, the function will exit immediately if the
+user has root privileges; this behaviour cannot be overridden.
+
+Once activated, the function's behaviour is supposed to be
+self-explanatory.  Menus are present allowing the user to alter
+the value of options and parameters.  Suggestions for improvements are
+always welcome.
+
+When the script exits, the user is given the opportunity to save the new
+file or not; changes are not irreversible until this point.  However,
+the script is careful to restrict changes to the file only to a group
+marked by the lines `tt(# Lines configured by zsh-newuser-install)' and
+`tt(# End of lines configured by zsh-newuser-install)'.  In addition,
+the old version of tt(.zshrc) is saved to a file with the suffix
+tt(.zni) appended.
+
+If the function edits an existing tt(.zshrc), it is up to the user
+to ensure that the changes made will take effect.  For example, if
+control usually returns early from the existing tt(.zshrc) the lines
+will not be executed; or a later initialization file may override
+options or parameters, and so on.  The function itself does not attempt to
+detect any such conflicts.
+)
+enditem()
+
+texinode(Other Functions)()(User Configuration Functions)(User Contributions)
 sect(Other Functions)
 
 There are a large number of helpful functions in the tt(Functions/Misc)

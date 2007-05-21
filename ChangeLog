@@ -1,5 +1,9 @@
 2007-05-21  Peter Stephenson  <pws@csr.com>
 
+	* 23447: INSTALL, README, Doc/Zsh/contrib.yo,
+	Doc/Zsh/mod_newuser.yo, Doc/Zsh/roadmap.yo: improve documentation
+	for the zsh/newuser module and zsh-newuser-install function.
+
 	* 23446: Src/Modules/parameter.c: a typo meant scanning
 	alias parameters returned a value the same as the key.
 

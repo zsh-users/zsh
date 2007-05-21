@@ -242,17 +242,27 @@ shell interactively and has no initialisation files (.zshenv, .zshrc,
 .zprofile or .zlogin).  The shell then executes code in the file
 scripts/newuser in the shared library area (by default
 /usr/local/share/zsh/<VERSION>/scripts/newuser).  This feature can be
-turned off simply by removing this script.  The module can be removed
-entirely from the configured shell by editing the line starting
-"name=zsh/newuser" in the config.modules file, which is generated in the
-top level distribution directory during configuration: change the line to
-include "link=no auto=no".
+turned off simply by removing or renaming this script.  This is the
+recommended way of disabling the features as the function
+zsh-newuser-install (see below) remains available for users who
+wish to run it.
+
+The module can be removed entirely from the configured shell by editing the
+line starting "name=zsh/newuser" in the config.modules file, which is
+generated in the top level distribution directory during configuration:
+change the line to include "link=no auto=no".
 
 The supplied script executes the function supplied as
-Functions/Newuser/zsh-newuser-install.  This function is currently under
-development.  It is probably preferable for administrators who wish to
-customize the system their own way to edit the newuser script in
-scripts/newuser.  Also, as there is currently no internationalization
+Functions/Newuser/zsh-newuser-install, which is installed to the user's
+function path when the module is installed.  The function can be run by
+hand after being marked for autoload.  This is documented in the zshcontrib
+manual or in the info node `User Configuration Functions'.
+
+zsh-newuser-install is currently under development.  It is probably
+preferable for administrators who wish to customize the system their own
+way to edit the newuser script in scripts/newuser; for example, this script
+could copy skeleton files into place safe in the knowledge that the files
+don't yet exist.  Also, as there is currently no internationalization
 support, administrators of sites with users who mostly do not speak English
 may wish not to install the zsh/newuser module.
 

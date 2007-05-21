@@ -17,6 +17,11 @@ The instructions for compiling zsh are in the file INSTALL.  You should
 also check the file MACHINES in the top directory to see if there
 are any special instructions for your particular architecture.
 
+Note in particular the zsh/newuser module that guides new users through
+setting basic shell options without the administrator's intervention.  This
+is turned on by default.  See the section AUTOMATIC NEW USER CONFIGURATION
+in INSTALL for configuration information.
+
 Features
 --------
 
