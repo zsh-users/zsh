@@ -1778,7 +1778,7 @@ scanaliases(HashTable alht, UNUSED(HashTable ht), ScanFunc func,
 		if (func != scancountparams &&
 		    ((pmflags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
 		     !(pmflags & SCANPM_WANTKEYS)))
-		    pm.u.str = dupstring(al->node.nam);
+		    pm.u.str = dupstring(al->text);
 		func(&pm.node, pmflags);
 	    }
 	}

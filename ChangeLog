@@ -1,5 +1,8 @@
 2007-05-21  Peter Stephenson  <pws@csr.com>
 
+	* 23446: Src/Modules/parameter.c: a typo meant scanning
+	alias parameters returned a value the same as the key.
+
 	* Unposted, see discussion around 23431: MACHINES: mention
 	multibyte oddity on MacOS.
 
