@@ -29,12 +29,11 @@
 >*, [how] I [wonder] what?  You are!
 >] I [
 
-  # $s[(R)x] actually is $s[0], but zsh treats 0 as 1 for subscripting.
   print $s[(i)x] : $s[(I)x]
   print $s[(r)x] : $s[(R)x]
 0:Scalar pattern subscripts that do not match
 >61 : 0
->: T
+>:
 
   print -R $s[$s[(i)\[]] $s[(i)$s[(r)\*]] $s[(i)${(q)s[(r)\]]}]
 0:Scalar subscripting using a pattern subscript to get the index

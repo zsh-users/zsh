@@ -72,6 +72,10 @@ of the value.  The form ${param//#$search/replace} where the value
 $search starts with "%" considers the "%" to be part of the search
 string as before.
 
+Parameter subscripts of the form ${array[(R)test]} now return the
+empty string if they fail to match.  The previous longstanding behaviour
+was confusing and useless.
+
 The MULTIBYTE option is on by default where it is available; this
 causes many operations to recognise characters as in the current locale.
 Older versions of the shell always assumed a character was one byte.

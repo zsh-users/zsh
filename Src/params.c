@@ -1276,6 +1276,19 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 			if (pprog && pattry(pprog, *p) && !--num)
 			    return r;
 		    }
+		    /*
+		     * Failed to match.
+		     * If we're returning an index, return 0 to show
+		     * we've gone off the start.  Unfortunately this
+		     * is ambiguous with KSH_ARRAYS set, but we're
+		     * stuck with that now.
+		     *
+		     * If the index is to be turned into an element,
+		     * return an index that does not point to a valid
+		     * element (since 0 is treated the same as 1).
+		     */
+		    if (!ind)
+			r = len + 1;
 		} else
 		    for (r = 1 + beg, p = ta + beg; *p; r++, p++)
 			if (pprog && pattry(pprog, *p) && !--num)
@@ -1495,7 +1508,13 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		    }
 		}
 	    }
-	    return down ? 0 : slen + 1;
+	    /*
+	     * Failed to match.
+	     * If the argument selects an element rather than
+	     * its index, ensure the element is empty.
+	     * See comments on the array case above.
+	     */
+	    return (down && ind) ? 0 : slen + 1;
 	}
     }
     return r;

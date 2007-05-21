@@ -234,15 +234,7 @@ item(tt(R))(
 Like `tt(r)', but gives the last match.  For associative arrays, gives
 all possible matches. May be used for assigning to ordinary array
 elements, but not for assigning to associative arrays.
-
-Note that this flag can give odd results on failure.  For an ordinary array
-the item substituted is that corresponding to subscript 0.  If the option
-tt(KSH_ARRAYS) is not in effect, this is the same as the element
-corresponding to subscript 1, although the form tt(${array[(I)pattern]})
-will evaluate to 0 for a failed match.  If the option tt(KSH_ARRAYS) is in
-effect, the subscript is still 0 for a failed match; this cannot be
-distinguished from a successful match without testing tt(${array[0]})
-against the pattern.
+On failure the empty string is returned.
 )
 item(tt(i))(
 Like `tt(r)', but gives the index of the match instead; this may not be
@@ -251,13 +243,16 @@ behaves like `tt(r)'.  For associative arrays, the key part of each pair
 is compared to the pattern, and the first matching key found is the
 result.
 
-See `tt(r)' for discussion of subscripts of failed matches.
+On failure, a value one past the end of the array or string is returned.
 )
 item(tt(I))(
 Like `tt(i)', but gives the index of the last match, or all possible
 matching keys in an associative array.
 
-See `tt(R)' for discussion of subscripts of failed matches.
+On failure the value 0 is returned.  If the option tt(KSH_ARRAYS) is in
+effect, the subscript is still 0 for a failed match; this cannot be
+distinguished from a successful match without testing tt(${array[0]})
+against the pattern.
 )
 item(tt(k))(
 If used in a subscript on an associative array, this flag causes the keys
