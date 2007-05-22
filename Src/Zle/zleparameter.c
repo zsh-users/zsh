@@ -75,6 +75,8 @@ createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan)
 static char *
 widgetstr(Widget w)
 {
+    if (!w)
+	return dupstring("undefined");
     if (w->flags & WIDGET_INT)
 	return dupstring("builtin");
     if (w->flags & WIDGET_NCOMP) {
