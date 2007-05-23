@@ -655,6 +655,18 @@
 >This is in1
 >This is in2
 
+# This is trickier than it looks.  There's a hack at the end of
+# execcmd() to catch the multio processes attached to the
+# subshell, which otherwise sort of get lost in the general turmoil.
+# Without that, the multios aren't synchronous with the subshell
+# or the main shell starting the "cat", so the output files appear
+# empty.
+  setopt multios
+  ( echo hello ) >multio_out1 >multio_out2 && cat multio_out*
+0:Multios attached to a subshell
+>hello
+>hello
+
 # tried this with other things, but not on its own, so much.
   unsetopt nomatch
   print with nonomatch: flooble*

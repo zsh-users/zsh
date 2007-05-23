@@ -1,3 +1,9 @@
+2007-05-23  Peter Stephenson  <pws@csr.com>
+
+	* 23460: Src/exec.c, Src/jobs.c, Test/E01options.ztst:
+	fix longstanding problem with multios attached to a
+	subshell process.
+
 2007-05-22  Peter Stephenson  <pws@csr.com>
 
 	* Phil Pennock: 23450: Src/Zle/zleparameter.yo: undefined

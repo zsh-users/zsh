@@ -1296,6 +1296,15 @@ clearjobtab(int monitor)
 
     memset(jobtab, 0, jobtabsize * sizeof(struct job)); /* zero out table */
     maxjob = 0;
+
+    /*
+     * Although we don't have job control in subshells, we
+     * sometimes needs control structures for other purposes such
+     * as multios.  Grab a job for this purpose; any will do
+     * since we've freed them all up (so there's no question
+     * of problems with the job table size here).
+     */
+    thisjob = initjob();
 }
 
 static int initnewjob(int i)
