@@ -667,6 +667,16 @@
 >hello
 >hello
 
+# This tests for another race in multios.
+  print 'This test hangs the shell when it fails...' >&8
+  setopt multios
+  echo These are the contents of the file >multio_race.out
+  multio_race_fn() { cat; }
+  multio_race_fn <$(echo multio_race.out multio_race.out)
+0:Fix for race with input multios
+>These are the contents of the file
+>These are the contents of the file
+
 # tried this with other things, but not on its own, so much.
   unsetopt nomatch
   print with nonomatch: flooble*

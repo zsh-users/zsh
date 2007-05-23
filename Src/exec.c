@@ -1549,20 +1549,29 @@ closemn(struct multio **mfds, int fd)
 	pid_t pid;
 	struct timeval bgtime;
 
+	/*
+	 * We need to block SIGCHLD in case the process
+	 * we are spawning terminates before the job table
+	 * is set up to handle it.
+	 */
+	child_block();
 	if ((pid = zfork(&bgtime))) {
 	    for (i = 0; i < mn->ct; i++)
 		zclose(mn->fds[i]);
 	    zclose(mn->pipe);
-	    if (pid == -1) { 
+	    if (pid == -1) {
 		mfds[fd] = NULL;
+		child_unblock();
 		return;
 	    }
 	    mn->ct = 1;
 	    mn->fds[0] = fd;
 	    addproc(pid, NULL, 1, &bgtime);
+	    child_unblock();
 	    return;
 	}
 	/* pid == 0 */
+	child_unblock();
 	closeallelse(mn);
 	if (mn->rflag) {
 	    /* tee process */
