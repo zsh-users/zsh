@@ -1,3 +1,8 @@
+2007-05-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23471: configure.ac: error names not found properly
+	on Linux owing to restrictive test when searching files.
+
 2007-05-23  Peter Stephenson  <pws@csr.com>
 
 	* John Buddery: 23461 plus comment and test: fix race

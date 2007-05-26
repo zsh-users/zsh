@@ -1325,7 +1325,6 @@ sed 's/\\\\\\\\/\//g' |
 $AWK '{ if ($1 ~ /err/) files[[$1]] = $1 }
   END { for (var in files) print var }'`"
 rm -f nametmp.c
-lnerrs=0
 for ERRNO_TRY_H in $errfile_list /dev/null
 do
   dnl Try to make sure it doesn't get confused by files that don't
@@ -1337,9 +1336,8 @@ do
   nerrs=`test -f $ERRNO_TRY_H && \
   $EGREP '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*(_HURD_ERRNO )?\(?[_A-Z0-9]' $ERRNO_TRY_H | \
   wc -l | sed 's/[ 	]//g'`
-  if test "x$nerrs" != x && test "$nerrs" -ge 1 && test "$nerrs" -gt "$lnerrs"
+  if test "x$nerrs" != x && test "$nerrs" -ge 1
   then
-    lnerrs=$nerrs
     ERRNO_H="$ERRNO_H $ERRNO_TRY_H"
   fi
 done
