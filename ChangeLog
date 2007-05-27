@@ -1,3 +1,8 @@
+2007-05-27  Clint Adams  <clint@zsh.org>
+
+	* 23475: Completion/Unix/Command/_cdrecord: call $service
+	instead of 'cdrecord', in case we are using wodim.
+
 2007-05-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23471: configure.ac: error names not found properly

@@ -89,14 +89,14 @@ if [[ -n $state ]]; then
   
   case $state in
     device)
-      devices=( ${(f)"$(_call_program device cdrecord -scanbus 2>/dev/null \
+      devices=( ${(f)"$(_call_program device $service -scanbus 2>/dev/null \
           |grep '^	'|cut -c2-6,23-|sed 's/ /:/')"} )
       _describe -t devices device devices && return
     ;;
     blank)
       btypes=(
         'help:display list of available blanking types'
-	${${${${(f)"$(_call_program blank-types cdrecord blank=help 2>&1)"}[2,-1]}#?}/[[:blank:]]##/:}
+	${${${${(f)"$(_call_program blank-types $service blank=help 2>&1)"}[2,-1]}#?}/[[:blank:]]##/:}
       )
       _describe -t blank-types 'blanking type' btypes && return
     ;;
