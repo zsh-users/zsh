@@ -101,7 +101,6 @@
     zmodload zsh/datetime
   }
   fn
-# status is zero because load succeded although features not all enabled
 2:Failed to add parameter if local parameter present
 ?fn:2: Can't add module parameter `EPOCHSECONDS': local parameter exists
 ?fn:zsh/datetime:2: error when adding parameter `EPOCHSECONDS'
