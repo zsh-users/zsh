@@ -5006,9 +5006,8 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    shfunctab->printnode(hn, 0);
 		DPUTS(!hn, "BUG: I did not find any trap functions!");
 	    } else if (sigtrapped[sig]) {
-		const char *name = getsigname(sig);
-		if (!siglists[sig])
-		    printf("trap -- '' %s\n", name);
+		if (!sigfuncs[sig])
+		    printf("trap -- '' %s\n", sigs[sig]);
 		else {
 		    s = getpermtext(sigfuncs[sig], NULL);
 		    printf("trap -- ");
@@ -5071,7 +5070,7 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    flags = ZSIG_ALIAS;
 	}
 	t = dupeprog(prog, 0);
-	if (settrap(sig, t, flags))
+	if (settrap(sig, t))
 	    freeeprog(t);
     }
     return *argv != NULL;
