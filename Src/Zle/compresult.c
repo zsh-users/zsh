@@ -1227,6 +1227,9 @@ reverse_menu(UNUSED(Hookdef dummy), UNUSED(void *dummy2))
 {
     int was_meta;
 
+    if (minfo.cur == NULL)
+	return 1;
+
     do {
 	if (minfo.cur == (minfo.group)->matches) {
 	    do {

@@ -1,3 +1,8 @@
+2007-05-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23478: Src/Zle/compresult.c: don't run reverse-menu-complete
+	if no completion yet.
+
 2007-05-27  Clint Adams  <clint@zsh.org>
 
 	* 23475: Completion/Unix/Command/_cdrecord: call $service
