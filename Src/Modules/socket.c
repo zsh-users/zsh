@@ -255,6 +255,14 @@ static struct builtin bintab[] = {
     BUILTIN("zsocket", 0, bin_zsocket, 0, 3, 0, "ad:ltv", NULL),
 };
 
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
 /* The load/unload routines required by the zsh library interface */
 
 /**/
@@ -266,18 +274,31 @@ setup_(UNUSED(Module m))
 
 /**/
 int
-boot_(Module m)
+features_(Module m, char ***features)
 {
-    return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
 }
 
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
+boot_(Module m)
+{
+    return 0;
+}
 
 /**/
 int
 cleanup_(Module m)
 {
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

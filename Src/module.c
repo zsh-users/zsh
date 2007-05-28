@@ -35,6 +35,20 @@
 /**/
 LinkList linkedmodules;
 
+/* $module_path ($MODULE_PATH) */
+
+/**/
+char **module_path;
+
+/* List of modules */
+
+/**/
+mod_export LinkList modules;
+
+
+/************************************************************************
+ * zsh/main standard module functions
+ ************************************************************************/
 
 /* The `zsh/main' module contains all the base code that can't actually be *
  * built as a separate module.  It is initialised by main(), so there's    *
@@ -45,6 +59,24 @@ int
 setup_(UNUSED(Module m))
 {
     return 0;
+}
+
+/**/
+int
+features_(UNUSED(Module m), UNUSED(char ***features))
+{
+    /*
+     * There are lots and lots of features, but they're not
+     * handled here.
+     */
+    return 1;
+}
+
+/**/
+int
+enables_(UNUSED(Module m), UNUSED(int **enables))
+{
+    return 1;
 }
 
 /**/
@@ -68,12 +100,21 @@ finish_(UNUSED(Module m))
     return 0;
 }
 
+
+/************************************************************************
+ * Module utility functions
+ ************************************************************************/
+
 /* This registers a builtin module.                                   */
 
 /**/
 void
-register_module(char *n, Module_func setup, Module_func boot,
-		Module_func cleanup, Module_func finish)
+register_module(char *n, Module_void_func setup,
+		Module_features_func features,
+		Module_enables_func enables,
+		Module_void_func boot,
+		Module_void_func cleanup,
+		Module_void_func finish)
 {
     Linkedmod m;
 
@@ -81,6 +122,8 @@ register_module(char *n, Module_func setup, Module_func boot,
 
     m->name = ztrdup(n);
     m->setup = setup;
+    m->features = features;
+    m->enables = enables;
     m->boot = boot;
     m->cleanup = cleanup;
     m->finish = finish;
@@ -124,6 +167,12 @@ module_linked(char const *name)
     return NULL;
 }
 
+
+/************************************************************************
+ * Support for the various feature types.
+ * First, builtins.
+ ************************************************************************/
+
 /* addbuiltin() can be used to add a new builtin.  It returns zero on *
  * success, 1 on failure.  The only possible type of failure is that  *
  * a builtin with the specified name already exists.  An autoloaded   *
@@ -142,13 +191,81 @@ addbuiltin(Builtin b)
     return 0;
 }
 
-/* Add multiple builtins.  binl points to a table of `size' builtin      *
- * structures.  Those for which (.flags & BINF_ADDED) is false are to be *
- * added; that flag is set if they succeed.  If any fail, an error       *
- * message is printed, using nam as the leading name.  Returns 1 if all  *
- * additions succeed, 2 if some succeed and some fail, and 0 if all (and *
- * at least 1) fail.  The usual usage in a boot_*() function would be    *
- *  return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)); */
+/* Define an autoloadable builtin.  It returns 0 on success, or 1 on *
+ * failure.  The only possible cause of failure is that a builtin    *
+ * with the specified name already exists.                           */
+
+/**/
+int
+add_autobin(char *nam, char *module)
+{
+    Builtin bn = zshcalloc(sizeof(*bn));
+    bn->node.nam = ztrdup(nam);
+    bn->optstr = ztrdup(module);
+    return addbuiltin(bn);
+}
+
+/* Remove the builtin added previously by addbuiltin().  Returns *
+ * zero on succes and -1 if there is no builtin with that name.  */
+
+/**/
+int
+deletebuiltin(char *nam)
+{
+    Builtin bn;
+
+    bn = (Builtin) builtintab->removenode(builtintab, nam);
+    if (!bn)
+	return -1;
+    builtintab->freenode(&bn->node);
+    return 0;
+}
+
+/**/
+mod_export int
+setbuiltins(char const *nam, Builtin binl, int size, int *e)
+{
+    int hads = 0, hadf = 0, n;
+
+    for(n = 0; n < size; n++) {
+	Builtin b = &binl[n];
+	if (e && *e++) {
+	    if (b->node.flags & BINF_ADDED)
+		continue;
+	    if (addbuiltin(b)) {
+		zwarnnam(nam,
+			 "name clash when adding builtin `%s'", b->node.nam);
+		hadf = 1;
+	    } else {
+		b->node.flags |= BINF_ADDED;
+		hads = 2;
+	    }
+	} else {
+	    if (!(b->node.flags & BINF_ADDED))
+		continue;
+	    if (deletebuiltin(b->node.nam)) {
+		zwarnnam(nam, "builtin `%s' already deleted", b->node.nam);
+		hadf = 1;
+	    } else {
+		hads = 2;
+		b->node.flags &= ~BINF_ADDED;
+	    }
+	}
+    }
+    return hadf ? hads : 1;
+}
+
+/*
+ * Add multiple builtins.  binl points to a table of `size' builtin
+ * structures.  Those for which (.flags & BINF_ADDED) is false are to be
+ * added; that flag is set if they succeed.
+ *
+ * If any fail, an error message is printed, using nam as the leading name.
+ * Returns 1 if all additions succeed, 2 if some succeed and some fail, and 0
+ * if all (and at least 1) fail.
+ *
+ * This should not be used from a module; instead, use handlefeatures().
+ */
 
 /**/
 mod_export int
@@ -170,6 +287,11 @@ addbuiltins(char const *nam, Builtin binl, int size)
     }
     return hadf ? hads : 1;
 }
+
+
+/************************************************************************
+ * Function wrappers.
+ ************************************************************************/
 
 /* The list of function wrappers defined. */
 
@@ -208,75 +330,6 @@ addwrapper(Module m, FuncWrap w)
     return 0;
 }
 
-/* $module_path ($MODULE_PATH) */
-
-/**/
-char **module_path;
-
-/* List of modules */
-
-/**/
-mod_export LinkList modules;
-
-/* Define an autoloadable builtin.  It returns 0 on success, or 1 on *
- * failure.  The only possible cause of failure is that a builtin    *
- * with the specified name already exists.                           */
-
-/**/
-int
-add_autobin(char *nam, char *module)
-{
-    Builtin bn = zshcalloc(sizeof(*bn));
-    bn->node.nam = ztrdup(nam);
-    bn->optstr = ztrdup(module);
-    return addbuiltin(bn);
-}
-
-/* Remove the builtin added previously by addbuiltin().  Returns *
- * zero on succes and -1 if there is no builtin with that name.  */
-
-/**/
-int
-deletebuiltin(char *nam)
-{
-    Builtin bn;
-
-    bn = (Builtin) builtintab->removenode(builtintab, nam);
-    if (!bn)
-	return -1;
-    builtintab->freenode(&bn->node);
-    return 0;
-}
-
-/* Delete multiple builtins.  binl points to a table of `size' builtin  *
- * structures.  Those for which (.flags & BINF_ADDED) is true are to be *
- * deleted; that flag is cleared.  If any fail, an error message is     *
- * printed, using nam as the leading name.  Returns 1 if all deletions  *
- * succeed, 2 if some succeed and some fail, and 0 if all (and at least *
- * 1) fail.  In normal use, from a cleanup_*() function, this return    *
- * value would be ignored -- the only cause of failure would be that a  *
- * wayward module had deleted our builtin without telling us.           */
-
-/**/
-mod_export int
-deletebuiltins(char const *nam, Builtin binl, int size)
-{
-    int hads = 0, hadf = 0, n;
-
-    for(n = 0; n < size; n++) {
-	Builtin b = &binl[n];
-	if(!(b->node.flags & BINF_ADDED))
-	    continue;
-	if(deletebuiltin(b->node.nam)) {
-	    zwarnnam(nam, "builtin `%s' already deleted", b->node.nam);
-	    hadf = 1;
-	} else
-	    hads = 2;
-	b->node.flags &= ~BINF_ADDED;
-    }
-    return hadf ? hads : 1;
-}
-
 /* This removes the given wrapper definition from the list. Returned is *
  * one in case of error and zero otherwise. */
 
@@ -304,6 +357,684 @@ deletewrapper(Module m, FuncWrap w)
     }
     return 1;
 }
+
+
+/************************************************************************
+ * Conditions.
+ ************************************************************************/
+
+/* The list of module-defined conditions. */
+
+/**/
+mod_export Conddef condtab;
+
+/* This gets a condition definition with the given name. The first        *
+ * argument says if we have to look for an infix condition. The last      *
+ * argument is non-zero if we should autoload modules if needed. */
+
+/**/
+Conddef
+getconddef(int inf, char *name, int autol)
+{
+    Conddef p;
+    int f = 1;
+
+    do {
+	for (p = condtab; p; p = p->next) {
+	    if ((!!inf == !!(p->flags & CONDF_INFIX)) &&
+		!strcmp(name, p->name))
+		break;
+	}
+	if (autol && p && p->module) {
+	    /* This is a definition for an autoloaded condition, load the *
+	     * module if we haven't tried that already. */
+	    if (f) {
+		(void)load_module_silence(p->module, NULL, 0);
+		f = 0;
+		p = NULL;
+	    } else {
+		deleteconddef(p);
+		return NULL;
+	    }
+	} else
+	    break;
+    } while (!p);
+    return p;
+}
+
+/*
+ * This adds the given condition definition. The return value is zero on *
+ * success and 1 on failure. If there is a matching definition for an    *
+ * autoloaded condition, it is removed.
+ *
+ * This is used for adding both an autoload definition or
+ * a real condition.  In the latter case the caller is responsible
+ * for setting the CONDF_ADDED flag.
+ */
+
+/**/
+static int
+addconddef(Conddef c)
+{
+    Conddef p = getconddef((c->flags & CONDF_INFIX), c->name, 0);
+
+    if (p) {
+	if (!p->module || (p->flags & CONDF_ADDED))
+	    return 1;
+	/* There is an autoload definition. */
+
+	deleteconddef(p);
+    }
+    c->next = condtab;
+    condtab = c;
+    return 0;
+}
+
+/* This removes the given condition definition from the list(s). If this *
+ * is a definition for a autoloaded condition, the memory is freed. */
+
+/**/
+int
+deleteconddef(Conddef c)
+{
+    Conddef p, q;
+
+    for (p = condtab, q = NULL; p && p != c; q = p, p = p->next);
+
+    if (p) {
+	if (q)
+	    q->next = p->next;
+	else 
+	    condtab = p->next;
+		
+	if (p->module) {
+	    /* autoloaded, free it */
+	    zsfree(p->name);
+	    zsfree(p->module);
+	    zfree(p, sizeof(*p));
+	}
+	return 0;
+    }
+    return -1;
+}
+
+/**/
+mod_export int
+setconddefs(char const *nam, Conddef c, int size, int *e)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (e && *e++) {
+	    if (c->flags & CONDF_ADDED) {
+		c++;
+		continue;
+	    }
+	    if (addconddef(c)) {
+		zwarnnam(nam, "name clash when adding condition `%s'",
+			 c->name);
+		hadf = 1;
+	    } else {
+		c->flags |= CONDF_ADDED;
+		hads = 2;
+	    }
+	} else {
+	    if (!(c->flags & CONDF_ADDED)) {
+		c++;
+		continue;
+	    }
+	    if (deleteconddef(c)) {
+		zwarnnam(nam, "condition `%s' already deleted", c->name);
+		hadf = 1;
+	    } else {
+		c->flags &= ~CONDF_ADDED;
+		hads = 2;
+	    }
+	}
+	c++;
+    }
+    return hadf ? hads : 1;
+}
+
+/* This adds a definition for autoloading a module for a condition. */
+
+/**/
+int
+add_autocond(char *nam, int inf, char *module)
+{
+    Conddef c = (Conddef) zalloc(sizeof(*c));
+
+    c->name = ztrdup(nam);
+    c->flags = (inf  ? CONDF_INFIX : 0);
+    c->module = ztrdup(module);
+
+    if (addconddef(c)) {
+	zsfree(c->name);
+	zsfree(c->module);
+	zfree(c, sizeof(*c));
+
+	return 1;
+    }
+    return 0;
+}
+
+
+/************************************************************************
+ * Hook functions.
+ ************************************************************************/
+
+/* This list of hook functions defined. */
+
+/**/
+Hookdef hooktab;
+
+/* Find a hook definition given the name. */
+
+/**/
+Hookdef
+gethookdef(char *n)
+{
+    Hookdef p;
+
+    for (p = hooktab; p; p = p->next)
+	if (!strcmp(n, p->name))
+	    return p;
+    return NULL;
+}
+
+/* This adds the given hook definition. The return value is zero on      *
+ * success and 1 on failure.                                             */
+
+/**/
+int
+addhookdef(Hookdef h)
+{
+    if (gethookdef(h->name))
+	return 1;
+
+    h->next = hooktab;
+    hooktab = h;
+    h->funcs = znewlinklist();
+
+    return 0;
+}
+
+/* This adds multiple hook definitions. This is like addbuiltins(). */
+
+/**/
+mod_export int
+addhookdefs(char const *nam, Hookdef h, int size)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (addhookdef(h)) {
+	    zwarnnam(nam, "name clash when adding hook `%s'", h->name);
+	    hadf = 1;
+	} else
+	    hads = 2;
+	h++;
+    }
+    return hadf ? hads : 1;
+}
+
+/* Delete hook definitions. */
+
+/**/
+int
+deletehookdef(Hookdef h)
+{
+    Hookdef p, q;
+
+    for (p = hooktab, q = NULL; p && p != h; q = p, p = p->next);
+
+    if (!p)
+	return 1;
+
+    if (q)
+	q->next = p->next;
+    else
+	hooktab = p->next;
+    freelinklist(p->funcs, NULL);
+    return 0;
+}
+
+/**/
+mod_export int
+deletehookdefs(UNUSED(char const *nam), Hookdef h, int size)
+{
+    while (size--) {
+	deletehookdef(h);
+	h++;
+    }
+    return 1;
+}
+
+/* Add a function to a hook. */
+
+/**/
+int
+addhookdeffunc(Hookdef h, Hookfn f)
+{
+    zaddlinknode(h->funcs, (void *) f);
+
+    return 0;
+}
+
+/**/
+mod_export int
+addhookfunc(char *n, Hookfn f)
+{
+    Hookdef h = gethookdef(n);
+
+    if (h)
+	return addhookdeffunc(h, f);
+    return 1;
+}
+
+/* Delete a function from a hook. */
+
+/**/
+int
+deletehookdeffunc(Hookdef h, Hookfn f)
+{
+    LinkNode p;
+
+    for (p = firstnode(h->funcs); p; incnode(p))
+	if (f == (Hookfn) getdata(p)) {
+	    remnode(h->funcs, p);
+	    return 0;
+	}
+    return 1;
+}
+
+/**/
+mod_export int
+deletehookfunc(char *n, Hookfn f)
+{
+    Hookdef h = gethookdef(n);
+
+    if (h)
+	return deletehookdeffunc(h, f);
+    return 1;
+}
+
+/* Run the function(s) for a hook. */
+
+/**/
+mod_export int
+runhookdef(Hookdef h, void *d)
+{
+    if (empty(h->funcs)) {
+	if (h->def)
+	    return h->def(h, d);
+	return 0;
+    } else if (h->flags & HOOKF_ALL) {
+	LinkNode p;
+	int r;
+
+	for (p = firstnode(h->funcs); p; incnode(p))
+	    if ((r = ((Hookfn) getdata(p))(h, d)))
+		return r;
+	if (h->def)
+	    return h->def(h, d);
+	return 0;
+    } else
+	return ((Hookfn) getdata(lastnode(h->funcs)))(h, d);
+}
+
+/**/
+int
+runhook(char *n, void *d)
+{
+    Hookdef h = gethookdef(n);
+
+    if (h)
+	return runhookdef(h, d);
+    return 0;
+}
+
+
+/************************************************************************
+ * Shell parameters.
+ ************************************************************************/
+
+static int
+checkaddparam(char *nam)
+{
+    Param pm;
+
+    if (!(pm = (Param) gethashnode2(paramtab, nam)))
+	return 0;
+
+    if (pm->level || !(pm->node.flags & PM_AUTOLOAD)) {
+	zwarn("Can't add module parameter `%s': %s",
+	      nam, pm->level ?
+	      "local parameter exists" :
+	      "parameter already exists");
+	return 1;
+    }
+
+    unsetparam_pm(pm, 0, 1);
+    return 0;
+}
+
+/* This adds the given parameter definition. The return value is zero on *
+ * success and 1 on failure. */
+
+/**/
+int
+addparamdef(Paramdef d)
+{
+    Param pm;
+
+    if (checkaddparam(d->name))
+	return 1;
+
+    if (d->getnfn) {
+	if (!(pm = createspecialhash(d->name, d->getnfn,
+				     d->scantfn, d->flags)))
+	    return 1;
+    }
+    else if (!(pm = createparam(d->name, d->flags)) &&
+	!(pm = (Param) paramtab->getnode(paramtab, d->name)))
+	return 1;
+
+    d->pm = pm;
+    pm->level = 0;
+    if (d->var)
+	pm->u.data = d->var;
+    if (d->var || d->gsu) {
+	/*
+	 * If no get/set/unset class, use the appropriate
+	 * variable type, else use the one supplied.
+	 */
+	switch (PM_TYPE(pm->node.flags)) {
+	case PM_SCALAR:
+	    pm->gsu.s = d->gsu ? (GsuScalar)d->gsu : &varscalar_gsu;
+	    break;
+
+	case PM_INTEGER:
+	    pm->gsu.i = d->gsu ? (GsuInteger)d->gsu : &varinteger_gsu;
+	    break;
+
+	case PM_ARRAY:
+	    pm->gsu.a = d->gsu ? (GsuArray)d->gsu : &vararray_gsu;
+	    break;
+
+	case PM_HASHED:
+	    /* hashes may behave like standard hashes */
+	    if (d->gsu)
+		pm->gsu.h = (GsuHash)d->gsu;
+	    break;
+
+	default:
+	    unsetparam_pm(pm, 0, 1);
+	    return 1;
+	}
+    }
+
+    return 0;
+}
+
+/* Delete parameters defined. No error checking yet. */
+
+/**/
+int
+deleteparamdef(Paramdef d)
+{
+    Param pm = (Param) paramtab->getnode(paramtab, d->name);
+
+    if (!pm)
+	return 1;
+    if (pm != d->pm) {
+	/*
+	 * See if the parameter has been hidden.  If so,
+	 * bring it to the front to unset it.
+	 */
+	Param prevpm, searchpm;
+	for (prevpm = pm, searchpm = pm->old;
+	     searchpm;
+	     prevpm = searchpm, searchpm = searchpm->old)
+	    if (searchpm == d->pm)
+		break;
+
+	if (!searchpm)
+	    return 1;
+
+	paramtab->removenode(paramtab, pm->node.nam);
+	prevpm->old = searchpm->old;
+	searchpm->old = pm;
+	paramtab->addnode(paramtab, searchpm->node.nam, searchpm);
+
+	pm = searchpm;
+    }
+    pm->node.flags = (pm->node.flags & ~PM_READONLY) | PM_REMOVABLE;
+    unsetparam_pm(pm, 0, 1);
+    d->pm = NULL;
+    return 0;
+}
+
+/**/
+mod_export int
+setparamdefs(char const *nam, Paramdef d, int size, int *e)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (e && *e++) {
+	    if (d->pm) {
+		d++;
+		continue;
+	    }
+	    if (addparamdef(d)) {
+		zwarnnam(nam, "error when adding parameter `%s'", d->name);
+		hadf = 1;
+	    } else {
+		hads = 2;
+	    }
+	} else {
+	    if (!d->pm) {
+		d++;
+		continue;
+	    }
+	    if (deleteparamdef(d)) {
+		zwarnnam(nam, "parameter `%s' already deleted", d->name);
+		hadf = 1;
+	    } else {
+		hads = 2;
+	    }
+	}
+	d++;
+    }
+    return hadf ? hads : 1;
+}
+
+/* This adds a definition for autoloading a module for a parameter. */
+
+/**/
+void
+add_autoparam(char *nam, char *module)
+{
+    Param pm;
+
+    queue_signals();
+    if (checkaddparam(nam)) {
+	unqueue_signals();
+	return;
+    }
+
+    pm = setsparam(nam, ztrdup(module));
+
+    pm->node.flags |= PM_AUTOLOAD;
+    unqueue_signals();
+}
+
+
+/************************************************************************
+ * Math functions.
+ ************************************************************************/
+
+/* List of math functions. */
+
+/**/
+MathFunc mathfuncs;
+
+/**/
+void
+removemathfunc(MathFunc previous, MathFunc current)
+{
+    if (previous)
+	previous->next = current->next;
+    else
+	mathfuncs = current->next;
+
+    zsfree(current->name);
+    zsfree(current->module);
+    zfree(current, sizeof(*current));
+}
+
+/**/
+MathFunc
+getmathfunc(char *name, int autol)
+{
+    MathFunc p, q = NULL;
+
+    for (p = mathfuncs; p; q = p, p = p->next)
+	if (!strcmp(name, p->name)) {
+	    if (autol && p->module && !(p->flags & MFF_USERFUNC)) {
+		char *n = dupstring(p->module);
+
+		removemathfunc(q, p);
+
+		(void)load_module_silence(n, NULL, 0);
+
+		return getmathfunc(name, 0);
+	    }
+	    return p;
+	}
+
+    return NULL;
+}
+
+/**/
+static int
+addmathfunc(MathFunc f)
+{
+    MathFunc p, q = NULL;
+
+    if (f->flags & MFF_ADDED)
+	return 1;
+
+    for (p = mathfuncs; p; q = p, p = p->next)
+	if (!strcmp(f->name, p->name)) {
+	    if (p->module && !(p->flags & MFF_USERFUNC)) {
+		/*
+		 * Autoloadable, replace.
+		 */
+		removemathfunc(q, p);
+		break;
+	    }
+	    return 1;
+	}
+
+    f->next = mathfuncs;
+    mathfuncs = f;
+
+    return 0;
+}
+
+/**/
+mod_export int
+deletemathfunc(MathFunc f)
+{
+    MathFunc p, q;
+
+    for (p = mathfuncs, q = NULL; p && p != f; q = p, p = p->next);
+
+    if (p) {
+	if (q)
+	    q->next = f->next;
+	else
+	    mathfuncs = f->next;
+
+	/* the following applies to both unloaded and user-defined functions */
+	if (f->module) {
+	    zsfree(f->name);
+	    zsfree(f->module);
+	    zfree(f, sizeof(*f));
+	} else
+	    f->flags &= ~MFF_ADDED;
+
+	return 0;
+    }
+    return -1;
+}
+
+/**/
+mod_export int
+setmathfuncs(char const *nam, MathFunc f, int size, int *e)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (e && *e++) {
+	    if (f->flags & MFF_ADDED) {
+		f++;
+		continue;
+	    }
+	    if (addmathfunc(f)) {
+		zwarnnam(nam, "name clash when adding math function `%s'",
+			 f->name);
+		hadf = 1;
+	    } else {
+		f->flags |= MFF_ADDED;
+		hads = 2;
+	    }
+	} else {
+	    if (!(f->flags & MFF_ADDED)) {
+		f++;
+		continue;
+	    }
+	    if (deletemathfunc(f)) {
+		zwarnnam(nam, "math function `%s' already deleted", f->name);
+		hadf = 1;
+	    } else {
+		f->flags &= ~MFF_ADDED;
+		hads = 2;
+	    }	    
+	}
+	f++;
+    }
+    return hadf ? hads : 1;
+}
+
+/**/
+int
+add_automathfunc(char *nam, char *module)
+{
+    MathFunc f = (MathFunc) zalloc(sizeof(*f));
+
+    f->name = ztrdup(nam);
+    f->module = ztrdup(module);
+    f->flags = 0;
+
+    if (addmathfunc(f)) {
+	zsfree(f->name);
+	zsfree(f->module);
+	zfree(f, sizeof(*f));
+
+	return 1;
+    }
+
+    return 0;
+}
+
+
+/************************************************************************
+ * Now support for dynamical loading and the fallback functions
+ * we use for loading if dynamical loading is not available.
+ ************************************************************************/
 
 /**/
 #ifdef DYNAMIC
@@ -392,11 +1123,15 @@ hpux_dlsym(void *handle, char *name)
 
 #ifdef DLSYM_NEEDS_UNDERSCORE
 # define STR_SETUP     "_setup_"
+# define STR_FEATURES  "_features_"
+# define STR_ENABLES   "_enables_"
 # define STR_BOOT      "_boot_"
 # define STR_CLEANUP   "_cleanup_"
 # define STR_FINISH    "_finish_"
 #else /* !DLSYM_NEEDS_UNDERSCORE */
 # define STR_SETUP     "setup_"
+# define STR_FEATURES  "features_"
+# define STR_ENABLES   "enables_"
 # define STR_BOOT      "boot_"
 # define STR_CLEANUP   "cleanup_"
 # define STR_FINISH    "finish_"
@@ -542,38 +1277,52 @@ module_loaded(const char *name)
 static int
 dyn_setup_module(Module m)
 {
-    return ((int (*)_((int,Module))) m->u.handle)(0, m);
+    return ((int (*)_((int,Module))) m->u.handle)(0, m, NULL);
+}
+
+/**/
+static int
+dyn_features_module(Module m, char ***features)
+{
+    return ((int (*)_((int,Module))) m->u.handle)(4, m, features);
+}
+
+/**/
+static int
+dyn_enables_module(Module m, int **enables)
+{
+    return ((int (*)_((int,Module))) m->u.handle)(5, m, enables);
 }
 
 /**/
 static int
 dyn_boot_module(Module m)
 {
-    return ((int (*)_((int,Module))) m->u.handle)(1, m);
+    return ((int (*)_((int,Module))) m->u.handle)(1, m, NULL);
 }
 
 /**/
 static int
 dyn_cleanup_module(Module m)
 {
-    return ((int (*)_((int,Module))) m->u.handle)(2, m);
+    return ((int (*)_((int,Module))) m->u.handle)(2, m, NULL);
 }
 
 /**/
 static int
 dyn_finish_module(Module m)
 {
-    return ((int (*)_((int,Module))) m->u.handle)(3, m);
+    return ((int (*)_((int,Module))) m->u.handle)(3, m, NULL);
 }
 
 /**/
 #else
 
-static Module_func
+static Module_generic_func
 module_func(Module m, char *name)
 {
 #ifdef DYNAMIC_NAME_CLASH_OK
-    return (Module_func) dlsym(m->u.handle, name);
+    return (Module_generic_func) dlsym(m->u.handle, name);
 #else /* !DYNAMIC_NAME_CLASH_OK */
     VARARR(char, buf, strlen(name) + strlen(m->nam)*2 + 1);
     char const *p;
@@ -594,7 +1343,7 @@ module_func(Module m, char *name)
 	    *q++ = *p;
     }
     *q = 0;
-    return (Module_func) dlsym(m->u.handle, buf);
+    return (Module_generic_func) dlsym(m->u.handle, buf);
 #endif /* !DYNAMIC_NAME_CLASH_OK */
 }
 
@@ -602,7 +1351,7 @@ module_func(Module m, char *name)
 static int
 dyn_setup_module(Module m)
 {
-    Module_func fn = module_func(m, STR_SETUP);
+    Module_void_func fn = (Module_void_func)module_func(m, STR_SETUP);
 
     if (fn)
 	return fn(m);
@@ -612,9 +1361,34 @@ dyn_setup_module(Module m)
 
 /**/
 static int
+dyn_features_module(Module m, char ***features)
+{
+    Module_features_func fn =
+	(Module_features_func)module_func(m, STR_FEATURES);
+
+    if (fn)
+	return fn(m, features);
+    /* not a user-visible error if no features function */
+    return 1;
+}
+
+/**/
+static int
+dyn_enables_module(Module m, int **enables)
+{
+    Module_enables_func fn = (Module_enables_func)module_func(m, STR_ENABLES);
+
+    if (fn)
+	return fn(m, enables);
+    /* not a user-visible error if no enables function */
+    return 1;
+}
+
+/**/
+static int
 dyn_boot_module(Module m)
 {
-    Module_func fn = module_func(m, STR_BOOT);
+    Module_void_func fn = (Module_void_func)module_func(m, STR_BOOT);
 
     if(fn)
 	return fn(m);
@@ -626,7 +1400,7 @@ dyn_boot_module(Module m)
 static int
 dyn_cleanup_module(Module m)
 {
-    Module_func fn = module_func(m, STR_CLEANUP);
+    Module_void_func fn = (Module_void_func)module_func(m, STR_CLEANUP);
 
     if(fn)
 	return fn(m);
@@ -641,7 +1415,7 @@ dyn_cleanup_module(Module m)
 static int
 dyn_finish_module(Module m)
 {
-    Module_func fn = module_func(m, STR_FINISH);
+    Module_void_func fn = (Module_void_func)module_func(m, STR_FINISH);
     int r;
 
     if (fn)
@@ -663,6 +1437,24 @@ setup_module(Module m)
 {
     return ((m->flags & MOD_LINKED) ?
 	    (m->u.linked->setup)(m) : dyn_setup_module(m));
+}
+
+/**/
+static int
+features_module(Module m, char ***features)
+{
+    return ((m->flags & MOD_LINKED) ?
+	    (m->u.linked->features)(m, features) :
+	    dyn_features_module(m, features));
+}
+
+/**/
+static int
+enables_module(Module m, int **enables)
+{
+    return ((m->flags & MOD_LINKED) ?
+	    (m->u.linked->enables)(m, enables) :
+	    dyn_enables_module(m, enables));
 }
 
 /**/
@@ -701,6 +1493,22 @@ setup_module(Module m)
 
 /**/
 static int
+features_module(Module m, char ***features)
+{
+    return ((m->flags & MOD_LINKED) ? (m->u.linked->features)(m, features)
+	    : 1);
+}
+
+/**/
+static int
+enables_module(Module m, int **enables)
+{
+    return ((m->flags & MOD_LINKED) ? (m->u.linked->enables)(m, enables)
+	    : 1);
+}
+
+/**/
+static int
 boot_module(Module m)
 {
     return ((m->flags & MOD_LINKED) ? (m->u.linked->boot)(m) : 1);
@@ -723,6 +1531,125 @@ finish_module(Module m)
 /**/
 #endif /* !DYNAMIC */
 
+
+/************************************************************************
+ * Functions called when manipulating modules
+ ************************************************************************/
+
+/*
+ * Set the features for the module, which must be loaded
+ * by now (though may not be fully set up).
+ *
+ * Return 0 for success, 1 for failure, 2 if some features
+ * couldn't be set.
+ */
+
+/**/
+static int
+do_module_features(Module m, char **enablesstr, int silent)
+{
+    char **features;
+
+    if (features_module(m, &features) == 0) {
+	/*
+	 * Features are supported.  If we were passed
+	 * a NULL array, enable all features, else
+	 * enable only the features listed.
+	 * (This may in principle be an empty array,
+	 * although that's not very pointful.)
+	 */
+	int *enables = NULL;
+	if (enables_module(m, &enables)) {
+	    /* If features are supported, enables should be, too */
+	    if (!silent)
+		zwarn("error getting enabled features for module `%s'",
+		      m->nam);
+	    return 1;
+	}
+
+	if (enablesstr) {
+	    char **ep;
+	    for (ep = enablesstr; *ep; ep++) {
+		char **fp, *esp = *ep;
+		int on = 1;
+		if (*esp == '+')
+		    esp++;
+		else if (*esp == '-') {
+		    on = 0;
+		    esp++;
+		}
+		for (fp = features; *fp; fp++)
+		    if (!strcmp(*fp, esp)) {
+			enables[fp - features] = on;
+			break;
+		    }
+		if (!*fp) {
+		    if (!silent)
+			zwarn("module `%s' has no such feature: %s",
+			      m->nam, esp);
+		    return 1;
+		}
+	    }
+	} else {
+	    /*
+	     * Enable all features.  This is used when loading
+	     * without using zmodload -F.
+	     */
+	    int n_features = arrlen(features);
+	    int *ep;
+	    for (ep = enables; n_features--; ep++)
+		*ep = 1;
+	}
+
+	if (enables_module(m, &enables))
+	    return 2;
+    } else if (enablesstr) {
+	if (!silent)
+	    zwarn("module `%s' does not support features", m->nam);
+	return 1;
+    }
+    /* Else it doesn't support features but we don't care. */
+
+    return 0;
+}
+
+/*
+ * Boot the module, including setting up features.
+ * As we've only just loaded the module, we don't yet
+ * know what features it supports, so we get them passed
+ * as a string.
+ *
+ * Returns 0 if OK, 1 if completely failed, 2 if some features
+ * couldn't be set up.
+ */
+
+/**/
+static int
+do_boot_module(Module m, char **enablesstr, int silent)
+{
+    int ret = do_module_features(m, enablesstr, silent);
+
+    if (ret == 1)
+	return 1;
+
+    if (boot_module(m))
+	return 1;
+    return ret;
+}
+
+/*
+ * Cleanup the module.
+ */
+
+/**/
+static int
+do_cleanup_module(Module m)
+{
+    return (m->flags & MOD_LINKED) ?
+	(m->u.linked && m->u.linked->cleanup(m)) :
+	(m->u.handle && cleanup_module(m));
+}
+
 /**/
 static int
 modname_ok(char const *p)
@@ -735,27 +1662,37 @@ modname_ok(char const *p)
     return 0;
 }
 
-/**/
-mod_export int
-load_module(char const *name)
-{
-    return load_module_silence(name, 0);
-}
+/*
+ * Now returns 0 for success (changed post-4.3.4),
+ * 1 for complete failure, 2 if some features couldn't be set.
+ */
 
 /**/
 mod_export int
-load_module_silence(char const *name, int silent)
+load_module(char const *name, char **enablesstr)
+{
+    return load_module_silence(name, enablesstr, 0);
+}
+
+/*
+ * Returns 0 for success (changed post-4.3.4), 1 for complete
+ * failure, 2 if some features couldn't be set.
+ */
+
+/**/
+mod_export int
+load_module_silence(char const *name, char **enablesstr, int silent)
 {
     Module m;
     void *handle = NULL;
     Linkedmod linked;
     LinkNode node, n;
-    int set;
+    int set, bootret;
 
     if (!modname_ok(name)) {
 	if (!silent)
 	    zerr("invalid module name `%s'", name);
-	return 0;
+	return 1;
     }
     /*
      * The following function call may alter name to the final name in a
@@ -767,7 +1704,7 @@ load_module_silence(char const *name, int silent)
 	if (!(linked = module_linked(name)) &&
 	    !(handle = do_load_module(name, silent))) {
 	    unqueue_signals();
-	    return 0;
+	    return 1;
 	}
 	m = zshcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
@@ -780,40 +1717,47 @@ load_module_silence(char const *name, int silent)
 	}
 	node = zaddlinknode(modules, m);
 
-	if ((set = setup_module(m)) || boot_module(m)) {
-	    if (!set)
+	if ((set = setup_module(m)) ||
+	    (bootret = do_boot_module(m, enablesstr, silent)) == 1) {
+	    if (!set) {
+		do_cleanup_module(m);
 		finish_module(m);
+	    }
 	    delete_module(node);
 	    unqueue_signals();
-	    return 0;
+	    return 1;
 	}
 	m->flags |= MOD_INIT_S | MOD_INIT_B;
 	m->flags &= ~MOD_SETUP;
 	unqueue_signals();
-	return 1;
-    } 
+	return bootret;
+    }
     m = (Module) getdata(node);
     if (m->flags & MOD_SETUP) {
 	unqueue_signals();
-	return 1;
+	return 0;
     }
     if (m->flags & MOD_UNLOAD)
 	m->flags &= ~MOD_UNLOAD;
     else if ((m->flags & MOD_LINKED) ? m->u.linked : m->u.handle) {
 	unqueue_signals();
-	return 1;
+	return 0;
     }
     if (m->flags & MOD_BUSY) {
 	zerr("circular dependencies for module %s", name);
-	return 0;
+	return 1;
     }
     m->flags |= MOD_BUSY;
+    /*
+     * TODO: shouldn't we unload the module if one of
+     * its dependencies fails?
+     */
     if (m->deps)
 	for (n = firstnode(m->deps); n; incnode(n))
-	    if (!load_module_silence((char *) getdata(n), silent)) {
+	    if (load_module_silence((char *) getdata(n), NULL, silent) == 1) {
 		m->flags &= ~MOD_BUSY;
 		unqueue_signals();
-		return 0;
+		return 1;
 	    }
     m->flags &= ~MOD_BUSY;
     if (!m->u.handle) {
@@ -821,7 +1765,7 @@ load_module_silence(char const *name, int silent)
 	if (!(linked = module_linked(name)) &&
 	    !(handle = do_load_module(name, silent))) {
 	    unqueue_signals();
-	    return 0;
+	    return 1;
 	}
 	if (handle) {
 	    m->u.handle = handle;
@@ -837,12 +1781,13 @@ load_module_silence(char const *name, int silent)
 		m->u.linked = NULL;
 	    m->flags &= ~MOD_SETUP;
 	    unqueue_signals();
-	    return 0;
+	    return 1;
 	}
 	m->flags |= MOD_INIT_S;
     }
     m->flags |= MOD_SETUP;
-    if (boot_module(m)) {
+    if ((bootret = do_boot_module(m, enablesstr, silent)) == 1) {
+	do_cleanup_module(m);
 	finish_module(m);
 	if (m->flags & MOD_LINKED)
 	    m->u.linked = NULL;
@@ -850,42 +1795,44 @@ load_module_silence(char const *name, int silent)
 	    m->u.handle = NULL;
 	m->flags &= ~MOD_SETUP;
 	unqueue_signals();
-	return 0;
+	return 1;
     }
     m->flags |= MOD_INIT_B;
     m->flags &= ~MOD_SETUP;
     unqueue_signals();
-    return 1;
+    return bootret;
 }
 
 /* This ensures that the module with the name given as the second argument
  * is loaded.
- * The third argument should be non-zero if the function should complain
- * about trying to load a module with a full path name in restricted mode.
- * The last argument should be non-zero if this function should signal an
- * error if the module is already loaded.
- * The return value is non-zero if the module was found or loaded. */
+ * The last argument is the array of features to set.  If this is NULL
+ * and the module needs to be loaded, all features are enabled.
+ * If this is non-NULL the module features are set accordingly
+ * whether or not the module is loaded; it is an error if the
+ * module does not support the features passed (even if the feature
+ * is to be turned off) or if the module does not support features
+ * at all.
+ * The return value is 0 if the module was found or loaded
+ * (this changed post-4.3.4, because I got so confused---pws),
+ * 1 if loading failed completely, 2 if some features couldn't be set.
+ */
 
 /**/
 mod_export int
-require_module(char *nam, const char *module, UNUSED(int res), int test)
+require_module(char *nam, const char *module, char **features)
 {
     Module m = NULL;
     LinkNode node;
-    int ret = 1;
+    int ret = 0;
 
     /* Resolve aliases and actual loadable module as for load_module */
     queue_signals();
     node = find_module(module, 1, &module);
-    if (node && (m = ((Module) getdata(node)))->u.handle &&
-	!(m->flags & MOD_UNLOAD)) {
-	if (test) {
-	    unqueue_signals();
-	    zwarnnam(nam, "module %s already loaded.", module);
-	    return 0;
-	}
-    } else
-	ret = load_module_silence(module, 0);
+    if (!node || !(m = ((Module) getdata(node)))->u.handle ||
+	(m->flags & MOD_UNLOAD))
+	ret = load_module_silence(module, features, 0);
+    else
+	ret = do_module_features(m, features, 0);
     unqueue_signals();
 
     return ret;
@@ -953,6 +1900,11 @@ autoloadscan(HashNode hn, int printflags)
     putchar('\n');
 }
 
+
+/************************************************************************
+ * Handling for the zmodload builtin and its various options.
+ ************************************************************************/
+
 /**/
 int
 bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
@@ -961,10 +1913,18 @@ bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
 	OPT_ISSET(ops,'p') || OPT_ISSET(ops,'f');
     int ops_au = OPT_ISSET(ops,'a') || OPT_ISSET(ops,'u');
     int ret = 1;
+    /* options only allowed with -F */
+    char *fonly = "lP", *fp;
 
-    if (ops_bcpf && !ops_au) {
-	zwarnnam(nam, "-b, -c, -f, and -p must be combined with -a or -u");
-	return 1;
+    if (ops_bcpf) {
+	if (!ops_au) {
+	    zwarnnam(nam, "-b, -c, -f, and -p must be combined with -a or -u");
+	    return 1;
+	}
+	if (OPT_ISSET(ops,'F')) {
+	    zwarnnam(nam, "-b, -c, -f, and -p cannot be combined with -F");
+	    return 1;
+	}
     }
     if (OPT_ISSET(ops,'A') || OPT_ISSET(ops,'R')) {
 	if (ops_bcpf || ops_au || OPT_ISSET(ops,'d') || 
@@ -987,10 +1947,19 @@ bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
 			       OPT_ISSET(ops,'a') || OPT_ISSET(ops,'d') ||
 			       OPT_ISSET(ops,'i') || OPT_ISSET(ops,'u'))) {
 	zwarnnam(nam, "-e cannot be combined with other options");
+	/* except -F ... */
 	return 1;
     }
+    for (fp = fonly; *fp; fp++) {
+	if (OPT_ISSET(ops,STOUC(*fp)) && !OPT_ISSET(ops,'F')) {
+	    zwarnnam(nam, "-%c is only allowed with -F", *fp);
+	    return 1;
+	}
+    }
     queue_signals();
-    if (OPT_ISSET(ops,'e'))
+    if (OPT_ISSET(ops, 'F'))
+	ret = bin_zmodload_features(nam, args, ops);
+    else if (OPT_ISSET(ops,'e'))
 	ret = bin_zmodload_exist(nam, args, ops);
     else if (OPT_ISSET(ops,'d'))
 	ret = bin_zmodload_dep(nam, args, ops);
@@ -1471,9 +2440,7 @@ unload_module(Module m, LinkNode node)
     }
     if ((m->flags & MOD_INIT_S) &&
 	!(m->flags & MOD_UNLOAD) &&
-	((m->flags & MOD_LINKED) ?
-	 (m->u.linked && m->u.linked->cleanup(m)) :
-	 (m->u.handle && cleanup_module(m))))
+	do_cleanup_module(m))
 	return 1;
     else {
 	int del = (m->flags & MOD_UNLOAD);
@@ -1622,608 +2589,274 @@ bin_zmodload_load(char *nam, char **args, Options ops)
 	return 0;
     } else {
 	/* load modules */
-	for (; *args; args++)
-	    if (!require_module(nam, *args, 1, (!OPT_ISSET(ops,'i'))))
-		ret = 1;
+	for (; *args; args++) {
+	    int tmpret = require_module(nam, *args, NULL);
+	    if (tmpret && ret != 1)
+		ret = tmpret;
+	}
 
 	return ret;
     }
 }
 
-/* The list of module-defined conditions. */
-
 /**/
-mod_export Conddef condtab;
-
-/* This gets a condition definition with the given name. The first        *
- * argument says if we have to look for an infix condition. The last      *
- * argument is non-zero if we should autoload modules if needed. */
-
-/**/
-Conddef
-getconddef(int inf, char *name, int autol)
+static int
+bin_zmodload_features(char *nam, char **args, Options ops)
 {
-    Conddef p;
-    int f = 1;
+    char *modname = *args;
 
-    do {
-	for (p = condtab; p; p = p->next) {
-	    if ((!!inf == !!(p->flags & CONDF_INFIX)) &&
-		!strcmp(name, p->name))
-		break;
-	}
-	if (autol && p && p->module) {
-	    /* This is a definition for an autoloaded condition, load the *
-	     * module if we haven't tried that already. */
-	    if (f) {
-		load_module_silence(p->module, 0);
-		f = 0;
-		p = NULL;
-	    } else {
-		deleteconddef(p);
-		return NULL;
-	    }
-	} else
-	    break;
-    } while (!p);
-    return p;
-}
-
-/* This adds the given condition definition. The return value is zero on *
- * success and 1 on failure. If there is a matching definition for an    *
- * autoloaded condition, it is removed. */
-
-/**/
-int
-addconddef(Conddef c)
-{
-    Conddef p = getconddef((c->flags & CONDF_INFIX), c->name, 0);
-
-    if (p) {
-	if (!p->module || (p->flags & CONDF_ADDED))
-	    return 1;
-	/* There is an autoload definition. */
-
-	deleteconddef(p);
-    }
-    c->next = condtab;
-    condtab = c;
-    return 0;
-}
-
-/* This adds multiple condition definitions. This is like addbuiltins(). */
-
-/**/
-mod_export int
-addconddefs(char const *nam, Conddef c, int size)
-{
-    int hads = 0, hadf = 0;
-
-    while (size--) {
-	if (c->flags & CONDF_ADDED) {
-	    c++;
-	    continue;
-	}
-	if (addconddef(c)) {
-	    zwarnnam(nam, "name clash when adding condition `%s'", c->name);
-	    hadf = 1;
-	} else {
-	    c->flags |= CONDF_ADDED;
-	    hads = 2;
-	}
-	c++;
-    }
-    return hadf ? hads : 1;
-}
-
-/* This list of hook functions defined. */
-
-/**/
-Hookdef hooktab;
-
-/* Find a hook definition given the name. */
-
-/**/
-Hookdef
-gethookdef(char *n)
-{
-    Hookdef p;
-
-    for (p = hooktab; p; p = p->next)
-	if (!strcmp(n, p->name))
-	    return p;
-    return NULL;
-}
-
-/* This adds the given hook definition. The return value is zero on      *
- * success and 1 on failure.                                             */
-
-/**/
-int
-addhookdef(Hookdef h)
-{
-    if (gethookdef(h->name))
+    if (!modname) {
+	zwarnnam(nam, "-F requires a module name");
 	return 1;
-
-    h->next = hooktab;
-    hooktab = h;
-    h->funcs = znewlinklist();
-
-    return 0;
-}
-
-/* This adds multiple hook definitions. This is like addbuiltins(). */
-
-/**/
-mod_export int
-addhookdefs(char const *nam, Hookdef h, int size)
-{
-    int hads = 0, hadf = 0;
-
-    while (size--) {
-	if (addhookdef(h)) {
-	    zwarnnam(nam, "name clash when adding hook `%s'", h->name);
-	    hadf = 1;
-	} else
-	    hads = 2;
-	h++;
     }
-    return hadf ? hads : 1;
-}
+    args++;
 
-/* Delete hook definitions. */
-
-/**/
-int
-deletehookdef(Hookdef h)
-{
-    Hookdef p, q;
-
-    for (p = hooktab, q = NULL; p && p != h; q = p, p = p->next);
-
-    if (!p)
-	return 1;
-
-    if (q)
-	q->next = p->next;
-    else
-	hooktab = p->next;
-    freelinklist(p->funcs, NULL);
-    return 0;
-}
-
-/**/
-mod_export int
-deletehookdefs(UNUSED(char const *nam), Hookdef h, int size)
-{
-    while (size--) {
-	deletehookdef(h);
-	h++;
-    }
-    return 1;
-}
-
-/* Add a function to a hook. */
-
-/**/
-int
-addhookdeffunc(Hookdef h, Hookfn f)
-{
-    zaddlinknode(h->funcs, (void *) f);
-
-    return 0;
-}
-
-/**/
-mod_export int
-addhookfunc(char *n, Hookfn f)
-{
-    Hookdef h = gethookdef(n);
-
-    if (h)
-	return addhookdeffunc(h, f);
-    return 1;
-}
-
-/* Delete a function from a hook. */
-
-/**/
-int
-deletehookdeffunc(Hookdef h, Hookfn f)
-{
-    LinkNode p;
-
-    for (p = firstnode(h->funcs); p; incnode(p))
-	if (f == (Hookfn) getdata(p)) {
-	    remnode(h->funcs, p);
-	    return 0;
-	}
-    return 1;
-}
-
-/**/
-mod_export int
-deletehookfunc(char *n, Hookfn f)
-{
-    Hookdef h = gethookdef(n);
-
-    if (h)
-	return deletehookdeffunc(h, f);
-    return 1;
-}
-
-/* Run the function(s) for a hook. */
-
-/**/
-mod_export int
-runhookdef(Hookdef h, void *d)
-{
-    if (empty(h->funcs)) {
-	if (h->def)
-	    return h->def(h, d);
-	return 0;
-    } else if (h->flags & HOOKF_ALL) {
-	LinkNode p;
-	int r;
-
-	for (p = firstnode(h->funcs); p; incnode(p))
-	    if ((r = ((Hookfn) getdata(p))(h, d)))
-		return r;
-	if (h->def)
-	    return h->def(h, d);
-	return 0;
-    } else
-	return ((Hookfn) getdata(lastnode(h->funcs)))(h, d);
-}
-
-/**/
-int
-runhook(char *n, void *d)
-{
-    Hookdef h = gethookdef(n);
-
-    if (h)
-	return runhookdef(h, d);
-    return 0;
-}
-
-/* This adds the given parameter definition. The return value is zero on *
- * success and 1 on failure. */
-
-/**/
-int
-addparamdef(Paramdef d)
-{
-    Param pm;
-
-    if ((pm = (Param) gethashnode2(paramtab, d->name)))
-	unsetparam_pm(pm, 0, 1);
-
-    if (!(pm = createparam(d->name, d->flags)) &&
-	!(pm = (Param) paramtab->getnode(paramtab, d->name)))
-	return 1;
-
-    pm->level = 0;
-    pm->u.data = d->var;
-    if (d->gsu)
-	pm->gsu.i = (GsuInteger) d->gsu;
-    else {
+    if (OPT_ISSET(ops,'l') || OPT_ISSET(ops,'L') || OPT_ISSET(ops,'e')) {
 	/*
-	 * If no get/set/unset class, use the appropriate
-	 * variable type.
+	 * With option 'l', list all features one per line with + or -.
+	 * With option 'L', list as zmodload statement showing
+	 * only options turned on.
+	 * With both options, list as zmodload showing options
+	 * to be turned both on and off.
 	 */
-	switch (PM_TYPE(pm->node.flags)) {
-	case PM_SCALAR:
-	    pm->gsu.s = &varscalar_gsu;
-	    break;
+	LinkNode node;
+	Module m = NULL;
+	char **features, **fp, **arrset = NULL, **arrp = NULL;
+	int *enables = NULL, *ep;
+	char *param = OPT_ARG_SAFE(ops,'P');
 
-	case PM_INTEGER:
-	    pm->gsu.i = &varinteger_gsu;
-	    break;
-
-	case PM_ARRAY:
-	    pm->gsu.a = &vararray_gsu;
-	    break;
-
-	default:
-	    unsetparam_pm(pm, 0, 1);
+	node = find_module(modname, 1, NULL);
+	if (node)
+	    m = ((Module) getdata(node));
+	if (!m || !m->u.handle || (m->flags & MOD_UNLOAD)) {
+	    if (!OPT_ISSET(ops,'e'))
+		zwarnnam(nam, "module `%s' is not yet loaded", modname);
 	    return 1;
 	}
-    }
-
-    return 0;
-}
-
-/* This adds multiple parameter definitions. This is like addbuiltins(). */
-
-/**/
-mod_export int
-addparamdefs(char const *nam, Paramdef d, int size)
-{
-    int hads = 0, hadf = 0;
-
-    while (size--) {
-	if (addparamdef(d)) {
-	    zwarnnam(nam, "error when adding parameter `%s'", d->name);
-	    hadf = 1;
-	} else
-	    hads = 2;
-	d++;
-    }
-    return hadf ? hads : 1;
-}
-
-/* Delete parameters defined. No error checking yet. */
-
-/**/
-int
-deleteparamdef(Paramdef d)
-{
-    unsetparam(d->name);
-    return 0;
-}
-
-/**/
-mod_export int
-deleteparamdefs(UNUSED(char const *nam), Paramdef d, int size)
-{
-    while (size--) {
-	deleteparamdef(d);
-	d++;
-    }
-    return 1;
-}
-
-/* This adds a definition for autoloading a module for a condition. */
-
-/**/
-int
-add_autocond(char *nam, int inf, char *module)
-{
-    Conddef c = (Conddef) zalloc(sizeof(*c));
-
-    c->name = ztrdup(nam);
-    c->flags = (inf  ? CONDF_INFIX : 0);
-    c->module = ztrdup(module);
-
-    if (addconddef(c)) {
-	zsfree(c->name);
-	zsfree(c->module);
-	zfree(c, sizeof(*c));
-
-	return 1;
-    }
-    return 0;
-}
-
-/* This removes the given condition definition from the list(s). If this *
- * is a definition for a autoloaded condition, the memory is freed. */
-
-/**/
-int
-deleteconddef(Conddef c)
-{
-    Conddef p, q;
-
-    for (p = condtab, q = NULL; p && p != c; q = p, p = p->next);
-
-    if (p) {
-	if (q)
-	    q->next = p->next;
-	else 
-	    condtab = p->next;
-		
-	if (p->module) {
-	    /* autoloaded, free it */
-	    zsfree(p->name);
-	    zsfree(p->module);
-	    zfree(p, sizeof(*p));
-	}
-	return 0;
-    }
-    return -1;
-}
-
-/* This removes multiple condition definitions (like deletebuiltins()). */
-
-/**/
-mod_export int
-deleteconddefs(char const *nam, Conddef c, int size)
-{
-    int hads = 0, hadf = 0;
-
-    while (size--) {
-	if (!(c->flags & CONDF_ADDED)) {
-	    c++;
-	    continue;
-	}
-	if (deleteconddef(c)) {
-	    zwarnnam(nam, "condition `%s' already deleted", c->name);
-	    hadf = 1;
-	} else
-	    hads = 2;
-	c->flags &= ~CONDF_ADDED;
-	c++;
-    }
-    return hadf ? hads : 1;
-}
-
-/* This adds a definition for autoloading a module for a parameter. */
-
-/**/
-void
-add_autoparam(char *nam, char *module)
-{
-    Param pm;
-
-    queue_signals();
-    if ((pm = (Param) gethashnode2(paramtab, nam)))
-	unsetparam_pm(pm, 0, 1);
-
-    pm = setsparam(nam, ztrdup(module));
-
-    pm->node.flags |= PM_AUTOLOAD;
-    unqueue_signals();
-}
-
-/* List of math functions. */
-
-/**/
-MathFunc mathfuncs;
-
-/**/
-void
-removemathfunc(MathFunc previous, MathFunc current)
-{
-    if (previous)
-	previous->next = current->next;
-    else
-	mathfuncs = current->next;
-
-    zsfree(current->name);
-    zsfree(current->module);
-    zfree(current, sizeof(*current));
-}
-
-/**/
-MathFunc
-getmathfunc(char *name, int autol)
-{
-    MathFunc p, q = NULL;
-
-    for (p = mathfuncs; p; q = p, p = p->next)
-	if (!strcmp(name, p->name)) {
-	    if (autol && p->module && !(p->flags & MFF_USERFUNC)) {
-		char *n = dupstring(p->module);
-
-		removemathfunc(q, p);
-
-		load_module_silence(n, 0);
-
-		return getmathfunc(name, 0);
-	    }
-	    return p;
-	}
-
-    return NULL;
-}
-
-/**/
-mod_export int
-addmathfunc(MathFunc f)
-{
-    MathFunc p, q = NULL;
-
-    if (f->flags & MFF_ADDED)
-	return 1;
-
-    for (p = mathfuncs; p; q = p, p = p->next)
-	if (!strcmp(f->name, p->name)) {
-	    if (p->module && !(p->flags & MFF_USERFUNC)) {
-		/*
-		 * Autoloadable, replace.
-		 */
-		removemathfunc(q, p);
-		break;
-	    }
+	if (features_module(m, &features)) {
+	    if (!OPT_ISSET(ops,'e'))
+		zwarnnam(nam, "module `%s' does not support features", m->nam);
 	    return 1;
 	}
-
-    f->flags |= MFF_ADDED;
-    f->next = mathfuncs;
-    mathfuncs = f;
-
-    return 0;
-}
-
-/**/
-mod_export int
-addmathfuncs(char const *nam, MathFunc f, int size)
-{
-    int hads = 0, hadf = 0;
-
-    while (size--) {
-	if (f->flags & MFF_ADDED) {
-	    f++;
-	    continue;
+	if (enables_module(m, &enables)) {
+	    /* this shouldn't ever happen, so don't silence this error */
+	    zwarnnam(nam, "error getting enabled features for module `%s'",
+		     m->nam);
+	    return 1;
 	}
-	if (addmathfunc(f)) {
-	    zwarnnam(nam, "name clash when adding math function `%s'",
-		     f->name);
-	    hadf = 1;
-	} else
-	    hads = 2;
-	f++;
-    }
-    return hadf ? hads : 1;
-}
-
-/**/
-int
-add_automathfunc(char *nam, char *module)
-{
-    MathFunc f = (MathFunc) zalloc(sizeof(*f));
-
-    f->name = ztrdup(nam);
-    f->module = ztrdup(module);
-    f->flags = 0;
-
-    if (addmathfunc(f)) {
-	zsfree(f->name);
-	zsfree(f->module);
-	zfree(f, sizeof(*f));
-
+	for (arrp = args; *arrp; arrp++) {
+	    char *arg = *arrp;
+	    int on;
+	    if (*arg == '-') {
+		on = 0;
+		arg++;
+	    } else if (*arg == '+') {
+		on = 1;
+		arg++;
+	    } else
+		on = -1;
+	    for (fp = features, ep = enables; *fp; fp++, ep++) {
+		if (!strcmp(arg, *fp)) {
+		    /* for -e, check given state, if any */
+		    if (OPT_ISSET(ops,'e') && on != -1 &&
+			on != (*ep & 1))
+			return 1;
+		    break;
+		}
+	    }
+	    if (!*fp) {
+		if (!OPT_ISSET(ops,'e'))
+		    zwarnnam(nam, "module `%s' has no such feature: %s",
+			     *arrp);
+		return 1;
+	    }
+	}
+	if (OPT_ISSET(ops,'e'))		/* yep, everything we want exists */
+	    return 0;
+	if (OPT_ISSET(ops,'P')) {
+	    int arrlen = 0;
+	    for (fp = features, ep = enables; *fp; fp++, ep++) {
+		if (OPT_ISSET(ops, 'L') && !OPT_ISSET(ops, 'l') &&
+		    !*ep)
+		    continue;
+		if (*args) {
+		    char **argp;
+		    for (argp = args; *argp; argp++) {
+			char *arg = *argp;
+			/* ignore +/- for consistency */
+			if (*arg == '+' || *arg == '-')
+			    arg++;
+			if (!strcmp(*fp, arg))
+			    break;
+		    }
+		    if (!*argp)
+			continue;
+		}
+		arrlen++;
+	    }
+	    arrp = arrset = zalloc(sizeof(char *) * (arrlen+1));
+	} else if (OPT_ISSET(ops, 'L'))
+	    printf("zmodload -F %s ", m->nam);
+	for (fp = features, ep = enables; *fp; fp++, ep++) {
+	    char *onoff;
+	    int term;
+	    if (*args) {
+		char **argp;
+		for (argp = args; *argp; argp++) {
+		    char *arg = *argp;
+		    if (*arg == '+' || *arg == '-')
+			arg++;
+		    if (!strcmp(*fp, *argp))
+			break;
+		}
+		if (!*argp)
+		    continue;
+	    }
+	    if (OPT_ISSET(ops, 'L') && !OPT_ISSET(ops, 'l')) {
+		if (!*ep)
+		    continue;
+		onoff = "";
+	    } else if (*ep) {
+		onoff = "+";
+	    } else {
+		onoff = "-";
+	    }
+	    if (param) {
+		*arrp++ = bicat(onoff, *fp);
+	    } else {
+		if (OPT_ISSET(ops, 'L') && fp[1]) {
+		    term = ' ';
+		} else {
+		    term = '\n';
+		}
+		printf("%s%s%c", onoff, *fp, term);
+	    }
+	}
+	if (param) {
+	    *arrp = NULL;
+	    if (!setaparam(param, arrset))
+		return 1;
+	}
+	return 0;
+    } else if (OPT_ISSET(ops,'P')) {
+	zwarnnam(nam, "-P can only be used with -l or -L");
 	return 1;
     }
-    f->flags &= ~MFF_ADDED; /* still to autoload, not added yet */
 
+    return require_module(nam, modname, args);
+}
+
+
+/************************************************************************
+ * Generic feature support.
+ * These functions are designed to be called by modules.
+ ************************************************************************/
+
+/*
+ * Construct a features array out of the list of concrete
+ * features given, leaving space for any abstract features
+ * to be added by the module itself.
+ *
+ * Note the memory is from the heap.
+ */
+
+/**/
+mod_export char **
+featuresarray(char const *nam, Features f)
+{
+    int bn_size = f->bn_size, cd_size = f->cd_size;
+    int pd_size = f->pd_size, mf_size = f->mf_size;
+    int features_size = bn_size + cd_size + pd_size + mf_size + f->n_abstract;
+    Builtin bnp = f->bn_list;
+    Conddef cdp = f->cd_list;
+    Paramdef pdp = f->pd_list;
+    MathFunc mfp = f->mf_list;
+    char **features = (char **)zhalloc((features_size + 1) * sizeof(char *));
+    char **featurep = features;
+
+    while (bn_size--)
+	*featurep++ = dyncat("b:", (bnp++)->node.nam);
+    while (cd_size--)
+	*featurep++ = dyncat("c:", (cdp++)->name);
+    while (pd_size--)
+	*featurep++ = dyncat("p:", (pdp++)->name);
+    while (mf_size--)
+	*featurep++ = dyncat("f:", (mfp++)->name);
+
+    features[features_size] = NULL;
+    return features;
+}
+
+/*
+ * Return the current set of enables for the features in a
+ * module using heap memory.  Leave space for abstract
+ * features.  The array is not zero terminated.
+ */
+/**/
+mod_export int *
+getfeatureenables(char const *nam, Features f)
+{
+    int bn_size = f->bn_size, cd_size = f->cd_size;
+    int pd_size = f->pd_size, mf_size = f->mf_size;
+    int features_size = bn_size + cd_size + pd_size + mf_size + f->n_abstract;
+    Builtin bnp = f->bn_list;
+    Conddef cdp = f->cd_list;
+    Paramdef pdp = f->pd_list;
+    MathFunc mfp = f->mf_list;
+    int *enables = zhalloc(sizeof(int) * features_size);
+    int *enablep = enables;
+
+    while (bn_size--)
+	*enablep++ = ((bnp++)->node.flags & BINF_ADDED) ? 1 : 0;
+    while (cd_size--)
+	*enablep++ = ((cdp++)->flags & CONDF_ADDED) ? 1 : 0;
+    while (pd_size--)
+	*enablep++ = (pdp++)->pm ? 1 : 0;
+    while (mf_size--)
+	*enablep++ = ((mfp++)->flags & MFF_ADDED) ? 1 : 0;
+
+    return enables;
+}
+
+/*
+ * Add or remove the concrete features passed in arguments,
+ * depending on the corresponding element of the array e.
+ * If e is NULL, disable everything.
+ * Return 0 for success, 1 for failure; does not attempt
+ * to imitate the return values of addbuiltins() etc.
+ * Any failure in adding a requested feature is an
+ * error.
+ */
+
+/**/
+mod_export int
+setfeatureenables(char const *nam, Features f, int *e)
+{
+    int ret = 0;
+
+    if (f->bn_size && setbuiltins(nam, f->bn_list, f->bn_size, e) != 1)
+	ret = 1;
+    if (e)
+	e += f->bn_size;
+    if (f->cd_size && setconddefs(nam, f->cd_list, f->cd_size, e) != 1)
+	ret = 1;
+    if (e)
+	e += f->cd_size;
+    if (f->pd_size && setparamdefs(nam, f->pd_list, f->pd_size, e) != 1)
+	ret = 1;
+    if (e)
+	e += f->pd_size;
+    if (f->mf_size && setmathfuncs(nam, f->mf_list, f->mf_size, e) != 1)
+	ret = 1;
+    return ret;
+}
+	    
+/**/
+mod_export int
+handlefeatures(char *nam, Features f, int **enables)
+{
+    if (!enables || *enables)
+	return setfeatureenables(nam, f, *enables);
+    *enables = getfeatureenables(nam, f);
     return 0;
-}
-
-/**/
-mod_export int
-deletemathfunc(MathFunc f)
-{
-    MathFunc p, q;
-
-    for (p = mathfuncs, q = NULL; p && p != f; q = p, p = p->next);
-
-    if (p) {
-	if (q)
-	    q->next = f->next;
-	else
-	    mathfuncs = f->next;
-
-	/* the following applies to both unloaded and user-defined functions */
-	if (f->module) {
-	    zsfree(f->name);
-	    zsfree(f->module);
-	    zfree(f, sizeof(*f));
-	} else
-	    f->flags &= ~MFF_ADDED;
-
-	return 0;
-    }
-    return -1;
-}
-
-/**/
-mod_export int
-deletemathfuncs(char const *nam, MathFunc f, int size)
-{
-    int hads = 0, hadf = 0;
-
-    while (size--) {
-	if (!(f->flags & MFF_ADDED)) {
-	    f++;
-	    continue;
-	}
-	if (deletemathfunc(f)) {
-	    zwarnnam(nam, "math function `%s' already deleted", f->name);
-	    hadf = 1;
-	} else
-	    hads = 2;
-	f++;
-    }
-    return hadf ? hads : 1;
 }

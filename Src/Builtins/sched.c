@@ -333,6 +333,14 @@ static struct builtin bintab[] = {
     BUILTIN("sched", 0, bin_sched, 0, -1, 0, NULL, NULL),
 };
 
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
 /**/
 int
 setup_(UNUSED(Module m))
@@ -342,10 +350,23 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(Module m)
 {
-    if(!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)))
-	return 1;
     addprepromptfn(&checksched);
     return 0;
 }
@@ -364,8 +385,7 @@ cleanup_(Module m)
 	zfree(sch, sizeof(*sch));
     }
     delprepromptfn(&checksched);
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

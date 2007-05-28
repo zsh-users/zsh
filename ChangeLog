@@ -1,5 +1,30 @@
 2007-05-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Not posted but see 23479:Completion/Unix/Command/_chmod,
+	Completion/Unix/Command/_chown, Completion/Unix/Command/_cvs,
+	Completion/Unix/Type/_list_files, Completion/Zsh/Command/_stat,
+	Completion/Zsh/Command/_zstyle,
+	Completion/Zsh/Type/_file_descriptors,Doc/Zsh/builtins.yo,
+	Doc/Zsh/compsys.yo, Doc/Zsh/mod_stat.yo,
+	Etc/zsh-development-guide, Src/builtin.c, Src/cond.c, Src/exec.c
+	Src/init.c, Src/mkbltnmlst.sh, Src/mkmakemod.sh, Src/modentry.c,
+	Src/module.c, Src/params.c, Src/zsh.h, Src/Builtins/rlimits.c,
+	Src/Builtins/sched.c, Src/Modules/cap.c, Src/Modules/clone.c,
+	Src/Modules/datetime.c, Src/Modules/example.c,
+	Src/Modules/files.c, Src/Modules/langinfo.c,
+	Src/Modules/langinfo.mdd, Src/Modules/mapfile.c,
+	Src/Modules/mathfunc.c, Src/Modules/parameter.c,
+	Src/Modules/pcre.c, Src/Modules/regex.c, Src/Modules/socket.c,
+	Src/Modules/stat.c, Src/Modules/system.c, Src/Modules/tcp.c,
+	Src/Modules/termcap.c, Src/Modules/terminfo.c, Src/Modules/zftp.c,
+	Src/Modules/zprof.c, Src/Modules/zpty.c, Src/Modules/zselect.c,
+	Src/Modules/zutil.c, Src/Zle/compctl.c, Src/Zle/complete.c,
+	Src/Zle/complist.c, Src/Zle/computil.c, Src/Zle/deltochar.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c,
+	Src/Zle/zleparameter.c, Test/B02typeset.ztst,
+	Test/V01zmodload.ztst, Test/V04features.ztst: add "zmodload -F"
+	and internal features support for modules.
+
 	* 23478: Src/Zle/compresult.c: don't run reverse-menu-complete
 	if no completion yet.
 

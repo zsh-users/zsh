@@ -95,7 +95,10 @@ evalcond(Estate state, char *fromtest)
     case COND_REGEX:
 	{
 	    char *modname = isset(REMATCHPCRE) ? "zsh/pcre" : "zsh/regex";
-	    if (!load_module_silence(modname, 1)) {
+	    /*
+	     * TODO: we just need to load the appropriate condition.
+	     */
+	    if (load_module_silence(modname, NULL, 1) == 1) {
 		zwarnnam(fromtest, "%s not available for regex",
 			 modname);
 		return 2;

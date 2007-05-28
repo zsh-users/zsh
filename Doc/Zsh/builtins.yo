@@ -1845,6 +1845,7 @@ findex(zmodload)
 cindex(modules, loading)
 cindex(loading modules)
 xitem(tt(zmodload) [ tt(-dL) ] [ ... ])
+xitem(tt(zmodload -F) [ tt(-lLe) tt(-P) tt(param) ] var(module) [tt(PLUS()-)]var(feature...))
 xitem(tt(zmodload -e) [ tt(-A) ] [ ... ])
 xitem(tt(zmodload) [ tt(-a) [ tt(-bcpf) [ tt(-I) ] ] ] [ tt(-iL) ] ...)
 xitem(tt(zmodload) tt(-u) [ tt(-abcdpf) [ tt(-I) ] ] [ tt(-iL) ] ...)
@@ -1867,20 +1868,23 @@ item(tt(zmodload) tt(-u) [ tt(-i) ] var(name) ...)(
 In the simplest case, tt(zmodload) loads a binary module.  The module must
 be in a file with a name consisting of the specified var(name) followed by
 a standard suffix, usually `tt(.so)' (`tt(.sl)' on HPUX).
-If the module to be loaded is
-already loaded and the tt(-i) option is given, the duplicate module is
-ignored.  Otherwise tt(zmodload) prints an error message and returns
-a non-zero status.  If tt(zmodload) detects an inconsistency, such as an
+If the module to be loaded is already loaded the duplicate module is
+ignored.  If tt(zmodload) detects an inconsistency, such as an
 invalid module name or circular dependency list, the current code block is 
-aborted.  Hence `tt(zmodload -i) var(module) tt(2>/dev/null)' is sufficient
+aborted.   Hence `tt(zmodload) var(module) tt(2>/dev/null)' is sufficient
 to test whether a module is available.
 If it is available, the module is loaded if necessary, while if it
-is not available, non-zero status is silently returned.
+is not available, non-zero status is silently returned.  The option
+tt(-i) is accepted for compatibility but has no effect.
 
 The var(name)d module is searched for in the same way a command is, using
 tt($module_path) instead of tt($path).  However, the path search is
 performed even when the module name contains a `tt(/)', which it usually does.
 There is no way to prevent the path search.
+
+If the module supports features (see below), tt(zmodload) tries to
+enable all features when loading a module.  If the module was successfully
+loaded but not all features could be enabled, tt(zmodload) returns status 2.
 
 With tt(-u), tt(zmodload) unloads modules.  The same var(name)
 must be given that was given when the module was loaded, but it is not
@@ -1891,6 +1895,54 @@ unloaded (or was never loaded).
 Each module has a boot and a cleanup function.  The module
 will not be loaded if its boot function fails.  Similarly a module
 can only be unloaded if its cleanup function runs successfully.
+)
+item(tt(zmodload -F) [ tt(-lLe) tt(-P) tt(param) ] var(module) [tt(PLUS()-)]var(feature...))(
+tt(zmodload -F) allows more selective control over the features provided
+by modules.  With no options apart from tt(-F), the module named
+var(module) is loaded, if it was not already loaded, and the list of
+var(feature)s is set to the required state.  If no 
+var(feature)s are specified, the module is loaded, if it was not already
+loaded, but the state of features is unchanged.  Each feature
+may be preceded by a tt(PLUS()) to turn the feature on, or tt(-) to turn it
+off; the tt(PLUS()) is assumed if neither character is present.
+Any feature not explicitly mentioned is left in its current state;
+if the module was not previously loaded this means any such features will
+remain disabled.  The return status is zero if all features were
+set, 1 if the module failed to load, and 2 if some features could
+not be set (for example, a parameter couldn't be added because there
+was a different parameter of the same name) but the module was loaded.
+
+The standard features are builtins, conditions, parameters and math
+functions; these are indicated by the prefix `tt(b:)', `tt(c:)', `tt(p:)'
+and `tt(f:)', respectively, followed by the name that the corresponding
+feature would have in the shell.  For example, `tt(b:strftime)' indicates
+a builtin named tt(strftime) and tt(p:EPOCHSECONDS) indicates a parameter
+named tt(EPOCHSECONDS).  The module may provide other (`abstract') features
+of its own as indicated by its documentation; these have no prefix.
+
+With tt(-l) or tt(-L), features provided by the module are listed.  With
+tt(-l) alone, a list of features together with their states is shown, one
+feature per line.  With tt(-L) alone, a tt(zmodload -F) command that would
+cause enabled features of the module to be turned on is shown.  With
+tt(-lL), a tt(zmodload -F) command that would cause all the features to be
+set to their current state is shown.  If one of these combinations is given
+the option tt(-P) var(param) then the parameter tt(param) is set to an
+array of features, either features together with their state or (if
+tt(-L) alone is given) enabled features.
+
+A set of features may be provided together with tt(-l) or tt(-L); in
+that case only the state of features provided is considered.  Each
+feature may be preceded by tt(PLUS()) or tt(-) but the character
+has no effect.  If no set of features is provided, all features
+are considered.
+
+With tt(-e), the command first tests that the module is loaded;
+if it is not, status 1 is returned.  If the module is loaded,
+the list of features given as an argument is examined.  Any feature
+given with no prefix is simply tested to see if the module provides it;
+any feature given with a prefix tt(PLUS()) or tt(-) is tested to
+see if is provided and in the given state.  If the tests on all features
+in the list succeed, status 0 is returned, else status 1.
 )
 xitem(tt(zmodload) tt(-d) [ tt(-L) ] [ var(name) ])
 xitem(tt(zmodload) tt(-d) var(name) var(dep) ...)

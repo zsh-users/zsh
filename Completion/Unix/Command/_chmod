@@ -54,13 +54,9 @@ case "$state" in
   ;;
   files)
     if [[ -n $opt_args[--reference] ]]; then
-      if zstyle -t ":completion:${curcontext}:" disable-stat; then
-	_files && ret=0
-      else
-	zmodload -i zsh/stat 2>/dev/null
-	typeset -i8 ref=$(stat +mode $opt_args[--reference])
-	_wanted files expl file _files -g "*(-.^f${ref#??})" && ret=0
-      fi
+      zmodload -F zsh/stat zstat 2>/dev/null
+      typeset -i8 ref=$(zstat +mode $opt_args[--reference])
+      _wanted files expl file _files -g "*(-.^f${ref#??})" && ret=0
     elif [[ $words[2] = [0-7]## ]]; then
       _wanted files expl file _files -g "*(-.^f$words[2])" && ret=0
     else

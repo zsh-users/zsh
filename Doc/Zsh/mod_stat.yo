@@ -1,17 +1,24 @@
 COMMENT(!MOD!zsh/stat
 A builtin command interface to the tt(stat) system call.
 !MOD!)
-The tt(zsh/stat) module makes available one builtin command:
+The tt(zsh/stat) module makes available one builtin command under
+two possible names:
 
 startitem()
 findex(stat)
 cindex(files, listing)
 cindex(files, examining)
-item(tt(stat) [ tt(-gnNolLtTrs) ] [ tt(-f) var(fd) ] \
+xitem(tt(zstat) [ tt(-gnNolLtTrs) ] [ tt(-f) var(fd) ] \
     [ tt(-H) var(hash) ] [ tt(-A) var(array) ] \
-    [ tt(-F) var(fmt) ] [ tt(PLUS())var(element) ] [ var(file) ... ])(
+    [ tt(-F) var(fmt) ] [ tt(PLUS())var(element) ] [ var(file) ... ])
+itme(tt(stat) var(...))(
 The command acts as a front end to the tt(stat) system call (see
-manref(stat)(2)).
+manref(stat)(2)).  The same command is provided with two names; as
+the name tt(stat) is often used by an external command it is recommended
+that only the tt(zstat) form of the command is used.  This can be
+arranged by loading the module with the command `tt(zmodload -F zsh/stat
+zstat)'.
+
 If the tt(stat) call fails, the appropriate system error message
 printed and status 1 is returned.
 The fields of tt(struct stat) give information about
@@ -69,7 +76,7 @@ The number of disk blocks used by the file.
 item(tt(link))(
 If the file is a link and the tt(-L) option is in
 effect, this contains the name of the file linked to, otherwise
-it is empty.  Note that if this element is selected (``tt(stat PLUS()link)'')
+it is empty.  Note that if this element is selected (``tt(zstat PLUS()link)'')
 then the tt(-L) option is automatically used.
 )
 enditem()

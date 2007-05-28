@@ -34,46 +34,6 @@
 
 static int incleanup;
 
-/* Empty dummy function for special hash parameters. */
-
-/**/
-static void
-shempty(void)
-{
-}
-
-/* Create a simple special hash parameter. */
-
-/**/
-static Param
-createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan)
-{
-    Param pm;
-    HashTable ht;
-
-    if (!(pm = createparam(name, PM_SPECIAL|PM_HIDE|PM_HIDEVAL|
-			   PM_REMOVABLE|PM_HASHED)))
-	return NULL;
-
-    pm->level = pm->old ? locallevel : 0;
-    pm->gsu.h = &stdhash_gsu;
-    pm->u.hash = ht = newhashtable(0, name, NULL);
-
-    ht->hash        = hasher;
-    ht->emptytable  = (TableFunc) shempty;
-    ht->filltable   = NULL;
-    ht->addnode     = (AddNodeFunc) shempty;
-    ht->getnode     = ht->getnode2 = get;
-    ht->removenode  = (RemoveNodeFunc) shempty;
-    ht->disablenode = NULL;
-    ht->enablenode  = NULL;
-    ht->freenode    = (FreeNodeFunc) shempty;
-    ht->printnode   = printparamnode;
-    ht->scantab     = scan;
-
-    return pm;
-}
-
 /* Functions for the parameters special parameter. */
 
 /* Return a string describing the type of a parameter. */
@@ -1838,13 +1798,6 @@ struct pardef {
     Param pm;
 };
 
-/*
- * This is a duplicate of nullsethash_gsu.  On some systems
- * (such as Cygwin) we can't put a pointer to an imported variable
- * in a compile-time initialiser, so we use this instead.
- */
-static const struct gsu_hash pmnullsethash_gsu =
-{ hashgetfn, nullsethashfn, nullunsetfn };
 static const struct gsu_hash pmcommands_gsu =
 { hashgetfn, setpmcommands, stdunsetfn };
 static const struct gsu_hash pmfunctions_gsu =
@@ -1881,145 +1834,113 @@ static const struct gsu_array dirs_gsu =
 static const struct gsu_array historywords_gsu =
 { histwgetfn, arrsetfn, stdunsetfn };
 
-static struct pardef partab[] = {
-    { "parameters", PM_READONLY,
-      getpmparameter, scanpmparameters, &pmnullsethash_gsu,
-      NULL, NULL },
-    { "commands", 0,
-      getpmcommand, scanpmcommands, &pmcommands_gsu,
-      NULL, NULL },
-    { "functions", 0,
-      getpmfunction, scanpmfunctions, &pmfunctions_gsu,
-      NULL, NULL },
-    { "dis_functions", 0,
-      getpmdisfunction, scanpmdisfunctions, &pmdisfunctions_gsu,
-      NULL, NULL },
-    { "funcstack", PM_ARRAY|PM_SPECIAL|PM_READONLY,
-      NULL, NULL, NULL,
-      &funcstack_gsu, NULL },
-    { "functrace", PM_ARRAY|PM_SPECIAL|PM_READONLY,
-      NULL, NULL, NULL,
-      &functrace_gsu, NULL },
-    { "builtins", PM_READONLY,
-      getpmbuiltin, scanpmbuiltins, NULL,
-      NULL, NULL },
-    { "dis_builtins", PM_READONLY,
-      getpmdisbuiltin, scanpmdisbuiltins, NULL,
-      NULL, NULL },
-    { "reswords", PM_ARRAY|PM_SPECIAL|PM_READONLY,
-      NULL, NULL, NULL,
-      &reswords_gsu, NULL },
-    { "dis_reswords", PM_ARRAY|PM_SPECIAL|PM_READONLY,
-      NULL, NULL, NULL,
-      &disreswords_gsu, NULL },
-    { "options", 0,
-      getpmoption, scanpmoptions, &pmoptions_gsu,
-      NULL, NULL },
-    { "modules", PM_READONLY,
-      getpmmodule, scanpmmodules, NULL,
-      NULL, NULL },
-    { "dirstack", PM_ARRAY|PM_SPECIAL|PM_REMOVABLE,
-      NULL, NULL, NULL,
-      &dirs_gsu, NULL },
-    { "history", PM_READONLY,
-      getpmhistory, scanpmhistory, NULL,
-      NULL, NULL,  },
-    { "historywords", PM_ARRAY|PM_SPECIAL|PM_READONLY,
-      NULL, NULL, NULL,
-      &historywords_gsu, NULL },
-    { "jobtexts", PM_READONLY,
-      getpmjobtext, scanpmjobtexts, NULL,
-      NULL, NULL },
-    { "jobstates", PM_READONLY,
-      getpmjobstate, scanpmjobstates, NULL,
-      NULL, NULL },
-    { "jobdirs", PM_READONLY,
-      getpmjobdir, scanpmjobdirs, NULL,
-      NULL, NULL },
-    { "nameddirs", 0,
-      getpmnameddir, scanpmnameddirs, &pmnameddirs_gsu,
-      NULL, NULL },
-    { "userdirs", PM_READONLY,
-      getpmuserdir, scanpmuserdirs, NULL,
-      NULL, NULL },
-    { "aliases", 0,
-      getpmralias, scanpmraliases, &pmraliases_gsu,
-      NULL, NULL },
-    { "galiases", 0,
-      getpmgalias, scanpmgaliases, &pmgaliases_gsu,
-      NULL, NULL },
-    { "saliases", 0,
-      getpmsalias, scanpmsaliases, &pmsaliases_gsu,
-      NULL, NULL },
-    { "dis_aliases", 0,
-      getpmdisralias, scanpmdisraliases, &pmdisraliases_gsu,
-      NULL, NULL },
-    { "dis_galiases", 0,
-      getpmdisgalias, scanpmdisgaliases, &pmdisgaliases_gsu,
-      NULL, NULL },
-    { "dis_saliases", 0,
-      getpmdissalias, scanpmdissaliases, &pmdissaliases_gsu,
-      NULL, NULL },
-    { NULL, 0, NULL, NULL, NULL, NULL, NULL }
+static struct paramdef partab[] = {
+    SPECIALPMDEF("parameters", PM_READONLY,
+	    NULL, getpmparameter, scanpmparameters),
+    SPECIALPMDEF("commands", 0, &pmcommands_gsu, getpmcommand, scanpmcommands),
+    SPECIALPMDEF("functions", 0, &pmfunctions_gsu, getpmfunction,
+		 scanpmfunctions),
+    SPECIALPMDEF("dis_functions", 0, 
+	    &pmdisfunctions_gsu, getpmdisfunction, scanpmdisfunctions),
+    SPECIALPMDEF("funcstack", PM_ARRAY|PM_READONLY,
+	    &funcstack_gsu, NULL, NULL),
+    SPECIALPMDEF("functrace", PM_ARRAY|PM_READONLY,
+	    &functrace_gsu, NULL, NULL),
+    SPECIALPMDEF("builtins", PM_READONLY, NULL, getpmbuiltin, scanpmbuiltins),
+    SPECIALPMDEF("dis_builtins", PM_READONLY,
+	    NULL, getpmdisbuiltin, scanpmdisbuiltins),
+    SPECIALPMDEF("reswords", PM_ARRAY|PM_READONLY,
+	    &reswords_gsu, NULL, NULL),
+    SPECIALPMDEF("dis_reswords", PM_ARRAY|PM_READONLY,
+	    &disreswords_gsu, NULL, NULL),
+    SPECIALPMDEF("options", 0,
+	    &pmoptions_gsu, getpmoption, scanpmoptions),
+    SPECIALPMDEF("modules", PM_READONLY,
+	    NULL, getpmmodule, scanpmmodules),
+    SPECIALPMDEF("dirstack", PM_ARRAY,
+	    &dirs_gsu, NULL, NULL),
+    SPECIALPMDEF("history", PM_READONLY,
+	    NULL, getpmhistory, scanpmhistory),
+    SPECIALPMDEF("historywords", PM_ARRAY|PM_READONLY,
+	    &historywords_gsu, NULL, NULL),
+    SPECIALPMDEF("jobtexts", PM_READONLY,
+	    NULL, getpmjobtext, scanpmjobtexts),
+    SPECIALPMDEF("jobstates", PM_READONLY,
+	    NULL, getpmjobstate, scanpmjobstates),
+    SPECIALPMDEF("jobdirs", PM_READONLY,
+	    NULL, getpmjobdir, scanpmjobdirs),
+    SPECIALPMDEF("nameddirs", 0,
+	    &pmnameddirs_gsu, getpmnameddir, scanpmnameddirs),
+    SPECIALPMDEF("userdirs", PM_READONLY,
+	    NULL, getpmuserdir, scanpmuserdirs),
+    SPECIALPMDEF("aliases", 0,
+	    &pmraliases_gsu, getpmralias, scanpmraliases),
+    SPECIALPMDEF("galiases", 0,
+	    &pmgaliases_gsu, getpmgalias, scanpmgaliases),
+    SPECIALPMDEF("saliases", 0,
+	    &pmsaliases_gsu, getpmsalias, scanpmsaliases),
+    SPECIALPMDEF("dis_aliases", 0,
+	    &pmdisraliases_gsu, getpmdisralias, scanpmdisraliases),
+    SPECIALPMDEF("dis_galiases", 0,
+	    &pmdisgaliases_gsu, getpmdisgalias, scanpmdisgaliases),
+    SPECIALPMDEF("dis_saliases", 0,
+	    &pmdissaliases_gsu, getpmdissalias, scanpmdissaliases)
+};
+
+static struct features module_features = {
+    NULL, 0,
+    NULL, 0,
+    partab, sizeof(partab)/sizeof(*partab),
+    NULL, 0,
+    0
 };
 
 /**/
 int
 setup_(UNUSED(Module m))
 {
-    incleanup = 0;
-
     return 0;
 }
 
 /**/
 int
-boot_(UNUSED(Module m))
+features_(Module m, char ***features)
 {
-    /* Create the special associative arrays.
-     * As an example for autoloaded parameters, this is probably a bad
-     * example, because the zsh core doesn't support creation of
-     * special hashes, yet. */
-
-    struct pardef *def;
-
-    for (def = partab; def->name; def++) {
-	unsetparam(def->name);
-
-	if (def->getnfn) {
-	    if (!(def->pm = createspecialhash(def->name, def->getnfn,
-					      def->scantfn)))
-		return 1;
-	    def->pm->node.flags |= def->flags;
-	    if (def->hash_gsu)
-		def->pm->gsu.h = def->hash_gsu;
-	} else {
-	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE|
-					PM_HIDEVAL | PM_REMOVABLE)))
-		return 1;
-	    def->pm->gsu.a = def->array_gsu;
-	}
-    }
+    *features = featuresarray(m->nam, &module_features);
     return 0;
 }
 
 /**/
 int
-cleanup_(UNUSED(Module m))
+enables_(Module m, int **enables)
 {
-    Param pm;
-    struct pardef *def;
-
+    int ret;
+    /*
+     * If we remove features, we shouldn't have an effect
+     * on the main shell, so set the flag to indicate.
+     */
     incleanup = 1;
+    ret = handlefeatures(m->nam, &module_features, enables);
+    incleanup = 0;
+    return ret;
+}
 
-    for (def = partab; def->name; def++) {
-	if ((pm = (Param) paramtab->getnode(paramtab, def->name)) &&
-	    pm == def->pm) {
-	    pm->node.flags &= ~PM_READONLY;
-	    unsetparam_pm(pm, 0, 1);
-	}
-    }
+/**/
+int
+boot_(Module m)
+{
     return 0;
+}
+
+/**/
+int
+cleanup_(Module m)
+{
+    int ret;
+    incleanup = 1;
+    ret = setfeatureenables(m->nam, &module_features, NULL);
+    incleanup = 0;
+    return ret;
 }
 
 /**/

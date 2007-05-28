@@ -131,7 +131,7 @@ static struct builtin builtins[] =
     BUILTIN("whence", 0, bin_whence, 0, -1, 0, "acmpvfsw", NULL),
     BUILTIN("where", 0, bin_whence, 0, -1, 0, "pmsw", "ca"),
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
-    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ARILabcfdipue", NULL),
+    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "AFRILP:abcfdilpue", NULL),
     BUILTIN("zcompile", 0, bin_zcompile, 0, -1, 0, "tUMRcmzka", NULL),
 };
 
@@ -2033,6 +2033,10 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 * because we've checked for unpleasant surprises above.
 	 */
 	pm->node.flags = (PM_TYPE(pm->node.flags) | on | PM_SPECIAL) & ~off;
+	/*
+	 * Readonlyness of special parameters must be preserved.
+	 */
+	pm->node.flags |= tpm->node.flags & PM_READONLY;
 	if (newspecial == NS_SECONDS) {
 	    /* We save off the raw internal value of the SECONDS var */
 	    tpm->u.dval = getrawseconds();
@@ -2085,7 +2089,21 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		    "%s: array elements must be scalar", pname);
 	    return NULL;
 	}
-    } else if (isident(pname) && !idigit(*pname)) {
+    } 
+    /*
+     * As we can hide existing parameters, we allow a name if
+     * it's not a normal identifier but is one of the special
+     * set found in the parameter table.  The second test is
+     * because we can set individual positional parameters;
+     * however "0" is not a positional parameter and is OK.
+     *
+     * It would be neater to extend isident() and be clearer
+     * about where we allow various parameter types.  It's
+     * not entirely clear to me isident() should reject
+     * specially named parameters given that it accepts digits.
+     */
+    else if ((isident(pname) || paramtab->getnode(paramtab, pname))
+	     && (!idigit(*pname) || !strcmp(pname, "0"))) {
 	/*
 	 * Create a new node for a parameter with the flags in `on' minus the
 	 * readonly flag
@@ -2101,10 +2119,10 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		return NULL;
 	}
     } else {
-	if (isident(pname))
-	    zerrnam(cname, "not valid in this context: %s", pname);
-	else
+	if (idigit(*pname))
 	    zerrnam(cname, "not an identifier: %s", pname);
+	else
+	    zerrnam(cname, "not valid in this context: %s", pname);
 	return NULL;
     }
 
@@ -2138,7 +2156,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		  "BUG: parameter recreated with wrong flags");
 	    unsetparam_pm(ipm, 0, 1);
 	}
-    } else if (newspecial != NS_NONE && !(pm->old->node.flags & PM_NORESTORE)) {
+    } else if (newspecial != NS_NONE &&
+	       !(pm->old->node.flags & (PM_NORESTORE|PM_READONLY))) {
 	/*
 	 * We need to use the special setting function to re-initialise
 	 * the special parameter to empty.

@@ -1,4 +1,4 @@
-#compdef stat
+#compdef stat zstat
 
 local expl ret=1
 

@@ -50,14 +50,10 @@ case $state in
   files)
     (( $+opt_args[-h] || $+opt_args[--no-dereference] )) || deref="-"
     if (( $+opt_args[--reference] )); then
-      if zstyle -t ":completion:${curcontext}:" disable-stat; then
-	_files && ret=0
-      else
-	zmodload -i zsh/stat 2>/dev/null
-	usr=$(stat +uid $opt_args[--reference])
-	grp=$(stat +gid $opt_args[--reference])
-	_wanted files expl file _files -g "*($deref^u$usr,$deref^g$grp)" && ret=0
-      fi
+      zmodload -F zsh/stat zstat 2>/dev/null
+      usr=$(zstat +uid $opt_args[--reference])
+      grp=$(zstat +gid $opt_args[--reference])
+      _wanted files expl file _files -g "*($deref^u$usr,$deref^g$grp)" && ret=0
       return ret
     fi
     if [[ $service = chgrp ]]; then

@@ -30,45 +30,6 @@
 #include "zleparameter.mdh"
 #include "zleparameter.pro"
 
-/* Empty dummy function for special hash parameters. */
-
-/**/
-static void
-shempty(void)
-{
-}
-
-/* Create a simple special hash parameter. */
-
-/**/
-static Param
-createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan)
-{
-    Param pm;
-    HashTable ht;
-
-    if (!(pm = createparam(name, PM_SPECIAL|PM_HIDE|PM_REMOVABLE|PM_HASHED)))
-	return NULL;
-
-    pm->level = pm->old ? locallevel : 0;
-    pm->gsu.h = &stdhash_gsu;
-    pm->u.hash = ht = newhashtable(0, name, NULL);
-
-    ht->hash        = hasher;
-    ht->emptytable  = (TableFunc) shempty;
-    ht->filltable   = NULL;
-    ht->addnode     = (AddNodeFunc) shempty;
-    ht->getnode     = ht->getnode2 = get;
-    ht->removenode  = (RemoveNodeFunc) shempty;
-    ht->disablenode = NULL;
-    ht->enablenode  = NULL;
-    ht->freenode    = (FreeNodeFunc) shempty;
-    ht->printnode   = printparamnode;
-    ht->scantab     = scan;
-
-    return pm;
-}
-
 /* Functions for the zlewidgets special parameter. */
 
 /**/
@@ -157,18 +118,6 @@ keymapsgetfn(UNUSED(Param pm))
     return ret;
 }
 
-/* Table for defined parameters. */
-
-struct pardef {
-    char *name;
-    int flags;
-    GetNodeFunc getnfn;
-    ScanTabFunc scantfn;
-    GsuHash hash_gsu;
-    GsuArray array_gsu;
-    Param pm;
-};
-
 /*
  * This is a duplicate of stdhash_gsu.  On some systems
  * (such as Cygwin) we can't put a pointer to an imported variable
@@ -179,14 +128,18 @@ static const struct gsu_hash zlestdhash_gsu =
 static const struct gsu_array keymaps_gsu =
 { keymapsgetfn, arrsetfn, stdunsetfn };
 
-static struct pardef partab[] = {
-    { "widgets", PM_READONLY,
-      getpmwidgets, scanpmwidgets, &zlestdhash_gsu,
-      NULL, NULL },
-    { "keymaps", PM_ARRAY|PM_SPECIAL|PM_READONLY,
-      NULL, NULL, NULL,
-      &keymaps_gsu, NULL },
-    { NULL, 0, NULL, NULL, NULL, NULL, NULL }
+static struct paramdef partab[] = {
+    SPECIALPMDEF("widgets", PM_READONLY,
+		 &zlestdhash_gsu, getpmwidgets, scanpmwidgets),
+    SPECIALPMDEF("keymaps", PM_ARRAY|PM_READONLY, &keymaps_gsu, NULL, NULL),
+};
+
+static struct features module_features = {
+    NULL, 0,
+    NULL, 0,
+    partab, sizeof(partab)/sizeof(*partab),
+    NULL, 0,
+    0
 };
 
 /**/
@@ -198,44 +151,31 @@ setup_(UNUSED(Module m))
 
 /**/
 int
-boot_(UNUSED(Module m))
+features_(Module m, char ***features)
 {
-    struct pardef *def;
-
-    for (def = partab; def->name; def++) {
-	unsetparam(def->name);
-
-	if (def->getnfn) {
-	    if (!(def->pm = createspecialhash(def->name, def->getnfn,
-					      def->scantfn)))
-		return 1;
-	    def->pm->node.flags |= def->flags;
-	    if (def->hash_gsu)
-		def->pm->gsu.h = def->hash_gsu;
-	} else {
-	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE)))
-		return 1;
-	    def->pm->gsu.a = def->array_gsu;
-	}
-    }
+    *features = featuresarray(m->nam, &module_features);
     return 0;
 }
 
 /**/
 int
-cleanup_(UNUSED(Module m))
+enables_(Module m, int **enables)
 {
-    Param pm;
-    struct pardef *def;
+    return handlefeatures(m->nam, &module_features, enables);
+}
 
-    for (def = partab; def->name; def++) {
-	if ((pm = (Param) paramtab->getnode(paramtab, def->name)) &&
-	    pm == def->pm) {
-	    pm->node.flags &= ~PM_READONLY;
-	    unsetparam_pm(pm, 0, 1);
-	}
-    }
+/**/
+int
+boot_(UNUSED(Module m))
+{
     return 0;
+}
+
+/**/
+int
+cleanup_(Module m)
+{
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

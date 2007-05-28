@@ -550,11 +550,10 @@ _cvs_watchers() {
 
 (( $+functions[_cvs_loadstat] )) ||
 _cvs_loadstat() {
-  zstyle -t ":completion:${curcontext}:" disable-stat && return 1
   (( $+_cvs_loadstat_status )) && return $_cvs_loadstat_status
 
-  zmodload -i zsh/stat 2>/dev/null
-  (( _cvs_loadstat_status = ! $+builtins[stat] ))
+  zmodload -F zsh/stat zstat 2>/dev/null
+  (( _cvs_loadstat_status = ! $+builtins[zstat] ))
   return $_cvs_loadstat_status
 }
 
@@ -566,7 +565,7 @@ _cvs_root() {
 
   if [[ -f "${cvspassfile::=${CVS_PASSFILE:-$HOME/.cvspass}}" ]]; then
     if _cvs_loadstat; then
-      id="$(LC_ALL=C builtin stat -g +mtime -F '%Y/%m/%d-%T' "$cvspassfile")"
+      id="$(LC_ALL=C builtin zstat -g +mtime -F '%Y/%m/%d-%T' "$cvspassfile")"
     else
       id="$(LC_ALL=C ls -l "$cvspassfile")"
     fi
@@ -865,7 +864,7 @@ _cvs_modified_entries() {
     realdir=${(e)~linedir}
     [[ -f "$realdir"CVS/Entries ]] && {
       local -a mtime
-      LC_ALL=C builtin stat -A mtime -gn +mtime -F $'%a %b %e %T %Y\n' ${realdir}*(D) 2>/dev/null
+      LC_ALL=C builtin zstat -A mtime -gn +mtime -F $'%a %b %e %T %Y\n' ${realdir}*(D) 2>/dev/null
       [[ -n ${pat::="${(@j:|:)${(@)${(@)${(@)${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}/${slash}[^${slash}]#${slash}//}%/[^/]#/[^/]#}:#${(j:|:)~${(f)${(j:/:)${mtime##*/}}//(#m)[][*?()<|^~#\\]/\\$MATCH}#/}}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}"} ]]
     } &&
     _wanted files expl 'modified file' _path_files -g "$pat"

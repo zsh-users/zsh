@@ -364,46 +364,69 @@ static const struct gsu_array errnos_gsu =
 /* Functions for the sysparams special parameter. */
 
 /**/
-static char *
-sysparamgetfn(Param pm)
+static void
+fillpmsysparams(Param pm, char *name)
 {
     char buf[DIGBUFSIZE];
     int num;
 
-    if (!strcmp(pm->node.nam, "pid")) {
+    pm->node.nam = dupstring(name);
+    pm->node.flags = PM_SCALAR | PM_READONLY;
+    pm->gsu.s = &nullsetscalar_gsu;
+    if (!strcmp(name, "pid")) {
 	num = (int)getpid();
-    } else if (!strcmp(pm->node.nam, "ppid")) {
+    } else if (!strcmp(name, "ppid")) {
 	num = (int)getppid();
-    }
-    else {
-#ifdef DEBUG
-	dputs("Bad sysparam parameter");
-#endif
-	return "";
+    } else {
+	pm->u.str = dupstring("");
+	pm->node.flags |= PM_UNSET;
+	return;
     }
 
     sprintf(buf, "%d", num);
-    return dupstring(buf);
+    pm->u.str = dupstring(buf);
 }
 
-static const struct gsu_scalar sysparam_gsu =
-{ sysparamgetfn, strsetfn, stdunsetfn };
 
-static void
-fixsysparams(HashNode hn, int flags)
+/**/
+static HashNode
+getpmsysparams(UNUSED(HashTable ht), char *name)
 {
-    Param pm = (Param)hn;
+    Param pm;
 
-    if (flags) {
-	/* prepare to free */
-	pm->node.flags &= ~PM_READONLY;
-    } else {
-	/* assign */
-	pm->gsu.s = &sysparam_gsu;
-	pm->node.flags |= PM_READONLY;
-    }
+    pm = (Param) hcalloc(sizeof(struct param));
+    fillpmsysparams(pm, name);
+    return &pm->node;
 }
 
+
+/**/
+static void
+scanpmsysparams(UNUSED(HashTable ht), ScanFunc func, int flags)
+{
+    struct param spm;
+
+    fillpmsysparams(&spm, "pid");
+    func(&spm.node, flags);
+    fillpmsysparams(&spm, "ppid");
+    func(&spm.node, flags);
+}
+
+
+static struct paramdef partab[] = {
+    SPECIALPMDEF("errnos", PM_ARRAY|PM_READONLY,
+		 &errnos_gsu, NULL, NULL),
+    SPECIALPMDEF("sysparams", PM_READONLY,
+		 NULL, getpmsysparams, scanpmsysparams)
+};
+
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    NULL, 0,
+    partab, sizeof(partab)/sizeof(*partab),
+    NULL, 0,
+    0
+};
 
 /* The load/unload routines required by the zsh library interface */
 
@@ -415,61 +438,24 @@ setup_(UNUSED(Module m))
 }
 
 /**/
-static void
-tidyparam(Param pm)
+int
+features_(Module m, char ***features)
 {
-    if (!pm)
-	return;
-    pm->node.flags &= ~PM_READONLY;
-    unsetparam_pm(pm, 0, 1);
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
 }
 
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
 
 /**/
 int
 boot_(Module m)
 {
-    Param pm_nos, pm_params;
-    HashTable ht;
-    const char *sysparams_args[] = {
-	"pid", 	"ppid", NULL
-    }, **srcptr;
-    char **arglist, **dstptr;
-
-    /* this takes care of an autoload on errnos */
-    unsetparam("errnos");
-    if (!(pm_nos = createparam("errnos", PM_ARRAY|PM_SPECIAL|PM_READONLY|
-			       PM_HIDE|PM_HIDEVAL|PM_REMOVABLE)))
-	return 1;
-    pm_nos->gsu.a = &errnos_gsu;
-
-    if (!(pm_params = createparam("sysparams", PM_HASHED|PM_SPECIAL|
-				  PM_HIDE|PM_HIDEVAL|PM_REMOVABLE))) {
-	tidyparam(pm_nos);
-	return 1;
-    }
-    pm_params->level = pm_params->old ? locallevel : 0;
-    pm_params->gsu.h = &stdhash_gsu;
-    pm_params->u.hash = ht = newparamtable(0, "sysparams");
-
-    arglist = (char **)zshcalloc((2*arrlen((char **)sysparams_args) + 1) *
-			       sizeof(char *));
-    for (srcptr = sysparams_args, dstptr = arglist; *srcptr; ) {
-	*dstptr++ = ztrdup(*srcptr++);
-	*dstptr++ = ztrdup("");
-    }
-    *dstptr = NULL;
-    /* make sure we don't overwrite the hash table: use the "augment" arg */
-    arrhashsetfn(pm_params, arglist, 1);
-    scanhashtable(ht, 0, 0, 0, fixsysparams, 0);
-
-    pm_params->node.flags |= PM_READONLY;
-
-    if (!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab))) {
-	tidyparam(pm_nos);
-	tidyparam(pm_params);
-	return 1;
-    }
     return 0;
 }
 
@@ -478,17 +464,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    Param pm;
-    if ((pm = (Param)paramtab->getnode(paramtab, "errnos")))
-	tidyparam(pm);
-    if ((pm = (Param)paramtab->getnode(paramtab, "sysparams")))
-    {
-	scanhashtable(pm->u.hash, 0, 0, 0, fixsysparams, 1);
-	tidyparam(pm);
-    }
-
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

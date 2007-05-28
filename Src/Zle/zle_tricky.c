@@ -612,7 +612,7 @@ docomplete(int lst)
      * no completion widgets are defined. */
 
     if (!module_loaded("zsh/compctl") && !hascompwidgets)
-	load_module("zsh/compctl");
+	(void)load_module("zsh/compctl", NULL);
 
     if (runhookdef(BEFORECOMPLETEHOOK, (void *) &lst)) {
 	active = 0;

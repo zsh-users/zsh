@@ -46,15 +46,7 @@ done
 
 (( ok )) || return 1
 
-zmodload -i zsh/stat 2>/dev/null || return 1
-
-{
-# Enable stat temporarily if disabled to avoid clashes.
-integer disable_stat
-if [[ ${builtins[stat]} != defined ]]; then
-  (( disable_stat = 1 ))
-  enable stat
-fi
+zmodload -F zsh/stat zstat 2>/dev/null || return 1
 
 dir=${2:+$2/}
 dir=${(Q)dir}
@@ -66,7 +58,7 @@ for f in ${(PQ)1}; do
   fi
 
   # Borrowed from Functions/Example/zls
-  stat -s -H stat -F "%b %e %H:%M" - "$dir$f" >/dev/null 2>&1
+  zstat -s -H stat -F "%b %e %H:%M" - "$dir$f" >/dev/null 2>&1
 
   listfiles+=("$stat[mode] ${(l:3:)stat[nlink]} ${(r:8:)stat[uid]} \
  ${(r:8:)stat[gid]} ${(l:8:)stat[size]} $stat[mtime] $f")
@@ -74,7 +66,4 @@ done
 
 (( ${#listfiles} )) && listopts=(-d listfiles -l -o)
 
-} always {
-  (( disable_stat )) && disable stat
-}
 return 0

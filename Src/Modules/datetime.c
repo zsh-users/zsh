@@ -154,8 +154,16 @@ static const struct gsu_integer epochseconds_gsu =
 { getcurrentsecs, NULL, stdunsetfn };
 
 static struct paramdef patab[] = {
-    PARAMDEF("EPOCHSECONDS", PM_INTEGER|PM_SPECIAL|PM_READONLY,
-		    NULL, &epochseconds_gsu),
+    SPECIALPMDEF("EPOCHSECONDS", PM_INTEGER|PM_READONLY,
+		 &epochseconds_gsu, NULL, NULL),
+};
+
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    NULL, 0,
+    patab, sizeof(patab)/sizeof(*patab),
+    NULL, 0,
+    0
 };
 
 /**/
@@ -167,26 +175,31 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(Module m)
 {
-    return !(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
-	     addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab))
-	    );
+    return 0;
 }
 
 /**/
 int
 cleanup_(Module m)
 {
-    Param pm;
-
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-    pm = (Param) paramtab->getnode(paramtab, "EPOCHSECONDS");
-    if (pm && (pm->node.flags & PM_SPECIAL)) {
-	pm->node.flags &= ~PM_READONLY;
-	unsetparam_pm(pm, 0, 1);
-    }
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

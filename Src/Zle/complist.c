@@ -3219,11 +3219,34 @@ menuselect(char **args)
     return 0;
 }
 
+static struct features module_features = {
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
 /**/
 int
 setup_(UNUSED(Module m))
 {
     return 0;
+}
+
+/**/
+int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
 }
 
 /**/
@@ -3269,7 +3292,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(UNUSED(Module m))
+cleanup_(Module m)
 {
     free(mtab);
     free(mgtab);
@@ -3279,7 +3302,7 @@ cleanup_(UNUSED(Module m))
     deletehookfunc("menu_start", (Hookfn) domenuselect);
     unlinkkeymap("menuselect", 1);
     unlinkkeymap("listscroll", 1);
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

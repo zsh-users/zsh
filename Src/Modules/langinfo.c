@@ -30,13 +30,9 @@
 #include "langinfo.mdh"
 #include "langinfo.pro"
 
-static char langinfo_nam[] = "langinfo";
-
 #ifdef HAVE_LANGINFO_H
 # include <langinfo.h>
 #endif
-
-static Param langinfo_pm;
 
 /**/
 #ifdef HAVE_NL_LANGINFO
@@ -396,46 +392,6 @@ liitem(char *name)
 }
 
 /**/
-static void
-shempty(void)
-{
-}
-
-/* Create a simple special hash parameter. */
-
-/**/
-static Param
-createlihash()
-{
-    Param pm;
-    HashTable ht;
-
-    unsetparam(langinfo_nam);
-
-    if (!(pm = createparam(langinfo_nam, PM_SPECIAL|PM_HIDE|PM_HIDEVAL|
-			   PM_REMOVABLE|PM_HASHED)))
-	return NULL;
-
-    pm->level = pm->old ? locallevel : 0;
-    pm->gsu.h = &stdhash_gsu;
-    pm->u.hash = ht = newhashtable(7, langinfo_nam, NULL);
-
-    ht->hash        = hasher;
-    ht->emptytable  = (TableFunc) shempty;
-    ht->filltable   = NULL;
-    ht->addnode     = (AddNodeFunc) shempty;
-    ht->getnode     = ht->getnode2 = getlanginfo;
-    ht->removenode  = (RemoveNodeFunc) shempty;
-    ht->disablenode = NULL;
-    ht->enablenode  = NULL;
-    ht->freenode    = (FreeNodeFunc) shempty;
-    ht->printnode   = printparamnode;
-    ht->scantab     = scanlanginfo;
-
-    return (langinfo_pm = pm);
-}
-
-/**/
 static HashNode
 getlanginfo(UNUSED(HashTable ht), char *name)
 {
@@ -490,8 +446,24 @@ scanlanginfo(UNUSED(HashTable ht), ScanFunc func, int flags)
     
 }
 
+static struct paramdef partab[] = {
+    SPECIALPMDEF("langinfo", 0, NULL, getlanginfo, scanlanginfo)
+};
+
 /**/
 #endif /* HAVE_NL_LANGINFO */
+
+static struct features module_features = {
+    NULL, 0,
+    NULL, 0,
+#ifdef HAVE_NL_LANGINFO
+    partab, sizeof(partab)/sizeof(*partab),
+#else
+    NULL, 0,
+#endif
+    NULL, 0,
+    0
+};
 
 /**/
 int
@@ -502,14 +474,23 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(UNUSED(Module m))
 {
-#ifdef HAVE_NL_LANGINFO
-    if (!createlihash())
-    	return 1;
-#else
-    unsetparam(langinfo_nam);
-#endif
     return 0;
 }
 
@@ -517,16 +498,7 @@ boot_(UNUSED(Module m))
 int
 cleanup_(UNUSED(Module m))
 {
-#ifdef HAVE_NL_LANGINFO
-    Param pm;
-
-    if ((pm = (Param) paramtab->getnode(paramtab, langinfo_nam)) &&
-	pm == langinfo_pm) {
-	pm->node.flags &= ~PM_READONLY;
-	unsetparam_pm(pm, 0, 1);
-    }
-#endif
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

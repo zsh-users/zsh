@@ -3151,7 +3151,6 @@ zftp_cleanup(void)
     zfunsetparam("ZFTP_SESSION");
     freelinklist(zfsessions, (FreeFunc) freesession);
     zfree(zfstatusp, sizeof(int)*zfsesscnt);
-    deletebuiltins("zftp", bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
 static int
@@ -3161,47 +3160,68 @@ zftpexithook(UNUSED(Hookdef d), UNUSED(void *dummy))
     return 0;
 }
 
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
 /* The load/unload routines required by the zsh library interface */
 
 /**/
 int
 setup_(UNUSED(Module m))
 {
-    /* setup_ returns 0 for success. require_module returns 1 for success. */
-    return !require_module("", "zsh/net/tcp", 0, 0);
+    return (require_module("", "zsh/net/tcp", NULL) == 1);
+}
+
+/**/
+int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
 }
 
 /**/
 int
 boot_(UNUSED(Module m))
 {
-    int ret;
-    if ((ret = addbuiltins("zftp", bintab,
-			   sizeof(bintab)/sizeof(*bintab))) == 1) {
-	/* if successful, set some default parameters */
-	off_t tmout_def = 60;
-	zfsetparam("ZFTP_VERBOSE", ztrdup("450"), ZFPM_IFUNSET);
-	zfsetparam("ZFTP_TMOUT", &tmout_def, ZFPM_IFUNSET|ZFPM_INTEGER);
-	zfsetparam("ZFTP_PREFS", ztrdup("PS"), ZFPM_IFUNSET);
-	/* default preferences if user deletes variable */
-	zfprefs = ZFPF_SNDP|ZFPF_PASV;
+    /*
+     * Set some default parameters.
+     * These aren't special, so aren't associated with features.
+     */
+    off_t tmout_def = 60;
+    zfsetparam("ZFTP_VERBOSE", ztrdup("450"), ZFPM_IFUNSET);
+    zfsetparam("ZFTP_TMOUT", &tmout_def, ZFPM_IFUNSET|ZFPM_INTEGER);
+    zfsetparam("ZFTP_PREFS", ztrdup("PS"), ZFPM_IFUNSET);
+    /* default preferences if user deletes variable */
+    zfprefs = ZFPF_SNDP|ZFPF_PASV;
     
-	zfsessions = znewlinklist();
-	newsession("default");
+    zfsessions = znewlinklist();
+    newsession("default");
 
-	addhookfunc("exit", zftpexithook);
-    }
+    addhookfunc("exit", zftpexithook);
 
-    return !ret;
+    return 0;
 }
 
 /**/
 int
-cleanup_(UNUSED(Module m))
+cleanup_(Module m)
 {
     deletehookfunc("exit", zftpexithook);
     zftp_cleanup();
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

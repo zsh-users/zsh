@@ -979,7 +979,7 @@ run_init_scripts(void)
 		 * Always attempt to load the newuser module to perform
 		 * checks for new zsh users.  Don't care if we can't load it.
 		 */
-		if (load_module_silence("zsh/newuser", 1)) {
+		if (!load_module_silence("zsh/newuser", NULL, 1)) {
 		    /* Unload it immediately. */
 		    unload_named_module("zsh/newuser", "zsh", 1);
 		}
@@ -1152,7 +1152,7 @@ init_bltinmods(void)
 
 #include "bltinmods.list"
 
-    load_module("zsh/main");
+    (void)load_module("zsh/main", NULL);
 }
 
 /**/
@@ -1213,8 +1213,8 @@ char *
 autoload_zleread(char **lp, char **rp, int ha, int con)
 {
     zlereadptr = fallback_zleread;
-    if (load_module("zsh/zle"))
-	load_module("zsh/compctl");
+    if (load_module("zsh/zle", NULL) != 1)
+	(void)load_module("zsh/compctl", NULL);
     return zlereadptr(lp, rp, ha, con);
 }
 
@@ -1240,7 +1240,7 @@ static void
 autoload_zlesetkeymap(int mode)
 {
     zlesetkeymapptr = noop_function_int;
-    load_module("zsh/zle");
+    (void)load_module("zsh/zle", NULL);
     (*zlesetkeymapptr)(mode);
 }
 

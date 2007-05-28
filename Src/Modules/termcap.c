@@ -48,8 +48,7 @@
 #include "termcap.mdh"
 #include "termcap.pro"
 
-static char termcap_nam[] = "termcap";
-
+/**/
 #ifdef HAVE_TGETENT
 # ifdef USES_TERM_H
 #  ifdef HAVE_TERMIO_H
@@ -64,8 +63,6 @@ static char termcap_nam[] = "termcap";
 #   include <termcap.h>
 #  endif
 # endif
-
-static Param termcap_pm;
 
 #ifndef HAVE_BOOLCODES
 static char *boolcodes[] = {
@@ -161,60 +158,9 @@ bin_echotc(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     return 0;
 }
 
-#else /* ! HAVE_TGETENT */
-
-#define bin_echotc bin_notavail
-
-#endif /* HAVE_TGETENT */
-
 static struct builtin bintab[] = {
     BUILTIN("echotc", 0, bin_echotc, 1, -1, 0, NULL, NULL),
 };
-
-/**/
-#ifdef HAVE_TGETENT
-
-/* Empty dummy function for special hash parameters. */
-
-/**/
-static void
-shempty(void)
-{
-}
-
-/* Create a simple special hash parameter. */
-
-/**/
-static Param
-createtchash()
-{
-    Param pm;
-    HashTable ht;
-
-    unsetparam(termcap_nam);
-
-    if (!(pm = createparam(termcap_nam, PM_SPECIAL|PM_HIDE|PM_HIDEVAL|
-			   PM_REMOVABLE|PM_HASHED)))
-	return NULL;
-
-    pm->level = pm->old ? locallevel : 0;
-    pm->gsu.h = &stdhash_gsu;
-    pm->u.hash = ht = newhashtable(7, termcap_nam, NULL);
-
-    ht->hash        = hasher;
-    ht->emptytable  = (TableFunc) shempty;
-    ht->filltable   = NULL;
-    ht->addnode     = (AddNodeFunc) shempty;
-    ht->getnode     = ht->getnode2 = gettermcap;
-    ht->removenode  = (RemoveNodeFunc) shempty;
-    ht->disablenode = NULL;
-    ht->enablenode  = NULL;
-    ht->freenode    = (FreeNodeFunc) shempty;
-    ht->printnode   = printparamnode;
-    ht->scantab     = scantermcap;
-
-    return (termcap_pm = pm);
-}
 
 /**/
 static HashNode
@@ -364,8 +310,28 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
     }
 }
 
+struct paramdef partab[] = {
+    SPECIALPMDEF("termcap", PM_READONLY, NULL, gettermcap, scantermcap)
+};
+
 /**/
 #endif /* HAVE_TGETENT */
+
+static struct features module_features = {
+#ifdef HAVE_TGETENT
+    bintab, sizeof(bintab)/sizeof(*bintab),
+#else
+    NULL, 0,
+#endif
+    NULL, 0,
+#ifdef HAVE_TGETENT
+    partab, sizeof(partab)/sizeof(*partab),
+#else
+    NULL, 0,
+#endif
+    NULL, 0,
+    0
+};
 
 /**/
 int
@@ -376,36 +342,36 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(Module m)
 {
 #ifdef HAVE_TGETENT
 # ifdef HAVE_SETUPTERM
     setupterm((char *)0, 1, (int *)0);
 # endif
-
-    if (!createtchash())
-    	return 1;
-#else
-    unsetparam(termcap_nam);
 #endif
-    return  !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return  0;
 }
 
 /**/
 int
 cleanup_(Module m)
 {
-#ifdef HAVE_TGETENT
-    Param pm;
-
-    if ((pm = (Param) paramtab->getnode(paramtab, termcap_nam)) &&
-	pm == termcap_pm) {
-	pm->node.flags &= ~PM_READONLY;
-	unsetparam_pm(pm, 0, 1);
-    }
-#endif
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

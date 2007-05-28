@@ -1777,6 +1777,14 @@ mod_export struct hookdef zlehooks[] = {
     HOOKDEF("invalidate_list", NULL, 0),
 };
 
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
 /**/
 int
 setup_(UNUSED(Module m))
@@ -1817,11 +1825,25 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(Module m)
 {
     addhookfunc("before_trap", (Hookfn) zlebeforetrap);
     addhookfunc("after_trap", (Hookfn) zleaftertrap);
-    addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     addhookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return 0;
 }
@@ -1836,9 +1858,8 @@ cleanup_(Module m)
     }
     deletehookfunc("before_trap", (Hookfn) zlebeforetrap);
     deletehookfunc("after_trap", (Hookfn) zleaftertrap);
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deletehookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

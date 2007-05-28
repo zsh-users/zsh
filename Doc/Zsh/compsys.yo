@@ -1268,13 +1268,6 @@ If this is set to `true', the tt(_expand_alias) completer and bindable
 command will try to expand disabled aliases, too.  The default is
 `tt(false)'.
 )
-kindex(disable-stat, completion style)
-item(tt(disable-stat))(
-This is used with an empty tag by the tt(_cvs) function
-to decide whether the tt(zsh/stat) module should be used to
-generate names of modified files in the appropriate places (this is its
-only use).  If the style is set, completion will use the tt(ls) command.
-)
 kindex(domains, completion style)
 item(tt(domains))(
 A list of names of network domains for completion.

@@ -58,59 +58,8 @@
 #endif /* HAVE_MMAP && HAVE_MUNMAP && HAVE_MSYNC */
 #endif /* HAVE_SYS_MMAN_H &&  HAVE_FTRUNCATE */
 
-/*
- * Name of the special parameter.  If zmodload took arguments,
- * we could make this selectable.
- */
-static char mapfile_nam[] = "mapfile";
-
-static Param mapfile_pm;
-
-/* Empty dummy function for special hash parameters. */
-
-/**/
-static void
-shempty(void)
-{
-}
-
 static const struct gsu_hash mapfiles_gsu =
 { hashgetfn, setpmmapfiles, stdunsetfn };
-
-/* Create the special hash parameter. */
-
-/**/
-static Param
-createmapfilehash()
-{
-    Param pm;
-    HashTable ht;
-
-    unsetparam(mapfile_nam);
-    mapfile_pm = NULL;
-
-    if (!(pm = createparam(mapfile_nam, PM_SPECIAL|PM_HIDE|PM_HIDEVAL|
-			   PM_REMOVABLE|PM_HASHED)))
-	return NULL;
-
-    pm->level = pm->old ? locallevel : 0;
-    pm->gsu.h = &mapfiles_gsu;
-    pm->u.hash = ht = newhashtable(7, mapfile_nam, NULL);
-
-    ht->hash        = hasher;
-    ht->emptytable  = (TableFunc) shempty;
-    ht->filltable   = NULL;
-    ht->addnode     = (AddNodeFunc) shempty;
-    ht->getnode     = ht->getnode2 = getpmmapfile;
-    ht->removenode  = (RemoveNodeFunc) shempty;
-    ht->disablenode = NULL;
-    ht->enablenode  = NULL;
-    ht->freenode    = (FreeNodeFunc) shempty;
-    ht->printnode   = printparamnode;
-    ht->scantab     = scanpmmapfile;
-
-    return (mapfile_pm = pm);
-}
 
 /* Functions for the options special parameter. */
 
@@ -192,9 +141,6 @@ setpmmapfiles(Param pm, HashTable ht)
     int i;
     HashNode hn;
 
-    /* just to see if I've understood what's happening */
-    DPUTS(pm != mapfile_pm, "BUG: setpmmapfiles called for wrong param");
-
     if (!ht)
 	return;
 
@@ -261,6 +207,10 @@ get_contents(char *fname)
 static const struct gsu_scalar mapfile_gsu =
 { strgetfn, setpmmapfile, unsetpmmapfile };
 
+static struct paramdef partab[] = {
+    SPECIALPMDEF("mapfile", 0, &mapfiles_gsu, getpmmapfile, scanpmmapfile)
+};
+
 /**/
 static HashNode
 getpmmapfile(UNUSED(HashTable ht), char *name)
@@ -272,7 +222,7 @@ getpmmapfile(UNUSED(HashTable ht), char *name)
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR;
     pm->gsu.s = &mapfile_gsu;
-    pm->node.flags |= (mapfile_pm->node.flags & PM_READONLY);
+    pm->node.flags |= (partab[0].pm->node.flags & PM_READONLY);
 
     /* Set u.str to contents of file given by name */
     if ((contents = get_contents(pm->node.nam)))
@@ -298,7 +248,7 @@ scanpmmapfile(UNUSED(HashTable ht), ScanFunc func, int flags)
     memset((void *)&pm, 0, sizeof(struct param));
     pm.node.flags = PM_SCALAR;
     pm.gsu.s = &mapfile_gsu;
-    pm.node.flags |= (mapfile_pm->node.flags & PM_READONLY);
+    pm.node.flags |= (partab[0].pm->node.flags & PM_READONLY);
 
     /* Here we scan the current directory, calling func() for each file */
     while ((pm.node.nam = zreaddir(dir, 1))) {
@@ -315,6 +265,14 @@ scanpmmapfile(UNUSED(HashTable ht), ScanFunc func, int flags)
     closedir(dir);
 }
 
+static struct features module_features = {
+    NULL, 0,
+    NULL, 0,
+    partab, sizeof(partab)/sizeof(*partab),
+    NULL, 0,
+    0
+};
+
 /**/
 int
 setup_(UNUSED(Module m))
@@ -324,13 +282,23 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(UNUSED(Module m))
 {
-    /* Create the special associative array. */
-
-    if (!createmapfilehash())
-	return 1;
-
     return 0;
 }
 
@@ -338,16 +306,7 @@ boot_(UNUSED(Module m))
 int
 cleanup_(UNUSED(Module m))
 {
-    Param pm;
-
-    /* Remove the special parameter if it is still the same. */
-
-    if ((pm = (Param) paramtab->getnode(paramtab, mapfile_nam)) &&
-	pm == mapfile_pm) {
-	pm->node.flags &= ~PM_READONLY;
-	unsetparam_pm(pm, 0, 1);
-    }
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

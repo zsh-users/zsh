@@ -295,6 +295,19 @@ static struct builtin bintab[] = {
 };
 
 
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+#if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
+    cotab, sizeof(cotab)/sizeof(*cotab),
+#else /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
+    NULL, 0,
+#endif /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
+
 /**/
 int
 setup_(UNUSED(Module m))
@@ -304,25 +317,31 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(Module m)
 {
-#if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
-    return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) ||
-	   !addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
-#else /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
-    return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-#endif /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
+    return 0;
 }
 
 /**/
 int
 cleanup_(Module m)
 {
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-#if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
-    deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
-#endif /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

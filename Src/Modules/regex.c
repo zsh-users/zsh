@@ -131,6 +131,16 @@ static struct conddef cotab[] = {
     CONDDEF("regex-match", CONDF_INFIX, zcond_regex_match, 0, 0, ZREGEX_EXTENDED)
 };
 
+
+static struct features module_features = {
+    NULL, 0,
+    cotab, sizeof(cotab)/sizeof(*cotab),
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
+
 /**/
 int
 setup_(UNUSED(Module m))
@@ -140,17 +150,31 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(Module m)
 {
-    return !addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
+    return 0;
 }
 
 /**/
 int
 cleanup_(Module m)
 {
-    deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

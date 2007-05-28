@@ -725,9 +725,19 @@ ptyhook(UNUSED(Hookdef d), UNUSED(void *dummy))
     return 0;
 }
 
+
 static struct builtin bintab[] = {
     BUILTIN("zpty", 0, bin_zpty, 0, -1, 0, "ebdrwLnt", NULL),
 };
+
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
 
 /**/
 int
@@ -738,12 +748,27 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(Module m)
 {
     ptycmds = NULL;
 
     addhookfunc("exit", ptyhook);
-    return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return 0;
 }
 
 /**/
@@ -752,8 +777,7 @@ cleanup_(Module m)
 {
     deletehookfunc("exit", ptyhook);
     deleteallptycmds();
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

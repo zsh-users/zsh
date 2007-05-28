@@ -49,9 +49,11 @@
 >zmodload zsh/main
 >zmodload zsh/parameter
 
+# You use to need zmodload -i to avoid an error.
+# That has been deemed pointless, so now an attempt
+# to load a loaded module should succeed.
  zmodload zsh/main
-1:Test reloading an already-loaded module
-?(eval):zmodload:1: module zsh/main already loaded.
+0:Test reloading an already-loaded module
 
 # Loop over the modules found above and attempt to load each one.  Use
 # the -i flag in case dependencies cause multiple modules to be loaded,

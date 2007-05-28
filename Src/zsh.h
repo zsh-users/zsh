@@ -77,7 +77,7 @@ typedef mnumber (*StrMathFunc)(char *, char *, int);
 struct mathfunc {
     MathFunc next;
     char *name;
-    int flags;
+    int flags;			/* MFF_* flags defined below */
     NumMathFunc nfunc;
     StrMathFunc sfunc;
     char *module;
@@ -92,6 +92,7 @@ struct mathfunc {
 #define MFF_ADDED    2
 /* Math function is implemented by a shell function */
 #define MFF_USERFUNC 4
+
 
 #define NUMMATHFUNC(name, func, min, max, id) \
     { NULL, name, 0, func, NULL, NULL, min, max, id }
@@ -375,6 +376,7 @@ typedef struct builtin   *Builtin;
 typedef struct cmdnam    *Cmdnam;
 typedef struct complist  *Complist;
 typedef struct conddef   *Conddef;
+typedef struct features  *Features;
 typedef struct funcstack *Funcstack;
 typedef struct funcwrap  *FuncWrap;
 typedef struct hashnode  *HashNode;
@@ -1166,14 +1168,40 @@ struct module {
 #define MOD_INIT_B  (1<<5)
 #define MOD_ALIAS   (1<<6)
 
-typedef int (*Module_func) _((Module));
+typedef int (*Module_generic_func) _((void));
+typedef int (*Module_void_func) _((Module));
+typedef int (*Module_features_func) _((Module, char ***));
+typedef int (*Module_enables_func) _((Module, int **));
 
 struct linkedmod {
     char *name;
-    Module_func setup;
-    Module_func boot;
-    Module_func cleanup;
-    Module_func finish;
+    Module_void_func setup;
+    Module_features_func features;
+    Module_enables_func enables;
+    Module_void_func boot;
+    Module_void_func cleanup;
+    Module_void_func finish;
+};
+
+/*
+ * Structure combining all the concrete features available in
+ * a module and with space for information about abstract features.
+ */
+struct features {
+    /* List of builtins provided by the module and the size thereof */
+    Builtin bn_list;
+    int bn_size;
+    /* List of conditions provided by the module and the size thereof */
+    Conddef cd_list;
+    int cd_size;
+    /* List of parameters provided by the module and the size thereof */
+    Paramdef pd_list;
+    int pd_size;
+    /* List of math functions provided by the module and the size thereof */
+    MathFunc mf_list;
+    int mf_size;
+    /* Number of abstract features */
+    int n_abstract;
 };
 
 /* C-function hooks */
@@ -1422,26 +1450,65 @@ struct tieddata {
 #define PF_ASSIGN	0x02	/* argument handled like the RHS of foo=bar */
 #define PF_SINGLE	0x04	/* single word substitution */
 
+/*
+ * Structure for adding parameters in a module.
+ * The flags should declare the type; note PM_SCALAR is zero.
+ *
+ * Special hashes are recognized by getnfn so the PM_HASHED
+ * is optional.  These get slightly non-standard attention:
+ * the function createspecialhash is used to create them.
+ *
+ * The get/set/unset attribute may be NULL; in that case the
+ * parameter is assigned methods suitable for handling the
+ * tie variable var, if that is not NULL, else standard methods.
+ *
+ * pm is set when the parameter is added to the parameter table
+ * and serves as a flag that the parameter has been added.
+ */
 struct paramdef {
     char *name;
     int flags;
-    void *var;
-    void *gsu;			/* get/set/unset structure */
+    void *var;			/* tied internal variable, if any */
+    const void *gsu;		/* get/set/unset structure, if special */
+    GetNodeFunc getnfn;		/* function to get node, if special hash */
+    ScanTabFunc scantfn;	/* function to scan table, if special hash */
+    Param pm;			/* structure inserted into param table */
 };
 
+/*
+ * Shorthand for common uses of adding parameters, with no special
+ * hash properties.
+ */
 #define PARAMDEF(name, flags, var, gsu) \
-    { name, flags, (void *) var, (void *) gsu, }
+    { name, flags, (void *) var, (void *) gsu, \
+	    NULL, NULL, NULL \
+    }
 /*
  * Note that the following definitions are appropriate for defining
  * parameters that reference a variable (var).  Hence the get/set/unset
  * methods used will assume var needs dereferencing to get the value.
  */
 #define INTPARAMDEF(name, var) \
-    { name, PM_INTEGER, (void *) var, NULL }
+    { name, PM_INTEGER, (void *) var, NULL,  NULL, NULL, NULL }
 #define STRPARAMDEF(name, var) \
-    { name, PM_SCALAR, (void *) var, NULL }
+    { name, PM_SCALAR, (void *) var, NULL, NULL, NULL, NULL }
 #define ARRPARAMDEF(name, var) \
-    { name, PM_ARRAY, (void *) var, NULL }
+    { name, PM_ARRAY, (void *) var, NULL, NULL, NULL, NULL }
+/*
+ * The following is appropriate for a module function that behaves
+ * in a special fashion.  Parameters used in a module that don't
+ * have special behaviour shouldn't be declared in a table but
+ * should just be added with the standard parameter functions.
+ *
+ * These parameters are not marked as removable, since they
+ * shouldn't be loaded as local parameters, unlike the special
+ * Zle parameters that are added and removed on each call to Zle.
+ * We add the PM_REMOVABLE flag when removing the feature corresponding
+ * to the parameter.
+ */
+#define SPECIALPMDEF(name, flags, gsufn, getfn, scanfn) \
+    { name, flags | PM_SPECIAL | PM_HIDE | PM_HIDEVAL, \
+	    NULL, gsufn, getfn, scanfn, NULL }
 
 #define setsparam(S,V) assignsparam(S,V,0)
 #define setaparam(S,V) assignaparam(S,V,0)

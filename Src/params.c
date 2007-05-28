@@ -419,7 +419,7 @@ getparamnode(HashTable ht, char *nam)
     if (pm && pm->u.str && (pm->node.flags & PM_AUTOLOAD)) {
 	char *mn = dupstring(pm->u.str);
 
-	if (!load_module(mn))
+	if (load_module(mn, NULL) == 1)
 	    return NULL;
 	hn = gethashnode2(ht, nam);
 	if (((Param) hn) == pm && (pm->node.flags & PM_AUTOLOAD)) {
@@ -839,6 +839,47 @@ createparam(char *name, int flags)
 	assigngetset(pm);
     return pm;
 }
+
+/* Empty dummy function for special hash parameters. */
+
+/**/
+static void
+shempty(void)
+{
+}
+
+/* Create a simple special hash parameter. */
+
+/**/
+mod_export Param
+createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan, int flags)
+{
+    Param pm;
+    HashTable ht;
+
+    if (!(pm = createparam(name, PM_SPECIAL|PM_HASHED|flags)))
+	return NULL;
+
+    pm->level = pm->old ? locallevel : 0;
+    pm->gsu.h = (flags & PM_READONLY) ? &stdhash_gsu :
+	&nullsethash_gsu;
+    pm->u.hash = ht = newhashtable(0, name, NULL);
+
+    ht->hash        = hasher;
+    ht->emptytable  = (TableFunc) shempty;
+    ht->filltable   = NULL;
+    ht->addnode     = (AddNodeFunc) shempty;
+    ht->getnode     = ht->getnode2 = get;
+    ht->removenode  = (RemoveNodeFunc) shempty;
+    ht->disablenode = NULL;
+    ht->enablenode  = NULL;
+    ht->freenode    = (FreeNodeFunc) shempty;
+    ht->printnode   = printparamnode;
+    ht->scantab     = scan;
+
+    return pm;
+}
+
 
 /* Copy a parameter */
 
@@ -4117,7 +4158,7 @@ scanendscope(HashNode hn, UNUSED(int flags))
 	    if (pm->env)
 		delenv(pm);
 
-	    if (!(tpm->node.flags & PM_NORESTORE))
+	    if (!(tpm->node.flags & (PM_NORESTORE|PM_READONLY)))
 		switch (PM_TYPE(pm->node.flags)) {
 		case PM_SCALAR:
 		    pm->gsu.s->setfn(pm, tpm->u.str);

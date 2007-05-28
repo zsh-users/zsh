@@ -74,11 +74,36 @@ deltochar(UNUSED(char **args))
     return !ok;
 }
 
+
+static struct features module_features = {
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
+
 /**/
 int
 setup_(UNUSED(Module m))
 {
     return 0;
+}
+
+/**/
+int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
 }
 
 /**/
@@ -100,11 +125,11 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(UNUSED(Module m))
+cleanup_(Module m)
 {
     deletezlefunction(w_deletetochar);
     deletezlefunction(w_zaptochar);
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

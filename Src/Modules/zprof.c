@@ -295,12 +295,35 @@ static struct funcwrap wrapper[] = {
     WRAPDEF(zprof_wrapper),
 };
 
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    NULL, 0,
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
 /**/
 int
 setup_(Module m)
 {
     zprof_module = m;
     return 0;
+}
+
+/**/
+int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
 }
 
 /**/
@@ -312,8 +335,7 @@ boot_(Module m)
     arcs = NULL;
     narcs = 0;
     stack = NULL;
-    return !(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
-	     !addwrapper(m, wrapper));
+    return addwrapper(m, wrapper);
 }
 
 /**/
@@ -322,9 +344,8 @@ cleanup_(Module m)
 {
     freepfuncs(calls);
     freeparcs(arcs);
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deletewrapper(m, wrapper);
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

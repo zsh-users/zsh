@@ -1467,6 +1467,14 @@ struct hookdef comphooks[] = {
     HOOKDEF("comp_list_matches", ilistmatches, 0),
 };
 
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    cotab, sizeof(cotab)/sizeof(*cotab),
+    NULL, 0,
+    NULL, 0,
+    0
+};
+
 /**/
 int
 setup_(UNUSED(Module m))
@@ -1492,6 +1500,21 @@ setup_(UNUSED(Module m))
 
 /**/
 int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
+}
+
+/**/
+int
 boot_(Module m)
 {
     addhookfunc("complete", (Hookfn) do_completion);
@@ -1502,11 +1525,7 @@ boot_(Module m)
     addhookfunc("list_matches", (Hookfn) list_matches);
     addhookfunc("invalidate_list", (Hookfn) invalidate_list);
     addhookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
-    if (!(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
-	  addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab)) |
-	  !addwrapper(m, wrapper)))
-	return 1;
-    return 0;
+    return addwrapper(m, wrapper);
 }
 
 /**/
@@ -1521,10 +1540,8 @@ cleanup_(Module m)
     deletehookfunc("list_matches", (Hookfn) list_matches);
     deletehookfunc("invalidate_list", (Hookfn) invalidate_list);
     deletehookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-    deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
     deletewrapper(m, wrapper);
-    return 0;
+    return seteatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

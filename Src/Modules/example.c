@@ -184,6 +184,14 @@ static struct funcwrap wrapper[] = {
     WRAPDEF(ex_wrapper),
 };
 
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    cotab, sizeof(cotab)/sizeof(*cotab),
+    patab, sizeof(patab)/sizeof(*patab),
+    mftab, sizeof(mftab)/sizeof(*mftab),
+    0
+};
+
 /**/
 int
 setup_(UNUSED(Module m))
@@ -191,6 +199,21 @@ setup_(UNUSED(Module m))
     printf("The example module has now been set up.\n");
     fflush(stdout);
     return 0;
+}
+
+/**/
+int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m->nam, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m->nam, &module_features, enables);
 }
 
 /**/
@@ -203,23 +226,15 @@ boot_(Module m)
     arrparam[0] = ztrdup("example");
     arrparam[1] = ztrdup("array");
     arrparam[2] = NULL;
-    return !(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
-	     addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab)) |
-	     addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab)) |
-	     addmathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab)) |
-	     !addwrapper(m, wrapper));
+    return addwrapper(m, wrapper);
 }
 
 /**/
 int
 cleanup_(Module m)
 {
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
-    deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
-    deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
-    deletemathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
     deletewrapper(m, wrapper);
-    return 0;
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

@@ -356,8 +356,6 @@
 
  local parentenv=preserved
  fn() {
-  # The first declare works around the "not an identifier" bug with -h
-  declare \! \# \$ \* - \? @ 0
   typeset -h +g -m \*
   unset -m \*
   integer i=9

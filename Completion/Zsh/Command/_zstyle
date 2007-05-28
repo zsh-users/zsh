@@ -40,7 +40,6 @@ styles=(
   completer		 c:completer
   condition		 c:bool
   cursor		 c:cursor
-  disable-stat		 c:bool
   disabled               c:bool
   domains                c:
   expand		 c:
