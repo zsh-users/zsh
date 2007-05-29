@@ -1,5 +1,10 @@
 2007-05-29  Peter Stephenson  <pws@csr.com>
 
+	* 23486: Test/A01grammar.ztst, Test/C03traps.ztst,
+	Test/D07multibyte.ztst, Test/E01options.ztst, Test/ztst.zsh:
+	Use {fd} syntax to open fd's for tests that won't clash
+	with standard fd's.
+
 	* 23485: Completion/Zsh/Command/_zmodload, Src/cond.c,
 	Src/exec.c, Src/module.c, Src/params.c: completion for
 	zmodload -F; autoloading now requests a specific feature

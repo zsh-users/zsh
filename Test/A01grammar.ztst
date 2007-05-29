@@ -452,7 +452,7 @@
 >chrysanthemum contains an e
 >Zanzibar either begins with a or an upper case letter
 
-  print 'This test hangs the shell when it fails...' >&8
+  print -u $ZTST_fd 'This test hangs the shell when it fails...'
   name=0
 # The number 4375 here is chosen to produce more than 16384 bytes of output
   while (( name < 4375 )); do

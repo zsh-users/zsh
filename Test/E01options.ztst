@@ -668,7 +668,7 @@
 >hello
 
 # This tests for another race in multios.
-  print 'This test hangs the shell when it fails...' >&8
+  print -u $ZTST_fd 'This test hangs the shell when it fails...'
   setopt multios
   echo These are the contents of the file >multio_race.out
   multio_race_fn() { cat; }

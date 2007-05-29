@@ -147,10 +147,14 @@ $ZTST_failmsg"
 ZTST_verbose() {
   local lev=$1
   shift
-  [[ -n $ZTST_verbose && $ZTST_verbose -ge $lev ]] && print -r -- $* >&8
+  if [[ -n $ZTST_verbose && $ZTST_verbose -ge $lev ]]; then
+    print -r -u $ZTST_fd -- $*
+  fi
 }
 ZTST_hashmark() {
-  [[ ZTST_verbose -le 0 && -t 8 ]] && print -nu8 ${(pl:SECONDS::\#::\#\r:)}
+  if [[ ZTST_verbose -le 0 && -t $ZTST_fd ]]; then
+    print -n -u$ZTST_fd -- ${(pl:SECONDS::\#::\#\r:)}
+  fi
   (( SECONDS > COLUMNS+1 && (SECONDS -= COLUMNS) ))
 }
 
@@ -159,8 +163,8 @@ if [[ ! -r $ZTST_testname ]]; then
   exit 1
 fi
 
-exec 8>&1
-exec 9<$ZTST_testname
+exec {ZTST_fd}>&1
+exec {ZTST_input}<$ZTST_testname
 
 # The current line read from the test file.
 ZTST_curline=''
@@ -172,7 +176,7 @@ ZTST_cursect=''
 ZTST_getline() {
   local IFS=
   while true; do
-    read -r ZTST_curline <&9 || return 1
+    read -u $ZTST_input -r ZTST_curline || return 1
     [[ $ZTST_curline == \#* ]] || return 0
   done
 }

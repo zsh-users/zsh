@@ -122,7 +122,7 @@
 # least the full two seconds to make sure we have got the output from the
 # execution of the trap.
 
-  print 'This test takes at least three seconds...' >&8
+  print -u $ZTST_fd 'This test takes at least three seconds...'
   fn1() {
     trap 'print TERM1' TERM
     fn2() { trap 'print TERM2; return 1' TERM; sleep 2; }
@@ -135,7 +135,7 @@
 0: Nested `trap ... TERM', triggered on inner loop
 >TERM2
 
-  print 'This test, too, takes at least three seconds...' >&8
+  print -u $ZTST_fd 'This test, too, takes at least three seconds...'
   fn1() {
     trap 'print TERM1; return 1' TERM
     fn2() { trap 'print TERM2; return 1' TERM; }
@@ -253,7 +253,7 @@
 >Exiting, attempt 2
 >Running exit trap
 
-  print Another test that takes three seconds >&8
+  print -u $ZTST_fd Another test that takes three seconds
   gotsig=0
   signal_handler() {
    echo "parent received signal"
