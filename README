@@ -137,6 +137,11 @@ set non-ASCII characters for history or comments.  Multibyte characters
 have never worked and the most consistent change was to restrict the
 set to portable characters only.
 
+Writers of add-on modules should note that the API has changed
+significantly to allow user control of individual features provided by
+modules.  See the documentation for zmodload -F and
+Etc/zsh-development-guide, in that order.
+
 Documentation
 -------------
 

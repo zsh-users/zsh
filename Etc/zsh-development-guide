@@ -229,7 +229,8 @@ the module's feature strctures for all standard features; space
 is left for abstract features at the end of the array and the names
 must be added by the module.  Note that heap memory should
 be used for this (zhalloc, etc.) as memory for the features array is not
-freed.
+freed; note also the pointers for the abstract features are not
+initialised so setting them is mandatory any time there are any present.
 
 A structure "struct features" should
 be used to contain all standard features as well as the number of
@@ -242,12 +243,14 @@ should be set to an array of the same length as *featuresp without the
 NULL, containing a 1 for every feature that is enabled and a zero for other
 feature.  By default features are disabled.  If *enablesp is not NULL, its
 values should be used to decide whether features are to be turned off.  It
-should return status 0 for success, 1 on a failure to alter a feature.
-The function handlefeatures() conveniently handles all standard features
-present in the module's features structure; abstract features must
-be handled by the module.  As with features_, any handling of the
-array by the module itself should take into account that the array
-will not be freed and any allocation should therefore be from heap memory.
+should return status 0 for success, 1 on a failure to alter a feature.  The
+function handlefeatures() conveniently handles all standard features
+present in the module's features structure; abstract features must be
+handled by the module (as with the features array, the area of the enables
+array for abstract features is not even initialised by the main shell).  As
+with features_, any handling of the array by the module itself should take
+into account that the array will not be freed and any allocation should
+therefore be from heap memory.
 
 The functions features_ and enables_ can be called at any point
 after setup_ has been called and before cleanup_ is called.  In

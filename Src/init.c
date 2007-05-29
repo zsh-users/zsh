@@ -701,7 +701,7 @@ setupvals(void)
 	    close(tmppipe[1]);
     }
 
-    addhookdefs(argzero, zshhooks, sizeof(zshhooks)/sizeof(*zshhooks));
+    (void)addhookdefs(argzero, zshhooks, sizeof(zshhooks)/sizeof(*zshhooks));
 
     init_eprog();
 
@@ -979,7 +979,7 @@ run_init_scripts(void)
 		 * Always attempt to load the newuser module to perform
 		 * checks for new zsh users.  Don't care if we can't load it.
 		 */
-		if (!load_module_silence("zsh/newuser", NULL, 1)) {
+		if (!load_module("zsh/newuser", NULL, 1)) {
 		    /* Unload it immediately. */
 		    unload_named_module("zsh/newuser", "zsh", 1);
 		}
@@ -1152,7 +1152,7 @@ init_bltinmods(void)
 
 #include "bltinmods.list"
 
-    (void)load_module("zsh/main", NULL);
+    (void)load_module("zsh/main", NULL, 0);
 }
 
 /**/
@@ -1213,8 +1213,8 @@ char *
 autoload_zleread(char **lp, char **rp, int ha, int con)
 {
     zlereadptr = fallback_zleread;
-    if (load_module("zsh/zle", NULL) != 1)
-	(void)load_module("zsh/compctl", NULL);
+    if (load_module("zsh/zle", NULL, 0) != 1)
+	(void)load_module("zsh/compctl", NULL, 0);
     return zlereadptr(lp, rp, ha, con);
 }
 
@@ -1240,7 +1240,7 @@ static void
 autoload_zlesetkeymap(int mode)
 {
     zlesetkeymapptr = noop_function_int;
-    (void)load_module("zsh/zle", NULL);
+    (void)load_module("zsh/zle", NULL, 0);
     (*zlesetkeymapptr)(mode);
 }
 

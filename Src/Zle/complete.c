@@ -1524,7 +1524,7 @@ boot_(Module m)
     addhookfunc("reverse_menu", (Hookfn) reverse_menu);
     addhookfunc("list_matches", (Hookfn) list_matches);
     addhookfunc("invalidate_list", (Hookfn) invalidate_list);
-    addhookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
+    (void)addhookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
     return addwrapper(m, wrapper);
 }
 
@@ -1539,7 +1539,8 @@ cleanup_(Module m)
     deletehookfunc("reverse_menu", (Hookfn) reverse_menu);
     deletehookfunc("list_matches", (Hookfn) list_matches);
     deletehookfunc("invalidate_list", (Hookfn) invalidate_list);
-    deletehookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
+    (void)deletehookdefs(m->nam, comphooks,
+			 sizeof(comphooks)/sizeof(*comphooks));
     deletewrapper(m, wrapper);
     return setfeatureenables(m->nam, &module_features, NULL);
 }

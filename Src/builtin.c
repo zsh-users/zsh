@@ -163,7 +163,7 @@ createbuiltintable(void)
     builtintab->freenode    = freebuiltinnode;
     builtintab->printnode   = printbuiltinnode;
 
-    addbuiltins("zsh", builtins, sizeof(builtins)/sizeof(*builtins));
+    (void)addbuiltins("zsh", builtins, sizeof(builtins)/sizeof(*builtins));
 }
 
 /* Print a builtin */

@@ -1844,7 +1844,7 @@ boot_(Module m)
 {
     addhookfunc("before_trap", (Hookfn) zlebeforetrap);
     addhookfunc("after_trap", (Hookfn) zleaftertrap);
-    addhookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
+    (void)addhookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return 0;
 }
 
@@ -1858,7 +1858,7 @@ cleanup_(Module m)
     }
     deletehookfunc("before_trap", (Hookfn) zlebeforetrap);
     deletehookfunc("after_trap", (Hookfn) zleaftertrap);
-    deletehookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
+    (void)deletehookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return setfeatureenables(m->nam, &module_features, NULL);
 }
 

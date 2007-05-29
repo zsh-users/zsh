@@ -1,5 +1,10 @@
 2007-05-29  Peter Stephenson  <pws@csr.com>
 
+	* 23488: README, Etc/zsh-development-guide, Src/builtin.c,
+	Src/init.c, Src/module.c, Src/module/zftp.c, Src/Zle/complete.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c:
+	tidy up module interface and documentation.
+
 	* 23486: Test/A01grammar.ztst, Test/C03traps.ztst,
 	Test/D07multibyte.ztst, Test/E01options.ztst, Test/ztst.zsh:
 	Use {fd} syntax to open fd's for tests that won't clash
