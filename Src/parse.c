@@ -2125,7 +2125,7 @@ par_cond_triple(char *a, char *b, char *c)
 	ecstr(c);
 	ecadd(ecnpats++);
     } else if ((b[0] == Equals || b[0] == '=') &&
-               (b[1] == '~' || b[1] == Tilde) && ~b[2]) {
+               (b[1] == '~' || b[1] == Tilde) && !b[2]) {
 	ecadd(WCB_COND(COND_REGEX, 0));
 	ecstr(a);
 	ecstr(c);

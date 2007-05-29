@@ -1,3 +1,9 @@
+2007-05-29  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/mod_stat.yo: typo.
+
+	* Phil Pennock: 23480: Src/parse.c: typo in =~ handling.
+
 2007-05-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Not posted but see 23479:Completion/Unix/Command/_chmod,

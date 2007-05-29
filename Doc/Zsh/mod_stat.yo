@@ -11,7 +11,7 @@ cindex(files, examining)
 xitem(tt(zstat) [ tt(-gnNolLtTrs) ] [ tt(-f) var(fd) ] \
     [ tt(-H) var(hash) ] [ tt(-A) var(array) ] \
     [ tt(-F) var(fmt) ] [ tt(PLUS())var(element) ] [ var(file) ... ])
-itme(tt(stat) var(...))(
+item(tt(stat) var(...))(
 The command acts as a front end to the tt(stat) system call (see
 manref(stat)(2)).  The same command is provided with two names; as
 the name tt(stat) is often used by an external command it is recommended
