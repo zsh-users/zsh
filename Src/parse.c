@@ -2108,6 +2108,16 @@ yyerror(int noerr)
 	errflag = 1;
 }
 
+/*
+ * Duplicate a programme list, on the heap if heap is 1, else
+ * in permanent storage.
+ *
+ * Be careful in case p is the Eprog for a function which will
+ * later be autoloaded.  The shf element of the returned Eprog
+ * must be set appropriately by the caller.  (Normally we create
+ * the Eprog in this case by using mkautofn.)
+ */
+
 /**/
 mod_export Eprog
 dupeprog(Eprog p, int heap)
@@ -2898,7 +2908,7 @@ static FuncDump dumps;
 
 /**/
 static int
-zwcstat(char *filename, struct stat *buf, FuncDump dumps)
+zwcstat(char *filename, struct stat *buf)
 {
     if (stat(filename, buf)) {
 #ifdef HAVE_FSTAT
@@ -2971,7 +2981,7 @@ load_dump_file(char *dump, struct stat *sbuf, int other, int len)
 
 #else
 
-#define zwcstat(f, b, d) stat(f, b)
+#define zwcstat(f, b) (!!stat(f, b))
 
 #endif
 
@@ -2998,7 +3008,7 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
     dig = dyncat(path, FD_EXT);
     wc = dyncat(file, FD_EXT);
 
-    rd = zwcstat(dig, &std, dumps);
+    rd = zwcstat(dig, &std);
     rc = stat(wc, &stc);
     rn = stat(file, &stn);
 
@@ -3078,7 +3088,7 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
     struct stat lsbuf;
 
     if (!sbuf) {
-	if (zwcstat(file, &lsbuf, dumps))
+	if (zwcstat(file, &lsbuf))
 	    return NULL;
 	sbuf = &lsbuf;
     }
