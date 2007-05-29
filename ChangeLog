@@ -1,3 +1,8 @@
+2007-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Src/module.c: failure adding autoload builtin
+	didn't clean up properly.
+
 2007-05-29  Peter Stephenson  <pws@csr.com>
 
 	* 23488: README, Etc/zsh-development-guide, Src/builtin.c,

@@ -202,7 +202,11 @@ add_autobin(char *nam, char *module)
     Builtin bn = zshcalloc(sizeof(*bn));
     bn->node.nam = ztrdup(nam);
     bn->optstr = ztrdup(module);
-    return addbuiltin(bn);
+    if (addbuiltin(bn)) {
+	builtintab->freenode(&bn->node);
+	return 1;
+    }
+    return 0;
 }
 
 /* Remove the builtin added previously by addbuiltin().  Returns *
