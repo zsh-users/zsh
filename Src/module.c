@@ -389,7 +389,7 @@ getconddef(int inf, char *name, int autol)
 	    /* This is a definition for an autoloaded condition, load the *
 	     * module if we haven't tried that already. */
 	    if (f) {
-		(void)load_module_silence(p->module, NULL, 0);
+		(void)ensurefeature(p->module, "c:", name);
 		f = 0;
 		p = NULL;
 	    } else {
@@ -907,7 +907,7 @@ getmathfunc(char *name, int autol)
 
 		removemathfunc(q, p);
 
-		(void)load_module_silence(n, NULL, 0);
+		(void)ensurefeature(n, "f:", name);
 
 		return getmathfunc(name, 0);
 	    }
@@ -2850,7 +2850,7 @@ setfeatureenables(char const *nam, Features f, int *e)
 	ret = 1;
     return ret;
 }
-	    
+
 /**/
 mod_export int
 handlefeatures(char *nam, Features f, int **enables)
@@ -2859,4 +2859,21 @@ handlefeatures(char *nam, Features f, int **enables)
 	return setfeatureenables(nam, f, *enables);
     *enables = getfeatureenables(nam, f);
     return 0;
+}
+
+/*
+ * Ensure module "modname" is providing feature with "prefix"
+ * and "feature" (e.g. "b:", "limit").
+ */
+
+/**/
+mod_export int
+ensurefeature(char *modname, char *prefix, char *feature)
+{
+    char *f = dyncat(prefix, feature);
+    char *features[2];
+
+    features[0] = f;
+    features[1] = NULL;
+    return require_module(NULL, modname, features);
 }

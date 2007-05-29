@@ -1,5 +1,10 @@
 2007-05-29  Peter Stephenson  <pws@csr.com>
 
+	* 23485: Completion/Zsh/Command/_zmodload, Src/cond.c,
+	Src/exec.c, Src/module.c, Src/params.c: completion for
+	zmodload -F; autoloading now requests a specific feature
+	from a module.
+
 	* 23482: Src/Modules/tcp.c, Src/Zle/complete.c: more typos.
 
 	* unposted: Doc/Zsh/mod_stat.yo: typo.

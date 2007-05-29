@@ -419,7 +419,7 @@ getparamnode(HashTable ht, char *nam)
     if (pm && pm->u.str && (pm->node.flags & PM_AUTOLOAD)) {
 	char *mn = dupstring(pm->u.str);
 
-	if (load_module(mn, NULL) == 1)
+	if (ensurefeature(mn, "p:", nam))
 	    return NULL;
 	hn = gethashnode2(ht, nam);
 	if (((Param) hn) == pm && (pm->node.flags & PM_AUTOLOAD)) {

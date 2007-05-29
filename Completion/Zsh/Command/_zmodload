@@ -1,48 +1,70 @@
 #compdef zmodload
 
-local suf comp state line expl curcontext="$curcontext" ret=1
+local suf comp state line expl curcontext="$curcontext" ret=1 NORMARG
 typeset -A opt_args
 suf=()
 
-_arguments -C -A "-*" -s \
-  '(-d -e)-i[suppress error if command would do nothing]' \
+_arguments -n -C -A "-*" -s \
+  '(-i -u -d -a -b -c -I -p -f -e)-A[create module aliases]' \
   '-u[unload module]' \
-  '(-i)-d[list or specify module dependencies]' \
   '(-e)-a[autoload module]' \
   '(-c -I -p -f)-b[autoload module for builtins]' \
   '(-b -I -p -f)-c[autoload module for condition codes]' \
-  '(-b -c -p -f)-I[define infix condition names]' \
-  '(-b -c -I -f)-p[autoload module for parameters]' \
-  '(-b -c -I -p)-f[autoload module for math functions]' \
+  '(-i)-d[list or specify module dependencies]' \
   '(-i -u -d -a -b -c -p -f -L -A)-e[test if modules are loaded]' \
+  '(-b -c -I -p)-f[autoload module for math functions]' \
+  '(-u -b -c -p -f -A)-F[handle features]' \
+  '(-d -e)-i[suppress error if command would do nothing]' \
+  '(-b -c -p -f)-I[define infix condition names]' \
+  '(-u -b -c -p -f -A)-l[list features]' \
   '(-e -u)-L[output in the form of calls to zmodload]' \
-  '(-i -u -d -a -b -c -I -p -f -e)-A[create module aliases]' \
+  '(-b -c -I -f)-p[autoload module for parameters]' \
+  '(-u -b -c -p -f -A)-P[array param for features]:array name:_parameters' \
   '*:params:->params' && ret=0
 
 [[ $state = params ]] || return ret
 
 (( $+opt_args[-A] )) && compset -P '*=' || suf=( -S '=' )
 
-comp=( files aliases )
-if (( $+opt_args[-u] )); then
-  if (( $+opt_args[-b] || $+opt_args[-a] )); then
-    comp=( builtins )
+
+if (( $+opt_args[-F] && CURRENT > NORMARG )); then
+  local module=$words[NORMARG]
+  local -a features
+
+  if [[ $modules[$module] != loaded ]]; then
+    _message "features for unloaded module"
   else
-    comp=( loadedmodules aliases )
+    zmodload -lFP features $module
+    if compset -P -; then
+      # only enabled features needed
+      features=(${${features:#-*}##?})
+    elif compset -P +; then
+      # only disabled features needed
+      features=(${${features:#+*}##?})
+    fi
+    _wanted features expl feature compadd -a features
   fi
+else
+  comp=( files aliases )
+  if (( $+opt_args[-u] )); then
+    if (( $+opt_args[-b] || $+opt_args[-a] )); then
+      comp=( builtins )
+    else
+      comp=( loadedmodules aliases )
+    fi
+  fi
+  (( $+opt_args[-a] && CURRENT > 3 )) && comp=( builtins )
+
+  _tags "$comp[@]"
+  while _tags; do
+    _requested builtins expl 'builtin command' \
+      compadd "$@" -k builtins && ret=0
+    _requested loadedmodules expl 'loaded modules' \
+      compadd -k 'modules[(R)loaded]' && ret=0
+    _requested files expl 'module file' \
+      _files -W module_path -/g '*.(dll|s[ol])(:r)' && ret=0
+    _requested aliases expl 'module alias' \
+      compadd "$suf[@]" -k 'modules[(R)alias*]' && ret=0
+  done
+  return ret
 fi
-(( $+opt_args[-a] && CURRENT > 3 )) && comp=( builtins )
-
-_tags "$comp[@]"
-while _tags; do
-  _requested builtins expl 'builtin command' \
-    compadd "$@" -k builtins && ret=0
-  _requested loadedmodules expl 'loaded modules' \
-    compadd -k 'modules[(R)loaded]' && ret=0
-  _requested files expl 'module file' \
-    _files -W module_path -/g '*.(dll|s[ol])(:r)' && ret=0
-  _requested aliases expl 'module alias' \
-    compadd "$suf[@]" -k 'modules[(R)alias*]' && ret=0
-done
-
-return ret

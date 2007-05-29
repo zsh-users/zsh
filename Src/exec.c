@@ -2012,7 +2012,12 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
 		/* autoload the builtin if necessary */
 		if (!((Builtin) hn)->handlerfunc) {
-		    (void)load_module(((Builtin) hn)->optstr, NULL);
+		    /*
+		     * Ensure the module is loaded and the
+		     * feature corresponding to the builtin
+		     * is enabled.
+		     */
+		    (void)ensurefeature(((Builtin) hn)->optstr, "b:", hn->nam);
 		    hn = builtintab->getnode(builtintab, cmdarg);
 		}
 		assign = (hn && (hn->flags & BINF_MAGICEQUALS));
@@ -2229,7 +2234,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
 		/* autoload the builtin if necessary */
 		if (!((Builtin) hn)->handlerfunc) {
-		    (void)load_module(((Builtin) hn)->optstr, NULL);
+		    (void)ensurefeature(((Builtin) hn)->optstr, "b:", cmdarg);
 		    hn = builtintab->getnode(builtintab, cmdarg);
 		}
 		break;

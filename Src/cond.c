@@ -95,15 +95,12 @@ evalcond(Estate state, char *fromtest)
     case COND_REGEX:
 	{
 	    char *modname = isset(REMATCHPCRE) ? "zsh/pcre" : "zsh/regex";
-	    /*
-	     * TODO: we just need to load the appropriate condition.
-	     */
-	    if (load_module_silence(modname, NULL, 1) == 1) {
+	    sprintf(overridename = overridebuf, "-%s-match", modname+4);
+	    if (ensurefeature(modname, "c:", overridename+1)) {
 		zwarnnam(fromtest, "%s not available for regex",
 			 modname);
 		return 2;
 	    }
-	    sprintf(overridename = overridebuf, "-%s-match", modname+4);
 	    ctype = COND_MODI;
 	}
 	/*FALLTHROUGH*/
