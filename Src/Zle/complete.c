@@ -1541,7 +1541,7 @@ cleanup_(Module m)
     deletehookfunc("invalidate_list", (Hookfn) invalidate_list);
     deletehookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
     deletewrapper(m, wrapper);
-    return seteatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

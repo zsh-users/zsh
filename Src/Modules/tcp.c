@@ -722,7 +722,7 @@ cleanup_(Module m)
 {
     tcp_cleanup();
     freelinklist(ztcp_sessions, (FreeFunc) ztcp_free_session);
-    return setfeatureeanbles(m->nam, &module_features, NULL);
+    return setfeatureenables(m->nam, &module_features, NULL);
 }
 
 /**/

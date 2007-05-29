@@ -1,5 +1,7 @@
 2007-05-29  Peter Stephenson  <pws@csr.com>
 
+	* 23482: Src/Modules/tcp.c, Src/Zle/complete.c: more typos.
+
 	* unposted: Doc/Zsh/mod_stat.yo: typo.
 
 	* Phil Pennock: 23480: Src/parse.c: typo in =~ handling.
