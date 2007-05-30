@@ -7,9 +7,13 @@
 local comp curcontext="$curcontext" tmp suf="$SUFFIX" \
       _completer \
       _matcher _c_matcher _matchers _matcher_num
+integer ind
 
-zstyle -a ":completion:${curcontext}:" completer comp ||
-  comp=( "${(@)_completers[1,_completer_num-1][(R)_prefix(|:*),-1]}" )
+if ! zstyle -a ":completion:${curcontext}:" completer comp; then
+  comp=( "${(@)_completers[1,_completer_num-1]}" )
+  ind=${comp[(I)_prefix(|:*)]}
+  (( ind )) && comp=("${(@)comp[ind,-1]}")
+fi
 
 if zstyle -t ":completion:${curcontext}:" add-space; then
   ISUFFIX=" $SUFFIX"

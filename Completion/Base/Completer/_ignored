@@ -5,9 +5,13 @@
 [[ _matcher_num -gt 1 || $compstate[ignored] -eq 0 ]] && return 1
 
 local comp
+integer ind
 
-zstyle -a ":completion:${curcontext}:" completer comp ||
-  comp=( "${(@)_completers[1,_completer_num-1][(R)_ignored(|:*),-1]}" )
+if ! zstyle -a ":completion:${curcontext}:" completer comp; then
+  comp=( "${(@)_completers[1,_completer_num-1]}" )
+  ind=${comp[(I)_ignored(|:*)]}
+  (( ind )) && comp=("${(@)comp[ind,-1]}")
+fi
 
 local _comp_no_ignore=yes tmp expl \
       _completer _completer_num \

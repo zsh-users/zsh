@@ -1,3 +1,9 @@
+2007-05-30  Peter Stephenson  <pws@csr.com>
+
+	* 23495: Completion/Base/Completer/_ignored,
+	Completion/Base/Completer/_prefix: 23440 broken obscure
+	use of subscripting.
+
 2007-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/module.c: failure adding autoload builtin
