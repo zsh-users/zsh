@@ -486,39 +486,39 @@ item(tt(${PLUS())var(name)tt(}))(
 If var(name) is the name of a set parameter `tt(1)' is substituted,
 otherwise `tt(0)' is substituted.
 )
+xitem(tt(${)var(name)tt(-)var(word)tt(}))
 item(tt(${)var(name)tt(:-)var(word)tt(}))(
-If var(name) is set and is non-null then substitute its
-value; otherwise substitute var(word). If var(name) is
-missing, substitute var(word).
-Note that you can use standard shell quoting in the var(word) value to
-selectively override the splitting done by the tt(SH_WORD_SPLIT) option
-and the tt(=) flag, but not the tt(s:)var(string)tt(:) flag.
+If var(name) is set, or in the second form is non-null, then substitute
+its value; otherwise substitute var(word).  In the second form var(name)
+may be omitted, in which case var(word) is always substituted.
 )
+xitem(tt(${)var(name)tt(PLUS())var(word)tt(}))
+item(tt(${)var(name)tt(:PLUS())var(word)tt(}))(
+If var(name) is set, or in the second form is non-null, then substitute
+var(word); otherwise substitute nothing.
+)
+xitem(tt(${)var(name)tt(=)var(word)tt(}))
 xitem(tt(${)var(name)tt(:=)var(word)tt(}))
 item(tt(${)var(name)tt(::=)var(word)tt(}))(
-In the first form, if var(name) is unset or is null then
-set it to var(word); in the second form, unconditionally
-set var(name) to var(word).  In both forms, the value of
-the parameter is then substituted.
+In the first form, if var(name) is unset then set it to var(word); in the
+second form, if var(name) is unset or null then set it to var(word); and
+in the third form, unconditionally set var(name) to var(word).  In all
+forms, the value of the parameter is then substituted.
 )
+xitem(tt(${)var(name)tt(?)var(word)tt(}))
 item(tt(${)var(name)tt(:?)var(word)tt(}))(
-If var(name) is set and is non-null then substitute
-its value; otherwise, print var(word) and exit from the shell.
-Interactive shells instead return to the prompt.
-If var(word) is omitted, then a standard message is printed.
-)
-item(tt(${)var(name)tt(:PLUS())var(word)tt(}))(
-If var(name) is set and is non-null then substitute
-var(word); otherwise substitute nothing.
-Note that you can use standard shell quoting in the var(word) value to
-selectively override the splitting done by the tt(SH_WORD_SPLIT) option
-and the tt(=) flag, but not the tt(s:)var(string)tt(:) flag.
+In the first form, if var(name) is set, or in the second form if var(name)
+is both set and non-null, then substitute its value; otherwise, print
+var(word) and exit from the shell.  Interactive shells instead return to
+the prompt.  If var(word) is omitted, then a standard message is printed.
 )
 enditem()
 
-If the colon is omitted from one of the above expressions
-containing a colon, then the shell only checks whether
-var(name) is set, not whether its value is null.
+In any of the above expressions that test a variable and substitute an
+alternate var(word), note that you can use standard shell quoting in the
+var(word) value to selectively override the splitting done by the
+tt(SH_WORD_SPLIT) option and the tt(=) flag, but not splitting by the
+tt(s:)var(string)tt(:) flag.
 
 In the following expressions, when var(name) is an array and
 the substitution is not quoted, or if the `tt((@))' flag or the
