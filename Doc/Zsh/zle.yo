@@ -87,6 +87,14 @@ execute the binding.  This timeout is defined by the tt(KEYTIMEOUT) parameter;
 its default is 0.4 sec.  There is no timeout if the prefix string is not
 itself bound to a command.
 
+The key timeout is also applied when ZLE is reading the bytes from a
+multibyte character string when it is in the appropriate mode.  (This
+requires that the shell was compiled with multibyte mode enabled; typically
+also the locale has characters with the UTF-8 encoding, although any
+multibyte encoding known to the operating system is supported.)  If the
+second or a subsequent byte is not read within the timeout period, the
+shell acts as if tt(?) were typed and resets the input state.
+
 As well as ZLE commands, key sequences can be bound to other strings, by using
 `tt(bindkey -s)'.
 When such a sequence is read, the replacement string is pushed back as input,
@@ -474,7 +482,7 @@ if the remote side has closed the connection; we handle that by testing
 for a failed read.
 example(if ztcp pwspc 2811; then
   tcpfd=$REPLY
-  handler() {
+  handler+LPAR()RPAR() {
     zle -I
     local line
     if ! read -r line <&$1; then
@@ -755,8 +763,8 @@ enditem()
 
 subsect(Special Widget)
 
-There is one user-defined widget which is special to the shell.
-If it does not exist, no special action is taken.  The environment
+There are a few user-defined widgets which are special to the shell.
+If they do not exist, no special action is taken.  The environment
 provided is identical to that for any other editing widget.
 
 startitem()
@@ -766,11 +774,24 @@ Executed every time the line editor is started to read a new line
 of input.  The following example puts the line editor into vi command
 mode when it starts up.
 
-example(zle-line-init() { zle -K vicmd; }
+example(zle-line-init+LPAR()RPAR() { zle -K vicmd; }
 zle -N zle-line-init)
 
 (The command inside the function sets the keymap directly; it is
 equivalent to tt(zle vi-cmd-mode).)
+)
+tindex(zle-keymap-select)
+item(tt(zle-keymap-select))(
+Executed every time the keymap changes, i.e. the special parameter
+tt(KEYMAP) is set to a different value, while the line editor is active.
+Initialising the keymap when the line editor starts does not cause the
+widget to be called.
+
+The value tt($KEYMAP) within the function reflects the new keymap.  The
+old keymap is passed as the sole argument.
+
+This can been used for detecting switches between the vi command
+(tt(vicmd)) and insert (usually tt(main)) keymaps.
 )
 enditem()
 
@@ -1511,6 +1532,23 @@ Inside a widget function, if passed an argument, i.e. `tt(zle
 universal-argument) var(num)', the numerical argument will be set to
 var(num); this is equivalent to `tt(NUMERIC=)var(num)'.
 )
+tindex(argument-base)
+item(tt(argument-base))(
+Use the existing numeric argument as a numeric base, which must be in the
+range 2 to 36 inclusive.  Subsequent use of tt(digit-argument) and
+tt(universal-argument) will input a new prefix in the given base.
+The usual hexadecimal convention is used: the letter tt(a) or tt(A)
+corresponds to 10, and so on.  Arguments in bases requiring digits from 10
+upwards are more conveniently input with tt(universal-argument), since
+tt(ESC-a) etc. are not usually bound to tt(digit-argument).
+
+The function can be used with a command argument inside a user-defined
+widget.  The following code sets the base to 16 and lets the user input a
+hexadecimal argument until a key out of the digit range is typed:
+
+example(zle argument-base 16
+zle universal-argument)
+)
 enditem()
 texinode(Completion)(Miscellaneous)(Arguments)(Zle Widgets)
 subsect(Completion)
@@ -1738,7 +1776,7 @@ the command line or key bindings temporarily.
 
 
 The following widget, tt(caps-lock), serves as an example.
-example(self-insert-ucase() {
+example(self-insert-ucase+LPAR()RPAR() {
   LBUFFER+=${(U)KEYS[-1]}
 }
 
