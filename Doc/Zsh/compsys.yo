@@ -1263,6 +1263,36 @@ given, the name will only be completed if parameters of that type are
 required in the particular context.  Names for which no type is
 specified will always be completed.
 )
+kindex(file-list, completion style)
+item(tt(file-list))(
+This style controls whether files completed using the standard builtin
+mechanism are to be listed with a long list similar to tt(ls -l)
+(although note that this feature actually uses the shell module
+tt(zsh/stat) for file information).
+
+The style may either be set to a true value (or `tt(all)'), or
+one of the values `tt(insert)' or `tt(list)', indicating that files
+are to be listed in long format in all circumstances, or when
+attempting to insert a file name, or when listing file names
+without attempting to insert one.
+
+More generally, the value may be an array of any of the above values,
+optionally followed by tt(=)var(num).  If var(num) is present it
+gives the maximum number of matches for which long listing style
+will be used.  For example,
+
+example(zstyle ':completion:*' file-list list=20 insert=10)
+
+specifies that long format will be used when listing up to 20 files
+or inserting a file with up to 10 matches (assuming a listing
+is to be shown at all, for example on an ambiguous completion), else short
+format will be used.
+
+example(zstyle -e ':completion:*' file-list '(( ${+NUMERIC} )) && reply=(true)')
+
+specifies that long format will be used any time a numeric argument is
+supplied, else short format.
+)
 kindex(file-patterns, completion style)
 item(tt(file-patterns))(
 This is used by the standard function for completing filenames,
@@ -1278,7 +1308,8 @@ which are not used.  Its value consists of elements of the form
 such specifications separated by spaces.
 
 The var(pattern) is a pattern that is to be used to generate filenames.
-Any occurrence of the sequence `tt(%p)' is replaced by any pattern(s)
+Any occurrence of the sequence `tt(%p)' is replaced by any
+pattern+LPAR()s+RPAR()
 passed by the function calling tt(_files).  Colons in the pattern must
 be preceded by a backslash to make them distinguishable from the colon
 before the var(tag).  If more than one pattern is needed, the patterns
@@ -2039,8 +2070,9 @@ locations it will be used as the default.
 )
 kindex(pine-directory, completion style)
 item(tt(pine-directory))(
-If set, specifies the directory containing PINE mailbox files.  It
-defaults to `tt(~/mail)'.
+If set, specifies the directory containing PINE mailbox files.  There
+is no default, since recursively searching this directory is inconvenient
+for anyone who doesn't use PINE.
 )
 kindex(ports, completion style)
 item(tt(ports))(
@@ -2099,6 +2131,14 @@ command.  If set to `tt(true)' (the default), regular aliases will be
 expanded but only in command position.  If it is set to `tt(false)',
 regular aliases will never be expanded.   If it is set to `tt(always)',
 regular aliases will be expanded even if not in command position.
+)
+kindex(rehash, completion style)
+item(tt(rehash))(
+If this is set when completing external commands, the internal
+list (hash) of commands will be updated for each search by issuing
+the tt(rehash) command.  There is a speed penalty for this which
+is only likely to be noticeable when directories in the path have
+slow file access.
 )
 kindex(remote-access, completion style)
 item(tt(remote-access))(
@@ -2428,7 +2468,7 @@ files are completed separately, so if the tt(hosts) style is set hosts
 can be completed without reference to the tt(urls) style.
 
 See the description in the function tt(_urls) itself
-for more information (e.g. `tt(more $^fpath/_urls(N))').
+for more information (e.g. `tt(more $^fpath/_urls+LPAR()N+RPAR())').
 )
 kindex(use-cache, completion style)
 item(tt(use-cache))(
@@ -3156,7 +3196,7 @@ combined in a single word even if one or more of the options take
 arguments.  For example, if tt(-a) takes an argument, with no
 tt(-s) `tt(-ab)' is considered as a single (unhandled) option; with
 tt(-s) tt(-ab) is an option with the argument `tt(b)'; with both tt(-s)
-and tt(-w), tt(-ab) may be the option tt(-a) and the option(-b) with
+and tt(-w), tt(-ab) may be the option tt(-a) and the option tt(-b) with
 arguments still to come.
 
 The option tt(-W) takes this a stage further:  it is possible to
