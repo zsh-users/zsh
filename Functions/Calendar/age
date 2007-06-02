@@ -27,24 +27,16 @@
 # any argument is passed in the first format.
 
 emulate -L zsh
-integer mystat disable_stat
 
-zmodload -i zsh/stat
-# Allow the builtin stat to be hidden.
+zmodload -F zsh/stat b:zstat
 zmodload -i zsh/parameter
-
-{
-if [[ $builtins[stat] != defined ]]; then
-  (( disable_stat = 1 ))
-  enable stat
-fi
 
 autoload -U calendar_scandate
 
 local -a vals
 
 [[ -e $REPLY ]] || return 1
-stat -A vals +mtime $REPLY || return 1
+zstat -A vals +mtime $REPLY || return 1
 
 if (( $# >= 1 )); then
   local AGEREF=$1
@@ -72,14 +64,6 @@ if calendar_scandate -t $AGEREF; then
   fi
 
   (( date1 <= mtime && mtime <= date2 ))
-  mystat=$?
 else
-  mystat=1
+  return 1
 fi
-
-} always {
-# If the builtin stat was previously disabled, disable it again.
-(( disable_stat )) && disable stat
-}
-
-return $mystat

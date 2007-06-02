@@ -1,3 +1,8 @@
+2007-06-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Functions/Calendar/age, Functions/Example/zls:
+	some more uses of zsh/stat that should only enable b:zstat.
+
 2007-05-30  Peter Stephenson  <pws@csr.com>
 
 	* 23495: Completion/Base/Completer/_ignored,
