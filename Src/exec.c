@@ -3111,7 +3111,13 @@ gethere(char *str, int typ)
 	    ;
 	for (;;) {
 	    if (bptr == buf + bsiz) {
-		buf = realloc(buf, 2 * bsiz);
+		char *newbuf = realloc(buf, 2 * bsiz);
+		if (!newbuf) {
+		    /* out of memory */
+		    zfree(buf, bsiz);
+		    return NULL;
+		}
+		buf = newbuf;
 		t = buf + bsiz - (bptr - t);
 		bptr = buf + bsiz;
 		bsiz *= 2;

@@ -356,6 +356,16 @@ yylex(void)
 	    ALLOWHIST
 	    cmdpop();
 	    hwend();
+	    if (!name) {
+		zerr("here document too large");
+		while (hdocs) {
+		    next = hdocs->next;
+		    zfree(hdocs, sizeof(struct heredocs));
+		    hdocs = next;
+		}
+		tok = LEXERR;
+		break;
+	    }
 	    setheredoc(hdocs->pc, REDIR_HERESTR, name);
 	    zfree(hdocs, sizeof(struct heredocs));
 	    hdocs = next;

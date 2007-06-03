@@ -1,3 +1,8 @@
+2007-06-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23511: Src/exec.c, Src/lex.c: error if here document
+	too large.
+
 2007-06-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Functions/Calendar/age, Functions/Example/zls:
