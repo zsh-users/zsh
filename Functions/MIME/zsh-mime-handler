@@ -64,6 +64,22 @@ zstyle -a $context handle-nonexistent hand_nonex ||
 local pattern
 local -a files
 
+# Search some path for the file, if required.
+# We do this before any other tests that need to find the
+# actual file or its directory.
+local dir
+local -a filepath
+if zstyle -t $context find-file-in-path && [[ $1 != /* ]] &&
+  [[ $1 != */* || -o pathdirs ]]; then
+  zstyle -a $context file-path filepath || filepath=($path)
+  for dir in $filepath; do
+    if [[ -e $dir/$1 ]]; then
+      1=$dir/$1
+      break
+    fi
+  done
+fi
+
 # In case the pattern contains glob qualifiers, as it does by default,
 # we need to do real globbing, not just pattern matching.
 # The strategy is to glob the files in the directory using the
@@ -111,7 +127,6 @@ zstyle -t $context current-shell && no_sh=yes
 # terminal and display is set.
 zstyle -t $context never-background && no_bg=yes
 
-local -a files
 local hasmeta stdin
 
 # See if the handler has shell metacharacters in.
@@ -120,7 +135,7 @@ if [[ $handler = *[\\\;\*\?\|\"\'\`\$]* ]]; then
     hasmeta=1
 fi
 
-local -a execargs
+local -a execargs files
 
 if [[ $handler = *%s* ]]; then
   # We need to replace %s with the file(s).

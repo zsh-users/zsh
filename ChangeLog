@@ -1,3 +1,8 @@
+2007-06-04  Peter Stephenson  <pws@csr.com>
+
+	* 23518: Doc/Zsh/contrib.yo, Functions/MIME/zsh-mime-handler:
+	add find-file-in-path and file-path styles to MIME system.
+
 2007-06-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23511: Src/exec.c, Src/lex.c: error if here document
