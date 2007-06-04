@@ -26,7 +26,7 @@ _arguments -C -s -S \
 
 [[ $state = expr ]] || return 1
 
-# It's very like there's a quoted expression, since things like '2 seconds'
+# It's very likely there's a quoted expression, since things like '2 seconds'
 # need to be a single argument.  Units themselves don't have special
 # characters, so it's safe to take just the characters around the
 # cursor.
