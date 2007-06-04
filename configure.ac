@@ -551,18 +551,15 @@ if test $ac_cv_header_sys_time_h = yes && test $ac_cv_header_sys_select_h = yes;
   fi
 fi
 
-AC_CACHE_CHECK(POSIX termios, zsh_cv_sys_posix_termios,
-[AC_TRY_LINK([#include <sys/types.h>
-#include <unistd.h>
-#include <termios.h>],
-[/* SunOS 4.0.3 has termios.h but not the library calls.  */
-tcgetattr(0, 0);],
-  zsh_cv_sys_posix_termios=yes, zsh_cv_sys_posix_termios=no)])
-
-if test $zsh_cv_sys_posix_termios = yes; then
+AH_TEMPLATE([GWINSZ_IN_SYS_IOCTL],
+[Define if TIOCGWINSZ is defined in sys/ioctl.h but not in termios.h.])
+if test $ac_cv_header_termios_h = yes; then
   AC_CACHE_CHECK(TIOCGWINSZ in termios.h,
   zsh_cv_header_termios_h_tiocgwinsz,
-  [AC_TRY_LINK([#include <sys/types.h>
+  [AC_TRY_LINK([
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
 #include <termios.h>],
   [int x = TIOCGWINSZ;],
   zsh_cv_header_termios_h_tiocgwinsz=yes,
@@ -570,13 +567,13 @@ if test $zsh_cv_sys_posix_termios = yes; then
 else
   zsh_cv_header_termios_h_tiocgwinsz=no
 fi
- 
-AH_TEMPLATE([GWINSZ_IN_SYS_IOCTL],
-[Define if your system defines TIOCGWINSZ in sys/ioctl.h.])
 if test $zsh_cv_header_termios_h_tiocgwinsz = no; then
   AC_CACHE_CHECK(TIOCGWINSZ in sys/ioctl.h,
   zsh_cv_header_sys_ioctl_h_tiocgwinsz,
-  [AC_TRY_LINK([#include <sys/types.h>
+  [AC_TRY_LINK([
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
 #include <sys/ioctl.h>],
   [int x = TIOCGWINSZ;],
   zsh_cv_header_sys_ioctl_h_tiocgwinsz=yes,
@@ -1670,24 +1667,12 @@ if test $zsh_cv_header_unistd_h_sbrk_proto = yes; then
   AC_DEFINE(HAVE_SBRK_PROTO)
 fi
 
-dnl ----------------------------------
-dnl ioctl and mknod prototypes for OSF
-dnl ----------------------------------
-
-AH_TEMPLATE([HAVE_IOCTL_PROTO],
-[Define to 1 if there is a prototype defined for ioctl() on your system])
+dnl -----------------------
+dnl mknod prototype for OSF
+dnl -----------------------
 AH_TEMPLATE([HAVE_MKNOD_PROTO],
-[Define to 1 if there is a prototype defined for mknod() on your system])
+[Define to 1 if there is a prototype defined for mknod() on your system.])
 if test "$ac_cv_prog_cc_stdc" != no; then
-  AC_CACHE_CHECK(for ioctl prototype in <sys/ioctl.h>,
-  zsh_cv_header_sys_ioctl_h_ioctl_proto,
-  [AC_TRY_COMPILE([#include <sys/ioctl.h>
-   int ioctl(double x);], [int i;],
-  zsh_cv_header_sys_ioctl_h_ioctl_proto=no,
-  zsh_cv_header_sys_ioctl_h_ioctl_proto=yes)])
-  if test $zsh_cv_header_sys_ioctl_h_ioctl_proto = yes; then
-    AC_DEFINE(HAVE_IOCTL_PROTO)
-  fi
   AC_CACHE_CHECK(for mknod prototype in <sys/stat.h>,
   zsh_cv_header_sys_stat_h_mknod_proto,
   [AC_TRY_COMPILE([#include <sys/stat.h>
@@ -1697,6 +1682,45 @@ if test "$ac_cv_prog_cc_stdc" != no; then
   if test $zsh_cv_header_sys_stat_h_mknod_proto = yes; then
     AC_DEFINE(HAVE_MKNOD_PROTO)
   fi
+fi
+
+dnl ----------------------------------------
+dnl presence and location of ioctl prototype
+dnl ----------------------------------------
+AC_CACHE_CHECK(for ioctl prototype in <unistd.h> or <termios.h>,
+zsh_cv_header_unistd_h_termios_h_ioctl_proto,
+[AC_TRY_COMPILE([
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#ifdef HAVE_TERMIOS_H
+# include <termios.h>
+#endif
+double ioctl();], [int i;],
+zsh_cv_header_unistd_h_termios_h_ioctl_proto=no,
+zsh_cv_header_unistd_h_termios_h_ioctl_proto=yes)])
+
+if test $zsh_cv_header_unistd_h_termios_h_ioctl_proto = no; then
+  AC_CACHE_CHECK(for ioctl prototype in <sys/ioctl.h>,
+  zsh_cv_header_sys_ioctl_h_ioctl_proto,
+  [AC_TRY_COMPILE([#include <sys/ioctl.h>
+  double ioctl();], [int i;],
+  zsh_cv_header_sys_ioctl_h_ioctl_proto=no,
+  zsh_cv_header_sys_ioctl_h_ioctl_proto=yes)])
+else
+  zsh_cv_header_sys_ioctl_h_ioctl_proto=no
+fi
+
+AH_TEMPLATE([HAVE_IOCTL_PROTO],
+[Define to 1 if there is a prototype defined for ioctl() on your system.])
+if test $zsh_cv_header_unistd_h_termios_h_ioctl_proto = yes || \
+   test $zsh_cv_header_sys_ioctl_h_ioctl_proto = yes; then
+  AC_DEFINE(HAVE_IOCTL_PROTO)
+fi
+AH_TEMPLATE([IOCTL_IN_SYS_IOCTL],
+[Define to 1 if we must include <sys/ioctl.h> to get a prototype for ioctl().])
+if test $zsh_cv_header_sys_ioctl_h_ioctl_proto = yes; then
+  AC_DEFINE(IOCTL_IN_SYS_IOCTL)
 fi
 
 dnl -------------------

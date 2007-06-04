@@ -337,7 +337,7 @@ struct timezone {
 # endif  /* HAVE_TERMIO_H  */
 #endif   /* HAVE_TERMIOS_H */
 
-#if defined(GWINSZ_IN_SYS_IOCTL) || defined(CLOBBERS_TYPEAHEAD)
+#if defined(GWINSZ_IN_SYS_IOCTL) || defined(IOCTL_IN_SYS_IOCTL)
 # include <sys/ioctl.h>
 #endif
 #ifdef WINSIZE_IN_PTEM
