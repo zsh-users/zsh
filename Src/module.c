@@ -42,28 +42,28 @@ LinkList linkedmodules;
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     return 0;
 }
 
 /**/
 int
-cleanup_(Module m)
+cleanup_(UNUSED(Module m))
 {
     return 0;
 }
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }
@@ -86,6 +86,27 @@ register_module(char *n, Module_func setup, Module_func boot,
     m->finish = finish;
 
     zaddlinknode(linkedmodules, m);
+}
+
+/* Print an alias. */
+
+/**/
+static void
+printmodalias(Module m, Options ops)
+{
+    if (OPT_ISSET(ops,'L')) {
+	printf("zmodload -A ");
+	if (m->nam[0] == '-')
+	    fputs("-- ", stdout);
+	quotedzputs(m->nam, stdout);
+	putchar('=');
+	quotedzputs(m->u.alias, stdout);
+    } else {
+	nicezputs(m->nam, stdout);
+	fputs(" -> ", stdout);
+	nicezputs(m->u.alias, stdout);
+    }
+    putchar('\n');
 }
 
 /* Check if a module is linked in. */
@@ -164,6 +185,15 @@ addwrapper(Module m, FuncWrap w)
 {
     FuncWrap p, q;
 
+    /*
+     * We can't add a wrapper to an alias, since it's supposed
+     * to behave identically to the resolved module.  This shouldn't
+     * happen since we usually add wrappers when a real module is
+     * loaded.
+     */
+    if (m->flags & MOD_ALIAS)
+	return 1;
+
     if (w->flags & WRAPF_ADDED)
 	return 1;
     for (p = wrappers, q = NULL; p; q = p, p = p->next);
@@ -196,7 +226,7 @@ mod_export LinkList modules;
 int
 add_autobin(char *nam, char *module)
 {
-    Builtin bn = zcalloc(sizeof(*bn));
+    Builtin bn = zshcalloc(sizeof(*bn));
     bn->nam = ztrdup(nam);
     bn->optstr = ztrdup(module);
     return addbuiltin(bn);
@@ -256,6 +286,9 @@ deletewrapper(Module m, FuncWrap w)
 {
     FuncWrap p, q;
 
+    if (m->flags & MOD_ALIAS)
+	return 1;
+
     if (w->flags & WRAPF_ADDED) {
 	for (p = wrappers, q = NULL; p && p != w; q = p, p = p->next);
 
@@ -292,7 +325,8 @@ load_and_bind(const char *fn)
 	int err = loadbind(0, (void *) addbuiltin, ret);
 	for (node = firstnode(modules); !err && node; incnode(node)) {
 	    Module m = (Module) getdata(node);
-	    if (m->u.handle && !(m->flags & MOD_LINKED))
+	    if (!(m->flags & MOD_ALIAS) &&
+		m->u.handle && !(m->flags & MOD_LINKED))
 		err |= loadbind(0, m->u.handle, ret);
 	}
 
@@ -315,7 +349,7 @@ load_and_bind(const char *fn)
 #else
 
 #ifdef HAVE_DLFCN_H
-# if defined(HAVE_DL_H) && defined(__hpux)
+# if defined(HAVE_DL_H) && defined(HPUXDYNAMIC)
 #  include <dl.h>
 # else
 #  include <dlfcn.h>
@@ -400,12 +434,12 @@ try_load_module(char const *name)
 
 /**/
 static void *
-do_load_module(char const *name)
+do_load_module(char const *name, int silent)
 {
     void *ret;
 
     ret = try_load_module(name);
-    if (!ret) {
+    if (!ret && !silent) {
 	int waserr = errflag;
 	zerr("failed to load module: %s", name, 0);
 	errflag = waserr;
@@ -418,11 +452,12 @@ do_load_module(char const *name)
 
 /**/
 static void *
-do_load_module(char const *name)
+do_load_module(char const *name, int silent)
 {
     int waserr = errflag;
 
-    zerr("failed to load module: %s", name, 0);
+    if (!silent)
+	zerr("failed to load module: %s", name, 0);
     errflag = waserr;
 
     return NULL;
@@ -431,20 +466,77 @@ do_load_module(char const *name)
 /**/
 #endif /* !DYNAMIC */
 
+/*
+ * Find a module in the list.
+ * If aliasp is non-zero, resolve any aliases to the underlying module.
+ * If namep is set, this is set to point to the last alias value resolved,
+ *   even if that module was not loaded. or the module name if no aliases.
+ *   Hence this is always the physical module to load in a chain of aliases.
+ * Return NULL if the module named is not stored as a structure, or if we were
+ * resolving aliases and the final module named is not stored as a
+ * structure.
+ *
+ * TODO: now we have aliases, there may be some merit in using a hash
+ * table instead of a linked list.
+ */
 /**/
 static LinkNode
-find_module(const char *name)
+find_module(const char *name, int aliasp, const char **namep)
 {
     Module m;
     LinkNode node;
 
     for (node = firstnode(modules); node; incnode(node)) {
 	m = (Module) getdata(node);
-	if (!strcmp(m->nam, name))
+	if (!strcmp(m->nam, name)) {
+	    if (aliasp && (m->flags & MOD_ALIAS)) {
+		if (namep)
+		    *namep = m->u.alias;
+		return find_module(m->u.alias, 1, namep);
+	    }
+	    if (namep)
+		*namep = m->nam;
 	    return node;
+	}
     }
     return NULL;
 }
+
+/*
+ * Unlink and free a module node from the linked list.
+ */
+
+/**/
+static void
+delete_module(LinkNode node)
+{
+    Module m = (Module) remnode(modules, node);
+
+    if (m->flags & MOD_ALIAS)
+	zsfree(m->u.alias);
+    zsfree(m->nam);
+    if (m->deps)
+	freelinklist(m->deps, freestr);
+    zfree(m, sizeof(*m));
+}
+
+/**/
+mod_export int
+module_loaded(const char *name)
+{
+    LinkNode node;
+    Module m;
+
+    return ((node = find_module(name, 1, NULL)) &&
+	    (m = ((Module) getdata(node)))->u.handle &&
+	    !(m->flags & MOD_UNLOAD));
+}
+
+/*
+ * Setup and cleanup functions:  we don't search for aliases here,
+ * since they should have been resolved before we try to load or unload
+ * the module.
+ */
 
 /**/
 #ifdef DYNAMIC
@@ -654,8 +746,15 @@ modname_ok(char const *p)
 }
 
 /**/
-int
+mod_export int
 load_module(char const *name)
+{
+    return load_module_silence(name, 0);
+}
+
+/**/
+mod_export int
+load_module_silence(char const *name, int silent)
 {
     Module m;
     void *handle = NULL;
@@ -664,14 +763,23 @@ load_module(char const *name)
     int set;
 
     if (!modname_ok(name)) {
-	zerr("invalid module name `%s'", name, 0);
+	if (!silent)
+	    zerr("invalid module name `%s'", name, 0);
 	return 0;
     }
-    if (!(node = find_module(name))) {
+    /*
+     * The following function call may alter name to the final name in a
+     * chain of aliases.  This makes sure the actual module loaded
+     * is the right one.
+     */
+    queue_signals();
+    if (!(node = find_module(name, 1, &name))) {
 	if (!(linked = module_linked(name)) &&
-	    !(handle = do_load_module(name)))
+	    !(handle = do_load_module(name, silent))) {
+	    unqueue_signals();
 	    return 0;
-	m = zcalloc(sizeof(*m));
+	}
+	m = zshcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
 	if (handle) {
 	    m->u.handle = handle;
@@ -685,23 +793,26 @@ load_module(char const *name)
 	if ((set = setup_module(m)) || boot_module(m)) {
 	    if (!set)
 		finish_module(m);
-	    remnode(modules, node);
-	    zsfree(m->nam);
-	    zfree(m, sizeof(*m));
-	    m->flags &= ~MOD_SETUP;
+	    delete_module(node);
+	    unqueue_signals();
 	    return 0;
 	}
 	m->flags |= MOD_INIT_S | MOD_INIT_B;
 	m->flags &= ~MOD_SETUP;
+	unqueue_signals();
 	return 1;
     } 
     m = (Module) getdata(node);
-    if (m->flags & MOD_SETUP)
+    if (m->flags & MOD_SETUP) {
+	unqueue_signals();
 	return 1;
+    }
     if (m->flags & MOD_UNLOAD)
 	m->flags &= ~MOD_UNLOAD;
-    else if ((m->flags & MOD_LINKED) ? m->u.linked : m->u.handle)
+    else if ((m->flags & MOD_LINKED) ? m->u.linked : m->u.handle) {
+	unqueue_signals();
 	return 1;
+    }
     if (m->flags & MOD_BUSY) {
 	zerr("circular dependencies for module %s", name, 0);
 	return 0;
@@ -709,16 +820,19 @@ load_module(char const *name)
     m->flags |= MOD_BUSY;
     if (m->deps)
 	for (n = firstnode(m->deps); n; incnode(n))
-	    if (!load_module((char *) getdata(n))) {
+	    if (!load_module_silence((char *) getdata(n), silent)) {
 		m->flags &= ~MOD_BUSY;
+		unqueue_signals();
 		return 0;
 	    }
     m->flags &= ~MOD_BUSY;
     if (!m->u.handle) {
 	handle = NULL;
 	if (!(linked = module_linked(name)) &&
-	    !(handle = do_load_module(name)))
+	    !(handle = do_load_module(name, silent))) {
+	    unqueue_signals();
 	    return 0;
+	}
 	if (handle) {
 	    m->u.handle = handle;
 	    m->flags |= MOD_SETUP;
@@ -732,6 +846,7 @@ load_module(char const *name)
 	    else
 		m->u.linked = NULL;
 	    m->flags &= ~MOD_SETUP;
+	    unqueue_signals();
 	    return 0;
 	}
 	m->flags |= MOD_INIT_S;
@@ -744,10 +859,12 @@ load_module(char const *name)
 	else
 	    m->u.handle = NULL;
 	m->flags &= ~MOD_SETUP;
+	unqueue_signals();
 	return 0;
     }
     m->flags |= MOD_INIT_B;
     m->flags &= ~MOD_SETUP;
+    unqueue_signals();
     return 1;
 }
 
@@ -761,38 +878,50 @@ load_module(char const *name)
 
 /**/
 mod_export int
-require_module(char *nam, char *module, int res, int test)
+require_module(char *nam, const char *module, UNUSED(int res), int test)
 {
     Module m = NULL;
     LinkNode node;
+    int ret = 1;
 
-    /* First see if the module is linked in. */
-    for (node = firstnode(linkedmodules); node; incnode(node)) {
-	if (!strcmp((char *) getdata(node), nam))
-	    return 1;
-    }
-    node = find_module(module);
+    /* Resolve aliases and actual loadable module as for load_module */
+    queue_signals();
+    node = find_module(module, 1, &module);
     if (node && (m = ((Module) getdata(node)))->u.handle &&
 	!(m->flags & MOD_UNLOAD)) {
 	if (test) {
+	    unqueue_signals();
 	    zwarnnam(nam, "module %s already loaded.", module, 0);
 	    return 0;
 	}
     } else
-	return load_module(module);
+	ret = load_module_silence(module, 0);
+    unqueue_signals();
 
-    return 1;
+    return ret;
 }
 
 /**/
 void
-add_dep(char *name, char *from)
+add_dep(const char *name, char *from)
 {
     LinkNode node;
     Module m;
 
-    if (!(node = find_module(name))) {
-	m = zcalloc(sizeof(*m));
+    /*
+     * If we were passed an alias, we must resolve it to a final
+     * module name (and maybe add the corresponding struct), since otherwise
+     * we would need to check all modules to see if they happen
+     * to be aliased to the same thing to implement dependencies properly.
+     *
+     * This should mean that an attempt to add an alias which would
+     * have the same name as a module which has dependencies is correctly
+     * rejected, because then the module named already exists as a non-alias.
+     * Better make sure.  (There's no problem making a an alias which
+     * *points* to a module with dependencies, of course.)
+     */
+    if (!(node = find_module(name, 1, &name))) {
+	m = zshcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
 	zaddlinknode(modules, m);
     } else
@@ -836,75 +965,211 @@ autoloadscan(HashNode hn, int printflags)
 
 /**/
 int
-bin_zmodload(char *nam, char **args, char *ops, int func)
+bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    if ((ops['b'] || ops['c'] || ops['p'] || ops['f']) &&
-	!(ops['a'] || ops['u'])) {
+    int ops_bcpf = OPT_ISSET(ops,'b') || OPT_ISSET(ops,'c') || 
+	OPT_ISSET(ops,'p') || OPT_ISSET(ops,'f');
+    int ops_au = OPT_ISSET(ops,'a') || OPT_ISSET(ops,'u');
+    int ret = 1;
+
+    if (ops_bcpf && !ops_au) {
 	zwarnnam(nam, "-b, -c, -f, and -p must be combined with -a or -u",
 		 NULL, 0);
 	return 1;
     }
-    if (ops['d'] && ops['a']) {
+    if (OPT_ISSET(ops,'A') || OPT_ISSET(ops,'R')) {
+	if (ops_bcpf || ops_au || OPT_ISSET(ops,'d') || 
+	    (OPT_ISSET(ops,'R') && OPT_ISSET(ops,'e'))) {
+	    zwarnnam(nam, "illegal flags combined with -A or -R", NULL, 0);
+	    return 1;
+	}
+	if (!OPT_ISSET(ops,'e'))
+	    return bin_zmodload_alias(nam, args, ops);
+    }
+    if (OPT_ISSET(ops,'d') && OPT_ISSET(ops,'a')) {
 	zwarnnam(nam, "-d cannot be combined with -a", NULL, 0);
 	return 1;
     }
-    if (ops['u'] && !*args) {
+    if (OPT_ISSET(ops,'u') && !*args) {
 	zwarnnam(nam, "what do you want to unload?", NULL, 0);
 	return 1;
     }
-    if (ops['e'] && (ops['I'] || ops['L'] || ops['a'] || ops['d'] ||
-		     ops['i'] || ops['u'])) {
+    if (OPT_ISSET(ops,'e') && (OPT_ISSET(ops,'I') || OPT_ISSET(ops,'L') || 
+			       OPT_ISSET(ops,'a') || OPT_ISSET(ops,'d') ||
+			       OPT_ISSET(ops,'i') || OPT_ISSET(ops,'u'))) {
 	zwarnnam(nam, "-e cannot be combined with other options", NULL, 0);
 	return 1;
     }
-    if (ops['e'])
-	return bin_zmodload_exist(nam, args, ops);
-    else if (ops['d'])
-	return bin_zmodload_dep(nam, args, ops);
-    else if ((ops['a'] || ops['b']) && !(ops['c'] || ops['p'] || ops['f']))
-	return bin_zmodload_auto(nam, args, ops);
-    else if (ops['c'] && !(ops['b'] || ops['p']))
-	return bin_zmodload_cond(nam, args, ops);
-    else if (ops['f'] && !(ops['b'] || ops['p']))
-	return bin_zmodload_math(nam, args, ops);
-    else if (ops['p'] && !(ops['b'] || ops['c']))
-	return bin_zmodload_param(nam, args, ops);
-    else if (!(ops['a'] || ops['b'] || ops['c'] || ops['p']))
-	return bin_zmodload_load(nam, args, ops);
+    queue_signals();
+    if (OPT_ISSET(ops,'e'))
+	ret = bin_zmodload_exist(nam, args, ops);
+    else if (OPT_ISSET(ops,'d'))
+	ret = bin_zmodload_dep(nam, args, ops);
+    else if ((OPT_ISSET(ops,'a') || OPT_ISSET(ops,'b')) && 
+	     !(OPT_ISSET(ops,'c') || OPT_ISSET(ops,'p') || OPT_ISSET(ops,'f')))
+	ret = bin_zmodload_auto(nam, args, ops);
+    else if (OPT_ISSET(ops,'c') && !(OPT_ISSET(ops,'b') || OPT_ISSET(ops,'p')))
+	ret = bin_zmodload_cond(nam, args, ops);
+    else if (OPT_ISSET(ops,'f') && !(OPT_ISSET(ops,'b') || OPT_ISSET(ops,'p')))
+	ret = bin_zmodload_math(nam, args, ops);
+    else if (OPT_ISSET(ops,'p') && !(OPT_ISSET(ops,'b') || OPT_ISSET(ops,'c')))
+	ret = bin_zmodload_param(nam, args, ops);
+    else if (!(OPT_ISSET(ops,'a') || OPT_ISSET(ops,'b') || 
+	       OPT_ISSET(ops,'c') || OPT_ISSET(ops,'p')))
+	ret = bin_zmodload_load(nam, args, ops);
     else
 	zwarnnam(nam, "use only one of -b, -c, or -p", NULL, 0);
+    unqueue_signals();
 
-    return 1;
+    return ret;
 }
 
 /**/
 static int
-bin_zmodload_exist(char *nam, char **args, char *ops)
+bin_zmodload_alias(char *nam, char **args, Options ops)
 {
+    /*
+     * TODO: while it would be too nasty to have aliases, as opposed
+     * to real loadable modules, with dependencies --- just what would
+     * we need to load when, exactly? --- there is in principle no objection
+     * to making it possible to force an alias onto an existing unloaded
+     * module which has dependencies.  This would simply transfer
+     * the dependencies down the line to the aliased-to module name.
+     * This is actually useful, since then you can alias zsh/zle=mytestzle
+     * to load another version of zle.  But then what happens when the
+     * alias is removed?  Do you transfer the dependencies back? And
+     * suppose other names are aliased to the same file?  It might be
+     * kettle of fish best left unwormed.
+     */
     LinkNode node;
     Module m;
 
     if (!*args) {
+	if (OPT_ISSET(ops,'R')) {
+	    zwarnnam(nam, "no module alias to remove", NULL, 0);
+	    return 1;
+	}
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
+	    if (m->flags & MOD_ALIAS)
+		printmodalias(m, ops);
+	}
+	return 0;
+    }
+
+    for (; *args; args++) {
+	char *eqpos = strchr(*args, '=');
+	char *aliasname = eqpos ? eqpos+1 : NULL;
+	if (eqpos)
+	    *eqpos = '\0';
+	if (!modname_ok(*args)) {
+	    zwarnnam(nam, "invalid module name `%s'", *args, 0);
+	    return 1;
+	}
+	if (OPT_ISSET(ops,'R')) {
+	    if (aliasname) {
+		zwarnnam(nam, "bad syntax for removing module alias: %s",
+			 *args, 0);
+		return 1;
+	    }
+	    node = find_module(*args, 0, NULL);
+	    if (node) {
+		m = (Module) getdata(node);
+		if (!(m->flags & MOD_ALIAS)) {
+		    zwarnnam(nam, "module is not an alias: %s", *args, 0);
+		    return 1;
+		}
+		delete_module(node);
+	    } else {
+		zwarnnam(nam, "no such module alias: %s", *args, 0);
+		return 1;
+	    }
+	} else {
+	    if (aliasname) {
+		const char *mname = aliasname;
+		if (!modname_ok(aliasname)) {
+		    zwarnnam(nam, "invalid module name `%s'", aliasname, 0);
+		    return 1;
+		}
+		do {
+		    if (!strcmp(mname, *args)) {
+			zwarnnam(nam, "module alias would refer to itself: %s",
+				 *args, 0);
+			return 1;
+		    }
+		} while ((node = find_module(mname, 0, NULL))
+			 && ((m = (Module) getdata(node))->flags & MOD_ALIAS)
+			 && (mname = m->u.alias));
+		node = find_module(*args, 0, NULL);
+		if (node) {
+		    m = (Module) getdata(node);
+		    if (!(m->flags & MOD_ALIAS)) {
+			zwarnnam(nam, "module is not an alias: %s", *args, 0);
+			return 1;
+		    }
+		    zsfree(m->u.alias);
+		} else {
+		    m = (Module) zshcalloc(sizeof(*m));
+		    m->nam = ztrdup(*args);
+		    m->flags = MOD_ALIAS;
+		    zaddlinknode(modules, m);
+		}
+		m->u.alias = ztrdup(aliasname);
+	    } else {
+		if ((node = find_module(*args, 0, NULL))) {
+		    m = (Module) getdata(node);
+		    if (m->flags & MOD_ALIAS)
+			printmodalias(m, ops);
+		    else {
+			zwarnnam(nam, "module is not an alias: %s",
+				 *args, 0);
+			return 1;
+		    }
+		} else {
+		    zwarnnam(nam, "no such module alias: %s", *args, 0);
+		    return 1;
+		}
+	    }
+	}
+    }
+
+    return 0;
+}
+
+/**/
+static int
+bin_zmodload_exist(UNUSED(char *nam), char **args, Options ops)
+{
+    LinkNode node;
+    Module m;
+    char *modname;
+
+    if (!*args) {
+	for (node = firstnode(modules); node; incnode(node)) {
+	    m = (Module) getdata(node);
+	    modname = m->nam;
+	    if (m->flags & MOD_ALIAS) {
+		LinkNode node2;
+		if (OPT_ISSET(ops,'A') && 
+		    (node2 = find_module(m->u.alias, 1, NULL)))
+		    m = (Module) getdata(node2);
+		else
+		    continue;
+	    } 
 	    if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
-		nicezputs(m->nam, stdout);
+		nicezputs(modname, stdout);
 		putchar('\n');
 	    }
 	}
 	return 0;
     } else {
-	int ret = 0, f;
+	int ret = 0;
 
 	for (; !ret && *args; args++) {
-	    f = 0;
-	    for (node = firstnode(modules);
-		 !f && node; incnode(node)) {
-		m = (Module) getdata(node);
-		if (m->u.handle && !(m->flags & MOD_UNLOAD))
-		    f = !strcmp(*args, m->nam);
-	    }
-	    ret = !f;
+	    if (!(node = find_module(*args, 1, NULL))
+		|| !(m = (Module) getdata(node))->u.handle
+		|| (m->flags & MOD_UNLOAD))
+		ret = 1;
 	}
 	return ret;
     }
@@ -912,27 +1177,28 @@ bin_zmodload_exist(char *nam, char **args, char *ops)
 
 /**/
 static int
-bin_zmodload_dep(char *nam, char **args, char *ops)
+bin_zmodload_dep(UNUSED(char *nam), char **args, Options ops)
 {
     LinkNode node;
     Module m;
-    if(ops['u']) {
-	/* remove dependencies */
-	char *tnam = *args++;
-	node = find_module(tnam);
+    if (OPT_ISSET(ops,'u')) {
+	/* remove dependencies, which can't pertain to aliases */
+	const char *tnam = *args++;
+	node = find_module(tnam, 1, &tnam);
 	if (!node)
 	    return 0;
 	m = (Module) getdata(node);
-	if(*args && m->deps) {
+	if (*args && m->deps) {
 	    do {
-		for(node = firstnode(m->deps); node; incnode(node))
-		    if(!strcmp(*args, getdata(node))) {
-			zsfree(getdata(node));
-			remnode(m->deps, node);
+		LinkNode dnode;
+		for (dnode = firstnode(m->deps); dnode; incnode(dnode))
+		    if (!strcmp(*args, getdata(dnode))) {
+			zsfree(getdata(dnode));
+			remnode(m->deps, dnode);
 			break;
 		    }
 	    } while(*++args);
-	    if(empty(m->deps)) {
+	    if (empty(m->deps)) {
 		freelinklist(m->deps, freestr);
 		m->deps = NULL;
 	    }
@@ -942,19 +1208,16 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 		m->deps = NULL;
 	    }
 	}
-	if (!m->deps && !m->u.handle) {
-	    remnode(modules, node);
-	    zsfree(m->nam);
-	    zfree(m, sizeof(*m));
-	}
+	if (!m->deps && !m->u.handle)
+	    delete_module(node);
 	return 0;
-    } else if(!args[0] || !args[1]) {
+    } else if (!args[0] || !args[1]) {
 	/* list dependencies */
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
 	    if (m->deps && (!args[0] || !strcmp(args[0], m->nam))) {
 		LinkNode n;
-		if(ops['L']) {
+		if (OPT_ISSET(ops,'L')) {
 		    printf("zmodload -d ");
 		    if(m->nam[0] == '-')
 			fputs("-- ", stdout);
@@ -965,7 +1228,7 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 		}
 		for (n = firstnode(m->deps); n; incnode(n)) {
 		    putchar(' ');
-		    if(ops['L'])
+		    if(OPT_ISSET(ops,'L'))
 			quotedzputs((char *) getdata(n), stdout);
 		    else
 			nicezputs((char *) getdata(n), stdout);
@@ -979,7 +1242,7 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 	int ret = 0;
 	char *tnam = *args++;
 
-	for(; *args; args++)
+	for (; *args; args++)
 	    add_dep(tnam, *args);
 	return ret;
     }
@@ -987,15 +1250,15 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 
 /**/
 static int
-bin_zmodload_auto(char *nam, char **args, char *ops)
+bin_zmodload_auto(char *nam, char **args, Options ops)
 {
     int ret = 0;
-    if(ops['u']) {
+    if(OPT_ISSET(ops,'u')) {
 	/* remove autoloaded builtins */
 	for (; *args; args++) {
 	    Builtin bn = (Builtin) builtintab->getnode2(builtintab, *args);
 	    if (!bn) {
-		if(!ops['i']) {
+		if(!OPT_ISSET(ops,'i')) {
 		    zwarnnam(nam, "%s: no such builtin", *args, 0);
 		    ret = 1;
 		}
@@ -1009,7 +1272,7 @@ bin_zmodload_auto(char *nam, char **args, char *ops)
     } else if(!*args) {
 	/* list autoloaded builtins */
 	scanhashtable(builtintab, 0, 0, 0,
-	    autoloadscan, ops['L'] ? PRINT_LIST : 0);
+	    autoloadscan, OPT_ISSET(ops,'L') ? PRINT_LIST : 0);
 	return 0;
     } else {
 	/* add autoloaded builtins */
@@ -1020,7 +1283,7 @@ bin_zmodload_auto(char *nam, char **args, char *ops)
 	    if (strchr(bnam, '/')) {
 		zwarnnam(nam, "%s: `/' is illegal in a builtin", bnam, 0);
 		ret = 1;
-	    } else if (add_autobin(bnam, modnam) && !ops['i']) {
+	    } else if (add_autobin(bnam, modnam) && !OPT_ISSET(ops,'i')) {
 		zwarnnam(nam, "failed to add builtin %s", bnam, 0);
 		ret = 1;
 	    }
@@ -1031,17 +1294,17 @@ bin_zmodload_auto(char *nam, char **args, char *ops)
 
 /**/
 static int
-bin_zmodload_cond(char *nam, char **args, char *ops)
+bin_zmodload_cond(char *nam, char **args, Options ops)
 {
     int ret = 0;
 
-    if (ops['u']) {
+    if (OPT_ISSET(ops,'u')) {
 	/* remove autoloaded conditions */
 	for (; *args; args++) {
-	    Conddef cd = getconddef(ops['I'], *args, 0);
+	    Conddef cd = getconddef(OPT_ISSET(ops,'I'), *args, 0);
 
 	    if (!cd) {
-		if (!ops['i']) {
+		if (!OPT_ISSET(ops,'i')) {
 		    zwarnnam(nam, "%s: no such condition", *args, 0);
 		    ret = 1;
 		}
@@ -1058,7 +1321,7 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 
 	for (p = condtab; p; p = p->next) {
 	    if (p->module) {
-		if (ops['L']) {
+		if (OPT_ISSET(ops,'L')) {
 		    fputs("zmodload -ac", stdout);
 		    if (p->flags & CONDF_INFIX)
 			putchar('I');
@@ -1083,7 +1346,8 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 	    if (strchr(cnam, '/')) {
 		zwarnnam(nam, "%s: `/' is illegal in a condition", cnam, 0);
 		ret = 1;
-	    } else if (add_autocond(cnam, ops['I'], modnam) && !ops['i']) {
+	    } else if (add_autocond(cnam, OPT_ISSET(ops,'I'), modnam) &&
+		       !OPT_ISSET(ops,'i')) {
 		zwarnnam(nam, "failed to add condition `%s'", cnam, 0);
 		ret = 1;
 	    }
@@ -1094,21 +1358,21 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 
 /**/
 static int
-bin_zmodload_math(char *nam, char **args, char *ops)
+bin_zmodload_math(char *nam, char **args, Options ops)
 {
     int ret = 0;
 
-    if (ops['u']) {
-	/* remove autoloaded conditions */
+    if (OPT_ISSET(ops,'u')) {
+	/* remove autoloaded math functions */
 	for (; *args; args++) {
 	    MathFunc f = getmathfunc(*args, 0);
 
 	    if (!f) {
-		if (!ops['i']) {
+		if (!OPT_ISSET(ops,'i')) {
 		    zwarnnam(nam, "%s: no such math function", *args, 0);
 		    ret = 1;
 		}
-	    } else if (f->flags & CONDF_ADDED) {
+	    } else if (f->flags & MFF_ADDED) {
 		zwarnnam(nam, "%s: math function is already defined", *args, 0);
 		ret = 1;
 	    } else
@@ -1121,7 +1385,7 @@ bin_zmodload_math(char *nam, char **args, char *ops)
 
 	for (p = mathfuncs; p; p = p->next) {
 	    if (p->module) {
-		if (ops['L']) {
+		if (OPT_ISSET(ops,'L')) {
 		    fputs("zmodload -af", stdout);
 		    printf(" %s %s\n", p->module, p->name);
 		} else
@@ -1130,7 +1394,7 @@ bin_zmodload_math(char *nam, char **args, char *ops)
 	}
 	return 0;
     } else {
-	/* add autoloaded conditions */
+	/* add autoloaded math functions */
 	char *modnam;
 
 	modnam = *args++;
@@ -1140,7 +1404,7 @@ bin_zmodload_math(char *nam, char **args, char *ops)
 		zwarnnam(nam, "%s: `/' is illegal in a math function",
 			 fnam, 0);
 		ret = 1;
-	    } else if (add_automathfunc(fnam, modnam) && !ops['i']) {
+	    } else if (add_automathfunc(fnam, modnam) && !OPT_ISSET(ops,'i')) {
 		zwarnnam(nam, "failed to add math function `%s'", fnam, 0);
 		ret = 1;
 	    }
@@ -1164,17 +1428,17 @@ printautoparams(HashNode hn, int lon)
 
 /**/
 static int
-bin_zmodload_param(char *nam, char **args, char *ops)
+bin_zmodload_param(char *nam, char **args, Options ops)
 {
     int ret = 0;
 
-    if (ops['u']) {
+    if (OPT_ISSET(ops,'u')) {
 	/* remove autoloaded parameters */
 	for (; *args; args++) {
 	    Param pm = (Param) gethashnode2(paramtab, *args);
 
 	    if (!pm) {
-		if (!ops['i']) {
+		if (!OPT_ISSET(ops,'i')) {
 		    zwarnnam(nam, "%s: no such parameter", *args, 0);
 		    ret = 1;
 		}
@@ -1186,7 +1450,7 @@ bin_zmodload_param(char *nam, char **args, char *ops)
 	}
 	return ret;
     } else if (!*args) {
-	scanhashtable(paramtab, 1, 0, 0, printautoparams, ops['L']);
+	scanhashtable(paramtab, 1, 0, 0, printautoparams, OPT_ISSET(ops,'L'));
 	return 0;
     } else {
 	/* add autoloaded parameters */
@@ -1209,6 +1473,15 @@ bin_zmodload_param(char *nam, char **args, char *ops)
 int
 unload_module(Module m, LinkNode node)
 {
+    /*
+     * Only unload the real module, so resolve aliases.
+     */
+    if (m->flags & MOD_ALIAS) {
+	LinkNode node = find_module(m->u.alias, 1, NULL);
+	if (!node)
+	    return 1;
+	m = (Module) getdata(node);
+    }
     if ((m->flags & MOD_INIT_S) &&
 	!(m->flags & MOD_UNLOAD) &&
 	((m->flags & MOD_LINKED) ?
@@ -1242,7 +1515,7 @@ unload_module(Module m, LinkNode node)
 	    LinkNode n;
 
 	    for (n = firstnode(m->deps); n; incnode(n)) {
-		LinkNode dn = find_module((char *) getdata(n));
+		LinkNode dn = find_module((char *) getdata(n), 1, NULL);
 		Module dm;
 
 		if (dn && (dm = (Module) getdata(dn)) &&
@@ -1280,63 +1553,76 @@ unload_module(Module m, LinkNode node)
 		if (!node)
 		    return 1;
 	    }
-	    remnode(modules, node);
-	    zsfree(m->nam);
-	    zfree(m, sizeof(*m));
+	    delete_module(node);
 	}
     }
     return 0;
 }
 
+
+/**/
+int
+unload_named_module(char *modname, char *nam, int silent)
+{
+    const char *mname;
+    LinkNode node;
+    Module m;
+    int ret = 0;
+
+    node = find_module(modname, 1, &mname);
+    if (node) {
+	LinkNode mn, dn;
+	int del = 0;
+
+	for (mn = firstnode(modules); mn; incnode(mn)) {
+	    m = (Module) getdata(mn);
+	    if (m->deps && m->u.handle)
+		for (dn = firstnode(m->deps); dn; incnode(dn))
+		    if (!strcmp((char *) getdata(dn), mname)) {
+			if (m->flags & MOD_UNLOAD)
+			    del = 1;
+			else {
+			    zwarnnam(nam, "module %s is in use by another module and cannot be unloaded", mname, 0);
+			    return 1;
+			}
+		    }
+	}
+	m = (Module) getdata(node);
+	if (del)
+	    m->wrapper++;
+	if (unload_module(m, node))
+	    ret = 1;
+	if (del)
+	    m->wrapper--;
+    } else if (!silent) {
+	zwarnnam(nam, "no such module %s", modname, 0);
+	ret = 1;
+    }
+
+    return ret;
+}
+
+
 /**/
 static int
-bin_zmodload_load(char *nam, char **args, char *ops)
+bin_zmodload_load(char *nam, char **args, Options ops)
 {
     LinkNode node;
     Module m;
     int ret = 0;
-    if(ops['u']) {
+    if(OPT_ISSET(ops,'u')) {
 	/* unload modules */
 	for(; *args; args++) {
-	    node = find_module(*args);
-	    if (node) {
-		LinkNode mn, dn;
-		int del = 0;
-
-		for (mn = firstnode(modules); mn; incnode(mn)) {
-		    m = (Module) getdata(mn);
-		    if (m->deps && m->u.handle)
-			for (dn = firstnode(m->deps); dn; incnode(dn))
-			    if (!strcmp((char *) getdata(dn), *args)) {
-				if (m->flags & MOD_UNLOAD)
-				    del = 1;
-				else {
-				    zwarnnam(nam, "module %s is in use by another module and cannot be unloaded", *args, 0);
-				    ret = 1;
-				    goto cont;
-				}
-			    }
-		}
-		m = (Module) getdata(node);
-		if (del)
-		    m->wrapper++;
-		if (unload_module(m, node))
-		    ret = 1;
-		if (del)
-		    m->wrapper--;
-	    } else if (!ops['i']) {
-		zwarnnam(nam, "no such module %s", *args, 0);
+	    if (unload_named_module(*args, nam, OPT_ISSET(ops,'i')))
 		ret = 1;
-	    }
-	    cont: ;
 	}
 	return ret;
     } else if(!*args) {
 	/* list modules */
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
-	    if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
-		if(ops['L']) {
+	    if (m->u.handle && !(m->flags & (MOD_UNLOAD|MOD_ALIAS))) {
+		if(OPT_ISSET(ops,'L')) {
 		    printf("zmodload ");
 		    if(m->nam[0] == '-')
 			fputs("-- ", stdout);
@@ -1350,7 +1636,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
     } else {
 	/* load modules */
 	for (; *args; args++)
-	    if (!require_module(nam, *args, 1, (!ops['i'])))
+	    if (!require_module(nam, *args, 1, (!OPT_ISSET(ops,'i'))))
 		ret = 1;
 
 	return ret;
@@ -1383,7 +1669,7 @@ getconddef(int inf, char *name, int autol)
 	    /* This is a definition for an autoloaded condition, load the *
 	     * module if we haven't tried that already. */
 	    if (f) {
-		load_module(p->module);
+		load_module_silence(p->module, 0);
 		f = 0;
 		p = NULL;
 	    } else {
@@ -1521,7 +1807,7 @@ deletehookdef(Hookdef h)
 
 /**/
 mod_export int
-deletehookdefs(char const *nam, Hookdef h, int size)
+deletehookdefs(UNUSED(char const *nam), Hookdef h, int size)
 {
     while (size--) {
 	deletehookdef(h);
@@ -1632,9 +1918,31 @@ addparamdef(Paramdef d)
 
     pm->level = 0;
     pm->u.data = d->var;
-    pm->sets.ifn = (void (*)(Param, zlong)) d->set;
-    pm->gets.ifn = (zlong (*)(Param)) d->get;
-    pm->unsetfn = (void (*)(Param, int)) d->unset;
+    if (d->gsu)
+	pm->gsu.i = (GsuInteger) d->gsu;
+    else {
+	/*
+	 * If no get/set/unset class, use the appropriate
+	 * variable type.
+	 */
+	switch (PM_TYPE(pm->flags)) {
+	case PM_SCALAR:
+	    pm->gsu.s = &varscalar_gsu;
+	    break;
+
+	case PM_INTEGER:
+	    pm->gsu.i = &varinteger_gsu;
+	    break;
+
+	case PM_ARRAY:
+	    pm->gsu.a = &vararray_gsu;
+	    break;
+
+	default:
+	    unsetparam_pm(pm, 0, 1);
+	    return 1;
+	}
+    }
 
     return 0;
 }
@@ -1670,7 +1978,7 @@ deleteparamdef(Paramdef d)
 
 /**/
 mod_export int
-deleteparamdefs(char const *nam, Paramdef d, int size)
+deleteparamdefs(UNUSED(char const *nam), Paramdef d, int size)
 {
     while (size--) {
 	deleteparamdef(d);
@@ -1761,18 +2069,33 @@ add_autoparam(char *nam, char *module)
 {
     Param pm;
 
+    queue_signals();
     if ((pm = (Param) gethashnode2(paramtab, nam)))
 	unsetparam_pm(pm, 0, 1);
 
-    pm = setsparam(ztrdup(nam), ztrdup(module));
+    pm = setsparam(nam, ztrdup(module));
 
     pm->flags |= PM_AUTOLOAD;
+    unqueue_signals();
 }
 
 /* List of math functions. */
 
 /**/
 MathFunc mathfuncs;
+
+/**/
+static void removemathfunc(MathFunc previous, MathFunc current)
+{
+    if (previous)
+	previous->next = current->next;
+    else
+	mathfuncs = current->next;
+
+    zsfree(current->name);
+    zsfree(current->module);
+    zfree(current, sizeof(*current));
+}
 
 /**/
 MathFunc
@@ -1785,15 +2108,9 @@ getmathfunc(char *name, int autol)
 	    if (autol && p->module) {
 		char *n = dupstring(p->module);
 
-		if (q)
-		    q->next = p->next;
-		else
-		    mathfuncs = p->next;
+		removemathfunc(q, p);
 
-		zsfree(p->module);
-		zfree(p, sizeof(*p));
-
-		load_module(n);
+		load_module_silence(n, 0);
 
 		return getmathfunc(name, 0);
 	    }
@@ -1807,14 +2124,22 @@ getmathfunc(char *name, int autol)
 mod_export int
 addmathfunc(MathFunc f)
 {
-    MathFunc p;
+    MathFunc p, q = NULL;
 
     if (f->flags & MFF_ADDED)
 	return 1;
 
-    for (p = mathfuncs; p; p = p->next)
-	if (!strcmp(f->name, p->name))
+    for (p = mathfuncs; p; q = p, p = p->next)
+	if (!strcmp(f->name, p->name)) {
+	    if (p->module) {
+		/*
+		 * Autoloadable, replace.
+		 */
+		removemathfunc(q, p);
+		break;
+	    }
 	    return 1;
+	}
 
     f->flags |= MFF_ADDED;
     f->next = mathfuncs;
@@ -1862,6 +2187,8 @@ add_automathfunc(char *nam, char *module)
 
 	return 1;
     }
+    f->flags &= ~MFF_ADDED; /* still to autoload, not added yet */
+
     return 0;
 }
 
