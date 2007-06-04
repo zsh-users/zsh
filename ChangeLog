@@ -1,5 +1,7 @@
 2007-06-04  Peter Stephenson  <pws@csr.com>
 
+	* 23519: Completion/Unix/Command/_units: completion for "units".
+
 	* 23518: Doc/Zsh/contrib.yo, Functions/MIME/zsh-mime-handler:
 	add find-file-in-path and file-path styles to MIME system.
 
