@@ -1,6 +1,7 @@
 #compdef units
 
 local curcontext="$curcontext" state line
+integer ret=1
 typeset -A opt_args
 
 # Command line completion for Solaris units isn't very useful; this
@@ -67,12 +68,13 @@ pfxs=(${${all:#^[[:alnum:]]##-}%%-})
 units=(${${all:#^[[:alnum:]]##([\(\]]*|)}%%\(*})
 
 if (( ${#units} )); then
-  _alternative 'unit prefixes:unitprefix:compadd -S "" -a pfxs' \
-    'units:unit:compadd -a units' && return 0
+  _alternative 'unitprefixes:unit prefix:compadd -S "" -a pfxs' \
+    'units:unit:compadd -a units' && ret=0
   # attempt to skip a prefix
   if compset -P "(${(j.|.)pfxs})"; then
-    _wanted units expl unit compadd -a units
+    _wanted units expl unit compadd -a units && ret=0
   fi
+  return ret
 else
   _message "No unit definitions found."
 fi

@@ -1,5 +1,9 @@
 2007-06-05  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/_units: message and tag were
+	reversed; always attempt completion with removed prefix
+	(a bit problematic if prefix is e.g. "m").
+
 	* From Mikael Magnusson and Phil Pennock: 23521, 23522:
 	Completion/Unix/Command/_units: extra locations for
 	units data.
