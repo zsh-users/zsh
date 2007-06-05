@@ -71,7 +71,7 @@ if (( ${#units} )); then
   _alternative 'unitprefixes:unit prefix:compadd -S "" -a pfxs' \
     'units:unit:compadd -a units' && ret=0
   # attempt to skip a prefix
-  if compset -P "(${(j.|.)pfxs})"; then
+  if $(( ${#pfxs} )) && compset -P "(${(j.|.)pfxs})"; then
     _wanted units expl unit compadd -a units && ret=0
   fi
   return ret
