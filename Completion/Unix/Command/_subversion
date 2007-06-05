@@ -72,6 +72,12 @@ _svn () {
 	      '*:file:_files -g "*(e:_svn_controlled:)"'
             )
           ;;
+	  (propget|propedit)
+	    args+=(
+		'1:property name:_svn_props'
+		'2:target: _alternative "files:file:_files" "urls:URL:_svn_urls"'
+	    )
+	  ;;
 	  (propset)
 	    args=(
 	    ':propname:(svn:ignore svn:keywords svn:executable svn:eol-style svn:mime-type svn:externals svn:needs-lock)'
@@ -232,6 +238,14 @@ _svn_commands() {
 (( $+functions[_svnadmin_command] )) ||
 _svnadmin_commands() {
   compadd "$@" -k _svnadmin_cmds || compadd "$@" ${(s.:.)_svnadmin_cmds}
+}
+
+(( $+functions[_svn_props] )) ||
+_svn_props() {
+  local properties
+
+  properties=( ${${(M)${(f)"$(svn proplist 2>/dev/null)"}:#  [^ ]*}#  } )
+  compadd "$@" -a properties && return 0
 }
 
 _subversion () {
