@@ -37,9 +37,12 @@ compset -S '[^[:alnum:]]*'
 local datfile
 local -a testfiles
 testfiles=(
-  /usr/share/units.dat		# GNU
-  /usr/local/share/units.dat
+  /usr/share/units.dat		# GNU on Fedora
+  /usr/share/units/units.dat    # on gentoo
+  /usr/share/misc/units.dat     # on Debian
+  /usr/local/share/units.dat    # GNU DIY install
   /usr/share/lib/unittab	# Solaris
+  /usr/share/misc/units.lib     # BSD
 )
 
 datfile=${opt_args[-f]:-${opt_args[--file]}}
