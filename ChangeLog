@@ -1,3 +1,8 @@
+2007-06-06  Peter Stephenson  <pws@csr.com>
+
+	* Phil Pennock: 23529: Completion/compdump: quote completion dump
+	to prevent global alias expansion.
+
 2007-06-05  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_units: message and tag were

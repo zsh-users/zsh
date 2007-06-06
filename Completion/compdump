@@ -41,32 +41,32 @@ print "#files: $#_d_files\tversion: $ZSH_VERSION" > $_d_file
 
 print "\n_comps=(" >> $_d_file
 for _d_f in ${(ok)_comps}; do
-  print -r - "${(q)_d_f}" "${(q)_comps[$_d_f]}"
+  print -r - "${(qq)_d_f}" "${(qq)_comps[$_d_f]}"
 done >> $_d_file
 print ")" >> $_d_file
 
 print "\n_services=(" >> $_d_file
 for _d_f in ${(ok)_services}; do
-  print -r - "${(q)_d_f}" "${(q)_services[$_d_f]}"
+  print -r - "${(qq)_d_f}" "${(qq)_services[$_d_f]}"
 done >> $_d_file
 print ")" >> $_d_file
 
 print "\n_patcomps=(" >> $_d_file
 for _d_f in ${(ok)_patcomps}; do
-  print -r - "${(q)_d_f}" "${(q)_patcomps[$_d_f]}"
+  print -r - "${(qq)_d_f}" "${(qq)_patcomps[$_d_f]}"
 done >> $_d_file
 print ")" >> $_d_file
 
 _d_tmp="_postpatcomps"
 print "\n_postpatcomps=(" >> $_d_file
 for _d_f in ${(ok)_postpatcomps}; do
-  print -r - "${(q)_d_f}" "${(q)_postpatcomps[$_d_f]}"
+  print -r - "${(qq)_d_f}" "${(qq)_postpatcomps[$_d_f]}"
 done >> $_d_file
 print ")" >> $_d_file
 
 print "\n_compautos=(" >> $_d_file
 for _d_f in "${(ok@)_compautos}"; do
-  print -r - "${(q)_d_f}" "${(q)_compautos[$_d_f]}"
+  print -r - "${(qq)_d_f}" "${(qq)_compautos[$_d_f]}"
 done >> $_d_file
 print ")" >> $_d_file
 
@@ -129,7 +129,7 @@ done
 print >> $_d_file
 
 print "typeset -gUa _comp_assocs" >> $_d_file
-print "_comp_assocs=( ${(q)_comp_assocs} )" >> $_d_file
+print "_comp_assocs=( ${(qq)_comp_assocs} )" >> $_d_file
 
 mv $_d_file ${_d_file%.$HOST.$$}
 
