@@ -38,9 +38,8 @@ typedef struct style *Style;
 /* A pattern and the styles for it. */
 
 struct style {
-    Style next;			/* next in stypat list */
+    struct hashnode node;
     Stypat pats;		/* patterns */
-    char *name;
 };
 
 struct stypat {
@@ -51,12 +50,41 @@ struct stypat {
     Eprog eval;			/* eval-on-retrieve? */
     char **vals;
 };
-    
-/* List of styles. */
 
-static Style zstyles;
+/* Hash table of styles and associated functions. */
+
+static HashTable zstyletab;
 
 /* Memory stuff. */
+
+static void
+freestylepatnode(Stypat p)
+{
+    zsfree(p->pat);
+    freepatprog(p->prog);
+    if (p->vals)
+	freearray(p->vals);
+    if (p->eval)
+	freeeprog(p->eval);
+    zfree(p, sizeof(*p));
+}
+
+static void
+freestylenode(HashNode hn)
+{
+    Style s = (Style) hn;
+    Stypat p, pn;
+
+    p = s->pats;
+    while (p) {
+	pn = p->next;
+	freestylepatnode(p);
+	p = pn;
+    }
+
+    zsfree(s->node.nam);
+    zfree(s, sizeof(struct style));
+}
 
 /*
  * Free the information for one of the patterns associated with
@@ -79,60 +107,135 @@ freestypat(Stypat p, Style s, Stypat prev)
 	    s->pats = p->next;
     }
 
-    zsfree(p->pat);
-    freepatprog(p->prog);
-    if (p->vals)
-	freearray(p->vals);
-    if (p->eval)
-	freeeprog(p->eval);
-    zfree(p, sizeof(*p));
+    freestylepatnode(p);
 
     if (s && !s->pats) {
 	/* No patterns left, free style */
-	if (s == zstyles) {
-	    zstyles = s->next;
-	} else {
-	    Style s2;
-	    for (s2 = zstyles; s2->next != s; s2 = s2->next)
-		;
-	    s2->next = s->next;
-	}
-	zsfree(s->name);
+	zstyletab->removenode(zstyletab, s->node.nam);
+	zsfree(s->node.nam);
 	zfree(s, sizeof(*s));
     }
 }
+
+/* Pattern to match context when printing nodes */
+
+static Patprog zstyle_contprog;
+
+/*
+ * Print a node.  Print flags as shown.
+ */
+enum {
+    ZSLIST_NONE,
+    ZSLIST_BASIC,
+    ZSLIST_SYNTAX,
+};
 
 static void
-freeallstyles(void)
+printstylenode(HashNode hn, int printflags)
 {
-    Style s, sn;
-    Stypat p, pn;
+    Style s = (Style)hn;
+    Stypat p;
+    char **v;
 
-    for (s = zstyles; s; s = sn) {
-	sn = s->next;
-	for (p = s->pats; p; p = pn) {
-	    pn = p->next;
-	    freestypat(p, NULL, NULL);
-	}
-	zsfree(s->name);
-	zfree(s, sizeof(*s));
+    if (printflags == ZSLIST_BASIC) {
+	quotedzputs(s->node.nam, stdout);
+	putchar('\n');
     }
-    zstyles = NULL;
+
+    for (p = s->pats; p; p = p->next) {
+	if (zstyle_contprog && !pattry(zstyle_contprog, p->pat))
+	    continue;
+	if (printflags == ZSLIST_BASIC)
+	    printf("%s  %s", (p->eval ? "(eval)" : "      "), p->pat);
+	else {
+	    printf("zstyle %s", (p->eval ? "-e " : ""));
+	    quotedzputs(p->pat, stdout);
+	    printf(" %s", s->node.nam);
+	}
+	for (v = p->vals; *v; v++) {
+	    putchar(' ');
+	    quotedzputs(*v, stdout);
+	}
+	putchar('\n');
+    }
 }
 
-/* Get the style struct for a name. */
+/*
+ * Scan the list for a particular pattern, maybe adding matches to
+ * the link list (heap memory).  Value to be added as
+ * shown in enum
+ */
+static LinkList zstyle_list;
+static char *zstyle_patname;
 
-static Style
-getstyle(char *name)
+enum {
+    ZSPAT_NAME,		/* Add style names for matched pattern to list */
+    ZSPAT_PAT,		/* Add all patterns to list, doesn't use patname */
+    ZSPAT_REMOVE,	/* Remove matched pattern, doesn't use list */
+};
+
+static void
+scanpatstyles(HashNode hn, int spatflags)
 {
-    Style s;
+    Style s = (Style)hn;
+    Stypat p, q;
+    LinkNode n;
 
-    for (s = zstyles; s; s = s->next)
-	if (!strcmp(name, s->name)) {
-	    return s;
+    for (q = NULL, p = s->pats; p; q = p, p = p->next) {
+	switch (spatflags) {
+	case ZSPAT_NAME:
+	    if (!strcmp(p->pat, zstyle_patname)) {
+		addlinknode(zstyle_list, s->node.nam);
+		return;
+	    }
+	    break;
+
+	case ZSPAT_PAT:
+	    /* Check pattern isn't already there */
+	    for (n = firstnode(zstyle_list); n; incnode(n))
+		if (!strcmp(p->pat, (char *) getdata(n)))
+		    break;
+	    if (!n)
+		addlinknode(zstyle_list, p->pat);
+	    break;
+
+	case ZSPAT_REMOVE:
+	    if (!strcmp(p->pat, zstyle_patname)) {
+		freestypat(p, s, q);
+		/*
+		 * May remove link node itself; that's OK
+		 * when scanning but we need to make sure
+		 * we don't look at it any more.
+		 */
+		return;
+	    }
+	    break;
 	}
+    }
+}
 
-    return NULL;
+
+static HashTable
+newzstyletable(int size, char const *name)
+{
+    HashTable ht;
+    ht = newhashtable(size, name, NULL);
+
+    ht->hash        = hasher;
+    ht->emptytable  = emptyhashtable;
+    ht->filltable   = NULL;
+    ht->cmpnodes    = strcmp;
+    ht->addnode     = addhashnode;
+    /* DISABLED is not supported */
+    ht->getnode     = gethashnode2;
+    ht->getnode2    = gethashnode2;
+    ht->removenode  = removehashnode;
+    ht->disablenode = NULL;
+    ht->enablenode  = NULL;
+    ht->freenode    = freestylenode;
+    ht->printnode   = printstylenode;
+
+    return ht;
 }
 
 /* Store a value for a style. */
@@ -226,15 +329,9 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
 static Style
 addstyle(char *name)
 {
-    Style s;
+    Style s = (Style) zshcalloc(sizeof(*s));
 
-    s = (Style) zalloc(sizeof(*s));
-    s->next = NULL;
-    s->pats = NULL;
-    s->name = ztrdup(name);
-
-    s->next = zstyles;
-    zstyles = s;
+    zstyletab->addnode(zstyletab, ztrdup(name), s);
 
     return s;
 }
@@ -274,11 +371,12 @@ lookupstyle(char *ctxt, char *style)
     Style s;
     Stypat p;
 
-    for (s = zstyles; s; s = s->next)
-	if (!strcmp(s->name, style))
-	    for (p = s->pats; p; p = p->next)
-		if (pattry(p->prog, ctxt))
-		    return (p->eval ? evalstyle(p) : p->vals);
+    s = (Style)zstyletab->getnode2(zstyletab, style);
+    if (!s)
+	return NULL;
+    for (p = s->pats; p; p = p->next)
+	if (pattry(p->prog, ctxt))
+	    return (p->eval ? evalstyle(p) : p->vals);
 
     return NULL;
 }
@@ -286,10 +384,10 @@ lookupstyle(char *ctxt, char *style)
 static int
 bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
-    int min, max, n, add = 0, list = 0, eval = 0;
+    int min, max, n, add = 0, list = ZSLIST_NONE, eval = 0;
 
     if (!args[0])
-	list = 1;
+	list = ZSLIST_BASIC;
     else if (args[0][0] == '-') {
 	char oc;
 
@@ -299,7 +397,7 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		return 1;
 	    }
 	    if (oc == 'L') {
-		list = 2;
+		list = ZSLIST_SYNTAX;
 		args++;
 	    } else if (oc == 'e') {
 		eval = add = 1;
@@ -328,16 +426,13 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    zwarnnam(nam, "invalid pattern: %s", args[0]);
 	    return 1;
 	}
-	if (!(s = getstyle(args[1])))
+	if (!(s = (Style)zstyletab->getnode2(zstyletab, args[1])))
 	    s = addstyle(args[1]);
 	return setstypat(s, args[0], prog, args + 2, eval);
     }
     if (list) {
 	Style s;
-	Stypat p;
-	char **v;
 	char *context, *stylename;
-	Patprog contprog;
 
 	switch (arrlen(args)) {
 	case 2:
@@ -360,34 +455,23 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
 	if (context) {
 	    tokenize(context);
-	    contprog = patcompile(context, PAT_STATIC, NULL);
-	} else
-	    contprog = NULL;
+	    zstyle_contprog = patcompile(context, PAT_STATIC, NULL);
 
-	for (s = zstyles; s; s = s->next) {
-	    if (list == 1) {
-		quotedzputs(s->name, stdout);
-		putchar('\n');
-	    }
-	    if (stylename && strcmp(s->name, stylename) != 0)
-		continue;
-	    for (p = s->pats; p; p = p->next) {
-		if (contprog && !pattry(contprog, p->pat))
-		    continue;
-		if (list == 1)
-		    printf("%s  %s", (p->eval ? "(eval)" : "      "), p->pat);
-		else {
-		    printf("zstyle %s", (p->eval ? "-e " : ""));
-		    quotedzputs(p->pat, stdout);
-		    printf(" %s", s->name);
-		}
-		for (v = p->vals; *v; v++) {
-		    putchar(' ');
-		    quotedzputs(*v, stdout);
-		}
-		putchar('\n');
-	    }
+	    if (!zstyle_contprog)
+		return 1;
+	} else
+	    zstyle_contprog = NULL;
+
+	if (stylename) {
+	    s = (Style)zstyletab->getnode2(zstyletab, stylename);
+	    if (!s)
+		return 1;
+	    zstyletab->printnode(&s->node, list);
+	} else {
+	    scanhashtable(zstyletab, 1, 0, 0,
+			  zstyletab->printnode, list);
 	}
+
 	return 0;
     }
     switch (args[0][1]) {
@@ -421,7 +505,8 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    char *pat = args[1];
 
 		    for (args += 2; *args; args++) {
-			if ((s = getstyle(*args))) {
+			if ((s = (Style)zstyletab->getnode2(zstyletab,
+							    *args))) {
 			    Stypat p, q;
 
 			    for (q = NULL, p = s->pats; p;
@@ -434,22 +519,14 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 			}
 		    }
 		} else {
-		    Style next;
-		    Stypat p, q;
+		    zstyle_patname = args[1];
 
-		    /* careful! style itself may be deleted */
-		    for (s = zstyles; s; s = next) {
-			next = s->next;
-			for (q = NULL, p = s->pats; p; q = p, p = p->next) {
-			    if (!strcmp(p->pat, args[1])) {
-				freestypat(p, s, q);
-				break;
-			    }
-			}
-		    }
+		    /* sorting not needed for deletion */
+		    scanhashtable(zstyletab, 0, 0, 0, scanpatstyles,
+				  ZSPAT_REMOVE);
 		}
 	    } else
-		freeallstyles();
+		zstyletab->emptytable(zstyletab);
 	}
 	break;
     case 's':
@@ -554,20 +631,21 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	break;
     case 'g':
 	{
-	    LinkList l = newlinklist();
 	    int ret = 1;
 	    Style s;
 	    Stypat p;
 
+	    zstyle_list = newlinklist();
+
 	    if (args[2]) {
 		if (args[3]) {
-		    if ((s = getstyle(args[3]))) {
+		    if ((s = (Style)zstyletab->getnode2(zstyletab, args[3]))) {
 			for (p = s->pats; p; p = p->next) {
 			    if (!strcmp(args[2], p->pat)) {
 				char **v = p->vals;
 
 				while (*v)
-				    addlinknode(l, *v++);
+				    addlinknode(zstyle_list, *v++);
 
 				ret = 0;
 				break;
@@ -575,28 +653,17 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 			}
 		    }
 		} else {
-		    for (s = zstyles; s; s = s->next)
-			for (p = s->pats; p; p = p->next)
-			    if (!strcmp(args[2], p->pat)) {
-				addlinknode(l, s->name);
-				break;
-			    }
+		    zstyle_patname = args[2];
+		    scanhashtable(zstyletab, 1, 0, 0, scanpatstyles,
+				  ZSPAT_NAME);
 		    ret = 0;
 		}
 	    } else {
-		LinkNode n;
-
-		for (s = zstyles; s; s = s->next)
-		    for (p = s->pats; p; p = p->next) {
-			for (n = firstnode(l); n; incnode(n))
-			    if (!strcmp(p->pat, (char *) getdata(n)))
-				break;
-			if (!n)
-			    addlinknode(l, p->pat);
-		    }
+		scanhashtable(zstyletab, 1, 0, 0, scanpatstyles,
+			      ZSPAT_PAT);
 		ret = 0;
 	    }
-	    set_list_array(args[1], l);
+	    set_list_array(args[1], zstyle_list);
 
 	    return ret;
 	}
@@ -1752,7 +1819,7 @@ static struct features module_features = {
 int
 setup_(UNUSED(Module m))
 {
-    zstyles = NULL;
+    zstyletab = newzstyletable(17, "zstyletab");
 
     return 0;
 }
@@ -1790,7 +1857,7 @@ cleanup_(Module m)
 int
 finish_(UNUSED(Module m))
 {
-    freeallstyles();
+    deletehashtable(zstyletab);
 
     return 0;
 }

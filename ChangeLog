@@ -1,3 +1,11 @@
+2007-06-08  Peter Stephenson  <pws@csr.com>
+
+	* 23537: Doc/Zsh/mod_zutil.yo, Src/Module/zutil.c,
+	Test/V05styles.ztst:  use hash table for styles and add
+	tests.  Apart from ordering of styles by name (patterns
+	are still ordered by weight) there should be no effect on
+	shell syntax and output.
+
 2007-06-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23535: Src/Module/parameter.mdd: autoload saliases and

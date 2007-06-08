@@ -30,7 +30,8 @@ simple strings are considered to be more specific than patterns and
 complex patterns are considered to be more specific than the pattern
 `tt(*)'.
 
-The first form (without arguments) lists the definitions in the order
+The first form (without arguments) lists the definitions.  Styles
+are shown in alphabetic order and patterns are shown in the order
 tt(zstyle) will test them.
 
 If the tt(-L) option is given, listing is done in the form of calls to
