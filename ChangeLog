@@ -1,3 +1,8 @@
+2007-06-11  Peter Stephenson  <pws@csr.com>
+
+	* 23543: Completion/Unix/Command/_perforce: work around
+	problem adding "..." with hiddne prefix.
+
 2007-06-08  Peter Stephenson  <pws@csr.com>
 
 	* 23537: Doc/Zsh/mod_zutil.yo, Src/Module/zutil.c,
