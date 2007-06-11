@@ -811,7 +811,7 @@ printjob(Job jn, int lng, int synch)
 
     if (lng < 0) {
 	conted = 1;
-	lng = 0;
+	lng = !!isset(LONGLISTJOBS);
     }
 
 /* find length of longest signame, check to see */
@@ -871,7 +871,7 @@ printjob(Job jn, int lng, int synch)
 			break;
 		    len2 += strlen(qn->text) + 2;
 		}
-	    if (!thisfmt) {
+	    if (!thisfmt || lng) {
 		if (fline)
 		    fprintf(fout, "[%ld]  %c ",
 			    (long)job,
@@ -1344,7 +1344,7 @@ scanjobs(void)
  
     for (i = 1; i <= maxjob; i++)
         if (jobtab[i].stat & STAT_CHANGED)
-            printjob(jobtab + i, 0, 1);
+            printjob(jobtab + i, !!isset(LONGLISTJOBS), 1);
 }
 
 /**** job control builtins ****/
@@ -1612,10 +1612,14 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	return 0;
     }
 
-    lng = (OPT_ISSET(ops,'l')) ? 1 : (OPT_ISSET(ops,'p')) ? 2 : 0;
-    if (OPT_ISSET(ops,'d'))
-	lng |= 4;
-    
+    if (func == BIN_JOBS) {
+	lng = (OPT_ISSET(ops,'l')) ? 1 : (OPT_ISSET(ops,'p')) ? 2 : 0;
+	if (OPT_ISSET(ops,'d'))
+	    lng |= 4;
+    } else {
+	lng = !!isset(LONGLISTJOBS);
+    }
+
     if ((func == BIN_FG || func == BIN_BG) && !jobbing) {
 	/* oops... maybe bg and fg should have been disabled? */
 	zwarnnam(name, "no job control in this shell.", NULL, 0);
@@ -1752,7 +1756,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    }
 	    if (func != BIN_WAIT)
 		/* for bg and fg -- show the job we are operating on */
-		printjob(jobtab + job, (stopped) ? -1 : 0, 1);
+		printjob(jobtab + job, (stopped) ? -1 : lng, 1);
 	    if (func != BIN_BG) {		/* fg or wait */
 		if (jobtab[job].pwd && strcmp(jobtab[job].pwd, pwd)) {
 		    fprintf(shout, "(pwd : ");
