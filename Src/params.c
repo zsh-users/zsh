@@ -1941,10 +1941,18 @@ getarrvalue(Value v)
 mod_export zlong
 getintvalue(Value v)
 {
-    if (!v || v->isarr)
+    if (!v)
 	return 0;
     if (v->inv)
 	return v->start;
+    if (v->isarr) {
+	char **arr = getarrvalue(v);
+	if (arr) {
+	    char *scal = sepjoin(arr, NULL, 1);
+	    return mathevali(scal);
+	} else
+	    return 0;
+    }
     if (PM_TYPE(v->pm->node.flags) == PM_INTEGER)
 	return v->pm->gsu.i->getfn(v->pm);
     if (v->pm->node.flags & (PM_EFLOAT|PM_FFLOAT))
@@ -1959,10 +1967,18 @@ getnumvalue(Value v)
     mnumber mn;
     mn.type = MN_INTEGER;
 
-    if (!v || v->isarr) {
+
+    if (!v) {
 	mn.u.l = 0;
     } else if (v->inv) {
 	mn.u.l = v->start;
+    } else if (v->isarr) {
+	char **arr = getarrvalue(v);
+	if (arr) {
+	    char *scal = sepjoin(arr, NULL, 1);
+	    return matheval(scal);
+	} else
+	    mn.u.l = 0;
     } else if (PM_TYPE(v->pm->node.flags) == PM_INTEGER) {
 	mn.u.l = v->pm->gsu.i->getfn(v->pm);
     } else if (v->pm->node.flags & (PM_EFLOAT|PM_FFLOAT)) {

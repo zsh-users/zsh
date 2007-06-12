@@ -1,5 +1,9 @@
 2007-06-12  Peter Stephenson  <pws@csr.com>
 
+	* 23553: Src/params.c: use of unsubscripted array inside
+	math evaluation now does something reasonable instead of
+	returning 0.
+
 	* 23552: Src/Builtins/sched.c: remove unnecessary debugging
 	warning.
 
