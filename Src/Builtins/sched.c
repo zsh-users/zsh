@@ -78,8 +78,11 @@ schedaddtimed(time_t t)
 static void
 scheddeltimed(void)
 {
-    deltimedfn(checksched);
-    schedcmdtimed = 0;
+    if (schedcmdtimed)
+    {
+	deltimedfn(checksched);
+	schedcmdtimed = 0;
+    }
 }
 
 
