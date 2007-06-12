@@ -3,5 +3,6 @@ link=either
 load=yes
 
 autobins="sched"
+autoparams="zsh_scheduled_events"
 
 objects="sched.o"

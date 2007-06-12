@@ -145,6 +145,40 @@ checksched(void)
     }
 }
 
+/*
+ * Format event sch.  If sn is zero, allocate string on the heap
+ * and return it; if non-zero, print with that as scheduled event
+ * number.
+ */
+
+static
+char *schedtext(struct schedcmd *sch, int sn)
+{
+    char *str, tbuf[40], *flagstr, *endstr;
+    time_t t;
+    struct tm *tmp;
+
+    t = sch->time;
+    tmp = localtime(&t);
+    ztrftime(tbuf, 20, "%a %b %e %k:%M;%S", tmp);
+    if (sch->flags & SCHEDFLAG_TRASH_ZLE)
+	flagstr = "-o ";
+    else
+	flagstr = "";
+    if (*sch->cmd == '-')
+	endstr = "-- ";
+    else
+	endstr = "";
+    if (sn) {
+	printf("%3d %s %s%s%s\n", sn, tbuf, flagstr, endstr, sch->cmd);
+	return NULL;
+    } else {
+	str = (char *)zhalloc(48 + strlen(sch->cmd));
+	sprintf(str, "%s %s%s%s", tbuf, flagstr, endstr, sch->cmd);
+	return str;
+    }
+}
+
 /**/
 static int
 bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
@@ -204,22 +238,8 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 
     /* given no arguments, display the schedule list */
     if (!*argptr) {
-	char tbuf[40], *flagstr, *endstr;
-
-	for (sn = 1, sch = schedcmds; sch; sch = sch->next, sn++) {
-	    t = sch->time;
-	    tm = localtime(&t);
-	    ztrftime(tbuf, 20, "%a %b %e %k:%M:%S", tm);
-	    if (sch->flags & SCHEDFLAG_TRASH_ZLE)
-		flagstr = "-o ";
-	    else
-		flagstr = "";
-	    if (*sch->cmd == '-')
-		endstr = "-- ";
-	    else
-		endstr = "";
-	    printf("%3d %s %s%s%s\n", sn, tbuf, flagstr, endstr, sch->cmd);
-	}
+	for (sn = 1, sch = schedcmds; sch; sch = sch->next, sn++)
+	    (void)schedtext(sch, 1);
 	return 0;
     } else if (!argptr[1]) {
 	/* other than the two cases above, sched *
@@ -332,14 +352,43 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     return 0;
 }
 
+
+/**/
+static char **
+schedgetfn(UNUSED(Param pm))
+{
+    int i;
+    struct schedcmd *sch;
+    char **ret, **aptr;
+
+    for (i = 0, sch = schedcmds; sch; sch = sch->next, i++)
+	;
+
+    aptr = ret = zhalloc(sizeof(char **) * (i+1));
+    for (sch = schedcmds; sch; sch = sch->next, aptr++)
+	*aptr = schedtext(sch, 0);
+    *aptr = NULL;
+
+    return ret;
+}
+
+
 static struct builtin bintab[] = {
     BUILTIN("sched", 0, bin_sched, 0, -1, 0, NULL, NULL),
+};
+
+static const struct gsu_array sched_gsu =
+{ schedgetfn, arrsetfn, stdunsetfn };
+
+static struct paramdef partab[] = {
+    SPECIALPMDEF("zsh_scheduled_events", PM_ARRAY|PM_READONLY,
+		 &sched_gsu, NULL, NULL)
 };
 
 static struct features module_features = {
     bintab, sizeof(bintab)/sizeof(*bintab),
     NULL, 0,
-    NULL, 0,
+    partab, sizeof(partab)/sizeof(*partab),
     NULL, 0,
     0
 };

@@ -1,7 +1,13 @@
+2007-06-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23554: Doc/Zsh/mod_sched.yo, Doc/Zsh/params.yo,
+	Src/Builtins/sched.c, Src/Builtins/sched.mdd:
+	add $zsh_scheduled_events.
+
 2007-06-12  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Unix/Command/_pkg-config,
-	Completion/Unix/Command/_unexpand: remove RCS $Id: ChangeLog,v 1.3546 2007/06/12 17:02:38 clint Exp $
+	Completion/Unix/Command/_unexpand: remove RCS $Id: ChangeLog,v 1.3547 2007/06/12 22:01:37 pws Exp $
 	comments.
 
 2007-06-12  Peter Stephenson  <pws@csr.com>

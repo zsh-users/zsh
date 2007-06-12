@@ -712,6 +712,10 @@ item(tt(ZSH_NAME))(
 Expands to the basename of the command used to invoke this instance
 of zsh.
 )
+item(tt(zsh_scheduled_events))(
+See ifzman(the section `The zsh/sched Module' in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/sched Module)).
+)
 vindex(ZSH_VERSION)
 item(tt(ZSH_VERSION))(
 The version number of this zsh.
