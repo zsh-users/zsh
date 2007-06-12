@@ -259,8 +259,10 @@ statfullpath(const char *s, struct stat *st, int l)
 	l = 0;
     }
     unmetafy(buf, NULL);
-    if (!st)
-	return access(buf, F_OK) && (!l || readlink(buf, NULL, 0));
+    if (!st) {
+	char lbuf[1];
+	return access(buf, F_OK) && (!l || readlink(buf, lbuf, 1) < 0);
+    }
     return l ? lstat(buf, st) : stat(buf, st);
 }
 
