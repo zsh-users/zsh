@@ -1,13 +1,4 @@
 #compdef pkg-config
-#
-# $Id: _pkg-config,v 1.1 2005/08/12 10:03:58 pws Exp $
-#
-# Copyright (C) 2005 Travis L. Spencer
-# ALL RIGHTS RESERVED
-#
-# See the file LICENCE in the root of the zsh distribution for
-# licensing information.
-#
 
 local arguments packages curcontext="$curcontext" stat line
 declare -A opt_args
@@ -48,10 +39,3 @@ if [[ -n $state ]] ; then
     packages=( ${(f)"$((pkg-config --list-all | cut -d' ' -f1) 2>/dev/null)"} )
     compadd -a - packages
 fi
-
-: <<EMACS_LOCAL_VARIABLES
-Local Variables:
-mode: shell-script
-mode: flyspell-prog
-End:
-EMACS_LOCAL_VARIABLES

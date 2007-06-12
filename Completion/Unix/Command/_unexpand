@@ -1,13 +1,4 @@
 #compdef unexpand
-#
-# $Id: _unexpand,v 1.1 2005/07/11 03:34:35 barts Exp $
-#
-# Copyright (C) 2005 Travis L. Spencer
-# ALL RIGHTS RESERVED
-#
-# See the file LICENCE in the root of the zsh distribution for
-# licensing information.
-#
 
 local all tabs ret=1
 local -a args
@@ -33,10 +24,3 @@ fi
 _arguments "$args[@]" && ret=0
 
 return ret
-
-: <<EMACS_LOCAL_VARIABLES
-Local Variables:
-mode: shell-script
-mode: flyspell-prog
-End:
-EMACS_LOCAL_VARIABLES

@@ -1,3 +1,9 @@
+2007-06-12  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Unix/Command/_pkg-config,
+	Completion/Unix/Command/_unexpand: remove RCS $Id: ChangeLog,v 1.3546 2007/06/12 17:02:38 clint Exp $
+	comments.
+
 2007-06-12  Peter Stephenson  <pws@csr.com>
 
 	* 23553: Src/params.c: use of unsubscripted array inside
