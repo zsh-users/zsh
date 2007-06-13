@@ -865,7 +865,8 @@ _git-reset () {
     '(        --soft --hard)--mixed[like --soft but report what has not been updated (default)]' \
     '(--mixed        --hard)--soft[do not touch the index file nor the working tree]' \
     '(--mixed --soft       )--hard[match the working tree and index to the given tree]' \
-    ':commit-ish:__git_revisions' && ret=0
+    ':commit-ish:__git_revisions' \
+    '*:path:_files' && ret=0
 }
 
 _git-resolve () {

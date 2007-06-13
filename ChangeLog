@@ -3,6 +3,9 @@
 	* 23556: Completion/Unix/Command/_rrdtool: completion
 	for rrdtool.
 
+	* 23557: Completion/Unix/Command/_git: complete
+	filenames after 'git reset <revision>'.
+
 2007-06-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23554: Doc/Zsh/mod_sched.yo, Doc/Zsh/params.yo,
