@@ -1,3 +1,8 @@
+2007-06-12  Clint Adams  <clint@zsh.org>
+
+	* 23556: Completion/Unix/Command/_rrdtool: completion
+	for rrdtool.
+
 2007-06-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23554: Doc/Zsh/mod_sched.yo, Doc/Zsh/params.yo,
@@ -7,7 +12,7 @@
 2007-06-12  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Unix/Command/_pkg-config,
-	Completion/Unix/Command/_unexpand: remove RCS $Id: ChangeLog,v 1.3547 2007/06/12 22:01:37 pws Exp $
+	Completion/Unix/Command/_unexpand: remove RCS Id
 	comments.
 
 2007-06-12  Peter Stephenson  <pws@csr.com>
