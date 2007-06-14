@@ -15,8 +15,9 @@ user@host text, date text, and current working directory respectively.
 The default colors are yellow, yellow, red, white, white, and yellow.
 This theme works best with a dark background.
 
-Recommended fonts for this theme: nexus or vga or similar.  If you
-don't have any of these, the 8-bit characters will probably look stupid.
+Recommended fonts for this theme: either UTF-8, or nexus or vga or similar.
+If you don't have any of these, the 8-bit characters will probably look
+stupid.
 EOH
 }
 
@@ -28,9 +29,9 @@ prompt_fire_setup () {
   local date=${5:-'white'}
   local cwd=${6:-'yellow'}
 
-  for code in 333 262 261 260; do
-    local char_$code=$(echo -n "\\0$code")
-  done
+  local char_333 char_262 char_261 char_260
+  autoload -U prompt_special_chars
+  prompt_special_chars
 
   local GRAD1="%{$char_333$char_262$char_261$char_260%}"
   local GRAD2="%{$char_260$char_261$char_262$char_333%}"

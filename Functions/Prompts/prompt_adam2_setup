@@ -10,8 +10,8 @@ where the colors are for the hyphens, current directory, user@host,
 and user input bits respectively.  The default colors are cyan, green,
 cyan, and white.  This theme works best with a dark background.
 
-If you have the `nexus' or `vga' console fonts or similar, you
-can specify the `8bit' option to use 8-bit replacements for the
+If you have either UTF-8 or the `nexus' or `vga' console fonts or similar,
+you can specify the `8bit' option to use 8-bit replacements for the
 7-bit characters.
 
 And you probably thought adam1 was overkill ...
@@ -24,10 +24,17 @@ prompt_adam2_setup () {
 
   if [[ $1 == '8bit' ]]; then
     shift
-    prompt_gfx_tlc=$'\xda'
-    prompt_gfx_mlc=$'\xc3'
-    prompt_gfx_blc=$'\xc0'
-    prompt_gfx_hyphen=$'\xc4'
+    if [[ ${LC_ALL:-${LC_CTYPE:-$LANG}} = *UTF-8* ]]; then
+      prompt_gfx_tlc=$'\xe2\x94\x8c'
+      prompt_gfx_mlc=$'\xe2\x94\x9c'
+      prompt_gfx_blc=$'\xe2\x94\x94'
+      prompt_gfx_hyphen=$'\xe2\x94\x80'
+    else
+      prompt_gfx_tlc=$'\xda'
+      prompt_gfx_mlc=$'\xc3'
+      prompt_gfx_blc=$'\xc0'
+      prompt_gfx_hyphen=$'\xc4'
+    fi
   else
     prompt_gfx_tlc='.'
     prompt_gfx_mlc='|'

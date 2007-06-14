@@ -11,8 +11,9 @@ This prompt is color-scheme-able.  You can invoke it thus:
 The default colors are both cyan.  This theme works best with a dark
 background.
 
-Recommended fonts for this theme: nexus or vga or similar.  If you
-don't have any of these, the 8-bit characters will probably look stupid.
+Recommended fonts for this theme: either UTF-8, or nexus or vga or similar.
+If you don't have any of these, the 8-bit characters will probably look
+stupid.
 EOH
 }
 
@@ -20,9 +21,9 @@ prompt_elite2_setup () {
   local text_col=${1:-'cyan'}
   local parens_col=${2:-$text_col}
 
-  for code in 332 304 300; do
-    local char_$code=$(echo -n "\\0$code")
-  done
+  local char_333 char_262 char_261 char_260
+  autoload -U prompt_special_chars
+  prompt_special_chars
 
   local text="%{$fg_no_bold[$text_col]%}"
   local parens="%{$fg_bold[$parens_col]%}"

@@ -1,0 +1,18 @@
+# Utility function to set up some special characters
+# used by prompts.
+#
+# These used to be defined to characters found in particular
+# character sets (e.g. IBM852) which now aren't widely used.
+# We still provide them in that form if the current character
+# set isn't UTF-8.  We could in principle use iconv if available.
+
+if [[ ${LC_ALL:-${LC_CTYPE:-$LANG}} = *UTF-8* ]]; then
+  char_333=$'\xe2\x96\x88'
+  char_262=$'\xe2\x96\x93'
+  char_261=$'\xe2\x96\x92'
+  char_260=$'\xe2\x96\x91'
+else
+  for code in 333 262 261 260; do
+    char_$code=$(echo -n "\\0$code")
+  done
+fi

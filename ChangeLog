@@ -1,3 +1,10 @@
+2007-06-14  Peter Stephenson  <pws@csr.com>
+
+	* users/11568: Functions/Prompts/.distfiles,
+	Functions/Prompts/prompt_{adam2,bigfade,elite2,elite,fade,fire}_setup,
+	Functions/Prompts/prompt_special_chars: allow UTF-8 versions
+	of certain visually striking but uninformative characters.
+
 2007-06-14  Clint Adams  <clint@zsh.org>
 
 	* 23561: Completion/Unix/Command/_git: merge in relevant changes
