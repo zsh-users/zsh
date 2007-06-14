@@ -1,3 +1,9 @@
+2007-06-14  Peter Stephenson  <pws@csr.com>
+
+	* 23560: Doc/Zsh/mod_sched.yo, Src/Builtins/sched.c: improved
+	version of 23554 making $zsh_scheduled_events more useful
+	for programming.
+
 2007-06-12  Clint Adams  <clint@zsh.org>
 
 	* 23556: Completion/Unix/Command/_rrdtool: completion

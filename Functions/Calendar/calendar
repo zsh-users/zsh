@@ -352,13 +352,8 @@ fi
   if [[ -n $sched ]]; then
     if [[ $next -ge 0 ]]; then
       # Remove any existing calendar scheduling.
-      # Luckily sched doesn't delete its schedule in a subshell.
-      sched | while read line; do
-	if [[ $line = (#b)[[:space:]]#(<->)[[:space:]]##*[[:space:]]'calendar -s'* ]]; then
-	  # End of pipeline run in current shell, so delete directly.
-	  sched -1 $match[1]
-	fi
-      done
+      i=${"${(@)zsh_scheduled_events#*:*:}"[(I)calendar -s*]}
+      (( i )) && sched -$i
       $sched $next calendar "${calopts[@]}" $next $next
     else
       $showprog $start $stop \

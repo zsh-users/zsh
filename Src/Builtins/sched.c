@@ -145,40 +145,6 @@ checksched(void)
     }
 }
 
-/*
- * Format event sch.  If sn is zero, allocate string on the heap
- * and return it; if non-zero, print with that as scheduled event
- * number.
- */
-
-static
-char *schedtext(struct schedcmd *sch, int sn)
-{
-    char *str, tbuf[40], *flagstr, *endstr;
-    time_t t;
-    struct tm *tmp;
-
-    t = sch->time;
-    tmp = localtime(&t);
-    ztrftime(tbuf, 20, "%a %b %e %k:%M;%S", tmp);
-    if (sch->flags & SCHEDFLAG_TRASH_ZLE)
-	flagstr = "-o ";
-    else
-	flagstr = "";
-    if (*sch->cmd == '-')
-	endstr = "-- ";
-    else
-	endstr = "";
-    if (sn) {
-	printf("%3d %s %s%s%s\n", sn, tbuf, flagstr, endstr, sch->cmd);
-	return NULL;
-    } else {
-	str = (char *)zhalloc(48 + strlen(sch->cmd));
-	sprintf(str, "%s %s%s%s", tbuf, flagstr, endstr, sch->cmd);
-	return str;
-    }
-}
-
 /**/
 static int
 bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
@@ -238,8 +204,24 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 
     /* given no arguments, display the schedule list */
     if (!*argptr) {
-	for (sn = 1, sch = schedcmds; sch; sch = sch->next, sn++)
-	    (void)schedtext(sch, 1);
+	for (sn = 1, sch = schedcmds; sch; sch = sch->next, sn++) {
+	    char tbuf[40], *flagstr, *endstr;
+	    time_t t;
+	    struct tm *tmp;
+
+	    t = sch->time;
+	    tmp = localtime(&t);
+	    ztrftime(tbuf, 20, "%a %b %e %k:%M:%S", tmp);
+	    if (sch->flags & SCHEDFLAG_TRASH_ZLE)
+		flagstr = "-o ";
+	    else
+		flagstr = "";
+	    if (*sch->cmd == '-')
+		endstr = "-- ";
+	    else
+		endstr = "";
+	    printf("%3d %s %s%s%s\n", sn, tbuf, flagstr, endstr, sch->cmd);
+	}
 	return 0;
     } else if (!argptr[1]) {
 	/* other than the two cases above, sched *
@@ -365,8 +347,19 @@ schedgetfn(UNUSED(Param pm))
 	;
 
     aptr = ret = zhalloc(sizeof(char **) * (i+1));
-    for (sch = schedcmds; sch; sch = sch->next, aptr++)
-	*aptr = schedtext(sch, 0);
+    for (sch = schedcmds; sch; sch = sch->next, aptr++) {
+	char tbuf[40], *flagstr;
+	time_t t;
+
+	t = sch->time;
+	sprintf(tbuf, "%ld", t);
+	if (sch->flags & SCHEDFLAG_TRASH_ZLE)
+	    flagstr = "-o";
+	else
+	    flagstr = "";
+	*aptr = (char *)zhalloc(5 + strlen(tbuf) + strlen(sch->cmd));
+	sprintf(*aptr, "%s:%s:%s", tbuf, flagstr, sch->cmd);
+    }
     *aptr = NULL;
 
     return ret;

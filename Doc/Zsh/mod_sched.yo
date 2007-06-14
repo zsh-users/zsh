@@ -48,9 +48,13 @@ item(zsh_scheduled_events)(
 A readonly array corresponding to the events scheduled by the
 tt(sched) builtin.  The indices of the array correspond to the numbers
 shown when tt(sched) is run with no arguments (provided that the
-tt(KSH_ARRAYS) option is not set).  The value of the
-corresponding element is the same as the text shown to the right
-of the index in the tt(sched) listing.
+tt(KSH_ARRAYS) option is not set).  The value of the array
+consists of the scheduled time in seconds since the epoch
+(see ifnzman(The zsh/datetime Module)\
+ifzman(the section `The zsh/datetime Module') for facilities for
+using this number), followed by a colon, followed by any options
+(which may be empty but will be preceeded by a `tt(-)' otherwise),
+followed by a colon, followed by the command to be executed.
 
 The tt(sched) builtin should be used for manipulating the events.  Note
 that this will have an immediate effect on the contents of the array,
