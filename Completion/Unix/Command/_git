@@ -624,10 +624,31 @@ _git-upload-pack () {
 }
 
 _git-add () {
-  _arguments \
+  local curcontext=$curcontext state line
+  declare -A opt_args
+
+  _arguments -C -S \
     '-n[do not actually add files; only show which ones would be added]' \
     '-v[show files as they are added]' \
-    '*:file:_files -g "*(^e:__git_is_indexed:)"' && ret=0
+    '-f[allow adding otherwise ignored files]' \
+    '(-i --interactive)'{-i,--interactive}'[add contents interactively to the index]' \
+    '*:file:->files' && ret=0
+
+  case $state in
+    (files)
+      declare -a ignored_files_alternatives
+      if (( words[(I)-f] )); then
+        ignored_files_alternatives=(
+          'ignored-modified-files:ignored modified files:__git_modified_files --ignored'
+          'ignored-other-files:ignored other files:__git_other_files --ignored')
+      fi
+
+      _alternative \
+        'modified-files:modified files:__git_modified_files' \
+        'other-files:other files:__git_other_files' \
+        $ignored_files_alternatives && ret=0
+      ;;
+  esac
 }
 
 _git-am () {
@@ -1138,6 +1159,14 @@ __git_guard () {
   [[ -n "$PREFIX$SUFFIX" ]]
 }
 
+__git_command_successful () {
+  if (( ${#pipestatus:#0} > 0 )); then
+    _message 'not a git repository'
+    return 1
+  fi
+  return 0
+}
+
 __git_objects () {
   __git_guard $* "[[:xdigit:]]#" "object"
 }
@@ -1159,14 +1188,28 @@ __git_stages () {
 }
 
 __git_files () {
-  local expl files
+  local expl files ls_opts opts gitdir
 
-  files=("${(@f)$(git-ls-files 2>/dev/null)}")
-  if (( $? == 0 )); then
-    _wanted files expl 'index file' _multi_parts $@ - / files
-  else
-    _message 'not a git repository'
-  fi
+  zparseopts -D -E -a opts -- -cached -deleted -modified -others -ignored -unmerged -killed
+
+  gitdir=$(_call_program gitdir git rev-parse --git-dir 2>/dev/null)
+  __git_command_successful || return
+
+  ls_opts=("--exclude-per-directory=.gitignore")
+  [[ -f "$gitdir/info/exclude" ]] && ls_opts+="--exclude-from=$gitdir/info/exclude"
+
+  files=(${(ps:\0:)"$(_call_program files git ls-files -z $ls_opts $opts 2>/dev/null)"})
+  __git_command_successful || return
+
+  _wanted files expl 'index file' _multi_parts $@ - / files
+}
+
+__git_modified_files () {
+  __git_files $* --modified
+}
+
+__git_other_files () {
+  __git_files $* --others
 }
 
 __git_tree_files () {

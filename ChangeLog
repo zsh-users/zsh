@@ -1,3 +1,9 @@
+2007-06-14  Clint Adams  <clint@zsh.org>
+
+	* 23561: Completion/Unix/Command/_git: merge in relevant changes
+	from Nikolai Weibull's repo to more appropriately complete after
+	'git add'.
+
 2007-06-14  Peter Stephenson  <pws@csr.com>
 
 	* 23560: Doc/Zsh/mod_sched.yo, Src/Builtins/sched.c: improved
