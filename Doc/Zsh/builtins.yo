@@ -708,7 +708,8 @@ See
 ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
 ifnzman(noderef(Arithmetic Evaluation))
 for a description of arithmetic expressions.  The exit status is 0 if the
-value of the last expression is nonzero, and 1 otherwise.
+value of the last expression is nonzero, 1 if it is zero, and 2 if
+an error occurred.
 )
 findex(limit)
 cindex(resource limits)
