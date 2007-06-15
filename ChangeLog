@@ -1,7 +1,7 @@
 2007-06-15  Peter Stephenson  <pws@csr.com>
 
 	* 23553: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo, Src/exec.c,
-	Src/math.c: should have been committed but wasn't.
+	Src/math.c: should have been committed but weren't.
 
 2007-06-14  Peter Stephenson  <pws@csr.com>
 

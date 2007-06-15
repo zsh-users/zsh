@@ -3662,7 +3662,10 @@ execarith(Estate state, UNUSED(int do_exec))
 	fprintf(xtrerr, " ))\n");
 	fflush(xtrerr);
     }
-    errflag = 0;
+    if (errflag) {
+	errflag = 0;
+	return 2;
+    }
     /* should test for fabs(val.u.d) < epsilon? */
     return (val.type == MN_INTEGER) ? val.u.l == 0 : val.u.d == 0.0;
 }
