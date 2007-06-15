@@ -1,6 +1,6 @@
 2007-06-15  Peter Stephenson  <pws@csr.com>
 
-	* 23553: Doc/Zsh/builtins.yo: was missed out.
+	* 23553: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo: was missed out.
 
 2007-06-14  Peter Stephenson  <pws@csr.com>
 
