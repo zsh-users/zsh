@@ -1061,8 +1061,19 @@ mathevall(char *s, int prek, char **ep)
 	  "BUG: math: wallabies roaming too freely in outback");
 
     if (errflag) {
+	/*
+	 * This used to set the return value to errflag.
+	 * I don't understand how that could be useful; the
+	 * caller doesn't know that's what's happened and
+	 * may not get a value at all.
+	 * Worse, we reset errflag in execarith() and setting
+	 * this explicitly non-zero means a (( ... )) returns
+	 * status 0 if there's an error.  That surely can't
+	 * be right.  execarith() now detects an error and returns
+	 * status 2.
+	 */
 	ret.type = MN_INTEGER;
-	ret.u.l = errflag;
+	ret.u.l = 0;
     } else {
 	if (stack[0].val.type == MN_UNSET)
 	    ret = getnparam(stack[0].lval);
