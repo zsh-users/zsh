@@ -1,5 +1,8 @@
 2007-06-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Test/D07multibyte.ztst: stop test files from
+	cluttering up directory.
+
 	* users/11575: Doc/Zsh/compsys.yo: document use of
 	additional completers and insert style with _all_matches
 

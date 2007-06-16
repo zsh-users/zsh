@@ -17,6 +17,7 @@
     ZTST_unimplemented="no UTF-8 locale or multibyte mode is not implemented"
   else
     print -u $ZTST_fd Testing multibyte with locale $LANG
+    mkdir multibyte.tmp && cd multibyte.tmp
   fi
 
 %test
