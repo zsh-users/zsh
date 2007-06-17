@@ -995,7 +995,7 @@ init_misc(void)
 /* source a file */
 
 /**/
-int
+mod_export int
 source(char *s)
 {
     Eprog prog;
