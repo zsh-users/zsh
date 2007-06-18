@@ -1,5 +1,8 @@
 2007-06-18  Peter Stephenson  <pws@csr.com>
 
+	* unposted (should be in 23562): Test/C01arith.ztst: stupidity
+	strikes again
+
 	* 23562: README, Doc/Zsh/options.yo, Doc/Zsh/params.yo,
 	Src/exec.c, Src/glob.c, Src/options.c, Src/params.c, Src/subst.c,
 	Src/zsh.h, Src/Modules/mapfile.c, Src/Modules/parameter.c,

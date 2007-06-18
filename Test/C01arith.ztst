@@ -93,7 +93,7 @@
 
   (( newarray[unsetvar] = 1 ))
 2:error using unset variable as index
-?(eval):1:  assignment to invalid subscript range
+?(eval):1: newarray: assignment to invalid subscript range
 
   integer setvar=1
   (( newarray[setvar]++ ))
