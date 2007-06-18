@@ -346,15 +346,6 @@ process.  This may be used instead of the tt(<)
 form for a program that expects to lseek (see manref(lseek)(2))
 on the input file.
 
-There is an optimisation for substitutions of the form
-tt(=LPAR()<<<)var(arg)tt(RPAR()), where var(arg) is a single-word argument
-to the here-string redirection tt(<<<).  This form produces a file name
-containing the value of var(arg) after any substitutions have been
-performed.  This is handled entirely within the current shell.  This is
-effectively the reverse of the special form tt($LPAR()<)var(arg)tt(RPAR())
-which treats var(arg) as a file name and replaces it with the file's
-contents.
-
 The tt(=) form is useful as both the tt(/dev/fd) and the named pipe
 implementation of tt(<LPAR())var(...)tt(RPAR()) have drawbacks.  In 
 the former case, some programmes may automatically close the file
