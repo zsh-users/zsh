@@ -96,6 +96,14 @@ Subscripts may be used inside braces used to delimit a parameter name, thus
 option is set, the braced form is the only one that works, as bracketed
 expressions otherwise are not treated as subscripts.
 
+If the tt(KSH_ARRAYS) option is not set, then by default accesses to
+an array element with a subscript that evaluates to zero return an
+empty string, while an attempt to write such an element is treated as
+an error.  For backward compatibility the tt(KSH_ZERO_SUBSCRIPT)
+option can be set to cause subscript values 0 and 1 to be equivalent; see
+the description of the option in ifzman(zmanref(zshoptions))\
+ifnzman(noderef(Description of Options)).
+
 The same subscripting syntax is used for associative arrays, except that
 no arithmetic expansion is applied to var(exp).  However, the parsing
 rules for arithmetic expressions still apply, which affects the way that
@@ -233,26 +241,22 @@ print ${array[(R)$key2]})
 item(tt(R))(
 Like `tt(r)', but gives the last match.  For associative arrays, gives
 all possible matches. May be used for assigning to ordinary array
-elements, but not for assigning to associative arrays.
-On failure the empty string is returned.
+elements, but not for assigning to associative arrays.  On failure, for
+normal arrays this has the effect of returning the element corresponding to
+subscript 0; this is empty unless one of the options tt(KSH_ARRAYS) or
+tt(KSH_ZERO_SUBSCRIPT) is in effect.
 )
 item(tt(i))(
 Like `tt(r)', but gives the index of the match instead; this may not be
 combined with a second argument.  On the left side of an assignment,
 behaves like `tt(r)'.  For associative arrays, the key part of each pair
 is compared to the pattern, and the first matching key found is the
-result.
-
-On failure, a value one past the end of the array or string is returned.
+result.  On failure substitutes one more than the last currently
+valid index, as discussed under the description of `tt(r)'.
 )
 item(tt(I))(
 Like `tt(i)', but gives the index of the last match, or all possible
-matching keys in an associative array.
-
-On failure the value 0 is returned.  If the option tt(KSH_ARRAYS) is in
-effect, the subscript is still 0 for a failed match; this cannot be
-distinguished from a successful match without testing tt(${array[0]})
-against the pattern.
+matching keys in an associative array.  On failure substitutes 0.
 )
 item(tt(k))(
 If used in a subscript on an associative array, this flag causes the keys

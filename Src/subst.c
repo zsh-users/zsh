@@ -2008,7 +2008,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    v->isarr = isarr;
 	    v->pm = pm;
 	    v->end = -1;
-	    if (getindex(&s, v, qt) || s == os)
+	    if (getindex(&s, v, qt ? SCANPM_DQUOTED : 0) || s == os)
 		break;
 	}
 	/*
@@ -2025,8 +2025,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	 * in the subexp stuff or immediately above.
 	 */
 	if ((isarr = v->isarr)) {
-	    /* No way to get here with v->inv != 0, so getvaluearr() *
-	     * is called by getarrvalue(); needn't test PM_HASHED.   */
+	    /*
+	     * No way to get here with v->flags & VALFLAG_INV, so
+	     * getvaluearr() is called by getarrvalue(); needn't test
+	     * PM_HASHED.
+	     */
 	    if (v->isarr == SCANPM_WANTINDEX) {
 		isarr = v->isarr = 0;
 		val = dupstring(v->pm->node.nam);
@@ -2048,8 +2051,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		int tmplen = arrlen(v->pm->gsu.a->getfn(v->pm));
 
 		if (v->start < 0)
-		    v->start += tmplen + v->inv;
-		if (!v->inv && (v->start >= tmplen || v->start < 0))
+		    v->start += tmplen + ((v->flags & VALFLAG_INV) ? 1 : 0);
+		if (!(v->flags & VALFLAG_INV) &&
+		    (v->start >= tmplen || v->start < 0))
 		    vunset = 1;
 	    }
 	    if (!vunset) {

@@ -585,10 +585,15 @@ struct asgment {
 struct value {
     int isarr;
     Param pm;		/* parameter node                      */
-    int inv;		/* should we return the index ?        */
+    int flags;		/* flags defined below                 */
     int start;		/* first element of array slice, or -1 */
     int end;		/* 1-rel last element of array slice, or -1 */
     char **arr;		/* cache for hash turned into array */
+};
+
+enum {
+    VALFLAG_INV =	0x0001,	/* We are performing inverse subscripting */
+    VALFLAG_EMPTY =	0x0002	/* Subscripted range is empty */
 };
 
 #define MAX_ARRLEN    262144
@@ -1725,6 +1730,7 @@ enum {
     KSHGLOB,
     KSHOPTIONPRINT,
     KSHTYPESET,
+    KSHZEROSUBSCRIPT,
     LISTAMBIGUOUS,
     LISTBEEP,
     LISTPACKED,

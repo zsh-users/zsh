@@ -91,8 +91,13 @@
 >3.5
 >4
 
-  (( newarray[unsetvar]++ ))
-  (( newarray[unsetvar]++ ))
+  (( newarray[unsetvar] = 1 ))
+2:error using unset variable as index
+?(eval):1:  assignment to invalid subscript range
+
+  integer setvar=1
+  (( newarray[setvar]++ ))
+  (( newarray[setvar]++ ))
   print ${(t)newarray} ${#newarray} ${newarray[1]}
 0:setting array elements in math context
 >array 1 2

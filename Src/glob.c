@@ -1470,7 +1470,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    v.isarr = SCANPM_WANTVALS;
 		    v.pm = NULL;
 		    v.end = -1;
-		    v.inv = 0;
+		    v.flags = 0;
 		    if (getindex(&s, &v, 0) || s == os) {
 			zerr("invalid subscript");
 			restore_globstate(saved);

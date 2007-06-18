@@ -182,3 +182,56 @@
   echo X${${l##*}[-1]}X
 0:Negative index applied to substition result from empty array
 >XX
+
+  array=(one two three four)
+  print X$array[0]X
+0:Element zero is empty if KSH_ZERO_SUBSCRIPT is off.
+>XX
+
+  array[0]=fumble
+1:Can't set element zero if KSH_ZERO_SUBSCRIPT is off.
+?(eval):1: array: assignment to invalid subscript range
+
+  print X$array[(R)notfound]X
+0:(R) returns empty if not found if KSH_ZERO_SUBSCRIPT is off.
+>XX
+
+  setopt KSH_ZERO_SUBSCRIPT
+  print X$array[0]X
+0:Element zero is element one if KSH_ZERO_SUBSCRIPT is on.
+>XoneX
+
+  array[0]=fimble
+  print $array
+0:Can set element zero if KSH_ZERO_SUBSCRIPT is on.
+>fimble two three four
+
+  print X$array[(R)notfound]X
+0:(R) yuckily returns the first element on failure withe KSH_ZERO_SUBSCRIPT
+>XfimbleX
+
+  unsetopt KSH_ZERO_SUBSCRIPT
+  array[(R)notfound,(r)notfound]=(help help here come the seventies retreads)
+  print $array
+0:[(R)notfound,(r)notfound] replaces the whole array
+>help help here come the seventies retreads
+
+  string="Why, if it isn't Officer Dibble"
+  print "[${string[0]}][${string[1]}][${string[0,3]}]"
+0:String subscripts with KSH_ZERO_SUBSCRIPT unset
+>[][W][Why]
+
+  setopt KSH_ZERO_SUBSCRIPT
+  print "[${string[0]}][${string[1]}][${string[0,3]}]"
+0:String subscripts with KSH_ZERO_SUBSCRIPT set
+>[W][W][Why]
+
+  unsetopt KSH_ZERO_SUBSCRIPT
+  string[0,3]="Goodness"
+  print $string
+0:Assignment to chunk of string ignores element 0
+>Goodness, if it isn't Officer Dibble
+
+  string[0]=!
+1:Can't set only element zero of string
+?(eval):1: string: assignment to invalid subscript range

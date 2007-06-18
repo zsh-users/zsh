@@ -45,6 +45,31 @@ behaviour.)  Now it is treated identically to "$@".  The same change
 applies to expressions with forced splitting such as ${=1+"$@"}, but
 otherwise the case where SH_WORD_SPLIT is not set is unaffected.
 
+In previous versions of the shell it was possible to use index 0 in an
+array or string subscript to refer to the same element as index 1 if the
+option KSH_ARRAYS was not in effect.  This was a limited approximation to
+the full KSH_ARRAYS handling and so was not very useful.  In this version
+of the shell, this behaviour is only provided when the option
+KSH_ZERO_SUBSCRIPT is set.  Note that despite the name this does not provide
+true compatibility with ksh or other shells and KSH_ARRAYS should still be
+used for that purpose.  By default, the option is not set; an array
+subscript that evaluates to 0 returns an empty string or array element and
+attempts to write to an array or string range including only a zero
+subscript are treated as an error.  Writes to otherwise valid ranges that
+also include index zero are allowed; hence for example the assignment
+  array[(R)notfound,(r)notfound]=()
+(where the string "notfound" does not match an element in $array) sets the
+entire array to be empty, as in previous versions of the shell.
+KSH_ZERO_SUBSCRIPT is irrelevant when KSH_ARRAYS is set.  Also as in previous
+versions, attempts to write to non-existent elements at the end of an array
+cause the array to be suitably extended.  This difference means that, for
+example
+  array[(R)notfound]=(replacement)
+is an error if KSH_ZERO_SUBSCRIPT is not set (new behaviour), while
+  array[(r)notfound]=(replacement)
+causes the given value to be appended to the array (same behaviour as
+previous versions).
+
 The "exec" precommand modifier now takes various options for compatibility
 with other shells.  This means that whereas "exec -prog" previously
 tried to execute a command name "-prog", it will now report an error
@@ -76,10 +101,6 @@ this syntax would have matched against "%search", anchored only at the head
 of the value.  The form ${param//#$search/replace} where the value
 $search starts with "%" considers the "%" to be part of the search
 string as before.
-
-Parameter subscripts of the form ${array[(R)test]} now return the
-empty string if they fail to match.  The previous longstanding behaviour
-was confusing and useless.
 
 The MULTIBYTE option is on by default where it is available; this
 causes many operations to recognise characters as in the current locale.

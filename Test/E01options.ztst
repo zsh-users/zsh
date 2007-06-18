@@ -521,7 +521,7 @@
 >one one[2]
 >one two three
 >one two three two
->one one two three
+>one two three
 
   fpath=(.)
   echo >foo 'echo foo loaded; foo() { echo foo run; }'

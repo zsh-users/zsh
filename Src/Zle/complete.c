@@ -1139,7 +1139,7 @@ set_compstate(UNUSED(Param pm), HashTable ht)
 	    for (cp = compkparams,
 		 pp = compkpms; cp->name; cp++, pp++)
 		if (!strcmp(hn->nam, cp->name)) {
-		    v.isarr = v.inv = v.start = 0;
+		    v.isarr = v.flags = v.start = 0;
 		    v.end = -1;
 		    v.arr = NULL;
 		    v.pm = (Param) hn;

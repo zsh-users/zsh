@@ -1244,6 +1244,31 @@ tt(readonly), are processed.  Without this option, zsh will perform normal
 word splitting after command and parameter expansion in arguments of an
 assignment; with it, word splitting does not take place in those cases.
 )
+pindex(KSH_ZERO_SUBSCRIPT)
+cindex(arrays, behaviour of index zero)
+item(tt(KSH_ZERO_SUBSCRIPT))(
+Treat use of a subscript of value zero in array or string expressions as a
+reference to the first element, i.e. the element that usually has the
+subscript 1.  Ignored if tt(KSH_ARRAYS) is also set.
+
+If neither this option nor tt(KSH_ARRAYS) is set, accesses to an element of
+an array or string with subscript zero return an empty element or string,
+while attempts to set element zero of an array or string are treated as an
+error.  However, attempts to set an otherwise valid subscript range that
+includes zero will succeed.  For example, if tt(KSH_ZERO_SUBSCRIPT) is not
+set,
+
+example(array[0]=(element))
+
+is an error, while
+
+example(array[0,1]=(element))
+
+is not and will replace the first element of the array.
+
+This option is for compatibility with older versions of the shell and
+is not recommended in new code.
+)
 pindex(POSIX_BUILTINS)
 item(tt(POSIX_BUILTINS) <K> <S>)(
 When this option is set the tt(command) builtin can be used to execute

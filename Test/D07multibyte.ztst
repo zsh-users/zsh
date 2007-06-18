@@ -88,7 +88,7 @@
   s=é
   print A${s[-2]}A B${s[-1]}B C${s[0]}C D${s[1]}D E${s[2]}E
 0:Out of range subscripts with multibyte characters
->AA BéB CéC DéD EE
+>AA BéB CC DéD EE
 
   print ${a[(i)é]} ${a[(I)é]} ${a[${a[(i)é]},${a[(I)é]}]}
 0:Reverse indexing with multibyte characters

@@ -149,7 +149,7 @@ setpmmapfiles(Param pm, HashTable ht)
 	    for (hn = ht->nodes[i]; hn; hn = hn->next) {
 		struct value v;
 
-		v.isarr = v.inv = v.start = 0;
+		v.isarr = v.flags = v.start = 0;
 		v.end = -1;
 		v.arr = NULL;
 		v.pm = (Param) hn;

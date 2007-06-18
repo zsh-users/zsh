@@ -1,3 +1,17 @@
+2007-06-18  Peter Stephenson  <pws@csr.com>
+
+	* 23562: README, Doc/Zsh/options.yo, Doc/Zsh/params.yo,
+	Src/exec.c, Src/glob.c, Src/options.c, Src/params.c, Src/subst.c,
+	Src/zsh.h, Src/Modules/mapfile.c, Src/Modules/parameter.c,
+	Src/Zle/complete.c, Test/C01arith.ztst, Test/D05array.ztst,
+	Test/D06subscript.ztst, Test/D07multibyte.ztst,
+	Test/E01options.ztst: add KSH_ZERO_SUBSCRIPT option to handle
+	the currently default behaviour that $array[0] or $string[0]
+	is mapped to $array[1] or $string[1] if KSH_ARRAYS is not
+	in effect.  Now off by default; returns empty element or
+	causes error if used for setting.  Valid ranges that happen
+	to include zero are not affected.
+
 2007-06-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Test/D07multibyte.ztst: stop test files from

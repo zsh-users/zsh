@@ -180,7 +180,7 @@ setpmcommands(UNUSED(Param pm), HashTable ht)
 	    Cmdnam cn = zshcalloc(sizeof(*cn));
 	    struct value v;
 
-	    v.isarr = v.inv = v.start = 0;
+	    v.isarr = v.flags = v.start = 0;
 	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
@@ -341,7 +341,7 @@ setfunctions(UNUSED(Param pm), HashTable ht, int dis)
 	for (hn = ht->nodes[i]; hn; hn = hn->next) {
 	    struct value v;
 
-	    v.isarr = v.inv = v.start = 0;
+	    v.isarr = v.flags = v.start = 0;
 	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
@@ -701,7 +701,7 @@ setpmoptions(UNUSED(Param pm), HashTable ht)
 	    struct value v;
 	    char *val;
 
-	    v.isarr = v.inv = v.start = 0;
+	    v.isarr = v.flags = v.start = 0;
 	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
@@ -1325,7 +1325,7 @@ setpmnameddirs(UNUSED(Param pm), HashTable ht)
 	    struct value v;
 	    char *val;
 
-	    v.isarr = v.inv = v.start = 0;
+	    v.isarr = v.flags = v.start = 0;
 	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
@@ -1554,7 +1554,7 @@ setaliases(HashTable alht, UNUSED(Param pm), HashTable ht, int flags)
 	    struct value v;
 	    char *val;
 
-	    v.isarr = v.inv = v.start = 0;
+	    v.isarr = v.flags = v.start = 0;
 	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;

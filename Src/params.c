@@ -520,7 +520,7 @@ scanparamvals(HashNode hn, int flags)
 	    return;
     }
     v.isarr = (PM_TYPE(v.pm->node.flags) & (PM_ARRAY|PM_HASHED));
-    v.inv = 0;
+    v.flags = 0;
     v.start = 0;
     v.end = -1;
     paramvals[numparamvals] = getstrvalue(&v);
@@ -1298,7 +1298,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		    (*ta || ((v->isarr & SCANPM_MATCHMANY) &&
 			     (v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
 					  SCANPM_KEYMATCH))))) {
-		    *inv = v->inv;
+		    *inv = (v->flags & VALFLAG_INV) ? 1 : 0;
 		    *w = v->end;
 		    return 1;
 		}
@@ -1317,19 +1317,6 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 			if (pprog && pattry(pprog, *p) && !--num)
 			    return r;
 		    }
-		    /*
-		     * Failed to match.
-		     * If we're returning an index, return 0 to show
-		     * we've gone off the start.  Unfortunately this
-		     * is ambiguous with KSH_ARRAYS set, but we're
-		     * stuck with that now.
-		     *
-		     * If the index is to be turned into an element,
-		     * return an index that does not point to a valid
-		     * element (since 0 is treated the same as 1).
-		     */
-		    if (!ind)
-			r = len + 1;
 		} else
 		    for (r = 1 + beg, p = ta + beg; *p; r++, p++)
 			if (pprog && pattry(pprog, *p) && !--num)
@@ -1549,13 +1536,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		    }
 		}
 	    }
-	    /*
-	     * Failed to match.
-	     * If the argument selects an element rather than
-	     * its index, ensure the element is empty.
-	     * See comments on the array case above.
-	     */
-	    return (down && ind) ? 0 : slen + 1;
+	    return down ? 0 : slen + 1;
 	}
     }
     return r;
@@ -1563,13 +1544,14 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 
 /**/
 int
-getindex(char **pptr, Value v, int dq)
+getindex(char **pptr, Value v, int flags)
 {
     int start, end, inv = 0;
     char *s = *pptr, *tbrack;
 
     *s++ = '[';
-    s = parse_subscript(s, dq);	/* Error handled after untokenizing */
+    /* Error handled after untokenizing */
+    s = parse_subscript(s, flags & SCANPM_DQUOTED);
     /* Now we untokenize everything except inull() markers so we can check *
      * for the '*' and '@' special subscripts.  The inull()s are removed  *
      * in getarg() after we know whether we're doing reverse indexing.    */
@@ -1654,7 +1636,7 @@ getindex(char **pptr, Value v, int dq)
 	    if (start > 0 && (isset(KSHARRAYS) || (v->pm->node.flags & PM_HASHED)))
 		start--;
 	    if (v->isarr != SCANPM_WANTINDEX) {
-		v->inv = 1;
+		v->flags |= VALFLAG_INV;
 		v->isarr = 0;
 		v->start = start;
 		v->end = start + 1;
@@ -1686,7 +1668,32 @@ getindex(char **pptr, Value v, int dq)
 	    if (start > 0)
 		start -= startprevlen;
 	    else if (start == 0 && end == 0)
-		end = startnextlen;
+	    {
+		/*
+		 * Strictly, this range is entirely off the
+		 * start of the available index range.
+		 * This can't happen with KSH_ARRAYS; we already
+		 * altered the start index in getarg().
+		 * Are we being strict?
+		 */
+		if (isset(KSHZEROSUBSCRIPT)) {
+		    /*
+		     * We're not.
+		     * Treat this as accessing the first element of the
+		     * array.
+		     */
+		    end = startnextlen;
+		} else {
+		    /*
+		     * We are.  Flag that this range is invalid
+		     * for setting elements.  Set the indexes
+		     * to a range that returns empty for other accesses.
+		     */
+		    v->flags |= VALFLAG_EMPTY;
+		    start = -1;
+		    com = 1;
+		}
+	    }
 	    if (s == tbrack) {
 		s++;
 		if (v->isarr && !com &&
@@ -1755,7 +1762,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	else
 	    v = (Value) hcalloc(sizeof *v);
 	v->pm = argvparam;
-	v->inv = 0;
+	v->flags = 0;
 	v->start = ppar - 1;
 	v->end = ppar;
 	if (sav)
@@ -1786,11 +1793,11 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		v->isarr = SCANPM_MATCHMANY;
 	}
 	v->pm = pm;
-	v->inv = 0;
+	v->flags = 0;
 	v->start = 0;
 	v->end = -1;
 	if (bracks > 0 && (*s == '[' || *s == Inbrack)) {
-	    if (getindex(&s, v, (flags & SCANPM_DQUOTED))) {
+	    if (getindex(&s, v, flags)) {
 		*pptr = s;
 		return v;
 	    }
@@ -1830,7 +1837,7 @@ getstrvalue(Value v)
     if (!v)
 	return hcalloc(1);
 
-    if (v->inv && !(v->pm->node.flags & PM_HASHED)) {
+    if ((v->flags & VALFLAG_INV) && !(v->pm->node.flags & PM_HASHED)) {
 	sprintf(buf, "%d", v->start);
 	s = dupstring(buf);
 	return s;
@@ -1911,7 +1918,7 @@ getarrvalue(Value v)
 	return arrdup(nular);
     else if (IS_UNSET_VALUE(v))
 	return arrdup(&nular[1]);
-    if (v->inv) {
+    if (v->flags & VALFLAG_INV) {
 	char buf[DIGBUFSIZE];
 
 	s = arrdup(nular);
@@ -1943,7 +1950,7 @@ getintvalue(Value v)
 {
     if (!v)
 	return 0;
-    if (v->inv)
+    if (v->flags & VALFLAG_INV)
 	return v->start;
     if (v->isarr) {
 	char **arr = getarrvalue(v);
@@ -1970,7 +1977,7 @@ getnumvalue(Value v)
 
     if (!v) {
 	mn.u.l = 0;
-    } else if (v->inv) {
+    } else if (v->flags & VALFLAG_INV) {
 	mn.u.l = v->start;
     } else if (v->isarr) {
 	char **arr = getarrvalue(v);
@@ -2000,7 +2007,7 @@ export_param(Param pm)
 	if (emulation == EMULATE_KSH /* isset(KSHARRAYS) */) {
 	    struct value v;
 	    v.isarr = 1;
-	    v.inv = 0;
+	    v.flags = 0;
 	    v.start = 0;
 	    v.end = -1;
 	    val = getstrvalue(&v);
@@ -2037,6 +2044,11 @@ setstrvalue(Value v, char *val)
 	zsfree(val);
 	return;
     }
+    if (v->flags & VALFLAG_EMPTY) {
+	zerr("%s: assignment to invalid subscript range", v->pm->node.nam);
+	zsfree(val);
+	return;
+    }
     v->pm->node.flags &= ~PM_UNSET;
     switch (PM_TYPE(v->pm->node.flags)) {
     case PM_SCALAR:
@@ -2051,7 +2063,7 @@ setstrvalue(Value v, char *val)
 
 	    z = dupstring(v->pm->gsu.s->getfn(v->pm));
 	    zlen = strlen(z);
-	    if (v->inv && unset(KSHARRAYS))
+	    if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS))
 		v->start--, v->end--;
 	    if (v->start < 0) {
 		v->start += zlen;
@@ -2176,6 +2188,11 @@ setarrvalue(Value v, char **val)
 	     v->pm->node.nam);
 	return;
     }
+    if (v->flags & VALFLAG_EMPTY) {
+	zerr("%s: assignment to invalid subscript range", v->pm->node.nam);
+	freearray(val);
+	return;
+    }
     if (v->start == 0 && v->end == -1) {
 	if (PM_TYPE(v->pm->node.flags) == PM_HASHED)
 	    arrhashsetfn(v->pm, val, 0);
@@ -2194,7 +2211,7 @@ setarrvalue(Value v, char **val)
 		 v->pm->node.nam);
 	    return;
 	}
-	if (v->inv && unset(KSHARRAYS)) {
+	if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS)) {
 	    if (v->start > 0)
 		v->start--;
 	    v->end--;

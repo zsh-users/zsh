@@ -30,12 +30,12 @@
 >..
 
   echo .$foo[0].
-0:Treat 0 like 1
->.a.
+0:Treat 0 as empty
+>..
 
   echo .$foo[0,0].
-0:Treat 0,0 like 1,1.
->.a.
+0:Treat 0,0 as empty
+>..
 
   echo .$foo[0,1].
 0:Another weird way to access the first element
