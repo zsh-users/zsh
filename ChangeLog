@@ -1,3 +1,9 @@
+2007-06-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted, c.f. 23572: Src/modentry.c: bad prototype.
+
+	* 23571: Src/module.c: AIX definitions weren't right.
+
 2007-06-19  Clint Adams  <clint@zsh.org>
 
 	* 23569: Completion/Debian/Command/_bts: make 'bts show'

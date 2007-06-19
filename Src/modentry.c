@@ -4,7 +4,7 @@ int setup_ _((Module));
 int boot_ _((Module));
 int cleanup_ _((Module));
 int finish_ _((Module));
-int modentry _((int boot, Module m));
+int modentry _((int boot, Module m, void *ptr));
 
 /**/
 int
