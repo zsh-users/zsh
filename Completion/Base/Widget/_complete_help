@@ -37,7 +37,7 @@ _complete_help() {
   }
   trap 'unfunction compadd zstyle' EXIT INT
 
-  _main_complete
+  ${1:-_main_complete}
 
   unfunction compadd zstyle
   trap - EXIT INT

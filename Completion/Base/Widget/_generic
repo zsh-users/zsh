@@ -1,5 +1,12 @@
 #autoload
 
+if [[ -n $ZSH_TRACE_GENERIC_WIDGET ]]; then
+  local widget=$ZSH_TRACE_GENERIC_WIDGET
+  unset ZSH_TRACE_GENERIC_WIDGET
+  $widget _generic
+  return
+fi
+
 local curcontext="${curcontext:-}"
 
 if [[ -z "$curcontext" ]]; then
