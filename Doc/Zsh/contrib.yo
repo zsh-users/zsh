@@ -1130,8 +1130,8 @@ example({
 In common with exception handling in other languages, the exception may be
 thrown by code deeply nested inside the `try' block.  However, note that it
 must be thrown inside the current shell, not in a subshell forked for a
-pipline, parenthesised current-shell construct, or some form of
-substitution.
+pipeline, parenthesised current-shell construct, or some form of
+command or process substitution.
 
 The system internally uses the shell variable tt(EXCEPTION) to record the
 name of the exception between throwing and catching.  One drawback of this
