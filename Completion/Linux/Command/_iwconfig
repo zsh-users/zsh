@@ -44,6 +44,7 @@ if [[ -n "$state" ]]; then
     period|timeout) _message -e timeouts 'timeout' ;;
     txpower) _message -e power 'transmit power' ;;
     retry) _message -e retries 'retries' ;;
+    (modu) _wanted -x names expl 'modulation' compadd 11g CCK OFDMa auto ;;
     *)
       _values -S ' ' -w 'option' \
       	'essid[set the network name]' \
@@ -60,6 +61,7 @@ if [[ -n "$state" ]]; then
 	'*power[manipulate power management scheme parameters]' \
 	'txpower[set transmit power]' \
 	'retry[set number of retries]' \
+	'modu[force a specific set of modulations]' \
 	'commit[apply changes imediately]' && ret=0
     ;;
   esac
