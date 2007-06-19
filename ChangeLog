@@ -1,5 +1,8 @@
 2007-06-19  Clint Adams  <clint@zsh.org>
 
+	* 23569: Completion/Debian/Command/_bts: make 'bts show'
+	behave the same as 'bts bugs'.
+
 	* 23568: Completion/Linux/Command/_iwconfig: complete iwconfig
 	modu.
 
