@@ -40,6 +40,20 @@ setup_(UNUSED(Module m))
 }
 
 /**/
+int
+features_(Module m, char ***features)
+{
+    return 1;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return 0;
+}
+
+/**/
 static int
 check_dotfile(const char *dotdir, const char *fname)
 {

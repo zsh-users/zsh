@@ -1,5 +1,8 @@
 2007-06-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 23575: Src/Modules/newuser.c: yet another problem on AIX:
+	need features_ and enables_ functions.
+
 	* unposted, c.f. 23572: Src/modentry.c: bad prototype.
 
 	* 23571: Src/module.c: AIX definitions weren't right.
