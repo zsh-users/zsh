@@ -2,7 +2,6 @@ name=zsh/sched
 link=either
 load=yes
 
-autobins="sched"
-autoparams="zsh_scheduled_events"
+autofeatures="b:sched p:zsh_scheduled_events"
 
 objects="sched.o"

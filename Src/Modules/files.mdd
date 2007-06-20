@@ -2,6 +2,6 @@ name=zsh/files
 link=dynamic
 load=no
 
-autobins="chgrp chown ln mkdir mv rm rmdir sync"
+autofeatures="b:chgrp b:chown b:ln b:mkdir b:mv b:rm b:rmdir b:sync"
 
 objects="files.o"

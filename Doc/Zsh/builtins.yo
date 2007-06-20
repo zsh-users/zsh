@@ -1897,7 +1897,7 @@ Each module has a boot and a cleanup function.  The module
 will not be loaded if its boot function fails.  Similarly a module
 can only be unloaded if its cleanup function runs successfully.
 )
-item(tt(zmodload -F) [ tt(-lLe) tt(-P) tt(param) ] var(module) [tt(PLUS()-)]var(feature...))(
+item(tt(zmodload -F) [ tt(-alLe) tt(-P) tt(param) ] var(module) [tt(PLUS()-)]var(feature...))(
 tt(zmodload -F) allows more selective control over the features provided
 by modules.  With no options apart from tt(-F), the module named
 var(module) is loaded, if it was not already loaded, and the list of
@@ -1914,12 +1914,13 @@ not be set (for example, a parameter couldn't be added because there
 was a different parameter of the same name) but the module was loaded.
 
 The standard features are builtins, conditions, parameters and math
-functions; these are indicated by the prefix `tt(b:)', `tt(c:)', `tt(p:)'
-and `tt(f:)', respectively, followed by the name that the corresponding
-feature would have in the shell.  For example, `tt(b:strftime)' indicates
-a builtin named tt(strftime) and tt(p:EPOCHSECONDS) indicates a parameter
-named tt(EPOCHSECONDS).  The module may provide other (`abstract') features
-of its own as indicated by its documentation; these have no prefix.
+functions; these are indicated by the prefix `tt(b:)', `tt(c:)'
+(`tt(C:)' for an infix condition), `tt(p:)' and `tt(f:)', respectively,
+followed by the name that the corresponding feature would have in the
+shell.  For example, `tt(b:strftime)' indicates a builtin named
+tt(strftime) and tt(p:EPOCHSECONDS) indicates a parameter named
+tt(EPOCHSECONDS).  The module may provide other (`abstract') features of
+its own as indicated by its documentation; these have no prefix.
 
 With tt(-l) or tt(-L), features provided by the module are listed.  With
 tt(-l) alone, a list of features together with their states is shown, one
@@ -1944,6 +1945,13 @@ given with no prefix is simply tested to see if the module provides it;
 any feature given with a prefix tt(PLUS()) or tt(-) is tested to
 see if is provided and in the given state.  If the tests on all features
 in the list succeed, status 0 is returned, else status 1.
+
+With tt(-a), the given list of features is marked for autoload from
+the specified module, which may not be loaded.  An optional tt(PLUS())
+may appear before the feature name.  If the feature is prefixed with
+tt(-), the existing autoload is deleted.  Note that only standard
+features as described above can be autoloaded; other features require
+the module to be loaded.
 )
 xitem(tt(zmodload) tt(-d) [ tt(-L) ] [ var(name) ])
 xitem(tt(zmodload) tt(-d) var(name) var(dep) ...)

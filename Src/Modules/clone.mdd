@@ -2,6 +2,6 @@ name=zsh/clone
 link=dynamic
 load=no
 
-autobins="clone"
+autofeatures="b:clone"
 
 objects="clone.o"

@@ -4,6 +4,6 @@ load=yes
 
 moddeps="zsh/zle"
 
-autoparams="widgets keymaps"
+autofeatures="p:widgets p:keymaps"
 
 objects="zleparameter.o"

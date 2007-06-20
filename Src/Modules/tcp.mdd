@@ -4,4 +4,4 @@ load=no
 functions='Functions/TCP/*'
 
 objects="tcp.o"
-autobins="ztcp"
+autofeatures="b:ztcp"

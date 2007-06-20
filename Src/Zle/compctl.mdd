@@ -4,7 +4,7 @@ load=yes
 
 moddeps="zsh/complete zsh/zle"
 
-autobins="compctl compcall"
+autofeatures="b:compctl b:compcall"
 
 headers="compctl.h"
 objects="compctl.o"

@@ -3,4 +3,4 @@ link=dynamic
 load=no
 
 objects="zselect.o"
-autobins="zselect"
+autofeatures="b:zselect"

@@ -12,7 +12,6 @@ link='if test "x$ac_cv_func_tigetflag" = xyes -a "x$ac_cv_header_curses_h" = xye
 '
 load=yes
 
-autobins="echoti"
-autoparams="terminfo"
+autofeatures="b:echoti p:terminfo"
 
 objects="terminfo.o"

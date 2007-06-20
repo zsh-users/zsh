@@ -3,7 +3,7 @@ link=dynamic
 load=no
 functions='Functions/Zftp/*'
 
-autobins="zftp"
+autofeatures="b:zftp"
 
 moddeps="zsh/net/tcp"
 

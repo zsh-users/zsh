@@ -2,9 +2,7 @@ name=zsh/system
 link=dynamic
 load=no
 
-autobins="sysread syswrite syserror"
-
-autoparams="errnos"
+autofeatures="b:sysread b:syswrite b:syserror p:errnos"
 
 objects="system.o errnames.o"
 

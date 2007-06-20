@@ -3,7 +3,7 @@ link=either
 load=yes
 functions='Functions/Zle/*'
 
-autobins="bindkey vared zle"
+autofeatures="b:bindkey b:vared b:zle"
 
 objects="zle_bindings.o zle_hist.o zle_keymap.o zle_main.o \
 zle_misc.o zle_move.o zle_params.o zle_refresh.o \

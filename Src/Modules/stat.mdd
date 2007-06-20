@@ -2,6 +2,6 @@ name=zsh/stat
 link=dynamic
 load=no
 
-autobins="stat"
+autofeatures="b:stat b:zstat"
 
 objects="stat.o"

@@ -197,14 +197,24 @@ addbuiltin(Builtin b)
 
 /**/
 int
-add_autobin(char *nam, char *module)
+add_autobin(char *cmdnam, char *bnam, char *module, int opt_i)
 {
-    Builtin bn = zshcalloc(sizeof(*bn));
-    bn->node.nam = ztrdup(nam);
+    Builtin bn;
+
+    if (strchr(bnam, '/')) {
+	zwarnnam(cmdnam, "%s: `/' is illegal in a builtin", bnam);
+	return 1;
+    }
+
+    bn = zshcalloc(sizeof(*bn));
+    bn->node.nam = ztrdup(bnam);
     bn->optstr = ztrdup(module);
     if (addbuiltin(bn)) {
 	builtintab->freenode(&bn->node);
-	return 1;
+	if (!opt_i) {
+	    zwarnnam(cmdnam, "failed to add builtin %s", bnam);
+	    return 1;
+	}
     }
     return 0;
 }
@@ -222,6 +232,27 @@ deletebuiltin(char *nam)
     if (!bn)
 	return -1;
     builtintab->freenode(&bn->node);
+    return 0;
+}
+
+/* Remove an autoloaded added by add_autobin */
+
+/**/
+static int
+del_autobin(char *cmdnam, char *bnam, int opt_i)
+{
+    Builtin bn = (Builtin) builtintab->getnode2(builtintab, bnam);
+    if (!bn) {
+	if(!opt_i) {
+	    zwarnnam(cmdnam, "%s: no such builtin", bnam);
+	    return 1;
+	}
+    } else if (bn->node.flags & BINF_ADDED) {
+	zwarnnam(cmdnam, "%s: builtin is already defined", bnam);
+	return 1;
+    } else
+	deletebuiltin(bnam);
+
     return 0;
 }
 
@@ -406,10 +437,14 @@ getconddef(int inf, char *name, int autol)
 		break;
 	}
 	if (autol && p && p->module) {
-	    /* This is a definition for an autoloaded condition, load the *
-	     * module if we haven't tried that already. */
+	    /*
+	     * This is a definition for an autoloaded condition; load the
+	     * module if we haven't tried that already.
+	     */
 	    if (f) {
-		(void)ensurefeature(p->module, "c:", name);
+		(void)ensurefeature(p->module,
+				    (p->flags & CONDF_INFIX) ?
+				    "C:" : "c:", name);
 		f = 0;
 		p = NULL;
 	    } else {
@@ -523,11 +558,18 @@ setconddefs(char const *nam, Conddef c, int size, int *e)
 
 /**/
 int
-add_autocond(char *nam, int inf, char *module)
+add_autocond(char *cmdnam, char *cnam, int inf, char *module, int opt_i)
 {
-    Conddef c = (Conddef) zalloc(sizeof(*c));
+    Conddef c;
 
-    c->name = ztrdup(nam);
+    if (strchr(cnam, '/')) {
+	zwarnnam(cmdnam, "%s: `/' is illegal in a condition", cnam);
+	return 1;
+    }
+
+    c = (Conddef) zalloc(sizeof(*c));
+
+    c->name = ztrdup(cnam);
     c->flags = (inf  ? CONDF_INFIX : 0);
     c->module = ztrdup(module);
 
@@ -536,11 +578,35 @@ add_autocond(char *nam, int inf, char *module)
 	zsfree(c->module);
 	zfree(c, sizeof(*c));
 
-	return 1;
+	if (!opt_i) {
+	    zwarnnam(cmdnam, "failed to add condition `%s'", cnam);
+	    return 1;
+	}
     }
     return 0;
 }
 
+/* Remove a condition added with add_autocond */
+
+/**/
+static int
+del_autocond(char *cmdnam, char *cnam, int infix, int opt_i)
+{
+    Conddef cd = getconddef(infix, cnam, 0);
+
+    if (!cd) {
+	if (!opt_i) {
+	    zwarnnam(cmdnam, "%s: no such condition", cnam);
+	    return 1;
+	}
+    } else if (cd->flags & CONDF_ADDED) {
+	zwarnnam(cmdnam, "%s: condition is already defined", cnam);
+	return 1;
+    } else
+	deleteconddef(cd);
+
+    return 0;
+}
 
 /************************************************************************
  * Hook functions.
@@ -722,10 +788,13 @@ runhookdef(Hookdef h, void *d)
  * Check that it's possible to add a parameter.  This
  * requires that either there's no parameter already present,
  * or it's a global parameter marked for autoloading.
+ *
+ * The special status 2 is to indicate it didn't work but
+ * -i was in use so we didn't print a warning.
  */
 
 static int
-checkaddparam(char *nam)
+checkaddparam(char *nam, int opt_i)
 {
     Param pm;
 
@@ -733,11 +802,22 @@ checkaddparam(char *nam)
 	return 0;
 
     if (pm->level || !(pm->node.flags & PM_AUTOLOAD)) {
-	zwarn("Can't add module parameter `%s': %s",
-	      nam, pm->level ?
-	      "local parameter exists" :
-	      "parameter already exists");
-	return 1;
+	/*
+	 * -i suppresses "it's already that way" warnings,
+	 * but not "this can't possibly work" warnings, so we print
+	 * the message anyway if there's a local parameter blocking
+	 * the parameter we want to add, not if there's a
+	 * non-autoloadable parameter already there.  This
+	 * is consistent with the way add_auto* functions work.
+	 */
+	if (!opt_i || !pm->level) {
+	    zwarn("Can't add module parameter `%s': %s",
+		  nam, pm->level ?
+		  "local parameter exists" :
+		  "parameter already exists");
+	    return 1;
+	}
+	return 2;
     }
 
     unsetparam_pm(pm, 0, 1);
@@ -753,7 +833,7 @@ addparamdef(Paramdef d)
 {
     Param pm;
 
-    if (checkaddparam(d->name))
+    if (checkaddparam(d->name, 0))
 	return 1;
 
     if (d->getnfn) {
@@ -879,23 +959,60 @@ setparamdefs(char const *nam, Paramdef d, int size, int *e)
 /* This adds a definition for autoloading a module for a parameter. */
 
 /**/
-void
-add_autoparam(char *nam, char *module)
+int
+add_autoparam(char *cmdnam, char *pnam, char *module, int opt_i)
 {
     Param pm;
+    int ret;
 
-    queue_signals();
-    if (checkaddparam(nam)) {
-	unqueue_signals();
-	return;
+    if (strchr(pnam, '/')) {
+	zwarnnam(cmdnam, "%s: `/' is illegal in a parameter", pnam);
+	return 1;
     }
 
-    pm = setsparam(nam, ztrdup(module));
+    queue_signals();
+    if ((ret = checkaddparam(pnam, opt_i))) {
+	unqueue_signals();
+	/*
+	 * checkaddparam() has already printed a message
+	 * if one was needed.  If it wasn't because of -i,
+	 * ret is 2; for consistency with other add_auto*
+	 * functions we return status 0 to indicate there's
+	 * already such a parameter and we've been told not
+	 * to worry if so.
+	 */
+	return ret == 2 ? 0 : 1;
+    }
+
+    pm = setsparam(pnam, ztrdup(module));
 
     pm->node.flags |= PM_AUTOLOAD;
     unqueue_signals();
+
+    return 0;
 }
 
+/* Remove a parameter added with add_autoparam() */
+
+/**/
+static int
+del_autoparam(char *cmdnam, char *pnam, int opt_i)
+{
+    Param pm = (Param) gethashnode2(paramtab, pnam);
+
+    if (!pm) {
+	if (!opt_i) {
+	    zwarnnam(cmdnam, "%s: no such parameter", pnam);
+	    return 1;
+	}
+    } else if (!(pm->node.flags & PM_AUTOLOAD)) {
+	zwarnnam(cmdnam, "%s: parameter is already defined", pnam);
+	return 1;
+    } else
+	unsetparam_pm(pm, 0, 1);
+
+    return 0;
+}
 
 /************************************************************************
  * Math functions.
@@ -1053,11 +1170,18 @@ setmathfuncs(char const *nam, MathFunc f, int size, int *e)
 
 /**/
 int
-add_automathfunc(char *nam, char *module)
+add_automathfunc(char *cmdnam, char *fnam, char *module, int opt_i)
 {
-    MathFunc f = (MathFunc) zalloc(sizeof(*f));
+    MathFunc f;
 
-    f->name = ztrdup(nam);
+    if (strchr(fnam, '/')) {
+	zwarnnam(cmdnam, "%s: `/' is illegal in a math function", fnam);
+	return 1;
+    }
+
+    f = (MathFunc) zalloc(sizeof(*f));
+
+    f->name = ztrdup(fnam);
     f->module = ztrdup(module);
     f->flags = 0;
 
@@ -1066,12 +1190,36 @@ add_automathfunc(char *nam, char *module)
 	zsfree(f->module);
 	zfree(f, sizeof(*f));
 
-	return 1;
+	if (!opt_i) {
+	    zwarnnam(cmdnam, "failed to add math function `%s'", fnam);
+	    return 1;
+	}
     }
 
     return 0;
 }
 
+/* Remove a math function added with add_automathfunc() */
+
+/**/
+static int
+del_automathfunc(char *cmdnam, char *fnam, int opt_i)
+{
+    MathFunc f = getmathfunc(fnam, 0);
+    
+    if (!f) {
+	if (!opt_i) {
+	    zwarnnam(cmdnam, "%s: no such math function", fnam);
+	    return 1;
+	}
+    } else if (f->flags & MFF_ADDED) {
+	zwarnnam(cmdnam, "%s: math function is already defined", fnam);
+	return 1;
+    } else
+	deletemathfunc(f);
+
+    return 0;
+}
 
 /************************************************************************
  * Now support for dynamical loading and the fallback functions
@@ -2002,15 +2150,13 @@ bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
     /* options only allowed with -F */
     char *fonly = "lP", *fp;
 
-    if (ops_bcpf) {
-	if (!ops_au) {
-	    zwarnnam(nam, "-b, -c, -f, and -p must be combined with -a or -u");
-	    return 1;
-	}
-	if (OPT_ISSET(ops,'F')) {
-	    zwarnnam(nam, "-b, -c, -f, and -p cannot be combined with -F");
-	    return 1;
-	}
+    if (ops_bcpf && !ops_au) {
+	zwarnnam(nam, "-b, -c, -f, and -p must be combined with -a or -u");
+	return 1;
+    }
+    if (OPT_ISSET(ops,'F') && (ops_bcpf || OPT_ISSET(ops,'u'))) {
+	zwarnnam(nam, "-b, -c, -f, -p and -u cannot be combined with -F");
+	return 1;
     }
     if (OPT_ISSET(ops,'A') || OPT_ISSET(ops,'R')) {
 	if (ops_bcpf || ops_au || OPT_ISSET(ops,'d') || 
@@ -2304,20 +2450,11 @@ static int
 bin_zmodload_auto(char *nam, char **args, Options ops)
 {
     int ret = 0;
-    if(OPT_ISSET(ops,'u')) {
-	/* remove autoloaded builtins */
+    if (OPT_ISSET(ops,'u')) {
+	/* removed autoloaded builtins */
 	for (; *args; args++) {
-	    Builtin bn = (Builtin) builtintab->getnode2(builtintab, *args);
-	    if (!bn) {
-		if(!OPT_ISSET(ops,'i')) {
-		    zwarnnam(nam, "%s: no such builtin", *args);
-		    ret = 1;
-		}
-	    } else if (bn->node.flags & BINF_ADDED) {
-		zwarnnam(nam, "%s: builtin is already defined", *args);
+	    if (del_autobin(nam, *args, OPT_ISSET(ops,'i')))
 		ret = 1;
-	    } else
-		deletebuiltin(*args);
 	}
 	return ret;
     } else if(!*args) {
@@ -2331,13 +2468,8 @@ bin_zmodload_auto(char *nam, char **args, Options ops)
 	modnam = *args++;
 	do {
 	    char *bnam = *args ? *args++ : modnam;
-	    if (strchr(bnam, '/')) {
-		zwarnnam(nam, "%s: `/' is illegal in a builtin", bnam);
+	    if (add_autobin(nam, bnam, modnam, OPT_ISSET(ops,'i')))
 		ret = 1;
-	    } else if (add_autobin(bnam, modnam) && !OPT_ISSET(ops,'i')) {
-		zwarnnam(nam, "failed to add builtin %s", bnam);
-		ret = 1;
-	    }
 	} while(*args);
 	return ret;
     }
@@ -2354,18 +2486,9 @@ bin_zmodload_cond(char *nam, char **args, Options ops)
     if (OPT_ISSET(ops,'u')) {
 	/* remove autoloaded conditions */
 	for (; *args; args++) {
-	    Conddef cd = getconddef(OPT_ISSET(ops,'I'), *args, 0);
-
-	    if (!cd) {
-		if (!OPT_ISSET(ops,'i')) {
-		    zwarnnam(nam, "%s: no such condition", *args);
-		    ret = 1;
-		}
-	    } else if (cd->flags & CONDF_ADDED) {
-		zwarnnam(nam, "%s: condition is already defined", *args);
+	    if (del_autocond(nam, *args, OPT_ISSET(ops,'I'),
+			     OPT_ISSET(ops,'i')))
 		ret = 1;
-	    } else
-		deleteconddef(cd);
 	}
 	return ret;
     } else if (!*args) {
@@ -2396,14 +2519,9 @@ bin_zmodload_cond(char *nam, char **args, Options ops)
 	modnam = *args++;
 	do {
 	    char *cnam = *args ? *args++ : modnam;
-	    if (strchr(cnam, '/')) {
-		zwarnnam(nam, "%s: `/' is illegal in a condition", cnam);
+	    if (add_autocond(nam, cnam, OPT_ISSET(ops, 'I'),
+			     modnam, OPT_ISSET(ops,'i')))
 		ret = 1;
-	    } else if (add_autocond(cnam, OPT_ISSET(ops,'I'), modnam) &&
-		       !OPT_ISSET(ops,'i')) {
-		zwarnnam(nam, "failed to add condition `%s'", cnam);
-		ret = 1;
-	    }
 	} while(*args);
 	return ret;
     }
@@ -2420,18 +2538,8 @@ bin_zmodload_math(char *nam, char **args, Options ops)
     if (OPT_ISSET(ops,'u')) {
 	/* remove autoloaded math functions */
 	for (; *args; args++) {
-	    MathFunc f = getmathfunc(*args, 0);
-
-	    if (!f) {
-		if (!OPT_ISSET(ops,'i')) {
-		    zwarnnam(nam, "%s: no such math function", *args);
-		    ret = 1;
-		}
-	    } else if (f->flags & MFF_ADDED) {
-		zwarnnam(nam, "%s: math function is already defined", *args);
+	    if (del_automathfunc(nam, *args, OPT_ISSET(ops,'i')))
 		ret = 1;
-	    } else
-		deletemathfunc(f);
 	}
 	return ret;
     } else if (!*args) {
@@ -2455,13 +2563,8 @@ bin_zmodload_math(char *nam, char **args, Options ops)
 	modnam = *args++;
 	do {
 	    char *fnam = *args ? *args++ : modnam;
-	    if (strchr(fnam, '/')) {
-		zwarnnam(nam, "%s: `/' is illegal in a math function", fnam);
+	    if (add_automathfunc(nam, fnam, modnam, OPT_ISSET(ops,'i')))
 		ret = 1;
-	    } else if (add_automathfunc(fnam, modnam) && !OPT_ISSET(ops,'i')) {
-		zwarnnam(nam, "failed to add math function `%s'", fnam);
-		ret = 1;
-	    }
 	} while(*args);
 	return ret;
     }
@@ -2496,18 +2599,8 @@ bin_zmodload_param(char *nam, char **args, Options ops)
     if (OPT_ISSET(ops,'u')) {
 	/* remove autoloaded parameters */
 	for (; *args; args++) {
-	    Param pm = (Param) gethashnode2(paramtab, *args);
-
-	    if (!pm) {
-		if (!OPT_ISSET(ops,'i')) {
-		    zwarnnam(nam, "%s: no such parameter", *args);
-		    ret = 1;
-		}
-	    } else if (!(pm->node.flags & PM_AUTOLOAD)) {
-		zwarnnam(nam, "%s: parameter is already defined", *args);
+	    if (del_autoparam(nam, *args, OPT_ISSET(ops,'i')))
 		ret = 1;
-	    } else
-		unsetparam_pm(pm, 0, 1);
 	}
 	return ret;
     } else if (!*args) {
@@ -2520,11 +2613,8 @@ bin_zmodload_param(char *nam, char **args, Options ops)
 	modnam = *args++;
 	do {
 	    char *pnam = *args ? *args++ : modnam;
-	    if (strchr(pnam, '/')) {
-		zwarnnam(nam, "%s: `/' is illegal in a parameter", pnam);
+	    if (add_autoparam(nam, pnam, modnam, OPT_ISSET(ops,'i')))
 		ret = 1;
-	    } else
-		add_autoparam(pnam, modnam);
 	} while(*args);
 	return ret;
     }
@@ -2733,6 +2823,8 @@ bin_zmodload_features(char *nam, char **args, Options ops)
 	 * only options turned on.
 	 * With both options, list as zmodload showing options
 	 * to be turned both on and off.
+	 *
+	 * TODO: handle -a, list only autoloads.
 	 */
 	LinkNode node;
 	Module m = NULL;
@@ -2856,6 +2948,8 @@ bin_zmodload_features(char *nam, char **args, Options ops)
     } else if (OPT_ISSET(ops,'P')) {
 	zwarnnam(nam, "-P can only be used with -l or -L");
 	return 1;
+    } else if (OPT_ISSET(ops,'a')) {
+	return autofeatures(nam, args, modname, OPT_ISSET(ops,'i'));
     }
 
     return require_module(modname, args);
@@ -2891,8 +2985,11 @@ featuresarray(char const *nam, Features f)
 
     while (bn_size--)
 	*featurep++ = dyncat("b:", (bnp++)->node.nam);
-    while (cd_size--)
-	*featurep++ = dyncat("c:", (cdp++)->name);
+    while (cd_size--) {
+	*featurep++ = dyncat((cdp->flags & CONDF_INFIX) ? "C:" : "c:",
+			     cdp->name);
+	cdp++;
+    }
     while (pd_size--)
 	*featurep++ = dyncat("p:", (pdp++)->name);
     while (mf_size--)
@@ -3010,4 +3107,73 @@ ensurefeature(char *modname, char *prefix, char *feature)
     features[0] = f;
     features[1] = NULL;
     return require_module(modname, features);
+}
+
+/*
+ * Add autoloadable features for a given module.
+ */
+
+/**/
+int
+autofeatures(char *cmdnam, char **features, char *module, int opt_i)
+{
+    int ret = 0, infix;
+
+    while (*features) {
+	char *feature = *features, *fnam;
+	int add;
+
+	if (*feature == '-') {
+	    add = 0;
+	    feature ++;
+	} else {
+	    add = 1;
+	    if (*feature == '+')
+		feature++;
+	}
+
+	if (!*feature || feature[1] != ':') {
+	    zwarnnam(cmdnam, "bad format for autoloadable feature: `%s'",
+		     feature);
+	    ret = 1;
+	}
+	fnam = feature + 2;
+	switch (feature[0]) {
+	case 'b':
+	    if (add ? add_autobin(cmdnam, fnam, module, opt_i) :
+		del_autobin(cmdnam, fnam, opt_i));
+		ret = 1;
+	    break;
+
+	case 'c':
+	case 'C':
+	    infix = (feature[0] == 'C');
+	    if (add ? add_autocond(cmdnam, fnam, infix, module, opt_i) :
+		del_autocond(cmdnam, fnam, infix, opt_i))
+		ret = 1;
+	    break;
+
+	case 'p':
+	    if (add ? add_autoparam(cmdnam, fnam, module, opt_i) :
+		del_autoparam(cmdnam, fnam, opt_i));
+		ret = 1;
+	    break;
+
+	case 'f':
+	    if (add ? add_automathfunc(cmdnam, fnam, module, opt_i) :
+		del_automathfunc(cmdnam, fnam, opt_i))
+		ret = 1;
+	    break;
+
+	default:
+	    zwarnnam(cmdnam, "bad autoloadable feature type: `%s'",
+		     feature);
+	    ret = 1;
+	    break;
+	}
+
+	features++;
+    }
+
+    return ret;
 }

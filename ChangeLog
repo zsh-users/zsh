@@ -1,3 +1,22 @@
+2007-06-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23578: Doc/Zsh/builtins.yo, Src/mkbltnmlst.sh, Src/module.c,
+	Src/Builtins/rlimits.mdd, Src/Builtins/sched.mdd,
+	Src/Modules/cap.mdd, Src/Modules/clone.mdd,
+	Src/Modules/datetime.mdd, Src/Modules/example.mdd,
+	Src/Modules/files.mdd, Src/Modules/langinfo.mdd,
+	Src/Modules/mapfile.mdd, Src/Modules/mathfunc.mdd,
+	Src/Modules/parameter.mdd, Src/Modules/pcre.mdd,
+	Src/Modules/regex.mdd, Src/Modules/socket.mdd,
+	Src/Modules/stat.mdd, Src/Modules/system.mdd, Src/Modules/tcp.mdd,
+	Src/Modules/termcap.mdd, Src/Modules/terminfo.mdd,
+	Src/Modules/zftp.mdd, Src/Modules/zprof.mdd, Src/Modules/zpty.mdd,
+	Src/Modules/zselect.mdd, Src/Modules/zutil.mdd,
+	Src/Zle/compctl.mdd, Src/Zle/complete.mdd, Src/Zle/computil.mdd,
+	Src/Zle/zle.mdd, Src/Zle/zleparameter.mdd:  make standard
+	features autoloadable and use feature notation for predefined
+	autoloads.
+
 2007-06-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23575: Src/Modules/newuser.c: yet another problem on AIX:

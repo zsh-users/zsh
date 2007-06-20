@@ -2,6 +2,6 @@ name=zsh/mapfile
 link=dynamic
 load=no
 
-autoparams="mapfile"
+autofeatures="p:mapfile"
 
 objects="mapfile.o"

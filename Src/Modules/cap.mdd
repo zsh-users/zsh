@@ -2,6 +2,6 @@ name=zsh/cap
 link=dynamic
 load=no
 
-autobins="cap getcap setcap"
+autofeatures="b:cap b:getcap b:setcap"
 
 objects="cap.o"

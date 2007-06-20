@@ -6,4 +6,4 @@ moddeps="zsh/complete"
 
 objects="zutil.o"
 
-autobins="zformat zstyle zregexparse zparseopts"
+autofeatures="b:zformat b:zstyle b:zregexparse b:zparseopts"

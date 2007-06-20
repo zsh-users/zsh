@@ -5,9 +5,7 @@ functions='Completion/*comp* Completion/AIX/*/* Completion/BSD/*/* Completion/Ba
 
 moddeps="zsh/zle"
 
-autobins="compadd compset"
-
-autoprefixconds="prefix suffix between after"
+autofeatures="b:compadd b:compset c:prefix c:suffix c:between c:after"
 
 headers="comp.h"
 

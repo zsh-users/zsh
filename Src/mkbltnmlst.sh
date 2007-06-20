@@ -40,23 +40,17 @@ for x_mod in $x_mods; do
     unset moddeps autobins autoinfixconds autoprefixconds autoparams
     unset automathfuncs
     . $srcdir/../$modfile
-    echo "  if (emulation == EMULATE_ZSH) {"
-    for bin in $autobins; do
-	echo "    add_autobin(\"$bin\", \"$x_mod\");"
-    done
-    for cond in $autoinfixconds; do
-	echo "    add_autocond(\"$cond\", 1, \"$x_mod\");"
-    done
-    for cond in $autoprefixconds; do
-	echo "    add_autocond(\"$cond\", 0, \"$x_mod\");"
-    done
-    for param in $autoparams; do
-	echo "    add_autoparam(\"$param\", \"$x_mod\");"
-    done
-    for mfunc in $automathfuncs; do
-	echo "    add_automathfunc(\"$mfunc\", \"$x_mod\");"
-    done
-    echo "  }"
+    if test "x$autofeatures" != x; then
+	echo "  if (emulation == EMULATE_ZSH) {"
+	echo "    char *features[] = { "
+	for feature in $autofeatures; do
+	    echo "      \"$feature\","
+	done
+	echo "      NULL"
+	echo "    }; "
+	echo "    autofeatures(\"zsh\", features, \"$x_mod\", 1);"
+	echo "  }"
+    fi
     for dep in $moddeps; do
 	echo "  add_dep(\"$x_mod\", \"$dep\");"
     done

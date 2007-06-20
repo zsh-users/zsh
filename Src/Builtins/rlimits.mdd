@@ -2,7 +2,7 @@ name=zsh/rlimits
 link=either
 load=yes
 
-autobins="limit ulimit unlimit"
+autofeatures="b:limit b:ulimit b:unlimit"
 
 objects="rlimits.o"
 

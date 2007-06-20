@@ -3,4 +3,4 @@ link=dynamic
 load=no
 
 objects="socket.o"
-autobins="zsocket"
+autofeatures="b:zsocket"

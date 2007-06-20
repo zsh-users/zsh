@@ -2,11 +2,6 @@ name=zsh/example
 link=dynamic
 load=no
 
-autobins="example"
-
-autoinfixconds="ex"
-autoprefixconds="len"
-autoparams="exint exstr exarr"
-automathfuncs="sum length"
+autofeatures="b:example C:ex c:len p:exint p:exstr p:exarr f:sum f:length"
 
 objects="example.o"

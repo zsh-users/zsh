@@ -2,6 +2,6 @@ name=zsh/zprof
 link=dynamic
 load=no
 
-autobins="zprof"
+autofeatures="b:zprof"
 
 objects="zprof.o"

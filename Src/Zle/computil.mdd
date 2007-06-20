@@ -6,4 +6,4 @@ moddeps="zsh/complete zsh/zle"
 
 objects="computil.o"
 
-autobins="compdescribe comparguments compvalues compquote comptags comptry compfiles compgroups"
+autofeatures="b:compdescribe b:comparguments b:compvalues b:compquote b:comptags b:comptry b:compfiles b:compgroups"

@@ -4,6 +4,6 @@ link=either
 load=no
 
 functions='Functions/Calendar/*'
-autobins="strftime"
+autofeatures="b:strftime p:EPOCHSECONDS"
 
 objects="datetime.o"
