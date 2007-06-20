@@ -2041,9 +2041,15 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if (y < mlines)
 		mline = y;
 	}
+	DPUTS(mline < 0,
+	      "BUG: mline < 0 after re-scanning mtab in domenuselect()");
 	while (mline < mlbeg)
-	    if ((mlbeg -= step) < 0)
+	    if ((mlbeg -= step) < 0) {
 		mlbeg = 0;
+		/* Crude workaround for BUG above */
+		if (mline < 0)
+		    break;
+	    }
 
 	if (mlbeg && lbeg != mlbeg) {
 	    Cmatch **p = mtab + ((mlbeg - 1) * columns), **q;
