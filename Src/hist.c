@@ -2158,6 +2158,7 @@ savehistfile(char *fn, int err, int writeflags)
     Histent he;
     zlong xcurhist = curhist - !!(histactive & HA_ACTIVE);
     int extended_history = isset(EXTENDEDHISTORY);
+    int ret;
 
     if (!interact || savehistsiz <= 0 || !hist_ring
      || (!fn && !(fn = getsparam("HISTFILE"))))
@@ -2242,59 +2243,69 @@ savehistfile(char *fn, int err, int writeflags)
 	    }
 	    t = start = he->node.nam;
 	    if (extended_history) {
-		fprintf(out, ": %ld:%ld;", (long)he->stim,
-			he->ftim? (long)(he->ftim - he->stim) : 0L);
+		ret = fprintf(out, ": %ld:%ld;", (long)he->stim,
+			      he->ftim? (long)(he->ftim - he->stim) : 0L);
 	    } else if (*t == ':')
-		fputc('\\', out);
+		ret = fputc('\\', out);
 
-	    for (; *t; t++) {
+	    for (; ret >= 0 && *t; t++) {
 		if (*t == '\n')
-		    fputc('\\', out);
-		fputc(*t, out);
+		    if ((ret = fputc('\\', out)) < 0)
+			break;
+		if ((ret = fputc(*t, out)) < 0)
+		    break;
 	    }
-	    fputc('\n', out);
+	    if (ret < 0 || (ret = fputc('\n', out)) < 0)
+		break;
 	}
-	if (start && writeflags & HFILE_USE_OPTIONS) {
+	if (ret >= 0 && start && writeflags & HFILE_USE_OPTIONS) {
 	    struct stat sb;
-	    fflush(out);
-	    if (fstat(fileno(out), &sb) == 0) {
-		lasthist.fsiz = sb.st_size;
-		lasthist.mtim = sb.st_mtime;
+	    if ((ret = fflush(out)) >= 0) {
+		if (fstat(fileno(out), &sb) == 0) {
+		    lasthist.fsiz = sb.st_size;
+		    lasthist.mtim = sb.st_mtime;
+		}
+		zsfree(lasthist.text);
+		lasthist.text = ztrdup(start);
 	    }
-	    zsfree(lasthist.text);
-	    lasthist.text = ztrdup(start);
 	}
-	fclose(out);
+	if (fclose(out) < 0 && ret >= 0)
+	    ret = -1;
+	if (ret >= 0) {
+	    if (tmpfile) {
+		if (rename(tmpfile, unmeta(fn)) < 0)
+		    zerr("can't rename %s.new to $HISTFILE", fn);
+		free(tmpfile);
+	    }
+
+	    if (writeflags & HFILE_SKIPOLD
+		&& !(writeflags & (HFILE_FAST | HFILE_NO_REWRITE))) {
+		int remember_histactive = histactive;
+
+		/* Zeroing histactive avoids unnecessary munging of curline. */
+		histactive = 0;
+		/* The NULL leaves HISTFILE alone, preserving fn's value. */
+		pushhiststack(NULL, savehistsiz, savehistsiz, -1);
+
+		hist_ignore_all_dups |= isset(HISTSAVENODUPS);
+		readhistfile(fn, err, 0);
+		hist_ignore_all_dups = isset(HISTIGNOREALLDUPS);
+		if (histlinect)
+		    savehistfile(fn, err, 0);
+
+		pophiststack();
+		histactive = remember_histactive;
+	    }
+	}
+    } else
+	ret = -1;
+
+    if (ret < 0 && err) {
 	if (tmpfile) {
-	    if (rename(tmpfile, unmeta(fn)) < 0)
-		zerr("can't rename %s.new to $HISTFILE", fn);
-	    free(tmpfile);
-	}
-
-	if (writeflags & HFILE_SKIPOLD
-	 && !(writeflags & (HFILE_FAST | HFILE_NO_REWRITE))) {
-	    int remember_histactive = histactive;
-
-	    /* Zeroing histactive avoids unnecessary munging of curline. */
-	    histactive = 0;
-	    /* The NULL leaves HISTFILE alone, preserving fn's value. */
-	    pushhiststack(NULL, savehistsiz, savehistsiz, -1);
-
-	    hist_ignore_all_dups |= isset(HISTSAVENODUPS);
-	    readhistfile(fn, err, 0);
-	    hist_ignore_all_dups = isset(HISTIGNOREALLDUPS);
-	    if (histlinect)
-		savehistfile(fn, err, 0);
-
-	    pophiststack();
-	    histactive = remember_histactive;
-	}
-    } else if (err) {
-	if (tmpfile) {
-	    zerr("can't write history file %s.new", fn);
+	    zerr("failed to write history file %s.new: %e", fn);
 	    free(tmpfile);
 	} else
-	    zerr("can't write history file %s", fn);
+	    zerr("failed to write history file %s: %e", fn);
     }
 
     unlockhistfile(fn);
