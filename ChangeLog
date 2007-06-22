@@ -1,3 +1,8 @@
+2007-06-22  Clint Adams  <clint@zsh.org>
+
+	* 23580: Completion/Unix/Command/_guilt: rudimentary completion
+	for guilt.
+
 2007-06-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23578: Doc/Zsh/builtins.yo, Src/mkbltnmlst.sh, Src/module.c,
