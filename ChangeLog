@@ -1,5 +1,8 @@
 2007-06-23  Clint Adams  <clint@zsh.org>
 
+	* 23587: Completion/X/Command/_xrandr: completion for
+	xrandr.
+
 	* 23586: Completion/Unix/Command/_dmidecode: completion for
 	dmidecode.
 
