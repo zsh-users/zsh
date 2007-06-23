@@ -1,3 +1,7 @@
+2007-06-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23585: Src/hist.c: handle errno when handling errors.
+
 2007-06-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23581: Src/hist.c: handle errors in writing history file

@@ -2190,6 +2190,7 @@ savehistfile(char *fn, int err, int writeflags)
 	if (isset(SHAREHISTORY))
 	    extended_history = 1;
     }
+    errno = 0;
     if (writeflags & HFILE_APPEND) {
 	tmpfile = NULL;
 	out = fdopen(open(unmeta(fn),
@@ -2302,10 +2303,10 @@ savehistfile(char *fn, int err, int writeflags)
 
     if (ret < 0 && err) {
 	if (tmpfile) {
-	    zerr("failed to write history file %s.new: %e", fn);
+	    zerr("failed to write history file %s.new: %e", fn, errno);
 	    free(tmpfile);
 	} else
-	    zerr("failed to write history file %s: %e", fn);
+	    zerr("failed to write history file %s: %e", fn, errno);
     }
 
     unlockhistfile(fn);
