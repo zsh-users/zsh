@@ -1,0 +1,10 @@
+#compdef dmidecode
+
+_arguments \
+  '(-d --dev-mem)'{-d,--dev-mem}':memory device:_files' \
+  '(-q --quiet -u --dump)'{-q,--quiet}'[be less verbose]' \
+  '(-t --type -u --dump -s --string)'{-s,--string}':DMI string:(bios-vendor bios-version bios-release-date system-manufacturer system-product-name system-version system-serial-number system-uuid baseboard-manufacturer baseboard-product-name baseboard-version baseboard-serial-number baseboard-asset-tag chassis-manufacturer chassis-type chassis-version chassis-serial-number chassis-asset-tag processor-family processor-manufacturer processor-version processor-frequency)' \
+  '(-t --type)'{-t,--type}':types to display:(bios system baseboard chassis processor memory cache connector slot)' \
+  '(-q --quiet -u --dump -s --string)'{-u,--dump}'[do not decode]' \
+  '(-h --help)'{-h,--help}'[display usage information]' \
+  '(-V --version)'{-V,--version}'[display version information]'
