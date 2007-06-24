@@ -1,4 +1,4 @@
-#compdef git git-annotate git-apply git-checkout-index git-commit-tree git-hash-object git-index-pack git-init-db git-merge-index git-mktag git-pack-objects git-prune-packed git-read-tree git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
+#compdef git git-annotate git-apply git-checkout-index git-commit-tree git-hash-object git-index-pack git-init-db git-merge-index git-mktag git-pack-objects git-prune-packed git-read-tree git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
 
 # Commands not completed:
 # git-sh-setup
@@ -87,6 +87,7 @@ _git_commands () {
     'applymbox:apply patches from a mailbox'
     'applypatch:apply one patch extracted from an e-mail'
     'archimport:import an Arch repository into git'
+    'archive:create an archive of files from a named tree'
     'bisect:find the change that introduced a bug'
     'branch:create and show branches'
     'cat-file:provide content or type information for repository objects'
@@ -696,6 +697,46 @@ _git-applymbox () {
     '(1)-c[restart command after fixing an unclean patch]:patch:_files -g ".dotest/0*"' \
     ':mbox file:_files' \
     '::signoff file:__git_signoff_file' && ret=0
+}
+
+_git-archive () {
+  local curcontext=$curcontext state line
+  declare -A opt_args
+
+  declare -a backend_args
+
+  if (( words[(I)--format=*] > 0 && words[(I)--format=*] < CURRENT )); then
+    case ${words[$words[(I)--format=*]]#--format=} in
+      (zip)
+        backend_args=(
+          '-0[do not deflate files]'
+          '-1[minimum compression]'
+          '-2[a little more compression]'
+          '-3[slightly more compression]'
+          '-4[a bit more compression]'
+          '-5[even more compression]'
+          '-6[slightly even more compression]'
+          '-7[getting there]'
+          '-8[close to maximum compression]'
+          '-9[maximum compression]')
+        ;;
+    esac
+  fi
+
+  _arguments -C \
+    '--format=-[format of the resulting archive]:archive format:__git_archive_formats' \
+    '(- :)--list[list available archive formats]' \
+    '--prefix=-[prepend the given path prefix to to each filename]' \
+    $backend_args \
+    '--remote=-[archive remote repository]:remote repository:__git_any_repositories' \
+    ':tree-ish:__git_tree_ishs' \
+    '*:tree file:->files' && ret=0
+
+  case $state in
+    (files)
+      __git_tree_files $line[1] && ret=0
+      ;;
+  esac
 }
 
 _git-bisect () {
@@ -1487,4 +1528,14 @@ __git_local_references () {
 
 __git_is_indexed () {
   [[ -n $(git ls-files $REPLY) ]]
+}
+
+__git_archive_formats () {
+  local expl
+  declare -a formats
+
+  formats=(${${(f)"$(_call_program archive-formats git archive --list)"}})
+  __git_command_successful || return
+
+  _wanted archive-formats expl 'archive format' compadd $formats
 }
