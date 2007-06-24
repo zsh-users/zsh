@@ -829,10 +829,80 @@ _git-format-patch () {
     '::my revision:__git_revisions' && ret=0
 }
 
-# TODO: something better
 _git-grep () {
-  service=grep _grep
-  ret=0
+  local -a pattern_operators
+
+  if (( words[(I)-e] == CURRENT - 2 )); then
+    pattern_operators=(
+      '--and[both patterns must match]'
+      '--or[either pattern must match]'
+      '--not[the following pattern must not match]')
+  fi
+
+  local curcontext=$curcontext state line
+  declare -A opt_args
+
+  _arguments -A '--*' \
+    '--cached[grep blobs registered in index file instead of working tree]' \
+    '(-a --text)'{-a,--text}'[process binary files as if they were text]' \
+    '(-i --ignore-case)'{-i,--ignore-case}'[ignore case when matching]' \
+    '(-w --word-regexp)'{-w,--word-regexp}'[match only whole words]' \
+    '(-v --invert-match)'{-v,--invert-match}'[select non-matching lines]' \
+    '(   -H)-h[supress output of filenames]' \
+    '(-h   )-H[show filenames]' \
+    '--full-name[output paths relative to the project top directory]' \
+    '(-E --extended-regexp -G --basic-regexp)'{-E,--extended-regexp}'[use POSIX extended regexes]' \
+    '(-E --extended-regexp -G --basic-regexp)'{-G,--basic-regexp}'[use POSIX basic regexes]' \
+    '-n[prefix the line number to matching lines]' \
+    '(-l --files-with-matches -L --files-without-match)'{-l,--files-with-match}'[show only names of matching files]' \
+    '(-l --files-with-matches -L --files-without-match)'{-L,--files-without-match}'[show only names of non-matching files]' \
+    '(-c --count)'{-c,--count}'[show number of matching lines in files]' \
+    '-A[show trailing context]: :_guard "[[\:digit\:]]#" lines' \
+    '-B[show leading context]: :_guard "[[\:digit\:]]#" lines' \
+    '-C[show context]: :_guard "[[\:digit\:]]#" lines' \
+    '(1)*-f[read patterns from given file]:pattern file:_files' \
+    '(1)*-e[use the given pattern for matching]:pattern' \
+    $pattern_operators \
+    '--all-match[all patterns must match]' \
+    ':pattern:' \
+    '*::tree-or-file:->files' && ret=0
+  
+  case $state in
+    (files)
+      integer first_tree last_tree start end
+
+      (( start = words[(I)(-f|-e)] > 0 ? 1 : 2 ))
+      (( end = $#line - 1 ))
+
+      for (( i = start; i <= end; i++ )); do
+        [[ line[i] == '--' ]] && break
+        git cat-file -e "${(Q)line[i]}^{tree}" 2>/dev/null || break
+        if (( first_tree == 0 )); then
+          (( first_tree = last_tree = i ))
+        else
+          (( last_tree = i ))
+        fi
+      done
+
+      if (( last_tree == 0 || last_tree == end )); then
+        if (( first_tree == 0 )); then
+          _alternative \
+            'tree:tree:__git_trees' \
+            "file:file:__git_cached_files" && ret=0
+        else
+          _alternative \
+            'tree:tree:__git_trees' \
+            "tree file:tree-files:__git_tree_files $line[first_tree,last_tree]" && ret=0
+        fi
+      else
+        if (( first_tree == 0 )); then
+          __git_cached_files
+        else
+          __git_tree_files $line[first_tree,last_tree]
+        fi
+      fi
+      ;;
+  esac
 }
 
 # TODO: this isn't strictly right, but close enough
