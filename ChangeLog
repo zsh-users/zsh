@@ -1,3 +1,8 @@
+2007-06-24  Clint Adams  <clint@zsh.org>
+
+	* 23593: Completion/Unix/Command/_git: merge in git annotate
+	completion from Nikolai Weibull's repository.
+
 2007-06-23  Clint Adams  <clint@zsh.org>
 
 	* 23587: Completion/X/Command/_xrandr: completion for

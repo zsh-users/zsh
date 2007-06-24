@@ -1,4 +1,4 @@
-#compdef git git-apply git-checkout-index git-commit-tree git-hash-object git-index-pack git-init-db git-merge-index git-mktag git-pack-objects git-prune-packed git-read-tree git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
+#compdef git git-annotate git-apply git-checkout-index git-commit-tree git-hash-object git-index-pack git-init-db git-merge-index git-mktag git-pack-objects git-prune-packed git-read-tree git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
 
 # Commands not completed:
 # git-sh-setup
@@ -82,6 +82,7 @@ _git_commands () {
   commands=(
     'add:add paths to the index'
     'am:apply patches from a mailbox (cooler than applymbox)'
+    'annotate:annotate file lines with commit info'
     'apply:apply patch on a git index file and a work tree'
     'applymbox:apply patches from a mailbox'
     'applypatch:apply one patch extracted from an e-mail'
@@ -195,6 +196,29 @@ if [[ $words[1] == git ]]; then
 else
   _call_function ret _$words[1]
 fi
+
+_git-annotate () {
+  _arguments -S \
+    '-b[show blank SHA-1 for boundary commits]' \
+    '--root[do not treat root commits as boundaries]' \
+    '--show-stats[include additional statistics at the end of blame output]' \
+    '-c[undocumented]' \
+    '-l[show long rev]' \
+    '-t[show raw timestamp]' \
+    '-S[use revs from revs-file]:revs-file:_files' \
+    '-M-[detect moving lines in the file as well]:: :_guard "[[\:digit\:]]" "number of characters"' \
+    '*-C-[detect copied lines from other files from same commit as well]:: :_guard "[[\:digit\:]]" "number of characters"' \
+    '-L[annotate only the given line range]:line range' \
+    '--contents[annotate against the given file if no rev is specified]:file:_files' \
+    '--incremental[show results incrementally for machine processing]' \
+    '--score-debug[uncodumented]' \
+    '(-f --show-name)'{-f,--show-name}'[undocumented]' \
+    '(-n --show-number)'{-n,--show-number}'[undocumented]' \
+    '(-p --porcelain)'{-p,--porcelain}'[show results designed for machine processing]' \
+    '(-h --help)'{-h,--help}'[show help message]' \
+    ':file:__git_cached_files' \
+    '::revision:__git_revisions' && ret=0
+}
 
 _git-apply () {
   _arguments \
@@ -1202,6 +1226,10 @@ __git_files () {
   __git_command_successful || return
 
   _wanted files expl 'index file' _multi_parts $@ - / files
+}
+
+__git_cached_files () {
+  __git_files $* --cached
 }
 
 __git_modified_files () {
