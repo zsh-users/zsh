@@ -2487,19 +2487,29 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 mod_export void
 tokenize(char *s)
 {
-    zshtokenize(s, 0);
+    zshtokenize(s, 0, 0);
 }
+
+/*
+ * shtokenize is used when we tokenize a string with GLOB_SUBST set.
+ * In that case we need to retain backslashes when we turn the
+ * pattern back into a string, so that the string is not
+ * modified if it failed to match a pattern.
+ *
+ * It may be modified by the effect of SH_GLOB which turns off
+ * various zsh-specific options.
+ */
 
 /**/
 mod_export void
 shtokenize(char *s)
 {
-    zshtokenize(s, isset(SHGLOB));
+    zshtokenize(s, 1, isset(SHGLOB));
 }
 
 /**/
 static void
-zshtokenize(char *s, int shglob)
+zshtokenize(char *s, int glbsbst, int shglob)
 {
     char *t;
     int bslash = 0;
@@ -2508,9 +2518,10 @@ zshtokenize(char *s, int shglob)
       cont:
 	switch (*s) {
 	case Bnull:
+	case Bnullkeep:
 	case '\\':
 	    if (bslash) {
-		s[-1] = Bnull;
+		s[-1] = glbsbst ? Bnullkeep : Bnull;
 		break;
 	    }
 	    bslash = 1;
@@ -2519,7 +2530,7 @@ zshtokenize(char *s, int shglob)
 	    if (shglob)
 		break;
 	    if (bslash) {
-		s[-1] = Bnull;
+		s[-1] = glbsbst ? Bnullkeep : Bnull;
 		break;
 	    }
 	    t = s;
@@ -2549,7 +2560,7 @@ zshtokenize(char *s, int shglob)
 	    for (t = ztokens; *t; t++)
 		if (*t == *s) {
 		    if (bslash)
-			s[-1] = Bnull;
+			s[-1] = glbsbst ? Bnullkeep : Bnull;
 		    else
 			*s = (t - ztokens) + Pound;
 		    break;
@@ -2569,12 +2580,23 @@ remnulargs(char *s)
 	char *o = s, c;
 
 	while ((c = *s++))
-	    if (INULL(c)) {
+	    if (c == Bnullkeep) {
+		/*
+		 * An active backslash that needs to be turned back into
+		 * a real backslash for output.  However, we don't
+		 * do that yet since we need to ignore it during
+		 * pattern matching.
+		 */
+		continue;
+	    } else if (INULL(c)) {
 		char *t = s - 1;
 
-		while ((c = *s++))
-		    if (!INULL(c))
+		while ((c = *s++)) {
+		    if (c == Bnullkeep)
+			*t++ = '\\';
+		    else if (!INULL(c))
 			*t++ = c;
+		}
 		*t = '\0';
 		if (!*o) {
 		    o[0] = Nularg;

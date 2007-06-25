@@ -260,13 +260,13 @@ static char endseg[] = {
 
 static char endstr[] = {
     '/',			/* file only */
-    '\0', Bar, Outpar, Quest, Star, Inbrack, Inpar, Inang,
+    '\0', Bar, Outpar, Quest, Star, Inbrack, Inpar, Inang, Bnullkeep,
 				/* all patterns */
     Tilde, Hat, Pound		/* extended glob only */
 };
 
-#define PATENDSTRLEN_NORM 9
-#define PATENDSTRLEN_EXT  12
+#define PATENDSTRLEN_NORM 10
+#define PATENDSTRLEN_EXT  13
 
 
 /* Default size for pattern buffer */
@@ -1239,6 +1239,13 @@ patcomppiece(int *flagp)
 	     * repeatable.
 	     */
 	    return 0;
+	    break;
+	case Bnullkeep:
+	    /*
+	     * Marker for restoring a backslash in output:
+	     * does not match a character.
+	     */
+	    return patcomppiece(flagp);
 	    break;
 #ifdef DEBUG
 	default:

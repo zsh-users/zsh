@@ -22,9 +22,17 @@
 # still not be good enough.  Maybe we should trick it somehow.
 emulate -R zsh
 
+# Ensure the locale does not screw up sorting.  Don't supply a locale
+# unless there's one set, to minimise problems.
+[[ -n $LC_ALL ]] && LC_ALL=C
+[[ -n $LC_COLLATE ]] && LC_COLLATE=C
+[[ -n $LANG ]] && LANG=C
+
 # Set the module load path to correspond to this build of zsh.
 # This Modules directory should have been created by "make check".
 [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
+# Allow this to be passed down.
+export MODULE_PATH
 
 # We need to be able to save and restore the options used in the test.
 # We use the $options variable of the parameter module for this.
@@ -47,12 +55,48 @@ ZTST_mainopts=(${(kv)options})
 ZTST_testdir=$PWD
 ZTST_testname=$1
 
-# The source directory is not necessarily the current directory
-ZTST_srcdir=${0%/*}
+integer ZTST_testfailed
+
+# This is POSIX nonsense.  Because of the vague feeling someone, somewhere
+# may one day need to examine the arguments of "tail" using a standard
+# option parser, every Unix user in the world is expected to switch
+# to using "tail -n NUM" instead of "tail -NUM".  Older versions of
+# tail don't support this.
+tail() {
+  emulate -L zsh
+
+  if [[ -z $TAIL_SUPPORTS_MINUS_N ]]; then
+    local test
+    test=$(echo "foo\nbar" | command tail -n 1 2>/dev/null)
+    if [[ $test = bar ]]; then
+      TAIL_SUPPORTS_MINUS_N=1
+    else
+      TAIL_SUPPORTS_MINUS_N=0
+    fi
+  fi
+
+  integer argi=${argv[(i)-<->]}
+
+  if [[ $argi -le $# && $TAIL_SUPPORTS_MINUS_N = 1 ]]; then
+    argv[$argi]=(-n ${argv[$argi][2,-1]})
+  fi
+
+  command tail "$argv[@]"
+}
+
+# The source directory is not necessarily the current directory,
+# but if $0 doesn't contain a `/' assume it is.
+if [[ $0 = */* ]]; then
+  ZTST_srcdir=${0%/*}
+else
+  ZTST_srcdir=$PWD
+fi
 [[ $ZTST_srcdir = /* ]] || ZTST_srcdir="$ZTST_testdir/$ZTST_srcdir"
 
 # Set the function autoload paths to correspond to this build of zsh.
-fpath=( $ZTST_srcdir/../(Completion|Functions)/*~*/CVS(/) )
+fpath=( $ZTST_srcdir/../Functions/*~*/CVS(/)
+        $ZTST_srcdir/../Completion
+        $ZTST_srcdir/../Completion/*/*~*/CVS(/) )
 
 : ${TMPPREFIX:=/tmp/zsh}
 # Temporary files for redirection inside tests.
@@ -66,14 +110,15 @@ ZTST_terr=${TMPPREFIX}.ztst.terr.$$
 
 ZTST_cleanup() {
   cd $ZTST_testdir
-  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp ${TMPPREFIX}.ztst*$$
+  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp(N) \
+    ${TMPPREFIX}.ztst*$$(N)
 }
 
 # This cleanup always gets performed, even if we abort.  Later,
 # we should try and arrange that any test-specific cleanup
 # always gets called as well.
-trap - 'print cleaning up...
-ZTST_cleanup' INT QUIT TERM
+##trap 'print cleaning up...
+##ZTST_cleanup' INT QUIT TERM
 # Make sure it's clean now.
 rm -rf dummy.tmp *.tmp
 
@@ -85,20 +130,31 @@ ZTST_testfailed() {
     print -r "Was testing: $ZTST_message"
   fi
   print -r "$ZTST_testname: test failed."
-  ZTST_cleanup
-  exit 1
+  if [[ -n $ZTST_failmsg ]]; then
+    print -r "The following may (or may not) help identifying the cause:
+$ZTST_failmsg"
+  fi
+  ZTST_testfailed=1
+  return 1
 }
 
 # Print messages if $ZTST_verbose is non-empty
 ZTST_verbose() {
   local lev=$1
   shift
-  [[ -n $ZTST_verbose && $ZTST_verbose -ge $lev ]] && print -- $* >&8
+  [[ -n $ZTST_verbose && $ZTST_verbose -ge $lev ]] && print -r -- $* >&8
+}
+ZTST_hashmark() {
+  [[ ZTST_verbose -le 0 && -t 8 ]] && print -nu8 ${(pl:SECONDS::\#::\#\r:)}
+  (( SECONDS > COLUMNS+1 && (SECONDS -= COLUMNS) ))
 }
 
-[[ ! -r $ZTST_testname ]] && ZTST_testfailed "can't read test file."
+if [[ ! -r $ZTST_testname ]]; then
+  ZTST_testfailed "can't read test file."
+  exit 1
+fi
 
-[[ -n $ZTST_verbose && $ZTST_verbose -ge 0 ]] && exec 8>&1
+exec 8>&1
 exec 9<$ZTST_testname
 
 # The current line read from the test file.
@@ -118,15 +174,18 @@ ZTST_getline() {
 
 # Get the name of the section.  It may already have been read into
 # $curline, or we may have to skip some initial comments to find it.
+# If argument present, it's OK to skip the reset of the current section,
+# so no error if we find garbage.
 ZTST_getsect() {
   local match mbegin mend
 
   while [[ $ZTST_curline != '%'(#b)([[:alnum:]]##)* ]]; do
     ZTST_getline || return 1
     [[ $ZTST_curline = [[:blank:]]# ]] && continue
-    if [[ $ZTST_curline != '%'[[:alnum:]]##* ]]; then
+    if [[ $# -eq 0 && $ZTST_curline != '%'[[:alnum:]]##* ]]; then
       ZTST_testfailed "bad line found before or after section:
 $ZTST_curline"
+      exit 1
     fi
   done
   # have the next line ready waiting
@@ -169,13 +228,14 @@ ${ZTST_curline[2,-1]}"
 $ZTST_redir"
 
 case $char in
-  '<') fn=$ZTST_in
+  ('<') fn=$ZTST_in
        ;;
-  '>') fn=$ZTST_out
+  ('>') fn=$ZTST_out
        ;;
-  '?') fn=$ZTST_err
+  ('?') fn=$ZTST_err
        ;;
-   *)  ZTST_testfailed "bad redir operator: $char"
+   (*)  ZTST_testfailed "bad redir operator: $char"
+       return 1
        ;;
 esac
 if [[ $ZTST_flags = *q* ]]; then
@@ -183,6 +243,8 @@ if [[ $ZTST_flags = *q* ]]; then
 else
   print -r -- "$ZTST_redir" >>$fn
 fi
+
+return 0
 }
 
 # Execute an indented chunk.  Redirections will already have
@@ -191,9 +253,10 @@ ZTST_execchunk() {
   options=($ZTST_testopts)
   eval "$ZTST_code"
   ZTST_status=$?
+  # careful... ksh_arrays may be in effect.
+  ZTST_testopts=(${(kv)options[*]})
+  options=(${ZTST_mainopts[*]})
   ZTST_verbose 2 "ZTST_execchunk: status $ZTST_status"
-  ZTST_testopts=(${(kv)options})
-  options=($ZTST_mainopts)
   return $ZTST_status
 }
 
@@ -202,12 +265,27 @@ ZTST_execchunk() {
 ZTST_prepclean() {
   # Execute indented code chunks.
   while ZTST_getchunk; do
-    ZTST_execchunk >/dev/null || [[ -n $1 ]] ||
-    ZTST_testfailed "non-zero status from preparation code:
-$ZTST_code"
+    ZTST_execchunk >/dev/null || [[ -n $1 ]] || {
+      [[ -n "$ZTST_unimplemented" ]] ||
+      ZTST_testfailed "non-zero status from preparation code:
+$ZTST_code" && return 0
+    }
   done
 }
 
+# diff wrapper
+ZTST_diff() {
+  local diff_out diff_ret
+
+  diff_out=$(diff "$@")
+  diff_ret="$?"
+  if [[ "$diff_ret" != "0" ]]; then
+    print -r "$diff_out"
+  fi
+
+  return "$diff_ret"
+}
+    
 ZTST_test() {
   local last match mbegin mend found
 
@@ -215,6 +293,7 @@ ZTST_test() {
     rm -f $ZTST_in $ZTST_out $ZTST_err
     touch $ZTST_in $ZTST_out $ZTST_err
     ZTST_message=''
+    ZTST_failmsg=''
     found=0
 
     ZTST_verbose 2 "ZTST_test: looking for new test"
@@ -223,14 +302,14 @@ ZTST_test() {
       ZTST_verbose 2 "ZTST_test: examining line:
 $ZTST_curline"
       case $ZTST_curline in
-	%*) if [[ $found = 0 ]]; then
+	(%*) if [[ $found = 0 ]]; then
 	      break 2
 	    else
 	      last=1
 	      break
 	    fi
 	    ;;
-	[[:space:]]#)
+	([[:space:]]#)
 	    if [[ $found = 0 ]]; then
 	      ZTST_getline || break 2
 	      continue
@@ -238,7 +317,7 @@ $ZTST_curline"
 	      break
 	    fi
 	    ;;
-	[[:space:]]##[^[:space:]]*) ZTST_getchunk
+	([[:space:]]##[^[:space:]]*) ZTST_getchunk
 	  if [[ $ZTST_curline == (#b)([-0-9]##)([[:alpha:]]#)(:*)# ]]; then
 	    ZTST_xstatus=$match[1]
 	    ZTST_flags=$match[2]
@@ -246,29 +325,38 @@ $ZTST_curline"
 	  else
 	    ZTST_testfailed "expecting test status at:
 $ZTST_curline"
+	    return 1
 	  fi
 	  ZTST_getline
 	  found=1
 	  ;;
-	'<'*) ZTST_getredir
+	('<'*) ZTST_getredir || return 1
 	  found=1
 	  ;;
-	'>'*) ZTST_getredir
+	('>'*) ZTST_getredir || return 1
 	  found=1
 	  ;;
-	'?'*) ZTST_getredir
+	('?'*) ZTST_getredir || return 1
 	  found=1
 	  ;;
-	*) ZTST_testfailed "bad line in test block:
+	('F:'*) ZTST_failmsg="${ZTST_failmsg:+${ZTST_failmsg}
+}  ${ZTST_curline[3,-1]}"
+	  ZTST_getline
+	  found=1
+          ;;
+	(*) ZTST_testfailed "bad line in test block:
 $ZTST_curline"
+	  return 1
           ;;
       esac
     done
 
     # If we found some code to execute...
     if [[ -n $ZTST_code ]]; then
+      ZTST_hashmark
       ZTST_verbose 1 "Running test: $ZTST_message"
       ZTST_verbose 2 "ZTST_test: expecting status: $ZTST_xstatus"
+      ZTST_verbose 2 "Input: $ZTST_in, output: $ZTST_out, error: $ZTST_terr"
 
       ZTST_execchunk <$ZTST_in >$ZTST_tout 2>$ZTST_terr
 
@@ -278,6 +366,7 @@ $ZTST_curline"
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
 $(<$ZTST_terr)}"
+	return 1
       fi
 
       ZTST_verbose 2 "ZTST_test: test produced standard output:
@@ -286,15 +375,17 @@ ZTST_test: and standard error:
 $(<$ZTST_terr)"
 
       # Now check output and error.
-      if [[ $ZTST_flags != *d* ]] && ! diff -c $ZTST_out $ZTST_tout; then
+      if [[ $ZTST_flags != *d* ]] && ! ZTST_diff -c $ZTST_out $ZTST_tout; then
 	ZTST_testfailed "output differs from expected as shown above for:
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
 $(<$ZTST_terr)}"
+	return 1
       fi
-      if [[ $ZTST_flags != *D* ]] && ! diff -c $ZTST_err $ZTST_terr; then
+      if [[ $ZTST_flags != *D* ]] && ! ZTST_diff -c $ZTST_err $ZTST_terr; then
 	ZTST_testfailed "error output differs from expected as shown above for:
 $ZTST_code"
+	return 1
       fi
     fi
     ZTST_verbose 1 "Test successful."
@@ -312,35 +403,52 @@ $ZTST_code"
 typeset -A ZTST_sects
 ZTST_sects=(prep 0 test 0 clean 0)
 
+print "$ZTST_testname: starting."
+
 # Now go through all the different sections until the end.
-while ZTST_getsect; do
+# prep section may set ZTST_unimplemented, in this case the actual
+# tests will be skipped
+ZTST_skipok=
+ZTST_unimplemented=
+while [[ -z "$ZTST_unimplemented" ]] && ZTST_getsect $ZTST_skipok; do
   case $ZTST_cursect in
-    prep) if (( ${ZTST_sects[prep]} + ${ZTST_sects[test]} + \
+    (prep) if (( ${ZTST_sects[prep]} + ${ZTST_sects[test]} + \
 	        ${ZTST_sects[clean]} )); then
 	    ZTST_testfailed "\`prep' section must come first"
+            exit 1
 	  fi
 	  ZTST_prepclean
 	  ZTST_sects[prep]=1
 	  ;;
-    test)
+    (test)
 	  if (( ${ZTST_sects[test]} + ${ZTST_sects[clean]} )); then
 	    ZTST_testfailed "bad placement of \`test' section"
+	    exit 1
 	  fi
+	  # careful here: we can't execute ZTST_test before || or &&
+	  # because that affects the behaviour of traps in the tests.
 	  ZTST_test
+	  (( $? )) && ZTST_skipok=1
 	  ZTST_sects[test]=1
 	  ;;
-    clean)
+    (clean)
 	   if (( ${ZTST_sects[test]} == 0 || ${ZTST_sects[clean]} )); then
 	     ZTST_testfailed "bad use of \`clean' section"
+	   else
+	     ZTST_prepclean 1
+	     ZTST_sects[clean]=1
 	   fi
-	   ZTST_prepclean 1
-	   ZTST_sects[clean]=1
+	   ZTST_skipok=
 	   ;;
     *) ZTST_testfailed "bad section name: $ZTST_cursect"
        ;;
   esac
 done
 
-print "$ZTST_testname: all tests successful."
+if [[ -n "$ZTST_unimplemented" ]]; then
+  print "$ZTST_testname: skipped ($ZTST_unimplemented)"
+elif (( ! $ZTST_testfailed )); then
+  print "$ZTST_testname: all tests successful."
+fi
 ZTST_cleanup
-exit 0
+exit $(( ZTST_testfailed ))

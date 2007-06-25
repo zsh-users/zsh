@@ -196,6 +196,20 @@
 >* boringfile evenmoreboringfile boringfile evenmoreboringfile
 >boringfile evenmoreboringfile
 
+# The following tests a bug where globsubst didn't preserve
+# backslashes when printing out the original string.
+  str1='\\*\\'
+  (
+  setopt globsubst nonomatch
+  [[ \\\\ = $str1 ]] && print -r '\\ matched by' $str1
+  [[ \\foo\\ = $str1 ]] && print -r '\\foo matched by' $str1
+  [[ a\\b\\ = $str1 ]] || print -r 'a\\b not matched by' $str1
+  )
+0:globsubst with backslashes
+>\\ matched by \\*\\
+>\\foo matched by \\*\\
+>a\\b not matched by \\*\\
+
   print -l "${$(print one word)}" "${=$(print two words)}"
 0:splitting of $(...) inside ${...}
 >one word
