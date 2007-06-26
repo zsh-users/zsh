@@ -48,7 +48,7 @@ for x_mod in $x_mods; do
 	done
 	echo "      NULL"
 	echo "    }; "
-	echo "    autofeatures(\"zsh\", features, \"$x_mod\", 1);"
+	echo "    autofeatures(\"zsh\", \"$x_mod\", features, 0, 1);"
 	echo "  }"
     fi
     for dep in $moddeps; do

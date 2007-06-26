@@ -83,17 +83,33 @@
  zmodload -ub bogus
 0:Add/remove autoloaded builtin
 
+ zmodload -ub bogus
+1:Fail to remove unautoloaded builtin
+?(eval):zmodload:1: bogus: no such builtin
+
  zmodload -ac bogus
  zmodload -uc bogus
 0:Add/remove autoloaded condition
+
+ zmodload -uc bogus
+1:Fail to remove unautoloaded condition
+?(eval):zmodload:1: bogus: no such condition
 
  zmodload -ap bogus
  zmodload -up bogus
 0:Add/remove autoloaded parameter
 
+ zmodload -up bogus
+1:Fail to remove unautoloaded parameter
+?(eval):zmodload:1: bogus: no such parameter
+
  zmodload -af bogus
  zmodload -uf bogus
 0:Add/remove autoloaded math function
+
+ zmodload -uf bogus
+1:Fail to remove unautoloaded math function
+?(eval):zmodload:1: bogus: no such math function
 
 # If the "example" module is available, test various autoloading behavior.
 

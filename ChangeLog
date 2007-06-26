@@ -1,3 +1,8 @@
+2007-06-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23606: Src/mkbltnmlst.sh, Src/module.c, Test/V01zmodload.ztst:
+	make all module feature autoloads pass through one function.
+
 2007-06-24  Clint Adams  <clint@zsh.org>
 
 	* 23595: Completion/Unix/Command/_git: merge in git archive
