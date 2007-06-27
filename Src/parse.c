@@ -2933,7 +2933,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 	    }
 	    for (i = 0; i < shfunctab->hsize; i++)
 		for (hn = shfunctab->nodes[i]; hn; hn = hn->next)
-		    if (!listcontains(lnames, hn->nam) &&
+		    if (!linknodebydatum(lnames, hn->nam) &&
 			pattry(pprog, hn->nam) &&
 			cur_add_func(nam, (Shfunc) hn, lnames, progs,
 				     &hlen, &tlen, what)) {

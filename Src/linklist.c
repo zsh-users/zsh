@@ -273,18 +273,10 @@ newsizedlist(int size)
     return list;
 }
 
-/**/
-mod_export int
-listcontains(LinkList list, void *dat)
-{
-    LinkNode node;
-
-    for (node = firstnode(list); node; incnode(node))
-	if (getdata(node) == dat)
-	    return 1;
-
-    return 0;
-}
+/*
+ * Return the node whose data is the pointer "dat", else NULL.
+ * Can be used as a boolean test.
+ */
 
 /**/
 mod_export LinkNode
@@ -297,4 +289,68 @@ linknodebydatum(LinkList list, void *dat)
 	    return node;
 
     return NULL;
+}
+
+/*
+ * Return the node whose data matches the string "dat", else NULL.
+ */
+
+/**/
+mod_export LinkNode
+linknodebystring(LinkList list, char *dat)
+{
+    LinkNode node;
+
+    for (node = firstnode(list); node; incnode(node))
+	if (!strcmp((char *)getdata(node), dat))
+	    return node;
+
+    return NULL;
+}
+
+/*
+ * Convert a linked list whose data elements are strings to
+ * an array.  Memory is off the heap and the elements of the
+ * array are the same elements as the linked list data if copy is
+ * 0, else copied onto the heap.
+ */
+
+/**/
+mod_export char **
+hlinklist2array(LinkList list, int copy)
+{
+    int l = countlinknodes(list);
+    char **ret = (char **) zhalloc((l + 1) * sizeof(char *)), **p;
+    LinkNode n;
+
+    for (n = firstnode(list), p = ret; n; incnode(n), p++) {
+	*p = (char *) getdata(n);
+	if (copy)
+	    *p = dupstring(*p);
+    }
+    *p = NULL;
+
+    return ret;
+}
+
+/*
+ * Convert a linked list whose data elements are strings to
+ * an array.  The result is a permanently allocated, freearrayable
+ * array.
+ */
+
+/**/
+mod_export char **
+zlinklist2array(LinkList list)
+{
+    int l = countlinknodes(list);
+    char **ret = (char **) zalloc((l + 1) * sizeof(char *)), **p;
+    LinkNode n;
+
+    for (n = firstnode(list), p = ret; n; incnode(n), p++) {
+	*p = ztrdup((char *) getdata(n));
+    }
+    *p = NULL;
+
+    return ret;
 }

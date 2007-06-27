@@ -2973,14 +2973,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	else if (!nextnode(firstnode(list)))
 	    val = getdata(firstnode(list));
 	else {
-	    char **ap;
-	    LinkNode node;
-
-	    aval = ap = (char **) zhalloc((countlinknodes(list) + 1) *
-					  sizeof(char *));
-	    for (node = firstnode(list); node; incnode(node))
-		*ap++ = (char *) getdata(node);
-	    *ap = NULL;
+	    aval = hlinklist2array(list, 0);
 	    isarr = 2;
 	    l->list.flags |= LF_ARRAY;
 	}

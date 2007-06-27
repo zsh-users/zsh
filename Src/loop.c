@@ -311,20 +311,14 @@ size_t
 selectlist(LinkList l, size_t start)
 {
     size_t longest = 1, fct, fw = 0, colsz, t0, t1, ct;
-    LinkNode n;
     char **arr, **ap;
 
     trashzleptr();
-    ct = countlinknodes(l);
-    ap = arr = (char **) zhalloc((countlinknodes(l) + 1) * sizeof(char **));
-
-    for (n = (LinkNode) firstnode(l); n; incnode(n))
-	*ap++ = (char *)getdata(n);
-    *ap = NULL;
+    arr = hlinklist2array(l, 0);
     for (ap = arr; *ap; ap++)
 	if (strlen(*ap) > longest)
 	    longest = strlen(*ap);
-    t0 = ct;
+    t0 = ct = ap - arr;
     longest++;
     while (t0)
 	t0 /= 10, longest++;

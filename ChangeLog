@@ -1,3 +1,9 @@
+2007-06-27  Peter Stephenson  <pws@csr.com>
+
+	* 23670: Src/linklist.c, Src/loop.c, Src/module.c, Src/parse.c,
+	Src/subst.c, Src/Modules/parameter.c, Src/Zle/compcore.c,
+	Src/Zle/computil.c: Rationalise some linked list functions.
+
 2007-06-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23606: Src/mkbltnmlst.sh, Src/module.c, Test/V01zmodload.ztst:

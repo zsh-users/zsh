@@ -644,7 +644,7 @@ callcompfunc(char *s, char *fn)
 	if (compredirs)
 	    freearray(compredirs);
         if (rdstrs)
-            compredirs = bld_list_array(rdstrs);
+            compredirs = zlinklist2array(rdstrs);
         else
             compredirs = (char **) zshcalloc(sizeof(char *));
 
@@ -1852,30 +1852,13 @@ set_comp_sep(void)
     return 0;
 }
 
-/* This builds an array from a list of strings. */
-
-/**/
-mod_export char **
-bld_list_array(LinkList l)
-{
-    char **a, **p;
-    LinkNode n;
-
-    a = (char **) zalloc((countlinknodes(l) + 1) * sizeof(char *));
-    for (p = a, n = firstnode(l); n; incnode(n))
-	*p++ = ztrdup((char *) getdata(n));
-    *p = NULL;
-
-    return a;
-}
-
 /* This stores the strings from the list in an array. */
 
 /**/
 mod_export void
 set_list_array(char *name, LinkList l)
 {
-    setaparam(name, bld_list_array(l));
+    setaparam(name, zlinklist2array(l));
 }
 
 /* Get the words from a variable or a (list of words). */

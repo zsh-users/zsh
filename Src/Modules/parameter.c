@@ -793,19 +793,6 @@ modpmparamscan(HashNode hn, UNUSED(int dummy))
 }
 
 /**/
-static int
-findmodnode(LinkList l, char *nam)
-{
-    LinkNode node;
-
-    for (node = firstnode(l); node; incnode(node))
-	if (!strcmp(nam, (char *) getdata(node)))
-	    return 1;
-
-    return 0;
-}
-
-/**/
 static HashNode
 getpmmodule(UNUSED(HashTable ht), char *name)
 {
@@ -889,14 +876,14 @@ scanpmmodules(UNUSED(HashTable ht), ScanFunc func, int flags)
     for (i = 0; i < builtintab->hsize; i++)
 	for (hn = builtintab->nodes[i]; hn; hn = hn->next) {
 	    if (!(((Builtin) hn)->node.flags & BINF_ADDED) &&
-		!findmodnode(done, ((Builtin) hn)->optstr)) {
+		!linknodebystring(done, ((Builtin) hn)->optstr)) {
 		pm.node.nam = ((Builtin) hn)->optstr;
 		addlinknode(done, pm.node.nam);
 		func(&pm.node, flags);
 	    }
 	}
     for (p = condtab; p; p = p->next)
-	if (p->module && !findmodnode(done, p->module)) {
+	if (p->module && !linknodebystring(done, p->module)) {
 	    pm.node.nam = p->module;
 	    addlinknode(done, pm.node.nam);
 	    func(&pm.node, flags);
@@ -904,7 +891,7 @@ scanpmmodules(UNUSED(HashTable ht), ScanFunc func, int flags)
     for (i = 0; i < realparamtab->hsize; i++)
 	for (hn = realparamtab->nodes[i]; hn; hn = hn->next) {
 	    if ((((Param) hn)->node.flags & PM_AUTOLOAD) &&
-		!findmodnode(done, ((Param) hn)->u.str)) {
+		!linknodebystring(done, ((Param) hn)->u.str)) {
 		pm.node.nam = ((Param) hn)->u.str;
 		addlinknode(done, pm.node.nam);
 		func(&pm.node, flags);
@@ -934,15 +921,7 @@ dirssetfn(UNUSED(Param pm), char **x)
 static char **
 dirsgetfn(UNUSED(Param pm))
 {
-    int l = countlinknodes(dirstack);
-    char **ret = (char **) zhalloc((l + 1) * sizeof(char *)), **p;
-    LinkNode n;
-
-    for (n = firstnode(dirstack), p = ret; n; incnode(n), p++)
-	*p = dupstring((char *) getdata(n));
-    *p = NULL;
-
-    return ret;
+    return hlinklist2array(dirstack, 1);
 }
 
 /* Functions for the history special parameter. */
@@ -1012,7 +991,7 @@ scanpmhistory(UNUSED(HashTable ht), ScanFunc func, int flags)
 static char **
 histwgetfn(UNUSED(Param pm))
 {
-    char **ret, **p, *h, *e, sav;
+    char *h, *e, sav;
     LinkList l = newlinklist(), ll;
     LinkNode n;
     int i = addhistnum(curhist, -1, HIST_FOREIGN), iw;
@@ -1033,13 +1012,8 @@ histwgetfn(UNUSED(Param pm))
 	}
 	he = up_histent(he);
     }
-    ret = (char **) zhalloc((countlinknodes(l) + 1) * sizeof(char *));
 
-    for (p = ret, n = firstnode(l); n; incnode(n), p++)
-	*p = (char *) getdata(n);
-    *p = NULL;
-
-    return ret;
+    return hlinklist2array(l, 0);
 }
 
 /* Functions for the jobtexts special parameter. */

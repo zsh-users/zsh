@@ -3406,16 +3406,9 @@ bin_compvalues(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
         /* Again, as for comparguments.  This returns the values and their
          * arguments as an array which will be stored in val_args in _values. */
 	if (cv_laststate.vals) {
-	    char **ret, **p;
-	    LinkNode n;
+	    char **ret;
 
-	    ret = (char **) zalloc((countlinknodes(cv_laststate.vals) + 1) *
-				   sizeof(char *));
-
-	    for (n = firstnode(cv_laststate.vals), p = ret; n; incnode(n), p++)
-		*p = ztrdup((char *) getdata(n));
-	    *p = NULL;
-
+	    ret = zlinklist2array(cv_laststate.vals);
 	    sethparam(args[1], ret);
 
 	    return 0;
@@ -3738,7 +3731,6 @@ bin_comptry(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	if (!strcmp(*args, "-m")) {
 	    char *s, *p, *q, *c, **all = comptags[lasttaglevel]->all;
 	    LinkList list = newlinklist();
-	    LinkNode node;
 	    int num = 0;
 	    Ctset set;
 
@@ -3833,16 +3825,11 @@ bin_comptry(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    }
 		}
 		if (num) {
-		    char **a;
 		    Ctset l;
 
 		    set = (Ctset) zalloc(sizeof(*set));
 
-		    a = set->tags = (char **) zalloc((num + 1) * sizeof(char *));
-		    for (node = firstnode(list); node; incnode(node))
-			*a++ = ztrdup((char *) getdata(node));
-
-		    *a = NULL;
+		    set->tags = zlinklist2array(list);
 		    set->next = NULL;
 		    set->ptr = NULL;
 		    set->tag = NULL;

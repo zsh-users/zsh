@@ -2623,9 +2623,7 @@ unload_module(Module m, LinkNode node)
 	}
 	if(!m->deps) {
 	    if (!node) {
-		for (node = firstnode(modules); node; incnode(node))
-		    if (m == (Module) getdata(node))
-			break;
+		node = linknodebydatum(modules, m);
 		if (!node)
 		    return 1;
 	    }
