@@ -1,4 +1,4 @@
-#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-hash-object git-index-pack git-init-db git-merge-index git-mktag git-pack-objects git-prune-packed git-read-tree git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
+#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-describe git-hash-object git-index-pack git-init-db git-merge-index git-mktag git-pack-objects git-prune-packed git-read-tree git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
 
 # Commands not completed:
 # git-sh-setup
@@ -396,20 +396,36 @@ _git-cat-file () {
   fi
 }
 
+_git-describe () {
+  _arguments \
+    $abbrev_arg \
+    '--all[use any ref found in "$GIT_DIR/refs/"]' \
+    '--tags[use any tag found in "$GIT_DIR/refs/tags/"]' \
+    $abbrev_arg \
+    '--candidates=-[consider up to given number of canditates]: :_guard "[[\:digit\:]]##" "number of canditates"' \
+    '--debug[display information about the searching strategy]' \
+    '*:committish:__git_committishs' && ret=0
+}
+
 _git-diff-index () {
   _arguments -S \
     $diff_args \
     '--cached[do not consider the work tree at all]' \
     '-m[flag non-checked-out files as up-to-date]' \
     ':tree-ish:__git_tree_ishs' \
-    '*:index file:__git_files' && ret=0
+    '*::index file:__git_cached_files' && ret=0
 }
 
 _git-diff-files () {
   _arguments \
     $diff_args \
-    '-q[do not complain about nonexisting files]' \
-    '*:file:_files' && ret=0
+    '(-0 -1 -2 -3 --base --ours --theirs -c --cc)-0[omit diff output for unmerged entries]' \
+    '(-0 -1 -2 -3 --base --ours --theirs -c --cc)'{-1,--base}'[diff against "base" version]' \
+    '(-0 -1 -2 -3 --base --ours --theirs -c --cc)'{-2,--ours}'[diff against "our branch" version]' \
+    '(-0 -1 -2 -3 --base --ours --theirs -c --cc)'{-3,--theirs}'[diff against "their branch" version]' \
+    '(-0 -1 -2 -3 --base --ours --theirs -c --cc)'{-c,--cc}'[compare "our branch", "their branch" and working tree files]' \
+    '-q[remain silent even on nonexisting files]' \
+    '*::file:_files' && ret=0
 }
 
 _git-diff-stages () {
@@ -417,23 +433,27 @@ _git-diff-stages () {
     $diff_args \
     ':stage 1:__git_stages' \
     ':stage 2:__git_stages' \
-    '*:index file:__git_files' && ret=0
+    '*::index file:_files' && ret=0
 }
 
 _git-diff-tree () {
   local curcontext=$curcontext state line
   typeset -A opt_args
 
-  _arguments -S \
+  _arguments -C -S \
     $diff_args \
     $pretty_arg \
     '--no-commit-id[skip output of commit IDs]' \
     '--root[show diff against the empty tree]' \
     '--stdin[read commit and tree information from standard input]' \
     '-m[show merge commits]' \
-    '-r[recurse into subdirectories]' \
-    '(-r)-t[show tree entry itself as well as subtrees (implies -r)]' \
-    '-v[show verbose headers]' \
+    '(-t)-r[recurse into subdirectories]' \
+    '-t[show tree entry itself as well as subtrees (implies -r)]' \
+    '-s[do not show differences]' \
+    '-v[show commit message before the differences]' \
+    '(-c --cc)-c[show differences from each of the parents to the merge result]' \
+    '(-c --cc)--cc[how differences from each of the parents and omit differences from only one parent]' \
+    '--always[always show commit itself and the commit log message]' \
     ':tree-ish:__git_tree_ishs' \
     '*::file:->files' && ret=0
 
@@ -1378,6 +1398,10 @@ __git_commits () {
   _alternative \
     'heads::__git_heads' \
     'tags::__git_tags'
+}
+
+__git_committishs () {
+  __git_commits
 }
 
 # TODO: deal with prefixes and suffixes listed in git-rev-parse

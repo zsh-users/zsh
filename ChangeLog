@@ -1,5 +1,9 @@
 2007-06-28  Clint Adams  <clint@zsh.org>
 
+	* 23610: Completion/Unix/Command/_git: merge in from Nikolai
+	Weibull's repository git describe as well as fixes for
+	diff-index, diff-files, and diff-stages.
+
 	* 23609: Completion/Unix/Command/_git: merge in git clean
 	completion from Nikolai Weibull's repository.
 
