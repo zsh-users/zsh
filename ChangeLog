@@ -5,7 +5,7 @@
 
 2007-06-27  Peter Stephenson  <pws@csr.com>
 
-	* 23670: Src/linklist.c, Src/loop.c, Src/module.c, Src/parse.c,
+	* 23607: Src/linklist.c, Src/loop.c, Src/module.c, Src/parse.c,
 	Src/subst.c, Src/Modules/parameter.c, Src/Zle/compcore.c,
 	Src/Zle/computil.c: Rationalise some linked list functions.
 
