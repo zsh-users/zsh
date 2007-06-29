@@ -2,6 +2,7 @@ DISTFILES_SRC='
 .distfiles
 _a2ps           _elinks         _kvno           _perldoc        _surfraw
 _aap            _elm            _last           _php            _sysctl
+                                _ldd
 _ant            _enscript       _less           _pine           _tar
 _antiword       _env            _links          _ping           _tardy
 _apachectl      _fakeroot       _loadkeys       _pkg-config     _tcptraceroute

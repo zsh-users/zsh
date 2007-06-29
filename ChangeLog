@@ -1,3 +1,8 @@
+2007-06-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 23611: Completion/Unix/Command/_ldd, Completion/Unix/Type/_ld_debug:
+	new completions for ldd and LD_DEBUG on Solaris and Linux
+
 2007-06-28  Clint Adams  <clint@zsh.org>
 
 	* 23610: Completion/Unix/Command/_git: merge in from Nikolai
