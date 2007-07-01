@@ -9,7 +9,7 @@
 # Values encoding simple types
 #
 local -a subcmd_dev
-subcmd_dev=(/$'[[:alpha:]]##[[:digit:]]##\0'/ ':interfaces:network interface:_net_interfaces')
+subcmd_dev=(/$'[[:alpha:]]##[[:digit:]]##(\.[[:digit:]]##)#\0'/ ':interfaces:network interface:_net_interfaces')
 
 local -a subcmd_onoff
 subcmd_onoff=(/$'(on|off)\0'/ ':onoff:state (on or off):(on off)')
@@ -29,6 +29,14 @@ local -a subcmd_ipaddr
 subcmd_ipaddr=(
   /$'(<->(.<->(.<->(.<->|)|)|)|[:[:xdigit]]#:[:[:xdigit:]]#)(|/<->)\0'/
   ':ipaddress:IP address (v4 or v6) with optional /<network-prefix-length>:( )'
+)
+
+local -a subcmd_ipaddrs
+local PATH=$PATH
+PATH=/sbin:$PATH
+subcmd_ipaddrs=(
+  /$'(<->(.<->(.<->(.<->|)|)|)|[:[:xdigit]]#:[:[:xdigit:]]#)(|/<->)\0'/
+  ":ipaddress:IP address (v4 or v6) currently set:( $(ip addr show | sed -n 's/^ *inet6* \([0-9a-f\.:/]*\) .*$/\1/p') )"
 )
 
 local -a subcmd_scope
@@ -190,7 +198,7 @@ link_cmds=("$reply[@]")
 #
 local -a addr_add_cmds
 # TODO: broadcast can take + or =
-_regex_words addr-add-commands "addr add/change/replace commands" \
+_regex_words addr-add-commands "addr add/remove/change/replace commands" \
   'dev:specify device:$subcmd_dev' \
   'lo*cal:specify local IP address:$subcmd_ipaddr' \
   'p*eer:specify peer IP address (point-to-point):$subcmd_ipaddr' \
@@ -199,6 +207,9 @@ _regex_words addr-add-commands "addr add/change/replace commands" \
   's*cope:specify scope for address:$subcmd_scope'
 # can complete IP address with no keyword
 addr_add_cmds=("(" $subcmd_ipaddr "|" ")" "$reply[@]" "#" )
+
+local -a addr_del_cmds
+addr_del_cmds=("(" $subcmd_ipaddrs "|" "$reply[@]" ")" "#" )
 
 local -a addr_show_cmds
 # TODO: broadcast can take + or =
@@ -223,7 +234,7 @@ _regex_words \
   'a*dd:add new protocol address:$addr_add_cmds' \
   'c*hange:change existing protocol address:$addr_add_cmds' \
   'r*replace:add or update protocol address:$addr_add_cmds' \
-  'd*elete:delete protocol address:$addr_add_cmds' \
+  'd*elete:delete protocol address:$addr_del_cmds' \
   's*how:show protocol address:$addr_show_cmds' \
   'f*lush:flush protocol address:$addr_show_cmds'
 addr_cmds=("$reply[@]")
@@ -495,11 +506,11 @@ _regex_words \
   commands "ip command" \
   'l*ink:configure network device:$link_cmds' \
   'a*ddr:manage protocol address:$addr_cmds' \
-  'ro*ute:manage routing table:$route_cmds' \
+  'r*oute:manage routing table:$route_cmds' \
   'ru*le:manage routing policy database:$rule_cmds' \
   'n*eigh:manage neighbour/ARP tables:$neigh_cmds' \
   't*unnel:configure tunnel:$tunnel_cmds' \
-  'ma*ddr:manage multicast addresses:$maddr_cmds' \
+  'm*addr:manage multicast addresses:$maddr_cmds' \
   'mr*oute:manage multicast routing cache:$mroute_cmds' \
   'mo*nitor:monitor state:$monitor_cmds'
 args+=("$reply[@]")

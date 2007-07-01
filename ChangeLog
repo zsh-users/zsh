@@ -1,3 +1,9 @@
+2007-07-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Tomasz Pala: users/11599: Completion/Unix/Command/_ip:
+	improvements for VLAN interfaces, deleting addresses,
+	abbreviations.
+
 2007-07-01  Clint Adams  <clint@zsh.org>
 
 	* 23628: Completion/Unix/Command/_git: merge in from Nikolai
