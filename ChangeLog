@@ -1,3 +1,9 @@
+2007-07-01  Clint Adams  <clint@zsh.org>
+
+	* 23627: Completion/Unix/Command/_git: merge in from Nikolai
+	Weibull's repository fixes for git hash-object, index-pack,
+	merge-index.
+
 2007-06-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 23611: Completion/Unix/Command/_ldd, Completion/Unix/Type/_ld_debug:

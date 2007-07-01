@@ -271,17 +271,18 @@ _git-commit-tree () {
 
 _git-hash-object () {
   _arguments \
+    '(:)--stdin[read object from standard input]' \
     '-t[the type of object to create]:object type:((blob\:"a blob of data"
                                                     commit\:"a tree with parent commits"
                                                     tag\:"a symbolic name for another object"
                                                     tree\:"a recursive tree of blobs"))' \
     '-w[write the object to the object database]' \
-    ':file:_files' && ret=0
+    '(--stdin):file:_files' && ret=0
 }
 
 _git-index-pack () {
   _arguments \
-    '-o[write generated pack index into specified file]' \
+    '-o[write generated pack index into specified file]:file:_files' \
     ':pack file:_files -g "*.pack"' && ret=0
 }
 
@@ -294,7 +295,7 @@ _git-merge-index () {
   if (( CURRENT > 2 )) && [[ $words[CURRENT-1] != -[oq] ]]; then
     _arguments -S \
       '(:)-a[run merge against all files in the index that need merging]' \
-      '*:index file:__git_files' && ret=0
+      '*:index file:__git_cached_files' && ret=0
   else
     typeset -a arguments
 
