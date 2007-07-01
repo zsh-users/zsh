@@ -1,5 +1,8 @@
 2007-07-01  Clint Adams  <clint@zsh.org>
 
+	* 23628: Completion/Unix/Command/_git: merge in from Nikolai
+	Weibull's repository completion for git mktree.
+
 	* 23627: Completion/Unix/Command/_git: merge in from Nikolai
 	Weibull's repository fixes for git hash-object, index-pack,
 	merge-index.

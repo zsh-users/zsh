@@ -1,4 +1,4 @@
-#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-describe git-hash-object git-index-pack git-init-db git-merge-index git-mktag git-pack-objects git-prune-packed git-read-tree git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
+#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-describe git-hash-object git-index-pack git-init-db git-merge-index git-mktag git-mktree git-pack-objects git-prune-packed git-read-tree git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
 
 # Commands not completed:
 # git-sh-setup
@@ -133,6 +133,7 @@ _git_commands () {
     'merge-index:runs a merge for files needing merging'
     'merge-one-file:standard helper-program to use with merge-index'
     'mktag:creates a tag object'
+    'mktree:build tree-object from ls-tree formatted text'
     'mv:moves or renames a file, directory, or symlink'
     'name-rev:find symbolic names for given revisions'
     'octopus:merges more than two commits'
@@ -309,6 +310,11 @@ _git-merge-index () {
 
 _git-mktag () {
   _message 'no arguments allowed; only accepts tags on standard input'
+}
+
+_git-mktree () {
+  _arguments \
+    $nul_arg && ret=0
 }
 
 _git-pack-objects () {
