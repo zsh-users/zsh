@@ -27,12 +27,12 @@ zsh.tar.gz
    Latest production release of zsh.  Includes the source files of all
    documentation.
 
-zsh-beta.tar.gz
+zsh-dev.tar.gz
    The current development version of zsh.  Not guaranteed to be stable.
 
 zsh-*.tar.gz
    Specific zsh versions.  If you just want the latest zsh then use
-   zsh.tar.gz or zsh-beta.tar.gz.
+   zsh.tar.gz or zsh-dev.tar.gz.
 
 zsh-*-*.diff.gz
    Context diffs between releases.  Note that if you use this for
@@ -53,9 +53,9 @@ zsh-doc.tar.gz
    Pre-built Postscript, Info, DVI and HTML versions of the documentation
    contained in the stable zsh distribution zsh.tar.gz.
 
-zsh-beta-doc.tar.gz
+zsh-dev-doc.tar.gz
    Pre-built Postscript, Info, DVI and HTML versions of the documentation
-   contained in the beta zsh distribution zsh-beta.tar.gz.
+   contained in the development zsh distribution zsh-dev.tar.gz.
 
 zsh-*-doc.tar.gz
    Pre-built documentation for specific zsh versions.
