@@ -1,5 +1,8 @@
 2007-07-02  Clint Adams  <clint@zsh.org>
 
+	* 23639: Completion/Unix/Command/_git: merge in git merge-tree
+	completion from Nikolai Weibull's repository.
+
 	* 23629: Etc/FTP-README: change references to "beta" to "dev" or
 	"development".
 
