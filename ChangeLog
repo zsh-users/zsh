@@ -1,5 +1,8 @@
 2007-07-02  Clint Adams  <clint@zsh.org>
 
+	* 23639: Completion/Unix/Command/_git: merge in git quiltimport
+	completion from Nikolai Weibull's repository.
+
 	* 23639: Completion/Unix/Command/_git: merge in git merge-tree
 	completion from Nikolai Weibull's repository.
 
