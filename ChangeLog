@@ -1,3 +1,8 @@
+2007-07-03  Clint Adams  <clint@zsh.org>
+
+	* 23644: Completion/Unix/Command/_git: merge in git remote
+	completion from Nikolai Weibull's repository.
+
 2007-07-02  Clint Adams  <clint@zsh.org>
 
 	* 23639: Completion/Unix/Command/_git: merge in git quiltimport

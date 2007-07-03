@@ -1,4 +1,4 @@
-#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-describe git-hash-object git-index-pack git-init-db git-merge-index git-merge-tree git-mktag git-mktree git-pack-objects git-prune-packed git-read-tree git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-quiltimport git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
+#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-describe git-hash-object git-index-pack git-init-db git-merge-index git-merge-tree git-mktag git-mktree git-pack-objects git-prune-packed git-read-tree git-remote git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-quiltimport git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
 
 # Commands not completed:
 # git-sh-setup
@@ -151,6 +151,7 @@ _git_commands () {
     'rebase:rebases local commits to new upstream head'
     'receive-pack:command invoked by send-pack to receive what is pushed to it'
     'relink:hardlinks acommon objects in local repositories'
+    'remote:manage set of tracked repositories'
     'repack:packs unpacked objects in a repository'
     'request-pull:generates a summary of pending changes'
     'reset:resets current HEAD to the specified state'
@@ -359,6 +360,47 @@ _git-read-tree () {
   else
     _message 'no more arguments'
   fi
+}
+
+_git-remote () {
+  local curcontext=$curcontext state line
+  declare -A opt_args
+
+  _arguments -C \
+    ':command:->command' \
+    '*::options:->options' && ret=0
+
+  case $state in
+    (command)
+      declare -a commands
+
+      commands=(
+        'add:add a new remote'
+        'show:show information about a given remote'
+        'prune:delete all stale tracking branches for a given remote'
+        'update:fetch updates for a set of remotes')
+
+      _describe -t commands 'sub-command' commands && ret=0
+      ;;
+    (options)
+      case $line[1] in
+        (add)
+          _arguments \
+            '*'{--track,-t}'[track given branch instead of default glob refspec]:branch:__git_branch_names' \
+            '(--master -m)'{--master,-m}"[set the remote's HEAD to point to given master branch]:branch:__git_branch_names" \
+            '(--fetch -f)'{--fetch,-f}'[run git-fetch on the new remote after it has been created]' \
+            ':branch name:__git_remotes' \
+            ':url:_urls' && ret=0
+          ;;
+        (show|name|prune)
+          __git_remotes && ret=0
+          ;;
+        (update)
+          __git_remote-groups && ret=0
+          ;;
+      esac
+      ;;
+  esac
 }
 
 _git-unpack-objects () {
@@ -1493,6 +1535,29 @@ __git_any_repositories () {
     'remote repositories::__git_remote_repository'
 }
 
+__git_remotes () {
+  local expl gitdir remotes
+
+  gitdir=$(_call_program gitdir git rev-parse --git-dir 2>/dev/null)
+  __git_command_successful || return
+
+#  zparseopts -a opts X+:
+#
+#  if (( !$opts[(I)-X] )); then
+#    descr=remote
+#  fi
+
+  remotes=(${${(f)"$(_call_program remotes git config --get-regexp '"^remote\..*\.url$"')"}//#(#b)remote.(*).url */$match[1]})
+  __git_command_successful || return
+
+  # TODO: Should combine the two instead of either or.
+  if (( $#remotes > 0 )); then
+    _wanted remotes expl remote compadd $* - $remotes
+  else
+    _wanted remotes expl remote _files $* - -W "($gitdir/remotes)" -g "$gitdir/remotes/*"
+  fi
+}
+
 __git_ref_specs () {
   if compset -P '*:'; then
     __git_heads
@@ -1564,6 +1629,32 @@ __git_references () {
   else
     _message 'not a git repository'
   fi
+}
+
+__git_branch_names () {
+  local expl
+  declare -a branch_names
+
+  branch_names=(${${(f)"$(_call_program branch-names git branch 2>/dev/null)"}#[* ] })
+  __git_command_successful || return
+
+  _wanted branch-names expl branch-name compadd $* - $branch_names
+}
+
+__git_config_filtered_gettable_name () {
+  local expl
+  declare -a names
+
+  # TODO: See __git_config_gettable_name for discussion on how to actually get
+  # out the names, skipping the values.
+  names=(${${(M)${${(f)"$(_call_program $2 git config --list)"}%%\=*}:#$1.*}#$1.})
+  __git_command_successful || return
+
+  _wanted $2 expl $3 compadd $names
+}
+
+__git_remote-groups () {
+  __git_config_filtered_gettable_name 'remotes' remote-groups 'remote-groups'
 }
 
 __git_local_references () {
