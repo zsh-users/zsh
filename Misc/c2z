@@ -3,6 +3,7 @@
 # c2z - environment conversion tool
 # Contributed by Bart Schaefer
 # (Tweaked a bit by Paul Falstad)
+# (Tweaked again by Bart Schaefer)
 #
 # This is a quick script to convert csh aliases to zsh aliases/functions.
 # It also converts the csh environment and local variables to zsh.  c2z
@@ -81,7 +82,13 @@ grep -v ! /tmp/cz$$.1 >/tmp/cz$$.3
 sed -e "s/'/'"\\\\"''"/g \
     -e 's/^\([^'"$T"']*\)'"$T"'\(.*\)$/alias -- \1='"'\2'/" \
     /tmp/cz$$.3
-sed -e 's/![:#]*/$/g' \
+sed -e 's/>\(&*\)!/>\1|/g' \
+    -e 's/!\*:q/"$@"/g' \
+    -e 's/\(![:#]*[^'"$T"']*\):q/"\1"/g' \
+    -e 's/!\([-0-9][0-9]*\)\(:x\)*/$\2(fc -nl \1)/g' \
+    -e 's/\$:x(fc/$=(fc/g' \
+    -e 's/![:#]*\([^'"$T"']\)/$==\1/g' \
+    -e 's/\$=\(=[^'"$T"']*\):x/$\1/g' \
     -e 's/\$cwd/$PWD/' \
     -e 's/^\([^'"$T"']*\)'"$T"'\(.*\)$/\1 () { \2 }/' \
     /tmp/cz$$.2
@@ -92,6 +99,7 @@ exec < /tmp/cz$$.e
 # Would be nice to deal with embedded newlines, e.g. in TERMCAP, but ...
 sed -e '/^SHLVL/d' \
     -e '/^PWD/d' \
+    -e '/^_=/d' \
     -e "s/'/'"\\\\"''"/g \
     -e "s/^\([A-Za-z0-9_]*=\)/export \1'/" \
     -e "s/$/'/"

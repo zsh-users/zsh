@@ -1,6 +1,7 @@
-texinode(The example Module)(The files Module)(The deltochar Module)(Zsh Modules)
-sect(The example Module)
-The tt(example) module makes available one builtin command:
+COMMENT(!MOD!zsh/example
+An example of how to write a module.
+!MOD!)
+The tt(zsh/example) module makes available one builtin command:
 
 startitem()
 findex(example)

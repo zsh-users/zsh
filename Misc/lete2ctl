@@ -9,6 +9,7 @@
 # Runs as a filter.  Should ignore anything which isn't a "complete".
 # It expects each "complete" statement to be the first thing on a line.
 # All the examples in the tcsh manual give sensible results.
+# Author:  Peter Stephenson <pws@ibmth.df.unipi.it>
 #
 # Option:
 # -x (exact): only applies in the case of command disambiguation (is
@@ -38,6 +39,11 @@
 # (5) Make sure all command names with wildcards are processed together --
 #     they need to be lumped into one "compctl -C" or "compctl -D"
 #     statement for zsh.
+# (6) Group completion (complete's g flag) is not built into zsh, so
+#     you need perl to be available to generate the groups.  If this
+#     script is useful, I assume that's not a problem.
+# (7) I don't know what `completing completions' means, so the X
+#     flag to complete is not handled.
 
 # Handle options
 if (@ARGV) {
@@ -113,6 +119,13 @@ sub gettype {
 # Nothing (n) can be handled by returning nothing.  (C.f. King Lear, I.i.)
     if ($c =~ /[abcjuv]/) {
 	$ret = "-$c";
+    } elsif ($c eq 'C') {
+	if (defined($glob)) {
+	    $ret = "-W $glob -/g '*(.*)'";
+	    undef($glob);
+	} else {
+	    $ret = '-c';
+	}
     } elsif ($c eq 'S') {
 	$ret = '-k signals';
     } elsif ($c eq 'd') {
@@ -121,18 +134,42 @@ sub gettype {
 	} else {
 	    $ret = '-/';
 	}
+    } elsif ($c eq 'D') {
+	if (defined($glob)) {
+	    $ret = "-W $glob -/";
+	    undef($glob);
+	} else {
+	    $ret = '-/';
+	}
     } elsif ($c eq 'e') {
 	$ret = '-E';
     } elsif ($c eq 'f' && !$glob) {
 	$ret = '-f';
+    } elsif ($c eq 'F') {
+	if (defined($glob)) {
+	    $ret = "-W $glob -f";
+	    undef($glob);
+	} else {
+	    $ret = '-f';
+	}
+    } elsif ($c eq 'g') {
+	$ret = "-s '\$(perl -e '\\''while ((\$name) = getgrent)\n" .
+	    "{ print \$name, \"\\n\"; }'\\'')'";
     } elsif ($c eq 'l') {
 	$ret = q!-k "(`limit | awk '{print $1}'`)"!;
     } elsif ($c eq 'p') {
-	$ret = "-W $glob -f", undef($glob) if defined($glob);
+        $ret = "-W $glob -f", undef($glob) if defined($glob);
     } elsif ($c eq 's') {
-	$ret = '-p';
+        $ret = '-p';
     } elsif ($c eq 't') {
 	$qual = '.';
+    } elsif ($c eq 'T') {
+        if (defined($glob)) {
+            $ret = "-W $glob -g '*(.)'";
+            undef($glob);
+        } else {
+            $ret = "-g '*(.)'";
+        }
     } elsif ($c eq 'x') {
 	$glob =~ s/'/'\\''/g;
 	$ret = "-X '$glob'";
@@ -190,7 +227,7 @@ $" = " - ";
 
 while (<>) {
     if (/^\s*complete\s/) {
-	undef(@stuff); 
+	undef(@stuff);
 	$default = '';
 	$_ = $';
 	while (/\\$/) {
@@ -211,7 +248,7 @@ while (<>) {
 	    # Loop over remaining arguments to "complete".
 	    $sep = substr($word,1,1);
 	    $sep =~ s/(\W)/\\$1/g;
-	    @split = split(/$sep/,$word);
+	    @split = split(/$sep/,$word,4);
 	    for ($i = 0; $i < 3; $i++) {
 		while ($split[$i] =~ /\\$/) {
 		    substr($split[$i],-1,1) = "";
@@ -225,7 +262,9 @@ while (<>) {
 		 # The "complete" catch-all:  treat this as compctl\'s
 		 # default (requiring no pattern matching).
 		$default .= &gettype($type) . ' ';
-		defined($suffix) && ($defsuf .= $suffix);
+		defined($suffix) &&
+		    (defined($defsuf) ? ($defsuf .= $suffix)
+		     : ($defsuf = $suffix));
 	    } else {
 		$pat = &getpat($pat,$arg);
 		$type = &gettype($type);

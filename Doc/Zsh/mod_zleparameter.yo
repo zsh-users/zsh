@@ -1,19 +1,20 @@
-texinode(The zleparameter Module)()(The zle Module)(Zsh Modules)
-sect(The zleparameter Module)
+COMMENT(!MOD!zsh/zleparameter
+Access to internals of the Zsh Line Editor via parameters.
+!MOD!)
 cindex(parameters, special)
-The tt(zleparameter) module defines two special parameters that can be 
+The tt(zsh/zleparameter) module defines two special parameters that can be 
 used to access internal information of the Zsh Line Editor (see
 ifzman(zmanref(zshzle))\
 ifnzman(noderef(Zsh Line Editor))\
 ).
 
 startitem()
-vindex(zlekeymaps)
-item(tt(zlekeymaps))(
+vindex(keymaps)
+item(tt(keymaps))(
 This array contains the names of the keymaps currently defined.
 )
-vindex(zlewidgets)
-item(tt(zlewidgets))(
+vindex(widgets)
+item(tt(widgets))(
 This associative array contains one entry per widget defined. The name 
 of the widget is the key and the value gives information about the
 widget. It is either the string `tt(builtin)' for builtin widgets, a
