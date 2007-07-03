@@ -1,17 +1,17 @@
 2007-07-03  Peter Stephenson  <pws@csr.com>
 
-	* unposted: Doc/Zsh/mod_cap.yo, Doc/Zsh/mod_complete.yo,
-	Doc/Zsh/mod_example.yo, Doc/Zsh/mod_files.yo,
-	Doc/Zsh/mod_mapfile.yo, Doc/Zsh/mod_zleparameter.yo, Doc/intro.ms,
-	Doc/zshzftpsys.yo, Etc/Makefile.in,
-	Functions/Prompts/prompt_adam1_setup,
+	* unposted: Completion/README, Doc/Zsh/mod_cap.yo,
+	Doc/Zsh/mod_complete.yo, Doc/Zsh/mod_example.yo,
+	Doc/Zsh/mod_files.yo, Doc/Zsh/mod_mapfile.yo,
+	Doc/Zsh/mod_zleparameter.yo, Doc/intro.ms, Doc/zshzftpsys.yo,
+	Etc/Makefile.in, Functions/Prompts/prompt_adam1_setup,
 	Functions/Prompts/prompt_redhat_setup,
 	Functions/Prompts/prompt_suse_setup, Functions/Zftp/zfrglob,
 	Functions/Zftp/zftp_chpwd, Misc/.distfiles, Misc/bash2zshprompt,
 	Misc/c2z, Misc/compctl-examples, Misc/globtests.ksh,
 	Misc/job-control-tests, Misc/lete2ctl, Src/Zle/.distfiles,
-	Util/preconfig, aclocal.m4: jiggery pokery to force files
-	onto main branch (1.X) from vendor branch (1.1.1.X).
+	Util/preconfig, aclocal.m4: jiggery pokery to force files onto
+	main branch (1.X) from vendor branch (1.1.1.X).
 
 2007-07-03  Clint Adams  <clint@zsh.org>
 
