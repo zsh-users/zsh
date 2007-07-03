@@ -1,11 +1,13 @@
 2007-07-03  Clint Adams  <clint@zsh.org>
 
+	* 23645: Functions/Zftp/zfautocheck: use == instead of =.
+
 	* 23644: Completion/Unix/Command/_git: merge in git remote
 	completion from Nikolai Weibull's repository.
 
 2007-07-02  Clint Adams  <clint@zsh.org>
 
-	* 23639: Completion/Unix/Command/_git: merge in git quiltimport
+	* 23640: Completion/Unix/Command/_git: merge in git quiltimport
 	completion from Nikolai Weibull's repository.
 
 	* 23639: Completion/Unix/Command/_git: merge in git merge-tree
