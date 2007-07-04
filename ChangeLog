@@ -1,3 +1,8 @@
+2007-07-03  Clint Adams  <clint@zsh.org>
+
+	* 23653: Completion/Debian/Command/_apt: add completion for apt-get
+	autoremove.
+
 2007-07-03  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/README, Doc/Zsh/mod_cap.yo,
