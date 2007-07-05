@@ -1,5 +1,8 @@
 2007-07-05  Clint Adams  <clint@zsh.org>
 
+	* 23655: Completion/Unix/Command/_git: merge in git instaweb
+	completion from Nikolai Weibull's repository.
+
 	* 23654: Completion/Debian/Command/_reprepro: add completion for
 	reprepro.
 

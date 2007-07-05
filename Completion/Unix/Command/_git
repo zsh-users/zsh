@@ -1,4 +1,4 @@
-#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-describe git-hash-object git-index-pack git-init-db git-merge-index git-merge-tree git-mktag git-mktree git-pack-objects git-prune-packed git-read-tree git-remote git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-quiltimport git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
+#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-describe git-hash-object git-index-pack git-init-db git-instaweb git-merge-index git-merge-tree git-mktag git-mktree git-pack-objects git-prune-packed git-read-tree git-remote git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-quiltimport git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-send-email git-stripspace
 
 # Commands not completed:
 # git-sh-setup
@@ -120,6 +120,7 @@ _git_commands () {
     'http-fetch:downloads a remote git repository via HTTP'
     'index-pack:build pack index file for an existing packed archive'
     'init-db:creates an empty git object database'
+    'instaweb:instantly browse your working repository in gitweb'
     'local-fetch:duplicates another git repository on a local system'
     'log:shows commit logs'
     'lost-found:recovers lost references that luckily have not yet been pruned'
@@ -1322,6 +1323,18 @@ _git-daemon () {
 
 _git-get-tar-commit-id () {
   _message 'no arguments allowed; accepts tar-file on standard input'
+}
+
+_git-instaweb () {
+  _arguments \
+    '(-l --local)'{-l,--local}'[bind the web server to 127.0.0.1]' \
+    '(-d --httpd)'{-d,--httpd=}'[HTTP-daemon command-line that will be executed]:command line' \
+    '(-m --module-path)'{-m,--module-path=}'[module path for the Apache HTTP-daemon]:module path:_directories' \
+    '(-p --port)'{-p,--port=}'[port to bind web server to]: :_guard "[[\:digit\:]]" port' \
+    '(-b --browser)'{-b,--browser=}'[web-browser command-line that will be executed]:command line' \
+    '--start[start the HTTP-daemon and exit]' \
+    '--stop[start the HTTP-daemon and exit]' \
+    '--restart[restart the HTTP-daemon and exit]' && ret=0
 }
 
 _git-mailinfo () {
