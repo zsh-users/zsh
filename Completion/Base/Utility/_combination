@@ -72,13 +72,21 @@ pats=( "${(@)keys/*/*}" )
 while [[ "$1" = *=* ]]; do
   tmp="${1%%\=*}"
   key="${tmp%:*}"
-  num="${${tmp##*:}:-1}"
+  if [[ $1 = *:* ]]; then
+    num=${tmp##*:}
+  else
+    num=1
+  fi
   pats[$keys[(in:num:)$key]]="${1#*\=}"
   shift
 done
 
 key="${1%:*}"
-num="${${1##*:}:-1}"
+if [[ $1 = *:* ]]; then
+  num=${1##*:}
+else
+  num=1
+fi
 shift
 
 if zstyle -a ":completion:${curcontext}:$tag" "$style" tmp; then
