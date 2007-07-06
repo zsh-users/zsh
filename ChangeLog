@@ -4,6 +4,11 @@
 	appears to reduce collisions between lock attempts in multiple
 	windows.
 
+2007-07-05  Peter Stephenson  <pws@csr.com>
+
+	* 23658: Completion/Base/Utility/_combination: bad use
+	of index variable exposed by 23553.
+
 2007-07-05  Clint Adams  <clint@zsh.org>
 
 	* 23655: Completion/Unix/Command/_git: merge in git instaweb
