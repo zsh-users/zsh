@@ -1,5 +1,9 @@
 2007-07-06  Peter Stephenson  <pws@csr.com>
 
+	* 23660: Doc/Zsh/expn.yo, Src/sort.c, Test/D04parameter.ztst:
+	numerical sorting didn't work in reverse, wasn't tested and wasn't
+	correctly documented.
+
 	* unposted: Functions/Calendar/calendar_lockfiles: configuration
 	appears to reduce collisions between lock attempts in multiple
 	windows.

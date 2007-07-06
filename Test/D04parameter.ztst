@@ -913,3 +913,10 @@
 >AXB C1D
 >AB C0D
 >AB C0D
+
+  foo=(a6 a117 a17 b6 b117 b17)
+  print ${(n)foo}
+  print ${(On)foo}
+0:Numeric sorting
+>a6 a17 a117 b6 b17 b117
+>b117 b17 b6 a117 a17 a6

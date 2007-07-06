@@ -764,13 +764,12 @@ item(tt(L))(
 Convert all letters in the result to lower case.
 )
 item(tt(n))(
-Sort decimal numbers numerically; if the first differing
+Sort decimal integers numerically; if the first differing
 characters of two test strings are not digits, sorting
-is lexical.   Numbers with initial zeroes
-are sorted before those without.  Hence the array `tt(foo1 foo02
-foo2 foo3 foo20 foo23)' is sorted into the order shown.  Trailing
-non-digits are not sorted; the order of `tt(2foo)' and `tt(2bar)'
-is not defined.  May be combined with `tt(i)' or `tt(O)'.
+is lexical.   Integers with more initial zeroes
+are sorted before those with fewer or none.  Hence the array `tt(foo1 foo02
+foo2 foo3 foo20 foo23)' is sorted into the order shown.
+May be combined with `tt(i)' or `tt(O)'.
 )
 item(tt(o))(
 Sort the resulting words in ascending order; if this appears on its

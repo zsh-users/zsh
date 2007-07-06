@@ -134,9 +134,9 @@ eltpcmp(const void *a, const void *b)
 		    while (idigit(*as) && idigit(*bs))
 			as++, bs++;
 		    if (idigit(*as) && !idigit(*bs))
-			return 1;
+			return sortdir;
 		    if (idigit(*bs) && !idigit(*as))
-			return -1;
+			return -sortdir;
 		}
 	    }
 	}
