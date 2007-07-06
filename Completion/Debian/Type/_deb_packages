@@ -7,7 +7,7 @@ _deb_packages_update_avail () {
       _cache_invalid DEBS_avail ) && ! _retrieve_cache DEBS_avail;
   then
     _deb_packages_cache_avail=(
-      ${(f)"$(apt-cache --generate pkgnames)"}
+      ${(f)"$(apt-cache --generate pkgnames 2>/dev/null)"}
     )
 
     _store_cache DEBS_avail _deb_packages_cache_avail
