@@ -1,3 +1,9 @@
+2007-07-06  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Calendar/calendar_lockfiles: configuration
+	appears to reduce collisions between lock attempts in multiple
+	windows.
+
 2007-07-05  Clint Adams  <clint@zsh.org>
 
 	* 23655: Completion/Unix/Command/_git: merge in git instaweb

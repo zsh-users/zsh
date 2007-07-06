@@ -3,13 +3,13 @@
 
 local file lockfile msgdone
 # Number of attempts to lock a file.  Probably not worth stylising.
-integer lockattempts=3 loadtried
+integer lockattempts=4 loadtried
 
 # The lockfile name is not stylised: it has to be a fixed
 # derivative of the main fail.
 for file; do
   lockfile=$file.lockfile
-  for (( i = 0; i < lockattempts; i++ )); do
+  for (( i = 0; i <= lockattempts; i++ )); do
     if ln -s $file $lockfile >/dev/null 2>&1; then
       lockfiles+=($lockfile)
       break
@@ -24,10 +24,10 @@ for file; do
     fi
     if zmodload -e zsh/zselect; then
       # This gives us finer grained timing (100th second).
-      # Randomize the sleep between .1 and 1 second so that
+      # Randomize the sleep between .1 and 2 seconds so that
       # we are much less likely to have multiple instances
       # retrying at once.
-      zselect -t $(( 10 + RANDOM * 90 / 32768 ))
+      zselect -t $(( 10 + RANDOM * 190 / 32768 ))
     else
       sleep 1
     fi
