@@ -376,7 +376,7 @@ static nl_item nl_vals[] = {
 };
 
 static nl_item *
-liitem(char *name)
+liitem(const char *name)
 {
     char **element;
     nl_item *nlcode;
@@ -393,16 +393,17 @@ liitem(char *name)
 
 /**/
 static HashNode
-getlanginfo(UNUSED(HashTable ht), char *name)
+getlanginfo(UNUSED(HashTable ht), const char *name)
 {
     int len, *elem;
-    char *listr;
+    char *listr, *nameu;
     Param pm = NULL;
 
-    unmetafy(name, &len);
+    nameu = dupstring(name);
+    unmetafy(nameu, &len);
 
     pm = (Param) hcalloc(sizeof(struct param));
-    pm->node.nam = dupstring(name);
+    pm->node.nam = nameu;
     pm->node.flags = PM_READONLY | PM_SCALAR;
     pm->gsu.s = &nullsetscalar_gsu;
 
@@ -456,12 +457,12 @@ static struct paramdef partab[] = {
 static struct features module_features = {
     NULL, 0,
     NULL, 0,
+    NULL, 0,
 #ifdef HAVE_NL_LANGINFO
     partab, sizeof(partab)/sizeof(*partab),
 #else
     NULL, 0,
 #endif
-    NULL, 0,
     0
 };
 
@@ -476,7 +477,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -484,7 +485,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -498,7 +499,7 @@ boot_(UNUSED(Module m))
 int
 cleanup_(UNUSED(Module m))
 {
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

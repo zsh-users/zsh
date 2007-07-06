@@ -37,8 +37,7 @@ for x_mod in $x_mods; do
         echo "/* non-linked-in known module \`$x_mod' */"
 	linked=no
     esac
-    unset moddeps autobins autoinfixconds autoprefixconds autoparams
-    unset automathfuncs
+    unset moddeps autofeatures
     . $srcdir/../$modfile
     if test "x$autofeatures" != x; then
 	echo "  if (emulation == EMULATE_ZSH) {"

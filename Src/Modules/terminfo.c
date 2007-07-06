@@ -129,10 +129,10 @@ static struct builtin bintab[] = {
 
 /**/
 static HashNode
-getterminfo(UNUSED(HashTable ht), char *name)
+getterminfo(UNUSED(HashTable ht), const char *name)
 {
     int len, num;
-    char *tistr;
+    char *tistr, *nameu;
     Param pm = NULL;
 
     /* This depends on the termcap stuff in init.c */
@@ -141,21 +141,22 @@ getterminfo(UNUSED(HashTable ht), char *name)
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
 	return NULL;
 
-    unmetafy(name, &len);
+    nameu = dupstring(name);
+    unmetafy(nameu, &len);
 
     pm = (Param) hcalloc(sizeof(struct param));
-    pm->node.nam = dupstring(name);
+    pm->node.nam = nameu;
     pm->node.flags = PM_READONLY;
 
-    if (((num = tigetnum(name)) != -1) && (num != -2)) {
+    if (((num = tigetnum(nameu)) != -1) && (num != -2)) {
 	pm->u.val = num;
 	pm->node.flags |= PM_INTEGER;
 	pm->gsu.i = &nullsetinteger_gsu;
-    } else if ((num = tigetflag(name)) != -1) {
+    } else if ((num = tigetflag(nameu)) != -1) {
 	pm->u.str = num ? dupstring("yes") : dupstring("no");
 	pm->node.flags |= PM_SCALAR;
 	pm->gsu.s = &nullsetscalar_gsu;
-    } else if ((tistr = (char *)tigetstr(name)) != NULL && tistr != (char *)-1) {
+    } else if ((tistr = (char *)tigetstr(nameu)) != NULL && tistr != (char *)-1) {
 	pm->u.str = dupstring(tistr);
 	pm->node.flags |= PM_SCALAR;
 	pm->gsu.s = &nullsetscalar_gsu;
@@ -298,12 +299,12 @@ static struct features module_features = {
     NULL, 0,
 #endif
     NULL, 0,
+    NULL, 0,
 #ifdef USE_TERMINFO_MODULE
     partab, sizeof(partab)/sizeof(*partab),
 #else
     NULL, 0,
 #endif
-    NULL, 0,
     0
 };
 
@@ -318,7 +319,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -326,7 +327,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -349,7 +350,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

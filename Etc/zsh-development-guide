@@ -218,7 +218,7 @@ by the zsh core. The first one, named `setup_', should set up any data
 needed in the module, at least any data other modules may be interested
 in.
 
-The next pair are features_ and enables_ and deal with enabling module
+The next pair are `features_' and `enables_' and deal with enabling module
 features.  Ensure you are familiar with the description of features under
 `zmodload -F'.  The function features_ takes an argument `char
 ***featuresp'; *featuresp is to be set to a NULL-terminated array
@@ -235,8 +235,7 @@ initialised so setting them is mandatory any time there are any present.
 A structure "struct features" should
 be used to contain all standard features as well as the number of
 abstract features (those only understood by the module itself).
-It contains pointers to all builtins, conditions, parameters and
-conditions controlled by the module.
+See below.
 
 enables_ takes an argument `int **enablesp'.  If *enablesp is NULL, it
 should be set to an array of the same length as *featuresp without the
@@ -248,31 +247,44 @@ function handlefeatures() conveniently handles all standard features
 present in the module's features structure; abstract features must be
 handled by the module (as with the features array, the area of the enables
 array for abstract features is not even initialised by the main shell).  As
-with features_, any handling of the array by the module itself should take
+with `features_', any handling of the array by the module itself should take
 into account that the array will not be freed and any allocation should
 therefore be from heap memory.
 
-The functions features_ and enables_ can be called at any point
-after setup_ has been called and before cleanup_ is called.  In
-particular they can be called before or after boot_.
+The functions `features_' and `enables_' can be called at any point
+after `setup_' has been called and before `cleanup_' is called.  In
+particular they can be called before or after `boot_'.
 
 The function named `boot_' should register function wrappers, hooks and
 anything that will be visible to the user that is not handled by features_
 and enables_ (so features should not be turned on here).  It will be called
 after the `setup_'-function, and also after the intial set of features
-have been set by calls to features_ and enables_.
+have been set by calls to `features_' and `enables_'.
 
 The function named `cleanup_', is called when the user tries to unload
 a module and should de-register all features and hooks.  A call
 to setfeatures with the final argument NULL will remove all standard
-features present in the module's features structure.
+features present in the module's features structure.  Note that
+`cleanup_' is called whenever `setup_' succeeded, so that `cleanup_'
+must be prepared to handle any state resulting from a failed `boot_'
+or initial call to `features_'.  Note also that a return code of 1
+from `cleanup_' will result in the module not being unloaded, so
+usually `cleanup_' will return 0 even if it has to handle an unclean
+state; if it does return 1, it must be prepared to be called again
+in a future attempt to unload.
 
 The last function, `finish_' is called when the module is actually unloaded
 and should finalize all the data initialized in the `setup_'-function.
+However, `finish_' is called even if `setup_' failed, so it should
+not rely on the module successfully being set up.
+The state from `finish_' module is currently ignored; it is called
+too late to prevent the module from being unloaded.
 
 In short, the `cleanup_'-function should undo what the `boot_'-function did
-(together with handling any residual effects of enables_), and the
-`finish_'-function should undo what the `setup_'-function did.
+(together with handling any residual effects of `enables_'), but should
+not rely on `boot_' having been successful, and the
+`finish_'-function should undo what the `setup_'-function did, but
+should not rely on `setup_' having been successful.
 
 All of these functions should return zero if they succeeded and
 non-zero otherwise.
@@ -301,6 +313,10 @@ as discussed below:
     NULL, 0, /* declare any math functions here */
     0, /* number of abstract features */
   }
+
+Within each individual table ("bintab", etc.), features should be listed
+in ASCII order as no further sorting is performed by the shell when
+features are listed.
 
 Abstract features are handled by the module; the number present
 in `struct features' is there to ensure the main shell allocated

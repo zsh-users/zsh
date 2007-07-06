@@ -96,11 +96,7 @@ evalcond(Estate state, char *fromtest)
 	{
 	    char *modname = isset(REMATCHPCRE) ? "zsh/pcre" : "zsh/regex";
 	    sprintf(overridename = overridebuf, "-%s-match", modname+4);
-	    if (ensurefeature(modname, "c:", overridename+1)) {
-		zwarnnam(fromtest, "%s not available for regex",
-			 modname);
-		return 2;
-	    }
+	    (void)ensurefeature(modname, "c:", overridename+1);
 	    ctype = COND_MODI;
 	}
 	/*FALLTHROUGH*/
@@ -129,7 +125,7 @@ evalcond(Estate state, char *fromtest)
 	    if ((cd = getconddef((ctype == COND_MODI), name + 1, 1))) {
 		if (ctype == COND_MOD &&
 		    (l < cd->min || (cd->max >= 0 && l > cd->max))) {
-		    zwarnnam(fromtest, "unrecognized condition: `%s'", name);
+		    zwarnnam(fromtest, "unknown condition: -%s", name);
 		    return 2;
 		}
 		if (tracingcond)
@@ -139,13 +135,23 @@ evalcond(Estate state, char *fromtest)
 	    else {
 		char *s = strs[0];
 
+		if (overridename) {
+		    /*
+		     * Standard regex function not available: this
+		     * is a hard error.
+		     */
+		    zerrnam(fromtest, "%s not available for regex",
+			     overridename);
+		    return 2;
+		}
+
 		strs[0] = dupstring(name);
 		name = s;
 
 		if (name && name[0] == '-' &&
 		    (cd = getconddef(0, name + 1, 1))) {
 		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
-			zwarnnam(fromtest, "unrecognized condition: `%s'",
+			zwarnnam(fromtest, "unknown condition: -%s",
 				 name);
 			return 2;
 		    }
@@ -154,7 +160,7 @@ evalcond(Estate state, char *fromtest)
 		    return !cd->handler(strs, cd->condid);
 		} else {
 		    zwarnnam(fromtest,
-			     "unrecognized condition: `%s'",
+			     "unknown condition: -%s",
 			     name ? name : "<null>");
 		}
 	    }

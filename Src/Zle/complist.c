@@ -3238,7 +3238,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -3246,7 +3246,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -3261,7 +3261,8 @@ boot_(Module m)
     w_menuselect = addzlefunction("menu-select", menuselect,
                                     ZLE_MENUCMP|ZLE_KEEPSUFFIX|ZLE_ISCOMP);
     if (!w_menuselect) {
-	zwarnnam(m->nam, "name clash when adding ZLE function `menu-select'");
+	zwarnnam(m->node.nam,
+		 "name clash when adding ZLE function `menu-select'");
 	return -1;
     }
     addhookfunc("comp_list_matches", (Hookfn) complistmatches);
@@ -3302,7 +3303,7 @@ cleanup_(Module m)
     deletehookfunc("menu_start", (Hookfn) domenuselect);
     unlinkkeymap("menuselect", 1);
     unlinkkeymap("listscroll", 1);
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

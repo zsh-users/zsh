@@ -1801,10 +1801,10 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("zstyle", 0, bin_zstyle, 0, -1, 0, NULL, NULL),
     BUILTIN("zformat", 0, bin_zformat, 3, -1, 0, NULL, NULL),
-    BUILTIN("zregexparse", 0, bin_zregexparse, 3, -1, 0, "c", NULL),
     BUILTIN("zparseopts", 0, bin_zparseopts, 1, -1, 0, NULL, NULL),
+    BUILTIN("zregexparse", 0, bin_zregexparse, 3, -1, 0, "c", NULL),
+    BUILTIN("zstyle", 0, bin_zstyle, 0, -1, 0, NULL, NULL),
 };
 
 static struct features module_features = {
@@ -1828,7 +1828,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -1836,7 +1836,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -1850,7 +1850,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

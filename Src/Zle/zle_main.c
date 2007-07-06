@@ -1827,7 +1827,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -1835,7 +1835,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -1844,7 +1844,7 @@ boot_(Module m)
 {
     addhookfunc("before_trap", (Hookfn) zlebeforetrap);
     addhookfunc("after_trap", (Hookfn) zleaftertrap);
-    (void)addhookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
+    (void)addhookdefs(m, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return 0;
 }
 
@@ -1853,13 +1853,14 @@ int
 cleanup_(Module m)
 {
     if(zleactive) {
-	zerrnam(m->nam, "can't unload the zle module while zle is active");
+	zerrnam(m->node.nam,
+		"can't unload the zle module while zle is active");
 	return 1;
     }
     deletehookfunc("before_trap", (Hookfn) zlebeforetrap);
     deletehookfunc("after_trap", (Hookfn) zleaftertrap);
-    (void)deletehookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
-    return setfeatureenables(m->nam, &module_features, NULL);
+    (void)deletehookdefs(m, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

@@ -93,7 +93,7 @@ paramtypestr(Param pm)
 
 /**/
 static HashNode
-getpmparameter(UNUSED(HashTable ht), char *name)
+getpmparameter(UNUSED(HashTable ht), const char *name)
 {
     Param rpm, pm = NULL;
 
@@ -199,7 +199,7 @@ static const struct gsu_scalar pmcommand_gsu =
 
 /**/
 static HashNode
-getpmcommand(UNUSED(HashTable ht), char *name)
+getpmcommand(UNUSED(HashTable ht), const char *name)
 {
     Cmdnam cmd;
     Param pm = NULL;
@@ -372,7 +372,7 @@ static const struct gsu_scalar pmdisfunction_gsu =
 
 /**/
 static HashNode
-getfunction(UNUSED(HashTable ht), char *name, int dis)
+getfunction(UNUSED(HashTable ht), const char *name, int dis)
 {
     Shfunc shf;
     Param pm = NULL;
@@ -416,14 +416,14 @@ getfunction(UNUSED(HashTable ht), char *name, int dis)
 
 /**/
 static HashNode
-getpmfunction(HashTable ht, char *name)
+getpmfunction(HashTable ht, const char *name)
 {
     return getfunction(ht, name, 0);
 }
 
 /**/
 static HashNode
-getpmdisfunction(HashTable ht, char *name)
+getpmdisfunction(HashTable ht, const char *name)
 {
     return getfunction(ht, name, DISABLED);
 }
@@ -542,7 +542,7 @@ functracegetfn(UNUSED(Param pm))
 
 /**/
 static HashNode
-getbuiltin(UNUSED(HashTable ht), char *name, int dis)
+getbuiltin(UNUSED(HashTable ht), const char *name, int dis)
 {
     Param pm = NULL;
     Builtin bn;
@@ -566,14 +566,14 @@ getbuiltin(UNUSED(HashTable ht), char *name, int dis)
 
 /**/
 static HashNode
-getpmbuiltin(HashTable ht, char *name)
+getpmbuiltin(HashTable ht, const char *name)
 {
     return getbuiltin(ht, name, 0);
 }
 
 /**/
 static HashNode
-getpmdisbuiltin(HashTable ht, char *name)
+getpmdisbuiltin(HashTable ht, const char *name)
 {
     return getbuiltin(ht, name, DISABLED);
 }
@@ -721,7 +721,7 @@ static const struct gsu_scalar pmoption_gsu =
 
 /**/
 static HashNode
-getpmoption(UNUSED(HashTable ht), char *name)
+getpmoption(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     int n;
@@ -771,69 +771,29 @@ scanpmoptions(UNUSED(HashTable ht), ScanFunc func, int flags)
 
 /* Functions for the modules special parameter. */
 
-static char *modpmname;
-static int modpmfound;
-
-/**/
-static void
-modpmbuiltinscan(HashNode hn, UNUSED(int dummy))
-{
-    if (!(((Builtin) hn)->node.flags & BINF_ADDED) &&
-	!strcmp(((Builtin) hn)->optstr, modpmname))
-	modpmfound = 1;
-}
-
-/**/
-static void
-modpmparamscan(HashNode hn, UNUSED(int dummy))
-{
-    if ((((Param) hn)->node.flags & PM_AUTOLOAD) &&
-	!strcmp(((Param) hn)->u.str, modpmname))
-	modpmfound = 1;
-}
-
 /**/
 static HashNode
-getpmmodule(UNUSED(HashTable ht), char *name)
+getpmmodule(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     char *type = NULL;
-    LinkNode node;
+    Module m;
 
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
 
-    if (!type) {
-	Module m;
+    m = (Module)modulestab->getnode2(modulestab, name);
 
-	for (node = firstnode(modules); node; incnode(node)) {
-	    m = (Module) getdata(node);
-	    if (m->u.handle && !(m->flags & MOD_UNLOAD) &&
-		!strcmp(name, m->nam)) {
-		type = ((m->flags & MOD_ALIAS) ?
-			dyncat("alias:", m->u.alias) : "loaded");
-		break;
-	    }
-	}
+    if (!m)
+	return NULL;
+    if (m->u.handle && !(m->node.flags & MOD_UNLOAD)) {
+	type = ((m->node.flags & MOD_ALIAS) ?
+		dyncat("alias:", m->u.alias) : "loaded");
     }
-    modpmname = name;
-    modpmfound = 0;
     if (!type) {
-	scanhashtable(builtintab, 0, 0, 0, modpmbuiltinscan, 0);
-	if (!modpmfound) {
-	    Conddef p;
-
-	    for (p = condtab; p; p = p->next)
-		if (p->module && !strcmp(name, p->module)) {
-		    modpmfound = 1;
-		    break;
-		}
-	    if (!modpmfound)
-		scanhashtable(realparamtab, 0, 0, 0, modpmparamscan, 0);
-	}
-	if (modpmfound)
+	if (m->autoloads && firstnode(m->autoloads))
 	    type = "autoloaded";
     }
     if (type)
@@ -853,7 +813,6 @@ scanpmmodules(UNUSED(HashTable ht), ScanFunc func, int flags)
     int i;
     HashNode hn;
     LinkList done = newlinklist();
-    LinkNode node;
     Module m;
     Conddef p;
     char *loaded = dupstring("loaded");
@@ -862,14 +821,16 @@ scanpmmodules(UNUSED(HashTable ht), ScanFunc func, int flags)
     pm.node.flags = PM_SCALAR | PM_READONLY;
     pm.gsu.s = &nullsetscalar_gsu;
 
-    for (node = firstnode(modules); node; incnode(node)) {
-	m = (Module) getdata(node);
-	if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
-	    pm.node.nam = m->nam;
-	    pm.u.str = ((m->flags & MOD_ALIAS) ?
-			dyncat("alias:", m->u.alias) : loaded);
-	    addlinknode(done, pm.node.nam);
-	    func(&pm.node, flags);
+    for (i = 0; i < modulestab->hsize; i++) {
+	for (hn = modulestab->nodes[i]; hn; hn = hn->next) {
+	    m = (Module) hn;
+	    if (m->u.handle && !(m->node.flags & MOD_UNLOAD)) {
+		pm.node.nam = m->node.nam;
+		pm.u.str = ((m->node.flags & MOD_ALIAS) ?
+			    dyncat("alias:", m->u.alias) : loaded);
+		addlinknode(done, pm.node.nam);
+		func(&pm.node, flags);
+	    }
 	}
     }
     pm.u.str = dupstring("autoloaded");
@@ -928,11 +889,11 @@ dirsgetfn(UNUSED(Param pm))
 
 /**/
 static HashNode
-getpmhistory(UNUSED(HashTable ht), char *name)
+getpmhistory(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     Histent he;
-    char *p;
+    const char *p;
     int ok = 1;
 
     pm = (Param) hcalloc(sizeof(struct param));
@@ -1042,7 +1003,7 @@ pmjobtext(int job)
 
 /**/
 static HashNode
-getpmjobtext(UNUSED(HashTable ht), char *name)
+getpmjobtext(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     int job;
@@ -1139,7 +1100,7 @@ pmjobstate(int job)
 
 /**/
 static HashNode
-getpmjobstate(UNUSED(HashTable ht), char *name)
+getpmjobstate(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     int job;
@@ -1201,7 +1162,7 @@ pmjobdir(int job)
 
 /**/
 static HashNode
-getpmjobdir(UNUSED(HashTable ht), char *name)
+getpmjobdir(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     int job;
@@ -1329,7 +1290,7 @@ static const struct gsu_scalar pmnamedir_gsu =
 
 /**/
 static HashNode
-getpmnameddir(UNUSED(HashTable ht), char *name)
+getpmnameddir(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     Nameddir nd;
@@ -1378,7 +1339,7 @@ scanpmnameddirs(UNUSED(HashTable ht), ScanFunc func, int flags)
 
 /**/
 static HashNode
-getpmuserdir(UNUSED(HashTable ht), char *name)
+getpmuserdir(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     Nameddir nd;
@@ -1631,7 +1592,7 @@ assignaliasdefs(Param pm, int flags)
 
 /**/
 static HashNode
-getalias(HashTable alht, UNUSED(HashTable ht), char *name, int flags)
+getalias(HashTable alht, UNUSED(HashTable ht), const char *name, int flags)
 {
     Param pm = NULL;
     Alias al;
@@ -1653,45 +1614,45 @@ getalias(HashTable alht, UNUSED(HashTable ht), char *name, int flags)
 
 /**/
 static HashNode
-getpmralias(HashTable ht, char *name)
+getpmralias(HashTable ht, const char *name)
 {
     return getalias(aliastab, ht, name, 0);
 }
 
 /**/
 static HashNode
-getpmdisralias(HashTable ht, char *name)
+getpmdisralias(HashTable ht, const char *name)
 {
     return getalias(aliastab, ht, name, DISABLED);
 }
 
 /**/
 static HashNode
-getpmgalias(HashTable ht, char *name)
+getpmgalias(HashTable ht, const char *name)
 {
     return getalias(aliastab, ht, name, ALIAS_GLOBAL);
 }
 
 /**/
 static HashNode
-getpmdisgalias(HashTable ht, char *name)
+getpmdisgalias(HashTable ht, const char *name)
 {
     return getalias(aliastab, ht, name, ALIAS_GLOBAL|DISABLED);
 }
 
 /**/
 static HashNode
-getpmsalias(HashTable ht, char *name)
+getpmsalias(HashTable ht, const char *name)
 {
     return getalias(sufaliastab, ht, name, ALIAS_SUFFIX);
 }
 
 /**/
 static HashNode
-getpmdissalias(HashTable ht, char *name)
+getpmdissalias(HashTable ht, const char *name)
 {
     return getalias(sufaliastab, ht, name, ALIAS_SUFFIX|DISABLED);
-}
+} 
 
 /**/
 static void
@@ -1809,63 +1770,63 @@ static const struct gsu_array historywords_gsu =
 { histwgetfn, arrsetfn, stdunsetfn };
 
 static struct paramdef partab[] = {
-    SPECIALPMDEF("parameters", PM_READONLY,
-	    NULL, getpmparameter, scanpmparameters),
-    SPECIALPMDEF("commands", 0, &pmcommands_gsu, getpmcommand, scanpmcommands),
-    SPECIALPMDEF("functions", 0, &pmfunctions_gsu, getpmfunction,
-		 scanpmfunctions),
-    SPECIALPMDEF("dis_functions", 0, 
-	    &pmdisfunctions_gsu, getpmdisfunction, scanpmdisfunctions),
-    SPECIALPMDEF("funcstack", PM_ARRAY|PM_READONLY,
-	    &funcstack_gsu, NULL, NULL),
-    SPECIALPMDEF("functrace", PM_ARRAY|PM_READONLY,
-	    &functrace_gsu, NULL, NULL),
+    SPECIALPMDEF("aliases", 0,
+	    &pmraliases_gsu, getpmralias, scanpmraliases),
     SPECIALPMDEF("builtins", PM_READONLY, NULL, getpmbuiltin, scanpmbuiltins),
-    SPECIALPMDEF("dis_builtins", PM_READONLY,
-	    NULL, getpmdisbuiltin, scanpmdisbuiltins),
-    SPECIALPMDEF("reswords", PM_ARRAY|PM_READONLY,
-	    &reswords_gsu, NULL, NULL),
-    SPECIALPMDEF("dis_reswords", PM_ARRAY|PM_READONLY,
-	    &disreswords_gsu, NULL, NULL),
-    SPECIALPMDEF("options", 0,
-	    &pmoptions_gsu, getpmoption, scanpmoptions),
-    SPECIALPMDEF("modules", PM_READONLY,
-	    NULL, getpmmodule, scanpmmodules),
+    SPECIALPMDEF("commands", 0, &pmcommands_gsu, getpmcommand, scanpmcommands),
     SPECIALPMDEF("dirstack", PM_ARRAY,
 	    &dirs_gsu, NULL, NULL),
+    SPECIALPMDEF("dis_aliases", 0,
+	    &pmdisraliases_gsu, getpmdisralias, scanpmdisraliases),
+    SPECIALPMDEF("dis_builtins", PM_READONLY,
+	    NULL, getpmdisbuiltin, scanpmdisbuiltins),
+    SPECIALPMDEF("dis_functions", 0, 
+	    &pmdisfunctions_gsu, getpmdisfunction, scanpmdisfunctions),
+    SPECIALPMDEF("dis_galiases", 0,
+	    &pmdisgaliases_gsu, getpmdisgalias, scanpmdisgaliases),
+    SPECIALPMDEF("dis_reswords", PM_ARRAY|PM_READONLY,
+	    &disreswords_gsu, NULL, NULL),
+    SPECIALPMDEF("dis_saliases", 0,
+	    &pmdissaliases_gsu, getpmdissalias, scanpmdissaliases),
+    SPECIALPMDEF("funcstack", PM_ARRAY|PM_READONLY,
+	    &funcstack_gsu, NULL, NULL),
+    SPECIALPMDEF("functions", 0, &pmfunctions_gsu, getpmfunction,
+		 scanpmfunctions),
+    SPECIALPMDEF("functrace", PM_ARRAY|PM_READONLY,
+	    &functrace_gsu, NULL, NULL),
+    SPECIALPMDEF("galiases", 0,
+	    &pmgaliases_gsu, getpmgalias, scanpmgaliases),
     SPECIALPMDEF("history", PM_READONLY,
 	    NULL, getpmhistory, scanpmhistory),
     SPECIALPMDEF("historywords", PM_ARRAY|PM_READONLY,
 	    &historywords_gsu, NULL, NULL),
-    SPECIALPMDEF("jobtexts", PM_READONLY,
-	    NULL, getpmjobtext, scanpmjobtexts),
-    SPECIALPMDEF("jobstates", PM_READONLY,
-	    NULL, getpmjobstate, scanpmjobstates),
     SPECIALPMDEF("jobdirs", PM_READONLY,
 	    NULL, getpmjobdir, scanpmjobdirs),
+    SPECIALPMDEF("jobstates", PM_READONLY,
+	    NULL, getpmjobstate, scanpmjobstates),
+    SPECIALPMDEF("jobtexts", PM_READONLY,
+	    NULL, getpmjobtext, scanpmjobtexts),
+    SPECIALPMDEF("modules", PM_READONLY,
+	    NULL, getpmmodule, scanpmmodules),
     SPECIALPMDEF("nameddirs", 0,
 	    &pmnameddirs_gsu, getpmnameddir, scanpmnameddirs),
-    SPECIALPMDEF("userdirs", PM_READONLY,
-	    NULL, getpmuserdir, scanpmuserdirs),
-    SPECIALPMDEF("aliases", 0,
-	    &pmraliases_gsu, getpmralias, scanpmraliases),
-    SPECIALPMDEF("galiases", 0,
-	    &pmgaliases_gsu, getpmgalias, scanpmgaliases),
+    SPECIALPMDEF("options", 0,
+	    &pmoptions_gsu, getpmoption, scanpmoptions),
+    SPECIALPMDEF("parameters", PM_READONLY,
+	    NULL, getpmparameter, scanpmparameters),
+    SPECIALPMDEF("reswords", PM_ARRAY|PM_READONLY,
+	    &reswords_gsu, NULL, NULL),
     SPECIALPMDEF("saliases", 0,
 	    &pmsaliases_gsu, getpmsalias, scanpmsaliases),
-    SPECIALPMDEF("dis_aliases", 0,
-	    &pmdisraliases_gsu, getpmdisralias, scanpmdisraliases),
-    SPECIALPMDEF("dis_galiases", 0,
-	    &pmdisgaliases_gsu, getpmdisgalias, scanpmdisgaliases),
-    SPECIALPMDEF("dis_saliases", 0,
-	    &pmdissaliases_gsu, getpmdissalias, scanpmdissaliases)
+    SPECIALPMDEF("userdirs", PM_READONLY,
+	    NULL, getpmuserdir, scanpmuserdirs)
 };
 
 static struct features module_features = {
     NULL, 0,
     NULL, 0,
-    partab, sizeof(partab)/sizeof(*partab),
     NULL, 0,
+    partab, sizeof(partab)/sizeof(*partab),
     0
 };
 
@@ -1880,7 +1841,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -1894,7 +1855,7 @@ enables_(Module m, int **enables)
      * on the main shell, so set the flag to indicate.
      */
     incleanup = 1;
-    ret = handlefeatures(m->nam, &module_features, enables);
+    ret = handlefeatures(m, &module_features, enables);
     incleanup = 0;
     return ret;
 }
@@ -1912,7 +1873,7 @@ cleanup_(Module m)
 {
     int ret;
     incleanup = 1;
-    ret = setfeatureenables(m->nam, &module_features, NULL);
+    ret = setfeatureenables(m, &module_features, NULL);
     incleanup = 0;
     return ret;
 }

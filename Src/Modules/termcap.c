@@ -164,10 +164,10 @@ static struct builtin bintab[] = {
 
 /**/
 static HashNode
-gettermcap(UNUSED(HashTable ht), char *name)
+gettermcap(UNUSED(HashTable ht), const char *name)
 {
     int len, num;
-    char *tcstr, buf[2048], *u;
+    char *tcstr, buf[2048], *u, *nameu;
     Param pm = NULL;
 
     /* This depends on the termcap stuff in init.c */
@@ -176,16 +176,18 @@ gettermcap(UNUSED(HashTable ht), char *name)
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
 	return NULL;
 
-    unmetafy(name, &len);
+    
+    nameu = dupstring(name);
+    unmetafy(nameu, &len);
 
     pm = (Param) hcalloc(sizeof(struct param));
-    pm->node.nam = dupstring(name);
+    pm->node.nam = nameu;
     pm->node.flags = PM_READONLY;
     u = buf;
 
     /* logic in the following cascade copied from echotc, above */
 
-    if ((num = tgetnum(name)) != -1) {
+    if ((num = tgetnum(nameu)) != -1) {
 	pm->gsu.i = &nullsetinteger_gsu;
 	pm->u.val = num;
 	pm->node.flags |= PM_INTEGER;
@@ -193,7 +195,7 @@ gettermcap(UNUSED(HashTable ht), char *name)
     }
 
     pm->gsu.s = &nullsetscalar_gsu;
-    switch (ztgetflag(name)) {
+    switch (ztgetflag(nameu)) {
     case -1:
 	break;
     case 0:
@@ -205,7 +207,7 @@ gettermcap(UNUSED(HashTable ht), char *name)
 	pm->node.flags |= PM_SCALAR;
 	return &pm->node;
     }
-    if ((tcstr = tgetstr(name, &u)) != NULL && tcstr != (char *)-1) {
+    if ((tcstr = tgetstr(nameu, &u)) != NULL && tcstr != (char *)-1) {
 	pm->u.str = dupstring(tcstr);
 	pm->node.flags |= PM_SCALAR;
     } else {
@@ -324,12 +326,12 @@ static struct features module_features = {
     NULL, 0,
 #endif
     NULL, 0,
+    NULL, 0,
 #ifdef HAVE_TGETENT
     partab, sizeof(partab)/sizeof(*partab),
 #else
     NULL, 0,
 #endif
-    NULL, 0,
     0
 };
 
@@ -344,7 +346,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -352,7 +354,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -371,7 +373,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

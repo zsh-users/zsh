@@ -39,6 +39,9 @@
    fi
  }
 
+ mkdir zmodload.tmp
+ cd zmodload.tmp
+
 %test
 
 # This first test depends on knowing that zsh is run with +Z from the
@@ -118,9 +121,84 @@
    zmodload -ab zsh/example example
    builtin example
    zmodload -e zsh/example
- else print -u8 Warning: zsh/example not linked: not checking autoloading
+ else print -u$ZTST_fd Warning: zsh/example not linked: not checking autoloading
  fi
 0d:Autoload a module via a builtin
+
+  zmodload -u zsh/example
+  builtin example
+0d:Autoloads are persistent
+
+  (zmodload -u zsh/parameter
+  zmodload -aF zsh/parameter b:fail
+  fail
+  print "Shouldn't get here.")
+1:Failed builtin autoload
+?(eval):3: module `zsh/parameter' has no such feature: `b:fail': autoload cancelled
+?(eval):3: unknown builtin: fail
+
+  (zmodload -u zsh/parameter
+  zmodload -aF zsh/parameter p:fail
+  print $fail
+  print "Shouldn't get here.")
+1:Failed parameter autoload
+?(eval):3: module `zsh/parameter' has no such feature: `p:fail': autoload cancelled
+?(eval):3: unknown parameter: fail
+
+  (zmodload -u zsh/parameter
+  zmodload -aF zsh/parameter c:fail
+  [[ -fail foo ]]
+  print "Shouldn't get here.")
+2:Failed condition autoload
+?(eval):3: module `zsh/parameter' has no such feature: `c:fail': autoload cancelled
+?(eval):3: unknown condition: -foo
+
+  (zmodload -u zsh/parameter
+  zmodload -aF zsh/parameter f:fail
+  (( fail() )) )
+2:Failed math function autoload
+?(eval):3: module `zsh/parameter' has no such feature: `f:fail': autoload cancelled
+?(eval):3: unknown function: fail
+
+  zmodload -aF zsh/parameter f:fail2
+1:Immediate autoload failure on non-existent feature when module loaded
+?(eval):zmodload:1: module `zsh/parameter' has no such feature: `f:fail2'
+
+  (zmodload -u zsh/parameter
+  zmodload -aF zsh/parameter p:fail
+  print $(( ${#modules} > 1 )) )
+0:Autoloads checked on loading but don't necessarily effect current command
+>1
+?(eval):3: module `zsh/parameter' has no such feature: `p:fail': autoload cancelled
+
+  zmodload -laF zsh/parameter
+0:List default autoloads
+>p:aliases
+>p:builtins
+>p:commands
+>p:dirstack
+>p:dis_aliases
+>p:dis_builtins
+>p:dis_functions
+>p:dis_galiases
+>p:dis_reswords
+>p:dis_saliases
+>p:funcstack
+>p:functions
+>p:functrace
+>p:galiases
+>p:history
+>p:historywords
+>p:jobdirs
+>p:jobstates
+>p:jobtexts
+>p:modules
+>p:nameddirs
+>p:options
+>p:parameters
+>p:reswords
+>p:saliases
+>p:userdirs
 
  if [[ $mods[(r)zsh/example] == zsh/example ]]; then
    zmodload -u zsh/example
@@ -168,6 +246,11 @@
  zmodload -R example
  zmodload -e example
 1:Delete the module alias again
+
+  zmodload >zmodload_list
+  print -l ${(o)mods} >mods_list
+  diff zmodload_list mods_list
+0:Listing with zmodload should give all our modules.
 
 # Don't unload the main module.
 # Do unload zsh/parameter, but reload it as it is needed.

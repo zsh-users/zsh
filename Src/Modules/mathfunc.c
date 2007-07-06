@@ -125,12 +125,6 @@ enum {
 
 
 static struct mathfunc mftab[] = {
-  /* Functions taking string arguments */
-#ifdef HAVE_ERAND48
-  /* here to avoid comma hassle */
-  STRMATHFUNC("rand48", math_string, MS_RAND48),
-#endif
-
   NUMMATHFUNC("abs", math_func, 1, 1, MF_ABS | BFLAG(BF_FRAC) |
 	      TFLAG(TF_NOCONV|TF_NOASS)),
   NUMMATHFUNC("acos", math_func, 1, 1, MF_ACOS | BFLAG(BF_FRAC)),
@@ -167,6 +161,9 @@ static struct mathfunc mftab[] = {
   NUMMATHFUNC("log1p", math_func, 1, 1, MF_LOG1P | BFLAG(BF_GTRM1)),
   NUMMATHFUNC("logb", math_func, 1, 1, MF_LOGB | BFLAG(BF_NONZ)),
   NUMMATHFUNC("nextafter", math_func, 2, 2, MF_NEXTAFTER),
+#ifdef HAVE_ERAND48
+  STRMATHFUNC("rand48", math_string, MS_RAND48),
+#endif
   NUMMATHFUNC("rint", math_func, 1, 1, MF_RINT),
   NUMMATHFUNC("scalb", math_func, 2, 2, MF_SCALB | TFLAG(TF_INT2)),
 #ifdef HAVE_SIGNGAM
@@ -564,8 +561,8 @@ math_string(UNUSED(char *name), char *arg, int id)
 static struct features module_features = {
     NULL, 0,
     NULL, 0,
-    NULL, 0,
     mftab, sizeof(mftab)/sizeof(*mftab),
+    NULL, 0,
     0
 };
 
@@ -580,7 +577,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -588,7 +585,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -602,7 +599,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

@@ -411,7 +411,7 @@ newparamtable(int size, char const *name)
 
 /**/
 static HashNode
-getparamnode(HashTable ht, char *nam)
+getparamnode(HashTable ht, const char *nam)
 {
     HashNode hn = gethashnode2(ht, nam);
     Param pm = (Param) hn;
@@ -419,12 +419,16 @@ getparamnode(HashTable ht, char *nam)
     if (pm && pm->u.str && (pm->node.flags & PM_AUTOLOAD)) {
 	char *mn = dupstring(pm->u.str);
 
-	if (ensurefeature(mn, "p:", nam))
-	    return NULL;
+	(void)ensurefeature(mn, "p:", (pm->node.flags & PM_AUTOALL) ? NULL :
+			    nam);
 	hn = gethashnode2(ht, nam);
-	if (((Param) hn) == pm && (pm->node.flags & PM_AUTOLOAD)) {
-	    pm->node.flags &= ~PM_AUTOLOAD;
-	    zwarnnam(nam, "autoload failed");
+	if (!hn) {
+	    /*
+	     * This used to be a warning, but surely if we allow
+	     * stuff to go ahead with the autoload stub with
+	     * no error status we're in for all sorts of mayhem?
+	     */
+	    zerr("unknown parameter: %s", nam);
 	}
     }
     return hn;

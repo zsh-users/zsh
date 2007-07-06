@@ -1445,10 +1445,10 @@ static struct builtin bintab[] = {
 };
 
 static struct conddef cotab[] = {
+    CONDDEF("after", 0, cond_range, 1, 1, 0),
+    CONDDEF("between", 0, cond_range, 2, 2, 1),
     CONDDEF("prefix", 0, cond_psfix, 1, 2, CVT_PREPAT),
     CONDDEF("suffix", 0, cond_psfix, 1, 2, CVT_SUFPAT),
-    CONDDEF("between", 0, cond_range, 2, 2, 1),
-    CONDDEF("after", 0, cond_range, 1, 1, 0),
 };
 
 static struct funcwrap wrapper[] = {
@@ -1502,7 +1502,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -1510,7 +1510,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -1524,7 +1524,7 @@ boot_(Module m)
     addhookfunc("reverse_menu", (Hookfn) reverse_menu);
     addhookfunc("list_matches", (Hookfn) list_matches);
     addhookfunc("invalidate_list", (Hookfn) invalidate_list);
-    (void)addhookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
+    (void)addhookdefs(m, comphooks, sizeof(comphooks)/sizeof(*comphooks));
     return addwrapper(m, wrapper);
 }
 
@@ -1539,10 +1539,10 @@ cleanup_(Module m)
     deletehookfunc("reverse_menu", (Hookfn) reverse_menu);
     deletehookfunc("list_matches", (Hookfn) list_matches);
     deletehookfunc("invalidate_list", (Hookfn) invalidate_list);
-    (void)deletehookdefs(m->nam, comphooks,
+    (void)deletehookdefs(m, comphooks,
 			 sizeof(comphooks)/sizeof(*comphooks));
     deletewrapper(m, wrapper);
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

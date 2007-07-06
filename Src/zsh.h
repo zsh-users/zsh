@@ -92,6 +92,8 @@ struct mathfunc {
 #define MFF_ADDED    2
 /* Math function is implemented by a shell function */
 #define MFF_USERFUNC 4
+/* When autoloading, enable all features in module */
+#define MFF_AUTOALL  8
 
 
 #define NUMMATHFUNC(name, func, min, max, id) \
@@ -538,8 +540,12 @@ struct conddef {
     char *module;		/* module to autoload                 */
 };
 
-#define CONDF_INFIX  1
-#define CONDF_ADDED  2
+/* Condition is an infix */
+#define CONDF_INFIX   1
+/* Condition has been loaded from library */
+#define CONDF_ADDED   2
+/* When autoloading, enable all features in library */
+#define CONDF_AUTOALL 4
 
 #define CONDDEF(name, flags, handler, min, max, condid) \
     { NULL, name, flags, handler, min, max, condid, NULL }
@@ -928,11 +934,16 @@ struct dirsav {
 typedef void *(*VFunc) _((void *));
 typedef void (*FreeFunc) _((void *));
 
-typedef unsigned (*HashFunc)       _((char *));
+typedef unsigned (*HashFunc)       _((const char *));
 typedef void     (*TableFunc)      _((HashTable));
+/*
+ * Note that this is deliberately "char *", not "const char *",
+ * since the AddNodeFunc is passed a pointer to a string that
+ * will be stored and later freed.
+ */
 typedef void     (*AddNodeFunc)    _((HashTable, char *, void *));
-typedef HashNode (*GetNodeFunc)    _((HashTable, char *));
-typedef HashNode (*RemoveNodeFunc) _((HashTable, char *));
+typedef HashNode (*GetNodeFunc)    _((HashTable, const char *));
+typedef HashNode (*RemoveNodeFunc) _((HashTable, const char *));
 typedef void     (*FreeNodeFunc)   _((HashNode));
 typedef int      (*CompareFunc)    _((const char *, const char *));
 
@@ -1152,25 +1163,37 @@ struct builtin {
 #define BINF_SKIPDASH		(1<<14) /* Treat `-' as argument (maybe `+') */
 #define BINF_DASHDASHVALID	(1<<15) /* Handle `--' even if SKIPINVALD */
 #define BINF_CLEARENV		(1<<16) /* new process started with cleared env */
+#define BINF_AUTOALL		(1<<17) /* autoload all features at once */
 
 struct module {
-    char *nam;
-    int flags;
+    struct hashnode node;
     union {
 	void *handle;
 	Linkedmod linked;
 	char *alias;
     } u;
+    LinkList autoloads;
     LinkList deps;
     int wrapper;
 };
 
+/* We are in the process of loading the module */
 #define MOD_BUSY    (1<<0)
+/*
+ * We are in the process of unloading the module.
+ * Note this is not needed to indicate a module is actually
+ * unloaded: for that, the handle (or linked pointer) is set to NULL.
+ */
 #define MOD_UNLOAD  (1<<1)
+/* We are in the process of setting up the module */
 #define MOD_SETUP   (1<<2)
+/* Module is statically linked into the main binary */
 #define MOD_LINKED  (1<<3)
+/* Module setup has been carried out (and module has not been finished) */
 #define MOD_INIT_S  (1<<4)
+/* Module boot has been carried out (and module has not been finished) */
 #define MOD_INIT_B  (1<<5)
+/* Module record is an alias */
 #define MOD_ALIAS   (1<<6)
 
 typedef int (*Module_generic_func) _((void));
@@ -1199,12 +1222,12 @@ struct features {
     /* List of conditions provided by the module and the size thereof */
     Conddef cd_list;
     int cd_size;
-    /* List of parameters provided by the module and the size thereof */
-    Paramdef pd_list;
-    int pd_size;
     /* List of math functions provided by the module and the size thereof */
     MathFunc mf_list;
     int mf_size;
+    /* List of parameters provided by the module and the size thereof */
+    Paramdef pd_list;
+    int pd_size;
     /* Number of abstract features */
     int n_abstract;
 };
@@ -1408,6 +1431,10 @@ struct tieddata {
 #define PM_REMOVABLE	(1<<26)	/* special can be removed from paramtab     */
 #define PM_AUTOLOAD	(1<<27) /* autoloaded from module                   */
 #define PM_NORESTORE	(1<<28)	/* do not restore value of local special    */
+#define PM_AUTOALL	(1<<28) /* autoload all features in module
+				 * when loading: valid only if PM_AUTOLOAD
+				 * is also present.
+				 */
 #define PM_HASHELEM     (1<<29) /* is a hash-element */
 #define PM_NAMEDDIR     (1<<30) /* has a corresponding nameddirtab entry    */
 

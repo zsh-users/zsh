@@ -24,13 +24,16 @@
  * provided hereunder is on an "as is" basis, and Zoltán Hidvégi and the
  * Zsh Development Group have no obligation to provide maintenance,
  * support, updates, enhancements, or modifications.
- *
  */
 
 #include "zsh.mdh"
 #include "module.pro"
 
-/* List of linked-in modules. */
+/*
+ * List of linked-in modules.
+ * This is set up at boot and remains for the life of the shell;
+ * entries do not appear in "zmodload" listings.
+ */
 
 /**/
 LinkList linkedmodules;
@@ -40,19 +43,42 @@ LinkList linkedmodules;
 /**/
 char **module_path;
 
-/* List of modules */
+/* Hash of modules */
 
 /**/
-mod_export LinkList modules;
+mod_export HashTable modulestab;
 
 /*
  * Bit flags passed as the "flags" argument of a autofeaturefn_t.
+ * Used in other places, such as the final argument to
+ * do_module_features().
  */
 enum {
-    /* `-i' option: ignore errors pertaining to redefinitions */
-    AUTOFEAT_IGNORE = 0x0001,
+    /*
+     * `-i' option: ignore errors pertaining to redefinitions,
+     * or indicate to do_module_features() that it should be
+     * silent.
+     */
+    FEAT_IGNORE = 0x0001,
     /* If a condition, condition is infix rather than prefix */
-    AUTOFEAT_INFIX = 0x0002
+    FEAT_INFIX = 0x0002,
+    /*
+     * Enable all features in the module when autoloading.
+     * This is the traditional zmodload -a behaviour;
+     * zmodload -Fa only enables features explicitly marked for
+     * autoloading.
+     */
+    FEAT_AUTOALL = 0x0004,
+    /*
+     * Remove feature:  alternative to "-X:NAME" used if
+     * X is passed separately from NAME.
+     */
+    FEAT_REMOVE = 0x0008,
+    /*
+     * For do_module_features().  Check that any autoloads
+     * for the module are actually provided.
+     */
+    FEAT_CHECKAUTO = 0x0010
 };
 
 /*
@@ -65,7 +91,7 @@ enum {
  *
  * "flags" is a set of the bits above.
  *
- * The return value is 0 for success, a negative value for failure with no
+ * The return value is 0 for success, -1 for failure with no
  * message needed, and one of the following to indicate the calling
  * function should print a message:
  *
@@ -73,7 +99,199 @@ enum {
  * 2:  [feature]: no such [type]
  * 3:  [feature]: [type] is already defined
  */
-typedef int (*autofeaturefn_t)(char *module, char *feature, int flags);
+typedef int (*autofeaturefn_t)(const char *module, const char *feature,
+			       int flags);
+
+/* Bits in the second argument to find_module. */
+enum {
+    /*
+     * Resolve any aliases to the underlying module.
+     */
+    FINDMOD_ALIASP = 0x0001,
+    /*
+     * Create an element for the module in the list if
+     * it is not found.
+     */
+    FINDMOD_CREATE = 0x0002,
+};
+
+static void
+freemodulenode(HashNode hn)
+{
+    Module m = (Module) hn;
+
+    if (m->node.flags & MOD_ALIAS)
+	zsfree(m->u.alias);
+    zsfree(m->node.nam);
+    if (m->autoloads)
+	freelinklist(m->autoloads, freestr);
+    if (m->deps)
+	freelinklist(m->deps, freestr);
+    zfree(m, sizeof(*m));
+}
+
+/* flags argument to printmodulenode */
+enum {
+    /* -L flag, output zmodload commands */
+    PRINTMOD_LIST = 0x0001,
+    /* -e flag */
+    PRINTMOD_EXIST = 0x0002,
+    /* -A flag */
+    PRINTMOD_ALIAS = 0x0004,
+    /* -d flag */
+    PRINTMOD_DEPS = 0x0008,
+    /* -F flag */
+    PRINTMOD_FEATURES = 0x0010,
+    /* -l flag in combination with -L flag */
+    PRINTMOD_LISTALL = 0x0020,
+    /* -a flag */
+    PRINTMOD_AUTO = 0x0040
+};
+
+/* Scan function for printing module details */
+
+static void
+printmodulenode(HashNode hn, int flags)
+{
+    Module m = (Module)hn;
+    /*
+     * If we check for a module loaded under an alias, we
+     * need the name of the alias.  We can use it in other
+     * cases, too.
+     */
+    const char *modname = m->node.nam;
+
+    if (flags & PRINTMOD_DEPS) {
+	/*
+	 * Print the module's dependencies.
+	 */
+	LinkNode n;
+
+	if (!m->deps)
+	    return;
+
+	if (flags & PRINTMOD_LIST) {
+	    printf("zmodload -d ");
+	    if (modname[0] == '-')
+		fputs("-- ", stdout);
+	    quotedzputs(modname, stdout);
+	} else {
+	    nicezputs(modname, stdout);
+	    putchar(':');
+	}
+	for (n = firstnode(m->deps); n; incnode(n)) {
+	    putchar(' ');
+	    if (flags & PRINTMOD_LIST)
+		quotedzputs((char *) getdata(n), stdout);
+	    else
+		nicezputs((char *) getdata(n), stdout);
+	}
+    } else if (flags & PRINTMOD_EXIST) {
+	/*
+	 * Just print the module name, provided the module is
+	 * present under an alias or otherwise.
+	 */
+	if (m->node.flags & MOD_ALIAS) {
+	    if (!(flags & PRINTMOD_ALIAS) ||
+		!(m = find_module(m->u.alias, FINDMOD_ALIASP, NULL)))
+		return;
+	}
+	if (!m->u.handle || (m->node.flags & MOD_UNLOAD))
+	    return;
+	nicezputs(modname, stdout);
+   } else if (m->node.flags & MOD_ALIAS) {
+	/*
+	 * Normal listing, but for aliases.
+	 */
+	if (flags & PRINTMOD_LIST) {
+	    printf("zmodload -A ");
+	    if (modname[0] == '-')
+		fputs("-- ", stdout);
+	    quotedzputs(modname, stdout);
+	    putchar('=');
+	    quotedzputs(m->u.alias, stdout);
+	} else {
+	    nicezputs(modname, stdout);
+	    fputs(" -> ", stdout);
+	    nicezputs(m->u.alias, stdout);
+	}
+    } else if (m->u.handle) {
+	/*
+	 * Loaded module.
+	 */
+	if (flags & PRINTMOD_LIST) {
+	    /*
+	     * List with -L format.  Possibly we are printing
+	     * features, either enables or autoloads.
+	     */
+	    char **features = NULL;
+	    int *enables = NULL;
+	    if (flags & PRINTMOD_AUTO) {
+		if (!m->autoloads || !firstnode(m->autoloads))
+		    return;
+	    } else if (flags & PRINTMOD_FEATURES) {
+		if (features_module(m, &features) ||
+		    enables_module(m, &enables) ||
+		    !*features)
+		    return;
+	    }
+	    printf("zmodload ");
+	    if (flags & PRINTMOD_AUTO) {
+		fputs("-Fa ", stdout);
+	    } else if (features)
+		fputs("-F ", stdout);
+	    if(modname[0] == '-')
+		fputs("-- ", stdout);
+	    quotedzputs(modname, stdout);
+	    if (flags & PRINTMOD_AUTO) {
+		LinkNode an;
+		for (an = firstnode(m->autoloads); an; incnode(an)) {
+		    putchar(' ');
+		    quotedzputs((char *)getdata(an), stdout);
+		}
+	    } else if (features) {
+		const char *f;
+		while ((f = *features++)) {
+		    int on = *enables++;
+		    if (flags & PRINTMOD_LISTALL)
+			printf(" %s", on ? "+" : "-");
+		    else if (!on)
+			continue;
+		    else
+			putchar(' ');
+		    quotedzputs(f, stdout);
+		}
+	    }
+	} else /* -l */
+	    nicezputs(modname, stdout);
+    } else
+	return;
+    putchar('\n');
+}
+
+/**/
+HashTable
+newmoduletable(int size, char const *name)
+{
+    HashTable ht;
+    ht = newhashtable(size, name, NULL);
+
+    ht->hash        = hasher;
+    ht->emptytable  = emptyhashtable;
+    ht->filltable   = NULL;
+    ht->cmpnodes    = strcmp;
+    ht->addnode     = addhashnode;
+    /* DISABLED is not supported */
+    ht->getnode     = gethashnode2;
+    ht->getnode2    = gethashnode2;
+    ht->removenode  = removehashnode;
+    ht->disablenode = NULL;
+    ht->enablenode  = NULL;
+    ht->freenode    = freemodulenode;
+    ht->printnode   = printmodulenode;
+
+    return ht;
+}
 
 /************************************************************************
  * zsh/main standard module functions
@@ -160,27 +378,6 @@ register_module(char *n, Module_void_func setup,
     zaddlinknode(linkedmodules, m);
 }
 
-/* Print an alias. */
-
-/**/
-static void
-printmodalias(Module m, Options ops)
-{
-    if (OPT_ISSET(ops,'L')) {
-	printf("zmodload -A ");
-	if (m->nam[0] == '-')
-	    fputs("-- ", stdout);
-	quotedzputs(m->nam, stdout);
-	putchar('=');
-	quotedzputs(m->u.alias, stdout);
-    } else {
-	nicezputs(m->nam, stdout);
-	fputs(" -> ", stdout);
-	nicezputs(m->u.alias, stdout);
-    }
-    putchar('\n');
-}
-
 /* Check if a module is linked in. */
 
 /**/
@@ -208,7 +405,7 @@ module_linked(char const *name)
  * builtin can be replaced using this function.                       */
 
 /**/
-int
+static int
 addbuiltin(Builtin b)
 {
     Builtin bn = (Builtin) builtintab->getnode2(builtintab, b->node.nam);
@@ -226,16 +423,19 @@ addbuiltin(Builtin b)
 
 /**/
 static int
-add_autobin(char *module, char *bnam, int flags)
+add_autobin(const char *module, const char *bnam, int flags)
 {
     Builtin bn;
+    int ret;
 
     bn = zshcalloc(sizeof(*bn));
     bn->node.nam = ztrdup(bnam);
     bn->optstr = ztrdup(module);
-    if (addbuiltin(bn)) {
+    if (flags & FEAT_AUTOALL)
+	bn->node.flags |= BINF_AUTOALL;
+    if ((ret = addbuiltin(bn))) {
 	builtintab->freenode(&bn->node);
-	if (!(flags & AUTOFEAT_IGNORE))
+	if (!(flags & FEAT_IGNORE))
 	    return 1;
     }
     return 0;
@@ -246,7 +446,7 @@ add_autobin(char *module, char *bnam, int flags)
 
 /**/
 int
-deletebuiltin(char *nam)
+deletebuiltin(const char *nam)
 {
     Builtin bn;
 
@@ -261,14 +461,15 @@ deletebuiltin(char *nam)
 
 /**/
 static int
-del_autobin(UNUSED(char *module), char *bnam, int flags)
+del_autobin(UNUSED(const char *module), const char *bnam, int flags)
 {
     Builtin bn = (Builtin) builtintab->getnode2(builtintab, bnam);
     if (!bn) {
-	if(!(flags & AUTOFEAT_IGNORE))
+	if(!(flags & FEAT_IGNORE))
 	    return 2;
     } else if (bn->node.flags & BINF_ADDED) {
-	return 3;
+	if (!(flags & FEAT_IGNORE))
+	    return 3;
     } else
 	deletebuiltin(bnam);
 
@@ -383,7 +584,7 @@ addwrapper(Module m, FuncWrap w)
      * happen since we usually add wrappers when a real module is
      * loaded.
      */
-    if (m->flags & MOD_ALIAS)
+    if (m->node.flags & MOD_ALIAS)
 	return 1;
 
     if (w->flags & WRAPF_ADDED)
@@ -409,7 +610,7 @@ deletewrapper(Module m, FuncWrap w)
 {
     FuncWrap p, q;
 
-    if (m->flags & MOD_ALIAS)
+    if (m->node.flags & MOD_ALIAS)
 	return 1;
 
     if (w->flags & WRAPF_ADDED) {
@@ -444,7 +645,7 @@ mod_export Conddef condtab;
 
 /**/
 Conddef
-getconddef(int inf, char *name, int autol)
+getconddef(int inf, const char *name, int autol)
 {
     Conddef p;
     int f = 1;
@@ -462,8 +663,8 @@ getconddef(int inf, char *name, int autol)
 	     */
 	    if (f) {
 		(void)ensurefeature(p->module,
-				    (p->flags & CONDF_INFIX) ?
-				    "C:" : "c:", name);
+				    (p->flags & CONDF_INFIX) ? "C:" : "c:",
+				    (p->flags & CONDF_AUTOALL) ? NULL : name);
 		f = 0;
 		p = NULL;
 	    } else {
@@ -577,14 +778,16 @@ setconddefs(char const *nam, Conddef c, int size, int *e)
 
 /**/
 static int
-add_autocond(char *module, char *cnam, int flags)
+add_autocond(const char *module, const char *cnam, int flags)
 {
     Conddef c;
 
     c = (Conddef) zalloc(sizeof(*c));
 
     c->name = ztrdup(cnam);
-    c->flags = ((flags & AUTOFEAT_INFIX) ? CONDF_INFIX : 0);
+    c->flags = ((flags & FEAT_INFIX) ? CONDF_INFIX : 0);
+    if (flags & FEAT_AUTOALL)
+	c->flags |= CONDF_AUTOALL;
     c->module = ztrdup(module);
 
     if (addconddef(c)) {
@@ -592,7 +795,7 @@ add_autocond(char *module, char *cnam, int flags)
 	zsfree(c->module);
 	zfree(c, sizeof(*c));
 
-	if (!(flags & AUTOFEAT_IGNORE))
+	if (!(flags & FEAT_IGNORE))
 	    return 1;
     }
     return 0;
@@ -602,16 +805,17 @@ add_autocond(char *module, char *cnam, int flags)
 
 /**/
 static int
-del_autocond(UNUSED(char *modnam), char *cnam, int flags)
+del_autocond(UNUSED(const char *modnam), const char *cnam, int flags)
 {
-    Conddef cd = getconddef((flags & AUTOFEAT_INFIX) ? 1 : 0, cnam, 0);
+    Conddef cd = getconddef((flags & FEAT_INFIX) ? 1 : 0, cnam, 0);
 
     if (!cd) {
-	if (!(flags & AUTOFEAT_IGNORE)) {
+	if (!(flags & FEAT_IGNORE)) {
 	    return 2;
 	}
     } else if (cd->flags & CONDF_ADDED) {
-	return 3;
+	if (!(flags & FEAT_IGNORE))
+	    return 3;
     } else
 	deleteconddef(cd);
 
@@ -658,17 +862,21 @@ addhookdef(Hookdef h)
     return 0;
 }
 
-/* This adds multiple hook definitions. This is like addbuiltins(). */
+/*
+ * This adds multiple hook definitions. This is like addbuiltins().
+ * This allows a NULL module because we call it from init.c.
+ */
 
 /**/
 mod_export int
-addhookdefs(char const *nam, Hookdef h, int size)
+addhookdefs(Module m, Hookdef h, int size)
 {
     int ret = 0;
 
     while (size--) {
 	if (addhookdef(h)) {
-	    zwarnnam(nam, "name clash when adding hook `%s'", h->name);
+	    zwarnnam(m ? m->node.nam : NULL,
+		     "name clash when adding hook `%s'", h->name);
 	    ret = 1;
 	}
 	h++;
@@ -701,7 +909,7 @@ deletehookdef(Hookdef h)
 
 /**/
 mod_export int
-deletehookdefs(UNUSED(char const *nam), Hookdef h, int size)
+deletehookdefs(UNUSED(Module m), Hookdef h, int size)
 {
     int ret = 0;
 
@@ -804,7 +1012,7 @@ runhookdef(Hookdef h, void *d)
  */
 
 static int
-checkaddparam(char *nam, int opt_i)
+checkaddparam(const char *nam, int opt_i)
 {
     Param pm;
 
@@ -970,13 +1178,13 @@ setparamdefs(char const *nam, Paramdef d, int size, int *e)
 
 /**/
 static int
-add_autoparam(char *module, char *pnam, int flags)
+add_autoparam(const char *module, const char *pnam, int flags)
 {
     Param pm;
     int ret;
 
     queue_signals();
-    if ((ret = checkaddparam(pnam, (flags & AUTOFEAT_IGNORE)))) {
+    if ((ret = checkaddparam(pnam, (flags & FEAT_IGNORE)))) {
 	unqueue_signals();
 	/*
 	 * checkaddparam() has already printed a message if one was
@@ -988,9 +1196,11 @@ add_autoparam(char *module, char *pnam, int flags)
 	return ret == 2 ? 0 : -1;
     }
 
-    pm = setsparam(pnam, ztrdup(module));
+    pm = setsparam(dupstring(pnam), ztrdup(module));
 
     pm->node.flags |= PM_AUTOLOAD;
+    if (flags & FEAT_AUTOALL)
+	pm->node.flags |= PM_AUTOALL;
     unqueue_signals();
 
     return 0;
@@ -1000,15 +1210,16 @@ add_autoparam(char *module, char *pnam, int flags)
 
 /**/
 static int
-del_autoparam(UNUSED(char *modnam), char *pnam, int flags)
+del_autoparam(UNUSED(const char *modnam), const char *pnam, int flags)
 {
     Param pm = (Param) gethashnode2(paramtab, pnam);
 
     if (!pm) {
-	if (!(flags & AUTOFEAT_IGNORE))
+	if (!(flags & FEAT_IGNORE))
 	    return 2;
     } else if (!(pm->node.flags & PM_AUTOLOAD)) {
-	return 3;
+	if (!(flags & FEAT_IGNORE))
+	    return 3;
     } else
 	unsetparam_pm(pm, 0, 1);
 
@@ -1047,7 +1258,7 @@ removemathfunc(MathFunc previous, MathFunc current)
 
 /**/
 MathFunc
-getmathfunc(char *name, int autol)
+getmathfunc(const char *name, int autol)
 {
     MathFunc p, q = NULL;
 
@@ -1058,7 +1269,8 @@ getmathfunc(char *name, int autol)
 
 		removemathfunc(q, p);
 
-		(void)ensurefeature(n, "f:", name);
+		(void)ensurefeature(n, "f:", (p->flags & MFF_AUTOALL) ? NULL :
+				    name);
 
 		return getmathfunc(name, 0);
 	    }
@@ -1171,7 +1383,7 @@ setmathfuncs(char const *nam, MathFunc f, int size, int *e)
 
 /**/
 static int
-add_automathfunc(char *module, char *fnam, int flags)
+add_automathfunc(const char *module, const char *fnam, int flags)
 {
     MathFunc f;
 
@@ -1186,7 +1398,7 @@ add_automathfunc(char *module, char *fnam, int flags)
 	zsfree(f->module);
 	zfree(f, sizeof(*f));
 
-	if (!(flags & AUTOFEAT_IGNORE))
+	if (!(flags & FEAT_IGNORE))
 	    return 1;
     }
 
@@ -1197,15 +1409,16 @@ add_automathfunc(char *module, char *fnam, int flags)
 
 /**/
 static int
-del_automathfunc(UNUSED(char *modnam), char *fnam, int flags)
+del_automathfunc(UNUSED(const char *modnam), const char *fnam, int flags)
 {
     MathFunc f = getmathfunc(fnam, 0);
     
     if (!f) {
-	if (!(flags & AUTOFEAT_IGNORE))
+	if (!(flags & FEAT_IGNORE))
 	    return 2;
     } else if (f->flags & MFF_ADDED) {
-	return 3;
+	if (!(flags & FEAT_IGNORE))
+	    return 3;
     } else
 	deletemathfunc(f);
 
@@ -1233,13 +1446,15 @@ load_and_bind(const char *fn)
     void *ret = (void *) load((char *) fn, L_NOAUTODEFER, NULL);
 
     if (ret) {
-	LinkNode node;
-	int err = loadbind(0, (void *) addbuiltin, ret);
-	for (node = firstnode(modules); !err && node; incnode(node)) {
-	    Module m = (Module) getdata(node);
-	    if (!(m->flags & MOD_ALIAS) &&
-		m->u.handle && !(m->flags & MOD_LINKED))
-		err |= loadbind(0, m->u.handle, ret);
+	Module m;
+	int i, err = loadbind(0, (void *) addbuiltin, ret);
+	for (i = 0; i < modulestab->hsize && !err; i++) {
+	    for (m = (Module)modulestab->nodes[i]; m && !err;
+		 m = m->node.next) {
+		if (!(m->flags & MOD_ALIAS) &&
+		    m->u.handle && !(m->flags & MOD_LINKED))
+		    err |= loadbind(0, m->u.handle, ret);
+	    }
 	}
 
 	if (err) {
@@ -1256,6 +1471,9 @@ load_and_bind(const char *fn)
 #define dlopen(X,Y) load_and_bind(X)
 #define dlclose(X)  unload(X)
 #define dlerror()   (dlerrstr[0])
+#ifndef HAVE_DLERROR
+# define HAVE_DLERROR 1
+#endif
 
 /**/
 #else
@@ -1294,7 +1512,9 @@ hpux_dlsym(void *handle, char *name)
 }
 
 # define dlsym(handle,name) hpux_dlsym(handle,name)
-# define dlerror() 0
+# ifdef HAVE_DLERROR		/* paranoia */
+#  undef HAVE_DLERROR
+# endif
 #else
 # ifndef HAVE_DLCLOSE
 #  define dlclose(X) ((X), 0)
@@ -1366,8 +1586,13 @@ do_load_module(char const *name, int silent)
     void *ret;
 
     ret = try_load_module(name);
-    if (!ret && !silent)
+    if (!ret && !silent) {
+#ifdef HAVE_DLERROR
+	zwarn("failed to load module `%s': %s", name, dlerror());
+#else
 	zwarn("failed to load module: %s", name);
+#endif
+    }
     return ret;
 }
 
@@ -1391,19 +1616,6 @@ do_load_module(char const *name, int silent)
 /**/
 #endif /* !DYNAMIC */
 
-/* Bits in the second argument to find_module. */
-enum {
-    /*
-     * Resolve any aliases to the underlying module.
-     */
-    FINDMOD_ALIASP = 0x0001,
-    /*
-     * Create an element for the module in the list if
-     * it is not found.
-     */
-    FINDMOD_CREATE = 0x0002,
-};
-
 /*
  * Find a module in the list.
  * flags is a set of bits defined in the enum above.
@@ -1413,35 +1625,29 @@ enum {
  * Return NULL if the module named is not stored as a structure, or if we were
  * resolving aliases and the final module named is not stored as a
  * structure.
- *
- * TODO: now we have aliases, there may be some merit in using a hash
- * table instead of a linked list.
  */
 /**/
-static LinkNode
+static Module
 find_module(const char *name, int flags, const char **namep)
 {
     Module m;
-    LinkNode node;
 
-    for (node = firstnode(modules); node; incnode(node)) {
-	m = (Module) getdata(node);
-	if (!strcmp(m->nam, name)) {
-	    if ((flags & FINDMOD_ALIASP) && (m->flags & MOD_ALIAS)) {
-		if (namep)
-		    *namep = m->u.alias;
-		return find_module(m->u.alias, flags, namep);
-	    }
+    m = (Module)modulestab->getnode2(modulestab, name);
+    if (m) {
+	if ((flags & FINDMOD_ALIASP) && (m->node.flags & MOD_ALIAS)) {
 	    if (namep)
-		*namep = m->nam;
-	    return node;
+		*namep = m->u.alias;
+	    return find_module(m->u.alias, flags, namep);
 	}
+	if (namep)
+	    *namep = m->node.nam;
+	return m;
     }
     if (!(flags & FINDMOD_CREATE))
 	return NULL;
     m = zshcalloc(sizeof(*m));
-    m->nam = ztrdup(name);
-    return zaddlinknode(modules, m);
+    modulestab->addnode(modulestab, ztrdup(name), m);
+    return m;
 }
 
 /*
@@ -1450,16 +1656,11 @@ find_module(const char *name, int flags, const char **namep)
 
 /**/
 static void
-delete_module(LinkNode node)
+delete_module(Module m)
 {
-    Module m = (Module) remnode(modules, node);
+    modulestab->removenode(modulestab, m->node.nam);
 
-    if (m->flags & MOD_ALIAS)
-	zsfree(m->u.alias);
-    zsfree(m->nam);
-    if (m->deps)
-	freelinklist(m->deps, freestr);
-    zfree(m, sizeof(*m));
+    modulestab->freenode(&m->node);
 }
 
 /*
@@ -1473,12 +1674,11 @@ delete_module(LinkNode node)
 mod_export int
 module_loaded(const char *name)
 {
-    LinkNode node;
     Module m;
 
-    return ((node = find_module(name, FINDMOD_ALIASP, NULL)) &&
-	    (m = ((Module) getdata(node)))->u.handle &&
-	    !(m->flags & MOD_UNLOAD));
+    return ((m = find_module(name, FINDMOD_ALIASP, NULL)) &&
+	    m->u.handle &&
+	    !(m->node.flags & MOD_UNLOAD));
 }
 
 /*
@@ -1575,7 +1775,7 @@ dyn_setup_module(Module m)
 
     if (fn)
 	return fn(m);
-    zwarnnam(m->nam, "no setup function");
+    zwarnnam(m->node.nam, "no setup function");
     return 1;
 }
 
@@ -1612,7 +1812,7 @@ dyn_boot_module(Module m)
 
     if(fn)
 	return fn(m);
-    zwarnnam(m->nam, "no boot function");
+    zwarnnam(m->node.nam, "no boot function");
     return 1;
 }
 
@@ -1624,7 +1824,7 @@ dyn_cleanup_module(Module m)
 
     if(fn)
 	return fn(m);
-    zwarnnam(m->nam, "no cleanup function");
+    zwarnnam(m->node.nam, "no cleanup function");
     return 1;
 }
 
@@ -1641,7 +1841,7 @@ dyn_finish_module(Module m)
     if (fn)
 	r = fn(m);
     else {
-	zwarnnam(m->nam, "no finish function");
+	zwarnnam(m->node.nam, "no finish function");
 	r = 1;
     }
     dlclose(m->u.handle);
@@ -1655,7 +1855,7 @@ dyn_finish_module(Module m)
 static int
 setup_module(Module m)
 {
-    return ((m->flags & MOD_LINKED) ?
+    return ((m->node.flags & MOD_LINKED) ?
 	    (m->u.linked->setup)(m) : dyn_setup_module(m));
 }
 
@@ -1663,7 +1863,7 @@ setup_module(Module m)
 static int
 features_module(Module m, char ***features)
 {
-    return ((m->flags & MOD_LINKED) ?
+    return ((m->node.flags & MOD_LINKED) ?
 	    (m->u.linked->features)(m, features) :
 	    dyn_features_module(m, features));
 }
@@ -1672,7 +1872,7 @@ features_module(Module m, char ***features)
 static int
 enables_module(Module m, int **enables)
 {
-    return ((m->flags & MOD_LINKED) ?
+    return ((m->node.flags & MOD_LINKED) ?
 	    (m->u.linked->enables)(m, enables) :
 	    dyn_enables_module(m, enables));
 }
@@ -1681,7 +1881,7 @@ enables_module(Module m, int **enables)
 static int
 boot_module(Module m)
 {
-    return ((m->flags & MOD_LINKED) ?
+    return ((m->node.flags & MOD_LINKED) ?
 	    (m->u.linked->boot)(m) : dyn_boot_module(m));
 }
 
@@ -1689,7 +1889,7 @@ boot_module(Module m)
 static int
 cleanup_module(Module m)
 {
-    return ((m->flags & MOD_LINKED) ?
+    return ((m->node.flags & MOD_LINKED) ?
 	    (m->u.linked->cleanup)(m) : dyn_cleanup_module(m));
 }
 
@@ -1697,7 +1897,7 @@ cleanup_module(Module m)
 static int
 finish_module(Module m)
 {
-    return ((m->flags & MOD_LINKED) ?
+    return ((m->node.flags & MOD_LINKED) ?
 	    (m->u.linked->finish)(m) : dyn_finish_module(m));
 }
 
@@ -1708,14 +1908,14 @@ finish_module(Module m)
 static int
 setup_module(Module m)
 {
-    return ((m->flags & MOD_LINKED) ? (m->u.linked->setup)(m) : 1);
+    return ((m->node.flags & MOD_LINKED) ? (m->u.linked->setup)(m) : 1);
 }
 
 /**/
 static int
 features_module(Module m, char ***features)
 {
-    return ((m->flags & MOD_LINKED) ? (m->u.linked->features)(m, features)
+    return ((m->node.flags & MOD_LINKED) ? (m->u.linked->features)(m, features)
 	    : 1);
 }
 
@@ -1723,7 +1923,7 @@ features_module(Module m, char ***features)
 static int
 enables_module(Module m, int **enables)
 {
-    return ((m->flags & MOD_LINKED) ? (m->u.linked->enables)(m, enables)
+    return ((m->node.flags & MOD_LINKED) ? (m->u.linked->enables)(m, enables)
 	    : 1);
 }
 
@@ -1731,21 +1931,21 @@ enables_module(Module m, int **enables)
 static int
 boot_module(Module m)
 {
-    return ((m->flags & MOD_LINKED) ? (m->u.linked->boot)(m) : 1);
+    return ((m->node.flags & MOD_LINKED) ? (m->u.linked->boot)(m) : 1);
 }
 
 /**/
 static int
 cleanup_module(Module m)
 {
-    return ((m->flags & MOD_LINKED) ? (m->u.linked->cleanup)(m) : 1);
+    return ((m->node.flags & MOD_LINKED) ? (m->u.linked->cleanup)(m) : 1);
 }
 
 /**/
 static int
 finish_module(Module m)
 {
-    return ((m->flags & MOD_LINKED) ? (m->u.linked->finish)(m) : 1);
+    return ((m->node.flags & MOD_LINKED) ? (m->u.linked->finish)(m) : 1);
 }
 
 /**/
@@ -1761,14 +1961,16 @@ finish_module(Module m)
  * by now (though may not be fully set up).
  *
  * Return 0 for success, 1 for failure, 2 if some features
- * couldn't be set.
+ * couldn't be set by the module itself (non-existent features
+ * are tested here and cause 1 to be returned).
  */
 
 /**/
 static int
-do_module_features(Module m, char **enablesstr, int silent)
+do_module_features(Module m, char **enablesstr, int flags)
 {
     char **features;
+    int ret = 0;
 
     if (features_module(m, &features) == 0) {
 	/*
@@ -1781,10 +1983,60 @@ do_module_features(Module m, char **enablesstr, int silent)
 	int *enables = NULL;
 	if (enables_module(m, &enables)) {
 	    /* If features are supported, enables should be, too */
-	    if (!silent)
+	    if (!(flags & FEAT_IGNORE))
 		zwarn("error getting enabled features for module `%s'",
-		      m->nam);
+		      m->node.nam);
 	    return 1;
+	}
+
+	if ((flags & FEAT_CHECKAUTO) && m->autoloads) {
+	    /*
+	     * Check autoloads are available.  Since these
+	     * have been requested at some other point, they
+	     * don't affect the return status unless something
+	     * in enablesstr doesn't work.
+	     */
+	    LinkNode an, nextn;
+	    for (an = firstnode(m->autoloads); an; an = nextn) {
+		char *al = (char *)getdata(an), **ptr;
+		/* careful, we can delete the current node */
+		nextn = nextnode(an);
+		for (ptr = features; *ptr; ptr++)
+		    if (!strcmp(al, *ptr))
+			break;
+		if (!*ptr) {
+		    char *arg[2];
+		    if (!(flags & FEAT_IGNORE))
+			zwarn(
+		    "module `%s' has no such feature: `%s': autoload cancelled",
+		    m->node.nam, al);
+		    /*
+		     * This shouldn't happen, so it's not worth optimising
+		     * the call to autofeatures...
+		     */
+		    arg[0] = al = dupstring(al);
+		    arg[1] = NULL;
+		    (void)autofeatures(NULL, m->node.nam, arg, 0,
+				       FEAT_IGNORE|FEAT_REMOVE);
+		    /*
+		     * don't want to try to enable *that*... 
+		     * expunge it from the enable string.
+		     */
+		    if (enablesstr) {
+			for (ptr = enablesstr; *ptr; ptr++) {
+			    if (!strcmp(al, *ptr)) {
+				/* can't enable it after all, so return 1 */
+				ret = 1;
+				while (*ptr) {
+				    *ptr = ptr[1];
+				    ptr++;
+				}
+				break;
+			    }
+			}
+		    }
+		}
+	    }
 	}
 
 	if (enablesstr) {
@@ -1804,9 +2056,9 @@ do_module_features(Module m, char **enablesstr, int silent)
 			break;
 		    }
 		if (!*fp) {
-		    if (!silent)
-			zwarn("module `%s' has no such feature: %s",
-			      m->nam, esp);
+		    if (!(flags & FEAT_IGNORE))
+			zwarn("module `%s' has no such feature: `%s'",
+			      m->node.nam, esp);
 		    return 1;
 		}
 	    }
@@ -1824,13 +2076,13 @@ do_module_features(Module m, char **enablesstr, int silent)
 	if (enables_module(m, &enables))
 	    return 2;
     } else if (enablesstr) {
-	if (!silent)
-	    zwarn("module `%s' does not support features", m->nam);
+	if (!(flags & FEAT_IGNORE))
+	    zwarn("module `%s' does not support features", m->node.nam);
 	return 1;
     }
     /* Else it doesn't support features but we don't care. */
 
-    return 0;
+    return ret;
 }
 
 /*
@@ -1847,7 +2099,9 @@ do_module_features(Module m, char **enablesstr, int silent)
 static int
 do_boot_module(Module m, char **enablesstr, int silent)
 {
-    int ret = do_module_features(m, enablesstr, silent);
+    int ret = do_module_features(m, enablesstr,
+				 silent ? FEAT_IGNORE|FEAT_CHECKAUTO :
+				 FEAT_CHECKAUTO);
 
     if (ret == 1)
 	return 1;
@@ -1865,7 +2119,7 @@ do_boot_module(Module m, char **enablesstr, int silent)
 static int
 do_cleanup_module(Module m)
 {
-    return (m->flags & MOD_LINKED) ?
+    return (m->node.flags & MOD_LINKED) ?
 	(m->u.linked && m->u.linked->cleanup(m)) :
 	(m->u.handle && cleanup_module(m));
 }
@@ -1910,7 +2164,6 @@ load_module(char const *name, char **enablesstr, int silent)
     Module m;
     void *handle = NULL;
     Linkedmod linked;
-    LinkNode node, n;
     int set, bootret;
 
     if (!modname_ok(name)) {
@@ -1924,66 +2177,65 @@ load_module(char const *name, char **enablesstr, int silent)
      * is the right one.
      */
     queue_signals();
-    if (!(node = find_module(name, FINDMOD_ALIASP, &name))) {
+    if (!(m = find_module(name, FINDMOD_ALIASP, &name))) {
 	if (!(linked = module_linked(name)) &&
 	    !(handle = do_load_module(name, silent))) {
 	    unqueue_signals();
 	    return 1;
 	}
 	m = zshcalloc(sizeof(*m));
-	m->nam = ztrdup(name);
 	if (handle) {
 	    m->u.handle = handle;
-	    m->flags |= MOD_SETUP;
+	    m->node.flags |= MOD_SETUP;
 	} else {
 	    m->u.linked = linked;
-	    m->flags |= MOD_SETUP | MOD_LINKED;
+	    m->node.flags |= MOD_SETUP | MOD_LINKED;
 	}
-	node = zaddlinknode(modules, m);
+	modulestab->addnode(modulestab, ztrdup(name), m);
 
 	if ((set = setup_module(m)) ||
 	    (bootret = do_boot_module(m, enablesstr, silent)) == 1) {
-	    if (!set) {
+	    if (!set)
 		do_cleanup_module(m);
-		finish_module(m);
-	    }
-	    delete_module(node);
+	    finish_module(m);
+	    delete_module(m);
 	    unqueue_signals();
 	    return 1;
 	}
-	m->flags |= MOD_INIT_S | MOD_INIT_B;
-	m->flags &= ~MOD_SETUP;
+	m->node.flags |= MOD_INIT_S | MOD_INIT_B;
+	m->node.flags &= ~MOD_SETUP;
 	unqueue_signals();
 	return bootret;
     }
-    m = (Module) getdata(node);
-    if (m->flags & MOD_SETUP) {
+    if (m->node.flags & MOD_SETUP) {
 	unqueue_signals();
 	return 0;
     }
-    if (m->flags & MOD_UNLOAD)
-	m->flags &= ~MOD_UNLOAD;
-    else if ((m->flags & MOD_LINKED) ? m->u.linked : m->u.handle) {
+    if (m->node.flags & MOD_UNLOAD)
+	m->node.flags &= ~MOD_UNLOAD;
+    else if ((m->node.flags & MOD_LINKED) ? m->u.linked : m->u.handle) {
 	unqueue_signals();
 	return 0;
     }
-    if (m->flags & MOD_BUSY) {
-	zerr("circular dependencies for module %s", name);
+    if (m->node.flags & MOD_BUSY) {
+	zerr("circular dependencies for module ;%s", name);
 	return 1;
     }
-    m->flags |= MOD_BUSY;
+    m->node.flags |= MOD_BUSY;
     /*
      * TODO: shouldn't we unload the module if one of
      * its dependencies fails?
      */
-    if (m->deps)
+    if (m->deps) {
+	LinkNode n;
 	for (n = firstnode(m->deps); n; incnode(n))
 	    if (load_module((char *) getdata(n), NULL, silent) == 1) {
-		m->flags &= ~MOD_BUSY;
+		m->node.flags &= ~MOD_BUSY;
 		unqueue_signals();
 		return 1;
 	    }
-    m->flags &= ~MOD_BUSY;
+    }
+    m->node.flags &= ~MOD_BUSY;
     if (!m->u.handle) {
 	handle = NULL;
 	if (!(linked = module_linked(name)) &&
@@ -1993,36 +2245,37 @@ load_module(char const *name, char **enablesstr, int silent)
 	}
 	if (handle) {
 	    m->u.handle = handle;
-	    m->flags |= MOD_SETUP;
+	    m->node.flags |= MOD_SETUP;
 	} else {
 	    m->u.linked = linked;
-	    m->flags |= MOD_SETUP | MOD_LINKED;
+	    m->node.flags |= MOD_SETUP | MOD_LINKED;
 	}
 	if (setup_module(m)) {
+	    finish_module(m);
 	    if (handle)
 		m->u.handle = NULL;
 	    else
 		m->u.linked = NULL;
-	    m->flags &= ~MOD_SETUP;
+	    m->node.flags &= ~MOD_SETUP;
 	    unqueue_signals();
 	    return 1;
 	}
-	m->flags |= MOD_INIT_S;
+	m->node.flags |= MOD_INIT_S;
     }
-    m->flags |= MOD_SETUP;
+    m->node.flags |= MOD_SETUP;
     if ((bootret = do_boot_module(m, enablesstr, silent)) == 1) {
 	do_cleanup_module(m);
 	finish_module(m);
-	if (m->flags & MOD_LINKED)
+	if (m->node.flags & MOD_LINKED)
 	    m->u.linked = NULL;
 	else
 	    m->u.handle = NULL;
-	m->flags &= ~MOD_SETUP;
+	m->node.flags &= ~MOD_SETUP;
 	unqueue_signals();
 	return 1;
     }
-    m->flags |= MOD_INIT_B;
-    m->flags &= ~MOD_SETUP;
+    m->node.flags |= MOD_INIT_B;
+    m->node.flags &= ~MOD_SETUP;
     unqueue_signals();
     return bootret;
 }
@@ -2030,7 +2283,8 @@ load_module(char const *name, char **enablesstr, int silent)
 /* This ensures that the module with the name given as the first argument
  * is loaded.
  * The other argument is the array of features to set.  If this is NULL
- * and the module needs to be loaded, all features are enabled.
+ * all features are enabled (even if the module was already loaded).
+ *
  * If this is non-NULL the module features are set accordingly
  * whether or not the module is loaded; it is an error if the
  * module does not support the features passed (even if the feature
@@ -2050,14 +2304,13 @@ mod_export int
 require_module(const char *module, char **features)
 {
     Module m = NULL;
-    LinkNode node;
     int ret = 0;
 
     /* Resolve aliases and actual loadable module as for load_module */
     queue_signals();
-    node = find_module(module, 1, &module);
-    if (!node || !(m = ((Module) getdata(node)))->u.handle ||
-	(m->flags & MOD_UNLOAD))
+    m = find_module(module, FINDMOD_ALIASP, &module);
+    if (!m || !m->u.handle ||
+	(m->node.flags & MOD_UNLOAD))
 	ret = load_module(module, features, 0);
     else
 	ret = do_module_features(m, features, 0);
@@ -2090,7 +2343,7 @@ add_dep(const char *name, char *from)
      * Better make sure.  (There's no problem making a an alias which
      * *points* to a module with dependencies, of course.)
      */
-    m = getdata(find_module(name, FINDMOD_ALIASP|FINDMOD_CREATE, &name));
+    m = find_module(name, FINDMOD_ALIASP|FINDMOD_CREATE, &name);
     if (!m->deps)
 	m->deps = znewlinklist();
     for (node = firstnode(m->deps);
@@ -2179,7 +2432,8 @@ bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
     if (OPT_ISSET(ops,'e') && (OPT_ISSET(ops,'I') || OPT_ISSET(ops,'L') || 
-			       OPT_ISSET(ops,'a') || OPT_ISSET(ops,'d') ||
+			       (OPT_ISSET(ops,'a') && !OPT_ISSET(ops,'F'))
+			       || OPT_ISSET(ops,'d') ||
 			       OPT_ISSET(ops,'i') || OPT_ISSET(ops,'u'))) {
 	zwarnnam(nam, "-e cannot be combined with other options");
 	/* except -F ... */
@@ -2233,7 +2487,6 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
      * suppose other names are aliased to the same file?  It might be
      * kettle of fish best left unwormed.
      */
-    LinkNode node;
     Module m;
 
     if (!*args) {
@@ -2241,11 +2494,9 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
 	    zwarnnam(nam, "no module alias to remove");
 	    return 1;
 	}
-	for (node = firstnode(modules); node; incnode(node)) {
-	    m = (Module) getdata(node);
-	    if (m->flags & MOD_ALIAS)
-		printmodalias(m, ops);
-	}
+	scanhashtable(modulestab, 1, MOD_ALIAS, 0,
+		      modulestab->printnode,
+		      OPT_ISSET(ops,'L') ? PRINTMOD_LIST : 0);
 	return 0;
     }
 
@@ -2264,14 +2515,13 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
 			 *args);
 		return 1;
 	    }
-	    node = find_module(*args, 0, NULL);
-	    if (node) {
-		m = (Module) getdata(node);
-		if (!(m->flags & MOD_ALIAS)) {
+	    m = find_module(*args, 0, NULL);
+	    if (m) {
+		if (!(m->node.flags & MOD_ALIAS)) {
 		    zwarnnam(nam, "module is not an alias: %s", *args);
 		    return 1;
 		}
-		delete_module(node);
+		delete_module(m);
 	    } else {
 		zwarnnam(nam, "no such module alias: %s", *args);
 		return 1;
@@ -2289,29 +2539,28 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
 				 *args);
 			return 1;
 		    }
-		} while ((node = find_module(mname, 0, NULL))
-			 && ((m = (Module) getdata(node))->flags & MOD_ALIAS)
+		} while ((m = find_module(mname, 0, NULL))
+			 && (m->node.flags & MOD_ALIAS)
 			 && (mname = m->u.alias));
-		node = find_module(*args, 0, NULL);
-		if (node) {
-		    m = (Module) getdata(node);
-		    if (!(m->flags & MOD_ALIAS)) {
+		m = find_module(*args, 0, NULL);
+		if (m) {
+		    if (!(m->node.flags & MOD_ALIAS)) {
 			zwarnnam(nam, "module is not an alias: %s", *args);
 			return 1;
 		    }
 		    zsfree(m->u.alias);
 		} else {
 		    m = (Module) zshcalloc(sizeof(*m));
-		    m->nam = ztrdup(*args);
-		    m->flags = MOD_ALIAS;
-		    zaddlinknode(modules, m);
+		    m->node.flags = MOD_ALIAS;
+		    modulestab->addnode(modulestab, ztrdup(*args), m);
 		}
 		m->u.alias = ztrdup(aliasname);
 	    } else {
-		if ((node = find_module(*args, 0, NULL))) {
-		    m = (Module) getdata(node);
-		    if (m->flags & MOD_ALIAS)
-			printmodalias(m, ops);
+		if ((m = find_module(*args, 0, NULL))) {
+		    if (m->node.flags & MOD_ALIAS)
+			modulestab->printnode(&m->node,
+					      OPT_ISSET(ops,'L') ?
+					      PRINTMOD_LIST : 0);
 		    else {
 			zwarnnam(nam, "module is not an alias: %s", *args);
 			return 1;
@@ -2333,35 +2582,20 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
 static int
 bin_zmodload_exist(UNUSED(char *nam), char **args, Options ops)
 {
-    LinkNode node;
     Module m;
-    char *modname;
 
     if (!*args) {
-	for (node = firstnode(modules); node; incnode(node)) {
-	    m = (Module) getdata(node);
-	    modname = m->nam;
-	    if (m->flags & MOD_ALIAS) {
-		LinkNode node2;
-		if (OPT_ISSET(ops,'A') && 
-		    (node2 = find_module(m->u.alias, FINDMOD_ALIASP, NULL)))
-		    m = (Module) getdata(node2);
-		else
-		    continue;
-	    }
-	    if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
-		nicezputs(modname, stdout);
-		putchar('\n');
-	    }
-	}
+	scanhashtable(modulestab, 1, 0, 0, modulestab->printnode,
+		      OPT_ISSET(ops,'A') ? PRINTMOD_EXIST|PRINTMOD_ALIAS :
+		      PRINTMOD_EXIST);
 	return 0;
     } else {
 	int ret = 0;
 
 	for (; !ret && *args; args++) {
-	    if (!(node = find_module(*args, FINDMOD_ALIASP, NULL))
-		|| !(m = (Module) getdata(node))->u.handle
-		|| (m->flags & MOD_UNLOAD))
+	    if (!(m = find_module(*args, FINDMOD_ALIASP, NULL))
+		|| !m->u.handle
+		|| (m->node.flags & MOD_UNLOAD))
 		ret = 1;
 	}
 	return ret;
@@ -2374,15 +2608,13 @@ bin_zmodload_exist(UNUSED(char *nam), char **args, Options ops)
 static int
 bin_zmodload_dep(UNUSED(char *nam), char **args, Options ops)
 {
-    LinkNode node;
     Module m;
     if (OPT_ISSET(ops,'u')) {
 	/* remove dependencies, which can't pertain to aliases */
 	const char *tnam = *args++;
-	node = find_module(tnam, FINDMOD_ALIASP, &tnam);
-	if (!node)
+	m = find_module(tnam, FINDMOD_ALIASP, &tnam);
+	if (!m)
 	    return 0;
-	m = (Module) getdata(node);
 	if (*args && m->deps) {
 	    do {
 		LinkNode dnode;
@@ -2404,32 +2636,18 @@ bin_zmodload_dep(UNUSED(char *nam), char **args, Options ops)
 	    }
 	}
 	if (!m->deps && !m->u.handle)
-	    delete_module(node);
+	    delete_module(m);
 	return 0;
     } else if (!args[0] || !args[1]) {
 	/* list dependencies */
-	for (node = firstnode(modules); node; incnode(node)) {
-	    m = (Module) getdata(node);
-	    if (m->deps && (!args[0] || !strcmp(args[0], m->nam))) {
-		LinkNode n;
-		if (OPT_ISSET(ops,'L')) {
-		    printf("zmodload -d ");
-		    if(m->nam[0] == '-')
-			fputs("-- ", stdout);
-		    quotedzputs(m->nam, stdout);
-		} else {
-		    nicezputs(m->nam, stdout);
-		    putchar(':');
-		}
-		for (n = firstnode(m->deps); n; incnode(n)) {
-		    putchar(' ');
-		    if(OPT_ISSET(ops,'L'))
-			quotedzputs((char *) getdata(n), stdout);
-		    else
-			nicezputs((char *) getdata(n), stdout);
-		}
-		putchar('\n');
-	    }
+	int depflags = OPT_ISSET(ops,'L') ?
+	    PRINTMOD_DEPS|PRINTMOD_LIST : PRINTMOD_DEPS;
+	if (args[0]) {
+	    if ((m = (Module)modulestab->getnode2(modulestab, args[0])))
+		modulestab->printnode(&m->node, depflags);
+	} else {
+	    scanhashtable(modulestab, 1, 0, 0, modulestab->printnode,
+			  depflags);
 	}
 	return 0;
     } else {
@@ -2467,7 +2685,7 @@ printautoparams(HashNode hn, int lon)
 static int
 bin_zmodload_auto(char *nam, char **args, Options ops)
 {
-    int fchar;
+    int fchar, flags;
     char *modnam;
 
     if (OPT_ISSET(ops,'c')) {
@@ -2530,9 +2748,12 @@ bin_zmodload_auto(char *nam, char **args, Options ops)
 	fchar = 'b';
     }
 
+    flags = FEAT_AUTOALL;
+    if (OPT_ISSET(ops,'i'))
+	flags |= FEAT_IGNORE;
     if (OPT_ISSET(ops,'u')) {
 	/* remove autoload */
-	fchar *= -1;
+	flags |= FEAT_REMOVE;
 	modnam = NULL;
     } else {
 	/* add autoload */
@@ -2541,94 +2762,113 @@ bin_zmodload_auto(char *nam, char **args, Options ops)
 	if (args[1])
 	    args++;
     }
-    return autofeatures(nam, modnam, args, fchar, OPT_ISSET(ops,'i'));
+    return autofeatures(nam, modnam, args, fchar, flags);
 }
 
 /* Backend handler for zmodload -u */
 
 /**/
 int
-unload_module(Module m, LinkNode node)
+unload_module(Module m)
 {
+    int del;
+
     /*
      * Only unload the real module, so resolve aliases.
      */
-    if (m->flags & MOD_ALIAS) {
-	LinkNode node = find_module(m->u.alias, FINDMOD_ALIASP, NULL);
-	if (!node)
+    if (m->node.flags & MOD_ALIAS) {
+	m = find_module(m->u.alias, FINDMOD_ALIASP, NULL);
+	if (!m)
 	    return 1;
-	m = (Module) getdata(node);
     }
-    if ((m->flags & MOD_INIT_S) &&
-	!(m->flags & MOD_UNLOAD) &&
+    /*
+     * We may need to clean up the module any time setup_ has been
+     * called.  After cleanup_ is successful we are no longer in the
+     * booted state (because features etc. are deregistered), so remove
+     * MOD_INIT_B, and also MOD_INIT_S since we won't need to cleanup
+     * again if this succeeded.
+     */
+    if ((m->node.flags & MOD_INIT_S) &&
+	!(m->node.flags & MOD_UNLOAD) &&
 	do_cleanup_module(m))
 	return 1;
-    else {
-	int del = (m->flags & MOD_UNLOAD);
+    m->node.flags &= ~(MOD_INIT_B|MOD_INIT_S);
 
-	if (m->wrapper) {
-	    m->flags |= MOD_UNLOAD;
-	    return 0;
+    del = (m->node.flags & MOD_UNLOAD);
+
+    if (m->wrapper) {
+	m->node.flags |= MOD_UNLOAD;
+	return 0;
+    }
+    m->node.flags &= ~MOD_UNLOAD;
+
+    /*
+     * We always need to finish the module (and unload it)
+     * if it is present.
+     */
+    if (m->node.flags & MOD_LINKED) {
+	if (m->u.linked) {
+	    m->u.linked->finish(m);
+	    m->u.linked = NULL;
 	}
-	m->flags &= ~MOD_UNLOAD;
-	if (m->flags & MOD_INIT_B) {
-	    if (m->flags & MOD_LINKED) {
-		if (m->u.linked) {
-		    m->u.linked->finish(m);
-		    m->u.linked = NULL;
-		}
-	    } else {
-		if (m->u.handle) {
-		    finish_module(m);
-		    m->u.handle = NULL;
-		}
-	    }
+    } else {
+	if (m->u.handle) {
+	    finish_module(m);
+	    m->u.handle = NULL;
 	}
-	if (del && m->deps) {
-	    /* The module was unloaded delayed, unload all modules *
-	     * on which it depended. */
-	    LinkNode n;
+    }
 
-	    for (n = firstnode(m->deps); n; incnode(n)) {
-		LinkNode dn = find_module((char *) getdata(n),
-					  FINDMOD_ALIASP, NULL);
-		Module dm;
+    if (del && m->deps) {
+	/* The module was unloaded delayed, unload all modules *
+	 * on which it depended. */
+	LinkNode n;
 
-		if (dn && (dm = (Module) getdata(dn)) &&
-		    (dm->flags & MOD_UNLOAD)) {
-		    /* See if this is the only module depending on it. */
+	for (n = firstnode(m->deps); n; incnode(n)) {
+	    Module dm = find_module((char *) getdata(n),
+				    FINDMOD_ALIASP, NULL);
 
-		    LinkNode an;
-		    Module am;
-		    int du = 1;
-
-		    for (an = firstnode(modules); du && an; incnode(an)) {
-			am = (Module) getdata(an);
-			if (am != m && am->deps &&
-			    ((am->flags & MOD_LINKED) ?
-			     am->u.linked : am->u.handle)) {
-			    LinkNode sn;
-
-			    for (sn = firstnode(am->deps); du && sn;
-				 incnode(sn)) {
-				if (!strcmp((char *) getdata(sn), dm->nam))
-				    du = 0;
-			    }
+	    if (dm &&
+		(dm->node.flags & MOD_UNLOAD)) {
+		/* See if this is the only module depending on it. */
+		Module am;
+		int du = 1, i;
+		/* Scan hash table the hard way */
+		for (i = 0; du && i < modulestab->hsize; i++) {
+		    for (am = (Module)modulestab->nodes[i]; du && am;
+			 am = (Module)am->node.next) {
+			LinkNode sn;
+			/*
+			 * Don't scan the module we're unloading;
+			 * ignore if no dependencies.
+			 */
+			if (am == m || !am->deps)
+			    continue;
+			/* Don't scan if not loaded nor linked */
+			if ((am->node.flags & MOD_LINKED) ?
+			    !am->u.linked : !am->u.handle)
+			    continue;
+			for (sn = firstnode(am->deps); du && sn;
+			     incnode(sn)) {
+			    if (!strcmp((char *) getdata(sn),
+					dm->node.nam))
+				du = 0;
 			}
 		    }
-		    if (du)
-			unload_module(dm, NULL);
 		}
+		if (du)
+		    unload_module(dm);
 	    }
 	}
-	if(!m->deps) {
-	    if (!node) {
-		node = linknodebydatum(modules, m);
-		if (!node)
-		    return 1;
-	    }
-	    delete_module(node);
-	}
+    }
+    if (m->autoloads && firstnode(m->autoloads)) {
+	/*
+	 * Module has autoloadable features.  Restore them
+	 * so that the module will be reloaded when needed.
+	 */
+	autofeatures("zsh", m->node.nam,
+		     hlinklist2array(m->autoloads, 0), 0, FEAT_IGNORE);
+    } else if (!m->deps) {
+	delete_module(m);
     }
     return 0;
 }
@@ -2644,32 +2884,35 @@ int
 unload_named_module(char *modname, char *nam, int silent)
 {
     const char *mname;
-    LinkNode node;
     Module m;
     int ret = 0;
 
-    node = find_module(modname, FINDMOD_ALIASP, &mname);
-    if (node) {
-	LinkNode mn, dn;
-	int del = 0;
+    m = find_module(modname, FINDMOD_ALIASP, &mname);
+    if (m) {
+	int i, del = 0;
+	Module dm;
 
-	for (mn = firstnode(modules); mn; incnode(mn)) {
-	    m = (Module) getdata(mn);
-	    if (m->deps && m->u.handle)
-		for (dn = firstnode(m->deps); dn; incnode(dn))
+	for (i = 0; i < modulestab->hsize; i++) {
+	    for (dm = (Module)modulestab->nodes[i]; dm;
+		 dm = (Module)dm->node.next) {
+		LinkNode dn;
+		if (!dm->deps || !dm->u.handle)
+		    continue;
+		for (dn = firstnode(dm->deps); dn; incnode(dn)) {
 		    if (!strcmp((char *) getdata(dn), mname)) {
-			if (m->flags & MOD_UNLOAD)
+			if (dm->node.flags & MOD_UNLOAD)
 			    del = 1;
 			else {
 			    zwarnnam(nam, "module %s is in use by another module and cannot be unloaded", mname);
 			    return 1;
 			}
 		    }
+		}
+	    }
 	}
-	m = (Module) getdata(node);
 	if (del)
 	    m->wrapper++;
-	if (unload_module(m, node))
+	if (unload_module(m))
 	    ret = 1;
 	if (del)
 	    m->wrapper--;
@@ -2687,8 +2930,6 @@ unload_named_module(char *modname, char *nam, int silent)
 static int
 bin_zmodload_load(char *nam, char **args, Options ops)
 {
-    LinkNode node;
-    Module m;
     int ret = 0;
     if(OPT_ISSET(ops,'u')) {
 	/* unload modules */
@@ -2699,19 +2940,9 @@ bin_zmodload_load(char *nam, char **args, Options ops)
 	return ret;
     } else if(!*args) {
 	/* list modules */
-	for (node = firstnode(modules); node; incnode(node)) {
-	    m = (Module) getdata(node);
-	    if (m->u.handle && !(m->flags & (MOD_UNLOAD|MOD_ALIAS))) {
-		if(OPT_ISSET(ops,'L')) {
-		    printf("zmodload ");
-		    if(m->nam[0] == '-')
-			fputs("-- ", stdout);
-		    quotedzputs(m->nam, stdout);
-		} else
-		    nicezputs(m->nam, stdout);
-		putchar('\n');
-	    }
-	}
+	scanhashtable(modulestab, 1, 0, MOD_UNLOAD|MOD_ALIAS,
+		      modulestab->printnode,
+		      OPT_ISSET(ops,'L') ? PRINTMOD_LIST : 0);
 	return 0;
     } else {
 	/* load modules */
@@ -2729,15 +2960,31 @@ bin_zmodload_load(char *nam, char **args, Options ops)
 
 /**/
 static int
-bin_zmodload_features(char *nam, char **args, Options ops)
+bin_zmodload_features(const char *nam, char **args, Options ops)
 {
     char *modname = *args;
+
+    if (modname)
+	args++;
+    else if (OPT_ISSET(ops,'L')) {
+	int printflags = PRINTMOD_LIST|PRINTMOD_FEATURES;
+	if (OPT_ISSET(ops,'P')) {
+	    zwarnnam(nam, "-P is only allowed with a module name");
+	    return 1;
+	}
+	if (OPT_ISSET(ops,'l'))
+	    printflags |= PRINTMOD_LISTALL;
+	if (OPT_ISSET(ops,'a'))
+	    printflags |= PRINTMOD_AUTO;
+	scanhashtable(modulestab, 1, 0, MOD_ALIAS,
+		      modulestab->printnode, printflags);
+	return 0;
+    }
 
     if (!modname) {
 	zwarnnam(nam, "-F requires a module name");
 	return 1;
     }
-    args++;
 
     if (OPT_ISSET(ops,'l') || OPT_ISSET(ops,'L') || OPT_ISSET(ops,'e')) {
 	/*
@@ -2746,32 +2993,74 @@ bin_zmodload_features(char *nam, char **args, Options ops)
 	 * only options turned on.
 	 * With both options, list as zmodload showing options
 	 * to be turned both on and off.
-	 *
-	 * TODO: handle -a, list only autoloads.
 	 */
-	LinkNode node;
-	Module m = NULL;
+	Module m;
 	char **features, **fp, **arrset = NULL, **arrp = NULL;
 	int *enables = NULL, *ep;
 	char *param = OPT_ARG_SAFE(ops,'P');
 
-	node = find_module(modname, FINDMOD_ALIASP, NULL);
-	if (node)
-	    m = ((Module) getdata(node));
-	if (!m || !m->u.handle || (m->flags & MOD_UNLOAD)) {
+	m = find_module(modname, FINDMOD_ALIASP, NULL);
+	if (OPT_ISSET(ops,'a')) {
+	    LinkNode ln;
+	    /*
+	     * If there are no autoloads defined, return status 1.
+	     */
+	    if (!m || !m->autoloads)
+		return 1;
+	    if (OPT_ISSET(ops,'e')) {
+		for (fp = args; *fp; fp++) {
+		    char *fstr = *fp;
+		    int sense = 1;
+		    if (*fstr == '+')
+			fstr++;
+		    else if (*fstr == '-') {
+			fstr++;
+			sense = 0;
+		    }
+		    if ((linknodebystring(m->autoloads, fstr) != NULL) !=
+			sense)
+			return 1;
+		}
+		return 0;
+	    }
+	    if (param) {
+		arrp = arrset = (char **)zalloc(sizeof(char*) *
+				 (countlinknodes(m->autoloads)+1));
+	    } else if (OPT_ISSET(ops,'L')) {
+		printf("zmodload -aF %s%c", m->node.nam,
+		       m->autoloads && firstnode(m->autoloads) ? ' ' : '\n');
+		arrp = NULL;
+	    }
+	    for (ln = firstnode(m->autoloads); ln; incnode(ln)) {
+		char *al = (char *)getdata(ln);
+		if (param)
+		    *arrp++ = ztrdup(al);
+		else
+		    printf("%s%c", al,
+			   OPT_ISSET(ops,'L') && nextnode(ln) ? ' ' : '\n');
+	    }
+	    if (param) {
+		*arrp = NULL;
+		if (!setaparam(param, arrset))
+		    return 1;
+	    }
+	    return 0;
+	}
+	if (!m || !m->u.handle || (m->node.flags & MOD_UNLOAD)) {
 	    if (!OPT_ISSET(ops,'e'))
 		zwarnnam(nam, "module `%s' is not yet loaded", modname);
 	    return 1;
 	}
 	if (features_module(m, &features)) {
 	    if (!OPT_ISSET(ops,'e'))
-		zwarnnam(nam, "module `%s' does not support features", m->nam);
+		zwarnnam(nam, "module `%s' does not support features",
+			 m->node.nam);
 	    return 1;
 	}
 	if (enables_module(m, &enables)) {
 	    /* this shouldn't ever happen, so don't silence this error */
 	    zwarnnam(nam, "error getting enabled features for module `%s'",
-		     m->nam);
+		     m->node.nam);
 	    return 1;
 	}
 	for (arrp = args; *arrp; arrp++) {
@@ -2796,14 +3085,14 @@ bin_zmodload_features(char *nam, char **args, Options ops)
 	    }
 	    if (!*fp) {
 		if (!OPT_ISSET(ops,'e'))
-		    zwarnnam(nam, "module `%s' has no such feature: %s",
+		    zwarnnam(nam, "module `%s' has no such feature: `%s'",
 			     *arrp);
 		return 1;
 	    }
 	}
 	if (OPT_ISSET(ops,'e'))		/* yep, everything we want exists */
 	    return 0;
-	if (OPT_ISSET(ops,'P')) {
+	if (param) {
 	    int arrlen = 0;
 	    for (fp = features, ep = enables; *fp; fp++, ep++) {
 		if (OPT_ISSET(ops, 'L') && !OPT_ISSET(ops, 'l') &&
@@ -2826,7 +3115,7 @@ bin_zmodload_features(char *nam, char **args, Options ops)
 	    }
 	    arrp = arrset = zalloc(sizeof(char *) * (arrlen+1));
 	} else if (OPT_ISSET(ops, 'L'))
-	    printf("zmodload -F %s ", m->nam);
+	    printf("zmodload -F %s ", m->node.nam);
 	for (fp = features, ep = enables; *fp; fp++, ep++) {
 	    char *onoff;
 	    int term;
@@ -2872,7 +3161,18 @@ bin_zmodload_features(char *nam, char **args, Options ops)
 	zwarnnam(nam, "-P can only be used with -l or -L");
 	return 1;
     } else if (OPT_ISSET(ops,'a')) {
-	return autofeatures(nam, modname, args, 0, OPT_ISSET(ops,'i'));
+	/*
+	 * With zmodload -aF, we always use the effect of -i.
+	 * The thinking is that marking a feature for
+	 * autoload is separate from enabling or disabling it.
+	 * Arguably we could do this with the zmodload -ab method
+	 * but I've kept it there for old time's sake.
+	 * The decoupling has meant FEAT_IGNORE/-i also
+	 * suppresses an error for attempting to remove an
+	 * autoload when the feature is enabled, which used
+	 * to be a hard error before.
+	 */
+	return autofeatures(nam, modname, args, 0, FEAT_IGNORE);
     }
 
     return require_module(modname, args);
@@ -2894,15 +3194,15 @@ bin_zmodload_features(char *nam, char **args, Options ops)
 
 /**/
 mod_export char **
-featuresarray(char const *nam, Features f)
+featuresarray(UNUSED(Module m), Features f)
 {
     int bn_size = f->bn_size, cd_size = f->cd_size;
-    int pd_size = f->pd_size, mf_size = f->mf_size;
+    int mf_size = f->mf_size, pd_size = f->pd_size;
     int features_size = bn_size + cd_size + pd_size + mf_size + f->n_abstract;
     Builtin bnp = f->bn_list;
     Conddef cdp = f->cd_list;
-    Paramdef pdp = f->pd_list;
     MathFunc mfp = f->mf_list;
+    Paramdef pdp = f->pd_list;
     char **features = (char **)zhalloc((features_size + 1) * sizeof(char *));
     char **featurep = features;
 
@@ -2913,10 +3213,10 @@ featuresarray(char const *nam, Features f)
 			     cdp->name);
 	cdp++;
     }
-    while (pd_size--)
-	*featurep++ = dyncat("p:", (pdp++)->name);
     while (mf_size--)
 	*featurep++ = dyncat("f:", (mfp++)->name);
+    while (pd_size--)
+	*featurep++ = dyncat("p:", (pdp++)->name);
 
     features[features_size] = NULL;
     return features;
@@ -2929,15 +3229,15 @@ featuresarray(char const *nam, Features f)
  */
 /**/
 mod_export int *
-getfeatureenables(char const *nam, Features f)
+getfeatureenables(UNUSED(Module m), Features f)
 {
     int bn_size = f->bn_size, cd_size = f->cd_size;
-    int pd_size = f->pd_size, mf_size = f->mf_size;
-    int features_size = bn_size + cd_size + pd_size + mf_size + f->n_abstract;
+    int mf_size = f->mf_size, pd_size = f->pd_size;
+    int features_size = bn_size + cd_size + mf_size + pd_size + f->n_abstract;
     Builtin bnp = f->bn_list;
     Conddef cdp = f->cd_list;
-    Paramdef pdp = f->pd_list;
     MathFunc mfp = f->mf_list;
+    Paramdef pdp = f->pd_list;
     int *enables = zhalloc(sizeof(int) * features_size);
     int *enablep = enables;
 
@@ -2945,10 +3245,10 @@ getfeatureenables(char const *nam, Features f)
 	*enablep++ = ((bnp++)->node.flags & BINF_ADDED) ? 1 : 0;
     while (cd_size--)
 	*enablep++ = ((cdp++)->flags & CONDF_ADDED) ? 1 : 0;
-    while (pd_size--)
-	*enablep++ = (pdp++)->pm ? 1 : 0;
     while (mf_size--)
 	*enablep++ = ((mfp++)->flags & MFF_ADDED) ? 1 : 0;
+    while (pd_size--)
+	*enablep++ = (pdp++)->pm ? 1 : 0;
 
     return enables;
 }
@@ -2965,31 +3265,31 @@ getfeatureenables(char const *nam, Features f)
 
 /**/
 mod_export int
-setfeatureenables(char const *nam, Features f, int *e)
+setfeatureenables(Module m, Features f, int *e)
 {
     int ret = 0;
 
     if (f->bn_size) {
-	if (setbuiltins(nam, f->bn_list, f->bn_size, e))
+	if (setbuiltins(m->node.nam, f->bn_list, f->bn_size, e))
 	    ret = 1;
 	if (e)
 	    e += f->bn_size;
     }
     if (f->cd_size) {
-	if (setconddefs(nam, f->cd_list, f->cd_size, e))
+	if (setconddefs(m->node.nam, f->cd_list, f->cd_size, e))
 	    ret = 1;
 	if (e)
 	    e += f->cd_size;
     }
+    if (f->mf_size) {
+	if (setmathfuncs(m->node.nam, f->mf_list, f->mf_size, e))
+	    ret = 1;
+    }
     if (f->pd_size) {
-	if (setparamdefs(nam, f->pd_list, f->pd_size, e))
+	if (setparamdefs(m->node.nam, f->pd_list, f->pd_size, e))
 	    ret = 1;
 	if (e)
 	    e += f->pd_size;
-    }
-    if (f->mf_size) {
-	if (setmathfuncs(nam, f->mf_list, f->mf_size, e))
-	    ret = 1;
     }
     return ret;
 }
@@ -3001,31 +3301,40 @@ setfeatureenables(char const *nam, Features f, int *e)
 
 /**/
 mod_export int
-handlefeatures(char *nam, Features f, int **enables)
+handlefeatures(Module m, Features f, int **enables)
 {
     if (!enables || *enables)
-	return setfeatureenables(nam, f, *enables);
-    *enables = getfeatureenables(nam, f);
+	return setfeatureenables(m, f, *enables);
+    *enables = getfeatureenables(m, f);
     return 0;
 }
 
 /*
  * Ensure module "modname" is providing feature with "prefix"
- * and "feature" (e.g. "b:", "limit").
+ * and "feature" (e.g. "b:", "limit").  If feature is NULL,
+ * ensure all features are loaded (used for compatibility
+ * with the pre-feature autoloading behaviour).
  *
  * This will usually be called from the main shell to handle
  * loading of an autoloadable feature.
  *
  * Returns 0 on success, 1 for error in module, 2 for error
- * setting the feature.
+ * setting the feature.  However, this isn't actually all
+ * that useful for testing immediately on an autoload since
+ * it could be a failure to autoload a different feature
+ * from the one we want.  We could fix this but it's
+ * possible to test other ways.
  */
 
 /**/
 mod_export int
-ensurefeature(char *modname, char *prefix, char *feature)
+ensurefeature(const char *modname, const char *prefix, const char *feature)
 {
-    char *f = dyncat(prefix, feature);
-    char *features[2];
+    char *f, *features[2];
+
+    if (!feature)
+	return require_module(modname, NULL);
+    f = dyncat(prefix, feature);
 
     features[0] = f;
     features[1] = NULL;
@@ -3038,28 +3347,38 @@ ensurefeature(char *modname, char *prefix, char *feature)
 
 /**/
 int
-autofeatures(char *cmdnam, char *module, char **features, int prefchar,
-	     int opt_i)
+autofeatures(const char *cmdnam, const char *module, char **features,
+	     int prefchar, int defflags)
 {
     int ret = 0, subret;
-    int defflags = opt_i ? AUTOFEAT_IGNORE : 0;
+    Module defm, m;
+    char **modfeatures = NULL;
+    if (module) {
+	defm = (Module)find_module(module,
+				   FINDMOD_ALIASP|FINDMOD_CREATE, NULL);
+	if ((defm->node.flags & MOD_LINKED) ? defm->u.linked :
+	    defm->u.handle)
+	    (void)features_module(defm, &modfeatures);
+    } else
+	defm = NULL;
 
-    while (*features) {
-	char *fnam, *typnam;
+    for (; *features; features++) {
+	char *fnam, *typnam, *feature;
 	int add, fchar, flags = defflags;
 	autofeaturefn_t fn;
 
 	if (prefchar) {
-	    if (prefchar < 0) {
-		add = 0;
-		fchar = - prefchar;
-	    } else {
-		add = 1;
-		fchar = prefchar;
-	    }
+	    /*
+	     * "features" is list of bare features with no
+	     * type prefix; prefchar gives type character.
+	     */
+	    add = 1; 		/* unless overridden by flag */
+	    fchar = prefchar;
 	    fnam = *features;
+	    feature = zhalloc(strlen(fnam) + 3);
+	    sprintf(feature, "%c:%s", fchar, fnam);
 	} else {
-	    char *feature = *features;
+	    feature = *features;
 	    if (*feature == '-') {
 		add = 0;
 		feature++;
@@ -3073,12 +3392,13 @@ autofeatures(char *cmdnam, char *module, char **features, int prefchar,
 		zwarnnam(cmdnam, "bad format for autoloadable feature: `%s'",
 			 feature);
 		ret = 1;
+		continue;
 	    }
 	    fnam = feature + 2;
 	    fchar = feature[0];
 	}
-
-	features++;
+	if (flags & FEAT_REMOVE)
+	    add = 0;
 
 	switch (fchar) {
 	case 'b':
@@ -3087,21 +3407,21 @@ autofeatures(char *cmdnam, char *module, char **features, int prefchar,
 	    break;
 
 	case 'C':
-	    flags |= AUTOFEAT_INFIX;
+	    flags |= FEAT_INFIX;
 	    /* FALLTHROUGH */
 	case 'c':
 	    fn = add ? add_autocond : del_autocond;
 	    typnam = "condition";
 	    break;
 
-	case 'p':
-	    fn = add ? add_autoparam : del_autoparam;
-	    typnam = "parameter";
-	    break;
-
 	case 'f':
 	    fn = add ? add_automathfunc : del_automathfunc;
 	    typnam = "math function";
+	    break;
+
+	case 'p':
+	    fn = add ? add_autoparam : del_autoparam;
+	    typnam = "parameter";
 	    break;
 
 	default:
@@ -3116,10 +3436,91 @@ autofeatures(char *cmdnam, char *module, char **features, int prefchar,
 	    ret = 1;
 	    continue;
 	} 
-	subret = fn(module, fnam, flags);
+
+	if (!module) {
+	    /*
+	     * Traditional un-autoload syntax doesn't tell us
+	     * which module this came from.
+	     */
+	    int i;
+	    for (i = 0, m = NULL; !m && i < modulestab->hsize; i++) {
+		for (m = (Module)modulestab->nodes[i]; m;
+		     m = (Module)m->node.next) {
+		    if (m->autoloads &&
+			linknodebystring(m->autoloads, feature))
+			break;
+		}
+	    }
+	    if (!m) {
+		if (!(flags & FEAT_IGNORE)) {
+		    ret = 1;
+		    zwarnnam(cmdnam, "%s: no such %s", fnam, typnam);
+		}
+		continue;
+	    }
+	} else
+	    m = defm;
+
+	subret = 0;
+	if (add) {
+	    char **ptr;
+	    if (modfeatures) {
+		/*
+		 * If the module is already available, check that
+		 * it does in fact provide the necessary feature.
+		 */
+		for (ptr = modfeatures; *ptr; ptr++)
+		    if (!strcmp(*ptr, feature))
+			break;
+		if (!*ptr) {
+		    zwarnnam(cmdnam, "module `%s' has no such feature: `%s'",
+			     m->node.nam, feature);
+		    ret = 1;
+		    continue;
+		}
+	    }
+	    if (!m->autoloads) {
+		m->autoloads = znewlinklist();
+		zaddlinknode(m->autoloads, ztrdup(feature));
+	    } else {
+		/* Insert in lexical order */
+		LinkNode ln, prev = (LinkNode)m->autoloads;
+		while ((ln = nextnode(prev))) {
+		    int cmp = strcmp(feature, (char *)getdata(ln));
+		    if (cmp == 0) {
+			/* Already there.  Never an error. */
+			break;
+		    }
+		    if (cmp < 0) {
+			zinsertlinknode(m->autoloads, prev,
+					ztrdup(feature));
+			break;
+		    }
+		    prev = ln;
+		}
+		if (!ln)
+		    zaddlinknode(m->autoloads, ztrdup(feature));
+	    }
+	} else if (m->autoloads) {
+	    LinkNode ln;
+	    if ((ln = linknodebystring(m->autoloads, feature)))
+		zsfree((char *)remnode(m->autoloads, ln));
+	    else {
+		/*
+		 * With -i (or zmodload -Fa), removing an autoload
+		 * that's not there is not an error.
+		 */
+		subret = (flags & FEAT_IGNORE) ? -2 : 2;
+	    }
+	}
+
+	if (subret == 0)
+	    subret = fn(module, fnam, flags);
 
 	if (subret != 0) {
-	    ret = 1;
+	    /* -2 indicates not an error, just skip running fn() */
+	    if (subret != -2)
+		ret = 1;
 	    switch (subret) {
 	    case 1:
 		zwarnnam(cmdnam, "failed to add %s `%s'", typnam, fnam);

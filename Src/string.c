@@ -109,7 +109,7 @@ zhtricat(char const *s1, char const *s2, char const *s3)
 
 /**/
 mod_export char *
-dyncat(char *s1, char *s2)
+dyncat(const char *s1, const char *s2)
 {
     /* This version always uses space from the current heap. */
     char *ptr;

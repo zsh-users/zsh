@@ -4544,14 +4544,14 @@ bin_compgroups(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("compdescribe", 0, bin_compdescribe, 3, -1, 0, NULL, NULL),
     BUILTIN("comparguments", 0, bin_comparguments, 1, -1, 0, NULL, NULL),
-    BUILTIN("compvalues", 0, bin_compvalues, 1, -1, 0, NULL, NULL),
+    BUILTIN("compdescribe", 0, bin_compdescribe, 3, -1, 0, NULL, NULL),
+    BUILTIN("compfiles", 0, bin_compfiles, 1, -1, 0, NULL, NULL),
+    BUILTIN("compgroups", 0, bin_compgroups, 1, -1, 0, NULL, NULL),
     BUILTIN("compquote", 0, bin_compquote, 1, -1, 0, "p", NULL),
     BUILTIN("comptags", 0, bin_comptags, 1, -1, 0, NULL, NULL),
     BUILTIN("comptry", 0, bin_comptry, 0, -1, 0, NULL, NULL),
-    BUILTIN("compfiles", 0, bin_compfiles, 1, -1, 0, NULL, NULL),
-    BUILTIN("compgroups", 0, bin_compgroups, 1, -1, 0, NULL, NULL),
+    BUILTIN("compvalues", 0, bin_compvalues, 1, -1, 0, NULL, NULL)
 };
 
 static struct features module_features = {
@@ -4581,7 +4581,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -4589,7 +4589,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -4603,7 +4603,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

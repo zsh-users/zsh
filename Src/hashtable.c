@@ -78,7 +78,7 @@ static HashTable firstht, lastht;
 
 /**/
 mod_export unsigned
-hasher(char *str)
+hasher(const char *str)
 {
     unsigned hashval = 0, c;
 
@@ -223,7 +223,7 @@ addhashnode2(HashTable ht, char *nam, void *nodeptr)
 
 /**/
 mod_export HashNode
-gethashnode(HashTable ht, char *nam)
+gethashnode(HashTable ht, const char *nam)
 {
     unsigned hashval;
     HashNode hp;
@@ -247,7 +247,7 @@ gethashnode(HashTable ht, char *nam)
 
 /**/
 mod_export HashNode
-gethashnode2(HashTable ht, char *nam)
+gethashnode2(HashTable ht, const char *nam)
 {
     unsigned hashval;
     HashNode hp;
@@ -267,7 +267,7 @@ gethashnode2(HashTable ht, char *nam)
 
 /**/
 mod_export HashNode
-removehashnode(HashTable ht, char *nam)
+removehashnode(HashTable ht, const char *nam)
 {
     unsigned hashval;
     HashNode hp, hq;
@@ -795,7 +795,7 @@ createshfunctable(void)
 
 /**/
 static HashNode
-removeshfuncnode(UNUSED(HashTable ht), char *nam)
+removeshfuncnode(UNUSED(HashTable ht), const char *nam)
 {
     HashNode hn;
     int signum;
@@ -1378,7 +1378,7 @@ addnameddirnode(HashTable ht, char *nam, void *nodeptr)
 
 /**/
 static HashNode
-removenameddirnode(HashTable ht, char *nam)
+removenameddirnode(HashTable ht, const char *nam)
 {
     HashNode hn = removehashnode(ht, nam);
 
@@ -1453,7 +1453,7 @@ createhisttable(void)
 
 /**/
 unsigned
-histhasher(char *str)
+histhasher(const char *str)
 {
     unsigned hashval = 0;
 

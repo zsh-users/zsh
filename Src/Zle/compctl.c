@@ -3938,8 +3938,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 
 static struct builtin bintab[] = {
-    BUILTIN("compctl", 0, bin_compctl, 0, -1, 0, NULL, NULL),
     BUILTIN("compcall", 0, bin_compcall, 0, 0, 0, "TD", NULL),
+    BUILTIN("compctl", 0, bin_compctl, 0, -1, 0, NULL, NULL),
 };
 
 static struct features module_features = {
@@ -3974,7 +3974,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -3982,7 +3982,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -4000,7 +4000,7 @@ cleanup_(Module m)
 {
     deletehookfunc("compctl_make", (Hookfn) ccmakehookfn);
     deletehookfunc("compctl_cleanup", (Hookfn) cccleanuphookfn);
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

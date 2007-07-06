@@ -225,7 +225,7 @@ zprof_wrapper(Eprog prog, FuncWrap w, char *name)
     struct timezone dummy;
     double prev = 0, now;
 
-    if (zprof_module && !(zprof_module->flags & MOD_UNLOAD)) {
+    if (zprof_module && !(zprof_module->node.flags & MOD_UNLOAD)) {
         active = 1;
         if (!(f = findpfunc(name))) {
             f = (Pfunc) zalloc(sizeof(*f));
@@ -260,7 +260,7 @@ zprof_wrapper(Eprog prog, FuncWrap w, char *name)
     }
     runshfunc(prog, w, name);
     if (active) {
-        if (zprof_module && !(zprof_module->flags & MOD_UNLOAD)) {
+        if (zprof_module && !(zprof_module->node.flags & MOD_UNLOAD)) {
             tv.tv_sec = tv.tv_usec = 0;
             gettimeofday(&tv, &dummy);
 
@@ -315,7 +315,7 @@ setup_(Module m)
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -323,7 +323,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -345,7 +345,7 @@ cleanup_(Module m)
     freepfuncs(calls);
     freeparcs(arcs);
     deletewrapper(m, wrapper);
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

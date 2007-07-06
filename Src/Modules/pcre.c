@@ -290,8 +290,8 @@ static struct conddef cotab[] = {
 
 static struct builtin bintab[] = {
     BUILTIN("pcre_compile", 0, bin_pcre_compile, 1, 1, 0, "aimx",  NULL),
-    BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL),
-    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, "a:v:",    NULL)
+    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, "a:v:",    NULL),
+    BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL)
 };
 
 
@@ -319,7 +319,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -327,7 +327,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -341,7 +341,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

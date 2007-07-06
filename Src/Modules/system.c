@@ -365,7 +365,7 @@ static const struct gsu_array errnos_gsu =
 
 /**/
 static void
-fillpmsysparams(Param pm, char *name)
+fillpmsysparams(Param pm, const char *name)
 {
     char buf[DIGBUFSIZE];
     int num;
@@ -390,7 +390,7 @@ fillpmsysparams(Param pm, char *name)
 
 /**/
 static HashNode
-getpmsysparams(UNUSED(HashTable ht), char *name)
+getpmsysparams(UNUSED(HashTable ht), const char *name)
 {
     Param pm;
 
@@ -423,8 +423,8 @@ static struct paramdef partab[] = {
 static struct features module_features = {
     bintab, sizeof(bintab)/sizeof(*bintab),
     NULL, 0,
-    partab, sizeof(partab)/sizeof(*partab),
     NULL, 0,
+    partab, sizeof(partab)/sizeof(*partab),
     0
 };
 
@@ -441,7 +441,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -449,7 +449,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -464,7 +464,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/

@@ -250,7 +250,7 @@ execbuiltin(LinkList args, Builtin bn)
     name = (char *) ugetnode(args);
 
     if (!bn->handlerfunc) {
-	zwarnnam(name, "autoload failed");
+	DPUTS(1, "Missing builtin detected too late");
 	deletebuiltin(bn->node.nam);
 	return 1;
     }

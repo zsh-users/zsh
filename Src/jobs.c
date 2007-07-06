@@ -2147,7 +2147,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 
 /**/
 mod_export int
-getsignum(char *s)
+getsignum(const char *s)
 {
     int x, i;
 
@@ -2205,7 +2205,7 @@ gettrapnode(int sig, int ignoredisable)
 {
     char fname[20];
     HashNode hn;
-    HashNode (*getptr)(HashTable ht, char *name);
+    HashNode (*getptr)(HashTable ht, const char *name);
     int i;
     if (ignoredisable)
 	getptr = shfunctab->getnode2;

@@ -701,7 +701,7 @@ setupvals(void)
 	    close(tmppipe[1]);
     }
 
-    (void)addhookdefs(argzero, zshhooks, sizeof(zshhooks)/sizeof(*zshhooks));
+    (void)addhookdefs(NULL, zshhooks, sizeof(zshhooks)/sizeof(*zshhooks));
 
     init_eprog();
 
@@ -769,7 +769,7 @@ setupvals(void)
     watch    = mkarray(NULL);
     psvar    = mkarray(NULL);
     module_path = mkarray(ztrdup(MODULE_DIR));
-    modules = znewlinklist();
+    modulestab = newmoduletable(17, "modules");
     linkedmodules = znewlinklist();
 
     /* Set default prompts */

@@ -1932,11 +1932,16 @@ the option tt(-P) var(param) then the parameter tt(param) is set to an
 array of features, either features together with their state or (if
 tt(-L) alone is given) enabled features.
 
-A set of features may be provided together with tt(-l) or tt(-L); in
-that case only the state of features provided is considered.  Each
-feature may be preceded by tt(PLUS()) or tt(-) but the character
-has no effect.  If no set of features is provided, all features
-are considered.
+With the option tt(-L) the module name may be omitted; then a list
+of all enabled features for all modules providing features is printed
+in the form of tt(zmodload -F) commands.  If tt(-l) is also given,
+the state of both enabled and disabled features is output in that form.
+
+A set of features may be provided together with tt(-l) or tt(-L) and a
+module name; in that case only the state of those features is
+considered.  Each feature may be preceded by tt(PLUS()) or tt(-) but the
+character has no effect.  If no set of features is provided, all
+features are considered.
 
 With tt(-e), the command first tests that the module is loaded;
 if it is not, status 1 is returned.  If the module is loaded,
@@ -1947,11 +1952,31 @@ see if is provided and in the given state.  If the tests on all features
 in the list succeed, status 0 is returned, else status 1.
 
 With tt(-a), the given list of features is marked for autoload from
-the specified module, which may not be loaded.  An optional tt(PLUS())
+the specified module, which may not yet be loaded.  An optional tt(PLUS())
 may appear before the feature name.  If the feature is prefixed with
-tt(-), the existing autoload is deleted.  Note that only standard
-features as described above can be autoloaded; other features require
-the module to be loaded.
+tt(-), any existing autoload is removed.  The options tt(-l) and tt(-L)
+may be used to list autoloads.  Autoloading is specific to individual
+features; when the module is loaded only the requested feature is
+enabled.  Autoload requests are preserved if the module is
+subsequently unloaded until an explicit `tt(zmodload -Fa) var(module)
+tt(-)var(feature)' is issued.  It is not an error to request an autoload
+for a feature of a module that is already loaded.  
+
+When the module is loaded each autoload is checked against the features
+actually provided by the module; if the feature is not provided the
+autoload request is deleted.  A warning message is output; if the
+module is being loaded to provide a different feature, and that autoload
+is successful, there is no effect on the status of the current command.
+If the module is already loaded at the time when tt(zmodload -Fa) is
+run, an error message is printed and status 1 returned.
+
+tt(zmodload -Fa) can be used with the tt(-l), tt(-L), tt(-e) and
+tt(-P) options for listing and testing the existence of autoloadable
+features.  In this case tt(-l) is ignored if tt(-L) is specified.
+tt(zmodload -FaL) with no module name lists autoloads for all modules.
+
+Note that only standard features as described above can be autoloaded;
+other features require the module to be loaded before enabling.
 )
 xitem(tt(zmodload) tt(-d) [ tt(-L) ] [ var(name) ])
 xitem(tt(zmodload) tt(-d) var(name) var(dep) ...)
@@ -1973,10 +1998,12 @@ xitem(tt(zmodload) tt(-ab) [ tt(-i) ] var(name) [ var(builtin) ... ])
 item(tt(zmodload) tt(-ub) [ tt(-i) ] var(builtin) ...)(
 The tt(-ab) option defines autoloaded builtins.  It defines the specified
 var(builtin)s.  When any of those builtins is called, the module specified
-in the first argument is loaded.  If only the var(name) is given, one
-builtin is defined, with the same name as the module.  tt(-i) suppresses
-the error if the builtin is already defined or autoloaded, regardless of
-which module it came from.
+in the first argument is loaded and all its features are enabled (for
+selective control of features use `tt(zmodload -F -a)' as described
+above).  If only the var(name) is given, one builtin is defined, with
+the same name as the module.  tt(-i) suppresses the error if the builtin
+is already defined or autoloaded, but not if another builtin of the
+same name is already defined.
 
 With tt(-ab) and no arguments, all autoloaded builtins are listed, with the
 module name (if different) shown in parentheses after the builtin name.
@@ -1987,6 +2014,9 @@ If tt(-b) is used together with the tt(-u) option, it removes builtins
 previously defined with tt(-ab).  This is only possible if the builtin is
 not yet loaded.  tt(-i) suppresses the error if the builtin is already
 removed (or never existed).
+
+Autoload requests are retained if the module is subsequently unloaded
+until an explicit `tt(zmodload -ub) var(builtin)' is issued.
 )
 xitem(tt(zmodload) tt(-ac) [ tt(-IL) ])
 xitem(tt(zmodload) tt(-ac) [ tt(-iI) ] var(name) [ var(cond) ... ])
@@ -2021,12 +2051,12 @@ Equivalent to tt(-ab) and tt(-ub).
 item(tt(zmodload -e) [ tt(-A) ] [ var(string) ... ])(
 The tt(-e) option without arguments lists all loaded modules; if the tt(-A)
 option is also given, module aliases corresponding to loaded modules are
-also shown.  With arguments only the return status is set to zero
-if all var(string)s given as arguments are names of loaded modules
-and to one if at least on var(string) is not the name of a
-loaded module.  This can be used to test for the availability 
-of things implemented by modules.  In this case, any aliases are
-automatically resolved and the tt(-A) flag is not used.
+also shown.  If arguments are provided, nothing is printed;
+the return status is set to zero if all var(string)s given as arguments
+are names of loaded modules and to one if at least on var(string) is not
+the name of a loaded module.  This can be used to test for the
+availability of things implemented by modules.  In this case, any
+aliases are automatically resolved and the tt(-A) flag is not used.
 )
 item(tt(zmodload) tt(-A) [ tt(-L) ] [ var(modalias)[tt(=)var(module)] ... ])(
 For each argument, if both var(modalias) and var(module) are given,

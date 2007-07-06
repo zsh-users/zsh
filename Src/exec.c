@@ -871,7 +871,7 @@ execlist(Estate state, int dont_change_job, int exiting)
     /* Loop over all sets of comands separated by newline, *
      * semi-colon or ampersand (`sublists').               */
     code = *state->pc++;
-    while (wc_code(code) == WC_LIST && !breaks && !retflag) {
+    while (wc_code(code) == WC_LIST && !breaks && !retflag && !errflag) {
 	int donedebug;
 
 	ltype = WC_LIST_TYPE(code);
@@ -1915,6 +1915,34 @@ execsubst(LinkList strs)
     }
 }
 
+/*
+ * Check if a builtin requires an autoload and if so
+ * deal with it.  This may return NULL.
+ */
+
+/**/
+static HashNode
+resolvebuiltin(const char *cmdarg, HashNode hn)
+{
+    if (!((Builtin) hn)->handlerfunc) {
+	/*
+	 * Ensure the module is loaded and the
+	 * feature corresponding to the builtin
+	 * is enabled.
+	 */
+	(void)ensurefeature(((Builtin) hn)->optstr, "b:",
+			    (hn->flags & BINF_AUTOALL) ? NULL :
+			    hn->nam);
+	hn = builtintab->getnode(builtintab, cmdarg);
+	if (!hn) {
+	    lastval = 1;
+	    zerr("unknown builtin: %s");
+	    return NULL;
+	}
+    }
+    return hn;
+}
+
 /**/
 static void
 execcmd(Estate state, int input, int output, int how, int last1)
@@ -2011,16 +2039,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		is_builtin = 1;
 
 		/* autoload the builtin if necessary */
-		if (!((Builtin) hn)->handlerfunc) {
-		    /*
-		     * Ensure the module is loaded and the
-		     * feature corresponding to the builtin
-		     * is enabled.
-		     */
-		    (void)ensurefeature(((Builtin) hn)->optstr, "b:", hn->nam);
-		    hn = builtintab->getnode(builtintab, cmdarg);
-		}
-		assign = (hn && (hn->flags & BINF_MAGICEQUALS));
+		if (!(hn = resolvebuiltin(cmdarg, hn)))
+		    return;
+		assign = (hn->flags & BINF_MAGICEQUALS);
 		break;
 	    }
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
@@ -2233,10 +2254,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		is_builtin = 1;
 
 		/* autoload the builtin if necessary */
-		if (!((Builtin) hn)->handlerfunc) {
-		    (void)ensurefeature(((Builtin) hn)->optstr, "b:", cmdarg);
-		    hn = builtintab->getnode(builtintab, cmdarg);
-		}
+		if (!(hn = resolvebuiltin(cmdarg, hn)))
+		    return;
 		break;
 	    }
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
@@ -4104,8 +4123,8 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 	wrap->module->wrapper--;
 
 	if (!wrap->module->wrapper &&
-	    (wrap->module->flags & MOD_UNLOAD))
-	    unload_module(wrap->module, NULL);
+	    (wrap->module->node.flags & MOD_UNLOAD))
+	    unload_module(wrap->module);
 
 	if (!cont)
 	    return;

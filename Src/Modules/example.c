@@ -165,19 +165,19 @@ static struct builtin bintab[] = {
 };
 
 static struct conddef cotab[] = {
-    CONDDEF("len", 0, cond_p_len, 1, 2, 0),
     CONDDEF("ex", CONDF_INFIX, cond_i_ex, 0, 0, 0),
+    CONDDEF("len", 0, cond_p_len, 1, 2, 0),
 };
 
 static struct paramdef patab[] = {
+    ARRPARAMDEF("exarr", &arrparam),
     INTPARAMDEF("exint", &intparam),
     STRPARAMDEF("exstr", &strparam),
-    ARRPARAMDEF("exarr", &arrparam),
 };
 
 static struct mathfunc mftab[] = {
-    NUMMATHFUNC("sum", math_sum, 1, -1, 0),
     STRMATHFUNC("length", math_length, 0),
+    NUMMATHFUNC("sum", math_sum, 1, -1, 0),
 };
 
 static struct funcwrap wrapper[] = {
@@ -187,8 +187,8 @@ static struct funcwrap wrapper[] = {
 static struct features module_features = {
     bintab, sizeof(bintab)/sizeof(*bintab),
     cotab, sizeof(cotab)/sizeof(*cotab),
-    patab, sizeof(patab)/sizeof(*patab),
     mftab, sizeof(mftab)/sizeof(*mftab),
+    patab, sizeof(patab)/sizeof(*patab),
     0
 };
 
@@ -205,7 +205,7 @@ setup_(UNUSED(Module m))
 int
 features_(Module m, char ***features)
 {
-    *features = featuresarray(m->nam, &module_features);
+    *features = featuresarray(m, &module_features);
     return 0;
 }
 
@@ -213,7 +213,7 @@ features_(Module m, char ***features)
 int
 enables_(Module m, int **enables)
 {
-    return handlefeatures(m->nam, &module_features, enables);
+    return handlefeatures(m, &module_features, enables);
 }
 
 /**/
@@ -234,7 +234,7 @@ int
 cleanup_(Module m)
 {
     deletewrapper(m, wrapper);
-    return setfeatureenables(m->nam, &module_features, NULL);
+    return setfeatureenables(m, &module_features, NULL);
 }
 
 /**/
