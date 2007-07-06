@@ -181,6 +181,18 @@ case "$words[1]" in
      _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
+  (cache)
+     _alternative \
+       'package:package:_deb_packages avail' \
+       'email:email address:_email_addresses -c' \
+       'rc:rc:compadd release-critical'
+  ;;
+  (cleancache)
+     _alternative \
+       'package:package:_deb_packages avail' \
+       'email:email address:_email_addresses -c' \
+       'all:all:compadd ALL'
+  ;;
   help)
   ;&
   *) _wanted sep expl 'separator' compadd -S ' ' , .

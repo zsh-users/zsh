@@ -1,3 +1,8 @@
+2007-07-06  Clint Adams  <clint@zsh.org>
+
+	* 23664: Completion/Debian/Command/_bts: handle bts cache
+	and cleancache subcommands.
+
 2007-07-06  Peter Stephenson  <pws@csr.com>
 
 	* 23660: Doc/Zsh/expn.yo, Src/sort.c, Test/D04parameter.ztst:
