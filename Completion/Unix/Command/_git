@@ -902,18 +902,23 @@ _git-cherry-pick () {
 _git-clone () {
   local -a shared
 
-  if (( $words[(I)(-l|--local)] )); then
+  if (( words[(I)(-l|--local)] )); then
     shared=('(-s --shared)'{-s,--shared}'[share the objects with the source repository]')
   fi
 
   _arguments \
+    '--bare[make a bare GIT repository]' \
     '(-l --local)'{-l,--local}'[perform a local cloning of a repository]' \
-    $shared
+    $shared \
+    '--reference[reference repository]:repository:_directories' \
     '(-q --quiet)'{-q,--quiet}'[operate quietly]' \
     '-n[do not checkout HEAD after clone is complete]' \
+    '(-o --origin)'{-o,--origin}'[use given name instead of "origin" as branch name]:name:__git_guard_branch-name' \
     '(-u --upload-pack)'{-u,--uploadpack}'[specify path to git-upload-pack on remote side]:remote path' \
+    $template_arg \
+    '--depth[create a shallow clone, given number of revisions deep]: :_guard "[[\:digit\:]]##" depth' \
     ':repository:__git_any_repositories' \
-    ':directory:_directories' && ret=0
+    '*:directory:_directories' && ret=0
 }
 
 _git-commit () {
