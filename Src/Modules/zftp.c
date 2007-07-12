@@ -1697,12 +1697,12 @@ zftp_open(char *name, char **args, int flags)
 {
     struct protoent *zprotop;
     struct servent *zservp;
-    struct hostent *zhostp;
+    struct addrinfo *zai;
     char **addrp, *fname, *tmpptr, *portnam = "ftp";
     char *hostnam, *hostsuffix;
     int err, tmout, port = -1;
     ZSOCKLEN_T  len;
-    int herrno, af, hlen;
+    int af, hlen;
 
     if (!*args) {
 	if (zfsess->userparams)
@@ -1806,21 +1806,20 @@ zftp_open(char *name, char **args, int flags)
 #endif
     {
 	off_t tcp_port;
+	struct addrinfo hints, *hostlist;
+	int gai_err;
 
-	zhostp = zsh_getipnodebyname(hostnam, af, 0, &herrno);
-	if (!zhostp || errflag) {
-	    /* should use herror() here if available, but maybe
-	     * needs configure test. on AIX it's present but not
-	     * in headers.
-	     * 
-	     * on the other hand, herror() is obsolete
-	     */
+	hints.ai_family = af;
+
+	gai_err = getaddrinfo(hostnam, NULL, &hints, &hostlist);
+
+	if (errflag || gai_err) {
 	    FAILED();
-	    zwarnnam(name, "host not found: %s", hostnam);
+	    zwarnnam(name, "host lookup failure: %s", gai_strerror(gai_err));
 	    alarm(0);
 	    return 1;
 	}
-	zfsetparam("ZFTP_HOST", ztrdup(zhostp->h_name), ZFPM_READONLY);
+	zfsetparam("ZFTP_HOST", ztrdup(hostlist->ai_canonname), ZFPM_READONLY);
 	/* careful with pointer types */
 #if defined(HAVE_NTOHS) && defined(HAVE_HTONS)
 	tcp_port = (off_t)ntohs((unsigned short)zservp->s_port);
@@ -1845,7 +1844,6 @@ zftp_open(char *name, char **args, int flags)
 		tcp_close(zfsess->control);
 		zfsess->control = NULL;
 	    }
-	    freehostent(zhostp);
 	    zfunsetparam("ZFTP_HOST");
 	    zfunsetparam("ZFTP_PORT");
 	    FAILED();
@@ -1864,17 +1862,16 @@ zftp_open(char *name, char **args, int flags)
 	err = 1;
 
 	/* try all possible IP's */
-	for (addrp = zhostp->h_addr_list; err && *addrp; addrp++) {
-	    if(hlen != zhostp->h_length)
+	for (zai = hostlist; err && zai; zai = zai->ai_next) {
+	    if(hlen != zai->ai_addrlen)
 		zwarnnam(name, "address length mismatch");
 	    do {
-		err = tcp_connect(zfsess->control, *addrp, zhostp, zservp->s_port);
+		err = tcp_connect(zfsess->control, zai);
 	    } while (err && errno == EINTR && !errflag);
 	    /* you can check whether it's worth retrying here */
 	}
 
 	if (err) {
-	    freehostent(zhostp);
 	    zfclose(0);
 	    FAILED();
 	    zwarnnam(name, "connect failed: %e", errno);
@@ -1895,7 +1892,6 @@ zftp_open(char *name, char **args, int flags)
 	zsh_inet_ntop(af, *addrp, pbuf, sizeof(pbuf));
 	zfsetparam("ZFTP_IP", ztrdup(pbuf), ZFPM_READONLY);
     }
-    freehostent(zhostp);
     /* now we can talk to the control connection */
     zcfinish = 0;
 

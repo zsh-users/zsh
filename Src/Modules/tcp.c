@@ -135,79 +135,6 @@ zsh_inet_pton(int af, char const *src, void *dst)
 /**/
 #endif /* !HAVE_INET_PTON */
 
-/**/
-#ifndef HAVE_GETIPNODEBYNAME
-
-/**/
-# ifndef HAVE_GETHOSTBYNAME2
-
-/**/
-mod_export struct hostent *
-zsh_gethostbyname2(char const *name, int af)
-{
-    if (af != AF_INET) {
-	h_errno = NO_RECOVERY;
-	return NULL;
-    }
-    return gethostbyname(name);
-}
-
-/**/
-#else /* !HAVE_GETHOSTBYNAME2 */
-
-/**/
-# define zsh_gethostbyname2 gethostbyname2
-
-/**/
-# endif /* !HAVE_GETHOSTBYNAME2 */
-
-/* note: this is not a complete implementation.  If ignores the flags,
-   and does not provide the memory allocation of the standard interface.
-   Each returned structure will overwrite the previous one. */
-
-/**/
-mod_export struct hostent *
-zsh_getipnodebyname(char const *name, int af, UNUSED(int flags), int *errorp)
-{
-    static struct hostent ahe;
-    static char nbuf[16];
-    static char *addrlist[] = { nbuf, NULL };
-# ifdef SUPPORT_IPV6
-    static char pbuf[INET6_ADDRSTRLEN];
-# else
-    static char pbuf[INET_ADDRSTRLEN];
-# endif
-    struct hostent *he;
-    if (zsh_inet_pton(af, name, nbuf) == 1) {
-	zsh_inet_ntop(af, nbuf, pbuf, sizeof(pbuf));
-	ahe.h_name = pbuf;
-	ahe.h_aliases = addrlist+1;
-	ahe.h_addrtype = af;
-	ahe.h_length = (af == AF_INET) ? 4 : 16;
-	ahe.h_addr_list = addrlist;
-	return &ahe;
-    }
-    he = zsh_gethostbyname2(name, af);
-    if (!he)
-	*errorp = h_errno;
-    return he;
-}
-
-/**/
-mod_export void
-freehostent(UNUSED(struct hostent *ptr))
-{
-}
-
-/**/
-#else /* !HAVE_GETIPNODEBYNAME */
-
-/**/
-# define zsh_getipnodebyname getipnodebyname
-
-/**/
-#endif /* !HAVE_GETIPNODEBYNAME */
-
 LinkList ztcp_sessions;
 
 /* "allocate" a tcp_session */
@@ -311,25 +238,23 @@ tcp_close(Tcp_session sess)
 
 /**/
 mod_export int
-tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
+tcp_connect(Tcp_session sess, struct addrinfo *zai)
 {
     int salen;
 #ifdef SUPPORT_IPV6
-    if (zhost->h_addrtype==AF_INET6) {
-	memcpy(&(sess->peer.in6.sin6_addr), addrp, zhost->h_length);
-	sess->peer.in6.sin6_port = d_port;
+    if (zai->ai_family==AF_INET6) {
+	memcpy(&(sess->peer.in6.sin6_addr), zai->ai_addr, zai->ai_addrlen);
 	sess->peer.in6.sin6_flowinfo = 0;
 # ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
 	sess->peer.in6.sin6_scope_id = 0;
 # endif
-	sess->peer.in6.sin6_family = zhost->h_addrtype;
+	sess->peer.in6.sin6_family = zai->ai_family;
 	salen = sizeof(struct sockaddr_in6);
     } else
 #endif /* SUPPORT_IPV6 */
     {
-	memcpy(&(sess->peer.in.sin_addr), addrp, zhost->h_length);
-	sess->peer.in.sin_port = d_port;
-	sess->peer.in.sin_family = zhost->h_addrtype;
+	memcpy(&(sess->peer.in.sin_addr), zai->ai_addr, zai->ai_addrlen);
+	sess->peer.in.sin_family = zai->ai_family;
 	salen = sizeof(struct sockaddr_in);
     }
 
@@ -339,12 +264,13 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 static int
 bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    int herrno, err=1, destport, force=0, verbose=0, test=0, targetfd=0;
+    int err=1, destport, force=0, verbose=0, test=0, targetfd=0;
     ZSOCKLEN_T  len;
-    char **addrp, *desthost, *localname, *remotename;
-    struct hostent *zthost = NULL, *ztpeer = NULL;
+    char *desthost, *localname, *remotename;
+    char zthostname[1025], ztpeername[1025];
     struct servent *srv;
     Tcp_session sess = NULL;
+    struct addrinfo *zhostlist, *zai;
 
     if (OPT_ISSET(ops,'f'))
 	force = 1;
@@ -561,16 +487,16 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 
 		if (sess->fd != -1)
 		{
-		    zthost = gethostbyaddr((const void *)&(sess->sock.in.sin_addr), sizeof(sess->sock.in.sin_addr), AF_INET);
-		    if (zthost)
-			localname = zthost->h_name;
-		    else
+		    if (getnameinfo((const struct sockaddr *)&(sess->sock.in.sin_addr), sizeof(struct sockaddr_in), zthostname, 1025, NULL, 0, 0))
 			localname = ztrdup(inet_ntoa(sess->sock.in.sin_addr));
-		    ztpeer = gethostbyaddr((const void *)&(sess->peer.in.sin_addr), sizeof(sess->peer.in.sin_addr), AF_INET);
-		    if (ztpeer)
-			remotename = ztpeer->h_name;
 		    else
+			localname = (char *)&zthostname;
+
+		    if (getnameinfo((const struct sockaddr *)&(sess->peer.in.sin_addr), sizeof(struct sockaddr_in), ztpeername, 1025, NULL, 0, 0))
 			remotename = ztrdup(inet_ntoa(sess->peer.in.sin_addr));
+		    else 
+			remotename = (char *)&ztpeername;
+
 		    if (OPT_ISSET(ops,'L')) {
 			int schar;
 			if (sess->flags & ZTCP_ZFTP)
@@ -602,20 +528,21 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    destport = htons(23);
 	}
 	else {
+	    struct addrinfo hints;
 
-	    srv = getservbyname(args[1],"tcp");
-	    if (srv)
-		destport = srv->s_port;
-	    else
-		destport = htons(atoi(args[1]));
-	}
-	
-	desthost = ztrdup(args[0]);
-	
-	zthost = zsh_getipnodebyname(desthost, AF_INET, 0, &herrno);
-	if (!zthost || errflag) {
-	    zwarnnam(nam, "host resolution failure: %s", desthost);
-	    return 1;
+	    hints.ai_family = AF_INET;
+	    hints.ai_socktype = SOCK_STREAM;
+	    hints.ai_protocol = PF_INET;
+
+	    desthost = ztrdup(args[0]);
+
+	    if(getaddrinfo(desthost, args[1], &hints, &zhostlist)) {
+	        zwarnnam(nam, "host resolution failure: %s", desthost);
+	        return 1;
+	    }
+	    else {
+		destport = ntohs(((struct sockaddr_in *)(&zhostlist->ai_addr))->sin_port);
+	    }
 	}
 	
 	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, 0);
@@ -637,11 +564,11 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 	
-	for (addrp = zthost->h_addr_list; err && *addrp; addrp++) {
-	    if (zthost->h_length != 4)
+	for (zai = zhostlist; err && zai; zai = zai->ai_next) {
+	    if (zai->ai_addrlen != 4)
 		zwarnnam(nam, "address length mismatch");
 	    do {
-		err = tcp_connect(sess, *addrp, zthost, destport);
+		err = tcp_connect(sess, zai);
 	    } while (err && errno == EINTR && !errflag);
 	}
 	

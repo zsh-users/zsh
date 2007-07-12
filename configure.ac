@@ -1116,7 +1116,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       waitpid wait3 \
 	       sigaction sigblock sighold sigrelse sigsetmask sigprocmask \
 	       killpg setpgid setpgrp tcsetpgrp tcgetattr nice \
-	       gethostname gethostbyname2 getipnodebyname \
+	       gethostname getaddrinfo getnameinfo \
 	       inet_aton inet_pton inet_ntop \
 	       getlogin getpwent getpwnam getpwuid getgrgid getgrnam \
 	       initgroups nis_list \
