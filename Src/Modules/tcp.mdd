@@ -1,7 +1,6 @@
 name=zsh/net/tcp
-link=`if test x$ac_cv_func_getaddrinfo; then echo dynamic; else echo no; fi`
+link=dynamic
 load=no
-
 functions='Functions/TCP/*'
 
 objects="tcp.o"
