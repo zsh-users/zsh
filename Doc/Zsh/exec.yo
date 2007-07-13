@@ -5,6 +5,8 @@ sect(Command Execution)
 )\
 cindex(command execution)
 cindex(execution, of commands)
+cindex(command not found, handling of)
+findex(command_not_found_handler)
 If a command name contains no slashes, the shell attempts to locate
 it.  If there exists a shell function by that name, the function
 is invoked as described in noderef(Functions).  If there exists
@@ -23,3 +25,13 @@ is a file beginning with `tt(#!)', the remainder of the first line
 specifies an interpreter for the program.  The shell will
 execute the specified interpreter on operating systems that do
 not handle this executable format in the kernel.
+
+If no external command is found but a function tt(command_not_found_handler)
+exists the shell executes this function with all
+command line arguments.  The function should return status zero if it
+successfully handled the command, or non-zero status if it failed.
+In the latter case the standard handling is applied: `command not
+found' is printed to standard error and the shell exits with status 127.
+Note that the handler is executed in a subshell forked to execute
+an external command, hence changes to directories, shell parameters,
+etc. have no effect on the main shell.

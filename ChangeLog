@@ -1,3 +1,9 @@
+2007-07-13  Peter Stephenson  <pws@csr.com>
+
+	* 23671: Doc/Zsh/exec.yo, Src/exec.c: Function
+	command_not_found_handler can be defined to handle command
+	not found.
+
 2007-07-12  Clint Adams  <clint@zsh.org>
 
 	* 23674: Completion/Unix/Command/_git: merge in git clone

@@ -468,6 +468,25 @@ isgooderr(int e, char *dir)
 	    e != ENOENT && e != ENOTDIR); 
 }
 
+/*
+ * Attempt to handle command not found.
+ * Return 0 if the condition was handled, non-zero otherwise.
+ */
+
+/**/
+static int
+commandnotfound(char *arg0, LinkList args)
+{
+    Shfunc shf = (Shfunc)
+	shfunctab->getnode(shfunctab, "command_not_found_handler");
+
+    if (!shf)
+	return 127;
+
+    pushnode(args, arg0);
+    return doshfunc(shf->node.nam, shf->funcdef, args, shf->node.flags, 1);
+}
+
 /* execute an external command */
 
 /**/
@@ -562,6 +581,8 @@ execute(LinkList args, int flags, int defpath)
 	}
 
 	if (!ps) {
+	    if (commandnotfound(arg0, args) == 0)
+		_exit(0);
 	    zerr("command not found: %s", arg0);
 	    _exit(127);
 	}
@@ -624,6 +645,8 @@ execute(LinkList args, int flags, int defpath)
 
     if (eno)
 	zerr("%e: %s", eno, arg0);
+    else if (commandnotfound(arg0, args) == 0)
+	_exit(0);
     else
 	zerr("command not found: %s", arg0);
     _exit((eno == EACCES || eno == ENOEXEC) ? 126 : 127);
