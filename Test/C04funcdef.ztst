@@ -70,3 +70,32 @@
 0:User-defined math functions, multiple interfaces
 >4
 >5
+
+  command_not_found_handler() {
+    print "Great News!  I've handled the command:"
+    print "$1"
+    print "with arguments:"
+    print -l ${argv[2,-1]}
+  }
+  ACommandWhichHadBetterNotExistOnTheSystem and some "really useful" args
+0:Command not found handler, success
+>Great News!  I've handled the command:
+>ACommandWhichHadBetterNotExistOnTheSystem
+>with arguments:
+>and
+>some
+>really useful
+>args
+
+  command_not_found_handler() {
+     print "Your command:" >&2
+     print "$1" >&2
+     print "has gone down the tubes.  Sorry." >&2
+     return 1
+  }
+  ThisCommandDoesNotExistEither
+127:Command not found handler, failure
+?Your command:
+?ThisCommandDoesNotExistEither
+?has gone down the tubes.  Sorry.
+?(eval):7: command not found: ThisCommandDoesNotExistEither
