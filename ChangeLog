@@ -1,3 +1,8 @@
+2007-07-17  Peter Stephenson  <pws@csr.com>
+
+	* 23682: Src/module.c: missed cases where m->name should
+	be m->node.nam from 23665.
+
 2007-07-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23680: Test/C04funcdef.ztst: tests for 23671.

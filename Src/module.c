@@ -1744,12 +1744,12 @@ module_func(Module m, char *name)
 #ifdef DYNAMIC_NAME_CLASH_OK
     return (Module_generic_func) dlsym(m->u.handle, name);
 #else /* !DYNAMIC_NAME_CLASH_OK */
-    VARARR(char, buf, strlen(name) + strlen(m->nam)*2 + 1);
+    VARARR(char, buf, strlen(name) + strlen(m->node.nam)*2 + 1);
     char const *p;
     char *q;
     strcpy(buf, name);
     q = strchr(buf, 0);
-    for(p = m->nam; *p; p++) {
+    for(p = m->node.nam; *p; p++) {
 	if(*p == '/') {
 	    *q++ = 'Q';
 	    *q++ = 's';
