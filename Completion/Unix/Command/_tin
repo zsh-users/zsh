@@ -37,7 +37,7 @@ _arguments -C -s \
   '::newsgroup:_newsgroups' && return 0
 
 if [[ "$state" = newshosts ]]; then
-  newshosts=( ${${(f)"$(<~/.tin/newsrctable)"}%%\#*} ) 2>/dev/null
+  newshosts=( ${${(f)"$(<${TIN_HOMEDIR:-$HOME}/.tin/newsrctable)"}%%\#*} ) 2>/dev/null
   _tags hosts nicknames
   while _tags; do
     _requested hosts expl 'NNTP server hostname' \
