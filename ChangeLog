@@ -1,3 +1,9 @@
+2007-07-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Renato Botelho <rbgarga@gmail.com>: 23685:
+	Completion/BSD/Command/{_portlint,_csup,_portsnap}:
+	new FreeBSD completions.
+
 2007-07-19  Clint Adams  <clint@zsh.org>
 
 	* Magnus Therning + tweaks: 23686: Completion/Unix/Command/_tin:
