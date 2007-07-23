@@ -1,3 +1,8 @@
+2007-07-23  Peter Stephenson  <pws@csr.com>
+
+	* 23693: Src/Zle/compmatch.c: _match tried to match the quoted
+	form of file names and any completion that did it's own quoting.
+
 2007-07-22  Clint Adams  <clint@zsh.org>
 
 	* 23691: Completion/BSD/Command/_portsnap: declare local parameter

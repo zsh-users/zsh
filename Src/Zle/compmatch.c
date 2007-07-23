@@ -966,7 +966,8 @@ match_parts(char *l, char *w, int n, int part)
 /* Check if the word w is matched by the strings in pfx and sfx (the prefix
  * and the suffix from the line) or the pattern cp. In clp a cline list for
  * w is returned.
- * qu is non-zero if the words has to be quoted before processed any further.
+ * qu is non-zero if the words has to be quoted before processed any
+ * further: the value 2 indicates file quoting.
  * bpl and bsl are used to report the positions where the brace-strings in
  * the prefix and the suffix have to be re-inserted if this match is inserted
  * in the line.
@@ -983,9 +984,30 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
     if (cp) {
 	/* We have a globcomplete-like pattern, just use that. */
 	int wl;
+	char *teststr;
 
 	r = w;
-	if (!pattry(cp, r))
+	if (!qu) {
+	    /*
+	     * If we're not quoting the strings, that means they're
+	     * already quoted (?) and so when we test them against
+	     * a pattern we have to remove the quotes else we will
+	     * end up trying to match against the quote characters.
+	     *
+	     * Almost certainly this fails in some complicated cases
+	     * but it should catch the basic ones.
+	     */
+	    teststr = dupstring(r);
+	    tokenize(teststr);
+	    if (parse_subst_string(teststr))
+		teststr = r;
+	    else {
+		remnulargs(teststr);
+		untokenize(teststr);
+	    }
+	} else
+	    teststr = r;
+	if (!pattry(cp, teststr))
 	    return NULL;
     
 	r = (qu == 2 ? tildequote(r, 0) : multiquote(r, !qu));
