@@ -1,3 +1,8 @@
+2007-07-24  Peter Stephenson  <pws@csr.com>
+
+	* 23694: Src/cond.c: change of infix condition features to C:
+	broke =~.
+
 2007-07-23  Peter Stephenson  <pws@csr.com>
 
 	* 23693: Src/Zle/compmatch.c: _match tried to match the quoted

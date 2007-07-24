@@ -96,7 +96,7 @@ evalcond(Estate state, char *fromtest)
 	{
 	    char *modname = isset(REMATCHPCRE) ? "zsh/pcre" : "zsh/regex";
 	    sprintf(overridename = overridebuf, "-%s-match", modname+4);
-	    (void)ensurefeature(modname, "c:", overridename+1);
+	    (void)ensurefeature(modname, "C:", overridename+1);
 	    ctype = COND_MODI;
 	}
 	/*FALLTHROUGH*/
