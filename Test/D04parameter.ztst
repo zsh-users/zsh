@@ -920,3 +920,20 @@
 0:Numeric sorting
 >a6 a17 a117 b6 b17 b117
 >b117 b17 b6 a117 a17 a6
+
+  x=sprodj
+  x[-10]=scrumf
+  print $x
+0:Out of range negative scalar subscripts
+>scrumfsprodj
+
+  a=(some sunny day)
+  a[-10]=(we\'ll meet again)
+  print -l $a
+0:Out of range negative array subscripts
+>we'll
+>meet
+>again
+>some
+>sunny
+>day
