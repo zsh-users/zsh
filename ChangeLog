@@ -1,3 +1,10 @@
+2007-07-26  Peter Stephenson  <pws@csr.com>
+
+	* 23703: Src/init.c: getenv() should be zgetenv().
+
+	* 23702: Config/installfns.sh: use chmod to change permissions
+	since installing as a programme may try to strip the script.
+
 2007-07-25  Clint Adams  <clint@zsh.org>
 
 	* 23697: configure.ac: use -rdynamic where it seems to be

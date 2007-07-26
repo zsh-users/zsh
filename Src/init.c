@@ -832,7 +832,7 @@ setupvals(void)
     if (emulation == EMULATE_ZSH)
 	ptr = home;
     else
-	ptr = getenv("HOME");
+	ptr = zgetenv("HOME");
     if (ptr && ispwd(ptr))
 	pwd = ztrdup(ptr);
     else if ((ptr = zgetenv("PWD")) && (strlen(ptr) < PATH_MAX) &&
