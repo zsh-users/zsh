@@ -177,6 +177,16 @@
 >1:  [[ path/testy = *((#s)|/)test((#e)|/)* ]]
 >1:  [[ path/testy/ohyes = *((#s)|/)test((#e)|/)* ]]
 >1:  [[ path/atest/ohyes = *((#s)|/)test((#e)|/)* ]]
+>0:  [[ XabcdabcY = X(ab|c|d)(#c5)Y ]]
+>0:  [[ XabcdabcY = X(ab|c|d)(#c1,5)Y ]]
+>0:  [[ XabcdabcY = X(ab|c|d)(#c5,8)Y ]]
+>0:  [[ XabcdabcY = X(ab|c|d)(#c4,)Y ]]
+>1:  [[ XabcdabcY = X(ab|c|d)(#c6,)Y ]]
+>1:  [[ XabcdabcY = X(ab|c|d)(#c1,4)Y ]]
+>0:  [[ ZX = Z(|)(#c1)X ]]
+>0:  [[ froofroo = (fro(#c2))(#c2) ]]
+>1:  [[ froofroofroo = (fro(#c2))(#c2) ]]
+>1:  [[ froofro = (fro(#c2))(#c2) ]]
 >0 tests failed.
 
   globtest globtests.ksh
@@ -357,3 +367,7 @@
 >  [[:IFSSPACE:]] yes
 >/ [[:WORD:]] no
 >/ [[:WORD:]] yes
+
+ [[ foo = (#c0)foo ]]
+1:Misplaced (#c...) flag
+?(eval):1: bad pattern: (#c0)foo

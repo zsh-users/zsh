@@ -105,6 +105,8 @@ typedef union upat *Upat;
 #define P_GFLAGS  0x08	/* long Match nothing and set globbing flags */
 #define P_ISSTART 0x09  /* no   Match start of string. */
 #define P_ISEND   0x0a  /* no   Match end of string. */
+#define P_COUNTSTART 0x0b /* no Initialise P_COUNT */
+#define P_COUNT   0x0c  /* 3*long uc* node Match a number of repetitions */
 /* numbered so we can test bit 5 for a branch */
 #define	P_BRANCH  0x20	/* node	Match this alternative, or the next... */
 #define	P_WBRANCH 0x21	/* uc* node P_BRANCH, but match at least 1 char */
@@ -179,6 +181,17 @@ typedef union upat *Upat;
  *   for top level file globs, e.g. ** / *.c~*foo.c
  *                                    ^ I had to leave this space
  * P_NUM*: zl is a zlong if that is 64-bit, else an unsigned long.
+ *
+ * P_COUNTSTART, P_COUNT: a P_COUNTSTART flags the start of a quantified
+ * closure (#cN,M) and is used to initialise the count.  Executing
+ * the pattern leads back to the P_COUNT, while the next links of the
+ * P_COUNTSTART and P_COUNT lead to the tail of the pattern:
+ *
+ *	       	        ----------------
+ *     	       	       v       	        ^
+ *        <COUNTSTART><COUNT>pattern<BACK> tail
+ *	     	    v      v  	  	    ^
+ *	            ------------------------
  */
 #define PP_ALPHA  1
 #define PP_ALNUM  2
@@ -210,6 +223,13 @@ typedef union upat *Upat;
 /* Specific to lstr type, i.e. P_EXACTLY. */
 #define P_LS_LEN(p)	((p)[1].l) /* can be used as lvalue */
 #define P_LS_STR(p)	((char *)((p) + 2))
+
+/* Specific to P_COUNT: arguments as offset in nodes from operator */
+#define P_CT_CURRENT	(1)	/* Current count */
+#define P_CT_MIN	(2)     /* Minimum count */
+#define P_CT_MAX	(3)	/* Maximum count, -1 for none */
+#define P_CT_PTR	(4)	/* Pointer to last match start */
+#define P_CT_OPERAND	(5)	/* Operand of P_COUNT */
 
 /* Flags needed when pattern is executed */
 #define P_SIMPLE        0x01	/* Simple enough to be #/## operand. */
@@ -766,7 +786,7 @@ patcompswitch(int paren, int *flagp)
 		     * no top-level |'s.
 		     *
 		     * No gfchanged, as nothing to follow branch at top
-		     * level. 
+		     * level.
 		     */
 		    union upat up;
 		    gfnode = patnode(P_GFLAGS);
@@ -948,7 +968,7 @@ patgetglobflags(char **strp, long *assertp, int *ignore)
     *ignore = 1;
     /* (#X): assumes we are still positioned on the first X */
     for (; *ptr && *ptr != Outpar; ptr++) {
-	if (*ptr == 'q') { 
+	if (*ptr == 'q') {
 	    /* Glob qualifiers, ignored in pattern code */
 	    while (*ptr && *ptr != Outpar)
 		ptr++;
@@ -1044,8 +1064,9 @@ patgetglobflags(char **strp, long *assertp, int *ignore)
 static long
 patcomppiece(int *flagp)
 {
-    long starter = 0, next, pound, op;
+    long starter = 0, next, op, opnd;
     int flags, flags2, kshchar, len, ch, patch, nmeta;
+    int pound, count;
     union upat up;
     char *nptr, *str0, *ptr, *patprev;
     zrange_t from, to;
@@ -1098,10 +1119,13 @@ patcomppiece(int *flagp)
 	/* more than one character matched? */
 	morelen = (patprev > str0);
 	/*
-	 * If we have more than one character, a following hash only
-	 * applies to the last, so backtrack one character.
+	 * If we have more than one character, a following hash
+	 * or (#c...) only applies to the last, so backtrack one character.
 	 */
-	if (isset(EXTENDEDGLOB) && *patparse == Pound && morelen)
+	if (isset(EXTENDEDGLOB) &&
+	    (*patparse == Pound ||
+	     (*patparse == Inpar && patparse[1] == Pound &&
+	      patparse[2] == 'c')) && morelen)
 	    patparse = patprev;
 	/*
 	 * If len is 1, we can't have an active # following, so doesn't
@@ -1345,7 +1369,10 @@ patcomppiece(int *flagp)
 	}
     }
 
+    count = 0;
     if (!(pound = (*patparse == Pound && isset(EXTENDEDGLOB))) &&
+	!(count = (isset(EXTENDEDGLOB) && *patparse == Inpar &&
+		   patparse[1] == Pound && patparse[2] == 'c')) &&
 	(kshchar <= 0 || kshchar == '@' || kshchar == '!')) {
 	*flagp = flags;
 	return starter;
@@ -1364,6 +1391,10 @@ patcomppiece(int *flagp)
     } else if (kshchar == '?') {
 	op = 0;
 	*flagp = 0;
+    } else if (count) {
+	op = P_COUNT;
+	patparse += 3;
+	*flagp = P_HSTART;
     } else if (*++patparse == Pound) {
 	op = P_TWOHASH;
 	patparse++;
@@ -1383,7 +1414,56 @@ patcomppiece(int *flagp)
      * each time we fail on a non-empty branch, we try the empty branch,
      * which is equivalent to backtracking.
      */
-    if ((flags & P_SIMPLE) && (op == P_ONEHASH || op == P_TWOHASH) &&
+    if (op == P_COUNT) {
+	/* (#cN,M) */
+	union upat countargs[P_CT_OPERAND];
+	char *opp = patparse;
+
+	countargs[0].l = P_COUNT;
+	countargs[P_CT_CURRENT].l = 0L;
+	countargs[P_CT_MIN].l = (long)zstrtol(patparse, &patparse, 10);
+	if (patparse == opp) {
+	    /* missing number treated as zero */
+	    countargs[P_CT_MIN].l = 0L;
+	}
+	if (*patparse != ',' && *patparse != Comma) {
+	    /* either max = min or error */
+	    if (*patparse != Outpar)
+		return 0;
+	    countargs[P_CT_MAX].l = countargs[P_CT_MIN].l;
+	} else {
+	    opp = ++patparse;
+	    countargs[P_CT_MAX].l = (long)zstrtol(patparse, &patparse, 10);
+	    if (*patparse != Outpar)
+		return 0;
+	    if (patparse == opp) {
+		/* missing number treated as infinity: record as -1 */
+		countargs[P_CT_MAX].l = -1L;
+	    }
+	}
+	patparse++;
+	countargs[P_CT_PTR].p = NULL;
+	/* Mark this chain as a min/max count... */
+	patinsert(P_COUNTSTART, starter, (char *)countargs, sizeof(countargs));
+	/*
+	 * The next of the operand is a loop back to the P_COUNT.  This is
+	 * how we get recursion for the count.  We don't loop back to
+	 * the P_COUNTSTART; that's used for initialising the count
+	 * and saving and restoring the count for any enclosing use
+	 * of the match.
+	 */
+	opnd = P_OPERAND(starter) + P_CT_OPERAND;
+	pattail(opnd, patnode(P_BACK));
+	pattail(opnd, P_OPERAND(starter));
+	/*
+	 * The next of the counter operators is what follows the
+	 * closure.
+	 * This handles matching of the tail.
+	 */
+	next = patnode(P_NOTHING);
+	pattail(starter, next);
+	pattail(P_OPERAND(starter), next);
+    } else if ((flags & P_SIMPLE) && (op == P_ONEHASH || op == P_TWOHASH) &&
 	P_OP((Upat)patout+starter) == P_ANY) {
 	/* Optimize ?# to *.  Silly thing to do, since who would use
 	 * use ?# ? But it makes the later code shorter.
@@ -1397,7 +1477,7 @@ patcomppiece(int *flagp)
 	    uptr->l = (uptr->l & ~0xff) | P_STAR;
 	}
     } else if ((flags & P_SIMPLE) && op && !(patglobflags & 0xff)) {
-	/* Don't simplify if we need to look for approximations. */
+	/* Simplify, but not if we need to look for approximations. */
 	patinsert(op, starter, NULL, 0);
     } else if (op == P_ONEHASH) {
 	/* Emit x# as (x&|), where & means "self". */
@@ -2830,6 +2910,54 @@ patmatch(Upat prog)
 	    if (patinput < patinend || (patflags & PAT_NOTEND))
 		fail = 1;
 	    break;
+	case P_COUNTSTART:
+	    {
+		/*
+		 * Save and restore the current count and the
+		 * start pointer in case the pattern has been
+		 * executed by a previous repetition of a
+		 * closure.
+		 */
+		long *curptr = &P_OPERAND(scan)[P_CT_CURRENT].l;
+		long savecount = *curptr;
+		unsigned char *saveptr = scan[P_CT_PTR].p;
+		int ret;
+
+		*curptr = 0L;
+		ret = patmatch(P_OPERAND(scan));
+		*curptr = savecount;
+		scan[P_CT_PTR].p = saveptr;
+		return ret;
+	    }
+	case P_COUNT:
+	    {
+		/* (#cN,M): execution is relatively straightforward */
+		long cur = scan[P_CT_CURRENT].l;
+		long min = scan[P_CT_MIN].l;
+		long max = scan[P_CT_MAX].l;
+
+		if (cur && cur >= min &&
+		    (unsigned char *)patinput == scan[P_CT_PTR].p) {
+		    /*
+		     * Not at the first attempt to match so
+		     * the previous attempt managed zero length.
+		     * We can do this indefinitely so there's
+		     * no point in going on.  Simply try to
+		     * match the remainder of the pattern.
+		     */
+		    return patmatch(next);
+		}
+		scan[P_CT_PTR].p = (unsigned char *)patinput;
+
+		if (max < 0 || cur < max) {
+		    scan[P_CT_CURRENT].l = cur + 1;
+		    if (patmatch(scan + P_CT_OPERAND))
+			return 1;
+		}
+		if (cur < min)
+		    return 0;
+		return patmatch(next);
+	    }
 	case P_END:
 	    if (!(fail = (patinput < patinend && !(patflags & PAT_NOANCH))))
 		return 1;

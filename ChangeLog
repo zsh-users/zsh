@@ -1,3 +1,9 @@
+2007-07-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23713: Doc/Zsh/expn.yo, Misc/globtests, Src/pattern.c,
+	Test/D02glob.ztst: add (#cN,M) globbing flag to work like
+	{N,M} in regular expressions.
+
 2007-07-27  Clint Adams  <clint@zsh.org>
 
 	* 23712: Completion/Unix/Command/_dvi: handle dvips -j.

@@ -1636,6 +1636,18 @@ item(tt(B))(
 Deactivate backreferences, negating the effect of the tt(b) flag from that
 point on.
 )
+item(tt(c)var(N)tt(,)var(M))(
+The flag tt(LPAR()#c)var(N)tt(,)var(M)tt(RPAR()) can be used anywhere
+that the tt(#) or tt(##) operators can be used; it cannot be combined
+with other globbing flags and a bad pattern error occurs if it is
+misplaced.  It is equivalent to the form tt({)var(N)tt(,)var(M)tt(}) in
+regular expressions.  The previous character or group is required to
+match between var(N) and var(M) times, inclusive.  The form
+tt(LPAR()#c)var(N)tt(RPAR()) requires exactly tt(N) matches;
+tt(LPAR()#c,)var(M)tt(RPAR()) is equivalent to specifying var(N) as 0;
+tt(LPAR()#c)var(N)tt(,RPAR()) specifies that there is no maximum limit
+on the number of matches.
+)
 item(tt(m))(
 Set references to the match data for the entire string matched; this is
 similar to backreferencing and does not work in filename generation.  The
