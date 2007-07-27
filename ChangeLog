@@ -1,3 +1,7 @@
+2007-07-27  Clint Adams  <clint@zsh.org>
+
+	* 23712: Completion/Unix/Command/_dvi: handle dvips -j.
+
 2007-07-26  Peter Stephenson  <pws@csr.com>
 
 	* 23703: Src/init.c: getenv() should be zgetenv().
