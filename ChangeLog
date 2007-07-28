@@ -1,3 +1,8 @@
+2007-07-28  Clint Adams  <clint@zsh.org>
+
+	* 23714: Completion/Unix/Command/_dvi: handle dvips -G, -R, -u, -U,
+	-v, -V, -y, and -z.
+
 2007-07-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23713: Doc/Zsh/expn.yo, Misc/globtests, Src/pattern.c,

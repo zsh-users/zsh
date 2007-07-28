@@ -24,6 +24,7 @@ dvips)
     '-E[generate EPSF file]' \
     '(-o)-f[write to stdout]' \
     '-F[append control-D]' \
+    '-G[shift low chars to higher position]' \
     '-h[specify additional header file]:postscript header file:_files -g "*.(#i)(ps|eps)(-.)"' \
     '-i[one file per section]' \
     '-j[download fonts partially]' \
@@ -41,13 +42,20 @@ dvips)
     '-P[specify printer]:printer name' \
     '-q[quiet operation]' \
     '-r[reverse order of pages]' \
+    '-R[run securely]' \
     '-s[enclose output in save/restore pair]' \
     '-S[set maximum number of pages per section]:maximum number of pages per section' \
     '(-T)*-t[specify paper type]:paper type:(letter legal ledger a4 a3 landscape)' \
     '(-t)-T[set paper size]:paper size (<x>,<y>)' \
+    '-u:PS mapfile:' \
+    '-U[disable string param trick]' \
+    '-v[print version number and quit]' \
+    '-V[send downloadable PS fonts as PK]' \
     '-x[set magnification ratio]:magnification ratio (per mille)' \
     '(-D)-X[set horizontal resolution]:horizontal resolution' \
+    '-y[multiply by dvi magnification]' \
     '(-D)-Y[set vertical resolution]:vertical resolution' \
+    '-z[hyper PS]' \
     '-Z[compress bitmapped fonts]' \
     ':input file:_files -g "*.(dvi|DVI)(-.)"'
   ;;
