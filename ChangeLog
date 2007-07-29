@@ -1,5 +1,8 @@
 2007-07-29  Clint Adams  <clint@zsh.org>
 
+	* 23720: Completion/Unix/Command/_dvi: handle arguments to dvips -P
+	as part of the same word.
+
 	* 23718: Completion/Unix/Command/_dvi: don't use _arguments -s.
 
 2007-07-28  Clint Adams  <clint@zsh.org>

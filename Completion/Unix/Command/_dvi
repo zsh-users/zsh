@@ -39,7 +39,7 @@ dvips)
     '-O[specify offset of origin]:offset of origin (<x>,<y>)' \
     '(-p -l -n)-pp[specify which pages to print]:list of pages or ranges to print:' \
     '(-pp)-p[specify first page to print]:number of first page' \
-    '-P[specify printer]:printer name' \
+    '-P+[specify printer]:printer name' \
     '-q[quiet operation]' \
     '-r[reverse order of pages]' \
     '-R[run securely]' \
