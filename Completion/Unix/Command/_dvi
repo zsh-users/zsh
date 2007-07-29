@@ -11,7 +11,7 @@ args=(
 
 case "$service" in
 dvips)
-  _arguments -s \
+  _arguments \
     '-a[make three passes]' \
     '(-B)-A[print only odd numbered pages]' \
     '(-A)-B[print only even numbered pages]' \
