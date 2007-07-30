@@ -693,6 +693,15 @@ struct timezone {
 
 extern char **environ;
 
+/*
+ * We always need setenv and unsetenv in pairs, because
+ * we don't know how to do memory management on the values set.
+ */
+#ifndef HAVE_UNSETENV
+#undef HAVE_SETENV
+#endif
+
+
 /* These variables are sometimes defined in, *
  * and needed by, the termcap library.       */
 #if MUST_DEFINE_OSPEED

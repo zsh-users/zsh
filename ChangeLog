@@ -1,3 +1,9 @@
+2007-07-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23725: configure.ac, Src/exec.c, Src/params.c, Src/system.h:
+	use setenv() and unsetenv() for memory management of the
+	environment where possible.
+
 2007-07-29  Clint Adams  <clint@zsh.org>
 
 	* 23720: Completion/Unix/Command/_dvi: handle arguments to dvips -P

@@ -524,7 +524,16 @@ execute(LinkList args, int flags, int defpath)
      * that as argv[0] for this external command       */
     if (unset(RESTRICTED) && (z = zgetenv("ARGV0"))) {
 	setdata(firstnode(args), (void *) ztrdup(z));
+	/*
+	 * Note we don't do anything with the parameter structure
+	 * for ARGV0: that's OK since we're about to exec or exit
+	 * on failure.
+	 */
+#ifdef HAVE_UNSETENV
+	unsetenv("ARGV0");
+#else
 	delenvvalue(z - 6);
+#endif
     } else if (flags & BINF_DASH) {
     /* Else if the pre-command `-' was given, we add `-' *
      * to the front of argv[0] for this command.         */

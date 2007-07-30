@@ -1126,7 +1126,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       setlocale \
 	       uname \
 	       signgam \
-	       putenv getenv \
+	       putenv getenv setenv unsetenv xw\
 	       brk sbrk \
 	       pathconf sysconf \
 	       tgetent tigetflag tigetnum tigetstr setupterm \

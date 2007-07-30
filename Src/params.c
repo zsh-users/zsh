@@ -610,7 +610,7 @@ void
 createparamtable(void)
 {
     Param ip, pm;
-#ifndef HAVE_PUTENV
+#if !defined(HAVE_PUTENV) && !defined(HAVE_SETENV)
     char **new_environ;
     int  envsize;
 #endif
@@ -665,7 +665,7 @@ createparamtable(void)
 
     setsparam("LOGNAME", ztrdup((str = getlogin()) && *str ? str : cached_username));
 
-#ifndef HAVE_PUTENV
+#if !defined(HAVE_PUTENV) && !defined(HAVE_SETENV)
     /* Copy the environment variables we are inheriting to dynamic *
      * memory, so we can do mallocs and frees on it.               */
     envsize = sizeof(char *)*(1 + arrlen(environ));
@@ -3855,6 +3855,30 @@ arrfixenv(char *s, char **t)
 int
 zputenv(char *str)
 {
+#ifdef HAVE_SETENV
+    /*
+     * If we are using unsetenv() to remove values from the
+     * environment, which is the safe thing to do, we
+     * need to use setenv() to put them there in the first place.
+     * Unfortunately this is a slightly different interface
+     * from what zputenv() assumes.
+     */
+    char *ptr;
+    int ret;
+
+    for (ptr = str; *ptr && *ptr != '='; ptr++)
+	;
+    if (*ptr) {
+	*ptr = '\0';
+	ret = setenv(str, ptr+1, 1);
+	*ptr = '=';
+    } else {
+	/* safety first */
+	DPUTS(1, "bad environment string");
+	ret = setenv(str, ptr, 1);
+    }
+    return ret;
+#else
 #ifdef HAVE_PUTENV
     return putenv(str);
 #else
@@ -3878,8 +3902,11 @@ zputenv(char *str)
     }
     return 0;
 #endif
+#endif
 }
 
+/**/
+#ifndef HAVE_UNSETENV
 /**/
 static int
 findenv(char *name, int *pos)
@@ -3899,6 +3926,8 @@ findenv(char *name, int *pos)
     
     return 0;
 }
+/**/
+#endif
 
 /* Given *name = "foo", it searches the environment for string *
  * "foo=bar", and returns a pointer to the beginning of "bar"  */
@@ -3939,14 +3968,20 @@ copyenvstr(char *s, char *value, int flags)
 void
 addenv(Param pm, char *value)
 {
-    char *oldenv = 0, *newenv = 0, *env = 0;
+    char *newenv = 0;
+#ifndef HAVE_UNSETENV
+    char *oldenv = 0, *env = 0;
     int pos;
+#endif
 
-    /* First check if there is already an environment *
-     * variable matching string `name'. If not, and   *
-     * we are not requested to add new, return        */
+#ifndef HAVE_UNSETENV
+    /*
+     * First check if there is already an environment
+     * variable matching string `name'.
+     */
     if (findenv(pm->node.nam, &pos))
 	oldenv = environ[pos];
+#endif
 
      newenv = mkenvstr(pm->node.nam, value, pm->node.flags);
      if (zputenv(newenv)) {
@@ -3954,6 +3989,19 @@ addenv(Param pm, char *value)
 	pm->env = NULL;
 	return;
     }
+#ifdef HAVE_UNSETENV
+     /*
+      * If we are using setenv/unsetenv to manage the environment,
+      * we simply store the string we created in pm->env since
+      * memory management of the environment is handled entirely
+      * by the system.
+      *
+      * TODO: is this good enough to fix problem cases from
+      * the other branch?  If so, we don't actually need to
+      * store pm->env at all, just a flag that the value was set.
+      */
+     pm->env = newenv;
+#else
     /*
      * Under Cygwin we must use putenv() to maintain consistency.
      * Unfortunately, current version (1.1.2) copies argument and may
@@ -3973,6 +4021,7 @@ addenv(Param pm, char *value)
 
     DPUTS(1, "addenv should never reach the end");
     pm->env = NULL;
+#endif
 }
 
 
@@ -4003,6 +4052,7 @@ mkenvstr(char *name, char *value, int flags)
  * string.                                         */
 
 
+#ifndef HAVE_UNSETENV
 /**/
 void
 delenvvalue(char *x)
@@ -4018,6 +4068,8 @@ delenvvalue(char *x)
     }
     zsfree(x);
 }
+#endif
+
 
 /* Delete a pointer from the list of pointers to environment *
  * variables by shifting all the other pointers up one slot. */
@@ -4026,7 +4078,12 @@ delenvvalue(char *x)
 void
 delenv(Param pm)
 {
+#ifdef HAVE_UNSETENV
+    unsetenv(pm->node.nam);
+    zsfree(pm->env);
+#else
     delenvvalue(pm->env);
+#endif
     pm->env = NULL;
     /*
      * Note we don't remove PM_EXPORT from the flags.  This
