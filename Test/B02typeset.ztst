@@ -377,3 +377,14 @@
 >integer local i
 >local tagged scalar
 >preserved
+
+ export ENVFOO=bar
+ print ENVFOO in environment
+ env | grep '^ENVFOO'
+ unset ENVFOO
+ print ENVFOO no longer in environment
+ env | grep '^ENVFOO'
+1:Adding and removing values to and from the environment
+>ENVFOO in environment
+>ENVFOO=bar
+>ENVFOO no longer in environment

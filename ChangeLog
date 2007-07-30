@@ -1,5 +1,8 @@
 2007-07-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 23726: Test/B02typeset.ztst: test for adding and removing
+	of environment variables.
+
 	* 23725: configure.ac, Src/exec.c, Src/params.c, Src/system.h:
 	use setenv() and unsetenv() for memory management of the
 	environment where possible.
