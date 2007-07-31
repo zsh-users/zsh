@@ -381,10 +381,27 @@
  export ENVFOO=bar
  print ENVFOO in environment
  env | grep '^ENVFOO'
+ print Changing ENVFOO
+ ENVFOO="not bar any more"
+ env | grep '^ENVFOO'
  unset ENVFOO
  print ENVFOO no longer in environment
  env | grep '^ENVFOO'
 1:Adding and removing values to and from the environment
 >ENVFOO in environment
 >ENVFOO=bar
+>Changing ENVFOO
+>ENVFOO=not bar any more
 >ENVFOO no longer in environment
+
+ (export FOOENV=BAR
+ env | grep '^FOOENV'
+ print Exec
+ exec $ZTST_testdir/../Src/zsh -c '
+ print Unset
+ unset FOOENV
+ env | grep "^FOOENV"')
+1:Can unset environment variables after exec
+>FOOENV=BAR
+>Exec
+>Unset

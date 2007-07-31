@@ -1,3 +1,8 @@
+2007-07-31  Peter Stephenson  <pws@csr.com>
+
+	* 23730: Src/exec.c, Src/params.c, Src/system.h, B02typeset.ztst:
+	improve preprocessor and regression tests for 23725.
+
 2007-07-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23726: Test/B02typeset.ztst: test for adding and removing

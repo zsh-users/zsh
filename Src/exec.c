@@ -529,7 +529,7 @@ execute(LinkList args, int flags, int defpath)
 	 * for ARGV0: that's OK since we're about to exec or exit
 	 * on failure.
 	 */
-#ifdef HAVE_UNSETENV
+#ifdef USE_SET_UNSET_ENV
 	unsetenv("ARGV0");
 #else
 	delenvvalue(z - 6);

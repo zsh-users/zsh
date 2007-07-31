@@ -697,8 +697,8 @@ extern char **environ;
  * We always need setenv and unsetenv in pairs, because
  * we don't know how to do memory management on the values set.
  */
-#ifndef HAVE_UNSETENV
-#undef HAVE_SETENV
+#if defined(HAVE_SETENV) && defined(HAVE_UNSETENV)
+# define USE_SET_UNSET_ENV
 #endif
 
 

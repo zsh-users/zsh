@@ -610,7 +610,7 @@ void
 createparamtable(void)
 {
     Param ip, pm;
-#if !defined(HAVE_PUTENV) && !defined(HAVE_SETENV)
+#if !defined(HAVE_PUTENV) && !defined(USE_SET_UNSET_ENV)
     char **new_environ;
     int  envsize;
 #endif
@@ -665,7 +665,7 @@ createparamtable(void)
 
     setsparam("LOGNAME", ztrdup((str = getlogin()) && *str ? str : cached_username));
 
-#if !defined(HAVE_PUTENV) && !defined(HAVE_SETENV)
+#if !defined(HAVE_PUTENV) && !defined(USE_SET_UNSET_ENV)
     /* Copy the environment variables we are inheriting to dynamic *
      * memory, so we can do mallocs and frees on it.               */
     envsize = sizeof(char *)*(1 + arrlen(environ));
@@ -3855,7 +3855,7 @@ arrfixenv(char *s, char **t)
 int
 zputenv(char *str)
 {
-#ifdef HAVE_SETENV
+#ifdef USE_SET_UNSET_ENV
     /*
      * If we are using unsetenv() to remove values from the
      * environment, which is the safe thing to do, we
@@ -3906,7 +3906,7 @@ zputenv(char *str)
 }
 
 /**/
-#ifndef HAVE_UNSETENV
+#ifndef USE_SET_UNSET_ENV
 /**/
 static int
 findenv(char *name, int *pos)
@@ -3969,12 +3969,10 @@ void
 addenv(Param pm, char *value)
 {
     char *newenv = 0;
-#ifndef HAVE_UNSETENV
+#ifndef USE_SET_UNSET_ENV
     char *oldenv = 0, *env = 0;
     int pos;
-#endif
 
-#ifndef HAVE_UNSETENV
     /*
      * First check if there is already an environment
      * variable matching string `name'.
@@ -3989,7 +3987,7 @@ addenv(Param pm, char *value)
 	pm->env = NULL;
 	return;
     }
-#ifdef HAVE_UNSETENV
+#ifdef USE_SET_UNSET_ENV
      /*
       * If we are using setenv/unsetenv to manage the environment,
       * we simply store the string we created in pm->env since
@@ -4052,7 +4050,7 @@ mkenvstr(char *name, char *value, int flags)
  * string.                                         */
 
 
-#ifndef HAVE_UNSETENV
+#ifndef USE_SET_UNSET_ENV
 /**/
 void
 delenvvalue(char *x)
@@ -4078,7 +4076,7 @@ delenvvalue(char *x)
 void
 delenv(Param pm)
 {
-#ifdef HAVE_UNSETENV
+#ifdef USE_SET_UNSET_ENV
     unsetenv(pm->node.nam);
     zsfree(pm->env);
 #else
