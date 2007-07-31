@@ -260,6 +260,11 @@
  zmodload zsh/parameter
 0d:Unload the modules loaded by this test suite
 
+  zmodload -aF zsh/zftp b:zftp
+  zmodload -LaF | grep zftp
+0:Listing feature autoloads includes unloaded modules
+>zmodload -Fa zsh/zftp b:zftp
+
 %clean
 
  eval "$deps"

@@ -215,7 +215,7 @@ printmodulenode(HashNode hn, int flags)
 	    fputs(" -> ", stdout);
 	    nicezputs(m->u.alias, stdout);
 	}
-    } else if (m->u.handle) {
+    } else if (m->u.handle || (flags & PRINTMOD_AUTO)) {
 	/*
 	 * Loaded module.
 	 */
