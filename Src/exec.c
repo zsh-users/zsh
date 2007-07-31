@@ -1968,7 +1968,7 @@ resolvebuiltin(const char *cmdarg, HashNode hn)
 	hn = builtintab->getnode(builtintab, cmdarg);
 	if (!hn) {
 	    lastval = 1;
-	    zerr("unknown builtin: %s");
+	    zerr("unknown builtin: %s", cmdarg);
 	    return NULL;
 	}
     }

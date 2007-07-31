@@ -1,5 +1,9 @@
 2007-07-31  Peter Stephenson  <pws@csr.com>
 
+	* 23732: Src/exec.c, Test/B02tyepset.ztst: unknown builtin
+	error message was broken; test warning output was broken;
+	exec of zsh in new env test was broken.
+
 	* 23730: Src/exec.c, Src/params.c, Src/system.h, B02typeset.ztst:
 	improve preprocessor and regression tests for 23725.
 

@@ -397,7 +397,7 @@
  (export FOOENV=BAR
  env | grep '^FOOENV'
  print Exec
- exec $ZTST_testdir/../Src/zsh -c '
+ exec $ZTST_testdir/../Src/zsh -fc '
  print Unset
  unset FOOENV
  env | grep "^FOOENV"')

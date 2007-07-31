@@ -36,7 +36,7 @@
   if [[ -n $block ]]; then
     [[ -b $block[(f)1] && ! -b zerolength ]]
   else
-    print -u8 'Warning: Not testing [[ -b blockdevice ]] (no devices found)'
+    print -u$ZTST_fd 'Warning: Not testing [[ -b blockdevice ]] (no devices found)'
     [[ ! -b zerolength ]]
   fi
 0D:-b cond
@@ -55,7 +55,7 @@
   if [[ -n $block ]]; then
     [[ -f zerolength && ! -f cond && ! -f $char && ! -f $block[(f)1] && ! -f . ]]
   else
-    print -u8 'Warning: Not testing [[ -f blockdevice ]] (no devices found)'
+    print -u$ZTST_fd 'Warning: Not testing [[ -f blockdevice ]] (no devices found)'
     [[ -f zerolength && ! -f cond && ! -f $char && ! -f . ]]
   fi
 0:-f cond
@@ -79,20 +79,20 @@
 0:-o cond
 
   if ! grep '#define HAVE_FIFOS' $ZTST_testdir/../config.h; then
-    print -u8 'Warning: Not testing [[ -p pipe ]] (FIFOs not supported)'
+    print -u$ZTST_fd 'Warning: Not testing [[ -p pipe ]] (FIFOs not supported)'
     [[ ! -p zerolength ]]
   else
     if whence mkfifo && mkfifo pipe || mknod pipe p; then
       [[ -p pipe && ! -p zerolength ]]
     else
-      print -u8 'Warning: Not testing [[ -p pipe ]] (cannot create FIFO)'
+      print -u$ZTST_fd 'Warning: Not testing [[ -p pipe ]] (cannot create FIFO)'
       [[ ! -p zerolength ]]
     fi
   fi
 0dD:-p cond
 
   if (( EUID == 0 )); then
-    print -u8 'Warning: Not testing [[ ! -r file ]] (root reads anything)'
+    print -u$ZTST_fd 'Warning: Not testing [[ ! -r file ]] (root reads anything)'
     [[ -r zerolength && -r unmodish ]]
   else
     [[ -r zerolength && ! -r unmodish ]]
@@ -129,10 +129,10 @@
   cat unmodified
   touch newnewnew
   if [[ $OSTYPE == "cygwin" ]]; then
-    print -u8 "Warning: not testing [[ -N file ]] (not supported on Cygwin)"
+    print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported on Cygwin)"
     true
   elif [[ "$(find . -prune -fstype nfs 2>/dev/null)" == "." ]]; then
-    print -u8 "Warning: not testing [[ -N file ]] (not supported with NFS)"
+    print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported with NFS)"
     true
   else
     [[ -N newnewnew && ! -N unmodified ]]
@@ -174,7 +174,7 @@ F:are not recorded. This does not indicate a problem in the shell.
 0:|| and && in conds
 
   if ! grep '#define PATH_DEV_FD' $ZTST_testdir/../config.h; then
-    print -u8 "Warning: not testing [[ -e /dev/fd/0 ]] (/dev/fd not supported)"
+    print -u$ZTST_fd "Warning: not testing [[ -e /dev/fd/0 ]] (/dev/fd not supported)"
     true
   else
     [[ -e /dev/fd/0 ]]
@@ -182,7 +182,7 @@ F:are not recorded. This does not indicate a problem in the shell.
 0dD:/dev/fd support in conds handled by access
 
   if ! grep '#define PATH_DEV_FD' $ZTST_testdir/../config.h; then
-    print -u8 "Warning: not testing [[ -O /dev/fd/0 ]] (/dev/fd not supported)"
+    print -u$ZTST_fd "Warning: not testing [[ -O /dev/fd/0 ]] (/dev/fd not supported)"
     true
   else
     [[ -O /dev/fd/0 ]]
