@@ -1,5 +1,8 @@
 2007-08-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 23736: Src/hist.c: status for file save wasnʼt
+	initialised.
+
 	* unposted: **/.distfiles: update files for distribution.
 
 2007-07-31  Peter Stephenson  <pws@csr.com>

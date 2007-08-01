@@ -2225,6 +2225,7 @@ savehistfile(char *fn, int err, int writeflags)
 	}
     }
     if (out) {
+	ret = 0;
 	for (; he && he->histnum <= xcurhist; he = down_histent(he)) {
 	    if ((writeflags & HFILE_SKIPDUPS && he->node.flags & HIST_DUP)
 	     || (writeflags & HFILE_SKIPFOREIGN && he->node.flags & HIST_FOREIGN)
