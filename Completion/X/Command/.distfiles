@@ -10,4 +10,5 @@ _urxvt          _vnc
 _x_utils        _xauth          _xdvi           _xfig           _xloadimage
 _xmodmap        _xpdf           _xscreensaver   _xset           _xterm
 _xv             _xwit
+_xrandr
 '

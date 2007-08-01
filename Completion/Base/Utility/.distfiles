@@ -5,4 +5,5 @@ _arg_compile      _combination      _regex_arguments  _values
 _arguments        _set_command      _retrieve_cache   _guard
 _cache_invalid    _describe         _sep_parts        _pick_variant
 _call_function    _multi_parts      _store_cache      _regex_words
+_complete_help_generic
 '

@@ -11,6 +11,7 @@ DISTFILES_SRC='
     newuser.mdd newuser.c
     parameter.mdd parameter.c
     pcre.mdd pcre.c
+    regex.mdd regex.c
     socket.mdd socket.c
     stat.mdd stat.c
     system.mdd system.c errnames1.awk errnames2.awk
