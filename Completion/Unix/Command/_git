@@ -939,11 +939,11 @@ _git-commit () {
 # TODO: __git_files should be __git_tree_files (do like in git-diff-tree and
 # such)
 _git-diff () {
-  _arguments \
+  _arguments -S \
     $diff_args \
-    '::original revision:__git_revisions' \
-    '::new revision:__git_revisions' \
-    '*:index file:__git_files' && ret=0
+    '::original revision:__git_commits' \
+    '::new revision:__git_commits' \
+    '*::index file:__git_modified_files' && ret=0
 }
 
 _git-fetch () {
