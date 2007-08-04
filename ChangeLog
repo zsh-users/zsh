@@ -1,5 +1,8 @@
 2007-08-04  Clint Adams  <clint@zsh.org>
 
+	* Matthieu Moy: 23738: Completion/Unix/Command/_git: additional
+	git diff args.
+
 	* 23739: Completion/Unix/Command/_git: merge in git diff
 	completion fixes from Nikolai Weibull's repository.
 
