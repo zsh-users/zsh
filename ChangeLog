@@ -1,3 +1,8 @@
+2007-08-07  Clint Adams  <clint@zsh.org>
+
+	* 23745: Completion/Unix/Command/_genisoimage: partial completion
+	for genisoimage.
+
 2007-08-04  Clint Adams  <clint@zsh.org>
 
 	* Matthieu Moy: 23738: Completion/Unix/Command/_git: additional
