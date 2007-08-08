@@ -1,5 +1,8 @@
 2007-08-07  Clint Adams  <clint@zsh.org>
 
+	* 23746: Completion/Unix/Command/_growisofs: partial completion
+	for growisofs.
+
 	* 23745: Completion/Unix/Command/_genisoimage: partial completion
 	for genisoimage.
 
