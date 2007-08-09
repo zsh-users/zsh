@@ -3,6 +3,9 @@
 	* Nikolai Weibull: 23749: Completion/Unix/Command/_cdrdao:
 	completion for cdrdao.
 
+	* Nikolai Weibull: 23748: Completion/Unix/Command/_growisofs:
+	better completion for growisofs and mkisofs.
+
 2007-08-07  Clint Adams  <clint@zsh.org>
 
 	* 23746: Completion/Unix/Command/_growisofs: partial completion
