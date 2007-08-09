@@ -1,3 +1,8 @@
+2007-08-09  Clint Adams  <clint@zsh.org>
+
+	* Nikolai Weibull: 23749: Completion/Unix/Command/_cdrdao:
+	completion for cdrdao.
+
 2007-08-07  Clint Adams  <clint@zsh.org>
 
 	* 23746: Completion/Unix/Command/_growisofs: partial completion
