@@ -74,7 +74,11 @@ case "$state" in
 
   all_modules)
     modules=( ${${${${(f)"$(_call_program modules ${(M)words[1]##*/}modprobe -l 2>/dev/null)"}:#}##*/}%%.*} )
-    _wanted modules expl module compadd -a modules && return
+    _tags files modules
+    while _tags; do
+      _requested files expl "module file"  _files && ret=0
+      _requested modules expl module compadd -a modules && ret=0
+    done
   ;;
 
   params)

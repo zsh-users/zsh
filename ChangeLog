@@ -1,3 +1,8 @@
+2007-08-12  Andrey Borzenkov <bor@zsh.org>
+
+	* 23751: Completion/Linux/Command/_modutils: support for
+	completing module files directly
+
 2007-08-09  Clint Adams  <clint@zsh.org>
 
 	* Nikolai Weibull: 23749: Completion/Unix/Command/_cdrdao:
