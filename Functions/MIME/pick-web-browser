@@ -20,24 +20,23 @@
 # browser instead.
 
 emulate -L zsh
-setopt extendedglob cbases nonomatch
+setopt extendedglob cbases nonomatch warncreateglobal
 
 zmodload -i zsh/zutil
 
 local -a xbrowsers ttybrowsers
 
 # X Windows browsers which might be running and can accept
-# a remote URL.  You can change the order of preference.
-# If none is already running, starts the first in the array.
+# a remote URL.
 zstyle -a :mime: x-browsers xbrowsers ||
   xbrowsers=(firefox mozilla netscape opera konqueror)
-# Preferred command line browser.  Used if there is on $DISPLAY set.
+# Preferred command line browsers.
 zstyle -a :mime: tty-browsers ttybrowsers ||
-  ttybrowsers=(links lynx)
+  ttybrowsers=(elinks links lynx)
 # Characters in addition to alphanumerics which can appear literally
 # in a URL.  `-' should be the first if it appears, so append others
 # to the end.
-litc="-_./"
+local litc="-_./"
 
 local -a windows remoteargs match mbegin mend
 local url browser command
@@ -63,57 +62,76 @@ if [[ -f $url ]]; then
   fi
 fi
 
+local bstyle
+local -a bstyles
+zstyle -a :mime: browser-styles bstyles || bstyles=(running x tty)
 
-if [[ -n $DISPLAY ]]; then
-  # X Windows running
+for bstyle in $bstyles; do
+  case $bstyle in
+    (running)
+    [[ -z $DISPLAY ]] && continue
+    # X Windows running
 
-  # Get the name of all windows running; use the internal name, not
-  # the friendly name, which is less useful.
-  #
-  # The nasty but portable version.
-  # The nice but non-portable version uses Perl, even though perl
-  # is more portable.
-#    windows=(${(f)"$(xwininfo -root -all | 
-#	sed -ne 's/.*".*": ("\(.*\)" ".*").*/\1/p' |sort | uniq)"})
+    # Get the name of all windows running; use the internal name, not
+    # the friendly name, which is less useful.
+    #
+    # The nasty but portable version.
+    # The nice but non-portable version uses Perl, even though perl
+    # is more portable.
+    #    windows=(${(f)"$(xwininfo -root -all | 
+    #	sed -ne 's/.*".*": ("\(.*\)" ".*").*/\1/p' |sort | uniq)"})
 
-  windows=(${(f)"$(xwininfo -root -all | 
+    windows=(${(f)"$(xwininfo -root -all | 
          perl -ne '/.*"(.*)": \("(.*)" "(.*)"\).*/ and $w{$2} = 1;
                    END { print join("\n", keys %w), "\n" }')"})
 
-  # Is any browser we've heard of running?
-  for browser in $xbrowsers; do
-    # Some browser executables call themselves <browser>-bin
-    if [[ $windows[(I)(#i)$browser(|[.-]bin)] -ne 0 ]]; then
-      if zstyle -s ":mime:browser:running:${browser}:" command command; then
-	# The (q)'s here and below are pure paranoia:  no browser
-	# name is going to include metacharacters, and we already
-	# converted difficult characters in the URL to hex.
-	zformat -f command $command b:${(q)browser} u:${(q)url}
-	eval $command
-      else
-	if [[ $browser = konqueror ]]; then
-	  # kfmclient is less hairy and better supported than direct
-	  # use of dcop.  Run kfmclient --commands
-	  # for more information.  Note that as konqueror is a fully
-	  # featured file manager, this will actually do complete
-	  # MIME handling, not just web pages.
-	  kfmclient openURL $url ||
+    # Is any browser we've heard of running?
+    for browser in $xbrowsers; do
+      # Some browser executables call themselves <browser>-bin
+      if [[ $windows[(I)(#i)$browser(|[.-]bin)] -ne 0 ]]; then
+	if zstyle -s ":mime:browser:running:${browser}:" command command; then
+	  # The (q)'s here and below are pure paranoia:  no browser
+	  # name is going to include metacharacters, and we already
+	  # converted difficult characters in the URL to hex.
+	  zformat -f command $command b:${(q)browser} u:${(q)url}
+	  eval $command
+	else
+	  case $browser in
+	    (konqueror)
+	    # kfmclient is less hairy and better supported than direct
+	    # use of dcop.  Run kfmclient --commands
+	    # for more information.  Note that as konqueror is a fully
+	    # featured file manager, this will actually do complete
+	    # MIME handling, not just web pages.
+	    kfmclient openURL $url ||
 	    dcop $(dcop|grep konqueror) default openBrowserWindow $url
-        elif [[ $browser = firefox ]]; then
-	  # open in new tab
-	  $browser -new-tab $url
-        else
-	  # Mozilla bells and whistles are described at:
-	  # http://www.mozilla.org/unix/remote.html
-	  $browser -remote "openURL($url)"
-        fi
-      fi
-      return
-    fi
-  done
+	    ;;
 
-  # Start our preferred X Windows browser in the background.
-  for browser in $xbrowsers; do
+	    (firefox)
+	    # open in new tab
+	    $browser -new-tab $url
+	    ;;
+
+	    (opera)
+	    $browser -newpage $url
+	    ;;
+
+	    (*)
+	    # Mozilla bells and whistles are described at:
+	    # http://www.mozilla.org/unix/remote.html
+	    $browser -remote "openURL($url)"
+	    ;;
+	  esac
+	fi
+	return
+      fi
+    done
+    ;;
+
+    (x)
+    [[ -z $DISPLAY ]] && continue
+    # Start our preferred X Windows browser in the background.
+    for browser in $xbrowsers; do
       if eval "[[ =$browser != \\=$browser ]]"; then
 	if zstyle -s ":mime:browser:new:${browser}:" command command; then
 	  zformat -f command $command b:${(q)browser} u:${(q)url}
@@ -122,20 +140,27 @@ if [[ -n $DISPLAY ]]; then
 	  # The following is to make the job text more readable.
 	  eval ${(q)browser} ${(q)url} "&"
 	fi
-	break
+	return
       fi
-  done
-else
-  # Start up dumb terminal browser.
-  for browser in $ttybrowsers; do
-    if eval "[[ =$browser != \\=$browser ]]"; then
-      if zstyle -s ":mime:browser:new:${browser}" command command; then
-	zformat -f command $command b:${(q)browser} u:${(q)url}
-	eval $command
-      else
-	$browser $url
+    done
+    ;;
+
+    (tty)
+    # Start up dumb terminal browser.
+    for browser in $ttybrowsers; do
+      if eval "[[ =$browser != \\=$browser ]]"; then
+	if zstyle -s ":mime:browser:new:${browser}" command command; then
+	  zformat -f command $command b:${(q)browser} u:${(q)url}
+	  eval $command
+	else
+	  $browser $url
+	fi
+	return
       fi
-      break
-    fi
-  done
-fi
+    done
+    ;;
+  esac
+done
+
+# No eligible browser.
+return 255
