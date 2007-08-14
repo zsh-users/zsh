@@ -66,7 +66,12 @@ int isfirstch;
 /**/
 int inalmore;
 
-/* don't do spelling correction */
+/*
+ * Don't do spelling correction.
+ * Bit 1 is only valid for the current word.  It's
+ * set when we detect a lookahead that stops the word from
+ * needing correction.
+ */
  
 /**/
 int nocorrect;
@@ -344,6 +349,7 @@ yylex(void)
     do
 	tok = gettok();
     while (tok != ENDINPUT && exalias());
+    nocorrect &= 1;
     if (tok == NEWLIN || tok == ENDINPUT) {
 	while (hdocs) {
 	    struct heredocs *next = hdocs->next;
@@ -629,7 +635,7 @@ isnumglob(void)
 }
 
 /**/
-int
+static int
 gettok(void)
 {
     int c, d;
@@ -1036,8 +1042,16 @@ gettokstr(int c, int sub)
 		     *   pws 1999/6/14
 		     */
 		    if (e == ')' || (isset(SHGLOB) && inblank(e) && !bct &&
-				     !brct && !intpos && incmdpos))
+				     !brct && !intpos && incmdpos)) {
+			/*
+			 * Either a () token, or a command word with
+			 * something suspiciously like a ksh function
+			 * definition.
+			 * The current word isn't spellcheckable.
+			 */
+			nocorrect |= 2;
 			goto brk;
+		    }
 		}
 		/*
 		 * This also handles the [k]sh `foo( )' function definition.

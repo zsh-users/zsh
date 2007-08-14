@@ -1,3 +1,9 @@
+2007-08-14  Peter Stephenson  <pws@csr.com>
+
+	* 23757: Src/lex.c: suppression correction of command
+	words immediately followed by () or something that looks
+	like it's going to be one.
+
 2007-08-12  Andrey Borzenkov <bor@zsh.org>
 
 	* 23751: Completion/Linux/Command/_modutils: support for
