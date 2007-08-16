@@ -2248,6 +2248,10 @@ char *argv[];
   zsh_cv_sys_elf=yes,
   zsh_cv_sys_elf=no,
   zsh_cv_sys_elf=yes)])
+
+  # We use [0-9]* in case statements, so need to change quoting
+  changequote(, )
+
   DL_EXT="${DL_EXT=so}"
   if test x$zsh_cv_sys_elf = xyes; then
     case "$host" in
@@ -2350,6 +2354,10 @@ char *argv[];
       esac
     ;;
   esac
+
+  # Done with our shell code, so restore autotools quoting
+  changequote([, ])
+
 AC_CACHE_CHECK(if we can use -rdynamic, zsh_cv_rdynamic_available,
 old_LDFLAGS="$LDFLAGS"
 LDFLAGS="$LDFLAGS -rdynamic"
