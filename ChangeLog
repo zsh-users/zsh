@@ -1,3 +1,8 @@
+2007-08-16  Peter Stephenson  <pws@csr.com>
+
+	* 23761: Doc/Zsh/calsys.yo, Functions/Calendar/calendar:
+	calendar -b shows brief output.
+
 2007-08-14  Peter Stephenson  <pws@csr.com>
 
 	* 23759: Doc/Zsh/contrib.yo, Functions/MIME/pick-web-browser:

@@ -309,8 +309,8 @@ subsect(Calendar system functions)
 
 startitem()
 findex(calendar)
-xitem(tt(calendar) [ tt(-adDsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ [ var(start) ] var(end) ])(
-item(tt(calendar -r) [ tt(-adDrsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ var(start) ])(
+xitem(tt(calendar) [ tt(-abdDsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ [ var(start) ] var(end) ])(
+item(tt(calendar -r) [ tt(-abdDrsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ var(start) ])(
 Show events in the calendar.
 
 With no arguments, show events from the start of today until the end of
@@ -341,6 +341,10 @@ startitem()
 item(tt(-a))(
 Show all items in the calendar, regardless of the tt(start) and
 tt(end).
+)
+item(tt(-b))(
+Brief:  don't display continuation lines (i.e. indented lines following
+the line with the date/time), just the first line.
 )
 item(tt(-C) var(calfile))(
 Explicitly specify a calendar file instead of the value of

@@ -1,11 +1,11 @@
 emulate -L zsh
 setopt extendedglob
 
-local line restline REPLY REPLY2 userange pruned nobackup datefmt
+local line showline restline REPLY REPLY2 userange pruned nobackup datefmt
 local calendar donefile sched newfile warnstr mywarnstr newdate
 integer time start stop today ndays y m d next=-1 shown done nodone
 integer verbose warntime mywarntime t tcalc tsched i rstat remaining
-integer showcount icount repeating repeattime resched showall
+integer showcount icount repeating repeattime resched showall brief
 local -a calendar_entries calendar_addlines
 local -a times calopts showprog lockfiles match mbegin mend
 
@@ -99,6 +99,11 @@ while [[ ${argv[opti+1]} = -* ]]; do
       (a)
       # Show all entries
       (( showall = 1 ))
+      ;;
+
+      (b)
+      # Brief: don't show continuation lines
+      (( brief = 1 ))
       ;;
 
       (d)
@@ -284,16 +289,21 @@ fi
       fi
     fi
     (( shown = 0 ))
+    if (( brief )); then
+      showline=${line%%$'\n'*}
+    else
+      showline=$line
+    fi
     if (( showall || (t >= start && (remaining || t <= stop || icount < showcount)) ))
     then
-      $showprog $start $stop "$line"
+      $showprog $start $stop "$showline"
       (( icount++ ))
       # Doesn't count as "shown" unless the event has now passed.
       (( t <= EPOCHSECONDS )) && (( shown = 1 ))
     elif [[ -n $sched ]]; then
       (( tsched = t - mywarntime ))
       if (( tsched >= start && tsched <= stop)); then
-	$showprog $start $stop "due in ${mywarnstr}: $line"
+	$showprog $start $stop "due in ${mywarnstr}: $showline"
       fi
     fi
     if [[ -n $sched ]]; then
