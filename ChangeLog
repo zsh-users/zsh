@@ -1,5 +1,8 @@
 2007-08-16  Peter Stephenson  <pws@csr.com>
 
+	* Roy Marples: 23762: configure.ac: need to suppress [...] quoting
+	for use of [...] in case.
+
 	* 23761: Doc/Zsh/calsys.yo, Functions/Calendar/calendar:
 	calendar -b shows brief output.
 
