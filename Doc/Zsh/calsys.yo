@@ -50,6 +50,12 @@ that continues the description of the event from the preceeding line
 (note the date may not be continued in this way).  An initial ampersand
 (tt(&)) is ignored for compatibility.
 
+An indented line on which the first non-whitespace character is tt(#)
+is not displayed with the calendar entry, but is still scanned for
+information.  This can be used to hide information useful to the
+calendar system but not to the user, such as the unique identifier
+used by tt(calendar_add).
+
 The Emacs extension that a date with no description may refer to a number
 of succeeding events at different times is not supported.
 
@@ -289,13 +295,18 @@ as recommended above.
 example(Feb 1, 2006 14:30 Pointless bureaucratic meeting
 Mar 27, 2006 11:00 Mutual recrimination and finger pointing
   Bring water pistol and waterproofs
+Mar 31, 2006 14:00 Very serious managerial pontification
+  # UID 12C7878A9A50
 Apr 10, 2006 13:30 Even more pointless blame assignment exercise WARN 30 mins
 May 18, 2006 16:00 Regular moaning session RPT monthly, 3rd Thursday)
 
-The second entry has a continuation line.  The third entry will produce
-a warning 30 minutes before the event (to allow you to equip yourself
-appropriately).  The fourth entry repeats after a month on the 3rd
-Thursday, i.e. June 15, 2006, at the same time.
+The second entry has a continuation line.  The third entry has a
+continuation line that will not be shown when the entry is displayed, but
+the unique identifier will be used by the tt(calendar_add) function when
+updating the event.  The fourth entry will produce a warning 30 minutes
+before the event (to allow you to equip yourself appropriately).  The fifth
+entry repeats after a month on the 3rd Thursday, i.e. June 15, 2006, at the
+same time.
 
 texinode(Calendar System User Functions)(Calendar Styles)(Calendar File and Date Formats)(Calendar Function System)
 sect(User Functions)
@@ -415,16 +426,32 @@ enditem()
 findex(calendar_add)
 item(tt(calendar_add) [ tt(-BL) ] var(event ...))(
 Adds a single event to the calendar in the appropriate location.
+The event can contain multiple lines, as described in
+ifnzman(noderef(Calendar File and Date Formats))\
+ifzman(the section Calendar File Format above).
 Using this function ensures that the calendar file is sorted in date
 and time order.  It also makes special arrangments for locking
-the file will it is altered.  The old calendar is left in a file
+the file while it is altered.  The old calendar is left in a file
 with the suffix tt(.old).
 
 The option tt(-B) indicates that backing up the calendar file will be
 handled by the caller and should not be performed by tt(calendar_add).  The
 option tt(-L) indicates that tt(calendar_add) does not need to lock the
-calendar file up the old one as it is already locked.  These options will
-not usually be needed by users.
+calendar file as it is already locked.  These options will not usually be
+needed by users.
+
+The function can use a unique identifier stored with each event to ensure
+that updates to existing events are treated correctly.  The entry
+should contain the word tt(UID), followed by whitespace, followed by
+a word consisting entirely of hexadecimal digits of arbitrary length
+(all digits are significant, including leading zeroes).  As the UID
+is not directly useful to the user, it is convenient to hide it on
+an indented continuation line starting with a tt(#), for example:
+
+example(Aug 31, 2007 09:30  Celebrate the end of the holidays
+  # UID 045B78A0)
+
+The second line will not be shown by the tt(calendar) function.
 )
 findex(calendar_edit)
 item(tt(calendar_edit))(

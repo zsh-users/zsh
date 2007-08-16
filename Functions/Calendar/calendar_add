@@ -12,7 +12,7 @@ setopt extendedglob
 
 local calendar newfile REPLY lastline opt
 local -a calendar_entries lockfiles
-integer newdate done rstat nolock nobackup
+integer my_date done rstat nolock nobackup
 
 autoload -U calendar_{read,lockfiles,scandate}
 
@@ -42,9 +42,19 @@ if ! calendar_scandate -a "$*"; then
   print "$0: failed to parse date/time" >&2
   return 1
 fi
-(( newdate = $REPLY ))
+(( my_date = $REPLY ))
 
 # $calendar doesn't necessarily exist yet.
+
+local -a match mbegin mend
+local my_uid their_uid
+
+# Match a UID, a unique identifier for the entry inherited from
+# text/calendar format.
+local uidpat='(|*[[:space:]])UID[[:space:]]##(#b)([[:xdigit:]]##)(|[[:space:]]*)'
+if [[ "$*" = ${~uidpat} ]]; then
+  my_uid=$match[1]
+fi
 
 # start of block for following always to clear up lockfiles.
 {
@@ -55,15 +65,22 @@ fi
 
     {
       for line in $calendar_entries; do
-	if (( ! done )) && calendar_scandate -a $line && (( REPLY > newdate )); then
+	if (( ! done )) && calendar_scandate -a $line && (( REPLY > my_date )); then
 	  print -r -- "$*"
 	  (( done = 1 ))
-	elif [[ $REPLY -eq $newdate && $line = "$*" ]]; then
+	fi
+	# Don't save this entry if it has the same UID as the new one.
+	if [[ -n $my_uid && $line = ${~uidpat} ]]; then
+	  their_uid=$match[1]
+	  [[ ${(U)my_uid} = ${(U)their_uid} ]] && continue
+	fi
+	if [[ $REPLY -eq $my_date && $line = "$*" ]]; then
+	  (( done )) && continue # paranoia: shouldn't happen
 	  (( done = 1 ))
 	fi
 	print -r -- $line
-	done
-	(( done )) || print -r -- "$*"
+      done
+      (( done )) || print -r -- "$*"
     } >$newfile
     if (( ! nobackup )); then
       if ! mv $calendar $calendar.old; then

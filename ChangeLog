@@ -1,5 +1,9 @@
 2007-08-16  Peter Stephenson  <pws@csr.com>
 
+	* 23764: Doc/Zsh/calsys.yo, Functions/Calendar/calendar,
+	Functions/Calendar/calendar_add: allow hidden continuation
+	lines in calendar entry and use UID to help with updates.
+
 	* Roy Marples: 23762: configure.ac: need to suppress [...] quoting
 	for use of [...] in case.
 
