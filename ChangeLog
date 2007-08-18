@@ -1,3 +1,8 @@
+2007-08-18  Clint Adams  <clint@zsh.org>
+
+	* 23775: Completion/Unix/Command/_growisofs:
+	restore completion of devicename=filename pairs after -Z and -M.
+
 2007-08-16  Peter Stephenson  <pws@csr.com>
 
 	* 23764: Doc/Zsh/calsys.yo, Functions/Calendar/calendar,

@@ -1,5 +1,8 @@
 #compdef mkisofs growisofs
 
+local context state line
+typeset -A opt_args
+
 declare -a find_options
 
 find_options=(
@@ -181,8 +184,8 @@ else
 
   if [[ $service == growisofs ]]; then
     growisofs_options=(
-      '-Z[burn an initial session to the selected device]:device:_files -g "*(%,@)"'
-      '-M[merge a session with an existing one on the selected device]:device:_files -g "*(%,@)"'
+      '-Z[burn an initial session to the selected device]:device:->devimg'
+      '-M[merge a session with an existing one on the selected device]:device:->devimg'
       '-dvd-compat[provide maximum compatibility with DVD-ROM/Video]'
       '-dry-run[do everything up to the actual burning process]'
       '-overburn[allow overburning of the media]'
@@ -328,5 +331,15 @@ else
     '(- *)-help[display help message]' \
     '(- *)-version[display version information]' \
     $growisofs_options \
-    '*:pathspec:_mkisofs_pathspec'
+    '*:pathspec:_mkisofs_pathspec' && return 0
+
+    case "$state" in
+      (devimg)
+      if compset -P \*=; then
+        _files
+      else
+        _files -g "*(%,@)"
+      fi
+      ;;
+      esac
 fi
