@@ -1,3 +1,8 @@
+2007-08-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23778: Doc/Zsh/builtins.yo: document KSH_TYPESET behaviour
+	in the typeset manual entry.
+
 2007-08-18  Clint Adams  <clint@zsh.org>
 
 	* 23775: Completion/Unix/Command/_growisofs:
