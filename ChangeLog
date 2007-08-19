@@ -1,5 +1,10 @@
 2007-08-19  Clint Adams  <clint@zsh.org>
 
+	* R.Ramkumar: 23783: Completion/Zsh/Command/_command,
+	Completion/Zsh/Command/_hash, Completion/Zsh/Command/_which,
+	Completion/Zsh/Context/_equal, Completion/Zsh/Type/_command_names:
+	use _path_commands.
+
 	* R.Ramkumar, tweaked: 23782: Completion/Unix/Type/_path_commands:
 	commands with descriptions.
 

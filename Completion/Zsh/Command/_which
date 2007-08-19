@@ -28,7 +28,7 @@ if [[ "$state" = command ]]; then
   args=( "$@" )
 
   _alternative -O args \
-    'commands:external command:compadd -k commands' \
+    'commands:external command:_path_commands' \
     'builtins:builtin command:compadd -k builtins' \
     'functions:shell function:compadd -k functions' \
     'aliases:alias:compadd -k aliases' \

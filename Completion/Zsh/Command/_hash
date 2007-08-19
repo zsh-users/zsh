@@ -33,7 +33,8 @@ if [[ $state = hashval ]]; then
   elif compset -P 1 '*='; then
     _wanted -C value values expl 'executable file' _files -g '*(-*)' && ret=0
   else
-    _wanted -C name commands expl command compadd -q -S '=' -k commands && ret=0
+    curcontext="${curcontext%:*}:name"
+    _path_commands -q -S '=' && ret=0
   fi
 fi
 

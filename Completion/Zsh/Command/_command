@@ -1,10 +1,12 @@
 #compdef command
 
+local ret
+
 if [[ CURRENT -ge 3 ]]; then
   compset -n 2
-  _normal
+  _normal && ret=0
 else
-  local expl
-
-  _wanted commands expl 'external command' compadd "$@" -k commands
+  _path_commands "$@" && ret=0
 fi
+
+return ret
