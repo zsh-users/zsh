@@ -1,5 +1,6 @@
 #compdef dput
 
+_dput() {
 _arguments \
   '(-c --config)'{-c,--config}'[specify config file]:config file:_files' \
   '(-d --debug)'{-d,--debug}'[debug mode]' \
@@ -13,5 +14,19 @@ _arguments \
   '(-s --simulate)'{-s,--simulate}'[simulate an upload only]' \
   '(-u --unchecked)'{-u,--unchecked}'[do not check GPG signature on the changes file]' \
   '(-v --version)'{-v,--version}'[show version information]' \
-  '1::host:_hosts' \
+  '1::host:_dput_hosts' \
   '*:changes file:_files -g "*.changes(-.)"'
+}
+
+_dput_hosts() {
+  local expl
+
+  if ( [[ ${+_dput_cfhosts} -eq 0 ]] || _cache_invalid dputhosts ) && ! _retrieve_cache dputhosts; then
+    _dput_cfhosts=(${${(M)${(f)"$(dput -H)"}:#*=>*}/ =>*/})
+    _store_cache dputhosts _dput_cfhosts
+  fi
+
+  _wanted dputhosts expl 'target host' compadd -a _dput_cfhosts
+}
+
+_dput "$@"
