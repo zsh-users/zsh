@@ -1,3 +1,8 @@
+2007-08-19  Clint Adams  <clint@zsh.org>
+
+	* 23780: Completion/Debian/Command/_dput: add -e, -H, and
+	optional host argument.
+
 2007-08-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23778: Doc/Zsh/builtins.yo: document KSH_TYPESET behaviour
