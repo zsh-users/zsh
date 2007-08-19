@@ -1,5 +1,8 @@
 2007-08-19  Clint Adams  <clint@zsh.org>
 
+	* R.Ramkumar, tweaked: 23782: Completion/Unix/Type/_path_commands:
+	commands with descriptions.
+
 	* 23781: Completion/Debian/Command/_dput: base host completion
 	on output of `dput -H`.
 
