@@ -4124,6 +4124,51 @@ hasspecial(char const *s)
     return 0;
 }
 
+
+static char *
+addunprintable(char *v, const char *u, const char *uend)
+{
+    for (; u < uend; u++) {
+	/*
+	 * Just do this byte by byte; there's no great
+	 * advantage in being clever with multibyte
+	 * characters if we don't think they're printable.
+	 */
+	int c;
+	if (*u == Meta)
+	    c = STOUC(*++u ^ 32);
+	else
+	    c = STOUC(*u);
+	switch (c) {
+	case '\0':
+	    *v++ = '\\';
+	    *v++ = '0';
+	    if ('0' <= u[1] && u[1] <= '7') {
+		*v++ = '0';
+		*v++ = '0';
+	    }
+	    break;
+
+	case '\007': *v++ = '\\'; *v++ = 'a'; break;
+	case '\b': *v++ = '\\'; *v++ = 'b'; break;
+	case '\f': *v++ = '\\'; *v++ = 'f'; break;
+	case '\n': *v++ = '\\'; *v++ = 'n'; break;
+	case '\r': *v++ = '\\'; *v++ = 'r'; break;
+	case '\t': *v++ = '\\'; *v++ = 't'; break;
+	case '\v': *v++ = '\\'; *v++ = 'v'; break;
+
+	default:
+	    *v++ = '\\';
+	    *v++ = '0' + ((c >> 6) & 7);
+	    *v++ = '0' + ((c >> 3) & 7);
+	    *v++ = '0' + (c & 7);
+	    break;
+	}
+    }
+
+    return v;
+}
+
 /*
  * Quote the string s and return the result.
  *
@@ -4142,8 +4187,16 @@ quotestring(const char *s, char **e, int instring)
 {
     const char *u, *tt;
     char *v;
-    char *buf = hcalloc(4 * strlen(s) + 1);
+    /*
+     * With QT_BACKSLASH we may need to use $'\300' stuff.
+     * Keep memory usage within limits by allocating temporary
+     * storage and using heap for correct size at end.
+     */
+    int alloclen = (instring == QT_BACKSLASH ? 7 : 4) * strlen(s) + 1;
+    char *buf = zshcalloc(alloclen);
     int sf = 0;
+    convchar_t cc;
+    const char *uend;
 
     DPUTS(instring < QT_BACKSLASH || instring > QT_DOLLARS,
 	  "BUG: bad quote type in quotestring");
@@ -4154,10 +4207,9 @@ quotestring(const char *s, char **e, int instring)
 	 * As we test for printability here we need to be able
 	 * to look for multibyte characters.
 	 */
-	convchar_t cc;
 	MB_METACHARINIT();
 	while (*u) {
-	    const char *uend = u + MB_METACHARLENCONV(u, &cc);
+	    uend = u + MB_METACHARLENCONV(u, &cc);
 
 	    if (e && !sf && *e <= u) {
 		*e = v;
@@ -4183,53 +4235,19 @@ quotestring(const char *s, char **e, int instring)
 		    *v++ = *u++;
 	    } else {
 		/* Not printable */
-		for (; u < uend; u++) {
-		    /*
-		     * Just do this byte by byte; there's no great
-		     * advantage in being clever with multibyte
-		     * characters if we don't think they're printable.
-		     */
-		    int c;
-		    if (*u == Meta)
-			c = STOUC(*++u ^ 32);
-		    else
-			c = STOUC(*u);
-		    switch (c) {
-		    case '\0':
-			*v++ = '\\';
-			*v++ = '0';
-			if ('0' <= u[1] && u[1] <= '7') {
-			    *v++ = '0';
-			    *v++ = '0';
-			}
-			break;
-
-		    case '\007': *v++ = '\\'; *v++ = 'a'; break;
-		    case '\b': *v++ = '\\'; *v++ = 'b'; break;
-		    case '\f': *v++ = '\\'; *v++ = 'f'; break;
-		    case '\n': *v++ = '\\'; *v++ = 'n'; break;
-		    case '\r': *v++ = '\\'; *v++ = 'r'; break;
-		    case '\t': *v++ = '\\'; *v++ = 't'; break;
-		    case '\v': *v++ = '\\'; *v++ = 'v'; break;
-
-		    default:
-			*v++ = '\\';
-			*v++ = '0' + ((c >> 6) & 7);
-			*v++ = '0' + ((c >> 3) & 7);
-			*v++ = '0' + (c & 7);
-			break;
-		    }
-		}
+		v = addunprintable(v, u, uend);
+		u = uend;
 	    }
 	}
     }
     else
     {
 	/*
-	 * Here the only special characters are syntactic, so
-	 * we can go through bytewise.
+	 * Here there are syntactic special characters, so
+	 * we start by going through bytewise.
 	 */
-	for (; *u; u++) {
+	while (*u) {
+	    int dobackslash = 0;
 	    if (e && *e == u)
 		*e = v, sf = 1;
 	    if (*u == Tick || *u == Qtick) {
@@ -4239,8 +4257,6 @@ quotestring(const char *s, char **e, int instring)
 		while (*u && *u != c)
 		    *v++ = *u++;
 		*v++ = c;
-		if (!*u)
-		    u--;
 		continue;
 	    } else if ((*u == Qstring || *u == '$') && u[1] == '\'' &&
 		       instring == QT_DOUBLE) {
@@ -4268,9 +4284,7 @@ quotestring(const char *s, char **e, int instring)
 		    *v++ = *u++;
 		}
 		if (*u)
-		    *v++ = *u;
-		else
-		    u--;
+		    *v++ = *u++;
 		continue;
 	    }
 	    else if (ispecial(*u) &&
@@ -4296,13 +4310,51 @@ quotestring(const char *s, char **e, int instring)
 			*v++ = '"', *v++ = '\n', *v++ = '"';
 		    else
 			*v++ = '\'', *v++ = '\'';
+		    u++;
 		    continue;
-		} else
-		    *v++ = '\\';
+		} else {
+		    /*
+		     * We'll need a backslash, but don't add it
+		     * yet since if the character isn't printable
+		     * we'll have to upgrade it to $'...'.
+		     */
+		    dobackslash = 1;
+		}
 	    }
-	    if(*u == Meta)
+
+	    if (itok(*u) || instring != QT_BACKSLASH) {
+		/* Needs to be passed straight through. */
+		if (dobackslash)
+		    *v++ = '\\';
 		*v++ = *u++;
-	    *v++ = *u;
+		continue;
+	    }
+
+	    /*
+	     * Now check if the output is unprintable in the
+	     * current character set.
+	     */
+	    uend = u + MB_METACHARLENCONV(u, &cc);
+	    if (
+#ifdef MULTIBYTE_SUPPORT
+		cc != WEOF &&
+#endif
+		WC_ISPRINT(cc)) {
+		if (dobackslash)
+		    *v++ = '\\';
+		while (u < uend) {
+		    if (*u == Meta)
+			*v++ = *u++;
+		    *v++ = *u++;
+		}
+	    } else {
+		/* Not printable */
+		*v++ = '$';
+		*v++ = '\'';
+		v = addunprintable(v, u, uend);
+		*v++ = '\'';
+		u = uend;
+	    }
 	}
     }
     *v = '\0';
@@ -4311,7 +4363,9 @@ quotestring(const char *s, char **e, int instring)
 	*e = v, sf = 1;
     DPUTS(e && !sf, "BUG: Wild pointer *e in quotestring()");
 
-    return buf;
+    v = dupstring(buf);
+    zfree(buf, alloclen);
+    return v;
 }
 
 /* Unmetafy and output a string, quoted if it contains special characters. */
