@@ -1,5 +1,9 @@
 2007-08-21  Clint Adams  <clint@zsh.org>
 
+	* 23788: Doc/Zsh/mod_files.yo, Src/Modules/files.c: add -h option
+	to chown symlinks rather than targets, and change default behavior
+	to do the opposite.
+
 	* Matthieu Moy: 23785: Completion/Unix/Command/_git: add missing
 	backslash in _arguments list in git-send-email.
 

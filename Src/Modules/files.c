@@ -593,12 +593,26 @@ chown_dochown(char *arg, char *rp, UNUSED(struct stat const *sp), void *magic)
 {
     struct chownmagic *chm = magic;
 
+    if(chown(rp, chm->uid, chm->gid)) {
+	zwarnnam(chm->nam, "%s: %e", arg, errno);
+	return 1;
+    }
+    return 0;
+}
+
+/**/
+static int
+chown_dolchown(char *arg, char *rp, UNUSED(struct stat const *sp), void *magic)
+{
+    struct chownmagic *chm = magic;
+
     if(lchown(rp, chm->uid, chm->gid)) {
 	zwarnnam(chm->nam, "%s: %e", arg, errno);
 	return 1;
     }
     return 0;
 }
+
 
 /**/
 static unsigned long getnumeric(char *p, int *errp)
@@ -684,7 +698,8 @@ bin_chown(char *nam, char **args, Options ops, int func)
     }
     free(uspec);
     return recursivecmd(nam, 0, OPT_ISSET(ops,'R'), OPT_ISSET(ops,'s'),
-	args + 1, chown_dochown, recurse_donothing, chown_dochown, &chm);
+	args + 1, OPT_ISSET(ops, 'h') ? chown_dolchown : chown_dochown, recurse_donothing,
+	OPT_ISSET(ops, 'h') ? chown_dolchown : chown_dochown, &chm);
 }
 
 /* module paraphernalia */
@@ -696,8 +711,8 @@ bin_chown(char *nam, char **args, Options ops, int func)
 #endif
 
 static struct builtin bintab[] = {
-    BUILTIN("chgrp", 0, bin_chown, 2, -1, BIN_CHGRP, "Rs",    NULL),
-    BUILTIN("chown", 0, bin_chown, 2, -1, BIN_CHOWN, "Rs",    NULL),
+    BUILTIN("chgrp", 0, bin_chown, 2, -1, BIN_CHGRP, "hRs",    NULL),
+    BUILTIN("chown", 0, bin_chown, 2, -1, BIN_CHOWN, "hRs",    NULL),
     BUILTIN("ln",    0, bin_ln,    1, -1, BIN_LN,    LN_OPTS, NULL),
     BUILTIN("mkdir", 0, bin_mkdir, 1, -1, 0,         "pm:",   NULL),
     BUILTIN("mv",    0, bin_ln,    2, -1, BIN_MV,    "fi",    NULL),
