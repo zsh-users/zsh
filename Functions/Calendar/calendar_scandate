@@ -257,54 +257,64 @@ else
 fi
 
 # Look for a time separately; we need colons for this.
-case $line in
-  # with seconds, am/pm: don't match / in front.
-  ((#ibm)${~tspat}(<0-12>):(<0-59>)[.:]((<0-59>)(.<->|))[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))(*))
+# We want to look for the first time to ensure it's associated
+# with a date at the start of the line.  Of course there may be
+# a time followed by some other text followed by a date, but
+# in that case the whole thing is too ambiguous to worry about
+# (and we don't need to worry about this for a calendar entry where
+# the date must be at the start).
+#
+# We do this by minimal matching at the head, i.e. ${...#...}.
+# To use a case statement we'd need to be able to request non-greedy
+# matching for a pattern.
+rest=${line#(#ibm)${~tspat}(<0-12>):(<0-59>)[.:]((<0-59>)(.<->|))[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))}
+if [[ $rest != $line ]]; then
   hour=$match[2]
   minute=$match[3]
   second=$match[5]
   [[ $match[7] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
   time_found=1
-  ;;
-
+else
   # no seconds, am/pm
-  ((#ibm)${~tspat}(<0-12>):(<0-59>)[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))(*))
-  hour=$match[2]
-  minute=$match[3]
-  [[ $match[4] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
-  time_found=1
-  ;;
-
-  # no colon, even, but a.m./p.m. indicator
-  ((#ibm)${~tspat}(<0-12>)[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))(*))
-  hour=$match[2]
-  minute=0
-  [[ $match[3] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
-  time_found=1
-  ;;
-
-  # 24 hour clock, with seconds
-  ((#ibm)${~tspat}(<0-24>):(<0-59>)[.:]((<0-59>)(.<->|))(*))
-  hour=$match[2]
-  minute=$match[3]
-  second=$match[5]
-  time_found=1
-  ;;
-
-  # 24 hour clock, no seconds
-  ((#ibm)${~tspat}(<0-24>):(<0-59>)(*))
-  hour=$match[2]
-  minute=$match[3]
-  time_found=1
-  ;;
-esac
-
+  rest=${line#(#ibm)${~tspat}(<0-12>):(<0-59>)[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))}
+  if [[ $rest != $line ]]; then
+    hour=$match[2]
+    minute=$match[3]
+    [[ $match[4] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
+    time_found=1
+  else
+    # no colon, even, but a.m./p.m. indicator
+    rest=${line#(#ibm)${~tspat}(<0-12>)[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))}
+    if [[ $rest != $line ]]; then
+      hour=$match[2]
+      minute=0
+      [[ $match[3] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
+      time_found=1
+    else
+      # 24 hour clock, with seconds
+      rest=${line#(#ibm)${~tspat}(<0-24>):(<0-59>)[.:]((<0-59>)(.<->|))(.|[[:space:]]|(#e))}
+      if [[ $rest != $line ]]; then
+	hour=$match[2]
+	minute=$match[3]
+	second=$match[5]
+	time_found=1
+      else
+	rest=${line#(#ibm)${~tspat}(<0-24>):(<0-59>)(.|[[:space:]]|(#e))}
+	if [[ $rest != $line ]]; then
+	  hour=$match[2]
+	  minute=$match[3]
+	  time_found=1
+	fi
+      fi
+    fi
+  fi
+fi
 (( hour == 24 )) && hour=0
 
 if (( time_found )); then
   # time was found
   time_start=$mbegin[2]
-  time_end=$mend[-2]
+  time_end=$mend[-1]
   # Remove the timespec because it may be in the middle of
   # the date (as in the output of "date".
   # There may be a time zone, too, which we don't yet handle.

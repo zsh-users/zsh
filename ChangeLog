@@ -1,5 +1,9 @@
 2007-08-21  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Calendar/calendar_scandate: ensure we
+	match the first time on the line so as to hook up with date.
+	Could usefully be done with the date too, but not as crucial.
+
 	* users/11790: Functions/Zle/{up,down}-line-or-beginning-search:
 	emulate -L zsh to avoid nounset problem.
 
