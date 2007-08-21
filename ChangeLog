@@ -1,7 +1,7 @@
 2007-08-21  Clint Adams  <clint@zsh.org>
 
 	* Matthieu Moy: 23785: Completion/Unix/Command/_git: add missing
-	backslash in _arguments list.
+	backslash in _arguments list in git-send-email.
 
 2007-08-21  Peter Stephenson  <pws@csr.com>
 

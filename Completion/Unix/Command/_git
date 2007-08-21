@@ -1403,7 +1403,7 @@ _git-send-email () {
     '--in-reply-to[specify the contents of the first In-Reply-To header]' \
     '--smtp-server[specify the outgoing smtp server]:smtp server:_hosts' \
     '--subject[specify the initial subject of the email thread]' \
-    '--to[specify the primary recipient of the emails]'
+    '--to[specify the primary recipient of the emails]' \
     ':file:_files' && ret=0
 }
 
