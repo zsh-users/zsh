@@ -1,6 +1,8 @@
 # Like down-line-or-search, but uses the whole line prefix up to the
 # cursor position for searching forwards.
 
+emulate -L zsh
+
 if [[ ${+NUMERIC} -eq 0 &&
     ( $LASTWIDGET = $__searching || $RBUFFER != *$'\n'* ) ]]
 then

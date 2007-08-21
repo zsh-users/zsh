@@ -1,6 +1,8 @@
 # Like up-line-or-search, but uses the whole line prefix up to the
 # cursor position for searching backwards.
 
+emulate -L zsh
+
 if [[ $LBUFFER == *$'\n'* ]]; then
   zle .up-line-or-history
   __searching=''

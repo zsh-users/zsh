@@ -1,3 +1,8 @@
+2007-08-21  Peter Stephenson  <pws@csr.com>
+
+	* users/11790: Functions/Zle/{up,down}-line-or-beginning-search:
+	emulate -L zsh to avoid nounset problem.
+
 2007-08-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23784: Src/utils.c: Use $'\...' quoting for unparseable and
