@@ -1,5 +1,9 @@
 2007-08-22  Peter Stephenson  <pws@csr.com>
 
+	* 23794: Src/Zle/compresult.c: completing on 'echo "foo$"<TAB>'
+	was broken.  The code is as opaque as usual but preventing the
+	crash seems straightforward.
+
 	* 23792: Doc/Zsh/expn.yo, Test/D07multibyte.ztst:  test
 	and documentation for 23784.
 

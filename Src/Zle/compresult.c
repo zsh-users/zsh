@@ -1148,7 +1148,7 @@ do_single(Cmatch m)
 		makesuffixstr(m->remf, m->rems, 1);
 	}
     }
-    if (minfo.we && partest && isset(AUTOPARAMKEYS)) {
+    if (minfo.we && partest && isset(AUTOPARAMKEYS) && minfo.insc - parq > 0) {
 	/* the suffix code needs numbers of characters, not octets */
 	int outlen;
 	char *tmpstr = dupstrpfx(zlemetaline + parq, minfo.insc - parq);
