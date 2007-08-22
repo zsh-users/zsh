@@ -22,7 +22,7 @@
 # The main widget function.
 
 incremental-complete-word() {
-  #emulate -L zsh
+  emulate -L zsh
   unsetopt autolist menucomplete automenu # doesn't work well
 
   local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt pstr word

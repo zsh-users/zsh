@@ -179,9 +179,9 @@ void
 zwcputc(ZLE_INT_T c)
 {
 #ifdef MULTIBYTE_SUPPORT
-    char mbtmp[MB_CUR_MAX + 1];
     mbstate_t mbstate;
     int i;
+    VARARR(char, mbtmp, MB_CUR_MAX + 1);
 
     if (c == WEOF)
 	return;

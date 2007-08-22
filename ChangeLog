@@ -1,3 +1,11 @@
+2007-08-22  Peter Stephenson  <pws@csr.com>
+
+	* 23791: Src/Zle/zle_refresh.c: use VARARR for arrays with
+	MB_CUR_MAX.
+
+	* users/11791: Functions/Zle/incremental-complete-word:
+	missing "emulate -L zsh": was commented out, not sure why.
+
 2007-08-21  Clint Adams  <clint@zsh.org>
 
 	* 23788: Doc/Zsh/mod_files.yo, Src/Modules/files.c: add -h option
