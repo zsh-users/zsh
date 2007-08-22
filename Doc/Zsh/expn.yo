@@ -792,10 +792,14 @@ have `tt(foo=bar)' and `tt(bar=baz)', the strings tt(${(P)foo}),
 tt(${(P)${foo}}), and tt(${(P)$(echo bar)}) will be expanded to `tt(baz)'.
 )
 item(tt(q))(
-Quote the resulting words with backslashes. If this flag is given
+Quote the resulting words with backslashes; unprintable or invalid
+characters are quoted using the tt($'\)var(NNN)tt(') form, with separate
+quotes for each octet.  If this flag is given
 twice, the resulting words are quoted in single quotes and if it is
-given three times, the words are quoted in double quotes. If it is
-given four times, the words are quoted in single quotes preceded by a tt($).
+given three times, the words are quoted in double quotes; in these forms
+no special handling of unprintable or invalid characters is attempted.  If
+the flag is given four times, the words are quoted in single quotes
+preceded by a tt($).
 )
 item(tt(Q))(
 Remove one level of quotes from the resulting words.

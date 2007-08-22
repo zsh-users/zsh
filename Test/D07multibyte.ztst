@@ -378,3 +378,9 @@
 >ngs200.txt
 >ngs20.txt
 >ngs2.txt
+
+# Not strictly multibyte, but gives us a well-defined locale for testing.
+  foo=$'X\xc0Y\x07Z\x7fT'
+  print -r ${(q)foo}
+0:Backslash-quoting of unprintable/invalid characters uses $'...'
+>X$'\300'Y$'\a'Z$'\177'T
