@@ -1556,6 +1556,7 @@ mod_export int
 parse_subst_string(char *s)
 {
     int c, l = strlen(s), err, olen, lexstop_ret;
+    char *ptr;
 
     if (!*s || !strcmp(s, nulstring))
 	return 0;
@@ -1593,6 +1594,43 @@ parse_subst_string(char *s)
 	return 1;
     }
 #endif
+    /* Check for $'...' quoting.  This needs special handling. */
+    for (ptr = s; *ptr; )
+    {
+	if (*ptr == String && ptr[1] == Snull)
+	{
+	    char *t;
+	    int len, tlen, diff;
+	    t = getkeystring(ptr + 2, &len, GETKEYS_DOLLARS_QUOTE, NULL);
+	    len += 2;
+	    tlen = strlen(t);
+	    diff = len - tlen;
+	    /*
+	     * Yuk.
+	     * parse_subst_string() currently handles strings in-place.
+	     * That's not so easy to fix without knowing whether
+	     * additional memory should come off the heap or
+	     * otherwise.  So we cheat by copying the unquoted string
+	     * into place, unless it's too long.  That's not the
+	     * normal case, but I'm worried there are are pathological
+	     * cases with converting metafied multibyte strings.
+	     * If someone can prove there aren't I will be very happy.
+	     */
+	    if (diff < 0) {
+		DPUTS(1, "$'...' subst too long: fix get_parse_string()");
+		return 1;
+	    }
+	    memcpy(ptr, t, tlen);
+	    ptr += tlen;
+	    if (diff > 0) {
+		char *dptr = ptr;
+		char *sptr = ptr + diff;
+		while ((*dptr++ = *sptr++))
+		    ;
+	    }
+	} else
+	    ptr++;
+    }
     return 0;
 }
 

@@ -1,3 +1,8 @@
+2007-08-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23795: Src/lex.c: make ${(Q)...} handle $'...' correctly,
+	up to the problem of long flies in short ointments.
+
 2007-08-23  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Calendar/calendar_show: used subscript

@@ -320,6 +320,11 @@
 0:${(Q)...}
 >and now even the pubs are shut.
 
+  foo="X$'\x41'$'\x42'Y"
+  print -r ${(Q)foo}
+0:${(Q)...} with handling of $'...'
+>XABY
+
   psvar=(dog)
   setopt promptsubst
   foo='It shouldn'\''t $(happen) to a %1v.'
