@@ -1,3 +1,8 @@
+2007-08-23  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Calendar/calendar_show: used subscript
+	0 instead of 1, hence broken since 23562.
+
 2007-08-22  Peter Stephenson  <pws@csr.com>
 
 	* 23794: Src/Zle/compresult.c: completing on 'echo "foo$"<TAB>'

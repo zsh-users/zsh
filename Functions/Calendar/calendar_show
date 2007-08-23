@@ -16,8 +16,8 @@ if [[ -n $DISPLAY &&  $start -eq $stop ]]; then
   if [[ -n ${commands[xmessage]} ]]; then
     cmd=(xmessage -center)
   fi
-  if [[ -n $cmd[0] ]] &&
-    ! ps -u$UID | grep $cmd[0] >/dev/null 2>&1; then
+  if [[ -n $cmd[1] ]] &&
+    ! ps -u$UID | grep $cmd[1] >/dev/null 2>&1; then
     # turn off job control for this
     ($cmd "$*" &)
   fi
