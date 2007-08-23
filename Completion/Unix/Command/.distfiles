@@ -17,8 +17,10 @@ _bogofilter     _fsh            _mail           _qemu           _toilet
 _bzip2          _fuser          _make           _quilt          _totd
 _bzr            _gcc            _man            _raggle         _tracepath
 _cal            _gdb            _mencal         _rake           _twisted
+                _genisoimage
 _ccal           _getconf        _mercurial      _rar            _unace
 _cdcd           _getent         _metaflac       _rcs            _unexpand
+_cdrdao
 _cdrecord       _getmail        _mh             _renice         _uniq
 _chkconfig      _git            _mkdir          _ri             _user_admin
 _chmod          _global         _module         _rlogin         _vim
@@ -29,6 +31,7 @@ _configure      _gphoto2        _mt             _sablotron      _w3m
 _cowsay         _gprof          _mtools         _samba          _webbrowser
 _cp             _grep           _mtr            _sccs           _wget
 _cpio           _groff          _mutt           _screen         _whereis
+                _growisofs
 _cplay          _gs             _mysqldiff      _sed            _whois
 _cssh           _gzip           _mysql_utils    _sh             _wiggle
 _cvs            _iconv          _ncftp          _showmount      _xargs

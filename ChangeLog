@@ -1,5 +1,10 @@
 2007-08-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Config/version.mk,
+	Completion/Unix/Command/.distfiles,
+	Completion/Unix/Type/.distfiles: updates for dev version
+	I haven't got around to making yet, but one day soon.
+
 	* 23795: Src/lex.c: make ${(Q)...} handle $'...' correctly,
 	up to the problem of long flies in short ointments.
 
