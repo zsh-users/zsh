@@ -1,3 +1,9 @@
+2007-08-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23809: Src/Zle/zle_tricky.c: attempt to expand finished
+	$'...' expressions before or after the cursor in the
+	word being completed.
+
 2007-08-30  Peter Stephenson  <pws@csr.com>
 
 	* 23808: Src/utils.c: debugging to try to isolate intermittent

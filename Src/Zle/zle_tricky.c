@@ -1611,7 +1611,90 @@ get_comp_string(void)
     /* While building the quoted form, we also clean up the command line. */
     for (p = s, i = wb, j = 0; *p; p++, i++) {
 	int skipchars;
-	if ((*p == String || *p == Qstring) && p[1] == Snull)
+	if (*p == String && p[1] == Snull) {
+	    char *pe;
+	    for (pe = p + 2; *pe && *pe != Snull && i + (pe - p) < zlemetacs;
+		 pe++)
+		;
+	    if (!*pe) {
+		/* no terminating Snull, can't substitute */
+		skipchars = 2;
+	    } else {
+		/*
+		 * Try and substitute the $'...' expression.
+		 */
+		int len, tlen;
+		char *t = getkeystring(p + 2, &len, GETKEYS_DOLLARS_QUOTE,
+				       NULL);
+		len += 2;
+		tlen = strlen(t);
+		skipchars = len - tlen;
+		/*
+		 * If this makes the line longer, we don't attempt
+		 * to substitute it.  This is because "we" don't
+		 * really understand what the heck is going on anyway
+		 * and have blindly copied the code here from
+		 * the sections below.
+		 */
+		if (skipchars >= 0) {
+		    /* Update the completion string */
+		    memcpy(p, t, tlen);
+		    /* Update the version of the line we are operating on */
+		    ocs = zlemetacs;
+		    zlemetacs = i;
+		    if (skipchars > 0) {
+			/* Move the tail of the completion string up. */
+			char *dptr = p + tlen;
+			char *sptr = p + len;
+			while ((*dptr++ = *sptr++))
+			    ;
+			/*
+			 * If the character is before the cursor, we need to
+			 * update the offset into the completion string to the
+			 * cursor position, too.  (Use ocs since we've hacked
+			 * zlemetacs at this point.)
+			 */
+			if (i < ocs)
+			    offs -= skipchars;
+			/* Move the tail of the line up */
+			foredel(skipchars);
+			/*
+			 * Update the offset into the command line to the
+			 * cursor position if that's after the current position.
+			 */
+			if ((zlemetacs = ocs) > i)
+			    zlemetacs -= skipchars;
+			/* Always update the word end. */
+			we -= skipchars;
+		    }
+		    /*
+		     * Copy the unquoted string into place, which
+		     * now has the correct size.
+		     */
+		    memcpy(zlemetaline + i, t, tlen);
+
+		    /*
+		     * Move both the completion string pointer
+		     * and the command line offset to the end of
+		     * the chunk we've copied in (minus 1 for
+		     * the end of loop increment).  The line
+		     * and completion string chunks are now the
+		     * same length.
+		     */
+		    p += tlen - 1;
+		    i += tlen - 1;
+		    continue;
+		} else {
+		    /*
+		     * We give up if the expansion is longer the original
+		     * string.  That's because "we" don't really have the
+		     * first clue how the completion system actually works.
+		     */
+		    skipchars = 2;
+		}
+	    }
+	}
+	else if (*p == Qstring && p[1] == Snull)
 	    skipchars = 2;
 	else if (inull(*p))
 	    skipchars = 1;
