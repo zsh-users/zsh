@@ -42,6 +42,8 @@ doinsert(ZLE_STRING_T zstr, int len)
     int m = neg ? -zmult : zmult;    /* number of copies to insert */
     int count;
 
+    UNMETACHECK();
+
     iremovesuffix(c1, 0);
     invalidatelist();
 

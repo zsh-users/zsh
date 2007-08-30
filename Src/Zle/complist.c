@@ -2542,10 +2542,20 @@ domenuselect(Hookdef dummy, Chdata dat)
                 strncpy(zlemetaline, origline, l);
                 zlemetacs = origcs;
 
+		/*
+		 * Horrible quick fix:
+		 * we shouldn't need to metafy and unmetafy
+		 * quite as much.  If we kept unmetafied through
+		 * here we could fix up setmstatus to use unmetafied
+		 * as well.  This is the only use of setmstatus which
+		 * restores the line so that should be doable.
+		 */
+		unmetafy_line();
                 if (cmd == Th(z_selfinsert))
                     selfinsert(zlenoargs);
                 else
                     selfinsertunmeta(zlenoargs);
+		metafy_line();
 
                 saveline = (char *) zhalloc(zlemetall);
                 memcpy(saveline, zlemetaline, zlemetall);

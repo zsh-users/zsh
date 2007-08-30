@@ -1,3 +1,8 @@
+2007-08-30  Peter Stephenson  <pws@csr.com>
+
+	* 23807: Src/Zle/complist.c, Src/Zle/zle_misc.c: interactive mode
+	in completion was fairly seriously broken.
+
 2007-08-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk,
