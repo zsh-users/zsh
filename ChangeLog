@@ -1,3 +1,8 @@
+2007-08-30  Clint Adams  <clint@zsh.org>
+
+	* Chris Lamb: 23810: Completion/Debian/Command/_lighttpd:
+	 completion for lighty-{enable,disable}-mod .
+
 2007-08-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23809: Src/Zle/zle_tricky.c: attempt to expand finished
