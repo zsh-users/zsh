@@ -1,5 +1,8 @@
 2007-08-30  Peter Stephenson  <pws@csr.com>
 
+	* 23808: Src/utils.c: debugging to try to isolate intermittent
+	problem in wcs_nicechar().
+
 	* 23807: Src/Zle/complist.c, Src/Zle/zle_misc.c: interactive mode
 	in completion was fairly seriously broken.
 

@@ -552,8 +552,12 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     if (swidep)
 	*swidep = s;
     for (mbptr = mbstr; ret; s++, mbptr++, ret--) {
+	DPUTS(s >= buf + NICECHAR_MAX,
+	      "BUG: buffer too small in wcs_nicechar");
 	if (imeta(*mbptr)) {
 	    *s++ = Meta;
+	    DPUTS(s >= buf + NICECHAR_MAX,
+		  "BUG: buffer too small for metafied char in wcs_nicechar");
 	    *s = *mbptr ^ 32;
 	} else {
 	    *s = *mbptr;
