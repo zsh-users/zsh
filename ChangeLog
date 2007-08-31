@@ -1,3 +1,7 @@
+2007-08-31  Peter Stephenson  <pws@csr.com>
+
+	* 23812: Src/exec.c: ( command & ) caused core dump after 23460.
+
 2007-08-30  Clint Adams  <clint@zsh.org>
 
 	* Chris Lamb: 23810: Completion/Debian/Command/_lighttpd:
