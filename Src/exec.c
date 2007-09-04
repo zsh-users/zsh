@@ -804,6 +804,105 @@ hashcmd(char *arg0, char **pp)
     return cn;
 }
 
+/**/
+int
+forklevel;
+
+/* Arguments to entersubsh() */
+enum {
+    /* Subshell is to be run asynchronously (else synchronously) */
+    ESUB_ASYNC = 0x01,
+    /*
+     * Perform process group and tty handling and clear the
+     * (real) job table, since it won't be any longer valid
+     */
+    ESUB_PGRP = 0x02,
+    /* Don't unset traps */
+    ESUB_KEEPTRAP = 0x04,
+    /* This is only a fake entry to a subshell */
+    ESUB_FAKE = 0x08,
+    /* Release the process group if pid is the shell's process group */
+    ESUB_REVERTPGRP = 0x10,
+    /* Don't handle the MONITOR option even if previously set */
+    ESUB_NOMONITOR = 0x20
+};
+
+/**/
+static void
+entersubsh(int flags)
+{
+    int sig, monitor;
+
+    if (!(flags & ESUB_KEEPTRAP))
+	for (sig = 0; sig < VSIGCOUNT; sig++)
+	    if (!(sigtrapped[sig] & ZSIG_FUNC))
+		unsettrap(sig);
+    monitor = isset(MONITOR);
+    if (flags & ESUB_NOMONITOR)
+	opts[MONITOR] = 0;
+    if (!isset(MONITOR)) {
+	if (flags & ESUB_ASYNC) {
+	    settrap(SIGINT, NULL, 0);
+	    settrap(SIGQUIT, NULL, 0);
+	    if (isatty(0)) {
+		close(0);
+		if (open("/dev/null", O_RDWR | O_NOCTTY)) {
+		    zerr("can't open /dev/null: %e", errno);
+		    _exit(1);
+		}
+	    }
+	}
+    } else if (thisjob != -1 && (flags & ESUB_PGRP)) {
+	if (jobtab[list_pipe_job].gleader && (list_pipe || list_pipe_child)) {
+	    if (setpgrp(0L, jobtab[list_pipe_job].gleader) == -1 ||
+		killpg(jobtab[list_pipe_job].gleader, 0) == -1) {
+		jobtab[list_pipe_job].gleader =
+		    jobtab[thisjob].gleader = (list_pipe_child ? mypgrp : getpid());
+		setpgrp(0L, jobtab[list_pipe_job].gleader);
+		if (!(flags & ESUB_ASYNC))
+		    attachtty(jobtab[thisjob].gleader);
+	    }
+	}
+	else if (!jobtab[thisjob].gleader ||
+		 setpgrp(0L, jobtab[thisjob].gleader) == -1) {
+	    jobtab[thisjob].gleader = getpid();
+	    if (list_pipe_job != thisjob &&
+		!jobtab[list_pipe_job].gleader)
+		jobtab[list_pipe_job].gleader = jobtab[thisjob].gleader;
+	    setpgrp(0L, jobtab[thisjob].gleader);
+	    if (!(flags & ESUB_ASYNC))
+		attachtty(jobtab[thisjob].gleader);
+	}
+    }
+    if (!(flags & ESUB_FAKE))
+	subsh = 1;
+    if ((flags & ESUB_REVERTPGRP) && getpid() == mypgrp)
+	release_pgrp();
+    if (SHTTY != -1) {
+	shout = NULL;
+	zclose(SHTTY);
+	SHTTY = -1;
+    }
+    if (isset(MONITOR)) {
+	signal_default(SIGTTOU);
+	signal_default(SIGTTIN);
+	signal_default(SIGTSTP);
+    }
+    if (interact) {
+	signal_default(SIGTERM);
+	if (!(sigtrapped[SIGINT] & ZSIG_IGNORED))
+	    signal_default(SIGINT);
+    }
+    if (!(sigtrapped[SIGQUIT] & ZSIG_IGNORED))
+	signal_default(SIGQUIT);
+    opts[MONITOR] = opts[USEZLE] = 0;
+    zleactive = 0;
+    if (flags & ESUB_PGRP)
+	clearjobtab(monitor);
+    get_usage();
+    forklevel = locallevel;
+}
+
 /* execute a string */
 
 /**/
@@ -1301,7 +1400,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    }
 		    else {
 			close(synch[0]);
-			entersubsh(Z_ASYNC, 0, 0, 0);
+			entersubsh(ESUB_ASYNC);
 			if (jobtab[list_pipe_job].procs) {
 			    if (setpgrp(0L, mypgrp = jobtab[list_pipe_job].gleader)
 				== -1) {
@@ -1413,7 +1512,8 @@ execpline2(Estate state, wordcode pcode,
 	    } else {
 		zclose(pipes[0]);
 		close(synch[0]);
-		entersubsh(how, 2, 0, 0);
+		entersubsh(((how & Z_ASYNC) ? ESUB_ASYNC : 0)
+			   | ESUB_PGRP | ESUB_KEEPTRAP);
 		close(synch[1]);
 		execcmd(state, input, pipes[1], how, 0);
 		_exit(lastval);
@@ -2419,7 +2519,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	  (!is_cursh && (last1 != 1 || nsigtrapped || havefiles()))))) {
 
 	pid_t pid;
-	int synch[2];
+	int synch[2], flags;
 	char dummy;
 	struct timeval bgtime;
 
@@ -2432,7 +2532,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (oautocont >= 0)
 		opts[AUTOCONTINUE] = oautocont;
 	    return;
-	} if (pid) {
+	}
+	if (pid) {
+
 	    close(synch[1]);
 	    read(synch[0], &dummy, 1);
 	    close(synch[0]);
@@ -2462,7 +2564,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	}
 	/* pid == 0 */
 	close(synch[0]);
-	entersubsh(how, (type != WC_SUBSH) && !(how & Z_ASYNC) ? 2 : 1, 0, 0);
+	flags = ((how & Z_ASYNC) ? ESUB_ASYNC : 0) | ESUB_PGRP;
+	if ((type != WC_SUBSH) && !(how & Z_ASYNC))
+	    flags |= ESUB_KEEPTRAP;
+	entersubsh(flags);
 	close(synch[1]);
 	forked = 1;
 	if (sigtrapped[SIGINT] & ZSIG_IGNORED)
@@ -2737,10 +2842,16 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	 * the current shell (including a fake exec to run a builtin then
 	 * exit) in case there is an error return.
 	 */
-	if (is_exec)
-	    entersubsh(how, (type != WC_SUBSH) ? 2 : 1, 1,
-		       (do_exec || (type >= WC_CURSH && last1 == 1)) 
-		       && !forked);
+	if (is_exec) {
+	    int flags = ((how & Z_ASYNC) ? ESUB_ASYNC : 0) |
+		ESUB_PGRP | ESUB_FAKE;
+	    if (type != WC_SUBSH)
+		flags |= ESUB_KEEPTRAP;
+	    if ((do_exec || (type >= WC_CURSH && last1 == 1)) 
+		&& !forked)
+		flags |= ESUB_REVERTPGRP;
+	    entersubsh(flags);
+	}
 	if (type >= WC_CURSH) {
 	    if (last1 == 1)
 		do_exec = 1;
@@ -3037,83 +3148,6 @@ fixfds(int *save)
     errno = old_errno;
 }
 
-/**/
-int
-forklevel;
-
-/**/
-static void
-entersubsh(int how, int cl, int fake, int revertpgrp)
-{
-    int sig, monitor;
-
-    if (cl != 2)
-	for (sig = 0; sig < VSIGCOUNT; sig++)
-	    if (!(sigtrapped[sig] & ZSIG_FUNC))
-		unsettrap(sig);
-    if (!(monitor = isset(MONITOR))) {
-	if (how & Z_ASYNC) {
-	    settrap(SIGINT, NULL, 0);
-	    settrap(SIGQUIT, NULL, 0);
-	    if (isatty(0)) {
-		close(0);
-		if (open("/dev/null", O_RDWR | O_NOCTTY)) {
-		    zerr("can't open /dev/null: %e", errno);
-		    _exit(1);
-		}
-	    }
-	}
-    } else if (thisjob != -1 && cl) {
-	if (jobtab[list_pipe_job].gleader && (list_pipe || list_pipe_child)) {
-	    if (setpgrp(0L, jobtab[list_pipe_job].gleader) == -1 ||
-		killpg(jobtab[list_pipe_job].gleader, 0) == -1) {
-		jobtab[list_pipe_job].gleader =
-		    jobtab[thisjob].gleader = (list_pipe_child ? mypgrp : getpid());
-		setpgrp(0L, jobtab[list_pipe_job].gleader);
-		if (how & Z_SYNC)
-		    attachtty(jobtab[thisjob].gleader);
-	    }
-	}
-	else if (!jobtab[thisjob].gleader ||
-		 setpgrp(0L, jobtab[thisjob].gleader) == -1) {
-	    jobtab[thisjob].gleader = getpid();
-	    if (list_pipe_job != thisjob &&
-		!jobtab[list_pipe_job].gleader)
-		jobtab[list_pipe_job].gleader = jobtab[thisjob].gleader;
-	    setpgrp(0L, jobtab[thisjob].gleader);
-	    if (how & Z_SYNC)
-		attachtty(jobtab[thisjob].gleader);
-	}
-    }
-    if (!fake)
-	subsh = 1;
-    if (revertpgrp && getpid() == mypgrp)
-	release_pgrp();
-    if (SHTTY != -1) {
-	shout = NULL;
-	zclose(SHTTY);
-	SHTTY = -1;
-    }
-    if (isset(MONITOR)) {
-	signal_default(SIGTTOU);
-	signal_default(SIGTTIN);
-	signal_default(SIGTSTP);
-    }
-    if (interact) {
-	signal_default(SIGTERM);
-	if (!(sigtrapped[SIGINT] & ZSIG_IGNORED))
-	    signal_default(SIGINT);
-    }
-    if (!(sigtrapped[SIGQUIT] & ZSIG_IGNORED))
-	signal_default(SIGQUIT);
-    opts[MONITOR] = opts[USEZLE] = 0;
-    zleactive = 0;
-    if (cl)
-	clearjobtab(monitor);
-    get_usage();
-    forklevel = locallevel;
-}
-
 /*
  * Close internal shell fds.
  *
@@ -3307,8 +3341,7 @@ getoutput(char *cmd, int qt)
     child_unblock();
     zclose(pipes[0]);
     redup(pipes[1], 1);
-    opts[MONITOR] = 0;
-    entersubsh(Z_SYNC, 1, 0, 0);
+    entersubsh(ESUB_PGRP|ESUB_NOMONITOR);
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
     cmdpop();
@@ -3460,8 +3493,7 @@ getoutputfile(char *cmd)
 
     /* pid == 0 */
     redup(fd, 1);
-    opts[MONITOR] = 0;
-    entersubsh(Z_SYNC, 1, 0, 0);
+    entersubsh(ESUB_PGRP|ESUB_NOMONITOR);
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
     cmdpop();
@@ -3532,7 +3564,7 @@ getproc(char *cmd)
 	zerr("can't open %s: %e", pnam, errno);
 	_exit(1);
     }
-    entersubsh(Z_ASYNC, 1, 0, 0);
+    entersubsh(ESUB_ASYNC|ESUB_PGRP);
     redup(fd, out);
 #else /* PATH_DEV_FD */
     int pipes[2];
@@ -3558,7 +3590,7 @@ getproc(char *cmd)
 	}
 	return pnam;
     }
-    entersubsh(Z_ASYNC, 1, 0, 0);
+    entersubsh(ESUB_ASYNC|ESUB_PGRP);
     redup(pipes[out], out);
     closem(FDT_UNUSED);   /* this closes pipes[!out] as well */
 #endif /* PATH_DEV_FD */
@@ -3602,7 +3634,7 @@ getpipe(char *cmd, int nullexec)
 	    addproc(pid, NULL, 1, &bgtime);
 	return pipes[!out];
     }
-    entersubsh(Z_ASYNC, 1, 0, 0);
+    entersubsh(ESUB_ASYNC|ESUB_PGRP);
     redup(pipes[out], out);
     closem(FDT_UNUSED);	/* this closes pipes[!out] as well */
     cmdpush(CS_CMDSUBST);

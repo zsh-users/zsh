@@ -1,3 +1,8 @@
+2007-09-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/11807: Src/exec.c, Src/jobs.c: display of jobs in
+	subshells and occasionally in the main shell was screwy.
+
 2007-08-31  Peter Stephenson  <pws@csr.com>
 
 	* 23812: Src/exec.c: ( command & ) caused core dump after 23460.

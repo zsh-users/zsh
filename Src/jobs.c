@@ -821,10 +821,7 @@ printjob(Job jn, int lng, int synch)
     int doneprint = 0;
     FILE *fout = (synch == 2) ? stdout : shout;
 
-    /*
-     * Wow, what a hack.  Did I really write this? --- pws
-     */
-    if (jn < jobtab || jn >= jobtab + jobtabsize)
+    if (oldjobtab != NULL)
 	job = jn - oldjobtab;
     else
 	job = jn - jobtab;
@@ -1286,6 +1283,7 @@ clearjobtab(int monitor)
 
     if (monitor && oldmaxjob) {
 	int sz = oldmaxjob * sizeof(struct job);
+	DPUTS(oldjobtab != NULL, "BUG: saving job table twice\n");
 	oldjobtab = (struct job *)zalloc(sz);
 	memcpy(oldjobtab, jobtab, sz);
 
@@ -1473,7 +1471,16 @@ setcurjob(void)
 static int
 getjob(char *s, char *prog)
 {
-    int jobnum, returnval;
+    int jobnum, returnval, mymaxjob;
+    Job myjobtab;
+
+    if (oldjobtab) {
+	myjobtab = oldjobtab;
+	mymaxjob = oldmaxjob;
+    } else {
+	myjobtab= jobtab;
+	mymaxjob = maxjob;
+    }
 
     /* if there is no %, treat as a name */
     if (*s != '%')
@@ -1502,8 +1509,15 @@ getjob(char *s, char *prog)
     /* a digit here means we have a job number */
     if (idigit(*s)) {
 	jobnum = atoi(s);
-	if (jobnum && jobnum <= maxjob && jobtab[jobnum].stat &&
-	    !(jobtab[jobnum].stat & STAT_SUBJOB) && jobnum != thisjob) {
+	if (jobnum && jobnum <= mymaxjob && myjobtab[jobnum].stat &&
+	    !(myjobtab[jobnum].stat & STAT_SUBJOB) &&
+	    /*
+	     * If running jobs in a subshell, we are allowed to
+	     * refer to the "current" job (it's not really the
+	     * current job in the subshell).  It's possible we
+	     * should reset thisjob to -1 on entering the subshell.
+	     */
+	    (myjobtab == oldjobtab || jobnum != thisjob)) {
 	    returnval = jobnum;
 	    goto done;
 	}
@@ -1515,10 +1529,11 @@ getjob(char *s, char *prog)
     if (*s == '?') {
 	struct process *pn;
 
-	for (jobnum = maxjob; jobnum >= 0; jobnum--)
-	    if (jobtab[jobnum].stat && !(jobtab[jobnum].stat & STAT_SUBJOB) &&
+	for (jobnum = mymaxjob; jobnum >= 0; jobnum--)
+	    if (myjobtab[jobnum].stat &&
+		!(myjobtab[jobnum].stat & STAT_SUBJOB) &&
 		jobnum != thisjob)
-		for (pn = jobtab[jobnum].procs; pn; pn = pn->next)
+		for (pn = myjobtab[jobnum].procs; pn; pn = pn->next)
 		    if (strstr(pn->text, s + 1)) {
 			returnval = jobnum;
 			goto done;
@@ -1772,7 +1787,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
     In the default case for bg, fg and disown, the argument will be provided by
     the above routine.  We now loop over the arguments. */
     for (; (firstjob != -1) || *argv; (void)(*argv && argv++)) {
-	int stopped, ocj = thisjob;
+	int stopped, ocj = thisjob, jstat;
 
         func = ofunc;
 
@@ -1798,6 +1813,11 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    thisjob = ocj;
 	    continue;
 	}
+	if (func != BIN_JOBS && oldjobtab != NULL) {
+	    zwarnnam(name, "can't manipulate jobs in subshell");
+	    unqueue_signals();
+	    return 1;
+	}
 	/* The only type of argument allowed now is a job spec.  Check it. */
 	job = (*argv) ? getjob(*argv, name) : firstjob;
 	firstjob = -1;
@@ -1805,9 +1825,10 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    retval = 1;
 	    break;
 	}
-	if (!(jobtab[job].stat & STAT_INUSE) ||
-	    (jobtab[job].stat & STAT_NOPRINT)) {
-	    zwarnnam(name, "%%%d: no such job", job);
+	jstat = oldjobtab ? oldjobtab[job].stat : jobtab[job].stat;
+	if (!(jstat & STAT_INUSE) ||
+	    (jstat & STAT_NOPRINT)) {
+	    zwarnnam(name, "%s: no such job", *argv);
 	    unqueue_signals();
 	    return 1;
 	}
@@ -1815,7 +1836,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
          * on disown), we actually do a bg and then delete the job table entry. */
 
         if (isset(AUTOCONTINUE) && func == BIN_DISOWN &&
-            jobtab[job].stat & STAT_STOPPED)
+            jstat & STAT_STOPPED)
             func = BIN_BG;
 
 	/* We have a job number.  Now decide what to do with it. */
@@ -1905,7 +1926,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	        deletejob(jobtab + job);
 	    break;
 	case BIN_JOBS:
-	    printjob(job + jobtab, lng, 2);
+	    printjob(job + (oldjobtab ? oldjobtab : jobtab), lng, 2);
 	    break;
 	case BIN_DISOWN:
 	    if (jobtab[job].stat & STAT_STOPPED) {
