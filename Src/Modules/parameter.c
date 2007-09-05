@@ -1007,13 +1007,18 @@ getpmjobtext(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     int job;
+    char *pend;
 
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
 
-    if ((job = atoi(name)) >= 1 && job <= maxjob &&
+    job = strtod(name, &pend);
+    /* Non-numeric keys are looked up by job name */
+    if (*pend)
+	job = getjob(name, NULL);
+    if (job >= 1 && job <= maxjob &&
 	jobtab[job].stat && jobtab[job].procs &&
 	!(jobtab[job].stat & STAT_NOPRINT))
 	pm->u.str = pmjobtext(job);
@@ -1104,13 +1109,17 @@ getpmjobstate(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     int job;
+    char *pend;
 
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
 
-    if ((job = atoi(name)) >= 1 && job <= maxjob &&
+    job = strtod(name, &pend);
+    if (*pend)
+	job = getjob(name, NULL);
+    if (job >= 1 && job <= maxjob &&
 	jobtab[job].stat && jobtab[job].procs &&
 	!(jobtab[job].stat & STAT_NOPRINT))
 	pm->u.str = pmjobstate(job);
@@ -1166,13 +1175,17 @@ getpmjobdir(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
     int job;
+    char *pend;
 
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
 
-    if ((job = atoi(name)) >= 1 && job <= maxjob &&
+    job = strtod(name, &pend);
+    if (*pend)
+	job = getjob(name, NULL);
+    if (job >= 1 && job <= maxjob &&
 	jobtab[job].stat && jobtab[job].procs &&
 	!(jobtab[job].stat & STAT_NOPRINT))
 	pm->u.str = pmjobdir(job);

@@ -1468,8 +1468,8 @@ setcurjob(void)
  * to a job number.                                             */
 
 /**/
-static int
-getjob(char *s, char *prog)
+mod_export int
+getjob(const char *s, const char *prog)
 {
     int jobnum, returnval, mymaxjob;
     Job myjobtab;
@@ -1489,7 +1489,8 @@ getjob(char *s, char *prog)
     /* "%%", "%+" and "%" all represent the current job */
     if (*s == '%' || *s == '+' || !*s) {
 	if (curjob == -1) {
-	    zwarnnam(prog, "no current job");
+	    if (prog)
+		zwarnnam(prog, "no current job");
 	    returnval = -1;
 	    goto done;
 	}
@@ -1499,7 +1500,8 @@ getjob(char *s, char *prog)
     /* "%-" represents the previous job */
     if (*s == '-') {
 	if (prevjob == -1) {
-	    zwarnnam(prog, "no previous job");
+	    if (prog)
+		zwarnnam(prog, "no previous job");
 	    returnval = -1;
 	    goto done;
 	}
@@ -1521,7 +1523,8 @@ getjob(char *s, char *prog)
 	    returnval = jobnum;
 	    goto done;
 	}
-	zwarnnam(prog, "%%%s: no such job", s);
+	if (prog)
+	    zwarnnam(prog, "%%%s: no such job", s);
 	returnval = -1;
 	goto done;
     }
@@ -1538,7 +1541,8 @@ getjob(char *s, char *prog)
 			returnval = jobnum;
 			goto done;
 		    }
-	zwarnnam(prog, "job not found: %s", s);
+	if (prog)
+	    zwarnnam(prog, "job not found: %s", s);
 	returnval = -1;
 	goto done;
     }
@@ -2299,7 +2303,7 @@ bin_suspend(char *name, UNUSED(char **argv), Options ops, UNUSED(int func))
 
 /**/
 int
-findjobnam(char *s)
+findjobnam(const char *s)
 {
     int jobnum;
 

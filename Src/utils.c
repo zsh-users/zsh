@@ -5017,7 +5017,7 @@ getkeystring(char *s, int *len, int how, int *misc)
 
 /**/
 mod_export int
-strpfx(char *s, char *t)
+strpfx(const char *s, const char *t)
 {
     while (*s && *s == *t)
 	s++, t++;

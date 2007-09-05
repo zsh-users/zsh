@@ -1,5 +1,9 @@
 2007-09-05  Peter Stephenson  <pws@csr.com>
 
+	* users/11818: Doc/Zsh/mod_parameter.yo, Src/jobs.c, Src/utils.c,
+	Src/Modules/parameter.c:  Allow non-numeric lookup of job
+	status parameters.
+
 	* unposted: Functions/Calendar/calendar: make sure there's a
 	space between a date of a recurring event and the rest of
 	the line.
