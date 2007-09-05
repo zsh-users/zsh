@@ -317,6 +317,9 @@ fi
       if (( shown && repeating )); then
 	# Done and dusted, but a repeated event is due.
 	strftime -s newdate $datefmt $repeattime
+	if [[ $newdate != *[[:space:]] && $restline != [[:space:]]* ]]; then
+	  newdate+=" "
+	fi
 	calendar_addlines+=("$newdate$restline")
 
 	# We'll add this back in below, but we check in case the

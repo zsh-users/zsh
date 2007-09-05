@@ -1,3 +1,9 @@
+2007-09-05  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Calendar/calendar: make sure there's a
+	space between a date of a recurring event and the rest of
+	the line.
+
 2007-09-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/11807: Src/exec.c, Src/jobs.c: display of jobs in
