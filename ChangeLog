@@ -1,6 +1,6 @@
 2007-09-13  Clint Adams  <clint@zsh.org>
 
-	* 2381x: Src/Zle/zle_hist.c: set vipenultsrchstr to NULL
+	* 23813: Src/Zle/zle_hist.c: set vipenultsrchstr to NULL
 	after freeing it to avoid vi-mode history search segfaults.
 
 2007-09-05  Peter Stephenson  <pws@csr.com>
