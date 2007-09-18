@@ -39,7 +39,10 @@ tmp=
 [[ -z $tmp && $sel = *G* ]] && tmp=$dis_galiases[$word]
 
 if [[ -n $tmp ]]; then
-  $pre _wanted aliases expl alias compadd -UQ ${(Q)tmp%%[[:blank:]]##}
+  # We used to remove the quoting from the value in the parameter.
+  # That was probably just an oversight: an alias is always replaced
+  # literally.
+  $pre _wanted aliases expl alias compadd -UQ ${tmp%%[[:blank:]]##}
 elif (( $#pre )) && zstyle -t ":completion:${curcontext}:" complete; then
   $pre _aliases -s "$sel" -S ''
 else
