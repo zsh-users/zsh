@@ -271,7 +271,7 @@ get_usage(void)
 }
 
 
-#ifndef HAVE_GETRUSAGE
+#if !defined HAVE_WAIT3 || !defined HAVE_GETRUSAGE
 /* Update status of process that we have just WAIT'ed for */
 
 /**/
@@ -279,17 +279,26 @@ void
 update_process(Process pn, int status)
 {
     struct timezone dummy_tz;
-    long childs, childu;
+#ifdef HAVE_GETRUSAGE
+    struct timeval childs = child_usage.ru_stime;
+    struct timeval childu = child_usage.ru_utime;
+#else
+    long childs = shtms.tms_cstime;
+    long childu = shtms.tms_cutime;
+#endif
 
-    childs = shtms.tms_cstime;
-    childu = shtms.tms_cutime;
     /* get time-accounting info          */
     get_usage();
     gettimeofday(&pn->endtime, &dummy_tz);  /* record time process exited        */
 
     pn->status = status;                    /* save the status returned by WAIT  */
+#ifdef HAVE_GETRUSAGE
+    dtime(&pn->ti.ru_stime, &childs, &child_usage.ru_stime);
+    dtime(&pn->ti.ru_utime, &childu, &child_usage.ru_utime);
+#else
     pn->ti.st  = shtms.tms_cstime - childs; /* compute process system space time */
     pn->ti.ut  = shtms.tms_cutime - childu; /* compute process user space time   */
+#endif
 }
 #endif
 
