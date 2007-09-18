@@ -1021,6 +1021,7 @@ static void
 par_case(int *complex)
 {
     int oecused = ecused, brflag, p, pp, n = 1, type;
+    int ona, onc;
 
     p = ecadd(0);
 
@@ -1031,14 +1032,23 @@ par_case(int *complex)
     ecstr(tokstr);
 
     incmdpos = 1;
+    ona = noaliases;
+    onc = nocorrect;
+    noaliases = nocorrect = 1;
     yylex();
     while (tok == SEPER)
 	yylex();
     if (!(tok == STRING && !strcmp(tokstr, "in")) && tok != INBRACE)
+    {
+	noaliases = ona;
+	nocorrect = onc;
 	YYERRORV(oecused);
+    }
     brflag = (tok == INBRACE);
     incasepat = 1;
     incmdpos = 0;
+    noaliases = ona;
+    nocorrect = onc;
     yylex();
 
     for (;;) {
