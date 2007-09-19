@@ -25,8 +25,11 @@
 # This note is mostly here so you can work out what I tried to do when
 # it goes horribly wrong.
 
+local autocd
+[[ -o autocd ]] && autocd=autocd
+
 emulate -L zsh
-setopt extendedglob cbases
+setopt extendedglob cbases nullglob $autocd
 
 # We need zformat from zsh/zutil for %s replacement.
 zmodload -i zsh/zutil
@@ -45,22 +48,70 @@ suffix=$match[1]
 context=":mime:.${suffix}:"
 
 local handler flags no_sh no_bg
-local -a exec_asis
+local -a exec_asis hand_nonex
 
 # Set to a list of patterns which are ignored and executed as they are,
 # despite being called for interpretation by the mime handler.
 # Defaults to executable files, which ensures that they are executed as
 # they are, even if they have a suffix.
-zstyle -a $context execute-as-is exec_asis || exec_asis=('*(*)')
+zstyle -a $context execute-as-is exec_asis || exec_asis=('*(*)' '*(/)')
+
+# Set to a list of patterns for which the handler will be used even
+# if the file doesn't exist on the disk.
+zstyle -a $context handle-nonexistent hand_nonex ||
+  hand_nonex=('[[:alpha:]]#:/*')
 
 local pattern
+local -a files
+
+# Search some path for the file, if required.
+# We do this before any other tests that need to find the
+# actual file or its directory.
+local dir
+local -a filepath
+if zstyle -t $context find-file-in-path && [[ $1 != /* ]] &&
+  [[ $1 != */* || -o pathdirs ]]; then
+  zstyle -a $context file-path filepath || filepath=($path)
+  for dir in $filepath; do
+    if [[ -e $dir/$1 ]]; then
+      1=$dir/$1
+      break
+    fi
+  done
+fi
+
+# In case the pattern contains glob qualifiers, as it does by default,
+# we need to do real globbing, not just pattern matching.
+# The strategy is to glob the files in the directory using the
+# pattern and see if the one we've been passed is in the list.
+local dirpref=${1%/*}
+if [[ $dirpref = $1 ]]; then
+  dirpref=
+else
+  dirpref+=/
+fi
 
 for pattern in $exec_asis; do
-    if [[ $1 = ${~pattern} ]]; then
-	"$@"
-	return 0
-    fi
+  files=(${dirpref}${~pattern})
+  if [[ -n ${files[(r)$1]} ]]; then
+    "$@"
+    return
+  fi
 done
+
+if [[ ! -e $1 ]]; then
+  local nonex_ok
+  for pattern in $hand_nonex; do
+    if [[ $1 = ${~pattern} ]]; then
+      nonex_ok=1
+      break
+    fi
+  done
+  if [[ -z $nonex_ok ]]; then
+    "$@"
+    return
+  fi
+fi
 
 zstyle -s $context handler handler ||
   handler="${zsh_mime_handlers[$suffix]}"
@@ -76,7 +127,6 @@ zstyle -t $context current-shell && no_sh=yes
 # terminal and display is set.
 zstyle -t $context never-background && no_bg=yes
 
-local -a files
 local hasmeta stdin
 
 # See if the handler has shell metacharacters in.
@@ -85,7 +135,7 @@ if [[ $handler = *[\\\;\*\?\|\"\'\`\$]* ]]; then
     hasmeta=1
 fi
 
-local -a execargs
+local -a execargs files
 
 if [[ $handler = *%s* ]]; then
   # We need to replace %s with the file(s).
