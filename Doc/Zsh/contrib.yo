@@ -835,7 +835,8 @@ For example, starting from the line:
 
 example(print This line contains fan and fond)
 
-and invoking tt(replace-pattern) with the source string `tt(f(?)n)' and
+and invoking tt(replace-pattern) with the source string
+`tt(f+LPAR()?+RPAR()n)' and
 the replacment string `tt(c\1r)' produces the not very useful line:
 
 example(print This line contains car and cord)
@@ -1187,19 +1188,26 @@ It is recommended that a trailing tt(*) (suitably quoted) be appended
 to style patterns in case the system is extended in future.  Some
 examples are given below.
 startitem()
-item(mime-types)(
-A list of files in the format of tt(~/.mime.types) and
-tt(/etc/mime.types) to be read during setup, replacing the default list
-which consists of those two files.  The context is tt(:mime:).
-A tt(PLUS()) in the list will be replaced by the default files.
+item(tt(current-shell))(
+If this boolean style is true, the mailcap handler for the context in
+question is run using the tt(eval) builtin instead of by starting a new
+tt(sh) process.  This is more efficient, but may not work in the occasional
+cases where the mailcap handler uses strict POSIX syntax.
 )
-item(mailcap)(
-A list of files in the format of tt(~/.mailcap) and
-tt(/etc/mailcap) to be read during setup, replacing the default list
-which consists of those two files.  The context is tt(:mime:).
-A tt(PLUS()) in the list will be replaced by the default files.
+item(tt(execute-as-is))(
+This style gives a list of patterns to be matched against files
+passed for execution with a handler program.  If the file matches
+the pattern, the entire command line is executed in its current form,
+with no handler.  This is useful for files which might have suffixes
+but nonetheless be executable in their own right.  If the style
+is not set, the pattern tt(*+LPAR()*+RPAR()) is used; hence executable
+files are executed directly and not passed to a handler.
 )
-item(handler)(
+item(tt(flags))(
+Defines flags to go with a handler; the context is as for the
+tt(handler) style, and the format is as for the flags in tt(mailcap).
+)
+item(tt(handler))(
 Specifies a handler for a suffix; the suffix is given by the context as
 tt(:mime:.)var(suffix)tt(:), and the format of the handler is exactly
 that in tt(mailcap).  Note in particular the `tt(.)' and trailing colon
@@ -1209,11 +1217,63 @@ the tt(flags) style should be set to include the word tt(needsterminal),
 or if the output is to be displayed through a pager (but not if the
 handler is itself a pager), it should include tt(copiousoutput).
 )
-item(flags)(
-Defines flags to go with a handler; the context is as for the
-tt(handler) style, and the format is as for the flags in tt(mailcap).
+item(tt(mailcap))(
+A list of files in the format of tt(~/.mailcap) and
+tt(/etc/mailcap) to be read during setup, replacing the default list
+which consists of those two files.  The context is tt(:mime:).
+A tt(PLUS()) in the list will be replaced by the default files.
 )
-item(pager)(
+item(tt(mailcap-priorities))(
+This style is used to resolve multiple mailcap entries for the same MIME
+type.  It consists of an array of the following elements, in descending
+order of priority; later entries will be used if earlier entries are
+unable to resolve the entries being compared.  If none of the tests
+resolve the entries, the first entry encountered is retained.
+
+startitem()
+item(tt(files))(
+The order of files (entries in the tt(mailcap) style) read.  Earlier
+files are preferred.  (Note this does not resolve entries in the same file.)
+)
+item(tt(priority))(
+The priority flag from the mailcap entry.  The priority is an integer
+from 0 to 9 with the default value being 5.
+)
+item(tt(flags))(
+The test given by the tt(mailcap-prio-flags) option is used to resolve
+entries.
+)
+item(tt(place))(
+Later entries are preferred; as the entries are strictly ordered, this
+test always succeeds.
+)
+enditem()
+
+Note that as this style is handled during initialisation, the context
+is always tt(:mime:), with no discrimination by suffix.
+)
+item(tt(mailcap-prio-flags))(
+This style is used when the keyword tt(flags) is encountered in the
+list of tests specified by the tt(mailcap-priorities) style.
+It should be set to a list of patterns, each of which is tested against
+the flags specified in the mailcap entry (in other words, the sets of
+assignments found with some entries in the mailcap file).  Earlier
+patterns in the list are preferred to later ones, and matched patterns
+are preferred to unmatched ones.
+)
+item(tt(mime-types))(
+A list of files in the format of tt(~/.mime.types) and
+tt(/etc/mime.types) to be read during setup, replacing the default list
+which consists of those two files.  The context is tt(:mime:).
+A tt(PLUS()) in the list will be replaced by the default files.
+)
+item(tt(never-background))(
+If this boolean style is set, the handler for the given context is
+always run in the foreground, even if the flags provided in the mailcap
+entry suggest it need not be (for example, it doesnʼt require a
+terminal).
+)
+item(tt(pager))(
 If set, will be used instead of tt($PAGER) or tt(more) to handle
 suffixes where the tt(copiousoutput) flag is set.  The context is
 as for tt(handler), i.e. tt(:mime:.)var(suffix)tt(:) for handling
