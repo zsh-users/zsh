@@ -1,3 +1,8 @@
+2007-09-21  Clint Adams  <clint@zsh.org>
+
+	* 23822: Completion/Unix/Command/_git: merge in git rm
+	completion fixes from Nikolai Weibull's repository.
+
 2007-09-18  Peter Stephenson  <pws@csr.com>
 
 	* users/11852: Completion/Base/Completer/_expand_alias:
