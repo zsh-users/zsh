@@ -1,5 +1,8 @@
 2007-09-23  Clint Adams  <clint@zsh.org>
 
+	* 23824: Completion/Unix/Command/_git: merge in git rerere
+	completion from Nikolai Weibull's repository.
+
 	* 23823: Completion/Unix/Command/_git: merge in git rev-parse
 	completion from Nikolai Weibull's repository.
 
