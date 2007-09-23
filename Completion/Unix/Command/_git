@@ -1,10 +1,9 @@
-#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-describe git-hash-object git-index-pack git-init-db git-instaweb git-merge-index git-merge-tree git-mktag git-mktree git-pack-objects git-prune-packed git-read-tree git-remote git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-quiltimport git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-rm git-send-email git-stripspace
+#compdef git git-annotate git-apply git-checkout-index git-clean git-commit-tree git-describe git-hash-object git-index-pack git-init-db git-instaweb git-merge-index git-merge-tree git-mktag git-mktree git-pack-objects git-prune-packed git-read-tree git-remote git-rev-parse git-unpack-objects git-update-index git-write-tree git-cat-file git-diff-index git-diff-files git-diff-stages git-diff-tree git-fsck-objects git-ls-files git-ls-tree git-quiltimport git-merge-base git-name-rev git-rev-list git-show-index git-tar-tree git-unpack-file git-var git-verify-pack git-clone-pack git-fetch-pack git-http-fetch git-local-fetch git-peek-remote git-receive-pack git-send-pack git-ssh-fetch git-ssh-upload git-update-server-info git-upload-pack git-add git-am git-applymbox git-bisect git-branch git-checkout git-cherry-pick git-clone git-commit git-diff git-fetch git-format-patch git-grep git-log git-ls-remote git-merge git-mv git-octopus git-pull git-push git-rebase git-repack git-reset git-resolve git-revert git-shortlog git-show-branch git-status git-verify-tag git-whatchanged git-applypatch git-archimport git-archive git-convert-objects git-cvsimport git-lost-found git-merge-one-file git-prune git-relink git-svnimport git-symbolic-ref git-tag git-update-ref git-check-ref-format git-cherry git-count-objects git-daemon git-get-tar-commit-id git-mailinfo git-mailsplit git-patch-id git-request-pull git-rm git-send-email git-stripspace
 
 # Commands not completed:
 # git-sh-setup
 # git-shell
 # git-parse-remote 
-# git-rev-parse 
 
 # TODO: most commands need a valid git repository to run, so add a check for it
 # so that we can make our handling a little bit cleaner (need to deal with
@@ -1391,9 +1390,29 @@ _git-request-pull () {
     ':end commit:__git_revisions'
 }
 
-# TODO: do we want this?
-#_git-rev-parse () {
-#}
+_git-rev-parse () {
+  _arguments \
+    '(--revs-only --no-revs)--revs-only[do not output flags and parameters not meant for "git-rev-list"]' \
+    '(--revs-only --no-revs)--no-revs[do not output flags and parameters meant for "git-rev-list"]' \
+    '(--flags --no-flags)--flags[do not output non-flag parameters]' \
+    '(--flags --no-flags)--no-flags[do not output flag parameters]' \
+    '--default[use "arg" if there is no parameter given]:arg' \
+    '--verify[verify parameter to be usable]' \
+    '--sq[output single shell-quoted line]' \
+    '--not[toggle ^ prefix of object names]' \
+    '--symbolic[output in a format as true to input as possible]' \
+    '--all[show all refs found in $GIT_DIR/refs]' \
+    '--branches[show branch refs found in $GIT_DIR/refs/heads]' \
+    '--tags[show tag refs found in $GIT_DIR/refs/tags]' \
+    '--remotes[show tag refs found in $GIT_DIR/refs/remotes]' \
+    '--show-prefix[show path of current directory relative to top-leve directory]' \
+    '--show-cdup[show path of top-level directory relative to current directory]' \
+    '--git-dir[show "$GIT_DIR" if defined else show path to ".git" directory]' \
+    '--short=-[show only handful hexdigits prefix]:: :_guard "[[\:digit\:]]#" number' \
+    {--after=-,--since=-}'[show "--max-age=" parameter corresponding given date string]:datestring' \
+    {--berore=-,--until=-}'[show "--min-age=" parameter corresponding given date string]:datestring' \
+    '*:args' && ret=0
+}
 
 _git-rm () {
   _arguments -S -A '-*' \
