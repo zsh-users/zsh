@@ -1,3 +1,9 @@
+2007-09-25  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 23827: Completion/Unix/Command/_vorbis: 
+	allow all arguments to options to either immediately follow
+	the option letter or be the next word.
+
 2007-09-23  Clint Adams  <clint@zsh.org>
 
 	* 23824: Completion/Unix/Command/_git: merge in git rerere
