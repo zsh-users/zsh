@@ -1663,7 +1663,7 @@ _git-ls-remote () {
 _git-merge () {
   _arguments \
     "$merge_args[@]" \
-    ':merge message' \
+    '-m:merge message' \
     '*:remote:__git_commits' && ret=0
 }
 
