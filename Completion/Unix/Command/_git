@@ -166,139 +166,249 @@ __git_zstyle_default () {
   fi
 }
 
-# TODO: either skip uninteresting commands or skip the description - the list
-# is just too long
+# TODO: Either skip uninteresting commands or skip the description - the list
+# is just too long.
+# NOTE: I'm coming to the opinion that skipping the description is the right
+# thing to do…, but not 100% sure yet.
 (( $+functions[_git_commands] )) ||
 _git_commands () {
-  local -a commands
-
-  commands=(
+  local -a base_commands
+  base_commands=(
     'add:add paths to the index'
-    'am:apply patches from a mailbox (cooler than applymbox)'
-    'annotate:annotate file lines with commit info'
     'apply:apply patch on a git index file and a work tree'
-    'applymbox:apply patches from a mailbox'
-    'applypatch:apply one patch extracted from an e-mail'
-    'archimport:import an Arch repository into git'
-    'archive:create an archive of files from a named tree'
     'bisect:find the change that introduced a bug'
     'branch:create and show branches'
-    'cat-file:provide content or type information for repository objects'
-    'check-ref-format:makes sure that a reference-name is well formed'
     'checkout:checkout and switch to a branch'
-    'checkout-index:copy files from the index to the working directory'
-    'cherry:find commits not merged upstream'
     'cherry-pick:cherry-pick the effect of an existing commit'
-    'clean:remove untracked files from the working tree'
-    'clone:clones a repository into a new directory'
-    'clone-pack:clones a repository into the current repository (transport)'
+    'clone:clone a repository into a new directory'
     'commit:record changes to the repository'
-    'commit-tree:creates a new commit object'
-    'convert-objects:converts old-style git repository'
-    'count-objects:count unpacked objects and display their disk consumption'
-    'cvsimport:import a CVS "repository" into a git repository'
-    'daemon:starts a really simple server for git repositories'
     'diff:show changes between commits, commit and working tree, etc.'
-    'diff-files:compares files in the working tree and the index'
-    'diff-index:compares content and mode of blobs between index and repository'
-    'diff-stages:compares two "merge states" in the index file'
-    'diff-tree:compares the content and mode of blobs found via two tree objects'
     'fetch:download objects and a head from another repository'
-    'fetch-pack:receive missing objects from another repository'
-    'format-patch:prepare patches for e-mail submission'
-    'fsck-objects:verifies the connectivity and validity of the objects in the database'
-    'get-tar-commit-id:extract commit ID from an archive created using tar-tree'
+    'gc:cleanup unnecessary files and optimize thee local repository'
     'grep:print lines matching a pattern'
-    'hash-object:computes the object ID from a file'
-    'http-fetch:downloads a remote git repository via HTTP'
-    'index-pack:build pack index file for an existing packed archive'
-    'init-db:creates an empty git object database'
-    'instaweb:instantly browse your working repository in gitweb'
-    'local-fetch:duplicates another git repository on a local system'
-    'log:shows commit logs'
-    'lost-found:recovers lost references that luckily have not yet been pruned'
-    'ls-files:information about files in the index/working directory'
-    'ls-remote:shows references in a remote or local repository'
-    'ls-tree:displays a tree object in human-readable form'
-    'mailinfo:extracts patch from a single e-mail message'
-    'mailsplit:splits an mbox file into a list of files'
+    'init:create empty git object database'
+    'log:show commit logs'
     'merge:grand unified merge driver'
-    'merge-base:finds a good common ancestor as possible for a merge'
-    'merge-index:runs a merge for files needing merging'
-    'merge-one-file:standard helper-program to use with merge-index'
-    'merge-tree:show three-way merge without touching index'
-    'mktag:creates a tag object'
-    'mktree:build tree-object from ls-tree formatted text'
-    'mv:moves or renames a file, directory, or symlink'
-    'name-rev:find symbolic names for given revisions'
-    'octopus:merges more than two commits'
-    'pack-objects:creates a packed archive of objects'
-    'parse-remote:routines to help parsing $GIT_DIR/remotes/'
-    'patch-id:computes unique ID for a apatch'
-    'peek-remote:lists references on a remote repository using the upload-pack protocol'
-    'prune:prunes all unreachable objects from the object database'
-    'prune-packed:removes extra objects that are already in pack files'
+    'mv:move or rename file, directory, or symlink'
+    'prune:prune all unreachable objects from the object database'
     'pull:fetch from and merge with a remote repository'
     'push:update remote refs along with associated objects'
-    'quiltimport:apply a quilt patchset'
-    'read-tree:reads tree information into the directory index'
-    'rebase:rebases local commits to new upstream head'
-    'receive-pack:command invoked by send-pack to receive what is pushed to it'
-    'relink:hardlinks acommon objects in local repositories'
-    'remote:manage set of tracked repositories'
-    'repack:packs unpacked objects in a repository'
-    'request-pull:generates a summary of pending changes'
-    'rerere:reuse recorded resolve'
-    'reset:resets current HEAD to the specified state'
-    'resolve:merges two commits'
-    'rev-list:lists commit object in reverse chronological order'
-    'rev-parse:picks out and massages parameters for other git commands'
-    'revert:reverts an existing commit'
+    'rebase:rebase local commits to new upstream head'
+    'reset:reset current HEAD to the specified state'
+    'revert:revert existing commit'
     'rm:remove files from the working tree and from the index'
-    'send-email:sends patch-e-mails out of "format-patch --mbox" output'
-    'send-pack:pushes to a remote repository, intelligently'
-    'shortlog:summarizes git log output'
-    'show-branch:shows branches and their commits'
-    'show-index:displays contents of a pack idx file'
-    'ssh-fetch:pulls from a remote repository over an SSH connection'
-    'ssh-upload:helper "server-side" program used by ssh-fetch'
-    "status:shows the working-tree's status"
-    'stripspace:filters out empty lines'
-    'svnimport:imports a SVN repository into git'
-    'symbolic-ref:reads and modifies symbolic references'
-    'tag:creates a tag object signed with GPG'
-    'tar-tree:creates a tar archive of the files in the named tree'
-    "unpack-file:creates a temporary file with a blob's contents"
-    'unpack-objects:unpacks objects out of a packed archive'
-    'update-index:modifies the index in some given way'
-    'update-ref:updates the object name stored in a reference safely'
-    'update-server-info:updates auxiliary information on a dumb server'
-    'upload-pack:command invoked by clone-pack and fetch-pack'
-    'var:displays a git logical variable'
-    'verify-pack:validates packed git archive files'
-    'verify-tag:checks the GPG signature of a tag'
-    'whatchanged:shows commit-logs and differences they introduce'
-    'write-tree:creates a tree from the current index')
+    'show-branch:show branches and their commits'
+    "status:show working-tree's status"
+    'tag:create tag object signed with GPG'
+    'verify-tag:check GPG signature of a tag')
+
+  local -a additional_commands
+  additional_commands=(
+    'am:apply patches from a mailbox (cooler than applymbox)'
+    'annotate:annotate file lines with commit info'
+    'applymbox:apply patches from a mailbox'
+    'applypatch:apply one patch extracted from an e-mail'
+    'archive:create an archive of files from a named tree'
+    'blame:blame file lines on commits'
+    'cat-file:provide content or type information for repository objects'
+    'check-ref-format:makes sure that a reference-name is well formed'
+    'checkout-index:copy files from the index to the working directory'
+    'cherry:find commits not merged upstream'
+    'clean:remove untracked files from the working tree'
+    'clone-pack:clone a repository into the current repository (transport)'
+    'commit-tree:create a new commit object'
+    'count-objects:count unpacked objects and display their disk consumption'
+    'describe:show the most recent tag that is reachable from a commit'
+    'diff-files:compare files in the working tree and the index'
+    'diff-index:compare content and mode of blobs between index and repository'
+    'diff-stages:compare two "merge states" in the index file'
+    'diff-tree:compare the content and mode of blobs found via two tree objects'
+    'fetch-pack:receive missing objects from another repository'
+    'fmt-merge-msg:produce merge commit message'
+    'imap-send:dump mailbox from stdin into imap folder'
+    'index-pack:build pack index file for an existing packed archive'
+    'local-fetch:duplicate another git repository on a local system'
+    'ls-remote:show references in a remote or local repository'
+    'ls-tree:display tree object in human-readable form'
+    'mailinfo:extract patch from a single e-mail message'
+    'mailsplit:split mbox file into a list of files'
+    'merge-base:find as good a common ancestor as possible for a merge'
+    'merge-file:run a three-way file merge'
+    'merge-index:run merge for files needing merging'
+    'merge-one-file:standard helper-program to use with merge-index'
+    'merge-tree:show three-way merge without touching index'
+    'mktag:create tag object'
+    'mktree:build tree-object from ls-tree formatted text'
+    'name-rev:find symbolic names for given revisions'
+    'octopus:merge more than two commits'
+    'pack-objects:create packed archive of objects'
+    'pack-redundant:find redundant pack files'
+    'pack-refs:pack heads and tags for efficient repository access'
+    'parse-remote:routines to help parsing $GIT_DIR/remotes/'
+    'peek-remote:list references on a remote repository using the upload-pack protocol'
+    'prune-packed:remove extra objects that are already in pack files'
+    'read-tree:read tree information into the directory index'
+    'reflog:manage reflog information'
+    'relink:hardlink common objects in local repositories'
+    'repack:pack unpacked objects in a repository'
+    'request-pull:generate summary of pending changes'
+    'rerere:reuse recorded resolve'
+    'rev-list:list commit object in reverse chronological order'
+    'shortlog:summarize git log output'
+    'show:show various types of objects'
+    'show-index:display contents of a pack idx file'
+    'symbolic-ref:read and modify symbolic references'
+    'tar-tree:create tar archive of the files in the named tree'
+    "unpack-file:create temporary file with blob's contents"
+    'unpack-objects:unpack objects out of packed archive'
+    'update-ref:update object name stored in a reference safely'
+    'update-server-info:update auxiliary information on a dumb server'
+    'var:display git logical variable'
+    'verify-pack:validate packed git archive files'
+    'whatchanged:show commit-logs and differences they introduce'
+    'write-tree:create tree from the current index')
+
+  local -a useful_commands
+  useful_commands=(
+    'format-patch:prepare patches for e-mail submission'
+    'ls-files:information about files in the index/working directory'
+    'config:get and set options in "$GIT_DIR/config"'
+    'instaweb:insantly browse your working repository in gitweb'
+    'remote:manage set of tracked repositories'
+    'send-email:send patch-e-mails out of "format-patch" output'
+    'update-index:modify index in some given way')
+
+  local -a interoperability_commands
+  interoperability_commands=(
+    'archimport:import an Arch repository into git'
+    'cvsexportcommit:export a commit to a CVS checkout'
+    'cvsimport:import a CVS "repository" into a git repository'
+    'svnimport:import SVN repository into git'
+    'quiltimport:apply a quilt patchset'
+    'svn:bidirectional operation between a single Subversion branch and git')
+
+  local -a ancillary_commands
+  ancillary_commands=(
+    'convert-objects:convert old-style git repository'
+    'get-tar-commit-id:extract commit ID from an archive created using tar-tree'
+    'hash-object:compute object ID from a file'
+    'patch-id:compute unique ID for a patch'
+    'fsck:verify the connectivity and validity of the objects in the database'
+    'lost-found:recover lost references that luckily have not yet been pruned')
+
+  local -a internal_commands
+  internal_commands=(
+    'daemon:start a really simple server for git repositories'
+    'fast-import:import information into git directly'
+    'http-fetch:download remote git repository via HTTP'
+    'http-push:push missing objects using HTTP/DAV'
+    'receive-pack:command invoked by send-pack to receive what is pushed to it'
+    'rev-parse:pick out and massage parameters for other git commands'
+    'runstatus:a helper for git-status and git-commit'
+    'send-pack:push to remote repository, intelligently'
+    'ssh-fetch:pull from remote repository over an SSH connection'
+    'ssh-upload:"server-side" helper program used by ssh-fetch'
+    'stripspace:filter out empty lines'
+    'upload-pack:command invoked by clone-pack and fetch-pack')
+
+  local wanted_commands
+  zstyle -s ':completion:${curcontext}:' commands wanted_commands || wanted_commands="all -internal"
+
+  local -aU unique_wanted_commands
+  unique_wanted_commands=($=wanted_commands)
+
+  integer index_of_all=$(( $unique_wanted_commands[(I)all] ))
+  if (( index_of_all > 0 )); then
+    unique_wanted_commands[index_of_all]=()
+    unique_wanted_commands+=(base additional useful interoperability ancillary internal)
+  fi
+
+  for (( i = 0; i < $#unique_wanted_commands; i++ )); do
+    if [[ $unique_wanted_commands[i] == (#bq)-(*) ]]; then
+      unique_wanted_commands[i]=()
+      unique_wanted_commands[(I)$match[1]]=()
+    fi
+  done
+
+  local -a commands
+  for wanted_command in $unique_wanted_commands; do
+    case $wanted_command in
+      (base)
+        commands+=($base_commands) ;;
+      (additional)
+        commands+=($additional_commands) ;;
+      (useful)
+        commands+=($useful_commands) ;;
+      (interoperability)
+        commands+=($interoperability_commands) ;;
+      (ancillary)
+        commands+=($ancillary_commands) ;;
+      (internal)
+        commands+=($internal_commands) ;;
+    esac
+  done
 
   _describe -t commands 'git command' commands && ret=0
 }
 
-# TODO: this needs to be cleaned up and fixed
-local curcontext=$curcontext ret=1
+(( $+functions[__git_aliases] )) ||
+__git_aliases () {
+  declare -a aliases
 
-if [[ $words[1] == git ]]; then
-  if (( CURRENT == 2 )); then
-    _git_commands
+  # TODO: See __git_config_gettable_name for discussion on how to actually get
+  # out the names, skipping the values.
+  # TODO: Should check if the terminal is unicode capable.  If so, use ‘ and ’
+  # instead of '.
+  aliases=(${^${${(M)${(f)"$(_call_program aliases git config --list)"}:#alias.*}#alias.}/(#b)=(*)/:alias for \'$match[1]}\')
+  __git_command_successful || return 0
+
+  local expl
+
+  _describe -t aliases 'git alias' aliases
+}
+
+(( $+functions[__git_aliases_and_commands] )) ||
+__git_aliases_and_commands () {
+  _alternative \
+    'aliases: :__git_aliases' \
+    'commands: :_git_commands'
+}
+
+_git () {
+  local curcontext=$curcontext ret=1
+
+  if [[ $words[1] == git ]]; then
+    local state line
+    declare -A opt_args
+    _arguments -C \
+      '(- :)--version[display version information]' \
+      '(- :)--help[display help message]' \
+      '--exec-path=-[path containing core git-programs]::directory:_directories' \
+      '(-p --paginate)'{-p,--paginate}'[pipe output into $PAGER]' \
+      '--git-dir=-[path to repository]:directory:_directories' \
+      '--bare[use $PWD as repository]' \
+      ':command:->command' \
+      '*::options:->options' && ret=0
+    case $state in
+      (command)
+        __git_aliases_and_commands
+        ;;
+      (options)
+        curcontext="${curcontext%:*:*}:git-$words[1]:"
+        _call_function ret _git-$words[1]
+        ;;
+    esac
   else
-    shift words
-    (( CURRENT-- ))
-    curcontext="${curcontext%:*:*}:git-$words[1]:"
-    _call_function ret _git-$words[1]
+    _call_function ret _$words[1]
   fi
-else
-  _call_function ret _$words[1]
-fi
+}
 
+# NOTE: -c is undocumented.
+# TODO: Perhaps provide some sort of completion or guard for line range (-L).
+# NOTE: --score-debug is undocumented.
+# NOTE: --show-name is undocumented.
+# NOTE: --show-number is undocumented.
+(( $+functions[_git-annotate] )) ||
 _git-annotate () {
   _arguments -S \
     '-b[show blank SHA-1 for boundary commits]' \
@@ -3705,3 +3815,92 @@ __git_svn_revisions () {
 __git_svn_revision_numbers () {
   _guard "[[:digit:]]#" "revision number"
 }
+
+(( $+functions[__git_svn_base_revisions] )) ||
+__git_svn_base_revisions () {
+  declare -a revisions
+
+  revisions=(
+    'BASE:the bottommost revision of the SVN repository')
+
+  # TODO: How do we deal with $*?
+  _describe -t symbolic-revisions 'symbolic revision' revisions -S ':' -r ': '
+}
+
+# ---
+
+# TODO: How do we do -/n/ here?
+# --reflog undocumented
+# --left-right undocumented
+# -m undocumented
+# -v undocumented
+# --root undocumented
+# --no-commit-id undocumented
+# --always undocumented
+# --abbrev undocumented
+# --abbrev-commit undocumented
+# --full-diff undocumented
+# --full-history undocumented
+# --all-match undocumented
+# optional argument to --unpacked undocumented
+(( $+functions[__git_setup_revision_arguments] )) ||
+__git_setup_revision_arguments () {
+  revision_arguments=(
+    '(-n --max-count -)'{-n+,--max-count=-}'[maximum number of commits to output]: :_guard "[[\:digit\:]]#" number'
+    '--skip=-[skip given number of commits before output]: :_guard "[[\:digit\:]]#" number'
+    '(          --since --after)--max-age=-[maximum age of commits to output]: :_guard "[[\:digit\:]]#" timestamp'
+    '(--max-age --since --after)'{--since=-,--after=-}'[show commits more recent than given date]:date'
+    '(          --until --before)--min-age[minimum age of commits to output]: :_guard "[[\:digit\:]]#" timestamp'
+    '(--min-age --until --before)'{--until=-,--before=-}'[show commits older than given date]: :_guard "[[\:digit\:]]#" timestamp'
+    '--all[show all commits from refs]'
+    '--reflog[show all commits from reflogs]'
+    '(-g --walk-reflogs)'{-g,--walk-reflogs}'[walk reflog entries from most recent to oldest]'
+    '*--not[reverses meaning of ^ prefix for revisions that follow]'
+    '--default[use argument as default revision]:default revision:__git_revisions'
+    '--merge[after a failed merge, show refs that touch files having a conflict]'
+    '(             --date-order)--topo-order[show commits in topological order]'
+    '(--topo-order             )--date-order[show commits in date order]'
+    '--parents[show parent commits]'
+    '(        --sparse)--dense[this is the inverse of --sparse, and is also the default]'
+    '(--dense         )--sparse[when paths are given, output only commits that changes any of them]'
+    '--remove-empty[stop when a given path disappears from the tree]'
+    '--no-merges[do not print commits with more than one parent]'
+    '--boundary[output uninteresting commits at the boundary]'
+    '--left-right[undocumented]'
+    '(          --objects-edge)--objects[show object ids of objects referenced by the listed commits]'
+    '(--objects               )--objects-edge[show object ids of objects referenced by the listed and excluded commits]'
+    '(   -t)-r[show recursive diffs]'
+    '(-r   )-t[show the tree objects in the diff output]'
+    '-m[do not ignore merges]'
+    '(   --cc --full-diff)-c[show merge diffs from parents simultaneously]'
+    '(-c      --full-diff)--cc[show merge diffs from parents simultaneously without one-parent diffs]'
+    '(-c --cc            )--full-diff[undocumented]'
+    '(   --pretty --header)-v[show verbose header]'
+    '(-v          --header)'$pretty_arg
+    '--root[show root diff]'
+    '--no-commit-id[do not show commit ids]'
+    '--always[always show header]'
+    $abbrev_arg
+    '--abbrev-commit[undocumented]'
+    '--full-history[undocumented]'
+    '--relative-date[show dates relative to the current time]'
+    '--author=-[limit commits to those by the given author]:author'
+    '--committer=-[limit commits to those by the given committer]:committer'
+    '--grep=-[limit commits to those with log messages matching the given pattern]:pattern'
+    '--all-match[undocumented]'
+    '--encoding=-[output log messages in given encoding]::encoding:__git_encodings'
+    $diff_args)
+
+  if (( words[(I)--objects(|-edge)] )); then
+    revision_arguments+=('--unpacked=-[print object IDs that are not in packs]::object')
+  fi
+}
+
+# ---
+
+(( $+functions[__git_is_indexed] )) ||
+__git_is_indexed () {
+  [[ -n $(git ls-files $REPLY) ]]
+}
+
+_git

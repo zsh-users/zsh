@@ -1,5 +1,8 @@
 2007-09-25  Clint Adams  <clint@zsh.org>
 
+	* 23829: Completion/Unix/Command/_git: merge in the remaining
+	git completion changes from Nikolai Weibull's repository.
+
 	* 23828: Completion/Unix/Command/_git: merge in lots of
 	git completion changes from Nikolai Weibull's repository.
 
