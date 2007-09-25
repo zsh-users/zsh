@@ -1,5 +1,8 @@
 2007-09-25  Clint Adams  <clint@zsh.org>
 
+	* 23831: Completion/Unix/Command/_git: fix handling of merge
+	strategy option.
+
 	* 23829: Completion/Unix/Command/_git: merge in the remaining
 	git completion changes from Nikolai Weibull's repository.
 

@@ -92,10 +92,6 @@ fetch_args=(
   '-w[write commit-id into the filename under "$GIT_DIR/refs/<filename>"]:filename'
 )
 
-declare -g merge_strategy_arg
-
-merge_strategy_arg='*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies'
-
 declare -ga merge_args
 
 # TODO: Add descriptions to strategies (stupid is undocumented).
@@ -103,7 +99,7 @@ merge_args=(
   '(-n --no-summary)'{-n,--no-summary}'[do not show diffstat at the end of the merge]'
   '--no-commit[perform the merge but do not autocommit]'
   '--squash[merge, but do not make a commit]'
-  $merge_strategy_arg
+  '*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies'
 )
 
 declare -ga force_ref_arg
@@ -1666,7 +1662,7 @@ _git-ls-remote () {
 (( $+functions[_git-merge] )) ||
 _git-merge () {
   _arguments \
-    $merge_args \
+    "$merge_args[@]" \
     ':merge message' \
     '*:remote:__git_commits' && ret=0
 }
@@ -1689,7 +1685,7 @@ _git-octupus () {
 (( $+functions[_git-pull] )) ||
 _git-pull () {
   _arguments \
-    $merge_args \
+    "$merge_args[@]" \
     $common_fetch_args \
     ':repository:__git_any_repositories' \
     '*:refspec:__git_ref_specs' && ret=0
@@ -1725,7 +1721,7 @@ _git-rebase () {
       '--abort[abort current rebase]' \
       '--skip[skip the current patch]' \
       '--merge[use merging strategies to rebase]' \
-      $merge_strategy_arg \
+      '*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
       $verbose_arg \
       '-C-[ensure that given lines of surrounding context match]: :_guard "[[\:digit\:]]##" "lines of context"' \
       ':upstream branch:__git_revisions' \
@@ -2310,7 +2306,7 @@ _git-svn () {
 
       if [[ $line[1] == (dcommit|rebase) ]]; then
         arguments+=(
-            $merge_strategy_arg)
+            '*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies')
       fi
 
       if [[ $line[1] == (dcommit|log|rebase) ]]; then
