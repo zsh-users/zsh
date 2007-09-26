@@ -1,3 +1,8 @@
+2007-09-26  Peter Stephenson  <pws@csr.com>
+
+	* users/11883: Src/init.c: "return" at top level caused
+	following precommand functions to return immediately.
+
 2007-09-26  Clint Adams  <clint@zsh.org>
 
 	* 23834: Completion/Unix/Type/_tex: complete tex files for xetex

@@ -1343,9 +1343,11 @@ zsh_main(UNUSED(int argc), char **argv)
 	 */
 	maybeshrinkjobtab();
 
-	do
+	do {
+	    /* Reset return from top level which gets us back here */
+	    retflag = 0;
 	    loop(1,0);
-	while (tok != ENDINPUT && (tok != LEXERR || isset(SHINSTDIN)));
+	} while (tok != ENDINPUT && (tok != LEXERR || isset(SHINSTDIN)));
 	if (tok == LEXERR) {
 	    /* Make sure a parse error exits with non-zero status */
 	    if (!lastval)
