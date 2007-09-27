@@ -1,10 +1,20 @@
 #compdef comm
 
-_arguments -s \
-  '-1[suppress lines unique to FILE1]' \
-  '-2[suppress lines unique to FILE2]' \
-  '-3[suppress lines that appear in both files]' \
-  '--help' \
-  '--version' \
-  '1:file1 to compare:_files' \
+local -a args
+
+args=(
+  '-1[suppress lines unique to FILE1]'
+  '-2[suppress lines unique to FILE2]'
+  '-3[suppress lines that appear in both files]'
+  '1:file1 to compare:_files'
   '2:file2 to compare:_files'
+)
+
+if _pick_variant gnu=GNU unix --version; then
+  args+=(
+    '(- : *)--version[display version information]'
+    '(- : *)--help[display help information]'
+  )
+fi
+
+_arguments -s $args

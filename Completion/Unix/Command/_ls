@@ -5,7 +5,7 @@ local arguments is_gnu
 
 _pick_variant -r is_gnu gnu=gnu unix --help
 
-if [[ "$OSTYPE" = (netbsd*|freebsd*|openbsd*) && "$is_gnu" != gnu ]]; then
+if [[ "$OSTYPE" = (netbsd*|freebsd*|openbsd*|darwin*) && "$is_gnu" != gnu ]]; then
   arguments=(
     '(-A)-a[list entries starting with .]'
     '(-a)-A[list all except . and ..]'
@@ -54,6 +54,13 @@ if [[ "$OSTYPE" = (netbsd*|freebsd*|openbsd*) && "$is_gnu" != gnu ]]; then
 
     '*:files:_files'
   )
+  if [[ "$OSTYPE" = (freebsd*|darwin*) ]]; then
+    arguments+=(
+      '-G[enable colorized output]'
+      '-H[follow symlinks on the command line]'
+      '-P[do not follow symlinks]'
+    )
+  fi
 else
   arguments=(
     '(--all -a -A --almost-all)'{--all,-a}'[list entries starting with .]'
