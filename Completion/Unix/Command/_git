@@ -1960,7 +1960,7 @@ __git_zstyle_default ':completion::complete:git-status:argument-rest:*' ignore-l
 (( $+functions[_git-verify-tag] )) ||
 _git-verify-tag () {
   _arguments \
-    ':tag:__git_tag_ids' && ret=0
+    ':tag:__git_tags' && ret=0
 }
 
 # TODO: This should take those arguments that git-diff-tree can take, as well.

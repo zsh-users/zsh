@@ -1,5 +1,8 @@
 2007-09-27  Clint Adams  <clint@zsh.org>
 
+	* Mikael Magnusson: 23838: Completion/Unix/Command/_git: 
+	have git verify-tag complete tags instead of hash IDs.
+
 	* 23846: Completion/Unix/Command/_git: merge in additional changes
 	from Nikolai Weibull's repo.
 
