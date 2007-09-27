@@ -1,10 +1,4 @@
-#compdef git git-add git-am git-annotate git-apply git-applymbox git-applypatch git-archimport git-archive git-bisect git-blame git-branch git-cat-file git-check-ref-format git-checkout git-checkout-index git-cherry git-cherry-pick git-clean git-clone git-clone-pack git-commit git-commit-tree git-convert-objects git-count-objects git-cvsexportcommit git-cvsimport git-daemon git-describe git-diff git-diff-files git-diff-index git-diff-stages git-diff-tree git-fast-import git-fetch git-fetch-pack git-fmt-merge-msg git-format-patch git-fsck git-gc git-get-tar-commit-id git-grep git-hash-object git-http-fetch git-http-push git-imap-send git-index-pack git-init git-instaweb git-local-fetch git-log git-lost-found git-ls-files git-ls-remote git-ls-tree git-mailinfo git-mailsplit git-merge git-merge-base git-merge-file git-merge-index git-merge-one-file git-merge-tree git-mktag git-mktree git-mv git-name-rev git-octopus git-pack-objects git-pack-redundant git-pack-refs git-patch-id git-peek-remote git-prune git-prune-packed git-pull git-push git-quiltimport git-read-tree git-rebase git-receive-pack git-reflog git-relink git-remote git-repack gut-runstatus git-config git-request-pull git-rerere git-reset git-rev-list git-rev-parse git-revert git-rm git-send-email git-send-pack git-shortlog git-show git-show-branch git-show-index git-ssh-fetch git-ssh-upload git-status git-stripspace git-svn git-svnimport git-symbolic-ref git-tag git-tar-tree git-unpack-file git-unpack-objects git-update-index git-update-ref git-update-server-info git-upload-pack git-var git-verify-pack git-verify-tag git-whatchanged git-write-tree
-
-# Commands not completed:
-# git-cvsserver
-# git-parse-remote 
-# git-shell
-# git-sh-setup
+#compdef git git-add git-am git-annotate git-apply git-applymbox git-applypatch git-archimport git-archive git-bisect git-blame git-branch git-cat-file git-check-attr git-check-ref-format git-checkout git-checkout-index git-cherry git-cherry-pick git-clean git-clone git-clone-pack git-commit git-commit-tree git-convert-objects git-count-objects git-cvsexportcommit git-cvsimport git-cvsserver git-daemon git-describe git-diff git-diff-files git-diff-index git-diff-stages git-diff-tree git-fast-import git-fetch git-fetch-pack git-fmt-merge-msg git-for-each-ref git-format-patch git-fsck git-gc git-get-tar-commit-id git-grep git-hash-object git-http-fetch git-http-push git-imap-send git-index-pack git-init git-instaweb git-local-fetch git-log git-lost-found git-ls-files git-ls-remote git-ls-tree git-mailinfo git-mailsplit git-merge git-merge-base git-merge-file git-merge-index git-merge-one-file git-merge-tree git-mktag git-mktree git-mv git-name-rev git-octopus git-pack-objects git-pack-redundant git-pack-refs git-patch-id git-peek-remote git-prune git-prune-packed git-pull git-push git-quiltimport git-read-tree git-rebase git-receive-pack git-reflog git-relink git-remote git-repack gut-runstatus git-config git-request-pull git-rerere git-reset git-rev-list git-rev-parse git-revert git-rm git-send-email git-send-pack git-sh-setup git-shell git-shortlog git-show git-show-branch git-show-index git-show-ref git-ssh-fetch git-ssh-upload git-status git-stripspace git-svn git-svnimport git-symbolic-ref git-tag git-tar-tree git-unpack-file git-unpack-objects git-update-index git-update-ref git-update-server-info git-upload-archive git-upload-pack git-var git-verify-pack git-verify-tag git-whatchanged git-write-tree
 
 # TODO: All if (( words[(I)-option] )) should be turned into
 # if (( words[(I)-option] > 0 && words[(I)-option] < CURRENT )), as the user
@@ -21,7 +15,7 @@ nul_arg='-z[use NUL termination on output]'
 
 declare -g abbrev_arg
 
-abbrev_arg='--abbrev=-[set minimum SHA1 display-length]: :_guard "[[\:digit\:]]##" length'
+abbrev_arg='--abbrev=-[set minimum SHA1 display-length]: :_guard "[[\:digit\:]]#" length'
 
 declare -g find_copies_harder_arg=
 
@@ -84,12 +78,12 @@ exec_arg='--exec=-[specify path to git-upload-pack on remote side]:remote path'
 declare -ga fetch_args
 
 fetch_args=(
-  '-a[fetch all objects]'
   '-c[fetch commit objects]'
-  '--recover[recover from a failed fetch]'
   '-t[fetch trees associated with commit objects]'
+  '-a[fetch all objects]'
   '-v[show what is downloaded]'
   '-w[write commit-id into the filename under "$GIT_DIR/refs/<filename>"]:filename'
+  '--recover[recover from a failed fetch]'
 )
 
 declare -ga merge_args
@@ -128,11 +122,15 @@ verbose_arg='-v[produce verbose output]'
 declare -g help_arg=
 help_arg='-h[display usage information]'
 
+declare -ga upload_pack_arg
+upload_pack_arg=('(-u --upload-pack)'{-u,--upload-pack=-}'[specify path to git-upload-pack on remote side]:remote path')
+
+
 declare -ga common_fetch_args
 
 common_fetch_args=(
   '(-a --append)'{-a,--append}'[append ref names and object names of fetched refs to "$GIT_DIR/FETCH_HEAD"]'
-  '--upload-pack[pass --exec=<upload-pack> to git-fetch-pack]:remote pack'
+  $upload_pack_arg
   $force_ref_arg
   $tags_fetch_arg
   '(-k --keep)'{-k,--keep}'[keep downloaded pack]'
@@ -154,6 +152,9 @@ template_arg='--template=-[directory to use as a template for the object databas
 declare -g shared_arg=
 
 shared_arg='--shared=-[share repository amongst several users]::permissions:__git_repository_permissions'
+
+declare -g thin_arg=
+thin_arg='--thin[minimize number of objects to be sent]'
 
 __git_zstyle_default () {
   zstyle -t $1 $2
@@ -207,6 +208,7 @@ _git_commands () {
     'archive:create an archive of files from a named tree'
     'blame:blame file lines on commits'
     'cat-file:provide content or type information for repository objects'
+    'check-attr:display gitattributes information'
     'check-ref-format:makes sure that a reference-name is well formed'
     'checkout-index:copy files from the index to the working directory'
     'cherry:find commits not merged upstream'
@@ -220,7 +222,6 @@ _git_commands () {
     'diff-stages:compare two "merge states" in the index file'
     'diff-tree:compare the content and mode of blobs found via two tree objects'
     'fetch-pack:receive missing objects from another repository'
-    'fmt-merge-msg:produce merge commit message'
     'imap-send:dump mailbox from stdin into imap folder'
     'index-pack:build pack index file for an existing packed archive'
     'local-fetch:duplicate another git repository on a local system'
@@ -231,7 +232,6 @@ _git_commands () {
     'merge-base:find as good a common ancestor as possible for a merge'
     'merge-file:run a three-way file merge'
     'merge-index:run merge for files needing merging'
-    'merge-one-file:standard helper-program to use with merge-index'
     'merge-tree:show three-way merge without touching index'
     'mktag:create tag object'
     'mktree:build tree-object from ls-tree formatted text'
@@ -253,6 +253,7 @@ _git_commands () {
     'shortlog:summarize git log output'
     'show:show various types of objects'
     'show-index:display contents of a pack idx file'
+    'show-ref:list references in a local repository'
     'symbolic-ref:read and modify symbolic references'
     'tar-tree:create tar archive of the files in the named tree'
     "unpack-file:create temporary file with blob's contents"
@@ -269,7 +270,7 @@ _git_commands () {
     'format-patch:prepare patches for e-mail submission'
     'ls-files:information about files in the index/working directory'
     'config:get and set options in "$GIT_DIR/config"'
-    'instaweb:insantly browse your working repository in gitweb'
+    'instaweb:instantly browse your working repository in gitweb'
     'remote:manage set of tracked repositories'
     'send-email:send patch-e-mails out of "format-patch" output'
     'update-index:modify index in some given way')
@@ -286,6 +287,7 @@ _git_commands () {
   local -a ancillary_commands
   ancillary_commands=(
     'convert-objects:convert old-style git repository'
+    'for-each-ref:output information on each ref'
     'get-tar-commit-id:extract commit ID from an archive created using tar-tree'
     'hash-object:compute object ID from a file'
     'patch-id:compute unique ID for a patch'
@@ -296,15 +298,19 @@ _git_commands () {
   internal_commands=(
     'daemon:start a really simple server for git repositories'
     'fast-import:import information into git directly'
+    'fmt-merge-msg:produce merge commit message'
     'http-fetch:download remote git repository via HTTP'
     'http-push:push missing objects using HTTP/DAV'
+    'merge-one-file:standard helper-program to use with merge-index'
     'receive-pack:command invoked by send-pack to receive what is pushed to it'
     'rev-parse:pick out and massage parameters for other git commands'
     'runstatus:a helper for git-status and git-commit'
     'send-pack:push to remote repository, intelligently'
+    'shell:restricted login shell for GIT-only SSH access'
     'ssh-fetch:pull from remote repository over an SSH connection'
     'ssh-upload:"server-side" helper program used by ssh-fetch'
     'stripspace:filter out empty lines'
+    'upload-archive:send archive back to git-archive'
     'upload-pack:command invoked by clone-pack and fetch-pack')
 
   local wanted_commands
@@ -890,9 +896,30 @@ _git-diff-tree () {
   esac
 }
 
+# TODO: Better completion for --format: should complete %(field) stuff, that
+# is, %(refname), %(objecttype), %(objectsize), %(objectname) with optional ‘*’
+# in front.
+# TODO: Documentation says that --count can be given * number of times, but
+# sources beg to differ, allowing only one.
+(( $+functions[_git-for-each-ref] )) ||
+_git-for-each-ref () {
+  _arguments -S \
+    '--format=-[output format of ref information]:format' \
+    '(-s --shell -p --perl --python --tcl)'{-s,--shell}'[use string literals suitable for sh]' \
+    '(-s --shell -p --perl --python --tcl)'{-p,--perl}'[use string literals suitable for Perl]' \
+    '(-s --shell -p --perl          --tcl)'--python'[use string literals suitable for Python]' \
+    '(-s --shell -p --perl --python      )'--tcl'[use string literals suitable for Tcl]' \
+    '--count=-[maximum number of refs to iterate over]: :_guard "[[\:digit\:]]#" "maximum number of refs"' \
+    '--sort=-[key to sort refs by]:sort key:__git_ref_sort_keys' \
+    ':: :_guard "([^-]?#|)" pattern' && ret=0
+}
+
 (( $+functions[_git-fmt-merge-msg] )) ||
 _git-fmt-merge-msg () {
-  _message "you probably should not be issuing this command"
+  arguments \
+    '(          --no-summary)--summary[add one-line descriptions from commits being merged]' \
+    '(--summary             )--no-summary[do not add one-line descriptions from commits being merged]' \
+    '(-F --file)'{-F,--file}'[specify list of merged objects from file]:file:_files' && ret=0
 }
 
 (( $+functions[_git-fsck] )) ||
@@ -909,6 +936,12 @@ _git-fsck () {
 
 (( $+functions[_git-ls-files] )) ||
 _git-ls-files () {
+  local no_empty_directory_arg
+
+  if (( words[(I)--directory] )); then
+    no_empty_directory_arg='--no-empty-directory[do not list empty directories]'
+  fi
+
   _arguments -S \
     $nul_arg \
     '(-c --cached)'{-c,--cached}'[show cached files in the output]' \
@@ -918,15 +951,17 @@ _git-ls-files () {
     '(-m --modified)'{-m,--modified}'[show modified files in the output]' \
     '(-o --others)'{-o,--others}'[show other files in the output]' \
     '(-s --stage)'{-s,--stage}'[show stage files in the output]' \
-    '(-t -v)-t[identify each files status (HMRCK?)]' \
     '(-u --unmerged)'{-u,--unmerged}'[show unmerged files in the output]' \
-    '(-t -v)-v[identify each files status (hmrck?)]' \
+    '(   -v)-t[identify each files status (HMRCK?)]' \
+    '(-t   )-v[identify each files status (hmrck?)]' \
     '*'{-x,--exclude=-}'[skip files matching given pattern]:file pattern' \
     '*'{-X,--exclude-from=-}'[skip files matching patterns in given file]:file:_files' \
     '*--exclude-per-directory=-[skip directories matching patterns in given file]:file:_files' \
     '--directory[if a whole directory is classified as "other", show just its name]' \
+    $no_empty_directory_arg \
     '--error-unmatch[if any <file> does not appear in the index, treat this as an error]' \
     '--full-name[force paths to be output relative to the project top directory]' \
+    $abbrev_arg \
     '*::index file:_files' && ret=0
 }
 
@@ -942,6 +977,7 @@ _git-ls-tree () {
     {--name-only,--name-status}'[list only filenames, one per line]' \
     '-r[recurse into subdirectories]' \
     '-t[show tree entries even when going to recurse them]' \
+    '--full-name[output full path-names]' \
     ':tree-ish:__git_tree_ishs' \
     '*::tree file:->files' && ret=0
 
@@ -977,6 +1013,7 @@ _git-merge-base () {
 _git-name-rev () {
   _arguments -S \
     '--tags[only use tags to name the commits]' \
+    '--refs=-[only use refs matching given pattern]: :_guard "?#" "shell pattern"' \
     '(--stdin :)--all[list all commits reachable from all refs]' \
     '(--all :)--stdin[read from stdin and append revision-name]' \
     '(--stdin --all)*:commit-ish:__git_revisions' && ret=0
@@ -1006,11 +1043,30 @@ _git-rev-list () {
     _arguments -S \
       $revision_arguments \
       '(--pretty)--header[show commit headers]' \
+      '--remote-empty[stop when a given path disappears from the tree]' \
       '--timestamp[undocumented]' \
-      '--bisect[show only the middlemost commit object]' \
+      '(         --bisect-vars)--bisect[show only the middlemost commit object]' \
+      '(--bisect              )--bisect-vars[same as --bisect, outputing shell-evalable code]' \
       '--stdin[read commit objects from standard input]' \
       '*:commit id:__git_commits2' && ret=0
   fi
+}
+
+(( $+functions[_git-show-ref] )) ||
+_git-show-ref () {
+  _arguments -S \
+    - list \
+      '(-h --head)'{-h,--head}'[show the HEAD reference]' \
+      '--tags[show only "refs/tags"]' \
+      '--heads[show only "refs/heads"]' \
+      '(-d --dereference)'{-d,--dereference}'[dereference tags into object IDs as well]' \
+      '(-s --hash)'{-s+,--hash=-}'[only show the SHA-1 hash, not the reference name]:: :_guard "[[\:digit\:]]#" length' \
+      '--verify[enable stricter reference checking]' \
+      $abbrev_arg \
+      '(-q --quiet)'{-q,--quiet}'[do not print any results to stdout]' \
+      '*: :_guard "([^-]?#|)" pattern' \
+    - exclude \
+      '--exclude-existing=-[filter out existing refs from stdin]:: :_guard "([^-]?#|)" pattern' && ret=0
 }
 
 (( $+functions[_git-show] )) ||
@@ -1032,6 +1088,7 @@ _git-show-index () {
 (( $+functions[_git-tar-tree] )) ||
 _git-tar-tree () {
   _arguments \
+    '--remote=-[retrieve a tar archive from a remote repository]:__git_remote_repository' \
     ':tree-ish:__git_tree_ishs' \
     ':base:_files' && ret=0
 }
@@ -1068,11 +1125,16 @@ _git-clone-pack () {
 (( $+functions[_git-fetch-pack] )) ||
 _git-fetch-pack () {
   _arguments \
-    $exec_arg \
-    '-k[do not invoke "git-unpack-objects" on received data]'
-    '-q[pass "-q" flag to "git-unpack-objects"]' \
+    '--all[fetch all remote refs]' \
+    '(-q --quiet)'{-q,--quiet}'[make output less verbose]' \
+    '(-k --keep)'{-k,--keep}'[do not invoke git-unpack-objects on received data]' \
+    $thin_arg \
+    '(--upload-pack --exec)'{--upload-pack=-,--exec=-}'[specify path to git-upload-pack on remote side]:remote path' \
+    '--depth=-[limit fetching to ancestor-chains not longer than given number]: :_guard "[[\:digit\:]]#" "maximum ancestor-chain length"' \
+    '--no-progress[do not show progress]' \
+    $verbose_arg \
     ':repository:__git_any_repositories' \
-    '*:head:__git_heads' && ret=0
+    '*:references:__git_references' && ret=0
 }
 
 (( $+functions[_git-fast-import] )) ||
@@ -1095,6 +1157,7 @@ _git-fast-import () {
 _git-http-fetch () {
   _arguments \
     $fetch_args \
+    '(1)--stdin[read commit ids and refs from standard input]' \
     ':commit id:__git_commits' \
     ':URL:_urls' && ret=0
 }
@@ -1102,11 +1165,14 @@ _git-http-fetch () {
 (( $+functions[_git-http-push] )) ||
 _git-http-push () {
   _arguments \
+    '--all[verify that all objects in local ref history exist remotely]' \
     '--complete[do not assume that the remote repository is complete]' \
-    $force_ref_arg \
+    '--force[allow refs that are not ancestors to be updated]' \
     '--verbose[report the list of objects being walked locally and sent to the remote]' \
+    '(   -D)-d[remove refs from remote repository]' \
+    '(-d   )-D[forcefully remove refs from remote repository]' \
     ':URL:_urls' \
-    '*:remote refs' && ret=0
+    '*:remote refs:__git_remote_references' && ret=0
 }
 
 (( $+functions[_git-local-fetch] )) ||
@@ -1116,15 +1182,28 @@ _git-local-fetch () {
     '-l[hard-link objects]' \
     '-n[do not copy objects]' \
     '-s[sym-link objects]' \
+    '(1)--stdin[read commit ids and refs from standard input]' \
     ':commit id:__git_commits' \
     ':directory:_directories' && ret=0
 }
 
+# TODO: --tags undocumented.
+# TODO: --heads undocumented.
+# TODO: --refs undocumented.
 (( $+functions[_git-peek-remote] )) ||
 _git-peek-remote () {
   _arguments \
+    '--upload-pack=-[specify path to git-upload-pack on remote side]:remote path' \
     $exec_arg \
+    '--tags[undocumented]' \
+    '--heads[undocumented]' \
+    '--refs[undocumented]' \
     ':repository:__git_repository' && ret=0
+}
+
+(( $+functions[_git-sh-setup] )) ||
+_git-sh-setup () {
+  _message "you probably should not be issuing this command; it is an internal git helper"
 }
 
 # TODO: --dry-run undocumented.
@@ -1179,17 +1258,62 @@ _git-reflog () {
 
 (( $+functions[_git-receive-pack] )) ||
 _git-receive-pack () {
-  _message "you probably should not be issuing this command"
+  _arguments \
+    ':directory to sync into:_directories' && ret=0
+}
+
+(( $+functions[_git-shell] )) ||
+_git-shell () {
+  local curcontext=$curcontext state line
+  declare -A opt_args
+
+  _arguments -C \
+    '-c[command to execute]:command:->commands' \
+    ':argument to command:->arguments' && ret=0
+
+  case $state in
+    (commands)
+      declare -a commands
+
+      commands=(git-receive-pack git-upload-pack)
+
+      _describe -t commands command commands && ret=0
+      ;;
+    (arguments)
+      case $line[1] in
+        (git-receive-pack)
+          local expl
+
+          _description directories expl 'directory to sync into'
+          _directories $expl
+          ;;
+        (git-upload-pack)
+          local expl
+
+          _description directories expl 'directory to sync from'
+          _directories $expl
+          ;;
+      esac
+      ;;
+  esac
+}
+
+(( $+functions[_git-upload-archive] )) ||
+_git-upload-archive () {
+  _arguments \
+    ':directory to get tar archive from:_directories' && ret=0
 }
 
 (( $+functions[_git-send-pack] )) ||
 _git-send-pack () {
   _arguments \
-    $exec_arg \
+    '(--receive-pack --exec)'{--receive-pack=-,--exec=-}'[specify path to git-receive-pack on remote side]:remote path'
     '--all[update all refs that exist locally]' \
     '--force[update remote orphaned refs]' \
+    $verbose_arg \
+    $thin_arg \
     ':repository:__git_any_repositories' \
-    '*:remote refs' && ret=0
+    '*:remote refs:__git_remote_references' && ret=0
 }
 
 (( $+functions[_git-ssh-fetch] )) ||
@@ -1217,6 +1341,8 @@ _git-update-server-info () {
 (( $+functions[_git-upload-pack] )) ||
 _git-upload-pack () {
   _arguments \
+    '--strict[do not try <directory>/.git/ if <directory> is not a git directory' \
+    '--timeout=-[interrupt transfer after given number of seconds of inactivity]: :_guard "[[\:digit\:]]" "inactivity timeout"' \
     ':directory:_directories' && ret=0
 }
 
@@ -1487,7 +1613,7 @@ _git-clone () {
     '(-q --quiet)'{-q,--quiet}'[operate quietly]' \
     '-n[do not checkout HEAD after clone is complete]' \
     '(-o --origin)'{-o,--origin}'[use given name instead of "origin" as branch name]:name:__git_guard_branch-name' \
-    '(-u --upload-pack)'{-u,--uploadpack}'[specify path to git-upload-pack on remote side]:remote path' \
+    $upload_pack_arg \
     $template_arg \
     '--depth[create a shallow clone, given number of revisions deep]: :_guard "[[\:digit\:]]##" depth' \
     ':repository:__git_any_repositories' \
@@ -1655,6 +1781,7 @@ _git-ls-remote () {
   _arguments \
     '(-h --heads)'{-h,--heads}'[show only refs under refs/heads]' \
     '(-t --tags)'{-t,--tags}'[show only refs under refs/tags]' \
+    $upload_pack_arg \
     ':repository:__git_any_repositories' \
     '*: :__git_references' && ret=0
 }
@@ -1858,6 +1985,30 @@ _git-applypatch () {
     '::signoff file:__git_signoff_file' && ret=0
 }
 
+# TODO: Need to combine the list of attributes defined in __git_attributes.
+(( $+functions[_git-check-attr] )) ||
+_git-check-attr () {
+  local -a attributes
+
+  attributes=(crlf ident filter diff merge)
+
+  local only_attributes=1
+  for (( i = 2; i < $#words; i++ )); do
+    if (( attributes[(I)$words[i]] == 0 )); then
+      only_attributes=0
+      break
+    fi
+  done
+
+  if (( !only_attributes || words[(I)--] )); then
+    __git_files && ret=0
+  else
+    _alternative \
+      'files:file:__git_files' \
+      'attributes:attribute:__git_attributes' && ret=0
+  fi
+}
+
 # TODO: archive/branch can use _arch_archives perhaps?
 (( $+functions[_git-archimport] )) ||
 _git-archimport () {
@@ -1920,6 +2071,11 @@ _git-cvsimport () {
     $verbose_arg \
     '-z[specify timestamp fuzz factor to cvsps]:fuzz-factor' \
     ':cvsmodule' && ret=0
+}
+
+(( $+functions[_git-cvsserver] )) ||
+_git-cvsserver () {
+  _message "you probably should not be issuing this command; it is an internal git helper"
 }
 
 (( $+functions[_git-lost-found] )) ||
@@ -2056,19 +2212,31 @@ _git-count-objects () {
 
 # TODO: do better than _directories?  The directory needs to be a git-repository,
 # so one could check for a required file in the given directory.
+# TODO: --interpolated-path should complete %H, %CH, %IP, %P, and %D.
 (( $+functions[_git-daemon] )) ||
 _git-daemon () {
   _arguments -S \
     '--strict-paths[match paths exactly]' \
-    '--base-path=[remap all the path requests as relative to the given path]:path:_directories' \
+    '--base-path=-[remap all the path requests as relative to the given path]:path:_directories' \
+    '--interpolated-path=-[dynamically construct alternate paths]:path:_directories' \
     '--export-all[allow pulling from all repositories without verification]' \
-    '(--port)--inetd[run server as an inetd service]' \
-    '(--inetd)--port=-[specify port to listen to]' \
-    '--init-timeout=-[specify timeout between connection and request]' \
-    '--timeout=-[specify timeout for sub-requests]' \
+    '(--port --listen --user --group)--inetd[run server as an inetd service]' \
+    '(--inetd)--listen=-[listen on a specific IP address or hostname]:hostname:_hosts' \
+    '(--inetd)--port=-[specify port to listen to]:port:_ports' \
+    '--init-timeout=-[specify timeout between connection and request]: :_guard "[[\:digit\:]]#" timeout' \
+    '--timeout=-[specify timeout for sub-requests]: :_guard "[[\:digit\:]]#" timeout' \
     '--syslog[log to syslog instead of stderr]' \
-    '--user-path=[allow ~user notation to be used in requests]::path:_directories' \
+    '--user-path=-[allow ~user notation to be used in requests]::path:_directories' \
     '--verbose[log details about incoming connections and requested files]' \
+    '--reuseaddr[reuse addresses when already bound]' \
+    '(--syslog)--detach[detach from the shell]' \
+    '--pid-file=-[save the process id in given file]:pid file:_files' \
+    '--user=-[set uid of daemon]:user:_users' \
+    '--group=-[set gid of daemon]:group:_groups' \
+    '--enable=-[enable site-wide service]:service:__git_daemon_service' \
+    '--disable=-[disable site-wide service]:service:__git_daemon_service' \
+    '--allow-override[allow overriding site-wide service]:service:__git_daemon_service' \
+    '--forbid-override[forbid overriding site-wide service]:service:__git_daemon_service' \
     '*:repository:_directories' && ret=0
 }
 
@@ -2676,12 +2844,6 @@ __git_signoff_file () {
 
 (( $+functions[__git_tag_ids] )) ||
 __git_tag_ids () {
-  local -a refs
-
-  refs=(${${(f)"$(_call_program tag_ids git ls-remote --tags ./. 2>/dev/null)"}%$'\t'*})
-  __git_command_successful || return
-
-  _wanted tag_id expl 'tag object hash' compadd - $refs
 }
 
 (( $+functions[__git_heads_or_tags] )) ||
@@ -2747,6 +2909,11 @@ __git_local_references () {
   _wanted references expl 'references' compadd - $_git_local_refs_cache
 }
 
+(( $+functions[__git_remote_references] )) ||
+__git_remote_references () {
+  __git_references
+}
+
 (( $+functions[__git_branch_names] )) ||
 __git_branch_names () {
   local expl
@@ -2758,6 +2925,8 @@ __git_branch_names () {
   _wanted branch-names expl branch-name compadd $* - $branch_names
 }
 
+# TODO: Add merge.*.(name|driver|recursive) and diff.*.(command|funcname) (see
+# gitattributes(5)).
 (( $+functions[__git_config_name] )) ||
 __git_config_name () {
   local label=names
@@ -3829,11 +3998,72 @@ __git_svn_base_revisions () {
   _describe -t symbolic-revisions 'symbolic revision' revisions -S ':' -r ': '
 }
 
+# TODO: numparent is undocumented.
+(( $+functions[__git_ref_sort_keys] )) ||
+__git_ref_sort_keys () {
+  compset -P '-'
+
+  local -a keys
+
+  keys=(
+    'refname:the name of the ref'
+    'objecttype:the type of the object'
+    'objectsize:the size of the object'
+    'objectname:the object name (SHA-1)'
+    'tree:the tree header-field'
+    'parent:the parent header-field'
+    'numparent:undocumented'
+    'object:the object header-field'
+    'type:the type header-field'
+    'tag:the tag header-field'
+    'author:the author header-field'
+    'authorname:the name component of the author header-field'
+    'authoremail:the email component of the author header-field'
+    'authordate:the date component of the author header-field'
+    'committername:the name component of the committer header-field'
+    'committeremail:the email component of the committer header-field'
+    'committerdate:the date component of the committer header-field'
+    'taggername:the name component of the tagger header-field'
+    'taggeremail:the email component of the tagger header-field'
+    'taggerdate:the date component of the tagger header-field'
+    'creatorname:the name component of the creator header-field'
+    'creatordate:the date component of the creator header-field'
+    'subject:the subject of the message'
+    'body:the body of the message'
+    'body:the contents of the message (subject and body)')
+
+  _describe -t sort-keys 'sort key' keys
+}
+
+(( $+functions[__git_daemon_service] )) ||
+__git_daemon_service () {
+  local -a services
+
+  services=(
+    'upload-pack:serve git-fetch-pack and git-peek-remote clients'
+    'upload-archive:serve git-archive --remote clients')
+
+  _describe -t services 'service' services
+}
+
+(( $+functions[__git_attributes] )) ||
+__git_attributes () {
+  local -a attributes
+
+  attributes=(
+    'crlf:line-ending convention'
+    'ident:ident substitution'
+    'filter:filters'
+    'diff:textual diff'
+    'merge:merging strategy')
+
+  _describe -t attributes 'attribute' attributes
+}
+
 # ---
 
 # TODO: How do we do -/n/ here?
 # --reflog undocumented
-# --left-right undocumented
 # -m undocumented
 # -v undocumented
 # --root undocumented
@@ -3855,6 +4085,7 @@ __git_setup_revision_arguments () {
     '(          --until --before)--min-age[minimum age of commits to output]: :_guard "[[\:digit\:]]#" timestamp'
     '(--min-age --until --before)'{--until=-,--before=-}'[show commits older than given date]: :_guard "[[\:digit\:]]#" timestamp'
     '--all[show all commits from refs]'
+    '--cherry-pick[omit any same-change commits]'
     '--reflog[show all commits from reflogs]'
     '(-g --walk-reflogs)'{-g,--walk-reflogs}'[walk reflog entries from most recent to oldest]'
     '*--not[reverses meaning of ^ prefix for revisions that follow]'
@@ -3868,7 +4099,7 @@ __git_setup_revision_arguments () {
     '--remove-empty[stop when a given path disappears from the tree]'
     '--no-merges[do not print commits with more than one parent]'
     '--boundary[output uninteresting commits at the boundary]'
-    '--left-right[undocumented]'
+    '--left-right[mark which side of a symmetric diff a commit is reachable from]'
     '(          --objects-edge)--objects[show object ids of objects referenced by the listed commits]'
     '(--objects               )--objects-edge[show object ids of objects referenced by the listed and excluded commits]'
     '(   -t)-r[show recursive diffs]'
@@ -3886,6 +4117,9 @@ __git_setup_revision_arguments () {
     '--abbrev-commit[undocumented]'
     '--full-history[undocumented]'
     '--relative-date[show dates relative to the current time]'
+    "--date=-[format of date output]:date format:((relative\:'show dates relative to the current time'
+                                                   local\:\"show timestamps in user's local timezone\"
+                                                   default\:'show timestamp in the original timezone\""
     '--author=-[limit commits to those by the given author]:author'
     '--committer=-[limit commits to those by the given committer]:committer'
     '--grep=-[limit commits to those with log messages matching the given pattern]:pattern'

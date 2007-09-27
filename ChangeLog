@@ -1,5 +1,8 @@
 2007-09-27  Clint Adams  <clint@zsh.org>
 
+	* 23846: Completion/Unix/Command/_git: merge in additional changes
+	from Nikolai Weibull's repo.
+
 	* Jun Takimoto: 23814: Completion/Unix/Command/_ls, Command/_ls,
 	Completion/BSD/Command/_chflags,
 	Completion/Unix/Type/_file_systems, Completion/Unix/Command/_comm:
