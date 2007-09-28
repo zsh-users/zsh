@@ -1,3 +1,8 @@
+2007-09-28  Clint Adams  <clint@zsh.org>
+
+	* Jesse Weinstein: 23848: Completion/Unix/Command/_md5sum:
+	completion for md5sum.
+
 2007-09-27  Clint Adams  <clint@zsh.org>
 
 	* Mikael Magnusson: 23838: Completion/Unix/Command/_git: 

@@ -1,0 +1,9 @@
+#compdef md5sum
+
+_arguments -S \
+    "-v[verbose, print file names when checking]" \
+    "-b[read files in binary mode]" \
+    "(*)-c[check message digests (default is generate)]:md5 digest file:_files -g \*.md5" \
+    "(-)*:file to digest:_files" 
+
+
