@@ -1,3 +1,8 @@
+2007-09-29  Clint Adams  <clint@zsh.org>
+
+	* Pierre Habouzit: 23851: Completion/Unix/Command/_git: 
+	use ad-hoc functions to list git branches and tags.
+
 2007-09-28  Clint Adams  <clint@zsh.org>
 
 	* 23850: Completion/Unix/Command/_md5sum: complete for GNU md5sum

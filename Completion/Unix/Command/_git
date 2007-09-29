@@ -2846,30 +2846,26 @@ __git_signoff_file () {
 __git_tag_ids () {
 }
 
-(( $+functions[__git_heads_or_tags] )) ||
-__git_heads_or_tags () {
-  local expl
-  declare -a refs opts
-  declare -A ours
-
-  zparseopts -K -D -a opts S: M: J: V: 1 2 n F: X: P:=ours T:=ours
-
-  (( $+ours[-P] )) || ours[-P]=./.
-
-  refs=(${${${${(f)"$(_call_program $ours[-T] git ls-remote --$ours[-T] $ours[-P] 2>/dev/null)"}#*$'\t'}:#*\^*}#refs/$ours[-T]/})
-  __git_command_successful || return
-
-  _wanted $ours[-T] expl $ours[-T] compadd $opts - $refs
-}
-
 (( $+functions[__git_heads] )) ||
 __git_heads () {
-  __git_heads_or_tags $* -T heads && ret=0
+  local expl
+  declare -a branch_names
+
+  branch_names=(${${(f)"$(_call_program heads git branch -a 2>/dev/null)"}#[* ] })
+  __git_command_successful || return
+
+  _wanted heads expl branch-name compadd $* - $branch_names
 }
 
 (( $+functions[__git_tags] )) ||
 __git_tags () {
-  __git_heads_or_tags $* -T tags && ret=0
+  local expl
+  declare -a tag_names
+
+  tag_names=(${${(f)"$(_call_program tags git tag -l 2>/dev/null)"}#[* ] })
+  __git_command_successful || return
+
+  _wanted tags expl tag-name compadd $* - $tag_names
 }
 
 # TODO: depending on what options are on the command-line already, complete
