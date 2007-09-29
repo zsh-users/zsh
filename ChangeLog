@@ -1,5 +1,9 @@
 2007-09-29  Clint Adams  <clint@zsh.org>
 
+	* Julien BLACHE: 23852:
+	Completion/Debian/Command/_dpatch-edit-patch: completion for
+	dpatch-edit-patch.
+
 	* Pierre Habouzit: 23851: Completion/Unix/Command/_git: 
 	use ad-hoc functions to list git branches and tags.
 
