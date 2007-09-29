@@ -1,5 +1,8 @@
 2007-09-29  Clint Adams  <clint@zsh.org>
 
+	* 23860: Completion/Debian/Command/_dpatch-edit-patch: complete
+	patch names, omitting the .dpatch extension.
+
 	* 23854: Completion/Debian/Command/_dpatch-edit-patch: complete
 	colon-separated path after -P, other minor tweaks.
 

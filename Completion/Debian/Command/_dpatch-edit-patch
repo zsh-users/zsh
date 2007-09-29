@@ -13,5 +13,5 @@ _arguments \
   '(-l --shell)'{-l,--shell=}'[shell to be invoked]:shell:' \
   '(-P --origtargzpath)'{-P,--origtargzpath=}'[colon-separated list of paths containing upstream tarballs, use with -b]:path to upstream tarballs:_dir_list' \
   '(-h --help)'{-h,--help}'[help text]' \
-  '1:patch name:_files -W $PWD/debian/patches -g "*.dpatch"' \
-  '2:base patch name:_files -W $PWD/debian/patches -g "*.dpatch"'
+  '1:patch name:_files -W $PWD/debian/patches -g \*.dpatch\(-.\:r\)' \
+  '2:base patch name:_files -W $PWD/debian/patches -g \*.dpatch\(-.\:r\)'
