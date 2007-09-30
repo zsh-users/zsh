@@ -1,5 +1,8 @@
 2007-09-30  Clint Adams  <clint@zsh.org>
 
+	* Nikolai Weibull: 23871: Completion/Unix/Command/_cdrdao:
+	fix __cdrdao-drivers typo.
+
 	* 23872: Completion/Unix/Command/_git: complete git
 	config in subcommand position.
 

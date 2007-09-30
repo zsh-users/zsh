@@ -56,7 +56,7 @@ tmpfile_args=(
 declare -ga device_args
 device_args=(
   '--device[set SCSI address of the CD recorder]:device:__cdrdao-device'
-  '--driver[use given driver for the CD recorder]:driver:__cdrdao-driver')
+  '--driver[use given driver for the CD recorder]:driver:__cdrdao-drivers')
 
 # TODO: Gah!  Fix a cddb server spec matcher
 declare -ga cddb_args
@@ -267,7 +267,7 @@ _cdrdao-copy () {
     $dependent_args
     $common_read_args
     '--source-device[set SCSI address of the CD reader]:device:__cdrdao-device' \
-    '--source-driver[use given driver for the CD reader]:driver:__cdrdao-driver' \
+    '--source-driver[use given driver for the CD reader]:driver:__cdrdao-drivers' \
     '--on-the-fly[perform on-the-fly copy of CD (no image created)]' \
     $fasttoc_arg \
     '--keepimage[do not remove generated image when done]' \
