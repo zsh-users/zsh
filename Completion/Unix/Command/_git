@@ -1705,7 +1705,8 @@ _git-log () {
   __git_setup_revision_arguments
 
   _arguments -S \
-    $revision_arguments && ret=0
+    "$revision_arguments[@]" \
+    '*:tree-ish: _alternative c\:\:__git_committishs f\:\:_files' && ret=0
 }
 
 # TODO: repository needs fixing

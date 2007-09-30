@@ -1,5 +1,8 @@
 2007-09-30  Clint Adams  <clint@zsh.org>
 
+	* 23875: Completion/Unix/Command/_git: complete heads, tags, and
+	files after git log.
+
 	* 23874: Completion/Unix/Command/_git: only declare
 	revision_arguments parameter once.
 
