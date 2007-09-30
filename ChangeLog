@@ -1,5 +1,8 @@
 2007-09-30  Clint Adams  <clint@zsh.org>
 
+	* 23863: Completion/Linux/Command/_lsusb: completion
+	for lsusb.
+
 	* 23863: Completion/Unix/Command/_git: remove all
 	global variables.
 
