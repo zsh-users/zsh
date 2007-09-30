@@ -9,23 +9,17 @@
 #
 # zstyle ':completion::*:git-{name-rev,add,rm}:*' ignore-line true
 
-declare -g nul_arg=
+_git() {
+local nul_arg abbrev_arg find_copies_harder_arg diff_l_arg pretty_arg exec_arg
+local author_conversion_file_arg long_author_conversion_file_arg verbose_arg
+local help_arg template_arg shared_arg thin_arg author_conversion_file_arg_spec
+local -a diff_args fetch_args merge_args force_ref_arg tags_fetch_arg
+local -a upload_pack_arg common_fetch_args common_apply_args
 
 nul_arg='-z[use NUL termination on output]'
-
-declare -g abbrev_arg
-
 abbrev_arg='--abbrev=-[set minimum SHA1 display-length]: :_guard "[[\:digit\:]]#" length'
-
-declare -g find_copies_harder_arg=
-
 find_copies_harder_arg='--find-copies-harder[try harder to find copies]'
-
-declare -g diff_l_arg
-
 diff_l_arg='-l-[limit number of rename/copy targets to run]: :_guard "[[\:digit\:]]#" number'
-
-declare -ga diff_args
 
 diff_args=(
   '--diff-filter=-[select certain kinds of files for diff]: :_guard "[ACDMRTUXB*]#" kinds'
@@ -65,17 +59,13 @@ diff_args=(
   '(--exit-code)--quiet[disable all output]'
 )
 
-declare -g pretty_arg=
 pretty_arg='--pretty=-[pretty print commit messages]::pretty print:((raw\:"the raw commits"
                                                                      medium\:"most parts of the messages"
                                                                      short\:"few headers and only subject of messages"
                                                                      full\:"all parts of the commit messages"
                                                                      oneline\:"commit-ids and subject of messages"))'
 
-declare -g exec_arg=
 exec_arg='--exec=-[specify path to git-upload-pack on remote side]:remote path'
-
-declare -ga fetch_args
 
 fetch_args=(
   '-c[fetch commit objects]'
@@ -86,8 +76,6 @@ fetch_args=(
   '--recover[recover from a failed fetch]'
 )
 
-declare -ga merge_args
-
 # TODO: Add descriptions to strategies (stupid is undocumented).
 merge_args=(
   '(-n --no-summary)'{-n,--no-summary}'[do not show diffstat at the end of the merge]'
@@ -96,37 +84,24 @@ merge_args=(
   '*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies'
 )
 
-declare -ga force_ref_arg
-
 force_ref_arg=('(-f --force)'{-f,--force}'[allow refs that are not ancestors to be updated]')
-
-declare -ga tags_fetch_arg
 
 tags_fetch_arg=(
   '(--no-tags -t --tags)--no-tags[disable automatic tag following]'
   '(--no-tags -t --tags)'{-t,--tags}'[fetch remote tags]'
 )
 
-local author_conversion_file_arg_spec
 author_conversion_file_arg_spec='[specify author-conversion file]:author-conversion file:_files'
 
-declare -g author_conversion_file_arg=
 author_conversion_file_arg='-A'$author_conversion_file_arg_spec
 
-declare -g long_author_conversion_file_arg=
 long_author_conversion_file_arg='--authors-file=-'$author_conversion_file_arg_spec
 
-declare -g verbose_arg=
 verbose_arg='-v[produce verbose output]'
 
-declare -g help_arg=
 help_arg='-h[display usage information]'
 
-declare -ga upload_pack_arg
 upload_pack_arg=('(-u --upload-pack)'{-u,--upload-pack=-}'[specify path to git-upload-pack on remote side]:remote path')
-
-
-declare -ga common_fetch_args
 
 common_fetch_args=(
   '(-a --append)'{-a,--append}'[append ref names and object names of fetched refs to "$GIT_DIR/FETCH_HEAD"]'
@@ -138,22 +113,15 @@ common_fetch_args=(
   '--depth=-[deepen the history of a shallow repository by the given number of commits]: :_guard "[[\:guard\:]]" "depth"'
 )
 
-declare -ga common_apply_args
-
 common_apply_args=(
   '--whitespace=-[detect a new or modified line that ends with trailing whitespaces]: :__git_apply_whitespace_strategies'
   '-p-[remove N leading slashes from traditional diff paths]: :_guard  "[[\:digit\:]]#" number'
   '-C-[ensure at least N lines of context match before and after each change]: :_guard  "[[\:digit\:]]#" number')
 
-declare -g template_arg=
-
 template_arg='--template=-[directory to use as a template for the object database]:directory:_directories'
-
-declare -g shared_arg=
 
 shared_arg='--shared=-[share repository amongst several users]::permissions:__git_repository_permissions'
 
-declare -g thin_arg=
 thin_arg='--thin[minimize number of objects to be sent]'
 
 __git_zstyle_default () {
@@ -375,36 +343,6 @@ __git_aliases_and_commands () {
     'aliases: :__git_aliases' \
     'commands: :_git_commands'
 }
-
-_git () {
-  local curcontext=$curcontext ret=1
-
-  if [[ $words[1] == git ]]; then
-    local state line
-    declare -A opt_args
-    _arguments -C \
-      '(- :)--version[display version information]' \
-      '(- :)--help[display help message]' \
-      '--exec-path=-[path containing core git-programs]::directory:_directories' \
-      '(-p --paginate)'{-p,--paginate}'[pipe output into $PAGER]' \
-      '--git-dir=-[path to repository]:directory:_directories' \
-      '--bare[use $PWD as repository]' \
-      ':command:->command' \
-      '*::options:->options' && ret=0
-    case $state in
-      (command)
-        __git_aliases_and_commands
-        ;;
-      (options)
-        curcontext="${curcontext%:*:*}:git-$words[1]:"
-        _call_function ret _git-$words[1]
-        ;;
-    esac
-  else
-    _call_function ret _$words[1]
-  fi
-}
-
 # NOTE: -c is undocumented.
 # TODO: Perhaps provide some sort of completion or guard for line range (-L).
 # NOTE: --score-debug is undocumented.
@@ -4133,6 +4071,34 @@ __git_setup_revision_arguments () {
 (( $+functions[__git_is_indexed] )) ||
 __git_is_indexed () {
   [[ -n $(git ls-files $REPLY) ]]
+}
+
+  local curcontext=$curcontext ret=1
+
+  if [[ $words[1] == git ]]; then
+    local state line
+    declare -A opt_args
+    _arguments -C \
+      '(- :)--version[display version information]' \
+      '(- :)--help[display help message]' \
+      '--exec-path=-[path containing core git-programs]::directory:_directories' \
+      '(-p --paginate)'{-p,--paginate}'[pipe output into $PAGER]' \
+      '--git-dir=-[path to repository]:directory:_directories' \
+      '--bare[use $PWD as repository]' \
+      ':command:->command' \
+      '*::options:->options' && ret=0
+    case $state in
+      (command)
+        __git_aliases_and_commands
+        ;;
+      (options)
+        curcontext="${curcontext%:*:*}:git-$words[1]:"
+        _call_function ret _git-$words[1]
+        ;;
+    esac
+  else
+    _call_function ret _$words[1]
+  fi
 }
 
 _git

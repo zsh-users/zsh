@@ -1,5 +1,8 @@
 2007-09-30  Clint Adams  <clint@zsh.org>
 
+	* 23863: Completion/Unix/Command/_git: remove all
+	global variables.
+
 	* 23862: Completion/Unix/Command/_git: declare
 	author_conversion_file_arg_spec local.
 
