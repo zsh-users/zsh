@@ -254,6 +254,7 @@ _git_commands () {
 
   local -a ancillary_commands
   ancillary_commands=(
+    'config:get and set repository or global options'
     'convert-objects:convert old-style git repository'
     'for-each-ref:output information on each ref'
     'get-tar-commit-id:extract commit ID from an archive created using tar-tree'
