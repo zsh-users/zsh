@@ -15,6 +15,7 @@ local author_conversion_file_arg long_author_conversion_file_arg verbose_arg
 local help_arg template_arg shared_arg thin_arg author_conversion_file_arg_spec
 local -a diff_args fetch_args merge_args force_ref_arg tags_fetch_arg
 local -a upload_pack_arg common_fetch_args common_apply_args
+local -a revision_arguments
 
 nul_arg='-z[use NUL termination on output]'
 abbrev_arg='--abbrev=-[set minimum SHA1 display-length]: :_guard "[[\:digit\:]]#" length'
@@ -976,8 +977,6 @@ _git-rev-list () {
     _arguments \
       '*:index file:__git_cached_files' && ret=0
   else
-    declare -a revision_arguments
-
     __git_setup_revision_arguments
 
     _arguments -S \
@@ -1011,8 +1010,6 @@ _git-show-ref () {
 
 (( $+functions[_git-show] )) ||
 _git-show () {
-  declare -a revision_arguments
-
   __git_setup_revision_arguments
 
   _arguments -S \
@@ -1153,8 +1150,6 @@ _git-sh-setup () {
 # TODO: -- undocumented.
 (( $+functions[_git-reflog] )) ||
 _git-reflog () {
-  declare -a revision_arguments
-
   __git_setup_revision_arguments
 
   if (( CURRENT == 2 )); then
@@ -1707,8 +1702,6 @@ _git-grep () {
 
 (( $+functions[_git-log] )) ||
 _git-log () {
-  declare -a revision_arguments
-
   __git_setup_revision_arguments
 
   _arguments -S \
@@ -1854,8 +1847,6 @@ _git-revert () {
 # less what git-rev-list takes).
 (( $+functions[_git-shortlog] )) ||
 _git-shortlog () {
-  declare -a revision_arguments
-
   __git_setup_revision_arguments
 
   _arguments -S \
@@ -1906,8 +1897,6 @@ _git-verify-tag () {
 # TODO: This should take those arguments that git-diff-tree can take, as well.
 (( $+functions[_git-whatchanged] )) ||
 _git-whatchanged () {
-  declare -a revision_arguments
-
   __git_setup_revision_arguments
 
   _arguments -S \
@@ -2442,8 +2431,6 @@ _git-svn () {
             '--minimize[undocumented]')
           ;;
         (log)
-          declare -a revision_arguments
-
           __git_setup_revision_arguments
 
           arguments+=(
