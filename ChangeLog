@@ -1,5 +1,8 @@
 2007-09-30  Clint Adams  <clint@zsh.org>
 
+	* 23867: Completion/Debian/Command/_dpkg-buildpackage: completion
+	for dpkg-buildpackage.
+
 	* 23863: Completion/Linux/Command/_lsusb: completion
 	for lsusb.
 
