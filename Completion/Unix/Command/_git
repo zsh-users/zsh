@@ -107,7 +107,7 @@ tags_fetch_arg=(
   '(--no-tags -t --tags)'{-t,--tags}'[fetch remote tags]'
 )
 
-
+local author_conversion_file_arg_spec
 author_conversion_file_arg_spec='[specify author-conversion file]:author-conversion file:_files'
 
 declare -g author_conversion_file_arg=
