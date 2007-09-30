@@ -1,5 +1,8 @@
 2007-09-30  Clint Adams  <clint@zsh.org>
 
+	* 23868: Completion/Debian/Command/_svn-buildpackage: completion
+	for svn-buildpackage.
+
 	* 23867: Completion/Debian/Command/_dpkg-buildpackage: completion
 	for dpkg-buildpackage.
 
