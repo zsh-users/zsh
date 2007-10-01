@@ -1,3 +1,8 @@
+2007-10-01  Clint Adams  <clint@zsh.org>
+
+	* Jesse Weinstein: 23878: Completion/Unix/Command/_ranlib:
+	completion for ranlib.
+
 2007-09-30  Clint Adams  <clint@zsh.org>
 
 	* 23875: Completion/Unix/Command/_git: complete heads, tags, and
