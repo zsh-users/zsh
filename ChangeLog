@@ -1,5 +1,8 @@
 2007-10-01  Clint Adams  <clint@zsh.org>
 
+	* Nikolai Weibull: 23879: Completion/Unix/Command/_git: complete
+	only cached files after git log.
+
 	* Jesse Weinstein: 23878: Completion/Unix/Command/_ranlib:
 	completion for ranlib.
 
