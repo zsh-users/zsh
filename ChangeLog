@@ -1,5 +1,8 @@
 2007-10-01  Clint Adams  <clint@zsh.org>
 
+	* Nikolai Weibull: 23888: Completion/Unix/Command/_git: complete
+	branch names and cached files after git log.
+
 	* Nikolai Weibull: 23879: Completion/Unix/Command/_git: complete
 	only cached files after git log.
 
@@ -219,6 +222,9 @@
 	* 23784: Src/utils.c: Use $'\...' quoting for unparseable and
 	unprintable characters when doing backslash quoting.
 
+2007-08-19  Clint Adams  <clint@zsh.org>
+
+	* R.Ramkumar: 23783: Completion/Zsh/Command/_command,
 2007-08-19  Clint Adams  <clint@zsh.org>
 
 	* R.Ramkumar: 23783: Completion/Zsh/Command/_command,
@@ -7164,9 +7170,6 @@
 
 	* unposted: Functions/Misc/zrecompile: change "mv" to "mv -f"
 	when backing up .zwc files, because zcompile creates the files
-	read-only.  See thread ending at users/7269.
-
-2004-03-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 19708: Completion/compaudit: change getent() function to
 	handle two arguments

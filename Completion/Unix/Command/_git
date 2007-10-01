@@ -1702,11 +1702,22 @@ _git-grep () {
 
 (( $+functions[_git-log] )) ||
 _git-log () {
+  local curcontext=$curcontext state line
+  declare -A opt_args
+
   __git_setup_revision_arguments
 
   _arguments -S \
     $revision_arguments \
-    '*:file:__git_cached_files' && ret=0
+    '*:file-or-branch:->files' && ret=0
+
+  case $state in
+    (files)
+      _alternative \
+        'files:index file:__git_cached_files' \
+        'branches:branch:__git_branch_names' && ret=0
+      ;;
+  esac
 }
 
 # TODO: repository needs fixing
