@@ -1,5 +1,8 @@
 2007-10-01  Clint Adams  <clint@zsh.org>
 
+	* Nikolai Weibull: 23889: Completion/Unix/Command/_git: fix -o
+	completion in git cvsimport.
+
 	* Nikolai Weibull: 23888: Completion/Unix/Command/_git: complete
 	branch names and cached files after git log.
 

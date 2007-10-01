@@ -2001,7 +2001,7 @@ _git-cvsimport () {
     '-k[remove keywords from source files in the CVS archive]' \
     '-m[attempt to detect merges based on the commit message]' \
     '-M[attempt to detect merges based on the commit message with custom pattern]:pattern' \
-    '-o[specify the branch into which you wish to import]:branch:__git_branches' \
+    '-o[specify the branch into which you wish to import]:branch:__git_branch_names' \
     '-P[read cvsps output file]:file:_files' \
     '-p[specify additionaly options for cvsps]:cvsps-options' \
     '-s[substitute the "/" character in branch names with given substitution]:substitute' \
