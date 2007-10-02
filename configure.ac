@@ -641,12 +641,11 @@ dnl SYSV-derived systems.  However, if we find terminfo and termcap
 dnl stuff in the same library we will use that; typically this
 dnl is ncurses or curses.
 dnl On HPUX, Hcurses is reported to work better than curses.
-dnl Prefer ncurses to curses on all systems; prefer it to tinfo
-dnl if we were told to use curses.  tinfo isn't very common now.
-AC_ARG_WITH(curses-terminfo,
-AC_HELP_STRING([--with-curses-terminfo], [use terminfo support from curses library]),
-[if test x$withval = xyes; then
-  termcap_curses_order="ncurses tinfo curses termcap"
+dnl Prefer ncurses to curses on all systems.  tinfo isn't very common now.
+AC_ARG_WITH(term-lib,
+AC_HELP_STRING([--with-term-lib=LIBS], [search space-separated LIBS for terminal handling]),
+[if test x$withval != xno && test x$withval != x ; then
+  termcap_curses_order="$withval"
   AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 else
   termcap_curses_order="tinfo termcap ncurses curses"
@@ -677,7 +676,12 @@ dnl both available and both contain termcap functions, while
 dnl only [n]curses contains terminfo functions, we only link against
 dnl [n]curses.
 AC_SEARCH_LIBS(tigetflag, [$termcap_curses_order])
-AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
+AC_SEARCH_LIBS(tgetent, [$termcap_curses_order],
+  true,
+  AC_MSG_FAILURE(["No terminal handling library was found on your system.
+This is probably a library called 'curses' or 'ncurses'.  You may
+need to install a package called 'curses-devel' or 'ncurses-devel' on your
+system."], 255))
 AC_CHECK_HEADERS(curses.h, [],
 [AC_CACHE_CHECK(for Solaris 8 curses.h mistake, ac_cv_header_curses_solaris,
 AC_TRY_COMPILE([#include <curses.h>], [],

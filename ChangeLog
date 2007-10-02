@@ -1,5 +1,10 @@
 2007-10-02  Peter Stephenson  <pws@csr.com>
 
+	* 23896: configure.ac, INSTALL, README: replace
+	--with-curses-terminfo by --with-term-lib, which takes an
+	argument; fail if termcap/curses library not found; improve
+	installation documentation.
+
 	* 23883: Doc/Zsh/func.yo: try to improve precmd documentation.
 
 	* Daniel Qarras: users/11915: Completion/Unix/Command/_module:

@@ -304,6 +304,34 @@ corresponds to that of builtin widgets.
 
 See chapter 5 in the FAQ for some notes on multibyte input.
 
+Terminal Handling
+-----------------
+
+Historically, several different libraries have provided the features the
+shell needs to provide output to the terminal.  The most common have been
+termcap, which is now largely outmoded, and curses, which supersedes
+termcap and typically contains the same features as well as others.
+configure will search for an appropriate library; the default search order
+is "tinfo termcap ncurses curses" except on HP-UX and Solaris where it is
+"Hcurses ncurses curses termcap".  Note that even though termcap is usually
+searched first zsh tries to make features from curses available and if the
+curses library contains both curses and termcap features, as is normal,
+the curses variant is used.  ncurses is a newer version of curses
+and tinfo is related to it.
+
+On some systems a suitable development package with a name such as
+curses-devel or ncurses-devel needs to be installed before zsh can
+be compiled.  This is likely to be contained on any installation media,
+or available for download.  It is highly unlikely that you will need to
+compile this from scratch.
+
+You can tell configure which libraries to search by passing an
+argument via --with-term-lib.  This takes a space-separated list
+of libraries to try as its argument, so the default is equivalent to
+--with-term-lib="tinfo termcap ncurses curses".  It replaces the
+old option --with-curses-terminfo, which altered the search order but
+didn't allow an explicit search list to be passed.
+
 Memory Routines
 ---------------
 

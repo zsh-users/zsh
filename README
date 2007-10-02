@@ -34,6 +34,10 @@ Possible incompatibilities
 
 Since 4.2:
 
+The configuration option --with-curses-terminfo has been replaced
+by the option --with-term-lib="LIBS" where LIBS is a space-separated
+list of libraries to search for termcap and curses features.
+
 The option SH_WORD_SPLIT, used in Bourne/Korn/Posix shell compatibility
 mode, has been made more like other shells in the case of substitutions of
 the form ${1+"$@"} (a common trick used to work around problems in older
