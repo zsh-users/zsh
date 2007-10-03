@@ -3501,7 +3501,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 					p++;
 				/* Get the pattern string. */
 				tokenize(g = dupstrpfx(g, p - g));
-				if (*g == '=')
+				if (*g == '=' && isset(EQUALS))
 				    *g = Equals;
 				if (*g == '~')
 				    *g = Tilde;
