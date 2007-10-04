@@ -1,5 +1,9 @@
 2007-10-04  Clint Adams  <clint@zsh.org>
 
+	* 23905: Completion/Unix/Command/_git: remove useless gitdir
+	assignment and scope array locally in new __git_changed_files
+	function.
+
 	* Mikael Magnusson: 23903: Completion/Unix/Command/_git:
 	complete both modified and added files for git commit.
 
