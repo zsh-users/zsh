@@ -1,3 +1,8 @@
+2007-10-05  Peter Stephenson  <p.w.stephenson@ntlworld.com
+
+	* unposted, c.f. users/11935: Doc/Zsh/builtins.yo: quoting
+	of arguments to unalias.
+
 2007-10-04  Clint Adams  <clint@zsh.org>
 
 	* 23905: Completion/Unix/Command/_git: remove useless gitdir
