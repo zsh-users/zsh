@@ -1,3 +1,8 @@
+2007-10-04  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 23906: Completion/Unix/Command/_git: add
+	missing backslash in _git-svn.
+
 2007-10-05  Peter Stephenson  <p.w.stephenson@ntlworld.com
 
 	* unposted, c.f. users/11935: Doc/Zsh/builtins.yo: quoting
