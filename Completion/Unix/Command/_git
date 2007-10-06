@@ -1585,6 +1585,7 @@ __git_zstyle_default ':completion::complete:git-commit:argument-rest:*' ignore-l
 _git-diff () {
   _arguments -S \
     $diff_args \
+    '--cached[show diff between index and named commit]' \
     '::original revision:__git_commits' \
     '::new revision:__git_commits' \
     '*::index file:__git_modified_files' && ret=0

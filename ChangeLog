@@ -1,5 +1,8 @@
 2007-10-06  Clint Adams  <clint@zsh.org>
 
+	* Mikael Magnusson: 23907: Completion/Unix/Command/_git: add
+	--cached option to git-diff completion.
+
 	* 23908: Completion/Unix/Command/_git: add missing backslash in
 	_git-svn.
 
