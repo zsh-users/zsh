@@ -1,4 +1,7 @@
-2007-10-04  Clint Adams  <clint@zsh.org>
+2007-10-06  Clint Adams  <clint@zsh.org>
+
+	* 23908: Completion/Unix/Command/_git: add missing backslash in
+	_git-svn.
 
 	* Mikael Magnusson: 23906: Completion/Unix/Command/_git: add
 	missing backslash in _git-svn.

@@ -2473,7 +2473,7 @@ _git-svn () {
         '(-V --version)'{-V,--version}'[display version information]' \
         '--minimize-connections[undocumented]' \
         '(-R --svn-remote --remote)'{-R,--svn-remote,--remote}'[svn remote to use]:svn remote:__git_svn-remotes' \
-        '(-i --id)'{-i,--id}'[set GIT_SVN_ID]:GIT_SVN_ID'
+        '(-i --id)'{-i,--id}'[set GIT_SVN_ID]:GIT_SVN_ID' \
         $arguments && ret=0
 
       case $state in
