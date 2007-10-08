@@ -15,7 +15,7 @@ script=$words[1]
 what='(st(art|op|atus)|(force-|)re(start|load)|debug_(up|down)|dump(|_stats)|add|delete|clean|list)'
 
 read -u0 -k2 magic < $script && [[ $magic = '#!' ]] &&
-    cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $script)"}:#[[:blank:]]#(\'|)${~what}(\|${~what})#(\'|)\)}}//[^-a-z_]} )
+    cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $script)"}:#[[:blank:]]#(\'|)${~what}([[:blank:]]#\|[[:blank:]]#${~what})#(\'|)\)}}//[^-a-z_]} )
 
 # This would be the pattern to use every line of the form <space>foo).
 # Some people say this might match too many lines...

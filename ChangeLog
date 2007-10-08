@@ -1,3 +1,8 @@
+2007-10-08  Peter Stephenson  <pws@csr.com>
+
+	* arno: 23910: Completion/Unix/Command/_init_d: handle
+	spaces in cases in init scripts.
+
 2007-10-08  Clint Adams  <clint@zsh.org>
 
 	* 23911: configure.ac, Src/Modules/curses.c,
