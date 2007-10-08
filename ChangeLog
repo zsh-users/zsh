@@ -1,3 +1,8 @@
+2007-10-08  Clint Adams  <clint@zsh.org>
+
+	* 23919: Src/Modules/curses.c, Src/Modules/curses.mdd:
+	have new zcurses builtin replace 4 separate builtins.
+
 2007-10-08  Peter Stephenson  <pws@csr.com>
 
 	* arno: 23910: Completion/Unix/Command/_init_d: handle
