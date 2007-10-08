@@ -1,0 +1,7 @@
+name=zsh/curses
+link='if test "x$ac_cv_func_initscr" = xyes -a "x$ac_cv_header_curses_h" = xyes -a "x$ac_cv_func_setcchar" = xyes; then echo dynamic; else echo no; fi'
+load=no
+
+autobins="zcurses_newwin"
+
+objects="curses.o"

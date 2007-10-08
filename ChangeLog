@@ -1,3 +1,8 @@
+2007-10-08  Clint Adams  <clint@zsh.org>
+
+	* 23911: configure.ac, Src/Modules/curses.c,
+	Src/Modules/curses.mdd: curses windowing module.
+
 2007-10-06  Clint Adams  <clint@zsh.org>
 
 	* Mikael Magnusson: 23907: Completion/Unix/Command/_git: add
