@@ -55,12 +55,12 @@ static const char *
 zcurses_strerror(int err)
 {
     static const char *errs[] = {
-	NULL,
+	"unknown error",
 	"window number out of range",
 	"window already defined",
 	NULL };
 
-    return errs[err];
+    return errs[(err < 1 || err > 2) ? 0 : err];
 }
 
 /**/
@@ -81,12 +81,12 @@ zcurses_validate_window(char *win, int criteria)
 	return -1;
     }
 
-    if(zcurses_WIN[target]!=NULL && (criteria & ZCURSES_UNUSED)) {
+    if (zcurses_WIN[target]!=NULL && (criteria & ZCURSES_UNUSED)) {
 	zc_errno = ZCURSES_EDEFINED;
 	return -1;
     }
 
-    if(zcurses_WIN[target]==NULL && (criteria & ZCURSES_USED)) {
+    if (zcurses_WIN[target]==NULL && (criteria & ZCURSES_USED)) {
 	zc_errno = ZCURSES_EUNDEFINED;
 	return -1;
     }
@@ -98,30 +98,30 @@ zcurses_validate_window(char *win, int criteria)
 static int
 bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    int targetwin;
+    unsigned targetwin;
 
     if (OPT_ISSET(ops,'a')) {
 	int nlines, ncols, begin_y, begin_x;
-	unsigned winnum;
 
 	nlines = atoi(args[0]);
 	ncols = atoi(args[1]);
 	begin_y = atoi(args[2]);
 	begin_x = atoi(args[3]);
-	winnum = zcurses_validate_window(args[4], ZCURSES_UNUSED);
+	targetwin = zcurses_validate_window(args[4], ZCURSES_UNUSED);
 
-	if (winnum == -1) {
+	if (targetwin == -1) {
 	    zerrnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[4], 0);
 	    return 1;
 	}
 
-	zcurses_WIN[winnum]=newwin(nlines, ncols, begin_y, begin_x);
+	zcurses_WIN[targetwin]=newwin(nlines, ncols, begin_y, begin_x);
 
-	if(zcurses_WIN[winnum]==NULL)
+	if (zcurses_WIN[targetwin]==NULL)
 	    return 1;
 
 	return 0;
     }
+
     if (OPT_ISSET(ops,'d')) {
 	targetwin = zcurses_validate_window(OPT_ARG(ops,'d'), ZCURSES_USED);
 	if (targetwin == -1) {
@@ -129,7 +129,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 
-	if(delwin(zcurses_WIN[targetwin])!=OK)
+	if (delwin(zcurses_WIN[targetwin])!=OK)
 		return 1;
 
 	zcurses_WIN[targetwin]=NULL;
@@ -145,135 +145,101 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 
 	return (wrefresh(zcurses_WIN[targetwin])!=OK) ? 1 : 0;
     }
+
     if (OPT_ISSET(ops,'m')) {
 	int y, x;
-	unsigned winnum;
 
-	winnum = atoi(args[0]);
+	targetwin = zcurses_validate_window(args[0], ZCURSES_USED);
+	if (targetwin == -1) {
+	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	    return 1;
+	}
+
 	y = atoi(args[1]);
 	x = atoi(args[2]);
 
-	if(winnum > ZCURSES_MAX_WINDOWS) {
-	    zerrnam(nam, "bad window number: %s", args[0], 0);
-	    return 1;
-	}
-
-	if(zcurses_WIN[winnum]==NULL) {
-	    zwarnnam(nam, "window number %s is not defined", args[0], 0);
-	    return 1;
-	}
-
-	if(wmove(zcurses_WIN[winnum], y, x)!=OK)
+	if (wmove(zcurses_WIN[targetwin], y, x)!=OK)
 	    return 1;
 
 	return 0;
     }
-    return 0;
-}
 
-/**/
-static int
-bin_zcurses_wadd_wch(char *nam, char **args, Options ops, UNUSED(int func))
-{
-    unsigned winnum;
-    wchar_t c;
-    cchar_t cc;
+    if (OPT_ISSET(ops,'c')) {
+	wchar_t c;
+	cchar_t cc;
 
-    winnum = atoi(args[0]);
+	targetwin = zcurses_validate_window(args[0], ZCURSES_USED);
+	if (targetwin == -1) {
+	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	    return 1;
+	}
 
-    if(mbrtowc(&c, args[1], MB_CUR_MAX, NULL) < 1)
-	return 1;
+	if (mbrtowc(&c, args[1], MB_CUR_MAX, NULL) < 1)
+	    return 1;
 
-    if (setcchar(&cc, &c, A_NORMAL, 0, NULL)==ERR)
-	return 1;
+	if (setcchar(&cc, &c, A_NORMAL, 0, NULL)==ERR)
+	    return 1;
 
-    if(winnum > ZCURSES_MAX_WINDOWS) {
-	zerrnam(nam, "bad window number: %s", args[0], 0);
-	return 1;
-    }
+	if (wadd_wch(zcurses_WIN[targetwin], &cc)!=OK)
+	    return 1;
 
-    if(zcurses_WIN[winnum]==NULL) {
-	zwarnnam(nam, "window number %s is not defined", args[0], 0);
-	return 1;
-    }
-
-    if(wadd_wch(zcurses_WIN[winnum], &cc)!=OK)
-	return 1;
-
-    return 0;
-}
-
-/**/
-static int
-bin_zcurses_wadd_wchstr(char *nam, char **args, Options ops, UNUSED(int func))
-{
-    unsigned winnum;
-    wchar_t *ws;
-    cchar_t *wcc;
-    size_t sl;
-
-    winnum = atoi(args[0]);
-
-    if(winnum > ZCURSES_MAX_WINDOWS) {
-	zerrnam(nam, "bad window number: %s", args[0], 0);
-	return 1;
-    }
-
-    if(zcurses_WIN[winnum]==NULL) {
-	zwarnnam(nam, "window number %s is not defined", args[0], 0);
-	return 1;
-    }
-
-    sl = strlen(args[1]);
-
-    if(sl == 0) {
 	return 0;
     }
 
-    ws = malloc(sl * sizeof(wchar_t));
+    if (OPT_ISSET(ops,'s')) {
+	wchar_t *ws;
+	cchar_t *wcc;
+	size_t sl;
 
-    if(mbstowcs(ws, args[1], sl) < 1) {
+	targetwin = zcurses_validate_window(args[0], ZCURSES_USED);
+	if (targetwin == -1) {
+	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	    return 1;
+	}
+
+	sl = strlen(args[1]);
+
+	if (sl == 0) {
+	    return 0;
+	}
+
+	ws = malloc(sl * sizeof(wchar_t));
+
+	if (mbstowcs(ws, args[1], sl) < 1) {
+	    free(ws);
+	    return 1;
+	}
+
+	wcc = malloc(wcslen(ws) * sizeof(cchar_t));
+
+	if (setcchar(wcc, ws, A_NORMAL, 0, NULL)==ERR) {
+	    return 1;
+	}
+
 	free(ws);
-	return 1;
-    }
 
-    wcc = malloc(wcslen(ws) * sizeof(cchar_t));
+	if (wadd_wchstr(zcurses_WIN[targetwin], wcc)!=OK) {
+	    free(wcc);
+	    return 1;
+	}
 
-    if (setcchar(wcc, ws, A_NORMAL, 0, NULL)==ERR) {
-	return 1;
-    }
-
-    free(ws);
-
-    if(wadd_wchstr(zcurses_WIN[winnum], wcc)!=OK) {
 	free(wcc);
-	return 1;
+	return 0;
     }
 
-    free(wcc);
-    return 0;
-}
+    if (OPT_ISSET(ops,'b')) {
 
-/**/
-static int
-bin_zcurses_wborder(char *nam, char **args, Options ops, UNUSED(int func))
-{
-    unsigned winnum;
+	targetwin = zcurses_validate_window(OPT_ARG(ops,'b'), ZCURSES_USED);
+	if (targetwin == -1) {
+	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), OPT_ARG(ops,'b'), 0);
+	    return 1;
+	}
 
-    winnum = atoi(args[0]);
+	if (wborder(zcurses_WIN[targetwin], 0, 0, 0, 0, 0, 0, 0, 0)!=OK)
+	    return 1;
 
-    if(winnum > ZCURSES_MAX_WINDOWS) {
-	zerrnam(nam, "bad window number: %s", args[0], 0);
-	return 1;
+	return 0;
     }
-
-    if(zcurses_WIN[winnum]==NULL) {
-	zwarnnam(nam, "window number %s does not exist", args[0], 0);
-	return 1;
-    }
-
-    if(wborder(zcurses_WIN[winnum], 0, 0, 0, 0, 0, 0, 0, 0)!=OK)
-	return 1;
 
     return 0;
 }
@@ -283,10 +249,7 @@ bin_zcurses_wborder(char *nam, char **args, Options ops, UNUSED(int func))
  */
 
 static struct builtin bintab[] = {
-    BUILTIN("zcurses", 0, bin_zcurses, 0, 5, 0, "ad:mr:", NULL),
-    BUILTIN("zcurses_wadd_wch", 0, bin_zcurses_wadd_wch, 2, 2, 0, NULL, NULL),
-    BUILTIN("zcurses_wadd_wchstr", 0, bin_zcurses_wadd_wchstr, 2, 2, 0, NULL, NULL),
-    BUILTIN("zcurses_wborder", 0, bin_zcurses_wborder, 1, 1, 0, NULL, NULL),
+    BUILTIN("zcurses", 0, bin_zcurses, 0, 5, 0, "ab:cd:mr:rs", NULL),
 };
 
 static struct features module_features = {

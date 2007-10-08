@@ -1,5 +1,8 @@
 2007-10-08  Clint Adams  <clint@zsh.org>
 
+	* 23923: Src/Modules/curses.c: fold all other curses windowing
+	builtins into zcurses.
+
 	* 23919: Src/Modules/curses.c, Src/Modules/curses.mdd:
 	have new zcurses builtin replace 4 separate builtins.
 
