@@ -28,6 +28,7 @@
 "clear-screen", clearscreen, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "complete-word", completeword, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "copy-prev-word", copyprevword, ZLE_KEEPSUFFIX
+"copy-prev-shell-word", copyprevshellword, ZLE_KEEPSUFFIX
 "copy-region-as-kill", copyregionaskill, ZLE_KEEPSUFFIX
 "delete-char", deletechar, ZLE_KEEPSUFFIX
 "delete-char-or-list", deletecharorlist, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
@@ -55,7 +56,7 @@
 "expand-word", expandword, 0
 "forward-char", forwardchar, 0
 "forward-word", forwardword, 0
-"get-line", getline, 0
+"get-line", zgetline, 0
 "gosmacs-transpose-chars", gosmacstransposechars, 0
 "history-beginning-search-backward", historybeginningsearchbackward, 0
 "history-beginning-search-forward", historybeginningsearchforward, 0
@@ -84,8 +85,11 @@
 "quoted-insert", quotedinsert, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "quote-line", quoteline, 0
 "quote-region", quoteregion, 0
+"read-command", readcommand, 0
+"recursive-edit", recursiveedit, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "redisplay", redisplay, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
-"redo", redo, 0
+"redo", redo, ZLE_KEEPSUFFIX
+"reset-prompt", resetprompt, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "reverse-menu-complete", reversemenucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "run-help", processcmd, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "self-insert", selfinsert, ZLE_MENUCMP | ZLE_KEEPSUFFIX
@@ -97,7 +101,7 @@
 "transpose-chars", transposechars, 0
 "transpose-words", transposewords, 0
 "undefined-key", undefinedkey, 0
-"undo", undo, 0
+"undo", undo, ZLE_KEEPSUFFIX
 "universal-argument", universalargument, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "up-case-word", upcaseword, 0
 "up-history", uphistory, 0
@@ -162,7 +166,7 @@
 "vi-set-mark", visetmark, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "vi-substitute", visubstitute, 0
 "vi-swap-case", viswapcase, 0
-"vi-undo-change", viundochange, 0
+"vi-undo-change", viundochange, ZLE_KEEPSUFFIX
 "vi-unindent", viunindent, 0
 "vi-up-line-or-history", viuplineorhistory, ZLE_LINEMOVE
 "vi-yank", viyank, 0

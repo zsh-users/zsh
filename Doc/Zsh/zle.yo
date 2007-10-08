@@ -103,6 +103,12 @@ This input can itself invoke further replacement strings, but in order to
 detect loops the process will be stopped if there are twenty such replacements
 without a real command being read.
 
+A key sequence typed by the user can be turned into a command name for use
+in user-defined widgets with the tt(read-command) widget, described
+ifzman(below)\
+ifnzman(in noderef(Miscellaneous) below)\
+.
+
 texinode(Zle Builtins)(Zle Widgets)(Keymaps)(Zsh Line Editor)
 sect(Zle Builtins)
 cindex(zle, builtin commands)
@@ -1762,6 +1768,16 @@ At the top-level (tt(PS1)) prompt, equivalent to tt(push-line).
 At a secondary (tt(PS2)) prompt, move the entire current multiline
 construct into the editor buffer.
 The latter is equivalent to tt(push-input) followed by tt(get-line).
+)
+tindex(read-command)
+item(tt(read-command))(
+Only useful from a user-defined widget.  A keystroke is read just as in
+normal operation, but instead of the command being executed the name
+of the command that would be executed is stored in the shell parameter
+tt(REPLY).  This can be used as the argument of a future tt(zle)
+command.  If the key sequence is not bound, status 1 is returned;
+typically, however, tt(REPLY) is set to tt(undefined-key) to indicate
+a useless key sequence.
 )
 tindex(recursive-edit)
 item(tt(recursive-edit))(
