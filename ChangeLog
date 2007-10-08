@@ -33,6 +33,11 @@
 	* Mikael Magnusson: 23903: Completion/Unix/Command/_git:
 	complete both modified and added files for git commit.
 
+2007-10-03  Peter Stephenson  <pws@csr.com>
+
+	* 23900: Src/Zle/compctl.c, Src/Zle/zle_tricky.c: Better handling
+	of NO_EQUALS option on old-style completion.
+
 2007-10-02  Peter Stephenson  <pws@csr.com>
 
 	* 23896: configure.ac, INSTALL, README: replace
