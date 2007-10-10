@@ -1,7 +1,8 @@
 #compdef valgrind -value-,VALGRIND_OPTS,-default-
 
-local curcontext="$curcontext" state line common cmd
-local -a args args_{memcheck,addrcheck,cachegrind,helgrind,massif}
+local curcontext="$curcontext" state line
+local -a cmd common common_mem_null \
+  args args_{addrcheck,memcheck,cachegrind,helgrind,lackey,massif,none}
 
 cmd=(
   '1:command name:_command_names -e'
@@ -16,12 +17,17 @@ if [[ $service = *_OPTS* ]]; then
 fi
 
 common=(
-  '--sloppy-malloc=-[round malloc sizes to multiple of 4]:enable:(yes no)'
   '--alignment=-[set minimum alignment of allocations]:number'
+)
+
+common_mem_null=(
+  '--xml=-[output everything in XML]:enable:(yes no)'
+  '--xml-user-comment=-[copy specified string verbatim to XML output]:string'
 )
 
 args_addrcheck=(
   $common
+  $common_mem_null
   '--partial-loads-ok=-:enable:(yes no)'
   '--freelist-vol=-[volume of freed blocks queue]:blocks'
   '--leak-check=-[search for memory leaks at exit]:enable:(yes no)'
@@ -32,7 +38,6 @@ args_addrcheck=(
 
 args_memcheck=(
   $args_addrcheck
-  '--avoid-strlen-errors=-[suppress errs from inlined strlen]:enable:(yes no)'
 )
 
 args_cachegrind=(
@@ -47,6 +52,11 @@ args_helgrind=(
   '--show-last-access=-[show location of last word access on error]:locations:(no some all)'
 )
 
+args_lackey=(
+  '--fnname=-[count calls to specified name]:name'
+  '--detailed-counts=-[count loads, stores and alu ops]:enable:(yes no)'
+)
+
 args_massif=(
   $common
   '--heap=-[profile heap blocks]:enable:(yes no)'
@@ -57,10 +67,14 @@ args_massif=(
   '--format=-[specify format of textual output]:format:(text html)'
 )
 
-args="args_${${words[(r)--(skin|tool)=*]#*=}:-memcheck}"
+args_none=(
+  $common_mem_null
+)
+
+args="args_${${words[(r)--tool=*]#*=}:-memcheck}"
 
 _arguments -C ${(P)args} $cmd \
-  '(--tool --skin)'{--tool,--skin}'=-[specify valgrind tool]:valgrind tool:->tools' \
+  '--tool=-[specify valgrind tool]:valgrind tool:->tools' \
   '(-h --help)'{-h,--help}'[show help information]' \
   '--help-debug[show help info including debugging options]' \
   '--version[show version]' \
@@ -69,15 +83,15 @@ _arguments -C ${(P)args} $cmd \
   '--trace-children=-[valgrind-ise child processes]:enable:(yes no)' \
   '--track-fds=-[track open file descriptors]:enable:(yes no)' \
   '--time-stamp=-[add timestamps to log messages]:enable:(yes no)' \
-  '--run-libc-freeres=-[free up glibc memory at exit]:enable:(yes no)' \
-  '--weird-hacks=-[enable hack]:hack:(lax-ioctls)' \
-  '--signal-polltime=-[signal poll period (ms)]:period' \
-  '--lowlat-signals=-[improve thread signal wake-up latency]:enable:(yes no)' \
-  '--lowlat-syscalls=-[improve thread syscall wake-up latency]:enable:(yes no)' \
-  '--pointercheck=-[enforce client address space limits]:enable:(yes no)' \
   '--log-fd=-[log messages to specified file descriptor]:file descriptor:_file_descriptors' \
-  '--log-file=-[log messages to specified file]:file:_files' \
+  '--log-file=-[log messages to specified file with pid appended]:file:_files' \
+  '--log-file-exactly=-[log messages to specified file]:file:_files' \
+  '--log-file-qualifier=-[log messages to filename given by specified environment variable]:variable:_parameters -g "*scalar*"' \
   '--log-socket=-[log messages to socket]:ipaddr\:port' \
+  '--run-libc-freeres=-[free up glibc memory at exit]:enable:(yes no)' \
+  '--sim-hints=-[enable hint]:hint:(lax-ioctls enable-outer)' \
+  '--show-emwarns=-[show warnings about emulation limits]:enable:(yes no)' \
+  '--kernel-variant=-[handle non-standard kernel variants]:kernel variant:_values -s , kernel\ variant bproc' \
   '--demangle=-[automatically demangle C++ names]:enable:(yes no)' \
   '--num-callers=-[specify no of callers to show in stack traces]:number' \
   '--error-limit=-[stop showing new errors if too many]:enable:(yes no)' \
@@ -86,11 +100,20 @@ _arguments -C ${(P)args} $cmd \
   '--gen-suppressions=-[print suppressions for errors detected]:enable:(yes no)' \
   '--db-attach=-[start debugger when errors detected]:enable:(yes no)' \
   '--db-command=-[specify command to start debugger]:command:_command_names -e' \
-  '--input-fd=-[specify file descriptor for input]:file descriptor:_file_descriptors' && return
+  '--input-fd=-[specify file descriptor for input]:file descriptor:_file_descriptors' \
+  '--max-stackframe=-[assume stack switch for SP changes larger than specified number of bytes]:bytes' \
+  && return
+
+typeset -a tools
 
 if [[ -n "$state" ]]; then
-  _wanted tools exl 'valgrind tool' compadd ${=${${(f)"$(_call_program \
-      tools valgrind --tool= 2>&1)"}[(r)Available*,-1]}[2,-1]} && return
+  # `valgrind --tool=` no longer works.
+  # The method below is even more hackish, but the only one I could find.
+  # Basically uses debug output to find out the directory where the tools are
+  # present and lists all executables in that directory.
+  # Hope the program provides a neater interface some day!
+  tools=(${${${(M)${(f)"$(_call_program tools valgrind --tool=something -d 2> /dev/null)"}:#*launcher launching *something}##*launcher launching }%%something}*(*:t))
+  _wanted tools exl 'valgrind tool' compadd $tools && return
 fi
 
 return 1
