@@ -1,3 +1,8 @@
+2007-10-08  Clint Adams  <clint@zsh.org>
+
+	* 23927: Src/system.h: don't define struct timezone if
+	ZSH_OOT_MODULE is defined.
+
 2007-10-11  Peter Stephenson  <pws@csr.com>
 
 	* 23934: Completion/Base/Completer/_expand_alias:

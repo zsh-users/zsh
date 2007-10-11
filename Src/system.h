@@ -225,7 +225,7 @@ char *alloca _((size_t));
 #endif
 
 /* This is needed by some old SCO unices */
-#ifndef HAVE_STRUCT_TIMEZONE
+#if !defined(HAVE_STRUCT_TIMEZONE) && !defined(ZSH_OOT_MODULE)
 struct timezone {
     int tz_minuteswest;
     int tz_dsttime;
