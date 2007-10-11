@@ -1,3 +1,9 @@
+2007-10-11  Peter Stephenson  <pws@csr.com>
+
+	* 23934: Completion/Base/Completer/_expand_alias:
+	if "foo" expands as regular alias to "foo blah", turn this
+	into "\foo blah" to avoid the alias kicking in again.
+
 2007-10-08  Clint Adams  <clint@zsh.org>
 
 	* 23923: Src/Modules/curses.c: fold all other curses windowing

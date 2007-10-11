@@ -1229,12 +1229,17 @@ that minimum width.  If the numbers are in decreasing order the
 resulting sequence will also be in decreasing order.
 
 If a brace expression matches none of the above forms, it is left
-unchanged, unless the tt(BRACE_CCL) option is set.
+unchanged, unless the option tt(BRACE_CCL) (an abbreviation for `brace
+character class') is set.
 pindex(BRACE_CCL, use of)
-In that case, it is expanded to a sorted list of the individual
-characters between the braces, in the manner of a search set.
-`tt(-)' is treated specially as in a search set, but `tt(^)' or `tt(!)' as
-the first character is treated normally.
+In that case, it is expanded to a list of the individual
+characters between the braces sorted into the order of the characters
+in the ASCII character set (multibyte characters are not currently
+handled).  The syntax is similar to a
+tt([)...tt(]) expression in filename generation:
+`tt(-)' is treated specially to denote a range of characters, but `tt(^)' or
+`tt(!)' as the first character is treated normally.  For example,
+`tt({abcdef0-9})' expands to 16 words tt(0 1 2 3 4 5 6 7 8 9 a b c d e f).
 
 Note that brace expansion is not part of filename generation (globbing); an
 expression such as tt(*/{foo,bar}) is split into two separate words
