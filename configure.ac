@@ -648,12 +648,12 @@ AC_HELP_STRING([--with-term-lib=LIBS], [search space-separated LIBS for terminal
   termcap_curses_order="$withval"
   AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 else
-  termcap_curses_order="tinfo termcap ncurses curses"
+  termcap_curses_order="ncursesw tinfo termcap ncurses curses"
 fi],
 [case "$host_os" in
   hpux10.*|hpux11.*|solaris*)
-      termcap_curses_order="Hcurses ncurses curses termcap" ;;
-  *)             termcap_curses_order="tinfo termcap ncurses curses" ;;
+      termcap_curses_order="Hcurses ncursesw ncurses curses termcap" ;;
+  *)             termcap_curses_order="ncursesw tinfo termcap ncurses curses" ;;
 esac])dnl
 
 AH_TEMPLATE([HAVE_BOOLCODES],

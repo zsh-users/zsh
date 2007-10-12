@@ -312,12 +312,21 @@ shell needs to provide output to the terminal.  The most common have been
 termcap, which is now largely outmoded, and curses, which supersedes
 termcap and typically contains the same features as well as others.
 configure will search for an appropriate library; the default search order
-is "tinfo termcap ncurses curses" except on HP-UX and Solaris where it is
-"Hcurses ncurses curses termcap".  Note that even though termcap is usually
-searched first zsh tries to make features from curses available and if the
-curses library contains both curses and termcap features, as is normal,
-the curses variant is used.  ncurses is a newer version of curses
-and tinfo is related to it.
+is "ncursesw tinfo termcap ncurses curses" except on HP-UX and Solaris
+where it is "Hcurses ncursesw ncurses curses termcap".  Note that even
+though termcap is searched before traditional forms of curses zsh tries to
+make features from curses available and if the curses library contains both
+curses and termcap features, as is normal, the curses variant is used.
+ncurses is a newer version of curses and tinfo is related to it.
+
+The library ncursesw is a variant of ncurses that supports wide characters.
+zsh attempts to use this to provide functions needed by the zsh/curses
+module; depending on the configuration, the main shell may not require the
+additional functions.  As the integration of wide character support into
+ncurses is continuing, it is possible that on some systems attempting to
+use ncursesw may cause problems during building.  If so, please report this
+to the developers at zsh-workers@sunsite.dk and attempt to recompile with
+--with-term-lib="tinfo termcap ncurses curses" (see below).
 
 On some systems a suitable development package with a name such as
 curses-devel or ncurses-devel needs to be installed before zsh can
@@ -328,7 +337,7 @@ compile this from scratch.
 You can tell configure which libraries to search by passing an
 argument via --with-term-lib.  This takes a space-separated list
 of libraries to try as its argument, so the default is equivalent to
---with-term-lib="tinfo termcap ncurses curses".  It replaces the
+--with-term-lib="ncursesw tinfo termcap ncurses curses".  It replaces the
 old option --with-curses-terminfo, which altered the search order but
 didn't allow an explicit search list to be passed.
 

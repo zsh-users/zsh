@@ -1,3 +1,8 @@
+2007-10-12  Peter Stephenson  <pws@csr.com>
+
+	* 23943 (slightly modified): INSTALL, configure.ac: search
+	ncursesw and document this.
+
 2007-10-08  Clint Adams  <clint@zsh.org>
 
 	* 23927: Src/system.h: don't define struct timezone if
