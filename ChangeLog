@@ -1,9 +1,14 @@
+2007-10-12  Clint Adams  <clint@zsh.org>
+
+	* 23945: Config/aczshoot.m4: autoconf include file for
+	budding out-of-tree module support.
+
 2007-10-12  Peter Stephenson  <pws@csr.com>
 
 	* 23943 (slightly modified): INSTALL, configure.ac: search
 	ncursesw and document this.
 
-2007-10-08  Clint Adams  <clint@zsh.org>
+2007-10-11  Clint Adams  <clint@zsh.org>
 
 	* 23927: Src/system.h: don't define struct timezone if
 	ZSH_OOT_MODULE is defined.
