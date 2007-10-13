@@ -1,3 +1,7 @@
+2007-10-13  Clint Adams  <clint@zsh.org>
+
+	* unposted: Config/aczshoot.m4: quote name of aclocal function.
+
 2007-10-12  Clint Adams  <clint@zsh.org>
 
 	* 23945: Config/aczshoot.m4: autoconf include file for

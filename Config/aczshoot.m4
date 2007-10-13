@@ -1,4 +1,4 @@
-AC_DEFUN(zsh_OOT,
+AC_DEFUN([zsh_OOT],
 [
 AC_CHECK_HEADERS(stdarg.h varargs.h termios.h termio.h)
 
