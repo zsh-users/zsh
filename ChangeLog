@@ -1,5 +1,8 @@
 2007-10-13  Clint Adams  <clint@zsh.org>
 
+	* 23947: Functions/Prompts/prompt_clint_setup: remove apm battery
+	status and add git branch detection.
+
 	* unposted: Config/aczshoot.m4: quote name of aclocal function.
 
 2007-10-12  Clint Adams  <clint@zsh.org>

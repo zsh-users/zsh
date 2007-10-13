@@ -36,7 +36,7 @@ prompt_clint_setup () {
   [[ -n "$WINDOW" ]] && p_win="$pc['\(']%{$fg_bold[$pcc[4]]%}$WINDOW$pc['\)']"
 
   p_userpwd="$pc['<']%{$fg_no_bold[$pcc[3]]%}%n@%m$p_win%{$fg_bold[$pcc[5]]%}:%{$fg_no_bold[$pcc[4]]%}%~$pc['>']"
-  [[ -f /proc/apm ]] && p_apm="%(2v.-%2v-.)"
+  p_git="%(2v.-%U%2v%u-.)"
 
   p_shlvlhist="%{$reset_color%}zsh%(2L./$SHLVL.) %B%h%b "
   p_rc="%(?..[%?%1v] )"
@@ -46,34 +46,28 @@ prompt_clint_setup () {
 
   prompt="$p_date$p_tty$p_plat$p_ver
 $p_userpwd
-$p_shlvlhist$p_rc$p_apm$p_end"
+$p_shlvlhist$p_rc$p_git$p_end"
   PS2='%(4_.\.)%3_> %E'
 
-  [[ -f /proc/apm ]] &&
-     precmd () { prompt_clint_precmd ; prompt_clint_apm_precmd } ||
-     precmd () { prompt_clint_precmd }
+  precmd () { prompt_clint_precmd }
   preexec () { }
 }
 
 prompt_clint_precmd () {
   setopt noxtrace noksharrays localoptions
   local exitstatus=$?
+  local git_dir git_ref
 
+  psvar=()
   [[ $exitstatus -ge 128 ]] && psvar[1]=" $signals[$exitstatus-127]" ||
 	psvar[1]=""
 
   [[ -o interactive ]] && jobs -l
 
-}
+  git_dir=$(git-rev-parse --git-dir 2> /dev/null) || return
+  git_ref=$(git-symbolic-ref HEAD 2> /dev/null) || git_ref="(no branch)"
+  psvar[2]=${ref#refs/heads/}
 
-prompt_clint_apm_precmd () {
-  setopt noxtrace noksharrays localoptions
-  local bat ac
-
-  bat=${${="$(</proc/apm)"}[7]/%/%%}
-  [[ ${${="$(</proc/apm)"}[4]} == "0x01" ]] && ac="AC+"
-
-  [[ $bat == ("100%"|"-1%") ]] && psvar[2]=() || psvar[2]="$ac$bat"
 }
 
 prompt_clint_setup "$@"
