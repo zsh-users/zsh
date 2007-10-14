@@ -1,3 +1,8 @@
+2007-10-14  Clint Adams  <clint@zsh.org>
+
+	* 23952: Src/Modules/curses.c, Src/Modules/curses.mdd: work with
+	non-wide curses as well.
+
 2007-10-13  Clint Adams  <clint@zsh.org>
 
 	* 23947: Functions/Prompts/prompt_clint_setup: remove apm battery

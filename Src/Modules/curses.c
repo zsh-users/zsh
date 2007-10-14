@@ -30,7 +30,9 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
 #include <ncurses.h>
-#include <wchar.h>
+#ifdef HAVE_SETCCHAR
+# include <wchar.h>
+#endif
 
 #include <stdio.h>
 
@@ -165,8 +167,10 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
     }
 
     if (OPT_ISSET(ops,'c')) {
+#ifdef HAVE_SETCCHAR
 	wchar_t c;
 	cchar_t cc;
+#endif
 
 	targetwin = zcurses_validate_window(args[0], ZCURSES_USED);
 	if (targetwin == -1) {
@@ -174,6 +178,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 
+#ifdef HAVE_SETCCHAR
 	if (mbrtowc(&c, args[1], MB_CUR_MAX, NULL) < 1)
 	    return 1;
 
@@ -182,14 +187,20 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 
 	if (wadd_wch(zcurses_WIN[targetwin], &cc)!=OK)
 	    return 1;
+#else
+	if (waddch(zcurses_WIN[targetwin], (chtype)args[1][0])!=OK)
+	    return 1;
+#endif
 
 	return 0;
     }
 
     if (OPT_ISSET(ops,'s')) {
+#ifdef HAVE_SETCCHAR
 	wchar_t *ws;
 	cchar_t *wcc;
 	size_t sl;
+#endif
 
 	targetwin = zcurses_validate_window(args[0], ZCURSES_USED);
 	if (targetwin == -1) {
@@ -197,6 +208,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 
+#ifdef HAVE_SETCCHAR
 	sl = strlen(args[1]);
 
 	if (sl == 0) {
@@ -224,6 +236,10 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	free(wcc);
+#else
+	if (waddstr(zcurses_WIN[targetwin], args[1])!=OK)
+	    return 1;
+#endif
 	return 0;
     }
 
