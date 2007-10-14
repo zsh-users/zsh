@@ -1,3 +1,12 @@
+2007-10-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Functions/Prompts/prompt_bart_setup: make sure
+	localtraps is unset before assigning to functions[TRAPWINCH].
+
+	* users/12008: Functions/Prompts/promptinit: emulate zsh to
+	avoid setopts conflicts.  Run precmd and preexec only if they
+	are defined as functions.
+
 2007-10-14  Clint Adams  <clint@zsh.org>
 
 	* 23952: Src/Modules/curses.c, Src/Modules/curses.mdd: work with
