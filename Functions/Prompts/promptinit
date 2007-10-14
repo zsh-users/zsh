@@ -39,6 +39,7 @@ promptinit () {
 }
 
 prompt_preview_safely() {
+  emulate -L zsh
   print $reset_color
   if [[ -z "$prompt_themes[(r)$1]" ]]; then
     print "Unknown theme: $1"
@@ -165,6 +166,7 @@ Use prompt -h <theme> for help on specific themes.'
 }
 
 prompt () {
+  emulate -L zsh
   local prompt_opts
   
   set_prompt "$@"
@@ -176,6 +178,7 @@ prompt () {
 }
 
 prompt_preview_theme () {
+  emulate -L zsh
   local -a psv; psv=($psvar); local -a +h psvar; psvar=($psv) # Ick
   local +h PS1=$PS1 PS2=$PS2 PS3=$PS3 PS4=$PS4 RPS1=$RPS1
   trap "${$(functions precmd):-:} ; ${$(functions preexec):-:}" 0
@@ -184,10 +187,10 @@ prompt_preview_theme () {
   (( $#* > 1 )) && print -n " with parameters \`$*[2,-1]'"
   print ":"
   prompt_${1}_setup "$@[2,-1]"
-  precmd
+  typeset +f precmd >&- && precmd
   [[ -o promptcr ]] && print -n $'\r'; :
   print -P "${PS1}command arg1 arg2 ... argn"
-  preexec
+  typeset +f preexec >&- && preexec
 }
 
 [[ -o kshautoload ]] || promptinit "$@"
