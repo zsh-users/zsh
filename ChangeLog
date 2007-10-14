@@ -1,5 +1,8 @@
 2007-10-14  Clint Adams  <clint@zsh.org>
 
+	* unposted: Doc/Zsh/.distfiles, Src/Modules/.distfiles: update for
+	zsh/curses module and documentation.
+
 	* 23954: Doc/Makefile.in, Doc/Zsh/mod_curses.yo: documentation for
 	zsh/curses module.
 
