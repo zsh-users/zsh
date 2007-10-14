@@ -1,3 +1,8 @@
+2007-10-14  Clint Adams  <clint@zsh.org>
+
+	* 23954: Doc/Makefile.in, Doc/Zsh/mod_curses.yo: documentation for
+	zsh/curses module.
+
 2007-10-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_bart_setup: make sure
