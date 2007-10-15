@@ -380,6 +380,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
+    endwin();
     freelinklist(zcurses_windows, (FreeFunc) zcurses_free_window);
     return setfeatureenables(m, &module_features, NULL);
 }
