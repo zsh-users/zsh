@@ -105,14 +105,14 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops,'a')) {
 	int nlines, ncols, begin_y, begin_x;
 
-	nlines = atoi(args[0]);
-	ncols = atoi(args[1]);
-	begin_y = atoi(args[2]);
-	begin_x = atoi(args[3]);
-	targetwin = zcurses_validate_window(args[4], ZCURSES_UNUSED);
+	targetwin = zcurses_validate_window(args[0], ZCURSES_UNUSED);
+	nlines = atoi(args[1]);
+	ncols = atoi(args[2]);
+	begin_y = atoi(args[3]);
+	begin_x = atoi(args[4]);
 
 	if (targetwin == -1) {
-	    zerrnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[4], 0);
+	    zerrnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
 	    return 1;
 	}
 

@@ -6,7 +6,7 @@ The tt(zsh/curses) module makes available one builtin command:
 startitem()
 findex(zcurses)
 cindex(windows, curses)
-xitem(tt(zcurses) tt(-a) var(nlines) var(ncols) var(begin_y) var(begin_x) var(targetwin) )
+xitem(tt(zcurses) tt(-a) var(targetwin) var(nlines) var(ncols) var(begin_y) var(begin_x) )
 xitem(tt(zcurses) tt(-d) var(targetwin) )
 xitem(tt(zcurses) tt(-r) var(targetwin) )
 xitem(tt(zcurses) tt(-m) var(targetwin) var(new_y) var(new_x) )
