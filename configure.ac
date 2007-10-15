@@ -26,7 +26,7 @@ dnl  support, updates, enhancements, or modifications.
 dnl
 
 AC_INIT(Src/zsh.h)
-AC_PREREQ(2.50)
+AC_PREREQ(2.53b)
 AC_CONFIG_HEADER(config.h)
 
 dnl What version of zsh are we building ?
@@ -489,6 +489,7 @@ AC_PROG_MAKE_SET            dnl Does make define $MAKE
 AC_PROG_INSTALL             dnl Check for BSD compatible `install'
 AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
 AC_PROG_LN                  dnl Check for working ln, for "make install"
+AC_PROG_EGREP               dnl sets $EGREP to grep -E or egrep
 AC_CHECK_PROGS([YODL], [yodl], [: yodl])
 AC_CHECK_PROGS([PDFETEX], [pdfetex], [: pdfetex])
 AC_CHECK_PROGS([ANSI2KNR], [ansi2knr], [: ansi2knr])
@@ -1292,7 +1293,7 @@ do
   dnl Try to make sure it doesn't get confused by files that don't
   dnl have real error definitions in.  Count definitions to make sure.
   nerrs=`test -f $ERRNO_H && \
-  grep '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*[0-9][0-9]*' $ERRNO_H | \
+  $EGREP '#[ 	]*define[ 	][ 	]*E[0-9A-Z]*[ 	]*(_HURD_ERRNO \()?[0-9]+\)?' $ERRNO_H | \
   wc -l | sed 's/[ 	]//g'`
   test "x$nerrs" != x && test "$nerrs" -ge 7 && break
 done
@@ -1575,11 +1576,16 @@ AC_DEFINE_UNQUOTED(DEFAULT_PATH, "$zsh_cv_cs_path",
 dnl ----------------------------
 dnl CHECK FOR /dev/fd FILESYSTEM
 dnl ----------------------------
+dnl FreeBSD 5 only supports /dev/fd/0 to /dev/fd/2 without mounting
+dnl a special file system.  As zsh needs arbitrary /dev/fd (typically
+dnl >10) for its own use, we need to make sure higher fd's are available.
+dnl Since we're using the shell, we're restricted to 0 to 9 but 3 should
+dnl be good enough.
 AH_TEMPLATE([PATH_DEV_FD],
 [Define to the path of the /dev/fd filesystem.])
 AC_CACHE_CHECK(for /dev/fd filesystem, zsh_cv_sys_path_dev_fd,
 [for zsh_cv_sys_path_dev_fd in /proc/self/fd /dev/fd no; do
-   test x`echo ok|cat $zsh_cv_sys_path_dev_fd/0 2>/dev/null` = xok && break
+   test x`echo ok|(exec 3<&0; cat $zsh_cv_sys_path_dev_fd/3 2>/dev/null;)` = xok && break
  done])
 if test $zsh_cv_sys_path_dev_fd != no; then
   AC_DEFINE_UNQUOTED(PATH_DEV_FD, "$zsh_cv_sys_path_dev_fd")
@@ -2202,7 +2208,7 @@ char *argv[];
     esac
   fi
   case "$host_os" in
-    freebsd*|linux*|irix*|osf*|gnu*|dragonfly*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
+    *freebsd*|linux*|irix*|osf*|gnu*|dragonfly*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
     sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
     netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;
@@ -2226,7 +2232,7 @@ char *argv[];
   esac
   case "$host" in
     *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
-    *-freebsd[3-9]*|*-linux*|gnu*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
+    *-freebsd[3-9]*|*-kfreebsd*|*-linux*|gnu*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
     *openbsd*)
        if test $zsh_cv_sys_elf = yes; then
 	 EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}"
