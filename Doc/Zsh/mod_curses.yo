@@ -17,8 +17,8 @@ Manipulate curses windows.
 
 With tt(-a), create a window with var(nlines) lines and var(ncols) columns.
 Its upper left corner will be placed at row var(begin_y) and column
-var(begin_x) of the screen.  var(targetwin) must be an integer between 1
-and 9 inclusive, and refer to a window that is not currently assigned.
+var(begin_x) of the screen.  var(targetwin) is a string and refers
+to the name of a window that is not currently assigned.
 
 Use tt(-d) to delete a window created with tt(-a).
 

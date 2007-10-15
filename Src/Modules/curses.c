@@ -39,9 +39,13 @@
 #include "curses.mdh"
 #include "curses.pro"
 
-#define ZCURSES_MAX_WINDOWS 9
+typedef struct zc_win {
+    WINDOW *win;
+    char *name;
+} *ZCWin;
 
-static WINDOW *zcurses_WIN[ZCURSES_MAX_WINDOWS + 1];
+WINDOW *win_zero;
+LinkList zcurses_windows;
 
 #define ZCURSES_ERANGE 1
 #define ZCURSES_EDEFINED 2
@@ -52,7 +56,6 @@ static WINDOW *zcurses_WIN[ZCURSES_MAX_WINDOWS + 1];
 
 static int zc_errno;
 
-/**/
 static const char *
 zcurses_strerror(int err)
 {
@@ -65,94 +68,144 @@ zcurses_strerror(int err)
     return errs[(err < 1 || err > 2) ? 0 : err];
 }
 
-/**/
-static unsigned
+static LinkNode
+zcurses_getwindowbyname(char *name)
+{
+    LinkNode node;
+    ZCWin w;
+
+    for (node = firstnode(zcurses_windows); node; incnode(node))
+	if (w = (ZCWin)getdata(node), !strcmp(w->name, name))
+	    return node;
+
+    return NULL;
+}
+
+static LinkNode
 zcurses_validate_window(char *win, int criteria)
 {
-    unsigned target;
+    LinkNode target;
 
-    if (win==NULL) {
+    if (win==NULL || strlen(win) < 1) {
 	zc_errno = ZCURSES_ERANGE;
-	return -1;
+	return NULL;
     }
 
-    target = (unsigned)atoi(win);
+    target = zcurses_getwindowbyname(win);
 
-    if (target > ZCURSES_MAX_WINDOWS || target < 1) {
-	zc_errno = ZCURSES_ERANGE;
-	return -1;
-    }
-
-    if (zcurses_WIN[target]!=NULL && (criteria & ZCURSES_UNUSED)) {
+    if (target && (criteria & ZCURSES_UNUSED)) {
 	zc_errno = ZCURSES_EDEFINED;
-	return -1;
+	return NULL;
     }
 
-    if (zcurses_WIN[target]==NULL && (criteria & ZCURSES_USED)) {
+    if (!target && (criteria & ZCURSES_USED)) {
 	zc_errno = ZCURSES_EUNDEFINED;
-	return -1;
+	return NULL;
     }
 
+    zc_errno = 0;
     return target;
+}
+
+static int
+zcurses_free_window(ZCWin w)
+{
+    if (delwin(w->win)!=OK)
+	return 1;
+
+    if (w->name)
+	zsfree(w->name);
+
+    zfree(w, sizeof(struct zc_win));
+
+    return 0;
 }
 
 /**/
 static int
 bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    unsigned targetwin;
-
     if (OPT_ISSET(ops,'a')) {
 	int nlines, ncols, begin_y, begin_x;
+        ZCWin w;
 
-	targetwin = zcurses_validate_window(args[0], ZCURSES_UNUSED);
+	if (zcurses_validate_window(args[0], ZCURSES_UNUSED) == NULL && zc_errno) {
+	    zerrnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	    return 1;
+	}
+
 	nlines = atoi(args[1]);
 	ncols = atoi(args[2]);
 	begin_y = atoi(args[3]);
 	begin_x = atoi(args[4]);
 
-	if (targetwin == -1) {
-	    zerrnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+        w = (ZCWin)zshcalloc(sizeof(struct zc_win));
+        if (!w)
+	    return 1;
+
+        w->name = ztrdup(args[0]);
+	w->win = newwin(nlines, ncols, begin_y, begin_x);
+
+	if (w->win == NULL) {
+	    zsfree(w->name);
+	    free(w);
 	    return 1;
 	}
 
-	zcurses_WIN[targetwin]=newwin(nlines, ncols, begin_y, begin_x);
-
-	if (zcurses_WIN[targetwin]==NULL)
-	    return 1;
+        zinsertlinknode(zcurses_windows, lastnode(zcurses_windows), (void *)w);
 
 	return 0;
     }
 
     if (OPT_ISSET(ops,'d')) {
-	targetwin = zcurses_validate_window(OPT_ARG(ops,'d'), ZCURSES_USED);
-	if (targetwin == -1) {
+	LinkNode node;
+	ZCWin w;
+
+	node = zcurses_validate_window(OPT_ARG(ops,'d'), ZCURSES_USED);
+	if (node == NULL) {
 	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), OPT_ARG(ops,'d'), 0);
 	    return 1;
 	}
 
-	if (delwin(zcurses_WIN[targetwin])!=OK)
-		return 1;
+	w = (ZCWin)getdata(node);
 
-	zcurses_WIN[targetwin]=NULL;
+	if (w == NULL) {
+	    zwarnnam(nam, "record for window `%s' is corrupt", OPT_ARG(ops, 'd'), 0);
+	    return 1;
+	}
+	if (delwin(w->win)!=OK)
+	    return 1;
+
+	if (w->name)
+	    zsfree(w->name);
+
+        remnode(zcurses_windows, node);
+
 	return 0;
     }
 
     if (OPT_ISSET(ops,'r')) {
-	targetwin = zcurses_validate_window(OPT_ARG(ops,'r'), ZCURSES_USED);
-	if (targetwin == -1) {
+	LinkNode node;
+	ZCWin w;
+
+	node = zcurses_validate_window(OPT_ARG(ops,'r'), ZCURSES_USED);
+	if (node == NULL) {
 	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), OPT_ARG(ops,'r'), 0);
 	    return 1;
 	}
 
-	return (wrefresh(zcurses_WIN[targetwin])!=OK) ? 1 : 0;
+	w = (ZCWin)getdata(node);
+
+	return (wrefresh(w->win)!=OK) ? 1 : 0;
     }
 
     if (OPT_ISSET(ops,'m')) {
 	int y, x;
+	LinkNode node;
+	ZCWin w;
 
-	targetwin = zcurses_validate_window(args[0], ZCURSES_USED);
-	if (targetwin == -1) {
+	node = zcurses_validate_window(args[0], ZCURSES_USED);
+	if (node == NULL) {
 	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
 	    return 1;
 	}
@@ -160,23 +213,29 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	y = atoi(args[1]);
 	x = atoi(args[2]);
 
-	if (wmove(zcurses_WIN[targetwin], y, x)!=OK)
+	w = (ZCWin)getdata(node);
+
+	if (wmove(w->win, y, x)!=OK)
 	    return 1;
 
 	return 0;
     }
 
     if (OPT_ISSET(ops,'c')) {
+	LinkNode node;
+	ZCWin w;
 #ifdef HAVE_SETCCHAR
 	wchar_t c;
 	cchar_t cc;
 #endif
 
-	targetwin = zcurses_validate_window(args[0], ZCURSES_USED);
-	if (targetwin == -1) {
+	node = zcurses_validate_window(args[0], ZCURSES_USED);
+	if (node == NULL) {
 	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
 	    return 1;
 	}
+
+	w = (ZCWin)getdata(node);
 
 #ifdef HAVE_SETCCHAR
 	if (mbrtowc(&c, args[1], MB_CUR_MAX, NULL) < 1)
@@ -185,10 +244,10 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	if (setcchar(&cc, &c, A_NORMAL, 0, NULL)==ERR)
 	    return 1;
 
-	if (wadd_wch(zcurses_WIN[targetwin], &cc)!=OK)
+	if (wadd_wch(w->win, &cc)!=OK)
 	    return 1;
 #else
-	if (waddch(zcurses_WIN[targetwin], (chtype)args[1][0])!=OK)
+	if (waddch(w->win, (chtype)args[1][0])!=OK)
 	    return 1;
 #endif
 
@@ -196,17 +255,22 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
     }
 
     if (OPT_ISSET(ops,'s')) {
+	LinkNode node;
+	ZCWin w;
+
 #ifdef HAVE_SETCCHAR
 	wchar_t *ws;
 	cchar_t *wcc;
 	size_t sl;
 #endif
 
-	targetwin = zcurses_validate_window(args[0], ZCURSES_USED);
-	if (targetwin == -1) {
+	node = zcurses_validate_window(args[0], ZCURSES_USED);
+	if (node == NULL) {
 	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
 	    return 1;
 	}
+
+	w = (ZCWin)getdata(node);
 
 #ifdef HAVE_SETCCHAR
 	sl = strlen(args[1]);
@@ -230,28 +294,32 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 
 	free(ws);
 
-	if (wadd_wchstr(zcurses_WIN[targetwin], wcc)!=OK) {
+	if (wadd_wchstr(w->win, wcc)!=OK) {
 	    free(wcc);
 	    return 1;
 	}
 
 	free(wcc);
 #else
-	if (waddstr(zcurses_WIN[targetwin], args[1])!=OK)
+	if (waddstr(w->win, args[1])!=OK)
 	    return 1;
 #endif
 	return 0;
     }
 
     if (OPT_ISSET(ops,'b')) {
+	LinkNode node;
+	ZCWin w;
 
-	targetwin = zcurses_validate_window(OPT_ARG(ops,'b'), ZCURSES_USED);
-	if (targetwin == -1) {
+	node = zcurses_validate_window(OPT_ARG(ops,'b'), ZCURSES_USED);
+	if (node == NULL) {
 	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), OPT_ARG(ops,'b'), 0);
 	    return 1;
 	}
 
-	if (wborder(zcurses_WIN[targetwin], 0, 0, 0, 0, 0, 0, 0, 0)!=OK)
+	w = (ZCWin)getdata(node);
+
+	if (wborder(w->win, 0, 0, 0, 0, 0, 0, 0, 0)!=OK)
 	    return 1;
 
 	return 0;
@@ -302,11 +370,8 @@ enables_(Module m, int **enables)
 int
 boot_(Module m)
 {
-    int i;
-    for(i=1;i<=ZCURSES_MAX_WINDOWS;i++)
-	zcurses_WIN[i]=NULL;
-
-    zcurses_WIN[0]=initscr();
+    zcurses_windows = znewlinklist();
+    win_zero=initscr();
 
     return 0;
 }
@@ -315,6 +380,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
+    freelinklist(zcurses_windows, (FreeFunc) zcurses_free_window);
     return setfeatureenables(m, &module_features, NULL);
 }
 

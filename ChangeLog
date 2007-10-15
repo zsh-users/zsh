@@ -1,5 +1,9 @@
 2007-10-15  Clint Adams  <clint@zsh.org>
 
+	* 23962: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c: store windows
+	in a linked list instead of a static array, and use strings as
+	window identifiers instead of integers.
+
 	* 23958: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c: change target
 	window to be the first argument of zcurses -a.
 
