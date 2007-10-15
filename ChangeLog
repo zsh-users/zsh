@@ -1,5 +1,8 @@
 2007-10-15  Clint Adams  <clint@zsh.org>
 
+	* 23965: Completion/Unix/Command/_git: add missing bracket in
+	completion for git svnimport.
+
 	* 23964: Src/Modules/curses.c: call endwin() in curses module cleanup.
 
 	* 23962: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c: store windows

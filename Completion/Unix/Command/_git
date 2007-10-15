@@ -2072,7 +2072,7 @@ _git-svnimport () {
     '-M[attempt to detect merges based on the commit message with custom pattern]:pattern' \
     '-o[specify the branch into which you wish to import]:branch' \
     '-r[prepend "rX: " to commit messages, where X is the subversion revision]' \
-    '-s[specify the change number to start importing from:start-revision' \
+    '-s[specify the change number to start importing from]:start-revision' \
     '-T[specify the name of the SVN tags directory]:directory:_directories' \
     '-t[specify the name of the SVN trunk]:trunk:_directories' \
     '-I[import svn:ignore directory property to files with given name]:ignored file:_files' \
