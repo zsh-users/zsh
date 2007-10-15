@@ -1,3 +1,7 @@
+2007-10-15  Clint Adams  <clint@zsh.org>
+
+	* 23957: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c: minor fixes.
+
 2007-10-14  Clint Adams  <clint@zsh.org>
 
 	* unposted: Doc/Zsh/.distfiles, Src/Modules/.distfiles: update for

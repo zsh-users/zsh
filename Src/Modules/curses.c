@@ -78,7 +78,7 @@ zcurses_validate_window(char *win, int criteria)
 
     target = (unsigned)atoi(win);
 
-    if (target > ZCURSES_MAX_WINDOWS) {
+    if (target > ZCURSES_MAX_WINDOWS || target < 1) {
 	zc_errno = ZCURSES_ERANGE;
 	return -1;
     }

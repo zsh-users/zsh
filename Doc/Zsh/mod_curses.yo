@@ -26,7 +26,8 @@ The tt(-r) command will refresh window var(targetwin); this is necessary to
 make any pending changes (such as characters you have prepared for output
 with tt(-c)) visible on the screen.
 
-tt(-m) moves var(targetwin) to new coordinates var(new_y) and var(new_x).
+tt(-m) moves the cursor position in var(targetwin) to new coordinates
+var(new_y) and var(new_x).
 
 Outputting characters and strings are achieved by tt(-c) and tt(-s)
 respectively.
