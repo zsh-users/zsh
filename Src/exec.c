@@ -399,9 +399,12 @@ zexecve(char *pth, char **argv)
 			    char *buf;
 			    if (*ptr)
 				*ptr = '\0';
-			    buf = tricat("%s: bad interpreter: ", ptr2,
-					 ": %e");
-			    zerr(buf, pth, eno);
+			    /*
+			     * TODO: needs variable argument handling
+			     * in zerrmsg() etc. to do this properly.
+			     */
+			    buf = dyncat(pth, ": bad interpreter: %s: %e");
+			    zerr(buf, ptr2, eno);
 			} else if (*ptr) {
 			    *ptr = '\0';
 			    argv[-2] = ptr2;
