@@ -1,7 +1,7 @@
 #compdef sysctl
 
 case $OSTYPE in
-  freebsd[5-9].*|freebsd4.[4-9]*)
+  *freebsd[5-9].*|freebsd4.[4-9]*)
     local -a sysctlvars
     sysctlvars=( $(sysctl -aN) )
     _arguments -s -A "-*" \
