@@ -44,8 +44,10 @@ typedef struct zc_win {
     char *name;
 } *ZCWin;
 
-WINDOW *win_zero;
-LinkList zcurses_windows;
+static WINDOW *win_zero;
+static struct ttyinfo saved_tty_state;
+static struct ttyinfo curses_tty_state;
+static LinkList zcurses_windows;
 
 #define ZCURSES_ERANGE 1
 #define ZCURSES_EDEFINED 2
@@ -125,6 +127,18 @@ zcurses_free_window(ZCWin w)
 static int
 bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 {
+    /* Initialise curses */
+    if (OPT_ISSET(ops,'i')) {
+	if (!win_zero) {
+	    gettyinfo(&saved_tty_state);
+	    win_zero = initscr();
+	    gettyinfo(&curses_tty_state);
+	} else {
+	    settyinfo(&curses_tty_state);
+	}
+	return 0;
+    }
+
     if (OPT_ISSET(ops,'a')) {
 	int nlines, ncols, begin_y, begin_x;
         ZCWin w;
@@ -179,24 +193,31 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	if (w->name)
 	    zsfree(w->name);
 
-        remnode(zcurses_windows, node);
+        zfree((ZCWin)remnode(zcurses_windows, node), sizeof(struct zc_win));
 
 	return 0;
     }
 
     if (OPT_ISSET(ops,'r')) {
-	LinkNode node;
-	ZCWin w;
+	if (args[0]) {
+	    LinkNode node;
+	    ZCWin w;
 
-	node = zcurses_validate_window(OPT_ARG(ops,'r'), ZCURSES_USED);
-	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), OPT_ARG(ops,'r'), 0);
-	    return 1;
+	    node = zcurses_validate_window(args[0], ZCURSES_USED);
+	    if (node == NULL) {
+		zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0],
+			 0);
+		return 1;
+	    }
+
+	    w = (ZCWin)getdata(node);
+
+	    return (wrefresh(w->win)!=OK) ? 1 : 0;
 	}
-
-	w = (ZCWin)getdata(node);
-
-	return (wrefresh(w->win)!=OK) ? 1 : 0;
+	else
+	{
+	    return (refresh() != OK) ? 1 : 0;
+	}
     }
 
     if (OPT_ISSET(ops,'m')) {
@@ -325,6 +346,22 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	return 0;
     }
 
+    /* Finish using curses */
+    if (OPT_ISSET(ops,'e')) {
+	if (win_zero) {
+	    endwin();
+	    /* Restore TTY as it was before zcurses -i */
+	    settyinfo(&saved_tty_state);
+	    /*
+	     * TODO: should I need the following?  Without it
+	     * the screen stays messed up.  Presumably we are
+	     * doing stuff with shttyinfo when we shouldn't really be.
+	     */
+	    gettyinfo(&shttyinfo);
+	}
+	return 0;
+    }
+
     return 0;
 }
 
@@ -333,7 +370,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
  */
 
 static struct builtin bintab[] = {
-    BUILTIN("zcurses", 0, bin_zcurses, 0, 5, 0, "ab:cd:mr:rs", NULL),
+    BUILTIN("zcurses", 0, bin_zcurses, 0, 5, 0, "ab:cd:eimrs", NULL),
 };
 
 static struct features module_features = {
@@ -371,7 +408,6 @@ int
 boot_(Module m)
 {
     zcurses_windows = znewlinklist();
-    win_zero=initscr();
 
     return 0;
 }
@@ -380,7 +416,6 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    endwin();
     freelinklist(zcurses_windows, (FreeFunc) zcurses_free_window);
     return setfeatureenables(m, &module_features, NULL);
 }

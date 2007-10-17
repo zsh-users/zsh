@@ -1,3 +1,13 @@
+2007-10-17  Peter Stephenson  <pws@csr.com>
+
+	* 23970 (slightly modified): Doc/Zsh/mod_curses.yo,
+	Src/Modules/curses.c: fix up deletion of curses windows and add
+	zcurses -i/-e for initialisation and end to retain terminal
+	sanity; make "zcurses -r" do a global refresh.
+
+	* Vin Shelton: 23968: Doc/Zsh/mod_curses.yo: overabundance of
+	enditem().
+
 2007-10-15  Clint Adams  <clint@zsh.org>
 
 	* 23965: Completion/Unix/Command/_git: add missing bracket in
