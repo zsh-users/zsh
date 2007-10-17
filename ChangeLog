@@ -1,3 +1,8 @@
+2007-10-17  Clint Adams  <clint@zsh.org>
+
+	* 23981: Src/Modules/curses.c: add zcurses -A to set window
+	attributes.
+
 2007-10-17  Peter Stephenson  <pws@csr.com>
 
 	* 23970 (slightly modified): Doc/Zsh/mod_curses.yo,

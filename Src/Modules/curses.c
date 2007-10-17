@@ -44,6 +44,11 @@ typedef struct zc_win {
     char *name;
 } *ZCWin;
 
+struct zcurses_attribute {
+    char *name;
+    int number;
+};
+
 static WINDOW *win_zero;
 static struct ttyinfo saved_tty_state;
 static struct ttyinfo curses_tty_state;
@@ -55,6 +60,9 @@ static LinkList zcurses_windows;
 
 #define ZCURSES_UNUSED 1
 #define ZCURSES_USED 2
+
+#define ZCURSES_ATTRON 1
+#define ZCURSES_ATTROFF 2
 
 static int zc_errno;
 
@@ -123,6 +131,41 @@ zcurses_free_window(ZCWin w)
     return 0;
 }
 
+static int
+zcurses_attribute(WINDOW *w, char *attr, int op)
+{
+    struct zcurses_attribute *zca;
+
+    static const struct zcurses_attribute zcurses_attributes[] = {
+	{"blink", A_BLINK},
+	{"bold", A_BOLD},
+	{"dim", A_DIM},
+	{"reverse", A_REVERSE},
+	{"standout", A_STANDOUT},
+	{"underline", A_UNDERLINE},
+	{NULL, 0}
+    };
+
+    if (!attr)
+	return 1;
+
+    for(zca=(struct zcurses_attribute *)zcurses_attributes;zca->name;zca++)
+	if (!strcmp(attr, zca->name)) {
+	    switch(op) {
+		case ZCURSES_ATTRON:
+		    wattron(w, zca->number);
+		    break;
+		case ZCURSES_ATTROFF:
+		    wattroff(w, zca->number);
+		    break;
+	    }
+
+	    return 0;
+	}
+
+    return 1;
+}
+
 /**/
 static int
 bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
@@ -141,7 +184,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 
     if (OPT_ISSET(ops,'a')) {
 	int nlines, ncols, begin_y, begin_x;
-        ZCWin w;
+	ZCWin w;
 
 	if (zcurses_validate_window(args[0], ZCURSES_UNUSED) == NULL && zc_errno) {
 	    zerrnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
@@ -153,11 +196,11 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	begin_y = atoi(args[3]);
 	begin_x = atoi(args[4]);
 
-        w = (ZCWin)zshcalloc(sizeof(struct zc_win));
-        if (!w)
+	w = (ZCWin)zshcalloc(sizeof(struct zc_win));
+	if (!w)
 	    return 1;
 
-        w->name = ztrdup(args[0]);
+	w->name = ztrdup(args[0]);
 	w->win = newwin(nlines, ncols, begin_y, begin_x);
 
 	if (w->win == NULL) {
@@ -166,7 +209,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 
-        zinsertlinknode(zcurses_windows, lastnode(zcurses_windows), (void *)w);
+	zinsertlinknode(zcurses_windows, lastnode(zcurses_windows), (void *)w);
 
 	return 0;
     }
@@ -193,7 +236,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	if (w->name)
 	    zsfree(w->name);
 
-        zfree((ZCWin)remnode(zcurses_windows, node), sizeof(struct zc_win));
+	zfree((ZCWin)remnode(zcurses_windows, node), sizeof(struct zc_win));
 
 	return 0;
     }
@@ -206,7 +249,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	    node = zcurses_validate_window(args[0], ZCURSES_USED);
 	    if (node == NULL) {
 		zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0],
-			 0);
+			0);
 		return 1;
 	    }
 
@@ -361,6 +404,37 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 	return 0;
     }
+    if (OPT_ISSET(ops,'A')) {
+	LinkNode node;
+	ZCWin w;
+	char **attrs;
+
+	if (!args[0])
+	    return 1;
+
+	node = zcurses_validate_window(args[0], ZCURSES_USED);
+	if (node == NULL) {
+	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	    return 1;
+	}
+
+	w = (ZCWin)getdata(node);
+
+	for(attrs = args+1; *attrs; attrs++) {
+	    switch(*attrs[0]) {
+		case '-':
+		    zcurses_attribute(w->win, (*attrs)+1, ZCURSES_ATTROFF);
+		    break;
+		case '+':
+		    zcurses_attribute(w->win, (*attrs)+1, ZCURSES_ATTRON);
+		    break;
+		default:
+		    /* maybe a bad idea to spew warnings here */
+		    break;
+	    }
+	}
+	return 0;
+    }
 
     return 0;
 }
@@ -370,7 +444,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
  */
 
 static struct builtin bintab[] = {
-    BUILTIN("zcurses", 0, bin_zcurses, 0, 5, 0, "ab:cd:eimrs", NULL),
+    BUILTIN("zcurses", 0, bin_zcurses, 0, 5, 0, "Aab:cd:eimrs", NULL),
 };
 
 static struct features module_features = {
