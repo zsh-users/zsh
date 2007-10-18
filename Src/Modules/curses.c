@@ -30,6 +30,11 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
 #include <ncurses.h>
+#ifndef MULTIBYTE_SUPPORT
+# undef HAVE_SETCCHAR
+# undef HAVE_WADDWSTR
+#endif
+
 #ifdef HAVE_SETCCHAR
 # include <wchar.h>
 #endif
@@ -322,10 +327,11 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	LinkNode node;
 	ZCWin w;
 
-#ifdef HAVE_SETCCHAR
-	wchar_t *ws;
-	cchar_t *wcc;
-	size_t sl;
+#ifdef HAVE_WADDWSTR
+	int clen;
+	wint_t wc;
+	wchar_t *wstr, *wptr;
+	char *str = args[1];
 #endif
 
 	node = zcurses_validate_window(args[0], ZCURSES_USED);
@@ -336,34 +342,20 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 
 	w = (ZCWin)getdata(node);
 
-#ifdef HAVE_SETCCHAR
-	sl = strlen(args[1]);
+#ifdef HAVE_WADDWSTR
+	mb_metacharinit();
+	wptr = wstr = zhalloc((strlen(str)+1) * sizeof(cchar_t));
 
-	if (sl == 0) {
-	    return 0;
+	while (*str && (clen = mb_metacharlenconv(str, &wc))) {
+	    str += clen;
+	    if (wc == WEOF) /* TODO: replace with space? nicen? */
+		continue;
+	    *wptr++ = wc;
 	}
-
-	ws = malloc(sl * sizeof(wchar_t));
-
-	if (mbstowcs(ws, args[1], sl) < 1) {
-	    free(ws);
+	*wptr++ = L'\0';
+	if (waddwstr(w->win, wstr)!=OK) {
 	    return 1;
 	}
-
-	wcc = malloc(wcslen(ws) * sizeof(cchar_t));
-
-	if (setcchar(wcc, ws, A_NORMAL, 0, NULL)==ERR) {
-	    return 1;
-	}
-
-	free(ws);
-
-	if (wadd_wchstr(w->win, wcc)!=OK) {
-	    free(wcc);
-	    return 1;
-	}
-
-	free(wcc);
 #else
 	if (waddstr(w->win, args[1])!=OK)
 	    return 1;
