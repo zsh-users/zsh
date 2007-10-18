@@ -1,5 +1,8 @@
 2007-10-18  Clint Adams  <clint@zsh.org>
 
+	* Mikael Magnusson: 23988: Completion/Unix/Command/_git: fix
+	git-svn commands completion.
+
 	* 23989: Src/Modules/curses.c: add broken zcurses -C to set window
 	colors.
 

@@ -2345,6 +2345,7 @@ _git-svn () {
         'set-tree:commit given commit or tree to SVN repository'
         'show-ignore:output corresponding .gitignore file of svn:ignore'
         'commit-diff:commit diff of two tree-ishs')
+        _describe -t commands command commands && ret=0
       ;;
     (options)
       declare -a arguments
