@@ -2570,7 +2570,7 @@ __git_tree_ishs () {
 
 (( $+functions[__git_blobs] )) ||
 __git_blobs () {
-  _git_guard $* "[[:xdigit:]]#" 'blob id'
+  __git_guard $* "[[:xdigit:]]#" 'blob id'
 }
 
 (( $+functions[__git_stages] )) ||
