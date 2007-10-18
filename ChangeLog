@@ -1,5 +1,8 @@
 2007-10-18  Peter Stephenson  <pws@csr.com>
 
+	* 23986: Doc/Zsh/contrib.yo: zmv example for turning spaces
+	into underscores.
+
 	* 23978: configure.ac, Src/Modules/curses.c: use waddwstr() to
 	get zcurses -s to work with wide characters.
 
