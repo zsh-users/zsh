@@ -1,3 +1,8 @@
+2007-10-18  Clint Adams  <clint@zsh.org>
+
+	* 23989: Src/Modules/curses.c: add broken zcurses -C to set window
+	colors.
+
 2007-10-18  Peter Stephenson  <pws@csr.com>
 
 	* 23986: Doc/Zsh/contrib.yo: zmv example for turning spaces
