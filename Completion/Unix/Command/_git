@@ -1011,6 +1011,7 @@ _git-show-ref () {
 (( $+functions[_git-show] )) ||
 _git-show () {
   local curcontext=$curcontext state line
+  typeset -A opt_args
   __git_setup_revision_arguments
 
   _arguments -S \
@@ -1021,7 +1022,7 @@ _git-show () {
     (object)
       compset -P '*:'
       if [[ -n $IPREFIX ]]; then
-        __git_tree_files $IPREFIX[1,-2]
+        __git_tree_files ${IPREFIX%:}
       else
         _alternative \
           'revisions:revision:__git_revisions' \

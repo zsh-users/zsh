@@ -1,5 +1,7 @@
 2007-10-19  Clint Adams  <clint@zsh.org>
 
+	* 23994: Completion/Unix/Command/_git: tweaks for 23993.
+
 	* Mikael Magnusson: 23993: Completion/Unix/Command/_git: improved
 	completion for git show.
 
