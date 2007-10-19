@@ -1010,11 +1010,25 @@ _git-show-ref () {
 
 (( $+functions[_git-show] )) ||
 _git-show () {
+  local curcontext=$curcontext state line
   __git_setup_revision_arguments
 
   _arguments -S \
     $revision_arguments \
-    '*:object:__git_revisions' && ret=0
+    '*:object:->object' && ret=0
+
+  case $state in
+    (object)
+      compset -P '*:'
+      if [[ -n $IPREFIX ]]; then
+        __git_tree_files $IPREFIX[1,-2]
+      else
+        _alternative \
+          'revisions:revision:__git_revisions' \
+          'files:file:__git_files'
+      fi
+      ;;
+  esac
 }
 
 (( $+functions[_git-show-index] )) ||
