@@ -58,7 +58,7 @@ static WINDOW *win_zero;
 static struct ttyinfo saved_tty_state;
 static struct ttyinfo curses_tty_state;
 static LinkList zcurses_windows;
-static HashTable zcurses_colorpairs;
+static HashTable zcurses_colorpairs = NULL;
 
 #define ZCURSES_ERANGE 1
 #define ZCURSES_EDEFINED 2
@@ -599,7 +599,8 @@ int
 cleanup_(Module m)
 {
     freelinklist(zcurses_windows, (FreeFunc) zcurses_free_window);
-    deletehashtable(zcurses_colorpairs);
+    if (zcurses_colorpairs)
+	deletehashtable(zcurses_colorpairs);
     return setfeatureenables(m, &module_features, NULL);
 }
 

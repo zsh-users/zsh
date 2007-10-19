@@ -1,5 +1,8 @@
 2007-10-19  Clint Adams  <clint@zsh.org>
 
+	* 23997: Src/Modules/curses.c: don't delete color pair hash
+	on module unload unless it's been previously initialized.
+
 	* 23994: Completion/Unix/Command/_git: tweaks for 23993.
 
 	* Mikael Magnusson: 23993: Completion/Unix/Command/_git: improved
