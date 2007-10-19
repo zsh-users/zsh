@@ -1,3 +1,8 @@
+2007-10-19  Geoff Wing  <gcw@zsh.org>
+
+	* 23924: Src/Zle/zle_main.c, Src/Zle/zle_refresh.c: Improve
+	synchronising of character attributes with other output routines
+
 2007-10-18  Clint Adams  <clint@zsh.org>
 
 	* Mikael Magnusson: 23991: Completion/Unix/Command/_git: fix

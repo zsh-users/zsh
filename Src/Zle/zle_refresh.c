@@ -413,6 +413,23 @@ snextline(Rparams rpms)
     rpms->sen = rpms->s + winw;
 }
 
+/**/
+static void
+settextattributes(void)
+{
+    if (txtchangeisset(TXTNOBOLDFACE))
+	tsetcap(TCALLATTRSOFF, 0);
+    if (txtchangeisset(TXTNOSTANDOUT))
+	tsetcap(TCSTANDOUTEND, 0);
+    if (txtchangeisset(TXTNOUNDERLINE))
+	tsetcap(TCUNDERLINEEND, 0);
+    if (txtchangeisset(TXTBOLDFACE))
+	tsetcap(TCBOLDFACEBEG, 0);
+    if (txtchangeisset(TXTSTANDOUT))
+	tsetcap(TCSTANDOUTBEG, 0);
+    if (txtchangeisset(TXTUNDERLINE))
+	tsetcap(TCUNDERLINEBEG, 0);
+}
 
 /**/
 mod_export void
@@ -429,11 +446,9 @@ zrefresh(void)
     int tmpcs, tmpll;		/* ditto cursor position and line length     */
     int tmpalloced;		/* flag to free tmpline when finished        */
     int remetafy;		/* flag that zle line is metafied            */
+    int fixprompt;		/* we still need to reexpand the prompt      */
     struct rparams rpms;
     
-    if (trashedzle)
-	reexpandprompt();
-
     /* If this is called from listmatches() (indirectly via trashzle()), and *
      * that was called from the end of zrefresh(), then we don't need to do  *
      * anything.  All this `inlist' code is actually unnecessary, but it     *
@@ -525,6 +540,7 @@ zrefresh(void)
 	    listshown = 0;
 	}
 #endif
+	fixprompt = trashedzle;
 	resetvideo();
 	resetneeded = 0;	/* unset */
 	oput_rpmpt = 0;		/* no right-prompt currently on screen */
@@ -533,6 +549,8 @@ zrefresh(void)
 	tsetcap(TCALLATTRSOFF, 0);
 	tsetcap(TCSTANDOUTEND, 0);
 	tsetcap(TCUNDERLINEEND, 0);
+	/* cheat on attribute unset */
+	txtunset(TXTBOLDFACE|TXTSTANDOUT|TXTUNDERLINE|TXTDIRTY);
 
         if (!clearflag) {
             if (tccan(TCCLEAREOD))
@@ -544,26 +562,17 @@ zrefresh(void)
 	}
         if (t0 > -1)
             olnct = (t0 < winh) ? t0 : winh;
+	if (fixprompt)
+	    reexpandprompt(); 
         if (termflags & TERM_SHORT)
             vcs = 0;
-        else if (!clearflag && lpromptbuf[0]) {
+	else if (!clearflag && lpromptbuf[0]) {
             zputs(lpromptbuf, shout);
 	    if (lpromptwof == winw)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
 	} else {
 	    txtchange = pmpt_attr;
-	    if (txtchangeisset(TXTNOBOLDFACE))
-		tsetcap(TCALLATTRSOFF, 0);
-	    if (txtchangeisset(TXTNOSTANDOUT))
-		tsetcap(TCSTANDOUTEND, 0);
-	    if (txtchangeisset(TXTNOUNDERLINE))
-		tsetcap(TCUNDERLINEEND, 0);
-	    if (txtchangeisset(TXTBOLDFACE))
-		tsetcap(TCBOLDFACEBEG, 0);
-	    if (txtchangeisset(TXTSTANDOUT))
-		tsetcap(TCSTANDOUTBEG, 0);
-	    if (txtchangeisset(TXTUNDERLINE))
-		tsetcap(TCUNDERLINEBEG, 0);
+	    settextattributes();
 	}
 	if (clearflag) {
 	    zputc(ZWC('\r'));
@@ -872,20 +881,8 @@ individually */
 
 /* reset character attributes */
     if (clearf && postedit) {
-	if ((txtchange = pmpt_attr ? pmpt_attr : rpmpt_attr)) {
-	    if (txtchangeisset(TXTNOBOLDFACE))
-		tsetcap(TCALLATTRSOFF, 0);
-	    if (txtchangeisset(TXTNOSTANDOUT))
-		tsetcap(TCSTANDOUTEND, 0);
-	    if (txtchangeisset(TXTNOUNDERLINE))
-		tsetcap(TCUNDERLINEEND, 0);
-	    if (txtchangeisset(TXTBOLDFACE))
-		tsetcap(TCBOLDFACEBEG, 0);
-	    if (txtchangeisset(TXTSTANDOUT))
-		tsetcap(TCSTANDOUTBEG, 0);
-	    if (txtchangeisset(TXTUNDERLINE))
-		tsetcap(TCUNDERLINEBEG, 0);
-	}
+	if ((txtchange = pmpt_attr ? pmpt_attr : rpmpt_attr))
+	    settextattributes();
     }
     clearf = 0;
     oput_rpmpt = put_rpmpt;

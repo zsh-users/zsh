@@ -1678,8 +1678,10 @@ reexpandprompt(void)
     if (!reexpanding++) {
 	free(lpromptbuf);
 	lpromptbuf = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL);
+	pmpt_attr = txtchange;
 	free(rpromptbuf);
 	rpromptbuf = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL);
+	rpmpt_attr = txtchange;
     }
     reexpanding--;
 }
