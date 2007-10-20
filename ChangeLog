@@ -1,3 +1,8 @@
+2007-10-20  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 23999: Completion/Unix/Command/_git:
+	improvements for git show, git rev-parse, et al.
+
 2007-10-19  Clint Adams  <clint@zsh.org>
 
 	* 23997: Src/Modules/curses.c: don't delete color pair hash

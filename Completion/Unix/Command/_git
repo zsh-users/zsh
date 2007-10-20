@@ -1016,20 +1016,7 @@ _git-show () {
 
   _arguments -S \
     $revision_arguments \
-    '*:object:->object' && ret=0
-
-  case $state in
-    (object)
-      compset -P '*:'
-      if [[ -n $IPREFIX ]]; then
-        __git_tree_files ${IPREFIX%:}
-      else
-        _alternative \
-          'revisions:revision:__git_revisions' \
-          'files:file:__git_files'
-      fi
-      ;;
-  esac
+    '*:object:__git_objects' && ret=0
 }
 
 (( $+functions[_git-show-index] )) ||
@@ -2273,7 +2260,7 @@ _git-rev-parse () {
     '--short=-[show only handful hexdigits prefix]:: :_guard "[[\:digit\:]]#" number' \
     {--after=-,--since=-}'[show "--max-age=" parameter corresponding given date string]:datestring' \
     {--berore=-,--until=-}'[show "--min-age=" parameter corresponding given date string]:datestring' \
-    '*:args' && ret=0
+    '*:objects:__git_objects' && ret=0
 }
 
 (( $+functions[_git-runstatus] )) ||
@@ -2570,12 +2557,19 @@ __git_command_successful () {
 
 (( $+functions[__git_objects] )) ||
 __git_objects () {
-  __git_guard $* "[[:xdigit:]]#" "object"
+  compset -P '*:'
+  if [[ -n $IPREFIX ]]; then
+    __git_tree_files ${IPREFIX%:}
+  else
+    _alternative \
+      'revisions:revision:__git_revisions' \
+      'files:file:__git_files'
+  fi
 }
 
 (( $+functions[__git_trees] )) ||
 __git_trees () {
-  __git_guard $* "[[:xdigit:]]#" "tree"
+  __git_objects
 }
 
 (( $+functions[__git_tree_ishs] )) ||
@@ -2585,7 +2579,7 @@ __git_tree_ishs () {
 
 (( $+functions[__git_blobs] )) ||
 __git_blobs () {
-  __git_guard $* "[[:xdigit:]]#" 'blob id'
+  __git_objects
 }
 
 (( $+functions[__git_stages] )) ||
