@@ -1,3 +1,7 @@
+2007-10-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24001: Src/Modules/curses.c: fix up zcurses -C.
+
 2007-10-20  Clint Adams  <clint@zsh.org>
 
 	* Mikael Magnusson: 23999: Completion/Unix/Command/_git:

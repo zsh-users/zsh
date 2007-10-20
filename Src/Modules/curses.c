@@ -54,6 +54,12 @@ struct zcurses_namenumberpair {
     int number;
 };
 
+struct colorpairnode {
+    struct hashnode node;
+    short colorpair;
+};
+typedef struct colorpairnode *Colorpairnode;
+
 static WINDOW *win_zero;
 static struct ttyinfo saved_tty_state;
 static struct ttyinfo curses_tty_state;
@@ -70,7 +76,8 @@ static HashTable zcurses_colorpairs = NULL;
 #define ZCURSES_ATTRON 1
 #define ZCURSES_ATTROFF 2
 
-static int zc_errno, zc_color_phase=0, next_cp=0;
+static int zc_errno, zc_color_phase=0;
+static short next_cp=0;
 
 static const char *
 zcurses_strerror(int err)
@@ -172,7 +179,7 @@ zcurses_attribute(WINDOW *w, char *attr, int op)
     return 1;
 }
 
-static int
+static short
 zcurses_color(char *color)
 {
     struct zcurses_namenumberpair *zc;
@@ -191,19 +198,21 @@ zcurses_color(char *color)
 
     for(zc=(struct zcurses_namenumberpair *)zcurses_colors;zc->name;zc++)
 	if (!strcmp(color, zc->name)) {
-	    return zc->number;
+	    return (short)zc->number;
 	}
 
-    return -1;
+    return (short)-1;
 }
 
 static int
 zcurses_colorset(WINDOW *w, char *colorpair)
 {
     char *fg, *bg, *cp;
-    int *c, f, b;
+    short f, b;
+    Colorpairnode cpn;
 
-    if (zc_color_phase==1 || !(c = (int *) gethashnode(zcurses_colorpairs, colorpair))) {
+    if (zc_color_phase==1 ||
+	!(cpn = (Colorpairnode) gethashnode(zcurses_colorpairs, colorpair))) {
 	zc_color_phase = 2;
 	cp = ztrdup(colorpair);
 	fg = strtok(cp, "/");
@@ -229,26 +238,23 @@ zcurses_colorset(WINDOW *w, char *colorpair)
 	if (init_pair(next_cp, f, b) == ERR)
 	    return 1;
 
-	c = (int *)zalloc(sizeof(int *));
+	cpn = (Colorpairnode)zalloc(sizeof(struct colorpairnode));
 	
-	if(!c)
+	if (!cpn)
 	    return 1;
 
-	*c = next_cp;
-	addhashnode(zcurses_colorpairs, colorpair, (void *)c);
-    } 
+	cpn->colorpair = next_cp;
+	addhashnode(zcurses_colorpairs, ztrdup(colorpair), (void *)cpn);
+    }
 
-	fprintf(stderr, "%d\n", *c);
-
-    return (wcolor_set(w, *c, NULL) == ERR);
+    return (wcolor_set(w, cpn->colorpair, NULL) == ERR);
 }
 
 static void
-freecolornode(HashNode hn)
+freecolorpairnode(HashNode hn)
 {
-    int *i = (int *) hn;
-
-    zfree(i, sizeof(int));
+    zsfree(hn->nam);
+    zfree(hn, sizeof(struct colorpairnode));
 }
 
 /**/
@@ -275,7 +281,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 		zcurses_colorpairs->removenode  = removehashnode;
 		zcurses_colorpairs->disablenode = NULL;
 		zcurses_colorpairs->enablenode  = NULL;
-		zcurses_colorpairs->freenode    = freecolornode;
+		zcurses_colorpairs->freenode    = freecolorpairnode;
 		zcurses_colorpairs->printnode   = NULL;
 
 	    }
