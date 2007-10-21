@@ -281,7 +281,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 {
     char **saargs;
     struct zcurses_subcommand *zcsc;
-    int sc;
+    int sc, num_args;
 
     struct zcurses_subcommand scs[] = {
 	{{"init", ZCURSES_SC_INIT}, 0, 0},
@@ -310,7 +310,13 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
 
-    /* here would be a good place to validate number of args */
+    saargs = args;
+    while (*saargs++);
+    num_args = saargs - (args + 2);
+
+    if (num_args < zcsc->minargs || num_args > zcsc->maxargs)
+	return 1;
+
     saargs = args + 1;
 
     /* Initialise curses */

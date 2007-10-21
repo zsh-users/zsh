@@ -1,5 +1,8 @@
 2007-10-21  Clint Adams  <clint@zsh.org>
 
+	* 24005: Src/Modules/curses.c: enforce min/max arguments on zcurses
+	commands.
+
 	* 24004: Doc/Zsh/mod_curses.yo: align documentation with UI changes
 	in 24002.
 
