@@ -1,3 +1,8 @@
+2007-10-21  Clint Adams  <clint@zsh.org>
+
+	* 24004: Doc/Zsh/mod_curses.yo: align documentation with UI changes
+	in 24002.
+
 2007-10-20  Clint Adams  <clint@zsh.org>
 
 	* 24002: Src/Modules/curses.c: change all the subcommands from
