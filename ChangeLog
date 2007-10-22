@@ -1,5 +1,9 @@
 2007-10-22  Peter Stephenson  <pws@csr.com>
 
+	* 24007: Src/prompt.c, Src/utils.c: mildly suspicious things
+	found when looking at crash: prompt allocation length and use
+	of "shout".
+
 	* 24006: Src/glob.c: (F) glob qualifier needs to unmetafy.
 
 2007-10-21  Clint Adams  <clint@zsh.org>

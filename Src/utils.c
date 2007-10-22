@@ -1160,7 +1160,7 @@ preprompt(void)
     int period = getiparam("PERIOD");
     int mailcheck = getiparam("MAILCHECK");
 
-    if (isset(PROMPTSP) && isset(PROMPTCR) && !use_exit_printed) {
+    if (isset(PROMPTSP) && isset(PROMPTCR) && !use_exit_printed && shout) {
 	/* The PROMPT_SP heuristic will move the prompt down to a new line
 	 * if there was any dangling output on the line (assuming the terminal
 	 * has automatic margins, but we try even if hasam isn't set).
@@ -1284,7 +1284,7 @@ checkmailpath(char **s)
 		checkmailpath(arr);
 		popheap();
 	    }
-	} else {
+	} else if (shout) {
 	    if (st.st_size && st.st_atime <= st.st_mtime &&
 		st.st_mtime > lastmailcheck) {
 		if (!u) {
@@ -2302,7 +2302,7 @@ spckword(char **s, int hist, int cmd, int ask)
 	if (ask) {
 	    if (noquery(0)) {
 		x = 'n';
-	    } else {
+	    } else if (shout) {
 		char *pptbuf;
 		pptbuf = promptexpand(sprompt, 0, best, guess);
 		zputs(pptbuf, shout);

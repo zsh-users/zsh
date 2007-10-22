@@ -181,10 +181,10 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     bp1 = NULL;
     truncwidth = 0;
     putpromptchar(1, '\0');
-    addbufspc(1);
+    addbufspc(2);
     if(dontcount)
 	*bp++ = Outpar;
-    *bp = 0;
+    *bp = '\0';
     if (!ns) {
 	/* If zero, Inpar, Outpar and Nularg should be removed. */
 	for (bp = buf; *bp; ) {
