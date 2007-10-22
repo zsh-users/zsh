@@ -1,3 +1,7 @@
+2007-10-22  Peter Stephenson  <pws@csr.com>
+
+	* 24006: Src/glob.c: (F) glob qualifier needs to unmetafy.
+
 2007-10-21  Clint Adams  <clint@zsh.org>
 
 	* 24005: Src/Modules/curses.c: enforce min/max arguments on zcurses

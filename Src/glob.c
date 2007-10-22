@@ -326,7 +326,8 @@ insert(char *s, int checked)
 	    /* Reject the file if the function returned zero *
 	     * and the sense was positive (sense&1 == 0), or *
 	     * vice versa.                                   */
-	    if ((!((qn->func) (news, bp, qn->data, qn->sdata)) ^ qn->sense) & 1) {
+	    if ((!((qn->func) (news, bp, qn->data, qn->sdata))
+		 ^ qn->sense) & 1) {
 		/* Try next alternative, or return if there are no more */
 		if (!(qo = qo->or)) {
 		    unqueue_signals();
@@ -3254,6 +3255,8 @@ qualnonemptydir(char *name, struct stat *buf, UNUSED(off_t days), UNUSED(char *s
 {
     DIR *dirh;
     struct dirent *de;
+    int unamelen;
+    char *uname = unmetafy(dupstring(name), &unamelen);
 
     if (!S_ISDIR(buf->st_mode))
 	return 0;
@@ -3261,7 +3264,7 @@ qualnonemptydir(char *name, struct stat *buf, UNUSED(off_t days), UNUSED(char *s
     if (buf->st_nlink > 2)
 	return 1;
 
-    if (!(dirh = opendir(name)))
+    if (!(dirh = opendir(uname)))
 	return 0;
 
     while ((de = readdir(dirh))) {
