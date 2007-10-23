@@ -1167,7 +1167,26 @@ patcomppiece(int *flagp)
 	 * ..(#a1).. (i.e. the (#a1) has no effect), but if you're
 	 * going to write funny patterns, you get no sympathy from me.
 	 */
-	if (patglobflags & (0xFF|GF_LCMATCHUC|GF_IGNCASE)) {
+	if (patglobflags &
+#ifdef __CYGWIN__
+	    /*
+	     * As above: don't use pattern matching for files
+	     * just because of case insensitivity if file system
+	     * is known to be case insensitive.
+	     *
+	     * This is known to be necessary in at least one case:
+	     * if "mount -c /" is in effect, so that drives appear
+	     * directly under / instead of the usual /cygdrive, they
+	     * aren't shown by readdir().  So it's vital we don't use
+	     * globbing to find "/c", since that'll fail.
+	     */
+	    ((patflags & PAT_FILE) ?
+	    (0xFF|GF_LCMATCHUC) :
+	    (0xFF|GF_LCMATCHUC|GF_IGNCASE))
+#else
+	    (0xFF|GF_LCMATCHUC|GF_IGNCASE)
+#endif
+	    ) {
 	    if (!(patflags & PAT_FILE))
 		flags &= ~P_PURESTR;
 	    else if (!(nptr[0] == '.' &&
