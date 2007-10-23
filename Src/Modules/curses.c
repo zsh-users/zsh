@@ -291,7 +291,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	{{"move", ZCURSES_SC_MOVE}, 3, 3},
 	{{"c", ZCURSES_SC_CHAR}, 2, 2},
 	{{"s", ZCURSES_SC_STRING}, 2, 2},
-	{{"border", ZCURSES_SC_BORDER}, 1, 5},
+	{{"border", ZCURSES_SC_BORDER}, 1, 1},
 	{{"endwin", ZCURSES_SC_ENDWIN}, 1, 1},
 	{{"attr", ZCURSES_SC_ATTR}, 2, 2},
 	{{"color", ZCURSES_SC_COLOR}, 2, 2},
