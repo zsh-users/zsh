@@ -1,3 +1,11 @@
+2007-10-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24011 (tweaked to include 24010 and to remove unneeded
+	#define's): Src/Modules/curses.c: fix attr/endwin argument
+	counts; verbose errors for wrong arguments; one cchar_t
+	should be a wchar_t; dispatch straight to subcommands;
+	attr passes back status from setting attributes.
+
 2007-10-23  Clint Adams  <clint@zsh.org>
 
 	* 24010: Src/Modules/curses.c: fix max arguments for 'zcurses

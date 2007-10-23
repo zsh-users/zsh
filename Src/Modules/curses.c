@@ -60,8 +60,10 @@ struct colorpairnode {
 };
 typedef struct colorpairnode *Colorpairnode;
 
+typedef int (*zccmd_t)(const char *nam, char **args);
 struct zcurses_subcommand {
-    struct zcurses_namenumberpair nn;
+    const char *name;
+    zccmd_t cmd;
     int minargs;
     int maxargs;
 };
@@ -82,18 +84,6 @@ static HashTable zcurses_colorpairs = NULL;
 #define ZCURSES_ATTRON 1
 #define ZCURSES_ATTROFF 2
 
-#define ZCURSES_SC_INIT 1
-#define ZCURSES_SC_ADDWIN 2
-#define ZCURSES_SC_DELWIN 3
-#define ZCURSES_SC_REFRESH 4
-#define ZCURSES_SC_MOVE 5
-#define ZCURSES_SC_CHAR 6
-#define ZCURSES_SC_STRING 7
-#define ZCURSES_SC_BORDER 8
-#define ZCURSES_SC_ENDWIN 9
-#define ZCURSES_SC_ATTR 10
-#define ZCURSES_SC_COLOR 11
-
 static int zc_errno, zc_color_phase=0;
 static short next_cp=0;
 
@@ -110,7 +100,7 @@ zcurses_strerror(int err)
 }
 
 static LinkNode
-zcurses_getwindowbyname(char *name)
+zcurses_getwindowbyname(const char *name)
 {
     LinkNode node;
     ZCWin w;
@@ -198,7 +188,7 @@ zcurses_attribute(WINDOW *w, char *attr, int op)
 }
 
 static short
-zcurses_color(char *color)
+zcurses_color(const char *color)
 {
     struct zcurses_namenumberpair *zc;
 
@@ -275,38 +265,369 @@ freecolorpairnode(HashNode hn)
     zfree(hn, sizeof(struct colorpairnode));
 }
 
+
+/*************
+ * Subcommands
+ *************/
+
+static int
+zccmd_init(const char *nam, char **args)
+{
+    if (!win_zero) {
+	gettyinfo(&saved_tty_state);
+	win_zero = initscr();
+	if (start_color() != ERR) {
+	    if(!zc_color_phase)
+		zc_color_phase = 1;
+	    zcurses_colorpairs = newhashtable(8, "zc_colorpairs", NULL);
+
+	    zcurses_colorpairs->hash        = hasher;
+	    zcurses_colorpairs->emptytable  = emptyhashtable;
+	    zcurses_colorpairs->filltable   = NULL;
+	    zcurses_colorpairs->cmpnodes    = strcmp;
+	    zcurses_colorpairs->addnode     = addhashnode;
+	    zcurses_colorpairs->getnode     = gethashnode2;
+	    zcurses_colorpairs->getnode2    = gethashnode2;
+	    zcurses_colorpairs->removenode  = removehashnode;
+	    zcurses_colorpairs->disablenode = NULL;
+	    zcurses_colorpairs->enablenode  = NULL;
+	    zcurses_colorpairs->freenode    = freecolorpairnode;
+	    zcurses_colorpairs->printnode   = NULL;
+
+	}
+	gettyinfo(&curses_tty_state);
+    } else {
+	settyinfo(&curses_tty_state);
+    }
+    return 0;
+}
+
+
+static int
+zccmd_addwin(const char *nam, char **args)
+{
+    int nlines, ncols, begin_y, begin_x;
+    ZCWin w;
+
+    if (zcurses_validate_window(args[0], ZCURSES_UNUSED) == NULL &&
+	zc_errno) {
+	zerrnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	return 1;
+    }
+
+    nlines = atoi(args[1]);
+    ncols = atoi(args[2]);
+    begin_y = atoi(args[3]);
+    begin_x = atoi(args[4]);
+
+    w = (ZCWin)zshcalloc(sizeof(struct zc_win));
+    if (!w)
+	return 1;
+
+    w->name = ztrdup(args[0]);
+    w->win = newwin(nlines, ncols, begin_y, begin_x);
+
+    if (w->win == NULL) {
+	zsfree(w->name);
+	free(w);
+	return 1;
+    }
+
+    zinsertlinknode(zcurses_windows, lastnode(zcurses_windows), (void *)w);
+
+    return 0;
+}
+
+static int
+zccmd_delwin(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+    if (w == NULL) {
+	zwarnnam(nam, "record for window `%s' is corrupt", args[0], 0);
+	return 1;
+    }
+    if (delwin(w->win)!=OK)
+	return 1;
+
+    if (w->name)
+	zsfree(w->name);
+
+    zfree((ZCWin)remnode(zcurses_windows, node), sizeof(struct zc_win));
+
+    return 0;
+}
+
+static int
+zccmd_refresh(const char *nam, char **args)
+{
+    if (args[0]) {
+	LinkNode node;
+	ZCWin w;
+
+	node = zcurses_validate_window(args[0], ZCURSES_USED);
+	if (node == NULL) {
+	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0],
+		     0);
+	    return 1;
+	}
+
+	w = (ZCWin)getdata(node);
+
+	return (wrefresh(w->win)!=OK) ? 1 : 0;
+    }
+    else
+    {
+	return (refresh() != OK) ? 1 : 0;
+    }
+}
+
+
+static int
+zccmd_move(const char *nam, char **args)
+{
+    int y, x;
+    LinkNode node;
+    ZCWin w;
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	return 1;
+    }
+
+    y = atoi(args[1]);
+    x = atoi(args[2]);
+
+    w = (ZCWin)getdata(node);
+
+    if (wmove(w->win, y, x)!=OK)
+	return 1;
+
+    return 0;
+}
+
+
+static int
+zccmd_char(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+#ifdef HAVE_SETCCHAR
+    wchar_t c;
+    cchar_t cc;
+#endif
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+#ifdef HAVE_SETCCHAR
+    if (mbrtowc(&c, args[1], MB_CUR_MAX, NULL) < 1)
+	return 1;
+
+    if (setcchar(&cc, &c, A_NORMAL, 0, NULL)==ERR)
+	return 1;
+
+    if (wadd_wch(w->win, &cc)!=OK)
+	return 1;
+#else
+    if (waddch(w->win, (chtype)args[1][0])!=OK)
+	return 1;
+#endif
+
+    return 0;
+}
+
+
+static int
+zccmd_string(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+
+#ifdef HAVE_WADDWSTR
+    int clen;
+    wint_t wc;
+    wchar_t *wstr, *wptr;
+    char *str = args[1];
+#endif
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+#ifdef HAVE_WADDWSTR
+    mb_metacharinit();
+    wptr = wstr = zhalloc((strlen(str)+1) * sizeof(wchar_t));
+
+    while (*str && (clen = mb_metacharlenconv(str, &wc))) {
+	str += clen;
+	if (wc == WEOF) /* TODO: replace with space? nicen? */
+	    continue;
+	*wptr++ = wc;
+    }
+    *wptr++ = L'\0';
+    if (waddwstr(w->win, wstr)!=OK) {
+	return 1;
+    }
+#else
+    if (waddstr(w->win, args[1])!=OK)
+	return 1;
+#endif
+    return 0;
+}
+
+
+static int
+zccmd_border(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+    if (wborder(w->win, 0, 0, 0, 0, 0, 0, 0, 0)!=OK)
+	return 1;
+
+    return 0;
+}
+
+
+static int
+zccmd_endwin(const char *nam, char **args)
+{
+    if (win_zero) {
+	endwin();
+	/* Restore TTY as it was before zcurses -i */
+	settyinfo(&saved_tty_state);
+	/*
+	 * TODO: should I need the following?  Without it
+	 * the screen stays messed up.  Presumably we are
+	 * doing stuff with shttyinfo when we shouldn't really be.
+	 */
+	gettyinfo(&shttyinfo);
+    }
+    return 0;
+}
+
+
+static int
+zccmd_attr(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+    char **attrs;
+    int ret = 0;
+
+    if (!args[0])
+	return 1;
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+    for(attrs = args+1; *attrs; attrs++) {
+	switch(*attrs[0]) {
+	case '-':
+	    if (zcurses_attribute(w->win, (*attrs)+1, ZCURSES_ATTROFF))
+		ret = 1;
+	    break;
+	case '+':
+	    if (zcurses_attribute(w->win, (*attrs)+1, ZCURSES_ATTRON))
+		ret = 1;
+	    break;
+	default:
+	    /* maybe a bad idea to spew warnings here */
+	    break;
+	}
+    }
+    return ret;
+}
+
+
+static int
+zccmd_color(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+
+    if (!args[0] || !args[1] || !zc_color_phase)
+	return 1;
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+    return zcurses_colorset(w->win, args[1]);
+}
+
+
+/*********************
+  Main builtin handler
+ *********************/
+
 /**/
 static int
 bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 {
     char **saargs;
     struct zcurses_subcommand *zcsc;
-    int sc, num_args;
+    int num_args;
 
     struct zcurses_subcommand scs[] = {
-	{{"init", ZCURSES_SC_INIT}, 0, 0},
-	{{"addwin", ZCURSES_SC_ADDWIN}, 5, 5},
-	{{"delwin", ZCURSES_SC_DELWIN}, 1, 1},
-	{{"refresh", ZCURSES_SC_REFRESH}, 0, 1},
-	{{"move", ZCURSES_SC_MOVE}, 3, 3},
-	{{"c", ZCURSES_SC_CHAR}, 2, 2},
-	{{"s", ZCURSES_SC_STRING}, 2, 2},
-	{{"border", ZCURSES_SC_BORDER}, 1, 1},
-	{{"endwin", ZCURSES_SC_ENDWIN}, 1, 1},
-	{{"attr", ZCURSES_SC_ATTR}, 2, 2},
-	{{"color", ZCURSES_SC_COLOR}, 2, 2},
-	{{NULL, -1}, 0, 0}
+	{"init", zccmd_init, 0, 0},
+	{"addwin", zccmd_addwin, 5, 5},
+	{"delwin", zccmd_delwin, 1, 1},
+	{"refresh", zccmd_refresh, 0, 1},
+	{"move", zccmd_move, 3, 3},
+	{"c", zccmd_char, 2, 2},
+	{"s", zccmd_string, 2, 2},
+	{"border", zccmd_border, 1, 1},
+	{"endwin", zccmd_endwin, 0, 0},
+	{"attr", zccmd_attr, 2, -1},
+	{"color", zccmd_color, 2, 2},
+	{NULL, (zccmd_t)0, 0, 0}
     };
 
-    for(zcsc = scs; zcsc->nn.name; zcsc++) {
-	if(!strcmp(args[0], zcsc->nn.name))
+    for(zcsc = scs; zcsc->name; zcsc++) {
+	if(!strcmp(args[0], zcsc->name))
 	    break;
     }
 
-    sc = zcsc->nn.number;
-
-    if (sc == -1) {
-	zwarnnam(nam, "unknown subcommand: %s", args[0], 0);
+    if (zcsc->name == NULL) {
+	zwarnnam(nam, "unknown subcommand: %s", args[0]);
 	return 1;
     }
 
@@ -314,293 +635,15 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
     while (*saargs++);
     num_args = saargs - (args + 2);
 
-    if (num_args < zcsc->minargs || num_args > zcsc->maxargs)
+    if (num_args < zcsc->minargs) {
+	zwarnnam(nam, "too few arguments for subcommand: %s", args[0]);
 	return 1;
-
-    saargs = args + 1;
-
-    /* Initialise curses */
-    if (sc == ZCURSES_SC_INIT) {
-	if (!win_zero) {
-	    gettyinfo(&saved_tty_state);
-	    win_zero = initscr();
-	    if (start_color() != ERR) {
-		if(!zc_color_phase)
-		    zc_color_phase = 1;
-		zcurses_colorpairs = newhashtable(8, "zc_colorpairs", NULL);
-
-		zcurses_colorpairs->hash        = hasher;
-		zcurses_colorpairs->emptytable  = emptyhashtable;
-		zcurses_colorpairs->filltable   = NULL;
-		zcurses_colorpairs->cmpnodes    = strcmp;
-		zcurses_colorpairs->addnode     = addhashnode;
-		zcurses_colorpairs->getnode     = gethashnode2;
-		zcurses_colorpairs->getnode2    = gethashnode2;
-		zcurses_colorpairs->removenode  = removehashnode;
-		zcurses_colorpairs->disablenode = NULL;
-		zcurses_colorpairs->enablenode  = NULL;
-		zcurses_colorpairs->freenode    = freecolorpairnode;
-		zcurses_colorpairs->printnode   = NULL;
-
-	    }
-	    gettyinfo(&curses_tty_state);
-	} else {
-	    settyinfo(&curses_tty_state);
-	}
-	return 0;
-    } else
-    if (sc == ZCURSES_SC_ADDWIN) {
-	int nlines, ncols, begin_y, begin_x;
-	ZCWin w;
-
-	if (zcurses_validate_window(saargs[0], ZCURSES_UNUSED) == NULL && zc_errno) {
-	    zerrnam(nam, "%s: %s", zcurses_strerror(zc_errno), saargs[0], 0);
-	    return 1;
-	}
-
-	nlines = atoi(saargs[1]);
-	ncols = atoi(saargs[2]);
-	begin_y = atoi(saargs[3]);
-	begin_x = atoi(saargs[4]);
-
-	w = (ZCWin)zshcalloc(sizeof(struct zc_win));
-	if (!w)
-	    return 1;
-
-	w->name = ztrdup(saargs[0]);
-	w->win = newwin(nlines, ncols, begin_y, begin_x);
-
-	if (w->win == NULL) {
-	    zsfree(w->name);
-	    free(w);
-	    return 1;
-	}
-
-	zinsertlinknode(zcurses_windows, lastnode(zcurses_windows), (void *)w);
-
-	return 0;
-    } else
-    if (sc == ZCURSES_SC_DELWIN) {
-	LinkNode node;
-	ZCWin w;
-
-	node = zcurses_validate_window(saargs[0], ZCURSES_USED);
-	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), saargs[0], 0);
-	    return 1;
-	}
-
-	w = (ZCWin)getdata(node);
-
-	if (w == NULL) {
-	    zwarnnam(nam, "record for window `%s' is corrupt", saargs[0], 0);
-	    return 1;
-	}
-	if (delwin(w->win)!=OK)
-	    return 1;
-
-	if (w->name)
-	    zsfree(w->name);
-
-	zfree((ZCWin)remnode(zcurses_windows, node), sizeof(struct zc_win));
-
-	return 0;
-    } else
-    if (sc == ZCURSES_SC_REFRESH) {
-	if (saargs[0]) {
-	    LinkNode node;
-	    ZCWin w;
-
-	    node = zcurses_validate_window(saargs[0], ZCURSES_USED);
-	    if (node == NULL) {
-		zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), saargs[0],
-			0);
-		return 1;
-	    }
-
-	    w = (ZCWin)getdata(node);
-
-	    return (wrefresh(w->win)!=OK) ? 1 : 0;
-	}
-	else
-	{
-	    return (refresh() != OK) ? 1 : 0;
-	}
-    } else
-    if (sc == ZCURSES_SC_MOVE) {
-	int y, x;
-	LinkNode node;
-	ZCWin w;
-
-	node = zcurses_validate_window(saargs[0], ZCURSES_USED);
-	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), saargs[0], 0);
-	    return 1;
-	}
-
-	y = atoi(saargs[1]);
-	x = atoi(saargs[2]);
-
-	w = (ZCWin)getdata(node);
-
-	if (wmove(w->win, y, x)!=OK)
-	    return 1;
-
-	return 0;
-    } else
-    if (sc == ZCURSES_SC_CHAR) {
-	LinkNode node;
-	ZCWin w;
-#ifdef HAVE_SETCCHAR
-	wchar_t c;
-	cchar_t cc;
-#endif
-
-	node = zcurses_validate_window(saargs[0], ZCURSES_USED);
-	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), saargs[0], 0);
-	    return 1;
-	}
-
-	w = (ZCWin)getdata(node);
-
-#ifdef HAVE_SETCCHAR
-	if (mbrtowc(&c, saargs[1], MB_CUR_MAX, NULL) < 1)
-	    return 1;
-
-	if (setcchar(&cc, &c, A_NORMAL, 0, NULL)==ERR)
-	    return 1;
-
-	if (wadd_wch(w->win, &cc)!=OK)
-	    return 1;
-#else
-	if (waddch(w->win, (chtype)saargs[1][0])!=OK)
-	    return 1;
-#endif
-
-	return 0;
-    } else
-    if (sc == ZCURSES_SC_STRING) {
-	LinkNode node;
-	ZCWin w;
-
-#ifdef HAVE_WADDWSTR
-	int clen;
-	wint_t wc;
-	wchar_t *wstr, *wptr;
-	char *str = saargs[1];
-#endif
-
-	node = zcurses_validate_window(saargs[0], ZCURSES_USED);
-	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
-	    return 1;
-	}
-
-	w = (ZCWin)getdata(node);
-
-#ifdef HAVE_WADDWSTR
-	mb_metacharinit();
-	wptr = wstr = zhalloc((strlen(str)+1) * sizeof(cchar_t));
-
-	while (*str && (clen = mb_metacharlenconv(str, &wc))) {
-	    str += clen;
-	    if (wc == WEOF) /* TODO: replace with space? nicen? */
-		continue;
-	    *wptr++ = wc;
-	}
-	*wptr++ = L'\0';
-	if (waddwstr(w->win, wstr)!=OK) {
-	    return 1;
-	}
-#else
-	if (waddstr(w->win, saargs[1])!=OK)
-	    return 1;
-#endif
-	return 0;
-    } else
-    if (sc == ZCURSES_SC_BORDER) {
-	LinkNode node;
-	ZCWin w;
-
-	node = zcurses_validate_window(saargs[0], ZCURSES_USED);
-	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), saargs[0], 0);
-	    return 1;
-	}
-
-	w = (ZCWin)getdata(node);
-
-	if (wborder(w->win, 0, 0, 0, 0, 0, 0, 0, 0)!=OK)
-	    return 1;
-
-	return 0;
-    } else
-    /* Finish using curses */
-    if (sc == ZCURSES_SC_ENDWIN) {
-	if (win_zero) {
-	    endwin();
-	    /* Restore TTY as it was before zcurses -i */
-	    settyinfo(&saved_tty_state);
-	    /*
-	     * TODO: should I need the following?  Without it
-	     * the screen stays messed up.  Presumably we are
-	     * doing stuff with shttyinfo when we shouldn't really be.
-	     */
-	    gettyinfo(&shttyinfo);
-	}
-	return 0;
-    } else
-    if (sc == ZCURSES_SC_ATTR) {
-	LinkNode node;
-	ZCWin w;
-	char **attrs;
-
-	if (!saargs[0])
-	    return 1;
-
-	node = zcurses_validate_window(saargs[0], ZCURSES_USED);
-	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), saargs[0], 0);
-	    return 1;
-	}
-
-	w = (ZCWin)getdata(node);
-
-	for(attrs = saargs+1; *attrs; attrs++) {
-	    switch(*attrs[0]) {
-		case '-':
-		    zcurses_attribute(w->win, (*attrs)+1, ZCURSES_ATTROFF);
-		    break;
-		case '+':
-		    zcurses_attribute(w->win, (*attrs)+1, ZCURSES_ATTRON);
-		    break;
-		default:
-		    /* maybe a bad idea to spew warnings here */
-		    break;
-	    }
-	}
-	return 0;
-    } else
-    if (sc == ZCURSES_SC_COLOR) {
-	LinkNode node;
-	ZCWin w;
-
-	if (!saargs[0] || !saargs[1] || !zc_color_phase)
-	    return 1;
-
-	node = zcurses_validate_window(saargs[0], ZCURSES_USED);
-	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), saargs[0], 0);
-	    return 1;
-	}
-
-	w = (ZCWin)getdata(node);
-
-	return zcurses_colorset(w->win, saargs[1]);
+    } else if (zcsc->maxargs >= 0 && num_args > zcsc->maxargs) {
+	zwarnnam(nam, "too may arguments for subcommand: %s", args[0]);
+	return 1;
     }
 
-    return 0;
+    return zcsc->cmd(nam, args+1);
 }
 
 /*
