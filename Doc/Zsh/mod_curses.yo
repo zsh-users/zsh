@@ -7,18 +7,18 @@ startitem()
 findex(zcurses)
 cindex(windows, curses)
 xitem(tt(zcurses) tt(init))
-xitem(tt(zcurses) tt(endwin))
+xitem(tt(zcurses) tt(end))
 xitem(tt(zcurses) tt(addwin) var(targetwin) var(nlines) var(ncols) var(begin_y) var(begin_x) )
 xitem(tt(zcurses) tt(delwin) var(targetwin) )
 xitem(tt(zcurses) tt(refresh) [ var(targetwin) ] )
 xitem(tt(zcurses) tt(move) var(targetwin) var(new_y) var(new_x) )
-xitem(tt(zcurses) tt(c) var(targetwin) var(character) )
-xitem(tt(zcurses) tt(s) var(targetwin) var(string) )
+xitem(tt(zcurses) tt(char) var(targetwin) var(character) )
+xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
 item(tt(zcurses) tt(addwin) var(targetwin) var({+/-}attribute) [var({+/-}attribute)] [...])(
 Manipulate curses windows.  All uses of this command should be
 bracketed by `tt(zcurses init)' to initialise use of curses, and
-`tt(zcurses endwin)' to end it; omitting `tt(zcurses endwin)' can cause
+`tt(zcurses end)' to end it; omitting `tt(zcurses end)' can cause
 the terminal to be in an unwanted state.
 
 With tt(addwin), create a window with var(nlines) lines and var(ncols) columns.
@@ -30,13 +30,13 @@ Use tt(delwin) to delete a window created with tt(addwin).
 
 The tt(refresh) command will refresh window var(targetwin); this is necessary to
 make any pending changes (such as characters you have prepared for output
-with tt(c)) visible on the screen.  If no argument is given,
+with tt(char)) visible on the screen.  If no argument is given,
 all windows are refreshed; this is necessary after deleting a window.
 
 tt(move) moves the cursor position in var(targetwin) to new coordinates
 var(new_y) and var(new_x).
 
-Outputting characters and strings are achieved by tt(c) and tt(s)
+Outputting characters and strings are achieved by tt(char) and tt(string)
 respectively.
 
 To draw a border around window var(targetwin), use tt(border).

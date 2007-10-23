@@ -1,3 +1,8 @@
+2007-10-23  Clint Adams  <clint@zsh.org>
+
+	* 24012: Src/Modules/curses.c: rename "endwin", "c", and "s" to
+	"endwin", "char", and "string" respectively.
+
 2007-10-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24011 (tweaked to include 24010 and to remove unneeded

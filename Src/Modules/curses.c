@@ -612,10 +612,10 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	{"delwin", zccmd_delwin, 1, 1},
 	{"refresh", zccmd_refresh, 0, 1},
 	{"move", zccmd_move, 3, 3},
-	{"c", zccmd_char, 2, 2},
-	{"s", zccmd_string, 2, 2},
+	{"char", zccmd_char, 2, 2},
+	{"string", zccmd_string, 2, 2},
 	{"border", zccmd_border, 1, 1},
-	{"endwin", zccmd_endwin, 0, 0},
+	{"end", zccmd_endwin, 0, 0},
 	{"attr", zccmd_attr, 2, -1},
 	{"color", zccmd_color, 2, 2},
 	{NULL, (zccmd_t)0, 0, 0}
