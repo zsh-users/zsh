@@ -1,5 +1,8 @@
 2007-10-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24018: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
+	add "zcurses scroll".
+
 	* 24017: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
 	fold color support into attr subcommand and improve error
 	handling; add various readonly parameters; replace strtok();

@@ -18,7 +18,8 @@ xitem(tt(zcurses) tt(move) var(targetwin) var(new_y) var(new_x) )
 xitem(tt(zcurses) tt(char) var(targetwin) var(character) )
 xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
-item(tt(zcurses) tt(attr) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) ] [...])(
+xitem(tt(zcurses) tt(attr) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) ] [...])
+item(tt(zcurses) tt(scroll) [ tt(on) | tt(off) | {+/-}var(lines) ])(
 Manipulate curses windows.  All uses of this command should be
 bracketed by `tt(zcurses init)' to initialise use of curses, and
 `tt(zcurses end)' to end it; omitting `tt(zcurses end)' can cause
@@ -53,6 +54,15 @@ supported are tt(blink), tt(bold), tt(dim), tt(reverse), tt(standout),
 and tt(underline).  Each var(fg_col)tt(/)var(bg_col) (to be read as
 `var(fg_col) on var(bg_col)') sets the foreground and background color
 for character output.
+
+tt(scroll) can be used with tt(on) or tt(off) to enabled or disable
+scrolling of a window when the cursor would otherwise move below the
+window due to typing or output.  It can also be used with a positive
+or negative integer to scroll the window up or down the given number
+of lines without changing the current cursor position (which therefore
+appears to move in the opposite direction relative to the window).
+In the second case, if scrolling is tt(off) it is temporarily turned tt(on)
+to allow the window to be scrolled,
 )
 enditem()
 

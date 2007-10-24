@@ -51,9 +51,15 @@
 
 #include <stdio.h>
 
+enum zc_win_flags {
+    /* Scrolling enabled */
+    ZCWF_SCROLL = 0x0001
+};
+
 typedef struct zc_win {
     WINDOW *win;
     char *name;
+    int flags;
 } *ZCWin;
 
 struct zcurses_namenumberpair {
@@ -620,6 +626,49 @@ zccmd_attr(const char *nam, char **args)
 }
 
 
+static int
+zccmd_scroll(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+    int ret = 0;
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+    if (!strcmp(args[1], "on")) {
+	if (scrollok(w->win, TRUE) == ERR)
+	    return 1;
+	w->flags |= ZCWF_SCROLL;
+    } else if (!strcmp(args[1], "off")) {
+	if (scrollok(w->win, FALSE) == ERR)
+	    return 1;
+	w->flags &= ~ZCWF_SCROLL;
+    } else {
+	char *endptr;
+	zlong sl = zstrtol(args[1], &endptr, 10);
+	if (*endptr) {
+	    zwarnnam(nam, "scroll requires `on', `off' or integer: %s",
+		     args[1]);
+	    return 1;
+	}
+	if (!(w->flags & ZCWF_SCROLL))
+	    scrollok(w->win, TRUE);
+	if (wscrl(w->win, (int)sl) == ERR)
+	    ret = 1;
+	if (!(w->flags & ZCWF_SCROLL))
+	    scrollok(w->win, FALSE);
+    }
+
+    return ret;
+}
+
+
 /*********************
   Main builtin handler
  *********************/
@@ -643,6 +692,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	{"border", zccmd_border, 1, 1},
 	{"end", zccmd_endwin, 0, 0},
 	{"attr", zccmd_attr, 2, -1},
+	{"scroll", zccmd_scroll, 2, 2},
 	{NULL, (zccmd_t)0, 0, 0}
     };
 
