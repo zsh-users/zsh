@@ -94,6 +94,48 @@ static HashTable zcurses_colorpairs = NULL;
 static int zc_errno, zc_color_phase=0;
 static short next_cp=0;
 
+static const struct zcurses_namenumberpair zcurses_attributes[] = {
+    {"blink", A_BLINK},
+    {"bold", A_BOLD},
+    {"dim", A_DIM},
+    {"reverse", A_REVERSE},
+    {"standout", A_STANDOUT},
+    {"underline", A_UNDERLINE},
+    {NULL, 0}
+};
+
+static const struct zcurses_namenumberpair zcurses_colors[] = {
+    {"black", COLOR_BLACK},
+    {"red", COLOR_RED},
+    {"green", COLOR_GREEN},
+    {"yellow", COLOR_YELLOW},
+    {"blue", COLOR_BLUE},
+    {"magenta", COLOR_MAGENTA},
+    {"cyan", COLOR_CYAN},
+    {"white", COLOR_WHITE},
+    {NULL, 0}
+};
+
+static char **
+zcurses_pairs_to_array(const struct zcurses_namenumberpair *nnps)
+{
+    char **arr, **arrptr;
+    int count;
+    const struct zcurses_namenumberpair *nnptr;
+
+    for (nnptr = nnps; nnptr->name; nnptr++)
+	;
+    count = nnptr - nnps;
+
+    arrptr = arr = (char **)zhalloc((count+1) * sizeof(char *));
+
+    for (nnptr = nnps; nnptr->name; nnptr++)
+	*arrptr++ = dupstring(nnptr->name);
+    *arrptr = NULL;
+
+    return arr;
+}
+
 static const char *
 zcurses_strerror(int err)
 {
@@ -164,16 +206,6 @@ zcurses_attribute(WINDOW *w, char *attr, int op)
 {
     struct zcurses_namenumberpair *zca;
 
-    static const struct zcurses_namenumberpair zcurses_attributes[] = {
-	{"blink", A_BLINK},
-	{"bold", A_BOLD},
-	{"dim", A_DIM},
-	{"reverse", A_REVERSE},
-	{"standout", A_STANDOUT},
-	{"underline", A_UNDERLINE},
-	{NULL, 0}
-    };
-
     if (!attr)
 	return 1;
 
@@ -199,18 +231,6 @@ zcurses_color(const char *color)
 {
     struct zcurses_namenumberpair *zc;
 
-    static const struct zcurses_namenumberpair zcurses_colors[] = {
-	{"black", COLOR_BLACK},
-	{"red", COLOR_RED},
-	{"green", COLOR_GREEN},
-	{"yellow", COLOR_YELLOW},
-	{"blue", COLOR_BLUE},
-	{"magenta", COLOR_MAGENTA},
-	{"cyan", COLOR_CYAN},
-	{"white", COLOR_WHITE},
-	{NULL, 0}
-    };
-
     for(zc=(struct zcurses_namenumberpair *)zcurses_colors;zc->name;zc++)
 	if (!strcmp(color, zc->name)) {
 	    return (short)zc->number;
@@ -220,9 +240,9 @@ zcurses_color(const char *color)
 }
 
 static int
-zcurses_colorset(WINDOW *w, char *colorpair)
+zcurses_colorset(const char *nam, WINDOW *w, char *colorpair)
 {
-    char *fg, *bg, *cp;
+    char *bg, *cp;
     short f, b;
     Colorpairnode cpn;
 
@@ -230,36 +250,43 @@ zcurses_colorset(WINDOW *w, char *colorpair)
 	!(cpn = (Colorpairnode) gethashnode(zcurses_colorpairs, colorpair))) {
 	zc_color_phase = 2;
 	cp = ztrdup(colorpair);
-	fg = strtok(cp, "/");
-	bg = strtok(NULL, "/");
 
+	bg = strchr(cp, '/');
 	if (bg==NULL) {
 	    zsfree(cp);
 	    return 1;
 	}
-        
-	f = zcurses_color(fg);
-	b = zcurses_color(bg);
 
-	zsfree(cp);
+	*bg = '\0';        
+	f = zcurses_color(cp);
+	b = zcurses_color(bg+1);
 
-	if (f==-1 || b==-1)
+	if (f==-1 || b==-1) {
+	    if (f == -1)
+		zwarnnam(nam, "foreground color `%s' not known", cp);
+	    if (b == -1)
+		zwarnnam(nam, "background color `%s' not known", bg+1);
+	    *bg = '/';
+	    zsfree(cp);
 	    return 1;
+	}
+	*bg = '/';
 
 	++next_cp;
-	if (next_cp >= COLOR_PAIRS)
+	if (next_cp >= COLOR_PAIRS || init_pair(next_cp, f, b) == ERR)  {
+	    zsfree(cp);
 	    return 1;
-
-	if (init_pair(next_cp, f, b) == ERR)
-	    return 1;
+	}
 
 	cpn = (Colorpairnode)zalloc(sizeof(struct colorpairnode));
 	
-	if (!cpn)
+	if (!cpn) {
+	    zsfree(cp);
 	    return 1;
+	}
 
 	cpn->colorpair = next_cp;
-	addhashnode(zcurses_colorpairs, ztrdup(colorpair), (void *)cpn);
+	addhashnode(zcurses_colorpairs, cp, (void *)cpn);
     }
 
     return (wcolor_set(w, cpn->colorpair, NULL) == ERR);
@@ -353,14 +380,14 @@ zccmd_delwin(const char *nam, char **args)
 
     node = zcurses_validate_window(args[0], ZCURSES_USED);
     if (node == NULL) {
-	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
 	return 1;
     }
 
     w = (ZCWin)getdata(node);
 
     if (w == NULL) {
-	zwarnnam(nam, "record for window `%s' is corrupt", args[0], 0);
+	zwarnnam(nam, "record for window `%s' is corrupt", args[0]);
 	return 1;
     }
     if (delwin(w->win)!=OK)
@@ -408,7 +435,7 @@ zccmd_move(const char *nam, char **args)
 
     node = zcurses_validate_window(args[0], ZCURSES_USED);
     if (node == NULL) {
-	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
 	return 1;
     }
 
@@ -436,7 +463,7 @@ zccmd_char(const char *nam, char **args)
 
     node = zcurses_validate_window(args[0], ZCURSES_USED);
     if (node == NULL) {
-	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
 	return 1;
     }
 
@@ -475,7 +502,7 @@ zccmd_string(const char *nam, char **args)
 
     node = zcurses_validate_window(args[0], ZCURSES_USED);
     if (node == NULL) {
-	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
 	return 1;
     }
 
@@ -511,7 +538,7 @@ zccmd_border(const char *nam, char **args)
 
     node = zcurses_validate_window(args[0], ZCURSES_USED);
     if (node == NULL) {
-	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
 	return 1;
     }
 
@@ -555,49 +582,41 @@ zccmd_attr(const char *nam, char **args)
 
     node = zcurses_validate_window(args[0], ZCURSES_USED);
     if (node == NULL) {
-	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
 	return 1;
     }
 
     w = (ZCWin)getdata(node);
 
     for(attrs = args+1; *attrs; attrs++) {
-	switch(*attrs[0]) {
-	case '-':
-	    if (zcurses_attribute(w->win, (*attrs)+1, ZCURSES_ATTROFF))
+	if (strchr(*attrs, '/')) {
+	    if (zcurses_colorset(nam, w->win, *attrs))
 		ret = 1;
-	    break;
-	case '+':
-	    if (zcurses_attribute(w->win, (*attrs)+1, ZCURSES_ATTRON))
+	} else {
+	    char *ptr;
+	    int onoff;
+
+	    switch(*attrs[0]) {
+	    case '-':
+		onoff = ZCURSES_ATTROFF;
+		ptr = (*attrs) + 1;
+		break;
+	    case '+':
+		onoff = ZCURSES_ATTRON;
+		ptr = (*attrs) + 1;
+		break;
+	    default:
+		onoff = ZCURSES_ATTRON;
+		ptr = *attrs;
+		break;
+	    }
+	    if (zcurses_attribute(w->win, ptr, onoff)) {
+		zwarnnam(nam, "attribute `%s' not known", ptr);
 		ret = 1;
-	    break;
-	default:
-	    /* maybe a bad idea to spew warnings here */
-	    break;
+	    }
 	}
     }
     return ret;
-}
-
-
-static int
-zccmd_color(const char *nam, char **args)
-{
-    LinkNode node;
-    ZCWin w;
-
-    if (!args[0] || !args[1] || !zc_color_phase)
-	return 1;
-
-    node = zcurses_validate_window(args[0], ZCURSES_USED);
-    if (node == NULL) {
-	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
-	return 1;
-    }
-
-    w = (ZCWin)getdata(node);
-
-    return zcurses_colorset(w->win, args[1]);
 }
 
 
@@ -624,7 +643,6 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	{"border", zccmd_border, 1, 1},
 	{"end", zccmd_endwin, 0, 0},
 	{"attr", zccmd_attr, 2, -1},
-	{"color", zccmd_color, 2, 2},
 	{NULL, (zccmd_t)0, 0, 0}
     };
 
@@ -653,19 +671,103 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
     return zcsc->cmd(nam, args+1);
 }
 
-/*
- * boot_ is executed when the module is loaded.
- */
 
 static struct builtin bintab[] = {
     BUILTIN("zcurses", 0, bin_zcurses, 1, 6, 0, "", NULL),
 };
 
+
+/*******************
+ * Special variables
+ *******************/
+
+static char **
+zcurses_colorsarrgetfn(UNUSED(Param pm))
+{
+    return zcurses_pairs_to_array(zcurses_colors);
+}
+
+static const struct gsu_array zcurses_colorsarr_gsu =
+{ zcurses_colorsarrgetfn, arrsetfn, stdunsetfn };
+
+
+static char **
+zcurses_attrgetfn(UNUSED(Param pm))
+{
+    return zcurses_pairs_to_array(zcurses_attributes);
+}
+
+static const struct gsu_array zcurses_attrs_gsu =
+{ zcurses_attrgetfn, arrsetfn, stdunsetfn };
+
+
+static char **
+zcurses_windowsgetfn(UNUSED(Param pm))
+{
+    LinkNode node;
+    char **arr, **arrptr;
+    int count = countlinknodes(zcurses_windows);
+
+    arrptr = arr = (char **)zhalloc((count+1) * sizeof(char *));
+
+    for (node = firstnode(zcurses_windows); node; incnode(node))
+	*arrptr++ = dupstring(((ZCWin)getdata(node))->name);
+    *arrptr = NULL;
+
+    return arr;
+}
+
+static const struct gsu_array zcurses_windows_gsu =
+{ zcurses_windowsgetfn, arrsetfn, stdunsetfn };
+
+
+static zlong
+zcurses_colorsintgetfn(UNUSED(Param pm))
+{
+    return COLORS;
+}
+
+static const struct gsu_integer zcurses_colorsint_gsu =
+{ zcurses_colorsintgetfn, nullintsetfn, stdunsetfn };
+
+
+static zlong
+zcurses_colorpairsintgetfn(UNUSED(Param pm))
+{
+    return COLOR_PAIRS;
+}
+
+static const struct gsu_integer zcurses_colorpairsint_gsu =
+{ zcurses_colorpairsintgetfn, nullintsetfn, stdunsetfn };
+
+
+static struct paramdef partab[] = {
+    SPECIALPMDEF("zcurses_colors", PM_ARRAY|PM_READONLY,
+		 &zcurses_colorsarr_gsu, NULL, NULL),
+    SPECIALPMDEF("zcurses_attrs", PM_ARRAY|PM_READONLY,
+		 &zcurses_attrs_gsu, NULL, NULL),
+    SPECIALPMDEF("zcurses_windows", PM_ARRAY|PM_READONLY,
+		 &zcurses_windows_gsu, NULL, NULL),
+    SPECIALPMDEF("ZCURSES_COLORS", PM_INTEGER|PM_READONLY,
+		 &zcurses_colorsint_gsu, NULL, NULL),
+    SPECIALPMDEF("ZCURSES_COLOR_PAIRS", PM_INTEGER|PM_READONLY,
+		 &zcurses_colorpairsint_gsu, NULL, NULL)
+};
+
+/***************************
+ * Standard module interface
+ ***************************/
+
+
+/*
+ * boot_ is executed when the module is loaded.
+ */
+
 static struct features module_features = {
     bintab, sizeof(bintab)/sizeof(*bintab),
     NULL, 0,
     NULL, 0,
-    NULL, 0,
+    partab, sizeof(partab)/sizeof(*partab),
     0
 };
 

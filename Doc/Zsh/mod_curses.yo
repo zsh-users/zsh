@@ -1,7 +1,10 @@
 COMMENT(!MOD!zsh/curses
 curses windowing commands
 !MOD!)
-The tt(zsh/curses) module makes available one builtin command:
+The tt(zsh/curses) module makes available one builtin command and
+various parameters.
+
+subsect(Builtin)
 
 startitem()
 findex(zcurses)
@@ -15,7 +18,7 @@ xitem(tt(zcurses) tt(move) var(targetwin) var(new_y) var(new_x) )
 xitem(tt(zcurses) tt(char) var(targetwin) var(character) )
 xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
-item(tt(zcurses) tt(addwin) var(targetwin) var({+/-}attribute) [var({+/-}attribute)] [...])(
+item(tt(zcurses) tt(attr) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) ] [...])(
 Manipulate curses windows.  All uses of this command should be
 bracketed by `tt(zcurses init)' to initialise use of curses, and
 `tt(zcurses end)' to end it; omitting `tt(zcurses end)' can cause
@@ -26,7 +29,8 @@ Its upper left corner will be placed at row var(begin_y) and column
 var(begin_x) of the screen.  var(targetwin) is a string and refers
 to the name of a window that is not currently assigned.
 
-Use tt(delwin) to delete a window created with tt(addwin).
+Use tt(delwin) to delete a window created with tt(addwin).  Note
+that tt(end) does em(not) implicitly delete windows.
 
 The tt(refresh) command will refresh window var(targetwin); this is necessary to
 make any pending changes (such as characters you have prepared for output
@@ -41,10 +45,49 @@ respectively.
 
 To draw a border around window var(targetwin), use tt(border).
 
-tt(addwin) will set var(targetwin)'s attributes for any successive character
-output.  Each var(attribute) given on the line should be prepended by a
-tt(+) to set or a tt(-) to unset that attribute.  The attributes supported
-are tt(blink), tt(bold), tt(dim), tt(reverse), tt(standout), and
-tt(underline).
+tt(attr) will set var(targetwin)'s attributes or foreground/background
+color pair for any successive character output.  Each var(attribute)
+given on the line may be prepended by a tt(+) to set or a tt(-) to
+unset that attribute; tt(+) is assumed if absent.  The attributes
+supported are tt(blink), tt(bold), tt(dim), tt(reverse), tt(standout),
+and tt(underline).  Each var(fg_col)tt(/)var(bg_col) (to be read as
+`var(fg_col) on var(bg_col)') sets the foreground and background color
+for character output.
+)
+enditem()
+
+subsect(Parameters)
+
+startitem()
+vindex(ZCURSES_COLORS)
+item(tt(ZCURSES_COLORS))(
+Readonly integer.  The maximum number of colors the terminal
+supports.  This value is initialised by the curses library and is not
+available until the first time tt(zcurses init) is run.
+)
+vindex(ZCURSES_COLOR_PAIRS)
+item(tt(ZCURSES_COLOR_PAIRS))(
+Readonly integer.  The maximum number of color pairs
+var(fg_col)tt(/)var(bg_col) that may be defined in `tt(zcurses attr)'
+commands; note this limit applies to all color pairs that have been
+used whether or not they are currently active.  This value is initialised
+by the curses library and is not available until the first time tt(zcurses
+init) is run.
+)
+vindex(zcurses_attrs)
+item(tt(zcurses_attrs))(
+Readonly array.  The attributes supported by tt(zsh/curses); available
+as soon as the module is loaded.
+)
+vindex(zcurses_colors)
+item(tt(zcurses_colors))(
+Readonly array.  The colors supported by tt(zsh/curses); available
+as soon as the module is loaded.
+)
+vindex(zcurses_windows)
+item(tt(zcurses_windows))(
+Readonly array.  The current list of windows, i.e. all windows that
+have been created with `tt(zcurses addwin)' and not removed with
+`tt(zcurses delwin)'.
 )
 enditem()
