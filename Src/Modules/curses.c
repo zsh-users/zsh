@@ -29,7 +29,17 @@
 
 #define _XOPEN_SOURCE_EXTENDED 1
 
-#include <ncurses.h>
+#include "curses.mdh"
+#include "curses.pro"
+
+#ifdef HAVE_NCURSES_H
+# include <ncurses.h>
+#else
+# ifdef HAVE_CURSES_H
+#  include <curses.h>
+# endif
+#endif
+
 #ifndef MULTIBYTE_SUPPORT
 # undef HAVE_SETCCHAR
 # undef HAVE_WADDWSTR
@@ -40,9 +50,6 @@
 #endif
 
 #include <stdio.h>
-
-#include "curses.mdh"
-#include "curses.pro"
 
 typedef struct zc_win {
     WINDOW *win;
