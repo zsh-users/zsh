@@ -662,8 +662,10 @@ since the assignment.
 Unlike other special parameters, the type of the tt(SECONDS) parameter can
 be changed using the tt(typeset) command.  Only integer and one of the
 floating point types are allowed.  For example, `tt(typeset -F SECONDS)'
-causes the value to be reported as a floating point number.  The precision
-is six decimal places, although not all places may be useful.
+causes the value to be reported as a floating point number.  See
+the documentation for the builtin tt(typeset) in
+ifzman(zmanref(zshbuiltins))\
+ifnzman(noderef(Shell Builtin Commands)) for more details.
 )
 vindex(SHLVL)
 item(tt(SHLVL) <S>)(

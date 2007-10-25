@@ -1,5 +1,8 @@
 2007-10-25  Peter Stephenson  <pws@csr.com>
 
+	* c.f. users/12109: Doc/Zsh/params.yo: tweak to SECONDS
+	documentation for clarity.
+
 	* users/12100: Completion/Unix/Type/_path_files,
 	Doc/Zsh/compsys.yo: with NO_CASE_GLOB, use a case-insensitive
 	matcher if none is in effect.
