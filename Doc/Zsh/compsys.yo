@@ -1968,6 +1968,11 @@ quickly reduce the shell's performance.  As a rough rule of thumb,
 one to three strings will give acceptable performance.  On the other
 hand, putting multiple space-separated values into the same string does
 not have an appreciable impact on performance.
+
+If there is no current matcher or it is empty, and the option
+tt(NO_CASE_GLOB) is in effect, the matching for files is performed
+case-insensitively in any case.  However, any matcher must
+explicitly specify case-insensitive matching if that is required.
 )
 kindex(max-errors, completion style)
 item(tt(max-errors))(

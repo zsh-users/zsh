@@ -101,7 +101,16 @@ if (( $#ignore )); then
   (( $mopts[(I)-F] )) || mopts=( "$mopts[@]" -F _comp_ignore )
 fi
 
-(( $#matcher )) && mopts=( "$mopts[@]" "$matcher[@]" )
+if [[ $#matcher -eq 0 && -o nocaseglob ]]; then
+  # If globbing is case insensitive and there's no matcher,
+  # do case-insensitive matching.
+  matcher=( -M 'm:{a-zA-Z}={A-Za-z}' )
+fi
+
+if (( $#matcher )); then
+  # Add the current matcher to the options to compadd.
+  mopts=( "$mopts[@]" "$matcher[@]" )
+fi
 
 if zstyle -s ":completion:${curcontext}:" file-sort tmp1; then
   case "$tmp1" in

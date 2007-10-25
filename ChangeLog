@@ -1,3 +1,9 @@
+2007-10-25  Peter Stephenson  <pws@csr.com>
+
+	* users/12100: Completion/Unix/Type/_path_files,
+	Doc/Zsh/compsys.yo: with NO_CASE_GLOB, use a case-insensitive
+	matcher if none is in effect.
+
 2007-10-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24018: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
