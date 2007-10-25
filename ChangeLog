@@ -1,5 +1,8 @@
 2007-10-25  Peter Stephenson  <pws@csr.com>
 
+	* c.f. users/12110: Doc/Zsh/params.yo: desperately try to
+	get the $SECONDS documentation correct.
+
 	* c.f. users/12109: Doc/Zsh/params.yo: tweak to SECONDS
 	documentation for clarity.
 
