@@ -1628,7 +1628,6 @@ par_simple(int *complex, int nr)
 		    lineno += oldlineno;
 		    ecnpats = onp;
 		    ecssub = oecssub;
-		    cmdpop();
 		    YYERROR(oecused);
 		}
 		yylex();
