@@ -696,7 +696,7 @@ zccmd_input(const char *nam, char **args)
     VARARR(char, instr, 2*MB_CUR_MAX+1);
 #else
     int ci;
-    instr[3];
+    char instr[3];
 #endif
 
     node = zcurses_validate_window(args[0], ZCURSES_USED);
