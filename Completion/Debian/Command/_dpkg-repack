@@ -1,0 +1,7 @@
+#compdef dpkg-repack
+
+_arguments \
+  '--root=[take package from filesystem rooted on <dir>]:root dir:_files -/' \
+  '--arch=[force the package to be built for architecture <arch>]:architecture:(alpha amd64 arm hppa hurd-i386 i386 ia64 m68k mips mipsel powerpc s390 sparc)' \
+  '--generate[generate build directory but do not build deb]' \
+  '*:package:_deb_packages xinstalled'
