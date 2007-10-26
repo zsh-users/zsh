@@ -19,7 +19,8 @@ xitem(tt(zcurses) tt(char) var(targetwin) var(character) )
 xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
 xitem(tt(zcurses) tt(attr) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) ] [...])
-item(tt(zcurses) tt(scroll) [ tt(on) | tt(off) | {+/-}var(lines) ])(
+xitem(tt(zcurses) tt(scroll) [ tt(on) | tt(off) | {+/-}var(lines) ])
+item(tt(input) var(targetwin) [ var(param) [ var(kpparm) ] ])(
 Manipulate curses windows.  All uses of this command should be
 bracketed by `tt(zcurses init)' to initialise use of curses, and
 `tt(zcurses end)' to end it; omitting `tt(zcurses end)' can cause
@@ -44,7 +45,10 @@ var(new_y) and var(new_x).
 Outputting characters and strings are achieved by tt(char) and tt(string)
 respectively.
 
-To draw a border around window var(targetwin), use tt(border).
+To draw a border around window var(targetwin), use tt(border).  Note
+that the border is not subsequently handled specially:  in other words,
+the border is simply a set of characters output at the edge of the
+window.  Hence it can be overwritten, can scroll off the window, etc.
 
 tt(attr) will set var(targetwin)'s attributes or foreground/background
 color pair for any successive character output.  Each var(attribute)
@@ -62,7 +66,19 @@ or negative integer to scroll the window up or down the given number
 of lines without changing the current cursor position (which therefore
 appears to move in the opposite direction relative to the window).
 In the second case, if scrolling is tt(off) it is temporarily turned tt(on)
-to allow the window to be scrolled,
+to allow the window to be scrolled.
+
+tt(input) reads a single character from the window without echoing
+it back.  If var(param) is supplied the character is assigned to the
+parameter var(param), else it is assigned to the parameter var(REPLY).
+If both var(param) and var(kpparam) are supplied, the key is read
+in `keypad' mode.  In this mode special keys such as function keys
+and arrow keys return the name of the key in the parameter var(kpparam).
+The key names are the macros defined in the tt(curses.h) or tt(ncurses.h)
+with the prefix `tt(KEY_)' removed.  Other keys cause a value to be set in
+var(param) as before.  On a succesful return only one of var(param) or
+var(kpparm) contains a non-empty string; the other is set to an empty
+string.
 )
 enditem()
 

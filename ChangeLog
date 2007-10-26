@@ -1,3 +1,11 @@
+2007-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24024: configure.ac, Doc/Zsh/mod_curses.yo,
+	Src/Modules/curses.c:  add "zcurses input" for single character
+	raw input without echoing.  Test for wget_wch for wide
+	character input.  Add handling for keypad() mode by
+	scanning header.
+
 2007-10-26  Clint Adams  <clint@zsh.org>
 
 	* 24022: Completion/Debian/Command/_dpkg-repack: completion for

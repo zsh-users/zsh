@@ -1134,7 +1134,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       brk sbrk \
 	       pathconf sysconf \
 	       tgetent tigetflag tigetnum tigetstr setupterm initscr \
-	       setcchar waddwstr \
+	       setcchar waddwstr wget_wch \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
 	       erand48 open_memstream \
@@ -1353,6 +1353,46 @@ zsh_cv_path_errno_h="$ERRNO_H"
 ])
 ERRNO_H="$zsh_cv_path_errno_h"
 AC_SUBST(ERRNO_H)dnl
+
+dnl Where are curses key definitions located?  Need for keypad() mode.
+AC_CACHE_CHECK(where curses key definitions are located, zsh_cv_path_curses_keys_h,
+[dnl This is an identical trick to errno.h, except we use ncurses.h
+dnl if we can.
+if test x$ac_cv_header_ncurses_h = xyes; then
+  echo "#include <ncurses.h>" >nametmp.c
+else
+  if test x$ac_cv_header_curses_h = xyes; then
+    echo "#include <curses.h>" >nametmp.c
+  else
+    echo >nametmp.c
+  fi
+fi
+curses_list="`$CPP nametmp.c |
+sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
+       -e 's/^#[ 	0-9].*\"\(.*\)\"/\1/p' |
+sed 's/\\\\\\\\/\//g' |
+$AWK '{ if ($1 ~ /\.h/) files[[$1]] = $1 }
+  END { for (var in files) print var }'`"
+rm -f nametmp.c
+if x"$curses_list" = x; then
+  echo Failed
+  exit 1
+fi
+for CURSES_TRY_H in $curses_list /dev/null
+do
+  nkeys=`test -f $CURSES_TRY_H && \
+  $EGREP '#[ 	]*define[ 	][ 	]*KEY_' $CURSES_TRY_H | \
+  wc -l | sed 's/[ 	]//g'`
+  if test "x$nkeys" != x && test "$nkeys" -ge 10
+  then
+    CURSES_KEYS_H=$CURSES_TRY_H
+    break
+  fi
+done
+zsh_cv_path_curses_keys_h="$CURSES_KEYS_H"
+])
+CURSES_KEYS_H="$zsh_cv_path_curses_keys_h"
+AC_SUBST(CURSES_KEYS_H)dnl
 
 dnl -----------------------------------------------------
 dnl Look for the file containing the RLIMIT_* definitions
