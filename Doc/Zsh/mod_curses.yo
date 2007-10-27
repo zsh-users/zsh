@@ -15,6 +15,8 @@ xitem(tt(zcurses) tt(addwin) var(targetwin) var(nlines) var(ncols) var(begin_y) 
 xitem(tt(zcurses) tt(delwin) var(targetwin) )
 xitem(tt(zcurses) tt(refresh) [ var(targetwin) ] )
 xitem(tt(zcurses) tt(move) var(targetwin) var(new_y) var(new_x) )
+xitem(tt(zcurses) tt(clear) var(targetwin) [ tt(redraw) | tt(eol) | tt(bot) ])
+xitem(tt(location) var(targetwin) var(array))
 xitem(tt(zcurses) tt(char) var(targetwin) var(character) )
 xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
@@ -29,18 +31,45 @@ the terminal to be in an unwanted state.
 With tt(addwin), create a window with var(nlines) lines and var(ncols) columns.
 Its upper left corner will be placed at row var(begin_y) and column
 var(begin_x) of the screen.  var(targetwin) is a string and refers
-to the name of a window that is not currently assigned.
+to the name of a window that is not currently assigned.  Note
+in particular the curses convention that vertical values appear
+before horizontal values.
 
 Use tt(delwin) to delete a window created with tt(addwin).  Note
-that tt(end) does em(not) implicitly delete windows.
+that tt(end) does em(not) implicitly delete windows, and that
+tt(delwin) does not erase the screen image of the window.
 
-The tt(refresh) command will refresh window var(targetwin); this is necessary to
-make any pending changes (such as characters you have prepared for output
-with tt(char)) visible on the screen.  If no argument is given,
-all windows are refreshed; this is necessary after deleting a window.
+The window corresponding to the full visible screen is called
+tt(stdscr); it always exists after `tt(zcurses init)' and cannot
+be delete with tt(delwin).
+
+The tt(refresh) command will refresh window var(targetwin); this is
+necessary to make any pending changes (such as characters you have
+prepared for output with tt(char)) visible on the screen.  tt(refresh)
+without an argument causes the screen to be cleared and redrawn.
 
 tt(move) moves the cursor position in var(targetwin) to new coordinates
 var(new_y) and var(new_x).
+
+tt(clear) erases the contents of var(targetwin).  One (and no more than one)
+of three options may be specified.  With the option tt(redraw),
+in addition the next tt(refresh) of var(targetwin) will cause the screen to be
+cleared and repainted.  With the option tt(eol), var(targetwin) is only
+cleared to the end of the current cursor line.  With the option
+tt(bot), var(targetwin) is cleared to the end of the window, i.e
+everything to the right and below the cursor is cleared.
+
+tt(location) writes various positions associated with var(targetwin)
+into the array named var(array).
+These are, in order:
+startsitem()
+sitem()(The y and x coordinates of the cursor relative to the top left
+of var(targetwin))
+sitem()(The y and x coordinates of the top left of var(targetwin) on the
+screen)
+sitem()(The y and x coordinates of the bottom right of var(targetwin)
+on the screen.)
+endsitem()
 
 Outputting characters and strings are achieved by tt(char) and tt(string)
 respectively.

@@ -5,7 +5,7 @@ BEGIN {nkeydefs = 0}
     keytail = substr($0, keyindex, 80)
     split(keytail, tmp)
     keynam = substr(tmp[1], 5, 30)
-    if (keynam != "MIN" && keynam != "MAX") {
+    if (keynam != "MIN" && keynam != "MAX" && keynam != "CODE_YES") {
 	name[nkeydefs++] = keynam
     }
 }

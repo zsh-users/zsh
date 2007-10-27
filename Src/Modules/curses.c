@@ -53,8 +53,10 @@
 #include <stdio.h>
 
 enum zc_win_flags {
+    /* Window is permanent (probably "stdscr") */
+    ZCWF_PERMANENT = 0x0001,
     /* Scrolling enabled */
-    ZCWF_SCROLL = 0x0001
+    ZCWF_SCROLL = 0x0002
 };
 
 typedef struct zc_win {
@@ -82,13 +84,12 @@ struct zcurses_subcommand {
     int maxargs;
 };
 
-static WINDOW *win_zero;
 static struct ttyinfo saved_tty_state;
 static struct ttyinfo curses_tty_state;
 static LinkList zcurses_windows;
 static HashTable zcurses_colorpairs = NULL;
 
-#define ZCURSES_ERANGE 1
+#define ZCURSES_EINVALID 1
 #define ZCURSES_EDEFINED 2
 #define ZCURSES_EUNDEFINED 3
 
@@ -151,11 +152,12 @@ zcurses_strerror(int err)
 {
     static const char *errs[] = {
 	"unknown error",
-	"window number out of range",
+	"window name invalid",
 	"window already defined",
+	"window undefined",
 	NULL };
 
-    return errs[(err < 1 || err > 2) ? 0 : err];
+    return errs[(err < 1 || err > 3) ? 0 : err];
 }
 
 static LinkNode
@@ -177,7 +179,7 @@ zcurses_validate_window(char *win, int criteria)
     LinkNode target;
 
     if (win==NULL || strlen(win) < 1) {
-	zc_errno = ZCURSES_ERANGE;
+	zc_errno = ZCURSES_EINVALID;
 	return NULL;
     }
 
@@ -200,7 +202,7 @@ zcurses_validate_window(char *win, int criteria)
 static int
 zcurses_free_window(ZCWin w)
 {
-    if (delwin(w->win)!=OK)
+    if (!(w->flags & ZCWF_PERMANENT) && delwin(w->win)!=OK)
 	return 1;
 
     if (w->name)
@@ -317,9 +319,23 @@ freecolorpairnode(HashNode hn)
 static int
 zccmd_init(const char *nam, char **args)
 {
-    if (!win_zero) {
+    LinkNode stdscr_win = zcurses_getwindowbyname("stdscr");
+
+    if (!stdscr_win) {
+	ZCWin w = (ZCWin)zshcalloc(sizeof(struct zc_win));
+	if (!w)
+	    return 1;
+
 	gettyinfo(&saved_tty_state);
-	win_zero = initscr();
+	w->name = ztrdup("stdscr");
+	w->win = initscr();
+	if (w->win == NULL) {
+	    zsfree(w->name);
+	    zfree(w, sizeof(struct zc_win));
+	    return 1;
+	}
+	w->flags = ZCWF_PERMANENT;
+	zinsertlinknode(zcurses_windows, lastnode(zcurses_windows), (void *)w);
 	if (start_color() != ERR) {
 	    if(!zc_color_phase)
 		zc_color_phase = 1;
@@ -410,6 +426,10 @@ zccmd_delwin(const char *nam, char **args)
 	zwarnnam(nam, "record for window `%s' is corrupt", args[0]);
 	return 1;
     }
+    if (w->flags & ZCWF_PERMANENT) {
+	zwarnnam(nam, "window `%s' can't be deleted", args[0]);
+	return 1;
+    }
     if (delwin(w->win)!=OK)
 	return 1;
 
@@ -420,6 +440,7 @@ zccmd_delwin(const char *nam, char **args)
 
     return 0;
 }
+
 
 static int
 zccmd_refresh(const char *nam, char **args)
@@ -441,7 +462,7 @@ zccmd_refresh(const char *nam, char **args)
     }
     else
     {
-	return (refresh() != OK) ? 1 : 0;
+	return (wrefresh(curscr) != OK) ? 1 : 0;
     }
 }
 
@@ -468,6 +489,35 @@ zccmd_move(const char *nam, char **args)
 	return 1;
 
     return 0;
+}
+
+
+static int
+zccmd_clear(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+    if (!args[1]) {
+	return werase(w->win) != OK;
+    } else if (!strcmp(args[1], "redraw")) {
+	return wclear(w->win) != OK;
+    } else if (!strcmp(args[1], "eol")) {
+	return wclrtoeol(w->win) != OK;
+    } else if (!strmp(args[1], "bot")) {
+	return wclrtobot(w->win) != OK;
+    } else {
+	zwarnnam(nam, "`clear' expects `redraw', `eol' or `bot'");
+	return 1;
+    }
 }
 
 
@@ -574,7 +624,9 @@ zccmd_border(const char *nam, char **args)
 static int
 zccmd_endwin(const char *nam, char **args)
 {
-    if (win_zero) {
+    LinkNode stdscr_win = zcurses_getwindowbyname("stdscr");
+
+    if (stdscr_win) {
 	endwin();
 	/* Restore TTY as it was before zcurses -i */
 	settyinfo(&saved_tty_state);
@@ -727,6 +779,7 @@ zccmd_input(const char *nam, char **args)
 	break;
 
     case KEY_CODE_YES:
+	*instr = '\0';
 	keypadnum = (int)wi;
 	break;
 
@@ -736,8 +789,11 @@ zccmd_input(const char *nam, char **args)
     }
 #else
     ci = wgetch(w->win);
+    if (ci == ERR)
+	return 1;
     if (ci >= 256) {
 	keypadnum = ci;
+	*instr = '\0';
     } else {
 	if (imeta(ci)) {
 	    instr[0] = Meta;
@@ -753,16 +809,17 @@ zccmd_input(const char *nam, char **args)
 	var = args[1];
     else
 	var = "REPLY";
-    if (!setsparam(var, ztrdup(keypadnum > 0 ? "" : instr)))
+    if (!setsparam(var, ztrdup(instr)))
 	return 1;
-    if (args[2]) {
+    if (args[1] && args[2]) {
 	if (keypadnum > 0) {
 	    const struct zcurses_namenumberpair *nnptr;
 	    char fbuf[DIGBUFSIZE+1];
 
 	    for (nnptr = keypad_names; nnptr->name; nnptr++) {
 		if (keypadnum == nnptr->number) {
-		    setsparam(args[2], ztrdup(nnptr->name));
+		    if (!setsparam(args[2], ztrdup(nnptr->name)))
+			return 1;
 		    return 0;
 		}
 	    }
@@ -773,11 +830,47 @@ zccmd_input(const char *nam, char **args)
 		/* print raw number */
 		sprintf(fbuf, "%d", keypadnum);
 	    }
-	    setsparam(args[2], ztrdup(fbuf));
+	    if (!setsparam(args[2], ztrdup(fbuf)))
+		return 1;
 	} else {
-	    setsparam(args[2], ztrdup(""));
+	    if (!setsparam(args[2], ztrdup("")))
+		return 1;
 	}
     }
+    return 0;
+}
+
+
+static int
+zccmd_position(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+    int i, intarr[6];
+    char **array, dbuf[DIGBUFSIZE];
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+    /* Look no pointers:  these are macros. */
+    if (getyx(w->win, intarr[0], intarr[1]) == ERR ||
+	getbegyx(w->win, intarr[2], intarr[3]) == ERR ||
+	getmaxyx(w->win, intarr[4], intarr[5]) == ERR)
+	return 1;
+
+    array = (char **)zalloc(7*sizeof(char *));
+    for (i = 0; i < 6; i++) {
+	sprintf(dbuf, "%d", intarr[i]);
+	array[i] = ztrdup(dbuf);
+    }
+    array[6] = NULL;
+
+    setaparam(args[1], array);
     return 0;
 }
 
@@ -800,6 +893,8 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	{"delwin", zccmd_delwin, 1, 1},
 	{"refresh", zccmd_refresh, 0, 1},
 	{"move", zccmd_move, 3, 3},
+	{"clear", zccmd_clear, 1, 2},
+	{"position", zccmd_position, 2, 2},
 	{"char", zccmd_char, 2, 2},
 	{"string", zccmd_string, 2, 2},
 	{"border", zccmd_border, 1, 1},
@@ -829,6 +924,13 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     } else if (zcsc->maxargs >= 0 && num_args > zcsc->maxargs) {
 	zwarnnam(nam, "too may arguments for subcommand: %s", args[0]);
+	return 1;
+    }
+
+    if (zcsc->cmd != zccmd_init && zcsc->cmd != zccmd_endwin &&
+	!zcurses_getwindowbyname("stdscr")) {
+	zwarnnam(nam, "command `%s' can't be used before `zcurses init'",
+		 zcsc->name);
 	return 1;
     }
 

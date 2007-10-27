@@ -1,12 +1,18 @@
+2007-10-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24025: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c,
+	Src/Modules/curses_keys.awk: new zcurses subcommands
+	"clear" and "position"; "stdscr" window; numerous other tweaks.
+
 2007-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/curses.c: zcurses input oops.
 	
 	* 24024: configure.ac, Doc/Zsh/mod_curses.yo,
-	Src/Modules/curses.c:  add "zcurses input" for single character
-	raw input without echoing.  Test for wget_wch for wide
-	character input.  Add handling for keypad() mode by
-	scanning header.
+	Src/Modules/curses.c, Src/Modules/curses_keys.awk:  add "zcurses
+	input" for single character raw input without echoing.  Test for
+	wget_wch for wide character input.  Add handling for keypad()
+	mode by scanning header.
 
 2007-10-26  Clint Adams  <clint@zsh.org>
 
