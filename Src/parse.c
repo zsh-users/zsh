@@ -2898,17 +2898,23 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
     return 0;
 }
 
+/**/
 #if defined(HAVE_SYS_MMAN_H) && defined(HAVE_MMAP) && defined(HAVE_MUNMAP)
 
 #include <sys/mman.h>
 
+/**/
 #if defined(MAP_SHARED) && defined(PROT_READ)
 
+/**/
 #define USE_MMAP 1
 
+/**/
 #endif
+/**/
 #endif
 
+/**/
 #ifdef USE_MMAP
 
 /* List of dump files mapped. */
@@ -2992,6 +2998,7 @@ load_dump_file(char *dump, struct stat *sbuf, int other, int len)
 
 #define zwcstat(f, b) (!!stat(f, b))
 
+/**/
 #endif
 
 /* Try to load a function from one of the possible wordcode files for it.
