@@ -10,25 +10,34 @@
 #
 # This works only with the new function based completion system.
 
+# Recommended settings:
+#   zstyle ':completion:incremental:*' completer _complete _ignored
+#   zstyle :incremental stop-keys $'[\e\C-b\C-f\C-n\C-p\C-u-\C-x]'
+
+# BUGS:
+# The _oldlist completer breaks incremental completion.  Use a context-
+# specific completer zstyle as shown above to disable the _oldlist
+# completer in this function.
+
 # The main widget function.
 
 incremental-complete-word() {
-  #emulate -L zsh
+  emulate -L zsh
   unsetopt autolist menucomplete automenu # doesn't work well
 
   local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt pstr word
-  local lastl lastr wid twid num alt post toolong
+  local lastl lastr wid twid num post toolong
   local curcontext="${curcontext}" stop brk
 
   [[ -z "$curcontext" ]] && curcontext=:::
   curcontext="incremental:${curcontext#*:}"
 
-  zstyle -s ":completion:${curcontext}" prompt pmpt ||
+  zstyle -s ":incremental" prompt pmpt ||
     pmpt='incremental (%c): %u%s  %l'
-  zstyle -s ":completion:${curcontext}" stop stop
-  zstyle -s ":completion:${curcontext}" break brk
+  zstyle -s ":incremental" stop-keys stop
+  zstyle -s ":incremental" break-keys brk
 
-  if zstyle -t ":completion:${curcontext}" list; then
+  if zstyle -t ":incremental" list; then
     wid=list-choices
     post=( icw-list-helper )
   else
@@ -42,10 +51,6 @@ incremental-complete-word() {
   RBUFFER="$rbuf"
   num=$_lastcomp[nmatches]
   if (( ! num )); then
-    num="${_lastcomp[alternate_nmatches]}"
-    alt=' -alt-'
-  fi
-  if (( ! num )); then
     word=''
     state='-no match-'
   elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
@@ -55,8 +60,8 @@ incremental-complete-word() {
     word="${_lastcomp[unambiguous]}"
     state=''
   fi
-  zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" "a:$alt" \
-                          "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
+  zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" \
+                          "l:$toolong" "c:${_lastcomp[completer]}"
   zle -R "$pstr"
   read -k key
 
@@ -79,33 +84,31 @@ incremental-complete-word() {
     else
       LBUFFER="$LBUFFER$key"
     fi
-    lastl="$LBUFFER"
-    lastr="$RBUFFER"
-    [[ "$twid" = "$wid" ]] && comppostfuncs=( "$post[@]" )
-    toolong=''
-    zle $twid "$@"
-    LBUFFER="$lastl"
-    RBUFFER="$lastr"
-    num=$_lastcomp[nmatches]
-    if (( ! num )); then
-      num="${_lastcomp[alternate_nmatches]}"
-      alt=' -alt-'
+    if (( ! PENDING )); then
+      lastl="$LBUFFER"
+      lastr="$RBUFFER"
+      [[ "$twid" = "$wid" ]] && comppostfuncs=( "$post[@]" )
+      toolong=''
+      zle $twid "$@"
+      LBUFFER="$lastl"
+      RBUFFER="$lastr"
+      num=$_lastcomp[nmatches]
+      if (( ! num )); then
+        word=''
+        state='-no match-'
+      elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
+        word=''
+        state='-no prefix-'
+      else
+        word="${_lastcomp[unambiguous]}"
+        state=''
+      fi
+      zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" \
+                              "l:$toolong" "c:${_lastcomp[completer]}"
+      zle -R "$pstr"
     else
-      alt=''
+      zle -R
     fi
-    if (( ! num )); then
-      word=''
-      state='-no match-'
-    elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
-      word=''
-      state='-no prefix-'
-    else
-      word="${_lastcomp[unambiguous]}"
-      state=''
-    fi
-    zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" "a:$alt" \
-                            "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
-    zle -R "$pstr"
     read -k key
   done
 
@@ -124,11 +127,9 @@ icw-list-helper() {
   # +1 for the status line we will add...
 
   if [[ compstate[list_lines]+BUFFERLINES+1 -gt LINES ]]; then
-    compstate[list]='list explanations'
-    if [[ compstate[list_lines]+BUFFERLINES+1 -gt LINES ]]; then
-      compstate[list]=''
-      compstate[force_list]=yes
-    fi
+    compstate[list]='list explanations messages'
+    [[ compstate[list_lines]+BUFFERLINES+1 -gt LINES ]] && compstate[list]=''
+
     toolong='...'
   fi
 }
