@@ -1,0 +1,18 @@
+#compdef vorbiscomment
+
+#Written by Jesse Weinstein <jessw@netwood.net>, Wed Jul 19 15:31:11 2006
+#Version 0.9 - could handle -t option slightly better
+#Released under the MIT license (or any compatible free-content license)
+#i.e. do whatever you like with it, but credit me.
+
+_arguments \
+    '-h[help]' \
+    '-q[quiet]' \
+    '(-a -w -q -c -t 2)-l[list comments]' \
+    '(-l)-a[append comments]' \
+    '(-l)-w[overwrite comments]' \
+    '(-l -c)-t[tag and value]:: ' \
+    '(-l -t)-c[tag file]::_files' \
+    '1:OGG file:_files -g \*.ogg' \
+    '(-l)2:output OGG file:_files -g \*.ogg' \
+    && return 0
