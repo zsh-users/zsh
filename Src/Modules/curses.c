@@ -512,7 +512,7 @@ zccmd_clear(const char *nam, char **args)
 	return wclear(w->win) != OK;
     } else if (!strcmp(args[1], "eol")) {
 	return wclrtoeol(w->win) != OK;
-    } else if (!strmp(args[1], "bot")) {
+    } else if (!strcmp(args[1], "bot")) {
 	return wclrtobot(w->win) != OK;
     } else {
 	zwarnnam(nam, "`clear' expects `redraw', `eol' or `bot'");
