@@ -1,5 +1,8 @@
 2007-10-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Doc/Zsh/mod_curses.yo: Oops, misdescribed the
+	effect of getmaxyx().
+
 	* 24025: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c,
 	Src/Modules/curses_keys.awk: new zcurses subcommands
 	"clear" and "position"; "stdscr" window; numerous other tweaks.
