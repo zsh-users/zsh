@@ -67,8 +67,7 @@ sitem()(The y and x coordinates of the cursor relative to the top left
 of var(targetwin))
 sitem()(The y and x coordinates of the top left of var(targetwin) on the
 screen)
-sitem()(The maximum value of y and x within var(targetwin), i.e. the
-position of the bottom right corner relative to the top left corner.)
+sitem()(The size of var(targetwin) in y and x dimensions.)
 endsitem()
 
 Outputting characters and strings are achieved by tt(char) and tt(string)
