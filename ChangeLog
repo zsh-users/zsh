@@ -1,5 +1,8 @@
 2007-10-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24028: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
+	add "zcurses timeout".
+
 	* 24027: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
 	add "touch", subwindows, optimized "refresh".
 

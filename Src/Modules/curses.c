@@ -562,7 +562,7 @@ zccmd_refresh(const char *nam, char **args)
 
 
 static int
-zccmd_move(const char *nam, char **args)
+zccmd_move(const char *nam,  char **args)
 {
     int y, x;
     LinkNode node;
@@ -936,6 +936,33 @@ zccmd_input(const char *nam, char **args)
 
 
 static int
+zccmd_timeout(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+    int to;
+    char *eptr;
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+    to = (int)zstrtol(args[1], &eptr, 10);
+    if (*eptr) {
+	zwarnnam(nam, "timeout requires an integer: %s", args[1]);
+	return 1;
+    }
+
+    wtimeout(w->win, to);
+    return 0;
+}
+
+
+static int
 zccmd_position(const char *nam, char **args)
 {
     LinkNode node;
@@ -1019,6 +1046,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	{"attr", zccmd_attr, 2, -1},
 	{"scroll", zccmd_scroll, 2, 2},
 	{"input", zccmd_input, 1, 3},
+	{"timeout", zccmd_timeout, 2, 2},
 	{"touch", zccmd_touch, 1, -1},
 	{NULL, (zccmd_t)0, 0, 0}
     };

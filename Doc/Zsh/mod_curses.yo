@@ -23,7 +23,8 @@ xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
 xitem(tt(zcurses) tt(attr) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) ] [...])
 xitem(tt(zcurses) tt(scroll) [ tt(on) | tt(off) | {+/-}var(lines) ])
-item(tt(input) var(targetwin) [ var(param) [ var(kpparm) ] ])(
+xitem(tt(zcurses) tt(input) var(targetwin) [ var(param) [ var(kpparm) ] ])
+item(tt(zcurses) tt(timeout) var(targetwin) var(intval))(
 Manipulate curses windows.  All uses of this command should be
 bracketed by `tt(zcurses init)' to initialise use of curses, and
 `tt(zcurses end)' to end it; omitting `tt(zcurses end)' can cause
@@ -125,6 +126,14 @@ with the prefix `tt(KEY_)' removed.  Other keys cause a value to be set in
 var(param) as before.  On a succesful return only one of var(param) or
 var(kpparm) contains a non-empty string; the other is set to an empty
 string.
+
+tt(timeout) specifies a timeout value for input from var(targetwin).
+If var(intval) is negative, `tt(zcurses input)' waits indefinitely for
+a character to be typed; this is the default.  If var(intval) is zero,
+`tt(zcurses input)' returns immediately; if there is typeahead it is
+returned, else no input is done and status 1 is returned.  If var(intval)
+is positive, `tt(zcurses input)' waits var(intval) milliseconds for
+input and if there is none at the end of that period returns status 1.
 )
 enditem()
 
