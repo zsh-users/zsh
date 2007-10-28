@@ -121,6 +121,9 @@ static const struct zcurses_namenumberpair zcurses_colors[] = {
     {"magenta", COLOR_MAGENTA},
     {"cyan", COLOR_CYAN},
     {"white", COLOR_WHITE},
+#ifdef HAVE_USE_DEFAULT_COLORS
+    {"default", -1},
+#endif
     {NULL, 0}
 };
 
@@ -337,6 +340,8 @@ zccmd_init(const char *nam, char **args)
 	w->flags = ZCWF_PERMANENT;
 	zinsertlinknode(zcurses_windows, lastnode(zcurses_windows), (void *)w);
 	if (start_color() != ERR) {
+	    Colorpairnode cpn;
+
 	    if(!zc_color_phase)
 		zc_color_phase = 1;
 	    zcurses_colorpairs = newhashtable(8, "zc_colorpairs", NULL);
@@ -354,6 +359,16 @@ zccmd_init(const char *nam, char **args)
 	    zcurses_colorpairs->freenode    = freecolorpairnode;
 	    zcurses_colorpairs->printnode   = NULL;
 
+#ifdef HAVE_USE_DEFAULT_COLORS
+	    use_default_colors();
+#endif
+	    /* Initialise the default color pair, always 0 */
+	    cpn = (Colorpairnode)zalloc(sizeof(struct colorpairnode));
+	    if (cpn) {
+		cpn->colorpair = 0;
+		addhashnode(zcurses_colorpairs,
+			    ztrdup("default/default"), (void *)cpn);
+	    }
 	}
 	/*
 	 * We use cbreak mode because we don't want line buffering

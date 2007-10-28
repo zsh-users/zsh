@@ -1134,7 +1134,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       brk sbrk \
 	       pathconf sysconf \
 	       tgetent tigetflag tigetnum tigetstr setupterm initscr \
-	       setcchar waddwstr wget_wch \
+	       setcchar waddwstr wget_wch use_default_colors \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
 	       erand48 open_memstream \

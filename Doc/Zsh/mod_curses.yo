@@ -83,9 +83,14 @@ color pair for any successive character output.  Each var(attribute)
 given on the line may be prepended by a tt(+) to set or a tt(-) to
 unset that attribute; tt(+) is assumed if absent.  The attributes
 supported are tt(blink), tt(bold), tt(dim), tt(reverse), tt(standout),
-and tt(underline).  Each var(fg_col)tt(/)var(bg_col) (to be read as
+and tt(underline).
+
+Each var(fg_col)tt(/)var(bg_col) attribute (to be read as
 `var(fg_col) on var(bg_col)') sets the foreground and background color
-for character output.
+for character output.  The color tt(default) is sometimes available
+(in particular if the library is ncurses), specifying the foreground
+or background color with which the terminal started.  The color pair
+tt(default/default) is always available.
 
 tt(scroll) can be used with tt(on) or tt(off) to enabled or disable
 scrolling of a window when the cursor would otherwise move below the
