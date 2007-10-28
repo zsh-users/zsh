@@ -1563,6 +1563,8 @@ singledraw()
     g = mgtab[ml1 * columns + mc1];
     clprintm(g, mtab[ml1 * columns + mc1], mcc1, ml1, lc1,
              (g->widths ? g->widths[mcc1] : g->width));
+    if (mlprinted)
+	(void) tcmultout(TCUP, TCMULTUP, mlprinted);
     putc('\r', shout);
 
     if (md2 != md1)
@@ -1572,6 +1574,8 @@ singledraw()
     g = mgtab[ml2 * columns + mc2];
     clprintm(g, mtab[ml2 * columns + mc2], mcc2, ml2, lc2,
              (g->widths ? g->widths[mcc2] : g->width));
+    if (mlprinted)
+	(void) tcmultout(TCUP, TCMULTUP, mlprinted);
     putc('\r', shout);
 
     if (mstatprinted) {
