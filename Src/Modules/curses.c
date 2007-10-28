@@ -59,11 +59,15 @@ enum zc_win_flags {
     ZCWF_SCROLL = 0x0002
 };
 
-typedef struct zc_win {
+typedef struct zc_win *ZCWin;
+
+struct zc_win {
     WINDOW *win;
     char *name;
     int flags;
-} *ZCWin;
+    LinkList children;
+    ZCWin parent;
+};
 
 struct zcurses_namenumberpair {
     char *name;
@@ -210,6 +214,9 @@ zcurses_free_window(ZCWin w)
 
     if (w->name)
 	zsfree(w->name);
+
+    if (w->children)
+	freelinklist(w->children, (FreeFunc)NULL);
 
     zfree(w, sizeof(struct zc_win));
 
@@ -410,11 +417,37 @@ zccmd_addwin(const char *nam, char **args)
 	return 1;
 
     w->name = ztrdup(args[0]);
-    w->win = newwin(nlines, ncols, begin_y, begin_x);
+    if (args[5]) {
+	LinkNode node;
+	ZCWin worig;
+
+	node = zcurses_validate_window(args[5], ZCURSES_USED);
+	if (node == NULL) {
+	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0],
+		     0);
+	    zsfree(w->name);
+	    zfree(w, sizeof(struct zc_win));
+	    return 1;
+	}
+
+	worig = (ZCWin)getdata(node);
+
+	w->win = subwin(worig->win, nlines, ncols, begin_y, begin_x);
+	if (w->win) {
+	    w->parent = worig;
+	    if (!worig->children)
+		worig->children = znewlinklist();
+	    zinsertlinknode(worig->children, lastnode(worig->children),
+			    (void *)w);
+	}
+    } else {
+	w->win = newwin(nlines, ncols, begin_y, begin_x);
+    }
 
     if (w->win == NULL) {
+	zwarnnam(nam, "failed to create window `%s'", w->name);
 	zsfree(w->name);
-	free(w);
+	zfree(w, sizeof(struct zc_win));
 	return 1;
     }
 
@@ -428,6 +461,7 @@ zccmd_delwin(const char *nam, char **args)
 {
     LinkNode node;
     ZCWin w;
+    int ret = 0;
 
     node = zcurses_validate_window(args[0], ZCURSES_USED);
     if (node == NULL) {
@@ -445,39 +479,84 @@ zccmd_delwin(const char *nam, char **args)
 	zwarnnam(nam, "window `%s' can't be deleted", args[0]);
 	return 1;
     }
-    if (delwin(w->win)!=OK)
+
+    if (w->children && firstnode(w->children)) {
+	zwarnnam(nam, "window `%s' has subwindows, delete those first",
+		 w->name);
 	return 1;
+    }
+
+    if (delwin(w->win)!=OK) {
+	/*
+	 * Not sure what to do here, but we are probably stuffed,
+	 * so delete the window locally anyway.
+	 */
+	ret = 1;
+    }
+
+    if (w->parent) {
+	/* Remove from parent's list of children */
+	LinkList wpc = w->parent->children;
+	LinkNode pcnode;
+	for (pcnode = firstnode(wpc); pcnode; incnode(pcnode)) {
+	    ZCWin child = (ZCWin)getdata(pcnode);
+	    if (child == w) {
+		remnode(wpc, pcnode);
+		break;
+	    }
+	}
+	DPUTS(pcnode == NULL, "BUG: child node not found in parent's children");
+	/*
+	 * We need to touch the parent to get the parent to refresh
+	 * properly.
+	 */
+	touchwin(w->parent->win);
+    }
+    else
+	touchwin(stdscr);
 
     if (w->name)
 	zsfree(w->name);
 
     zfree((ZCWin)remnode(zcurses_windows, node), sizeof(struct zc_win));
 
-    return 0;
+    return ret;
 }
 
 
 static int
 zccmd_refresh(const char *nam, char **args)
 {
+    WINDOW *win;
+    int ret = 0;
+
     if (args[0]) {
-	LinkNode node;
-	ZCWin w;
+	for (; *args; args++) {
+	    LinkNode node;
+	    ZCWin w;
 
-	node = zcurses_validate_window(args[0], ZCURSES_USED);
-	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0],
-		     0);
-	    return 1;
+	    node = zcurses_validate_window(args[0], ZCURSES_USED);
+	    if (node == NULL) {
+		zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0],
+			 0);
+		return 1;
+	    }
+
+	    w = (ZCWin)getdata(node);
+
+	    if (w->parent) {
+		/* This is what the manual says you have to do. */
+		touchwin(w->parent->win);
+	    }
+	    win = w->win;
+	    if (wnoutrefresh(win) != OK)
+		ret = 1;
 	}
-
-	w = (ZCWin)getdata(node);
-
-	return (wrefresh(w->win)!=OK) ? 1 : 0;
+	return (doupdate() != OK || ret);
     }
     else
     {
-	return (wrefresh(curscr) != OK) ? 1 : 0;
+	return (wrefresh(stdscr) != OK) ? 1 : 0;
     }
 }
 
@@ -890,6 +969,29 @@ zccmd_position(const char *nam, char **args)
 }
 
 
+static int
+zccmd_touch(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+    int ret = 0;
+
+    for (; *args; args++) {
+	node = zcurses_validate_window(args[0], ZCURSES_USED);
+	if (node == NULL) {
+	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
+	    return 1;
+	}
+
+	w = (ZCWin)getdata(node);
+	if (touchwin(w->win) != OK)
+	    ret = 1;
+    }
+
+    return ret;
+}
+
+
 /*********************
   Main builtin handler
  *********************/
@@ -904,9 +1006,9 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 
     struct zcurses_subcommand scs[] = {
 	{"init", zccmd_init, 0, 0},
-	{"addwin", zccmd_addwin, 5, 5},
+	{"addwin", zccmd_addwin, 5, 6},
 	{"delwin", zccmd_delwin, 1, 1},
-	{"refresh", zccmd_refresh, 0, 1},
+	{"refresh", zccmd_refresh, 0, -1},
 	{"move", zccmd_move, 3, 3},
 	{"clear", zccmd_clear, 1, 2},
 	{"position", zccmd_position, 2, 2},
@@ -917,6 +1019,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	{"attr", zccmd_attr, 2, -1},
 	{"scroll", zccmd_scroll, 2, 2},
 	{"input", zccmd_input, 1, 3},
+	{"touch", zccmd_touch, 1, -1},
 	{NULL, (zccmd_t)0, 0, 0}
     };
 
@@ -954,7 +1057,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 
 
 static struct builtin bintab[] = {
-    BUILTIN("zcurses", 0, bin_zcurses, 1, 6, 0, "", NULL),
+    BUILTIN("zcurses", 0, bin_zcurses, 1, -1, 0, "", NULL),
 };
 
 

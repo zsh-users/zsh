@@ -11,12 +11,13 @@ findex(zcurses)
 cindex(windows, curses)
 xitem(tt(zcurses) tt(init))
 xitem(tt(zcurses) tt(end))
-xitem(tt(zcurses) tt(addwin) var(targetwin) var(nlines) var(ncols) var(begin_y) var(begin_x) )
+xitem(tt(zcurses) tt(addwin) var(targetwin) var(nlines) var(ncols) var(begin_y) var(begin_x) [ var(parentwin) ] )
 xitem(tt(zcurses) tt(delwin) var(targetwin) )
-xitem(tt(zcurses) tt(refresh) [ var(targetwin) ] )
+xitem(tt(zcurses) tt(refresh) [ var(targetwin) ... ] )
+xitem(tt(zcurses) tt(touch) var(targetwin) ...)
 xitem(tt(zcurses) tt(move) var(targetwin) var(new_y) var(new_x) )
 xitem(tt(zcurses) tt(clear) var(targetwin) [ tt(redraw) | tt(eol) | tt(bot) ])
-xitem(tt(location) var(targetwin) var(array))
+xitem(tt(zcurses) tt(location) var(targetwin) var(array))
 xitem(tt(zcurses) tt(char) var(targetwin) var(character) )
 xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
@@ -35,6 +36,13 @@ to the name of a window that is not currently assigned.  Note
 in particular the curses convention that vertical values appear
 before horizontal values.
 
+If tt(addwin) is given an existing window as the final argument, the new
+window is created as a subwindow of var(parentwin).  This differs from an
+ordinary new window in that the memory of the window contents is shared
+with the parent's memory.  Subwindows must be deleted before their parent.
+Note that the coordinates of subwindows are relative to the screen, not
+the parent, as with other windows
+
 Use tt(delwin) to delete a window created with tt(addwin).  Note
 that tt(end) does em(not) implicitly delete windows, and that
 tt(delwin) does not erase the screen image of the window.
@@ -47,6 +55,11 @@ The tt(refresh) command will refresh window var(targetwin); this is
 necessary to make any pending changes (such as characters you have
 prepared for output with tt(char)) visible on the screen.  tt(refresh)
 without an argument causes the screen to be cleared and redrawn.
+If multiple windows are given, the screen is updated once at the end.
+
+The tt(touch) command marks the var(targetwin)s listed as changed.
+This is necessary before tt(refresh)ing windows if a window that
+was in front of another window (which may be tt(stdscr)) is deleted.
 
 tt(move) moves the cursor position in var(targetwin) to new coordinates
 var(new_y) and var(new_x).

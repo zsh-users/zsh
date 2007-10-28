@@ -1,5 +1,8 @@
 2007-10-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24027: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
+	add "touch", subwindows, optimized "refresh".
+
 	* 24026: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
 	handle default/default colorpair and handle color
 	default separately if use_default_colors() is available.
