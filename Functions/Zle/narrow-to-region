@@ -1,0 +1,123 @@
+# Restrict the start of the editable line to the region between cursor
+# and mark (including the character at the end).  Can be bound used as
+# a zle widget, or called as a function from another widget.
+#
+# Optionally accepts exactly two arguments, which are used instead of
+# $CURSOR and $MARK as limits to the range.
+#
+# Other options:
+#   -p pretext   show `pretext' instead of the buffer text before the region.
+#   -P posttext  show  `posttext' instead of the buffer text after the region.
+# Either or both may be empty.
+#   -n           Only replace the text before or after the region with
+#                the -p or -P options if the text was not empty.
+#   -S statevar
+#   -R statevar
+# Save or restore the state in/from the parameter named statevar.  In
+# either case no recursive editing takes place; this will typically be
+# done within the calling function between calls with -S and -R.  The
+# statevar may not begin with the prefix _ntr_ which is reserved for
+# parameters within narrow-to-region.
+
+emulate -L zsh
+setopt extendedglob
+
+local _ntr_lbuffer _ntr_rbuffer 
+local _ntr_predisplay=$PREDISPLAY _ntr_postdisplay=$POSTDISPLAY
+integer _ntr_start _ntr_end _ntr_swap _ntr_cursor=$CURSOR _ntr_mark=$MARK
+integer _ntr_stat
+
+local _ntr_opt _ntr_pretext _ntr_posttext _ntr_usepretext _ntr_useposttext
+local _ntr_nonempty _ntr_save _ntr_restore
+
+while getopts "np:P:R:S:" _ntr_opt; do
+  case $_ntr_opt in
+    (n) _ntr_nonempty=1
+	;;
+    (p) _ntr_pretext=$OPTARG _ntr_usepretext=1
+	;;
+    (P) _ntr_posttext=$OPTARG _ntr_useposttext=1
+	;;
+    (R) _ntr_restore=$OPTARG
+        ;;
+    (S)	_ntr_save=$OPTARG
+	;;
+    (*) [[ $_ntr_opt != '?' ]] && print "$0: unhandled option: $_ntr_opt" >&2
+	return 1
+	;;
+  esac
+done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
+
+if [[ $_ntr_restore = _ntr_* || $_ntr_save = _ntr_* ]]; then
+  zle -M "$0: _ntr_ prefix is reserved" >&2
+  return 1
+fi
+
+if [[ -n $_ntr_save || -z $_ntr_restore ]]; then
+
+  if (( $# )); then
+    if (( $# != 2 )); then
+      zle -M "$0: supply zero or two arguments"
+      return 1
+    fi
+    _ntr_start=$1
+    _ntr_end=$2
+  else
+    _ntr_start=$MARK
+    _ntr_end=$CURSOR
+  fi
+
+  if (( _ntr_start > _ntr_end )); then
+    _ntr_swap=_ntr_start
+    _ntr_start=_ntr_end
+    _ntr_end=_ntr_swap
+  fi
+
+  (( _ntr_end++, _ntr_cursor -= _ntr_start, _ntr_mark -= _ntr_start ))
+  
+  _ntr_lbuffer=${BUFFER[1,_ntr_start]}
+  if [[ -z $_ntr_usepretext || ( -n $_ntr_nonempty && -z $_ntr_lbuffer ) ]]
+  then
+    _ntr_pretext=$_ntr_lbuffer
+  fi
+  _ntr_rbuffer=${BUFFER[_ntr_end,-1]}
+  if [[ -z $_ntr_useposttext || ( -n $_ntr_nonempty && -z $_ntr_rbuffer ) ]]
+  then
+    _ntr_posttext=$_ntr_rbuffer
+  fi
+  PREDISPLAY="$_ntr_predisplay$_ntr_pretext"
+  POSTDISPLAY="$_ntr_posttext$_ntr_postdisplay"
+  BUFFER=${BUFFER[_ntr_start+1,_ntr_end-1]}
+  CURSOR=$_ntr_cursor
+  MARK=$_ntr_mark
+
+  if [[ -n $_ntr_save ]]; then
+    eval "$_ntr_save=(${(qq)_ntr_predisplay} ${(qq)_ntr_postdisplay}
+${(qq)_ntr_lbuffer} ${(qq)_ntr_rbuffer})" || return 1
+  fi
+fi
+
+if [[ -z $_ntr_save && -z $_ntr_restore ]]; then
+  zle recursive-edit
+  _ntr_stat=$?
+fi
+
+if [[ -n $_ntr_restore || -z $_ntr_save ]]; then
+  if [[ -n $_ntr_restore ]]; then
+    if ! eval "_ntr_predisplay=\${${_ntr_restore}[1]}
+_ntr_postdisplay=\${${_ntr_restore}[2]}
+_ntr_lbuffer=\${${_ntr_restore}[3]}
+_ntr_rbuffer=\${${_ntr_restore}[4]}"; then
+      zle -M Failed.
+      return 1
+    fi
+  fi
+
+  PREDISPLAY=$_ntr_predisplay
+  POSTDISPLAY=$_ntr_postdisplay
+  LBUFFER="$_ntr_lbuffer$LBUFFER"
+  RBUFFER="$RBUFFER$_ntr_rbuffer"
+fi
+
+return $_ntr_stat
