@@ -169,25 +169,31 @@ cindex(subscript flags)
 If the opening bracket, or the comma in a range, in any subscript
 expression is directly followed by an opening parenthesis, the string up
 to the matching closing one is considered to be a list of flags, as in
-`var(name)tt([LPAR())var(flags)tt(RPAR())var(exp)tt(])'.  The flags
-currently understood are:
+`var(name)tt([LPAR())var(flags)tt(RPAR())var(exp)tt(])'.
+
+The flags tt(s), tt(n) and tt(b) take an argument; the delimiter
+is shown below as `tt(:)', but any character, or the matching pairs
+`tt(LPAR())...tt(RPAR())', `tt({)...tt(})', `tt([)...tt(])', or
+`tt(<)...tt(>)', may be used.
+
+The flags currently understood are:
 
 startitem()
 item(tt(w))(
-If the parameter subscripted is a scalar than this flag makes
+If the parameter subscripted is a scalar then this flag makes
 subscripting work on words instead of characters.  The default word
 separator is whitespace.
 )
 item(tt(s:)var(string)tt(:))(
 This gives the var(string) that separates words (for use with the
-tt(w) flag).
+tt(w) flag).  The delimiter character tt(:) is arbitrary; see above.
 )
 item(tt(p))(
 Recognize the same escape sequences as the tt(print) builtin in
 the string argument of a subsequent `tt(s)' flag.
 )
 item(tt(f))(
-If the parameter subscripted is a scalar than this flag makes
+If the parameter subscripted is a scalar then this flag makes
 subscripting work on lines instead of characters, i.e. with elements
 separated by newlines.  This is a shorthand for `tt(pws:\n:)'.
 )
@@ -257,11 +263,13 @@ item(tt(n:)var(expr)tt(:))(
 If combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them give
 the var(n)th or var(n)th last match (if var(expr) evaluates to
 var(n)).  This flag is ignored when the array is associative.
+The delimiter character tt(:) is arbitrary; see above.
 )
 item(tt(b:)var(expr)tt(:))(
 If combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them begin
 at the var(n)th or var(n)th last element, word, or character (if var(expr)
 evaluates to var(n)).  This flag is ignored when the array is associative.
+The delimiter character tt(:) is arbitrary; see above.
 )
 item(tt(e))(
 This flag has no effect and for ordinary arrays is retained for backward
