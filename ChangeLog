@@ -1,5 +1,8 @@
 2007-10-29  Peter Stephenson  <pws@csr.com>
 
+	* 24029: Src/Modules/curses.c: crashed on attempt to use
+	color if it wasn't available.
+
 	* unposted: configure.ac: remove some broken debugging.
 
 2007-10-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>

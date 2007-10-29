@@ -268,6 +268,10 @@ zcurses_colorset(const char *nam, WINDOW *w, char *colorpair)
     short f, b;
     Colorpairnode cpn;
 
+    /* zcurses_colorpairs is only initialised if color is supported */
+    if (!zcurses_colorpairs)
+	return 1;
+
     if (zc_color_phase==1 ||
 	!(cpn = (Colorpairnode) gethashnode(zcurses_colorpairs, colorpair))) {
 	zc_color_phase = 2;
