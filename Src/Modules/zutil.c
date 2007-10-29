@@ -48,23 +48,58 @@ struct stypat {
     char *pat;			/* pattern string */
     Patprog prog;		/* compiled pattern */
     int weight;			/* how specific is the pattern? */
+    Eprog eval;			/* eval-on-retrieve? */
     char **vals;
 };
     
 /* List of styles. */
 
-static Style zstyles, zlstyles;
+static Style zstyles;
 
 /* Memory stuff. */
 
+/*
+ * Free the information for one of the patterns associated with
+ * a style.
+ *
+ * If the style s is passed, prev is the previous pattern in the list,
+ * found when scanning.  We use this to update the list of patterns.
+ * If this results in their being no remaining patterns, the style
+ * itself is removed from the list of styles.  This isn't optimised,
+ * since it's not a very frequent operation; we simply scan down the list
+ * to find the previous entry.
+ */
 static void
-freestypat(Stypat p)
+freestypat(Stypat p, Style s, Stypat prev)
 {
+    if (s) {
+	if (prev)
+	    prev->next = p->next;
+	else
+	    s->pats = p->next;
+    }
+
     zsfree(p->pat);
     freepatprog(p->prog);
     if (p->vals)
 	freearray(p->vals);
+    if (p->eval)
+	freeeprog(p->eval);
     zfree(p, sizeof(*p));
+
+    if (s && !s->pats) {
+	/* No patterns left, free style */
+	if (s == zstyles) {
+	    zstyles = s->next;
+	} else {
+	    Style s2;
+	    for (s2 = zstyles; s2->next != s; s2 = s2->next)
+		;
+	    s2->next = s->next;
+	}
+	zsfree(s->name);
+	zfree(s, sizeof(*s));
+    }
 }
 
 static void
@@ -77,12 +112,12 @@ freeallstyles(void)
 	sn = s->next;
 	for (p = s->pats; p; p = pn) {
 	    pn = p->next;
-	    freestypat(p);
+	    freestypat(p, NULL, NULL);
 	}
 	zsfree(s->name);
 	zfree(s, sizeof(*s));
     }
-    zstyles = zlstyles = NULL;
+    zstyles = NULL;
 }
 
 /* Get the style struct for a name. */
@@ -93,21 +128,37 @@ getstyle(char *name)
     Style s;
 
     for (s = zstyles; s; s = s->next)
-	if (!strcmp(name, s->name))
+	if (!strcmp(name, s->name)) {
 	    return s;
+	}
 
     return NULL;
 }
 
 /* Store a value for a style. */
 
-static void
-setstypat(Style s, char *pat, Patprog prog, char **vals)
+static int
+setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
 {
     int weight, tmp, first;
     char *str;
     Stypat p, q, qq;
+    Eprog eprog = NULL;
 
+    if (eval) {
+	int ef = errflag;
+
+	eprog = parse_string(zjoin(vals, ' ', 1));
+	errflag = ef;
+
+	if (!eprog)
+	{
+	    freepatprog(prog);
+	    return 1;
+	}
+
+	eprog = dupeprog(eprog, 0);
+    }
     for (p = s->pats; p; p = p->next)
 	if (!strcmp(pat, p->pat)) {
 
@@ -115,9 +166,13 @@ setstypat(Style s, char *pat, Patprog prog, char **vals)
 
 	    if (p->vals)
 		freearray(p->vals);
+	    if (p->eval)
+		freeeprog(p->eval);
 	    p->vals = zarrdup(vals);
+	    p->eval = eprog;
+	    freepatprog(prog);
 
-	    return;
+	    return 0;
 	}
 
     /* New pattern. */
@@ -126,6 +181,7 @@ setstypat(Style s, char *pat, Patprog prog, char **vals)
     p->pat = ztrdup(pat);
     p->prog = prog;
     p->vals = zarrdup(vals);
+    p->eval = eprog;
     p->next = NULL;
 
     /* Calculate the weight. */
@@ -161,6 +217,8 @@ setstypat(Style s, char *pat, Patprog prog, char **vals)
 	qq->next = p;
     else
 	s->pats = p;
+
+    return 0;
 }
 
 /* Add a new style. */
@@ -175,18 +233,42 @@ addstyle(char *name)
     s->pats = NULL;
     s->name = ztrdup(name);
 
-    if (zlstyles)
-	zlstyles->next = s;
-    else
-	zstyles = s;
-    zlstyles = s;
+    s->next = zstyles;
+    zstyles = s;
 
     return s;
 }
 
+static char **
+evalstyle(Stypat p)
+{
+    int ef = errflag;
+    char **ret, *str;
+
+    unsetparam("reply");
+    execode(p->eval, 1, 0);
+    if (errflag) {
+	errflag = ef;
+	return NULL;
+    }
+    errflag = ef;
+
+    queue_signals();
+    if ((ret = getaparam("reply")))
+	ret = arrdup(ret);
+    else if ((str = getsparam("reply"))) {
+	ret = (char **) hcalloc(2 * sizeof(char *));
+	ret[0] = dupstring(str);
+    }
+    unqueue_signals();
+    unsetparam("reply");
+
+    return ret;
+}
+
 /* Look up a style for a context pattern. This does the matching. */
 
-static Stypat
+static char **
 lookupstyle(char *ctxt, char *style)
 {
     Style s;
@@ -196,15 +278,15 @@ lookupstyle(char *ctxt, char *style)
 	if (!strcmp(s->name, style))
 	    for (p = s->pats; p; p = p->next)
 		if (pattry(p->prog, ctxt))
-		    return p;
+		    return (p->eval ? evalstyle(p) : p->vals);
 
     return NULL;
 }
 
 static int
-bin_zstyle(char *nam, char **args, char *ops, int func)
+bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
-    int min, max, n, add = 0, list = 0;
+    int min, max, n, add = 0, list = 0, eval = 0;
 
     if (!args[0])
 	list = 1;
@@ -218,6 +300,10 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	    }
 	    if (oc == 'L')
 		list = 2;
+	    else if (oc == 'e') {
+		eval = add = 1;
+		args++;
+	    }
 	} else {
 	    add = 1;
 	    args++;
@@ -243,9 +329,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	}
 	if (!(s = getstyle(args[1])))
 	    s = addstyle(args[1]);
-	setstypat(s, args[0], prog, args + 2);
-
-	return 0;
+	return setstypat(s, args[0], prog, args + 2, eval);
     }
     if (list) {
 	Style s;
@@ -259,9 +343,9 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	    }
 	    for (p = s->pats; p; p = p->next) {
 		if (list == 1)
-		    printf("    %s", p->pat);
+		    printf("%s  %s", (p->eval ? "(eval)" : "      "), p->pat);
 		else {
-		    printf("zstyle ");
+		    printf("zstyle %s", (p->eval ? "-e " : ""));
 		    quotedzputs(p->pat, stdout);
 		    printf(" %s", s->name);
 		}
@@ -279,7 +363,6 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
     case 's': min = 3; max =  4; break;
     case 'b': min = 3; max =  3; break;
     case 'a': min = 3; max =  3; break;
-    case 'h': min = 3; max =  3; break;
     case 't': min = 2; max = -1; break;
     case 'T': min = 2; max = -1; break;
     case 'm': min = 3; max =  3; break;
@@ -312,27 +395,22 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 			    for (q = NULL, p = s->pats; p;
 				 q = p, p = p->next) {
 				if (!strcmp(p->pat, pat)) {
-				    if (q)
-					q->next = p->next;
-				    else
-					s->pats = p->next;
-				    freestypat(p);
+				    freestypat(p, s, q);
 				    break;
 				}
 			    }
 			}
 		    }
 		} else {
+		    Style next;
 		    Stypat p, q;
 
-		    for (s = zstyles; s; s = s->next) {
+		    /* careful! style itself may be deleted */
+		    for (s = zstyles; s; s = next) {
+			next = s->next;
 			for (q = NULL, p = s->pats; p; q = p, p = p->next) {
 			    if (!strcmp(p->pat, args[1])) {
-				if (q)
-				    q->next = p->next;
-				else
-				    s->pats = p->next;
-				freestypat(p);
+				freestypat(p, s, q);
 				break;
 			    }
 			}
@@ -344,12 +422,11 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	break;
     case 's':
 	{
-	    Stypat s;
-	    char *ret;
+	    char **vals, *ret;
 	    int val;
 
-	    if ((s = lookupstyle(args[1], args[2])) && s->vals[0]) {
-		ret = sepjoin(s->vals, (args[4] ? args[4] : " "), 0);
+	    if ((vals = lookupstyle(args[1], args[2])) && vals[0]) {
+		ret = sepjoin(vals, (args[4] ? args[4] : " "), 0);
 		val = 0;
 	    } else {
 		ret = ztrdup("");
@@ -362,16 +439,15 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	break;
     case 'b':
 	{
-	    Stypat s;
-	    char *ret;
+	    char **vals, *ret;
 	    int val;
 
-	    if ((s = lookupstyle(args[1], args[2])) &&
-		s->vals[0] && !s->vals[1] &&
-		(!strcmp(s->vals[0], "yes") ||
-		 !strcmp(s->vals[0], "true") ||
-		 !strcmp(s->vals[0], "on") ||
-		 !strcmp(s->vals[0], "1"))) {
+	    if ((vals = lookupstyle(args[1], args[2])) &&
+		vals[0] && !vals[1] &&
+		(!strcmp(vals[0], "yes") ||
+		 !strcmp(vals[0], "true") ||
+		 !strcmp(vals[0], "on") ||
+		 !strcmp(vals[0], "1"))) {
 		ret = "yes";
 		val = 0;
 	    } else {
@@ -384,14 +460,12 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	}
 	break;
     case 'a':
-    case 'h':
 	{
-	    Stypat s;
-	    char **ret;
+	    char **vals, **ret;
 	    int val;
 
-	    if ((s = lookupstyle(args[1], args[2]))) {
-		ret = zarrdup(s->vals);
+	    if ((vals = lookupstyle(args[1], args[2]))) {
+		ret = zarrdup(vals);
 		val = 0;
 	    } else {
 		char *dummy = NULL;
@@ -399,10 +473,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 		ret = zarrdup(&dummy);
 		val = 1;
 	    }
-	    if (args[0][1] == 'a')
-		setaparam(args[3], ret);
-	    else
-		sethparam(args[3], ret);
+	    setaparam(args[3], ret);
 
 	    return val;
 	}
@@ -410,14 +481,14 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
     case 't':
     case 'T':
 	{
-	    Stypat s;
+	    char **vals;
 
-	    if ((s = lookupstyle(args[1], args[2])) && s->vals[0]) {
+	    if ((vals = lookupstyle(args[1], args[2])) && vals[0]) {
 		if (args[3]) {
 		    char **ap = args + 3, **p;
 
 		    while (*ap) {
-			p = s->vals;
+			p = vals;
 			while (*p)
 			    if (!strcmp(*ap, *p++))
 				return 0;
@@ -425,27 +496,25 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 		    }
 		    return 1;
 		} else
-		    return !(!strcmp(s->vals[0], "true") ||
-			     !strcmp(s->vals[0], "yes") ||
-			     !strcmp(s->vals[0], "on") ||
-			     !strcmp(s->vals[0], "1"));
+		    return !(!strcmp(vals[0], "true") ||
+			     !strcmp(vals[0], "yes") ||
+			     !strcmp(vals[0], "on") ||
+			     !strcmp(vals[0], "1"));
 	    }
-	    return (args[0][1] == 't' ? (s ? 1 : 2) : 0);
+	    return (args[0][1] == 't' ? (vals ? 1 : 2) : 0);
 	}
 	break;
     case 'm':
 	{
-	    Stypat s;
+	    char **vals;
 	    Patprog prog;
 
 	    tokenize(args[3]);
 
-	    if ((s = lookupstyle(args[1], args[2])) &&
+	    if ((vals = lookupstyle(args[1], args[2])) &&
 		(prog = patcompile(args[3], PAT_STATIC, NULL))) {
-		char **p = s->vals;
-
-		while (*p)
-		    if (pattry(prog, *p++))
+		while (*vals)
+		    if (pattry(prog, *vals++))
 			return 0;
 	    }
 	    return 1;
@@ -505,8 +574,150 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 
 /* Format stuff. */
 
+/*
+ * One chunk of text, to allow recursive handling of ternary
+ * expressions in zformat -f output.
+ *   instr	The input string.
+ *   specs	The format specifiers, specs[c] is the string from c:string
+ *   outp	*outp is the start of the output string
+ *   ousedp	(*outp)[*ousedp] is where to write next
+ *   olenp	*olenp is the size allocated for *outp
+ *   endchar    Terminator character in addition to `\0' (may be '\0')
+ *   skip	If 1, don't output, just parse.
+ */
+static char *zformat_substring(char* instr, char **specs, char **outp,
+			       int *ousedp, int *olenp, int endchar, int skip)
+{
+    char *s;
+
+    for (s = instr; *s && *s != endchar; s++) {
+	if (*s == '%') {
+	    int right, min = -1, max = -1, outl, testit;
+	    char *spec, *start = s;
+
+	    if ((right = (*++s == '-')))
+		s++;
+
+	    if (*s >= '0' && *s <= '9') {
+		for (min = 0; *s >= '0' && *s <= '9'; s++)
+		    min = (min * 10) + (int) STOUC(*s) - '0';
+	    }
+
+	    /* Ternary expressions */
+	    testit = (STOUC(*s) == '(');
+	    if (testit && s[1] == '-')
+	    {
+		/* Allow %(-1... etc. */
+		right = 1;
+		s++;
+	    }
+	    if ((*s == '.' || testit) && s[1] >= '0' && s[1] <= '9') {
+		for (max = 0, s++; *s >= '0' && *s <= '9'; s++)
+		    max = (max * 10) + (int) STOUC(*s) - '0';
+	    }
+	    else if (testit)
+		s++;
+
+	    if (testit && STOUC(*s)) {
+		int actval, testval, endcharl;
+
+		/*
+		 * One one number is useful for ternary expressions.
+		 * Remember to put the sign back.
+		 */
+		testval = (min >= 0) ? min : (max >= 0) ? max : 0;
+		if (right)
+		    testval *= -1;
+
+		if (specs[STOUC(*s)])
+		    actval = (int)mathevali(specs[STOUC(*s)]);
+		else
+		    actval = 0;
+		/* zero means values are equal, i.e. true */
+		actval -= testval;
+
+		/* careful about premature end of string */
+		if (!(endcharl = *++s))
+		    return NULL;
+
+		/*
+		 * Either skip true text and output false text, or
+		 * vice versa... unless we are already skipping.
+		 */
+		if (!(s = zformat_substring(s+1, specs, outp, ousedp,
+					    olenp, endcharl, skip || actval)))
+		    return NULL;
+		if (!(s = zformat_substring(s+1, specs, outp, ousedp,
+					    olenp, ')', skip || !actval)))
+		    return NULL;
+	    } else if (skip) {
+		continue;
+	    } else if ((spec = specs[STOUC(*s)])) {
+		int len;
+
+		if ((len = strlen(spec)) > max && max >= 0)
+		    len = max;
+		outl = (min >= 0 ? (min > len ? min : len) : len);
+
+		if (*ousedp + outl >= *olenp) {
+		    int nlen = *olenp + outl + 128;
+		    char *tmp = (char *) zhalloc(nlen);
+
+		    memcpy(tmp, *outp, *olenp);
+		    *olenp = nlen;
+		    *outp = tmp;
+		}
+		if (len >= outl) {
+		    memcpy(*outp + *ousedp, spec, outl);
+		    *ousedp += outl;
+		} else {
+		    int diff = outl - len;
+
+		    if (right) {
+			while (diff--)
+			    (*outp)[(*ousedp)++] = ' ';
+			memcpy(*outp + *ousedp, spec, len);
+			*ousedp += len;
+		    } else {
+			memcpy(*outp + *ousedp, spec, len);
+			*ousedp += len;
+			while (diff--)
+			    (*outp)[(*ousedp)++] = ' ';
+		    }
+		}
+	    } else {
+		int len = s - start + 1;
+
+		if (*ousedp + len >= *olenp) {
+		    int nlen = *olenp + len + 128;
+		    char *tmp = (char *) zhalloc(nlen);
+
+		    memcpy(tmp, *outp, *olenp);
+		    *olenp = nlen;
+		    *outp = tmp;
+		}
+		memcpy(*outp + *ousedp, start, len);
+		*ousedp += len;
+	    }
+	} else {
+	    if (skip)
+		continue;
+	    if (*ousedp + 1 >= *olenp) {
+		char *tmp = (char *) zhalloc((*olenp) << 1);
+
+		memcpy(tmp, *outp, *olenp);
+		*olenp <<= 1;
+		*outp = tmp;
+	    }
+	    (*outp)[(*ousedp)++] = *s;
+	}
+    }
+
+    return s;
+}
+
 static int
-bin_zformat(char *nam, char **args, char *ops, int func)
+bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char opt;
 
@@ -519,11 +730,13 @@ bin_zformat(char *nam, char **args, char *ops, int func)
     switch (opt) {
     case 'f':
 	{
-	    char **ap, *specs[256], *out, *s;
+	    char **ap, *specs[256], *out;
 	    int olen, oused = 0;
 
 	    memset(specs, 0, 256 * sizeof(char *));
 
+	    specs['%'] = "%";
+	    specs[')'] = ")";
 	    for (ap = args + 2; *ap; ap++) {
 		if (!ap[0][0] || ap[0][0] == '-' || ap[0][0] == '.' ||
 		    (ap[0][0] >= '0' && ap[0][0] <= '9') ||
@@ -535,80 +748,7 @@ bin_zformat(char *nam, char **args, char *ops, int func)
 	    }
 	    out = (char *) zhalloc(olen = 128);
 
-	    for (s = args[1]; *s; s++) {
-		if (*s == '%') {
-		    int right, min = -1, max = -1, outl;
-		    char *spec, *start = s;
-
-		    if ((right = (*++s == '-')))
-			s++;
-
-		    if (*s >= '0' && *s <= '9') {
-			for (min = 0; *s >= '0' && *s <= '9'; s++)
-			    min = (min * 10) + (int) STOUC(*s) - '0';
-		    }
-		    if (*s == '.' && s[1] >= '0' && s[1] <= '9') {
-			for (max = 0, s++; *s >= '0' && *s <= '9'; s++)
-			    max = (max * 10) + (int) STOUC(*s) - '0';
-		    }
-		    if ((spec = specs[STOUC(*s)])) {
-			int len;
-
-			if ((len = strlen(spec)) > max && max >= 0)
-			    len = max;
-			outl = (min >= 0 ? (min > len ? min : len) : len);
-
-			if (oused + outl >= olen) {
-			    int nlen = olen + outl + 128;
-			    char *tmp = (char *) zhalloc(nlen);
-
-			    memcpy(tmp, out, olen);
-			    olen = nlen;
-			    out = tmp;
-			}
-			if (len >= outl) {
-			    memcpy(out + oused, spec, outl);
-			    oused += outl;
-			} else {
-			    int diff = outl - len;
-
-			    if (right) {
-				while (diff--)
-				    out[oused++] = ' ';
-				memcpy(out + oused, spec, len);
-				oused += len;
-			    } else {
-				memcpy(out + oused, spec, len);
-				oused += len;
-				while (diff--)
-				    out[oused++] = ' ';
-			    }				
-			}
-		    } else {
-			int len = s - start + 1;
-
-			if (oused + len >= olen) {
-			    int nlen = olen + len + 128;
-			    char *tmp = (char *) zhalloc(nlen);
-
-			    memcpy(tmp, out, olen);
-			    olen = nlen;
-			    out = tmp;
-			}
-			memcpy(out + oused, start, len);
-			oused += len;
-		    }
-		} else {
-		    if (oused + 1 >= olen) {
-			char *tmp = (char *) zhalloc(olen << 1);
-
-			memcpy(tmp, out, olen);
-			olen <<= 1;
-			out = tmp;
-		    }
-		    out[oused++] = *s;
-		}
-	    }
+	    zformat_substring(args[1], specs, &out, &oused, &olen, '\0', 0);
 	    out[oused] = '\0';
 
 	    setsparam(args[0], ztrdup(out));
@@ -687,12 +827,14 @@ savematch(MatchData *m)
 {
     char **a;
 
+    queue_signals();
     a = getaparam("match");
     m->match = a ? zarrdup(a) : NULL;
     a = getaparam("mbegin");
     m->mbegin = a ? zarrdup(a) : NULL;
     a = getaparam("mend");
     m->mend = a ? zarrdup(a) : NULL;
+    unqueue_signals();
 }
 
 static void
@@ -1008,14 +1150,13 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
     setiparam(var1, point1);
     setiparam(var2, point2);
 
-    if (!*subj) {
-	if (sm->nullacts)
-	    for (ln = firstnode(sm->nullacts); ln; ln = nextnode(ln)) {
-	        char *action = getdata(ln);
+    if (!comp && !*subj && sm->nullacts) {
+	for (ln = firstnode(sm->nullacts); ln; ln = nextnode(ln)) {
+	    char *action = getdata(ln);
 
-		if (action)
-		    execstring(action, 1, 0);
-	    }
+	    if (action)
+		execstring(action, 1, 0);
+	}
 	return 0;
     }
 
@@ -1036,13 +1177,18 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 	    if (next->pattern && !next->patprog) {
 	        tokenize(next->pattern);
 		if (!(next->patprog = patcompile(next->pattern, 0, NULL)))
-		    return 2;
+		    return 3;
 	    }
 	    if (next->pattern && pattry(next->patprog, subj) &&
 		(!next->guard || (execstring(next->guard, 1, 0), !lastval))) {
 		LinkNode aln;
-		char **mend = getaparam("mend");
-		int len = atoi(mend[0]);
+		char **mend;
+		int len;
+
+		queue_signals();
+		mend = getaparam("mend");
+		len = atoi(mend[0]);
+		unqueue_signals();
 
 		for (i = len; i; i--)
 		  if (*subj++ == Meta)
@@ -1102,7 +1248,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 }
 
 /*
-  usage: zregexparse string regex...
+  usage: zregexparse [-c] var1 var2 string regex...
   status:
     0: matched
     1: unmatched (all next state candidates are failed)
@@ -1111,7 +1257,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 */
 
 static int
-bin_zregexparse(char *nam, char **args, char *ops, int func)
+bin_zregexparse(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int oldextendedglob = opts[EXTENDEDGLOB];
     char *var1 = args[0];
@@ -1137,7 +1283,7 @@ bin_zregexparse(char *nam, char **args, char *ops, int func)
 	ret = 0;
 
     if (!ret)
-	ret = rmatch(&result, subj, var1, var2, ops['c']);
+	ret = rmatch(&result, subj, var1, var2, OPT_ISSET(ops,'c'));
     popheap();
 
     opts[EXTENDEDGLOB] = oldextendedglob;
@@ -1265,10 +1411,10 @@ add_opt_val(Zoptdesc d, char *arg)
 }
 
 static int
-bin_zparseopts(char *nam, char **args, char *ops, int func)
+bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
-    char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL;
-    int del = 0, f;
+    char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL, **cp, **np;
+    int del = 0, f, extract = 0, keep = 0;
     Zoptdesc sopts[256], d;
     Zoptarr a, defarr = NULL;
     Zoptval v;
@@ -1295,6 +1441,22 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 		    break;
 		}
 		del = 1;
+		break;
+	    case 'E':
+		if (o[2]) {
+		    args--;
+		    o = NULL;
+		    break;
+		}
+		extract = 1;
+		break;
+	    case 'K':
+		if (o[2]) {
+		    args--;
+		    o = NULL;
+		    break;
+		}
+		keep = 1;
 		break;
 	    case 'a':
 		if (defarr) {
@@ -1327,12 +1489,18 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 		}
 		break;
 	    }
-	    if (!o)
+	    if (!o) {
+		o = "";
 		break;
+	    }
 	} else {
 	    args--;
 	    break;
 	}
+    }
+    if (!o) {
+	zwarnnam(nam, "missing option descriptions", NULL, 0);
+	return 1;
     }
     while ((o = dupstring(*args++))) {
 	if (!*o) {
@@ -1400,10 +1568,19 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 	if (!o[1])
 	    sopts[STOUC(*o)] = d;
     }
-    for (pp = pparams; (o = *pp); pp++) {
-	if (*o != '-')
-	    break;
+    np = cp = pp = ((extract && del) ? arrdup(pparams) : pparams);
+    for (; (o = *pp); pp++) {
+	if (*o != '-') {
+	    if (extract) {
+		if (del)
+		    *cp++ = o;
+		continue;
+	    } else
+		break;
+	}
 	if (!o[1] || (o[1] == '-' && !o[2])) {
+	    if (del && extract)
+		*cp++ = o;
 	    pp++;
 	    break;
 	}
@@ -1429,8 +1606,14 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 		} else
 		    add_opt_val(d, NULL);
 	    }
-	    if (!o)
-		break;
+	    if (!o) {
+		if (extract) {
+		    if (del)
+			*cp++ = *pp;
+		    continue;
+		} else
+		    break;
+	    }
 	} else {
 	    if (d->flags & ZOF_ARG) {
 		char *e = o + strlen(d->name) + 1;
@@ -1450,19 +1633,25 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 		add_opt_val(d, NULL);
 	}
     }
+    if (extract && del)
+	while (*pp)
+	    *cp++ = *pp++;
+
     for (a = opt_arrs; a; a = a->next) {
-	aval = (char **) zalloc((a->num + 1) * sizeof(char *));
-	for (ap = aval, v = a->vals; v; ap++, v = v->next) {
-	    if (v->str)
-		*ap = ztrdup(v->str);
-	    else {
-		*ap = ztrdup(v->name);
-		if (v->arg)
-		    *++ap = ztrdup(v->arg);
+	if (!keep || a->num) {
+	    aval = (char **) zalloc((a->num + 1) * sizeof(char *));
+	    for (ap = aval, v = a->vals; v; ap++, v = v->next) {
+		if (v->str)
+		    *ap = ztrdup(v->str);
+		else {
+		    *ap = ztrdup(v->name);
+		    if (v->arg)
+			*++ap = ztrdup(v->arg);
+		}
 	    }
+	    *ap = NULL;
+	    setaparam(a->name, aval);
 	}
-	*ap = NULL;
-	setaparam(a->name, aval);
     }
     if (assoc) {
 	int num;
@@ -1471,36 +1660,44 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 	    if (d->vals)
 		num++;
 
-	aval = (char **) zalloc(((num * 2) + 1) * sizeof(char *));
-	for (ap = aval, d = opt_descs; d; d = d->next) {
-	    if (d->vals) {
-		*ap++ = n = (char *) zalloc(strlen(d->name) + 2);
-		*n = '-';
-		strcpy(n + 1, d->name);
+	if (!keep || num) {
+	    aval = (char **) zalloc(((num * 2) + 1) * sizeof(char *));
+	    for (ap = aval, d = opt_descs; d; d = d->next) {
+		if (d->vals) {
+		    *ap++ = n = (char *) zalloc(strlen(d->name) + 2);
+		    *n = '-';
+		    strcpy(n + 1, d->name);
 
-		for (num = 1, v = d->vals; v; v = v->onext) {
-		    num += (v->arg ? strlen(v->arg) : 0);
-		    if (v->next)
-			num++;
-		}
-		*ap++ = n = (char *) zalloc(num);
-		for (v = d->vals; v; v = v->onext) {
-		    if (v->arg) {
-			strcpy(n, v->arg);
-			n += strlen(v->arg);
+		    for (num = 1, v = d->vals; v; v = v->onext) {
+			num += (v->arg ? strlen(v->arg) : 0);
+			if (v->next)
+			    num++;
 		    }
-		    *n = ' ';
+		    *ap++ = n = (char *) zalloc(num);
+		    for (v = d->vals; v; v = v->onext) {
+			if (v->arg) {
+			    strcpy(n, v->arg);
+			    n += strlen(v->arg);
+			}
+			*n = ' ';
+		    }
+		    *n = '\0';
 		}
-		*n = '\0';
 	    }
+	    *ap = NULL;
+	    sethparam(assoc, aval);
 	}
-	*ap = NULL;
-	sethparam(assoc, aval);
     }
     if (del) {
-	pp = zarrdup(pp);
-	freearray(pparams);
-	pparams = pp;
+	if (extract) {
+	    *cp = NULL;
+	    freearray(pparams);
+	    pparams = zarrdup(np);
+	} else {
+	    pp = zarrdup(pp);
+	    freearray(pparams);
+	    pparams = pp;
+	}
     }
     return 0;
 }
@@ -1515,9 +1712,9 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
-    zstyles = zlstyles = NULL;
+    zstyles = NULL;
 
     return 0;
 }
@@ -1539,7 +1736,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     freeallstyles();
 
