@@ -26,6 +26,8 @@ emulate -R zsh
 # unless there's one set, to minimise problems.
 [[ -n $LC_ALL ]] && LC_ALL=C
 [[ -n $LC_COLLATE ]] && LC_COLLATE=C
+[[ -n $LC_NUMERIC ]] && LC_NUMERIC=C
+[[ -n $LC_MESSAGES ]] && LC_MESSAGES=C
 [[ -n $LANG ]] && LANG=C
 
 # Set the module load path to correspond to this build of zsh.
