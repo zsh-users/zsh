@@ -1,0 +1,15 @@
+#autoload
+
+local expl
+
+case $OSTYPE in
+  aix*) _hosts "$@" ;;
+  darwin*|freebsd*|dragonfly*) _hosts "$@" ;;
+  irix*) _hosts "$@" ;;
+  # Couldn't find anything special for linux except for /proc/net/dev
+  # Is there any proc file which gives the formatted ip?
+  linux*) ;&
+  *)
+    _wanted bind-addresses expl 'bind address' compadd "$@" - \
+      ${${${(M)${(f)"$(ifconfig -a)"}:#*addr:*}##*addr:}%% *}
+esac

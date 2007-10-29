@@ -54,7 +54,7 @@ _ssh () {
     _arguments -C -s \
       '(-A)-a[disable forwarding of authentication agent connection]' \
       '(-a)-A[enables forwarding of the authentication agent connection]' \
-      '(-P)-b+[specify interface to transmit on]:bind address' \
+      '(-P)-b+[specify interface to transmit on]:bind address:_bind_addresses' \
       '-D+[specify a dynamic port forwarding]:port' \
       '-e+[set escape character]:escape character (or `none'"'"'):' \
       '(-n)-f[go to background]' \
@@ -75,6 +75,9 @@ _ssh () {
       '-V[show version number]' \
       '(-X)-x[disable X11 forwarding]' \
       '(-x)-X[enable X11 forwarding]' \
+      '-M[master mode for connection sharing]' \
+      '-S:path to control socket:_files' \
+      '-O:multiplex control command:(check exit)' \
       '*-L[specify local port forwarding]:local port forwarding:->forward' \
       '*-R[specify remote port forwarding]:remote port forwarding:->forward' \
       ':remote host name:->userhost' \
@@ -214,6 +217,13 @@ _ssh () {
           _description files expl 'xauth program'
           _files "$expl[@]" -g '*(-*)' && ret=0
           ;;
+	*(#i)controlmaster*)
+	  _wanted values expl 'truthish value' compadd yes no auto autoask && ret=0
+	  ;;
+	*(#i)controlpath*)
+          _description files expl 'path to control socket'
+          _files "$expl[@]" && ret=0
+	  ;;
         esac
       else
         _wanted values expl 'configure file option' \
@@ -223,13 +233,14 @@ _ssh () {
 		ChallengeResponseAuthentication CheckHostIP \
 		Cipher Ciphers ClearAllForwardings Compression \
                 CompressionLevel ConnectionAttempts ConnectTimeout \
+		ControlMaster ControlPath \
 		DynamicForward EnableSSHKeysign \
 		EscapeChar FallBackToRsh ForwardAgent ForwardX11 \
 		ForwardX11Trusted \
                 GatewayPorts GlobalKnownHostsFile GSSAPIAuthentication \
 		GSSAPIDelegateCredentials HostbasedAuthentication \
 		HostKeyAlgorithms HostKeyAlias HostName IdentityFile \
-		IdentitiesOnly \
+		IdentitiesOnly KbdInteractiveDevices \
 		KeepAlive KerberosAuthentication KerberosTgtPassing \
 		LocalForward LogLevel MACs NoHostAuthenticationForLocalhost \
 		NumberOfPasswordPrompts PreferredAuthentications \
@@ -312,14 +323,22 @@ _ssh_users () {
 
 _ssh_hosts () {
   local -a config_hosts
+  local config
+  integer ind
 
+  # If users-hosts matches, we shouldn't complete anything else.
   if [[ "$IPREFIX" == *@ ]]; then
-    _combination -s '[:@]' my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@"
+    _combination -s '[:@]' my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@" && return
   else
     _combination -s '[:@]' my-accounts users-hosts \
-      ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
+      ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@" && return
   fi
-  if [[ -r "$HOME/.ssh/config" ]]; then
+  if (( ind = ${words[(I)-F]} )); then
+    config=${~words[ind+1]}
+  else
+    config="$HOME/.ssh/config"
+  fi
+  if [[ -r $config ]]; then
     local IFS=$'\t ' key hosts host
     while read key hosts; do
       if [[ "$key" == (#i)host ]]; then
@@ -330,7 +349,7 @@ _ssh_hosts () {
 	    esac
 	 done
       fi
-    done < "$HOME/.ssh/config"
+    done < "$config"
     if (( ${#config_hosts} )); then
       _wanted hosts expl 'remote host name' \
 	compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" $config_hosts
