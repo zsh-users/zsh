@@ -536,7 +536,7 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
     /* Obsolescent sh compatibility: set - is the same as set +xv *
      * and set - args is the same as set +xv -- args              */
-    if (*args && **args == '-' && !args[0][1]) {
+    if (emulation != EMULATE_ZSH && *args && **args == '-' && !args[0][1]) {
 	dosetopt(VERBOSE, 0, 0);
 	dosetopt(XTRACE, 0, 0);
 	if (!args[1])
