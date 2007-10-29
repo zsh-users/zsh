@@ -1,3 +1,8 @@
+2007-10-29  Clint Adams  <clint@zsh.org>
+
+	* Markus Waldeck: 24032 (tweaked): Completion/Unix/Command/_cut:
+	completion for cut.
+
 2007-10-29  Peter Stephenson  <pws@csr.com>
 
 	* 24029: Src/Modules/curses.c: crashed on attempt to use
