@@ -1,4 +1,4 @@
-#compdef dchroot
+#compdef dchroot-dsa
 
 local expl context state line
 typeset -A opt_args
@@ -10,9 +10,8 @@ _arguments -S \
        '(-d --directory)'{-d,--directory=}'[directory to use]:dir:_files -W / -P /' \
        '(-l --list)'{-l,--list}'[list available chroots]' \
        '(-i --info)'{-i,--info}'[show information about selected chroots]' \
-       '(-p --path)'{-p,--path}'[print path to selected chroot]' \
+       '(-p --listpaths)'{-p,--listpaths}'[print paths to available chroots]' \
        '--config[dump configuration of selected chroots]' \
-       '(-d --preserve-environment)'{-d,--preserve-environment}'[preserve user environment]' \
        '(-q --quiet)'{-q,--quiet}'[quiet]' \
        '(-v --verbose)'{-v,--verbose}'[verbose]' \
        '(-V --version)'{-V,--version}'[version]' \
@@ -22,6 +21,6 @@ _arguments -S \
 case "$state" in
 	(chroot)
 	_wanted tag expl 'chroot' \
-	compadd ${(os:,:)${${${"$(dchroot -l )"#*: }// /}//[[\]]/,}}
+        compadd ${(os:,:)${${${"$(dchroot -l )"#*: }// /}//[[\]]/,}}
 	;;
 esac
