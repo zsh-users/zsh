@@ -383,12 +383,13 @@ tindex(capitalize-word-match)
 tindex(up-case-word-match)
 tindex(down-case-word-match)
 tindex(select-word-style)
+tindex(match-word-context)
 tindex(match-words-by-style)
 xitem(tt(forward-word-match), tt(backward-word-match))
 xitem(tt(kill-word-match), tt(backward-kill-word-match))
 xitem(tt(transpose-words-match), tt(capitalize-word-match))
 xitem(tt(up-case-word-match), tt(down-case-word-match))
-item(tt(select-word-style), tt(match-words-by-style))(
+item(tt(select-word-style), tt(match-word-context), tt(match-words-by-style))(
 The eight `tt(-match)' functions are drop-in replacements for the
 builtin widgets without the suffix.  By default they behave in a similar
 way.  However, by the use of styles and the function tt(select-word-style),
@@ -462,7 +463,7 @@ Words are whitespace-delimited strings of characters.
 )
 enditem()
 
-The first three of those styles usually use tt($WORDCHARS), but the value
+The first three of those rules usually use tt($WORDCHARS), but the value
 in the parameter can be overridden by the style tt(word-chars), which works
 in exactly the same way as tt($WORDCHARS).  In addition, the style
 tt(word-class) uses character class syntax to group characters and takes
@@ -473,7 +474,7 @@ alphanumerics plus the characters `tt(-)' and `tt(:)'.  Be careful
 including `tt(])', `tt(^)' and `tt(-)' as these are special inside
 character classes.
 
-The final style is tt(skip-chars).  This is mostly useful for
+The style tt(skip-chars) is mostly useful for
 tt(transpose-words) and similar functions.  If set, it gives a count of
 characters starting at the cursor position which will not be considered
 part of the word and are treated as space, regardless of what they actually
@@ -484,6 +485,16 @@ example(zstyle ':zle:transpose-words' skip-chars 1)
 has been set, and tt(transpose-words-match) is called with the cursor on
 the var(X) of tt(foo)var(X)tt(bar), where var(X) can be any character, then
 the resulting expression is tt(bar)var(X)tt(foo).
+
+Finer grained control can be obtained by setting the style tt(word-context)
+to an array of pairs of entries.  Each pair of entries consists of a
+var(pattern) and a var(subcontext).  The shell argument the cursor is on is
+matched against each var(pattern) in turn until one matches; if it does,
+the context is extended by a colon and the corresponding var(subcontext).
+Note that the test is made against the original word on the line, with no
+stripping of quotes.  If the cursor is at the end of the line the test is
+performed against an empty string; if it is on whitespace between words the
+test is made against a single space.  Some examples are given below.
 
 Here are some examples of use of the styles, actually taken from the
 simplified interface in tt(select-word-style):
@@ -499,6 +510,21 @@ example(style ':zle:*kill*' word-style space)
 
 Uses space-delimited words for widgets with the word `kill' in the name.
 Neither of the styles tt(word-chars) nor tt(word-class) is used in this case.
+
+Here are some examples of use of the tt(word-context) style to extend
+the context.
+
+example(zstyle ':zle:*' word-context "*/*" file "[[:space:]]" whitespace
+zstyle ':zle:transpose-words:whitespace' word-style shell
+zstyle ':zle:transpose-words:filename' word-style normal
+zstyle ':zle:transpose-words:filename' word-chars '')
+
+This provides two different ways of using tt(transpose-words) depending on
+whether the cursor is on whitespace between words or on a filename, here
+any word containing a tt(/).  On whitespace, complete arguments as defined
+by standard shell rules will be transposed.  In a filename, only
+alphanumerics will be transposed.  Elsewhere, words will be transposed
+using the default style for tt(:zle:transpose-words).
 
 The word matching and all the handling of tt(zstyle) settings is actually
 implemented by the function tt(match-words-by-style).  This can be used to
@@ -526,6 +552,10 @@ endsitem()
 
 For example, tt(match-words-by-style -w shell -c 0) may be used to
 extract the command argument around the cursor.
+
+The tt(word-context) style is implemented by the function
+tt(match-word-context).  This should not usually need to be called
+directly.
 )
 tindex(delete-whole-word-match)
 item(tt(delete-whole-word-match))(
