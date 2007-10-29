@@ -1374,10 +1374,6 @@ sed 's/\\\\\\\\/\//g' |
 $AWK '{ if ($1 ~ /\.h/) files[[$1]] = $1 }
   END { for (var in files) print var }'`"
 rm -f nametmp.c
-if x"$curses_list" = x; then
-  echo Failed
-  exit 1
-fi
 for CURSES_TRY_H in $curses_list /dev/null
 do
   nkeys=`test -f $CURSES_TRY_H && \
