@@ -5,12 +5,84 @@ cindex(completion, programmable)
 cindex(completion, controlling)
 sect(Description)
 
-This describes the shell code for the new completion system.  It consists
-of various shell functions; those beginning `tt(comp)' are to be called
-directly, while those beginning `tt(_)' are called by the
-completion code.  The shell functions of the second set, which implement
+This describes the shell code for the `new' completion system, referred
+to as tt(compsys).  It is written in shell functions based on the
+features described in
+ifzman(zmanref(zshcompwid))\
+ifnzman(the previous chapter, noderef(Completion Widgets)).
+
+The features are contextual, sensitive to the point at which completion is
+started.  Many completions are already provided.
+For this reason, a user can perform a great many tasks without
+knowing any details beyond how to initialize the system, which is
+described
+ifzman(below in INITIALIZATION)\
+ifnzman(in noderef(Initialization)).
+
+The context that decides what completion is to be performed may be
+startitemize()
+itemiz(\
+an argument or option position: these describe the position on the
+command line at which completion is requested.  For example `first argument
+to rmdir, the word being completed names a directory';
+)
+itemiz(\
+a special context, denoting an element in the shell's syntax.  For example
+`a word in command position' or `an array subscript'.
+)
+enditemize()
+
+A full context specification contains other elements, as we shall describe.
+
+Besides commands names and contexts, the system employs two more
+concepts, em(styles) and em(tags).  These provide ways for the user
+to configure the system's behaviour.
+
+Tags play a dual role.  They serve as a classification system for
+the matches, typically indicating a class of object that the user
+may need to distinguish.  For example, when completing arguments of the
+tt(ls) command the user may prefer to try tt(files) before tt(directories),
+so both of these are tags.  They also appear as the rightmost
+element in a context specification.
+
+Styles modify various operations of the completion system, such as
+output formatting, but also what kinds of completers are used (and in
+what order), or which tags are examined.  Styles may accept arguments
+and are manipulated using the tt(zstyle) command described in
+ifzman(see zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module)).
+
+In summary, tags describe em(what) the completion objects are, and style
+tt(how) they are to be completed.  At various points of execution, the
+completion system checks what styles and/or tags are defined for the
+current context, and uses that to modify its behavior.  The full
+description of context handling, which determines how tags and other
+elements of the context influence the behaviour of styles, is described
+ifzman(below in COMPLETION SYSTEM CONFIGURATION)\
+ifnzman(in noderef(Completion System Configuration)).
+
+When a completion is requested, a dispatcher function is called;
+see the description of tt(_main_complete) in the list of control functions
+below. This dispatcher decides which function should
+be called to produce the completions, and calls it. The result is
+passed to one or more em(completers), functions that implement
+individual completion strategies: simple completion, error correction,
+completion with error correction, menu selection, etc.
+
+More generally, the shell functions contained in the completion system are
+of two types:
+startitemize()
+itemiz(\
+those beginning `tt(comp)' are to be called directly; there are only
+a few of these;
+)
+itemiz(\
+those beginning `tt(_)' are called by the
+completion code.  The shell functions of this set, which implement
 completion behaviour and may be bound to keystrokes, are referred to
-as `widgets'.
+as `widgets'.  These proliferate as new completions are required.
+)
+enditemize()
 
 startmenu()
 menu(Initialization)
@@ -464,8 +536,9 @@ em(styles), context-sensitive options that can be used to configure the
 completion system.  The context used for lookup may vary during the same
 call to the completion system.
 
-The context string always consists of the following fields, separated
-by colons and with a leading colon before the first:
+The context string always consists of a fixed set of fields, separated
+by colons and with a leading colon before the first, in the form
+tt(:completion:)var(function)tt(:)var(completer)tt(:)var(command)tt(:)var(argument)tt(:)tt(tag).  These have the following meaning:
 
 startitemize()
 itemiz(\
@@ -510,13 +583,19 @@ this is only the case if the command line is parsed with standard
 UNIX-style options and arguments, so many completions do not set this.
 )
 itemiz(\
-The var(tag).  Tags are used to discriminate between the types
-of matches a completion function can generate in a certain context and
-are described further below.
+The var(tag).  As described previously, tags are used to discriminate between
+the types of matches a completion function can generate in a certain context.
+Any completion function may use any tag name it likes, but a list of the
+more common ones is given below.
 )
 enditemize()
 
-As an example, the context name
+The context is gradually put together as the functions are executed, starting
+with the main entry point, which adds tt(:completion:) and the var(function)
+element if necessary.  The completer then adds the var(completer) element.
+The contextual completion adds the var(command) and var(argument) options.
+Finally, the var(tag) is added when the types of completion are known.
+For example, the context name
 
 example(tt(:completion::complete:dvips:option-o-1:files))
 
@@ -527,12 +606,7 @@ example(tt(dvips -o ...))
 
 and the completion function will generate filenames.
 
-Each type of completion the system can perform in a given context is
-described by a `tag', a short descriptive string such as tt(files) in
-the example above.  Any completion function may use any tag name it
-likes, but a list of the more common ones is given below.
-
-Usually completion will be tried by all possible tags in an order given
+Usually completion will be tried for all possible tags in an order given
 by the completion function.  However, this can be altered by using the
 tt(tag-order) style.  Completion is then restricted to the list of given
 tags in the given order.
@@ -591,7 +665,7 @@ ifzman(see zmanref(zshcompwid))\
 ifnzman(noderef(Completion Widgets)))\
 ).  For example,
 
-example(tt(ztyle -e ':completion:*' hosts 'reply=($myhosts)'))
+example(tt(zstyle -e ':completion:*' hosts 'reply=($myhosts)'))
 
 This forces the value of the tt(hosts) style to be read from the
 variable tt(myhosts) each time a host name is needed; this is useful
