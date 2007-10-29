@@ -589,19 +589,15 @@ appear as the argument to a style; this requires some understanding of
 the internals of completion functions (see
 ifzman(see zmanref(zshcompwid))\
 ifnzman(noderef(Completion Widgets)))\
-).  For example:
+).  For example,
 
-example(zstyle -e ':completion:*' completer '
-    if [[ $words[1] = cvs ]]; then
-      reply=(_complete)
-    else
-      reply=(_complete _approximate)
-    fi')
+example(tt(ztyle -e ':completion:*' hosts 'reply=($myhosts)'))
 
-uses the value `tt(_complete)' for the tt(completer) style in most
-contexts, but the value `tt(_complete _approximate)' when the first word
-on the command line is `tt(cvs)'.  This is probably more conveniently done
-by specifying the style for two different contexts.  This form can be
+This forces the value of the tt(hosts) style to be read from the
+variable tt(myhosts) each time a host name is needed; this is useful
+if the value of tt(myhosts) can change dynamically.
+For another useful example, see the example in the description of the
+tt(file-list) style below.  This form can be
 slow and should be avoided for commonly examined styles such
 as tt(menu) and tt(list-rows-first).
 
@@ -3313,8 +3309,8 @@ This describes multiple arguments.  Only the last var(optarg) for
 an option taking multiple arguments may be
 given in this form.  If the var(pattern) is empty (i.e., tt(:*:)), all
 the remaining words on the line are to be completed as described by the
-var(action); otherwise, all the words up to a word matching the
-var(pattern) are to be completed using the var(action).
+var(action); otherwise, all the words up to and including a word matching
+the var(pattern) are to be completed using the var(action).
 
 Multiple colons are treated as for the `tt(*:)var(...)' forms for
 ordinary arguments:  when the var(message) is preceded by two colons,
