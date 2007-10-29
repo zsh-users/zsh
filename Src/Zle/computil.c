@@ -2285,6 +2285,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'M': min = 1; max =  1; break;
     case 'a': min = 0; max =  0; break;
     case 'W': min = 2; max =  2; break;
+    case 'n': min = 1; max =  1; break;
     default:
 	zwarnnam(nam, "invalid option: %s", args[0], 0);
 	return 1;
@@ -2578,6 +2579,20 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 	    sethparam(args[2], ret);
 	}
+	return 0;
+    case 'n':
+	/*
+	 * This returns the array index of the word where normal
+	 * arguments began.  It uses optbeg rather than nargbeg
+	 * (the value used when parsing) because nargbeg is assigned
+	 * to optbeg in the returned value and nargbeg isn't
+	 * used.
+	 *
+	 * -->PLEASE DON'T ASK<--
+	 *
+	 * Thank you.
+	 */
+	setiparam(args[1], (zlong)ca_laststate.optbeg + !isset(KSHARRAYS));
 	return 0;
     }
     return 1;
