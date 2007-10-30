@@ -22,6 +22,7 @@ xitem(tt(zcurses) tt(char) var(targetwin) var(character) )
 xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
 xitem(tt(zcurses) tt(attr) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) ] [...])
+xitem(tt(zcurses) tt(bg) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) | tt(@)var(char) ] [...])
 xitem(tt(zcurses) tt(scroll) [ tt(on) | tt(off) | {+/-}var(lines) ])
 xitem(tt(zcurses) tt(input) var(targetwin) [ var(param) [ var(kpparm) ] ])
 item(tt(zcurses) tt(timeout) var(targetwin) var(intval))(
@@ -42,7 +43,7 @@ window is created as a subwindow of var(parentwin).  This differs from an
 ordinary new window in that the memory of the window contents is shared
 with the parent's memory.  Subwindows must be deleted before their parent.
 Note that the coordinates of subwindows are relative to the screen, not
-the parent, as with other windows
+the parent, as with other windows.
 
 Use tt(delwin) to delete a window created with tt(addwin).  Note
 that tt(end) does em(not) implicitly delete windows, and that
@@ -105,6 +106,16 @@ for character output.  The color tt(default) is sometimes available
 (in particular if the library is ncurses), specifying the foreground
 or background color with which the terminal started.  The color pair
 tt(default/default) is always available.
+
+tt(bg) overrides the color and other attributes of all characters in the
+window.  Its usual use is to set the background initially, but it will
+overwrite the attributes of any characters at the time when it is called.
+In addition to the arguments allowed with tt(attr), an argument tt(@)var(char)
+specifies a character to be shown in otherwise blank areas of the window.
+Owing to limitations of curses this cannot be a multibyte character
+(use of ASCII characters only is recommended).  As the specified set
+of attributes override the existing background, turning attributes
+off in the arguments is not useful, though this does not cause an error.
 
 tt(scroll) can be used with tt(on) or tt(off) to enabled or disable
 scrolling of a window when the cursor would otherwise move below the

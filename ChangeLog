@@ -1,3 +1,8 @@
+2007-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24038: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c: add
+	"zcurses bg".
+
 2007-10-30  Peter Stephenson  <pws@csr.com>
 
 	* users/12149: Doc/Zsh/expn.yo, Src/subst.c,
