@@ -1,3 +1,10 @@
+2007-10-30  Peter Stephenson  <pws@csr.com>
+
+	* 24030, adapted: Src/Modules/curses.c: turning off a key timeout
+	on Solaris 8 seemed to need leaving and re-entering cbreak mode.
+	This can't be done per-window, so make this specific to Solaris
+	not using ncurses.
+
 2007-10-29  Clint Adams  <clint@zsh.org>
 
 	* Markus Waldeck: 24032 (tweaked): Completion/Unix/Command/_cut:

@@ -961,6 +961,18 @@ zccmd_timeout(const char *nam, char **args)
 	return 1;
     }
 
+#if defined(__sun__) && defined(__SVR4) && !defined(HAVE_USE_DEFAULT_COLORS)
+    /*
+     * On Solaris turning a timeout off seems to be problematic.
+     * The following fixes it.  We test for Solaris without ncurses
+     * (the last test) to be specific; this may turn up in other older
+     * versions of curses, but it's difficult to test for.
+     */
+    if (to < 0) {
+	nocbreak();
+	cbreak();
+    }
+#endif
     wtimeout(w->win, to);
     return 0;
 }
