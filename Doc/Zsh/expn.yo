@@ -960,6 +960,17 @@ separator var(string).  Note that a var(string) of two or more
 characters means that all of them must match in sequence; this differs from
 the treatment of two or more characters in the tt(IFS) parameter.
 See also the tt(=) flag and the tt(SH_WORD_SPLIT) option.
+
+For historical reasons, the usual behaviour that empty array elements
+are retained inside double quotes is disabled for arrays generated
+by splitting; hence the following:
+
+example(line="one::three"
+print -l "${(s.:.)line}")
+
+produces two lines of output for tt(one) and tt(three) and elides the
+empty field.  To override this behaviour, supply the "(@)" flag as well,
+i.e.  tt("${(@s.:.)line}").
 )
 enditem()
 

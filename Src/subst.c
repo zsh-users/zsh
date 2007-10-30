@@ -1260,13 +1260,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * parameter (the value v) to storing them in val and aval.
      * However, sometimes you find v reappearing temporarily.
      *
-     * The values -1 and 2 are special to isarr.  It looks like 2 is
-     * some kind of an internal flag to do with whether the array's been
-     * copied, in which case I don't know why we don't use the copied
-     * flag, but they do both occur close together so they presumably
-     * have different effects.  The value -1 is used to force us to
-     * keep an empty array.  It's tested in the YUK chunk (I mean the
-     * one explicitly marked as such).
+     * The values -1 and 2 are special to isarr.  The value -1 is used
+     * to force us to keep an empty array.  It's tested in the YUK chunk
+     * (I mean the one explicitly marked as such).  The value 2
+     * indicates an array has come from splitting a scalar.  We use
+     * that to override the usual rule that in double quotes we don't
+     * remove empty elements (so "${(s.:):-foo::bar}" produces two
+     * words).  This seems to me to be quite the wrong thing to do,
+     * but it looks like code may be relying on it.  So we require (@)
+     * as well before we keep the empty fields (look for assignments
+     * like "isarr = nojoin ? 1 : 2").
      */
     int isarr = 0;
     /*
@@ -2453,7 +2456,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    char *arr[2], **t, **a, **p;
 		    if (spsep || spbreak) {
 			aval = sepsplit(val, spsep, 0, 1);
-			isarr = 2;
+			isarr = nojoin ? 1 : 2;
 			l = arrlen(aval);
 			if (l && !*(aval[l-1]))
 			    l--;
@@ -2772,7 +2775,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    else if (!aval[1])
 		val = aval[0];
 	    else
-		isarr = 2;
+		isarr = nojoin ? 1 : 2;
 	}
 	if (isarr)
 	    l->list.flags |= LF_ARRAY;
@@ -2974,7 +2977,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    val = getdata(firstnode(list));
 	else {
 	    aval = hlinklist2array(list, 0);
-	    isarr = 2;
+	    isarr = nojoin ? 1 : 2;
 	    l->list.flags |= LF_ARRAY;
 	}
 	copied = 1;

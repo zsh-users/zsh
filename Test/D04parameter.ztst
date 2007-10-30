@@ -942,3 +942,35 @@
 >some
 >sunny
 >day
+
+  foo="line:with::missing::fields:in:it"
+  print -l ${(s.:.)foo}
+0:Removal of empty fields in unquoted splitting
+>line
+>with
+>missing
+>fields
+>in
+>it
+
+  foo="line:with::missing::fields:in:it"
+  print -l "${(s.:.)foo}"
+0:Hacky removal of empty fields in quoted splitting with no "@"
+>line
+>with
+>missing
+>fields
+>in
+>it
+
+  foo="line:with::missing::fields:in:it"
+  print -l "${(@s.:.)foo}"
+0:Retention of empty fields in quoted splitting with "@"
+>line
+>with
+>
+>missing
+>
+>fields
+>in
+>it

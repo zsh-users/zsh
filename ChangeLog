@@ -1,5 +1,11 @@
 2007-10-30  Peter Stephenson  <pws@csr.com>
 
+	* users/12149: Doc/Zsh/expn.yo, Src/subst.c,
+	Test/D04parameter.ztst:  "${(@s.:.)...}" retains empty
+	fields, although "${(s.:.)...}" remains backward compatible.
+
+2007-10-30  Peter Stephenson  <pws@csr.com>
+
 	* 24030, adapted: Src/Modules/curses.c: turning off a key timeout
 	on Solaris 8 seemed to need leaving and re-entering cbreak mode.
 	This can't be done per-window, so make this specific to Solaris
