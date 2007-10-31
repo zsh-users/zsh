@@ -3998,6 +3998,8 @@ addenv(Param pm, char *value)
       * the other branch?  If so, we don't actually need to
       * store pm->env at all, just a flag that the value was set.
       */
+     if (pm->env)
+         zsfree(pm->env);
      pm->env = newenv;
 #else
     /*
