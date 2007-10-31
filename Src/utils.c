@@ -2310,7 +2310,8 @@ spckword(char **s, int hist, int cmd, int ask)
 		fflush(shout);
 		zbeep();
 		x = getquery("nyae \t", 0);
-	    }
+	    } else
+		x = 'n';
 	} else
 	    x = 'y';
 	if (x == 'y' || x == ' ' || x == '\t') {
