@@ -1,3 +1,8 @@
+2007-10-31  Clint Adams  <clint@zsh.org>
+
+	* 24039: Completion/Unix/Command/_cut: cope with FreeBSD
+	cut in addition to GNU cut.
+
 2007-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24038: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c: add
