@@ -1,3 +1,8 @@
+2007-10-31  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/utils.c: Fixed the use of an uninitialized 'x'
+	in spckword() if shout is NULL.
+
 2007-10-31  Clint Adams  <clint@zsh.org>
 
 	* 24039: Completion/Unix/Command/_cut: cope with FreeBSD
