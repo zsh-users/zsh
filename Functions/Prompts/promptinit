@@ -166,7 +166,6 @@ Use prompt -h <theme> for help on specific themes.'
 }
 
 prompt () {
-  emulate -L zsh
   local prompt_opts
   
   set_prompt "$@"
