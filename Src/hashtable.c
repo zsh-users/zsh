@@ -1258,7 +1258,8 @@ add_userdir(int status, char *key, int keylen, char *val, int vallen, char *dumm
 
     if (vallen > keylen && *(p = val + keylen) == ':') {
 	*p++ = '\0';
-	if ((de = strrchr(p, ':'))) {
+	for (de = val + vallen - 1; *de != ':' && de > val; de--);
+	if (de > val) {
 	    *de = '\0';
 	    if ((d = strrchr(p, ':'))) {
 		if (*++d && val[0])

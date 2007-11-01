@@ -1,5 +1,8 @@
 2007-11-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 24048: Src/hashtable.c: fix home directory expansion with
+	NIS on Solaris
+
 	* Frank Benkstein: 24047: Completion/compinit: fix compdef
 	with more than three commands using the same service
 
