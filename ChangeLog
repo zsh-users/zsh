@@ -1,5 +1,8 @@
 2007-11-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 24050: configure.ac, Src/cond.c, Src/glob.c, Src/system.h:
+	handle nanosecond timestamps on systems that support them
+
 	* 24048: Src/hashtable.c: fix home directory expansion with
 	NIS on Solaris
 

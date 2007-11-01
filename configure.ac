@@ -977,6 +977,17 @@ if test x$zsh_cv_type_sigset_t = xno; then
   AC_DEFINE(sigset_t, unsigned int)
 fi
 
+dnl check structures for high resolution timestamps
+AC_CHECK_MEMBERS([struct stat.st_atim.tv_nsec,
+                  struct stat.st_atimespec.tv_nsec,
+                  struct stat.st_atimensec,
+                  struct stat.st_mtim.tv_nsec,
+                  struct stat.st_mtimespec.tv_nsec,
+                  struct stat.st_mtimensec,
+                  struct stat.st_ctim.tv_nsec,
+                  struct stat.st_ctimespec.tv_nsec,
+                  struct stat.st_ctimensec])
+
 dnl Check for struct timezone since some old SCO versions do not define it
 zsh_TYPE_EXISTS([
 #ifdef HAVE_SYS_TIME_H

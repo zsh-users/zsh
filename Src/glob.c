@@ -52,6 +52,18 @@ struct gmatch {
     long _mtime;
     long _ctime;
     long _links;
+#ifdef GET_ST_ATIME_NSEC
+    long ansec;
+    long _ansec;
+#endif
+#ifdef GET_ST_MTIME_NSEC
+    long mnsec;
+    long _mnsec;
+#endif
+#ifdef GET_ST_CTIME_NSEC
+    long cnsec;
+    long _cnsec;
+#endif
 };
 
 #define GS_NAME   1
@@ -373,6 +385,15 @@ insert(char *s, int checked)
 	    matchptr->mtime = buf.st_mtime;
 	    matchptr->ctime = buf.st_ctime;
 	    matchptr->links = buf.st_nlink;
+#ifdef GET_ST_ATIME_NSEC
+	    matchptr->ansec = GET_ST_ATIME_NSEC(buf);
+#endif
+#ifdef GET_ST_MTIME_NSEC
+	    matchptr->mnsec = GET_ST_MTIME_NSEC(buf);
+#endif
+#ifdef GET_ST_CTIME_NSEC
+	    matchptr->cnsec = GET_ST_CTIME_NSEC(buf);
+#endif
 	}
 	if (statted & 2) {
 	    matchptr->_size = buf2.st_size;
@@ -380,6 +401,15 @@ insert(char *s, int checked)
 	    matchptr->_mtime = buf2.st_mtime;
 	    matchptr->_ctime = buf2.st_ctime;
 	    matchptr->_links = buf2.st_nlink;
+#ifdef GET_ST_ATIME_NSEC
+	    matchptr->_ansec = GET_ST_ATIME_NSEC(buf);
+#endif
+#ifdef GET_ST_MTIME_NSEC
+	    matchptr->_mnsec = GET_ST_MTIME_NSEC(buf);
+#endif
+#ifdef GET_ST_CTIME_NSEC
+	    matchptr->_cnsec = GET_ST_CTIME_NSEC(buf);
+#endif
 	}
 	matchptr++;
 
@@ -885,12 +915,24 @@ gmatchcmp(Gmatch a, Gmatch b)
 	    break;
 	case GS_ATIME:
 	    r = a->atime - b->atime;
+#ifdef GET_ST_ATIME_NSEC
+            if (!r)
+              r = a->ansec - b->ansec;
+#endif
 	    break;
 	case GS_MTIME:
 	    r = a->mtime - b->mtime;
+#ifdef GET_ST_MTIME_NSEC
+            if (!r)
+              r = a->mnsec - b->mnsec;
+#endif
 	    break;
 	case GS_CTIME:
 	    r = a->ctime - b->ctime;
+#ifdef GET_ST_CTIME_NSEC
+            if (!r)
+              r = a->cnsec - b->cnsec;
+#endif
 	    break;
 	case GS_LINKS:
 	    r = b->links - a->links;
@@ -900,12 +942,24 @@ gmatchcmp(Gmatch a, Gmatch b)
 	    break;
 	case GS__ATIME:
 	    r = a->_atime - b->_atime;
+#ifdef GET_ST_ATIME_NSEC
+            if (!r)
+              r = a->_ansec - b->_ansec;
+#endif
 	    break;
 	case GS__MTIME:
 	    r = a->_mtime - b->_mtime;
+#ifdef GET_ST_MTIME_NSEC
+            if (!r)
+              r = a->_mnsec - b->_mnsec;
+#endif
 	    break;
 	case GS__CTIME:
 	    r = a->_ctime - b->_ctime;
+#ifdef GET_ST_CTIME_NSEC
+            if (!r)
+              r = a->_cnsec - b->_cnsec;
+#endif
 	    break;
 	case GS__LINKS:
 	    r = b->_links - a->_links;

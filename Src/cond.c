@@ -344,19 +344,39 @@ evalcond(Estate state, char *fromtest)
     case 'G':
 	return !((st = getstat(left)) && st->st_gid == getegid());
     case 'N':
+#if defined(GET_ST_MTIME_NSEC) && defined(GET_ST_ATIME_NSEC)
+	if (!(st = getstat(left)))
+	    return 1;
+        return (st->st_atime == st->st_mtime) ?
+        	GET_ST_ATIME_NSEC(*st) > GET_ST_MTIME_NSEC(*st) :
+        	st->st_atime > st->st_mtime;
+#else
 	return !((st = getstat(left)) && st->st_atime <= st->st_mtime);
+#endif
     case 't':
 	return !isatty(mathevali(left));
     case COND_NT:
     case COND_OT:
 	{
 	    time_t a;
+#ifdef GET_ST_MTIME_NSEC
+	    long nsecs;
+#endif
 
 	    if (!(st = getstat(left)))
 		return 1;
 	    a = st->st_mtime;
+#ifdef GET_ST_MTIME_NSEC
+	    nsecs = GET_ST_MTIME_NSEC(*st);
+#endif
 	    if (!(st = getstat(right)))
 		return 1;
+#ifdef GET_ST_MTIME_NSEC
+	    if (a == st->st_mtime) {
+                return !((ctype == COND_NT) ? nsecs > GET_ST_MTIME_NSEC(*st) :
+                        nsecs < GET_ST_MTIME_NSEC(*st));
+	    }
+#endif
 	    return !((ctype == COND_NT) ? a > st->st_mtime : a < st->st_mtime);
 	}
     case COND_EF:

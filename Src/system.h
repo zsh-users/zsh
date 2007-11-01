@@ -805,3 +805,24 @@ extern short ospeed;
 # define USE_GETPWUID
 #endif
 
+#ifdef HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC
+# define GET_ST_ATIME_NSEC(st) (st).st_atim.tv_nsec
+#elif HAVE_STRUCT_STAT_ST_ATIMESPEC_TV_NSEC
+# define GET_ST_ATIME_NSEC(st) (st).st_atimespec.tv_nsec
+#elif HAVE_STRUCT_STAT_ST_ATIMENSEC
+# define GET_ST_ATIME_NSEC(st) (st).st_atimensec
+#endif
+#ifdef HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC
+# define GET_ST_MTIME_NSEC(st) (st).st_mtim.tv_nsec
+#elif HAVE_STRUCT_STAT_ST_MTIMESPEC_TV_NSEC
+# define GET_ST_MTIME_NSEC(st) (st).st_mtimespec.tv_nsec
+#elif HAVE_STRUCT_STAT_ST_MTIMENSEC
+# define GET_ST_MTIME_NSEC(st) (st).st_mtimensec
+#endif
+#ifdef HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC
+# define GET_ST_CTIME_NSEC(st) (st).st_ctim.tv_nsec
+#elif HAVE_STRUCT_STAT_ST_CTIMESPEC_TV_NSEC
+# define GET_ST_CTIME_NSEC(st) (st).st_ctimespec.tv_nsec
+#elif HAVE_STRUCT_STAT_ST_CTIMENSEC
+# define GET_ST_CTIME_NSEC(st) (st).st_ctimensec
+#endif
