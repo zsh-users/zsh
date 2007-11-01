@@ -1,3 +1,8 @@
+2007-11-01  Oliver Kiddle  <opk@zsh.org>
+
+	* Frank Benkstein: 24047: Completion/compinit: fix compdef
+	with more than three commands using the same service
+
 2007-10-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 24045: Src/params.c: fix memory leak where old value of an

@@ -271,7 +271,7 @@ compdef() {
         if [[ "$1" = *\=* ]]; then
 	  cmd="${1%%\=*}"
 	  svc="${1#*\=}"
-          func="$_comps[${_services[(R)$svc]:-$svc}]"
+          func="$_comps[${_services[(r)$svc]:-$svc}]"
           [[ -n ${_services[$svc]} ]] &&
               svc=${_services[$svc]}
 	  [[ -z "$func" ]] &&
