@@ -34,12 +34,7 @@
 >baz
 >bar
 
-# some locales force case-insensitive sorting
- (LC_ALL=C; print -o a B c)
-0:case-sensitive argument sorting
->B a c
-
- (LC_ALL=C; print -io a B c)
+ print -io a B c
 0:case-insensitive argument sorting
 >a B c
 
@@ -268,20 +263,3 @@
  printf '%b\n' '\0123'
 0:printf handles \0... octal escapes in replacement text
 >S
-
- print -lO $'a' $'a\0' $'a\0b' $'a\0b\0' $'a\0b\0a' $'a\0b\0b' $'a\0c' |
- while read -r line; do
-    for (( i = 1; i <= ${#line}; i++ )); do
-      foo=$line[i]
-      printf "%02x" $(( #foo ))
-    done
-    print
- done
-0:sorting with embedded nulls
->610063
->6100620062
->6100620061
->61006200
->610062
->6100
->61
