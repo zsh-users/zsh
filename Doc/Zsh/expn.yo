@@ -650,7 +650,7 @@ characters corresponding to the resulting integer.  Note that this form is
 entirely distinct from use of the tt(#) without parentheses.
 )
 item(tt(%))(
-Expand all tt(%) escapes in the resulting words in the same way as in in
+Expand all tt(%) escapes in the resulting words in the same way as in
 prompts (see noderef(Prompt Expansion)). If this flag is given twice,
 full prompt expansion is done on the resulting words, depending on the
 setting of the tt(PROMPT_PERCENT), tt(PROMPT_SUBST) and tt(PROMPT_BANG)
