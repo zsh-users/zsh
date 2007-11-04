@@ -15,3 +15,4 @@ so_locations
 *.swp
 errnames.c errcount.h
 *.dll
+curses_keys.h

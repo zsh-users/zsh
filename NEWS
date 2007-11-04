@@ -45,6 +45,10 @@ Major changes between versions 4.2 and 4.3
   is present.  See the section FILENAME GENERATION in the zshexpn
   manual page.
 
+- Time comparisons on files when sorting or using test operators will
+  use high-resolution timestamps when available.  This gives a
+  resolution of a nanosecond instead of a second.
+
 - The idiom =(<<<...) is optimised so that the shell internally turns
   the ... into the contents of a file whose name is then substituted.
   The syntax has always been usable by means of the NULLCMD feature,
