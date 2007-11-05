@@ -1,0 +1,129 @@
+#compdef zip unzip zipinfo
+
+local suffixes suf zipfile uzi
+local expl curcontext="$curcontext" state line ret=1
+typeset -A opt_args
+
+case $service in
+  zip)
+    _arguments -C -s \
+      '-f[freshen: only changed files]' \
+      '-d[delete entries in zipfile]' \
+      '-r[recurse into directories]' \
+      '-R[PKZIP recursion]' \
+      '-q[quiet operation]' \
+      '-c[add one-line comments]' \
+      '-b[use "path" for temp file]:path for temporary archive:_files -/' \
+      '-@[read names from stdin]' \
+      '-F[fix zipfile]' \
+      '-FF[try harder to fix zipfile]' \
+      '-A[adjust self-extracting exe]' \
+      '-T[test zipfile integrity]' \
+      '-y[store symbolic links as the link instead of the referenced file]' \
+      '-e[encrypt]' \
+      '-h[show help]' \
+      '-u[update: only changed or new files]' \
+      '-m[move into zipfile (delete files)]' \
+      '-g[allow growing existing zipfile]' \
+      '-j[junk: do not record directory names]' \
+      '-l[convert LF to CR LF]' \
+      '-ll[convert CR LF to LF]' \
+      '-L[display license]' \
+      '-v[verbose operation/print version info]' \
+      '-z[add zipfile comment]' \
+      '-t[only do files after or at "mmddyyyy"]:mmddyyyy' \
+      '-tt[only do files before "mmddyyyy"]:mmddyyyy' \
+      '-o[make zipfile as old as latest entry]' \
+      '-D[do not add directory entries]' \
+      '-J[junk zip file prefix (unzipsfx)]' \
+      '-X[eXclude eXtra file attributes]' \
+      '-n[specify suffixes of files not to be compressed]:suffixes:->suffixes' \
+      '(   -1 -2 -3 -4 -5 -6 -7 -8 -9)-0[store only]' \
+      '(-0    -2 -3 -4 -5 -6 -7 -8 -9)-1[compress faster]' \
+      '(-0 -1    -3 -4 -5 -6 -7 -8 -9)-2' \
+      '(-0 -1 -2    -4 -5 -6 -7 -8 -9)-3' \
+      '(-0 -1 -2 -3    -5 -6 -7 -8 -9)-4' \
+      '(-0 -1 -2 -3 -4    -6 -7 -8 -9)-5' \
+      '(-0 -1 -2 -3 -4 -5    -7 -8 -9)-6' \
+      '(-0 -1 -2 -3 -4 -5 -6    -8 -9)-7' \
+      '(-0 -1 -2 -3 -4 -5 -6 -7    -9)-8' \
+      '(-0 -1 -2 -3 -4 -5 -6 -7 -8   )-9[compress better]' \
+      '-x[exclude the following names]' \
+      '-i[include only the following names]' \
+      "(-f -d -R -q -c -b -@ -F -FF -A -T -y -e -h -u -m -g -j -l -ll -L -v -z -t -tt -o -D -J -X -n -0 -1 -2 -3 -4 -5 -6 -7 -8 -9):zip file:_files -g '(#i)*.(zip|xpi|[ejw]ar)(-.)'" \
+      '*:file:->files' && ret=0
+  ;;
+  unzip)
+    _arguments -C -s \
+      '(-f -u -l -t -z -d)-p[extract files to pipe]' \
+      '(-p -u -l -t -z)-f[freshen existing files; create none]' \
+      '(-p -f -l -t -z)-u[update files; create if necessary]' \
+      '(-p -f -u -t -z -d)-l[list files]' \
+      '(-p -f -u -l -z -d)-t[test compressed archive data]' \
+      '(-p -f -u -l -t -d)-z[display archive comment]' \
+      '(-p -l -t -z)-d+[specify directory to extract files to]:directory:_files -/' \
+      '(-p -l -t -z -o)-n[never overwrite existing files]' \
+      '(-p -l -t -z -n)-o[overwrite files without prompting]' \
+      "(-p -l -t -z)-j[junk paths (don't make directories)]" \
+      '-C[match filenames case-insensitively]' \
+      '(-p -l -t -z)-X[restore UID/GID info]' \
+      '-q[quiet]' '-qq[quieter]' \
+      '(-l -t -z)-a[auto-convert any text files]' \
+      '(-l -t -z)-aa[treat all files as text]' \
+      '-v[verbose/display version info]' \
+      '(-p -z)-L[lowercase (some) filenames]' \
+      '-M[page output]' \
+      '-x[exclude the following names]' \
+      '-Z[zipinfo mode]:zipinfomode:->zipinfo' \
+      "(-p -f -u -l -t -z -n -o -j -C -X -q -qq -a -aa -v -L -M)1:zip file:_files -g '(#i)*.(zip|xpi|[ejw]ar)(-.)'" \
+      '*:file:->files' && ret=0
+  ;;
+esac
+
+[[ $state == zipinfo ]] && uzi="-Z[zipinfo mode]"
+
+if [[ $service == zipinfo ]] || [[ -n $uzi ]]; then
+    _arguments -C -s \
+      $uzi \
+      '(-2 -s -m -l -v -h -t -T -z)-1[filenames only]' \
+      '(-1 -s -m -l -v -T)-2[just filenames but allow -h/-t/-z]' \
+      '(-1 -2 -m -l -v -h -t)-s[short format]' \
+      '(-1 -2 -s -l -v -h -t)-m[medium format]' \
+      '(-1 -2 -s -m -v -h -t)-l[long format]' \
+      '(-1 -2 -s -m -l -h -z)-v[verbose, multi-page format]' \
+      '(-1 -s -m -l -v)-h[print header line]' \
+      '(-1 -v)-z[print zipfile comment]' \
+      '-C[match filenames case-insensitively]' \
+      '(-1 -s -m -l)-t[print totals]' \
+      '(-1 -2)-T[use sortable decimal format for file times]' \
+      '-M[page output]' \
+      '-x[exclude the following names]' \
+      "(-1 -2 -s -m -l -v -h -z -C -t -T -M)1:zip file:_files -g '(#i)*.(zip|xpi|[ejw]ar)(-.)'" \
+      '*:file:->files' && ret=0
+fi
+
+case $state in
+  suffixes)
+    compset -P '*:'
+    compset -S ':*' || suf=":."
+    suffixes=( *.*(N:e) )
+    _wanted suffixes expl suffixes \
+	compadd -S "$suf" -r ": \t" .$^suffixes && return
+  ;;
+  files)
+    if [[ $service = zip ]] && (( ! ${+opt_args[-d]} )); then
+      _wanted files expl zfile _files -g '^(#i)*.(zip|xpi|[ejw]ar)(-.)' && return
+    else
+      zipfile=( $~line[1](|.zip|.ZIP) )
+      [[ -z $zipfile[1] ]] && return 1
+      if [[ $zipfile[1] !=  $_zip_cache_list ]]; then
+	_zip_cache_name="$zipfile[1]"
+	_zip_cache_list=( ${(f)"$(zipinfo -1 $_zip_cache_name)"} )
+      fi
+     _wanted files expl 'file from archive' \
+	 _multi_parts / _zip_cache_list && return
+    fi
+  ;;
+esac
+
+return ret
