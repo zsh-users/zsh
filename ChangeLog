@@ -1,3 +1,8 @@
+2007-11-04  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync:  Added new options
+	for the upcoming 3.0.0 release of rsync.
+
 2007-11-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* c.f. 24050: NEWS: note high resolution timestamps.
