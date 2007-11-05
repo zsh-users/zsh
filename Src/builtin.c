@@ -4229,6 +4229,7 @@ zexit(int val, int from_where)
 #endif
 	}
     }
+    lastval = val;
     if (sigtrapped[SIGEXIT])
 	dotrap(SIGEXIT);
     runhookdef(EXITHOOK, NULL);
