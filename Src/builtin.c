@@ -4186,6 +4186,10 @@ zexit(int val, int from_where)
 {
     static int in_exit;
 
+    /* Don't do anything recursively:  see below */
+    if (in_exit == -1)
+	return;
+
     if (isset(MONITOR) && !stopmsg && from_where != 1) {
 	scanjobs();    /* check if jobs need printing           */
 	if (isset(CHECKJOBS))
@@ -4195,8 +4199,15 @@ zexit(int val, int from_where)
 	    return;
 	}
     }
+    /* Positive in_exit means we have been here before */
     if (from_where == 2 || (in_exit++ && from_where))
 	return;
+
+    /*
+     * We're now committed to exiting.  Set in_exit to -1 to
+     * indicate we shouldn't do any recursive processing.
+     */
+    in_exit = -1;
 
     if (isset(MONITOR)) {
 	/* send SIGHUP to any jobs left running  */

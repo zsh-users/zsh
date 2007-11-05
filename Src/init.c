@@ -131,6 +131,15 @@ loop(int toplevel, int justonce)
 		(tok == LEXERR && (!isset(SHINSTDIN) || !toplevel)) ||
 		justonce)
 		break;
+	    if (exit_pending) {
+		/*
+		 * Something down there (a ZLE function?) decided
+		 * to exit when there was stuff to clear up.
+		 * Handle that now.
+		 */
+		stopmsg = 1;
+		zexit(exit_pending >> 1, 0);
+	    }
 	    if (tok == LEXERR && !lastval)
 		lastval = 1;
 	    continue;
