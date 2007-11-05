@@ -1,0 +1,44 @@
+# compdef yafc
+
+_yafc() {
+    local arguments
+    arguments=(
+    '(--anon -a)'{--anon,-a}'[Try an anonymous login]'
+    '(--debug -d)'{--debug,-d}'[Print all messages to/from server]'
+    '(--dump-rc -D)'{--dump-rc,-D}'[Print the default configuration file]'
+    '(--mechanism -m)'{--mechanism=-,-m}'[specify a security mechanism]:security mechanism:(krb4, krb5, none)'
+    '(--norc -n)'{--norc,-n}'[Do not read the users configuration file]'
+    '(--noproxy -p)'{--noproxy,-p}'[Do not connect via the proxy]'
+    '(--quiet -q)'{--quiet,-q}'[Do not print the welcome message]'
+    '(--rcfile -r)'{--rcfile=-,-r}'[Specify a configuration file]:configuration file:_files'
+    '(--trace -t)'{--trace=-,-t-}'[Specify a trace file]:trace file:_files'
+    '(--noauto -u)'{--noauto,-u}'[Do not login automagically]'
+    '(--noalias -U)'{--noalias,-U}'[As --noauto, but bookmark aliases is disabled]'
+    '(--verbose -v)'{--verbose,-v}'[print all responses received]'
+    '(--wait -w)'{--wait,-w=}'[Specify a waiting time between connection attempts]:wait time: '
+    '(--workdir -W)'{--workdir=,-W+}'[Use a different working directory]:working directory:_directories'
+    '(--version -V)'{--version,-V}'[Print version information]'
+    '(--help -h)'{--help,-h}'[Print a short help description]'
+    '*:address:_yafc_address'
+    )
+
+    _arguments -S -s $arguments
+}
+
+ (( $+functions[_yafc_bookmarks] )) ||
+_yafc_bookmarks() {
+    local bkmfile=~/.yafc/bookmarks
+    
+    if [[ -f $bkmfile ]]; then
+        local -a bkms
+        bkms=(${${${(M)"${(f)$(<$bkmfile)}":#machine*alias ##\'*\' #}##machine*alias ##\'}%%\' #}) #" vim syntax goes crazy
+        _wanted bookmarks expl 'bookmarks' compadd "$@" -a - bkms
+    fi
+}
+
+ (( $+functions[_yafc_address] )) ||
+_yafc_address() {
+  _alternative 'bookmarks:bookmark:_yafc_bookmarks' '_hosts'
+}
+
+_yafc "$@"
