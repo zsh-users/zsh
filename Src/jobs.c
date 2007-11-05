@@ -1742,9 +1742,21 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	case BIN_WAIT:
 	    if (func == BIN_BG)
 		jobtab[job].stat |= STAT_NOSTTY;
-	    if ((stopped = (jobtab[job].stat & STAT_STOPPED)))
+	    if ((stopped = (jobtab[job].stat & STAT_STOPPED))) {
 		makerunning(jobtab + job);
-	    else if (func == BIN_BG) {
+		if (func == BIN_BG) {
+		    /* Set $! to indicate this was backgrounded */
+		    Process pn = jobtab[job].procs;
+		    for (;;) {
+			Process next = pn->next;
+			if (!next) {
+			    lastpid = (zlong) pn->pid;
+			    break;
+			}
+			pn = next;
+		    }
+		}
+	    } else if (func == BIN_BG) {
 		/* Silly to bg a job already running. */
 		zwarnnam(name, "job already in background", NULL, 0);
 		thisjob = ocj;
