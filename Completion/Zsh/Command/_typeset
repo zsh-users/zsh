@@ -1,0 +1,99 @@
+#compdef autoload declare export functions integer float local readonly typeset
+
+local expl state line func i use curcontext="$curcontext"
+local fopts="-f -k -z"
+local popts="-A -E -F -L -R -T -Z -a -g -h -H -i -l -r -x"
+local -A allargs opt_args
+local -a args
+
+allargs=(
+  A "($fopts -E -F -L -R -T -U -Z -a -i -m)-A[specify that arguments refer to associative arrays]"
+  E "($fopts -A -F -L -R -T -U -Z -a -i -m)-E[floating point, use engineering notation on output]"
+  F "($fopts -A -E -L -R -T -U -Z -a -i -m)-F[floating point, use fixed point decimal on output]"
+  L "($fopts -A -E -F -i)-L+[left justify and remove leading blanks from value]:width"
+  R "($fopts -A -E -F -i)-R+[right justify and fill with leading blanks]:width"
+  T "($fopts -A -E -F -a -g -h -i -l -m -t)-T[tie scalar to array]"
+  U '(-A -E -F -i)-U[keep array values unique and suppress alias expansion for functions]'
+  Uf '-U[suppress alias expansion for functions]'
+  Up '(-E -F -i)-+U[keep array values unique]'
+  X '+X[immediately autoload function]'
+  Z "($fopts -A -E -F -i)-Z+[right justify and fill with leading zeros]:width"
+  a "($fopts -A -E -F -T -i)-a[specify that arguments refer to arrays]"
+  f "($popts)-f[specify that arguments refer to functions]"
+  g "($fopts -T)-+g[do not restrict parameter to local scope]"
+  h "($fopts -T)-+h[hide specialness of parameter]"
+  H "($fopts -T)-+H[hide value of parameter in listings]"
+  i "($fopts -A -E -F -T)-+i[represent internally as an integer]"
+  k "($popts -w -z)-+k[mark function for ksh-style autoloading]"
+  l "($popts -T)-l[convert the value to lowercase]"
+  m '(-A -E -F -T -i)-m[treat arguments as patterns]'
+  p '-p[output parameters in form of calls to typeset]'
+  r '(-f)-+r[mark parameters as readonly]'
+  t '(-T)-+t[tag parameters and turn on execution tracing for functions]'
+  tf '(-T)-+t[turn on execution tracing for functions]'
+  tp '(-T)-+t[tag parameters]'
+  u '-u[convert the value to uppercase or mark function for autoloading]'
+  uf '-u[mark function for autoloadling]'
+  up '-u[convert the value to uppercase]'
+  w '(-k -z)-w[specify that arguments refer to files compiled with zcompile]'
+  x "($fopts)-+x[export parameter]"
+  z "($popts -k -w)-+z[mark function for zsh-style autoloading]"
+)
+
+use="AEFHLRTUZafghiklmprtuxz"
+
+case ${service} in
+  autoload)
+    use="UXktwz"
+    func=f
+  ;;
+  float) use="EFHghlprtux";;
+  functions)
+    use="Ukmtuz"
+    func=f
+  ;;
+  integer)
+    use="Hghilprtux"
+    allargs[i]='-i[specify arithmetic base for output]' \
+  ;;
+  readonly) use="${use/r/}" ;;
+  local) use="${use/[fkz]/}" ;&
+  export) use="${${use//[gkz]/}/x/}" ;;
+esac
+
+[[ -z "${words[(r)-*[aA]*]}" ]] || func=p
+[[ -z "${words[(r)-*f*]}" ]] || func=f
+
+for ((i=1;i<=$#use;++i)); do
+  args+=( ${allargs[${use[$i]}${${(s::)use[$i]}[(r)[Uut]]:+$func}]} )
+done
+
+_arguments -C -s -A "-*" -S "${args[@]}" '*::vars:= ->vars_eq'
+
+if [[ "$state" = vars_eq ]]; then
+  if [[ $func = f ]]; then
+    if (( $+opt_args[-w] ));then
+      _wanted files expl 'zwc file' _files -g '*.zwc(-.)'
+    elif [[ $service = autoload || -n $opt_args[(i)-[uU]] ]]; then
+      args=(${^fpath}/*(:t))
+      # Filter out functions already loaded or marked for autoload.
+      args=(${args:#(${(kj.|.)~functions})})
+      _wanted functions expl 'shell function' compadd -a args
+    else
+      _functions
+    fi
+  elif [[ "$PREFIX" = *\=* ]]; then
+    compstate[parameter]="${PREFIX%%\=*}"
+    compset -P 1 '*='
+    _value
+  elif (( $+opt_args[-a] || $+opt_args[-A] )); then
+    _parameters -q
+  elif (( $+opt_args[-T] )); then
+    _arguments \
+      ':scalar parameter:_parameters -g "*scalar*" -q -S "="' \
+      ':array parameter:_parameters -g "*array*"' \
+      ':separator character'
+  else
+    _parameters -q -S '='
+  fi
+fi
