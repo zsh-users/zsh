@@ -252,14 +252,11 @@ The value of tt($?) at the start of execution is the exit status of the
 shell or the return status of the function exiting.
 )
 findex(TRAPZERR)
-findex(TRAPERR)
 item(tt(TRAPZERR))(
 Executed whenever a command has a non-zero exit status.  However, the
 function is not executed if the command occurred in a sublist followed by
 `tt(&&)' or `tt(||)'; only the final command in a sublist of this type
-causes the trap to be executed.  The function tt(TRAPERR) acts the same as
-tt(TRAPZERR) on systems where there is no tt(SIGERR) (this is the usual
-case).
+causes the trap to be executed.
 )
 enditem()
 
