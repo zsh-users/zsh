@@ -1,3 +1,8 @@
+2007-11-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 24048: Src/hashtable.c: fix home directory expansion with
+	NIS on Solaris
+
 2007-05-10  Peter Stephenson  <pws@csr.com>
 
 	* Peter A. Castro: 23408: zftp account handling was broken.

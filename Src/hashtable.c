@@ -92,11 +92,11 @@ hasher(char *str)
 
 /**/
 mod_export HashTable
-newhashtable(int size, char const *name, PrintTableStats printinfo)
+newhashtable(int size, UNUSED(char const *name), UNUSED(PrintTableStats printinfo))
 {
     HashTable ht;
 
-    ht = (HashTable) zcalloc(sizeof *ht);
+    ht = (HashTable) zshcalloc(sizeof *ht);
 #ifdef ZSH_HASH_DEBUG
     ht->next = NULL;
     if(!firstht)
@@ -108,7 +108,7 @@ newhashtable(int size, char const *name, PrintTableStats printinfo)
     ht->printinfo = printinfo ? printinfo : printhashtabinfo;
     ht->tablename = ztrdup(name);
 #endif /* ZSH_HASH_DEBUG */
-    ht->nodes = (HashNode *) zcalloc(size * sizeof(HashNode));
+    ht->nodes = (HashNode *) zshcalloc(size * sizeof(HashNode));
     ht->hsize = size;
     ht->ct = 0;
     ht->scan = NULL;
@@ -156,7 +156,7 @@ addhashnode(HashTable ht, char *nam, void *nodeptr)
 	ht->freenode(oldnode);
 }
 
-/* Add a node to a hash table, returning the old node on replacment. */
+/* Add a node to a hash table, returning the old node on replacement. */
 
 /**/
 HashNode
@@ -315,7 +315,7 @@ removehashnode(HashTable ht, char *nam)
 
 /**/
 void
-disablehashnode(HashNode hn, int flags)
+disablehashnode(HashNode hn, UNUSED(int flags))
 {
     hn->flags |= DISABLED;
 }
@@ -324,7 +324,7 @@ disablehashnode(HashNode hn, int flags)
 
 /**/
 void
-enablehashnode(HashNode hn, int flags)
+enablehashnode(HashNode hn, UNUSED(int flags))
 {
     hn->flags &= ~DISABLED;
 }
@@ -458,7 +458,7 @@ expandhashtable(HashTable ht)
     onodes = ht->nodes;
 
     ht->hsize = osize * 4;
-    ht->nodes = (HashNode *) zcalloc(ht->hsize * sizeof(HashNode));
+    ht->nodes = (HashNode *) zshcalloc(ht->hsize * sizeof(HashNode));
     ht->ct = 0;
 
     /* scan through the old list of nodes, and *
@@ -496,7 +496,7 @@ resizehashtable(HashTable ht, int newsize)
      * we free it and allocate a new nodes array.          */
     if (ht->hsize != newsize) {
 	zfree(ht->nodes, ht->hsize * sizeof(HashNode));
-	ht->nodes = (HashNode *) zcalloc(newsize * sizeof(HashNode));
+	ht->nodes = (HashNode *) zshcalloc(newsize * sizeof(HashNode));
 	ht->hsize = newsize;
     } else {
 	/* else we just re-zero the current nodes array */
@@ -557,14 +557,17 @@ printhashtabinfo(HashTable ht)
 
 /**/
 int
-bin_hashinfo(char *nam, char **args, char *ops, int func)
+bin_hashinfo(char *nam, char **args, Options ops, int func)
 {
     HashTable ht;
+
     printf("----------------------------------------------------\n");
+    queue_signals();
     for(ht = firstht; ht; ht = ht->next) {
 	ht->printinfo(ht);
 	printf("----------------------------------------------------\n");
     }
+    unqueue_signals();
     return 0;
 }
 
@@ -627,21 +630,21 @@ hashdir(char **dirp)
     Cmdnam cn;
     DIR *dir;
     char *fn;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
     char *exe;
-#endif
+#endif /* _WIN32 || _CYGWIN__ */
 
     if (isrelative(*dirp) || !(dir = opendir(unmeta(*dirp))))
 	return;
 
     while ((fn = zreaddir(dir, 1))) {
 	if (!cmdnamtab->getnode(cmdnamtab, fn)) {
-	    cn = (Cmdnam) zcalloc(sizeof *cn);
+	    cn = (Cmdnam) zshcalloc(sizeof *cn);
 	    cn->flags = 0;
 	    cn->u.name = dirp;
 	    cmdnamtab->addnode(cmdnamtab, ztrdup(fn), cn);
 	}
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
 	/* Hash foo.exe as foo, since when no real foo exists, foo.exe
 	   will get executed by DOS automatically.  This quiets
 	   spurious corrections when CORRECT or CORRECT_ALL is set. */
@@ -651,13 +654,13 @@ hashdir(char **dirp)
 	    (exe[3] == 'E' || exe[3] == 'e') && exe[4] == 0) {
 	    *exe = 0;
 	    if (!cmdnamtab->getnode(cmdnamtab, fn)) {
-		cn = (Cmdnam) zcalloc(sizeof *cn);
+		cn = (Cmdnam) zshcalloc(sizeof *cn);
 		cn->flags = 0;
 		cn->u.name = dirp;
 		cmdnamtab->addnode(cmdnamtab, ztrdup(fn), cn);
 	    }
 	}
-#endif /* _WIN32 */
+#endif /* _WIN32 || __CYGWIN__ */
     }
     closedir(dir);
 }
@@ -667,7 +670,7 @@ hashdir(char **dirp)
 
 /**/
 static void
-fillcmdnamtable(HashTable ht)
+fillcmdnamtable(UNUSED(HashTable ht))
 {
     char **pq;
  
@@ -734,6 +737,13 @@ printcmdnamnode(HashNode hn, int printflags)
 	return;
     }
 
+    if (printflags & PRINT_LIST) {
+	printf("hash ");
+
+	if(cn->nam[0] == '-')
+	    printf("-- ");
+    }
+
     if (cn->flags & HASHED) {
 	quotedzputs(cn->nam, stdout);
 	putchar('=');
@@ -784,16 +794,17 @@ createshfunctable(void)
 
 /**/
 static HashNode
-removeshfuncnode(HashTable ht, char *nam)
+removeshfuncnode(UNUSED(HashTable ht), char *nam)
 {
     HashNode hn;
+    int signum;
 
-    if ((hn = removehashnode(shfunctab, nam))) {
-	if (!strncmp(hn->nam, "TRAP", 4))
-	    unsettrap(getsignum(hn->nam + 4));
-	return hn;
-    } else
-	return NULL;
+    if (!strncmp(nam, "TRAP", 4) && (signum = getsignum(nam + 4)) != -1)
+	hn = removetrap(signum);
+    else
+	hn = removehashnode(shfunctab, nam);
+
+    return hn;
 }
 
 /* Disable an entry in the shell function hash table.    *
@@ -802,7 +813,7 @@ removeshfuncnode(HashTable ht, char *nam)
 
 /**/
 static void
-disableshfuncnode(HashNode hn, int flags)
+disableshfuncnode(HashNode hn, UNUSED(int flags))
 {
     hn->flags |= DISABLED;
     if (!strncmp(hn->nam, "TRAP", 4)) {
@@ -819,14 +830,13 @@ disableshfuncnode(HashNode hn, int flags)
 
 /**/
 static void
-enableshfuncnode(HashNode hn, int flags)
+enableshfuncnode(HashNode hn, UNUSED(int flags))
 {
     Shfunc shf = (Shfunc) hn;
-    int signum;
 
     shf->flags &= ~DISABLED;
     if (!strncmp(shf->nam, "TRAP", 4)) {
-	signum = getsignum(shf->nam + 4);
+	int signum = getsignum(shf->nam + 4);
 	if (signum != -1) {
 	    settrap(signum, shf->funcdef);
 	    sigtrapped[signum] |= ZSIG_FUNC;
@@ -853,7 +863,7 @@ static void
 printshfuncnode(HashNode hn, int printflags)
 {
     Shfunc f = (Shfunc) hn;
-    char *t;
+    char *t = 0;
  
     if ((printflags & PRINT_NAMEONLY) ||
 	((printflags & PRINT_WHENCE_SIMPLE) &&
@@ -871,27 +881,35 @@ printshfuncnode(HashNode hn, int printflags)
 	return;
     }
  
-    if (f->flags & PM_UNDEFINED)
-	t = tricat("builtin autoload -X",
-		   ((f->flags & PM_UNALIASED)? "U" : ""),
-		   ((f->flags & PM_TAGGED)? "t" : ""));
-    else {
-	if (!f->funcdef)
-	    t = 0;
-	else
-	    t = getpermtext(f->funcdef, NULL);
-    }
-
     quotedzputs(f->nam, stdout);
-    if (t) {
+    if (f->funcdef || f->flags & PM_UNDEFINED) {
 	printf(" () {\n\t");
 	if (f->flags & PM_UNDEFINED)
 	    printf("%c undefined\n\t", hashchar);
+	else
+	    t = getpermtext(f->funcdef, NULL);
 	if (f->flags & PM_TAGGED)
 	    printf("%c traced\n\t", hashchar);
-	zputs(t, stdout);
+	if (!t) {
+	    char *fopt = "Utkz";
+	    int flgs[] = {
+		PM_UNALIASED, PM_TAGGED, PM_KSHSTORED, PM_ZSHSTORED, 0
+	    };
+	    int fl;;
+
+	    zputs("builtin autoload -X", stdout);
+	    for (fl=0;fopt[fl];fl++)
+		if (f->flags & flgs[fl]) putchar(fopt[fl]);
+	} else {
+	    zputs(t, stdout);
+	    zsfree(t);
+	    if (f->funcdef->flags & EF_RUN) {
+		printf("\n\t");
+		quotedzputs(f->nam, stdout);
+		printf(" \"$@\"");
+	    }
+	}   
 	printf("\n}\n");
-	zsfree(t);
     } else {
 	printf(" () { }\n");
     }
@@ -910,7 +928,7 @@ static struct reswd reswds[] = {
     {NULL, "}", 0, OUTBRACE},
     {NULL, "case", 0, CASE},
     {NULL, "coproc", 0, COPROC},
-    {NULL, "do", 0, DO},
+    {NULL, "do", 0, DOLOOP},
     {NULL, "done", 0, DONE},
     {NULL, "elif", 0, ELIF},
     {NULL, "else", 0, ELSE},
@@ -928,7 +946,7 @@ static struct reswd reswds[] = {
     {NULL, "time", 0, TIME},
     {NULL, "until", 0, UNTIL},
     {NULL, "while", 0, WHILE},
-    {NULL, NULL}
+    {NULL, NULL, 0, 0}
 };
 
 /* hash table containing the reserved words */
@@ -999,30 +1017,51 @@ printreswdnode(HashNode hn, int printflags)
 /**/
 mod_export HashTable aliastab;
  
-/* Create new hash table for aliases */
+/* has table containing suffix aliases */
+
+/**/
+mod_export HashTable sufaliastab;
+ 
+/* Create new hash tables for aliases */
 
 /**/
 void
-createaliastable(void)
+createaliastable(HashTable ht)
 {
+    ht->hash        = hasher;
+    ht->emptytable  = NULL;
+    ht->filltable   = NULL;
+    ht->cmpnodes    = strcmp;
+    ht->addnode     = addhashnode;
+    ht->getnode     = gethashnode;
+    ht->getnode2    = gethashnode2;
+    ht->removenode  = removehashnode;
+    ht->disablenode = disablehashnode;
+    ht->enablenode  = enablehashnode;
+    ht->freenode    = freealiasnode;
+    ht->printnode   = printaliasnode;
+}
+
+/**/
+void
+createaliastables(void)
+{
+    /* Table for regular and global aliases */
+
     aliastab = newhashtable(23, "aliastab", NULL);
 
-    aliastab->hash        = hasher;
-    aliastab->emptytable  = NULL;
-    aliastab->filltable   = NULL;
-    aliastab->cmpnodes    = strcmp;
-    aliastab->addnode     = addhashnode;
-    aliastab->getnode     = gethashnode;
-    aliastab->getnode2    = gethashnode2;
-    aliastab->removenode  = removehashnode;
-    aliastab->disablenode = disablehashnode;
-    aliastab->enablenode  = enablehashnode;
-    aliastab->freenode    = freealiasnode;
-    aliastab->printnode   = printaliasnode;
+    createaliastable(aliastab);
 
     /* add the default aliases */
     aliastab->addnode(aliastab, ztrdup("run-help"), createaliasnode(ztrdup("man"), 0));
     aliastab->addnode(aliastab, ztrdup("which-command"), createaliasnode(ztrdup("whence"), 0));
+
+
+    /* Table for suffix aliases --- make this smaller */
+
+    sufaliastab = newhashtable(11, "sufaliastab", NULL);
+
+    createaliastable(sufaliastab);
 }
 
 /* Create a new alias node */
@@ -1033,7 +1072,7 @@ createaliasnode(char *txt, int flags)
 {
     Alias al;
 
-    al = (Alias) zcalloc(sizeof *al);
+    al = (Alias) zshcalloc(sizeof *al);
     al->flags = flags;
     al->text = txt;
     al->inuse = 0;
@@ -1078,10 +1117,12 @@ printaliasnode(HashNode hn, int printflags)
 
     if (printflags & PRINT_WHENCE_CSH) {
 	nicezputs(a->nam, stdout);
-	if (a->flags & ALIAS_GLOBAL)
-	    printf(": globally aliased to ");
-	else
-	    printf(": aliased to ");
+	printf(": ");
+	if (a->flags & ALIAS_SUFFIX)
+	    printf("suffix ");
+	else if (a->flags & ALIAS_GLOBAL)
+	    printf("globally ");
+	printf ("aliased to ");
 	nicezputs(a->text, stdout);
 	putchar('\n');
 	return;
@@ -1089,10 +1130,14 @@ printaliasnode(HashNode hn, int printflags)
 
     if (printflags & PRINT_WHENCE_VERBOSE) {
 	nicezputs(a->nam, stdout);
-	if (a->flags & ALIAS_GLOBAL)
-	    printf(" is a global alias for ");
+	printf(" is a");
+	if (a->flags & ALIAS_SUFFIX)
+	    printf(" suffix");
+	else if (a->flags & ALIAS_GLOBAL)
+	    printf(" global");
 	else
-	    printf(" is an alias for ");
+	    printf("n");
+	printf(" alias for ");
 	nicezputs(a->text, stdout);
 	putchar('\n');
 	return;
@@ -1100,7 +1145,9 @@ printaliasnode(HashNode hn, int printflags)
 
     if (printflags & PRINT_LIST) {
 	printf("alias ");
-	if (a->flags & ALIAS_GLOBAL)
+	if (a->flags & ALIAS_SUFFIX)
+	    printf("-s ");
+	else if (a->flags & ALIAS_GLOBAL)
 	    printf("-g ");
 
 	/* If an alias begins with `-', then we must output `-- ' *
@@ -1112,6 +1159,7 @@ printaliasnode(HashNode hn, int printflags)
     quotedzputs(a->nam, stdout);
     putchar('=');
     quotedzputs(a->text, stdout);
+
     putchar('\n');
 }
 
@@ -1183,7 +1231,7 @@ emptynameddirtable(HashTable ht)
 static int
 add_userdir(nis_name table, nis_object *object, void *userdata)
 {
-    if (object->zo_data.objdata_u.en_data.en_cols.en_cols >= 6) {
+    if (object->zo_data.objdata_u.en_data.en_cols.en_cols_len >= 6) {
 	static char name[40], dir[PATH_MAX + 1];
 	register entry_col *ec =
 	    object->zo_data.objdata_u.en_data.en_cols.en_cols_val;
@@ -1211,7 +1259,8 @@ add_userdir(int status, char *key, int keylen, char *val, int vallen, char *dumm
 
     if (vallen > keylen && *(p = val + keylen) == ':') {
 	*p++ = '\0';
-	if ((de = strrchr(p, ':'))) {
+	for (de = val + vallen - 1; *de != ':' && de > val; de--);
+	if (de > val) {
 	    *de = '\0';
 	    if ((d = strrchr(p, ':'))) {
 		if (*++d && val[0])
@@ -1226,7 +1275,7 @@ add_userdir(int status, char *key, int keylen, char *val, int vallen, char *dumm
 
 /**/
 static void
-fillnameddirtable(HashTable ht)
+fillnameddirtable(UNUSED(HashTable ht))
 {
     if (!allusersadded) {
 #if defined(HAVE_NIS) || defined(HAVE_NIS_PLUS)
@@ -1366,6 +1415,13 @@ printnameddirnode(HashNode hn, int printflags)
 	putchar('\n');
 	return;
     }
+    
+    if (printflags & PRINT_LIST) {
+      printf("hash -d ");
+
+      if(nd->nam[0] == '-')
+	    printf("-- ");
+    }
 
     quotedzputs(nd->nam, stdout);
     putchar('=');
@@ -1460,8 +1516,9 @@ addhistnode(HashTable ht, char *nam, void *nodeptr)
     if (oldnode && oldnode != (HashNode)nodeptr) {
 	if (he->flags & HIST_MAKEUNIQUE
 	 || (he->flags & HIST_FOREIGN && (Histent)oldnode == he->up)) {
+	    (void) addhashnode2(ht, oldnode->nam, oldnode); /* restore hash */
 	    he->flags |= HIST_DUP;
-	    addhashnode(ht, oldnode->nam, oldnode); /* Remove the new dup */
+	    he->flags &= ~HIST_MAKEUNIQUE;
 	}
 	else {
 	    oldnode->flags |= HIST_DUP;
@@ -1488,7 +1545,7 @@ freehistdata(Histent he, int unlink)
     if (!he)
 	return;
 
-    if (!(he->flags & HIST_DUP))
+    if (!(he->flags & (HIST_DUP | HIST_TMPSTORE)))
 	removehashnode(histtab, he->text);
 
     zsfree(he->text);
