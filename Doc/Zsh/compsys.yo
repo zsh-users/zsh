@@ -1308,6 +1308,31 @@ It is important to use a sufficiently restrictive context when specifying
 fake strings.  Note that the styles tt(fake-files) and tt(fake-parameters)
 provide additional features when completing files or parameters.
 )
+kindex(fake-always, completion style)
+item(tt(fake-always))(
+This works identically to the tt(fake) style except that
+the tt(ignored-patterns) style is not applied to it.  This makes it
+possible to override a set of matches completely by setting the
+ignored patterns to `tt(*)'.
+
+The following shows a way of supplementing any tag with arbitrary data, but
+having it behave for display purposes like a separate tag.  In this example
+we use the features of the tt(tag-order) style to divide the
+tt(named-directories) tag into two when performing completion with
+the standard completer tt(complete) for arguments of tt(cd).  The tag
+tt(named-directories-normal) behaves as normal, but the tag
+tt(named-directories-mine) contains a fixed set of directories.
+This has the effect of adding the match group `tt(extra directories)' with
+the given completions.
+
+example(zstyle ':completion::complete:cd:*' tag-order \ 
+  'named-directories:-mine:extra\ directories
+  named-directories:-normal:named\ directories *'
+zstyle ':completion::complete:cd:*:named-directories-mine' \ 
+  fake-always mydir1 mydir2
+zstyle ':completion::complete:cd:*:named-directories-mine' \ 
+  ignored-patterns '*')
+)
 kindex(fake-files, completion style)
 item(tt(fake-files))(
 This style is used when completing files and looked up 
