@@ -1841,6 +1841,18 @@ bin_fg(char *name, char **argv, Options ops, int func)
     return retval;
 }
 
+#if defined(SIGCHLD) && defined(SIGCLD)
+#if SIGCHLD == SIGCLD
+#define ALT_SIGS 1
+#endif
+#endif
+#if defined(SIGPOLL) && defined(SIGIO)
+#if SIGPOLL == SIGIO
+#define ALT_SIGS 1
+#endif
+#endif
+
+#ifdef ALT_SIGS
 const struct {
     const char *name;
     int num;
@@ -1855,15 +1867,9 @@ const struct {
     { "IO", SIGIO },
 #endif
 #endif
-#if !defined(SIGERR)
-    /*
-     * If SIGERR is not defined by the operating system, use it
-     * as an alias for SIGZERR.
-     */
-    { "ERR", SIGZERR },
-#endif
     { NULL, 0 }
 };
+#endif
 
 /* kill: send a signal to a process.  The process(es) may be specified *
  * by job specifier (see above) or pid.  A signal, defaulting to       *
@@ -1895,6 +1901,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 			    for (sig = 1; sig <= SIGCOUNT; sig++)
 				if (!cstrpcmp(sigs + sig, &signame))
 				    break;
+#ifdef ALT_SIGS
 			    if (sig > SIGCOUNT) {
 				int i;
 
@@ -1905,6 +1912,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 					break;
 				    }
 			    }
+#endif
 			    if (sig > SIGCOUNT) {
 				zwarnnam(nam, "unknown signal: SIG%s",
 					 signame, 0);
@@ -1967,6 +1975,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 			break;
 		if (*signame == '0' && !signame[1])
 		    sig = 0;
+#ifdef ALT_SIGS
 		if (sig > SIGCOUNT) {
 		    int i;
 
@@ -1977,6 +1986,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 			    break;
 			}
 		}
+#endif
 		if (sig > SIGCOUNT) {
 		    zwarnnam(nam, "unknown signal: SIG%s", signame, 0);
 		    zwarnnam(nam, "type kill -l for a List of signals", NULL, 0);
@@ -2054,39 +2064,17 @@ getsignum(char *s)
 	if (!strcmp(s, sigs[i]))
 	    return i;
 
+#ifdef ALT_SIGS
     for (i = 0; alt_sigs[i].name; i++)
     {
 	if (!strcmp(s, alt_sigs[i].name))
 	    return alt_sigs[i].num;
     }
+#endif
 
     /* no matching signal */
     return -1;
 }
-
-/* Get the name for a signal. */
-
-/**/
-mod_export const char *
-getsigname(int sig)
-{
-    if (sigtrapped[sig] & ZSIG_ALIAS)
-    {
-	int i;
-	for (i = 0; alt_sigs[i].name; i++)
-	    if (sig == alt_sigs[i].num)
-		return alt_sigs[i].name;
-    }
-    else
-	return sigs[sig];
-
-    /* shouldn't reach here */
-#ifdef DEBUG
-    dputs("Bad alias flag for signal");
-#endif
-    return "";
-}
-
 
 /* Get the function node for a trap, taking care about alternative names */
 /**/
@@ -2096,7 +2084,9 @@ gettrapnode(int sig, int ignoredisable)
     char fname[20];
     HashNode hn;
     HashNode (*getptr)(HashTable ht, char *name);
+#ifdef ALT_SIGS
     int i;
+#endif
     if (ignoredisable)
 	getptr = shfunctab->getnode2;
     else
@@ -2106,6 +2096,7 @@ gettrapnode(int sig, int ignoredisable)
     if ((hn = getptr(shfunctab, fname)))
 	return hn;
 
+#ifdef ALT_SIGS
     for (i = 0; alt_sigs[i].name; i++) {
 	if (alt_sigs[i].num == sig) {
 	    sprintf(fname, "TRAP%s", alt_sigs[i].name);
@@ -2113,6 +2104,7 @@ gettrapnode(int sig, int ignoredisable)
 		return hn;
 	}
     }
+#endif
 
     return NULL;
 }

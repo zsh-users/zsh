@@ -1866,8 +1866,7 @@ struct heap {
 /* Mask to get the above flags */
 #define ZSIG_MASK	(ZSIG_TRAPPED|ZSIG_IGNORED|ZSIG_FUNC)
 /* No. of bits to shift local level when storing in sigtrapped */
-#define ZSIG_ALIAS	(1<<3)  /* Trap is stored under an alias */
-#define ZSIG_SHIFT	4
+#define ZSIG_SHIFT	3
 
 /**********************************/
 /* Flags to third argument of zle */
