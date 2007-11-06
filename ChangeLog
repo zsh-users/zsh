@@ -1,3 +1,9 @@
+2007-11-06  Peter Stephenson  <pws@csr.com>
+
+	* 24068: Src/builtin.c: attempt to make `printf "%g\n" -0'
+	output "-0", although this depends on the vagaries of the
+	library's strtod() (works on Solaris, doesn't on Fedora 7).
+
 2007-11-04  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync:  Added new options

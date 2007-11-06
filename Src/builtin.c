@@ -4162,9 +4162,25 @@ bin_print(char *name, char **args, Options ops, int func)
 			    break;
 		    case 2:
 			if (curarg) {
-			    mnumval = matheval(curarg);
-			    doubleval = (mnumval.type & MN_FLOAT) ?
-			    	mnumval.u.d : (double)mnumval.u.l;
+			    char *eptr;
+			    /*
+			     * First attempt to parse as a floating
+			     * point constant.  If we go through
+			     * a math evaluation, we can lose
+			     * mostly unimportant information
+			     * that people in standards organizations
+			     * worry about.
+			     */
+			    doubleval = strtod(curarg, &eptr);
+			    /*
+			     * If it didn't parse as a constant,
+			     * parse it as an expression.
+			     */
+			    if (*eptr != '\0') {
+				mnumval = matheval(curarg);
+				doubleval = (mnumval.type & MN_FLOAT) ?
+				    mnumval.u.d : (double)mnumval.u.l;
+			    }
 			} else doubleval = 0;
 			if (errflag) {
 			    doubleval = 0;
