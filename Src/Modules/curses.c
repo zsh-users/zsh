@@ -1210,6 +1210,16 @@ static const struct gsu_array zcurses_attrs_gsu =
 
 
 static char **
+zcurses_keycodesgetfn(UNUSED(Param pm))
+{
+    return zcurses_pairs_to_array(keypad_names);
+}
+
+static const struct gsu_array zcurses_keycodes_gsu =
+{ zcurses_keycodesgetfn, arrsetfn, stdunsetfn };
+
+
+static char **
 zcurses_windowsgetfn(UNUSED(Param pm))
 {
     LinkNode node;
@@ -1254,6 +1264,8 @@ static struct paramdef partab[] = {
 		 &zcurses_colorsarr_gsu, NULL, NULL),
     SPECIALPMDEF("zcurses_attrs", PM_ARRAY|PM_READONLY,
 		 &zcurses_attrs_gsu, NULL, NULL),
+    SPECIALPMDEF("zcurses_keycodes", PM_ARRAY|PM_READONLY,
+		 &zcurses_keycodes_gsu, NULL, NULL),
     SPECIALPMDEF("zcurses_windows", PM_ARRAY|PM_READONLY,
 		 &zcurses_windows_gsu, NULL, NULL),
     SPECIALPMDEF("ZCURSES_COLORS", PM_INTEGER|PM_READONLY,

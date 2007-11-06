@@ -176,6 +176,13 @@ item(tt(zcurses_colors))(
 Readonly array.  The colors supported by tt(zsh/curses); available
 as soon as the module is loaded.
 )
+vindex(zcurses_keycodes)
+item(tt(zcurses_keycodes))(
+Readonly array.  The values that may be returned in the second
+parameter supplied to `tt(zcurses input)' in the order in which they
+are defined internally by curses.  Not all function keys
+are listed, only tt(F0); curses reserves space for tt(F0) up to tt(F63).
+)
 vindex(zcurses_windows)
 item(tt(zcurses_windows))(
 Readonly array.  The current list of windows, i.e. all windows that

@@ -1,5 +1,8 @@
 2007-11-06  Peter Stephenson  <pws@csr.com>
 
+	* 24069: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c: add
+	$zcurses_keycodes.
+
 	* 24068: Src/builtin.c: attempt to make `printf "%g\n" -0'
 	output "-0", although this depends on the vagaries of the
 	library's strtod() (works on Solaris, doesn't on Fedora 7).
