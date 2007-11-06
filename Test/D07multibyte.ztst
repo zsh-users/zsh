@@ -384,3 +384,13 @@
   print -r ${(q)foo}
 0:Backslash-quoting of unprintable/invalid characters uses $'...'
 >X$'\300'Y$'\a'Z$'\177'T
+
+# This also isn't strictly multibyte and is here to reduce the
+# likelihood of a "can't do character set conversion" error.
+  testfn() { (LC_ALL=C; print $'\u00e9') }
+  repeat 4 testfn
+1:error handling in Unicode quoting
+?testfn: character not in range
+?testfn: character not in range
+?testfn: character not in range
+?testfn: character not in range

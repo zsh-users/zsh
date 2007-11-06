@@ -4578,6 +4578,31 @@ ucs4toutf8(char *dest, unsigned int wval)
 }
 #endif
 
+
+/*
+ * The following only occurs once or twice in the code, but in different
+ * places depending how character set conversion is implemented.
+ */
+#define CHARSET_FAILED()		      \
+    if (how & GETKEY_DOLLAR_QUOTE) {	      \
+	while ((*tdest++ = *++s)) {	      \
+	    if (how & GETKEY_UPDATE_OFFSET) { \
+		if (s - sstart > *misc)	      \
+		    (*misc)++;		      \
+	    }				      \
+	    if (*s == Snull) {		      \
+		*len = (s - sstart) + 1;      \
+		*tdest = '\0';		      \
+		return buf;		      \
+	    }				      \
+	}				      \
+	*len = tdest - buf;		      \
+	return buf;			      \
+    }					      \
+    *t = '\0';				      \
+    *len = t - buf;			      \
+    return buf
+
 /*
  * Decode a key string, turning it into the literal characters.
  * The value returned is a newly allocated string from the heap.
@@ -4622,7 +4647,7 @@ mod_export char *
 getkeystring(char *s, int *len, int how, int *misc)
 {
     char *buf, tmp[1];
-    char *t, *tdest = NULL, *u = NULL, *sstart = s;
+    char *t, *tdest = NULL, *u = NULL, *sstart = s, *tbuf;
     char svchar = '\0';
     int meta = 0, control = 0;
     int i;
@@ -4642,38 +4667,69 @@ getkeystring(char *s, int *len, int how, int *misc)
 #endif
 
     DPUTS((how & GETKEY_UPDATE_OFFSET) &&
-	  (how & ~(GETKEY_DOLLAR_QUOTE|GETKEY_UPDATE_OFFSET)),
+	  (how & ~(GETKEYS_DOLLARS_QUOTE|GETKEY_UPDATE_OFFSET)),
 	  "BUG: offset updating in getkeystring only supported with $'.");
+    DPUTS((how & (GETKEY_DOLLAR_QUOTE|GETKEY_SINGLE_CHAR)) ==
+	  (GETKEY_DOLLAR_QUOTE|GETKEY_SINGLE_CHAR),
+	  "BUG: incompatible options in getkeystring");
 
     if (how & GETKEY_SINGLE_CHAR)
 	t = buf = tmp;
-    else
-	t = buf = zhalloc(strlen(s) + 1);
-    if (how & GETKEY_DOLLAR_QUOTE) {
+    else {
+	/* Length including terminating NULL */
+	int maxlen = 1;
 	/*
-	 * TODO: we're not necessarily guaranteed the output string will
+	 * We're not necessarily guaranteed the output string will
 	 * be no longer than the input with \u and \U when output
-	 * characters need to be metafied: should check the maximum
-	 * length.
-	 *
-	 * We're going to unmetafy into the original string, but
-	 * to get a proper metafied input we're going to metafy
-	 * into an allocated buffer.  This is necessary if we have
-	 * \u and \U's with multiple metafied bytes.  We can't
-	 * simply remetafy the entire string because there may
-	 * be tokens (indeed, we know there are lexical nulls floating
-	 * around), so we have to be aware character by character
-	 * what we are converting.
+	 * characters need to be metafied.  As this is the only
+	 * case where the string can get longer (?I think),
+	 * include it in the allocation length here but don't
+	 * bother taking account of other factors.
 	 */
-	tdest = t;
-	t = s;
+	for (t = s; *t; t++) {
+	    if (*t == '\\') {
+		if (!t[1]) {
+		    maxlen++;
+		    break;
+		}
+		if (t[1] == 'u' || t[1] == 'U')
+		    maxlen += MB_CUR_MAX * 2;
+		else
+		    maxlen += 2;
+		/* skip the backslash and the following character */
+		t++;
+	    } else
+		maxlen++;
+	}
+	if (how & GETKEY_DOLLAR_QUOTE) {
+	    /*
+	     * We're going to unmetafy into a new string, but
+	     * to get a proper metafied input we're going to metafy
+	     * into an intermediate buffer.  This is necessary if we have
+	     * \u and \U's with multiple metafied bytes.  We can't
+	     * simply remetafy the entire string because there may
+	     * be tokens (indeed, we know there are lexical nulls floating
+	     * around), so we have to be aware character by character
+	     * what we are converting.
+	     *
+	     * In this case, buf is the final buffer (as usual),
+	     * but t points into a temporary buffer that just has
+	     * to be long enough to hold the result of one escape
+	     * code transformation.  We count this is a full multibyte
+	     * character (MB_CUR_MAX) with every character metafied
+	     * (*2) plus a little bit of fuzz (for e.g. the odd backslash).
+	     */
+	    buf = tdest = zhalloc(maxlen);
+	    t = tbuf = zhalloc(MB_CUR_MAX * 3 + 1);
+	} else {
+	    t = buf = zhalloc(maxlen);
+	}
     }
     for (; *s; s++) {
-	char *torig = t;
 	if (*s == '\\' && s[1]) {
 	    int miscadded;
-	    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc) {
-		(*misc)++;
+	    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart < *misc) {
+		(*misc)--;
 		miscadded = 1;
 	    } else
 		miscadded = 0;
@@ -4707,7 +4763,7 @@ getkeystring(char *s, int *len, int how, int *misc)
 		if (!(how & GETKEY_EMACS)) {
 		    *t++ = '\\', s--;
 		    if (miscadded)
-			(*misc)--;
+			(*misc)++;
 		    continue;
 		}
 		/* FALL THROUGH */
@@ -4715,30 +4771,32 @@ getkeystring(char *s, int *len, int how, int *misc)
 		*t++ = '\033';
 		break;
 	    case 'M':
+		/* HERE: GETKEY_UPDATE_OFFSET */
 		if (how & GETKEY_EMACS) {
 		    if (s[1] == '-')
 			s++;
 		    meta = 1 + control;	/* preserve the order of ^ and meta */
 		} else {
 		    if (miscadded)
-			(*misc)--;
+			(*misc)++;
 		    *t++ = '\\', s--;
 		}
 		continue;
 	    case 'C':
+		/* HERE: GETKEY_UPDATE_OFFSET */
 		if (how & GETKEY_EMACS) {
 		    if (s[1] == '-')
 			s++;
 		    control = 1;
 		} else {
 		    if (miscadded)
-			(*misc)--;
+			(*misc)++;
 		    *t++ = '\\', s--;
 		}
 		continue;
 	    case Meta:
 		if (miscadded)
-		    (*misc)--;
+		    (*misc)++;
 		*t++ = '\\', s--;
 		break;
 	    case '-':
@@ -4755,15 +4813,16 @@ getkeystring(char *s, int *len, int how, int *misc)
 		    return buf;
 		}
 		goto def;
-	    case 'u':
-		if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc)
-		    (*misc) += 4;
 	    case 'U':
-		if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc) {
-		    (*misc) += 6;
+		if ((how & GETKEY_UPDATE_OFFSET) && s - sstart < *misc)
+		    (*misc) -= 4;
+		/* FALLTHROUGH */
+	    case 'u':
+		if ((how & GETKEY_UPDATE_OFFSET) && s - sstart < *misc) {
+		    (*misc) -= 6; /* HERE don't really believe this */
 		    /*
 		     * We've now adjusted the offset for all the input
-		     * characters, so we need to subtract for each
+		     * characters, so we need to add for each
 		     * byte of output below.
 		     */
 		}
@@ -4787,31 +4846,18 @@ getkeystring(char *s, int *len, int how, int *misc)
 		count = wctomb(t, (wchar_t)wval);
 		if (count == -1) {
 		    zerr("character not in range");
-		    if (how & GETKEY_DOLLAR_QUOTE) {
-			/* HERE new convention */
-			for (u = t; (*u++ = *++s);) {
-			    if ((how & GETKEY_UPDATE_OFFSET) &&
-				s - sstart > *misc)
-				(*misc)++;
-			}
-			return t;
-		    }
-		    *t = '\0';
-		    *len = t - buf;
-		    return buf;
+		    CHARSET_FAILED();
 		}
-		if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc)
+		if ((how & GETKEY_UPDATE_OFFSET) && s - sstart < *misc)
 		    (*misc) += count;
 		t += count;
-		continue;
 # else
 #  if defined(HAVE_NL_LANGINFO) && defined(CODESET)
 		if (!strcmp(nl_langinfo(CODESET), "UTF-8")) {
 		    count = ucs4toutf8(t, wval);
 		    t += count;
-		    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc)
+		    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart < *misc)
 			(*misc) += count;
-		    continue;
 		} else {
 #   ifdef HAVE_ICONV
 		    ICONV_CONST char *inptr = inbuf;
@@ -4826,46 +4872,55 @@ getkeystring(char *s, int *len, int how, int *misc)
     	    	    cd = iconv_open(nl_langinfo(CODESET), "UCS-4BE");
 		    if (cd == (iconv_t)-1) {
 			zerr("cannot do charset conversion");
-			if (how & GETKEY_DOLLAR_QUOTE) {
-			    /* HERE: new convention */
-			    for (u = t; (*u++ = *++s);) {
-				if ((how & GETKEY_UPDATE_OFFSET) &&
-				    s - sstart > *misc)
-				    (*misc)++;
-			    }
-			    return t;
-			}
-			*t = '\0';
-			*len = t - buf;
-			return buf;
+			CHARSET_FAILED();
 		    }
                     count = iconv(cd, &inptr, &inbytes, &t, &outbytes);
 		    iconv_close(cd);
 		    if (count == (size_t)-1) {
                         zerr("character not in range");
-		        *t = '\0';
-			*len = t - buf;
-			return buf;
+			CHARSET_FAILED();
 		    }
-		    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart > *misc)
+		    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart < *misc)
 			(*misc) += count;
-		    continue;
 #   else
                     zerr("cannot do charset conversion");
-		    *t = '\0';
-		    *len = t - buf;
-		    return buf;
+		    CHARSET_FAILED();
 #   endif
 		}
 #  else
                 zerr("cannot do charset conversion");
-		*t = '\0';
-		*len = t - buf;
-		return buf;
+		CHARSET_FAILED();
 #  endif
 # endif
+		if (how & GETKEY_DOLLAR_QUOTE) {
+		    char *t2;
+		    for (t2 = tbuf; t2 < t; t2++) {
+			if (imeta(*t2)) {
+			    *tdest++ = Meta;
+			    *tdest++ = *t2 ^ 32;
+			} else
+			    *tdest++ = *t2;
+		    }
+		    /* reset temporary buffer after handling */
+		    t = tbuf;
+		}
+		continue;
+	    case '\'':
+	    case '\\':
+		if (how & GETKEY_DOLLAR_QUOTE) {
+		    /*
+		     * Usually \' and \\ will have the initial
+		     * \ turned into a Bnull, however that's not
+		     * necessarily the case when called from
+		     * completion.
+		     */
+		    *t++ = *s;
+		    break;
+		}
+		/* FALLTHROUGH */
 	    default:
 	    def:
+		/* HERE: GETKEY_UPDATE_OFFSET? */
 		if ((idigit(*s) && *s < '8') || *s == 'x') {
 		    if (!(how & GETKEY_OCTAL_ESC)) {
 			if (*s == '0')
@@ -4890,7 +4945,7 @@ getkeystring(char *s, int *len, int how, int *misc)
 		} else {
 		    if (!(how & GETKEY_EMACS) && *s != '\\') {
 			if (miscadded)
-			    (*misc)--;
+			    (*misc)++;
 			*t++ = '\\';
 		    }
 		    *t++ = *s;
@@ -4961,6 +5016,8 @@ getkeystring(char *s, int *len, int how, int *misc)
 			 */
 			*tdest++ = *++s;
 		    }
+		    /* reset temporary buffer, now handled */
+		    t = tbuf;
 		    continue;
 		} else
 		    *t++ = *s;
@@ -4984,13 +5041,17 @@ getkeystring(char *s, int *len, int how, int *misc)
 	}
 	if (how & GETKEY_DOLLAR_QUOTE) {
 	    char *t2;
-	    for (t2 = torig; t2 < t; t2++) {
+	    for (t2 = tbuf; t2 < t; t2++) {
 		if (imeta(*t2)) {
 		    *tdest++ = Meta;
 		    *tdest++ = *t2 ^ 32;
 		} else
 		    *tdest++ = *t2;
 	    }
+	    /*
+	     * Reset use of temporary buffer.
+	     */
+	    t = tbuf;
 	}
 	if ((how & GETKEY_SINGLE_CHAR) && t != tmp) {
 	    *misc = STOUC(tmp[0]);

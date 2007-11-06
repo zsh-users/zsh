@@ -42,3 +42,13 @@
   unsetopt rcquotes
 0:Yes RC_QUOTES with single quotes
 >'
+
+  print '<\u0041>'
+  printf '%s\n' $'<\u0042>'
+  print '<\u0043>'
+  printf '%s\n' $'<\u0044>'
+0:\u in both print and printf
+><A>
+><B>
+><C>
+><D>

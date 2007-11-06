@@ -1,3 +1,9 @@
+2007-11-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24070: Src/utils.c, Test/A03quoting.ztst,
+	Test/D07multibyte.ztst: Some fixes for \u handling in
+	getkeystring().
+
 2007-11-06  Peter Stephenson  <pws@csr.com>
 
 	* 24069: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c: add
