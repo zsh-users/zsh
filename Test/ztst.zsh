@@ -30,6 +30,9 @@ emulate -R zsh
 [[ -n $LC_MESSAGES ]] && LC_MESSAGES=C
 [[ -n $LANG ]] && LANG=C
 
+# Don't propagate variables that are set by default in the shell.
+typeset +x WORDCHARS
+
 # Set the module load path to correspond to this build of zsh.
 # This Modules directory should have been created by "make check".
 [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
