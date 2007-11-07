@@ -23,8 +23,9 @@ xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
 xitem(tt(zcurses) tt(attr) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) ] [...])
 xitem(tt(zcurses) tt(bg) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) | tt(@)var(char) ] [...])
-xitem(tt(zcurses) tt(scroll) [ tt(on) | tt(off) | {+/-}var(lines) ])
-xitem(tt(zcurses) tt(input) var(targetwin) [ var(param) [ var(kpparm) ] ])
+xitem(tt(zcurses) tt(scroll) var(targetwin) [ tt(on) | tt(off) | {+/-}var(lines) ])
+xitem(tt(zcurses) tt(input) var(targetwin) [ var(param) [ var(kparam) [ var(mparam) ] ] ])
+xitem(tt(zcurses) tt(mouse) [ tt(delay) var(num) | {+/-}tt(motion) ])
 item(tt(zcurses) tt(timeout) var(targetwin) var(intval))(
 Manipulate curses windows.  All uses of this command should be
 bracketed by `tt(zcurses init)' to initialise use of curses, and
@@ -129,14 +130,59 @@ to allow the window to be scrolled.
 tt(input) reads a single character from the window without echoing
 it back.  If var(param) is supplied the character is assigned to the
 parameter var(param), else it is assigned to the parameter var(REPLY).
-If both var(param) and var(kpparam) are supplied, the key is read
-in `keypad' mode.  In this mode special keys such as function keys
-and arrow keys return the name of the key in the parameter var(kpparam).
-The key names are the macros defined in the tt(curses.h) or tt(ncurses.h)
-with the prefix `tt(KEY_)' removed.  Other keys cause a value to be set in
-var(param) as before.  On a succesful return only one of var(param) or
-var(kpparm) contains a non-empty string; the other is set to an empty
-string.
+
+If both var(param) and var(kparam) are supplied, the key is read in
+`keypad' mode.  In this mode special keys such as function keys and
+arrow keys return the name of the key in the parameter var(kparam).  The
+key names are the macros defined in the tt(curses.h) or tt(ncurses.h)
+with the prefix `tt(KEY_)' removed; see also the description of the
+parameter tt(zcurses_keycodes) below.  Other keys cause a value to be
+set in var(param) as before.  On a succesful return only one of
+var(param) or var(kparam) contains a non-empty string; the other is set
+to an empty string.
+
+If var(mparam) is also supplied, tt(input) attempts to handle mouse
+input.  This is only available with the ncurses library; mouse handling
+can be detected by checking for the exit status of `tt(zcurses mouse)' with
+no arguments.  If a mouse
+button is clicked (or double- or triple-clicked, or pressed or released with
+a configurable delay from being clicked) then tt(kparam) is set to the string
+tt(MOUSE), and var(mparam) is set to an array consisting of the
+following elements:
+startitem()
+sitem(-)(An identifier to discriminate different input devices; this
+is only rarely useful.)
+sitem(-)(The x, y and z coordinates of the mouse click relative to
+the full screen, as three elements in that order (i.e. the y coordinate
+is, unusually, after the x coordinate).  The z coordinate is only
+available for a few unusual input devices and is otherwise set to zero.)
+sitem(-)(Any events that occurred as separate items; usually
+there will be just one.  An event consists of tt(PRESSED), tt(RELEASED),
+tt(CLICKED), tt(DOUBLE_CLICKED) or tt(TRIPLE_CLICKED) followed
+immediately (in the same element) by the number of the button.)
+sitem(-)(If the shift key was pressed, the string tt(SHIFT).)
+sitem(-)(If the control key was pressed, the string tt(CTRL).)
+sitem(-)(If the alt key was pressed, the string tt(ALT).)
+endsitem()
+
+Not all mouse events may be passed through to the terminal window;
+most terminal emulators handle some mouse events themselves.  Note
+that the ncurses manual implies that using input both with and
+without mouse handling may cause the mouse cursor to appear and
+disappear.
+
+The subcommand tt(mouse) can be used to configure the use of the mouse.
+There is no window argument; mouse options are global.
+`tt(zcurses mouse)' with no arguments returns status 0 if mouse handling
+is possible, else status 1.  Otherwise, the possible arguments (which
+may be combined on the same command line) are as follows.
+tt(delay) var(num) sets the maximum delay in milliseconds between press and
+release events to be considered as a click; the value 0 disables click
+resolution, and the default is one sixth of a second.  tt(motion) proceeded
+by an optional `tt(PLUS())' (the default) or tt(-) turns on or off
+reporting of mouse motion in addition to clicks, presses and releases,
+which are always reported.  However, it appears reports for mouse
+motion are not currently implemented.
 
 tt(timeout) specifies a timeout value for input from var(targetwin).
 If var(intval) is negative, `tt(zcurses input)' waits indefinitely for

@@ -1,3 +1,9 @@
+2007-11-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24073 (plus tweak to allow "zcurses mouse" with no additional
+	arguments): Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
+	add zcurses mouse handling.
+
 2007-11-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24070: Src/utils.c, Test/A03quoting.ztst,
