@@ -1140,7 +1140,7 @@ zccmd_input(const char *nam, char **args)
 		    addlinknode(margs, "CTRL");
 		if (mevent.bstate & BUTTON_SHIFT)
 		    addlinknode(margs, "ALT");
-		if (!setaparam(args[3], zlinklist2array(margs)));
+		if (!setaparam(args[3], zlinklist2array(margs)))
 		    return 1;
 	    } else {
 #endif
