@@ -1,5 +1,8 @@
 2007-11-08  Peter Stephenson  <pws@csr.com>
 
+	* users/12198: Doc/Zsh/mod_complist.yo: make the definition of
+	the menu-select widget clearer.
+
 	* unposted: Src/curses.c: typo in parameter setting in
 	24073.
 

@@ -192,8 +192,15 @@ shell is set up to return to the last prompt after showing a
 completion list (see the tt(ALWAYS_LAST_PROMPT) option in
 ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Options))\
-).  It can be invoked directly by
-the widget tt(menu-select) defined by the module.  Alternatively,
+).
+
+Menu selection can be invoked directly by
+the widget tt(menu-select) defined by this module.  This is a standard
+ZLE widget that can be bound to a key in the usual way as described
+in ifzman(zmanref(zshzle))\
+ifnzman(noderef(Zsh Line Editor)).
+
+Alternatively,
 the parameter tt(MENUSELECT) can be set to an integer, which gives the
 minimum number of matches that must be present before menu selection is
 automatically turned on.  This second method requires that menu completion
