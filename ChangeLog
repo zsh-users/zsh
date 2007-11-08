@@ -1,3 +1,8 @@
+2007-11-08  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/curses.c: typo in parameter setting in
+	24073.
+
 2007-11-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24073 (plus tweak to allow "zcurses mouse" with no additional

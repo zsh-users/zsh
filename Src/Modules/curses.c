@@ -1099,10 +1099,10 @@ zccmd_input(const char *nam, char **args)
 		    /*
 		     * This may happen if the mouse wasn't in
 		     * the window, so set the array to empty
-		     * but return success.
+		     * but return success unless the set itself
+		     * failed.
 		     */
-		    setaparam(args[3], mkarray(NULL));
-		    return 0;
+		    return !setaparam(args[3], mkarray(NULL));
 		}
 		margs = newlinklist();
 		sprintf(digits, "%d", (int)mevent.id);
@@ -1173,7 +1173,7 @@ zccmd_input(const char *nam, char **args)
     }
 #ifdef NCURSES_MOUSE_VERSION
     if (keypadnum != KEY_MOUSE && nargs >= 4)
-	setaparam(args[3], mkarray(NULL));
+	return !setaparam(args[3], mkarray(NULL));
 #endif
     return 0;
 }
