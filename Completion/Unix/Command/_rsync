@@ -125,8 +125,8 @@ _arguments -s \
   '--inplace[update destination files in-place]' \
   '(--append-verify)--append[append data onto shorter files]' \
   '(--append)--append-verify[append data onto shorter files, verifying old data]' \
-  '--acls[preserve access-control lists]' \
-  '--xattrs[preserve extended attributes]' \
+  '(-A --acls)'{-A,--acls}'[preserve access-control lists]' \
+  '(-X --xattrs)'{-X,--xattrs}'[preserve extended attributes]' \
   '--fake-super[use xattrs to save all file attributes]' \
   '(-d --dirs)'{-d,--dirs}'[transfer directories without recursing]' \
   {--no-d,--no-dirs}'[turn off --dirs]' \
@@ -141,7 +141,7 @@ _arguments -s \
   '(-K --keep-dirlinks)'{-K,--keep-dirlinks}'[treat symlinked dir on receiver as dir]' \
   '(-p --perms -E --executability)'{-p,--perms}'[preserve permissions]' \
   {--no-p,--no-perms}'[turn off --perms]' \
-  '(-E --executability -p --perms)'{-E,--executability}'[preserve executability]' \
+  '(-E --executability)'{-E,--executability}'[preserve executability]' \
   '(-o --owner)'{-o,--owner}'[preserve owner]' \
   {--no-o,--no-owner}'[turn off --owner]' \
   '(-g --group)'{-g,--group}'[preserve group]' \
