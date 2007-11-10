@@ -9,7 +9,7 @@
 # saved for future yanking in the normal way.
 
 emulate -L zsh
-setopt extendedglob xtrace
+setopt extendedglob
 
 local curcontext=:zle:$WIDGET
 local -a matched_words
