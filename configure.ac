@@ -492,6 +492,7 @@ AC_PROG_LN                  dnl Check for working ln, for "make install"
 AC_PROG_EGREP               dnl sets $EGREP to grep -E or egrep
 AC_CHECK_PROGS([YODL], [yodl], [: yodl])
 AC_CHECK_PROGS([PDFETEX], [pdfetex], [: pdfetex])
+AC_CHECK_PROGS([TEXI2PDF], [texi2pdf], [])
 AC_CHECK_PROGS([ANSI2KNR], [ansi2knr], [: ansi2knr])
 
 if test x"$ansi2knr" = xyes && test x"$ANSI2KNR" = x": ansi2knr"; then

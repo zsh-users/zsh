@@ -95,7 +95,11 @@ pdf: zsh.pdf
 .PHONY: pdf
 
 zsh.pdf: $(sdir)/zsh.texi
-	PDFTEX=$(PDFETEX) $(TEXI2DVI) --pdf $(sdir)/zsh.texi
+	if [ x$(TEXI2PDF) != x ]; then \
+	  $(TEXI2PDF) $(sdir)/zsh.texi; \
+	else \
+	  PDFTEX=$(PDFETEX) $(TEXI2DVI) --pdf $(sdir)/zsh.texi; \
+	fi
 
 texi: $(sdir)/zsh.texi
 .PHONY: texi
