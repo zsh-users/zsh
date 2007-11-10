@@ -1536,9 +1536,13 @@ parse_subst_string(char *s)
 	return 1;
     }
 #ifdef DEBUG
-    if (c != STRING || olen != l || errflag) {
+    /*
+     * Historical note: we used to check here for olen == l, but
+     * that's not necessarily the case if we stripped an RCQUOTE.
+     */
+    if (c != STRING || errflag) {
 	fprintf(stderr, "Oops. Bug in parse_subst_string: %s\n",
-		olen < l ? "len < l" : errflag ? "errflag" : "c != STRING");
+		errflag ? "errflag" : "c != STRING");
 	fflush(stderr);
 	untokenize(s);
 	return 1;
