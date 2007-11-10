@@ -1,5 +1,8 @@
 2007-11-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24082: Functionz/Zle/delete-whole-word-match: failed if
+	cursor was on whitespace.
+
 	* Mikael Magnusson, 24076; 24081: Doc/Zsh/zle.yo,
 	Functions/Zle/backward-kill-word-match,
 	Functions/Zle/delete-whole-word-match,
