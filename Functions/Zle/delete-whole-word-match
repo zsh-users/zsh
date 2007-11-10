@@ -9,7 +9,7 @@
 # saved for future yanking in the normal way.
 
 emulate -L zsh
-setopt extendedglob
+setopt extendedglob xtrace
 
 local curcontext=:zle:$WIDGET
 local -a matched_words
@@ -49,7 +49,7 @@ if [[ $WIDGET = *kill* ]]; then
   if [[ $LASTWIDGET = *kill* ]]; then
     CUTBUFFER="$CUTBUFFER$word"
   else
-    zle copy-region-as-kill "$word"
+    zle copy-region-as-kill -- "$word"
   fi
 fi
 BUFFER="${BUFFER[1,pos1]}${BUFFER[pos2,-1]}"

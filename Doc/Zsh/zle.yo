@@ -554,7 +554,9 @@ appears as if the top-level widget called by the user were still
 active.  With the option tt(-w), tt(WIDGET) and related parameters are set
 to reflect the widget being executed by the tt(zle) call.
 
-Any further arguments will be passed to the widget.  If it is a shell
+Any further arguments will be passed to the widget; note that as
+standard argument handling is performed, any general argument list
+should be preceded by tt(-)tt(-).  If it is a shell
 function, these are passed down as positional parameters; for builtin
 widgets it is up to the widget in question what it does with them.
 Currently arguments are only handled by the incremental-search commands,

@@ -22,7 +22,7 @@ while (( count-- )); do
     if [[ -n $done || $LASTWIDGET = *kill* ]]; then
       CUTBUFFER="$CUTBUFFER$word"
     else
-      zle copy-region-as-kill $word
+      zle copy-region-as-kill -- $word
     fi
     RBUFFER=${(j..)matched_words[6,7]}
   else
