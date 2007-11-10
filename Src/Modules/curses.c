@@ -41,9 +41,11 @@
 #endif
 
 #ifndef MULTIBYTE_SUPPORT
+# undef HAVE_GETCCHAR
 # undef HAVE_SETCCHAR
 # undef HAVE_WADDWSTR
 # undef HAVE_WGET_WCH
+# undef HAVE_WIN_WCH
 #endif
 
 #ifdef HAVE_SETCCHAR
@@ -377,6 +379,25 @@ zcurses_colorget(const char *nam, char *colorpair)
     }
 
     return cpn;
+}
+
+static Colorpairnode cpn_match;
+
+static void
+zcurses_colornode(HashNode hn, int cp)
+{
+    Colorpairnode cpn = (Colorpairnode)hn;
+    if (cpn->colorpair == (short)cp)
+	cpn_match = cpn;
+}
+
+static Colorpairnode
+zcurses_colorget_reverse(short cp)
+{
+    cpn_match = NULL;
+    scanhashtable(zcurses_colorpairs, 0, 0, 0,
+		  zcurses_colornode, cp);
+    return cpn_match;
 }
 
 static void
@@ -1302,6 +1323,100 @@ zccmd_position(const char *nam, char **args)
 
 
 static int
+zccmd_querychar(const char *nam, char **args)
+{
+    LinkNode node;
+    ZCWin w;
+    short cp;
+    Colorpairnode cpn;
+    const struct zcurses_namenumberpair *zattrp;
+    LinkList clist;
+#if defined(HAVE_WIN_WCH) && defined(HAVE_GETCCHAR)
+    wchar_t c;
+    cchar_t cc;
+    attr_t attrs;
+    int count;
+    VARARR(char, instr, 2*MB_CUR_MAX+1);
+#else
+    chtype inc;
+    char instr[3];
+#endif
+
+    node = zcurses_validate_window(args[0], ZCURSES_USED);
+    if (node == NULL) {
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
+	return 1;
+    }
+
+    w = (ZCWin)getdata(node);
+
+#if defined(HAVE_WIN_WCH) && defined(HAVE_GETCCHAR)
+    if (win_wch(w->win, &cc) == ERR)
+	return 1;
+
+    if (getcchar(&cc, &c, &attrs, &cp, NULL) == ERR)
+	return 1;
+    /* Hmmm... I always get 0 for cp, whereas the following works... */
+    cp = PAIR_NUMBER(winch(w->win));
+
+    count = wctomb(instr, c);
+    if (count == -1)
+	return 1;
+    (void)metafy(instr, count, META_NOALLOC);
+#else
+    inc = winch(w->win);
+    /* I think the following is correct, the manual is a little terse */
+    cp = PAIR_NUMBER(inc);
+    inc &= A_CHARTEXT;
+    if (imeta(inc)) {
+	instr[0] = Meta;
+	instr[1] = STOUC(inc ^ 32);
+	instr[2] = '\0';
+    } else {
+	instr[0] = STOUC(inc);
+	instr[1] = '\0';
+    }
+    /*
+     * I'm guessing this is OK... header says attr_t must be at
+     * least as wide as chtype.
+     */
+    attrs = (attr_t)inc;
+#endif
+
+    /*
+     * Attribute numbers vary, so make a linked list.
+     * This also saves us from doing the permanent allocation till
+     * the end.
+     */
+    clist = newlinklist();
+    /* First the (possibly multibyte) character itself. */
+    addlinknode(clist, instr);
+    /*
+     * Next the colo[u]r.
+     * We should be able to match it in the colorpair list, but
+     * if some reason we can't, fail safe and output the number.
+     */
+    cpn = zcurses_colorget_reverse(cp);
+    if (cpn) {
+	addlinknode(clist, cpn->node.nam);
+    } else {
+	/* report color pair number */
+	char digits[DIGBUFSIZE];
+	sprintf(digits, "%d", (int)cp);
+	addlinknode(clist, digits);
+    }
+    /* Now see what attributes are present. */
+    for (zattrp = zcurses_attributes; zattrp->name; zattrp++) {
+	if (attrs & zattrp->number)
+	    addlinknode(clist, zattrp->name);
+    }
+
+    /* Turn this into an array and store it. */
+    return !setaparam(args[1] ? args[1] : "reply", zlinklist2array(clist));
+}
+
+
+static int
 zccmd_touch(const char *nam, char **args)
 {
     LinkNode node;
@@ -1354,6 +1469,7 @@ bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
 	{"input", zccmd_input, 1, 4},
 	{"timeout", zccmd_timeout, 2, 2},
 	{"mouse", zccmd_mouse, 0, -1},
+	{"querychar", zccmd_querychar, 1, 2},
 	{"touch", zccmd_touch, 1, -1},
 	{NULL, (zccmd_t)0, 0, 0}
     };

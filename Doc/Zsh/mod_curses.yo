@@ -26,14 +26,16 @@ xitem(tt(zcurses) tt(bg) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)
 xitem(tt(zcurses) tt(scroll) var(targetwin) [ tt(on) | tt(off) | {+/-}var(lines) ])
 xitem(tt(zcurses) tt(input) var(targetwin) [ var(param) [ var(kparam) [ var(mparam) ] ] ])
 xitem(tt(zcurses) tt(mouse) [ tt(delay) var(num) | {+/-}tt(motion) ])
-item(tt(zcurses) tt(timeout) var(targetwin) var(intval))(
+xitem(tt(zcurses) tt(timeout) var(targetwin) var(intval))
+item(tt(zcurses) tt(querychar) var(targetwin) [ var(param) ])(
 Manipulate curses windows.  All uses of this command should be
 bracketed by `tt(zcurses init)' to initialise use of curses, and
 `tt(zcurses end)' to end it; omitting `tt(zcurses end)' can cause
 the terminal to be in an unwanted state.
 
-With tt(addwin), create a window with var(nlines) lines and var(ncols) columns.
-Its upper left corner will be placed at row var(begin_y) and column
+The subcommand tt(addwin) creates a window with var(nlines) lines and
+var(ncols) columns.  Its upper left corner will be placed at row
+var(begin_y) and column
 var(begin_x) of the screen.  var(targetwin) is a string and refers
 to the name of a window that is not currently assigned.  Note
 in particular the curses convention that vertical values appear
@@ -46,37 +48,40 @@ with the parent's memory.  Subwindows must be deleted before their parent.
 Note that the coordinates of subwindows are relative to the screen, not
 the parent, as with other windows.
 
-Use tt(delwin) to delete a window created with tt(addwin).  Note
-that tt(end) does em(not) implicitly delete windows, and that
-tt(delwin) does not erase the screen image of the window.
+Use the subcommand tt(delwin) to delete a window created with
+tt(addwin).  Note that tt(end) does em(not) implicitly delete windows,
+and that tt(delwin) does not erase the screen image of the window.
 
 The window corresponding to the full visible screen is called
 tt(stdscr); it always exists after `tt(zcurses init)' and cannot
 be delete with tt(delwin).
 
-The tt(refresh) command will refresh window var(targetwin); this is
+The subcommand tt(refresh) will refresh window var(targetwin); this is
 necessary to make any pending changes (such as characters you have
 prepared for output with tt(char)) visible on the screen.  tt(refresh)
 without an argument causes the screen to be cleared and redrawn.
 If multiple windows are given, the screen is updated once at the end.
 
-The tt(touch) command marks the var(targetwin)s listed as changed.
+The subcommand tt(touch) marks the var(targetwin)s listed as changed.
 This is necessary before tt(refresh)ing windows if a window that
 was in front of another window (which may be tt(stdscr)) is deleted.
 
-tt(move) moves the cursor position in var(targetwin) to new coordinates
-var(new_y) and var(new_x).
+The subcommand tt(move) moves the cursor position in var(targetwin) to
+new coordinates var(new_y) and var(new_x).  Note that the 
+subcommand tt(string) (but not the subcommand tt(char)) advances the
+cursor position over the characters added.
 
-tt(clear) erases the contents of var(targetwin).  One (and no more than one)
-of three options may be specified.  With the option tt(redraw),
-in addition the next tt(refresh) of var(targetwin) will cause the screen to be
-cleared and repainted.  With the option tt(eol), var(targetwin) is only
-cleared to the end of the current cursor line.  With the option
+The subcommand tt(clear) erases the contents of var(targetwin).  One
+(and no more than one) of three options may be specified.  With the
+option tt(redraw), in addition the next tt(refresh) of var(targetwin)
+will cause the screen to be cleared and repainted.  With the option
+tt(eol), var(targetwin) is only cleared to the end of the current cursor
+line.  With the option
 tt(bot), var(targetwin) is cleared to the end of the window, i.e
 everything to the right and below the cursor is cleared.
 
-tt(location) writes various positions associated with var(targetwin)
-into the array named var(array).
+The subcommand tt(location) writes various positions associated with
+var(targetwin) into the array named var(array).
 These are, in order:
 startsitem()
 sitem()(The y and x coordinates of the cursor relative to the top left
@@ -94,12 +99,12 @@ that the border is not subsequently handled specially:  in other words,
 the border is simply a set of characters output at the edge of the
 window.  Hence it can be overwritten, can scroll off the window, etc.
 
-tt(attr) will set var(targetwin)'s attributes or foreground/background
-color pair for any successive character output.  Each var(attribute)
-given on the line may be prepended by a tt(+) to set or a tt(-) to
-unset that attribute; tt(+) is assumed if absent.  The attributes
-supported are tt(blink), tt(bold), tt(dim), tt(reverse), tt(standout),
-and tt(underline).
+The subcommand tt(attr) will set var(targetwin)'s attributes or
+foreground/background color pair for any successive character output.
+Each var(attribute) given on the line may be prepended by a tt(+) to set
+or a tt(-) to unset that attribute; tt(+) is assumed if absent.  The
+attributes supported are tt(blink), tt(bold), tt(dim), tt(reverse),
+tt(standout), and tt(underline).
 
 Each var(fg_col)tt(/)var(bg_col) attribute (to be read as
 `var(fg_col) on var(bg_col)') sets the foreground and background color
@@ -118,18 +123,19 @@ Owing to limitations of curses this cannot be a multibyte character
 of attributes override the existing background, turning attributes
 off in the arguments is not useful, though this does not cause an error.
 
-tt(scroll) can be used with tt(on) or tt(off) to enabled or disable
-scrolling of a window when the cursor would otherwise move below the
-window due to typing or output.  It can also be used with a positive
-or negative integer to scroll the window up or down the given number
-of lines without changing the current cursor position (which therefore
-appears to move in the opposite direction relative to the window).
-In the second case, if scrolling is tt(off) it is temporarily turned tt(on)
-to allow the window to be scrolled.
+The subcommand tt(scroll) can be used with tt(on) or tt(off) to enabled
+or disable scrolling of a window when the cursor would otherwise move
+below the window due to typing or output.  It can also be used with a
+positive or negative integer to scroll the window up or down the given
+number of lines without changing the current cursor position (which
+therefore appears to move in the opposite direction relative to the
+window).  In the second case, if scrolling is tt(off) it is temporarily
+turned tt(on) to allow the window to be scrolled.
 
-tt(input) reads a single character from the window without echoing
-it back.  If var(param) is supplied the character is assigned to the
-parameter var(param), else it is assigned to the parameter var(REPLY).
+The subcommand tt(input) reads a single character from the window
+without echoing it back.  If var(param) is supplied the character is
+assigned to the parameter var(param), else it is assigned to the
+parameter var(REPLY).
 
 If both var(param) and var(kparam) are supplied, the key is read in
 `keypad' mode.  In this mode special keys such as function keys and
@@ -184,13 +190,22 @@ reporting of mouse motion in addition to clicks, presses and releases,
 which are always reported.  However, it appears reports for mouse
 motion are not currently implemented.
 
-tt(timeout) specifies a timeout value for input from var(targetwin).
-If var(intval) is negative, `tt(zcurses input)' waits indefinitely for
-a character to be typed; this is the default.  If var(intval) is zero,
-`tt(zcurses input)' returns immediately; if there is typeahead it is
-returned, else no input is done and status 1 is returned.  If var(intval)
-is positive, `tt(zcurses input)' waits var(intval) milliseconds for
-input and if there is none at the end of that period returns status 1.
+The subcommand tt(timeout) specifies a timeout value for input from
+var(targetwin).  If var(intval) is negative, `tt(zcurses input)' waits
+indefinitely for a character to be typed; this is the default.  If
+var(intval) is zero, `tt(zcurses input)' returns immediately; if there
+is typeahead it is returned, else no input is done and status 1 is
+returned.  If var(intval) is positive, `tt(zcurses input)' waits
+var(intval) milliseconds for input and if there is none at the end of
+that period returns status 1.
+
+The subcommand tt(querychar) queries the character at the current cursor
+position.  The return values are stored in the array named var(param) if
+supplied, else in the array tt(reply).  The first value is the character
+(which may be a multibyte character if the system supports them); the
+second is the color pair in the usual var(fg_col)tt(/)var(bg_col)
+notation.  Any attributes other than color that apply to the character,
+as set with the subcommand tt(attr), appear as additional elements.
 )
 enditem()
 

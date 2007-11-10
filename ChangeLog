@@ -1,5 +1,8 @@
 2007-11-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24083: Doc/Zsh/mod_curses, Src/Modules/curses.c: add
+	'zcurses querychar'.
+
 	* 24082: Functionz/Zle/delete-whole-word-match: failed if
 	cursor was on whitespace.
 
