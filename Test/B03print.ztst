@@ -259,7 +259,3 @@
  printf $'%\0'
 1:explicit null after % in format specifier
 ?(eval):printf:1: %: invalid directive
-
- printf '%b\n' '\0123'
-0:printf handles \0... octal escapes in replacement text
->S
