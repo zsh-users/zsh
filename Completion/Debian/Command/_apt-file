@@ -1,0 +1,55 @@
+#compdef apt-file
+
+_apt-file() {
+  local -a arguments
+  local state line cmds 
+  arguments=(
+    '(--cache -c)'{--cache,-c}'[cache directory]:directory:_directories'
+    '(-v --verbose)'{-v,--verbose}'[verbose]'
+     '(--cdrom-mount -d)'{--cdrom-mount,-d}'[cdrom mount point]:directory:_directories'
+     '(--ignore-case -i)'{--ignore-case,-i}'[ignore case]'
+     '(--regexp -r)'{--regexp,-r}'[regular expression]'
+     '(-V --version)'{-V,--version}'[version]'
+     '(-a --architecture)'{-a,--architecture}'[architecture]:architecture:(alpha arm hppa hurd-i386 i386 ia64 m68k mips mipsel powerpc s390 sparc)'
+    '(-s --sources-list)'{-s,--sources-list}'[source.list file]:file:_files'
+    '(-l --package-only)'{-l,--package-only}'[only display package name]'
+    '(-F --fixed-string)'{-F,--fixed-string}'[do not expand search pattern]'
+    '(-y --dummy)'{-y,--dummy}'[run in dummy mode]'
+    '(-h --help)'{-h,--help}'[display help screen]'
+    '1: :->cmds'
+    '*: :->args'
+  )
+    _arguments -S $arguments
+
+    case $state in
+      cmds)
+        cmds=(
+            'update:Resynchronize package contents'
+            'search:Search in which package file is included'
+            'list:List contents of a package'
+            'show:Alias for list'
+            'purge:remove all Contents-<ARCH>.gz files in cache directory'
+        )
+        _describe -t commands 'apt-list command' cmds && ret=0
+      ;;
+      args)
+        case $line[1] in
+            search)
+                _message "pattern"
+            ;;
+            list|show)
+               _deb_packages avail 
+            ;;
+            update|purge)
+                # do nothing
+            ;;
+            *)
+                _message "command $line[1] not available"
+            ;;
+        esac
+      ;;
+    esac
+
+}
+
+_apt-file "$@"
