@@ -2896,7 +2896,7 @@ getoutput(char *cmd, int qt)
 	zclose(pipes[1]);
 	retval = readoutput(pipes[0], qt);
 	fdtable[pipes[0]] = FDT_UNUSED;
-	waitforpid(pid);		/* unblocks */
+	waitforpid(pid, 0);		/* unblocks */
 	lastval = cmdoutval;
 	return retval;
     }
@@ -3025,7 +3025,7 @@ getoutputfile(char *cmd)
 
 	close(fd);
 	os = jobtab[thisjob].stat;
-	waitforpid(pid);
+	waitforpid(pid, 0);
 	cmdoutval = 0;
 	jobtab[thisjob].stat = os;
 	return nam;
