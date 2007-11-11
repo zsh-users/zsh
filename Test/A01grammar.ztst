@@ -413,6 +413,29 @@
 0:`case' with braces
 >schmavo
 
+  for word in artichoke bladderwort chrysanthemum Zanzibar
+  case $word in
+    (*der*) print $word contains the forbidden incantation der
+         ;;
+    (a*) print $word begins with a
+         ;&
+    ([[:upper:]]*) print $word either begins with a or an upper case letter
+         ;|
+    ([[:lower:]]*) print $word begins with a lower case letter
+         ;|
+    (*e*) print $word contains an e
+         ;;
+  esac
+0:`case' with mixed ;& and ;|
+>artichoke begins with a
+>artichoke either begins with a or an upper case letter
+>artichoke begins with a lower case letter
+>artichoke contains an e
+>bladderwort contains the forbidden incantation der
+>chrysanthemum begins with a lower case letter
+>chrysanthemum contains an e
+>Zanzibar either begins with a or an upper case letter
+
   print 'This test hangs the shell when it fails...' >&8
   name=0
 # The number 4375 here is chosen to produce more than 16384 bytes of output

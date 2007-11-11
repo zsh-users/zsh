@@ -158,6 +158,7 @@ mod_export char *tokstrings[WHILE + 1] = {
     "))",	/* DOUTPAR	     */
     "&|",	/* AMPERBANG	  30 */
     ";&",	/* SEMIAMP	     */
+    ";|",	/* SEMIBAR	     */
 };
 
 /* lexical state */
@@ -384,6 +385,7 @@ ctxtlex(void)
     case SEMI:
     case DSEMI:
     case SEMIAMP:
+    case SEMIBAR:
     case AMPER:
     case AMPERBANG:
     case INPAR:
@@ -716,6 +718,8 @@ gettok(void)
 	    return DSEMI;
 	else if(d == '&')
 	    return SEMIAMP;
+	else if (d == '|')
+	    return SEMIBAR;
 	hungetc(d);
 	lexstop = 0;
 	return SEMI;

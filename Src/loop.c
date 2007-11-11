@@ -38,7 +38,7 @@ int loops;
 /* # of continue levels */
  
 /**/
-int contflag;
+mod_export int contflag;
  
 /* # of break levels */
  
@@ -52,15 +52,15 @@ execfor(Estate state, int do_exec)
     Wordcode end, loop;
     wordcode code = state->pc[-1];
     int iscond = (WC_FOR_TYPE(code) == WC_FOR_COND), ctok = 0, atok = 0;
+    int last = 0;
     char *name, *str, *cond = NULL, *advance = NULL;
     zlong val = 0;
-    LinkList args = NULL;
+    LinkList vars = NULL, args = NULL;
 
-    name = ecgetstr(state, EC_NODUP, NULL);
     end = state->pc + WC_FOR_SKIP(code);
 
     if (iscond) {
-	str = dupstring(name);
+	str = dupstring(ecgetstr(state, EC_NODUP, NULL));
 	singsub(&str);
 	if (isset(XTRACE)) {
 	    char *str2 = dupstring(str);
@@ -77,28 +77,32 @@ execfor(Estate state, int do_exec)
 	}
 	cond = ecgetstr(state, EC_NODUP, &ctok);
 	advance = ecgetstr(state, EC_NODUP, &atok);
-    } else if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
-	int htok = 0;
-
-	if (!(args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
-	    state->pc = end;
-	    return 0;
-	}
-	if (htok)
-	    execsubst(args);
     } else {
-	char **x;
+	vars = ecgetlist(state, *state->pc++, EC_NODUP, NULL);
 
-	args = newlinklist();
-	for (x = pparams; *x; x++)
-	    addlinknode(args, dupstring(*x));
+	if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
+	    int htok = 0;
+
+	    if (!(args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
+		state->pc = end;
+		return 0;
+	    }
+	    if (htok)
+		execsubst(args);
+	} else {
+	    char **x;
+
+	    args = newlinklist();
+	    for (x = pparams; *x; x++)
+		addlinknode(args, dupstring(*x));
+	}
     }
     lastval = 0;
     loops++;
     pushheap();
     cmdpush(CS_FOR);
     loop = state->pc;
-    for (;;) {
+    while (!last) {
 	if (iscond) {
 	    if (ctok) {
 		str = dupstring(cond);
@@ -127,14 +131,29 @@ execfor(Estate state, int do_exec)
 	    if (!val)
 		break;
 	} else {
-	    if (!args || !(str = (char *) ugetnode(args)))
-		break;
-	    if (isset(XTRACE)) {
-		printprompt4();
-		fprintf(xtrerr, "%s=%s\n", name, str);
-		fflush(xtrerr);
+	    LinkNode node;
+	    int count = 0;
+	    for (node = firstnode(vars); node; incnode(node))
+	    {
+		name = (char *)getdata(node);
+		if (!args || !(str = (char *) ugetnode(args)))
+		{
+		    if (count) { 
+			str = "";
+			last = 1;
+		    } else
+			break;
+		}
+		if (isset(XTRACE)) {
+		    printprompt4();
+		    fprintf(xtrerr, "%s=%s\n", name, str);
+		    fflush(xtrerr);
+		}
+		setsparam(name, ztrdup(str));
+		count++;
 	    }
-	    setsparam(name, ztrdup(str));
+	    if (!count)
+		break;
 	}
 	state->pc = loop;
 	execlist(state, 1, do_exec && args && empty(args));
@@ -177,7 +196,7 @@ execfor(Estate state, int do_exec)
 
 /**/
 int
-execselect(Estate state, int do_exec)
+execselect(Estate state, UNUSED(int do_exec))
 {
     Wordcode end, loop;
     wordcode code = state->pc[-1];
@@ -226,7 +245,7 @@ execselect(Estate state, int do_exec)
 		    int oef = errflag;
 
 		    isfirstln = 1;
-		    str = (char *)zleread(prompt3, NULL, 0);
+		    str = (char *)zleread(&prompt3, NULL, 0, ZLCON_SELECT);
 		    if (errflag)
 			str = NULL;
 		    errflag = oef;
@@ -319,7 +338,8 @@ selectlist(LinkList l, size_t start)
     for (t1 = start; t1 != colsz && t1 - start < lines - 2; t1++) {
 	ap = arr + t1;
 	do {
-	    int t2 = strlen(*ap) + 2, t3;
+	    size_t t2 = strlen(*ap) + 2;
+	    int t3;
 
 	    fprintf(stderr, "%d) %s", t3 = ap - arr + 1, *ap);
 	    while (t3)
@@ -348,7 +368,7 @@ selectlist(LinkList l, size_t start)
 
 /**/
 int
-execwhile(Estate state, int do_exec)
+execwhile(Estate state, UNUSED(int do_exec))
 {
     Wordcode end, loop;
     wordcode code = state->pc[-1];
@@ -361,37 +381,53 @@ execwhile(Estate state, int do_exec)
     cmdpush(isuntil ? CS_UNTIL : CS_WHILE);
     loops++;
     loop = state->pc;
-    for (;;) {
-	state->pc = loop;
-	noerrexit = 1;
-	execlist(state, 1, 0);
-	noerrexit = olderrexit;
-	if (!((lastval == 0) ^ isuntil)) {
-	    if (breaks)
-		breaks--;
-	    lastval = oldval;
-	    break;
-	}
-	if (retflag) {
-	    lastval = oldval;
-	    break;
-	}
-	execlist(state, 1, 0);
-	if (breaks) {
-	    breaks--;
-	    if (breaks || !contflag)
-		break;
-	    contflag = 0;
-	}
-	if (errflag) {
-	    lastval = 1;
-	    break;
-	}
-	if (retflag)
-	    break;
-	freeheap();
-	oldval = lastval;
-    }
+
+    if (loop[0] == WC_END && loop[1] == WC_END) {
+
+        /* This is an empty loop.  Make sure the signal handler sets the
+        * flags and then just wait for someone hitting ^C. */
+
+        int old_simple_pline = simple_pline;
+
+        simple_pline = 1;
+
+        while (!breaks)
+            ;
+        breaks--;
+
+        simple_pline = old_simple_pline;
+    } else
+        for (;;) {
+            state->pc = loop;
+            noerrexit = 1;
+            execlist(state, 1, 0);
+            noerrexit = olderrexit;
+            if (!((lastval == 0) ^ isuntil)) {
+                if (breaks)
+                    breaks--;
+                lastval = oldval;
+                break;
+            }
+            if (retflag) {
+                lastval = oldval;
+                break;
+            }
+            execlist(state, 1, 0);
+            if (breaks) {
+                breaks--;
+                if (breaks || !contflag)
+                    break;
+                contflag = 0;
+            }
+            if (errflag) {
+                lastval = 1;
+                break;
+            }
+            if (retflag)
+                break;
+            freeheap();
+            oldval = lastval;
+        }
     cmdpop();
     popheap();
     loops--;
@@ -401,7 +437,7 @@ execwhile(Estate state, int do_exec)
 
 /**/
 int
-execrepeat(Estate state, int do_exec)
+execrepeat(Estate state, UNUSED(int do_exec))
 {
     Wordcode end, loop;
     wordcode code = state->pc[-1];
@@ -524,9 +560,9 @@ execcase(Estate state, int do_exec)
 	if (isset(XTRACE)) {
 	    char *pat2, *opat;
 
-	    opat = pat = ecgetstr(state, EC_DUP, NULL);
+	    pat = dupstring(opat = ecrawstr(state->prog, state->pc, NULL));
 	    singsub(&pat);
-	    save = (state->prog->alloc != EA_HEAP &&
+	    save = (!(state->prog->flags & EF_HEAP) &&
 		    !strcmp(pat, opat) && *spprog != dummy_patprog2);
 
 	    pat2 = dupstring(pat);
@@ -534,9 +570,8 @@ execcase(Estate state, int do_exec)
 	    printprompt4();
 	    fprintf(xtrerr, "case %s (%s)\n", word, pat2);
 	    fflush(xtrerr);
-	    state->pc++;
-	} else
-	    state->pc += 2;
+	}
+	state->pc += 2;
 
 	if (*spprog != dummy_patprog1 && *spprog != dummy_patprog2)
 	    pprog = *spprog;
@@ -546,11 +581,11 @@ execcase(Estate state, int do_exec)
 		char *opat;
 		int htok = 0;
 
-		opat = pat = dupstring(ecrawstr(state->prog,
+		pat = dupstring(opat = ecrawstr(state->prog,
 						state->pc - 2, &htok));
 		if (htok)
 		    singsub(&pat);
-		save = (state->prog->alloc != EA_HEAP &&
+		save = (!(state->prog->flags & EF_HEAP) &&
 			!strcmp(pat, opat) && *spprog != dummy_patprog2);
 	    }
 	    if (!(pprog = patcompile(pat, (save ? PAT_ZDUP : PAT_STATIC),
@@ -567,17 +602,83 @@ execcase(Estate state, int do_exec)
 		state->pc = next;
 		code = *state->pc;
 		state->pc += 3;
-		next = state->pc + WC_CASE_SKIP(code) - 1;
+		next = state->pc + WC_CASE_SKIP(code) - 2;
 		execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
 				    do_exec));
 	    }
-	    break;
-	} else
-	    state->pc = next;
+	    if (WC_CASE_TYPE(code) != WC_CASE_TESTAND)
+		break;
+	}
+	state->pc = next;
     }
     cmdpop();
 
     state->pc = end;
 
     return lastval;
+}
+
+/*
+ * Errflag from `try' block, may be reset in `always' block.
+ * Accessible from an integer parameter, so needs to be a zlong.
+ */
+
+/**/
+zlong
+try_errflag = -1;
+
+/**/
+int
+exectry(Estate state, int do_exec)
+{
+    Wordcode end, always;
+    int endval;
+    int save_retflag, save_breaks, save_loops, save_contflag;
+    zlong save_try_errflag;
+
+    end = state->pc + WC_TRY_SKIP(state->pc[-1]);
+    always = state->pc + 1 + WC_TRY_SKIP(*state->pc);
+    state->pc++;
+    pushheap();
+    cmdpush(CS_CURSH);
+
+    /* The :try clause */
+    execlist(state, 1, do_exec);
+
+    /* Don't record errflag here, may be reset. */
+    endval = lastval;
+
+    freeheap();
+
+    cmdpop();
+    cmdpush(CS_ALWAYS);
+
+    /* The always clause. */
+    save_try_errflag = try_errflag;
+    try_errflag = (zlong)errflag;
+    errflag = 0;
+    save_retflag = retflag;
+    retflag = 0;
+    save_breaks = breaks;
+    breaks = 0;
+    save_loops = loops;
+    loops = 0;
+    save_contflag = contflag;
+    contflag = 0;
+
+    state->pc = always;
+    execlist(state, 1, do_exec);
+
+    errflag = try_errflag ? 1 : 0;
+    try_errflag = save_try_errflag;
+    retflag = save_retflag;
+    breaks = save_breaks;
+    loops = save_loops;
+    contflag = save_contflag;
+
+    cmdpop();
+    popheap();
+    state->pc = end;
+
+    return endval;
 }

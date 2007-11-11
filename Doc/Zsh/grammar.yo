@@ -199,14 +199,23 @@ var(list) is then executed var(n) times.
 findex(case)
 cindex(case selection)
 cindex(selection, case)
-item(tt(case) var(word) tt(in) [ [tt(LPAR())] var(pattern) [ tt(|) var(pattern) ] ... tt(RPAR()) var(list) (tt(;;)|tt(;&)) ] ... tt(esac))(
+item(tt(case) var(word) tt(in) [ [tt(LPAR())] var(pattern) [ tt(|) var(pattern) ] ... tt(RPAR()) var(list) (tt(;;)|tt(;&)|tt(;|)) ] ... tt(esac))(
 Execute the var(list) associated with the first var(pattern)
 that matches var(word), if any.  The form of the patterns
 is the same as that used for filename generation.  See
 noderef(Filename Generation).
+
 If the var(list) that is executed is terminated with tt(;&) rather than
-tt(;;), the following list is also executed.  This continues until either
-a list is terminated with tt(;;) or the tt(esac) is reached.
+tt(;;), the following list is also executed.  The rule for
+the terminator of the following list tt(;;), tt(;&) or tt(;|) is
+applied unless the tt(esac) is reached.
+
+If the var(list) that is executed is terminated with tt(;|) the
+shell continues to scan the var(pattern)s looking for the next match,
+executing the corresponding var(list), and applying the rule for
+the corresponding terminator tt(;;), tt(;&) or tt(;|).
+Note that var(word) is not re-expanded; all applicable var(pattern)s
+are tested with the same var(word).
 )
 findex(select)
 cindex(user selection)
@@ -390,7 +399,7 @@ var(list) mentioned above.
 item(tt(repeat) var(word) var(sublist))(
 This is a short form of tt(repeat).
 )
-item(tt(case) var(word) tt({) [ [tt(LPAR())] var(pattern) [ tt(|) var(pattern) ] ... tt(RPAR()) var(list) (tt(;;)|tt(;&)) ] ... tt(}))(
+item(tt(case) var(word) tt({) [ [tt(LPAR())] var(pattern) [ tt(|) var(pattern) ] ... tt(RPAR()) var(list) (tt(;;)|tt(;&)|tt(;|)) ] ... tt(}))(
 An alternative form of tt(case).
 )
 item(tt(select) var(name) [ tt(in) var(word) var(term) ] var(sublist))(

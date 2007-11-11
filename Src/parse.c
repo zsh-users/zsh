@@ -167,9 +167,9 @@ struct heredocs *hdocs;
  *
  *   WC_CASE
  *     - first CASE is always of type HEAD, data contains offset to esac
- *     - after that CASEs of type OR (;;) and AND (;&), data is offset to
- *       next case
- *     - each OR/AND case is followed by pattern, pattern-number, list
+ *     - after that CASEs of type OR (;;), AND (;&) and TESTAND (;|),
+ *       data is offset to next case
+ *     - each OR/AND/TESTAND case is followed by pattern, pattern-number, list
  *
  *   WC_IF
  *     - first IF is of type HEAD, data contains offset to fi
@@ -1012,7 +1012,7 @@ par_for(int *complex)
 /*
  * case	: CASE STRING { SEPER } ( "in" | INBRACE )
 				{ { SEPER } STRING { BAR STRING } OUTPAR
-					list [ DSEMI | SEMIAMP ] }
+					list [ DSEMI | SEMIAMP | SEMIBAR ] }
 				{ SEPER } ( "esac" | OUTBRACE )
  */
 
@@ -1139,10 +1139,12 @@ par_case(int *complex)
 	n++;
 	if (tok == SEMIAMP)
 	    type = WC_CASE_AND;
+	else if (tok == SEMIBAR)
+	    type = WC_CASE_TESTAND;
 	ecbuf[pp] = WCB_CASE(type, ecused - 1 - pp);
 	if ((tok == ESAC && !brflag) || (tok == OUTBRACE && brflag))
 	    break;
-	if (tok != DSEMI && tok != SEMIAMP)
+	if (tok != DSEMI && tok != SEMIAMP && tok != SEMIBAR)
 	    YYERRORV(oecused);
 	incasepat = 1;
 	incmdpos = 0;

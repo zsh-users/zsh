@@ -537,7 +537,19 @@ gettext2(Estate state)
 		}
 	    } else if (state->pc < s->u._case.end) {
 		tindent--;
-		taddstr(WC_CASE_TYPE(code) == WC_CASE_OR ? " ;;" : ";&");
+		switch (WC_CASE_TYPE(code)) {
+		case WC_CASE_OR:
+		    taddstr(" ;;");
+		    break;
+
+		case WC_CASE_AND:
+		    taddstr(";&");
+		    break;
+
+		default:
+		    taddstr(";|");
+		    break;
+		}
 		if (tnewlins)
 		    taddnl();
 		else
@@ -553,7 +565,19 @@ gettext2(Estate state)
 			  s->u._case.end);
 	    } else {
 		tindent--;
-		taddstr(WC_CASE_TYPE(code) == WC_CASE_OR ? " ;;" : ";&");
+		switch (WC_CASE_TYPE(code)) {
+		case WC_CASE_OR:
+		    taddstr(" ;;");
+		    break;
+
+		case WC_CASE_AND:
+		    taddstr(";&");
+		    break;
+
+		default:
+		    taddstr(";|");
+		    break;
+		}
 		tindent--;
 		if (tnewlins)
 		    taddnl();
