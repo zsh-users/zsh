@@ -612,20 +612,24 @@ AC_CHECK_LIB(c, printf, [LIBS="$LIBS -lc"])
 AC_CHECK_LIB(m, pow)
 
 dnl Prefer BSD termcap library to SysV curses library, except on certain
-dnl SYSV-derived systems.
+dnl SYSV-derived systems.  However, if we find terminfo and termcap
+dnl stuff in the same library we will use that; typically this
+dnl is ncurses or curses.
 dnl On HPUX, Hcurses is reported to work better than curses.
+dnl Prefer ncurses to curses on all systems; prefer it to tinfo
+dnl if we were told to use curses.  tinfo isn't very common now.
 AC_ARG_WITH(curses-terminfo,
 [  --with-curses-terminfo     use terminfo support from curses library],
 [if test x$withval = xyes; then
-  termcap_curses_order="tinfo curses ncurses termcap"
+  termcap_curses_order="ncurses tinfo curses termcap"
   AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 else
-  termcap_curses_order="tinfo termcap curses ncurses"
+  termcap_curses_order="tinfo termcap ncurses curses"
 fi],
 [case "$host_os" in
   hpux10.*|hpux11.*|solaris*)
-      termcap_curses_order="Hcurses curses ncurses termcap" ;;
-  *)             termcap_curses_order="tinfo termcap curses ncurses" ;;
+      termcap_curses_order="Hcurses ncurses curses termcap" ;;
+  *)             termcap_curses_order="tinfo termcap ncurses curses" ;;
 esac])dnl
 
 AH_TEMPLATE([HAVE_BOOLCODES],
@@ -642,8 +646,13 @@ AH_TEMPLATE([HAVE_STRNAMES],
 [Define if you have the terminfo strnames symbol.])
 AH_TEMPLATE([TERM_H_NEEDS_CURSES_H],
 [Define if term.h chokes without curses.h.])
-AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
+dnl Check for tigetflag (terminfo) before tgetent (termcap).
+dnl That's so that on systems where termcap and [n]curses are
+dnl both available and both contain termcap functions, while
+dnl only [n]curses contains terminfo functions, we only link against
+dnl [n]curses.
 AC_SEARCH_LIBS(tigetflag, [$termcap_curses_order])
+AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
 AC_CHECK_HEADERS(curses.h, [],
 [AC_CACHE_CHECK(for Solaris 8 curses.h mistake, ac_cv_header_curses_solaris,
 AC_TRY_COMPILE([#include <curses.h>], [],
