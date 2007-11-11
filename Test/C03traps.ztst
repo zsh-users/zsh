@@ -253,6 +253,103 @@
 >Exiting, attempt 2
 >Running exit trap
 
+  print Another test that takes three seconds >&8
+  gotsig=0
+  signal_handler() {
+   echo "parent received signal"
+   gotsig=1
+  }
+  child() {
+   sleep 1
+   echo "child sending signal"
+   kill -15 $parentpid
+   sleep 2
+   echo "child exiting" 
+   exit 33
+  } 
+  parentpid=$$
+  child &
+  childpid=$!
+  trap signal_handler 15
+  echo "parent waiting"
+  wait $childpid
+  cstatus=$?
+  echo "wait #1 finished, gotsig=$gotsig, status=$cstatus"
+  gotsig=0
+  wait $childpid
+  cstatus=$?
+  echo "wait #2 finished, gotsig=$gotsig, status=$cstatus"
+0:waiting for trapped signal
+>parent waiting
+>child sending signal
+>parent received signal
+>wait #1 finished, gotsig=1, status=143
+>child exiting
+>wait #2 finished, gotsig=0, status=33
+
+  fn1() {
+    setopt errexit
+    trap 'echo error1' ZERR
+    false
+    print Shouldn\'t get here 1a
+  }
+  fn2() {
+    setopt errexit
+    trap 'echo error2' ZERR
+    return 1
+    print Shouldn\'t get here 2a
+  }
+  fn3() {
+    setopt errexit
+    TRAPZERR() { echo error3; }
+    false
+    print Shouldn\'t get here 3a
+  }
+  fn4() {
+    setopt errexit
+    TRAPZERR() { echo error4; }
+    return 1
+    print Shouldn\'t get here 4a
+  }
+  (fn1; print Shouldn\'t get here 1b)
+  (fn2; print Shouldn\'t get here 2b)
+  (fn3; print Shouldn\'t get here 3b)
+  (fn4; print Shouldn\'t get here 4b)
+1: Combination of ERR_EXIT and ZERR trap
+>error1
+>error2
+>error3
+>error4
+
+   fn1() { TRAPZERR() { print trap; return 42; }; false; print Broken; }
+   (fn1)
+   print Working $?
+0: Force return of containing function from TRAPZERR.
+>trap
+>Working 42
+
+   fn2() { trap 'print trap; return 42' ZERR; false; print Broken }
+   (fn2)
+   print Working $?
+0: Return with non-zero status triggered from within trap '...' ZERR.
+>trap
+>Working 42
+
+   fn3() { TRAPZERR() { print trap; return 0; }; false; print OK this time; }
+   (fn3)
+   print Working $?
+0: Normal return from TRAPZERR.
+>trap
+>OK this time
+>Working 0
+
+   fn4() { trap 'print trap; return 0' ZERR; false; print Broken; }
+   (fn4)
+   print Working $?
+0: Return with zero status triggered from within trap '...' ZERR.
+>trap
+>Working 0
+
 %clean
 
   rm -f TRAPEXIT
