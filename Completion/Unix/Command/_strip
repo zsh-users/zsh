@@ -1,6 +1,60 @@
 #compdef strip
 
-local expl
+local curcontext=$curcontext state line ret=0
+declare -A opt_args
+declare -a args
 
-_description files expl executable
-_files "$expl[@]" -g '*(-*)'
+if _pick_variant gnu=GNU solaris --version; then
+  if [[ -prefix @* ]]; then
+    compset -P '@'
+
+    local expl
+
+    _description files expl 'command-line-options file'
+    _files $expl && ret=0
+    return $ret
+  fi
+  args=(
+    '(-F --target)'{-F+,--target=}'[object code format to use]:bfd name:->bfdnames'
+    '--help[display usage information and exit]'
+    '--info[display list of architectures and object formats]'
+    '(-I --input-target)'{-I+,--input-target=}'[object code format of input]:bfd name:->bfdnames'
+    '(-O --output-target)'{-I+,--output-target=}'[object code format of output]:bfd name:->bfdnames'
+    '*'{-R+,--remove-section=}'[remove given sections]:section name'
+    '(-s --strip-all)'{-s,--strip-all}'[remove all symbols]'
+    '(-g -S -d --strip-debug)'{-g,-S,-d,--strip-debug}'[remove debugging symbols]'
+    '--strip-unneeded[remove symbols not needed for relocation processing]'
+    '*'{-K+,--keep-symbol=}'[keep given symbol]:symbol name'
+    '*'{-N+,--strip-symbol=}'[strip given symbol]:symbol name'
+    '(*)-o+[output file]:output file:_files'
+    '(-p --preserve-dates)'{-p,--preserve-dates}'[preserve access and modification dates]'
+    '(-w --wildcard)'{-w,--wildcard}'[permit wilcards in symbol names]'
+    '(-x --discard-all)'{-x,--discard-all}'[remove non-global symbols]'
+    '(-X --discard-locals)'{-X,--discard-locals}'[remove compiler-generated local symbols]'
+    '--keep-file-symbols[retain symbols specifying source file names]'
+    '--only-keep-debug[remove everything except debugging information]'
+    '(-V --version)'{-V,--version}'[display version information and exit]'
+    '(-v --verbose)'{-v,--verbose}'[list all object files modified or members of archives]')
+else
+  args=(
+    '-l[strip line information only]'
+    '-V[display version information on stderr and exit]'
+    '-x[do not strip the symbol table]')
+fi
+
+_arguments \
+  $args \
+  '1:executable:_files -g "*(-*)"' \
+  '*::executable:_files -g "*(-*)"' && ret=0
+
+case $state in
+  (bfdnames)
+    local expl
+    declare -a bfdnames
+
+    bfdnames=(${=${(M)${(f)"$(_call_program bfdnames strip --help 2>/dev/null)"}:#strip: supported targets: *}#strip: supported targets: })
+    _describe -t bfdnames 'bfd name' bfdnames && ret=0
+    ;;
+esac
+
+return $ret
