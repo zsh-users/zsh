@@ -1390,8 +1390,6 @@ As there are several steps to dispatching a command, the following
 should be checked if attempting to execute a file by extension
 tt(.)var(ext) does not have the expected effect.
 
-startitem()
-item()(
 The command `tt(alias -s) var(ext)' should show
 `tt(ps=zsh-mime-handler)'.  If it shows something else, another suffix
 alias was already installed and was not overwritten.  If it shows
@@ -1399,8 +1397,7 @@ nothing, no handler was installed:  this is most likely because no
 handler was found in the tt(.mime.types) and tt(mailcap) combination for
 tt(.ext) files.  In that case, appropriate handling should be added to
 tt(~/.mime.types) and tt(mailcap).
-)
-item()(
+
 If the extension is handled by tt(zsh-mime-handler) but the file is
 not opened correctly, either the handler defined for the type is
 incorrect, or the flags associated with it are in appropriate.  Running
@@ -1414,8 +1411,7 @@ An example of a suitable tt(mailcap) entry for such a program is:
 
 example(text/html; /usr/bin/lynx '%s'; needsterminal)
 )
-enditem()
-)
+findex(pick-web-browser)
 item(tt(pick-web-browser))(
 This function is separate from the two MIME functions described above
 and can be assigned directly to a suffix:
