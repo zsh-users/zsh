@@ -1331,10 +1331,10 @@ zccmd_querychar(const char *nam, char **args)
     Colorpairnode cpn;
     const struct zcurses_namenumberpair *zattrp;
     LinkList clist;
+    attr_t attrs;
 #if defined(HAVE_WIN_WCH) && defined(HAVE_GETCCHAR)
     wchar_t c;
     cchar_t cc;
-    attr_t attrs;
     int count;
     VARARR(char, instr, 2*MB_CUR_MAX+1);
 #else
