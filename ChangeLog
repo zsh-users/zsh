@@ -1,5 +1,8 @@
 2007-11-12  Peter Stephenson  <pws@csr.com>
 
+	* 24093: Doc/Zsh/arith.yo: be more accurate about supported
+	floating point.
+
 	* 24089: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
 	compilation on non-curses system; also (unposted) avoid crash
 	decoding color when not supported.
