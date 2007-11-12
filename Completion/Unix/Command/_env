@@ -1,0 +1,12 @@
+#compdef env
+
+if _pick_variant gnu=Free\ Soft unix --version; then
+  _arguments \
+    '(--ignore-environment -i)'{-i,--ignore-environment}'[start with empty environment]' \
+    {-u,--unset=}':env var to remove:compadd ${(k)parameters[(R)*export*]}' \
+    '--help[help]' \
+    '--version[version]' \
+    '*::arguments: _normal'
+else
+  _precommand
+fi

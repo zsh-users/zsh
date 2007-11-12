@@ -1,0 +1,70 @@
+#compdef mkdir
+
+local curcontext="$curcontext" line state \
+  args args_zsh args_cmd variant expl ret=1
+typeset -a opt_args
+
+args=(
+  '(-m --mode)'{-m,--mode=}'[set permission mode]:numeric mode'
+  '(-p --parents)'{-p,--parents}'[make parent directories as needed]'
+  )
+
+args_zsh=('(-)*: :->directories')
+
+args_cmd=(
+  '(-v --verbose)'{-v,--verbose}'[print message for each created directory]'
+  '(- :)--help[display help information]'
+  '(- :)--version[display version information]'
+  '*: :->directories'
+  )
+
+case "$OSTYPE" in
+  linux*)
+    args_cmd=(
+      '(-Z --context)'{-Z,--context=}'[set SELinux context]:SELinux context'
+      $args_cmd)
+    ;;
+esac
+
+_pick_variant -r variant gnu=gnu zsh='\(eval\)' unix --help
+
+# It can still happen that there is a precommand command or builtin in the line.
+# In such cases, the variant has to be modified suitably, after further checking
+# the variant of the _command_ mkdir.
+
+# I currently don't know of any way to find out what precommands are present on
+# the line. The variant should be modified like this once a way is found out:
+
+# if [[ $variant == zsh ]]; then
+#   if [[ $precommand = *command* ]]; then
+#     _mkdir_command () { command mkdir "$@" }
+#     _pick_variant -c _mkdir_command -r variant gnu=gnu unix --help
+#   fi
+# elif [[ $precommand = *builtin* ]]; then
+#   variant=zsh
+# fi
+
+if [[ $variant == zsh ]]; then
+  args+=($args_zsh)
+else
+  args+=($args_cmd)
+fi
+
+# remove long options?
+[[ $variant != gnu ]] && args=( ${${${args:#(|*\))--*}//--[^ )]#/}/\( #\)/} )
+
+_arguments -C -s $args && ret=0
+
+case "$state" in
+  directories)
+    if (( $ret )) && [[ ! -prefix - ]] || \
+      [[ $variant == zsh && ${#${${words[2,-1]}:#-*}} -gt 0 ]]; then
+      _wanted directories expl \
+	'parent directory (alternatively specify name of directory)' \
+	_path_files -/ || _message 'name of directory'
+      ret=0
+    fi
+    ;;
+esac
+
+return ret
