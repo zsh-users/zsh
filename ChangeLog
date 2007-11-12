@@ -1,5 +1,9 @@
 2007-11-12  Peter Stephenson  <pws@csr.com>
 
+	* 24089: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c:
+	compilation on non-curses system; also (unposted) avoid crash
+	decoding color when not supported.
+
 	* Vin Shelton: 24088: Src/Modules/curses.c: 24083 error with
 	no multibyte.
 

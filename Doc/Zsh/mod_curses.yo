@@ -204,8 +204,9 @@ position.  The return values are stored in the array named var(param) if
 supplied, else in the array tt(reply).  The first value is the character
 (which may be a multibyte character if the system supports them); the
 second is the color pair in the usual var(fg_col)tt(/)var(bg_col)
-notation.  Any attributes other than color that apply to the character,
-as set with the subcommand tt(attr), appear as additional elements.
+notation, or tt(0) if color is not supported.  Any attributes other than
+color that apply to the character, as set with the subcommand tt(attr),
+appear as additional elements.
 )
 enditem()
 

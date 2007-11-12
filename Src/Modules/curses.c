@@ -94,7 +94,13 @@ static struct ttyinfo saved_tty_state;
 static struct ttyinfo curses_tty_state;
 static LinkList zcurses_windows;
 static HashTable zcurses_colorpairs = NULL;
+#ifdef NCURSES_MOUSE_VERSION
+/*
+ * The following is in principle a general set of flags, but
+ * is currently only needed for mouse status.
+ */
 static int zcurses_flags;
+#endif
 
 #define ZCURSES_EINVALID 1
 #define ZCURSES_EDEFINED 2
@@ -394,6 +400,9 @@ zcurses_colornode(HashNode hn, int cp)
 static Colorpairnode
 zcurses_colorget_reverse(short cp)
 {
+    if (!zcurses_colorpairs)
+	return NULL;
+
     cpn_match = NULL;
     scanhashtable(zcurses_colorpairs, 0, 0, 0,
 		  zcurses_colornode, cp);
@@ -1331,14 +1340,14 @@ zccmd_querychar(const char *nam, char **args)
     Colorpairnode cpn;
     const struct zcurses_namenumberpair *zattrp;
     LinkList clist;
-    attr_t attrs;
 #if defined(HAVE_WIN_WCH) && defined(HAVE_GETCCHAR)
+    attr_t attrs;
     wchar_t c;
     cchar_t cc;
     int count;
     VARARR(char, instr, 2*MB_CUR_MAX+1);
 #else
-    chtype inc;
+    chtype inc, attrs;
     char instr[3];
 #endif
 
@@ -1376,11 +1385,7 @@ zccmd_querychar(const char *nam, char **args)
 	instr[0] = STOUC(inc);
 	instr[1] = '\0';
     }
-    /*
-     * I'm guessing this is OK... header says attr_t must be at
-     * least as wide as chtype.
-     */
-    attrs = (attr_t)inc;
+    attrs = inc;
 #endif
 
     /*
