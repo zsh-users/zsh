@@ -1,0 +1,27 @@
+#compdef hg
+
+local context state line
+typeset -A opt_args
+
+if (( ! $+_mercurial_cmds )); then
+  local _mercurial_cmds
+  _mercurial_cmds=( $($service debugcomplete) )
+fi
+if (( ! $+_mercurial_options )); then
+  local _mercurial_options
+  _mercurial_options=( $($service debugcomplete --options) )
+fi
+
+_arguments \
+  "$_mercurial_options[@]" \
+  '*:command:->subcmds' && return 0
+
+case "$state" in
+  (subcmds)
+    if (( CURRENT == 2 )); then
+      compadd -- "$_mercurial_cmds[@]"
+    else
+      _files
+    fi
+  ;;
+esac
