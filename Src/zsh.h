@@ -1690,7 +1690,9 @@ struct ttyinfo {
 #  ifdef OXTABS
 #define SGTABTYPE       OXTABS
 #  else
+#   ifdef XTABS
 #define SGTABTYPE       XTABS
+#   endif
 #  endif
 # endif
 
