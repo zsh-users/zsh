@@ -2536,7 +2536,7 @@ bin_zcompile(char *nam, char **args, Options ops, UNUSED(int func))
 static Wordcode
 load_dump_header(char *nam, char *name, int err)
 {
-    int fd, v = 0;
+    int fd, v = 1;
     wordcode buf[FD_PRELEN + 1];
 
     if ((fd = open(name, O_RDONLY)) < 0) {
@@ -2624,6 +2624,8 @@ write_dump(int dfd, LinkList progs, int map, int hlen, int tlen)
 
     if (map == 1)
 	map = (tlen >= FD_MINMAP);
+
+    memset(pre, 0, sizeof(wordcode) * FD_PRELEN);
 
     for (ohlen = hlen; ; hlen = ohlen) {
 	fdmagic(pre) = (other ? FD_OMAGIC : FD_MAGIC);
