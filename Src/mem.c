@@ -32,7 +32,7 @@
 
 /*
 	There are two ways to allocate memory in zsh.  The first way is
-	to call zalloc/zcalloc, which call malloc/calloc directly.  It
+	to call zalloc/zshcalloc, which call malloc/calloc directly.  It
 	is legal to call realloc() or free() on memory allocated this way.
 	The second way is to call zhalloc/hcalloc, which allocates memory
 	from one of the memory pools on the heap stack.  Such memory pools 
@@ -64,6 +64,15 @@
 	guarantees that the memory for the pool is at the end of the memory
 	which means that we can give it back to the system when the pool is
 	freed.
+
+	hrealloc(char *p, size_t old, size_t new) is an optimisation
+	with a similar interface to realloc().  Typically the new size
+	will be larger than the old one, since there is no gain in
+	shrinking the allocation (indeed, that will confused hrealloc()
+	since it will forget that the unused space once belonged to this
+	pointer).  However, new == 0 is a special case; then if we
+	had to allocate a special heap for this memory it is freed at
+	that point.
 */
 
 #if defined(HAVE_SYS_MMAN_H) && defined(HAVE_MMAP) && defined(HAVE_MUNMAP)
@@ -98,14 +107,19 @@ union mem_align {
 
 #define H_ISIZE  sizeof(union mem_align)
 #define HEAPSIZE (16384 - H_ISIZE)
+/* Memory available for user data in default arena size */
 #define HEAP_ARENA_SIZE (HEAPSIZE - sizeof(struct heap))
 #define HEAPFREE (16384 - H_ISIZE)
+
+/* Memory available for user data in heap h */
+#define ARENA_SIZEOF(h) ((h)->size - sizeof(struct heap))
 
 /* list of zsh heaps */
 
 static Heap heaps;
 
-/* first heap with free space, not always correct */
+/* a heap with free space, not always correct (it will be the last heap
+ * if that was newly allocated but it may also be another one) */
 
 static Heap fheap;
 
@@ -115,9 +129,13 @@ static Heap fheap;
 mod_export Heap
 new_heaps(void)
 {
-    Heap h = heaps;
+    Heap h;
+
+    queue_signals();
+    h = heaps;
 
     fheap = heaps = NULL;
+    unqueue_signals();
 
     return h;
 }
@@ -130,6 +148,7 @@ old_heaps(Heap old)
 {
     Heap h, n;
 
+    queue_signals();
     for (h = heaps; h; h = n) {
 	n = h->next;
 	DPUTS(h->sp, "BUG: old_heaps() with pushed heaps");
@@ -141,6 +160,7 @@ old_heaps(Heap old)
     }
     heaps = old;
     fheap = NULL;
+    unqueue_signals();
 }
 
 /* Temporarily switch to other heaps (or back again). */
@@ -149,10 +169,14 @@ old_heaps(Heap old)
 mod_export Heap
 switch_heaps(Heap new)
 {
-    Heap h = heaps;
+    Heap h;
+
+    queue_signals();
+    h = heaps;
 
     heaps = new;
     fheap = NULL;
+    unqueue_signals();
 
     return h;
 }
@@ -166,6 +190,8 @@ pushheap(void)
     Heap h;
     Heapstack hs;
 
+    queue_signals();
+
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
     h_push++;
 #endif
@@ -177,6 +203,7 @@ pushheap(void)
 	h->sp = hs;
 	hs->used = h->used;
     }
+    unqueue_signals();
 }
 
 /* reset heaps to previous state */
@@ -186,6 +213,8 @@ mod_export void
 freeheap(void)
 {
     Heap h, hn, hl = NULL;
+
+    queue_signals();
 
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
     h_free++;
@@ -199,7 +228,7 @@ freeheap(void)
 	    memset(arena(h) + h->sp->used, 0xff, h->used - h->sp->used);
 #endif
 	    h->used = h->sp->used;
-	    if (!fheap && h->used < HEAP_ARENA_SIZE)
+	    if (!fheap && h->used < ARENA_SIZEOF(h))
 		fheap = h;
 	    hl = h;
 	} else {
@@ -214,6 +243,8 @@ freeheap(void)
 	hl->next = NULL;
     else
 	heaps = NULL;
+
+    unqueue_signals();
 }
 
 /* reset heap to previous state and destroy state information */
@@ -224,6 +255,8 @@ popheap(void)
 {
     Heap h, hn, hl = NULL;
     Heapstack hs;
+
+    queue_signals();
 
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
     h_pop++;
@@ -238,7 +271,7 @@ popheap(void)
 	    memset(arena(h) + hs->used, 0xff, h->used - hs->used);
 #endif
 	    h->used = hs->used;
-	    if (!fheap && h->used < HEAP_ARENA_SIZE)
+	    if (!fheap && h->used < ARENA_SIZEOF(h))
 		fheap = h;
 	    zfree(hs, sizeof(*hs));
 
@@ -255,7 +288,47 @@ popheap(void)
 	hl->next = NULL;
     else
 	heaps = NULL;
+
+    unqueue_signals();
 }
+
+#ifdef USE_MMAP
+/*
+ * Utility function to allocate a heap area of at least *n bytes.
+ * *n will be rounded up to the next page boundary.
+ */
+static Heap
+mmap_heap_alloc(size_t *n)
+{
+    Heap h;
+    static size_t pgsz = 0;
+
+    if (!pgsz) {
+
+#ifdef _SC_PAGESIZE
+	pgsz = sysconf(_SC_PAGESIZE);     /* SVR4 */
+#else
+# ifdef _SC_PAGE_SIZE
+	pgsz = sysconf(_SC_PAGE_SIZE);    /* HPUX */
+# else
+	pgsz = getpagesize();
+# endif
+#endif
+
+	pgsz--;
+    }
+    *n = (*n + pgsz) & ~pgsz;
+    h = (Heap) mmap(NULL, *n, PROT_READ | PROT_WRITE,
+		    MMAP_FLAGS, -1, 0);
+    if (h == ((Heap) -1)) {
+	zerr("fatal error: out of heap memory", NULL, 0);
+	exit(1);
+    }
+
+    return h;
+}
+#endif
+
 
 /* allocate memory from the current memory pool */
 
@@ -268,16 +341,24 @@ zhalloc(size_t size)
 
     size = (size + H_ISIZE - 1) & ~(H_ISIZE - 1);
 
+    queue_signals();
+
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
     h_m[size < (1024 * H_ISIZE) ? (size / H_ISIZE) : 1024]++;
 #endif
 
     /* find a heap with enough free space */
 
-    for (h = (fheap ? fheap : heaps); h; h = h->next) {
-	if (HEAP_ARENA_SIZE >= (n = size + h->used)) {
+    for (h = ((fheap && ARENA_SIZEOF(fheap) >= (size + fheap->used))
+	      ? fheap : heaps);
+	 h; h = h->next) {
+	if (ARENA_SIZEOF(h) >= (n = size + h->used)) {
+	    void *ret;
+
 	    h->used = n;
-	    return arena(h) + n - size;
+	    ret = arena(h) + n - size;
+	    unqueue_signals();
+	    return ret;
 	}
     }
     {
@@ -289,37 +370,11 @@ zhalloc(size_t size)
             /* tricky, see above */
 #endif
 
-	queue_signals();
 	n = HEAP_ARENA_SIZE > size ? HEAPSIZE : size + sizeof(*h);
 	for (hp = NULL, h = heaps; h; hp = h, h = h->next);
 
 #ifdef USE_MMAP
-	{
-	    static size_t pgsz = 0;
-
-	    if (!pgsz) {
-
-#ifdef _SC_PAGESIZE
-		pgsz = sysconf(_SC_PAGESIZE);     /* SVR4 */
-#else
-# ifdef _SC_PAGE_SIZE
-		pgsz = sysconf(_SC_PAGE_SIZE);    /* HPUX */
-# else
-		pgsz = getpagesize();
-# endif
-#endif
-
-		pgsz--;
-	    }
-	    n = (n + pgsz) & ~pgsz;
-	    h = (Heap) mmap(NULL, n, PROT_READ | PROT_WRITE,
-			    MMAP_FLAGS, -1, 0);
-	    if (h == ((Heap) -1)) {
-		zerr("fatal error: out of heap memory", NULL, 0);
-		exit(1);
-	    }
-	    h->size = n;
-	}
+	h = mmap_heap_alloc(&n);
 #else
 	h = (Heap) zalloc(n);
 #endif
@@ -330,6 +385,7 @@ zhalloc(size_t size)
 	called = 1;
 #endif
 
+	h->size = n;
 	h->used = size;
 	h->next = NULL;
 	h->sp = NULL;
@@ -338,7 +394,7 @@ zhalloc(size_t size)
 	    hp->next = h;
 	else
 	    heaps = h;
-	fheap = NULL;
+	fheap = h;
 
 	unqueue_signals();
 	return arena(h);
@@ -361,14 +417,23 @@ hrealloc(char *p, size_t old, size_t new)
 
     /* find the heap with p */
 
+    queue_signals();
     for (h = heaps, ph = NULL; h; ph = h, h = h->next)
-	if (p >= arena(h) && p < arena(h) + HEAP_ARENA_SIZE)
+	if (p >= arena(h) && p < arena(h) + ARENA_SIZEOF(h))
 	    break;
 
     DPUTS(!h, "BUG: hrealloc() called for non-heap memory.");
     DPUTS(h->sp && arena(h) + h->sp->used > p,
 	  "BUG: hrealloc() wants to realloc pushed memory");
 
+    /*
+     * If the end of the old chunk is before the used pointer,
+     * more memory has been zhalloc'ed afterwards.
+     * We can't tell if that's still in use, obviously, since
+     * that's the whole point of heap memory.
+     * We have no choice other than to grab some more memory
+     * somewhere else and copy in the old stuff.
+     */
     if (p + old < arena(h) + h->used) {
 	if (new > old) {
 	    char *ptr = (char *) zhalloc(new);
@@ -376,14 +441,29 @@ hrealloc(char *p, size_t old, size_t new)
 #ifdef ZSH_MEM_DEBUG
 	    memset(p, 0xff, old);
 #endif
+	    unqueue_signals();
 	    return ptr;
-	} else
+	} else {
+	    unqueue_signals();
 	    return new ? p : NULL;
+	}
     }
 
     DPUTS(p + old != arena(h) + h->used, "BUG: hrealloc more than allocated");
 
+    /*
+     * We now know there's nothing afterwards in the heap, now see if
+     * there's nothing before.  Then we can reallocate the whole thing.
+     * Otherwise, we need to keep the stuff at the start of the heap,
+     * then allocate a new one too; this is handled below.  (This will
+     * guarantee we occupy a full heap next time round, provided we
+     * don't use the heap for anything else.)
+     */
     if (p == arena(h)) {
+	/*
+	 * Zero new seems to be a special case saying we've finished
+	 * with the specially reallocated memory, see scanner() in glob.c.
+	 */
 	if (!new) {
 	    if (ph)
 		ph->next = h->next;
@@ -395,26 +475,59 @@ hrealloc(char *p, size_t old, size_t new)
 #else
 	    zfree(h, HEAPSIZE);
 #endif
+	    unqueue_signals();
 	    return NULL;
 	}
-#ifndef USE_MMAP
-	if (old > HEAP_ARENA_SIZE || new > HEAP_ARENA_SIZE) {
-	    size_t n = HEAP_ARENA_SIZE > new ? HEAPSIZE : new + sizeof(*h);
+	if (new > ARENA_SIZEOF(h)) {
+	    /*
+	     * Not enough memory in this heap.  Allocate a new
+	     * one of sufficient size.
+	     *
+	     * To avoid this happening too often, allocate
+	     * chunks in multiples of HEAPSIZE.
+	     * (Historical note:  there didn't used to be any
+	     * point in this since we didn't consistently record
+	     * the allocated size of the heap, but now we do.)
+	     */
+	    size_t n = (new + sizeof(*h) + HEAPSIZE);
+	    n -= n % HEAPSIZE;
+	    fheap = NULL;
 
+#ifdef USE_MMAP
+	    {
+		/*
+		 * I don't know any easy portable way of requesting
+		 * a mmap'd segment be extended, so simply allocate
+		 * a new one and copy.
+		 */
+		Heap hnew;
+
+		hnew = mmap_heap_alloc(&n);
+		/* Copy the entire heap, header (with next pointer) included */
+		memcpy(hnew, h, h->size);
+		munmap((void *)h, h->size);
+		h = hnew;
+	    }
+#else
+	    h = (Heap) realloc(h, n);
+#endif
+
+	    h->size = n;
 	    if (ph)
-		ph->next = h = (Heap) realloc(h, n);
+		ph->next = h;
 	    else
-		heaps = h = (Heap) realloc(h, n);
+		heaps = h;
 	}
 	h->used = new;
+	unqueue_signals();
 	return arena(h);
-#endif
     }
 #ifndef USE_MMAP
-    DPUTS(h->used > HEAP_ARENA_SIZE, "BUG: hrealloc at invalid address");
+    DPUTS(h->used > ARENA_SIZEOF(h), "BUG: hrealloc at invalid address");
 #endif
-    if (h->used + (new - old) <= HEAP_ARENA_SIZE) {
+    if (h->used + (new - old) <= ARENA_SIZEOF(h)) {
 	h->used += new - old;
+	unqueue_signals();
 	return p;
     } else {
 	char *t = zhalloc(new);
@@ -423,6 +536,7 @@ hrealloc(char *p, size_t old, size_t new)
 #ifdef ZSH_MEM_DEBUG
 	memset(p, 0xff, old);
 #endif
+	unqueue_signals();
 	return t;
     }
 }
@@ -450,26 +564,30 @@ zalloc(size_t size)
 
     if (!size)
 	size = 1;
+    queue_signals();
     if (!(ptr = (void *) malloc(size))) {
 	zerr("fatal error: out of memory", NULL, 0);
 	exit(1);
     }
+    unqueue_signals();
 
     return ptr;
 }
 
 /**/
 mod_export void *
-zcalloc(size_t size)
+zshcalloc(size_t size)
 {
     void *ptr;
 
     if (!size)
 	size = 1;
+    queue_signals();
     if (!(ptr = (void *) malloc(size))) {
 	zerr("fatal error: out of memory", NULL, 0);
 	exit(1);
     }
+    unqueue_signals();
     memset(ptr, 0, size);
 
     return ptr;
@@ -485,6 +603,7 @@ zcalloc(size_t size)
 mod_export void *
 zrealloc(void *ptr, size_t size)
 {
+    queue_signals();
     if (ptr) {
 	if (size) {
 	    /* Do normal realloc */
@@ -492,44 +611,22 @@ zrealloc(void *ptr, size_t size)
 		zerr("fatal error: out of memory", NULL, 0);
 		exit(1);
 	    }
+	    unqueue_signals();
 	    return ptr;
 	}
 	else
 	    /* If ptr is not NULL, but size is zero, *
 	     * then object pointed to is freed.      */
 	    free(ptr);
+
+	ptr = NULL;
     } else {
 	/* If ptr is NULL, then behave like malloc */
-	return malloc(size);
+	ptr = malloc(size);
     }
+    unqueue_signals();
 
-    return NULL;
-}
-
-/**/
-mod_export char *
-dupstring(const char *s)
-{
-    char *t;
-
-    if (!s)
-	return NULL;
-    t = (char *) zhalloc(strlen((char *)s) + 1);
-    strcpy(t, s);
-    return t;
-}
-
-/**/
-mod_export char *
-ztrdup(const char *s)
-{
-    char *t;
-
-    if (!s)
-	return NULL;
-    t = (char *)zalloc(strlen((char *)s) + 1);
-    strcpy(t, s);
-    return t;
+    return ptr;
 }
 
 /**/
@@ -674,7 +771,7 @@ static char *m_high, *m_low;
    size of the small blocks held in a memory block, given a pointer to the
    header of it.  M_SBLEN() gives the size of a memory block that can hold
    an array of small blocks, given the size of these small blocks.  M_BSLEN()
-   caculates the size of the small blocks held in a memory block, given the
+   calculates the size of the small blocks held in a memory block, given the
    length of that block (including the header of the memory block.  M_NSMALL
    is the number of possible block sizes that small blocks should be used
    for. */
@@ -718,10 +815,26 @@ malloc(MALLOC_ARG_T size)
 #endif
 
     /* some systems want malloc to return the highest valid address plus one
-       if it is called with an argument of zero */
+       if it is called with an argument of zero.
+    
+       TODO: really?  Suppose we allocate more memory, so
+       that this is now in bounds, then a more rational application
+       that thinks it can free() anything it malloc'ed, even
+       of zero length, calls free for it?  Aren't we in big
+       trouble?  Wouldn't it be safer just to allocate some
+       memory anyway?
+
+       If the above comment is really correct, then at least
+       we need to check in free() if we're freeing memory
+       at m_high.
+    */
 
     if (!size)
+#if 1
+	size = 1;
+#else
 	return (MALLOC_RET_T) m_high;
+#endif
 
     queue_signals();  /* just queue signals rather than handling them */
 
@@ -1118,7 +1231,12 @@ zfree(void *p, int sz)
 	long n = (m_lfree->len - M_MIN - M_KEEP) & ~(m_pgsz - 1);
 
 	m_lfree->len -= n;
+#ifdef HAVE_BRK
 	if (brk(m_high -= n) == -1) {
+#else
+	m_high -= n;
+	if (sbrk(-n) == (void *)-1) {
+#endif /* HAVE_BRK */
 	    DPUTS(1, "MEM: allocation error at brk.");
 	}
 
@@ -1214,28 +1332,29 @@ calloc(MALLOC_ARG_T n, MALLOC_ARG_T size)
 
 /**/
 int
-bin_mem(char *name, char **argv, char *ops, int func)
+bin_mem(char *name, char **argv, Options ops, int func)
 {
     int i, ii, fi, ui, j;
     struct m_hdr *m, *mf, *ms;
     char *b, *c, buf[40];
     long u = 0, f = 0, to, cu;
 
-    if (ops['v']) {
+    queue_signals();
+    if (OPT_ISSET(ops,'v')) {
 	printf("The lower and the upper addresses of the heap. Diff gives\n");
 	printf("the difference between them, i.e. the size of the heap.\n\n");
     }
     printf("low mem %ld\t high mem %ld\t diff %ld\n",
 	   (long)m_l, (long)m_high, (long)(m_high - ((char *)m_l)));
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nThe number of bytes that were allocated using sbrk() and\n");
 	printf("the number of bytes that were given back to the system\n");
 	printf("via brk().\n");
     }
     printf("\nsbrk %d\tbrk %d\n", m_s, m_b);
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nInformation about the sizes that were allocated or freed.\n");
 	printf("For each size that were used the number of mallocs and\n");
 	printf("frees is shown. Diff gives the difference between these\n");
@@ -1257,11 +1376,11 @@ bin_mem(char *name, char **argv, char *ops, int func)
     if (m_m[i] || m_f[i])
 	printf("big\t%d\t%d\t%d\n", m_m[i], m_f[i], m_m[i] - m_f[i]);
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nThe list of memory blocks. For each block the following\n");
 	printf("information is shown:\n\n");
 	printf("num\tthe number of this block\n");
-	printf("tnum\tlike num but counted separatedly for used and free\n");
+	printf("tnum\tlike num but counted separately for used and free\n");
 	printf("\tblocks\n");
 	printf("addr\tthe address of this block\n");
 	printf("len\tthe length of the block\n");
@@ -1270,7 +1389,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	printf("\t  free\tthis block is free\n");
 	printf("\t  small\tthis block is used for an array of small blocks\n");
 	printf("cum\tthe accumulated sizes of the blocks, counted\n");
-	printf("\tseparatedly for used and free blocks\n");
+	printf("\tseparately for used and free blocks\n");
 	printf("\nFor blocks holding small blocks the number of free\n");
 	printf("blocks, the number of used blocks and the size of the\n");
 	printf("blocks is shown. For otherwise used blocks the first few\n");
@@ -1309,7 +1428,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	    mf = mf->next;
     }
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nHere is some information about the small blocks used.\n");
 	printf("For each size the arrays with the number of free and the\n");
 	printf("number of used blocks are shown.\n");
@@ -1328,7 +1447,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	    }
 	    putchar('\n');
 	}
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\n\nBelow is some information about the allocation\n");
 	printf("behaviour of the zsh heaps. First the number of times\n");
 	printf("pushheap(), popheap(), and freeheap() were called.\n");
@@ -1337,7 +1456,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 
     printf("push %d\tpop %d\tfree %d\n\n", h_push, h_pop, h_free);
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nThe next list shows for several sizes the number of times\n");
 	printf("memory of this size were taken from heaps.\n\n");
     }
@@ -1349,6 +1468,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
     if (h_m[1024])
 	printf("big\t%d\n", h_m[1024]);
 
+    unqueue_signals();
     return 0;
 }
 
@@ -1359,7 +1479,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 
 /**/
 mod_export void
-zfree(void *p, int sz)
+zfree(void *p, UNUSED(int sz))
 {
     if (p)
 	free(p);
