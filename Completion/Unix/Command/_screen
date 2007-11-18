@@ -75,7 +75,11 @@ _arguments -C \
   '-p[preselect the named window]:window number or name:((\=\:windowlist -\:blank\ window \:window\ number))' \
   '-q[quiet startup, exit with non-zero return code if unsuccessful]' \
   '-r[reattach to a detached screen process]: :->detached-sessions' \
+  '-Dr: :->any-sessions' \
+  '-dr: :->any-sessions' \
   '-R[reattach if possible, otherwise start a new session]: :->detached-sessions' \
+  '-DR: :->any-sessions' \
+  '-dR: :->any-sessions' \
   '-s[shell to execute rather than $SHELL]:shell name: _command_names -e' \
   '-S[name this session <pid>.sockname instead of <pid>.<tty>.<host>]:session name' \
   "-t[set title (window's name)]:title" \
@@ -84,6 +88,8 @@ _arguments -C \
   '(-)-v[print screen version]' \
   '(-)-wipe[do nothing, clean up SockDir]' \
   '-x[attach to a not detached screen (multi display mode)]: :->attached-sessions' \
+  '-Dx: :->any-sessions' \
+  '-dx: :->any-sessions' \
   '-X[execute command as a screen command in the specified session]:screencmd:(${scr_cmds[@]})' \
   '*::arguments: _normal'
 
@@ -101,6 +107,11 @@ if [[ -n $state ]]; then
             -ls)"}:#*[Dd]etached*}##[[:blank:]]}%%[[:blank:]]*}
       )
     ;;
+    any-sessions)
+      sessions=(
+        ${${${(M)${(f)"$(_call_program screen-sessions $words[1] \
+	    -ls)"}:#*tached*}##[[:blank:]]}%%[[:blank:]]*}
+      )
   esac
 
   # check if initial PID is necessary to make sessions unambiguous
