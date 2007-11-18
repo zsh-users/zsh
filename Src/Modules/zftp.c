@@ -2167,7 +2167,7 @@ zftp_login(char *name, char **args, UNUSED(int flags))
 	    else
 		acct = zfgetinfo("Account: ", 0);
 	    zsfree(ucmd);
-	    ucmd = tricat("ACCT ", passwd, "\r\n");
+	    ucmd = tricat("ACCT ", acct, "\r\n");
 	    if (zfsendcmd(ucmd) == 6)
 		stopit = 2;
 	    break;
