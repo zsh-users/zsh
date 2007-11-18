@@ -58,7 +58,6 @@
  
 #define child_block()      signal_block(sigchld_mask)
 #define child_unblock()    signal_unblock(sigchld_mask)
-#define child_suspend(S)   signal_suspend(SIGCHLD, S)
 
 /* ignore a signal */
 #define signal_ignore(S)   signal(S, SIG_IGN)
@@ -73,48 +72,38 @@
  * queue signals, it is probably overkill for zsh to do  *
  * this, but it shouldn't hurt anything to do it anyway. */
 
-/* Right now I'm queueing all signals, but maybe we only *
- * need to queue SIGCHLD.  Anybody know?                 */
-
-#define MAX_QUEUE_SIZE 16
+#define MAX_QUEUE_SIZE 128
 
 #define queue_signals()    (queueing_enabled++)
 
-#define unqueue_signals()  do { \
-    DPUTS(!queueing_enabled, "BUG: unqueue_signals called but not queueing"); \
-    if (!--queueing_enabled) { \
-	while (queue_front != queue_rear) {      /* while signals in queue */ \
-	    sigset_t oset; \
-	    queue_front = (queue_front + 1) % MAX_QUEUE_SIZE; \
-	    oset = signal_setmask(signal_mask_queue[queue_front]); \
-	    handler(signal_queue[queue_front]);  /* handle queued signal   */ \
-	    signal_setmask(oset); \
-	} \
+#define run_queued_signals() do { \
+    while (queue_front != queue_rear) {      /* while signals in queue */ \
+	sigset_t oset; \
+	queue_front = (queue_front + 1) % MAX_QUEUE_SIZE; \
+	oset = signal_setmask(signal_mask_queue[queue_front]); \
+	zhandler(signal_queue[queue_front]);  /* handle queued signal   */ \
+	signal_setmask(oset); \
     } \
 } while (0)
 
+#define unqueue_signals()  do { \
+    DPUTS(!queueing_enabled, "BUG: unqueue_signals called but not queueing"); \
+    if (!--queueing_enabled) run_queued_signals(); \
+} while (0)
 
-/* Make some signal functions faster. */
+#define queue_signal_level() queueing_enabled
 
-#ifdef POSIX_SIGNALS
-#define signal_block(S) \
-    ((dummy_sigset1 = (S)), \
-     sigprocmask(SIG_BLOCK, &dummy_sigset1, &dummy_sigset2), \
-     dummy_sigset2)
-#else
-# ifdef BSD_SIGNALS
+#define dont_queue_signals() do { \
+    queueing_enabled = 0; \
+    run_queued_signals(); \
+} while (0)
+
+#define restore_queue_signals(q) (queueing_enabled = (q))
+
+#ifdef BSD_SIGNALS
 #define signal_block(S) sigblock(S)
-# else
-extern sigset_t signal_block _((sigset_t));
-# endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
-
-#ifdef POSIX_SIGNALS
-#define signal_unblock(S) \
-    ((dummy_sigset1 = (S)), \
-     sigprocmask(SIG_UNBLOCK, &dummy_sigset1, &dummy_sigset2), \
-     dummy_sigset2)
 #else
-extern sigset_t signal_unblock _((sigset_t));
-#endif   /* POSIX_SIGNALS */
+extern sigset_t signal_block _((sigset_t));
+#endif  /* BSD_SIGNALS   */
 
+extern sigset_t signal_unblock _((sigset_t));
