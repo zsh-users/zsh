@@ -12,8 +12,8 @@ _arguments -s \
   '(-l --link)'{-l,--link}'[link files instead of copying]' \
   '(-L --dereference)'{-L,--dereference}'[always follow symbolic links]' \
   '-p[same as --preserve=mode,ownership,timestamps]' \
-  '--preserve=:attributes to preserve:_values -s , mode ownership timestamps links all' \
-  '--no-preserve=:attributes not to preserve:_values -s , mode ownership timestamps links all' \
+  '--preserve=:attributes to preserve:_values -s , attribute mode ownership timestamps links all' \
+  '--no-preserve=:attributes not to preserve:_values -s , attribute mode ownership timestamps links all' \
   '--parents[append source path to target directory]' \
   '-P[same as --no-dereference]' \
   '(-R -r --recursive)'{-R,-r,--recursive}'[copy directories recursively]' \

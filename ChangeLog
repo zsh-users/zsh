@@ -1,3 +1,8 @@
+2007-11-18  Clint Adams  <clint@zsh.org>
+
+	* Nikolai Weibull: 24075: Completion/Unix/Command/_cp: fix
+	completion of values for --preserve and --no-preserve.
+
 2007-11-12  Peter Stephenson  <pws@csr.com>
 
 	* 24093: Doc/Zsh/arith.yo: be more accurate about supported
