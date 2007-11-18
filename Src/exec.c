@@ -1047,10 +1047,10 @@ execpline(Estate state, wordcode slcode, int how, int last1)
     child_block();
 
     /*
-     * Get free entry in job table and initialize it.
-     * This is currently the only call to initjob(), so this
-     * is also the only place where we can expand the job table
-     * under us.
+     * Get free entry in job table and initialize it.  This is currently
+     * the only call to initjob() (apart from a minor exception in
+     * clearjobtab()), so this is also the only place where we can
+     * expand the job table under us.
      */
     if ((thisjob = newjob = initjob()) == -1) {
 	child_unblock();
@@ -1462,20 +1462,29 @@ closemn(struct multio **mfds, int fd)
 	pid_t pid;
 	struct timeval bgtime;
 
+	/*
+	 * We need to block SIGCHLD in case the process
+	 * we are spawning terminates before the job table
+	 * is set up to handle it.
+	 */
+	child_block();
 	if ((pid = zfork(&bgtime))) {
 	    for (i = 0; i < mn->ct; i++)
 		zclose(mn->fds[i]);
 	    zclose(mn->pipe);
-	    if (pid == -1) { 
+	    if (pid == -1) {
 		mfds[fd] = NULL;
+		child_unblock();
 		return;
 	    }
 	    mn->ct = 1;
 	    mn->fds[0] = fd;
 	    addproc(pid, NULL, 1, &bgtime);
+	    child_unblock();
 	    return;
 	}
 	/* pid == 0 */
+	child_unblock();
 	closeallelse(mn);
 	if (mn->rflag) {
 	    /* tee process */
@@ -2533,8 +2542,38 @@ execcmd(Estate state, int input, int output, int how, int last1)
     }
 
   err:
-    if (forked)
+    if (forked) {
+	/*
+	 * So what's going on here then?  Well, I'm glad you asked.
+	 *
+	 * If we create multios for use in a subshell we do
+	 * this after forking, in this function above.  That
+	 * means that the current (sub)process is responsible
+	 * for clearing them up.  However, the processes won't
+	 * go away until we have closed the fd's talking to them.
+	 * Since we're about to exit the shell there's nothing
+	 * to stop us closing all fd's (including the ones 0 to 9
+	 * that we usually leave alone).
+	 *
+	 * Then we wait for any processes.  When we forked,
+	 * we cleared the jobtable and started a new job just for
+	 * any oddments like this, so if there aren't any we won't
+	 * need to wait.  The result of not waiting is that
+	 * the multios haven't flushed the fd's properly, leading
+	 * to obscure missing data.
+	 *
+	 * It would probably be cleaner to ensure that the
+	 * parent shell handled multios, but that requires
+	 * some architectural changes which are likely to be
+	 * hairy.
+	 */
+	for (i = 0; i < 10; i++)
+	    if (fdtable[i] != FDT_UNUSED)
+		close(i);
+	closem(FDT_UNUSED);
+	waitjobs();
 	_exit(lastval);
+    }
     fixfds(save);
 
  done:
