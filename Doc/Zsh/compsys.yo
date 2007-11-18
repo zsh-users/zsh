@@ -1340,12 +1340,17 @@ without a tag.  Its values are of the form
 `var(dir)tt(:)var(names...)'.  This will add the var(names) (strings
 separated by spaces) as
 possible matches when completing in the directory var(dir), even if no 
-such files really exist.
+such files really exist.  The dir may be a pattern; pattern characters
+or colons in var(dir) should be quote with a backslash to be treated
+literally.
 
 This can be useful on systems that support special filesystems whose
 top-level pathnames can not be listed or generated with glob patterns.
 It can also be used for directories for which one does not have read
 permission.
+
+The pattern form can be used to add a certain `magic' entry
+to all directories on a particular filing system.
 )
 kindex(fake-parameters, completion style)
 item(tt(fake-parameters))(
