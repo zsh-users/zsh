@@ -27,6 +27,7 @@ arguments=(
   '-l[lisp mode]'
   '-C[make vim compatible with vi]'
   '-N[do not force compatibility with vi]'
+  '(--nofork -f)'{--nofork,-f}'[do not detach the GUI version from the shell]'
   '-V-[verbosity level]::verbosity:((0\:"do not display any messages"
                                      1\:"display when viminfo file is read or written"
                                      2\:"display sourced files"
@@ -44,8 +45,10 @@ arguments=(
   '(-A    -F)-H[start in Hebrew mode]'
   '(-A -H   )-H[start in Farsi mode]'
   '-T[set terminal type]:::_terminals'
-  '-u[use given RC file instead of default .vimrc]::rc file:_files'
+  '-u[use given vimrc file instead of default .vimrc]::rc file:_files'
+  '-U[use given gvimrc file instead of default .gvimrc]::rc file:_files'
   '--noplugin[do not load plugin scripts]'
+  '-p-[number of tabs to open (default: one for each file)]::tab count: '
   '-o-[number of windows to open (default: one for each file)]::window count: '
   '-O-[number of windows to vertically split open (default is one for each file)]::window count: '
   '*--cmd[execute given command before loading any RC files]:command: '
@@ -61,6 +64,7 @@ arguments=(
   '--remote-wait[as --remote but wait for files to have been edited]:*:file:_vim_files'
   '--remote-wait-silent[as --remote-wait but without complaining if not possible]:*:file:_vim_files'
   '--remote-send[send given keys to vim server if possible]:keys: '
+  '--remote-tab[as --remote but open tab page for each file]:*:file:_vim_files'
   '--remote-expr[evaluate given expression in a vim server and print result]:expression: '
   '(- *)--serverlist[list available vim servers and exit]'
   '--servername[name of vim server to send to or name of server to become]:server name: '
