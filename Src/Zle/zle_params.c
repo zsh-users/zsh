@@ -497,16 +497,18 @@ set_killring(UNUSED(Param pm), char **x)
 	 */
 	int kpos = 0;
 	kringsize = arrlen(x);
-	kring = (Cutbuffer)zshcalloc(kringsize * sizeof(struct cutbuffer));
-	for (p = x; *p; p++) {
-	    int n, len = strlen(*p);
-	    kptr = kring + kpos;
+	if (kringsize != 0) {
+	    kring = (Cutbuffer)zshcalloc(kringsize * sizeof(struct cutbuffer));
+	    for (p = x; *p; p++) {
+		int n, len = strlen(*p);
+		kptr = kring + kpos;
 
-	    kptr->buf = stringaszleline(*p, 0, &n, NULL, NULL);
-	    kptr->len = n;
+		kptr->buf = stringaszleline(*p, 0, &n, NULL, NULL);
+		kptr->len = n;
 
-	    zfree(*p, len+1);
-	    kpos = (kpos + kringsize -1 ) % kringsize;
+		zfree(*p, len+1);
+		kpos = (kpos + kringsize -1 ) % kringsize;
+	    }
 	}
 	free(x);
     }

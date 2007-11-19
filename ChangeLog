@@ -1,5 +1,9 @@
 2007-11-19  Peter Stephenson  <pws@csr.com>
 
+	* users/12230: Src/Zle/zle_params.c: if killring was set
+	to empty array, kringsize was zero but kring was unset,
+	causing unhealthy effects in cut().
+
 	* unposted: from Eric Mangold: Completion/Unix/Command/_twisted:
 	update.
 
