@@ -24,16 +24,16 @@ local ZFTP_VERBOSE=${ZFTP_VERBOSE//0}
 
 if [[ -z $ZFTP_HOST ]]; then
   zfopen || return 1
-  [[ $1 = *d* ]] || do_close=1
+  [[ $1 == *d* ]] || do_close=1
 elif zftp test 2>/dev/null; then
   return 0
 else
   zfopen || return 1
 fi
 
-if [[ $1 = *n* ]]; then
+if [[ $1 == *n* ]]; then
   return 0
-elif [[ -n $lastloc && $ZFTP_HOST = ${lastloc%%:*} ]]; then
+elif [[ -n $lastloc && $ZFTP_HOST == ${lastloc%%:*} ]]; then
   # don't print directory since we're just going back where we were.
   zfcd ${lastloc#*:} >& /dev/null
 fi
