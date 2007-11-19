@@ -2728,9 +2728,16 @@ bindkey '^Xa' all-matches
 zstyle ':completion:all-matches:*' old-matches only
 zstyle ':completion:all-matches::::' completer _all_matches)
 
-Note that this does not generate completions by itself.  First use
+Note that this does not generate completions by itself:  first use
 any of the standard ways of generating a list of completions,
-then use tt(^Xa) to show all matches.
+then use tt(^Xa) to show all matches.  It is possible instead to
+add a standard completer to the list and request that the
+list of all matches should be directly inserted:
+
+example(zstyle ':completion:all-matches::::' completer _all_matches _complete
+zstyle ':completion:all-matches:*' insert true)
+
+In this case the tt(old-matches) style should not be set.
 )
 findex(_approximate)
 item(tt(_approximate))(
