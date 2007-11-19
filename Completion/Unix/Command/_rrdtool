@@ -1,0 +1,23 @@
+#compdef rrdtool
+
+_arguments \
+  ':rrdtool command:(create update updatev graph dump restore
+                   last lastupdate first help info fetch tune
+		   resize xport)' \
+  '*::subcmd:->subcmd' && return 0
+
+case "$state" in
+    (subcmd)
+
+  case "$words[1]" in
+      (help)
+      	_wanted -V 'subcommands' expl 'subcommand' compadd \
+	create update updatev graph dump restore last lastupdate \
+	first help info fetch tune resize xport
+	;;
+      (*)
+    	_files
+    	;;
+  esac
+  ;;
+esac
