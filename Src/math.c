@@ -40,7 +40,7 @@ int noeval;
 /* integer zero */
 
 /**/
-mnumber zero_mnumber;
+mod_export mnumber zero_mnumber;
 
 /* last input base we used */
 
@@ -168,8 +168,8 @@ static int prec[TOKCOUNT] =
      0,  16, 0
 };
 
-#define TOPPREC 17
-#define ARGPREC (TOPPREC-1)
+#define TOPPREC 18
+#define ARGPREC 16
 
 static int type[TOKCOUNT] =
 {
@@ -186,14 +186,75 @@ static int type[TOKCOUNT] =
 /* 50 */  LR|OP_OPF, RL|OP_E2, LR|OP_OPF
 };
 
+static int
+lexconstant(void)
+{
+#ifdef USE_LOCALE
+    char *prev_locale;
+#endif
+    char *nptr;
+
+    nptr = ptr;
+    if (*nptr == '-')
+	nptr++;
+
+    if (*nptr == '0')
+    {
+	nptr++;
+	if (*nptr == 'x' || *nptr == 'X') {
+	    /* Let zstrtol parse number with base */
+	    yyval.u.l = zstrtol(ptr, &ptr, 0);
+	    /* Should we set lastbase here? */
+	    lastbase = 16;
+	    return NUM;
+	}
+	else if (isset(OCTALZEROES) &&
+		 (memchr(nptr, '.', strlen(nptr)) == NULL) &&
+		 idigit(*nptr)) {
+	    yyval.u.l = zstrtol(ptr, &ptr, 0);
+	    lastbase = 8;
+	    return NUM;
+	}
+    }
+
+    while (idigit(*nptr))
+	nptr++;
+
+    if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
+	/* it's a float */
+	yyval.type = MN_FLOAT;
+#ifdef USE_LOCALE
+	prev_locale = dupstring(setlocale(LC_NUMERIC, NULL));
+	setlocale(LC_NUMERIC, "POSIX");
+#endif
+	yyval.u.d = strtod(ptr, &nptr);
+#ifdef USE_LOCALE
+	if (prev_locale) setlocale(LC_NUMERIC, prev_locale);
+#endif
+	if (ptr == nptr || *nptr == '.') {
+	    zerr("bad floating point constant", NULL, 0);
+	    return EOI;
+	}
+	ptr = nptr;
+    } else {
+	/* it's an integer */
+	yyval.u.l = zstrtol(ptr, &ptr, 10);
+
+	if (*ptr == '#') {
+	    ptr++;
+	    yyval.u.l = zstrtol(ptr, &ptr, lastbase = yyval.u.l);
+	}
+    }
+    return NUM;
+}
+
+/**/
+int outputradix;
 
 /**/
 static int
 zzlex(void)
 {
-#ifdef USE_LOCALE
-    char *prev_locale;
-#endif
     int cct = 0;
     yyval.type = MN_INTEGER;
 
@@ -218,7 +279,14 @@ zzlex(void)
 		ptr++;
 		return MINUSEQ;
 	    }
-	    return (unary) ? UMINUS : MINUS;
+	    if (unary) {
+		if (idigit(*ptr) || *ptr == '.') {
+		    ptr--;
+		    return lexconstant();
+		} else
+		    return UMINUS;
+	    } else
+		return MINUS;
 	case '(':
 	    return M_INPAR;
 	case ')':
@@ -340,61 +408,53 @@ zzlex(void)
 	    return EOI;
 	case '[':
 	    {
-		int base = zstrtol(ptr, &ptr, 10);
+		int n;
 
-		if (*ptr == ']')
-		    ptr++;
-		yyval.u.l = zstrtol(ptr, &ptr, lastbase = base);
-		return NUM;
+		if (idigit(*ptr)) {
+		    n = zstrtol(ptr, &ptr, 10);
+		    if (*ptr != ']' || !idigit(*++ptr)) {
+			zerr("bad base syntax", NULL, 0);
+			return EOI;
+		    }
+		    yyval.u.l = zstrtol(ptr, &ptr, lastbase = n);
+		    return NUM;
+		}
+		if (*ptr == '#') {
+		    n = 1;
+		    if (*++ptr == '#') {
+			n = -1;
+			ptr++;
+		    }
+		    if (!idigit(*ptr))
+			goto bofs;
+		    outputradix = n * zstrtol(ptr, &ptr, 10);
+		} else {
+		    bofs:
+		    zerr("bad output format specification", NULL, 0);
+		    return EOI;
+		}
+		if(*ptr != ']')
+			goto bofs;
+		ptr++;
+		break;
 	    }
 	case ' ':
 	case '\t':
 	case '\n':
 	    break;
-	case '0':
-	    if (*ptr == 'x' || *ptr == 'X') {
-		/* Should we set lastbase here? */
-		yyval.u.l = zstrtol(++ptr, &ptr, lastbase = 16);
-		return NUM;
-	    }
 	/* Fall through! */
 	default:
-	    if (idigit(*--ptr) || *ptr == '.') {
-		char *nptr;
-		for (nptr = ptr; idigit(*nptr); nptr++);
-
-		if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
-		    /* it's a float */
-		    yyval.type = MN_FLOAT;
-#ifdef USE_LOCALE
-		    prev_locale = setlocale(LC_NUMERIC, NULL);
-		    setlocale(LC_NUMERIC, "POSIX");
-#endif
-		    yyval.u.d = strtod(ptr, &nptr);
-#ifdef USE_LOCALE
-		    setlocale(LC_NUMERIC, prev_locale);
-#endif
-		    if (ptr == nptr || *nptr == '.') {
-			zerr("bad floating point constant", NULL, 0);
-			return EOI;
-		    }
-		    ptr = nptr;
-		} else {
-		    /* it's an integer */
-		    yyval.u.l = zstrtol(ptr, &ptr, 10);
-
-		    if (*ptr == '#') {
-			ptr++;
-			yyval.u.l = zstrtol(ptr, &ptr, lastbase = yyval.u.l);
-		    }
-		}
-		return NUM;
-	    }
+	    if (idigit(*--ptr) || *ptr == '.')
+		return lexconstant();
 	    if (*ptr == '#') {
 		if (*++ptr == '\\' || *ptr == '#') {
 		    int v;
 
 		    ptr++;
+		    if (!*ptr) {
+			zerr("character missing after ##", NULL, 0);
+			return EOI;
+		    }
 		    ptr = getkeystring(ptr, NULL, 6, &v);
 		    yyval.u.l = v;
 		    return NUM;
@@ -446,7 +506,7 @@ static struct mathvalue *stack;
 
 /**/
 static void
-push(mnumber val, char *lval)
+push(mnumber val, char *lval, int getme)
 {
     if (sp == STACKSZ - 1)
 	zerr("stack overflow", NULL, 0);
@@ -454,8 +514,21 @@ push(mnumber val, char *lval)
 	sp++;
     stack[sp].val = val;
     stack[sp].lval = lval;
+    if (getme)
+	stack[sp].val.type = MN_UNSET;
 }
 
+/**/
+static mnumber
+pop(int noget)
+{
+    struct mathvalue *mv = stack+sp;
+
+    if (mv->val.type == MN_UNSET && !noget)
+	mv->val = getnparam(mv->lval);
+    sp--;
+    return errflag ? zero_mnumber : mv->val;
+}
 
 /**/
 static mnumber
@@ -465,10 +538,12 @@ getcvar(char *s)
     mnumber mn;
     mn.type = MN_INTEGER;
 
+    queue_signals();
     if (!(t = getsparam(s)))
 	mn.u.l = 0;
     else
         mn.u.l = STOUC(*t == Meta ? t[1] ^ 32 : *t);
+    unqueue_signals();
     return mn;
 }
 
@@ -485,6 +560,7 @@ setvar(char *s, mnumber v)
     }
     if (noeval)
 	return v;
+    untokenize(s);
     setnparam(s, v);
     return v;
 }
@@ -582,8 +658,10 @@ op(int what)
     if (tp & (OP_A2|OP_A2IR|OP_A2IO|OP_E2|OP_E2IO)) {
 	/* Make sure anyone seeing this message reports it. */
 	DPUTS(sp < 1, "BUG: math: not enough wallabies in outback.");
-	b = stack[sp--].val;
-	a = stack[sp--].val;
+	b = pop(0);
+	a = pop(what == EQ);
+	if (errflag)
+	    return;
 
 	if (tp & (OP_A2IO|OP_E2IO)) {
 	    /* coerce to integers */
@@ -595,10 +673,11 @@ op(int what)
 		b.type = MN_INTEGER;
 		b.u.l = (zlong)b.u.d;
 	    }
-	} else if (a.type != b.type && what != COMMA) {
+	} else if (a.type != b.type && what != COMMA &&
+		   (a.type != MN_UNSET || what != EQ)) {
 	    /*
 	     * Different types, so coerce to float.
-	     * It may happen during an assigment that the LHS
+	     * It may happen during an assignment that the LHS
 	     * variable is actually an integer, but there's still
 	     * no harm in doing the arithmetic in floating point;
 	     * the assignment will do the correct conversion.
@@ -752,13 +831,15 @@ op(int what)
 	}
 	if (tp & (OP_E2|OP_E2IO)) {
 	    lv = stack[sp+1].lval;
-	    push(setvar(lv,c), lv);
+	    push(setvar(lv,c), lv, 0);
 	} else
-	    push(c,NULL);
+	    push(c,NULL, 0);
 	return;
     }
 
     spval = &stack[sp].val;
+    if (stack[sp].val.type == MN_UNSET)
+	*spval = getnparam(stack[sp].lval);
     switch (what) {
     case NOT:
 	if (spval->type & MN_FLOAT) {
@@ -804,11 +885,13 @@ op(int what)
 	break;
     case QUEST:
 	DPUTS(sp < 2, "BUG: math: three shall be the number of the counting.");
-	c = stack[sp--].val;
-	b = stack[sp--].val;
-	a = stack[sp--].val;
+	c = pop(0);
+	b = pop(0);
+	a = pop(0);
+	if (errflag)
+	    return;
 	/* b and c can stay different types in this case. */
-	push(((a.type & MN_FLOAT) ? a.u.d : a.u.l) ? b : c, NULL);
+	push(((a.type & MN_FLOAT) ? a.u.d : a.u.l) ? b : c, NULL, 0);
 	break;
     case COLON:
 	zerr("':' without '?'", NULL, 0);
@@ -839,7 +922,11 @@ static void
 bop(int tk)
 {
     mnumber *spval = &stack[sp].val;
-    int tst = (spval->type & MN_FLOAT) ? (zlong)spval->u.d : spval->u.l; 
+    int tst;
+
+    if (stack[sp].val.type == MN_UNSET)
+	*spval = getnparam(stack[sp].lval);
+    tst = (spval->type & MN_FLOAT) ? (zlong)spval->u.d : spval->u.l; 
 
     switch (tk) {
     case DAND:
@@ -902,10 +989,29 @@ mathevall(char *s, int prek, char **ep)
     stack[0].val.u.l = 0;
     mathparse(prek);
     *ep = ptr;
-    DPUTS(!errflag && sp,
+    DPUTS(!errflag && sp > 0,
 	  "BUG: math: wallabies roaming too freely in outback");
 
-    ret = stack[0].val;
+    if (errflag) {
+	/*
+	 * This used to set the return value to errflag.
+	 * I don't understand how that could be useful; the
+	 * caller doesn't know that's what's happened and
+	 * may not get a value at all.
+	 * Worse, we reset errflag in execarith() and setting
+	 * this explicitly non-zero means a (( ... )) returns
+	 * status 0 if there's an error.  That surely can't
+	 * be right.  execarith() now detects an error and returns
+	 * status 2.
+	 */
+	ret.type = MN_INTEGER;
+	ret.u.l = 0;
+    } else {
+	if (stack[0].val.type == MN_UNSET)
+	    ret = getnparam(stack[0].lval);
+	else
+	    ret = stack[0].val;
+    }
 
     if (--mlevel) {
 	lastbase = xlastbase;
@@ -929,6 +1035,9 @@ matheval(char *s)
     char *junk;
     mnumber x;
     int xmtok = mtok;
+    /* maintain outputradix across levels of evaluation */
+    if (!mlevel)
+	outputradix = 0;
 
     if (!*s) {
 	x.type = MN_INTEGER;
@@ -943,7 +1052,7 @@ matheval(char *s)
 }
 
 /**/
-zlong
+mod_export zlong
 mathevali(char *s)
 {
     mnumber x = matheval(s);
@@ -1014,22 +1123,25 @@ mathparse(int pc)
     if (errflag)
 	return;
     mtok = zzlex();
+    /* Handle empty input */
+    if (pc == TOPPREC && mtok == EOI)
+	return;
     checkunary(mtok, optr);
     while (prec[mtok] <= pc) {
 	if (errflag)
 	    return;
 	switch (mtok) {
 	case NUM:
-	    push(yyval, NULL);
+	    push(yyval, NULL, 0);
 	    break;
 	case ID:
-	    push((noeval ? zero_mnumber : getnparam(yylval)), yylval);
+	    push(zero_mnumber, yylval, !noeval);
 	    break;
 	case CID:
-	    push((noeval ? zero_mnumber : getcvar(yylval)), yylval);
+	    push((noeval ? zero_mnumber : getcvar(yylval)), yylval, 0);
 	    break;
 	case FUNC:
-	    push((noeval ? zero_mnumber : callmathfunc(yylval)), yylval);
+	    push((noeval ? zero_mnumber : callmathfunc(yylval)), yylval, 0);
 	    break;
 	case M_INPAR:
 	    mathparse(TOPPREC);
@@ -1040,6 +1152,8 @@ mathparse(int pc)
 	    }
 	    break;
 	case QUEST:
+	    if (stack[sp].val.type == MN_UNSET)
+		stack[sp].val = getnparam(stack[sp].lval);
 	    q = (stack[sp].val.type == MN_FLOAT) ? (zlong)stack[sp].val.u.d :
 		stack[sp].val.u.l;
 
