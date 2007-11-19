@@ -37,9 +37,9 @@ function load_twisted_completions() {
     python_code='
 import twisted, os.path
 dir = os.path.dirname(twisted.__file__)
-print dir + os.sep + os.path.join("python", "zsh")
+print os.path.join(dir, "python", "zsh")
 '
-    dir=$($PYTHON -c "$python_code")
+    dir=$(${=PYTHON} -c "$python_code")
     #debug "Trying to load twisted functions from $dir:q"
     if [[ -r $dir/_twistd ]]; then
         old_fpath=($fpath)

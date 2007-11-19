@@ -1,3 +1,8 @@
+2007-11-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted: from Eric Mangold: Completion/Unix/Command/_twisted:
+	update.
+
 2007-11-18  Clint Adams  <clint@zsh.org>
 
 	* Nikolai Weibull: 24075: Completion/Unix/Command/_cp: fix
