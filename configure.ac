@@ -2244,7 +2244,6 @@ char *argv[];
   esac
   case "$host" in
     *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
-    *-freebsd[3-9]*|*-kfreebsd*|*-linux*|gnu*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
     *openbsd*)
        if test $zsh_cv_sys_elf = yes; then
 	 EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}"
@@ -2270,6 +2269,13 @@ char *argv[];
       esac
     ;;
   esac
+AC_CACHE_CHECK(if we can use -rdynamic, zsh_cv_rdynamic_available,
+old_LDFLAGS="$LDFLAGS"
+LDFLAGS="$LDFLAGS -rdynamic"
+AC_TRY_LINK([], [], [zsh_cv_rdynamic_available=yes
+EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}"],
+[zsh_cvs_rdynamic_available=no])
+LDFLAGS="$old_LDFLAGS")
   AC_CACHE_CHECK(if your dlsym() needs a leading underscore,
    zsh_cv_func_dlsym_needs_underscore,
    [echo failed >conftestval && cat >conftest.c <<EOM
