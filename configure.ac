@@ -636,6 +636,17 @@ AC_CHECK_LIB(c, printf, [LIBS="$LIBS -lc"])
 
 AC_CHECK_LIB(m, pow)
 
+dnl Various features of ncurses depend on having the right header
+dnl (the system's own curses.h may well not be good enough).
+dnl So don't search for ncurses unless we found the header.
+if test x$ac_cv_header_ncurses_h = xyes; then
+  ncursesw_test=ncursesw
+  ncurses_test=ncurses
+else
+  ncursesw_test=
+  ncurses_test=
+fi
+
 dnl Prefer BSD termcap library to SysV curses library, except on certain
 dnl SYSV-derived systems.  However, if we find terminfo and termcap
 dnl stuff in the same library we will use that; typically this
@@ -648,12 +659,13 @@ AC_HELP_STRING([--with-term-lib=LIBS], [search space-separated LIBS for terminal
   termcap_curses_order="$withval"
   AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 else
-  termcap_curses_order="ncursesw tinfo termcap ncurses curses"
+  termcap_curses_order="$ncursesw_test tinfo termcap $ncurses_test curses"
 fi],
 [case "$host_os" in
   hpux10.*|hpux11.*|solaris*)
-      termcap_curses_order="Hcurses ncursesw ncurses curses termcap" ;;
-  *)             termcap_curses_order="ncursesw tinfo termcap ncurses curses" ;;
+   termcap_curses_order="Hcurses $ncursesw_test $ncurses_test curses termcap" ;;
+  *)
+   termcap_curses_order="$ncursesw_test tinfo termcap $ncurses_test curses" ;;
 esac])dnl
 
 AH_TEMPLATE([HAVE_BOOLCODES],
@@ -2357,7 +2369,8 @@ char *argv[];
     esac
   fi
   case "$host_os" in
-    *freebsd*|linux*|irix*|osf*|gnu*|dragonfly*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
+    osf*) DLLDFLAGS="${DLLDFLAGS=-shared -expect_unresolved '*'}" ;;
+    *freebsd*|linux*|irix*|gnu*|dragonfly*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
     sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
     netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;

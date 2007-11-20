@@ -1,5 +1,15 @@
 2007-11-20  Peter Stephenson  <pws@csr.com>
 
+	* 24104: INSTALL, configure.ac: don't search for ncurses if
+	we can't find ncurses.h.
+
+	* 24103: Doc/Makefile.in: ensure zsh.texi is updated if
+	the version changes.
+
+	* ????? & 24104: configure.ac: attempt to prevent Tru64 Unix
+	from reporting missing symbols when linking dynamically (not
+	tested).
+
 	* unposted: run Util/check_exports and add some mod_export tags.
 
 	* unposted: fix .distfiles and version.mk for 4.3.4-dev-2.

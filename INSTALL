@@ -328,6 +328,14 @@ use ncursesw may cause problems during building.  If so, please report this
 to the developers at zsh-workers@sunsite.dk and attempt to recompile with
 --with-term-lib="tinfo termcap ncurses curses" (see below).
 
+Note that use of ncurses requires the header ncurses.h, so this
+needs to be in the include path.  configure will not search for
+ncurses or ncursesw unless this is the case.  If you have installed
+ncurses.h in a non-standard place you may need to pass
+CPPFLAGS=-I/usr/local/include (or wherever the header is found) to
+configure.  Similarly, you may need to pass LDFLAGS=-L/usr/local/lib
+(or wherever) in order to find the library.
+
 On some systems a suitable development package with a name such as
 curses-devel or ncurses-devel needs to be installed before zsh can
 be compiled.  This is likely to be contained on any installation media,
