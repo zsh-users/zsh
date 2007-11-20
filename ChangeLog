@@ -1,5 +1,11 @@
 2007-11-20  Peter Stephenson  <pws@csr.com>
 
+	* 24107: configure.ac, Src/Modules/curses.c: yet more
+	library fun: search for ncurses headers in other places,
+	don't use ncursesw/ncurses.h if no multibyte support,
+	don't use any ncurses headers if the terminal library
+	isn't ncurses.
+
 	* 24104: INSTALL, configure.ac: don't search for ncurses if
 	we can't find ncurses.h.
 

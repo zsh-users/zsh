@@ -557,7 +557,8 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 unistd.h sys/capability.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
 		 netinet/in_systm.h pcre.h langinfo.h wchar.h stddef.h \
-		 sys/stropts.h iconv.h ncurses.h)
+		 sys/stropts.h iconv.h ncurses.h ncursesw/ncurses.h \
+		 ncurses/ncurses.h)
 if test x$dynamic = xyes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -639,7 +640,7 @@ AC_CHECK_LIB(m, pow)
 dnl Various features of ncurses depend on having the right header
 dnl (the system's own curses.h may well not be good enough).
 dnl So don't search for ncurses unless we found the header.
-if test x$ac_cv_header_ncurses_h = xyes; then
+if test x$ac_cv_header_ncurses_h = xyes || test x$ac_cv_header_ncurses_ncurses_h = xyes || test x$ac_cv_header_ncursesw_ncurses_h = xyes; then
   ncursesw_test=ncursesw
   ncurses_test=ncurses
 else
@@ -718,6 +719,16 @@ AC_MSG_RESULT(yes)
 else
 AC_MSG_RESULT(no)
 fi
+
+dnl If our terminal library is not ncurses, don't try including
+dnl any ncurses headers.
+AH_TEMPLATE([ZSH_IGNORE_NCURSES],
+[Define to 1 to ignore any ncurses library headers found on the system.])
+case $LIBS in
+  ncurses*) ;;
+  *)
+  AC_DEFINE(ZSH_IGNORE_NCURSES) ;;
+esac
 
 AC_MSG_CHECKING(if boolcodes is available)
 AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
@@ -1381,7 +1392,7 @@ dnl Where are curses key definitions located?  Need for keypad() mode.
 AC_CACHE_CHECK(where curses key definitions are located, zsh_cv_path_curses_keys_h,
 [dnl This is an identical trick to errno.h, except we use ncurses.h
 dnl if we can.
-if test x$ac_cv_header_ncurses_h = xyes; then
+if test x$ac_cv_header_ncurses_h = xyes || test x$ac_cv_header_ncurses_ncurses_h = xyes || test x$ac_cv_header_ncursesw_ncurses_h = xyes; then
   echo "#include <ncurses.h>" >nametmp.c
 else
   if test x$ac_cv_header_curses_h = xyes; then
