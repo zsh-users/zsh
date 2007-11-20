@@ -1726,8 +1726,11 @@ setstrvalue(Value v, char *val)
 	    }
 	    if (v->start > zlen)
 		v->start = zlen;
-	    if (v->end < 0)
+	    if (v->end < 0) {
 		v->end += zlen + 1;
+		if (v->end < 0)
+		    v->end = 0;
+	    }
 	    else if (v->end > zlen)
 		v->end = zlen;
 	    x = (char *) zalloc(v->start + strlen(val) + zlen - v->end + 1);
