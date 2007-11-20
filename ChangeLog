@@ -1,5 +1,9 @@
 2007-11-20  Peter Stephenson  <pws@csr.com>
 
+	* 24108 plus yet another tweak: configure.ac: the test
+	for whether we using ncurses as a library was both wrong
+	and in the wrong place.
+
 	* 24107: configure.ac, Src/Modules/curses.c: yet more
 	library fun: search for ncurses headers in other places,
 	don't use ncursesw/ncurses.h if no multibyte support,
