@@ -1,5 +1,7 @@
 2007-11-20  Peter Stephenson  <pws@csr.com>
 
+	* unposted: run Util/check_exports and add some mod_export tags.
+
 	* unposted: fix .distfiles and version.mk for 4.3.4-dev-2.
 
 2007-11-19  Peter Stephenson  <pws@csr.com>

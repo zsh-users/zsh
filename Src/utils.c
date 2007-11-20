@@ -1351,7 +1351,7 @@ freestr(void *a)
 }
 
 /**/
-void
+mod_export void
 gettyinfo(struct ttyinfo *ti)
 {
     if (SHTTY != -1) {
@@ -2862,7 +2862,7 @@ getshfunc(char *nam)
 }
 
 /**/
-char **
+mod_export char **
 mkarray(char *s)
 {
     char **t = (char **) zalloc((s) ? (2 * sizeof s) : (sizeof s));

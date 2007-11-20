@@ -33,7 +33,7 @@
 /* text attribute mask */
 
 /**/
-unsigned txtattrmask;
+mod_export unsigned txtattrmask;
 
 /* text change - attribute change made by prompts */
 
