@@ -46,8 +46,11 @@ _diffstat       _java           _pax            _stty           _zip
 _du             _joe            _pbm            _su
 _dvi            _killall        _perforce       _subversion
 _ecasound       _knock          _perl           _sudo
+_cut
 _dmidecode
 _guilt
+_md5sum
+_ranlib
 _rrdtool
 _units
 '

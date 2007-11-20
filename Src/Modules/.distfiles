@@ -2,7 +2,7 @@ DISTFILES_SRC='
     .cvsignore .distfiles .exrc
     cap.mdd cap.c
     clone.mdd clone.c
-    curses.mdd curses.c
+    curses.mdd curses.c curses_keys.awk
     datetime.mdd datetime.c
     example.mdd example.c
     files.mdd files.c

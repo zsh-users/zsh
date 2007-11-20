@@ -10,4 +10,9 @@ _auto-apt           _debsign      _madison           _uscan
 _bts                _dlocate      _make-kpkg         _wajig
 _bug                _dpkg         _mergechanges      _wanna-build
 _cdbs-edit-patch    _dpkg-cross   _module-assistant
+_dpatch-edit-patch
+_dpkg-buildpackage
+_dpkg-repack
+_lighttpd
+_svn-buildpackage
 '

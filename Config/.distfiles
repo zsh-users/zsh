@@ -1,5 +1,6 @@
 DISTFILES_SRC='
     .distfiles .cvsignore
+    aczshoot.m4
     clean.mk config.mk defs.mk.in version.mk
     installfns.sh uninstallfns.sh
 '
