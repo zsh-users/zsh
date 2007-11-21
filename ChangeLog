@@ -1,3 +1,7 @@
+2007-11-21  Peter Stephenson  <pws@csr.com>
+
+	* 24110: Src/Modules/curses.c: change those includes yet again.
+
 2007-11-20  Peter Stephenson  <pws@csr.com>
 
 	* 24108 plus yet another tweak: configure.ac: the test

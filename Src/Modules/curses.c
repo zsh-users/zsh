@@ -49,11 +49,11 @@
 # ifdef HAVE_NCURSESW_NCURSES_H
 #  include <ncursesw/ncurses.h>
 # else
-#  ifdef HAVE_NCURSES_H
-#   include <ncurses.h>
+#  ifdef HAVE_NCURSES_NCURSES_H
+#   include <ncurses/ncurses.h>
 #  else
-#   ifdef HAVE_NCURSES_NCURSES_H
-#    include <ncurses/ncurses.h>
+#   ifdef HAVE_NCURSES_H
+#    include <ncurses.h>
 #   else
 #    ifdef HAVE_CURSES_H
 #     include <curses.h>
