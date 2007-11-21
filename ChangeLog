@@ -1,3 +1,8 @@
+2007-11-21  Clint Adams  <clint@zsh.org>
+
+	* arno.: 24111: Completion/Debian/Command/_dlocate: complete -lsbin
+	and -lsman options to dlocate.
+
 2007-11-21  Peter Stephenson  <pws@csr.com>
 
 	* 24110: Src/Modules/curses.c: change those includes yet again.
