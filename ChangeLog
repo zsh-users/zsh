@@ -1,3 +1,8 @@
+2007-11-22  Clint Adams  <clint@zsh.org>
+
+	* 24114: Completion/Unix/Command/_git: make colon suffix removable
+	after the first part of refspecs.
+
 2007-11-21  Clint Adams  <clint@zsh.org>
 
 	* arno.: 24111: Completion/Debian/Command/_dlocate: complete -lsbin

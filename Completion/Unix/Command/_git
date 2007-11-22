@@ -2801,7 +2801,7 @@ __git_ref_specs () {
     if compset -S ':*'; then
       __git_heads
     else
-      __git_heads -S ':'
+      __git_heads -qS ':'
     fi
   fi
 }
