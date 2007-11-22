@@ -66,7 +66,7 @@ prompt_clint_precmd () {
 
   git_dir=$(git-rev-parse --git-dir 2> /dev/null) || return
   git_ref=$(git-symbolic-ref HEAD 2> /dev/null) || git_ref="(no branch)"
-  psvar[2]=${ref#refs/heads/}
+  psvar[2]=${git_ref#refs/heads/}
 
 }
 

@@ -1,5 +1,8 @@
 2007-11-22  Clint Adams  <clint@zsh.org>
 
+	* unposted: Functions/Prompts/prompt_clint_setup: fix typo in git
+	psvar assignment.
+
 	* Sean Finney: 24115: Completion/Unix/Command/_git: offer tags as
 	well as heads where refspecs are valid.
 
