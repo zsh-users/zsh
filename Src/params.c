@@ -692,13 +692,17 @@ createparamtable(void)
 					    getsparam(pm->node.nam), pm->node.flags);
 		    else
 			pm->env = ztrdup(*envp2);
+#ifndef USE_SET_UNSET_ENV
 		    *envp++ = pm->env;
+#endif
 		}
 	    }
 	}
     }
     popheap();
+#ifndef USE_SET_UNSET_ENV
     *envp = '\0';
+#endif
     opts[ALLEXPORT] = oae;
 
     if (emulation == EMULATE_ZSH)
