@@ -1,3 +1,8 @@
+2007-11-23  Geoff Wing  <gcw@zsh.org>
+
+	* 24098: Src/Zle/zle_refresh.c: Fix my botch with 23924, rework
+	out new prompts and their lengths before use in resetvideo().
+
 2007-11-22  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_clint_setup: fix typo in git

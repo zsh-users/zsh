@@ -446,7 +446,6 @@ zrefresh(void)
     int tmpcs, tmpll;		/* ditto cursor position and line length     */
     int tmpalloced;		/* flag to free tmpline when finished        */
     int remetafy;		/* flag that zle line is metafied            */
-    int fixprompt;		/* we still need to reexpand the prompt      */
     struct rparams rpms;
     
     /* If this is called from listmatches() (indirectly via trashzle()), and *
@@ -540,17 +539,18 @@ zrefresh(void)
 	    listshown = 0;
 	}
 #endif
-	fixprompt = trashedzle;
-	resetvideo();
-	resetneeded = 0;	/* unset */
-	oput_rpmpt = 0;		/* no right-prompt currently on screen */
-
 	/* we probably should only have explicitly set attributes */
 	tsetcap(TCALLATTRSOFF, 0);
 	tsetcap(TCSTANDOUTEND, 0);
 	tsetcap(TCUNDERLINEEND, 0);
 	/* cheat on attribute unset */
 	txtunset(TXTBOLDFACE|TXTSTANDOUT|TXTUNDERLINE|TXTDIRTY);
+
+	if (trashedzle)
+	    reexpandprompt(); 
+	resetvideo();
+	resetneeded = 0;	/* unset */
+	oput_rpmpt = 0;		/* no right-prompt currently on screen */
 
         if (!clearflag) {
             if (tccan(TCCLEAREOD))
@@ -562,8 +562,6 @@ zrefresh(void)
 	}
         if (t0 > -1)
             olnct = (t0 < winh) ? t0 : winh;
-	if (fixprompt)
-	    reexpandprompt(); 
         if (termflags & TERM_SHORT)
             vcs = 0;
 	else if (!clearflag && lpromptbuf[0]) {
