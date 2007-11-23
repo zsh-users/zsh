@@ -1,0 +1,53 @@
+#compdef uname
+
+typeset -A _uname_args
+
+if _pick_variant gnu="Free Soft" unix --version; then
+  case $LANG in
+    (de_DE.UTF-8)
+       _uname_args=(
+             all               "alle Informationen ausgeben"
+             kernel-name       "Namen des Kernels ausgeben"
+             nodename          "Netzwerknamen der Maschine ausgeben"
+             kernel-release    "Release-Nummer des Kernels ausgeben"
+             kernel-version    "Version des Kernels ausgeben"
+             machine           "Maschinentyp (Hardware) ausgeben"
+             processor         "Typ des Prozessors ausgeben (oder das Wort unknown)"
+             hardware-platform "Hardwareplattform ausgeben (oder das Wort unknown)"
+             operating-system  "Namen des Betriebssystems ausgeben"
+             help              "diese Hilfe anzeigen und beenden"
+             version           "Versionsinformation anzeigen und beenden"
+       )
+    ;;
+    (*)
+       _uname_args=(
+             all               "print all information"
+             kernel-name       "print the kernel name"
+             nodename          "print the network node hostname"
+             kernel-release    "print the kernel release"
+             kernel-version    "print the kernel version"
+             machine           "print the machine hardware name"
+             processor         "print the processor type or \"unknown\""
+             hardware-platform "print the hardware platform or \"unknown\""
+             operating-system  "print the operating system"
+             help              "display this help and exit"
+             version           "output version information and exit"
+       )
+    ;;
+  esac
+
+  _arguments \
+        '(--all -a)'{--all,-a}'['$_uname_args[all]']' \
+        '(--kernel-name -s)'{--kernel-name,-s}'['$_uname_args[kernel-name]']' \
+        '(--nodename -n)'{--nodename,-n}'['$_uname_args[nodename]']' \
+        '(--kernel-release -r)'{--kernel-release,-r}'['$_uname_args[kernel-release]']' \
+        '(--kernel-version -v)'{--kernel-version,-v}'['$_uname_args[kernel-version]']' \
+        '(--machine -m)'{--machine,-m}'['$_uname_args[machine]']' \
+        '(--processor -p)'{--processor,-p}'['$_uname_args[processor]']' \
+        '(--hardware-platform -i)'{--hardware-platform,-i}'['$_uname_args[hardware-platform]']' \
+        '(--operating-system -o)'{--operating-system,-o}'['$_uname_args[operating-system]']' \
+        '--help['$_uname_args[help]']' \
+        '--version['$_uname_args[version]']'
+else
+#       TODO add options of a NON GNU implementation
+fi

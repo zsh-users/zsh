@@ -1,3 +1,8 @@
+2007-11-23  Clint Adams  <clint@zsh.org>
+
+	* Markus Waldeck: 24117: Completion/Unix/Command/_uname:
+	completion for uname.
+
 2007-11-23  Geoff Wing  <gcw@zsh.org>
 
 	* 24098: Src/Zle/zle_refresh.c: Fix my botch with 23924, rework
