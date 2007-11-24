@@ -769,10 +769,7 @@ case $LIBS in
   AC_DEFINE(ZSH_IGNORE_NCURSES) ;;
 esac
 
-dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
-dnl libnsl (Network Services Library) to find yp_all
-
-AC_SEARCH_LIBS(yp_all, nsl)
+AC_SEARCH_LIBS(getpwnam, nsl)
 
 dnl I am told that told that unicos reqire these for nis_list
 if test `echo $host_os | sed 's/^\(unicos\).*/\1/'` = unicos; then
@@ -1747,6 +1744,9 @@ AC_CACHE_CHECK(for NIS, zsh_cv_sys_nis,
 zsh_cv_sys_nis=yes || zsh_cv_sys_nis=no])
 if test x$zsh_cv_sys_nis = xyes; then
   AC_DEFINE(HAVE_NIS)
+dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
+dnl libnsl (Network Services Library) to find yp_all
+  AC_SEARCH_LIBS(yp_all, nsl)
 fi
 
 dnl -----------------

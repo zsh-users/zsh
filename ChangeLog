@@ -1,3 +1,8 @@
+2007-11-24  Clint Adams  <clint@zsh.org>
+
+	* 24118: configure.ac: only link against libnsl if we have NIS and
+	need it for yp_all, or if we need it for getpwnam.
+
 2007-11-23  Clint Adams  <clint@zsh.org>
 
 	* Markus Waldeck: 24117: Completion/Unix/Command/_uname:
