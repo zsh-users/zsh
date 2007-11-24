@@ -1271,7 +1271,14 @@ retain their special attributes when made local.
 
 For each var(name)tt(=)var(value) assignment, the parameter
 var(name) is set to var(value).  Note that arrays currently cannot be
-assigned in tt(typeset) expressions, only scalars and integers.
+assigned in tt(typeset) expressions, only scalars and integers.  Unless
+the option tt(KSH_TYPESET) is set, normal expansion rules apply to
+assignment arguments, so var(value) may be split into separate words; if
+the option is set, assignments which can be recognised when expansion is
+performed are treated as single words.  For example the command
+tt(typeset vbl=$(echo one two)) is treated as having one argument if
+tt(KSH_TYPESET) is set, but otherwise is treated as having the two arguments
+tt(vbl=one) and tt(two).
 
 If the shell option tt(TYPESET_SILENT) is not set, for each remaining
 var(name) that refers to a parameter that is set, the name and value of the
