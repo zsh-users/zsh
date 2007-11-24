@@ -858,14 +858,20 @@ _perforce_resolved_files() {
 }
 
 
-(( $+functions[_perforce_subdirs] )) ||
-_perforce_subdirs() {
-  # This has no other function than to offer to add the `...' used
-  # by Perforce to indicate a recursive search of directories.
-  # Bit pathetic, really.
-  compset -P '*/'
-  compadd "$@" '...'
-}
+# This has no other function than to offer to add the `...' used
+# by Perforce to indicate a recursive search of directories.
+# Bit pathetic, really.
+#
+# This has been causing odd effects with prefixes so is turned off.
+#(( $+functions[_perforce_subdirs] )) ||
+#_perforce_subdirs() {
+#  if [[ $PREFIX = */* ]]; then
+#    local dir=${PREFIX%%[^/]#}
+#    compadd "$@" -J subdirs -p $dir ...
+#  else
+#    compadd "$@" -J subdirs ...
+#  fi
+#}
 
 
 (( $+functions[_perforce_depot_dirs] )) ||
@@ -1076,7 +1082,8 @@ _perforce_files() {
       altfiles+=("client-dirs:client directory:_perforce_client_dirs")
     fi
     altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs"
-      "subdirs:subdirectory search:_perforce_subdirs")
+#      "subdirs:subdirectory search:_perforce_subdirs"
+    )
     _alternative $altfiles
   elif [[ -n $unmaintained && -z $dodirs ]]; then
     # a la _cvs_nonentried_files: directories are never maintained,
@@ -1113,7 +1120,7 @@ _perforce_files() {
       altfiles+=("$type-files:$type file:_perforce_${type}_files")
     done
 
-    altfiles+=("subdirs:subdirectory search:_perforce_subdirs")
+#    altfiles+=("subdirs:subdirectory search:_perforce_subdirs")
     if zstyle -t ":completion:${curcontext}:" depot-files; then
       altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs")
     else
@@ -1126,13 +1133,15 @@ _perforce_files() {
       altfiles+=("depot-files:file in depot:_perforce_depot_files")
     fi
     altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs"
-      "subdirs:subdirectory search:_perforce_subdirs")
+#      "subdirs:subdirectory search:_perforce_subdirs"
+    )
     _alternative $altfiles
   else
     # Look locally.
-    _alternative \
-      "files:file:_path_files -R _perforce_file_suffix $dodirs" \
-      "subdirs:subdirectory search:_perforce_subdirs"
+#   _alternative \
+#      "files:file:_path_files -R _perforce_file_suffix $dodirs" \
+#      "subdirs:subdirectory search:_perforce_subdirs"
+    _path_files -R _perforce_file_suffix $dodirs
   fi
 }
 
