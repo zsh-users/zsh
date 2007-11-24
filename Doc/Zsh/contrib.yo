@@ -1462,28 +1462,76 @@ example(autoload -U pick-web-browser
 alias -s html=pick-web-browser)
 
 It is provided as an intelligent front end to dispatch a web browser.
-It will check if an X Windows display is available, and if so
-if there is already a browser running which can accept a remote
-connection.  In that case, the file will be displayed in that browser;
-you should check explicitly if it has appeared in the running browser's
-window.  Otherwise, it will start a new browser according to a builtin
-set of preferences.
+It may be run as either a function or a shell script.  The status
+255 is returned if no browser could be started.
 
-Alternatively, tt(pick-web-browser) can be run as a zsh script.
+Various styles are available to customize the choice of browsers:
 
-Two styles are available to customize the choice of browsers:
-tt(x-browsers) when running under the X Windows System, and
-tt(tty-browsers) otherwise.  These are arrays in decreasing order
-of preference consiting of the command name under which to start the
+startitem()
+item(tt(browser-style))(
+The value of the style is an array giving preferences in decreasing order
+for the type of browser to use.  The values of elements may be
+
+startitem()
+item(tt(running))(
+Use a GUI browser that is already running when an X Window display is
+available.  The browsers listed in the tt(x-browsers) style are tried
+in order until one is found; if it is, the file will be displayed in
+that browser, so the user may need to check whether it has appeared.
+If no running browser is found, one is not started.  Browsers other than
+Firefox, Opera and Konqueror are assumed to understand the Mozilla
+syntax for opening a URL remotely.
+)
+item(tt(x))(
+Start a new GUI browser when an X Window display is available.  Search for
+the availability of one of the browsers listed in the tt(x-browsers) style
+and start the first one that is found.  No check is made for an already
+running browser.
+)
+item(tt(tty))(
+Start a terminal-based browser.  Search for the availability of one
+of the browsers listed in the tt(tty-browsers) style and start the
+first one that is found.
+)
+enditem()
+
+If the style is not set the default tt(running x tty) is used.
+)
+item(tt(x-browsers))(
+An array in decreasing order
+of preference of browsers to use when running under the X Window System.
+The array consists of the command name under which to start the
 browser.  They are looked up in the context tt(:mime:) (which may
 be extended in future, so appending `tt(*)' is recommended).  For
 example,
 
-example(zstyle ':mime:*' x-browsers opera konqueror netscape)
+example(zstyle ':mime:*' x-browsers opera konqueror firefox)
 
 specifies that tt(pick-web-browser) should first look for a runing
-instance of Opera, Konqueror or Netscape, in that order, and if it
-fails to find any should attempt to start Opera.
+instance of Opera, Konqueror or Firefox, in that order, and if it
+fails to find any should attempt to start Opera.  The default is
+tt(firefox mozilla netscape opera konqueror).
+)
+item(tt(tty-browsers))(
+An array similar to tt(x-browsers), except that it gives browsers to
+use use when no X Window display is available.  The default is
+tt(elinks links lynx).
+)
+item(tt(command))(
+If it is set this style is used to pick the command
+used to open a page for a browser.  The context is
+tt(:mime:browser:new:$browser:) to start a new browser or
+tt(:mime:browser:running:$browser:) to open a URL in a browser already
+runing on the current X display, where tt($browser) is the value matched
+in the tt(x-browsers) or tt(tty-browsers) style.  The escape sequence
+tt(%b) in the style's value will be replaced by the browser, while tt(%u)
+will be replaced by the URL.  If the style is not set, the default for all
+new instances is equivalent to tt(%b %u) and the defaults for using running
+browsers are equivalent to the values tt(kfmclient openURL %u) for
+Konqueror, tt(firefox -new-tab %u) for Firefox, tt(opera -newpage %u)
+for Opera, and tt(%b -remote "openUrl+LPAR()%u+RPAR()") for all others.
+)
+enditem()
 )
 enditem()
 
