@@ -1,0 +1,93 @@
+#compdef lsmod modinfo modprobe rmmod insmod
+
+local curcontext="$curcontext" expl state line modules ign args ret=1
+
+args=(
+  '(-)'{-V,--version}'[print version]'
+  '(-)'{-h,--help}'[print help text]'
+)
+
+case "$service" in
+  lsmod) _arguments -s "$args[@]" && return ;;
+  
+  modinfo)
+    _arguments -s -C "$args[@]" \
+      '(-)'{-a,--author}"[display the module's author]" \
+      '(-)'{-d,--description}"[display the module's description]" \
+      '(-)'{-f+,--format}'[display module info in specified format]' \
+      '(-)'{-l,--license}"[display the module's license]" \
+      '(-)'{-n,--filename}"[display the module's filename]" \
+      '(-)'{-p,--parameters}'[display the typed parameters that a module may support]' \
+      '1:module file:->all_modules' && ret=0
+  ;;
+
+  modprobe)
+    ign='-h --help -V --version -c --showconfig'
+    _arguments -s -C "$args[@]" \
+      "(-a --all $ign)"{-a,--all}'[load all matching modules]' \
+      '(-)'{-c,--showconfig}'[show current configuration]' \
+      "(-d --debug $ign)"{-d,--debug}'[print debug info]' \
+      "(-k --autoclean $ign)"{-k,--autoclean}'[set autoclean]' \
+      "(-n --show $ign)"{-n,--show}"[don't actually perform action]" \
+      "(-q --quiet $ign)"{-q,--quiet}"[don't complain about insmod failures]" \
+      "(-s --syslog $ign)"{-s,--syslog}'[report via syslog instead of stderr]' \
+      "(* -t --type $ign)"{-t,--type}'[module type]:module type' \
+      "(-v --verbose $ign)"{-v,--verbose}'[print all commands as executed]' \
+      '(-C --config)'{-C,--config}'[specify config file]:config file:_files' \
+      "(-r --remove -l --list -t --type -a --all $ign)"{-r,--remove}'[remove module (stacks)]' \
+      "(* -l --list -r --remove $ign)"{-l,--list}'[list matching modules]' \
+      "(-c $ign)1:modules:->all_modules" \
+      "(-c -l --list -t --type $ign)*:params:->params" && ret=0
+      
+      [[ -n $state ]] && (( $+opt_args[-r] )) && state=loaded_modules        
+  ;;
+
+  rmmod)
+    _arguments -s -C "$args[@]" \
+      '(-a --all)'{-a,--all}'[remove all unused autocleanable modules]' \
+      '(-e --persist)'{-e,--persist}'[save persistent data]' \
+      '(-r --stacks)'{-r,--stacks}'[remove a module stack]' \
+      '(-s --syslog)'{-s,--syslog}'[output to syslog]' \
+      '(-v --verbose)'{-v,--verbose}'[be verbose]' \
+      '*:loaded module:->loaded_modules' && ret=0
+  ;;
+
+  insmod)
+    _arguments \
+      '1:module file:_files' \
+      '*:module parameters:' && ret=0
+  ;;
+esac 
+
+case "$state" in
+  loaded_modules)
+    if [[ -r /proc/modules ]]; then
+     modules=(${${(f)"$(</proc/modules)"}%% *})
+    elif [[ -x /sbin/lsmod ]]; then
+     modules=(${${(f)"$(/sbin/lsmod)"}[2,-1]%% *})
+    else
+     return 1
+    fi
+    
+    _wanted modules expl 'loaded module' compadd -a modules && return
+  ;;
+
+  all_modules)
+    modules=( ${${${${(f)"$(_call_program modules ${(M)words[1]##*/}modprobe -l 2>/dev/null)"}:#}##*/}%%.*} )
+    _tags files modules
+    while _tags; do
+      _requested files expl "module file"  _files && ret=0
+      _requested modules expl module compadd -a modules && ret=0
+    done
+  ;;
+
+  params)
+    if compset -P '*='; then
+      _message -e value 'parameter value'
+    else
+      _message -e parameter 'module parameter'
+    fi
+  ;;
+esac
+
+return ret
