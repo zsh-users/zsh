@@ -137,7 +137,7 @@ prompt_bart_ps1 () {
 }
 
 prompt_bart_winch () {
-    setopt localoptions noksharrays unset
+    setopt localoptions nolocaltraps noksharrays unset
 
     # Delete ourself from TRAPWINCH if not using our precmd insert.
     [[ $functions[precmd] = *prompt_bart_precmd* ]] && prompt_bart_ps1 ||
@@ -145,7 +145,7 @@ prompt_bart_winch () {
 }
 
 prompt_bart_setup () {
-    setopt localoptions noksharrays unset
+    setopt localoptions nolocaltraps noksharrays unset
 
     # A few extra niceties ...
     repeat 1 case "$1:l" in
