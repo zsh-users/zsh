@@ -1543,7 +1543,9 @@ findex(unhash)
 item(tt(unhash) [ tt(-adfms) ] var(name) ...)(
 Remove the element named var(name) from an internal hash table.  The
 default is remove elements from the command hash table.  The tt(-a)
-option causes tt(unhash) to remove regular or global aliases.
+option causes tt(unhash) to remove regular or global aliases; note
+when removing a global aliases that the argument must be quoted to prevent
+it from being expanded before being passed to the command.
 The tt(-s) option causes tt(unhash) to remove suffix aliases.
 The tt(-f) option causes
 tt(unhash) to remove shell functions.  The tt(-d) options causes
