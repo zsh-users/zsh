@@ -2571,7 +2571,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (fdtable[i] != FDT_UNUSED)
 		close(i);
 	closem(FDT_UNUSED);
-	waitjobs();
+	if (thisjob != -1)
+	    waitjobs();
 	_exit(lastval);
     }
     fixfds(save);
