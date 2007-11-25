@@ -41,6 +41,14 @@ int lastcol;
 /**/
 int histline;
 
+/* Previous search string use in an incremental search */
+
+/**/
+char *previous_search = NULL;
+
+/**/
+int previous_search_len = 0;
+
 #define ZLETEXT(X) ((X)->zle_text ? (X)->zle_text : (X)->text)
 
 /**/
@@ -48,7 +56,7 @@ void
 remember_edits(void)
 {
     Histent ent = quietgethist(histline);
-    if (metadiffer(ZLETEXT(ent), (char *) line, ll)) {
+    if (ent && metadiffer(ZLETEXT(ent), (char *) line, ll)) {
 	zsfree(ent->zle_text);
 	ent->zle_text = metafy((char *) line, ll, META_DUP);
     }
@@ -68,7 +76,7 @@ forget_edits(void)
 
 /**/
 int
-uphistory(char **args)
+uphistory(UNUSED(char **args))
 {
     int nodups = isset(HISTIGNOREDUPS);
     if (!zle_goto_hist(histline, -zmult, nodups) && isset(HISTBEEP))
@@ -84,7 +92,7 @@ upline(void)
 
     if (n < 0) {
 	zmult = -zmult;
-	n = downline();
+	n = -downline();
 	zmult = -zmult;
 	return n;
     }
@@ -168,7 +176,7 @@ downline(void)
 
     if (n < 0) {
 	zmult = -zmult;
-	n = upline();
+	n = -upline();
 	zmult = -zmult;
 	return n;
     }
@@ -246,21 +254,21 @@ downlineorsearch(char **args)
 
 /**/
 int
-acceptlineanddownhistory(char **args)
+acceptlineanddownhistory(UNUSED(char **args))
 {
-    Histent he;
+    Histent he = quietgethist(histline);
 
-    if (!(he = movehistent(quietgethist(histline), 1, HIST_FOREIGN)))
-	return 1;
-    zpushnode(bufstack, ztrdup(ZLETEXT(he)));
+    if (he && (he = movehistent(he, 1, HIST_FOREIGN))) {
+	zpushnode(bufstack, ztrdup(he->text));
+	stackhist = he->histnum;
+    }
     done = 1;
-    stackhist = he->histnum;
     return 0;
 }
 
 /**/
 int
-downhistory(char **args)
+downhistory(UNUSED(char **args))
 {
     int nodups = isset(HISTIGNOREDUPS);
     if (!zle_goto_hist(histline, zmult, nodups) && isset(HISTBEEP))
@@ -301,7 +309,8 @@ historysearchbackward(char **args)
 	str = srch_str;
 	hp = histpos;
     }
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, -1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;
@@ -349,7 +358,8 @@ historysearchforward(char **args)
 	str = srch_str;
 	hp = histpos;
     }
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, 1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;
@@ -380,7 +390,7 @@ beginningofbufferorhistory(char **args)
 
 /**/
 int
-beginningofhistory(char **args)
+beginningofhistory(UNUSED(char **args))
 {
     if (!zle_goto_hist(firsthist(), 0, 0) && isset(HISTBEEP))
 	return 1;
@@ -400,7 +410,7 @@ endofbufferorhistory(char **args)
 
 /**/
 int
-endofhistory(char **args)
+endofhistory(UNUSED(char **args))
 {
     zle_goto_hist(curhist, 0, 0);
     return 0;
@@ -410,46 +420,138 @@ endofhistory(char **args)
 int
 insertlastword(char **args)
 {
-    int n;
+    int n, nwords, histstep = -1, wordpos = 0, deleteword = 0;
     char *s, *t;
-    Histent he;
+    Histent he = NULL;
+    LinkList l = NULL;
+    LinkNode node;
 
-/* multiple calls will now search back through the history, pem */
     static char *lastinsert;
-    static int lasthist, lastpos;
-    int evhist = addhistnum(curhist, -1, HIST_FOREIGN), save;
+    static int lasthist, lastpos, lastlen;
+    int evhist, save;
 
-    if (lastinsert) {
-	int lastlen = ztrlen(lastinsert);
-	int pos = cs;
+    /*
+     * If we have at least one argument, the first is the history
+     * step.  The default is -1 (go back).  Repeated calls take
+     * a step in this direction.  A value of 0 is allowed and doesn't
+     * move the line.
+     *
+     * If we have two arguments, the second is the position of
+     * the word to extract, 1..N.  The default is to use the
+     * numeric argument, or the last word if that is not set.
+     *
+     * If we have three arguments, we reset the history pointer to
+     * the current history event before applying the history step.
+     */
+    if (*args)
+    {
+	histstep = (int)zstrtol(*args, NULL, 10);
+	if (*++args)
+	{
+	    wordpos = (int)zstrtol(*args, NULL, 10);
+	    if (*++args)
+		lasthist = curhist;
+	}
+    }
 
-	if (lastpos <= pos &&
-	    lastlen == pos - lastpos &&
-	    memcmp(lastinsert, (char *)&line[lastpos], lastlen) == 0) {
-	    evhist = addhistnum(lasthist, -1, HIST_FOREIGN);
+    if (lastinsert && lastlen &&
+	lastpos <= cs &&
+	lastlen == cs - lastpos &&
+	memcmp(lastinsert, (char *)&line[lastpos], lastlen) == 0)
+	deleteword = 1;
+    else
+	lasthist = curhist;
+    evhist = histstep ? addhistnum(lasthist, histstep, HIST_FOREIGN) :
+	lasthist;
+
+    if (evhist == curhist) {
+	/*
+	 * The line we are currently editing.  If we are going to
+	 * replace an existing word, delete the old one now to avoid
+	 * confusion.
+	 */
+	if (deleteword) {
+	    int pos = cs;
 	    cs = lastpos;
 	    foredel(pos - cs);
+	    /*
+	     * Mark that this has been deleted.
+	     * For consistency with history lines, we really ought to
+	     * insert it back if the current command later fails. But
+	     * - we can't be bothered
+	     * - the problem that this can screw up going to other
+	     *   lines in the history because we don't update
+	     *   the history line isn't really relevant
+	     * - you can see what you're copying, dammit, so you
+	     *   shouldn't make errors.
+	     * Of course, I could have implemented it in the time
+	     * it took to say why I haven't.
+	     */
+	    deleteword = 0;
 	}
-	zsfree(lastinsert);
-	lastinsert = NULL;
+	/*
+	 * Can only happen fail if the line is empty, I hope.
+	 * In that case, we don't need to worry about restoring
+	 * a deleted word, because that can only have come
+	 * from a non-empty line.  I think.
+	 */
+	if (!(l = bufferwords(NULL, NULL, NULL)))
+	    return 1;
+	nwords = countlinknodes(l);
+    } else {
+	/* Some stored line. */
+	if (!(he = quietgethist(evhist)) || !he->nwords)
+	    return 1;
+	nwords = he->nwords;
     }
-    if (!(he = quietgethist(evhist)) || !he->nwords)
-	return 1;
-    if (zmult > 0) {
-	n = he->nwords - (zmult - 1);
+    if (wordpos) {
+	n = (wordpos > 0) ? wordpos : nwords + wordpos + 1;
+    } else if (zmult > 0) {
+	n = nwords - (zmult - 1);
     } else {
 	n = 1 - zmult;
     }
-    if (n < 1 || n > he->nwords)
+    if (n < 1 || n > nwords) {
+	/*
+	 * We can't put in the requested word, but we did find the
+	 * history entry, so we remember the position in the history
+	 * list.  This avoids getting stuck on a history line with
+	 * fewer words than expected.  The cursor location cs
+	 * has not changed, and lastinsert is still valid.
+	 */
+	lasthist = evhist;
 	return 1;
-    s = he->text + he->words[2*n-2];
-    t = he->text + he->words[2*n-1];
+    }
+    /*
+     * Only remove the old word from the command line if we have
+     * successfully found a new one to insert.
+     */
+    if (deleteword > 0) {
+	int pos = cs;
+	cs = lastpos;
+	foredel(pos - cs);
+    }
+    if (lastinsert) {
+	zfree(lastinsert, lastlen);
+	lastinsert = NULL;
+    }
+    if (l) {
+	for (node = firstnode(l); --n; incnode(node))
+	    ;
+	s = (char *)getdata(node);
+	t = s + strlen(s);
+    } else {
+	s = he->text + he->words[2*n-2];
+	t = he->text + he->words[2*n-1];
+    }
+
     save = *t;
     *t = '\0';			/* ignore trailing whitespace */
-
     lasthist = evhist;
     lastpos = cs;
-    lastinsert = ztrdup(s);
+    lastlen = t - s;
+    lastinsert = zalloc(t - s);
+    memcpy(lastinsert, s, lastlen);
     n = zmult;
     zmult = 1;
     doinsert(s);
@@ -472,7 +574,7 @@ zle_setline(Histent he)
 
 /**/
 int
-setlocalhistory(char **args)
+setlocalhistory(UNUSED(char **args))
 {
     if (zmod.flags & MOD_MULT) {
 	hist_skip_flags = zmult? HIST_FOREIGN : 0;
@@ -486,7 +588,9 @@ setlocalhistory(char **args)
 int
 zle_goto_hist(int ev, int n, int skipdups)
 {
-    Histent he = movehistent(quietgethist(ev), n, hist_skip_flags);
+    Histent he = quietgethist(ev);
+    if (!he || !(he = movehistent(he, n, hist_skip_flags)))
+	return 1;
     if (skipdups && n) {
 	n = n < 0? -1 : 1;
 	while (he && !metadiffer(ZLETEXT(he), (char *) line, ll))
@@ -500,7 +604,7 @@ zle_goto_hist(int ev, int n, int skipdups)
 
 /**/
 int
-pushline(char **args)
+pushline(UNUSED(char **args))
 {
     int n = zmult;
 
@@ -556,9 +660,10 @@ pushinput(char **args)
     return ret;
 }
 
+/* Renamed to avoid clash with library function */
 /**/
 int
-getline(char **args)
+zgetline(UNUSED(char **args))
 {
     char *s = (char *)getlinknode(bufstack);
 
@@ -610,6 +715,8 @@ void
 free_isrch_spots(void)
 {
     zfree(isrch_spots, max_spot * sizeof(*isrch_spots));
+    max_spot = 0;
+    isrch_spots = NULL;
 }
 
 /**/
@@ -660,10 +767,11 @@ doisearch(char **args, int dir)
     int odir = dir, sens = zmult == 1 ? 3 : 1;
     int hl = histline, savekeys = -1, feep = 0;
     Thingy cmd;
-    char *okeymap = curkeymapname;
-    static char *previous_search = NULL;
-    static int previous_search_len = 0;
+    char *okeymap;
     Histent he;
+
+    if (!(he = quietgethist(hl)))
+	return;
 
     clearlist = 1;
 
@@ -678,7 +786,7 @@ doisearch(char **args, int dir)
     strcpy(ibuf, ISEARCH_PROMPT);
     memcpy(ibuf + NORM_PROMPT_POS, (dir == 1) ? "fwd" : "bck", 3);
     remember_edits();
-    he = quietgethist(hl);
+    okeymap = ztrdup(curkeymapname);
     s = ZLETEXT(he);
     selectkeymap("main", 1);
     pos = metalen(s, cs);
@@ -702,7 +810,7 @@ doisearch(char **args, int dir)
 			else
 			    pos -= 1 + (pos != 1 && s[pos-2] == Meta);
 		    } else if (sbuf[0] != '^') {
-			if (pos >= strlen(s+1))
+			if (pos >= (int)strlen(s+1))
 			    skip_line = 1;
 			else
 			    pos += 1 + (s[pos] == Meta);
@@ -720,7 +828,8 @@ doisearch(char **args, int dir)
 		    statusline = ibuf + NORM_PROMPT_POS;
 		    break;
 		}
-		if (!(he = movehistent(he, dir, hist_skip_flags))) {
+		if (!(zlereadflags & ZLRF_HISTORY)
+		 || !(he = movehistent(he, dir, hist_skip_flags))) {
 		    if (sbptr == (int)isrch_spots[top_spot-1].len
 		     && (isrch_spots[top_spot-1].flags & ISS_FAILING))
 			top_spot--;
@@ -842,17 +951,17 @@ doisearch(char **args, int dir)
 		sbuf[sbptr] = '^';
 		zrefresh();
 	    }
-	    if ((c = getkey(0)) == EOF)
+	    if ((lastchar = getkey(0)) == EOF)
 		feep = 1;
 	    else
 		goto ins;
 	} else {
 	    if(cmd == Th(z_selfinsertunmeta)) {
-		c &= 0x7f;
-		if(c == '\r')
-		    c = '\n';
+		lastchar &= 0x7f;
+		if(lastchar == '\r')
+		    lastchar = '\n';
 	    } else if (cmd == Th(z_magicspace))
-		c = ' ';
+		lastchar = ' ';
 	    else if (cmd != Th(z_selfinsert)) {
 		ungetkeycmd();
 		if (cmd == Th(z_sendbreak))
@@ -870,7 +979,7 @@ doisearch(char **args, int dir)
 		sbuf = ibuf + FIRST_SEARCH_CHAR;
 		sibuf *= 2;
 	    }
-	    sbuf[sbptr++] = c;
+	    sbuf[sbptr++] = lastchar;
 	}
 	if (feep)
 	    handlefeep(zlenoargs);
@@ -883,6 +992,7 @@ doisearch(char **args, int dir)
     }
     statusline = NULL;
     selectkeymap(okeymap, 1);
+    zsfree(okeymap);
     /*
      * Don't allow unused characters provided as a string to the
      * widget to overflow and be used as separated commands.
@@ -891,45 +1001,46 @@ doisearch(char **args, int dir)
 	kungetct = savekeys;
 }
 
+static Histent
+infernexthist(Histent he, UNUSED(char **args))
+{
+    for (he = movehistent(he, -2, HIST_FOREIGN);
+	 he; he = movehistent(he, -1, HIST_FOREIGN)) {
+	if (!metadiffer(he->text, (char *) line, ll))
+	    return movehistent(he, 1, HIST_FOREIGN);
+    }
+    return NULL;
+}
+
 /**/
 int
 acceptandinfernexthistory(char **args)
 {
     Histent he;
 
+    if (!(he = infernexthist(hist_ring, args)))
+	return 1;
+    zpushnode(bufstack, ztrdup(he->text));
     done = 1;
-    for (he = movehistent(quietgethist(histline), -2, HIST_FOREIGN);
-	 he; he = movehistent(he, -1, HIST_FOREIGN)) {
-	if (!metadiffer(ZLETEXT(he), (char *) line, ll)) {
-	    he = movehistent(he, 1, HIST_FOREIGN);
-	    zpushnode(bufstack, ztrdup(ZLETEXT(he)));
-	    stackhist = he->histnum;
-	    return 0;
-	}
-    }
-    return 1;
+    stackhist = he->histnum;
+    return 0;
 }
 
 /**/
 int
 infernexthistory(char **args)
 {
-    Histent he;
+    Histent he = quietgethist(histline);
 
-    for (he = movehistent(quietgethist(histline), -2, HIST_FOREIGN);
-	 he; he = movehistent(he, -1, HIST_FOREIGN)) {
-	if (!metadiffer(ZLETEXT(he), (char *) line, ll)) {
-	    he = movehistent(he, 1, HIST_FOREIGN);
-	    zle_setline(he);
-	    return 0;
-	}
-    }
-    return 1;
+    if (!he || !(he = infernexthist(he, args)))
+	return 1;
+    zle_setline(he);
+    return 0;
 }
 
 /**/
 int
-vifetchhistory(char **args)
+vifetchhistory(UNUSED(char **args))
 {
     if (zmult < 0)
 	return 1;
@@ -949,7 +1060,7 @@ vifetchhistory(char **args)
 
 /* the last vi search */
 
-static char *visrchstr;
+static char *visrchstr, *vipenultsrchstr;
 static int visrchsense;
 
 /**/
@@ -959,10 +1070,15 @@ getvisrchstr(void)
     char *sbuf = zhalloc(80);
     int sptr = 1, ret = 0, ssbuf = 80, feep = 0;
     Thingy cmd;
-    char *okeymap = curkeymapname;
+    char *okeymap = ztrdup(curkeymapname);
+
+    if (vipenultsrchstr) {
+	zsfree(vipenultsrchstr);
+	vipenultsrchstr = NULL;
+    }
 
     if (visrchstr) {
-	zsfree(visrchstr);
+	vipenultsrchstr = visrchstr;
 	visrchstr = NULL;
     }
     clearlist = 1;
@@ -978,7 +1094,7 @@ getvisrchstr(void)
 	    break;
 	}
 	if(cmd == Th(z_magicspace)) {
-	    c = ' ';
+	    lastchar = ' ';
 	    cmd = Th(z_selfinsert);
 	}
 	if(cmd == Th(z_redisplay)) {
@@ -989,6 +1105,10 @@ getvisrchstr(void)
 	    	cmd == Th(z_vicmdmode)) {
 	    sbuf[sptr] = 0;
 	    visrchstr = metafy(sbuf + 1, sptr - 1, META_DUP);
+	    if (!strlen(visrchstr)) {
+	        zsfree(visrchstr);
+		visrchstr = ztrdup(vipenultsrchstr);
+	    }
 	    ret = 1;
 	    sptr = 0;
 	} else if(cmd == Th(z_backwarddeletechar) ||
@@ -1009,15 +1129,15 @@ getvisrchstr(void)
 		sbuf[sptr] = '^';
 		zrefresh();
 	    }
-	    if ((c = getkey(0)) == EOF)
+	    if ((lastchar = getkey(0)) == EOF)
 		feep = 1;
 	    else
 		goto ins;
 	} else if(cmd == Th(z_selfinsertunmeta) || cmd == Th(z_selfinsert)) {
 	    if(cmd == Th(z_selfinsertunmeta)) {
-		c &= 0x7f;
-		if(c == '\r')
-		    c = '\n';
+		lastchar &= 0x7f;
+		if(lastchar == '\r')
+		    lastchar = '\n';
 	    }
 	  ins:
 	    if(sptr == ssbuf - 1) {
@@ -1025,7 +1145,7 @@ getvisrchstr(void)
 		strcpy(newbuf, sbuf);
 		statusline = sbuf = newbuf;
 	    }
-	    sbuf[sptr++] = c;
+	    sbuf[sptr++] = lastchar;
 	} else {
 	    feep = 1;
 	}
@@ -1035,6 +1155,7 @@ getvisrchstr(void)
     }
     statusline = NULL;
     selectkeymap(okeymap, 1);
+    zsfree(okeymap);
     return ret;
 }
 
@@ -1082,7 +1203,7 @@ vihistorysearchbackward(char **args)
 
 /**/
 int
-virepeatsearch(char **args)
+virepeatsearch(UNUSED(char **args))
 {
     Histent he;
     int t0;
@@ -1096,7 +1217,8 @@ virepeatsearch(char **args)
 	visrchsense = -visrchsense;
     }
     t0 = strlen(visrchstr);
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, visrchsense, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;
@@ -1144,7 +1266,8 @@ historybeginningsearchbackward(char **args)
 	zmult = n;
 	return ret;
     }
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, -1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;
@@ -1180,7 +1303,8 @@ historybeginningsearchforward(char **args)
 	zmult = n;
 	return ret;
     }
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, 1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;
