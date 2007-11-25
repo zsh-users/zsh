@@ -1,0 +1,31 @@
+#compdef lsusb
+
+local context state line usbidsline vendorid pair
+typeset -A opt_args
+
+_arguments \
+  '(-v --verbose)'{-v,--verbose}'[be verbose]' \
+  '-s:bus and/or devnum to show:' \
+  '-d:vendor and product to show:->vendorproduct' \
+  '-D:device to show:_files' \
+  '-t[dump the physical USB device hierarchy as a tree]' \
+  '(-V --version)'{-V,--version}'[print version info and exit]' && return 0
+
+  if [[ ${+_lsusb_vendors} -eq 0 ]]; then
+    typeset -A _lsusb_vendors _lsusb_devices
+  while IFS="" read usbidsline
+  do
+    case "$usbidsline" in
+      ((#b)([0-9a-f]##) ##(*))
+        vendorid="$match[1]"
+        _lsusb_vendors[$vendorid]="$match[2]"
+      ;;
+      (	(#b)([0-9a-f]##) ##(*)))
+        pair="$vendorid:$match[1]"
+        _lsusb_devices[${pair}]="$match[2]"
+      ;;
+    esac
+  done < <(zcat /var/lib/usbutils/usb.ids)
+fi
+
+compadd -k _lsusb_devices
