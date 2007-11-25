@@ -20,6 +20,10 @@ case $OSTYPE in
     fss=( cd9660 devfs ext2fs fdesc kernfs linprocfs mfs msdos nfs 
           ntfs null nwfs portal procfs std udf ufs umap union )
   ;;
+  darwin*)
+    fss=( afp cd9660 cddafs devfs fdesc hfs lfs msdos nfs
+          ntfs smbfs synthfs udf ufs volfs webdav )
+  ;;
   *)
     # default for all other systems
     fss=( ufs )
