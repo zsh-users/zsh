@@ -1440,6 +1440,13 @@ get_comp_string(void)
                     *q = Bnull;
         }
     }
+    /*
+     * Leading "=" gets tokenized in case the EQUALS options
+     * changes afterwards.  It's too late for that now, so restore it
+     * to a plain "=" if the option is unset.
+     */
+    if (*s == Equals && !isset(EQUALS))
+	*s = '=';
     /* While building the quoted form, we also clean up the command line. */
     for (p = s, i = wb, j = 0; *p; p++, i++)
 	if (INULL(*p)) {
