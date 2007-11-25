@@ -1,6 +1,7 @@
 #compdef -K _expand_alias complete-word \C-xa
 
 local word expl tmp pre sel what
+local -a tmpa
 
 eval "$_comp_setup"
 
@@ -42,10 +43,24 @@ if [[ -n $tmp ]]; then
   # We used to remove the quoting from the value in the parameter.
   # That was probably just an oversight: an alias is always replaced
   # literally.
+  tmp=${tmp%%[[:blank:]]##}
+  if [[ $tmp[1] = [[:alnum:]_] ]]; then
+    tmpa=(${(z)tmp})
+    if [[ $tmpa[1] = $word && $tmp = $aliases[$word] ]]; then
+      # This is an active regular alias and the first word in the result
+      # is the same as what was on the line already.  Quote it so
+      # that it doesn't get reexanded on execution.
+      #
+      # Strictly we also need to check if the original word matches
+      # a later word in the expansion and the previous words are
+      # all aliases where the expansion ends in " ", but I'm
+      # too lazy.
+      tmp="\\$tmp"
+    fi
+  fi
   $pre _wanted aliases expl alias compadd -UQ ${tmp%%[[:blank:]]##}
 elif (( $#pre )) && zstyle -t ":completion:${curcontext}:" complete; then
   $pre _aliases -s "$sel" -S ''
 else
   return 1
 fi
-
