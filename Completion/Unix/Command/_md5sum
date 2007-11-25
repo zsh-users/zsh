@@ -1,0 +1,11 @@
+#compdef md5sum
+
+_arguments -S \
+  '(-b --binary)'{-b,--binary}'[read in binary mode]' \
+  '(-c --check)'{-c,--check}'[read MD5 sums from the FILEs and check them]' \
+  '(-t --text)'{-t,--text}'[read in text mode]' \
+  '--status[no output, status code shows success]' \
+  '(-w --warn)'{-w,--warn}'[warn about improperly formatted checksum lines]' \
+  '--help[display help and exit]' \
+  '--version[output version information and exit]' \
+  '*:files:_files'
