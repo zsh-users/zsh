@@ -1,0 +1,46 @@
+#autoload
+
+# The option `-e' if given as the first argument says that we should
+# complete only external commands and executable files. This and a
+# `-' as the first argument is then removed from the arguments.
+
+local args defs
+
+zstyle -t ":completion:${curcontext}:commands" rehash && rehash
+
+defs=(
+  'commands:external command:_path_commands'
+)
+
+[[ -n "$path[(r).]" || $PREFIX = */* ]] &&
+  defs=( "$defs[@]"
+         'executables:executable file or directory:_path_files -/g \*\(-\*\)'
+  )
+
+if [[ "$1" = -e ]]; then
+  shift
+else
+  [[ "$1" = - ]] && shift
+
+  defs=( "$defs[@]"
+    'builtins:builtin command:compadd -k builtins'
+    'functions:shell function:compadd -k functions'
+    'aliases:alias:compadd -k aliases'
+    'suffix-aliases:suffix alias:_suffix_alias_files'
+    'reserved-words:reserved word:compadd -k reswords'
+    'jobs:: _jobs -t'
+    'parameters:: _parameters -g "^*readonly*" -qS= -r "\n\t\- =["'
+  )
+fi
+
+args=( "$@" )
+
+local -a cmdpath
+if zstyle -a ":completion:${curcontext}" command-path cmdpath &&
+   [[ $#cmdpath -gt 0 ]]
+then
+  local -a +h path
+  local -A +h commands
+  path=( $cmdpath )
+fi
+_alternative -O args "$defs[@]"

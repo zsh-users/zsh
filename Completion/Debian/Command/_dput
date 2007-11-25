@@ -1,14 +1,32 @@
 #compdef dput
 
+_dput() {
 _arguments \
   '(-c --config)'{-c,--config}'[specify config file]:config file:_files' \
   '(-d --debug)'{-d,--debug}'[debug mode]' \
   '(-D --dinstall)'{-D,--dinstall}'[run dinstall after upload]' \
+  '(-e --delayed)'{-E,--delayed}'number of days in delayed queue:(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)' \
   '(-f --force)'{-f,--force}'[force upload of already uploaded package]' \
+  '(-H --host-list)'{-H,--host-list}'[display host list]' \
   '(-l --lintian)'{-l,--lintian}'[run lintian before upload]' \
   '(-o --check-only)'{-o,--check-only}'[check the package, do not upload]' \
   '(-p --print)'{-p,--print}'[print configuration]' \
   '(-s --simulate)'{-s,--simulate}'[simulate an upload only]' \
   '(-u --unchecked)'{-u,--unchecked}'[do not check GPG signature on the changes file]' \
   '(-v --version)'{-v,--version}'[show version information]' \
+  '1::host:_dput_hosts' \
   '*:changes file:_files -g "*.changes(-.)"'
+}
+
+_dput_hosts() {
+  local expl
+
+  if ( [[ ${+_dput_cfhosts} -eq 0 ]] || _cache_invalid dputhosts ) && ! _retrieve_cache dputhosts; then
+    _dput_cfhosts=(${${(M)${(f)"$(dput -H)"}:#*=>*}/ =>*/})
+    _store_cache dputhosts _dput_cfhosts
+  fi
+
+  _wanted dputhosts expl 'target host' compadd -a _dput_cfhosts
+}
+
+_dput "$@"
