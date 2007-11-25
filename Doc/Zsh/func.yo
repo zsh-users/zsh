@@ -188,7 +188,9 @@ Hence the set of functions is always called together.
 findex(precmd)
 vindex(precmd_functions)
 item(tt(precmd))(
-Executed before each prompt.
+Executed before each prompt.  Note that precommand functions are not
+reexecuted simply because the command line is redrawn, as happens, for
+example, when a notification about an exiting job is displayed.
 )
 findex(preexec)
 vindex(preexec_functions)
