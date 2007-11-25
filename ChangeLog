@@ -1,3 +1,698 @@
+2007-10-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Functions/Prompts/prompt_bart_setup: make sure
+	localtraps is unset before assigning to functions[TRAPWINCH].
+
+	* users/12008: Functions/Prompts/promptinit: emulate zsh to
+	avoid setopts conflicts.  Run precmd and preexec only if they
+	are defined as functions.
+
+2007-10-13  Clint Adams  <clint@zsh.org>
+
+	* 23947: Functions/Prompts/prompt_clint_setup: remove apm battery
+	status and add git branch detection.
+
+2007-10-11  Peter Stephenson  <pws@csr.com>
+
+	* 23934: Completion/Base/Completer/_expand_alias:
+	if "foo" expands as regular alias to "foo blah", turn this
+	into "\foo blah" to avoid the alias kicking in again.
+
+2007-10-08  Peter Stephenson  <pws@csr.com>
+
+	* arno: 23910: Completion/Unix/Command/_init_d: handle
+	spaces in cases in init scripts.
+
+2007-10-06  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 23907: Completion/Unix/Command/_git: add
+	--cached option to git-diff completion.
+
+	* 23908: Completion/Unix/Command/_git: add missing backslash in
+	_git-svn.
+
+	* Mikael Magnusson: 23906: Completion/Unix/Command/_git: add
+	missing backslash in _git-svn.
+
+2007-10-05  Peter Stephenson  <p.w.stephenson@ntlworld.com
+
+	* unposted, c.f. users/11935: Doc/Zsh/builtins.yo: quoting
+	of arguments to unalias.
+
+2007-10-04  Clint Adams  <clint@zsh.org>
+
+	* 23905: Completion/Unix/Command/_git: remove useless gitdir
+	assignment and scope array locally in new __git_changed_files
+	function.
+
+	* Mikael Magnusson: 23903: Completion/Unix/Command/_git:
+	complete both modified and added files for git commit.
+
+2007-10-03  Peter Stephenson  <pws@csr.com>
+
+	* 23900: Src/Zle/compctl.c, Src/Zle/zle_tricky.c: Better handling
+	of NO_EQUALS option on old-style completion.
+
+	* 23883: Doc/Zsh/func.yo: try to improve precmd documentation.
+
+	* Daniel Qarras: users/11915: Completion/Unix/Command/_module:
+	.version incorrectly quoted as regexp.
+
+2007-10-01  Clint Adams  <clint@zsh.org>
+
+	* Nikolai Weibull: 23889: Completion/Unix/Command/_git: fix -o
+	completion in git cvsimport.
+
+	* Nikolai Weibull: 23888: Completion/Unix/Command/_git: complete
+	branch names and cached files after git log.
+
+	* Nikolai Weibull: 23879: Completion/Unix/Command/_git: complete
+	only cached files after git log.
+
+	* Jesse Weinstein: 23878: Completion/Unix/Command/_ranlib:
+	completion for ranlib.
+
+2007-09-30  Clint Adams  <clint@zsh.org>
+
+	* 23875: Completion/Unix/Command/_git: complete heads, tags, and
+	files after git log.
+
+	* 23874: Completion/Unix/Command/_git: only declare
+	revision_arguments parameter once.
+
+	* Nikolai Weibull: 23871: Completion/Unix/Command/_cdrdao:
+	fix __cdrdao-drivers typo.
+
+	* 23872: Completion/Unix/Command/_git: complete git
+	config in subcommand position.
+
+	* 23870: Completion/Unix/Command/_git: completion for git
+	mergetool.
+
+	* 23868: Completion/Debian/Command/_svn-buildpackage: completion
+	for svn-buildpackage.
+
+	* 23867: Completion/Debian/Command/_dpkg-buildpackage: completion
+	for dpkg-buildpackage.
+
+	* 23863: Completion/Linux/Command/_lsusb: completion
+	for lsusb.
+
+	* 23863: Completion/Unix/Command/_git: remove all
+	global variables.
+
+	* 23862: Completion/Unix/Command/_git: declare
+	author_conversion_file_arg_spec local.
+
+2007-09-29  Clint Adams  <clint@zsh.org>
+
+	* 23860: Completion/Debian/Command/_dpatch-edit-patch: complete
+	patch names, omitting the .dpatch extension.
+
+	* 23854: Completion/Debian/Command/_dpatch-edit-patch: complete
+	colon-separated path after -P, other minor tweaks.
+
+	* Julien BLACHE: 23852:
+	Completion/Debian/Command/_dpatch-edit-patch: completion for
+	dpatch-edit-patch.
+
+	* Pierre Habouzit: 23851: Completion/Unix/Command/_git: 
+	use ad-hoc functions to list git branches and tags.
+
+2007-09-28  Clint Adams  <clint@zsh.org>
+
+	* 23850: Completion/Unix/Command/_md5sum: complete for GNU md5sum
+	instead.
+
+	* Jesse Weinstein: 23848: Completion/Unix/Command/_md5sum:
+	completion for md5sum.
+
+2007-09-27  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 23838: Completion/Unix/Command/_git: 
+	have git verify-tag complete tags instead of hash IDs.
+
+	* 23846: Completion/Unix/Command/_git: merge in additional changes
+	from Nikolai Weibull's repo.
+
+	* Jun Takimoto: 23814: Completion/Unix/Command/_ls,
+	Completion/BSD/Command/_chflags,
+	Completion/Unix/Type/_file_systems, Completion/Unix/Command/_comm:
+	fixes for Darwin.
+
+	* 23841: Completion/Unix/Command/_git: complete tag hashes for git
+	verify-tag.
+
+2007-09-26  Peter Stephenson  <pws@csr.com>
+
+	* users/11883: Src/init.c: "return" at top level caused
+	following precommand functions to return immediately.
+
+2007-09-26  Clint Adams  <clint@zsh.org>
+
+	* 23834: Completion/Unix/Type/_tex: complete tex files for xetex
+	and xelatex.
+
+2007-09-25  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 23832: Completion/Unix/Command/_git: 
+	fix git merge -m completion.
+
+	* 23831: Completion/Unix/Command/_git: fix handling of merge
+	strategy option.
+
+	* 23829: Completion/Unix/Command/_git: merge in the remaining
+	git completion changes from Nikolai Weibull's repository.
+
+	* 23828: Completion/Unix/Command/_git: merge in lots of
+	git completion changes from Nikolai Weibull's repository.
+
+	* Mikael Magnusson: 23827: Completion/Unix/Command/_vorbis: 
+	allow all arguments to options to either immediately follow
+	the option letter or be the next word.
+
+2007-09-23  Clint Adams  <clint@zsh.org>
+
+	* 23824: Completion/Unix/Command/_git: merge in git rerere
+	completion from Nikolai Weibull's repository.
+
+	* 23823: Completion/Unix/Command/_git: merge in git rev-parse
+	completion from Nikolai Weibull's repository.
+
+2007-09-21  Clint Adams  <clint@zsh.org>
+
+	* 23822: Completion/Unix/Command/_git: merge in git rm
+	completion fixes from Nikolai Weibull's repository.
+
+2007-09-18  Peter Stephenson  <pws@csr.com>
+
+	* users/11852: Completion/Base/Completer/_expand_alias:
+	quotes were incorrectly removed from aliases.
+
+2007-09-13  Clint Adams  <clint@zsh.org>
+
+	* 23813: Src/Zle/zle_hist.c: set vipenultsrchstr to NULL
+	after freeing it to avoid vi-mode history search segfaults.
+
+2007-08-31  Peter Stephenson  <pws@csr.com>
+
+	* 23812: Src/exec.c: ( command & ) caused core dump after 23460.
+
+2007-08-30  Clint Adams  <clint@zsh.org>
+
+	* Chris Lamb: 23810: Completion/Debian/Command/_lighttpd:
+	 completion for lighty-{enable,disable}-mod .
+
+2007-08-30  Peter Stephenson  <pws@csr.com>
+
+	* 23807: Src/Zle/complist.c, Src/Zle/zle_misc.c: interactive mode
+	in completion was fairly seriously broken.
+
+	* users/11791: Functions/Zle/incremental-complete-word:
+	missing "emulate -L zsh": was commented out, not sure why.
+
+2007-08-21  Clint Adams  <clint@zsh.org>
+
+	* 23788: Doc/Zsh/mod_files.yo, Src/Modules/files.c: add -h option
+	to chown symlinks rather than targets, and change default behavior
+	to do the opposite.
+
+	* Matthieu Moy: 23785: Completion/Unix/Command/_git: add missing
+	backslash in _arguments list in git-send-email.
+
+2007-08-21  Peter Stephenson  <pws@csr.com>
+
+	* users/11790: Functions/Zle/{up,down}-line-or-beginning-search:
+	emulate -L zsh to avoid nounset problem.
+
+2007-08-19  Clint Adams  <clint@zsh.org>
+
+	* R.Ramkumar: 23783: Completion/Zsh/Command/_command,
+	Completion/Zsh/Command/_hash, Completion/Zsh/Command/_which,
+	Completion/Zsh/Context/_equal, Completion/Zsh/Type/_command_names:
+	use _path_commands.
+
+	* R.Ramkumar, tweaked: 23782: Completion/Unix/Type/_path_commands:
+	commands with descriptions.
+
+	* 23781: Completion/Debian/Command/_dput: base host completion
+	on output of `dput -H`.
+
+	* 23780: Completion/Debian/Command/_dput: add -e, -H, and
+	optional host argument.
+
+2007-08-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23778: Doc/Zsh/builtins.yo: document KSH_TYPESET behaviour
+	in the typeset manual entry.
+
+2007-08-18  Clint Adams  <clint@zsh.org>
+
+	* 23775: Completion/Unix/Command/_growisofs:
+	restore completion of devicename=filename pairs after -Z and -M.
+
+2007-08-16  Peter Stephenson  <pws@csr.com>
+
+	* Roy Marples: 23762: configure.ac: need to suppress [...] quoting
+	for use of [...] in case.
+
+2007-08-14  Peter Stephenson  <pws@csr.com>
+
+	* 23759: Doc/Zsh/contrib.yo, Functions/MIME/pick-web-browser:
+	a few improvements to pick-web-browser.
+
+	* 23757: Src/lex.c: suppression correction of command
+	words immediately followed by () or something that looks
+	like it's going to be one.
+
+2007-08-12  Andrey Borzenkov <bor@zsh.org>
+
+	* 23751: Completion/Linux/Command/_modutils: support for
+	completing module files directly
+
+2007-08-09  Clint Adams  <clint@zsh.org>
+
+	* Nikolai Weibull: 23749: Completion/Unix/Command/_cdrdao:
+	completion for cdrdao.
+
+	* Nikolai Weibull: 23748: Completion/Unix/Command/_growisofs:
+	better completion for growisofs and mkisofs.
+
+2007-08-07  Clint Adams  <clint@zsh.org>
+
+	* 23746: Completion/Unix/Command/_growisofs: partial completion
+	for growisofs.
+
+	* 23745: Completion/Unix/Command/_genisoimage: partial completion
+	for genisoimage.
+
+2007-08-04  Clint Adams  <clint@zsh.org>
+
+	* Matthieu Moy: 23738: Completion/Unix/Command/_git: additional
+	git diff args.
+
+	* 23739: Completion/Unix/Command/_git: merge in git diff
+	completion fixes from Nikolai Weibull's repository.
+
+2007-07-29  Clint Adams  <clint@zsh.org>
+
+	* 23720: Completion/Unix/Command/_dvi: handle arguments to dvips -P
+	as part of the same word.
+
+	* 23718: Completion/Unix/Command/_dvi: don't use _arguments -s.
+
+2007-07-28  Clint Adams  <clint@zsh.org>
+
+	* 23714: Completion/Unix/Command/_dvi: handle dvips -G, -R, -u, -U,
+	-v, -V, -y, and -z.
+
+2007-07-27  Clint Adams  <clint@zsh.org>
+
+	* 23712: Completion/Unix/Command/_dvi: handle dvips -j.
+
+2007-07-26  Peter Stephenson  <pws@csr.com>
+
+	* 23702: Config/installfns.sh: use chmod to change permissions
+	since installing as a programme may try to strip the script.
+
+2007-07-25  Clint Adams  <clint@zsh.org>
+
+	* 23697: configure.ac: use -rdynamic where it seems to be
+	available, not based on the value of $host.
+
+2007-07-25  Peter Stephenson  <pws@csr.com>
+
+	* 23696: Src/params.c, Test/D04parameter.ztst: assignment
+	to negative subscripts in scalars before the start was broken.
+	Now adds at start.
+
+2007-07-23  Peter Stephenson  <pws@csr.com>
+
+	* 23693: Src/Zle/compmatch.c: _match tried to match the quoted
+	form of file names and any completion that did it's own quoting.
+
+2007-07-22  Clint Adams  <clint@zsh.org>
+
+	* 23691: Completion/BSD/Command/_portsnap: declare local parameter
+	scope for _arguments state.
+
+2007-07-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Renato Botelho <rbgarga@gmail.com>: 23685:
+	Completion/BSD/Command/{_portlint,_csup,_portsnap}:
+	new FreeBSD completions.
+
+2007-07-19  Clint Adams  <clint@zsh.org>
+
+	* Magnus Therning + tweaks: 23686: Completion/Unix/Command/_tin:
+	respect TIN_HOMEDIR environment variable.
+
+2007-07-12  Clint Adams  <clint@zsh.org>
+
+	* 23674: Completion/Unix/Command/_git: merge in git clone
+	completion fixes from Nikolai Weibull's repository.
+
+2007-07-06  Clint Adams  <clint@zsh.org>
+
+	* 23666: Completion/Debian/Type/_deb_packages:
+	redirect stderr from apt-cache --generate pkgnames to
+	/dev/null.
+
+2007-07-06  Clint Adams  <clint@zsh.org>
+
+	* 23664: Completion/Debian/Command/_bts: handle bts cache
+	and cleancache subcommands.
+
+2007-07-05  Peter Stephenson  <pws@csr.com>
+
+	* 23658: Completion/Base/Utility/_combination: bad use
+	of index variable exposed by 23553.
+
+2007-07-05  Clint Adams  <clint@zsh.org>
+
+	* 23655: Completion/Unix/Command/_git: merge in git instaweb
+	completion from Nikolai Weibull's repository.
+
+	* 23654: Completion/Debian/Command/_reprepro: add completion for
+	reprepro.
+
+2007-07-03  Clint Adams  <clint@zsh.org>
+
+	* 23653: Completion/Debian/Command/_apt: add completion for apt-get
+	autoremove.
+
+2007-07-03  Clint Adams  <clint@zsh.org>
+
+	* 23645: Functions/Zftp/zfautocheck: use == instead of =.
+
+	* 23644: Completion/Unix/Command/_git: merge in git remote
+	completion from Nikolai Weibull's repository.
+
+2007-07-02  Clint Adams  <clint@zsh.org>
+
+	* 23640: Completion/Unix/Command/_git: merge in git quiltimport
+	completion from Nikolai Weibull's repository.
+
+	* 23639: Completion/Unix/Command/_git: merge in git merge-tree
+	completion from Nikolai Weibull's repository.
+
+	* 23629: Etc/FTP-README: change references to "beta" to "dev" or
+	"development".
+
+2007-07-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Tomasz Pala: users/11599: Completion/Unix/Command/_ip:
+	improvements for VLAN interfaces, deleting addresses,
+	abbreviations.
+
+2007-07-01  Clint Adams  <clint@zsh.org>
+
+	* 23628: Completion/Unix/Command/_git: merge in from Nikolai
+	Weibull's repository completion for git mktree.
+
+	* 23627: Completion/Unix/Command/_git: merge in from Nikolai
+	Weibull's repository fixes for git hash-object, index-pack,
+	merge-index.
+
+2007-06-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 23611: Completion/Unix/Command/_ldd, Completion/Unix/Type/_ld_debug:
+	new completions for ldd and LD_DEBUG on Solaris and Linux
+
+2007-06-28  Clint Adams  <clint@zsh.org>
+
+	* 23610: Completion/Unix/Command/_git: merge in from Nikolai
+	Weibull's repository git describe as well as fixes for
+	diff-index, diff-files, and diff-stages.
+
+	* 23609: Completion/Unix/Command/_git: merge in git clean
+	completion from Nikolai Weibull's repository.
+
+2007-06-24  Clint Adams  <clint@zsh.org>
+
+	* 23595: Completion/Unix/Command/_git: merge in git archive
+	completion from Nikolai Weibull's repository.
+
+	* 23594: Completion/Unix/Command/_git: merge in git grep
+	completion from Nikolai Weibull's repository.
+
+	* 23593: Completion/Unix/Command/_git: merge in git annotate
+	completion from Nikolai Weibull's repository.
+
+2007-06-23  Clint Adams  <clint@zsh.org>
+
+	* 23587: Completion/X/Command/_xrandr: completion for
+	xrandr.
+
+	* 23586: Completion/Unix/Command/_dmidecode: completion for
+	dmidecode.
+
+2007-06-22  Clint Adams  <clint@zsh.org>
+
+	* 23580: Completion/Unix/Command/_guilt: rudimentary completion
+	for guilt.
+
+2007-06-19  Clint Adams  <clint@zsh.org>
+
+	* 23569: Completion/Debian/Command/_bts: make 'bts show'
+	behave the same as 'bts bugs'.
+
+	* 23568: Completion/Linux/Command/_iwconfig: complete iwconfig
+	modu.
+
+2007-06-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/11575: Doc/Zsh/compsys.yo: document use of
+	additional completers and insert style with _all_matches
+
+2007-06-15  Peter Stephenson  <pws@csr.com>
+
+	* 23553: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo, Src/exec.c,
+	Src/math.c: should have been committed but weren't.
+
+2007-06-14  Clint Adams  <clint@zsh.org>
+
+	* 23561: Completion/Unix/Command/_git: merge in relevant changes
+	from Nikolai Weibull's repo to more appropriately complete after
+	'git add'.
+
+2007-06-12  Clint Adams  <clint@zsh.org>
+
+	* 23556: Completion/Unix/Command/_rrdtool: completion
+	for rrdtool.
+
+	* 23557: Completion/Unix/Command/_git: complete
+	filenames after 'git reset <revision>'.
+
+2007-06-12  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Unix/Command/_pkg-config,
+	Completion/Unix/Command/_unexpand: remove RCS Id
+	comments.
+
+2007-06-11  Peter Stephenson  <pws@csr.com>
+
+	* 23543: Completion/Unix/Command/_perforce: work around
+	problem adding "..." with hiddne prefix.
+
+2007-06-06  Peter Stephenson  <pws@csr.com>
+
+	* Phil Pennock: 23529: Completion/compdump: quote completion dump
+	to prevent global alias expansion.
+
+2007-06-05  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_units: message and tag were
+	reversed; always attempt completion with removed prefix
+	(a bit problematic if prefix is e.g. "m").
+
+	* From Mikael Magnusson and Phil Pennock: 23521, 23522:
+	Completion/Unix/Command/_units: extra locations for
+	units data.
+
+2007-06-04  Peter Stephenson  <pws@csr.com>
+
+	* 23519: Completion/Unix/Command/_units: completion for "units".
+
+	* 23518: Doc/Zsh/contrib.yo, Functions/MIME/zsh-mime-handler:
+	add find-file-in-path and file-path styles to MIME system.
+
+2007-05-27  Clint Adams  <clint@zsh.org>
+
+	* 23475: Completion/Unix/Command/_cdrecord: call $service
+	instead of 'cdrecord', in case we are using wodim.
+
+2007-05-23  Peter Stephenson  <pws@csr.com>
+
+	* John Buddery: 23461 plus comment and test: fix race
+	setting up multios by blocking SIGCHLD.
+
+	* 23460: Src/exec.c, Src/jobs.c, Test/E01options.ztst:
+	fix longstanding problem with multios attached to a
+	subshell process.
+
+2007-05-22  Peter Stephenson  <pws@csr.com>
+
+	* Phil Pennock: 23450: Src/Zle/zleparameter.c: undefined
+	widget caused crash in in $widgets special parameter.
+
+2007-05-17  Clint Adams  <clint@zsh.org>
+
+	* Nikolai Weibull: 23443: Completion/Unix/Command/_vim:
+	mark --nofork and -f as redundant.
+
+2007-05-16  Clint Adams  <clint@zsh.org>
+
+	* Ag. D. Hatzimanikas: 23442: Completion/Unix/Command/_vim:
+	update for vim 7.1.
+
+2007-05-14  Clint Adams  <clint@zsh.org>
+
+	* Alexander Myodov: 23439: Completion/Unix/Command/_screen:
+	complete sessions for -dr, -dR, -Dr, -DR, -dx, and -Dx.
+
+2007-05-14  Peter Stephenson  <pws@csr.com>
+
+	* users/11484: Functions/Misc/zmv: allow renaming $f to $g
+	to work if the files are really the same.
+
+	* 23438 (slightly improved to use _call_program):
+	Completion/Unix/Type/_printers: improve finding of network
+	printers.
+
+2007-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23434: Completion/Unix/Command/_configure: use also
+	for config.status.
+
+2007-05-10  Peter Stephenson  <pws@csr.com>
+
+	* Peter A. Castro: 23408: zftp account handling was broken.
+
+2007-05-01  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/contrib.yo: typo in widget name.
+
+	* Guillaume Chazarain: 23364: Src/signals.c, Src/signals.h: fix
+	race in POSIX signal blocking - use local variables as other forms
+	already do.
+
+	* 23363: README (not posted), Doc/Zsh/compsys.yo,
+	Src/Zle/computil.c: fake-files style now takes pattern.
+
+2007-04-30  Peter Stephenson  <pws@csr.com>
+
+	* 23339: Src/mem.c: make malloc(0) allocate a single byte
+	instead of returning invalid (and unfreeable) memory.
+
+2007-04-26  Peter Stephenson  <pws@csr.com>
+
+	* Phil Pennock: 23326: Src/utils.c: with no __STDC_ISO_10646__
+	or HAVE_ICONV but with HAVE_NL_LANGINFO and CODESET the
+	code wouldn't compile.
+
+2007-04-23  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/parse.c: make sure we get "invalid zwc file"
+	for a short file (not "wrong version").
+
+	* 23312: Src/parse.c, Src/zsh.mdd: ensure parse.c is updated
+	when version.h changes in order to pick up changes to ZWC
+	files; memset() header of wordcode file to normalise unused words.
+
+	* 23308: Src/text.c: stop tindent becoming negative, which
+	causes infinite use of memory; add debug test to see where
+	it would become negative.
+
+2007-04-21  Clint Adams  <clint@zsh.org>
+
+	* 23303: Completion/Unix/Command/_date: use _guard.
+
+2007-04-19  Clint Adams  <clint@zsh.org>
+
+	* 23301: Paul Ackersviller: Functions/Misc/add-zsh-hook:
+	fix semicolon mistyped as a colon.
+
+	* 23302: Completion/Unix/Command/_subversion: complete properties
+	after svn propget and propedit.
+
+2007-04-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Misc/add-zsh-hook: should have been
+	added ages ago but wasn't.
+
+2007-04-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* users/11424: Functions/Zle/smart-insert-last-word: fixed
+	parse error caused by a comment in a math expression.
+
+2007-04-17  Geoff Wing  <gcw@zsh.org>
+
+	* unposted: LICENCE: update year to 2007
+
+2007-04-14  Clint Adams  <schizo@debian.org>
+
+	* 23275: Completion/Unix/Command/_date: change order of
+	arguments to _arguments so that options will actually be
+	completed.
+
+2007-04-13  Peter Stephenson  <pws@csr.com>
+
+	* 23271: Pete Hollobon: Completion/Unix/Command/_sqsh,
+	Completion/Unix/Command/.distfiles: new completion.
+
+2007-04-05  Clint Adams  <clint@zsh.org>
+
+	* 23264: Src/Modules/pcre.c: don't add the -pcre-match
+	operator unless the pcre functions are available.
+
+2007-03-31  Clint Adams  <clint@zsh.org>
+
+	* 23255: Completion/Unix/Command/_module: fix 23253 better.
+
+	* 23253: Erik Johansson: Completion/Unix/Command/_module:
+	remove double quotes causing zcompile to choke.
+
+2007-03-30  Clint Adams  <clint@zsh.org>
+
+	* 23252: Completion/Debian/Command/_aptitude: complete for
+	"aptitude unhold".
+
+2007-03-29  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Unix/Command/.distfiles: update
+	.distfiles.
+
+2007-03-28  Clint Adams  <clint@zsh.org>
+
+	* 23241: Daniel Qarras: Completion/Unix/Command/_module:
+	fix for _module.
+
+2007-03-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* usres/11333: Completion/Unix/Command/_ssh: users-hosts
+	didn't limit the hosts properly when the user was matched
+	for ssh.
+
+2007-03-24  Clint Adams  <clint@zsh.org>
+
+	* 23236: Daniel Qarras: Completion/Unix/Command/_module:
+	enhancements for _module.
+
+2007-03-22  Peter Stephenson  <pws@csr.com>
+
+	* 23226: Completion/Unix/Command/_nice: "nice -n<->" wasn't
+	handled.
+
+2007-03-19  Peter Stephenson  <pws@csr.com>
+
+	* 23221: Martin Koeppe: don't used XTABS if not available.
+
+2007-03-15  Peter Stephenson  <pws@csr.com>
+
+	* 23219: Src/options.c: Ismail Dönmez reported that lower
+	casing of I to dotless i in tr_TR.UTF-8 broke option handling.
+
 2007-03-14  Clint Adams  <clint@zsh.org>
 
 	* 23215: Completion/Unix/Command/_module: completion for
@@ -33,6 +728,16 @@
 	* 23190: Completion/Unix/Type/_net_interfaces: use ifconfig
 	on Linux and fall back to old method in order to pick up
 	additional interface types.
+
+
+	* unposted: Completion/Unix/Command/_ip: tweak ip route
+	show abbreviations.
+
+2007-02-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 23186: Completion/Base/Utility/_regex_words,
+	Completion/Unix/Command/_ip (tweaked), Doc/Zsh/compsys.yo: add to
+	regex completion handling and add new ip completion.
 
 2007-02-25  Barton E. Schaefer  <schaefer@zsh.org>
 
@@ -74,12 +779,6 @@
 
 	* 23168: Src/Modules/tcp.c: error when failing to bind
 	to a port didn't use native byte order.
-
-2007-02-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
-
-	23165: Src/math.c, Src/utils.c, Doc/Zsh/options.yo: don't
-	try to parse base indicators in octal and raise error for
-	bases above 36.
 
 2007-02-10  Felix Rosencrantz <f.rosencrantz@gmail.com>
 	* 23164: Src/builtin.c when PUSHD_SILENT is set, don't print anything
@@ -730,10 +1429,6 @@
 
 	* 22554: Jesse Weinstein: Completion/Unix/Command/_vorbiscomment:
 	completion for vorbiscomment.
-
-2006-07-18  Peter Stephenson  <pws@csr.com>
-
-	* unposted: **/.distfiles: update distributed files.
 
 2006-07-18  Clint Adams  <clint@zsh.org>
 
