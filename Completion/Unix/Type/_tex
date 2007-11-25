@@ -1,4 +1,4 @@
-#compdef tex latex slitex pdflatex jadetex pdfjadetex
+#compdef tex latex slitex pdflatex jadetex pdfjadetex xetex=tex xelatex=latex
 
 local expl
 
