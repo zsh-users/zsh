@@ -1,56 +1,218 @@
 DISTFILES_SRC='
 .distfiles
-_a2ps           _elinks         _kvno           _perldoc        _surfraw
-_aap            _elm            _last           _php            _sysctl
-                                _ldd
-_ant            _enscript       _less           _pine           _tar
-_antiword       _env            _links          _ping           _tardy
-_apachectl      _fakeroot       _loadkeys       _pkg-config     _tcptraceroute
-_apm            _fetchmail      _locate         _pon            _telnet
-_arp            _figlet         _look           _postfix        _texinfo
-_arping         _find           _lp             _prcs           _tidy
-_attr           _finger         _ls             _printenv       _tiff
-_baz            _flasher        _lsof           _psutils        _tin
-_bison          _flex           _lynx           _pump           _tla
-_bittorrent     _fortune        _lzop           _python         _todo.sh
-_bogofilter     _fsh            _mail           _qemu           _toilet
-_bzip2          _fuser          _make           _quilt          _totd
-_bzr            _gcc            _man            _raggle         _tracepath
-_cal            _gdb            _mencal         _rake           _twisted
-                _genisoimage
-_ccal           _getconf        _mercurial      _rar            _unace
-_cdcd           _getent         _metaflac       _rcs            _unexpand
+_a2ps
+_aap
+_ant
+_antiword
+_apachectl
+_apm
+_arp
+_arping
+_attr
+_baz
+_bison
+_bittorrent
+_bogofilter
+_bzip2
+_bzr
+_cal
+_ccal
+_cdcd
 _cdrdao
-_cdrecord       _getmail        _mh             _renice         _uniq
-_chkconfig      _git            _mkdir          _ri             _user_admin
-_chmod          _global         _module         _rlogin         _vim
-_chown          _gnu_generic    _monotone       _rsync          _vorbis
-_comm           _gnutls         _mount          _rubber         _vorbiscomment
-_compress       _gpg            _mpc            _ruby           _vux
-_configure      _gphoto2        _mt             _sablotron      _w3m
-_cowsay         _gprof          _mtools         _samba          _webbrowser
-_cp             _grep           _mtr            _sccs           _wget
-_cpio           _groff          _mutt           _screen         _whereis
-                _growisofs
-_cplay          _gs             _mysqldiff      _sed            _whois
-_cssh           _gzip           _mysql_utils    _sh             _wiggle
-_cvs            _iconv          _ncftp          _showmount      _xargs
-_darcs          _ifconfig       _netcat         _sisu           _xmlsoft
-_date           _imagemagick    _nice           _slrn           _yafc
-_dd             _init_d         _nmap           _socket         _yodl
-_dhclient       _ip             _nslookup       _spamassassin   _yp
-                                                _sqsh
-_dict           _irssi          _pack           _ssh            _zcat
-_diff           _ispell         _patch          _strip          _zdump
-_diffstat       _java           _pax            _stty           _zip
-_du             _joe            _pbm            _su
-_dvi            _killall        _perforce       _subversion
-_ecasound       _knock          _perl           _sudo
+_cdrecord
+_chkconfig
+_chmod
+_chown
+_comm
+_compress
+_configure
+_cowsay
+_cp
+_cpio
+_cplay
+_cssh
 _cut
+_cvs
+_darcs
+_date
+_dd
+_dhclient
+_dict
+_diff
+_diffstat
 _dmidecode
+_du
+_dvi
+_ecasound
+_elinks
+_elm
+_enscript
+_env
+_fakeroot
+_fetchmail
+_figlet
+_find
+_finger
+_flasher
+_flex
+_fortune
+_fsh
+_fuser
+_gcc
+_gdb
+_genisoimage
+_getconf
+_getent
+_getmail
+_git
+_global
+_gnu_generic
+_gnutls
+_gpg
+_gphoto2
+_gprof
+_grep
+_groff
+_growisofs
+_gs
 _guilt
+_gzip
+_iconv
+_ifconfig
+_imagemagick
+_init_d
+_ip
+_irssi
+_ispell
+_java
+_joe
+_killall
+_knock
+_kvno
+_last
+_ldd
+_less
+_links
+_loadkeys
+_locate
+_look
+_lp
+_ls
+_lsof
+_lynx
+_lzop
+_mail
+_make
+_man
 _md5sum
+_mencal
+_mercurial
+_metaflac
+_mh
+_mkdir
+_module
+_monotone
+_mount
+_mpc
+_mt
+_mtools
+_mtr
+_mutt
+_mysql_utils
+_mysqldiff
+_ncftp
+_netcat
+_nice
+_nmap
+_nslookup
+_pack
+_patch
+_pax
+_pbm
+_perforce
+_perl
+_perldoc
+_php
+_pine
+_ping
+_pkg-config
+_pon
+_postfix
+_prcs
+_printenv
+_psutils
+_pump
+_python
+_qemu
+_quilt
+_raggle
+_rake
 _ranlib
+_rar
+_rcs
+_renice
+_ri
+_rlogin
 _rrdtool
+_rsync
+_rubber
+_ruby
+_sablotron
+_samba
+_sccs
+_screen
+_sed
+_sh
+_showmount
+_sisu
+_slrn
+_socket
+_spamassassin
+_sqsh
+_ssh
+_strip
+_stty
+_su
+_subversion
+_sudo
+_surfraw
+_sysctl
+_tar
+_tardy
+_tcptraceroute
+_telnet
+_texinfo
+_tidy
+_tiff
+_tin
+_tla
+_todo.sh
+_toilet
+_totd
+_tracepath
+_twisted
+_unace
+_uname
+_unexpand
+_uniq
 _units
+_user_admin
+_vim
+_vorbis
+_vorbiscomment
+_vux
+_w3m
+_webbrowser
+_wget
+_whereis
+_whois
+_wiggle
+_xargs
+_xmlsoft
+_yafc
+_yodl
+_yp
+_zcat
+_zdump
+_zip
 '

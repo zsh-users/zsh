@@ -1,5 +1,8 @@
 2007-11-26  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk, Completion/Unix/Command/.distfiles:
+	changes for 4.3.4-dev-3.
+
 	* 24120: Src/init.c: memory allocation for termcap strings
 	was screwy, in particular when terminal couldn't move left.
 
