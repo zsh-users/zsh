@@ -1884,6 +1884,13 @@ passed down verbatim to the tt(cp), tt(ln) or tt(mv) command called to
 perform the work.  It should probably begin with a `tt(-)'.)
 endsitem()
 
+Further examples:
+
+example(zmv -v '(* *)' '${1// /_}')
+
+For any file in the current directory with at least one space in the name,
+replace every space by an underscore and display the commands executed.
+
 For more complete examples and other implementation details, see the
 tt(zmv) source file, usually located in one of the directories named in
 your tt(fpath), or in tt(Functions/Misc/zmv) in the zsh distribution.
