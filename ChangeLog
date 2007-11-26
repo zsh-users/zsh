@@ -1,3 +1,8 @@
+2007-11-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Ryan F: users/12154: Completion/Unix/Type/_groups: MacOS X
+	group completion.
+
 2007-11-26  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk, Completion/Unix/Command/.distfiles:
