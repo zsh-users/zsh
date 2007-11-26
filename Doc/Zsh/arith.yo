@@ -12,7 +12,8 @@ integers, the shell is usually compiled to use 8-byte precision where this
 is available, otherwise precision is 4 bytes.  This can be tested, for
 example, by giving the command `tt(print - $(( 12345678901 )))'; if the
 number appears unchanged, the precision is at least 8 bytes.  Floating
-point arithmetic is always double precision.
+point arithmetic always uses the `double' type with whatever corresponding
+precision is provided by the compiler and the library.
 
 The tt(let) builtin command takes arithmetic expressions as arguments; each
 is evaluated separately.  Since many of the arithmetic operators, as well
