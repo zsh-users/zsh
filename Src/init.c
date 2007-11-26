@@ -598,19 +598,22 @@ init_term(void)
 	if (tccan(TCUP))
 	    termflags &= ~TERM_NOUP;
 	else {
+	    zsfree(tcstr[TCUP]);
 	    tcstr[TCUP] = NULL;
 	    termflags |= TERM_NOUP;
 	}
 
 	/* most termcaps don't define "bc" because they use \b. */
 	if (!tccan(TCBACKSPACE)) {
+	    zsfree(tcstr[TCBACKSPACE]);
 	    tcstr[TCBACKSPACE] = ztrdup("\b");
 	    tclen[TCBACKSPACE] = 1;
 	}
 
 	/* if there's no termcap entry for cursor left, use backspace. */
 	if (!tccan(TCLEFT)) {
-	    tcstr[TCLEFT] = tcstr[TCBACKSPACE];
+	    zsfree(tcstr[TCLEFT]);
+	    tcstr[TCLEFT] = ztrdup(tcstr[TCBACKSPACE]);
 	    tclen[TCLEFT] = tclen[TCBACKSPACE];
 	}
 
@@ -629,6 +632,7 @@ init_term(void)
 
 	/* if there's no termcap entry for clear, use ^L. */
 	if (!tccan(TCCLEARSCREEN)) {
+	    zsfree(tcstr[TCCLEARSCREEN]);
 	    tcstr[TCCLEARSCREEN] = ztrdup("\14");
 	    tclen[TCCLEARSCREEN] = 1;
 	}
