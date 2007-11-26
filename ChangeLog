@@ -1,3 +1,8 @@
+2007-11-26  Peter Stephenson  <pws@csr.com>
+
+	* c.f. users/12248: Doc/Zsh/.distfiles: zshcalsys.1 was missing
+	from distribution.
+
 2007-11-24  Clint Adams  <clint@zsh.org>
 
 	* 24118: configure.ac: only link against libnsl if we have NIS and
