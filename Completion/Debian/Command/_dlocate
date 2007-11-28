@@ -13,6 +13,8 @@ _arguments \
 	'-du[du -sck of all files in package]' \
         '-conf[list conffiles in package]' \
 	'-lsconf[ls -ldF of conffiles in package]' \
+	'-lsman[list man pages in package]' \
+	'-lsbin[list executable files in package]' \
 	'-md5sum[list md5sums (if any) of package]' \
 	'-md5check[check md5sums (if any) of package]' \
 	'-man[list man pages (if any) of package]' \
