@@ -1,3 +1,9 @@
+2007-11-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24127: Src/Zle/compcore.c, Src/Zle/compmatch.c: fix
+	bug with matcher 'r:|[-./_]=* r:|=* l:|=*' completing
+	where word on command line starts after a "-".
+
 2007-11-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync: Added one more

@@ -2376,7 +2376,7 @@ addmatches(Cadata dat, char **argv)
 		    ms = dupstring(s);
 		else
 		    sl = strlen(ms = multiquote(s, 0));
-		lc = bld_parts(ms, sl, -1, NULL);
+		lc = bld_parts(ms, sl, -1, NULL, NULL);
 		isexact = 0;
 	    } else if (!(ms = comp_match(lpre, lsuf, s, cp, &lc,
 					 (!(dat->aflags & CAF_QUOTE) ?
@@ -2520,7 +2520,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	for (pp = NULL, p = line; p->next; pp = p, p = p->next);
 
 	if (psl) {
-	    s = bld_parts(psuf, psl, psl, &sl);
+	    s = bld_parts(psuf, psl, psl, &sl, NULL);
 
 	    if (sline) {
 		Cline sp;
@@ -2554,7 +2554,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	if (isl) {
 	    Cline tsl;
 
-	    s = bld_parts(isuf, isl, isl, &tsl);
+	    s = bld_parts(isuf, isl, isl, &tsl, NULL);
 
 	    if (sl)
 		sl->next = s;
@@ -2573,7 +2573,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	    sl = tsl;
 	}
 	if (qisl) {
-	    Cline qsl = bld_parts(dupstring(qisuf), qisl, qisl, NULL);
+	    Cline qsl = bld_parts(dupstring(qisuf), qisl, qisl, NULL, NULL);
 
 	    qsl->flags |= CLF_SUF;
 	    qsl->suffix = qsl->prefix;
@@ -2616,7 +2616,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	    if (pline)
 		for (p = cp_cline(pline, 1), lp = p; lp->next; lp = lp->next);
 	    else
-		p = bld_parts(ppre, ppl, ppl, &lp);
+		p = bld_parts(ppre, ppl, ppl, &lp, NULL);
 
 	    if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID)) &&
 		!lp->llen && !lp->wlen && !lp->olen) {
@@ -2644,19 +2644,19 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	    }
 	}
 	if (pl) {
-	    Cline lp, p = bld_parts(pre, pl, pl, &lp);
+	    Cline lp, p = bld_parts(pre, pl, pl, &lp, NULL);
 
 	    lp->next = line;
 	    line = p;
 	}
 	if (ipl) {
-	    Cline lp, p = bld_parts(ipre, ipl, ipl, &lp);
+	    Cline lp, p = bld_parts(ipre, ipl, ipl, &lp, NULL);
 
 	    lp->next = line;
 	    line = p;
 	}
 	if (qipl) {
-	    Cline lp, p = bld_parts(dupstring(qipre), qipl, qipl, &lp);
+	    Cline lp, p = bld_parts(dupstring(qipre), qipl, qipl, &lp, NULL);
 
 	    lp->next = line;
 	    line = p;
@@ -2676,7 +2676,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	    if (ppl)
 		memcpy(apre + qipl + ipl + pl, ppre, ppl);
 
-	    p = bld_parts(apre, palen, palen, &lp);
+	    p = bld_parts(apre, palen, palen, &lp, NULL);
 
 	    if (pline)
 		for (lp->next = cp_cline(pline, 1); lp->next; lp = lp->next);
