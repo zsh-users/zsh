@@ -305,11 +305,13 @@ if (( ! $+_fs_any )); then
     _fs_any=(
       '(sync)async[do all I/O asynchronously]'
       '(noatime)atime[update access time]'
+      '(norelatime)relatime[update atime relative to mtime/ctime]' 
       '(rw suid dev exec async)defaults[use default options]'
       '(nodev)dev[interpret devices]'
       '(noexec)exec[permit execution of binaries]'
       '(nomand)mand[allow mandatory locks]'
       "(atime)noatime[don't update access time]"
+      "(relatime)norelatime[update access time without regard to mtime/ctime]"
       "(dev)nodev[don't interpret devices]"
       "(exec)noexec[don't allow execution of binaries]"
       "(mand)nomand[don'tallow mandatory locks]"
