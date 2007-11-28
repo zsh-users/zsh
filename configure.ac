@@ -716,6 +716,17 @@ AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
 AC_MSG_RESULT($strnames)
 ])
 
+
+dnl If our terminal library is not ncurses, don't try including
+dnl any ncurses headers.
+AH_TEMPLATE([ZSH_IGNORE_NCURSES],
+[Define to 1 to ignore any ncurses library headers found on the system.])
+case $LIBS in
+  *-lncurses*) ;;
+  *)
+  AC_DEFINE(ZSH_IGNORE_NCURSES) ;;
+esac
+
 dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
 dnl libnsl (Network Services Library) to find yp_all
 
