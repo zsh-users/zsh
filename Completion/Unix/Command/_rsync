@@ -188,7 +188,8 @@ _arguments -s \
   '--delay-updates[put all updated files into place at end of transfer]' \
   '(-m --prune-empty-dirs)'{-m,--prune-empty-dirs}'[prune empty directory chains from file-list]' \
   '--numeric-ids[do not map uid/gid values by user/group name]' \
-  '--timeout=[set I/O timeout in seconds]:seconds' \
+  '--timeout=[set I/O timeout in seconds for lulls in a transfer]:seconds' \
+  '--contimeout=[set connect timeout in seconds for daemon connections]:seconds' \
   '(-I --ignore-times)'{-I,--ignore-times}'[do not skip files that match in size and mod-time]' \
   '--size-only[skip files that match in size]' \
   '--modify-window=[compare mod-times with reduced accuracy]:seconds' \

@@ -1,3 +1,8 @@
+2007-11-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: Added one more
+	option for the upcoming 3.0.0 version of rsync: --contimeout.
+
 2007-11-28  Peter Stephenson  <pws@csr.com>
 
 	* Mustafa Oezkan: 24126: Completion/Unix/Command/_mount:
