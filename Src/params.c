@@ -681,13 +681,17 @@ createparamtable(void)
 					    getsparam(pm->nam), pm->flags);
 		    else
 			pm->env = ztrdup(*envp2);
+#ifndef USE_SET_UNSET_ENV
 		    *envp++ = pm->env;
+#endif
 		}
 	    }
 	}
     }
     popheap();
+#ifndef USE_SET_UNSET_ENV
     *envp = '\0';
+#endif
     opts[ALLEXPORT] = oae;
 
     pm = (Param) paramtab->getnode(paramtab, "HOME");
