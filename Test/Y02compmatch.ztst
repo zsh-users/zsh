@@ -667,6 +667,14 @@
 >NO:{aA.bC.cB.dA}
 >NO:{aD.bC.cB.dA}
 
+ users_12227_matcher='r:|[-./_]=* r:|=* l:|=*'
+ users_12227_list=(foo-bar-abc foo-bar-def foo-bar-ghi)
+ test_code $users_12227_matcher users_12227_list
+ comptest $'tst bar\t'
+0:Test for wildcard left anchor with partial word right anchors
+>line: {tst foo-bar-}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{12}
 
 %clean
 
