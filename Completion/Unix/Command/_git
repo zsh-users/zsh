@@ -2801,7 +2801,9 @@ __git_ref_specs () {
     if compset -S ':*'; then
       __git_heads
     else
-      __git_heads -S ':'
+      _alternative \
+       'tags:tag:__git_tags' \
+       'heads:head:__git_heads -qS :'
     fi
   fi
 }
