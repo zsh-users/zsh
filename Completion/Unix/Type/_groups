@@ -7,7 +7,11 @@ _tags groups || return 1
 if ! zstyle -a ":completion:${curcontext}:" groups groups; then
   (( $+_cache_groups )) ||
       if [[ $OSTYPE = darwin* ]]; then
-        : ${(A)_cache_groups:=${${(M)${(f)"$(_call_program groups lookupd -q group)"}:#name*}##*: }}
+        if (( ${+commands[lookupd]} )); then 
+          : ${(A)_cache_groups:=${${(M)${(f)"$(_call_program groups lookupd -q group)"}:#name*}##*: }}
+        elif (( ${+commands[dscacheutil]} )); then
+          : ${(A)_cache_groups:=${${(M)${(f)"$(_call_program groups dscacheutil -q group)"}:#name*}##*: }}
+        fi
       elif (( ${+commands[getent]} )); then
         : ${(A)_cache_groups:=${${(s: :)$(_call_program groups getent group 2>/dev/null)}%%:*}}
       else
