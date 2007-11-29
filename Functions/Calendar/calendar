@@ -1,18 +1,19 @@
 emulate -L zsh
 setopt extendedglob
 
-local line showline restline REPLY REPLY2 userange pruned nobackup datefmt
+local line showline restline REPLY REPLY2 userange nobackup datefmt
 local calendar donefile sched newfile warnstr mywarnstr newdate
 integer time start stop today ndays y m d next=-1 shown done nodone
 integer verbose warntime mywarntime t tcalc tsched i rstat remaining
 integer showcount icount repeating repeattime resched showall brief
 local -a calendar_entries calendar_addlines
 local -a times calopts showprog lockfiles match mbegin mend
+local -A reply
 
 zmodload -i zsh/datetime || return 1
 zmodload -i zsh/zutil || return 1
 
-autoload -U calendar_{add,read,scandate,show,lockfiles}
+autoload -U calendar_{add,parse,read,scandate,show,lockfiles}
 
 # Read the calendar file from the calendar-file style
 zstyle -s ':datetime:calendar:' calendar-file calendar || calendar=~/calendar
@@ -254,31 +255,29 @@ fi
 
   calendar_read $calendar
   for line in $calendar_entries; do
-    # This call sets REPLY to the date and time in seconds since the epoch,
-    # REPLY2 to the line with the date and time removed.
-    calendar_scandate -as $line || continue
-    (( t = REPLY ))
-    restline=$REPLY2
+    calendar_parse $line  ||  continue
 
+    # Extract returned parameters from $reply
+    # Time of event
+    (( t = ${reply[time]} ))
+    # Remainder of line including RPT and WARN stuff:  we need
+    # to keep these for rescheduling.
+    restline=$reply[text1]
     # Look for specific warn time.
-    pruned=${restline#(|*[[:space:],])WARN[[:space:]]}
-    (( mywarntime = warntime ))
-    mywarnstr=$warnstr
-    if [[ $pruned != $restline ]]; then
-      if calendar_scandate -asm -R $t $pruned; then
-	(( mywarntime = t - REPLY ))
-	mywarnstr=${pruned%%"$REPLY2"}
-      fi
+    if [[ -n ${reply[warntime]} ]]; then
+      (( mywarntime = t - ${reply[warntime]} ))
+      mywarnstr=${reply[warnstr]}
+    else
+      (( mywarntime = warntime ))
+      mywarnstr=$warnstr
     fi
-
     # Look for a repeat time.
-    (( repeating = 0 ))
-    pruned=${restline#(|*[[:space:],])RPT[[:space:]]}
-    if [[ $pruned != $restline ]]; then
-      if calendar_scandate -a -R $t $pruned; then
-	(( repeattime = REPLY, repeating = 1 ))
-      fi
+    if [[ -n ${reply[rpttime]} ]]; then
+      (( repeattime = ${reply[rpttime]}, repeating = 1 ))
+    else
+      (( repeating = 0 ))
     fi
+    # Finished extracting parameters from $reply
 
     if (( verbose )); then
       print "Examining: $line"

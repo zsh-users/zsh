@@ -1,13 +1,14 @@
 DISTFILES_SRC='
-    .distfiles
-    age
-    calendar
-    calendar_add
-    calendar_edit
-    calendar_lockfiles
-    calendar_read
-    calendar_scandate
-    calendar_show
-    calendar_showdate
-    calendar_sort
+.distfiles
+age
+calendar
+calendar_add
+calendar_edit
+calendar_lockfiles
+calendar_parse
+calendar_read
+calendar_scandate
+calendar_show
+calendar_showdate
+calendar_sort
 '

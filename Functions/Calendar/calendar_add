@@ -11,10 +11,11 @@ emulate -L zsh
 setopt extendedglob
 
 local calendar newfile REPLY lastline opt
-local -a calendar_entries lockfiles
-integer my_date done rstat nolock nobackup
+local -a calendar_entries lockfiles reply
+integer my_date done rstat nolock nobackup new_recurring old_recurring
+local -A reply parse_new parse_old recurring_uids
 
-autoload -U calendar_{read,lockfiles,scandate}
+autoload -U calendar_{parse,read,lockfiles}
 
 while getopts "BL" opt; do
   case $opt in
@@ -38,11 +39,13 @@ zstyle -s ':datetime:calendar_add:' calendar-file calendar ||
   calendar=~/calendar
 newfile=$calendar.new.$HOST.$$
 
-if ! calendar_scandate -a "$*"; then
+if ! calendar_parse "$*"; then
   print "$0: failed to parse date/time" >&2
   return 1
 fi
-(( my_date = $REPLY ))
+parse_new=("${(@kv)reply}")
+(( my_date = $parse_new[time] ))
+[[ -n $parse_new[rpttime] ]] && (( new_recurring = 1 ))
 
 # $calendar doesn't necessarily exist yet.
 
@@ -53,7 +56,7 @@ local my_uid their_uid
 # text/calendar format.
 local uidpat='(|*[[:space:]])UID[[:space:]]##(#b)([[:xdigit:]]##)(|[[:space:]]*)'
 if [[ "$*" = ${~uidpat} ]]; then
-  my_uid=$match[1]
+  my_uid=${(U)match[1]}
 fi
 
 # start of block for following always to clear up lockfiles.
@@ -63,16 +66,55 @@ fi
   if [[ -f $calendar ]]; then
     calendar_read $calendar
 
+    if [[ -n $my_uid ]]; then
+      # Pre-scan to find recurring events with a UID
+      for line in $calendar_entries; do
+	calendar_parse $line  ||  continue
+	# Recurring with a UID?
+	if [[ -n $reply[rpttime] && $line = ${~uidpat} ]]; then
+	  # Yes, so record this as a recurring event.
+	  their_uid=${(U)match[1]}
+	  recurring_uids[$their_uid]=1
+	fi
+      done
+    fi
+
     {
       for line in $calendar_entries; do
-	if (( ! done )) && calendar_scandate -a $line && (( REPLY > my_date )); then
+	calendar_parse $line  ||  continue
+	parse_old=("${(@kv)reply}")
+	if (( ! done && ${parse_old[time]} > my_date )); then
 	  print -r -- "$*"
 	  (( done = 1 ))
 	fi
-	# Don't save this entry if it has the same UID as the new one.
+	if [[ -n $parse_old[rpttime] ]]; then
+	  (( old_recurring = 1 ))
+	else
+	  (( old_recurring = 0 ))
+	fi
 	if [[ -n $my_uid && $line = ${~uidpat} ]]; then
-	  their_uid=$match[1]
-	  [[ ${(U)my_uid} = ${(U)their_uid} ]] && continue
+	  their_uid=${(U)match[1]}
+	  if [[ $my_uid = $their_uid ]]; then
+	    # Deal with recurrences, being careful in case there
+	    # are one-off variants that don't replace recurrences.
+	    #
+	    # Bug 1: "calendar" still doesn't know about one-off variants.
+	    # Bug 2: neither do I; how do we know which occurrence
+	    # it replaces?
+	    # Bug 3: the code for calculating recurrences is awful anyway.
+
+	    if (( old_recurring && new_recurring )); then
+	      # Replacing a recurrence; there can be only one.
+	      continue
+	    elif (( ! new_recurring )); then
+	      # Not recurring.  See if we have previously found
+	      # a recurrent version
+	      [[ -n $recurring_uids[$their_uid] ]] && (( old_recurring = 1 ))
+	      # No, so assume this is a straightforward replacement
+	      # of a non-recurring event.
+	      (( ! old_recurring )) && continue
+	    fi
+	  fi
 	fi
 	if [[ $REPLY -eq $my_date && $line = "$*" ]]; then
 	  (( done )) && continue # paranoia: shouldn't happen

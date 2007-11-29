@@ -464,6 +464,36 @@ This function locks out the calendar system during the edit.
 Hence it should be used to edit the calendar file if there is any
 possibility of a calendar event occurring meanwhile.
 )
+findex(calendar_parse)
+item(tt(calendar_parse) var(calendar-entry))(
+This is the internal function that analyses the parts of a calendar
+entry, which is passed as the only argument.  The function returns
+status 1 if the argument could not be parsed as a calendar entry
+and status 2 if the wrong number of arguments were passed; it also sets the
+parameter tt(reply) to an empty associative array.  Otherwise,
+it returns status 0 and sets elements of the associative
+array tt(reply) as follows:
+startsitem()
+sitem(time)(The time as a string of digits in the same units as
+tt($EPOCHSECONDS))
+sitem(text1)(The text from the line not including the date and time of the
+event, but including any tt(WARN) or tt(RPT) keywords and values.)
+sitem(warntime)(Any warning time given by the tt(WARN) keyword as a string
+of digits containing the time at which to warn in the same units as
+tt($EPOCHSECONDS).  (Note this is an absolute time, not the relative time
+passed down.)  Not set no tt(WARN) keyword and value were
+matched.)
+sitem(warnstr)(The raw string matched after the tt(WARN) keyword, else unset.)
+sitem(rpttime)(Any recurrence time given by the tt(RPT) keyword as a string
+of digits containing the time of the recurrenced in the same units
+as tt($EPOCHSECONDS).  (Note this is an absolute time.)  Not set if
+no tt(RPT) keyword and value were matched.)
+sitem(rptstr)(The raw string matched after the tt(RPT) keyword, else unset.)
+sitem(text2)(The text from the line after removal of the date and any
+keywords and values.)
+)
+endsitem()
+)
 findex(calendar_showdate)
 item(tt(calendar_showdate) [ tt(-r) ] [ tt(-f) var(fmt) ] var(date-spec ...))(
 The given var(date-spec) is interpreted and the corresponding date and

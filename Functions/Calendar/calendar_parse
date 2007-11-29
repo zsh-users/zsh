@@ -1,0 +1,83 @@
+# Parse the line passed down in the first argument as a calendar entry.
+# Sets the values parsed into the associative array reply, consisting of:
+# time  The time as an integer (as per EPOCHSECONDS)
+# text1 The text from the the line not including the date/time, but
+#       including any WARN or RPT text.  This is useful for rescheduling
+#       events, since the keywords need to be retained in this case.
+# warntime  Any warning time (WARN keyword) as an integer, else an empty
+#       string.  This is the time of the warning in units of EPOCHSECONDS,
+#       not the parsed version of the original number (which was a time
+#       difference).
+# warnstr  Any warning time as the original string (e.g. "5 mins"), not
+#       including the WARN keyword.
+# rpttime  Any repeat/recurrence time (RPT keyword) as an integer, else empty.
+#       This is the time of the recurrence itself in EPOCHSECONDS units
+#       (as with a warning---not the difference between the events).
+# rptstr   Any repeat/recurrence time as the original string.
+# text2 The text from the line with the date and keywords and values removed.
+#
+# Note that here an "integer" is a string of digits, not an internally
+# formatted integer.
+#
+# Return status 1 if parsing failed.  reply is set to an empty
+# in this case.  Note the caller is responsible for
+# making reply local.
+
+emulate -L zsh
+setopt extendedglob
+
+local REPLY REPLY2
+local -a match mbegin mend
+
+autoload -U calendar_scandate
+
+typeset -gA reply
+
+reply=()
+
+if (( $# != 1 )); then
+  print "Usage: $0 calendar-entry" >&2
+  return 2
+fi
+
+# This call sets REPLY to the date and time in seconds since the epoch,
+# REPLY2 to the line with the date and time removed.
+calendar_scandate -as $1 || return 1
+reply[time]=$(( REPLY ))
+reply[text1]=${REPLY2##[[:space:]]#}
+
+reply[text2]=$reply[text1]
+
+integer changed=1
+
+while (( changed )); do
+
+  (( changed = 0 ))
+
+  # Look for specific warn time.
+  if [[ $reply[text2] = (#b)(|*[[:space:],])WARN[[:space:]](*) ]]; then
+    if calendar_scandate -asm -R $reply[time] $match[2]; then
+      reply[warntime]=$REPLY
+      reply[warnstr]=${match[2]%%"$REPLY2"}
+      reply[text2]="${match[1]}${REPLY2##[[:space:]]#}"
+    else
+      # Just remove the keyword for further parsing
+      reply[text2]="${match[1]}${match[2]##[[:space:]]#}"
+    fi
+    (( changed = 1 ))
+  elif [[ $reply[text2] = (#b)(|*[[:space:],])RPT[[:space:]](*) ]]; then
+    if calendar_scandate -a -R $reply[time] $match[2]; then
+      reply[rpttime]=$REPLY
+      reply[rptstr]=${match[2]%%"$REPLY2"}
+      reply[text2]="${match[1]}${REPLY2##[[:space:]]#}"
+    else
+      # Just remove the keyword for further parsing
+      reply[text2]="${match[1]}${match[2]##[[:space:]]#}"
+    fi
+    (( changed = 1 ))
+  fi
+done
+
+reply[text2]="${reply[text2]##[[:space:],]#}"
+
+return 0

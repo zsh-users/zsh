@@ -1,3 +1,8 @@
+2007-11-29  Peter Stephenson  <pws@csr.com>
+
+	* Kohsuke Kawaguchi: 24129: Completion/Unix/Command/_ant:
+	skip targets that can't be invoked from the command line.
+
 2007-11-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24128: Test/Y02compmatch.ztst: test for 24127.
