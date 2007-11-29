@@ -1,5 +1,12 @@
 2007-11-29  Peter Stephenson  <pws@csr.com>
 
+	* 24130 (belatedly): Doc/Zsh/calsys.yo,
+	Functions/Calendar/.distfiles, Functions/Calendar/calendar,
+	Functions/Calendar/calendar_add,
+	Functions/Calendar/calendar_parse: abstract calendar_parse from
+	calendar and use in calendar_add to be slightly cleverer about
+	recurrences.
+
 	* Kohsuke Kawaguchi: 24129: Completion/Unix/Command/_ant:
 	skip targets that can't be invoked from the command line.
 
