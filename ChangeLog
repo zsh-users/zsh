@@ -1,3 +1,7 @@
+2007-11-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* arno: 24134: Completion/Unix/Command/_find: additional options.
+
 2007-11-29  Peter Stephenson  <pws@csr.com>
 
 	* 24130 (belatedly): Doc/Zsh/calsys.yo,

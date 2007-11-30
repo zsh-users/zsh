@@ -5,11 +5,16 @@ _arguments \
   '*-depth' \
   '*-follow' \
   '*-help' \
+  '*-ignore_readdir_race' \
   '*-maxdepth:maximum search depth:' \
   '*-mindepth:minimum search depth:' \
   '*-mount' \
+  '*-noignore_readdir_race' \
   '*-noleaf' \
+  '*-regextype:regexp syntax:(emacs posix-awk posix-basic posix-egrep posix-extended)' \
   '*-version' \
+  '*-warn' \
+  '*-nowarn' \
   '*-xdev' \
   '*-amin:access time (minutes):' \
   '*-cmin:inode change time (minutes):' \
@@ -36,17 +41,23 @@ _arguments \
   '*-ipath:path pattern to search (case insensitive):' \
   '*-regex:regular expression to search:' \
   '*-iregex:regular expression to search (case insensitive):' \
+  '*-wholename:full path pattern to search:' \
+  '*-iwholename:full path pattern to search (case insensitive):' \
   '*-inum:inode number:' \
   '*-links:number of links:' \
   '*-nouser' \
   '*-nogroup' \
   '*-perm:file permission bits:' \
   '*-size:file size:' \
+  '*-samefile:same inode as:_files' \
   '*-true' \
   '*-type:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))' \
   '*-xtype:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))' \
+  '*-delete' \
   '*-exec:program: _command_names -e:*\;::program arguments: _normal' \
+  '*-execdir:program: _command_names -e:*\;::program arguments: _normal' \
   '*-ok:program: _command_names -e:*\;::program arguments: _normal' \
+  '*-okdir:program: _command_names -e:*\;::program arguments: _normal' \
   '*-fls:output file:_files' \
   '*-fprint:output file:_files' \
   '*-fprint0:output file:_files' \
@@ -55,5 +66,6 @@ _arguments \
   '*-print0' \
   '*-printf:output format:' \
   '*-prune' \
+  '*-quit' \
   '*-ls' \
   '*:directory:_files -/'
