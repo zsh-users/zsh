@@ -8,7 +8,9 @@ local buildfile classpath cp userjars importedfiles target='*:target:->target' t
 
 find_targets() {
     importedfiles=( $(sed -n "s/ *<import[^>]* file=[\"']\([^\"']*\)[\"'].*/\1/p" < $1) )
-    sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" $1
+    # Tweaked to omit targets beginning with "-" that can't
+    # be invoked from the command line; see zsh-workers/24129.
+    sed -n "s/ *<target[^>]*  name=[\"']\([^-][^\"']*\)[\"'].*/\1/p" $1
     if (( $#importedfiles )) ; then
 	( cd $1:h
     	for file in $importedfiles ; do
