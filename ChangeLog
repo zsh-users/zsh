@@ -1,3 +1,204 @@
+2007-11-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* arno: 24134: Completion/Unix/Command/_find: additional options.
+
+2007-11-29  Peter Stephenson  <pws@csr.com>
+
+	* Kohsuke Kawaguchi: 24129: Completion/Unix/Command/_ant:
+	skip targets that can't be invoked from the command line.
+
+2007-11-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24128: Test/Y02compmatch.ztst: test for 24127.
+
+	* 24127: Src/Zle/compcore.c, Src/Zle/compmatch.c: fix
+	bug with matcher 'r:|[-./_]=* r:|=* l:|=*' completing
+	where word on command line starts after a "-".
+
+2007-11-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: Added one more
+	option for the upcoming 3.0.0 version of rsync: --contimeout.
+
+2007-11-28  Peter Stephenson  <pws@csr.com>
+
+	* Mustafa Oezkan: 24126: Completion/Unix/Command/_mount:
+	additional options.
+
+2007-11-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Ryan F: users/12154: Completion/Unix/Type/_groups: MacOS X
+	group completion.
+
+2007-11-24  Clint Adams  <clint@zsh.org>
+
+	* 24118: configure.ac: only link against libnsl if we have NIS and
+	need it for yp_all, or if we need it for getpwnam.
+
+2007-11-23  Clint Adams  <clint@zsh.org>
+
+	* Markus Waldeck: 24117: Completion/Unix/Command/_uname:
+	completion for uname.
+
+2007-11-22  Clint Adams  <clint@zsh.org>
+
+	* unposted: Functions/Prompts/prompt_clint_setup: fix typo in git
+	psvar assignment.
+
+	* Sean Finney: 24115: Completion/Unix/Command/_git: offer tags as
+	well as heads where refspecs are valid.
+
+	* 24114: Completion/Unix/Command/_git: make colon suffix removable
+	after the first part of refspecs.
+
+2007-11-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 24113: Src/params.c: createparamtable() was still messing with
+	the internals of the environment even when USE_SET_UNSET_ENV.
+
+2007-11-21  Clint Adams  <clint@zsh.org>
+
+	* arno.: 24111: Completion/Debian/Command/_dlocate: complete -lsbin
+	and -lsman options to dlocate.
+
+2007-11-20  Peter Stephenson  <pws@csr.com>
+
+	* 24108 plus yet another tweak: configure.ac: the test
+	for whether we using ncurses as a library was both wrong
+	and in the wrong place.
+
+	* 24103: Doc/Makefile.in: ensure zsh.texi is updated if
+	the version changes.
+
+2007-11-19  Peter Stephenson  <pws@csr.com>
+
+	* users/12230: Src/Zle/zle_params.c: if killring was set
+	to empty array, kringsize was zero but kring was unset,
+	causing unhealthy effects in cut().
+
+	* unposted: from Eric Mangold: Completion/Unix/Command/_twisted:
+	update.
+
+2007-11-18  Clint Adams  <clint@zsh.org>
+
+	* Nikolai Weibull: 24075: Completion/Unix/Command/_cp: fix
+	completion of values for --preserve and --no-preserve.
+
+2007-11-12  Peter Stephenson  <pws@csr.com>
+
+	* 24093: Doc/Zsh/arith.yo: be more accurate about supported
+	floating point.
+
+2007-11-11  Clint Adams  <clint@zsh.org>
+
+	* Nikolai Weibull: 24046: Completion/Unix/Command/_strip: improve
+	completion for Solaris and GNU strips.
+
+2007-11-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24082: Functionz/Zle/delete-whole-word-match: failed if
+	cursor was on whitespace.
+
+	* Mikael Magnusson, 24076; 24081: Doc/Zsh/zle.yo,
+	Functions/Zle/backward-kill-word-match,
+	Functions/Zle/delete-whole-word-match,
+	Functions/Zle/kill-word-match:  need to cancel option
+	processing with -- after widget calls with arguments.
+
+2007-11-09  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: Added missing
+	single-letter options for --acls and --xattrs.
+
+2007-11-08  Peter Stephenson  <pws@csr.com>
+
+	* users/12198: Doc/Zsh/mod_complist.yo: make the definition of
+	the menu-select widget clearer.
+
+2007-11-06  Peter Stephenson  <pws@csr.com>
+
+	* 24068: Src/builtin.c: attempt to make `printf "%g\n" -0'
+	output "-0", although this depends on the vagaries of the
+	library's strtod() (works on Solaris, doesn't on Fedora 7).
+
+2007-11-04  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync:  Added new options
+	for the upcoming 3.0.0 release of rsync.
+
+2007-11-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 24048: Src/hashtable.c: fix home directory expansion with
+	NIS on Solaris
+
+	* Frank Benkstein: 24047: Completion/compinit: fix compdef
+	with more than three commands using the same service
+
+2007-10-31  Oliver Kiddle  <opk@zsh.org>
+
+	* 24045: Src/params.c: fix memory leak where old value of an
+	environment variable isn't freed
+
+2007-10-31  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 24043: Functions/Prompts/promptinit: emulate -L resets prompt
+	options that we don't want reset, so remove it
+
+2007-10-31  Clint Adams  <clint@zsh.org>
+
+	* 24039: Completion/Unix/Command/_cut: cope with FreeBSD
+	cut in addition to GNU cut.
+
+2007-10-29  Clint Adams  <clint@zsh.org>
+
+	* Markus Waldeck: 24032 (tweaked): Completion/Unix/Command/_cut:
+	completion for cut.
+
+2007-10-26  Clint Adams  <clint@zsh.org>
+
+	* 24022: Completion/Debian/Command/_dpkg-repack: completion for
+	dpkg-repack by Dr. Markus Waldeck, tweaked a bit.
+
+2007-10-25  Peter Stephenson  <pws@csr.com>
+
+	* c.f. users/12110: Doc/Zsh/params.yo: desperately try to
+	get the $SECONDS documentation correct.
+
+	* c.f. users/12109: Doc/Zsh/params.yo: tweak to SECONDS
+	documentation for clarity.
+
+	* users/12100: Completion/Unix/Type/_path_files,
+	Doc/Zsh/compsys.yo: with NO_CASE_GLOB, use a case-insensitive
+	matcher if none is in effect.
+
+2007-10-20  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 23999: Completion/Unix/Command/_git:
+	improvements for git show, git rev-parse, et al.
+
+	* 23994: Completion/Unix/Command/_git: tweaks for 23993.
+
+	* Mikael Magnusson: 23993: Completion/Unix/Command/_git: improved
+	completion for git show.
+
+2007-10-18  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 23991: Completion/Unix/Command/_git: fix
+	typo in __git_blobs().
+
+	* Mikael Magnusson: 23988: Completion/Unix/Command/_git: fix
+	git-svn commands completion.
+
+2007-10-18  Peter Stephenson  <pws@csr.com>
+
+	* 23986: Doc/Zsh/contrib.yo: zmv example for turning spaces
+	into underscores.
+
+2007-10-15  Clint Adams  <clint@zsh.org>
+
+	* 23965: Completion/Unix/Command/_git: add missing bracket in
+	completion for git svnimport.
+
 2007-10-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_bart_setup: make sure
@@ -204,9 +405,6 @@
 	 completion for lighty-{enable,disable}-mod .
 
 2007-08-30  Peter Stephenson  <pws@csr.com>
-
-	* 23807: Src/Zle/complist.c, Src/Zle/zle_misc.c: interactive mode
-	in completion was fairly seriously broken.
 
 	* users/11791: Functions/Zle/incremental-complete-word:
 	missing "emulate -L zsh": was commented out, not sure why.
@@ -1772,51 +1970,10 @@
 	* 22335: Src/Zle/zle_thingy.c: fix some compiler warnings and
 	ensure that zmod gets restored properly in bin_zle_call().
 
-2006-03-08  Peter Stephenson  <pws@csr.com>
-
-	* 22337: Src/builtin.c: debugging code omitted from 22331.
-
 2006-03-07  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 22301: Completion/Base/Completer/_expand: enable alises for the
 	expansion of $(...) and `...`.
-
-	* 22271 (updated): Src/subst.c, Src/linklist.c, Src/zsh.h: got rid
-	of the mult_isarr global from subst.c by using the LinkList's new
-	flag integer.
-
-	* unposted: Src/linklist.c, Src/zsh.h: changed the previous-node
-	pointer in a "struct linknode" from "last" to "prev".
-
-	* 22331: Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/hist.c,
-	Src/init.c, Src/lex.c, Src/linklist.c, Src/module.c, Src/options.c,
-	Src/params.c, Src/parse.c, Src/prompt.c, Src/signals.c, Src/subst.c,
-	Src/utils.c, Src/zsh.h, Src/Modules/datetime.c,
-	Src/Modules/langinfo.c, Src/Modules/mapfile.c,
-	Src/Modules/parameter.c, Src/Modules/system.c, Src/Modules/termcap.c,
-	Src/Modules/terminfo.c, Src/Modules/zftp.c, Src/Zle/compctl.c,
-	Src/Zle/compctl.h, Src/Zle/complete.c, Src/Zle/compresult.c,
-	Src/Zle/computil.c, Src/Zle/zle_hist.c, Src/Zle/zle_main.c,
-	Src/Zle/zle_params.c, Src/Zle/zle_tricky.c, Src/Zle/zleparameter.c:
-	Changed some structures to avoid gcc's type-punned warnings.
-
-2006-03-07  Peter Stephenson  <pws@csr.com>
-
-	* 22328, modified: Completion/Unix/Type/_list_files,
-	Completion/Unix/Type/_path_files, Doc/Zsh/compsys.yo,
-	Doc/Zsh/compwid.yo, Src/Zle/comp.h, Src/Zle/compcore.c,
-	Src/Zle/complete.c:  Option -o to compadd uses match
-	strings rather than display strings from -d for sorting;
-	_path_files uses _list_files to handle file-list style
-	which allows long format file lists.
-
-	* unposted: Config/version.mk: belatedly update version
-	to 4.3.2-dev-1 to avoid clash with released version.
-
-2006-03-06  Barton E. Schaefer  <schaefer@zsh.org>
-
-	* 22321 plus tweak: Src/builtin.c, Src/mem.c, Src/params.c:
-	optimize 22318 by stealing some ideas from Andrey Borzenkov.
 
 2006-03-06  Peter Stephenson  <pws@csr.com>
 
@@ -1824,8 +1981,6 @@
 	Doc/Zsh/compsys.yo: rehash style for external commands.
 
 2006-03-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
-
-	* 22318: Src/builtin.c: uniquifying special arrays was broken.
 
 	* 22277: Test/C03traps.ztst: missed this.
 
