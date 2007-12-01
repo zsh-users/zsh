@@ -1,3 +1,8 @@
+2007-12-01  Clint Adams  <clint@zsh.org>
+
+	* 24135: Completion/Debian/Command/_make-kpkg: consistently
+	complete subcommands with minus signs instead of underscores.
+
 2007-11-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* arno: 24134: Completion/Unix/Command/_find: additional options.
