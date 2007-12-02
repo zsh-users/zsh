@@ -34,14 +34,14 @@ _arguments \
         binary-arch\:"arch dependent packages" \
         kernel-source\:"package of the kernel sources" \
         kernel-headers\:"package of the header files included in the kernel" \
-        kernel_manual\:"package of the manual pages included in the kernel" \
+        kernel-manual\:"package of the manual pages included in the kernel" \
         kernel-doc\:"package of teh documentation included in the kernel" \
         kernel-image\:"package of the kernel image" \
         build\:"compiles the kernel" \
         modules\:"build all add-on modules" \
-        modules_config\:"configure all add-on modules" \
-        modules_image\:"build all add-on modules, but wirhou source and diff files" \
-        modules_clean\:"clean add-on modules" \
+        modules-config\:"configure all add-on modules" \
+        modules-image\:"build all add-on modules, but wirhou source and diff files" \
+        modules-clean\:"clean add-on modules" \
         configure\:"configure the kernel" \
         debian\:"creates the debian/ directory" \
         libc-kheaders\:"create the kernel headers package needed by libc" \
