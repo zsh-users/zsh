@@ -11,7 +11,7 @@ DISTFILES_SRC='
     mod_stat.yo mod_system.yo mod_tcp.yo mod_termcap.yo
     mod_terminfo.yo mod_zftp.yo mod_zle.yo mod_zleparameter.yo
     mod_zselect.yo mod_zutil.yo mod_zprof.yo mod_zpty.yo
-    modules.yo modlist.yo modmenu.yo manmodmenu.yo
+    modules.yo
     options.yo params.yo prompt.yo redirect.yo restricted.yo
     roadmap.yo seealso.yo
     zftpsys.yo zle.yo contrib.yo tcpsys.yo
