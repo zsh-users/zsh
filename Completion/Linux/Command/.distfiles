@@ -1,0 +1,10 @@
+DISTFILES_SRC='
+.distfiles
+_acpi        _analyseplugin
+_acpitool
+_brctl       _fusermount  _iptables    _iwconfig    _losetup
+_mii-tool    _modutils    _mondo       _pkgtool     _sshfs       _tpb
+_tpconfig    _tune2fs     _uml         _valgrind    _vserver
+_lsusb
+_yast
+'
