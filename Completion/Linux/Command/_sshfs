@@ -1,0 +1,14 @@
+#compdef sshfs
+
+_arguments \
+  '-V[version]' \
+  '-p:tcp port:' \
+  '-C[compression]' \
+  '-o:options:_values -s , "sshfs or fuse or mount options" reconnect sshfs_sync no_readahead sshfs_debug cache=:cache\ setting:(yes no) cache_timeout=:seconds: cache_stat_timeout=:seconds: cache_dir_timeout=:seconds: cache_link_timeout=:seconds: ssh_command=:ssh\ command:_command_names directport=:port: SSHOPT=:ssh\ option: default_permissions allow_other allow_root kernel_cache large_read direct_io max_read=:size: hard_remove debug fs_name=:name: use_ino readdir_ino' \
+  '-d[debug]' \
+  '-f[foreground]' \
+  '-s[disable multithreaded operation]' \
+  '-r[mount read-only]' \
+  '-h[help]' \
+  ':remote directory:_user_at_host -S:' \
+  ':mountpoint:_files -/'

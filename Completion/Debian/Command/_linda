@@ -1,0 +1,26 @@
+#compdef linda
+
+_arguments \
+  '(-c --config)'{-c,--config=}':config file:_files' \
+  '(-C --checks)'{-C,--checks=}':check regexes:' \
+  '(-d --debug)*'{-d,--debug}'[debug]' \
+  '(-D --disable-local)*'{-D,--disable-local}'[disable registration of local checks]' \
+  '(-f --format)'{-f,--format=}':output format:(branden long lintian figlet)' \
+  '(-h --help)'{-h,--help}'[help]' \
+  '(-i --info)'{-i,--info}'[info]' \
+  '(-l --lab)'{-l,--lab=}':lab root:_files -/' \
+  '(-L --list-checks)'{-L,--list-checks=}':list checks:' \
+  '(-m --more-overrides)'{-m,--more-overrides=}':more overrides:' \
+  '(-n --no-cull)'{-n,--no-cull}'[do not delete lab after completion]' \
+  '(-o --show-overridden)'{-o,--show-overridden}'[display errors that are overridden]' \
+  '(-p --print-overrides)'{-p,--print-overrides}'[print parsed overrides]' \
+  '(-P --profiling)'{-P,--profiling}'[print profiling stats]' \
+  '(-q --quiet)'{-q,--quiet}'[quiet]' \
+  '(-s --show-tag)'{-s,--show-tag}'[print tag along with errors]' \
+  '(-S --seteuid)'{-S,--seteuid}'[do not seteuid to nobody]' \
+  '(-t --types)'{-t,--types=}':types string:_values -s , "types" Error Warning eXperimental Informational' \
+  '(-T --traceback)'{-T,--traceback}'[show a traceback from any exception]' \
+  '(-U --unpack)'{-U,--unpack}':unpack level:' \
+  '(-v --verbose)'{-v,--verbose}'[verbose]' \
+  '(-V --version)'{-V,--version}'[version]' \
+  ':package:_files -g "*.(changes|u#deb|dsc)"'

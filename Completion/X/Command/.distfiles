@@ -1,8 +1,14 @@
 DISTFILES_SRC='
 .distfiles
-_gnome-gv
-_gv        _netscape  _xauth     _xfig      _mozilla   _xterm     _xwit
-_nedit     _vnc       _x_utils   _xdvi      _xmodmap   _xset      _xv
-_acroread  _dcop      _gqview    _xloadimage _mplayer
-_kfmclient _urxvt     _xpdf
+_acroread       _dcop
+_gnome-gv       _gqview         _gv             _kfmclient
+_mozilla        _mplayer        _nautilus
+_nedit          _netscape
+_qiv            
+_setxkbmap
+_urxvt          _vnc
+_x_utils        _xauth          _xdvi           _xfig           _xloadimage
+_xmodmap        _xpdf           _xscreensaver   _xset           _xterm
+_xv             _xwit
+_xrandr
 '

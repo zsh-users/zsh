@@ -1,0 +1,335 @@
+#compdef gcc g++ -value-,LDFLAGS,-default- -value-,CFLAGS,-default- -value-,CPPFLAGS,-default-
+
+local curcontext="$curcontext" state line ret=1 expl args args2
+typeset -A opt_args
+
+if [[ "$service" = -value-* ]]; then
+  compset -q
+  words=( fake "$words[@]" )
+  (( CURRENT++ ))
+  if [[ "$service" = *LDFLAGS ]]; then
+    args2=( '-R:runtime path:->rundir' )
+  else
+    args2=()
+  fi
+else
+  args2=( '*:input file:_files -g "*.([cCmisSoak]|cc|cxx|ii|k[ih])(-.)"' )
+fi
+
+args=()
+case $MACHTYPE in
+m68*)
+  args=(
+    -m68000 -m68020 -m68020-40 -m68030 -m68040 -m68881
+    -mbitfield -mc68000 -mc68020 -mfpa -mnobitfield
+    -mrtd -mshort -msoft-float
+  )
+  ;;
+vax)
+  args=(
+    -mg -mgnu -munix
+  )
+  ;;
+c[1234]*)
+  args=(
+    -mc1 -mc2 -mc32 -mc34 -mc38
+    -margcount -mnoargcount
+    -mlong32 -mlong64
+    -mvolatile-cache -mvolatile-nocache
+  )
+  ;;
+amd290?0)
+  args=(
+    -m29000 -m29050 -mbw -mnbw -mdw -mndw
+    -mlarge -mnormal -msmall
+    -mkernel-registers -mno-reuse-arg-regs
+    -mno-stack-check -mno-storem-bug
+    -mreuse-arg-regs -msoft-float -mstack-check
+    -mstorem-bug -muser-registers
+  )
+  ;;
+arm)
+  args=(
+    -mapcs -m2 -m3 -m6 -mbsd -mxopen -mno-symrename
+  )
+  ;;
+m88k)
+  args=(
+    -m88000 -m88100 -m88110 -mbig-pic
+    -mcheck-zero-division -mhandle-large-shift
+    -midentify-revision -mno-check-zero-division
+    -mno-ocs-debug-info -mno-ocs-frame-position
+    -mno-optimize-arg-area -mno-serialize-volatile
+    -mno-underscores -mocs-debug-info
+    -mocs-frame-position -moptimize-arg-area
+    -mserialize-volatile -msvr3
+    -msvr4 -mtrap-large-shift -muse-div-instruction
+    -mversion-03.00 -mwarn-passed-structs
+    '-mshort-data--:maximum displacement:'
+  )
+  ;;
+rs6000|powerpc*)
+  args=(
+    '-mcpu=:CPU type:(rios1 rios2 rsc 501 603 604 power powerpc 403 common)'
+    -mpower -mno-power -mpower2 -mno-power2
+    -mpowerpc -mno-powerpc
+    -mpowerpc-gpopt -mno-powerpc-gpopt
+    -mpowerpc-gfxopt -mno-powerpc-gfxopt
+    -mnew-mnemonics -mno-new-mnemonics
+    -mfull-toc  -mminimal-toc -mno-fop-in-toc -mno-sum-in-toc
+    -msoft-float -mhard-float -mmultiple -mno-multiple
+    -mstring -mno-string -mbit-align -mno-bit-align
+    -mstrict-align -mno-strict-align -mrelocatable -mno-relocatable
+    -mtoc -mno-toc -mtraceback -mno-traceback
+    -mlittle -mlittle-endian -mbig -mbig-endian
+    -mcall-aix -mcall-sysv -mprototype
+  )
+  ;;
+romp)
+  args=(
+    -mcall-lib-mul -mfp-arg-in-fpregs -mfp-arg-in-gregs
+    -mfull-fp-blocks -mhc-struct-return -min-line-mul
+    -mminimum-fp-blocks -mnohc-struct-return
+  )
+  ;;
+mips*)
+  args=(
+    '-mcpu=:CPU type:(r2000 r3000 r4000 r4400 r4600 r6000_'
+    -mabicalls -membedded-data
+    -membedded-pic -mfp32 -mfp64 -mgas -mgp32 -mgp64
+    -mgpopt -mhalf-pic -mhard-float -mint64 -mips1
+    -mips2 -mips3 -mlong64 -mlong-calls -mmemcpy
+    -mmips-as -mmips-tfile -mno-abicalls
+    -mno-embedded-data -mno-embedded-pic
+    -mno-gpopt -mno-long-calls
+    -mno-memcpy -mno-mips-tfile -mno-rnames -mno-stats
+    -mrnames -msoft-float
+    -m4650 -msingle-float -mmad
+    -mstats -EL -EB -nocpp
+    '-G:maximum size for small section objects:'
+  )
+  ;;
+i[3456]86|x86_64)
+  args=(
+    '-mtune=:CPU type:(i386 i486 i586 pentium pentium-mmx i686 pentiumpro pentium2 pentium3 pentium3m pentium-m pentium4 pentium4m prescott nocona k6 k6-2 k6-3 athlon athlon-tbird athlon-4 athlon-xp athlon-mp k8 opteron athlon64 athlon-fx winchip-c6 winchip2 c3 c3-2)'
+    '-march=:CPU type:(i386 i486 i586 pentium pentium-mmx i686 pentiumpro pentium2 pentium3 pentium3m pentium-m pentium4 pentium4m prescott nocona k6 k6-2 k6-3 athlon athlon-tbird athlon-4 athlon-xp athlon-mp k8 opteron athlon64 athlon-fx winchip-c6 winchip2 c3 c3-2)'
+    '-mfpmath=:FPU type:(387 sse sse,387)'
+    '-masm=:asm dialect:(att intel)'
+    -mieee-fp -mno-ieee-fp -msoft-float
+    -mno-fp-ret-in-387 -mno-fancy-math-387
+    -malign-double -mno-align-double
+    -m128bit-long-double -m96bit-long-double
+    -msvr3-shlib -mno-svr3-shlib
+    -mrtd
+    '-mregparm=:number of integer argument registers:'
+    '-mpreferred-stack-boundary=:size of boundary:'
+    -mmmx  -msse  -msse2 -msse3 -m3dnow
+    -mno-mmx  -mno-sse  -mno-sse2 -mno-sse3 -mno-3dnow
+    -mpush-args -mno-push-args -maccumulate-outgoing-args
+    -mthreads
+    -mno-align-stringops -minline-all-stringops
+    -momit-leaf-frame-pointer
+    -mtls-direct-seg-refs -mno-tls-direct-seg-refs
+    -m32 -m64
+    -mno-red-zone
+    '-mcmodel=:memory model:(small kernel medium large)'
+    -mno-wide-multiply
+    '-mreg-alloc=:default register allocation order:' 
+    '-malign-jumps=: **2 base for jump goal alignment:'
+    '-malign-loops=: **2 base for loop alignment:'
+    '-malign-functions=: **2 base for function alignment:'
+  )
+  ;;
+hppa*)
+  args=(
+    -mdisable-fpregs -mdisable-indexing -mfast-indirect-calls
+    -mgas -mjump-in-delay -mlong-millicode-calls -mno-disable-fpregs
+    -mno-disable-indexing -mno-fast-indirect-calls -mno-gas
+    -mno-jump-in-delay -mno-millicode-long-calls
+    -mno-portable-runtime -mno-soft-float -msoft-float
+    -mpa-risc-1-0 -mpa-risc-1-1 -mportable-runtime
+    '-mschedule=:code scheduling constraints:(700 7100 7100LC)'
+  )
+  ;;
+i960)
+  args=(
+    -m{ka,kb,mc,ca,cf,sa,sb}
+    -masm-compat -mclean-linkage
+    -mcode-align -mcomplex-addr -mleaf-procedures
+    -mic-compat -mic2.0-compat -mic3.0-compat
+    -mintel-asm -mno-clean-linkage -mno-code-align
+    -mno-complex-addr -mno-leaf-procedures
+    -mno-old-align -mno-strict-align -mno-tail-call
+    -mnumerics -mold-align -msoft-float -mstrict-align
+    -mtail-call
+  )
+  ;;
+sparc)
+  args=(
+    -mapp-regs -mno-app-regs
+    -mfpu -mhard-float
+    -mno-fpu -msoft-float
+    -mhard-quad-float
+    -msoft-quad-float
+    -mno-unaligned-doubles
+    -munaligned-doubles
+    -mfaster-structs -mno-faster-structs
+    -mimpure-text
+    '-mcpu=:CPU type:(v7 cypress v8 supersparc sparclite f930 f934 hypersparc sparclite86x sparclet tsc701 v9 ultrasparc ultrasparc3)'
+    '-mtune=:CPU type:(cypress supersparc hypersparc f930 f934 sparclite86x tsc701 ultrasparc ultrasparc3)'
+    -mv8plus -mno-v8plus
+    -mvis -mno-vis
+    -mlittle-endian
+    -m32 -m64
+    '-mcmodel=:memory model:(medlow medmid medany embmedany)'
+    -mstack-bias -mno-stack-bias
+    -mv8
+    -mcypress -mepilogue -mflat
+    -mno-flat
+    -mno-epilogue
+    -msparclite -msupersparc
+    -mmedlow -mmedany
+    -mint32 -mint64 -mlong32 -mlong64
+  )
+  ;;
+alpha*)
+  args=(
+    -mfp-regs -mno-fp-regs -mno-soft-float
+    -msoft-float
+  )
+  ;;
+clipper)
+  args=(
+    -mc300 -mc400
+  )
+  ;;
+h8/300)
+  args=(
+    -mrelax -mh
+  )
+  ;;
+esac
+
+
+_arguments -C -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
+  "$args[@]" \
+  -c -S -E -v -a -w -C -H -P -s '(-pg)-p' '(-p)-pg' \
+  '-o:output file:_files -g "^*.(c|h|cc|C|cxx)(-.)"' \
+  '-x:input file language:(c objective-c c++ c-header cpp-output c++-cpp-output assembler assembler-with-cpp none)' \
+  '+e-:virtual function definitions in classes:((0\:only\ interface 1\:generate\ code))' \
+  '-d-:dump:->dump' \
+  '-g-::debugging information type:(gdb coff stabs stabs+ dwarf dwarf+ xcoff xcoff+)' \
+  '-O-::optimization level:(0 1 2 3)' \
+  '*-M-::output dependencies:((M\:only\ user\ header\ files MD\:output\ to\ file G\:treat\ missing\ header\ files\ as\ generated))' \
+  '*-A-:define assertion:' \
+  '*-D-:define macro:' \
+  '*-U-:undefine macro:' \
+  '*-Wp,-:preprocessor option:' \
+  '*-Wl,-:linker option:' \
+  '*-Xlinker:linker option:' \
+  '*-u:pretend symbol to be undefined:' \
+  '*-Wa,-:assembler option:' \
+  '*-l:library:->library' \
+  '*-L-:library search path:_files -/' \
+  '*-I-:header file search path:_files -/' \
+  '-B-:executable prefix:_files -/' \
+  '-b:target machine:' \
+  '-V:gcc version:' \
+  '-print-file-name=:library:->library' \
+  '-print-prog-name=:program:' \
+  '*-include:include file:_files -g \*.h\(-.\)' \
+  '*-imacros:macro input file:_files -g \*.h\(-.\)' \
+  '*-idirafter:second include path directory:_files -/' \
+  '*-iprefix:prefix:_files' \
+  '*-iwithprefix:second include path directory:_files -/' \
+  '*-iwithprefixbefore:main include path directory:_files -/' \
+  '*-isystem:second include path directory (system):_files -/' \
+  -nostdinc -trigraphs -undef -pipe -ansi \
+  -fallow-single-precision -fcond-mismatch -fasm \
+  -fbuiltin -fsigned-bitfields -fsigned-char \
+  -funsigned-bitfields -funsigned-char -fwritable-strings \
+  -traditional -traditional-cpp -trigraphs \
+  -fall-virtual -fdollars-in-identifiers -felide-constructors \
+  -fenum-int-equiv -fexternal-templates -ffor-scope \
+  -fhandle-signatures -fmemoize-lookups -fdefault-inline -fgnu-keywords \
+  -fnonnull-objects -foperator-names -fstrict-prototype \
+  -fthis-is-variable -nostdinc++ -traditional \
+  -fsyntax-only -pedantic -pedantic-errors \
+  -Wall -Waggregate-return -Wbad-function-cast \
+  -Wcast-align -Wcast-qual -Wchar-subscript -Wcomment \
+  -Wconversion -Wenum-clash -Werror -Wformat \
+  '-Wid-clash--:minimum identifier difference length:' \
+  -Wimplicit -Wimport -Winline \
+  '-Wlarger-than--:maximum object length:' \
+  -Wmissing-declarations \
+  -Wmissing-prototypes -Wnested-externs \
+  -Wimport -Woverloaded-virtual -Wparentheses \
+  -Wpointer-arith -Wredundant-decls -Wreorder -Wreturn-type -Wshadow \
+  -Wstrict-prototypes -Wswitch -Wsynth -Wtemplate-debugging \
+  -Wtraditional -Wtrigraphs -Wuninitialized -Wunused \
+  -Wwrite-strings \
+  -fpretend-float \
+  -print-libgcc-file-name \
+  -print-search-dirs -save-temps \
+  -fcaller-saves -fcse-follow-jumps -fcse-skip-blocks \
+  -fdelayed-branch  -fexpensive-optimizations \
+  -ffast-math -ffloat-store -fforce-addr -fforce-mem \
+  -finline-functions -fkeep-inline-functions \
+  -fdefault-inline -fdefer-pop -ffunction-cse \
+  -finline -fpeephole -fomit-frame-pointer \
+  -frerun-cse-after-loop -fschedule-insns \
+  -fschedule-insns2 -fstrength-reduce -fthread-jumps \
+  -funroll-all-loops -funroll-loops \
+  -nostartfiles -nodefaultlibs -nostdlib \
+  -static -shared -symbolic \
+  '*-fcall-saved--:register saved by function call:' \
+  '*-fcall-used--:register clobbered by function call:' \
+  '*-ffixed--:fixed register:' \
+  -finhibit-size-directive \
+  -fno-common -fno-ident -fno-gnu-linker \
+  -fpcc-struct-return -fpic -fPIC \
+  -freg-struct-return -fshared-data -fshort-enums \
+  -fshort-double -fvolatile -fvolatile-global \
+  -fverbose-asm -fpack-struct \
+  "$args2[@]" && ret=0
+
+
+case "$state" in
+dump)
+  _values -s '' 'dump information' \
+    'M[only macro definitions]' \
+    'N[macro names]' \
+    'D[macro definitions and normal output]' \
+    'y[debugging information during parsing]' \
+    'r[after RTL generation]' \
+    'x[only generate RTL]' \
+    'j[after jump optimization]' \
+    's[after CSE]' \
+    'L[after loop optimization]' \
+    't[after second CSE pass]' \
+    'f[after flow analysis]' \
+    'c[after instruction combination]' \
+    'S[after first instruction scheduling pass]' \
+    'l[after local register allocation]' \
+    'g[after global register allocation]' \
+    'R[after second instruction scheduling pass]' \
+    'J[after last jump optimization]' \
+    'd[after delayed branch scheduling]' \
+    'k[after conversion from registers to stack]' \
+    'a[all dumps]' \
+    'm[print memory usage statistics]' \
+    'p[annotate assembler output]' && ret=0
+  ;;
+library)
+  _wanted libraries expl library \
+      compadd - ${^=LD_LIBRARY_PATH:-/usr/lib /usr/local/lib}/lib*.(a|so*)(:t:fr:s/lib//) && ret=0
+  ;;
+rundir)
+  compset -P '*:'
+  compset -S ':*'
+  _files -/ -S/ -r '\n\t\- /:' "$@"
+  ;;
+esac
+
+return ret
+

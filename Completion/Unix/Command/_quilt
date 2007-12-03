@@ -1,22 +1,30 @@
 #compdef quilt
 
-local _quilt_subcommands expl curcontext="$curcontext"
-
 _arguments \
   '--trace' \
   '--quiltrc:config file:_files' \
   '--version' \
-  '*::quilt command:->subcmd' && return 0
+  ':quilt command:(add files import previous setup annotate fold mail push
+    snapshot applied fork new refresh top delete graph next remove unapplied
+    diff grep patches rename upgrade edit header pop series)' \
+  '*::subcmd:->subcmd' && return 0
 
+case "$state" in
+    (subcmd)
 
- _quilt_subcommands=(add files import previous setup annotate fold mail
- push snapshot applied fork new refresh top delete graph next remove
- unapplied diff grep patches rename upgrade edit header pop series)
-
-
-if (( CURRENT == 1 )); then
-  _describe -t subcommand 'subcommand' _quilt_subcommands
-else
-  # this part should be tailored for subcmds
-  _files
-fi
+  case "$words[1]" in
+      (applied|delete|files|graph|header|next|previous|refresh|unapplied)
+      	_wanted -V 'patches' expl 'patch' compadd ${(f)"$(quilt series)"}
+	;;
+      (push)
+    	_wanted -V 'unapplied patches' expl 'patch' compadd ${(f)"$(quilt unapplied)"}
+    	;;
+      (pop)
+    	_wanted -V 'applied patches' expl 'patch' compadd ${(f)"$(quilt applied)"}
+    	;;
+      (*)
+    	_files
+    	;;
+  esac
+  ;;
+esac
