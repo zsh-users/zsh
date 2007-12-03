@@ -150,7 +150,7 @@ _git_commands () {
     'commit:record changes to the repository'
     'diff:show changes between commits, commit and working tree, etc.'
     'fetch:download objects and a head from another repository'
-    'gc:cleanup unnecessary files and optimize thee local repository'
+    'gc:cleanup unnecessary files and optimize the local repository'
     'grep:print lines matching a pattern'
     'init:create empty git object database'
     'log:show commit logs'
@@ -238,7 +238,6 @@ _git_commands () {
   useful_commands=(
     'format-patch:prepare patches for e-mail submission'
     'ls-files:information about files in the index/working directory'
-    'config:get and set options in "$GIT_DIR/config"'
     'instaweb:instantly browse your working repository in gitweb'
     'remote:manage set of tracked repositories'
     'send-email:send patch-e-mails out of "format-patch" output'

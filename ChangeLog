@@ -1,3 +1,8 @@
+2007-12-03  Clint Adams  <clint@zsh.org>
+
+	* 24140: Completion/Unix/Command/_git: spelling fix and
+	removal of redundant "config" subcommand as proposed by Wayne.
+
 2007-12-01  Clint Adams  <clint@zsh.org>
 
 	* 24135: Completion/Debian/Command/_make-kpkg: consistently
