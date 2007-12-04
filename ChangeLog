@@ -1,3 +1,15 @@
+2007-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24148: configure.ac, Src/utils.c: attempt to use strerror_r()
+	to make error messages in signal handle safer.
+
+2007-12-03  Peter Stephenson  <pws@csr.com>
+
+	* 24143: Etc/zsh-development-guide, Util/.distfiles:  Remove
+	difflog.pl from the distribution owing to security worries
+	in usage (but leave it in the archive); also document the
+	distfiles business.
+
 2007-12-03  Clint Adams  <clint@zsh.org>
 
 	* 24140: Completion/Unix/Command/_git: spelling fix and
