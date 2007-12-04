@@ -2,10 +2,9 @@
 
 use strict;
 use IO::File;
+use File::Temp qw(tempfile);
 
 my @differ = qw(diff -bw);
-my $oldtmp = "/tmp/difflog$$.old";
-my $newtmp = "/tmp/difflog$$.new";
 
 my $newfn = pop(@ARGV);
 my $oldfn = pop(@ARGV);
@@ -36,16 +35,16 @@ while ($old < @oldentries && $new < @newentries)
   else
   {
     if ($oldhash{$oldentries[$old]} ne $newhash{$newentries[$new]}) {
-      my $oldfh = new IO::File("/tmp/difflog$$.old", 'w');
-      $oldfh->print($oldhash{$oldentries[$old]});
-      $oldfh->close();
-      my $newfh = new IO::File("/tmp/difflog$$.new", 'w');
-      $newfh->print($newhash{$newentries[$new]});
-      $newfh->close();
-      open(DIFF, join(' ', @differ, @ARGV, $oldtmp, $newtmp, '|'));
+      my($oldfh, $oldtmp) = tempfile('difflog-XXXXXXXX', SUFFIX => '.old', DIR => '/tmp');
+      print $oldfh $oldhash{$oldentries[$old]};
+      close($oldfh);
+      my($newfh, $newtmp) = tempfile('difflog-XXXXXXXX', SUFFIX => '.new', DIR => '/tmp');
+      print $newfh $newhash{$newentries[$new]};
+      close($newfh);
+      open(DIFF, '-|', @differ, @ARGV, $oldtmp, $newtmp) or die $!;
       my @lines = <DIFF>;
       close(DIFF);
-      unlink </tmp/difflog$$.*>;
+      unlink($oldtmp, $newtmp);
       if (@lines)
       {
 	print "diff for ", $oldentries[$old], ":\n";

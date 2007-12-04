@@ -3,6 +3,10 @@
 	* 24148: configure.ac, Src/utils.c: attempt to use strerror_r()
 	to make error messages in signal handle safer.
 
+2007-12-03  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 24147: Util/difflog.pl: improved the temporary-file handling.
+
 2007-12-03  Peter Stephenson  <pws@csr.com>
 
 	* 24143: Etc/zsh-development-guide, Util/.distfiles:  Remove
