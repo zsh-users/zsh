@@ -1,3 +1,8 @@
+2007-12-05  Clint Adams  <clint@zsh.org>
+
+	* 24160: Src/Modules/terminfo.c, Src/Modules/terminfo.mdd:
+	build terminfo module if ncursesw is present but curses.h is not.
+
 2007-12-05  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_ip: typo in "addr replace"

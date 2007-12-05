@@ -49,7 +49,28 @@
 #  undef offsetof
 # endif
 
-# include <curses.h>
+#ifdef ZSH_IGNORE_NCURSES
+# ifdef HAVE_CURSES_H
+#  include <curses.h>
+# endif
+#else
+# ifdef HAVE_NCURSESW_NCURSES_H
+#  include <ncursesw/ncurses.h>
+# else
+#  ifdef HAVE_NCURSES_NCURSES_H
+#   include <ncurses/ncurses.h>
+#  else
+#   ifdef HAVE_NCURSES_H
+#    include <ncurses.h>
+#   else
+#    ifdef HAVE_CURSES_H
+#     include <curses.h>
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
 # ifdef HAVE_TERM_H
 #  include <term.h>
 # endif
