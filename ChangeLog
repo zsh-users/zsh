@@ -1,3 +1,8 @@
+2007-12-05  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_ip: typo in "addr replace"
+	completion.
+
 2007-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24148: configure.ac, Src/utils.c: attempt to use strerror_r()
