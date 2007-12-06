@@ -1,3 +1,9 @@
+2007-12-06  Clint Adams  <clint@zsh.org>
+
+	* 24169: Completion/Unix/Command/_cut: use print in command
+	substitution to avoid a literal non-ASCII character in the German
+	translation of args for cut completion.
+
 2007-12-05  Clint Adams  <clint@zsh.org>
 
 	* 24160: Src/Modules/terminfo.c, Src/Modules/terminfo.mdd:
