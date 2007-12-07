@@ -1,3 +1,8 @@
+2007-12-07  Peter Stephenson  <pws@csr.com>
+
+	* Guillaume Chazarain: 24170: Src/exec.c: block interrupts
+	around fork since it may mess with locks.
+
 2007-12-07  Clint Adams  <clint@zsh.org>
 
 	* 24172 (tweaked): configure.ac: check ncurses.h, ncurses/ncurses.h, and
