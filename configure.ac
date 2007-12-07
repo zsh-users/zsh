@@ -1392,7 +1392,7 @@ AC_CACHE_CHECK(where curses key definitions are located, zsh_cv_path_curses_keys
 dnl if we can.
 if test x$ac_cv_header_ncurses_h = xyes; then
   echo "#include <ncurses.h>" >nametmp.c
-elif test x$ac_cv_header_ncurses_ncurses_h = xyes
+elif test x$ac_cv_header_ncurses_ncurses_h = xyes; then
   echo "#include <ncurses/ncurses.h>" >nametmp.c
 elif test x$ac_cv_header_ncursesw_ncurses_h = xyes; then
   echo "#include <ncursesw/ncurses.h>" >nametmp.c
