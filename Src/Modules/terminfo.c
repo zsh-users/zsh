@@ -30,7 +30,7 @@
 #define USES_TERM_H 1
 #include "terminfo.mdh"
 
-#if defined(HAVE_TIGETFLAG) && defined(HAVE_CURSES_H)
+#if defined(HAVE_TIGETFLAG) && (defined(HAVE_CURSES_H) || defined(HAVE_NCURSES_H) || defined(HAVE_NCURSES_NCURSES_H) || defined(NCURSESW_NCURSES_H))
 # define USE_TERMINFO_MODULE 1
 #else
 # undef USE_TERMINFO_MODULE
