@@ -1,5 +1,7 @@
 2007-12-07  Peter Stephenson  <pws@csr.com>
 
+	* Unposted: Src/exec.c: add explanatory comment for 24170/24179.
+
 	* 24180: configure.ac, Src/utils.c: back off (most of) 24148.
 
 	* 24179: Src/exec.c: alter 241770 to use queue_signals().
