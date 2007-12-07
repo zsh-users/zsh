@@ -1,3 +1,8 @@
+2007-12-07  Clint Adams  <clint@zsh.org>
+
+	* 24174: Completion/Unix/Command/_cut: Oliver's deuglification
+	of 24169.
+
 2007-12-07  Peter Stephenson  <pws@csr.com>
 
 	* Unposted: Src/exec.c: add explanatory comment for 24170/24179.
