@@ -229,7 +229,6 @@ zfork(struct timeval *tv)
 {
     pid_t pid;
     struct timezone dummy_tz;
-    sigset_t signals;
 
     /*
      * Is anybody willing to explain this test?
@@ -240,10 +239,9 @@ zfork(struct timeval *tv)
     }
     if (tv)
 	gettimeofday(tv, &dummy_tz);
-    sigfillset(&signals);
-    signals = signal_block(signals);
+    queue_signals();
     pid = fork();
-    signal_setmask(signals);
+    unqueue_signals();
     if (pid == -1) {
 	zerr("fork failed: %e", errno);
 	return -1;
