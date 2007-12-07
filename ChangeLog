@@ -3,7 +3,7 @@
 	* 24172 (tweaked): configure.ac: check ncurses.h, ncurses/ncurses.h, and
 	ncursesw/ncurses.h for curses keys.
 
-	* 24171: Src/Modules/terminfo.c: define USE_TERMINFO_MODULE when
+	* 24171, 24173: Src/Modules/terminfo.c: define USE_TERMINFO_MODULE when
 	ncurses.h, ncurses/ncurses.h, or ncursesw/ncurses.h is present.
 
 2007-12-06  Clint Adams  <clint@zsh.org>
