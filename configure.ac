@@ -1390,15 +1390,18 @@ dnl Where are curses key definitions located?  Need for keypad() mode.
 AC_CACHE_CHECK(where curses key definitions are located, zsh_cv_path_curses_keys_h,
 [dnl This is an identical trick to errno.h, except we use ncurses.h
 dnl if we can.
-if test x$ac_cv_header_ncurses_h = xyes || test x$ac_cv_header_ncurses_ncurses_h = xyes || test x$ac_cv_header_ncursesw_ncurses_h = xyes; then
+if test x$ac_cv_header_ncurses_h = xyes; then
   echo "#include <ncurses.h>" >nametmp.c
+elif test x$ac_cv_header_ncurses_ncurses_h = xyes
+  echo "#include <ncurses/ncurses.h>" >nametmp.c
+elif test x$ac_cv_header_ncursesw_ncurses_h = xyes; then
+  echo "#include <ncursesw/ncurses.h>" >nametmp.c
+elif test x$ac_cv_header_curses_h = xyes; then
+  echo "#include <curses.h>" >nametmp.c
 else
-  if test x$ac_cv_header_curses_h = xyes; then
-    echo "#include <curses.h>" >nametmp.c
-  else
-    echo >nametmp.c
-  fi
+  echo >nametmp.c
 fi
+
 curses_list="`$CPP nametmp.c |
 sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
        -e 's/^#[ 	0-9].*\"\(.*\)\"/\1/p' |
