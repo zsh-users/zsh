@@ -233,7 +233,7 @@ _regex_words \
   'h*elp:show help for command' \
   'a*dd:add new protocol address:$addr_add_cmds' \
   'c*hange:change existing protocol address:$addr_add_cmds' \
-  'r*replace:add or update protocol address:$addr_add_cmds' \
+  'r*eplace:add or update protocol address:$addr_add_cmds' \
   'd*elete:delete protocol address:$addr_del_cmds' \
   's*how:show protocol address:$addr_show_cmds' \
   'f*lush:flush protocol address:$addr_show_cmds'
