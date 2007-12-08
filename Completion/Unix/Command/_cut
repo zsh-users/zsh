@@ -11,7 +11,7 @@ if _pick_variant gnu="Free Soft" unix --version; then
              delimiter       "Delimiter anstelle von Tabulator als Trenner benutzen"
              fields          "nur diese Felder und alle Zeilen OHNE Trennzeichen ausgeben"
              n               "(ignoriert)"
-             complement      "das Komplement der Menge der gewählten Bytes, Zeichen oder Felder bilden"
+             complement      "das Komplement der Menge der gew$'\u00e4'hlten Bytes, Zeichen oder Felder bilden"
              only-delimited  "keine Zeilen ausgeben, die keinen Trenner enthalten"
              output-delimiter "Zeichenkette als Ausgabetrennzeichen benutzen"
              help            "diese Hilfe anzeigen und beenden"
