@@ -1,3 +1,7 @@
+2007-12-08  Clint Adams  <clint@zsh.org>
+
+	* 24187: Completion/Unix/Command/_members: completion for members.
+
 2007-12-07  Clint Adams  <clint@zsh.org>
 
 	* 24174: Completion/Unix/Command/_cut: Oliver's deuglification
