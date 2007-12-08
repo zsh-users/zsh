@@ -1,0 +1,13 @@
+#compdef id
+
+_arguments \
+  '-a[no-op]' \
+  '(-Z --context)'{-Z,--context}'[print only context]' \
+  '(-g --group)'{-g,--group}'[print only EGID]' \
+  '(-G --groups)'{-G,--groups}'[print all GIDs]' \
+  '(-n --name)'{-n,--name}'[print name instead of number]' \
+  '(-r --real)'{-r,--real}'[print real ID instead of effective]' \
+  '(-u --user)'{-u,--user}'[print only EUID]' \
+  '--help[display help]' \
+  '--version[display version]' \
+  ':user:_users'
