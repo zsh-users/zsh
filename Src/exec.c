@@ -2339,7 +2339,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    lastval = 0;
 		    return;
 		} else {
-		    cmdoutval = 0;
+		    cmdoutval = lastval;
 		    if (varspc)
 			addvars(state, varspc, 0);
 		    if (errflag)
