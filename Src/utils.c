@@ -173,34 +173,7 @@ zerrmsg(const char *fmt, const char *str, int num)
 		    errflag = 1;
 		    return;
 		}
-#ifdef HAVE_STRERROR_R
-		/*
-		 * There are two incompatible strerror_r()s floating round.
-		 * The GNU extension refuses to copy the message into the
-		 * buffer if it can return a constant string.  To suppress it
-		 * we need to define _XOPEN_SOURCE to 600.  I don't dare do
-		 * this because we're already depending on _GNU_SOURCE.  So
-		 * try to handle both by looking for errno being set (for the
-		 * standard version failing) or errbuf being left untouched
-		 * (for the GNU version).  One presumes that if strerror_r()
-		 * didn't copy anything to errbuf, then it's safe to
-		 * call strerror() to get the string.
-		 *
-		 * This is a mess, but it's about a decade and half
-		 * too late to shirk from messes in the source.
-		 */
-		olderrno = errno;
-		errno = 0;
-		errbuf[0] = '\0';
-		strerror_r(num, errbuf, ERRBUFSIZE);
-		if (errno || errbuf[0] == '\0')
-		    errmsg = strerror(num);
-		else
-		    errmsg = errbuf;
-		errno = olderrno;
-#else
 		errmsg = strerror(num);
-#endif
 		/* If the message is not about I/O problems, it looks better *
 		 * if we uncapitalize the first letter of the message        */
 		if (num == EIO)
