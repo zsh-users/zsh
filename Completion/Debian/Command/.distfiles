@@ -14,5 +14,6 @@ _dpatch-edit-patch
 _dpkg-buildpackage
 _dpkg-repack
 _lighttpd
+_members
 _svn-buildpackage
 '
