@@ -1,5 +1,5 @@
 /*
- * datetime.c - parameter interface to langinfo via curses
+ * datetime.c - parameter and command interface to date and time utilities
  *
  * This file is part of zsh, the Z shell.
  *
@@ -121,7 +121,7 @@ bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
     }
 
     t = localtime(&secs);
-    bufsize = strlen(argv[0]) * 2;
+    bufsize = strlen(argv[0]) * 8;
     buffer = zalloc(bufsize);
 
     for (x=0; x < 4; x++) {

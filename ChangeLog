@@ -1,3 +1,8 @@
+2007-12-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24197, Src/utils.c, Src/Modules/datetime.c: interface to
+	ztrftime() for insufficient memory was broken.
+
 2007-12-08  Clint Adams  <clint@zsh.org>
 
 	* 24188: Completion/Unix/Command/_id: completion for GNU id.

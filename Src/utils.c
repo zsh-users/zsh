@@ -2389,7 +2389,7 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 	     * Fix up some longer cases specially when we get to them.
 	     */
 	    if (ztrftimebuf(&bufsize, 2))
-		return 0;
+		return -1;
 	    switch (*fmt++) {
 	    case 'd':
 		*buf++ = '0' + tm->tm_mday / 10;
@@ -2447,12 +2447,12 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 #ifndef HAVE_STRFTIME
 	    case 'a':
 		if (ztrftimebuf(&bufsize, strlen(astr[tm->tm_wday]) - 2))
-		    return 0;
+		    return -1;
 		strucpy(&buf, astr[tm->tm_wday]);
 		break;
 	    case 'b':
 		if (ztrftimebuf(&bufsize, strlen(estr[tm->tm_mon]) - 2))
-		    return 0;
+		    return -1;
 		strucpy(&buf, estr[tm->tm_mon]);
 		break;
 	    case 'p':
@@ -2487,7 +2487,7 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 	    }
 	} else {
 	    if (ztrftimebuf(&bufsize, 1))
-		return 0;
+		return -1;
 	    *buf++ = *fmt++;
 	}
     *buf = '\0';
