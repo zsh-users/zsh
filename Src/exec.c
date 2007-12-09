@@ -228,7 +228,15 @@ zfork(struct timeval *tv)
     }
     if (tv)
 	gettimeofday(tv, &dummy_tz);
+    /*
+     * Queueing signals is necessary on Linux because fork()
+     * manipulates mutexes, leading to deadlock in memory
+     * allocation.  We don't expect fork() to be particularly
+     * zippy anyway.
+     */
+    queue_signals();
     pid = fork();
+    unqueue_signals();
     if (pid == -1) {
 	zerr("fork failed: %e", NULL, errno);
 	return -1;
