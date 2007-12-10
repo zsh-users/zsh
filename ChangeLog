@@ -1,3 +1,8 @@
+2007-12-10  Peter Stephenson  <pws@csr.com>
+
+	* Vincent Lefevre: 24192: Completion/Unix/Command/_make:
+	make GNU make support -include.
+
 2007-12-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 24150 plus unposted: Src/exec.c, Test/D08cmdsubst.ztst:
