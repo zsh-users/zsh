@@ -20,7 +20,7 @@
 
 	* 24180: Src/utils.c: back off (most of) 24148.
 
-	* 24179: Src/exec.c: alter 241770 to use queue_signals().
+	* 24179: Src/exec.c: alter 24170 to use queue_signals().
 
 	* Guillaume Chazarain: 24170: Src/exec.c: block interrupts
 	around fork since it may mess with locks.
