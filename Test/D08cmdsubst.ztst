@@ -81,3 +81,11 @@
 >third: file1.txt file2.txt
 >fourth: *
 >fifth: file1.txt file2.txt
+
+  $(exit 0) $(exit 3) || print $?
+0:empty command uses exit value of last substitution
+>3
+
+  X=$(exit 2) $(exit 0) || print $?
+0:variable assignments processed after other substitutions
+>2

@@ -1,3 +1,11 @@
+2007-12-09  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 24150 plus unposted: Src/exec.c, Test/D08cmdsubst.ztst:
+	Retain exit status of last non-assignment command substitution
+	across variable assignment processing so that, in the event of
+	no command word to execute, the exit status of the statement is
+	that of the last command substitution (per POSIX).
+
 2007-12-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24197, Src/utils.c, Src/Modules/datetime.c: interface to
