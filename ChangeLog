@@ -1,3 +1,8 @@
+2007-12-11  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk, Completion/Unix/Command/.distfiles:
+	4.3.4-dev-4.
+
 2007-12-10  Peter Stephenson  <pws@csr.com>
 
 	* Vincent Lefevre: 24192: Completion/Unix/Command/_make:
@@ -1359,7 +1364,7 @@
 2007-06-11  Peter Stephenson  <pws@csr.com>
 
 	* 23543: Completion/Unix/Command/_perforce: work around
-	problem adding "..." with hiddne prefix.
+	problem adding "..." with hidden prefix.
 
 2007-06-08  Peter Stephenson  <pws@csr.com>
 
