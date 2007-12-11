@@ -81,8 +81,8 @@ parseMakefile() {
 	    input=${input%%:*}
 	    print $(expandVars 10 $input)
 	    ;;
-	($incl *)
-	    local f=${input##$incl ##}
+	(${~incl} *)
+	    local f=${input##${~incl} ##}
 	    if [[ $incl = '.include' ]]; then
 		f=${f#[\"<]}
 		f=${f%[\">]}
@@ -125,7 +125,7 @@ findBasedir () {
 _pick_variant -r is_gnu gnu=GNU unix -v -f
 
 if [[ $is_gnu = gnu ]]; then
-    incl=include
+    incl="(-|)include"
 else
     incl=.include
 fi
