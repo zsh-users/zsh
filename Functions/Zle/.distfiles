@@ -16,4 +16,9 @@ delete-whole-word-match quote-and-complete-word url-quote-magic
 zed-set-file-name history-pattern-search
 keeper
 which-command
+keymap+widget
+match-word-context
+modify-current-argument
+replace-string-again
+split-shell-arguments
 '
