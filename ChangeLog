@@ -1,3 +1,7 @@
+2007-12-11  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Debian/Command/.distfiles: update.
+
 2007-12-11  Peter Stephenson  <pws@csr.com>
 
 	* users/12307: Test/C02cond.ztst: the wretched -N test is
