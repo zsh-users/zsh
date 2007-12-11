@@ -1,7 +1,9 @@
 2007-12-11  Peter Stephenson  <pws@csr.com>
 
+	* 24210: Src/builtin.c: "set -o" should abort on failure.
+
 	* unposted: Config/version.mk, Completion/Unix/Command/.distfiles:
-	4.3.4-dev-4.
+	Functions/Zle/.distfiles: 4.3.4-dev-4.
 
 2007-12-10  Peter Stephenson  <pws@csr.com>
 

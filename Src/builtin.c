@@ -567,9 +567,9 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    return 0;
 		}
 		if(!(optno = optlookup(*args)))
-		    zwarnnam(nam, "no such option: %s", *args);
+		    zerrnam(nam, "no such option: %s", *args);
 		else if(dosetopt(optno, action, 0))
-		    zwarnnam(nam, "can't change option: %s", *args);
+		    zerrnam(nam, "can't change option: %s", *args);
 		break;
 	    } else if(**args == 'A') {
 		if(!*++*args)
@@ -588,13 +588,15 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		sort = action ? 1 : -1;
 	    else {
 	    	if (!(optno = optlookupc(**args)))
-		    zwarnnam(nam, "bad option: -%c", **args);
+		    zerrnam(nam, "bad option: -%c", **args);
 		else if(dosetopt(optno, action, 0))
-		    zwarnnam(nam, "can't change option: -%c", **args);
+		    zerrnam(nam, "can't change option: -%c", **args);
 	    }
 	}
 	args++;
     }
+    if (errflag)
+	return 1;
  doneoptions:
     inittyptab();
 
