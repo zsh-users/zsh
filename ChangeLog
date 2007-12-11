@@ -1,5 +1,8 @@
 2007-12-11  Peter Stephenson  <pws@csr.com>
 
+	* users/12307: Test/C02cond.ztst: the wretched -N test is
+	still problematic; expand the delay to 2 seconds.
+
 	* 24210: Src/builtin.c: "set -o" should abort on failure.
 
 	* unposted: Config/version.mk, Completion/Unix/Command/.distfiles:
