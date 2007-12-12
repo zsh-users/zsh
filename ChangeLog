@@ -1,5 +1,9 @@
 2007-12-12  Peter Stephenson  <pws@csr.com>
 
+	* users/12325: Doc/Zsh/builtins.yo, Src/builtin.c:
+	implement OSI rules for three- and four-argument test and [ ... ]
+	commands and warn users about the problems.
+
 	* users/12305: Doc/Zsh/builtins.yo, Src/init.c,
 	Test/A01grammar.ztst: option output wasn't well described;
 	"-c" is documented not to set SHIN_STDIN, so don't.

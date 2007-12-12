@@ -5506,6 +5506,7 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     char **s;
     Eprog prog;
     struct estate state;
+    int nargs;
 
     /* if "test" was invoked as "[", it needs a matching "]" *
      * which is subsequently ignored                         */
@@ -5520,6 +5521,20 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     /* an empty argument list evaluates to false (1) */
     if (!*argv)
 	return 1;
+
+    /*
+     * Implement some XSI extensions to POSIX here.
+     * See
+     * http://www.opengroup.org/onlinepubs/009695399/utilities/test.html.
+     */
+    nargs = arrlen(argv);
+    if (nargs == 3 || nargs == 4)
+    {
+	if (*argv[0] == '(' && *argv[nargs-1] == ')') {
+	    argv[nargs-1] = NULL;
+	    argv++;
+	}
+    }
 
     testargs = argv;
     tok = NULLTOK;

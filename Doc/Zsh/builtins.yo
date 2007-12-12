@@ -1235,7 +1235,15 @@ tt(test) and tt([) builtins are:  these commands are not handled
 syntactically, so for example an empty variable expansion may cause an
 argument to be omitted; syntax errors cause status 2 to be returned instead
 of a shell error; and arithmetic operators expect integer arguments rather
-than arithemetic expressions.
+than arithmetic expressions.
+
+The command attempts to implement POSIX and its extensions where these
+are specified.  Unfortunately there are intrinsic ambiguities in
+the syntax; in particular there is no distinction between test operators
+and strings that resemble them.  The standard attempts to resolve these
+for small numbers of arguments (up to four); for five or more arguments
+compatibility cannot be relied on.  Users are urged wherever possible to
+use the `tt([[)' test syntax which does not have these ambiguities.
 )
 findex(times)
 cindex(shell, timing)
