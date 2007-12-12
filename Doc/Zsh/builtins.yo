@@ -1137,7 +1137,8 @@ sort arguments in descending order.  For the meaning of the other flags, see
 ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Options))\
 .  Flags may be specified by name using the tt(-o) option. If no option
-name is supplied with tt(-o), the current option states are printed.
+name is supplied with tt(-o), the current option states are printed:  see
+the description of tt(setopt) below for more information on the format.
 With tt(PLUS()o) they are printed in a form that can be used as input
 to the shell.
 
@@ -1180,8 +1181,23 @@ cindex(options, setting)
 item(tt(setopt) [ {tt(PLUS())|tt(-)}var(options) | \
 {tt(PLUS())|tt(-)}tt(o) var(option_name) ] [ var(name) ... ])(
 Set the options for the shell.  All options specified either
-with flags or by name are set.  If no arguments are supplied,
-the names of all options currently set are printed.
+with flags or by name are set.
+
+If no arguments are supplied, the names of all options currently set are
+printed.  The form is chosen so as to minimize the differences from the
+default options for the current emulation (the default emulation being
+native tt(zsh), shown as tt(<Z>) in
+ifzman(zmanref(zshoptions))\
+ifnzman(noderef(Description of Options))).
+Options that are on by default for the emulation are
+shown with the prefix tt(no) only if they are off, while other options are
+shown without the prefix tt(no) and only if they are on.  In addition to
+options changed from the default state by the user, any options activated
+automatically by the shell (for example, tt(SHIN_STDIN) or tt(INTERACTIVE))
+will be shown in the list.  The format is further modified by the option
+tt(KSH_OPTION_PRINT), however the rationale for choosing options with
+or without the tt(no) prefix remains the same in this case.
+
 If the tt(-m) flag is given the arguments are taken as patterns
 (which should be quoted to protect them from filename expansion), and all
 options with names matching these patterns are set.

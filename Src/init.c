@@ -272,7 +272,6 @@ parseargs(char **argv)
 		/* -c command */
 		cmd = *argv;
 		opts[INTERACTIVE] &= 1;
-		opts[SHINSTDIN] = 0;
 		scriptname = ztrdup("zsh");
 	    } else if (**argv == 'o') {
 		if (!*++*argv)
@@ -334,7 +333,7 @@ parseargs(char **argv)
 	}
 	while (*argv)
 	    zaddlinknode(paramlist, ztrdup(*argv++));
-    } else
+    } else if (!cmd)
 	opts[SHINSTDIN] = 1;
     if(isset(SINGLECOMMAND))
 	opts[INTERACTIVE] &= 1;

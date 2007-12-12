@@ -490,7 +490,7 @@
 
   $ZTST_testdir/../Src/zsh -f -c "'"
 1:Parse error on inline command causes non-zero exit status
-?zsh: unmatched '
+?zsh:1: unmatched '
 
   $ZTST_testdir/../Src/zsh -f NonExistentScript
 127q:Non-existent script causes exit status 127

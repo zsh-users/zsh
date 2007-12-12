@@ -1,3 +1,9 @@
+2007-12-12  Peter Stephenson  <pws@csr.com>
+
+	* users/12305: Doc/Zsh/builtins.yo, Src/init.c,
+	Test/A01grammar.ztst: option output wasn't well described;
+	"-c" is documented not to set SHIN_STDIN, so don't.
+
 2007-12-11  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Debian/Command/.distfiles: update.
