@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh -i
+#!/bin/zsh -i
 #
 # Zsh calculator.  Understands most ordinary arithmetic expressions.
 # Line editing and history are available. A blank line or `q' quits.

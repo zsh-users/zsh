@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/bin/zsh
 #
 # This autoloadable function checks the folders specified as arguments
 # for new mails.  The arguments are interpreted in exactly the same way

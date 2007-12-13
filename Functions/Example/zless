@@ -1,4 +1,4 @@
-#!/usr/bin/zsh -f
+#!/bin/zsh -f
 #
 # zsh function script to run less on various inputs, decompressing as required.
 # Author: Phil Pennock.  zsh-hacks@athenaeum.demon.co.uk

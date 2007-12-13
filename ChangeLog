@@ -1,5 +1,10 @@
 2007-12-13  Clint Adams  <clint@zsh.org>
 
+	* 24242: Functions/Calendar/calendar_add, Functions/Example/cat,
+	Functions/Example/zless, Functions/Misc/checkmail,
+	Functions/Misc/run-help, Functions/Misc/zcalc, Functions/Misc/zkbd:
+	unify top lines as #!/bin/zsh (followed by options).
+
 	* Peter: 24235: Completion/Base/Utility/_arguments: handle
 	underscores.
 

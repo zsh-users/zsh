@@ -1,4 +1,4 @@
-#! /bin/zsh -f
+#!/bin/zsh -f
 
 [[ -o interactive ]] && {
     local -i ARGC

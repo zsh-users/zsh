@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/zsh
 #
 # Figure out where to get the best help, and get it.
 #
