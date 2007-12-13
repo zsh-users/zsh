@@ -1,5 +1,9 @@
 2007-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24239: Completion/Zsh/Context/_subscript: if the [ of
+	a subscript was backslashed, a trailing space was added
+	backslashed along with the "\[".
+
 	* 24236: Test/C02cond.ztst: another case where the wretched
 	cond -N test can fail.
 

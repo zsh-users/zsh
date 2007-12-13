@@ -3,8 +3,8 @@
 local expl ind osuf=']' flags sep
 
 if [[ "$1" = -q ]]; then
-  osuf='] '
   compquote osuf
+  osuf+=' '
   shift
 fi
 
