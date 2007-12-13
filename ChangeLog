@@ -1,3 +1,8 @@
+2007-12-13  Clint Adams  <clint@zsh.org>
+
+	* Peter: 24235: Completion/Base/Utility/_arguments: handle
+	underscores.
+
 2007-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24241: Doc/Zsh/expn.yo: explain the effect of time glob

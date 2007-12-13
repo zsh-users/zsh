@@ -97,7 +97,7 @@ if (( long )); then
        # present.  Maybe the problem was that the intervening code
        # didn't.  If it's buggy without removing them, the problem
        # probably is later, not here.
-       if [[ -z ${tmp[(r)${match[1]%%[^a-zA-Z0-9-]#}]} ]]; then
+       if [[ -z ${tmp[(r)${match[1]%%[^a-zA-Z0-9_-]#}]} ]]; then
 	 tmp+=($match[1])
        fi
        opt=$match[2]
@@ -218,9 +218,9 @@ if (( long )); then
 	    odescr=
 	  fi
 	  if [[ $opt = (#b)(*)\[\=* ]]; then
-	    opt2=${${match[1]}//[^a-zA-Z0-9-]}=-${dir}${odescr}
+	    opt2=${${match[1]}//[^a-zA-Z0-9_-]}=-${dir}${odescr}
 	  else
-	    opt2=${${opt}//[^a-zA-Z0-9-]}=${dir}${odescr}
+	    opt2=${${opt}//[^a-zA-Z0-9_-]}=${dir}${odescr}
 	  fi
 	  if [[ "$descr" = :\=* ]]; then
 	    cache+=( "${opt2}::${(L)${opt%\]}#*\=}: " )
@@ -247,7 +247,7 @@ if (( long )); then
 	  else
 	    odescr=
 	  fi
-	  opt2="${${opt%%\=*}//[^a-zA-Z0-9-]}=${dir}${odescr}"
+	  opt2="${${opt%%\=*}//[^a-zA-Z0-9_-]}=${dir}${odescr}"
 	  if [[ "$descr" = :\=* ]]; then
 	    cache+=( "${opt2}:${(L)${opt%\]}#*\=}: " )
 	  else
@@ -268,7 +268,7 @@ if (( long )); then
 	  # I discovered after about half an hour, so don't do that.
 	  "${(@)^${(@)tmp:#^*:*}//:/[}]"
 	  # commands with no description
-	  "${(@)${(@)tmp:#*:*}//[^a-zA-Z0-9-]}")
+	  "${(@)${(@)tmp:#*:*}//[^a-zA-Z0-9_-]}")
         if [[ -n "$descr" && "$descr" != ': :  ' ]]; then
 	  cache+=( "${(@)^tmp}${descr}" )
         else
