@@ -1,5 +1,8 @@
 2007-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24241: Doc/Zsh/expn.yo: explain the effect of time glob
+	qualifiers better.
+
 	* 24240: Src/Zle/zle_main.c: vared didnʼt check for trailing
 	garbage on parameter names until too late.
 

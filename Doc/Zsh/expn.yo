@@ -2076,8 +2076,14 @@ Files accessed more than var(n) days ago are selected by a positive var(n)
 value (tt(PLUS())var(n)).  Optional unit specifiers `tt(M)', `tt(w)',
 `tt(h)', `tt(m)' or `tt(s)' (e.g. `tt(ah5)') cause the check to be
 performed with months (of 30 days), weeks, hours, minutes or seconds
-instead of days, respectively.  For instance, `tt(echo *(ah-5))' would
-echo files accessed within the last five hours.
+instead of days, respectively.
+
+Any fractional part of the difference between the access time and the
+current part in the appropriate units is ignored in the comparison.  For
+instance, `tt(echo *(ah-5))' would echo files accessed within the last
+five hours, while `tt(echo *(ah+5))' would echo files accessed at least
+six hours ago, as times strictly between five and six hours are treated
+as five hours.
 )
 item(tt(m)[tt(Mwhms)][tt(-)|tt(PLUS())]var(n))(
 like the file access qualifier, except that it uses the file modification
