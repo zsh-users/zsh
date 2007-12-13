@@ -1,5 +1,8 @@
 2007-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24240: Src/Zle/zle_main.c: vared didnʼt check for trailing
+	garbage on parameter names until too late.
+
 	* 24239: Completion/Zsh/Context/_subscript: if the [ of
 	a subscript was backslashed, a trailing space was added
 	backslashed along with the "\[".

@@ -1441,6 +1441,10 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	zwarnnam(name, "no such variable: %s", args[0]);
 	return 1;
     } else if (v) {
+	if (*s) {
+	    zwarnnam(name, "not an identifier: `%s'", args[0]);
+	    return 1;
+	}
 	if (v->isarr) {
 	    /* Array: check for separators and quote them. */
 	    char **arr = getarrvalue(v), **aptr, **tmparr, **tptr;
