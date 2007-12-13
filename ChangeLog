@@ -1,5 +1,8 @@
 2007-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24236: Test/C02cond.ztst: another case where the wretched
+	cond -N test can fail.
+
 	* 24234: Doc/Zsh/expn.yo, Src/params.c, Src/subst.c,
 	Test/B02typeset.ztst: apply parameter flags defined with
 	typeset etc. consistently so that substitution code layered

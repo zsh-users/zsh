@@ -142,7 +142,9 @@
 F:This test can fail on NFS-mounted filesystems as the access and
 F:modification times are not updated separately.  The test will fail
 F:on HFS+ (Apple Mac OS X default) filesystems because access times
-F:are not recorded. This does not indicate a problem in the shell.
+F:are not recorded.  Also, Linux ext3 filesystems may be mounted
+F:with the noatime option which does not update access times.
+F:Failures in these cases do not indicate a problem in the shell.
 
   [[ newnewnew -nt zerolength && ! (unmodified -nt zerolength) ]]
 0:-nt cond
