@@ -1,3 +1,10 @@
+2007-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24234: Doc/Zsh/expn.yo, Src/params.c, Src/subst.c,
+	Test/B02typeset.ztst: apply parameter flags defined with
+	typeset etc. consistently so that substitution code layered
+	above always sees the effects.
+
 2007-12-12  Peter Stephenson  <pws@csr.com>
 
 	* users/12325: Doc/Zsh/builtins.yo, Src/builtin.c:

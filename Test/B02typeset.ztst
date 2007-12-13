@@ -18,7 +18,6 @@
 #  Function tracing (typeset -ft)		E02xtrace
 
 # Not yet tested:
-#  Case conversion (-l, -u)
 #  Assorted illegal flag combinations
 
 %prep
@@ -339,6 +338,28 @@
 >'0x0000002B'
 >'-0x000002B'
 
+ setopt cbases
+ integer -Z 10 -i 16 foozi16c
+ for foozi16c in 0x1234 -0x1234; do
+   for (( i = 1; i <= 5; i++ )); do
+       print "'${foozi16c[i,11-i]}'"
+   done
+   print "'${foozi16c[-2]}'"
+ done
+0:Extracting substrings from padded integers
+>'0x00001234'
+>'x0000123'
+>'000012'
+>'0001'
+>'00'
+>'3'
+>'-0x0001234'
+>'0x000123'
+>'x00012'
+>'0001'
+>'00'
+>'3'
+
  typeset -F 3 -Z 10 foozf
  for foozf in 3.14159 -3.14159 4 -4; do
    print "'$foozf'"
@@ -405,3 +426,21 @@
 >FOOENV=BAR
 >Exec
 >Unset
+
+ local case1=upper
+ typeset -u case1
+ print $case1
+ UPPER="VALUE OF \$UPPER"
+ print ${(P)case1}
+0:Upper case conversion
+>UPPER
+>VALUE OF $UPPER
+
+ local case2=LOWER
+ typeset -l case2
+ print $case2
+ lower="value of \$lower"
+ print ${(P)case2}
+0:Lower case conversion
+>lower
+>value of $lower

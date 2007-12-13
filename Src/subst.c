@@ -1320,11 +1320,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     /* Scalar and array value, see isarr above */
     char *val = NULL, **aval = NULL;
     /*
-     * Padding based on setting in parameter rather than substitution
-     * flags.  This is only used locally.
-     */
-    unsigned int fwidth = 0;
-    /*
      * vbuf and v are both used to retrieve parameter values; this
      * is a kludge, we pass down vbuf and it may or may not return v.
      */
@@ -2061,143 +2056,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    }
 	    if (!vunset) {
 		/*
-		 * There really is a value.  Apply any necessary
-		 * padding or case transformation.  Note these
-		 * are the per-parameter transformations specified
-		 * with typeset, not the per-substitution ones set
-		 * by flags.  TODO: maybe therefore this would
-		 * be more consistent if moved into getstrvalue()?
-		 * Bet that's easier said than done.
-		 *
-		 * TODO: use string widths.  In fact, shouldn't the
-		 * strlen()s be ztrlen()s anyway?
+		 * There really is a value.  Padding and case
+		 * transformations used to be handled here, but
+		 * are now handled in getstrvalue() for greater
+		 * consistency.
 		 */
 		val = getstrvalue(v);
-		fwidth = v->pm->width ? v->pm->width : (int)strlen(val);
-		switch (v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
-		    char *t, *tend;
-		    unsigned int t0;
-
-		case PM_LEFT:
-		case PM_LEFT | PM_RIGHT_Z:
-		    t = val;
-		    if (v->pm->node.flags & PM_RIGHT_Z)
-			while (*t == '0')
-			    t++;
-		    else
-			while (iblank(*t))
-			    t++;
-		    MB_METACHARINIT();
-		    for (tend = t, t0 = 0; t0 < fwidth && *tend; t0++)
-			tend += MB_METACHARLEN(tend);
-		    /*
-		     * t0 is the number of characters from t used,
-		     * hence (fwidth - t0) is the number of padding
-		     * characters.  fwidth is a misnomer: we use
-		     * character counts, not character widths.
-		     *
-		     * (tend - t) is the number of bytes we need
-		     * to get fwidth characters or the entire string;
-		     * the characters may be multiple bytes.
-		     */
-		    fwidth -= t0; /* padding chars remaining */
-		    t0 = tend - t; /* bytes to copy from string */
-		    val = (char *) hcalloc(t0 + fwidth + 1);
-		    memcpy(val, t, t0);
-		    if (fwidth)
-			memset(val + t0, ' ', fwidth);
-		    val[t0 + fwidth] = '\0';
-		    copied = 1;
-		    break;
-		case PM_RIGHT_B:
-		case PM_RIGHT_Z:
-		case PM_RIGHT_Z | PM_RIGHT_B:
-		    {
-			int zero = 1;
-			/* Calculate length in possibly multibyte chars */
-			unsigned int charlen = MB_METASTRLEN(val);
-
-			if (charlen < fwidth) {
-			    char *valprefend = val;
-			    int preflen;
-			    if (v->pm->node.flags & PM_RIGHT_Z) {
-				/*
-				 * This is a documented feature: when deciding
-				 * whether to pad with zeroes, ignore
-				 * leading blanks already in the value;
-				 * only look for numbers after that.
-				 * Not sure how useful this really is.
-				 * It's certainly confusing to code around.
-				 */
-				for (t = val; iblank(*t); t++)
-				    ;
-				/*
-				 * Allow padding after initial minus
-				 * for numeric variables.
-				 */
-				if ((v->pm->node.flags &
-				     (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) &&
-				    *t == '-')
-				    t++;
-				/*
-				 * Allow padding after initial 0x or
-				 * base# for integer variables.
-				 */
-				if (v->pm->node.flags & PM_INTEGER) {
-				    if (isset(CBASES) &&
-					t[0] == '0' && t[1] == 'x')
-					t += 2;
-				    else if ((valprefend = strchr(t, '#')))
-					t = valprefend + 1;
-				}
-				valprefend = t;
-				if (!*t)
-				    zero = 0;
-				else if (v->pm->node.flags &
-					 (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) {
-				    /* zero always OK */
-				} else if (!idigit(*t))
-				    zero = 0;
-			    }
-			    /* number of characters needed for padding */
-			    fwidth -= charlen;
-			    /* bytes from original string */
-			    t0 = strlen(val);
-			    t = (char *) hcalloc(fwidth + t0 + 1);
-			    /* prefix guaranteed to be single byte chars */
-			    preflen = valprefend - val;
-			    memset(t + preflen, 
-				   (((v->pm->node.flags & PM_RIGHT_B)
-				     || !zero) ?       ' ' : '0'), fwidth);
-			    /*
-			     * Copy - or 0x or base# before any padding
-			     * zeroes.
-			     */
-			    if (preflen)
-				memcpy(t, val, preflen);
-			    memcpy(t + preflen + fwidth,
-				   valprefend, t0 - preflen);
-			    t[fwidth + t0] = '\0';
-			    val = t;
-			    copied = 1;
-			} else {
-			    /* Need to skip (charlen - fwidth) chars */
-			    for (t0 = charlen - fwidth; t0; t0--)
-				val += MB_METACHARLEN(val);
-			}
-		    }
-		    break;
-		}
-		switch (v->pm->node.flags & (PM_LOWER | PM_UPPER)) {
-		case PM_LOWER:
-		    val = casemodify(val, CASMOD_LOWER);
-		    copied = 1;
-		    break;
-		case PM_UPPER:
-		    val = casemodify(val, CASMOD_UPPER);
-		    copied = 1;
-		    break;
-		}
 	    }
 	}
 	/*
