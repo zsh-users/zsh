@@ -1,3 +1,7 @@
+2007-12-14  Peter Stephenson  <pws@csr.com>
+
+	* 24251: Doc/ztexi.yo: fix sitem() macro.
+
 2007-12-13  Clint Adams  <clint@zsh.org>
 
 	* 24242: Functions/Calendar/calendar_add, Functions/Example/cat,

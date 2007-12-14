@@ -183,7 +183,7 @@ def(endsitem)(0)(\
   enditem()\
 )
 def(sitem)(2)(\
-  item(ARG1)(NL()ARG2)\
+  item(ARG1)(+NL()ARG2)\
 )
 def(sxitem)(1)(\
   xitem(ARG1)\
