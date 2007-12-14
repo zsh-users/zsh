@@ -52,6 +52,10 @@
 # undef HAVE_SYS_UTSNAME_H
 #endif
 
+#if defined(ZSH_CURSES_SOURCE) && defined(ZSH_CURSES_NEEDS_XOPEN)
+#define _XOPEN_SOURCE_EXTENDED 1
+#endif
+
 /*
  * Solaris by default zeroes all elements of the tm structure in
  * strptime().  Unfortunately that gives us no way of telling whether

@@ -27,7 +27,7 @@
  *
  */
 
-#define _XOPEN_SOURCE_EXTENDED 1
+#define ZSH_CURSES_SOURCE 1
 
 #include "curses.mdh"
 #include "curses.pro"

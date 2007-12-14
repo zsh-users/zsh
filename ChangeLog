@@ -1,5 +1,8 @@
 2007-12-14  Peter Stephenson  <pws@csr.com>
 
+	* 24252: configure.ac, Src/system.h, Src/Modules/curses.c:
+	_XOPEN_SOURCE_EXTENDED was causing problems on OpenBSD.
+
 	* 24251: Doc/ztexi.yo: fix sitem() macro.
 
 2007-12-13  Clint Adams  <clint@zsh.org>

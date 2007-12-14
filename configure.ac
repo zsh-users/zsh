@@ -669,6 +669,22 @@ fi],
    termcap_curses_order="$ncursesw_test tinfo termcap $ncurses_test curses" ;;
 esac])dnl
 
+AH_TEMPLATE([ZSH_CURSES_NEEDS_XOPEN],
+[Define if the curses libraries need _XOPEN_SOURCE_EXTENDED defined])
+AC_CACHE_CHECK(if the curses library needs _XOPEN_SOURCE_EXTENDED,
+zsh_cv_curses_needs_xopen,
+[case "$host_os" in
+  *openbsd*)
+  zsh_cv_curses_needs_xopen=no
+  ;;
+  *)
+  zsh_cv_curses_needs_xopen=yes
+  ;;
+esac])
+if test x$zsh_cv_curses_needs_xopen = xyes; then
+  AC_DEFINE(ZSH_CURSES_NEEDS_XOPEN)
+fi
+
 AH_TEMPLATE([HAVE_BOOLCODES],
 [Define if you have the termcap boolcodes symbol.])
 AH_TEMPLATE([HAVE_NUMCODES],
