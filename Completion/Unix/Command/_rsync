@@ -158,7 +158,7 @@ _arguments -s \
   '--chmod[change destination permissions]:mods' \
   '(-S --sparse)'{-S,--sparse}'[handle sparse files efficiently]' \
   '(-n --dry-run)'{-n,--dry-run}'[show what would have been transferred]' \
-  '(-W --whole-file)'{-W,--whole-file}'[copy files whole (without rsync algorithm)]' \
+  '(-W --whole-file)'{-W,--whole-file}'[copy files whole (without delta-transfer algorithm)]' \
   {--no-W,--no-whole-file}'[turn off --whole-file]' \
   '(-x --one-file-system)'{-x,--one-file-system}'[do not cross filesystem boundaries]' \
   '(-B --block-size)'{-B,--block-size=}'[force a fixed checksum block-size]:block size' \

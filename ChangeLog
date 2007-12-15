@@ -1,3 +1,8 @@
+2007-12-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: Improved the help
+	text of the --whole-file option.
+
 2007-12-14  Peter Stephenson  <pws@csr.com>
 
 	* 24252: configure.ac, Src/system.h, Src/Modules/curses.c:
