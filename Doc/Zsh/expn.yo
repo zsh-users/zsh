@@ -788,7 +788,7 @@ This forces the value of the parameter var(name) to be interpreted as a
 further parameter name, whose value will be used where appropriate.
 Note that flags set with one of the tt(typeset) family of commands
 (in particular case transformations) are not applied to the value of
-var(name) used in htis fashion.
+var(name) used in this fashion.
 
 If used with a nested parameter or command substitution, the result of that
 will be taken as a parameter name in the same way.  For example, if you
