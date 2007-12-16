@@ -1,5 +1,7 @@
 2007-12-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24268: Completion/Unix/Type/_mailboxes: handle backslashed =.
+
 	* 24264: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Src/params.c,
 	Src/subst.c, Src/zsh.h, Test/B02typeset.ztst: restrict the
 	effect of 24234 to expansion in the parameter substitution code

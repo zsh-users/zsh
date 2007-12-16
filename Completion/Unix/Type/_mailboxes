@@ -150,7 +150,7 @@ _mua_mailboxes() {
       fi
       ;;
     (*:mutt:*)
-      if compset -P '='; then
+      if compset -P '(|\\)='; then
         mbox_names=( "${_mutt_cache[@]#[+=]}" "${(@)_mbox_cache#$~maildirectory/}" "${(@)_maildir_cache#$~maildirectory/}" "${(@)_mh_cache#$~maildirectory/}")
       elif compset -P +; then
         mbox_names=( "${_mutt_cache[@]#[+=]}" "${(@)_mbox_cache#$~maildirectory/}" "${(@)_maildir_cache#$~maildirectory/}" "${(@)_mh_cache#$~maildirectory/}")
