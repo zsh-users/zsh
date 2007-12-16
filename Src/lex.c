@@ -548,6 +548,11 @@ add(int c)
 		else\
 		    parend = inbufct;} }
 
+/*
+ * Return 1 for math, 0 for a command, 2 for an error.  If it couldn't be
+ * parsed as math, but there was no gross error, it's a command.
+ */
+
 static int
 cmd_or_math(int cs_type)
 {
@@ -558,14 +563,19 @@ cmd_or_math(int cs_type)
     c = dquote_parse(')', 0);
     cmdpop();
     *bptr = '\0';
-    if (c)
-	return 1;
-    c = hgetc();
-    if (c == ')')
-	return 1;
-    hungetc(c);
-    lexstop = 0;
-    c = ')';
+    if (!c) {
+	/* Successfully parsed, see if it was math */
+	c = hgetc();
+	if (c == ')')
+	    return 1; /* yes */
+	hungetc(c);
+	lexstop = 0;
+	c = ')';
+    } else if (lexstop) {
+	/* we haven't got anything to unget */
+	return 2;
+    }
+    /* else unsuccessful: unget the whole thing */
     hungetc(c);
     lexstop = 0;
     while (len > oldlen) {
@@ -576,18 +586,25 @@ cmd_or_math(int cs_type)
     return 0;
 }
 
+
+/*
+ * Parse either a $(( ... )) or a $(...)
+ * Return 0 on success, 1 on failure.
+ */
 static int
 cmd_or_math_sub(void)
 {
-    int c = hgetc();
+    int c = hgetc(), ret;
 
     if (c == '(') {
 	add(Inpar);
 	add('(');
-	if (cmd_or_math(CS_MATHSUBST)) {
+	if ((ret = cmd_or_math(CS_MATHSUBST)) == 1) {
 	    add(')');
 	    return 0;
 	}
+	if (ret == 2)
+	    return 1;
 	bptr -= 2;
 	len -= 2;
     } else {
@@ -781,7 +798,16 @@ gettok(void)
 	    if (incmdpos) {
 		len = 0;
 		bptr = tokstr = (char *) hcalloc(bsiz = 32);
-		return cmd_or_math(CS_MATH) ? DINPAR : INPAR;
+		switch (cmd_or_math(CS_MATH)) {
+		case 1:
+		    return DINPAR;
+
+		case 0:
+		    return INPAR;
+
+		default:
+		    return LEXERR;
+		}
 	    }
 	} else if (d == ')')
 	    return INOUTPAR;
@@ -1328,6 +1354,9 @@ gettokstr(int c, int sub)
     return peek;
 }
 
+
+/* Return non-zero for error (character to unget), else zero */
+
 /**/
 static int
 dquote_parse(char endchar, int sub)
@@ -1466,6 +1495,10 @@ dquote_parse(char endchar, int sub)
 	 * to hungetc() a character on an error.  However, I don't
 	 * understand what that actually gets us, and we can't guarantee
 	 * it's a character anyway, because of the previous test.
+	 *
+	 * We use the same feature in cmd_or_math we we actually do
+	 * need to unget if we decide it's really a command substitution.
+	 * We try to handle the other case by testing for lexstop.
 	 */
 	err = c;
     }

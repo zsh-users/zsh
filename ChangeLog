@@ -1,5 +1,8 @@
 2007-12-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24271: Src/lex.c, Test/C01arith.ztst: handle parse failures
+	in math substitution better.
+
 	* 24268: Completion/Unix/Type/_mailboxes: handle backslashed =.
 
 	* 24264: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Src/params.c,

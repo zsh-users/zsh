@@ -153,3 +153,12 @@
   print $(( 37#z ))
 1:bases beyond 36 don't work
 ?(eval):1: invalid base: 37
+
+  print $(( 3 + "fail" ))
+1:parse failure in arithmetic
+?(eval):1: bad math expression: operand expected at `"fail" '
+
+  alias 3=echo
+  print $(( 3 + "OK"); echo "Worked")
+0:not a parse failure because not arithmetic
+>+ OK Worked
