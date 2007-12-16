@@ -4,7 +4,7 @@ ZSH CONTRIBUTORS
 
 Zsh was originally written by Paul Falstad <pf@zsh.org>.  Zsh is
 now maintained by the members of the zsh-workers mailing list
-<zsh-workers@sunsite.auc.dk>.  The development is currently coordinated
+<zsh-workers@sunsite.dk>.  The development is currently coordinated
 by Peter Stephenson <pws@zsh.org>.
 
 This file credits only the major contributors to the current release.
@@ -14,6 +14,153 @@ are included for disambiguation purposes only, and are not guaranteed
 to be currently accurate.  If you feel that you or someone else have
 been unfairly omitted from this list please mail the current maintainer
 at <coordinator@zsh.org>.
+
+Version 4.2
+-----------
+
+The contributor list is similar to that for 4.1.1.
+
+Much of the work porting patches from the 4.3 to the 4.2 branch
+has been done by Paul Ackersviller <pda@sdf.lonestar.org>.
+
+Version 4.1.1
+-------------
+
+Clint Adams <clint@zsh.org>: termcap/terminfo, completion, configuration,
+various modules, networking, prompts
+
+Andrey Borzenkov <bor@zsh.org>: configuration, completion functions, cygwin
+support
+
+Chmouel Boudjnah <chmouel@mandrakesoft.com>: Linux completion support
+
+Wayne Davison <wayned@users.sourceforge.net>: shell history mechanism,
+arithmetic
+
+Zvi Har'El <rl@math.technion.ac.il>: completion functions
+
+Doug Kearns  <djkea2@mugca.its.monash.edu.au>: completion functions
+
+Oliver Kiddle <opk@zsh.org>: builtins, completion, parameters, prompts,
+standards support, tests
+
+Andrew Main <zefram@zsh.org>: zle keymaps, games
+
+Akinori Musha: BSD completion support
+
+Felix Rosencrantz <f_rosenkrantz@yahoo.com>: completion, zle
+
+Bart Schaefer <schaefer@zsh.org>: configuration, parameters, prompts,
+signals, syntax, tests, functions, sanity checking
+
+Adam Spiers <adam@spiers.net>: completion and other functions
+
+Peter Stephenson <pws@zsh.org>: configuration, zle, networking, syntax,
+completion
+
+Tanaka Akira <akr@zsh.org>: completion functions
+
+Philippe Troin <phil@fifi.org>: signals, process groups.
+
+Geoff Wing <gcw@zsh.org>: archiving and distribution network, line editor
+display, configuration
+
+Sven Wischnowsky <wischnow@zsh.org>: internal completion mechanism and
+low-level functions, line editor internals, syntax, wordcode mechanism,
+
+
+Version 4.0.1
+-------------
+
+Clint Adams <schizo@debian.org>: Completion functions, general
+configuration and module issues.
+
+Andrej Borsenkow <bor@zsh.org>: Cygwin support,
+configuration, completion functions.
+
+Chmouel Boudjnah <chmouel@mandrakesoft.com>: configuration support.
+
+Wayne Davison <wayned@users.sourceforge.net>: History code.
+
+Alexandre Duret-Lutz: completion functions and substitution code.
+
+Oliver Kiddle <opk@zsh.org>: Modules and completion functions, AIX support.
+
+Andrew Main <zefram@zsh.org>: Parameters and arithmetic, configuration.
+
+Felix Rosencrantz <f_rosencrantz@yahoo.com>: Test code and shell functions.
+
+Bart Schaefer <schaefer@zsh.org>: bits of everything in all parts of code;
+general sanity control.
+
+Adam Spiers <adam@spiers.net>: Completion and other functions, completion
+caching.
+
+Peter Stephenson <pws@zsh.org>: configuration and installation, parameters,
+completion functions and configuration.
+
+Tanaka Akira <akr@zsh.org>: Completion and test functions.
+
+Geoff Wing <gcw@zsh.org>: FTP and mailing list archive
+
+Sven Wischnowsky <wischnow@zsh.org>: Most of the completion code, zpty,
+signal queueing, parameters, builtins, builtouts, built-here-and-theres;
+mend garden shed, rewire electricity, reinstall shutters, fix TV aerial in
+howling gale...
+
+Other patches from E. Jay Birkenbilt, Jan Fedak, Ulrik Haugen, Paul
+Johnson, Fr. Br. George (George V Kouryachy).
+
+Versions 3.1.7 to 3.1.9
+-----------------------
+
+* Clint Adams <schizo@debian.org>: configuration, various fixes esp. in
+  completion
+
+* Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>:design, testing and
+  patches for completion system, documentation, various other fixes
+
+* Chmouel Boudjnah <chmouel@mandrakesoft.com>: design, testing and patches
+  for completion system, documentation, various other fixes
+
+* Wayne Davison <wayne@clari.net>: History code
+
+* Alexandre Duret-Lutz <duret_g@epita.fr>: design, testing and patches for
+  completion system, documentation, various other fixes
+
+* Oliver Kiddle <opk@zsh.org>: AIX dynamic library support, various
+  completion functions, web page maintenance, documentation fixes
+
+* Andrew Main <zefram@zsh.org>: configuration and module/DLL code, IPv6
+  support, various other bits
+
+* Felix Rosencrantz <f_rosencrantz@yahoo.com>: design, testing and patches
+  for completion system, documentation, various other fixes
+
+* Bart Schaefer <schaefer@zsh.org>: documentation and many other bits,
+  archive maintenance
+
+* Adam Spiers <adam@spiers.net>: various completion functions, source code
+  archive maintenance, documentation fixes, prompt themes
+
+* Peter Stephenson <pws@zsh.org>: pattern matching code rewrite and
+  enhancements, typeset and local variables, zftp maintenance, general
+  configuration, floating point support
+
+* Tanaka Akira <akr@zsh.org>: CVS archive, numerous completion functions
+  for common commands, regex shell function state machine
+
+* Geoff Wing <gcw@zsh.org>: mailing list and FTP archive, various other
+  bits
+
+* Sven Wischnowsky <wischnow@zsh.org>: almost all completion code including
+  all comp* libraries, all core functions in completion function system;
+  styles; job control code; rewrite of internal shell code structures and
+  parsing and execution code to use word code; parameter code; repair roof,
+  fix guttering, put up shelves in study, recarpet hall, ...
+
+Other patches were submitted by Will Day, Irving Wolfe, John Williams, Vin
+Shelton, Akim Demaille, Helmut Jarausch, Gene Cohler, Johan Sundström.
 
 Version 3.1.6
 -------------
