@@ -599,7 +599,8 @@ struct value {
 
 enum {
     VALFLAG_INV =	0x0001,	/* We are performing inverse subscripting */
-    VALFLAG_EMPTY =	0x0002	/* Subscripted range is empty */
+    VALFLAG_EMPTY =	0x0002,	/* Subscripted range is empty */
+    VALFLAG_SUBST =     0x0004  /* Substitution, so apply padding, case flags */
 };
 
 #define MAX_ARRLEN    262144

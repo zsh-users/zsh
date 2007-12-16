@@ -1889,128 +1889,130 @@ getstrvalue(Value v)
 	break;
     }
 
-    if (v->pm->node.flags & (PM_LEFT|PM_RIGHT_B|PM_RIGHT_Z)) {
-	int fwidth = v->pm->width ? v->pm->width : MB_METASTRLEN(s);
-	switch (v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
-	    char *t, *tend;
-	    unsigned int t0;
+    if (v->flags & VALFLAG_SUBST) {
+	if (v->pm->node.flags & (PM_LEFT|PM_RIGHT_B|PM_RIGHT_Z)) {
+	    int fwidth = v->pm->width ? v->pm->width : MB_METASTRLEN(s);
+	    switch (v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
+		char *t, *tend;
+		unsigned int t0;
 
-	case PM_LEFT:
-	case PM_LEFT | PM_RIGHT_Z:
-	    t = s;
-	    if (v->pm->node.flags & PM_RIGHT_Z)
-		while (*t == '0')
-		    t++;
-	    else
-		while (iblank(*t))
-		    t++;
-	    MB_METACHARINIT();
-	    for (tend = t, t0 = 0; t0 < fwidth && *tend; t0++)
-		tend += MB_METACHARLEN(tend);
-	    /*
-	     * t0 is the number of characters from t used,
-	     * hence (fwidth - t0) is the number of padding
-	     * characters.  fwidth is a misnomer: we use
-	     * character counts, not character widths.
-	     *
-	     * (tend - t) is the number of bytes we need
-	     * to get fwidth characters or the entire string;
-	     * the characters may be multiple bytes.
-	     */
-	    fwidth -= t0; /* padding chars remaining */
-	    t0 = tend - t; /* bytes to copy from string */
-	    s = (char *) hcalloc(t0 + fwidth + 1);
-	    memcpy(s, t, t0);
-	    if (fwidth)
-		memset(s + t0, ' ', fwidth);
-	    s[t0 + fwidth] = '\0';
-	    break;
-	case PM_RIGHT_B:
-	case PM_RIGHT_Z:
-	case PM_RIGHT_Z | PM_RIGHT_B:
-	    {
-		int zero = 1;
-		/* Calculate length in possibly multibyte chars */
-		unsigned int charlen = MB_METASTRLEN(s);
+	    case PM_LEFT:
+	    case PM_LEFT | PM_RIGHT_Z:
+		t = s;
+		if (v->pm->node.flags & PM_RIGHT_Z)
+		    while (*t == '0')
+			t++;
+		else
+		    while (iblank(*t))
+			t++;
+		MB_METACHARINIT();
+		for (tend = t, t0 = 0; t0 < fwidth && *tend; t0++)
+		    tend += MB_METACHARLEN(tend);
+		/*
+		 * t0 is the number of characters from t used,
+		 * hence (fwidth - t0) is the number of padding
+		 * characters.  fwidth is a misnomer: we use
+		 * character counts, not character widths.
+		 *
+		 * (tend - t) is the number of bytes we need
+		 * to get fwidth characters or the entire string;
+		 * the characters may be multiple bytes.
+		 */
+		fwidth -= t0; /* padding chars remaining */
+		t0 = tend - t; /* bytes to copy from string */
+		s = (char *) hcalloc(t0 + fwidth + 1);
+		memcpy(s, t, t0);
+		if (fwidth)
+		    memset(s + t0, ' ', fwidth);
+		s[t0 + fwidth] = '\0';
+		break;
+	    case PM_RIGHT_B:
+	    case PM_RIGHT_Z:
+	    case PM_RIGHT_Z | PM_RIGHT_B:
+		{
+		    int zero = 1;
+		    /* Calculate length in possibly multibyte chars */
+		    unsigned int charlen = MB_METASTRLEN(s);
 
-		if (charlen < fwidth) {
-		    char *valprefend = s;
-		    int preflen;
-		    if (v->pm->node.flags & PM_RIGHT_Z) {
-			/*
-			 * This is a documented feature: when deciding
-			 * whether to pad with zeroes, ignore
-			 * leading blanks already in the value;
-			 * only look for numbers after that.
-			 * Not sure how useful this really is.
-			 * It's certainly confusing to code around.
-			 */
-			for (t = s; iblank(*t); t++)
-			    ;
-			/*
-			 * Allow padding after initial minus
-			 * for numeric variables.
-			 */
-			if ((v->pm->node.flags &
-			     (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) &&
-			    *t == '-')
-			    t++;
-			/*
-			 * Allow padding after initial 0x or
-			 * base# for integer variables.
-			 */
-			if (v->pm->node.flags & PM_INTEGER) {
-			    if (isset(CBASES) &&
-				t[0] == '0' && t[1] == 'x')
-				t += 2;
-			    else if ((valprefend = strchr(t, '#')))
-				t = valprefend + 1;
+		    if (charlen < fwidth) {
+			char *valprefend = s;
+			int preflen;
+			if (v->pm->node.flags & PM_RIGHT_Z) {
+			    /*
+			     * This is a documented feature: when deciding
+			     * whether to pad with zeroes, ignore
+			     * leading blanks already in the value;
+			     * only look for numbers after that.
+			     * Not sure how useful this really is.
+			     * It's certainly confusing to code around.
+			     */
+			    for (t = s; iblank(*t); t++)
+				;
+			    /*
+			     * Allow padding after initial minus
+			     * for numeric variables.
+			     */
+			    if ((v->pm->node.flags &
+				 (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) &&
+				*t == '-')
+				t++;
+			    /*
+			     * Allow padding after initial 0x or
+			     * base# for integer variables.
+			     */
+			    if (v->pm->node.flags & PM_INTEGER) {
+				if (isset(CBASES) &&
+				    t[0] == '0' && t[1] == 'x')
+				    t += 2;
+				else if ((valprefend = strchr(t, '#')))
+				    t = valprefend + 1;
+			    }
+			    valprefend = t;
+			    if (!*t)
+				zero = 0;
+			    else if (v->pm->node.flags &
+				     (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) {
+				/* zero always OK */
+			    } else if (!idigit(*t))
+				zero = 0;
 			}
-			valprefend = t;
-			if (!*t)
-			    zero = 0;
-			else if (v->pm->node.flags &
-				 (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) {
-			    /* zero always OK */
-			} else if (!idigit(*t))
-			    zero = 0;
+			/* number of characters needed for padding */
+			fwidth -= charlen;
+			/* bytes from original string */
+			t0 = strlen(s);
+			t = (char *) hcalloc(fwidth + t0 + 1);
+			/* prefix guaranteed to be single byte chars */
+			preflen = valprefend - s;
+			memset(t + preflen, 
+			       (((v->pm->node.flags & PM_RIGHT_B)
+				 || !zero) ?       ' ' : '0'), fwidth);
+			/*
+			 * Copy - or 0x or base# before any padding
+			 * zeroes.
+			 */
+			if (preflen)
+			    memcpy(t, s, preflen);
+			memcpy(t + preflen + fwidth,
+			       valprefend, t0 - preflen);
+			t[fwidth + t0] = '\0';
+			s = t;
+		    } else {
+			/* Need to skip (charlen - fwidth) chars */
+			for (t0 = charlen - fwidth; t0; t0--)
+			    s += MB_METACHARLEN(s);
 		    }
-		    /* number of characters needed for padding */
-		    fwidth -= charlen;
-		    /* bytes from original string */
-		    t0 = strlen(s);
-		    t = (char *) hcalloc(fwidth + t0 + 1);
-		    /* prefix guaranteed to be single byte chars */
-		    preflen = valprefend - s;
-		    memset(t + preflen, 
-			   (((v->pm->node.flags & PM_RIGHT_B)
-			     || !zero) ?       ' ' : '0'), fwidth);
-		    /*
-		     * Copy - or 0x or base# before any padding
-		     * zeroes.
-		     */
-		    if (preflen)
-			memcpy(t, s, preflen);
-		    memcpy(t + preflen + fwidth,
-			   valprefend, t0 - preflen);
-		    t[fwidth + t0] = '\0';
-		    s = t;
-		} else {
-		    /* Need to skip (charlen - fwidth) chars */
-		    for (t0 = charlen - fwidth; t0; t0--)
-			s += MB_METACHARLEN(s);
 		}
+		break;
 	    }
+	}
+	switch (v->pm->node.flags & (PM_LOWER | PM_UPPER)) {
+	case PM_LOWER:
+	    s = casemodify(s, CASMOD_LOWER);
+	    break;
+	case PM_UPPER:
+	    s = casemodify(s, CASMOD_UPPER);
 	    break;
 	}
-    }
-    switch (v->pm->node.flags & (PM_LOWER | PM_UPPER)) {
-    case PM_LOWER:
-	s = casemodify(s, CASMOD_LOWER);
-	break;
-    case PM_UPPER:
-	s = casemodify(s, CASMOD_UPPER);
-	break;
     }
     if (v->start == 0 && v->end == -1)
 	return s;

@@ -1429,6 +1429,11 @@ tt(exported), tt(integer), tt(readonly)).  If tt(+m) is used with attribute
 flags, and all those flags are introduced with tt(PLUS()), the matching
 parameter names are printed but their values are not.
 
+Attribute flags that transform the final value (tt(-L), tt(-R), tt(-Z),
+tt(-l), tt(u)) are only applied to the expanded value at the point
+of a parameter expansion expression using `tt($)'.  They are not applied
+when a parameter is retrieved internally by the shell for any purpose. 
+
 The following attribute flags may be specified:
 
 startitem()

@@ -785,8 +785,12 @@ with `tt(a)', `tt(i)' or `tt(n)' to reverse the order of sorting.
 )
 item(tt(P))(
 This forces the value of the parameter var(name) to be interpreted as a
-further parameter name, whose value will be used where appropriate. If
-used with a nested parameter or command substitution, the result of that
+further parameter name, whose value will be used where appropriate.
+Note that flags set with one of the tt(typeset) family of commands
+(in particular case transformations) are not applied to the value of
+var(name) used in htis fashion.
+
+If used with a nested parameter or command substitution, the result of that
 will be taken as a parameter name in the same way.  For example, if you
 have `tt(foo=bar)' and `tt(bar=baz)', the strings tt(${(P)foo}),
 tt(${(P)${foo}}), and tt(${(P)$(echo bar)}) will be expanded to `tt(baz)'.
@@ -1062,7 +1066,7 @@ which is expanded by filename expansion to a full path; the outer
 substitution then applies the modifier tt(:h) and takes the directory part
 of the path.)
 )
-time(tt(2.) em(Internal Parameter Flags))(
+item(tt(2.) em(Internal Parameter Flags))(
 Any parameter flags set by one of the tt(typeset) family of commands,
 in particular the tt(L), tt(R), tt(Z), tt(u) and tt(l) flags for padding
 and capitalization, are applied directly to the parameter value.

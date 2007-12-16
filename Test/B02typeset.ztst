@@ -430,17 +430,17 @@
  local case1=upper
  typeset -u case1
  print $case1
- UPPER="VALUE OF \$UPPER"
+ upper="VALUE OF \$UPPER"
  print ${(P)case1}
-0:Upper case conversion
+0:Upper case conversion, does not apply to values used internally
 >UPPER
 >VALUE OF $UPPER
 
  local case2=LOWER
  typeset -l case2
  print $case2
- lower="value of \$lower"
+ LOWER="value of \$lower"
  print ${(P)case2}
-0:Lower case conversion
+0:Lower case conversion, does not apply to values used internally
 >lower
 >value of $lower

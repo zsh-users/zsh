@@ -2059,8 +2059,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		 * There really is a value.  Padding and case
 		 * transformations used to be handled here, but
 		 * are now handled in getstrvalue() for greater
-		 * consistency.
+		 * consistency.  However, we get unexpected effects
+		 * if we allow them to applied on every call, so
+		 * set the flag that allows them to be substituted.
 		 */
+		v->flags |= VALFLAG_SUBST;
 		val = getstrvalue(v);
 	    }
 	}
