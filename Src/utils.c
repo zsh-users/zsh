@@ -4653,7 +4653,7 @@ mod_export char *
 getkeystring(char *s, int *len, int how, int *misc)
 {
     char *buf, tmp[1];
-    char *t, *tdest = NULL, *u = NULL, *sstart = s, *tbuf;
+    char *t, *tdest = NULL, *u = NULL, *sstart = s, *tbuf = NULL;
     char svchar = '\0';
     int meta = 0, control = 0;
     int i;

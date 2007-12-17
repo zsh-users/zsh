@@ -1,5 +1,7 @@
 2007-12-17  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/utils.c: suppress harmless warning.
+
 	* 24275: Src/builtin.c, Src/Zle/zle_utils.c,
 	Test/D07multibyte.ztst: Solaris returns the full character
 	length from mbrlen() etc. even if the call started in the
