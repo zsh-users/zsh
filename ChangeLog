@@ -1,3 +1,7 @@
+2007-12-17  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: 4.2.7.
+
 2007-12-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Etc/CONTRIBUTORS: add Paul Ackersviller to the 4.2 bit.
