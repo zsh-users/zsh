@@ -1,3 +1,8 @@
+2007-12-17  Peter Stephenson  <pws@csr.com>
+
+	* Wayne: 24273: Src/Modules/curses.c: various macros
+	aren't supposed to return a value.
+
 2007-12-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24271: Src/lex.c, Test/C01arith.ztst: handle parse failures

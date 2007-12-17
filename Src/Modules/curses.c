@@ -1329,9 +1329,14 @@ zccmd_position(const char *nam, char **args)
     w = (ZCWin)getdata(node);
 
     /* Look no pointers:  these are macros. */
-    if (getyx(w->win, intarr[0], intarr[1]) == ERR ||
-	getbegyx(w->win, intarr[2], intarr[3]) == ERR ||
-	getmaxyx(w->win, intarr[4], intarr[5]) == ERR)
+    getyx(w->win, intarr[0], intarr[1]);
+    if (intarr[0] == -1)
+	return 1;
+    getbegyx(w->win, intarr[2], intarr[3]);
+    if (intarr[2] == -1)
+	return 1;
+    getmaxyx(w->win, intarr[4], intarr[5]);
+    if (intarr[4] == -1)
 	return 1;
 
     array = (char **)zalloc(7*sizeof(char *));
