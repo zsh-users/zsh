@@ -1,5 +1,10 @@
 2007-12-17  Peter Stephenson  <pws@csr.com>
 
+	* 24275: Src/builtin.c, Src/Zle/zle_utils.c,
+	Test/D07multibyte.ztst: Solaris returns the full character
+	length from mbrlen() etc. even if the call started in the
+	middle; bad characters are silently converted to a question mark.
+
 	* unposted: Config/version.mk: 4.3.4-dev-5.
 
 	* unposted: Src/lex.c: minor typo

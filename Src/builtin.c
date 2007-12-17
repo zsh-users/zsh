@@ -4927,7 +4927,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		    break;
 		}
 		*bptr = (char) val;
-#ifdef MULTIBYTE_SUPPORT	
+#ifdef MULTIBYTE_SUPPORT
 		if (isset(MULTIBYTE)) {
 		    ret = mbrlen(bptr++, 1, &mbs);
 		    if (ret == MB_INVALID)
@@ -4954,8 +4954,8 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		    eof = 1;
 		    break;
 		}
-	    
-#ifdef MULTIBYTE_SUPPORT	
+
+#ifdef MULTIBYTE_SUPPORT
 		if (isset(MULTIBYTE)) {
 		    while (val > 0) {
 			ret = mbrlen(bptr, val, &mbs);
@@ -4970,6 +4970,10 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 			    }
 			    else if (ret == 0) /* handle null as normal char */
 				ret = 1;
+			    else if (ret > val) {
+				/* Some mbrlen()s return the full char len */
+				ret = val;
+			    }
 			    nchars--;
 			    val -= ret;
 			    bptr += ret;

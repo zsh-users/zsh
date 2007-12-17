@@ -294,6 +294,16 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 		 * (certainly true for Unicode and unlikely to be false
 		 * in any non-pathological multibyte representation). */
 		cnt = 1;
+	    } else if (cnt > ll) {
+		/*
+		 * Some multibyte implementations return the
+		 * full length of a previous incomplete character
+		 * instead of the remaining length.
+		 * This is paranoia: it only applies if we start
+		 * midway through a multibyte character, which
+		 * presumably can't happen.
+		 */
+		cnt = ll;
 	    }
 
 	    if (outcs) {
@@ -843,6 +853,12 @@ showmsg(char const *msg)
 		cnt = 1;
 		/* FALL THROUGH */
 	    default:
+		/*
+		 * Paranoia: only needed if we start in the middle
+		 * of a multibyte string and only in some implementations.
+		 */
+		if (cnt > ulen)
+		    cnt = ulen;
 		n = wcs_nicechar(c, &width, NULL);
 		break;
 	    }

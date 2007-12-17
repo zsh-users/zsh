@@ -388,9 +388,18 @@
 # This also isn't strictly multibyte and is here to reduce the
 # likelihood of a "can't do character set conversion" error.
   testfn() { (LC_ALL=C; print $'\u00e9') }
-  repeat 4 testfn
-1:error handling in Unicode quoting
-?testfn: character not in range
-?testfn: character not in range
-?testfn: character not in range
-?testfn: character not in range
+  repeat 4 testfn 2>&1 | while read line; do
+    if [[ $line = *"character not in range"* ]]; then
+      print OK
+    elif [[ $line = "?" ]]; then
+      print OK
+    else
+      print Failed: no error message and no question mark
+    fi
+  done
+  true
+0:error handling in Unicode quoting
+>OK
+>OK
+>OK
+>OK
