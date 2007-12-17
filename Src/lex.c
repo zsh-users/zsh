@@ -1496,7 +1496,7 @@ dquote_parse(char endchar, int sub)
 	 * understand what that actually gets us, and we can't guarantee
 	 * it's a character anyway, because of the previous test.
 	 *
-	 * We use the same feature in cmd_or_math we we actually do
+	 * We use the same feature in cmd_or_math where we actually do
 	 * need to unget if we decide it's really a command substitution.
 	 * We try to handle the other case by testing for lexstop.
 	 */

@@ -2,6 +2,8 @@
 
 	* unposted: Config/version.mk: 4.3.4-dev-5.
 
+	* unposted: Src/lex.c: minor typo
+
 	* Wayne: 24273: Src/Modules/curses.c: various macros
 	aren't supposed to return a value.
 
