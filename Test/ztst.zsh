@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh -f
+#!/bin/zsh -f
 # The line above is just for convenience.  Normally tests will be run using
 # a specified version of zsh.  With dynamic loading, any required libraries
 # must already have been installed in that case.

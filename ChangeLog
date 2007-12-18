@@ -1,3 +1,10 @@
+2007-12-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24289 plus change suggested by Ismail in 24290:
+	Test/Makefile.in, Test/runtests.zsh, Test/ztst.zsh,
+	Test/.distfiles: count successful and unsuccessful scripts
+	and report with status.
+
 2007-12-18  Peter Stephenson  <pws@csr.com>
 
 	* 24279: Src/jobs.c, Src/zle_main.c, Src/zle_thingy.c: allow
