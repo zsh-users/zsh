@@ -93,7 +93,7 @@ static struct tms shtms;
 /* 1 if ttyctl -f has been executed */
  
 /**/
-int ttyfrozen;
+mod_export int ttyfrozen;
 
 /* Previous values of errflag and breaks if the signal handler had to
  * change them. And a flag saying if it did that. */

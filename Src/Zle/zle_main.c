@@ -208,10 +208,21 @@ mod_export void
 zsetterm(void)
 {
     struct ttyinfo ti;
-
 #if defined(FIONREAD)
     int val;
+#endif
 
+    if (fetchttyinfo) {
+	/*
+	 * User requested terminal to be returned to normal use,
+	 * so remember the terminal settings if not frozen.
+	 */
+	if (!ttyfrozen)
+	    gettyinfo(&shttyinfo);
+	fetchttyinfo = 0;
+    }
+
+#if defined(FIONREAD)
     ioctl(SHTTY, FIONREAD, (char *)&val);
     if (val) {
 	/*
@@ -1113,6 +1124,7 @@ zleread(char **lp, char **rp, int flags, int context)
     insmode = unset(OVERSTRIKE);
     eofsent = 0;
     resetneeded = 0;
+    fetchttyinfo = 0;
     raw_lp = lp;
     lpromptbuf = promptexpand(lp ? *lp : NULL, 1, NULL, NULL);
     pmpt_attr = txtchange;

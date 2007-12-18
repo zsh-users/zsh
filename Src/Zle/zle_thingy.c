@@ -711,6 +711,17 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     return ret;
 }
 
+
+/*
+ * Flag that the user has requested the terminal be trashed
+ * for whatever use.  We attempt to keep the tty settings in
+ * this mode synced with the normal (non-zle) settings unless
+ * they are frozen.
+ */
+
+/**/
+int fetchttyinfo;
+
 /**/
 static int
 bin_zle_invalidate(UNUSED(char *name), UNUSED(char **args), UNUSED(Options ops), UNUSED(char func))
@@ -721,7 +732,18 @@ bin_zle_invalidate(UNUSED(char *name), UNUSED(char **args), UNUSED(Options ops),
      * true if a completion widget is active.
      */
     if (zleactive) {
+	int wastrashed = trashedzle;
 	trashzle();
+	if (!wastrashed && (zlereadflags & ZLRF_NOSETTY)) {
+	    /*
+	     * We normally wouldn't have restored the terminal
+	     * in this case, but as it's at user request we do
+	     * so (hence the apparently illogical sense of the
+	     * second part of the test).
+	     */
+	    settyinfo(&shttyinfo);
+	}
+	fetchttyinfo = 1;
 	return 0;
     } else
 	return 1;

@@ -1,3 +1,9 @@
+2007-12-18  Peter Stephenson  <pws@csr.com>
+
+	* 24279: Src/jobs.c, Src/zle_main.c, Src/zle_thingy.c: allow
+	terminal changes in zle -I to be remembered in normal shell
+	settings.
+
 2007-12-17  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/utils.c: suppress harmless warning.
