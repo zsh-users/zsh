@@ -14,7 +14,7 @@
 # is-at-least 586 $MACHTYPE && echo 'You could be running Mandrake!'
 # is-at-least $ZSH_VERSION || print 'Something fishy here.'
 
-emulate zsh ; setopt LOCAL_OPTIONS
+emulate -L zsh
 
 local IFS=".-" min_cnt=0 ver_cnt=0 part min_ver version
 
