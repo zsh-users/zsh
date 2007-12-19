@@ -1,5 +1,7 @@
 2007-12-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24301: missed a case for the lower-casing fix in 23219.
+
 	* 24298: Tonguc Yumruk: Functions/Misc/is-at-least: use
 	emulate -L for consistency.
 

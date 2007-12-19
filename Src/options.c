@@ -571,7 +571,9 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 		if (*t == '_')
 		    chuck(t);
 		else {
-		    *t = tulower(*t);
+		    /* See comment in optlookup() */
+		    if (*t >= 'A' && *t <= 'Z')
+			*t = (*t - 'A') + 'a';
 		    t++;
 		}
 
