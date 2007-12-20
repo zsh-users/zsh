@@ -1,3 +1,8 @@
+2007-12-20  Peter Stephenson  <pws@csr.com>
+
+	* 24305: NEWS, README, Etc/FAQ.yo: update files in preparation
+	for 4.3.5.
+
 2007-12-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24301: missed a case for the lower-casing fix in 23219.

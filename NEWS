@@ -2,8 +2,34 @@
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
 
-Major changes between versions 4.2 and 4.3
-------------------------------------------
+Note also the list of incompatibilities in the README file.
+
+Major changes between versions 4.3.4 and 4.3.5
+----------------------------------------------
+
+- The new extended globbing flag (#cN,M) behaves similarly to the extended
+  regular expression syntax {N,M}.
+
+- The zsh/datetime module has been enhanced and a calendar function
+  system has been added along the lines of (but much enhanced from)
+  the traditional Unix "calendar" utility.  This is still under
+  development.  See the zshcalsys manual.  (The calendar functions
+  were in 4.3.4 but were not listed in this file.  There have been
+  significant enhancements since 4.3.4.)
+
+- A new module zsh/curses provides a builtin zcurses for access to
+  to the curses screen manipulation package.  See the entry for zsh/curses
+  in the zshmodules manual.
+
+- The module system has been enhanced to support the notion of "features"
+  that give more control over which builtins, parameters, conditions
+  and math functions are loaded from a module.  In particular,
+  "zmodload -F zsh/stat b:zstat" makes the builtin previously called
+  "stat" available as "zstat" (only) to avoid clashes with a system
+  command named "stat".
+
+Major changes between versions 4.2 and 4.3.4
+--------------------------------------------
 
 - There is support for multibyte character sets.  This is now reasonably
   close to complete, although Unicode combining characters don't work
