@@ -1,8 +1,3 @@
-2007-12-25  Clint Adams  <clint@zsh.org>
-
-	* 24318: Doc/ztexi.yo: drop leading spaces from direntry to cope
-	with new makeinfo behavior.
-
 2007-12-24  Clint Adams  <clint@zsh.org>
 
 	* 24316: Test/runtests.zsh, Test/ztst.zsh: count skipped tests
