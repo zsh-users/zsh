@@ -467,6 +467,7 @@ done
 
 if [[ -n "$ZTST_unimplemented" ]]; then
   print "$ZTST_testname: skipped ($ZTST_unimplemented)"
+  ZTST_testfailed=2
 elif (( ! $ZTST_testfailed )); then
   print "$ZTST_testname: all tests successful."
 fi

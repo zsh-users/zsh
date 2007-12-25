@@ -1,3 +1,8 @@
+2007-12-24  Clint Adams  <clint@zsh.org>
+
+	* 24316: Test/runtests.zsh, Test/ztst.zsh: count skipped tests
+	differently from successes and failures.
+
 2007-12-20  Peter Stephenson  <pws@csr.com>
 
 	* unposted: 4.3.4-dev-6.
