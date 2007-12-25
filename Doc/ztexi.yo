@@ -71,7 +71,7 @@ def(texinfo)(2)(\
   NOTRANS(@ifinfo)+NL()\
   NOTRANS(@dircategory Utilities)+NL()\
   NOTRANS(@direntry)+NL()\
-  NOTRANS(     * ZSH: (zsh).                     The Z Shell Manual.)+NL()\
+  NOTRANS(* ZSH: (zsh).                     The Z Shell Manual.)+NL()\
   NOTRANS(@end direntry)+NL()\
   NOTRANS(@end ifinfo)+NL()\
 )
