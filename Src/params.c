@@ -1891,7 +1891,7 @@ getstrvalue(Value v)
 
     if (v->flags & VALFLAG_SUBST) {
 	if (v->pm->node.flags & (PM_LEFT|PM_RIGHT_B|PM_RIGHT_Z)) {
-	    int fwidth = v->pm->width ? v->pm->width : MB_METASTRLEN(s);
+	    unsigned int fwidth = v->pm->width ? v->pm->width : MB_METASTRLEN(s);
 	    switch (v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 		char *t, *tend;
 		unsigned int t0;

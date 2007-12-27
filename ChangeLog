@@ -1,3 +1,8 @@
+2007-12-27  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/params.c: silenced a compiler warning by making
+	an int unsigned.
+
 2007-12-24  Clint Adams  <clint@zsh.org>
 
 	* 24316: Test/runtests.zsh, Test/ztst.zsh: count skipped tests
