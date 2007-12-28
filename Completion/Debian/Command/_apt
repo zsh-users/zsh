@@ -551,7 +551,7 @@ _apt_releases_update () {
       _cache_invalid APT_releases ) && ! _retrieve_cache APT_releases;
   then
     _apt_releases=(
-${${${${(M)${(f)"$(apt-cache dump)"}:# #Archive:*}# #Archive: #}:#*\(null\)*}/ /}
+${${${${(M)${(f)"$(apt-cache policy)"}:#*release*}#*a=}%%,*}:#now}
     )
     typeset -U _apt_releases
     _store_cache APT_releases _apt_releases

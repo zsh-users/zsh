@@ -1,3 +1,9 @@
+2007-12-27  Clint Adams  <clint@zsh.org>
+
+	* 24323: Completion/Debian/Command/_apt: for performance reasons,
+	procure release names via apt-cache policy instead of apt-cache
+	dump.
+
 2007-12-27  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/params.c: silenced a compiler warning by making
