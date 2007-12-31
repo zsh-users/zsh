@@ -4,11 +4,15 @@ _xt_arguments \
   '-g[initial window geometry]:geometry:_x_geometry' \
   '-cmap[install a private colormap]' \
   '-rgb[biggest RGB cube to allocate]:int:' \
+  '-mattecolor[color of background outside page area]:color:' \
   '-papercolor[color of paper background]:color:' \
   '-z[initial zoom level]:zoom level:' \
   '-t1lib[enable t1lib font rasterizer]:bool:(yes no)' \
   '-freetype[enable FreeType font rasterizer]:bool:(yes no)' \
   '-aa[enable font anti-aliasing]:bool:(yes no)' \
+  '-aaVector[enable vector anti-aliasing]:bool:(yes no)' \
+  '-cont[start in continuous view mode]' \
+  '-exec[execute command on xpdf remote server]:command:' \
   '-ps[default PostScript file name or command]:file or command:_files' \
   '-paper[paper size]:paper size:(letter legal A4 A3 match)' \
   '-paperw[paper width]:points:' \

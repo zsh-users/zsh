@@ -1,3 +1,8 @@
+2007-12-31  Clint Adams  <clint@zsh.org>
+
+	* 24330: Completion/X/_xpdf: add some missing options from xpdf
+	3.02.
+
 2007-12-27  Clint Adams  <clint@zsh.org>
 
 	* 24323: Completion/Debian/Command/_apt: for performance reasons,
