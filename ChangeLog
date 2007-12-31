@@ -1,3 +1,14 @@
+2007-12-31  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* J.Sommer: 24333: Functions/Misc/.distfiles,
+	Functions/Misc/run-help-git, Functions/Misc/run-help-svk,
+	Functions/Misc/run-help-svn: run-help helpers.
+
+	* 24332: Functions/Misc/run-help: use only the path tail of $1
+	when calling "man" et al.  Look for a helper function named
+	run-help-$1 to provide specific help for the command, before
+	falling back on "man".
+
 2007-12-31  Clint Adams  <clint@zsh.org>
 
 	* 24330: Completion/X/_xpdf: add some missing options from xpdf

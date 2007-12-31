@@ -85,7 +85,24 @@ do
 	man zshmisc
 	;;
     (*)
-	((! didman++)) && man $@
+	if ((! didman++))
+	then
+	    if whence "run-help-$1:t" >/dev/null
+	    then
+		local cmd_args
+		builtin getln cmd_args
+		builtin print -z "$cmd_args"
+		cmd_args=( ${(z)cmd_args} )
+		# Discard environment assignments, etc.
+		while [[ $cmd_args[1] != $1 ]]
+		do
+		    shift cmd_args
+		done
+		eval "run-help-$1:t ${(@)cmd_args[2,-1]}"
+	    else
+		man $@:t
+	    fi
+	fi
 	;;
     esac
     if ((i < $#places && ! didman))

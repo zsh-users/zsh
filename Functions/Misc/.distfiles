@@ -1,8 +1,27 @@
 DISTFILES_SRC='
 .distfiles
 add-zsh-hook
-allopt      getjobs       mere       relative   zcalc   zmv          zargs
-checkmail   harden        nslookup   run-help   zed     zrecompile
-colors      is-at-least   promptnl   tetris     zkbd    zstyle+
+allopt
+checkmail
+colors
+getjobs
+harden
+is-at-least
+mere
+nslookup
+promptnl
+relative
+run-help
+run-help-git
+run-help-svk
+run-help-svn
+tetris
+zargs
+zcalc
+zed
+zkbd
 zmathfuncdef
+zmv
+zrecompile
+zstyle+
 '
