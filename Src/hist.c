@@ -826,7 +826,7 @@ hbegin(int dohist)
     }
     chwordpos = 0;
 
-    if (hist_ring && !hist_ring->ftim)
+    if (hist_ring && !hist_ring->ftim && !strin)
 	hist_ring->ftim = time(NULL);
     if ((dohist == 2 || (interact && isset(SHINSTDIN))) && !strin) {
 	histactive = HA_ACTIVE;

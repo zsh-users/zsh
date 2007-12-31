@@ -9,6 +9,9 @@
 	run-help-$1 to provide specific help for the command, before
 	falling back on "man".
 
+	* 24324: Src/hist.c: do not set ftim when re-entering the history
+	mechanism for string substitution.
+
 2007-12-31  Clint Adams  <clint@zsh.org>
 
 	* 24330: Completion/X/_xpdf: add some missing options from xpdf
