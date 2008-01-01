@@ -1,5 +1,8 @@
 2007-12-31  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted (based on J.Sommer: 24334): Doc/Zsh/contrib.yo:
+	Document expanded behavior of run-help.
+
 	* J.Sommer: 24333: Functions/Misc/.distfiles,
 	Functions/Misc/run-help-git, Functions/Misc/run-help-svk,
 	Functions/Misc/run-help-svn: run-help helpers.

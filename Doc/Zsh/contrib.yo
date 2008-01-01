@@ -193,8 +193,8 @@ of the file is composed from the tt(TERM), tt(VENDOR) and tt(OSTYPE)
 parameters, joined by hyphens.
 
 You may read this file into your tt(.zshrc) or another startup file with
-the "source" or "." commands, then reference the tt(key) parameter in
-bindkey commands, like this:
+the `tt(source)' or `tt(.)' commands, then reference the tt(key) parameter
+in bindkey commands, like this:
 
 example(source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
 [[ -n ${key[Left]} ]] && bindkey "${key[Left]}" backward-char
@@ -2034,10 +2034,54 @@ the context prefix `tt(:completion:nslookup)'.
 
 See also the tt(pager), tt(prompt) and tt(rprompt) styles below.
 )
-item(tt(run-help))(
-See `Accessing On-Line Help'
+findex(run-help)
+item(tt(run-help) var(cmd))(
+This function is designed to be invoked by the tt(run-help) ZLE widget,
+in place of the default alias.  See `Accessing On-Line Help'
 ifzman(above)\
-ifnzman((noderef(Utilities))).
+ifnzman((noderef(Utilities))) for setup instructions.
+
+In the discussion which follows, if var(cmd) is a filesystem path, it is
+first reduced to its rightmost component (the file name).
+
+Help is first sought by looking for a file named var(cmd) in the directory
+named by the tt(HELPDIR) parameter.  If no file is found, an assistant
+function, alias, or command named tt(run-help-var(cmd)) is sought.  If
+found, the assistant is executed with the rest of the current command line
+(everything after the command name var(cmd)) as its arguments.  When
+neither file nor assistant is found, the external command
+`tt(man) var(cmd)' is run.
+
+An example assistant for the "ssh" command:
+
+example(run-help-ssh() {
+    emulate -LR zsh
+    local -a args
+    # Delete the "-l username" option
+    zparseopts -D -E -a args l:
+    # Delete other options, leaving: host command
+    args=(${@:#-*})
+    if [[ ${#args} -lt 2 ]]; then
+        man ssh
+    else
+        run-help $args[2]
+    fi
+})
+
+Several of these assistants are provided in the tt(Functions/Misc)
+directory.  These must be autoloaded, or placed as executable scripts in
+your search path, in order to be found and used by tt(run-help).
+
+startitem()
+findex(run-help-git)
+findex(run-help-svk)
+findex(run-help-svn)
+xitem(tt(run-help-git))
+xitem(tt(run-help-svk))
+item(tt(run-help-svn))(
+Assistant functions for the tt(git), tt(svk), and tt(svn) commands.
+)
+enditem()
 )
 item(tt(tetris))(
 Zsh was once accused of not being as complete as Emacs,
