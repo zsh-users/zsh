@@ -211,6 +211,18 @@ F:Failures in these cases do not indicate a problem in the shell.
 0:-nt shouldn't abort on non-existent files
 >status = 1
 
+# core dumps on failure
+  if zmodload -i zsh/regex 2>/dev/null; then
+     echo >regex_test.sh 'if [[ $# = 1 ]]; then
+	if [[ $1 =~ /?[^/]+:[0-9]+:$ ]]; then
+	  :
+	fi
+      fi
+      exit 0'
+      $ZTST_testdir/../Src/zsh -f ./regex_test.sh
+  fi
+0:regex tests shouldn't crash
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish
