@@ -9,6 +9,7 @@ _metaflac_opts=(
     '--preserve-modtime' 
     '--with-filename[prefix output with filename]' 
     '--no-filename' 
+    '--no-utf8-convert'
     '--dont-use-padding[always rewrite the file]' 
 )
 _metaflac_shorts=(
@@ -41,6 +42,7 @@ _metaflac_opers=(
     '--block-type=:: '
     '--except-block-type=:: '
     '--application-data-format=:: '
+    '--list'
     '--remove'
     '--remove-all'
     '--merge-padding'
