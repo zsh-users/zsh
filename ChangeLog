@@ -1,3 +1,8 @@
+2008-01-04  Clint Adams  <clint@zsh.org>
+
+	* 24360: Completion/Unix/Command/_du: fix misspelling of
+	--separate-dirs.
+
 2008-01-04  Peter Stephenson  <pws@csr.com>
 
 	* 25356: Src/text.c, Test/C02cond.ztst: "=~" wasn't handled by

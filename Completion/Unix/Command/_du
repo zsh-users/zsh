@@ -13,7 +13,7 @@ if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
     '(-B --block-size)-k[use block size of 1k]' \
     '(-l --count-links)'{-l,--count-links}'[count sizes many times if hard linked]' \
     '(-L --dereference -D --dereference-args)'{-L,--dereference}'[dereference all symlinks]' \
-    '(-S --separate-dirs)'{-S,--seperate-dirs}'[do not include size of subdirectories]' \
+    '(-S --separate-dirs)'{-S,--separate-dirs}'[do not include size of subdirectories]' \
     '(-s --summarize --max-depth -a --all)'{-s,--summarize}'[only display total for each argument]' \
     '(-x --one-file-system)'{-x,--one-file-system}'[skip directories on different filesystems]' \
     \*{-X+,--exclude-from=}'[exclude files matching any pattern in file]:file:_files' \
