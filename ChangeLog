@@ -1,3 +1,8 @@
+2008-01-04  Clint Adams  <clint@zsh.org>
+
+	* 24349: Functions/Misc/run-help: add comment about HELPDIR to
+	assist replacement in Debian build.
+
 2008-01-03  Clint Adams  <clint@zsh.org>
 
 	* 24345: Completion/Unix/Command/_metaflac: add --no-utf8-comment
