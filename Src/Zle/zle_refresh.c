@@ -1055,6 +1055,18 @@ refreshline(int ln)
 	ccs = lpromptw;
     }
 
+#ifdef MULTIBYTE_SUPPORT
+    /*
+     * Realign to a real character after any jiggery pokery at
+     * the start of the line.
+     */
+    while (*nl == WEOF) {
+	nl++, ccs++, vcs++;
+	if (*ol)
+	    ol++;
+    }
+#endif
+
 /* 3: main display loop - write out the buffer using whatever tricks we can */
 
     for (;;) {
