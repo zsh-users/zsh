@@ -1,0 +1,50 @@
+#compdef vim-addons
+
+local state line cmds ret=1
+typeset -A opt_args
+
+_arguments -C \
+	{-q,--query}'[be quiet and make the output more parseable]' \
+	{-r,--registry-dir}'[set the registry directory]' \
+	{-s,--source-dir}'[set addon source directory]' \
+	{-t,--target-dir}'[set addon target directory]' \
+	{-v,--verbose}'[increase verbosity]' \
+	{-y,--system-dir}'[set system-wide target directory]' \
+	{-h,--help}'[help]' \
+	{-w,--system-wide}'[set target directory to the system-wide one (overrides -t)]' \
+	'1: :->cmds' \
+	'*: :->args' && ret=0
+	
+case $state in
+  cmds)
+    cmds=(
+      'install:install the specified addon'
+      'remove:remove the specified addon'
+      'list:list available addons in registry'
+      'status:list the status of addons'
+      'disable:disable the specified addons'
+      'amend:under the effects of the previous disable'
+      'files:list the files composing the specified addon'
+      'show:display detailed information about the specified addon'
+    )
+    _describe -t commands 'vim-addons command' cmds && ret=0
+  ;;
+  args)
+    case $line[1] in
+      install)
+        _wanted addon expl 'addon' compadd $(command vim-addons -q | awk '$2 == "removed" { print $1 }') && ret=0
+      ;;
+      amend)
+        _wanted addon expl 'addon' compadd $(command vim-addons -q | awk '$2 == "disabled" { print $1 }') && ret=0
+      ;;
+      remove)
+        _wanted addon expl 'addon' compadd $(command vim-addons -q | awk '$2 ~ /disabled|installed/ { print $1 }') && ret=0
+      ;;
+      files|status|disable|show)
+        _wanted addon expl 'addon' compadd $(command vim-addons list) && ret=0
+      ;;
+    esac
+  ;;
+esac
+
+return ret
