@@ -1,5 +1,7 @@
 2008-01-08  Peter Stephenson  <pws@csr.com>
 
+	* unposted: 4.3.4-dev-7.
+
 	* 24371: Src/Zle/zle_refresh.c: potential crash when refreshing
 	scrolling chunk of large history entry.
 
