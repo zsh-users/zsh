@@ -797,7 +797,7 @@ zrefresh(void)
 		(int)ZR_strlen(nbuf[0]) + rpromptw < winw - 1;
     } else {
 /* insert >.... on first line if there is more text before start of screen */
-	memset(nbuf[0], ZWC(' '), lpromptw);
+	ZR_memset(nbuf[0], ZWC(' '), lpromptw);
 	t0 = winw - lpromptw;
 	t0 = t0 > 5 ? 5 : t0;
 	ZR_memcpy(nbuf[0] + lpromptw, ZWS(">...."), t0);
@@ -1133,6 +1133,15 @@ refreshline(int ln)
 	    if (!*ol) {
 		i = (col_cleareol >= 0) ? col_cleareol : nllen;
 		i -= vcs;
+		if (i < 0) {
+		    /*
+		     * This shouldn't be necessary, but it's better
+		     * than a crash if there's a bug somewhere else,
+		     * so report in debug mode.
+		     */
+		    DPUTS(1, "BUG: badly calculated old line width in refresh");
+		    i = 0;
+		}
 		zwrite(nl, i);
 		vcs += i;
 		if (col_cleareol >= 0)

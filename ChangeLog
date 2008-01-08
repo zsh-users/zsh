@@ -1,3 +1,8 @@
+2008-01-08  Peter Stephenson  <pws@csr.com>
+
+	* 24371: Src/Zle/zle_refresh.c: potential crash when refreshing
+	scrolling chunk of large history entry.
+
 2008-01-06  Clint Adams  <clint@zsh.org>
 
 	* Chris Lamb: 24365: Completion/Debian/Command/.distfiles,
