@@ -199,7 +199,31 @@ F:Failures in these cases do not indicate a problem in the shell.
 0:strings with `[' builtin
 
   [ `echo 0` -lt `echo 1` ]
-0:substituion in `[' builtin
+0:substitution in `[' builtin
+
+  [ -n foo scrimble ]
+1:argument checking for [ builtin
+?(eval):[:1: too many arguments
+
+  test -n foo scramble
+1:argument checking for test builtin
+?(eval):test:1: too many arguments
+
+  [ -n foo scrimble scromble ]
+1:argument checking for [ builtin
+?(eval):[:1: too many arguments
+
+  test -n foo scramble scrumble
+1:argument checking for test builtin
+?(eval):test:1: too many arguments
+
+  [ -n foo -a -n bar scrimble ]
+1:argument checking for [ builtin
+?(eval):[:1: too many arguments
+
+  test -n foo -a -z "" scramble
+1:argument checking for test builtin
+?(eval):test:1: too many arguments
 
   fn() {
     # careful: first file must exist to trigger bug

@@ -74,7 +74,7 @@ fi
 	if [[ -n $reply[rpttime] && $line = ${~uidpat} ]]; then
 	  # Yes, so record this as a recurring event.
 	  their_uid=${(U)match[1]}
-	  recurring_uids[$their_uid]=1
+	  recurring_uids[$their_uid]=$reply[time]
 	fi
       done
     fi
@@ -113,6 +113,11 @@ fi
 	      # No, so assume this is a straightforward replacement
 	      # of a non-recurring event.
 	      (( ! old_recurring )) && continue
+	      # It's recurring, but if this is a one-off at the
+	      # same time as the previous one, replace anyway.
+	      [[ -z $parse_old[$rpttime] ]] &&
+	        (( ${parse_new[time]} == ${parse_old[time]} )) &&
+		continue
 	    fi
 	  fi
 	fi

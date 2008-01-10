@@ -537,6 +537,12 @@ parse_list(void)
     return bld_eprog();
 }
 
+/*
+ * This entry point is only used for bin_test, our attempt to
+ * provide compatibility with /bin/[ and /bin/test.  Hence
+ * at this point condlex should always be set to testlex.
+ */
+
 /**/
 mod_export Eprog
 parse_cond(void)

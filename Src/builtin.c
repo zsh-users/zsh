@@ -5472,7 +5472,7 @@ zread(int izle, int *readchar)
 
 /* holds arguments for testlex() */
 /**/
-char **testargs;
+char **testargs, **curtestarg;
 
 /* test, [: the old-style general purpose logical expression builtin */
 
@@ -5483,7 +5483,7 @@ testlex(void)
     if (tok == LEXERR)
 	return;
 
-    tokstr = *testargs;
+    tokstr = *(curtestarg = testargs);
     if (!*testargs) {
 	/* if tok is already zero, reading past the end:  error */
 	tok = tok ? NULLTOK : LEXERR;
@@ -5554,6 +5554,11 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
 
     if (!prog || tok == LEXERR) {
 	zwarnnam(name, tokstr ? "parse error" : "argument expected");
+	return 1;
+    }
+
+    if (*curtestarg) {
+	zwarnnam(name, "too many arguments");
 	return 1;
     }
 
