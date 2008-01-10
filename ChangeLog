@@ -1,3 +1,8 @@
+2008-01-10  Peter Stephenson  <pws@csr.com>
+
+	* 24384: Src/params.c: eliminate invalid pointer and also
+	(unposted) add debug check for use.
+
 2008-01-08  Peter Stephenson  <pws@csr.com>
 
 	* unposted: 4.3.4-dev-7.

@@ -542,6 +542,8 @@ scanparamvals(HashNode hn, int flags)
 char **
 paramvalarr(HashTable ht, int flags)
 {
+    DPUTS((flags & (SCANPM_MATCHKEY|SCANPM_MATCHVAL)) && !scanprog,
+	  "BUG: scanning hash without scanprog set");
     numparamvals = 0;
     if (ht)
 	scanhashtable(ht, 0, 0, PM_UNSET, scancountparams, flags);
@@ -1308,8 +1310,10 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 					  SCANPM_KEYMATCH))))) {
 		    *inv = (v->flags & VALFLAG_INV) ? 1 : 0;
 		    *w = v->end;
+		    scanprog = NULL;
 		    return 1;
 		}
+		scanprog = NULL;
 	    } else
 		ta = getarrvalue(v);
 	    if (!ta || !*ta)
