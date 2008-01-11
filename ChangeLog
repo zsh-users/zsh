@@ -1,3 +1,8 @@
+2008-01-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* "N.J. Mann" <njm@njm.f2s.com>: users/12420:
+	Completion/Unix/Command/_cvs: completion for cvs commit -f.
+
 2008-01-10  Peter Stephenson  <pws@csr.com>
 
 	* users/12412: Src/builtin.c, Src/parse.c, Test/C02cond.ztst:

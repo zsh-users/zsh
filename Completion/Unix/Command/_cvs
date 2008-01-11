@@ -170,7 +170,16 @@ _cvs_commit() {
     '(-F)-m+[message]:message:_cvs_m' \
     '(-m)-F+[message file]:log message file:_files' \
     '-r+[specify revision]:tag:_cvs_revisions' \
-    '*:modified file:_cvs_files_modified'
+    '*:modified file:_cvs_commit_arg'
+}
+
+(( $+functions[_cvs_commit_arg] )) ||
+_cvs_commit_arg() {
+  if (( $+opt_args[-f] )); then
+    _cvs_files
+  else
+    _cvs_files_modified
+  fi
 }
 
 (( $+functions[_cvs_diff] )) ||
