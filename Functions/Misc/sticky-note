@@ -1,0 +1,87 @@
+#!/bin/zsh -f
+
+# A little zsh sticky-note ("post-it") application.  Sticky notes are
+# stored in the file named by the STICKYFILE variable (defaults to
+# $HOME/.zsticky).  The number of notes stored is STICKYSIZE (1000).
+#
+# May be bound as a widget:
+#    zle -N sticky-note
+# And/or run as a command:
+#    sticky-note
+#    sticky-note -b
+#    sticky-note -l ...
+# With the -l option, lists previous sticky notes.  Most options of the
+# "fc -l" command are supported, for selecting which notes to display.
+# The -b option is like "zed -b": installs keymaps/bindings only.
+#
+# Otherwise invokes the line editor with the previous notes available
+# as an editor history.  Two quick taps on the return/enter key finish
+# the note, or you can use use ^X^W as usual (ZZ in vicmd mode).
+
+# I encourage all you creative people to contribute enhancements ...
+# no-prize for the first person to put the most recent sticky note in
+# his PS1 string.
+
+emulate -LR zsh
+
+local STICKYFILE=${STICKYFILE:-$HOME/.zsticky}
+local STICKYSIZE=${STICKYSIZE:-1000}
+
+# If invoked as a widget, behave a bit like run-help
+if zle
+then
+  if [[ $CONTEXT = (cont|select|vared) ]]
+  then
+    zle -M "No stickies during ${${(z)PREBUFFER}[1]:-$CONTEXT}, sorry"
+    zle .beep
+  else
+    zle .push-line
+    BUFFER=sticky-note
+    zle .accept-line
+  fi
+  return 0
+fi
+
+(($+bg && $+fg)) || { autoload -U colors; colors }
+
+# Invoked as a command, behave like zed, but write a history file
+setopt nobanghist extendedhistory histignoredups
+fc -ap $STICKYFILE $STICKYSIZE $STICKYSIZE
+
+# With a -l option, list the existing sticky notes
+if [[ "$1" == -*l* ]]
+then
+  print -nr "$bg[yellow]$fg[black]"
+  fc -f "$@"
+  print -nr "$reset_color"
+  return 0
+fi
+
+# Set up keybindings (adapted from "zed")
+if ! bindkey -M sticky >& /dev/null
+then
+  bindkey -N sticky main
+  bindkey -M sticky ^X^W accept-line
+  bindkey -M sticky ^M^M accept-line	# Two quick RETs ends note
+  bindkey -M sticky ^M self-insert-unmeta
+fi
+if ! bindkey -M sticky-vicmd >& /dev/null 
+then
+  bindkey -N sticky-vicmd vicmd
+  bindkey -M sticky-vicmd ZZ accept-line
+fi
+
+[[ "$1" == -b ]] && return 0
+
+# Edit a new sticky note and add it to the STICKYFILE
+local sticky
+while vared -h -p "%{$bg[yellow]$fg[black]%}" -M sticky -m sticky-vicmd sticky
+do
+  {
+    print -s -- "$sticky"
+  } always {
+    (( TRY_BLOCK_ERROR = 0 ))
+  } && break
+  echo -n -e '\a'
+done
+return 0
