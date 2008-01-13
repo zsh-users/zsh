@@ -68,7 +68,7 @@ _dpkg_options=(
   '-D+[debug options]:debug options:(h 1 2 3)'
   '--debug=[debug options]:debug options:(help 1 2 3)'
   '--ignore-depends=[ignore depends involving package]:package:_deb_packages avail'
-  --{force,refuse,no-force}'--[forcing options]:what:(auto-select downgrade configure-any hold bad-path not-root overwrite overwrite-diverted depends-version depends confnew confold confdef confmiss conflicts architecture overwrite-dir remove-reinstreq remove-essential)'
+  --{force,refuse,no-force}'--[forcing options]:what:(all downgrade configure-any hold bad-path not-root overwrite overwrite-diverted bad-verify depends-version depends confnew confold confdef confmiss conflicts architecture overwrite-dir remove-reinstreq remove-essential help)'
 )
 
 _dpkg_options_recursive=( '(--recursive -R)'{--recursive,-R}'[recursive]' )

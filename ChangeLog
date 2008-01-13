@@ -1,3 +1,8 @@
+2008-01-13  Clint Adams  <clint@zsh.org>
+
+	* 24387: Completion/Debian/Command/_dpkg: update --force-*
+	options for dpkg completion.
+
 2008-01-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/12426: Functions/Misc/sticky-note: post-its for zsh.
@@ -921,7 +926,7 @@
 	Completion/Debian/Command/_dpatch-edit-patch: completion for
 	dpatch-edit-patch.
 
-	* Pierre Habouzit: 23851: Completion/Unix/Command/_git: 
+	* Pierre Habouzit: 23851: Completion/Unix/Command/_git:
 	use ad-hoc functions to list git branches and tags.
 
 2007-09-28  Clint Adams  <clint@zsh.org>
@@ -934,7 +939,7 @@
 
 2007-09-27  Clint Adams  <clint@zsh.org>
 
-	* Mikael Magnusson: 23838: Completion/Unix/Command/_git: 
+	* Mikael Magnusson: 23838: Completion/Unix/Command/_git:
 	have git verify-tag complete tags instead of hash IDs.
 
 	* 23846: Completion/Unix/Command/_git: merge in additional changes
@@ -960,7 +965,7 @@
 
 2007-09-25  Clint Adams  <clint@zsh.org>
 
-	* Mikael Magnusson: 23832: Completion/Unix/Command/_git: 
+	* Mikael Magnusson: 23832: Completion/Unix/Command/_git:
 	fix git merge -m completion.
 
 	* 23831: Completion/Unix/Command/_git: fix handling of merge
@@ -972,7 +977,7 @@
 	* 23828: Completion/Unix/Command/_git: merge in lots of
 	git completion changes from Nikolai Weibull's repository.
 
-	* Mikael Magnusson: 23827: Completion/Unix/Command/_vorbis: 
+	* Mikael Magnusson: 23827: Completion/Unix/Command/_vorbis:
 	allow all arguments to options to either immediately follow
 	the option letter or be the next word.
 
@@ -3518,7 +3523,7 @@
 
 2006-06-09  Clint Adams  <clint@zsh.org>
 
-	* users/10282: Oliver Kiddle: Completion/Unix/Command/_man: 
+	* users/10282: Oliver Kiddle: Completion/Unix/Command/_man:
 	complete associated sections with man page names.
 
 2006-06-08  Clint Adams  <clint@zsh.org>
@@ -4976,7 +4981,7 @@
 
 	* 21778: Completion/Debian/Command/_piuparts: completion for
 	piuparts.
- 
+
 2005-09-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* 21770: Src/Zle/zle_keymap.c: tweak 21760 so binding XYA in a
@@ -5709,7 +5714,7 @@
 2005-06-30  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_links: declare parameter vals
-	local 
+	local
 
 2005-06-28  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
@@ -5869,7 +5874,7 @@
 	cleanup	descriptions in calling functions
 
 	* 21314: Doc/Zsh/compsys.yo: declare expl local in example use
-	of _wanted 
+	of _wanted
 
 	* unposted: Completion/Linux/Command/_yast: new yast completion
 
@@ -5899,7 +5904,7 @@
 
 2005-06-07  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
-	* unposted: Completion/Zsh/Command/_dirs: fix typo in opt description 
+	* unposted: Completion/Zsh/Command/_dirs: fix typo in opt description
 
 2005-06-06  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
@@ -5989,7 +5994,7 @@
 2005-05-13  Motoi Washida <a66@h8.dion.ne.jp>
 
 	* users/8826: Completion/Darwin/Type/_retrieve_mac_apps: search
-	applications using spotlight. 
+	applications using spotlight.
 
 2005-05-12  Felix Rosencrantz <f.rosencrantz@gmail.com>
 
@@ -6815,7 +6820,7 @@
 	* 20734: Completion/Linux/Command/_valgrind: rewrite to handle
 	version 2.2.0 of valgrind
 
-	* 20730 (modified): Completion/Base/Completer/_expand: fix 
+	* 20730 (modified): Completion/Base/Completer/_expand: fix
 	suffix style to regard quoted special characters as not special
 
 2005-01-19  Peter Stephenson  <pws@csr.com>
