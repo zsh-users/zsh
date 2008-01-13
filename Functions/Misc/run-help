@@ -11,7 +11,7 @@
 emulate -R zsh
 setopt localoptions
 
-# HELPDIR should be set to the location of the help files
+local HELPDIR="${HELPDIR:-/usr/share/zsh/$ZSH_VERSION/help}"
 
 [[ $1 == "." ]] && 1="dot"
 [[ $1 == ":" ]] && 1="colon"
@@ -19,7 +19,7 @@ setopt localoptions
 # Check whether Util/helpfiles has been used to generate zsh help
 if [[ $# == 0 || $1 == "-l" ]]
 then
-    if [[ -n "${HELPDIR:-}" && -d $HELPDIR ]]
+    if [[ -d $HELPDIR ]]
     then
 	echo "Here is a list of topics for which special help is available:"
 	echo ""
