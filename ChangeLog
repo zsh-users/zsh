@@ -1,3 +1,8 @@
+2008-01-16  Clint Adams  <clint@zsh.org>
+
+	* 24402: Completion/Unix/Command/_sed: complete more than
+	one input file.
+
 2008-01-14  Peter Stephenson  <pws@csr.com>
 
 	* 24388: Completion/Unix/Command/_mh: abort neatly if MH
