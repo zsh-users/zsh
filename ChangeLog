@@ -1,3 +1,8 @@
+2008-01-14  Peter Stephenson  <pws@csr.com>
+
+	* 24388: Completion/Unix/Command/_mh: abort neatly if MH
+	commands not found.
+
 2008-01-13  Clint Adams  <clint@zsh.org>
 
 	* 24387: Completion/Debian/Command/_dpkg: update --force-*

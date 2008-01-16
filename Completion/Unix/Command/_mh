@@ -1,5 +1,10 @@
 #compdef ali anno burst comp dist flist flists folder folders forw inc mark mhlist mhmail mhn mhparam mhpath mhshow mhstore msgchk next packf pick prev refile repl rmf rmm scan show sortm whom
 
+if [[ -z $commands[mhpath] ]]; then
+  _message "MH commands are not available"
+  return 1
+fi
+
 # Completion for all possible MH commands.
 local mymhdir=${$(_call_program mhpath mhpath + 2>/dev/null):-~/Mail}
 local mhlib=/usr/lib/mh
