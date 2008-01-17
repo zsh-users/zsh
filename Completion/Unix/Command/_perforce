@@ -1728,6 +1728,7 @@ _perforce_cmd_edit() {
 (( $+functions[_perforce_cmd_filelog] )) ||
 _perforce_cmd_filelog() {
   _arguments -s : \
+    '-h[follow branc/copy from records]' \
     '-i[follow branches]' \
     '-l[long output, full change text]' \
     '-L[long output, truncated change text]' \
@@ -1823,6 +1824,7 @@ _perforce_cmd_group() {
     '-d[delete group]' \
     '-o[output to stdout]' \
     '-i[read from stdin]' \
+    '(-o)-a[allow non-super owner to modify group]' \
     '1::perforce group:_perforce_groups'
 }
 
@@ -1832,6 +1834,7 @@ _perforce_cmd_groups() {
   _arguments -s : \
     '-i[show indirect membership by subgroups]' \
     '-m[set max groups to show]:max groups: ' \
+    '-v[show summary data]' \
     '1::user or group name:_perforce_users_or_groups'
 }
 
