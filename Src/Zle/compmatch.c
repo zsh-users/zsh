@@ -2003,8 +2003,8 @@ sub_join(Cline a, Cline b, Cline e, int anew)
 	ca = a->prefix;
 
 	while (n) {
-	    e->prefix = cp_cline(n, 0);
-	    a->prefix = cp_cline(ca, 0);
+	    e->prefix = cp_cline(n, 1);
+	    a->prefix = cp_cline(ca, 1);
 
 	    if (anew) {
 		int f = e->flags;
