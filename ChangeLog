@@ -1,3 +1,9 @@
+2008-01-18  Clint Adams  <clint@zsh.org>
+
+	* 24408: configure.ac, Etc/zsh-development-guide:
+	use contents of ZSH_EXTRAVERSION environment variable for
+	version suffix.
+
 2008-01-18  Peter Stephenson  <pws@csr.com>
 
 	* 24406: Src/Zle/compmatch.c: use deep copy of Cline structure
