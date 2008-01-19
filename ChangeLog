@@ -1,5 +1,8 @@
 2008-01-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Completion/Unix/Command/_mount: make MATCH etc.
+	local.
+
 	* users/12461: Completion/Unix/Command/_mount: mount points
 	weren't completed properly for umount.
 

@@ -867,6 +867,7 @@ udevordir)
     ;;
   esac
 
+  local MATCH MBEGIN MEND
   # "Mummy, why is mount point matching full of squiggles?"
   #
   # "Well, dear, the clever people who wrote Linux decided that some
