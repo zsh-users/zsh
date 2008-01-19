@@ -1,3 +1,8 @@
+2008-01-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/12461: Completion/Unix/Command/_mount: mount points
+	weren't completed properly for umount.
+
 2008-01-18  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/12453: Functions/Misc/xtermctl: X11 window control for
