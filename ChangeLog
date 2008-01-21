@@ -1,3 +1,8 @@
+2008-01-21  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/builtin.c: got rid of compiler warning about
+	a signed/unsigned comparison.
+
 2008-01-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Completion/Unix/Command/_mount: make MATCH etc.
