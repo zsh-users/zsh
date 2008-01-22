@@ -2655,8 +2655,7 @@ __git_tree_files () {
   integer at_least_one_tree_added
   local -a tree_files
 
-  Path=${1%/*}/
-  [[ $Path = / ]] && Path=.
+  Path=${1:h}/
   shift
   (( at_least_one_tree_added = 0 ))
   for tree in $*; do
