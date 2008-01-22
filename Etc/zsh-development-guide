@@ -860,9 +860,9 @@ The following parameters are currently used:
 Version Suffixes
 ----------------
 The configure script reads the version number from Config/version.mk.
-If the environment variable ZSH_EXTRAVERSION is set, the string
+If the environment variable ZSH_VERSIONSUFFIX is set, the string
 contained therein will be appended to the version string.  For example,
 if Config/version.mk contains "VERSION=4.3.4-dev-7" and
-ZSH_EXTRAVERSION is set to "-ca", $ZSH_VERSION in the shell built from
+ZSH_VERSIONSUFFIX is set to "-ca", $ZSH_VERSION in the shell built from
 that run will equal "4.3.4-dev-7-ca".  Caution is recommended when
 using this feature, as is-at-least may misunderstand your conventions.

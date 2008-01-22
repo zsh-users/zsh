@@ -1,5 +1,8 @@
 2008-01-22  Clint Adams  <clint@zsh.org>
 
+	* 24429: configure.ac, Etc/zsh-development-guide:
+	use ZSH_VERSIONSUFFIX instead of ZSH_EXTRAVERSION.
+
 	* Frank Terbeck: 24413: Completion/Unix/Command/_git: handle
 	completion when git aliases are used.
 
