@@ -447,6 +447,10 @@ zrefresh(void)
     int tmpalloced;		/* flag to free tmpline when finished        */
     int remetafy;		/* flag that zle line is metafied            */
     struct rparams rpms;
+#ifdef MULTIBYTE_SUPPORT
+    int width;                  /* width of wide character                   */
+#endif
+
     
     /* If this is called from listmatches() (indirectly via trashzle()), and *
      * that was called from the end of zrefresh(), then we don't need to do  *
@@ -633,8 +637,7 @@ zrefresh(void)
 		while ((++t0) & 7);
 	}
 #ifdef MULTIBYTE_SUPPORT
-	else if (iswprint(*t)) {
-	    int width = wcwidth(*t);
+	else if (iswprint(*t) && (width = wcwidth(*t)) > 0) {
 	    if (width > rpms.sen - rpms.s) {
 		/*
 		 * Too wide to fit.  Insert spaces to end of current line.
@@ -649,7 +652,7 @@ zrefresh(void)
 		    rpms.nvcs = rpms.s - nbuf[rpms.nvln = rpms.ln];
 		}
 	    }
-	    if (width > rpms.sen - rpms.s) {
+	    if (width > rpms.sen - rpms.s || width == 0) {
 		/*
 		 * The screen width is too small to fit even one
 		 * occurrence.
@@ -663,7 +666,11 @@ zrefresh(void)
 	    }
 	}
 #endif
-	else if (ZC_icntrl(*t)) {	/* other control character */
+	else if (ZC_icntrl(*t)
+#ifdef MULTIBYTE_SUPPORT
+		 && (unsigned)*t <= 0xffU
+#endif
+	    ) {	/* other control character */
 	    *rpms.s++ = ZWC('^');
 	    if (rpms.s == rpms.sen) {
 		/* text wrapped */
@@ -671,9 +678,42 @@ zrefresh(void)
 		    break;
 	    }
 	    *rpms.s++ = (((unsigned int)*t & ~0x80u) > 31) ? ZWC('?') : (*t | ZWC('@'));
-	} else {			/* normal character */
+	}
+#ifdef MULTIBYTE_SUPPORT
+	else {
+	    /*
+	     * Not printable or zero width.
+	     * Resort to hackery.
+	     */
+	    char dispchars[11];
+	    char *dispptr = dispchars;
+	    wchar_t wc;
+
+	    if ((unsigned)*t > 0xffffU) {
+		sprintf(dispchars, "<%.08x>", (unsigned)*t);
+	    } else {
+		sprintf(dispchars, "<%.04x>", (unsigned)*t);
+	    }
+	    while (*dispptr) {
+		if (mbtowc(&wc, dispptr, 1) == 1 /* paranoia */)
+		{
+		    *rpms.s++ = wc;
+		    if (rpms.s == rpms.sen) {
+			/* text wrapped */
+			if (nextline(&rpms, 1))
+			    break;
+		    }
+		}
+		dispptr++;
+	    }
+	    if (*dispptr) /* nextline said stop processing */
+		break;
+	}
+#else
+	else {			/* normal character */
 	    *rpms.s++ = *t;
 	}
+#endif
 	if (rpms.s == rpms.sen) {
 	    /* text wrapped */
 	    if (nextline(&rpms, 1))
