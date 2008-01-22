@@ -1,7 +1,7 @@
 2008-01-22  Clint Adams  <clint@zsh.org>
 
-	* 24437, 24441: Completion/Unix/Command/_git: compensate for
-	some breakage introduced by 24396.
+	* 24437, 24441, 24442: Completion/Unix/Command/_git: compensate
+	for some breakage introduced by 24396.
 
 2008-01-22  Peter Stephenson  <pws@csr.com>
 
