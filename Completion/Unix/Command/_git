@@ -164,7 +164,7 @@ _git_commands () {
     'revert:revert existing commit'
     'rm:remove files from the working tree and from the index'
     'show-branch:show branches and their commits'
-    "status:show working-tree's status"
+    'status:show working-tree'\''s status'
     'tag:create tag object signed with GPG'
     'verify-tag:check GPG signature of a tag')
 
@@ -225,7 +225,7 @@ _git_commands () {
     'show-ref:list references in a local repository'
     'symbolic-ref:read and modify symbolic references'
     'tar-tree:create tar archive of the files in the named tree'
-    "unpack-file:create temporary file with blob's contents"
+    'unpack-file:create temporary file with blob'\''s contents'
     'unpack-objects:unpack objects out of packed archive'
     'update-ref:update object name stored in a reference safely'
     'update-server-info:update auxiliary information on a dumb server'
@@ -665,7 +665,7 @@ _git-remote () {
         (add)
           _arguments \
             '*'{--track,-t}'[track given branch instead of default glob refspec]:branch:__git_branch_names' \
-            '(--master -m)'{--master,-m}"[set the remote's HEAD to point to given master branch]:branch:__git_branch_names" \
+            '(--master -m)'{--master,-m}'[set the remote'\''s HEAD to point to given master branch]:branch:__git_branch_names' \
             '(--fetch -f)'{--fetch,-f}'[run git-fetch on the new remote after it has been created]' \
             ':branch name:__git_remotes' \
             ':url:_urls' && ret=0
@@ -936,7 +936,7 @@ _git-imap-send () {
 (( $+functions[_git-quiltimport] )) ||
 _git-quiltimport () {
   _arguments \
-    "--dry-run[check patches and warn if they can't be imported]" \
+    '--dry-run[check patches and warn if they can'\''t be imported]' \
     '--author[default author name and email address to use for patches]' \
     '--patches[set directory containing patches]:patch directory:_directories' && ret=0
 }
@@ -1051,7 +1051,7 @@ _git-verify-pack () {
     '-v[show objects contained in pack]' \
     '*:index file:_files -g "*.idx"' && ret=0
 }
- 
+
 (( $+functions[_git-clone-pack] )) ||
 _git-clone-pack () {
   _arguments \
@@ -1456,7 +1456,7 @@ _git-branch () {
       '-v[show SHA1 and commit subject line for each head]' \
       $my_abbrev_arg \
     - create \
-      "-l[create the branch's reflog]" \
+      '-l[create the branch'\''s reflog]' \
       '-f[force the creation of a new branch]' \
       ':branch-name:__git_branch_names' \
       '::start-point:__git_revisions' \
@@ -1482,7 +1482,7 @@ _git-checkout () {
   local new_branch_reflog_arg
 
   if (( words[(I)-b] > 0 )); then
-    new_branch_reflog_arg="-l[create the new branch's reflog]"
+    new_branch_reflog_arg='-l[create the new branch'\''s reflog]'
   fi
 
   # TODO: This isn’t quite correct in regards of the handling of the “--”
@@ -2030,8 +2030,8 @@ _git-lost-found () {
 _git-pack-refs () {
   _arguments \
     '--all[pack all refs]' \
-    "(        --no-prune)--prune[remove loose refs after packing them]" \
-    "(--prune           )--no-prune[don't remove loose refs after packing them]" && ret=0
+    '(        --no-prune)--prune[remove loose refs after packing them]' \
+    '(--prune           )--no-prune[don'\''t remove loose refs after packing them]' && ret=0
 }
 
 # TODO: something better
@@ -2276,7 +2276,7 @@ _git-runstatus () {
 _git-rm () {
   _arguments -S -A '-*' \
     '-f[override the up-to-date check]' \
-    "-n[don't actually remove the files, just show if they exist in the index]" \
+    '-n[don'\''t actually remove the files, just show if they exist in the index]' \
     '-r[allow recursive removal when a leading directory-name is given]' \
     '--cached[only remove files from the index]' \
     '*:files:__git_cached_files' && ret=0
@@ -2342,7 +2342,7 @@ _git-svn () {
         'rebase:fetch revs from SVN parent of HEAD and rebase current work on it'
         'dcommit:commit diffs from given head onto SVN repository'
         'log:output SVN log-messages'
-        "find-rev:output git commit corresponding to the given SVN revision's hash"
+        'find-rev:output git commit corresponding to the given SVN revision'\''s hash'
         'set-tree:commit given commit or tree to SVN repository'
         'show-ignore:output corresponding .gitignore file of svn:ignore'
         'commit-diff:commit diff of two tree-ishs')
@@ -2985,7 +2985,7 @@ __git_config_name () {
   else
     names=(
       'core.fileMode:whether differences in the executable bit is relevant'
-      "core.autocrlf:what type of conversion of CRLF's git should do"
+      'core.autocrlf:what type of conversion of CRLF'\''s git should do'
       'core.symlinks:whether symlinks are treated as special files or not'
       'core.gitProxy:command to execute to establish a connection to remote server'
       'core.ignoreStat:whether modification times of files are ignored'
@@ -3247,7 +3247,7 @@ __git_config_values () {
 
       booleans=(
         {true,yes}':create ref files for branch heads'
-        {false,no}":don't automatically create ref files")
+        {false,no}':don'\''t automatically create ref files')
 
       _describe -t boolean 'boolean' booleans
       ;;
@@ -3263,7 +3263,7 @@ __git_config_values () {
       booleans=(
         {true,yes}':warn if a ref name matches multiple refs'
         {false,no}':ignore ambiguous ref names')
-      
+
       _describe -t boolean 'boolean' booleans
       ;;
     ((#i)core.compression)
@@ -3356,7 +3356,7 @@ __git_config_values () {
 
       settings=(
         {true,yes}':enable basic rename detection'
-        {false,no}":don't try to detect renames"
+        {false,no}':don'\''t try to detect renames'
         {copies,copy}':detect file renames and copies')
 
       _describe -t values 'rename-detection setting' settings
@@ -3390,7 +3390,7 @@ __git_config_values () {
 
       booleans=(
         {true,yes}':enable the cvs server interface'
-        {false,no}":don't enable the cvs server interface")
+        {false,no}':don'\''t enable the cvs server interface')
 
       _describe -t booleans 'boolean' booleans
       ;;
@@ -3475,7 +3475,7 @@ __git_config_values () {
       declare -a booleans
 
       booleans=(
-        {true,yes}":don't use EPSV mode over FTP (for stupid servers)"
+        {true,yes}':don'\''t use EPSV mode over FTP (for stupid servers)'
         {false,no}':use EPSV mode over FTP')
 
       _describe -t booleans 'boolean' booleans
@@ -3498,7 +3498,7 @@ __git_config_values () {
       # TODO: Use (default) in more descriptions.
       booleans=(
         {true,yes}':include summaries in merge commit messages'
-        {false,no}":don't add summaries to merge commit messages (default)")
+        {false,no}':don'\''t add summaries to merge commit messages (default)')
 
       _describe -t booleans 'boolean' booleans
       ;;
@@ -3554,7 +3554,7 @@ __git_config_values () {
       declare -a opts
 
       opts=(
-        "--no-tags:don't fetch tags automatically"
+        '--no-tags:don'\''t fetch tags automatically'
         '"":fetch tags as usual')
 
       _describe -t tag-options 'tag retrieval' opts
@@ -3578,7 +3578,7 @@ __git_config_values () {
 
       booleas=(
         {true,yes}':allow creation of delta-base-offset packs'
-        {false,no}":don't create delta-base-offset packs")
+        {false,no}':don'\''t create delta-base-offset packs')
 
       _describe -t booleans 'boolean' booleans
       ;;
@@ -3592,7 +3592,7 @@ __git_config_values () {
     ((#i)tar.umask)
       _alternative \
         'number: :_guard "[0-7]#" "numeric mode"' \
-        "values:special value:((user:\"use user's current umask\"))"
+        'values:special value:((user:"use user'\''s current umask"))'
       ;;
     ((#i)user.email)
       _email_addresses
@@ -3611,8 +3611,8 @@ __git_config_values () {
       declare -a booleans
 
       booleans=(
-        {true,yes}":git-receive-pack will deny a ref update that isn't a fast forward"
-        {false,no}":allow a ref update that isn't a fast forward")
+        {true,yes}':git-receive-pack will deny a ref update that isn'\''t a fast forward'
+        {false,no}':allow a ref update that isn'\''t a fast forward')
 
       _describe -t booleans 'boolean' booleans
       ;;
@@ -3640,7 +3640,7 @@ __git_config_values () {
 
       booleans=(
         {true,yes}':bind the HTTP daemon to 127.0.0.1'
-        {false,no}":don't bind the HTTP daemon to a specific address")
+        {false,no}':don'\''t bind the HTTP daemon to a specific address')
 
       _describe -t booleans 'boolean' booleans
       ;;
@@ -3673,7 +3673,7 @@ __git_config_values () {
 
       booleans=(
         {true,yes}':remap URLs and UUIDs for mirrors'
-        {false,no}":don't remap URLs and UUIDs for mirrors")
+        {false,no}':don'\''t remap URLs and UUIDs for mirrors')
 
       _describe -t booleans 'boolean' booleans
       ;;
@@ -3745,13 +3745,13 @@ __git_config_values () {
       __git_svn_revisions
       ;;
     ((#i)svn.merge)
-      __git_boolean_settings false 'use merging strategies' "don't try to merge"
+      __git_boolean_settings false 'use merging strategies' 'don'\''t try to merge'
       ;;
     ((#i)svn.fetch-all)
       __git_boolean_settings false 'undocumented'
       ;;
     ((#i)svn.stdin)
-      __git_boolean_settings false 'read list of commits to commit from stdin' "don't necessarily read list of commits to commit from stdin"
+      __git_boolean_settings false 'read list of commits to commit from stdin' 'don'\''t necessarily read list of commits to commit from stdin'
       ;;
     ((#i)svn.strategy)
       __git_merge_strategies
@@ -3772,7 +3772,7 @@ __git_config_values () {
       __git_boolean_settings false 'give output suitable for concatenation'
       ;;
     ((#i)svn.showcommit)
-      __git_boolean_settings false 'output git commit SHA-1, as well' "don't output git commit SHA-1"
+      __git_boolean_settings false 'output git commit SHA-1, as well' 'don'\''t output git commit SHA-1'
       ;;
     ((#i)svn.online)
       __git_boolean_settings false 'produce output similar to --pretty=oneline'
@@ -3823,7 +3823,7 @@ __git_boolean_settings () {
 
   declare -A descriptions
 
-  descriptions=(true $2 false "don't $2")
+  descriptions=(true $2 false 'don'\''t '"$2")
 
   if (( $# > 2 )); then
     descriptions[false]=$3
@@ -4088,9 +4088,9 @@ __git_setup_revision_arguments () {
     '--abbrev-commit[undocumented]'
     '--full-history[undocumented]'
     '--relative-date[show dates relative to the current time]'
-    "--date=-[format of date output]:date format:((relative\:'show dates relative to the current time'
-                                                   local\:\"show timestamps in user's local timezone\"
-                                                   default\:'show timestamp in the original timezone\""
+    '--date=-[format of date output]:date format:((relative\:"show dates relative to the current time"
+                                                   local\:"show timestamps in user'\''s local timezone"
+                                                   default\:"show timestamp in the original timezone"))'
     '--author=-[limit commits to those by the given author]:author'
     '--committer=-[limit commits to those by the given committer]:committer'
     '--grep=-[limit commits to those with log messages matching the given pattern]:pattern'
@@ -4111,6 +4111,28 @@ __git_is_indexed () {
 }
 
   local curcontext=$curcontext ret=1
+
+  # fun with $words[] and $CURRENT to enable completion for args
+  # to git aliases (eg. git co <TAB>)
+  local -A git_aliases
+  # TODO: filling git_aliases like this is ugly. I didn't get it working elegantly.
+  local oifs=$IFS
+  IFS=$'\0'
+  git_aliases=(${=${(0)${(@)${${${(f)"$(git config --get-regexp alias.\*)"}/(#s)alias./}/ /$'\0'}}}})
+  IFS=$oifs ; unset oifs
+
+  if (( CURRENT >= 3 )) && [[ -n ${git_aliases[$words[2]]} ]] ; then
+    local -a tmpwords
+    tmpwords=(${words[1]} ${(z)git_aliases[$words[2]]})
+    if [[ -z "${words[3,-1]}" ]] ; then
+        tmpwords[$(( ${#tmpwords} + 1 ))]=""
+    else
+        tmpwords+=("${words[3,-1]}")
+    fi
+    words=("${tmpwords[@]}")
+    (( CURRENT += ${#${(z)git_aliases[$words[2]]}} - 1 ))
+    unset tmpwords
+  fi
 
   if [[ $words[1] == git ]]; then
     local state line
