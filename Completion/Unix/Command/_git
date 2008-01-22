@@ -825,12 +825,12 @@ _git-diff-tree () {
         # new tree:
         #   ...
         _alternative \
-          "original tree:original tree:__git_tree_files $line[1]" \
-          "new tree:new tree:__git_tree_files $line[2]" && ret=0
+          "original tree:original tree:__git_tree_files . $line[1]" \
+          "new tree:new tree:__git_tree_files . $line[2]" && ret=0
       else
         _alternative \
           ': :__git_tree_ishs' \
-          ": :__git_tree_files $line[1]" && ret=0
+          ": :__git_tree_files . $line[1]" && ret=0
       fi
       ;;
   esac
@@ -923,7 +923,7 @@ _git-ls-tree () {
 
   case $state in
     files)
-      __git_tree_files $line[1] && ret=0
+      __git_tree_files . $line[1] && ret=0
       ;;
   esac
 }
@@ -1365,7 +1365,7 @@ _git-archive () {
 
   case $state in
     (files)
-      __git_tree_files $line[1] && ret=0
+      __git_tree_files . $line[1] && ret=0
       ;;
   esac
 }
@@ -1503,7 +1503,7 @@ _git-checkout () {
   case $state in
     (files)
       if [[ -n $line[1] ]]; then
-        __git_tree_files $line[1] && ret=0
+        __git_tree_files . $line[1] && ret=0
       else
         __git_cached_files && ret=0
       fi
@@ -1689,13 +1689,13 @@ _git-grep () {
         else
           _alternative \
             'tree:tree:__git_trees' \
-            "tree file:tree-files:__git_tree_files $line[first_tree,last_tree]" && ret=0
+            "tree file:tree-files:__git_tree_files .  $line[first_tree,last_tree]" && ret=0
         fi
       else
         if (( first_tree == 0 )); then
           __git_cached_files
         else
-          __git_tree_files $line[first_tree,last_tree]
+          __git_tree_files . $line[first_tree,last_tree]
         fi
       fi
       ;;
@@ -1835,7 +1835,7 @@ _git-reset () {
 
   if [[ $words[2] == --mixed ]]; then
     commit_arg=':commit:__git_revisions'
-    path_arg="*:file:__git_tree_files $words[3]"
+    path_arg="*:file:__git_tree_files . $words[3]"
   else
     commit_arg='::commit:__git_revisions'
   fi
@@ -2558,7 +2558,7 @@ __git_command_successful () {
 __git_objects () {
   compset -P '*:'
   if [[ -n $IPREFIX ]]; then
-    __git_tree_files ${IPREFIX%:}
+    __git_tree_files "$PREFIX" "${IPREFIX%:}"
   else
     _alternative \
       'revisions:revision:__git_revisions' \
@@ -2651,13 +2651,16 @@ __git_tree_files () {
 
   zparseopts -D -E -a multi_parts_opts M: J: V: 1 2 n F: X:
 
-  local tree
+  local tree Path
   integer at_least_one_tree_added
   local -a tree_files
 
+  Path=${1%/*}/
+  [[ $Path = / ]] && Path=.
+  shift
   (( at_least_one_tree_added = 0 ))
   for tree in $*; do
-    tree_files+=(${(ps:\0:)"$(_call_program tree-files git ls-tree --name-only -z -r $tree 2>/dev/null)"})
+    tree_files+=(${(ps:\0:)"$(_call_program tree-files git ls-tree --name-only -z $tree $Path 2>/dev/null)"})
     __git_command_successful && (( at_least_one_tree_added = 1 ))
   done
 

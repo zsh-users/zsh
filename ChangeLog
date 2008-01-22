@@ -1,3 +1,9 @@
+2008-01-22  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 24396: Completion/Unix/Command/_git:
+	don't pass -r to git ls-files for performance reasons,
+	compensate for lack of recursion.
+
 2008-01-21  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/builtin.c: got rid of compiler warning about
