@@ -1663,7 +1663,7 @@ _git-grep () {
     '--all-match[all patterns must match]' \
     ':pattern:' \
     '*::tree-or-file:->files' && ret=0
-  
+
   case $state in
     (files)
       integer first_tree last_tree start end
@@ -2573,7 +2573,7 @@ __git_trees () {
 
 (( $+functions[__git_tree_ishs] )) ||
 __git_tree_ishs () {
-  __git_commits 
+  __git_commits
 }
 
 (( $+functions[__git_blobs] )) ||
@@ -2726,7 +2726,7 @@ _remote_files () {
     while _tags; do
       while _next_label files expl ${suf:-remote directory}; do
 #        [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf \
-#	    ${(q)remdispf%[*=@|]} && ret=0 
+#	    ${(q)remdispf%[*=@|]} && ret=0
 	compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
 	    ${(q)remdispd%/} && ret=0
       done
@@ -2934,7 +2934,7 @@ __git_config_name () {
     compset -P 'remotes.'
 
     __git_remote-groups
-    return 
+    return
   elif [[ -prefix gitcvs.* ]]; then
     names=(
       'enabled:whether the cvs pserver interface is enabled'
@@ -3805,7 +3805,7 @@ __git_config_values () {
 #
 # -t can be used to specify a tag to use (default: booleans).
 # -l can be used to specify a label to use (default: 'boolean').
-# 
+#
 # The first argument is the default value, so that the description of the
 # default value can be suffixed with " (default)".  The second argument
 # is the description for the true value.  If a third argument is given,
@@ -3814,7 +3814,7 @@ __git_config_values () {
 # "don't ".
 (( $+functions[__git_boolean_settings] )) ||
 __git_boolean_settings () {
-  local tag label garbage 
+  local tag label garbage
 
   zparseopts -D -E -a garba S: M: J: V: 1 2 n F: X: -t=tag -l=label
 
