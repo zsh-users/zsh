@@ -64,7 +64,10 @@ is tt(2) if this is because the command has finished.
 
 If the tt(-r) option is combined with the tt(-t) option, tt(zpty) tests
 whether output is available before trying to read.  If no output is
-available, tt(zpty) immediately returns the status tt(1).
+available, tt(zpty) immediately returns the status tt(1).  When used
+with a var(pattern), the behaviour on a failed poll is similar to
+when the command has exited:  the return value is zero if at least
+one character could still be read even if the pattern failed to match.
 )
 item(tt(zpty) tt(-t) var(name))(
 The tt(-t) option without the tt(-r) option can be used to test

@@ -1,3 +1,9 @@
+2008-01-25  Peter Stephenson  <pws@csr.com>
+
+	* 24460: Doc/Zsh/mod_zpty.yo, Src/utils.c, Src/Modules/zpty.c:
+	make "zpty -rt" more consistent by polling before every byte,
+	not just the first.
+
 2008-01-25  Clint Adams  <clint@zsh.org>
 
 	* 24464: Completion/Unix/Command/_git: remove trailing whitespace.

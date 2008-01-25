@@ -1886,7 +1886,7 @@ zstrtol(const char *s, char **t, int base)
 }
 
 /**/
-int
+mod_export int
 setblock_fd(int turnonblocking, int fd, long *modep)
 {
 #ifdef O_NDELAY

@@ -468,7 +468,7 @@ checkptycmd(Ptycmd cmd)
 }
 
 static int
-ptyread(char *nam, Ptycmd cmd, char **args)
+ptyread(char *nam, Ptycmd cmd, char **args, int noblock)
 {
     int blen, used, seen = 0, ret = 0;
     char *buf;
@@ -509,6 +509,45 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	cmd->read = -1;
     }
     do {
+	if (noblock && cmd->read == -1) {
+	    int pollret;
+	    /*
+	     * Check there is data available.  Borrowed from
+	     * poll_read() in utils.c and simplified.
+	     */
+#ifdef HAVE_SELECT
+	    fd_set foofd;
+	    struct timeval expire_tv;
+	    expire_tv.tv_sec = 0;
+	    expire_tv.tv_usec = 0;
+	    FD_ZERO(&foofd);
+	    FD_SET(cmd->fd, &foofd);
+	    pollret = select(cmd->fd+1,
+			 (SELECT_ARG_2_T) &foofd, NULL, NULL, &expire_tv);
+#else
+#ifdef FIONREAD
+	    if (ioctl(cmd->fd, FIONREAD, (char *) &val) == 0)
+		pollret = (val > 0);
+#endif
+#endif
+
+	    if (pollret < 0) {
+		/*
+		 * See read_poll() for this.
+		 * Last despairing effort to poll: attempt to
+		 * set nonblocking I/O and actually read the
+		 * character.  cmd->read stores the character read.
+		 */
+		long mode;
+
+		if (setblock_fd(0, cmd->fd, &mode))
+		    pollret = read(cmd->fd, &cmd->read, 1);
+		if (mode != -1)
+		    fcntl(cmd->fd, F_SETFL, mode);
+	    }
+	    if (pollret == 0)
+		break;
+	}
 	if (!ret) {
 	    checkptycmd(cmd);
 	    if (cmd->fin)
@@ -648,12 +687,9 @@ bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 	if (p->fin)
 	    return 2;
-	if (OPT_ISSET(ops,'t') && p->read == -1 &&
-	    !read_poll(p->fd, &p->read, 0, 0))
-	    return 1;
 
 	return (OPT_ISSET(ops,'r') ?
-		ptyread(nam, p, args + 1) :
+		ptyread(nam, p, args + 1, OPT_ISSET(ops,'t')) :
 		ptywrite(p, args + 1, OPT_ISSET(ops,'n')));
     } else if (OPT_ISSET(ops,'d')) {
 	Ptycmd p;
