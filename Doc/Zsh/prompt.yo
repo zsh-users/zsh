@@ -1,8 +1,6 @@
 texinode(Prompt Expansion)(Expansion)(Conditional Expressions)(Top)
 chapter(Prompt Expansion)
-ifzman(\
-sect(Prompt Expansion)
-)\
+sect(Expansion of Prompt Sequences)
 cindex(prompt expansion)
 cindex(expansion, prompt)
 Prompt sequences undergo a special form of expansion.  This type of expansion
@@ -31,9 +29,13 @@ represented as `tt(!!)'.
 pindex(PROMPT_PERCENT, use of)
 If the tt(PROMPT_PERCENT) option is set, certain escape sequences that
 start with `tt(%)' are expanded.
-Some escapes take an optional integer argument, which
+Many escapes are followed by a single character, although some of these
+take an optional integer argument that
 should appear between the `tt(%)' and the next character of the
-sequence.  The following escape sequences are recognized:
+sequence.  More complicated escape sequences are available to provide
+conditional expansion.
+
+sect(Simple Prompt Escapes)
 
 subsect(Special characters)
 startitem()
@@ -188,7 +190,7 @@ position.  Brace pairs can nest.
 )
 enditem()
 
-subsect(Conditional substrings)
+sect(Conditional Substrings in Prompts)
 startitem()
 item(tt(%v))(
 vindex(psvar, use of)

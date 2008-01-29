@@ -1,5 +1,11 @@
 2008-01-29  Peter Stephenson  <pws@csr.com>
 
+	* 24485: INSTALL: note that term.h may need CPPFLAGS=-I...
+	if it's to be included from the curses library directory.
+
+	* 24483: Doc/Zsh/prompt.yo, Doc/Zsh/zle.yo: some minor
+	sectioning problems.
+
 	* users/12498: Doc/Zsh/contrib.yo: missing section spotted
 	by Vincent.
 

@@ -336,6 +336,11 @@ CPPFLAGS=-I/usr/local/include (or wherever the header is found) to
 configure.  Similarly, you may need to pass LDFLAGS=-L/usr/local/lib
 (or wherever) in order to find the library.
 
+You may also need to add headers if you need to include the file term.h
+from an installation of an ncurses variant instead of from the system
+directories.  For example, CPPFLAGS=-I/usr/local/include/ncursesw will
+force configure to search for term.h in the given directory.
+
 On some systems a suitable development package with a name such as
 curses-devel or ncurses-devel needs to be installed before zsh can
 be compiled.  This is likely to be contained on any installation media,

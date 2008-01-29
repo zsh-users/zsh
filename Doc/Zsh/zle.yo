@@ -784,7 +784,7 @@ defined with tt(zle -N) this is set to the empty string.  Read-only.
 )
 enditem()
 
-subsect(Special Widget)
+subsect(Special Widgets)
 
 There are a few user-defined widgets which are special to the shell.
 If they do not exist, no special action is taken.  The environment
