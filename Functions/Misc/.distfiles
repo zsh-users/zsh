@@ -15,7 +15,9 @@ run-help
 run-help-git
 run-help-svk
 run-help-svn
+sticky-note
 tetris
+xtermctl
 zargs
 zcalc
 zed
