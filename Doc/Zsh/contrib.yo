@@ -1889,6 +1889,7 @@ as well as the shell function implementation.
 enditem()
 
 texinode(User Configuration Functions)(Other Functions)(Mathematical Functions)(User Contributions)
+sect(User Configuration Functions)
 
 The tt(zsh/newuser) module comes with a function to aid in configuring
 shell options for new users.  If the module is installed, this function can

@@ -1,3 +1,11 @@
+2008-01-29  Peter Stephenson  <pws@csr.com>
+
+	* users/12498: Doc/Zsh/contrib.yo: missing section spotted
+	by Vincent.
+
+	* unposted: Config/version.mk, Functions/Misc/.distfiles:
+	4.3.4-dev-8.
+
 2008-01-25  Peter Stephenson  <pws@csr.com>
 
 	* 24460: Doc/Zsh/mod_zpty.yo, Src/utils.c, Src/Modules/zpty.c:
