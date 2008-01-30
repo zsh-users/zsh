@@ -1,5 +1,9 @@
 2008-01-30  Peter Stephenson  <pws@csr.com>
 
+	* 24498: Src/mkmakemod.sh: check config.h instead of config.status
+	for dynamic configuration since the syntax is less variable.
+	Could be done by generating from Src/mkmakemod.sh.in instead.
+
 	* 24496: Doc/Zsh/contrib.yo: more Yodl parenthesis protection.
 
 2008-01-29  Peter Stephenson  <pws@csr.com>

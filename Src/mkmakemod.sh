@@ -111,10 +111,7 @@ if $first_stage; then
     sed -e '/^#/d' -e 's/ .*/ /' -e 's/^name=/ /'`"
     module_list="${bin_mods}${dyn_mods}"
 
-    # check 2.13, 2.50, and 2.60 syntaxes
-    if grep '%@D@%D%' config.status >/dev/null ||
-       grep ',@D@,D,' config.status >/dev/null ||
-       grep ',@D@,|#_!!_#|D,' config.status >/dev/null; then
+    if grep '^#define DYNAMIC ' config.h >/dev/null; then
 	is_dynamic=true
     else
 	is_dynamic=false
