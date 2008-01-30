@@ -2055,7 +2055,7 @@ neither file nor assistant is found, the external command
 
 An example assistant for the "ssh" command:
 
-example(run-help-ssh() {
+example(run-help-ssh+LPAR()RPAR() {
     emulate -LR zsh
     local -a args
     # Delete the "-l username" option
