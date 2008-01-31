@@ -1,3 +1,9 @@
+2008-01-31  Peter Stephenson  <pws@csr.com>
+
+	* Christopher Key <cjk32@cam.ac.uk>: users/12521:
+	Completion/Unix/Command/_subversion: svn and svnadmin help
+	parsing.
+
 2008-01-30  Peter Stephenson  <pws@csr.com>
 
 	* 24498: Src/mkmakemod.sh: check config.h instead of config.status
