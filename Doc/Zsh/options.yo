@@ -418,7 +418,7 @@ Note that this happens anyway with tt(typeset) and similar statements.
 
 This option respects the setting of the tt(KSH_TYPESET) option.  In other
 words, if both options are in effect, arguments looking like
-assignments will not undergo wordsplitting.
+assignments will not undergo word splitting.
 )
 pindex(MARK_DIRS)
 cindex(directories, marking)

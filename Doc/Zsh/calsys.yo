@@ -46,7 +46,7 @@ a date and time specification followed by a description of the event.
 
 Various enhancements to this format are supported, based on the syntax
 of Emacs calendar mode.  An indented line indicates a continuation line
-that continues the description of the event from the preceeding line
+that continues the description of the event from the preceding line
 (note the date may not be continued in this way).  An initial ampersand
 (tt(&)) is ignored for compatibility.
 
@@ -222,7 +222,7 @@ passed to the function tt(calendar), the start time acts an anchor for the
 end time when the end time is relative (even if the start time is
 implicit).  When examining calendar files, the scheduled event being
 examined anchors the warning time when it is given explicitly by means of
-the tt(WARN) keyword; likewise, the scheduled event anchors a repitition
+the tt(WARN) keyword; likewise, the scheduled event anchors a repetition
 period when given by the tt(RPT) keyword, so that specifications such as
 tt(RPT 2 months, 3rd Thursday) are handled properly.  Finally, the tt(-R)
 argument to tt(calendar_scandate) directly provides an anchor for relative
@@ -430,7 +430,7 @@ The event can contain multiple lines, as described in
 ifnzman(noderef(Calendar File and Date Formats))\
 ifzman(the section Calendar File Format above).
 Using this function ensures that the calendar file is sorted in date
-and time order.  It also makes special arrangments for locking
+and time order.  It also makes special arrangements for locking
 the file while it is altered.  The old calendar is left in a file
 with the suffix tt(.old).
 
@@ -485,7 +485,7 @@ passed down.)  Not set no tt(WARN) keyword and value were
 matched.)
 sitem(warnstr)(The raw string matched after the tt(WARN) keyword, else unset.)
 sitem(rpttime)(Any recurrence time given by the tt(RPT) keyword as a string
-of digits containing the time of the recurrenced in the same units
+of digits containing the time of the recurrence in the same units
 as tt($EPOCHSECONDS).  (Note this is an absolute time.)  Not set if
 no tt(RPT) keyword and value were matched.)
 sitem(rptstr)(The raw string matched after the tt(RPT) keyword, else unset.)
@@ -505,7 +505,7 @@ use the system as a date calculator.  For example, tt(calendar_showdate '+1
 month, 1st Friday') shows the date of the first Friday of next month.
 
 With the option tt(-r) nothing is printed but the value of the date and
-timein seconds since the epoch is stored in the parameter tt(REPLY).
+time in seconds since the epoch is stored in the parameter tt(REPLY).
 
 With the option tt(-f) var(fmt) the given date/time conversion format
 is passed to tt(strftime); see notes on the tt(date-format) style below.
@@ -536,7 +536,7 @@ example(zmodload -i zsh/stat
 disable stat)
 
 tt(age) selects files having a given modification time for use
-as a glob qualifer.  The format of the date is the same as that
+as a glob qualifier.  The format of the date is the same as that
 understood by the calendar system, described in
 ifzman(the section FILE AND DATE FORMATS above)\
 ifnzman(noderef(Calendar File and Date Formats)).
@@ -666,7 +666,7 @@ same time.
 The files locked are appended to the array tt(lockfiles), which should
 be local to the caller.
 
-If all files were successully, status zero is returned, else status one.
+If all files were successfully locked, status zero is returned, else status one.
 
 This function may be used as a general file locking function, although
 this will only work if only this mechanism is used to lock files.
@@ -697,7 +697,7 @@ Options:
 startitem()
 item(tt(-a))(
 The date and time are anchored to the start of the argument; they
-will not be matched if there is preceeding text.
+will not be matched if there is preceding text.
 )
 item(tt(-A))(
 The date and time are anchored to both the start and end of the argument;

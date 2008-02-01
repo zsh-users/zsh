@@ -1,3 +1,11 @@
+2008-02-01  Clint Adams  <clint@zsh.org>
+
+	* 24513, 24514, 24515, 24516, 24517, 24518, 24519, 24520, 24521:
+	Doc/Zsh/builtins.yo, Doc/Zsh/calsys.yo, Doc/Zsh/contrib.yo,
+	Doc/Zsh/expn.yo, Doc/Zsh/grammar.yo, Doc/Zsh/mod_curses.yo,
+	Doc/Zsh/mod_newuser.yo, Doc/Zsh/mod_sched.yo, Doc/Zsh/options.yo,
+	Doc/Zsh/roadmap.yo, Doc/Zsh/tcpsys.yo: typo fixes from A. Costa.
+
 2008-02-01  Peter Stephenson  <pws@csr.com>
 
 	* users/12527: Etc/relnote_4.3.5.txt: Add release note for 4.3.5.

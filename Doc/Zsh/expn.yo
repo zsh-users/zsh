@@ -288,7 +288,7 @@ Note the same record of the last var(l) and var(r) is maintained
 across all forms of expansion.
 
 If the option tt(HIST_SUBST_PATTERN) is set, var(l) is treated as
-a pattern of the usual form desribed in
+a pattern of the usual form described in
 ifzman(the section FILENAME GENERATION below)\
 ifnzman(noderef(Filename Generation)).  This can be used in
 all the places where modifiers are available; note, however, that
@@ -298,7 +298,7 @@ they are replaced at the correct time.
 Note also that complicated patterns used in globbing qualifiers may
 need the extended glob qualifier notation
 tt(LPAR()#q:s/)var(...)tt(/)var(...)tt(/RPAR()) in order for the
-shell to recognize the expression as a glob qualifer.  Further,
+shell to recognize the expression as a glob qualifier.  Further,
 note that bad patterns in the substitution are not subject to
 the tt(NO_BAD_PATTERN) option so will cause an error.
 

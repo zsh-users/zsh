@@ -528,7 +528,7 @@ string.  It can contain:
 startitem()
 item(tt(%c))(
 Expands to 1 if the session is the current session, otherwise 0.  Used
-with ternary expresions such as `tt(%LPAR()c.-.PLUS()RPAR())' to
+with ternary expressions such as `tt(%LPAR()c.-.PLUS()RPAR())' to
 output `tt(PLUS())' for the current session and `tt(-)' otherwise.
 )
 item(tt(%f))(

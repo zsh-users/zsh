@@ -765,7 +765,7 @@ sitem(tt(RQUOTE()))(Acute.)
 sitem(tt(>))(Circumflex.)
 sitem(tt(?))(Tilde.  (This is not tt(~) as RFC 1345 does not assume that
 character is present on the keyboard.))
-sitem(tt(-))(Macron.  (A horizonal bar over the base character.))
+sitem(tt(-))(Macron.  (A horizontal bar over the base character.))
 sitem(tt(LPAR()))(Breve.  (A shallow dish shape over the base character.))
 sitem(tt(.))(Dot above the base character, or in the case of tt(i) no dot,
 or in the case of tt(L) and tt(l) a centered dot.)
@@ -786,7 +786,7 @@ The most common characters from the Arabic, Cyrillic, Greek and Hebrew
 alphabets are available; consult RFC 1345 for the appropriate sequences.
 In addition, a set of two letter codes not in RFC 1345 are available for
 the double-width characters corresponding to ASCII characters from tt(!)
-to tt(~) (0x21 to 0x7e) by preceeding the character with tt(^), for
+to tt(~) (0x21 to 0x7e) by preceding the character with tt(^), for
 example tt(^A) for a double-width tt(A).
 
 The following other two-character sequences are understood.
@@ -1098,7 +1098,7 @@ example(print This line contains fan and fond)
 
 and invoking tt(replace-pattern) with the source string
 `tt(f+LPAR()?+RPAR()n)' and
-the replacment string `tt(c\1r)' produces the not very useful line:
+the replacement string `tt(c\1r)' produces the not very useful line:
 
 example(print This line contains car and cord)
 
@@ -1742,7 +1742,7 @@ example,
 
 example(zstyle ':mime:*' x-browsers opera konqueror firefox)
 
-specifies that tt(pick-web-browser) should first look for a runing
+specifies that tt(pick-web-browser) should first look for a running
 instance of Opera, Konqueror or Firefox, in that order, and if it
 fails to find any should attempt to start Opera.  The default is
 tt(firefox mozilla netscape opera konqueror).
@@ -1757,7 +1757,7 @@ If it is set this style is used to pick the command
 used to open a page for a browser.  The context is
 tt(:mime:browser:new:$browser:) to start a new browser or
 tt(:mime:browser:running:$browser:) to open a URL in a browser already
-runing on the current X display, where tt($browser) is the value matched
+running on the current X display, where tt($browser) is the value matched
 in the tt(x-browsers) or tt(tty-browsers) style.  The escape sequence
 tt(%b) in the style's value will be replaced by the browser, while tt(%u)
 will be replaced by the URL.  If the style is not set, the default for all

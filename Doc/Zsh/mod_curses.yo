@@ -143,7 +143,7 @@ arrow keys return the name of the key in the parameter var(kparam).  The
 key names are the macros defined in the tt(curses.h) or tt(ncurses.h)
 with the prefix `tt(KEY_)' removed; see also the description of the
 parameter tt(zcurses_keycodes) below.  Other keys cause a value to be
-set in var(param) as before.  On a succesful return only one of
+set in var(param) as before.  On a successful return only one of
 var(param) or var(kparam) contains a non-empty string; the other is set
 to an empty string.
 

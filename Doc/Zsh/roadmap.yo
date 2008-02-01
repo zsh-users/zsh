@@ -14,7 +14,7 @@ be created or edited to customize the shell.  See ifzman(the section
 Startup/Shutdown Files in zmanref(zsh))\
 ifnzman(noderef(Files)).
 
-If no personal intialization files exist for the current user, a function
+If no personal initialization files exist for the current user, a function
 is run to help you change some of the most common settings.  It won't
 appear if your administrator has disabled the tt(zsh/newuser) module.
 The function is designed to be self-explanatory.  You can run it by hand

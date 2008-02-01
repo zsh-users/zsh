@@ -36,7 +36,7 @@ The tt(zsh/newuser) module is then unconditionally unloaded.
 Note that it is possible to achieve exactly the same effect as the
 tt(zsh/newuser) module by adding code to tt(/etc/zshenv).  The module
 exists simply to allow the shell to make arrangements for new users without
-the need for invervention by package maintainers and system administrators.
+the need for intervention by package maintainers and system administrators.
 
 The script supplied with the module invokes the shell function
 tt(zsh-newuser-install).  This may be invoked directly by the user

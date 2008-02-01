@@ -53,7 +53,7 @@ consists of the scheduled time in seconds since the epoch
 (see ifnzman(The zsh/datetime Module)\
 ifzman(the section `The zsh/datetime Module') for facilities for
 using this number), followed by a colon, followed by any options
-(which may be empty but will be preceeded by a `tt(-)' otherwise),
+(which may be empty but will be preceded by a `tt(-)' otherwise),
 followed by a colon, followed by the command to be executed.
 
 The tt(sched) builtin should be used for manipulating the events.  Note
