@@ -1,3 +1,10 @@
+2008-02-01  Clint Adams  <clint@zsh.org>
+
+	* 24506: Makefile.in, configure.ac, Doc/Makefile.in,
+	Etc/Makefile.in, Src/Makefile.in, Src/Makemod.in.in,
+	Test/Makefile.in: make ZSH_VERSIONSUFFIX propagate to somewhere
+	useful.
+
 2008-01-31  Peter Stephenson  <pws@csr.com>
 
 	* Christopher Key <cjk32@cam.ac.uk>: users/12521:

@@ -28,6 +28,7 @@ subdir = Doc
 dir_top = ..
 
 @VERSION_MK@
+VERSION = @VERSION@
 
 # source/build directories
 VPATH           = @srcdir@
