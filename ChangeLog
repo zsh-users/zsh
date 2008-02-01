@@ -1,5 +1,7 @@
 2008-02-01  Peter Stephenson  <pws@csr.com>
 
+	* users/12527: Etc/relnote_4.3.5.txt: Add release note for 4.3.5.
+
 	* unposted: Release 4.3.5.
 
 	* Back off 24506 pending 4.3.5 release.
