@@ -1,3 +1,9 @@
+2008-02-01  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Release 4.3.5.
+
+	* Back off 24506 pending 4.3.5 release.
+
 2008-02-01  Clint Adams  <clint@zsh.org>
 
 	* 24506: Makefile.in, configure.ac, Doc/Makefile.in,

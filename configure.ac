@@ -33,7 +33,6 @@ dnl What version of zsh are we building ?
 . ${srcdir}/Config/version.mk
 VERSION="$VERSION$ZSH_VERSIONSUFFIX"
 echo "configuring for zsh $VERSION"
-AC_SUBST(VERSION)
 
 dnl ----------------------------------------------
 dnl CHECK FOR MACHINE/VENDOR/OPERATING SYSTEM TYPE

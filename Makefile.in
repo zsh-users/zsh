@@ -29,7 +29,6 @@ dir_top = .
 SUBDIRS = Doc Etc Src Test
 
 @VERSION_MK@
-VERSION = @VERSION@
 
 # source/build directories
 VPATH           = @srcdir@

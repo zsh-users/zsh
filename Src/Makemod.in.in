@@ -31,7 +31,6 @@
 # SUBDIRS is done by mkmakemod.sh
 
 @VERSION_MK@
-VERSION = @VERSION@
 
 # source/build directories
 VPATH           = @srcdir@
