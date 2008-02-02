@@ -1,3 +1,7 @@
+2008-02-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24524: Config/version.mk: increment version to 4.3.5-dev-0.
+
 2008-02-01  Clint Adams  <clint@zsh.org>
 
 	* 24513, 24514, 24515, 24516, 24517, 24518, 24519, 24520, 24521:
