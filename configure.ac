@@ -31,7 +31,6 @@ AC_CONFIG_HEADER(config.h)
 
 dnl What version of zsh are we building ?
 . ${srcdir}/Config/version.mk
-VERSION="$VERSION$ZSH_VERSIONSUFFIX"
 echo "configuring for zsh $VERSION"
 
 dnl ----------------------------------------------

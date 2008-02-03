@@ -1,5 +1,8 @@
 2008-02-03  Clint Adams  <clint@zsh.org>
 
+	* 24528: configure.ac, Etc/zsh-development-guide:
+	revert 24429.
+
 	* 24527: Completion/Unix/Command/_cut: a subset of the
 	fixes from Mikael Magnusson in 24526.
 
