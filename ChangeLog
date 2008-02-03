@@ -1,3 +1,8 @@
+2008-02-03  Clint Adams  <clint@zsh.org>
+
+	* 24527: Completion/Unix/Command/_cut: a subset of the
+	fixes from Mikael Magnusson in 24526.
+
 2008-02-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24524: Config/version.mk: increment version to 4.3.5-dev-0.

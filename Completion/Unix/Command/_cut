@@ -42,9 +42,10 @@ if _pick_variant gnu="Free Soft" unix --version; then
         '-n['$_cut_args[n]']' \
         '--complement['$_cut_args[complement]']' \
         '(--only-delimited -s)'{--only-delimited=,-s}'['$_cut_args[only-delimited]']' \
-        '--output-delimiter['$_cut_args[output-delimiter]']' \
+        '--output-delimiter=['$_cut_args[output-delimiter]']' \
         '--help['$_cut_args[help]']' \
-        '--version['$_cut_args[version]']'
+        '--version['$_cut_args[version]']' \
+        '*:file:_files'
 else
   _arguments \
     '-b[list specifies byte positions]:list:' \
