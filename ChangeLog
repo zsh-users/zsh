@@ -1,3 +1,8 @@
+2008-02-05  Peter Stephenson  <pws@csr.com>
+
+	* 24533 (tweaked): Completion/compinstall: use _completer _ignored
+	as default to offer user if no completers are defined
+
 2008-02-03  Clint Adams  <clint@zsh.org>
 
 	* 24528: configure.ac, Etc/zsh-development-guide:

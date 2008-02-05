@@ -506,7 +506,7 @@ s.    Specify a list of completers.
 		      ;;
 		[sS]) olist=
 		      tmparr=(_complete _approximate _correct _match _expand)
-		      while true; do 
+		      while true; do
 			clear
 			print "\
      *** compinstall:  choosing completers to have _oldlist behaviour ***
@@ -839,7 +839,11 @@ __ci_do_completers() {
   for c in ${=newc}; do
     completers[$c]=1
   done
-  clist=(_list _oldlist _menu _expand _complete _ignored 
+  if (( ${#completers} == 0 )); then
+    completers[_complete]=1
+    completers[_ignored]=1
+  fi
+  clist=(_list _oldlist _menu _expand _complete _ignored
          _match _correct _approximate _prefix)
 
   # TODO: these are a bit brief, so could provide some more detailed help.
