@@ -35,14 +35,14 @@ if _pick_variant gnu="Free Soft" unix --version; then
   esac
 
   _arguments \
-        '(--bytes -b)'{--bytes=,-b}'['$_cut_args[bytes]']' \
-        '(--characters -c)'{--characters=,-c}'['$_cut_args[characters]']' \
-        '(--delimiter -d)'{--delimiter=,-d}'['$_cut_args[delimiter]']' \
-        '(--fields -f)'{--fields=,-f}'['$_cut_args[fields]']' \
+        '(--bytes -b+)'{--bytes=,-b}'['$_cut_args[bytes]']:list' \
+        '(--characters -c+)'{--characters=,-c}'['$_cut_args[characters]']:list' \
+        '(--delimiter -d+)'{--delimiter=,-d}'['$_cut_args[delimiter]']:delimeter' \
+        '(--fields -f+)'{--fields=,-f}'['$_cut_args[fields]']:list' \
         '-n['$_cut_args[n]']' \
         '--complement['$_cut_args[complement]']' \
-        '(--only-delimited -s)'{--only-delimited=,-s}'['$_cut_args[only-delimited]']' \
-        '--output-delimiter=['$_cut_args[output-delimiter]']' \
+        '(--only-delimited -s)'{--only-delimited,-s}'['$_cut_args[only-delimited]']' \
+        '--output-delimiter=['$_cut_args[output-delimiter]']:delimeter' \
         '--help['$_cut_args[help]']' \
         '--version['$_cut_args[version]']' \
         '*:file:_files'

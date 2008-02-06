@@ -1,3 +1,8 @@
+2008-02-05  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 24529: Completion/Unix/Command/_cut:
+	remaining fixes from 24526.
+
 2008-02-05  Peter Stephenson  <pws@csr.com>
 
 	* 24533 (tweaked): Completion/compinstall: use _completer _ignored
