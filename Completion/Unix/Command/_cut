@@ -23,7 +23,7 @@ if _pick_variant gnu="Free Soft" unix --version; then
              bytes           "select only these bytes"
              characters      "select only these characters"
              delimiter       "use DELIM instead of TAB for field delimiter"
-             fields          "select only these fields and lines whitout the delimiter character"
+             fields          "select only these fields and lines without the delimiter character"
              n               "(ignored)"
              complement      "complement the set of selected bytes, characters or fields"
              only-delimited  "do not print lines not containing delimiters"
@@ -35,10 +35,10 @@ if _pick_variant gnu="Free Soft" unix --version; then
   esac
 
   _arguments \
-        '(--bytes -b+)'{--bytes=,-b}'['$_cut_args[bytes]']:list' \
-        '(--characters -c+)'{--characters=,-c}'['$_cut_args[characters]']:list' \
-        '(--delimiter -d+)'{--delimiter=,-d}'['$_cut_args[delimiter]']:delimeter' \
-        '(--fields -f+)'{--fields=,-f}'['$_cut_args[fields]']:list' \
+        '(--bytes -b)'{--bytes=,-b+}'['$_cut_args[bytes]']:list' \
+        '(--characters -c)'{--characters=,-c+}'['$_cut_args[characters]']:list' \
+        '(--delimiter -d)'{--delimiter=,-d+}'['$_cut_args[delimiter]']:delimeter' \
+        '(--fields -f)'{--fields=,-f+}'['$_cut_args[fields]']:list' \
         '-n['$_cut_args[n]']' \
         '--complement['$_cut_args[complement]']' \
         '(--only-delimited -s)'{--only-delimited,-s}'['$_cut_args[only-delimited]']' \
