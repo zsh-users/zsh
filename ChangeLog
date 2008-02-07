@@ -1,6 +1,8 @@
 2008-02-07  Clint Adams  <clint@zsh.org>
 
-	* unposted: Functions/Misc/run-help-git: remove shebang line.
+	* unposted: Functions/Misc/run-help-git,
+	Functions/Calendar/calendar_add, Functions/Misc/sticky-note: remove
+	shebang line.
 
 2008-02-06  Clint Adams  <clint@zsh.org>
 
