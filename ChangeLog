@@ -1,3 +1,7 @@
+2008-02-07  Clint Adams  <clint@zsh.org>
+
+	* unposted: Functions/Misc/run-help-git: remove shebang line.
+
 2008-02-06  Clint Adams  <clint@zsh.org>
 
 	* 24536: Completion/Unix/Command/_cut: tweaks to 24529, spelling

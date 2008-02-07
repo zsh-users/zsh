@@ -1,4 +1,3 @@
-#!/bin/zsh
 if [ $# -eq 0 ]; then
     man git
 else
