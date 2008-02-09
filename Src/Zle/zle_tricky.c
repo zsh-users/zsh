@@ -1230,11 +1230,16 @@ get_comp_string(void)
 	    /* This is done when the lexer reached the word the cursor is on. */
 	    tt = tokstr ? dupstring(tokstr) : NULL;
 
-            if (isset(RCQUOTES) && *tt == Snull) {
-                char *p, *e = tt + zlemetacs - wb;
-                for (p = tt; *p && p < e; p++)
-                    if (*p == '\'')
-                        qsub++;
+            if (isset(RCQUOTES)) {
+		char *tt1, *e = tt + zlemetacs - wb;
+		for (tt1 = tt; *tt1; tt1++) {
+		    if (*tt1 == Snull) {
+			char *p;
+			for (p = tt1; *p && p < e; p++)
+			    if (*p == '\'')
+				qsub++;
+		    }
+		}
             }
 	    /* If we added a `x', remove it. */
 	    if (addedx && tt)

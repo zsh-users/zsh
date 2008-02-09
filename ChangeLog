@@ -1,3 +1,9 @@
+2008-02-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24542: Src/Zle/zle_tricky.c: RC_QUOTES wasn't handled
+	if the opening quote wasn't at the start of the word, causing
+	endless looping.
+
 2008-02-07  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Misc/run-help-git,
