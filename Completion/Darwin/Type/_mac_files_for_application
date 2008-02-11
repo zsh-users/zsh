@@ -66,7 +66,7 @@ _mac_files_for_application() {
 
   case ${#glob_patterns} in
     0) return 1 ;;
-    1) _files "$opts[@]" -g "$glob_patterns[0]" ;;
+    1) _files "$opts[@]" -g "$glob_patterns[1]" ;;
     *) _files "$opts[@]" -g "{${(j/,/)glob_patterns}}" ;;
   esac
 }

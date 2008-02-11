@@ -1,5 +1,9 @@
 2008-02-11  Peter Stephenson  <pws@csr.com>
 
+	* users/12547: Completion/Darwin/Type/_mac_files_for_application,
+	Completion/Unix/Command/_locate: fix array indices [0] -> [1] in
+	completion.
+
 	* Haakon Riiser: 24545: Completion/X/Command/_acroread: new
 	options for version 8.
 

@@ -1,7 +1,7 @@
 #compdef locate mlocate slocate
 
 # Decide if we are using mlocate or slocate.
-local ltype basename=${words[0]:t} input
+local ltype basename=${words[1]:t} input
 # If we can't, use this guess.
 local best_guess=mlocate
 
@@ -11,7 +11,7 @@ case $basename in
   ;;
 
   (locate)
-  input="$(_call_program locate $words[0] -V)"
+  input="$(_call_program locate $words[1] -V)"
   case $input in
     (*mlocate*)
     ltype=mlocate
