@@ -26,8 +26,15 @@ if [[ -z $_acroread_version ]]; then
   fi
 fi
 
-if [[ $_acroread_version == 7.* ]]; then
+if [[ $_acroread_version == [78].* ]]; then
+  local -a extra_args
+  if [[ $_acroread_version == 8.* ]]; then
+    extra_args=(-man '-installCertificate:server ip::server port')
+  else
+    extra_args=()
+  fi
   _arguments -C \
+    "${extra_args[@]}" \
     '--display=:X display:_x_display' \
     '--screen=:X screen (overrides the screen part of DISPLAY)' \
     --sync \
@@ -55,6 +62,8 @@ if [[ $_acroread_version == 7.* ]]; then
     '(-odd)-even' \
     -commentsOff \
     -annotsOff \
+    -stampsOff \
+    -markupsOn \
     '(-level3)-level2' \
     '(-level2)-level3' \
     -printerhalftones \

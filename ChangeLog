@@ -1,3 +1,8 @@
+2008-02-11  Peter Stephenson  <pws@csr.com>
+
+	* Haakon Riiser: 24545: Completion/X/Command/_acroread: new
+	options for version 8.
+
 2008-02-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24542: Src/Zle/zle_tricky.c: RC_QUOTES wasn't handled
