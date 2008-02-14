@@ -1200,6 +1200,7 @@ do_menucmp(int lst)
 	showinglist = -2;
 	return;
     }
+
     /* Otherwise go to the next match in the array... */
     do {
 	if (!*++(minfo.cur)) {

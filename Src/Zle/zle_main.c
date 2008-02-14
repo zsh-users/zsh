@@ -1000,6 +1000,8 @@ zlecore(void)
     FD_ZERO(&foofd);
 #endif
 
+    pushheap();
+
     /*
      * A widget function may decide to exit the shell.
      * We never exit directly from functions, to allow
@@ -1070,7 +1072,11 @@ zlecore(void)
 #endif
 	    if (!kungetct)
 		zrefresh();
+
+	freeheap();
     }
+
+    popheap();
 }
 
 /* Read a line.  It is returned metafied. */
@@ -1786,12 +1792,19 @@ static struct builtin bintab[] = {
 
 /**/
 mod_export struct hookdef zlehooks[] = {
+    /* LISTMATCHESHOOK */
     HOOKDEF("list_matches", NULL, 0),
+    /* COMPLETEHOOK */
     HOOKDEF("complete", NULL, 0),
+    /* BEFORECOMPLETEHOOK */
     HOOKDEF("before_complete", NULL, 0),
+    /* AFTERCOMPLETEHOOK */
     HOOKDEF("after_complete", NULL, 0),
+    /* ACCEPTCOMPHOOK */
     HOOKDEF("accept_completion", NULL, 0),
+    /* REVERSEMENUHOOK */
     HOOKDEF("reverse_menu", NULL, 0),
+    /* INVALIDATELISTHOOK */
     HOOKDEF("invalidate_list", NULL, 0),
 };
 

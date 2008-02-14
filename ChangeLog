@@ -1,3 +1,10 @@
+2008-02-14  Peter Stephenson  <pws@csr.com>
+
+	* 24551: Src/Zle/compresult.c, Src/Zle/zle_main.c: free heap
+	memory after each full Zle command executed (plus cosmetics).
+	Still need to try and stop menu selection accumulating heap
+	memory.
+
 2008-02-11  Peter Stephenson  <pws@csr.com>
 
 	* users/12547: Completion/Darwin/Type/_mac_files_for_application,
