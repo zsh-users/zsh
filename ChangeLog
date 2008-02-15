@@ -1,5 +1,8 @@
 2008-02-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24556: Doc/Zsh/prompt.yo, Src/prompt.c: %G inside %{...%}
+	can be used to count width of "glitch" characters.
+
 	* 24554: Src/Zle/complist.c: push an extra heap for
 	complistmatches() to stop accumulating it; always treat
 	mcolors as a global instead of just sometimes.

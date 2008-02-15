@@ -473,6 +473,16 @@ putpromptchar(int doprint, int endchar)
 		    *bp++ = Inpar;
 		}
 		break;
+	    case 'G':
+		if (arg > 0) {
+		    addbufspc(arg);
+		    while (arg--)
+			*bp++ = Nularg;
+		} else {
+		    addbufspc(1);
+		    *bp++ = Nularg;
+		}
+		break;
 	    case /*{*/ '}':
 		if (trunccount && trunccount >= dontcount)
 		    return *fm;

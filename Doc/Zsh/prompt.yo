@@ -188,6 +188,18 @@ Include a string as a literal escape sequence.
 The string within the braces should not change the cursor
 position.  Brace pairs can nest.
 )
+item(tt(%G))(
+Within a tt(%{)...tt(%}) sequence, include a `glitch': that is, assume
+that a single character width will be output.  This is useful when
+outputting characters that otherwise cannot be correctly handled by the
+shell, such as the alternate character set on some terminals.
+The characters in question can be included within a tt(%{)...tt(%})
+sequence together with the appropriate number of tt(%G) sequences to
+indicate the correct width.  An integer between the `tt(%)' and `tt(G)'
+indicates a character width other than one.  Hence tt(%{)var(seq)tt(%2G%})
+outputs var(seq) and assumes it takes up the width of two standard
+characters.
+)
 enditem()
 
 sect(Conditional Substrings in Prompts)
