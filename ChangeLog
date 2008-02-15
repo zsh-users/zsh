@@ -1,3 +1,9 @@
+2008-02-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24554: Src/Zle/complist.c: push an extra heap for
+	complistmatches() to stop accumulating it; always treat
+	mcolors as a global instead of just sometimes.
+
 2008-02-14  Peter Stephenson  <pws@csr.com>
 
 	* 24551: Src/Zle/compresult.c, Src/Zle/zle_main.c: free heap

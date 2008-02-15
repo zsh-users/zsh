@@ -31,6 +31,124 @@
 #include "complist.pro"
 
 
+/* Information about the list shown. */
+
+/*
+ * noselect: 1 if complistmatches indicated we shouldn't do selection.
+ *           Tested in domenuselect.
+ * mselect:  Local copy of the index of the currently selected match.
+ *           Initialised to the gnum entry of the current match for
+ *           each completion.
+ * inselect: 1 if we already selecting matches; tested in complistmatches()
+ * mcol:     The column for the selected completion.  As we never scroll
+ *           horizontally this applies both the screen and the logical array.
+ * mline:    The line for the selected completion in the logical array of
+ *           all matches, not all of which may be on screen at once.
+ * mcols:    Local copy of columns used in sizing arrays. 
+ * mlines:   The number of lines in the logical array of all matches,
+ *           initialised from listdat.nlines.
+ */
+static int noselect, mselect, inselect, mcol, mline, mcols, mlines;
+/*
+ * selected: Used to signal between domenucomplete() and menuselect()
+ *           that a selected entry has been found.  Or something.
+ * mlbeg:    The first line of the logical array of all matches that
+ *           fits on screen.
+ * mlend:    The line after the last that fits on screen.
+ * mscroll:  1 if the scrolling prompt is shown on screen.
+ * mrestlines: The number of screen lines remaining to be processed.
+ */
+static int selected, mlbeg = -1, mlend = 9999999, mscroll, mrestlines;
+/*
+ * mnew: 1 if a new selection menu is being displayed.
+ * mlastcols: stored value of mcols for use in calculating mnew.
+ * mlastlines: stored value of mlines for use in calculating mnew.
+ * mhasstat: Indicates if the status line is present (but maybe not
+ *           yet printed).
+ * mfirstl: The first line of the logical array of all matches to
+ *          be shown on screen, -1 if this has not yet been determined.
+ * mlastm: The index of the selected match in some circumstances; used
+ *         if an explicit number for a match is passed to compprintfmt();
+ *         initialised from the total number of matches.  I realise this
+ *         isn't very illuminating.
+ */
+static int mnew, mlastcols, mlastlines, mhasstat, mfirstl, mlastm;
+/*
+ * mlprinted: Used to signal the number of additional lines printed
+ *            when outputting matches (as argument passing is a bit
+ *            screwy within the completion system).
+ * molbeg:    The last value of mlbeg; -1 if invalid, -42 if, er, very
+ *            invalid.  Used in calculations of how much to draw.
+ * mocol:     The last value of mcol.
+ * moline:    The last value of mline.
+ * mstatprinted: Indicates that the status line has now been printed,
+ *               c.f. mhasstat.
+ */
+static int mlprinted, molbeg = -2, mocol = 0, moline = 0, mstatprinted;
+/*
+ * mstatus: The message printed when scrolling.
+ * mlistp: The message printed when merely listing.
+ */
+static char *mstatus, *mlistp;
+/*
+ * mtab is the logical array of all matches referred to above.  It
+ * contains mcols*mlines entries.  These entries contain a pointer to
+ * the match structure which is in use at a particular point.  Note
+ * that for multiple line entries lines after the first contain NULL.
+ *
+ * mmtabp is a pointer to the selected entry in mtab.
+ */
+static Cmatch **mtab, **mmtabp;
+/*
+ * Used to indicate that the list has changed and needs redisplaying.
+ */
+static int mtab_been_reallocated;
+/*
+ * Array and pointer for the match group in exactly the same layout
+ * as mtab and mmtabp.
+ */
+static Cmgroup *mgtab, *mgtabp;
+/*
+ * Contains information about the colours to be used for entries.
+ * Sometimes mcolors is passed as an argument even though it's
+ * available to all the functions.
+ */
+static struct listcols mcolors;
+#ifdef DEBUG
+/*
+ * Allow us to keep track of pointer arithmetic for mgtab; could
+ * just as well have been for mtab but wasn't.
+ */
+int mgtabsize;
+#endif
+
+/* Used in mtab/mgtab, for explanations. */
+
+#define MMARK       ((unsigned long) 1)
+#define mmarked(v)  (((unsigned long) (v)) & MMARK)
+#define mtmark(v)   ((Cmatch *) (((unsigned long) (v)) | MMARK))
+#define mtunmark(v) ((Cmatch *) (((unsigned long) (v)) & ~MMARK))
+#define mgmark(v)   ((Cmgroup)  (((unsigned long) (v)) | MMARK))
+#define mgunmark(v) ((Cmgroup)  (((unsigned long) (v)) & ~MMARK))
+
+/* Information for in-string colours. */
+
+/* Maximum number of in-string colours supported. */
+
+#define MAX_POS 11
+
+static int nrefs;
+static int begpos[MAX_POS], curisbeg;
+static int endpos[MAX_POS];
+static int sendpos[MAX_POS], curissend; /* sorted end positions */
+static char **patcols, *curiscols[MAX_POS];
+static int curiscol;
+
+/* The last color used. */
+
+static char *last_cap;
+
+
 /* We use the parameters ZLS_COLORS and ZLS_COLOURS in the same way as
  * the color ls does. It's just that we don't support the `or' file
  * type. */
@@ -67,10 +185,6 @@ static Keymap mskeymap, lskeymap;
 #define COL_DU 17
 
 #define NUM_COLS 18
-
-/* Maximum number of in-string colours supported. */
-
-#define MAX_POS 11
 
 /* Names of the terminal strings. */
 
@@ -191,7 +305,7 @@ getcolval(char *s, int multi)
  * character after it. */
 
 static char *
-getcoldef(Listcols c, char *s)
+getcoldef(char *s)
 {
     Patprog gprog = NULL;
 
@@ -236,12 +350,12 @@ getcoldef(Listcols c, char *s)
 	ec->ext = n;
 	ec->col = s;
 	ec->next = NULL;
-	if ((eo = c->exts)) {
+	if ((eo = mcolors.exts)) {
 	    while (eo->next)
 		eo = eo->next;
 	    eo->next = ec;
 	} else
-	    c->exts = ec;
+	    mcolors.exts = ec;
 	if (*p)
 	    *p++ = '\0';
 	return p;
@@ -278,12 +392,12 @@ getcoldef(Listcols c, char *s)
 		pc->cols[i] = cols[i];
 	    pc->cols[i] = NULL;
 	    pc->next = NULL;
-	    if ((po = c->pats)) {
+	    if ((po = mcolors.pats)) {
 		while (po->next)
 		    po = po->next;
 		po->next = pc;
 	    } else
-		c->pats = pc;
+		mcolors.pats = pc;
 	}
 	if (*t)
 	    *t++ = '\0';
@@ -311,12 +425,12 @@ getcoldef(Listcols c, char *s)
 			NULL : gprog);
 	    fc->col = s;
 	    fc->next = NULL;
-	    if ((fo = c->files[i])) {
+	    if ((fo = mcolors.files[i])) {
 		while (fo->next)
 		    fo = fo->next;
 		fo->next = fc;
 	    } else
-		c->files[i] = fc;
+		mcolors.files[i] = fc;
 	}
 	if (*p)
 	    *p++ = '\0';
@@ -337,10 +451,12 @@ filecol(char *col)
     return fc;
 }
 
-/* This initializes the given terminal color structure. */
+/*
+ * This initializes the given terminal color structure.
+ */
 
 static void
-getcols(Listcols c)
+getcols()
 {
     char *s;
     int i, l;
@@ -350,171 +466,59 @@ getcols(Listcols c)
     if (!(s = getsparam("ZLS_COLORS")) &&
 	!(s = getsparam("ZLS_COLOURS"))) {
 	for (i = 0; i < NUM_COLS; i++)
-	    c->files[i] = filecol("");
-	c->pats = NULL;
-	c->exts = NULL;
+	    mcolors.files[i] = filecol("");
+	mcolors.pats = NULL;
+	mcolors.exts = NULL;
 	
 	if ((s = tcstr[TCSTANDOUTBEG]) && s[0]) {
-	    c->files[COL_MA] = filecol(s);
-	    c->files[COL_EC] = filecol(tcstr[TCSTANDOUTEND]);
+	    mcolors.files[COL_MA] = filecol(s);
+	    mcolors.files[COL_EC] = filecol(tcstr[TCSTANDOUTEND]);
 	} else
-	    c->files[COL_MA] = filecol(defcols[COL_MA]);
+	    mcolors.files[COL_MA] = filecol(defcols[COL_MA]);
 	lr_caplen = 0;
-	if ((max_caplen = strlen(c->files[COL_MA]->col)) <
-	    (l = strlen(c->files[COL_EC]->col)))
+	if ((max_caplen = strlen(mcolors.files[COL_MA]->col)) <
+	    (l = strlen(mcolors.files[COL_EC]->col)))
 	    max_caplen = l;
 	unqueue_signals();
 	return;
     }
-    /* We have one of the parameters, use it. */
-    memset(c, 0, sizeof(*c));
+    /* Reset the global color structure. */
+    memset(&mcolors, 0, sizeof(mcolors));
     s = dupstring(s);
     while (*s)
 	if (*s == ':')
 	    s++;
 	else
-	    s = getcoldef(c, s);
+	    s = getcoldef(s);
     unqueue_signals();
 
     /* Use default values for those that aren't set explicitly. */
     for (i = 0; i < NUM_COLS; i++) {
-	if (!c->files[i] || !c->files[i]->col)
-	    c->files[i] = filecol(defcols[i]);
-	if (c->files[i] && c->files[i]->col &&
-	    (l = strlen(c->files[i]->col)) > max_caplen)
+	if (!mcolors.files[i] || !mcolors.files[i]->col)
+	    mcolors.files[i] = filecol(defcols[i]);
+	if (mcolors.files[i] && mcolors.files[i]->col &&
+	    (l = strlen(mcolors.files[i]->col)) > max_caplen)
 	    max_caplen = l;
     }
-    lr_caplen = strlen(c->files[COL_LC]->col) + strlen(c->files[COL_RC]->col);
+    lr_caplen = strlen(mcolors.files[COL_LC]->col) +
+	strlen(mcolors.files[COL_RC]->col);
 
     /* Default for missing files. */
-    if (!c->files[COL_MI] || !c->files[COL_MI]->col)
-	c->files[COL_MI] = c->files[COL_FI];
+    if (!mcolors.files[COL_MI] || !mcolors.files[COL_MI]->col)
+	mcolors.files[COL_MI] = mcolors.files[COL_FI];
 
     return;
 }
 
-/* Information about the list shown. */
-
-/*
- * noselect: 1 if complistmatches indicated we shouldn't do selection.
- *           Tested in domenuselect.
- * mselect:  Local copy of the index of the currently selected match.
- *           Initialised to the gnum entry of the current match for
- *           each completion.
- * inselect: 1 if we already selecting matches; tested in complistmatches()
- * mcol:     The column for the selected completion.  As we never scroll
- *           horizontally this applies both the screen and the logical array.
- * mline:    The line for the selected completion in the logical array of
- *           all matches, not all of which may be on screen at once.
- * mcols:    Local copy of columns used in sizing arrays. 
- * mlines:   The number of lines in the logical array of all matches,
- *           initialised from listdat.nlines.
- */
-static int noselect, mselect, inselect, mcol, mline, mcols, mlines;
-/*
- * selected: Used to signal between domenucomplete() and menuselect()
- *           that a selected entry has been found.  Or something.
- * mlbeg:    The first line of the logical array of all matches that
- *           fits on screen.
- * mlend:    The line after the last that fits on screen.
- * mscroll:  1 if the scrolling prompt is shown on screen.
- * mrestlines: The number of screen lines remaining to be processed.
- */
-static int selected, mlbeg = -1, mlend = 9999999, mscroll, mrestlines;
-/*
- * mnew: 1 if a new selection menu is being displayed.
- * mlastcols: stored value of mcols for use in calculating mnew.
- * mlastlines: stored value of mlines for use in calculating mnew.
- * mhasstat: Indicates if the status line is present (but maybe not
- *           yet printed).
- * mfirstl: The first line of the logical array of all matches to
- *          be shown on screen, -1 if this has not yet been determined.
- * mlastm: The index of the selected match in some circumstances; used
- *         if an explicit number for a match is passed to compprintfmt();
- *         initialised from the total number of matches.  I realise this
- *         isn't very illuminating.
- */
-static int mnew, mlastcols, mlastlines, mhasstat, mfirstl, mlastm;
-/*
- * mlprinted: Used to signal the number of additional lines printed
- *            when outputting matches (as argument passing is a bit
- *            screwy within the completion system).
- * molbeg:    The last value of mlbeg; -1 if invalid, -42 if, er, very
- *            invalid.  Used in calculations of how much to draw.
- * mocol:     The last value of mcol.
- * moline:    The last value of mline.
- * mstatprinted: Indicates that the status line has now been printed,
- *               c.f. mhasstat.
- */
-static int mlprinted, molbeg = -2, mocol = 0, moline = 0, mstatprinted;
-/*
- * mstatus: The message printed when scrolling.
- * mlistp: The message printed when merely listing.
- */
-static char *mstatus, *mlistp;
-/*
- * mtab is the logical array of all matches referred to above.  It
- * contains mcols*mlines entries.  These entries contain a pointer to
- * the match structure which is in use at a particular point.  Note
- * that for multiple line entries lines after the first contain NULL.
- *
- * mmtabp is a pointer to the selected entry in mtab.
- */
-static Cmatch **mtab, **mmtabp;
-/*
- * Used to indicate that the list has changed and needs redisplaying.
- */
-static int mtab_been_reallocated;
-/*
- * Array and pointer for the match group in exactly the same layout
- * as mtab and mmtabp.
- */
-static Cmgroup *mgtab, *mgtabp;
-/*
- * Contains information about the colours to be used for entries.
- * Sometimes mcolors is passed as an argument even though it's
- * availabel to all the functions.
- */
-static struct listcols mcolors;
-#ifdef DEBUG
-/*
- * Allow us to keep track of pointer arithmetic for mgtab; could
- * just as well have been for mtab but wasn't.
- */
-int mgtabsize;
-#endif
-
-/* Used in mtab/mgtab, for explanations. */
-
-#define MMARK       ((unsigned long) 1)
-#define mmarked(v)  (((unsigned long) (v)) & MMARK)
-#define mtmark(v)   ((Cmatch *) (((unsigned long) (v)) | MMARK))
-#define mtunmark(v) ((Cmatch *) (((unsigned long) (v)) & ~MMARK))
-#define mgmark(v)   ((Cmgroup)  (((unsigned long) (v)) | MMARK))
-#define mgunmark(v) ((Cmgroup)  (((unsigned long) (v)) & ~MMARK))
-
-/* Information for in-string colours. */
-
-static int nrefs;
-static int begpos[MAX_POS], curisbeg;
-static int endpos[MAX_POS];
-static int sendpos[MAX_POS], curissend; /* sorted end positions */
-static char **patcols, *curiscols[MAX_POS];
-static int curiscol;
-
-/* The last color used. */
-
-static char *last_cap;
-
 static void
-zlrputs(Listcols c, char *cap)
+zlrputs(char *cap)
 {
     if (!*last_cap || strcmp(last_cap, cap)) {
 	VARARR(char, buf, lr_caplen + max_caplen + 1);
 
-	strcpy(buf, c->files[COL_LC]->col);
+	strcpy(buf, mcolors.files[COL_LC]->col);
 	strcat(buf, cap);
-	strcat(buf, c->files[COL_RC]->col);
+	strcat(buf, mcolors.files[COL_RC]->col);
 
 	tputs(buf, 1, putshout);
 
@@ -523,18 +527,18 @@ zlrputs(Listcols c, char *cap)
 }
 
 static void
-zcputs(Listcols c, char *group, int colour)
+zcputs(char *group, int colour)
 {
     Filecol fc;
 
-    for (fc = c->files[colour]; fc; fc = fc->next)
+    for (fc = mcolors.files[colour]; fc; fc = fc->next)
 	if (fc->col &&
 	    (!fc->prog || !group || pattry(fc->prog, group))) {
-	    zlrputs(c, fc->col);
+	    zlrputs(fc->col);
 
 	    return;
 	}
-    zlrputs(c, "0");
+    zlrputs("0");
 }
 
 /* Turn off colouring. */
@@ -546,16 +550,16 @@ zcoff(void)
 	tputs(mcolors.files[COL_EC]->col, 1, putshout);
 	*last_cap = '\0';
     } else
-	zcputs(&mcolors, NULL, COL_NO);
+	zcputs(NULL, COL_NO);
 }
 
 
 static void
-initiscol(Listcols c)
+initiscol()
 {
     int i;
 
-    zlrputs(c, patcols[0]);
+    zlrputs(patcols[0]);
 
     curiscols[curiscol = 0] = *patcols++;
 
@@ -568,15 +572,15 @@ initiscol(Listcols c)
 }
 
 static void
-doiscol(Listcols c, int pos)
+doiscol(int pos)
 {
     int fi;
 
     while (pos > sendpos[curissend]) {
 	curissend++;
 	if (curiscol) {
-	    zcputs(c, NULL, COL_NO);
-	    zlrputs(c, curiscols[--curiscol]);
+	    zcputs(NULL, COL_NO);
+	    zlrputs(curiscols[--curiscol]);
 	}
     }
     while (((fi = (endpos[curisbeg] < begpos[curisbeg] || 
@@ -592,8 +596,8 @@ doiscol(Listcols c, int pos)
 		sendpos[j] = sendpos[j-1];
 	    sendpos[i] = e;
 	    
-	    zcputs(c, NULL, COL_NO);
-	    zlrputs(c, *patcols);
+	    zcputs(NULL, COL_NO);
+	    zlrputs(*patcols);
 	    curiscols[++curiscol] = *patcols;
 	}
 	++patcols;
@@ -604,14 +608,14 @@ doiscol(Listcols c, int pos)
 /* Stripped-down version of printfmt(). But can do in-string colouring. */
 
 static int
-clprintfmt(Listcols c, char *p, int ml)
+clprintfmt(char *p, int ml)
 {
     int cc = 0, i = 0, ask, beg;
 
-    initiscol(c);
+    initiscol();
 
     for (; *p; p++) {
-	doiscol(c, i++);
+	doiscol(i++);
 	cc++;
 	if (*p == '\n') {
 	    if (mlbeg >= 0 && tccan(TCCLEAREOL))
@@ -643,7 +647,7 @@ clprintfmt(Listcols c, char *p, int ml)
  */
 
 static int
-clnicezputs(Listcols colors, char *s, int ml)
+clnicezputs(int do_colors, char *s, int ml)
 {
     int i = 0, col = 0, ask, oml = ml;
     char *t;
@@ -674,8 +678,8 @@ clnicezputs(Listcols colors, char *s, int ml)
     uptr = unmetafy(ums, &umlen);
     umleft = umlen;
 
-    if (colors)
-	initiscol(colors);
+    if (do_colors)
+	initiscol();
 
     mb_metacharinit();
     while (umleft > 0) {
@@ -708,14 +712,14 @@ clnicezputs(Listcols colors, char *s, int ml)
 
 	umleft -= cnt;
 	uptr += cnt;
-	if (colors) {
+	if (do_colors) {
 	    /*
 	     * The code for the colo[u]ri[s/z]ation is obscure (surprised?)
 	     * but if we do it for every input character, as we do in
 	     * the simple case, we shouldn't go too far wrong.
 	     */
 	    while (cnt--)
-		doiscol(colors, i++);
+		doiscol(i++);
 	}
 
 	/*
@@ -756,7 +760,7 @@ clnicezputs(Listcols colors, char *s, int ml)
 		    return ask;
 		}
 		col -= columns;
-		if (colors)
+		if (do_colors)
 		    fputs(" \010", shout);
 	    }
 	}
@@ -765,12 +769,12 @@ clnicezputs(Listcols colors, char *s, int ml)
     free(ums);
 #else
 
-    if (colors)
-	initiscol(colors);
+    if (do_colors)
+	initiscol();
 
     while ((cc = *s++)) {
-	if (colors)
-	    doiscol(colors, i++);
+	if (do_colors)
+	    doiscol(i++);
 	if (itok(cc)) {
 	    if (cc <= Comma)
 		cc = ztokens[cc - Pound];
@@ -794,7 +798,7 @@ clnicezputs(Listcols colors, char *s, int ml)
 		    return ask;
 		}
 		col = 0;
-		if (colors)
+		if (do_colors)
 		    fputs(" \010", shout);
 	    }
 	}
@@ -807,13 +811,13 @@ clnicezputs(Listcols colors, char *s, int ml)
 /* Get the terminal color string for the given match. */
 
 static int
-putmatchcol(Listcols c, char *group, char *n)
+putmatchcol(char *group, char *n)
 {
     Patcol pc;
 
     nrefs = MAX_POS - 1;
 
-    for (pc = c->pats; pc; pc = pc->next)
+    for (pc = mcolors.pats; pc; pc = pc->next)
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
 	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
 	    if (pc->cols[1]) {
@@ -821,12 +825,12 @@ putmatchcol(Listcols c, char *group, char *n)
 
 		return 1;
 	    }
-	    zlrputs(c, pc->cols[0]);
+	    zlrputs(pc->cols[0]);
 
 	    return 0;
 	}
 
-    zcputs(c, group, COL_NO);
+    zcputs(group, COL_NO);
 
     return 0;
 }
@@ -835,23 +839,23 @@ putmatchcol(Listcols c, char *group, char *n)
  * file modes. */
 
 static int
-putfilecol(Listcols c, char *group, char *n, mode_t m)
+putfilecol(char *group, char *n, mode_t m)
 {
     int colour;
     Extcol ec;
     Patcol pc;
 
-    for (ec = c->exts; ec; ec = ec->next)
+    for (ec = mcolors.exts; ec; ec = ec->next)
 	if (strsfx(ec->ext, n) &&
 	    (!ec->prog || !group || pattry(ec->prog, group))) {
-	    zlrputs(c, ec->col);
+	    zlrputs(ec->col);
 
 	    return 0;
 	}
 
     nrefs = MAX_POS - 1;
 
-    for (pc = c->pats; pc; pc = pc->next)
+    for (pc = mcolors.pats; pc; pc = pc->next)
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
 	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
 	    if (pc->cols[1]) {
@@ -859,7 +863,7 @@ putfilecol(Listcols c, char *group, char *n, mode_t m)
 
 		return 1;
 	    }
-	    zlrputs(c, pc->cols[0]);
+	    zlrputs(pc->cols[0]);
 
 	    return 0;
 	}
@@ -881,7 +885,7 @@ putfilecol(Listcols c, char *group, char *n, mode_t m)
     else
 	colour = COL_FI;
 
-    zcputs(c, group, colour);
+    zcputs(group, colour);
 
     return 0;
 }
@@ -1593,7 +1597,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 
     if (!mp) {
 	if (dolist(ml)) {
-	    zcputs(&mcolors, g->name, COL_SP);
+	    zcputs(g->name, COL_SP);
 	    len = width - 2;
 	    while (len-- > 0)
 		putc(' ', shout);
@@ -1637,17 +1641,17 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	    mcol = 0;
 	    mmtabp = mtab + mm;
 	    mgtabp = mgtab + mm;
-	    zcputs(&mcolors, g->name, COL_MA);
+	    zcputs(g->name, COL_MA);
 	} else if ((m->flags & CMF_NOLIST) &&
                    mcolors.files[COL_HI] && mcolors.files[COL_HI]->col)
-	    zcputs(&mcolors, g->name, COL_HI);
+	    zcputs(g->name, COL_HI);
 	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)) &&
                  mcolors.files[COL_DU] && mcolors.files[COL_DU]->col)
-	    zcputs(&mcolors, g->name, COL_DU);
+	    zcputs(g->name, COL_DU);
 	else
-	    subcols = putmatchcol(&mcolors, g->name, m->disp);
+	    subcols = putmatchcol(g->name, m->disp);
 	if (subcols)
-	    ret = clprintfmt(&mcolors, m->disp, ml);
+	    ret = clprintfmt(m->disp, ml);
 	else {
 	    compprintfmt(m->disp, 0, 1, 0, ml, &stop);
 	    if (stop)
@@ -1698,17 +1702,17 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	    mline = ml;
 	    mmtabp = mtab + mx + mm;
 	    mgtabp = mgtab + mx + mm;
-	    zcputs(&mcolors, g->name, COL_MA);
+	    zcputs(g->name, COL_MA);
 	} else if (m->flags & CMF_NOLIST)
-	    zcputs(&mcolors, g->name, COL_HI);
+	    zcputs(g->name, COL_HI);
 	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
-	    zcputs(&mcolors, g->name, COL_DU);
+	    zcputs(g->name, COL_DU);
 	else if (m->mode)
-	    subcols = putfilecol(&mcolors, g->name, m->str, m->mode);
+	    subcols = putfilecol(g->name, m->str, m->mode);
 	else
-	    subcols = putmatchcol(&mcolors, g->name, (m->disp ? m->disp : m->str));
+	    subcols = putmatchcol(g->name, (m->disp ? m->disp : m->str));
 
-	ret = clnicezputs(subcols ? &mcolors : NULL,
+	ret = clnicezputs(subcols,
 			  (m->disp ? m->disp : m->str), ml);
 	if (ret) {
 	    zcoff();
@@ -1720,7 +1724,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	if ((g->flags & CGF_FILES) && m->modec) {
 	    if (m->gnum != mselect) {
 		zcoff();
-		zcputs(&mcolors, g->name, COL_TC);
+		zcputs(g->name, COL_TC);
 	    }
 	    putc(m->modec, shout);
 	    len++;
@@ -1728,14 +1732,14 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	if ((len = width - len - 2) > 0) {
 	    if (m->gnum != mselect) {
 		zcoff();
-		zcputs(&mcolors, g->name, COL_SP);
+		zcputs(g->name, COL_SP);
 	    }
 	    while (len-- > 0)
 		putc(' ', shout);
 	}
 	zcoff();
 	if (!lastc) {
-	    zcputs(&mcolors, g->name, COL_SP);
+	    zcputs(g->name, COL_SP);
 	    fputs("  ", shout);
 	    zcoff();
 	}
@@ -1838,7 +1842,18 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	amatches = oamatches;
 	return (noselect = 1);
     }
-    getcols(&mcolors);
+
+    /*
+     * There's a lot of memory allocation from this function
+     * for setting up the color display which isn't needed
+     * after the function exits, so it's worthwhile pushing
+     * another heap.  As this is called from a hook in the main
+     * completion handler nothing temporarily allocated from here can be
+     * useful outside.
+     */
+    pushheap();
+
+    getcols();
 
     mnew = ((calclist(mselect >= 0) || mlastcols != columns ||
 	     mlastlines != listdat.nlines) && mselect >= 0);
@@ -1849,6 +1864,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	showinglist = listshown = 0;
 	noselect = 1;
 	amatches = oamatches;
+	popheap();
 	return 1;
     }
     if (inselect || mlbeg >= 0)
@@ -1880,6 +1896,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	mlistp = NULL;
 	if (asklist()) {
 	    amatches = oamatches;
+	    popheap();
 	    return (noselect = 1);
 	}
     }
@@ -1922,6 +1939,8 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
     moline = mline;
 
     amatches = oamatches;
+
+    popheap();
 
     return noselect;
 }
@@ -2239,7 +2258,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     }
     /*
      * Lots of the logic here doesn't really make sense if the
-     * line isn't metafied, but the evidence was that only used
+     * line isn't metafied, but the evidence was that it only used
      * to be metafied locally in a couple of places.
      * It's horrifically difficult to work out where the line
      * is metafied, so I've resorted to the following.
