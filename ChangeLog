@@ -1,3 +1,10 @@
+2008-02-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24566: Doc/Zsh/prompt.yo, Src/prompt.c: fallout:
+	fix truncation with glitch spaces; more careful
+	documentation; allow %N{...}; make unsupported
+	characters default to width 1.
+
 2008-02-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24556: Doc/Zsh/prompt.yo, Src/prompt.c: %G inside %{...%}

@@ -187,6 +187,9 @@ item(tt(%{)...tt(%}))(
 Include a string as a literal escape sequence.
 The string within the braces should not change the cursor
 position.  Brace pairs can nest.
+
+A positive numeric argument between the tt(%) and the %%({) is treated as
+described for tt(%G) below.
 )
 item(tt(%G))(
 Within a tt(%{)...tt(%}) sequence, include a `glitch': that is, assume
@@ -199,6 +202,13 @@ indicate the correct width.  An integer between the `tt(%)' and `tt(G)'
 indicates a character width other than one.  Hence tt(%{)var(seq)tt(%2G%})
 outputs var(seq) and assumes it takes up the width of two standard
 characters.
+
+Multiple uses of tt(%G) accumulate in the obvious fashion; the position
+of the tt(%G) is unimportant.  Negative integers are not handled.
+
+Note that when prompt truncation is in use it is advisable to divide up
+output into single characters within each tt(%{)...tt(%}) group so that
+the correct truncation point can be found.
 )
 enditem()
 
