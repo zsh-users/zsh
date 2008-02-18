@@ -1,3 +1,9 @@
+2008-02-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/12600: Src/builtin.c: reorder handling of -s/-d/-t options
+	so that terminal input modes are set before attempting a
+	read-poll.  Also display any prompt before read-polling.
+
 2008-02-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24566: Doc/Zsh/prompt.yo, Src/prompt.c: fallout:
