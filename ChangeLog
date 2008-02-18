@@ -4,6 +4,9 @@
 	so that terminal input modes are set before attempting a
 	read-poll.  Also display any prompt before read-polling.
 
+	* unposted: Functions/Misc/xtermctl: update uses of "read" to
+	take advantage of users/12600.
+
 2008-02-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24566: Doc/Zsh/prompt.yo, Src/prompt.c: fallout:

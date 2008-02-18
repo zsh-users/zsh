@@ -44,19 +44,23 @@ function xterm-tell {
   print -nr -- $'\e['"${seq}"t
 }
 
+# The following use of "read -st 2 ..." with the control sequences in
+# the prompt string requires zsh 4.3.5-dev-1 or later (zsh-users/12600
+# or equivalent patch).
+
 function xterm-ask {
   local esc
   unset REPLY reply
   1=get_${1#get_}
-  xterm-tell $1
+  local seq=${xtermseq[$1]:?no such control}
   case $1 in
   (get_(label|title))
-      read -t 2 -rk 3 esc || return 1
-      read -rsd $'\e'
-      read -rk 1 esc
+      read -st 2 -rk 3 esc$'?\e['"${seq}"t || return 1
+      read -srd $'\e'
+      read -srk 1 esc
       ;;
   (get_*)
-      read -t 2 -rk 2 esc || return 1
+      read -st 2 -rk 2 esc$'?\e['"${seq}"t || return 1
       IFS=';' read -Arsd t
       (( $#reply > 2 )) && shift reply
       ;;
