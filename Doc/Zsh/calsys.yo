@@ -440,6 +440,10 @@ option tt(-L) indicates that tt(calendar_add) does not need to lock the
 calendar file as it is already locked.  These options will not usually be
 needed by users.
 
+If the style tt(reformat-date) is true, the date and time of the
+new entry will be rewritten into the standard date format:  see
+the descriptions of this style and the style tt(date-format).
+
 The function can use a unique identifier stored with each event to ensure
 that updates to existing events are treated correctly.  The entry
 should contain the word tt(UID), followed by whitespace, followed by
@@ -623,6 +627,14 @@ The location of the file to which events which have passed are appended.
 The default is the calendar file location with the suffix tt(.done).
 The style may be set to an empty string in which case a "done" file
 will not be maintained.
+)
+kindex(reformat-date)
+item(tt(reformat-date))(
+Boolean, used by tt(calendar_add).  If it is true, the date and time
+of new entries added to the calendar will be reformatted to the format
+given by the style tt(date-format) or its default.  Only the date and
+time of the event itself is reformatted; any subsidiary dates and times
+such as those associated with repeat and warning times are left alone.
 )
 kindex(show-prog)
 item(tt(show-prog))(

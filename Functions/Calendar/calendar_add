@@ -8,6 +8,8 @@
 emulate -L zsh
 setopt extendedglob
 
+local context=":datetime:calendar_add:"
+
 local calendar newfile REPLY lastline opt
 local -a calendar_entries lockfiles reply
 integer my_date done rstat nolock nobackup new_recurring old_recurring
@@ -33,17 +35,25 @@ done
 shift $(( OPTIND - 1 ))
 
 # Read the calendar file from the calendar-file style
-zstyle -s ':datetime:calendar_add:' calendar-file calendar ||
+zstyle -s $context calendar-file calendar ||
   calendar=~/calendar
 newfile=$calendar.new.$HOST.$$
 
-if ! calendar_parse "$*"; then
+local addline="$*"
+if ! calendar_parse $addline; then
   print "$0: failed to parse date/time" >&2
   return 1
 fi
 parse_new=("${(@kv)reply}")
 (( my_date = $parse_new[time] ))
 [[ -n $parse_new[rpttime] ]] && (( new_recurring = 1 ))
+if zstyle -t $context reformat-date; then
+  local datefmt
+  zstyle -s $context date-format datefmt ||
+    datefmt="%a %b %d %H:%M:%S %Z %Y"
+  strftime -s REPLY $datefmt $parse_new[time]
+  addline="$REPLY $parse_new[text1]"
+fi
 
 # $calendar doesn't necessarily exist yet.
 
@@ -53,7 +63,7 @@ local my_uid their_uid
 # Match a UID, a unique identifier for the entry inherited from
 # text/calendar format.
 local uidpat='(|*[[:space:]])UID[[:space:]]##(#b)([[:xdigit:]]##)(|[[:space:]]*)'
-if [[ "$*" = ${~uidpat} ]]; then
+if [[ $addline = ${~uidpat} ]]; then
   my_uid=${(U)match[1]}
 fi
 
@@ -82,7 +92,7 @@ fi
 	calendar_parse $line  ||  continue
 	parse_old=("${(@kv)reply}")
 	if (( ! done && ${parse_old[time]} > my_date )); then
-	  print -r -- "$*"
+	  print -r -- $addline
 	  (( done = 1 ))
 	fi
 	if [[ -n $parse_old[rpttime] ]]; then
@@ -119,13 +129,13 @@ fi
 	    fi
 	  fi
 	fi
-	if [[ $REPLY -eq $my_date && $line = "$*" ]]; then
+	if [[ $parse_old[time] -eq $my_date && $line = $addline ]]; then
 	  (( done )) && continue # paranoia: shouldn't happen
 	  (( done = 1 ))
 	fi
 	print -r -- $line
       done
-      (( done )) || print -r -- "$*"
+      (( done )) || print -r -- $addline
     } >$newfile
     if (( ! nobackup )); then
       if ! mv $calendar $calendar.old; then
