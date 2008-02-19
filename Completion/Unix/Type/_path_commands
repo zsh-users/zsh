@@ -52,7 +52,7 @@ fi
 if [[ -n $need_desc ]]; then
   typeset -a dcmds descs cmds
   local desc cmd sep
-  for cmd in ${(@)commands[(I)$PREFIX*]}; do
+  for cmd in ${(k)commands}; do
     desc=$_command_descriptions[$cmd]
     if [[ -z $desc ]]; then
       cmds+=$cmd

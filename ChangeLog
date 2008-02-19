@@ -3,6 +3,12 @@
 	* 24572: Doc/Zsh/calsys.yo, Functions/Calendar/calendar_add:
 	add style reformate-date.
 
+2008-02-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 24570: Completion/Unix/Type/_path_commands: don't attempt to
+	pre-filter $commands on $PREFIX, just let compadd deal with it.
+	Fixes a bad interaction with the _approximate completer.
+
 2008-02-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/12600: Src/builtin.c: reorder handling of -s/-d/-t options
