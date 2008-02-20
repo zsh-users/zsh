@@ -1,7 +1,7 @@
 2008-02-19  Peter Stephenson  <pws@csr.com>
 
 	* 24572: Doc/Zsh/calsys.yo, Functions/Calendar/calendar_add:
-	add style reformate-date.
+	add style reformat-date.
 
 2008-02-19  Barton E. Schaefer  <schaefer@zsh.org>
 
