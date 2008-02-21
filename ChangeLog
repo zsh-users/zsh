@@ -1,3 +1,8 @@
+2008-02-21  Peter Stephenson  <pws@csr.com>
+
+	* users/12632: Src/exec.c: bug unexporting special parameter
+	after "SPECIAL=stuff funccall".
+
 2008-02-19  Peter Stephenson  <pws@csr.com>
 
 	* 24572: Doc/Zsh/calsys.yo, Functions/Calendar/calendar_add:

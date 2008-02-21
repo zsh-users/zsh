@@ -3113,6 +3113,8 @@ restore_params(LinkList restorelist, LinkList removelist)
 		DPUTS(!tpm || PM_TYPE(pm->node.flags) != PM_TYPE(tpm->node.flags) ||
 		      !(pm->node.flags & PM_SPECIAL),
 		      "BUG: in restoring special parameters");
+		if (!pm->env && tpm->env)
+		    delenv(tpm);
 		tpm->node.flags = pm->node.flags;
 		switch (PM_TYPE(pm->node.flags)) {
 		case PM_SCALAR:
