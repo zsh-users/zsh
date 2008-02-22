@@ -1,3 +1,4 @@
+#!/bin/zsh -fi
 # A little zsh sticky-note ("post-it") application.  Sticky notes are
 # stored in the file named by the STICKYFILE variable (defaults to
 # $HOME/.zsticky).  The number of notes stored is STICKYSIZE (1000).

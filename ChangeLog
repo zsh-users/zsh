@@ -1,3 +1,8 @@
+2008-02-22  Clint Adams  <clint@zsh.org>
+
+	* 24576: Functions/Calendar/calendar_add,
+	Functions/Misc/sticky-note: replace shebang lines.
+
 2008-02-21  Peter Stephenson  <pws@csr.com>
 
 	* users/12632: Src/exec.c: bug unexporting special parameter

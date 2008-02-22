@@ -1,3 +1,4 @@
+#!/bin/zsh
 # All arguments are joined with spaces and inserted into the calendar
 # file at the appropriate point.
 #
