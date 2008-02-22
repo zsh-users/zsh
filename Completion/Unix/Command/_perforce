@@ -1571,6 +1571,7 @@ _perforce_cmd_change() {
     '(-o -i)-d[discard newly created pending change]' \
     '(-d -i -f)-o[output specification to standard output]' \
     '(-d -o)-i[read specification from standard input]' \
+    '(-d -o)-u[force change of jobs or description by owner]' \
     "(-i)1::change:_perforce_changes$ctype"
 }
 

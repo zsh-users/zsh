@@ -1,3 +1,8 @@
+2008-02-22  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: new option
+	p4 change -u.
+
 2008-02-22  Clint Adams  <clint@zsh.org>
 
 	* 24578: Completion/Debian/Command/_dpkg: stop completing
