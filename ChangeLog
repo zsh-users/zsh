@@ -1,5 +1,8 @@
 2008-02-22  Clint Adams  <clint@zsh.org>
 
+	* 24578: Completion/Debian/Command/_dpkg: stop completing
+	--print-gnu-build-architecture, which was dropped in 2005.
+
 	* 24576: Functions/Calendar/calendar_add,
 	Functions/Misc/sticky-note: replace shebang lines.
 
