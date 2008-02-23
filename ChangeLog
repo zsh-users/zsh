@@ -1,3 +1,14 @@
+2008-02-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24585: Completion/Base/Utility/_alternative,
+	Completion/Unix/Type/_path_files,
+	Completion/Zsh/Type/_delimiters,
+	Completion/Zsh/Type/_globqual_delims,
+	Completion/Zsh/Type/_globquals,
+	Completion/Zsh/Type/_history_modifiers, Doc/Zsh/compsys.yo:
+	completion for glob qualifiers plus bug fix for message-only
+	completion in _alternative.
+
 2008-02-22  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: new option

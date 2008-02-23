@@ -75,7 +75,7 @@ while _tags; do
 done
 
 for descr in "$mesgs[@]"; do
-  _message -e "${descr%%:*}" "${desc#*:}"
+  _message -e "${descr%%:*}" "${descr#*:}"
 done
 
 return 1

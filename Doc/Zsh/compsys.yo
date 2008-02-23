@@ -1262,6 +1262,15 @@ This style is used by the tt(_list) completer function to decide if
 insertion of matches should be delayed unconditionally. The default is 
 `true'.
 )
+kindex(delimiters, completion style)
+item(tt(delimiters))(
+This style is used when adding a delimiter for use with history
+modifiers or glob qualifiers that have delimited arguments.  It is
+an array of preferred delimiters to add.  Non-special characters are
+preferred as the completion system may otherwise become confused.
+The default list is tt(:), tt(+), tt(/), tt(-), tt(%).  The list
+may be empty to force a delimiter to be typed.
+)
 kindex(disabled, completion style)
 item(tt(disabled))(
 If this is set to `true', the tt(_expand_alias) completer and bindable 

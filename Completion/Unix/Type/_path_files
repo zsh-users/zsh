@@ -6,8 +6,9 @@
 local linepath realpath donepath prepath testpath exppath skips skipped
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
 local pats haspats ignore pfx pfxsfx sopt gopt opt sdirs ignpar cfopt listsfx
-local nm=$compstate[nmatches] menu matcher mopts sort match mid accex fake
+local nm=$compstate[nmatches] menu matcher mopts sort mid accex fake
 local listfiles listopts tmpdisp
+local -a match mbegin mend
 
 typeset -U prepaths exppaths
 
@@ -349,7 +350,19 @@ for prepath in "$prepaths[@]"; do
 
     tmp2=( "$tmp1[@]" )
 
-    if [[ "$tpre$tsuf" = */* ]]; then
+    # Look for glob qualifiers.
+    # Extra nastiness to be careful about a quoted parenthesis.
+    # The initial tests look for parentheses with zero or an
+    # even number of backslashes in front.
+    # The later test looks for an outstanding quote.
+    if [[ ( -o bareglobqual && \
+	      "$tpre/$tsuf" = (#b)((*[^\\]|)(\\\\)#\()([^\)]#) || \
+            -o extendedglob && \
+		"$tpre/$tsuf" = (#b)((*[^\\]|)(\\\\)#"(#q")([^\)]#) \
+	  ) && -z $compstate[quote] ]]; then
+       compset -p ${#match[1]}
+       _globquals
+    elif [[ "$tpre$tsuf" = */* ]]; then
       compfiles -P$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" "$sdirs" fake
     elif [[ "$sopt" = *[/f]* ]]; then
       compfiles -p$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" "$sdirs" fake "$pats[@]"
