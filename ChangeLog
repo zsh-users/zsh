@@ -1,5 +1,11 @@
 2008-02-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24590: Src/exec.c, Src/lex.c: tame overzealous error
+	report when unquoting.
+
+	* 24588: Completion/Zsh/Type/_globquals,
+	Completion/Zsh/Type/_history_modifiers: tweaks
+
 	* 24585: Completion/Base/Utility/_alternative,
 	Completion/Unix/Type/_path_files,
 	Completion/Zsh/Type/_delimiters,

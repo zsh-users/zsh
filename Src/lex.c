@@ -1619,7 +1619,7 @@ parse_subst_string(char *s)
      * Historical note: we used to check here for olen == l, but
      * that's not necessarily the case if we stripped an RCQUOTE.
      */
-    if (c != STRING || errflag) {
+    if (c != STRING || (errflag && !noerrs)) {
 	fprintf(stderr, "Oops. Bug in parse_subst_string: %s\n",
 		errflag ? "errflag" : "c != STRING");
 	fflush(stderr);

@@ -56,24 +56,18 @@ while [[ -n $PREFIX ]]; do
 
     (d)
     # complete/skip device
-    if [[ -z $PREFIX ]]; then
-      _message device ID
+    if ! compset -p '[[:digit:]]##'; then
+      _message "device ID"
       return
     fi
-    # It's pointless trying to complete the device.
-    # Simply assume it's done.
-    compset -p '[[:digit:]]##'
     ;;
 
     (l)
     # complete/skip link count
-    if [[ PREFIX = ([-+]|) ]]; then
-      _message link count
+    if ! compset -P '([-+]|)[[:digit:]]##'; then
+      _message "link count"
       return
     fi
-    # It's pointless trying to complete the link count.
-    # Simply assume it's done.
-    compset -P '([-+]|)[[:digit:]]##'
     ;;
 
     (u)
@@ -162,9 +156,9 @@ while [[ -n $PREFIX ]]; do
     # complete/skip range: check for closing bracket
     if ! compset -P "(-|)[[:digit:]]##(,(-|)[[:digit:]]##|)]"; then
       if compset -P "(-|)[[:digit:]]##,"; then
-	_message end of range
+	_message "end of range"
       else
-	_message start of range
+	_message "start of range"
       fi
       return
     fi
@@ -172,7 +166,7 @@ while [[ -n $PREFIX ]]; do
 
     (:)
     # complete modifiers and don't stop completing them
-    _history_modifiers
+    _history_modifiers q
     return
     ;;
   esac

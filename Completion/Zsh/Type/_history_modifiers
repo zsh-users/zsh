@@ -53,9 +53,10 @@ while true; do
     [[ -n $PREFIX ]] && return 1
 
     list=("\::modifier")
-    [[ $type = g ]] && list+=("):end of qualifiers")
+    [[ $type = q ]] && list+=("):end of qualifiers")
     # strictly we want a normal suffix if end of qualifiers
     _describe -t delimiters "delimiter" list -Q -S ''
+    return
   else
     list=(
       "s:substitute string"

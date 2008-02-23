@@ -46,7 +46,10 @@ enum {
 /**/
 int noerrexit;
 
-/* suppress error messages */
+/*
+ * noerrs = 1: suppress error messages
+ * noerrs = 2: don't set errflag on parse error, either
+ */
  
 /**/
 mod_export int noerrs;
