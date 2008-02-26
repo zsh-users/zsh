@@ -4885,7 +4885,7 @@ getkeystring(char *s, int *len, int how, int *misc)
 		     * It shouldn't ever be NULL, but while we're
 		     * being paranoid...
 		     */
-		    if (!codessetstr || !*codsetstr ||
+		    if (!codesetstr || !*codesetstr ||
 			!strcmp(codesetstr, "646"))
 			codesetstr == "US-ASCII";
     	    	    cd = iconv_open(nl_langinfo(CODESET), "UCS-4BE");
