@@ -1,5 +1,8 @@
 2008-02-26  Peter Stephenson  <pws@csr.com>
 
+	* 24596: Src/utils.c: if nl_langinfo(CODESET) returns ""
+	or "646" use "US-ASCII".
+
 	* 24592: Src/utils.c: make errors about charset conversion
 	more explicit.
 

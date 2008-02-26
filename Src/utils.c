@@ -4867,6 +4867,7 @@ getkeystring(char *s, int *len, int how, int *misc)
 		} else {
 #   ifdef HAVE_ICONV
 		    ICONV_CONST char *inptr = inbuf;
+		    const char *codesetstr = nl_langinfo(CODESET);
     	    	    inbytes = 4;
 		    outbytes = 6;
 		    /* store value in big endian form */
@@ -4875,6 +4876,18 @@ getkeystring(char *s, int *len, int how, int *misc)
 			wval >>= 8;
 		    }
 
+		    /*
+		     * If the code set isn't handled, we'd better
+		     * assume it's US-ASCII rather than just failing
+		     * hopelessly.  Solaris has a weird habit of
+		     * returning 646.
+		     *
+		     * It shouldn't ever be NULL, but while we're
+		     * being paranoid...
+		     */
+		    if (!codessetstr || !*codsetstr ||
+			!strcmp(codesetstr, "646"))
+			codesetstr == "US-ASCII";
     	    	    cd = iconv_open(nl_langinfo(CODESET), "UCS-4BE");
 		    if (cd == (iconv_t)-1) {
 			zerr("cannot do charset conversion (iconv failed)");
