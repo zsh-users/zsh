@@ -1,3 +1,11 @@
+2008-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24602: Test/C02cond.ztst: failing to run a test didn't
+	set prerequisites for later test.
+
+	* 24600: astonishingly, there was a fourth bug in few
+	lines of 24596.
+
 2008-02-26  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: Src/utils.c: fix typos in 24596

@@ -125,6 +125,10 @@
 
 # can't be bothered with -S
 
+  print -u $ZTST_fd 'This test takes two seconds...'
+  sleep 2
+  cat unmodified
+  touch newnewnew
   if [[ $OSTYPE == "cygwin" ]]; then
     print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported on Cygwin)"
     true
@@ -132,10 +136,6 @@
     print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported with NFS)"
     true
   else
-    print -u $ZTST_fd 'This test takes two seconds...'
-    sleep 2
-    cat unmodified
-    touch newnewnew
     [[ -N newnewnew && ! -N unmodified ]]
   fi
 0:-N cond
