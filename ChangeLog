@@ -1,3 +1,8 @@
+2008-02-26  Peter Stephenson  <pws@csr.com>
+
+	* 24592: Src/utils.c: make errors about charset conversion
+	more explicit.
+
 2008-02-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24590: Src/exec.c, Src/lex.c: tame overzealous error

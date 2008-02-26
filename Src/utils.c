@@ -4877,7 +4877,7 @@ getkeystring(char *s, int *len, int how, int *misc)
 
     	    	    cd = iconv_open(nl_langinfo(CODESET), "UCS-4BE");
 		    if (cd == (iconv_t)-1) {
-			zerr("cannot do charset conversion");
+			zerr("cannot do charset conversion (iconv failed)");
 			CHARSET_FAILED();
 		    }
                     count = iconv(cd, &inptr, &inbytes, &t, &outbytes);
@@ -4889,12 +4889,12 @@ getkeystring(char *s, int *len, int how, int *misc)
 		    if ((how & GETKEY_UPDATE_OFFSET) && s - sstart < *misc)
 			(*misc) += count;
 #   else
-                    zerr("cannot do charset conversion");
+                    zerr("cannot do charset conversion (iconv not available)");
 		    CHARSET_FAILED();
 #   endif
 		}
 #  else
-                zerr("cannot do charset conversion");
+                zerr("cannot do charset conversion (NLS not supported)");
 		CHARSET_FAILED();
 #  endif
 # endif
