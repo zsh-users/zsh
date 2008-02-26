@@ -4887,7 +4887,7 @@ getkeystring(char *s, int *len, int how, int *misc)
 		     */
 		    if (!codesetstr || !*codesetstr ||
 			!strcmp(codesetstr, "646"))
-			codesetstr == "US-ASCII";
+			codesetstr = "US-ASCII";
     	    	    cd = iconv_open(nl_langinfo(CODESET), "UCS-4BE");
 		    if (cd == (iconv_t)-1) {
 			zerr("cannot do charset conversion (iconv failed)");
