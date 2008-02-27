@@ -212,7 +212,11 @@ Sun: SunOS 4.1.x
 	This may work, but the first username completion will be _very_
 	slow (as slow as in tcsh).
 
-Sun: Solaris 2.x, 8, 9
+Sun: Solaris 2.x, 8, 9, ...
+	It is recommended that the system library version of iconv()
+	be used rather than libiconv since there are incompatibilities
+	in the way codesets are named.
+
 	The UCB versions of the routines for reading directories are not
 	usable (the struct definitions are incompatible with the ones
 	assumed by zsh).  The symptom of this is that globbed filenames in

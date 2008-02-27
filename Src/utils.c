@@ -4880,15 +4880,32 @@ getkeystring(char *s, int *len, int how, int *misc)
 		     * If the code set isn't handled, we'd better
 		     * assume it's US-ASCII rather than just failing
 		     * hopelessly.  Solaris has a weird habit of
-		     * returning 646.
+		     * returning 646.  This is handled by the
+		     * native iconv(), but not by GNU iconv; what's
+		     * more, some versions of the native iconv don't
+		     * handle standard names like ASCII.
+		     *
+		     * This should only be a problem if there's a
+		     * mismatch between the NLS and the iconv in use,
+		     * which probably only means if libiconv is in use.
+		     * We checked at configure time if our libraries
+		     * pulled in _libiconv_version, which should be
+		     * a good test.
 		     *
 		     * It shouldn't ever be NULL, but while we're
 		     * being paranoid...
 		     */
-		    if (!codesetstr || !*codesetstr ||
-			!strcmp(codesetstr, "646"))
+#ifdef ICONV_FROM_LIBICONV
+		    if (!codesetstr || !*codesetstr)
 			codesetstr = "US-ASCII";
+#endif
     	    	    cd = iconv_open(codesetstr, "UCS-4BE");
+#ifdef ICONV_FROM_LIBICONV
+		    if (cd == (iconv_t)-1 &&  !strcmp(codesetstr, "646")) {
+			codesetstr = "US-ASCII";
+			cd = iconv_open(codesetstr, "UCS-4BE");
+		    }
+#endif
 		    if (cd == (iconv_t)-1) {
 			zerr("cannot do charset conversion (iconv failed)");
 			CHARSET_FAILED();

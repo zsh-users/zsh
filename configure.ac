@@ -824,8 +824,13 @@ if test "x$ac_cv_header_iconv_h" = "xyes"; then
       [ #include <iconv.h> ])
   fi
 fi
+AH_TEMPLATE([ICONV_FROM_LIBICONV],
+[Define to 1 if iconv() is linked from libiconv])
 if test "x$ac_found_iconv" = xyes; then
   AC_DEFINE(HAVE_ICONV, 1, [Define if you have the iconv() function.])
+  AC_TRY_LINK([#include <iconv.h>],
+    [int myversion = _libiconv_version],
+    AC_DEFINE(ICONV_FROM_LIBICONV), )
 fi
 
 dnl Check if iconv uses const in prototype declaration
