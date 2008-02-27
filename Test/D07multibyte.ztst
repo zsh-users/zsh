@@ -322,10 +322,16 @@
 # We ask for case-insensitive sorting here (and supply upper case
 # characters) so that we exercise the logic in the shell that lowers the
 # case of the string for case-insensitive sorting.
-  print -oi HAH HUH HEH HÉH HÈH
+# As all letters are upper case, however, sort should produce the same order.
+  print -loi HAH HUH HEH HÉH HÈH >zshsort.txt
+  print -l HAH HUH HEH HÉH HÈH | sort >sortsort.txt
+  print Diff output should be empty
+  diff zshsort.txt sortsort.txt
+  print Sort in C locale
   (LC_ALL=C; print -oi HAH HUH HEH HÉH HÈH)
 0:Multibyte characters in print sorting
->HAH HEH HÉH HÈH HUH
+>Diff output should be empty
+>Sort in C locale
 >HAH HEH HUH HÈH HÉH
 
 # These are control characters in Unicode, so don't show up.
