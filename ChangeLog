@@ -1,3 +1,8 @@
+2008-02-22  Clint Adams  <clint@zsh.org>
+
+	* 24617: Doc/Makefile.in: add '.' to the yodl include path
+	for when files are passed as ../../Doc/*.yo.
+
 2008-02-27  Peter Stephenson  <pws@csr.com>
 
 	* 24611: Src/subst.c, Test/D04parameter.ztst: 23562

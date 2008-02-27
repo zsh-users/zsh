@@ -122,8 +122,8 @@ zsh.info: $(sdir)/zsh.texi
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
 	case '$(YODL)' in :*) touch $$target ;; *) \
-	    echo $(YODL) -o $$target -I$(sdir) -w zman.yo version.yo $< ; \
-	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | \
+	    echo $(YODL) -o $$target -I$(sdir):. -w zman.yo version.yo $< ; \
+	    $(YODL) -I$(sdir):. -w zman.yo version.yo $< | \
 	      sed -e '1s/\\-/-/g' -e '/^\.'\''/d' -e 's/\(\\fB\)*'\''/\1\\\&'\''/' > $$target \
 	;; esac; \
 
