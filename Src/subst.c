@@ -1915,7 +1915,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			     hkeys|hvals|
 			     (arrasg ? SCANPM_ASSIGNING : 0)|
 			     (qt ? SCANPM_DQUOTED : 0))) ||
-	    (v->pm && (v->pm->node.flags & PM_UNSET)))
+	    (v->pm && (v->pm->node.flags & PM_UNSET)) ||
+	    (v->flags & VALFLAG_EMPTY))
 	    vunset = 1;
 
 	if (wantt) {

@@ -52,6 +52,14 @@
 0:$+...
 >1 1 0 0
 
+  x=()
+  print ${+x} ${+x[1]} ${+x[(r)foo]} ${+x[(r)bar]}
+  x=(foo)
+  print ${+x} ${+x[1]} ${+x[(r)foo]} ${+x[(r)bar]}
+0:$+... with arrays
+>1 0 0 0
+>1 1 1 0
+
   set1=set1v
   null1=
   print ${set1:-set1d} ${set1-set2d} ${null1:-null1d} ${null1-null2d} x
