@@ -122,7 +122,11 @@ static struct listcols mcolors;
 int mgtabsize;
 #endif
 
-/* Used in mtab/mgtab, for explanations. */
+/*
+ * Used in mtab/mgtab, for explanations.
+ *
+ * UUUUUUUUUUUUUUURRRRGHHHHHHHHHH!!!!!!!!! --- pws
+ */
 
 #define MMARK       ((unsigned long) 1)
 #define mmarked(v)  (((unsigned long) (v)) & MMARK)
@@ -2325,8 +2329,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     for (;;) {
 	METACHECK();
 
-    	mtab_been_reallocated = 0;
-	if (mline < 0) {
+	if (mline < 0 || mtab_been_reallocated) {
 	    int x, y;
 	    Cmatch **p = mtab;
 
@@ -2342,6 +2345,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if (y < mlines)
 		mline = y;
 	}
+    	mtab_been_reallocated = 0;
 	DPUTS(mline < 0,
 	      "BUG: mline < 0 after re-scanning mtab in domenuselect()");
 	while (mline < mlbeg)

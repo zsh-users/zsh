@@ -1,3 +1,8 @@
+2008-02-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24627: Src/Zsh/complist.c: fix(?) crash when resizing window
+	during menu-select.
+
 2008-02-28  Clint Adams  <clint@zsh.org>
 
 	* 24626: Completion/Unix/Type/_path_commands, Doc/Zsh/compsys.yo:
