@@ -1672,6 +1672,12 @@ Excluded values act in a similar fashion to values of the
 tt(ignored-patterns) style, so they can be restored to consideration by
 the tt(_ignored) completer.
 )
+kindex(extra-verbose, completion style)
+item(tt(extra-verbose))(
+If set, the completion listing is more verbose at the cost of
+a probable decrease in completion speed.  Completion performance
+will suffer if this style is set to `true'.
+)
 kindex(ignored-patterns, completion style)
 item(tt(ignored-patterns))(
 A list of patterns; any trial completion matching one of the patterns

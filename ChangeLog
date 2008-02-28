@@ -1,5 +1,8 @@
 2008-02-28  Clint Adams  <clint@zsh.org>
 
+	* 24626: Completion/Unix/Type/_path_commands, Doc/Zsh/compsys.yo:
+	only process command descriptions if extra-verbose style is set.
+
 	* 24622: Completion/Unix/Command/_git: add completion for
 	'git bisect skip' and 'git bisect run'.
 
