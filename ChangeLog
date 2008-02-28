@@ -1,9 +1,14 @@
+2008-02-28  Clint Adams  <clint@zsh.org>
+
+	* 24622: Completion/Unix/Command/_git: add completion for
+	'git bisect skip' and 'git bisect run'.
+
 2008-02-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24618: Test/D07multibyte.ztst: use "sort" to avoid making
 	assumptions about sorting of UTF-8 files.
 
-2008-02-22  Clint Adams  <clint@zsh.org>
+2008-02-27  Clint Adams  <clint@zsh.org>
 
 	* 24617: Doc/Makefile.in: add '.' to the yodl include path
 	for when files are passed as ../../Doc/*.yo.

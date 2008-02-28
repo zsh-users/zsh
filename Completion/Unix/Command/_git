@@ -1395,6 +1395,8 @@ _git-bisect () {
     reset:"finish bisection search and return to the given branch (or master)"
     start:"reset bisection state and start a new bisection"
     visualize:"show the remaining revisions in gitk"
+    skip:"choose a nearby commit"
+    run:"run evaluation script"
   )
 
   if (( CURRENT == 2 )); then
@@ -1405,7 +1407,7 @@ _git-bisect () {
         _arguments \
           '2:revision:__git_commits' && ret=0
         ;;
-      (good)
+      (good|skip)
         _arguments \
           '*:revision:__git_commits' && ret=0
         ;;
@@ -1417,6 +1419,11 @@ _git-bisect () {
         _arguments \
           '2:branch:__git_heads' && ret=0
         ;;
+      (run)
+        _arguments \
+          '*::arguments: _normal' && ret=0
+        ;;
+
       (*)
         _nothing
         ;;
