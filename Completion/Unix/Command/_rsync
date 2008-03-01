@@ -58,7 +58,11 @@ elif compset -P 'rsync://'; then
 elif compset -P 1 '*:'; then
 
   if zstyle -T ":completion:${curcontext}:files" remote-access; then
-    remfiles=(${(M)${(f)"$(_call_program files ssh -a -x ${IPREFIX%:} ls -d1FL "${(Q)PREFIX%%[^./][^/]#}\*" 2>/dev/null)"}%%[^/]#(|/)})
+    if [[ -z $QIPREFIX ]]
+    then rempat="${PREFIX%%[^./][^/]#}\*"
+    else rempat="${(q)PREFIX%%[^./][^/]#}\*"
+    fi
+    remfiles=(${(M)${(f)"$(_call_program files ssh -a -x ${IPREFIX%:} ls -d1FL "$rempat" 2>/dev/null)"}%%[^/]#(|/)})
     compset -P '*/'
     compset -S '/*' || suf='remote file'
 

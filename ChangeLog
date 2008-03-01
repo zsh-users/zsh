@@ -1,3 +1,8 @@
+2008-02-29  Clint Adams  <clint@zsh.org>
+
+	* 24632: Completion/Unix/Command/_rsync: fix remote ssh filename
+	quoting.
+
 2008-02-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24627: Src/Zsh/complist.c: fix(?) crash when resizing window
