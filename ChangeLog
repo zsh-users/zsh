@@ -1,3 +1,8 @@
+2008-03-01  Clint Adams  <clint@zsh.org>
+
+	* 24650: Completion/Unix/Type/_path_commands: use zstyle -t instead
+	of -T since extra-verbose isn't meant to default to yes.
+
 2008-02-29  Clint Adams  <clint@zsh.org>
 
 	* 24632: Completion/Unix/Command/_rsync: fix remote ssh filename
