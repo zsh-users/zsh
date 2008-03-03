@@ -1,5 +1,8 @@
 2008-03-03  Peter Stephenson  <pws@csr.com>
 
+	* 24673: Test/D07multibyte.ztst: another attempt to sort
+	characters the same way on multiple UTF-8 implementations.
+
 	* 24662: River Tarnell <river@wikimedia.org>: configure.ac,
 	Src/compat.c: strtoul() when not in system library.
 

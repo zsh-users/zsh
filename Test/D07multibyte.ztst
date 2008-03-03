@@ -322,16 +322,10 @@
 # We ask for case-insensitive sorting here (and supply upper case
 # characters) so that we exercise the logic in the shell that lowers the
 # case of the string for case-insensitive sorting.
-# As all letters are upper case, however, sort should produce the same order.
-  print -loi HAH HUH HEH HÉH HÈH >zshsort.txt
-  print -l HAH HUH HEH HÉH HÈH | sort >sortsort.txt
-  print Diff output should be empty
-  diff zshsort.txt sortsort.txt
-  print Sort in C locale
+  print -oi HΕH HΔH HΓH HΒH HΑH
   (LC_ALL=C; print -oi HAH HUH HEH HÉH HÈH)
 0:Multibyte characters in print sorting
->Diff output should be empty
->Sort in C locale
+>HΑH HΒH HΓH HΔH HΕH
 >HAH HEH HUH HÈH HÉH
 
 # These are control characters in Unicode, so don't show up.
@@ -366,24 +360,24 @@
 >1 149
 >1 150
 
-  touch ngs1.txt ngs2.txt ngs10.txt ngs20.txt ngs100.txt ngs200.txt
+  touch ngs1txt ngs2txt ngs10txt ngs20txt ngs100txt ngs200txt
   setopt numericglobsort
   print -l ngs*
   unsetopt numericglobsort
   print -l ngs*
 0:NUMERIC_GLOB_SORT option in UTF-8 locale
->ngs1.txt
->ngs2.txt
->ngs10.txt
->ngs20.txt
->ngs100.txt
->ngs200.txt
->ngs100.txt
->ngs10.txt
->ngs1.txt
->ngs200.txt
->ngs20.txt
->ngs2.txt
+>ngs1txt
+>ngs2txt
+>ngs10txt
+>ngs20txt
+>ngs100txt
+>ngs200txt
+>ngs100txt
+>ngs10txt
+>ngs1txt
+>ngs200txt
+>ngs20txt
+>ngs2txt
 
 # Not strictly multibyte, but gives us a well-defined locale for testing.
   foo=$'X\xc0Y\x07Z\x7fT'
