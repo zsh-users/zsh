@@ -23,6 +23,17 @@ done
 return 1
 }
 
+_call_whatis() { 
+  case "$(whatis --version)" in
+  (whatis from *)
+    local -A args
+    zparseopts -D -A args s: r:
+    apropos "${args[-r]:-"$@"}" | fgrep "($args[-s]"
+    ;;
+  (*) whatis "$@";;
+  esac
+}
+
 _path_commands() {
 local need_desc expl ret=1
 
@@ -38,7 +49,7 @@ if zstyle -t ":completion:${curcontext}:" extra-verbose; then
   if ( [[ -n $first ]] || _cache_invalid command-descriptions ) && \
     ! _retrieve_cache command-descriptions; then
     local line
-    for line in "${(f)$(_call_program command-descriptions whatis -s 1 -r .\\\*\; whatis -s 6 -r .\\\* 2> /dev/null)}"; do
+    for line in "${(f)$(_call_program command-descriptions _call_whatis -s 1 -r .\\\*\; _call_whatis -s 6 -r .\\\* 2>/dev/null)}"; do
       [[ -n ${line:#(#b)([^ ]#) #\([^ ]#\)( #\[[^ ]#\]|)[ -]#(*)} ]] && continue;
       [[ -z $match[1] || -z $match[3] || -z ${${match[1]}:#*:*} ]] && continue;
       _command_descriptions[$match[1]]=$match[3]
@@ -50,9 +61,10 @@ if zstyle -t ":completion:${curcontext}:" extra-verbose; then
 fi
 
 if [[ -n $need_desc ]]; then
-  typeset -a dcmds descs cmds
+  typeset -a dcmds descs cmds matches
   local desc cmd sep
-  for cmd in ${(k)commands}; do
+  compadd "$@" -O matches -k commands
+  for cmd in $matches; do
     desc=$_command_descriptions[$cmd]
     if [[ -z $desc ]]; then
       cmds+=$cmd

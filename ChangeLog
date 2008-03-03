@@ -1,3 +1,9 @@
+2008-03-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 24653, 24659: Completion/Unix/Type/_path_commands: use a
+	helper function to call "whatis" portably, and use compadd -O
+	to pre-filter matches before reading $_command_descriptions.
+
 2008-03-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24656: Src/builtin.c: fix cd overeagerness to find integers
