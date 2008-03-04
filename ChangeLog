@@ -1,3 +1,8 @@
+2008-03-04  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: ignore range
+	limiters >, >=, =, <, <= after @ in labels and dates, too.
+
 2008-03-03  Peter Stephenson  <pws@csr.com>
 
 	* 24673: Test/D07multibyte.ztst: another attempt to sort

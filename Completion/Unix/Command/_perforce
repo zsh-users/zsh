@@ -708,7 +708,7 @@ _perforce_counter_values() {
 (( $+functions[_perforce_dates] )) ||
 _perforce_dates() {
   # Only useful in a file spec after `@'.
-  compset -P '*@'
+  compset -P '*@(|\\\<|\\\>)(|=)'
 
   # Date/time now in format required by Perforce.
   local now="$(date +%Y:%m:%d:%T)" name prefix
@@ -1351,7 +1351,7 @@ _perforce_labels() {
       argv=($argv[1,-2])
       # Completing after `@'.
       file=${${(Q)PREFIX}%%@*}
-      compset -P '*@'
+      compset -P '*@(|\\\<|\\\>)(|=)'
     fi
 
     ll=(${${(f)"$(_perforce_call_p4 labels labels ${file:+\$file})"}//(#b)Label\ ([^[:blank:]]##)\ (*)/$match[1]:$match[2]})
