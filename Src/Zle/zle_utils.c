@@ -294,7 +294,7 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 		 * (certainly true for Unicode and unlikely to be false
 		 * in any non-pathological multibyte representation). */
 		cnt = 1;
-	    } else if (cnt > ll) {
+	    } else if (cnt > (size_t)ll) {
 		/*
 		 * Some multibyte implementations return the
 		 * full length of a previous incomplete character
@@ -857,7 +857,7 @@ showmsg(char const *msg)
 		 * Paranoia: only needed if we start in the middle
 		 * of a multibyte string and only in some implementations.
 		 */
-		if (cnt > ulen)
+		if (cnt > (size_t)ulen)
 		    cnt = ulen;
 		n = wcs_nicechar(c, &width, NULL);
 		break;
