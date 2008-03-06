@@ -1,3 +1,14 @@
+2008-03-06  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 24693: Src/utils.c: provide better errors when skipping
+	history-file saving due to ownership.  Allow root to do the
+	save anyway if zsh can chown a file descriptor.  Fixed the
+	propagation of the errno from a failed open() of the history
+	file (zsh used to complain about an invalid file descriptor).
+
+	* unposted: Src/Zle/zle_utils.c:  fixed 2 compiler warnings
+	about comparing signed and unsigned.
+
 2008-03-04  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: ignore range

@@ -2192,13 +2192,13 @@ savehistfile(char *fn, int err, int writeflags)
     }
     errno = 0;
     if (writeflags & HFILE_APPEND) {
+	int fd = open(unmeta(fn), O_CREAT | O_WRONLY | O_APPEND | O_NOCTTY, 0600);
 	tmpfile = NULL;
-	out = fdopen(open(unmeta(fn),
-			O_CREAT | O_WRONLY | O_APPEND | O_NOCTTY, 0600), "a");
+	out = fd >= 0 ? fdopen(fd, "a") : NULL;
     } else if (!isset(HISTSAVEBYCOPY)) {
+	int fd = open(unmeta(fn), O_CREAT | O_WRONLY | O_TRUNC | O_NOCTTY, 0600);
 	tmpfile = NULL;
-	out = fdopen(open(unmeta(fn),
-			 O_CREAT | O_WRONLY | O_TRUNC | O_NOCTTY, 0600), "w");
+	out = fd >= 0 ? fdopen(fd, "w") : NULL;
     } else {
 	tmpfile = bicat(unmeta(fn), ".new");
 	if (unlink(tmpfile) < 0 && errno != ENOENT)
@@ -2206,13 +2206,27 @@ savehistfile(char *fn, int err, int writeflags)
 	else {
 	    struct stat sb;
 	    int old_exists = stat(unmeta(fn), &sb) == 0;
+	    uid_t euid = geteuid();
 
-	    if (old_exists && sb.st_uid != geteuid()) {
+	    if (old_exists
+#if defined HAVE_FCHMOD && defined HAVE_FCHOWN
+	     && euid
+#endif
+	     && sb.st_uid != euid) {
 		free(tmpfile);
-		tmpfile = NULL; /* Avoid an error about HISTFILE.new */
+		if (err) {
+		    if (isset(APPENDHISTORY) || isset(INCAPPENDHISTORY)
+		     || isset(SHAREHISTORY))
+			zerr("rewriting %s would change its ownership -- skipped", fn);
+		    else
+			zerr("rewriting %s would change its ownership -- history not saved", fn);
+		    err = 0; /* Don't report a generic error below. */
+		}
 		out = NULL;
-	    } else
-		out = fdopen(open(tmpfile, O_CREAT | O_WRONLY | O_EXCL, 0600), "w");
+	    } else {
+		int fd = open(tmpfile, O_CREAT | O_WRONLY | O_EXCL, 0600);
+		out = fd >= 0 ? fdopen(fd, "w") : NULL;
+	    }
 
 #ifdef HAVE_FCHMOD
 	    if (old_exists && out) {
