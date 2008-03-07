@@ -173,7 +173,7 @@ static struct optname optns[] = {
 {{NULL, "monitor",	      OPT_SPECIAL},		 MONITOR},
 {{NULL, "multibyte",
 #ifdef MULTIBYTE_SUPPORT
-			      OPT_ALL
+			      OPT_EMULATE|OPT_ZSH|OPT_CSH|OPT_KSH
 #else
 			      0
 #endif

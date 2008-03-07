@@ -1,3 +1,8 @@
+2008-03-07  Peter Stephenson  <pws@csr.com>
+
+	* 24696: Doc/Zsh/options.yo, Src/options.c: turn off MULTIBYTE
+	by default in sh emulation.
+
 2008-03-06  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 24693: Src/utils.c: provide better errors when skipping
