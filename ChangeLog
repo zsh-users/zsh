@@ -1,5 +1,7 @@
 2008-03-07  Peter Stephenson  <pws@csr.com>
 
+	* Richard Hartmann: 24631: Completion/Unix/Command/_gpg: update.
+
 	* 24696: Doc/Zsh/options.yo, Src/options.c: turn off MULTIBYTE
 	by default in sh emulation.
 
