@@ -1,3 +1,9 @@
+2008-03-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/12699: Src/Zle/computil.c: don't complete normal
+	arguments where we're completing the required argument
+	to an option in the word following the option.
+
 2008-03-07  Peter Stephenson  <pws@csr.com>
 
 	* Richard Hartmann: 24631: Completion/Unix/Command/_gpg: update.

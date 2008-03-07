@@ -1612,7 +1612,16 @@ get_cadef(char *nam, char **args)
     return new;
 }
 
-/* Get the option used in a word from the line, if any. */
+/*
+ * Get the option used in a word from the line, if any.
+ *
+ * "d" is a complete set of argument/option definitions to scan.
+ * "line" is the word we are scanning.
+ * "full" indicates that the option must match a full word; otherwise
+ *   we look for "=" arguments or prefixes.
+ * *"end" is set to point to the end of the option, in some cases
+ *   leaving an option argument after it.
+ */
 
 static Caopt
 ca_get_opt(Cadef d, char *line, int full, char **end)
@@ -1784,6 +1793,12 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 /* State when parsing a command line. */
 
 typedef struct castate *Castate;
+
+/*
+ *           **** DOCUMENT ME ****
+ *
+ * This structure and its use are a nightmare.
+ */
 
 struct castate {
     Castate snext;
@@ -2244,9 +2259,18 @@ ca_colonlist(LinkList l)
 	return ztrdup("");
 }
 
+/*
+ * This function adds the current set of descriptions, actions,
+ * and subcontext descriptions to the given linked list for passing
+ * up in comparguments -D and comparguments -L.  opt is the
+ * option string (may be NULL if this isn't an option argument) and arg the
+ * argument structure (either an option argument or a normal argument
+ * as determined by arg->type).
+ */
+
 static void
 ca_set_data(LinkList descr, LinkList act, LinkList subc,
-	    char *opt, Caarg arg, int single)
+	    char *opt, Caarg arg, Caopt optdef, int single)
 {
     LinkNode dnode, anode;
     char nbuf[40], *buf;
@@ -2297,6 +2321,19 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
 
 	    addlinknode(subc, buf);
 	}
+	/*
+	 * If this is an argument to an option, and the option definition says
+	 * the argument to the option is required and in the following
+	 * (i.e. this) word, then it must match what we've just told it to
+	 * match---don't try to match normal arguments.
+	 *
+	 * This test may be too stringent for what we need, or it
+	 * may be too loose; I've simply tweaked it until it gets
+	 * the case above right.
+	 */
+	if (arg->type == CAA_NORMAL &&
+	    opt && optdef && optdef->type == CAO_NEXT)
+	    return;
 	if (single)
 	    break;
 
@@ -2467,7 +2504,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 			ignore_prefix(lstate->doff);
 		    }
 		    ca_set_data(descr, act, subc, arg->opt, arg,
-				(lstate->doff > 0));
+				lstate->curopt, (lstate->doff > 0));
 		}
 		lstate = lstate->snext;
 	    }
@@ -2565,7 +2602,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 		if (opt && opt->args) {
 		    ret = 0;
-		    ca_set_data(descr, act, subc, opt->name, opt->args, 1);
+		    ca_set_data(descr, act, subc, opt->name, opt->args, opt, 1);
 		}
 		lstate = lstate->snext;
 	    }
