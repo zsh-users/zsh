@@ -1,3 +1,11 @@
+2008-03-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24699: Src/hist.c, Src/input.c, Src/lex.c,
+	Test/D04parameter.ztst: fix two bugs in the hacked up parsing
+	of strings for parameter substitution: ${(Q)...} lost an initial
+	">" and ${(z)...} on a string with an opening parenthesis but
+	no closing parenthesis appended an extra space.
+
 2008-03-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/12699: Src/Zle/computil.c: don't complete normal

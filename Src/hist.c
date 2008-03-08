@@ -2456,7 +2456,7 @@ bufferwords(LinkList list, char *buf, int *index)
     int num = 0, cur = -1, got = 0, ne = noerrs;
     int owb = wb, owe = we, oadx = addedx, ozp = zleparse, onc = nocomments;
     int ona = noaliases, ocs = zlemetacs, oll = zlemetall;
-    char *p;
+    char *p, *addedspaceptr;
 
     if (!list)
 	list = newlinklist();
@@ -2470,7 +2470,15 @@ bufferwords(LinkList list, char *buf, int *index)
 
 	p = (char *) zhalloc(l + 2);
 	memcpy(p, buf, l);
-	p[l] = ' ';
+	/*
+	 * I'm sure this space is here for a reason, but it's
+	 * a pain in the neck:  when we get back a string that's
+	 * not finished it's very hard to tell if a space at the
+	 * end is this one or not.  We use two tricks below to
+	 * work around this.
+	 */
+	addedspaceptr = p + l;
+	*addedspaceptr = ' ';
 	p[l + 1] = '\0';
 	inpush(p, 0, NULL);
 	zlemetall = strlen(p) ;
@@ -2493,7 +2501,8 @@ bufferwords(LinkList list, char *buf, int *index)
 	    p = (char *) zhalloc(hptr - chline + ll + 2);
 	    memcpy(p, chline, hptr - chline);
 	    memcpy(p + (hptr - chline), linein, ll);
-	    p[(hptr - chline) + ll] = ' ';
+	    addedspaceptr = p + (hptr - chline) + ll;
+	    *addedspaceptr = ' ';
 	    p[(hptr - chline) + zlemetall] = '\0';
 	    inpush(p, 0, NULL);
 
@@ -2506,7 +2515,8 @@ bufferwords(LinkList list, char *buf, int *index)
 	} else {
 	    p = (char *) zhalloc(ll + 2);
 	    memcpy(p, linein, ll);
-	    p[ll] = ' ';
+	    addedspaceptr = p + ll;
+	    *addedspaceptr = ' ';
 	    p[zlemetall] = '\0';
 	    inpush(p, 0, NULL);
 	}
@@ -2526,6 +2536,21 @@ bufferwords(LinkList list, char *buf, int *index)
 	    break;
 	if (tokstr && *tokstr) {
 	    untokenize((p = dupstring(tokstr)));
+	    if (ingetptr() > addedspaceptr) {
+		/*
+		 * Whoops, we've read past the space we added, probably
+		 * because we were expecting a terminator but when
+		 * it didn't turn up and shrugged our shoulders thinking
+		 * it might as well be a complete string anyway.
+		 * So remove the space.  C.f. below for the case
+		 * where the missing terminator caused a lex error.
+		 * We use the same paranoid test.
+		 */
+		int plen = strlen(p);
+		if (plen && p[plen-1] == ' ' &&
+		    (plen == 1 || p[plen-2] != Meta))
+		    p[plen-1] = '\0';
+	    }
 	    addlinknode(list, p);
 	    num++;
 	} else if (buf) {

@@ -566,3 +566,15 @@ inpopalias(void)
     while (inbufflags & INP_ALIAS)
 	inpoptop();
 }
+
+
+/*
+ * Get pointer to remaining string to read.
+ */
+
+/**/
+char *
+ingetptr(void)
+{
+    return inbufptr;
+}

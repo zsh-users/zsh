@@ -914,6 +914,19 @@ gettok(void)
     return gettokstr(c, 0);
 }
 
+/*
+ * Get the remains of a token string.  This has two uses.
+ * When called from gettok(), with sub = 0, we have already identified
+ * any interesting initial character and want to get the rest of
+ * what we now know is a string.  However, the string may still include
+ * metacharacters and potentially substitutions.
+ *
+ * When called from parse_subst_string() with sub = 1, we are not
+ * fully parsing a command line, merely tokenizing a string.
+ * In this case we always add characters to the parsed string
+ * unless there is a parse error.
+ */
+
 /**/
 static int
 gettokstr(int c, int sub)
@@ -1134,7 +1147,10 @@ gettokstr(int c, int sub)
 	    if (e != '(') {
 		hungetc(e);
 		lexstop = 0;
-		goto brk;
+		if (in_brace_param || sub)
+		    break;
+		else
+		    goto brk;
 	    }
 	    add(Outang);
 	    if (skipcomm()) {
