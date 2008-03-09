@@ -4138,7 +4138,7 @@ __git_is_indexed () {
     unset tmpwords
   fi
 
-  if [[ $words[1] == git ]]; then
+  if [[ $service == git ]]; then
     local state line
     declare -A opt_args
     _arguments -C \
@@ -4155,12 +4155,12 @@ __git_is_indexed () {
         __git_aliases_and_commands
         ;;
       (options)
-        curcontext="${curcontext%:*:*}:git-$words[1]:"
-        _call_function ret _git-$words[1]
+        curcontext="${curcontext%:*:*}:git-$service:"
+        _call_function ret _git-$service
         ;;
     esac
   else
-    _call_function ret _$words[1]
+    _call_function ret _$service
   fi
 }
 

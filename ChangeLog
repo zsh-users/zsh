@@ -1,3 +1,8 @@
+2008-03-09  Clint Adams  <clint@zsh.org>
+
+	* 24701: Completion/Unix/Command/_git: use $service instead of
+	$words[1] so completion will work if git is an alias to a wrapper.
+
 2008-03-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24699: Src/hist.c, Src/input.c, Src/lex.c,
