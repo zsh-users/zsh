@@ -4155,8 +4155,8 @@ __git_is_indexed () {
         __git_aliases_and_commands
         ;;
       (options)
-        curcontext="${curcontext%:*:*}:git-$service:"
-        _call_function ret _git-$service
+        curcontext="${curcontext%:*:*}:git-$words[1]:"
+        _call_function ret _git-$words[1]
         ;;
     esac
   else
