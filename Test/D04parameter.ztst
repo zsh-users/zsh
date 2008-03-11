@@ -336,7 +336,7 @@
   # The following may look a bit random.
   # For the split we are checking that anything that
   # would normally be followed by a different word has
-  # an argument break after it and anything that doesn't doesn't.
+  # an argument break after it and anything that wouldn't doesn't.
   # For the (Q) we are simply checking that nothing disappears
   # in the parsing.
   foo='<five> {six} (seven) >eight< }nine{ |forty-two| $many$ )ten( more'

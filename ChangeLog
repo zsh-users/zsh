@@ -1,3 +1,8 @@
+2008-03-11  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/hist.c: make test in 24699 for the extra
+	space safer.
+
 2008-03-09  Clint Adams  <clint@zsh.org>
 
 	* 24701, 24702: Completion/Unix/Command/_git: use $service instead of

@@ -2479,7 +2479,7 @@ bufferwords(LinkList list, char *buf, int *index)
 	 */
 	addedspaceptr = p + l;
 	*addedspaceptr = ' ';
-	p[l + 1] = '\0';
+	addedspaceptr[1] = '\0';
 	inpush(p, 0, NULL);
 	zlemetall = strlen(p) ;
 	zlemetacs = zlemetall + 1;
@@ -2503,7 +2503,7 @@ bufferwords(LinkList list, char *buf, int *index)
 	    memcpy(p + (hptr - chline), linein, ll);
 	    addedspaceptr = p + (hptr - chline) + ll;
 	    *addedspaceptr = ' ';
-	    p[(hptr - chline) + zlemetall] = '\0';
+	    addedspaceptr[1] = '\0';
 	    inpush(p, 0, NULL);
 
 	    /*
@@ -2536,11 +2536,11 @@ bufferwords(LinkList list, char *buf, int *index)
 	    break;
 	if (tokstr && *tokstr) {
 	    untokenize((p = dupstring(tokstr)));
-	    if (ingetptr() > addedspaceptr) {
+	    if (ingetptr() == addedspaceptr + 1) {
 		/*
 		 * Whoops, we've read past the space we added, probably
 		 * because we were expecting a terminator but when
-		 * it didn't turn up and shrugged our shoulders thinking
+		 * it didn't turn up we shrugged our shoulders thinking
 		 * it might as well be a complete string anyway.
 		 * So remove the space.  C.f. below for the case
 		 * where the missing terminator caused a lex error.
