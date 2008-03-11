@@ -1,3 +1,9 @@
+2008-03-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 24703: Src/Zle/zle_main.c: clear trashedzle when first starting
+	the editor in zleread(), so that reexpandprompt() from the first
+	zrefresh() won't expand the prompt an extra time.
+
 2008-03-11  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/hist.c: make test in 24699 for the extra

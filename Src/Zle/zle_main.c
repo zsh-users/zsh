@@ -1131,6 +1131,7 @@ zleread(char **lp, char **rp, int flags, int context)
     eofsent = 0;
     resetneeded = 0;
     fetchttyinfo = 0;
+    trashedzle = 0;
     raw_lp = lp;
     lpromptbuf = promptexpand(lp ? *lp : NULL, 1, NULL, NULL);
     pmpt_attr = txtchange;
@@ -1721,7 +1722,8 @@ resetprompt(UNUSED(char **args))
 /**/
 mod_export void
 zle_resetprompt(void)
-{   reexpandprompt();
+{
+    reexpandprompt();
     if (zleactive)
         redisplay(NULL);
 }
