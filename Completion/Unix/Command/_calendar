@@ -1,0 +1,12 @@
+#compdef calendar
+
+_arguments \
+  '-a[process files of all users]' \
+  '-A[print today and the following num days]:number of days:' \
+  '-b[enforce special KOI8 date calculation mode]' \
+  '-B[print today and the previous num days]:number of days:' \
+  '-f[use file as the default calendar]:calendar file:_files' \
+  '-l[print today and the following num days]:number of days:' \
+  '-w[print today and the following num days only if today is Friday]:number of days:' \
+  '-t[act as though today is the date specified]:date:'
+
