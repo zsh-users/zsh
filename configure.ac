@@ -685,20 +685,6 @@ if test x$zsh_cv_curses_needs_xopen = xyes; then
   AC_DEFINE(ZSH_CURSES_NEEDS_XOPEN)
 fi
 
-AH_TEMPLATE([HAVE_BOOLCODES],
-[Define if you have the termcap boolcodes symbol.])
-AH_TEMPLATE([HAVE_NUMCODES],
-[Define if you have the termcap numcodes symbol.])
-AH_TEMPLATE([HAVE_STRCODES],
-[Define if you have the termcap strcodes symbol.])
-AH_TEMPLATE([HAVE_BOOLNAMES],
-[Define if you have the terminfo boolnames symbol.])
-AH_TEMPLATE([HAVE_NUMNAMES],
-[Define if you have the terminfo numnames symbol.])
-AH_TEMPLATE([HAVE_STRNAMES],
-[Define if you have the terminfo strnames symbol.])
-AH_TEMPLATE([TERM_H_NEEDS_CURSES_H],
-[Define if term.h chokes without curses.h.])
 dnl Check for tigetflag (terminfo) before tgetent (termcap).
 dnl That's so that on systems where termcap and [n]curses are
 dnl both available and both contain termcap functions, while
@@ -721,69 +707,18 @@ ac_cv_header_curses_solaris=no))
 if test x$ac_cv_header_curses_solaris = xyes; then
 AC_DEFINE(HAVE_CURSES_H)
 fi])
-AC_CHECK_HEADERS(term.h,
-[AC_MSG_CHECKING(if term.h needs curses.h)
-AC_TRY_COMPILE([#include <term.h>], [char **test = boolcodes;], boolcodes_with_only_term_h=yes,
-boolcodes_with_only_term_h=no)
-AC_TRY_COMPILE([#include <curses.h>
-#include <term.h>], [char **test = boolcodes;], boolcodes_with_curses_h_and_term_h=yes,
-boolcodes_with_curses_h_and_term_h=no)
-if test "x$boolcodes_with_curses_h_and_term_h" = xyes && test "x$boolcodes_with_only_term_h" = xno;
-then
-AC_DEFINE(TERM_H_NEEDS_CURSES_H)
-AC_MSG_RESULT(yes)
-else
-AC_MSG_RESULT(no)
-fi
-
-AC_MSG_CHECKING(if boolcodes is available)
-AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
-#include <curses.h>
-#endif
-#include <term.h>], [char **test = boolcodes; printf(*test);],
-AC_DEFINE(HAVE_BOOLCODES) boolcodes=yes, boolcodes=no)
-AC_MSG_RESULT($boolcodes)
-AC_MSG_CHECKING(if numcodes is available)
-AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
-#include <curses.h>
-#endif
-#include <term.h>], [char **test = numcodes; printf(*test);],
-AC_DEFINE(HAVE_NUMCODES) numcodes=yes, numcodes=no)
-AC_MSG_RESULT($numcodes)
-AC_MSG_CHECKING(if strcodes is available)
-AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
-#include <curses.h>
-#endif
-#include <term.h>], [char **test = strcodes; printf(*test);],
-AC_DEFINE(HAVE_STRCODES) strcodes=yes, strcodes=no)
-AC_MSG_RESULT($strcodes)
-AC_MSG_CHECKING(if boolnames is available)
-AC_TRY_LINK([#include <curses.h>
-#include <term.h>], [char **test = boolnames; printf(*test);],
-AC_DEFINE(HAVE_BOOLNAMES) boolnames=yes, boolnames=no)
-AC_MSG_RESULT($boolnames)
-AC_MSG_CHECKING(if numnames is available)
-AC_TRY_LINK([#include <curses.h>
-#include <term.h>], [char **test = numnames; printf(*test);],
-AC_DEFINE(HAVE_NUMNAMES) numnames=yes, numnames=no)
-AC_MSG_RESULT($numnames)
-AC_MSG_CHECKING(if strnames is available)
-AC_TRY_LINK([#include <curses.h>
-#include <term.h>], [char **test = strnames; printf(*test);],
-AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
-AC_MSG_RESULT($strnames)
-])
-
 
 dnl If our terminal library is not ncurses, don't try including
 dnl any ncurses headers.
-AH_TEMPLATE([ZSH_IGNORE_NCURSES],
-[Define to 1 to ignore any ncurses library headers found on the system.])
-case $LIBS in
-  *-lncurses*) ;;
+AC_CACHE_CHECK(if we need to ignore ncurses, zsh_cv_ignore_ncurses,
+[case $LIBS in
+  *-lncurses*)
+  zsh_cv_ignore_ncurses=no
+  ;;
   *)
-  AC_DEFINE(ZSH_IGNORE_NCURSES) ;;
-esac
+  zsh_cv_ignore_ncurses=yes
+  ;;
+esac])
 
 AC_SEARCH_LIBS(getpwnam, nsl)
 
@@ -1407,20 +1342,42 @@ zsh_cv_path_errno_h="$ERRNO_H"
 ERRNO_H="$zsh_cv_path_errno_h"
 AC_SUBST(ERRNO_H)dnl
 
+AC_CACHE_CHECK(location of curses header, zsh_cv_path_curses_header,
+[if test x$zsh_cv_ignore_ncurses = xyes; then
+  if test x$ac_cv_header_curses_h = xyes; then
+    zsh_cv_path_curses_header=curses.h
+  else
+    zsh_cv_path_curses_header=none
+  fi
+elif test x$ac_cv_header_ncursesw_ncurses_h = xyes; then
+  zsh_cv_path_curses_header=ncursesw/ncurses.h
+elif test x$ac_cv_header_ncurses_ncurses_h = xyes; then
+  zsh_cv_path_curses_header=ncurses/ncurses.h
+elif test x$ac_cv_header_ncurses_h = xyes; then
+  zsh_cv_path_curses_header=ncurses.h
+elif test x$ac_cv_header_curses_h = xyes; then
+  zsh_cv_path_curses_header=curses.h
+else
+  zsh_cv_path_curses_header=none
+fi])
+AH_TEMPLATE([ZSH_HAVE_CURSES_H],
+[Define to 1 if some variant of a curses header can be included])
+if test x$zsh_cv_path_curses_header != xnone; then
+  AC_DEFINE(ZSH_HAVE_CURSES_H)
+  ZSH_CURSES_H=$zsh_cv_path_curses_header
+else
+  ZSH_CURSES_H=
+fi
+AC_SUBST(ZSH_CURSES_H)
+
 dnl Where are curses key definitions located?  Need for keypad() mode.
 AC_CACHE_CHECK(where curses key definitions are located, zsh_cv_path_curses_keys_h,
 [dnl This is an identical trick to errno.h, except we use ncurses.h
 dnl if we can.
-if test x$ac_cv_header_ncurses_h = xyes; then
-  echo "#include <ncurses.h>" >nametmp.c
-elif test x$ac_cv_header_ncurses_ncurses_h = xyes; then
-  echo "#include <ncurses/ncurses.h>" >nametmp.c
-elif test x$ac_cv_header_ncursesw_ncurses_h = xyes; then
-  echo "#include <ncursesw/ncurses.h>" >nametmp.c
-elif test x$ac_cv_header_curses_h = xyes; then
-  echo "#include <curses.h>" >nametmp.c
-else
+if test x$zsh_cv_path_curses_header = xnone; then
   echo >nametmp.c
+else
+  echo "#include <$zsh_cv_path_curses_header>" >nametmp.c
 fi
 
 curses_list="`$CPP nametmp.c |
@@ -1445,6 +1402,97 @@ zsh_cv_path_curses_keys_h="$CURSES_KEYS_H"
 ])
 CURSES_KEYS_H="$zsh_cv_path_curses_keys_h"
 AC_SUBST(CURSES_KEYS_H)dnl
+
+dnl See if there are variants of term.h.  For testing each one
+dnl we include the most likely variant of the curses header.
+AC_CHECK_HEADERS(ncursesw/term.h,
+true, true,
+[#include <ncursesw/ncurses.h>])
+AC_CHECK_HEADERS(ncurses/term.h,
+true, true,
+[#include <ncurses/ncurses.h>])
+AC_CHECK_HEADERS(term.h,
+true, true,
+[#include <curses.h>])
+
+dnl See if term.h is bundled along with the curses library we
+dnl are using.  If this isn't the default system curses, compilation
+dnl could barf unless we include from the right subdirectory.
+AC_CACHE_CHECK(where term.h is located, zsh_cv_path_term_header,
+[case x$zsh_cv_path_curses_header in
+  xncursesw/*)
+  if test x$ac_cv_header_ncursesw_term_h = xyes; then
+    zsh_cv_path_term_header=ncursesw/term.h
+  fi
+  ;;
+  xncurses/*)
+  if test x$ac_cv_header_ncurses_term_h = xyes; then
+    zsh_cv_path_term_header=ncurses/term.h
+  fi
+  ;;
+esac
+if test x$zsh_cv_path_term_header = x; then
+  if test x$ac_cv_header_term_h = xyes; then
+    zsh_cv_path_term_header=term.h
+  else
+    zsh_cv_path_term_header=none
+  fi
+fi])
+
+AH_TEMPLATE([ZSH_HAVE_TERM_H],
+[Define to 1 if some variant of term.h can be included])
+AH_TEMPLATE([HAVE_BOOLCODES],
+[Define if you have the termcap boolcodes symbol.])
+AH_TEMPLATE([HAVE_NUMCODES],
+[Define if you have the termcap numcodes symbol.])
+AH_TEMPLATE([HAVE_STRCODES],
+[Define if you have the termcap strcodes symbol.])
+AH_TEMPLATE([HAVE_BOOLNAMES],
+[Define if you have the terminfo boolnames symbol.])
+AH_TEMPLATE([HAVE_NUMNAMES],
+[Define if you have the terminfo numnames symbol.])
+AH_TEMPLATE([HAVE_STRNAMES],
+[Define if you have the terminfo strnames symbol.])
+
+if test x$zsh_cv_path_term_header != xnone; then
+  AC_DEFINE(ZSH_HAVE_TERM_H)
+  ZSH_TERM_H=$zsh_cv_path_term_header
+  if test x$zsh_cv_path_curses_header != xnone; then
+    term_includes="#include <$zsh_cv_path_curses_header>
+#include <$zsh_cv_path_term_header>"
+  else
+    term_includes="#include <$zsh_cv_path_term_header>"
+  fi
+
+  AC_MSG_CHECKING(if boolcodes is available)
+  AC_TRY_LINK($term_includes, [char **test = boolcodes; printf(*test);],
+  AC_DEFINE(HAVE_BOOLCODES) boolcodes=yes, boolcodes=no)
+  AC_MSG_RESULT($boolcodes)
+  AC_MSG_CHECKING(if numcodes is available)
+  AC_TRY_LINK($term_includes, [char **test = numcodes; printf(*test);],
+  AC_DEFINE(HAVE_NUMCODES) numcodes=yes, numcodes=no)
+  AC_MSG_RESULT($numcodes)
+  AC_MSG_CHECKING(if strcodes is available)
+  AC_TRY_LINK($term_includes, [char **test = strcodes; printf(*test);],
+  AC_DEFINE(HAVE_STRCODES) strcodes=yes, strcodes=no)
+  AC_MSG_RESULT($strcodes)
+  AC_MSG_CHECKING(if boolnames is available)
+  AC_TRY_LINK($term_includes, [char **test = boolnames; printf(*test);],
+  AC_DEFINE(HAVE_BOOLNAMES) boolnames=yes, boolnames=no)
+  AC_MSG_RESULT($boolnames)
+  AC_MSG_CHECKING(if numnames is available)
+  AC_TRY_LINK($term_includes, [char **test = numnames; printf(*test);],
+  AC_DEFINE(HAVE_NUMNAMES) numnames=yes, numnames=no)
+  AC_MSG_RESULT($numnames)
+  AC_MSG_CHECKING(if strnames is available)
+  AC_TRY_LINK($term_includes, [char **test = strnames; printf(*test);],
+  AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
+  AC_MSG_RESULT($strnames)
+else
+  ZSH_TERM_H=
+fi
+AC_SUBST(ZSH_TERM_H)
+
 
 dnl -----------------------------------------------------
 dnl Look for the file containing the RLIMIT_* definitions

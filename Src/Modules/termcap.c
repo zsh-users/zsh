@@ -36,7 +36,7 @@
 #include "../../config.h"
 
 #ifdef HAVE_TGETENT
-# if defined(HAVE_CURSES_H) && defined(HAVE_TERM_H)
+# if defined(ZSH_HAVE_CURSES_H) && defined(ZSH_HAVE_TERM_H)
 #  define USES_TERM_H 1
 # else
 #  ifdef HAVE_TERMCAP_H
@@ -54,10 +54,10 @@
 #  ifdef HAVE_TERMIO_H
 #   include <termio.h>
 #  endif
-#  ifdef TERM_H_NEEDS_CURSES_H
-#   include <curses.h>
+#  ifdef ZSH_HAVE_CURSES_H
+#   include "../zshcurses.h"
 #  endif
-#  include <term.h>
+#  include "../zshterm.h"
 # else
 #  ifdef USES_TERMCAP_H
 #   include <termcap.h>

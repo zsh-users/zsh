@@ -41,26 +41,8 @@
 # undef HAVE_NCURSESW_NCURSES_H
 #endif
 
-#ifdef ZSH_IGNORE_NCURSES
-# ifdef HAVE_CURSES_H
-#  include <curses.h>
-# endif
-#else
-# ifdef HAVE_NCURSESW_NCURSES_H
-#  include <ncursesw/ncurses.h>
-# else
-#  ifdef HAVE_NCURSES_NCURSES_H
-#   include <ncurses/ncurses.h>
-#  else
-#   ifdef HAVE_NCURSES_H
-#    include <ncurses.h>
-#   else
-#    ifdef HAVE_CURSES_H
-#     include <curses.h>
-#    endif
-#   endif
-#  endif
-# endif
+#ifdef ZSH_HAVE_CURSES_H
+# include "../zshcurses.h"
 #endif
 
 #ifdef HAVE_SETCCHAR

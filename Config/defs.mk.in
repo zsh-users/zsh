@@ -29,6 +29,10 @@ SHELL = /bin/sh
 @SET_MAKE@
 EXEEXT = @EXEEXT@
 
+# headers
+ZSH_CURSES_H = @ZSH_CURSES_H@
+ZSH_TERM_H = @ZSH_TERM_H@
+
 # install basename
 tzsh            = @tzsh@
 

@@ -30,7 +30,7 @@
 #define USES_TERM_H 1
 #include "terminfo.mdh"
 
-#if defined(HAVE_TIGETFLAG) && (defined(HAVE_CURSES_H) || defined(HAVE_NCURSES_H) || defined(HAVE_NCURSES_NCURSES_H) || defined(HAVE_NCURSESW_NCURSES_H))
+#if defined(HAVE_TIGETFLAG) && defined(ZSH_HAVE_CURSES_H)
 # define USE_TERMINFO_MODULE 1
 #else
 # undef USE_TERMINFO_MODULE
@@ -49,30 +49,12 @@
 #  undef offsetof
 # endif
 
-#ifdef ZSH_IGNORE_NCURSES
-# ifdef HAVE_CURSES_H
-#  include <curses.h>
-# endif
-#else
-# ifdef HAVE_NCURSESW_NCURSES_H
-#  include <ncursesw/ncurses.h>
-# else
-#  ifdef HAVE_NCURSES_NCURSES_H
-#   include <ncurses/ncurses.h>
-#  else
-#   ifdef HAVE_NCURSES_H
-#    include <ncurses.h>
-#   else
-#    ifdef HAVE_CURSES_H
-#     include <curses.h>
-#    endif
-#   endif
-#  endif
-# endif
+#ifdef ZSH_HAVE_CURSES_H
+# include "../zshcurses.h"
 #endif
 
-# ifdef HAVE_TERM_H
-#  include <term.h>
+# ifdef ZSH_HAVE_TERM_H
+#  include "../zshterm.h"
 # endif
 
 /* echoti: output a terminfo capability */

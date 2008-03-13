@@ -1,3 +1,11 @@
+2008-03-13  Peter Stephenson  <pws@csr.com>
+
+	* 24705: configure.ac, Config/defs.mk.in, Src/zsh.mdd,
+	Src/Modules/curses.c, Src/Modules/termcap.c,
+	Src/Modules/terminfo.c: rationalise curses and term headers
+	some more and add intermediate generated <build>/Src/zshcurses.h
+	and <build>/Src/zshterm.h to include the right ones.
+
 2008-03-12  Clint Adams  <clint@zsh.org>
 
 	* 24704: Completion/Unix/Command/_calendar: completion for BSD
