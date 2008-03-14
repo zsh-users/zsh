@@ -1,5 +1,8 @@
 2008-03-14  Peter Stephenson  <pws@csr.com>
 
+	* 24712: Src/utils.c: handling of backticks when being requoted
+	for use inside double quotes had off-by-one error.
+
 	* 24711: Src/parse.c, Src/text.c, Src/zsh.h,
 	Test/A04redirect.ztst:  fix re-presentation of here-documents
 	munged internally to here-strings.

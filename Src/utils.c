@@ -4268,6 +4268,8 @@ quotestring(const char *s, char **e, int instring)
 		while (*u && *u != c)
 		    *v++ = *u++;
 		*v++ = c;
+		if (*u)
+		    u++;
 		continue;
 	    } else if ((*u == Qstring || *u == '$') && u[1] == '\'' &&
 		       instring == QT_DOUBLE) {
