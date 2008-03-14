@@ -309,7 +309,10 @@ enum {
     REDIR_OUTPIPE		/* > >(...) */
 };
 #define REDIR_TYPE_MASK	(0x1f)
+/* Redir using {var} syntax */
 #define REDIR_VARID_MASK (0x20)
+/* Mark here-string that came from a here-document */
+#define REDIR_FROM_HEREDOC_MASK (0x40)
 
 #define IS_WRITE_FILE(X)      ((X)>=REDIR_WRITE && (X)<=REDIR_READWRITE)
 #define IS_APPEND_REDIR(X)    (IS_WRITE_FILE(X) && ((X) & 2))
@@ -550,10 +553,18 @@ struct conddef {
 #define CONDDEF(name, flags, handler, min, max, condid) \
     { NULL, name, flags, handler, min, max, condid, NULL }
 
+/* Flags for redirections */
+
+enum {
+    /* Mark a here-string that came from a here-document */
+    REDIRF_FROM_HEREDOC = 1
+};
+
 /* tree element for redirection lists */
 
 struct redir {
     int type;
+    int flags;
     int fd1, fd2;
     char *name;
     char *varid;
@@ -744,6 +755,7 @@ struct eccstr {
 
 #define WC_REDIR_TYPE(C)    ((int)(wc_data(C) & REDIR_TYPE_MASK))
 #define WC_REDIR_VARID(C)   ((int)(wc_data(C) & REDIR_VARID_MASK))
+#define WC_REDIR_FROM_HEREDOC(C) ((int)(wc_data(C) & REDIR_FROM_HEREDOC_MASK))
 #define WCB_REDIR(T)        wc_bld(WC_REDIR, (T))
 /* Size of redir is 4 words if REDIR_VARID_MASK is set, else 3 */
 #define WC_REDIR_WORDS(C)   (WC_REDIR_VARID(C) ? 4 : 3)

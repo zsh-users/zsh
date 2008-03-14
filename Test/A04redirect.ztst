@@ -82,6 +82,58 @@
 >b
 >c
 
+# The following tests check that output of parsed here-documents works.
+# This isn't completely trivial because we convert the here-documents
+# internally to here-strings.  So we check again that we can output
+# the reevaluated here-strings correctly.  Hence there are three slightly
+# different stages.  We don't care how the output actually looks, so
+# we don't test that.
+  heretest() {
+    print First line
+    cat <<-HERE
+	$foo$foo met celeste  'but with extra'  "stuff to test quoting"
+	HERE
+    print Last line
+  }
+  heretest
+  eval "$(functions heretest)"
+  heretest
+  eval "$(functions heretest)"
+  heretest
+0:Re-evaluation of function output with here document, unquoted
+>First line
+>barbar met celeste  'but with extra'  "stuff to test quoting"
+>Last line
+>First line
+>barbar met celeste  'but with extra'  "stuff to test quoting"
+>Last line
+>First line
+>barbar met celeste  'but with extra'  "stuff to test quoting"
+>Last line
+
+  heretest() {
+    print First line
+    cat <<'    HERE'
+    $foo$foo met celeste  'but with extra'  "stuff to test quoting"
+    HERE
+    print Last line
+  }
+  heretest
+  eval "$(functions heretest)"
+  heretest
+  eval "$(functions heretest)"
+  heretest
+0:Re-evaluation of function output with here document, quoted
+>First line
+>    $foo$foo met celeste  'but with extra'  "stuff to test quoting"
+>Last line
+>First line
+>    $foo$foo met celeste  'but with extra'  "stuff to test quoting"
+>Last line
+>First line
+>    $foo$foo met celeste  'but with extra'  "stuff to test quoting"
+>Last line
+
   #
   # exec tests: perform these in subshells so if they fail the
   # shell won't exit.

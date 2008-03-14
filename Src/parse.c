@@ -1861,7 +1861,7 @@ par_redir(int *rp, char *idstring)
 void
 setheredoc(int pc, int type, char *str)
 {
-    ecbuf[pc] = WCB_REDIR(type);
+    ecbuf[pc] = WCB_REDIR(type | REDIR_FROM_HEREDOC_MASK);
     ecbuf[pc + 2] = ecstrcode(str);
 }
 
@@ -2409,6 +2409,10 @@ ecgetredirs(Estate s)
 	r->type = WC_REDIR_TYPE(code);
 	r->fd1 = *s->pc++;
 	r->name = ecgetstr(s, EC_DUP, NULL);
+	if (WC_REDIR_FROM_HEREDOC(code))
+	    r->flags = REDIRF_FROM_HEREDOC;
+	else
+	    r->flags = 0;
 	if (WC_REDIR_VARID(code))
 	    r->varid = ecgetstr(s, EC_DUP, NULL);
 	else
