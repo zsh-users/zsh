@@ -1,3 +1,7 @@
+2008-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: zsh-4.3.5-dev-1.
+
 2008-03-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted (see 24709): Functions/Misc/zkbd: add -h to local
