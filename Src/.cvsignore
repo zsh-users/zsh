@@ -23,7 +23,9 @@ libzsh.so*
 sigcount.h
 signames.c signames2.c
 version.h
+zshcurses.h
 zshpaths.h
+zshterm.h
 zshxmods.h
 bltinmods.list
 tags TAGS

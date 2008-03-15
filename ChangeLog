@@ -1,5 +1,9 @@
 2008-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Completion/Unix/Command/.distfiles,
+	Completion/Zsh/Type/.distfiles, Etc/.distfiles, Src/.cvsignore:
+	fix distribution files.
+
 	* unposted: Config/version.mk: zsh-4.3.5-dev-1.
 
 2008-03-14  Barton E. Schaefer  <schaefer@zsh.org>

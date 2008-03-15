@@ -1,8 +1,19 @@
 DISTFILES_SRC='
-    .cvsignore .distfiles Makefile.in
-    BUGS CONTRIBUTORS FAQ FAQ.yo STD-TODO TODO
-    FTP-README pubring.pgp
-    completion-style-guide zsh-development-guide
-    changelog2html.pl
-    ChangeLog-3.1 ChangeLog-3.0 ChangeLog-4.1
+.cvsignore
+.distfiles
+BUGS
+CONTRIBUTORS
+ChangeLog-3.0
+ChangeLog-3.1
+ChangeLog-4.1
+FAQ
+FAQ.yo
+FTP-README
+Makefile.in
+STD-TODO TODO
+changelog2html.pl
+completion-style-guide
+pubring.pgp
+relnote_4.3.5.txt
+zsh-development-guide
 '

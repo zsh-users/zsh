@@ -1,8 +1,23 @@
 DISTFILES_SRC='
 .distfiles
-_aliases           _file_descriptors  _jobs_fg           _options_unset
-_arrays            _functions         _limits            _parameters
-_command_names     _jobs              _options           _vars
-_directory_stack   _jobs_bg           _options_set
+_aliases
+_arrays
+_command_names
+_delimiters
+_directory_stack
+_file_descriptors
+_functions
+_globqual_delims
+_globquals
+_history_modifiers
+_jobs
+_jobs_bg
+_jobs_fg
+_limits
+_options
+_options_set
+_options_unset
+_parameters
 _suffix_alias_files
+_vars
 '
