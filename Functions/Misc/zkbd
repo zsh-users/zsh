@@ -1,8 +1,8 @@
 #!/bin/zsh -f
 
 [[ -o interactive ]] && {
-    local -i ARGC
-    (ARGC=0) 2>/dev/null || {
+    local -hi ARGC		# local is a no-op outside of a function
+    (ARGC=0) 2>/dev/null || {	# so ARGC remains read-only for "source"
         print -u2 ${0}: must be run as a function or shell script, not sourced
         return 1
     }
@@ -118,21 +118,33 @@ else
     unset alt
 fi
 
-(( $+alt + $+meta == 0 )) && cat <<EOF
+if (( $+alt + $+meta == 0 ))
+then
+    print $'\n---------\n'
+    if [[ -o multibyte ]]
+    then cat <<EOF
+You are using zsh in MULTIBYTE mode to support modern character sets (for
+languages other than English).  To use the Meta or Alt keys, you probably
+need to revert to single-byte mode with a command such as
 
----------
-
+    unsetopt MULTIBYTE
+EOF
+    else cat <<EOF
 Your current terminal and keyboard configuration does not appear to use
 high-order characters.  You may be able to enable the Meta or Alt keys
 with a command such as
 
     stty pass8
+EOF
+    fi
+    cat <<EOF
 
 If you want to use these extra keys with zsh, try adding the above command
 to your ${ZDOTDIR:-$HOME}/.zshrc file.
 
 See also "man stty" or the documentation for your terminal or emulator.
 EOF
+fi
 
 (( $+alt || $+meta )) && cat <<EOF
 
@@ -145,7 +157,11 @@ by adding
     bindkey -m
 
 to your ${ZDOTDIR:-$HOME}/.zshrc file.
+
 EOF
+
+read -k 1 key"?Press a key to proceed: "
+[[ $key != $'\n' ]] && print
 
 cat <<\EOF
 
@@ -165,7 +181,7 @@ use of that key.  Press Space to skip to the next key.
 
 EOF
 
-read -k 1 key"?Press any key when ready to begin: "
+read -k 1 key"?Press a key when ready to begin: "
 [[ $key != $'\n' ]] && print
 
 cat <<\EOF
@@ -235,18 +251,19 @@ else
     fi
 fi
 
-command mv $zkbd/$TERM.tmp $zkbd/$TERM-$VENDOR-$OSTYPE
+local termID=${DISPLAY:-$VENDOR-$OSTYPE}
+command mv $zkbd/$TERM.tmp $zkbd/$TERM-$termID
 
 cat <<EOF
 
 Parameter assignments for the keys you typed have been written to the file:
-$zkbd/$TERM-$VENDOR-$OSTYPE
+$zkbd/$TERM-$termID
 
 You may read this file into ${ZDOTDIR:-$HOME}/.zshrc or another startup
 file with the "source" or "." commands, then reference the \$key parameter
 in bindkey commands, like this:
 
-    source ${zkbd/$HOME/~}/\$TERM-\$VENDOR-\$OSTYPE
+    source ${zkbd/$HOME/~}/\$TERM-\${DISPLAY:-\$VENDOR-\$OSTYPE}
     [[ -n \${key[Left]} ]] && bindkey "\${key[Left]}" backward-char
     [[ -n \${key[Right]} ]] && bindkey "\${key[Right]}" forward-char
     # etc.

@@ -1,3 +1,10 @@
+2008-03-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (see 24709): Functions/Misc/zkbd: add -h to local
+	declaration in is-this-a-function test.  Use $DISPLAY when we
+	have one instead of only $VENDOR-$OSTYPE as file name suffix.
+	Add some knowledge of the MULTIBYTE option and its effects.
+
 2008-03-14  Peter Stephenson  <pws@csr.com>
 
 	* 24712: Src/utils.c: handling of backticks when being requoted
