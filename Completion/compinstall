@@ -1438,7 +1438,7 @@ number of completions.  Please enter:
 	 done
 	 amenu=(${=menu})
 	 elt=${amenu[(i)*select*]}
-	 [[ $elt -gt $#amenu ]] && elt=
+	 [[ $elt -eq 0 || $elt -gt $#amenu ]] && elt=
 	 case $select in
 	   <->) if [[ -n $elt ]]; then
 		  amenu[$elt]="select=$select"

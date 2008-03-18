@@ -178,10 +178,14 @@
 >lower
 >upper
 
-  typeset -a empty_array
-  echo X${${l##*}[-1]}X
+  typeset -ga empty
+  echo X${${empty##*}[-1]}X
 0:Negative index applied to substition result from empty array
 >XX
+
+  print $empty[(i)] $empty[(I)]
+0:(i) returns 1 for empty array, (I) returns 0.
+>1 0
 
   array=(one two three four)
   print X$array[0]X

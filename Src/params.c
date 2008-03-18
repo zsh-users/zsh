@@ -1317,7 +1317,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    } else
 		ta = getarrvalue(v);
 	    if (!ta || !*ta)
-		return 0;
+		return !down;
 	    len = arrlen(ta);
 	    if (beg < 0)
 		beg += len;

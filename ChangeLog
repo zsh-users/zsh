@@ -1,3 +1,10 @@
+2008-03-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 24717, 24718, 24719: Completion/compinstall, Src/params.c,
+	Test/D06subscript.ztst: a 0 subscript is neither valid nor
+	equivalent to 1 any longer, so the (i) subscript flag on an empty
+	array needs to yield 1 as it probably always should have.
+
 2008-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Completion/Unix/Command/.distfiles,
@@ -1012,7 +1019,7 @@
 2007-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/curses.c: zcurses input oops.
-	
+
 	* 24024: configure.ac, Doc/Zsh/mod_curses.yo,
 	Src/Modules/curses.c, Src/Modules/curses_keys.awk:  add "zcurses
 	input" for single character raw input without echoing.  Test for
@@ -6234,7 +6241,7 @@
 	* 21316 (modified): Completion/Unix/Command/_less,
 	Completion/Unix/Type/_ctags_tags: new completion for ctags tags; update
 	less -t completion to use it
-	
+
 	* 21320: Completion/Unix/Command/_screen: complete -D and -R with the
 	appropriate session types; fix incorrect completion of -c and -dmS
 	options
