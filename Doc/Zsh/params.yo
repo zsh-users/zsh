@@ -251,8 +251,8 @@ Like `tt(r)', but gives the index of the match instead; this may not be
 combined with a second argument.  On the left side of an assignment,
 behaves like `tt(r)'.  For associative arrays, the key part of each pair
 is compared to the pattern, and the first matching key found is the
-result.  On failure substitutes one more than the last currently
-valid index, as discussed under the description of `tt(r)'.
+result.  On failure substitutes the length of the array plus one, as
+discussed under the description of `tt(r)'.
 )
 item(tt(I))(
 Like `tt(i)', but gives the index of the last match, or all possible
