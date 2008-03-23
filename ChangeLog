@@ -1,6 +1,11 @@
+2008-03-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/params.yo: further documentation tweak for the
+	(R) and	(I) subscript flags.
+
 2008-03-18  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* unposted: Doc/Zsh/params.yo: Tweak documentation for the (i) and
+	* unposted: Doc/Zsh/params.yo: tweak documentation for the (i) and
 	(I) subscript flags.
 
 	* 24717, 24718, 24719: Completion/compinstall, Src/params.c,

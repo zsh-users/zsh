@@ -225,6 +225,13 @@ example (assuming the option tt(KSH_ARRAYS) is not in effect):
 example([[ ${array[(i)pattern]} -le ${#array} ]])
 
 If tt(KSH_ARRAYS) is in effect, the tt(-le) should be replaced by tt(-lt).
+item(tt(R))(
+Like `tt(r)', but gives the last match.  For associative arrays, gives
+all possible matches. May be used for assigning to ordinary array
+elements, but not for assigning to associative arrays.  On failure, for
+normal arrays this has the effect of returning the element corresponding to
+subscript 0; this is empty unless one of the options tt(KSH_ARRAYS) or
+tt(KSH_ZERO_SUBSCRIPT) is in effect.
 
 Note that in subscripts with both `tt(r)' and `tt(R)' pattern characters
 are active even if they were substituted for a parameter (regardless
@@ -238,13 +245,6 @@ tt($key):
 example(key2=${key//(#m)[\][+LPAR()+RPAR()\\*?#<>~^]/\\$MATCH}
 print ${array[(R)$key2]})
 )
-item(tt(R))(
-Like `tt(r)', but gives the last match.  For associative arrays, gives
-all possible matches. May be used for assigning to ordinary array
-elements, but not for assigning to associative arrays.  On failure, for
-normal arrays this has the effect of returning the element corresponding to
-subscript 0; this is empty unless one of the options tt(KSH_ARRAYS) or
-tt(KSH_ZERO_SUBSCRIPT) is in effect.
 )
 item(tt(i))(
 Like `tt(r)', but gives the index of the match instead; this may not be
@@ -252,11 +252,14 @@ combined with a second argument.  On the left side of an assignment,
 behaves like `tt(r)'.  For associative arrays, the key part of each pair
 is compared to the pattern, and the first matching key found is the
 result.  On failure substitutes the length of the array plus one, as
-discussed under the description of `tt(r)'.
+discussed under the description of `tt(r)', or the empty string for an
+associative array.
 )
 item(tt(I))(
 Like `tt(i)', but gives the index of the last match, or all possible
-matching keys in an associative array.  On failure substitutes 0.
+matching keys in an associative array.  On failure substitutes 0, or
+the empty string for an associative array.  This flag is best when
+testing for values or keys that do not exist.
 )
 item(tt(k))(
 If used in a subscript on an associative array, this flag causes the keys
