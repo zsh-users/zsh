@@ -2646,7 +2646,7 @@ __git_unmerged_files () {
 __git_changed_files () {
   local -a files
 
-  files=(${(ps:\0:)"$(_call_program files git diff-index -z --name-only HEAD 2>/dev/null)"})
+  files=(${(ps:\0:)"$(_call_program files git diff-index -z --name-only --no-color HEAD 2>/dev/null)"})
   __git_command_successful || return
 
   _wanted files expl 'index file' _multi_parts $@ - / files
@@ -2830,7 +2830,7 @@ __git_heads () {
   local expl
   declare -a branch_names
 
-  branch_names=(${${(f)"$(_call_program heads git branch -a 2>/dev/null)"}#[* ] })
+  branch_names=(${${(f)"$(_call_program heads git branch --no-color -a 2>/dev/null)"}#[* ] })
   __git_command_successful || return
 
   _wanted heads expl branch-name compadd $* - $branch_names
@@ -2894,7 +2894,7 @@ __git_branch_names () {
   local expl
   declare -a branch_names
 
-  branch_names=(${${(f)"$(_call_program branch-names git branch 2>/dev/null)"}#[* ] })
+  branch_names=(${${(f)"$(_call_program branch-names git branch --no-color 2>/dev/null)"}#[* ] })
   __git_command_successful || return
 
   _wanted branch-names expl branch-name compadd $* - $branch_names

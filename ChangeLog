@@ -1,3 +1,8 @@
+2008-03-23  Clint Adams  <clint@zsh.org>
+
+	* 24730: Completion/Unix/Command/_git: use --no-color when
+	calling git commands that might output color codes.
+
 2008-03-22  Clint Adams  <clint@zsh.org>
 
 	* 24728: Completion/Debian/Command/_aptitude: complete for
