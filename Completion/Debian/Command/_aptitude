@@ -54,7 +54,7 @@ case $state in
       search)
         _message -e patterns pattern
       ;;
-      download|show|changelog)
+      (download|show|changelog|why|why-not)
         _deb_packages avail && ret=0
       ;;
       (remove|purge|hold|unhold|reinstall|forbid-version|markauto|unmarkauto)

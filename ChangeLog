@@ -1,3 +1,8 @@
+2008-03-22  Clint Adams  <clint@zsh.org>
+
+	* 24728: Completion/Debian/Command/_aptitude: complete for
+	aptitude why and why-not.
+
 2008-03-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/params.yo: further documentation tweak for the
