@@ -1,3 +1,13 @@
+2008-03-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24732: Src/Builtins/sched.c: not enough space for ztrftime
+	string with multibyte characters.
+
+	* 24731: Doc/Zsh/params.yo, Src/params.c, Src/pattern.c,
+	Test/D04parameter.ztst: use [(e)...] parameter flag to quote
+	pattern characters, also fix bug that optimization of matches
+	with no pattern characters didnʼt work for multibyte matching.
+
 2008-03-23  Clint Adams  <clint@zsh.org>
 
 	* 24730: Completion/Unix/Command/_git: use --no-color when

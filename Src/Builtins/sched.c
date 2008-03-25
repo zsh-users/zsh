@@ -205,13 +205,13 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     /* given no arguments, display the schedule list */
     if (!*argptr) {
 	for (sn = 1, sch = schedcmds; sch; sch = sch->next, sn++) {
-	    char tbuf[40], *flagstr, *endstr;
+	    char tbuf[60], *flagstr, *endstr;
 	    time_t t;
 	    struct tm *tmp;
 
 	    t = sch->time;
 	    tmp = localtime(&t);
-	    ztrftime(tbuf, 20, "%a %b %e %k:%M:%S", tmp);
+	    ztrftime(tbuf, 40, "%a %b %e %k:%M:%S", tmp);
 	    if (sch->flags & SCHEDFLAG_TRASH_ZLE)
 		flagstr = "-o ";
 	    else

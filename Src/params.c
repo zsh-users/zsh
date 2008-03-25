@@ -1007,7 +1007,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
     int keymatch = 0, needtok = 0, arglen, len;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt, c;
-    zlong num = 1, beg = 0, r = 0;
+    zlong num = 1, beg = 0, r = 0, quote_arg = 0;
     Patprog pprog = NULL;
 
     ishash = (v->pm && PM_TYPE(v->pm->node.flags) == PM_HASHED);
@@ -1058,8 +1058,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		sep = "\n";
 		break;
 	    case 'e':
-		/* Compatibility flag with no effect except to prevent *
-		 * special interpretation by getindex() of `*' or `@'. */
+		quote_arg = 1;
 		break;
 	    case 'n':
 		t = get_strarg(++s, &arglen);
@@ -1286,7 +1285,10 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    }
 	}
 	if (!keymatch) {
-	    tokenize(s);
+	    if (quote_arg)
+		untokenize(s);
+	    else
+		tokenize(s);
 	    remnulargs(s);
 	    pprog = patcompile(s, 0, NULL);
 	} else

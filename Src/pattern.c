@@ -511,7 +511,7 @@ patcompile(char *exp, int inflags, char **endexp)
 
     if (!(patflags & PAT_ANY)) {
 	/* Look for a really pure string, with no tokens at all. */
-	if (!patglobflags
+	if (!(patglobflags & ~GF_MULTIBYTE)
 #ifdef __CYGWIN__
 	    /*
 	     * If the OS treats files case-insensitively and we
