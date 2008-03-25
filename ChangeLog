@@ -1,5 +1,8 @@
 2008-03-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24733: Src/jobs.c: wait shouldn't return immediately on
+	a signal unless it's trapped (bug in 22281).
+
 	* 24732: Src/Builtins/sched.c: not enough space for ztrftime
 	string with multibyte characters.
 

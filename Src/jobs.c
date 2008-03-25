@@ -1170,7 +1170,8 @@ waitforpid(pid_t pid, int wait_cmd)
 
 	last_signal = -1;
 	signal_suspend(SIGCHLD);
-	if (last_signal != SIGCHLD && wait_cmd) {
+	if (last_signal != SIGCHLD && wait_cmd && last_signal >= 0 &&
+	    (sigtrapped[last_signal] & ZSIG_TRAPPED)) {
 	    /* wait command interrupted, but no error: return */
 	    restore_queue_signals(q);
 	    return 128 + last_signal;
@@ -1208,7 +1209,8 @@ zwaitjob(int job, int wait_cmd)
 	       !(jn->stat & STAT_DONE) &&
 	       !(interact && (jn->stat & STAT_STOPPED))) {
 	    signal_suspend(SIGCHLD);
-	    if (last_signal != SIGCHLD && wait_cmd)
+	    if (last_signal != SIGCHLD && wait_cmd && last_signal >= 0 &&
+		(sigtrapped[last_signal] & ZSIG_TRAPPED))
 	    {
 		/* builtin wait interrupted by trapped signal */
 		restore_queue_signals(q);
