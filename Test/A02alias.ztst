@@ -14,9 +14,9 @@
 0:Global aliasing
 >echo
 
-  \foo foo
+  \ThisCommandDefinitelyDoesNotExist foo
 127:Not aliasing
-?(eval):1: command not found: foo
+?(eval):1: command not found: ThisCommandDefinitelyDoesNotExist
 
   \bar \bar
 0:Aliasing with a backslash

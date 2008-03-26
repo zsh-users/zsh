@@ -363,8 +363,6 @@
   touch ngs1txt ngs2txt ngs10txt ngs20txt ngs100txt ngs200txt
   setopt numericglobsort
   print -l ngs*
-  unsetopt numericglobsort
-  print -l ngs*
 0:NUMERIC_GLOB_SORT option in UTF-8 locale
 >ngs1txt
 >ngs2txt
@@ -372,12 +370,6 @@
 >ngs20txt
 >ngs100txt
 >ngs200txt
->ngs100txt
->ngs10txt
->ngs1txt
->ngs200txt
->ngs20txt
->ngs2txt
 
 # Not strictly multibyte, but gives us a well-defined locale for testing.
   foo=$'X\xc0Y\x07Z\x7fT'
