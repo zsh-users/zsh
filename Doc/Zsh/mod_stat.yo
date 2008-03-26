@@ -5,6 +5,7 @@ The tt(zsh/stat) module makes available one builtin command under
 two possible names:
 
 startitem()
+findex(zstat)
 findex(stat)
 cindex(files, listing)
 cindex(files, examining)
