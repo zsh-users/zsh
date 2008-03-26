@@ -27,18 +27,38 @@ local expl ret=1 tag=$1 desc=$2
 
 shift 2
 
-if (( ! $+commands[readlink] )); then
+if ! zmodload -F zsh/stat b:zstat 2>/dev/null; then
   _wanted "$tag" expl "$desc" compadd $__gopts $@ && ret=0
   return ret
 fi
 
+typeset REPLY
 typeset -a matches files
+
+_canonical_paths_get_canonical_path() {
+  typeset newfile
+  typeset -A seen
+
+  REPLY=$1
+  # Guard against loops.
+  while [[ -z ${seen[$REPLY]} ]]; do
+    seen[$REPLY]=1
+    newfile=$(zstat +link $REPLY 2>/dev/null)
+    if [[ -n $newfile ]]; then
+      REPLY=$newfile
+    else
+      break
+    fi
+  done
+}
+
 
 if (( $__opts[(I)-N] )); then
   files=($@)
 else
   for __index in $@; do
-    files+=$(readlink -qf $__index)
+    _canonical_paths_get_canonical_path $__index
+    files+=($REPLY)
   done
 fi
 
@@ -48,13 +68,16 @@ _canonical_paths_add_paths () {
   expref=${~origpref}
   [[ $origpref == (|*/). ]] && rltrim=.
   curpref=${${expref%$rltrim}:-./}
-  canpref=$(readlink -qf $curpref)
-  if [[ $? -eq 0 ]]; then
-    [[ $curpref == */ && $canpref == *[^/] ]] && canpref+=/
-    canpref+=$rltrim
-    [[ $expref == *[^/] && $canpref == */ ]] && origpref+=/
-    matches+=(${${(M)files:#$canpref*}/$canpref/$origpref})
+  if zstat $curpref >&/dev/null; then
+    _canonical_paths_get_canonical_path $curpref
+    canpref=$REPLY
+  else
+    canpref=$curpref
   fi
+  [[ $curpref == */ && $canpref == *[^/] ]] && canpref+=/
+  canpref+=$rltrim
+  [[ $expref == *[^/] && $canpref == */ ]] && origpref+=/
+  matches+=(${${(M)files:#$canpref*}/$canpref/$origpref})
   for subdir in $expref?*(@); do
     _canonical_paths_add_paths ${subdir/$expref/$origpref} add
   done

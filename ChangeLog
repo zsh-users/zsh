@@ -1,5 +1,9 @@
 2008-03-26  Peter Stephenson  <pws@csr.com>
 
+	* 25753 (after various previous attempts):
+	Completion/Unix/Type/_canonical_paths: use zstat to find
+	canonical name for symbolic links.
+
 	* c.f. 24741: Doc/Zsh/mod_stat.yo: loading zstat builtin was
 	misdocumented.
 
