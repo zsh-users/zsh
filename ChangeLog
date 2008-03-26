@@ -1,5 +1,7 @@
 2008-03-26  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: 4.3.5-dev-3.
+
 	* 25753 (after various previous attempts):
 	Completion/Unix/Type/_canonical_paths: use zstat to find
 	canonical name for symbolic links.
