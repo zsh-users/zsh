@@ -18,7 +18,7 @@ manref(stat)(2)).  The same command is provided with two names; as
 the name tt(stat) is often used by an external command it is recommended
 that only the tt(zstat) form of the command is used.  This can be
 arranged by loading the module with the command `tt(zmodload -F zsh/stat
-zstat)'.
+b:zstat)'.
 
 If the tt(stat) call fails, the appropriate system error message
 printed and status 1 is returned.

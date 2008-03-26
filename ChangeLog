@@ -1,5 +1,12 @@
 2008-03-26  Peter Stephenson  <pws@csr.com>
 
+	* c.f. 24741: Doc/Zsh/mod_stat.yo: loading zstat builtin was
+	misdocumented.
+
+	* 24736: Test/A02alias.ztst, Test/D07multibyte.ztst:
+	tests failing with "foo" in the path and with inscrutable
+	numeric sorting with NUMERIC_GLOB_SORT unset.
+
 	* unposted: Config/version.mk: 4.3.5-dev-2.
 
 2008-03-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
