@@ -36,20 +36,41 @@ typeset REPLY
 typeset -a matches files
 
 _canonical_paths_get_canonical_path() {
-  typeset newfile
+  typeset newfile dir
   typeset -A seen
 
   REPLY=$1
-  # Guard against loops.
+  # Resolve any trailing symbolic links, guarding against loops.
   while [[ -z ${seen[$REPLY]} ]]; do
     seen[$REPLY]=1
-    newfile=$(zstat +link $REPLY 2>/dev/null)
-    if [[ -n $newfile ]]; then
-      REPLY=$newfile
+    newfile=()
+    zstat -A newfile +link $REPLY 2>/dev/null
+    if [[ -n $newfile[1] ]]; then
+      REPLY=$newfile[1]
     else
       break
     fi
   done
+
+  # Canonicalise the directory path.  We may not be able to
+  # do this if we can't read all components.
+  if [[ -d $REPLY ]]; then
+    dir="$(unfunction chpwd
+           setopt CHASE_LINKS
+           cd $REPLY 2>/dev/null && pwd)"
+    if [[ -n $dir ]]; then
+      REPLY=$dir
+    fi
+  elif [[ $REPLY = */*[^/] && $REPLY != /[^/]# ]]; then
+    # Don't try this if there's a trailing slash or we're in
+    # the root directory.
+    dir="$(unfunction chpwd
+           setopt CHASE_LINKS
+           cd ${REPLY%/*} 2>/dev/null && pwd)"
+    if [[ -n $dir ]]; then
+      REPLY=$dir/${REPLY##*/}
+    fi
+  fi
 }
 
 

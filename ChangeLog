@@ -1,5 +1,8 @@
 2008-03-27  Peter Stephenson  <pws@csr.com>
 
+	* 24757: Completion/Unix/Type/_canonical_paths: use
+	CHASE_LINKS and pwd to canonicalize the directory path.
+
 	* unposted: fix alias test in 24736 properly by replacing
 	"foo" everywhere.
 
