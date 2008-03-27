@@ -1,5 +1,9 @@
 2008-03-27  Peter Stephenson  <pws@csr.com>
 
+	* 24759: Completion/Unix/Type/_canonical_paths: unfunction
+	is noisy if function wasn't set.  Also sanitize use of
+	helper functions.
+
 	* 24757: Completion/Unix/Type/_canonical_paths: use
 	CHASE_LINKS and pwd to canonicalize the directory path.
 
