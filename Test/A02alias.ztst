@@ -1,20 +1,24 @@
+# To get the "command not found" message when aliasing is suppressed
+# we need, er, a command that isn't found.
+# The other aliases are only ever used as aliases.
+
 %prep
-  alias foo=echo
+  alias ThisCommandDefinitelyDoesNotExist=echo
 
   alias -g bar=echo
 
   alias '\bar=echo'
 
 %test
-  foo foo
+  ThisCommandDefinitelyDoesNotExist ThisCommandDefinitelyDoesNotExist
 0:Basic aliasing
->foo
+>ThisCommandDefinitelyDoesNotExist
 
   bar bar
 0:Global aliasing
 >echo
 
-  \ThisCommandDefinitelyDoesNotExist foo
+  \ThisCommandDefinitelyDoesNotExist ThisCommandDefinitelyDoesNotExist
 127:Not aliasing
 ?(eval):1: command not found: ThisCommandDefinitelyDoesNotExist
 
