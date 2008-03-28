@@ -50,8 +50,8 @@ static struct builtin builtins[] =
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
     BUILTIN("bye", 0, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("cd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "sPL", NULL),
-    BUILTIN("chdir", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "sPL", NULL),
+    BUILTIN("cd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "qsPL", NULL),
+    BUILTIN("chdir", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "qsPL", NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
     BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klmprtuxz", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
@@ -98,10 +98,10 @@ static struct builtin builtins[] =
     BUILTIN("patdebug", 0, bin_patdebug, 1, -1, 0, "p", NULL),
 #endif
 
-    BUILTIN("popd", 0, bin_cd, 0, 1, BIN_POPD, NULL, NULL),
+    BUILTIN("popd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 1, BIN_POPD, "q", NULL),
     BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsu:z-", NULL),
     BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, NULL, NULL),
-    BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "sPL", NULL),
+    BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "qsPL", NULL),
     BUILTIN("pushln", 0, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "nrl", NULL),
@@ -788,7 +788,7 @@ bin_cd(char *nam, char **argv, Options ops, int func)
 	unqueue_signals();
 	return 1;
     }
-    cd_new_pwd(func, dir);
+    cd_new_pwd(func, dir, OPT_ISSET(ops, 'q'));
 
     if (stat(unmeta(pwd), &st1) < 0) {
 	setjobpwd();
@@ -1087,7 +1087,7 @@ cd_try_chdir(char *pfix, char *dest, int hard)
 
 /**/
 static void
-cd_new_pwd(int func, LinkNode dir)
+cd_new_pwd(int func, LinkNode dir, int quiet)
 {
     char *new_pwd, *s;
     int dirstacksize;
@@ -1127,7 +1127,7 @@ cd_new_pwd(int func, LinkNode dir)
 
     if (isset(INTERACTIVE)) {
 	if (func != BIN_CD) {
-            if (unset(PUSHDSILENT))
+            if (unset(PUSHDSILENT) && !quiet)
 	        printdirstack();
         } else if (doprintdir) {
 	    fprintdir(pwd, stdout);
@@ -1138,7 +1138,8 @@ cd_new_pwd(int func, LinkNode dir)
     /* execute the chpwd function */
     fflush(stdout);
     fflush(stderr);
-    callhookfunc("chpwd", NULL, 1);
+    if (!quiet)
+	callhookfunc("chpwd", NULL, 1);
 
     dirstacksize = getiparam("DIRSTACKSIZE");
     /* handle directory stack sizes out of range */

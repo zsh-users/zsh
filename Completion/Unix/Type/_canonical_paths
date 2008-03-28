@@ -15,42 +15,45 @@
 
 _canonical_paths_pwd() {
   # Get the canonical directory name by changing to it.
-  # To be run in a subshell.
-  (( ${+functions[chpwd]} )) && unfunction chpwd
-  setopt CHASE_LINKS
-  cd $1 2>/dev/null && pwd
+  integer chaselinks
+  [[ -o chaselinks ]] && (( chaselinks = 1 ))
+  setopt localoptions nopushdignoredups chaselinks
+  if builtin pushd -q -- $1 2>/dev/null; then
+    REPLY=$PWD
+    (( chaselinks )) || unsetopt chaselinks
+    builtin popd -q
+  else
+    REPLY=$1
+  fi
 }
 
 _canonical_paths_get_canonical_path() {
-  typeset newfile dir
+  typeset newfile nondir
   typeset -A seen
 
   REPLY=$1
-  # Resolve any trailing symbolic links, guarding against loops.
-  while [[ -z ${seen[$REPLY]} ]]; do
-    seen[$REPLY]=1
-    newfile=()
-    zstat -A newfile +link $REPLY 2>/dev/null
-    if [[ -n $newfile[1] ]]; then
-      REPLY=$newfile[1]
-    else
-      break
-    fi
-  done
-
   # Canonicalise the directory path.  We may not be able to
   # do this if we can't read all components.
   if [[ -d $REPLY ]]; then
-    dir="$(_canonical_paths_pwd $REPLY)"
-    if [[ -n $dir ]]; then
-      REPLY=$dir
-    fi
-  elif [[ $REPLY = */*[^/] && $REPLY != /[^/]# ]]; then
-    # Don't try this if there's a trailing slash or we're in
-    # the root directory.
-    dir="$(_canonical_paths_pwd ${REPLY%/*})"
-    if [[ -n $dir ]]; then
-      REPLY=$dir/${REPLY##*/}
+    _canonical_paths_pwd $REPLY
+  else
+    # Resolve any trailing symbolic links, guarding against loops.
+    while [[ -z ${seen[$REPLY]} ]]; do
+      seen[$REPLY]=1
+      newfile=()
+      zstat -A newfile +link $REPLY 2>/dev/null
+      if [[ -n $newfile[1] ]]; then
+	REPLY=$newfile[1]
+      else
+	break
+      fi
+    done
+    if [[ $REPLY = */*[^/] && $REPLY != /[^/]# ]]; then
+      # Don't try this if there's a trailing slash or we're in
+      # the root directory.
+      nondir=${REPLY##*/#}
+      _canonical_paths_pwd ${REPLY%/#*}
+      REPLY+="/$nondir"
     fi
   fi
 }

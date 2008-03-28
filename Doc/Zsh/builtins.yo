@@ -152,16 +152,16 @@ alias(bye)(exit)
 module(cap)(zsh/cap)
 findex(cd)
 cindex(directories, changing)
-xitem(tt(cd) [ tt(-sLP) ] [ var(arg) ])
-xitem(tt(cd) [ tt(-sLP) ] var(old) var(new))
-item(tt(cd) [ tt(-sLP) ] {tt(PLUS())|tt(-)}var(n))(
+xitem(tt(cd) [ tt(-qsLP) ] [ var(arg) ])
+xitem(tt(cd) [ tt(-qsLP) ] var(old) var(new))
+item(tt(cd) [ tt(-qsLP) ] {tt(PLUS())|tt(-)}var(n))(
 Change the current directory.  In the first form, change the
 current directory to var(arg), or to the value of tt($HOME) if
 var(arg) is not specified.  If var(arg) is `tt(-)', change to the
 value of tt($OLDPWD), the previous directory.
 
 Otherwise, if var(arg) begins with a slash, attempt to change to the
-director given by var(arg).
+directory given by var(arg).
 
 If var(arg) does not begin with a slash, the behaviour depends on whether
 the current directory `tt(.)' occurs in the list of directories contained
@@ -189,11 +189,17 @@ An argument of the form `tt(-)var(n)' counts from the right.
 If the tt(PUSHD_MINUS) option is set, the meanings of `tt(PLUS())'
 and `tt(-)' in this context are swapped.
 
+If the tt(-q) (quiet) option is specified, the hook function tt(chpwd)
+and the functions in the array tt(chpwd_functions) are not called.
+This is useful for calls to tt(cd) that do not change the environment
+seen by an interactive user.
+
 If the tt(-s) option is specified, tt(cd) refuses to change the current
 directory if the given pathname contains symlinks.  If the tt(-P) option
 is given or the tt(CHASE_LINKS) option is set, symbolic links are resolved
 to their true values.  If the tt(-L) option is given symbolic links are
-followed regardless of the state of the tt(CHASE_LINKS) option.
+retained in the directory (and not resolved) regardless of the state of
+the tt(CHASE_LINKS) option.
 )
 alias(chdir)(cd)
 module(clone)(zsh/clone)
@@ -795,7 +801,7 @@ Same as tt(exit), except that it only works in a login shell.
 )
 prefix(noglob)
 findex(popd)
-item(tt(popd) [ {tt(PLUS())|tt(-)}var(n) ])(
+item(tt(popd) [ [-q] {tt(PLUS())|tt(-)}var(n) ])(
 Remove an entry from the directory stack, and perform a tt(cd) to
 the new top directory.  With no argument, the current top entry is
 removed.  An argument of the form `tt(PLUS())var(n)' identifies a stack
@@ -804,6 +810,11 @@ starting with zero.  An argument of the form tt(-n) counts from the right.
 pindex(PUSHD_MINUS, use of)
 If the tt(PUSHD_MINUS) option is set, the meanings of `tt(PLUS())' and
 `tt(-)' in this context are swapped.
+
+If the tt(-q) (quiet) option is specified, the hook function tt(chpwd)
+and the functions in the array tt($chpwd_functions) are not called,
+and the new directory stack is not printed.  This is useful for calls to
+tt(popd) that do not change the environment seen by an interactive user.
 )
 findex(print)
 xitem(tt(print) [ tt(-abcDilmnNoOpPrsz) ] [ tt(-u) var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
@@ -935,9 +946,9 @@ pindex(PUSHD_TO_HOME, use of)
 pindex(PUSHD_MINUS, use of)
 pindex(CDABLE_VARS, use of)
 pindex(PUSHD_SILENT, use of)
-xitem(tt(pushd) [ tt(-sLP) ] [ var(arg) ])
-xitem(tt(pushd) [ tt(-sLP) ] var(old) var(new))
-item(tt(pushd) [ tt(-sLP) ] {tt(PLUS())|tt(-)}var(n))(
+xitem(tt(pushd) [ tt(-qsLP) ] [ var(arg) ])
+xitem(tt(pushd) [ tt(-qsLP) ] var(old) var(new))
+item(tt(pushd) [ tt(-qsLP) ] {tt(PLUS())|tt(-)}var(n))(
 Change the current directory, and push the old current directory
 onto the directory stack.  In the first form, change the
 current directory to var(arg).
@@ -956,8 +967,14 @@ command, starting with zero.  An argument of the form `tt(-)var(n)' counts
 from the right.  If the tt(PUSHD_MINUS) option is set, the meanings
 of `tt(PLUS())' and `tt(-)' in this context are swapped.
 
-If the option tt(PUSHD_SILENT) is not set, the directory
-stack will be printed after a tt(pushd) is performed.
+If the tt(-q) (quiet) option is specified, the hook function tt(chpwd)
+and the functions in the array tt($chpwd_functions) are not called,
+and the new directory stack is not printed.  This is useful for calls to
+tt(pushd) that do not change the environment seen by an interactive user.
+
+If the option tt(-q) is not specified and the shell option tt(PUSHD_SILENT)
+is not set, the directory stack will be printed after a tt(pushd) is
+performed.
 
 The options tt(-s), tt(-L) and tt(-P) have the same meanings as for the
 tt(cd) builtin.
