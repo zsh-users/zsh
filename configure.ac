@@ -656,7 +656,7 @@ dnl On HPUX, Hcurses is reported to work better than curses.
 dnl Prefer ncurses to curses on all systems.  tinfo isn't very common now.
 AC_ARG_WITH(term-lib,
 AC_HELP_STRING([--with-term-lib=LIBS], [search space-separated LIBS for terminal handling]),
-[if test x$withval != xno && test x$withval != x ; then
+[if test "x$withval" != xno && test "x$withval" != x ; then
   termcap_curses_order="$withval"
   AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 else

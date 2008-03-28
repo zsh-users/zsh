@@ -1,5 +1,8 @@
 2008-03-28  Peter Stephenson  <pws@csr.com>
 
+	* users/12739: configure.ac: multiple arguments to --with-term-lib
+	weren't handled properly.
+
 	* 24768: Completion/Unix/Type/_canonical_paths,
 	Doc/Zsh/builtins.yo, Etc/relnotes_4.3.6.txt, Src/builtin.c:
 	add -q option to cd, chdir, pushd, popd; use in _canonical_paths;
