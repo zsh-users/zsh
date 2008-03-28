@@ -1221,6 +1221,16 @@ bindable command.  If it set to `true' and the word on the command
 line is not the name of an alias, matching alias names will be
 completed.
 )
+kindex(complete-options, completion style)
+time(tt(complete-options))(
+This is used by the completer for tt(cd), tt(chdir) and tt(pushd).
+For these commands a tt(-) is used to introduce a directory stack entry
+and completion of these is far more common than completing options.
+Hence unless the value of this style is true options will not be
+completed, even after an initial tt(-).  If it is true, options will
+be completed after an initial tt(-) unless there is a preceeding
+tt(--) on the command line.
+)
 kindex(completer, completion style)
 item(tt(completer))(
 The strings given as the value of this style provide the names of the
