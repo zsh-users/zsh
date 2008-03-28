@@ -1,3 +1,9 @@
+2008-03-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24777: Src/Zle/complist.c: bug clearing a list when
+	exiting from menu selection in some circumstances (see
+	24756 for test case).
+
 2008-03-28  Peter Stephenson  <pws@csr.com>
 
 	* 24776: Completion/compinit: clarify the message printed

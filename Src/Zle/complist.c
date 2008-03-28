@@ -53,7 +53,7 @@ static int noselect, mselect, inselect, mcol, mline, mcols, mlines;
  * selected: Used to signal between domenucomplete() and menuselect()
  *           that a selected entry has been found.  Or something.
  * mlbeg:    The first line of the logical array of all matches that
- *           fits on screen.
+ *           fits on screen.  Setting this to -1 forces a redraw.
  * mlend:    The line after the last that fits on screen.
  * mscroll:  1 if the scrolling prompt is shown on screen.
  * mrestlines: The number of screen lines remaining to be processed.
@@ -3216,6 +3216,15 @@ domenuselect(Hookdef dummy, Chdata dat)
 	}
     }
     if (!noselect && (!dat || acc)) {
+	/*
+	 * I added the following because in certain cases the zrefresh()
+	 * here was screwing up the list.  Forcing it to redraw the
+	 * screen worked.  The case in question (courtesy of
+	 * "Matt Wozniski" <godlygeek@gmail.com>) is in zsh-workers/24756.
+	 *
+	 * *** PLEASE DON'T ASK ME WHY THIS IS NECESSARY ***
+	 */
+	mlbeg = -1;
 	showinglist = ((validlist && !nolist) ? -2 : 0);
 	onlyexpl = oe;
 	if (!smatches)
