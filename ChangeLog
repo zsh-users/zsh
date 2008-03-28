@@ -1,5 +1,8 @@
 2008-03-28  Peter Stephenson  <pws@csr.com>
 
+	* 24775: Completion/Zsh/Command/_cd, Doc/Zsh/compsys.yo: improve
+	option handling.
+
 	* users/12739: configure.ac: multiple arguments to --with-term-lib
 	weren't handled properly.
 
