@@ -1,5 +1,8 @@
 2008-03-28  Peter Stephenson  <pws@csr.com>
 
+	* 24776: Completion/compinit: clarify the message printed
+	when compaudit finds problems.
+
 	* 24775: Completion/Zsh/Command/_cd, Doc/Zsh/compsys.yo: improve
 	option handling.
 

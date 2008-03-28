@@ -417,8 +417,9 @@ if [[ -n "$_i_check" ]]; then
   if ! eval compaudit; then
     if [[ -n "$_i_q" ]]; then
       if [[ "$_i_fail" = ask ]]; then
-        if ! read -q "?Ignore insecure $_i_q and continue [ny]? "; then
-	  print -u2 "run compaudit to see list of insecure $_i_q"
+        if ! read -q \
+"?zsh compinit: insecure $_i_q, run compaudit for list.
+Ignore insecure $_i_q and continue [y] or abort compinit [n]? "; then
 	  print -u2 "$0: initialization aborted"
           unfunction compinit compdef
           unset _comp_dumpfile _comp_secure compprefuncs comppostfuncs \
