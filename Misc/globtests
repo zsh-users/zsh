@@ -192,5 +192,20 @@ t ZX               Z(|)(#c1)X
 t froofroo         (fro(#c2))(#c2)
 f froofroofroo     (fro(#c2))(#c2)
 f froofro          (fro(#c2))(#c2)
+t ax               ?(#c1,2)x
+t ax               ?(#c1,)x
+t ax               ?(#c0,1)x
+f ax               ?(#c0,0)x
+f ax               ?(#c2,)x
+t aa               a(#c1,2)a
+t aa               a(#c1,)a
+t aa               a(#c0,1)a
+f aa               a(#c0,0)a
+f aa               a(#c2,)a
+t test.zsh         *.?(#c1)sh
+t test.bash        *.?(#c2)sh
+t test.bash        *.?(#c1,2)sh
+t test.bash        *.?(#c1,)sh
+t test.zsh         *.?(#c1,)sh
 EOT
 print "$failed tests failed."

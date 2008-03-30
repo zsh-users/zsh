@@ -2969,9 +2969,11 @@ patmatch(Upat prog)
 		scan[P_CT_PTR].p = (unsigned char *)patinput;
 
 		if (max < 0 || cur < max) {
+		    char *patinput_thistime = patinput;
 		    scan[P_CT_CURRENT].l = cur + 1;
 		    if (patmatch(scan + P_CT_OPERAND))
 			return 1;
+		    patinput = patinput_thistime;
 		}
 		if (cur < min)
 		    return 0;

@@ -187,6 +187,21 @@
 >0:  [[ froofroo = (fro(#c2))(#c2) ]]
 >1:  [[ froofroofroo = (fro(#c2))(#c2) ]]
 >1:  [[ froofro = (fro(#c2))(#c2) ]]
+>0:  [[ ax = ?(#c1,2)x ]]
+>0:  [[ ax = ?(#c1,)x ]]
+>0:  [[ ax = ?(#c0,1)x ]]
+>1:  [[ ax = ?(#c0,0)x ]]
+>1:  [[ ax = ?(#c2,)x ]]
+>0:  [[ aa = a(#c1,2)a ]]
+>0:  [[ aa = a(#c1,)a ]]
+>0:  [[ aa = a(#c0,1)a ]]
+>1:  [[ aa = a(#c0,0)a ]]
+>1:  [[ aa = a(#c2,)a ]]
+>0:  [[ test.zsh = *.?(#c1)sh ]]
+>0:  [[ test.bash = *.?(#c2)sh ]]
+>0:  [[ test.bash = *.?(#c1,2)sh ]]
+>0:  [[ test.bash = *.?(#c1,)sh ]]
+>0:  [[ test.zsh = *.?(#c1,)sh ]]
 >0 tests failed.
 
   globtest globtests.ksh
