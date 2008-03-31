@@ -5,7 +5,7 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 4.3.5 of the shell.  This is a development release,
+This is version 4.3.6 of the shell.  This is a development release,
 but is believed to be reasonably stable.  Sites where the users need to
 edit command lines with multibyte characters (in particular UTF-8)
 will probably want to upgrade.

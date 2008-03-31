@@ -297,7 +297,7 @@ sect(On what machines will it run?)
 sect(What's the latest version?)
 
   Zsh 4.2.7 is the latest production version.  The latest development
-  version is 4.3.5; this contains support for multibyte character strings
+  version is 4.3.6; this contains support for multibyte character strings
   (such as UTF-8 locales).  All the main features for multibyte
   support are now in place, although there is some debugging work
   still to be done.

@@ -1,5 +1,9 @@
 2008-03-31  Peter Stephenson  <pws@csr.com>
 
+	* unposted: README, Config/version.mk, Etc/.distfiles, Etc/FAQ.yo,
+	Etc/relnote{,s}_4.3.6.txt:  4.3.5-dev-4 and renumber for
+	4.3.6.
+
 	* unposted: Functions/Calendar/calendar_show: if in KDE,
 	use kdialog rather than xmessage.
 
