@@ -9,11 +9,21 @@ zmodload -i zsh/parameter || return
 
 # Use xmessage to display the message if the start and stop time
 # are the same, indicating we have been scheduled to display it.
-# Don't do this if there's already an xmessage for the same user.
+# Don't do this if there's already an notification/message for the same user.
 # HERE: this should be configurable and we should be able to do
 # better if xmessage isn't available, e.g. wish.
 if [[ -n $DISPLAY &&  $start -eq $stop ]]; then
-  if [[ -n ${commands[xmessage]} ]]; then
+  if [[ -n ${commands[kdialog]} && -n $KDE_SESSION_UID ]] && dcop >&/dev/null
+  then
+    # We're in a KDE session, most probably.
+    # Simple:
+    cmd=(kdialog --msgbox)
+    # Alternative:
+    #  calendar_knotify_show() {
+    #    dcop knotify default notify calendar zsh "$*" '' '' 2 0
+    #  }
+    #  cmd=(calendar_knotify_show)
+  elif [[ -n ${commands[xmessage]} ]]; then
     cmd=(xmessage -center)
   fi
   if [[ -n $cmd[1] ]] &&

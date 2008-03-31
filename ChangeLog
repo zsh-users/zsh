@@ -1,3 +1,8 @@
+2008-03-31  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Calendar/calendar_show: if in KDE,
+	use kdialog rather than xmessage.
+
 2008-03-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24708: Misc/globtests, Src/pattern.c, Test/D02glob.ztst:
