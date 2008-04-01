@@ -1,5 +1,8 @@
 2008-04-01  Peter Stephenson  <pws@csr.com>
 
+	* unposet: Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo: need tt(--) ->
+	tt(-)tt(-).   Plus other minor typos.
+
 	* unposted: (spotted by Ismail): Doc/Zsh/compsys.yo: typo.
 
 2008-03-31  Peter Stephenson  <pws@csr.com>

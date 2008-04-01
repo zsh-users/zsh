@@ -838,7 +838,7 @@ sitem(tt(SE))(Section)
 sitem(tt(Co))(Copyright)
 sitem(tt(-a))(Spanish feminine ordinal indicator)
 sitem(tt(<<))(Left guillemet)
-sitem(tt(--))(Soft hyphen)
+sitem(tt(-)tt(-))(Soft hyphen)
 sitem(tt(Rg))(Registered trade mark)
 sitem(tt(PI))(Pilcrow (paragraph))
 sitem(tt(-o))(Spanish masculine ordinal indicator)
@@ -894,7 +894,7 @@ sitem(tt(cS), tt(cH), tt(cD), tt(cC))(Card suits: spades, hearts, diamonds,
 clubs)
 sitem(tt(Md), tt(M8), tt(M2), tt(Mb), tt(Mx), tt(MX))(Musical notation:
 crotchet (quarter note), quaver (eighth note), semiquavers (sixteenth
-notes), flag sign, natural signa, sharp sign)
+notes), flag sign, natural sign, sharp sign)
 sitem(tt(Fm), tt(Ml))(Female, male)
 endsitem()
 )

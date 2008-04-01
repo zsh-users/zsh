@@ -1229,7 +1229,7 @@ and completion of these is far more common than completing options.
 Hence unless the value of this style is true options will not be
 completed, even after an initial tt(-).  If it is true, options will
 be completed after an initial tt(-) unless there is a preceeding
-tt(--) on the command line.
+tt(-)tt(-) on the command line.
 )
 kindex(completer, completion style)
 item(tt(completer))(
