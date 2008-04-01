@@ -1222,7 +1222,7 @@ line is not the name of an alias, matching alias names will be
 completed.
 )
 kindex(complete-options, completion style)
-time(tt(complete-options))(
+item(tt(complete-options))(
 This is used by the completer for tt(cd), tt(chdir) and tt(pushd).
 For these commands a tt(-) is used to introduce a directory stack entry
 and completion of these is far more common than completing options.

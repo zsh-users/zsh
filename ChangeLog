@@ -1,3 +1,7 @@
+2008-04-01  Peter Stephenson  <pws@csr.com>
+
+	* unposted: (spotted by Ismail): Doc/Zsh/compsys.yo: typo.
+
 2008-03-31  Peter Stephenson  <pws@csr.com>
 
 	* unposted: README, Config/version.mk, Etc/.distfiles, Etc/FAQ.yo,
