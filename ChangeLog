@@ -1,5 +1,8 @@
 2008-04-02  Peter Stephenson  <pws@csr.com>
 
+	* unposted: update version to 4.3.6-dev-0 to avoid clash with
+	released version.
+
 	* 24781: Doc/Zsh/contrib.yo, Functions/Zle/match-word-context:
 	make word-context style more useful by using previous or next word
 	depending on widget name.
