@@ -1,5 +1,8 @@
 2008-04-02  Peter Stephenson  <pws@csr.com>
 
+	* users/12754: Doc/Zsh/params.yo: [(w)...] doesn't work with (i),
+	(I), (r), (R).
+
 	* unposted: update version to 4.3.6-dev-0 to avoid clash with
 	released version.
 

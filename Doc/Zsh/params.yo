@@ -190,7 +190,8 @@ startitem()
 item(tt(w))(
 If the parameter subscripted is a scalar then this flag makes
 subscripting work on words instead of characters.  The default word
-separator is whitespace.
+separator is whitespace.  Currently this flag does not work
+with reverse subscripting (the tt(i), tt(I), tt(r) and tt(R) flags).
 )
 item(tt(s:)var(string)tt(:))(
 This gives the var(string) that separates words (for use with the
