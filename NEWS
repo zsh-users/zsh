@@ -4,6 +4,18 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Major changes between versions 4.3.5 and 4.3.6
+----------------------------------------------
+
+cd, chdir, pushd and popd now take a -q option to suppress side effects
+including printing the directory stack (for pushd and popd) and executing
+the chpwd hook functions (for all four).
+
+The parameter subscript (e) flag now forces the argument to be treated
+as a string where it would previously have been treated as a pattern,
+for example ${array[(ie)*]} substitutes the index of the element whose
+value is "*".
+
 Major changes between versions 4.3.4 and 4.3.5
 ----------------------------------------------
 

@@ -1,6 +1,10 @@
+2008-04-02  Peter Stephenson  <pws@csr.com>
+
+	* unposted: NEWS, Config/version.mk: Release 4.3.6.
+
 2008-04-01  Peter Stephenson  <pws@csr.com>
 
-	* unposet: Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo: need tt(--) ->
+	* unposted: Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo: need tt(--) ->
 	tt(-)tt(-).   Plus other minor typos.
 
 	* unposted: (spotted by Ismail): Doc/Zsh/compsys.yo: typo.
