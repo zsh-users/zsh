@@ -6,7 +6,7 @@ emulate -L zsh
 setopt extendedglob
 
 local -a worcon bufwords
-local pat tag lastword word
+local pat tag lastword word backword forword
 integer iword
 
 zstyle -a $curcontext word-context worcon || return 0
@@ -23,21 +23,18 @@ bufwords=(${(z)BUFFER})
 
 if [[ $lastword = ${bufwords[iword]} ]]; then
   # If the word immediately left of the cursor is complete,
-  # we're not on it.  Either we're on unquoted whitespace, or
-  # the start of a new word.  Test the latter.
-  if [[ -z $RBUFFER ]]; then
-    # Nothing there, so not in a word.
-      word=''
-  elif [[ $RBUFFER[1] = [[:space:]] ]]; then
-    # Whitespace, so not in a word.
-    word=' '
-  else
-    # We want the next word along.
-    word=${bufwords[iword+1]}
-  fi
+  # we're not on it for forward operations.
+  forword=${bufwords[iword+1]}
 else
   # We're on a word.
-  word=${bufwords[iword]}
+  forword=${bufwords[iword]}
+fi
+backword=${bufwords[iword]}
+
+if [[ $curcontext = *back* ]]; then
+  word=$backword
+else
+  word=$forword
 fi
 
 for pat tag in "${worcon[@]}"; do

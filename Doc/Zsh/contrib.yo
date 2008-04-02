@@ -494,9 +494,10 @@ var(pattern) and a var(subcontext).  The shell argument the cursor is on is
 matched against each var(pattern) in turn until one matches; if it does,
 the context is extended by a colon and the corresponding var(subcontext).
 Note that the test is made against the original word on the line, with no
-stripping of quotes.  If the cursor is at the end of the line the test is
-performed against an empty string; if it is on whitespace between words the
-test is made against a single space.  Some examples are given below.
+stripping of quotes.  Special handling is done between words: the current
+context is examined and if it contains the string tt(back), the word before
+the cursor is considered, else the word after cursor is considered. Some
+examples are given below.
 
 Here are some examples of use of the styles, actually taken from the
 simplified interface in tt(select-word-style):
