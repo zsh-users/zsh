@@ -1,5 +1,7 @@
 2008-04-02  Peter Stephenson  <pws@csr.com>
 
+	* unposted: README: minor tweaks.
+
 	* unposted: NEWS, Config/version.mk: Release 4.3.6.
 
 2008-04-01  Peter Stephenson  <pws@csr.com>
