@@ -434,6 +434,11 @@ get_region_highlight(UNUSED(Param pm))
 }
 
 
+/*
+ * The parameter system requires the pm argument, but this
+ * may be NULL if called directly.
+ */
+
 /**/
 void
 set_region_highlight(UNUSED(Param pm), char **aval)

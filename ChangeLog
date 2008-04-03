@@ -1,5 +1,8 @@
 2008-04-03  Peter Stephenson  <pws@csr.com>
 
+	* 24787: Src/Zle/zle_main.c, Src/Zle/zle_refresh.c: reset
+	region_highlight when finished editing command line.
+
 	* 24786: Src/builtin.c, Src/init.c, Src/zle/zle_keymap.c,
 	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_vi.c:
 	handle read -t properly in zle by passing down timeout
