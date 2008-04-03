@@ -453,8 +453,8 @@ struct ztmout {
  * timed function.
  *
  * do_keytmout is passed down from getbyte() here.  If it is positive,
- * we the keytimeout value, which is in 100ths of a second (directly set
- * from the parameter).  If it is negative, we use -(do_keytmout+1)
+ * we use the keytimeout value, which is in 100ths of a second (directly
+ * set from the parameter).  If it is negative, we use -(do_keytmout+1)
  * (i.e. the one's complement, to allow a zero value to be set).  This
  * is only used when calling into zle from outside to specify an
  * explicit timeout.  This is also in 100ths of a second.
@@ -1225,6 +1225,8 @@ zleread(char **lp, char **rp, int flags, int context)
     zleline = NULL;
     forget_edits();
     errno = old_errno;
+    /* highlight no longer valid */
+    set_region_highlight(NULL, NULL);
     return s;
 }
 
