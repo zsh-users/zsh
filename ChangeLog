@@ -1,5 +1,10 @@
 2008-04-03  Peter Stephenson  <pws@csr.com>
 
+	* 24786: Src/builtin.c, Src/init.c, Src/zle/zle_keymap.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_vi.c:
+	handle read -t properly in zle by passing down timeout
+	to getbyte().
+
 	* 24782, plus a couple of fixes: Doc/Zsh/zle.yo,
 	Functions/Zle/read-from-minibuffer,
 	Functions/Zle/replace-string-again, Src/zsh.h, Src/Zle/zle.h,

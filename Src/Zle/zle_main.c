@@ -451,13 +451,22 @@ struct ztmout {
 /*
  * See if we need a timeout either for a key press or for a
  * timed function.
+ *
+ * do_keytmout is passed down from getbyte() here.  If it is positive,
+ * we the keytimeout value, which is in 100ths of a second (directly set
+ * from the parameter).  If it is negative, we use -(do_keytmout+1)
+ * (i.e. the one's complement, to allow a zero value to be set).  This
+ * is only used when calling into zle from outside to specify an
+ * explicit timeout.  This is also in 100ths of a second.
  */
 
 static void
-calc_timeout(struct ztmout *tmoutp, int do_keytmout)
+calc_timeout(struct ztmout *tmoutp, long do_keytmout)
 {
-    if (do_keytmout && keytimeout > 0) {
-	if (keytimeout > ZMAXTIMEOUT * 100 /* 24 days for a keypress???? */)
+    if (do_keytmout && (keytimeout > 0 || do_keytmout < 0)) {
+	if (do_keytmout < 0)
+	    tmoutp->exp100ths = (time_t)-do_keytmout;
+	else if (keytimeout > ZMAXTIMEOUT * 100 /* 24 days for a keypress???? */)
 	    tmoutp->exp100ths = ZMAXTIMEOUT * 100;
 	else
 	    tmoutp->exp100ths = keytimeout;
@@ -501,8 +510,10 @@ calc_timeout(struct ztmout *tmoutp, int do_keytmout)
     }
 }
 
+/* see calc_timeout for use of do_keytmout */
+
 static int
-raw_getbyte(int do_keytmout, char *cptr)
+raw_getbyte(long do_keytmout, char *cptr)
 {
     int ret;
     struct ztmout tmout;
@@ -785,9 +796,11 @@ raw_getbyte(int do_keytmout, char *cptr)
     return ret;
 }
 
+/* see calc_timeout for use of do_keytmout */
+
 /**/
 mod_export int
-getbyte(int do_keytmout, int *timeout)
+getbyte(long do_keytmout, int *timeout)
 {
     char cc;
     unsigned int ret;
@@ -899,7 +912,7 @@ getbyte(int do_keytmout, int *timeout)
 mod_export ZLE_INT_T
 getfullchar(int do_keytmout)
 {
-    int inchar = getbyte(do_keytmout, NULL);
+    int inchar = getbyte((long)do_keytmout, NULL);
 
 #ifdef MULTIBYTE_SUPPORT
     return getrestchar(inchar);
@@ -962,7 +975,7 @@ getrestchar(int inchar)
 	 * arrive together.  If we don't do this the input can
 	 * get stuck if an invalid byte sequence arrives.
 	 */
-	inchar = getbyte(1, &timeout);
+	inchar = getbyte(1L, &timeout);
 	/* getbyte deliberately resets lastchar_wide_valid */
 	lastchar_wide_valid = 1;
 	if (inchar == EOF) {

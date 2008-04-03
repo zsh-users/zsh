@@ -4739,6 +4739,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     int readchar = -1, val, resettty = 0;
     struct ttyinfo saveti;
     char d;
+    long izle_timeout = 0;
 #ifdef MULTIBYTE_SUPPORT
     wchar_t delim = L'\n', wc;
     mbstate_t mbs;
@@ -4900,18 +4901,32 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		timeout = (zlong)mn.u.l * (zlong)1000000;
 	    }
 	}
-	if (readfd == -1 ||
-	    !read_poll(readfd, &readchar, keys && !zleactive, timeout)) {
-	    if (OPT_ISSET(ops,'k') && !zleactive && !isem)
-		settyinfo(&shttyinfo);
-	    else if (resettty && SHTTY != -1)
-	      settyinfo(&saveti);
-	    if (haso) {
-		fclose(shout);
-		shout = oshout;
-		SHTTY = -1;
+	if (izle) {
+	    /*
+	     * Timeout is in 100ths of a second rather than us.
+	     * See calc_timeout() in zle_main for format of this.
+	     */
+	    timeout = -(timeout/(zlong)10000 + 1L);
+	    izle_timeout = (long)timeout;
+#ifdef LONG_MAX
+	    /* saturate if range exceeded */
+	    if ((zlong)izle_timeout != timeout)
+		izle_timeout = LONG_MAX;
+#endif
+	} else {
+	    if (readfd == -1 ||
+		!read_poll(readfd, &readchar, keys && !zleactive, timeout)) {
+		if (OPT_ISSET(ops,'k') && !zleactive && !isem)
+		    settyinfo(&shttyinfo);
+		else if (resettty && SHTTY != -1)
+		    settyinfo(&saveti);
+		if (haso) {
+		    fclose(shout);
+		    shout = oshout;
+		    SHTTY = -1;
+		}
+		return 1;
 	    }
-	    return 1;
 	}
     }
 
@@ -4927,7 +4942,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 
 	do {
 	    if (izle) {
-		if ((val = getkeyptr(0, NULL)) < 0) {
+		if ((val = getkeyptr(izle_timeout, NULL)) < 0) {
 		    eof = 1;
 		    break;
 		}
@@ -5033,7 +5048,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 #ifdef MULTIBYTE_SUPPORT
 	    int key;
 
-	    while ((key = getkeyptr(0, NULL)) >= 0) {
+	    while ((key = getkeyptr(izle_timeout, NULL)) >= 0) {
 		char c = (char)key;
 		/*
 		 * If multibyte, it can't be y, so we don't care
@@ -5044,7 +5059,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		    break;
 	    }
 #else
-	    int key = getkeyptr(0, NULL);
+	    int key = getkeyptr(izle_timeout, NULL);
 #endif
 
 	    readbuf[0] = (key == 'y' ? 'y' : 'n');
@@ -5087,7 +5102,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 #endif
 	/* get input, a character at a time */
 	while (!gotnl) {
-	    c = zread(izle, &readchar);
+	    c = zread(izle, &readchar, izle_timeout);
 	    /* \ at the end of a line indicates a continuation *
 	     * line, except in raw mode (-r option)            */
 #ifdef MULTIBYTE_SUPPORT
@@ -5277,7 +5292,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     if (!gotnl) {
 	sigset_t s = child_unblock();
 	for (;;) {
-	    c = zread(izle, &readchar);
+	    c = zread(izle, &readchar, izle_timeout);
 #ifdef MULTIBYTE_SUPPORT
 	    if (c == EOF) {
 		/* not waiting to be completed any more */
@@ -5418,13 +5433,13 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 
 /**/
 static int
-zread(int izle, int *readchar)
+zread(int izle, int *readchar, long izle_timeout)
 {
     char cc, retry = 0;
     int ret;
 
     if (izle) {
-	int c = getkeyptr(0, NULL);
+	int c = getkeyptr(izle_timeout, NULL);
 
 	return (c < 0 ? EOF : c);
     }

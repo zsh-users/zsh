@@ -108,7 +108,7 @@ vigetkey(void)
     char m[3], *str;
     Thingy cmd;
 
-    if (getbyte(0, NULL) == EOF)
+    if (getbyte(0L, NULL) == EOF)
 	return ZLEEOF;
 
     m[0] = lastchar;

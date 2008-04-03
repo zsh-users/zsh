@@ -82,7 +82,7 @@ mod_export int hasam, hasxn;
 /* Pointer to read-key function from zle */
 
 /**/
-mod_export int (*getkeyptr) _((int, int *));
+mod_export int (*getkeyptr) _((long, int *));
 
 /* SIGCHLD mask */
 

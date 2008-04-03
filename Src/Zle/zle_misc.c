@@ -619,7 +619,7 @@ universalargument(char **args)
      *
      * Hence for now this remains byte-by-byte.
      */
-    while ((gotk = getbyte(0, NULL)) != EOF) {
+    while ((gotk = getbyte(0L, NULL)) != EOF) {
 	if (gotk == '-' && !digcnt) {
 	    minus = -1;
 	    digcnt++;
