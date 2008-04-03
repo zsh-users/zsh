@@ -1,5 +1,12 @@
 2008-04-03  Peter Stephenson  <pws@csr.com>
 
+	* 24782, plus a couple of fixes: Doc/Zsh/zle.yo,
+	Functions/Zle/read-from-minibuffer,
+	Functions/Zle/replace-string-again, Src/zsh.h, Src/Zle/zle.h,
+	Src/Zle/zle_main.c, Src/Zle/zle_move.c, Src/Zle/zle_params.c,
+	Src/Zle/zle_refresh.c: initial go at highlighting of command
+	lines in zle using $zle_highlight and $region_highlight.
+
 	* unposted, see users/12758: actually, [(w)...] does work with
 	(r) and (R).
 

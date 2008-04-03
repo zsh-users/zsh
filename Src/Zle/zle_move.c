@@ -183,7 +183,12 @@ backwardchar(UNUSED(char **args))
 int
 setmarkcommand(UNUSED(char **args))
 {
+    if (zmult < 0) {
+	region_active = 0;
+	return 0;
+    }
     mark = zlecs;
+    region_active = 1;
     return 0;
 }
 
@@ -193,11 +198,17 @@ exchangepointandmark(UNUSED(char **args))
 {
     int x;
 
+    if (zmult == 0) {
+	region_active = 1;
+	return 0;
+    }
     x = mark;
     mark = zlecs;
     zlecs = x;
     if (zlecs > zlell)
 	zlecs = zlell;
+    if (zmult > 0)
+	region_active = 1;
     return 0;
 }
 

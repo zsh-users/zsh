@@ -325,6 +325,37 @@ enum suffixtype {
     SUFTYP_NEGRNG		/* Range of characters not to match */
 };
 
+
+#ifdef MULTIBYTE_SUPPORT
+/*
+ * We use a wint_t here, since we need an invalid character as a
+ * placeholder and wint_t guarantees that we can use WEOF to do this.
+ */
+typedef wint_t REFRESH_CHAR;
+#else
+typedef char REFRESH_CHAR;
+#endif
+
+/*
+ * Description of one screen cell in zle_refresh.c
+ */
+typedef struct {
+    /* The (possibly wide) character */
+    REFRESH_CHAR chr;
+    /*
+     * Its attributes.  'On' attributes (TXT_ATTR_ON_MASK) are
+     * applied before the character, 'off' attributes (TXT_ATTR_OFF_MASK)
+     * after it.  'On' attributes are present for all characters that
+     * need the effect; 'off' attributes are only present for the
+     * last character in the sequence.
+     */
+    REFRESH_CHAR atr;
+} REFRESH_ELEMENT;
+
+/* A string of screen cells */
+typedef REFRESH_ELEMENT *REFRESH_STRING;
+
+
 #ifdef DEBUG
 #define METACHECK()		\
 	DPUTS(zlemetaline == NULL, "line not metafied")

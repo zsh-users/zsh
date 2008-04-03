@@ -19,14 +19,14 @@ while getopts "k:" opt; do
 done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
-local savelbuffer=$LBUFFER saverbuffer=$RBUFFER
-local savepredisplay=$PREDISPLAY savepostdisplay=$POSTDISPLAY
-
-LBUFFER="$2"
-RBUFFER="$3"
-PREDISPLAY="$PREDISPLAY$savelbuffer$saverbuffer$POSTDISPLAY
-${1:-? }"
-POSTDISPLAY=
+  local pretext="$PREDISPLAY$LBUFFER$RBUFFER$POSTDISPLAY
+"
+local LBUFFER="$2"
+local RBUFFER="$3"
+local PREDISPLAY="$pretext${1:-? }"
+local POSTDISPLAY=
+local -a region_highlight
+region_highlight=("P${#pretext} ${#PREDISPLAY} bold")
 
 if [[ -n $keys ]]; then
   zle -R
@@ -37,10 +37,5 @@ else
   stat=$?
   (( stat )) || REPLY=$BUFFER
 fi
-
-LBUFFER=$savelbuffer
-RBUFFER=$saverbuffer
-PREDISPLAY=$savepredisplay
-POSTDISPLAY=$savepostdisplay
 
 return $stat

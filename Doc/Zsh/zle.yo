@@ -29,10 +29,22 @@ line editor.
 ifzman(See em(Parameters Used By The Shell) in zmanref(zshparam))\
 ifnzman(noderef(Parameters Used By The Shell)).
 
+The parameter tt(zle_highlight) is also used by the line editor;
+ifzman(see em(Character Highlighting) below)\
+ifnzman(noderef(Character Highlighting)).  Highlighting
+of special characters and the region between the cursor and the
+mark (as set with tt(set-mark-command) in Emacs mode) is enabled
+by default; consult this reference for more information.  Irrascible
+conservatives will wish to know that all highlighting may be disabled by
+the following setting:
+
+example(zle_highlight=(none))
+
 startmenu()
 menu(Keymaps)
 menu(Zle Builtins)
 menu(Zle Widgets)
+menu(Character Highlighting)
 endmenu()
 
 texinode(Keymaps)(Zle Builtins)()(Zsh Line Editor)
@@ -578,7 +590,7 @@ enditem()
 )
 enditem()
 
-texinode(Zle Widgets)()(Zle Builtins)(Zsh Line Editor)
+texinode(Zle Widgets)(Character Highlighting)(Zle Builtins)(Zsh Line Editor)
 sect(Widgets)
 cindex(widgets)
 All actions in the editor are performed by `widgets'.  A widget's job is
@@ -761,6 +773,45 @@ item(tt(RBUFFER) (scalar))(
 The part of the buffer that lies to the right of the cursor position.
 If it is assigned to, only that part of the buffer is replaced, and the
 cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
+)
+vindex(region_highlight)
+item(tt(region_highlight) (array))(
+Each element of this array may be set to a string that describes
+highlighting for an arbitrary region of the command line that will
+take effect the next time the command line is redisplayed.  Each
+string consists of the following parts:
+
+startlist()
+list(Optionally, a `tt(P)' to signify that the start and end offset that
+follow include any string set by the tt(PREDISPLAY) special parameter;
+this is needed if the predisplay string itself is to be highlighted.
+Whitespace may follow the `tt(P)'.)
+list(A start offset in the same units as tt(CURSOR), terminated by
+whitespace.)
+list(An end offset in the same units as tt(CURSOR), terminated by
+whitespace.)
+list(A highlight specification in the same format as
+used for the contexts tt(region) or tt(special)
+in the parameter tt(zle_highlight),
+ifnzman(noderef(Character Highlighting))\
+ifzman(see Character Highlighting below).
+Hence this should be a comma-separated list of any of the
+words tt(bold), tt(standout) or tt(underline).
+endlist()
+
+For example, 
+
+example(region_highlight=("P0 20 bold"))
+
+specifies that the first twenty characters of the text including
+any predisplay string should be highlighted in bold.
+
+Note that the effect of tt(region_highlight) is not saved and disappears
+as soon as the line is accepted.  The line editor makes no attempt to
+keep the highlighting effect synchronised with the line as it is edited;
+hence region highlighting is best limited to static effects within
+user widgets.
+)
 )
 vindex(WIDGET)
 item(tt(WIDGET) (scalar))(
@@ -1720,7 +1771,11 @@ Reads a key sequence, then prints the function bound to that sequence.
 )
 tindex(exchange-point-and-mark)
 item(tt(exchange-point-and-mark) (^X^X) (unbound) (unbound))(
-Exchange the cursor position with the position of the mark.
+Exchange the cursor position (point) with the position of the mark.
+Unless a negative prefix argument is given, the region between
+point and mark is activated so that it can be highlighted.
+If a zero prefix argument is given, the region is activated but
+point and mark are not swapped.
 )
 tindex(execute-named-cmd)
 item(tt(execute-named-cmd) (ESC-x) (unbound) (unbound))(
@@ -1914,7 +1969,10 @@ Set the specified mark at the cursor position.
 )
 tindex(set-mark-command)
 item(tt(set-mark-command) (^@) (unbound) (unbound))(
-Set the mark at the cursor position.
+Set the mark at the cursor position.  If called with a negative
+prefix argument, do not set the mark but deactivate the region so that
+it is no longer highlighted (it is still usable for other purposes).
+Otherwise the region is marked as active.
 )
 tindex(spell-word)
 item(tt(spell-word) (ESC-$ ESC-S ESC-s) (unbound) (unbound))(
@@ -1961,3 +2019,98 @@ If the last command executed was a digit as part of an argument,
 continue the argument.  Otherwise, execute vi-beginning-of-line.
 )
 enditem()
+
+texinode(Character Highlighting)()(Zle Widgets)(Zsh Line Editor)
+sect(Character Highlighting)
+
+The line editor has the ability to highlight characters or regions
+of the line that have a particular significance.  This is controlled
+by the array parameter tt(zsh_highlight), if it has been set by the user.
+
+If the parameter contains the single entry tt(none) all highlighting
+is turned off.  Note the parameter is still expected to be an array.
+
+Otherwise each entry of the array should consist of a word indicating a
+context for highlighting, then a colon, then a comma-separated list of
+the types of highlighting to apply in that context.
+
+The contexts available for highlighting are the following:
+
+startitem()
+cindex(region, highlighting)
+cindex(highlighting, region)
+item(tt(region))(
+The region between the cursor (point) and the mark as set with
+tt(set-mark-command).  The region is only highlighted if it is active,
+which is the case if tt(set-mark-command) or tt(exchange-point-and-mark)
+has been called and the line has not been subsequently modified.  The
+region can be deactivated by calling tt(set-mark-command) with a
+negative prefix argument, or reactivated by calling
+tt(exchange-point-and-mark) with a zero prefix argument.  Note
+that whether or not the region is active has no effect on its
+use within widgets, it simply determines whether it is highlighted.
+)
+cindex(special characters, highlighting)
+cindex(highlighting, special characters)
+item(tt(special))(
+Individual characters that have no direct printable
+representation but are shown in a special manner by the line editor.
+These characters are described below.)
+enditem()
+
+The available types of highlighting are the following.  Note that
+not all types of highlighting are available on all terminals:
+
+startitem()
+item(tt(none))(
+No highlighting is applied to the given context.  It is not useful for
+this to appear with other types of highlighting; it is used to override
+a default.
+)
+item(tt(bold))(
+The characters in the given context are shown in a bold font.
+)
+item(tt(standout))(
+The characters in the given context are shown in the terminal's standout
+mode.  The actual effect is specific to the terminal; on many terminals it
+is inverse video.  On some such terminals, where the cursor does not blink
+it appears with standout mode negated, making it less than clear where
+the cursor actually is.  On such terminals one of the other effects
+may be preferable for highlighting the region.
+)
+item(tt(underline))(
+The characters in the given context are shown underlined.  Some
+terminals show the foreground in a different colour instead; in this
+case whitespace will not be highlighted.
+)
+enditem()
+
+The characters described above as `special' are as follows.  The
+formatting described here is used irrespective of whether the characters
+are highlighted:
+
+startitem()
+item(ASCII control characters)(
+Control characters in the ASCII range are shown as
+`tt(^)' followed by the base character.)
+item(Unprintable multibyte characters)(
+If the tt(MULTIBYTE) option is in effect,
+multibyte characters not in the ASCII character set that are reported as
+having zero width are shown as a hexadecimal number between
+angle brackets.  The number is the code point of the character in
+the wide character set; this may or may not be Unicode, depending
+on the operating system.)
+enditem()
+
+If tt(zle_highlight) is not set or no value applies to a particular
+context, the defaults applied are equivalent to
+
+example(zle_highlight=LPAR()region:standout special:standout+RPAR())
+
+i.e. both the region and special characters are shown in standout mode.
+
+Within widgets, arbitrary regions may be highlighted by setting the
+special array parameter tt(region_highlight); see
+ifnzman(nodreref(Zle Widgets))\
+ifzman(above).
+

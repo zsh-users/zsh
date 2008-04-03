@@ -1076,6 +1076,7 @@ zlecore(void)
 	freeheap();
     }
 
+    region_active = 0;
     popheap();
 }
 
@@ -1933,6 +1934,7 @@ finish_(UNUSED(Module m))
     getkeyptr = NULL;
 
     zfree(clwords, clwsize * sizeof(char *));
+    zle_refresh_finish();
 
     return 0;
 }

@@ -384,6 +384,7 @@ spaceinline(int ct)
 	if (mark > zlecs)
 	    mark += ct;
     }
+    region_active = 0;
 }
 
 /**/
@@ -408,6 +409,7 @@ shiftchars(int to, int cnt)
 	}
 	zleline[zlell = to] = ZWC('\0');
     }
+    region_active = 0;
 }
 
 /**/
@@ -724,8 +726,12 @@ getzlequery(void)
     else
 	c = ZC_tolower(c);
     /* echo response and return */
-    if (c != ZWC('\n'))
-	zwcputc(c);
+    if (c != ZWC('\n')) {
+	REFRESH_ELEMENT re;
+	re.chr = c;
+	re.atr = 0;
+	zwcputc(&re, NULL);
+    }
     return c == ZWC('y');
 }
 
@@ -903,6 +909,7 @@ int
 handlefeep(UNUSED(char **args))
 {
     zbeep();
+    region_active = 0;
     return 0;
 }
 

@@ -9,7 +9,8 @@ local MATCH MBEGIN MEND curwidget=${1:-$WIDGET}
 local -a match mbegin mend
 
 if [[ -z $_replace_string_src ]]; then
-  zle -M No string to replace.
+  zle -M "No string to replace."
+  return 1
 fi
 
 if [[ $curwidget = *pattern* ]]; then

@@ -1941,6 +1941,8 @@ struct ttyinfo {
 #define TXTUNDERLINE  0x04
 #define TXTDIRTY      0x80
 
+#define TXT_ATTR_ON_MASK   0x07
+
 #define txtisset(X)  (txtattrmask & (X))
 #define txtset(X)    (txtattrmask |= (X))
 #define txtunset(X)  (txtattrmask &= ~(X))
@@ -1949,7 +1951,11 @@ struct ttyinfo {
 #define TXTNOSTANDOUT	0x20
 #define TXTNOUNDERLINE	0x40
 
-#define txtchangeisset(X)	(txtchange & (X))
+#define TXT_ATTR_OFF_MASK  0x70
+/* Bits to shift off right to get on */
+#define TXT_ATTR_OFF_ON_SHIFT (4)
+
+#define txtchangeisset(T,X)	((T) & (X))
 #define txtchangeset(X, Y)	(txtchange |= (X), txtchange &= ~(Y))
 
 /****************************************/

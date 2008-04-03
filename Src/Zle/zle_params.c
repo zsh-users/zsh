@@ -90,6 +90,9 @@ static const struct gsu_integer pending_gsu =
 
 static const struct gsu_array killring_gsu =
 { get_killring, set_killring, unset_killring };
+/* implementation is in zle_refresh.c */
+static const struct gsu_array region_highlight_gsu =
+{ get_region_highlight, set_region_highlight, unset_region_highlight };
 
 #define GSU(X) ( (GsuScalar)(void*)(&(X)) )
 static struct zleparam {
@@ -120,6 +123,7 @@ static struct zleparam {
     { "PREBUFFER",  PM_SCALAR | PM_READONLY,  GSU(prebuffer_gsu), NULL },
     { "PREDISPLAY", PM_SCALAR, GSU(predisplay_gsu), NULL },
     { "RBUFFER", PM_SCALAR,  GSU(rbuffer_gsu), NULL },
+    { "region_highlight", PM_ARRAY, GSU(region_highlight_gsu), NULL },
     { "WIDGET", PM_SCALAR | PM_READONLY, GSU(widget_gsu), NULL },
     { "WIDGETFUNC", PM_SCALAR | PM_READONLY, GSU(widgetfunc_gsu), NULL },
     { "WIDGETSTYLE", PM_SCALAR | PM_READONLY, GSU(widgetstyle_gsu), NULL },
