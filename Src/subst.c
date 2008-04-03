@@ -2589,7 +2589,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    else if (getlen == 2) {
 		if (*aval)
 		    for (len = -sl, ctr = aval;
-			 len += sl + MB_METASTRLEN(*ctr), *++ctr;);
+			 len += sl + MB_METASTRLEN2(*ctr, multi_width),
+			     *++ctr;);
 	    }
 	    else
 		for (ctr = aval;
@@ -2597,7 +2598,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		     len += wordcount(*ctr, spsep, getlen > 3), ctr++);
 	} else {
 	    if (getlen < 3)
-		len = MB_METASTRLEN(val);
+		len = MB_METASTRLEN2(val, multi_width);
 	    else
 		len = wordcount(val, spsep, getlen > 3);
 	}

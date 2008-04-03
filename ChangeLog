@@ -1,3 +1,8 @@
+2008-04-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24788: Doc/Zsh/expn.yo, Src/subst.c: ${(m)#...} returns
+	string print width.
+
 2008-04-03  Peter Stephenson  <pws@csr.com>
 
 	* 24787: Src/Zle/zle_main.c, Src/Zle/zle_refresh.c: reset

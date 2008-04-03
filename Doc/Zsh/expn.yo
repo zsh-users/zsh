@@ -943,11 +943,13 @@ Control characters are always assumed to be one unit wide; this allows the
 mechanism to be used for generating repetitions of control characters.
 )
 item(tt(m))(
-Only useful together with tt(l) and tt(r) when the tt(MULTIBYTE) option
+Only useful together with one of the flags tt(l) or tt(r) or with the
+tt(#) length operator when the tt(MULTIBYTE) option
 is in effect.  Use the character width reported by the system in
-calculating the how much of the string it occupies.  Most printable
-characters have a width of one unit, however certain Asian character sets
-and certain special effects use wider characters.
+calculating the how much of the string it occupies or the overall
+length of the string.  Most printable characters have a width of one
+unit, however certain Asian character sets and certain special effects
+use wider characters; combining characters have zero width.
 )
 item(tt(r:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
 As tt(l), but pad the words on the right and insert var(string2)
