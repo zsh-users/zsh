@@ -1,3 +1,8 @@
+2008-04-03  Peter Stephenson  <pws@csr.com>
+
+	* unposted, see users/12758: actually, [(w)...] does work with
+	(r) and (R).
+
 2008-04-02  Peter Stephenson  <pws@csr.com>
 
 	* users/12754: Doc/Zsh/params.yo: [(w)...] doesn't work with (i),
