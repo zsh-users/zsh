@@ -1,5 +1,8 @@
 2008-04-04  Peter Stephenson  <pws@csr.com>
 
+	* 24792: Src/Zle/zle_refresh.c: try to be safer about turning
+	off attributes when outputting at a new position.
+
 	* c.f Mikael, 24790: Doc/Zsh/zle.yo: item()s need closing
 	parentheses on next line.
 

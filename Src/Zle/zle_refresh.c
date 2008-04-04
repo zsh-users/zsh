@@ -506,11 +506,23 @@ unset_region_highlight(Param pm, int exp)
 void
 zwcputc(const REFRESH_ELEMENT *c, REFRESH_CHAR *curatrp)
 {
+    /*
+     * Safety: turn attributes off if last heard of turned on.
+     * This differs from *curatrp, which is an optimisation for
+     * writing lots of stuff at once.
+     */
+    static int lastatr;
 #ifdef MULTIBYTE_SUPPORT
     mbstate_t mbstate;
     int i;
     VARARR(char, mbtmp, MB_CUR_MAX + 1);
 #endif
+
+    if (lastatr & ~c->atr) {
+	/* Stuff on we don't want, turn it off */
+	settextattributes((lastatr & ~c->atr) << TXT_ATTR_OFF_ON_SHIFT);
+	lastatr = 0;
+    }
 
     /*
      * Don't output "on" attributes in a string of characters with
@@ -518,8 +530,10 @@ zwcputc(const REFRESH_ELEMENT *c, REFRESH_CHAR *curatrp)
      */
     if ((c->atr & TXT_ATTR_ON_MASK) &&
 	(!curatrp ||
-	 ((*curatrp & TXT_ATTR_ON_MASK) != (c->atr & TXT_ATTR_ON_MASK))))
-	settextattributes(c->atr & TXT_ATTR_ON_MASK);
+	 ((*curatrp & TXT_ATTR_ON_MASK) != (c->atr & TXT_ATTR_ON_MASK)))) {
+	lastatr = c->atr & TXT_ATTR_ON_MASK;
+	settextattributes(lastatr);
+    }
 
 #ifdef MULTIBYTE_SUPPORT
     if (c->chr != WEOF) {
@@ -531,8 +545,10 @@ zwcputc(const REFRESH_ELEMENT *c, REFRESH_CHAR *curatrp)
     fputc(c->chr, shout);
 #endif
 
-    if (c->atr & TXT_ATTR_OFF_MASK)
+    if (c->atr & TXT_ATTR_OFF_MASK) {
 	settextattributes(c->atr & TXT_ATTR_OFF_MASK);
+	lastatr &= ~((c->atr & TXT_ATTR_OFF_MASK) >> TXT_ATTR_OFF_ON_SHIFT);
+    }
     if (curatrp) {
 	/*
 	 * Remember the current attributes:  those that are turned
