@@ -1,3 +1,8 @@
+2008-04-04  Peter Stephenson  <pws@csr.com>
+
+	* c.f Mikael, 24790: Doc/Zsh/zle.yo: item()s need closing
+	parentheses on next line.
+
 2008-04-04  Clint Adams  <clint@zsh.org>
 
 	* 24789: Completion/Unix/Command/_stgit: completion for

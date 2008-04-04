@@ -2055,7 +2055,8 @@ cindex(highlighting, special characters)
 item(tt(special))(
 Individual characters that have no direct printable
 representation but are shown in a special manner by the line editor.
-These characters are described below.)
+These characters are described below.
+)
 enditem()
 
 The available types of highlighting are the following.  Note that
@@ -2092,14 +2093,16 @@ are highlighted:
 startitem()
 item(ASCII control characters)(
 Control characters in the ASCII range are shown as
-`tt(^)' followed by the base character.)
+`tt(^)' followed by the base character.
+)
 item(Unprintable multibyte characters)(
 If the tt(MULTIBYTE) option is in effect,
 multibyte characters not in the ASCII character set that are reported as
 having zero width are shown as a hexadecimal number between
 angle brackets.  The number is the code point of the character in
 the wide character set; this may or may not be Unicode, depending
-on the operating system.)
+on the operating system.
+)
 enditem()
 
 If tt(zle_highlight) is not set or no value applies to a particular
