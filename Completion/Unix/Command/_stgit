@@ -1,0 +1,57 @@
+#compdef stg
+
+typeset -a subcmds
+
+subcmds=(
+  'help:print the detailed command usage'
+  'version:display version information'
+  'copyright:display copyright information'
+  'clone:make a local clone of a remote repository'
+  'id:print the GIT hash value of a StGIT reference'
+  'applied:print the applied patches'
+  'branch:manage patch stacks'
+  'clean:delete the empty patches in the series'
+  'commit:permanently store the applied patches into stack base'
+  'float:push patches to the top, even if applied'
+  'goto:push or pop patches to the given one'
+  'hide:hide a patch in the series'
+  'init:initialise the current branch for use with StGIT'
+  'patches:show the applied patches modifying a file'
+  'pop:pop one or more patches from the stack'
+  'pull:pull the changes from the remote repository'
+  'push:push one or more patches onto of the stack'
+  'rebase:move the stack base to another point in history'
+  'repair:Fix StGit metadata if branch was modified with git commands'
+  'series:print the patch series'
+  'sink:send patches deeper down the stack'
+  'top:print the name of the top patch'
+  'unapplied:print the unapplied patches'
+  'uncommit:turn regular GIT commits into StGIT patches'
+  'unhide:unhide a hidden patch in the series'
+  'delete:delete patches'
+  'edit:edit a patch description or diff'
+  'export:exports patches to a directory'
+  'files:show the files modified by a patch (or the current patch)'
+  'fold:integrate a GNU diff patch into the current patch'
+  'import:import a GNU diff file as a new patch'
+  'log:display the patch changelog'
+  'mail:send a patch or series of patches by e-mail'
+  'new:create a new patch and make it the topmost one'
+  'pick:import a patch from a different branch or a commit object'
+  'refresh:generate a new commit for the current patch'
+  'rename:rename a patch in the series'
+  'show:show the commit corresponding to a patch (or the current patch)'
+  'sync:synchronise patches with a branch or a series'
+  'add:add files or directories to the repository'
+  'cp:copy files inside the repository'
+  'diff:show the tree diff'
+  'resolved:mark a file conflict as solved'
+  'rm:remove files from the repository'
+  'status:show the tree status'
+)
+
+if (( CURRENT == 2 )); then
+  _describe -t commands 'stgit command' subcmds
+else
+  _files
+fi

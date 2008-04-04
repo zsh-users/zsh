@@ -1,3 +1,8 @@
+2008-04-04  Clint Adams  <clint@zsh.org>
+
+	* 24789: Completion/Unix/Command/_stgit: completion for
+	stg subcommands.
+
 2008-04-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24788: Doc/Zsh/expn.yo, Src/subst.c: ${(m)#...} returns
