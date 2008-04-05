@@ -2114,6 +2114,6 @@ i.e. both the region and special characters are shown in standout mode.
 
 Within widgets, arbitrary regions may be highlighted by setting the
 special array parameter tt(region_highlight); see
-ifnzman(nodreref(Zle Widgets))\
+ifnzman(noderef(Zle Widgets))\
 ifzman(above).
 

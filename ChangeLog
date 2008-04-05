@@ -1,3 +1,8 @@
+2008-04-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* İsmail Dönmez <ismail@namtrac.org>: 24793: Doc/Zsh/zle.yo:
+	typo.
+
 2008-04-04  Peter Stephenson  <pws@csr.com>
 
 	* 24792: Src/Zle/zle_refresh.c: try to be safer about turning
