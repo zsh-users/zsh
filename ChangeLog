@@ -1,3 +1,8 @@
+2008-04-07  Clint Adams  <clint@zsh.org>
+
+	* Markus Waldeck: 24799: Completion/Unix/Command/_vorbis:
+	complete .spx files for ogg123.
+
 2008-04-07  Peter Stephenson  <pws@csr.com>
 
 	* 24797: Doc/Zsh/zle.yo, Functions/Zle/read-from-minibuffer:

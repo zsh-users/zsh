@@ -55,7 +55,7 @@ case $service in
       '(-@ --list)'{-@+,--list}'[play all of the files from a playlist]:playlist:_files' \
       '--audio-buffer=[size of output audio buffer]:kilobytes' \
       \*{-o,--device-option=}'[assign device option values]:device option:->devopts' \
-      '*:sound file or directory:_files -g "(#i)*.(ogg|flac)"' && ret=0
+      '*:sound file or directory:_files -g "(#i)*.(ogg|flac|spx)"' && ret=0
   ;;
   ogginfo)
     _arguments \
