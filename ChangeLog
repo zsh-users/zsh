@@ -1,3 +1,10 @@
+2008-04-07  Peter Stephenson  <pws@csr.com>
+
+	* 24797: Doc/Zsh/zle.yo, Functions/Zle/read-from-minibuffer:
+	document POSTDISPLAY highlighting; restore read-from-minibuffer
+	save/restore mechanism using variables to avoid problems with
+	not restoring special ZLE variables when they go out of scope.
+
 2008-04-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* İsmail Dönmez <ismail@namtrac.org>: 24793: Doc/Zsh/zle.yo:

@@ -21,21 +21,41 @@ done
 
   local pretext="$PREDISPLAY$LBUFFER$RBUFFER$POSTDISPLAY
 "
-local LBUFFER="$2"
-local RBUFFER="$3"
-local PREDISPLAY="$pretext${1:-? }"
-local POSTDISPLAY=
-local -a region_highlight
-region_highlight=("P${#pretext} ${#PREDISPLAY} bold")
+# We could use the local variables mechanism to save these
+# values, but if read-from-minibuffer is called as a widget
+# (which isn't actually all that useful) the values won't be
+# restored because the variables are already local at the current
+# level and don't get restored when they go out of scope.
+# We could do it with an additional function level.
+  local save_lbuffer=$LBUFFER
+  local save_rbuffer=$RBUFFER
+  local save_predisplay=$PREDISPLAY
+  local save_postdisplay=$POSTDISPLAY
+  local -a save_region_highlight
+  save_region_highlight=("${region_highlight[@]}")
 
-if [[ -n $keys ]]; then
-  zle -R
-  read -k $keys
-  stat=$?
-else
-  zle recursive-edit -K main
-  stat=$?
-  (( stat )) || REPLY=$BUFFER
-fi
+{
+  LBUFFER="$2"
+  RBUFFER="$3"
+  PREDISPLAY="$pretext${1:-? }"
+  POSTDISPLAY=
+  region_highlight=("P${#pretext} ${#PREDISPLAY} bold")
+
+  if [[ -n $keys ]]; then
+    zle -R
+    read -k $keys
+    stat=$?
+  else
+    zle recursive-edit -K main
+    stat=$?
+    (( stat )) || REPLY=$BUFFER
+  fi
+} always {
+  LBUFFER=$save_lbuffer
+  RBUFFER=$save_rbuffer
+  PREDISPLAY=$save_predisplay
+  POSTDISPLAY=$save_postdisplay
+  region_highlight=("${save_region_highlight[@]}")
+}
 
 return $stat

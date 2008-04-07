@@ -778,8 +778,12 @@ vindex(region_highlight)
 item(tt(region_highlight) (array))(
 Each element of this array may be set to a string that describes
 highlighting for an arbitrary region of the command line that will
-take effect the next time the command line is redisplayed.  Each
-string consists of the following parts:
+take effect the next time the command line is redisplayed.  Highlighting
+of the non-editable parts of the command line in tt(PREDISPLAY)
+and tt(POSTDISPLAY) are possible, but note that the tt(P) flag
+is needed for character indexing to include tt(PREDISPLAY).
+
+Each string consists of the following parts:
 
 startlist()
 list(Optionally, a `tt(P)' to signify that the start and end offset that
