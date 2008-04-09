@@ -1,5 +1,8 @@
 2008-04-09  Peter Stephenson  <pws@csr.com>
 
+	* 24806: Doc/Zsh/params.yo, Completion/Zsh/Context/_subscript: fix
+	typos, completing of * and @.
+
 	* 24804: Completion/Zsh/Context/_subscript: quoting of
 	associative array keys for subscripts was wrong.
 
