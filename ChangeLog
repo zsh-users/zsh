@@ -1,3 +1,8 @@
+2008-04-09  Peter Stephenson  <pws@csr.com>
+
+	* 24804: Completion/Zsh/Context/_subscript: quoting of
+	associative array keys for subscripts was wrong.
+
 2008-04-07  Clint Adams  <clint@zsh.org>
 
 	* Markus Waldeck: 24799: Completion/Unix/Command/_vorbis:

@@ -67,12 +67,14 @@ elif compset -P '\('; then
 
   _values -s '' 'subscript flags' $flags
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
-  local suf
+  local suf MATCH MBEGIN MEND
+  local -a keys
+  keys=(${${(kP)compstate[parameter]}//(#m)[\$\\\[\]\(\)\[\{\}]/\\$MATCH})
 
   [[ "$RBUFFER" != (|\\)\]* ]] && suf="$osuf"
 
   _wanted association-keys expl 'association key' \
-      compadd -S "$suf" -k "$compstate[parameter]"
+      compadd -Q -S "$suf" -a keys
 elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   local list i j ret=1 disp
 
