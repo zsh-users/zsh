@@ -1,3 +1,10 @@
+2008-04-11  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/zle_hist.c, Src/zle_utils.c: move zlecmp() and
+	zlefind() unaltered into zle_hist.c as statics in preparation
+	for surgery on the zle_text interface.  (You should see the
+	waiting list for surgery, though.)
+
 2008-04-09  Peter Stephenson  <pws@csr.com>
 
 	* 24806: Doc/Zsh/params.yo, Completion/Zsh/Context/_subscript: fix
