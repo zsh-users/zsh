@@ -1,3 +1,8 @@
+2008-04-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Frank Terbeck: 24807: Completion/compint: Completion system
+	needs no_ignore_braces option.
+
 2008-04-11  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/zle_hist.c, Src/zle_utils.c: move zlecmp() and

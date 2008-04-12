@@ -141,6 +141,7 @@ _comp_options=(
     NO_errexit
     NO_globsubst
     NO_histsubstpattern
+    NO_ignorebraces
     NO_kshglob
     NO_ksharrays
     NO_kshtypeset
