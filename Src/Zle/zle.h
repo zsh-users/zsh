@@ -74,6 +74,16 @@ typedef wint_t   ZLE_INT_T;
 #define LASTFULLCHAR	lastchar_wide
 #define LASTFULLCHAR_T  ZLE_INT_T
 
+/* We may need to handle combining character alignment */
+#define CCLEFT()	alignmultiwordleft(1)
+#define CCRIGHT()	alignmultiwordright(1)
+/*
+ * Increment or decrement the cursor position, skipping over
+ * combining characters.
+ */
+#define INCCS()		inccs()
+#define DECCS()		deccs()
+
 #else  /* Not MULTIBYTE_SUPPORT: old single-byte code */
 
 typedef char ZLE_CHAR_T;
@@ -132,6 +142,15 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 
 #define LASTFULLCHAR	lastchar
 #define LASTFULLCHAR_T	int
+
+/* Combining character alignment: none in this mode */
+#define CCLEFT()
+#define CCRIGHT()
+/*
+ * Increment or decrement the cursor position: simple in this case.
+ */
+#define INCCS()		((void)(zlecs++))
+#define DECCS()		((void)(zlecs--))
 
 #endif
 
@@ -201,6 +220,12 @@ struct modifier {
 /* current modifier status */
 
 #define zmult (zmod.mult)
+
+/* flags to cut() and cuttext() and other front-ends */
+
+#define CUT_FRONT   (1<<0)   /* Text goes in front of cut buffer */
+#define CUT_REPLACE (1<<1)   /* Text replaces cut buffer */
+#define CUT_RAW     (1<<2)   /* Raw character counts (not used in cut itself) */
 
 /* undo system */
 
@@ -340,7 +365,11 @@ typedef char REFRESH_CHAR;
  * Description of one screen cell in zle_refresh.c
  */
 typedef struct {
-    /* The (possibly wide) character */
+    /*
+     * The (possibly wide) character.
+     * If atr contains TXT_MULTIWORD_MASK, an index into the set of multiword
+     * symbols (only if MULTIBYTE_SUPPORT is present).
+     */
     REFRESH_CHAR chr;
     /*
      * Its attributes.  'On' attributes (TXT_ATTR_ON_MASK) are
@@ -349,7 +378,7 @@ typedef struct {
      * need the effect; 'off' attributes are only present for the
      * last character in the sequence.
      */
-    REFRESH_CHAR atr;
+    int atr;
 } REFRESH_ELEMENT;
 
 /* A string of screen cells */

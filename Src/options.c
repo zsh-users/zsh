@@ -101,6 +101,7 @@ static struct optname optns[] = {
 {{NULL, "chaselinks",	      OPT_EMULATE},		 CHASELINKS},
 {{NULL, "checkjobs",	      OPT_EMULATE|OPT_ZSH},	 CHECKJOBS},
 {{NULL, "clobber",	      OPT_EMULATE|OPT_ALL},	 CLOBBER},
+{{NULL, "combiningchars",     0},			 COMBININGCHARS},
 {{NULL, "completealiases",    0},			 COMPLETEALIASES},
 {{NULL, "completeinword",     0},			 COMPLETEINWORD},
 {{NULL, "correct",	      0},			 CORRECT},

@@ -685,7 +685,7 @@ docomplete(int lst)
 	}
 	ocs = zlemetacs;
 	zlemetacs = 0;
-	foredel(chl);
+	foredel(chl, CUT_RAW);
 	zlemetacs = ocs;
     }
     freeheap();
@@ -796,7 +796,7 @@ docomplete(int lst)
 		if (inull(*q))
 		    *q = Nularg;
 	    zlemetacs = wb;
-	    foredel(we - wb);
+	    foredel(we - wb, CUT_RAW);
 
 	    untokenize(x = ox = dupstring(w));
 	    if (*w == Tilde || *w == Equals || *w == String)
@@ -848,7 +848,7 @@ docomplete(int lst)
                      * parts of the code re-install them, but for expansion
                      * we have to do it here. */
                     zlemetacs = 0;
-                    foredel(zlemetall);
+                    foredel(zlemetall, CUT_RAW);
                     spaceinline(origll);
                     memcpy(zlemetaline, origline, origll);
                     zlemetacs = origcs;
@@ -1669,7 +1669,7 @@ get_comp_string(void)
 			if (i < ocs)
 			    offs -= skipchars;
 			/* Move the tail of the line up */
-			foredel(skipchars);
+			foredel(skipchars, CUT_RAW);
 			/*
 			 * Update the offset into the command line to the
 			 * cursor position if that's after the current position.
@@ -1724,7 +1724,7 @@ get_comp_string(void)
 		} else {
 		    ocs = zlemetacs;
 		    zlemetacs = i;
-		    foredel(skipchars);
+		    foredel(skipchars, CUT_RAW);
 		    if ((zlemetacs = ocs) > (i -= skipchars))
 			zlemetacs -= skipchars;
 		    we -= skipchars;
@@ -1732,7 +1732,7 @@ get_comp_string(void)
 	    } else {
 		ocs = zlemetacs;
 		zlemetacs = we;
-		backdel(skipchars);
+		backdel(skipchars, CUT_RAW);
 		if (ocs == we)
 		    zlemetacs = we - skipchars;
 		else
@@ -2085,7 +2085,7 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	/* Only the list of expansions was requested. Restore the 
          * command line. */
         zlemetacs = 0;
-        foredel(zlemetall);
+        foredel(zlemetall, CUT_RAW);
         spaceinline(origll);
         memcpy(zlemetaline, origline, origll);
         zlemetacs = origcs;
@@ -2095,7 +2095,7 @@ doexpansion(char *s, int lst, int olst, int explincmd)
     }
     /* Remove the current word and put the expansions there. */
     zlemetacs = wb;
-    foredel(we - wb);
+    foredel(we - wb, CUT_RAW);
     while ((ss = (char *)ugetnode(vl))) {
 	ret = 0;
 	ss = quotename(ss, NULL);
@@ -2811,7 +2811,7 @@ expandcmdpath(UNUSED(char **args))
     if (!str)
 	return 1;
     zlecs = cmdwb;
-    foredel(cmdwe - cmdwb);
+    foredel(cmdwe - cmdwb, CUT_RAW);
     zlestr = stringaszleline(str, 0, &strll, NULL, NULL);
     spaceinline(strll);
     ZS_strncpy(zleline + zlecs, zlestr, strll);

@@ -3081,6 +3081,14 @@ wcsitype(wchar_t c, int itype)
 	case IWORD:
 	    if (iswalnum(c))
 		return 1;
+	    /*
+	     * If we are handling combining characters, anything
+	     * printable with zero width needs to be considered
+	     * part of a word.
+	     */
+	    if (isset(COMBININGCHARS) &&
+		iswprint(c) && wcwidth(c) == 0)
+		return 1;
 	    return !!wmemchr(wordchars_wide.chars, c, wordchars_wide.len);
 
 	case ISEP:

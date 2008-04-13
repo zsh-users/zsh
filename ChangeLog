@@ -1,5 +1,13 @@
 2008-04-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24808: Doc/Zsh/options.yo, Src/options.c, Src/utils.c, Src/zsh.h,
+	Src/Zle/compcore.c, Src/Zle/complist.c, Src/Zle/compresult.c,
+	Src/Zle/deltochar.c, Src/Zle/zle.h, Src/Zle/zle_hist.c,
+	Src/Zle/zle_misc.c, Src/Zle/zle_move.c, Src/Zle/zle_refresh.c,
+	Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c,
+	Src/Zle/zle_word.c: add COMBINING_CHARS option and basic
+	zle support.
+
 	* Miek Gieben: users/12781: Functions/Misc/zmv: too many
 	backslashes in Usage message.
 

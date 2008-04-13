@@ -640,7 +640,7 @@ insertlastword(char **args)
 	if (deleteword) {
 	    int pos = zlemetacs;
 	    zlemetacs = lastpos;
-	    foredel(pos - zlemetacs);
+	    foredel(pos - zlemetacs, CUT_RAW);
 	    /*
 	     * Mark that this has been deleted.
 	     * For consistency with history lines, we really ought to
@@ -701,7 +701,7 @@ insertlastword(char **args)
     if (deleteword > 0) {
 	int pos = zlemetacs;
 	zlemetacs = lastpos;
-	foredel(pos - zlemetacs);
+	foredel(pos - zlemetacs, CUT_RAW);
     }
     if (lastinsert) {
 	zfree(lastinsert, lastlen);

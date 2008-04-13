@@ -1444,6 +1444,24 @@ cindex(enabling the beep)
 item(tt(BEEP) (tt(PLUS()B)) <D>)(
 Beep on error in ZLE.
 )
+pindex(COMBINING_CHARS)
+cindex(characters, (Unicode) combining)
+cindex(combining characters (Unicode))
+cindex(Unicode combining characters)
+item(tt(COMBINING_CHARS))(
+Assume that the terminal displays combining characters correctly.
+Specifically, if a base alphanumeric character is followed by one or more
+zero-width punctuation characters, assume that the zero-width charaters
+will be displayed as modifications to the base character within the
+same width.  Not all terminals handle this.  If this option is not
+set, zero-width characters are displayed separately with special
+mark-up.
+
+If this option is set, the pattern test tt([[:WORD:]]) matches a
+zero-width punctuation character on the assumption that it will be
+used as part of a word in combination with a word character.
+Otherwise the base shell does not handle combining characters specially.
+)
 pindex(EMACS)
 item(tt(EMACS))(
 If ZLE is loaded, turning on this option has the equivalent effect

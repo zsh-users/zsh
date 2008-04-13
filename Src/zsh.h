@@ -1715,6 +1715,7 @@ enum {
     CHASELINKS,
     CHECKJOBS,
     CLOBBER,
+    COMBININGCHARS,
     COMPLETEALIASES,
     COMPLETEINWORD,
     CORRECT,
@@ -1936,6 +1937,10 @@ struct ttyinfo {
 
 #define tccan(X) (tclen[X])
 
+/*
+ * Text attributes for displaying in ZLE
+ */
+
 #define TXTBOLDFACE   0x01
 #define TXTSTANDOUT   0x02
 #define TXTUNDERLINE  0x04
@@ -1954,6 +1959,12 @@ struct ttyinfo {
 #define TXT_ATTR_OFF_MASK  0x70
 /* Bits to shift off right to get on */
 #define TXT_ATTR_OFF_ON_SHIFT (4)
+
+/*
+ * Indicates to zle_refresh.c that the character entry is an
+ * index into the list of multiword symbols.
+ */
+#define TXT_MULTIWORD_MASK  0x100
 
 #define txtchangeisset(T,X)	((T) & (X))
 #define txtchangeset(X, Y)	(txtchange |= (X), txtchange &= ~(Y))

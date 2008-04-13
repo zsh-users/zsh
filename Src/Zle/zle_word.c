@@ -30,6 +30,12 @@
 #include "zle.mdh"
 #include "zle_word.pro"
 
+/*
+ * HERE: our handling of combining characters may be wrong.  We
+ * should make sure we only consider a combining character part of
+ * a word if the base character is.
+ */
+
 /**/
 int
 forwardword(char **args)
@@ -45,11 +51,11 @@ forwardword(char **args)
     }
     while (n--) {
 	while (zlecs != zlell && ZC_iword(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
 	if (wordflag && !n)
 	    return 0;
 	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
     }
     return 0;
 }
@@ -72,14 +78,14 @@ viforwardword(char **args)
     while (n--) {
 	if (Z_vialnum(zleline[zlecs]))
 	    while (zlecs != zlell && Z_vialnum(zleline[zlecs]))
-		zlecs++;
+		INCCS();
 	else
 	    while (zlecs != zlell && !Z_vialnum(zleline[zlecs]) && !ZC_iblank(zleline[zlecs]))
-		zlecs++;
+		INCCS();
 	if (wordflag && !n)
 	    return 0;
 	while (zlecs != zlell && ZC_inblank(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
     }
     return 0;
 }
@@ -99,11 +105,11 @@ viforwardblankword(char **args)
     }
     while (n--) {
 	while (zlecs != zlell && !ZC_iblank(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
 	if (wordflag && !n)
 	    return 0;
 	while (zlecs != zlell && ZC_iblank(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
     }
     return 0;
 }
@@ -123,11 +129,11 @@ emacsforwardword(char **args)
     }
     while (n--) {
 	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
 	if (wordflag && !n)
 	    return 0;
 	while (zlecs != zlell && ZC_iword(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
     }
     return 0;
 }
@@ -141,13 +147,14 @@ viforwardblankwordend(UNUSED(char **args))
     if (n < 0)
 	return 1;
     while (n--) {
+	/* HERE: the zlecs + 1 here is suspect */
 	while (zlecs != zlell && ZC_iblank(zleline[zlecs + 1]))
-	    zlecs++;
+	    INCCS();
 	while (zlecs != zlell && !ZC_iblank(zleline[zlecs + 1]))
-	    zlecs++;
+	    INCCS();
     }
     if (zlecs != zlell && virangeflag)
-	zlecs++;
+	INCCS();
     return 0;
 }
 
@@ -165,18 +172,19 @@ viforwardwordend(char **args)
 	return ret;
     }
     while (n--) {
+	/* HERE: the zlecs + 1 here is suspect */
 	if (ZC_iblank(zleline[zlecs + 1]))
 	    while (zlecs != zlell && ZC_iblank(zleline[zlecs + 1]))
-		zlecs++;
+		INCCS();
 	if (Z_vialnum(zleline[zlecs + 1]))
 	    while (zlecs != zlell && Z_vialnum(zleline[zlecs + 1]))
-		zlecs++;
+		INCCS();
 	else
 	    while (zlecs != zlell && !Z_vialnum(zleline[zlecs + 1]) && !ZC_iblank(zleline[zlecs + 1]))
-		zlecs++;
+		INCCS();
     }
     if (zlecs != zlell && virangeflag)
-	zlecs++;
+	INCCS();
     return 0;
 }
 
@@ -194,10 +202,11 @@ backwardword(char **args)
 	return ret;
     }
     while (n--) {
+	/* HERE: the zlecs - 1 here is suspect */
 	while (zlecs && !ZC_iword(zleline[zlecs - 1]))
-	    zlecs--;
+	    DECCS();
 	while (zlecs && ZC_iword(zleline[zlecs - 1]))
-	    zlecs--;
+	    DECCS();
     }
     return 0;
 }
@@ -216,14 +225,15 @@ vibackwardword(char **args)
 	return ret;
     }
     while (n--) {
+	/* HERE: the zlecs - 1 here is suspect */
 	while (zlecs && ZC_iblank(zleline[zlecs - 1]))
-	    zlecs--;
+	    DECCS();
 	if (Z_vialnum(zleline[zlecs - 1]))
 	    while (zlecs && Z_vialnum(zleline[zlecs - 1]))
-		zlecs--;
+		DECCS();
 	else
 	    while (zlecs && !Z_vialnum(zleline[zlecs - 1]) && !ZC_iblank(zleline[zlecs - 1]))
-		zlecs--;
+		DECCS();
     }
     return 0;
 }
@@ -243,9 +253,9 @@ vibackwardblankword(char **args)
     }
     while (n--) {
 	while (zlecs && ZC_iblank(zleline[zlecs - 1]))
-	    zlecs--;
+	    DECCS();
 	while (zlecs && !ZC_iblank(zleline[zlecs - 1]))
-	    zlecs--;
+	    DECCS();
     }
     return 0;
 }
@@ -265,9 +275,9 @@ emacsbackwardword(char **args)
     }
     while (n--) {
 	while (zlecs && !ZC_iword(zleline[zlecs - 1]))
-	    zlecs--;
+	    DECCS();
 	while (zlecs && ZC_iword(zleline[zlecs - 1]))
-	    zlecs--;
+	    DECCS();
     }
     return 0;
 }
@@ -286,12 +296,16 @@ backwarddeleteword(char **args)
 	return ret;
     }
     while (n--) {
+	/*
+	 * HERE: the zlecs - 1 here is suspect, and we should
+	 * do the DECCS() thing.
+	 */
 	while (x && !ZC_iword(zleline[x - 1]))
 	    x--;
 	while (x && ZC_iword(zleline[x - 1]))
 	    x--;
     }
-    backdel(zlecs - x);
+    backdel(zlecs - x, CUT_RAW);
     return 0;
 }
 
@@ -306,6 +320,10 @@ vibackwardkillword(UNUSED(char **args))
 	return 1;
 /* this taken from "vibackwardword" */
     while (n--) {
+	/*
+	 * HERE: the zlecs - 1 here is suspect, and we should
+	 * do the DECCS() thing.
+	 */
 	while ((x > lim) && ZC_iblank(zleline[x - 1]))
 	    x--;
 	if (Z_vialnum(zleline[x - 1]))
@@ -315,7 +333,7 @@ vibackwardkillword(UNUSED(char **args))
 	    while ((x > lim) && !Z_vialnum(zleline[x - 1]) && !ZC_iblank(zleline[x - 1]))
 		x--;
     }
-    backkill(zlecs - x, 1);
+    backkill(zlecs - x, CUT_FRONT);
     return 0;
 }
 
@@ -334,12 +352,16 @@ backwardkillword(char **args)
 	return ret;
     }
     while (n--) {
+	/*
+	 * HERE: the zlecs - 1 here is suspect, and we should
+	 * do the DECCS() thing.
+	 */
 	while (x && !ZC_iword(zleline[x - 1]))
 	    x--;
 	while (x && ZC_iword(zleline[x - 1]))
 	    x--;
     }
-    backkill(zlecs - x, 1);
+    backkill(zlecs - x, CUT_FRONT);
     return 0;
 }
 
@@ -354,10 +376,10 @@ upcaseword(UNUSED(char **args))
 	n = -n;
     while (n--) {
 	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
 	while (zlecs != zlell && ZC_iword(zleline[zlecs])) {
 	    zleline[zlecs] = ZC_toupper(zleline[zlecs]);
-	    zlecs++;
+	    INCCS();
 	}
     }
     if (neg)
@@ -376,10 +398,10 @@ downcaseword(UNUSED(char **args))
 	n = -n;
     while (n--) {
 	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
 	while (zlecs != zlell && ZC_iword(zleline[zlecs])) {
 	    zleline[zlecs] = ZC_tolower(zleline[zlecs]);
-	    zlecs++;
+	    INCCS();
 	}
     }
     if (neg)
@@ -399,14 +421,14 @@ capitalizeword(UNUSED(char **args))
     while (n--) {
 	first = 1;
 	while (zlecs != zlell && !ZC_iword(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
 	while (zlecs != zlell && ZC_iword(zleline[zlecs]) && !ZC_ialpha(zleline[zlecs]))
-	    zlecs++;
+	    INCCS();
 	while (zlecs != zlell && ZC_iword(zleline[zlecs])) {
 	    zleline[zlecs] = (first) ? ZC_toupper(zleline[zlecs]) :
 		ZC_tolower(zleline[zlecs]);
 	    first = 0;
-	    zlecs++;
+	    INCCS();
 	}
     }
     if (neg)
@@ -429,12 +451,13 @@ deleteword(char **args)
 	return ret;
     }
     while (n--) {
+	/* HERE: we should do the INCCS() thing */
 	while (x != zlell && !ZC_iword(zleline[x]))
 	    x++;
 	while (x != zlell && ZC_iword(zleline[x]))
 	    x++;
     }
-    foredel(x - zlecs);
+    foredel(x - zlecs, CUT_RAW);
     return 0;
 }
 
@@ -453,12 +476,13 @@ killword(char **args)
 	return ret;
     }
     while (n--) {
+	/* HERE: we should do the INCCS() thing */
 	while (x != zlell && !ZC_iword(zleline[x]))
 	    x++;
 	while (x != zlell && ZC_iword(zleline[x]))
 	    x++;
     }
-    forekill(x - zlecs, 0);
+    forekill(x - zlecs, CUT_RAW);
     return 0;
 }
 
@@ -474,6 +498,10 @@ transposewords(UNUSED(char **args))
     if (neg)
 	n = -n;
     while (n--) {
+	/*
+	 * HERE: we should do the INCCS() thing.
+	 * A great deal of the following needs rewriting.
+	 */
 	while (x != zlell && zleline[x] != ZWC('\n') && !ZC_iword(zleline[x]))
 	    x++;
 	if (x == zlell || zleline[x] == ZWC('\n')) {

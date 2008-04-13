@@ -210,7 +210,13 @@ getvirange(int wf)
      * moving to the opening bracket, meaning that we need to *
      * change the *starting* position.                        */
     if(virangeflag == -1)
-	pos++;
+    {
+	int origcs = zlecs;
+	zlecs = pos;
+	INCCS();
+	pos = zlecs;
+	zlecs = origcs;
+    }
 
     /* Get the range the right way round.  zlecs is placed at the *
      * start of the range, and pos (the return value of this   *
@@ -314,12 +320,12 @@ videlete(UNUSED(char **args))
 
     startvichange(1);
     if ((c2 = getvirange(0)) != -1) {
-	forekill(c2 - zlecs, 0);
+	forekill(c2 - zlecs, CUT_RAW);
 	ret = 0;
 	if (vilinerange && zlell) {
 	    if (zlecs == zlell)
-		zlecs--;
-	    foredel(1);
+		DECCS();
+	    foredel(1, 0);
 	    vifirstnonblank(zlenoargs);
 	}
     }
@@ -350,7 +356,7 @@ videletechar(char **args)
     if (n > findeol() - zlecs)
 	n = findeol() - zlecs;
     /* do the deletion */
-    forekill(n, 0);
+    forekill(n, CUT_RAW);
     return 0;
 }
 
@@ -363,7 +369,7 @@ vichange(UNUSED(char **args))
     startvichange(1);
     if ((c2 = getvirange(1)) != -1) {
 	ret = 0;
-	forekill(c2 - zlecs, 0);
+	forekill(c2 - zlecs, CUT_RAW);
 	selectkeymap("main", 1);
 	viinsbegin = zlecs;
 	undoing = 0;
@@ -388,7 +394,7 @@ visubstitute(UNUSED(char **args))
     if (n > findeol() - zlecs)
 	n = findeol() - zlecs;
     /* do the substitution */
-    forekill(n, 0);
+    forekill(n, CUT_RAW);
     startvitext(1);
     return 0;
 }
@@ -397,7 +403,7 @@ visubstitute(UNUSED(char **args))
 int
 vichangeeol(UNUSED(char **args))
 {
-    forekill(findeol() - zlecs, 0);
+    forekill(findeol() - zlecs, CUT_RAW);
     startvitext(1);
     return 0;
 }
@@ -488,11 +494,22 @@ int
 vireplacechars(UNUSED(char **args))
 {
     ZLE_INT_T ch;
-    int n = zmult;
+    int n = zmult, origcs = zlecs, fail = 0;
 
+    if (n > 0) {
+	while (n > 0) {
+	    if (zlecs == zlell || zleline[zlell] == ZWC('\n')) {
+		fail = 1;
+		break;
+	    }
+	    INCCS();
+	}
+	n = zlecs - origcs;
+	zlecs = origcs;
+    }
     startvichange(1);
     /* check argument range */
-    if (n < 1 || n + zlecs > findeol()) {
+    if (n < 1 || fail) {
 	if(vichgrepeat)
 	    vigetkey();
 	if(vichgflag) {
@@ -511,9 +528,10 @@ vireplacechars(UNUSED(char **args))
     if (ch == ZWC('\r') || ch == ZWC('\n')) {
 	/* <return> handled specially */
 	zlecs += n - 1;
-	backkill(n - 1, 0);
+	backkill(n - 1, CUT_RAW);
 	zleline[zlecs++] = '\n';
     } else {
+	/* HERE: we shouldn't replace combining chars, we should delete them */
 	while (n--)
 	    zleline[zlecs++] = ch;
 	zlecs--;
@@ -531,7 +549,7 @@ vicmdmode(UNUSED(char **args))
     undoing = 1;
     vichgflag = 0;
     if (zlecs != findbol())
-	zlecs--;
+	DECCS();
     return 0;
 }
 
@@ -575,7 +593,7 @@ vioperswapcase(UNUSED(char **args))
 		zleline[zlecs] = ZC_toupper(zleline[zlecs]);
 	    else if (ZC_iupper(zleline[zlecs]))
 		zleline[zlecs] = ZC_tolower(zleline[zlecs]);
-	    zlecs++;
+	    INCCS();
 	}
 	/* go back to the first line of the range */
 	zlecs = oldcs;
@@ -664,7 +682,7 @@ viunindent(UNUSED(char **args))
     /* remove a tab from the beginning of each line within range */
     while (zlecs < c2) {
 	if (zleline[zlecs] == '\t')
-	    foredel(1);
+	    foredel(1, 0);
 	zlecs = findeol() + 1;
     }
     /* go back to the first line of the range */
@@ -699,7 +717,7 @@ vibackwarddeletechar(char **args)
     if (n > zlecs - findbol())
 	n = zlecs - findbol();
     /* do the deletion */
-    backkill(n, 1);
+    backkill(n, CUT_FRONT|CUT_RAW);
     return 0;
 }
 
@@ -709,7 +727,7 @@ vikillline(UNUSED(char **args))
 {
     if (viinsbegin > zlecs)
 	return 1;
-    backdel(zlecs - viinsbegin);
+    backdel(zlecs - viinsbegin, CUT_RAW);
     return 0;
 }
 
@@ -790,7 +808,7 @@ vijoin(UNUSED(char **args))
 	return 1;
     zlecs = x + 1;
     for (x = 1; zlecs != zlell && ZC_iblank(zleline[zlecs]); zlecs++, x++);
-    backdel(x);
+    backdel(x, CUT_RAW);
     if (zlecs && ZC_iblank(zleline[zlecs-1]))
 	zlecs--;
     else {
@@ -893,7 +911,7 @@ vipoundinsert(UNUSED(char **args))
 	    viinsbegin++;
 	zlecs = oldcs + (zlecs <= oldcs);
     } else {
-	foredel(1);
+	foredel(1, 0);
 	if (zlecs < viinsbegin)
 	    viinsbegin--;
 	zlecs = oldcs - (zlecs < oldcs);
@@ -921,7 +939,7 @@ viquotedinsert(char **args)
 #ifndef HAS_TIO
     zsetterm();
 #endif
-    foredel(1);
+    foredel(1, 0);
     if(LASTFULLCHAR == ZLEEOF)
 	return 1;
     else

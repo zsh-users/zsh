@@ -105,6 +105,7 @@ selfinsertunmeta(char **args)
 int
 deletechar(char **args)
 {
+    int n;
     if (zmult < 0) {
 	int ret;
 	zmult = -zmult;
@@ -112,12 +113,15 @@ deletechar(char **args)
 	zmult = -zmult;
 	return ret;
     }
-    if (zlecs + zmult <= zlell) {
-	zlecs += zmult;
-	backdel(zmult);
-	return 0;
+
+    n = zmult;
+    while (n--) {
+	if (zlecs == zlell)
+	    return 1;
+	INCCS();
     }
-    return 1;
+    backdel(zmult, 0);
+    return 0;
 }
 
 /**/
@@ -131,7 +135,7 @@ backwarddeletechar(char **args)
 	zmult = -zmult;
 	return ret;
     }
-    backdel(zmult > zlecs ? zlecs : zmult);
+    backdel(zmult > zlecs ? zlecs : zmult, 0);
     return 0;
 }
 
@@ -149,7 +153,7 @@ killwholeline(UNUSED(char **args))
 	while (zlecs && zleline[zlecs - 1] != '\n')
 	    zlecs--;
 	for (i = zlecs; i != zlell && zleline[i] != '\n'; i++);
-	forekill(i - zlecs + (i != zlell), fg);
+	forekill(i - zlecs + (i != zlell), fg ? (CUT_FRONT|CUT_RAW) : CUT_RAW);
     }
     clearlist = 1;
     return 0;
@@ -160,7 +164,7 @@ int
 killbuffer(UNUSED(char **args))
 {
     zlecs = 0;
-    forekill(zlell, 0);
+    forekill(zlell, CUT_RAW);
     clearlist = 1;
     return 0;
 }
@@ -185,7 +189,7 @@ backwardkillline(char **args)
 	    while (zlecs && zleline[zlecs - 1] != '\n')
 		zlecs--, i++;
     }
-    forekill(i, 1);
+    forekill(i, CUT_FRONT|CUT_RAW);
     clearlist = 1;
     return 0;
 }
@@ -267,13 +271,13 @@ poundinsert(UNUSED(char **args))
 	    zlecs = findeol();
 	}
     } else {
-	foredel(1);
+	foredel(1, 0);
 	zlecs = findeol();
 	while(zlecs != zlell) {
 	    zlecs++;
 	    vifirstnonblank(zlenoargs);
 	    if(zleline[zlecs] == '#')
-		foredel(1);
+		foredel(1, 0);
 	    zlecs = findeol();
 	}
     }
@@ -319,7 +323,7 @@ killline(char **args)
 	    while (zlecs != zlell && zleline[zlecs] != ZWC('\n'))
 		zlecs++, i++;
     }
-    backkill(i, 0);
+    backkill(i, CUT_RAW);
     clearlist = 1;
     return 0;
 }
@@ -331,9 +335,9 @@ killregion(UNUSED(char **args))
     if (mark > zlell)
 	mark = zlell;
     if (mark > zlecs)
-	forekill(mark - zlecs, 0);
+	forekill(mark - zlecs, CUT_RAW);
     else
-	backkill(zlecs - mark, 1);
+	backkill(zlecs - mark, CUT_FRONT|CUT_RAW);
     return 0;
 }
 
@@ -344,7 +348,7 @@ copyregionaskill(char **args)
     if (*args) {
         int len;
         ZLE_STRING_T line = stringaszleline(*args, 0, &len, NULL, NULL);
-	cuttext(line, len, -1);
+	cuttext(line, len, CUT_REPLACE);
 	free(line);
     } else {
 	if (mark > zlell)
@@ -352,7 +356,7 @@ copyregionaskill(char **args)
 	if (mark > zlecs)
 	    cut(zlecs, mark - zlecs, 0);
 	else
-	    cut(mark, zlecs - mark, 1);
+	    cut(mark, zlecs - mark, CUT_FRONT);
     }
     return 0;
 }
@@ -441,7 +445,7 @@ yankpop(UNUSED(char **args))
     } while (!buf->buf || *buf->buf == ZWC('\0'));
 
     zlecs = yankb;
-    foredel(yanke - yankb);
+    foredel(yanke - yankb, CUT_RAW);
     cc = buf->len;
     spaceinline(cc);
     ZS_memcpy(zleline + zlecs, buf->buf, cc);
@@ -766,7 +770,7 @@ quoteregion(UNUSED(char **args))
     }
     str = (ZLE_STRING_T)hcalloc((len = mark - zlecs) * ZLE_CHAR_SIZE);
     ZS_memcpy(str, zleline + zlecs, len);
-    foredel(len);
+    foredel(len, CUT_RAW);
     str = makequote(str, &len);
     spaceinline(len);
     ZS_memcpy(zleline + zlecs, str, len);
@@ -1321,10 +1325,10 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	    /* must be shifting wide character lengths */
 	    if (zlemetaline != NULL) {
 		unmetafy_line();
-		backdel(sl);
+		backdel(sl, CUT_RAW);
 		metafy_line();
 	    } else
-		backdel(sl);
+		backdel(sl, CUT_RAW);
 	    if (!keep)
 		invalidatelist();
 	}

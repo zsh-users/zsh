@@ -357,6 +357,17 @@ zlegetline(int *ll, int *cs)
 }
 
 
+/*
+ * Basic utility functions for adding to line or removing from line.
+ * At this level the counts supplied are raw character counts, so
+ * the calling code must be aware of combining characters where
+ * necessary, e.g. if we want to delete a + combing grave forward
+ * from the cursor, then shiftchars() gets the count 2 (not 1).
+ *
+ * This is necessary because these utility functions don't know about
+ * zlecs, and we need to count combined characters from there.
+ */
+
 /* insert space for ct chars at cursor position */
 
 /**/
@@ -412,27 +423,6 @@ shiftchars(int to, int cnt)
     region_active = 0;
 }
 
-/**/
-mod_export void
-backkill(int ct, int dir)
-{
-    int i = (zlecs -= ct);
-
-    cut(i, ct, dir);
-    shiftchars(i, ct);
-}
-
-/**/
-mod_export void
-forekill(int ct, int dir)
-{
-    int i = zlecs;
-
-    cut(i, ct, dir);
-    shiftchars(i, ct);
-}
-
-
 /*
  * Put the ct characters starting at zleline + i into the
  * cutbuffer, circling the kill ring if necessary (it's
@@ -448,9 +438,9 @@ forekill(int ct, int dir)
 
 /**/
 void
-cut(int i, int ct, int dir)
+cut(int i, int ct, int flags)
 {
-  cuttext(zleline + i, ct, dir);
+  cuttext(zleline + i, ct, flags);
 }
 
 /*
@@ -459,7 +449,7 @@ cut(int i, int ct, int dir)
 
 /**/
 void
-cuttext(ZLE_STRING_T line, int ct, int dir)
+cuttext(ZLE_STRING_T line, int ct, int flags)
 {
     if (!ct)
 	return;
@@ -504,7 +494,7 @@ cuttext(ZLE_STRING_T line, int ct, int dir)
 	cutbuf.buf = (ZLE_STRING_T)zalloc(ZLE_CHAR_SIZE);
 	cutbuf.buf[0] = ZWC('\0');
 	cutbuf.len = cutbuf.flags = 0;
-    } else if (!(lastcmd & ZLE_KILL) || dir < 0) {
+    } else if (!(lastcmd & ZLE_KILL) || (flags & CUT_RAW)) {
 	Cutbuffer kptr;
 	if (!kring) {
 	    kringsize = KRINGCTDEF;
@@ -519,7 +509,7 @@ cuttext(ZLE_STRING_T line, int ct, int dir)
 	cutbuf.buf[0] = ZWC('\0');
 	cutbuf.len = cutbuf.flags = 0;
     }
-    if (dir) {
+    if (flags & (CUT_FRONT|CUT_REPLACE)) {
 	ZLE_STRING_T s = (ZLE_STRING_T)zalloc((cutbuf.len + ct)*ZLE_CHAR_SIZE);
 
 	ZS_memcpy(s, line, ct);
@@ -539,24 +529,87 @@ cuttext(ZLE_STRING_T line, int ct, int dir)
 	cutbuf.flags &= ~CUTBUFFER_LINE;
 }
 
+/*
+ * Now we're back in the world of zlecs where we need to keep
+ * track of whether we're on a combining character.
+ */
+
 /**/
 mod_export void
-backdel(int ct)
+backkill(int ct, int flags)
 {
-    if (zlemetaline != NULL)
-	shiftchars(zlemetacs -= ct, ct);
-    else
-	shiftchars(zlecs -= ct, ct);
+    int i;
+
+    if (flags & CUT_RAW) {
+	i = (zlecs -= ct);
+    } else {
+	int n = ct;
+	while (n--)
+	    DECCS();
+	i = zlecs;
+    }
+
+    cut(i, ct, flags);
+    shiftchars(i, ct);
 }
 
 /**/
 mod_export void
-foredel(int ct)
+forekill(int ct, int flags)
 {
-    if (zlemetaline != NULL)
-	shiftchars(zlemetacs, ct);
-    else
+    int i = zlecs;
+
+    if (!(flags & CUT_RAW)) {
+	int n = ct;
+	while (n--)
+	    INCCS();
+	ct = zlecs - i;
+	zlecs = i;
+    }
+
+    cut(i, ct, flags);
+    shiftchars(i, ct);
+}
+
+/**/
+mod_export void
+backdel(int ct, int flags)
+{
+    if (flags & CUT_RAW) {
+	if (zlemetaline != NULL) {
+	    shiftchars(zlemetacs -= ct, ct);
+	} else {
+	    shiftchars(zlecs -= ct, ct);
+	}
+    } else {
+	int n = ct, origcs = zlecs;
+	DPUTS(zlemetaline != NULL, "backdel needs CUT_RAW when metafied");
+	while (n--)
+	    DECCS();
+	shiftchars(zlecs, origcs - zlecs);
+    }
+}
+
+/**/
+mod_export void
+foredel(int ct, int flags)
+{
+    if (flags & CUT_RAW) {
+	if (zlemetaline != NULL) {
+	    shiftchars(zlemetacs, ct);
+	} else if (flags & CUT_RAW) {
+	    shiftchars(zlecs, ct);
+	}
+    } else {
+	int origcs = zlecs;
+	int n = ct;
+	DPUTS(zlemetaline != NULL, "backdel needs CUT_RAW when metafied");
+	while (n--)
+	    INCCS();
+	ct = zlecs - origcs;
+	zlecs = origcs;
 	shiftchars(zlecs, ct);
+    }
 }
 
 /**/
@@ -578,7 +631,7 @@ setline(char *s, int flags)
     zleline = stringaszleline(scp, 0, &zlell, &linesz, NULL);
 
     if ((flags & ZSL_TOEND) && (zlecs = zlell) && invicmdmode())
-	zlecs--;
+	DECCS();
     else if (zlecs > zlell)
 	zlecs = zlell;
 
@@ -1035,7 +1088,7 @@ unapplychange(struct change *ch)
     }
     zlecs = ch->off;
     if(ch->ins)
-	foredel(ch->insl);
+	foredel(ch->insl, CUT_RAW);
     if(ch->del) {
 	spaceinline(ch->dell);
 	ZS_memcpy(zleline + zlecs, ch->del, ch->dell);
@@ -1075,7 +1128,7 @@ applychange(struct change *ch)
     }
     zlecs = ch->off;
     if(ch->del)
-	foredel(ch->dell);
+	foredel(ch->dell, CUT_RAW);
     if(ch->ins) {
 	spaceinline(ch->insl);
 	ZS_memcpy(zleline + zlecs, ch->ins, ch->insl);

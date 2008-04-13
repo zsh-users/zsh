@@ -32,6 +32,112 @@
 
 static int vimarkcs[27], vimarkline[27];
 
+#ifdef MULTIBYTE_SUPPORT
+/*
+ * Take account of combining characters when moving left.  If
+ * we are on a zero-width printable wide character and are
+ * treating these as part of the base character for display purposes,
+ * move left until we reach a non-zero-width printable character
+ * (the base character).  If we reach something else first, stay where we
+ * were.
+ *
+ * If setpos is non-zero, update zlecs on success.
+ * Return 1 if we were on a combining char and could move, else 0.
+ */
+/**/
+int
+alignmultiwordleft(int setpos)
+{
+    int loccs;
+
+    /* generic nothing to do test */
+    if (!isset(COMBININGCHARS) || zlecs == zlell || zlecs == 0)
+	return 0;
+
+    /* need to be on zero-width punctuation character */
+    if (!iswpunct(zleline[zlecs]) || wcwidth(zleline[zlecs]) != 0)
+	 return 0;
+
+    /* yes, go left */
+    loccs = zlecs - 1;
+
+    for (;;) {
+	/* second test here is paranoia */
+	if (iswalnum(zleline[loccs]) && wcwidth(zleline[loccs]) > 0) {
+	    /* found start position */
+	    if (setpos)
+		zlecs = loccs;
+	    return 1;
+	} else if (!iswpunct(zleline[loccs]) ||
+		   wcwidth(zleline[loccs]) != 0) {
+	    /* no go */
+	    return 0;
+	}
+	/* combining char, keep going */
+	if (loccs-- == 0)
+	    return 0;
+    }
+}
+
+
+/*
+ * Same principle when moving right.  We need to check if
+ * alignmultiwordleft() would be successful in order to decide
+ * if we're on a combining character, and if so we move right to
+ * anything that isn't one.
+ */
+/**/
+int
+alignmultiwordright(int setpos)
+{
+    int loccs;
+
+    /*
+     * Are we on a suitable character?
+     */
+    if (!alignmultiwordleft(0))
+	return 0;
+
+    /* yes, go right */
+    loccs = zlecs + 1;
+
+    while (loccs < zlell) {
+	/* Anything other than a combining char will do here */
+	if (!iswpunct(zleline[loccs]) || wcwidth(zleline[loccs]) != 0) {
+	    if (setpos)
+		zlecs = loccs;
+	    return 1;
+	}
+	loccs++;
+    }
+
+    zlecs = zlell;
+    return 1;
+}
+
+
+/* Move cursor right, checking for combining characters */
+
+/**/
+mod_export void
+inccs(void)
+{
+    zlecs++;
+    alignmultiwordright(1);
+}
+
+
+/* Move cursor left, checking for combining characters */
+
+/**/
+mod_export void
+deccs(void)
+{
+    zlecs--;
+    alignmultiwordleft(1);
+}
+#endif
+
 /**/
 int
 beginningofline(char **args)
@@ -157,25 +263,43 @@ endoflinehist(char **args)
 
 /**/
 int
-forwardchar(UNUSED(char **args))
+forwardchar(char **args)
 {
-    zlecs += zmult;
-    if (zlecs > zlell)
-	zlecs = zlell;
-    if (zlecs < 0)
-	zlecs = 0;
+    int n = zmult;
+
+    if (n < 0) {
+	int ret;
+	zmult = -n;
+	ret = backwardchar(args);
+	zmult = n;
+	return ret;
+    }
+
+    /*
+     * If handling combining characters with the base character,
+     * we skip over the whole set in one go, so need to check.
+     */
+    while (zlecs < zlell && n--)
+	INCCS();
     return 0;
 }
 
 /**/
 int
-backwardchar(UNUSED(char **args))
+backwardchar(char **args)
 {
-    zlecs -= zmult;
-    if (zlecs > zlell)
-	zlecs = zlell;
-    if (zlecs < 0)
-	zlecs = 0;
+    int n = zmult;
+
+    if (n < 0) {
+	int ret;
+	zmult = -n;
+	ret = forwardchar(args);
+	zmult = n;
+	return ret;
+    }
+
+    while (zlecs > 0 && n--)
+	DECCS();
     return 0;
 }
 
@@ -216,17 +340,21 @@ exchangepointandmark(UNUSED(char **args))
 int
 vigotocolumn(UNUSED(char **args))
 {
-    int x, y;
+    int x, y, n = zmult;
 
     findline(&x, &y);
-    if (zmult >= 0)
-	zlecs = x + zmult - (zmult > 0);
-    else
-	zlecs = y + zmult;
-    if (zlecs > y)
-	zlecs = y;
-    if (zlecs < x)
+    if (n >= 0) {
+	if (n)
+	    n--;
 	zlecs = x;
+	while (zlecs < y && n--)
+	    INCCS();
+    } else {
+	zlecs = y;
+	n = -n;
+	while (zlecs > x && n--)
+	    DECCS();
+    }
     return 0;
 }
 
@@ -286,7 +414,7 @@ vimatchbracket(UNUSED(char **args))
 	zlecs = ocs;
 	return 1;
     } else if(dir > 0 && virangeflag)
-	zlecs++;
+	INCCS();
     return 0;
 }
 
@@ -307,7 +435,7 @@ viforwardchar(char **args)
     if (zlecs >= lim)
 	return 1;
     while (n-- && zlecs < lim)
-	zlecs++;
+	INCCS();
     return 0;
 }
 
@@ -326,9 +454,9 @@ vibackwardchar(char **args)
     }
     if (zlecs == findbol())
 	return 1;
-    while (n--) {
-	zlecs--;
-	if (zlecs < 0 || zleline[zlecs] == '\n') {
+    while (n-- && zlecs > 0) {
+	DECCS();
+	if (zleline[zlecs] == '\n') {
 	    zlecs++;
 	    break;
 	}
@@ -432,7 +560,10 @@ virepeatfind(char **args)
     }
     while (n--) {
 	do {
-	    zlecs += vfinddir;
+	    if (vfinddir > 0)
+		INCCS();
+	    else
+		DECCS();
 	} while (zlecs >= 0 && zlecs < zlell
 	    && (ZLE_INT_T)zleline[zlecs] != vfindchar
 	    && zleline[zlecs] != ZWC('\n'));
@@ -441,9 +572,12 @@ virepeatfind(char **args)
 	    return 1;
 	}
     }
-    zlecs += tailadd;
+    if (tailadd > 0)
+	INCCS();
+    else if (tailadd < 0)
+	DECCS();
     if (vfinddir == 1 && virangeflag)
-	zlecs++;
+	INCCS();
     return 0;
 }
 
@@ -471,7 +605,7 @@ vifirstnonblank(UNUSED(char **args))
 {
     zlecs = findbol();
     while (zlecs != zlell && ZC_iblank(zleline[zlecs]))
-	zlecs++;
+	INCCS();
     return 0;
 }
 

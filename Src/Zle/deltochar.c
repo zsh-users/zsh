@@ -46,10 +46,11 @@ deltochar(UNUSED(char **args))
 	    while (dest != zlell && (ZLE_INT_T)zleline[dest] != c)
 		dest++;
 	    if (dest != zlell) {
+		/* HERE adjust dest for trailing combining chars */
 		if (!zap || n > 0)
-		    dest++;
+		    INCCS();
 		if (!n) {
-		    forekill(dest - zlecs, 0);
+		    forekill(dest - zlecs, CUT_RAW);
 		    ok++;
 		}
 	    }
@@ -63,7 +64,8 @@ deltochar(UNUSED(char **args))
 		dest--;
 	    if ((ZLE_INT_T)zleline[dest] == c) {
 		if (!n) {
-		    backkill(zlecs - dest - zap, 1);
+		    /* HERE adjust zap for trailing combining chars */
+		    backkill(zlecs - dest - zap, CUT_RAW|CUT_FRONT);
 		    ok++;
 		}
 		if (dest)

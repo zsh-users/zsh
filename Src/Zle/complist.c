@@ -2052,7 +2052,7 @@ setmstatus(char *status, char *sline, int sll, int scs,
             s[lastend - zlemetacs] = '\0';
         }
         zlemetacs = 0;
-        foredel(zlemetall);
+        foredel(zlemetall, CUT_RAW);
         spaceinline(sll);
         memcpy(zlemetaline, sline, sll);
         zlemetacs = scs;
@@ -2298,7 +2298,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	     */
             mode = MM_INTER;
             zlemetacs = 0;
-            foredel(zlemetall);
+            foredel(zlemetall, CUT_RAW);
             spaceinline(l);
             strncpy(zlemetaline, origline, l);
             zlemetacs = origcs;
@@ -2501,7 +2501,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		 */
                 mode = MM_INTER;
                 zlemetacs = 0;
-                foredel(zlemetall);
+                foredel(zlemetall, CUT_RAW);
                 spaceinline(l);
                 strncpy(zlemetaline, origline, l);
                 zlemetacs = origcs;
@@ -2560,7 +2560,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		 * characters typed by the user.
 		 */
                 zlemetacs = 0;
-                foredel(zlemetall);
+                foredel(zlemetall, CUT_RAW);
                 spaceinline(l);
                 strncpy(zlemetaline, origline, l);
                 zlemetacs = origcs;
@@ -2701,7 +2701,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 
 	    handleundo();
 	    zlemetacs = 0;
-	    foredel(zlemetall);
+	    foredel(zlemetall, CUT_RAW);
 	    spaceinline(l = strlen(u->line));
 	    strncpy(zlemetaline, u->line, l);
 	    zlemetacs = u->cs;
@@ -3090,7 +3090,7 @@ domenuselect(Hookdef dummy, Chdata dat)
                 origcs = modecs;
                 origll = modell;
                 zlemetacs = 0;
-                foredel(zlemetall);
+                foredel(zlemetall, CUT_RAW);
                 spaceinline(origll);
                 strncpy(zlemetaline, origline, origll);
                 zlemetacs = origcs;

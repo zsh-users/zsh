@@ -349,7 +349,7 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     if (makecomplist(s, incmd, lst)) {
 	/* Error condition: feeeeeeeeeeeeep(). */
 	zlemetacs = 0;
-	foredel(zlemetall);
+	foredel(zlemetall, CUT_RAW);
 	inststr(origline);
 	zlemetacs = origcs;
 	clearlist = 1;
@@ -381,7 +381,7 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     } else if (!useline && uselist) {
 	/* All this and the guy only wants to see the list, sigh. */
 	zlemetacs = 0;
-	foredel(zlemetall);
+	foredel(zlemetall, CUT_RAW);
 	inststr(origline);
 	zlemetacs = origcs;
 	showinglist = -2;
@@ -429,7 +429,7 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	if (forcelist)
 	    clearlist = 1;
 	zlemetacs = 0;
-	foredel(zlemetall);
+	foredel(zlemetall, CUT_RAW);
 	inststr(origline);
 	zlemetacs = origcs;
     }
@@ -519,7 +519,7 @@ after_complete(UNUSED(Hookdef dummy), int *dat)
 	    if (ret >= 2) {
 		fixsuffix();
 		zlemetacs = 0;
-		foredel(zlemetall);
+		foredel(zlemetall, CUT_RAW);
 		inststr(origline);
 		zlemetacs = origcs;
 		if (ret == 2) {
