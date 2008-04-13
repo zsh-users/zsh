@@ -1,3 +1,8 @@
+2008-04-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Miek Gieben: users/12781: Functions/Misc/zmv: too many
+	backslashes in Usage message.
+
 2008-04-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Frank Terbeck: 24807: Completion/compint: Completion system

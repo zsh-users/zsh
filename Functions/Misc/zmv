@@ -148,7 +148,7 @@ if (( $# != 2 )); then
   %N [OPTIONS] oldpattern newpattern
 where oldpattern contains parenthesis surrounding patterns which will
 be replaced in turn by \$1, \$2, ... in newpattern.  For example,
-  %N '(*).lis' '\\\\\$1.txt'
+  %N '(*).lis' '\$1.txt'
 renames 'foo.lis' to 'foo.txt', 'my.old.stuff.lis' to 'my.old.stuff.txt',
 and so on.  Something simpler (for basic commands) is the -W option:
   %N -W '*.lis' '*.txt'
