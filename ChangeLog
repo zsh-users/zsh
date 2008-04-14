@@ -1,5 +1,8 @@
 2008-04-14  Peter Stephenson  <pws@csr.com>
 
+	* 24814: Src/hist.c: suspicious handling of temporary history
+	buffer.
+
 	* 24811: Doc/Zsh/roadmap.yo, Etc/FAQ.yo: update introductory
 	documentation on multibyte support.
 

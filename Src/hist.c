@@ -2214,6 +2214,7 @@ savehistfile(char *fn, int err, int writeflags)
 #endif
 	     && sb.st_uid != euid) {
 		free(tmpfile);
+		tmpfile = NULL;
 		if (err) {
 		    if (isset(APPENDHISTORY) || isset(INCAPPENDHISTORY)
 		     || isset(SHAREHISTORY))
@@ -2292,6 +2293,7 @@ savehistfile(char *fn, int err, int writeflags)
 		if (rename(tmpfile, unmeta(fn)) < 0)
 		    zerr("can't rename %s.new to $HISTFILE", fn);
 		free(tmpfile);
+		tmpfile = NULL;
 	    }
 
 	    if (writeflags & HFILE_SKIPOLD
@@ -2317,12 +2319,13 @@ savehistfile(char *fn, int err, int writeflags)
 	ret = -1;
 
     if (ret < 0 && err) {
-	if (tmpfile) {
+	if (tmpfile)
 	    zerr("failed to write history file %s.new: %e", fn, errno);
-	    free(tmpfile);
-	} else
+	else
 	    zerr("failed to write history file %s: %e", fn, errno);
     }
+    if (tmpfile)
+	free(tmpfile);
 
     unlockhistfile(fn);
 }
