@@ -1,3 +1,9 @@
+2008-04-14  Peter Stephenson  <pws@csr.com>
+
+	* 24810 (slightly edited to move added text later):
+	Src/Zle/zle_tricky.c: after unmetafying the command line ensure
+	we're not on a combining character.
+
 2008-04-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24808: Doc/Zsh/options.yo, Src/options.c, Src/utils.c, Src/zsh.h,
