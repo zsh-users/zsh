@@ -56,6 +56,8 @@ doinsert(ZLE_STRING_T zstr, int len)
 	    zleline[zlecs++] = *s;
     if(neg)
 	zlecs += zmult * len;
+    /* if we ended up on a combining character, skip over it */
+    CCRIGHT();
 }
 
 /**/

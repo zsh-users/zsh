@@ -980,14 +980,11 @@ unmetafy_line(void)
 
     free(zlemetaline);
     zlemetaline = NULL;
-
-#ifdef MULTIBYTE_SUPPORT
     /*
      * If we inserted combining characters under the cursor we
      * won't have tested the effect yet.  So fix it up now.
      */
-    alignmultiwordright(1);
-#endif
+    CCRIGHT();
 }
 
 /* Free a brinfo list. */

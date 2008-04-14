@@ -756,10 +756,12 @@ zle_setline(Histent he)
 	ZS_memcpy(zleline, he->zle_text, zlell);
 
 	if ((zlecs = zlell) && invicmdmode())
-	    zlecs--;
+	    DECCS();
     } else {
 	setline(he->node.nam, ZSL_COPY|ZSL_TOEND);
     }
+    /* Move right if we're on a zero-width combining character */
+    CCRIGHT();
     setlastline();
     clearlist = 1;
 }
@@ -1548,6 +1550,7 @@ historybeginningsearchbackward(char **args)
 		zletextfree(&zt);
 		zle_setline(he);
 		zlecs = cpos;
+		CCRIGHT();
 		return 0;
 	    }
 	}
@@ -1588,6 +1591,7 @@ historybeginningsearchforward(char **args)
 		zletextfree(&zt);
 		zle_setline(he);
 		zlecs = cpos;
+		CCRIGHT();
 		return 0;
 	    }
 	}
