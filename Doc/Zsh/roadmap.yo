@@ -44,6 +44,13 @@ variables (referred to in the documentation as parameters) tt(HISTFILE),
 tt(HISTSIZE) and tt(SAVEHIST) in ifzman(zmanref(zshparam))\
 ifnzman(noderef(Parameters Used By The Shell)).
 
+The shell now supports the UTF-8 character set (and also others if
+supported by the operating system).  This is (mostly) handled transparently
+by the shell, but the degree of support in terminal emulators is variable.
+There is some discussion of this in the shell FAQ,
+http://zsh.dotsrc.org/FAQ/ .  Note in particular that for combining
+characters to be handled the option tt(COMBINING_CHARS) needs to be set.
+
 subsect(Completion)
 
 Completion is a feature present in many shells. It allows the user to

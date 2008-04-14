@@ -126,11 +126,11 @@ Chapter 4:  The mysteries of completion
 4.5. How do I get started with programmable completion?
 4.6. Suppose I want to complete all files during a special completion?
 
-Chapter 5:  Multibyte input
+Chapter 5:  Multibyte input and output
 
 5.1. What is multibyte input?
-5.2. How does zsh handle multibyte input?
-5.3. How do I ensure multibyte input works on my system?
+5.2. How does zsh handle multibyte input and output?
+5.3. How do I ensure multibyte input and output work on my system?
 5.4. How can I input characters that aren't on my keyboard?
 
 Chapter 6:  The future of zsh
@@ -1961,7 +1961,7 @@ sect(Suppose I want to complete all files during a special completion?)
   such as expansion or approximate completion.
 
 
-chapter(Multibyte input)
+chapter(Multibyte input and output)
 label(c5)
 
 sect(What is multibyte input?)
@@ -2012,7 +2012,7 @@ sect(What is multibyte input?)
   in those formats.)
 
 
-sect(How does zsh handle multibyte input?)
+sect(How does zsh handle multibyte input and output?)
 
   Until version 4.3, zsh didn't handle multibyte input properly at all.
   Each octet in a multibyte character would look to the shell like a
@@ -2021,50 +2021,44 @@ sect(How does zsh handle multibyte input?)
   cause all sorts of odd effects.  (It was possible to edit in zsh using
   single-byte extensions of ASCII such as the ISO 8859 family, however.)
 
-  From version 4.3, multibyte input is handled in the line editor if zsh
-  has been compiled with the appropriate definitions.  This will happen
-  automatically if the compiler defines __STDC_ISO_10646__, which is true
-  for many recent GNU-based systems.  On other systems you must configure
-  zsh with the argument --enable-multibyte to configure.  Explicit use of
-  --enable-multibyte should work on many other recent UNIX systems; if it
-  works on yours, and that's not mentioned in the shell documentation,
-  please report this to zsh-workers@sunsite.dk, and if it doesn't but you
-  can work out why not we'd also be interested in hearing.
+  From version 4.3.4, multibyte input is handled in the line editor if zsh
+  has been compiled with the appropriate definitions, and is automatically
+  activated.  This is indicated by the option tt(MULTIBYTE), which is
+  set by default on shells that support multibyte mode.  Hence you
+  can test this with a standard option test:  `tt([[ -o multibyte ]])'.
 
-  (The reason for the test for __STDC_ISO_10646__ is that its presence
-  happens to indicate that the required library support is likely to be
-  present, short-circuiting a large number of configuration tests.  This
-  isn't strictly guaranteed, since the definition indicates the rather more
-  limited fact that the wide character representation used internally by
-  the shell is Unicode.  However, in practice such systems provide the
-  right level of support for zsh to use.  It would be better to test
-  individually for the library features the shell needs; unfortunately
-  there are a lot of them.)
+  The tt(MULTIBYTE) option affects the entire shell: parameter expansion,
+  pattern matching, etc. count valid multibyte character strings as a
+  single character.  You can unset the option locally in a function to
+  revert to single-byte operation.
 
-  You can test if multibyte handling is compiled into your version of the
-  shell by running:
-  verb(
-    (bindkey -m)
-  )
-  which should output a warning:
-  verb(
-    bindkey: warning: `bindkey -m' disables multibyte support
-  )
-  If it doesn't, you don't have multibyte support in your shell.  The
-  parentheses are there to run the command in a subshell, which protects
-  your interactive shell from the effects being warned about.
+  Note that if the shell is emulating a Bourne shell the tt(MULTIBYTE)
+  option is unset by default.  This allows various POSIX modes to
+  work normally (POSIX does not deal with multibyte characters).  If
+  you use a "sh" or "ksh" emulation interactively you shouldprobably
+  set the tt(MULTIBYTE) option.
 
-  Multibyte strings are not yet handled anywhere else in the shell.  This
-  means, for example, patterns treat multibyte characters as a set of single
-  octets and the ${#var} syntax counts octets, not characters.  There will
-  probably be new syntax to ensure that zsh can work both in its traditional
-  way as well as when interpreting multibyte characters.
+  The other option that affects multibyte support is tt(COMBINING_CHARS),
+  new in version 4.3.7.  When this is set, any zero-length punctuation
+  characters that follow an alphanumeric character (the base character) are
+  assumed to be modifications (accents etc.) to the base character and to
+  be displayed within the same screen area as the base character.  As not
+  all terminals handle this, even if they correctly display the base
+  multibyte character, this option is not on by default.  The KDE terminal
+  emulator tt(konsole) is known to handle combining characters.
+
+  The tt(COMBINING_CHARS) option only affects output; combining characters
+  may always be input, but when the option is off will be displayed
+  specially.  By default this is as a code point (the index of the
+  character in the character set) between angle brackets, usually
+  in inverse video.  Highlighting of such special characters can
+  be modified using the new array parameter tt(zle_highlight).
 
 
-sect(How do I ensure multibyte input works on my system?)
+sect(How do I ensure multibyte input and output work on my system?)
 
   Once you have a version of zsh with multibyte support, you need to
-  ensure the envivronment is correct.  We'll assume you're using UTF-8.
+  ensure the environment is correct.  We'll assume you're using UTF-8.
   Many modern systems may come set up correctly already.  Try one of
   the editing widgets described in the next section to see.
 
@@ -2162,6 +2156,9 @@ url(http://www.unicode.org/charts/)(http://www.unicode.org/charts/).
   correct and the character selected exists in the current character set;
   however, using UTF-8 massively extends the number of valid characters
   that can be produced.
+
+  See also url(http://www.cl.cam.ac.uk/~mgk25/unicode.html#input)http://www.cl.cam.ac.uk/~mgk25/unicode.html#input)
+  for general information on entering Unicode characters from a keyboard.
 
 
 chapter(The future of zsh)
