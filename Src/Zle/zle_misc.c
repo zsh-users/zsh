@@ -196,23 +196,66 @@ backwardkillline(char **args)
     return 0;
 }
 
+#ifdef MULTIBYTE_SUPPORT
+/*
+ * Transpose the chunk of the line from start to middle with
+ * that from middle to end.
+ */
+
+static void
+transpose_swap(int start, int middle, int end)
+{
+    int len1, len2;
+    ZLE_STRING_T first;
+
+    len1 = middle - start;
+    len2 = end - middle;
+
+    first = (ZLE_STRING_T)zalloc(len1 * ZLE_CHAR_SIZE);
+    ZS_memcpy(first, zleline + start, len1);
+    /* Move may be overlapping... */
+    ZS_memmove(zleline + start, zleline + middle, len2);
+    ZS_memcpy(zleline + start + len2, first, len1);
+    zfree(first, len1 * ZLE_CHAR_SIZE);
+}
+#endif
+
 /**/
 int
 gosmacstransposechars(UNUSED(char **args))
 {
-    int cc;
-
     if (zlecs < 2 || zleline[zlecs - 1] == '\n' || zleline[zlecs - 2] == '\n') {
-	if (zlecs == zlell || zleline[zlecs] == '\n' ||
-	    ((zlecs + 1 == zlell || zleline[zlecs + 1] == '\n') &&
-	     (!zlecs || zleline[zlecs - 1] == '\n'))) {
+	int twice = (zlecs == 0 || zleline[zlecs - 1] == '\n');
+
+	if (zlecs == zlell || zleline[zlecs] == '\n')
 	    return 1;
+
+	INCCS();
+	if (twice) {
+	    if (zlecs == zlell || zleline[zlecs] == '\n')
+		return 1;
+	    INCCS();
 	}
-	zlecs += (zlecs == 0 || zleline[zlecs - 1] == '\n') ? 2 : 1;
     }
-    cc = zleline[zlecs - 2];
-    zleline[zlecs - 2] = zleline[zlecs - 1];
-    zleline[zlecs - 1] = cc;
+#ifdef MULTIBYTE_SUPPORT
+    {
+	int start, middle;
+
+	middle = zlecs;
+	DECPOS(middle);
+
+	start = middle;
+	DECPOS(start);
+
+	transpose_swap(start, middle, zlecs);
+    }
+#else
+    {
+	ZLE_CHAR_T cc = zleline[zlecs - 2];
+	zleline[zlecs - 2] = zleline[zlecs - 1];
+	zleline[zlecs - 1] = cc;
+    }
+#endif
     return 0;
 }
 
@@ -220,7 +263,7 @@ gosmacstransposechars(UNUSED(char **args))
 int
 transposechars(UNUSED(char **args))
 {
-    int cc, ct;
+    int ct;
     int n = zmult;
     int neg = n < 0;
 
@@ -231,26 +274,43 @@ transposechars(UNUSED(char **args))
 	    if (zlell == zlecs || zleline[zlecs] == '\n')
 		return 1;
 	    if (!neg)
-		zlecs++;
-	    ct++;
+		INCCS();
+	    INCPOS(ct);
 	}
 	if (neg) {
 	    if (zlecs && zleline[zlecs - 1] != '\n') {
-		zlecs--;
-		if (ct > 1 && zleline[ct - 2] != '\n')
-		    ct--;
+		DECCS();
+		if (ct > 1 && zleline[ct - 2] != '\n') {
+		    DECPOS(ct);
+		}
 	    }
 	} else {
 	    if (zlecs != zlell && zleline[zlecs] != '\n')
-		zlecs++;
+		INCCS();
 	}
-	if (ct == zlell || zleline[ct] == '\n')
-	    ct--;
+	if (ct == zlell || zleline[ct] == '\n') {
+	    DECPOS(ct);
+	}
 	if (ct < 1 || zleline[ct - 1] == '\n')
 	    return 1;
-	cc = zleline[ct - 1];
-	zleline[ct - 1] = zleline[ct];
-	zleline[ct] = cc;
+#ifdef MULTIBYTE_SUPPORT
+	{
+	    /*
+	     * We should keep any accents etc. on their original characters.
+	     */
+	    int start = ct, end = ct;
+	    DECPOS(start);
+	    INCPOS(end);
+
+	    transpose_swap(start, ct, end);
+	}
+#else
+	{
+	    ZLE_CHAR_T cc = zleline[ct - 1];
+	    zleline[ct - 1] = zleline[ct];
+	    zleline[ct] = cc;
+	}
+#endif
     }
     return 0;
 }

@@ -1,3 +1,10 @@
+2008-04-15  Peter Stephenson  <pws@csr.com>
+
+	* : Src/Zle/zle.h, Src/Zle/zle_misc.c, Src/Zle/zle_move.c,
+	Src/Zle/zle_utils.c: need to fix up combining character aligment
+	in case of sneaky combination generation; fix transposing
+	characters.
+
 2008-04-14  Peter Stephenson  <pws@csr.com>
 
 	* 24816: Src/Zle/zle_hist.c, Src/Zle/zle_misc.c,

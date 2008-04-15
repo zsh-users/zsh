@@ -551,6 +551,7 @@ backkill(int ct, int flags)
 
     cut(i, ct, flags);
     shiftchars(i, ct);
+    CCRIGHT();
 }
 
 /**/
@@ -569,6 +570,7 @@ forekill(int ct, int flags)
 
     cut(i, ct, flags);
     shiftchars(i, ct);
+    CCRIGHT();
 }
 
 /**/
@@ -588,6 +590,7 @@ backdel(int ct, int flags)
 	    DECCS();
 	shiftchars(zlecs, origcs - zlecs);
     }
+    CCRIGHT();
 }
 
 /**/
@@ -603,13 +606,14 @@ foredel(int ct, int flags)
     } else {
 	int origcs = zlecs;
 	int n = ct;
-	DPUTS(zlemetaline != NULL, "backdel needs CUT_RAW when metafied");
+	DPUTS(zlemetaline != NULL, "foredel needs CUT_RAW when metafied");
 	while (n--)
 	    INCCS();
 	ct = zlecs - origcs;
 	zlecs = origcs;
 	shiftchars(zlecs, ct);
     }
+    CCRIGHT();
 }
 
 /**/
@@ -634,6 +638,7 @@ setline(char *s, int flags)
 	DECCS();
     else if (zlecs > zlell)
 	zlecs = zlell;
+    CCRIGHT();
 
     if (flags & ZSL_COPY)
 	free(scp);

@@ -75,14 +75,19 @@ typedef wint_t   ZLE_INT_T;
 #define LASTFULLCHAR_T  ZLE_INT_T
 
 /* We may need to handle combining character alignment */
-#define CCLEFT()	alignmultiwordleft(1)
-#define CCRIGHT()	alignmultiwordright(1)
+#define CCLEFT()	alignmultiwordleft(&zlecs, 1)
+#define CCRIGHT()	alignmultiwordright(&zlecs, 1)
 /*
  * Increment or decrement the cursor position, skipping over
  * combining characters.
  */
 #define INCCS()		inccs()
 #define DECCS()		deccs()
+/*
+ * Same for any other position.
+ */
+#define INCPOS(pos)	incpos(&pos)
+#define DECPOS(pos)	decpos(&pos)
 
 #else  /* Not MULTIBYTE_SUPPORT: old single-byte code */
 
@@ -151,6 +156,11 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
  */
 #define INCCS()		((void)(zlecs++))
 #define DECCS()		((void)(zlecs--))
+/*
+ * Same for any other position.
+ */
+#define INCPOS(pos)	((void)(pos++))
+#define DECPOS(pos)	((void)(pos--))
 
 #endif
 

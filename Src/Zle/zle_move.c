@@ -46,27 +46,27 @@ static int vimarkcs[27], vimarkline[27];
  */
 /**/
 int
-alignmultiwordleft(int setpos)
+alignmultiwordleft(int *pos, int setpos)
 {
-    int loccs;
+    int loccs = *pos;
 
     /* generic nothing to do test */
-    if (!isset(COMBININGCHARS) || zlecs == zlell || zlecs == 0)
+    if (!isset(COMBININGCHARS) || loccs == zlell || loccs == 0)
 	return 0;
 
     /* need to be on zero-width punctuation character */
-    if (!iswpunct(zleline[zlecs]) || wcwidth(zleline[zlecs]) != 0)
+    if (!iswpunct(zleline[loccs]) || wcwidth(zleline[loccs]) != 0)
 	 return 0;
 
     /* yes, go left */
-    loccs = zlecs - 1;
+    loccs--;
 
     for (;;) {
 	/* second test here is paranoia */
 	if (iswalnum(zleline[loccs]) && wcwidth(zleline[loccs]) > 0) {
 	    /* found start position */
 	    if (setpos)
-		zlecs = loccs;
+		*pos = loccs;
 	    return 1;
 	} else if (!iswpunct(zleline[loccs]) ||
 		   wcwidth(zleline[loccs]) != 0) {
@@ -88,30 +88,31 @@ alignmultiwordleft(int setpos)
  */
 /**/
 int
-alignmultiwordright(int setpos)
+alignmultiwordright(int *pos, int setpos)
 {
     int loccs;
 
     /*
      * Are we on a suitable character?
      */
-    if (!alignmultiwordleft(0))
+    if (!alignmultiwordleft(pos, 0))
 	return 0;
 
     /* yes, go right */
-    loccs = zlecs + 1;
+    loccs = *pos + 1;
 
     while (loccs < zlell) {
 	/* Anything other than a combining char will do here */
 	if (!iswpunct(zleline[loccs]) || wcwidth(zleline[loccs]) != 0) {
 	    if (setpos)
-		zlecs = loccs;
+		*pos = loccs;
 	    return 1;
 	}
 	loccs++;
     }
 
-    zlecs = zlell;
+    if (setpos)
+	*pos = loccs;
     return 1;
 }
 
@@ -123,7 +124,7 @@ mod_export void
 inccs(void)
 {
     zlecs++;
-    alignmultiwordright(1);
+    alignmultiwordright(&zlecs, 1);
 }
 
 
@@ -134,7 +135,26 @@ mod_export void
 deccs(void)
 {
     zlecs--;
-    alignmultiwordleft(1);
+    alignmultiwordleft(&zlecs, 1);
+}
+
+/* Same utilities for general position */
+
+/**/
+mod_export void
+incpos(int *pos)
+{
+    (*pos)++;
+    alignmultiwordright(pos, 1);
+}
+
+
+/**/
+mod_export void
+decpos(int *pos)
+{
+    (*pos)--;
+    alignmultiwordleft(pos, 1);
 }
 #endif
 
